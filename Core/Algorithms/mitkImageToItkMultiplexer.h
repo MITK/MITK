@@ -173,3 +173,17 @@ MakeCastImageFilter(  ItkInputImageType* inputImage )
       _calculateMitkToItkPipelineFunction(resultItkImage, resultItkImageType, mitkSourceImage, itkfunction, unsigned char,  inputDimension)         \
   }                                                                                                    \
 }
+
+namespace mitk 
+{
+  template <typename ItkOutputImageType> void CastToItkImage(mitk::Image * mitkimage, typename itk::SmartPointer<ItkOutputImageType>& itkoutputimage)
+  {
+    FixedInputDimensionMitkToItkFunctionMultiplexer(itkoutputimage, ItkOutputImageType, mitkimage, ItkOutputImageType::ImageDimension, MakeCastImageFilter);
+  }
+
+  template <typename ItkOutputImageType> void CastToMitkImage(itk::SmartPointer<ItkOutputImageType>& itkimage, itk::SmartPointer<mitk::Image>& mitkoutputimage)
+  {
+    mitkoutputimage->InitializeByItk(itkimage.GetPointer());
+    mitkoutputimage->SetVolume(itkimage->GetBufferPointer());
+  }
+}

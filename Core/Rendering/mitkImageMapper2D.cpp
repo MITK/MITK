@@ -8,6 +8,8 @@
 #include "DataTreeNode.h"
 
 #include "mitkLookupTableProperty.h"
+#include "mitkBoolProperty.h"
+#include "mitkLevelWindowProperty.h"
 
 #include "mitkRenderWindow.h"
 #include "mitkAbstractTransformGeometry.h"
@@ -310,8 +312,25 @@ void mitk::ImageMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
 		image->setColors(LookupTable->GetLookupTable().GetRawLookupTable());
 	}
   
+  mitk::BoolProperty::Pointer binary;
+  binary = dynamic_cast<mitk::BoolProperty*>(this->GetDataTreeNode()->GetProperty("binary").GetPointer());
+	
+  mitk::LevelWindowProperty::Pointer overwriteLevelWindow;
+  overwriteLevelWindow = dynamic_cast<mitk::LevelWindowProperty*>(this->GetDataTreeNode()->GetProperty("levelWindow").GetPointer());
+	
+  if (binary.IsNotNull() )
+  {
+    image->setExtrema(0, 1);
+  }
+  else if (overwriteLevelWindow.IsNotNull() )
+  {
+    image->setExtrema(overwriteLevelWindow->GetLevelWindow().GetMin(), overwriteLevelWindow->GetLevelWindow().GetMax());
+  }
+  else 
+  {
   // set the properties
-  image->setExtrema(levelWindow.GetMin(), levelWindow.GetMax());
+    image->setExtrema(levelWindow.GetMin(), levelWindow.GetMax());
+  }
 //  image->setColor(rgba[0], rgba[1], rgba[2], rgba[3]);
 }
 

@@ -13,6 +13,8 @@
 
 #include <itkRegionOfInterestImageFilter.h>
 #include "itkImageRegionIteratorWithIndex.h"
+#include "itkConfidenceConnectedImageFilter.h"
+#include <itkMultiplyImageFilter.h>
 
 namespace mitk {
 
@@ -36,6 +38,9 @@ public:
   typedef ItkRegionOfInterestFilterType::InputImageRegionType ItkRegionType;
   typedef itk::ImageRegionIteratorWithIndex< ItkImageType > ItkImageIteratorType;
   typedef itk::ImageFileWriter<ItkImageType> ItkImageWriter;
+          
+  typedef itk::ConfidenceConnectedImageFilter<ItkImageType, ItkImageType> ConnectedFilterType;
+  typedef  itk::MultiplyImageFilter< ItkImageType, ItkImageType, ItkImageType > MultiplyImageFilterType;
 
   mitkClassMacro(BoundingObjectCutter, ImageToImageFilter);
   itkNewMacro(Self);
@@ -60,7 +65,7 @@ public:
 
   itkBooleanMacro(UseInsideValue);
   
-  ItkImageType::Pointer m_ItkImage;
+  //ItkImageType::Pointer m_ItkImage;
 protected:
   BoundingObjectCutter();
   virtual ~BoundingObjectCutter();

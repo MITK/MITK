@@ -19,32 +19,17 @@ mitk::BoundingObjectCutter::~BoundingObjectCutter()
 {
 }
 
-//void mitk::BoundingObjectCutter::SetBoundingObject(mitk::Ellipsoid* _arg)
-//{  
-//  if (m_BoundingObject != _arg)
-//    _arg = _arg;
-//}
-//const mitk::Ellipsoid* mitk::BoundingObjectCutter::GetBoundingObject()
-//{
-//  return m_BoundingObject.GetPointer();
-//}
-
 /**
  * \todo check if this is no conflict to the ITK filter writing rules -> ITK SoftwareGuide p.512
  */  
 void mitk::BoundingObjectCutter::GenerateOutputInformation()
 {
-
   itkDebugMacro(<<"GenerateOutputInformation()");
-
   //if(input.IsNull()) return;
-
 }
 
 void mitk::BoundingObjectCutter::GenerateData()
 {
-  itkDebugMacro(<<"GenerateData()");
-
   if(m_BoundingObject.IsNull())
     return;  // return empty image/source image?
 
@@ -65,7 +50,6 @@ void mitk::BoundingObjectCutter::GenerateData()
     std::cout << " image is NULL...returning" << std::endl;
     return; // return and do nothing in case of failure
   }
-
   // calculate region of interest
   m_BoundingObject->UpdateOutputInformation();
   mitk::BoundingBox::Pointer boundingBox = const_cast<mitk::BoundingBox*>(m_BoundingObject->GetGeometry()->GetBoundingBox());
@@ -73,9 +57,9 @@ void mitk::BoundingObjectCutter::GenerateData()
   const mitk::BoundingBox::PointType maxPoint = boundingBox->GetMaximum();
   float* posPoint = m_BoundingObject->GetGeometry()->GetVtkTransform()->GetPosition();
   ItkImageType::IndexType start;
-  start[0] = posPoint[0] + minPoint[0]; // first index on X
-  start[1] = posPoint[1] + minPoint[1]; // first index on Y
-  start[2] = posPoint[2] + minPoint[2]; // first index on Z
+  start[0] = posPoint[0] + minPoint[0] + 0.5; // first index on X
+  start[1] = posPoint[1] + minPoint[1] + 0.5; // first index on Y
+  start[2] = posPoint[2] + minPoint[2] + 0.5; // first index on Z
   ItkImageType::SizeType size;
   size[0] = maxPoint[0] - minPoint[0]; // size along X
   size[1] = maxPoint[1] - minPoint[1]; // size along Y
@@ -87,13 +71,10 @@ void mitk::BoundingObjectCutter::GenerateData()
   ItkRegionOfInterestFilterType::Pointer regionOfInterestFilter = ItkRegionOfInterestFilterType::New();
   regionOfInterestFilter->SetRegionOfInterest(regionOfInterest);
   regionOfInterestFilter->SetInput(itkImage);  
-  ItkImageType::Pointer itkImageCut = regionOfInterestFilter->GetOutput();
-  
+  ItkImageType::Pointer itkImageCut = regionOfInterestFilter->GetOutput();  
   itkImageCut->Update();  // Cut the region of interest out of the source image
 
   ItkImageIteratorType it(itkImageCut, itkImageCut->GetRequestedRegion());
-
-//  ItkImageType::IndexType index;
   mitk::ITKPoint3D p;
   if (GetUseInsideValue()) // use a fixed value for each inside pixel(create a binary mask of the bounding object)
     for (it.GoToBegin(); !it.IsAtEnd(); ++it)
@@ -107,26 +88,52 @@ void mitk::BoundingObjectCutter::GenerateData()
   else // no fixed value for inside, but the pixel value of the original image (normal cutting)
     for ( it.GoToBegin(); !it.IsAtEnd(); ++it)
     {    
-      // index in weltkoordinaten umrechnen und testen, ob IsInside() in boundingobject      
+      // transform to world coordinates and check if p is inside the bounding object
       itkImageCut->TransformIndexToPhysicalPoint(it.GetIndex(), p);
-      //p = ;
       if(!m_BoundingObject->IsInside(p))
         it.Value() = m_OutsideValue;
     }
+
+    std::cout << " cutting done, now starting region grower.\n";
+    // now start a regiongrowing filter
+    ConnectedFilterType::Pointer confidenceConnected = ConnectedFilterType::New();
+    confidenceConnected->SetInput( itkImageCut );
+    confidenceConnected->SetMultiplier( 1.78 );
+    confidenceConnected->SetNumberOfIterations( 5 );
+    confidenceConnected->SetReplaceValue( 10000 );
+    
+    // Set seedpoint to center of image
+    ItkImageType::IndexType index; 
+    index[0] = size[0] / 2.0;
+    index[1] = size[1] / 2.0;
+    index[2] = size[2] / 2.0;
+    confidenceConnected->SetSeed( index );
+    
+    confidenceConnected->SetInitialNeighborhoodRadius( 2 );
+  
+    //MultiplyImageFilterType::Pointer multiplyFilter = MultiplyImageFilterType::New();
+    //multiplyFilter->SetInput1(confidenceConnected->GetOutput());
+    //multiplyFilter->SetInput2(itkImageCut);
+
+    try
+    {
+      //multiplyFilter->Update();
+      confidenceConnected->Update();
+    }
+    catch( itk::ExceptionObject & excep )
+    {
+      std::cerr << "Exception while updating RegiongrowingFilter!" << std::endl;
+      std::cerr << excep << std::endl;
+    }
+
     // convert the itk image back to an mitk image and set it as outout for this filter
     mitk::Image::Pointer outputImage = this->GetOutput();
-    outputImage->InitializeByItk(itkImageCut.GetPointer());
-    outputImage->SetVolume(itkImageCut->GetBufferPointer());
+
+    //outputImage->InitializeByItk(multiplyFilter->GetOutput());
+    //outputImage->SetVolume(multiplyFilter->GetOutput()->GetBufferPointer());
+
+    outputImage->InitializeByItk(confidenceConnected->GetOutput());
+    outputImage->SetVolume(confidenceConnected->GetOutput()->GetBufferPointer());
+
     //this->GraftOutput(outputImage);
-    m_ItkImage = itkImageCut;
-
-    //ItkImageWriter::Pointer writer = ItkImageWriter::New();
-    //writer->SetInput(itkImageCut);
-    //writer->SetFileName("c:\\cutimage.vtk");
-    //writer->Update();
-
-    //CommonFunctionality::AddItkImageToDataTree(itkImageCut,	mitk::DataTreeIterator *  	  iterator, "ausgeschnittenes Bild")  	
 }
-
-
-

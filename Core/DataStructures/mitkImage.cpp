@@ -246,10 +246,11 @@ mitk::ImageDataItem::Pointer mitk::Image::GetChannelData(int n)
                 if(vol->GetParent()!=ch)
                 {
 				    // copy data of volume in channel
-				    memcpy(static_cast<char*>(ch->GetData())+vol->GetOffset(), vol->GetData(), size);
+					int offset = t*m_OffsetTable[3]*m_PixelType.GetBpe()/8;
+				    memcpy(static_cast<char*>(ch->GetData())+offset, vol->GetData(), size);
 
 				    // replace old volume with reference to channel
-				    vol=new ImageDataItem(*vol, 3, t*m_OffsetTable[3]*m_PixelType.GetBpe()/8);
+				    vol=new ImageDataItem(*vol, 3, offset);
 				    m_Volumes[posVol]=vol;
                 }
 			}

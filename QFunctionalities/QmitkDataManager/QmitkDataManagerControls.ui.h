@@ -168,7 +168,7 @@ void QmitkDataManagerControls::SaveButton_clicked()
           {
             selectedItemsName = itksys::SystemTools::GetFilenameWithoutExtension(selectedItemsName);
             selectedItemsName += ".mps";
-            QString fileName = QFileDialog::getSaveFileName(QString(selectedItemsName),"MITK Point-Sets (*.mps)");
+            QString fileName = QFileDialog::getSaveFileName(QString(selectedItemsName.c_str()),"MITK Point-Sets (*.mps)");
             if (fileName != NULL ) 
             {
               mitk::PointSetWriter::Pointer writer = mitk::PointSetWriter::New();

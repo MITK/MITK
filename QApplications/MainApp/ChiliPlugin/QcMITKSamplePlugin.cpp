@@ -12,7 +12,15 @@
 #include "QcMITKSamplePlugin.h"
 #include "mitkProperties.h"
 #include "mitkLevelWindowProperty.h"
+#include "mitkStringProperty.h"
 #include "ToolBar.h"
+
+#include "ipFunc.h"
+
+#include <crtdbg.h>
+
+
+QcPlugin* QcMITKSamplePlugin::s_PluginInstance = NULL;
 
 QcMITKSamplePlugin::QcMITKSamplePlugin( QWidget *parent )
   : QcPlugin( parent )
@@ -32,6 +40,7 @@ QcMITKSamplePlugin::QcMITKSamplePlugin( QWidget *parent )
    
   itkGenericOutputMacro(<<"hallo");
   
+  s_PluginInstance = this;
 }
 
 QString 
@@ -115,6 +124,46 @@ void QcMITKSamplePlugin::selectSerie (QcLightbox* lightbox)
   levWinProp->SetLevelWindow( levelwindow );
   node->GetPropertyList()->SetProperty( "levelwindow", levWinProp );
   node->SetProperty( "volumerendering", new mitk::BoolProperty( false ) );
+  node->SetProperty("LoadedFromChili", new mitk::BoolProperty( true ) );
+  node->SetProperty("name", new mitk::StringProperty( "1" ) );
+
+itkGenericOutputMacro(<<"before thresh: ");
+  ipPicDescriptor *cur, *tmp;
+  cur = ipFuncThresh( image->GetPic(), 100, NULL );
+itkGenericOutputMacro(<<"before convert: ");
+  cur = ipFuncConvert( cur, ipPicUInt, 8 );
+  if(cur!=NULL)
+  {
+    itkGenericOutputMacro(<<"before multc: ");
+      tmp = ipFuncMultC( cur, 100, ipFuncKeep, NULL );
+    itkGenericOutputMacro(<<"before free: ");
+      ipPicFree( cur );
+  ipPicPut("c:\\atest2.pic",cur); 
+      cur=tmp;
+    itkGenericOutputMacro(<<"after thresh: ");
+      mitk::Image::Pointer result = mitk::Image::New();
+      if(cur->dim>3) cur->dim=3;
+      result->Initialize(cur);
+      result->SetGeometry(static_cast<mitk::Geometry3D*>(image->GetGeometry()->Clone().GetPointer()));
+      result->SetPicVolume(cur);
+      int pos=it.ChildPosition(node);
+      if(pos<0) pos=0;
+      it.GoToChild( pos );
+    itkGenericOutputMacro(<<"after gotoch: "<<pos);
+      mitk::DataTreeNode::Pointer resultnode = mitk::DataTreeNode::New();
+      resultnode->SetData(result);
+    itkGenericOutputMacro(<<"before lv: ");
+      levelwindow.SetAuto( cur );
+      levWinProp->SetLevelWindow( levelwindow );
+      resultnode->GetPropertyList()->SetProperty( "levelwindow", levWinProp );
+itkGenericOutputMacro(<<"lv: "<<levelwindow.GetMin() <<" "<<levelwindow.GetMax());
+    itkGenericOutputMacro(<<"before vr: ");
+      resultnode->SetProperty( "volumerendering", new mitk::BoolProperty( false ) );
+    itkGenericOutputMacro(<<"before addr: ");
+      resultnode->SetProperty("name", new mitk::StringProperty( "2" ) );
+      it.Add(resultnode);
+    itkGenericOutputMacro(<<"done: ");
+  }
 
   ap->getMultiWidget()->texturizePlaneSubTree(&it);
   ap->getMultiWidget()->updateMitkWidgets();

@@ -67,7 +67,10 @@ class OpenGLRenderer : public BaseRenderer
 	virtual void UpdateVtkActors();
 
     VtkRenderWindow*  GetVtkRenderWindow(){ return  m_MitkVtkRenderWindow;}
-
+    
+    //##Documentation
+    //## @brief returns the vtk-renderer associated with the OpenGL renderer.
+    vtkRenderer * GetVtkRenderer(){return m_VtkRenderer;};
 
 protected:
     //##ModelId=3E33145B005A

@@ -36,7 +36,7 @@ public:
 
   virtual void initializeQfm();
 
-protected:
+//protected:
 
 		/*! 
 			\brief opens the specified file and initializes the application

@@ -137,11 +137,11 @@ void QmitkSimpleExampleFunctionality::initNavigators()
     if(timebounds[1]<mitk::ScalarTypeNumericTraits::max())
     {
       mitk::TimeSlicedGeometry::Pointer timegeometry = mitk::TimeSlicedGeometry::New();
-      timegeometry->Initialize(10);
+      mitk::ScalarType duration = timebounds[1]-timebounds[0];
+      timegeometry->Initialize(duration);
       timegeometry->SetTimeBoundsInMS(timebounds); //@bug really required?
       timegeometry->SetEvenlyTimed();
-      mitk::ScalarType duration = timebounds[1]-timebounds[0];
-      timebounds[1] = timebounds[0]+duration/10.0;
+      timebounds[1] = timebounds[0]+1.0f;
 
       timegeometry->SetGeometry3D(geometry, 0);
       geometry->SetTimeBoundsInMS(timebounds);

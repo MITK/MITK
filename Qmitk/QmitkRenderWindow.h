@@ -37,8 +37,12 @@ public:
   //##ModelId=3E1EB4410304
   QmitkRenderWindow(mitk::BaseRenderer* renderer, QGLFormat glf, QWidget *parent = 0, const char *name = 0);
 
+  QmitkRenderWindow(QGLFormat glf, QWidget *parent = 0, const char *name = 0);
+
   //##ModelId=3E1EB4410318
   QmitkRenderWindow(mitk::BaseRenderer* renderer, QWidget *parent = 0, const char *name = 0);
+
+  QmitkRenderWindow(QWidget *parent = 0, const char *name = 0);
 
   //##ModelId=3E1EB441032C
   virtual ~QmitkRenderWindow();
@@ -54,6 +58,8 @@ public:
   virtual void Update();
 
   virtual void Repaint();
+
+  virtual QSizePolicy sizePolicy() const;
 
 protected:
   //##ModelId=3E3314590396

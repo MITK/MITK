@@ -31,9 +31,25 @@ mitk::QmitkRenderWindow::QmitkRenderWindow(mitk::BaseRenderer* renderer, QGLForm
   setMouseTracking(true);
 }
 
+mitk::QmitkRenderWindow::QmitkRenderWindow(QGLFormat glf, QWidget *parent, const char *name) 
+  : QGLWidget(glf, parent, name), mitk::RenderWindow(name, NULL), m_InitNeeded(false), m_ResizeNeeded(false), m_InResize(false)
+{
+  InitRenderer();
+  setFocusPolicy(QWidget::StrongFocus);
+  setMouseTracking(true);
+}
+
 //##ModelId=3E1EB4410318
 mitk::QmitkRenderWindow::QmitkRenderWindow(mitk::BaseRenderer* renderer, QWidget *parent, const char *name)
 : QGLWidget(parent, name), mitk::RenderWindow(name, renderer), m_InitNeeded(false), m_ResizeNeeded(false), m_InResize(false)
+{
+  InitRenderer();
+  setFocusPolicy(QWidget::StrongFocus);
+  setMouseTracking(true);
+}
+
+mitk::QmitkRenderWindow::QmitkRenderWindow(QWidget *parent, const char *name)
+: QGLWidget(parent, name), mitk::RenderWindow(name, NULL), m_InitNeeded(false), m_ResizeNeeded(false), m_InResize(false)
 {
   InitRenderer();
   setFocusPolicy(QWidget::StrongFocus);
@@ -206,6 +222,11 @@ void mitk::QmitkRenderWindow::Repaint()
   //updateGL();//not strong enough
   repaint();
 };
+
+QSizePolicy mitk::QmitkRenderWindow::sizePolicy() const
+{
+  return QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding, 0, 0);
+}
 
 //##ModelId=3E6D5DD403B0
 void mitk::QmitkRenderWindow::focusInEvent(QFocusEvent*)  {};

@@ -21,6 +21,17 @@ typedef Matrix4<ScalarType> Matrix4D;
 typedef itk::Point<ScalarType,3> ITKPoint3D;
 typedef itk::Vector<ScalarType,3> ITKVector3D;
 
+//##Documentation
+//##@brief enumeration of the type a point can be
+typedef enum PointSpecificationType
+{
+  PTUNDEFINED = 0,
+  PTSTART,
+  PTCORNER,
+  PTEDGE
+};
+
+
 typedef class itk::NumericTraits<mitk::ScalarType> ScalarTypeNumericTraits;
 extern const ScalarType eps;
 

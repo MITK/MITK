@@ -101,19 +101,8 @@ public:
   virtual bool IsValidSlice(int s = 0) const;
 
   //##Documentation
-  //## @brief Get the spacing (size of a pixel).
-  //##
-  itkGetConstReferenceMacro(Spacing, mitk::Vector3D);
-
-  //##Documentation
-  //## @brief Get the spacing as a float[3] array.
-  const float* mitk::SlicedGeometry3D::GetFloatSpacing() const;
-
-  //##ModelId=3E3BE8CF010E
-  //##Documentation
   //## @brief Set the spacing (m_Spacing)
-  virtual void SetSpacing(mitk::Vector3D aSpacing);
-  virtual void SetSpacing(const float aSpacing[3]);
+  virtual void SetSpacing(const mitk::Vector3D& aSpacing);
 
   //##Documentation
   //## @brief Set/Get whether the SlicedGeometry3D is evenly-spaced (m_EvenlySpaced)
@@ -165,6 +154,8 @@ public:
   //## Initializes the bounding box according to the width/height of the Geometry2D and @a slices.
   //## The x-/y-spacing is calculated from the Geometry2D.
   virtual void InitializeEvenlySpaced(mitk::Geometry2D* geometry2D, mitk::ScalarType zSpacing, unsigned int slices, bool flipped=false);
+
+  virtual void SetImageGeometry(const bool isAnImageGeometry);
 protected:
   SlicedGeometry3D();
 
@@ -177,11 +168,6 @@ protected:
   //##Documentation
   //## Container for the 2D-geometries contained within this SliceGeometry3D .
   mutable std::vector<Geometry2D::Pointer> m_Geometry2Ds;
-
-  //##ModelId=3E3BE8BF0288
-  //##Documentation
-  //## Spacing of the data. Only valid for evenly-spaced geometries (m_EvenlySpaced==true).
-  mitk::Vector3D m_Spacing;
 
   //##ModelId=3E3C13B70180
   //##Documentation
@@ -203,9 +189,6 @@ protected:
   //##Documentation
   //## Number of slices this SliceGeometry3D is descibing.
   unsigned int m_Slices;
-
-private:
-  float m_FloatSpacing[3];
 };
 
 } // namespace mitk

@@ -74,13 +74,6 @@ const mitk::BoundingBox* mitk::SlicedGeometry3D::GetBoundingBox() const
   return m_BoundingBox.GetPointer();
 }
 
-//##ModelId=3DCBC65C017C
-const float* mitk::SlicedGeometry3D::GetFloatSpacing() const
-{
-  return m_FloatSpacing;
-}
-
-//##ModelId=3E15578402BD
 bool mitk::SlicedGeometry3D::SetGeometry2D(mitk::Geometry2D* geometry2D, int s)
 {
   if(IsValidSlice(s))
@@ -163,6 +156,8 @@ void mitk::SlicedGeometry3D::InitializeEvenlySpaced(mitk::Geometry2D* geometry2D
 
   mitk::Vector3D spacing;
   FillVector3D(spacing, geometry2D->GetExtentInMM(0)/bounds[1], geometry2D->GetExtentInMM(1)/bounds[3], zSpacing);
+  //ensure that spacing differs from m_Spacing to make SetSpacing change the matrix
+  m_Spacing[2]=zSpacing-1;
 
   SetDirectionVector(directionVector);
   SetBounds(bounds);
@@ -177,10 +172,23 @@ void mitk::SlicedGeometry3D::InitializeEvenlySpaced(mitk::Geometry2D* geometry2D
   geometry2D->UnRegister();
 }
 
+void mitk::SlicedGeometry3D::SetImageGeometry(const bool isAnImageGeometry)
+{
+  Superclass::SetImageGeometry(isAnImageGeometry);
+
+  mitk::Geometry3D* geometry;
+  unsigned int s;
+  for(s=0; s < m_Slices; ++s)
+  {
+    geometry = m_Geometry2Ds[s];
+    if(geometry!=NULL)
+      geometry->SetImageGeometry(isAnImageGeometry);
+  }
+}
+
 //##ModelId=3E15572E0269
 mitk::SlicedGeometry3D::SlicedGeometry3D() : m_EvenlySpaced(true), m_Slices(0)
 {
-  FillVector3D(m_FloatSpacing, 0,0,0);
   Initialize(m_Slices);
 }
 
@@ -197,7 +205,7 @@ bool mitk::SlicedGeometry3D::IsValidSlice(int s) const
 }
 
 //##ModelId=3E3BE8CF010E
-void mitk::SlicedGeometry3D::SetSpacing(mitk::Vector3D aSpacing)
+void mitk::SlicedGeometry3D::SetSpacing(const mitk::Vector3D& aSpacing)
 {
   bool hasEvenlySpacedPlaneGeometry=false;
   mitk::Point3D origin;
@@ -225,26 +233,8 @@ void mitk::SlicedGeometry3D::SetSpacing(mitk::Vector3D aSpacing)
     }
   }
 
-  m_Spacing = aSpacing;
+  Superclass::SetSpacing(aSpacing);
 
-  AffineTransform3D::MatrixType::InternalMatrixType vnlmatrix;
-
-  vnlmatrix = m_IndexToWorldTransform->GetMatrix().GetVnlMatrix();
-
-  mitk::VnlVector col;
-  col = vnlmatrix.get_column(0); col.normalize(); col*=aSpacing[0]; vnlmatrix.set_column(0, col);
-  col = vnlmatrix.get_column(1); col.normalize(); col*=aSpacing[1]; vnlmatrix.set_column(1, col);
-  col = vnlmatrix.get_column(2); col.normalize(); col*=aSpacing[2]; vnlmatrix.set_column(2, col);
-
-  Matrix3D matrix;
-  matrix = vnlmatrix;
-
-  AffineTransform3D::Pointer transform = AffineTransform3D::New();
-  transform->SetMatrix(matrix);
-  transform->SetOffset(m_IndexToWorldTransform->GetOffset());
-
-  SetIndexToWorldTransform(transform.GetPointer());
-  
   mitk::Geometry2D::Pointer firstGeometry;
 
   //in case of evenly-spaced data: re-initialize instances of Geometry2D, since the spacing influences them
@@ -276,18 +266,7 @@ void mitk::SlicedGeometry3D::SetSpacing(mitk::Vector3D aSpacing)
   if(m_Slices>0)
     m_Geometry2Ds[0] = firstGeometry;
 
-  itk2vtk(m_Spacing, m_FloatSpacing);
-
   Modified();
-}
-
-void mitk::SlicedGeometry3D::SetSpacing(const float aSpacing[3])
-{
-  mitk::Vector3D tmp;
-  tmp[0]= aSpacing[0];
-  tmp[1]= aSpacing[1];
-  tmp[2]= aSpacing[2];
-  SetSpacing(tmp);
 }
 
 //##ModelId=3E3C13F802A6

@@ -29,8 +29,11 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkMatrix4x4.h>
 
 // Standard Constructor for the new makro. sets the geometry to 3 dimensions
-mitk::Geometry3D::Geometry3D() : m_ParametricBoundingBox(NULL), m_VtkIndexToWorldTransform(NULL), m_FrameOfReferenceID(0)
+mitk::Geometry3D::Geometry3D() 
+  : m_ParametricBoundingBox(NULL), m_VtkIndexToWorldTransform(NULL), 
+    m_ImageGeometry(false), m_Valid(true), m_FrameOfReferenceID(0)
 {
+  FillVector3D(m_FloatSpacing, 1,1,1);
   Initialize();
 }
 
@@ -38,6 +41,17 @@ mitk::Geometry3D::Geometry3D() : m_ParametricBoundingBox(NULL), m_VtkIndexToWorl
 mitk::Geometry3D::~Geometry3D()
 {
 
+}
+
+static void CopySpacingFromTransform(mitk::AffineTransform3D* transform, mitk::Vector3D& spacing, float floatSpacing[3])
+{
+  mitk::AffineTransform3D::MatrixType::InternalMatrixType vnlmatrix;
+  vnlmatrix = transform->GetMatrix().GetVnlMatrix();
+
+  spacing[0]=vnlmatrix.get_column(0).magnitude();
+  spacing[1]=vnlmatrix.get_column(1).magnitude();
+  spacing[2]=vnlmatrix.get_column(2).magnitude();
+  mitk::itk2vtk(spacing, floatSpacing);
 }
 
 //##ModelId=3E3453C703AF
@@ -53,6 +67,7 @@ void mitk::Geometry3D::Initialize()
     m_IndexToWorldTransform = TransformType::New();
   else
     m_IndexToWorldTransform->SetIdentity();
+  CopySpacingFromTransform(m_IndexToWorldTransform, m_Spacing, m_FloatSpacing);
 
   if(m_VtkIndexToWorldTransform==NULL)
     m_VtkIndexToWorldTransform = vtkTransform::New();
@@ -98,6 +113,7 @@ void mitk::Geometry3D::TransferVtkToITKTransform()
   m_IndexToWorldTransform->SetOffset( offset );
   m_IndexToWorldTransform->Modified();
   m_ParametricTransform = m_IndexToWorldTransform;
+  CopySpacingFromTransform(m_IndexToWorldTransform, m_Spacing, m_FloatSpacing);
 }
 
 
@@ -117,15 +133,9 @@ void mitk::Geometry3D::SetFloatBounds(const float bounds[6])
   SetBoundsArray(b, m_BoundingBox);
 }
 
-void mitk::Geometry3D::SetFloatParametricBounds(const float bounds[6])
-{
-  mitk::BoundingBox::BoundsArrayType b;
-  b=bounds;
-  SetBoundsArray(b, m_ParametricBoundingBox);
-}
-
 void mitk::Geometry3D::SetParametricBounds(const BoundingBox::BoundsArrayType& bounds)
 {
+	//std::cout << " BOUNDS: " << bounds << std::endl;
   SetBoundsArray(bounds, m_ParametricBoundingBox);
 }
 
@@ -157,7 +167,8 @@ void mitk::Geometry3D::SetIndexToWorldTransform(mitk::AffineTransform3D* transfo
   if(m_IndexToWorldTransform.GetPointer() != transform)
   {
     Superclass::SetIndexToWorldTransform(transform);
-    m_ParametricTransform = m_IndexToWorldTransform;    
+    m_ParametricTransform = m_IndexToWorldTransform;
+    CopySpacingFromTransform(m_IndexToWorldTransform, m_Spacing, m_FloatSpacing);
     TransferItkToVtkTransform();
     Modified();
   }
@@ -335,6 +346,50 @@ void mitk::Geometry3D::BackTransform(const mitk::Point3D &at, const mitk::Vector
   const TransformType::MatrixType& inverse = m_IndexToWorldTransform->GetInverseMatrix();
 #endif
   out = inverse * in;
+}
+
+const float* mitk::Geometry3D::GetFloatSpacing() const
+{
+  return m_FloatSpacing;
+}
+
+void mitk::Geometry3D::SetSpacing(const float aSpacing[3])
+{
+  mitk::Vector3D tmp;
+  tmp[0]= aSpacing[0];
+  tmp[1]= aSpacing[1];
+  tmp[2]= aSpacing[2];
+  SetSpacing(tmp);
+}
+
+void mitk::Geometry3D::SetSpacing(const mitk::Vector3D& aSpacing)
+{
+  if(mitk::Equal(m_Spacing, aSpacing) == false)
+  {
+    assert(aSpacing[0]>0 && aSpacing[1]>0 && aSpacing[2]>0);
+
+    m_Spacing = aSpacing;
+
+    AffineTransform3D::MatrixType::InternalMatrixType vnlmatrix;
+
+    vnlmatrix = m_IndexToWorldTransform->GetMatrix().GetVnlMatrix();
+
+    mitk::VnlVector col;
+    col = vnlmatrix.get_column(0); col.normalize(); col*=aSpacing[0]; vnlmatrix.set_column(0, col);
+    col = vnlmatrix.get_column(1); col.normalize(); col*=aSpacing[1]; vnlmatrix.set_column(1, col);
+    col = vnlmatrix.get_column(2); col.normalize(); col*=aSpacing[2]; vnlmatrix.set_column(2, col);
+
+    Matrix3D matrix;
+    matrix = vnlmatrix;
+
+    AffineTransform3D::Pointer transform = AffineTransform3D::New();
+    transform->SetMatrix(matrix);
+    transform->SetOffset(m_IndexToWorldTransform->GetOffset());
+
+    SetIndexToWorldTransform(transform.GetPointer());
+
+    itk2vtk(m_Spacing, m_FloatSpacing);
+  }
 }
 
 const mitk::Vector3D mitk::Geometry3D::GetXAxis()

@@ -86,9 +86,6 @@ public:
     assert(m_ParametricBoundingBox.IsNotNull());
     return m_ParametricBoundingBox->GetBounds();
   }
-
-  virtual void SetParametricBounds(const BoundingBox::BoundsArrayType& bounds);
-  virtual void SetFloatParametricBounds(const float bounds[6]);
  
   mitk::ScalarType GetParametricExtent(int direction) const
   {
@@ -129,7 +126,10 @@ public:
       case 7: FillVector3D(cornerpoint, bounds[1],bounds[3],bounds[5]); break;
       default: assert(id < 8);
     }
-
+    if(m_ImageGeometry)
+    {
+      FillVector3D(cornerpoint, cornerpoint[0]-0.5, cornerpoint[1]-0.5, cornerpoint[2]-0.5);
+    }
     return m_IndexToWorldTransform->TransformPoint(cornerpoint);
   }
 
@@ -142,6 +142,10 @@ public:
     cornerpoint[0] = (xFront ? bounds[0] : bounds[1]);
     cornerpoint[1] = (yFront ? bounds[2] : bounds[3]);
     cornerpoint[2] = (zFront ? bounds[4] : bounds[5]);
+    if(m_ImageGeometry)
+    {
+      FillVector3D(cornerpoint, cornerpoint[0]-0.5, cornerpoint[1]-0.5, cornerpoint[2]-0.5);
+    }
 
     return m_IndexToWorldTransform->TransformPoint(cornerpoint);
   }
@@ -151,6 +155,7 @@ public:
   //##
   //## The length of the vector is the size of the bounding-box in the 
   //## specified @a direction in mm
+  //## \sa GetMatrixColumn
   Vector3D GetAxisVector(unsigned int direction) const
   {
     Vector3D frontToBack;
@@ -187,8 +192,9 @@ public:
 
   //##Documentation
   //## @brief Get a VnlVector along bounding-box in the specified 
-  //## @a direction (length is spacing)
+  //## @a direction, length is spacing
   //##
+  //## \sa GetAxisVector
   VnlVector GetMatrixColumn(unsigned int direction) const
   {
     return m_IndexToWorldTransform->GetMatrix().GetVnlMatrix().get_column(direction);
@@ -197,6 +203,7 @@ public:
   //##Documentation
   //## @brief Get the extent of the bounding-box in the specified @a direction in mm
   //##
+  //## Equals length of GetAxisVector(direction).
   ScalarType GetExtentInMM(int direction) const
   {
     return m_IndexToWorldTransform->GetMatrix().GetVnlMatrix().get_column(direction).magnitude()*GetExtent(direction);
@@ -244,6 +251,29 @@ public:
 
   //##ModelId=3E3453C703AF
   virtual void Initialize();
+
+  itkGetConstMacro(ImageGeometry, bool);
+  itkSetMacro(ImageGeometry, bool);
+  itkBooleanMacro(ImageGeometry);
+
+  virtual bool IsValid() const
+  {
+    return m_Valid;
+  }
+
+  //##Documentation
+  //## @brief Get the spacing (size of a pixel).
+  //##
+  itkGetConstReferenceMacro(Spacing, mitk::Vector3D);
+
+  //##Documentation
+  //## @brief Get the spacing as a float[3] array.
+  const float* GetFloatSpacing() const;
+
+  //##Documentation
+  //## @brief Set the spacing (m_Spacing)
+  virtual void SetSpacing(const mitk::Vector3D& aSpacing);
+  virtual void SetSpacing(const float aSpacing[3]);
 
   itkGetConstMacro(FrameOfReferenceID, unsigned int);
   itkSetMacro(FrameOfReferenceID, unsigned int);
@@ -297,6 +327,13 @@ protected:
   virtual void BackTransform(const mitk::Point3D &in, mitk::Point3D& out) const;
   virtual void BackTransform(const mitk::Point3D &at, const mitk::Vector3D &in, mitk::Vector3D& out) const;
 
+  //##Documentation
+  //## @brief Set the parametric bounds
+  //## 
+  //## Protected in this class, made public in some sub-classes, e.g.,
+  //## ExternAbstractTransformGeometry.
+  virtual void SetParametricBounds(const BoundingBox::BoundsArrayType& bounds);
+
   mutable mitk::BoundingBox::Pointer m_ParametricBoundingBox;
 
   mutable mitk::TimeBounds m_TimeBoundsInMS;
@@ -305,7 +342,19 @@ protected:
   
   mitk::Transform3D::Pointer m_ParametricTransform;
 
+  bool m_ImageGeometry;
+
+  //##Documentation
+  //## \breif Spacing of the data. Only significant if the geometry describes 
+  //## an Image (m_ImageGeometry==true).
+  mitk::Vector3D m_Spacing;
+
+  bool m_Valid;
+
   unsigned int m_FrameOfReferenceID;
+
+private:
+  float m_FloatSpacing[3];
 };
 
 } // namespace mitk

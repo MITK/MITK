@@ -186,11 +186,6 @@ inline bool Equal(double scalar1, double scalar2)
   return fabs(scalar1-scalar2) < mitk::eps;
 }
 
-inline bool Equal(float scalar1, float scalar2) 
-{
-  return fabs(scalar1-scalar2) < mitk::eps;
-}
-
 } // namespace mitk
 
 

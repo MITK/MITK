@@ -153,6 +153,9 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
       mitk::StringProperty::Pointer nameProp = new mitk::StringProperty(tmpName.ascii());
       node->SetProperty("fileName",nameProp);
 
+      // disable volume rendering by default
+      node->SetProperty("volumerendering",new mitk::BoolProperty(false));
+      
       mitk::LevelWindowProperty::Pointer levWinProp = new mitk::LevelWindowProperty();
       mitk::LevelWindow levelWindow;
       reader->UpdateLargestPossibleRegion();
@@ -737,7 +740,7 @@ void QmitkMainTemplate::initWidgets( mitk::DataTreeIterator * it )
     Vector3f(bounds[1],bounds[2],bounds[4]),
     Vector3f(bounds[0],bounds[2],bounds[5])
     );
-  mitkMultiWidget->mitkWidget4->GetRenderer()->SetData(it);
+    mitkMultiWidget->mitkWidget4->GetRenderer()->SetData(it);
 }
 
 

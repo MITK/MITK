@@ -19,71 +19,76 @@
 #include <qlist.h>
 
 /*!\class
-	\brief MITK example demonstrating how a new application functionality can be implemented
+\brief MITK example demonstrating how a new application functionality can be implemented
 
-	One needs to reimplement the methods createControlWidget(..), createMainWidget(..) 
-	and createAction(..) from QmitkFunctionality. A QmitkFctMediator object gets passed a reference of a 
-	functionality and positions the widgets in the application window controlled by a 
-	layout template
- */
+One needs to reimplement the methods createControlWidget(..), createMainWidget(..) 
+and createAction(..) from QmitkFunctionality. A QmitkFctMediator object gets passed a reference of a 
+functionality and positions the widgets in the application window controlled by a 
+layout template
+*/
 class QmitkSimpleExampleFunctionality : public QmitkFunctionality
 {
-	Q_OBJECT
+    Q_OBJECT
 public:
 
-	/*!
-		\brief default constructor
-	*/
-  QmitkSimpleExampleFunctionality(QObject *parent=0, const char *name=0, QmitkStdMultiWidget *mitkStdMultiWidget=NULL);
-	
-	/*!
-		\brief default destructor
-	*/
-  virtual ~QmitkSimpleExampleFunctionality();
+    /*!
+    \brief default constructor
+    */
+    QmitkSimpleExampleFunctionality(QObject *parent=0, const char *name=0, QmitkStdMultiWidget *mitkStdMultiWidget=NULL);
 
-	/*!
-		\brief method for creating the widget containing the application controls, like sliders, buttons etc.
-	*/
-  virtual QWidget * createControlWidget(QWidget *parent);
+    /*!
+    \brief default destructor
+    */
+    virtual ~QmitkSimpleExampleFunctionality();
 
-	/*!
-		\brief method for creating the applications main widget
-	*/
-  virtual QWidget * createMainWidget(QWidget * parent);
-  
-	/*!
-		\brief method for creating an QAction object, i.e. button & menu entry
-	*/
-  virtual QAction * createAction(QActionGroup *parent);
+    /*!
+    \brief method for creating the widget containing the application controls, like sliders, buttons etc.
+    */
+    virtual QWidget * createControlWidget(QWidget *parent);
 
-	virtual QString getFunctionalityName();
+    /*!
+    \brief method for creating the applications main widget
+    */
+    virtual QWidget * createMainWidget(QWidget * parent);
+
+    /*!
+    \brief method for creating the connections of main and control widget
+    */
+    virtual void createConnections();
+
+    /*!
+    \brief method for creating an QAction object, i.e. button & menu entry
+    */
+    virtual QAction * createAction(QActionGroup *parent);
+
+    virtual QString getFunctionalityName();
 
 protected slots:
-	/*!
-	  qt slot for event processing from a slider control
-	 */
-	void selectSliceWidgetXY( int z );
+    /*!
+    qt slot for event processing from a slider control
+    */
+    void selectSliceWidgetXY( int z );
 
-	/*!
-	  qt slot for event processing from a slider control
-	 */
-	void selectSliceWidgetXZ( int z );
+    /*!
+    qt slot for event processing from a slider control
+    */
+    void selectSliceWidgetXZ( int z );
 
-	/*!
-	  qt slot for event processing from a slider control
-	 */
-	void selectSliceWidgetYZ( int z );
+    /*!
+    qt slot for event processing from a slider control
+    */
+    void selectSliceWidgetYZ( int z );
 
-	/*!
-	  qt slot for event processing from a slider control
-	 */
-	void selectSliceWidgetFP( int z );
+    /*!
+    qt slot for event processing from a slider control
+    */
+    void selectSliceWidgetFP( int z );
 
 protected:
-	QmitkStdMultiWidget * multiWidget;
-	QmitkSimpleExampleControls * controls;
-	int count;
-	mitk::FloatProperty::Pointer opacityprop;
+    QmitkStdMultiWidget * multiWidget;
+    QmitkSimpleExampleControls * controls;
+    int count;
+    mitk::FloatProperty::Pointer opacityprop;
 
 
 };

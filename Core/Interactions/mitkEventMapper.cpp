@@ -452,17 +452,26 @@ bool mitk::EventMapper::MapEvent(Event* event)
   A user interaction with the mouse is started by a mousePressEvent, continues with a MouseMove and finishes with a MouseReleaseEvent
 	*/
   bool ok;
+
   switch (event->GetType())
   {
-    case mitk::Type_MouseMove:
-      ok = m_GlobalStateMachine->HandleEvent(&m_StateEvent, mitk::OperationEvent::GetCurrObjectEventId(), mitk::OperationEvent::GetCurrGroupEventId());
-      break;
-    case mitk::Type_MouseButtonRelease:
-      ok = m_GlobalStateMachine->HandleEvent(&m_StateEvent, mitk::OperationEvent::GetCurrObjectEventId(), mitk::OperationEvent::GetCurrGroupEventId());
-      break;
-    default:
+    case mitk::Type_MouseButtonPress://Increase
       ok = m_GlobalStateMachine->HandleEvent(&m_StateEvent, mitk::OperationEvent::IncCurrObjectEventId(), mitk::OperationEvent::GetCurrGroupEventId());
-
+      break;
+    case mitk::Type_MouseMove://same
+      ok = m_GlobalStateMachine->HandleEvent(&m_StateEvent, mitk::OperationEvent::GetCurrObjectEventId(), mitk::OperationEvent::GetCurrGroupEventId());
+      break;
+    case mitk::Type_MouseButtonRelease://same
+      ok = m_GlobalStateMachine->HandleEvent(&m_StateEvent, mitk::OperationEvent::GetCurrObjectEventId(), mitk::OperationEvent::GetCurrGroupEventId());
+      break;
+    case mitk::Type_User://same
+      ok = m_GlobalStateMachine->HandleEvent(&m_StateEvent, mitk::OperationEvent::GetCurrObjectEventId(), mitk::OperationEvent::GetCurrGroupEventId());
+      break;
+    case mitk::Type_KeyPress://Increase
+      ok = m_GlobalStateMachine->HandleEvent(&m_StateEvent, mitk::OperationEvent::IncCurrObjectEventId(), mitk::OperationEvent::GetCurrGroupEventId());
+      break;
+    default://increase
+      ok = m_GlobalStateMachine->HandleEvent(&m_StateEvent, mitk::OperationEvent::IncCurrObjectEventId(), mitk::OperationEvent::GetCurrGroupEventId());
   }
 
   return ok;
@@ -501,7 +510,7 @@ inline const int mitk::EventMapper::convertConstString2ConstInt(std::string inpu
   {
       return (tempIt)->second;
   }
-  
+
   (StatusBar::GetInstance())->DisplayText("Warning! from mitkEventMapper.cpp: Couldn't find matching Event Int from Event String in XML-File");
   return -1;//for didn't find anything
 }
@@ -524,15 +533,15 @@ bool mitk::EventMapper::startElement( const QString&, const QString&, const QStr
 	{
 		//new entry in list of EventDescriptions
 		bool ok = false;//for error at converting 16 to 10 system
-		EventDescription eventDescr( 
+		EventDescription eventDescr(
               convertConstString2ConstInt( atts.value( TYPE.c_str()).latin1()),
 			  convertConstString2ConstInt( atts.value( BUTTON.c_str()).latin1()),
 			  (( atts.value((QString)(BUTTONSTATE.c_str())) ).remove(0,2) ).toInt( &ok, 16 ),
 			  convertConstString2ConstInt( atts.value( KEY.c_str()).latin1()),
 			                               atts.value( NAME.c_str()).latin1(),
 			                               atts.value( ID.c_str()).toInt() );
-        
-        if (!ok) 
+
+        if (!ok)
         {
             (StatusBar::GetInstance())->DisplayText("error reading Event::Button, ButtonState or Key!");
         }

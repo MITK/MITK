@@ -25,8 +25,11 @@ protected:
   mitk::DataTree::Pointer m_Tree;
   mitk::Image::Pointer m_FirstImage;
   mitk::PointSet::Pointer m_Seeds;
+
+  mitk::Image::Pointer m_ResultImage;
+  mitk::DataTreeNode::Pointer m_ResultNode;
   QWidget* m_TopLevelWidget;
 protected slots:
-  void StartRegionGrowing();
+  virtual void StartRegionGrowing();
 };
 #endif // STEP6_H

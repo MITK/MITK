@@ -15,8 +15,6 @@
 #include <mitkImageAccessByItk.h>
 #include <mitkDataTreeHelper.h>
 
-#include <itksys/SystemTools.hxx>
-#include <qapplication.h>
 #include <qhbox.h>
 #include <qvbox.h>
 #include <qpushbutton.h>
@@ -24,7 +22,7 @@
 //##Documentation
 //## @brief Start region-grower at interactively added points
 Step6::Step6( int argc, char* argv[], QWidget *parent, const char *name )
-  : QMainWindow ( parent, name ), m_FirstImage(NULL)
+  : QMainWindow ( parent, name ), m_FirstImage(NULL), m_ResultImage(NULL), m_ResultNode(NULL)
 {
   // create the tree: this is now a member
   m_Tree=mitk::DataTree::New();
@@ -44,7 +42,7 @@ Step6::Step6( int argc, char* argv[], QWidget *parent, const char *name )
   connect(startButton, SIGNAL(clicked()), this, SLOT(StartRegionGrowing()));
   if(m_FirstImage.IsNull()) startButton->setEnabled(false);
 
-  // as in Step5, create Point>Set (now as a member m_Seeds) and 
+  // as in Step5, create PointSet (now as a member m_Seeds) and 
   // associate a interactor to it
   mitk::DataTreePreOrderIterator it(m_Tree);
   m_Seeds = mitk::PointSet::New();
@@ -80,12 +78,13 @@ void Step6::RegionGrowing( itk::Image<typename TPixel, VImageDimension>* itkImag
 
   // add output of ConfidenceConnectedImageFilter to tree
   mitk::DataTreePreOrderIterator it(m_Tree);
-  mitk::DataTreeNode::Pointer node = mitk::DataTreeHelper::AddItkImageToDataTree(regGrowFilter->GetOutput(), &it, "segmentation");
+  m_ResultNode = mitk::DataTreeHelper::AddItkImageToDataTree(regGrowFilter->GetOutput(), &it, "segmentation");
+  m_ResultImage = static_cast<mitk::Image*>(m_ResultNode->GetData());
   // set some additional properties
-  node->SetProperty("binary", new mitk::BoolProperty(true));
-  node->SetProperty("color", new mitk::ColorProperty(1.0,0.0,0.0));
-  node->SetProperty("volumerendering", new mitk::BoolProperty(true));
-  node->SetProperty("layer", new mitk::IntProperty(1));
+  m_ResultNode->SetProperty("binary", new mitk::BoolProperty(true));
+  m_ResultNode->SetProperty("color", new mitk::ColorProperty(1.0,0.0,0.0));
+  m_ResultNode->SetProperty("volumerendering", new mitk::BoolProperty(true));
+  m_ResultNode->SetProperty("layer", new mitk::IntProperty(1));
 }
 
 void Step6::StartRegionGrowing()
@@ -201,22 +200,4 @@ void Step6::SetupWidgets()
   updateController->AddRenderWindow(view3->GetRenderWindow());
 
   setCentralWidget(m_TopLevelWidget);
-}
-
-#include <qapplication.h>
-int main(int argc, char* argv[])
-{
-  QApplication qtapplication( argc, argv );
-
-  if(argc<2)
-  {
-    fprintf( stderr, "Usage:   %s [filename1] [filename2] ...\n\n", itksys::SystemTools::GetFilenameName(argv[0]).c_str() );
-    return 1;
-  }
-
-  Step6 mainWindow(argc, argv, NULL, "mainwindow");
-  qtapplication.setMainWidget(&mainWindow);
-  mainWindow.show();
-
-  return qtapplication.exec();
 }

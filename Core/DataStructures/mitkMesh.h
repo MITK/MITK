@@ -73,6 +73,12 @@ public:
   virtual DataType::Pointer GetMesh() const;
 
   //##Documentation
+	//## @brief returns the mesh 
+  virtual DataType::Pointer GetMesh();
+
+  void SetMesh(DataType::Pointer);
+
+  //##Documentation
 	//## @brief checks if the given point is in a cell and returns that cellId.
   //## Basicaly it searches lines and points that are hit.
   virtual bool EvaluatePosition(Point3D point, unsigned long &cellId, float precision);

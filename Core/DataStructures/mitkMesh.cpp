@@ -48,6 +48,15 @@ mitk::Mesh::DataType::Pointer mitk::Mesh::GetMesh() const
   return m_ItkData;
 }
 
+mitk::Mesh::DataType::Pointer mitk::Mesh::GetMesh()
+{
+  return m_ItkData;
+}
+
+void mitk::Mesh::SetMesh(DataType::Pointer mesh)
+{
+  m_ItkData = mesh;
+}
 
 unsigned long mitk::Mesh::GetNumberOfCells()
 {

@@ -6,8 +6,8 @@
  *   writes a PicFile to disk
  *
  * $Log$
- * Revision 1.1  1997/09/06 19:09:59  andre
- * Initial revision
+ * Revision 1.2  1997/09/15 10:24:13  andre
+ * ipPicPut now returns status
  *
  * Revision 0.1  1993/04/02  16:18:39  andre
  * now works on PC, SUN and DECstation
@@ -25,7 +25,8 @@
 
 #include "ipPic.h"
 
-void ipPicPut( char *outfile_name, ipPicDescriptor *pic )
+int
+ipPicPut( char *outfile_name, ipPicDescriptor *pic )
 {
   FILE *outfile;
 
@@ -35,7 +36,7 @@ void ipPicPut( char *outfile_name, ipPicDescriptor *pic )
   if( pic->info->write_protect )
     {
       fprintf( stderr, "ipPicPut: sorry, can't write (missing tags !!!)\n" );
-      return;
+      return( -1 );
     }
 
   if( outfile_name == NULL )
@@ -47,8 +48,8 @@ void ipPicPut( char *outfile_name, ipPicDescriptor *pic )
 
   if( outfile == NULL )
     {
-      /*ipPrintErr( "ipPicPut: sorry, error opening outfile\n" );*/
-      /*return();*/
+      fprintf( stderr, "ipPicPut: sorry, error opening outfile\n" );
+      return( -1 );
     }
 
   tags_len = _ipPicTagsSize( pic->info->tags_head );
@@ -74,7 +75,7 @@ void ipPicPut( char *outfile_name, ipPicDescriptor *pic )
   if( outfile != stdout )
     fclose( outfile );
 
-  /*return();*/
+  return( 0 );
 }
 
 ipUInt4_t _ipPicTagsSize( _ipPicTagsElement_t *head )

@@ -12,6 +12,7 @@ namespace mitk {
 #define GImageDimension 4
 #endif
 
+//##ModelId=3E8600D800C5
 typedef itk::BoundingBox<> BoundingBox;
 
 //##ModelId=3DCBF389032B

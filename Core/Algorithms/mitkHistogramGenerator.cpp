@@ -33,14 +33,15 @@ void mitk::HistogramGenerator::ComputeHistogram()
 {
   AccessByItk(m_Image,InternalCompute);
 
-/* // debug code
+// debug code
+  /*
   const unsigned int histogramSize = m_Histogram->Size();
 
   std::cout << "Histogram size " << histogramSize << std::endl;
   
   HistogramType::ConstIterator itr = GetHistogram()->Begin();
   HistogramType::ConstIterator end = GetHistogram()->End();
-
+  
   int bin = 0;
   while( itr != end )
     {
@@ -48,7 +49,8 @@ void mitk::HistogramGenerator::ComputeHistogram()
     std::cout << itr.GetFrequency() << std::endl;
     ++itr;
     ++bin;
-    } */
+    }
+    */ 
 }
 
 template < typename TPixel, unsigned int VImageDimension > 
@@ -70,3 +72,21 @@ void mitk::HistogramGenerator::InternalCompute(itk::Image< TPixel, VImageDimensi
   m_Histogram = histogramGenerator->GetOutput();
 
 }
+
+float mitk::HistogramGenerator::GetMaximumFrequency() const {
+  return CalculateMaximumFrequency(this->m_Histogram);
+};
+
+float mitk::HistogramGenerator::CalculateMaximumFrequency(HistogramType::ConstPointer histogram) {
+  
+  HistogramType::ConstIterator itr = histogram->Begin();
+  HistogramType::ConstIterator end = histogram->End();
+  
+  float maxFreq = 0;
+  while( itr != end )
+    {
+    maxFreq = std::max(maxFreq,itr.GetFrequency());
+    ++itr;
+    }
+  return maxFreq;
+};

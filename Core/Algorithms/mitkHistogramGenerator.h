@@ -46,7 +46,8 @@ public:
 	
 	// TODO: calculate if needed in GetHistogram()
 	void ComputeHistogram();
-	
+	float GetMaximumFrequency() const;
+	static float CalculateMaximumFrequency(HistogramType::ConstPointer histogram);
 protected:
 	HistogramGenerator();
 

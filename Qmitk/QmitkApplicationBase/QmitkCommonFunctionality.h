@@ -14,7 +14,7 @@
 #include <mitkLevelWindowProperty.h>
 #include <mitkStringProperty.h>
 #include <mitkDataTreeNode.h>
-#include <mitkSurfaceData.h>
+#include <mitkSurface.h>
 #include <mitkDataTreeNodeFactory.h>
 
 #include <qstring.h>
@@ -114,7 +114,7 @@ public:
       node = subTree->Get();
     }
 
-    mitk::SurfaceData::Pointer surface = mitk::SurfaceData::New();
+    mitk::Surface::Pointer surface = mitk::Surface::New();
     //    vtkPolyData* polys = MeshUtil<TMeshType>::meshToPolyData( itkMesh );
     /**
     * @todo include Algorithms/itkMeshDeformation into Framework module so the upper line can be used
@@ -153,7 +153,7 @@ public:
       node = subTree->Get();
     }
 
-    mitk::SurfaceData::Pointer surface = mitk::SurfaceData::New();
+    mitk::Surface::Pointer surface = mitk::Surface::New();
     surface->SetVtkPolyData(polys);
     node->SetData( surface );
     node->SetProperty("layer", new mitk::IntProperty(1));

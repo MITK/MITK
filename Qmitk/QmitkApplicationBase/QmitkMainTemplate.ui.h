@@ -19,7 +19,7 @@
 #include <vtkStructuredPointsReader.h>
 #include <vtkStructuredPointsWriter.h>
 #include <map>
-#include <mitkSurfaceData.h>
+#include <mitkSurface.h>
 
 #include <mitkProperties.h>
 #include <mitkLookupTableProperty.h>
@@ -206,7 +206,7 @@ void QmitkMainTemplate::fileSaveAs()
           writer->Delete();
         }
       }
-      mitk::SurfaceData::Pointer surface = dynamic_cast<mitk::SurfaceData*>(node->GetData());
+      mitk::Surface::Pointer surface = dynamic_cast<mitk::Surface*>(node->GetData());
       if( surface.IsNotNull() )
       {
         QString fileName = QFileDialog::getSaveFileName(NULL,"stl (*.stl);;vtk (*.vtk)");

@@ -30,7 +30,7 @@
 #include <itkNumericSeriesFileNames.h>
 
 // MITK-related includes
-#include "mitkSurfaceData.h"
+#include "mitkSurface.h"
 #include "mitkPicFileReader.h"
 #include "mitkPicVolumeTimeSeriesReader.h"
 #include "mitkStringProperty.h"
@@ -200,7 +200,7 @@ void mitk::DataTreeNodeFactory::ReadFileTypeSTL()
 
     if ( stlReader->GetOutput() != NULL )
     {
-        mitk::SurfaceData::Pointer surface = mitk::SurfaceData::New();
+        mitk::Surface::Pointer surface = mitk::Surface::New();
         surface->SetVtkPolyData( stlReader->GetOutput() );
         mitk::DataTreeNode::Pointer node = this->GetOutput();
         node->SetData( surface );
@@ -228,7 +228,7 @@ void mitk::DataTreeNodeFactory::ReadFileTypeVTK()
 
     if ( reader->GetOutput() != NULL )
     {
-        mitk::SurfaceData::Pointer surface = mitk::SurfaceData::New();
+        mitk::Surface::Pointer surface = mitk::Surface::New();
         surface->SetVtkPolyData( reader->GetOutput() );
         mitk::DataTreeNode::Pointer node = this->GetOutput();
         node->SetData( surface );
@@ -948,7 +948,7 @@ void mitk::DataTreeNodeFactory::ReadFileSeriesTypeSTL()
         return ;
     }
 
-    mitk::SurfaceData::Pointer surface = mitk::SurfaceData::New();
+    mitk::Surface::Pointer surface = mitk::Surface::New();
     std::cout << "prefix: "<< m_FilePrefix << ", pattern: " <<m_FilePattern << std::endl;
     surface->Initialize(m_MatchedFileNames.size());
     //surface->Resize( m_MatchedFileNames.size() );

@@ -3,7 +3,7 @@
 
 #include "mitkCommon.h"
 #include "mitkGLMapper2D.h"
-#include "mitkSurfaceDataMapper2D.h"
+#include "mitkSurfaceMapper2D.h"
 
 namespace mitk {
 
@@ -46,7 +46,7 @@ protected:
     //##ModelId=3E67E285024E
     virtual void GenerateOutputInformation();
 
-    SurfaceDataMapper2D::Pointer m_SurfaceMapper;
+    SurfaceMapper2D::Pointer m_SurfaceMapper;
 };
 
 } // namespace mitk

@@ -3,7 +3,7 @@
 
 #include "mitkBaseRenderer.h"
 #include "mitkPlaneGeometry.h"
-#include "mitkSurfaceData.h"
+#include "mitkSurface.h"
 #include "mitkColorProperty.h"
 #include "mitkProperties.h"
 #include "mitkVtkAbstractTransformGeometry.h"

@@ -9,8 +9,8 @@
 #include "mitkProperties.h"
 #include "mitkSmartPointerProperty.h"
 
-#include "mitkGeometry2DDataToSurfaceDataFilter.h"
-#include "mitkSurfaceDataMapper2D.h"
+#include "mitkGeometry2DDataToSurfaceFilter.h"
+#include "mitkSurfaceMapper2D.h"
 
 #include "GL/glu.h"
 
@@ -91,15 +91,15 @@ void mitk::Geometry2DDataMapper2D::Paint(mitk::BaseRenderer * renderer)
     }
     else
     {
-      mitk::Geometry2DDataToSurfaceDataFilter::Pointer surfaceCreator;
+      mitk::Geometry2DDataToSurfaceFilter::Pointer surfaceCreator;
       mitk::SmartPointerProperty::Pointer surfacecreatorprop;
       surfacecreatorprop=dynamic_cast<mitk::SmartPointerProperty*>(GetDataTreeNode()->GetProperty("surfacegeometry", renderer).GetPointer());
       if( (surfacecreatorprop.IsNull()) || 
           (surfacecreatorprop->GetSmartPointer().IsNull()) ||
-          ((surfaceCreator=dynamic_cast<mitk::Geometry2DDataToSurfaceDataFilter*>(surfacecreatorprop->GetSmartPointer().GetPointer())).IsNull())
+          ((surfaceCreator=dynamic_cast<mitk::Geometry2DDataToSurfaceFilter*>(surfacecreatorprop->GetSmartPointer().GetPointer())).IsNull())
         )
       {
-        surfaceCreator = mitk::Geometry2DDataToSurfaceDataFilter::New();
+        surfaceCreator = mitk::Geometry2DDataToSurfaceFilter::New();
         surfacecreatorprop=new mitk::SmartPointerProperty(surfaceCreator);
         GetDataTreeNode()->SetProperty("surfacegeometry", surfacecreatorprop);
       }
@@ -123,7 +123,7 @@ void mitk::Geometry2DDataMapper2D::Paint(mitk::BaseRenderer * renderer)
       surfaceCreator->Update(); //@FIXME ohne das crash
       
       if(m_SurfaceMapper.IsNull())
-        m_SurfaceMapper=mitk::SurfaceDataMapper2D::New();
+        m_SurfaceMapper=mitk::SurfaceMapper2D::New();
       m_SurfaceMapper->SetInput(GetDataTreeNode());
       m_SurfaceMapper->SetSurface(surfaceCreator->GetOutput());
       

@@ -3,7 +3,7 @@
 #include "mitkVector.h"
 
 mitk::BoundingObject::BoundingObject()
-  : SurfaceData(), m_Positive(true)
+  : Surface(), m_Positive(true)
 {
   m_Geometry3D->Initialize();
 }

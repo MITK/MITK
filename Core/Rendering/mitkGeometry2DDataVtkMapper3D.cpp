@@ -5,8 +5,8 @@
 #include "mitkDataTree.h"
 #include "mitkImageMapper2D.h"
 
-#include "mitkSurfaceData.h"
-#include "mitkGeometry2DDataToSurfaceDataFilter.h"
+#include "mitkSurface.h"
+#include "mitkGeometry2DDataToSurfaceFilter.h"
 
 #include "vtkActor.h"
 #include "vtkProperty.h"
@@ -141,15 +141,15 @@ void mitk::Geometry2DDataVtkMapper3D::Update(mitk::BaseRenderer* renderer)
 
   if(input.IsNotNull())
   {
-    mitk::Geometry2DDataToSurfaceDataFilter::Pointer surfaceCreator;
+    mitk::Geometry2DDataToSurfaceFilter::Pointer surfaceCreator;
     mitk::SmartPointerProperty::Pointer surfacecreatorprop;
     surfacecreatorprop=dynamic_cast<mitk::SmartPointerProperty*>(GetDataTreeNode()->GetProperty("surfacegeometry", renderer).GetPointer());
     if( (surfacecreatorprop.IsNull()) || 
       (surfacecreatorprop->GetSmartPointer().IsNull()) ||
-      ((surfaceCreator=dynamic_cast<mitk::Geometry2DDataToSurfaceDataFilter*>(surfacecreatorprop->GetSmartPointer().GetPointer())).IsNull())
+      ((surfaceCreator=dynamic_cast<mitk::Geometry2DDataToSurfaceFilter*>(surfacecreatorprop->GetSmartPointer().GetPointer())).IsNull())
       )
     {
-      surfaceCreator = mitk::Geometry2DDataToSurfaceDataFilter::New();
+      surfaceCreator = mitk::Geometry2DDataToSurfaceFilter::New();
       surfacecreatorprop=new mitk::SmartPointerProperty(surfaceCreator);
       GetDataTreeNode()->SetProperty("surfacegeometry", surfacecreatorprop);
     }

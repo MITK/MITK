@@ -33,7 +33,7 @@ void mitk::SlicedData::SetRequestedRegionToLargestPossibleRegion()
   m_UseLargestPossibleRegion = true;
   if(GetGeometry()==NULL) 
     return;
-  int i;
+  unsigned int i;
   const RegionType::IndexType & index = GetLargestPossibleRegion().GetIndex();
   const RegionType::SizeType & size = GetLargestPossibleRegion().GetSize();
   for(i=0;i<VmitkImageDimension;++i)

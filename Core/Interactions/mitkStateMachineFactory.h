@@ -5,7 +5,9 @@
 #include "State.h"
 #include <qxml.h>
 
+//##ModelId=3E72243D0244
 typedef std::map<std::string,mitk::State*> StartStateMap;
+//##ModelId=3E72243D0253
 typedef std::map<std::string,mitk::State *>::iterator StartStateMapIter;
 
 /*typedef std::map<int,mitk::State *> StateMap;
@@ -29,6 +31,9 @@ namespace mitk {
     //##ModelId=3E68B2C600BD
 	  StateMachineFactory();
 
+    //##ModelId=3E72243E0188
+	  ~StateMachineFactory();
+
     //##ModelId=3E5B4144024F
 	//##Documentation
 	//## returns NULL if no entry with string type is found
@@ -39,18 +44,11 @@ namespace mitk {
 	//##loads the xml file filename and generates the necessary instances
 	  static bool LoadBehavior(std::string fileName);
 
-	  bool startDocument(){
-	  
-		  return TRUE;
-	  }
-
-	  bool endDocument() {
-	  
-		  return true;
-	  }
+	  //bool startDocument(){return TRUE;}
+	  //bool endDocument() {return true;}
 
     //##ModelId=3E6773790098
-	  bool startElement( const QString& namespaceURI, const QString& localName, const QString& qName, const QXmlAttributes& atts );
+	  bool startElement( const QString&, const QString&, const QString& qName, const QXmlAttributes& atts );
 
     //##ModelId=3E6907B40180
 	  bool endElement( const QString&, const QString&, const QString & qName );
@@ -61,6 +59,8 @@ namespace mitk {
 	//##Documentation
 	//## sets the pointers in Transition (setNextState(..)) according to the extracted xml-file content
 	  static bool ConnectStates(StateMap *states);
+
+	  
 
 	//##ModelId=3E5B423003DF
 	  static StartStateMap m_StartStates;
@@ -74,17 +74,33 @@ namespace mitk {
     //##ModelId=3E68B2C60040
 	  std::string m_AktStateMachineName;
 
+    //##ModelId=3E72243D031F
 	  static const std::string STYLE;
+    //##ModelId=3E72243D033E
 	  static const std::string NAME;
+    //##ModelId=3E72243D036D
 	  static const std::string ID;	  
+    //##ModelId=3E72243D038C
 	  static const std::string START_STATE;
+    //##ModelId=3E72243D03BB
 	  static const std::string NEXT_STATE_ID;
+    //##ModelId=3E72243E0002
 	  static const std::string EVENT_ID;
+    //##ModelId=3E72243E0031
 	  static const std::string SIDE_EFFECT_ID;
 	  
+    //##ModelId=3E72243E005F
 	  static const std::string TYPE;
+    //##ModelId=3E72243E009E
 	  static const std::string BUTTON_NUMBER;
+    //##ModelId=3E72243E00CD
 	  static const std::string KEY;
+    //##ModelId=3E72243E010B
+	  static const std::string TRUE;
+    //##ModelId=3E72243E013A
+	  static const std::string FALSE;
+
+
 	  
 };
 

@@ -7,10 +7,14 @@
 #include <map>
 
 
+//##ModelId=3E6907B400B4
 typedef std::map<int,mitk::State*> StateMap;
+//##ModelId=3E6907B400C4
 typedef std::map<int,mitk::Transition> TransitionMap;
 
+//##ModelId=3E72243D0263
 typedef std::map<int,mitk::State *>::iterator StateMapIter;
+//##ModelId=3E72243D0273
 typedef std::map<int,mitk::Transition>::iterator TransMapIter;
 
 

@@ -54,7 +54,7 @@ public:
 *  \todo maybe inner class should be moved out
 */
 
-template <typename MeshType, class ScalarAccessor=NullScalarAccessor<typename MeshType> >
+template <typename MeshType, class ScalarAccessor=NullScalarAccessor<MeshType> >
 class MeshUtil
 {
 

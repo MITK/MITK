@@ -117,9 +117,9 @@ ipPicDescriptor *ipFuncScale ( ipPicDescriptor *pic_old,
   if ( sc_kind == ipFuncScaleNN )
     pic_new = _ipFuncScNN ( pic_old, pic_new );
   else if ( sc_kind == ipFuncScaleBl ) {
-    /* pic_new = _ipFuncScBL ( pic_old, pic_new ); */
-    printf("using NN due to error in _ipFuncScaleBL ... ");
-    pic_new = _ipFuncScNN ( pic_old, pic_new );
+    pic_new = _ipFuncScBL ( pic_old, pic_new ); 
+    /*printf("using NN due to error in _ipFuncScaleBL ... ");
+      pic_new = _ipFuncScNN ( pic_old, pic_new );*/
   }
   else
     {

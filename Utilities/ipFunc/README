@@ -1,0 +1,12 @@
+Kompilieren von libipFunc.a:
+
+cp ipFuncLib.pro ipFunc.pro
+qmake ipFunc.pro
+make
+
+
+
+Kompilieren von ipFunc:
+cp ipFuncMain.pro ipFunc.pro
+qmake ipFunc.pro
+make

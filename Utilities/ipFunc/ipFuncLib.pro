@@ -87,7 +87,7 @@ SOURCES		= AddC.c \
 		  SDevC.c \
 		  SDevR.c \
 		  SDevROI.c \
-#		  ScBl.c \
+		  ScBl.c \
 		  ScFact.c \
 		  ScNN.c \
 		  Scale.c \

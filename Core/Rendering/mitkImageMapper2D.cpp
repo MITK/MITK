@@ -20,6 +20,7 @@
 #include <vtkLookupTable.h>
 
 int mitk::ImageMapper2D::numRenderer = 0;
+ 
 
 mitk::ImageMapper2D::ImageMapper2D() : m_SliceSelector(NULL)
 {
@@ -69,7 +70,7 @@ void mitk::ImageMapper2D::Paint(mitk::BaseRenderer * renderer)
   //test - small differences noticed for unisotropic datasets.
   if((Vector2D(oldtopLeft-topLeft).length()>0.1) || (Vector2D(oldbottomRight-bottomRight).length()>0.1))
   {
-    bottomRight*=1.0;
+    itkWarningMacro("oldtopLeft!=topLeft in ImageMapper2D");
   }
 
   glMatrixMode (GL_PROJECTION);
@@ -196,18 +197,21 @@ void mitk::ImageMapper2D::GenerateData(mitk::BaseRenderer *renderer)
 
     m_Reslicer->SetBackgroundLevel(-1024);
 
+    //let's define how many pixels we really want to sample: width x height pixels
     int width, height;
+    //let's use the values of worldgeometry->GetWidthInUnits() and worldgeometry->GetHeightInUnits() for that purpose
+    //maybe it is useful to add here a more sophisticated rule that depends on the actual size of the current display, so not to
+    //sample 1000x1000 pixels for a display of 10x10 pixels
     width=worldgeometry->GetWidthInUnits();
     height=worldgeometry->GetHeightInUnits();
-    renderinfo.m_PixelsPerMM.set(planeview->getLengthOfOrientation1()/width, planeview->getLengthOfOrientation2()/height);
+    renderinfo.m_PixelsPerMM.set(width/planeview->getLengthOfOrientation1(), height/planeview->getLengthOfOrientation2());
 
-    m_Reslicer->SetOutputSpacing(renderinfo.m_PixelsPerMM.x, renderinfo.m_PixelsPerMM.y, 1.0);
+    m_Reslicer->SetOutputSpacing(1.0/renderinfo.m_PixelsPerMM.x, 1.0/renderinfo.m_PixelsPerMM.y, 1.0);
     m_Reslicer->SetOutputExtent(0, width-1, 0, height-1, 0, 1);
 
+    //calulate the origin and the orientations for the reslice-filter
     double origin[3];
-    origin[0]=planeview->point.x;
-    origin[1]=planeview->point.y;
-    origin[2]=planeview->point.z;
+    vec2vtk(planeview->point, origin);
 
     m_Reslicer->SetResliceAxes(geometry);
     m_Reslicer->SetResliceAxesOrigin(origin);
@@ -219,22 +223,18 @@ void mitk::ImageMapper2D::GenerateData(mitk::BaseRenderer *renderer)
     Vector3f orient2 = planeview->getOrientation2();
     orient2.normalize();
 
-    // Richtung der X-Achse der Ergebnisschicht im Volumen,
-    cosines[0]=orient1.x;
-    cosines[1]=orient1.y;
-    cosines[2]=orient1.z;
+    // direction of the X-axis of the sampled result
+    vec2vtk(orient1, cosines);
 
-    //Richtung der Y-Achse der Ergebnisschicht im Volumen
-    cosines[3]=orient2.x;
-    cosines[4]=orient2.y;
-    cosines[5]=orient2.z;
+    // direction of the Y-axis of the sampled result
+    vec2vtk(orient2, cosines+3);
 
-    // Schichtfolge/Projektionsrichtung
-    cosines[6]= planeview->normal.x;
-    cosines[7]= planeview->normal.y;
-    cosines[8]= planeview->normal.z;
+    // normal of the plane
+    vec2vtk(planeview->normal, cosines+6);
+
     m_Reslicer->SetResliceAxesDirectionCosines(cosines);
 
+    //do the reslicing
     m_Reslicer->Update();
 
     vtkImageData* vtkoutput = m_Reslicer->GetOutput();

@@ -6,7 +6,10 @@
  *   reads a PicFile from disk
  *
  * $Log$
- * Revision 1.7  1999/11/27 20:03:48  andre
+ * Revision 1.8  1999/11/28 16:29:43  andre
+ * *** empty log message ***
+ *
+ * Revision 1.7  1999/11/27  20:03:48  andre
  * *** empty log message ***
  *
  * Revision 1.6  1999/11/27  19:29:43  andre
@@ -43,16 +46,16 @@
 
 #include "ipPic.h"
 
-ipFile_t
+ipPicFile_t
 _ipPicOpenPicFileIn( char *path )
 {
-  ipFile_t infile;
+  ipPicFile_t infile;
   if( path == NULL )
     infile = stdin;
   else if( strcmp(path, "stdin") == 0 )
     infile = stdin;
   else
-    infile = ipFOpen( path, "rb" );
+    infile = ipPicFOpen( path, "rb" );
   return( infile );
 }
 
@@ -107,13 +110,13 @@ ipPicDescriptor *ipPicGet( char *infile_name, ipPicDescriptor *pic )
   fread( &(tag_name[4]), 1, sizeof(ipPicTag_t)-4, infile );
   strncpy( pic->info->version, tag_name, _ipPicTAGLEN );
 
-  ipFReadLE( &len, sizeof(ipUInt4_t), 1, infile );
+  ipPicFReadLE( &len, sizeof(ipUInt4_t), 1, infile );
 
-  ipFReadLE( &(pic->type), sizeof(ipUInt4_t), 1, infile );
-  ipFReadLE( &(pic->bpe), sizeof(ipUInt4_t), 1, infile );
-  ipFReadLE( &(pic->dim), sizeof(ipUInt4_t), 1, infile );
+  ipPicFReadLE( &(pic->type), sizeof(ipUInt4_t), 1, infile );
+  ipPicFReadLE( &(pic->bpe), sizeof(ipUInt4_t), 1, infile );
+  ipPicFReadLE( &(pic->dim), sizeof(ipUInt4_t), 1, infile );
 
-  ipFReadLE( &(pic->n), sizeof(ipUInt4_t), pic->dim, infile );
+  ipPicFReadLE( &(pic->n), sizeof(ipUInt4_t), pic->dim, infile );
 
 
   to_read = len -        3 * sizeof(ipUInt4_t)
@@ -137,7 +140,7 @@ ipPicDescriptor *ipPicGet( char *infile_name, ipPicDescriptor *pic )
   if( pic->type == ipPicNonUniform )
     fread( pic->data, pic->bpe / 8, _ipPicElements(pic), infile );
   else
-    ipFReadLE( pic->data, pic->bpe / 8, _ipPicElements(pic), infile );
+    ipPicFReadLE( pic->data, pic->bpe / 8, _ipPicElements(pic), infile );
 
   if( infile != stdin )
     fclose( infile );
@@ -166,14 +169,14 @@ _ipPicTagsElement_t *_ipPicReadTags( _ipPicTagsElement_t *head, ipUInt4_t bytes_
       strncpy( tsv->tag, tag_name, _ipPicTAGLEN );
       tsv->tag[_ipPicTAGLEN] = '\0';
 
-      ipFReadLE( &len, sizeof(ipUInt4_t), 1, stream );
+      ipPicFReadLE( &len, sizeof(ipUInt4_t), 1, stream );
 
-      ipFReadLE( &(tsv->type), sizeof(ipUInt4_t), 1, stream );
-      ipFReadLE( &(tsv->bpe), sizeof(ipUInt4_t), 1, stream );
-      ipFReadLE( &(tsv->dim), sizeof(ipUInt4_t), 1, stream );
+      ipPicFReadLE( &(tsv->type), sizeof(ipUInt4_t), 1, stream );
+      ipPicFReadLE( &(tsv->bpe), sizeof(ipUInt4_t), 1, stream );
+      ipPicFReadLE( &(tsv->dim), sizeof(ipUInt4_t), 1, stream );
 
 
-      ipFReadLE( &(tsv->n), sizeof(ipUInt4_t), tsv->dim, stream );
+      ipPicFReadLE( &(tsv->n), sizeof(ipUInt4_t), tsv->dim, stream );
 
       /*printf( "%.*s\n", _ipPicTAGLEN, tsv->tag );
       printf( "  %i\n", len );
@@ -212,7 +215,7 @@ assert( elements * tsv->bpe / 8 == len
           else
             tsv->value = malloc( elements * tsv->bpe / 8 );
 
-          ipFReadLE( tsv->value, tsv->bpe / 8, elements, stream );
+          ipPicFReadLE( tsv->value, tsv->bpe / 8, elements, stream );
 
           if( tsv->type == ipPicASCII )
             ((char *)(tsv->value))[elements] = '\0';

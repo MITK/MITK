@@ -306,11 +306,11 @@ void mitk::CylindricToCartesianFilter::buildConeCutOffShortCut(int orig_xsize, i
 
 void mitk::CylindricToCartesianFilter::GenerateOutputInformation()
 {
-  mitk::Image::ConstPointer input = this->GetInput();
   mitk::Image::Pointer output = this->GetOutput();
-
-  if ((output->IsInitialized()) && (this->GetMTime() <= m_TimeOfHeaderInitialization.GetMTime()))
+  if ((output->IsInitialized()) && (output->GetPipelineMTime() <= m_TimeOfHeaderInitialization.GetMTime()))
     return;
+
+  mitk::Image::ConstPointer input = this->GetInput();
 
   itkDebugMacro(<<"GenerateOutputInformation()");
 
@@ -453,6 +453,7 @@ void mitk::CylindricToCartesianFilter::GenerateData()
   }
   //ipPicPut("outzzzzzzzz.pic",pic_transformed);	
   ipPicFree(pic_transformed);
+  m_TimeOfHeaderInitialization.Modified();
 }
 
 mitk::CylindricToCartesianFilter::CylindricToCartesianFilter()

@@ -47,7 +47,7 @@ See MITKCopyright.txt or http://www.mitk.org/ for details.
 mitk::OpenGLRenderer::OpenGLRenderer() : m_VtkMapperPresent(false), 
   m_VtkRenderer(NULL), m_LastUpdateVtkActorsTime(0)
 {
-  m_CameraController=NULL;
+  m_CameraController=NULL;//\*todo remove line
   m_CameraController = new VtkInteractorCameraController();  
 
   m_DataChangedCommand = itk::MemberCommand<mitk::OpenGLRenderer>::New();

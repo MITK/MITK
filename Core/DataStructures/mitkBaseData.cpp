@@ -18,16 +18,16 @@ mitk::BaseData::~BaseData()
 //##ModelId=3DCBE2BA0139
 mitk::Geometry3D::ConstPointer mitk::BaseData::GetUpdatedGeometry()
 {
-    SetRequestedRegionToLargestPossibleRegion();
+  SetRequestedRegionToLargestPossibleRegion();
 
-    UpdateOutputInformation();
+  UpdateOutputInformation();
 
   return m_Geometry3D.GetPointer();
 }
 
 mitk::Geometry3D::Pointer mitk::BaseData::GetGeometry() const
 {
-	return m_Geometry3D.GetPointer();
+  return m_Geometry3D.GetPointer();
 }
 
 //##ModelId=3E3C4ACB0046

@@ -4,7 +4,7 @@
 #include <sstream>
 #include <vector>
 #include <math.h>
-#include "mitkTranferFunction.h"
+#include "mitkTransferFunction.h"
 
 
 class QmitkTransferFunctionCanvas : public QWidget {
@@ -14,7 +14,7 @@ class QmitkTransferFunctionCanvas : public QWidget {
   public:
 
     QmitkTransferFunctionCanvas( QWidget * parent=0, const char * name=0, WFlags f = false );	
-      
+
     // members of QmitkTransferFunctionCanvas follow
     void mousePressEvent( QMouseEvent* mouseEvent );
 
@@ -23,27 +23,24 @@ class QmitkTransferFunctionCanvas : public QWidget {
     void mouseMoveEvent( QMouseEvent* mouseEvent );
     void mouseReleaseEvent( QMouseEvent* mouseEvent );
     void mouseDoubleClickEvent( QMouseEvent* mouseEvent );
-    virtual void PaintElement(QPainter &p,Element* element);
-    QPoint HandleToPoint(const Handle &handle) const {
+    virtual void PaintElement(QPainter &p,mitk::TransferFunction::Element* element);
+    QPoint HandleToPoint(const mitk::TransferFunction::Handle &handle) const {
       int ix = (int)(handle.m_Pos.first * width());
       int iy = height() - (int)( handle.m_Pos.second * height());
       return QPoint(ix,iy);
     }
-    typedef std::set<Element*> ElementSetType; 	
-    ElementSetType m_Elements;
-    /*
+    void SetTransferFunction(mitk::TransferFunction* transferFunction) {
+      this->m_TransferFunction = transferFunction;
+      update();
+    } 
+    mitk::TransferFunction::Pointer m_TransferFunction; 
+    void PaintElementFunction(const mitk::TransferFunction::ElementSetType &elements, QPainter &p,int penWidth = 0);
 
-
-       void virtual resizeEvent ( QResizeEvent * event );
-
-       void update();*/
-    void PaintElementFunction(const ElementSetType &elements, QPainter &p,int penWidth = 0);
-
-    std::pair<Element*,Handle*> GetNearHandle(int x,int y,unsigned int maxSquaredDistance = 6);
-    float SquaredDistance(int x, int y, Handle* handle);
-    Handle* m_GrabbedHandle;
-    Element* m_GrabbedElement;
+    std::pair<mitk::TransferFunction::Element*,mitk::TransferFunction::Handle*> GetNearHandle(int x,int y,unsigned
+    int maxSquaredDistance = 6);
+    float SquaredDistance(int x, int y, mitk::TransferFunction::Handle* handle);
+    mitk::TransferFunction::Handle* m_GrabbedHandle;
+    mitk::TransferFunction::Element* m_GrabbedElement;
     std::pair<int,int> m_MoveStart; 
 };
 
-class 

@@ -8,8 +8,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>405</width>
-            <height>901</height>
+            <width>576</width>
+            <height>912</height>
         </rect>
     </property>
     <property name="caption">
@@ -126,8 +126,21 @@
         <data format="XBM.GZ" length="79">789c534e494dcbcc4b554829cdcdad8c2fcf4c29c95030e0524611cd48cd4ccf28010a1797249664262b2467241641a592324b8aa363156c15aab914146aadb90067111b1f</data>
     </image>
 </images>
+<includes>
+    <include location="local" impldecl="in declaration">mitkDataTreeNode.h</include>
+    <include location="local" impldecl="in implementation">mitkProperties.h</include>
+    <include location="local" impldecl="in implementation">QmitkDataTreeViewItem.h</include>
+    <include location="local" impldecl="in implementation">QmitkTransferFunctionWidget.ui.h</include>
+</includes>
+<forwards>
+    <forward>class QListViewItem</forward>
+</forwards>
+<slots>
+    <slot>SetDataTreeNode( mitk::DataTreeNode * node )</slot>
+    <slot>PropertyChange( QListViewItem * PropertyItem )</slot>
+</slots>
 <layoutdefaults spacing="6" margin="11"/>
 <includehints>
-    <includehint>qtransferfunctioncanvas.h</includehint>
+    <includehint>qmitktransferfunctioncanvas.h</includehint>
 </includehints>
 </UI>

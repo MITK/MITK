@@ -218,14 +218,16 @@
     </connection>
 </connections>
 <includes>
-    <include location="global" impldecl="in implementation">mitkStringProperty.h</include>
-    <include location="global" impldecl="in implementation">qlistview.h</include>
-    <include location="global" impldecl="in implementation">qdropsite.h</include>
     <include location="global" impldecl="in declaration">DataTree.h</include>
     <include location="local" impldecl="in declaration">DataTreeView.h</include>
     <include location="global" impldecl="in declaration">map</include>
     <include location="local" impldecl="in declaration">BaseProperty.h</include>
     <include location="global" impldecl="in declaration">string</include>
+    <include location="global" impldecl="in implementation">mitkStringProperty.h</include>
+    <include location="global" impldecl="in implementation">qlistview.h</include>
+    <include location="global" impldecl="in implementation">qdropsite.h</include>
+    <include location="local" impldecl="in implementation">GlobalInteraction.h</include>
+    <include location="local" impldecl="in implementation">QmitkDataManagerControls.ui.h</include>
 </includes>
 <variables>
     <variable access="public">static mitk::PropertyList::Pointer m_PropertyList;</variable>
@@ -237,8 +239,8 @@
 </slots>
 <functions>
     <function access="private" specifier="non virtual">init()</function>
-    <function>SetDataTreeIterator( mitk::DataTreeIterator * it )</function>
     <function access="protected">UpdateRendererCombo()</function>
+    <function>SetDataTreeIterator( mitk::DataTreeIterator * it )</function>
 </functions>
 <layoutdefaults spacing="0" margin="0"/>
 <includehints>

@@ -17,7 +17,7 @@ void QmitkDataManagerControls::init() {
   m_DataTreeView->addColumn( "RefCount");
   m_RemoveButton->setEnabled(false);
 
-
+  
 }
 
 

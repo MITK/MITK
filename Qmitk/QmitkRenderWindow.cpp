@@ -157,7 +157,7 @@ void QmitkRenderWindow::mousePressEvent(QMouseEvent *me)
   QGLWidget::mousePressEvent(me);
   if (m_Renderer.IsNotNull())
   {
-    Point2D p; p[0]=me->x(); p[1]=me->y();
+    mitk::Point2D p; p[0]=me->x(); p[1]=me->y();
     mitk::MouseEvent event(m_Renderer, me->type(), me->button(), me->state(), Qt::Key_unknown, p);
     m_Renderer->MousePressEvent(&event);
   }
@@ -169,7 +169,7 @@ void QmitkRenderWindow::mouseReleaseEvent(QMouseEvent *me)
   QGLWidget::mouseReleaseEvent(me);
   if (m_Renderer.IsNotNull()) 
   {
-    Point2D p; p[0]=me->x(); p[1]=me->y();
+    mitk::Point2D p; p[0]=me->x(); p[1]=me->y();
     mitk::MouseEvent event(m_Renderer, me->type(), me->button(), me->state(), Qt::Key_unknown, p);
     m_Renderer->MouseReleaseEvent(&event);
   }
@@ -180,7 +180,7 @@ void QmitkRenderWindow::mouseMoveEvent(QMouseEvent *me)
 {
   QGLWidget::mouseMoveEvent(me);
   if (m_Renderer.IsNotNull()) {
-    Point2D p; p[0]=me->x(); p[1]=me->y();
+    mitk::Point2D p; p[0]=me->x(); p[1]=me->y();
     mitk::MouseEvent event(m_Renderer, me->type(), me->button(), me->state(), Qt::Key_unknown, p);
     m_Renderer->MouseMoveEvent(&event);
   }

@@ -2,7 +2,7 @@
 #define MITKVECTOR_H_HEADER_INCLUDED_C1EBD0AD
 
 #include <itkPoint.h>
-#include <itkAffineTransform.h>
+#include <itkFixedCenterOfRotationAffineTransform.h>
 #include <float.h>
 
 namespace mitk {
@@ -11,7 +11,7 @@ typedef float ScalarType;
 typedef itk::Matrix<ScalarType, 3, 3> Matrix3D;
 typedef vnl_matrix_fixed<ScalarType, 3, 3> VnlMatrix3D;
 typedef itk::Transform<ScalarType, 3, 3> Transform3D;
-typedef itk::AffineTransform<ScalarType, 3> AffineTransform3D;
+typedef itk::FixedCenterOfRotationAffineTransform<ScalarType, 3> AffineTransform3D;
 typedef vnl_vector<ScalarType> VnlVector;
 typedef vnl_vector_ref<ScalarType> VnlVectorRef;
 

@@ -76,7 +76,7 @@ public:
     assert(direction>=0 && direction<3);
     assert(m_ParametricBoundingBox.IsNotNull());
 
-    AffineBoundingBoxType::BoundsArrayType bounds = m_ParametricBoundingBox->GetBounds();
+    BoundingBoxType::BoundsArrayType bounds = m_ParametricBoundingBox->GetBounds();
     return bounds[direction*2+1]-bounds[direction*2];
   }
 

@@ -1,7 +1,9 @@
 #include "mitkGeometry3D.h"
 #include "mitkPlaneGeometry.h"
 #include "mitkOperation.h"
-#include "mitkAffineTransformationOperation.h"
+//#include "mitkAffineTransformationOperation.h"
+#include "mitkRotationOperation.h"
+#include "mitkPointOperation.h"
 #include "mitkInteractionConst.h"
 #include "mitkStatusBar.h"
 #include <float.h>
@@ -143,19 +145,19 @@ vtkTransform* mitk::Geometry3D::GetVtkTransform()
 
 void mitk::Geometry3D::ExecuteOperation(Operation* operation)
 {  
-  mitk::AffineTransformationOperation *affineOp = dynamic_cast<mitk::AffineTransformationOperation *>(operation);
-	if (affineOp == NULL)
-	{
-		mitk::StatusBar::DisplayText("Recieved wrong type of operation!See mitkAffineInteractor.cpp", 10000);
-		return;
-	} 
   switch (operation->GetOperationType())
 	{
 	case OpNOTHING:
 		break;
 	case OpMOVE:
   {
-    mitk::ITKPoint3D newPos = affineOp->GetPoint();
+    mitk::PointOperation *pointOp = dynamic_cast<mitk::PointOperation *>(operation);
+	  if (pointOp == NULL)
+	  {
+		  mitk::StatusBar::DisplayText("Recieved wrong type of operation!See mitkAffineInteractor.cpp", 10000);
+		  return;
+	  } 
+    mitk::ITKPoint3D newPos = pointOp->GetPoint();
     ScalarType data[3];
     m_Transform->GetPosition(data);
     m_Transform->PostMultiply();
@@ -165,7 +167,13 @@ void mitk::Geometry3D::ExecuteOperation(Operation* operation)
   }
 	case OpSCALE:
   {
-    mitk::ITKPoint3D newScale = affineOp->GetPoint();
+    mitk::PointOperation *pointOp = dynamic_cast<mitk::PointOperation *>(operation);
+	  if (pointOp == NULL)
+	  {
+		  mitk::StatusBar::DisplayText("Recieved wrong type of operation!See mitkAffineInteractor.cpp", 10000);
+		  return;
+	  } 
+    mitk::ITKPoint3D newScale = pointOp->GetPoint();
     ScalarType data[3];
     data[0] = 1 + (newScale[0] / GetXAxis().GetNorm());
     data[1] = 1 + (newScale[1] / GetYAxis().GetNorm());
@@ -184,14 +192,21 @@ void mitk::Geometry3D::ExecuteOperation(Operation* operation)
   }
   case OpROTATE:
   {
-    ITKPoint3D m_RotationVector = affineOp->GetPoint();
-    ScalarType m_Angle = affineOp->GetAngle();
-    ScalarType pos[3];
-    m_Transform->GetPosition(pos);
+    mitk::RotationOperation *rotateOp = dynamic_cast<mitk::RotationOperation *>(operation);
+    if (rotateOp == NULL)
+    {
+	    mitk::StatusBar::DisplayText("Recieved wrong type of operation!See mitkAffineInteractor.cpp", 10000);
+	    return;
+    }
+    ITKVector3D rotationVector = rotateOp->GetVectorOfRotation();
+    ITKPoint3D center = rotateOp->GetCenterOfRotation();
+    ScalarType angle = rotateOp->GetAngleOfRotation();
+    //ScalarType pos[3];
+    //m_Transform->GetPosition(pos);
     m_Transform->PostMultiply();
-    m_Transform->Translate(-pos[0], -pos[1], -pos[2]);
-    m_Transform->RotateWXYZ(m_Angle, m_RotationVector[0], m_RotationVector[1], m_RotationVector[2]);
-    m_Transform->Translate(pos[0], pos[1], pos[2]);
+    m_Transform->Translate(-center[0], -center[1], -center[2]);
+    m_Transform->RotateWXYZ(angle, rotationVector[0], rotationVector[1], rotationVector[2]);
+    m_Transform->Translate(center[0], center[1], center[2]);
     m_Transform->PreMultiply();
     break;  
   }

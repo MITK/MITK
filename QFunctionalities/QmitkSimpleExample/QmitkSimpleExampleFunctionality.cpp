@@ -311,6 +311,7 @@ void QmitkSimpleExampleFunctionality::initWidgets()
 
 void QmitkSimpleExampleFunctionality::ExecuteOperation(mitk::Operation* operation)
 {
+
     bool ok;//as return
 
     mitk::PointOperation* pointoperation=dynamic_cast<mitk::PointOperation*>(operation);

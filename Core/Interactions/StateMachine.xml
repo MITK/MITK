@@ -66,13 +66,13 @@
 	</stateMachine>
 	<stateMachine NAME="navigation">
 		<state NAME="neutral" ID="1" START_STATE="TRUE">
-			<transition NAME="send Koordinates press" NEXT_STATE_ID="1" EVENT_ID="1">
+			<transition NAME="send Koordinates press" NEXT_STATE_ID="1" EVENT_ID="600">
 				<action ID="90" />
 			</transition>
-			<transition NAME="send Koordinates move" NEXT_STATE_ID="1" EVENT_ID="530">
+			<transition NAME="send Koordinates move" NEXT_STATE_ID="1" EVENT_ID="610">
 				<action ID="90" />
 			</transition>
-			<transition NAME="send Koordinates release" NEXT_STATE_ID="1" EVENT_ID="505">
+			<transition NAME="send Koordinates release" NEXT_STATE_ID="1" EVENT_ID="620">
 				<action ID="42" />
 			</transition>
 		</state>
@@ -701,6 +701,13 @@
 		<event NAME="CTRL+middleBNRelease" ID="539" TYPE="Type_MouseButtonRelease" BUTTON="BS_MidButton" BUTTONSTATE="0x0204" KEY="Key_none" />
 		<!-- Shift + Ctrl + left MouseButton -->
 		<event NAME="SHIFT+CTRL+middleBN" ID="540" TYPE="Type_MouseButtonPress" BUTTON="BS_LeftButton" BUTTONSTATE="0x0300" KEY="Key_none" />
+		<!-- ALT + left MouseButton -->
+		<event NAME="ALT+leftBN" ID="600" TYPE="Type_MouseButtonPress" BUTTON="BS_LeftButton" BUTTONSTATE="0x0400" KEY="Key_none" />
+		<!-- ALT + left MouseButton and MouseMove -->
+		<event NAME="ALT+leftBN+MouseMove" ID="610" TYPE="Type_MouseMove" BUTTON="BS_NoButton" BUTTONSTATE="0x0401" KEY="Key_none" />
+		<!-- ALT + leftMouseButtonRelease -->
+		<event NAME="ALT+leftMouseRelease" ID="620" TYPE="Type_MouseButtonRelease" BUTTON="BS_LeftButton" BUTTONSTATE="0x0401" KEY="Key_none" />
+		
 		<!-- -->
 		<!-- -->
 		<!-- own thrown events -->

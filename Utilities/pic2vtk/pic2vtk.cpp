@@ -488,7 +488,7 @@ vtkImageData* Pic2vtk::convert( ipPicDescriptor* pic ) {
 	if ( pic->dim == 1 ) {
 		inData->SetDimensions( pic->n[0] -1, 1, 1);		
 		size = pic->n[0];		
-		inData->SetOrigin( ((float) pic->n[0]) / 2.0f, 0, 0 );		
+		inData->SetOrigin( ((float) pic->n[0]) / 2.0f, 0, 0 );
 	} else if ( pic->dim == 2 ) {
 		inData->SetDimensions( pic->n[0] , pic->n[1] , 1 );
 		size = pic->n[0] * pic->n[1];
@@ -651,8 +651,8 @@ vtkImageData* Pic2vtk::convertVectorImage( ipPicDescriptor* pic ) {
 
 	std::cout << "   pic dimension = " << dim << std::endl;
 	std::cout << "   pic vector dim = " << vectorDim << std::endl;
-	
-	
+
+
 	if ( dim == 1 ) {
 		inData->SetDimensions( pic->n[0] -1, 1, 1);
 		volumeSize = pic->n[0];
@@ -662,7 +662,8 @@ vtkImageData* Pic2vtk::convertVectorImage( ipPicDescriptor* pic ) {
 		inData->SetDimensions( pic->n[0] , pic->n[1] , 1 );
 		volumeSize = pic->n[0]* pic->n[1];
 		size = volumeSize * vectorDim;
-		inData->SetOrigin( ((float) pic->n[0]) / 2.0f, ((float) pic->n[1]) / 2.0f, 0 );
+		//inData->SetOrigin( ((float) pic->n[0]) / 2.0f, ((float) pic->n[1]) / 2.0f, 0 );
+		inData->SetOrigin( 0,0, 0 );
 	} else if ( dim >= 3 ) {
 		inData->SetDimensions( pic->n[0], pic->n[1], pic->n[2] );
 		volumeSize = pic->n[0]* pic->n[1]* pic->n[2];
@@ -675,9 +676,9 @@ vtkImageData* Pic2vtk::convertVectorImage( ipPicDescriptor* pic ) {
 
 //	std::cout << " size = " << size << std::endl;
 //	std::cout << " volumeSize = " << volumeSize << std::endl;
-	
-	inData->SetNumberOfScalarComponents(vectorDim);
 
+	//inData->SetNumberOfScalarComponents(vectorDim);
+	inData->SetNumberOfScalarComponents(3);
 
 	if ( ( pic->type == ipPicInt || pic->type == ipPicUInt ) && pic->bpe == 1 ) {
 		inData->SetScalarType( VTK_BIT );
@@ -704,9 +705,9 @@ vtkImageData* Pic2vtk::convertVectorImage( ipPicDescriptor* pic ) {
 #define COPYVECTORDATAPIC2VTK		\
 		for ( register unsigned long i = 0; i < volumeSize ; i++ ) \
 		{ \
-			for ( register unsigned int j = 0; j<vectorDim; j++)	\
+			for ( register unsigned int j = 0; j<3; j++)	\
 			{	\
-				*a++ = *(s + j*volumeSize);	\
+				if (j<vectorDim) *a++ = *(s + j*volumeSize); else *a++=0;	\
 			}	\
 			s++; \
 		}

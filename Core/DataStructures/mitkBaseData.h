@@ -19,16 +19,16 @@ class BaseProcess;
 //## Base of all data objects, e.g., images, contours, surfaces etc. Inherits
 //## from itk::DataObject and thus can be included in a pipeline.
 class BaseData : public itk::DataObject
-{	
+{
 public:
     //##ModelId=3E10262200CE
     typedef Geometry3D::Pointer Geometry3DPointer;
 
     mitkClassMacro(mitk::BaseData,itk::DataObject)
 
-        //itkNewMacro(Self);  
+    //itkNewMacro(Self);  
 
-        //##ModelId=3DCBE2BA0139
+    //##ModelId=3DCBE2BA0139
     //##Documentation
     //## Return the Geometry3D of the data. The method does not
     //## simply return the value of the m_Geometry3D member. Before doing this, it
@@ -52,10 +52,74 @@ public:
     virtual mitk::Geometry2D::ConstPointer GetGeometry2D(int s, int t) const;
 
     //##ModelId=3E8600DB0188
+    //##Documentation
+    //## @brief Helps to deal with the weak-pointer-problem.
     virtual void UnRegister() const;
 
     //##ModelId=3E8600DB02DC
+    //##Documentation
+    //## @brief for internal use only. Helps to deal with the
+    //## weak-pointer-problem.
     virtual int GetExternalReferenceCount() const;
+
+   /** @fn void mitk::BaseData::UpdateOutputInformation()=0
+   * @brief Update the information for this BaseData so that it can be used
+   * as an output of a BaseProcess. 
+   *
+   * This method is used in the pipeline mechanism to propagate information and 
+   * initialize the meta data associated with a BaseData. Any implementation 
+   * of this method in a derived class is assumed to call its source's
+   * BaseProcess::UpdateOutputInformation() which determines modified
+   * times, LargestPossibleRegions, and any extra meta data like spacing,
+   * origin, etc. */
+
+  /** @fn void mitk::BaseData::SetRequestedRegionToLargestPossibleRegion()=0
+   * @brief Set the RequestedRegion to the LargestPossibleRegion.
+   *
+   * This forces a filter to produce all of the output in one execution
+   * (i.e. not streaming) on the next call to Update(). */
+
+  /** @fn bool mitk::BaseData::RequestedRegionIsOutsideOfTheBufferedRegion()=0
+   * @brief Determine whether the RequestedRegion is outside of the BufferedRegion.
+   *
+   * BufferedRegion. This method returns true if the RequestedRegion
+   * is outside the BufferedRegion (true if at least one pixel is
+   * outside). This is used by the pipeline mechanism to determine
+   * whether a filter needs to re-execute in order to satisfy the
+   * current request.  If the current RequestedRegion is already
+   * inside the BufferedRegion from the previous execution (and the
+   * current filter is up to date), then a given filter does not need
+   * to re-execute */
+
+  /** @fn bool mitk::BaseData::VerifyRequestedRegion()=0
+   * @brief Verify that the RequestedRegion is within the LargestPossibleRegion.
+   *
+   * If the RequestedRegion is not within the LargestPossibleRegion,
+   * then the filter cannot possibly satisfy the request. This method
+   * returns true if the request can be satisfied (even if it will be
+   * necessary to process the entire LargestPossibleRegion) and
+   * returns false otherwise.  This method is used by
+   * PropagateRequestedRegion().  PropagateRequestedRegion() throws a
+   * InvalidRequestedRegionError exception if the requested region is
+   * not within the LargestPossibleRegion. */
+
+  /** @fn void mitk::BaseData::CopyInformation(const itk::DataObject*)=0
+   * @brief Copy information from the specified data set.
+   *
+   * This method is part of the pipeline execution model. By default, a 
+   * BaseProcess will copy meta-data from the first input to all of its
+   * outputs. See ProcessObject::GenerateOutputInformation().  Each
+   * subclass of DataObject is responsible for being able to copy
+   * whatever meta-data it needs from from another DataObject.
+   * The default implementation of this method is empty. If a subclass
+   * overrides this method, it should always call its superclass'
+   * version. */
+  
+  /** @fn void mitk::BaseData::SetRequestedRegion(itk::DataObject *data)=0
+   * @brief Set the requested region from this data object to match the requested
+   * region of the data object passed in as a parameter.
+   * 
+   * This method is implemented in the concrete subclasses of BaseData. */
 protected:
     //##ModelId=3E3FE04202B9
     BaseData();
@@ -69,6 +133,9 @@ protected:
     //##ModelId=3E8600D9021B
     mutable unsigned int m_SourceOutputIndexDuplicate;
     //##ModelId=3E8600DC0053
+    //##Documentation
+    //## @brief for internal use only. Helps to deal with the
+    //## weak-pointer-problem.
     virtual void ConnectSource(itk::ProcessObject *arg, unsigned int idx) const;
 private:
     //##ModelId=3E8600D90384

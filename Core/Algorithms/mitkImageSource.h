@@ -27,14 +27,14 @@ class ImageSource : public BaseProcess
 public:
   mitkClassMacro(ImageSource,BaseProcess);
   
-  /** Smart Pointer type to a DataObject. */
+  /** @brief Smart Pointer type to a DataObject. */
     //##ModelId=3E1886F1001A
   typedef itk::DataObject::Pointer DataObjectPointer;
 
-  /** Method for creation through the object factory. */
+  /** @brief Method for creation through the object factory. */
   itkNewMacro(Self);  
 
-  /** Some convenient typedefs. */
+  /** @brief Some convenient typedefs. */
     //##ModelId=3E1886F10038
   typedef mitk::Image OutputImageType;
     //##ModelId=3E1886F10056
@@ -42,19 +42,22 @@ public:
     //##ModelId=3E1886F1006A
   typedef SlicedData::RegionType OutputImageRegionType;
 
-  /** Get the image output of this process object.  */
+  /** @brief Get the image output of this process object.  */
     //##ModelId=3E1886F101A2
   OutputImageType * GetOutput(void);
     //##ModelId=3E1886F101F0
   OutputImageType * GetOutput(unsigned int idx);
   
-  /** Set the image output of this process object. This call is slated
+  /** @brief Set the image output of this process object. 
+   *
+   * This call is slated
    * to be removed from ITK. You should GraftOutput() and possible
    * DataObject::DisconnectPipeline() to properly change the output. */
     //##ModelId=3E1886F1024A
   void SetOutput(OutputImageType *output);
 
-  /** Graft the specified DataObject onto this ProcessObject's output.
+  /** @brief Graft the specified DataObject onto this ProcessObject's output.
+   *
    * This method grabs a handle to the specified DataObject's bulk
    * data to used as its output's own bulk data. It also copies the
    * region ivars (RequestedRegion, BufferedRegion,
@@ -92,8 +95,10 @@ public:
     //##ModelId=3E1886F102A5
   virtual void GraftOutput(OutputImageType *output);
 
-  /** Graft the specified data object onto this ProcessObject's idx'th
-   * output. This is the similar to GraftOutput method except is
+  /** @brief Graft the specified data object onto this ProcessObject's idx'th
+   * output. 
+   *
+   * This is the similar to GraftOutput method except is
    * allows you specify which output is affected. The specified index
    * must be a valid output number (less than
    * ProcessObject::GetNumberOfOutputs()). See the GraftOutput for
@@ -101,8 +106,10 @@ public:
     //##ModelId=3E1886F10313
   virtual void GraftNthOutput(unsigned int idx, OutputImageType *output);
 
-  /** Make a DataObject of the correct type to used as the specified
-   * output.  Every ProcessObject subclass must be able to create a
+  /** @brief Make a DataObject of the correct type to used as the specified
+   * output. 
+   *
+   * Every ProcessObject subclass must be able to create a
    * DataObject that can be used as a specified output. This method
    * is automatically called when DataObject::DisconnectPipeline() is
    * called.  DataObject::DisconnectPipeline, disconnects a data object
@@ -131,8 +138,10 @@ protected:
     //##ModelId=3E1886F20093
   virtual ~ImageSource() {}
   
-  /** A version of GenerateData() specific for image processing
-   * filters.  This implementation will split the processing across
+  /** @brief A version of GenerateData() specific for image processing
+   * filters. 
+   *
+   * This implementation will split the processing across
    * multiple threads. The buffer is allocated by this method. Then
    * the BeforeThreadedGenerateData() method is called (if
    * provided). Then, a series of threads are spawned each calling
@@ -149,9 +158,11 @@ protected:
     //##ModelId=3E1886F200CF
   virtual void GenerateData();
 
-  /** If an imaging filter can be implemented as a multithreaded
+  /** @brief If an imaging filter can be implemented as a multithreaded
    * algorithm, the filter will provide an implementation of
-   * ThreadedGenerateData().  This superclass will automatically split
+   * ThreadedGenerateData().
+   *
+   * This superclass will automatically split
    * the output image into a number of pieces, spawn multiple threads,
    * and call ThreadedGenerateData() in each thread. Prior to spawning
    * threads, the BeforeThreadedGenerateData() method is called. After
@@ -177,7 +188,9 @@ protected:
                             int threadId );
 
 
-  /** This method is intentionally left blank. ImageSource's need not
+  /** @brief This method is intentionally left blank. 
+   *
+   * ImageSource's need not
    * Initialize their containers. The Image::Allocate() method (called
    * from GenerateData()) will resize the container if more memory is
    * needed.  Otherwise, the memory can be reused.
@@ -185,18 +198,21 @@ protected:
     //##ModelId=3E1886F201E8
   virtual void PrepareOutputs() {};
 
-  /** The GenerateData method normally allocates the buffers for all of the
-   * outputs of a filter. Some filters may want to override this default
+  /** @brief The GenerateData method normally allocates the buffers for all of the
+   * outputs of a filter. 
+   *
+   * Some filters may want to override this default
    * behavior. For example, a filter may have multiple outputs with
    * varying resolution. Or a filter may want to process data in place by
    * grafting its input to its output.*/
     //##ModelId=3E1886F2022E
   virtual void AllocateOutputs();
   
-  /** If an imaging filter needs to perform processing after the buffer
+  /** @brief If an imaging filter needs to perform processing after the buffer
    * has been allocated but before threads are spawned, the filter can
-   * can provide an implementation for BeforeThreadedGenerateData(). The
-   * execution flow in the default GenerateData() method will be:
+   * can provide an implementation for BeforeThreadedGenerateData().
+   *
+   * The execution flow in the default GenerateData() method will be:
    *      1) Allocate the output buffer
    *      2) Call BeforeThreadedGenerateData()
    *      3) Spawn threads, calling ThreadedGenerateData() in each thread.
@@ -206,9 +222,11 @@ protected:
     //##ModelId=3E1886F2026A
   virtual void BeforeThreadedGenerateData() {};
   
-  /** If an imaging filter needs to perform processing after all
+  /** @brief If an imaging filter needs to perform processing after all
    * processing threads have completed, the filter can can provide an
-   * implementation for AfterThreadedGenerateData(). The execution
+   * implementation for AfterThreadedGenerateData().
+   *
+   * The execution
    * flow in the default GenerateData() method will be:
    *      1) Allocate the output buffer
    *      2) Call BeforeThreadedGenerateData()
@@ -219,8 +237,10 @@ protected:
     //##ModelId=3E1886F202B0
   virtual void AfterThreadedGenerateData() {};
   
-  /** Split the output's RequestedRegion into "num" pieces, returning
-   * region "i" as "splitRegion". This method is called "num" times. The
+  /** @brief Split the output's RequestedRegion into "num" pieces, returning
+   * region "i" as "splitRegion". 
+   *
+   * This method is called "num" times. The
    * regions must not overlap. The method returns the number of pieces that
    * the routine is capable of splitting the output RequestedRegion,
    * i.e. return value is less than or equal to "num". */
@@ -228,13 +248,14 @@ protected:
   virtual
   int SplitRequestedRegion(int i, int num, OutputImageRegionType& splitRegion);
 
-  /** Static function used as a "callback" by the MultiThreader.  The threading
-   * library will call this routine for each thread, which will delegate the
+  /** @brief Static function used as a "callback" by the MultiThreader. 
+   *
+   * The threading library will call this routine for each thread, which will delegate the
    * control to ThreadedGenerateData(). */
     //##ModelId=3E1886F30063
   static ITK_THREAD_RETURN_TYPE ThreaderCallback( void *arg );
 
-  /** Internal structure used for passing image data into the threading library */
+  /** @brief Internal structure used for passing image data into the threading library */
     //##ModelId=3E1886F100A6
   struct ThreadStruct
   {

@@ -62,3 +62,49 @@ void mitk::Geometry2DData::CopyInformation(const itk::DataObject *data)
 {
 }
 
+//##ModelId=3E6423D2030E
+void mitk::Geometry2DData::SetGeometry2D(const mitk::Geometry2D* geometry2d, int t)
+{
+}
+
+//##ModelId=3E66CC5A0295
+void mitk::Geometry2DData::UpdateOutputInformation()
+{
+}
+
+//##ModelId=3E66CC5A02B4
+void mitk::Geometry2DData::SetRequestedRegionToLargestPossibleRegion()
+{
+}
+
+//##ModelId=3E66CC5A02D2
+bool mitk::Geometry2DData::RequestedRegionIsOutsideOfTheBufferedRegion()
+{
+}
+
+//##ModelId=3E66CC5A02F0
+bool mitk::Geometry2DData::VerifyRequestedRegion()
+{
+}
+
+//##ModelId=3E66CC5A030E
+void mitk::Geometry2DData::SetRequestedRegion(itk::DataObject *data)
+{
+}
+
+//##ModelId=3E67D85E00B7
+void mitk::Geometry2DData::CopyInformation(const itk::DataObject *data)
+{
+}
+
+//##ModelId=3E639CD30201
+mitk::Geometry2DData::Geometry2DData()
+{
+}
+
+
+//##ModelId=3E639CD30233
+mitk::Geometry2DData::~Geometry2DData()
+{
+}
+

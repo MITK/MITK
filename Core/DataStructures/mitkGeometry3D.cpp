@@ -68,9 +68,9 @@ void mitk::Geometry3D::Initialize()
 void mitk::Geometry3D::TransferItkToVtkTransform()
 {
  // copy m_IndexToWorldTransform into m_VtkIndexToWorldTransform 
-  m_VtkIndexToWorldTransform = vtkTransform::New();
+  if(m_VtkIndexToWorldTransform==NULL)
+    m_VtkIndexToWorldTransform = vtkTransform::New();
   vtkMatrix4x4 * vtkmatrix = vtkMatrix4x4::New();
-  vtkmatrix->Identity();
   int i,j;
   for(i=0;i<3;++i)
     for(j=0;j<3;++j)
@@ -78,6 +78,7 @@ void mitk::Geometry3D::TransferItkToVtkTransform()
   for(i=0;i<3;++i)
     vtkmatrix->SetElement(i, 3, m_IndexToWorldTransform->GetOffset()[i]);
   m_VtkIndexToWorldTransform->SetMatrix(vtkmatrix);
+  m_VtkIndexToWorldTransform->Modified();
   vtkmatrix->Delete();
 }
 

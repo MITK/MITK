@@ -72,6 +72,13 @@ public:
   //##ModelId=3E3FE0430148
   DataTreeIteratorClone GetNext( const char* propertyName, const mitk::BaseProperty* property,  DataTreeIteratorBase* startPosition = NULL );
 
+  DataTreeIteratorClone GetIteratorToNode(const DataTreeNode* node, const DataTreeIteratorBase* startPosition = NULL )
+  {
+    return GetIteratorToNode(this, node, startPosition);
+  }
+
+  static DataTreeIteratorClone GetIteratorToNode(mitk::DataTreeBase* tree, const DataTreeNode* node, const DataTreeIteratorBase* startPosition = NULL );
+
   //##ModelId=3ED91D050085
   //##Documentation
   //## @brief Compute the bounding box of data tree structure

@@ -59,6 +59,26 @@ mitk::DataTreeIteratorClone mitk::DataTree::GetNext( const char* propertyKey, co
   return pos;
 }
 
+mitk::DataTreeIteratorClone mitk::DataTree::GetIteratorToNode(mitk::DataTreeBase* tree, const mitk::DataTreeNode* node, const mitk::DataTreeIteratorBase* startPosition )
+{
+  DataTreeIteratorClone pos;
+
+  if(startPosition != NULL)
+    pos = *startPosition;
+  else
+    pos = DataTreePreOrderIterator(tree);
+
+  while ( !pos->IsAtEnd() )
+  {
+    if ( pos->Get().GetPointer() == node )
+      return pos;
+    ++pos;
+  }
+  return pos;
+
+}
+
+
 //##ModelId=3ED91D050085
 mitk::BoundingBox::Pointer mitk::DataTree::ComputeBoundingBox(mitk::DataTreeIteratorBase* it, const char* boolPropertyKey, mitk::BaseRenderer* renderer, const char* boolPropertyKey2)
 {

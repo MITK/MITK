@@ -29,7 +29,7 @@ void mitk::DICOMFileReader::GenerateOutputInformation()
 		ipUInt4_t image_size,slices;
 		ipUInt1_t *header = NULL;
 		unsigned char *image = NULL;
-		ipBool_t color;
+    ipBool_t color=ipFalse;
         ipBool_t encrypt;
         void * data;
 		ipUInt4_t  len;

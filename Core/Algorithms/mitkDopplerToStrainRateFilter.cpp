@@ -1,6 +1,7 @@
 #include "mitkDopplerToStrainRateFilter.h"
 #include "mitkImageTimeSelector.h"
 #include "mitkProperties.h"
+#include "mitkPlaneGeometry.h"
 
 #include <iostream.h>
 #include <string>
@@ -31,18 +32,20 @@ void mitk::DopplerToStrainRateFilter::GenerateOutputInformation()
 
 	// initialize the spacing of the output
 	// @todo position of input image is not yet used to calculate position of the output
-    mitk::Point3D origin, right, bottom;
-    origin.set(0,0,0);                output->GetGeometry()->UnitsToMM(origin, origin);
-    right.set(tmpDimensions[0],0,0);  output->GetGeometry()->UnitsToMM(right, right);
-    bottom.set(0,tmpDimensions[1],0); output->GetGeometry()->UnitsToMM(bottom, bottom);
+    //mitk::Point3D origin, right, bottom;
+    //origin.set(0,0,0);                output->GetGeometry()->UnitsToMM(origin, origin);
+    //right.set(tmpDimensions[0],0,0);  output->GetGeometry()->UnitsToMM(right, right);
+    //bottom.set(0,tmpDimensions[1],0); output->GetGeometry()->UnitsToMM(bottom, bottom);
 
-    PlaneView view_std(origin, right, bottom);
+    //PlaneView view_std(origin, right, bottom);
 
-    mitk::PlaneGeometry::Pointer planegeometry=mitk::PlaneGeometry::New();
-    planegeometry->SetPlaneView(view_std);
-    planegeometry->SetSizeInUnits(tmpDimensions[0], tmpDimensions[1]);
+    //mitk::PlaneGeometry::Pointer planegeometry=mitk::PlaneGeometry::New();
+    //planegeometry->SetPlaneView(view_std);
+    //planegeometry->SetThicknessBySpacing(input->GetSlicedGeometry()->GetSpacing());
+    //planegeometry->SetSizeInUnits(tmpDimensions[0], tmpDimensions[1]);
 
-    output->GetSlicedGeometry()->SetGeometry2D(planegeometry.GetPointer(), 0, 0);
+    //output->GetSlicedGeometry()->SetGeometry2D(planegeometry.GetPointer(), 0);
+    output->GetSlicedGeometry()->SetGeometry2D(mitk::Image::BuildStandardPlaneGeometry2D(output->GetSlicedGeometry(), tmpDimensions).GetPointer(), 0);
     output->GetSlicedGeometry()->SetEvenlySpaced();
 
 	  output->SetPropertyList(input->GetPropertyList()->Clone());    

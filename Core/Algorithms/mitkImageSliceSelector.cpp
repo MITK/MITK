@@ -11,16 +11,8 @@ void mitk::ImageSliceSelector::GenerateOutputInformation()
 	output->Initialize(input->GetPixelType(), 2, input->GetDimensions());
 
   // initialize geometry
-  SlicedGeometry3D::Pointer geometry = SlicedGeometry3D::New();
-  geometry->Initialize(1, 1);
-  geometry->SetGeometry2D(input->GetSlicedGeometry()->GetGeometry2D(m_SliceNr, m_TimeNr).GetPointer(), 0, 0);
-  geometry->SetEvenlySpaced(input->GetSlicedGeometry()->GetEvenlySpaced());
-  geometry->SetSpacing(input->GetSlicedGeometry()->GetSpacing());
-
-
-  geometry->SetSpacing(input->GetSlicedGeometry()->GetSpacing());
+  output->SetGeometry(input->GetSlicedGeometry(m_TimeNr)->GetGeometry2D(m_SliceNr)->Clone());
   output->SetPropertyList(input->GetPropertyList()->Clone());
-  output->SetGeometry(geometry);
 }
 
 //##ModelId=3E1A0A320090

@@ -5,8 +5,49 @@
 #include "mitkGlobalInteraction.h"
 #include "mitkDisplayPositionEvent.h"
 #include "mitkSmartPointerProperty.h"
+#include "mitkSlicedGeometry3D.h"
 #include "mitkStatusBar.h"
 #include <vtkTransform.h>
+
+//##ModelId=3E3D2F120050
+mitk::BaseRenderer::BaseRenderer() : 
+  m_DataTreeIterator(NULL), m_RenderWindow(NULL), m_LastUpdateTime(0), m_MapperID(defaultMapper), m_CameraController(NULL), m_Focused(false), 
+  m_WorldGeometry(NULL),  m_TimeSlicedWorldGeometry(NULL), m_CurrentWorldGeometry2D(NULL), m_Slice(0), m_TimeStep(0)
+{
+  //adding this BaseRenderer to the List of all BaseRenderer
+  mitk::GlobalInteraction *globalInteraction = dynamic_cast<mitk::GlobalInteraction *>(EventMapper::GetGlobalStateMachine());
+  if (globalInteraction != NULL)
+	{
+    globalInteraction->AddFocusElement(this);
+  }
+
+  SmartPointerProperty::Pointer rendererProp = new SmartPointerProperty((itk::Object*)this);
+
+  m_CurrentWorldGeometry2D = mitk::PlaneGeometry::New();
+
+  m_CurrentWorldGeometry2DData = mitk::Geometry2DData::New();
+  m_CurrentWorldGeometry2DData->SetGeometry2D(m_CurrentWorldGeometry2D);
+  m_CurrentWorldGeometry2DNode = mitk::DataTreeNode::New();
+  m_CurrentWorldGeometry2DNode->SetData(m_CurrentWorldGeometry2DData);
+  m_CurrentWorldGeometry2DNode->GetPropertyList()->SetProperty("renderer", rendererProp);
+  m_CurrentWorldGeometry2DTransformTime = m_CurrentWorldGeometry2DNode->GetVtkTransform()->GetMTime();
+
+  m_DisplayGeometry = mitk::DisplayGeometry::New();
+  m_DisplayGeometry->SetWorldGeometry(m_CurrentWorldGeometry2D);
+  m_DisplayGeometryData = mitk::Geometry2DData::New();
+  m_DisplayGeometryData->SetGeometry2D(m_DisplayGeometry);
+  m_DisplayGeometryNode = mitk::DataTreeNode::New();
+  m_DisplayGeometryNode->SetData(m_DisplayGeometryData);
+  m_DisplayGeometryNode->GetPropertyList()->SetProperty("renderer", rendererProp);
+  m_DisplayGeometryTransformTime = m_DisplayGeometryNode->GetVtkTransform()->GetMTime();
+}
+
+
+//##ModelId=3E3D2F12008C
+mitk::BaseRenderer::~BaseRenderer()
+{
+  delete m_DataTreeIterator;
+}
 
 //##ModelId=3D6A1791038B
 void mitk::BaseRenderer::SetData(mitk::DataTreeIterator* iterator)
@@ -68,56 +109,69 @@ void mitk::BaseRenderer::InitSize(int w, int h)
   GetDisplayGeometry()->Fit();
 }
 
-//##ModelId=3E3D2F120050
-mitk::BaseRenderer::BaseRenderer() : m_DataTreeIterator(NULL), m_RenderWindow(NULL), m_LastUpdateTime(0), m_MapperID(defaultMapper), m_CameraController(NULL), m_Focused(false)
+void mitk::BaseRenderer::SetSlice(unsigned int slice)
 {
-  //adding this BaseRenderer to the List of all BaseRenderer
-  mitk::GlobalInteraction *globalInteraction = dynamic_cast<mitk::GlobalInteraction *>(EventMapper::GetGlobalStateMachine());
-  if (globalInteraction != NULL)
-	{
-    globalInteraction->AddFocusElement(this);
+  if(m_Slice!=slice)
+  {
+    m_Slice = slice;
+    if(m_TimeSlicedWorldGeometry.IsNotNull())
+    {
+      SlicedGeometry3D* slicedWorldGeometry=dynamic_cast<SlicedGeometry3D*>(m_TimeSlicedWorldGeometry->GetGeometry3D(m_TimeStep));
+      if(slicedWorldGeometry!=NULL)
+        SetCurrentWorldGeometry2D(slicedWorldGeometry->GetGeometry2D(m_Slice));
+    }
+    else
+      Modified();
   }
-
-  SmartPointerProperty::Pointer rendererProp = new SmartPointerProperty((itk::Object*)this);
-
-  m_WorldGeometry = mitk::PlaneGeometry::New();
-
-  m_WorldGeometryData = mitk::Geometry2DData::New();
-  m_WorldGeometryData->SetGeometry2D(m_WorldGeometry);
-  m_WorldGeometryNode = mitk::DataTreeNode::New();
-  m_WorldGeometryNode->SetData(m_WorldGeometryData);
-  m_WorldGeometryNode->GetPropertyList()->SetProperty("renderer", rendererProp);
-  m_WorldGeometryTransformTime = m_WorldGeometryNode->GetVtkTransform()->GetMTime();
-
-  m_DisplayGeometry = mitk::DisplayGeometry::New();
-  m_DisplayGeometry->SetWorldGeometry(m_WorldGeometry);
-  m_DisplayGeometryData = mitk::Geometry2DData::New();
-  m_DisplayGeometryData->SetGeometry2D(m_DisplayGeometry);
-  m_DisplayGeometryNode = mitk::DataTreeNode::New();
-  m_DisplayGeometryNode->SetData(m_DisplayGeometryData);
-  m_DisplayGeometryNode->GetPropertyList()->SetProperty("renderer", rendererProp);
-  m_DisplayGeometryTransformTime = m_DisplayGeometryNode->GetVtkTransform()->GetMTime();
 }
 
-
-//##ModelId=3E3D2F12008C
-mitk::BaseRenderer::~BaseRenderer()
+void mitk::BaseRenderer::SetTimeStep(unsigned int timeStep)
 {
-  delete m_DataTreeIterator;
+  if(m_TimeStep!=timeStep)
+  {
+    m_TimeStep = timeStep;
+    if(m_TimeSlicedWorldGeometry.IsNotNull())
+    {
+      SlicedGeometry3D* slicedWorldGeometry=dynamic_cast<SlicedGeometry3D*>(m_TimeSlicedWorldGeometry->GetGeometry3D(m_TimeStep));
+      if(slicedWorldGeometry!=NULL)
+        SetCurrentWorldGeometry2D(slicedWorldGeometry->GetGeometry2D(m_Slice));
+    }
+    else
+      Modified();
+  }
 }
 
 //##ModelId=3E66CC590379
-void mitk::BaseRenderer::SetWorldGeometry(const mitk::Geometry2D* geometry2d)
+void mitk::BaseRenderer::SetWorldGeometry(mitk::Geometry3D* geometry)
 {
-  itkDebugMacro("setting WorldGeometry to " << geometry2d);
-  if (m_WorldGeometry != geometry2d)
+  itkDebugMacro("setting WorldGeometry to " << geometry);
+
+  if(m_WorldGeometry != geometry)
   {
-    m_WorldGeometry = geometry2d;
-    m_WorldGeometryData->SetGeometry2D(m_WorldGeometry);
-    m_DisplayGeometry->SetWorldGeometry(m_WorldGeometry);
-    m_WorldGeometryUpdateTime.Modified();
-    Modified();
+    m_WorldGeometry = geometry;
+    m_TimeSlicedWorldGeometry=dynamic_cast<TimeSlicedGeometry*>(geometry);
+    if(m_TimeSlicedWorldGeometry.IsNotNull())
+    {
+      itkDebugMacro("setting TimeSlicedWorldGeometry to " << m_TimeSlicedWorldGeometry);
+      if(m_TimeStep > m_TimeSlicedWorldGeometry->GetTimeSteps())
+        m_TimeStep = m_TimeSlicedWorldGeometry->GetTimeSteps();
+      SlicedGeometry3D* slicedWorldGeometry=dynamic_cast<SlicedGeometry3D*>(m_TimeSlicedWorldGeometry->GetGeometry3D(0));
+      if(slicedWorldGeometry!=NULL)
+      {
+        if(m_Slice > slicedWorldGeometry->GetSlices())
+          m_Slice = slicedWorldGeometry->GetSlices();
+      }
+      assert(slicedWorldGeometry!=NULL); //only as long as the todo described in SetWorldGeometry is not done
+      SetCurrentWorldGeometry2D(slicedWorldGeometry->GetGeometry2D(m_Slice)); // calls Modified()
+    }
+    else
+    {
+      SetCurrentWorldGeometry2D(dynamic_cast<Geometry2D*>(geometry));
+      Modified();
+    }
   }
+  if(m_CurrentWorldGeometry2D.IsNull())
+    itkWarningMacro("m_CurrentWorldGeometry2D is NULL");
 }
 
 //##ModelId=3E66CC59026B
@@ -129,6 +183,18 @@ void mitk::BaseRenderer::SetDisplayGeometry(mitk::DisplayGeometry* geometry2d)
     m_DisplayGeometry = geometry2d;
     m_DisplayGeometryData->SetGeometry2D(m_DisplayGeometry);
     m_DisplayGeometryUpdateTime.Modified();
+    Modified();
+  }
+}
+
+void mitk::BaseRenderer::SetCurrentWorldGeometry2D(mitk::Geometry2D* geometry2d)
+{
+  if (m_CurrentWorldGeometry2D != geometry2d)
+  {
+    m_CurrentWorldGeometry2D = geometry2d;
+    m_CurrentWorldGeometry2DData->SetGeometry2D(m_CurrentWorldGeometry2D);
+    m_DisplayGeometry->SetWorldGeometry(m_CurrentWorldGeometry2D);
+    m_CurrentWorldGeometry2DUpdateTime.Modified();
     Modified();
   }
 }

@@ -78,17 +78,21 @@ QWidget * QmitkSimpleExampleFunctionality::createControlWidget(QWidget *parent)
         sliceNavigatorTransversal = mitk::SliceNavigationController::New();
         sliceNavigatorTransversal->SetViewDirection(mitk::SliceNavigationController::Transversal);
         sliceNavigatorTransversal->AddRenderer(multiWidget->mitkWidget1->GetRenderer());
-        new QmitkStepperAdapter(controls->getSliceNavigatorTransversal(), sliceNavigatorTransversal->GetSlice(), "sliceNavigatorTransversalFromSimpleExemple");
+        new QmitkStepperAdapter(controls->getSliceNavigatorTransversal(), sliceNavigatorTransversal->GetSlice(), "sliceNavigatorTransversalFromSimpleExample");
 
         sliceNavigatorSagittal = mitk::SliceNavigationController::New();
         sliceNavigatorSagittal->SetViewDirection(mitk::SliceNavigationController::Sagittal);
         sliceNavigatorSagittal->AddRenderer(multiWidget->mitkWidget2->GetRenderer());
-        new QmitkStepperAdapter(controls->getSliceNavigatorSagittal(), sliceNavigatorSagittal->GetSlice(), "sliceNavigatorSagittalFromSimpleExemple");
+        new QmitkStepperAdapter(controls->getSliceNavigatorSagittal(), sliceNavigatorSagittal->GetSlice(), "sliceNavigatorSagittalFromSimpleExample");
 
         sliceNavigatorFrontal = mitk::SliceNavigationController::New();
         sliceNavigatorFrontal->SetViewDirection(mitk::SliceNavigationController::Frontal);
         sliceNavigatorFrontal->AddRenderer(multiWidget->mitkWidget3->GetRenderer());
-        new QmitkStepperAdapter(controls->getSliceNavigatorFrontal(), sliceNavigatorFrontal->GetSlice(), "sliceNavigatorFrontalFromSimpleExemple");
+        new QmitkStepperAdapter(controls->getSliceNavigatorFrontal(), sliceNavigatorFrontal->GetSlice(), "sliceNavigatorFrontalFromSimpleExample");
+
+        sliceNavigatorTime = mitk::SliceNavigationController::New();
+        sliceNavigatorTime->AddRenderer(multiWidget->mitkWidget1->GetRenderer());
+        new QmitkStepperAdapter(controls->getSliceNavigatorTime(), sliceNavigatorTime->GetTime(), "sliceNavigatorTimeFromSimpleExample");
     }
     return controls;
 }
@@ -108,31 +112,49 @@ QAction * QmitkSimpleExampleFunctionality::createAction(QActionGroup *parent)
     //    action = new QAction( tr( "Left" ), QPixmap(textleft_xpm), tr( "&Left" ), CTRL + Key_L, parent, "simple example" );
     return action;
 }
+void QmitkSimpleExampleFunctionality::initNavigators()
+{
+  //\todo unwanted recursion: here we want to set the new worldgeometry according to the boundingbox of the (sub-)tree. Unfortuantely, the
+  //old worldgeometries are included in the tree and thus considered in the boundingbox-calculation.... Current solution: make them temporarily invisible
+  //and use ComputeVisibleBoundingBox.
+  mitk::DataTreeNode::Pointer node;
+  bool v1,v2,v3,v4;
+  node = multiWidget->mitkWidget1->GetRenderer()->GetCurrentWorldGeometry2DNode(); node->GetVisibility(v1, NULL); node->SetVisibility(false, NULL);
+  node = multiWidget->mitkWidget2->GetRenderer()->GetCurrentWorldGeometry2DNode(); node->GetVisibility(v2, NULL); node->SetVisibility(false, NULL);
+  node = multiWidget->mitkWidget3->GetRenderer()->GetCurrentWorldGeometry2DNode(); node->GetVisibility(v3, NULL); node->SetVisibility(false, NULL);
+  node = multiWidget->mitkWidget4->GetRenderer()->GetCurrentWorldGeometry2DNode(); node->GetVisibility(v4, NULL); node->SetVisibility(false, NULL);
+
+  const mitk::BoundingBox::Pointer boundingbox = mitk::DataTree::ComputeVisibleBoundingBox(m_DataTreeIterator);
+  if(boundingbox->GetPoints()->Size()>0)
+  {
+    mitk::Geometry3D::Pointer geometry = mitk::Geometry3D::New();
+    geometry->Initialize();
+    geometry->SetBoundingBox(boundingbox);
+    sliceNavigatorTransversal->SetWorldGeometry(geometry.GetPointer()); sliceNavigatorTransversal->Update();
+    sliceNavigatorFrontal->SetWorldGeometry(geometry.GetPointer());     sliceNavigatorFrontal->Update();
+    sliceNavigatorSagittal->SetWorldGeometry(geometry.GetPointer());    sliceNavigatorSagittal->Update();
+  }
+
+ multiWidget->mitkWidget1->GetRenderer()->GetCurrentWorldGeometry2DNode()->SetVisibility(v1, NULL);
+ multiWidget->mitkWidget2->GetRenderer()->GetCurrentWorldGeometry2DNode()->SetVisibility(v2, NULL);
+ multiWidget->mitkWidget3->GetRenderer()->GetCurrentWorldGeometry2DNode()->SetVisibility(v3, NULL);
+ multiWidget->mitkWidget4->GetRenderer()->GetCurrentWorldGeometry2DNode()->SetVisibility(v4, NULL);
+}
 
 void QmitkSimpleExampleFunctionality::treeChanged(mitk::DataTreeIterator& itpos)
 {
-  if(controls->isVisible())
-  {
-    const mitk::BoundingBox::Pointer boundingbox = mitk::DataTree::ComputeBoundingBox(m_DataTreeIterator);
-    if(boundingbox->GetPoints()->Size()>0)
-    {
-      mitk::Geometry3D::Pointer geometry = mitk::Geometry3D::New();
-      geometry->Initialize(1);
-      geometry->SetBoundingBox(boundingbox);
-      sliceNavigatorTransversal->SetGeometry(geometry.GetPointer());
-      sliceNavigatorFrontal->SetGeometry(geometry.GetPointer());
-      sliceNavigatorSagittal->SetGeometry(geometry.GetPointer());
-    }
-  }
+  if(isActivated())
+    initNavigators();
 }
 
 void QmitkSimpleExampleFunctionality::activated()
 {
+  QmitkFunctionality::activated();
     assert( multiWidget != NULL );
     // init widget 4 as a 3D widget
     multiWidget->mitkWidget4->GetRenderer()->SetMapperID(2);
 
-    treeChanged(*m_DataTreeIterator);
+    initNavigators();
 }
 
 //void QmitkSimpleExampleFunctionality::deactivated()
@@ -142,7 +164,7 @@ void QmitkSimpleExampleFunctionality::activated()
 
 void QmitkSimpleExampleFunctionality::selectSliceWidgetXY( int z )
 {
-    const mitk::Geometry2D* g2d = multiWidget->mitkWidget1->GetRenderer()->GetWorldGeometry();
+    const mitk::Geometry2D* g2d = multiWidget->mitkWidget1->GetRenderer()->GetCurrentWorldGeometry2D();
     const mitk::PlaneGeometry* pg = dynamic_cast<const mitk::PlaneGeometry*>(g2d);
     mitk::PlaneView pv = pg->GetPlaneView();
     pv.point.z = z;
@@ -155,7 +177,7 @@ void QmitkSimpleExampleFunctionality::selectSliceWidgetXY( int z )
 
 void QmitkSimpleExampleFunctionality::selectSliceWidgetXZ(int y)
 {
-    const mitk::Geometry2D* g2d = multiWidget->mitkWidget3->GetRenderer()->GetWorldGeometry();
+    const mitk::Geometry2D* g2d = multiWidget->mitkWidget3->GetRenderer()->GetCurrentWorldGeometry2D();
     const mitk::PlaneGeometry* pg = dynamic_cast<const mitk::PlaneGeometry*>(g2d);
     mitk::PlaneView pv = pg->GetPlaneView();
     pv.point.y=y;
@@ -168,7 +190,7 @@ void QmitkSimpleExampleFunctionality::selectSliceWidgetXZ(int y)
 
 void QmitkSimpleExampleFunctionality::selectSliceWidgetYZ(int x)
 {
-    const mitk::Geometry2D* g2d = multiWidget->mitkWidget2->GetRenderer()->GetWorldGeometry();
+    const mitk::Geometry2D* g2d = multiWidget->mitkWidget2->GetRenderer()->GetCurrentWorldGeometry2D();
     const mitk::PlaneGeometry* pg = dynamic_cast<const mitk::PlaneGeometry*>(g2d);
     mitk::PlaneView pv = pg->GetPlaneView();
     pv.point.x = x;
@@ -260,7 +282,7 @@ void QmitkSimpleExampleFunctionality::ExecuteOperation(mitk::Operation* operatio
                     v=(int)seed.x;
                     if(controls->getSliderYZ()->value()!=v)
                     {
-                        g2d = multiWidget->mitkWidget2->GetRenderer()->GetWorldGeometry();
+                        g2d = multiWidget->mitkWidget2->GetRenderer()->GetCurrentWorldGeometry2D();
                         pg = dynamic_cast<const mitk::PlaneGeometry*>(g2d);
                         pv = pg->GetPlaneView();
                         pv.point.x = v; 
@@ -274,7 +296,7 @@ void QmitkSimpleExampleFunctionality::ExecuteOperation(mitk::Operation* operatio
                     v=(int)seed.y;
                     if(controls->getSliderXZ()->value()!=v)
                     {
-                        g2d = multiWidget->mitkWidget3->GetRenderer()->GetWorldGeometry();
+                        g2d = multiWidget->mitkWidget3->GetRenderer()->GetCurrentWorldGeometry2D();
                         pg = dynamic_cast<const mitk::PlaneGeometry*>(g2d);
                         pv = pg->GetPlaneView();
                         pv.point.y = v;
@@ -289,7 +311,7 @@ void QmitkSimpleExampleFunctionality::ExecuteOperation(mitk::Operation* operatio
                     v=(int)seed.z;
                     if(controls->getSliderXY()->value()!=v)
                     {
-                        g2d = multiWidget->mitkWidget1->GetRenderer()->GetWorldGeometry();
+                        g2d = multiWidget->mitkWidget1->GetRenderer()->GetCurrentWorldGeometry2D();
                         pg = dynamic_cast<const mitk::PlaneGeometry*>(g2d);
                         pv = pg->GetPlaneView();
                         pv.point.z = v;

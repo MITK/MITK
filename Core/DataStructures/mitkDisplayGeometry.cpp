@@ -225,12 +225,11 @@ void mitk::DisplayGeometry::MMToULDisplay(const mitk::Vector2D &vec_mm, mitk::Ve
 }
 
 //##ModelId=3E3AEB620231
-double mitk::DisplayGeometry::GetTime(int t) const
+const mitk::TimeBounds& mitk::DisplayGeometry::GetTimeBoundsInMS() const
 {
-  if(m_WorldGeometry.IsNull()) return 0.0;
+  if(m_WorldGeometry.IsNull()) return NULL;
 
-
-  return m_WorldGeometry->GetTime(t);
+  return m_WorldGeometry->GetTimeBoundsInMS();
 }
 
 //##ModelId=3E3AE91A035E

@@ -4,6 +4,7 @@
 #include "mitkAffineTransformationOperation.h"
 #include "mitkInteractionConst.h"
 #include "mitkStatusBar.h"
+#include <float.h>
 
 #include <vecmath.h>
 #include <vtkTransform.h>
@@ -16,61 +17,58 @@ extern "C"
 }
 #endif
 
-//##ModelId=3DCBF5D40253
-mitk::BoundingBox::ConstPointer mitk::Geometry3D::GetBoundingBox(int t) const
-{
-  assert(m_BoundingBoxes.size()>0);
-  assert(m_BoundingBoxes[t].IsNotNull());
-
-  return m_BoundingBoxes[t];
-}
-
-//##ModelId=3ED91D050299
-void mitk::Geometry3D::SetBoundingBox(const mitk::BoundingBox* boundingBox,  int t)
-{
-  if(IsValidTime(t))
-    m_BoundingBoxes[t]=boundingBox;
-  else
-    itkExceptionMacro("tried to set boundingbox for an invalid point of time (t:"<<t<<"). Was Initialize called at all?");
-}
-
 //##ModelId=3ED91D050305
-void mitk::Geometry3D::SetBoundingBox(const float bounds[6],  int t)
+void mitk::Geometry3D::SetBoundingBox(const float bounds[6])
 {
-  if(IsValidTime(t))
-  {
-    mitk::BoundingBox::Pointer boundingBox=mitk::BoundingBox::New();
+  mitk::BoundingBox::Pointer boundingBox=mitk::BoundingBox::New();
+  
+  mitk::BoundingBox::PointsContainer::Pointer pointscontainer=mitk::BoundingBox::PointsContainer::New();
+  mitk::ScalarType nullpoint[]={0,0,0};
+  mitk::BoundingBox::PointType p(nullpoint);
+  
+  mitk::BoundingBox::PointIdentifier pointid=0;
+  
+  //add the four edge points of the upper AND lower boundery of the plane geometry to the bounding box calculator.
+  p[0]=bounds[0]; p[1]=bounds[2]; p[2]=bounds[4];
+  pointscontainer->InsertElement(pointid++, p);
 
-    mitk::BoundingBox::PointsContainer::Pointer pointscontainer=mitk::BoundingBox::PointsContainer::New();
-    mitk::ScalarType nullpoint[]={0,0,0};
-    mitk::BoundingBox::PointType p(nullpoint);
+  //p[0]=bounds[0]; p[1]=bounds[2]; p[2]=bounds[5];
+  //pointscontainer->InsertElement(pointid++, p);
 
-    mitk::BoundingBox::PointIdentifier pointid=0;
+  //p[0]=bounds[0]; p[1]=bounds[3]; p[2]=bounds[4];
+  //pointscontainer->InsertElement(pointid++, p);
 
-    p[0]=bounds[0]; p[1]=bounds[2]; p[2]=bounds[4];
-    pointscontainer->InsertElement(pointid++, p);
+  //p[0]=bounds[0]; p[1]=bounds[3]; p[2]=bounds[5];
+  //pointscontainer->InsertElement(pointid++, p);
 
-    p[0]=bounds[1]; p[1]=bounds[3]; p[2]=bounds[5];
-    pointscontainer->InsertElement(pointid++, p);
+  //p[0]=bounds[1]; p[1]=bounds[2]; p[2]=bounds[4];
+  //pointscontainer->InsertElement(pointid++, p);
 
-    boundingBox->SetPoints(pointscontainer);
+  //p[0]=bounds[1]; p[1]=bounds[2]; p[2]=bounds[5];
+  //pointscontainer->InsertElement(pointid++, p);
 
-    boundingBox->ComputeBoundingBox();
+  //p[0]=bounds[1]; p[1]=bounds[3]; p[2]=bounds[4];
+  //pointscontainer->InsertElement(pointid++, p);
 
-    m_BoundingBoxes[t]=boundingBox;
-  }
-  else
-    itkExceptionMacro("tried to set boundingbox for an invalid point of time (t:"<<t<<")");
+  p[0]=bounds[1]; p[1]=bounds[3]; p[2]=bounds[5];
+  pointscontainer->InsertElement(pointid++, p);
+
+  boundingBox->SetPoints(pointscontainer);
+  
+  boundingBox->ComputeBoundingBox();
+  
+  SetBoundingBox(boundingBox);
 }
 
 //##ModelId=3DCBF5E9037F
-/*!
-\todo use parameter t or removed it!!!
-*/
-double mitk::Geometry3D::GetTime(int t) const
+const mitk::TimeBounds& mitk::Geometry3D::GetTimeBoundsInMS() const
 {
-  itkExceptionMacro("GetTime not yet supported.");
-  return 0;
+  return m_TimeBoundsInMS;
+}
+
+void mitk::Geometry3D::SetTimeBoundsInMS(const mitk::TimeBounds& timebounds)
+{
+  m_TimeBoundsInMS = timebounds;
 }
 
 //##ModelId=3DE763C500C4
@@ -116,24 +114,17 @@ void mitk::Geometry3D::UnitsToMM(const mitk::Vector3D &vec_units, mitk::Vector3D
 }
 
 //##ModelId=3E3453C703AF
-void mitk::Geometry3D::Initialize(unsigned int timeSteps)
+void mitk::Geometry3D::Initialize()
 {
-  m_TimeSteps = timeSteps;
-
   //initialize m_TransformOfOrigin and m_Spacing (and m_TransformUnitsToMM/m_TransformMMToUnits).
   m_TransformOfOrigin.setIdentity();
-
-  //initialize bounding box array
-  int num=m_TimeSteps;
-  BoundingBox::ConstPointer bnull=NULL;
-  m_BoundingBoxes.reserve(m_TimeSteps);
-  m_BoundingBoxes.assign(num, bnull);
-
 }
 
 // Standard Constructor for the new makro. sets the geometry to 3 dimensions
-mitk::Geometry3D::Geometry3D() : m_TimeSteps(0)
+mitk::Geometry3D::Geometry3D() : m_BoundingBox(NULL)
 {
+  m_TimeBoundsInMS[0]=-DBL_MAX; m_TimeBoundsInMS[1]=DBL_MAX;
+
   m_TransformMMToUnits.setIdentity();
   m_TransformUnitsToMM.setIdentity();
 
@@ -161,13 +152,6 @@ mitk::Geometry3D::~Geometry3D()
 
 }
 
-//##ModelId=3E3BE1F8000C
-bool mitk::Geometry3D::IsValidTime(int t) const
-{
-  return (t>=0) && (t< (int)m_TimeSteps);
-}
-
-
 vtkTransform* mitk::Geometry3D::GetTransform()
 {
   return m_Transform;
@@ -184,10 +168,13 @@ void mitk::Geometry3D::SetMasterTransform(const vtkTransform * transform)
 
 }
 
-mitk::Geometry3D::Pointer mitk::Geometry3D::Clone()
+/*!
+\todo set m_Origin, m_Orientation,... in the new Geometry - Need to write acces Methods for the member variables first.
+*/
+mitk::Geometry3D::Pointer mitk::Geometry3D::Clone() const
 {
   mitk::Geometry3D::Pointer newGeometry = Geometry3D::New();
-  newGeometry->Initialize(m_TimeSteps);
+  newGeometry->Initialize();
   newGeometry->GetTransform()->SetMatrix(m_Transform->GetMatrix());
   //newGeometry->GetRelativeTransform()->SetMatrix(m_RelativeTransform->GetMatrix());
   newGeometry->SetPosition(m_Position);

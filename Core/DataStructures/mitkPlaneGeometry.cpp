@@ -3,11 +3,13 @@
 
 //##ModelId=3E395F22035A
 mitk::PlaneGeometry::PlaneGeometry() : 
-m_ScaleFactorMMPerUnitX(1.0), 
-m_ScaleFactorMMPerUnitY(1.0)
+  m_ScaleFactorMMPerUnitX(1.0), 
+  m_ScaleFactorMMPerUnitY(1.0),
+  m_Thickness(1.0)
 {
   Geometry2D::SetWidthInUnits(10);
   Geometry2D::SetHeightInUnits(10);
+  Initialize();
 }
 
 
@@ -27,10 +29,44 @@ void mitk::PlaneGeometry::SetPlaneView(const mitk::PlaneView& aPlaneView)
 {
   m_PlaneView=aPlaneView;
 
+  ComputeBoundingBox();
+
   m_WidthInUnits = (unsigned int)m_PlaneView.getOrientation1().length();
   m_HeightInUnits = (unsigned int)m_PlaneView.getOrientation2().length();
 
   Modified();
+}
+
+void mitk::PlaneGeometry::ComputeBoundingBox()
+{
+  Point3D lowerright = m_PlaneView.point+m_PlaneView.getOrientation1()+m_PlaneView.getOrientation2();
+  float bounds[6]={m_PlaneView.point.x, lowerright.x, m_PlaneView.point.y, lowerright.y, m_PlaneView.point.z, lowerright.z+m_Thickness};
+  SetBoundingBox(bounds);
+}
+
+void mitk::PlaneGeometry::SetThickness(mitk::ScalarType thickness)
+{
+  if(m_Thickness!=thickness)
+  {
+    m_Thickness = thickness;
+
+    ComputeBoundingBox();
+
+    Modified();
+  }
+}
+
+void mitk::PlaneGeometry::SetThicknessBySpacing(const float* spacing)
+{
+  Vector3D spacingVec(spacing[0], spacing[1], spacing[2]);
+  SetThicknessBySpacing(&spacingVec);
+}
+
+void mitk::PlaneGeometry::SetThicknessBySpacing(const Vector3D* spacing)
+{
+  Vector3D n=m_PlaneView.normal;
+  n.normalize();
+  SetThickness(n.dot(*spacing));
 }
 
 //##ModelId=3E3B9C6E02B5
@@ -100,7 +136,25 @@ void mitk::PlaneGeometry::Modified() const
 {
   m_ScaleFactorMMPerUnitX=m_PlaneView.getOrientation1().length()/m_WidthInUnits;
   m_ScaleFactorMMPerUnitY=m_PlaneView.getOrientation2().length()/m_HeightInUnits;
-
+  
   Superclass::Modified();
 }
 
+void mitk::PlaneGeometry::Initialize()
+{
+  Superclass::Initialize();
+
+  ComputeBoundingBox();
+}
+
+mitk::Geometry3D::Pointer mitk::PlaneGeometry::Clone() const
+{
+  mitk::PlaneGeometry::Pointer newGeometry = PlaneGeometry::New();
+  newGeometry->Initialize();
+  newGeometry->GetTransform()->SetMatrix(m_Transform->GetMatrix());
+  //newGeometry->GetRelativeTransform()->SetMatrix(m_RelativeTransform->GetMatrix());
+  newGeometry->SetPlaneView(m_PlaneView);
+  newGeometry->SetWidthInUnits(m_WidthInUnits);
+  newGeometry->SetHeightInUnits(m_HeightInUnits);
+  return newGeometry.GetPointer();
+}

@@ -98,7 +98,7 @@ public:
     virtual void MMToUnits(const mitk::Point2D &pt_mm, mitk::Point2D &pt_units) const;
 
     //##ModelId=3E3AEB620231
-    virtual double GetTime(int t) const;
+    virtual const TimeBounds& GetTimeBoundsInMS() const;
 
     //##ModelId=3E3B02710239
     virtual void DisplayToUnits(const mitk::Vector2D &vec_display, mitk::Vector2D &vec_units) const;

@@ -47,11 +47,11 @@ void mitk::Geometry2DDataMapper2D::Paint(mitk::BaseRenderer * renderer)
     mitk::Geometry2DData::Pointer input  = const_cast<mitk::Geometry2DData*>(this->GetInput());
     
     //intersecting with ourself?
-    if(input->GetGeometry2D()==renderer->GetWorldGeometry())
+    if(input->GetGeometry2D()==renderer->GetCurrentWorldGeometry2D())
       return; //do nothing!
     
     PlaneGeometry::ConstPointer input_planeGeometry = dynamic_cast<const PlaneGeometry *>(input->GetGeometry2D());
-    PlaneGeometry::ConstPointer worldPlaneGeometry = dynamic_cast<const PlaneGeometry*>(renderer->GetWorldGeometry());        
+    PlaneGeometry::ConstPointer worldPlaneGeometry = dynamic_cast<const PlaneGeometry*>(renderer->GetCurrentWorldGeometry2D());        
     
     if(worldPlaneGeometry.IsNotNull() && (input_planeGeometry.IsNotNull()))
     {
@@ -76,7 +76,7 @@ void mitk::Geometry2DDataMapper2D::Paint(mitk::BaseRenderer * renderer)
         displayGeometry->MMToDisplay(lineTo, lineTo);
         
         //convert display coordinates ( (0,0) is top-left ) in GL coordinates ( (0,0) is bottom-left )
-        //                float toGL=//displayGeometry->GetDisplayHeight(); displayGeometry->GetWorldGeometry()->GetHeightInUnits();
+        //                float toGL=//displayGeometry->GetDisplayHeight(); displayGeometry->GetCurrentWorldGeometry2D()->GetHeightInUnits();
         //                lineFrom.y=toGL-lineFrom.y;
         //                lineTo.y=toGL-lineTo.y;
         

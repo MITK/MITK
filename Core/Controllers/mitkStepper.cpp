@@ -1,6 +1,6 @@
 #include "mitkStepper.h"
 
-mitk::Stepper::Stepper() : m_Steps(1), m_Pos(0), m_StepSize(1), m_PosToUnitFactor(1), m_ZeroLine(0)
+mitk::Stepper::Stepper() : m_Steps(0), m_Pos(0), m_StepSize(1), m_PosToUnitFactor(1), m_ZeroLine(0)
 {
 
 }
@@ -53,7 +53,12 @@ void mitk::Stepper::Next()
 float mitk::Stepper::ConvertPosToUnit(unsigned int posValue)
 {
   if(posValue >= m_Steps)
-    posValue = m_Steps-1;
+  {
+    if(m_Steps==0)
+      posValue = 0;
+    else
+      posValue = m_Steps-1;
+  }
   return posValue*m_PosToUnitFactor-m_ZeroLine;
 }
 
@@ -61,7 +66,12 @@ unsigned int mitk::Stepper::ConvertUnitToPos(float unitValue)
 {
   unsigned int posValue = (unsigned int)(unitValue/m_PosToUnitFactor+m_ZeroLine+0.5);
   if(posValue >= m_Steps)
-    posValue = m_Steps-1;
+  {
+    if(m_Steps==0)
+      posValue = 0;
+    else
+      posValue = m_Steps-1;
+  }
   return posValue;
 }
 

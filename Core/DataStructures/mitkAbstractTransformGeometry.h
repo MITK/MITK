@@ -84,6 +84,7 @@ public:
 
   virtual void Modified() const;
 
+  virtual Geometry3D::Pointer Clone() const;
 protected:
   //##ModelId=3EF4A266029C
   AbstractTransformGeometry();

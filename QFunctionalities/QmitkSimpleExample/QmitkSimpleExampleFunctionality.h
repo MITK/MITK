@@ -113,6 +113,7 @@ protected slots:
 
   void treeChanged(mitk::DataTreeIterator& itpos);
 protected:
+  void initNavigators();
 
 	/*!
 	* default main widget containing 4 windows showing 3 
@@ -155,7 +156,7 @@ protected:
   mitk::SliceNavigationController::Pointer sliceNavigatorTransversal;
   mitk::SliceNavigationController::Pointer sliceNavigatorFrontal;
   mitk::SliceNavigationController::Pointer sliceNavigatorSagittal;
-		
+  mitk::SliceNavigationController::Pointer sliceNavigatorTime;
 };
 
 #endif // !defined(AFX_QMITKSIMPLEEXAMPLEFUNCTIONALITY_H__1DC0BA6E_9B8D_4D63_8A63_5B661CE33712__INCLUDED_)

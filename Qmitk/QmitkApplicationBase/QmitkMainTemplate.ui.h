@@ -321,8 +321,8 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
 
     reader->SetFileName(fileName);
     
-    mitk::ImageTimeSelector::Pointer timeSelector=mitk::ImageTimeSelector::New();
-    mitk::ImageTimeSelector::Pointer DopplerTimeSelector=mitk::ImageTimeSelector::New();
+    mitk::ImageChannelSelector::Pointer channelSelector=mitk::ImageChannelSelector::New();
+    mitk::ImageChannelSelector::Pointer DopplerChannelSelector=mitk::ImageChannelSelector::New();
 
 
     mitk::CylindricToCartesianFilter::Pointer cyl2cart = mitk::CylindricToCartesianFilter::New();;
@@ -348,12 +348,10 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
 		}
 
 				
-    timeSelector->SetInput(reader->GetOutput());
-    timeSelector->SetTimeNr(0);
+    channelSelector->SetInput(reader->GetOutput());
 
    
-    DopplerTimeSelector->SetInput(reader->GetOutput());
-    DopplerTimeSelector->SetTimeNr(0);
+    DopplerChannelSelector->SetInput(reader->GetOutput());
 
 
     mitk::DataTreeIterator* it=tree->inorderIterator();
@@ -362,22 +360,22 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
     //
     // switch to Backscatter information
     //    
-    timeSelector->SetChannelNr(0);
-    timeSelector->Update();
-    ipPicPut("timeselect.pic",timeSelector->GetOutput()->GetPic());    
+    channelSelector->SetChannelNr(0);
+    channelSelector->Update();
+    ipPicPut("timeselect.pic",channelSelector->GetOutput()->GetPic());    
         
     //
     // insert original (in cylinric coordinates) Backscatter information
     //
     node = mitk::DataTreeNode::New();
-    node->SetData(timeSelector->GetOutput());
+    node->SetData(channelSelector->GetOutput());
     mitk::StringProperty::Pointer ultrasoundProp = new mitk::StringProperty("OriginalBackscatter");    
     node->SetProperty("ultrasound",ultrasoundProp);
     mitk::StringProperty::Pointer nameProp = new mitk::StringProperty("OriginalBackscatter");
     node->SetProperty("fileName",nameProp);
     node->SetProperty("layer", new mitk::IntProperty(-11) );
     mitk::LevelWindow levelWindow;
-    levelWindow.SetAuto( timeSelector->GetOutput()->GetPic() );
+    levelWindow.SetAuto( channelSelector->GetOutput()->GetPic() );
     node->SetLevelWindow(levelWindow, NULL);
     node->SetVisibility(false,NULL);
     node->Update();
@@ -386,7 +384,7 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
     //
     // insert transformed (in cartesian coordinates) Backscatter information
     //
-    cyl2cart->SetInput(timeSelector->GetOutput());
+    cyl2cart->SetInput(reader->GetOutput());
     node=mitk::DataTreeNode::New();
     node->SetData(cyl2cart->GetOutput());
     ultrasoundProp = new mitk::StringProperty("TransformedBackscatter");
@@ -407,8 +405,8 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
 	    //
   	  // switch to Doppler information
 	    //
-  	  DopplerTimeSelector->SetChannelNr(1);
-	    DopplerTimeSelector->Update();
+  	  DopplerChannelSelector->SetChannelNr(1);
+	    DopplerChannelSelector->Update();
 
 	    //
   	  // create a Doppler lookup table
@@ -426,7 +424,7 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
 	    // insert original (in cylindric coordinates) Doppler information
   	  //
 	    node=mitk::DataTreeNode::New();
-	 	  node->SetData(DopplerTimeSelector->GetOutput());
+	 	  node->SetData(DopplerChannelSelector->GetOutput());
 	    ultrasoundProp = new mitk::StringProperty("OriginalDoppler");
   	  node->SetProperty("ultrasound",ultrasoundProp);
 	    nameProp = new mitk::StringProperty("OriginalDoppler");
@@ -436,7 +434,7 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
 
    		mitk::LevelWindowProperty::Pointer levWinProp = new mitk::LevelWindowProperty();
       mitk::LevelWindow levelWindow;
-      levelWindow.SetAuto( timeSelector->GetOutput()->GetPic() );
+      levelWindow.SetAuto( channelSelector->GetOutput()->GetPic() );
 			levWinProp->SetLevelWindow(levelWindow);      
       // set the overwrite LevelWindow
       // if "levelwindow" is used if "levelWindow" is not available
@@ -452,7 +450,7 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
 			//
   	  // insert transformed (in cartesian coordinates) Doppler information
     	//
-	    cyl2cartDoppler->SetInput(DopplerTimeSelector->GetOutput());
+	    cyl2cartDoppler->SetInput(DopplerChannelSelector->GetOutput());
   	  node=mitk::DataTreeNode::New();
 	    node->SetData(cyl2cartDoppler->GetOutput());
   	  ultrasoundProp = new mitk::StringProperty("TransformedDoppler");
@@ -792,17 +790,17 @@ void QmitkMainTemplate::initialize()
     float white[3] = {1.0f,1.0f,1.0f};
     mitk::DataTreeNode::Pointer planeNode;
     // ... of widget 1
-    planeNode=mitkMultiWidget->mitkWidget1->GetRenderer()->GetWorldGeometryNode();
+    planeNode=mitkMultiWidget->mitkWidget1->GetRenderer()->GetCurrentWorldGeometry2DNode();
     planeNode->SetColor(white, mitkMultiWidget->mitkWidget4->GetRenderer());
     planeNode->SetProperty("fileName", new mitk::StringProperty("widget1Plane"));
     it->add(planeNode);
     // ... of widget 2
-    planeNode=mitkMultiWidget->mitkWidget2->GetRenderer()->GetWorldGeometryNode();
+    planeNode=mitkMultiWidget->mitkWidget2->GetRenderer()->GetCurrentWorldGeometry2DNode();
     planeNode->SetColor(white, mitkMultiWidget->mitkWidget4->GetRenderer());
     planeNode->SetProperty("fileName", new mitk::StringProperty("widget2Plane"));
     it->add(planeNode);
     // ... of widget 3
-    planeNode=mitkMultiWidget->mitkWidget3->GetRenderer()->GetWorldGeometryNode();
+    planeNode=mitkMultiWidget->mitkWidget3->GetRenderer()->GetCurrentWorldGeometry2DNode();
     planeNode->SetColor(white, mitkMultiWidget->mitkWidget4->GetRenderer());
     planeNode->SetProperty("fileName", new mitk::StringProperty("widget3Plane"));
     it->add(planeNode);

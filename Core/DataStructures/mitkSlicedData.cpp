@@ -164,7 +164,7 @@ void mitk::SlicedData::SetRequestedRegion(SlicedData::RegionType *region)
 
 
 //##ModelId=3E19EA3300BA
-mitk::SlicedData::SlicedData()
+mitk::SlicedData::SlicedData() : m_TimeSlicedGeometry(NULL)
 {
   unsigned int i;
   for(i=0;i<4;++i)
@@ -198,34 +198,47 @@ void mitk::SlicedData::CopyInformation(const itk::DataObject *data)
   }
 }
 
-const mitk::Geometry2D* mitk::SlicedData::GetGeometry2D(int s, int t) const
+//const mitk::Geometry2D* mitk::SlicedData::GetGeometry2D(int s, int t) const
+//{
+//  const_cast<SlicedData*>(this)->SetRequestedRegionToLargestPossibleRegion();
+//
+//  const_cast<SlicedData*>(this)->UpdateOutputInformation();
+//
+//  return GetSlicedGeometry(t)->GetGeometry2D(s);
+//}
+//
+mitk::SlicedGeometry3D* mitk::SlicedData::GetSlicedGeometry(unsigned int t) const
 {
-  const_cast<SlicedData*>(this)->SetRequestedRegionToLargestPossibleRegion();
-
-  const_cast<SlicedData*>(this)->UpdateOutputInformation();
-
-  return m_SlicedGeometry->GetGeometry2D(s,t);
+  if(m_TimeSlicedGeometry == NULL)
+    return NULL;
+  return dynamic_cast<SlicedGeometry3D*>(m_TimeSlicedGeometry->GetGeometry3D(t));
 }
 
-mitk::SlicedGeometry3D* mitk::SlicedData::GetSlicedGeometry() const
-{
-  return m_SlicedGeometry;
-}
-
-const mitk::SlicedGeometry3D* mitk::SlicedData::GetUpdatedSlicedGeometry()
+const mitk::SlicedGeometry3D* mitk::SlicedData::GetUpdatedSlicedGeometry(unsigned int t)
 {
   SetRequestedRegionToLargestPossibleRegion();
 
   UpdateOutputInformation();
 
-  return m_SlicedGeometry;
+  return GetSlicedGeometry(t);
 }
 
 void mitk::SlicedData::SetGeometry(Geometry3D* aGeometry3D)
 {
-  m_SlicedGeometry = dynamic_cast<SlicedGeometry3D*>(aGeometry3D);
-
-  assert(m_SlicedGeometry==aGeometry3D);
-
-  Superclass::SetGeometry(m_SlicedGeometry);
+  if(aGeometry3D!=NULL)
+  {
+    m_TimeSlicedGeometry = dynamic_cast<TimeSlicedGeometry*>(aGeometry3D);
+    if(m_TimeSlicedGeometry==NULL)
+    {
+      SlicedGeometry3D* slicedGeometry = dynamic_cast<SlicedGeometry3D*>(aGeometry3D);
+      assert(slicedGeometry!=NULL);
+      TimeSlicedGeometry::Pointer timeSlicedGeometry = TimeSlicedGeometry::New();
+      m_Geometry3D = m_TimeSlicedGeometry = timeSlicedGeometry;   
+      m_TimeSlicedGeometry->Initialize(1);
+      m_TimeSlicedGeometry->SetGeometry3D(slicedGeometry, 0);
+    }
+    Superclass::SetGeometry(m_TimeSlicedGeometry);
+  }
+  else
+    Superclass::SetGeometry(NULL);
 }

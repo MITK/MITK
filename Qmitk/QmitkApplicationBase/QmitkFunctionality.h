@@ -35,7 +35,8 @@ class QActionGroup;
 class QmitkFunctionality : public QObject
 {
 	Q_OBJECT
-	bool available;
+	bool m_Available;
+  bool m_Activated;
 
 public:
 
@@ -90,6 +91,13 @@ public:
   */
 	virtual void deactivated();
 
+  
+  //##Documentation
+  //## @brief Is the functionality currently active?
+  //## 
+  //## @warning Will only work if in sub-classes the superclass-methods are called in activated() and deactivated()!
+  virtual bool isActivated();
+
 	virtual bool isAvailable();
 
 	/*!
@@ -121,9 +129,6 @@ signals:
 
 protected:
 	virtual void setAvailability(bool available);
-
-
-protected:
 	/*!
 			a reference to a data tree iterator object
 	 */

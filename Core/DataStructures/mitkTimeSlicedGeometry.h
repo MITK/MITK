@@ -19,6 +19,7 @@ public:
   //## @brief Get the number of time-steps
   itkGetConstMacro(TimeSteps, unsigned int);
 
+  const TimeBounds& GetTimeBoundsInMS() const;
   //##Documentation
   //## @brief Set/Get whether the TimeSlicedGeometry is evenly-timed (m_EvenlyTimed)
   //## 

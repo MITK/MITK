@@ -29,7 +29,7 @@ mitk::PointSet::PointSet()
   m_PointSet = PointSetType::New();
   PointDataContainer::Pointer pointData = PointDataContainer::New();
   m_PointSet->SetPointData(pointData);
-  m_Geometry3D->Initialize(1);
+  m_Geometry3D->Initialize();
 }
 
 //##ModelId=3F0177E901BE

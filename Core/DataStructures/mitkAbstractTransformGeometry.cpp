@@ -10,6 +10,7 @@ mitk::AbstractTransformGeometry::AbstractTransformGeometry() :
 {
   Geometry2D::SetWidthInUnits(10);
   Geometry2D::SetHeightInUnits(10);
+  Initialize();
 }
 
 
@@ -62,6 +63,10 @@ void mitk::AbstractTransformGeometry::SetPlaneView(const mitk::PlaneView& aPlane
 
   m_WidthInUnits = m_PlaneView.getOrientation1().length();
   m_HeightInUnits = m_PlaneView.getOrientation2().length();
+
+  //@todo correct calculation missing!
+  float bounds[6]={0.0, m_PlaneView.getOrientation1().length(), 0.0, m_PlaneView.getOrientation2().length(), 0.0, 1.0};
+  SetBoundingBox(bounds);
 
   Modified();
 }
@@ -163,3 +168,15 @@ void mitk::AbstractTransformGeometry::Modified() const
   Superclass::Modified();
 }
 
+mitk::Geometry3D::Pointer mitk::AbstractTransformGeometry::Clone() const
+{
+  mitk::AbstractTransformGeometry::Pointer newGeometry = AbstractTransformGeometry::New();
+  newGeometry->Initialize();
+  newGeometry->GetTransform()->SetMatrix(m_Transform->GetMatrix());
+  //newGeometry->GetRelativeTransform()->SetMatrix(m_RelativeTransform->GetMatrix());
+  newGeometry->SetVtkAbstractTransform(m_VtkAbstractTransform);
+  newGeometry->SetPlaneView(m_PlaneView);
+  newGeometry->SetWidthInUnits(m_WidthInUnits);
+  newGeometry->SetHeightInUnits(m_HeightInUnits);
+  return newGeometry.GetPointer();
+}

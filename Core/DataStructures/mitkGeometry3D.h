@@ -15,10 +15,14 @@ namespace mitk {
 
 //##ModelId=3E8600D800C5
 //##Documentation
-//## @brief Standard 3D-BoundingBox typedef (float)
-//## Standard 3D-BoundingBox typedef to get rid of template arguments (3D,
-//## float).
+//## @brief Standard 3D-BoundingBox typedef
+//##
+//## Standard 3D-BoundingBox typedef to get rid of template arguments (3D, type).
 typedef itk::BoundingBox<unsigned long, 3, mitk::ScalarType>   BoundingBox;
+
+//##Documentation
+//## @brief Standard typedef for time-bounds
+typedef itk::FixedArray<mitk::ScalarType,2> TimeBounds;
 
 //##ModelId=3DCBF389032B
 //##Documentation
@@ -48,10 +52,13 @@ public:
   itkNewMacro(Self);
 
   //##ModelId=3DCBF5D40253
-  virtual mitk::BoundingBox::ConstPointer GetBoundingBox(int t = 0) const;
+  itkGetConstObjectMacro(BoundingBox, BoundingBox);
+  itkSetConstObjectMacro(BoundingBox, BoundingBox);
+
+  virtual void SetTimeBoundsInMS(const mitk::TimeBounds& timebounds);
 
   //##ModelId=3DCBF5E9037F
-  double GetTime(int t) const;
+  const TimeBounds& GetTimeBoundsInMS() const;
 
   //##ModelId=3DDE65D1028A
   void MMToUnits(const mitk::Point3D &pt_mm, mitk::Point3D &pt_units, float t = 0) const;
@@ -64,19 +71,13 @@ public:
   //##ModelId=3E3B987503A3
   void UnitsToMM(const mitk::Vector3D &vec_units, mitk::Vector3D &vec_mm, float t = 0) const;
 
-  //##ModelId=3E3BE1F8000C
-  virtual bool IsValidTime(int t = 0) const;
-
-  //##ModelId=3ED91D050299
-  virtual void SetBoundingBox(const mitk::BoundingBox* boundingBox,  int t=0);
-
   //##ModelId=3ED91D050305
-  virtual void SetBoundingBox(const float bounds[6],  int t=0);
+  virtual void SetBoundingBox(const float bounds[6]);
   
   vtkTransform* GetTransform();  
   
   //##ModelId=3E3453C703AF
-  virtual void Initialize(unsigned int timeSteps);
+  virtual void Initialize();
 
   //##Documentation
   //## @brief set a base geometry for the geometry.
@@ -91,15 +92,15 @@ public:
 
   //##Documentation
   //## @brief duplicates the geometry
-  virtual Pointer Clone();
+  virtual Pointer Clone() const;
 
   //##Documentation
   //##@brief executes affine operations (translate, rotate, scale)
   void ExecuteOperation(Operation* operation);
    
-  itkSetVectorMacro(Position, ScalarType, 3);
-  itkSetVectorMacro(Orientation, ScalarType, 3);
-  itkSetVectorMacro(Scale, ScalarType, 3); 
+  itkSetVectorMacro(Position, const ScalarType, 3);
+  itkSetVectorMacro(Orientation, const ScalarType, 3);
+  itkSetVectorMacro(Scale, const ScalarType, 3); 
 
   itkGetVectorMacro(Position, const ScalarType, 3);
   itkGetVectorMacro(Orientation, const ScalarType, 3);
@@ -115,7 +116,9 @@ protected:
   virtual ~Geometry3D();
 
   //##ModelId=3ED91D050269
-  mutable std::vector<mitk::BoundingBox::ConstPointer> m_BoundingBoxes;
+  mutable mitk::BoundingBox::ConstPointer m_BoundingBox;
+
+  mutable mitk::TimeBounds m_TimeBoundsInMS;
 
   //##ModelId=3E3BE8BF02BA
   mitk::Matrix4D m_TransformUnitsToMM;
@@ -123,8 +126,6 @@ protected:
   mitk::Matrix4D m_TransformMMToUnits;
   //##ModelId=3E3BE8BF02EC
   mitk::Matrix4D m_TransformOfOrigin;
-
-  unsigned int m_TimeSteps;
 
   vtkTransform* m_Transform;
   

@@ -65,6 +65,9 @@
                             <height>0</height>
                         </size>
                     </property>
+                    <property name="maxValue">
+                        <number>0</number>
+                    </property>
                     <property name="orientation">
                         <enum>Horizontal</enum>
                     </property>
@@ -80,6 +83,9 @@
                             <horstretch>0</horstretch>
                             <verstretch>0</verstretch>
                         </sizepolicy>
+                    </property>
+                    <property name="maxValue">
+                        <number>0</number>
                     </property>
                 </widget>
             </hbox>

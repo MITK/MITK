@@ -1,4 +1,7 @@
 #include "mitkImage.h"
+
+#include "mitkSlicedGeometry3D.h"
+#include "mitkPlaneGeometry.h"
 #include <vtkImageData.h>
 
 //##ModelId=3DCBC2B50345
@@ -46,7 +49,7 @@ vtkImageData* mitk::Image::GetVtkImageData(int t, int n)
   mitk::ImageDataItem::Pointer volume=GetVolumeData(t, n);
   if(volume.IsNull()) 
     return NULL;
-  float* spacing = const_cast<float*>(GetUpdatedSlicedGeometry()->GetSpacing());
+  float* spacing = const_cast<float*>(GetUpdatedSlicedGeometry(t)->GetSpacing());
   volume->GetVtkImageData()->SetSpacing(spacing);
   return volume->GetVtkImageData();
 }
@@ -479,8 +482,15 @@ void mitk::Image::Initialize(const mitk::PixelType& type, unsigned int dimension
   m_LargestPossibleRegion.SetSize(i, channels);
 
   m_PixelType=type;
-  SetGeometry(SlicedGeometry3D::New());
-  m_SlicedGeometry->Initialize(m_Dimensions[2], m_Dimensions[3]);
+
+  TimeSlicedGeometry::Pointer timeSliceGeometry;
+  timeSliceGeometry = TimeSlicedGeometry::New();
+  timeSliceGeometry->Initialize(m_Dimensions[3]);
+  SlicedGeometry3D::Pointer slicedGeometry = SlicedGeometry3D::New();
+  slicedGeometry->Initialize(m_Dimensions[2]);
+  timeSliceGeometry->SetGeometry3D(slicedGeometry, 0);
+  timeSliceGeometry->SetEvenlyTimed();
+  SetGeometry(timeSliceGeometry);  
 
   ImageDataItemPointer dnull=NULL;
 
@@ -568,21 +578,12 @@ void mitk::Image::Initialize(vtkImageData* vtkimagedata, int channels, int tDim,
     spacing.y=spacinglist[1];
   if(m_Dimension>=3)
     spacing.z=spacinglist[2];
-  m_SlicedGeometry->SetSpacing(spacing);
 
-  mitk::Point3D origin, right, bottom;
-  origin.set(0,0,0);               m_Geometry3D->UnitsToMM(origin, origin);
-  right.set(m_Dimensions[0],0,0);  m_Geometry3D->UnitsToMM(right, right);
-  bottom.set(0,m_Dimensions[1],0); m_Geometry3D->UnitsToMM(bottom, bottom);
-
-  PlaneView view_std(origin, right, bottom);
-
-  mitk::PlaneGeometry::Pointer planegeometry=mitk::PlaneGeometry::New();
-  planegeometry->SetPlaneView(view_std);
-  planegeometry->SetSizeInUnits(m_Dimensions[0], m_Dimensions[1]);
-
-  m_SlicedGeometry->SetGeometry2D(planegeometry.GetPointer(), 0, 0);
-  m_SlicedGeometry->SetEvenlySpaced();
+  SlicedGeometry3D* slicedGeometry = GetSlicedGeometry(0);
+  slicedGeometry->SetSpacing(spacing);
+  slicedGeometry->SetGeometry2D(BuildStandardPlaneGeometry2D(slicedGeometry, m_Dimensions).GetPointer(), 0);
+  slicedGeometry->SetEvenlySpaced();
+  m_TimeSlicedGeometry->SetEvenlyTimed();
 
   delete [] tmpDimensions;
 }
@@ -619,12 +620,17 @@ void mitk::Image::Initialize(ipPicDescriptor* pic, int channels, int tDim, int s
   m_LargestPossibleRegion.SetSize(i, channels);
 
   m_PixelType=PixelType(pic);
-  SetGeometry(SlicedGeometry3D::New());
-  m_SlicedGeometry->Initialize(m_Dimensions[2], m_Dimensions[3]);
-
-  m_SlicedGeometry->SetSpacing(pic);
-  m_SlicedGeometry->SetGeometry2D(pic, 0, 0);
-  m_SlicedGeometry->SetEvenlySpaced();
+  TimeSlicedGeometry::Pointer timeSliceGeometry;
+  timeSliceGeometry = TimeSlicedGeometry::New();
+  timeSliceGeometry->Initialize(m_Dimensions[3]);
+  SlicedGeometry3D::Pointer slicedGeometry = SlicedGeometry3D::New();
+  slicedGeometry->Initialize(m_Dimensions[2]);
+  timeSliceGeometry->SetGeometry3D(slicedGeometry, 0);
+  timeSliceGeometry->SetEvenlyTimed();
+  slicedGeometry->SetSpacing(pic);
+  slicedGeometry->SetGeometry2D(pic, 0);
+  slicedGeometry->SetEvenlySpaced();
+  SetGeometry(timeSliceGeometry);  
 
   ImageDataItemPointer dnull=NULL;
 
@@ -809,4 +815,21 @@ float mitk::Image::GetScalarValueMin() const
 float mitk::Image::GetScalarValueMax() const
 {
   return -1.0f;
+}
+
+mitk::Geometry2D::Pointer mitk::Image::BuildStandardPlaneGeometry2D(mitk::SlicedGeometry3D* slicedgeometry3D, unsigned int *dimensions)
+{
+  mitk::Point3D origin, right, bottom;
+  origin.set(0,0,0);             slicedgeometry3D->UnitsToMM(origin, origin);
+  right.set(dimensions[0],0,0);  slicedgeometry3D->UnitsToMM(right, right);
+  bottom.set(0,dimensions[1],0); slicedgeometry3D->UnitsToMM(bottom, bottom);
+
+  PlaneView view_std(origin, right, bottom);
+
+  mitk::PlaneGeometry::Pointer planegeometry=mitk::PlaneGeometry::New();
+  planegeometry->SetPlaneView(view_std);
+  planegeometry->SetThicknessBySpacing(slicedgeometry3D->GetSpacing());
+  planegeometry->SetSizeInUnits(dimensions[0], dimensions[1]);
+
+  return planegeometry.GetPointer();
 }

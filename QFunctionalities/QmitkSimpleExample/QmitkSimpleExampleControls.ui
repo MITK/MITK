@@ -8,8 +8,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>122</width>
-            <height>824</height>
+            <width>120</width>
+            <height>1057</height>
         </rect>
     </property>
     <property name="sizePolicy">
@@ -247,12 +247,17 @@
                 </widget>
                 <widget class="QmitkSliderNavigator">
                     <property name="name">
+                        <cstring>sliceNavigatorSagittal</cstring>
+                    </property>
+                </widget>
+                <widget class="QmitkSliderNavigator">
+                    <property name="name">
                         <cstring>sliceNavigatorFrontal</cstring>
                     </property>
                 </widget>
                 <widget class="QmitkSliderNavigator">
                     <property name="name">
-                        <cstring>sliceNavigatorSagittal</cstring>
+                        <cstring>sliceNavigatorTime</cstring>
                     </property>
                 </widget>
             </vbox>
@@ -348,9 +353,11 @@
     <function returnType="QWidget *">getSliceNavigatorTransversal()</function>
     <function returnType="QWidget *">getSliceNavigatorFrontal()</function>
     <function returnType="QWidget *">getSliceNavigatorSagittal()</function>
+    <function returnType="QWidget *">getSliceNavigatorTime()</function>
 </functions>
 <layoutdefaults spacing="0" margin="0"/>
 <includehints>
+    <includehint>qmitkslidernavigator.h</includehint>
     <includehint>qmitkslidernavigator.h</includehint>
     <includehint>qmitkslidernavigator.h</includehint>
     <includehint>qmitkslidernavigator.h</includehint>

@@ -32,6 +32,25 @@ mitk::Geometry3D* mitk::TimeSlicedGeometry::GetGeometry3D(int t) const
   return geometry3d;
 }
 
+const mitk::TimeBounds& mitk::TimeSlicedGeometry::GetTimeBoundsInMS() const
+{
+  TimeBounds timebounds;
+
+  mitk::Geometry3D::Pointer geometry3d;
+
+  geometry3d = m_Geometry3Ds[0];
+  assert(geometry3d!=NULL);
+  timebounds[0] = geometry3d->GetTimeBoundsInMS()[0];
+
+  geometry3d = m_Geometry3Ds[m_TimeSteps-1];
+  assert(geometry3d!=NULL);
+  timebounds[1]=geometry3d->GetTimeBoundsInMS()[1];
+
+  m_TimeBoundsInMS = timebounds;
+
+  return m_TimeBoundsInMS;
+}
+
 bool mitk::TimeSlicedGeometry::SetGeometry3D(mitk::Geometry3D* geometry3D, int t)
 {
   if(IsValidTime(t))

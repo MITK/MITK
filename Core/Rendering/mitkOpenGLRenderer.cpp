@@ -74,7 +74,7 @@ void mitk::OpenGLRenderer::SetData(mitk::DataTreeIterator* iterator)
             Image::Pointer image = dynamic_cast<Image*>(data.GetPointer());
             if(image.IsNotNull())
             {
-              SetWorldGeometry(image->GetGeometry2D(0, 0));
+              SetWorldGeometry(image->GetUpdatedSlicedGeometry(GetTimeStep())->GetGeometry2D(GetSlice()));
               geometry_is_set=true;
             }
           }
@@ -276,7 +276,7 @@ void mitk::OpenGLRenderer::Render()
   glClear(GL_COLOR_BUFFER_BIT);
 
   //PlaneGeometry* myPlaneGeom =
-  //  dynamic_cast<PlaneGeometry *>((mitk::Geometry2D*)(GetWorldGeometry()));
+  //  dynamic_cast<PlaneGeometry *>((mitk::Geometry2D*)(GetCurrentWorldGeometry2D()));
 
   glViewport (0, 0, m_Size[0], m_Size[1]);
   glMatrixMode( GL_PROJECTION );

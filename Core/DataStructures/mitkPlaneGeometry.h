@@ -37,6 +37,19 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
+  //##Documentation
+  //## @brief Get the thickness of the plane
+  itkGetConstMacro(Thickness, mitk::ScalarType);
+  //##Documentation
+  //## @brief Set the thickness of the plane
+  virtual void SetThickness(mitk::ScalarType thickness);
+  //##Documentation
+  //## @brief Set the thickness of the plane by a spacing vector as m_PlaneView.normal.dot(spacing)
+  virtual void SetThicknessBySpacing(const float* spacing);
+  //##Documentation
+  //## @brief Set the thickness of the plane by a spacing vector as m_PlaneView.normal.dot(spacing)
+  virtual void SetThicknessBySpacing(const Vector3D* spacing);
+
   //##ModelId=3E3B9C6E02B5
   virtual bool Map(const mitk::Point3D &pt3d_mm, mitk::Point2D &pt2d_mm) const;
 
@@ -60,11 +73,16 @@ public:
 
   virtual void Modified() const;
 
+  virtual void Initialize();
+
+  virtual Geometry3D::Pointer Clone() const;
 protected:
   //##ModelId=3E395F22035A
   PlaneGeometry();
   //##ModelId=3E395F220382
   virtual ~PlaneGeometry();
+
+  virtual void ComputeBoundingBox();
 
   //##ModelId=3E3A3F03034E
   //##Documentation
@@ -77,14 +95,18 @@ protected:
   //## 
   //## Is calculated in SetPlaneView from the value of m_WidthInUnits and the
   //## PlaneView
-  mutable float m_ScaleFactorMMPerUnitX;
+  mutable mitk::ScalarType m_ScaleFactorMMPerUnitX;
   //##ModelId=3E3BE12C0167
   //##Documentation
   //## @brief factor to convert y-coordinates from mm to units and vice versa
   //## 
   //## Is calculated in SetPlaneView from the value of m_HeightInUnits and
   //## the PlaneView
-  mutable float m_ScaleFactorMMPerUnitY;
+  mutable mitk::ScalarType m_ScaleFactorMMPerUnitY;
+
+  //##Documentation
+  //## @brief Thickness of the plane
+  mitk::ScalarType m_Thickness;
 };
 
 } // namespace mitk

@@ -167,7 +167,7 @@ void mitk::ImageMapper2D::GenerateData(mitk::BaseRenderer *renderer)
     vtkImageData* inputData = input->GetVtkImageData();
     const PlaneView* planeview=NULL;
 
-    const Geometry2D* worldgeometry = renderer->GetWorldGeometry();
+    const Geometry2D* worldgeometry = renderer->GetCurrentWorldGeometry2D();
 
     if(dynamic_cast<const PlaneGeometry *>(worldgeometry)!=NULL)
     {
@@ -346,13 +346,13 @@ void mitk::ImageMapper2D::Update(mitk::BaseRenderer* renderer)
       (image == NULL) ||
       (renderinfo.m_RendererId < 0) ||
       (renderinfo.m_LastUpdateTime < node->GetMTime()) ||
-      (renderinfo.m_LastUpdateTime < renderer->GetWorldGeometryUpdateTime()) ||
+      (renderinfo.m_LastUpdateTime < renderer->GetCurrentWorldGeometry2DUpdateTime()) ||
       (renderinfo.m_LastUpdateTime < renderer->GetDisplayGeometryUpdateTime())
     )
     GenerateData(renderer);
   else
   if(
-      (renderinfo.m_LastUpdateTime < renderer->GetWorldGeometry()->GetMTime())
+      (renderinfo.m_LastUpdateTime < renderer->GetCurrentWorldGeometry2D()->GetMTime())
       //&&
       //(renderinfo.m_LastUpdateTime < renderer->GetMTime())
     )

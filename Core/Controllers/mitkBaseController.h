@@ -43,14 +43,8 @@ public:
   //##ModelId=3DD528500222
   //##Documentation
   //## @brief Add a Renderer to control by this BaseController
-  //## @note not yet implemented
+  //## @deprecated will be substituted by itk-observer-mechanism soon
   virtual bool AddRenderer(mitk::BaseRenderer* renderer);
-
-  //##ModelId=3DD52870008D
-  //##Documentation
-  //## @brief Remove a Renderer to control by this BaseController
-  //## @note not yet implemented
-  virtual bool RemoveRenderer(mitk::BaseRenderer* renderer);
 
 protected:
   //##ModelId=3E3AE32B0048
@@ -68,6 +62,8 @@ protected:
   
   itk::Object::Pointer m_RendererReference;
   BaseRenderer* m_Renderer;
+
+  unsigned long m_LastUpdateTime;
 };
 
 } // namespace mitk

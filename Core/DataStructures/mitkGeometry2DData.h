@@ -12,7 +12,7 @@ namespace mitk {
 //##Documentation
 //## @brief Data class containing Geometry2D objects
 //## @ingroup Geometry
-//## @todo time support needs to be added
+//## @deprecated class will be removed and replaced simply by BaseData
 class Geometry2DData : public BaseData
 {
 public:
@@ -22,17 +22,14 @@ public:
 
     //##ModelId=3E6423D2030E
     //##Documentation
-    //## @brief Set the reference to the Geometry2D at time @a t that is stored
+    //## @brief Set the reference to the Geometry2D that is stored
     //## by the object
-    //## @warning no time support yet. @t is ignored.
-    virtual void SetGeometry2D( const mitk::Geometry2D* geometry2d, int t = 0 );
+    virtual void SetGeometry2D(mitk::Geometry2D* geometry2d);
     //##ModelId=3E6423D20318
     //##Documentation
-    //## @brief Get the reference to the Geometry2D at time @a t that is stored
+    //## @brief Get the reference to the Geometry2D that is stored
     //## by the object
-    //## @warning no time support yet. @t is ignored.
-    //## @todo time support needs to be added
-    const mitk::Geometry2D * GetGeometry2D(int t = 0) const
+    const mitk::Geometry2D * GetGeometry2D() const
     {
         return m_Geometry2D.GetPointer(); 
     };
@@ -63,7 +60,7 @@ protected:
     virtual ~Geometry2DData();
 
     //##ModelId=3EDD039F01D2
-	Geometry2D::ConstPointer m_Geometry2D;
+	Geometry2D::Pointer m_Geometry2D;
   SlicedGeometry3D::Pointer m_SlicedGeometry;
 };
 

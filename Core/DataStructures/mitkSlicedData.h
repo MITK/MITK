@@ -3,6 +3,7 @@
 
 #include "mitkCommon.h"
 #include "mitkBaseData.h"
+#include "mitkTimeSlicedGeometry.h"
 #include "mitkSlicedGeometry3D.h"
 #include "itkProcessObject.h"
 #include "itkIndex.h"
@@ -15,6 +16,8 @@
 #endif
 
 namespace mitk {
+
+class SlicedGeometry3D;
 
 //##ModelId=3E14379B00E8
 //##Documentation
@@ -149,24 +152,24 @@ public:
     return m_LargestPossibleRegion.GetSize(4);
   }
 
-  //##Documentation
-  //## @brief Return the Geometry2D of the slice (@a s, @a t). 
-  //## 
-  //## The method does not simply call GetGeometry()->GetGeometry2D(). Before doing this, it
-  //## makes sure that the Geometry2D is up-to-date before returning it (by
-  //## setting the update extent appropriately and calling
-  //## UpdateOutputInformation).
-  //## 
-  //## @warning GetGeometry2D not yet completely implemented.
-  //## @todo Appropriate setting of the update extent is missing.
-  virtual const mitk::Geometry2D* GetGeometry2D(int s, int t) const;
+  ////##Documentation
+  ////## @brief Return the Geometry2D of the slice (@a s, @a t). 
+  ////## 
+  ////## The method does not simply call GetGeometry()->GetGeometry2D(). Before doing this, it
+  ////## makes sure that the Geometry2D is up-to-date before returning it (by
+  ////## setting the update extent appropriately and calling
+  ////## UpdateOutputInformation).
+  ////## 
+  ////## @warning GetGeometry2D not yet completely implemented.
+  ////## @todo Appropriate setting of the update extent is missing.
+  //virtual const mitk::Geometry2D* GetGeometry2D(int s, int t=0) const;
 
   //##Documentation
   //## @brief Convenience access method for the geometry, which is of type SlicedGeometry3D (or a sub-class of it).
   //## 
   //## @em No update will be called. Normally used in GenerateOutputInformation of 
   //## subclasses of BaseProcess.
-  SlicedGeometry3D* GetSlicedGeometry() const;
+  SlicedGeometry3D* GetSlicedGeometry(unsigned int t=0) const;
 
   //##Documentation
   //## @brief Convenience access method for the geometry, which is of type SlicedGeometry3D (or a sub-class of it).
@@ -178,7 +181,7 @@ public:
   //## 
   //## @warning GetGeometry not yet completely implemented. 
   //## @todo Appropriate setting of the update extent is missing.
-  const SlicedGeometry3D* GetUpdatedSlicedGeometry();
+  const SlicedGeometry3D* GetUpdatedSlicedGeometry(unsigned int t=0);
 
   //##Documentation
   //## @brief Set the Geometry3D of the data, which will be referenced (not copied!). It
@@ -208,13 +211,9 @@ protected:
   //## which is of type SlicedGeometry3D (or a sub-class of it). 
   //## Has to be initialized by sub-classes of SlicedData, when creating
   //## the geometry!
-  SlicedGeometry3D* m_SlicedGeometry;
-private:
-
+  TimeSlicedGeometry* m_TimeSlicedGeometry;
 };
 
 } // namespace mitk
-
-
 
 #endif /* SLICEDDATA_H_HEADER_INCLUDED_C1EBD53D */

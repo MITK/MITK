@@ -32,28 +32,28 @@ void QmitkStdMultiWidget::init()
   // ... of widget 1
   qcolor=mitkWidget1->GetSelectionFrame()->paletteBackgroundColor();
   color[0]=qcolor.red()/255.0; color[1]=qcolor.green()/255.0; color[2]=qcolor.blue()/255.0;
-  planeNode=mitkWidget1->GetRenderer()->GetWorldGeometryNode();
+  planeNode=mitkWidget1->GetRenderer()->GetCurrentWorldGeometry2DNode();
   planeNode->SetColor(color);
   layer = new mitk::IntProperty(1);	
   planeNode->SetProperty("layer",layer); 	  
   // ... of widget 2
   qcolor=mitkWidget2->GetSelectionFrame()->paletteBackgroundColor();
   color[0]=qcolor.red()/255.0; color[1]=qcolor.green()/255.0; color[2]=qcolor.blue()/255.0;
-  planeNode=mitkWidget2->GetRenderer()->GetWorldGeometryNode();
+  planeNode=mitkWidget2->GetRenderer()->GetCurrentWorldGeometry2DNode();
   planeNode->SetColor(color);
   layer = new mitk::IntProperty(2);	
   planeNode->SetProperty("layer",layer); 	  
   // ... of widget 3
   qcolor=mitkWidget3->GetSelectionFrame()->paletteBackgroundColor();
   color[0]=qcolor.red()/255.0; color[1]=qcolor.green()/255.0; color[2]=qcolor.blue()/255.0;
-  planeNode=mitkWidget3->GetRenderer()->GetWorldGeometryNode();
+  planeNode=mitkWidget3->GetRenderer()->GetCurrentWorldGeometry2DNode();
   planeNode->SetColor(color);
   layer = new mitk::IntProperty(3);	
   planeNode->SetProperty("layer",layer); 	  
   // ... of widget 4
   qcolor=mitkWidget4->GetSelectionFrame()->paletteBackgroundColor();
   color[0]=qcolor.red()/255.0; color[1]=qcolor.green()/255.0; color[2]=qcolor.blue()/255.0;
-  planeNode=mitkWidget4->GetRenderer()->GetWorldGeometryNode();
+  planeNode=mitkWidget4->GetRenderer()->GetCurrentWorldGeometry2DNode();
   planeNode->SetColor(color);
 
 }

@@ -14,6 +14,7 @@ void QmitkSliderNavigator::Refetch()
   {
     m_InRefetch=true;
     
+    slider->setMinValue(0);
     slider->setMaxValue(m_Stepper->GetSteps()-1);
     slider->setValue(m_Stepper->GetPos());
     
@@ -29,6 +30,7 @@ void QmitkSliderNavigator::Refetch()
 void QmitkSliderNavigator::SetStepper( mitk::Stepper * stepper)
 {
     m_Stepper = stepper;
+    m_InRefetch = (m_Stepper==NULL); // this avoids trying to use m_Stepper until it is set to something != NULL (additionally to the avoiding recursions during refetching)
 }
 
 
@@ -40,7 +42,7 @@ void QmitkSliderNavigator::slider_valueChanged( int )
 
 void QmitkSliderNavigator::init()
 {
-    m_InRefetch = false;
+  m_InRefetch = true; // this avoids trying to use m_Stepper until it is set to something != NULL (additionally to the avoiding recursions during refetching)
 }
 
 

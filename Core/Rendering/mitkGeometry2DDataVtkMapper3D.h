@@ -47,7 +47,7 @@ class Geometry2DDataVtkMapper3D : public BaseVtkMapper3D
 	//## been resliced by an ImageMapper2D according to the Geometry2D.
     //## See ImageMapper2D for problems of the current version.
 	//## @warning Works only when the node to the Geometry2DData was created by 
-    //## calling BaseRenderer::GetWorldGeometryNode()
+    //## calling BaseRenderer::GetCurrentWorldGeometry2DNode()
     virtual void SetDataIteratorForTexture(mitk::DataTreeIterator* iterator);
     //##ModelId=3EF19F850151
     //##Documentation

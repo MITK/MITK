@@ -67,3 +67,9 @@ QWidget* QmitkSimpleExampleControls::getSliceNavigatorSagittal()
 {
     return sliceNavigatorSagittal;
 }
+
+
+QWidget * QmitkSimpleExampleControls::getSliceNavigatorTime()
+{
+    return sliceNavigatorTime;
+}

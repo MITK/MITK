@@ -50,7 +50,7 @@ void mitk::DataTree::treeChanged( TreeIterator<DataTreeNode::Pointer>& changedTr
 }
 
 //##ModelId=3ED91D050085
-mitk::BoundingBox::Pointer mitk::DataTree::ComputeBoundingBox(mitk::DataTreeIterator * it)
+mitk::BoundingBox::Pointer mitk::DataTree::ComputeBoundingBox(mitk::DataTreeIterator * it, const char* boolPropertyKey, mitk::BaseRenderer* renderer, const char* boolPropertyKey2)
 {
   mitk::DataTreeIterator* _it=it->clone();
   mitk::BoundingBox::Pointer m_BoundingBox=mitk::BoundingBox::New();
@@ -65,7 +65,7 @@ mitk::BoundingBox::Pointer mitk::DataTree::ComputeBoundingBox(mitk::DataTreeIter
   {
     _it->next();
     mitk::DataTreeNode::Pointer node = _it->get();
-    if (node->GetData() != NULL && node->GetData()->GetUpdatedGeometry()!=NULL) 
+    if (node->GetData() != NULL && node->GetData()->GetUpdatedGeometry() != NULL && node->IsOn(boolPropertyKey, renderer) && node->IsOn(boolPropertyKey2, renderer)) 
     {
       mitk::BoundingBox::ConstPointer nextBoundingBox = node->GetData()->GetGeometry()->GetBoundingBox();
       const mitk::BoundingBox::PointsContainer * nextPoints = nextBoundingBox->GetPoints();
@@ -90,42 +90,8 @@ mitk::BoundingBox::Pointer mitk::DataTree::ComputeBoundingBox(mitk::DataTreeIter
   return result;
 }
 
-mitk::BoundingBox::Pointer mitk::DataTree::ComputeVisibleBoundingBox(mitk::DataTreeIterator * it, mitk::BaseRenderer* renderer)
+const mitk::TimeBounds mitk::DataTree::ComputeTimeBoundsInMS(mitk::DataTreeIterator * it, const char* boolPropertyKey, mitk::BaseRenderer* renderer, const char* boolPropertyKey2)
 {
-  mitk::DataTreeIterator* _it=it->clone();
-  mitk::BoundingBox::Pointer m_BoundingBox=mitk::BoundingBox::New();
-  mitk::BoundingBox::PointsContainer::Pointer pointscontainer=mitk::BoundingBox::PointsContainer::New();
-  
-  mitk::ScalarType nullpoint[]={0,0,0};
-  mitk::BoundingBox::PointType p(nullpoint);
-  
-  mitk::BoundingBox::PointIdentifier pointid=0;
-  
-  while (_it->hasNext())
-  {
-    _it->next();
-    mitk::DataTreeNode::Pointer node = _it->get();
-    if (node->GetData() != NULL && node->GetData()->GetUpdatedGeometry()!=NULL && node->IsVisible(renderer)) 
-    {
-      mitk::BoundingBox::ConstPointer nextBoundingBox = node->GetData()->GetGeometry()->GetBoundingBox();
-      const mitk::BoundingBox::PointsContainer * nextPoints = nextBoundingBox->GetPoints();
-      if(nextPoints!=NULL)
-      {
-        mitk::BoundingBox::PointsContainer::ConstIterator pointsIt = nextPoints->Begin();
-      
-        while (pointsIt != nextPoints->End() )
-        {
-          pointscontainer->InsertElement( pointid++, pointsIt->Value());
-          ++pointsIt;
-        }
-      }
-    }
-  }
-  
-  mitk::BoundingBox::Pointer result = mitk::BoundingBox::New();
-  result->SetPoints(pointscontainer);
-  result->ComputeBoundingBox();
-  
-  delete _it;
-  return result;
+  TimeBounds timebounds;
+  return timebounds;
 }

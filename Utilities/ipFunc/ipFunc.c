@@ -111,7 +111,7 @@ void main (int argc, char **argv)
         printf(" Logic:        And, Not, Or\n");
         printf(" Geometric:    Refl, Rotate, Scale, Window, WindowR\n");
         printf(" Point:        Equal, Exp, Inv, LevWin, LN, Log, Norm, NormY\n");
-        printf("               Pot, Select, SelMM, Sqrt, Thresh, ZeroCr\n");
+        printf("               Pot, Select, SelInv, SelMM, Sqrt, Thresh, ZeroCr\n");
         printf(" Locale:       Canny, Conv, GaussF, Grad, Laplace, Mean\n");
         printf("               Rank, Roberts, Shp, Sobel\n");
         printf(" Morpho:       Close, Dila, Ero, Open\n");

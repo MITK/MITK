@@ -48,7 +48,7 @@
  *  this functions calculates the square root of all pixels
  */
 
-/** @briefs calculates the square root of all pixels
+/** @brief calculates the square root of all pixels
  *
  *  @param pic_1      pointer to the first image
  *  @param keep       tells whether the image type could be changed to ipPicFloat

@@ -50,15 +50,15 @@
 
 /**  this function calculates the greyvalue histogram of an image
  *
- *  @param pic_old      pointer to the image that should be inverted
- *  @param min_gv      min. greyvalue in histogram
- *  @param max_gv     max. greyvalue in histogram
+ *  @param pic_old  pointer to the image that should be inverted
+ *  @param min_gv   min. greyvalue in histogram
+ *  @param max_gv   max. greyvalue in histogram
  *  @param hist     pointer to the greyvalue histogram ( return value )
  *  @param size_hist   pointer to the number of elements in the histogram
  *                ( result value )
  *
- *  @return ipFuncERROR     - if an error occured
- *  @return ipFuncOK        - if no error occured
+ *  @return @arg @c ipFuncERROR     - if an error occured
+ *  @return @arg @c ipFuncOK        - if no error occured
  *
  * AUTHOR & DATE
  */

@@ -69,10 +69,6 @@
 
 #include "ipFunc.h"
 
-/* extern gloabal variables */
-
-extern int ipFuncErrno;
-
 /* type definitions */
 
 typedef enum

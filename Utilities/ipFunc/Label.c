@@ -60,6 +60,7 @@
  *  @param no_label    number of different labels (return value)
  *
  *  @return pointer to new image
+ *
  * USES
  *  function _ipFuncError  - checks image data
  *  function _ipFuncExtr   - calculates extreme greyvalues

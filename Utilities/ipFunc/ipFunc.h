@@ -138,10 +138,6 @@
 #define M_PI             3.14159265358979323846
 #endif
 
-/* extern gloabal variables */
-
-extern int ipFuncErrno;
-
 /* definition of constants */
 
 #define ipFuncERROR 0
@@ -199,11 +195,15 @@ typedef struct
 #define IPFUNCMAX( x, y ) ( ( (x) > (y) ) ? (x) : (y) )
 #define IPFUNCMIN( x, y ) ( ( (x) < (y) ) ? (x) : (y) )  
 
-/* function prototypes */
-
 #if defined(__cplusplus) || defined(c_plusplus)
 extern "C" {
 #endif
+/* extern gloabal variables */
+
+extern int ipFuncErrno;
+
+
+/* function prototypes */
 
 ipUInt4_t ipFuncBox ( ipPicDescriptor *pic_old,
                       ipUInt4_t       **beg,

@@ -98,7 +98,8 @@ ipPicDescriptor *ipFuncSelect ( ipPicDescriptor *pic_old,
     {                                                                        \
        help = (( type * )pic->data )[i];                                     \
        (( type * )pic_new->data )[i] =                                       \
-             ( help < ( type ) gv_low || help > ( type )gv_up ) ?            \
+             ( help < gv_low || help > gv_up ) ?                             \
+             /*( help < ( type ) gv_low || help > ( type )gv_up ) ? iw-3.8.2000*/       \
              ( type ) gv : help;                                             \
     }                                                                        \
                                                                              \
@@ -115,10 +116,8 @@ ipPicDescriptor *ipFuncSelect ( ipPicDescriptor *pic_old,
                                 ipFloat8_t      gv,
                                 ipPicDescriptor *pic_return ) 
 {
-  ipFloat8_t       min_gv, max_gv;  /* max and min posiible greyvalues      */
-  ipFloat8_t       min, max;        /* extreme greyvalues                   */
+  ipFloat8_t       min_gv, max_gv;  /* max and min possible greyvalues      */
   ipPicDescriptor  *pic_new;        /* pointer to transformed image         */
-  ipUInt4_t        i;               /* loop index                           */
 
 
   /* calculate max. and min. possible greyvalues                            */
@@ -135,11 +134,13 @@ ipPicDescriptor *ipFuncSelect ( ipPicDescriptor *pic_old,
        _ipFuncSetErrno ( ipFuncDATA_ERROR );
        return ( ipFuncERROR );
     }
-  if ( min_gv > gv_low || max_gv < gv_up ) 
+/* iw - commented out on 3.8.2000 
+   if ( min_gv > gv_low || max_gv < gv_up ) 
     {
        _ipFuncSetErrno ( ipFuncDATA_ERROR );
        return ( ipFuncERROR );
     }
+*/
   if ( min_gv > gv || max_gv < gv ) 
     {
        _ipFuncSetErrno ( ipFuncDATA_ERROR );

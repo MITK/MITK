@@ -68,5 +68,4 @@ private:
 } // namespace mitk
 
 
-
 #endif /* BASEDATA_H_HEADER_INCLUDED_C1EBB6FA */

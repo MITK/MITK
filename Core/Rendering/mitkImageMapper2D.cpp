@@ -175,13 +175,16 @@ void mitk::ImageMapper2D::GenerateData(mitk::BaseRenderer *renderer)
 		
         m_Reslicer->SetInput(inputData);
         m_Reslicer->SetOutputDimensionality(2);
-	m_Reslicer->SetOutputSpacing(1.0,1.0,1.0);
  	m_Reslicer->SetOutputOrigin(0,0,0);
+
         m_Reslicer->SetBackgroundLevel(-1024);
         PlaneGeometry* myPlaneGeom =
             dynamic_cast<PlaneGeometry *>((mitk::Geometry2D*)(renderer->GetWorldGeometry()));
         assert(myPlaneGeom);
         assert(myPlaneGeom->GetPlaneView().normal.length()>0.1);
+
+    	m_Reslicer->SetOutputSpacing(myPlaneGeom->GetPlaneView().getLengthOfOrientation1()/myPlaneGeom->GetWidthInUnits(), myPlaneGeom->GetPlaneView().getLengthOfOrientation2()/myPlaneGeom->GetHeightInUnits(),1.0);
+        m_Reslicer->SetOutputExtent(0.0, myPlaneGeom->GetWidthInUnits()-1, 0.0, myPlaneGeom->GetHeightInUnits()-1, 0.0, 1.0);
 
         double origin[3];
         origin[0]=myPlaneGeom->GetPlaneView().point.x;

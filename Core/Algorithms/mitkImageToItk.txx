@@ -103,10 +103,6 @@ template<class TPixel, unsigned int VImageDimension>
   void ImageToItk<TPixel, VImageDimension>
   ::GenerateData()
 {
-  
-  std::cout << "ImageToItk<TPixel, VImageDimension>::GenerateData() ... " << std::endl;
-  
-  
   // Allocate output
   mitk::Image::ConstPointer input = this->GetInput();
   typename OutputImageType::Pointer output = this->GetOutput();
@@ -145,13 +141,8 @@ template<class TPixel, unsigned int VImageDimension>
     import->SetImportPointer( (TPixel*) m_ImageDataItem->GetData(),	noBytes, false);
     
     output->SetPixelContainer(import);
-    //output->Update();
     itkDebugMacro( << "size of container = " << import->Size() );
   }
-  
-  std::cout << "ImageToItk<TPixel, VImageDimension>::GenerateData() OK! " << std::endl;
-  
-  
 }
 
 template<class TPixel, unsigned int VImageDimension>
@@ -180,8 +171,6 @@ template<class TPixel, unsigned int VImageDimension>
   void ImageToItk<TPixel, VImageDimension>
   ::GenerateOutputInformation()
 {
-  std::cout << "ImageToItk<TPixel, VImageDimension>::GenerateOutputInformation() ... " << std::endl;
-  
   mitk::Image::ConstPointer input = this->GetInput();
   typename OutputImageType::Pointer output = this->GetOutput();
   
@@ -210,9 +199,6 @@ template<class TPixel, unsigned int VImageDimension>
   output->SetRegions( region );
   output->SetOrigin( origin );
   output->SetSpacing( spacing );
-  
-  std::cout << "ImageToItk<TPixel, VImageDimension>::GenerateOutputInformation() OK! " << std::endl;
-  
 }
 
 template<class TPixel, unsigned int VImageDimension>
@@ -221,8 +207,6 @@ template<class TPixel, unsigned int VImageDimension>
   ::PrintSelf(std::ostream& os, itk::Indent indent) const
 {
   Superclass::PrintSelf(os,indent);
-  
-  std::cout << "Mit2itkWrapper .. " << std::endl;
 }
 
 }

@@ -97,7 +97,7 @@ template <class Tin, unsigned int n>
 {
   unsigned int i;
   for(i=0; i<out.size();++i)
-    out[i]=(Tout) in[i];
+    out[i]=in[i];
 }
 
 template <class T, unsigned int NVectorDimension>

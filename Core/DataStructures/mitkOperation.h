@@ -18,6 +18,7 @@ typedef int OperationType ;
 //static const int OpNOTHING = 999;
 
 
+
 //##ModelId=3E5F682C0289
 //##Documentation
 //## @brief Base class of all Operation-classes
@@ -25,23 +26,23 @@ typedef int OperationType ;
 //## 
 class Operation
 {
-  public:
-    //##ModelId=3E7830E70054
-    //##Documentation
+public:
+  //##ModelId=3E7830E70054
+  //##Documentation
 	//## Constructor
 	//## @params execId: which Operation shall be executed in Execute()
-    //## 
-    Operation(OperationType operationType);
+  //## 
+  Operation(OperationType operationType);
 
-    //##ModelId=3F01770A0007
-    virtual ~Operation();
+  //##ModelId=3F01770A0007
+  virtual ~Operation();
 
-    //##ModelId=3E7831B600CA
-    OperationType GetOperationType();
+  //##ModelId=3E7831B600CA
+  OperationType GetOperationType();
 
   protected:
-    //##ModelId=3E5F6A9001E9
-    OperationType m_OperationType;
+  //##ModelId=3E5F6A9001E9
+  OperationType m_OperationType;
 };
 }//namespace mitk
 #endif /* OPERATION_H_HEADER_INCLUDED_C16E7D9E */

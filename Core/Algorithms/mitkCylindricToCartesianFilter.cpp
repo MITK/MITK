@@ -7,8 +7,9 @@
 #include <ipPicTypeMultiplex.h>
 
 template <class T>
-void _transform(ipPicDescriptor *pic, ipPicDescriptor *dest, T outsideValue, float *fr, float *fphi, float *fz, short *rt, unsigned int *phit, unsigned int *zt, ipPicDescriptor *coneCutOff_pic)  //...t=truncated
+void _transform(ipPicDescriptor *pic, ipPicDescriptor *dest, float _outsideValue, float *fr, float *fphi, float *fz, short *rt, unsigned int *phit, unsigned int *zt, ipPicDescriptor *coneCutOff_pic)  //...t=truncated
 {
+  T outsideValue = static_cast<T>(_outsideValue);
   register float f, ft, f0, f1, f2, f3;
 
   ipInt2_t ox_size;

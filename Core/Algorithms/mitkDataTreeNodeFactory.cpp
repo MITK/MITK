@@ -793,8 +793,6 @@ void mitk::DataTreeNodeFactory::ReadFileSeriesTypeITKImageSeriesReader()
 
     StringContainer unmatchedFiles;
     StringContainer matchedFiles;
-    unsigned int minNumber = 0;
-    unsigned int maxNumber = 0;
 
     //
     // Load Directory

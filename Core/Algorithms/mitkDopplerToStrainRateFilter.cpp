@@ -95,13 +95,9 @@ void mitk::DopplerToStrainRateFilter::GenerateData()
 
   float alpha;								// the beam-angle, angle betwen current point and beam-point
   float dx, dy;								// projection of this->distance to x- and y-axis
-  float weightX, weightY;			// weigth-factors for x-velocity and y-velocity
-  int dxFloor, dyFloor;				// floored dx, dy
 
-  int x1, x2, x3, x4;					// a square, where the velocity v1 lies in
-  int y1, y2, y3, y4;					// the points are used for interpolation
-  int vTmp1, vTmp2;						// velocities used for interpolation
-  int vTmp3, vTmp4;	
+  int x1;					// a square, where the velocity v1 lies in
+  int y1;					// the points are used for interpolation
 
 
   int minStrainRate=128, maxStrainRate=128;

@@ -32,13 +32,15 @@ MakeCastImageFilter(  ItkInputImageType* inputImage )
   if ( typeId == typeid(type) )                                                                  \
 {                                                                                              \
     typedef mitk::ImageToItk<type, dimension> ImageToItkType;                                  \
+    typedef itk::SmartPointer<ImageToItkType>  ImageToItkTypePointer;                                  \
     typedef itk::Image<type, dimension> ImageType;                                  \
     typedef itk::ImageSource<ImageType> ImageFilterType;                                \
+    typedef itk::SmartPointer<ImageFilterType> ImageFilterTypePointer;                                \
     \
-    ImageToItkType::Pointer myImageToItkFilter = ImageToItkType::New();                                \
+    ImageToItkTypePointer myImageToItkFilter = ImageToItkType::New();                                \
     myImageToItkFilter ->SetInput(mitksource);                                                  \
     \
-    ImageFilterType::Pointer itkpipeline =                                                     \
+    ImageFilterTypePointer itkpipeline =                                                     \
     itkpipelinefunction(myImageToItkFilter->GetOutput()).GetPointer();                             \
     itkpipeline->Update();                                                                 \
     \
@@ -97,13 +99,15 @@ MakeCastImageFilter(  ItkInputImageType* inputImage )
   if ( typeId == typeid(type) )                                                                  \
 {                                                                                              \
     typedef mitk::ImageToItk<type, dimension> ImageToItkType;                                  \
+    typedef itk::SmartPointer<ImageToItkType> ImageToItkTypePointer;                          \
     typedef itk::Image<type, dimension> ImageType;                                  \
-    typedef itk::ImageSource<resultItkImageType> ImageFilterType;                                \
+    typedef itk::ImageSource<resultItkImageType> ImageFilterType;            \
+    typedef itk::SmartPointer<ImageFilterType> ImageFilterTypePointer;                         \
     \
-    ImageToItkType::Pointer myImageToItkFilter = ImageToItkType::New();                                \
+    ImageToItkTypePointer myImageToItkFilter = ImageToItkType::New();                                \
     myImageToItkFilter->SetInput(mitksource);                                                  \
     \
-    ImageFilterType::Pointer itkpipeline =                                                     \
+    ImageFilterTypePointer itkpipeline =                                                     \
     itkpipelinefunction<ImageType,resultItkImageType>(myImageToItkFilter->GetOutput()).GetPointer();                             \
     itkpipeline->Update();                                                                 \
     \

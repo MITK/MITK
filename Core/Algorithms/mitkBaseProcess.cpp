@@ -4,7 +4,7 @@
 #define MITK_WEAKPOINTER_PROBLEM_WORKAROUND_ENABLED
 
 //##ModelId=3E8600DD0036
-mitk::BaseProcess::BaseProcess() : m_Unregistering(false), m_ExternalReferenceCount(-1), m_CalculatingExternalReferenceCount(false)
+mitk::BaseProcess::BaseProcess() : m_Unregistering(false), m_CalculatingExternalReferenceCount(false), m_ExternalReferenceCount(-1)
 {
 
 }

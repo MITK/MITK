@@ -1,6 +1,6 @@
 #include "mitkStepper.h"
 
-mitk::Stepper::Stepper() : m_Steps(0), m_Pos(0), m_StepSize(1), m_PosToUnitFactor(1), m_ZeroLine(0)
+mitk::Stepper::Stepper() : m_Pos(0), m_Steps(0), m_StepSize(1), m_PosToUnitFactor(1), m_ZeroLine(0)
 {
 
 }

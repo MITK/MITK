@@ -3,14 +3,15 @@
 #include "mitkVector.h"
 
 template <class T>
-void _planesSet(ipPicDescriptor *dest, const mitk::Geometry3D* srcgeometry, const mitk::PlaneCutFilter::PlanesContainerType* planes, T outside_value, T * dummy=0)
+void _planesSet(ipPicDescriptor *dest, const mitk::Geometry3D* srcgeometry, const mitk::PlaneCutFilter::PlanesContainerType* planes, float _outside_value, T * dummy=0)
 {
+  T outside_value = static_cast<T>(_outside_value);
   T *d=(T*)dest->data;
 
   mitk::PlaneCutFilter::PlanesContainerType::ConstIterator pit, pend;
   pend = planes->End();
 
-  int x_max(dest->n[0]),y_max(dest->n[1]), z_max(dest->n[2]), xy3_size(dest->n[0]*dest->n[1]);
+  int x_max(dest->n[0]),y_max(dest->n[1]), z_max(dest->n[2]);
   mitk::Point3D p;
   mitk::Point3D pt_mm;
   for(p[2]=0;p[2]<z_max;++p[2])

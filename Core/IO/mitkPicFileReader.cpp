@@ -145,8 +145,6 @@ void mitk::PicFileReader::GenerateData()
 
     if( m_FileName != "")
     {
-        char * c=const_cast<char *>(m_FileName.c_str());
-
         ipPicDescriptor* pic=ipPicGet(const_cast<char *>(m_FileName.c_str()), NULL);
         ConvertHandedness(pic);
         output->SetPicChannel(pic);

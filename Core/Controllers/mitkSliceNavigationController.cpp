@@ -16,7 +16,7 @@
 
 //##ModelId=3E189B1D008D
 mitk::SliceNavigationController::SliceNavigationController(const char * type) 
-  : BaseController(type), m_ViewDirection(Transversal), m_BlockUpdate(false), m_CreatedWorldGeometry(NULL), m_InputWorldGeometry(NULL)
+  : BaseController(type), m_InputWorldGeometry(NULL), m_CreatedWorldGeometry(NULL), m_ViewDirection(Transversal), m_BlockUpdate(false)
 {
   itk::SimpleMemberCommand<SliceNavigationController>::Pointer sliceStepperChangedCommand, timeStepperChangedCommand;
   sliceStepperChangedCommand = itk::SimpleMemberCommand<SliceNavigationController>::New();
@@ -85,12 +85,12 @@ void mitk::SliceNavigationController::Update()
           break;
         case Frontal:
           planegeometry->InitializeStandardPlane(m_InputWorldGeometry, PlaneGeometry::Frontal);
-          m_Slice->SetSteps((int)m_InputWorldGeometry->GetExtent(1)+1.0);
+          m_Slice->SetSteps((int)(m_InputWorldGeometry->GetExtent(1)+1.0));
           viewSpacing=m_InputWorldGeometry->GetExtentInMM(1)/m_InputWorldGeometry->GetExtent(1);
           break;
         case Sagittal:
           planegeometry->InitializeStandardPlane(m_InputWorldGeometry, PlaneGeometry::Sagittal);
-          m_Slice->SetSteps((int)m_InputWorldGeometry->GetExtent(0)+1.0);
+          m_Slice->SetSteps((int)(m_InputWorldGeometry->GetExtent(0)+1.0));
           viewSpacing=m_InputWorldGeometry->GetExtentInMM(0)/m_InputWorldGeometry->GetExtent(0);
           break;
         default:

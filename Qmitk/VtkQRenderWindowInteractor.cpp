@@ -342,3 +342,4 @@ const char* VtkQRenderWindowInteractorFactory::GetDescription()
 }
 
 VtkQRenderWindowInteractorFactory vtkQRenderWindowInteractorFactory;
+

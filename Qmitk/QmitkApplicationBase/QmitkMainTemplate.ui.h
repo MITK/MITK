@@ -159,6 +159,13 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
       // disable volume rendering by default
       node->SetProperty("volumerendering",new mitk::BoolProperty(false));
 
+//	    mitk::USLookupTableSource::Pointer LookupTableSource = mitk::USLookupTableSource::New();
+//  	  LookupTableSource->SetUseStrainRateLookupTable();
+//	    LookupTableSource->Update();
+//  	  mitk::LookupTableSource::OutputTypePointer LookupTable = LookupTableSource->GetOutput();
+//	    mitk::LookupTableProperty::Pointer LookupTableProp = new mitk::LookupTableProperty(*LookupTable);
+//			node->SetProperty("LookupTable", LookupTableProp );
+      
       mitk::LevelWindowProperty::Pointer levWinProp = new mitk::LevelWindowProperty();
       mitk::LevelWindow levelWindow;
       reader->UpdateLargestPossibleRegion();
@@ -425,9 +432,18 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
 	    nameProp = new mitk::StringProperty("OriginalDoppler");
 	    node->SetProperty("fileName",nameProp);
 	    node->SetProperty("layer", new mitk::IntProperty(-6) );
-//    levelWindow.SetAuto( timeSelector->GetOutput()->GetPic() );
-//    node->SetLevelWindow(levelWindow, NULL);
-//    node->SetProperty("LookupTable", LookupTableProp );
+
+
+   		mitk::LevelWindowProperty::Pointer levWinProp = new mitk::LevelWindowProperty();
+      mitk::LevelWindow levelWindow;
+      levelWindow.SetAuto( timeSelector->GetOutput()->GetPic() );
+			levWinProp->SetLevelWindow(levelWindow);      
+      // set the overwrite LevelWindow
+      // if "levelwindow" is used if "levelWindow" is not available
+      // else "levelWindow" is used
+      // "levelWindow" is not affected by the slider
+      node->GetPropertyList()->SetProperty("levelWindow",levWinProp);
+
 	    node->SetProperty("LookupTable", LookupTableProp );
   	  node->SetVisibility(false,NULL);
 	    node->Update();
@@ -445,8 +461,18 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
   	  node->SetProperty("fileName",nameProp);
 	    node->SetProperty("layer", new mitk::IntProperty(-5) );
   	  cyl2cartDoppler->Update();
-//    levelWindow.SetAuto( cyl2cartDoppler->GetOutput()->GetPic() );
-//    node->SetLevelWindow(levelWindow, NULL);
+
+      //mitk::LevelWindow levelWindow;
+	    levelWindow.SetAuto( cyl2cartDoppler->GetOutput()->GetPic() );
+			levWinProp->SetLevelWindow(levelWindow);      	    
+      // set the overwrite LevelWindow
+      // if "levelwindow" is used if "levelWindow" is not available
+      // else "levelWindow" is used
+      // "levelWindow" is not affected by the slider
+      node->GetPropertyList()->SetProperty("levelWindow",levWinProp);
+
+
+
     	node->SetProperty("LookupTable", LookupTableProp );
 	    node->Update();
   	  it->add(node);

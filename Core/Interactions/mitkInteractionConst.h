@@ -124,6 +124,7 @@ typedef enum EActions
   AcCHECKSELECTED = 34, //check if the given element is selected or not
   AcCHECKGREATERZERO = 35, //check if the current number of elements is greater than 0
   AcCHECKGREATERTWO = 36, //check if the current number of elements is greater than two
+  AcCHECKOPERATION = 37, //check if the operation is of one spectial type
   AcFINISHOBJECT = 40,
   AcFINISHGROUP = 41,
   AcFINISHMOVEMENT = 42,

@@ -8,18 +8,24 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>600</width>
-            <height>480</height>
+            <width>953</width>
+            <height>701</height>
         </rect>
     </property>
     <property name="caption">
         <string>Form2</string>
     </property>
-    <hbox>
+    <grid>
         <property name="name">
             <cstring>unnamed</cstring>
         </property>
-        <widget class="QSplitter">
+        <property name="margin">
+            <number>0</number>
+        </property>
+        <property name="spacing">
+            <number>0</number>
+        </property>
+        <widget class="QSplitter" row="0" column="0">
             <property name="name">
                 <cstring>MainSplitter</cstring>
             </property>
@@ -33,7 +39,7 @@
             </property>
             <property name="minimumSize">
                 <size>
-                    <width>5</width>
+                    <width>57</width>
                     <height>50</height>
                 </size>
             </property>
@@ -85,7 +91,7 @@
                 </property>
             </widget>
         </widget>
-    </hbox>
+    </grid>
 </widget>
 <includes>
     <include location="global" impldecl="in implementation">qvaluelist.h</include>

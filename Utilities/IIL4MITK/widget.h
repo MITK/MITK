@@ -5,8 +5,8 @@
 #include <mitkRenderWindow.h>
 #include <mitkGL.h>
 
-class iilItem;
+class iil4mitkItem;
 
-typedef mitk::RenderWindow iilWidget;
+typedef mitk::RenderWindow iil4mitkWidget;
 
 #endif

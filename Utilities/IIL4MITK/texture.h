@@ -10,7 +10,7 @@ the rendering of images.
 
 \todo Remove the makeCurrent calls
 */
-class _iilTexture {
+class _iil4mitkTexture {
 
 public:
 
@@ -18,7 +18,7 @@ public:
 	\brief The constructor.
 	\note Make sure that the desired OpenGL context is selected.
 	*/
-	_iilTexture (iilWidget* parent); 
+	_iil4mitkTexture (iil4mitkWidget* parent); 
 	
 	/*! 
 	\brief The destructor.
@@ -27,7 +27,7 @@ public:
 	\note Make sure that the desired OpenGL context is selected.
 	existing.
 	*/
-	virtual ~_iilTexture ();
+	virtual ~_iil4mitkTexture ();
 
 	/*!
 	\brief Binds the texture to the OpenGL context of the widget.
@@ -133,7 +133,7 @@ private:
 	*/
 	float _red, _green, _blue, _alpha;
 
-  iilWidget* parent;
+  iil4mitkWidget* parent;
 };	
 
 #endif

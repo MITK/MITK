@@ -79,7 +79,7 @@ protected:
 
   bool m_InResize;
 public:
-  //iil compatibility
+  //iil4mitk compatibility
 
   //##ModelId=3E6D5DD40306
   virtual void mousePressEvent(QMouseEvent*);

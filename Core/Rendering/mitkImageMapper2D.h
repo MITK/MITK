@@ -33,7 +33,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkImageChannelSelector.h"
 #include "mitkBaseRenderer.h"
 
-class iilPicImage;
+class iil4mitkPicImage;
 class Vtk2itk;
 class vtkImageReslice;
 class vtkLookupTable;
@@ -99,8 +99,8 @@ public:
     unsigned long int m_LastUpdateTime;
     //##ModelId=3E6423D203E1
     //##Documentation
-    //## @brief stored iilPicImage containing the texture to display
-    iilPicImage* m_iilImage; 
+    //## @brief stored iil4mitkPicImage containing the texture to display
+    iil4mitkPicImage* m_iil4mitkImage; 
     //##ModelId=3E6E83AB02CD
     //##Documentation
     //## @brief stored data as a ipPicDescriptor
@@ -113,14 +113,14 @@ public:
     //## @brief number of pixels per mm in x- and y-direction of the resampled image m_Pic
     Vector2D m_PixelsPerMM;
     //##ModelId=3E6423D30002
-    RendererInfo() : m_LastUpdateTime(0), m_iilImage(NULL), m_Pic(NULL), m_RendererId(-1)
+    RendererInfo() : m_LastUpdateTime(0), m_iil4mitkImage(NULL), m_Pic(NULL), m_RendererId(-1)
     {
       m_PixelsPerMM.Fill(0);
     };
     //##ModelId=3E6423D30003
     ~RendererInfo()
     {
-      //         delete m_iilImage; //@FIXME: diese Zeile wird nie erreicht, s. Kommentar im desctuctor von ImageMapper2D
+      //         delete m_iil4mitkImage; //@FIXME: diese Zeile wird nie erreicht, s. Kommentar im desctuctor von ImageMapper2D
     }
   };
 
@@ -176,7 +176,7 @@ protected:
   std::map<mitk::BaseRenderer*,RendererInfo> m_RendererInfo;
 
 private:
-	int m_iilMode;
+	int m_iil4mitkMode;
 	
 };
 

@@ -8,18 +8,18 @@
 \brief The class adds support for PIC images by providing a proper interface
 to map the intensity range to the physical one of the display. 
 */
-class iilPicImage : public iilImage {
+class iil4mitkPicImage : public iil4mitkImage {
 
 public:
     /*!
     \brief The constructor.
     */
-    iilPicImage (const unsigned int size = 128);
+    iil4mitkPicImage (const unsigned int size = 128);
 
     /*!
     \brief The destructor.
     */
-    virtual ~iilPicImage ();
+    virtual ~iil4mitkPicImage ();
 
     /*!
     \brief Sets the PIC image.
@@ -122,14 +122,14 @@ public:
 public:
 
     virtual void clear ();
-	virtual void display (iilWidget* widget);
+	virtual void display (iil4mitkWidget* widget);
 
 public:
 
 	/*!
 	\brief Gets the first image of the item tree.
 	*/
-	static iilPicImage* find (const iilItem* item);
+	static iil4mitkPicImage* find (const iil4mitkItem* item);
 
 protected:
 

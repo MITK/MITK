@@ -14,21 +14,21 @@ power2 (const unsigned int x) {
     return y;
 }
 
-const unsigned int iilImage::_bytes [] = {1, 2, 3, 4};
+const unsigned int iil4mitkImage::_bytes [] = {1, 2, 3, 4};
 
-iilImage::iilImage ()
+iil4mitkImage::iil4mitkImage ()
         : _width (0), _height (0), _rx (0), _ry (0), _rw (0), _rh (0), _model (INTENSITY), _interpolation (false), _pixels (NULL), _internal (GL_LUMINANCE)
 {
 
 }
 
-iilImage::~iilImage ()
+iil4mitkImage::~iil4mitkImage ()
 {
     clear ();
 }
 
 void
-iilImage::setImage (const unsigned int width, const unsigned int height, const int model, unsigned char *data)
+iil4mitkImage::setImage (const unsigned int width, const unsigned int height, const int model, unsigned char *data)
 {
     assert (width > 0);
     assert (height > 0);
@@ -41,19 +41,19 @@ iilImage::setImage (const unsigned int width, const unsigned int height, const i
 }
 
 unsigned int
-iilImage::imageWidth() const
+iil4mitkImage::imageWidth() const
 {
     return _width;
 }
 
 unsigned int
-iilImage::imageHeight () const
+iil4mitkImage::imageHeight () const
 {
     return _height;
 }
 
 void
-iilImage::setRegion (const unsigned int x, const unsigned y, const unsigned w, const unsigned h)
+iil4mitkImage::setRegion (const unsigned int x, const unsigned y, const unsigned w, const unsigned h)
 {
     assert (x + w <= _width);
     assert (y + h <= _height);
@@ -65,31 +65,31 @@ iilImage::setRegion (const unsigned int x, const unsigned y, const unsigned w, c
 }
 
 unsigned int
-iilImage::regionX () const
+iil4mitkImage::regionX () const
 {
     return _rx;
 }
 
 unsigned int
-iilImage::regionY () const
+iil4mitkImage::regionY () const
 {
     return _ry;
 }
 
 unsigned int
-iilImage::regionWidth () const
+iil4mitkImage::regionWidth () const
 {
     return _rw;
 }
 
 unsigned int
-iilImage::regionHeight () const
+iil4mitkImage::regionHeight () const
 {
     return _rh;
 }
 
 void
-iilImage::clear ()
+iil4mitkImage::clear ()
 {
     _width = _height = 0;
     _rx = _ry = _rw = _rh = 0;
@@ -108,37 +108,37 @@ iilImage::clear ()
 }
 
 float
-iilImage::width () const
+iil4mitkImage::width () const
 {
     return (float) _rw;
 }
 
 float
-iilImage::height () const
+iil4mitkImage::height () const
 {
     return (float) _rh;
 }
 
 int
-iilImage::model () const
+iil4mitkImage::model () const
 {
     return _model;
 }
 
 void
-iilImage::setInterpolation (const bool on)
+iil4mitkImage::setInterpolation (const bool on)
 {
     _interpolation = on;
 }
 
 bool
-iilImage::interpolation () const
+iil4mitkImage::interpolation () const
 {
     return _interpolation;
 }
 
 void
-iilImage::display (iilWidget* widget)
+iil4mitkImage::display (iil4mitkWidget* widget)
 {
     GLdouble planeX [] = {-1, 0, 0, regionWidth ()};
     GLdouble planeY [] = {0, -1, 0, regionHeight ()};
@@ -180,7 +180,7 @@ iilImage::display (iilWidget* widget)
     }
 }
 
-void iilImage::drawTextures (iilWidget* widget)
+void iil4mitkImage::drawTextures (iil4mitkWidget* widget)
 {
 	const unsigned int s = 256; 	// size of the tiles
 	unsigned int n, m;		// number of the tiles
@@ -192,7 +192,7 @@ void iilImage::drawTextures (iilWidget* widget)
 	
 	Textures* textures;
 	{
-	        iilWidget* w;
+	        iil4mitkWidget* w;
 		unsigned int available, total;
 	
 		w = (widget->IsSharing () ? widget->SharedWidget () : widget);
@@ -204,7 +204,7 @@ void iilImage::drawTextures (iilWidget* widget)
 
 		if (!textures) {
 			textures = new Textures ();
-      typedef std::pair <void*, std::vector<_iilTexture*>* > TexturePair;
+      typedef std::pair <void*, std::vector<_iil4mitkTexture*>* > TexturePair;
 			_textures.insert (TexturePair(w, textures));
 		}
 		available = textures->size (); 
@@ -212,7 +212,7 @@ void iilImage::drawTextures (iilWidget* widget)
 //		textures->resize (total);
     int iii;
 		for (unsigned int i = available; i < total; i++) {
-			textures->push_back(new _iilTexture (w));
+			textures->push_back(new _iil4mitkTexture (w));
 iii=textures->size ();
 		}
 		widget->MakeCurrent ();
@@ -232,7 +232,7 @@ iii=textures->size ();
 		tex [0] = power2(s);
 		res [0] = 1.0f/tex[0];
 		for (unsigned int j = 0; j < m; j++) {
-			_iilTexture* texture;
+			_iil4mitkTexture* texture;
 			
 			texture = (*textures)[i*m+j];
 			pos [1] = _ry+j*(s-2);
@@ -265,7 +265,7 @@ iii=textures->size ();
 }
 
 void 
-iilImage::remove (iilWidget* widget)
+iil4mitkImage::remove (iil4mitkWidget* widget)
 {
   std::map<void*,Textures*>::iterator i =
    _textures.find (widget);
@@ -277,7 +277,7 @@ iilImage::remove (iilWidget* widget)
 }
 
 void
-iilImage::invalidateTextures ()
+iil4mitkImage::invalidateTextures ()
 {
   std::map<void*,Textures*>::iterator i;
   for (i=_textures.begin(); i!=_textures.end(); ++i) {
@@ -288,7 +288,7 @@ iilImage::invalidateTextures ()
 }
 
 void
-iilImage::updateTexture (_iilTexture* texture, unsigned int x, unsigned int y, unsigned int w, unsigned int h)
+iil4mitkImage::updateTexture (_iil4mitkTexture* texture, unsigned int x, unsigned int y, unsigned int w, unsigned int h)
 {
     unsigned int p2w = texture->width ();
     unsigned int p2h = texture->height ();
@@ -340,7 +340,7 @@ iilImage::updateTexture (_iilTexture* texture, unsigned int x, unsigned int y, u
     free (region);
 }
 
-void iilImage::copyImage (unsigned int x, unsigned int y, unsigned int w, unsigned int h, unsigned char* data, unsigned int width, unsigned int , unsigned int xoffset, unsigned int yoffset)
+void iil4mitkImage::copyImage (unsigned int x, unsigned int y, unsigned int w, unsigned int h, unsigned char* data, unsigned int width, unsigned int , unsigned int xoffset, unsigned int yoffset)
 {
     const unsigned int bytes = _bytes [_model];
     const unsigned char *src = _pixels + (y * _width + x) * bytes;
@@ -354,26 +354,26 @@ void iilImage::copyImage (unsigned int x, unsigned int y, unsigned int w, unsign
 }
 
 unsigned int
-iilImage::bpe ()
+iil4mitkImage::bpe ()
 {
     return _bytes [_model] * 8;
 }
 
 unsigned char*
-iilImage::pixels ()
+iil4mitkImage::pixels ()
 {
     return _pixels;
 }
 
-iilImage* 
-iilImage::find (const iilItem* item) 
+iil4mitkImage* 
+iil4mitkImage::find (const iil4mitkItem* item) 
 {
-    iilImage* result = NULL;
+    iil4mitkImage* result = NULL;
 
-    if (!item) return (iilImage *) NULL;
+    if (!item) return (iil4mitkImage *) NULL;
 
-    if ( dynamic_cast<const iilImage*>(item)!=NULL ) {
-        result = const_cast<iilImage*>(dynamic_cast<const iilImage*>(item));
+    if ( dynamic_cast<const iil4mitkImage*>(item)!=NULL ) {
+        result = const_cast<iil4mitkImage*>(dynamic_cast<const iil4mitkImage*>(item));
     }
-    return (iilImage *) result;
+    return (iil4mitkImage *) result;
 }

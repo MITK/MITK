@@ -151,5 +151,5 @@
   "toolbox-in-the-large", e.g., for combining and switching between one functionality for 
   segmentation and another for registration.
   \todo A "toolbox-in-the-small" for switching between different interactions (as, e.g., different
-  segmentation methods) should be included from the iil.
+  segmentation methods) should be included from the iil4mitk.
 */

@@ -1,50 +1,50 @@
 #include "widget.h"
 #include "item.h"
 
-iilItem::iilItem ()
+iil4mitkItem::iil4mitkItem ()
         : _x (0.0), _y (0.0), _red (1.0), _green (1.0), _blue (1.0), _alpha (1.0), _lineWidth (0.0), _constraint (0), _visible (true), _pickable (false), _scalable (true)
 {
 }
 
 void
-iilItem::remove (iilWidget* )
+iil4mitkItem::remove (iil4mitkWidget* )
 {
 }
 
 void
-iilItem::move (const float x, const float y)
+iil4mitkItem::move (const float x, const float y)
 {
     _x = x;
     _y = y;
 }
 
 float
-iilItem::x () const
+iil4mitkItem::x () const
 {
     return _x;
 }
 
 float
-iilItem::y () const
+iil4mitkItem::y () const
 {
     return _y;
 }
 
 float
-iilItem::width () const
+iil4mitkItem::width () const
 {
     return 0.0;
 }
 
 float
-iilItem::height () const
+iil4mitkItem::height () const
 {
     return 0.0;
 }
 
 
 void
-iilItem::setColor (const float red, const float green, const float blue, const float alpha)
+iil4mitkItem::setColor (const float red, const float green, const float blue, const float alpha)
 {
     _red = red;
     _green = green;
@@ -53,106 +53,106 @@ iilItem::setColor (const float red, const float green, const float blue, const f
 }
 
 float
-iilItem::red () const
+iil4mitkItem::red () const
 {
     return _red;
 }
 
 float
-iilItem::green () const
+iil4mitkItem::green () const
 {
     return _green;
 }
 
 float
-iilItem::blue () const
+iil4mitkItem::blue () const
 {
     return _blue;
 }
 
 float
-iilItem::alpha () const
+iil4mitkItem::alpha () const
 {
     return _alpha;
 }
 
 void 
-iilItem::setLineWidth (const float width)
+iil4mitkItem::setLineWidth (const float width)
 {
 	_lineWidth = width;
 }
 
 float 
-iilItem::lineWidth () const
+iil4mitkItem::lineWidth () const
 {
 	return _lineWidth;
 }
 
 void
-iilItem::setPickable (const bool on)
+iil4mitkItem::setPickable (const bool on)
 {
     _pickable = on;
 }
 
 bool
-iilItem::pickable () const
+iil4mitkItem::pickable () const
 {
     return _pickable;
 }
 
-iilItem*
-iilItem::picked (iilWidget*, const float x, const float y)
+iil4mitkItem*
+iil4mitkItem::picked (iil4mitkWidget*, const float x, const float y)
 {
     if (!pickable () || !visible ()) return NULL;
 
     bool p = !((x < this->x ()) || (y < this->y ()) || (x > this->x () + this->width ()) || (y > this->y () + this->height ()));
-    iilItem* obj = (p ? this : NULL);
+    iil4mitkItem* obj = (p ? this : NULL);
     return obj;
 }
 
 void 
-iilItem::setScalable (const bool scalable)
+iil4mitkItem::setScalable (const bool scalable)
 {
 	_scalable = scalable;
 }
 
 bool 
-iilItem::scalable () const
+iil4mitkItem::scalable () const
 {
 	return _scalable;
 }
 
 void
-iilItem::setConstraint (iilWidget* widget) {
+iil4mitkItem::setConstraint (iil4mitkWidget* widget) {
 	_constraint = widget;
 }
 
-iilWidget* 
-iilItem::constraint () const
+iil4mitkWidget* 
+iil4mitkItem::constraint () const
 {
 	return _constraint;
 }
 
 void
-iilItem::setVisible (const bool visible)
+iil4mitkItem::setVisible (const bool visible)
 {
     _visible = visible;
 }
 
 bool
-iilItem::visible () const
+iil4mitkItem::visible () const
 {
     return _visible;
 }
 
 void
-iilItem::hide () 
+iil4mitkItem::hide () 
 {
 	setVisible (false);
 }
 
 void
-iilItem::show ()
+iil4mitkItem::show ()
 {
 	setVisible (true);
 }

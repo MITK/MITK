@@ -11,19 +11,19 @@
 \todo Manage the texture in a common way for all instances.
 \todo Implement scaling of images here.
 */
-class iilImage : public iilItem {
+class iil4mitkImage : public iil4mitkItem {
 
 public:
 
     /*!
     \brief The constructor.
     */
-    iilImage ();
+    iil4mitkImage ();
 
     /*!
     \brief The destructor.
     */
-    virtual ~iilImage ();
+    virtual ~iil4mitkImage ();
 
     /*!
     \brief The supported color models.
@@ -97,27 +97,27 @@ public:
 
     virtual float width () const;
     virtual float height () const;
-    virtual void display (iilWidget* widget);
-    virtual void remove (iilWidget* widget);
+    virtual void display (iil4mitkWidget* widget);
+    virtual void remove (iil4mitkWidget* widget);
 
 public:
 
     /*!
     \brief Gets the first image of the item tree.
     */
-    static iilImage* find (const iilItem* item);
+    static iil4mitkImage* find (const iil4mitkItem* item);
 
 protected:
 
     /*!
     \brief Draws the image by means of the textures.
     */
-    void drawTextures (iilWidget* widget);
+    void drawTextures (iil4mitkWidget* widget);
 
     /*!
     \brief Updates the content of the given texture.
     */
-    void updateTexture (_iilTexture* texture, unsigned int x, unsigned int y, unsigned int w, unsigned int h);
+    void updateTexture (_iil4mitkTexture* texture, unsigned int x, unsigned int y, unsigned int w, unsigned int h);
 
     /*!
     \brief Copies a specified region of the image.
@@ -186,7 +186,7 @@ private:
     /*!
     \brief The list of allocated textures. 
     */
-    typedef std::vector<_iilTexture*> Textures;
+    typedef std::vector<_iil4mitkTexture*> Textures;
     std::map<void*,Textures*> _textures;
 
 };

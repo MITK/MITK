@@ -2,33 +2,33 @@
 #include "texture.h"
 #include "picimage.h"
 
-iilPicImage::iilPicImage (const unsigned int size)
+iil4mitkPicImage::iil4mitkPicImage (const unsigned int size)
         : _pic (NULL), _min (0.0), _max (0.0), _colors (NULL), _binary (false), _mask (false), _outline(false)
 {
 }
 
-iilPicImage::~iilPicImage ()
+iil4mitkPicImage::~iil4mitkPicImage ()
 {
 }
 
 void
-iilPicImage::setImage (ipPicDescriptor* pic, int model)
+iil4mitkPicImage::setImage (ipPicDescriptor* pic, int model)
 {
     assert (pic);
     assert (pic->dim >= 2);
 
     _pic = pic;
-    iilImage::setImage (pic->n[0], pic->n[1], model, (unsigned char *) pic->data);
+    iil4mitkImage::setImage (pic->n[0], pic->n[1], model, (unsigned char *) pic->data);
 }
 
 ipPicDescriptor*
-iilPicImage::image () const
+iil4mitkPicImage::image () const
 {
 	return _pic;
 }
 
 void
-iilPicImage::setExtrema (const float minimum, const float maximum)
+iil4mitkPicImage::setExtrema (const float minimum, const float maximum)
 {
     // assert (minimum < maximum);
 
@@ -38,7 +38,7 @@ iilPicImage::setExtrema (const float minimum, const float maximum)
 }
 
 void
-iilPicImage::setWindow (const float level, const float window)
+iil4mitkPicImage::setWindow (const float level, const float window)
 {
     // assert (window > 0);
     _min = level - window / 2.0;
@@ -47,43 +47,43 @@ iilPicImage::setWindow (const float level, const float window)
 }
 
 float
-iilPicImage::minimum () const
+iil4mitkPicImage::minimum () const
 {
     return _min;
 }
 
 float
-iilPicImage::maximum () const
+iil4mitkPicImage::maximum () const
 {
     return _max;
 }
 
 float
-iilPicImage::level () const
+iil4mitkPicImage::level () const
 {
     return (_min + _max) / 2.0;
 }
 
 float
-iilPicImage::window () const
+iil4mitkPicImage::window () const
 {
     return (_max - _min);
 }
 
 void
-iilPicImage::setColors (const unsigned char* colors)
+iil4mitkPicImage::setColors (const unsigned char* colors)
 {
     _colors = colors;
 }
 
 const unsigned char*
-iilPicImage::colors () const
+iil4mitkPicImage::colors () const
 {
     return _colors;
 }
 
 void 
-iilPicImage::setBinary (const bool on)
+iil4mitkPicImage::setBinary (const bool on)
 {
 	if (_binary != on) {
 		if (on) {
@@ -95,13 +95,13 @@ iilPicImage::setBinary (const bool on)
 }
 
 bool 
-iilPicImage::binary () const
+iil4mitkPicImage::binary () const
 {
 	return _binary;
 }
 
 void 
-iilPicImage::setOutline (const bool on)
+iil4mitkPicImage::setOutline (const bool on)
 {
 	if (_binary) {
 		_outline = on;
@@ -109,13 +109,13 @@ iilPicImage::setOutline (const bool on)
 }
 
 bool 
-iilPicImage::outline () const
+iil4mitkPicImage::outline () const
 {
 	return _outline;
 }
 
 void 
-iilPicImage::setMask (const bool on)
+iil4mitkPicImage::setMask (const bool on)
 {
 	if (_mask != on) {
 		if (on) {
@@ -127,13 +127,13 @@ iilPicImage::setMask (const bool on)
 }
 
 bool 
-iilPicImage::mask () const
+iil4mitkPicImage::mask () const
 {
 	return _mask;
 }
 
 void
-iilPicImage::clear ()
+iil4mitkPicImage::clear ()
 {
     _pic = NULL;
     _min = _max = 0.0;
@@ -141,18 +141,18 @@ iilPicImage::clear ()
     _binary = false;
     _mask = false; 
     _outline = false;
-    iilImage::clear ();
+    iil4mitkImage::clear ();
 }
 
-iilPicImage* 
-iilPicImage::find (const iilItem* item) 
+iil4mitkPicImage* 
+iil4mitkPicImage::find (const iil4mitkItem* item) 
 {
-    iilPicImage* result = NULL;
+    iil4mitkPicImage* result = NULL;
 
     if (!item) return NULL;
 
-    if ( dynamic_cast<const iilPicImage*>(item)!=NULL ) {
-        result = const_cast<iilPicImage*>(dynamic_cast<const iilPicImage*>(item));
+    if ( dynamic_cast<const iil4mitkPicImage*>(item)!=NULL ) {
+        result = const_cast<iil4mitkPicImage*>(dynamic_cast<const iil4mitkPicImage*>(item));
     }
     return result;
 }
@@ -344,7 +344,7 @@ static void extrema (unsigned char* dst, short* src, const unsigned int num, con
 }
 #endif
 
-void iilPicImage::copyImage (unsigned int x, unsigned int y, unsigned int w, unsigned int h, unsigned char* data, unsigned int width, unsigned int, unsigned int xoffset, unsigned int yoffset)
+void iil4mitkPicImage::copyImage (unsigned int x, unsigned int y, unsigned int w, unsigned int h, unsigned char* data, unsigned int width, unsigned int, unsigned int xoffset, unsigned int yoffset)
 {
     assert (_pic);
     // assert (_min <= _max);
@@ -397,10 +397,10 @@ void iilPicImage::copyImage (unsigned int x, unsigned int y, unsigned int w, uns
 
 
 void
-iilPicImage::display (iilWidget* widget)
+iil4mitkPicImage::display (iil4mitkWidget* widget)
 {
 	if (!_outline) {
-		iilImage::display( widget );
+		iil4mitkImage::display( widget );
 	}
 	else {
 		glMatrixMode (GL_MODELVIEW);

@@ -58,7 +58,7 @@ mitk::ImageMapper2D::ImageMapper2D() : m_SliceSelector(NULL)
 //##ModelId=3E32DCF60043
 mitk::ImageMapper2D::~ImageMapper2D()
 {
-  //@FIXME: durch die folgende Zeile sollte doch wohl der desctructor von RendererInfo aufgerufen werden. Das passiert aber nie. Deshalb wird bei der Programm-Beendung auch das iilImage und damit die textur nicht rechtzeitig freigegeben und das Programm crashed.
+  //@FIXME: durch die folgende Zeile sollte doch wohl der desctructor von RendererInfo aufgerufen werden. Das passiert aber nie. Deshalb wird bei der Programm-Beendung auch das iil4mitkImage und damit die textur nicht rechtzeitig freigegeben und das Programm crashed.
   m_RendererInfo.clear();
 }
 
@@ -78,7 +78,7 @@ void mitk::ImageMapper2D::Paint(mitk::BaseRenderer * renderer)
   if(IsVisible(renderer)==false) return;
 
   RendererInfo& renderinfo=m_RendererInfo[renderer];
-  iilPicImage*& image = renderinfo.m_iilImage;
+  iil4mitkPicImage*& image = renderinfo.m_iil4mitkImage;
 
   Update(renderer);
 
@@ -174,7 +174,7 @@ void mitk::ImageMapper2D::GenerateData(mitk::BaseRenderer *renderer)
 {
   RendererInfo& renderinfo=m_RendererInfo[renderer];
 
-  iilPicImage*& image = renderinfo.m_iilImage;
+  iil4mitkPicImage*& image = renderinfo.m_iil4mitkImage;
 
   mitk::Image* input  = const_cast<mitk::ImageMapper2D::InputImageType *>(this->GetInput());
 
@@ -332,11 +332,11 @@ void mitk::ImageMapper2D::GenerateData(mitk::BaseRenderer *renderer)
 
     //std::cout << "Pic dimensions:" << pic->dim << std::endl;
 
-    image = new iilPicImage(512);
+    image = new iil4mitkPicImage(512);
 
     ApplyProperties(renderer);
-//   image->setImage(pic, iilImage::INTENSITY_ALPHA);
-	  image->setImage(pic, m_iilMode);
+//   image->setImage(pic, iil4mitkImage::INTENSITY_ALPHA);
+	  image->setImage(pic, m_iil4mitkMode);
     image->setInterpolation(true);
     image->setRegion(0,0,pic->n[0],pic->n[1]);
 
@@ -364,7 +364,7 @@ void mitk::ImageMapper2D::GenerateAllData()
 void mitk::ImageMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
 {
   RendererInfo& renderinfo=m_RendererInfo[renderer];
-  iilPicImage*& image = renderinfo.m_iilImage;
+  iil4mitkPicImage*& image = renderinfo.m_iil4mitkImage;
 
   assert(image != NULL);
 
@@ -383,11 +383,11 @@ void mitk::ImageMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
   LookupTableProp = dynamic_cast<mitk::LookupTableProperty*>(this->GetDataTreeNode()->GetProperty("LookupTable").GetPointer());
 	if (LookupTableProp.IsNull() )
 	{
-		m_iilMode = iilImage::INTENSITY_ALPHA;
+		m_iil4mitkMode = iil4mitkImage::INTENSITY_ALPHA;
 	  image->setColor(rgba[0], rgba[1], rgba[2], rgba[3]);
 	}
 	else {
-		m_iilMode = iilImage::COLOR_ALPHA;
+		m_iil4mitkMode = iil4mitkImage::COLOR_ALPHA;
 		image->setColors(LookupTableProp->GetLookupTable().GetRawLookupTable());
 		
 	}
@@ -422,7 +422,7 @@ void mitk::ImageMapper2D::Update(mitk::BaseRenderer* renderer)
 
   RendererInfo& renderinfo=m_RendererInfo[renderer];
   DataTreeNode* node=GetDataTreeNode();
-  iilPicImage*& image = renderinfo.m_iilImage;
+  iil4mitkPicImage*& image = renderinfo.m_iil4mitkImage;
 
   if(
       (image == NULL) ||

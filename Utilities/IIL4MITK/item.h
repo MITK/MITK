@@ -11,10 +11,10 @@ interact with some item, each item provides the information
 whether it has been picked by the user.
 
 \todo Add a scale method.
-\todo Add a parameter iilWidget to the picking method. Done.
+\todo Add a parameter iil4mitkWidget to the picking method. Done.
 */
 
-class iilItem {
+class iil4mitkItem {
 
 public:
 
@@ -23,7 +23,7 @@ public:
     @param parent the parent item
     @param name the object name
     */
-    iilItem();
+    iil4mitkItem();
 
     /*!
     \brief Displays the item.
@@ -32,14 +32,14 @@ public:
     \todo Should the method return whether something has been
     rendered?  
     */
-    virtual void display (iilWidget* widget) = 0;
+    virtual void display (iil4mitkWidget* widget) = 0;
 
     /*!
     \brief Frees the resources of the item for the given widget.
     \note Make sure that the proper OpenGL context has been 
     made current.
     */
-    virtual void remove (iilWidget* widget);
+    virtual void remove (iil4mitkWidget* widget);
 
     /*!
     \brief Sets the position of the item.
@@ -104,7 +104,7 @@ public:
     @param x,y the point the user has picked
     @returns the picked item, or null if no item has been picked 
     */
-    virtual iilItem* picked (iilWidget* widget, const float x, const float y);
+    virtual iil4mitkItem* picked (iil4mitkWidget* widget, const float x, const float y);
 
     /*!
     \brief Sets if items should be scaled when the viewport is zoomed. 
@@ -125,12 +125,12 @@ public:
     @param widget the widget which the rendering is constraint to. If
     null is given, the constraint will be removed. 
     */
-    void setConstraint (iilWidget* widget);
+    void setConstraint (iil4mitkWidget* widget);
 
     /*!
     \brief Gets the widget which the rendering is constraint to.
     */
-    iilWidget* constraint () const;
+    iil4mitkWidget* constraint () const;
 
     /*!
     \brief Makes the item visible or hidden, respectively.
@@ -174,7 +174,7 @@ private:
     /*!
     \brief The widget which the rendering is constraint to.
     */
-    iilWidget* _constraint;
+    iil4mitkWidget* _constraint;
 
     /*!
     \brief Flags if the item will be displayed during 

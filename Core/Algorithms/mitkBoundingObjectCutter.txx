@@ -131,12 +131,12 @@ void BoundingObjectCutter<TPixel>::GenerateData()
     minPoint[0] = min[0];   minPoint[1] = min[1];   minPoint[2] = min[2];
     inputImageMitk->GetGeometry()->MMToUnits(minPoint, minPoint);                             // transform vertex into image unit coordinates
 
-    globalMinPoint[0] = (min[0] < globalMinPoint[0]) ? min[0] : globalMinPoint[0];  // check if world point
-    globalMinPoint[1] = (min[1] < globalMinPoint[1]) ? min[1] : globalMinPoint[1];  // has a lower or a
-    globalMinPoint[2] = (min[2] < globalMinPoint[2]) ? min[2] : globalMinPoint[2];  // higher value as
-    globalMaxPoint[0] = (min[0] > globalMaxPoint[0]) ? min[0] : globalMaxPoint[0];  // the last known highest
-    globalMaxPoint[1] = (min[1] > globalMaxPoint[1]) ? min[1] : globalMaxPoint[1];  // value
-    globalMaxPoint[2] = (min[2] > globalMaxPoint[2]) ? min[2] : globalMaxPoint[2];  // in each axis
+    globalMinPoint[0] = (minPoint[0] < globalMinPoint[0]) ? minPoint[0] : globalMinPoint[0];  // check if world point
+    globalMinPoint[1] = (minPoint[1] < globalMinPoint[1]) ? minPoint[1] : globalMinPoint[1];  // has a lower or a
+    globalMinPoint[2] = (minPoint[2] < globalMinPoint[2]) ? minPoint[2] : globalMinPoint[2];  // higher value as
+    globalMaxPoint[0] = (minPoint[0] > globalMaxPoint[0]) ? minPoint[0] : globalMaxPoint[0];  // the last known highest
+    globalMaxPoint[1] = (minPoint[1] > globalMaxPoint[1]) ? minPoint[1] : globalMaxPoint[1];  // value
+    globalMaxPoint[2] = (minPoint[2] > globalMaxPoint[2]) ? minPoint[2] : globalMaxPoint[2];  // in each axis
     pointsIterator++;
   }
   std::cout << " global bounding box in image coordinates: " << globalMinPoint << " - " << globalMaxPoint<< std::endl;
@@ -160,12 +160,12 @@ void BoundingObjectCutter<TPixel>::GenerateData()
   start[2] = static_cast<typename ItkImageType::IndexType::IndexValueType>(floor(globalMinPoint[2]));
   regionOfInterest.SetIndex(start);
   typename ItkImageType::SizeType size;  
-  size[0] = static_cast<typename ItkImageType::SizeType::SizeValueType>((globalMaxPoint[0] - globalMinPoint[0])/ itkImage->GetSpacing()[0]); // number of pixels along X axis
-  size[1] = static_cast<typename ItkImageType::SizeType::SizeValueType>((globalMaxPoint[1] - globalMinPoint[1])/ itkImage->GetSpacing()[1]); // number of pixels along Y axis
-  size[2] = static_cast<typename ItkImageType::SizeType::SizeValueType>((globalMaxPoint[2] - globalMinPoint[2])/ itkImage->GetSpacing()[2]); // number of pixels along Z axis
+  size[0] = static_cast<typename ItkImageType::SizeType::SizeValueType>(globalMaxPoint[0] - globalMinPoint[0]); // number of pixels along X axis
+  size[1] = static_cast<typename ItkImageType::SizeType::SizeValueType>(globalMaxPoint[1] - globalMinPoint[1]); // number of pixels along Y axis
+  size[2] = static_cast<typename ItkImageType::SizeType::SizeValueType>(globalMaxPoint[2] - globalMinPoint[2]); // number of pixels along Z axis
   regionOfInterest.SetSize(size);  
   regionOfInterest.Crop(itkImage->GetLargestPossibleRegion());  // fit region into source image 
-  typename ItkImageType::IndexType pos = regionOfInterest.GetIndex();
+/*  typename ItkImageType::IndexType pos = regionOfInterest.GetIndex();
   mitk::BoundingBox::PointType worldPos;
   worldPos[0] = pos[0]; worldPos[1] = pos[1]; worldPos[2] = pos[2];
   inputImageMitk->GetGeometry()->UnitsToMM(worldPos, worldPos);
@@ -174,7 +174,7 @@ void BoundingObjectCutter<TPixel>::GenerateData()
   worldPos[0] = pos[0]; worldPos[1] = pos[1]; worldPos[2] = pos[2];
   inputImageMitk->GetGeometry()->UnitsToMM(worldPos, worldPos);
   globalMaxPoint[0] = worldPos[0]; globalMaxPoint[1] = worldPos[1]; globalMaxPoint[2] = worldPos[2]; 
-  
+*/  
   /* Create output Image and output region */
   ItkRegionType outputRegion;
   typename ItkImageType::IndexType outputStart;
@@ -233,6 +233,7 @@ void BoundingObjectCutter<TPixel>::GenerateData()
     CastToMitkImage(itkOutputImage, outputImage);
   /* Position the output Image to match the corresponding region of the input image */
   outputImage->GetGeometry()->GetVtkTransform()->Translate(globalMinPoint[0], globalMinPoint[1], globalMinPoint[2]);
+  outputImage->GetGeometry()->TransferVtkToITKTransform();
   //outputImage->GetGeometry()->GetVtkTransform()->Translate(worldPos[0], worldPos[1], worldPos[2]);
 }
 

@@ -10,13 +10,6 @@
 #include <vtkTransform.h>
 #include <vtkMatrix4x4.h>
 
-#ifdef MBI_INTERNAL
-extern "C"
-{
-#include "ipDicom.h"
-}
-#endif
-
 //void printmatrix(vtkMatrix4x4* m)
 //{
 //  std::cout << "matrix: " << m->Element[0][0] << ",\t" << m->Element[0][1] << ",\t" << m->Element[0][2] << ",\t" << m->Element[0][3] << std::endl;

@@ -87,7 +87,7 @@ void mitk::BaseRenderer::SetData(const mitk::DataTreeIteratorBase* iterator)
 }
 
 //##ModelId=3E330C4D0395
-const MapperSlotId mitk::BaseRenderer::defaultMapper = 1;
+const mitk::BaseRenderer::MapperSlotId mitk::BaseRenderer::defaultMapper = 1;
 
 //##ModelId=3E33162C00D0
 void mitk::BaseRenderer::Paint()

@@ -13,7 +13,7 @@ class DataTreeNode;
 
 /** Macro for setting the Mode of this interactor */
 #define mitkSetModeOkMacro(ok) \
-  if (##ok) \
+  if (ok) \
     this->SetMode(SMSELECTED); \
   else \
     this->SetMode(SMDESELECTED); \

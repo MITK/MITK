@@ -1,6 +1,10 @@
 #include "mitkParRecFileReader.h"
 #include <itkImageFileReader.h>
 
+#ifdef __GNUC__
+#define stricmp strcasecmp 
+#endif
+
 void mitk::ParRecFileReader::GenerateOutputInformation()
 {
   mitk::Image::Pointer output = this->GetOutput();

@@ -18,6 +18,7 @@ extern "C"
 //##ModelId=3DCBF5D40253
 mitk::BoundingBox::ConstPointer mitk::Geometry3D::GetBoundingBox(int t) const
 {
+  assert(m_BoundingBoxes.size()>0);
   assert(m_BoundingBoxes[t].IsNotNull());
 
   return m_BoundingBoxes[t];
@@ -29,7 +30,7 @@ void mitk::Geometry3D::SetBoundingBox(const mitk::BoundingBox* boundingBox,  int
   if(IsValidTime(t))
     m_BoundingBoxes[t]=boundingBox;
   else
-    itkExceptionMacro("tried to set boundingbox for an invalid point of time (t:"<<t<<")");
+    itkExceptionMacro("tried to set boundingbox for an invalid point of time (t:"<<t<<"). Was Initialize called at all?");
 }
 
 //##ModelId=3ED91D050305
@@ -132,6 +133,8 @@ void mitk::Geometry3D::Initialize(unsigned int timeSteps)
 // Standard Constructor for the new makro. sets the geometry to 3 dimensions
 mitk::Geometry3D::Geometry3D() : m_TimeSteps(0)
 {
+  m_TransformMMToUnits.setIdentity();
+  m_TransformUnitsToMM.setIdentity();
   //New
   m_Transform = vtkTransform::New();  
   m_BaseGeometry = NULL; // there is no base geometry, this one is independend (until SetBaseGeometry() is called)

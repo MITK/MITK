@@ -29,8 +29,9 @@ namespace mitk {
   //##ModelId=3E5B2DB301FD
   //##Documentation
   //## Constructor
-  //## connects the current State to a
-  //## StateMachine of Type type;
+  //## @brief connects the current State to a StateMachine of Type type;
+  //## 
+  //## Because of the use of Smartpointers in DataTree and the use of observer-technologies, a StateMachine is a Subclass of itk::Object.
   //## default of m_UndoEnabled is true;
   StateMachine(std::string type);
 

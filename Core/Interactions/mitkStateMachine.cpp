@@ -3,8 +3,8 @@
 #include "mitkStateTransitionOperation.h"
 #include "mitkOperationEvent.h"
 #include "mitkUndoController.h"
-#include "mitkInteractionConst.h"
 #include "mitkStatusBar.h"
+#include "mitkInteractionConst.h"
 
 //##ModelId=3E5B2DB301FD
 //##Documentation

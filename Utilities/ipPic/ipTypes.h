@@ -75,6 +75,7 @@ typedef enum
     ipTypeArray,
     ipTypeList,
     ipTypePic,
+    ipTypePicTag,
     _ipTypeMAX
   } ipType_t;
 

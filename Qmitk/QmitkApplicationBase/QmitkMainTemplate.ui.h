@@ -550,3 +550,9 @@ void QmitkMainTemplate::setXMLFallBackPath( const char * anXmlFallBackPath )
 {
   xmlFallBackPath = anXmlFallBackPath;
 }
+
+
+void QmitkMainTemplate::m_ShowPlanesCheckBox_clicked()
+{
+    emit ShowWidgetPlanesToggled( m_ShowPlanesCheckBox->isOn() );
+}

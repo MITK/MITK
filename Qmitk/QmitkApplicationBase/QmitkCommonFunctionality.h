@@ -226,6 +226,29 @@ public:
     return node;
   }
 
+  static void SetWidgetPlanesEnabled(mitk::DataTree* dataTree, bool enable)
+  {
+    // widget plane are made visible again
+    mitk::DataTreeIteratorClone it = dataTree->GetNext("name", new mitk::StringProperty("widget1Plane"));
+    mitk::DataTreeNode::Pointer node = it->Get();
+    if ( node.IsNotNull() )  {
+      node->SetVisibility(enable, NULL);
+    }
+
+    it = dataTree->GetNext("name", new mitk::StringProperty("widget2Plane"));
+    node = it->Get();
+    if ( node.IsNotNull() )  
+    {
+      node->SetVisibility(enable, NULL);
+    }
+    it = dataTree->GetNext("name", new mitk::StringProperty("widget3Plane"));
+    node = it->Get();
+    if ( node.IsNotNull() )  
+    {
+      node->SetVisibility(enable, NULL);
+    }
+  }
+
 
 /*  static void SaveImage(std::string imageName, mitk::DataTreeIteratorBase* iterator)
 {

@@ -54,6 +54,10 @@ public:
 
   virtual void initializeQfm();
 
+public slots:
+
+  void SetWidgetPlanesEnabled(bool enable);
+
 protected:
 
 		QmitkSimpleExampleFunctionality * simpleFunc;

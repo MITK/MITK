@@ -80,8 +80,6 @@
         <separator/>
         <action name="helpAboutAction"/>
     </item>
-    <item text="new menu" name="unnamed">
-    </item>
 </menubar>
 <toolbars>
     <toolbar dock="2">
@@ -123,6 +121,14 @@
         </widget>
         <action name="Fullscreen"/>
         <separator/>
+        <widget class="QCheckBox">
+            <property name="name">
+                <cstring>m_ShowPlanesCheckBox</cstring>
+            </property>
+            <property name="text">
+                <string>Show Planes</string>
+            </property>
+        </widget>
         <action name="layoutGroup"/>
     </toolbar>
 </toolbars>
@@ -483,6 +489,22 @@
             <string>Fullscreen</string>
         </property>
     </action>
+    <action>
+        <property name="name">
+            <cstring>viewHideAction</cstring>
+        </property>
+        <property name="text">
+            <string>WidgetPlanes</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>viewnew_itemAction</cstring>
+        </property>
+        <property name="text">
+            <string>new item</string>
+        </property>
+    </action>
 </actions>
 <images>
     <image name="image0">
@@ -658,6 +680,12 @@
         <receiver>QmitkMainTemplate</receiver>
         <slot>FullScreenMode(bool)</slot>
     </connection>
+    <connection>
+        <sender>m_ShowPlanesCheckBox</sender>
+        <signal>clicked()</signal>
+        <receiver>QmitkMainTemplate</receiver>
+        <slot>m_ShowPlanesCheckBox_clicked()</slot>
+    </connection>
 </connections>
 <includes>
     <include location="global" impldecl="in declaration">mitkDataTree.h</include>
@@ -688,6 +716,9 @@
     <variable>mitk::UndoController* undoController;</variable>
     <variable>std::string xmlFallBackPath;</variable>
 </variables>
+<signals>
+    <signal>ShowWidgetPlanesToggled(bool)</signal>
+</signals>
 <slots>
     <slot>fileNew()</slot>
     <slot>fileOpen()</slot>
@@ -714,6 +745,7 @@
     <slot>changeToWidget2Layout()</slot>
     <slot>changeToWidget3Layout()</slot>
     <slot>FullScreenMode( bool fullscreen )</slot>
+    <slot>m_ShowPlanesCheckBox_clicked()</slot>
 </slots>
 <functions>
     <function>fileOpen( const char * fileName )</function>

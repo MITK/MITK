@@ -100,7 +100,7 @@ void mitk::OpenGLRenderer::UpdateVtkActors()
 				{
 					BaseVtkMapper3D* anVtkMapper3D;
 					anVtkMapper3D=dynamic_cast<BaseVtkMapper3D*>(mapper.GetPointer());
-					if(anVtkMapper2D != NULL)
+					if(anVtkMapper3D != NULL)
 					{
 						anVtkMapper3D->Update();
 						m_VtkRenderer->AddProp(anVtkMapper3D->GetProp());

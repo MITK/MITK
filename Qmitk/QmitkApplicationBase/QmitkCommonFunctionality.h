@@ -1,6 +1,3 @@
-#ifndef __Qmitk_CommonFunctionality_H
-#define __Qmitk_CommonFunctionality_H
-
 /*=========================================================================
 
   Program:   Medical Imaging & Interaction Toolkit

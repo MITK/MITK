@@ -1,5 +1,5 @@
 #include "mitkVtkInteractorCameraController.h"
-#include "mitkVtkQRenderWindowInteractor.h"
+#include "mitkVtkRenderWindowInteractor.h"
 #include "mitkInteractionConst.h"
 #include <vtkInteractorStyleSwitch.h>
 #include <vtkRenderWindowInteractor.h>
@@ -9,9 +9,9 @@
 //##ModelId=3E6D600F009A
 mitk::VtkInteractorCameraController::VtkInteractorCameraController(const char * type) : CameraController(type), m_VtkInteractor(NULL)
 {
-// todo: init
-    m_VtkInteractor = mitk::VtkQRenderWindowInteractor::New();
+  m_VtkInteractor = vtkRenderWindowInteractor::New();
   vtkInteractorStyleSwitch* interactorswitch = dynamic_cast<vtkInteractorStyleSwitch*>(m_VtkInteractor->GetInteractorStyle());
+
   if(interactorswitch!=NULL)
     interactorswitch->SetCurrentStyleToTrackballCamera();
 }
@@ -201,8 +201,8 @@ void mitk::VtkInteractorCameraController::KeyPressEvent(mitk::KeyEvent *ke)
 //##ModelId=3E6D600F0093
 bool mitk::VtkInteractorCameraController::SetRenderer(mitk::BaseRenderer* renderer)
 {
-  mitk::VtkQRenderWindowInteractor* windowInteractor = 
-    dynamic_cast<mitk::VtkQRenderWindowInteractor*>(m_VtkInteractor);
+  VtkRenderWindowInteractor* windowInteractor = 
+    dynamic_cast<VtkRenderWindowInteractor*>(m_VtkInteractor);
   if (windowInteractor == NULL) {
     std::cout << "renderwindow is not a mitk::VtkRenderWindow" << std::endl;
   } else {

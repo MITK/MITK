@@ -50,11 +50,11 @@ int mappingTests2D(const mitk::PlaneGeometry* planegeometry, const mitk::ScalarT
   }
   std::cout<<"[PASSED]"<<std::endl;
 
-  std::cout << "Testing UnitsToMM(pt2d_units, pt2d_mm) and compare with expected: ";
+  std::cout << "Testing IndexToWorld(pt2d_units, pt2d_mm) and compare with expected: ";
   mitk::Point2D pt2d_units;
   pt2d_units[0] = width/2.0;     pt2d_units[1] = height/2.0;
   pt2d_mm[0]    = widthInMM/2.0; pt2d_mm[1]    = heightInMM/2.0;
-  planegeometry->UnitsToMM(pt2d_units, testpt2d_mm);
+  planegeometry->IndexToWorld(pt2d_units, testpt2d_mm);
   if(mitk::Equal(pt2d_mm, testpt2d_mm) == false)
   {
     std::cout<<"[FAILED]"<<std::endl;
@@ -62,9 +62,9 @@ int mappingTests2D(const mitk::PlaneGeometry* planegeometry, const mitk::ScalarT
   }
   std::cout<<"[PASSED]"<<std::endl;
 
-  std::cout << "Testing MMToUnits(pt2d_mm, pt2d_units) and compare with expected: ";
+  std::cout << "Testing WorldToIndex(pt2d_mm, pt2d_units) and compare with expected: ";
   mitk::Point2D testpt2d_units;
-  planegeometry->MMToUnits(pt2d_mm, testpt2d_units);
+  planegeometry->WorldToIndex(pt2d_mm, testpt2d_units);
   if(mitk::Equal(pt2d_units, testpt2d_units) == false)
   {
     std::cout<<"[FAILED]"<<std::endl;

@@ -55,7 +55,7 @@ mitk::ContourInteractor::~ContourInteractor()
 //    pointInUnits[0] = points[2*pointIdx];
 //    pointInUnits[1] = points[2*pointIdx+1];
 //    pointInUnits[2] = m_ZCoord;
-//    m_SelectedImageGeometry->UnitsToMM(CorrectPointCoordinates(pointInUnits),pointInMM);
+//    m_SelectedImageGeometry->IndexToWorld(CorrectPointCoordinates(pointInUnits),pointInMM);
 //    contour->AddVertex(pointInMM);
 //  }
 //  return contour;

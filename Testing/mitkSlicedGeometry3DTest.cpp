@@ -51,7 +51,7 @@ int mitkSlicedGeometry3DTest(int argc, char* argv[])
   mitk::PlaneGeometry::Pointer planegeometry2;
   planegeometry2 = dynamic_cast<mitk::PlaneGeometry*>(planegeometry1->Clone().GetPointer());;
 
-  std::cout << "Changing the UnitsToMMTransform of planegeometry2 to a rotated version by SetUnitsToMMTransform() (keep origin): "<<std::endl;
+  std::cout << "Changing the IndexToWorldTransform of planegeometry2 to a rotated version by SetIndexToWorldTransform() (keep origin): "<<std::endl;
   mitk::AffineTransform3D::Pointer transform = mitk::AffineTransform3D::New();
   mitk::AffineTransform3D::MatrixType::InternalMatrixType vnlmatrix;
   vnlmatrix = planegeometry2->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix();

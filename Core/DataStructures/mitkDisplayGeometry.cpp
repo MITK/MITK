@@ -73,31 +73,31 @@ void mitk::DisplayGeometry::Map(const mitk::Point2D &pt2d_mm, mitk::Point3D &pt3
 }
 
 //##ModelId=3E3AEB52008A
-void mitk::DisplayGeometry::UnitsToMM(const mitk::Point2D &pt_units, mitk::Point2D &pt_mm) const
+void mitk::DisplayGeometry::IndexToWorld(const mitk::Point2D &pt_units, mitk::Point2D &pt_mm) const
 {
   if(m_WorldGeometry.IsNull()) return;
-  m_WorldGeometry->UnitsToMM(pt_units, pt_mm);
+  m_WorldGeometry->IndexToWorld(pt_units, pt_mm);
 }
 
 //##ModelId=3E3AEB54017D
-void mitk::DisplayGeometry::MMToUnits(const mitk::Point2D &pt_mm, mitk::Point2D &pt_units) const
+void mitk::DisplayGeometry::WorldToIndex(const mitk::Point2D &pt_mm, mitk::Point2D &pt_units) const
 {
   if(m_WorldGeometry.IsNull()) return;
-  m_WorldGeometry->MMToUnits(pt_mm, pt_units);
+  m_WorldGeometry->WorldToIndex(pt_mm, pt_units);
 }
 
 //##ModelId=3E3B994802B6
-void mitk::DisplayGeometry::UnitsToMM(const mitk::Point2D &atPt2d_units, const mitk::Vector2D &vec_units, mitk::Vector2D &vec_mm) const
+void mitk::DisplayGeometry::IndexToWorld(const mitk::Point2D &atPt2d_units, const mitk::Vector2D &vec_units, mitk::Vector2D &vec_mm) const
 {
   if(m_WorldGeometry.IsNull()) return;
-  m_WorldGeometry->UnitsToMM(atPt2d_units, vec_units, vec_mm);
+  m_WorldGeometry->IndexToWorld(atPt2d_units, vec_units, vec_mm);
 }
 
 //##ModelId=3E3B994B02A6
-void mitk::DisplayGeometry::MMToUnits(const mitk::Point2D &atPt2d_mm, const mitk::Vector2D &vec_mm, mitk::Vector2D &vec_units) const
+void mitk::DisplayGeometry::WorldToIndex(const mitk::Point2D &atPt2d_mm, const mitk::Vector2D &vec_mm, mitk::Vector2D &vec_units) const
 {
   if(m_WorldGeometry.IsNull()) return;
-  m_WorldGeometry->MMToUnits(atPt2d_mm, vec_mm, vec_units);
+  m_WorldGeometry->WorldToIndex(atPt2d_mm, vec_mm, vec_units);
 }
 
 //##ModelId=3E48D5B40210

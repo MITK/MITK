@@ -145,11 +145,11 @@ int mitkAbstractTransformGeometryTest(int argc, char* argv[])
   }
   std::cout<<"[PASSED]"<<std::endl;
 
-  std::cout << "Testing UnitsToMM(pt2d_units, pt2d_mm) and compare with expected: ";
+  std::cout << "Testing IndexToWorld(pt2d_units, pt2d_mm) and compare with expected: ";
   mitk::Point2D pt2d_units;
   pt2d_units[0] = width/2.0;     pt2d_units[1] = height/2.0;
   pt2d_mm[0]    = widthInMM/2.0; pt2d_mm[1]    = heightInMM/2.0;
-  abstractgeometry->UnitsToMM(pt2d_units, testpt2d_mm);
+  abstractgeometry->IndexToWorld(pt2d_units, testpt2d_mm);
   if(mitk::Equal(pt2d_mm, testpt2d_mm) == false)
   {
     std::cout<<"[FAILED]"<<std::endl;
@@ -169,10 +169,10 @@ int mitkAbstractTransformGeometryTest(int argc, char* argv[])
   }
   std::cout<<"[PASSED]"<<std::endl;
 
-  std::cout << "Testing UnitsToMM(pt2d_units, pt2d_mm) and compare with expected: ";
+  std::cout << "Testing IndexToWorld(pt2d_units, pt2d_mm) and compare with expected: ";
   pt2d_units[0] = width/2.0;     pt2d_units[1] = height/2.0;
   pt2d_mm[0]    = widthInMM/2.0; pt2d_mm[1]    = heightInMM/2.0;
-  abstractgeometry->UnitsToMM(pt2d_units, testpt2d_mm);
+  abstractgeometry->IndexToWorld(pt2d_units, testpt2d_mm);
   if(mitk::Equal(pt2d_mm, testpt2d_mm) == false)
   {
     std::cout<<"[FAILED]"<<std::endl;

@@ -74,7 +74,7 @@ public:
   //## 
   //## The result is a 2D point in mm (@a pt2d_mm) relative to the upper-left
   //## corner of the geometry. To convert this point into units (e.g., pixels
-  //## in case of an image), use MMToUnits.
+  //## in case of an image), use WorldToIndex.
   //## @return true projection was possible
   //## @sa Project(const mitk::Point3D &pt3d_mm, mitk::Point3D
   //## &projectedPt3d_mm) 
@@ -88,20 +88,20 @@ public:
   //## 
   //## To convert a 2D point given in units (e.g., pixels in case of an
   //## image) into a 2D point given in mm (as required by this method), use
-  //## UnitsToMM.
+  //## IndexToWorld.
   virtual void Map(const mitk::Point2D &pt2d_mm, mitk::Point3D &pt3d_mm) const;
 
   //##ModelId=3DE7895602F7
   //##Documentation
   //## @brief Convert a 2D point given in units (e.g., pixels in case of an
   //## image) into a 2D point given in mm
-  virtual void UnitsToMM(const mitk::Point2D &pt_units, mitk::Point2D &pt_mm) const;
+  virtual void IndexToWorld(const mitk::Point2D &pt_units, mitk::Point2D &pt_mm) const;
 
   //##ModelId=3DE7895C01CE
   //##Documentation
   //## @brief Convert a 2D point given in mm into a 2D point given in mm
   //## (e.g., pixels in case of an image)
-  virtual void MMToUnits(const mitk::Point2D &pt_mm, mitk::Point2D &pt_units) const;
+  virtual void WorldToIndex(const mitk::Point2D &pt_mm, mitk::Point2D &pt_units) const;
 
   //##ModelId=3E3B98C5019F
   //##Documentation
@@ -111,7 +111,7 @@ public:
   //## does not have the parameter, @em where the vector that is to be
   //## transformed is located. This method here should also need this
   //## information for general transforms.
-  virtual void UnitsToMM(const mitk::Point2D &atPt2d_units, const mitk::Vector2D &vec_units, mitk::Vector2D &vec_mm) const;
+  virtual void IndexToWorld(const mitk::Point2D &atPt2d_units, const mitk::Vector2D &vec_units, mitk::Vector2D &vec_mm) const;
   //##ModelId=3E3B98C9019B
   //##Documentation
   //## @brief Convert a 2D vector given in mm into a 2D point vector in mm
@@ -120,7 +120,7 @@ public:
   //## does not have the parameter, @em where the vector that is to be
   //## transformed is located. This method here should also need this
   //## information for general transforms.
-  virtual void MMToUnits(const mitk::Point2D &atPt2d_mm, const mitk::Vector2D &vec_mm, mitk::Vector2D &vec_units) const;
+  virtual void WorldToIndex(const mitk::Point2D &atPt2d_mm, const mitk::Vector2D &vec_mm, mitk::Vector2D &vec_units) const;
 
   //##ModelId=3E3C3A92033E
   //##Documentation
@@ -147,7 +147,7 @@ public:
   //## The result is a 2D vector in mm (@a vec2d_mm) relative to the
   //## upper-left
   //## corner of the geometry. To convert this point into units (e.g., pixels
-  //## in case of an image), use MMToUnits.
+  //## in case of an image), use WorldToIndex.
   //## @return true projection was possible
   //## @sa Project(const mitk::Vector3D &vec3d_mm, mitk::Vector3D
   //## &projectedVec3d_mm) 
@@ -161,7 +161,7 @@ public:
   //## 
   //## To convert a 2D vector given in units (e.g., pixels in case of an
   //## image) into a 2D vector given in mm (as required by this method), use
-  //## UnitsToMM.
+  //## IndexToWorld.
   virtual void Map(const mitk::Point2D & atPt2d_mm, const mitk::Vector2D &vec2d_mm, mitk::Vector3D &vec3d_mm) const;
 
   //##ModelId=3EF48F8F01B0

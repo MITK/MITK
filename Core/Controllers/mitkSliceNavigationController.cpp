@@ -249,7 +249,7 @@ bool mitk::SliceNavigationController::ExecuteAction( Action* action, mitk::State
               if(slicedWorldGeometry->GetEvenlySpaced())
               {
                 mitk::Point3D pointInUnits;
-                slicedWorldGeometry->MMToUnits(point, pointInUnits);
+                slicedWorldGeometry->WorldToIndex(point, pointInUnits);
                 best_slice = (int)pointInUnits[2];
               }
               else

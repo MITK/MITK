@@ -49,7 +49,7 @@ typedef itk::AffineGeometryFrame<mitk::ScalarType, 3> AffineGeometryFrame3D;
 //## @brief Describes the geometry of a data object
 //## @ingroup Geometry
 //## Describes the geometry of a data object. At least, it can
-//## return the bounding box of the data object. An important etpaub-class is
+//## return the bounding box of the data object. An important sub-class is
 //## SlicedGeometry3D, which descibes data objects consisting of
 //## slices, e.g., objects of type Image.
 //## Conversions between world coordinates (in mm) and unit coordinates 
@@ -216,16 +216,31 @@ public:
   itkGetConstObjectMacro(ParametricTransform, mitk::Transform3D);
 
   //##ModelId=3DDE65D1028A
-  void MMToUnits(const mitk::Point3D &pt_mm, mitk::Point3D &pt_units) const;
+  void WorldToIndex(const mitk::Point3D &pt_mm, mitk::Point3D &pt_units) const;
 
   //##ModelId=3DDE65DC0151
-  void UnitsToMM(const mitk::Point3D &pt_units, mitk::Point3D &pt_mm) const;
+  void IndexToWorld(const mitk::Point3D &pt_units, mitk::Point3D &pt_mm) const;
 
   //##ModelId=3E3B986602CF
-  void MMToUnits(const mitk::Point3D &atPt3d_mm, const mitk::Vector3D &vec_mm, mitk::Vector3D &vec_units) const;
+  void WorldToIndex(const mitk::Point3D &atPt3d_mm, const mitk::Vector3D &vec_mm, mitk::Vector3D &vec_units) const;
 
   //##ModelId=3E3B987503A3
-  void UnitsToMM(const mitk::Point3D &atPt3d_units, const mitk::Vector3D &vec_units, mitk::Vector3D &vec_mm) const;
+  void IndexToWorld(const mitk::Point3D &atPt3d_units, const mitk::Vector3D &vec_units, mitk::Vector3D &vec_mm) const;
+
+  template <typename TIndexType>
+  void WorldToIndex(const mitk::Point3D &pt_mm, TIndexType &index) const
+  {
+    mitk::Point3D pt_units;
+    WorldToIndex(pt_mm, pt_units);
+    int i, dim=index.GetIndexDimension();
+    if(dim>3)
+    {
+      index.Fill(0);
+      dim=3;
+    }
+    for(i=0;i<3;++i)
+      index[i]=(typename TIndexType::IndexValueType)pt_units[i];
+  }
 
   //##ModelId=3E3453C703AF
   virtual void Initialize();

@@ -212,7 +212,10 @@ mitk::BaseProperty::Pointer mitk::DataTreeNode::GetProperty(const char *property
     return property;
 
   //no? use the renderer-independent one!
-  return m_PropertyList->GetProperty(propertyKey);
+  property=m_PropertyList->GetProperty(propertyKey);
+  if(property.IsNotNull() && property->GetEnabled())
+    return property;
+  return NULL;
 }
 
 bool mitk::DataTreeNode::GetBoolProperty(const char* propertyKey, bool& boolValue, mitk::BaseRenderer* renderer) const

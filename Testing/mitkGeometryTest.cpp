@@ -105,7 +105,7 @@ GetAxisVector(direction).GetNorm() ==GetExtentInMM(direction)
   }
   std::cout<<"[PASSED]"<<std::endl;
 
-  std::cout << "Changing the UnitsToMMTransform to a rotated version by SetUnitsToMMTransform(): ";
+  std::cout << "Changing the IndexToWorldTransform to a rotated version by SetIndexToWorldTransform(): ";
   mitk::AffineTransform3D::Pointer transform = mitk::AffineTransform3D::New();
   mitk::AffineTransform3D::MatrixType::InternalMatrixType vnlmatrix;
   vnlmatrix = planegeometry->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix();

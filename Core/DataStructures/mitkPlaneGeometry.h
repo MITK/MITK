@@ -45,14 +45,14 @@ public:
   enum PlaneOrientation {Transversal, Sagittal, Frontal};
 
   //##ModelId=3E3B9C730262
-  virtual void UnitsToMM(const mitk::Point2D &pt_units, mitk::Point2D &pt_mm) const;
+  virtual void IndexToWorld(const mitk::Point2D &pt_units, mitk::Point2D &pt_mm) const;
   //##ModelId=3E3B9C760112
-  virtual void MMToUnits(const mitk::Point2D &pt_mm, mitk::Point2D &pt_units) const;
+  virtual void WorldToIndex(const mitk::Point2D &pt_mm, mitk::Point2D &pt_units) const;
 
   //##ModelId=3E3B9C8C0145
-  virtual void UnitsToMM(const mitk::Point2D &atPt2d_units, const mitk::Vector2D &vec_units, mitk::Vector2D &vec_mm) const;
+  virtual void IndexToWorld(const mitk::Point2D &atPt2d_units, const mitk::Vector2D &vec_units, mitk::Vector2D &vec_mm) const;
   //##ModelId=3E3B9C8E0152
-  virtual void MMToUnits(const mitk::Point2D &atPt2d_mm, const mitk::Vector2D &vec_mm, mitk::Vector2D &vec_units) const;
+  virtual void WorldToIndex(const mitk::Point2D &atPt2d_mm, const mitk::Vector2D &vec_mm, mitk::Vector2D &vec_units) const;
 
   //##Documentation
   //## @brief Set the origin, i.e. the upper-left corner of the plane

@@ -82,7 +82,7 @@ void mitk::Geometry2D::Map(const mitk::Point2D &pt2d_mm, mitk::Point3D &pt3d_mm)
 }
 
 //##ModelId=3DE7895602F7
-void mitk::Geometry2D::UnitsToMM(const mitk::Point2D &pt_units, mitk::Point2D &pt_mm) const
+void mitk::Geometry2D::IndexToWorld(const mitk::Point2D &pt_units, mitk::Point2D &pt_mm) const
 {
   assert(m_BoundingBox.IsNotNull());
   BoundingBox::BoundsArrayType bounds = m_BoundingBox->GetBounds();
@@ -94,9 +94,9 @@ void mitk::Geometry2D::UnitsToMM(const mitk::Point2D &pt_units, mitk::Point2D &p
 }
 
 //##ModelId=3DE7895C01CE
-void mitk::Geometry2D::MMToUnits(const mitk::Point2D &pt_mm, mitk::Point2D &pt_units) const
+void mitk::Geometry2D::WorldToIndex(const mitk::Point2D &pt_mm, mitk::Point2D &pt_units) const
 {
-  itkExceptionMacro(<< "No BackTransform in itk::Transform ==> no general MMToUnits(const mitk::Point2D &pt_mm, mitk::Point2D &pt_units) possible. Has to be implemented in sub-class.");
+  itkExceptionMacro(<< "No BackTransform in itk::Transform ==> no general WorldToIndex(const mitk::Point2D &pt_mm, mitk::Point2D &pt_units) possible. Has to be implemented in sub-class.");
   assert(m_BoundingBox.IsNotNull());
   BoundingBox::BoundsArrayType bounds = m_BoundingBox->GetBounds();
   pt_units[0]=pt_mm[0]/m_ScaleFactorMMPerUnitX;
@@ -104,7 +104,7 @@ void mitk::Geometry2D::MMToUnits(const mitk::Point2D &pt_mm, mitk::Point2D &pt_u
 }
 
 //##ModelId=3E3B98C5019F
-void mitk::Geometry2D::UnitsToMM(const mitk::Point2D &atPt2d_units, const mitk::Vector2D &vec_units, mitk::Vector2D &vec_mm) const
+void mitk::Geometry2D::IndexToWorld(const mitk::Point2D &atPt2d_units, const mitk::Vector2D &vec_units, mitk::Vector2D &vec_mm) const
 {
   assert(m_BoundingBox.IsNotNull());
   BoundingBox::BoundsArrayType bounds = m_BoundingBox->GetBounds();
@@ -116,9 +116,9 @@ void mitk::Geometry2D::UnitsToMM(const mitk::Point2D &atPt2d_units, const mitk::
 }
 
 //##ModelId=3E3B98C9019B
-void mitk::Geometry2D::MMToUnits(const mitk::Point2D &atPt2d_mm, const mitk::Vector2D &vec_mm, mitk::Vector2D &vec_units) const
+void mitk::Geometry2D::WorldToIndex(const mitk::Point2D &atPt2d_mm, const mitk::Vector2D &vec_mm, mitk::Vector2D &vec_units) const
 {
-  itkExceptionMacro(<< "No BackTransform in itk::Transform ==> no general MMToUnits(const mitk::Vector2D &vec_mm, mitk::Vector2D &vec_units) possible. Has to be implemented in sub-class.");
+  itkExceptionMacro(<< "No BackTransform in itk::Transform ==> no general WorldToIndex(const mitk::Vector2D &vec_mm, mitk::Vector2D &vec_units) possible. Has to be implemented in sub-class.");
   assert(m_BoundingBox.IsNotNull());
   BoundingBox::BoundsArrayType bounds = m_BoundingBox->GetBounds();
   vec_units[0]=vec_mm[0]/m_ScaleFactorMMPerUnitX;

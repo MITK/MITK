@@ -102,13 +102,13 @@ public:
   //##ModelId=3EF4A2660292
   virtual void Map(const mitk::Point2D & atPt2d_mm, const mitk::Vector2D &vec2d_mm, mitk::Vector3D &vec3d_mm) const;
 
-  virtual void UnitsToMM(const mitk::Point2D &pt_units, mitk::Point2D &pt_mm) const;
+  virtual void IndexToWorld(const mitk::Point2D &pt_units, mitk::Point2D &pt_mm) const;
 
-  virtual void MMToUnits(const mitk::Point2D &pt_mm, mitk::Point2D &pt_units) const;
+  virtual void WorldToIndex(const mitk::Point2D &pt_mm, mitk::Point2D &pt_units) const;
 
-  virtual void UnitsToMM(const mitk::Point2D &atPt2d_untis, const mitk::Vector2D &vec_units, mitk::Vector2D &vec_mm) const;
+  virtual void IndexToWorld(const mitk::Point2D &atPt2d_untis, const mitk::Vector2D &vec_units, mitk::Vector2D &vec_mm) const;
 
-  virtual void MMToUnits(const mitk::Point2D &atPt2d_mm, const mitk::Vector2D &vec_mm, mitk::Vector2D &vec_units) const;
+  virtual void WorldToIndex(const mitk::Point2D &atPt2d_mm, const mitk::Vector2D &vec_mm, mitk::Vector2D &vec_units) const;
 
   virtual void Initialize();
 

@@ -623,7 +623,7 @@ void mitk::Image::Initialize(const mitk::PixelType& type, const mitk::Geometry3D
     SlicedGeometry3D* slicedGeometry = GetSlicedGeometry(0);
   
     mitk::Point3D origin; origin.Fill(0.0);
-    slicedGeometry->UnitsToMM(origin, origin);
+    slicedGeometry->IndexToWorld(origin, origin);
 
     bounds[1]-=bounds[0]; bounds[3]-=bounds[2]; bounds[5]-=bounds[4];
     bounds[0] = 0.0;      bounds[2] = 0.0;      bounds[4] = 0.0;

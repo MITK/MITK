@@ -129,25 +129,25 @@ void mitk::Geometry3D::SetParametricBounds(const BoundingBox::BoundsArrayType& b
   SetBoundsArray(bounds, m_ParametricBoundingBox);
 }
 
-void mitk::Geometry3D::MMToUnits(const mitk::Point3D &pt_mm, mitk::Point3D &pt_units) const
+void mitk::Geometry3D::WorldToIndex(const mitk::Point3D &pt_mm, mitk::Point3D &pt_units) const
 {
   BackTransform(pt_mm, pt_units);
 }
 
 //##ModelId=3DDE65DC0151
-void mitk::Geometry3D::UnitsToMM(const mitk::Point3D &pt_units, mitk::Point3D &pt_mm) const
+void mitk::Geometry3D::IndexToWorld(const mitk::Point3D &pt_units, mitk::Point3D &pt_mm) const
 {
   pt_mm = m_ParametricTransform->TransformPoint(pt_units);
 }
 
 //##ModelId=3E3B986602CF
-void mitk::Geometry3D::MMToUnits(const mitk::Point3D &atPt3d_mm, const mitk::Vector3D &vec_mm, mitk::Vector3D &vec_units) const
+void mitk::Geometry3D::WorldToIndex(const mitk::Point3D &atPt3d_mm, const mitk::Vector3D &vec_mm, mitk::Vector3D &vec_units) const
 {
   BackTransform(atPt3d_mm, vec_mm, vec_units);
 }
 
 //##ModelId=3E3B987503A3
-void mitk::Geometry3D::UnitsToMM(const mitk::Point3D &atPt3d_units, const mitk::Vector3D &vec_units, mitk::Vector3D &vec_mm) const
+void mitk::Geometry3D::IndexToWorld(const mitk::Point3D &atPt3d_units, const mitk::Vector3D &vec_units, mitk::Vector3D &vec_mm) const
 {
   vec_mm = m_ParametricTransform->TransformVector(vec_units);
 }

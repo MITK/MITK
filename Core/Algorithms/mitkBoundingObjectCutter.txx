@@ -99,7 +99,7 @@ void BoundingObjectCutter::CutImageWithOutputTypeSelect
     for ( inputIt.GoToBegin(), outputIt.GoToBegin(); !inputIt.IsAtEnd(); ++inputIt, ++outputIt)
     {
       vtk2itk(inputIt.GetIndex(), p);
-      inputGeometry->UnitsToMM(p, p);
+      inputGeometry->IndexToWorld(p, p);
       if(m_BoundingObject->IsInside(p))
       {
         outputIt.Set(insideValue);
@@ -118,7 +118,7 @@ void BoundingObjectCutter::CutImageWithOutputTypeSelect
     for ( inputIt.GoToBegin(), outputIt.GoToBegin(); !inputIt.IsAtEnd(); ++inputIt, ++outputIt)
     {
       vtk2itk(inputIt.GetIndex(), p);
-      inputGeometry->UnitsToMM(p, p);
+      inputGeometry->IndexToWorld(p, p);
       if(m_BoundingObject->IsInside(p))
       {
         outputIt.Set( (TOutputPixel) inputIt.Value() );

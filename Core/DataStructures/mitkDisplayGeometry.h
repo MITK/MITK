@@ -45,13 +45,13 @@ namespace mitk {
 //## @code
 //## displaygeometry->DisplayToMM(pt_display, pt2d_mm);
 //## displaygeometry->Map(pt2d_mm, pt3d_mm);
-//## datum->GetGeometry()->MMToUnits(pt3d_mm, pt3d_datum_units);
+//## datum->GetGeometry()->WorldToIndex(pt3d_mm, pt3d_datum_units);
 //## @endcode
 //## Even, if you want to convert the 2D point @a pt_display into a 2D point in
 //## units on a certain 2D geometry @a certaingeometry, it is safer to use
 //## @code
 //## displaygeometry->DisplayToMM(pt_display, pt_mm);
-//## certaingeometry->MMToUnits(pt_mm, pt_certain_geometry_units);
+//## certaingeometry->WorldToIndex(pt_mm, pt_certain_geometry_units);
 //## @endcode
 //## unless you can be sure that the underlying geometry of @a displaygeometry
 //## is really the @a certaingeometry.
@@ -113,17 +113,17 @@ public:
   virtual void Map(const mitk::Point2D &pt2d_mm, mitk::Point3D &pt3d_mm) const;
 
   //##ModelId=3E3AEB52008A
-  virtual void UnitsToMM(const mitk::Point2D &pt_units, mitk::Point2D &pt_mm) const;
+  virtual void IndexToWorld(const mitk::Point2D &pt_units, mitk::Point2D &pt_mm) const;
   //##ModelId=3E3AEB54017D
-  virtual void MMToUnits(const mitk::Point2D &pt_mm, mitk::Point2D &pt_units) const;
+  virtual void WorldToIndex(const mitk::Point2D &pt_mm, mitk::Point2D &pt_units) const;
 
   //##ModelId=3E3AEB620231
   virtual const TimeBounds& GetTimeBoundsInMS() const;
 
   //##ModelId=3E3B994B02A6
-  virtual void MMToUnits(const mitk::Point2D &atPt2d_mm, const mitk::Vector2D &vec_mm, mitk::Vector2D &vec_units) const;
+  virtual void WorldToIndex(const mitk::Point2D &atPt2d_mm, const mitk::Vector2D &vec_mm, mitk::Vector2D &vec_units) const;
   //##ModelId=3E3B994802B6
-  virtual void UnitsToMM(const mitk::Point2D &atPt2d_units, const mitk::Vector2D &vec_units, mitk::Vector2D &vec_mm) const;
+  virtual void IndexToWorld(const mitk::Point2D &atPt2d_units, const mitk::Vector2D &vec_units, mitk::Vector2D &vec_mm) const;
 
   //##ModelId=3E3C666E0299
   unsigned int GetDisplayWidth() const

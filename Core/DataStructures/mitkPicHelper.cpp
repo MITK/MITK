@@ -83,9 +83,10 @@ bool mitk::PicHelper::GetSpacing(const ipPicDescriptor* aPic, Vector3D & spacing
         && len>0 && ((char *)data)[0] )
       {
         sscanf( (char *) data, "%lf\\%lf", &fy, &fx );    // row / column value 
-//        itkGenericOutputMacro( "fx, fy: " << fx << "/" << fy  << " mm");
-        return false;
+//        itkGenericOutputMacro( "fx, fy: " << fx << "/" << fy  << " mm");        
       }
+      else
+        ok=false;
       if(ok)
         FillVector3D(spacing, fx, fy,( spacing_z > 0 ? spacing_z : thickness));
       return ok;
@@ -214,7 +215,7 @@ bool mitk::PicHelper::SetGeometry2D(const ipPicDescriptor* aPic, int s, SlicedGe
     }
     else
     {
-      FillVector3D(origin,0,0,s); slicedgeometry->UnitsToMM(origin, origin);
+      FillVector3D(origin,0,0,s); slicedgeometry->IndexToWorld(origin, origin);
       FillVector3D(rightDV,pic->n[0],0,0);
       FillVector3D(bottomDV,0,pic->n[1],0);
 

@@ -38,7 +38,7 @@ void _planesSet(ipPicDescriptor *dest, const mitk::Geometry3D* srcgeometry, cons
       for(p[0]=0;p[0]<x_max;++p[0],++d)
         for(pit=planes->Begin();pit!=pend;++pit)
         {
-          srcgeometry->UnitsToMM(p, pt_mm);
+          srcgeometry->IndexToWorld(p, pt_mm);
           if(pit.Value()->SignedDistance(pt_mm) < 0)
             *d=outside_value;
         }

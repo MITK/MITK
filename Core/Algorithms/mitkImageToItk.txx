@@ -187,7 +187,7 @@ template<class TPixel, unsigned int VImageDimension>
   
   mitk::Point3D mitkorigin;
   mitkorigin.Fill(0.0);
-  input->GetGeometry()->UnitsToMM(mitkorigin, mitkorigin);
+  input->GetGeometry()->IndexToWorld(mitkorigin, mitkorigin);
   itk2vtk(mitkorigin, origin);
   
   IndexType start;

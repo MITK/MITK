@@ -362,6 +362,7 @@ mitk::Geometry3D::Pointer mitk::SlicedGeometry3D::Clone() const
   //newGeometry->GetRelativeTransform()->SetMatrix(m_RelativeTransform->GetMatrix());
   newGeometry->SetEvenlySpaced(m_EvenlySpaced);
   newGeometry->SetSpacing(GetSpacing());
+  newGeometry->SetDirectionVector(GetDirectionVector());
   unsigned int s;
   for(s=0; s<m_Slices; ++s)
   {

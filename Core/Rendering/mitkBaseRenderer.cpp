@@ -247,7 +247,10 @@ void mitk::BaseRenderer::MousePressEvent(mitk::MouseEvent *me)
   }
 
   if (m_CameraController)
-    m_CameraController->MousePressEvent(me);
+  {
+    if(me->GetButtonState()!=512) // provisorisch: Ctrl nicht durchlassen. Bald wird aus m_CameraController eine StateMachine
+      m_CameraController->MousePressEvent(me);
+  }
   if(m_MapperID==1)
   {
     Point2D p(me->GetDisplayPosition().x, me->GetDisplayPosition().y);
@@ -273,7 +276,10 @@ void mitk::BaseRenderer::MousePressEvent(mitk::MouseEvent *me)
 void mitk::BaseRenderer::MouseReleaseEvent(mitk::MouseEvent *me)
 {
   if (m_CameraController)
-    m_CameraController->MouseReleaseEvent(me);
+  {
+    if(me->GetButtonState()!=512) // provisorisch: Ctrl nicht durchlassen. Bald wird aus m_CameraController eine StateMachine
+      m_CameraController->MouseReleaseEvent(me);
+  }
 
   if(m_MapperID==1)
   {
@@ -299,7 +305,10 @@ void mitk::BaseRenderer::MouseReleaseEvent(mitk::MouseEvent *me)
 void mitk::BaseRenderer::MouseMoveEvent(mitk::MouseEvent *me)
 {
   if (m_CameraController)
-    m_CameraController->MouseMoveEvent(me);
+  {
+    if((me->GetButtonState()<=512) || (me->GetButtonState()>=516))// provisorisch: Ctrl nicht durchlassen. Bald wird aus m_CameraController eine StateMachine
+      m_CameraController->MouseMoveEvent(me);
+  }
   if(m_MapperID==1)
   {
     Point2D p(me->GetDisplayPosition().x, me->GetDisplayPosition().y);

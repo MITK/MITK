@@ -208,6 +208,30 @@ public:
     receiver->AddStateMachine(this);
   }
 
+  template <typename T> void ConnectUpdate(T* receiver)
+  {
+    typedef typename itk::SimpleMemberCommand<T>::Pointer SimpleMemberCommandPointer;
+    SimpleMemberCommandPointer eventSimpleCommand = itk::SimpleMemberCommand<T>::New();
+  #ifdef WIN32
+    eventSimpleCommand->SetCallbackFunction(receiver, T::Update);
+  #else
+    eventSimpleCommand->SetCallbackFunction(receiver, &T::Update);
+  #endif
+    AddObserver(UpdateEvent(), eventSimpleCommand);
+  }
+
+  template <typename T> void ConnectRepaint(T* receiver)
+  {
+    typedef typename itk::SimpleMemberCommand<T>::Pointer SimpleMemberCommandPointer;
+    SimpleMemberCommandPointer eventSimpleCommand = itk::SimpleMemberCommand<T>::New();
+  #ifdef WIN32
+    eventSimpleCommand->SetCallbackFunction(receiver, T::Repaint);
+  #else
+    eventSimpleCommand->SetCallbackFunction(receiver, &T::Repaint);
+  #endif
+    AddObserver(UpdateEvent(), eventSimpleCommand);
+  }
+
   virtual void SetGeometry(const itk::EventObject & geometrySliceEvent);
 
   virtual void SetGeometrySlice(const itk::EventObject & geometrySliceEvent);

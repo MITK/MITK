@@ -13,7 +13,7 @@
       <transition NAME="EV_PATH_COLLECTION_SELECTED" NEXT_STATE_ID="3" EVENT_ID="5551003">
         <action ID="5550001" /> <!--AC_SET_NEXT_BUTTON_VISIBLE-->
       </transition>
-      <transition NAME="EV_NAVIGATION_SELECTED" NEXT_STATE_ID="10" EVENT_ID="5551004">
+      <transition NAME="EV_NAVIGATION_SELECTED" NEXT_STATE_ID="40" EVENT_ID="5551004">
         <action ID="5550001" /> <!--AC_SET_NEXT_BUTTON_VISIBLE-->
       </transition>
     </state>
@@ -25,7 +25,7 @@
           <intParameter NAME="WIDGET_ID" VALUE="1" />
         </action>
       </transition>
-      <transition NAME="EV_NAVIGATION_SELECTED" NEXT_STATE_ID="10" EVENT_ID="5551004" />
+      <transition NAME="EV_NAVIGATION_SELECTED" NEXT_STATE_ID="40" EVENT_ID="5551004" />
       <transition NAME="EV_INIT" NEXT_STATE_ID="2" EVENT_ID="5551001">
         <action ID="55500010" /> <!--AC_INIT-->
       </transition>
@@ -84,9 +84,6 @@
     <state NAME="checkCount" ID="7">
       <transition NAME="EV_READY_FOR_COLLECTING_PATH" NEXT_STATE_ID="8" EVENT_ID="5551006">
         <action ID="5550001" /> <!--AC_SET_NEXT_BUTTON_VISIBLE-->
-        <action ID="5550007"> <!--AC_SET_NEXT_BUTTON_TEXT-->
-          <stringParameter NAME="BUTTON_TEXT" VALUE="Start collecting Path" />
-        </action>
       </transition>
       <transition NAME="EV_LESS_THEN_MIN_COUNT" NEXT_STATE_ID="6" EVENT_ID="5551005" />
       <transition NAME="EV_INIT" NEXT_STATE_ID="2" EVENT_ID="5551001">
@@ -95,9 +92,14 @@
     </state>
     <state NAME="readyForCollectingPath" ID="8">
       <transition NAME="EV_NEXT" NEXT_STATE_ID="9" EVENT_ID="5551007">
-        <action ID="5550002" /> <!--AC_SET_NEXT_BUTTON_INVISIBLE-->
         <action ID="5550005"> <!--AC_SET_ASSISTAND_WIDGET_STECK-->
-          <intParameter NAME="WIDGET_ID" VALUE="3" />
+          <intParameter NAME="WIDGET_ID" VALUE="4" />
+        </action>
+        <action ID="55500014"> <!--AC_START_APPLICATION_TEXT-->
+          <stringParameter NAME="START_APPLICATION_TEXT" VALUE="Ariadne is now ready for path collection" />
+        </action>
+        <action ID="5550007"> <!--AC_SET_NEXT_BUTTON_TEXT-->
+          <stringParameter NAME="BUTTON_TEXT" VALUE="Start" />
         </action>
       </transition>
       <transition NAME="EV_PREVIOUS" NEXT_STATE_ID="4" EVENT_ID="5551002">
@@ -110,7 +112,7 @@
       <transition NAME="EV_REMOVE_LANDMARK" NEXT_STATE_ID="7" EVENT_ID="5551010">
         <action ID="5550002" /> <!--AC_SET_NEXT_BUTTON_INVISIBLE-->
         <action ID="5550007"> <!--AC_SET_NEXT_BUTTON_TEXT-->
-          <stringParameter NAME="BUTTON_TEXT" VALUE="Next" />
+          <stringParameter NAME="BUTTON_TEXT" VALUE=">" />
         </action>
         <action ID="5550008"> <!--AC_CHECK_LANDMARK_COUNT-->
           <intParameter NAME="MIN_COUNT" VALUE="3" />
@@ -121,17 +123,211 @@
       </transition>
     </state>
     <state NAME="collectingPath" ID="9">
+      <transition NAME="EV_NEXT" NEXT_STATE_ID="2" EVENT_ID="5551007">
+        <action ID="55500013" /> <!--AC_CLOSE_ASSISTENT-->
+        <action ID="55500011" /> <!--AC_SET_APPLICATION_SELECTED_FALSE-->
+        <action ID="5550002" /> <!--AC_SET_NEXT_BUTTON_INVISIBLE-->
+        <action ID="5550004" /> <!--AC_SET_PREVIOUS_BUTTON_INVISIBLE-->
+        <action ID="55500016" /> <!--AC_START_PATHCOLLECTION-->
+        <action ID="5550005"> <!--AC_SET_ASSISTAND_WIDGET_STECK-->
+          <intParameter NAME="WIDGET_ID" VALUE="0" />
+        </action>
+        <action ID="5550007"> <!--AC_SET_NEXT_BUTTON_TEXT-->
+          <stringParameter NAME="BUTTON_TEXT" VALUE=">" />
+        </action>
+      </transition>
+      <transition NAME="EV_PREVIOUS" NEXT_STATE_ID="8" EVENT_ID="5551002">
+        <action ID="5550005"> <!--AC_SET_ASSISTAND_WIDGET_STECK-->
+          <intParameter NAME="WIDGET_ID" VALUE="2" />
+        </action>
+        <action ID="5550007"> <!--AC_SET_NEXT_BUTTON_TEXT-->
+          <stringParameter NAME="BUTTON_TEXT" VALUE=">" />
+        </action>
+      </transition>
       <transition NAME="EV_INIT" NEXT_STATE_ID="2" EVENT_ID="5551001">
         <action ID="55500010" /> <!--AC_INIT-->
+        <action ID="5550007"> <!--AC_SET_NEXT_BUTTON_TEXT-->
+          <stringParameter NAME="BUTTON_TEXT" VALUE=">" />
+        </action>
       </transition>
     </state>
-    <state NAME="chooseNavigation" ID="10">
+    <state NAME="chooseNavigation" ID="40">
       <transition NAME="EV_PATH_COLLECTION_SELECTED" NEXT_STATE_ID="3" EVENT_ID="5551003" />
       <transition NAME="EV_INIT" NEXT_STATE_ID="2" EVENT_ID="5551001">
         <action ID="55500010" /> <!--AC_INIT-->
       </transition>
+      <transition NAME="EV_NEXT" NEXT_STATE_ID="41" EVENT_ID="5551007">
+        <action ID="5550003" /> <!--AC_SET_PREVIOUS_BUTTON_VISIBLE-->
+        <action ID="5550002" /> <!--AC_SET_NEXT_BUTTON_INVISIBLE-->
+        <action ID="5550005"> <!--AC_SET_ASSISTAND_WIDGET_STECK-->
+          <intParameter NAME="WIDGET_ID" VALUE="3" />
+        </action>
+      </transition>
+      <transition NAME="EV_INIT" NEXT_STATE_ID="2" EVENT_ID="5551001">
+        <action ID="55500010" /> <!--AC_INIT-->
+      </transition>
     </state>
-  </stateMachine>
+    <state NAME="chooseData" ID="41">
+      <transition NAME="EV_DONE" NEXT_STATE_ID="42" EVENT_ID="5551008">
+        <action ID="5550001" /> <!--AC_SET_NEXT_BUTTON_VISIBLE-->
+      </transition>
+      <transition NAME="EV_PREVIOUS" NEXT_STATE_ID="2" EVENT_ID="5551002">
+        <action ID="5550004" /> <!--AC_SET_PREVIOUS_BUTTON_INVISIBLE-->
+        <action ID="5550001" /> <!--AC_SET_NEXT_BUTTON_VISIBLE-->
+        <action ID="55500011" /> <!--AC_SET_APPLICATION_SELECTED_FALSE-->
+        <action ID="5550005"> <!--AC_SET_ASSISTAND_WIDGET_STECK-->
+          <intParameter NAME="WIDGET_ID" VALUE="0" />
+        </action>
+      </transition>
+      <transition NAME="EV_INIT" NEXT_STATE_ID="2" EVENT_ID="5551001">
+        <action ID="55500010" /> <!--AC_INIT-->
+      </transition>
+    </state>
+    <state NAME="dataChoosed" ID="42">
+      <transition NAME="EV_NEXT" NEXT_STATE_ID="43" EVENT_ID="5551007">
+        <action ID="55500017" /> <!--AC_LOAD_LANDMARKS-->
+        <action ID="5550002" /> <!--AC_SET_NEXT_BUTTON_INVISIBLE-->
+        <action ID="5550005"> <!--AC_SET_ASSISTAND_WIDGET_STECK-->
+          <intParameter NAME="WIDGET_ID" VALUE="1" />
+        </action>
+      </transition>
+      <transition NAME="EV_PREVIOUS" NEXT_STATE_ID="2" EVENT_ID="5551002">
+        <action ID="5550004" /> <!--AC_SET_PREVIOUS_BUTTON_INVISIBLE-->
+        <action ID="5550001" /> <!--AC_SET_NEXT_BUTTON_VISIBLE-->
+        <action ID="55500011" /> <!--AC_SET_APPLICATION_SELECTED_FALSE-->
+        <action ID="5550005"> <!--AC_SET_ASSISTAND_WIDGET_STECK-->
+          <intParameter NAME="WIDGET_ID" VALUE="0" />
+        </action>
+      </transition>
+      <transition NAME="EV_INIT" NEXT_STATE_ID="2" EVENT_ID="5551001">
+        <action ID="55500010" /> <!--AC_INIT-->
+      </transition>
+    </state>
+    <state NAME="mountSensorForNavigation" ID="43">
+      <transition NAME="EV_DONE" NEXT_STATE_ID="44" EVENT_ID="5551008">
+        <action ID="5550001" /> <!--AC_SET_NEXT_BUTTON_VISIBLE-->
+      </transition>
+      <transition NAME="EV_PREVIOUS" NEXT_STATE_ID="42" EVENT_ID="5551002">
+        <action ID="5550001" /> <!--AC_SET_NEXT_BUTTON_VISIBLE-->
+        <action ID="5550005"> <!--AC_SET_ASSISTAND_WIDGET_STECK-->
+          <intParameter NAME="WIDGET_ID" VALUE="3" />
+        </action>
+      </transition>
+      <transition NAME="EV_INIT" NEXT_STATE_ID="2" EVENT_ID="5551001">
+        <action ID="55500010" /> <!--AC_INIT-->
+      </transition>
+    </state>
+    <state NAME="sensorMountedForNavigation" ID="44">
+      <transition NAME="EV_NEXT" NEXT_STATE_ID="46" EVENT_ID="5551007">
+        <action ID="5550002" /> <!--AC_SET_NEXT_BUTTON_INVISIBLE-->
+	<action ID="55500012" /> <!--AC_SENSOR_ATTACHED-->	
+        <action ID="5550005"> <!--AC_SET_ASSISTAND_WIDGET_STECK-->
+          <intParameter NAME="WIDGET_ID" VALUE="2" />
+        </action>
+        <action ID="5550008"> <!--AC_CHECK_LANDMARK_COUNT-->
+          <intParameter NAME="MIN_COUNT" VALUE="3" />
+        </action>
+      </transition>
+      <transition NAME="EV_PREVIOUS" NEXT_STATE_ID="43" EVENT_ID="5551002">
+        <action ID="5550009" /> <!--AC_SET_DONE_FALSE-->
+        <action ID="5550002" /> <!--AC_SET_NEXT_BUTTON_INVISIBLE-->
+      </transition>
+      <transition NAME="EV_INIT" NEXT_STATE_ID="2" EVENT_ID="5551001">
+        <action ID="55500010" /> <!--AC_INIT-->
+      </transition>
+    </state>
+    <state NAME="setLandmarks" ID="45">
+      <transition NAME="EV_NEW_LANDMARK" NEXT_STATE_ID="46" EVENT_ID="5551009">
+        <action ID="5550008"> <!--AC_CHECK_LANDMARK_COUNT-->
+          <intParameter NAME="MIN_COUNT" VALUE="3" />
+        </action>
+      </transition>
+      <transition NAME="EV_PREVIOUS" NEXT_STATE_ID="43" EVENT_ID="5551002">
+        <action ID="5550005"> <!--AC_SET_ASSISTAND_WIDGET_STECK-->
+          <intParameter NAME="WIDGET_ID" VALUE="3" />
+        </action>
+        <action ID="5550009" /> <!--AC_SET_DONE_FALSE-->
+      </transition>
+      <transition NAME="EV_INIT" NEXT_STATE_ID="2" EVENT_ID="5551001">
+        <action ID="55500010" /> <!--AC_INIT-->
+      </transition>
+    </state>
+    <state NAME="checkCount" ID="46">
+      <transition NAME="EV_READY_FOR_COLLECTING_PATH" NEXT_STATE_ID="47" EVENT_ID="5551006">
+        <action ID="5550001" /> <!--AC_SET_NEXT_BUTTON_VISIBLE-->
+      </transition>
+      <transition NAME="EV_LESS_THEN_MIN_COUNT" NEXT_STATE_ID="45" EVENT_ID="5551005" />
+      <transition NAME="EV_INIT" NEXT_STATE_ID="2" EVENT_ID="5551001">
+        <action ID="55500010" /> <!--AC_INIT-->
+      </transition>
+    </state>
+    <state NAME="readyForNavigation" ID="47">
+      <transition NAME="EV_NEXT" NEXT_STATE_ID="48" EVENT_ID="5551007">
+        <action ID="55500018" /> <!--AC_CALCULATE_LANDMARK_TRANSFORM-->
+        <action ID="5550005"> <!--AC_SET_ASSISTAND_WIDGET_STECK-->
+          <intParameter NAME="WIDGET_ID" VALUE="4" />
+        </action>
+        <action ID="55500014"> <!--AC_START_APPLICATION_TEXT-->
+          <stringParameter NAME="START_APPLICATION_TEXT" VALUE="Ariadne is now ready for navigation" />
+        </action>
+        <action ID="5550007"> <!--AC_SET_NEXT_BUTTON_TEXT-->
+          <stringParameter NAME="BUTTON_TEXT" VALUE="Start" />
+        </action>
+      </transition>
+      <transition NAME="EV_PREVIOUS" NEXT_STATE_ID="43" EVENT_ID="5551002">
+        <action ID="5550005"> <!--AC_SET_ASSISTAND_WIDGET_STECK-->
+          <intParameter NAME="WIDGET_ID" VALUE="3" />
+        </action>
+        <action ID="5550002" /> <!--AC_SET_NEXT_BUTTON_INVISIBLE-->
+        <action ID="5550009" /> <!--AC_SET_DONE_FALSE-->
+      </transition>
+      <transition NAME="EV_REMOVE_LANDMARK" NEXT_STATE_ID="46" EVENT_ID="5551010">
+        <action ID="5550002" /> <!--AC_SET_NEXT_BUTTON_INVISIBLE-->
+        <action ID="5550007"> <!--AC_SET_NEXT_BUTTON_TEXT-->
+          <stringParameter NAME="BUTTON_TEXT" VALUE=">" />
+        </action>
+        <action ID="5550008"> <!--AC_CHECK_LANDMARK_COUNT-->
+          <intParameter NAME="MIN_COUNT" VALUE="3" />
+        </action>
+      </transition>
+      <transition NAME="EV_INIT" NEXT_STATE_ID="2" EVENT_ID="5551001">
+        <action ID="55500010" /> <!--AC_INIT-->
+      </transition>
+    </state>
+    <state NAME="Navigation" ID="48">
+      <transition NAME="EV_NEXT" NEXT_STATE_ID="2" EVENT_ID="5551007">
+        <action ID="55500013" /> <!--AC_CLOSE_ASSISTENT-->
+        <action ID="55500011" /> <!--AC_SET_APPLICATION_SELECTED_FALSE-->
+        <action ID="5550002" /> <!--AC_SET_NEXT_BUTTON_INVISIBLE-->
+        <action ID="5550004" /> <!--AC_SET_PREVIOUS_BUTTON_INVISIBLE-->
+        <action ID="55500015" /> <!--AC_START_NAVIGATION-->
+        <action ID="5550005"> <!--AC_SET_ASSISTAND_WIDGET_STECK-->
+          <intParameter NAME="WIDGET_ID" VALUE="0" />
+        </action>
+        <action ID="5550007"> <!--AC_SET_NEXT_BUTTON_TEXT-->
+          <stringParameter NAME="BUTTON_TEXT" VALUE=">" />
+        </action>
+      </transition>
+      <transition NAME="EV_PREVIOUS" NEXT_STATE_ID="47" EVENT_ID="5551002">
+        <action ID="5550005"> <!--AC_SET_ASSISTAND_WIDGET_STECK-->
+          <intParameter NAME="WIDGET_ID" VALUE="2" />
+        </action>
+        <action ID="5550007"> <!--AC_SET_NEXT_BUTTON_TEXT-->
+          <stringParameter NAME="BUTTON_TEXT" VALUE=">" />
+        </action>
+      </transition>
+      <transition NAME="EV_INIT" NEXT_STATE_ID="2" EVENT_ID="5551001">
+        <action ID="55500010" /> <!--AC_INIT-->
+        <action ID="5550007"> <!--AC_SET_NEXT_BUTTON_TEXT-->
+          <stringParameter NAME="BUTTON_TEXT" VALUE=">" />
+        </action>
+      </transition>
+    </state>
+</stateMachine>
+
+
+
+
   <!-- Behaviour the global statemachine -->
   <stateMachine NAME="global">
     <state NAME="neutral" ID="1" START_STATE="TRUE">

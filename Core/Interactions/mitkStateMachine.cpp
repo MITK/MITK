@@ -29,58 +29,48 @@ std::string mitk::StateMachine::GetType() const
 //##ModelId=3E5B2DE30378
 bool mitk::StateMachine::HandleEvent(StateEvent const* stateEvent, int objectEventId, int groupEventId)
 {
+  if (m_CurrentState == NULL)
+  return false;//m_CurrentState needs to be set first!
 
-//debug
-//std::cout<<"EventID:"<<stateEvent->GetId();
+  //get Transition from m_Current State with equals ID
+  const Transition *tempTransition = m_CurrentState->GetTransition(stateEvent->GetId());
+  if (tempTransition == NULL) return false;
+  //get next State
+  State *tempNextState = tempTransition->GetNextState();
+  if (tempNextState == NULL) return false;
+  //and SideEffectId to execute later on
+  int tempSideEffectId = tempTransition->GetSideEffectId();
 
-	if (m_CurrentState == NULL)
-		return false;//m_CurrentState needs to be set first!
+  if ( ( m_CurrentState->GetId() != tempNextState->GetId() ) && ( m_UndoEnabled ) )	//write to UndoMechanism if there is a real statechange and Undo is enabled
+  {
+    //UNDO for this statechange
+	StateTransitionOperation* doOp = new StateTransitionOperation(OpSTATECHANGE, tempNextState);
+	StateTransitionOperation* undoOp = new StateTransitionOperation(OpSTATECHANGE, m_CurrentState);
+	OperationEvent *operationEvent = new OperationEvent(((mitk::OperationActor*)(this)), 
+														doOp, undoOp,
+														objectEventId ,groupEventId);
+	m_UndoController->SetOperationEvent(operationEvent);
+  }
 
-//get Transition from m_Current State with equals ID
-	const Transition *tempTransition = m_CurrentState->GetTransition(stateEvent->GetId());
-	if (tempTransition == NULL) return false;
-//get next State
-	State *tempNextState = tempTransition->GetNextState();
-	if (tempNextState == NULL) return false;
-//and SideEffectId to execute later on
-	int tempSideEffectId = tempTransition->GetSideEffectId();
-
-	if ( ( m_CurrentState->GetId() != tempNextState->GetId() ) && ( m_UndoEnabled ) )	//write to UndoMechanism if there is a real statechange and Undo is enabled
-	{
-		//UNDO for this statechange
-		StateTransitionOperation* doOp = new StateTransitionOperation(OpSTATECHANGE, tempNextState);
-		StateTransitionOperation* undoOp = new StateTransitionOperation(OpSTATECHANGE, m_CurrentState);
-		OperationEvent *operationEvent = new OperationEvent(((mitk::OperationActor*)(this)), 
-															doOp, undoOp,
-															objectEventId ,groupEventId);
-		m_UndoController->SetOperationEvent(operationEvent);
-	}
-
-//debug
-if (m_CurrentState->GetId()>1)//all other SM stay in 1, only SetOfPointsInteractor doesn't
-{
-std::cout<<"SMName: "<<m_Type<<" coming from StateID:"<<m_CurrentState->GetId()<<" "<<std::endl;
-std::cout<<"goint to StateID:"<<tempNextState->GetId()<<" "<<std::endl;
-std::cout<<std::endl;
-}
-
-
-	//first following StateChange(or calling ExecuteOperation(tempNextStateOp)), then operation(SideEffect)
-	m_CurrentState = tempNextState;	
-	//Undo is handled in ExecuteSideEffect(...)
-	bool ok = ExecuteSideEffect(tempSideEffectId, stateEvent, objectEventId, groupEventId);
+  //first following StateChange(or calling ExecuteOperation(tempNextStateOp)), then operation(SideEffect)
+  m_CurrentState = tempNextState;	
+  //Undo is handled in ExecuteSideEffect(...)
+  bool ok = ExecuteSideEffect(tempSideEffectId, stateEvent, objectEventId, groupEventId);
 		
-	//Doku: if the operation doesn't work, then we have already changed the state. 
-	//Ether go further without the success of the operation or undo the statechange.
-	if (!ok && m_UndoEnabled)
-	{
-		ok = m_UndoController->Undo(true);//fine undo!
-	}
-	else if (!ok && !m_UndoEnabled)
-	{
-		std::cout<<"Error! Sender: StateMachine; Message: Operation could not be done!"<<std::endl;
-	}
-	return ok;
+
+//Doku: if the operation didn't work, then we have already changed the state. 
+//Check, if we have already done a statechange, if yes, then recall all of thet ObjectEventId
+  if (!ok && m_UndoEnabled && 
+    m_UndoController->GetLastObjectEventIdInList()==OperationEvent::GetCurrObjectEventId())//oder objectEventId
+  {
+    ok = m_UndoController->Undo(true);//fine undo!
+  }
+  else if (!ok && !m_UndoEnabled && 
+    m_UndoController->GetLastObjectEventIdInList()==OperationEvent::GetCurrObjectEventId())
+  {
+    std::cout<<"Error! Sender: StateMachine; Message: Operation could not be done!"<<std::endl;
+  }
+  return ok;
 }
 //##ModelId=3EDCAECB0175
 void mitk::StateMachine::EnableUndo(bool enable)

@@ -6,6 +6,7 @@
 #include "LevelWindow.h"
 #include "mitkVtkInteractorCameraController.h"
 #include "mitkVtkRenderWindow.h"
+#include "mitkRenderWindow.h"
 
 #include <vtkRenderer.h>
 #include <vtkLight.h>

@@ -14,7 +14,8 @@ mitk::GlobalInteraction::GlobalInteraction(std::string type)
 
 inline mitk::StateEvent* GenerateEmptyStateEvent(int eventId)
 {
-	mitk::Event *noEvent = new mitk::Event(User,
+	mitk::Event *noEvent = new mitk::Event(NULL,
+                                    User,
 									NoButton,
 									NoButton,
 									Key_none);

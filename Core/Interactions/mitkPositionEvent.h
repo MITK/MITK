@@ -21,20 +21,20 @@ class PositionEvent : public Event
 {
   public:
     //##ModelId=3E5B7CF900F0
-    PositionEvent(int type, int button, int buttonState, int key, const Point3D& displPosition);
+    PositionEvent(mitk::BaseRenderer* sender, int type, int button, int buttonState, int key, const mitk::Point2D& displPosition, const mitk::Point3D& worldPosition);
 
 	//##ModelId=3E5B79DE0133
-    Point3D GetDisplayPosition() const;
+    const Point2D& GetDisplayPosition() const;
 	
     //##ModelId=3EDC8EEC00F8
-	Point3D GetWorldPosition() const;
+	const Point3D& GetWorldPosition() const;
 
     //##ModelId=3EDC8EEC0136
-	void SetWorldPosition(Point3D& worldPosition);
+	void SetWorldPosition(const Point3D& worldPosition);
     
   private:
     //##ModelId=3E5B79D00395
-    Point3D m_DisplayPosition;
+    Point2D m_DisplayPosition;
 	
     //##ModelId=3EDC8EEC008A
 	Point3D m_WorldPosition;

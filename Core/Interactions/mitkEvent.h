@@ -5,6 +5,8 @@
 
 namespace mitk {
 
+class BaseRenderer;
+
 //##ModelId=3E5A39350211
 //##Documentation
 //## @brief represents an Event with all its information
@@ -26,10 +28,12 @@ class Event
     //## button: mouse-button
     //## buttonState: which other key hast been pressed? (Mouse/Keyboard modifier-keys)
     //## key: pressed key
-    Event(int type, int button, int buttonState, int key);
+    Event(mitk::BaseRenderer* sender, int type, int button, int buttonState, int key);
 
     //##ModelId=3EF099E8023A
     virtual ~Event();
+
+    mitk::BaseRenderer* GetSender() const;
 
     //##ModelId=3E5B304700A7
     int GetType() const;
@@ -47,6 +51,8 @@ class Event
     int GetButtonState() const;
 
   protected:
+    mitk::BaseRenderer* m_Sender;
+
     //##ModelId=3E5B2F860321
     int m_Type;
 

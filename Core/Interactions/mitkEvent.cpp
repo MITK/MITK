@@ -1,18 +1,24 @@
 #include "Event.h"
 
 //##ModelId=3E5B3007000F
-mitk::Event::Event(int type, int button, int buttonState, int key)
+mitk::Event::Event(mitk::BaseRenderer* sender, int type, int button, int buttonState, int key)
 //: m_Type(type), m_Button(button), m_ButtonState(buttonState), m_Key(key)  
 {
-m_Type = type;
-m_Button = button;
-m_ButtonState = buttonState;
-m_Key = key;
+    m_Sender = sender;
+    m_Type = type;
+    m_Button = button;
+    m_ButtonState = buttonState;
+    m_Key = key;
 }
 
 //##ModelId=3EF099E8023A
 mitk::Event::~Event()
 {
+}
+
+mitk::BaseRenderer* mitk::Event::GetSender() const
+{
+    return m_Sender;
 }
 
 //##ModelId=3E5B304700A7

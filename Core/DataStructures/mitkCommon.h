@@ -1,3 +1,8 @@
+#ifdef _MSC_VER
+// This warns about truncation to 255 characters in debug/browse info
+#pragma warning (disable : 4786)
+#endif
+
 //add only those headers here that are really necessary for all classes!
 #include "itkObject.h"
 
@@ -20,6 +25,5 @@ typedef  int MapperSlotId;
 	typedef itk::SmartPointer<Self> Pointer; \
 	typedef itk::SmartPointer<const Self>  ConstPointer; \
     itkTypeMacro(className,SuperClassName)
-
 
 

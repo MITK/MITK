@@ -2,6 +2,7 @@
 #include "mitkAction.h"
 #include "mitkInteractionConst.h"
 #include <mitkProperties.h>
+#include <mitkEventMapper.h>
 
 mitk::HierarchicalInteractor::HierarchicalInteractor(const char * type, DataTreeNode* dataTreeNode)
 :Interactor(type,dataTreeNode)
@@ -27,7 +28,7 @@ bool mitk::HierarchicalInteractor::HandleEvent(StateEvent const* stateEvent)
   {
     if ( IsSubSelected() ) 
     {
-      ok = TransmitEvent( stateEvent );
+      ok = TransmitEvent( EventMapper::RefreshStateEvent(const_cast<StateEvent*>(stateEvent)) );
 
       //check if we still have a selected subinteractor. if not, then send deselectEvent
       bool subSelected = false;
@@ -81,20 +82,29 @@ bool mitk::HierarchicalInteractor::TransmitEvent( StateEvent const* stateEvent )
 float mitk::HierarchicalInteractor::CalculateJurisdiction(StateEvent const* stateEvent) const
 //go through all lower statemachines and this statemachine and return the highest value
 {
-  float returnJurisdiction = Superclass::CalculateJurisdiction( stateEvent );
+  float thisJurisdiction = Superclass::CalculateJurisdiction( stateEvent );
+  float lowerJurisdiction = this->CalculateLowerJurisdiction(stateEvent);
+  if (lowerJurisdiction > thisJurisdiction)
+    thisJurisdiction = lowerJurisdiction;
 
+  return thisJurisdiction;
+}
+
+float mitk::HierarchicalInteractor::CalculateLowerJurisdiction(StateEvent const* stateEvent) const
+{
+  float lowerJurisdiction = 0.0f;
   InteractorListConstIter i = m_AllInteractors.begin();
   InteractorListConstIter end = m_AllInteractors.end();
 
   while ( i != end )
   {
     float currentJurisdiction = (*i)->CalculateJurisdiction( stateEvent );
-    if (returnJurisdiction < currentJurisdiction)
-      returnJurisdiction = currentJurisdiction;
+    if (lowerJurisdiction < currentJurisdiction)
+      lowerJurisdiction = currentJurisdiction;
     i++;
   }
 
-  return returnJurisdiction;
+  return lowerJurisdiction;
 }
 
 
@@ -134,7 +144,7 @@ bool mitk::HierarchicalInteractor::ExecuteAction( Action* action, mitk::StateEve
         {
           float currentJurisdiction = (*i)->CalculateJurisdiction( stateEvent );
     
-          if ( jurisdiction > currentJurisdiction )          
+          if ( jurisdiction < currentJurisdiction )          
           {
             jurisdiction = currentJurisdiction;
             bestInteractor = i;
@@ -151,9 +161,9 @@ bool mitk::HierarchicalInteractor::ExecuteAction( Action* action, mitk::StateEve
         else 
           threshold = 0.5;         
 
-        if ( jurisdiction >= threshold )  
+        if ( jurisdiction >= threshold && bestInteractor != m_AllInteractors.end())  
         {          
-          m_SelectedInteractors.push_back( *i );
+          m_SelectedInteractors.push_back( *bestInteractor );
           mitk::StateEvent* newStateEvent = new mitk::StateEvent(EIDYES, stateEvent->GetEvent());
           this->HandleEvent( newStateEvent );
         }
@@ -213,7 +223,7 @@ bool mitk::HierarchicalInteractor::ExecuteAction( Action* action, mitk::StateEve
       {
         if ( IsSubSelected() ) 
         {
-          TransmitEvent( stateEvent );
+          TransmitEvent( mitk::EventMapper::RefreshStateEvent(const_cast<StateEvent*>(stateEvent)) );
         }
         return true;
       }

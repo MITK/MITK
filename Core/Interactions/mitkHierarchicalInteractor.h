@@ -9,6 +9,7 @@ namespace mitk {
  
 //##Documentation
 //## @brief Interface for an HierarchicalInteractor.
+//## @ingroup Interaction
 //##
 //## A hierarchicalInteractor administrates the forewarding of events to other Interactors or even HierarchicalInteractors
 class HierarchicalInteractor : public Interactor
@@ -46,7 +47,7 @@ public:
   bool AddInteractor(Interactor::Pointer interactor);
 
   //##Documentation
-  //## @brief derived from mitk::Interactor; merges all jurisdictions of lower interactors
+  //## @brief derived from mitk::Interactor; merges all jurisdictions of lower interactors with this jurisdiction
   virtual float CalculateJurisdiction(StateEvent const* stateEvent) const;
 
 
@@ -54,6 +55,10 @@ protected:
   //##Documentation
   //## @brief transmitts the event
   bool TransmitEvent( StateEvent const* stateEvent );
+
+  //##Documentation
+  //## @brief calculates and merges all jurisdictions of lower interactors
+  float CalculateLowerJurisdiction(StateEvent const* stateEvent) const;
 
   //##Documentation
   //## @brief stores pointers on hierarchical lower Interactors, that are in Mode selected or Subselected

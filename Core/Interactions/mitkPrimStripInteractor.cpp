@@ -209,7 +209,7 @@ bool mitk::PrimStripInteractor::ExecuteAction(Action* action, mitk::StateEvent c
   		if (posEvent == NULL) 
         return false;
 
-      bool hit = true;
+		//bool hit = true; /* \todo remove line */
       //var's for EvaluatePosition
       mitk::Point3D point = posEvent->GetWorldPosition();
       unsigned long cellId = 0;

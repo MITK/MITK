@@ -11,7 +11,8 @@ namespace mitk {
 //## @brief Interactor for Affine transformations translate, rotate 
 //## @ingroup Interaction
 //## 
-//## An object of this class can translate, rotate and scale the Data
+//## An object of this class can translate, rotate and scale the data objects 
+//## by modifying its geometry.
 class AffineInteractor : public Interactor
 {
 public:
@@ -35,8 +36,7 @@ protected:
 
   mitk::ITKPoint3D m_lastScalePosition;
   mitk::ITKPoint3D m_lastScaleData;
-  mitk::ITKPoint3D m_lastRotatePosition;
-  mitk::ITKPoint3D m_lastRotateData;
+  mitk::ITKVector3D m_lastRotatePosition;
   float m_ScaleFactor;
 };
 

@@ -14,7 +14,6 @@ namespace mitk {
 class Interactor : public StateMachine
 {
 public:
-
   mitkClassMacro(Interactor,StateMachine);
 
   //##Documentation
@@ -35,7 +34,6 @@ public:
   virtual bool ExecuteSideEffect(int sideEffectId, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId);
 
 protected:
-
   //##Documentation
   //## @brief Pointer to the data, this object handles the Interaction for
   DataTreeNode::Pointer m_DataTreeNode;

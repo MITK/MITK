@@ -198,7 +198,7 @@ void mitk::PointSet::ExecuteOperation(Operation* operation)
     }
     break;
 	default:
-		NULL;
+		break;
 	}
 	//to tell the mappers, that the data is modifierd and has to be updated
 	this->Modified();

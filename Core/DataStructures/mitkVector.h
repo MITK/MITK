@@ -38,66 +38,66 @@ extern const ScalarType epsSquared;
 template <class Tout>
   inline void FillVector3D(Tout& out, ScalarType x, ScalarType y, ScalarType z)
 {
-  out[0] = x;
-  out[1] = y;
-  out[2] = z;
+  out[0] = (Tout) x;
+  out[1] = (Tout) y;
+  out[2] = (Tout) z;
 }
 
 
 template <class Tin, class Tout>
   inline void itk2vtk(const Tin& in, Tout& out)
 {
-  out[0]=in[0];
-  out[1]=in[1];
-  out[2]=in[2];
+  out[0]=(Tout) in[0];
+  out[1]=(Tout) in[1];
+  out[2]=(Tout) in[2];
 }
 
 template <class Tin, class Tout>
   inline void vtk2itk(const Tin& in, Tout& out)
 {
-  out[0]=in[0];
-  out[1]=in[1];
-  out[2]=in[2];
+  out[0]=(Tout) in[0];
+  out[1]=(Tout) in[1];
+  out[2]=(Tout) in[2];
 }
 
 template <class Tin, class Tout>
   inline void vnl2vtk(const vnl_vector<Tin>& in, Tout *out)
 {
-  int i;
+  unsigned int i;
   for(i=0; i<in.size();++i)
-    out[i]=in[i];
+    out[i]=(Tout) in[i];
 }
 
 template <class Tin>
   inline void vtk2vnl(const Tin *in, vnl_vector<Tin>& out)
 {
-  int i;
+  unsigned int i;
   for(i=0; i<out.size();++i)
-    out[i]=in[i];
+    out[i]=(Tout) in[i];
 }
 
 template <class Tin>
   inline void vtk2vnlref(const Tin *in, vnl_vector_ref<Tin>& out)
 {
-  int i;
+  unsigned int i;
   for(i=0; i<out.size();++i)
-    out[i]=in[i];
+    out[i]=(Tout) in[i];
 }
 
 template <class Tin, class Tout, unsigned int n>
   inline void vnl2vtk(const vnl_vector_fixed<Tin, n>& in, Tout *out)
 {
-  int i;
+  unsigned int i;
   for(i=0; i<in.size();++i)
-    out[i]=in[i];
+    out[i]=(Tout) in[i];
 }
 
 template <class Tin, unsigned int n>
   inline void vtk2vnl(const Tin *in, vnl_vector_fixed<Tin, n>& out)
 {
-  int i;
+  unsigned int i;
   for(i=0; i<out.size();++i)
-    out[i]=in[i];
+    out[i]=(Tout) in[i];
 }
 
 template <class T, unsigned int NVectorDimension>

@@ -4,7 +4,7 @@
 #define MITK_WEAKPOINTER_PROBLEM_WORKAROUND_ENABLED
 
 //##ModelId=3E3FE04202B9
-mitk::BaseData::BaseData() : m_SmartSourcePointer(NULL), m_SourceOutputIndexDuplicate(0), m_Unregistering(false), m_ExternalReferenceCount(-1), m_CalculatingExternalReferenceCount(false)
+mitk::BaseData::BaseData() : m_SmartSourcePointer(NULL), m_SourceOutputIndexDuplicate(0), m_Unregistering(false), m_CalculatingExternalReferenceCount(false), m_ExternalReferenceCount(-1)
 {
   m_Geometry3D = Geometry3D::New();
   m_PropertyList = PropertyList::New();

@@ -221,7 +221,7 @@ void mitk::Geometry3D::ExecuteOperation(Operation* operation)
     break;  
   }
   default:
-    NULL;
+    break;
 	}
 }
 

@@ -72,24 +72,6 @@ bool mitk::SlicedGeometry3D::SetGeometry2D(mitk::Geometry2D* geometry2D, int s)
   return false;
 }
 
-//##ModelId=3E3453C703AF
-//void mitk::SlicedGeometry3D::Initialize(unsigned int slices)
-//{
-//  Superclass::Initialize();
-//  m_Slices = slices;
-//
-//  m_Geometry2Ds.clear();
-// 
-//  Geometry2D::Pointer gnull=NULL;
-// 
-//  m_Geometry2Ds.reserve(m_Slices);
-//  m_Geometry2Ds.assign(m_Slices, gnull);
-// 
-//  Vector3D spacing;
-//  spacing.Fill(1.0);
-//  SetSpacing(spacing);
-//}
-
 void mitk::SlicedGeometry3D::Initialize(unsigned int slices)
 {
   Superclass::Initialize();
@@ -174,46 +156,8 @@ void mitk::SlicedGeometry3D::InitializeEvenlySpaced(mitk::Geometry2D* geometry2D
   geometry2D->UnRegister();
 }
 
-  //mitk::Vector3D oldspacing;
-  //const AffineTransform3D::MatrixType::InternalMatrixType & vnlmatrix = m_IndexToWorldTransform->GetMatrix().GetVnlMatrix();
-  //oldspacing[0] = vnlmatrix.get_column(0).two_norm();
-  //oldspacing[1] = vnlmatrix.get_column(1).two_norm();
-  //oldspacing[2] = vnlmatrix.get_column(2).two_norm();
-
-  //mitk::Vector3D dist = spacing-oldspacing;
-  ////FIXME: directionvector beachten!!!
-  //if(dist.GetSquaredNorm()>mitk::eps)
-  //{
-  //  mitk::AffineTransform3D::Pointer transform = mitk::AffineTransform3D::New();
-  //  AffineTransform3D::MatrixType::InternalMatrixType newvnlmatrix = vnlmatrix;
-  //  newvnlmatrix(0,0) *= spacing[0]/oldspacing[0];
-  //  newvnlmatrix(1,1) *= spacing[1]/oldspacing[1];
-  //  newvnlmatrix(2,2) *= spacing[2]/oldspacing[2];
-  //  AffineTransform3D::MatrixType newmatrix;
-  //  newmatrix = newvnlmatrix;
-  //  transform->SetMatrix(newmatrix);
-  //  transform->SetOffset(m_IndexToWorldTransform->GetOffset());    
-  //  SetIndexToWorldTransform(transform);
-  //}
-
-//void mitk::SlicedGeometry3D::InitializeMatrixByFirstSliceAndSpacing(...)
-//{
-//      const mitk::BoundingBox::BoundsArrayType& firstgeometry2dbounds = geometry2D->GetBounds();
-//
-//      mitk::BoundingBox::Pointer boundingBox=mitk::BoundingBox::New();
-//
-//      mitk::BoundingBox::PointType p;
-//      p[0] = firstgeometry2dbounds[0]; p[1] = firstgeometry2dbounds[2]; p[2] = 0;
-//      boundingBox->SetMinimum(p);
-//      p[0] = firstgeometry2dbounds[1]; p[1] = firstgeometry2dbounds[3]; p[2] = m_Slices;
-//      boundingBox->SetMaximum(p);
-//
-//      m_BoundingBox = boundingBox;
-//}
-//
-
 //##ModelId=3E15572E0269
-mitk::SlicedGeometry3D::SlicedGeometry3D() : m_Slices(0), m_EvenlySpaced(true)
+mitk::SlicedGeometry3D::SlicedGeometry3D() : m_EvenlySpaced(true), m_Slices(0)
 {
   FillVector3D(m_FloatSpacing, 0,0,0);
   Initialize(m_Slices);
@@ -351,7 +295,7 @@ void mitk::SlicedGeometry3D::SetTimeBoundsInMS(const mitk::TimeBounds& timebound
 {
   Superclass::SetTimeBoundsInMS(timebounds);
 
-  int s;
+  unsigned int s;
   for(s=0; s<m_Slices; ++s)
   {
     if(m_Geometry2Ds[s].IsNotNull())

@@ -253,7 +253,7 @@ bool mitk::Mesh::GetPointIds(unsigned long cellId, unsigned long lineId, int &id
 
     PointIdIterator pointIdIt = cell->PointIdsBegin();
     PointIdIterator pointIdEnd = cell->PointIdsEnd();
-    int counter = 0;
+    unsigned int counter = 0;
     while (pointIdIt != pointIdEnd)
     {
       if(counter == lineId)

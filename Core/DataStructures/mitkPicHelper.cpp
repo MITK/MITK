@@ -143,7 +143,7 @@ bool mitk::PicHelper::SetGeometry2D(ipPicDescriptor* pic, int s, SlicedGeometry3
     ipPicTSV_t *tsv;
     if ( (tsv = ipPicQueryTag( pic, "REAL PIXEL SIZES" )) != NULL)
     {    
-      int count = tsv->n[1];
+      unsigned int count = (unsigned int) tsv->n[1];
       float* value = (float*) tsv->value;
       mitk::Vector3D pixelSize;
       ScalarType zPosition = 0.0f;

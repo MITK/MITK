@@ -59,7 +59,6 @@ mitk::EventMapper::EventMapper()
 {
 
 //map with string to key for mapping string from xml-file to int
-    m_EventConstMap;
 	m_EventConstMap["Type_None"] = 0;		// invalid event //@TODO:replace with mitk::Type_None
 	m_EventConstMap["Type_Timer"] = 1;		// timer event
 	m_EventConstMap["Type_MouseButtonPress"] = 2;		// mouse button pressed

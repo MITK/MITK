@@ -60,3 +60,9 @@ QPushButton* QmitkSimpleExampleControls::getReInitializeNavigatorsButton()
 {
     return reInitializeNavigatorsButton;
 }
+
+
+QWidget* QmitkSimpleExampleControls::getMovieNavigatorTime()
+{
+    return movieNavigatorTime;
+}

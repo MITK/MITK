@@ -41,10 +41,10 @@ class DisplayPositionEvent : public Event
     //## @params sender: the renderer that caused that event
     //##        type, button, buttonState, key: information from the Event
     //##        displPosition: the 2D Position of the mouse
-    DisplayPositionEvent(mitk::BaseRenderer* sender, int type, int button, int buttonState, int key, const mitk::Point2D& displPosition);
+    DisplayPositionEvent(BaseRenderer* sender, int type, int button, int buttonState, int key, const Point2D& displPosition);
 
     const Point2D& GetDisplayPosition() const;
-    void SetDisplayPosition(const mitk::Point2D& displPosition) { m_DisplayPosition = displPosition; }
+    void SetDisplayPosition(const Point2D& displPosition) { m_DisplayPosition = displPosition; }
   private:
     Point2D m_DisplayPosition;
 };

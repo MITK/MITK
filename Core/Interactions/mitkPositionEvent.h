@@ -46,7 +46,7 @@ public:
   //##        displPosition: the 2D Position e.g. from the mouse
   //##        worldPosition: the 3D position e.g. from a picking 
   //##        
-  PositionEvent(mitk::BaseRenderer* sender, int type, int button, int buttonState, int key, const mitk::Point2D& displPosition, const mitk::Point3D& worldPosition);
+  PositionEvent(BaseRenderer* sender, int type, int button, int buttonState, int key, const Point2D& displPosition, const Point3D& worldPosition);
 
   //##ModelId=3EDC8EEC00F8
   const Point3D& GetWorldPosition() const;

@@ -31,6 +31,9 @@ template<class T>
 class Tuple3 {
 /*
  * $Log$
+ * Revision 1.4  2003/08/14 16:22:51  max
+ * added vmless function object, which allows Tuple3 to be used in sorted stl-containers
+ *
  * Revision 1.3  2003/04/22 14:42:11  max
  * made inclusions of vecmath header files "local" (for gcc 3.3 support)
  *
@@ -538,7 +541,48 @@ VM_BEGIN_NS
 typedef Tuple3<double> Tuple3d;
 typedef Tuple3<float> Tuple3f;
 
-VM_END_NS
 
+
+/**
+ * Function object which provides a strict weak ordering of tuples. This allows
+ * tuples/points/vectors to be used in sorted STL containers like maps, sets
+ * etc...
+ */
+template <typename T>
+struct vmless
+{
+    /**
+     * Orders the tuples by their z,y and x values. z has the highest priority, x the smallest
+     * @param vec1 the first tuple
+     * @param vec2 the second type
+     * @returns true if vec1 < vec2, false otherwise.
+     */
+    bool operator() ( const Tuple3<T>& t1, const Tuple3<T>& t2 ) const
+    {
+        if ( t1.z < t2.z )
+            return true;
+        else if ( t1.z > t2.z )
+            return false;
+        else if ( t1.z == t2.z )
+        {
+            if ( t1.y < t2.y )
+                return true;
+            else if ( t1.y > t2.y )
+                return false;
+            else if ( t1.y == t2.y )
+            {
+                if ( t1.x < t2.x )
+                    return true;
+                else if ( t1.x > t2.x )
+                    return false;
+                else if ( t1.x == t2.x )
+                    return false;
+            }
+        }
+        return false; //the impossible happened!
+    }
+};
+
+VM_END_NS
 
 #endif /* TUPLE3_H */

@@ -8,21 +8,6 @@
 
 #include <mitkInteractionConst.h>
 
-
-//inline void UpdateAllWidgets()//@todo global quickimplementation. is to be changed into Modified Data...
-//{
-//    QWidgetList *list = QApplication::allWidgets();
-//    QWidgetListIt it( *list );         // iterate over the widgets
-//    QWidget * w;
-//    while ( (w=it.current()) != 0 ) {  // for each widget...
-//        ++it;
-//        w->update();
-//    }
-//    delete list;                      // delete the list, not the widgets
-//
-//}
-
-//##ModelId=3F0177E901BD
 mitk::Contour::Contour() :
 m_ContourPath (PathType::New()),
 m_CurrentWindow ( NULL ),
@@ -32,7 +17,6 @@ m_Vertices ( BoundingBoxType::PointsContainer::New() )
   m_Geometry3D->Initialize();
 }
 
-//##ModelId=3F0177E901BE
 mitk::Contour::~Contour()
 {}
 
@@ -47,7 +31,6 @@ void mitk::Contour::AddVertex(mitk::ITKPoint3D newPoint)
   m_ContourPath->AddVertex(idx);
 }
 
-//##ModelId=3F0177E901BF
 void mitk::Contour::ExecuteOperation(Operation* op)
 {
   mitk::PointOperation * pointOp = dynamic_cast<mitk::PointOperation*>( op );
@@ -75,7 +58,6 @@ void mitk::Contour::ExecuteOperation(Operation* op)
   }
 }
 
-//##ModelId=3F0177E901EE
 void mitk::Contour::UpdateOutputInformation()
 {
   float mitkBounds[6];
@@ -101,21 +83,20 @@ void mitk::Contour::UpdateOutputInformation()
   m_Geometry3D->SetBoundingBox(mitkBounds);
 }
 
-//##ModelId=3F0177E901FB
 void mitk::Contour::SetRequestedRegionToLargestPossibleRegion()
 {
 }
-//##ModelId=3F0177E901FD
+
 bool mitk::Contour::RequestedRegionIsOutsideOfTheBufferedRegion()
 {
     return false;
 }
-//##ModelId=3F0177E901FF
+
 bool mitk::Contour::VerifyRequestedRegion()
 {
     return false;
 }
-//##ModelId=3F0177E9020B
+
 void mitk::Contour::SetRequestedRegion(itk::DataObject*)
 {
 }

@@ -11,7 +11,7 @@ namespace mitk {
 
 class BaseRenderer;
 
-//##ModelId=3F0189F0014F
+//##
 //##Documentation
 //## @brief OpenGL-based mapper to display a Geometry2D in a 2D window
 //## @ingroup Mapper
@@ -22,29 +22,22 @@ class BaseRenderer;
 class ContourMapper2D : public GLMapper2D
 {
 public:
-    //##ModelId=3F0189F00363
+    
     mitkClassMacro(ContourMapper2D, Mapper2D);
 
-    //##ModelId=3F0189F00354
     itkNewMacro(Self);
 
-    //##ModelId=3F0189F00373
     virtual void Paint(mitk::BaseRenderer * renderer);
-
 
     const mitk::Contour * GetInput(void);
 
-    //##ModelId=3F0189F00376
     virtual void Update();
 
 protected:
-    //##ModelId=3F0189F00378
     ContourMapper2D();
 
-    //##ModelId=3F0189F00382
     virtual ~ContourMapper2D();
 
-    //##ModelId=3F0189F00384
     virtual void GenerateOutputInformation();
 };
 

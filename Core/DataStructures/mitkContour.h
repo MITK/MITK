@@ -25,9 +25,7 @@ public:
   typedef itk::BoundingBox<unsigned long, 3, ScalarType>        BoundingBoxType;
 
 
-  //##ModelId=3F0177E901BF
-	void ExecuteOperation(Operation* operation);
-
+ 	void ExecuteOperation(Operation* operation);
 
   void AddVertex(mitk::ITKPoint3D newPoint);
 
@@ -37,22 +35,15 @@ public:
   void SetCurrentWindow(mitk::RenderWindow* rw);
 
 	//virtual methods, that need to be implemented
-  //##ModelId=3F0177E901EE
 	virtual void UpdateOutputInformation();
-  //##ModelId=3F0177E901FB
 	virtual void SetRequestedRegionToLargestPossibleRegion();
-  //##ModelId=3F0177E901FD
 	virtual bool RequestedRegionIsOutsideOfTheBufferedRegion();
-  //##ModelId=3F0177E901FF
 	virtual bool VerifyRequestedRegion();
-  //##ModelId=3F0177E9020B
 	virtual void SetRequestedRegion(itk::DataObject *data);
 
 protected:
-  //##ModelId=3F0177E901BD
 	Contour();
 
-  //##ModelId=3F0177E901BE
 	virtual ~Contour();
 
 private:

@@ -6,9 +6,6 @@
 #include "mitkContour.h"
 #include "mitkBaseRenderer.h"
 
-
-//#include <vtkSphereSource.h>
-//#include <vtkAppendPolyData.h>
 #include <vtkPolyData.h>
 
 class vtkPolyDataMapper;
@@ -18,9 +15,8 @@ class vtkTubeFilter;
 
 namespace mitk {
 
-//##ModelId=3E70F60202EA
 //##Documentation
-//## @brief Vtk-based mapper for PointList
+//## @brief Vtk-based mapper for mitk::Contour
 //## @ingroup Mapper
 class ContourVtkMapper3D : public BaseVtkMapper3D
 {
@@ -31,20 +27,17 @@ class ContourVtkMapper3D : public BaseVtkMapper3D
     itkNewMacro(Self);
 
 
-    //##ModelId=3E70F60301E9
     virtual void GenerateData();
 
     virtual void GenerateOutputInformation();
 
-    //##ModelId=3E70F60301D5
     virtual const mitk::Contour* GetInput();
 
 
-    //##ModelId=3EF19FA803BF
     //##Documentation
     //## @brief Called by BaseRenderer when an update is required
     virtual void Update(mitk::BaseRenderer* renderer);
-    //##ModelId=3EF1B44001D5
+
     virtual void Update();
 
     virtual vtkProp* GetProp();
@@ -52,10 +45,7 @@ class ContourVtkMapper3D : public BaseVtkMapper3D
 
   protected:
    
-   // virtual void GenerateOutputInformation();
-   
     ContourVtkMapper3D();
-
    
     virtual ~ContourVtkMapper3D();
 

@@ -14,18 +14,15 @@
 #endif
 
 
-//##ModelId=3F0189F00378
 mitk::ContourMapper2D::ContourMapper2D()
 {
 }
 
-//##ModelId=3F0189F00382
 mitk::ContourMapper2D::~ContourMapper2D()
 {
 }
 
 
-//##ModelId=3F0189F00373
 void mitk::ContourMapper2D::Paint(mitk::BaseRenderer * renderer)
 {
   if(IsVisible(renderer)==false) return;
@@ -83,9 +80,6 @@ void mitk::ContourMapper2D::Paint(mitk::BaseRenderer * renderer)
   }
 }
 
-
-
-//##ModelId=3F0189F00366
 const mitk::Contour* mitk::ContourMapper2D::GetInput(void)
 {
 	if (this->GetNumberOfInputs() < 1)

@@ -27,41 +27,29 @@
 #include <stdlib.h>
 
 
-//##ModelId=3E70F60301E9
 void mitk::ContourVtkMapper3D::GenerateData()
 {
 }
 
-//##ModelId=3E70F60301F2
-//void mitk::ContourVtkMapper3D::GenerateOutputInformation()
-//{
-//}
 
-//##ModelId=3E70F60301F4
 mitk::ContourVtkMapper3D::ContourVtkMapper3D()
 {
     m_VtkPolyDataMapper = vtkPolyDataMapper::New();
     m_Actor = vtkActor::New();
     m_Actor->SetMapper(m_VtkPolyDataMapper);
-  
-		//m_Prop3D = m_Actor;
-		//m_Prop3D->Register(NULL);
 
-//		m_vtkPointList = vtkAppendPolyData::New();
-		m_Contour = vtkPolyData::New();
+    m_Contour = vtkPolyData::New();
  	  m_TubeFilter = vtkTubeFilter::New();
 
 
 }
 
-//##ModelId=3E70F60301F5
 mitk::ContourVtkMapper3D::~ContourVtkMapper3D()
 {
     m_VtkPolyDataMapper->Delete();
     m_Actor->Delete();
 }
 
-//##ModelId=3EF19FA803BF
 void mitk::ContourVtkMapper3D::Update(mitk::BaseRenderer* renderer)
 {
     if(IsVisible(renderer)==false)
@@ -71,29 +59,17 @@ void mitk::ContourVtkMapper3D::Update(mitk::BaseRenderer* renderer)
     }
     m_Actor->VisibilityOn();
 
-		/*m_vtkPointList->Delete();
-		m_vtkTextList->Delete();
-		m_Contour->Delete();*/
-
-//		m_vtkPointList = vtkAppendPolyData::New();
-//		m_vtkTextList = vtkAppendPolyData::New();
 		m_Contour = vtkPolyData::New();
 
 
     mitk::Contour::Pointer input  = const_cast<mitk::Contour*>(this->GetInput());
-    //mitk::Contour::PathType contourPath = input->GetContourPath();
 		bool makeContour = true;
-//		if (dynamic_cast<mitk::BoolProperty *>(this->GetDataTreeNode()->GetProperty("contour").GetPointer()) == NULL)
-//			makeContour = false;
-//		else
-//			makeContour = dynamic_cast<mitk::BoolProperty *>(this->GetDataTreeNode()->GetProperty("contour").GetPointer())->GetBool();
-//
-		if (makeContour)
+
+    if (makeContour)
 		{
 		  vtkPolyData *m_Contour = vtkPolyData::New();
 		  vtkPoints *points = vtkPoints::New();
 		  vtkCellArray *lines = vtkCellArray::New();
-      vtkCellArray *polys = vtkCellArray::New();
      
       Contour::InputType idx = input->GetContourPath()->StartOfInput();
       Contour::OutputType point;
@@ -118,13 +94,10 @@ void mitk::ContourVtkMapper3D::Update(mitk::BaseRenderer* renderer)
       int cell[2] = {ptIndex-1,0};
 			lines->InsertNextCell(2,cell);
       
-      polys->InsertNextCell(0, (vtkIdType*)points->GetData());
 
 			m_Contour->SetPoints(points);
 		  points->Delete();
   		m_Contour->SetLines(lines);
-//  		m_Contour->SetPolys(polys);
-		  polys->Delete();
 			m_Contour->Update();
 
 		  m_TubeFilter->SetInput(m_Contour);
@@ -140,7 +113,6 @@ void mitk::ContourVtkMapper3D::Update(mitk::BaseRenderer* renderer)
     StandardUpdate();
 }
 
-//##ModelId=3EF1B44001D5
 void mitk::ContourVtkMapper3D::Update()
 {
 }

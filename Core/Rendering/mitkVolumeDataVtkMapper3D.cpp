@@ -40,6 +40,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkImageChangeInformation.h>
 #include <vtkImageWriter.h>
 #include <vtkVolumeTextureMapper2D.h> 
+#include <vtkImageData.h>
 #include <vtkLODProp3D.h>
 #include <vtkImageResample.h>
 #include <vtkRenderWindow.h>
@@ -158,6 +159,8 @@ void mitk::VolumeDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
   }
 
   mitk::Image* input  = const_cast<mitk::Image *>(this->GetInput());
+  if((input==NULL) || (input->IsInitialized()==false))
+    return;
 
   // FIXME: const_cast; maybe GetVtkImageData can be made const by using volatile    
   const TimeSlicedGeometry* inputtimegeometry = dynamic_cast<const TimeSlicedGeometry*>(input->GetUpdatedGeometry());
@@ -178,9 +181,24 @@ void mitk::VolumeDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
   vtkImageData* inputData = input->GetVtkImageData(timestep);
   if(inputData==NULL)
     return;
+
   m_ImageCast->SetInput( inputData );
 
 //  m_ImageCast->Update();    
+
+  //trying to avoid update-problem, when size of input changed. Does not really help much.
+  if(m_ImageCast->GetOutput()!=NULL)
+  {
+    int * inputWE=inputData->GetWholeExtent();
+    int * outputWE=m_UnitSpacingImageFilter->GetOutput()->GetExtent();
+    if(m_ImageCast->GetOutput()!=NULL && memcmp(inputWE, outputWE,sizeof(int)*6) != 0)
+    {
+//      m_ImageCast->GetOutput()->SetUpdateExtentToWholeExtent();
+//      m_UnitSpacingImageFilter->GetOutput()->SetUpdateExtentToWholeExtent();
+      m_UnitSpacingImageFilter->UpdateWholeExtent();
+    }
+  }
+
   //m_VtkVolumeMapper->SetInput( m_UnitSpacingImageFilter->GetOutput() );
   //m_Volume->SetMapper( m_VtkVolumeMapper );
   m_Resampler->SetInput(m_UnitSpacingImageFilter->GetOutput());  

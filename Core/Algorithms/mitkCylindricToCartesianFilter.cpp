@@ -33,7 +33,7 @@ void _transform(ipPicDescriptor *pic, ipPicDescriptor *dest, T outsideValue, flo
   nxy_size=nx_size*ny_size;
   nz_size=256;*/
 
-  dest_start=dp=(T*)dest->data;
+  dest_start=dp=((T*)dest->data)+nxy_size*(nz_size-1);
 
   ipInt2_t y;
   //	int size=_ipPicElements(pic);
@@ -52,14 +52,14 @@ void _transform(ipPicDescriptor *pic, ipPicDescriptor *dest, T outsideValue, flo
     {
       x_start=-r0plusphi0; x_end=nx_size+r0plusphi0;
 
-      for(z=0;z<nz_size;++z,dp+=nxy_size-x_start)
+      for(z=0;z<nz_size;++z,dp+=-nxy_size-x_start)
         for(x=0;x<x_start;++x,++dp)
           *dp=outsideValue;		
-      dp-=nxy_size*nz_size; dp+=x_end;
-      for(z=0;z<nz_size;++z,dp+=nxy_size-x_start)
+      dp+=nxy_size*nz_size; dp+=x_end;
+      for(z=0;z<nz_size;++z,dp+=-nxy_size-x_start)
         for(x=x_end;x<nx_size;++x,++dp)
           *dp=outsideValue;				
-      dp-=nxy_size*nz_size; dp-=x_end;
+      dp+=nxy_size*nz_size; dp-=x_end;
 
       fr+=x_start;
       fphi+=x_start;
@@ -94,14 +94,14 @@ void _transform(ipPicDescriptor *pic, ipPicDescriptor *dest, T outsideValue, flo
 
       float *fzp;
 
-      for(z=0;z<z_start;++z, dp+=nxy_size)
+      for(z=0;z<z_start;++z, dp-=nxy_size)
         *dp=outsideValue;
 
       ztp=zt+z_start;
       fzp=fz+z_start;
       step=*ztp;
 
-      for(z=z_start;z<nz_size;++z, dp+=nxy_size)
+      for(z=z_start;z<nz_size;++z, dp-=nxy_size)
       {
         register T *opt=op;
         opt+=step;
@@ -121,7 +121,7 @@ void _transform(ipPicDescriptor *pic, ipPicDescriptor *dest, T outsideValue, flo
         step=*(++ztp);
       }
 
-      dp-=nxy_size*nz_size;
+      dp+=nxy_size*nz_size;
     }
     fr+=nx_size-x_end;
     fphi+=nx_size-x_end;
@@ -336,9 +336,9 @@ void mitk::CylindricToCartesianFilter::GenerateOutputInformation()
   if (pointProp.IsNotNull() )
   {
     Point3<int> tp = pointProp->GetValue();
+    tp.z = tp.y * scale;
     tp.x = tmpDimensions[0]/2;
     tp.y = tmpDimensions[0]/2;
-    tp.z = tp.z * scale;
     mitk::Point3iProperty::Pointer pointProp = new mitk::Point3iProperty(tp);
     output->SetProperty("ORIGIN", pointProp);
   }

@@ -9,6 +9,7 @@ mitk::DataTree::DataTree() :
 
 {
 
+	addTreeChangeListener( this );
 }
 
 

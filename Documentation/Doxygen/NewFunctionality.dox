@@ -1,0 +1,13 @@
+/**
+\page NewFunctionalityPage How to create a new functionality
+
+
+\section Build the graphical functionality generator 
+Do a CVS checkout of mitk.
+Configure a cmake-Build for the Directory Build/Tools/InsertNewFunctionality
+Build it (does not work on Windows yet, CMake bug)
+\section Start the graphical functionality generator 
+On windows: double click on the generated InsertNewFunctionality.jar
+On linux: \c java -jar InsertNewFunctionality.jar
+
+*/

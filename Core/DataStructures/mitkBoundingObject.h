@@ -1,22 +1,21 @@
 #ifndef BOUNDINGOBJECT_H_HEADER_INCLUDED
 #define BOUNDINGOBJECT_H_HEADER_INCLUDED
 
-//#include "mitkBaseData.h"
 #include <mitkSurfaceData.h>
-#include "mitkVector.h"
 
 namespace mitk {
 
 //##Documentation
-//## @brief Data class containing an ellipsoid
-//## @ingroup Geometry
+//## @brief superclass of the different bounding objects (cylinder, cuboid,...)
+//## Manages generic functions and provides an interface for IsInside()
+//## calculates a generic bounding box
+//## @ingroup Data
 class BoundingObject : public mitk::SurfaceData     //BaseData
 {
 public:
   mitkClassMacro(BoundingObject, mitk::SurfaceData);  
-//  itkNewMacro(Self);
 
-  virtual void UpdateOutputInformation() = 0;
+  virtual void UpdateOutputInformation();// = 0;
   void SetRequestedRegionToLargestPossibleRegion();
   bool RequestedRegionIsOutsideOfTheBufferedRegion();
   virtual bool VerifyRequestedRegion();
@@ -27,8 +26,6 @@ protected:
   BoundingObject();
   virtual ~BoundingObject();
 };
-  
-  
+
 }
 #endif /* BOUNDINGOBJECT_H_HEADER_INCLUDED */
-

@@ -26,7 +26,7 @@ namespace mitk {
 //##Documentation
 //## @brief OpenGL-texture-based mapper to display slices of an image
 //## @ingroup Mapper
-//## @todo the resampling is still left-handed, the flipping is done by OpenGL.
+//## Currently implemented for mapping on PlaneGeometry and AbstractTransformGeometry.
 //## This results in a flipped version when used for texture mapping. Furthermore,
 //## not the complete rectangular area described by the Geometry2D from the renderer
 //## is resampled, @em if the Geometry2D is larger than the image dimension in the requested

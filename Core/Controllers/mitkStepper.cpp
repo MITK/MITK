@@ -52,7 +52,7 @@ void mitk::Stepper::Last()
 //##ModelId=3DF8B91502F8
 void mitk::Stepper::First()
 {
-  if(m_Pos != m_Steps-1)
+  if(m_Pos != 0)
   {
   	m_Pos = 0;
     Modified();

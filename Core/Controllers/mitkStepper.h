@@ -41,13 +41,13 @@ public:
   itkNewMacro(Self);
 
   itkGetMacro(Pos, unsigned int);
-  itkSetClampMacro(Pos, unsigned int, 0, m_Steps);
+  itkSetClampMacro(Pos, unsigned int, 0, m_Steps-1);
 
   itkGetMacro(Steps, unsigned int);
   itkSetMacro(Steps, unsigned int);
 
   itkGetMacro(StepSize, unsigned int);
-  itkSetClampMacro(StepSize, unsigned int, 0, m_Steps);
+  itkSetClampMacro(StepSize, unsigned int, 0, m_Steps-1);
 
   virtual float ConvertPosToUnit(unsigned int posValue);
   virtual unsigned int ConvertUnitToPos(float unitValue);

@@ -64,6 +64,8 @@ class OpenGLRenderer : public BaseRenderer
     //## @warning Always call Update() before, which checks, whether there are vtk-based-mappers.
 	virtual void UpdateVtkActors();
 
+
+		vtkRenderer * GetVtkRenderer(){return m_VtkRenderer;};
 protected:
     //##ModelId=3E33145B005A
     virtual void Paint();

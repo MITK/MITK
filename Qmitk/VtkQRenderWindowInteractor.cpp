@@ -306,6 +306,8 @@ void VtkQRenderWindowInteractor::timerEvent ( QTimerEvent * )
 //##
 VTK_CREATE_CREATE_FUNCTION(VtkQRenderWindowInteractor);
 
+vtkStandardNewMacro(VtkQRenderWindowInteractorFactory);
+
 VtkQRenderWindowInteractorFactory*  VtkQRenderWindowInteractorFactory::m_Factory = NULL;
 
 //##
@@ -341,5 +343,4 @@ const char* VtkQRenderWindowInteractorFactory::GetDescription()
   return "Factory for VtkQRenderWindowInteractor";
 }
 
-VtkQRenderWindowInteractorFactory vtkQRenderWindowInteractorFactory;
-
+VTK_FACTORY_INTERFACE_IMPLEMENT(VtkQRenderWindowInteractorFactory)

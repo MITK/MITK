@@ -153,6 +153,7 @@ class VtkQRenderWindowInteractorFactory : public vtkObjectFactory
 {
   static VtkQRenderWindowInteractorFactory* m_Factory;
 public:
+  static VtkQRenderWindowInteractorFactory *New();
   VtkQRenderWindowInteractorFactory( );
   ~VtkQRenderWindowInteractorFactory( );
   virtual const char* GetVTKSourceVersion();

@@ -25,4 +25,10 @@ public:
 
 typedef iilWidget RenderWindowBase;
 
+namespace mitk {
+    
+typedef ::QMouseEvent MouseEvent;
+typedef ::QKeyEvent KeyEvent;
+#define mitkEnum Qt
+}
 #endif

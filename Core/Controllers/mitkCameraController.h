@@ -13,21 +13,17 @@ namespace mitk {
 class CameraController : public BaseController
 {
 public:
-    /** Standard class typedefs. */
-    //##ModelId=3E3AE7F4026B
-    typedef CameraController               Self;
-    //##ModelId=3E3AE7F40289
-    typedef BaseController                 Superclass;
-    //##ModelId=3E3AE7F402A7
-    typedef itk::SmartPointer<Self>        Pointer;
-    //##ModelId=3E3AE7F402C5
-    typedef itk::SmartPointer<const Self>  ConstPointer;
+    mitkClassMacro(CameraController, BaseController);
 
     /** Method for creation through the object factory. */
     itkNewMacro(Self);
 
-    /** Run-time type information (and related methods). */
-    itkTypeMacro(CameraController,BaseController);
+    virtual void Resize(int w, int h);
+
+    virtual void MousePressEvent(mitk::MouseEvent*);
+    virtual void MouseReleaseEvent(mitk::MouseEvent*);
+    virtual void MouseMoveEvent(mitk::MouseEvent*);
+    virtual void KeyPressEvent(mitk::KeyEvent*);
 protected:
     //##ModelId=3E3AE7440312
     CameraController();

@@ -4,15 +4,19 @@
 #include "BaseVtkMapper2D.h"
 #include "BaseVtkMapper3D.h"
 #include "LevelWindow.h"
+#include "mitkVtkInteractorCameraController.h"
+#include "mitkVtkRenderWindow.h"
 
 #include <vtkRenderer.h>
-#include <vtkRenderWindow.h>
 #include <vtkLight.h>
+#include <vtkRenderWindow.h>
 
 //##ModelId=3E33ECF301AD
 mitk::OpenGLRenderer::OpenGLRenderer() : m_IilImage(0)
 {
-
+    m_CameraController=NULL;
+    m_CameraController = VtkInteractorCameraController::New();
+    m_CameraController->AddRenderer(this);
 }
 
 //##ModelId=3E3D28AB0018
@@ -20,12 +24,12 @@ void mitk::OpenGLRenderer::SetData(mitk::DataTreeIterator* iterator)
 {
     BaseRenderer::SetData(iterator);
 
-    m_VtkRenderWindow->RemoveRenderer(m_VtkRenderer);
+    m_MitkVtkRenderWindow->RemoveRenderer(m_VtkRenderer);
     m_VtkRenderer->Delete();
 
     m_VtkRenderer = vtkRenderer::New();
     m_VtkRenderer->SetLayer(0);
-    m_VtkRenderWindow->AddRenderer( this->m_VtkRenderer );
+    m_MitkVtkRenderWindow->AddRenderer( this->m_VtkRenderer );
 
     m_Light->Delete();
     m_Light = vtkLight::New();
@@ -156,7 +160,7 @@ void mitk::OpenGLRenderer::Render()
         delete it;
 
        // if(m_VtkMapperPresent)
-            m_VtkRenderWindow->Render();
+            m_MitkVtkRenderWindow->MitkRender();
 }
 
 /*!
@@ -171,16 +175,21 @@ void mitk::OpenGLRenderer::InitRenderer(mitk::RenderWindow* renderwindow)
     m_InitNeeded = true;
     m_ResizeNeeded = true;
 
-    m_VtkRenderWindow = vtkRenderWindow::New();
-    m_VtkRenderWindow->SetNumberOfLayers(2);
+    m_MitkVtkRenderWindow = mitk::VtkRenderWindow::New();
+    m_MitkVtkRenderWindow->SetMitkRenderer(this);
+    m_MitkVtkRenderWindow->SetNumberOfLayers(2);
 
     m_VtkRenderer = vtkRenderer::New();
-    m_VtkRenderWindow->AddRenderer( m_VtkRenderer );
+    m_MitkVtkRenderWindow->AddRenderer( m_VtkRenderer );
 
     m_Light = vtkLight::New();
     m_VtkRenderer->AddLight( m_Light );
+
+    if(m_CameraController)
+        ((VtkInteractorCameraController*)m_CameraController.GetPointer())->SetRenderWindow(m_MitkVtkRenderWindow);
+
     //we should disable vtk doublebuffering, but then it doesn't work
-    //m_VtkRenderWindow->SwapBuffersOff();
+    //m_MitkVtkRenderWindow->SwapBuffersOff();
 }
 
 /*!
@@ -189,7 +198,7 @@ void mitk::OpenGLRenderer::InitRenderer(mitk::RenderWindow* renderwindow)
 //##ModelId=3E33ECF301B7
 mitk::OpenGLRenderer::~OpenGLRenderer() {
     m_VtkRenderer->Delete();
-    m_VtkRenderWindow->Delete();
+    m_MitkVtkRenderWindow->Delete();
 }
 
 /*!
@@ -205,7 +214,10 @@ void mitk::OpenGLRenderer::Initialize( ) {
 \brief Resize the OpenGL Window
 */
 //##ModelId=3E33145B00D2
-void mitk::OpenGLRenderer::Resize( int w, int h) {
+void mitk::OpenGLRenderer::Resize(int w, int h) 
+{
+    BaseRenderer::Resize(w, h);
+
     glViewport (0, 0, w, h);
     glMatrixMode( GL_PROJECTION );
     glLoadIdentity();
@@ -214,8 +226,9 @@ void mitk::OpenGLRenderer::Resize( int w, int h) {
 
     m_DisplayGeometry->SetSizeInDisplayUnits(w, h);
     m_DisplayGeometry->Fit();
+
     Update();
-    //    m_VtkRenderWindow->SetSize(w,h); //FIXME?
+    //    m_MitkVtkRenderWindow->SetSize(w,h); //FIXME?
 }
 
 /*!
@@ -232,16 +245,15 @@ void mitk::OpenGLRenderer::Paint( )
 //##ModelId=3E3314B0005C
 void mitk::OpenGLRenderer::SetWindowId(void * id)
 {
-    m_VtkRenderWindow->SetWindowId( id );
+    m_MitkVtkRenderWindow->SetWindowId( id );
 }
 
 
 //##ModelId=3E3799420227
 void mitk::OpenGLRenderer::InitSize(int w, int h)
 {
-    m_VtkRenderWindow->SetSize(w,h);
+    m_MitkVtkRenderWindow->SetSize(w,h);
     m_DisplayGeometry->Fit();
     Modified();
     Update();
 }
-

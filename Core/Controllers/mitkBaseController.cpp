@@ -31,8 +31,8 @@ bool mitk::BaseController::RemoveRenderer(mitk::BaseRenderer* renderer)
 //##ModelId=3DD528500222
 bool mitk::BaseController::AddRenderer(mitk::BaseRenderer* renderer)
 {
-	itkExceptionMacro("BaseController not yet implemented."); 	
-	return false;
+	itkWarningMacro("BaseController not yet implemented."); 	
+	return true;
 }
 
 //##ModelId=3DD5268F0013

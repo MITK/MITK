@@ -2,11 +2,13 @@
 #define BASECONTROLLER_H_HEADER_INCLUDED_C1E745A3
 
 #include "mitkCommon.h"
-#include "BaseRenderer.h"
 #include "Navigator.h"
 #include "Stepper.h"
+#include "mitkRenderWindow.h"
 
 namespace mitk {
+
+class BaseRenderer;
 
 //##ModelId=3DF8F7EA01DA
 //##Documentation
@@ -20,20 +22,10 @@ class BaseController : public itk::Object
 {
   public:
 	/** Standard class typedefs. */
-    //##ModelId=3E3AE5ED012E
-	typedef BaseController           Self;
-    //##ModelId=3E3AE5ED0157
-	typedef itk::Object              Superclass;
-    //##ModelId=3E3AE5ED016A
-	typedef itk::SmartPointer<Self>  Pointer;
-    //##ModelId=3E3AE5ED0174
-	typedef itk::SmartPointer<const Self>  ConstPointer;
+    mitkClassMacro(BaseController, itk::Object);
 
-	/** Method for creation through the object factory. */
+    /** Method for creation through the object factory. */
 	itkNewMacro(Self);
-
-	/** Run-time type information (and related methods). */
-	itkTypeMacro(BaseController,itk::Object);
 
     //##ModelId=3DF8F5CA03D8
     mitk::Stepper &GetSlice();
@@ -42,16 +34,16 @@ class BaseController : public itk::Object
     mitk::Stepper &GetTime();
 
     //##ModelId=3DD528260235
-    bool RemoveNavigator(mitk::Navigator* navigator);
+    virtual bool RemoveNavigator(mitk::Navigator* navigator);
 
     //##ModelId=3DD52870008D
-    bool RemoveRenderer(mitk::BaseRenderer* renderer);
+    virtual bool RemoveRenderer(mitk::BaseRenderer* renderer);
 
     //##ModelId=3DD528500222
-    bool AddRenderer(mitk::BaseRenderer* renderer);
+    virtual bool AddRenderer(mitk::BaseRenderer* renderer);
 
     //##ModelId=3DD5268F0013
-    bool AddNavigator(mitk::Navigator* navigator);
+    virtual bool AddNavigator(mitk::Navigator* navigator);
 
   protected:
     //##ModelId=3E3AE32B0048

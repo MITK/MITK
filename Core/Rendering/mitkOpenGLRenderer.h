@@ -14,6 +14,8 @@ class vtkLight;
 
 namespace mitk {
 
+class VtkRenderWindow;
+
 //##ModelId=3C6E9AD90215
 class OpenGLRenderer : public BaseRenderer
 {
@@ -39,7 +41,7 @@ class OpenGLRenderer : public BaseRenderer
     //##ModelId=3E3799420227
     virtual void InitSize(int w, int h);
 
-  protected:
+protected:
     //##ModelId=3E33145B005A
     virtual void Paint();
 
@@ -69,12 +71,12 @@ class OpenGLRenderer : public BaseRenderer
     vtkRenderer* m_VtkRenderer;
 
     //##ModelId=3E33145A03BF
-    vtkRenderWindow* m_VtkRenderWindow;
+    VtkRenderWindow* m_MitkVtkRenderWindow;
 
     //##ModelId=3E33145B001E
     vtkLight* m_Light;
 
-  public: //FIXME
+public: //FIXME
     //##ModelId=3E64243803E7
 	iilPicImage* m_IilImage;
 };

@@ -6,6 +6,7 @@
 #include "Geometry2D.h"
 #include "DisplayGeometry.h"
 #include "mitkGeometry2DData.h"
+#include "CameraController.h"
 
 namespace mitk {
 
@@ -76,6 +77,14 @@ class BaseRenderer : public itk::Object
 
     itkGetMacro(MapperID, MapperSlotId);
     itkSetMacro(MapperID, MapperSlotId);
+
+    itkGetMacro(Size, int*);
+
+    virtual void MousePressEvent(mitk::MouseEvent*);
+    virtual void MouseReleaseEvent(mitk::MouseEvent*);
+    virtual void MouseMoveEvent(mitk::MouseEvent*);
+    virtual void KeyPressEvent(mitk::KeyEvent*);
+
 protected:
     //##ModelId=3E3D2F120050
     BaseRenderer();
@@ -104,6 +113,10 @@ protected:
 
     //##ModelId=3E6423D20213
     unsigned long m_LastUpdateTime;
+
+    mitk::CameraController::Pointer m_CameraController;
+
+    int m_Size[2];
 };
 
 } // namespace mitk

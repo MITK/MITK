@@ -29,6 +29,12 @@ void mitk::BaseRenderer::Initialize()
 //##ModelId=3E33163703D9
 void mitk::BaseRenderer::Resize(int w, int h)
 {
+    m_Size[0] = w;
+    m_Size[1] = h;
+
+    if(m_CameraController)
+
+        m_CameraController->Resize(w, h);
 }
 
 //##ModelId=3E33163A0261
@@ -43,7 +49,7 @@ void mitk::BaseRenderer::InitSize(int w, int h)
 }
 
 //##ModelId=3E3D2F120050
-mitk::BaseRenderer::BaseRenderer() : m_DataTreeIterator(NULL), m_RenderWindow(NULL), m_LastUpdateTime(0), m_MapperID(defaultMapper)
+mitk::BaseRenderer::BaseRenderer() : m_DataTreeIterator(NULL), m_RenderWindow(NULL), m_LastUpdateTime(0), m_MapperID(defaultMapper), m_CameraController(NULL)
 {
     m_WorldGeometry = mitk::PlaneGeometry::New();
 
@@ -84,4 +90,28 @@ void mitk::BaseRenderer::SetDisplayGeometry(mitk::DisplayGeometry* geometry2d)
         m_DisplayGeometry2DData->SetGeometry2D(m_DisplayGeometry);
         Modified();
     }
+}
+
+void mitk::BaseRenderer::MousePressEvent(mitk::MouseEvent *me)
+{
+  if (m_CameraController)
+    m_CameraController->MousePressEvent(me);
+}
+
+void mitk::BaseRenderer::MouseReleaseEvent(mitk::MouseEvent *me)
+{
+  if (m_CameraController)
+    m_CameraController->MouseReleaseEvent(me);
+}
+
+void mitk::BaseRenderer::MouseMoveEvent(mitk::MouseEvent *me)
+{
+  if (m_CameraController)
+    m_CameraController->MouseMoveEvent(me);
+}
+
+void mitk::BaseRenderer::KeyPressEvent(mitk::KeyEvent *ke)
+{
+  if (m_CameraController)
+    m_CameraController->KeyPressEvent(ke);
 }

@@ -230,8 +230,6 @@ bool mitk::Geometry3D::SetGeometry2D(ipPicDescriptor* pic, int s, int t)
 {
     if((pic!=NULL) && (IsValidSlice(s,t)))
     {
-        itkWarningMacro("SetGeometry2D by pic assumes a plane geometry starting at (0,0,0)."); 
-
         //construct standard view
         mitk::Point3D origin, right, bottom; bool rightHanded=true;
 	    mitk::Vector2D viewport(0,0);

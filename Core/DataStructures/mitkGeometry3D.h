@@ -141,9 +141,14 @@ public:
     Geometry3D(const mitk::Geometry3D& right);
 
     //##ModelId=3E15578402BD
+    //##Documentation
+    //## @brief Set Geometry2D of slice @a s and time @a t.
     virtual bool SetGeometry2D(const mitk::Geometry2D* geometry2D, int s, int t = 0);
     //##ModelId=3E155839024F
     //##Documentation
+    //## @brief Set this Geometry3D according to the tags in @a pic. 
+    //## 
+    //## @a pic can be 2D, 3D or 4D.  For 3D,
     //## set according to tags in @a pic. @a pic can be 2D, 3D or 4D.  For 3D,
     //## the parameter @a s is ignored, for 4D @a s and @a t are ignored.
     //## @return @a false: geometry not changed, either because of inconsistent

@@ -46,6 +46,7 @@ class OpenGLRenderer : public BaseRenderer
     //##ModelId=3E3314B0005C
     virtual void SetWindowId(void *id);
 
+    //##ModelId=3EF162760271
     virtual void MakeCurrent();
 
     //##ModelId=3E3799420227
@@ -84,6 +85,7 @@ protected:
     //##ModelId=3E33145A0347
     bool m_ResizeNeeded;
 
+    //##ModelId=3EF1627601DB
     bool m_VtkMapperPresent;
 
     //##ModelId=3E33145A0383

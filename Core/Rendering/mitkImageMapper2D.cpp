@@ -6,9 +6,6 @@
 #include "PlaneGeometry.h"
 #include "BaseRenderer.h"
 #include "DataTreeNode.h"
-#include "mitkColorProperty.h"
-#include "mitkLevelWindowProperty.h"
-#include "mitkFloatProperty.h"
 
 #include <vtkImageReslice.h>
 #include <vtkTransform.h>
@@ -41,6 +38,8 @@ void mitk::ImageMapper2D::GenerateData()
 
 void mitk::ImageMapper2D::Paint(mitk::BaseRenderer * renderer)
 {
+    if(IsVisible(renderer)==false) return;
+
 	RendererInfo& renderinfo=m_RendererInfo[renderer];
 	DataTreeNode* node=GetDataTreeNode();
 
@@ -240,32 +239,19 @@ void mitk::ImageMapper2D::GenerateData(mitk::BaseRenderer *renderer)
 		
 		image->setImage(pic, iilImage::INTENSITY_ALPHA);
         image->setInterpolation(true);
-		image->setExtrema(0, 255);
         assert(pic->dim == 2);
-		
-        //query and set color
-        const mitk::DataTreeNode* node=GetDataTreeNode();
+
         float rgba[4]={1.0f,1.0f,1.0f,1.0f};
-        if(node!=NULL)
-        {
-            // check for color prop and use it for rendering if it exists
-			mitk::ColorProperty::Pointer colorprop = dynamic_cast<mitk::ColorProperty*>(node->GetPropertyList()->GetProperty("color").GetPointer());
-            if(colorprop.IsNotNull())
-                memcpy(rgba, colorprop->GetColor().GetDataPointer(), 3*sizeof(float));
-			
-			// check for opacity prop and use it for rendering if it exists
-            mitk::FloatProperty::Pointer opacityprop = dynamic_cast<mitk::FloatProperty*>(node->GetPropertyList()->GetProperty("opacity").GetPointer());
-            if(opacityprop.IsNotNull())
-                rgba[3]=opacityprop->GetValue();
-			
-			// check for level window prop and use it for display if it exists
-			mitk::LevelWindowProperty::Pointer levWinProp = dynamic_cast<mitk::LevelWindowProperty*>(node->GetPropertyList()->GetProperty("levelwindow").GetPointer());
-			if(levWinProp.IsNotNull()) {
-				image->setExtrema(levWinProp->GetLevelWindow().GetMin(),levWinProp->GetLevelWindow().GetMax());
-			}          
-		}
+        // check for color prop and use it for rendering if it exists
+        GetColor(rgba, renderer);
+        // check for opacity prop and use it for rendering if it exists
+        GetOpacity(rgba[3], renderer);
+        // check for level window prop and use it for display if it exists
+        mitk::LevelWindow levelWindow;
+        GetLevelWindow(levelWindow, renderer);
 		
 		image->setColor(rgba[0], rgba[1], rgba[2], rgba[3]);
+        image->setExtrema(levelWindow.GetMin(),levelWindow.GetMax());
 		image->setRegion(0,0,pic->n[0],pic->n[1]);
 		
 		mitk::Image::Pointer output = this->GetOutput();

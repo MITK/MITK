@@ -3,7 +3,7 @@
 #include <algorithm>
 
 //##ModelId=3ED91D060288
-mitk::LevelWindow::LevelWindow() : m_Min(-1024), m_Max(4096), m_RangeMin(-1024), m_RangeMax(4096)
+mitk::LevelWindow::LevelWindow(float level, float window) : m_Min(level-window/2.0), m_Max(level+window/2.0), m_RangeMin(-1024), m_RangeMax(4096)
 {
 
 }
@@ -161,6 +161,7 @@ float mitk::LevelWindow::GetRange() const
 	return  (m_RangeMax > 0) ? (m_RangeMax - m_RangeMin) : (m_RangeMin - m_RangeMax);
 }
 
+//##ModelId=3EF1627601A9
 void mitk::LevelWindow::SetAuto(ipPicDescriptor* pic)
 {
     if ( pic == NULL )

@@ -28,7 +28,7 @@ public:
     //##ModelId=3D6A0E9E0029
     //##Documentation
     //## @brief Get a property by its name. 
-    mitk::BaseProperty::Pointer GetProperty(const char *propertyKey);
+    mitk::BaseProperty::Pointer GetProperty(const char *propertyKey) const;
 
     //##ModelId=3D78B966005F
     //##Documentation
@@ -43,6 +43,12 @@ public:
     //## @brief Get the timestamp of the last change of the map or the last change of one of 
     //## the property store in the list (whichever is later).
     virtual unsigned long GetMTime() const;
+
+    //##ModelId=3EF1B0160286
+    //##Documentation
+    //## @brief Remove a property from the list/map.
+    bool DeleteProperty(const char* propertyKey);
+
 protected:
     //##ModelId=3E38FEFE0125
     PropertyList();

@@ -1,5 +1,5 @@
-#ifndef MITK_LEVEL_WINDOW_PROPERTY_H_
-#define MITK_LEVEL_WINDOW_PROPERTY_H_
+#ifndef MITKLEVELWINDOWPROPERTY_H_HEADER_INCLUDED_C10EEAA8
+#define MITKLEVELWINDOWPROPERTY_H_HEADER_INCLUDED_C10EEAA8
 
 #include "mitkCommon.h"
 #include "BaseProperty.h"
@@ -24,6 +24,9 @@ public:
     //##ModelId=3ED953090121
     LevelWindowProperty();
 
+    //##ModelId=3EF198D9012D
+    LevelWindowProperty(const mitk::LevelWindow &levWin);
+
     //##ModelId=3ED953090122
     virtual ~LevelWindowProperty();
 
@@ -41,4 +44,4 @@ public:
 
 
 
-#endif /* MITK_LEVEL_WINDOW_PROPERTY_H_ */
+#endif /* MITKLEVELWINDOWPROPERTY_H_HEADER_INCLUDED_C10EEAA8 */

@@ -97,6 +97,36 @@ const mitk::Geometry2DData *mitk::Geometry2DDataVtkMapper3D::GetInput()
 //##ModelId=3E691E09038A
 void mitk::Geometry2DDataVtkMapper3D::Update()
 {
+
+}
+
+//##ModelId=3E691E090396
+void mitk::Geometry2DDataVtkMapper3D::GenerateOutputInformation()
+{
+}
+
+//##ModelId=3E691E09038C
+void mitk::Geometry2DDataVtkMapper3D::GenerateData()
+{
+}
+
+//##ModelId=3E6E874F0007
+void mitk::Geometry2DDataVtkMapper3D::SetDataIteratorForTexture(mitk::DataTreeIterator* iterator)
+{
+    delete m_DataTreeIterator;
+    m_DataTreeIterator = iterator->clone();
+}
+
+//##ModelId=3EF19F850151
+void mitk::Geometry2DDataVtkMapper3D::Update(mitk::BaseRenderer* renderer)
+{
+    if(IsVisible(renderer)==false)
+    {
+        m_Actor->VisibilityOff();
+        return;
+    }
+    m_Actor->VisibilityOn();
+
     mitk::Geometry2DData::Pointer input  = const_cast<mitk::Geometry2DData*>(this->GetInput());
 
     if(input.IsNotNull())
@@ -133,12 +163,10 @@ void mitk::Geometry2DDataVtkMapper3D::Update()
 							mitk::BaseRenderer::Pointer renderer = dynamic_cast<mitk::BaseRenderer*>(rendererProp->GetSmartPointer().GetPointer());
 							if(renderer.IsNotNull())
 							{
-								// check for level window prop and use it for display if it exists
-								mitk::LevelWindowProperty::Pointer levWinProp = dynamic_cast<mitk::LevelWindowProperty*>(it->get()->GetPropertyList()->GetProperty("levelwindow").GetPointer());
-								if(levWinProp.IsNotNull())
-								{
-									m_VtkLookupTable->SetTableRange(levWinProp->GetLevelWindow().GetMin(),levWinProp->GetLevelWindow().GetMax());
-								}
+                                // check for level window prop and use it for display if it exists
+                                mitk::LevelWindow levelWindow;
+								if(it->get()->GetLevelWindow(levelWindow, renderer))
+									m_VtkLookupTable->SetTableRange(levelWindow.GetMin(),levelWindow.GetMax());
 
 								imagemapper->GenerateAllData();
 								const ImageMapper2D::RendererInfo* ri=imagemapper->GetRendererInfo(renderer);
@@ -157,37 +185,10 @@ void mitk::Geometry2DDataVtkMapper3D::Update()
                 }
             }
         }
-        //query and set color
-        const mitk::DataTreeNode* node=GetDataTreeNode();
-        float rgba[4]={1.0f,1.0f,1.0f,1.0f};
-        if(node!=NULL)
-        {
-            mitk::ColorProperty::Pointer colorprop = dynamic_cast<mitk::ColorProperty*>(node->GetPropertyList()->GetProperty("color").GetPointer());
-            if(colorprop.IsNotNull())
-                memcpy(rgba, colorprop->GetColor().GetDataPointer(), 3*sizeof(float));
-            mitk::FloatProperty::Pointer opacityprop = dynamic_cast<mitk::FloatProperty*>(node->GetPropertyList()->GetProperty("opacity").GetPointer());
-            if(opacityprop.IsNotNull())
-                rgba[3]=opacityprop->GetValue();
-        }
-        m_Actor->GetProperty()->SetColor(rgba);
-        m_Actor->GetProperty()->SetOpacity(rgba[3]);
+
+        //apply color read from the PropertyList
+        ApplyProperties(m_Actor, renderer);
     }
-}
-
-//##ModelId=3E691E090396
-void mitk::Geometry2DDataVtkMapper3D::GenerateOutputInformation()
-{
-}
-
-//##ModelId=3E691E09038C
-void mitk::Geometry2DDataVtkMapper3D::GenerateData()
-{
-}
-
-//##ModelId=3E6E874F0007
-void mitk::Geometry2DDataVtkMapper3D::SetDataIteratorForTexture(mitk::DataTreeIterator* iterator)
-{
-    delete m_DataTreeIterator;
-    m_DataTreeIterator = iterator->clone();
+    StandardUpdate();
 }
 

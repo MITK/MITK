@@ -4,7 +4,12 @@
 //##ModelId=3ED953090121
 mitk::LevelWindowProperty::LevelWindowProperty()
 {
+}
 
+//##ModelId=3EF198D9012D
+mitk::LevelWindowProperty::LevelWindowProperty(const mitk::LevelWindow &levWin)
+{
+    SetLevelWindow(levWin);
 }
 
 //##ModelId=3ED953090122
@@ -29,7 +34,7 @@ const mitk::LevelWindow & mitk::LevelWindowProperty::GetLevelWindow() const
 }
 
 //##ModelId=3ED953090135
-void mitk::LevelWindowProperty::SetLevelWindow(const mitk::LevelWindow &levWin )
+void mitk::LevelWindowProperty::SetLevelWindow(const mitk::LevelWindow &levWin)
 {
     if(m_LevWin != levWin)
     {

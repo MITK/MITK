@@ -17,9 +17,14 @@
 
 #include "PropertyList.h"
 
+#include <map>
+#include "LevelWindow.h"
+
 class vtkTransform;
 
 namespace mitk {
+
+class BaseRenderer;
 
 //##ModelId=3E031E2C0143
 //##Documentation
@@ -38,11 +43,21 @@ public:
 	//##ModelId=3D6A0E8C02CC
 	mitk::Mapper* GetMapper(MapperSlotId id) const;
 	//##ModelId=3E32C49D00A8
+    //##Documentation
+    //## @brief Get the data object (instance of BaseData, e.g., an Image)
+    //## managed by this DataTreeNode
 	BaseData* GetData() const;
     //##ModelId=3ED91D050121
+    //##Documentation
+    //## @brief Get the transformation applied prior to displaying the data as
+    //## a vtkTransform
+    //## @sa m_VtkTransform
 	vtkTransform* GetVtkTransform() const;
 
     //##ModelId=3E33F4E4025B
+    //##Documentation
+    //## @brief Set the data object (instance of BaseData, e.g., an Image)
+    //## managed by this DataTreeNode
     virtual void SetData(mitk::BaseData* baseData);
     //##ModelId=3E33F5D7032D
     mitk::DataTreeNode& operator=(const DataTreeNode& right);
@@ -69,7 +84,91 @@ public:
     //##ModelId=3E860A6601DB
     virtual void CopyInformation(const itk::DataObject *data);
     //##ModelId=3E3FE0420273
-    mitk::PropertyList::Pointer GetPropertyList() const;
+    //##Documentation
+    //## @brief Get the PropertyList of the @a renderer. If @a renderer is @a
+    //## NULL, the BaseRenderer-independent PropertyList of this DataTreeNode
+    //## is returned. 
+    //## @sa GetProperty
+    //## @sa m_PropertyList
+    //## @sa m_MapOfPropertyLists
+    mitk::PropertyList::Pointer GetPropertyList(const mitk::BaseRenderer* renderer = NULL) const;
+
+    //##ModelId=3EF189DB0111
+    //##Documentation
+    //## @brief Get the property (instance of BaseProperty) with key @a propertyKey from the PropertyList 
+    //## of the @a renderer, if available there, otherwise use the BaseRenderer-independent PropertyList.
+    //## 
+    //## If @a renderer is @a NULL or the @a propertyKey cannot be found 
+    //## in the PropertyList specific to @a renderer, the BaseRenderer-independent 
+    //## PropertyList of this DataTreeNode is queried.
+    //## @sa GetPropertyList
+    //## @sa m_PropertyList
+    //## @sa m_MapOfPropertyLists
+    mitk::BaseProperty::Pointer GetProperty(const char *propertyKey, const mitk::BaseRenderer* renderer = NULL) const;
+    //##ModelId=3EF1941C011F
+    //##Documentation
+    //## @brief Convenience access method for color properties (instances of
+    //## ColorProperty)
+    //## @return @a true property was found
+    bool GetColor(float rgb[3], mitk::BaseRenderer* renderer, const char* name = "color") const;
+
+    //##ModelId=3EF1941E01D6
+    //##Documentation
+    //## @brief Convenience access method for visibility properties (instances
+    //## of BoolProperty)
+    //## @return @a true property was found
+    //## @sa IsVisible
+    bool GetVisibility(bool &visible, mitk::BaseRenderer* renderer, const char* name = "visible") const;
+
+    //##ModelId=3EF19420016B
+    //##Documentation
+    //## @brief Convenience access method for opacity properties (instances of
+    //## FloatProperty)
+    //## @return @a true property was found
+    bool GetOpacity(float &opacity, mitk::BaseRenderer* renderer, const char* name = "opacity") const;
+
+    //##ModelId=3EF194220204
+    //##Documentation
+    //## @brief Convenience access method for color properties (instances of
+    //## LevelWindoProperty)
+    //## @return @a true property was found
+    bool GetLevelWindow(mitk::LevelWindow &levelWindow, mitk::BaseRenderer* renderer, const char* name = "levelwindow") const;
+
+    //##ModelId=3EF19424012B
+    //##Documentation
+    //## @brief Convenience access method for visibility properties (instances
+    //## of BoolProperty). Return value is the visibility. Default is
+    //## visible==true, i.e., true is returned even if the property (@a
+    //## propertyKey) is not found.
+    //## 
+    //## Thus, the return value has a different meaning than in the
+    //## GetVisibility method!
+    //## @sa GetVisibility
+    bool IsVisible(mitk::BaseRenderer* renderer, const char* name = "visible") const;
+
+    //##ModelId=3EF196360303
+    //##Documentation
+    //## @brief Convenience method for setting color properties (instances of
+    //## ColorProperty)
+    void SetColor(const float rgb[3], mitk::BaseRenderer* renderer = NULL, const char* name = "color");
+
+    //##ModelId=3EF1966703D6
+    //##Documentation
+    //## @brief Convenience method for setting visibility properties (instances
+    //## of BoolProperty)
+    void SetVisibility(bool visible, mitk::BaseRenderer* renderer, const char* name = "visible");
+
+    //##ModelId=3EF196880095
+    //##Documentation
+    //## @brief Convenience method for setting opacity properties (instances of
+    //## FloatProperty)
+    void SetOpacity(float opacity, mitk::BaseRenderer* renderer, const char* name = "opacity");
+
+    //##ModelId=3EF1969A0181
+    //##Documentation
+    //## @brief Convenience method for setting level-window properties
+    //## (instances of LevelWindowProperty)
+    void SetLevelWindow(mitk::LevelWindow levelWindow, mitk::BaseRenderer* renderer, const char* name = "levelwindow");
 
 protected:
     //##ModelId=3E33F5D702AA
@@ -78,19 +177,45 @@ protected:
     //##ModelId=3E33F5D702D3
     virtual ~DataTreeNode();
 
-	//@todo change to stl-vector
 	//##ModelId=3D6A0F8C0202
+    //##Documentation
+    //## @brief Mapper-slots
+    //## @todo change to stl-vector
     mutable mitk::Mapper::Pointer mappers[10];
 
     //##ModelId=3ED91D0500D3
+    //##Documentation
+    //## @brief Transformation applied prior to displaying the data
+    //## 
+    //## The advantage of such a transformation is that you do not need
+    //## to change the data itself if you just want to move or rotate it.
+    //## The OpenGL-people do the same with the glScale and glTranslate
+    //## functions.
+    //## Mappers must take this transformation into account during rendering.
+    //## For vtk-based renderers using a vtkProp3D, this transformation 
+    //## will be forked into the user-transformation of the vtkProp3D.
+    //## A vtkInteractorStyle will change the user-transformation of 
+    //## vtkProp3D and therewith m_VtkTransform.
 	mutable vtkTransform* m_VtkTransform;
 
 	//##ModelId=3E32C49D0095
+    //##Documentation
+    //## @brief The data object (instance of BaseData, e.g., an Image) managed
+    //## by this DataTreeNode
     BaseData::Pointer m_Data;
 
     //##ModelId=3E861B84033C
+    //##Documentation
+    //## @brief BaseRenderer-independent PropertyList
+    //## 
+    //## Properties herein can be overwritten specifically for each BaseRenderer
+    //## by the BaseRenderer-specific properties defined in m_MapOfPropertyLists.
     PropertyList::Pointer m_PropertyList;
 
+    //##ModelId=3EF16CFA010A
+    //##Documentation
+    //## @brief Map associating each BaseRenderer with its own PropertyList
+    mutable std::map<const mitk::BaseRenderer*,mitk::PropertyList::Pointer> m_MapOfPropertyLists;
 };
 
 

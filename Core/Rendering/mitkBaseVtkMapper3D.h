@@ -4,9 +4,11 @@
 #include "mitkCommon.h"
 #include "Mapper.h"
 #include "Mapper3D.h"
+#include "BaseRenderer.h"
 
 class vtkProp;
 class vtkProp3D;
+class vtkActor;
 
 namespace mitk {
 
@@ -23,6 +25,17 @@ public:
 
     //##ModelId=3E32C93D0000
     virtual vtkProp* GetProp();
+    //##ModelId=3EF180C70065
+    //##Documentation
+    //## @brief Apply color and opacity read from the PropertyList
+    virtual void ApplyProperties(vtkActor* actor, mitk::BaseRenderer* renderer);
+    //##ModelId=3EF19F3000A5
+    //##Documentation
+    //## @brief Called by BaseRenderer when an update is required
+    virtual void Update(mitk::BaseRenderer* renderer) = 0;
+
+
+
   protected:
     //##ModelId=3E3424950213
     BaseVtkMapper3D();

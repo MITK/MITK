@@ -4,6 +4,7 @@
 #include "mitkCommon.h"
 #include "Mapper2D.h"
 #include <vtkProp.h>
+#include "BaseRenderer.h"
 
 namespace mitk {
 
@@ -18,6 +19,11 @@ class BaseVtkMapper2D : public Mapper2D
   public:
     //##ModelId=3E3AA40002D4
     virtual vtkProp* GetProp() = 0;
+    //##ModelId=3EF19F880369
+    //##Documentation
+    //## @brief Called by BaseRenderer when an update is required
+    virtual void Update(mitk::BaseRenderer* renderer) = 0;
+
 
   protected:
     //##ModelId=3E3AE0060159

@@ -68,6 +68,7 @@ class BaseRenderer : public itk::Object
     //## @brief Set the window id of the window to draw into.
     virtual void SetWindowId(void *id);
 
+    //##ModelId=3EF1627503C4
     //##Documentation
     //## @brief Makes the widget, this renderer is drawing into, the current widget for 
     //## (e.g., if the renderer is an OpenGL-based renderer as mitk::OpenGLRenderer) 

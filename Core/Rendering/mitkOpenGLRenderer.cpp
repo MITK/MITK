@@ -13,7 +13,7 @@
 #include <vtkRenderWindow.h>
 #include <vtkTransform.h>
 
-#include "PlaneGeometry.h"
+#include "PlaneGeometry.h"upde
 
 //##ModelId=3E33ECF301AD
 mitk::OpenGLRenderer::OpenGLRenderer() : m_VtkMapperPresent(NULL)
@@ -106,7 +106,7 @@ void mitk::OpenGLRenderer::UpdateVtkActors()
 				anVtkMapper2D=dynamic_cast<BaseVtkMapper2D*>(mapper.GetPointer());
 				if(anVtkMapper2D != NULL)
 				{
-					anVtkMapper2D->Update();
+					anVtkMapper2D->Update(this);
 					m_VtkRenderer->AddProp(anVtkMapper2D->GetProp());
 				}
 				else
@@ -115,7 +115,7 @@ void mitk::OpenGLRenderer::UpdateVtkActors()
 					anVtkMapper3D=dynamic_cast<BaseVtkMapper3D*>(mapper.GetPointer());
 					if(anVtkMapper3D != NULL)
 					{
-						anVtkMapper3D->Update();
+						anVtkMapper3D->Update(this);
 						m_VtkRenderer->AddProp(anVtkMapper3D->GetProp());
 					}
 				}
@@ -155,14 +155,25 @@ void mitk::OpenGLRenderer::Update()
             Mapper2D* mapper2d=dynamic_cast<Mapper2D*>(mapper.GetPointer());
             if(mapper2d != NULL)
             {
+                BaseVtkMapper2D* vtkmapper2d=dynamic_cast<BaseVtkMapper2D*>(mapper.GetPointer());
+                if(vtkmapper2d != NULL)
+                {
+                    vtkmapper2d->Update(this);
+                    m_VtkMapperPresent=true;
+                }
+                else
+                    mapper2d->Update();
                 ImageMapper2D* imagemapper2d=dynamic_cast<ImageMapper2D*>(mapper.GetPointer());
-                mapper2d->Update();
             }
             else
-                if(dynamic_cast<BaseVtkMapper3D*>(mapper.GetPointer()))
-                    mapper->Update();
-			if(dynamic_cast<BaseVtkMapper2D*>(mapper.GetPointer()) || dynamic_cast<BaseVtkMapper3D*>(mapper.GetPointer()))
-				m_VtkMapperPresent=true;
+            {
+                BaseVtkMapper3D* vtkmapper3d=dynamic_cast<BaseVtkMapper3D*>(mapper.GetPointer());
+                if(vtkmapper3d != NULL)
+                {
+                    vtkmapper3d->Update(this);
+                    m_VtkMapperPresent=true;
+                }
+            }
         }
     }
 	
@@ -353,6 +364,7 @@ void mitk::OpenGLRenderer::InitSize(int w, int h)
     Update();
 }
 
+//##ModelId=3EF162760271
 void mitk::OpenGLRenderer::MakeCurrent()
 {
     if(m_RenderWindow!=NULL)

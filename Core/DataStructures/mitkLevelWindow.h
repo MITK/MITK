@@ -19,7 +19,7 @@ class LevelWindow
 {
 public:
     //##ModelId=3ED91D060288
-    LevelWindow();
+    LevelWindow(float level=128, float window=256);
     //##ModelId=3ED91D060298
     LevelWindow(const mitk::LevelWindow& levWin);
     //##ModelId=3ED91D06029A
@@ -121,6 +121,7 @@ public:
     /**!
     * \brief sets level/window to the min/max greyvalues of the given ipPicDescriptor
     */
+    //##ModelId=3EF1627601A9
     void SetAuto(ipPicDescriptor* pic);
 
     /*!

@@ -19,6 +19,11 @@ class GLMapper2D : public Mapper2D
     //##Documentation
     //## @brief Do the painting into the @a renderer
     virtual void Paint(mitk::BaseRenderer *renderer) = 0;
+    //##ModelId=3EF17AA10120
+    //##Documentation
+    //## @brief Apply color and opacity read from the PropertyList
+    virtual void ApplyProperties(mitk::BaseRenderer* renderer);
+
   protected:
     //##ModelId=3E681470037E
     GLMapper2D();

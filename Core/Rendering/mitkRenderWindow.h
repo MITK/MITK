@@ -24,6 +24,7 @@ public:
     {
     };
 
+    //##ModelId=3EF1627602DF
     //##Documentation
     //## @brief Makes the renderwindow the current widget for 
     //## (e.g., if the renderwindow is an OpenGL-widget) 

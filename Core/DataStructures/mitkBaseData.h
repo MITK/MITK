@@ -6,7 +6,6 @@
 #include "mitkCommon.h"
 #include "Geometry3D.h"
 #include "Geometry2D.h"
-#include "PropertyList.h"
 
 namespace mitk {
 

@@ -29,6 +29,8 @@ const mitk::Geometry2DData *mitk::Geometry2DDataMapper2D::GetInput(void)
 //##ModelId=3E67D77A0109
 void mitk::Geometry2DDataMapper2D::Paint(mitk::BaseRenderer * renderer)
 {
+    if(IsVisible(renderer)==false) return;
+
     //	FIXME: Logik fuer update
     bool updateNeccesary=true;
 
@@ -67,19 +69,8 @@ void mitk::Geometry2DDataMapper2D::Paint(mitk::BaseRenderer * renderer)
 //                lineFrom.y=toGL-lineFrom.y;
 //                lineTo.y=toGL-lineTo.y;
 
-                //query and set color
-                const mitk::DataTreeNode* node=GetDataTreeNode();
-                float rgba[4]={1.0f,1.0f,1.0f,1.0f};
-                if(node!=NULL)
-                {
-                    mitk::ColorProperty::Pointer colorprop = dynamic_cast<mitk::ColorProperty*>(node->GetPropertyList()->GetProperty("color").GetPointer());
-                    if(colorprop.IsNotNull())
-                        memcpy(rgba, colorprop->GetColor().GetDataPointer(), 3*sizeof(float));
-                    mitk::FloatProperty::Pointer opacityprop = dynamic_cast<mitk::FloatProperty*>(node->GetPropertyList()->GetProperty("opacity").GetPointer());
-                    if(opacityprop.IsNotNull())
-                        rgba[3]=opacityprop->GetValue();
-                }
-                glColor4fv(rgba);
+                //apply color and opacity read from the PropertyList
+                ApplyProperties(renderer);
 
                 //draw
                 glBegin (GL_LINE_LOOP);

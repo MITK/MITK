@@ -39,3 +39,57 @@ mitk::DataTreeNode* mitk::Mapper::GetDataTreeNode() const
     return node;
 }
 
+//##ModelId=3EF17276014B
+bool mitk::Mapper::GetColor(float rgb[3], mitk::BaseRenderer* renderer, const char* name) const
+{
+    const mitk::DataTreeNode* node=GetDataTreeNode();
+    if(node==NULL)
+        return false;
+
+    return node->GetColor(rgb, renderer, name);
+}
+
+//##ModelId=3EF17795006A
+bool mitk::Mapper::GetVisibility(bool &visible, mitk::BaseRenderer* renderer, const char* name) const
+{
+    const mitk::DataTreeNode* node=GetDataTreeNode();
+    if(node==NULL)
+        return false;
+
+    return node->GetVisibility(visible, renderer, name);
+}
+
+//##ModelId=3EF1781F0285
+bool mitk::Mapper::GetOpacity(float &opacity, mitk::BaseRenderer* renderer, const char* name) const
+{
+    const mitk::DataTreeNode* node=GetDataTreeNode();
+    if(node==NULL)
+        return false;
+
+    return node->GetOpacity(opacity, renderer, name);
+}
+
+//##ModelId=3EF179660018
+bool mitk::Mapper::GetLevelWindow(mitk::LevelWindow& levelWindow, mitk::BaseRenderer* renderer, const char* name) const
+{
+    const mitk::DataTreeNode* node=GetDataTreeNode();
+    if(node==NULL)
+        return false;
+
+    return node->GetLevelWindow(levelWindow, renderer, name);
+}
+
+//##ModelId=3EF18B340008
+bool mitk::Mapper::IsVisible(mitk::BaseRenderer* renderer, const char* name) const
+{
+    bool visible=true;
+    GetVisibility(visible, renderer, name);
+    return visible;
+}
+
+//##ModelId=3EF1A43C01D9
+void mitk::Mapper::StandardUpdate()
+{
+    Update();
+}
+

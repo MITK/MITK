@@ -174,6 +174,7 @@ void mitk::BaseRenderer::KeyPressEvent(mitk::KeyEvent *ke)
   mitk::EventMapper::MapEvent(&event);
 }
 
+//##ModelId=3EF1627503C4
 void mitk::BaseRenderer::MakeCurrent()
 {
 }

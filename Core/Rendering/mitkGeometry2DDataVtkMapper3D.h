@@ -6,6 +6,7 @@
 #include "mitkGeometry2DData.h"
 #include "DataTree.h"
 #include "ImageSliceSelector.h"
+#include "BaseRenderer.h"
 
 class vtkActor;
 class vtkTexture;
@@ -46,6 +47,11 @@ class Geometry2DDataVtkMapper3D : public BaseVtkMapper3D
 	//## been resliced by an ImageMapper2D according to the Geometry2D.
 	//## @bug see ImageMapper2D for problems of the current version.
     virtual void SetDataIteratorForTexture(mitk::DataTreeIterator* iterator);
+    //##ModelId=3EF19F850151
+    //##Documentation
+    //## @brief Called by BaseRenderer when an update is required
+    virtual void Update(mitk::BaseRenderer* renderer);
+
 
   protected:
     //##ModelId=3E691E09038E

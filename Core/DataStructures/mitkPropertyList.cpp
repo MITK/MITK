@@ -1,7 +1,7 @@
 #include "PropertyList.h"
 
 //##ModelId=3D6A0E9E0029
-mitk::BaseProperty::Pointer mitk::PropertyList::GetProperty(const char *propertyKey) 
+mitk::BaseProperty::Pointer mitk::PropertyList::GetProperty(const char *propertyKey) const
 {
     std::map<std::string,BaseProperty::Pointer>::const_iterator it;
     
@@ -52,3 +52,9 @@ unsigned long mitk::PropertyList::GetMTime() const
 	}
     return Superclass::GetMTime();
 }
+//##ModelId=3EF1B0160286
+bool mitk::PropertyList::DeleteProperty(const char* propertyKey)
+{
+    return m_Properties.erase(propertyKey)>0;
+}
+

@@ -2,14 +2,14 @@
 #define MAPPER_H_HEADER_INCLUDED_C1E6EA08
 
 #include "mitkCommon.h"
-#include "Geometry3D.h"
-#include "LevelWindow.h"
 #include "ImageSource.h"
-#include "BaseData.h"
+#include "LevelWindow.h"
 
 namespace mitk {
 
 class DataTreeNode;
+class BaseData;
+class BaseRenderer;
 
 //##ModelId=3D6A0EE70237
 //##Documentation
@@ -41,12 +41,58 @@ public:
     //##Documentation
     //## @brief Get the DataTreeNode containing the data to map
     mitk::DataTreeNode* GetDataTreeNode() const;
+    //##ModelId=3EF17276014B
+    //##Documentation
+    //## @brief Convenience access method for color properties (instances of
+    //## ColorProperty)
+    //## @return @a true property was found
+    virtual bool GetColor(float rgb[3], mitk::BaseRenderer* renderer, const char* name = "color") const;
+    //##ModelId=3EF17795006A
+    //##Documentation
+    //## @brief Convenience access method for visibility properties (instances
+    //## of BoolProperty)
+    //## @return @a true property was found
+    //## @sa IsVisible
+    virtual bool GetVisibility(bool &visible, mitk::BaseRenderer* renderer, const char* name = "visible") const;
+    //##ModelId=3EF1781F0285
+    //##Documentation
+    //## @brief Convenience access method for opacity properties (instances of
+    //## FloatProperty)
+    //## @return @a true property was found
+    virtual bool GetOpacity(float &opacity, mitk::BaseRenderer* renderer, const char* name = "opacity") const;
+    //##ModelId=3EF179660018
+    //##Documentation
+    //## @brief Convenience access method for color properties (instances of
+    //## LevelWindoProperty)
+    //## @return @a true property was found
+    virtual bool GetLevelWindow(mitk::LevelWindow &levelWindow, mitk::BaseRenderer* renderer, const char* name = "levelwindow") const;
+    //##ModelId=3EF18B340008
+    //##Documentation
+    //## @brief Convenience access method for visibility properties (instances
+    //## of BoolProperty). Return value is the visibility. Default is
+    //## visible==true, i.e., true is returned even if the property (@a
+    //## propertyKey) is not found.
+    //## 
+    //## Thus, the return value has a different meaning than in the
+    //## GetVisibility method!
+    //## @sa GetVisibility
+    virtual bool IsVisible(mitk::BaseRenderer* renderer, const char* name = "visible") const;
+
   protected:
     //##ModelId=3E3C337E0162
     Mapper();
 
     //##ModelId=3E3C337E019E
     virtual ~Mapper();
+    //##ModelId=3EF1A43C01D9
+    //##Documentation
+    //## @brief Calls Update(). MSVC 7 seems to have a bug: says Update does
+    //## not take 0 parameters in subclasses of BaseVtkMapper3D, which is only
+    //## true for one of the Update-methods
+    //## (BaseVtkMapper3D::Update(mitk::BaseRenderer* renderer), but not for
+    //## the Update inherited from itk::ProcessObject.
+    void StandardUpdate();
+
 };
 
 } // namespace mitk

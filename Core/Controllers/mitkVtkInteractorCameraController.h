@@ -23,6 +23,7 @@ public:
 
     itkNewMacro(Self);
 
+    //##ModelId=3EF162760380
     //##Documentation
     //## @brief Returns the vtkRenderWindowInteractor used internally by this CameraController
     vtkRenderWindowInteractor* GetVtkInteractor();

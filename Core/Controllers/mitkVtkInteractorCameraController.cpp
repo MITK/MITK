@@ -83,6 +83,7 @@ void mitk::VtkInteractorCameraController::SetRenderWindow(vtkRenderWindow* aren)
     m_VtkInteractor->SetRenderWindow(aren);
 }
 
+//##ModelId=3EF162760380
 vtkRenderWindowInteractor* mitk::VtkInteractorCameraController::GetVtkInteractor()
 {
     return m_VtkInteractor;

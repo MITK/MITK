@@ -19,18 +19,7 @@ namespace mitk {
 class BaseVtkMapper3D : public Mapper3D
 {
 public:
-    /** Standard class typedefs. */
-    //##ModelId=3E32DC990067
-    typedef BaseVtkMapper3D          Self;
-    //##ModelId=3E32DC9900A3
-    typedef Mapper                   Superclass;
-    //##ModelId=3E32DC9900C2
-    typedef itk::SmartPointer<Self>  Pointer;
-    //##ModelId=3E32DC9900EA
-    typedef itk::SmartPointer<const Self>  ConstPointer;
-
-    /** Run-time type information (and related methods). */
-    itkTypeMacro(Mapper,BaseVtkMapper3D);
+	mitkClassMacro(Mapper,BaseVtkMapper3D);
 
     //##ModelId=3E32C93D0000
     virtual vtkProp* GetProp();

@@ -23,21 +23,7 @@ namespace mitk {
 class Mapper2D : public Mapper
 {
 public:
-    //##ModelId=3E3AE1B90028
-    typedef Mapper2D Self;
-
-	/** Standard class typedefs. */
-    //##ModelId=3E3AE1B90046
-    typedef Mapper Superclass;
-
-    
-    //##ModelId=3E3AE1B9005A
-    typedef itk::SmartPointer<Self> Pointer;
-
-    
-    //##ModelId=3E3AE1B90078
-    typedef itk::SmartPointer<const Self> ConstPointer;
-
+	mitkClassMacro(Mapper2D,Mapper);
 
     //##ModelId=3E3C45A0009E
      virtual void SetGeometry3D(const mitk::Geometry3D* aGeometry3D);
@@ -47,10 +33,6 @@ public:
 
 	/** Method for creation through the object factory. */
 //	itkNewMacro(Self);
-
-	/** Run-time type information (and related methods). */
-	itkTypeMacro(Mapper2D,Mapper);
-
 protected:
     //##ModelId=3E3C46810341
     Mapper2D();

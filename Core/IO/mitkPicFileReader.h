@@ -25,31 +25,10 @@ class PicFileReader : public FileReader
 {
 
 public:
-
-	/** Standard class typedefs. */
-
-    //##ModelId=3E18763D0029
-	typedef PicFileReader      Self;
-
-    //##ModelId=3E18763D0051
-	typedef FileReader         Superclass;
-
-    //##ModelId=3E18763D007A
-	typedef itk::SmartPointer<Self>  Pointer;
-
-
+	mitkClassMacro(PicFileReader, FileReader);
 
 	/** Method for creation through the object factory. */
-
 	itkNewMacro(Self);
-
-
-
-	/** Run-time type information (and related methods). */
-
-	itkTypeMacro(PicFileReader, FileReader);
-
-
 
 protected:
 

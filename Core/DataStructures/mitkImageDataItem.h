@@ -15,17 +15,7 @@ namespace mitk {
 class ImageDataItem : public itk::LightObject
 {
   public:
-    //##ModelId=3E0B6F06023F
-    typedef ImageDataItem Self;
-
-    //##ModelId=3E0B6F060290
-    typedef itk::LightObject Superclass;
-
-    //##ModelId=3E0B6F0602D6
-    typedef itk::SmartPointer<Self> Pointer;
-
-    //##ModelId=3E0B6F060308
-    typedef itk::SmartPointer<const Self> ConstPointer;
+	mitkClassMacro(ImageDataItem, itk::LightObject);
 
     //##ModelId=3E0B7882024B
 	ImageDataItem(const ImageDataItem& aParent, unsigned int dimension, int offset = 0);

@@ -17,15 +17,8 @@ namespace mitk {
 class PlaneGeometry : public Geometry2D
 {
 public:
-    /** Standard class typedefs. */
-    //##ModelId=3E395F1702BE
-    typedef PlaneGeometry           Self;
-    //##ModelId=3E395F1702DC
-    typedef Geometry2D              Superclass;
-    //##ModelId=3E395F170304
-    typedef itk::SmartPointer<Self> Pointer;
-    //##ModelId=3E395F170322
-    typedef itk::SmartPointer<const Self>  ConstPointer;
+    mitkClassMacro(PlaneGeometry,Geometry2D);
+
 //    itkGetConstReferenceMacro(PlaneView, PlaneView);
     //##ModelId=3E395E3E0077
     virtual const mitk::PlaneView& GetPlaneView() const;
@@ -57,9 +50,6 @@ public:
     
     //##ModelId=3E3B9C8E0152
     virtual void MMToUnits(const mitk::Vector2D &vec_mm, mitk::Vector2D &vec_units) const;
-
-    /** Run-time type information (and related methods). */
-    itkTypeMacro(PlaneGeometry,Geometry2D);
 
 protected:
     //##ModelId=3E395F22035A

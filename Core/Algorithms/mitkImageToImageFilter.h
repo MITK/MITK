@@ -14,21 +14,10 @@ namespace mitk {
 class ImageToImageFilter : public ImageSource
 {
 public:
-	/** Standard class typedefs. */
-    //##ModelId=3E1A0A030378
-	typedef ImageToImageFilter       Self;
-    //##ModelId=3E1A0A0303A0
-	typedef ImageSource              Superclass;
-    //##ModelId=3E1A0A0303B4
-	typedef itk::SmartPointer<Self>  Pointer;
-    //##ModelId=3E1A0A0303D2
-	typedef itk::SmartPointer<const Self>  ConstPointer;
+	mitkClassMacro(ImageToImageFilter,ImageSource);
 
 	/** Method for creation through the object factory. */
 	itkNewMacro(Self);
-
-	/** Run-time type information (and related methods). */
-	itkTypeMacro(ImageToImageFilter,ImageSource);
 
 	/** Superclass typedefs. */
     //##ModelId=3E1A0A0303E6

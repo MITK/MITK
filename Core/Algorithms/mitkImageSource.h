@@ -25,15 +25,7 @@ namespace mitk {
 class ImageSource : public BaseProcess
 {
 public:
-  /** Standard class typedefs. */
-    //##ModelId=3E1886F0037F
-  typedef ImageSource         Self;
-    //##ModelId=3E1886F003B2
-  typedef BaseProcess         Superclass;
-    //##ModelId=3E1886F003C6
-  typedef itk::SmartPointer<Self>  Pointer;
-    //##ModelId=3E1886F003E4
-  typedef itk::SmartPointer<const Self>  ConstPointer;
+  mitkClassMacro(ImageSource,BaseProcess);
   
   /** Smart Pointer type to a DataObject. */
     //##ModelId=3E1886F1001A
@@ -41,9 +33,6 @@ public:
 
   /** Method for creation through the object factory. */
   itkNewMacro(Self);  
-
-  /** Run-time type information (and related methods). */
-  itkTypeMacro(ImageSource,BaseProcess);
 
   /** Some convenient typedefs. */
     //##ModelId=3E1886F10038

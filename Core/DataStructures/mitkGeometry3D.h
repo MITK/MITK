@@ -49,21 +49,10 @@ typedef itk::BoundingBox<> BoundingBox;
 class Geometry3D : public itk::Object
 {
 public:
-    /** Standard class typedefs. */
-    //##ModelId=3E1018B502F0
-    typedef Geometry3D         Self;
-    //##ModelId=3E1018B5032C
-    typedef itk::Object        Superclass;
-    //##ModelId=3E1018B50368
-    typedef itk::SmartPointer<Self> Pointer;
-    //##ModelId=3E1018B5039A
-    typedef itk::SmartPointer<const Self> ConstPointer;
+	mitkClassMacro(Geometry3D, itk::Object);
 
     /** Method for creation through the object factory. */
     //	itkNewMacro(Self);
-
-    /** Run-time type information (and related methods). */
-    itkTypeMacro(Geometry3D, itk::Object);
 
 #if !(_MSC_VER < 1300)
     //##ModelId=3E1552A603AC

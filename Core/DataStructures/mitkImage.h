@@ -18,7 +18,7 @@ class SubImageSelector;
 //##Documentation
 //## @brief Image class for storing images
 //## @ingroup Data
-//## Image class for storing images. Can be asked for header information, the
+//## Can be asked for header information, the
 //## data vector, ipPicDescriptors or vtkImageData objects. If not the complete
 //## data is required, the appropriate SubImageSelector class should be used
 //## for access.
@@ -31,18 +31,7 @@ class Image : public SlicedData
 //    template <typename, unsigned int> friend class ImageToItk;
 
   public:
-	/** Standard class typedefs. */
-    //##ModelId=3E0B6CF700ED
-	typedef Image       Self;
-    //##ModelId=3E0B6CF7015B
-	typedef BaseData	Superclass;
-    //##ModelId=3E0B6CF701AB
-	typedef itk::SmartPointer<Self>  Pointer;
-    //##ModelId=3E0B6CF70206
-	typedef itk::SmartPointer<const Self>  ConstPointer;
-	  
-	/** Run-time type information (and related methods). */
-	itkTypeMacro(Image,SlicedData);
+	mitkClassMacro(Image, SlicedData);    
 
     //##ModelId=3E18748C0045
     itkNewMacro(Self);  

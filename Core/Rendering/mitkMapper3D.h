@@ -14,26 +14,10 @@ namespace mitk {
 class Mapper3D : public Mapper
 {
 public:
-    //##ModelId=3E3AE1F20391
-    typedef Mapper3D Self;
-
-	/** Standard class typedefs. */
-    //##ModelId=3E3AE1F203A5
-    typedef Mapper Superclass;
-
-    
-    //##ModelId=3E3AE1F203C3
-    typedef itk::SmartPointer<Self> Pointer;
-
-    
-    //##ModelId=3E3AE1F203D7
-    typedef itk::SmartPointer<const Self> ConstPointer;
+	mitkClassMacro(Mapper3D,Mapper);
 
 	/** Method for creation through the object factory. */
 	//itkNewMacro(Self);
-
-	/** Run-time type information (and related methods). */
-	itkTypeMacro(Mapper3D,Mapper);
 
 protected:
     //##ModelId=3E3AE1C5010C

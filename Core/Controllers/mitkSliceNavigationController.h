@@ -17,21 +17,7 @@ namespace mitk {
 class SliceNavigationController : public BaseController
 {
   public:
-	/** Standard class typedefs. */
-    //##ModelId=3E189B050197
-	typedef SliceNavigationController      Self;
-    //##ModelId=3E189B0501BF
-	typedef BaseController                 Superclass;
-    //##ModelId=3E189B0501E7
-	typedef itk::SmartPointer<Self>        Pointer;
-    //##ModelId=3E189B05020F
-	typedef itk::SmartPointer<const Self>  ConstPointer;
-
-	/** Method for creation through the object factory. */
-	itkNewMacro(Self);
-
-	/** Run-time type information (and related methods). */
-	itkTypeMacro(SliceNavigationController,BaseController);
+	mitkClassMacro(SliceNavigationController,BaseController);
  
     //##ModelId=3DD524D7038C
     const mitk::Geometry3D* GetGeometry();

@@ -14,18 +14,10 @@ protected:
 //	mitk::Image::Pointer m_MitkImage;
 	mitk::ImageDataItem::Pointer m_ImageDataItem;
 public:
-	/** Standard class typedefs */
-	typedef ImageToItk                           Self;
-	typedef itk::Image<TPixel, VImageDimension>  Superclass;
-	
-	typedef itk::SmartPointer<Self>  Pointer;
-	typedef itk::SmartPointer<const Self>  ConstPointer;
-	
+	mitkClassMacro(ImageToItk, itk::Image);
+
 	/** Method for creation through the object factory. */
 	itkNewMacro(Self);  
-	
-	/** Run-time type information (and related methods). */
-	itkTypeMacro(ImageToItk, itk::Image);
 	
 	/** Superclass typedefs. */
 	typedef Superclass::OutputImageRegionType OutputImageRegionType;

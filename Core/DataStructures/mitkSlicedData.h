@@ -30,18 +30,7 @@ protected:
 	static const int VmitkImageDimension=5;
 #endif
 public:
-	/** Standard typedefs. */
-    //##ModelId=3E143BF0038B
-	typedef SlicedData  Self;
-    //##ModelId=3E143BF003BD
-	typedef BaseData    Superclass;
-    //##ModelId=3E143BF003DB
-	typedef itk::SmartPointer<Self>  Pointer;
-    //##ModelId=3E143BF10011
-	typedef itk::SmartPointer<const Self>  ConstPointer;
-
-	/** Run-time type information (and related methods). */
-	itkTypeMacro(SlicedBase, BaseData);
+	mitkClassMacro(SlicedData, BaseData);
 
 	/** Region typedef support. A region is used to specify a subset of a @a SlicedData. */
     //##ModelId=3E143BF1002F

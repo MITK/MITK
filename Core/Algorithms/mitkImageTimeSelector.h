@@ -16,18 +16,7 @@ namespace mitk {
 class ImageTimeSelector : public SubImageSelector
 {
 public:
-	/** Standard class typedefs. */
-	//##ModelId=3E18A0140171
-	typedef ImageTimeSelector        Self;
-	//##ModelId=3E18A01401B7
-	typedef SubImageSelector         Superclass;
-	//##ModelId=3E18A01401FD
-	typedef itk::SmartPointer<Self>  Pointer;
-	//##ModelId=3E18A0140243
-	typedef itk::SmartPointer<const Self>  ConstPointer;
-
-	/** Run-time type information (and related methods). */
-	itkTypeMacro(ImageTimeSelector,SubImageSelector);
+	mitkClassMacro(ImageTimeSelector,SubImageSelector);
 
 	itkNewMacro(Self);  
 

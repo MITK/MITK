@@ -20,21 +20,10 @@ namespace mitk {
 class DisplayGeometry : public Geometry2D
 {
 public:
-	/** Standard class typedefs. */
-    //##ModelId=3E3AF99E01FF
-	typedef DisplayGeometry          Self;
-    //##ModelId=3E3AF99E0213
-	typedef Geometry2D               Superclass;
-    //##ModelId=3E3AF99E0231
-	typedef itk::SmartPointer<Self>  Pointer;
-    //##ModelId=3E3AF99E024F
-	typedef itk::SmartPointer<const Self>  ConstPointer;
+	mitkClassMacro(DisplayGeometry,Geometry2D);
 
 	/** Method for creation through the object factory. */
 	itkNewMacro(Self);
-
-	/** Run-time type information (and related methods). */
-	itkTypeMacro(DisplayGeometry,Geometry2D);
 
     //##ModelId=3E3AEA5101A2
     virtual void SetWorldGeometry(const mitk::Geometry2D* aWorldGeometry);

@@ -580,6 +580,58 @@ void mitk::Image::Initialize(const mitk::PixelType& type, unsigned int dimension
   m_Initialized = true;
 }
 
+void mitk::Image::Initialize(const mitk::PixelType& type, const mitk::Geometry3D& geometry, bool shiftOriginToZero ) 
+{
+  unsigned int *dimensions = new unsigned int[3];
+  dimensions[0] = geometry.GetExtent(0);
+  dimensions[1] = geometry.GetExtent(1);
+  dimensions[2] = geometry.GetExtent(2);
+
+  unsigned int dimension = 2;
+
+  if ( dimensions[2] > 1 )
+    dimension = 3;
+
+  mitk::BoundingBox* boundingBox = const_cast<mitk::BoundingBox*>(geometry.GetParametricBoundingBox());
+  mitk::BoundingBox::PointType max = boundingBox->GetMaximum();
+  mitk::BoundingBox::PointType min = boundingBox->GetMinimum();
+  mitk::Vector3D spacing = max - min;    
+
+  spacing[0] /= dimensions[0];
+  spacing[1] /= dimensions[1];
+
+  if ( dimensions[1] > 0 )
+    spacing[2] /= dimensions[2];
+
+  const mitk::SlicedGeometry3D* slicedGeometry3D = dynamic_cast<const mitk::SlicedGeometry3D*>(&geometry);
+
+  Initialize( type, dimension, dimensions, 0 );
+
+  if ( slicedGeometry3D )
+    SetSpacing( slicedGeometry3D->GetSpacing() );
+  else 
+    SetSpacing( spacing );
+
+  SlicedGeometry3D* slicedGeometry = GetSlicedGeometry(0);
+  slicedGeometry->SetBounds(geometry.GetBoundingBox()->GetBounds());
+  slicedGeometry->SetIndexToWorldTransform( const_cast<mitk::AffineTransform3D*>(geometry.GetIndexToWorldTransform()) );
+  m_TimeSlicedGeometry->InitializeEvenlyTimed(slicedGeometry, m_Dimensions[3]);
+
+  /*
+  if ( shiftOriginToZero ) 
+  {
+    mitk::Point3D origin; origin.Fill(0);    
+    slicedGeometry->SetOrigin( origin );
+  } 
+  else
+  {
+    slicedGeometry->SetOrigin( geometry.GetOrigin() );
+  }
+  */
+
+  delete dimensions;
+}
+
 void mitk::Image::Initialize(vtkImageData* vtkimagedata, int channels, int tDim, int sDim)
 {
   if(vtkimagedata==NULL) return;

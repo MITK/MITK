@@ -186,6 +186,12 @@ namespace mitk {
     //## @warning Initialize() by pic assumes a plane, evenly spaced geometry starting at (0,0,0).
     virtual void Initialize(const mitk::PixelType& type, unsigned int dimension, unsigned int *dimensions, unsigned int channels = 1);
 
+    //##Documentation
+    //## initialize new (or re-initialize) image
+    //## @warning Initialize() by pic assumes a plane, evenly spaced geometry starting at (0,0,0).
+    //## shiftOriginToZero false: the origin of the geometry is used
+    virtual void Initialize(const mitk::PixelType& type, const mitk::Geometry3D& geometry, bool shiftOriginToZero = false);
+
     //##ModelId=3E102D2601DF
     //##Documentation
     //## initialize new (or re-initialize) image by @a pic. Dimensions and @a

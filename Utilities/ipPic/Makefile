@@ -46,6 +46,8 @@ DISTFILES = Makefile                                                     \
             ipPicSize.c ipPicElements.c ipPicTSVSize.c ipPicTSVElements.c\
             *.ps
 
+all:	libipPic.a picinfo pic2seq
+
 picinfo	:libipPic.a picinfo.o 
 	$(CC) $(LDFLAGS) -o $@ $@.o $(LIBS)
 
@@ -59,11 +61,12 @@ libipPic.a	:$(all)
 		ar rv libipPic.a $(all)
 		-ranlib libipPic.a
 
-install	:libipPic.a picinfo
+install	:libipPic.a picinfo pic2seq
 	cp ipPic.h /usr/local/include/ipPic
 	cp ipTypes.h /usr/local/include/ipPic
 	cp libipPic.a /usr/local/lib
 	cp picinfo /usr/local/bin
+	cp pic2seq /usr/local/bin
 	( cd /usr/local ; rdist )
 
 clean:

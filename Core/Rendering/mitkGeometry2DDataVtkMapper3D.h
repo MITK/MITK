@@ -77,6 +77,8 @@ class Geometry2DDataVtkMapper3D : public BaseVtkMapper3D
 
     //##ModelId=3E6E912903B1
     mitk::ImageSliceSelector::Pointer m_SliceSelector;
+
+	unsigned long int m_LastTextureUpdateTime;
 };
 
 } // namespace mitk

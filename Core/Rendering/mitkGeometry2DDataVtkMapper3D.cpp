@@ -17,11 +17,12 @@
 #include "mitkLevelWindowProperty.h"
 #include "mitkSmartPointerProperty.h"
 #include <vtkActor.h>
+#include <vtkImageData.h>
 
 #include "pic2vtk.h"
 
 //##ModelId=3E691E09038E
-mitk::Geometry2DDataVtkMapper3D::Geometry2DDataVtkMapper3D() : m_DataTreeIterator(NULL)
+mitk::Geometry2DDataVtkMapper3D::Geometry2DDataVtkMapper3D() : m_DataTreeIterator(NULL), m_LastTextureUpdateTime(0)
 {
     m_VtkPlaneSource = vtkPlaneSource::New();
 
@@ -142,24 +143,16 @@ void mitk::Geometry2DDataVtkMapper3D::Update()
 								}
 
 								imagemapper->GenerateAllData();
-								mitk::Image::Pointer image4texture = dynamic_cast<Image*>(imagemapper->GetOutput(0));
-								if(image4texture)
+								const ImageMapper2D::RendererInfo* ri=imagemapper->GetRendererInfo(renderer);
+								if((ri!=NULL) && (m_LastTextureUpdateTime<ri->m_LastUpdateTime))
 								{
-									m_SliceSelector->SetInput(image4texture);
-		m_SliceSelector->SetChannelNr(1);
-		//                            ipPicDescriptor *p=Pic2vtk::convert(m_SliceSelector->GetOutput()->GetVtkImageData());
-		//                            if((p!=NULL) && (plane.normal.z==1))
-		//                                ipPicPut("C:\\aaa.pic", p);
-									const ImageMapper2D::RendererInfo* ri=imagemapper->GetRendererInfo(renderer);
-									if(ri!=NULL)
-									{
-										ipPicDescriptor *p=ri->m_Pic;
-										m_VtkTexture->SetInput(Pic2vtk::convert(p));                            
-										m_Actor->SetTexture(m_VtkTexture);
-									}
-
-									break;
+									ipPicDescriptor *p=ri->m_Pic;
+									vtkImageData* vtkimage=Pic2vtk::convert(p);
+									m_VtkTexture->SetInput(vtkimage); vtkimage->Delete(); vtkimage=NULL;
+									m_Actor->SetTexture(m_VtkTexture);
+									m_LastTextureUpdateTime=ri->m_LastUpdateTime;
 								}
+								break;
 							}
 						}
                     }

@@ -89,15 +89,119 @@ int mitkImageTest(int argc, char* argv[])
   }
   std::cout<<"[PASSED]"<<std::endl;
   
-  std::cout << "Testing GetSliceData(): ";
-  
-  
+  std::cout << "Testing GetSliceData() and compare with filled values: ";
+  p2 = (int*)imgMem->GetSliceData(dim[2]/2)->GetData();
+  int xy_size = dim[0]*dim[1];
+  int start_mid_slice = (dim[2]/2)*xy_size;
+  for(i=0; i<xy_size; ++i, ++p2)
+  {
+    if(*p2!=i+start_mid_slice)
+    {
+      std::cout<<"[FAILED]"<<std::endl;
+      return EXIT_FAILURE;
+    }
+  }
+  std::cout<<"[PASSED]"<<std::endl;
 
-  //int *data = new int[size];
+  //----
+  ipPicDescriptor *pic_slice=ipPicClone(imgMem->GetSliceData(dim[2]/2)->GetPicDescriptor());
+	imgMem=mitk::Image::New();
+
+  std::cout << "Testing reinitializing via Initialize(const mitk::PixelType& type, unsigned int dimension, unsigned int *dimensions): ";
+	imgMem->Initialize(mitk::PixelType(typeid(int)), 3, dim);
+  std::cout<<"[PASSED]"<<std::endl;
+
+  std::cout << "Testing slice-wise filling via SetPicSlice(): ";
+  for(i=0;i<dim[2];++i)
+  {
+    imgMem->SetPicSlice(pic_slice, i, 0, 0);
+  }
+  std::cout<<"[PASSED]"<<std::endl;
+
+  std::cout << "Getting it again and compare with filled values: ";
+  p2 = (int*)imgMem->GetData();
+  if(p2==NULL)
+  {
+    std::cout<<"[FAILED]"<<std::endl;
+    return EXIT_FAILURE;
+  }
+  for(i=0; i<size; ++i, ++p2)
+  {
+    if(*p2!=(i%xy_size)+start_mid_slice)
+    {
+      std::cout<<"[FAILED]"<<std::endl;
+      return EXIT_FAILURE;
+    }
+  }
+  std::cout<<"[PASSED]"<<std::endl;
+
+  std::cout << "Testing IsInitialized(): ";
+  if(imgMem->IsInitialized()==false)
+  {
+    std::cout<<"[FAILED]"<<std::endl;
+    return EXIT_FAILURE;
+  }
+  std::cout<<"[PASSED]"<<std::endl;
+
+  std::cout << "Setting a copy of the volume once again: ";
+  imgMem->SetPicVolume(ipPicClone(imgMem->GetVolumeData(0)->GetPicDescriptor()),0);
+  std::cout<<"[PASSED]"<<std::endl;
+
+  std::cout << "Set a slice with different content via SetPicSlice(): ";
+  memset(pic_slice->data,0,xy_size*sizeof(int));
+  imgMem->SetPicSlice(pic_slice, 1);
+
+  std::cout << "Getting the volume again and compare the check the changed slice: ";
+  p2 = (int*)imgMem->GetData();
+  if(p2==NULL)
+  {
+    std::cout<<"[FAILED]"<<std::endl;
+    return EXIT_FAILURE;
+  }
+  p2+=xy_size;
+  for(i=0; i<xy_size; ++i, ++p2)
+  {
+    if(*p2!=0)
+    {
+      std::cout<<"[FAILED]"<<std::endl;
+      return EXIT_FAILURE;
+    }
+  }
+  std::cout<<"[PASSED]"<<std::endl;
+
+
+  std::cout << "Setting volume again: ";
+  imgMem->SetVolume(imgMem->GetData());
+  std::cout<<"[PASSED]"<<std::endl;
+
+  std::cout << "Set a slice with different content via SetSlice(): ";
+  memset(pic_slice->data,0,xy_size*sizeof(int));
+  imgMem->SetSlice(pic_slice->data, 0);
+
+  std::cout << "Getting the volume again and compare the check the changed slice: ";
+  p2 = (int*)imgMem->GetData();
+  if(p2==NULL)
+  {
+    std::cout<<"[FAILED]"<<std::endl;
+    return EXIT_FAILURE;
+  }
+  for(i=0; i<xy_size; ++i, ++p2)
+  {
+    if(*p2!=0)
+    {
+      std::cout<<"[FAILED]"<<std::endl;
+      return EXIT_FAILURE;
+    }
+  }
+  std::cout<<"[PASSED]"<<std::endl;
+
+
+
   //std::cout << "Testing SetVolume(): ";
   //imgMem->SetVolume(data);
   //std::cout<<"[PASSED]"<<std::endl;
 
+  ipPicFree(pic_slice);
 
   std::cout<<"[TEST DONE]"<<std::endl;
   return EXIT_SUCCESS;

@@ -7,6 +7,7 @@
 #include "DataTree.h"
 #include "ImageSliceSelector.h"
 #include "BaseRenderer.h"
+#include "mitkGeometry2DDataToSurfaceDataFilter.h"
 
 class vtkActor;
 class vtkTexture;
@@ -45,7 +46,9 @@ class Geometry2DDataVtkMapper3D : public BaseVtkMapper3D
     //## @brief The first image found when traversing the @a iterator (stored in m_DataTreeIterator)
 	//## will be used as a texture on the mapped Geometry2D, when it has 
 	//## been resliced by an ImageMapper2D according to the Geometry2D.
-	//## @bug see ImageMapper2D for problems of the current version.
+    //## See ImageMapper2D for problems of the current version.
+	//## @warning Works only when the node to the Geometry2DData was created by 
+    //## calling BaseRenderer::GetWorldGeometryNode()
     virtual void SetDataIteratorForTexture(mitk::DataTreeIterator* iterator);
     //##ModelId=3EF19F850151
     //##Documentation
@@ -105,6 +108,9 @@ class Geometry2DDataVtkMapper3D : public BaseVtkMapper3D
     //##Documentation
     //## @brief timestamp of last update of texture (m_VtkTexture) from image data
 	unsigned long int m_LastTextureUpdateTime;
+
+    //##ModelId=3EF5B7D90186
+    mitk::Geometry2DDataToSurfaceDataFilter::Pointer m_SurfaceCreator;
 };
 
 } // namespace mitk

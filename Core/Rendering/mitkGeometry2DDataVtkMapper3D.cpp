@@ -4,6 +4,7 @@
 
 #include "DataTree.h"
 #include "mitkImageMapper2D.h"
+#include "mitkSurfaceData.h"
 
 #include "vtkActor.h"
 #include "vtkProperty.h"
@@ -27,7 +28,7 @@ mitk::Geometry2DDataVtkMapper3D::Geometry2DDataVtkMapper3D() : m_DataTreeIterato
     m_VtkPlaneSource = vtkPlaneSource::New();
 
     m_VtkPolyDataMapper = vtkPolyDataMapper::New();
-        m_VtkPolyDataMapper->SetInput(m_VtkPlaneSource->GetOutput());
+//        m_VtkPolyDataMapper->SetInput(m_VtkPlaneSource->GetOutput());
         m_VtkPolyDataMapper->ImmediateModeRenderingOn();
 
     m_Actor = vtkActor::New();
@@ -47,6 +48,8 @@ mitk::Geometry2DDataVtkMapper3D::Geometry2DDataVtkMapper3D() : m_DataTreeIterato
         m_VtkTexture->InterpolateOn();
         m_VtkTexture->SetLookupTable(m_VtkLookupTable);
         m_VtkTexture->MapColorScalarsThroughLookupTableOn();
+
+    m_SurfaceCreator = mitk::Geometry2DDataToSurfaceDataFilter::New();
 
     //    m_Actor->SetTexture(axialTexture);
 
@@ -131,28 +134,32 @@ void mitk::Geometry2DDataVtkMapper3D::Update(mitk::BaseRenderer* renderer)
 
     if(input.IsNotNull())
     {
-        mitk::PlaneGeometry::ConstPointer planeGeometry = dynamic_cast<const PlaneGeometry *>(input->GetGeometry2D());
+//        mitk::PlaneGeometry::ConstPointer planeGeometry = dynamic_cast<const PlaneGeometry *>(input->GetGeometry2D());
 
-        if(planeGeometry.IsNotNull())
+        m_SurfaceCreator->SetInput(input);
+        m_SurfaceCreator->Update(); //FIXME ohne das crash
+        m_VtkPolyDataMapper->SetInput(m_SurfaceCreator->GetOutput()->GetVtkPolyData());
+
+//        if(planeGeometry.IsNotNull())
         {
-            const PlaneView &plane=planeGeometry->GetPlaneView();
-            Vector3D right, bottom;
-            right=plane.point+plane.getOrientation1();
-            bottom=plane.point+plane.getOrientation2();
+            //const PlaneView &plane=planeGeometry->GetPlaneView();
+            //Vector3D right, bottom;
+            //right=plane.point+plane.getOrientation1();
+            //bottom=plane.point+plane.getOrientation2();
 
-            m_VtkPlaneSource->SetXResolution(1);
-            m_VtkPlaneSource->SetYResolution(1);
-            m_VtkPlaneSource->SetOrigin(plane.point.x, plane.point.y, plane.point.z);
-            m_VtkPlaneSource->SetPoint1(right.x, right.y, right.z);
-            m_VtkPlaneSource->SetPoint2(bottom.x, bottom.y, bottom.z);
-
+            //m_VtkPlaneSource->SetXResolution(1);
+            //m_VtkPlaneSource->SetYResolution(1);
+            //m_VtkPlaneSource->SetOrigin(plane.point.x, plane.point.y, plane.point.z);
+            //m_VtkPlaneSource->SetPoint1(right.x, right.y, right.z);
+            //m_VtkPlaneSource->SetPoint2(bottom.x, bottom.y, bottom.z);
             if(m_DataTreeIterator)
             {
                 mitk::DataTreeIterator* it=m_DataTreeIterator->clone();
                 while(it->hasNext())
                 {
                     it->next();
-                    mitk::Mapper::Pointer mapper = it->get()->GetMapper(1);
+                    mitk::DataTreeNode* node=it->get();
+                    mitk::Mapper::Pointer mapper = node->GetMapper(1);
                     mitk::ImageMapper2D* imagemapper = dynamic_cast<ImageMapper2D*>(mapper.GetPointer());
 
                     if(imagemapper)
@@ -165,7 +172,7 @@ void mitk::Geometry2DDataVtkMapper3D::Update(mitk::BaseRenderer* renderer)
 							{
                                 // check for level window prop and use it for display if it exists
                                 mitk::LevelWindow levelWindow;
-								if(it->get()->GetLevelWindow(levelWindow, renderer))
+								if(node->GetLevelWindow(levelWindow, renderer))
 									m_VtkLookupTable->SetTableRange(levelWindow.GetMin(),levelWindow.GetMax());
 
 								imagemapper->GenerateAllData();

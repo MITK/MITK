@@ -92,80 +92,78 @@ float mitk::Interactor::CalculateJurisdiction(StateEvent const* stateEvent) cons
     //check, if the current state has a transition waiting for that key event.
     if (this->GetCurrentState()->GetTransition(stateEvent->GetId())!=NULL)
     {
-      returnvalue = 0.5;
+      return 0.5;
     }
     else
     {
-      returnvalue = 0;
+      return 0;
     }
-
   }
   
   //Mouse event handling:
-  else//if we have 2d or 3d position
+  //on MouseMove do nothing! reimplement if needed differently
+  if (stateEvent->GetEvent()->GetType() == mitk::Type_MouseMove)
   {
-    if (stateEvent->GetEvent()->GetType() == mitk::Type_MouseMove)//on MouseMove do nothing! reimplement if needed differently
+    return 0;
+  }
+
+  //compute the center of the data taken care of
+  mitk::BoundingBox *bBox = const_cast<mitk::BoundingBox*>(m_DataTreeNode->GetData()->GetGeometry()->GetBoundingBox());
+  if (bBox == NULL)
+    return 0;
+
+  mitk::PositionEvent const  *posEvent = dynamic_cast <const mitk::PositionEvent *> (stateEvent->GetEvent());
+	if (posEvent == NULL) //2D information from a 3D window
+  {
+    //get camera and calculate the distance between the center of this boundingbox and the camera
+    mitk::OpenGLRenderer* oglRenderer = dynamic_cast<mitk::OpenGLRenderer*>(stateEvent->GetEvent()->GetSender());
+    if (oglRenderer == NULL)
+      return 0;
+    
+    vtkCamera* camera = oglRenderer->GetVtkRenderer()->GetActiveCamera();
+    if (camera == NULL)
     {
+      assert(disPosEvent->GetSender()!=NULL);
       return 0;
     }
+    float normal[3];
+    camera->GetViewPlaneNormal(normal);
+    
+    mitk::BoundingBox::PointType center,n;
+    vtk2itk(n, normal);
+    returnvalue = center.SquaredEuclideanDistanceTo( n );
+    //map between 0.5 and 1
+  }
+  else//3D information from a 2D window.
+  {
+    mitk::Point3D worldPoint = posEvent->GetWorldPosition();
+    float p[3];
+    itk2vtk(worldPoint, p);
+    //transforming the Worldposition to local coordinatesystem
+    m_DataTreeNode->GetData()->GetGeometry()->GetVtkTransform()->GetInverse()->TransformPoint(p, p);
+    vtk2itk(p, worldPoint);
 
-    //compute the center of the data taken care of
-    mitk::BoundingBox *bBox = const_cast<mitk::BoundingBox*>(m_DataTreeNode->GetData()->GetGeometry()->GetBoundingBox());
-    if (bBox == NULL)
-      return 0;
+    //distance between center and point 
+    mitk::BoundingBox::PointType center = bBox->GetCenter();
+    returnvalue = worldPoint.EuclideanDistanceTo(center);
+    
+    //now compared to size of boundingbox to get between 0 and 1;
+    returnvalue = returnvalue/( (bBox->GetMaximum().EuclideanDistanceTo(bBox->GetMinimum() ) ) );
 
-    mitk::PositionEvent const  *posEvent = dynamic_cast <const mitk::PositionEvent *> (stateEvent->GetEvent());
-	  if (posEvent == NULL) //2D information from a 3D window
+    //shall be 1 if short length to center
+    returnvalue = 1 - returnvalue;
+
+    //check if the given position lies inside the data-object
+    if (bBox->IsInside(worldPoint))
     {
-      //get camera and calculate the distance between the center of this boundingbox and the camera
-      mitk::OpenGLRenderer* oglRenderer = dynamic_cast<mitk::OpenGLRenderer*>(stateEvent->GetEvent()->GetSender());
-      if (oglRenderer == NULL)
-        return 0;
-      
-      vtkCamera* camera = oglRenderer->GetVtkRenderer()->GetActiveCamera();
-      if (camera == NULL)
-      {
-        assert(disPosEvent->GetSender()!=NULL);
-        return 0;
-      }
-      float normal[3];
-      camera->GetViewPlaneNormal(normal);
-      
-      mitk::BoundingBox::PointType center,n;
-      vtk2itk(n, normal);
-      returnvalue = center.SquaredEuclideanDistanceTo( n );
-      //map between 0.5 and 1
+      //mapped between 0,5 and 1
+      returnvalue = 0.5 + (returnvalue / 2);
     }
-    else//3D information from a 2D window.
+    else
     {
-      mitk::Point3D worldPoint = posEvent->GetWorldPosition();
-      float p[3];
-      itk2vtk(worldPoint, p);
-      //transforming the Worldposition to local coordinatesystem
-      m_DataTreeNode->GetData()->GetGeometry()->GetVtkTransform()->GetInverse()->TransformPoint(p, p);
-      vtk2itk(p, worldPoint);
-
-      //check if the given position lies inside the data-object
-      if (bBox->IsInside(worldPoint))
-      {
-        //how near inside the center?
-        mitk::BoundingBox::PointType center = bBox->GetCenter();
-        //distance between center and point 
-        returnvalue = 1 - worldPoint.SquaredEuclideanDistanceTo(center);
-        //now compared to size of boundingbox;
-        returnvalue = returnvalue/( (bBox->GetMaximum() - bBox->GetMinimum()).GetNorm() / 2);
-        
-        //now map between 0.5 and 1
-        returnvalue = 0.5 + (returnvalue / 2);
-      }
-      else
-      {
-        //calculate the distance between the point and the BoundingBox
-        //and set it in range between 0 and 0.5 //TODO
-        returnvalue = 0;
-      }
+      //set it in range between 0 and 0.5
+      returnvalue = returnvalue / 2;
     }
-
   }
   return returnvalue;
 }

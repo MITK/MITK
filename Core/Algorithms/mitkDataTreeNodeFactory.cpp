@@ -952,6 +952,7 @@ void mitk::DataTreeNodeFactory::ReadFileSeriesTypeSTL()
 
     mitk::SurfaceData::Pointer surface = mitk::SurfaceData::New();
     std::cout << "prefix: "<< m_FilePrefix << ", pattern: " <<m_FilePattern << std::endl;
+    surface->Initialize(m_MatchedFileNames.size());
     //surface->Resize( m_MatchedFileNames.size() );
     for ( unsigned int i = 0 ; i < m_MatchedFileNames.size(); ++i )
     {

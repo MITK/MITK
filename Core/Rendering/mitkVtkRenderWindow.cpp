@@ -89,27 +89,28 @@ void mitk::VtkRenderWindow::CopyResultFrame()
 
 
 //derived to enable Stencil Buffer in pfd
-void mitk::VtkRenderWindow::SetupPixelFormat(HDC hDC, DWORD dwFlags, 
+/*
+ * void mitk::VtkRenderWindow::SetupPixelFormat(HDC hDC, DWORD dwFlags, 
                                                   int debug, int bpp, 
                                                   int zbpp)
 {
   PIXELFORMATDESCRIPTOR pfd = {
-    sizeof(PIXELFORMATDESCRIPTOR),  /* size */
-    1,                              /* version */
-    dwFlags         ,               /* support double-buffering */
-    PFD_TYPE_RGBA,                  /* color type */
-    bpp,                             /* prefered color depth */
-    0, 0, 0, 0, 0, 0,               /* color bits (ignored) */
-    0,                              /* no alpha buffer */
-    0,                              /* alpha bits (ignored) */
-    0,                              /* no accumulation buffer */
-    0, 0, 0, 0,                     /* accum bits (ignored) */
-    zbpp,                           /* depth buffer */
-    1,                              /* stencil buffer enabled!!!*/
-    0,                              /* no auxiliary buffers */
-    PFD_MAIN_PLANE,                 /* main layer */
-    0,                              /* reserved */
-    0, 0, 0,                        /* no layer, visible, damage masks */
+    sizeof(PIXELFORMATDESCRIPTOR),  //gc size 
+    1,                              //gc version 
+    dwFlags         ,               //gc support double-buffering 
+    PFD_TYPE_RGBA,                  //gc color type 
+    bpp,                             //gc prefered color depth 
+    0, 0, 0, 0, 0, 0,               //gc color bits (ignored) 
+    0,                              //gc no alpha buffer 
+    0,                              //gc alpha bits (ignored) 
+    0,                              //gc no accumulation buffer 
+    0, 0, 0, 0,                     //gc accum bits (ignored) 
+    zbpp,                           //gc depth buffer 
+    1,                              //gc stencil buffer enabled!!!
+    0,                              //gc no auxiliary buffers 
+    PFD_MAIN_PLANE,                 //gc main layer 
+    0,                              //gc reserved 
+    0, 0, 0,                        //gc no layer, visible, damage masks 
   };
   int pixelFormat;
   // Only try to set pixel format if we do not currently have one
@@ -153,3 +154,4 @@ void mitk::VtkRenderWindow::SetupPixelFormat(HDC hDC, DWORD dwFlags,
       this->StereoCapableWindow = 0;
     }
 }
+*/

@@ -67,8 +67,8 @@ public:
 
   // Description:
   // Initialize OpenGL for this window with Stencil Buffer enabled
-  virtual void SetupPixelFormat(HDC hDC, DWORD dwFlags, int debug, 
-                                int bpp=16, int zbpp=16);
+  // virtual void SetupPixelFormat(HDC hDC, DWORD dwFlags, int debug, 
+  //                              int bpp=16, int zbpp=16);
 
 protected:
   VtkRenderWindow();

@@ -342,53 +342,12 @@ void QmitkStdMultiWidget::initWidget(mitk::DataTreeIteratorBase* it,
                                    const mitk::Vector3D& right,
                                    const mitk::Vector3D& bottom)
 {
-/*
-  mitk::PlaneGeometry::Pointer plane = mitk::PlaneGeometry::New();
 
-  //ohne den Pointer-Umweg meckert gcc
-  mitk::PlaneView* view = new mitk::PlaneView(origin,right,bottom);
-  plane->SetPlaneView(*view);
-  delete view;
-
-  widget->GetRenderer()->SetWorldGeometry(plane);
-
-  widget->update();
-*/
 }
 
 void QmitkStdMultiWidget::initWidgets( mitk::DataTreeIteratorBase* it )
 {
-/*
-  const mitk::BoundingBox::BoundsArrayType bounds = mitk::DataTree::ComputeBoundingBox(it)->GetBounds();
-  printf("\nboundingbox\n");
 
-  setData(it);
-  
-  initWidget(it,
-    mitkWidget1,
-    Vector3f(bounds[0],bounds[3],bounds[5]),
-    Vector3f(bounds[1],bounds[3],bounds[5]),
-    Vector3f(bounds[0],bounds[2],bounds[5])
-    );
-  printf("\nw1 init\n");
-
-  // YZ
-  initWidget(it,mitkWidget2,
-    Vector3f(bounds[0],bounds[2],bounds[4]),
-    Vector3f(bounds[0],bounds[3],bounds[4]),
-    Vector3f(bounds[0],bounds[2],bounds[5])
-    );
-  // XZ
-  initWidget(it,
-    mitkWidget3,
-    Vector3f(bounds[0],bounds[2],bounds[4]),
-    Vector3f(bounds[1],bounds[2],bounds[4]),
-    Vector3f(bounds[0],bounds[2],bounds[5])
-    );
-  mitkWidget4->GetRenderer()->SetData(it);
-  
-  fit();
-*/
 }
 
 void QmitkStdMultiWidget::addPlaneSubTree(mitk::DataTreeIteratorBase* it)

@@ -149,7 +149,9 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
       mitk::DataTreeIterator* it=tree->inorderIterator();
 
       node=mitk::DataTreeNode::New();
+      
       node->SetData(reader->GetOutput());
+
       it->add(node);
 
       QString tmpName = fileName;

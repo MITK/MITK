@@ -1,6 +1,8 @@
 // std
 #include <string>
 
+#include <ipPic.h>
+
 // itk includes
 #include <itkMinimumMaximumImageCalculator.h>
 
@@ -108,11 +110,11 @@ public:
     }
 
     mitk::SurfaceData::Pointer surface = mitk::SurfaceData::New();
-//    vtkPolyData* polys = MeshUtil<TMeshType>::meshToPolyData( itkMesh );
+    //    vtkPolyData* polys = MeshUtil<TMeshType>::meshToPolyData( itkMesh );
     /**
-     * @todo include Algorithms/itkMeshDeformation into Framework module so the upper line can be used
-     * and the conversion works correctly
-     */
+    * @todo include Algorithms/itkMeshDeformation into Framework module so the upper line can be used
+    * and the conversion works correctly
+    */
     vtkPolyData* polys = vtkPolyData::New();
     surface->SetVtkPolyData(polys);
     node->SetData( surface );
@@ -129,7 +131,7 @@ public:
   * \brief converts the itk image to mitk image, creates a datatreenode and adds the node to 
   * the referenced datatree
   */
-    static void AddVtkMeshToDataTree(vtkPolyData* polys, mitk::DataTreeIterator* iterator, std::string str)
+  static mitk::DataTreeNode::Pointer AddVtkMeshToDataTree(vtkPolyData* polys, mitk::DataTreeIterator* iterator, std::string str)
   {
     mitk::DataTreeIterator* it=iterator->clone();
 
@@ -154,10 +156,58 @@ public:
     node->SetProperty("layer", new mitk::IntProperty(1));
     node->SetVisibility(true,NULL);
 
-    float meshColor[3] = {.5f,.5f,.5f};
+    float meshColor[3] = {1.0,0.5,0.5};
     node->SetColor(meshColor,  NULL );
     node->SetVisibility(true, NULL );
 
     delete it;
+
+    return node;
   }
+
+  /** 
+  * \brief creates a datatreenode for th PIC image and adds the node to 
+  * the referenced datatree
+  */
+  static mitk::DataTreeNode::Pointer AddPicImageToDataTree(ipPicDescriptor * pic, mitk::DataTreeIterator* iterator, std::string str)
+  {
+    mitk::DataTreeIterator* it=iterator->clone();
+
+    mitk::Image::Pointer image = mitk::Image::New();
+    image->Initialize(pic);
+    image->SetPicVolume(pic);
+
+    mitk::DataTreeNode::Pointer node = NULL;
+    mitk::DataTreeIterator* subTree = ((mitk::DataTree *) it->getTree())->GetNext("fileName", new mitk::StringProperty( str.c_str() ));
+
+    if (subTree == NULL || subTree->get() == NULL)
+    {
+      node=mitk::DataTreeNode::New();
+      mitk::StringProperty::Pointer nameProp = new mitk::StringProperty(str.c_str());
+      node->SetProperty("fileName",nameProp);
+      it->add(node);
+    }
+    else
+    {
+      node = subTree->get();
+    }
+    node->SetData(image);
+
+    mitk::LevelWindowProperty::Pointer levWinProp = new mitk::LevelWindowProperty();
+    mitk::LevelWindow levelWindow;
+    levelWindow.SetAuto( image->GetPic() );
+    levWinProp->SetLevelWindow(levelWindow);
+    node->GetPropertyList()->SetProperty("levelwindow",levWinProp);
+
+    //CommonFunctionality::MinMax<TImageType>(itkImage,extrema[0],extrema[1]);
+    //if (extrema[0] == 0 && extrema[1] ==1)
+    //{
+    //  mitk::BoolProperty::Pointer binProp = new mitk::BoolProperty(true);
+    //  node->GetPropertyList()->SetProperty("binary",binProp);
+    //}
+    delete it;
+
+    return node;
+  }
+
 };

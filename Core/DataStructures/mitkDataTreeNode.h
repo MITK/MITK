@@ -250,6 +250,10 @@ public:
   //## IntProperty)
   void SetIntProperty(const char* propertyKey, int intValue, mitk::BaseRenderer* renderer=NULL);
 
+  //##Documentation
+  //## @brief Get the timestamp of the last change of the contents of this node or 
+  //## the referenced BaseData.
+  virtual unsigned long GetMTime() const;
 protected:
   //##ModelId=3E33F5D702AA
   DataTreeNode();

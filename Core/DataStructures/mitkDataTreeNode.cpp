@@ -324,3 +324,11 @@ vtkTransform* mitk::DataTreeNode::GetVtkTransform() const
   return m_Data->GetGeometry()->GetTransform();
 }
 
+unsigned long mitk::DataTreeNode::GetMTime() const
+{
+  if((m_Data.IsNotNull()) && (Superclass::GetMTime()<m_Data->GetMTime()))
+	{
+		Modified();
+	}
+  return Superclass::GetMTime();
+}

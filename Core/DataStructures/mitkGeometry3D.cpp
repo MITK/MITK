@@ -96,7 +96,7 @@ void mitk::Geometry3D::UnitsToMM(const mitk::Vector3D &vec_units, mitk::Vector3D
 }
 
 //##ModelId=3DCBC65C017C
-const float *mitk::Geometry3D::GetSpacing() const
+const float* mitk::Geometry3D::GetSpacing() const
 {
 	return &m_Spacing.x;
 }
@@ -299,5 +299,8 @@ void mitk::Geometry3D::SetSpacing(ipPicDescriptor* pic)
 		}
 	}
 #endif
+	 // FIXME:
+	 // nur fuer Testdatensatz
+	 // spacing = Vector3D(1/3.0,1/4.0,1/5.0);
     SetSpacing(spacing);
 }

@@ -29,7 +29,7 @@ m_CurrentWindow ( NULL ),
 m_BoundingBox (BoundingBoxType::New()),
 m_Vertices ( BoundingBoxType::PointsContainer::New() )  
 {
-  m_Geometry3D->Initialize(1);
+  m_Geometry3D->Initialize();
 }
 
 //##ModelId=3F0177E901BE

@@ -17,7 +17,6 @@ public:
   itkNewMacro(Self);
 
   typedef itk::PolyLineParametricPath<3>                        PathType;
-  typedef itk::PolyLineParametricPath<3>                        PathType;
   typedef PathType::Pointer                                     PathPointer;
   typedef PathType::ContinuousIndexType                         ContinuousIndexType;
   typedef PathType::InputType                                   InputType;

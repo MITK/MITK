@@ -8,7 +8,7 @@ Do a CVS checkout of \c mMITKExample for the sample application including the li
 Start the CMake-GUI: 
 
 <b>Linux:</b>
-\c cd to your preferred build directory and use the command <c> ccmake <path-to-ip++-dir> <\c><br>
+\c cd to your preferred build directory and use the command <c> ccmake <path-to-ip++-dir> </c><br>
 <b>Windows:</b>
 Start \c CMakeSetup and select the path to \c ip++ as source directory and the path you like for binary directory. Select your compiler.
 <br>

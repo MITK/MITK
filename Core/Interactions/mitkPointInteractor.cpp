@@ -510,15 +510,15 @@ case AcREMOVEPOINT:
         PointOperation* doOp = new mitk::PointOperation(OpSETPOINTTYPE, point, position, true, PTSTART);
 
         //Undo
-	if (m_UndoEnabled)	//write to UndoMechanism
+      	if (m_UndoEnabled)	//write to UndoMechanism
         {
-	  PointOperation* undoOp = new mitk::PointOperation(OpSETPOINTTYPE, point, position, true, PTUNDEFINED);
-	  OperationEvent *operationEvent = new OperationEvent(pointSet, doOp, undoOp);
-	  m_UndoController->SetOperationEvent(operationEvent);
-	}
+	        PointOperation* undoOp = new mitk::PointOperation(OpSETPOINTTYPE, point, position, true, PTUNDEFINED);
+	        OperationEvent *operationEvent = new OperationEvent(pointSet, doOp, undoOp);
+	        m_UndoController->SetOperationEvent(operationEvent);
+	      }
 
-	//execute the Operation
-	pointSet->ExecuteOperation(doOp);
+	      //execute the Operation
+	      pointSet->ExecuteOperation(doOp);
         ok = true;
       }
     }

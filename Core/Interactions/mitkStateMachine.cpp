@@ -29,6 +29,10 @@ std::string mitk::StateMachine::GetType() const
 //##ModelId=3E5B2DE30378
 bool mitk::StateMachine::HandleEvent(StateEvent const* stateEvent, int objectEventId, int groupEventId)
 {
+
+////debug
+//std::cout<<"EventID:"<<stateEvent->GetId()<<std::endl;
+
 	if (m_CurrentState == NULL)
 		return false;//m_CurrentState needs to be set first!
 

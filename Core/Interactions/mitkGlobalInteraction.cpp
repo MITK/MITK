@@ -191,9 +191,10 @@ register at DataTree, that if anything changes, the list can be refreshed.
 If a new object is generated here, the new object flows into the m_SelectedElements
 and the Focus changes.
 */
-	//Quickimplementation; is to be changed with List from DataTree
+
+    //Quickimplementation; is to be changed with List from DataTree
 	//send the event to all in List
-	for (StateMachineListIter it = m_LocalStateMachines.begin(); it != m_LocalStateMachines.end(); it++)
+    for (StateMachineListIter it = m_LocalStateMachines.begin(); it != m_LocalStateMachines.end(); it++)
 	{
         if((*it)!=NULL)
             ok = (*it)->HandleEvent(stateEvent, objectEventId, groupEventId);

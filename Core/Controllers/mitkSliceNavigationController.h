@@ -83,6 +83,12 @@ public:
 
   virtual void Update();
 
+  virtual void SendCreatedWorldGeometry();
+
+  virtual void SendSlice();
+
+  virtual void SendTime();
+
   class TimeSlicedGeometryEvent : public itk::AnyEvent 
   { 
   public: 
@@ -104,10 +110,23 @@ public:
     TimeSlicedGeometryEvent(const Self&); 
     void operator=(const Self&); 
   };
+  mitkTimeSlicedGeometryEventMacro( GeometrySendEvent    , TimeSlicedGeometryEvent );
   mitkTimeSlicedGeometryEventMacro( GeometryTimeEvent    , TimeSlicedGeometryEvent );
   mitkTimeSlicedGeometryEventMacro( GeometrySliceEvent   , TimeSlicedGeometryEvent );
   
-  template <typename T> void ConnectGeometrySliceEvent(T* receiver)
+  template <typename T> void ConnectGeometrySendEvent(T* receiver)
+  {
+    typedef typename itk::ReceptorMemberCommand<T>::Pointer ReceptorMemberCommandPointer;
+    ReceptorMemberCommandPointer eventReceptorCommand = itk::ReceptorMemberCommand<T>::New();
+  #ifdef WIN32
+    eventReceptorCommand->SetCallbackFunction(receiver, T::SetGeometry);
+  #else
+    eventReceptorCommand->SetCallbackFunction(receiver, &T::SetGeometry);
+  #endif
+    AddObserver(GeometrySendEvent(NULL,0), eventReceptorCommand);
+  }
+  
+  template <typename T> void ConnectGeometrySliceEvent(T* receiver, bool connectSendEvent=true)
   {
     typedef typename itk::ReceptorMemberCommand<T>::Pointer ReceptorMemberCommandPointer;
     ReceptorMemberCommandPointer eventReceptorCommand = itk::ReceptorMemberCommand<T>::New();
@@ -117,9 +136,11 @@ public:
     eventReceptorCommand->SetCallbackFunction(receiver, &T::SetGeometrySlice);
   #endif
     AddObserver(GeometrySliceEvent(NULL,0), eventReceptorCommand);
+    if(connectSendEvent)
+      ConnectGeometrySendEvent(receiver);
   }
 
-  template <typename T> void ConnectGeometryTimeEvent(T* receiver)
+  template <typename T> void ConnectGeometryTimeEvent(T* receiver, bool connectSendEvent=true)
   {
     typedef typename itk::ReceptorMemberCommand<T>::Pointer ReceptorMemberCommandPointer;
     ReceptorMemberCommandPointer eventReceptorCommand = itk::ReceptorMemberCommand<T>::New();
@@ -129,13 +150,17 @@ public:
     eventReceptorCommand->SetCallbackFunction(receiver, &T::SetGeometryTime);
   #endif
     AddObserver(GeometryTimeEvent(NULL,0), eventReceptorCommand);
+    if(connectSendEvent)
+      ConnectGeometrySendEvent(receiver);
   }
 
   template <typename T> void ConnectGeometryEvents(T* receiver)
   {
-    ConnectGeometrySliceEvent(receiver);
+    ConnectGeometrySliceEvent(receiver, false); //connect sendEvent only once
     ConnectGeometryTimeEvent(receiver);
   }
+
+  virtual void SetGeometry(const itk::EventObject & geometrySliceEvent);
 
   virtual void SetGeometrySlice(const itk::EventObject & geometrySliceEvent);
 
@@ -147,10 +172,6 @@ protected:
 
   //##ModelId=3E189B1D00BF
   virtual ~SliceNavigationController();
-
-  virtual void SliceStepperChanged();
-
-  virtual void TimeStepperChanged();
 
   mitk::Geometry3D::ConstPointer m_InputWorldGeometry;
 

@@ -91,8 +91,19 @@ QWidget * QmitkSimpleExampleFunctionality::createControlWidget(QWidget *parent)
         new QmitkStepperAdapter(controls->getSliceNavigatorFrontal(), sliceNavigatorFrontal->GetSlice(), "sliceNavigatorFrontalFromSimpleExample");
 
         sliceNavigatorTime = mitk::SliceNavigationController::New();
-        sliceNavigatorTime->ConnectGeometryTimeEvent(multiWidget->mitkWidget1->GetRenderer().GetPointer());
+        sliceNavigatorTime->ConnectGeometryTimeEvent(multiWidget->mitkWidget1->GetRenderer().GetPointer(), false);
+        sliceNavigatorTime->ConnectGeometryTimeEvent(multiWidget->mitkWidget2->GetRenderer().GetPointer(), false);
+        sliceNavigatorTime->ConnectGeometryTimeEvent(multiWidget->mitkWidget3->GetRenderer().GetPointer(), false);
+        sliceNavigatorTime->ConnectGeometryTimeEvent(multiWidget->mitkWidget4->GetRenderer().GetPointer(), false);
         new QmitkStepperAdapter(controls->getSliceNavigatorTime(), sliceNavigatorTime->GetTime(), "sliceNavigatorTimeFromSimpleExample");
+
+        typedef itk::ReceptorMemberCommand<QmitkSimpleExampleFunctionality>::Pointer ReceptorMemberCommandPointer;
+        ReceptorMemberCommandPointer eventReceptorCommand = itk::ReceptorMemberCommand<QmitkSimpleExampleFunctionality>::New();
+        eventReceptorCommand->SetCallbackFunction(this, &QmitkSimpleExampleFunctionality::SliderNavigatorEvent);
+        sliceNavigatorTransversal->AddObserver(mitk::SliceNavigationController::GeometrySliceEvent(NULL,0), eventReceptorCommand);
+        sliceNavigatorSagittal->AddObserver(mitk::SliceNavigationController::GeometrySliceEvent(NULL,0), eventReceptorCommand);
+        sliceNavigatorFrontal->AddObserver(mitk::SliceNavigationController::GeometrySliceEvent(NULL,0), eventReceptorCommand);
+        sliceNavigatorTime->AddObserver(mitk::SliceNavigationController::GeometryTimeEvent(NULL,0), eventReceptorCommand);
     }
     return controls;
 }
@@ -142,10 +153,24 @@ void QmitkSimpleExampleFunctionality::initNavigators()
     }
 
     sliceNavigatorTransversal->SetInputWorldGeometry(geometry.GetPointer()); sliceNavigatorTransversal->Update();
-    sliceNavigatorFrontal->SetInputWorldGeometry(geometry.GetPointer());     sliceNavigatorFrontal->Update();
     sliceNavigatorSagittal->SetInputWorldGeometry(geometry.GetPointer());    sliceNavigatorSagittal->Update();
+    sliceNavigatorFrontal->SetInputWorldGeometry(geometry.GetPointer());     sliceNavigatorFrontal->Update();
     sliceNavigatorTime->SetInputWorldGeometry(geometry.GetPointer());        sliceNavigatorTime->Update();
   }
+}
+
+void QmitkSimpleExampleFunctionality::SliderNavigatorEvent(const itk::EventObject & geometryTimeEvent)
+{
+  if((dynamic_cast<const mitk::TimeSlicedGeometry*>(multiWidget->mitkWidget1->GetRenderer()->GetWorldGeometry())==NULL) &&
+    (dynamic_cast<const mitk::TimeSlicedGeometry*>(sliceNavigatorTransversal->GetCreatedWorldGeometry())!=NULL))
+    sliceNavigatorTransversal->SendCreatedWorldGeometry();
+  if((dynamic_cast<const mitk::TimeSlicedGeometry*>(multiWidget->mitkWidget2->GetRenderer()->GetWorldGeometry())==NULL) &&
+    (dynamic_cast<const mitk::TimeSlicedGeometry*>(sliceNavigatorSagittal->GetCreatedWorldGeometry())!=NULL))
+    sliceNavigatorSagittal->SendCreatedWorldGeometry();
+  if((dynamic_cast<const mitk::TimeSlicedGeometry*>(multiWidget->mitkWidget3->GetRenderer()->GetWorldGeometry())==NULL) &&
+    (dynamic_cast<const mitk::TimeSlicedGeometry*>(sliceNavigatorFrontal->GetCreatedWorldGeometry())!=NULL))
+    sliceNavigatorFrontal->SendCreatedWorldGeometry();
+  sliceNavigatorTime->SendCreatedWorldGeometry();
 }
 
 void QmitkSimpleExampleFunctionality::treeChanged(mitk::DataTreeIterator& itpos)

@@ -30,13 +30,13 @@ layout template.
 */
 class QmitkSimpleExampleFunctionality : public QmitkFunctionality, public mitk::OperationActor, public mitk::DataTreeBaseTreeChangeListener
 {
-    Q_OBJECT
+  Q_OBJECT
 public:
 
   /*!
   \brief default constructor
   */
-	QmitkSimpleExampleFunctionality(QObject *parent=0, const char *name=0, QmitkStdMultiWidget *mitkStdMultiWidget = NULL, mitk::DataTreeIterator * dataIt = NULL);
+  QmitkSimpleExampleFunctionality(QObject *parent=0, const char *name=0, QmitkStdMultiWidget *mitkStdMultiWidget = NULL, mitk::DataTreeIterator * dataIt = NULL);
 
   /*!
   \brief default destructor
@@ -45,7 +45,7 @@ public:
 
   /*!
   \brief method for creating the widget containing the application 
-					controls, like sliders, buttons etc.
+  controls, like sliders, buttons etc.
   */
   virtual QWidget * createControlWidget(QWidget *parent);
 
@@ -54,55 +54,56 @@ public:
   */
   virtual QWidget * createMainWidget(QWidget * parent);
 
-	/*!
+  /*!
   \brief method for creating the connections of main and control widget
   */
   virtual void createConnections();
 
   /*!
   \brief method for creating an QAction object, i.e. button & menu entry
-	@param parent the parent QWidget
+  @param parent the parent QWidget
   */
   virtual QAction * createAction(QActionGroup *parent);
 
-	/*! 
-		* \brief returns the name of this functionality object
-		*/
+  /*! 
+  * \brief returns the name of this functionality object
+  */
   virtual QString getFunctionalityName();
 
 
-	/*!
-	 \brief  inits the widgets of a functionality, 
-						i.e. initializing slider etc.
-	 */
-	void initWidgets();
+  /*!
+  \brief  inits the widgets of a functionality, 
+  i.e. initializing slider etc.
+  */
+  void initWidgets();
 
-    //##Documentation
-    //## \brief Implementation of OperationActor-method. Used for scrolling
-    //## through the slices by clicking into the images.
-    //## 
-    //## mitk::Operation is expected to be an mitk::PointOperation. 
-    //## The slices of widgets 1,2,3 are moved so that the seed point is on them.
-    virtual void ExecuteOperation(mitk::Operation* operation);
+  //##Documentation
+  //## \brief Implementation of OperationActor-method. Used for scrolling
+  //## through the slices by clicking into the images.
+  //## 
+  //## mitk::Operation is expected to be an mitk::PointOperation. 
+  //## The slices of widgets 1,2,3 are moved so that the seed point is on them.
+  virtual void ExecuteOperation(mitk::Operation* operation);
 
-    virtual void activated();
+  virtual void activated();
+
 protected slots:
 
-	/*!
+  /*!
   qt slot for event processing from a slider control,
-		controls transversal view
+  controls transversal view
   */
   void selectSliceWidgetXY( int z );
 
   /*!
   qt slot for event processing from a slider control
-			controls sagital view
+  controls sagital view
   */
   void selectSliceWidgetXZ( int z );
 
   /*!
   qt slot for event processing from a slider control
-			controls axial view
+  controls axial view
   */
   void selectSliceWidgetYZ( int z );
 
@@ -115,41 +116,25 @@ protected slots:
 protected:
   void initNavigators();
 
-	/*!
-	* default main widget containing 4 windows showing 3 
-	* orthogonal slices of the volume and a 3d render window
-	*/
-	QmitkStdMultiWidget * multiWidget;
+  /*!
+  * default main widget containing 4 windows showing 3 
+  * orthogonal slices of the volume and a 3d render window
+  */
+  QmitkStdMultiWidget * multiWidget;
 
-	/*!
-	* controls containing sliders for scrolling through the slices
-	*/
-	QmitkSimpleExampleControls * controls;
-  
+  /*!
+  * controls containing sliders for scrolling through the slices
+  */
+  QmitkSimpleExampleControls * controls;
 
-	/*!
 
-	* ???
-
-	*/
-
-//	int count;
-
-  
-
-	/*!
-
-	* property for opacity for showing image overlays.
-
-	* This property can be adjusted over a slider in 
-
-	* the control widget.
-
-	* 
-
-	*/
-
-	mitk::FloatProperty::Pointer opacityprop;
+  /*!
+  * property for opacity for showing image overlays.
+  * This property can be adjusted over a slider in 
+  * the control widget.
+  * 
+  */
+  mitk::FloatProperty::Pointer opacityprop;
 
   mitk::LookupTableProperty::Pointer lookupTableProp;
 
@@ -157,6 +142,15 @@ protected:
   mitk::SliceNavigationController::Pointer sliceNavigatorFrontal;
   mitk::SliceNavigationController::Pointer sliceNavigatorSagittal;
   mitk::SliceNavigationController::Pointer sliceNavigatorTime;
+
+  //##Documentation
+  //## \brief only temporarily as long as the old procedure for click-and-move-planes is used
+  //## 
+  //## The old procedure for click-and-move-planes send 2D-geometries to the renderers, so the 
+  //## sliders do not work after clicking. This methods is added as an observer to all sliderNavigators 
+  //## and the checks for each renderer whether it currently has a 2D-geometry and, if so, tells the 
+  //## the associated sliderNavigator to re-send the geometry.
+  void SliderNavigatorEvent(const itk::EventObject & geometryTimeEvent);
 };
 
 #endif // !defined(AFX_QMITKSIMPLEEXAMPLEFUNCTIONALITY_H__1DC0BA6E_9B8D_4D63_8A63_5B661CE33712__INCLUDED_)

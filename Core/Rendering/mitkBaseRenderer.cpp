@@ -119,7 +119,11 @@ void mitk::BaseRenderer::SetSlice(unsigned int slice)
     {
       SlicedGeometry3D* slicedWorldGeometry=dynamic_cast<SlicedGeometry3D*>(m_TimeSlicedWorldGeometry->GetGeometry3D(m_TimeStep));
       if(slicedWorldGeometry!=NULL)
+      {
+        if(m_Slice >= slicedWorldGeometry->GetSlices())
+          m_Slice = slicedWorldGeometry->GetSlices()-1;
         SetCurrentWorldGeometry2D(slicedWorldGeometry->GetGeometry2D(m_Slice));
+      }
     }
     else
       Modified();
@@ -133,6 +137,8 @@ void mitk::BaseRenderer::SetTimeStep(unsigned int timeStep)
     m_TimeStep = timeStep;
     if(m_TimeSlicedWorldGeometry.IsNotNull())
     {
+      if(m_TimeStep >= m_TimeSlicedWorldGeometry->GetTimeSteps())
+        m_TimeStep = m_TimeSlicedWorldGeometry->GetTimeSteps()-1;
       SlicedGeometry3D* slicedWorldGeometry=dynamic_cast<SlicedGeometry3D*>(m_TimeSlicedWorldGeometry->GetGeometry3D(m_TimeStep));
       if(slicedWorldGeometry!=NULL)
         SetCurrentWorldGeometry2D(slicedWorldGeometry->GetGeometry2D(m_Slice));
@@ -154,13 +160,13 @@ void mitk::BaseRenderer::SetWorldGeometry(mitk::Geometry3D* geometry)
     if(m_TimeSlicedWorldGeometry.IsNotNull())
     {
       itkDebugMacro("setting TimeSlicedWorldGeometry to " << m_TimeSlicedWorldGeometry);
-      if(m_TimeStep > m_TimeSlicedWorldGeometry->GetTimeSteps())
-        m_TimeStep = m_TimeSlicedWorldGeometry->GetTimeSteps();
-      SlicedGeometry3D* slicedWorldGeometry=dynamic_cast<SlicedGeometry3D*>(m_TimeSlicedWorldGeometry->GetGeometry3D(0));
+      if(m_TimeStep >= m_TimeSlicedWorldGeometry->GetTimeSteps())
+        m_TimeStep = m_TimeSlicedWorldGeometry->GetTimeSteps()-1;
+      SlicedGeometry3D* slicedWorldGeometry=dynamic_cast<SlicedGeometry3D*>(m_TimeSlicedWorldGeometry->GetGeometry3D(m_TimeStep));
       if(slicedWorldGeometry!=NULL)
       {
-        if(m_Slice > slicedWorldGeometry->GetSlices())
-          m_Slice = slicedWorldGeometry->GetSlices();
+        if(m_Slice >= slicedWorldGeometry->GetSlices())
+          m_Slice = slicedWorldGeometry->GetSlices()-1;
       }
       assert(slicedWorldGeometry!=NULL); //only as long as the todo described in SetWorldGeometry is not done
       SetCurrentWorldGeometry2D(slicedWorldGeometry->GetGeometry2D(m_Slice)); // calls Modified()
@@ -200,16 +206,22 @@ void mitk::BaseRenderer::SetCurrentWorldGeometry2D(mitk::Geometry2D* geometry2d)
   }
 }
 
+void mitk::BaseRenderer::SetGeometry(const itk::EventObject & geometrySendEvent)
+{
+  const SliceNavigationController::GeometrySendEvent* sendEvent =
+    dynamic_cast<const SliceNavigationController::GeometrySendEvent *>(&geometrySendEvent);
+
+  assert(sendEvent !=NULL);
+  SetWorldGeometry(sendEvent ->GetTimeSlicedGeometry());
+}
+
 void mitk::BaseRenderer::SetGeometrySlice(const itk::EventObject & geometrySliceEvent)
 {
   const SliceNavigationController::GeometrySliceEvent* sliceEvent =
     dynamic_cast<const SliceNavigationController::GeometrySliceEvent *>(&geometrySliceEvent);
 
-  if(sliceEvent!=NULL)
-  {
-    SetWorldGeometry(sliceEvent->GetTimeSlicedGeometry());
-    SetSlice(sliceEvent->GetPos());
-  }
+  assert(sliceEvent!=NULL);
+  SetSlice(sliceEvent->GetPos());
 }
 
 void mitk::BaseRenderer::SetGeometryTime(const itk::EventObject & geometryTimeEvent)
@@ -217,11 +229,8 @@ void mitk::BaseRenderer::SetGeometryTime(const itk::EventObject & geometryTimeEv
   const SliceNavigationController::GeometryTimeEvent * timeEvent =
     dynamic_cast<const SliceNavigationController::GeometryTimeEvent *>(&geometryTimeEvent);
 
-  if(timeEvent!=NULL)
-  {
-    SetWorldGeometry(timeEvent->GetTimeSlicedGeometry());
-    SetTimeStep(timeEvent->GetPos());
-  }
+  assert(timeEvent!=NULL);
+  SetTimeStep(timeEvent->GetPos());
 }
 
 //##ModelId=3E6D5DD30322

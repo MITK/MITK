@@ -12,11 +12,11 @@ mitk::SliceNavigationController::SliceNavigationController() : m_ViewDirection(T
   sliceStepperChangedCommand = itk::SimpleMemberCommand<SliceNavigationController>::New();
   timeStepperChangedCommand = itk::SimpleMemberCommand<SliceNavigationController>::New();
 #ifdef WIN32
-  sliceStepperChangedCommand->SetCallbackFunction(this, SliceNavigationController::SliceStepperChanged);
-  timeStepperChangedCommand->SetCallbackFunction(this,  SliceNavigationController::TimeStepperChanged);
+  sliceStepperChangedCommand->SetCallbackFunction(this, SliceNavigationController::SendSlice);
+  timeStepperChangedCommand->SetCallbackFunction(this,  SliceNavigationController::SendTime);
 #else
-  sliceStepperChangedCommand->SetCallbackFunction(this, &SliceNavigationController::SliceStepperChanged);
-  timeStepperChangedCommand->SetCallbackFunction(this,  &SliceNavigationController::TimeStepperChanged);
+  sliceStepperChangedCommand->SetCallbackFunction(this, &SliceNavigationController::SendSlice);
+  timeStepperChangedCommand->SetCallbackFunction(this,  &SliceNavigationController::SendTime);
 #endif
 
   m_Slice->AddObserver(itk::ModifiedEvent(), sliceStepperChangedCommand);
@@ -32,6 +32,9 @@ mitk::SliceNavigationController::~SliceNavigationController()
 
 void mitk::SliceNavigationController::Update()
 {
+  if(m_BlockUpdate)
+    return;
+  m_BlockUpdate = true;
   if(m_LastUpdateTime<GetMTime())
   {
     m_LastUpdateTime = GetMTime();
@@ -71,10 +74,8 @@ void mitk::SliceNavigationController::Update()
 
       m_InputWorldGeometry->MMToUnits(dimensionVec, dimensionVec);
 
-      m_BlockUpdate = true;
       m_Slice->SetSteps((int)dimensionVec.length()+1.0);
       m_Slice->SetPos(0);
-      m_BlockUpdate = false;
 
       // initialize the viewplane
       mitk::PlaneGeometry::Pointer planegeometry = mitk::PlaneGeometry::New();
@@ -98,10 +99,8 @@ void mitk::SliceNavigationController::Update()
       if(worldTimeSlicedGeometry==NULL)
       {
         m_CreatedWorldGeometry->Initialize(1);
-        m_BlockUpdate = true;
         m_Time->SetSteps(0);
         m_Time->SetPos(0);
-        m_BlockUpdate = false;
       }
       else
       {
@@ -119,14 +118,27 @@ void mitk::SliceNavigationController::Update()
     }
   }
 
+  //unblock update; we may do this now, because if m_BlockUpdate was already true before this method was entered,
+  //then we will never come here.
+  m_BlockUpdate = false;
+
+  //Send the geometry. Do this even if nothing was changed, because maybe Update() was only called to 
+  //re-send the old geometry and time/slice data.
+  SendCreatedWorldGeometry();
+  SendSlice();
+  SendTime();
+}
+
+void mitk::SliceNavigationController::SendCreatedWorldGeometry()
+{
   //Send the geometry. Do this even if nothing was changed, because maybe Update() was only called to 
   //re-send the old geometry.
-  InvokeEvent(GeometryTimeEvent (m_CreatedWorldGeometry, m_Time->GetPos()));
-  InvokeEvent(GeometrySliceEvent(m_CreatedWorldGeometry, m_Slice->GetPos()));
+  if(!m_BlockUpdate)
+    InvokeEvent(GeometrySendEvent (m_CreatedWorldGeometry, 0));
 }
 
 //##ModelId=3DD524D7038C
-void mitk::SliceNavigationController::SliceStepperChanged()
+void mitk::SliceNavigationController::SendSlice()
 {
   if(!m_BlockUpdate)
   {
@@ -138,7 +150,7 @@ void mitk::SliceNavigationController::SliceStepperChanged()
   }
 }
 
-void mitk::SliceNavigationController::TimeStepperChanged()
+void mitk::SliceNavigationController::SendTime()
 {
   if(!m_BlockUpdate)
   {
@@ -148,6 +160,10 @@ void mitk::SliceNavigationController::TimeStepperChanged()
       mitk::RenderWindow::UpdateAllInstances();
     }
   }
+}
+
+void mitk::SliceNavigationController::SetGeometry(const itk::EventObject & geometrySendEvent)
+{
 }
 
 void mitk::SliceNavigationController::SetGeometryTime(const itk::EventObject & geometryTimeEvent)

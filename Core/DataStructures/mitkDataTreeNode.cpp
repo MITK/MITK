@@ -37,8 +37,6 @@ void mitk::DataTreeNode::SetData(mitk::BaseData* baseData)
   if(m_Data!=baseData)
   {
     m_Data=baseData;
-    //@bug with the following line, the actor-mode of the vtkInteractor does not work any more
-    m_Geometry3D->SetBaseGeometry(m_Data->GetGeometry());
     Modified();
   }
 }
@@ -54,17 +52,13 @@ mitk::DataTreeNode::DataTreeNode() : m_Data(NULL)
   memset(mappers, 0, sizeof(mappers)); 
 
   m_PropertyList = PropertyList::New();
-
-  m_VtkTransform = vtkTransform::New();
-
-  m_Geometry3D = Geometry3D::New();
 }
 
 
 //##ModelId=3E33F5D702D3
 mitk::DataTreeNode::~DataTreeNode()
 {
-  m_VtkTransform->Delete();
+
 }
 
 //##ModelId=3E33F5D7032D
@@ -325,16 +319,8 @@ void mitk::DataTreeNode::SetProperty(const char *propertyKey,
 //##ModelId=3ED91D050121
 vtkTransform* mitk::DataTreeNode::GetVtkTransform() const
 {
-  //return m_VtkTransform;
-  return m_Geometry3D->GetTransform();
+  assert(m_Data!=NULL);
+  assert(m_Data->GetGeometry()!=NULL);
+  return m_Data->GetGeometry()->GetTransform();
 }
 
-mitk::Geometry3D* mitk::DataTreeNode::GetGeometry()
-{
-  return m_Geometry3D.GetPointer();
-}
-
-void mitk::DataTreeNode::SetGeometry(mitk::Geometry3D* newGeometry)
-{
-  m_Geometry3D = newGeometry;
-}

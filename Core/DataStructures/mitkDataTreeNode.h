@@ -56,7 +56,7 @@ public:
   //##Documentation
   //## @brief Get the transformation applied prior to displaying the data as
   //## a vtkTransform
-  //## @sa m_VtkTransform
+  //## \deprecated use GetData()->GetGeometry()->GetTransform() instead
   vtkTransform* GetVtkTransform() const;
   //##Documentation
   //## @brief Get the Interactor 
@@ -250,16 +250,6 @@ public:
   //## IntProperty)
   void SetIntProperty(const char* propertyKey, int intValue, mitk::BaseRenderer* renderer=NULL);
 
-  //##Documentation
-  //## @brief Returns the Geometry3D Object that describes the geometry of the node.
-  //## The geometry contains the vtkTransform used on various mappers.
-  //## IntProperty)
-  mitk::Geometry3D* GetGeometry();
-  //##Documentation
-  //## @brief Sets the Geometry3D Object that describes the geometry of the node.
-  //## The geometry contains the vtkTransform used on various mappers.
-  //## IntProperty)
-  void SetGeometry(mitk::Geometry3D* newGeometry);
 protected:
   //##ModelId=3E33F5D702AA
   DataTreeNode();
@@ -272,23 +262,6 @@ protected:
   //## @brief Mapper-slots
   //## @todo change to stl-vector
   mutable mitk::Mapper::Pointer mappers[10];
-
-  //##ModelId=3ED91D0500D3
-  //##Documentation
-  //## @brief Transformation applied prior to displaying the data
-  //## 
-  //## The advantage of such a transformation is that you do not need
-  //## to change the data itself if you just want to move or rotate it.
-  //## The OpenGL-people do the same with the glScale and glTranslate
-  //## functions.
-  //## Mappers must take this transformation into account during rendering.
-  //## For vtk-based renderers using a vtkProp3D, this transformation 
-  //## will be forked into the user-transformation of the vtkProp3D.
-  //## A vtkInteractorStyle will change the user-transformation of 
-  //## vtkProp3D and therewith m_VtkTransform.
-  //## @deprecated The vtkTransform is moved to the Geometry3D Property
-  //## of DataTreeNode. Use GetGeometry()->GetTransform() instead.
-  mutable vtkTransform* m_VtkTransform;
 
   //##ModelId=3E32C49D0095
   //##Documentation
@@ -312,8 +285,6 @@ protected:
   //##Documentation
   //## @brief Interactor, that handles the Interaction
   Interactor::Pointer m_Interactor;
-
-  Geometry3D::Pointer m_Geometry3D;
 };
 
 

@@ -18,6 +18,11 @@
 #include <vtkImageCast.h>
 #include <vtkImageWriter.h>
 #include <vtkImageData.h>
+
+
+#include <vtkVolumeTextureMapper2D.h> 
+
+
 const mitk::Image* mitk::VolumeDataVtkMapper3D::GetInput()
 {
   if (this->GetNumberOfInputs() < 1)
@@ -43,10 +48,12 @@ void mitk::VolumeDataVtkMapper3D::GenerateOutputInformation()
 
 mitk::VolumeDataVtkMapper3D::VolumeDataVtkMapper3D()
 {
-  m_VtkVolumeMapper = vtkVolumeRayCastMapper::New();
-  vtkVolumeRayCastCompositeFunction* compositeFunction = vtkVolumeRayCastCompositeFunction::New();
-  m_VtkVolumeMapper->SetVolumeRayCastFunction(compositeFunction);
-  compositeFunction->Delete();
+  //m_VtkVolumeMapper = vtkVolumeRayCastMapper::New();
+	m_VtkVolumeMapper = vtkVolumeTextureMapper2D::New();
+
+  //vtkVolumeRayCastCompositeFunction* compositeFunction = vtkVolumeRayCastCompositeFunction::New();
+  //m_VtkVolumeMapper->SetVolumeRayCastFunction(compositeFunction);
+  //compositeFunction->Delete();
   vtkFiniteDifferenceGradientEstimator* gradientEstimator = 
   vtkFiniteDifferenceGradientEstimator::New();
   m_VtkVolumeMapper->SetGradientEstimator(gradientEstimator);
@@ -138,20 +145,30 @@ void mitk::VolumeDataVtkMapper3D::Update(mitk::BaseRenderer* renderer)
     lw_min = 0;
     lw_max = 255;
   }
-  opacityTransferFunction->AddPoint( lw_min, 0.0 );
-  opacityTransferFunction->AddPoint( lw_max, 0.8 );
+  //opacityTransferFunction->AddPoint( lw_min, 0.0 );
+  //opacityTransferFunction->AddPoint( lw_max, 0.8 );
+
+  opacityTransferFunction->AddPoint( (lw_min+lw_max)/2, 0.0 );
+  opacityTransferFunction->AddPoint( lw_max, 0.5 );
   opacityTransferFunction->ClampingOn();
 
-  colorTransferFunction->AddRGBPoint( lw_min, 0.0, 0.0, 1.0 );
-  colorTransferFunction->AddRGBPoint( (lw_min+lw_max)/2, 1.0, 0.0, 0.0 );
-  colorTransferFunction->AddRGBPoint( lw_max, 0.0, 1.0, 0.0 );
+  //colorTransferFunction->AddRGBPoint( lw_min, 0.0, 0.0, 1.0 );
+  //colorTransferFunction->AddRGBPoint( (lw_min+lw_max)/2, 1.0, 0.0, 0.0 );
+  //colorTransferFunction->AddRGBPoint( lw_max, 0.0, 1.0, 0.0 );
+
+  colorTransferFunction->AddRGBPoint( lw_min, 0.0, 0.0, 0.0 );
+  colorTransferFunction->AddRGBPoint( (lw_min+lw_max)/2, 1, 1, 0.0 );
+  colorTransferFunction->AddRGBPoint( lw_max, 0.8, 0.2, 0 );
+
   colorTransferFunction->ClampingOn();
   
   m_VolumeProperty->SetColor( colorTransferFunction );
   m_VolumeProperty->SetScalarOpacity( opacityTransferFunction ); 
-  m_VolumeProperty->ShadeOn();
-  m_VolumeProperty->SetDiffuse(0.7);
-  m_VolumeProperty->SetAmbient(0.31);
+  //m_VolumeProperty->ShadeOn();
+
+  m_VolumeProperty->SetDiffuse(0.99);
+  m_VolumeProperty->SetAmbient(0.99);
+
   m_Volume->Update();
   // m_Prop3D = m_Volume;
 

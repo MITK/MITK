@@ -6,7 +6,11 @@
 #include "mitkBaseRenderer.h"
 #include "mitkImage.h"
 #include <vtkVolumeProperty.h>
+
 class vtkVolumeRayCastMapper;
+
+class vtkVolumeTextureMapper2D;
+
 class vtkVolume;
 class vtkObject;
 
@@ -54,7 +58,9 @@ protected:
   vtkVolume* m_Volume; 
 
    vtkVolumeProperty* m_VolumeProperty;
-   vtkVolumeRayCastMapper* m_VtkVolumeMapper;
+   //vtkVolumeRayCastMapper* m_VtkVolumeMapper;
+	vtkVolumeTextureMapper2D* m_VtkVolumeMapper;
+
 };
 
 } // namespace mitk

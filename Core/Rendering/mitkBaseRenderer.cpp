@@ -18,16 +18,23 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include "mitkBaseRenderer.h"
+
 #include "mitkPlaneGeometry.h"
-#include "mitkEventMapper.h"
-#include "mitkPositionEvent.h"
-#include "mitkGlobalInteraction.h"
-#include "mitkDisplayPositionEvent.h"
-#include "mitkWeakPointerProperty.h"
 #include "mitkSlicedGeometry3D.h"
+
 #include "mitkSliceNavigationController.h"
+
+#include "mitkEventMapper.h"
+#include "mitkGlobalInteraction.h"
+#include "mitkPositionEvent.h"
+#include "mitkDisplayPositionEvent.h"
+
+#include "mitkProperties.h"
+#include "mitkWeakPointerProperty.h"
+
 #include "mitkStatusBar.h"
 #include "mitkInteractionConst.h"
+
 #include <vtkTransform.h>
 
 //##ModelId=3E3D2F120050
@@ -54,6 +61,7 @@ mitk::BaseRenderer::BaseRenderer() :
   m_CurrentWorldGeometry2DNode = mitk::DataTreeNode::New();
   m_CurrentWorldGeometry2DNode->SetData(m_CurrentWorldGeometry2DData);
   m_CurrentWorldGeometry2DNode->GetPropertyList()->SetProperty("renderer", rendererProp);
+  m_CurrentWorldGeometry2DNode->GetPropertyList()->SetProperty("layer", new IntProperty(1000));
   m_CurrentWorldGeometry2DTransformTime = m_CurrentWorldGeometry2DNode->GetVtkTransform()->GetMTime();
 
   m_DisplayGeometry = mitk::DisplayGeometry::New();

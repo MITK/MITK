@@ -3,7 +3,6 @@
 
 #include "mitkCommon.h"
 #include "mitkOperation.h"
-#include "mitkVector.h"
 
 
 namespace mitk {

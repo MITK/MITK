@@ -8,7 +8,7 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>471</width>
+            <width>475</width>
             <height>776</height>
         </rect>
     </property>
@@ -22,7 +22,6 @@
     </property>
     <property name="font">
         <font>
-            <pointsize>10</pointsize>
         </font>
     </property>
     <property name="caption">
@@ -34,69 +33,90 @@
     <property name="acceptDrops">
         <bool>false</bool>
     </property>
-    <vbox>
-        <property name="name">
-            <cstring>unnamed</cstring>
-        </property>
-        <property name="margin">
-            <number>10</number>
-        </property>
-        <property name="spacing">
-            <number>5</number>
-        </property>
-        <widget class="QListView">
-            <column>
-                <property name="text">
-                    <string>Column 1</string>
-                </property>
-                <property name="clickable">
-                    <bool>true</bool>
-                </property>
-                <property name="resizable">
-                    <bool>true</bool>
-                </property>
-            </column>
-        <item>
+    <widget class="QListView">
+        <column>
             <property name="text">
-                <string>New Item</string>
+                <string>Column 1</string>
             </property>
-            <property name="pixmap">
-                <pixmap></pixmap>
-            </property>
-        </item>
-            <property name="name">
-                <cstring>m_DataTreeView</cstring>
-            </property>
-            <property name="minimumSize">
-                <size>
-                    <width>250</width>
-                    <height>0</height>
-                </size>
-            </property>
-            <property name="acceptDrops">
-                <bool>false</bool>
-            </property>
-            <property name="rootIsDecorated">
+            <property name="clickable">
                 <bool>true</bool>
             </property>
-        </widget>
-        <widget class="QmitkNodePropertiesView">
-            <property name="name">
-                <cstring>m_NodePropertiesView</cstring>
+            <property name="resizable">
+                <bool>true</bool>
             </property>
-            <property name="sizePolicy">
-                <sizepolicy>
-                    <hsizetype>7</hsizetype>
-                    <vsizetype>7</vsizetype>
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                </sizepolicy>
-            </property>
-            <property name="acceptDrops">
-                <bool>false</bool>
-            </property>
-        </widget>
-    </vbox>
+        </column>
+    <item>
+        <property name="text">
+            <string>New Item</string>
+        </property>
+        <property name="pixmap">
+            <pixmap></pixmap>
+        </property>
+    </item>
+        <property name="name">
+            <cstring>m_DataTreeView</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>10</x>
+                <y>40</y>
+                <width>455</width>
+                <height>361</height>
+            </rect>
+        </property>
+        <property name="minimumSize">
+            <size>
+                <width>250</width>
+                <height>0</height>
+            </size>
+        </property>
+        <property name="acceptDrops">
+            <bool>false</bool>
+        </property>
+        <property name="rootIsDecorated">
+            <bool>true</bool>
+        </property>
+    </widget>
+    <widget class="QPushButton">
+        <property name="name">
+            <cstring>m_RemoveButton</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>10</x>
+                <y>10</y>
+                <width>455</width>
+                <height>25</height>
+            </rect>
+        </property>
+        <property name="text">
+            <string>Remove</string>
+        </property>
+    </widget>
+    <widget class="QmitkNodePropertiesView">
+        <property name="name">
+            <cstring>m_NodePropertiesView</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>10</x>
+                <y>400</y>
+                <width>455</width>
+                <height>360</height>
+            </rect>
+        </property>
+        <property name="sizePolicy">
+            <sizepolicy>
+                <hsizetype>7</hsizetype>
+                <vsizetype>7</vsizetype>
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+            </sizepolicy>
+        </property>
+        <property name="acceptDrops">
+            <bool>false</bool>
+        </property>
+    </widget>
 </widget>
 <customwidgets>
     <customwidget>
@@ -130,19 +150,31 @@
         <receiver>m_NodePropertiesView</receiver>
         <slot>SelectionChanged(QListViewItem*)</slot>
     </connection>
+    <connection>
+        <sender>m_RemoveButton</sender>
+        <signal>clicked()</signal>
+        <receiver>QmitkDataManagerControls</receiver>
+        <slot>RemoveButtonClicked()</slot>
+    </connection>
 </connections>
 <includes>
-    <include location="global" impldecl="in declaration">DataTree.h</include>
-    <include location="local" impldecl="in declaration">DataTreeView.h</include>
     <include location="global" impldecl="in implementation">mitkStringProperty.h</include>
     <include location="global" impldecl="in implementation">qlistview.h</include>
     <include location="global" impldecl="in implementation">qdropsite.h</include>
-    <include location="local" impldecl="in implementation">QmitkDataManagerControls.ui.h</include>
+    <include location="global" impldecl="in declaration">DataTree.h</include>
+    <include location="local" impldecl="in declaration">DataTreeView.h</include>
+    <include location="global" impldecl="in declaration">map</include>
+    <include location="local" impldecl="in declaration">BaseProperty.h</include>
+    <include location="global" impldecl="in declaration">string</include>
 </includes>
 <variables>
+    <variable access="public">static mitk::PropertyList::Pointer m_PropertyList;</variable>
     <variable>QHBoxLayout * treeLayout;</variable>
-    <variable>mitk::DataTreeIterator * m_DataTreeIterator;</variable>
+    <variable>mitk::DataTreeIterator* m_DataTreeIterator;</variable>
 </variables>
+<slots>
+    <slot>RemoveButtonClicked()</slot>
+</slots>
 <functions>
     <function access="private" specifier="non virtual">init()</function>
     <function>SetDataTreeIterator( mitk::DataTreeIterator * it )</function>

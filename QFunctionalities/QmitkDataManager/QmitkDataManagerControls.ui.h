@@ -6,12 +6,16 @@
 ** init() function in place of a constructor, and a destroy() function in
 ** place of a destructor.
 *****************************************************************************/
+#include <utility>
+#include "mitkBoolProperty.h"
 void QmitkDataManagerControls::init() { 
 while (m_DataTreeView->columns() > 0 ) {
 	m_DataTreeView->removeColumn(0);
     }
     m_DataTreeView->addColumn( "Name" );
     m_DataTreeView->addColumn( "NodeType" );
+    m_DataTreeView->addColumn( "RefCount");
+    m_RemoveButton->setEnabled(false);
 }
 
 void QmitkDataManagerControls::SetDataTreeIterator(mitk::DataTreeIterator * it)
@@ -30,6 +34,18 @@ void QmitkDataManagerControls::SetDataTreeIterator(mitk::DataTreeIterator * it)
   delete tempIt;
 }
 
+void QmitkDataManagerControls::RemoveButtonClicked()
+{
+  DataTreeViewItem *selected = dynamic_cast<DataTreeViewItem*>(m_DataTreeView->selectedItem());
+  if (selected == NULL) {
+    std::cout << "nothing selected" << std::endl;
+  } else {
+    mitk::DataTreeIterator* selectedIterator = selected->GetDataTreeIterator();
+    assert(selectedIterator != NULL);
+selectedIterator->remove();
+    delete selected;
 
+  } 
+}
 
 

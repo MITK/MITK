@@ -60,9 +60,11 @@ void mitk::vtkPointSetXMLParser::EndElement ( const char *name )
     //
     if ( currentElement == mitk::PointSetWriter::XML_POINT )
     {
-        mitk::PointOperation pop( mitk::OpINSERT, m_CurrentPoint, m_CurrentPointId );
+        mitk::PointOperation popInsert( mitk::OpINSERT, m_CurrentPoint, m_CurrentPointId );
+        mitk::PointOperation popDeactivate( mitk::OpDESELECTPOINT, m_CurrentPoint, m_CurrentPointId );
         assert( m_CurrentPointSet.IsNotNull() );
-        m_CurrentPointSet->ExecuteOperation( &pop );
+        m_CurrentPointSet->ExecuteOperation( &popInsert );
+        m_CurrentPointSet->ExecuteOperation( &popDeactivate );
     }
 }
 

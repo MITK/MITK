@@ -1216,9 +1216,9 @@ VM_END_NS
 template <class T>
 VM_IOSTREAM_STD::ostream& operator<<(VM_IOSTREAM_STD::ostream& o, const VM_VECMATH_NS::Matrix4<T>& t1) {
     return  o << 
-    "[ ["<<t1.m00<<","<<t1.m01<<","<<t1.m02<<","<<t1.m03<<"]" << endl <<
-    "  ["<<t1.m10<<","<<t1.m11<<","<<t1.m12<<","<<t1.m13<<"]" << endl <<
-    "  ["<<t1.m20<<","<<t1.m21<<","<<t1.m22<<","<<t1.m23<<"]" << endl <<
+    "[ ["<<t1.m00<<","<<t1.m01<<","<<t1.m02<<","<<t1.m03<<"]" << VM_IOSTREAM_STD::endl <<
+    "  ["<<t1.m10<<","<<t1.m11<<","<<t1.m12<<","<<t1.m13<<"]" << VM_IOSTREAM_STD::endl <<
+    "  ["<<t1.m20<<","<<t1.m21<<","<<t1.m22<<","<<t1.m23<<"]" << VM_IOSTREAM_STD::endl <<
     "  ["<<t1.m30<<","<<t1.m31<<","<<t1.m32<<","<<t1.m33<<"]""] ]";
 }
 

@@ -162,10 +162,12 @@ mitk::ImageDataItem::Pointer mitk::Image::GetVolumeData(int t, int n)
 		}
 	if(complete)
 	{
+        vol=m_Volumes[pos];
 		// ok, let's combine the slices!
-		vol=new ImageDataItem(m_PixelType, 3, m_Dimensions);
+        if(vol==NULL)
+		    vol=new ImageDataItem(m_PixelType, 3, m_Dimensions);
 		vol->SetComplete(true);
-		int size=m_OffsetTable[3]*m_PixelType.GetBpe()/8;
+		int size=m_OffsetTable[2]*m_PixelType.GetBpe()/8;
 		for(s=0;s<m_Dimensions[2];++s)
 		{
 			int posSl;
@@ -173,10 +175,13 @@ mitk::ImageDataItem::Pointer mitk::Image::GetVolumeData(int t, int n)
 			posSl=GetSliceIndex(s,t,n);
 
 			sl=m_Slices[posSl];
-			sl=new ImageDataItem(*vol, 2, s*m_OffsetTable[2]*m_PixelType.GetBpe()/8);
-			sl->SetComplete(true);
-			memcpy(static_cast<char*>(vol->GetData())+sl->GetOffset(), sl->GetData(), size);
-			m_Slices[posSl]=sl;
+            if(sl->GetParent()!=vol)
+            {
+			    sl=new ImageDataItem(*vol, 2, s*size);
+			    sl->SetComplete(true);
+			    memcpy(static_cast<char*>(vol->GetData())+sl->GetOffset(), sl->GetData(), size);
+			    m_Slices[posSl]=sl;
+            }
 		}
 		return m_Volumes[pos]=vol;
 	}
@@ -230,10 +235,12 @@ mitk::ImageDataItem::Pointer mitk::Image::GetChannelData(int n)
 		}
 		else
 		{
+            ch=m_Channels[n];
 			// ok, let's combine the volumes!
-			ch=new ImageDataItem(m_PixelType, m_Dimension, m_Dimensions);
+            if(ch==NULL)
+			    ch=new ImageDataItem(m_PixelType, m_Dimension, m_Dimensions);
 			ch->SetComplete(true);
-			int size=m_OffsetTable[m_Dimension]*m_PixelType.GetBpe()/8;
+			int size=m_OffsetTable[m_Dimension-1]*m_PixelType.GetBpe()/8;
 			unsigned int t;
 			for(t=0;t<m_Dimensions[3];++t)
 			{
@@ -243,12 +250,15 @@ mitk::ImageDataItem::Pointer mitk::Image::GetChannelData(int n)
 				posVol=GetVolumeIndex(t,n);
 				vol=GetVolumeData(t,n);
 
-				// copy data of volume in channel
-				memcpy(static_cast<char*>(ch->GetData())+vol->GetOffset(), vol->GetData(), size);
+                if(vol->GetParent()!=ch)
+                {
+				    // copy data of volume in channel
+				    memcpy(static_cast<char*>(ch->GetData())+vol->GetOffset(), vol->GetData(), size);
 
-				// replace old volume with reference to channel
-				vol=new ImageDataItem(*vol, 3, t*m_OffsetTable[3]*m_PixelType.GetBpe()/8);
-				m_Volumes[posVol]=vol;
+				    // replace old volume with reference to channel
+				    vol=new ImageDataItem(*vol, 3, t*m_OffsetTable[3]*m_PixelType.GetBpe()/8);
+				    m_Volumes[posVol]=vol;
+                }
 			}
 		}
 		return m_Channels[n]=ch;
@@ -562,7 +572,7 @@ mitk::ImageDataItem::Pointer mitk::Image::AllocateSliceData(int s, int t, int n)
 	// is slice available as part of a volume that is available?
 	ImageDataItemPointer sl, ch, vol;
 	vol=m_Volumes[GetVolumeIndex(t,n)];
-	if((vol!=NULL) && (vol->IsComplete()))
+	if(vol!=NULL)
 	{
 		sl=new ImageDataItem(*vol, 2, s*m_OffsetTable[2]*m_PixelType.GetBpe()/8);
 		sl->SetComplete(true);
@@ -571,7 +581,7 @@ mitk::ImageDataItem::Pointer mitk::Image::AllocateSliceData(int s, int t, int n)
 
 	// is slice available as part of a channel that is available?
 	ch=m_Channels[n];
-	if((ch!=NULL) && (ch->IsComplete()))
+	if(ch!=NULL)
 	{
 		sl=new ImageDataItem(*ch, 2, (s*m_OffsetTable[2]+t*m_OffsetTable[3])*m_PixelType.GetBpe()/8);
 		sl->SetComplete(true);
@@ -579,7 +589,7 @@ mitk::ImageDataItem::Pointer mitk::Image::AllocateSliceData(int s, int t, int n)
 	}
 
 	// allocate new volume (instead of a single slice to keep data together!)
-	vol=AllocateVolumeData(t,n);
+	m_Volumes[GetVolumeIndex(t,n)]=vol=AllocateVolumeData(t,n);
 	sl=new ImageDataItem(*vol, 2, s*m_OffsetTable[2]*m_PixelType.GetBpe()/8);
 	sl->SetComplete(true);
 	return m_Slices[pos]=sl;

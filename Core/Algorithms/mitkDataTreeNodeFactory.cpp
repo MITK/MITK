@@ -472,6 +472,7 @@ void mitk::DataTreeNodeFactory::ReadFileTypeHPSONOS()
     levelwindow.SetAuto( sliceSelector->GetOutput()->GetPic() );
     node->SetLevelWindow( levelwindow, NULL );
     node->SetVisibility( false, NULL );
+    node->SetColor( 1.0, 1.0, 1.0, NULL );
     node->Update();
     // disable volume rendering by default
     node->SetProperty( "volumerendering", new mitk::BoolProperty( false ) );
@@ -490,6 +491,7 @@ void mitk::DataTreeNodeFactory::ReadFileTypeHPSONOS()
     node->SetProperty( "layer", new mitk::IntProperty( -10 ) );
 
     node->SetLevelWindow( levelwindow, NULL );
+    node->SetColor( 1.0, 1.0, 1.0, NULL );
     node->Update();
 
     // disable volume rendering by default
@@ -532,7 +534,6 @@ void mitk::DataTreeNodeFactory::ReadFileTypeHPSONOS()
         nameProp = new mitk::StringProperty( m_dir+"(OD)" );
         node->SetProperty( "name", nameProp );
         node->SetProperty( "layer", new mitk::IntProperty( -6 ) );
-
 
         mitk::LevelWindowProperty::Pointer levWinProp = new mitk::LevelWindowProperty();
         mitk::LevelWindow levelwindow;

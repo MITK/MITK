@@ -24,8 +24,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include "ipDicom/ipDicom.h"
 #endif
 
-bool mitk::PicHelper::GetSpacing(ipPicDescriptor* pic, Vector3D & spacing)
+bool mitk::PicHelper::GetSpacing(const ipPicDescriptor* aPic, Vector3D & spacing)
 {
+  ipPicDescriptor* pic = const_cast<ipPicDescriptor*>(aPic);
+
   ipPicTSV_t *tsv;
 
   tsv = ipPicQueryTag( pic, "REAL PIXEL SIZE" );
@@ -98,8 +100,10 @@ bool mitk::PicHelper::GetSpacing(ipPicDescriptor* pic, Vector3D & spacing)
   return false;
 }
 
-bool mitk::PicHelper::SetSpacing(ipPicDescriptor* pic, SlicedGeometry3D* slicedgeometry)
+bool mitk::PicHelper::SetSpacing(const ipPicDescriptor* aPic, SlicedGeometry3D* slicedgeometry)
 {
+  ipPicDescriptor* pic = const_cast<ipPicDescriptor*>(aPic);
+
   Vector3D spacing(slicedgeometry->GetSpacing());
 
   ipPicTSV_t *tsv;
@@ -131,7 +135,7 @@ bool mitk::PicHelper::SetSpacing(ipPicDescriptor* pic, SlicedGeometry3D* slicedg
     return false;
 }
 
-void mitk::PicHelper::InitializeEvenlySpaced(ipPicDescriptor* pic, unsigned int slices, SlicedGeometry3D* slicedgeometry)
+void mitk::PicHelper::InitializeEvenlySpaced(const ipPicDescriptor* pic, unsigned int slices, SlicedGeometry3D* slicedgeometry)
 {
   assert(pic!=NULL);
   assert(slicedgeometry!=NULL);
@@ -152,8 +156,9 @@ void mitk::PicHelper::InitializeEvenlySpaced(ipPicDescriptor* pic, unsigned int 
   }
 }
 
-bool mitk::PicHelper::SetGeometry2D(ipPicDescriptor* pic, int s, SlicedGeometry3D* slicedgeometry)
+bool mitk::PicHelper::SetGeometry2D(const ipPicDescriptor* aPic, int s, SlicedGeometry3D* slicedgeometry)
 {
+  ipPicDescriptor* pic = const_cast<ipPicDescriptor*>(aPic);
   if((pic!=NULL) && (slicedgeometry->IsValidSlice(s)))
   {
     //construct standard view

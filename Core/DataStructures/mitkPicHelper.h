@@ -37,13 +37,13 @@ class PicHelper
 public:
   static const char *GetNameOfClass() { return "PicHelper"; }
 
-  static bool GetSpacing(ipPicDescriptor* pic, Vector3D & spacing);
+  static bool GetSpacing(const ipPicDescriptor* pic, Vector3D & spacing);
 
-  static bool SetSpacing(ipPicDescriptor* pic, SlicedGeometry3D* slicedgeometry);
+  static bool SetSpacing(const ipPicDescriptor* pic, SlicedGeometry3D* slicedgeometry);
 
-  static void InitializeEvenlySpaced(ipPicDescriptor* pic, unsigned int slices, SlicedGeometry3D* slicedgeometry);
+  static void InitializeEvenlySpaced(const ipPicDescriptor* pic, unsigned int slices, SlicedGeometry3D* slicedgeometry);
 
-  static bool SetGeometry2D(ipPicDescriptor* pic, int s, SlicedGeometry3D* slicedgeometry);
+  static bool SetGeometry2D(const ipPicDescriptor* pic, int s, SlicedGeometry3D* slicedgeometry);
 };
 
 } // namespace mitk

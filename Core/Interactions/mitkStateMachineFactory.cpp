@@ -138,6 +138,7 @@ bool mitk::StateMachineFactory::startElement( const QString&, const QString&, co
 	if( qName == "mitkInteraktionStates" )								//e.g.<mitkInteraktionStates STYLE="Powerpoint">
 	{
 		NULL;//new statemachine pattern
+		//evtl. unterschied in STYLES PowerPoint oder PhotoShop usw...
 	}
 
 	else if ( qName == "stateMaschine" ) 									//e.g. <stateMaschine NAME="global">

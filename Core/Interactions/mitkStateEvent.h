@@ -16,14 +16,11 @@ class StateEvent
     //##ModelId=3E5B7A7603DA
     void Set(int id, Event const* event);
 
-    //##ModelId=3E5B7B69025D
-    void opname();
-
     //##ModelId=3E5B7AEC0394
     int GetId() const;
 
     //##ModelId=3E5B7B030383
-    Event const* GetEvent() const;
+	mitk::Event const* GetEvent() const;
     
   private:
     //##ModelId=3E5B7944016D

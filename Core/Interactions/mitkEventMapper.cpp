@@ -28,6 +28,20 @@ mitk::EventMapper::SetStateMachine(StateMachine* stateMachine)
 //##ModelId=3E5B34CF0041
 bool mitk::EventMapper::SetEvent(Event* event)
 {
+	if (m_StateMachine == NULL) 
+		return false;
+	
+	int i;
+	for (i = 0;
+		(i < ((int)(m_EventDescriptions.size()))) || 
+		!(m_EventDescriptions.at(i) == *event);
+		i++){}
+	if (!(m_EventDescriptions.at(i) == *event))//searched entry not found
+		return false;
+
+	m_StateEvent.Set( (m_EventDescriptions.at(i)).GetId(), event );
+	m_StateMachine->SetEvent(&m_StateEvent);
+	return true;
 }
 
 //##ModelId=3E5B35140072
@@ -53,11 +67,11 @@ bool mitk::EventMapper::LoadBehavior(std::string fileName)
 //##ModelId=3E788FC00308
 bool mitk::EventMapper::startElement( const QString&, const QString&, const QString& qName, const QXmlAttributes& atts )
 {
-	/*
+
 	qName.ascii(); //for debuging
 	if( qName == "events")
 	{
-		std::string name = atts.value( STYLE.c_str() ).latin1();//wohin speichern?
+		m_StyleName = atts.value( STYLE.c_str() ).latin1();
 	}
 	else if ( qName == "event")
 	{
@@ -67,19 +81,13 @@ bool mitk::EventMapper::startElement( const QString&, const QString&, const QStr
 										 atts.value( TYPE.c_str() ).toInt(),
 										 atts.value( BUTTON_NUMBER.c_str() ).toInt(), 
 										 atts.value( KEY.c_str() ).toInt() );
-		StateEvent tempStateEvent;//was hier?????????????????????????????
-		std::pair<EventDescriptionMapIter,bool> ok = 
-			m_EventDescriptions.insert(EventDescriptionMap::value_type (tempEventDescr, tempStateEvent));
-		return ok.second;
+		m_EventDescriptions.push_back(tempEventDescr);
 	}
-	
-	*/
 	return true;
 }
-
-//##ModelId=3E788FC100B6
-bool mitk::EventMapper::endElement( const QString&, const QString&, const QString & qName )
+//##ModelId=3E7B20EE01F5
+std::string mitk::EventMapper::GetStyleName()
 {
-	return true;
+	return m_StyleName;
 }
 

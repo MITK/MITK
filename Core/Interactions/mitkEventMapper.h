@@ -7,13 +7,13 @@
 #include "StateEvent.h"
 #include "StateMachine.h"
 #include <qxml.h>
-#include <map>
+#include <vector>
 #include <string>
 
 //##ModelId=3E788FC0001A
-typedef std::map<mitk::EventDescription, mitk::StateEvent> EventDescriptionMap;
+typedef std::vector<mitk::EventDescription> EventDescriptionVec;
 //##ModelId=3E788FC0002A
-typedef std::map<mitk::EventDescription, mitk::StateEvent>::iterator EventDescriptionMapIter;
+typedef std::vector<mitk::EventDescription>::iterator EventDescriptionVecIter;
 
 namespace mitk {
 
@@ -32,13 +32,13 @@ class EventMapper : public QXmlDefaultHandler
 
     //##ModelId=3E788FC00308
 	bool startElement( const QString&, const QString&, const QString& qName, const QXmlAttributes& atts );
+    //##ModelId=3E7B20EE01F5
+    std::string GetStyleName();
 
-    //##ModelId=3E788FC100B6
-	bool endElement( const QString&, const QString&, const QString & qName );
 
   private:
     //##ModelId=3E5B33F303CA
-	EventDescriptionMap m_EventDescriptions;
+	static EventDescriptionVec m_EventDescriptions;
 
     //##ModelId=3E5B343701F1
     static StateMachine* m_StateMachine;
@@ -59,6 +59,11 @@ class EventMapper : public QXmlDefaultHandler
 	static const std::string TRUE;
     //##ModelId=3E785B1B0245
 	static const std::string FALSE;
+    //##ModelId=3E7B139E0233
+    static StateEvent m_StateEvent;
+    //##ModelId=3E7B1EB800CC
+    static std::string m_StyleName;
+
 };
 
 } // namespace mitk

@@ -1,7 +1,7 @@
 #ifndef _ITEM_H_
 #define _ITEM_H_
 
-#include <GL/gl.h>
+#include <mitkGL.h>
 
 /*!
 \brief The items are objects that can be displayed by 

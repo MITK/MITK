@@ -37,7 +37,9 @@ an extension, which tries to ease the combination of both and to add the feature
 \section FurtherReading Further Reading
 \ref OverviewPage "Overview"
 
-\ref ModulePage "Details"
+<a href="modules.html>Details</a>
+
+\ref StylesAndNotesPage  "Style Guide and Technical Notes"
 */
 
 

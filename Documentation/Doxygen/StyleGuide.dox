@@ -1,0 +1,23 @@
+/**
+
+\page StylesAndNotesPage The MITK Style Guide and Technical Notes
+ 
+The style guide for MITK is almost identical to that of ITK, see the 
+<a href="../../itk/Style.pdf">ITK Style Guide</a> document. The only difference is that
+MITK has its own namespace (@a mitk).
+
+Some technical notes:
+\li The names of the files containing a class @a ExampleClass should be @a mitkExampleClass.h/.cpp.
+\li @a SmartPointers must be used for classes that have @a itk::Object as a base class. 
+Assignment of a just created instance to a normal pointer (e.g., 
+@code itk::Object* crash = itk::Object::New()@endcode) results in a crash, since the reference count 
+is decreased immediately to zero and the object is destroyed (use @code itk::Object::Pointer nocrash = itk::Object::New()@endcode.) 
+Static declarations are also forbidden and result into an exception, because the destructor is called 
+when the scope of the variable is left while the reference count is still greater than zero. 
+\li Note that using smart pointers requires using real pointers when setting input, but returning 
+smart pointers on output (taken from <a href="http://www.itk.org/Doxygen12/html/itkMacro_8h.html">itkMacro.h</a>.).
+\li Set- and Get-methods can be created with the macros @a itkSetObjectMacro(name,type) and 
+@a itkGetObjectMacro(name,type), respectively, if the @a type is derived from @a itk::LightObject or
+@a itk::Object. There are also macros for other types, e.g., strings, see 
+<a href="http://www.itk.org/Doxygen12/html/itkMacro_8h.html">itkMacro.h</a>.
+*/

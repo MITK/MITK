@@ -36,7 +36,7 @@ features, which are outside the scope of both.
 \section DesignOverview Design Overview
 
 The basic design concept of MITK is model-view-controller (MVC). Although some people think MVC is 
-out-of-date, it is useful for in this case (and also we do not really use pure MVC): we have data 
+out-of-date, it is useful in this case (and also we do not really use pure MVC): we have data 
 (\em model), on which we want to have different @em views and we want to interact with the data 
 (\em controller), which should result in a simultaneous and consistent update of all views.
 

@@ -159,7 +159,7 @@ void mitk::PointSet::ExecuteOperation(Operation* operation)
       pt.CastFrom(pointOp->GetPoint());
 
       m_ItkData->GetPoints()->InsertElement(position, pt);
-      m_ItkData->GetPointData()->InsertElement(position, true);
+      m_ItkData->GetPointData()->InsertElement(position, pointOp->GetSelected());
 		}
 		break;
 	case OpMOVE://moves the point given by index

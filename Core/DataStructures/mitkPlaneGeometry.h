@@ -64,8 +64,15 @@ public:
 
   //##Documentation
   //## @brief Initialize a plane with orientation @a planeorientation (default: transversal) with respect to 
-  //## @a geometryframe (default: identity) and unit spacing (bounds set accordingly).
+  //## @a geometry3D (default: identity). Spacing also taken from @a geometry3D.
   //##
+  //## @warning A former version of this method created a geometry with unit spacing. For unit spacing use
+  //## \code
+  //##   // for in-plane unit spacing:
+  //##   thisgeometry->SetSizeInUnits(thisgeometry->GetExtentInMM(0), thisgeometry->GetExtentInMM(1));
+  //##   // additionally, for unit spacing in normal direction (former version did not do this):
+  //##   thisgeometry->SetExtentInMM(2, 1.0);
+  //## \endcode
   virtual void InitializeStandardPlane(const mitk::Geometry3D* geometry3D, PlaneOrientation planeorientation = Transversal, mitk::ScalarType zPosition = 0, bool frontside=true);
 
   //##Documentation

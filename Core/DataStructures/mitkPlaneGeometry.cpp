@@ -54,7 +54,7 @@ void mitk::PlaneGeometry::SetIndexToWorldTransform(mitk::AffineTransform3D* tran
 
   Superclass::SetIndexToWorldTransform(transform);
 
-  m_Origin = transform->GetOffset().Get_vnl_vector().data_block();
+  vtk2itk(transform->GetOffset(), m_Origin);
 }
 
 void mitk::PlaneGeometry::SetBounds(const BoundingBox::BoundsArrayType& bounds)
@@ -111,7 +111,7 @@ void mitk::PlaneGeometry::Modified() const
 void mitk::PlaneGeometry::Initialize()
 {
   Superclass::Initialize();
-  m_Origin = m_IndexToWorldTransform->GetOffset().Get_vnl_vector().data_block();
+  vtk2itk(m_IndexToWorldTransform->GetOffset(), m_Origin);
 }
 
 void mitk::PlaneGeometry::InitializeStandardPlane(mitk::ScalarType width, mitk::ScalarType height, const Vector3D & spacing, mitk::PlaneGeometry::PlaneOrientation planeorientation, mitk::ScalarType zPosition, bool frontside)
@@ -129,28 +129,6 @@ void mitk::PlaneGeometry::InitializeStandardPlane(mitk::ScalarType width, mitk::
   transform->SetMatrix(matrix);
 
   InitializeStandardPlane(width, height, transform.GetPointer(), planeorientation, zPosition, frontside);
-  //Superclass::Initialize();
-
-  //SetSizeInUnits(width, height);
-
-  ////construct standard view
-  //mitk::Point3D origin; 
-  //origin.Fill(0);
-  //SetOrigin(origin);
-
-  //mitk::Vector3D rightDV, bottomDV;
-  //if(spacing==NULL)
-  //{
-  //  FillVector3D(rightDV,  width, 0, 0);
-  //  FillVector3D(bottomDV, 0, height, 0);
-  //  SetByRightAndDownVector(rightDV.Get_vnl_vector(), bottomDV.Get_vnl_vector(), 1);
-  //}
-  //else
-  //{
-  //  FillVector3D(rightDV,   width*(*spacing)[0], 0, 0);
-  //  FillVector3D(bottomDV, 0, height*(*spacing)[1], 0);
-  //  SetByRightAndDownVector(rightDV.Get_vnl_vector(), bottomDV.Get_vnl_vector(), (*spacing)[2]);
-  //}
 }
 
 void mitk::PlaneGeometry::InitializeStandardPlane(mitk::ScalarType width, mitk::ScalarType height, const mitk::AffineTransform3D* transform, mitk::PlaneGeometry::PlaneOrientation planeorientation, mitk::ScalarType zPosition, bool frontside)
@@ -241,10 +219,6 @@ void mitk::PlaneGeometry::InitializeStandardPlane(const mitk::Geometry3D* geomet
   switch(planeorientation)
   {
     case Transversal:
-      //if(frontside)
-      //  FillVector3D(origin,  bounds[0],  bounds[2], bounds[4]+zPosition);
-      //else
-      //  FillVector3D(origin,  bounds[0],  bounds[2]+height, zPosition);
       width  = geometry3D->GetExtent(0); widthInMM  = geometry3D->GetExtentInMM(0);
       height = geometry3D->GetExtent(1); heightInMM = geometry3D->GetExtentInMM(1);
       break;
@@ -262,11 +236,8 @@ void mitk::PlaneGeometry::InitializeStandardPlane(const mitk::Geometry3D* geomet
 
   InitializeStandardPlane(width, height, geometry3D->GetIndexToWorldTransform(), planeorientation, zPosition, frontside);
 
-  ScalarType bounds[6]={0, widthInMM, 0, heightInMM, 0, 1};
+  ScalarType bounds[6]={0, width, 0, height, 0, 1};
   SetBounds(bounds);
-
-  SetExtentInMM(0, widthInMM);
-  SetExtentInMM(1, heightInMM);
 
   mitk::Point3D  origin; 
   originVector = geometry3D->GetIndexToWorldTransform()->TransformVector(originVector);
@@ -304,10 +275,10 @@ void mitk::PlaneGeometry::InitializeStandardPlane(const VnlVector& rightVector, 
   matrix.GetVnlMatrix().set_column(1, downDV);
   matrix.GetVnlMatrix().set_column(2, normal);
   transform->SetMatrix(matrix);
-  transform->SetOffset(const_cast<Point3D&>(m_Origin).Get_vnl_vector().data_block());
   ScalarType bounds[6]={0, width, 0, height, 0, 1};
   SetBounds(bounds);
   SetIndexToWorldTransform(transform);
+  SetOrigin(m_Origin);
 }
 
 void mitk::PlaneGeometry::InitializePlane(const mitk::Point3D& origin, const mitk::Vector3D& normal)

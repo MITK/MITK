@@ -15,39 +15,66 @@ bool mitk::HierarchicalInteractor::IsSubSelected() const
   return (m_Mode==SMSUBSELECTED);
 }
 
+//##Documentation
+//## first we look if the event can be handled by this interactor.
+//## if it could not be handled, then check if we are in subselected mode.
+//## Then send the event to lower statemachines and afterwards check if they are still sub/selected
 bool mitk::HierarchicalInteractor::HandleEvent(StateEvent const* stateEvent, int objectEventId, int groupEventId)
 {
   bool ok = Interactor::HandleEvent( stateEvent, objectEventId, groupEventId );
 
-  if ( IsSubSelected() ) 
+  if (!ok)
   {
-    ok = TransmitEvent( stateEvent, objectEventId, groupEventId ) || ok ;
-  }
+    if ( IsSubSelected() ) 
+    {
+      ok = TransmitEvent( stateEvent, objectEventId, groupEventId );
 
+      //check if we still have a selected subinteractor. if not, then send deselectEvent
+      bool subSelected = false;
+      InteractorListIter i = m_SelectedInteractors.begin();
+      const InteractorListIter end = m_SelectedInteractors.end();
+
+      while ( i != end )
+      {
+        subSelected = ( (*i)->IsSelected() || subSelected );
+        ++i;
+      }
+
+      if ( !subSelected ) 
+      {
+        StateEvent sd( EIDSUBDESELECT, stateEvent->GetEvent() );
+        ok = Interactor::HandleEvent( &sd, objectEventId, groupEventId );
+        if (!ok)
+          itkWarningMacro("No SSD Transition defined! Redesign Interaction!!!");
+      }
+    }
+  }
   return ok;
 }
 
 bool mitk::HierarchicalInteractor::TransmitEvent( StateEvent const* stateEvent, int objectEventId, int groupEventId ) 
 {
+  bool ok = false;
   InteractorListIter i = m_SelectedInteractors.begin();
   const InteractorListIter end = m_SelectedInteractors.end();
-  bool ok = false;
-  bool subSelected = false;
 
   while ( i != end )
   {
-  
+    //safety!
+    if ((*i) == NULL)
+      break;
+
     ok = (*i)->HandleEvent( stateEvent, objectEventId, groupEventId ) || ok;
-    subSelected = (*i)->IsSelected() || subSelected;
-    i++;
-  }
 
-  if ( !subSelected ) 
-  {
-    StateEvent sd( EIDSUBDESELCT, stateEvent->GetEvent() );
-    HandleEvent( &sd, objectEventId, groupEventId );
+    if (!(*i)->IsSelected())
+    {
+      i = m_SelectedInteractors.erase(i);
+      if (m_SelectedInteractors.empty())
+        break;
+    }
+    else
+      i++;
   }
-
   return ok;
 }
 
@@ -85,7 +112,7 @@ bool mitk::HierarchicalInteractor::ExecuteAction(Action* action, mitk::StateEven
 
         while ( i != end )
         {
-          float currentJurisdiction = CalculateJurisdiction( stateEvent );
+          float currentJurisdiction = (*i)->CalculateJurisdiction( stateEvent );
     
           if ( jurisdiction > currentJurisdiction )          
           {
@@ -107,12 +134,12 @@ bool mitk::HierarchicalInteractor::ExecuteAction(Action* action, mitk::StateEven
         if ( jurisdiction >= threshold )  
         {          
           m_SelectedInteractors.push_back( *i );
-          mitk::StateEvent* newStateEvent = new mitk::StateEvent(StYES, stateEvent->GetEvent());
+          mitk::StateEvent* newStateEvent = new mitk::StateEvent(EIDYES, stateEvent->GetEvent());
           this->HandleEvent( newStateEvent, objectEventId, groupEventId );
         }
         else 
         {
-          mitk::StateEvent* newStateEvent = new mitk::StateEvent(StNO, stateEvent->GetEvent());
+          mitk::StateEvent* newStateEvent = new mitk::StateEvent(EIDNO, stateEvent->GetEvent());
           this->HandleEvent( newStateEvent, objectEventId, groupEventId );        
         }      
           
@@ -120,7 +147,6 @@ bool mitk::HierarchicalInteractor::ExecuteAction(Action* action, mitk::StateEven
       }
     case AcCHECKSUBINTERACTORS:
       {
-
         FloatProperty* thresholdProperty = dynamic_cast<FloatProperty*>(action->GetProperty("threshold"));
         float threshold;
 
@@ -147,15 +173,28 @@ bool mitk::HierarchicalInteractor::ExecuteAction(Action* action, mitk::StateEven
         
         if ( !m_SelectedInteractors.empty() )
         {          
-          mitk::StateEvent* newStateEvent = new mitk::StateEvent(StYES, stateEvent->GetEvent());
+          mitk::StateEvent* newStateEvent = new mitk::StateEvent(EIDYES, stateEvent->GetEvent());
           this->HandleEvent( newStateEvent, objectEventId, groupEventId );
         }
         else 
         {
-          mitk::StateEvent* newStateEvent = new mitk::StateEvent(StNO, stateEvent->GetEvent());
+          mitk::StateEvent* newStateEvent = new mitk::StateEvent(EIDNO, stateEvent->GetEvent());
           this->HandleEvent( newStateEvent, objectEventId, groupEventId );        
         }      
           
+        return true;
+      }
+    case AcFORCESUBINTERACTORS:
+      {
+        m_SelectedInteractors = m_AllInteractors;
+        return true;
+      }
+    case AcTRANSMITEVENT:
+      {
+        if ( IsSubSelected() ) 
+        {
+          TransmitEvent( stateEvent, objectEventId, groupEventId );
+        }
         return true;
       }
     default:

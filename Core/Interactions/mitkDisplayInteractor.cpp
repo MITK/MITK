@@ -1,6 +1,3 @@
-#ifndef _MITK_DISPLAY_INTERACTOR_CPP_
-#define _MITK_DISPLAY_INTERACTOR_CPP_
-
 #include "mitkDisplayInteractor.h"
 
 #include <mitkOperationActor.h>
@@ -61,6 +58,4 @@ void mitk::DisplayInteractor::ExecuteOperation(mitk::Operation * operation)
   }
 }
 
-
-#endif // _MITK_DISPLAY_INTERACTOR_CPP_
 

@@ -41,6 +41,8 @@ protected:
 	/** Time when Header was last read. */
     //##ModelId=3E19EA120063
 	itk::TimeStamp m_ReadHeaderTime;
+
+    int m_StartFileIndex;
 };
 
 } // namespace mitk

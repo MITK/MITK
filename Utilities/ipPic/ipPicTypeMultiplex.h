@@ -42,6 +42,33 @@
 #include "ipPic.h"
 //#include <complex>
 
+#define ipPicTypeMultiplex0( function, pic )										\
+{																					\
+  	if ( ( pic->type == ipPicInt || pic->type == ipPicUInt ) && pic->bpe == 1 ) {	\
+	} else if ( pic->type == ipPicInt && pic->bpe == 8 ) {							\
+		function<char>( pic );													\
+	} else if ( pic->type == ipPicUInt && pic->bpe == 8 ) {							\
+		function<unsigned char>( pic );											\
+	} else if ( pic->type == ipPicInt && pic->bpe == 16 ) {							\
+		function<short>( pic );													\
+	} else if ( pic->type == ipPicUInt && pic->bpe == 16 ) {						\
+		function<unsigned short>( pic );											\
+	} else if ( pic->type == ipPicInt && pic->bpe == 32 ) {							\
+		function<int>( pic );													\
+	} else if ( pic->type == ipPicUInt && pic->bpe == 32 ) {						\
+		function<unsigned int>( pic );											\
+	} else if ( pic->type == ipPicInt && pic->bpe == 64 ) {							\
+		function<long>( pic );													\
+	} else if ( pic->type == ipPicUInt && pic->bpe == 64 ) {						\
+		function<unsigned long>( pic );											\
+	} else if ( pic->type == ipPicFloat && pic->bpe == 32 ) {						\
+		function<float>( pic );													\
+	} else if ( pic->type == ipPicFloat && pic->bpe == 64 ) {						\
+		function<double>( pic );													\
+	}																				\
+}
+
+
 #define ipPicTypeMultiplex1( function, pic, param1 )										\
 {																					\
   	if ( ( pic->type == ipPicInt || pic->type == ipPicUInt ) && pic->bpe == 1 ) {	\

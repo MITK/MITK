@@ -31,7 +31,7 @@ typedef enum EConditions
 {
   StNO = 203,
   StYES = 204,
-  StSMALERNMINUS1 = 220,
+  StSMALLERNMINUS1 = 220,
   StLARGERNMINUS1 = 221,
 };
 

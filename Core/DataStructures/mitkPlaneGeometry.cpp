@@ -214,9 +214,16 @@ void mitk::PlaneGeometry::InitializeStandardPlane(const mitk::Geometry3D* geomet
   mitk::ScalarType width, height;
   mitk::ScalarType widthInMM, heightInMM;
 
+  const BoundingBox::BoundsArrayType& boundsarray = geometry3D->GetBoundingBox()->GetBounds();
+  mitk::Vector3D  originVector; 
+  FillVector3D(originVector,  boundsarray[0], boundsarray[2], boundsarray[4]);
   switch(planeorientation)
   {
     case Transversal:
+      //if(frontside)
+      //  FillVector3D(origin,  bounds[0],  bounds[2], bounds[4]+zPosition);
+      //else
+      //  FillVector3D(origin,  bounds[0],  bounds[2]+height, zPosition);
       width  = geometry3D->GetExtent(0); widthInMM  = geometry3D->GetExtentInMM(0);
       height = geometry3D->GetExtent(1); heightInMM = geometry3D->GetExtentInMM(1);
       break;
@@ -239,6 +246,11 @@ void mitk::PlaneGeometry::InitializeStandardPlane(const mitk::Geometry3D* geomet
 
   SetExtentInMM(0, widthInMM);
   SetExtentInMM(1, heightInMM);
+
+  mitk::Point3D  origin; 
+  originVector = geometry3D->GetUnitsToMMAffineTransform()->TransformVector(originVector);
+  origin = GetOrigin()+originVector;
+  SetOrigin(origin);
 }
 
 void mitk::PlaneGeometry::InitializeStandardPlane(const Vector3D& rightVector, const Vector3D& downVector, const Vector3D * spacing)

@@ -69,9 +69,9 @@ class BaseRenderer : public itk::Object
     //##ModelId=3E66CC59026B
     virtual void SetDisplayGeometry(mitk::DisplayGeometry* geometry2d);
 
-    itkGetObjectMacro(WorldGeometry, mitk::Geometry2D);
+    itkGetConstObjectMacro(WorldGeometry, mitk::Geometry2D);
     //##ModelId=3E66CC590379
-    virtual void SetWorldGeometry(mitk::Geometry2D* geometry2d);
+    virtual void SetWorldGeometry(const mitk::Geometry2D* geometry2d);
 
     itkGetObjectMacro(DisplayGeometry2DData, mitk::Geometry2DData);
     itkGetObjectMacro(WorldGeometry2DData, mitk::Geometry2DData);
@@ -104,15 +104,6 @@ protected:
     //##ModelId=3E330D6902E8
     mitk::DataTreeIterator* m_DataTreeIterator;
 
-    //##ModelId=3E3D2EEB0087
-    DisplayGeometry::Pointer m_DisplayGeometry;
-    //##ModelId=3E66B9FA022D
-    Geometry2D::Pointer m_WorldGeometry;
-    //##ModelId=3E66BDF000F4
-    Geometry2DData::Pointer m_DisplayGeometry2DData;
-    //##ModelId=3E66CC5901C1
-    Geometry2DData::Pointer m_WorldGeometry2DData;
-
     //##ModelId=3E3D1FCA0272
     RenderWindow* m_RenderWindow;
 
@@ -124,6 +115,17 @@ protected:
 
     //##ModelId=3E6D5DD302E6
     int m_Size[2];
+
+private:
+    //##ModelId=3E3D2EEB0087
+    DisplayGeometry::Pointer m_DisplayGeometry;
+    //##ModelId=3E66B9FA022D
+    Geometry2D::ConstPointer m_WorldGeometry;
+
+    //##ModelId=3E66BDF000F4
+    Geometry2DData::Pointer m_DisplayGeometry2DData;
+    //##ModelId=3E66CC5901C1
+    Geometry2DData::Pointer m_WorldGeometry2DData;
 };
 
 } // namespace mitk

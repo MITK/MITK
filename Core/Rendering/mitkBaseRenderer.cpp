@@ -68,7 +68,7 @@ mitk::BaseRenderer::~BaseRenderer()
 }
 
 //##ModelId=3E66CC590379
-void mitk::BaseRenderer::SetWorldGeometry(mitk::Geometry2D* geometry2d)
+void mitk::BaseRenderer::SetWorldGeometry(const mitk::Geometry2D* geometry2d)
 {
     itkDebugMacro("setting WorldGeometry to " << geometry2d);
     if (m_WorldGeometry != geometry2d)

@@ -630,7 +630,7 @@ void mitk::Image::Initialize(ipPicDescriptor* pic, int channels, int tDim, int s
   SlicedGeometry3D::Pointer slicedGeometry = SlicedGeometry3D::New();
   slicedGeometry->Initialize(m_Dimensions[2]);
   slicedGeometry->SetSpacing(pic);
-  slicedGeometry->SetGeometry2D(pic, 0);
+  slicedGeometry->SetGeometry2D(pic);
   slicedGeometry->SetEvenlySpaced();
   timeSliceGeometry->SetGeometry3D(slicedGeometry, 0);
   timeSliceGeometry->SetEvenlyTimed();

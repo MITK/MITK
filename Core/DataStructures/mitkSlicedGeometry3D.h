@@ -72,14 +72,18 @@ public:
   //##Documentation
   //## @brief Set this SlicedGeometry3D according to the tags in @a pic. 
   //## 
-  //## @a pic can be 2D, 3D or 4D.  For 3D,
-  //## set according to tags in @a pic. @a pic can be 2D, 3D or 4D.  For 3D,
-  //## the parameter @a s is ignored, for 4D @a s and @a t are ignored.
+  //## Currently, pic still does not have IGS information. Until it finally
+  //## has them, the following is done:
+  //## A slice parallel to the XY-plane is created with the size according 
+  //## to the information in the tag REAL PIXEL SIZES, including the 
+  //## z-position of the slice (sum of all z-sizes for slices < s).
+  //## If @a s is -1, all slices are initialized. 
+  //## If the tag REAL PIXEL SIZES does not exist, the spacing is used.
   //## @return @a false: geometry not changed, either because of inconsistent
   //## data (e.g., dimensions do not match the dimensions of a slice) or
   //## read-only geometry.
   //## @return @a true: geometry successfully updated.
-  virtual bool SetGeometry2D(ipPicDescriptor* pic, int s = 0);
+  virtual bool SetGeometry2D(ipPicDescriptor* pic, int s = -1);
 
   virtual void SetTimeBoundsInMS(const mitk::TimeBounds& timebounds);
 

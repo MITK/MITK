@@ -117,21 +117,90 @@ bool mitk::SlicedGeometry3D::SetGeometry2D(mitk::Geometry2D* geometry2D, int s)
 //##ModelId=3E155839024F
 bool mitk::SlicedGeometry3D::SetGeometry2D(ipPicDescriptor* pic, int s)
 {
-  if((pic!=NULL) && (IsValidSlice(s)))
+  if((pic!=NULL) && ((IsValidSlice(s)) || (s == -1)))
   {
-    //construct standard view
-    mitk::Point3D origin, right, bottom;
-    origin.set(0,0,s);         UnitsToMM(origin, origin);
-    right.set(pic->n[0],0,0);  UnitsToMM(right, right);
-    bottom.set(0,pic->n[1],0); UnitsToMM(bottom, bottom);
-    
-    PlaneView view_std(origin, right, bottom);
-    
-    mitk::PlaneGeometry::Pointer planegeometry=mitk::PlaneGeometry::New();
-    planegeometry->SetPlaneView(view_std);
-    planegeometry->SetThicknessBySpacing(&m_Spacing);
-    planegeometry->SetSizeInUnits(pic->n[0], pic->n[1]);
-    SetGeometry2D(planegeometry, s);
+    ipPicTSV_t *tsv;
+    if ( tsv = ipPicQueryTag( pic, "REAL PIXEL SIZES" ) )
+    {    
+      if(s == -1)
+      {
+        m_Geometry2Ds.clear();
+        Geometry2D::Pointer gnull=NULL;
+        m_Geometry2Ds.reserve(m_Slices);
+        m_Geometry2Ds.assign(m_Slices, gnull);       
+      }
+
+      int count = tsv->n[1];
+      float* value = (float*) tsv->value;
+      mitk::Point3D pixelSize;
+      ScalarType zPosition = 0.0f;
+
+      if(s != -1)
+      {
+        if(count < s)
+          return false;
+        count = s;
+      }
+      else
+      {
+        if(count < m_Slices)
+          return false;
+        count = m_Slices;
+      }
+
+      int slice;
+      for (slice=0; slice < count; ++slice ) 
+      {
+        pixelSize.x = (ScalarType) *value++;
+        pixelSize.y = (ScalarType) *value++;
+        pixelSize.z = (ScalarType) *value++;
+
+        zPosition += pixelSize.z / 2.0f;    // first half slice thickness
+
+        if((s==-1) || (slice==s))
+        {
+          mitk::Point3D origin, right, bottom;
+          origin.set( 0, 0, zPosition );         
+          right.set( pic->n[0] * pixelSize.x, 0, zPosition );  
+          bottom.set( 0, pic->n[1] * pixelSize.y, zPosition ); 
+
+          PlaneView planeView( origin, right, bottom );
+          mitk::PlaneGeometry::Pointer planegeometry=mitk::PlaneGeometry::New();
+          planegeometry->SetPlaneView( planeView );    
+          planegeometry->SetThickness( pixelSize.z );
+          SetGeometry2D( planegeometry, slice );
+        }
+
+        zPosition += pixelSize.z / 2.0f;  // second half slice thickness
+      } 
+
+      itkWarningMacro(<< "the sclices are inhomogeneous" );
+      m_EvenlySpaced = false;
+    }
+    else
+    {
+      //construct standard view
+      mitk::Point3D origin, right, bottom;
+
+      origin.set( 0, 0, m_Spacing.z*(s+ 0.5f));
+      right.set( pic->n[0] * m_Spacing.x, 0, m_Spacing.z / 2.0f );  
+      bottom.set( 0, pic->n[1] * m_Spacing.y, m_Spacing.z / 2.0f ); 
+
+      PlaneView planeView( origin, right, bottom );
+      mitk::PlaneGeometry::Pointer planegeometry=mitk::PlaneGeometry::New();
+      planegeometry->SetPlaneView( planeView );    
+      planegeometry->SetThickness( m_Spacing.z );
+      if(s==-1)
+      {
+        m_Geometry2Ds.clear();
+        Geometry2D::Pointer gnull=NULL;
+        m_Geometry2Ds.reserve(m_Slices);
+        m_Geometry2Ds.assign(m_Slices, gnull);       
+        s = 0;
+        m_EvenlySpaced = true;
+      }
+      SetGeometry2D(planegeometry, s);
+    }
     return true;
   }
   return false;
@@ -146,7 +215,6 @@ void mitk::SlicedGeometry3D::Initialize(unsigned int slices)
   m_Geometry2Ds.clear();
  
   Geometry2D::Pointer gnull=NULL;
- 
   m_Geometry2Ds.reserve(m_Slices);
   m_Geometry2Ds.assign(m_Slices, gnull);
  
@@ -241,7 +309,6 @@ void mitk::SlicedGeometry3D::SetSpacing(mitk::Vector3D aSpacing)
   m_Geometry2Ds.clear();
 
   Geometry2D::Pointer gnull=NULL;
-  
   m_Geometry2Ds.reserve(m_Slices);
   m_Geometry2Ds.assign(m_Slices, gnull);
 
@@ -297,105 +364,78 @@ void mitk::SlicedGeometry3D::SetSpacing(ipPicDescriptor* pic)
   if ( tsv ) 
   {
     SetSpacing( tsv );
-
-    origin.set( 0, 0, m_Spacing.z / 2.0f );         
-    right.set( pic->n[0] * m_Spacing.x, 0, m_Spacing.z / 2.0f );  
-    bottom.set( 0, pic->n[1] * m_Spacing.y, m_Spacing.z / 2.0f ); 
-
-    PlaneView planeView( origin, right, bottom );
-    mitk::PlaneGeometry::Pointer planegeometry=mitk::PlaneGeometry::New();
-    planegeometry->SetPlaneView( planeView );    
-    planegeometry->SetThickness( m_Spacing.z );
-    SetGeometry2D( planegeometry, 0 );
     m_EvenlySpaced = true;
   }
   else if ( tsv = ipPicQueryTag( pic, "REAL PIXEL SIZES" ) )
   {    
-    m_Geometry2Ds.clear();
     int count = tsv->n[1];
     float* value = (float*) tsv->value;
     mitk::Point3D pixelSize;
-    ScalarType zPosition = 0.0f;
+    mitk::Point3D summedPixelSize(0,0,0);
 
     for ( int s=0; s < count; s++ ) 
     {
 			pixelSize.x = (ScalarType) *value++;
 			pixelSize.y = (ScalarType) *value++;
 			pixelSize.z = (ScalarType) *value++;
+      summedPixelSize += pixelSize;
+    }
+    summedPixelSize *= 1.0f/count;
+    SetSpacing(summedPixelSize);
 
-      zPosition += pixelSize.z / 2.0f;    // first half slice thickness
-
-      mitk::Point3D origin, right, bottom;
-      origin.set( 0, 0, zPosition );         
-      right.set( pic->n[0] * pixelSize.x, 0, zPosition );  
-      bottom.set( 0, pic->n[1] * pixelSize.y, zPosition ); 
-
-      PlaneView planeView( origin, right, bottom );
-      mitk::PlaneGeometry::Pointer planegeometry=mitk::PlaneGeometry::New();
-      planegeometry->SetPlaneView( planeView );    
-      planegeometry->SetThickness( pixelSize.z );
-      SetGeometry2D( planegeometry, s );    
-
-      zPosition += pixelSize.z / 2.0f;  // second half slice thickness
-    } 
-
-    itkWarningMacro(<< "the sclices are inhomogeneous" );
+    itkWarningMacro(<< "the slices are inhomogeneous" );
     m_EvenlySpaced = false;
   }
   else if ( tsv = ipPicQueryTag( pic, "PIXEL SIZE" ) )
   {
     SetSpacing( tsv );    
-
-    origin.set( 0, 0, m_Spacing.z / 2.0f );         
-    right.set( pic->n[0] * m_Spacing.x, 0, m_Spacing.z / 2.0f );  
-    bottom.set( 0, pic->n[1] * m_Spacing.y, m_Spacing.z / 2.0f ); 
-
-    PlaneView planeView( origin, right, bottom );
-    mitk::PlaneGeometry::Pointer planegeometry=mitk::PlaneGeometry::New();
-    planegeometry->SetPlaneView( planeView );    
-    planegeometry->SetThickness( m_Spacing.z );
-    SetGeometry2D( planegeometry, 0 );
     m_EvenlySpaced = true;
-    itkWarningMacro(<< "using the tag PIXEL SIZE: " << m_Spacing << " this is not the correct thickness of the slice");
+    itkWarningMacro(<< "using the tag PIXEL SIZE: " << m_Spacing << " this may not the correct thickness of the slice");
   }
-
 #ifdef MBI_INTERNAL
-  else
+  else if( tsv = ipPicQueryTag( pic, "SOURCE HEADER" ) )
   {		
-    tsv = ipPicQueryTag( pic, "SOURCE HEADER" );
-    if( tsv )
+    void *data;
+    ipUInt4_t len;
+    ipFloat8_t spacing_z = 0;
+    ipFloat8_t thickness = 1;
+    ipFloat8_t fx = 1;
+    ipFloat8_t fy = 1;
+    
+    if( dicomFindElement( (unsigned char *) tsv->value, 0x0018, 0x0088, &data, &len ) )
     {
-      void *data;
-      ipUInt4_t len;
-      ipFloat8_t spacing_z = 0;
-      ipFloat8_t thickness = 1;
-      ipFloat8_t fx = 1;
-      ipFloat8_t fy = 1;
-      
-      if( dicomFindElement( (unsigned char *) tsv->value, 0x0018, 0x0088, &data, &len ) )
-      {
-        sscanf( (char *) data, "%lf", &m_Spacing );
-        itkDebugMacro( "spacing:   %5.2f mm\n" << spacing_z );
-      }
-      if( dicomFindElement( (unsigned char *) tsv->value, 0x0018, 0x0050, &data, &len ) )
-      {
-        sscanf( (char *) data, "%lf", &thickness );
-        itkDebugMacro( "thickness: %5.2f mm\n" << thickness );
-        
-        if( thickness == 0 )
-          thickness = 1;
-      }
-      if( dicomFindElement( (unsigned char *) tsv->value, 0x0028, 0x0030, &data, &len )
-        && len>0 && ((char *)data)[0] )
-      {
-        sscanf( (char *) data, "%lf\\%lf", &fy, &fx );    // row / column value 
-        itkDebugMacro( "fx, fy:    %5.2f/%5.2f mm\n" << fx << fy );
-      }
-      
-      m_Spacing.set(fx, fy,( spacing_z > 0 ? spacing_z : thickness));
+      sscanf( (char *) data, "%lf", &m_Spacing );
+      itkDebugMacro( "spacing:   %5.2f mm\n" << spacing_z );
     }
+    if( dicomFindElement( (unsigned char *) tsv->value, 0x0018, 0x0050, &data, &len ) )
+    {
+      sscanf( (char *) data, "%lf", &thickness );
+      itkDebugMacro( "thickness: %5.2f mm\n" << thickness );
+      
+      if( thickness == 0 )
+        thickness = 1;
+    }
+    if( dicomFindElement( (unsigned char *) tsv->value, 0x0028, 0x0030, &data, &len )
+      && len>0 && ((char *)data)[0] )
+    {
+      sscanf( (char *) data, "%lf\\%lf", &fy, &fx );    // row / column value 
+      itkDebugMacro( "fx, fy:    %5.2f/%5.2f mm\n" << fx << fy );
+    }
+    
+    Vector3D spacing(fx, fy,( spacing_z > 0 ? spacing_z : thickness));
+    SetSpacing(spacing);
+
+    itkWarningMacro(<< "using dicom spacing information: " << m_Spacing << " this may not the correct thickness of the slice");    
+
+    m_EvenlySpaced = true;
   }
 #endif
+  else
+  {
+    Vector3D spacing(1,1,1);
+    SetSpacing(spacing);
+    itkWarningMacro(<< "no spacing information found in pic-desciptor");
+  }
   // @FIXME:
   // nur fuer Testdatensatz
   // spacing = Vector3D(1/3.0,1/4.0,1/5.0);

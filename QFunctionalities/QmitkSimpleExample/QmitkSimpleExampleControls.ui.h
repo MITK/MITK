@@ -35,3 +35,9 @@ QWidget* QmitkSimpleExampleControls::getStereoSelect()
 {
     return stereoSelect;
 }
+
+
+QPushButton* QmitkSimpleExampleControls::getReInitializeNavigatorsButton()
+{
+    return reInitializeNavigatorsButton;
+}

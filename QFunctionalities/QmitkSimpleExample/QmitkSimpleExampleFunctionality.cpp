@@ -12,6 +12,7 @@
 #include "QmitkSelectableGLWidget.h"
 #include "QmitkStdMultiWidget.h"
 #include <QmitkStepperAdapter.h>
+#include "qpushbutton.h"
 
 // for stereo setting
 #include <mitkOpenGLRenderer.h>
@@ -25,7 +26,7 @@
 #include <mitkInteractionConst.h>
 
 QmitkSimpleExampleFunctionality::QmitkSimpleExampleFunctionality(QObject *parent, const char *name, QmitkStdMultiWidget *mitkStdMultiWidget, mitk::DataTreeIterator * it) : QmitkFunctionality(parent, name, it) ,
-controls(NULL), multiWidget(mitkStdMultiWidget)
+controls(NULL), multiWidget(mitkStdMultiWidget), m_NavigatorsInitialized(false)
 {
     setAvailability(true);
 
@@ -108,6 +109,7 @@ QWidget * QmitkSimpleExampleFunctionality::createControlWidget(QWidget *parent)
 void QmitkSimpleExampleFunctionality::createConnections()
 {
     connect(controls->getStereoSelect(), SIGNAL(activated(int)), this, SLOT(stereoSelectionChanged(int)) );
+    connect(controls->getReInitializeNavigatorsButton(), SIGNAL(clicked()), this, SLOT(initNavigators()) );
 }
 
 QAction * QmitkSimpleExampleFunctionality::createAction(QActionGroup *parent)
@@ -154,12 +156,15 @@ void QmitkSimpleExampleFunctionality::initNavigators()
       sliceNavigatorTime->SetInputWorldGeometry(geometry.GetPointer());        sliceNavigatorTime->Update();
     multiplexUpdateController->SetBlockUpdate(false);
     multiplexUpdateController->UpdateRequest();
+
+    m_NavigatorsInitialized=true;
   }
 }
 
 void QmitkSimpleExampleFunctionality::treeChanged(mitk::DataTreeIterator& itpos)
 {
-  initNavigators();
+  if(m_NavigatorsInitialized==false)
+    initNavigators();
 }
 
 void QmitkSimpleExampleFunctionality::activated()

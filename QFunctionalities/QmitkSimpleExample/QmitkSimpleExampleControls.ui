@@ -9,7 +9,7 @@
             <x>0</x>
             <y>0</y>
             <width>211</width>
-            <height>914</height>
+            <height>920</height>
         </rect>
     </property>
     <property name="minimumSize">
@@ -66,6 +66,14 @@
                 <cstring>sliceNavigatorTime</cstring>
             </property>
         </widget>
+        <widget class="QPushButton">
+            <property name="name">
+                <cstring>reInitializeNavigatorsButton</cstring>
+            </property>
+            <property name="text">
+                <string>re-initialize navigators</string>
+            </property>
+        </widget>
         <widget class="QComboBox">
             <item>
                 <property name="text">
@@ -100,7 +108,7 @@
             <property name="sizeHint">
                 <size>
                     <width>20</width>
-                    <height>40</height>
+                    <height>630</height>
                 </size>
             </property>
         </spacer>
@@ -144,6 +152,7 @@
     <function returnType="QWidget *">getSliceNavigatorSagittal()</function>
     <function returnType="QWidget *">getSliceNavigatorTime()</function>
     <function returnType="QWidget *">getStereoSelect()</function>
+    <function returnType="QPushButton *">getReInitializeNavigatorsButton()</function>
 </functions>
 <layoutdefaults spacing="0" margin="0"/>
 <includehints>

@@ -85,8 +85,9 @@ protected slots:
   void stereoSelectionChanged(int id);
 
   void treeChanged(mitk::DataTreeIterator& itpos);
-protected:
+
   void initNavigators();
+protected:
 
   /*!
   * default main widget containing 4 windows showing 3 
@@ -107,6 +108,8 @@ protected:
   mitk::SliceNavigationController::Pointer sliceNavigatorTime;
 
   mitk::MultiplexUpdateController::Pointer multiplexUpdateController;
+
+  bool m_NavigatorsInitialized;
 };
 
 #endif // !defined(AFX_QMITKSIMPLEEXAMPLEFUNCTIONALITY_H__1DC0BA6E_9B8D_4D63_8A63_5B661CE33712__INCLUDED_)

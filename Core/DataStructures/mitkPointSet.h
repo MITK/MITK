@@ -50,8 +50,8 @@ public:
 	//##@brief cellDataType, that stores all indexes of the lines, that are selected
 	//## e.g.: points A,B and C.Between A and B there is a line with index 0.
 	//## if vector of cellData contains 1 and 2, then the lines between B and C and C and A is selected.
-  typedef std::vector<int> SelectedLinesType;
-  typedef std::vector<int>::iterator SelectedLinesIter;
+  typedef std::vector<unsigned int> SelectedLinesType;
+  typedef SelectedLinesType::iterator SelectedLinesIter;
   typedef struct CellDataType 
   {
     bool selected; //used to set the whole cell on selected

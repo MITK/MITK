@@ -2,23 +2,24 @@
 #include <ipFunc.h>
 #include <itkImageFileReader.h>
 
-void mitk::LightBoxImageReader::SetLightBox(lightbox_t lightbox)
+
+void mitk::LightBoxImageReader::SetLightBox(QcLightbox* lightbox)
 {
     if(lightbox!=m_LightBox)
     {
         m_LightBox=lightbox;
-        Modified();
+        Modified();    
     }
 }
 
-lightbox_t mitk::LightBoxImageReader::GetLightBox()
+QcLightbox* mitk::LightBoxImageReader::GetLightBox()
 {
     return m_LightBox;
 }
 
 void mitk::LightBoxImageReader::GenerateOutputInformation()
 {
-    printf("\nGenerateOutputInformation\n");
+    itkGenericOutputMacro(<<"GenerateOutputInformation");
     if(m_LightBox==NULL)
     {
         itk::ImageFileReaderException e(__FILE__, __LINE__);
@@ -31,7 +32,7 @@ void mitk::LightBoxImageReader::GenerateOutputInformation()
     }
 
     mitk::Image::Pointer output = this->GetOutput();
-
+    
     if ((output->IsInitialized()) && (this->GetMTime() <= m_ReadHeaderTime.GetMTime()))
         return;
 
@@ -40,12 +41,12 @@ void mitk::LightBoxImageReader::GenerateOutputInformation()
     int position, numberOfImages=0;
     ipPicDescriptor*  pic=NULL;
 
-    for (position = 0; position < m_LightBox->images; ++position) 
+    for (position = 0; position < m_LightBox->getFrames (); ++position) //ehemals position < m_LightBox->images
     {
-        if (m_LightBox->image_list[position].type == DB_OBJECT_IMAGE) 
+        if (m_LightBox->fetchHeader(position) != NULL)  //ehemals: if (m_LightBox->image_list[position].type == DB_OBJECT_IMAGE) 
         {
             if(pic==NULL) // only build header
-                pic = pFetchImage (m_LightBox, position);
+                pic = m_LightBox->fetchHeader(position);
             ++numberOfImages;
             //            tagImageType = ipPicQueryTag (pic, tagIMAGE_TYPE);
             //     break;
@@ -53,7 +54,7 @@ void mitk::LightBoxImageReader::GenerateOutputInformation()
         }
     }
 
-    printf("\n numberofimages %d\n",numberOfImages);
+    itkGenericOutputMacro(<<"numberofimages " << numberOfImages);
 
     if(numberOfImages==0)
     {
@@ -65,29 +66,29 @@ void mitk::LightBoxImageReader::GenerateOutputInformation()
         return;
     }
 
-    printf("\n copy header \n");
+    itkGenericOutputMacro(<<"copy header");
     ipPicDescriptor *header=ipPicCopyHeader(pic, NULL);
-    printf("\n copy tags \n");
+    itkGenericOutputMacro(<<"copy tags ");
     ipFuncCopyTags(header, pic);
 
     //@FIXME: was ist, wenn die Bilder nicht alle gleich gross sind?
     if(numberOfImages>1)
     {  
-        printf("\n numberofimages %d > 1\n",numberOfImages);
+      itkGenericOutputMacro(<<"numberofimages > 1 :" << numberOfImages);
         header->dim=3;
         header->n[2]=numberOfImages;
     }
 
-    printf(" \ninitialisize output\n");
+    itkGenericOutputMacro(<<"initialisize output");
     output->Initialize(header);
 
-    printf("\n modifie \n");
+    itkGenericOutputMacro(<<" modifie ");
     m_ReadHeaderTime.Modified();
 }
 
 void mitk::LightBoxImageReader::GenerateData()
 {
-    printf("\n GenerateData \n");
+    itkGenericOutputMacro(<<"GenerateData ");
     if(m_LightBox==NULL)
     {
         itk::ImageFileReaderException e(__FILE__, __LINE__);
@@ -97,7 +98,7 @@ void mitk::LightBoxImageReader::GenerateData()
         throw e;
         return;
     }
-    printf("\n request output \n");
+    itkGenericOutputMacro(<<"request output ");
 
     mitk::Image::Pointer output = this->GetOutput();
 
@@ -105,11 +106,11 @@ void mitk::LightBoxImageReader::GenerateData()
     ipPicDescriptor*  pic=NULL;
 
     int zDim=(output->GetDimension()>2?output->GetDimensions()[2]:1);
-    printf("\n zdim is %u \n",zDim);
+    itkGenericOutputMacro(<<" zdim is "<<zDim);
 
-    for (position = 0; position < m_LightBox->images; ++position) 
+    for (position = 0; position < m_LightBox->getFrames (); ++position) 
     {
-        if (m_LightBox->image_list[position].type == DB_OBJECT_IMAGE) 
+        if (m_LightBox->fetchHeader(position) != NULL)//ehemals (m_LightBox->image_list[position].type == DB_OBJECT_IMAGE) 
         {
             if(numberOfImages>zDim)
             {
@@ -117,18 +118,19 @@ void mitk::LightBoxImageReader::GenerateData()
                 itk::OStringStream msg;
                 msg << "lightbox contains more images than calculated in the last GenerateOutputInformation call (>"<<zDim<<")";
                 e.SetDescription(msg.str().c_str());
-                printf("\n zu viele images \n");
+                itkGenericOutputMacro(<<"zu viele images");
                 throw e;
                 return;
             }
-            pic = pFetchImage (m_LightBox, position);
-            printf("\n add slice %u   x:%u y:%u\n", numberOfImages, pic->n[0],pic->n[1]);
+            pic = m_LightBox->fetchPic (position);// pFetchImage (m_LightBox, position);
+            itkGenericOutputMacro(<<"add slice  "<< numberOfImages <<" x:" <<pic->n[0]<<"y:"<<pic->n[1]);
             output->SetPicSlice(pic, zDim-1-numberOfImages);
-            printf("\n add slice %u  successful\n", numberOfImages, pic->n[0],pic->n[1]);	   ++numberOfImages;
+            itkGenericOutputMacro(<<" add slice   successful "<< numberOfImages<<"  "<< pic->n[0]<<"  "<<pic->n[1]);
+            ++numberOfImages;
             //	if(numberOfImages==24) break;
         }
     }
-    printf("\n fertig \n");
+    itkGenericOutputMacro(<<"fertig ");
 }
 /*
 Vector3<float> mitk::LightBoxImageReader::GetSpacingFromLB()

@@ -3,7 +3,7 @@
 #define NO_pVersion
 #include "mitkImageSource.h"
 #include "mitkCommon.h"
-#include "../../Applications/MITKSamplePlugIn/include/plugin.h"
+#include <chili/qclightbox.h>
 
 namespace mitk {
 
@@ -16,10 +16,10 @@ public:
     /** Method for creation through the object factory. */
     itkNewMacro(Self);
 
-    Vector3<float> GetSpacingFromLB();
+    //Vector3<float> GetSpacingFromLB();
 
-    void SetLightBox(lightbox_t lightbox);
-    lightbox_t GetLightBox();
+    void SetLightBox(QcLightbox* lightbox);
+    QcLightbox* GetLightBox();
 
 protected:
     virtual void GenerateData();
@@ -33,7 +33,7 @@ protected:
     /** Time when Header was last read. */
     itk::TimeStamp m_ReadHeaderTime;
 
-    lightbox_t m_LightBox;
+    QcLightbox* m_LightBox;
 };
 
 } // namespace mitk

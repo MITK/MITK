@@ -2,7 +2,7 @@
 #define _DATA_TREE_NODE_FACTORY_H_
 
 #include "mitkDataTreeNodeSource.h"
-#include "mitkFileReader.h"
+#include "mitkFileSeriesReader.h"
 
 #include <string>
 
@@ -23,7 +23,7 @@ namespace mitk
  * as appropriate. Second, you have to add an additional condition to
  * GenerateData which identifies your file type.
  */
-class DataTreeNodeFactory : public DataTreeNodeSource, public FileReader
+class DataTreeNodeFactory : public DataTreeNodeSource, public FileSeriesReader
 {
 public:
 
@@ -149,15 +149,11 @@ protected:
 
     virtual void ReadFileSeriesTypePIC();
     
+    virtual void ReadFileSeriesTypeSTL();
+    
     virtual void ReadFileSeriesTypeDCM();
     
     virtual void ReadFileSeriesTypeITKImageSeriesReader();
-    
-    std::string m_FileName;
-
-    std::string m_FilePrefix;
-
-    std::string m_FilePattern;
     
 };
    

@@ -10,6 +10,7 @@
 // VTK-related includes
 #include <vtkSTLReader.h>
 #include <vtkPolyDataReader.h>
+#include <vtkPolyData.h>
 #include <vtkStructuredPointsReader.h>
 #include <vtkStructuredPoints.h>
 
@@ -54,7 +55,6 @@
 
 
 mitk::DataTreeNodeFactory::DataTreeNodeFactory()
-        : m_FileName( "" ), m_FilePrefix( "" ), m_FilePattern( "" )
 {
     this->Modified();
 }
@@ -132,6 +132,10 @@ void mitk::DataTreeNodeFactory::GenerateData()
         {
             this->ReadFileSeriesTypeITKImageSeriesReader();
         }
+        else if ( this->FilePatternEndsWith( ".stl" ) || this->FilePatternEndsWith( ".STL" ) )
+        {
+            this->ReadFileSeriesTypeSTL();
+        }
     }
 }
 
@@ -201,7 +205,7 @@ void mitk::DataTreeNodeFactory::ReadFileTypeSTL()
         mitk::DataTreeNode::Pointer node = this->GetOutput();
         node->SetData( surface );
 
-				// set filename without path as string property
+        // set filename without path as string property
         mitk::StringProperty::Pointer nameProp = new mitk::StringProperty( this->GetBaseFileName() );
         node->SetProperty( "name", nameProp );
     }
@@ -229,7 +233,7 @@ void mitk::DataTreeNodeFactory::ReadFileTypeVTK()
         mitk::DataTreeNode::Pointer node = this->GetOutput();
         node->SetData( surface );
 
-				// set filename without path as string property
+        // set filename without path as string property
         mitk::StringProperty::Pointer nameProp = new mitk::StringProperty( this->GetBaseFileName() );
         node->SetProperty( "name", nameProp );
     }
@@ -458,11 +462,11 @@ void mitk::DataTreeNodeFactory::ReadFileTypeHPSONOS()
     node->SetData( cyl2cart->GetOutput() );
     ultrasoundProp = new mitk::StringProperty( "TransformedBackscatter" );
     node->SetProperty( "ultrasound", ultrasoundProp );
-		
+
     nameProp = new mitk::StringProperty( "TransformedBackscatter" );
     node->SetProperty( "name", nameProp );
     node->SetProperty( "layer", new mitk::IntProperty( -10 ) );
-   
+
     node->SetLevelWindow( levelwindow, NULL );
     node->Update();
 
@@ -845,9 +849,9 @@ void mitk::DataTreeNodeFactory::ReadFileSeriesTypeITKImageSeriesReader()
         //remove the last extension, until we have a digit at the end, or no extension is left!
         //
         std::string baseFilename = itksys::SystemTools::GetFilenameWithoutLastExtension( *it );
-        while ( ( baseFilename[baseFilename.length()-1] < '0' || baseFilename[baseFilename.length()-1] > '9') && itksys::SystemTools::GetFilenameLastExtension(baseFilename) != "") 
-             baseFilename = itksys::SystemTools::GetFilenameWithoutLastExtension( baseFilename );
-         
+        while ( ( baseFilename[ baseFilename.length() - 1 ] < '0' || baseFilename[ baseFilename.length() - 1 ] > '9' ) && itksys::SystemTools::GetFilenameLastExtension( baseFilename ) != "" )
+            baseFilename = itksys::SystemTools::GetFilenameWithoutLastExtension( baseFilename );
+
         std::string number;
         for ( unsigned int i = baseFilename.length() - 1; i >= 0; --i )
         {
@@ -932,5 +936,47 @@ void mitk::DataTreeNodeFactory::ReadFileSeriesTypeITKImageSeriesReader()
         itkWarningMacro( << e.what() );
         return ;
     }
+}
+
+
+void mitk::DataTreeNodeFactory::ReadFileSeriesTypeSTL()
+{
+    if ( !this->GenerateFileList() )
+    {
+        itkWarningMacro( << "Sorry, file list could not be determined..." );
+        return ;
+    }
+
+    mitk::SurfaceData::Pointer surface = mitk::SurfaceData::New();
+    std::cout << "prefix: "<< m_FilePrefix << ", pattern: " <<m_FilePattern << std::endl;
+    //surface->Resize( m_MatchedFileNames.size() );
+    for ( unsigned int i = 0 ; i < m_MatchedFileNames.size(); ++i )
+    {
+        std::string fileName = m_MatchedFileNames[i];
+        std::cout << "Loading " << fileName << " as stl..." << std::endl;
+
+        vtkSTLReader* stlReader = vtkSTLReader::New();
+        stlReader->SetFileName( fileName.c_str() );
+        stlReader->Update();
+
+        if ( stlReader->GetOutput() != NULL )
+        {
+            surface->SetVtkPolyData( stlReader->GetOutput(), i );
+        }
+        else
+        {
+            itkWarningMacro(<< "stlReader returned NULL while reading " << fileName << ". Trying to continue with empty vtkPolyData...");
+            surface->SetVtkPolyData( vtkPolyData::New(), i ); 
+        }
+        stlReader->Delete();
+    }
+    
+    mitk::DataTreeNode::Pointer node = this->GetOutput();
+    node->SetData( surface );
+
+    // set filename without path as string property
+    mitk::StringProperty::Pointer nameProp = new mitk::StringProperty( this->GetBaseFilePrefix() + ".stl" );
+    node->SetProperty( "name", nameProp );
+    std::cout << "...finished!" << std::endl;
 }
 

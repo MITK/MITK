@@ -9,7 +9,7 @@
             <x>0</x>
             <y>0</y>
             <width>752</width>
-            <height>923</height>
+            <height>929</height>
         </rect>
     </property>
     <property name="caption">
@@ -449,7 +449,7 @@
                 <bool>true</bool>
             </property>
             <property name="text">
-                <string>Widget1</string>
+                <string>Transversal plane</string>
             </property>
         </action>
         <action>
@@ -460,7 +460,7 @@
                 <bool>true</bool>
             </property>
             <property name="text">
-                <string>Widget2</string>
+                <string>Sagittal plane</string>
             </property>
         </action>
         <action>
@@ -471,7 +471,7 @@
                 <bool>true</bool>
             </property>
             <property name="text">
-                <string>Widget3</string>
+                <string>Coronal plane</string>
             </property>
         </action>
     </actiongroup>

@@ -34,7 +34,7 @@
     </customwidget>
     <customwidget>
         <class>QLevelWindowWidget</class>
-        <header location="global">../../AppModule/QLevelWindowWidget/QLevelWindowWidget.h</header>
+        <header location="global">../../Functionalities/QLevelWindowWidget/QLevelWindowWidget.h</header>
         <sizehint>
             <width>-1</width>
             <height>-1</height>

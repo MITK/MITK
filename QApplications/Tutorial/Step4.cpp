@@ -1,6 +1,5 @@
 #include <QmitkRenderWindow.h>
 #include <ComfortGLWidget.h>
-#include <vtkRenderer.h>
 
 #include <mitkDataTreeNodeFactory.h>
 #include <mitkProperties.h>
@@ -65,10 +64,10 @@ int main(int argc, char* argv[])
     }
   }
 
-  //Part V: Create windows and pass the tree to it
+  //Part IV: Create windows and pass the tree to it
   // create toplevel widget with horizontal layout
   QHBox toplevelWidget;
-  // Part Va: 3D view
+  // Part IVa: 3D view
   // create a renderwindow
   mitk::QmitkRenderWindow renderWindow(&toplevelWidget);
   // tell the renderwindow which (part of) the tree to render
@@ -76,7 +75,11 @@ int main(int argc, char* argv[])
   // use it as a 3D view
   renderWindow.GetRenderer()->SetMapperID(mitk::BaseRenderer::Standard3D);
 
-  // Part Vb: 2D view for slicing transversally
+  // *******************************************************
+  // ****************** START OF NEW PART ******************
+  // *******************************************************
+
+  // Part IVb: 2D view for slicing transversally
   // create ComfortGLWidget, which is based on the class 
   // QmitkRenderWindow, but additionally provides sliders
   ComfortGLWidget view2(&toplevelWidget);
@@ -87,7 +90,7 @@ int main(int argc, char* argv[])
   // slice itself in 3D: add it to the tree!
   it.Add(view2.GetRenderer()->GetCurrentWorldGeometry2DNode());
 
-  // Part Vc: 2D view for slicing sagitally
+  // Part IVc: 2D view for slicing sagitally
   // create ComfortGLWidget, which is based on the class 
   // QmitkRenderWindow, but additionally provides sliders
   ComfortGLWidget view3(&toplevelWidget);
@@ -98,7 +101,7 @@ int main(int argc, char* argv[])
   // slice itself in 3D: add it to the tree!
   it.Add(view3.GetRenderer()->GetCurrentWorldGeometry2DNode());
 
-  //Part VI: handle updates: To avoid unnecessary updates, we have to
+  //Part V: handle updates: To avoid unnecessary updates, we have to
   //define, when to update. The SliceNavigationController of each
   //2D view sends an event, when the slice was changed. Connect this
   //an update-controller to this event, and all renderwindows to
@@ -115,7 +118,11 @@ int main(int argc, char* argv[])
   updateController->AddRenderWindow(view2.GetRenderWindow());
   updateController->AddRenderWindow(view3.GetRenderWindow());
 
-  //Part VII: Qt-specific initialization
+  // *******************************************************
+  // ******************* END OF NEW PART *******************
+  // *******************************************************
+
+  //Part VI: Qt-specific initialization
   qtapplication.setMainWidget(&toplevelWidget);
   toplevelWidget.show();
 

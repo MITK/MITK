@@ -52,6 +52,9 @@ int main(int argc, char* argv[])
       mitk::DataTreeNode::Pointer node = nodeReader->GetOutput();
       it.Add(node);
 
+      // *********************************************************
+      // ****************** START OF NEW PART 1 ******************
+      // *********************************************************
       //Part IV: We want all images to be volume-rendered
       // Check, if the data is an image by dynamic_cast-ing the data
       // contained in the node. Warning: dynamic_cast's are rather slow,
@@ -60,6 +63,9 @@ int main(int argc, char* argv[])
       if(image.IsNotNull())
         // set the property "volumerendering" to the Boolean value "true"
         node->SetProperty("volumerendering", new mitk::BoolProperty(true));
+      // *********************************************************
+      // ******************* END OF NEW PART 1 *******************
+      // *********************************************************
     }
     catch(...)
     {
@@ -73,8 +79,14 @@ int main(int argc, char* argv[])
   mitk::QmitkRenderWindow renderWindow;
   // tell the renderwindow which (part of) the tree to render
   renderWindow.GetRenderer()->SetData(&it);
+  // *********************************************************
+  // ****************** START OF NEW PART 2 ******************
+  // *********************************************************
   // use it as a 3D view!
   renderWindow.GetRenderer()->SetMapperID(mitk::BaseRenderer::Standard3D);
+  // *********************************************************
+  // ******************* END OF NEW PART 2 *******************
+  // *********************************************************
 
   //Part VI: Qt-specific initialization
   qtapplication.setMainWidget(&renderWindow);

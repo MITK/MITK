@@ -150,6 +150,10 @@ float mitk::Interactor::CalculateJurisdiction(StateEvent const* stateEvent) cons
     //now compared to size of boundingbox to get between 0 and 1;
     returnvalue = returnvalue/( (bBox->GetMaximum().EuclideanDistanceTo(bBox->GetMinimum() ) ) );
 
+    //safety: if by now returnvalue is not in 0 and 1, then return 1!
+    if (returnvalue>1 ||returnvalue<0)
+      return 0;
+
     //shall be 1 if short length to center
     returnvalue = 1 - returnvalue;
 

@@ -128,6 +128,7 @@
 #include <sys/time.h>
 #include <sys/resource.h>
 #else
+#include <time.h>
 #include <sys/timeb.h>
 #endif
 #include <ipPic.h>

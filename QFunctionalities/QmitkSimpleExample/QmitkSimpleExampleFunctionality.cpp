@@ -187,40 +187,29 @@ void QmitkSimpleExampleFunctionality::initWidgets()
 				controls->sliderXY->setMaxValue(std::_MAX<int>(bounds[5],controls->sliderXY->maxValue()));
 				count++;
 			}
-			// init pic color props
-			if (count == 1) 
-            {
-				float color[3] = {1.0f,1.0f,1.0f};
-				node->SetColor(color);
-			}
-			else 
-            {
-				float color[3] = {1.0f,0.0f,0.0f};
-				node->SetColor(color);
-			}
 			
       lookupTableProp=NULL;
 
-			// init pic opacity props
-      if ( opacityprop.IsNull() ) {
-				opacityprop = new mitk::FloatProperty(1.0f);
-			}
-			if (count == 1) {
-				node->GetPropertyList()->SetProperty("opacity", new mitk::FloatProperty(1.0f) );
-			}
-			else {
-				opacityprop->SetValue(0.5f);
-				node->GetPropertyList()->SetProperty("opacity", opacityprop);
-        if(lookupTableProp.IsNull())
-        {
-          mitk::LookupTableProperty::Pointer lut = dynamic_cast<mitk::LookupTableProperty*>(node->GetPropertyList()->GetProperty("LookupTable").GetPointer());
-          if(lut.IsNotNull())
-          {
-            lookupTableProp = lut;
-            lookupTableProp->GetLookupTable().ChangeOpacityForAll(0.5f);
-          }
-        }
-			}
+			//// init pic opacity props
+   //   if ( opacityprop.IsNull() ) {
+			//	opacityprop = new mitk::FloatProperty(1.0f);
+			//}
+			//if (count == 1) {
+			//	node->GetPropertyList()->SetProperty("opacity", new mitk::FloatProperty(1.0f) );
+			//}
+			//else {
+			//	opacityprop->SetValue(1f);
+			//	node->GetPropertyList()->SetProperty("opacity", opacityprop);
+   //     if(lookupTableProp.IsNull())
+   //     {
+   //       mitk::LookupTableProperty::Pointer lut = dynamic_cast<mitk::LookupTableProperty*>(node->GetPropertyList()->GetProperty("LookupTable").GetPointer());
+   //       if(lut.IsNotNull())
+   //       {
+   //         lookupTableProp = lut;
+   //         lookupTableProp->GetLookupTable().ChangeOpacityForAll(0.5f);
+   //       }
+   //     }
+			//}
 		}
 	}
 	delete it;

@@ -59,11 +59,6 @@ public:
      */
     itkGetStringMacro( FilePattern );
     
-    /**
-     * Explicitly calls GenerateData(), since the pipelines Update()
-     * is broken. This will be fixed.
-     */
-    void Read();
     
 protected:
 

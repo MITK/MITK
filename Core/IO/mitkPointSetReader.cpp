@@ -5,7 +5,6 @@
 
 mitk::PointSetReader::PointSetReader()
 {
-    this->SetNumberOfOutputs( 0 );
 }
 
 
@@ -15,7 +14,6 @@ mitk::PointSetReader::~PointSetReader()
 
 void mitk::PointSetReader::GenerateData()
 {
-    std::cout << "Generate data called!" << std::endl;
     if ( m_FileName == "" )
     {
         itkWarningMacro( << "Sorry, filename has not been set!" );
@@ -31,19 +29,20 @@ void mitk::PointSetReader::GenerateData()
     parser->SetStream( &in );
     parser->Parse();
     mitk::vtkPointSetXMLParser::PointSetList pointSetList = parser->GetParsedPointSets();
-    this->ResizeOutputs(pointSetList.size());
-    
+    this->ResizeOutputs( pointSetList.size() );
+
     unsigned int i = 0;
-    for (mitk::vtkPointSetXMLParser::PointSetList::iterator it = pointSetList.begin(); it != pointSetList.end(); ++it, ++i)
+    for ( mitk::vtkPointSetXMLParser::PointSetList::iterator it = pointSetList.begin(); it != pointSetList.end(); ++it, ++i )
     {
-        this->SetOutput(i, *it);    
+        this->SetOutput( i, *it );
     }
     in.close();
 }
 
 
 void mitk::PointSetReader::GenerateOutputInformation()
-{}
+{
+}
 
 int mitk::PointSetReader::CanReadFile ( const char *name )
 {
@@ -70,8 +69,4 @@ void mitk::PointSetReader::ResizeOutputs( const unsigned int& num )
     }
 }
 
-void mitk::PointSetReader::Read()
-{
-    this->GenerateData();    
-}
 

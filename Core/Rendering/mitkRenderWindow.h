@@ -31,6 +31,11 @@ public:
     //## OpenGL operations, i.e. makes the widget's rendering context the current 
     //## OpenGL rendering context.
     virtual void MakeCurrent() {};
+
+    //##ModelId=3EF59AD202D5
+    //##Documentation
+    //## @brief Updates the contents of the renderwindow 
+    virtual void Update() {};
 };
 
 } // namespace mitk

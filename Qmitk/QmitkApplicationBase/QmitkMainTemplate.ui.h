@@ -726,6 +726,22 @@ void QmitkMainTemplate::init()
   //disabling the SizeGrip in the lower right corner
   (QmitkStatusBar::GetInstance())->SetSizeGripEnabled(false);
 
+  //this seems to be a bug of Qt3.1.1's designer: The object name of ToolBar is not initialized.
+  ToolBar->setName("ToolBar");
+
+  //create the data tree
+  tree=mitk::DataTree::New();
+  tree->Register(); //@FIXME: da DataTreeIterator keinen Smartpointer auf DataTree hält, wird tree sonst gelöscht.
+}
+
+/*!
+\brief basic initialization of main widgets
+
+The method is should be called at the end of the initialize-method of its
+subclasses.
+*/
+void QmitkMainTemplate::initialize()
+{
   //initialize interaction sub-system: undo-controller, statemachine-factory and global-interaction
 
   // test for environment variable MITKCONF
@@ -735,7 +751,7 @@ void QmitkMainTemplate::init()
   if (mitkConf != NULL) {
     xmlFileName = mitkConf;
   } else {
-    xmlFileName = "../../Interactions/mitkBaseInteraction";
+    xmlFileName = xmlFallBackPath;
   }
   xmlFileName += "/PointStateMachine.xml";
   if(QFile::exists(xmlFileName.c_str())==false)
@@ -769,25 +785,7 @@ void QmitkMainTemplate::init()
     std::cout<<"Couldn't find XML-configure-file! Check your branch!"<<std::endl;
   }
 
-  //this seems to be a bug of Qt3.1.1's designer: The object name of ToolBar is not initialized.
-  ToolBar->setName("ToolBar");
-
-  //create the data tree
-  tree=mitk::DataTree::New();
-  tree->Register(); //@FIXME: da DataTreeIterator keinen Smartpointer auf DataTree hält, wird tree sonst gelöscht.
-  //create root of data tree (empty)
-  //mitk::DataTreeNode::Pointer node=mitk::DataTreeNode::New();
-  //tree->setRoot(node);
-}
-
-/*!
-\brief basic initialization of main widgets
-
-The method is should be called at the end of the initialize-method of its
-subclasses.
-*/
-void QmitkMainTemplate::initialize()
-{
+  //initialize functionality management
   initializeQfm();
   QWidget* defaultMain = qfm->getDefaultMain();
 
@@ -946,4 +944,9 @@ void QmitkMainTemplate::changeToWidget2Layout()
 void QmitkMainTemplate::changeToWidget3Layout()
 {
   mitkMultiWidget->changeLayoutToWidget3();
+}
+
+void QmitkMainTemplate::setXMLFallBackPath( const char * anXmlFallBackPath )
+{
+  xmlFallBackPath = anXmlFallBackPath;
 }

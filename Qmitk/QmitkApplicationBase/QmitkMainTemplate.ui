@@ -9,7 +9,7 @@
             <x>0</x>
             <y>0</y>
             <width>752</width>
-            <height>920</height>
+            <height>923</height>
         </rect>
     </property>
     <property name="caption">
@@ -669,6 +669,7 @@
     <variable>QmitkStdMultiWidget* mitkMultiWidget;</variable>
     <variable>QmitkFctMediator* qfm;</variable>
     <variable>mitk::UndoController* undoController;</variable>
+    <variable>std::string xmlFallBackPath;</variable>
 </variables>
 <slots>
     <slot>fileNew()</slot>
@@ -705,6 +706,7 @@
     <function returnType="QmitkStdMultiWidget *">getMultiWidget()</function>
     <function>parseCommandLine()</function>
     <function returnType="mitk::DataTree::Pointer">GetTree()</function>
+    <function>setXMLFallBackPath(const char * anXmlFallBackPath)</function>
 </functions>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

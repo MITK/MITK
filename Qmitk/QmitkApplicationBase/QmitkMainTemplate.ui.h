@@ -112,7 +112,6 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
         }
         if(node != NULL)
         {
-            static int count = 0;
 
 						mitk::LevelWindowProperty::Pointer levWinProp = new mitk::LevelWindowProperty();
 						levWinProp->GetLevelWindow().SetRangeMin(-1024);
@@ -122,28 +121,8 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
 
 						node->GetPropertyList()->SetProperty("levelwindow",levWinProp);
 
-
-
 						connect(mitkMultiWidget->levelWindowWidget,SIGNAL(levelWindow(mitk::LevelWindow*)),this,SLOT(changeLevelWindow(mitk::LevelWindow*)) );
 
-						
-
-            if(count>0)
-            {
-                //sliderFP->setMinValue(0);
-                //sliderFP->setMaxValue(100);
-                //sliderFP->setValue(50);
-
-                float color[3]={1.0f,0.0f,0.0f};
-                mitk::ColorProperty::Pointer colorprop = new mitk::ColorProperty(color);
-                node->GetPropertyList()->SetProperty("color", colorprop);
-
-                //mitk::FloatProperty::Pointer 
-                opacityprop = new mitk::FloatProperty(0.5f);
-                node->GetPropertyList()->SetProperty("opacity", opacityprop);
-
-            }
-            ++count;
         }
 }
 
@@ -397,7 +376,8 @@ mitk::DataTree* QmitkMainTemplate::getDataTree()
 
 void QmitkMainTemplate::initWidgets( mitk::DataTreeNode::Pointer node )
 {
-           mitk::DataTreeIterator* it=tree->inorderIterator();
+		
+	mitk::DataTreeIterator* it=tree->inorderIterator();
 	   
 	printf("\nrequesting boundingbox\n");   
             mitk::BoundingBox::ConstPointer bb = node->GetData()->GetGeometry()->GetBoundingBox();

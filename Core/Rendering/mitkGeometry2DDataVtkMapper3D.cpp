@@ -31,58 +31,58 @@
 mitk::Geometry2DDataVtkMapper3D::Geometry2DDataVtkMapper3D() : m_DataTreeIterator(NULL), m_LastTextureUpdateTime(0)
 {
   m_VtkPlaneSource = vtkPlaneSource::New();
-  
+
   m_VtkPolyDataMapper = vtkPolyDataMapper::New();
   //        m_VtkPolyDataMapper->SetInput(m_VtkPlaneSource->GetOutput());
   m_VtkPolyDataMapper->ImmediateModeRenderingOn();
-  
+
   m_Actor = vtkActor::New();
   m_Actor->SetMapper(m_VtkPolyDataMapper);
-  
+
   m_Prop3D = m_Actor;
-		m_Prop3D->Register(NULL);
-    
+  m_Prop3D->Register(NULL);
+
   m_VtkLookupTable = vtkLookupTable::New();
-    m_VtkLookupTable->SetTableRange (-1024, 4096);
-    m_VtkLookupTable->SetSaturationRange (0, 0);
-    m_VtkLookupTable->SetHueRange (0, 0);
-    m_VtkLookupTable->SetValueRange (0, 1);
-    m_VtkLookupTable->Build ();
-    
-	m_VtkLookupTableDefault = m_VtkLookupTable;
-  
-    
+  m_VtkLookupTable->SetTableRange (-1024, 4096);
+  m_VtkLookupTable->SetSaturationRange (0, 0);
+  m_VtkLookupTable->SetHueRange (0, 0);
+  m_VtkLookupTable->SetValueRange (0, 1);
+  m_VtkLookupTable->Build ();
+
+  m_VtkLookupTableDefault = m_VtkLookupTable;
+
+
   m_VtkTexture = vtkTexture::New();
-    m_VtkTexture->InterpolateOn();
-    m_VtkTexture->SetLookupTable(m_VtkLookupTable);
-    m_VtkTexture->MapColorScalarsThroughLookupTableOn();
-    
-    //    m_Actor->SetTexture(axialTexture);
-    
-    //  axialTexture->SetInput(axialSection->GetOutput());
-    //  axialTexture->InterpolateOn();
-    //  axialTexture->SetLookupTable (lut);
-    //  axialTexture->MapColorScalarsThroughLookupTableOn();
-    //m_VtkPlaneSource = vtkPlaneSource::New();
-    //  m_VtkPlaneSource->SetXResolution(1);
-    //  m_VtkPlaneSource->SetYResolution(1);
-    //  m_VtkPlaneSource->SetOrigin(0.0, 0.0, slice);
-    //  m_VtkPlaneSource->SetPoint1(xDim, 0.0, slice);
-    //  m_VtkPlaneSource->SetPoint2(0.0, yDim, slice);
-    //m_VtkPolyDataMapper = vtkPolyDataMapper::New();
-    //  m_VtkPolyDataMapper->SetInput(m_VtkPlaneSource->GetOutput());
-    //  m_VtkPolyDataMapper->ImmediateModeRenderingOn();
-    //axial = vtkActor::New();
-    //  axial->SetMapper(m_VtkPolyDataMapper);
-    //  axial->SetTexture(axialTexture);
-    
+  m_VtkTexture->InterpolateOn();
+  m_VtkTexture->SetLookupTable(m_VtkLookupTable);
+  m_VtkTexture->MapColorScalarsThroughLookupTableOn();
+
+  //    m_Actor->SetTexture(axialTexture);
+
+  //  axialTexture->SetInput(axialSection->GetOutput());
+  //  axialTexture->InterpolateOn();
+  //  axialTexture->SetLookupTable (lut);
+  //  axialTexture->MapColorScalarsThroughLookupTableOn();
+  //m_VtkPlaneSource = vtkPlaneSource::New();
+  //  m_VtkPlaneSource->SetXResolution(1);
+  //  m_VtkPlaneSource->SetYResolution(1);
+  //  m_VtkPlaneSource->SetOrigin(0.0, 0.0, slice);
+  //  m_VtkPlaneSource->SetPoint1(xDim, 0.0, slice);
+  //  m_VtkPlaneSource->SetPoint2(0.0, yDim, slice);
+  //m_VtkPolyDataMapper = vtkPolyDataMapper::New();
+  //  m_VtkPolyDataMapper->SetInput(m_VtkPlaneSource->GetOutput());
+  //  m_VtkPolyDataMapper->ImmediateModeRenderingOn();
+  //axial = vtkActor::New();
+  //  axial->SetMapper(m_VtkPolyDataMapper);
+  //  axial->SetTexture(axialTexture);
+
 }
 
 //##ModelId=3E691E090394
 mitk::Geometry2DDataVtkMapper3D::~Geometry2DDataVtkMapper3D()
 {
   delete m_DataTreeIterator;
-  
+
   m_VtkPlaneSource->Delete();
   m_VtkPolyDataMapper->Delete();
   m_Actor->Delete();
@@ -99,14 +99,14 @@ const mitk::Geometry2DData *mitk::Geometry2DDataVtkMapper3D::GetInput()
   {
     return 0;
   }
-  
+
   return static_cast<const mitk::Geometry2DData * > ( GetData() );
 }
 
 //##ModelId=3E691E09038A
 void mitk::Geometry2DDataVtkMapper3D::Update()
 {
-  
+
 }
 
 //##ModelId=3E691E090396
@@ -135,9 +135,9 @@ void mitk::Geometry2DDataVtkMapper3D::Update(mitk::BaseRenderer* renderer)
     return;
   }
   m_Actor->VisibilityOn();
-  
+
   mitk::Geometry2DData::Pointer input  = const_cast<mitk::Geometry2DData*>(this->GetInput());
-  
+
   if(input.IsNotNull())
   {
     mitk::Geometry2DDataToSurfaceDataFilter::Pointer surfaceCreator;
@@ -152,18 +152,18 @@ void mitk::Geometry2DDataVtkMapper3D::Update(mitk::BaseRenderer* renderer)
       surfacecreatorprop=new mitk::SmartPointerProperty(surfaceCreator);
       GetDataTreeNode()->SetProperty("surfacegeometry", surfacecreatorprop);
     }
-    
+
     surfaceCreator->SetInput(input);
-    
+
     int res;
     if(GetDataTreeNode()->GetIntProperty("xresolution", res, renderer))
       surfaceCreator->SetXResolution(res);
     if(GetDataTreeNode()->GetIntProperty("yresolution", res, renderer))
       surfaceCreator->SetYResolution(res);
-    
+
     surfaceCreator->Update(); //FIXME ohne das crash
     m_VtkPolyDataMapper->SetInput(surfaceCreator->GetOutput()->GetVtkPolyData());
-    
+
     if(m_DataTreeIterator)
     {
       mitk::DataTreeIterator* it=m_DataTreeIterator->clone();
@@ -173,7 +173,7 @@ void mitk::Geometry2DDataVtkMapper3D::Update(mitk::BaseRenderer* renderer)
         mitk::DataTreeNode* node=it->get();
         mitk::Mapper::Pointer mapper = node->GetMapper(1);
         mitk::ImageMapper2D* imagemapper = dynamic_cast<ImageMapper2D*>(mapper.GetPointer());
-        
+
         if((node->IsVisible(renderer)) && (imagemapper))
         {
           mitk::SmartPointerProperty::Pointer rendererProp = dynamic_cast<mitk::SmartPointerProperty*>(GetDataTreeNode()->GetPropertyList()->GetProperty("renderer").GetPointer());
@@ -183,25 +183,25 @@ void mitk::Geometry2DDataVtkMapper3D::Update(mitk::BaseRenderer* renderer)
             if(renderer.IsNotNull())
             {
 
-							// check for LookupTable
-							mitk::LookupTableProperty::Pointer lut;
-						  lut = dynamic_cast<mitk::LookupTableProperty*>(node->GetPropertyList()->GetProperty("LookupTable").GetPointer());
-							if (lut.IsNotNull() )
-							{
-								m_VtkLookupTable = lut->GetLookupTable().GetVtkLookupTable();
-						    m_VtkTexture->SetLookupTable(m_VtkLookupTable);
-//						    m_VtkTexture->Modified();
-							} else {
-								m_VtkLookupTable = m_VtkLookupTableDefault;
-							}
-							
-							
+              // check for LookupTable
+              mitk::LookupTableProperty::Pointer lut;
+              lut = dynamic_cast<mitk::LookupTableProperty*>(node->GetPropertyList()->GetProperty("LookupTable").GetPointer());
+              if (lut.IsNotNull() )
+              {
+                m_VtkLookupTable = lut->GetLookupTable().GetVtkLookupTable();
+                m_VtkTexture->SetLookupTable(m_VtkLookupTable);
+                //						    m_VtkTexture->Modified();
+              } else {
+                m_VtkLookupTable = m_VtkLookupTableDefault;
+              }
+
+
               // check for level window prop and use it for display if it exists
               mitk::LevelWindow levelWindow;
               if(node->GetLevelWindow(levelWindow, renderer))
                 m_VtkLookupTable->SetTableRange(levelWindow.GetMin(),levelWindow.GetMax());
 
-             
+
               //we have to do this before GenerateAllData() is called there may be
               //no RendererInfo for renderer yet, thus GenerateAllData won't update
               //the (non-existing) RendererInfo for renderer. By calling GetRendererInfo
@@ -222,8 +222,8 @@ void mitk::Geometry2DDataVtkMapper3D::Update(mitk::BaseRenderer* renderer)
         }
       }
     }
-    
-    //apply color read from the PropertyList
+
+    //apply properties read from the PropertyList
     ApplyProperties(m_Actor, renderer);
   }
   StandardUpdate();

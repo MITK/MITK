@@ -89,6 +89,10 @@
             <string>Tools</string>
         </property>
         <action name="fileOpenAction"/>
+        <separator/>
+        <action name="editUndoAction"/>
+        <action name="editRedoAction"/>
+        <separator/>
     </toolbar>
 </toolbars>
 <actions>
@@ -114,7 +118,7 @@
             <cstring>fileOpenAction</cstring>
         </property>
         <property name="iconSet">
-            <iconset></iconset>
+            <iconset>fileopen</iconset>
         </property>
         <property name="text">
             <string>Open</string>
@@ -131,7 +135,7 @@
             <cstring>fileSaveAction</cstring>
         </property>
         <property name="iconSet">
-            <iconset></iconset>
+            <iconset>filesave</iconset>
         </property>
         <property name="text">
             <string>Save</string>
@@ -162,7 +166,7 @@
             <cstring>filePrintAction</cstring>
         </property>
         <property name="iconSet">
-            <iconset></iconset>
+            <iconset>print</iconset>
         </property>
         <property name="text">
             <string>Print</string>
@@ -193,7 +197,7 @@
             <cstring>editUndoAction</cstring>
         </property>
         <property name="iconSet">
-            <iconset></iconset>
+            <iconset>undo</iconset>
         </property>
         <property name="text">
             <string>Undo</string>
@@ -210,7 +214,7 @@
             <cstring>editRedoAction</cstring>
         </property>
         <property name="iconSet">
-            <iconset></iconset>
+            <iconset>redo</iconset>
         </property>
         <property name="text">
             <string>Redo</string>
@@ -227,7 +231,7 @@
             <cstring>editCutAction</cstring>
         </property>
         <property name="iconSet">
-            <iconset></iconset>
+            <iconset>editcut</iconset>
         </property>
         <property name="text">
             <string>Cut</string>
@@ -244,7 +248,7 @@
             <cstring>editCopyAction</cstring>
         </property>
         <property name="iconSet">
-            <iconset></iconset>
+            <iconset>editcopy</iconset>
         </property>
         <property name="text">
             <string>Copy</string>
@@ -261,7 +265,7 @@
             <cstring>editPasteAction</cstring>
         </property>
         <property name="iconSet">
-            <iconset></iconset>
+            <iconset>editpaste</iconset>
         </property>
         <property name="text">
             <string>Paste</string>

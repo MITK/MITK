@@ -6,7 +6,10 @@
  *   writes a PicFile to disk
  *
  * $Log$
- * Revision 1.8  1999/11/27 19:24:19  andre
+ * Revision 1.9  1999/11/27 19:40:44  andre
+ * *** empty log message ***
+ *
+ * Revision 1.8  1999/11/27  19:24:19  andre
  * *** empty log message ***
  *
  * Revision 1.3.2.3  1998/03/25  15:03:36  andre
@@ -53,6 +56,12 @@ ipPicPut( char *outfile_name, ipPicDescriptor *pic )
       fprintf( stderr, "ipPicPut: sorry, can't write (missing tags !!!)\n" );
       return( -1 );
     }
+
+  if( ipPicEncryptionType(pic) != ' ' )
+    {
+      fprintf( stderr, "ipPicPut: sorry, can't write (was encrypted !!!)\n" );
+      return( -1 );
+    } 
 
   if( outfile_name == NULL )
     outfile = stdout;
@@ -220,27 +229,7 @@ void _ipPicWriteTags( _ipPicTagsElement_t *head, FILE *stream, char encryption_t
         }
       else
         {
-          if( encryption_type == 'e'
-              && ( current->tsv->type == ipPicASCII
-                   || current->tsv->type == ipPicNonUniform ) )
-            {
-              char *buff = malloc( elements * current->tsv->bpe/8 );
-              int i;
-
-              for( i = 0; i < elements * current->tsv->bpe/8; i++ )
-                {
-                  if( i % 2 )
-                    ((ipUInt1_t *)buff)[i] = 255 - (((ipUInt1_t *)current->tsv->value)[i] ^ i);
-                  else
-                    ((ipUInt1_t *)buff)[i] = ((ipUInt1_t *)current->tsv->value)[i] ^ i;
-                }
-
-              ipFWriteLE( buff, current->tsv->bpe / 8, elements, stream );
-
-              free( buff );
-            }
-          else
-            ipFWriteLE( current->tsv->value, current->tsv->bpe / 8, elements, stream );
+          ipFWriteLE( current->tsv->value, current->tsv->bpe / 8, elements, stream );
         }
 
       current = current->next;

@@ -57,6 +57,8 @@ class OpenGLRenderer : public BaseRenderer
     //##ModelId=3E3799420227
     virtual void InitSize(int w, int h);
 
+    
+
     //##ModelId=3ED91D060305
     //##Documentation
     //## @brief Update the vtk-based-mappers by adding the produced actors to the m_VtkRenderer.
@@ -64,8 +66,9 @@ class OpenGLRenderer : public BaseRenderer
     //## @warning Always call Update() before, which checks, whether there are vtk-based-mappers.
 	virtual void UpdateVtkActors();
 
+    VtkRenderWindow*  GetRenderWindow(){ return  m_MitkVtkRenderWindow;}
 
-		vtkRenderer * GetVtkRenderer(){return m_VtkRenderer;};
+
 protected:
     //##ModelId=3E33145B005A
     virtual void Paint();

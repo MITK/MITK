@@ -55,10 +55,23 @@ public:
   //## @note The PlaneGeometry is cloned, @em not linked/referenced.
   virtual void SetPlane(const mitk::PlaneGeometry* aPlane);
 
+  //##Documentation
+  //## @brief Set if all points in the mesh should be interpreted as
+  //## one long line.
+  //##
+  //## Cells are not used in this mode, but all points in the order
+  //## of their indices form the line.
+  //## Default is @a false.
+  itkGetConstMacro(UseAllPoints, bool);
+  itkSetMacro(UseAllPoints, bool);
+  itkBooleanMacro(UseAllPoints);
+
 protected:
   PlanesPerpendicularToLinesFilter();
 
   virtual ~PlanesPerpendicularToLinesFilter();
+
+  void CreatePlane(const Point3D& curr);
 
   //## @brief Plane to be used as an example of the planes to move
   //## along the lines in the input mesh.
@@ -69,10 +82,22 @@ protected:
   //## \sa SetPlane
   mitk::PlaneGeometry::Pointer m_Plane;
 
+  bool m_UseAllPoints;
+
   //##Documentation
   //## @brief SlicedGeometry3D containing the created planes
   //##
   SlicedGeometry3D::Pointer m_CreatedGeometries;
+private:
+  std::deque<mitk::PlaneGeometry::Pointer> planes;
+  Point3D last;
+  VnlVector normal;
+  VnlVector right, down;
+  VnlVector targetRight;
+  Vector3D targetSpacing;
+  ScalarType halfWidthInMM, halfHeightInMM;
+  mitk::AffineGeometryFrame3D::BoundsArrayType bounds;
+  Point3D origin;
 };
 
 } // namespace mitk

@@ -118,6 +118,8 @@ typedef enum ESideEffects
   SeCHECKNMINUS1 = 32,  //check if the number of elements is equal to N-1
   SeCHECKEQUALS1 = 33,  //check if the number of elements in the data is equal to 1
   SeCHECKSELECTED = 34, //check if the given element is selected or not
+  SeCHECKGREATERZERO = 35, //check if the current number of elements is greater than 0
+  SeCHECKGREATERTWO = 36, //check if the current number of elements is greater than two
   SeFINISHOBJECT = 40,
   SeFINISHGROUP = 41,
   SeFINISHMOVEMENT = 42,
@@ -153,6 +155,8 @@ typedef enum ESideEffects
   SeSCALE = 1003,
   SeROTATESTART = 1004,
   SeROTATE = 1005,
+  SeMODESELECT = 1100,
+  SeMODEDESELECT = 1101
 };
 
 //Type of an Event;

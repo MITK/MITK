@@ -92,6 +92,13 @@
 #  endif
 #endif
 
+#ifdef __BORLANDC__
+#  ifndef VM_USE_STD_NAMESPACE
+#    define VM_USE_STD_NAMESPACE
+#  endif
+#endif
+
+//#define VM_USE_STD_NAMESPACE
 #ifdef VM_INCLUDE_NAMESPACE
 #  define VM_VECMATH_NS  kh_vecmath
 #  define VM_BEGIN_NS namespace kh_vecmath {

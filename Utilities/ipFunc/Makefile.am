@@ -1,5 +1,8 @@
 INCLUDES = -I../ipPic
 
+EXTRA_DIST = libipFunc.dsp ipFunc.dsp
+
+bin_PROGRAMS = ipFunc
 lib_LIBRARIES = libipFunc.a
 pkginclude_HEADERS = ipFunc.h
 noinst_HEADERS =		\
@@ -11,6 +14,11 @@ noinst_HEADERS =		\
       ipMorphological.h        	\
       ipPointOperators.h       	\
       ipStatistical.h            
+
+ipFunc_LDADD = ./libipFunc.a
+
+ipFunc_SOURCES = \
+	ipFunc.c
 
 libipFunc_a_SOURCES = \
       AddC.c          \

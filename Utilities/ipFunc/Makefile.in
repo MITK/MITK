@@ -112,6 +112,28 @@ DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
 TAR = tar
 GZIP_ENV = --best
+DEP_FILES =  .deps/AddC.P .deps/AddI.P .deps/AddSl.P .deps/And.P \
+.deps/Border.P .deps/BorderX.P .deps/Box.P .deps/Box2d.P .deps/Box3d.P \
+.deps/Canny.P .deps/Close.P .deps/CompressM.P .deps/Conv.P \
+.deps/Convert.P .deps/Curtosis.P .deps/CurtosisR.P .deps/Dila.P \
+.deps/DivC.P .deps/DivI.P .deps/DrawPoly.P .deps/Equal.P .deps/Ero.P \
+.deps/Error.P .deps/Exp.P .deps/ExtT.P .deps/ExtrC.P .deps/ExtrR.P \
+.deps/ExtrROI.P .deps/Extrema.P .deps/FillArea.P .deps/Frame.P \
+.deps/GaussF.P .deps/Grad.P .deps/Grav.P .deps/Hist.P .deps/HitMiss.P \
+.deps/HitMissI.P .deps/Inertia.P .deps/Inv.P .deps/LN.P .deps/Label.P \
+.deps/Laplace.P .deps/LevWind.P .deps/Log.P .deps/MakePicName.P \
+.deps/Malloc.P .deps/Mean.P .deps/MeanC.P .deps/MeanF.P .deps/MeanR.P \
+.deps/MeanROI.P .deps/Median.P .deps/Morph.P .deps/MultC.P \
+.deps/MultI.P .deps/Norm.P .deps/NormXY.P .deps/Not.P .deps/OpCl.P \
+.deps/Open.P .deps/Or.P .deps/Pot.P .deps/Range.P .deps/Rank.P \
+.deps/Refl.P .deps/RegGrow.P .deps/Roberts.P .deps/Rotate.P \
+.deps/SDev.P .deps/SDevC.P .deps/SDevR.P .deps/SDevROI.P .deps/ScBl.P \
+.deps/ScFact.P .deps/ScNN.P .deps/Scale.P .deps/SelInv.P .deps/SelMM.P \
+.deps/Select.P .deps/SetErrno.P .deps/Shp.P .deps/Skewness.P \
+.deps/SkewnessR.P .deps/Sobel.P .deps/Sqrt.P .deps/SubC.P .deps/SubI.P \
+.deps/Thresh.P .deps/Transpose.P .deps/Var.P .deps/VarC.P .deps/VarR.P \
+.deps/VarROI.P .deps/Window.P .deps/WindowR.P .deps/Xchange.P \
+.deps/ZeroCr.P .deps/_BorderX.P .deps/_DrawPoly.P .deps/ipGetANew.P
 SOURCES = $(libipFunc_a_SOURCES)
 OBJECTS = $(libipFunc_a_OBJECTS)
 
@@ -119,9 +141,9 @@ all: all-redirect
 .SUFFIXES:
 .SUFFIXES: .S .c .o .s
 $(srcdir)/Makefile.in: Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) 
-	cd $(top_srcdir) && $(AUTOMAKE) --gnu --include-deps ipFunc/Makefile
+	cd $(top_srcdir) && $(AUTOMAKE) --gnu ipFunc/Makefile
 
-Makefile: $(srcdir)/Makefile.in  $(top_builddir)/config.status
+Makefile: $(srcdir)/Makefile.in  $(top_builddir)/config.status $(BUILT_SOURCES)
 	cd $(top_builddir) \
 	  && CONFIG_FILES=$(subdir)/$@ CONFIG_HEADERS= $(SHELL) ./config.status
 
@@ -157,9 +179,6 @@ uninstall-libLIBRARIES:
 	list='$(lib_LIBRARIES)'; for p in $$list; do \
 	  rm -f $(DESTDIR)$(libdir)/$$p; \
 	done
-
-.c.o:
-	$(COMPILE) -c $<
 
 .s.o:
 	$(COMPILE) -c $<
@@ -231,6 +250,11 @@ distdir = $(top_builddir)/$(PACKAGE)-$(VERSION)/$(subdir)
 subdir = ipFunc
 
 distdir: $(DISTFILES)
+	here=`cd $(top_builddir) && pwd`; \
+	top_distdir=`cd $(top_distdir) && pwd`; \
+	distdir=`cd $(distdir) && pwd`; \
+	cd $(top_srcdir) \
+	  && $(AUTOMAKE) --include-deps --build-dir=$$here --srcdir-name=$(top_srcdir) --output-dir=$$top_distdir --gnu ipFunc/Makefile
 	@for file in $(DISTFILES); do \
 	  d=$(srcdir); \
 	  if test -d $$d/$$file; then \
@@ -241,107 +265,38 @@ distdir: $(DISTFILES)
 	    || cp -p $$d/$$file $(distdir)/$$file || :; \
 	  fi; \
 	done
-AddC.o: AddC.c ipFuncP.h ipFunc.h
-AddI.o: AddI.c ipFuncP.h ipFunc.h
-AddSl.o: AddSl.c ipFuncP.h ipFunc.h
-And.o: And.c ipFuncP.h ipFunc.h
-Border.o: Border.c ipFuncP.h ipFunc.h
-BorderX.o: BorderX.c ipFuncP.h ipFunc.h
-Box.o: Box.c ipFuncP.h ipFunc.h
-Box2d.o: Box2d.c ipFuncP.h ipFunc.h
-Box3d.o: Box3d.c ipFuncP.h ipFunc.h
-Canny.o: Canny.c ipFuncP.h ipFunc.h gradient.h
-Close.o: Close.c ipFuncP.h ipFunc.h
-CompressM.o: CompressM.c ipFuncP.h ipFunc.h
-Conv.o: Conv.c ipFuncP.h ipFunc.h
-Convert.o: Convert.c ipFuncP.h ipFunc.h
-Curtosis.o: Curtosis.c ipFuncP.h ipFunc.h
-CurtosisR.o: CurtosisR.c ipFuncP.h ipFunc.h
-Dila.o: Dila.c ipFuncP.h ipFunc.h
-DivC.o: DivC.c ipFuncP.h ipFunc.h
-DivI.o: DivI.c ipFuncP.h ipFunc.h
-DrawPoly.o: DrawPoly.c ipFuncP.h ipFunc.h
-Equal.o: Equal.c ipFuncP.h ipFunc.h
-Ero.o: Ero.c ipFuncP.h ipFunc.h
-Error.o: Error.c ipFuncP.h ipFunc.h
-Exp.o: Exp.c ipFuncP.h ipFunc.h
-ExtT.o: ExtT.c ipFuncP.h ipFunc.h
-ExtrC.o: ExtrC.c ipFuncP.h ipFunc.h
-ExtrR.o: ExtrR.c ipFuncP.h ipFunc.h
-ExtrROI.o: ExtrROI.c ipFuncP.h ipFunc.h
-Extrema.o: Extrema.c ipFuncP.h ipFunc.h
-FillArea.o: FillArea.c ipFuncP.h ipFunc.h
-Frame.o: Frame.c ipFuncP.h ipFunc.h
-GaussF.o: GaussF.c ipFuncP.h ipFunc.h
-Grad.o: Grad.c ipFuncP.h ipFunc.h gradient.h
-Grav.o: Grav.c ipFuncP.h ipFunc.h
-Hist.o: Hist.c ipFuncP.h ipFunc.h
-HitMiss.o: HitMiss.c ipFuncP.h ipFunc.h
-HitMissI.o: HitMissI.c ipFuncP.h ipFunc.h
-Inertia.o: Inertia.c ipFuncP.h ipFunc.h
-Inv.o: Inv.c ipFuncP.h ipFunc.h
-LN.o: LN.c ipFuncP.h ipFunc.h
-Label.o: Label.c ipFuncP.h ipFunc.h
-Laplace.o: Laplace.c ipFuncP.h ipFunc.h
-LevWind.o: LevWind.c ipFuncP.h ipFunc.h
-Log.o: Log.c ipFuncP.h ipFunc.h
-MakePicName.o: MakePicName.c
-Malloc.o: Malloc.c ipFuncP.h ipFunc.h
-Mean.o: Mean.c ipFuncP.h ipFunc.h
-MeanC.o: MeanC.c ipFuncP.h ipFunc.h
-MeanF.o: MeanF.c ipFuncP.h ipFunc.h
-MeanR.o: MeanR.c ipFuncP.h ipFunc.h
-MeanROI.o: MeanROI.c ipFuncP.h ipFunc.h
-Median.o: Median.c ipFuncP.h ipFunc.h
-Morph.o: Morph.c ipFuncP.h ipFunc.h
-MultC.o: MultC.c ipFuncP.h ipFunc.h
-MultI.o: MultI.c ipFuncP.h ipFunc.h
-Norm.o: Norm.c ipFuncP.h ipFunc.h
-NormXY.o: NormXY.c ipFuncP.h ipFunc.h
-Not.o: Not.c ipFuncP.h ipFunc.h
-OpCl.o: OpCl.c ipFuncP.h ipFunc.h
-Open.o: Open.c ipFuncP.h ipFunc.h
-Or.o: Or.c ipFuncP.h ipFunc.h
-Pot.o: Pot.c ipFuncP.h ipFunc.h
-Range.o: Range.c ipFuncP.h ipFunc.h
-Rank.o: Rank.c ipFuncP.h ipFunc.h
-Refl.o: Refl.c ipFuncP.h ipFunc.h
-RegGrow.o: RegGrow.c ipFuncP.h ipFunc.h
-Roberts.o: Roberts.c ipFuncP.h ipFunc.h
-Rotate.o: Rotate.c ipFuncP.h ipFunc.h
-SDev.o: SDev.c ipFuncP.h ipFunc.h
-SDevC.o: SDevC.c ipFuncP.h ipFunc.h
-SDevR.o: SDevR.c ipFuncP.h ipFunc.h
-SDevROI.o: SDevROI.c ipFuncP.h ipFunc.h
-ScBl.o: ScBl.c ipFunc.h
-ScFact.o: ScFact.c ipFuncP.h ipFunc.h
-ScNN.o: ScNN.c ipFuncP.h ipFunc.h
-Scale.o: Scale.c ipFuncP.h ipFunc.h
-SelInv.o: SelInv.c ipFuncP.h ipFunc.h
-SelMM.o: SelMM.c ipFuncP.h ipFunc.h
-Select.o: Select.c ipFuncP.h ipFunc.h
-SetErrno.o: SetErrno.c ipFuncP.h ipFunc.h
-Shp.o: Shp.c ipFuncP.h ipFunc.h
-Skewness.o: Skewness.c ipFuncP.h ipFunc.h
-SkewnessR.o: SkewnessR.c ipFuncP.h ipFunc.h
-Sobel.o: Sobel.c ipFuncP.h ipFunc.h
-Sqrt.o: Sqrt.c ipFuncP.h ipFunc.h
-SubC.o: SubC.c ipFuncP.h ipFunc.h
-SubI.o: SubI.c ipFuncP.h ipFunc.h
-Thresh.o: Thresh.c ipFuncP.h ipFunc.h
-Transpose.o: Transpose.c ipFuncP.h ipFunc.h
-Var.o: Var.c ipFuncP.h ipFunc.h
-VarC.o: VarC.c ipFuncP.h ipFunc.h
-VarR.o: VarR.c ipFuncP.h ipFunc.h
-VarROI.o: VarROI.c ipFuncP.h ipFunc.h
-Window.o: Window.c ipFuncP.h ipFunc.h
-WindowR.o: WindowR.c ipFuncP.h ipFunc.h
-Xchange.o: Xchange.c ipFuncP.h ipFunc.h
-ZeroCr.o: ZeroCr.c ipFuncP.h ipFunc.h
-_BorderX.o: _BorderX.c ipFuncP.h ipFunc.h
-_DrawPoly.o: _DrawPoly.c ipFuncP.h ipFunc.h
-ipGetANew.o: ipGetANew.c ipFuncP.h ipFunc.h
 
+DEPS_MAGIC := $(shell mkdir .deps > /dev/null 2>&1 || :)
+
+-include $(DEP_FILES)
+
+mostlyclean-depend:
+
+clean-depend:
+
+distclean-depend:
+	-rm -rf .deps
+
+maintainer-clean-depend:
+
+%.o: %.c
+	@echo '$(COMPILE) -c $<'; \
+	$(COMPILE) -Wp,-MD,.deps/$(*F).pp -c $<
+	@-cp .deps/$(*F).pp .deps/$(*F).P; \
+	tr ' ' '\012' < .deps/$(*F).pp \
+	  | sed -e 's/^\\$$//' -e '/^$$/ d' -e '/:$$/ d' -e 's/$$/ :/' \
+	    >> .deps/$(*F).P; \
+	rm .deps/$(*F).pp
+
+%.lo: %.c
+	@echo '$(LTCOMPILE) -c $<'; \
+	$(LTCOMPILE) -Wp,-MD,.deps/$(*F).pp -c $<
+	@-sed -e 's/^\([^:]*\)\.o[ 	]*:/\1.lo \1.o :/' \
+	  < .deps/$(*F).pp > .deps/$(*F).P; \
+	tr ' ' '\012' < .deps/$(*F).pp \
+	  | sed -e 's/^\\$$//' -e '/^$$/ d' -e '/:$$/ d' -e 's/$$/ :/' \
+	    >> .deps/$(*F).P; \
+	rm -f .deps/$(*F).pp
 info-am:
 info: info-am
 dvi-am:
@@ -379,23 +334,24 @@ distclean-generic:
 
 maintainer-clean-generic:
 mostlyclean-am:  mostlyclean-libLIBRARIES mostlyclean-compile \
-		mostlyclean-tags mostlyclean-generic
+		mostlyclean-tags mostlyclean-depend mostlyclean-generic
 
 mostlyclean: mostlyclean-am
 
-clean-am:  clean-libLIBRARIES clean-compile clean-tags clean-generic \
-		mostlyclean-am
+clean-am:  clean-libLIBRARIES clean-compile clean-tags clean-depend \
+		clean-generic mostlyclean-am
 
 clean: clean-am
 
 distclean-am:  distclean-libLIBRARIES distclean-compile distclean-tags \
-		distclean-generic clean-am
+		distclean-depend distclean-generic clean-am
 
 distclean: distclean-am
 
 maintainer-clean-am:  maintainer-clean-libLIBRARIES \
 		maintainer-clean-compile maintainer-clean-tags \
-		maintainer-clean-generic distclean-am
+		maintainer-clean-depend maintainer-clean-generic \
+		distclean-am
 	@echo "This command is intended for maintainers to use;"
 	@echo "it deletes files that may require special tools to rebuild."
 
@@ -406,12 +362,13 @@ clean-libLIBRARIES maintainer-clean-libLIBRARIES uninstall-libLIBRARIES \
 install-libLIBRARIES mostlyclean-compile distclean-compile \
 clean-compile maintainer-clean-compile uninstall-pkgincludeHEADERS \
 install-pkgincludeHEADERS tags mostlyclean-tags distclean-tags \
-clean-tags maintainer-clean-tags distdir info-am info dvi-am dvi check \
-check-am installcheck-am installcheck install-exec-am install-exec \
-install-data-am install-data install-am install uninstall-am uninstall \
-all-redirect all-am all installdirs mostlyclean-generic \
-distclean-generic clean-generic maintainer-clean-generic clean \
-mostlyclean distclean maintainer-clean
+clean-tags maintainer-clean-tags distdir mostlyclean-depend \
+distclean-depend clean-depend maintainer-clean-depend info-am info \
+dvi-am dvi check check-am installcheck-am installcheck install-exec-am \
+install-exec install-data-am install-data install-am install \
+uninstall-am uninstall all-redirect all-am all installdirs \
+mostlyclean-generic distclean-generic clean-generic \
+maintainer-clean-generic clean mostlyclean distclean maintainer-clean
 
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.

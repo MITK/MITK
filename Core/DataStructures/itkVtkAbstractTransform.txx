@@ -201,7 +201,7 @@ template<class TScalarType>
 unsigned long 
 itk::VtkAbstractTransform<TScalarType>::GetMTime() const
 {
-  if(m_LastVtkAbstractTransformTimeStamp<m_VtkAbstractTransform->GetMTime())
+  if((m_VtkAbstractTransform != NULL) && (m_LastVtkAbstractTransformTimeStamp < m_VtkAbstractTransform->GetMTime()))
   {
     m_LastVtkAbstractTransformTimeStamp=m_VtkAbstractTransform->GetMTime();
     Modified();

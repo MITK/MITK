@@ -195,6 +195,7 @@ public:
   //##ModelId=3EF4935C03B8
   virtual void Map(const mitk::Point2D & atPt2d_mm, const mitk::Vector2D &vec2d_mm, mitk::Vector3D &vec3d_mm) const;
 
+  virtual bool IsValid() const;
 protected:
   //##ModelId=3E3AE91A035E
   DisplayGeometry();

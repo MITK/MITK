@@ -44,9 +44,11 @@ namespace mitk {
 //## The PlaneGeometry m_Plane is used to define the parameter space. 2D coordinates are 
 //## first mapped by the PlaneGeometry and the resulting 3D coordinates are put into 
 //## the vtkAbstractTransform. 
+//## @note This class is the superclass of concrete geometries. Since there is no
+//## write access to the vtkAbstractTransform and m_Plane, this class is somehow
+//## abstract. For full write access from extern, use ExternAbstractTransformGeometry.
 //## @note The bounds of the PlaneGeometry are used as the parametric bounds.
-//## @note The PlaneGeometry is cloned, @em not linked/referenced.
-//## @sa AbstractTransformGeometry
+//## @sa ExternAbstractTransformGeometry
 class AbstractTransformGeometry : public Geometry2D
 {
 public:
@@ -59,11 +61,6 @@ public:
   //## @brief Get the vtkAbstractTransform (stored in m_VtkAbstractTransform)
   virtual vtkAbstractTransform* GetVtkAbstractTransform() const;
 
-  //##ModelId=3EF4A2660239
-  //##Documentation
-  //## @brief Set the vtkAbstractTransform (stored in m_VtkAbstractTransform)
-  virtual void SetVtkAbstractTransform(vtkAbstractTransform* aVtkAbstractTransform);
-
   virtual unsigned long GetMTime() const;
 
   //##ModelId=3EF4A2660241
@@ -72,17 +69,6 @@ public:
   //## m_VtkAbstractTransform and therewith defines the 2D manifold described by 
   //## AbstractTransformGeometry
   itkGetConstObjectMacro(Plane, PlaneGeometry);
-  //##ModelId=3EF4A2660243
-  //##Documentation
-  //## @brief Set the rectangular area that is used for transformation by 
-  //## m_VtkAbstractTransform and therewith defines the 2D manifold described by 
-  //## AbstractTransformGeometry
-  //##
-  //## @note The bounds of the PlaneGeometry are used as the parametric bounds.
-  //## @note The PlaneGeometry is cloned, @em not linked/referenced.
-  virtual void SetPlane(const mitk::PlaneGeometry* aPlane);
-
-  virtual void SetParametricBounds(const BoundingBox::BoundsArrayType& bounds);
   
   virtual mitk::ScalarType GetParametricExtentInMM(int direction) const;
 
@@ -110,6 +96,15 @@ public:
 
   virtual void WorldToIndex(const mitk::Point2D &atPt2d_mm, const mitk::Vector2D &vec_mm, mitk::Vector2D &vec_units) const;
 
+  //##Documentation
+  //## @brief Change the parametric bounds to @a oversampling times 
+  //## the bounds of m_Plane.
+  //##
+  //## The change is done once (immediately). Later changes of the bounds
+  //## of m_Plane will not influence the parametric bounds. (Consequently, 
+  //## there is no method to get the oversampling.)
+  virtual void SetOversampling(float oversampling);
+
   virtual void Initialize();
 
   virtual AffineGeometryFrame3D::Pointer Clone() const;
@@ -120,6 +115,22 @@ protected:
   virtual ~AbstractTransformGeometry();
   
   void InitializeGeometry(Self * newGeometry) const;
+  
+  //##Documentation
+  //## @brief Set the vtkAbstractTransform (stored in m_VtkAbstractTransform)
+  //##
+  //## Protected in this class, made public in ExternAbstractTransformGeometry.
+  virtual void SetVtkAbstractTransform(vtkAbstractTransform* aVtkAbstractTransform);
+
+  //##Documentation
+  //## @brief Set the rectangular area that is used for transformation by 
+  //## m_VtkAbstractTransform and therewith defines the 2D manifold described by 
+  //## ExternAbstractTransformGeometry
+  //##
+  //## Protected in this class, made public in ExternAbstractTransformGeometry.
+  //## @note The bounds of the PlaneGeometry are used as the parametric bounds.
+  //## @note The PlaneGeometry is cloned, @em not linked/referenced.
+  virtual void SetPlane(const mitk::PlaneGeometry* aPlane);
 
   //##ModelId=3EF4A266021A
   //##Documentation

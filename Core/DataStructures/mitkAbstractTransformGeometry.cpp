@@ -46,58 +46,12 @@ vtkAbstractTransform* mitk::AbstractTransformGeometry::GetVtkAbstractTransform()
   return m_ItkVtkAbstractTransform->GetVtkAbstractTransform();
 }
 
-//##ModelId=3EF4A2660239
-void mitk::AbstractTransformGeometry::SetVtkAbstractTransform(vtkAbstractTransform* aVtkAbstractTransform)
-{
-  m_ItkVtkAbstractTransform->SetVtkAbstractTransform(aVtkAbstractTransform);
-}
-
-//##ModelId=3EF4A2660243
-void mitk::AbstractTransformGeometry::SetPlane(const mitk::PlaneGeometry* aPlane)
-{
-  if(aPlane!=NULL)
-  {
-    m_Plane = dynamic_cast<mitk::PlaneGeometry*>(aPlane->Clone().GetPointer());
-
-		BoundingBox::BoundsArrayType b =m_Plane->GetBoundingBox()->GetBounds();
-
-		//std::cout << " BOUNDS: " << b << std::endl;
-		//std::cout << " EXTEND: " <<m_Plane->GetExtent(0) << std::endl;
-		//std::cout << " EXTEND: " <<m_Plane->GetExtent(1) << std::endl;
-
-    //SetParametricBounds(m_Plane->GetBoundingBox()->GetBounds());
-		SetParametricBounds(b);
-
-
-    //@warning affine-transforms and bounding-box should be set by specific sub-classes!
-    SetBounds(m_Plane->GetBoundingBox()->GetBounds());
-  }
-  else
-  {
-    if(m_Plane.IsNull())
-      return;
-    m_Plane=NULL;
-  }
-  Modified();
-}
-
-void mitk::AbstractTransformGeometry::SetParametricBounds(const BoundingBox::BoundsArrayType& bounds)
-{
-	//std::cout << " BOUNDS: " << bounds << std::endl;
-  Superclass::SetParametricBounds(bounds);
-
-  //@warning affine-transforms and bounding-box should be set by specific sub-classes!
-  SetBounds(bounds);
-
-  if(m_Plane.IsNotNull())
-  {
-    m_Plane->SetSizeInUnits(bounds[1]-bounds[0], bounds[3]-bounds[2]);
-    m_Plane->SetBounds(bounds);
-  }
-}
-
 mitk::ScalarType mitk::AbstractTransformGeometry::GetParametricExtentInMM(int direction) const
 {
+  if(m_Plane.IsNull())
+  {
+    itkExceptionMacro(<<"m_Plane is NULL.");
+  }
   return m_Plane->GetExtentInMM(direction);
 }
 
@@ -199,6 +153,32 @@ void mitk::AbstractTransformGeometry::WorldToIndex(const mitk::Point2D &atPt2d_m
   m_Plane->WorldToIndex(atPt2d_mm, vec_mm, vec_units);
 }
 
+void mitk::AbstractTransformGeometry::SetVtkAbstractTransform(vtkAbstractTransform* aVtkAbstractTransform)
+{
+  m_ItkVtkAbstractTransform->SetVtkAbstractTransform(aVtkAbstractTransform);
+}
+
+void mitk::AbstractTransformGeometry::SetPlane(const mitk::PlaneGeometry* aPlane)
+{
+  if(aPlane!=NULL)
+  {
+    m_Plane = static_cast<mitk::PlaneGeometry*>(aPlane->Clone().GetPointer());
+
+		BoundingBox::BoundsArrayType b=m_Plane->GetBoundingBox()->GetBounds();
+
+		SetParametricBounds(b);
+
+    //@warning affine-transforms and bounding-box should be set by specific sub-classes!
+    SetBounds(m_Plane->GetBoundingBox()->GetBounds());
+  }
+  else
+  {
+    if(m_Plane.IsNull())
+      return;
+    m_Plane=NULL;
+  }
+  Modified();
+}
 
 unsigned long mitk::AbstractTransformGeometry::GetMTime() const
 {
@@ -207,6 +187,19 @@ unsigned long mitk::AbstractTransformGeometry::GetMTime() const
 
   return Superclass::GetMTime();
 }
+
+void mitk::AbstractTransformGeometry::SetOversampling(float oversampling)
+{
+  if(m_Plane.IsNull())
+  {
+    itkExceptionMacro(<< "m_Plane is not set.");
+  }
+
+  mitk::BoundingBox::BoundsArrayType bounds = m_Plane->GetBounds();
+  bounds[1]*=oversampling; bounds[3]*=oversampling; bounds[5]*=oversampling;
+  SetParametricBounds(bounds);
+}
+
 mitk::AffineGeometryFrame3D::Pointer mitk::AbstractTransformGeometry::Clone() const
 {
   Self::Pointer newGeometry = Self::New();

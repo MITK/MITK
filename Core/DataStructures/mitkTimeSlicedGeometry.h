@@ -72,6 +72,8 @@ public:
   //##
   virtual void InitializeEvenlyTimed(mitk::Geometry3D* geometry3D, unsigned int timeSteps);
 
+  virtual void SetImageGeometry(const bool isAnImageGeometry);
+
   //##Documentation
   //## @brief Copy the m_TimeBoundsInMS of the geometries contained
   //## in @a timeslicedgeometry into the geometries contained in this

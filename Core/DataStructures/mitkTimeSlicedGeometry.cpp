@@ -167,6 +167,20 @@ mitk::TimeSlicedGeometry::~TimeSlicedGeometry()
 
 }
 
+void mitk::TimeSlicedGeometry::SetImageGeometry(const bool isAnImageGeometry)
+{
+  Superclass::SetImageGeometry(isAnImageGeometry);
+
+  mitk::Geometry3D* geometry3d;
+  unsigned int t;
+  for(t=0; t<m_TimeSteps; ++t)
+  {
+    geometry3d = m_Geometry3Ds[t];
+    if(geometry3d!=NULL)
+      geometry3d->SetImageGeometry(isAnImageGeometry);
+  }
+}
+
 const mitk::BoundingBox* mitk::TimeSlicedGeometry::GetBoundingBox() const
 {
   if(m_TimeSteps==0)

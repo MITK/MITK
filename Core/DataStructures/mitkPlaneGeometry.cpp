@@ -36,6 +36,7 @@ mitk::PlaneGeometry::~PlaneGeometry()
 void mitk::PlaneGeometry::Initialize()
 {
   Superclass::Initialize();
+  vtk2itk(m_IndexToWorldTransform->GetOffset(), m_Origin);
 }
 
 void mitk::PlaneGeometry::EnsurePerpendicularNormal(mitk::AffineTransform3D* transform)

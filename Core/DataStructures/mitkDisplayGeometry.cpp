@@ -249,7 +249,7 @@ void mitk::DisplayGeometry::SetOriginInMM(const mitk::Vector2D& origin_mm)
 //##ModelId=3E3C38660226
 void mitk::DisplayGeometry::Fit()
 {
-  if(m_WorldGeometry.IsNull()) return;
+  if((m_WorldGeometry.IsNull()) || (m_WorldGeometry->IsValid() == false)) return;
 
   mitk::ScalarType   x,y,w,h;
 
@@ -304,7 +304,7 @@ mitk::ScalarType mitk::DisplayGeometry::GetScaleFactorMMPerDisplayUnit() const
 //##ModelId=3E66CC5A0118
 unsigned long mitk::DisplayGeometry::GetMTime() const
 {
-  if(Geometry2D::GetMTime()<m_WorldGeometry->GetMTime())
+  if((m_WorldGeometry.IsNotNull()) && (Geometry2D::GetMTime() < m_WorldGeometry->GetMTime()))
     Modified();
   return Geometry2D::GetMTime();
 }
@@ -325,3 +325,7 @@ void mitk::DisplayGeometry::Map(const mitk::Point2D & atPt2d_mm, const mitk::Vec
   m_WorldGeometry->Map(atPt2d_mm, vec2d_mm, vec3d_mm);    
 }
 
+bool mitk::DisplayGeometry::IsValid() const
+{
+  return m_Valid && m_WorldGeometry.IsNotNull() && m_WorldGeometry->IsValid();
+}

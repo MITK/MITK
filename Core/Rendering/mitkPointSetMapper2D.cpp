@@ -14,7 +14,6 @@
 	#include <GL/glut.h>
 #endif
 	
-
 //##ModelId=3F0189F00378
 mitk::PointSetMapper2D::PointSetMapper2D()
 {
@@ -40,6 +39,8 @@ const mitk::PointSet *mitk::PointSetMapper2D::GetInput(void)
 //##ModelId=3F0189F00373
 void mitk::PointSetMapper2D::Paint(mitk::BaseRenderer * renderer)
 {
+  float colorSel[]={0.6,0.0,0.4}; //for selected!
+
     if(IsVisible(renderer)==false) return;
 
     //	@FIXME: Logik fuer update
@@ -68,6 +69,10 @@ void mitk::PointSetMapper2D::Paint(mitk::BaseRenderer * renderer)
         PointSet::PointSetType::PointDataContainerIterator selIt, selEnd;
         selIt=input->GetPointList()->GetPointData()->Begin();
         selEnd=input->GetPointList()->GetPointData()->End();
+        
+        //current color for changing to a diferent color if selected
+        float currCol[4];
+        glGetFloatv(GL_CURRENT_COLOR,currCol);
 
         int j=0;
         while(it!=end)
@@ -94,6 +99,7 @@ void mitk::PointSetMapper2D::Paint(mitk::BaseRenderer * renderer)
                 {
                     horz.x=10;
                     vert.y=10;
+                    glColor3f(colorSel[0],colorSel[1],colorSel[2]);//red
                 }
 
 								// now paint text if available
@@ -125,7 +131,8 @@ void mitk::PointSetMapper2D::Paint(mitk::BaseRenderer * renderer)
                     tmp=pt2d;			glVertex2fv(&tmp.x);
                 glEnd ();
 
-                
+                if (selIt->Value())//selected
+                  glColor3f(currCol[0],currCol[1],currCol[2]);//the color before changing to select!
             }
             ++it;
             ++selIt;

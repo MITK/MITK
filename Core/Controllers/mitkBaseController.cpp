@@ -3,6 +3,8 @@
 //##ModelId=3E3AE32B0048
 mitk::BaseController::BaseController()
 {
+  m_Slice = Stepper::New();
+  m_Time  = Stepper::New();
 }
 
 
@@ -15,20 +17,18 @@ mitk::BaseController::~BaseController()
 /*!
   \todo implement it!
   */
-mitk::Stepper &mitk::BaseController::GetSlice()
+mitk::Stepper* mitk::BaseController::GetSlice()
 {
-	itkExceptionMacro("BaseController not yet implemented."); 	
-	return m_Slice;
+  return m_Slice.GetPointer();
 }
 
 //##ModelId=3DF8F61101E3
 /*!
   \todo implement it!
   */
-mitk::Stepper &mitk::BaseController::GetTime()
+mitk::Stepper* mitk::BaseController::GetTime()
 {
-	itkExceptionMacro("BaseController not yet implemented."); 	
-	return m_Time;
+  return m_Time.GetPointer();
 }
 
 //##ModelId=3DD52870008D

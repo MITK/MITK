@@ -33,12 +33,12 @@ public:
   //##ModelId=3DF8F5CA03D8
   //##Documentation
   //## @brief Get the Stepper through the slices
-  mitk::Stepper &GetSlice();
+  mitk::Stepper* GetSlice();
 
   //##ModelId=3DF8F61101E3
   //##Documentation
   //## @brief Get the Stepper through the time
-  mitk::Stepper &GetTime();
+  mitk::Stepper* GetTime();
 
   //##ModelId=3DD528500222
   //##Documentation
@@ -61,10 +61,10 @@ protected:
 
   //##ModelId=3DF8C0140176
   //## @brief Stepper through the time
-  Stepper m_Time;
+  Stepper::Pointer m_Time;
   //##ModelId=3E189CAA0265
   //## @brief Stepper through the slices
-  Stepper m_Slice;
+  Stepper::Pointer m_Slice;
   //BaseRenderer::Pointer m_BaseRenderer;
 };
 

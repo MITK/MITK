@@ -1,8 +1,11 @@
-INCLUDEPATH	+= ../../Framework/QmitkApplicationBase ../../Functionalities/QmitkSimpleExample
+SOURCES	+= ../../Functionalities/QmitkSimpleExample/QmitkSimpleExampleFunctionality.cpp
+HEADERS	+= ../../Functionalities/QmitkSimpleExample/QmitkSimpleExampleFunctionality.h
 
 # an example of a functionality
-HEADERS	+= ../../Functionalities/QmitkSimpleExample/QmitkSimpleExampleFunctionality.h 
 		
-SOURCES	+= ../../Functionalities/QmitkSimpleExample/QmitkSimpleExampleFunctionality.cpp 
 
-FORMS += ../../Functionalities/QmitkSimpleExample/QmitkSimpleExampleControls.ui
+FORMS	= ../../Functionalities/QmitkSimpleExample/QmitkSimpleExampleControls.ui \
+	C:/home/ivo/c/ip++/AppModules/QmitkNavigators/QmitkSliderNavigator.ui
+TEMPLATE	=app
+INCLUDEPATH	+= ../../Framework/QmitkApplicationBase ../../Functionalities/QmitkSimpleExample
+LANGUAGE	= C++

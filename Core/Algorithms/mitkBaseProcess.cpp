@@ -118,7 +118,7 @@ void mitk::BaseProcess::SetNthOutput(unsigned int idx, itk::DataObject *output)
 void mitk::BaseProcess::AddOutput(itk::DataObject *output)
 {
 #ifdef MITK_WEAKPOINTER_PROBLEM_WORKAROUND_ENABLED
-    unsigned int idx;
+    unsigned int idx=0;
 
     output = dynamic_cast<mitk::BaseData*>(output);
 

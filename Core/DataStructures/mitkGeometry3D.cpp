@@ -330,7 +330,7 @@ mitk::Geometry3D::~Geometry3D()
 //##ModelId=3E3BE1F10106
 bool mitk::Geometry3D::IsValidSlice(int s, int t) const
 {
-  return ((s>=0) && (s<m_Dimensions[2]) && (t>=0) && (t<m_Dimensions[3]));
+  return ((s>=0) && (s<(int)m_Dimensions[2]) && (t>=0) && (t< (int)m_Dimensions[3]));
 }
 
 //##ModelId=3E3BE1F8000C

@@ -16,7 +16,7 @@ unsigned int mitk::Image::GetDimension() const
 //##ModelId=3DCBC6040068
 unsigned int mitk::Image::GetDimension(int i) const
 {
-	if((i>=0) && (i<m_Dimension))
+	if((i>=0) && (i<(int)m_Dimension))
 		return m_Dimensions[i];
 	return 1;
 }
@@ -446,7 +446,7 @@ bool mitk::Image::SetPicChannel(ipPicDescriptor *pic, int n)
 	if(pic==NULL) return false;
     if(pic->dim<=3) return SetPicVolume(pic, 0, n);
 	if(pic->dim!=m_Dimension) return false;
-    int i;
+    unsigned int i;
     for(i=0;i<m_Dimension; ++i)
     {
 	    if(pic->n[i]!=m_Dimensions[i]) return false;
@@ -545,7 +545,7 @@ void mitk::Image::Initialize(ipPicDescriptor* pic, int channels, int tDim, int s
 //##ModelId=3E155CF000F6
 bool mitk::Image::IsValidSlice(int s, int t, int n) const
 {
-	return ((s>=0) && (s<m_Dimensions[2]) && (t>=0) && (t<m_Dimensions[3]) && (n>=0) && (n<m_NumberOfChannels));
+	return ((s>=0) && (s<(int)m_Dimensions[2]) && (t>=0) && (t< (int) m_Dimensions[3]) && (n>=0) && (n< (int)m_NumberOfChannels));
 }
 
 //##ModelId=3E155D2501A7

@@ -16,7 +16,12 @@ void QmitkSelectableGLWidget::init()
     renderer=mitk::OpenGLRenderer::New();
     
     // create widget
-    QWidget *mitkWidget = new mitk::QmitkGLWidget(renderer, SelectionFrame,"QmitkSelectableGLWidget::QmitkGLWidget");
+    QString composedName("QmitkSelectableGLWidget::");
+    if(name()!=NULL)
+        composedName+=name();
+    else
+        composedName+="QmitkGLWidget";
+    QWidget *mitkWidget = new mitk::QmitkGLWidget(renderer, SelectionFrame,composedName);
     hlayout->addWidget(mitkWidget);
 }
 

@@ -1,4 +1,5 @@
 #include "LevelWindow.h"
+#include <ipFunc/ipFunc.h>
 #include <algorithm>
 
 //##ModelId=3ED91D060288
@@ -158,6 +159,38 @@ float mitk::LevelWindow::GetRangeMax() const
 float mitk::LevelWindow::GetRange() const
 {
 	return  (m_RangeMax > 0) ? (m_RangeMax - m_RangeMin) : (m_RangeMin - m_RangeMax);
+}
+
+void mitk::LevelWindow::SetAuto(ipPicDescriptor* pic)
+{
+    if ( pic == NULL )
+    {
+        return;        
+    }
+    ipPicTSV_t *tsv = ipPicQueryTag( pic, "LEVEL/WINDOW" );
+	if( tsv != NULL )
+	{
+		double level;
+		double window;
+        #define GET_C_W( type, tsv, C, W )			\
+		level = ((type *)tsv->value)[0];    \
+		window = ((type *)tsv->value)[1];
+		
+		ipPicFORALL_2( GET_C_W, tsv, level, window );
+
+		SetLevelWindow( level, window );
+	}
+    else
+    {
+        if( pic->data == NULL )
+        {
+            ipFloat8_t min = 0.0;
+            ipFloat8_t max = 0.0;
+            ipFuncExtr( pic, &min, &max );
+            this->SetMin( static_cast<float>( min ) );
+            this->SetMax( static_cast<float>( max ) );
+        }
+    }
 }
 
 /*!

@@ -3,6 +3,7 @@
 
 #include "mitkCommon.h"
 #include <itkObjectFactory.h>
+#include <ipPic/ipPic.h>
 
 namespace mitk {
 
@@ -116,7 +117,11 @@ public:
     */
     //##ModelId=3EA969CD0072
     float GetRange() const;
-
+    
+    /**!
+    * \brief sets level/window to the min/max greyvalues of the given ipPicDescriptor
+    */
+    void SetAuto(ipPicDescriptor* pic);
 
     /*!
     * \brief equality operator implementation

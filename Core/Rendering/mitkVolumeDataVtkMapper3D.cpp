@@ -124,7 +124,7 @@ void mitk::VolumeDataVtkMapper3D::Update(mitk::BaseRenderer* renderer)
   if (m_Prop3D) {
     m_Prop3D->VisibilityOn();
   }
-  vtkPiecewiseFunction *opacityTransferFunction, *gradientTransferFunction;
+  vtkPiecewiseFunction *opacityTransferFunction;
   vtkColorTransferFunction* colorTransferFunction;
 
   opacityTransferFunction  = vtkPiecewiseFunction::New();

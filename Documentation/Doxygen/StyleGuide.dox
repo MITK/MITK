@@ -58,8 +58,13 @@ Another example:
 typename std::vector<TreeChangeListener*>::iterator pos = treeChangeListenerList.begin();
 @endcode
 @a iterator is an inner class of @a vector.
-\li Never include mitkInteractionConst.h in a header. Always include it @a last in an implementation file. 
-If you get strange errors (e.g., syntax error before '15'), this might be the solution. 
+\li Constants in MITK for Operations and SideEffects are set in namespace, so don't forget to add prefix @a mitk:: 
+@code
+switch (sideEffectId)
+  {
+  case mitk::SeMOVESELECTED:
+@endcode
+Prefixes for the constants are to be used like corresponding others. See file @a Framework\SceneInteraction\mitkInteractionConst.h for further details.
 \li Often QmitkFunctionality::activated()/deactivated() is the right place to connect/disconnnect event-handlers 
 (e.g., GlobalStateMachine::AddStateMachine() in activated() and GlobalStateMachine::RemoveStateMachine()
  in deactivated()).

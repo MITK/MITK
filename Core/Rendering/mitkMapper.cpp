@@ -98,12 +98,20 @@ void mitk::Mapper::GenerateData(mitk::BaseRenderer* renderer)
 //##ModelId=3EF1A43C01D9
 void mitk::Mapper::Update(mitk::BaseRenderer* renderer)
 {
-  const DataTreeNode* node=GetDataTreeNode();
+  const DataTreeNode* node = GetDataTreeNode();
+  
+  //safty cause there are datatreenodes, that have no defined data (video-nodes and root)
+  unsigned int dataMTime = 0;
+  mitk::BaseData::Pointer data = dynamic_cast<mitk::BaseData *>(node->GetData());
+  if (data.IsNotNull())
+  {
+    dataMTime = data->GetMTime();
+  }
 
   if(
       (m_LastUpdateTime < GetMTime()) ||
       (m_LastUpdateTime < node->GetDataReferenceChangedTime()) ||
-      (m_LastUpdateTime < node->GetData()->GetMTime())
+      (m_LastUpdateTime < dataMTime)
     )
   {
     GenerateData();

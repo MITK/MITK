@@ -56,3 +56,8 @@ void mitk::Geometry2DData::SetRequestedRegion(itk::DataObject *data)
 {
 
 }
+//##ModelId=3E67D85E00B7
+void mitk::Geometry2DData::CopyInformation(const itk::DataObject *data)
+{
+}
+

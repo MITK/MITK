@@ -54,7 +54,7 @@ void mitk::DisplayGeometry::UnitsToDisplay(const mitk::Vector2D &vec_units, mitk
 //##ModelId=3E3AEB460259
 void mitk::DisplayGeometry::Map(const mitk::Point3D &pt3d_mm, mitk::Point2D &pt2d_mm) const
 {
-    if(m_WorldGeometry!=NULL) return;
+    if(m_WorldGeometry==NULL) return;
 
     m_WorldGeometry->Map(pt3d_mm, pt2d_mm);
 }
@@ -62,7 +62,7 @@ void mitk::DisplayGeometry::Map(const mitk::Point3D &pt3d_mm, mitk::Point2D &pt2
 //##ModelId=3E3AEB490380
 void mitk::DisplayGeometry::Map(const mitk::Point2D &pt2d_mm, mitk::Point3D &pt3d_mm) const
 {
-    if(m_WorldGeometry!=NULL) return;
+    if(m_WorldGeometry==NULL) return;
 
     m_WorldGeometry->Map(pt2d_mm, pt3d_mm);    
 }
@@ -70,28 +70,28 @@ void mitk::DisplayGeometry::Map(const mitk::Point2D &pt2d_mm, mitk::Point3D &pt3
 //##ModelId=3E3AEB52008A
 void mitk::DisplayGeometry::UnitsToMM(const mitk::Point2D &pt_units, mitk::Point2D &pt_mm) const
 {
-    if(m_WorldGeometry!=NULL) return;
+    if(m_WorldGeometry==NULL) return;
     m_WorldGeometry->UnitsToMM(pt_units, pt_mm);
 }
 
 //##ModelId=3E3AEB54017D
 void mitk::DisplayGeometry::MMToUnits(const mitk::Point2D &pt_mm, mitk::Point2D &pt_units) const
 {
-    if(m_WorldGeometry!=NULL) return;
+    if(m_WorldGeometry==NULL) return;
     m_WorldGeometry->MMToUnits(pt_mm, pt_units);
 }
 
 //##ModelId=3E3B994802B6
 void mitk::DisplayGeometry::UnitsToMM(const mitk::Vector2D &vec_units, mitk::Vector2D &vec_mm) const
 {
-    if(m_WorldGeometry!=NULL) return;
+    if(m_WorldGeometry==NULL) return;
     m_WorldGeometry->UnitsToMM(vec_units, vec_mm);
 }
 
 //##ModelId=3E3B994B02A6
 void mitk::DisplayGeometry::MMToUnits(const mitk::Vector2D &vec_mm, mitk::Vector2D &vec_units) const
 {
-    if(m_WorldGeometry!=NULL) return;
+    if(m_WorldGeometry==NULL) return;
     m_WorldGeometry->MMToUnits(vec_mm, vec_units);
 }
 
@@ -100,14 +100,14 @@ void mitk::DisplayGeometry::DisplayToMM(const mitk::Point2D &pt_display, mitk::P
 {
     DisplayToUnits(pt_display, pt_mm);
 
-    if(m_WorldGeometry!=NULL) return;
+    if(m_WorldGeometry==NULL) return;
     m_WorldGeometry->UnitsToMM(pt_mm, pt_mm);
 }
 
 //##ModelId=3E48D5D7027E
 void mitk::DisplayGeometry::MMToDisplay(const mitk::Point2D &pt_mm, mitk::Point2D &pt_display) const
 {
-    if(m_WorldGeometry!=NULL) return;
+    if(m_WorldGeometry==NULL) return;
     m_WorldGeometry->UnitsToMM(pt_mm, pt_display);
 
     UnitsToDisplay(pt_display, pt_display);
@@ -118,14 +118,14 @@ void mitk::DisplayGeometry::DisplayToMM(const mitk::Vector2D &vec_display, mitk:
 {
     DisplayToUnits(vec_display, vec_mm);
 
-    if(m_WorldGeometry!=NULL) return;
+    if(m_WorldGeometry==NULL) return;
     m_WorldGeometry->UnitsToMM(vec_mm, vec_mm);
 }
 
 //##ModelId=3E48E2B40374
 void mitk::DisplayGeometry::MMToDisplay(const mitk::Vector2D &vec_mm, mitk::Vector2D &vec_display) const
 {
-    if(m_WorldGeometry!=NULL) return;
+    if(m_WorldGeometry==NULL) return;
     m_WorldGeometry->UnitsToMM(vec_mm, vec_display);
 
     UnitsToDisplay(vec_display, vec_display);

@@ -5,6 +5,8 @@
 #include "Mapper.h"
 #include "Geometry3D.h"
 #include "DisplayGeometry.h"
+#include "BaseRenderer.h"
+#include "ImageChannelSelector.h"
 
 namespace mitk {
 
@@ -12,18 +14,25 @@ namespace mitk {
 class Mapper2D : public Mapper
 {
 public:
-	/** Standard class typedefs. */
     //##ModelId=3E3AE1B90028
-	typedef Mapper2D                 Self;
+    typedef Mapper2D Self;
+
+	/** Standard class typedefs. */
     //##ModelId=3E3AE1B90046
-	typedef Mapper                   Superclass;
+    typedef Mapper Superclass;
+
+    
     //##ModelId=3E3AE1B9005A
-	typedef itk::SmartPointer<Self>  Pointer;
+    typedef itk::SmartPointer<Self> Pointer;
+
+    
     //##ModelId=3E3AE1B90078
-	typedef itk::SmartPointer<const Self>  ConstPointer;
+    typedef itk::SmartPointer<const Self> ConstPointer;
+
 
     //##ModelId=3E3C45A0009E
      virtual void SetGeometry3D(const mitk::Geometry3D* aGeometry3D);
+
     //##ModelId=3E3C468102DC
   //    virtual void SetDisplayGeometry(const mitk::DisplayGeometry* aDisplayGeometry);
 

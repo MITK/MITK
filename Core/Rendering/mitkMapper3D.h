@@ -3,6 +3,7 @@
 
 #include "mitkCommon.h"
 #include "Mapper.h"
+#include "ImageChannelSelector.h"
 
 namespace mitk {
 
@@ -10,15 +11,20 @@ namespace mitk {
 class Mapper3D : public Mapper
 {
 public:
-	/** Standard class typedefs. */
     //##ModelId=3E3AE1F20391
-	typedef Mapper3D                 Self;
+    typedef Mapper3D Self;
+
+	/** Standard class typedefs. */
     //##ModelId=3E3AE1F203A5
-	typedef Mapper                   Superclass;
+    typedef Mapper Superclass;
+
+    
     //##ModelId=3E3AE1F203C3
-	typedef itk::SmartPointer<Self>  Pointer;
+    typedef itk::SmartPointer<Self> Pointer;
+
+    
     //##ModelId=3E3AE1F203D7
-	typedef itk::SmartPointer<const Self>  ConstPointer;
+    typedef itk::SmartPointer<const Self> ConstPointer;
 
 	/** Method for creation through the object factory. */
 	//itkNewMacro(Self);

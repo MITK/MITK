@@ -4,13 +4,14 @@
 #include "mitkCommon.h"
 #include "Mapper2D.h"
 #include "mitkGeometry2DData.h"
+#include "mitkGLMapper2D.h"
 
 namespace mitk {
 
 class BaseRenderer;
 
 //##ModelId=3E639D57030F
-class Geometry2DDataMapper2D : public Mapper2D
+class Geometry2DDataMapper2D : public GLMapper2D
 {
 public:
     //##ModelId=3E6423D2032C
@@ -26,13 +27,21 @@ public:
     //##ModelId=3E6423D2034B
     virtual void SetInput( const mitk::BaseData* data );
 
+    //##ModelId=3E67D77A0109
     virtual void Paint(mitk::BaseRenderer * renderer);
+    //##ModelId=3E67E1B90237
+    virtual void Update();
+
 protected:
     //##ModelId=3E639E100243
     Geometry2DDataMapper2D();
 
     //##ModelId=3E639E100257
     virtual ~Geometry2DDataMapper2D();
+    //##ModelId=3E67E285024E
+    virtual void GenerateOutputInformation();
+
+
 
 };
 

@@ -41,6 +41,7 @@ void mitk::Geometry2DDataMapper2D::SetInput(const mitk::BaseData* data)
 }
 
 
+//##ModelId=3E67D77A0109
 void mitk::Geometry2DDataMapper2D::Paint(mitk::BaseRenderer * renderer)
 {
     //	FIXME: Logik fuer update
@@ -60,12 +61,12 @@ void mitk::Geometry2DDataMapper2D::Paint(mitk::BaseRenderer * renderer)
             assert(displayGeometry);
 
             //calculate intersection of the plane data with the border of the world geometry rectangle
-	        Vector2f vlineFrom;
-	        Vector2f vlineTo;
-    		bool intersecting = worldPlaneGeometry->GetPlaneView().crossLine2D( planeGeometry->GetPlaneView(), vlineFrom, vlineTo );
+	        Vector2D vlineFrom;
+	        Vector2D vlineTo;
+    		bool intersecting = worldPlaneGeometry->GetPlaneView().intersectPlane2D( planeGeometry->GetPlaneView(), vlineFrom, vlineTo );
 
-	        Point2f lineFrom=vlineFrom;
-	        Point2f lineTo=vlineTo;
+	        Point2D lineFrom=vlineFrom;
+	        Point2D lineTo=vlineTo;
 
             if(intersecting)
             {
@@ -73,8 +74,10 @@ void mitk::Geometry2DDataMapper2D::Paint(mitk::BaseRenderer * renderer)
                 displayGeometry->MMToDisplay(lineFrom, lineFrom);
                 displayGeometry->MMToDisplay(lineTo, lineTo);
 
-                assert(myPlaneGeom);
-
+                //convert display coordinates ( (0,0) is top-left ) in GL coordinates ( (0,0) is bottom-left )
+                float toGL=displayGeometry->GetSizeInDisplayUnits().y;
+                lineFrom.y=toGL-lineFrom.y;
+                lineTo.y=toGL-lineTo.y;
 
                 glBegin (GL_LINE_LOOP);
                     glVertex2fv(&lineFrom.x);
@@ -85,3 +88,14 @@ void mitk::Geometry2DDataMapper2D::Paint(mitk::BaseRenderer * renderer)
         }
     }
 }
+
+//##ModelId=3E67E1B90237
+void mitk::Geometry2DDataMapper2D::Update()
+{
+}
+
+//##ModelId=3E67E285024E
+void mitk::Geometry2DDataMapper2D::GenerateOutputInformation()
+{
+}
+

@@ -86,7 +86,7 @@ bool mitk::AffineInteractor::ExecuteSideEffect(int sideEffectId, mitk::StateEven
 
     mitk::ITKVector3D newPosition = dummy.GetVectorFromOrigin();
 		      
-    double position[3];
+    mitk::ScalarType position[3];
     geometry->GetTransform()->GetPosition(position);
     mitk::ITKVector3D dataPosition = position;
 

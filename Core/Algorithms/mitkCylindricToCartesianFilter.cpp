@@ -221,7 +221,7 @@ void mitk::CylindricToCartesianFilter::buildTransformShortCuts(int orig_xsize, i
 //			else
 //				*fr=0;
 
-			phi=orig_zsize-(yq==0?1:atan((float)xq/yq)/M_PI+0.5)*orig_zsize;
+			phi=orig_zsize-(yq==0?1:-atan((float)xq/yq)/M_PI+0.5)*orig_zsize;
 			phit=(ipUInt4_t)phi;
 			*fphi=phi-phit;
 

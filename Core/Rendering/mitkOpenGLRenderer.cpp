@@ -185,7 +185,7 @@ void mitk::OpenGLRenderer::Update()
   {
     it->next();
     //      mitk::LevelWindow lw;
-    unsigned int dummy[] = {10,10,10};
+    //unsigned int dummy[] = {10,10,10};
     //Geometry3D geometry(3,dummy);
     mitk::Mapper::Pointer mapper = it->get()->GetMapper(m_MapperID);
     if(mapper.IsNotNull())
@@ -201,7 +201,7 @@ void mitk::OpenGLRenderer::Update()
         }
         else
           mapper2d->Update();
-        ImageMapper2D* imagemapper2d=dynamic_cast<ImageMapper2D*>(mapper.GetPointer());
+        //ImageMapper2D* imagemapper2d=dynamic_cast<ImageMapper2D*>(mapper.GetPointer());
       }
       else
       {
@@ -266,8 +266,8 @@ void mitk::OpenGLRenderer::Render()
 
   glClear(GL_COLOR_BUFFER_BIT);
 
-  PlaneGeometry* myPlaneGeom =
-    dynamic_cast<PlaneGeometry *>((mitk::Geometry2D*)(GetWorldGeometry()));
+  //PlaneGeometry* myPlaneGeom =
+  //  dynamic_cast<PlaneGeometry *>((mitk::Geometry2D*)(GetWorldGeometry()));
 
   glViewport (0, 0, m_Size[0], m_Size[1]);
   glMatrixMode( GL_PROJECTION );

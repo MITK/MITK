@@ -171,6 +171,9 @@ void mitk::Geometry3D::SetBoundingBox(const float bounds[6],  int t)
 }
 
 //##ModelId=3DCBF5E9037F
+/*!
+  \todo use parameter t or removed it!!!
+*/
 double mitk::Geometry3D::GetTime(int t) const
 {
   itkExceptionMacro("GetTime not yet supported."); 	
@@ -178,6 +181,9 @@ double mitk::Geometry3D::GetTime(int t) const
 }
 
 //##ModelId=3DE763C500C4
+/*!
+  \todo use parameter t or removed it!!!
+*/
 mitk::Geometry3D::TransformPointer mitk::Geometry3D::GetTransfrom() const
 {
   itkExceptionMacro("Transform not yet supported."); 	
@@ -185,24 +191,36 @@ mitk::Geometry3D::TransformPointer mitk::Geometry3D::GetTransfrom() const
 }
 
 //##ModelId=3DDE65D1028A
+/*!
+  \todo use parameter t or removed it!!! 
+*/
 void mitk::Geometry3D::MMToUnits(const mitk::Point3D &pt_mm, mitk::Point3D &pt_units, float t) const
 {
   m_TransformMMToUnits.transform(pt_mm, &pt_units);
 }
 
 //##ModelId=3DDE65DC0151
+/*!
+  \todo use parameter t or removed it!!!
+*/
 void mitk::Geometry3D::UnitsToMM(const mitk::Point3D &pt_units, mitk::Point3D &pt_mm, float t) const
 {
   m_TransformUnitsToMM.transform(pt_units, &pt_mm);
 }
 
 //##ModelId=3E3B986602CF
+/*!
+  \todo use parameter t or removed it!!!
+*/
 void mitk::Geometry3D::MMToUnits(const mitk::Vector3D &vec_mm, mitk::Vector3D &vec_units, float t) const
 {
   m_TransformMMToUnits.transform(vec_mm, &vec_units);
 }
 
 //##ModelId=3E3B987503A3
+/*!
+  \todo use parameter t or removed it!!!
+*/
 void mitk::Geometry3D::UnitsToMM(const mitk::Vector3D &vec_units, mitk::Vector3D &vec_mm, float t) const
 {
   m_TransformUnitsToMM.transform(vec_units, &vec_mm);

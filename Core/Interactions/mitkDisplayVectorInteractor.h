@@ -14,6 +14,8 @@ namespace mitk {
 class DisplayVectorInteractor : public StateMachine
 {
   public:
+    mitkClassMacro(DisplayVectorInteractor, StateMachine);
+
     //##ModelId=3EF222410127
     virtual void ExecuteOperation(Operation* operation);
     //##ModelId=3EF2229F00F0

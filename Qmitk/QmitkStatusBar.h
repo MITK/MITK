@@ -18,7 +18,7 @@ class QmitkStatusBar : public mitk::StatusBar
 {
   //Q_OBJECT
 public:
-  mitkClassMacro(QmitkStatusBar , mitk::StatusBar);
+  mitkClassMacro(QmitkStatusBar, mitk::StatusBar);
 
     typedef QmitkStatusBar Self;
     typedef mitk::StatusBar Superclass;

@@ -189,27 +189,6 @@ void QmitkSimpleExampleFunctionality::initWidgets()
 			}
 			
       lookupTableProp=NULL;
-
-			//// init pic opacity props
-   //   if ( opacityprop.IsNull() ) {
-			//	opacityprop = new mitk::FloatProperty(1.0f);
-			//}
-			//if (count == 1) {
-			//	node->GetPropertyList()->SetProperty("opacity", new mitk::FloatProperty(1.0f) );
-			//}
-			//else {
-			//	opacityprop->SetValue(1f);
-			//	node->GetPropertyList()->SetProperty("opacity", opacityprop);
-   //     if(lookupTableProp.IsNull())
-   //     {
-   //       mitk::LookupTableProperty::Pointer lut = dynamic_cast<mitk::LookupTableProperty*>(node->GetPropertyList()->GetProperty("LookupTable").GetPointer());
-   //       if(lut.IsNotNull())
-   //       {
-   //         lookupTableProp = lut;
-   //         lookupTableProp->GetLookupTable().ChangeOpacityForAll(0.5f);
-   //       }
-   //     }
-			//}
 		}
 	}
 	delete it;
@@ -217,7 +196,7 @@ void QmitkSimpleExampleFunctionality::initWidgets()
 
 void QmitkSimpleExampleFunctionality::ExecuteOperation(mitk::Operation* operation)
 {
-    bool ok;//as return type
+    bool ok;//as return
 
     mitk::PointOperation* pointoperation=dynamic_cast<mitk::PointOperation*>(operation);
     if(pointoperation!=NULL)
@@ -228,12 +207,12 @@ void QmitkSimpleExampleFunctionality::ExecuteOperation(mitk::Operation* operatio
         case mitk::OpMOVE:
                 {
                     mitk::ITKPoint3D point;
-                    mitk::Point3D seed; 
+                    mitk::Point3D seed;
 
                     point = pointoperation->GetPoint();
                     mitk::itk2vm(point, seed);
 
-                    const mitk::Geometry2D* g2d; 
+                    const mitk::Geometry2D* g2d;
                     const mitk::PlaneGeometry* pg;
                     mitk::PlaneView pv;
                     mitk::PlaneGeometry::Pointer plane;
@@ -253,7 +232,6 @@ void QmitkSimpleExampleFunctionality::ExecuteOperation(mitk::Operation* operatio
                         controls->getSliderYZ()->setValue(v);
                         controls->getSliderYZ()->blockSignals(false);
                     }
-
                     v=(int)seed.y;
                     if(controls->getSliderXZ()->value()!=v)
                     {

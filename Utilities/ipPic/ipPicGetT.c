@@ -6,7 +6,10 @@
  *   reads a tag from a PicFile
  *
  * $Log$
- * Revision 1.2  1997/09/15 13:21:14  andre
+ * Revision 1.3  1997/10/20 13:35:39  andre
+ * *** empty log message ***
+ *
+ * Revision 1.2  1997/09/15  13:21:14  andre
  * switched to new what string format
  *
  * Revision 1.1.1.1  1997/09/06  19:09:59  andre
@@ -78,7 +81,7 @@ ipPicDescriptor *ipPicGetTags( char *infile_name, ipPicDescriptor *pic )
   to_read = len -        3 * sizeof(ipUInt4_t)
                 -      dim * sizeof(ipUInt4_t);
 
-  pic->info->tags_head = _ipPicReadTags( pic->info->tags_head, to_read, infile );
+  pic->info->tags_head = _ipPicReadTags( pic->info->tags_head, to_read, infile, ipPicEncryptionType(pic)  );
 
   if( infile != stdin )
     fclose( infile );

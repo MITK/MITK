@@ -6,7 +6,10 @@
  *   reads a PicFile from disk
  *
  * $Log$
- * Revision 1.2  1997/09/15 13:21:13  andre
+ * Revision 1.3  1997/10/20 13:35:39  andre
+ * *** empty log message ***
+ *
+ * Revision 1.2  1997/09/15  13:21:13  andre
  * switched to new what string format
  *
  * Revision 1.1.1.1  1997/09/06  19:09:59  andre
@@ -88,7 +91,7 @@ ipPicDescriptor *ipPicGet( char *infile_name, ipPicDescriptor *pic )
 #if 0
   fseek( infile, to_read, SEEK_CUR );
 #else
-  pic->info->tags_head = _ipPicReadTags( pic->info->tags_head, to_read, infile );
+  pic->info->tags_head = _ipPicReadTags( pic->info->tags_head, to_read, infile, ipPicEncryptionType(pic) );
 #endif
 
   pic->info->write_protect = ipFalse;
@@ -112,7 +115,7 @@ ipPicDescriptor *ipPicGet( char *infile_name, ipPicDescriptor *pic )
   return( pic );
 }
 
-_ipPicTagsElement_t *_ipPicReadTags( _ipPicTagsElement_t *head, ipUInt4_t bytes_to_read, FILE *stream )
+_ipPicTagsElement_t *_ipPicReadTags( _ipPicTagsElement_t *head, ipUInt4_t bytes_to_read, FILE *stream, char encryption_type )
 {
   while( bytes_to_read > 0 )
     {
@@ -153,7 +156,8 @@ _ipPicTagsElement_t *_ipPicReadTags( _ipPicTagsElement_t *head, ipUInt4_t bytes_
           tsv->value = _ipPicReadTags( tsv->value,
                                        len -        3 * sizeof(ipUInt4_t)
                                            - tsv->dim * sizeof(ipUInt4_t),
-                                       stream );
+                                       stream,
+                                       encryption_type );
         }
       else
         {
@@ -178,6 +182,24 @@ assert( elements * tsv->bpe / 8 == len
 
           if( tsv->type == ipPicASCII )
             ((char *)(tsv->value))[elements] = '\0';
+
+          if( encryption_type == 'e'
+              && ( tsv->type == ipPicASCII
+                   || tsv->type == ipPicNonUniform ) )
+            {
+              if( tsv->type == ipPicNonUniform )
+                {
+                  sprintf( tsv->tag, "*** ENCRYPTED ***" );
+                  tsv->tag[_ipPicTAGLEN] = '\0';
+                }
+
+              free( tsv->value );
+
+              tsv->value = strdup( "*** ENCRYPTED ***" );
+              tsv->n[0] = strlen(tsv->value);
+              tsv->type = ipPicASCII;
+              tsv->dim = 1;
+            }
         }
 
       head = _ipPicInsertTag( head, tsv );

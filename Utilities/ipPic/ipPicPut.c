@@ -6,7 +6,10 @@
  *   writes a PicFile to disk
  *
  * $Log$
- * Revision 1.3  1997/09/15 13:21:18  andre
+ * Revision 1.4  1997/10/20 13:35:40  andre
+ * *** empty log message ***
+ *
+ * Revision 1.3  1997/09/15  13:21:18  andre
  * switched to new what string format
  *
  * Revision 1.2  1997/09/15  10:24:13  andre
@@ -39,6 +42,12 @@ ipPicPut( char *outfile_name, ipPicDescriptor *pic )
   if( pic->info->write_protect )
     {
       fprintf( stderr, "ipPicPut: sorry, can't write (missing tags !!!)\n" );
+      return( -1 );
+    }
+
+  if( ipPicEncryptionType(pic) != ' ' )
+    {
+      fprintf( stderr, "ipPicPut: sorry, can't write (was encrypted !!!)\n" );
       return( -1 );
     }
 

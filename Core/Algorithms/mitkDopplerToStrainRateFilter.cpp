@@ -3,7 +3,7 @@
 #include "mitkProperties.h"
 #include "mitkPlaneGeometry.h"
 
-#include <iostream.h>
+#include <iostream>
 #include <string>
 
 

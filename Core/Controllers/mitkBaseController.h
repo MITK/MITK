@@ -65,11 +65,11 @@ protected:
   //##ModelId=3E189CAA0265
   //## @brief Stepper through the slices
   Stepper::Pointer m_Slice;
-  //BaseRenderer::Pointer m_BaseRenderer;
+  
+  itk::Object::Pointer m_RendererReference;
+  BaseRenderer* m_Renderer;
 };
 
 } // namespace mitk
-
-
 
 #endif /* BASECONTROLLER_H_HEADER_INCLUDED_C1E745A3 */

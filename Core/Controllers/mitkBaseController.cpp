@@ -1,12 +1,12 @@
 #include "mitkBaseController.h"
+#include "mitkBaseRenderer.h"
 
 //##ModelId=3E3AE32B0048
-mitk::BaseController::BaseController()
+mitk::BaseController::BaseController() : m_Renderer(NULL)
 {
   m_Slice = Stepper::New();
   m_Time  = Stepper::New();
 }
-
 
 //##ModelId=3E3AE32B0070
 mitk::BaseController::~BaseController()
@@ -47,5 +47,6 @@ bool mitk::BaseController::RemoveRenderer(mitk::BaseRenderer* renderer)
   */
 bool mitk::BaseController::AddRenderer(mitk::BaseRenderer* renderer)
 {
+  m_RendererReference = m_Renderer = renderer;
 	return true;
 }

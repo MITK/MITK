@@ -5,6 +5,7 @@
 #include "mitkColorProperty.h"
 #include <vtkTransform.h>
 #include <GL/glut.h>
+#include <mitkProperties.h>
 
 
 //##Documentation
@@ -276,43 +277,52 @@ void mitk::MeshMapper2D::Paint(mitk::BaseRenderer * renderer)
           }
         }//if closed
         
-        //Axis-aligned bounding box(AABB) around the cell if selected
-        if (cellDataIt->Value().selected)
+        //Axis-aligned bounding box(AABB) around the cell if selected and set in Property
+        bool showBoundingBox;
+        if (dynamic_cast<mitk::BoolProperty *>(this->GetDataTreeNode()->GetProperty("showBoundingBox").GetPointer()) == NULL)
+		  		showBoundingBox = false;
+			  else
+				  showBoundingBox = dynamic_cast<mitk::BoolProperty *>(this->GetDataTreeNode()->GetProperty("showBoundingBox").GetPointer())->GetValue();
+
+        if(showBoundingBox) 
         {
-          mitk::Mesh::DataType::BoundingBoxPointer aABB = input->GetBoundingBoxFromCell(cellIt->Index());
-          if (aABB.IsNotNull())
+          if (cellDataIt->Value().selected)
           {
-            mitk::Mesh::PointType min, max;
-            min = aABB->GetMinimum();
-            max = aABB->GetMaximum();
+            mitk::Mesh::DataType::BoundingBoxPointer aABB = input->GetBoundingBoxFromCell(cellIt->Index());
+            if (aABB.IsNotNull())
+            {
+              mitk::Mesh::PointType min, max;
+              min = aABB->GetMinimum();
+              max = aABB->GetMaximum();
 
-            //project to the displayed geometry
-            Point2D min2D, max2D;
-            Point3D p, projected_p;
-            float vtkp[3];
-            itk2vtk(min, vtkp);
-            transform->TransformPoint(vtkp, vtkp);
-            vtk2itk(vtkp,p);
-            displayGeometry->Project(p, projected_p);
-            displayGeometry->Map(projected_p, min2D);
-            displayGeometry->MMToDisplay(min2D, min2D);
+              //project to the displayed geometry
+              Point2D min2D, max2D;
+              Point3D p, projected_p;
+              float vtkp[3];
+              itk2vtk(min, vtkp);
+              transform->TransformPoint(vtkp, vtkp);
+              vtk2itk(vtkp,p);
+              displayGeometry->Project(p, projected_p);
+              displayGeometry->Map(projected_p, min2D);
+              displayGeometry->MMToDisplay(min2D, min2D);
 
-            itk2vtk(max, vtkp);
-            transform->TransformPoint(vtkp, vtkp);
-            vtk2itk(vtkp,p);
-            displayGeometry->Project(p, projected_p);
-            displayGeometry->Map(projected_p, max2D);
-            displayGeometry->MMToDisplay(max2D, max2D);
+              itk2vtk(max, vtkp);
+              transform->TransformPoint(vtkp, vtkp);
+              vtk2itk(vtkp,p);
+              displayGeometry->Project(p, projected_p);
+              displayGeometry->Map(projected_p, max2D);
+              displayGeometry->MMToDisplay(max2D, max2D);
 
-            //draw the BoundingBox
-            glColor3f(selectedColor[0],selectedColor[1],selectedColor[2]);//red
-            //a line from lastPoint to firstPoint
-            glBegin(GL_LINE_LOOP);
-              glVertex2f(min2D[0], min2D[1]);
-              glVertex2f(min2D[0], max2D[1]);
-              glVertex2f(max2D[0], max2D[1]);
-              glVertex2f(max2D[0], min2D[1]);
-            glEnd();
+              //draw the BoundingBox
+              glColor3f(selectedColor[0],selectedColor[1],selectedColor[2]);//red
+              //a line from lastPoint to firstPoint
+              glBegin(GL_LINE_LOOP);
+                glVertex2f(min2D[0], min2D[1]);
+                glVertex2f(min2D[0], max2D[1]);
+                glVertex2f(max2D[0], max2D[1]);
+                glVertex2f(max2D[0], min2D[1]);
+              glEnd();
+            }
           }
         }
       }//if numOfPointsInCell>1

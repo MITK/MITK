@@ -15,8 +15,7 @@
 #include "PlaneGeometry.h"
 
 //##ModelId=3E33ECF301AD
-mitk::OpenGLRenderer::OpenGLRenderer() : m_IilImage(0),
-    first(true) //FIXME provisorium
+mitk::OpenGLRenderer::OpenGLRenderer() : first(true) //FIXME provisorium
 {
     m_CameraController=NULL;
     m_CameraController = VtkInteractorCameraController::New();
@@ -122,8 +121,6 @@ void mitk::OpenGLRenderer::Update()
             if(mapper2d!=NULL)
             {
                 ImageMapper2D* imagemapper2d=dynamic_cast<ImageMapper2D*>(mapper.GetPointer());
-                //								imagemapper2d->m_IilImage = &m_IilImage;
-                //								mapper2d->SetDisplayGeometry(GetDisplayGeometry());
                 mapper2d->Update();
             }
             else
@@ -170,7 +167,8 @@ void mitk::OpenGLRenderer::Render()
     while(it->hasNext())
     {
         it->next();
-        mitk::Mapper::Pointer mapper = it->get()->GetMapper(m_MapperID);
+		mitk::DataTreeNode::Pointer node = it->get();
+        mitk::Mapper::Pointer mapper = node->GetMapper(m_MapperID);
         if(mapper!=NULL)
         {
             GLMapper2D* mapper2d=dynamic_cast<GLMapper2D*>(mapper.GetPointer());

@@ -85,7 +85,6 @@ protected:
 
 public: //FIXME
     //##ModelId=3E64243803E7
-	iilPicImage* m_IilImage;
 };
 
 } // namespace mitk

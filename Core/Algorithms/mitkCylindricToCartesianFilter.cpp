@@ -445,16 +445,17 @@ void mitk::CylindricToCartesianFilter::GenerateInputRequestedRegion()
     mitk::Image::Pointer output = this->GetOutput();
 
 	Image::RegionType requestedRegion;
+    requestedRegion = output->GetRequestedRegion();
 	requestedRegion.SetIndex(0, 0);
 	requestedRegion.SetIndex(1, 0);
 	requestedRegion.SetIndex(2, 0);
-	requestedRegion.SetIndex(3, 0);
-	requestedRegion.SetIndex(4, 0);
+	//requestedRegion.SetIndex(3, 0);
+	//requestedRegion.SetIndex(4, 0);
 	requestedRegion.SetSize(0, input->GetDimension(0));
 	requestedRegion.SetSize(1, input->GetDimension(1));
 	requestedRegion.SetSize(2, input->GetDimension(2));
-	requestedRegion.SetSize(3, input->GetDimension(3));
-	requestedRegion.SetSize(4, output->GetNumberOfChannels());
+	//requestedRegion.SetSize(3, output->GetDimension(3));
+	//requestedRegion.SetSize(4, output->GetNumberOfChannels());
 
 	input->SetRequestedRegion( & requestedRegion );
 }

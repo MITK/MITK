@@ -18,6 +18,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkVector.h"
 
-const mitk::ScalarType mitk::eps     = vnl_math::float_eps;
+const mitk::ScalarType mitk::eps     = vnl_math::float_eps*100;
 const mitk::ScalarType mitk::sqrteps = vnl_math::float_sqrteps;
 

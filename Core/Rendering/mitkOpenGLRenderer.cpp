@@ -138,7 +138,7 @@ void mitk::OpenGLRenderer::Render()
         m_LastUpdateTime<GetDisplayGeometry()->GetMTime() ||
         m_LastUpdateTime<GetDisplayGeometry()->GetWorldGeometry()->GetMTime() ) 
     {
-        std::cout << "OpenGLRenderer calling its update..." << std::endl;
+        //std::cout << "OpenGLRenderer calling its update..." << std::endl;
         Update();
     }
     else

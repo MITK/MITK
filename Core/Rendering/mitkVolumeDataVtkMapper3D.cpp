@@ -23,6 +23,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkColorProperty.h"
 #include "mitkOpenGLRenderer.h"
 #include "mitkLookupTableProperty.h"
+#include "mitkTransferFunctionProperty.h"
+
 #include <vtkActor.h>
 #include <vtkProperty.h>
 #include <vtkVolumeRayCastMapper.h>
@@ -200,8 +202,9 @@ mitk::TransferFunctionProperty::Pointer tranferFunctionProp = dynamic_cast<mitk:
   if (tranferFunctionProp.IsNull()) {
    // create one
     mitk::TransferFunction::Pointer newTF = mitk::TransferFunction::New();
-    newTF->SetMin(-10);
-    newTF->SetMax(+310);
+    newTF->InitializeByMitkImage(input);
+//    newTF->SetMin(-10);
+//    newTF->SetMax(+310);
     this->GetDataTreeNode()->SetProperty("TransferFunction", new TransferFunctionProperty(newTF.GetPointer()));
   } 
     

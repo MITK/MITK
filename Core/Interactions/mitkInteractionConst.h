@@ -57,7 +57,7 @@ typedef enum EEventIds
   EIDMIDDLEMOUSEBTNANDMOUSEMOVE = 533,
   EIDCTRLANDLEFTMOUSEBTNANDMOUSEMOVE = 534,
   //own thrown events:
-  EIDNEW = 100,
+  EIDNEW = 1000,
   EIDOLD = 1001,
   EIDFINISHED = 1002,
   EIDSTNO = 1003,
@@ -70,6 +70,7 @@ typedef enum EEventIds
   EIDSTSMALERNMINUS1 = 1010,
   EIDSTLARGERNMINUS1 = 1011,
   EIDPOSITIONEVENT = 1012,
+  EIDEDIT = 1013,
   //external thrown events:
   EIDCLEAR = 1100
 };
@@ -82,13 +83,13 @@ typedef enum EOperations
   OpADD = 100, //add a point at the end
   OpINSERT = 200, //insert a point at position
   OpINSERTLINE = 201, //insert a line at position
-  OpMOVE = 300, //move a point 
+  OpMOVE = 300, //move a point
   OpMOVELINE = 301, //move a line
   OpREMOVE = 400, //remove a point at position
   OpREMOVELINE = 401, //remove a line at position
   OpREMOVECELL = 402, //remove a cell
-  OpDELETE = 500, //delete 
-  OpUNDELETE = 501, //undo the delete 
+  OpDELETE = 500, //delete
+  OpUNDELETE = 501, //undo the delete
   OpSTATECHANGE = 600, //change a state
   OpTERMINATE = 666, //change a state
   OpSELECTPOINT = 700,
@@ -149,8 +150,8 @@ typedef enum EActions
   AcDELETEPOINT = 120,
   AcCLEAR = 130, //clear all elements from a list
   AcTERMINATE_INTERACTION = 666,
-  AcTRANSLATESTART = 1000,  
-  AcTRANSLATE = 1001,  
+  AcTRANSLATESTART = 1000,
+  AcTRANSLATE = 1001,
   AcSCALESTART = 1002,
   AcSCALE = 1003,
   AcROTATESTART = 1004,

@@ -1,4 +1,3 @@
-//#include <QmitkSimpleExample/QmitkSimpleExampleFunctionality.h>
 #include "QmitkMainTemplate.h"
 
 class QmitkDataManager;
@@ -7,6 +6,7 @@ class QmitkSimpleExampleFunctionality;
 class QmitkSimpleTumorSegmentation;
 class QmitkLevelSets;
 class QmitkNoiseSuppression;
+class QmitkSimplexMeshTool;
 
 /*!
 	\brief This application demonstrates how to code a new MITK application 
@@ -65,6 +65,9 @@ protected:
 		 level set segmentation tool
 		 */
 		QmitkLevelSets * m_LevelSetTool;
+
+    
+    QmitkSimplexMeshTool * m_SimplexMeshTool;
 
     bool m_ControlsLeft;
 

@@ -200,5 +200,5 @@ void mitk::BoundingObjectCutter::GenerateData()
   outputImage->SetVolume(itkImageCut->GetBufferPointer());
 
   /* Position the output Image to match the corresponding region of the input image */
-  mitkImageTransform->Translate(globalMinPoint[0], globalMinPoint[1], globalMinPoint[2]);
+  outputImage->GetGeometry()->GetVtkTransform()->Translate(globalMinPoint[0], globalMinPoint[1], globalMinPoint[2]);
 }

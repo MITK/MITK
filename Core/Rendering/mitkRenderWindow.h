@@ -3,7 +3,7 @@
 
 #include <qgl.h>
 #include <widget.h>
-
+#include <set>
 class iilItem;
 
 namespace mitk {
@@ -17,11 +17,13 @@ public:
     //##ModelId=3E3ECC130358
     RenderWindow(QGLFormat glf, QWidget *parent = 0, const char *name = 0) : RenderWindowBase(glf, parent, name)
     {
+      instances.insert(this);
     };
 
     //##ModelId=3E3ECC13036D
     RenderWindow(QWidget *parent = 0, const char *name = 0) : RenderWindowBase(parent, name)
     {
+      instances.insert(this);
     };
 
     //##ModelId=3EF1627602DF
@@ -36,6 +38,20 @@ public:
     //##Documentation
     //## @brief Updates the contents of the renderwindow 
     virtual void Update() {};
+  
+  //##Documentation
+  //## @brief Updates the contents of all renderwindows
+  static void UpdateAllInstances() {
+    for (std::set<RenderWindow*>::iterator iter = instances.begin();iter != instances.end();iter++) {
+	(*iter)->Update();
+    }
+  }
+  
+  virtual ~RenderWindow() {
+    instances.erase(this);
+  }
+protected:
+  static std::set<RenderWindow*> instances;
 };
 
 } // namespace mitk

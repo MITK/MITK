@@ -93,7 +93,7 @@ typedef enum EOperations
   OpNOTHING = 0,
   OpTEST = 1,
   OpNEWCELL = 10, //add a new cell
-  OpADD = 100, //add a point
+  OpADD = 100, //add a point or a vessel
   OpADDLINE = 1001, //add a line
   OpINSERT = 200, //insert a point at position
   OpINSERTLINE = 201, //insert a line at position
@@ -116,10 +116,13 @@ typedef enum EOperations
   OpSELECTPOINT = 700,
   OpSELECTLINE = 701,
   OpSELECTCELL = 702,
+  OpSELECTSUBOBJECT = 703, //for VesselGraphInteractor2
   OpDESELECTPOINT = 800,
   OpDESELECTLINE = 801,
   OpDESELECTCELL = 802,
-  OpNAVIGATE = 900,
+  OpDESELECTSUBOBJECT = 803,
+  OpDESELECTALL = 804,     //for VesselGraphInteractor2
+  OpNAVIGATE = 900,       //for VesselGraphInteractor2
   OpZOOM = 1000,
   OpSCALE = 1100,
   OpROTATE = 1200,
@@ -175,6 +178,7 @@ typedef enum EActions
   AcSELECTPOINT = 66,
   AcSELECTLINE = 68,
   AcSELECTCELL = 67,
+  AcSELECTSUBOBJECT = 69,    //used in VesselGraphInteractor2
   AcDESELECTOBJECT = 70, //deselect picked from group
   AcDESELECTALL = 72,
   AcDESELECT = 75,
@@ -182,6 +186,7 @@ typedef enum EActions
   AcDESELECTLINE = 78,
   AcDESELECTCELL = 77,
   AcNEWPOINT = 80,
+  AcNEWSUBOBJECT = 81,
   AcMOVEPOINT = 90,
   AcMOVESELECTED = 91,
   AcMOVE = 92,
@@ -189,6 +194,7 @@ typedef enum EActions
   AcREMOVE = 101,
   AcREMOVELINE = 102,
   AcREMOVEALL = 103,
+  AcREMOVESELECTEDSUBOBJECT = 104,             //used in VesselGraphInteractor2
   AcINSERTPOINT = 110,
   AcINSERTLINE = 111,
   AcDELETEPOINT = 120,

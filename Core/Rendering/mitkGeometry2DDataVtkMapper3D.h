@@ -34,7 +34,7 @@ class Geometry2DDataVtkMapper3D : public BaseVtkMapper3D
     virtual void SetInput(const mitk::Geometry2DData *input);
 
     //##ModelId=3E691E090380
-    const mitk::Geometry2DData *GetInput(void);
+    virtual const mitk::Geometry2DData *GetInput();
   
     //##ModelId=3E691E090382
     virtual void SetInput(const mitk::BaseData* data);
@@ -73,7 +73,7 @@ class Geometry2DDataVtkMapper3D : public BaseVtkMapper3D
     vtkPlaneSource* m_VtkPlaneSource;
 
     //##ModelId=3E6E8AA4034C
-    vtkLookupTable *lut;
+    vtkLookupTable *m_VtkLookupTable;
 
     //##ModelId=3E691E090363
     vtkImageMapToWindowLevelColors* m_LevelWindowFilter;

@@ -176,7 +176,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define AccessFixedDimensionByItk_1(mitkImage, itkImageTypeFunction, dimension, param1)          \
 {                                                                                                \
   const std::type_info& typeId=*mitkImage->GetPixelType().GetTypeId();                           \
-  assert(mitkImage->GetDimension()==3);                                                          \
+  assert(mitkImage->GetDimension()==dimension);                                                  \
   _accessAllTypesByItk_1(mitkImage, itkImageTypeFunction, dimension, param1)                     \
 }
 
@@ -250,8 +250,8 @@ PURPOSE.  See the above copyright notices for more information.
 #define AccessFixedDimensionByItk_2(mitkImage, itkImageTypeFunction, dimension, param1, param2)  \
 {                                                                                                \
   const std::type_info& typeId=*mitkImage->GetPixelType().GetTypeId();                           \
-  assert(mitkImage->GetDimension()==3);                                                          \
-  _accessAllTypesByItk_2(mitkImage, itkImageTypeFunction, dimension, param1, param2)             \
+  assert(mitkImage->GetDimension()==dimension);                                                  \
+_accessAllTypesByItk_2(mitkImage, itkImageTypeFunction, dimension, param1, param2)               \
 }
 
 #endif // of MITKIMAGEACCESSBYITK_H_HEADER_INCLUDED

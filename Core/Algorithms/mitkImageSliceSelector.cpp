@@ -15,6 +15,8 @@ void mitk::ImageSliceSelector::GenerateOutputInformation()
   geometry->Initialize(1, 1);
   geometry->SetGeometry2D(input->GetSlicedGeometry()->GetGeometry2D(m_SliceNr, m_TimeNr).GetPointer(), 0, 0);
   geometry->SetEvenlySpaced(input->GetSlicedGeometry()->GetEvenlySpaced());
+
+  geometry->SetSpacing(input->GetSlicedGeometry()->GetSpacing());
   output->SetGeometry(geometry);
 }
 

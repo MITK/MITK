@@ -22,6 +22,7 @@ void mitk::ImageTimeSelector::GenerateOutputInformation()
   int dim=(input->GetDimension()<3?input->GetDimension():3);
 	output->Initialize(input->GetPixelType(), dim, input->GetDimensions());
 
+    	
   // initialize geometry
   SlicedGeometry3D::Pointer geometry = SlicedGeometry3D::New();
   geometry->Initialize(input->GetDimensions()[2], 1);
@@ -36,7 +37,18 @@ void mitk::ImageTimeSelector::GenerateOutputInformation()
       geometry->SetGeometry2D(input->GetSlicedGeometry()->GetGeometry2D(s, m_TimeNr), s, 0);
     }
   }
+
+//  std::cout << "in timeSelector" << std::endl;
+//  const float *spacing = input->GetSlicedGeometry()->GetSpacing();
+//	std::cout << "   in: xres=" << spacing[0] << " yres=" << spacing[1] << " zres=" << spacing[2] << std::endl;
+  
+  geometry->SetSpacing(input->GetSlicedGeometry()->GetSpacing());
+  
   output->SetGeometry(geometry);
+
+//  spacing = input->GetSlicedGeometry()->GetSpacing();
+//	std::cout << "   out: xres=" << spacing[0] << " yres=" << spacing[1] << " zres=" << spacing[2] << std::endl;
+  
 }
 
 //##ModelId=3E3BD0CE0194

@@ -6,7 +6,7 @@ SOURCES		= ipFunc.c
 
 unix:LIBS              = -L../../DataStructures/ipPic 
 
-unix:LIBS       += -L../../DatasStructures/ipPic/lib -Llib -L/opt/os/mbi/lib -lz  -lipFunc -lipPic
+unix:LIBS       += -lz  -L. -lipFunc -L../../DatasStructures/ipPic -lipPic
 
 win32:LIBS	+= $(IPDIR)/piano/ipPic/lib/libipPic.lib $(IPDIR)/piano/ipFunc/lib/libipFunc.lib 
 

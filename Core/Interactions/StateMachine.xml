@@ -459,7 +459,7 @@
 				 <action ID="31" /><!--AcCHECKOBJECT-->
 			</transition>
 		</state>
-		<state NAME="drawpolygonSSD" ID="1">
+		<state NAME="drawStripSSD" ID="1">
 			<transition NAME="finish" NEXT_STATE_ID="4" EVENT_ID="2">
 				 <action ID="2000" /> <!--AcTRANSMITEVENT-->
 				 <action ID="1101" /> <!--AcMODESELECT-->

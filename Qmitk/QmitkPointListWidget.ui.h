@@ -32,7 +32,6 @@ unsigned long QmitkPointListWidget::m_CurrentObserverID;
 
 void QmitkPointListWidget::init()
 {
-  std::cout << "1" << std::endl;
   m_DataChangedCommand = itk::SimpleMemberCommand<QmitkPointListWidget>::New();
 #ifdef WIN32
   m_DataChangedCommand->SetCallbackFunction(this, QmitkPointListWidget::ItemsOfListUpdate);
@@ -46,6 +45,9 @@ void QmitkPointListWidget::init()
 
 
 void QmitkPointListWidget::PointSelect( int ItemIndex )
+//when a point is selected in the widget, then an event equal to an user event gets sent to the global interaction so that the data (point) is selected
+//TODO: change the event EIDLEFTMOUSEBTN to something more defined, cause when user interaction changes in xml-file, 
+//then this don't work anymore (then change the event here too)
 {  
   assert(m_PointSet.IsNotNull());
   //assert(m_PointSet->IndexExists(ItemIndex));

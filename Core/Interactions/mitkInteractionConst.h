@@ -156,7 +156,9 @@ typedef enum EActions
   AcROTATESTART = 1004,
   AcROTATE = 1005,
   AcMODESELECT = 1100,
-  AcMODEDESELECT = 1101
+  AcMODEDESELECT = 1101,
+  AcINFORMLISTENERS = 1200, //GlobalInteraction
+  AcASKINTERACTORS = 1201  //GlobalInteraction
 };
 
 //Type of an Event;

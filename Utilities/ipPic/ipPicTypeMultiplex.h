@@ -586,4 +586,29 @@ else if ( pic->type == ipPicComplex && pic->bpe == 64 ) {						\
 	}																				\
 }
 
+#define ipPicTypeMultiplexR8( function, pic, returnValue, param1, param2, param3, param4, param5, param6, param7, param8 )	\
+{																					\
+	if ( pic->type == ipPicInt && pic->bpe == 8 ) {														\
+		returnValue = function<char>( pic, param1, param2, param3, param4, param5, param6, param7, param8 );					\
+	} else if ( pic->type == ipPicUInt && pic->bpe == 8 ) {												\
+		returnValue = function<unsigned char>( pic, param1, param2, param3, param4, param5, param6, param7, param8 );		\
+	} else if ( pic->type == ipPicInt && pic->bpe == 16 ) {												\
+		returnValue = function<short>( pic, param1, param2, param3, param4, param5, param6, param7, param8 );				\
+	} else if ( pic->type == ipPicUInt && pic->bpe == 16 ) {											\
+		returnValue = function<unsigned short>( pic, param1, param2, param3, param4, param5, param6, param7, param8 );		\
+	} else if ( pic->type == ipPicInt && pic->bpe == 32 ) {												\
+		returnValue = function<int>( pic, param1, param2, param3, param4, param5, param6, param7, param8 );					\
+	} else if ( pic->type == ipPicUInt && pic->bpe == 32 ) {											\
+		returnValue = function<unsigned int>( pic, param1, param2, param3, param4, param5, param6, param7, param8 );			\
+	} else if ( pic->type == ipPicInt && pic->bpe == 64 ) {												\
+		returnValue = function<long>( pic, param1, param2, param3, param4, param5, param6, param7, param8 );					\
+	} else if ( pic->type == ipPicUInt && pic->bpe == 64 ) {											\
+		returnValue = function<unsigned long>( pic, param1, param2, param3, param4, param5, param6, param7, param8 );		\
+	} else if ( pic->type == ipPicFloat && pic->bpe == 32 ) {											\
+		returnValue = function<float>( pic, param1, param2, param3, param4, param5, param6, param7, param8 );				\
+	} else if ( pic->type == ipPicFloat && pic->bpe == 64 ) {											\
+		returnValue = function<double>( pic, param1, param2, param3, param4, param5, param6, param7, param8 );				\
+	}																				\
+}
+
 #endif // IP_PIC_TYPE_MULTIPLEX_H

@@ -24,10 +24,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include "enabled.xpm"
 #include "disabled.xpm"
 QmitkDataTreeViewItem::QmitkDataTreeViewItem( QListView *parent, const QString &s1 , const QString &s2 , mitk::DataTreeIteratorBase* nodeIt )
-    : QListViewItem( parent, s1, s2 ),m_DataTreeIteratorBase(NULL)
+    : QListViewItem( parent, s1, s2 ), m_DataTreeIterator(NULL)
 {
   assert(nodeIt!=NULL);
-  m_DataTreeIteratorBase = nodeIt;
+  m_DataTreeIterator = nodeIt;
 
   m_TreeNode = nodeIt->Get();
   QListViewItem::setText(0,QString("All Datasets"));
@@ -42,10 +42,10 @@ QmitkDataTreeViewItem::QmitkDataTreeViewItem( QListView *parent, const QString &
 }
 
 QmitkDataTreeViewItem::QmitkDataTreeViewItem( QmitkDataTreeViewItem * parent, mitk::DataTreeIteratorBase * nodeIt )
-: QListViewItem(parent),m_DataTreeIteratorBase(NULL) 
+: QListViewItem(parent),m_DataTreeIterator(NULL) 
 {
   assert(nodeIt!=NULL);
-  m_DataTreeIteratorBase = nodeIt;
+  m_DataTreeIterator = nodeIt;
 
   m_TreeNode = nodeIt->Get();
   char name[256];

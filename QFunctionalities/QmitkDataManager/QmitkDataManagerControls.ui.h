@@ -138,7 +138,6 @@ void QmitkDataManagerControls::SaveButton_clicked()
     if (selectedIterator != NULL)
     {
       mitk::DataTreeNode* node = selectedIterator->Get();
-      std::cout << "2" << std::endl;
       if (node != NULL ){
         mitk::BaseData::Pointer data=node->GetData();
 

@@ -1,5 +1,5 @@
 #include <QmitkRenderWindow.h>
-#include <ComfortGLWidget.h>
+#include <QmitkSliceWidget.h>
 
 #include <mitkDataTreeNodeFactory.h>
 #include <mitkProperties.h>
@@ -17,10 +17,10 @@
 //## The QmitkRenderWindow is used for displaying a 3D view as in Step3,
 //## but without volume-rendering.
 //## Furthermore, we create two 2D views for slicing through the data. 
-//## We use the class ComfortGLWidget, which is based on the class 
+//## We use the class QmitkSliceWidget, which is based on the class 
 //## QmitkRenderWindow, but additionally provides sliders 
 //## to slice through the data. We create two instances of
-//## ComfortGLWidget, one for transversal and one for sagittal slicing.
+//## QmitkSliceWidget, one for transversal and one for sagittal slicing.
 //## The two slices are also shown at their correct position in 3D as
 //## well as intersection-line, each in the other 2D view.
 int main(int argc, char* argv[])
@@ -80,10 +80,10 @@ int main(int argc, char* argv[])
   // *******************************************************
 
   // Part IVb: 2D view for slicing transversally
-  // create ComfortGLWidget, which is based on the class 
+  // create QmitkSliceWidget, which is based on the class 
   // QmitkRenderWindow, but additionally provides sliders
-  ComfortGLWidget view2(&toplevelWidget);
-  // tell the ComfortGLWidget which (part of) the tree to render.
+  QmitkSliceWidget view2(&toplevelWidget);
+  // tell the QmitkSliceWidget which (part of) the tree to render.
   // By default, it slices the data transversally
   view2.SetData(&it);
   // We want to see the position of the slice in 2D and the
@@ -91,10 +91,10 @@ int main(int argc, char* argv[])
   it.Add(view2.GetRenderer()->GetCurrentWorldGeometry2DNode());
 
   // Part IVc: 2D view for slicing sagitally
-  // create ComfortGLWidget, which is based on the class 
+  // create QmitkSliceWidget, which is based on the class 
   // QmitkRenderWindow, but additionally provides sliders
-  ComfortGLWidget view3(&toplevelWidget);
-  // tell the ComfortGLWidget which (part of) the tree to render
+  QmitkSliceWidget view3(&toplevelWidget);
+  // tell the QmitkSliceWidget which (part of) the tree to render
   // and to slice sagitally
   view3.SetData(&it, mitk::SliceNavigationController::Sagittal);
   // We want to see the position of the slice in 2D and the

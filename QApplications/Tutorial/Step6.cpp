@@ -1,7 +1,7 @@
 #include "Step6.h"
 
 #include <QmitkRenderWindow.h>
-#include <ComfortGLWidget.h>
+#include <QmitkSliceWidget.h>
 
 #include <mitkDataTreeNodeFactory.h>
 #include <mitkProperties.h>
@@ -162,10 +162,10 @@ void Step6::SetupWidgets()
   renderWindow->GetRenderer()->SetMapperID(mitk::BaseRenderer::Standard3D);
 
   // Part VIb: 2D view for slicing transversally
-  // create ComfortGLWidget, which is based on the class 
+  // create QmitkSliceWidget, which is based on the class 
   // QmitkRenderWindow, but additionally provides sliders
-  ComfortGLWidget *view2=new ComfortGLWidget(viewParent);
-  // tell the ComfortGLWidget which (part of) the tree to render.
+  QmitkSliceWidget *view2=new QmitkSliceWidget(viewParent);
+  // tell the QmitkSliceWidget which (part of) the tree to render.
   // By default, it slices the data transversally
   view2->SetData(&it);
   // We want to see the position of the slice in 2D and the
@@ -173,10 +173,10 @@ void Step6::SetupWidgets()
   it.Add(view2->GetRenderer()->GetCurrentWorldGeometry2DNode());
 
   // Part VIc: 2D view for slicing sagitally
-  // create ComfortGLWidget, which is based on the class 
+  // create QmitkSliceWidget, which is based on the class 
   // QmitkRenderWindow, but additionally provides sliders
-  ComfortGLWidget *view3=new ComfortGLWidget(viewParent);
-  // tell the ComfortGLWidget which (part of) the tree to render
+  QmitkSliceWidget *view3=new QmitkSliceWidget(viewParent);
+  // tell the QmitkSliceWidget which (part of) the tree to render
   // and to slice sagitally
   view3->SetData(&it, mitk::SliceNavigationController::Sagittal);
   // We want to see the position of the slice in 2D and the

@@ -152,8 +152,8 @@
         <slot access="public">slot()</slot>
     </customwidget>
     <customwidget>
-        <class>ComfortGLWidget</class>
-        <header location="global">ComfortGLWidget.h</header>
+        <class>QmitkSliceWidget</class>
+        <header location="global">QmitkSliceWidget.h</header>
         <sizehint>
             <width>-1</width>
             <height>-1</height>

@@ -1,5 +1,5 @@
 #include <QmitkRenderWindow.h>
-#include <ComfortGLWidget.h>
+#include <QmitkSliceWidget.h>
 
 #include <mitkDataTreeNodeFactory.h>
 #include <mitkProperties.h>

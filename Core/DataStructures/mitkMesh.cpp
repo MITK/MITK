@@ -467,7 +467,7 @@ void mitk::Mesh::ExecuteOperation(Operation* operation)
     }
 		break;
   case OpDELETELINE:
-    //deleted the last line through removing the last index in the given cellId
+    //deleted the last line through removing the index PIdA (if set to -1, use the last point) in the given cellId
     {
       mitk::LineOperation *lineOp = dynamic_cast<mitk::LineOperation *>(operation);
       int cellId = -1;
@@ -479,8 +479,6 @@ void mitk::Mesh::ExecuteOperation(Operation* operation)
         if (cellId == -1)
           return;
         pId = this->SearchSelectedPoint();
-			  if (pId == -1)
-				  return;
       }
       else
       {
@@ -488,8 +486,6 @@ void mitk::Mesh::ExecuteOperation(Operation* operation)
         if (cellId == -1)
           return;
         pId = lineOp->GetPIdA();
-			  if (pId == -1)
-				  return;
       }
 
       bool ok;
@@ -500,22 +496,31 @@ void mitk::Mesh::ExecuteOperation(Operation* operation)
         CellType * cell = cellAutoPointer.GetPointer();
         if( cell->GetType() == CellType::POLYGON_CELL )
         {
-          PolygonType * polygon = static_cast<PolygonType *>( cell );
-          CellAutoPointer oldCell;
-          //polygon->MakeCopy(oldCell);
-          //due to bug in itk::PolygonCell::MakeCopy
-          PolygonType * newPolygonCell = new PolygonType;
-          oldCell.TakeOwnership( newPolygonCell );
-          unsigned long numberOfPoints = polygon->GetNumberOfPoints();
-          newPolygonCell->SetPointIds(0, numberOfPoints, polygon->GetPointIds());
+          PolygonType * oldPolygon = static_cast<PolygonType *>( cell );
 
-//          unsigned long numberOfPoints = oldCell->GetNumberOfPoints();
-          PointIdConstIterator oldIter;
-          oldIter = oldCell.GetPointer()->PointIdsBegin();
-          //decrease the number so which is equal to deleting the last index
-          --numberOfPoints;
-          int dummy = 0;//dummy for for itkPolygonCell->SetPointIds(...)
-          polygon->SetPointIds( dummy, numberOfPoints, oldIter );
+          PolygonType * newPolygonCell = new PolygonType;
+          CellAutoPointer newCell;
+          newCell.TakeOwnership( newPolygonCell );
+
+          PointIdConstIterator it, oldend;
+          oldend = oldPolygon->PointIdsEnd();
+          if(pId >= 0)
+          {
+            for(it = oldPolygon->PointIdsBegin(); it != oldend; ++it)
+            {
+              if((*it) != pId)
+              {
+                newPolygonCell->AddPointId(*it);
+              }
+            }
+          }
+          else
+          {
+            --oldend;
+            for(it = oldPolygon->PointIdsBegin(); it != oldend; ++it)
+              newPolygonCell->AddPointId(*it);
+          }
+          newPolygonCell->SetPointIds(0, newPolygonCell->GetNumberOfPoints(), newPolygonCell->PointIdsBegin());
         }
       }
     }

@@ -31,6 +31,19 @@ namespace mitk
 {
 
 template <typename TPixel>
+void BoundingObjectCutter<TPixel>::SetBoundingObject( const mitk::BoundingObject* boundingObject ) 
+{
+  this->SetNthInput( 1, m_BoundingObject );
+  m_BoundingObject = const_cast<mitk::BoundingObject*>(boundingObject);
+}
+
+template <typename TPixel>
+const mitk::BoundingObject* BoundingObjectCutter<TPixel>::GetBoundingObject() const 
+{
+  return m_BoundingObject->GetPointer();
+}
+
+template <typename TPixel>
 BoundingObjectCutter<TPixel>::BoundingObjectCutter() : 
 m_BoundingObject(NULL), m_InsideValue(1), m_OutsideValue(0), 
 m_UseInsideValue(false), m_OutsidePixelCount(0), m_InsidePixelCount(0)

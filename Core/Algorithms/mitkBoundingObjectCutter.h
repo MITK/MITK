@@ -51,8 +51,8 @@ public:
   virtual void GenerateOutputInformation();
   virtual void GenerateData();
 
-  itkSetObjectMacro(BoundingObject, mitk::BoundingObject);
-  itkGetObjectMacro(BoundingObject, mitk::BoundingObject);
+  void SetBoundingObject( const mitk::BoundingObject* boundingObject );
+  const mitk::BoundingObject* GetBoundingObject() const;
   itkSetMacro(InsideValue,  PixelType);
   itkGetMacro(InsideValue,  PixelType);
   itkSetMacro(OutsideValue, PixelType);

@@ -144,7 +144,7 @@ void mitk::BoundingObjectGroup::UpdateOutputInformation()
   /* the objects position is the center of all sub bounding objects */
   m_Geometry3D->GetVtkTransform()->Identity();
   m_Geometry3D->GetVtkTransform()->Translate(centerPoint[0], centerPoint[1], centerPoint[2]);
-  
+  m_Geometry3D->TransferVtkToITKTransform();  
 }
 
 void mitk::BoundingObjectGroup::AddBoundingObject(mitk::BoundingObject::Pointer boundingObject)

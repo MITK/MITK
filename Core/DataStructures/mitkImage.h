@@ -40,8 +40,9 @@ class Image : public SlicedData
     //##ModelId=3E0B7B3C00F0
 	typedef ImageDataItem::Pointer ImageDataItemPointer;
 
-	/** STL Array of SmartPointers to ImageDataItems */
     //##ModelId=3E0B7B3C0172
+    //##Documentation
+	//## @brief Type for STL Array of SmartPointers to ImageDataItems */
 	typedef std::vector<ImageDataItemPointer> ImageDataItemPointerArray;
 
   public:
@@ -50,11 +51,13 @@ class Image : public SlicedData
     const mitk::PixelType& GetType(int n = 0) const;
 
     //##ModelId=3DCBC5AA0112
+    //##Documentation
     //## @brief Get dimension of the image
     //##
     unsigned int GetDimension() const;
 
     //##ModelId=3DCBC6040068
+    //##Documentation
     //## @brief Get the size of dimension @a i (e.g., i=0 results in the number of pixels in x-direction).
     //##
     //## @sa GetDimensions()
@@ -225,6 +228,7 @@ class Image : public SlicedData
     //## @brief Check whether the image has been initialize, i.e., at least the header has to be set
 	virtual bool IsInitialized() const;
     //##ModelId=3E1A11530384
+    //##Documentation
     //## @brief Get the sizes of all dimensions as an integer-array.
     //##
     //## @sa GetDimension(int i);

@@ -66,7 +66,7 @@ protected:
   virtual void GenerateData();
 
   template < typename TPixel, unsigned int VImageDimension, typename TOutputPixel > 
-    void CutImageWithOutputTypeSelect( itk::Image< TPixel, VImageDimension>* inputItkImage, TPixel* dummy = NULL );
+    void CutImageWithOutputTypeSelect( itk::Image< TPixel, VImageDimension >* inputItkImage, TPixel* dummy = NULL, TOutputPixel* dummy2=NULL  );
   template < typename TPixel, unsigned int VImageDimension > 
     void CutImage( itk::Image< TPixel, VImageDimension >* itkImage, TPixel* dummy = NULL );
 
@@ -104,4 +104,5 @@ protected:
 } // namespace mitk
 
 #endif /* BOUNDINGOBJECTCUTTER_H_HEADER_INCLUDED_C10B22CD */
+
 

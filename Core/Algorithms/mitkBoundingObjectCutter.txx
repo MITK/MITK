@@ -19,6 +19,8 @@ See MITKCopyright.txt or http://www.mitk.org/ for details.
 #ifndef MITKBOUNDINGOBJECTCUTTER_TXX
 #define MITKBOUNDINGOBJECTCUTTER_TXX
 
+#include "mitkStatusBar.h"
+
 //##Documentation
 //## @brief For internal within mitkBoundingObjectCutter.cpp and mitkBoundingObjectCutAndCast.txx only
 
@@ -26,7 +28,7 @@ namespace mitk
 {
 
 template < typename TPixel, unsigned int VImageDimension, typename TOutputPixel > 
-void BoundingObjectCutter::CutImageWithOutputTypeSelect< TPixel, VImageDimension, TOutputPixel >( itk::Image<TPixel, VImageDimension>* inputItkImage, TPixel* dummy )
+void BoundingObjectCutter::CutImageWithOutputTypeSelect( itk::Image<TPixel, VImageDimension>* inputItkImage, TPixel* dummy, TOutputPixel* dummy2 )
 {
   typedef itk::Image<TPixel, VImageDimension> ItkInputImageType;
   typedef itk::Image<TOutputPixel, VImageDimension> ItkOutputImageType;
@@ -69,7 +71,7 @@ void BoundingObjectCutter::CutImageWithOutputTypeSelect< TPixel, VImageDimension
   ItkRegionType inputRegionOfInterest(index, size);
 
   // PART 2: get access to the MITK output image via an ITK image
-  mitk::ImageToItk<TOutputPixel, VImageDimension>::Pointer outputimagetoitk = mitk::ImageToItk<TOutputPixel, VImageDimension>::New();
+  typename mitk::ImageToItk<TOutputPixel, VImageDimension>::Pointer outputimagetoitk = mitk::ImageToItk<TOutputPixel, VImageDimension>::New();
   outputimagetoitk->SetInput(output);
   outputimagetoitk->Update();
   typename ItkOutputImageType::Pointer outputItkImage = outputimagetoitk->GetOutput();
@@ -119,7 +121,7 @@ void BoundingObjectCutter::CutImageWithOutputTypeSelect< TPixel, VImageDimension
       inputGeometry->UnitsToMM(p, p);
       if(m_BoundingObject->IsInside(p))
       {
-        outputIt.Set( inputIt.Value() );
+        outputIt.Set( (TOutputPixel) inputIt.Value() );
         ++m_InsidePixelCount;
       }
       else
@@ -133,4 +135,7 @@ void BoundingObjectCutter::CutImageWithOutputTypeSelect< TPixel, VImageDimension
 
 } // of namespace mitk
 #endif // of MITKBOUNDINGOBJECTCUTTER_TXX
+
+
+
 

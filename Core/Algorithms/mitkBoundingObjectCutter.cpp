@@ -108,9 +108,9 @@ void BoundingObjectCutter::GenerateOutputInformation()
   if(min[0]<0.0) min[0]=0.0;
   if(min[1]<0.0) min[1]=0.0;
   if(min[2]<0.0) min[2]=0.0;
-  start[0] = min[0] + 0.5; //to avoid rounding errors
-  start[1] = min[1] + 0.5;
-  start[2] = min[2] + 0.5;
+  start[0] = (mitk::SlicedData::IndexValueType) (min[0] + 0.5); //to avoid rounding errors
+  start[1] = (mitk::SlicedData::IndexValueType) (min[1] + 0.5);
+  start[2] = (mitk::SlicedData::IndexValueType) (min[2] + 0.5);
   m_InputRequestedRegion.SetIndex(start);
   
   mitk::SlicedData::SizeType size = m_InputRequestedRegion.GetSize();
@@ -119,15 +119,15 @@ void BoundingObjectCutter::GenerateOutputInformation()
   if ( size[0] < max[0] )
     size[0] -= start[0];
   else 
-    size[0] = max[0] - start[0];
+    size[0] = (mitk::SlicedData::IndexValueType) (max[0] - start[0]);
   if ( size[1] < max[1] )
     size[1] -= start[1];
   else 
-    size[1] = max[1] - start[1];
+    size[1] = (mitk::SlicedData::IndexValueType) (max[1] - start[1]);
   if ( size[2] < max[2] )
     size[2] -= start[2];
   else 
-    size[2] = max[2] - start[2];
+    size[2] = (mitk::SlicedData::IndexValueType) (max[2] - start[2]);
   m_InputRequestedRegion.SetSize(size);
 
   // PART II: initialize output image
@@ -150,7 +150,7 @@ void BoundingObjectCutter::GenerateOutputInformation()
 }
 
 template < typename TPixel, unsigned int VImageDimension > 
-void BoundingObjectCutter::CutImage< TPixel, VImageDimension >( itk::Image< TPixel, VImageDimension >* inputItkImage, TPixel* dummy )
+void BoundingObjectCutter::CutImage( itk::Image< TPixel, VImageDimension >* inputItkImage, TPixel* dummy )
 {
   CutImageWithOutputTypeSelect<TPixel, VImageDimension, TPixel>(inputItkImage, dummy);
 }
@@ -172,4 +172,5 @@ void BoundingObjectCutter::GenerateData()
 
 } // of namespace mitk
 #endif // of MITKBOUNDINGOBJECTCUTTER_CPP
+
 

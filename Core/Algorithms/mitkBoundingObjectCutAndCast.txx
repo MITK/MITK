@@ -22,12 +22,6 @@ See MITKCopyright.txt or http://www.mitk.org/ for details.
 #include "mitkBoundingObjectCutAndCast.h"
 #include "mitkImageAccessByItk.h"
 #include "mitkImage.h"
-#include "mitkBoundingObject.h"
-#include "mitkGeometry3D.h"
-#include "mitkImageToItk.h"
-#include "mitkStatusBar.h"
-
-#include <vtkTransform.h>
 
 namespace mitk
 {
@@ -67,3 +61,4 @@ void BoundingObjectCutAndCast<TPixel>::GenerateData()
 
 } // of namespace mitk
 #endif // of MITKBOUNDINGOBJECTCUTANDCAST_TXX
+

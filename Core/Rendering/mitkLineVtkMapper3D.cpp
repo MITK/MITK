@@ -3,7 +3,7 @@
 #include <vtkPolyDataMapper.h>
 #include <vtkActor.h>
 #include <vtkProp3DCollection.h>
-#include "mitkBoolProperty.h"
+#include <mitkProperties.h>
 #include "mitkStringProperty.h"
 #include <vtkProperty.h>
 

@@ -15,7 +15,6 @@ using boost::unit_test_framework::test_suite;
 
 #include <mitkDataTreeNode.h>
 #include <mitkStringProperty.h>
-#include <mitkBoolProperty.h>
 #include <mitkProperties.h>
 
 using boost::unit_test_framework::test_suite;

@@ -121,6 +121,7 @@ bool mitk::PicVolumeTimeSeriesReader::GenerateFileList()
         m_MatchedFiles[ i ] = it->second ;
         itkDebugMacro( << "Added " << it->second << " to the set of matched files!" );
     }
+    return true;
 }
 
 

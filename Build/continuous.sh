@@ -12,7 +12,10 @@ export PATH=/cygdrive/g/opt/share/Dart/mbi:$PATH
 else
   echo "True Unix detected"  
   MAKECMD=make
-export PATH=/opt/share/Dart/mbi:$PATH  
+  export PATH=/opt/share/Dart/mbi:$PATH  
+  # workaround: qt utils do not link against their own library,
+  # cmake calls the /opt/linux-gcc/qt/bin/ utils, which the use the system qt lib
+  export LD_LIBRARY_PATH=/opt/linux-gcc3/qt/lib:$LD_LIBRARY_PATH
 fi;	
 while true; do 
   echo "=========================================="

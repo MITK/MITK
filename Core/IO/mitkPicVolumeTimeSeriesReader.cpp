@@ -174,9 +174,15 @@ void mitk::PicVolumeTimeSeriesReader::GenerateOutputInformation()
     output->Initialize( header );
 
     ipPicFree( header );
+    
+    //
+    // Initialize the timebounds of the FIRST geometry/volume. 
+    // Since EvenlyTimed is activated, the timings are propagated 
+    // to the other volumes!
+    //
     mitk::ScalarType timearray[ 2 ];
     timearray[ 0 ] = 0;
-    timearray[ 1 ] = m_MatchedFiles.size();
+    timearray[ 1 ] = 1; 
     TimeBounds timebounds( timearray );
     output->GetSlicedGeometry()->SetTimeBoundsInMS( timebounds );
 

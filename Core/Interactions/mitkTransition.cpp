@@ -23,18 +23,12 @@ PURPOSE.  See the above copyright notices for more information.
 //##ModelId=3E5A3A77006F
 mitk::Transition::Transition(std::string name, int nextStateId, int eventId )
   : m_Name(name), m_NextState(NULL),  m_NextStateId(nextStateId), m_EventId(eventId)
-{	 
-  static int counter = 0;
-  std::cout << name << " " << counter++ << std::endl;
-}
+{}
 
 //##
 void mitk::Transition::AddAction( Action* action ) 
 {
   m_Actions.push_back( action );
-
-  int count = m_Actions.size();
-  std::cout << count << std::cout;  
 }
 
 //##ModelId=3E5A3BAE03B5

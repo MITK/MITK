@@ -26,9 +26,8 @@ namespace mitk {
  *
  */
 Action::Action( int actionId )
-:m_ActionId( actionId )
+:m_ActionId( actionId ), m_PropertiesList(NULL)
 { 
-  m_PropertiesList = PropertyList::New();
 }
 
 /**
@@ -43,6 +42,8 @@ Action::~Action()
  */
 void Action::AddProperty(const char* propertyKey, BaseProperty* property ) 
 {
+  if (m_PropertiesList.IsNull())
+    m_PropertiesList = PropertyList::New();
   m_PropertiesList->SetProperty( propertyKey, property );
 }
 
@@ -61,7 +62,10 @@ int Action::GetActionId() const
  */
 mitk::BaseProperty* Action::GetProperty( const char *propertyKey ) const 
 {
-  return m_PropertiesList->GetProperty( propertyKey );
+  if (m_PropertiesList.IsNotNull())
+    return m_PropertiesList->GetProperty( propertyKey );
+  else 
+    return NULL;
 }
 
 } // namespace mitk

@@ -73,9 +73,10 @@ class EventMapper : public QXmlDefaultHandler
 public:
 	//##Constants for EventMapping... In StateMachines do: case EventMapper::KeyPress
 	//##SideEffectId
-	static const int DONOTHING = 0;
-	static const int INITNEWOBJECT = 5;
-	static const int INITEDITOBJECT = 6;
+
+	static const int DONOTHING;
+	static const int INITNEWOBJECT;
+/*	static const int INITEDITOBJECT = 6;
 	static const int INITEDITGROUP = 7;
 	static const int ADDPOINT = 10;
 	static const int SNAPPING_ADDING = 20;
@@ -426,10 +427,15 @@ public:
     static const int Key_ydiaeresis = 0x0ff;
     static const int Key_unknown = 0xffff; 
 	static const int Key_none = Key_unknown;
+*/
+
 };
 
 } // namespace mitk
 
+
+const int mitk::EventMapper::DONOTHING = 0;
+const int mitk::EventMapper::INITNEWOBJECT = 5;
 
 
 #endif /* EVENTMAPPER_H_HEADER_INCLUDED_C187864A */

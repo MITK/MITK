@@ -258,7 +258,7 @@ namespace mitk {
         m_Dimension, 
         tmpDimensions,
         channels);
-#if ITK_VERSION_MINOR > 5
+#if (ITK_VERSION_MAJOR == 1 && ITK_VERSION_MINOR > 5) || ITK_VERSION_MAJOR > 1
       const typename itkImageType::SpacingType & itkspacing = itkimage->GetSpacing();  
 #else
       const double *itkspacing = itkimage->GetSpacing();  

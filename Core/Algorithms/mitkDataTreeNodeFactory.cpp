@@ -708,7 +708,7 @@ void mitk::DataTreeNodeFactory::ReadFileTypeITKImageIOFactory()
     void* buffer = malloc( imageIO->GetImageSizeInBytes() );
     imageIO->Read( buffer );
     mitk::Image::Pointer image = mitk::Image::New();
-#if ITK_VERSION_MINOR > 6
+#if ITK_VERSION_MAJOR == 2 || ( ITK_VERSION_MAJOR == 1 && ITK_VERSION_MINOR > 6 )
     mitk::PixelType pixelType( imageIO->GetComponentTypeInfo(), imageIO->GetNumberOfComponents() );
     image->Initialize( pixelType, ndim, dimensions );
 #else

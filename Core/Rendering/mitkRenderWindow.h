@@ -11,7 +11,7 @@ namespace mitk {
 class RenderWindow : public RenderWindowBase
 {
 public:
-    //##ModelId=3E3ECC130358
+    //##ModelId=3E3ECC1201B2
     RenderWindow(QGLFormat glf, QWidget *parent = 0, const char *name = 0) : RenderWindowBase(glf, parent, name)
     {
     

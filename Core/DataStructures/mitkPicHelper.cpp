@@ -2,7 +2,7 @@
 #include "mitkSlicedGeometry3D.h"
 #include "mitkPlaneGeometry.h"
 #ifdef MBI_INTERNAL
-#include "ipDicom.h"
+  #include "ipDicom/ipDicom.h"
 #endif
 
 bool mitk::PicHelper::GetSpacing(ipPicDescriptor* pic, Vector3D & spacing)

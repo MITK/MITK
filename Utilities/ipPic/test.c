@@ -15,6 +15,8 @@ int main( int argc, char *argv[] )
   ipPicAnnotation_t	a;
   char buff[] = "test test";
 
+  printf( "%s\n", _ipEndian()==_ipEndianBig?"BigEndian":"LitleEndian" );
+
   if( argc != 3 )
     exit(-1);
 

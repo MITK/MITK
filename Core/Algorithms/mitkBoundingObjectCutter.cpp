@@ -204,7 +204,7 @@ void BoundingObjectCutter::GenerateData()
 
     m_InputTimeSelector->SetTimeNr(timestep);
     m_InputTimeSelector->UpdateLargestPossibleRegion();
-    m_OutputTimeSelector->SetTimeNr(timestep);
+    m_OutputTimeSelector->SetTimeNr(t);
     m_OutputTimeSelector->UpdateLargestPossibleRegion();
 
     timestep = boundingObjectTimeGeometry->MSToTimeStep( timeInMS );

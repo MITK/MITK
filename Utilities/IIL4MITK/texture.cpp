@@ -21,8 +21,8 @@ Pay attention that the context which the widget share with another widget
 will not be deleted.
 */
 _iilTexture::~_iilTexture () {
-	assert((QGLWidget *)parent());
-	((QGLWidget *) parent ())->makeCurrent ();
+	if((QGLWidget *)parent()!=NULL)
+  	((QGLWidget *) parent ())->makeCurrent ();
 	glDeleteTextures (1, &_name);
 
 	// Are the textures deleted automatically?

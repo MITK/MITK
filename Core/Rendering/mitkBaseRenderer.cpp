@@ -140,11 +140,12 @@ void mitk::BaseRenderer::MousePressEvent(mitk::MouseEvent *me)
   }
   else if(m_MapperID==2)
   {
-    return;
     Point2D p(me->x(), me->y());
     GetDisplayGeometry()->ULDisplayToDisplay(p,p);
+    std::cout << "press event!" << std::endl;
     mitk::DisplayPositionEvent event(this, me->type(), me->button(), me->state(), Qt::Key_unknown, p);
-    mitk::EventMapper::MapEvent(&event);
+    if (! mitk::EventMapper::MapEvent(&event))
+        std::cerr << "error, event was not mapped!" << std::endl;
   }
 }
 
@@ -167,7 +168,6 @@ void mitk::BaseRenderer::MouseReleaseEvent(mitk::MouseEvent *me)
   }
   else if(m_MapperID==2)
   {
-    return;
     Point2D p(me->x(), me->y());
     GetDisplayGeometry()->ULDisplayToDisplay(p,p);
     mitk::DisplayPositionEvent event(this, me->type(), me->button(), me->state(), Qt::Key_unknown, p);
@@ -193,7 +193,6 @@ void mitk::BaseRenderer::MouseMoveEvent(mitk::MouseEvent *me)
   }
   else if(m_MapperID==2)
   {
-    return;
     Point2D p(me->x(), me->y());
     GetDisplayGeometry()->ULDisplayToDisplay(p,p);
     mitk::DisplayPositionEvent event(this, me->type(), me->button(), me->state(), Qt::Key_unknown, p);

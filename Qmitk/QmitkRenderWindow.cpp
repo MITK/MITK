@@ -99,13 +99,12 @@ void mitk::QmitkRenderWindow::paintGL( )
     SetWindowId( (void*) nId );
     m_InitNeeded = false;
   }
-  else
-    // rendering when not visible might cause serious problems (program may hang)
-    if(QGLWidget::isVisible())
-    {
-      if(m_Renderer.IsNotNull())
-        m_Renderer->Paint();
-    }
+  // rendering when not visible might cause serious problems (program may hang)
+  if(QGLWidget::isVisible())
+  {
+    if(m_Renderer.IsNotNull())
+      m_Renderer->Paint();
+  }
 }
 
 void mitk::QmitkRenderWindow::showEvent ( QShowEvent * )
@@ -115,9 +114,7 @@ void mitk::QmitkRenderWindow::showEvent ( QShowEvent * )
   {
     m_ResizeNeeded=false;
     if(m_Renderer.IsNotNull())
-      m_Renderer->InitSize(width()-40,height()-40);
-    //m_Renderer->SetSize(width(),height());
-    //    resizeGL(width(),height());
+      m_Renderer->InitSize(width(),height());
   }
 }
 

@@ -5,6 +5,7 @@
 #include "mitkRotationOperation.h"
 #include "mitkPointOperation.h"
 #include "mitkPositionEvent.h"
+#include "mitkDisplayPositionEvent.h"
 #include "vtkTransform.h"
 #include <mitkRenderWindow.h>
 #include <mitkBoolProperty.h>
@@ -15,6 +16,21 @@
 #include "mitkBoundingObject.h"
 
 #include <math.h>
+
+#include <vtkWorldPointPicker.h>
+#include <vtkPicker.h>
+#include "mitkOpenGLRenderer.h"
+#include "mitkBaseRenderer.h"
+#include "mitkGlobalInteraction.h"
+#include <mitkFocusManager.h>
+#include <mitkEventMapper.h>
+#include "vtkProp3D.h"
+#include "mitkVtkInteractorCameraController.h"
+#include <vtkInteractorObserver.h>
+#include "vtkRenderer.h"
+#include "vtkCamera.h"
+#include <vtkInteractorObserver.h>
+
 
 mitk::AffineInteractor::AffineInteractor(const char * type, DataTreeNode* dataTreeNode)
 	 : Interactor(type, dataTreeNode)
@@ -28,10 +44,63 @@ bool mitk::AffineInteractor::ExecuteAction(int actionId, mitk::StateEvent const*
   mitk::Geometry3D* geometry = m_DataTreeNode->GetData()->GetGeometry();
 	if (geometry == NULL)
 		return false;
-
+  /* Position events - 3D coordinates from a 2D window */
+  mitk::PositionEvent const  *posEvent = dynamic_cast <const mitk::PositionEvent *> (stateEvent->GetEvent());
+  /* Display  events - 2D coordinates from a 3D window */
+  mitk::DisplayPositionEvent const  *displayEvent = dynamic_cast <const mitk::DisplayPositionEvent *> (stateEvent->GetEvent());
   /* Each case must watch the type of the event! */
   switch (actionId)
 	{
+  case AcINITAFFINEINTERACTIONS:
+  {
+    /* Disable VTK Interactor while we perform our own interaction */
+    mitk::GlobalInteraction* globalInteraction = dynamic_cast<mitk::GlobalInteraction*>(mitk::EventMapper::GetGlobalStateMachine());
+    if (globalInteraction == NULL)
+      return false;
+    const FocusManager::FocusElement* fe = globalInteraction->GetFocus();
+    FocusManager::FocusElement* fe2 =  const_cast <FocusManager::FocusElement*>(fe);
+    mitk::OpenGLRenderer* glRenderer = dynamic_cast<mitk::OpenGLRenderer*>(fe2);
+    if (glRenderer != NULL)
+    {
+      VtkInteractorCameraController* vicc = dynamic_cast<VtkInteractorCameraController*>(glRenderer->GetCameraController());
+      if (vicc != NULL)
+      {
+        //vicc->GetVtkInteractor()->GetInteractorStyle()->Off();
+        //vicc->GetVtkInteractor()->Disable();
+        std::cout << "******************* disable vtk interactor *******************\n";
+      }
+    }
+    ok = true;
+    break;
+  }
+  case AcFINISHAFFINEINTERACTIONS:
+  {
+    /* Reenable VTK Interactor after we finished our own interaction */
+    mitk::GlobalInteraction* globalInteraction = dynamic_cast<mitk::GlobalInteraction*>(mitk::EventMapper::GetGlobalStateMachine());
+    if (globalInteraction == NULL)
+      return false;
+    const FocusManager::FocusElement* fe = globalInteraction->GetFocus();
+    FocusManager::FocusElement* fe2 =  const_cast <FocusManager::FocusElement*>(fe);
+    mitk::OpenGLRenderer* glRenderer = dynamic_cast<mitk::OpenGLRenderer*>(fe2);
+    if (glRenderer != NULL)
+    {
+      VtkInteractorCameraController* vicc = dynamic_cast<VtkInteractorCameraController*>(glRenderer->GetCameraController());
+      if (vicc != NULL)
+      {
+        //vicc->GetVtkInteractor()->Disable();
+        //vicc->GetVtkInteractor()->Delete();
+        //vicc->SetVtkInteractor(vtkRenderWindowInteractor::New());
+        //vicc->SetRenderer(glRenderer);
+        
+        //vicc->GetVtkInteractor()->Enable();
+        //vicc->GetVtkInteractor()->Start();
+        //std::cout << "******************* enable vtk interactor *******************\n";
+      }
+    }
+    ok = true;
+    break;
+  }
+
   case AcNEWPOINT:
   {
     //ok = true;
@@ -39,50 +108,76 @@ bool mitk::AffineInteractor::ExecuteAction(int actionId, mitk::StateEvent const*
   }
   case AcCHECKELEMENT:
   {
-    mitk::PositionEvent const  *posEvent = dynamic_cast <const mitk::PositionEvent *> (stateEvent->GetEvent());
-    mitk::StateEvent* newStateEvent = NULL;
-    
-    if (posEvent != NULL) //for 2D Interaction
+    mitk::Point3D worldPoint;
+    if (posEvent != NULL)   // Event in 2D Window with 3D coordinates
     {
-      mitk::Point3D worldPoint = posEvent->GetWorldPosition();
-
-      mitk::BoolProperty::Pointer prop;
-
-      if (this->CheckSelected(worldPoint))
-      {
-        newStateEvent = new mitk::StateEvent(StYES, posEvent);
-        prop = new mitk::BoolProperty(true);
-      }
-      else
-      {
-        newStateEvent = new mitk::StateEvent(StNO, posEvent);
-        prop = new mitk::BoolProperty(false);
-      }
-
-      /* write new state (selected/not selected) to the property */
-      m_DataTreeNode->GetPropertyList()->SetProperty("selected", prop);
+      worldPoint = posEvent->GetWorldPosition();
     }
-    else // DisplayEvent from 3D Window or else Event
+    else if (displayEvent != NULL)  // Event in 3D window with 2D coordinates
+    {  
+      /* pick a Prop3D and assume its position as event 3D coordinates */
+      const mitk::Point2D displayPoint = displayEvent->GetDisplayPosition();
+      mitk::GlobalInteraction* globalInteraction = dynamic_cast<mitk::GlobalInteraction*>(mitk::EventMapper::GetGlobalStateMachine());
+      if (globalInteraction == NULL)
+        return false;
+      const FocusManager::FocusElement* fe = globalInteraction->GetFocus();
+      FocusManager::FocusElement* fe2 =  const_cast <FocusManager::FocusElement*>(fe);
+      mitk::OpenGLRenderer* glRenderer = dynamic_cast<mitk::OpenGLRenderer*>(fe2);
+      if (glRenderer == NULL)
+        return false;
+      mitk::Point3D objectPoint;
+      vtkPicker* picker =	vtkPicker::New();
+      picker->SetTolerance (0.0001);
+      picker->Pick(displayPoint.x, displayPoint.y, 0, glRenderer->GetVtkRenderer());
+      if (picker->GetProp3D() == NULL)
+        return false;
+      worldPoint.x = picker->GetPickPosition()[0];
+      worldPoint.y = picker->GetPickPosition()[1];
+      worldPoint.z = picker->GetPickPosition()[2];
+    }
+    else  // neither 2D nor 3D coordinates available
+      return false;
+
+    /* now we have a worldpoint. check if it is inside our object and select/deselect it accordingly */
+    mitk::BoolProperty::Pointer selected;
+    mitk::ColorProperty::Pointer color;
+    mitk::StateEvent* newStateEvent = NULL;
+    if (this->CheckSelected(worldPoint))
+    {
+      newStateEvent = new mitk::StateEvent(StYES, posEvent);
+      selected = new mitk::BoolProperty(true);
+      color = new mitk::ColorProperty(1.0, 1.0, 0.0); // if selected, color is yellow
+    }
+    else
     {
       newStateEvent = new mitk::StateEvent(StNO, posEvent);
-      //no change on selected state because of no interaction in 3D right now
+      selected = new mitk::BoolProperty(false);
+      mitk::BoundingObject* b = dynamic_cast<mitk::BoundingObject*>(m_DataTreeNode->GetData());
+      if(b != NULL)
+      {
+        color = (b->GetPositive())? new mitk::ColorProperty(1.0, 0.0, 0.0) : new mitk::ColorProperty(0.0, 0.0, 1.0);  // if deselected, a boundingobject is colored according to its positive/negative state
+      }
+      else
+        color = new mitk::ColorProperty(1.0, 1.0, 1.0);   // if deselcted and no bounding object, color is white
     }
+
+    /* write new state (selected/not selected) to the property */
+    m_DataTreeNode->GetPropertyList()->SetProperty("selected", selected);
+    m_DataTreeNode->GetPropertyList()->SetProperty("color", color);
     this->HandleEvent( newStateEvent, objectEventId, groupEventId );
 		ok = true;
     break;
   }
   case AcADD:
   {
-    mitk::PositionEvent const  *posEvent = dynamic_cast <const mitk::PositionEvent *> (stateEvent->GetEvent());
-		if (posEvent == NULL)
+    if (posEvent == NULL)   // @TODO: this should work with displayevent too
       return false;
     mitk::Point3D worldPoint = posEvent->GetWorldPosition();
-
     mitk::StateEvent* newStateEvent = NULL;
     if (this->CheckSelected(worldPoint))
     {
       newStateEvent = new mitk::StateEvent(StYES, posEvent);
-      m_DataTreeNode->GetPropertyList()->SetProperty("selected", new mitk::BoolProperty(true));
+      m_DataTreeNode->GetPropertyList()->SetProperty("selected", new mitk::BoolProperty(true));  // TODO: Generate an Select Operation and send it to the undo controller ?
     }
     else  // if not selected, do nothing (don't deselect)
     {
@@ -94,28 +189,39 @@ bool mitk::AffineInteractor::ExecuteAction(int actionId, mitk::StateEvent const*
     break;
   }
   case AcTRANSLATESTART:
+  case AcROTATESTART:
+  case AcSCALESTART:
   {
-    mitk::PositionEvent const  *posEvent = dynamic_cast <const mitk::PositionEvent *> (stateEvent->GetEvent());
-		if (posEvent == NULL) return false;
-    //converting from Point3D to itk::Point
-		//mitk::ITKPoint3D newPosition;
-		mitk::vm2itk(posEvent->GetWorldPosition(), m_LastMousePosition);
-    //m_LastTranslatePosition = newPosition.GetVectorFromOrigin();
-    ok = true;
+		if (posEvent != NULL)
+    {     
+		  mitk::vm2itk(posEvent->GetWorldPosition(), m_LastMousePosition);
+      ok = true;
+    }
+    else if (displayEvent != NULL)  // 2D coordinate in event
+    {
+      return ConvertDisplayEventToWorldPosition(displayEvent, m_LastMousePosition);
+    }
+    else
+      ok = false;    
     break;
   }
   case AcTRANSLATE:
   {
-    mitk::PositionEvent const  *posEvent = dynamic_cast <const mitk::PositionEvent *> (stateEvent->GetEvent());
-		if (posEvent == NULL) return false;
-
-    //converting from Point3D to itk::Point
-		mitk::ITKPoint3D newPosition;
-		mitk::vm2itk(posEvent->GetWorldPosition(), newPosition);
-
-    newPosition -=  m_LastMousePosition.GetVectorFromOrigin();  // compute difference between actual and last mouse position
-
-    mitk::vm2itk(posEvent->GetWorldPosition(), m_LastMousePosition);  // save current mouse position as last position
+    mitk::ITKPoint3D newPosition;
+		if (posEvent != NULL)   // 3D coordinate in event
+    {
+		  mitk::vm2itk(posEvent->GetWorldPosition(), newPosition);          //converting from Point3D to itk::Point      
+      newPosition -=  m_LastMousePosition.GetVectorFromOrigin();        // compute difference between actual and last mouse position
+      mitk::vm2itk(posEvent->GetWorldPosition(), m_LastMousePosition);  // save current mouse position as last position
+    }
+    else if (displayEvent != NULL)  // 2D coordinate in event
+    {
+      mitk::ITKPoint3D p;
+      if(ConvertDisplayEventToWorldPosition(displayEvent, p) == false)
+        return false;
+      newPosition = p - m_LastMousePosition.GetVectorFromOrigin();        // compute difference between actual and last mouse position
+      m_LastMousePosition = p;    // save current mouse position as last position
+    }
 
     /* create operation with position difference */
     mitk::PointOperation* doOp = new mitk::PointOperation(OpMOVE, newPosition, 0); // Index is not used here
@@ -129,9 +235,7 @@ bool mitk::AffineInteractor::ExecuteAction(int actionId, mitk::StateEvent const*
       oldPosition[2] = pos[2];
 
       PointOperation* undoOp = new mitk::PointOperation(OpMOVE, oldPosition, 0);
-			OperationEvent *operationEvent = new OperationEvent(geometry,
-																	doOp, undoOp,
-																	objectEventId, groupEventId);
+			OperationEvent *operationEvent = new OperationEvent(geometry, doOp, undoOp, objectEventId, groupEventId);
 			m_UndoController->SetOperationEvent(operationEvent);
 		}
 		/* execute the Operation */
@@ -139,28 +243,30 @@ bool mitk::AffineInteractor::ExecuteAction(int actionId, mitk::StateEvent const*
     ok = true;
 	  break;
   }
-  case AcROTATESTART:
-  {
-    mitk::PositionEvent const  *posEvent = dynamic_cast <const mitk::PositionEvent *> (stateEvent->GetEvent());
-		if (posEvent == NULL) return false;
-    //converting from Point3D to itk::Point
-		//mitk::ITKPoint3D newPosition;
-		mitk::vm2itk(posEvent->GetWorldPosition(), m_LastMousePosition);
-    // save mouse down position
-    //m_lastRotatePosition = newPosition.GetVectorFromOrigin();
-    ok = true;
-    break;
-  }
+  // Not needed anymore - does the same as AcTRANSLATESTART --> see there
+  //case AcROTATESTART:
+  //{    
+		//if (posEvent == NULL)
+  //    return false;    
+		//mitk::vm2itk(posEvent->GetWorldPosition(), m_LastMousePosition);
+  //  ok = true;
+  //  break;
+  //}
   case AcROTATE:
   {
-    mitk::PositionEvent const  *posEvent = dynamic_cast <const mitk::PositionEvent *> (stateEvent->GetEvent());
-		if (posEvent == NULL) return false;
-    //converting from Point3D to itk::Point
-		mitk::ITKPoint3D dummy;
-    mitk::vm2itk(posEvent->GetWorldPosition(), dummy);
+    mitk::ITKPoint3D p;
+		if (posEvent != NULL)   // 3D coordinate in event
+    {
+		  mitk::vm2itk(posEvent->GetWorldPosition(), p);          //converting from Point3D to itk::Point      
+    }
+    else if (displayEvent != NULL)  // 2D coordinate in event
+    {
+      if(ConvertDisplayEventToWorldPosition(displayEvent, p) == false)
+        return false;
+    }
+    mitk::ITKVector3D newPosition = p.GetVectorFromOrigin();
 
-    mitk::ITKVector3D newPosition = dummy.GetVectorFromOrigin();
-
+    std::cout << "  Rotation. Worldposition = " << newPosition << std::endl;
     mitk::ScalarType position[3];
     geometry->GetVtkTransform()->GetPosition(position);
     mitk::ITKVector3D dataPosition = position;
@@ -174,11 +280,10 @@ bool mitk::AffineInteractor::ExecuteAction(int actionId, mitk::StateEvent const*
     rotationaxis[0] =  startPosition[1] * newPosition[2] - startPosition[2] * newPosition[1];
     rotationaxis[1] =  startPosition[2] * newPosition[0] - startPosition[0] * newPosition[2];
     rotationaxis[2] =  startPosition[0] * newPosition[1] - startPosition[1] * newPosition[0];
-
+    
     /* calculate rotation angle in degrees */
     mitk::ScalarType angle = atan2(rotationaxis.GetNorm(), newPosition * startPosition) * (180/vnl_math::pi);
-
-    m_LastMousePosition = dummy; // save current mouse position as last mouse position
+    m_LastMousePosition = p; // save current mouse position as last mouse position
 
     /* create operation with center of rotation, angle and axis and send it to the geometry and Undo controller */
     mitk::RotationOperation* doOp = new mitk::RotationOperation(OpROTATE, ITKPoint3D(position) , rotationaxis, angle);
@@ -186,9 +291,7 @@ bool mitk::AffineInteractor::ExecuteAction(int actionId, mitk::StateEvent const*
     if (m_UndoEnabled)	//write to UndoMechanism
 		{
       RotationOperation* undoOp = new mitk::RotationOperation(OpROTATE, ITKPoint3D(position) , rotationaxis, -angle);
-			OperationEvent *operationEvent = new OperationEvent(geometry,
-																	doOp, undoOp,
-																	objectEventId, groupEventId);
+      OperationEvent *operationEvent = new OperationEvent(geometry, doOp, undoOp, objectEventId, groupEventId);
 			m_UndoController->SetOperationEvent(operationEvent);
 		}
 		/* execute the Operation */
@@ -196,20 +299,20 @@ bool mitk::AffineInteractor::ExecuteAction(int actionId, mitk::StateEvent const*
     ok = true;
 	  break;
   }
-  case AcSCALESTART:
-  {
-    mitk::PositionEvent const  *posEvent = dynamic_cast <const mitk::PositionEvent *> (stateEvent->GetEvent());
-		if (posEvent == NULL) return false;
-    /*converting from Point3D to itk::Point */
-		mitk::vm2itk(posEvent->GetWorldPosition(), m_LastMousePosition);
+  //case AcSCALESTART:
+  //{
+		//if (posEvent == NULL)
+  //    return false;
+  //  /*converting from Point3D to itk::Point */
+		//mitk::vm2itk(posEvent->GetWorldPosition(), m_LastMousePosition);
 
-    ok = true;
-    break;
-  }
+  //  ok = true;
+  //  break;
+  //}
   case AcSCALE:
   {
-    mitk::PositionEvent const  *posEvent = dynamic_cast <const mitk::PositionEvent *> (stateEvent->GetEvent());
-		if (posEvent == NULL) return false;
+		if (posEvent == NULL)
+      return false;
     //converting from Point3D to itk::Point
 		mitk::ITKPoint3D newPosition;
 		mitk::vm2itk(posEvent->GetWorldPosition(), newPosition);
@@ -250,9 +353,7 @@ bool mitk::AffineInteractor::ExecuteAction(int actionId, mitk::StateEvent const*
       oldScaleData[2] = -newScale[2];
 
       PointOperation* undoOp = new mitk::PointOperation(OpSCALE, oldScaleData, 0);
-			OperationEvent *operationEvent = new OperationEvent(geometry,
-																	doOp, undoOp,
-																	objectEventId, groupEventId);
+      OperationEvent *operationEvent = new OperationEvent(geometry, doOp, undoOp, objectEventId, groupEventId);
 			m_UndoController->SetOperationEvent(operationEvent);
 		}
 		/* execute the Operation */
@@ -303,4 +404,45 @@ bool mitk::AffineInteractor::CheckSelected(const mitk::Point3D& worldPoint)
       selected = box->IsInside(itkPoint); // check if point is inside the datas bounding box
     }
     return selected;
+}
+
+bool mitk::AffineInteractor::ConvertDisplayEventToWorldPosition(mitk::DisplayPositionEvent const* displayEvent, mitk::ITKPoint3D& worldPoint)
+{
+  mitk::Point2D displayPoint = displayEvent->GetDisplayPosition();
+  /* Copied from vtk Sphere widget */
+  double focalPoint[4], position[4];
+  double z;
+  mitk::GlobalInteraction* globalInteraction = dynamic_cast<mitk::GlobalInteraction*>(mitk::EventMapper::GetGlobalStateMachine());
+  if (globalInteraction == NULL)
+    return false;
+  const FocusManager::FocusElement* fe = globalInteraction->GetFocus();
+  FocusManager::FocusElement* fe2 =  const_cast <FocusManager::FocusElement*>(fe);
+  mitk::OpenGLRenderer* glRenderer = dynamic_cast<mitk::OpenGLRenderer*>(fe2);
+  if (glRenderer == NULL)
+    return false;
+  vtkRenderer *renderer = glRenderer->GetVtkRenderer();
+  vtkCamera *camera = renderer->GetActiveCamera();
+  if ( !camera )
+  {
+    return false;
+  }
+  // Compute the two points defining the motion vector
+  camera->GetFocalPoint(focalPoint);
+  //this->ComputeWorldToDisplay(focalPoint[0], focalPoint[1], focalPoint[2], focalPoint);
+  renderer->SetWorldPoint(focalPoint[0], focalPoint[1], focalPoint[2], 1.0);
+  renderer->WorldToDisplay();
+  renderer->GetDisplayPoint(focalPoint);
+  z = focalPoint[2];
+  //      this->ComputeDisplayToWorld(displayPoint.x, displayPoint.y, z, position);
+  renderer->SetDisplayPoint(displayPoint.x, displayPoint.y, z);
+  renderer->DisplayToWorld();
+  renderer->GetWorldPoint(position);
+  if (position[3])
+  {
+    worldPoint[0] = position[0] / position[3];
+    worldPoint[1] = position[1] / position[3];
+    worldPoint[2] = position[2] / position[3];
+    position[3] = 1.0;
+  }
+  return true;
 }

@@ -22,7 +22,8 @@
 
 
 //##ModelId=3E33ECF301AD
-mitk::OpenGLRenderer::OpenGLRenderer() : m_VtkMapperPresent(false)
+mitk::OpenGLRenderer::OpenGLRenderer() : m_VtkMapperPresent(false), 
+	m_VtkRenderer(NULL), m_MitkVtkRenderWindow(NULL)
 {
   m_CameraController=NULL;
   m_CameraController = VtkInteractorCameraController::New();

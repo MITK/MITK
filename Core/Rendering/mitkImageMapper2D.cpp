@@ -299,7 +299,6 @@ void mitk::ImageMapper2D::GenerateData(mitk::BaseRenderer *renderer)
 
   //	std::cout << vtkoutput <<std::endl;
   ipPicDescriptor* pic = Pic2vtk::convert(vtkoutput);
-    ipPicPut("c:/a.pic",pic);
   assert(pic);
   if(pic->dim==1)
   {

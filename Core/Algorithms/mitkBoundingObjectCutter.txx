@@ -94,38 +94,63 @@ void BoundingObjectCutter<TPixel>::GenerateData() {
   }
 
    m_BoundingObject->UpdateOutputInformation();
-   mitk::Geometry3D* bOGeometry =  m_BoundingObject->GetGeometry();
+   mitk::Geometry3D* bOGeometry =  m_BoundingObject->GetGeometry(); 
    mitk::Geometry3D* inputImageGeometry = inputMitkImage->GetSlicedGeometry();
    mitk::BoundingBox::Pointer bOBoxRelativeToImage = bOGeometry->CalculateBoundingBoxRelativeToTransform( inputImageGeometry->GetIndexToWorldTransform() );
+   
+   //mitk::Geometry3D::Pointer outputImageGeometry = mitk::Geometry3D::New();   
+   //outputImageGeometry->SetIndexToWorldTransform( inputImageGeometry->GetIndexToWorldTransform() );
+   //outputImageGeometry->SetBounds( bOBoxRelativeToImage->GetBounds() );
+   //outputImageGeometry->Initialize();
 
-
-   // bOGeometryRelativeToImage->SetSpacing (inputImageGeometry->GetSpacing ); // !! achtung auflösung einfügen
-   mitk::Geometry3D::Pointer outputImageGeometry = mitk::Geometry3D::New();
-   outputImageGeometry->SetParametricBounds( bOBoxRelativeToImage->GetBounds() );
-   outputImageGeometry->Initialize();
-
-   outputImage->Initialize( inputMitkImage->GetPixelType(), *outputImageGeometry, false );
-
-   // convert to itkImage
-  typename ItkImageType::Pointer outputItkImage = ItkImageType::New();  
-  CastToItkImage(outputImage, outputItkImage);
-
-  // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+   //outputImage->Initialize( inputMitkImage->GetPixelType(), *outputImageGeometry, false );
 
   ItkRegionType regionOfInterest;
   typename ItkImageType::IndexType start;
   mitk::BoundingBox::PointType min = bOBoxRelativeToImage->GetMinimum();
   mitk::BoundingBox::PointType max = bOBoxRelativeToImage->GetMaximum();
-  start[0] =  min[0];
-  start[1] =  min[1];
-  start[2] =  min[2];
+  start[0] = min[0];
+  start[1] = min[1];
+  start[2] = min[2];
   regionOfInterest.SetIndex(start);
   typename ItkImageType::SizeType size;  
-  size[0] = max[0] - min[0];
-  size[1] = max[1] - min[1];
-  size[2] = max[2] - min[2];
+  ItkImageType::SizeType inputSize = inputItkImage->GetLargestPossibleRegion().GetSize();
+  if ( inputSize[0] < max[0] )
+    size[0] = inputSize[0] - min[0];
+  else 
+    size[0] = max[0] - min[0];
+  if ( inputSize[1] < max[1] )
+    size[1] = inputSize[1] - min[1];
+  else 
+    size[1] = max[1] - min[1];
+  if ( inputSize[2] < max[2] )
+    size[2] = inputSize[2] - min[2];
+  else 
+    size[2] = max[2] - min[2];
   regionOfInterest.SetSize(size);  
 
+  mitk::Vector3D spacing = inputMitkImage->GetSlicedGeometry()->GetSpacing();
+
+  //outputImage->SetSpacing(spacing);
+   // convert to itkImage
+  //typename ItkImageType::Pointer outputItkImage = ItkImageType::New();  
+  //CastToItkImage(outputImage, outputItkImage);
+
+
+  ItkImageType::Pointer outputItkImage = ItkImageType::New();
+  ItkRegionType outputRegion;
+  outputRegion.SetSize(size);
+  ItkImageType::IndexType origin;
+  origin.Fill(0);
+  outputRegion.SetIndex(origin);
+  outputItkImage->SetRegions(outputRegion);
+  ItkImageType::SpacingType itkSpacing;
+  itkSpacing[0] = spacing[0];
+  itkSpacing[1] = spacing[1];
+  itkSpacing[2] = spacing[2];
+  outputItkImage->SetSpacing(itkSpacing);
+  outputItkImage->Allocate();
+ 
   ItkImageIteratorType inputIt( inputItkImage, regionOfInterest );
   ItkImageIteratorType outputIt( outputItkImage, outputItkImage->GetLargestPossibleRegion() );
 
@@ -133,41 +158,54 @@ void BoundingObjectCutter<TPixel>::GenerateData() {
   m_OutsidePixelCount = 0;
   m_InsidePixelCount = 0;
   mitk::Point3D p;
+  ItkImageType::IndexType indexIn;
+  ItkImageType::IndexType indexOut;
+
+
 
   if (GetUseInsideValue()) // use a fixed value for each inside pixel (create a binary mask of the bounding object)
     for ( inputIt.GoToBegin(), outputIt.GoToBegin(); !inputIt.IsAtEnd(); ++inputIt, ++outputIt)
     {
+      indexIn = inputIt.GetIndex();
+      indexOut = outputIt.GetIndex();
       //itkImage->TransformIndexToPhysicalPoint(inputIt.GetIndex(), p);  // transform index of current pixel to world coordinate point
       p[0] = inputIt.GetIndex()[0]; p[1] = inputIt.GetIndex()[1]; p[2] = inputIt.GetIndex()[2]; 
       inputMitkImage->GetGeometry()->UnitsToMM(p, p);
       if(m_BoundingObject->IsInside(p))
       {
-        outputIt.Value() = m_InsideValue;
+        outputIt.Set(m_InsideValue);
         m_InsidePixelCount++;
       }
       else
       {
-        outputIt.Value() = m_OutsideValue;
+        outputIt.Set(m_OutsideValue);
         m_OutsidePixelCount++;
       }
     }
   else // no fixed value for inside, use the pixel value of the original image (normal cutting)
 
-    for ( inputIt.GoToBegin(), outputIt.GoToBegin(); !inputIt.IsAtEnd(); ++inputIt, ++outputIt)
+    for ( inputIt.GoToBegin(), outputIt.GoToBegin(); !inputIt.IsAtEnd() && !outputIt.IsAtEnd(); ++inputIt, ++outputIt)
     {
+      indexIn = inputIt.GetIndex();
+      indexOut = outputIt.GetIndex();
       p[0] = inputIt.GetIndex()[0]; p[1] = inputIt.GetIndex()[1]; p[2] = inputIt.GetIndex()[2]; 
       inputMitkImage->GetGeometry()->UnitsToMM(p, p);
       if(m_BoundingObject->IsInside(p))
       {
-        outputIt.Value() = inputIt.Value();
+        outputIt.Set( inputIt.Value());
         m_InsidePixelCount++;
       }
       else
       {
-        outputIt.Value() = m_OutsideValue;
+        outputIt.Set( m_OutsideValue );
         m_OutsidePixelCount++;
       }
     }  
+
+  CastToMitkImage(outputItkImage, outputImage);
+  /* Position the output Image to match the corresponding region of the input image */
+  outputImage->GetGeometry()->GetVtkTransform()->Translate(min[0], min[1], min[2]);
+  outputImage->GetGeometry()->TransferVtkToITKTransform();
 }
 
 

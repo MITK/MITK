@@ -8,15 +8,15 @@ Do a CVS checkout of \c mMITKExample for the sample application including the li
 Start the CMake-GUI: 
 
 <b>Linux:</b>
-\c cd to your preferred build directory and use the command <c> ccmake <path-to-ip++-dir> <\c>. Press \c t to toggle advanced mode.
-<b>Windows</b>
+\c cd to your preferred build directory and use the command <c> ccmake <path-to-ip++-dir> <\c><br>
+<b>Windows:</b>
 Start \c CMakeSetup and select the path to \c ip++ as source directory and the path you like for binary directory. Select your compiler.
-Toggle the advanced values checkbox. 
-
+<br>
 After checking the configured values and changing them if needed you can generate the Makefiles or MSVC-Profiles. 
-
+<br>
 <b>Linux:</b>
 \c make
-<b>Windows</b>
+<br>
+<b>Windows:</b>
 Open the just created solution file in \c ip++ and build the desired target.
 */

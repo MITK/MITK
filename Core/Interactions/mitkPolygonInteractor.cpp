@@ -75,7 +75,7 @@ bool mitk::PolygonInteractor::ExecuteSideEffect(int sideEffectId, mitk::StateEve
         return false;
 
       //inserting the new interactor into the list
-      //referencecounting has to be made. but so far I can see is it ok. 
+      //referencecounting has to be made. but so far I can see it is ok. 
       mitk::PointInteractor::Pointer pointInteractor = new mitk::PointInteractor("pointinteractor", m_DataTreeNode, m_PointIdCount);
       m_PointList->insert(PointListType::value_type(m_PointIdCount, pointInteractor));
 
@@ -101,7 +101,7 @@ bool mitk::PolygonInteractor::ExecuteSideEffect(int sideEffectId, mitk::StateEve
       mitk::PositionEvent const  *posEvent = dynamic_cast <const mitk::PositionEvent *> (stateEvent->GetEvent());
 		  if (posEvent == NULL) 
         return false;
-      //only one line can be selected. get the line and rebuild the cell with the ID of the new 
+      //only one line may be selected. get the line and rebuild the cell with the ID of the new 
       //point inserted between the two points of the selected line
       mitk::ITKPoint3D itkPoint;
 		  mitk::vm2itk(posEvent->GetWorldPosition(), itkPoint);

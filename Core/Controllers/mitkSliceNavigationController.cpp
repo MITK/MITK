@@ -35,6 +35,23 @@ mitk::SliceNavigationController::~SliceNavigationController()
 
 }
 
+void mitk::SliceNavigationController::SetInputWorldGeometry(const mitk::Geometry3D* geometry)
+{
+  if(geometry != NULL)
+  {
+    if(const_cast<BoundingBox*>(geometry->GetBoundingBox())->GetDiagonalLength2()<eps)
+    {
+      itkWarningMacro("setting an empty bounding-box");
+      geometry = NULL;
+    }
+  }
+  if(m_InputWorldGeometry != geometry)
+  {
+    m_InputWorldGeometry = geometry;
+    Modified();
+  }
+}
+
 void mitk::SliceNavigationController::Update()
 {
   if(m_BlockUpdate)

@@ -74,7 +74,7 @@ public:
 
   enum ViewDirection{Transversal, Sagittal, Frontal, Original};
 
-  itkSetObjectMacro(InputWorldGeometry, const mitk::Geometry3D);
+  void SetInputWorldGeometry(const mitk::Geometry3D* geometry);
   itkGetConstObjectMacro(InputWorldGeometry, mitk::Geometry3D);
 
   itkGetConstObjectMacro(CreatedWorldGeometry, mitk::Geometry3D);

@@ -149,15 +149,18 @@ void QmitkSimpleExampleFunctionality::initNavigators()
       geometry=timegeometry;
     }
 
-    multiplexUpdateController->SetBlockUpdate(true);
-      sliceNavigatorTransversal->SetInputWorldGeometry(geometry.GetPointer()); sliceNavigatorTransversal->Update();
-      sliceNavigatorSagittal->SetInputWorldGeometry(geometry.GetPointer());    sliceNavigatorSagittal->Update();
-      sliceNavigatorFrontal->SetInputWorldGeometry(geometry.GetPointer());     sliceNavigatorFrontal->Update();
-      sliceNavigatorTime->SetInputWorldGeometry(geometry.GetPointer());        sliceNavigatorTime->Update();
-    multiplexUpdateController->SetBlockUpdate(false);
-    multiplexUpdateController->UpdateRequest();
+    if(const_cast<mitk::BoundingBox*>(geometry->GetBoundingBox())->GetDiagonalLength2()>=mitk::eps)
+    {
+      multiplexUpdateController->SetBlockUpdate(true);
+        sliceNavigatorTransversal->SetInputWorldGeometry(geometry.GetPointer()); sliceNavigatorTransversal->Update();
+        sliceNavigatorSagittal->SetInputWorldGeometry(geometry.GetPointer());    sliceNavigatorSagittal->Update();
+        sliceNavigatorFrontal->SetInputWorldGeometry(geometry.GetPointer());     sliceNavigatorFrontal->Update();
+        sliceNavigatorTime->SetInputWorldGeometry(geometry.GetPointer());        sliceNavigatorTime->Update();
+      multiplexUpdateController->SetBlockUpdate(false);
+      multiplexUpdateController->UpdateRequest();
 
-    m_NavigatorsInitialized=true;
+      m_NavigatorsInitialized=true;
+    }
   }
 }
 
@@ -174,13 +177,16 @@ void QmitkSimpleExampleFunctionality::activated()
   // init widget 4 as a 3D widget
   multiWidget->mitkWidget4->GetRenderer()->SetMapperID(2);
 
-  multiplexUpdateController->SetBlockUpdate(true);
-    sliceNavigatorTransversal->Update();
-    sliceNavigatorSagittal->Update();
-    sliceNavigatorFrontal->Update();
-    sliceNavigatorTime->Update();
-  multiplexUpdateController->SetBlockUpdate(false);
-  multiplexUpdateController->UpdateRequest();
+  if(m_NavigatorsInitialized)
+  {
+    multiplexUpdateController->SetBlockUpdate(true);
+      sliceNavigatorTransversal->Update();
+      sliceNavigatorSagittal->Update();
+      sliceNavigatorFrontal->Update();
+      sliceNavigatorTime->Update();
+    multiplexUpdateController->SetBlockUpdate(false);
+    multiplexUpdateController->UpdateRequest();
+  }
 }
 
 //void QmitkSimpleExampleFunctionality::deactivated()

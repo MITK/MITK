@@ -55,7 +55,8 @@
 
 /* main function                                                         */
 
-void main (int argc, char **argv) 
+int
+main (int argc, char **argv) 
 {
 	/* variables                                                          */
 	
@@ -1326,5 +1327,7 @@ void main (int argc, char **argv)
 		if ( pic_hlp != NULL ) ipPicFree  ( pic_hlp );
 		pic_hlp = NULL;
 	}
+
+    return 0;
 }
 

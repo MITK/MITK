@@ -913,7 +913,7 @@ main (int argc, char **argv)
 			( ( (unsigned int) argc == 3 ) && ( strcasecmp (argv[2], "-h") == 0 ) ) || 
 			( (unsigned int) argc != 6 ) )
 		{
-			printf("Usage: ipFunc LevWind infile outfile level window \n" );
+			printf("Usage: ipFunc LevWin infile outfile level window \n" );
 			exit(1);
 		}
 		sscanf  ( argv[4], "%lf", &gv_low );

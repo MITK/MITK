@@ -178,9 +178,10 @@ void mitk::GlobalInteraction::AskCurrentInteractor(mitk::StateEvent const* state
   if (m_JurisdictionMap.empty())
     return;
 
-  if ( m_CurrentInteractorIter != m_JurisdictionMap.end())//if set
+  bool handled = false;
+  while ( m_CurrentInteractorIter != m_JurisdictionMap.end()&& !handled)
   {
-    (*m_CurrentInteractorIter).second->HandleEvent(stateEvent);
+    handled = (*m_CurrentInteractorIter).second->HandleEvent(stateEvent);
 
     //if after handling an event Interactor is in mode SELECTED or SUBSELECTED
     //then make sure, that this sub-/ selected interactor gets the next event
@@ -196,10 +197,11 @@ void mitk::GlobalInteraction::AskCurrentInteractor(mitk::StateEvent const* state
     }
     else //if the event could not be handled, then go to next interactor
     {
-      m_CurrentInteractorIter++;
+      if (!handled) 
+        m_CurrentInteractorIter++;
       //if at end, then loop to the begining
-      if (m_CurrentInteractorIter == m_JurisdictionMap.end())
-        m_CurrentInteractorIter= m_JurisdictionMap.begin();
+      /*if (m_CurrentInteractorIter == m_JurisdictionMap.end())
+        m_CurrentInteractorIter= m_JurisdictionMap.begin();*/
     }
   }
 }

@@ -1,5 +1,5 @@
-#ifndef _MITK_DATA_TREE_NODE_SOURCE_H
-#define _MITK_DATA_TREE_NODE_SOURCE_H
+#ifndef _MITK_POINT_SET_SOURCE_H
+#define _MITK_POINT_SET_SOURCE_H
 
 #include "itkProcessObject.h"
 #include "mitkPointSet.h"
@@ -35,25 +35,25 @@ public:
     virtual itk::DataObject::Pointer MakeOutput ( unsigned int idx );
 
     /**
-     * Allows to set the output of the base data source. 
-     * @param output the intended output of the base data source
+     * Allows to set the output of the point set source. 
+     * @param output the intended output of the point set source
      */
     virtual void SetOutput( OutputType* output );
     
     /**
-     * Allows to set the n-th output of the base data source. 
-     * @param output the intended output of the base data source
+     * Allows to set the n-th output of the point set source. 
+     * @param output the intended output of the point set source
      */
     virtual void SetOutput( unsigned int idx, OutputType* output );
     
     /**
-     * Returns the output with index 0 of the base data source
+     * Returns the output with index 0 of the point set source
      * @returns the output
      */
     virtual OutputType* GetOutput();
     
     /**
-     * Returns the n'th output of the base data source
+     * Returns the n'th output of the point set source
      * @param idx the index of the wanted output
      * @returns the output with index idx.
      */
@@ -68,4 +68,4 @@ protected:
 };
 
 }
-#endif // #define _MITK_BASE_DATA_SOURCE_H
+#endif // #define _MITK_POINT_SET_SOURCE_H

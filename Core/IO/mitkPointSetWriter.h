@@ -8,6 +8,14 @@
 namespace mitk
 {
 
+/**
+ * @brief XML-based writer for mitk::PointSets 
+ * @ingroup Process
+ * XML-based writer for mitk::PointSets. Multiple PointSets can be written in
+ * a single XML file by simply setting multiple inputs to the filter. 
+ * Writing of multiple XML files according to a given filename pattern is not
+ * yet supported.
+ */
 class PointSetWriter : public itk::ProcessObject, public mitk::FileWriter
 {
 public:
@@ -51,14 +59,36 @@ public:
      */
     itkGetStringMacro( FilePattern );
 
-    void SetInput( InputType* );
+    /**
+     * Sets the 0'th input object for the filter.
+     * @param input the first input for the filter.
+     */
+    void SetInput( InputType* input );
 
-    void SetInput( const unsigned int& num, InputType* );
+    /**
+     * Sets the n'th input object for the filter. If num is
+     * larger than GetNumberOfInputs() the number of inputs is
+     * resized appropriately.
+     * @param input the n'th input for the filter.
+     */
+    void SetInput( const unsigned int& num, InputType* input);
 
+    /**
+     * @returns the 0'th input object of the filter.
+     */
     PointSet* GetInput();
 
+    /**
+     * @param num the index of the desired output object.
+     * @returns the n'th input object of the filter. 
+     */
     PointSet* GetInput( const unsigned int& num );
 
+    
+    /**
+     * Explicitly calls GenerateData(), since the pipelines Update()
+     * is broken. This will be fixed.
+     */
     void Write();
 
 protected:
@@ -75,24 +105,41 @@ protected:
 
 
     /**
-     * Determines of which file type a given file is and calls the 
-     * appropriate reader function.
+     * Writes the XML file
      */
     virtual void GenerateData();
 
 
     /**
      * Resizes the number of inputs of the writer.
-     * The outputs are initialized by empty PointSets
+     * The inputs are initialized by empty PointSets
      * @param num the new number of inputs
      */
     virtual void ResizeInputs( const unsigned int& num );
 
+    
+    /**
+     * Converts an arbitrary type to a string. The type has to
+     * support the << operator. This works fine at least for integral
+     * data types as float, int, long etc.
+     * @param value the value to convert
+     * @returns the string representation of value
+     */
     template < typename T>
     std::string ConvertToString( T value );
-
+    
+    /**
+     * Writes an XML representation of the given point set to 
+     * an outstream. The XML-Header an root node is not included!
+     * @param pointSet the point set to be converted to xml
+     * @param out the stream to write to.
+     */
     void WriteXML( mitk::PointSet* pointSet, std::ofstream& out );
 
+    /**
+     * Writes an standard xml header to the given stream.
+     * @param file the stream in which the header is written.
+     */
     void WriteXMLHeader( std::ofstream &file );
     
     /** Write a start element tag */
@@ -116,6 +163,7 @@ protected:
     /** Write character data inside a tag. */
     void WriteCharacterData( std::string &data, std::ofstream &file );
 
+    /** Writes empty spaces to the stream according to m_IndentDepth and m_Indent */
     void WriteIndent( std::ofstream& file );
 
     std::string m_FileName;

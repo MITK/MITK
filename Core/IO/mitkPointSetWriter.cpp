@@ -2,6 +2,11 @@
 #include <iostream>
 #include <fstream>
 
+
+//
+// Initialization of the xml tags.
+//
+
 const char* mitk::PointSetWriter::XML_POINT_SET_FILE = "point_set_file" ;
 
 const char* mitk::PointSetWriter::XML_FILE_VERSION = "file_version" ;
@@ -21,10 +26,11 @@ const char* mitk::PointSetWriter::XML_Z = "z" ;
 const char* mitk::PointSetWriter::VERSION_STRING = "0.1" ;
 
 
+
+
 mitk::PointSetWriter::PointSetWriter()
 {
     this->SetNumberOfInputs( 1 );
-
     m_Indent = 2;
     m_IndentDepth = 0;
 }
@@ -40,6 +46,8 @@ mitk::PointSetWriter::~PointSetWriter()
 
 void mitk::PointSetWriter::GenerateData()
 {
+    m_IndentDepth = 0;
+    
     //
     // Opening the file to write to
     //
@@ -55,7 +63,6 @@ void mitk::PointSetWriter::GenerateData()
         out.close();
         return ;
     }
-    m_IndentDepth = 0;
 
     //
     // Here the actual xml writing takes place
@@ -65,16 +72,58 @@ void mitk::PointSetWriter::GenerateData()
     WriteStartElement( XML_FILE_VERSION, out );
     WriteCharacterData( VERSION_STRING, out );
     WriteEndElement( XML_FILE_VERSION, out, false );
+    
+    //
+    // for each input object write its xml representation to 
+    // the stream
+    //
     for ( unsigned int i = 0 ; i < this->GetNumberOfInputs(); ++i )
     {
         InputType::Pointer pointSet = this->GetInput( i );
         assert( pointSet.IsNotNull() );
         WriteXML( pointSet.GetPointer(), out );
     }
+    
     WriteEndElement( XML_POINT_SET_FILE, out );
 
     out.close();
 }
+
+
+
+
+void mitk::PointSetWriter::WriteXML( mitk::PointSet* pointSet, std::ofstream& out )
+{
+    WriteStartElement( XML_POINT_SET, out );
+    mitk::PointSet::PointsContainer* pointsContainer = pointSet->GetPointSet()->GetPoints();
+    mitk::PointSet::PointsContainer::Iterator it, end;
+    for ( it = pointsContainer->Begin(); it != pointsContainer->End(); ++it )
+    {
+        WriteStartElement( XML_POINT, out );
+
+        WriteStartElement( XML_ID, out );
+        WriteCharacterData( ConvertToString<int>( it->Index() ).c_str() , out );
+        WriteEndElement( XML_ID, out, false );
+
+        mitk::PointSet::PointType point = it->Value();
+
+        WriteStartElement( XML_X, out );
+        WriteCharacterData( ConvertToString<mitk::ScalarType>( point[ 0 ] ).c_str(), out );
+        WriteEndElement( XML_X, out, false );
+
+        WriteStartElement( XML_Y, out );
+        WriteCharacterData( ConvertToString<mitk::ScalarType>( point[ 1 ] ).c_str(), out );
+        WriteEndElement( XML_Y, out, false );
+
+        WriteStartElement( XML_Z, out );
+        WriteCharacterData( ConvertToString<mitk::ScalarType>( point[ 2 ] ).c_str(), out );
+        WriteEndElement( XML_Z, out, false );
+
+        WriteEndElement( XML_POINT, out );
+    }
+    WriteEndElement( XML_POINT_SET, out );
+}
+
 
 
 
@@ -148,41 +197,6 @@ std::string mitk::PointSetWriter::ConvertToString( T value )
         return o.str();
     else
         return "conversion error";
-}
-
-
-
-
-void mitk::PointSetWriter::WriteXML( mitk::PointSet* pointSet, std::ofstream& out )
-{
-    WriteStartElement( XML_POINT_SET, out );
-    mitk::PointSet::PointsContainer* pointsContainer = pointSet->GetPointSet()->GetPoints();
-    mitk::PointSet::PointsContainer::Iterator it, end;
-    for ( it = pointsContainer->Begin(); it != pointsContainer->End(); ++it )
-    {
-        WriteStartElement( XML_POINT, out );
-
-        WriteStartElement( XML_ID, out );
-        WriteCharacterData( ConvertToString<int>( it->Index() ).c_str() , out );
-        WriteEndElement( XML_ID, out, false );
-
-        mitk::PointSet::PointType point = it->Value();
-
-        WriteStartElement( XML_X, out );
-        WriteCharacterData( ConvertToString<mitk::ScalarType>( point[ 0 ] ).c_str(), out );
-        WriteEndElement( XML_X, out, false );
-
-        WriteStartElement( XML_Y, out );
-        WriteCharacterData( ConvertToString<mitk::ScalarType>( point[ 1 ] ).c_str(), out );
-        WriteEndElement( XML_Y, out, false );
-
-        WriteStartElement( XML_Z, out );
-        WriteCharacterData( ConvertToString<mitk::ScalarType>( point[ 2 ] ).c_str(), out );
-        WriteEndElement( XML_Z, out, false );
-
-        WriteEndElement( XML_POINT, out );
-    }
-    WriteEndElement( XML_POINT_SET, out );
 }
 
 

@@ -9,7 +9,7 @@
             <x>0</x>
             <y>0</y>
             <width>553</width>
-            <height>783</height>
+            <height>814</height>
         </rect>
     </property>
     <property name="sizePolicy">
@@ -49,13 +49,34 @@
         <property name="spacing">
             <number>5</number>
         </property>
-        <widget class="QPushButton">
+        <widget class="QLayoutWidget">
             <property name="name">
-                <cstring>m_RemoveButton</cstring>
+                <cstring>layout2</cstring>
             </property>
-            <property name="text">
-                <string>Remove</string>
-            </property>
+            <hbox>
+                <property name="name">
+                    <cstring>unnamed</cstring>
+                </property>
+                <property name="spacing">
+                    <number>10</number>
+                </property>
+                <widget class="QPushButton">
+                    <property name="name">
+                        <cstring>m_SaveButton</cstring>
+                    </property>
+                    <property name="text">
+                        <string>Save Selected</string>
+                    </property>
+                </widget>
+                <widget class="QPushButton">
+                    <property name="name">
+                        <cstring>m_RemoveButton</cstring>
+                    </property>
+                    <property name="text">
+                        <string>Remove</string>
+                    </property>
+                </widget>
+            </hbox>
         </widget>
         <widget class="QListView">
             <column>
@@ -193,28 +214,34 @@
 </images>
 <connections>
     <connection>
-        <sender>m_DataTreeView</sender>
-        <signal>selectionChanged(QListViewItem*)</signal>
-        <receiver>m_GlobalNodePropertiesView</receiver>
-        <slot>SelectionChanged(QListViewItem*)</slot>
-    </connection>
-    <connection>
         <sender>m_RemoveButton</sender>
         <signal>clicked()</signal>
         <receiver>QmitkDataManagerControls</receiver>
         <slot>RemoveButtonClicked()</slot>
     </connection>
     <connection>
-        <sender>m_DataTreeView</sender>
-        <signal>selectionChanged(QListViewItem*)</signal>
-        <receiver>m_RendererPropertiesView</receiver>
-        <slot>SelectionChanged(QListViewItem*)</slot>
-    </connection>
-    <connection>
         <sender>m_RenderWindowCombo</sender>
         <signal>activated(const QString&amp;)</signal>
         <receiver>m_RendererPropertiesView</receiver>
         <slot>SetRenderWindow(const QString&amp;)</slot>
+    </connection>
+    <connection>
+        <sender>m_SaveButton</sender>
+        <signal>clicked()</signal>
+        <receiver>QmitkDataManagerControls</receiver>
+        <slot>SaveButton_clicked()</slot>
+    </connection>
+    <connection>
+        <sender>m_DataTreeView</sender>
+        <signal>selectionChanged(QListViewItem*)</signal>
+        <receiver>m_GlobalNodePropertiesView</receiver>
+        <slot>SelectionChanged(QListViewItem*)</slot>
+    </connection>
+    <connection>
+        <sender>m_DataTreeView</sender>
+        <signal>selectionChanged(QListViewItem*)</signal>
+        <receiver>m_RendererPropertiesView</receiver>
+        <slot>SelectionChanged(QListViewItem*)</slot>
     </connection>
 </connections>
 <includes>
@@ -227,6 +254,7 @@
     <include location="global" impldecl="in implementation">qlistview.h</include>
     <include location="global" impldecl="in implementation">qdropsite.h</include>
     <include location="local" impldecl="in implementation">mitkGlobalInteraction.h</include>
+    <include location="local" impldecl="in implementation">QmitkCommonFunctionality.h</include>
     <include location="local" impldecl="in implementation">QmitkDataManagerControls.ui.h</include>
 </includes>
 <variables>
@@ -236,6 +264,7 @@
 </variables>
 <slots>
     <slot>RemoveButtonClicked()</slot>
+    <slot>SaveButton_clicked()</slot>
 </slots>
 <functions>
     <function access="private" specifier="non virtual">init()</function>

@@ -10,6 +10,11 @@
 #include "mitkProperties.h"
 #include "mitkEventMapper.h"
 #include "mitkFocusManager.h"
+
+#include <qfiledialog.h>
+#include "ipPic.h"
+#include "ipFunc.h"
+
 void QmitkDataManagerControls::init() { 
   while (m_DataTreeView->columns() > 0 ) {
 	m_DataTreeView->removeColumn(0);
@@ -88,8 +93,43 @@ void QmitkDataManagerControls::RemoveButtonClicked()
     assert(selectedIterator != NULL);
     selectedIterator->remove();
     delete selected;
-
   } 
 }
 
 
+void QmitkDataManagerControls::SaveButton_clicked()
+{
+  QmitkDataTreeViewItem *selected = dynamic_cast<QmitkDataTreeViewItem*>(m_DataTreeView->selectedItem());
+  if (selected != NULL) {
+    std::string m_SelectedItemsName = std::string(selected->text(0).ascii());
+  
+
+    mitk::DataTreeIterator* selectedIterator = ((mitk::DataTree *) m_DataTreeIterator->getTree())->GetNext("name", new mitk::StringProperty( m_SelectedItemsName  ));
+    if (selectedIterator != NULL)
+    {
+      mitk::DataTreeNode* node = selectedIterator->get();
+      std::cout << "2" << std::endl;
+      if (node != NULL ){
+        mitk::BaseData::Pointer data=node->GetData();
+
+        if (data.IsNotNull())
+        {
+          mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(data.GetPointer());
+          ipPicDescriptor * picImage = image->GetPic();
+
+          picImage = ipFuncRefl(picImage,3);
+
+          QString fileName = QFileDialog::getSaveFileName(QString(m_SelectedItemsName),"DKFZ Pic (*.seq *.pic *.pic.gz *.seq.gz *.dcm)");
+          if (fileName == NULL ) 
+          {
+            fileName = QString(m_SelectedItemsName.c_str());
+          }
+
+          ipPicPut((char *)fileName.ascii(), picImage);
+        }
+      }
+    } else {
+      std::cout << "logical error" << std::endl;
+    }
+  }
+}

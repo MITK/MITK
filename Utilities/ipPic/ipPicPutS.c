@@ -6,7 +6,10 @@
  *   writes a PicFile to disk
  *
  * $Log$
- * Revision 1.2  1997/09/15 13:21:19  andre
+ * Revision 1.3  1998/05/18 12:13:54  andre
+ * *** empty log message ***
+ *
+ * Revision 1.2  1997/09/15  13:21:19  andre
  * switched to new what string format
  *
  * Revision 1.1.1.1  1997/09/06  19:09:59  andre
@@ -61,6 +64,16 @@ void ipPicPutSlice( char *outfile_name, ipPicDescriptor *pic, ipUInt4_t slice )
     }
 
   if( pic->dim != pic_in->dim - 1 )
+    {
+      fclose( outfile );
+      return;
+    }
+  else if( pic->n[0] != pic_in->n[0]  )
+    {
+      fclose( outfile );
+      return;
+    }
+  else if( pic->n[1] != pic_in->n[1]  )
     {
       fclose( outfile );
       return;

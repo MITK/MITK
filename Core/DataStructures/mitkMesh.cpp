@@ -75,7 +75,7 @@ void mitk::Mesh::ExecuteOperation(Operation* operation)
       {
         if( cell->GetType() == CellType::LINE_CELL )
         {
-          LineType * line = static_cast<LineType *>( cell );
+//          LineType * line = static_cast<LineType *>( cell );
         }
       }
       else //create it

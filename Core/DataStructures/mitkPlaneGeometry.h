@@ -45,21 +45,20 @@ public:
 
   //##ModelId=3E3B9C730262
   virtual void UnitsToMM(const mitk::Point2D &pt_units, mitk::Point2D &pt_mm) const;
-
   //##ModelId=3E3B9C760112
   virtual void MMToUnits(const mitk::Point2D &pt_mm, mitk::Point2D &pt_units) const;
 
   //##ModelId=3E3B9C8C0145
   virtual void UnitsToMM(const mitk::Vector2D &vec_units, mitk::Vector2D &vec_mm) const;
-
   //##ModelId=3E3B9C8E0152
   virtual void MMToUnits(const mitk::Vector2D &vec_mm, mitk::Vector2D &vec_units) const;
+
   //##ModelId=3EF492640343
   virtual bool Map(const mitk::Point3D & atPt3d_mm, const mitk::Vector3D &vec3d_mm, mitk::Vector2D &vec2d_mm) const;
-
-
   //##ModelId=3EF49267006C
   virtual void Map(const mitk::Point2D & atPt2d_mm, const mitk::Vector2D &vec2d_mm, mitk::Vector3D &vec3d_mm) const;
+
+  virtual void Modified() const;
 
 protected:
   //##ModelId=3E395F22035A
@@ -78,14 +77,14 @@ protected:
   //## 
   //## Is calculated in SetPlaneView from the value of m_WidthInUnits and the
   //## PlaneView
-  float m_ScaleFactorMMPerUnitX;
+  mutable float m_ScaleFactorMMPerUnitX;
   //##ModelId=3E3BE12C0167
   //##Documentation
   //## @brief factor to convert y-coordinates from mm to units and vice versa
   //## 
   //## Is calculated in SetPlaneView from the value of m_HeightInUnits and
   //## the PlaneView
-  float m_ScaleFactorMMPerUnitY;
+  mutable float m_ScaleFactorMMPerUnitY;
 };
 
 } // namespace mitk

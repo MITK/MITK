@@ -41,6 +41,7 @@ void mitk::AbstractTransformGeometry::SetVtkAbstractTransform(vtkAbstractTransfo
   {
     m_VtkAbstractTransform->Register(NULL);
     m_InverseVtkAbstractTransform=m_VtkAbstractTransform->GetInverse();
+    m_InverseVtkAbstractTransform->Register(NULL);
   }
 
   m_LastVtkAbstractTransformTimeStamp = m_VtkAbstractTransform->GetMTime();
@@ -61,9 +62,6 @@ void mitk::AbstractTransformGeometry::SetPlaneView(const mitk::PlaneView& aPlane
 
   m_WidthInUnits = m_PlaneView.getOrientation1().length();
   m_HeightInUnits = m_PlaneView.getOrientation2().length();
-
-  m_ScaleFactorMMPerUnitX=m_PlaneView.getOrientation1().length()/m_WidthInUnits;
-  m_ScaleFactorMMPerUnitY=m_PlaneView.getOrientation2().length()/m_HeightInUnits;
 
   Modified();
 }
@@ -155,4 +153,12 @@ unsigned long mitk::AbstractTransformGeometry::GetMTime() const
   }
 
   return Superclass::GetMTime();
+}
+
+void mitk::AbstractTransformGeometry::Modified() const
+{
+  m_ScaleFactorMMPerUnitX=m_PlaneView.getOrientation1().length()/m_WidthInUnits;
+  m_ScaleFactorMMPerUnitY=m_PlaneView.getOrientation2().length()/m_HeightInUnits;
+
+  Superclass::Modified();
 }

@@ -30,9 +30,6 @@ void mitk::PlaneGeometry::SetPlaneView(const mitk::PlaneView& aPlaneView)
   m_WidthInUnits = (unsigned int)m_PlaneView.getOrientation1().length();
   m_HeightInUnits = (unsigned int)m_PlaneView.getOrientation2().length();
 
-  m_ScaleFactorMMPerUnitX=m_PlaneView.getOrientation1().length()/m_WidthInUnits;
-  m_ScaleFactorMMPerUnitY=m_PlaneView.getOrientation2().length()/m_HeightInUnits;
-
   Modified();
 }
 
@@ -99,3 +96,10 @@ void mitk::PlaneGeometry::Map(const mitk::Point2D & atPt2d_mm, const mitk::Vecto
   m_PlaneView.map(vec2d_mm, vec3d_mm);
 }
 
+void mitk::PlaneGeometry::Modified() const
+{
+  m_ScaleFactorMMPerUnitX=m_PlaneView.getOrientation1().length()/m_WidthInUnits;
+  m_ScaleFactorMMPerUnitY=m_PlaneView.getOrientation2().length()/m_HeightInUnits;
+
+  Superclass::Modified();
+}

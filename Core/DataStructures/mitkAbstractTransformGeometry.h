@@ -81,6 +81,9 @@ public:
   virtual void Map(const mitk::Point2D & atPt2d_mm, const mitk::Vector2D &vec2d_mm, mitk::Vector3D &vec3d_mm) const;
   
   virtual unsigned long GetMTime() const;
+
+  virtual void Modified() const;
+
 protected:
   //##ModelId=3EF4A266029C
   AbstractTransformGeometry();
@@ -110,14 +113,14 @@ protected:
   //## 
   //## Is calculated in SetPlaneView from the value of m_WidthInUnits and the
   //## PlaneView
-  float m_ScaleFactorMMPerUnitX;
+  mutable float m_ScaleFactorMMPerUnitX;
   //##ModelId=3EF4A266022D
   //##Documentation
   //## @brief factor to convert y-coordinates from mm to units and vice versa
   //## 
   //## Is calculated in SetPlaneView from the value of m_HeightInUnits and
   //## the PlaneView
-  float m_ScaleFactorMMPerUnitY;
+  mutable float m_ScaleFactorMMPerUnitY;
 
   mutable unsigned long m_LastVtkAbstractTransformTimeStamp;
 };

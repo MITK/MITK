@@ -9,7 +9,7 @@ namespace mitk {
 
 //##ModelId=3E5A3910009B
 //##Documentation
-//## @brief adds additional Information (Name and StateID) to an Event
+//## @brief adds additional Information (Name and EventID) to an Event
 //## @ingroup Interaction
 //## A name and an ID is added to the information of an event, so the event can
 //## be processed futher on.

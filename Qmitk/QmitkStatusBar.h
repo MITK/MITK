@@ -1,6 +1,7 @@
 #ifndef QMITKSTATUSBAR_H
 #define QMITKSTATUSBAR_H
 #include <mitkStatusBar.h>
+#include <mitkCommon.h>
 #include <qstatusbar.h>
 
 //##Documentation

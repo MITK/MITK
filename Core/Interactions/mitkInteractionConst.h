@@ -1,5 +1,12 @@
 #ifndef MITKINTERACTCONST_H
 #define MITKINTERACTCONST_H
+//##Documentation
+//## @brief Constants for most interaction classes, due to the generic StateMachines.
+//##
+//## @ingroup Interaction
+//##
+//## Changes in Type, ButtonState or Key has to be don in mitkEventMapper.cpp, too.
+
 /*Prefixes for Constants:
 E = Enumeration
 EID = EventId's

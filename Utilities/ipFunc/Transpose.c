@@ -62,6 +62,9 @@
  *  @return transposed image 
  *
  * $Log$
+ * Revision 1.3  2003/01/30 14:30:53  mark
+ * in Scale.c _ipFuncScaleBL auskommentiert, wegen Fehler
+ *
  * Revision 1.2  2000/05/24 15:29:43  tobiask
  * Changed the installation paths of the package.
  *
@@ -236,6 +239,12 @@ ipPicDescriptor *ipFuncTranspose( ipPicDescriptor *pic,
  
   free( (void *) r_index );
   if (default_perm) free ((void *) permutations_vector);
+
+
+  /* Copy Tags */
+
+  ipFuncCopyTags(pic_return, pic);
+
   return( pic_return );
 }
 #endif

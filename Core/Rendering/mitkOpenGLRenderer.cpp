@@ -285,6 +285,7 @@ void mitk::OpenGLRenderer::Update()
 
 //##ModelId=3E330D2903CC
 void mitk::OpenGLRenderer::Render()
+//first render vtkActors, then render mitkMappers
 {
   //if we do not have any data, we do nothing else but clearing our window
   if(GetData() == NULL)
@@ -390,7 +391,7 @@ void mitk::OpenGLRenderer::Render()
       //swap buffers
       if (m_VtkMapperPresent)
       {
-        m_RenderWindow->GetVtkRenderWindow()->SetFinishRendering(true);
+        m_RenderWindow->GetVtkRenderWindow()->SetFinishRendering(true);//set an internal flag to only swap buffers when ready with rendering
         m_RenderWindow->GetVtkRenderWindow()->CopyResultFrame();
       }
       else
@@ -481,7 +482,7 @@ void mitk::OpenGLRenderer::Resize(int w, int h)
 
   BaseRenderer::Resize(w, h);
 
-//  GetVtkRenderWindow()->SetSize(w,h); //done bei VtkInteractor via m_CameraController->Resize(...) in BaseRenderer 
+//  GetVtkRenderWindow()->SetSize(w,h); //done by VtkInteractor via m_CameraController->Resize(...) in BaseRenderer 
 
   Update();
 }

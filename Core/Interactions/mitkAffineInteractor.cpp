@@ -53,54 +53,14 @@ bool mitk::AffineInteractor::ExecuteAction(int actionId, mitk::StateEvent const*
 	{
   case AcINITAFFINEINTERACTIONS:
   {
-    /* Disable VTK Interactor while we perform our own interaction */
-    mitk::GlobalInteraction* globalInteraction = dynamic_cast<mitk::GlobalInteraction*>(mitk::EventMapper::GetGlobalStateMachine());
-    if (globalInteraction == NULL)
-      return false;
-    const FocusManager::FocusElement* fe = globalInteraction->GetFocus();
-    FocusManager::FocusElement* fe2 =  const_cast <FocusManager::FocusElement*>(fe);
-    mitk::OpenGLRenderer* glRenderer = dynamic_cast<mitk::OpenGLRenderer*>(fe2);
-    if (glRenderer != NULL)
-    {
-      VtkInteractorCameraController* vicc = dynamic_cast<VtkInteractorCameraController*>(glRenderer->GetCameraController());
-      if (vicc != NULL)
-      {
-        //vicc->GetVtkInteractor()->GetInteractorStyle()->Off();
-        //vicc->GetVtkInteractor()->Disable();
-        //std::cout << "******************* disable vtk interactor *******************\n";
-      }
-    }
     ok = true;
     break;
   }
   case AcFINISHAFFINEINTERACTIONS:
   {
-    /* Reenable VTK Interactor after we finished our own interaction */
-    mitk::GlobalInteraction* globalInteraction = dynamic_cast<mitk::GlobalInteraction*>(mitk::EventMapper::GetGlobalStateMachine());
-    if (globalInteraction == NULL)
-      return false;
-    const FocusManager::FocusElement* fe = globalInteraction->GetFocus();
-    FocusManager::FocusElement* fe2 =  const_cast <FocusManager::FocusElement*>(fe);
-    mitk::OpenGLRenderer* glRenderer = dynamic_cast<mitk::OpenGLRenderer*>(fe2);
-    if (glRenderer != NULL)
-    {
-      VtkInteractorCameraController* vicc = dynamic_cast<VtkInteractorCameraController*>(glRenderer->GetCameraController());
-      if (vicc != NULL)
-      {
-        //vicc->GetVtkInteractor()->Disable();
-        //vicc->GetVtkInteractor()->Delete();
-        //vicc->SetVtkInteractor(vtkRenderWindowInteractor::New());
-        //vicc->SetRenderer(glRenderer);
-        
-        //vicc->GetVtkInteractor()->Enable();
-        //vicc->GetVtkInteractor()->Start();
-        //std::cout << "******************* enable vtk interactor *******************\n";
-      }
-    }
     ok = true;
     break;
   }
-
   case AcNEWPOINT:
   {
     //ok = true;
@@ -170,7 +130,7 @@ bool mitk::AffineInteractor::ExecuteAction(int actionId, mitk::StateEvent const*
   }
   case AcADD:
   {
-    if (posEvent == NULL)   // @TODO: this should work with displayevent too
+    if (posEvent == NULL)   // @TODO: this should work with displayEvent too
       return false;
     mitk::Point3D worldPoint = posEvent->GetWorldPosition();
     mitk::StateEvent* newStateEvent = NULL;
@@ -199,7 +159,7 @@ bool mitk::AffineInteractor::ExecuteAction(int actionId, mitk::StateEvent const*
     }
     else if (displayEvent != NULL)  // 2D coordinate in event
     {
-      return ConvertDisplayEventToWorldPosition(displayEvent, m_LastMousePosition);
+      ok = ConvertDisplayEventToWorldPosition(displayEvent, m_LastMousePosition);      
     }
     else
       ok = false;    
@@ -218,11 +178,10 @@ bool mitk::AffineInteractor::ExecuteAction(int actionId, mitk::StateEvent const*
     {
       mitk::ITKPoint3D p;
       if(ConvertDisplayEventToWorldPosition(displayEvent, p) == false)
-        return false;
+        return false;      
       newPosition = p - m_LastMousePosition.GetVectorFromOrigin();        // compute difference between actual and last mouse position
       m_LastMousePosition = p;    // save current mouse position as last position
     }
-
     /* create operation with position difference */
     mitk::PointOperation* doOp = new mitk::PointOperation(OpMOVE, newPosition, 0); // Index is not used here
 		if (m_UndoEnabled)	//write to UndoMechanism
@@ -243,15 +202,6 @@ bool mitk::AffineInteractor::ExecuteAction(int actionId, mitk::StateEvent const*
     ok = true;
 	  break;
   }
-  // Not needed anymore - does the same as AcTRANSLATESTART --> see there
-  //case AcROTATESTART:
-  //{    
-		//if (posEvent == NULL)
-  //    return false;    
-		//mitk::vm2itk(posEvent->GetWorldPosition(), m_LastMousePosition);
-  //  ok = true;
-  //  break;
-  //}
   case AcROTATE:
   {
     mitk::ITKPoint3D p;
@@ -298,19 +248,8 @@ bool mitk::AffineInteractor::ExecuteAction(int actionId, mitk::StateEvent const*
     ok = true;
 	  break;
   }
-  //case AcSCALESTART:
-  //{
-		//if (posEvent == NULL)
-  //    return false;
-  //  /*converting from Point3D to itk::Point */
-		//mitk::vm2itk(posEvent->GetWorldPosition(), m_LastMousePosition);
-
-  //  ok = true;
-  //  break;
-  //}
   case AcSCALE:
-  {
-    std::cout << "  Scale!!!!!!!!!!!!!. ist hier ********************XxxXXXXXxxXX" << std::endl;
+  {    
     mitk::ITKPoint3D p;
 		if (posEvent != NULL)   // 3D coordinate in event
     {
@@ -321,10 +260,7 @@ bool mitk::AffineInteractor::ExecuteAction(int actionId, mitk::StateEvent const*
       if(ConvertDisplayEventToWorldPosition(displayEvent, p) == false)
         return false;
     }
-    std::cout << "  Scale. Worldposition = " << p << std::endl;
-
-    mitk::ITKVector3D v = p - m_LastMousePosition;
-    std::cout << "  Scale.        v = " << v << std::endl;
+    mitk::ITKVector3D v = p - m_LastMousePosition;    
     /* calculate scale changes */
     mitk::ITKPoint3D newScale;
     newScale[0] = (geometry->GetXAxis() * v) / geometry->GetXAxis().GetNorm();  // Scalarprodukt of normalized Axis
@@ -404,10 +340,6 @@ bool mitk::AffineInteractor::CheckSelected(const mitk::Point3D& worldPoint)
       itkPoint[0] = p[0]/p[3];
       itkPoint[1] = p[1]/p[3];
       itkPoint[2] = p[2]/p[3];
-      //// reaply scaling, because bounding box is scaled
-      //itkPoint[0] *= m_DataTreeNode->GetData()->GetGeometry()->GetXAxis().GetNorm();
-      //itkPoint[1] *= m_DataTreeNode->GetData()->GetGeometry()->GetYAxis().GetNorm();
-      //itkPoint[2] *= m_DataTreeNode->GetData()->GetGeometry()->GetZAxis().GetNorm();
       selected = box->IsInside(itkPoint); // check if point is inside the datas bounding box
     }
     return selected;

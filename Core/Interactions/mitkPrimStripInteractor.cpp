@@ -25,7 +25,7 @@ See MITKCopyright.txt or http://www.mitk.org/ for details.
 #include <mitkAction.h>
 #include <mitkLineOperation.h>
 #include <mitkProperties.h>
-
+#include <mitkPointOperation.h>
 
 
 mitk::PrimStripInteractor::PrimStripInteractor(const char * type, DataTreeNode* dataTreeNode)
@@ -161,7 +161,6 @@ bool mitk::PrimStripInteractor::ExecuteAction(Action* action, mitk::StateEvent c
 			if (posEvent == NULL)
         return false;
 
-      //converting from Point3D to itk::Point
       mitk::Point3D worldPoint = posEvent->GetWorldPosition();
 
       //searching for a point
@@ -348,6 +347,30 @@ bool mitk::PrimStripInteractor::ExecuteAction(Action* action, mitk::StateEvent c
     break;
   case AcREMOVE:
     ok = true;
+    break;
+  case AcSETSTARTPOINT:
+    {
+      //get the selected point and assign it as startpoint
+      Point3D point;//dummy
+      point.Fill(0);
+      int position = mesh->SearchSelectedPoint();
+      if (position >-1)
+      {
+        PointOperation* doOp = new mitk::PointOperation(OpSETPOINTTYPE, point, position, true, PTSTART);
+
+        //Undo
+      	if (m_UndoEnabled)	//write to UndoMechanism
+        {
+	        PointOperation* undoOp = new mitk::PointOperation(OpSETPOINTTYPE, point, position, true, PTUNDEFINED);
+	        OperationEvent *operationEvent = new OperationEvent(mesh, doOp, undoOp);
+	        m_UndoController->SetOperationEvent(operationEvent);
+	      }
+
+	      //execute the Operation
+	      mesh->ExecuteOperation(doOp);
+        ok = true;
+      }
+    }
     break;
   default:
     return Superclass::ExecuteAction(action, stateEvent);

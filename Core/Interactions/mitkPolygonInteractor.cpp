@@ -5,234 +5,320 @@
 #include <mitkOperationEvent.h>
 #include <mitkStateEvent.h>
 #include <mitkPointOperation.h>
+#include <mitkLineOperation.h>
 #include <mitkDataTreeNode.h>
 #include <mitkMesh.h>
-#include "mitkAction.h"
+#include <vtkPolyData.h>
+#include <mitkAction.h>
+#include <mitkEventMapper.h>
+#include <mitkProperties.h>
 
 
 mitk::PolygonInteractor::PolygonInteractor(const char * type, DataTreeNode* dataTreeNode)
-: Interactor(type, dataTreeNode), m_PointIdCount(0), m_LineIdCount(0)
+: HierarchicalInteractor(type, dataTreeNode)
 {
+  m_LineInteractor = new mitk::LineInteractor("lineinteractor",dataTreeNode);
+  this->AddInteractor((Interactor::Pointer)m_LineInteractor);
 }
 
 mitk::PolygonInteractor::~PolygonInteractor()
 {
+  //delete m_LineInteractor;
 }
 
-int mitk::PolygonInteractor::GetId()
+void mitk::PolygonInteractor::DeselectAllCells(int objectEventId, int groupEventId)  
 {
-  return m_Id;
+  mitk::Mesh* mesh = dynamic_cast<mitk::Mesh*>(m_DataTreeNode->GetData());
+	if (mesh == NULL)
+		return;
+
+  //deselect cells
+  mitk::Mesh::DataType *itkMesh = mesh->GetMesh(); 
+  mitk::Mesh::CellDataIterator cellDataIt, cellDataEnd;
+  cellDataEnd = itkMesh->GetCellData()->End();
+  for (cellDataIt = itkMesh->GetCellData()->Begin(); cellDataIt != cellDataEnd; cellDataIt++)
+	{
+    if ( cellDataIt->Value().selected )
+		{
+      mitk::LineOperation* doOp = new mitk::LineOperation(OpDESELECTCELL, cellDataIt->Index());
+			if (m_UndoEnabled)
+			{
+				mitk::LineOperation* undoOp = new mitk::LineOperation(OpSELECTCELL, cellDataIt->Index());
+				OperationEvent *operationEvent = new OperationEvent(mesh,
+																	doOp, undoOp,
+																	objectEventId, groupEventId);
+				m_UndoController->SetOperationEvent(operationEvent);
+			}
+			mesh->ExecuteOperation(doOp);
+		}
+	}
 }
-
-//##Documentation
-//##@brief makes sure, that one line is selected.
-//##if no line is selected, then the next line to the given point is selected
-//##if more than one line is selected, then all are deselected and the one next to the given point is selected.
-//## Returns true if success, false if an error occured
-bool mitk::PolygonInteractor::SelectOneLine(Point3D itkPoint)
-{
- // mitk::Mesh* data = dynamic_cast<mitk::Mesh*>(m_DataTreeNode->GetData());
-	//if (data == NULL)
- // {
- //   mitk::StatusBar::DisplayText("Error! Sender: PolygonInteractor; Message: Wrong type of Data!", 10000);
- //   return false;
- // }
- // 
- //// mitk::Mesh::CellDataContainerIterator it, end;
- //// end = data->GetMesh()->GetCellData()->End();
- ////	for (it = data->GetMesh()->GetCellData()->Begin(); it != end; it++)
-	////{
- ////   
- //// }
-
- // mitk::Mesh:: cell;
- // bool ok = data->GetMesh()->GetCellData(m_Id, cell)
-  return true;
-
-
-}
-
 
 bool mitk::PolygonInteractor::ExecuteAction(Action* action, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId)
 {
   bool ok = false;//for return type bool
   
-  //checking corresponding Data; has to be a Mesh or a subclass
-	mitk::Mesh* data = dynamic_cast<mitk::Mesh*>(m_DataTreeNode->GetData());
-	if (data == NULL)
+  //checking corresponding Data; has to be a PointSet or a subclass
+  mitk::Mesh* mesh = dynamic_cast<mitk::Mesh*>(m_DataTreeNode->GetData());
+	if (mesh == NULL)
 		return false;
 
-  
   switch (action->GetActionId())
 	{
   case AcDONOTHING:
     ok = true;
 	  break;
-  case AcINSERTPOINT:
-    //add a new point to the List of Points
+  //case AcTRANSMITEVENT:
+  //  {
+  //    //due to the use of guards-states the eventId can be changed from original to internal EventIds e.g. StYES.
+  //    //so we have remap the event and transmitt the original event with proper id
+  //    ok = m_LineInteractor->HandleEvent(mitk::EventMapper::RefreshStateEvent(const_cast<StateEvent*>(stateEvent)), objectEventId, groupEventId );
+  //    //check the state of the machine and according to that change the state/mode of this statemachine
+  //    int mode = m_LineInteractor->GetMode();
+  //    if (mode == mitk::Interactor::SMSELECTED ||
+  //      mode == mitk::Interactor::SMSUBSELECTED)
+  //      this->SetMode(mitk::Interactor::SMSUBSELECTED);
+  //    else 
+  //      this->SetMode(mitk::Interactor::SMDESELECTED);
+  //  }
+	 // break;
+  case AcINITNEWOBJECT:
     {
-      mitk::PositionEvent const  *posEvent = dynamic_cast <const mitk::PositionEvent *> (stateEvent->GetEvent());
-		  if (posEvent == NULL) 
-        return false;
+      //get the next cellId and set m_CurrentCellId
+      m_CurrentCellId = mesh->GetNewCellId();
 
-      //inserting the new interactor into the list
-      //referencecounting has to be made. but so far I can see it is ok. 
-      mitk::PointInteractor::Pointer pointInteractor = new mitk::PointInteractor("pointinteractor", m_DataTreeNode, m_PointIdCount);
-      m_PointList->insert(PointListType::value_type(m_PointIdCount, pointInteractor));
-
-      //Now add the point to the data
-		  mitk::Point3D itkPoint;
-		  itkPoint = posEvent->GetWorldPosition();
-      mitk::PointOperation* doOp = new mitk::PointOperation(OpINSERT, itkPoint, m_PointIdCount);
+      //now reserv a new cell in m_ItkData
+      LineOperation* doOp = new mitk::LineOperation(OpNEWCELL, m_CurrentCellId);
 		  if (m_UndoEnabled)
 		  {
-        mitk::PointOperation* undoOp = new mitk::PointOperation(OpREMOVE, itkPoint, m_PointIdCount);
-			  OperationEvent *operationEvent = new OperationEvent(data,
-				  													doOp, undoOp,
+			  LineOperation* undoOp = new mitk::LineOperation(OpDELETECELL, m_CurrentCellId);
+			  OperationEvent *operationEvent = new OperationEvent(mesh,
+																	  doOp, undoOp,
+																	  objectEventId, groupEventId);
+			  m_UndoController->SetOperationEvent(operationEvent);
+		  }
+      mesh->ExecuteOperation(doOp);
+    }
+    ok = true;
+    break;
+  case AcFINISHOBJECT:
+    //finish the creation of the polygon
+    {
+      LineOperation* lineDoOp = new mitk::LineOperation(OpCLOSECELL, m_CurrentCellId);
+		  if (m_UndoEnabled)
+		  {
+		  	LineOperation* lineUndoOp = new mitk::LineOperation(OpOPENCELL, m_CurrentCellId);
+			  OperationEvent *operationEvent = new OperationEvent(mesh,
+				  													lineDoOp, lineUndoOp,
 					  												objectEventId, groupEventId);
 			  m_UndoController->SetOperationEvent(operationEvent);
 		  }
-		  data->ExecuteOperation(doOp);
-	    ++m_PointIdCount;
+		  //execute the Operation
+      mesh->ExecuteOperation(lineDoOp );
     }
     ok = true;
-	  break;
-  case AcINSERTLINE:
+    break;
+  case AcCHECKLINE:
+    //check, if a line is hit
     {
       mitk::PositionEvent const  *posEvent = dynamic_cast <const mitk::PositionEvent *> (stateEvent->GetEvent());
-		  if (posEvent == NULL) 
+			if (posEvent == NULL)
         return false;
-      //only one line may be selected. get the line and rebuild the cell with the ID of the new 
-      //point inserted between the two points of the selected line
-      mitk::Point3D itkPoint;
-		  itkPoint = posEvent->GetWorldPosition();
 
-      SelectOneLine(itkPoint);
-      //now one line is selected
+      //converting from Point3D to itk::Point
+      mitk::Point3D worldPoint = posEvent->GetWorldPosition();
+
+      //searching for a point
+      unsigned long lineId = -1;
+      unsigned long cellId = -1;
+      int PRECISION = 1;
+      mitk::IntProperty *precision = dynamic_cast<IntProperty*>(action->GetProperty("PRECISION"));
+      if (precision != NULL)
+      {
+        PRECISION = precision->GetValue();
+      }
+
+      if(mesh->SearchLine(worldPoint, PRECISION, lineId, cellId))//line found
+      {
+        m_CurrentCellId = cellId;
+        mitk::StateEvent* newStateEvent = new mitk::StateEvent(StYES, stateEvent->GetEvent());
+        this->HandleEvent(newStateEvent, objectEventId, groupEventId );
+        ok = true;
+      }
+      else
+		  {
+			  //new Event with information NO
+        mitk::StateEvent* newStateEvent = new mitk::StateEvent(StNO, stateEvent->GetEvent());
+        this->HandleEvent(newStateEvent, objectEventId, groupEventId );
+			  ok = true;
+			}
+    }
+    break;
+  case AcCHECKBOUNDINGBOX:
+    //check if the MousePosition lies inside the BoundingBox of the current Cell
+    {
+      mitk::PositionEvent const  *posEvent = dynamic_cast <const mitk::PositionEvent *> (stateEvent->GetEvent());
+  		if (posEvent == NULL) 
+        return false;
+
+      mitk::Point3D worldPoint = posEvent->GetWorldPosition();
       
-      //create a new LineInteractor. then connect one old LineInteractor (is selected) to the new point, 
-      //the new lineInteractor to the same new point and to the other old point. With respect to undo!
+      //Axis-aligned bounding box(AABB) 
+      mitk::Mesh::DataType::BoundingBoxPointer aABB = mesh->GetBoundingBoxFromCell(m_CurrentCellId);
+      if (aABB.IsNull())
+        return false;
+
+      //check if the given point lies inside the boundingbox
+      if (aABB->IsInside(worldPoint))
+      {
+        mitk::StateEvent* newStateEvent = new mitk::StateEvent(EIDYES, stateEvent->GetEvent());
+        this->HandleEvent( newStateEvent, objectEventId, groupEventId );
+
+      }
+      else
+      {
+        mitk::StateEvent* newStateEvent = new mitk::StateEvent(EIDNO, stateEvent->GetEvent());
+        this->HandleEvent(newStateEvent, objectEventId, groupEventId );
+      }
+    }
+    ok = true;
+    break;
+  case AcCHECKOBJECT:
+    {
+      //picking if this object is hit. then set the m_CurrentCellId Variable
+      //this object is hit, if the transmitted position of the event is hitting a point or a line of that cell
+      mitk::PositionEvent const  *posEvent = dynamic_cast <const mitk::PositionEvent *> (stateEvent->GetEvent());
+  		if (posEvent == NULL) 
+        return false;
+
+      bool hit = true;
+      //var's for EvaluatePosition
+      mitk::Point3D point = posEvent->GetWorldPosition();
+      unsigned long cellId = -1;
+      
+      //check wheather the mesh is hit.
+      if (mesh->EvaluatePosition(point, cellId))
+      {
+        m_CurrentCellId = cellId;
+        mitk::StateEvent* newStateEvent = new mitk::StateEvent(EIDYES, stateEvent->GetEvent());
+        this->HandleEvent( newStateEvent, objectEventId, groupEventId );
+
+      }
+      else
+      {
+        m_CurrentCellId = 0;
+        mitk::StateEvent* newStateEvent = new mitk::StateEvent(EIDNO, stateEvent->GetEvent());
+        this->HandleEvent(newStateEvent, objectEventId, groupEventId );
+      }
+    }
+    ok = true;
+    break;
+  case AcSELECTCELL:
+    {
+      LineOperation* lineDoOp = new mitk::LineOperation(OpSELECTCELL, m_CurrentCellId);
+		  if (m_UndoEnabled)
+		  {
+		  	LineOperation* lineUndoOp = new mitk::LineOperation(OpDESELECTCELL, m_CurrentCellId);
+			  OperationEvent *operationEvent = new OperationEvent(mesh,
+				  													lineDoOp, lineUndoOp,
+					  												objectEventId, groupEventId);
+			  m_UndoController->SetOperationEvent(operationEvent);
+		  }
+      mesh->ExecuteOperation(lineDoOp );
+    }
+    ok = true;
+    break;
+  case AcDESELECTCELL:
+    {
+      //if number of cell is >0
+      if (mesh->GetNumberOfCells()>0)
+      {
+        LineOperation* lineDoOp = new mitk::LineOperation(OpDESELECTCELL, m_CurrentCellId);
+		    if (m_UndoEnabled)
+		    {
+		  	  LineOperation* lineUndoOp = new mitk::LineOperation(OpSELECTCELL, m_CurrentCellId);
+			    OperationEvent *operationEvent = new OperationEvent(mesh,
+				  													  lineDoOp, lineUndoOp,
+					  												  objectEventId, groupEventId);
+			    m_UndoController->SetOperationEvent(operationEvent);
+		    }
+        mesh->ExecuteOperation(lineDoOp );
+      }
+    }
+    ok = true;
+    break;
+  case AcINITEDITOBJECT:
+    ok = true;
+    break;
+  case AcINITMOVEMENT:
+    //prepare everything for movement of one cell
+    {
+      mitk::PositionEvent const  *posEvent = dynamic_cast <const mitk::PositionEvent *> (stateEvent->GetEvent());
+		  if (posEvent == NULL)
+        return false;
     
-
+      //start of the Movement is stored to calculate the undoCoordinate in FinishMovement
+      m_MovementStart = posEvent->GetWorldPosition();
+      m_OldPoint = m_MovementStart;
     }
     ok = true;
     break;
-  case AcCHECKGREATERZERO:
+  case AcMOVE:
+    //move the cell without undo
     {
-      //check if the number of points is greater to zero.
-      if (data->GetSize()>0)
-      {
-        mitk::StateEvent* newStateEvent = new mitk::StateEvent(StYES, stateEvent->GetEvent());
-        this->HandleEvent( newStateEvent, objectEventId, groupEventId );
-		    ok = true;
-      }
-      else 
-      {
-        mitk::StateEvent* newStateEvent = new mitk::StateEvent(StNO, stateEvent->GetEvent());
-        this->HandleEvent(newStateEvent, objectEventId, groupEventId );
-		    ok = true;
-      }
-    }
-    break;
-    case AcCHECKGREATERTWO:
-    {
-      //check if the number of points is greater to two.
-      if (data->GetSize()>2)
-      {
-        mitk::StateEvent* newStateEvent = new mitk::StateEvent(StYES, stateEvent->GetEvent());
-        this->HandleEvent( newStateEvent, objectEventId, groupEventId );
-		    ok = true;
-      }
-      else 
-      {
-        mitk::StateEvent* newStateEvent = new mitk::StateEvent(StNO, stateEvent->GetEvent());
-        this->HandleEvent(newStateEvent, objectEventId, groupEventId );
-		    ok = true;
-      }
-    }
-    break;
+      mitk::PositionEvent const  *posEvent = dynamic_cast <const mitk::PositionEvent *> (stateEvent->GetEvent());
+	  	if (posEvent == NULL)
+        return false;
 
+      mitk::Point3D newPoint = posEvent->GetWorldPosition();
 
-//  case AcREMOVE:
-//  {
-//    mitk::Point3D newPoint;
-//    newPoint.Fill(0);
-////critical, cause the inverse operation of removecell is not necesarily insertline. We don't know how the cell looked like when deleted.
-//    PointOperation* doOp = new mitk::PointOperation(OpREMOVECELL, newPoint, m_Id);
-//    if ( m_UndoEnabled )
-//    {
-//      LineOperation* undoOp = new mitk::LineOperation(OpINSERTLINE, m_PIdA, m_PIdB, m_Id);
-//      OperationEvent *operationEvent = new OperationEvent(m_DataTreeNode->GetData(),
-//                                                        doOp, undoOp,
-//                                                        objectEventId, groupEventId);
-//      m_UndoController->SetOperationEvent(operationEvent);
-//    }
-//    //execute the Operation
-//    m_DataTreeNode->GetData()->ExecuteOperation(doOp);
-//    ok = true;
-//  }
-//  break;
-//  case AcREMOVEALL://remove Line and the two points
-//  {
-//    //removing the line
-//    mitk::Point3D newPoint;
-//    newPoint.Fill(0);
-//    PointOperation* doOp = new mitk::PointOperation(OpREMOVECELL, newPoint, m_Id);
-//    if ( m_UndoEnabled )
-//    {
-//      LineOperation* undoOp = new mitk::LineOperation(OpINSERTLINE, m_Id, m_PIdA, m_PIdB);
-//      OperationEvent *operationEvent = new OperationEvent(m_DataTreeNode->GetData(),
-//                                                        doOp, undoOp,
-//                                                        objectEventId, groupEventId);
-//      m_UndoController->SetOperationEvent(operationEvent);
-//    }
-//    //execute the Operation
-//    m_DataTreeNode->GetData()->ExecuteOperation(doOp);
-//
-//    //now the two points. The StateMachines have to be deleted and the Data changed
-//    //for undo to work, we have to store the state the machine was in when deleted
-//    Operation* doOpA = new mitk::Operation(OpDELETE);
-//    if ( m_UndoEnabled )
-//    {
-//      StateTransitionOperation* undoOpA = new mitk::StateTransitionOperation(OpUNDELETE, m_PointA->GetCurrentState());
-//      OperationEvent *operationEventA = new OperationEvent(m_PointA,
-//                                                        doOpA, undoOpA,
-//                                                        objectEventId, groupEventId);
-//      m_UndoController->SetOperationEvent(operationEventA);
-//    }
-//    //execute the Operation
-//    m_PointA->ExecuteOperation(doOpA);
-//    
-//    Operation* doOpB = new mitk::Operation(OpDELETE);
-//    if ( m_UndoEnabled )
-//    {
-//      StateTransitionOperation* undoOpB = new mitk::StateTransitionOperation(OpUNDELETE, m_PointB->GetCurrentState());
-//      OperationEvent *operationEventB = new OperationEvent(m_PointB,
-//                                                        doOpB, undoOpB,
-//                                                        objectEventId, groupEventId);
-//      m_UndoController->SetOperationEvent(operationEventB);
-//    }
-//    //execute the Operation
-//    m_PointB->ExecuteOperation(doOp);
-//
-//    m_PointA = NULL;
-//    m_PointB = NULL;
-//
-//
-//    ok = true;
-//  }
-//  break;
-  case AcMODESELECT:
-    m_Mode = SMSELECTED;
+      //calculate a vector between the oldPoint and the newPoint
+      Vector3D vector = newPoint - m_OldPoint;
+      
+      CellOperation* doOp = new mitk::CellOperation(OpMOVECELL, m_CurrentCellId, vector);
+
+      m_OldPoint = newPoint;
+      
+      //execute the Operation
+      //here no undo is stored. only the start and the end is stored for undo.
+		  mesh->ExecuteOperation(doOp);
+    }
     ok = true;
     break;
-  case AcMODEDESELECT:
-    m_Mode = SMDESELECTED;
+  case AcFINISHMOVEMENT:
+    //move the cell to the final position and send undo-information
+    {
+      mitk::PositionEvent const *posEvent = dynamic_cast <const mitk::PositionEvent *> (stateEvent->GetEvent());
+		  if (posEvent == NULL)
+        return false;
+
+      //finish the movement:
+      // set undo-information and move it to the last position.
+      mitk::Point3D newPoint = posEvent->GetWorldPosition();
+
+      Vector3D vector = newPoint - m_OldPoint;
+
+      CellOperation* doOp = new mitk::CellOperation(OpMOVECELL, m_CurrentCellId, vector);
+	    if ( m_UndoEnabled )
+      {
+        Vector3D vectorBack = m_MovementStart - newPoint;
+        CellOperation* undoOp = new mitk::CellOperation(OpMOVECELL, m_CurrentCellId, vectorBack);
+        OperationEvent *operationEvent = new OperationEvent(m_DataTreeNode->GetData(),
+                                            							  doOp, undoOp,
+							                                              objectEventId, groupEventId);
+        m_UndoController->SetOperationEvent(operationEvent);
+      }
+		  //execute the Operation
+		  m_DataTreeNode->GetData()->ExecuteOperation(doOp);
+    }
+    ok = true;
+    break;
+  case AcREMOVE:
     ok = true;
     break;
   default:
-    itkWarningMacro("Message from mitkPolygonInteractor: I do not understand the Action! Check");
-    return false;
+    return Superclass::ExecuteAction(action, stateEvent, objectEventId, groupEventId);
   }
   return ok;
 }
+

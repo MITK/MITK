@@ -23,29 +23,39 @@ public:
 
   //##Documentation
   //##@brief Constructor 
-  PointInteractor(const char * type, DataTreeNode* dataTreeNode, int id);
+  PointInteractor(const char * type, DataTreeNode* dataTreeNode);
 
   //##Documentation
   //##@brief Destructor 
   virtual ~PointInteractor();
 
-  //##Documentation
-  //##@brief returns the Id of this point
-  int GetId();
+ 	//##Documentation
+	//## @brief Sets the amount of precision
+  void SetPrecision(unsigned int precision);
 
 protected:
+  //##Documentation
+  //## @brief select the point on the given position
+  virtual void SelectPoint(int position, int objectEventId, int groupEventId);
+
+  //##Documentation
+  //## @brief unselect all points that exist in mesh
+  virtual void DeselectAllPoints(int objectEventId, int groupEventId);
+
   //##Documentation
   //## @brief Executes Side-Effects
   virtual bool ExecuteAction(Action* action, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId);
 
+
 private:
-  //##Documentation
-  //## @brief stores the ID of the point
-  int m_Id;
 
   //##Documentation
   //## @brief to calculate a direction vector from last point and actual point
   Point3D m_LastPoint;
+
+  //##Documentation
+  //## @brief to store a position
+  unsigned int m_LastPosition;
 
 };
 }

@@ -91,7 +91,6 @@ class StateMachine : public itk::Object, public mitk::OperationActor
   //## @brief holds an UndoController, that can be accessed from all StateMachines. For ExecuteAction
   UndoController* m_UndoController;
 
- protected:
   //##ModelId=3EAEEDC603D9
   //##Documentation
   //## @brief A statemachine is also an OperationActor due to the UndoMechanism. 

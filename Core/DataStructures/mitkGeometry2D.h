@@ -44,12 +44,15 @@ public:
 	//##ModelId=3DDE65E00122
     //##Documentation
     //## @brief Project a 3D point given in mm (@a pt3d_mm) onto the 2D
-    //## geometry. 
+    //## geometry. The result is a 2D point in mm (@a pt2d_mm).
     //## 
     //## The result is a 2D point in mm (@a pt2d_mm) relative to the upper-left
     //## corner of the geometry. To convert this point into units (e.g., pixels
     //## in case of an image), use MMToUnits.
-	virtual void Map(const mitk::Point3D &pt3d_mm, mitk::Point2D &pt2d_mm) const;
+    //## @return true projection was possible
+    //## @sa Project(const mitk::Point3D &pt3d_mm, mitk::Point3D
+    //## &projectedPt3d_mm) 
+	virtual bool Map(const mitk::Point3D &pt3d_mm, mitk::Point2D &pt2d_mm) const;
 
 	//##ModelId=3DDE65E301DE
     //##Documentation
@@ -119,6 +122,49 @@ public:
 
     //##ModelId=3E395E0802E6
     Geometry2D(unsigned int width_units, unsigned int height_units);
+    //##ModelId=3EF48EA10320
+    //##Documentation
+    //## @brief Project a 3D point given in mm (@a pt3d_mm) onto the 2D
+    //## geometry. The result is a 3D point in mm (@a projectedPt3d_mm).
+    //## 
+    //## @return true projection was possible
+    virtual bool Project(const mitk::Point3D &pt3d_mm, mitk::Point3D &projectedPt3d_mm) const;
+
+
+    //##ModelId=3EF48F170280
+    //##Documentation
+    //## @brief Project a 3D vector given in mm (@a vec3d_mm) onto the 2D
+    //## geometry. The result is a 2D vector in mm (@a vec2d_mm).
+    //## 
+    //## The result is a 2D vector in mm (@a vec2d_mm) relative to the
+    //## upper-left
+    //## corner of the geometry. To convert this point into units (e.g., pixels
+    //## in case of an image), use MMToUnits.
+    //## @return true projection was possible
+    //## @sa Project(const mitk::Vector3D &vec3d_mm, mitk::Vector3D
+    //## &projectedVec3d_mm) 
+    virtual bool Map(const mitk::Point3D & atPt3d_mm, const mitk::Vector3D &vec3d_mm, mitk::Vector2D &vec2d_mm) const;
+
+  
+    //##ModelId=3EF48F2E00D4
+    //##Documentation
+    //## @brief Converts a 2D vector given in mm (@a vec2d_mm) relative to the
+    //## upper-left corner of the geometry into the corresponding
+    //## world-coordinate (a 3D vector in mm, @a vec3d_mm). 
+    //## 
+    //## To convert a 2D vector given in units (e.g., pixels in case of an
+    //## image) into a 2D vector given in mm (as required by this method), use
+    //## UnitsToMM.
+    virtual void Map(const mitk::Point2D & atPt2d_mm, const mitk::Vector2D &vec2d_mm, mitk::Vector3D &vec3d_mm) const;
+
+  
+    //##ModelId=3EF48F8F01B0
+    //##Documentation
+    //## @brief Project a 3D vector given in mm (@a vec3d_mm) onto the 2D
+    //## geometry. The result is a 3D vector in mm (@a projectedVec3d_mm).
+    //## 
+    //## @return true projection was possible
+    virtual bool Project(const mitk::Point3D & atPt3d_mm, const mitk::Vector3D &vec3d_mm, mitk::Vector3D &projectedVec3d_mm) const;
 
   protected:
     //##ModelId=3E395E080318

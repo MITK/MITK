@@ -54,11 +54,11 @@ void mitk::DisplayGeometry::UnitsToDisplay(const mitk::Vector2D &vec_units, mitk
 }
 
 //##ModelId=3E3AEB460259
-void mitk::DisplayGeometry::Map(const mitk::Point3D &pt3d_mm, mitk::Point2D &pt2d_mm) const
+bool mitk::DisplayGeometry::Map(const mitk::Point3D &pt3d_mm, mitk::Point2D &pt2d_mm) const
 {
-    if(m_WorldGeometry.IsNull()) return;
+    if(m_WorldGeometry.IsNull()) return false;
 
-    m_WorldGeometry->Map(pt3d_mm, pt2d_mm);
+    return m_WorldGeometry->Map(pt3d_mm, pt2d_mm);
 }
 
 //##ModelId=3E3AEB490380
@@ -133,28 +133,33 @@ void mitk::DisplayGeometry::MMToDisplay(const mitk::Vector2D &vec_mm, mitk::Vect
     UnitsToDisplay(vec_display, vec_display);
 }
 
+//##ModelId=3EF4364802A9
 void mitk::DisplayGeometry::ULDisplayToDisplay(const mitk::Point2D &pt_ULdisplay, mitk::Point2D &pt_display) const
 {
     pt_display.x=pt_ULdisplay.x;
     pt_display.y=GetDisplayHeight()-pt_ULdisplay.y;
 }
 
+//##ModelId=3EF43649007A
 void mitk::DisplayGeometry::DisplayToULDisplay(const mitk::Point2D &pt_display, mitk::Point2D &pt_ULdisplay) const
 {
     ULDisplayToDisplay(pt_display, pt_ULdisplay);
 }
 
+//##ModelId=3EF436490251
 void mitk::DisplayGeometry::ULDisplayToDisplay(const mitk::Vector2D &vec_ULdisplay, mitk::Vector2D &vec_display) const
 {
     vec_display.x= vec_ULdisplay.x;
     vec_display.y=-vec_ULdisplay.y;
 }
 
+//##ModelId=3EF4364A0049
 void mitk::DisplayGeometry::DisplayToULDisplay(const mitk::Vector2D &vec_display, mitk::Vector2D &vec_ULdisplay) const
 {
     ULDisplayToDisplay(vec_display, vec_ULdisplay);
 }
 
+//##ModelId=3EF436450223
 void mitk::DisplayGeometry::ULDisplayToUnits(const mitk::Point2D &pt_ULdisplay, mitk::Point2D &pt_units) const
 {
     pt_units.x=pt_ULdisplay.x;
@@ -162,24 +167,28 @@ void mitk::DisplayGeometry::ULDisplayToUnits(const mitk::Point2D &pt_ULdisplay, 
     DisplayToUnits(pt_units, pt_units);
 }
 
+//##ModelId=3EF43645039F
 void mitk::DisplayGeometry::UnitsToULDisplay(const mitk::Point2D &pt_units, mitk::Point2D &pt_ULdisplay) const
 {
     UnitsToDisplay(pt_units, pt_ULdisplay);
     pt_ULdisplay.y=GetDisplayHeight()-pt_ULdisplay.y;
 }
 
+//##ModelId=3EF436460120
 void mitk::DisplayGeometry::ULDisplayToUnits(const mitk::Vector2D &vec_ULdisplay, mitk::Vector2D &vec_units) const
 {
     vec_units.x= m_ScaleFactorUnitsPerDisplayUnit*vec_ULdisplay.x;
     vec_units.y=-m_ScaleFactorUnitsPerDisplayUnit*vec_ULdisplay.y;
 }
 
+//##ModelId=3EF436460292
 void mitk::DisplayGeometry::UnitsToULDisplay(const mitk::Vector2D &vec_units, mitk::Vector2D &vec_ULdisplay) const
 {
     vec_ULdisplay.x= vec_units.x*(1.0/m_ScaleFactorUnitsPerDisplayUnit);
     vec_ULdisplay.y=-vec_units.y*(1.0/m_ScaleFactorUnitsPerDisplayUnit);
 }
 
+//##ModelId=3EF436470027
 void mitk::DisplayGeometry::ULDisplayToMM(const mitk::Point2D &pt_ULdisplay, mitk::Point2D &pt_mm) const
 {
     ULDisplayToUnits(pt_ULdisplay, pt_mm);
@@ -188,6 +197,7 @@ void mitk::DisplayGeometry::ULDisplayToMM(const mitk::Point2D &pt_ULdisplay, mit
     m_WorldGeometry->UnitsToMM(pt_mm, pt_mm);
 }
 
+//##ModelId=3EF4364701AE
 void mitk::DisplayGeometry::MMToULDisplay(const mitk::Point2D &pt_mm, mitk::Point2D &pt_ULdisplay) const
 {
     if(m_WorldGeometry.IsNull()) return;
@@ -196,6 +206,7 @@ void mitk::DisplayGeometry::MMToULDisplay(const mitk::Point2D &pt_mm, mitk::Poin
     UnitsToULDisplay(pt_ULdisplay, pt_ULdisplay);
 }
 
+//##ModelId=3EF436470348
 void mitk::DisplayGeometry::ULDisplayToMM(const mitk::Vector2D &vec_ULdisplay, mitk::Vector2D &vec_mm) const
 {
     ULDisplayToUnits(vec_ULdisplay, vec_mm);
@@ -204,6 +215,7 @@ void mitk::DisplayGeometry::ULDisplayToMM(const mitk::Vector2D &vec_ULdisplay, m
     m_WorldGeometry->UnitsToMM(vec_mm, vec_mm);
 }
 
+//##ModelId=3EF436480105
 void mitk::DisplayGeometry::MMToULDisplay(const mitk::Vector2D &vec_mm, mitk::Vector2D &vec_ULdisplay) const
 {
     if(m_WorldGeometry.IsNull()) return;
@@ -354,5 +366,21 @@ unsigned long mitk::DisplayGeometry::GetMTime() const
     if(Geometry2D::GetMTime()<m_WorldGeometry->GetMTime())
         Modified();
     return Geometry2D::GetMTime();
+}
+
+//##ModelId=3EF4935A01B6
+bool mitk::DisplayGeometry::Map(const mitk::Point3D & atPt3d_mm, const mitk::Vector3D &vec3d_mm, mitk::Vector2D &vec2d_mm) const
+{
+    if(m_WorldGeometry.IsNull()) return false;
+
+    return m_WorldGeometry->Map(atPt3d_mm, vec3d_mm, vec2d_mm);
+}
+
+//##ModelId=3EF4935C03B8
+void mitk::DisplayGeometry::Map(const mitk::Point2D & atPt2d_mm, const mitk::Vector2D &vec2d_mm, mitk::Vector3D &vec3d_mm) const
+{
+    if(m_WorldGeometry.IsNull()) return;
+
+    m_WorldGeometry->Map(atPt2d_mm, vec2d_mm, vec3d_mm);    
 }
 

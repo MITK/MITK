@@ -41,7 +41,9 @@ public:
     //##ModelId=3E3AEBEF039C
     virtual void UnitsToDisplay(const mitk::Point2D &pt_units, mitk::Point2D &pt_display) const;
 
+    //##ModelId=3EF436450223
     virtual void ULDisplayToUnits(const mitk::Point2D &pt_ULdisplay, mitk::Point2D &pt_units) const;
+    //##ModelId=3EF43645039F
     virtual void UnitsToULDisplay(const mitk::Point2D &pt_units, mitk::Point2D &pt_ULdisplay) const;
 
     //##ModelId=3E3C36920345
@@ -54,7 +56,7 @@ public:
     mitk::Point2D GetOriginInDisplayUnits() const;
 
     //##ModelId=3E3AEB460259
-    virtual void Map(const mitk::Point3D &pt3d_mm, mitk::Point2D &pt2d_mm) const;
+    virtual bool Map(const mitk::Point3D &pt3d_mm, mitk::Point2D &pt2d_mm) const;
     //##ModelId=3E3AEB490380
     virtual void Map(const mitk::Point2D &pt2d_mm, mitk::Point3D &pt3d_mm) const;
 
@@ -74,7 +76,9 @@ public:
     //##ModelId=3E3B02760128
     virtual void UnitsToDisplay(const mitk::Vector2D &vec_units, mitk::Vector2D &vec_display) const;
 
+    //##ModelId=3EF436460120
     virtual void ULDisplayToUnits(const mitk::Vector2D &vec_ULdisplay, mitk::Vector2D &vec_units) const;
+    //##ModelId=3EF436460292
     virtual void UnitsToULDisplay(const mitk::Vector2D &vec_units, mitk::Vector2D &vec_ULdisplay) const;
 
     //##ModelId=3E3B994B02A6
@@ -106,21 +110,35 @@ public:
     //##ModelId=3E48E2B40374
     virtual void MMToDisplay(const mitk::Vector2D &vec_mm, mitk::Vector2D &vec_display) const;
 
+    //##ModelId=3EF436470027
     virtual void ULDisplayToMM(const mitk::Point2D &pt_ULdisplay, mitk::Point2D &pt_mm) const;
+    //##ModelId=3EF4364701AE
     virtual void MMToULDisplay(const mitk::Point2D &pt_mm, mitk::Point2D &pt_ULdisplay) const;
 
+    //##ModelId=3EF436470348
     virtual void ULDisplayToMM(const mitk::Vector2D &vec_ULdisplay, mitk::Vector2D &vec_mm) const;
+    //##ModelId=3EF436480105
     virtual void MMToULDisplay(const mitk::Vector2D &vec_mm, mitk::Vector2D &vec_ULdisplay) const;
 
+    //##ModelId=3EF4364802A9
     virtual void ULDisplayToDisplay(const mitk::Point2D &pt_ULdisplay, mitk::Point2D &pt_display) const;
+    //##ModelId=3EF43649007A
     virtual void DisplayToULDisplay(const mitk::Point2D &pt_display, mitk::Point2D &pt_ULdisplay) const;
 
+    //##ModelId=3EF436490251
     virtual void ULDisplayToDisplay(const mitk::Vector2D &vec_ULdisplay, mitk::Vector2D &vec_display) const;
+    //##ModelId=3EF4364A0049
     virtual void DisplayToULDisplay(const mitk::Vector2D &vec_display, mitk::Vector2D &vec_ULdisplay) const;
 
     /** Return this objects modified time.  */
     //##ModelId=3E66CC5A0118
     virtual unsigned long GetMTime() const;
+    //##ModelId=3EF4935A01B6
+    virtual bool Map(const mitk::Point3D & atPt3d_mm, const mitk::Vector3D &vec3d_mm, mitk::Vector2D &vec2d_mm) const;
+
+
+    //##ModelId=3EF4935C03B8
+    virtual void Map(const mitk::Point2D & atPt2d_mm, const mitk::Vector2D &vec2d_mm, mitk::Vector3D &vec3d_mm) const;
 
 protected:
     //##ModelId=3E3AE91A035E

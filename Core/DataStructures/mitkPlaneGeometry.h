@@ -40,7 +40,7 @@ public:
     //##ModelId=3E3AEB7C001C
     virtual itk::Transform<float,3,2>::Pointer GetTransfrom() const;
     //##ModelId=3E3B9C6E02B5
-    virtual void Map(const mitk::Point3D &pt3d_mm, mitk::Point2D &pt2d_mm) const;
+    virtual bool Map(const mitk::Point3D &pt3d_mm, mitk::Point2D &pt2d_mm) const;
 
     //##ModelId=3E3B9C7101BF
     virtual void Map(const mitk::Point2D &pt2d_mm, mitk::Point3D &pt3d_mm) const;
@@ -56,6 +56,12 @@ public:
     
     //##ModelId=3E3B9C8E0152
     virtual void MMToUnits(const mitk::Vector2D &vec_mm, mitk::Vector2D &vec_units) const;
+    //##ModelId=3EF492640343
+    virtual bool Map(const mitk::Point3D & atPt3d_mm, const mitk::Vector3D &vec3d_mm, mitk::Vector2D &vec2d_mm) const;
+
+
+    //##ModelId=3EF49267006C
+    virtual void Map(const mitk::Point2D & atPt2d_mm, const mitk::Vector2D &vec2d_mm, mitk::Vector3D &vec3d_mm) const;
 
 protected:
     //##ModelId=3E395F22035A

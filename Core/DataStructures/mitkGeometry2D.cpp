@@ -1,8 +1,9 @@
 #include "Geometry2D.h"
 
 //##ModelId=3DDE65E00122
-void mitk::Geometry2D::Map(const mitk::Point3D &pt3d_mm, mitk::Point2D &pt2d_mm) const
+bool mitk::Geometry2D::Map(const mitk::Point3D &pt3d_mm, mitk::Point2D &pt2d_mm) const
 {
+    return false;
 }
 
 //##ModelId=3DDE65E301DE
@@ -66,3 +67,34 @@ void mitk::Geometry2D::TransformGeometry(const vtkTransform * transform)
 {
 
 }
+//##ModelId=3EF48EA10320
+bool mitk::Geometry2D::Project(const mitk::Point3D &pt3d_mm, mitk::Point3D &projectedPt3d_mm) const
+{
+    Point2D tmp;
+    bool result=Map(pt3d_mm, tmp);
+    Map(tmp, projectedPt3d_mm);
+    return result;
+ }
+
+//##ModelId=3EF48F170280
+bool mitk::Geometry2D::Map(const mitk::Point3D & atPt3d_mm, const mitk::Vector3D &vec3d_mm, mitk::Vector2D &vec2d_mm) const
+{
+    return false;
+}
+
+//##ModelId=3EF48F2E00D4
+void mitk::Geometry2D::Map(const mitk::Point2D & atPt2d_mm, const mitk::Vector2D &vec2d_mm, mitk::Vector3D &vec3d_mm) const
+{
+}
+
+//##ModelId=3EF48F8F01B0
+bool mitk::Geometry2D::Project(const mitk::Point3D & atPt3d_mm, const mitk::Vector3D &vec3d_mm, mitk::Vector3D &projectedVec3d_mm) const
+{
+    Vector2D tmp;
+    Point2D point2d;
+    bool result=Map(atPt3d_mm, vec3d_mm, tmp);
+    Map(atPt3d_mm, point2d);
+    Map(point2d, tmp, projectedVec3d_mm);
+    return result;
+}
+

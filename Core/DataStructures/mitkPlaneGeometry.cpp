@@ -41,9 +41,9 @@ itk::Transform<float,3,2>::Pointer mitk::PlaneGeometry::GetTransfrom() const
 }
 
 //##ModelId=3E3B9C6E02B5
-void mitk::PlaneGeometry::Map(const mitk::Point3D &pt3d_mm, mitk::Point2D &pt2d_mm) const
+bool mitk::PlaneGeometry::Map(const mitk::Point3D &pt3d_mm, mitk::Point2D &pt2d_mm) const
 {
-    m_PlaneView.map(pt3d_mm, pt2d_mm);
+    return m_PlaneView.map(pt3d_mm, pt2d_mm);
 }
 
 //##ModelId=3E3B9C7101BF
@@ -91,3 +91,15 @@ void mitk::PlaneGeometry::TransformGeometry(const vtkTransform * transform)
     const_cast<vtkTransform *>(transform)->TransformNormalAtPoint(p, n, n); vtk2vec(n, m_PlaneView.normal);
 	const_cast<vtkTransform *>(transform)->TransformPoint(p, p); vtk2vec(p, m_PlaneView.point);
 }
+//##ModelId=3EF492640343
+bool mitk::PlaneGeometry::Map(const mitk::Point3D & atPt3d_mm, const mitk::Vector3D &vec3d_mm, mitk::Vector2D &vec2d_mm) const
+{
+    return m_PlaneView.map(vec3d_mm, vec2d_mm);
+}
+
+//##ModelId=3EF49267006C
+void mitk::PlaneGeometry::Map(const mitk::Point2D & atPt2d_mm, const mitk::Vector2D &vec2d_mm, mitk::Vector3D &vec3d_mm) const
+{
+    m_PlaneView.map(vec2d_mm, vec3d_mm);
+}
+

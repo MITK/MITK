@@ -109,9 +109,9 @@ void BoundingObjectCutter<TPixel>::GenerateData() {
   typename ItkImageType::IndexType start;
   mitk::BoundingBox::PointType min = bOBoxRelativeToImage->GetMinimum();
   mitk::BoundingBox::PointType max = bOBoxRelativeToImage->GetMaximum();
-  start[0] = min[0];
-  start[1] = min[1];
-  start[2] = min[2];
+  start[0] = min[0] + 0.5; //to avoid rounding errors
+  start[1] = min[1] + 0.5;
+  start[2] = min[2] + 0.5;
   regionOfInterest.SetIndex(start);
   typename ItkImageType::SizeType size;  
   typename ItkImageType::SizeType inputSize = inputItkImage->GetLargestPossibleRegion().GetSize();
@@ -204,7 +204,7 @@ void BoundingObjectCutter<TPixel>::GenerateData() {
 
   CastToMitkImage(outputItkImage, outputImage);
   /* Position the output Image to match the corresponding region of the input image */
-  outputImage->GetGeometry()->GetVtkTransform()->Translate(min[0], min[1], min[2]);
+  outputImage->GetGeometry()->GetVtkTransform()->Translate(start[0], start[1], start[2]);
   outputImage->GetGeometry()->TransferVtkToITKTransform();
 }
 

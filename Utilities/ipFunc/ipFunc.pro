@@ -3,11 +3,15 @@ TARGET = ipFunc
 LANGUAGE = C
 CONFIG = qt warn_on debug
 
+INCLUDEPATH = ../../DataStructures
+
 unix {
 	CONFIG += staticlib
 }
 
-INCLUDEPATH = ../../DataStructures
+win32 {
+	INCLUDEPATH += ../../DataStructures/ipPic
+}
 
 HEADERS		= gradient.h \
 		  ipAdministrative.h \

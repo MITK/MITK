@@ -1,7 +1,7 @@
 #include "mitkGeometry3D.h"
 #include "mitkPlaneGeometry.h"
 #include "mitkOperation.h"
-#include "mitkPointOperation.h"
+#include "mitkAffineTransformationOperation.h"
 #include "mitkInteractionConst.h"
 #include "mitkStatusBar.h"
 
@@ -152,44 +152,9 @@ bool mitk::Geometry3D::IsValidTime(int t) const
   return (t>=0) && (t< (int)m_TimeSteps);
 }
 
-//New:
 
-/*!
-    /brief Returns the actual global transformation
-    There are 4 cases:
-    - the local transformation has not changed and the transformation of the base geometry has not changed
-    - the local transformation has not changed but the transformation of the base geometry has changed
-    - the local transformation has changed and the transformation of the base geometry has not changed
-    - both the local and the base transformations have changed    
-*/
 vtkTransform* mitk::Geometry3D::GetTransform()
 {
-/*  bool baseGeometryChanged = (m_BaseTransformTimeStamp != m_BaseGeometry->GetTransform()->GetMTime());
-  bool ownGeometryChanged =  (m_TransformTimeStamp != m_RelativeTransform->GetMTime());
-  if (ownGeometryChanged)
-    if (baseGeometryChanged)
-    { // case 4
-      // must update relative tranform, so that basetransform * relativetransform = own transform
-      // and must update own transform somehow...
-    }
-    else
-    { // case 3
-      // must update relative tranform, so that basetransform * relativetransform = own transform
-
-    }
-  else  //own Geometry has not changed
-    if (baseGeometryChanged)
-    { // case 2
-      // must update own transform, so that basetransform * relative transform = own transform
-      m_Transform = m_BaseGeometry->GetTransform()
-      return m_Transform;  
-    }
-    else
-    { // case 1
-      // nothing has changed, just return the transform
-      return m_Transform;
-    }
-*/
   return m_Transform;
 }
 
@@ -216,8 +181,8 @@ mitk::Geometry3D::Pointer mitk::Geometry3D::Clone()
 
 void mitk::Geometry3D::ExecuteOperation(Operation* operation)
 {
-  mitk::PointOperation *pointOp = dynamic_cast<mitk::PointOperation *>(operation);
-	if (pointOp == NULL)
+  mitk::AffineTransformationOperation *affineOp = dynamic_cast<mitk::AffineTransformationOperation *>(operation);
+	if (affineOp == NULL)
 	{
 		(StatusBar::GetInstance())->DisplayText("Recieved wrong type of operation!See mitkAffineInteractor.cpp", 10000);
 		return;
@@ -229,49 +194,86 @@ void mitk::Geometry3D::ExecuteOperation(Operation* operation)
 		break;
 	case OpMOVE:
   {
-    mitk::ITKPoint3D newPos = pointOp->GetPoint();
-    //std::cout << "Geometry: received move Operation: <" << newPos[0] << ", " << newPos[1] << ", " << newPos[2] << ">\n";    
-    GetTransform()->GetMatrix()->SetElement(0, 3, newPos[0]);
-    GetTransform()->GetMatrix()->SetElement(1, 3, newPos[1]);
-    GetTransform()->GetMatrix()->SetElement(2, 3, newPos[2]);
-    float pos[3];     
-    GetTransform()->GetPosition(pos);
-    std::cout << "Geometry: new Position: <" << pos[0] << ", " << pos[1] << ", " << pos[2] << ">\n";
+    //Save actual scale, position and orientation
+    double orientation[3];     
+    GetTransform()->GetOrientation(orientation);
+    double scale[3];     
+    GetTransform()->GetScale(scale);
+    double position[3];     
+    GetTransform()->GetPosition(position);
+
+    mitk::ITKPoint3D newPos = affineOp->GetPoint();
+
+    //GetTransform()->Translate((newPos[0] - position[0]) / scale[0], (newPos[1] - position[1]) / scale[1], (newPos[2] - position[2]) / scale[0]);  // set new position
+    GetTransform()->Identity();               // reset transformation       
+    GetTransform()->PreMultiply();
+    GetTransform()->Translate(newPos[0], newPos[1], newPos[2]);  // set new position       
+    GetTransform()->RotateZ(orientation[2]);
+    GetTransform()->RotateX(orientation[0]);  // restore orientation
+    GetTransform()->RotateY(orientation[1]);
+    GetTransform()->Scale(scale);             // restore scale factors
+
+    //GetTransform()->GetPosition(position);
+    //std::cout << "Geometry: new Position: <" << position[0] << ", " << position[1] << ", " << position[2] << ">\n";
+    //GetTransform()->GetScale(scale);
+    //std::cout << "Geometry: new Scale: <" << scale[0] << ", " << scale[1] << ", " << scale[2] << ">\n";
+    //GetTransform()->GetOrientation(orientation);
+    //std::cout << "Geometry: new Orientation: <" << orientation[0] << ", " << orientation[1] << ", " << orientation[2] << ">\n";
     break;
   }		
 	case OpSCALE:
   {
-    mitk::ITKPoint3D newScale = pointOp->GetPoint();
-    //std::cout << "Geometry: received scale Operation: <" << newScale[0] << ", " << newScale[1] << ", " << newScale[2] << ">\n";    
+    //Save actual scale, position and orientation
     double scale[3];     
     GetTransform()->GetScale(scale);
-    //std::cout << "Geometry: old Scale: <" << scale[0] << ", " << scale[1] << ", " << scale[2] << ">\n";
-    
-    double e;
-    e = GetTransform()->GetMatrix()->GetElement(0, 0);
-    e = e / scale[0];
-    e = e * newScale[0];
-    GetTransform()->GetMatrix()->SetElement(0, 0, e);
-    e = GetTransform()->GetMatrix()->GetElement(1, 1);
-    e = e / scale[1];
-    e = e * newScale[1];
-    GetTransform()->GetMatrix()->SetElement(1, 1, e);
-    e = GetTransform()->GetMatrix()->GetElement(2, 2);
-    e = e / scale[2];
-    e = e * newScale[2];
-    GetTransform()->GetMatrix()->SetElement(2, 2, e);
+    double position[3];     
+    GetTransform()->GetPosition(position);
+    double orientation[3];     
+    GetTransform()->GetOrientation(orientation);
 
-    //GetTransform()->GetMatrix()->Modified();
-    
-    //GetTransform()->Scale(newScale[0], newScale[1], newScale[2]);     
+    mitk::ITKPoint3D newScale = affineOp->GetPoint();    
 
-    GetTransform()->GetScale(scale);
+    //GetTransform()->Scale(newScale[0] / scale[0], newScale[1] / scale[1], newScale[2] / scale[2]); // set new scale factors
+
+    GetTransform()->Identity();               // reset transformation
+    GetTransform()->PreMultiply();
+    GetTransform()->Translate(position);      // restore position
+    GetTransform()->RotateZ(orientation[2]);
+    GetTransform()->RotateX(orientation[0]);  // restore orientation
+    GetTransform()->RotateY(orientation[1]);
+    GetTransform()->Scale(newScale[0], newScale[1], newScale[2]);             // new scale factors
     
-    std::cout << "Geometry: new Scale: <" << scale[0] << ", " << scale[1] << ", " << scale[2] << ">\n";
+    //GetTransform()->GetScale(scale);
+    //std::cout << "Geometry: new Scale: <" << scale[0] << ", " << scale[1] << ", " << scale[2] << ">\n";
     break;
   }
   case OpROTATE:
   {
+    //Save actual scale, position and orientation
+    double scale[3];     
+    GetTransform()->GetScale(scale);
+    double position[3];     
+    GetTransform()->GetPosition(position);
+    double orientation[3];     
+    GetTransform()->GetOrientation(orientation);
+
+    mitk::ITKPoint3D newRotation = affineOp->GetPoint();
+
+    GetTransform()->Identity();               // reset transformation
+    GetTransform()->PreMultiply();
+    GetTransform()->Translate(position);      // restore position
+    GetTransform()->RotateWXYZ(affineOp->GetAngle(), newRotation[0], newRotation[1], newRotation[2]);
+    GetTransform()->RotateZ(orientation[2]);
+    GetTransform()->RotateX(orientation[0]);  // restore orientation
+    GetTransform()->RotateY(orientation[1]);    
+    GetTransform()->Scale(scale);             // restore scale factors
+        
+    GetTransform()->GetPosition(position);
+    std::cout << "Geometry: new Position: <" << position[0] << ", " << position[1] << ", " << position[2] << ">\n";
+    GetTransform()->GetScale(scale);
+    std::cout << "Geometry: new Scale: <" << scale[0] << ", " << scale[1] << ", " << scale[2] << ">\n";
+    GetTransform()->GetOrientation(orientation);
+    std::cout << "Geometry: new Orientation: <" << orientation[0] << ", " << orientation[1] << ", " << orientation[2] << ">\n";
     break;  
   }
   default:

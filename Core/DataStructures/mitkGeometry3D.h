@@ -78,6 +78,9 @@ public:
   //##ModelId=3E3453C703AF
   virtual void Initialize(unsigned int timeSteps);
 
+  //##Documentation
+  //## @brief set a base geometry for the geometry.
+  //## The geometrys transform is linked to the base geometrys transform  
   void SetBaseGeometry(mitk::Geometry3D* base);  
   
   //##Documentation
@@ -86,12 +89,12 @@ public:
   //## @todo not yet implemented
   virtual void SetMasterTransform(const vtkTransform * transform);
 
+  //##Documentation
+  //## @brief duplicates the geometry
   virtual Pointer Clone();
 
   //##Documentation
   //##@brief executes affine operations (translate, rotate, scale)
-  //## 
-  //## executes affine operations (translate, rotate, scale) 
   void ExecuteOperation(Operation* operation);
 
 protected:
@@ -112,13 +115,9 @@ protected:
 
   unsigned int m_TimeSteps;
 
-  //New:
   vtkTransform* m_Transform;
-  //vtkTransform* m_RelativeTransform;
+
   Geometry3D::Pointer m_BaseGeometry;  
-  //Geometry3D::ConstPointer m_BaseGeometry;  
-  //unsigned long m_TransformTimeStamp;
-  //unsigned long m_BaseTransformTimeStamp;
 };
 
 } // namespace mitk

@@ -238,6 +238,7 @@
 				<action ID="8" />
 			</transition>
 		</state>
+
 		<state NAME="move Point Space" ID="12">
 			<transition NAME="move point" NEXT_STATE_ID="12" EVENT_ID="530">
 				<action ID="91" />
@@ -312,6 +313,9 @@
 			<transition NAME="addPoint" NEXT_STATE_ID="1" EVENT_ID="3">
 	 			<action ID="1101" /> <!--AcMODESELECT-->
 	 			<action ID="10" /><!--AcADDPOINT-->
+				<action ID="30" > <!--AcCHECKELEMENT-->
+				 	<intParam Name="precision" Value="4" />
+				</action>
 			</transition>
 			<transition NAME="checkpicked" NEXT_STATE_ID="2" EVENT_ID="1">
 				 <action ID="30" > <!--AcCHECKELEMENT-->
@@ -323,6 +327,9 @@
 			<transition NAME="deselect all and add point" NEXT_STATE_ID="1" EVENT_ID="3">
 			 	<action ID="72" /><!--AcDESELECTALL-->
 			 	<action ID="10" /><!--AcADDPOINT-->
+				<action ID="30" > <!--AcCHECKELEMENT-->
+				 	<intParam Name="precision" Value="4" />
+				</action>
 			</transition>
 			<transition NAME="remove" NEXT_STATE_ID="5" EVENT_ID="12">
 			 	<action ID="1500" /> <!--AcCHECKGREATERONE-->
@@ -391,11 +398,11 @@
 			</transition>
 		</state>
 		<state NAME="checkPointSnap" ID="1">
-			<transition NAME="EIDNo" NEXT_STATE_ID="0" EVENT_ID="1003">
+			<transition NAME="EIDNo" NEXT_STATE_ID="3" EVENT_ID="1003">
 				<action ID="1550"/><!--AcFORCESUBINTERACTORS-->
 			 	<action ID="2000" /><!--AcTRANSMITEVENT-->
 			</transition>
-			<transition NAME="EIDYes" NEXT_STATE_ID="0" EVENT_ID="1004">
+			<transition NAME="EIDYes" NEXT_STATE_ID="3" EVENT_ID="1004">
 			 	<action ID="72" /><!--AcDESELECTALL-->
 			 	<action ID="66" /><!--AcSELECTPOINT-->
 			</transition>
@@ -416,24 +423,25 @@
 <!-- Behaviour of a Line. -->
 	<stateMachine NAME="lineinteractor">
 		<state NAME="unselected" ID="0" START_STATE="TRUE">
-			<transition NAME="addLine" NEXT_STATE_ID="1" EVENT_ID="3">
-				<action ID="1102" /><!--AcMODESUBSELECT-->
-				<action ID="1550"/><!--AcFORCESUBINTERACTORS-->
-				<action ID="2000" /><!--AcTRANSMITEVENT-->
-			 	<action ID="72" /> <!--AcDESELECTALL-->
-			 	<action ID="12" /><!--AcADDLINE -->
+			<transition NAME="insertLine" NEXT_STATE_ID="4" EVENT_ID="3">
+				<action ID="22"><!--AcCHECKLINE-->
+					<intParam Name="precision" Value="5" />
+				</action>
 			</transition>
 			<transition NAME="checkPointPick" NEXT_STATE_ID="2" EVENT_ID="1">
 	 			<action ID="38"><!--AcCHECKONESUBINTERACTOR-->
 	 				<floatParam Name="threshold" Value="0.5" />
 				</action>
 			</transition>
+			<transition NAME="SubInteractorDeselect" NEXT_STATE_ID="0" EVENT_ID="1020"> <!-- necessary transition of the state subSelected -->
+				<action ID="1101" /><!--AcMODEDESELECT--><!-- the event will produced from the hirachical interactor -->
+			</transition>
 		</state>
 		<state NAME="createLineSSD" ID="1">
 			<transition NAME="addLine" NEXT_STATE_ID="1" EVENT_ID="3">
 			 	<action ID="2000" /><!--AcTRANSMITEVENT-->
-			 	<action ID="72" /><!--AcDESELECTALL-->
 			 	<action ID="12" /><!--AcADDLINE -->
+			 	<action ID="72" /><!--AcDESELECTALL-->
 			</transition>
 			<transition NAME="Finish" NEXT_STATE_ID="0" EVENT_ID="2000">
 				<action ID="72" /><!--AcDESELECTALL-->
@@ -450,19 +458,35 @@
 					<intParam Name="precision" Value="5" />
 				</action>
 			</transition>
-			<transition NAME="EIDYes" NEXT_STATE_ID="10" EVENT_ID="1004">
+			<transition NAME="EIDYes" NEXT_STATE_ID="0" EVENT_ID="1004">
 				<action ID="72" /><!--AcDESELECTALL-->
 				<action ID="1102" /><!--AcMODESUBSELECT-->
 				<action ID="2000" /><!--AcTRANSMITEVENT-->
 			</transition>
 		</state>
-		<state NAME="checkLinePicked" ID="3">
+		<state NAME="checkLinePickedIFFselect" ID="3">
 			<transition NAME="EIDNo" NEXT_STATE_ID="0" EVENT_ID="1003">
 				<action ID="1100" /><!--AcMODEDESELECT-->
 			</transition>
 			<transition NAME="EIDYes" NEXT_STATE_ID="20" EVENT_ID="1004">
 				<action ID="1101" /><!--AcMODESELECT-->
 				<action ID="65" /><!--AcSELECT-->
+			</transition>
+		</state>
+		<state NAME="checkLinePickedIFFinsert" ID="4">
+			<transition NAME="EIDNo" NEXT_STATE_ID="1" EVENT_ID="1003">
+				<action ID="1102" /><!--AcMODESUBSELECT-->
+				<action ID="1550"/><!--AcFORCESUBINTERACTORS-->
+				<action ID="2000" /><!--AcTRANSMITEVENT-->
+			 	<action ID="72" /> <!--AcDESELECTALL-->
+			 	<action ID="12" /><!--AcADDLINE -->
+			</transition>
+			<transition NAME="EIDYes" NEXT_STATE_ID="0" EVENT_ID="1004">
+				<action ID="1102" /><!--AcMODESUBSELECT-->
+				<action ID="1550"/><!--AcFORCESUBINTERACTORS-->
+				<action ID="2000" /><!--AcTRANSMITEVENT-->
+			 	<action ID="12" /><!--12AcADDLINE111AcINSERTLINE -->
+			 	<action ID="72" /> <!--AcDESELECTALL-->
 			</transition>
 		</state>
 		<state NAME="SSD" ID="10">
@@ -519,13 +543,20 @@
 			</transition>
 		</state>
 		<state NAME="checkpicked" ID="3">
-			<transition NAME="EIDNO" NEXT_STATE_ID="0" EVENT_ID="1003" />
+			<transition NAME="EIDNO" NEXT_STATE_ID="0" EVENT_ID="1003">
+				<action ID="1101" /><!--AcMODEDESELECT-->
+			</transition>
 			<transition NAME="EIDYes" NEXT_STATE_ID="4" EVENT_ID="1004">
 				<action ID="1101" /> <!--AcMODESELECT-->
 				<action ID="67" /><!--AcSELECTCELL-->
 			</transition>
 		</state>
 		<state NAME="selected" ID="4">
+			<transition NAME="checkSubSelectForInsertLineAndPoint" NEXT_STATE_ID="7" EVENT_ID="3">
+				<action ID="38"><!--AcCHECKONESUBINTERACTOR-->
+					<floatParam Name="threshold" Value="0.5" />
+				</action>
+			</transition>
 			<transition NAME="remove" NEXT_STATE_ID="0" EVENT_ID="12">
 				<action ID="101" />
 				<action ID="1100" /> <!--AcMODEDESELECT-->
@@ -534,6 +565,9 @@
 				<action ID="38"><!--AcCHECKONESUBINTERACTOR-->
 					<floatParam Name="threshold" Value="0.5" />
 				</action>
+			<transition NAME="SubInteractorDeselect" NEXT_STATE_ID="0" EVENT_ID="1020"> <!-- necessary transition of the state subSelected -->
+				 <action ID="1101" /> <!--AcMODESELECT-->
+			</transition>
 			</transition>
 		</state>
 		<state NAME="CheckSubSelect" ID="5">
@@ -552,6 +586,14 @@
 			<transition NAME="EIDNO" NEXT_STATE_ID="0" EVENT_ID="1003" >
 				<action ID="77" /> <!--AcDESELECTCELL-->
 				<action ID="1100" /> <!--AcMODEDESELECT-->
+			</transition>
+		</state>
+		<state NAME="CheckSubSelectForInsertLineAndPoint" ID="7">
+			<transition NAME="EIDYES" NEXT_STATE_ID="4" EVENT_ID="1004">
+				<action ID="1102" /> <!--AcMODESUBSELECT-->
+				<action ID="2000" /> <!--AcTRANSMITEVENT-->
+			</transition>
+			<transition NAME="EIDNO" NEXT_STATE_ID="4" EVENT_ID="1003" >
 			</transition>
 		</state>
 		<state NAME="SSD" ID="10">

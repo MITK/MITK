@@ -45,11 +45,17 @@ public:
   bool AddInteractor(Interactor::Pointer interactor);
 
 protected:
-
+  //##Documentation
+  //## @brief transmitts the event
   bool TransmitEvent( StateEvent const* stateEvent, int objectEventId, int groupEventId );
-  InteractorList m_SelectedInteractors;
-  InteractorList m_AllInteractors;
 
+  //##Documentation
+  //## @brief stores pointers on hierarchical lower Interactors, that are in Mode selected or Subselected
+  InteractorList m_SelectedInteractors;
+
+  //##Documentation
+  //## @brief stores all lower Interactors
+  InteractorList m_AllInteractors;
 };
 
 }//namespace mitk

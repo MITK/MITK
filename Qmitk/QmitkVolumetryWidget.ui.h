@@ -27,6 +27,10 @@ PURPOSE.  See the above copyright notices for more information.
 ** destructor.
 *****************************************************************************/
 
+#include "mitkImageTimeSelector.h"
+#include "QmitkCommonFunctionality.h"
+#include "itkImage.h"
+#include <limits>
 
 void QmitkVolumetryWidget::SetDataTreeNode(mitk::DataTreeNode* node)
 {
@@ -52,6 +56,7 @@ void QmitkVolumetryWidget::SetDataTreeNode(mitk::DataTreeNode* node)
       {
         m_CalcButton->setEnabled(true);
       }
+      UpdateSlider();
     }
   }
 }
@@ -96,5 +101,52 @@ void QmitkVolumetryWidget::CalculateTimeSeries()
       }
       m_TextEdit->setText(vs.str().c_str());
     }
+  }
+}
+
+void QmitkVolumetryWidget::UpdateSlider()
+{
+
+  if (m_Node && dynamic_cast<mitk::Image*>(m_Node->GetData()))
+  {
+    typedef itk::Image<int,3> ItkInt3DImage;
+    ItkInt3DImage::Pointer itkImage = ItkInt3DImage::New();
+    mitk::Image* image = dynamic_cast<mitk::Image*>(m_Node->GetData());
+
+    if (image->GetDimension() == 4)
+    {
+
+      mitk::ImageTimeSelector::Pointer timeSelector = mitk::ImageTimeSelector::New();
+      timeSelector->SetInput(image);
+      float gMin = std::numeric_limits<float>::max();
+      float gMax = std::numeric_limits<float>::min();
+      for (unsigned int timeStep = 0; timeStep<image->GetDimension(3); timeStep++)
+      {
+        timeSelector->SetTimeNr(timeStep);
+        timeSelector->Update();
+        mitk::CastToItkImage(image,itkImage);
+        float min,max;
+        CommonFunctionality::MinMax<ItkInt3DImage>(itkImage,min,max);
+        if (min<gMin) { gMin = min; }
+        if (max>gMax) { gMax = max; }
+        m_ThresholdSlider->setMinValue(gMin);
+        m_ThresholdSlider->setMaxValue(gMax);
+        m_ThresholdSlider->setEnabled(true);
+      }
+    }
+    else if (image->GetDimension() == 3)
+    {
+      mitk::CastToItkImage(image,itkImage);
+      float min,max;
+      CommonFunctionality::MinMax<ItkInt3DImage>(itkImage,min,max);
+      m_ThresholdSlider->setMinValue(min);
+      m_ThresholdSlider->setMaxValue(max);
+      m_ThresholdSlider->setEnabled(true);
+    }
+    else
+    {
+      m_ThresholdSlider->setEnabled(false);
+    }
+
   }
 }

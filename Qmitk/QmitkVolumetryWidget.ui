@@ -8,8 +8,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>451</width>
-            <height>431</height>
+            <width>462</width>
+            <height>464</height>
         </rect>
     </property>
     <property name="sizePolicy">
@@ -225,6 +225,7 @@
     <slot>SetDataTreeNode( mitk::DataTreeNode * node )</slot>
     <slot access="protected">CalculateVolume()</slot>
     <slot>CalculateTimeSeries()</slot>
+    <slot>UpdateSlider()</slot>
 </slots>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

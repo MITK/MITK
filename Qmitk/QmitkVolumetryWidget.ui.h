@@ -72,7 +72,6 @@ void QmitkVolumetryWidget::CalculateVolume()
       std::stringstream vs;
       vs << volCalc->GetVolume() << " ml";
       m_Result->setText(vs.str().c_str() );
-      std::cout << "Volume:" << vs.str() << std::endl;
     }
   }
 }
@@ -94,9 +93,8 @@ void QmitkVolumetryWidget::CalculateTimeSeries()
       for (std::vector<float>::iterator it = volumes.begin(); it != volumes.end(); it++)
       {
         vs << timeStep++ << "," << *it << std::endl;
-        // m_Result->setText(vs.str().c_str() );
       }
-      std::cout << "Result:" << std::endl << vs.str() << std::endl;
+      m_TextEdit->setText(vs.str().c_str());
     }
   }
 }

@@ -98,6 +98,11 @@ public:
     BoundingBoxType::BoundsArrayType bounds = m_ParametricBoundingBox->GetBounds();
     return bounds[direction*2+1]-bounds[direction*2];
   }
+ 
+  virtual mitk::ScalarType GetParametricExtentInMM(int direction) const
+  {
+    return GetExtentInMM(direction);
+  }
 
   virtual void SetIndexToWorldTransform(mitk::AffineTransform3D* transform);
 

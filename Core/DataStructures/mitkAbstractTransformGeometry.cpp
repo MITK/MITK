@@ -96,6 +96,11 @@ void mitk::AbstractTransformGeometry::SetParametricBounds(const BoundingBox::Bou
   }
 }
 
+mitk::ScalarType mitk::AbstractTransformGeometry::GetParametricExtentInMM(int direction) const
+{
+  return m_Plane->GetExtentInMM(direction);
+}
+
 bool mitk::AbstractTransformGeometry::Project(const mitk::Point3D &pt3d_mm, mitk::Point3D &projectedPt3d_mm) const
 {
   assert(m_BoundingBox.IsNotNull());

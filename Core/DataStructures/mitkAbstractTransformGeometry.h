@@ -84,6 +84,8 @@ public:
 
   virtual void SetParametricBounds(const BoundingBox::BoundsArrayType& bounds);
   
+  virtual mitk::ScalarType GetParametricExtentInMM(int direction) const;
+
   virtual bool Project(const mitk::Point3D &pt3d_mm, mitk::Point3D &projectedPt3d_mm) const;
 
   //##ModelId=3EF4A2660256

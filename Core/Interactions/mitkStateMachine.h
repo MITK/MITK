@@ -49,7 +49,7 @@ class StateMachine : public itk::Object, public mitk::OperationActor
   //## EventMapper gives each event a new objectEventId
   //## and a StateMachine::ExecuteAction can descide weather it gets a
   //## new GroupEventId or not, depending on its state (e.g. finishedNewObject then new GroupEventId)
-  bool HandleEvent(StateEvent const* stateEvent, int objectEventId, int groupEventId);
+  virtual bool HandleEvent(StateEvent const* stateEvent, int objectEventId, int groupEventId);
 
   //##ModelId=3EDCAECB0175
   //##Documentation
@@ -91,7 +91,7 @@ class StateMachine : public itk::Object, public mitk::OperationActor
   //## @brief holds an UndoController, that can be accessed from all StateMachines. For ExecuteAction
   UndoController* m_UndoController;
 
- private:
+ protected:
   //##ModelId=3EAEEDC603D9
   //##Documentation
   //## @brief A statemachine is also an OperationActor due to the UndoMechanism. 
@@ -99,7 +99,9 @@ class StateMachine : public itk::Object, public mitk::OperationActor
   //## The statechange is done in ExecuteOperation, so that the statechange can be undone by UndoMechanism.
   //## Is set private here and in superclass it is set public, so UndoController
   //## can reach ist, but it can't be overwritten by a subclass
-  void ExecuteOperation(Operation* operation);
+  virtual void ExecuteOperation(Operation* operation);
+
+ private:
 
   //##ModelId=3E5B2D66027E
   std::string m_Type;

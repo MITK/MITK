@@ -72,11 +72,13 @@ bool mitk::StateMachine::HandleEvent(StateEvent const* stateEvent, int objectEve
 														objectEventId ,groupEventId);
 	  m_UndoController->SetOperationEvent(operationEvent);
     }
-#ifdef INTERDEBUG
-//Debug StateChanges through cout output! Thus very slow!
-std::cout<<this->GetType()<<": Changing from StateId "<<m_CurrentState->GetId()<<" to StateId "<<tempNextState->GetId()<<std::endl;
-std::cout<<this->GetType()<<": Changing from State "<<m_CurrentState->GetName()<<" to State "<<tempNextState->GetName()<<std::endl;
-#endif
+
+            #ifdef INTERDEBUG
+            //Debug StateChanges through cout output! Thus very slow!
+            std::cout<<this->GetType()<<": Changing from StateId "<<m_CurrentState->GetId()<<" to StateId "<<tempNextState->GetId()<<std::endl;
+            std::cout<<this->GetType()<<": Changing from State "<<m_CurrentState->GetName()<<" to State "<<tempNextState->GetName()<<std::endl;
+            #endif
+
     //first following StateChange(or calling ExecuteOperation(tempNextStateOp)), then operation(action)
     m_CurrentState = tempNextState;
   }

@@ -20,7 +20,7 @@ inline void UpdateAllWidgets()//@todo global quickimplementation. is to be chang
         w->update();
     }
     delete list;                      // delete the list, not the widgets
-  
+
 }
 
 //##ModelId=3F0177E901BD
@@ -68,7 +68,7 @@ int mitk::PointSet::SearchPoint(ITKPoint3D point, float distance )
   in[2] = point[2];
   out.Fill(0);
   pout = &out;
-	
+
   //searching the first point in the List, that is +- distance far away from the given point
   unsigned int i;
  	for (i=0; i < m_PointList->GetNumberOfPoints(); i++)
@@ -76,8 +76,8 @@ int mitk::PointSet::SearchPoint(ITKPoint3D point, float distance )
     m_PointList->GetPoint(i, pout);//changes out
     if (in == out)//if totaly equal
       return i;
-    
-    //distance calculation 
+
+    //distance calculation
 		if ( ( in[0] >= ( out[0] - distance ) ) && ( in[0] <= ( out[0] + distance ) ) &&
 			 ( in[1] >= ( out[1] - distance ) ) && ( in[1] <= ( out[1] + distance ) ) &&
 			 ( in[2] >= ( out[2] - distance ) ) && ( in[2] <= ( out[2] + distance ) ) )
@@ -174,7 +174,7 @@ void mitk::PointSet::ExecuteOperation(Operation* operation)
 	case OpINSERT://inserts the point at the given position pointOperation.index
 		{
       PointsContainer::Pointer itkPoints = m_PointList->GetPoints();
-      
+
 			if (m_PointList->GetNumberOfPoints() >= ((unsigned)(pointOp->GetIndex())))
 			{
         PointType pt;
@@ -206,7 +206,7 @@ void mitk::PointSet::ExecuteOperation(Operation* operation)
       //m_PointList->GetPoints()->pop_back();
       PointsContainer::Pointer position = m_PointList->GetPoints();
       position->DeleteIndex(position->size()-1);
-			m_SelectList.pop_back();			
+			m_SelectList.pop_back();
 		}
 		break;
 	case OpREMOVE://removes the point at position pointOperation.index
@@ -246,13 +246,21 @@ void mitk::PointSet::ExecuteOperation(Operation* operation)
 
 //##ModelId=3F0177E901EE
 void mitk::PointSet::UpdateOutputInformation()
-{    //What shall be done here? Ingmar
-  /*
-  PointSetType::BoundingBoxType const *bb = m_PointList->GetBoundingBox();
-  mitk::BoundingBox * mitkbb; 
-  mitkbb = bb;
-  m_Geometry3D->SetBoundingBox((const)(mitkbb));
-  */
+{
+  const PointSetType::BoundingBoxType *bb = m_PointList->GetBoundingBox();
+  BoundingBox::BoundsArrayType itkBounds = bb->GetBounds();
+  float mitkBounds[6];
+
+  //for assignment see Geometry3d::SetBoundingBox(const float bounds)
+  mitkBounds[0] = itkBounds[0];
+  mitkBounds[1] = itkBounds[2];
+  mitkBounds[2] = itkBounds[4];
+  mitkBounds[3] = itkBounds[1];
+  mitkBounds[4] = itkBounds[3];
+  mitkBounds[5] = itkBounds[5];
+
+  m_Geometry3D->SetBoundingBox(mitkBounds);
+ 
 }
 
 //##ModelId=3F0177E901FB

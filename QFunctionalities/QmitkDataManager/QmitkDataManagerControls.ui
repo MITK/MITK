@@ -9,7 +9,7 @@
             <x>0</x>
             <y>0</y>
             <width>553</width>
-            <height>820</height>
+            <height>823</height>
         </rect>
     </property>
     <property name="sizePolicy">
@@ -51,7 +51,7 @@
         </property>
         <widget class="QLayoutWidget">
             <property name="name">
-                <cstring>layout2</cstring>
+                <cstring>layout3</cstring>
             </property>
             <hbox>
                 <property name="name">
@@ -66,6 +66,14 @@
                     </property>
                     <property name="text">
                         <string>Save Selected</string>
+                    </property>
+                </widget>
+                <widget class="QPushButton">
+                    <property name="name">
+                        <cstring>m_SaveToLightBox</cstring>
+                    </property>
+                    <property name="text">
+                        <string>Save Selected to LightBox</string>
                     </property>
                 </widget>
                 <widget class="QPushButton">
@@ -243,6 +251,12 @@
         <receiver>m_RendererPropertiesView</receiver>
         <slot>SelectionChanged(QListViewItem*)</slot>
     </connection>
+    <connection>
+        <sender>m_SaveToLightBox</sender>
+        <signal>clicked()</signal>
+        <receiver>QmitkDataManagerControls</receiver>
+        <slot>SaveLightBox_clicked()</slot>
+    </connection>
 </connections>
 <includes>
     <include location="global" impldecl="in declaration">mitkDataTree.h</include>
@@ -263,9 +277,10 @@
     <variable>mitk::DataTreeIteratorClone m_DataTreeIterator;</variable>
 </variables>
 <slots>
-    <slot>SetDataTreeIterator( mitk::DataTreeIteratorBase* it )</slot>
+    <slot>SetDataTreeIterator( mitk::DataTreeIteratorBase * it )</slot>
     <slot>RemoveButtonClicked()</slot>
     <slot>SaveButton_clicked()</slot>
+    <slot>SaveLightBox_clicked()</slot>
 </slots>
 <functions>
     <function access="private" specifier="non virtual">init()</function>

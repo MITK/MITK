@@ -40,6 +40,14 @@ PURPOSE.  See the above copyright notices for more information.
 #include "ipPic.h"
 #include "ipFunc.h"
 
+#ifdef CHILIPLUGIN
+#include "QcMITKSamplePlugin.h"
+#include "mitkLightBoxResultImageWriter.h"
+#include <chili/plugin.h>
+#include <chili/qclightbox.h>
+#include <qmessagebox.h>
+#endif
+
 void QmitkDataManagerControls::init() { 
   m_DataTreeIterator = NULL;
   while (m_DataTreeView->columns() > 0 ) {
@@ -58,6 +66,9 @@ void QmitkDataManagerControls::init() {
 
     fm->AddObserver(fe,fcc);
   }
+#ifndef CHILIPLUGIN
+  m_SaveToLightBox->hide();
+#endif
 }
 
 void QmitkDataManagerControls::destroy() 
@@ -136,7 +147,6 @@ void QmitkDataManagerControls::SaveButton_clicked()
     std::string selectedItemsName = std::string(selected->text(0).ascii());
   
     mitk::DataTreeIteratorBase* selectedIterator = selected->GetDataTreeIterator();
-//    mitk::DataTreeIteratorBase* selectedIterator = ((mitk::DataTree *) m_DataTreeIterator->getTree())->GetNext("name", new mitk::StringProperty( selectedItemsName  ));
     if (selectedIterator != NULL)
     {
       mitk::DataTreeNode* node = selectedIterator->Get();
@@ -149,19 +159,6 @@ void QmitkDataManagerControls::SaveButton_clicked()
           if(image.IsNotNull())
           {
             CommonFunctionality::SaveImage<itk::Image<int,3> >(image);
-            //selectedItemsName = itksys::SystemTools::GetFilenameWithoutExtension(selectedItemsName);
-            //selectedItemsName += ".pic";
-
-            //ipPicDescriptor * picImage = image->GetPic();
-
-            //picImage = ipFuncRefl(picImage,3);
-
-            //QString fileName = QFileDialog::getSaveFileName(QString(selectedItemsName),"DKFZ Pic (*.seq *.pic *.pic.gz *.seq.gz *.dcm)");
-            //if (fileName != NULL ) 
-            //{
-            //  ipPicPut((char *)fileName.ascii(), picImage);
-            //}
-            return;
           }
           mitk::PointSet::Pointer pointset = dynamic_cast<mitk::PointSet*>(data.GetPointer());
           if(pointset.IsNotNull())
@@ -188,4 +185,54 @@ void QmitkDataManagerControls::SaveButton_clicked()
       std::cout << "logical error" << std::endl;
     }
   }
+}
+
+
+void QmitkDataManagerControls::SaveLightBox_clicked()
+{
+#ifdef CHILIPLUGIN
+  QmitkDataTreeViewItem *selected = dynamic_cast<QmitkDataTreeViewItem*>(m_DataTreeView->selectedItem());
+  if (selected != NULL)
+  {
+    std::string selectedItemsName = std::string(selected->text(0).ascii());
+
+    mitk::DataTreeIteratorBase* selectedIterator = selected->GetDataTreeIterator();
+    if (selectedIterator != NULL)
+    {
+      mitk::DataTreeNode* node = selectedIterator->Get();
+      if (node != NULL )
+      {
+        mitk::BaseData::Pointer data=node->GetData();
+
+        if (data.IsNotNull())
+        {
+          mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(data.GetPointer());
+          if(image.IsNotNull())
+          {
+            mitk::LightBoxResultImageWriter::Pointer lbwriter =  mitk::LightBoxResultImageWriter::New();
+            lbwriter->SetInputByNode(node);
+            if(lbwriter->SetSourceByTreeSearch(selectedIterator)==false)
+            {
+              QMessageBox::critical( this, "Save Selected to LightBox",
+                "Saving to LightBox not possible:\n"
+                "Unable to find parent image that came from Chili.", QMessageBox::Cancel|QMessageBox::Default|QMessageBox::Escape,QMessageBox::NoButton );
+              return;
+            }
+            QcPlugin* plugin = QcMITKSamplePlugin::GetPluginInstance();
+            if(plugin==NULL)
+            {
+              QMessageBox::critical( this, "Save Selected to LightBox",
+                "Saving to LightBox not possible:\n"
+                "This is not a plugin!!", QMessageBox::Cancel|QMessageBox::Default|QMessageBox::Escape,QMessageBox::NoButton );
+              return;
+            }
+            lbwriter->SetLightBox(plugin->lightboxManager()->getActiveLightbox());
+  itkGenericOutputMacro(<<"goooooooooooooooooooooooooooooooooooooooooooooo");
+            lbwriter->Write();
+          }
+        }
+      }
+    }
+  }
+#endif
 }

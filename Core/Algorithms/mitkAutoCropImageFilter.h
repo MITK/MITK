@@ -25,11 +25,11 @@ public:
 
 	itkNewMacro(Self);  
 
-	itkGetConstMacro(BackgroundValue,int);
-	itkSetMacro(BackgroundValue,int);
+	itkGetConstMacro(BackgroundValue,float);
+	itkSetMacro(BackgroundValue,float);
 
-	itkGetConstMacro(MarginFactor,int);
-	itkSetMacro(MarginFactor,int);
+	itkGetConstMacro(MarginFactor,float);
+	itkSetMacro(MarginFactor,float);
 
 protected:
 

@@ -44,9 +44,9 @@ typename ItkImageToImageFilterAdapter< TPixel>::ItkImageType::Pointer ItkImageTo
     //fill holes
   try
   {  
-    typedef itk::BinaryBallStructuringElement<ItkImageType::PixelType, 3> StructuringElementType;
-    itk::GrayscaleDilateImageFilter<ItkImageType, ItkImageType, StructuringElementType>::Pointer dilate = itk::GrayscaleDilateImageFilter<ItkImageType, ItkImageType, StructuringElementType>::New();
-    itk::GrayscaleErodeImageFilter<ItkImageType, ItkImageType, StructuringElementType>::Pointer erode = itk::GrayscaleErodeImageFilter<ItkImageType, ItkImageType, StructuringElementType>::New();
+    typedef typename itk::BinaryBallStructuringElement<typename ItkImageType::PixelType, 3> StructuringElementType;
+    typename itk::GrayscaleDilateImageFilter<ItkImageType, ItkImageType, StructuringElementType>::Pointer dilate = itk::GrayscaleDilateImageFilter<ItkImageType, ItkImageType, StructuringElementType>::New();
+    typename itk::GrayscaleErodeImageFilter<ItkImageType, ItkImageType, StructuringElementType>::Pointer erode = itk::GrayscaleErodeImageFilter<ItkImageType, ItkImageType, StructuringElementType>::New();
     StructuringElementType structuringElement;
     structuringElement.SetRadius(1);
     structuringElement.CreateStructuringElement();
@@ -121,7 +121,7 @@ void ItkImageToImageFilterAdapter< TPixel>::GenerateData()
   //CastToMitkImage(itkOutputImage, outputImage);
 
 
-  ItkImageType::Pointer itkOutputImage;
+  typename ItkImageType::Pointer itkOutputImage;
   bool closing = this->GetClosingEnabled();
   //dilate if specified in pipe param of xml-file
   if (closing == true)

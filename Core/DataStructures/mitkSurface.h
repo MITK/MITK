@@ -23,6 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkCommon.h"
 #include "mitkBaseData.h"
 #include "mitkTimeSlicedGeometry.h"
+#include "itkImageRegion.h"
 #include <vector>
 
 class vtkPolyData;
@@ -35,7 +36,12 @@ namespace mitk {
 //## @ingroup Data
 class Surface : public BaseData
 {
+protected:
+
 public:
+  // not yet the best chioce of a region-type for surfaces, but it works for the time being
+  typedef itk::ImageRegion< 5 >  RegionType;  
+	
   mitkClassMacro(Surface, BaseData);
   
   itkNewMacro(Self);
@@ -49,19 +55,16 @@ public:
   //##ModelId=3E70F66100AE
   virtual void UpdateOutputInformation();
   
-  //##ModelId=3E70F66100B0
   virtual void SetRequestedRegionToLargestPossibleRegion();
   
-  //##ModelId=3E70F66100B6
   virtual bool RequestedRegionIsOutsideOfTheBufferedRegion();
   
-  //##ModelId=3E70F66100B8
   virtual bool VerifyRequestedRegion();
-  
-  //##ModelId=3E70F66100BA
+ 
   virtual void SetRequestedRegion(itk::DataObject *data);
-  
-  //##ModelId=3E70F66100C1
+
+  virtual void SetRequestedRegion(Surface::RegionType *region);
+
   virtual void CopyInformation(const itk::DataObject *data);
   
   virtual void Update();
@@ -70,7 +73,31 @@ public:
   
   virtual void SetGeometry(Geometry3D* aGeometry3D);
 
-  virtual TimeSlicedGeometry* GetTimeSlicedGeometry();
+  mitk::TimeSlicedGeometry* GetTimeSlicedGeometry()
+  {
+    return dynamic_cast<mitk::TimeSlicedGeometry*>( m_Geometry3D.GetPointer() );
+  }
+
+  const mitk::TimeSlicedGeometry* GetTimeSlicedGeometry() const
+  {
+    return dynamic_cast<mitk::TimeSlicedGeometry*>( m_Geometry3D.GetPointer() );
+  }
+
+  const RegionType& GetLargestPossibleRegion() const
+  {
+	  m_LargestPossibleRegion.SetIndex(3, 0);
+	  m_LargestPossibleRegion.SetSize(3, GetTimeSlicedGeometry()->GetTimeSteps());
+	  return m_LargestPossibleRegion;
+  }
+
+  //##Documentation
+  //## Get the region object that defines the size and starting index
+  //## for the region of the image requested (i.e., the region of the
+  //## image to be operated on by a filter).
+  virtual const RegionType& GetRequestedRegion() const
+  {
+    return m_RequestedRegion;
+  }
 
   virtual void Initialize(unsigned int timeSteps=1);
 
@@ -86,12 +113,14 @@ protected:
   
   //##ModelId=3E70F6610099
   VTKPolyDataSeries m_PolyDataSeries;
+
+  mutable RegionType m_LargestPossibleRegion;
+
+  RegionType m_RequestedRegion;
   
   bool m_CalculateBoundingBox;
 };
 
 } // namespace mitk
-
-
 
 #endif /* MITKSURFACEDATA_H_HEADER_INCLUDED_C19085D7 */

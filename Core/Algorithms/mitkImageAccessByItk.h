@@ -233,7 +233,6 @@ PURPOSE.  See the above copyright notices for more information.
     return;                                                                                      \
   }                                                                                              \
   _accessMainTypesByItk_2(mitkImage, itkImageTypeFunction, 3, param1, param2)                    \
-  }                                                                                              \
 }
 
 //##Documentation

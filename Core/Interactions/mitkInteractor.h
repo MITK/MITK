@@ -11,13 +11,6 @@ namespace mitk {
 
 class DataTreeNode;
 
-/** Macro for setting the mode of this interactor */
-#define mitkSetModeOkMacro(ok) \
-  if (ok) \
-    this->SetMode(SMSELECTED); \
-  else \
-    this->SetMode(SMDESELECTED); \
- 
 //##Documentation
 //## @brief Interface for an Interactor.
 //## @ingroup Interaction
@@ -50,6 +43,7 @@ public:
     SMSELECTED,
     SMSUBSELECTED
   };
+  typedef SMMode ModeType;
 
   mitkClassMacro(Interactor,StateMachine);
 
@@ -92,12 +86,21 @@ public:
 
 protected:
   //##Documentation
+  //## @brief adds the handling of Operations used for mode change. Unrecognized Operations are send to Superclass.
+  virtual void ExecuteOperation(Operation* operation);
+  
+  //##Documentation
+  //## @brief creates a ModeOperation with the transmitted mode and sends it to this. Undo supported!
+  void CreateModeOperation(ModeType mode, int objectEventId, int groupEventId);
+
+  //##Documentation
   //## @brief Pointer to the data, this object handles the Interaction for
   DataTreeNode* m_DataTreeNode;
 
   //##Documentation
   //## @brief Mode of Selection
-  SMMode m_Mode;
+  ModeType m_Mode;
+
 
 };
 

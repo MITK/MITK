@@ -11,7 +11,7 @@
 #include "mitkInteractionConst.h"
 #include <vtkTransform.h>
 #include <itkVector.h>
-
+#include <mitkModeOperation.h>
 
 
 
@@ -37,6 +37,20 @@ bool mitk::Interactor::IsSelected() const
   return (m_Mode!=SMDESELECTED);
 }
 
+void mitk::Interactor::CreateModeOperation(ModeType mode, int objectEventId, int groupEventId)
+{
+  mitk::ModeOperation* doOp = new mitk::ModeOperation(OpMODECHANGE, mode);
+	if (m_UndoEnabled)
+	{
+    mitk::ModeOperation* undoOp = new mitk::ModeOperation(OpMODECHANGE, this->GetMode());
+		OperationEvent *operationEvent = new OperationEvent(this,
+					  									doOp, undoOp,
+						  								objectEventId, groupEventId);
+		m_UndoController->SetOperationEvent(operationEvent);
+	}
+	this->ExecuteOperation(doOp);
+}
+
 bool mitk::Interactor::ExecuteAction(Action* action, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId) 
 {
 
@@ -44,24 +58,22 @@ bool mitk::Interactor::ExecuteAction(Action* action, mitk::StateEvent const* sta
   {
     case AcMODEDESELECT:
       {
-        m_Mode = SMDESELECTED;
-        // ToDo
-        // Operation op( OPSelect, ... )
-        // m_DataTreeNode->GetData()->ExecuteOperation( &op );
+        this->CreateModeOperation(SMDESELECTED, objectEventId, groupEventId);
         return true;
       }
     case AcMODESELECT:
       {      
-        m_Mode = SMSELECTED;
-        // ToDo
-        // Operation op( OPSelect, ... )
-        // m_DataTreeNode->GetData()->ExecuteOperation( &op );
+        this->CreateModeOperation(SMSELECTED, objectEventId, groupEventId);
         return true;
       }
     case AcMODESUBSELECT:
       {
         mitk::StatusBar::DisplayText("Error! in XML-Interaction: an simple Interactor can not set in sub selected", 1102);
         return false;
+      }
+    default:
+      {
+        itkWarningMacro("Message from Interactor.cpp: Action could not be understood!");
       }
   }
   
@@ -153,8 +165,24 @@ float mitk::Interactor::CalculateJurisdiction(StateEvent const* stateEvent) cons
     }
 
   }
-
   return returnvalue;
+}
 
+void mitk::Interactor::ExecuteOperation(Operation* operation)
+{
+	switch (operation->GetOperationType())
+	{
+	case OpMODECHANGE:
+    {
+      ModeOperation *modeOp = dynamic_cast<ModeOperation*>(operation);
+      if (modeOp)
+      {
+         m_Mode = modeOp->GetMode();
+      }
+    }
+		break;
+  default:
+    Superclass::ExecuteOperation(operation);
+  }
 }
 

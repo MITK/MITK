@@ -77,6 +77,11 @@ bool mitk::StateMachine::HandleEvent(StateEvent const* stateEvent)
   if (tempTransition == NULL) //no transition in this state for that EventId
   {
     return false;
+    #ifdef INTERDEBUG
+            //Debug StateChanges through cout output! Thus very slow!
+            //itkWarningMacro(<<this->GetType()<<": Changing from StateId "<<m_CurrentState->GetId()<<" to StateId "<<tempNextState->GetId());
+            itkWarningMacro(<<": Did not find transition for Event Id " << stateEvent->GetId());
+    #endif
   }
 
   //get next State

@@ -43,8 +43,9 @@ namespace mitk {
 //## in display coordinates into a point in units of a BaseData-object @a datum
 //## (the requested point is 3D!), use
 //## @code
-//## displaygeometry->DisplayToMM(pt_display, pt_mm);
-//## datum->GetGeometry()->MMToUnits(pt_mm, pt_datum_units);
+//## displaygeometry->DisplayToMM(pt_display, pt2d_mm);
+//## displaygeometry->Map(pt2d_mm, pt3d_mm);
+//## datum->GetGeometry()->MMToUnits(pt3d_mm, pt3d_datum_units);
 //## @endcode
 //## Even, if you want to convert the 2D point @a pt_display into a 2D point in
 //## units on a certain 2D geometry @a certaingeometry, it is safer to use

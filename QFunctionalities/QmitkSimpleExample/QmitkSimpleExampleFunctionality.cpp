@@ -44,7 +44,9 @@ QmitkSimpleExampleFunctionality::~QmitkSimpleExampleFunctionality()
 
 QString QmitkSimpleExampleFunctionality::getFunctionalityName()
 {
-    return "simple example";
+    //return "simple example";
+		return name();
+		
 }
 
 QWidget * QmitkSimpleExampleFunctionality::createMainWidget(QWidget *parent)

@@ -40,11 +40,14 @@ mitk::WeakPointerProperty::~WeakPointerProperty()
 {
 }
 
+
 //##ModelId=3ED952AD02B7
 itk::Object::Pointer mitk::WeakPointerProperty::GetWeakPointer() const
 {
-    return m_WeakPointer;
+    return m_WeakPointer.GetPointer();
 }
+
+
 
 //##ModelId=3ED952AD02F6
 void mitk::WeakPointerProperty::SetWeakPointer(itk::Object* pointer)

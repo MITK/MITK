@@ -26,13 +26,14 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <mitkImage.h>
 #include <mitkImageSliceSelector.h>
+#include <mitkFrameOfReferenceUIDManager.h>
 
 #include <itkRootTreeIterator.h>
 #include <itkImageFileReader.h>
 
 mitk::LightBoxResultImageWriter::LightBoxResultImageWriter()
 {
-  m_ImageTypeName = "Result";
+  m_ImageTypeName = "Image, Segmentation";
 }
 
 mitk::LightBoxResultImageWriter::~LightBoxResultImageWriter()
@@ -58,8 +59,8 @@ void mitk::LightBoxResultImageWriter::SetInputByNode(const mitk::DataTreeNode *n
   
   node->GetLevelWindow(m_LevelWindow, NULL, "levelWindow");
   node->GetLevelWindow(m_LevelWindow, NULL);
-  const char * name;
-  if(node->GetStringProperty("name", name, NULL))
+  const char * name=NULL;
+  if(node->GetStringProperty("type name", name, NULL))
     SetImageTypeName(name);
 }
 
@@ -88,12 +89,22 @@ bool mitk::LightBoxResultImageWriter::SetSourceByTreeSearch(mitk::DataTreeIterat
   bool LoadedFromChili;
   while(!it->IsAtEnd())
   {
+//const char * name;
+//if(it->Get()->GetStringProperty("name", name, NULL))
+//{
+//  itkGenericOutputMacro(<<"candidate: "<<name);
+//}
+//else
+//{
+//  itkGenericOutputMacro(<<"candidate: no name");
+//}
     if(it->Get()->GetBoolProperty("LoadedFromChili", LoadedFromChili) && LoadedFromChili)
     {
       mitk::Image::Pointer sourcecandidate=dynamic_cast<mitk::Image*>(it->Get()->GetData());
       if(sourcecandidate.IsNotNull())
       {
-        if(image->GetDimension()==sourcecandidate->GetDimension())
+itkGenericOutputMacro(<<"found sourcecandidate: ");
+        if(image->GetDimension()<=sourcecandidate->GetDimension())
         {
           int i, dim=image->GetDimension();
           for(i=0; i<dim;++i)
@@ -103,13 +114,16 @@ bool mitk::LightBoxResultImageWriter::SetSourceByTreeSearch(mitk::DataTreeIterat
           {
             SetSourceImage(sourcecandidate);
             return true;
+itkGenericOutputMacro(<<"dim incorrect: "<<i <<" "<<dim);
           }
         }
       }
-      ++it;
     }
-    return false;
+    ++it;
+  itkGenericOutputMacro(<<"xxxx");
   }
+  itkGenericOutputMacro(<<"yyyyyyyyyyyyyyyyyyyyy");
+  return false;
 }
 
 void mitk::LightBoxResultImageWriter::SetLightBox(QcLightbox* lightbox)
@@ -153,13 +167,28 @@ void mitk::LightBoxResultImageWriter::GenerateData()
   resultslice->SetInput(image);
   sourceslice->SetInput(sourceimage);
 
+  mitk::SlicedGeometry3D* sourceSlicedGeometry;
+  mitk::Geometry3D* geometry3DofSlice;
+  Point3D origin;
+  Vector3D v;
+
+  sourceSlicedGeometry = sourceimage->GetSlicedGeometry();
+
+  origin = sourceSlicedGeometry->GetCornerPoint();
+
+  interSliceGeometry_t isg;
+  memcpy(isg.forUID, mitk::FrameOfReferenceUIDManager::GetFrameOfReferenceUID(sourceSlicedGeometry->GetFrameOfReferenceID()), 128);
+  isg.psu = ipPicUtilMillimeter;
+
   ipPicDescriptor *cur, *prev=NULL;
   LevelWindow levelwindow;
   int s, t;
   int smax, tmax;
   smax = image->GetDimension(2);
   tmax = image->GetDimension(3);
-  for(s=0;s<smax;++s)
+itkGenericOutputMacro(<<"writing image: "<<m_ImageTypeName);
+itkGenericOutputMacro(<<"lv: "<<m_LevelWindow.GetMin() <<" "<<m_LevelWindow.GetMax());
+  for(s=smax-1;s>=0;--s)
   {
     resultslice->SetSliceNr(s);
     sourceslice->SetSliceNr(s);
@@ -170,18 +199,41 @@ void mitk::LightBoxResultImageWriter::GenerateData()
       resultslice->Update();
       sourceslice->Update();
 
+      geometry3DofSlice = sourceSlicedGeometry->GetGeometry2D(s);
+
+      v=geometry3DofSlice->GetCornerPoint().GetVectorFromOrigin();
+      itk2vtk(v, isg.o);
+
+      v-=origin;
+      isg.sl = v.GetNorm();
+
+      v.Set_vnl_vector(geometry3DofSlice->GetMatrixColumn(0));
+      isg.ps[0]=v.GetNorm();
+      v/=isg.ps[0];
+      itk2vtk(v, isg.u);
+
+      v.Set_vnl_vector(geometry3DofSlice->GetMatrixColumn(1));
+      isg.ps[1]=v.GetNorm();
+      v/=isg.ps[1];
+      itk2vtk(v, isg.v);
+
+      v.Set_vnl_vector(geometry3DofSlice->GetMatrixColumn(2));
+      isg.ps[2]=v.GetNorm();
+      v/=isg.ps[2];
+      itk2vtk(v, isg.w);
+
+itkGenericOutputMacro(<<"isg: o("<<isg.o[0]<<" "<<isg.o[1]<<" "<<isg.o[2]<<") u("<<isg.u[0]<<" "<<isg.u[1]<<" "<<isg.u[2]<<") v("<<isg.v[0]<<" "<<isg.v[1]<<" "<<isg.v[2]<<") w("<<isg.w[0]<<" "<<isg.w[1]<<" "<<isg.w[2]<<") "<<t);
+
+itkGenericOutputMacro(<<"writing slice: "<<s <<" "<<t);
       cur=ipPicClone(resultslice->GetOutput()->GetPic());
       ipPicDelTag( cur, "SOURCE HEADER" );
 
       QcPlugin::addTags( cur, sourceslice->GetOutput()->GetPic(), prev==NULL );
 
-      //interSliceGeometry_t isg;
-      //isg.unit_t = ipPicUtilMillimeter;
-
-      //QcPlugin::addDicomHeader( cur, isg );
+      QcPlugin::addDicomHeader( cur, &isg );
       QcPlugin::addIcon( cur, true );
 
-      QcPlugin::addLevelWindow( cur, m_LevelWindow.GetMin(), m_LevelWindow.GetMax());
+      QcPlugin::addLevelWindow( cur, m_LevelWindow.GetLevel(), m_LevelWindow.GetWindow());
 
       QcPlugin::changeImageType( cur, const_cast<char*>(m_ImageTypeName.c_str()) ); 
       if( prev )
@@ -191,4 +243,9 @@ void mitk::LightBoxResultImageWriter::GenerateData()
       prev = cur;
     }
   }
+}
+
+void mitk::LightBoxResultImageWriter::Write() const
+{
+  const_cast<mitk::LightBoxResultImageWriter*>(this)->GenerateData();
 }

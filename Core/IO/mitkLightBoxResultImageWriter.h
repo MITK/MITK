@@ -84,6 +84,8 @@ public:
     }
   }
 
+  virtual void Write() const;
+
 protected:
   virtual void GenerateData();
 

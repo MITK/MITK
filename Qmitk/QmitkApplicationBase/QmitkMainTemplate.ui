@@ -8,8 +8,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>635</width>
-            <height>514</height>
+            <width>675</width>
+            <height>644</height>
         </rect>
     </property>
     <property name="caption">
@@ -504,9 +504,9 @@
     <function>initialize()</function>
     <function>initializeFunctionality()</function>
     <function>initializeQfm()</function>
-    <function returnType="mitk::DataTree *">getDataTree()</function>
     <function returnType="QmitkStdMultiWidget *">getMultiWidget()</function>
     <function>parseCommandLine()</function>
+    <function returnType="mitk::DataTree::Pointer">GetTree()</function>
 </functions>
 <pixmapinproject/>
 <layoutdefaults spacing="6" margin="11"/>

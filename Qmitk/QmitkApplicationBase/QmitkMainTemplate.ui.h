@@ -703,11 +703,11 @@ void QmitkMainTemplate::initializeQfm()
     qfm->initialize(this);
 }
 
-
-mitk::DataTree* QmitkMainTemplate::getDataTree()
-{
-    return tree;
-}
+// FIXME: probably obsolete
+// mitk::DataTree* QmitkMainTemplate::getDataTree()
+// {
+//     return tree;
+//}
 
 
 void QmitkMainTemplate::initWidgets( mitk::DataTreeIterator * it )
@@ -820,4 +820,7 @@ void QmitkMainTemplate::changeLevelWindow(mitk::LevelWindow* lw )
 	}
 	delete it;
   mitkMultiWidget->updateMitkWidgets();
+}
+mitk::DataTree::Pointer QmitkMainTemplate::GetTree() {
+    return tree;   
 }

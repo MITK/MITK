@@ -26,20 +26,18 @@ public:
 
   mitkClassMacro(BaseData,itk::DataObject)
 
-    //itkNewMacro(Self);  
-
-    //##ModelId=3DCBE2BA0139
-    //##Documentation
-    //## @brief Return the Geometry3D of the data. 
-    //## 
-    //## The method does not simply return the value of the m_Geometry3D member. 
-    //## Before doing this, it makes sure that the Geometry3D is up-to-date before 
-    //## returning it (by setting the update extent appropriately and calling
-    //## UpdateOutputInformation).
-    //## 
-    //## @warning GetGeometry not yet completely implemented. 
-    //## @todo Appropriate setting of the update extent is missing.
-    mitk::Geometry3D::ConstPointer GetUpdatedGeometry();
+  //##ModelId=3DCBE2BA0139
+  //##Documentation
+  //## @brief Return the Geometry3D of the data. 
+  //## 
+  //## The method does not simply return the value of the m_Geometry3D member. 
+  //## Before doing this, it makes sure that the Geometry3D is up-to-date before 
+  //## returning it (by setting the update extent appropriately and calling
+  //## UpdateOutputInformation).
+  //## 
+  //## @warning GetGeometry not yet completely implemented. 
+  //## @todo Appropriate setting of the update extent is missing.
+  mitk::Geometry3D::ConstPointer GetUpdatedGeometry();
 
   //##Documentation
   //## @brief Return the Geometry3D of the data as non-const pointer. 

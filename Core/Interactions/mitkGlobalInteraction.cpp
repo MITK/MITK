@@ -14,11 +14,11 @@ mitk::GlobalInteraction::GlobalInteraction(std::string type)
 
 inline mitk::StateEvent* GenerateEmptyStateEvent(int eventId)
 {
-	mitk::Event *noEvent = new mitk::Event(NULL,
-                                    Type_User,
-									BS_NoButton,
-									BS_NoButton,
-									Key_none);
+    mitk::Event *noEvent = new mitk::Event(NULL,
+        mitk::Type_User,
+        mitk::BS_NoButton,
+		mitk::BS_NoButton,
+        mitk::Key_none);
     mitk::StateEvent *stateEvent = new mitk::StateEvent(eventId, noEvent);
     //mitk::StateEvent *stateEvent = new mitk::StateEvent();
 	//stateEvent->Set( eventId, noEvent );

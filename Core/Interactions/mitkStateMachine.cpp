@@ -16,7 +16,7 @@ mitk::StateMachine::StateMachine(std::string type)
 : m_Type(type)
 {
 	m_CurrentState = mitk::StateMachineFactory::GetStartState(type);
-	m_UndoController = new UndoController(LIMITEDLINEARUNDO);//switch to LLU or add LLU
+    m_UndoController = new UndoController(LIMITEDLINEARUNDO);//switch to LLU or add LLU
 	m_UndoEnabled = true;
 }
 

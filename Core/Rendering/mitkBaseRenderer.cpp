@@ -50,7 +50,7 @@ void mitk::BaseRenderer::Resize(int w, int h)
 
   GetDisplayGeometry()->SetSizeInDisplayUnits(w, h);
   //@FIXME: die nächste Zeile ist nur da, weil der Anpassungsvorgang in SetSizeInDisplayUnits leider noch nicht richtig funktioniert.
-  GetDisplayGeometry()->Fit();    
+  GetDisplayGeometry()->Fit();
 }
 
 //##ModelId=3E33163A0261
@@ -63,7 +63,7 @@ void mitk::BaseRenderer::InitRenderer(mitk::RenderWindow* renderwindow)
 void mitk::BaseRenderer::InitSize(int w, int h)
 {
   GetDisplayGeometry()->SetSizeInDisplayUnits(w, h, false);
-  GetDisplayGeometry()->Fit();    
+  GetDisplayGeometry()->Fit();
 }
 
 //##ModelId=3E3D2F120050

@@ -73,7 +73,7 @@ void mitk::OpenGLRenderer::SetData(mitk::DataTreeIterator* iterator)
             if(image.IsNotNull())
             {
               SetWorldGeometry(image->GetGeometry2D(0, 0));
-              geometry_is_set=true;                            
+              geometry_is_set=true;
             }
           }
           //@todo add connections
@@ -131,7 +131,7 @@ void mitk::OpenGLRenderer::UpdateVtkActors()
   }
 
   //    try
-  if (m_DataTreeIterator != NULL) 
+  if (m_DataTreeIterator != NULL)
   {
     mitk::DataTreeIterator* it=m_DataTreeIterator->clone();
     while(it->hasNext())
@@ -231,7 +231,7 @@ void mitk::OpenGLRenderer::Render()
       //    m_MitkVtkRenderWindow->MitkRender();
      } else
       m_RenderWindow->swapBuffers();
-      
+
     return;
   }
 
@@ -244,11 +244,11 @@ void mitk::OpenGLRenderer::Render()
   m_WorldGeometryNode->GetVtkTransform()->Identity();
   m_WorldGeometryTransformTime=GetWorldGeometryNode()->GetVtkTransform()->GetMTime();
   }
-  */	
+  */
   //has the data tree been changed?
   if(dynamic_cast<mitk::DataTree*>(GetData()->getTree()) == NULL ) return;
-  //	if(m_LastUpdateTime<((mitk::DataTree*)GetData()->getTree())->GetMTime()) 
-  if(m_LastUpdateTime < dynamic_cast<mitk::DataTree*>(GetData()->getTree())->GetMTime() ) 
+  //	if(m_LastUpdateTime<((mitk::DataTree*)GetData()->getTree())->GetMTime())
+  if(m_LastUpdateTime < dynamic_cast<mitk::DataTree*>(GetData()->getTree())->GetMTime() )
   {
     //yes: update vtk-actors
     Update();
@@ -264,7 +264,7 @@ void mitk::OpenGLRenderer::Render()
     Update();
   }
   else
-  if(m_MapperID==2) 
+  if(m_MapperID==2)
   { //@todo in 3D mode wird sonst nix geupdated, da z.Z. weder camera noch Änderung des Baums beachtet wird!!!
     Update();
   }
@@ -288,7 +288,7 @@ void mitk::OpenGLRenderer::Render()
   std::priority_queue<LayerMapperPair> layers;
   int mapperNo = 0;
   while(it->hasNext())
-  {        
+  {
     it->next();
 
     mitk::DataTreeNode::Pointer node = it->get();
@@ -296,13 +296,13 @@ void mitk::OpenGLRenderer::Render()
     if(mapper.IsNotNull())
     {
       GLMapper2D* mapper2d=dynamic_cast<GLMapper2D*>(mapper.GetPointer());
-      if(mapper2d!=NULL) 
+      if(mapper2d!=NULL)
       {
         // mapper without a layer property are painted first
         int layer=-1;
         node->GetIntProperty("layer", layer, this);
         // pushing negative layer value, since default sort for
-        // priority_queue is lessthan 
+        // priority_queue is lessthan
         layers.push(LayerMapperPair(- (layer<<16) - mapperNo ,mapper2d));
         mapperNo++;
       }
@@ -326,7 +326,7 @@ void mitk::OpenGLRenderer::Render()
 
 This method is called from the two Constructors
 */
-void mitk::OpenGLRenderer::InitRenderer(mitk::RenderWindow* renderwindow) 
+void mitk::OpenGLRenderer::InitRenderer(mitk::RenderWindow* renderwindow)
 {
   BaseRenderer::InitRenderer(renderwindow);
 
@@ -374,14 +374,14 @@ void mitk::OpenGLRenderer::Initialize( ) {
 
   glClearColor(0.0, 0.0, 0.0, 1.0);
   glColor3f(1.0, 0.0, 0.0);
-  
+
 }
 
 /*!
 \brief Resize the OpenGL Window
 */
 //##ModelId=3E33145B00D2
-void mitk::OpenGLRenderer::Resize(int w, int h) 
+void mitk::OpenGLRenderer::Resize(int w, int h)
 {
   glViewport (0, 0, w, h);
   glMatrixMode( GL_PROJECTION );

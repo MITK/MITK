@@ -1,10 +1,10 @@
 #include "mitkVtkInteractorCameraController.h"
 #include "mitkVtkQRenderWindowInteractor.h"
 
-//#include <vtkInteractorStyleTrackball.h> 
+//#include <vtkInteractorStyleTrackball.h>
 
 //##ModelId=3E6D600F009A
-mitk::VtkInteractorCameraController::VtkInteractorCameraController() : m_VtkInteractor(NULL) 
+mitk::VtkInteractorCameraController::VtkInteractorCameraController() : m_VtkInteractor(NULL)
 {
     m_VtkInteractor = mitk::VtkQRenderWindowInteractor::New();
     //vtkInteractorStyleTrackball* iswitch = vtkInteractorStyleTrackball::New();
@@ -30,15 +30,15 @@ void mitk::VtkInteractorCameraController::MousePressEvent(mitk::MouseEvent *me)
 {
     if(m_VtkInteractor)
         m_VtkInteractor->MousePressEvent(me);
-//    if (!this->Enabled) 
+//    if (!this->Enabled)
 //    {
 //        return;
 //    }
 //    if((me->button() & mitk::ButtonState::LeftButton) == 0)
 //        return;
 ////    SetCapture(wnd);
-//    this->InteractorStyle->OnLeftButtonDown(me->state() & ControlButton, 
-//        me->state() & mitk::ShiftButton, 
+//    this->InteractorStyle->OnLeftButtonDown(me->state() & ControlButton,
+//        me->state() & mitk::ShiftButton,
 //        me->x(), this->Size[1] - me->y() - 1);
 }
 

@@ -1,7 +1,7 @@
 #include "QmitkFunctionality.h"
 
-#include <qlcdnumber.h> 
-#include <qslider.h> 
+#include <qlcdnumber.h>
+#include <qslider.h>
 
 
 QmitkFunctionality::QmitkFunctionality(QObject *parent, const char *name, mitk::DataTreeIterator * dataIt) : QObject(parent, name)
@@ -58,7 +58,7 @@ void QmitkFunctionality::initWidget(mitk::DataTreeIterator* it,
     widget->update();
 }
 
-void QmitkFunctionality::setDataTree(mitk::DataTreeIterator * it) 
+void QmitkFunctionality::setDataTree(mitk::DataTreeIterator * it)
 {
 	m_DataTreeIterator = it;
 }

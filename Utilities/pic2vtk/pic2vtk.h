@@ -8,17 +8,17 @@
  *	DKFZ - Heidelberg
  *
  *	Module Name:	Pic2vtk
- * 
+ *
  *	Module Klasse: 	ADT
  *
- *	Beschreibung:	 
- *					
+ *	Beschreibung:
+ *
  *
  *	Exportierte Klassen und Funktionen:
- *					
+ *
  *
  *	Importierte Klassen und Funktionen:
- *					
+ *
  *
  *	@warning		Dieses Modul wurde noch nicht abgenommen!
  *
@@ -42,13 +42,13 @@ public:
 	static vtkImageData* loadVtkImage( char* fileName );
 	static vtkImageData* loadImage( char* fileName, bool littleEndian = true );
 	static vtkImageData* convert( ipPicDescriptor* pic );
-	static vtkImageData* convert( ipPicDescriptor* pic, unsigned long mask, int move );	
+	static vtkImageData* convert( ipPicDescriptor* pic, unsigned long mask, int move );
 	static ipPicDescriptor* convert( vtkImageData* vtkImage );
 	static ipPicDescriptor* convertSigned2Unsigned( ipPicDescriptor*, unsigned long* offset = NULL );
 
 	static vtkImageData* convertVectorImage( ipPicDescriptor* pic );
 	static ipPicDescriptor* convertVectorImage( vtkImageData* vtkImage );
-	
+
 };
 
 #endif // Pic2vtk_h

@@ -35,7 +35,7 @@ mitk::ImageMapper2D::ImageMapper2D() : m_SliceSelector(NULL)
 mitk::ImageMapper2D::~ImageMapper2D()
 {
   //@FIXME: durch die folgende Zeile sollte doch wohl der desctructor von RendererInfo aufgerufen werden. Das passiert aber nie. Deshalb wird bei der Programm-Beendung auch das iilImage und damit die textur nicht rechtzeitig freigegeben und das Programm crashed.
-  m_RendererInfo.clear(); 
+  m_RendererInfo.clear();
 }
 
 //##ModelId=3E3D834B003A
@@ -77,9 +77,9 @@ void mitk::ImageMapper2D::Paint(mitk::BaseRenderer * renderer)
   gluOrtho2D(topLeft.x, bottomRight.x, topLeft.y, bottomRight.y );
   glMatrixMode( GL_MODELVIEW );
 
-  GLdouble eqn0[4] = {0.0, 1.0, 0.0, 0.0};	
+  GLdouble eqn0[4] = {0.0, 1.0, 0.0, 0.0};
   GLdouble eqn1[4] = {1.0, 0.0, 0.0, 0.0};
-  GLdouble eqn2[4] = {-1.0, 0.0 , 0.0, image->width()};	
+  GLdouble eqn2[4] = {-1.0, 0.0 , 0.0, image->width()};
   GLdouble eqn3[4] = {0, -1.0, 0.0, image->height() };
 
   glClipPlane (GL_CLIP_PLANE0, eqn0);
@@ -311,13 +311,13 @@ void mitk::ImageMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
 		m_iilMode = iilImage::COLOR_ALPHA;
 		image->setColors(LookupTable->GetLookupTable().GetRawLookupTable());
 	}
-  
+
   mitk::BoolProperty::Pointer binary;
   binary = dynamic_cast<mitk::BoolProperty*>(this->GetDataTreeNode()->GetProperty("binary").GetPointer());
-	
+
   mitk::LevelWindowProperty::Pointer overwriteLevelWindow;
   overwriteLevelWindow = dynamic_cast<mitk::LevelWindowProperty*>(this->GetDataTreeNode()->GetProperty("levelWindow").GetPointer());
-	
+
   if (binary.IsNotNull() )
   {
     image->setExtrema(0, 1);
@@ -326,7 +326,7 @@ void mitk::ImageMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
   {
     image->setExtrema(overwriteLevelWindow->GetLevelWindow().GetMin(), overwriteLevelWindow->GetLevelWindow().GetMax());
   }
-  else 
+  else
   {
   // set the properties
     image->setExtrema(levelWindow.GetMin(), levelWindow.GetMax());
@@ -341,7 +341,7 @@ void mitk::ImageMapper2D::Update(mitk::BaseRenderer* renderer)
   DataTreeNode* node=GetDataTreeNode();
   iilPicImage*& image = renderinfo.m_iilImage;
 
-  if( 
+  if(
       (image == NULL) ||
       (renderinfo.m_RendererId < 0) ||
       (renderinfo.m_LastUpdateTime < node->GetMTime())
@@ -349,7 +349,7 @@ void mitk::ImageMapper2D::Update(mitk::BaseRenderer* renderer)
     GenerateData(renderer);
   else
   if(
-      (renderinfo.m_LastUpdateTime < renderer->GetWorldGeometry()->GetMTime()) 
+      (renderinfo.m_LastUpdateTime < renderer->GetWorldGeometry()->GetMTime())
       //&&
       //(renderinfo.m_LastUpdateTime < renderer->GetMTime())
     )

@@ -279,7 +279,6 @@ void QmitkSimpleExampleFunctionality::initWidgets()
 	mitk::DataTreeIterator* it=m_DataTreeIterator->clone();
 	while (it->hasNext()) {
 		it->next();
-		printf("\nrequesting boundingbox\n");   
 		mitk::DataTreeNode::Pointer node = it->get();
 		mitk::BaseData::Pointer data=node->GetData();
     if((data.IsNotNull()) && (dynamic_cast<mitk::Geometry2DData*>(node->GetData()) == NULL ))

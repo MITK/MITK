@@ -5,7 +5,7 @@
 #include "mitkDisplayPositionEvent.h"
 //##ModelId=3E1EB4410304
 mitk::QmitkRenderWindow::QmitkRenderWindow(mitk::BaseRenderer* renderer, QGLFormat glf, QWidget *parent, const char *name) 
-  : QGLWidget(glf, parent, name), mitk::RenderWindow(name), m_Renderer(renderer)
+  : QGLWidget(glf, parent, name), mitk::RenderWindow(name, renderer)
 {
   InitRenderer();
   setFocusPolicy(QWidget::StrongFocus);
@@ -14,7 +14,7 @@ mitk::QmitkRenderWindow::QmitkRenderWindow(mitk::BaseRenderer* renderer, QGLForm
 
 //##ModelId=3E1EB4410318
 mitk::QmitkRenderWindow::QmitkRenderWindow(mitk::BaseRenderer* renderer, QWidget *parent, const char *name)
-  : QGLWidget(parent, name), mitk::RenderWindow(name), m_Renderer(renderer)
+  : QGLWidget(parent, name), mitk::RenderWindow(name, renderer)
 {
   InitRenderer();
   setFocusPolicy(QWidget::StrongFocus);

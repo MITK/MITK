@@ -3,6 +3,7 @@
 
 #include <set>
 #include <string>
+#include "mitkBaseRenderer.h"
 
 namespace mitk {
 //##ModelId=3E3ECC1201B2
@@ -15,9 +16,8 @@ public:
   typedef std::set<RenderWindow*> RenderWindowSet;
 
   //##ModelId=3E3ECC13036D
-  RenderWindow(const char *name = 0)
+  RenderWindow(const char *name, mitk::BaseRenderer* renderer = NULL)  : m_Name(name), m_Renderer(renderer)
   {
-    m_Name = name;
     instances.insert(this);
   };
 
@@ -96,9 +96,16 @@ public:
   //## TEMPORARY FOR IIL COMPATIBILITY - DO NOT USE!!!
   virtual bool isVisible (const float, const float,
     const float, const float) {return true;}
+
+  virtual void InitRenderer() = 0;
+
+  virtual BaseRenderer::Pointer GetRenderer() const {return m_Renderer;} 
+
 protected:
   static RenderWindowSet instances;
   std::string m_Name;
+  
+  BaseRenderer::Pointer m_Renderer;
 };
 
 } // namespace mitk

@@ -36,7 +36,6 @@ public:
 
   virtual void Repaint();
 
-  BaseRenderer::Pointer GetRenderer() const {return m_Renderer;} 
 protected:
   //##ModelId=3E3314590396
   virtual void paintGL();
@@ -58,9 +57,6 @@ protected:
 
   //##ModelId=3E33145902C4
   bool m_ResizeNeeded;
-
-  //##ModelId=3E6D5DD402DD
-  BaseRenderer::Pointer m_Renderer;
 
 public:
   //iil compatibility

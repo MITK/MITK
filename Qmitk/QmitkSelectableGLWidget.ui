@@ -1,0 +1,92 @@
+<!DOCTYPE UI><UI version="3.1" stdsetdef="1">
+<class>QmitkSelectableGLWidget</class>
+<widget class="QWidget">
+    <property name="name">
+        <cstring>QmitkSelectableGLWidget</cstring>
+    </property>
+    <property name="geometry">
+        <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>498</width>
+            <height>582</height>
+        </rect>
+    </property>
+    <property name="caption">
+        <string>Form1</string>
+    </property>
+    <hbox>
+        <property name="name">
+            <cstring>unnamed</cstring>
+        </property>
+        <property name="margin">
+            <number>0</number>
+        </property>
+        <property name="spacing">
+            <number>0</number>
+        </property>
+        <widget class="QFrame">
+            <property name="name">
+                <cstring>frame4</cstring>
+            </property>
+            <property name="frameShape">
+                <enum>StyledPanel</enum>
+            </property>
+            <property name="frameShadow">
+                <enum>Raised</enum>
+            </property>
+            <hbox>
+                <property name="name">
+                    <cstring>unnamed</cstring>
+                </property>
+                <property name="margin">
+                    <number>5</number>
+                </property>
+                <property name="spacing">
+                    <number>2</number>
+                </property>
+                <widget class="QFrame">
+                    <property name="name">
+                        <cstring>SelectionFrame</cstring>
+                    </property>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>7</hsizetype>
+                            <vsizetype>7</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
+                    <property name="paletteBackgroundColor">
+                        <color>
+                            <red>85</red>
+                            <green>0</green>
+                            <blue>255</blue>
+                        </color>
+                    </property>
+                    <property name="frameShape">
+                        <enum>StyledPanel</enum>
+                    </property>
+                    <property name="frameShadow">
+                        <enum>Raised</enum>
+                    </property>
+                </widget>
+            </hbox>
+        </widget>
+    </hbox>
+</widget>
+<includes>
+    <include location="global" impldecl="in declaration">QmitkGLWidget.h</include>
+    <include location="global" impldecl="in declaration">mitkOpenGLRenderer.h</include>
+    <include location="local" impldecl="in implementation">QmitkSelectableGLWidget.ui.h</include>
+</includes>
+<variables>
+    <variable>mitk::OpenGLRenderer::Pointer renderer;</variable>
+</variables>
+<functions>
+    <function access="private" specifier="non virtual">init()</function>
+    <function returnType="mitk::OpenGLRenderer::Pointer">GetRenderer()</function>
+</functions>
+<pixmapinproject/>
+<layoutdefaults spacing="6" margin="11"/>
+</UI>

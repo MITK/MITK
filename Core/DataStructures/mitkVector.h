@@ -9,6 +9,7 @@
 namespace mitk {
 typedef float ScalarType;
 typedef View3f   PlaneView;
+typedef Plane3d Plane3D;
 typedef Vector3f Vector3D;
 typedef Point3f  Point3D;
 typedef Vector2f Vector2D;

@@ -214,7 +214,7 @@ void QmitkSimpleExampleFunctionality::ExecuteOperation(mitk::Operation* operatio
     /****NAVIGATION inside the volume****/
         switch (operation->GetOperationType())
         {
-            case OpMOVE:
+        case mitk::OpMOVE:
                 {
                     mitk::ITKPoint3D point;
                     mitk::Point3D seed; 
@@ -276,7 +276,7 @@ void QmitkSimpleExampleFunctionality::ExecuteOperation(mitk::Operation* operatio
                     ok = true;
                 }
                 break;
-            case OpNOTHING:
+            case mitk::OpNOTHING:
                 break;
             default:
                 ;
@@ -291,14 +291,14 @@ void QmitkSimpleExampleFunctionality::ExecuteOperation(mitk::Operation* operatio
             return;
         switch (operation->GetOperationType())
         {
-            case OpMOVE :
+            case mitk::OpMOVE :
                 {
                     renderer->GetDisplayGeometry()->MoveBy(dcOperation->GetLastToCurrentDisplayVector()*(-1.0));
                     renderer->GetRenderWindow()->Update();
                     ok = true;
                 }
                 break;
-            case OpZOOM :
+            case mitk::OpZOOM :
                 {
                     float distance = dcOperation->GetLastToCurrentDisplayVector().y;
                     distance = (distance > 0 ? 1 : (distance < 0 ? -1 : 0));

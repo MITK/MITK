@@ -29,7 +29,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkMesh.h>
 #include <itkDefaultDynamicMeshTraits.h>
 #include <itkPolygonCell.h>
-  
+#include <itkEventObject.h>
+
 const unsigned int PointDimension = 3;
 const unsigned int MaxTopologicalDimension = 3;
 
@@ -161,8 +162,12 @@ protected:
   //##Documentation
   //## @brief Data from ITK; List of Points; the object, the operations are ment for
   DataType::Pointer m_ItkData;
+
+
 };
 
+  itkEventMacro( NewPointEvent, itk::AnyEvent );
+  itkEventMacro( RemovedPointEvent, itk::AnyEvent );
 } // namespace mitk
 
 

@@ -170,6 +170,7 @@ void mitk::PointSet::ExecuteOperation(Operation* operation)
       PointDataType pointData = {pointOp->GetIndex(), pointOp->GetSelected(), pointOp->GetPointType()};
       m_ItkData->GetPointData()->InsertElement(position, pointData);
       this->Modified();
+      ((const itk::Object*)this)->InvokeEvent( NewPointEvent() );
 		}
 		break;
 	case OpMOVE://moves the point given by index
@@ -189,6 +190,7 @@ void mitk::PointSet::ExecuteOperation(Operation* operation)
       m_ItkData->GetPoints()->DeleteIndex((unsigned)pointOp->GetIndex());
       m_ItkData->GetPointData()->DeleteIndex((unsigned)pointOp->GetIndex());
       this->Modified();
+     ((const itk::Object*)this)->InvokeEvent( RemovedPointEvent() );
 		}
 		break;
   case OpSELECTPOINT://select the given point

@@ -98,7 +98,7 @@ void mitk::Geometry2DDataMapper2D::Paint(mitk::BaseRenderer * renderer)
       surfacecreatorprop=dynamic_cast<mitk::SmartPointerProperty*>(GetDataTreeNode()->GetProperty("surfacegeometry", renderer).GetPointer());
       if( (surfacecreatorprop.IsNull()) || 
           (surfacecreatorprop->GetSmartPointer().IsNull()) ||
-          ((surfaceCreator=dynamic_cast<mitk::Geometry2DDataToSurfaceDataFilter*>(surfacecreatorprop->GetSmartPointer().GetPointer()))==NULL)
+          ((surfaceCreator=dynamic_cast<mitk::Geometry2DDataToSurfaceDataFilter*>(surfacecreatorprop->GetSmartPointer().GetPointer())).IsNull())
         )
       {
         surfaceCreator = mitk::Geometry2DDataToSurfaceDataFilter::New();

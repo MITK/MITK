@@ -12,6 +12,12 @@
             <height>932</height>
         </rect>
     </property>
+    <property name="minimumSize">
+        <size>
+            <width>400</width>
+            <height>200</height>
+        </size>
+    </property>
     <property name="caption">
         <string>QmitkMainTemplate</string>
     </property>

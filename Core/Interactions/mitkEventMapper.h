@@ -84,7 +84,7 @@ class EventMapper : public vtkXMLParser
   std::string GetStyleName();
 
   //friendship because of SetStateEvent for computing WorldCoordinates
-  friend GlobalInteraction;
+  friend class mitk::GlobalInteraction;
 
   protected:
   //##Documentation

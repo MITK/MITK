@@ -644,15 +644,18 @@ void QmitkMainTemplate::initialize()
 		// ... of widget 1
         planeNode=mitkMultiWidget->mitkWidget1->GetRenderer()->GetWorldGeometryNode();
         planeNode->SetColor(white, mitkMultiWidget->mitkWidget4->GetRenderer());
+        planeNode->SetProperty("fileName", new mitk::StringProperty("widget1Plane"));
 		it->add(planeNode);
 		// ... of widget 2
         planeNode=mitkMultiWidget->mitkWidget2->GetRenderer()->GetWorldGeometryNode();
         planeNode->SetColor(white, mitkMultiWidget->mitkWidget4->GetRenderer());
+        planeNode->SetProperty("fileName", new mitk::StringProperty("widget2Plane"));
 		it->add(planeNode);
 		// ... of widget 3
         planeNode=mitkMultiWidget->mitkWidget3->GetRenderer()->GetWorldGeometryNode();
         planeNode->SetColor(white, mitkMultiWidget->mitkWidget4->GetRenderer());
-        it->add(planeNode);
+            planeNode->SetProperty("fileName", new mitk::StringProperty("widget3Plane"));
+    it->add(planeNode);
 
         connect(mitkMultiWidget->levelWindowWidget,SIGNAL(levelWindow(mitk::LevelWindow*)),this,SLOT(changeLevelWindow(mitk::LevelWindow*)) );
     }

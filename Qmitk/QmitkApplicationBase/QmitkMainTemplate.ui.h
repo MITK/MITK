@@ -14,7 +14,6 @@
 #include <mitkColorProperty.h>
 #include <mitkFloatProperty.h>
 
-int count=0;
 mitk::FloatProperty::Pointer opacityprop=NULL;
 
 void QmitkMainTemplate::fileNew()
@@ -136,7 +135,8 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
     }
     if(node != NULL)
     {
-        if(count>0)
+        static int count = 0;
+	if(count>0)
         {
             //sliderFP->setMinValue(0);
             //sliderFP->setMaxValue(100);

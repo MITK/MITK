@@ -250,7 +250,7 @@ bool mitk::GlobalInteraction::ExecuteAction(Action* action, mitk::StateEvent con
         ok = GetWorldCoordinate(displayEvent, positionEvent);
         if (ok)
         {
-          int id = stateEvent->GetId();
+          // int id = stateEvent->GetId(); \todo remove this line
           mitk::EventMapper::SetStateEvent(positionEvent);
         }
       }

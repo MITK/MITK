@@ -189,7 +189,6 @@ bool mitk::HierarchicalInteractor::ExecuteAction( Action* action, mitk::StateEve
         InteractorListIter i = m_AllInteractors.begin();
         InteractorListIter bestInteractor = m_AllInteractors.end();
         const InteractorListIter end = m_AllInteractors.end();
-        float jurisdiction = 0.0f;
 
         while ( i != end )
         {

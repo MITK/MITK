@@ -1,43 +1,82 @@
-#ifndef MITKLookupTableSOURCE_H_HEADER_INCLUDED
-#define MITKLookupTableSOURCE_H_HEADER_INCLUDED
-
-#include "mitkCommon.h"
+#ifndef MITKLOOKUPTABLESOURCE_H_HEADER_INCLUDED
+#define MITKLOOKUPTABLESOURCE_H_HEADER_INCLUDED
 
 #include "mitkLookupTable.h"
+#include "mitkCommon.h"
+#include "BaseProcess.h"
 
+namespace mitk
+{
 
-class mitk::LookupTable;
-
-namespace mitk {
-
-
-class LookupTableSource : public itk::Object //: public BaseProcess
+/**
+ * @brief Base class for all objects which have an object of type
+ * mitkLookupTable as output
+ * @ingroup Process
+ * Base class for all objects which have an object of type mitkLookupTable
+ * as output. It is assumed, that mitkLookupTableSources do not provide support
+ * for streaming, that is, that the requested region is always the largest
+ * possible region.
+ */
+class LookupTableSource : public BaseProcess
 {
 public:
-	typedef enum {HP, Strain, DefaultLUT} LookupTableMode;
 
-  mitkClassMacro(LookupTableSource,itk::Object);
+    mitkClassMacro( LookupTableSource, BaseProcess );
 
-	  /** @brief Some convenient typedefs. */
+    itkNewMacro( Self );
+
     typedef mitk::LookupTable OutputType;
-    typedef OutputType * OutputTypePointer;
 
-    void SetUseHPDopplerLookupTable(){m_Mode = HP;};
+    typedef OutputType::Pointer OutputTypePointer;
 
-    void SetUseStrainLookupTable(){m_Mode = Strain;};
+    typedef itk::DataObject::Pointer DataObjectPointer;
 
-		virtual OutputTypePointer GetOutput(void);
-		LookupTableSource();
+    /**
+     * Allocates a new output object and returns it. Currently the
+     * index idx is not evaluated.
+     * @param idx the index of the output for which an object should be created
+     * @returns the new object
+     */
+    virtual DataObjectPointer MakeOutput ( unsigned int idx );
 
-		virtual ~LookupTableSource();
+    /**
+     * Generates the input requested region simply by calling the equivalent
+     * method of the superclass.
+     */
+    void GenerateInputRequestedRegion();
 
+    /**
+     * Allows to set the output of the lookup-table source. According to the itk documentation
+     * this method is outdated and should not be used. Instead GraftOutput(...)
+     * should be used.
+     * @param output the intended output of the lookup table source
+     */
+    void SetOutput( OutputType* output );
+
+    /**
+     * Replacement of the SetOutput method. I think it is not yet correcly 
+     * implemented, so you should better not use it.
+     * @todo provide a more usefule implementation
+     * @param output the intended output of the lookup table source.
+     */
+    virtual void GraftOutput( OutputType* output );
+
+    /**
+     * Returns the output with index 0 of the lookup table source
+     * @returns the output
+     */
+    OutputType* GetOutput();
+
+    /**
+     * Returns the n'th output of the lookup table source
+     * @param idx the index of the wanted output
+     * @returns the output with index idx.
+     */
+    OutputType* GetOutput ( unsigned int idx );
 
 protected:
-
-private:
-
-	LookupTableMode m_Mode;
-	OutputTypePointer m_LookupTable;
+    LookupTableSource();
+    virtual ~LookupTableSource();
 
 };
 
@@ -45,4 +84,5 @@ private:
 
 
 
-#endif /* MITKLookupTableSOURCE_H_HEADER_INCLUDED */
+#endif 
+

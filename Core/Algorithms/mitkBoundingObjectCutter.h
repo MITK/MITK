@@ -37,23 +37,18 @@ namespace mitk {
 //## otherwise it will have the pixelvalue of the input image.
 //## Pixel on the outside of the BoundingObject will have a pixelvalue of m_OutsideValue
 //## \todo What Image resolution/spacing should be used, if no input image is given?
-template <typename TPixel> class BoundingObjectCutter : public ImageToImageFilter
+class BoundingObjectCutter : public ImageToImageFilter
 {
 public:
   mitkClassMacro(BoundingObjectCutter, ImageToImageFilter);
   itkNewMacro(Self);
 
-  typedef TPixel PixelType;
-  typedef itk::Image<PixelType, 3> ItkImageType;
-  typedef typename ItkImageType::RegionType ItkRegionType;
-  typedef itk::ImageRegionIteratorWithIndex< ItkImageType > ItkImageIteratorType;
-
   void SetBoundingObject( const mitk::BoundingObject* boundingObject );
   const mitk::BoundingObject* GetBoundingObject() const;
-  itkSetMacro(InsideValue,  PixelType);
-  itkGetMacro(InsideValue,  PixelType);
-  itkSetMacro(OutsideValue, PixelType);
-  itkGetMacro(OutsideValue, PixelType);
+  itkSetMacro(InsideValue,  ScalarType);
+  itkGetMacro(InsideValue,  ScalarType);
+  itkSetMacro(OutsideValue, ScalarType);
+  itkGetMacro(OutsideValue, ScalarType);
   itkSetMacro(UseInsideValue, bool);
   itkGetMacro(UseInsideValue, bool);
   itkBooleanMacro(UseInsideValue);
@@ -64,29 +59,48 @@ protected:
   BoundingObjectCutter();
   virtual ~BoundingObjectCutter();
 
+  virtual const std::type_info& GetOutputPixelType();
+
   virtual void GenerateInputRequestedRegion();
   virtual void GenerateOutputInformation();
   virtual void GenerateData();
 
-  mitk::BoundingObject::Pointer m_BoundingObject; // BoundingObject that will be cut
-  PixelType m_InsideValue;                        // Value for inside pixels, if UseInsideValue is true
-  PixelType m_OutsideValue;                       // Value for outside pixels
-  bool m_UseInsideValue;                          // if true, pixels that are inside m_BoundingObject 
-                                                  // will get m_InsideValue in the cutting process 
-                                                  // (else they keep their original value)
+  template < typename TPixel, unsigned int VImageDimension, typename TOutputPixel > 
+    void CutImageWithOutputTypeSelect( itk::Image<typename TPixel, VImageDimension>* inputItkImage, typename TPixel* dummy = NULL );
+  template < typename TPixel, unsigned int VImageDimension > 
+    void CutImage( itk::Image<typename TPixel, VImageDimension>* itkImage, typename TPixel* dummy = NULL );
+
+  //##Description 
+  //## @brief BoundingObject that will be cut
+  mitk::BoundingObject::Pointer m_BoundingObject; 
+  //##Description 
+  //## @brief Value for inside pixels, used when m_UseInsideValue is @a true
+  //##
+  //## \sa m_UseInsideValue
+  ScalarType m_InsideValue;
+  //##Description 
+  //## @brief Value for outside pixels
+  ScalarType m_OutsideValue;                       // 
+  //##Description 
+  //## @brief Use m_InsideValue for inside pixels
+  //##
+  //## If @a true, pixels that are inside m_BoundingObject
+  //## will get m_InsideValue in the cutting process
+  //## If @a false, they keep their original value.
+  //## \sa m_InsideValue
+  bool m_UseInsideValue;
+
   unsigned int m_OutsidePixelCount;
   unsigned int m_InsidePixelCount;
 
   //##Description 
   //## @brief Region of input needed for cutting
-  typename mitk::SlicedData::RegionType m_InputRequestedRegion;
+  mitk::SlicedData::RegionType m_InputRequestedRegion;
 
   //##Description 
   //## @brief Time when Header was last initialized
   itk::TimeStamp m_TimeOfHeaderInitialization;
 };
 } // namespace mitk
-
-#include "mitkBoundingObjectCutter.txx"  // because it is a template
 
 #endif /* BOUNDINGOBJECTCUTTER_H_HEADER_INCLUDED_C10B22CD */

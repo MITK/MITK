@@ -382,6 +382,11 @@ static mitk::DataTreeNode::Pointer FileOpen()
             rescaler->SetOutputMaximum(255);
             itk::ImageSeriesWriter<OutputImage3DType, OutputImage2DType>::Pointer writer = itk::ImageSeriesWriter<OutputImage3DType, OutputImage2DType >::New();
             writer->SetInput( rescaler->GetOutput() );
+
+            int numberOfSlices = itkImage->GetLargestPossibleRegion().GetSize()[2];
+            writer->SetStartIndex(numberOfSlices);
+            writer->SetIncrementIndex(-1);
+
             int pos = fileName.findRev(".",fileName.length()-1);
             fileName.insert(pos,".%d");
             writer->SetSeriesFormat( fileName.ascii() );

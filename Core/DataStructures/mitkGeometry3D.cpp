@@ -241,17 +241,21 @@ void mitk::Geometry3D::Initialize(unsigned int dimension, const unsigned int* di
     m_TransformOfOrigin.setIdentity();
     SetSpacing(Vector3D(1.0,1.0,1.0));
 
-    //construct standard view
-    mitk::Point3D right, bottom; bool rightHanded=true;
-	mitk::Vector2D viewport(0,0);
-    right.set(m_Dimensions[0],0,0); UnitsToMM(right, right);
-    bottom.set(0,m_Dimensions[1],0); UnitsToMM(bottom, bottom);
-    PlaneView view_std(mitk::Point3D(0,0,0), right, bottom, viewport, viewport, rightHanded);
+    //does the Geometry has 2D slices?
+    if(num>0)
+    {
+        //construct standard view
+        mitk::Point3D right, bottom; bool rightHanded=true;
+	    mitk::Vector2D viewport(0,0);
+        right.set(m_Dimensions[0],0,0); UnitsToMM(right, right);
+        bottom.set(0,m_Dimensions[1],0); UnitsToMM(bottom, bottom);
+        PlaneView view_std(mitk::Point3D(0,0,0), right, bottom, viewport, viewport, rightHanded);
 
-    mitk::PlaneGeometry::Pointer planegeometry=mitk::PlaneGeometry::New();
-    m_Geometry2Ds[0]=planegeometry;
-    planegeometry->SetPlaneView(view_std);
-    planegeometry->SetSizeInUnits(m_Dimensions[0], m_Dimensions[1]);
+        mitk::PlaneGeometry::Pointer planegeometry=mitk::PlaneGeometry::New();
+        m_Geometry2Ds[0]=planegeometry;
+        planegeometry->SetPlaneView(view_std);
+        planegeometry->SetSizeInUnits(m_Dimensions[0], m_Dimensions[1]);
+    }
 }
 
 //##ModelId=3E15572E0269

@@ -23,6 +23,7 @@ See MITKCopyright.txt or http://www.mitk.org/ for details.
 //## @brief For internal within mitkBoundingObjectCutter.cpp and mitkBoundingObjectCutAndCast.txx only
 
 #include "mitkStatusBar.h"
+#include "mitkImageToItk.h"
 
 namespace mitk
 {

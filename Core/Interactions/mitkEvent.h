@@ -11,10 +11,10 @@ class BaseRenderer;
 //##Documentation
 //## @brief represents an Event with all its information
 //## @ingroup Interaction
-//## 
+//##
 //## Class, that stores mouse as well as key-events. Type stores the type of
 //## event, that has been activated (KeyPress, MouseMove...), Button and Key
-//## represent the youse of this event and ButtonState holds the Modifiers,
+//## represent the cause of this event and ButtonState holds the Modifiers,
 //## that might have been pressed during the appearance of this event.
 //## Ether Button (Mouse) or Key (Keyboard) is set. if both are set
 //## accidentally then the button is accepted.

@@ -11,7 +11,8 @@
 
 mitk::BoundingObjectCutter::BoundingObjectCutter()
 : m_UseInsideValue(false), m_OutsideValue(0), m_InsideValue(1), m_BoundingObject(NULL), 
-  m_UseRegionGrower(true), m_SegmentationFilter(NULL) //, m_BoundingObjectContainer(NULL)
+  m_UseRegionGrower(true), m_SegmentationFilter(NULL), m_OutsideVoxelCount(0), m_InsideVoxelCount(0),
+  m_ResampleFactor(1.0)
 {  
 }
 
@@ -99,44 +100,59 @@ void mitk::BoundingObjectCutter::GenerateData()
   ItkImageIteratorType imageIterator(itkImageCut, itkImageCut->GetRequestedRegion());
   mitk::ITKPoint3D p;
   bool inside = false;
+  m_OutsideVoxelCount = 0;
+  m_InsideVoxelCount = 0;
   if (GetUseInsideValue()) // use a fixed value for each inside pixel(create a binary mask of the bounding object)
     for (imageIterator.GoToBegin(); !imageIterator.IsAtEnd(); ++imageIterator)
     {          
       itkImageCut->TransformIndexToPhysicalPoint(imageIterator.GetIndex(), p);  // transform index of current pixel to world coordinate point
       if(m_BoundingObject->IsInside(p))
+      {
         imageIterator.Value() = m_InsideValue;
+        m_InsideVoxelCount++;
+      }
       else
+      {
         imageIterator.Value() = m_OutsideValue;
+        m_OutsideVoxelCount++;
+      }
     }
   else // no fixed value for inside, but the pixel value of the original image (normal cutting)
     for ( imageIterator.GoToBegin(); !imageIterator.IsAtEnd(); ++imageIterator)
     {    
       // transform to world coordinates and check if p is inside the bounding object
       itkImageCut->TransformIndexToPhysicalPoint(imageIterator.GetIndex(), p);
-      if(!m_BoundingObject->IsInside(p))
+      if(m_BoundingObject->IsInside(p))
+      {
+        m_InsideVoxelCount++;
+      }
+      else
+      {
         imageIterator.Value() = m_OutsideValue;
+        m_OutsideVoxelCount++;
+      }
     }
 
-  if (m_UseRegionGrower && m_SegmentationFilter.IsNotNull())
-  {
-    m_SegmentationFilter->SetInput( itkImageCut );
-    try
-    {
-      m_SegmentationFilter->Update();
-    }
-    catch( itk::ExceptionObject & excep )
-    {
-      std::cerr << "Exception while updating RegiongrowingFilter" << std::endl;
-      std::cerr << excep << std::endl;
-    }
-    // convert the itk image back to an mitk image and set it as output for this filter
-    outputImage->InitializeByItk(m_SegmentationFilter->GetOutput());
-    outputImage->SetVolume(m_SegmentationFilter->GetOutput()->GetBufferPointer());
-  }
-  else
-  {
+  //if (m_UseRegionGrower && m_SegmentationFilter.IsNotNull())
+  //{
+  //  m_SegmentationFilter->SetInput( itkImageCut );
+  //  try
+  //  {
+  //    m_SegmentationFilter->Update();
+  //  }
+  //  catch( itk::ExceptionObject & excep )
+  //  {
+  //    std::cerr << "Exception while updating RegiongrowingFilter" << std::endl;
+  //    std::cerr << excep << std::endl;
+  //  }
+  //  // convert the itk image back to an mitk image and set it as output for this filter
+  //  outputImage->InitializeByItk(m_SegmentationFilter->GetOutput());
+  //  outputImage->SetVolume(m_SegmentationFilter->GetOutput()->GetBufferPointer());
+  //}
+  //else
+  //{
     // convert the itk image back to an mitk image and set it as output for this filter
     outputImage->InitializeByItk(itkImageCut.GetPointer());
     outputImage->SetVolume(itkImageCut->GetBufferPointer());
-  }
+  //}
 }

@@ -52,6 +52,9 @@
  *   reads a slice from a PicFile
  *
  * $Log$
+ * Revision 1.10  2003/02/25 16:16:53  andre
+ * *** empty log message ***
+ *
  * Revision 1.9  2002/11/13 17:53:00  ivo
  * new ipPic added.
  *
@@ -100,6 +103,8 @@ ipPicDescriptor *ipPicGetSlice( char *infile_name, ipPicDescriptor *pic, ipUInt4
   ipUInt4_t len;
   ipUInt4_t skip;
 
+  int number = 1;
+
   unsigned long int picsize;
 
   if( infile_name == NULL )
@@ -134,6 +139,12 @@ ipPicDescriptor *ipPicGetSlice( char *infile_name, ipPicDescriptor *pic, ipUInt4
     }
 
 
+  if( pic == 3 )
+    {
+      pic = NULL;
+      number = 3;
+    }
+
   if( pic == NULL )
     pic = ipPicNew();
 
@@ -150,7 +161,6 @@ ipPicDescriptor *ipPicGetSlice( char *infile_name, ipPicDescriptor *pic, ipUInt4
 
   ipPicFReadLE( &(pic->n), sizeof(ipUInt4_t), pic->dim, infile );
 
-
   skip = len -        3 * sizeof(ipUInt4_t)
              - pic->dim * sizeof(ipUInt4_t);
   ipPicFSeek( infile, skip, SEEK_CUR );
@@ -166,11 +176,26 @@ ipPicDescriptor *ipPicGetSlice( char *infile_name, ipPicDescriptor *pic, ipUInt4
       return( pic );
     }
 
+  if( number < 1 )
+    number = 1;
+
+  if( slice + number - 1 > pic->n[2] )
+    number = pic->n[2] - slice + 1;
+
+
   pic->info->write_protect = ipTrue;
 
   picsize = _ipPicSize(pic);
 
   ipPicFSeek( infile, picsize * (slice - 1), SEEK_CUR );
+
+  if( number > 1 )
+    {
+      pic->dim = 3;
+      pic->n[2] = number;
+    }
+
+  picsize = _ipPicSize(pic);
 
   pic->data = malloc( picsize );
 

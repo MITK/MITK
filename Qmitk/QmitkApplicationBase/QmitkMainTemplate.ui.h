@@ -512,24 +512,22 @@ void QmitkMainTemplate::fileExit()
 
 void QmitkMainTemplate::editUndo()
 {
-    undoController->Undo();
+    undoController->Undo(PBShift->isOn());
 }
 
 void QmitkMainTemplate::editRedo()
 {
-    undoController->Redo();
+    undoController->Redo(PBShift->isOn());
 }
 
 void QmitkMainTemplate::editCut()
 {
-    //TEST!!!
-    undoController->Undo(false);
+
 }
 
 void QmitkMainTemplate::editCopy()
 {
-    //TEST!!!!
-    undoController->Redo(false);
+
 }
 
 void QmitkMainTemplate::editPaste()

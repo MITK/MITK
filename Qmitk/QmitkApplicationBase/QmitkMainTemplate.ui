@@ -93,6 +93,26 @@
         <separator/>
         <action name="editUndoAction"/>
         <action name="editRedoAction"/>
+        <widget class="QPushButton">
+            <property name="name">
+                <cstring>PBShift</cstring>
+            </property>
+            <property name="text">
+                <string>fine</string>
+            </property>
+            <property name="toggleButton">
+                <bool>true</bool>
+            </property>
+            <property name="on">
+                <bool>true</bool>
+            </property>
+            <property name="toolTip" stdset="0">
+                <string>fine Undo/Redo</string>
+            </property>
+            <property name="whatsThis" stdset="0">
+                <string>if activated, the Undo or Redo operates step by step and not in defined Groups</string>
+            </property>
+        </widget>
         <separator/>
     </toolbar>
 </toolbars>

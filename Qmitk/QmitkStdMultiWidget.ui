@@ -98,7 +98,7 @@
 <customwidgets>
     <customwidget>
         <class>QLevelWindowWidget</class>
-        <header location="global">QLevelWindowWidget/QLevelWindowWidget.h</header>
+        <header location="global">QLevelWindowWidget.h</header>
         <sizehint>
             <width>-1</width>
             <height>-1</height>

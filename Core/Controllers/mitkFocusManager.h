@@ -30,11 +30,6 @@ namespace mitk {
 	//##ModelId=3F01770802D7
 	typedef std::vector<FocusElement*>::iterator FocusListIterator;
 	
-	//##ModelId=3EDCAF790194
-	//##Documentation
-  //## Constructor
-  FocusManager();
-
   //##Documentation
   //## Destructor
   ~FocusManager();
@@ -104,6 +99,13 @@ namespace mitk {
   //## Sets the LoopMode.
 	//## if set to true-> the one after the last is the first
 	void SetLoop(bool loop);
+
+  friend class GlobalInteraction;	
+protected:
+  //##ModelId=3EDCAF790194
+	//##Documentation
+  //## Constructor
+  FocusManager();
 
 private:
   //##ModelId=3F0185C802C7

@@ -103,3 +103,8 @@ bool mitk::GlobalInteraction::SetFocus(mitk::FocusManager::FocusElement* element
   return m_FocusManager->SetFocused(element);
 }
 
+mitk::FocusManager* mitk::GlobalInteraction::GetFocusManager()
+{
+  return m_FocusManager;
+}
+

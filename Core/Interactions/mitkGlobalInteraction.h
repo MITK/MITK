@@ -71,6 +71,12 @@ class GlobalInteraction : public StateMachine
   //## returns true if the given element was found and focused
   bool SetFocus(FocusManager::FocusElement* element);
 
+  //##Documentation
+	//## @brief Returns the pointer to the FocusManager
+  //##
+  //## to add the observer for an event
+  mitk::FocusManager* mitk::GlobalInteraction::GetFocusManager();
+
 	protected:
 
 	//##ModelId=3E7F497F01AE

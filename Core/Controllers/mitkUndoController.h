@@ -18,6 +18,7 @@ typedef std::map<UndoType, UndoModel*> UndoModelMap;
 //##ModelId=3E9C45D50092
 typedef std::map<UndoType, UndoModel*>::iterator UndoModelMapIter;
 
+static const mitk::UndoType DEFAULTUNDOMODEL;
 
 //##ModelId=3E5F53AA026C
 class UndoController
@@ -27,12 +28,7 @@ class UndoController
 	//##Documentation
     //## Constructor; Adds the new UndoType or if undoType exists ,
 	//## switches it to undoType; for UndoTypes see definitionmitkInteractionConst.h
-    UndoController(UndoType undoType);
-
-    //##ModelId=3EA585FD0261
-	//##Documentation
-	//##plain constructor
-    UndoController();
+    UndoController(UndoType undoType = DEFAULTUNDOMODEL);
 
     //##ModelId=3E5F543402C5
     bool SetOperationEvent(OperationEvent* operationEvent);

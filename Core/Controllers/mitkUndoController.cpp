@@ -11,10 +11,6 @@ mitk::UndoType mitk::UndoController::m_CurUndoType;
 
 static const mitk::UndoType DEFAULTUNDOMODEL = LIMITEDLINEARUNDO;
 
-//##ModelId=3EA585FD0261
-mitk::UndoController::UndoController()
-{}
-
 mitk::UndoController::UndoController(UndoType undoType)
 {
 	if (SwitchUndoModel(undoType)==false) //existiert noch nicht in static-Liste

@@ -14,6 +14,8 @@ bool mitk::LimitedLinearUndo::SetOperationEvent(OperationEvent* operationEvent)
 //##ModelId=3E5F5D8C00C6
 bool mitk::LimitedLinearUndo::Undo()
 {
+	if(m_UndoList.size()<=0) return false;
+
 	//get the last operation from the static undo-list
 	OperationEvent* operationEvent = m_UndoList.back();
 	
@@ -28,6 +30,8 @@ bool mitk::LimitedLinearUndo::Undo()
 //##ModelId=3E5F5D8C00DA
 bool mitk::LimitedLinearUndo::Redo()
 {
+	if(m_RedoList.size()<=0) return false;
+
 	OperationEvent* operationEvent = m_RedoList.back();
 	
 	Execute( operationEvent );

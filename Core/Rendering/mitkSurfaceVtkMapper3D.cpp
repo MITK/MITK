@@ -100,8 +100,8 @@ void mitk::SurfaceVtkMapper3D::Update(mitk::BaseRenderer* renderer)
     timestep = inputTimeGeometry->MSToTimeStep( time );
   if( inputTimeGeometry->IsValidTime( timestep ) == false )
     return;
-  std::cout << "time: "<< time << std::endl;
-  std::cout << "timestep: "<<timestep << std::endl;
+//  std::cout << "time: "<< time << std::endl;
+//  std::cout << "timestep: "<<timestep << std::endl;
   
   //
   // set the input-object at time t for the mapper

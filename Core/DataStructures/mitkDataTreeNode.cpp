@@ -134,7 +134,7 @@ bool mitk::DataTreeNode::RequestedRegionIsOutsideOfTheBufferedRegion()
 //##ModelId=3E860A620080
 bool mitk::DataTreeNode::VerifyRequestedRegion()
 {
-  return GetData()!=NULL;
+    return true;
 }
 
 //##ModelId=3E860A640156

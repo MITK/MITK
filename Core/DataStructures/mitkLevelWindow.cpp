@@ -182,7 +182,7 @@ void mitk::LevelWindow::SetAuto(ipPicDescriptor* pic)
 	}
     else
     {
-        if( pic->data == NULL )
+        if( pic->data != NULL )
         {
             ipFloat8_t min = 0.0;
             ipFloat8_t max = 0.0;

@@ -254,9 +254,17 @@ void mitk::SlicedData::SetGeometry(Geometry3D* aGeometry3D)
       if(slicedGeometry.IsNull())
       {
         Geometry2D* geometry2d = dynamic_cast<Geometry2D*>(aGeometry3D);
-        assert(geometry2d!=NULL);
-        slicedGeometry = SlicedGeometry3D::New();
-        slicedGeometry->InitializeEvenlySpaced(geometry2d, 1);
+        if(geometry2d!=NULL)
+        {
+          slicedGeometry = SlicedGeometry3D::New();
+          slicedGeometry->InitializeEvenlySpaced(geometry2d, 1);
+        }
+        else
+        {
+          slicedGeometry = SlicedGeometry3D::New();
+          slicedGeometry->SetBounds(aGeometry3D->GetBoundingBox()->GetBounds());
+          slicedGeometry->SetIndexToWorldTransform( const_cast<mitk::AffineTransform3D*>(aGeometry3D->GetIndexToWorldTransform()) );
+        }
       }
       assert(slicedGeometry.IsNotNull());
 

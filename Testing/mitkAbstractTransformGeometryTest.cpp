@@ -25,9 +25,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <vtkSphericalTransform.h>
 
-#include <vnl/vnl_quaternion.h>
-#include <vnl/vnl_quaternion.txx>
-
 #include <fstream>
 
 int mitkAbstractTransformGeometryTest(int argc, char* argv[])

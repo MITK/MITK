@@ -34,6 +34,6 @@ QmitkStepperAdapter::QmitkStepperAdapter( QObject * navigator, mitk::Stepper * s
 
 QmitkStepperAdapter::~QmitkStepperAdapter()
 {
-
+  m_ItkEventListener->Delete();
 }
 

@@ -31,9 +31,13 @@ protected:
 
     virtual void GenerateOutputInformation();
     
-    vtkActor* m_SplineProp;
+    vtkActor* m_SplinesActor;
     
     vtkAssembly* m_Assembly;
+    
+    bool m_SplinesAvailable;
+    
+    bool m_SplinesAddedToAssembly;
     
 };
 

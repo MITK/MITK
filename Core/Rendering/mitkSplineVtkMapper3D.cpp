@@ -12,16 +12,23 @@
 
 
 mitk::SplineVtkMapper3D::SplineVtkMapper3D()
-        : m_SplineProp( NULL ), m_Assembly( NULL )
-{}
+        : m_SplinesActor( NULL ), m_Assembly( NULL )
+{
+    m_SplinesActor = vtkActor::New();
+    m_Assembly = vtkAssembly::New();
+    m_SplinesAddedToAssembly = false;
+    m_SplinesAvailable = false;
+    
+    m_Assembly->AddPart( m_Prop3D );
+}
 
 
 
 
 mitk::SplineVtkMapper3D::~SplineVtkMapper3D()
 {
-    if ( m_SplineProp != NULL )
-        m_SplineProp->Delete();
+    if ( m_SplinesActor != NULL )
+        m_SplinesActor->Delete();
 
     if ( m_Assembly != NULL )
         m_Assembly->Delete();
@@ -33,6 +40,7 @@ mitk::SplineVtkMapper3D::~SplineVtkMapper3D()
 vtkProp*
 mitk::SplineVtkMapper3D::GetProp()
 {
+    std::cout << "GetProp() called!" << std::endl;
     if ( GetDataTreeNode() != NULL && m_Assembly != NULL )
     {
         m_Assembly->SetUserTransform( GetDataTreeNode()->GetVtkTransform() );
@@ -57,6 +65,7 @@ mitk::SplineVtkMapper3D::GenerateData()
 
     if ( numberOfInputPoints >= 2 )
     {
+        m_SplinesAvailable = true;
         std::cout << "splines calculated" << std::endl;
         vtkCardinalSpline* splineX = vtkCardinalSpline::New();
         vtkCardinalSpline* splineY = vtkCardinalSpline::New();
@@ -100,14 +109,31 @@ mitk::SplineVtkMapper3D::GenerateData()
         vtkPolyDataMapper* profileMapper = vtkPolyDataMapper::New();
         profileMapper->SetInput( profileData );
 
-        m_SplineProp = vtkActor::New();
-        m_SplineProp->SetMapper( profileMapper );
+        m_SplinesActor->SetMapper( profileMapper );
         float rgba[ 4 ] = {1.0f, 1.0f, 1.0f, 1.0f};
-        m_SplineProp->GetProperty()->SetColor( rgba );
+        m_SplinesActor->GetProperty()->SetColor( rgba );
     }
     else
     {
-        m_SplineProp = NULL;
+        m_SplinesAvailable = false;
+    }
+
+        
+    if ( m_SplinesAvailable )
+    {
+        if ( ! m_SplinesAddedToAssembly )
+        {
+            m_Assembly->AddPart( m_SplinesActor );
+            m_SplinesAddedToAssembly = true;
+        }
+    }
+    else
+    {
+        if ( m_SplinesAddedToAssembly )
+        {
+            m_Assembly->RemovePart( m_SplinesActor );
+            m_SplinesAddedToAssembly = false;
+        }
     }
 }
 
@@ -129,27 +155,20 @@ mitk::SplineVtkMapper3D::GenerateOutputInformation()
 
 void mitk::SplineVtkMapper3D::Update( mitk::BaseRenderer* renderer )
 {
-    //std::cout << "Update called" << std::endl;
     Superclass::Update( renderer );
-    
-    m_Assembly = vtkAssembly::New();
-    if ( m_SplineProp != NULL )
-        m_Assembly->AddPart( m_SplineProp );
-    if ( m_Prop3D != NULL )
-        m_Assembly->AddPart( m_Prop3D );
     
     if ( IsVisible( renderer ) == false )
     {
-        if ( m_SplineProp != NULL )
-            m_SplineProp->VisibilityOff();
+        if ( m_SplinesActor != NULL )
+            m_SplinesActor->VisibilityOff(); 
 
         if ( m_Assembly != NULL )
             m_Assembly->VisibilityOff();
     }
     else
     {
-        if ( m_SplineProp != NULL )
-            m_SplineProp->VisibilityOn();
+        if ( m_SplinesActor != NULL )
+            m_SplinesActor->VisibilityOn();
 
         if ( m_Assembly != NULL )
             m_Assembly->VisibilityOn();

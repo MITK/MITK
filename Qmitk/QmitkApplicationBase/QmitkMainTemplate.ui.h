@@ -79,9 +79,9 @@ PURPOSE.  See the above copyright notices for more information.
   #include "itkDICOMImageIO2.h"
   #include "itkImageSeriesReader.h"
   #include "itkDICOMSeriesFileNames.h"
-  #include "QmitkCommonFunctionality.h"
 #endif
 
+#include "QmitkCommonFunctionality.h"
 #include <mitkParRecFileReader.h>
 #include <mitkInteractionConst.h>
 #include <QmitkStatusBar/QmitkStatusBar.h>
@@ -96,9 +96,11 @@ void QmitkMainTemplate::fileNew()
 void QmitkMainTemplate::fileOpen()
 {
 #ifdef MBI_INTERNAL
-  QString fileName = QFileDialog::getOpenFileName(NULL,"all (*.seq *.pic *.pic.gz *.seq.gz *.pvtk *.stl *.vtk *.ves *.uvg *.par *.dcm *.mhd *.png *.tif *.jpg hpsonos.db HPSONOS.DB);;DKFZ Pic (*.seq *.pic *.pic.gz *.seq.gz);;surface files (*.stl *.vtk);;stl files (*.stl);;vtk surface files (*.vtk);;vtk image files (*.pvtk);;vessel files (*.ves *.uvg);;par/rec files (*.par);;DSR files (hpsonos.db HPSONOS.DB);;DICOM files (*.dcm)");
+//  QString fileName = QFileDialog::getOpenFileName(NULL,"all (*.seq *.pic *.pic.gz *.seq.gz *.pvtk *.stl *.vtk *.ves *.uvg *.par *.dcm *.mhd *.png *.tif *.jpg hpsonos.db HPSONOS.DB);;DKFZ Pic (*.seq *.pic *.pic.gz *.seq.gz);;surface files (*.stl *.vtk);;stl files (*.stl);;vtk surface files (*.vtk);;vtk image files (*.pvtk);;vessel files (*.ves *.uvg);;par/rec files (*.par);;DSR files (hpsonos.db HPSONOS.DB);;DICOM files (*.dcm)");
+  QString fileName = QFileDialog::getOpenFileName(NULL,CommonFunctionality::GetInternalFileExtensions());
 #else
-  QString fileName = QFileDialog::getOpenFileName(NULL,"all (*.seq *.pic *.pic.gz *.seq.gz *.pvtk *.stl *.vtk *.par  *.png *.tif *.jpg);;DKFZ Pic (*.seq *.pic *.pic.gz *.seq.gz);;surface files (*.stl *.vtk);;stl files (*.stl);;vtk surface files (*.vtk);;vtk image files (*.pvtk);;par/rec files (*.par);;DICOM files (*.dcm)");
+//  QString fileName = QFileDialog::getOpenFileName(NULL,"all (*.seq *.pic *.pic.gz *.seq.gz *.pvtk *.stl *.vtk *.par  *.png *.tif *.jpg);;DKFZ Pic (*.seq *.pic *.pic.gz *.seq.gz);;surface files (*.stl *.vtk);;stl files (*.stl);;vtk surface files (*.vtk);;vtk image files (*.pvtk);;par/rec files (*.par);;DICOM files (*.dcm)");
+  QString fileName = QFileDialog::getOpenFileName( NULL,CommonFunctionality::GetExternalFileExtensions() );
 #endif
 
   if ( !fileName.isNull() )
@@ -147,7 +149,7 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
 
 void QmitkMainTemplate::fileOpenImageSequence()
 {
-  QString fileName = QFileDialog::getOpenFileName(NULL,"DKFZ Pic (*.seq *.pic *.pic.gz *.seq.gz);;Sets of 2D slices (*.pic *.pic.gz *.png *.dcm);;stl files (*.stl);;DICOM files(*.dcm *.DCM)");
+  QString fileName = QFileDialog::getOpenFileName(NULL,CommonFunctionality::GetInternalFileExtensions());
 
   if ( !fileName.isNull() )
   {

@@ -516,6 +516,10 @@ void mitk::DataTreeNodeFactory::ReadFileTypeHPSONOS()
         mitk::LookupTableSource::OutputTypePointer LookupTable = LookupTableSource->GetOutput();
         mitk::LookupTableProperty::Pointer LookupTableProp = new mitk::LookupTableProperty( *LookupTable );
 
+				int start = 128 - 1;
+				int end = 128 + 1;
+				for (int i=start; i<=end;i++)
+					LookupTableProp->GetLookupTable().ChangeOpacity(i, 0);
 
         //
         // insert original (in cylindric coordinates) Doppler information

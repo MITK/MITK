@@ -74,6 +74,7 @@ mitk::MeshVtkMapper3D::MeshVtkMapper3D() : m_PropAssemply(NULL)
   m_ContourActor = vtkActor::New();
   m_ContourMapper = vtkPolyDataMapper::New();
   m_ContourActor->SetMapper(m_ContourMapper);
+  m_ContourActor->GetProperty()->SetAmbient(1.0);
 
   m_PropAssemply = vtkPropAssembly::New();
   m_PropAssemply->AddPart(m_ContourActor);

@@ -7,7 +7,10 @@
  *   and swaps to the other endianess
  *
  * $Log$
- * Revision 1.7  1999/12/09 19:12:09  andre
+ * Revision 1.8  2000/01/17 18:31:59  andre
+ * *** empty log message ***
+ *
+ * Revision 1.7  1999/12/09  19:12:09  andre
  * *** empty log message ***
  *
  * Revision 1.5  1999/11/29  09:34:34  andre
@@ -67,6 +70,7 @@ ipPicFReadCvt( void *ptr, size_t size, size_t nitems, ipPicFile_t stream )
   size_t bytes_return;
 
   bytes_return = ipPicFRead( ptr, size, nitems, stream );
+
   _ipCvtEndian( ptr, size*nitems, size );
 
   return( bytes_return );

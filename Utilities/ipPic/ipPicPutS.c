@@ -6,7 +6,10 @@
  *   writes a PicFile to disk
  *
  * $Log$
- * Revision 1.5  1999/11/27 19:15:08  andre
+ * Revision 1.6  2000/01/17 18:32:00  andre
+ * *** empty log message ***
+ *
+ * Revision 1.5  1999/11/27  19:15:08  andre
  * *** empty log message ***
  *
  * Revision 1.4  1998/09/01  15:26:43  andre
@@ -62,6 +65,9 @@ void ipPicPutSlice( char *outfile_name, ipPicDescriptor *pic, ipUInt4_t slice )
       else
         return;
     }
+
+  pic_in = ipPicGetTags( outfile_name,
+                         pic_in );
 
   outfile = fopen( outfile_name, "r+b" );
 

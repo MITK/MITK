@@ -21,7 +21,7 @@ See MITKCopyright.txt or http://www.mitk.org/ for details.
 #include "mitkStringProperty.h"
 #include "mitkColorProperty.h"
 #include "mitkOpenGLRenderer.h"
-#include "../Algorithms/itkMeshDeformation/MeshUtil.h"
+#include "mitkMeshUtil.h"
 
 
 #include <vtkActor.h>

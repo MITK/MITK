@@ -22,6 +22,7 @@ class BaseController : public itk::Object
 {
   public:
 	/** Standard class typedefs. */
+    //##ModelId=3E6D5DD301B0
     mitkClassMacro(BaseController, itk::Object);
 
     /** Method for creation through the object factory. */

@@ -21,6 +21,7 @@ class OpenGLRenderer : public BaseRenderer
 {
   public:
     /** Standard class typedefs. */
+    //##ModelId=3E691CC70250
     mitkClassMacro(OpenGLRenderer,BaseRenderer);
 
     /** Method for creation through the object factory. */

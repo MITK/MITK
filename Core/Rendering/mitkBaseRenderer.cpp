@@ -92,24 +92,28 @@ void mitk::BaseRenderer::SetDisplayGeometry(mitk::DisplayGeometry* geometry2d)
     }
 }
 
+//##ModelId=3E6D5DD30322
 void mitk::BaseRenderer::MousePressEvent(mitk::MouseEvent *me)
 {
   if (m_CameraController)
     m_CameraController->MousePressEvent(me);
 }
 
+//##ModelId=3E6D5DD30372
 void mitk::BaseRenderer::MouseReleaseEvent(mitk::MouseEvent *me)
 {
   if (m_CameraController)
     m_CameraController->MouseReleaseEvent(me);
 }
 
+//##ModelId=3E6D5DD303C2
 void mitk::BaseRenderer::MouseMoveEvent(mitk::MouseEvent *me)
 {
   if (m_CameraController)
     m_CameraController->MouseMoveEvent(me);
 }
 
+//##ModelId=3E6D5DD4002A
 void mitk::BaseRenderer::KeyPressEvent(mitk::KeyEvent *ke)
 {
   if (m_CameraController)

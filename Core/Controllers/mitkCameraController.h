@@ -13,16 +13,22 @@ namespace mitk {
 class CameraController : public BaseController
 {
 public:
+    //##ModelId=3E6D5DD4008F
     mitkClassMacro(CameraController, BaseController);
 
     /** Method for creation through the object factory. */
     itkNewMacro(Self);
 
+    //##ModelId=3E6D5DD400A3
     virtual void Resize(int w, int h);
 
+    //##ModelId=3E6D5DD400C1
     virtual void MousePressEvent(mitk::MouseEvent*);
+    //##ModelId=3E6D5DD400D5
     virtual void MouseReleaseEvent(mitk::MouseEvent*);
+    //##ModelId=3E6D5DD400F3
     virtual void MouseMoveEvent(mitk::MouseEvent*);
+    //##ModelId=3E6D5DD40107
     virtual void KeyPressEvent(mitk::KeyEvent*);
 protected:
     //##ModelId=3E3AE7440312

@@ -14,59 +14,60 @@ class vtkPolyDataMapper;
 
 namespace mitk {
 
-//##ModelId=3E32C8E9030D
+//##ModelId=3E691E09014F
 //##Documentation
 //## Vtk-based mapper to display a Geometry2D in a 3D window.
 class Geometry2DDataVtkMapper3D : public BaseVtkMapper3D
 {
   public:
+    //##ModelId=3E691E09036C
     mitkClassMacro(Geometry2DDataVtkMapper3D, BaseVtkMapper3D);
 
     itkNewMacro(Geometry2DDataVtkMapper3D);
 
-    //##ModelId=3E32C9E5007A
+    //##ModelId=3E691E090376
     virtual vtkProp* GetProp();
-    //##ModelId=3E690E68028C
+    //##ModelId=3E691E090378
     virtual void SetInput(const mitk::Geometry2DData *input);
 
-    //##ModelId=3E690E6A0163
+    //##ModelId=3E691E090380
     const mitk::Geometry2DData *GetInput(void);
   
-    //##ModelId=3E690E6B0331
+    //##ModelId=3E691E090382
     virtual void SetInput(const mitk::BaseData* data);
   
-    //##ModelId=3E690E6D03A2
+    //##ModelId=3E691E09038A
     virtual void Update();
   
-    //##ModelId=3E690E7D021E
+    //##ModelId=3E691E09038C
     virtual void GenerateData();
 
   protected:
-    //##ModelId=3E32CA6C01A1
+    //##ModelId=3E691E09038E
     Geometry2DDataVtkMapper3D();
 
-    //##ModelId=3E32CA6C01C9
+    //##ModelId=3E691E090394
     virtual ~Geometry2DDataVtkMapper3D();
-    //##ModelId=3E690E6F00D4
+    //##ModelId=3E691E090396
     virtual void GenerateOutputInformation();
 
 
-    //##ModelId=3E690C6303DD
+    //##ModelId=3E691E090331
 	vtkPolyDataMapper* m_VtkPolyDataMapper;
 
-    //##ModelId=3E690C6400A0
+    //##ModelId=3E691E090344
     vtkActor* m_Actor;
 
-    //##ModelId=3E690C640140
+    //##ModelId=3E691E09034E
     vtkTexture* m_VtkTexture;
 
-    //##ModelId=3E690E3B03B4
+    //##ModelId=3E691E090358
     vtkPolyData* m_VtkPolyData;
 
-    //##ModelId=3E690C640190
+    //##ModelId=3E691E090362
     vtkPlaneSource* m_VtkPlaneSource;
 
-    //##ModelId=3E690C6401E0
+    //##ModelId=3E691E090363
     vtkImageMapToWindowLevelColors* m_LevelWindowFilter;
 };
 

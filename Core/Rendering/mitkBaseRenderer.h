@@ -18,6 +18,7 @@ class BaseRenderer : public itk::Object
 {
   public:
 	/** Standard class typedefs. */
+    //##ModelId=3E691E0901DB
     mitkClassMacro(BaseRenderer, itk::Object);
 
 	/** Method for creation through the object factory. */
@@ -80,9 +81,13 @@ class BaseRenderer : public itk::Object
 
     itkGetMacro(Size, int*);
 
+    //##ModelId=3E6D5DD30322
     virtual void MousePressEvent(mitk::MouseEvent*);
+    //##ModelId=3E6D5DD30372
     virtual void MouseReleaseEvent(mitk::MouseEvent*);
+    //##ModelId=3E6D5DD303C2
     virtual void MouseMoveEvent(mitk::MouseEvent*);
+    //##ModelId=3E6D5DD4002A
     virtual void KeyPressEvent(mitk::KeyEvent*);
 
 protected:
@@ -114,8 +119,10 @@ protected:
     //##ModelId=3E6423D20213
     unsigned long m_LastUpdateTime;
 
+    //##ModelId=3E6D5DD30232
     mitk::CameraController::Pointer m_CameraController;
 
+    //##ModelId=3E6D5DD302E6
     int m_Size[2];
 };
 

@@ -8,13 +8,13 @@
 #include "vtkPolyDataMapper.h"
 //#include "vtkImageMapToWindowLevelColors";
 
-//##ModelId=3E32C9E5007A
+//##ModelId=3E691E090376
 vtkProp* mitk::Geometry2DDataVtkMapper3D::GetProp()
 {
 	return m_Actor;
 }
 
-//##ModelId=3E32CA6C01A1
+//##ModelId=3E691E09038E
 mitk::Geometry2DDataVtkMapper3D::Geometry2DDataVtkMapper3D()
 {
     m_Actor = vtkActor::New();
@@ -47,12 +47,12 @@ mitk::Geometry2DDataVtkMapper3D::Geometry2DDataVtkMapper3D()
 
 }
 
-//##ModelId=3E32CA6C01C9
+//##ModelId=3E691E090394
 mitk::Geometry2DDataVtkMapper3D::~Geometry2DDataVtkMapper3D()
 {
 }
 
-//##ModelId=3E690E68028C
+//##ModelId=3E691E090378
 void mitk::Geometry2DDataVtkMapper3D::SetInput(const mitk::Geometry2DData *input)
 {
 	// Process object is not const-correct so the const_cast is required here
@@ -60,7 +60,7 @@ void mitk::Geometry2DDataVtkMapper3D::SetInput(const mitk::Geometry2DData *input
 		const_cast< mitk::Geometry2DData * >( input ) );
 }
 
-//##ModelId=3E690E6A0163
+//##ModelId=3E691E090380
 const mitk::Geometry2DData *mitk::Geometry2DDataVtkMapper3D::GetInput(void)
 {
 	if (this->GetNumberOfInputs() < 1)
@@ -72,13 +72,13 @@ const mitk::Geometry2DData *mitk::Geometry2DDataVtkMapper3D::GetInput(void)
 		(this->ProcessObject::GetInput(0) );
 }
 
-//##ModelId=3E690E6B0331
+//##ModelId=3E691E090382
 void mitk::Geometry2DDataVtkMapper3D::SetInput(const mitk::BaseData* data)
 {
 	SetInput(dynamic_cast<const mitk::Geometry2DData *>(data));
 }
 
-//##ModelId=3E690E6D03A2
+//##ModelId=3E691E09038A
 void mitk::Geometry2DDataVtkMapper3D::Update()
 {
     mitk::Geometry2DData::Pointer input  = const_cast<mitk::Geometry2DData*>(this->GetInput());
@@ -103,12 +103,12 @@ void mitk::Geometry2DDataVtkMapper3D::Update()
     }
 }
 
-//##ModelId=3E690E6F00D4
+//##ModelId=3E691E090396
 void mitk::Geometry2DDataVtkMapper3D::GenerateOutputInformation()
 {
 }
 
-//##ModelId=3E690E7D021E
+//##ModelId=3E691E09038C
 void mitk::Geometry2DDataVtkMapper3D::GenerateData()
 {
 }

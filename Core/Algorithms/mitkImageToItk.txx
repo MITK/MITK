@@ -150,7 +150,7 @@ template<class TPixel, unsigned int VImageDimension>
   ::UpdateOutputInformation()
 {
   mitk::Image::ConstPointer input = this->GetInput();
-  if(input.IsNotNull() && input->GetSource()->Updating())
+  if(input.IsNotNull() && (input->GetSource()!=NULL) && input->GetSource()->Updating())
   {
     typename OutputImageType::Pointer output = this->GetOutput();
     unsigned long t1 = input->GetUpdateMTime()+1;

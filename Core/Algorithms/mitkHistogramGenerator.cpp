@@ -16,12 +16,57 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#include "mitkHistogramGenerator.h"
+#include "itkScalarImageToHistogramGenerator.h"
 
-mitk::HistogramGenerator::HistogramGenerator() : m_TimeNr(0), m_ChannelNr(0)
+#include "mitkHistogramGenerator.h"
+#include "mitkImageAccessByItk.h"
+
+mitk::HistogramGenerator::HistogramGenerator() : m_Image(NULL), m_Size(256), m_Histogram(NULL)
 {
 }
 
 mitk::HistogramGenerator::~HistogramGenerator()
 {
+}
+
+void mitk::HistogramGenerator::ComputeHistogram()
+{
+  AccessByItk(m_Image,InternalCompute);
+
+/* // debug code
+  const unsigned int histogramSize = m_Histogram->Size();
+
+  std::cout << "Histogram size " << histogramSize << std::endl;
+  
+  HistogramType::ConstIterator itr = GetHistogram()->Begin();
+  HistogramType::ConstIterator end = GetHistogram()->End();
+
+  int bin = 0;
+  while( itr != end )
+    {
+    std::cout << "bin = " << GetHistogram()->GetBinMin(0,bin) << "--" << GetHistogram()->GetBinMax(0,bin) << " frequency = ";
+    std::cout << itr.GetFrequency() << std::endl;
+    ++itr;
+    ++bin;
+    } */
+}
+
+template < typename TPixel, unsigned int VImageDimension > 
+void mitk::HistogramGenerator::InternalCompute(itk::Image< TPixel, VImageDimension >* itkImage) 
+{
+  
+  typedef itk::Statistics::ScalarImageToHistogramGenerator< 
+                                              itk::Image< TPixel, VImageDimension >
+                                                          >   HistogramGeneratorType;
+
+  typename HistogramGeneratorType::Pointer histogramGenerator = HistogramGeneratorType::New();
+
+  histogramGenerator->SetInput( itkImage );
+
+  histogramGenerator->SetNumberOfBins( m_Size );
+  histogramGenerator->SetMarginalScale( 10.0 );
+  histogramGenerator->Compute();
+  
+  m_Histogram = histogramGenerator->GetOutput();
+
 }

@@ -19,7 +19,13 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef HISTOGRAM_GENERATOR_H_HEADER_INCLUDED
 #define HISTOGRAM_GENERATOR_H_HEADER_INCLUDED
 
+#include "itkObject.h"
+#include "itkObjectFactory.h"
+#include "itkHistogram.h"
+#include "itkImage.h"
+
 #include "mitkCommon.h"
+#include "mitkImage.h"
 
 namespace mitk {
 
@@ -32,12 +38,26 @@ public:
 	mitkClassMacro(HistogramGenerator,itk::Object);
 
 	itkNewMacro(Self);  
-
+	typedef itk::Statistics::Histogram<double> HistogramType;
+        
+	itkSetMacro(Image,mitk::Image::ConstPointer);
+	itkSetMacro(Size,int);
+	itkGetConstObjectMacro(Histogram,HistogramType);
+	
+	// TODO: calculate if needed in GetHistogram()
+	void ComputeHistogram();
+	
 protected:
 	HistogramGenerator();
 
 	virtual ~HistogramGenerator();
-
+	
+	template < typename TPixel, unsigned int VImageDimension > 
+        void InternalCompute(itk::Image< TPixel, VImageDimension >* itkImage);
+        
+	mitk::Image::ConstPointer m_Image;
+	int m_Size;
+	HistogramType::ConstPointer m_Histogram;
 };
 
 } // namespace mitk

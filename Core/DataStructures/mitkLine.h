@@ -214,7 +214,7 @@ public:
   //## @brief Test if a lines is parallel to this line
   bool IsParallel( const Line<TCoordRep,NPointDimension>& line) const 
   {
-    vnl_itk::Vector<TCoordRep> normal;
+    vnl_vector<TCoordRep> normal;
 
     normal = vnl_cross_3d( m_Direction.Get_vnl_vector(), line.GetDirection().Get_vnl_vector() );
 
@@ -228,7 +228,7 @@ public:
   //## @brief Test if a line is part of the line (line having infinite length)
   bool IsPartOfLine( const Line<TCoordRep,NPointDimension>& line ) const
   {
-    return ( Distance( line.GetPoint() ) < 0 ) && ( IsParallel( line ) )
+    return ( Distance( line.GetPoint() ) < 0 ) && ( IsParallel( line ) );
   }
 
   //##Documentation
@@ -334,3 +334,4 @@ typedef Line<ScalarType, 3> ITKLine3D;
 
 } // namespace mitk
 #endif /* MITKLINE_H_HEADER_INCLUDED_C19C01E2 */
+

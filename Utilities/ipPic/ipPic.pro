@@ -4,6 +4,10 @@ CONFIG += warn_on debug
 
 OBJECTS_DIR = obj
 
+unix {
+	CONFIG += staticlib
+}
+
 SOURCES = \
       ipPicInfo.c ipPicType.c                           \
       ipPicAddT.c ipPicQueryT.c ipPicDelT.c ipPicGetT.c \
@@ -21,4 +25,3 @@ SOURCES = \
 HEADERS = ipPic.h ipTypes.h ipPicOldP.h ipPicAnnotation.h 
 
 INCLUDEPATH = .. .
-

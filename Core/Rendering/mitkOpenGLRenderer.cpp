@@ -23,7 +23,7 @@
 
 //##ModelId=3E33ECF301AD
 mitk::OpenGLRenderer::OpenGLRenderer() : m_VtkMapperPresent(false), 
-	m_VtkRenderer(NULL), m_MitkVtkRenderWindow(NULL)
+	m_VtkRenderer(NULL), m_MitkVtkRenderWindow(NULL), m_LastUpdateVtkActorsTime(0)
 {
   m_CameraController=NULL;
   m_CameraController = VtkInteractorCameraController::New();
@@ -86,16 +86,19 @@ void mitk::OpenGLRenderer::SetData(mitk::DataTreeIterator* iterator)
     }
 
     //update the vtk-based mappers
-    Update(); //this is only called to check, whether we have vtk-based mappers!
-    UpdateVtkActors();
+    UpdateIncludingVtkActors();
 
     Modified();
   }
 }
 
 //##ModelId=3ED91D060305
-void mitk::OpenGLRenderer::UpdateVtkActors()
+void mitk::OpenGLRenderer::UpdateIncludingVtkActors()
 {
+  Update();
+
+  m_LastUpdateVtkActorsTime = GetMTime();
+
   VtkInteractorCameraController* vicc=dynamic_cast<VtkInteractorCameraController*>(m_CameraController.GetPointer());
 
   if (m_VtkMapperPresent == false)
@@ -250,12 +253,10 @@ void mitk::OpenGLRenderer::Render()
 
   //has the data tree been changed?
   if(dynamic_cast<mitk::DataTree*>(GetData()->getTree()) == NULL ) return;
-  //	if(m_LastUpdateTime<((mitk::DataTree*)GetData()->getTree())->GetMTime())
-  if(m_LastUpdateTime < dynamic_cast<mitk::DataTree*>(GetData()->getTree())->GetMTime() )
+  if(m_LastUpdateVtkActorsTime < dynamic_cast<mitk::DataTree*>(GetData()->getTree())->GetMTime() )
   {
     //yes: update vtk-actors
-    Update();
-    UpdateVtkActors();
+    UpdateIncludingVtkActors();
   }
   else
   //has anything else changed (geometry to display, etc.)?
@@ -430,8 +431,7 @@ void mitk::OpenGLRenderer::InitSize(int w, int h)
 void mitk::OpenGLRenderer::SetMapperID(const MapperSlotId mapperId)
 {
   Superclass::SetMapperID(mapperId);
-  Update();
-  UpdateVtkActors();
+  UpdateIncludingVtkActors();
 }
 
 //##ModelId=3EF162760271

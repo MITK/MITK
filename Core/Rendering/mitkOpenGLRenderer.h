@@ -64,7 +64,7 @@ class OpenGLRenderer : public BaseRenderer
     //## @brief Update the vtk-based-mappers by adding the produced actors to the m_VtkRenderer.
     //## 
     //## @warning Always call Update() before, which checks, whether there are vtk-based-mappers.
-	virtual void UpdateVtkActors();
+	virtual void UpdateIncludingVtkActors();
 
     VtkRenderWindow*  GetVtkRenderWindow(){ return  m_MitkVtkRenderWindow;}
     
@@ -116,6 +116,10 @@ protected:
 
     //##ModelId=3ED91D0602E6
     vtkLightKit* m_LightKit;
+
+    //##Documentation
+    //## @brief Timestamp of last call of UpdateVtkActors().
+    unsigned long m_LastUpdateVtkActorsTime;
 };
 
 } // namespace mitk

@@ -48,28 +48,34 @@ QmitkSimpleExampleFunctionality::QmitkSimpleExampleFunctionality(QObject *parent
 controls(NULL), multiWidget(mitkStdMultiWidget), m_NavigatorsInitialized(false)
 {
     setAvailability(true);
-
-    moveNzoom = new mitk::DisplayInteractor();
-    mitk::GlobalInteraction* globalInteraction = dynamic_cast<mitk::GlobalInteraction*>(mitk::EventMapper::GetGlobalStateMachine());
-    if(globalInteraction!=NULL)
-    {
-	    globalInteraction->AddListener(new mitk::DisplayVectorInteractor("moveNzoom", moveNzoom));//sends DisplayCoordinateOperation
-    }
 }
 
 QmitkSimpleExampleFunctionality::~QmitkSimpleExampleFunctionality()
 {
-  delete moveNzoom;
+//  delete moveNzoom;
 }
 
 QWidget * QmitkSimpleExampleFunctionality::createMainWidget(QWidget *parent)
 {
+    QWidget *result = NULL;
+
     if (multiWidget == NULL) 
     {
-        return multiWidget = new QmitkStdMultiWidget(parent);
+        multiWidget = new QmitkStdMultiWidget(parent);
+        result = multiWidget;
     }
     else
-        return NULL;
+    {
+        result = NULL;
+    }
+
+    mitk::GlobalInteraction* globalInteraction = dynamic_cast<mitk::GlobalInteraction*>(mitk::EventMapper::GetGlobalStateMachine());
+    if(globalInteraction!=NULL)
+    {
+      globalInteraction->AddListener(multiWidget->GetMoveAndZoomInteractor() );//sends DisplayCoordinateOperation
+    }
+
+    return result;
 }
 
 QWidget * QmitkSimpleExampleFunctionality::createControlWidget(QWidget *parent)

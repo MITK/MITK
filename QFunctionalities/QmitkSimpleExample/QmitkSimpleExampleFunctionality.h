@@ -104,7 +104,7 @@ protected:
   */
   QmitkSimpleExampleControls * controls;
 
-  mitk::DisplayInteractor* moveNzoom;
+//  mitk::DisplayInteractor* moveNzoom;
 
   bool m_NavigatorsInitialized;
 };

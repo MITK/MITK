@@ -17,7 +17,7 @@ int mitkContourMapper2DTest(int argc, char* argv[])
   node->SetData(contour);
 
   if (contour.IsNull()) {
-    std::cout<<"[FAILED]"<<std::endl;
+    std::cout << "[FAILED]" << std::endl;
     return EXIT_FAILURE;
   }
   else {
@@ -25,6 +25,7 @@ int mitkContourMapper2DTest(int argc, char* argv[])
   } 
 
   contourMapper->SetInput( node );
+  contourMapper->Update();
 
   std::cout<<"[TEST DONE]"<<std::endl;
   return EXIT_SUCCESS;

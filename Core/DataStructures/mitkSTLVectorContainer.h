@@ -61,6 +61,8 @@ public:
 
 typedef STLVectorContainer<int> IntVectorContainer;
 typedef STLVectorContainer<unsigned int> UnsignedIntVectorContainer;
+typedef STLVectorContainer<long> LongVectorContainer;
+typedef STLVectorContainer<unsigned long> UnsignedLongVectorContainer;
 typedef STLVectorContainer<short int> ShortIntVectorContainer;
 typedef STLVectorContainer<short unsigned int> ShortUnsignedIntVectorContainer;
 typedef STLVectorContainer<float> FloatVectorContainer;

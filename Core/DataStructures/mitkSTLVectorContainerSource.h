@@ -75,6 +75,8 @@ protected:
 
 typedef STLVectorContainerSource<int> IntVectorContainerSource;
 typedef STLVectorContainerSource<unsigned int> UnsignedIntVectorContainerSource;
+typedef STLVectorContainerSource<long> LongVectorContainerSource;
+typedef STLVectorContainerSource<unsigned long> UnsignedLongVectorContainerSource;
 typedef STLVectorContainerSource<short int> ShortIntVectorContainerSource;
 typedef STLVectorContainerSource<short unsigned int> ShortUnsignedIntVectorContainerSource;
 typedef STLVectorContainerSource<float> FloatVectorContainerSource;

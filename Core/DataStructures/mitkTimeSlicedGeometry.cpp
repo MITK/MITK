@@ -108,6 +108,8 @@ void mitk::TimeSlicedGeometry::InitializeEvenlyTimed(mitk::Geometry3D* geometry3
 {
   assert(geometry3D!=NULL);
 
+  geometry3D->Register();
+
   Initialize(timeSteps);
 
   AffineTransform3D::Pointer transform = AffineTransform3D::New();
@@ -118,6 +120,8 @@ void mitk::TimeSlicedGeometry::InitializeEvenlyTimed(mitk::Geometry3D* geometry3
   SetBounds(geometry3D->GetBounds());
   SetGeometry3D(geometry3D, 0);
   SetEvenlyTimed();
+
+  geometry3D->UnRegister();
 }
 
 mitk::TimeSlicedGeometry::TimeSlicedGeometry() : m_TimeSteps(0), m_EvenlyTimed(false)

@@ -119,6 +119,8 @@ void mitk::SlicedGeometry3D::InitializeEvenlySpaced(mitk::Geometry2D* geometry2D
   assert(geometry2D->GetExtent(0)>0);
   assert(geometry2D->GetExtent(1)>0);
 
+  geometry2D->Register();
+
   Superclass::Initialize();
   m_Slices = slices;
 
@@ -168,6 +170,8 @@ void mitk::SlicedGeometry3D::InitializeEvenlySpaced(mitk::Geometry2D* geometry2D
   SetEvenlySpaced();
 
   assert(m_UnitsToMMAffineTransform.GetPointer() != geometry2D->GetUnitsToMMAffineTransform()); // (**) see above.
+
+  geometry2D->UnRegister();
 }
 
   //mitk::Vector3D oldspacing;

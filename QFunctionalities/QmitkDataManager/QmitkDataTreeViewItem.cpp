@@ -25,7 +25,7 @@ QmitkDataTreeViewItem::QmitkDataTreeViewItem( QListView *parent, const QString &
 
 QmitkDataTreeViewItem::QmitkDataTreeViewItem( QmitkDataTreeViewItem * parent, mitk::DataTreeIterator * nodeIt )
 : QListViewItem(parent),m_DataTreeIterator(nodeIt) {
-  m_DataTreeIterator = nodeIt;
+  m_DataTreeIterator = nodeIt->clone();
   m_TreeNode = nodeIt->get();
   char name[256];
   

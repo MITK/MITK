@@ -54,6 +54,20 @@ template <class T>
   p.set(a[0], a[1], a[2]);
 }
 
+template <class T>
+  inline void vm2itk(const Vector3<T>& p, VnlVector& a)
+{
+  a[0]=p.x;
+  a[1]=p.y;
+  a[2]=p.z;
+}
+
+template <class T>
+  inline void itk2vm(const VnlVector& a, Vector3<T> & p)
+{
+  p.set(a[0], a[1], a[2]);
+}
+
 template <class Tin, class Tout>
   inline void vtk2vm(const Tin a[3], Vector3<Tout> & p)
 {

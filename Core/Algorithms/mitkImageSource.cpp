@@ -6,8 +6,8 @@ mitk::ImageSource::ImageSource()
   // output must be of type TOutputImage
   OutputImageType::Pointer output
     = static_cast<OutputImageType*>(this->MakeOutput(0).GetPointer()); 
-  this->ProcessObject::SetNumberOfRequiredOutputs(1);
-  this->ProcessObject::SetNthOutput(0, output.GetPointer());
+  Superclass::SetNumberOfRequiredOutputs(1);
+  Superclass::SetNthOutput(0, output.GetPointer());
 }
 
 /**

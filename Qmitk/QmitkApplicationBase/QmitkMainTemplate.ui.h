@@ -494,34 +494,20 @@ void QmitkMainTemplate::initialize()
 		it->next();
 		planesSubTree=dynamic_cast<mitk::DataTreeBase*>(it->getSubTree());
 		
-		mitk::ColorProperty::Pointer colorprop;
-        QColor qcolor;
-		float color[3] = {1.0f,1.0f,1.0f};
-
-        colorprop = new mitk::ColorProperty(color);
-
+        float white[3] = {1.0f,1.0f,1.0f};
         mitk::DataTreeNode::Pointer planeNode;
 		// ... of widget 1
         planeNode=mitkMultiWidget->mitkWidget1->GetRenderer()->GetWorldGeometryNode();
-        qcolor=mitkMultiWidget->mitkWidget1->GetSelectionFrame()->paletteBackgroundColor();
-        color[0]=qcolor.red(); color[1]=qcolor.green(); color[2]=qcolor.blue();
-    	colorprop = new mitk::ColorProperty(color);
-		planeNode->GetPropertyList()->SetProperty("color", colorprop);
+        planeNode->SetColor(white, mitkMultiWidget->mitkWidget4->GetRenderer());
 		it->add(planeNode);
 		// ... of widget 2
         planeNode=mitkMultiWidget->mitkWidget2->GetRenderer()->GetWorldGeometryNode();
-        qcolor=mitkMultiWidget->mitkWidget2->GetSelectionFrame()->paletteBackgroundColor();
-        color[0]=qcolor.red(); color[1]=qcolor.green(); color[2]=qcolor.blue();
-    	colorprop = new mitk::ColorProperty(color);
-		planeNode->GetPropertyList()->SetProperty("color", colorprop);
+        planeNode->SetColor(white, mitkMultiWidget->mitkWidget4->GetRenderer());
 		it->add(planeNode);
 		// ... of widget 3
         planeNode=mitkMultiWidget->mitkWidget3->GetRenderer()->GetWorldGeometryNode();
-        qcolor=mitkMultiWidget->mitkWidget3->GetSelectionFrame()->paletteBackgroundColor();
-        color[0]=qcolor.red(); color[1]=qcolor.green(); color[2]=qcolor.blue();
-    	colorprop = new mitk::ColorProperty(color);
-		planeNode->GetPropertyList()->SetProperty("color", colorprop);
-		it->add(planeNode);
+        planeNode->SetColor(white, mitkMultiWidget->mitkWidget4->GetRenderer());
+        it->add(planeNode);
 
         connect(mitkMultiWidget->levelWindowWidget,SIGNAL(levelWindow(mitk::LevelWindow*)),this,SLOT(changeLevelWindow(mitk::LevelWindow*)) );
     }

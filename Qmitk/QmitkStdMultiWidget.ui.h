@@ -15,8 +15,6 @@ void QmitkStdMultiWidget::updateMitkWidgets()
   mitkWidget3->GetRenderer()->GetRenderWindow()->updateGL(); 
   mitkWidget4->GetRenderer()->GetRenderWindow()->updateGL(); 
 }
-  
-
 
 void QmitkStdMultiWidget::init()
 {
@@ -24,4 +22,31 @@ void QmitkStdMultiWidget::init()
   mitkWidget2->GetSelectionFrame()->setPaletteBackgroundColor ("green");
   mitkWidget3->GetSelectionFrame()->setPaletteBackgroundColor ("blue");
   mitkWidget4->GetSelectionFrame()->setPaletteBackgroundColor ("yellow");
+
+  //transfer colors in WorldGeometry-Nodes of the associated Renderer
+  QColor qcolor;
+  float color[3] = {1.0f,1.0f,1.0f};
+
+  mitk::DataTreeNode::Pointer planeNode;
+  // ... of widget 1
+  qcolor=mitkWidget1->GetSelectionFrame()->paletteBackgroundColor();
+  color[0]=qcolor.red(); color[1]=qcolor.green(); color[2]=qcolor.blue();
+  planeNode=mitkWidget1->GetRenderer()->GetWorldGeometryNode();
+  planeNode->SetColor(color);
+  // ... of widget 2
+  qcolor=mitkWidget2->GetSelectionFrame()->paletteBackgroundColor();
+  color[0]=qcolor.red(); color[1]=qcolor.green(); color[2]=qcolor.blue();
+  planeNode=mitkWidget2->GetRenderer()->GetWorldGeometryNode();
+  planeNode->SetColor(color);
+  // ... of widget 3
+  qcolor=mitkWidget3->GetSelectionFrame()->paletteBackgroundColor();
+  color[0]=qcolor.red(); color[1]=qcolor.green(); color[2]=qcolor.blue();
+  planeNode=mitkWidget3->GetRenderer()->GetWorldGeometryNode();
+  planeNode->SetColor(color);
+  // ... of widget 4
+  qcolor=mitkWidget4->GetSelectionFrame()->paletteBackgroundColor();
+  color[0]=qcolor.red(); color[1]=qcolor.green(); color[2]=qcolor.blue();
+  planeNode=mitkWidget4->GetRenderer()->GetWorldGeometryNode();
+  planeNode->SetColor(color);
+
 }

@@ -26,7 +26,7 @@ typedef ::LinkedTree<DataTreeNode::Pointer> DataTreeBase;
 
 //##ModelId=3E38F35101A0
 
-class DataTree : public itk::Object, public DataTreeBase
+class DataTree : public itk::Object, public DataTreeBase,  public DataTreeBase::TreeChangeListener 
 
 {
 

@@ -543,11 +543,6 @@ void mitk::DataTreeNodeFactory::ReadFileTypeHPSONOS()
 }
 
 
-
-#endif
-
-
-
 void mitk::DataTreeNodeFactory::ReadFileTypeDCM()
 {
     std::cout << "loading " << m_FileName << " as DICOM... " << std::endl;
@@ -572,6 +567,10 @@ void mitk::DataTreeNodeFactory::ReadFileTypeDCM()
 
     std::cout << "...finished!" << std::endl;
 }
+
+
+#endif
+
 
 
 void mitk::DataTreeNodeFactory::ReadFileTypeITKImageIOFactory()

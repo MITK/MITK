@@ -318,9 +318,6 @@ bool mitk::PointSetInteractor::ExecuteAction( Action* action, mitk::StateEvent c
       mitk::PointSet::PointsContainer::Iterator it, end;
       it = points->Begin();
       end = points->End();
-      //debug
-      // int size = points->Size(); /* * \todo remove line */
-      //debug
       int position = 0;
       while (it != end)
 	    {
@@ -497,7 +494,7 @@ bool mitk::PointSetInteractor::ExecuteAction( Action* action, mitk::StateEvent c
 				      ok = true;
             }
           }
-          else //the position wasn't set properly. @todo if necessary: search the given point in list and set var position
+          else //the position wasn't set properly. If necessary: search the given point in list and set var position
           {
           mitk::StatusBar::DisplayText("Message from mitkPointSetInteractor: Error in Actions! Check Config XML-file", 10000);
             ok = false;

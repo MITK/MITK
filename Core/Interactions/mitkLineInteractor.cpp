@@ -83,11 +83,6 @@ void mitk::LineInteractor::DeselectAllLines()
   }
 }
 
-    /* 
-       Line 142:  \todo check if this piece of code really works. Shouldn't 
-       the lineId be compared to the value of the iterator?      
-    */
-
 float mitk::LineInteractor::CalculateJurisdiction(StateEvent const* stateEvent) const
 //go through all lines and check, if the given Point lies near a line
 {
@@ -151,10 +146,8 @@ float mitk::LineInteractor::CalculateJurisdiction(StateEvent const* stateEvent) 
     mitk::Mesh::PointIdConstIterator pointIdIt = cellAutoPointer.GetPointer()->PointIdsBegin();
     mitk::Mesh::PointIdConstIterator pointIdEnd = cellAutoPointer.GetPointer()->PointIdsEnd();
     //get to the desired index of pointIndexes according to lineId
-    /* 
-       \todo check if this piece of code really works. Shouldn't 
-       the lineId be compared to the value of the iterator????
-    */
+    //to get there, we need to iterate over the pointIds "lineId"-times!
+    //then we have an iterator on the pointIds of the desired line
     unsigned int counter = 0;
     while (pointIdIt != pointIdEnd)
     {
@@ -209,15 +202,6 @@ bool mitk::LineInteractor::ExecuteAction(Action* action, mitk::StateEvent const*
 	if (mesh == NULL)
 		return false;
 
-  //for reading on the points, Id's etc
-  
-  /** 
-     \todo remove next lines! 
-  */
-  // mitk::Mesh::DataType *itkpointSet = mesh->GetMesh();
-  // mitk::Mesh::PointsContainer *points = itkpointSet->GetPoints();
-
-  
   switch (action->GetActionId())
 	{
   case AcADDLINE:

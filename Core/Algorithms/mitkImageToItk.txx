@@ -20,6 +20,7 @@ See MITKCopyright.txt or http://www.mitk.org/ for details.
 #define IMAGETOITK_TXX_INCLUDED_C1C2FCD2
 
 #include "mitkImageToItk.h"
+#include "mitkBaseProcess.h"
 
 namespace mitk
 {

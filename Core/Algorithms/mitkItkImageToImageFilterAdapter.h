@@ -25,6 +25,10 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "itkImage.h"
 #include "itkImageToImageFilter.h"
+#include "itkGrayscaleErodeImageFilter.h"
+#include "itkGrayscaleDilateImageFilter.h"
+#include "itkBinaryBallStructuringElement.h"
+
 
 namespace mitk {
 
@@ -51,6 +55,8 @@ public:
   itkGetObjectMacro(FirstFilter, ImageToImageFilterType);
   itkSetObjectMacro(LastFilter, ImageToImageFilterType);
   itkGetObjectMacro(LastFilter, ImageToImageFilterType);
+  itkSetMacro(ClosingEnabled, bool);
+  itkGetMacro(ClosingEnabled, bool);
   void SetSingleFilter(typename ImageToImageFilterType::Pointer filter);
 
   virtual void GenerateOutputInformation();
@@ -59,9 +65,12 @@ public:
 protected:
 	ItkImageToImageFilterAdapter();
 	virtual ~ItkImageToImageFilterAdapter();
+  typename ItkImageType::Pointer DilateSegmentation( typename ItkImageType::Pointer itkSegmentationImage );
+  
 
   typename ImageToImageFilterType::Pointer m_FirstFilter;  // Start of Filter Pipeline
   typename ImageToImageFilterType::Pointer m_LastFilter;   // End of Filter Pipeline
+  bool m_ClosingEnabled;
 };
 } // namespace mitk
 

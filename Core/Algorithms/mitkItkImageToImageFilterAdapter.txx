@@ -38,6 +38,33 @@ ItkImageToImageFilterAdapter< TPixel>::~ItkImageToImageFilterAdapter()
 {
 }
 
+template <typename TPixel>
+typename ItkImageToImageFilterAdapter< TPixel>::ItkImageType::Pointer ItkImageToImageFilterAdapter<TPixel>::DilateSegmentation(typename ItkImageType::Pointer itkSegmentationImage)
+{
+    //fill holes
+  try
+  {  
+    typedef itk::BinaryBallStructuringElement<ItkImageType::PixelType, 3> StructuringElementType;
+    itk::GrayscaleDilateImageFilter<ItkImageType, ItkImageType, StructuringElementType>::Pointer dilate = itk::GrayscaleDilateImageFilter<ItkImageType, ItkImageType, StructuringElementType>::New();
+    itk::GrayscaleErodeImageFilter<ItkImageType, ItkImageType, StructuringElementType>::Pointer erode = itk::GrayscaleErodeImageFilter<ItkImageType, ItkImageType, StructuringElementType>::New();
+    StructuringElementType structuringElement;
+    structuringElement.SetRadius(1);
+    structuringElement.CreateStructuringElement();
+    erode->SetKernel( structuringElement );
+    dilate->SetKernel( structuringElement );
+    dilate->SetInput( itkSegmentationImage );
+    erode->SetInput( dilate->GetOutput() );
+    erode->Update();
+    return ( erode->GetOutput() );
+  }
+  catch (itk::ExceptionObject & error) 
+  {
+      std::cout << error;
+      return NULL;
+  }
+}
+
+
 /**
  * \todo check if this is no conflict to the ITK filter writing rules -> ITK SoftwareGuide p.512
  */  
@@ -92,10 +119,22 @@ void ItkImageToImageFilterAdapter< TPixel>::GenerateData()
   //outputImage->SetVolume(m_LastFilter->GetOutput()->GetBufferPointer());
   //ItkImageType::Pointer itkOutputImage = m_LastFilter->GetOutput();
   //CastToMitkImage(itkOutputImage, outputImage);
-  CastToMitkImage(m_LastFilter->GetOutput(), outputImage);
+
+
+  ItkImageType::Pointer itkOutputImage;
+  bool closing = this->GetClosingEnabled();
+  //dilate if specified in pipe param of xml-file
+  if (closing == true)
+    itkOutputImage = DilateSegmentation( m_LastFilter->GetOutput() );
+  else
+    itkOutputImage = m_LastFilter->GetOutput();
+
+
+  CastToMitkImage(itkOutputImage, outputImage);
   /* copy the transform from source to result image */
   outputImage->GetGeometry()->GetVtkTransform()->SetMatrix(inputImage->GetGeometry()->GetVtkTransform()->GetMatrix());
 }
+
 
 template <typename TPixel>
 void ItkImageToImageFilterAdapter<TPixel>::SetSingleFilter(typename ImageToImageFilterType::Pointer filter)

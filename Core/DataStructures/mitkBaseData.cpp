@@ -1,38 +1,112 @@
 #include "BaseData.h"
+#include "BaseProcess.h"
+
+#define MITK_WEAKPOINTER_PROBLEM_WORKAROUND_ENABLED
 
 //##ModelId=3E3FE04202B9
-mitk::BaseData::BaseData() 
+mitk::BaseData::BaseData() : m_SmartSourcePointer(NULL), m_SourceOutputIndexDuplicate(0), m_Unregistering(false), m_RealReferenceCount(-1), m_CalculatingRealReferenceCount(false)
 {
-	m_PropertyList = PropertyList::New();
+    m_PropertyList = PropertyList::New();
 }
 
 //##ModelId=3E3FE042031D
 mitk::BaseData::~BaseData() 
 {
-
+    m_SmartSourcePointer = NULL;
 }
 
 //##ModelId=3DCBE2BA0139
 const mitk::Geometry3D& mitk::BaseData::GetGeometry() const
 {
-	return *m_Geometry3D.GetPointer();
+    return *m_Geometry3D.GetPointer();
 }
 
 //##ModelId=3E3FE0420273
 mitk::PropertyList::Pointer mitk::BaseData::GetPropertyList() 
 {
-	return m_PropertyList;
+    return m_PropertyList;
 }
 
 //##ModelId=3E3C4ACB0046
 mitk::Geometry2D::ConstPointer mitk::BaseData::GetGeometry2D(int s, int t)
 {
     itkWarningMacro("GetGeometry2D not yet completely implemented. Appropriate setting of the update extent is missing.");
- 
+
     SetRequestedRegionToLargestPossibleRegion();
 
     UpdateOutputInformation();
 
     return GetGeometry().GetGeometry2D(s,t);
+}
+
+int mitk::BaseData::GetRealReferenceCount() const
+{
+    if(m_CalculatingRealReferenceCount==false) //this is only needed because a smart-pointer to m_Outputs (private!!) must be created by calling GetOutputs.
+    {
+        m_CalculatingRealReferenceCount = true;
+
+        m_RealReferenceCount = -1;
+
+        int realReferenceCount = GetReferenceCount();
+
+        if(GetSource()==NULL) 
+        {
+            m_RealReferenceCount = realReferenceCount;
+            m_CalculatingRealReferenceCount = false;
+            return m_RealReferenceCount;
+        }
+
+        mitk::BaseProcess::DataObjectPointerArray outputs = m_SmartSourcePointer->GetOutputs();
+
+        unsigned int idx;
+        for (idx = 0; idx < outputs.size(); ++idx)
+        {
+            //references of outputs that are not referenced from someone else (reference additional to the reference from this BaseProcess object) are interpreted as non-existent 
+            if(outputs[idx]==this)
+                --realReferenceCount;
+        }
+        m_RealReferenceCount = realReferenceCount;
+        if(m_RealReferenceCount<0)
+            m_RealReferenceCount=0;
+        m_CalculatingRealReferenceCount = false;
+    }
+    else
+        return -1;
+    return m_RealReferenceCount;
+}
+
+void mitk::BaseData::UnRegister() const
+{
+#ifdef MITK_WEAKPOINTER_PROBLEM_WORKAROUND_ENABLED
+    if(GetReferenceCount()>1)
+    {
+        Superclass::UnRegister();
+        if((m_Unregistering==false) && (m_SmartSourcePointer!=NULL))
+        {
+            m_Unregistering=true;
+            if(m_SmartSourcePointer->GetRealReferenceCount()==0)
+                m_SmartSourcePointer=NULL; // now the reference count is zero and this object has been destroyed; thus nothing may be done after this line!!
+            else
+                m_Unregistering=false;
+        }
+    }
+    else
+#endif
+        Superclass::UnRegister(); // now the reference count is zero and this object has been destroyed; thus nothing may be done after this line!!
+}
+
+void mitk::BaseData::ConnectSource(itk::ProcessObject *arg, unsigned int idx) const
+{
+#ifdef MITK_WEAKPOINTER_PROBLEM_WORKAROUND_ENABLED
+    itkDebugMacro( "connecting source  " << arg
+        << ", source output index " << idx);
+
+    if ( GetSource() != arg || m_SourceOutputIndexDuplicate != idx)
+    {
+        m_SmartSourcePointer = dynamic_cast<mitk::BaseProcess*>(arg);
+        m_SourceOutputIndexDuplicate = idx;
+        Modified();
+    }
+#endif
 }
 

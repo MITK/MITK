@@ -5,6 +5,8 @@
 
 namespace mitk {
 
+class BaseData;
+
 //##ModelId=3DCBF9BC011A
 //##Documentation
 //## Superclass of all classes generating some kind of mitk::BaseData. 
@@ -18,6 +20,27 @@ namespace mitk {
 //## for example mitk::ImageSource. 
 class BaseProcess : public itk::ProcessObject
 {
+public:
+    mitkClassMacro(BaseProcess, itk::ProcessObject);
+
+    virtual void UnRegister() const;
+
+    virtual int GetRealReferenceCount() const;
+protected:
+    BaseProcess();
+    virtual ~BaseProcess();
+
+    /** Protected methods for setting outputs.
+    * Subclasses make use of them for getting output. 
+    * These are only overwritten because of itk::DataObject::connectSource being 
+    * private and non-virtual:
+    * the important stuff is done in mitk::BaseData::connectSource.*/
+    virtual void SetNthOutput(unsigned int num, itk::DataObject *output);
+    virtual void AddOutput(itk::DataObject *output);
+private:
+    mutable bool m_Unregistering;
+    mutable bool m_CalculatingRealReferenceCount;
+    mutable int m_RealReferenceCount;
 };
 
 } // namespace mitk

@@ -67,3 +67,12 @@ bool mitk::PropertyList::DeleteProperty(const char* propertyKey)
     return m_Properties.erase(propertyKey)>0;
 }
 
+mitk::PropertyList::Pointer mitk::PropertyList::Clone()
+{
+  mitk::PropertyList::Pointer newPropertyList = PropertyList::New();
+
+  // copy the map
+  newPropertyList->m_Properties = m_Properties;
+
+  return newPropertyList.GetPointer();
+}

@@ -93,6 +93,11 @@ void mitk::SurfaceMapper2D::Paint(mitk::BaseRenderer * renderer)
   else
     useCellData = dynamic_cast<mitk::BoolProperty *>(this->GetDataTreeNode()->GetProperty("useCellDataForColouring").GetPointer())->GetValue();
 
+  if (dynamic_cast<mitk::IntProperty *>(this->GetDataTreeNode()->GetProperty("lineWidth").GetPointer()) == NULL)
+    m_LineWidth = 1;
+  else
+    m_LineWidth = dynamic_cast<mitk::IntProperty *>(this->GetDataTreeNode()->GetProperty("lineWidth").GetPointer())->GetValue();
+
   //
   // get the world time
   //
@@ -230,6 +235,8 @@ void mitk::SurfaceMapper2D::PaintCells(vtkPolyData* contour, const mitk::Geometr
       //convert point (until now mm and in worldcoordinates) to display coordinates (units )
       displayGeometry->MMToDisplay(p2d, p2d);
 
+      glLineWidth( m_LineWidth );
+
       if (lut != NULL) 
       {  // color each cell according to cell data
         float *color;
@@ -241,7 +248,6 @@ void mitk::SurfaceMapper2D::PaintCells(vtkPolyData* contour, const mitk::Geometr
           glColor3f(color[0],color[1],color[2]);
         }
       }
-
       //draw the line
       glBegin (GL_LINE_LOOP);
 
@@ -249,7 +255,7 @@ void mitk::SurfaceMapper2D::PaintCells(vtkPolyData* contour, const mitk::Geometr
       glVertex2f(p2d[0], p2d[1]);
       glVertex2f(last[0], last[1]);
       glEnd ();
-
+      glLineWidth(1.0);
       last=p2d;
     }
   }

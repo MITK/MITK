@@ -28,9 +28,9 @@ int mitkMeshTest(int argc, char* argv[])
 
   //create an operation and add a point.
   int position = 0;
-  mitk::Point3D itkPoint;
-  itkPoint.Fill(1);
-  mitk::PointOperation* doOp = new mitk::PointOperation(mitk::OpINSERT, itkPoint, position);
+  mitk::Point3D point;
+  point.Fill(1);
+  mitk::PointOperation* doOp = new mitk::PointOperation(mitk::OpINSERT, point, position);
 	mesh->ExecuteOperation(doOp);
 
   //now check new condition!
@@ -44,8 +44,8 @@ int mitkMeshTest(int argc, char* argv[])
   //get the point and check if it is still the same
   mitk::Point3D tempPoint;
   tempPoint.Fill(0);
-  tempPoint = mesh->GetItkPoint(position);
-  if (tempPoint != itkPoint)
+  tempPoint = mesh->GetPoint(position);
+  if (tempPoint != point)
   {
     std::cout<<"[FAILED]"<<std::endl;
     return EXIT_FAILURE;

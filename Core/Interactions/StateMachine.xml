@@ -523,6 +523,7 @@
 	<stateMachine NAME="polygoninteractor">
 		<state NAME="unselected" ID="0" START_STATE="TRUE">
 			<transition NAME="buildUp" NEXT_STATE_ID="1" EVENT_ID="3">
+				<action ID="5"/><!--AcINITNEWOBJECT-->
 				<action ID="1550"/><!--AcFORCESUBINTERACTORS-->
 	 			<action ID="1102" /> <!--AcMODESUBSELECT-->
 	 			<action ID="2000" /> <!--AcTRANSMITEVENT-->
@@ -549,6 +550,36 @@
 		<state NAME="subSelected" ID="3">
 			<transition NAME="SubInteractorDeselect" NEXT_STATE_ID="1" EVENT_ID="1020"> <!-- necessary transition of the state subSelected -->
 				<action ID="1101" /><!--AcMODEDESELECT--><!-- the event will produced from the hirachical interactor -->
+			</transition>
+		</state>
+	</stateMachine>
+<!-- Behaviour for measuring a length with lines-->
+	<stateMachine NAME="measureinteractor">
+		<state NAME="unbuild" ID="0" START_STATE="TRUE">
+			<transition NAME="forceSSD" NEXT_STATE_ID="1" EVENT_ID="3">
+	 			<action ID="5" /> <!--AcINITNEWOBJECT-->
+				<action ID="1550"/><!--AcFORCESUBINTERACTORS-->
+	 			<action ID="1102" /> <!--AcMODESUBSELECT-->
+	 			<action ID="2000" /> <!--AcTRANSMITEVENT-->
+			</transition>
+		</state>
+		<state NAME="BuildUpSSD" ID="1">
+			<transition NAME="SubInteractorDeselect" NEXT_STATE_ID="10" EVENT_ID="1020"> <!-- necessary transition of the state subSelected -->
+				<action ID="1101" /><!--AcMODEDESELECT--><!-- the event will produced from the hirachical interactor -->
+			</transition>
+			<transition NAME="reinit" NEXT_STATE_ID="0" EVENT_ID="2">
+				<action ID="101" />
+				<action ID="1100" /> <!--AcMODEDESELECT-->
+			</transition>
+		</state>
+		<state NAME="selected" ID="10">
+			<transition NAME="remove" NEXT_STATE_ID="0" EVENT_ID="12">
+				<action ID="101" />
+				<action ID="1100" /> <!--AcMODEDESELECT-->
+			</transition>
+			<transition NAME="reinit" NEXT_STATE_ID="0" EVENT_ID="2">
+				<action ID="101" />
+				<action ID="1100" /> <!--AcMODEDESELECT-->
 			</transition>
 		</state>
 	</stateMachine>

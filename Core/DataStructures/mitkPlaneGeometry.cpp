@@ -86,6 +86,8 @@ void mitk::PlaneGeometry::TransformGeometry(const vtkTransform * transform)
 	float p[3], n[3];
 	// the const_casts in the following are safe, since the used TransformNormalAtPoint/TransformPoint methods
 	// do not change anything
-	vec2vtk(m_PlaneView.normal, n); const_cast<vtkTransform *>(transform)->TransformNormalAtPoint(p, n, n); vtk2vec(n, m_PlaneView.normal);
-	vec2vtk(m_PlaneView.point, p); const_cast<vtkTransform *>(transform)->TransformPoint(p, p); vtk2vec(p, m_PlaneView.point);
+	vec2vtk(m_PlaneView.normal, n);
+    vec2vtk(m_PlaneView.point, p); 
+    const_cast<vtkTransform *>(transform)->TransformNormalAtPoint(p, n, n); vtk2vec(n, m_PlaneView.normal);
+	const_cast<vtkTransform *>(transform)->TransformPoint(p, p); vtk2vec(p, m_PlaneView.point);
 }

@@ -11,6 +11,9 @@ namespace mitk {
    typedef GenericProperty<Point3d> Point3dProperty;
    template class GenericProperty<Point3d>;
 
+   typedef GenericProperty<Point3<int> > Point3iProperty;
+   template class GenericProperty<Point3<int> >;
+   
 //   typedef GenericProperty<int> IntProperty;
 //   template class GenericProperty<int>;
             

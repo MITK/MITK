@@ -17,14 +17,13 @@ extern "C"
 }
 #endif
 
-void printmatrix(vtkMatrix4x4* m)
-{
-  std::cout << "matrix: " << m->Element[0][0] << ",\t" << m->Element[0][1] << ",\t" << m->Element[0][2] << ",\t" << m->Element[0][3] << std::endl;
-  std::cout << "        " << m->Element[1][0] << ",\t" << m->Element[1][1] << ",\t" << m->Element[1][2] << ",\t" << m->Element[0][3] << std::endl;
-  std::cout << "        " << m->Element[2][0] << ",\t" << m->Element[2][1] << ",\t" << m->Element[2][2] << ",\t" << m->Element[0][3] << std::endl;
-  std::cout << "        " << m->Element[3][0] << ",\t" << m->Element[3][1] << ",\t" << m->Element[3][2] << ",\t" << m->Element[3][3] << std::endl;
-}
-
+//void printmatrix(vtkMatrix4x4* m)
+//{
+//  std::cout << "matrix: " << m->Element[0][0] << ",\t" << m->Element[0][1] << ",\t" << m->Element[0][2] << ",\t" << m->Element[0][3] << std::endl;
+//  std::cout << "        " << m->Element[1][0] << ",\t" << m->Element[1][1] << ",\t" << m->Element[1][2] << ",\t" << m->Element[0][3] << std::endl;
+//  std::cout << "        " << m->Element[2][0] << ",\t" << m->Element[2][1] << ",\t" << m->Element[2][2] << ",\t" << m->Element[0][3] << std::endl;
+//  std::cout << "        " << m->Element[3][0] << ",\t" << m->Element[3][1] << ",\t" << m->Element[3][2] << ",\t" << m->Element[3][3] << std::endl;
+//}
 
 //##ModelId=3ED91D050305
 void mitk::Geometry3D::SetBoundingBox(const float bounds[6])
@@ -119,7 +118,6 @@ mitk::Geometry3D::~Geometry3D()
 
 }
 
-
 void mitk::Geometry3D::SetBaseGeometry(mitk::Geometry3D* base)
 {
   m_Transform->SetInput(base->GetTransform());
@@ -142,12 +140,6 @@ mitk::Geometry3D::Pointer mitk::Geometry3D::Clone() const
   newGeometry->SetBoundingBox(m_BoundingBox);
   newGeometry->SetTimeBoundsInMS(m_TimeBoundsInMS);  
   newGeometry->GetTransform()->SetMatrix(m_Transform->GetMatrix());
-  //newGeometry->GetRelativeTransform()->SetMatrix(m_RelativeTransform->GetMatrix());
-  //newGeometry->SetPosition(GetPosition());
-  //newGeometry->SetOrientation(GetOrientation());
-  //newGeometry->SetScale(GetScale());
-  //newGeometry->UpdateTransform();
-
   return newGeometry;  
 }
 
@@ -174,8 +166,7 @@ void mitk::Geometry3D::ExecuteOperation(Operation* operation)
     ScalarType data[3];
     m_Transform->GetPosition(data);
     m_Transform->PostMultiply();
-    m_Transform->Translate(newPos[0], newPos[1], newPos[2]);
-    //m_Transform->Translate(newPos[0] - data[0], newPos[1] - data[1], newPos[2] - data[2]);
+    m_Transform->Translate(newPos[0], newPos[1], newPos[2]);    
     m_Transform->PreMultiply();
     break;
   }
@@ -196,7 +187,6 @@ void mitk::Geometry3D::ExecuteOperation(Operation* operation)
     m_Transform->PostMultiply();
     m_Transform->Translate(pos[0], pos[1], pos[2]);
     m_Transform->PreMultiply();
-    //printmatrix(m_Transform->GetMatrix());
     break;
   }
   case OpROTATE:
@@ -216,7 +206,6 @@ void mitk::Geometry3D::ExecuteOperation(Operation* operation)
     NULL;
 	}
 }
-
 
 const mitk::ITKVector3D mitk::Geometry3D::GetXAxis()
 {
@@ -249,52 +238,3 @@ const mitk::ITKVector3D mitk::Geometry3D::GetZAxis()
   //v.Normalize();
   return v;
 }
-
-
-//void mitk::Geometry3D::SetPosition(const mitk::ScalarType data[]) 
-//{   
-//  if ((m_Position[0] != data[0]) || (m_Position[1] != data[1]) || (m_Position[2] != data[2])) 
-//  { 
-//    m_Position[0] = data[0]; 
-//    m_Position[1] = data[1]; 
-//    m_Position[2] = data[2]; 
-//    m_Modified = true; 
-//  }
-//}
-//
-//void mitk::Geometry3D::SetOrientation(const mitk::ScalarType data[])
-//{   
-//  if ((m_Orientation[0] != data[0]) || (m_Orientation[1] != data[1]) || (m_Orientation[2] != data[2])) 
-//  { 
-//    m_Orientation[0] = data[0]; 
-//    m_Orientation[1] = data[1]; 
-//    m_Orientation[2] = data[2]; 
-//    m_Modified = true; 
-//  }
-//}
-//
-//void mitk::Geometry3D::SetScale(const mitk::ScalarType data[])
-//{   
-//  if ((m_Scale[0] != data[0]) || (m_Scale[1] != data[1]) || (m_Scale[2] != data[2])) 
-//  {
-//    m_Scale[0] = data[0];
-//    m_Scale[1] = data[1];
-//    m_Scale[2] = data[2];
-//    m_Modified = true;
-//  }
-//}
-//
-//const mitk::ScalarType* mitk::Geometry3D::GetPosition() const
-//{
-//  return m_Position;
-//}
-//
-//const mitk::ScalarType* mitk::Geometry3D::GetOrientation() const
-//{
-//  return m_Orientation;
-//}
-//
-//const mitk::ScalarType* mitk::Geometry3D::GetScale() const
-//{
-//  return m_Scale;
-//}

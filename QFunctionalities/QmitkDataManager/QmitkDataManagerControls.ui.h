@@ -30,6 +30,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkEventMapper.h"
 #include "mitkFocusManager.h"
 #include "mitkPointSetWriter.h"
+#include "QmitkCommonFunctionality.h"
+#include "itkImage.h"
 
 #include <itksys/SystemTools.hxx>
 
@@ -146,18 +148,19 @@ void QmitkDataManagerControls::SaveButton_clicked()
           mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(data.GetPointer());
           if(image.IsNotNull())
           {
-            selectedItemsName = itksys::SystemTools::GetFilenameWithoutExtension(selectedItemsName);
-            selectedItemsName += ".pic";
+            CommonFunctionality::SaveImage<itk::Image<int,3> >(image);
+            //selectedItemsName = itksys::SystemTools::GetFilenameWithoutExtension(selectedItemsName);
+            //selectedItemsName += ".pic";
 
-            ipPicDescriptor * picImage = image->GetPic();
+            //ipPicDescriptor * picImage = image->GetPic();
 
-            picImage = ipFuncRefl(picImage,3);
+            //picImage = ipFuncRefl(picImage,3);
 
-            QString fileName = QFileDialog::getSaveFileName(QString(selectedItemsName),"DKFZ Pic (*.seq *.pic *.pic.gz *.seq.gz *.dcm)");
-            if (fileName != NULL ) 
-            {
-              ipPicPut((char *)fileName.ascii(), picImage);
-            }
+            //QString fileName = QFileDialog::getSaveFileName(QString(selectedItemsName),"DKFZ Pic (*.seq *.pic *.pic.gz *.seq.gz *.dcm)");
+            //if (fileName != NULL ) 
+            //{
+            //  ipPicPut((char *)fileName.ascii(), picImage);
+            //}
           }
           mitk::PointSet::Pointer pointset = dynamic_cast<mitk::PointSet*>(data.GetPointer());
           if(pointset.IsNotNull())

@@ -35,6 +35,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkDataTreeNode.h>
 #include <mitkSurface.h>
 #include <mitkDataTreeNodeFactory.h>
+#include <mitkImageToItkMultiplexer.h>
 
 #include <qfiledialog.h>
 #include "ipPic.h"
@@ -43,6 +44,12 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qstring.h>
 #include <qfiledialog.h>
 #include <qregexp.h>
+
+#include "itkImageSeriesReader.h"
+#include "itkImageSeriesWriter.h"
+#include "itkImageFileWriter.h"
+#include "itkNumericSeriesFileNames.h"
+
 
 class CommonFunctionality
 {
@@ -352,6 +359,68 @@ public:
       else
       {
         return NULL;
+      }
+    }
+
+
+    template < typename TImageType >
+    static void SaveImage(mitk::Image* image)
+    {
+      QString fileName = QFileDialog::getSaveFileName(QString("NewImage.mhd"),"DKFZ Pic (*.tif *.tiff *.png *.jpeg *.pic)");
+      if (fileName == NULL ) 
+      {
+        fileName = QString("NewImage.mhd");
+      }
+
+      try 
+      {
+        typename TImageType::Pointer itkImage = TImageType::New();
+        mitk::CastToItkImage( image, itkImage );
+        
+        if (fileName.contains(".pic") == 0 )
+        {
+          if (fileName.contains(".mhd") != 0)
+          {
+            itk::ImageFileWriter<TImageType>::Pointer writer = itk::ImageFileWriter<TImageType>::New();
+            writer->SetInput( itkImage );
+            writer->SetFileName( fileName.ascii() );
+            writer->Update();
+          }
+          else if (fileName.contains(".png") != 0)
+          {
+            typedef itk::Image<unsigned char,2> OutputImage2DType;
+            itk::ImageSeriesWriter<TImageType, OutputImage2DType>::Pointer writer = itk::ImageSeriesWriter<TImageType, OutputImage2DType >::New();
+            writer->SetInput( itkImage );
+            int pos = fileName.findRev(".",fileName.length()-1);
+            fileName.insert(pos,".%d");
+            writer->SetSeriesFormat( fileName.ascii() );
+            writer->Update();
+          }
+          else 
+          {
+            typedef itk::Image<typename TImageType::PixelType,2> OutputImage2DType;
+            itk::ImageSeriesWriter<TImageType, OutputImage2DType>::Pointer writer = itk::ImageSeriesWriter<TImageType, OutputImage2DType >::New();
+            writer->SetInput( itkImage );
+            int pos = fileName.findRev(".",fileName.length()-1);
+            fileName.insert(pos,".%d");
+            writer->SetSeriesFormat( fileName.ascii() );
+            writer->Update();
+          }
+
+        }
+        else
+        {
+          ipPicDescriptor * picImage = image->GetPic();
+          picImage = ipFuncRefl(picImage,3);
+          ipPicPut((char*)(fileName.ascii()), picImage);
+        }
+
+      }
+      catch ( itk::ExceptionObject &err)
+      {
+        std::cout << "Exception object caught! in texture measure calculations" <<std::endl;
+        std::cout << err << std::endl;
+        return;
       }
     }
 

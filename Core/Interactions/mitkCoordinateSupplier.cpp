@@ -70,12 +70,14 @@ bool mitk::CoordinateSupplier::ExecuteSideEffect(int sideEffectId, mitk::StateEv
           break;
         }
         case SeFINISHMOVEMENT:
-        {
+        {/*finishes a Movement from the coordinate supplier: 
+          gets the lastpoint from the undolist and writes an undo-operation so 
+          that the movement of the coordinatesupplier is undoable.*/
           mitk::ITKPoint3D movePoint, oldMovePoint;
           oldMovePoint.Fill(0);
           vm2itk(posEvent->GetWorldPosition(), movePoint);
           PointOperation* doOp = new mitk::PointOperation(OpMOVE, movePoint, 0);
-          if (m_UndoEnabled )//&& (posEvent->GetType() == mitk::Type_MouseButtonRelease)
+          if (m_UndoEnabled )
           {
             //get the last Position from the UndoList
             OperationEvent *lastOperationEvent = m_UndoController->GetLastOfType(m_Destination, OpMOVE);

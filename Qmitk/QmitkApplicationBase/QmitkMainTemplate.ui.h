@@ -164,6 +164,21 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
       node->GetPropertyList()->SetProperty("levelwindow",levWinProp);
 
       mitkMultiWidget->levelWindowWidget->setLevelWindow(levelWindow);
+
+
+        
+      // example usage of a lookup table
+      /*  
+  		mitk::LookupTableSource::Pointer LookupTableSource = new mitk::LookupTableSource();
+      //LookupTableSource->SetUseHPDopplerLookupTable();
+      //LookupTableSource->SetUseStrainLookupTable();
+  		mitk::LookupTableSource::OutputTypePointer LookupTable = LookupTableSource->GetOutput();
+      mitk::LookupTableProperty::Pointer LookupTableProp = new mitk::LookupTableProperty(*LookupTable);
+    	node->SetProperty("LookupTable", LookupTableProp );
+      */
+
+
+
       initWidgets(it);
     }
   }

@@ -54,11 +54,19 @@
 #include <mitkDSRFileReader.h>
 #include <mitkCylindricToCartesianFilter.h>
 #include <itksys/SystemTools.hxx>
+#else
+  #include "itkImage.h"
+  #include "itkImageFileReader.h"
+  #include "itkDICOMImageIO2.h"
+  #include "itkImageSeriesReader.h"
+  #include "itkDICOMSeriesFileNames.h"
+  #include "QmitkCommonFunctionality.h"
 #endif
 
 #include <mitkParRecFileReader.h>
 #include <mitkInteractionConst.h>
 #include <QmitkStatusBar/QmitkStatusBar.h>
+
 
 mitk::FloatProperty::Pointer opacityprop=NULL;
 
@@ -72,7 +80,7 @@ void QmitkMainTemplate::fileOpen()
 #ifdef MBI_INTERNAL
   QString fileName = QFileDialog::getOpenFileName(NULL,"all (*.seq *.pic *.pic.gz *.seq.gz *.pvtk *.stl *.vtk *.ves *.uvg *.par *.dcm hpsonos.db HPSONOS.DB);;DKFZ Pic (*.seq *.pic *.pic.gz *.seq.gz);;surface files (*.stl *.vtk);;stl files (*.stl);;vtk surface files (*.vtk);;vtk image files (*.pvtk);;vessel files (*.ves *.uvg);;par/rec files (*.par);;DSR files (hpsonos.db HPSONOS.DB);;DICOM files (*.dcm)");
 #else
-  QString fileName = QFileDialog::getOpenFileName(NULL,"all (*.seq *.pic *.pic.gz *.seq.gz *.pvtk *.stl *.vtk *.ves *.uvg *.par);;DKFZ Pic (*.seq *.pic *.pic.gz *.seq.gz);;surface files (*.stl *.vtk);;stl files (*.stl);;vtk surface files (*.vtk);;vtk image files (*.pvtk);;par/rec files (*.par)");
+  QString fileName = QFileDialog::getOpenFileName(NULL,"all (*.seq *.pic *.pic.gz *.seq.gz *.pvtk *.stl *.vtk *.ves *.uvg *.par);;DKFZ Pic (*.seq *.pic *.pic.gz *.seq.gz);;surface files (*.stl *.vtk);;stl files (*.stl);;vtk surface files (*.vtk);;vtk image files (*.pvtk);;par/rec files (*.par);;DICOM files (*.dcm)");
 #endif
 
   if ( !fileName.isNull() )
@@ -283,12 +291,12 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
     initWidgets(it);
     delete it;
   }
-  else if(strstr(fileName, "DCM")!=0)
+  else if(strstr(fileName, "DCM")!=0 || strstr(fileName, "dcm")!=0)
   {
     mitk::DICOMFileReader::Pointer reader;
 
     reader=mitk::DICOMFileReader::New();
-    std::cout << "loading " << fileName << " as pic ... " << std::endl;
+    std::cout << "loading " << fileName << " as DICOM... " << std::endl;
 
     reader->SetFileName(fileName);
 
@@ -487,6 +495,77 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
     }
 
     mitkMultiWidget->levelWindowWidget->setLevelWindow(levelWindow);
+
+    initWidgets(it);
+
+    delete it;
+  }
+#else
+  if(strstr(fileName, "DCM")!=0 || strstr(fileName, "dcm")!=0)
+  {
+    QString tmpName = fileName;
+    QString dir = tmpName.left(tmpName.findRev("/",tmpName.length())+1);
+
+    typedef itk::Image<unsigned short,3>            ImageType;
+    typedef itk::ImageSeriesReader< ImageType >     ReaderType;
+
+    itk::DICOMImageIO2::Pointer dicomIO = itk::DICOMImageIO2::New();
+
+    // Get the DICOM filenames from the directory
+    itk::DICOMSeriesFileNames::Pointer nameGenerator = itk::DICOMSeriesFileNames::New();
+    nameGenerator->SetDirectory( dir.ascii() );
+
+    typedef std::vector<std::string> seriesIdContainer;
+    const seriesIdContainer & seriesUID = nameGenerator->GetSeriesUIDs();
+
+    seriesIdContainer::const_iterator seriesItr = seriesUID.begin();
+    seriesIdContainer::const_iterator seriesEnd = seriesUID.end();
+
+    std::cout << std::endl << "The directory: " << std::endl;
+    std::cout << std::endl << dir << std::endl << std::endl;
+    std::cout << "Contains the following DICOM Series: ";
+    std::cout << std::endl << std::endl;
+
+    while( seriesItr != seriesEnd )
+    {
+      std::cout << seriesItr->c_str() << std::endl;
+      seriesItr++;
+    }
+
+    std::cout << std::endl << std::endl;
+    std::cout << "Now reading series: " << std::endl << std::endl;
+
+    typedef std::vector<std::string> fileNamesContainer;
+    fileNamesContainer fileNames;
+
+    std::cout << seriesUID.begin()->c_str() << std::endl;
+    fileNames = nameGenerator->GetFileNames();
+
+    ReaderType::Pointer reader = ReaderType::New();
+    reader->SetFileNames( fileNames );
+    reader->SetImageIO( dicomIO );
+
+    try
+    {
+      reader->Update();
+    }
+    catch (itk::ExceptionObject &ex)
+    {
+      std::cout << ex << std::endl;
+      return;
+    }
+    mitk::DataTreeIterator* it=tree->inorderIterator();
+
+    CommonFunctionality::AddItkImageToDataTree<ImageType>(reader->GetOutput(),it,fileName);
+
+
+    // disable volume rendering by default
+//    node->SetProperty("volumerendering",new mitk::BoolProperty(false));
+
+    //mitk::LevelWindow levelWindow;
+    //reader->Update();
+    //node->SetLevelWindow(levelWindow, NULL);
+    //mitkMultiWidget->levelWindowWidget->setLevelWindow(levelWindow);
 
     initWidgets(it);
 

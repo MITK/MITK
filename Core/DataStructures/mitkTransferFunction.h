@@ -26,7 +26,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <set>
 #include <vtkColorTransferFunction.h>
 #include <vtkPiecewiseFunction.h>
-
+#include <mitkImage.h>
+#include <mitkHistogramGenerator.h>
 namespace mitk
 {
 
@@ -38,13 +39,13 @@ namespace mitk
   class TransferFunction : public itk::DataObject 
   {
     public:
-      TransferFunction(int min, int max) : m_Min(min), m_Max(max) , m_ColorTransferFunction(vtkColorTransferFunction::New()), m_ScalarOpacityFunction(vtkPiecewiseFunction::New()), m_Valid(false)  {
+      TransferFunction(int min, int max) : m_Min(min), m_Max(max) , m_ColorTransferFunction(vtkColorTransferFunction::New()), m_ScalarOpacityFunction(vtkPiecewiseFunction::New()), m_Valid(false), m_Histogram(NULL)  {
         this->m_ScalarOpacityFunction->Initialize();
         // this->m_ColorTransferFunction->Initialize();
         
         // m_VtkElements.push_back();
       }
-      TransferFunction() : m_Min(0), m_Max(255) , m_ColorTransferFunction(vtkColorTransferFunction::New()), m_ScalarOpacityFunction(vtkPiecewiseFunction::New()), m_Valid(false)  {
+      TransferFunction() : m_Min(0), m_Max(255) , m_ColorTransferFunction(vtkColorTransferFunction::New()), m_ScalarOpacityFunction(vtkPiecewiseFunction::New()), m_Valid(false), m_Histogram(NULL)  {
         this->m_ScalarOpacityFunction->Initialize();
         // this->m_ColorTransferFunction->Initialize();
       }
@@ -52,10 +53,14 @@ namespace mitk
       itkNewMacro(Self);
       itkSetMacro(Min,int);
       itkSetMacro(Max,int);
+      itkGetMacro(Min,int);
+      itkGetMacro(Max,int);
       itkGetMacro(ScalarOpacityFunction,vtkPiecewiseFunction*); 
       itkGetMacro(ColorTransferFunction,vtkColorTransferFunction*); 
       itkGetMacro(Valid,bool);
+      itkGetMacro(Histogram,HistogramGenerator::HistogramType::ConstPointer);
       void UpdateVtkFunctions();
+      void InitializeByMitkImage(const mitk::Image* image);
       class RGBO {
         public:
 	RGBO(int red, int green, int blue, float opacity) : m_Red(red),m_Green(green),m_Blue(blue),m_Opacity(opacity) {}
@@ -208,6 +213,7 @@ namespace mitk
       vtkColorTransferFunction* m_ColorTransferFunction;
       vtkPiecewiseFunction* m_ScalarOpacityFunction;
       bool m_Valid;
+      mitk::HistogramGenerator::HistogramType::ConstPointer m_Histogram; 
   };
 }
 #endif 

@@ -33,9 +33,10 @@ class QmitkTransferFunctionCanvas : public QWidget {
       this->m_TransferFunction = transferFunction;
       update();
     } 
+    mitk::TransferFunction::Pointer GetTransferFunction() { return m_TransferFunction; } 
     mitk::TransferFunction::Pointer m_TransferFunction; 
     void PaintElementFunction(const mitk::TransferFunction::ElementSetType &elements, QPainter &p,int penWidth = 0);
-
+    void PaintHistogram(QPainter &p);
     std::pair<mitk::TransferFunction::Element*,mitk::TransferFunction::Handle*> GetNearHandle(int x,int y,unsigned
     int maxSquaredDistance = 6);
     float SquaredDistance(int x, int y, mitk::TransferFunction::Handle* handle);

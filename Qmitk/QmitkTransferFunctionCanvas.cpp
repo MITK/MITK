@@ -5,6 +5,7 @@
 #include "QmitkTransferFunctionCanvas.h"
 #include <assert.h>
 #include "mitkRenderWindow.h"
+#include <cmath>
 
 QmitkTransferFunctionCanvas::QmitkTransferFunctionCanvas(QWidget * parent, const char * name, WFlags f) : QWidget(parent, name, f), m_GrabbedHandle(NULL), m_GrabbedElement(NULL) {
   m_TransferFunction = mitk::TransferFunction::New();
@@ -41,20 +42,22 @@ void QmitkTransferFunctionCanvas::PaintElementFunction(const mitk::TransferFunct
 
 
 void QmitkTransferFunctionCanvas::paintEvent(QPaintEvent* ev) {
-  QPainter paint( this );
-  paint.save();
-  paint.setPen(Qt::green);
-  paint.drawRect(0,0,width(),height());
+  QPainter painter( this );
+  
+  PaintHistogram(painter);
+  painter.save();
+  painter.setPen(Qt::green);
+  painter.drawRect(0,0,width(),height());
   // make sure the sum-function is somehow visible
-  // paint.translate(0,-1.0);
-  //  paint.setPen(QPen(Qt::green,3));
-  PaintElementFunction(m_TransferFunction->GetElements(), paint, 3);
-  paint.restore();
+  // painter.translate(0,-1.0);
+  //  painter.setPen(QPen(Qt::green,3));
+  PaintElementFunction(m_TransferFunction->GetElements(), painter, 3);
+  painter.restore();
   for (mitk::TransferFunction::ElementSetType::iterator elemIt = m_TransferFunction->GetElements().begin(); elemIt != m_TransferFunction->GetElements().end(); elemIt++ ) {
     mitk::TransferFunction::ElementSetType element;
     element.insert(*elemIt);
-    PaintElementFunction(element,paint);
-    PaintElement(paint,*elemIt);
+    PaintElementFunction(element,painter);
+    PaintElement(painter,*elemIt);
   }
 
   QWidget::paintEvent(ev);
@@ -195,6 +198,25 @@ void QmitkTransferFunctionCanvas::mouseReleaseEvent( QMouseEvent*  ) {
   m_GrabbedHandle = NULL;
   update();
 };
+
+void QmitkTransferFunctionCanvas::PaintHistogram(QPainter &p) {
+  if (m_TransferFunction->GetHistogram().IsNotNull()) {
+  p.save();
+  p.setPen(Qt::blue);
+  float scaleFactor = (float)(m_TransferFunction->GetHistogram()->GetSize()[0]) / width();
+  float maxFreqLog = std::log(mitk::HistogramGenerator::CalculateMaximumFrequency(m_TransferFunction->GetHistogram()));
+  for (unsigned int x = 0; x<width(); x++) {
+    int tfIndex = x * scaleFactor;
+    float freq = m_TransferFunction->GetHistogram()->GetFrequency(tfIndex);
+    
+    if (freq>0) {
+      int y = (1 - std::log(freq) / maxFreqLog) * height();
+      p.drawLine(x,height(),x,y);
+    }
+  }
+  p.restore();
+  }
+}
 
 
 

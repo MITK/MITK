@@ -1,4 +1,8 @@
 #include "mitkTransferFunction.h"
+#include <mitkImageToItk.h>
+#include <itkScalarImageToHistogramGenerator.h>
+
+#include <mitkHistogramGenerator.h>
 
 void mitk::TransferFunction::FillValues(std::vector<mitk::TransferFunction::RGBO> &values, const mitk::TransferFunction::ElementSetType &elements) {
   for (unsigned int i=0;i<values.size();i++) {
@@ -32,3 +36,13 @@ void mitk::TransferFunction::UpdateVtkFunctions() {
    } 
 };
 
+void mitk::TransferFunction::InitializeByMitkImage( const mitk::Image * image )
+{
+  mitk::HistogramGenerator::Pointer histGen= mitk::HistogramGenerator::New();
+  histGen->SetImage(image);
+  histGen->SetSize(100);
+  histGen->ComputeHistogram();
+  m_Histogram = histGen->GetHistogram();
+  m_Min = GetHistogram()->GetBinMin(0,0);
+  m_Max = GetHistogram()->GetBinMax(0,GetHistogram()->Size()-1);
+}

@@ -16,15 +16,10 @@
 
 class QmitkStatusBar : public mitk::StatusBar
 {
-  //Q_OBJECT
 public:
-  //mitkClassMacro(QmitkStatusBar, mitk::StatusBar);
 
-    typedef QmitkStatusBar Self;
-    typedef mitk::StatusBar Superclass;
-    typedef itk::SmartPointer<Self>  Pointer;
-    typedef itk::SmartPointer<const Self>  ConstPointer;
-
+  mitkClassMacro(QmitkStatusBar, mitk::StatusBar);
+    
     //##Documentation
     //## @brief This is a singleton pattern New. 
     //##

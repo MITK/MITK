@@ -23,6 +23,7 @@ void mitk::PlaneGeometry::SetPlaneView(const mitk::PlaneView& aPlaneView)
     m_PlaneView=aPlaneView;
     m_ScaleFactorMMPerUnitX=m_PlaneView.getOrientation1().length()/m_WidthInUnits;
     m_ScaleFactorMMPerUnitY=m_PlaneView.getOrientation2().length()/m_HeightInUnits;
+		Modified();
 }
 
 //##ModelId=3E3AEB7C001C

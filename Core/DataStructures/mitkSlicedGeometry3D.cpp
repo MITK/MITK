@@ -172,6 +172,8 @@ void mitk::SlicedGeometry3D::InitializeEvenlySpaced(mitk::Geometry2D* geometry2D
 
   assert(m_IndexToWorldTransform.GetPointer() != geometry2D->GetIndexToWorldTransform()); // (**) see above.
 
+  SetFrameOfReferenceID(geometry2D->GetFrameOfReferenceID());
+
   geometry2D->UnRegister();
 }
 

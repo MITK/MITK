@@ -148,6 +148,8 @@ void mitk::TimeSlicedGeometry::InitializeEvenlyTimed(mitk::Geometry3D* geometry3
   //
   GetTimeBoundsInMS(); //@todo see GetTimeBoundsInMS
 
+  SetFrameOfReferenceID(geometry3D->GetFrameOfReferenceID());
+
   geometry3D->UnRegister();
 }
 

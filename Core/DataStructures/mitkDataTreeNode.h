@@ -3,9 +3,10 @@
 
 #include "mitkCommon.h"
 #include "ImageSource.h"
-#include "Mapper.h"
 
 namespace mitk {
+
+class Mapper;
 
 //##ModelId=3E031E2C0143
 class DataTreeNode : public ImageSource
@@ -27,7 +28,7 @@ class DataTreeNode : public ImageSource
 
   protected:
     //##ModelId=3D6A0F8C0202
-    Mapper mappers;
+	  mitk::Mapper* mappers;
 
 };
 

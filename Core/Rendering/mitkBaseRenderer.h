@@ -2,6 +2,7 @@
 #define BASERENDERER_H_HEADER_INCLUDED_C1E7600A
 
 #include "mitkCommon.h"
+#include "DataTree.h"
 
 namespace mitk {
 
@@ -9,10 +10,8 @@ namespace mitk {
 class BaseRenderer
 {
   public:
-    //##ModelId=3E189A2301F6
-    typedef int TreeIterator;
     //##ModelId=3D6A1791038B
-    void setData(TreeIterator* iterator);
+	  void setData(mitk::DataTreeIterator* iterator);
 
   private:
     //##ModelId=3D6A17780230

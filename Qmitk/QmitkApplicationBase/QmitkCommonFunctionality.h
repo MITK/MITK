@@ -558,16 +558,8 @@ static void SaveImage(mitk::Image* image)
         }
     }
 
-    static mitk::DataTreeIteratorBase* GetIteratorToFirstImageInDataTree(mitk::DataTree::Pointer dataTree)
-    {
-      mitk::DataTreePreOrderIterator dataTreeIterator( dataTree );
-
-      if ( dataTree.IsNull() )
-      {
-        std::cout << "iterator to data tree is NULL. I cannot work without datatree !!"  << std::endl;
-        return NULL;
-      }
-
+	static mitk::DataTreeIteratorBase* GetIteratorToFirstImage(mitk::DataTreeIteratorBase* dataTreeIterator)
+	{
       mitk::DataTreeIteratorClone it = dataTreeIterator;
       while ( !it->IsAtEnd() )
       {
@@ -587,6 +579,19 @@ static void SaveImage(mitk::Image* image)
       }
       std::cout << "No node containing an mitk::Image found, returning NULL..." << std::endl;
       return NULL;
+	}
+
+    static mitk::DataTreeIteratorBase* GetIteratorToFirstImageInDataTree(mitk::DataTree::Pointer dataTree)
+    {
+      mitk::DataTreePreOrderIterator dataTreeIterator( dataTree );
+
+      if ( dataTree.IsNull() )
+      {
+        std::cout << "iterator to data tree is NULL. I cannot work without datatree !!"  << std::endl;
+        return NULL;
+      }
+
+	  return GetIteratorToFirstImage(&dataTreeIterator);
     }
 
     static mitk::Image* GetFirstImageInDataTree(mitk::DataTree::Pointer dataTree)

@@ -43,22 +43,12 @@ const std::type_info& BoundingObjectCutAndCast<TPixel>::GetOutputPixelType()
   return typeid(TPixel);
 }
 
-template < typename TPixel > 
-void BoundingObjectCutAndCast<TPixel>::GenerateData()
+template <typename TPixel>
+void BoundingObjectCutAndCast<TPixel>::ComputeData(mitk::Image* input3D, int boTimeStep)
 {
-  mitk::Image::ConstPointer input = this->GetInput();
+  AccessFixedDimensionByItk_1(input3D, CutImageFixedOutputType, 3, boTimeStep);
 
-  if(input.IsNull())
-    return;  
-
-  if(m_BoundingObject.IsNull())
-    return;
-
-  AccessByItk(input, CutImageFixedOutputType);
-
-  m_TimeOfHeaderInitialization.Modified();
 }
 
 } // of namespace mitk
 #endif // of MITKBOUNDINGOBJECTCUTANDCAST_TXX
-

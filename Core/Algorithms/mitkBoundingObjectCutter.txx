@@ -28,15 +28,14 @@ namespace mitk
 {
 
 template < typename TPixel, unsigned int VImageDimension, typename TOutputPixel > 
-void BoundingObjectCutter::CutImageWithOutputTypeSelect( itk::Image<TPixel, VImageDimension>* inputItkImage, TPixel* dummy, TOutputPixel* dummy2 )
+void BoundingObjectCutter::CutImageWithOutputTypeSelect
+  ( itk::Image<TPixel, VImageDimension>* inputItkImage, int boTimeStep, TPixel* dummy, TOutputPixel* dummy2 )
 {
   typedef itk::Image<TPixel, VImageDimension> ItkInputImageType;
   typedef itk::Image<TOutputPixel, VImageDimension> ItkOutputImageType;
   typedef typename itk::ImageBase<VImageDimension>::RegionType ItkRegionType;
   typedef itk::ImageRegionIteratorWithIndex< ItkInputImageType > ItkInputImageIteratorType;
   typedef itk::ImageRegionIteratorWithIndex< ItkOutputImageType > ItkOutputImageIteratorType;
-
-  mitk::Image::Pointer output = this->GetOutput();
 
   if(m_BoundingObject.IsNull())
     return;
@@ -72,7 +71,7 @@ void BoundingObjectCutter::CutImageWithOutputTypeSelect( itk::Image<TPixel, VIma
 
   // PART 2: get access to the MITK output image via an ITK image
   typename mitk::ImageToItk<TOutputPixel, VImageDimension>::Pointer outputimagetoitk = mitk::ImageToItk<TOutputPixel, VImageDimension>::New();
-  outputimagetoitk->SetInput(output);
+  outputimagetoitk->SetInput(m_OutputTimeSelector->GetOutput());
   outputimagetoitk->Update();
   typename ItkOutputImageType::Pointer outputItkImage = outputimagetoitk->GetOutput();
 

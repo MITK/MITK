@@ -21,8 +21,9 @@ PURPOSE.  See the above copyright notices for more information.
 #define BOUNDINGOBJECTCUTTER_H_HEADER_INCLUDED_C10B22CD
 
 #include "mitkCommon.h"
+#include "mitkImageToImageFilter.h"
 #include "mitkBoundingObject.h"
-#include <mitkImageToImageFilter.h>
+#include "mitkImageTimeSelector.h"
 #include "itkImage.h"
 #include "itkImageRegionIteratorWithIndex.h"
 
@@ -66,9 +67,10 @@ protected:
   virtual void GenerateData();
 
   template < typename TPixel, unsigned int VImageDimension, typename TOutputPixel > 
-    void CutImageWithOutputTypeSelect( itk::Image< TPixel, VImageDimension >* inputItkImage, TPixel* dummy = NULL, TOutputPixel* dummy2=NULL  );
+    void CutImageWithOutputTypeSelect( itk::Image< TPixel, VImageDimension >* inputItkImage, int boTimeStep=0, TPixel* dummy = NULL, TOutputPixel* dummy2=NULL  );
   template < typename TPixel, unsigned int VImageDimension > 
-    void CutImage( itk::Image< TPixel, VImageDimension >* itkImage, TPixel* dummy = NULL );
+    void CutImage( itk::Image< TPixel, VImageDimension >* itkImage, int boTimeStep=0, TPixel* dummy = NULL );
+  virtual void ComputeData(mitk::Image* input3D, int boTimeStep);
 
   //##Description 
   //## @brief BoundingObject that will be cut
@@ -100,6 +102,9 @@ protected:
   //##Description 
   //## @brief Time when Header was last initialized
   itk::TimeStamp m_TimeOfHeaderInitialization;
+
+  mitk::ImageTimeSelector::Pointer m_InputTimeSelector;
+  mitk::ImageTimeSelector::Pointer m_OutputTimeSelector;
 };
 } // namespace mitk
 

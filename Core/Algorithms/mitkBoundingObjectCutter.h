@@ -11,10 +11,13 @@
 #include "itkImage.h"
 #include <itkImageFileWriter.h>
 
+#include "itkImageToImageFilter.h"
+
 #include <itkRegionOfInterestImageFilter.h>
 #include "itkImageRegionIteratorWithIndex.h"
 #include "itkConfidenceConnectedImageFilter.h"
 #include <itkMultiplyImageFilter.h>
+
 
 namespace mitk {
 
@@ -38,7 +41,9 @@ public:
   typedef ItkRegionOfInterestFilterType::InputImageRegionType ItkRegionType;
   typedef itk::ImageRegionIteratorWithIndex< ItkImageType > ItkImageIteratorType;
   typedef itk::ImageFileWriter<ItkImageType> ItkImageWriter;
-          
+
+  typedef itk::ImageToImageFilter<ItkImageType, ItkImageType> ImageToImageFilterType;
+
   typedef itk::ConfidenceConnectedImageFilter<ItkImageType, ItkImageType> ConnectedFilterType;
   typedef  itk::MultiplyImageFilter< ItkImageType, ItkImageType, ItkImageType > MultiplyImageFilterType;
 
@@ -71,7 +76,9 @@ public:
   itkSetClampMacro(ConfidenceFactor, float, 0.0, 10.0);
   itkGetMacro(ConfidenceFactor, float);
   
-  
+  itkSetObjectMacro(SegmentationFilter, ImageToImageFilterType);
+  itkGetObjectMacro(SegmentationFilter, ImageToImageFilterType);
+
   //ItkImageType::Pointer m_ItkImage;
 protected:
   BoundingObjectCutter();
@@ -83,6 +90,7 @@ protected:
   bool m_UseInsideValue;
   bool m_UseRegionGrower;
   float m_ConfidenceFactor;
+  ImageToImageFilterType::Pointer m_SegmentationFilter;
 
 };
 

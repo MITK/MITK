@@ -12,7 +12,7 @@
 
 mitk::BoundingObjectCutter::BoundingObjectCutter()
 : m_UseInsideValue(false), m_OutsideValue(0), m_InsideValue(1), m_BoundingObject(NULL), 
-  m_ConfidenceFactor(1.92), m_UseRegionGrower(true)
+  m_ConfidenceFactor(1.92), m_UseRegionGrower(true), m_SegmentationFilter(NULL)
 {  
 }
 
@@ -100,31 +100,34 @@ void mitk::BoundingObjectCutter::GenerateData()
     if (m_UseRegionGrower)
     {
       std::cout << " cutting done, now starting region grower.\n";
-      // now start a regiongrowing filter
-      ConnectedFilterType::Pointer confidenceConnected = ConnectedFilterType::New();
-      confidenceConnected->SetInput( itkImageCut );
-      //confidenceConnected->SetMultiplier( 1.88 );
-      confidenceConnected->SetMultiplier( m_ConfidenceFactor );
-      confidenceConnected->SetNumberOfIterations( 5 );
-      confidenceConnected->SetReplaceValue( 10000 );
-      
-      // Set seedpoint to center of image
-      ItkImageType::IndexType index; 
-      index[0] = static_cast<ItkImageType::IndexType::IndexValueType>(size[0] / 2.0);
-      index[1] = static_cast<ItkImageType::IndexType::IndexValueType>(size[1] / 2.0);
-      index[2] = static_cast<ItkImageType::IndexType::IndexValueType>(size[2] / 2.0);
-      confidenceConnected->SetSeed( index );
-      
-      confidenceConnected->SetInitialNeighborhoodRadius( 2 );
+      //// now start a region growing filter
+      //ConnectedFilterType::Pointer confidenceConnected = ConnectedFilterType::New();
+      //confidenceConnected->SetInput( itkImageCut );
+      ////confidenceConnected->SetMultiplier( 1.88 );
+      //confidenceConnected->SetMultiplier( m_ConfidenceFactor );
+      //confidenceConnected->SetNumberOfIterations( 5 );
+      //confidenceConnected->SetReplaceValue( 10000 );
+      //
+      //// Set seedpoint to center of image
+      //ItkImageType::IndexType index; 
+      //index[0] = static_cast<ItkImageType::IndexType::IndexValueType>(size[0] / 2.0);
+      //index[1] = static_cast<ItkImageType::IndexType::IndexValueType>(size[1] / 2.0);
+      //index[2] = static_cast<ItkImageType::IndexType::IndexValueType>(size[2] / 2.0);
+      //confidenceConnected->SetSeed( index );
+      //
+      //confidenceConnected->SetInitialNeighborhoodRadius( 2 );
     
       //MultiplyImageFilterType::Pointer multiplyFilter = MultiplyImageFilterType::New();
       //multiplyFilter->SetInput1(confidenceConnected->GetOutput());
       //multiplyFilter->SetInput2(itkImageCut);
 
+      m_SegmentationFilter->SetInput( itkImageCut );
+
       try
       {
         //multiplyFilter->Update();
-        confidenceConnected->Update();
+        //confidenceConnected->Update();
+        m_SegmentationFilter->Update();
       }
       catch( itk::ExceptionObject & excep )
       {
@@ -132,8 +135,11 @@ void mitk::BoundingObjectCutter::GenerateData()
         std::cerr << excep << std::endl;
       }
       // convert the itk image back to an mitk image and set it as output for this filter
-      outputImage->InitializeByItk(confidenceConnected->GetOutput());
-      outputImage->SetVolume(confidenceConnected->GetOutput()->GetBufferPointer());
+      //outputImage->InitializeByItk(confidenceConnected->GetOutput());
+      //outputImage->SetVolume(confidenceConnected->GetOutput()->GetBufferPointer());
+      outputImage->InitializeByItk(m_SegmentationFilter->GetOutput());
+      outputImage->SetVolume(m_SegmentationFilter->GetOutput()->GetBufferPointer());
+
     }
     else
     {

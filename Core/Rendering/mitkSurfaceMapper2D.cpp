@@ -5,7 +5,7 @@
 #include "mitkSurface.h"
 #include "mitkColorProperty.h"
 #include "mitkProperties.h"
-#include "mitkVtkAbstractTransformGeometry.h"
+#include "mitkAbstractTransformGeometry.h"
 
 #include <vtkPolyData.h>
 #include <vtkPolyDataSource.h>
@@ -126,7 +126,7 @@ void mitk::SurfaceMapper2D::Paint(mitk::BaseRenderer * renderer)
     {
       //@FIXME: does not work correctly. Does m_Plane->SetTransform really transforms a "plane plane" into a "curved plane"?
       return;
-      VtkAbstractTransformGeometry::ConstPointer worldAbstractGeometry = dynamic_cast<const VtkAbstractTransformGeometry*>(renderer->GetCurrentWorldGeometry2D());
+      AbstractTransformGeometry::ConstPointer worldAbstractGeometry = dynamic_cast<const AbstractTransformGeometry*>(renderer->GetCurrentWorldGeometry2D());
       if(worldAbstractGeometry.IsNotNull())
       {
         // set up vtkPlane according to worldGeometry

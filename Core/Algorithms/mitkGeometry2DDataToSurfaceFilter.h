@@ -16,7 +16,7 @@ class Geometry2DData;
 //## @brief Superclass of all classes having a Geometry2DData as input and
 //## generating Images as output
 //## @ingroup Process
-//## Currently implemented for PlaneGeometry and VtkAbstractTransformGeometry.
+//## Currently implemented for PlaneGeometry and AbstractTransformGeometry.
 //## Currently, this class does not really have subclasses, but does the job
 //## for itself. It checks which kind of Geometry2D is stored in the
 //## Geometry2DData and - if it knows how - it generates the respective

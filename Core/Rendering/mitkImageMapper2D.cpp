@@ -12,8 +12,8 @@
 #include "mitkLevelWindowProperty.h"
 
 #include "mitkRenderWindow.h"
-#include "mitkVtkAbstractTransformGeometry.h"
-#include "mitkVtkAbstractTransformGeometry.h"
+#include "mitkAbstractTransformGeometry.h"
+#include "mitkAbstractTransformGeometry.h"
 
 #include <vtkImageReslice.h>
 #include <vtkTransform.h>
@@ -228,9 +228,9 @@ void mitk::ImageMapper2D::GenerateData(mitk::BaseRenderer *renderer)
       inputData->SetSpacing(1,1,1); //spacing already included in transform!
     }
     else
-    if(dynamic_cast<const VtkAbstractTransformGeometry *>(worldgeometry)!=NULL)
+    if(dynamic_cast<const AbstractTransformGeometry *>(worldgeometry)!=NULL)
     {
-      const mitk::VtkAbstractTransformGeometry* abstractGeometry = dynamic_cast<const VtkAbstractTransformGeometry *>(worldgeometry);
+      const mitk::AbstractTransformGeometry* abstractGeometry = dynamic_cast<const AbstractTransformGeometry *>(worldgeometry);
       if(abstractGeometry!=NULL)
       {
         //let's use the values of worldgeometry->GetExtent(0) and worldgeometry->GetExtent(1) for that purpose

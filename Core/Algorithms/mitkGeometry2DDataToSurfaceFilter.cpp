@@ -2,7 +2,7 @@
 #include "mitkSurface.h"
 #include "mitkGeometry2DData.h"
 #include "mitkPlaneGeometry.h"
-#include "mitkVtkAbstractTransformGeometry.h"
+#include "mitkAbstractTransformGeometry.h"
 #include <vtkPolyData.h>
 #include <vtkPlaneSource.h>
 #include <vtkTransformPolyDataFilter.h>
@@ -57,7 +57,7 @@ void mitk::Geometry2DDataToSurfaceFilter::GenerateOutputInformation()
     }
     else
     {
-        mitk::VtkAbstractTransformGeometry::ConstPointer abstractGeometry = dynamic_cast<const VtkAbstractTransformGeometry *>(input->GetGeometry2D());
+        mitk::AbstractTransformGeometry::ConstPointer abstractGeometry = dynamic_cast<const AbstractTransformGeometry *>(input->GetGeometry2D());
         if(abstractGeometry.IsNotNull())
         {
           origin = abstractGeometry->GetPlane()->GetOrigin();

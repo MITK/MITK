@@ -28,7 +28,7 @@ class BaseRenderer;
 //##Documentation
 //## @brief OpenGL-texture-based mapper to display slices of an image
 //## @ingroup Mapper
-//## Currently implemented for mapping on PlaneGeometry and VtkAbstractTransformGeometry.
+//## Currently implemented for mapping on PlaneGeometry and AbstractTransformGeometry.
 //## This results in a flipped version when used for texture mapping. Furthermore,
 //## not the complete rectangular area described by the Geometry2D from the renderer
 //## is resampled, @em if the Geometry2D is larger than the image dimension in the requested

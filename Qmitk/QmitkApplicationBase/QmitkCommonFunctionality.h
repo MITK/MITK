@@ -9,6 +9,7 @@
 // mitk includes
 #include <mitkBoolProperty.h>
 #include <mitkProperties.h>
+#include <mitkLevelWindowProperty.h>
 #include <mitkStringProperty.h>
 #include <mitkDataTreeNode.h>
 #include <mitkSurfaceData.h>

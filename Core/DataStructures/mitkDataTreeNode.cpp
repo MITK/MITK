@@ -347,7 +347,7 @@ void mitk::DataTreeNode::SetProperty(const char *propertyKey,
 }
 
 //##ModelId=3ED91D050121
-vtkTransform* mitk::DataTreeNode::GetVtkTransform() const
+vtkLinearTransform* mitk::DataTreeNode::GetVtkTransform() const
 {
   assert(m_Data.IsNotNull());
   assert(m_Data->GetGeometry()!=NULL);

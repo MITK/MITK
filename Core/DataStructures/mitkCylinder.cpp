@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include "mitkCylinder.h"
-#include "vtkTransform.h"
+#include "vtkLinearTransform.h"
 #include "mitkVector.h"
 #include "vtkCylinderSource.h"
 

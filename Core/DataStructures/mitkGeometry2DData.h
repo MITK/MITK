@@ -23,7 +23,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkCommon.h"
 #include "mitkBaseData.h"
 #include "mitkGeometry2D.h"
-#include "mitkSlicedGeometry3D.h"
 
 namespace mitk {
 
@@ -48,9 +47,9 @@ public:
     //##Documentation
     //## @brief Get the reference to the Geometry2D that is stored
     //## by the object
-    const mitk::Geometry2D * GetGeometry2D() const
+    mitk::Geometry2D * GetGeometry2D() const
     {
-        return m_Geometry2D.GetPointer(); 
+        return static_cast<mitk::Geometry2D *>(m_Geometry3D.GetPointer());
     };
 
     //##ModelId=3E66CC5A0295
@@ -77,10 +76,6 @@ protected:
 
     //##ModelId=3E639CD30233
     virtual ~Geometry2DData();
-
-    //##ModelId=3EDD039F01D2
-	Geometry2D::Pointer m_Geometry2D;
-  SlicedGeometry3D::Pointer m_SlicedGeometry;
 };
 
 } // namespace mitk

@@ -42,6 +42,7 @@ public:
         
 	itkSetMacro(Image,mitk::Image::ConstPointer);
 	itkSetMacro(Size,int);
+	itkGetConstMacro(Size,int);
 	itkGetConstObjectMacro(Histogram,HistogramType);
 	
 	// TODO: calculate if needed in GetHistogram()
@@ -52,10 +53,7 @@ protected:
 	HistogramGenerator();
 
 	virtual ~HistogramGenerator();
-	
-	template < typename TPixel, unsigned int VImageDimension > 
-        void InternalCompute(itk::Image< TPixel, VImageDimension >* itkImage);
-        
+       
 	mitk::Image::ConstPointer m_Image;
 	int m_Size;
 	HistogramType::ConstPointer m_Histogram;

@@ -20,6 +20,10 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef _MITK_SURFACE_VTK_WRITER__H_
 #define _MITK_SURFACE_VTK_WRITER__H_
 
+#if(_MSC_VER==1200)
+#include <iomanip>
+#endif
+
 #include <itkProcessObject.h>
 #include <mitkFileWriter.h>
 #include <mitkPointSet.h>

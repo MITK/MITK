@@ -51,9 +51,10 @@ typedef enum PointSpecificationType
 };
 
 
-typedef class itk::NumericTraits<mitk::ScalarType> ScalarTypeNumericTraits;
+typedef itk::NumericTraits<mitk::ScalarType> ScalarTypeNumericTraits;
 extern const ScalarType eps;
 extern const ScalarType sqrteps;
+extern const double large;
 
 template <class Tout>
   inline void FillVector3D(Tout& out, ScalarType x, ScalarType y, ScalarType z)

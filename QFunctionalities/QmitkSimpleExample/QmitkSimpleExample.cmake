@@ -1,4 +1,4 @@
-INCLUDE_DIRECTORIES(../../Framework/QmitkApplicationBase ../../Functionalities/QmitkSimpleExample)
+INCLUDE_DIRECTORIES( ../../Functionalities/QmitkSimpleExample)
 
 # an example of a functionality
 

@@ -16,6 +16,10 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
+#if(_MSC_VER==1200)
+#error MeshUtils currently not supported for MS Visual C++ 6.0. Sorry.
+#endif
+
 #include <itkMesh.h>
 #include <itkLineCell.h>
 #include <itkTriangleCell.h>

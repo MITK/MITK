@@ -42,7 +42,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkColorProperty.h"
 #include "mitkStringProperty.h"
 
-class vtkTransform;
+class vtkLinearTransform;
 
 namespace mitk {
 
@@ -62,7 +62,7 @@ public:
   typedef mitk::Geometry3D::Pointer Geometry3DPointer;
   typedef std::vector<Mapper::Pointer> MapperVector;
 
-  mitkClassMacro(DataTreeNode,DataObject);
+  mitkClassMacro(DataTreeNode, itk::DataObject);
 
   itkNewMacro(Self);  
 
@@ -78,7 +78,7 @@ public:
   //## @brief Get the transformation applied prior to displaying the data as
   //## a vtkTransform
   //## \deprecated use GetData()->GetGeometry()->GetVtkTransform() instead
-  vtkTransform* GetVtkTransform() const;
+  vtkLinearTransform* GetVtkTransform() const;
   //##Documentation
   //## @brief Get the Interactor 
   Interactor::Pointer GetInteractor() const;
@@ -87,7 +87,7 @@ public:
   //##Documentation
   //## @brief Set the data object (instance of BaseData, e.g., an Image)
   //## managed by this DataTreeNode
-  //## @bug the actor-mode of the vtkInteractor does not work any more, if the transform of the 
+  //## @warning the actor-mode of the vtkInteractor does not work any more, if the transform of the 
   //## data-tree-node is connected to the transform of the basedata via vtkTransform->SetInput.
   virtual void SetData(mitk::BaseData* baseData);
   //##Documentation

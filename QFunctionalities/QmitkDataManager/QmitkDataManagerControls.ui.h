@@ -25,12 +25,13 @@ PURPOSE.  See the above copyright notices for more information.
 ** init() function in place of a constructor, and a destroy() function in
 ** place of a destructor.
 *****************************************************************************/
+
+#include "QmitkCommonFunctionality.h"
 #include <utility>
 #include "mitkProperties.h"
 #include "mitkEventMapper.h"
 #include "mitkFocusManager.h"
 #include "mitkPointSetWriter.h"
-#include "QmitkCommonFunctionality.h"
 #include "itkImage.h"
 
 #include <itksys/SystemTools.hxx>
@@ -38,8 +39,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qfiledialog.h>
 #include <qmessagebox.h>
 
-#include "ipPic.h"
-#include "ipFunc.h"
+#include "ipPic/ipPic.h"
+#include "ipFunc/ipFunc.h"
 
 #include "mitkChiliPlugin.h"
 #include "mitkLightBoxResultImageWriter.h"
@@ -156,7 +157,8 @@ void QmitkDataManagerControls::SaveButton_clicked()
           mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(data.GetPointer());
           if(image.IsNotNull())
           {
-            CommonFunctionality::SaveImage<itk::Image<int,3> >(image);
+            typedef itk::Image<int,3> ImageType;
+            CommonFunctionality::SaveImage< ImageType >(image);
           }
           mitk::PointSet::Pointer pointset = dynamic_cast<mitk::PointSet*>(data.GetPointer());
           if(pointset.IsNotNull())

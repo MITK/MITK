@@ -20,9 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITKSURFACEDATASOURCE_H_HEADER_INCLUDED_C10B4740
 #define MITKSURFACEDATASOURCE_H_HEADER_INCLUDED_C10B4740
 
-#include "mitkCommon.h"
 #include "mitkBaseProcess.h"
-#include "mitkImageSource.h"
 
 namespace mitk {
 class Surface;

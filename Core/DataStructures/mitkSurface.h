@@ -101,6 +101,8 @@ public:
 
   virtual void Initialize(unsigned int timeSteps=1);
 
+  void CalculateBoundingBox();
+
 protected:
  
   typedef std::vector< vtkPolyData* > VTKPolyDataSeries;
@@ -111,8 +113,6 @@ protected:
   //##ModelId=3E70F66100CA
   virtual ~Surface();
 
-  void CalculateBoundingBox();
-  
   //##ModelId=3E70F6610099
   VTKPolyDataSeries m_PolyDataSeries;
 

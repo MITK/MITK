@@ -1,5 +1,6 @@
-#include "mitkTransferFunction.h"
 #include <mitkImageToItk.h>
+
+#include "mitkTransferFunction.h"
 #include <itkScalarImageToHistogramGenerator.h>
 
 #include <mitkHistogramGenerator.h>
@@ -44,5 +45,5 @@ void mitk::TransferFunction::InitializeByMitkImage( const mitk::Image * image )
   histGen->ComputeHistogram();
   m_Histogram = histGen->GetHistogram();
   m_Min = GetHistogram()->GetBinMin(0,0);
-  m_Max = GetHistogram()->GetBinMax(0,GetHistogram()->Size()-1);
+  m_Max = GetHistogram()->GetBinMin(0, GetHistogram()->Size()-1);
 }

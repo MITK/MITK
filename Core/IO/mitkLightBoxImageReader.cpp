@@ -22,7 +22,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkFrameOfReferenceUIDManager.h"
 #include <mitkChiliPlugin.h>
 #include <itkImageFileReader.h>
-#include <vtkTransform.h>
 #include <list>
 #include <vnl/vnl_cross.h>
 

@@ -20,29 +20,36 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef IMAGETOITK_H_HEADER_INCLUDED_C1C2FCD2
 #define IMAGETOITK_H_HEADER_INCLUDED_C1C2FCD2
 
+#if(_MSC_VER==1200)
+#include <itkFixedCenterOfRotationAffineTransform.h>
+#endif
+
 #include <itkImage.h>
 #include <itkImageSource.h>
+#include "mitkBaseProcess.h"
 #include "mitkImage.h"
 
 namespace mitk
 {
 	
-template <typename TPixel, unsigned int VImageDimension=2>
-class ITK_EXPORT ImageToItk : public itk::ImageSource< itk::Image<TPixel,VImageDimension> >
+template <class TOutputImage>
+class ITK_EXPORT ImageToItk : public itk::ImageSource< TOutputImage >
 {
 protected:
 	mitk::Image::Pointer m_MitkImage;
 	mitk::ImageDataItem::Pointer m_ImageDataItem;
   
 public:
-  typedef itk::Image<TPixel,VImageDimension> TOutputImage;
-	mitkClassMacro(ImageToItk, itk::ImageSource<TOutputImage >);
+  typedef ImageToItk  Self;
+  typedef itk::ImageSource<TOutputImage>  Superclass;
+  typedef itk::SmartPointer<Self>  Pointer;
+  typedef itk::SmartPointer<const Self>  ConstPointer;
 
 	/** Method for creation through the object factory. */
 	itkNewMacro(Self);  
 	
 	/** Superclass typedefs. */
-	typedef typename Superclass::OutputImageRegionType OutputImageRegionType;
+  typedef typename Superclass::OutputImageRegionType OutputImageRegionType;
 
 	/** Some convenient typedefs. */
 	typedef mitk::Image                    InputImageType;
@@ -70,9 +77,13 @@ public:
   itkBooleanMacro( CopyMemFlag );
 
 protected:
-	ImageToItk();
+	ImageToItk(): m_CopyMemFlag(false), m_Channel(0)
+	{
+	}
 	
-	virtual ~ImageToItk();
+	virtual ~ImageToItk()
+	{
+	}
 
 	void PrintSelf(std::ostream& os, itk::Indent indent) const;
 	
@@ -91,7 +102,7 @@ private:
 };
 
 
-} // end namespace itk
+} // end namespace mitk
 
 
 

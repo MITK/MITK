@@ -53,7 +53,7 @@ namespace mitk
     virtual ~VolumeCalculator();
 
     template < typename TPixel, unsigned int VImageDimension >
-    void InternalCompute(itk::Image< TPixel, VImageDimension >* itkImage);
+    friend void InternalCompute(itk::Image< TPixel, VImageDimension >* itkImage, mitk::VolumeCalculator* volumeCalculator);
 
     mitk::Image::ConstPointer m_Image;
     int m_Threshold;

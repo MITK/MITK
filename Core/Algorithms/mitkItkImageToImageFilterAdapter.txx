@@ -22,7 +22,7 @@ See MITKCopyright.txt or http://www.mitk.org/ for details.
 #include "mitkItkImageToImageFilterAdapter.h"
 #include "mitkImageToItkMultiplexer.h"
 #include "mitkImage.h"
-#include "vtkTransform.h"
+#include <vtkLinearTransform.h>
 
 namespace mitk
 {
@@ -132,7 +132,7 @@ void ItkImageToImageFilterAdapter< TPixel>::GenerateData()
 
   CastToMitkImage(itkOutputImage, outputImage);
   /* copy the transform from source to result image */
-  outputImage->GetGeometry()->GetVtkTransform()->SetMatrix(inputImage->GetGeometry()->GetVtkTransform()->GetMatrix());
+  outputImage->SetGeometry(static_cast<Geometry3D*>(inputImage->GetGeometry()->Clone().GetPointer()));
 }
 
 

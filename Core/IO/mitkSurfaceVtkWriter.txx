@@ -16,7 +16,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-
 #include "mitkSurfaceVtkWriter.h"
 
 #include <sstream>
@@ -80,13 +79,11 @@ void mitk::SurfaceVtkWriter<VTKWRITER>::GenerateData()
 
 }
 
-
 template <class VTKWRITER>
 void mitk::SurfaceVtkWriter<VTKWRITER>::SetInput( mitk::Surface* surface )
 {
   this->ProcessObject::SetNthInput( 0, surface );
 }
-
 
 template <class VTKWRITER>
 const mitk::Surface* mitk::SurfaceVtkWriter<VTKWRITER>::GetInput()

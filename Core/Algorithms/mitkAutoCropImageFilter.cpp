@@ -1,6 +1,7 @@
+#include "mitkImageCast.h"
+
 #include "mitkAutoCropImageFilter.h"
 
-#include "mitkImageToItkMultiplexer.h"
 #include "mitkImageTimeSelector.h"
 #include "itkLinearInterpolateImageFunction.h"
 #include <itkBinaryMedianImageFilter.h>
@@ -8,7 +9,7 @@
 #include <itkImageRegionIterator.h>
 #include <itkCropImageFilter.h>
 #include <mitkImage.h>
-#include "vtkTransform.h"
+#include <vtkLinearTransform.h>
 
 mitk::AutoCropImageFilter::AutoCropImageFilter() : m_BackgroundValue(0), m_MarginFactor(1.0)
 {
@@ -75,8 +76,8 @@ void mitk::AutoCropImageFilter::Crop3DImage(mitk::ImageToImageFilter::InputImage
     {
       for (int i=0; i < 3; i++)
       {
-        minima[i] = std::min((int)minima[i],(int)(inIt.GetIndex()[i]));
-        maxima[i] = std::max((int)maxima[i],(int)(inIt.GetIndex()[i]));
+        minima[i] = vnl_math_min((int)minima[i],(int)(inIt.GetIndex()[i]));
+        maxima[i] = vnl_math_max((int)maxima[i],(int)(inIt.GetIndex()[i]));
       }
     }
   }
@@ -131,7 +132,9 @@ void mitk::AutoCropImageFilter::Crop3DImage(mitk::ImageToImageFilter::InputImage
   mitk::CastToMitkImage(outputItk, output);
   output->SetPropertyList(this->GetInput()->GetPropertyList()->Clone());
   output->SetGeometry( dynamic_cast<Geometry3D*>(this->GetInput()->GetSlicedGeometry()->Clone().GetPointer()) );
-  output->GetGeometry()->GetVtkTransform()->Translate(regionIndex[0],regionIndex[1],regionIndex[2]);
+  Vector3D originVector;
+  vtk2itk(origin, originVector);
+  output->GetGeometry()->Translate(originVector);
   this->SetOutput(output);  
 
 }

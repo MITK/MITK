@@ -407,6 +407,19 @@ namespace mitk {
     mitk::LevelWindow m_LevelWindow;
   };
 
+  template <typename ItkOutputImageType> 
+  void CastToMitkImage(const itk::SmartPointer<ItkOutputImageType>& itkimage, itk::SmartPointer<mitk::Image>& mitkoutputimage)
+  {
+    mitkoutputimage->InitializeByItk(itkimage.GetPointer());
+    mitkoutputimage->SetVolume(itkimage->GetBufferPointer());
+  }
+
+  template <typename ItkOutputImageType> 
+  void CastToMitkImage(const ItkOutputImageType* itkimage, itk::SmartPointer<mitk::Image>& mitkoutputimage)
+  {
+    mitkoutputimage->InitializeByItk(itkimage);
+    mitkoutputimage->SetVolume(itkimage->GetBufferPointer());
+  }
 } // namespace mitk
 
 #endif /* MITKIMAGE_H_HEADER_INCLUDED_C1C2FCD2 */

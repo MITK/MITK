@@ -20,8 +20,8 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITKIMAGETOITKMULTIPLEXER_H_HEADER_INCLUDED
 #define MITKIMAGETOITKMULTIPLEXER_H_HEADER_INCLUDED
  
-#include <mitkImageToItk.h>
 #include <itkCastImageFilter.h>
+#include <mitkImageToItk.h>
 
 /*!
 * \brief method creates a cast image filter and casts the image of ItkInputImageType
@@ -50,9 +50,9 @@ MakeCastImageFilter(  ItkInputImageType* inputImage )
 #define _calculateItkPipelineFunction(result, mitksource, itkpipelinefunction, type, dimension)    \
   if ( typeId == typeid(type) )                                                                  \
 {                                                                                              \
-    typedef mitk::ImageToItk<type, dimension> ImageToItkType;                                  \
-    typedef itk::SmartPointer<ImageToItkType>  ImageToItkTypePointer;                                  \
     typedef itk::Image<type, dimension> ImageType;                                  \
+    typedef mitk::ImageToItk<ImageType> ImageToItkType;                                  \
+    typedef itk::SmartPointer<ImageToItkType>  ImageToItkTypePointer;                                  \
     typedef itk::ImageSource<ImageType> ImageFilterType;                                \
     typedef itk::SmartPointer<ImageFilterType> ImageFilterTypePointer;                                \
     \
@@ -117,9 +117,9 @@ MakeCastImageFilter(  ItkInputImageType* inputImage )
 #define _calculateMitkToItkPipelineFunction(resultItkImage, resultItkImageType, mitksource, itkpipelinefunction, type, dimension)    \
   if ( typeId == typeid(type) )                                                                  \
 {                                                                                              \
-    typedef mitk::ImageToItk<type, dimension> ImageToItkType;                                  \
-    typedef itk::SmartPointer<ImageToItkType> ImageToItkTypePointer;                          \
     typedef itk::Image<type, dimension> ImageType;                                  \
+    typedef mitk::ImageToItk<ImageType> ImageToItkType;                                  \
+    typedef itk::SmartPointer<ImageToItkType> ImageToItkTypePointer;                          \
     typedef itk::ImageSource<resultItkImageType> ImageFilterType;            \
     typedef itk::SmartPointer<ImageFilterType> ImageFilterTypePointer;                         \
     \
@@ -200,24 +200,6 @@ MakeCastImageFilter(  ItkInputImageType* inputImage )
   }                                                                                                    \
 }
 
-namespace mitk 
-{
-  template <typename ItkOutputImageType> void CastToItkImage(const mitk::Image * mitkimage, typename itk::SmartPointer<ItkOutputImageType>& itkoutputimage)
-  {
-    FixedInputDimensionMitkToItkFunctionMultiplexer(itkoutputimage, ItkOutputImageType, mitkimage, ItkOutputImageType::ImageDimension, MakeCastImageFilter);
-  }
-
-  template <typename ItkOutputImageType> void CastToMitkImage(const itk::SmartPointer<ItkOutputImageType>& itkimage, itk::SmartPointer<mitk::Image>& mitkoutputimage)
-  {
-    mitkoutputimage->InitializeByItk(itkimage.GetPointer());
-    mitkoutputimage->SetVolume(itkimage->GetBufferPointer());
-  }
-
-  template <typename ItkOutputImageType> void CastToMitkImage(const ItkOutputImageType* itkimage, itk::SmartPointer<mitk::Image>& mitkoutputimage)
-  {
-    mitkoutputimage->InitializeByItk(itkimage);
-    mitkoutputimage->SetVolume(itkimage->GetBufferPointer());
-  }
-}
-
+//for compatibility
+#include "mitkImageCast.h"
 #endif // of MITKIMAGETOITKMULTIPLEXER_H_HEADER_INCLUDED

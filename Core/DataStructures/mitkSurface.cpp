@@ -128,7 +128,7 @@ void mitk::Surface::CalculateBoundingBox()
   // first make sure, that the associated time sliced geometry has
   // the same number of geometry 3d's as vtkPolyDatas are present
   //
-  mitk::TimeSlicedGeometry::Pointer timeGeometry = const_cast< mitk::TimeSlicedGeometry *>(this->GetTimeSlicedGeometry());
+  mitk::TimeSlicedGeometry::Pointer timeGeometry = GetTimeSlicedGeometry();
   if ( timeGeometry->GetTimeSteps() != m_PolyDataSeries.size() )
   {
     itkExceptionMacro(<<"timeGeometry->GetTimeSteps() != m_PolyDataSeries.size() -- use Initialize(timeSteps) with correct number of timeSteps!");
@@ -146,7 +146,7 @@ void mitk::Surface::CalculateBoundingBox()
 #else
     float bounds[ ] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 #endif
-    if ( polyData != NULL )
+    if ( ( polyData != NULL ) && ( polyData->GetNumberOfPoints() > 0 ) )
     {
       polyData->Update();
       polyData->ComputeBounds();
@@ -154,15 +154,7 @@ void mitk::Surface::CalculateBoundingBox()
     }
     mitk::Geometry3D::Pointer g3d = timeGeometry->GetGeometry3D( i );
     assert( g3d.IsNotNull() );
-#if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
-    float fbounds[ ] =  {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-    for (int i=0;i<6;i++)
-      fbounds[i] = bounds[i];
-      g3d->SetFloatBounds( fbounds );
-#else
     g3d->SetFloatBounds( bounds );
-#endif
-
   }
   mitk::BoundingBox::Pointer bb = const_cast<mitk::BoundingBox*>( timeGeometry->GetBoundingBox() );
   //std::cout << "min"<< bb->GetMinimum() << std::endl;

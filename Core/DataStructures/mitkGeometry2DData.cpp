@@ -23,9 +23,6 @@ PURPOSE.  See the above copyright notices for more information.
 //##ModelId=3E639CD30201
 mitk::Geometry2DData::Geometry2DData()
 {
-  m_SlicedGeometry = SlicedGeometry3D::New();
-  SetGeometry(m_SlicedGeometry);
-  //  m_SlicedGeometry->Initialize(1);
 }
 
 //##ModelId=3E639CD30233
@@ -36,16 +33,15 @@ mitk::Geometry2DData::~Geometry2DData()
 //##ModelId=3E6423D2030E
 void mitk::Geometry2DData::SetGeometry2D(mitk::Geometry2D *geometry2d)
 {
-  m_SlicedGeometry->SetGeometry2D(geometry2d, 0);
-  m_Geometry2D=geometry2d;
+  m_Geometry3D=geometry2d;
   Modified();
 }
 
 //##ModelId=3E66CC5A0295
 void mitk::Geometry2DData::UpdateOutputInformation()
 {
-  if(m_Geometry2D.IsNotNull())
-    SetPipelineMTime(m_Geometry2D->GetMTime());
+  if(m_Geometry3D.IsNotNull())
+    SetPipelineMTime(m_Geometry3D->GetMTime());
   if (this->GetSource())
   {
     this->GetSource()->UpdateOutputInformation();
@@ -61,7 +57,7 @@ void mitk::Geometry2DData::SetRequestedRegionToLargestPossibleRegion()
 //##ModelId=3E66CC5A02D2
 bool mitk::Geometry2DData::RequestedRegionIsOutsideOfTheBufferedRegion()
 {
-  if(m_Geometry2D.IsNull()) return true;
+  if(m_Geometry3D.IsNull()) return true;
 
   return false;
 }
@@ -69,7 +65,7 @@ bool mitk::Geometry2DData::RequestedRegionIsOutsideOfTheBufferedRegion()
 //##ModelId=3E66CC5A02F0
 bool mitk::Geometry2DData::VerifyRequestedRegion()
 {
-  if(m_Geometry2D.IsNull()) return false;
+  if(m_Geometry3D.IsNull()) return false;
 
   return true;
 }

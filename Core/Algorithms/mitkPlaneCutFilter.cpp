@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include "mitkPlaneCutFilter.h"
-#include "ipPicTypeMultiplex.h"
+#include "ipPic/ipPicTypeMultiplex.h"
 #include "mitkVector.h"
 
 template <class T>

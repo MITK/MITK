@@ -20,6 +20,10 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef BASEPROCESS_H_HEADER_INCLUDED_C19BE6FC
 #define BASEPROCESS_H_HEADER_INCLUDED_C19BE6FC
 
+#if(_MSC_VER==1200)
+#include <itkFixedArray.h>
+#endif
+
 #include "mitkCommon.h"
 #include <itkProcessObject.h>
 

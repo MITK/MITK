@@ -29,6 +29,7 @@ class vtkDataSetToPolyDataFilter;
 namespace mitk {
 
 class Surface;
+class Image;
 
 //##Documentation
 //## @brief Adapter for vtkProbeFilter, making it a 3D+t filter

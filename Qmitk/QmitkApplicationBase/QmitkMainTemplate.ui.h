@@ -82,7 +82,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkCommonFunctionality.h"
 #include <mitkParRecFileReader.h>
 #include <mitkInteractionConst.h>
-#include <QmitkStatusBar/QmitkStatusBar.h>
+#include <QmitkStatusBar.h>
 
 QmitkMainTemplate* QmitkMainTemplate::m_Instance = NULL;
 

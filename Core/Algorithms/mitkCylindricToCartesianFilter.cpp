@@ -23,7 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkPlaneGeometry.h"
 #include "mitkProperties.h"
 
-#include <ipPicTypeMultiplex.h>
+#include <ipPic/ipPicTypeMultiplex.h>
 
 template <class T>
 void _transform(ipPicDescriptor *pic, ipPicDescriptor *dest, float _outsideValue, float *fr, float *fphi, float *fz, short *rt, unsigned int *phit, unsigned int *zt, ipPicDescriptor *coneCutOff_pic)  //...t=truncated

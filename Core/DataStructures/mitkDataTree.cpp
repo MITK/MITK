@@ -94,6 +94,7 @@ mitk::BoundingBox::Pointer mitk::DataTree::ComputeBoundingBox(mitk::DataTreeIter
   mitk::BoundingBox::PointsContainer::Pointer pointscontainer=mitk::BoundingBox::PointsContainer::New();
 
   mitk::BoundingBox::PointIdentifier pointid=0;
+  mitk::Point3D point;
 
   while (!_it->IsAtEnd())
   {
@@ -104,7 +105,15 @@ mitk::BoundingBox::Pointer mitk::DataTree::ComputeBoundingBox(mitk::DataTreeIter
       const Geometry3D* geometry = node->GetData()->GetUpdatedGeometry();
       unsigned char i;
       for(i=0; i<8; ++i)
-        pointscontainer->InsertElement( pointid++, geometry->GetCornerPoint(i));
+      {
+        point = geometry->GetCornerPoint(i);
+        if(point[0]*point[0]+point[1]*point[1]+point[2]*point[2] < mitk::large)
+          pointscontainer->InsertElement( pointid++, point);
+        else
+        {
+          itkGenericOutputMacro( << "Unrealistically distant corner point encountered. Ignored. Node: " << node );
+        }
+      }
     }
     ++_it;
   }

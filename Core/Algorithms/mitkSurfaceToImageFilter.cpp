@@ -90,8 +90,8 @@ void mitk::SurfaceToImageFilter::GenerateOutputInformation()
   // Position the output Image to match the corresponding region of the input image
   mitk::SlicedGeometry3D* slicedGeometry = output->GetSlicedGeometry();
   const mitk::SlicedData::IndexType& start = inputImage->GetLargestPossibleRegion().GetIndex();
-  slicedGeometry->GetVtkTransform()->Translate(start[0], start[1], start[2]);
-  slicedGeometry->TransferVtkToITKTransform();
+  mitk::Vector3D vector; vtk2itk(start, vector);
+  slicedGeometry->Translate(vector);
 
   mitk::TimeSlicedGeometry* timeSlicedGeometry = output->GetTimeSlicedGeometry();
   timeSlicedGeometry->InitializeEvenlyTimed(slicedGeometry, output->GetDimension(3));

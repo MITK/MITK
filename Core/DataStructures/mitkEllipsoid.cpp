@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include "mitkEllipsoid.h"
-#include "vtkTransform.h"
+#include "vtkLinearTransform.h"
 #include "mitkVector.h"
 #include "vtkSphereSource.h"
 

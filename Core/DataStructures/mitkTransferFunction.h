@@ -21,8 +21,9 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITK_TRANSFER_FUNCTION_H_HEADER_INCLUDED
 
 #include "mitkCommon.h"
-#include <itkDataObject.h>
+#include <itkObject.h>
 #include <itkObjectFactory.h>
+#include <algorithm>
 #include <set>
 #include <vtkColorTransferFunction.h>
 #include <vtkPiecewiseFunction.h>
@@ -36,7 +37,7 @@ namespace mitk
   //## @brief
   //##
   //##
-  class TransferFunction : public itk::DataObject 
+  class TransferFunction : public itk::Object 
   {
     public:
       TransferFunction(int min, int max) : m_Min(min), m_Max(max) , m_ColorTransferFunction(vtkColorTransferFunction::New()), m_ScalarOpacityFunction(vtkPiecewiseFunction::New()), m_Valid(false), m_Histogram(NULL)  {
@@ -58,7 +59,7 @@ namespace mitk
       itkGetMacro(ScalarOpacityFunction,vtkPiecewiseFunction*); 
       itkGetMacro(ColorTransferFunction,vtkColorTransferFunction*); 
       itkGetMacro(Valid,bool);
-      itkGetMacro(Histogram,HistogramGenerator::HistogramType::ConstPointer);
+      itkGetConstObjectMacro(Histogram,HistogramGenerator::HistogramType);
       void UpdateVtkFunctions();
       void InitializeByMitkImage(const mitk::Image* image);
       class RGBO {
@@ -82,8 +83,8 @@ namespace mitk
         }
       };  
       class Element;
-      typedef std::set<mitk::TransferFunction::Element*> ElementSetType; 	
-      static void FillValues(std::vector<mitk::TransferFunction::RGBO> &values, const ElementSetType &elements);
+      typedef std::set<Element*> ElementSetType; 	
+      static void FillValues(std::vector<RGBO> &values, const ElementSetType &elements);
       
       ElementSetType m_Elements;
       ElementSetType& GetElements() { return m_Elements; }
@@ -192,7 +193,7 @@ namespace mitk
             // reconsider whether we really need this 
             GetTopHandle()->m_Min.first = GetLeftHandle()->m_Pos.first; 
             GetTopHandle()->m_Max.first = GetRightHandle()->m_Pos.first; 
-            GetTopHandle()->m_Min.second = std::max(GetLeftHandle()->m_Pos.second,GetRightHandle()->m_Pos.second);
+            GetTopHandle()->m_Min.second = vnl_math_max(GetLeftHandle()->m_Pos.second,GetRightHandle()->m_Pos.second);
             GetLeftHandle()->m_Max.second = .5 * GetTopHandle()->m_Pos.second;
             GetLeftHandle()->m_Min.second = .5 * GetTopHandle()->m_Pos.second;
             GetRightHandle()->m_Max.second = .5 * GetTopHandle()->m_Pos.second;

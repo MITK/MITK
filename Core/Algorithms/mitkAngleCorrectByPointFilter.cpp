@@ -108,7 +108,9 @@ void mitk::AngleCorrectByPointFilter::GenerateData()
   Vector3D tx_position = m_TransducerPosition.GetVectorFromOrigin();
   Vector3D center = m_Center.GetVectorFromOrigin();
   Vector3D assumed_direction;
-  ScalarType &x(p[0]),&y(p[1]),&z(p[2]);
+  ScalarType &x=p[0];
+  ScalarType &y=p[1];
+  ScalarType &z=p[2];
   Vector3D down;
   FillVector3D(down,0.0,0.0,-1.0);
 

@@ -18,6 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkProbeFilter.h"
 #include "mitkSurface.h"
+#include "mitkImage.h"
 #include "mitkTimeSlicedGeometry.h"
 
 #include <vtkPolyDataSource.h>

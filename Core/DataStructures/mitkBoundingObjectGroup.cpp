@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include "mitkBoundingObjectGroup.h"
-#include "vtkTransform.h"
+#include <vtkLinearTransform.h>
 
 mitk::BoundingObjectGroup::BoundingObjectGroup()
 :  m_Counter(0), m_CSGMode(Difference) //m_CSGMode(Union) m_CSGMode(Intersection)
@@ -115,7 +115,7 @@ void mitk::BoundingObjectGroup::UpdateOutputInformation()
   }
 
   /* BoundingBox is centered around the center of all sub bounding objects */
-  mitk::BoundingBox::PointType centerPoint;
+  Vector3D centerPoint;
   centerPoint[0] = (globalMinPoint[0] + globalMaxPoint[0])/ 2.0;
   centerPoint[1] = (globalMinPoint[1] + globalMaxPoint[1])/ 2.0;
   centerPoint[2] = (globalMinPoint[2] + globalMaxPoint[2])/ 2.0;
@@ -143,9 +143,8 @@ void mitk::BoundingObjectGroup::UpdateOutputInformation()
 
   /* the objects position is the center of all sub bounding objects */
   geometry3d->SetBounds(bounds);
-  geometry3d->GetVtkTransform()->Identity();
-  geometry3d->GetVtkTransform()->Translate(centerPoint[0], centerPoint[1], centerPoint[2]);
-  geometry3d->TransferVtkToITKTransform();
+  geometry3d->Translate(centerPoint);
+  geometry3d->TransferItkToVtkTransform();
 
   timeGeometry->InitializeEvenlyTimed(geometry3d, timesteps);
 }

@@ -1,4 +1,4 @@
-INCLUDE_DIRECTORIES(../../Framework/QmitkApplicationBase ../../Functionalities/QmitkFunctionalityTemplate)
+INCLUDE_DIRECTORIES( ../../Functionalities/QmitkFunctionalityTemplate)
 
 # FunctionalityTemplate
 

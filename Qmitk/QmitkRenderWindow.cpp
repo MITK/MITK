@@ -67,7 +67,7 @@ void QmitkRenderWindow::InitRenderer()
   m_InitNeeded = true;
   m_ResizeNeeded = true;
 
-  mitk::RenderWindow::InitRenderer();
+  RenderWindow::InitRenderer();
 
   this->setAutoBufferSwap( false );
 }

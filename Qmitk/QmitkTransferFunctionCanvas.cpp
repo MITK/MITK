@@ -21,7 +21,7 @@ void QmitkTransferFunctionCanvas::PaintElementFunction(const mitk::TransferFunct
   
   float maxValue = 0.0f;
   for (unsigned int i=0;i<values.size();i++) {
-    maxValue = std::max(maxValue,values[i].m_Opacity);
+    maxValue = vnl_math_max(maxValue,values[i].m_Opacity);
   }
   // do not scale if not neccessary
   // maxValue  = std::min(1.0f,maxValue);
@@ -200,17 +200,17 @@ void QmitkTransferFunctionCanvas::mouseReleaseEvent( QMouseEvent*  ) {
 };
 
 void QmitkTransferFunctionCanvas::PaintHistogram(QPainter &p) {
-  if (m_TransferFunction->GetHistogram().IsNotNull()) {
+  if (m_TransferFunction->GetHistogram() != NULL) {
   p.save();
   p.setPen(Qt::blue);
   float scaleFactor = (float)(m_TransferFunction->GetHistogram()->GetSize()[0]) / width();
-  float maxFreqLog = std::log(mitk::HistogramGenerator::CalculateMaximumFrequency(m_TransferFunction->GetHistogram()));
+  float maxFreqLog = vcl_log(mitk::HistogramGenerator::CalculateMaximumFrequency(m_TransferFunction->GetHistogram()));
   for (unsigned int x = 0; x<width(); x++) {
     int tfIndex = x * scaleFactor;
     float freq = m_TransferFunction->GetHistogram()->GetFrequency(tfIndex);
     
     if (freq>0) {
-      int y = (1 - std::log(freq) / maxFreqLog) * height();
+      int y = (1 - vcl_log(freq) / maxFreqLog) * height();
       p.drawLine(x,height(),x,y);
     }
   }

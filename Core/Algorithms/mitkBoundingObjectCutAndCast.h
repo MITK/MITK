@@ -50,12 +50,6 @@ protected:
 
   virtual const std::type_info& GetOutputPixelType();
 
-  template < typename TInputPixelType, unsigned int VImageDimension > 
-    void CutImageFixedOutputType( itk::Image< TInputPixelType, VImageDimension>* inputItkImage, int boTimeStep, TPixel* dummy = NULL )
-  {
-    CutImageWithOutputTypeSelect<TInputPixelType, VImageDimension, TPixel>(inputItkImage, boTimeStep);
-  }
-
   virtual void ComputeData(mitk::Image* input3D, int boTimeStep);
 };
 } // namespace mitk

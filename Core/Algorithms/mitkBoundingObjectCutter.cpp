@@ -16,15 +16,15 @@ See MITKCopyright.txt or http://www.mitk.org/ for details.
 
 =========================================================================*/
 
+#if(_MSC_VER==1200)
+#include <itkFixedCenterOfRotationAffineTransform.h>
+#endif
 #include "mitkBoundingObjectCutter.h"
+#include "mitkBoundingObjectCutter.txx"
 #include "mitkTimeHelper.h"
 #include "mitkImageAccessByItk.h"
 #include "mitkBoundingObject.h"
 #include "mitkGeometry3D.h"
-
-#include <vtkTransform.h>
-
-#include "mitkBoundingObjectCutter.txx"
 
 namespace mitk
 {
@@ -150,8 +150,8 @@ void BoundingObjectCutter::GenerateOutputInformation()
   // Position the output Image to match the corresponding region of the input image
   mitk::SlicedGeometry3D* slicedGeometry = output->GetSlicedGeometry();
   const mitk::SlicedData::IndexType& start = m_InputRequestedRegion.GetIndex();
-  slicedGeometry->GetVtkTransform()->Translate(start[0], start[1], start[2]);
-  slicedGeometry->TransferVtkToITKTransform();
+  mitk::Vector3D vector; vtk2itk(start, vector);
+  slicedGeometry->TransferVtkToItkTransform();
 
   mitk::TimeSlicedGeometry* timeSlicedGeometry = output->GetTimeSlicedGeometry();
   timeSlicedGeometry->InitializeEvenlyTimed(slicedGeometry, output->GetDimension(3));
@@ -160,15 +160,9 @@ void BoundingObjectCutter::GenerateOutputInformation()
   m_TimeOfHeaderInitialization.Modified();
 }
 
-template < typename TPixel, unsigned int VImageDimension > 
-void BoundingObjectCutter::CutImage( itk::Image< TPixel, VImageDimension >* inputItkImage, int boTimeStep, TPixel* dummy )
-{
-  CutImageWithOutputTypeSelect<TPixel, VImageDimension, TPixel>(inputItkImage, boTimeStep, dummy);
-}
-
 void BoundingObjectCutter::ComputeData(mitk::Image* input3D, int boTimeStep)
 {
-  AccessFixedDimensionByItk_1(input3D, CutImage, 3, boTimeStep);
+  AccessFixedDimensionByItk_2(input3D, CutImage, 3, this, boTimeStep);
 }
 
 void BoundingObjectCutter::GenerateData()

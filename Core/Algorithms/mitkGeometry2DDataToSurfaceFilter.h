@@ -20,7 +20,6 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITKGEOMETRY2DDATATOSURFACEDATAFILTER_H_HEADER_INCLUDED_C10B22CD
 #define MITKGEOMETRY2DDATATOSURFACEDATAFILTER_H_HEADER_INCLUDED_C10B22CD
 
-#include "mitkCommon.h"
 #include "mitkSurfaceSource.h"
 
 class vtkPlaneSource;
@@ -115,6 +114,27 @@ class Geometry2DDataToSurfaceFilter : public SurfaceSource
     //## @sa m_YResolution
     itkSetMacro(YResolution, int);
 
+    //##Documentation
+    //## @brief Get whether the Surface is at the origin and placed using the Geometry
+    //##
+    //## Default is @a false, i.e., the transform of the Geometry is the identity, thus
+    //## the points within the Surface are at their final position. Otherwise 
+    //## (m_PlaceByGeometry==@a true), the first cornerpoint of the created Surface is
+    //## at the origin and the actual position is determined by the transform of the 
+    //## Geometry.
+    //## \sa m_PlaceByGeometry
+    itkGetConstMacro(PlaceByGeometry, bool);
+    //##Documentation
+    //## @brief Set whether the Surface is at the origin and placed using the Geometry
+    //##
+    //## Default is @a false, i.e., the transform of the Geometry is the identity, thus
+    //## the points within the Surface are at their final position. Otherwise 
+    //## (m_PlaceByGeometry==@a true), the first cornerpoint of the created Surface is
+    //## at the origin and the actual position is determined by the transform of the 
+    //## Geometry.
+    //## \sa m_PlaceByGeometry
+    itkSetMacro(PlaceByGeometry, bool);
+    itkBooleanMacro(PlaceByGeometry);
   protected:
     //##ModelId=3EF4A4A70345
     Geometry2DDataToSurfaceFilter();
@@ -158,6 +178,16 @@ class Geometry2DDataToSurfaceFilter : public SurfaceSource
     //## @note Only used, when GetUseGeometryParametricBounds() is @a false, otherwise the
     //## the y-bounds of Geometry3D::GetParametricBounds() are used.
     int m_YResolution;
+
+    //##Documentation
+    //## @brief Define whether the Surface is at the origin and placed using the Geometry
+    //##
+    //## Default is @a false, i.e., the transform of the Geometry is the identity, thus
+    //## the points within the Surface are at their final position. Otherwise 
+    //## (m_PlaceByGeometry==@a true), the first cornerpoint of the created Surface is
+    //## at the origin and the actual position is determined by the transform of the 
+    //## Geometry.
+    bool m_PlaceByGeometry;
 };
 
 } // namespace mitk

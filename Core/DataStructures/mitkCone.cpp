@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include "mitkCone.h"
-#include "vtkTransform.h"
+#include "vtkLinearTransform.h"
 #include "mitkVector.h"
 #include "vtkConeSource.h"
 

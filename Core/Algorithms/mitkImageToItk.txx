@@ -20,38 +20,18 @@ See MITKCopyright.txt or http://www.mitk.org/ for details.
 #define IMAGETOITK_TXX_INCLUDED_C1C2FCD2
 
 #include "mitkImageToItk.h"
-#include "mitkBaseProcess.h"
-
-namespace mitk
-{
-
-template<class TPixel, unsigned int VImageDimension>
-  ImageToItk<TPixel, VImageDimension>
-  ::ImageToItk() 
-    : itk::ImageSource< itk::Image<TPixel, VImageDimension> >(), 
-        m_CopyMemFlag(false), m_Channel(0)
-{
-  
-}
 
 
-template<class TPixel, unsigned int VImageDimension>
-  ImageToItk<TPixel, VImageDimension>
-  ::~ImageToItk()
-{
-  
-}
-
-template<class TPixel, unsigned int VImageDimension>
-void ImageToItk<TPixel, VImageDimension>::SetInput(const mitk::Image *input)
+template <class TOutputImage>
+void mitk::ImageToItk<TOutputImage>::SetInput(const mitk::Image *input)
 {
   if(input == NULL)
     itkExceptionMacro( << "image is null" );
-  if(input->GetDimension()!=VImageDimension)
-    itkExceptionMacro( << "image has dimension " << input->GetDimension() << " instead of " << VImageDimension );
+  if(input->GetDimension()!=TOutputImage::GetImageDimension())
+    itkExceptionMacro( << "image has dimension " << input->GetDimension() << " instead of " << TOutputImage::GetImageDimension() );
   
   
-  if(typeid(TPixel) != *input->GetPixelType().GetTypeId())
+  if(typeid(PixelType) != *input->GetPixelType().GetTypeId())
     itkExceptionMacro( << "image has wrong pixel type " );
   
   // Process object is not const-correct so the const_cast is required here
@@ -59,8 +39,8 @@ void ImageToItk<TPixel, VImageDimension>::SetInput(const mitk::Image *input)
     const_cast< mitk::Image * >( input ) );
 }
 
-template<class TPixel, unsigned int VImageDimension>
-void ImageToItk<TPixel, VImageDimension>::SetInput( unsigned int index, const mitk::Image * input ) 
+template<class TOutputImage>
+void mitk::ImageToItk<TOutputImage>::SetInput( unsigned int index, const mitk::Image * input ) 
 {
   if( index+1 > this->GetNumberOfInputs() )
   {
@@ -69,11 +49,11 @@ void ImageToItk<TPixel, VImageDimension>::SetInput( unsigned int index, const mi
 
   if(input == NULL)
     itkExceptionMacro( << "image is null" );
-  if(input->GetDimension()!=VImageDimension)
-    itkExceptionMacro( << "image has dimension " << input->GetDimension() << " instead of " << VImageDimension );
+  if(input->GetDimension()!=TOutputImage::GetImageDimension())
+    itkExceptionMacro( << "image has dimension " << input->GetDimension() << " instead of " << TOutputImage::GetImageDimension() );
   
   
-  if(typeid(TPixel) != *input->GetPixelType().GetTypeId())
+  if(typeid(PixelType) != *input->GetPixelType().GetTypeId())
     itkExceptionMacro( << "image has wrong pixel type " );
 
   // Process object is not const-correct so the const_cast is required here
@@ -81,8 +61,8 @@ void ImageToItk<TPixel, VImageDimension>::SetInput( unsigned int index, const mi
     const_cast< mitk::Image *>( input ) );
 }
 
-template<class TPixel, unsigned int VImageDimension>
-const mitk::Image *ImageToItk<TPixel, VImageDimension>::GetInput(void) 
+template<class TOutputImage>
+const mitk::Image *mitk::ImageToItk<TOutputImage>::GetInput(void) 
 {
 	if (this->GetNumberOfInputs() < 1)
 	{
@@ -93,15 +73,15 @@ const mitk::Image *ImageToItk<TPixel, VImageDimension>::GetInput(void)
 		(this->ProcessObject::GetInput(0) );
 }
 
-template<class TPixel, unsigned int VImageDimension>
-const mitk::Image *ImageToItk<TPixel, VImageDimension>::GetInput(unsigned int idx)
+template<class TOutputImage>
+const mitk::Image *mitk::ImageToItk<TOutputImage>::GetInput(unsigned int idx)
 {
 	return static_cast< mitk::Image * >
 		(this->ProcessObject::GetInput(idx));
 }
 
-template<class TPixel, unsigned int VImageDimension>
-  void ImageToItk<TPixel, VImageDimension>
+template<class TOutputImage>
+  void mitk::ImageToItk<TOutputImage>
   ::GenerateData()
 {
   // Allocate output
@@ -110,7 +90,7 @@ template<class TPixel, unsigned int VImageDimension>
   
   
   unsigned long noBytes = input->GetDimension(0);
-  for (unsigned int i=1; i<VImageDimension; ++i)
+  for (unsigned int i=1; i<TOutputImage::GetImageDimension(); ++i)
   {
     noBytes = noBytes * input->GetDimension(i);
   }
@@ -132,22 +112,22 @@ template<class TPixel, unsigned int VImageDimension>
     m_ImageDataItem = const_cast<mitk::Image*>(input.GetPointer())->GetChannelData( m_Channel );
     
     itkDebugMacro("do not copyMem ...");
-    typedef itk::ImportImageContainer< unsigned long, TPixel >   ImportContainerType;
-    typename ImportContainerType::Pointer import;
+    typedef itk::ImportImageContainer< unsigned long, PixelType >   ImportContainerType;
+    ImportContainerType::Pointer import;
     
     import = ImportContainerType::New();
     import->Initialize();
     
     itkDebugMacro( << "size of container = " << import->Size() );
-    import->SetImportPointer( (TPixel*) m_ImageDataItem->GetData(),	noBytes, false);
+    import->SetImportPointer( (PixelType*) m_ImageDataItem->GetData(),	noBytes, false);
     
     output->SetPixelContainer(import);
     itkDebugMacro( << "size of container = " << import->Size() );
   }
 }
 
-template<class TPixel, unsigned int VImageDimension>
-  void ImageToItk<TPixel, VImageDimension>
+template<class TOutputImage>
+  void mitk::ImageToItk<TOutputImage>
   ::UpdateOutputInformation()
 {
   mitk::Image::ConstPointer input = this->GetInput();
@@ -168,8 +148,8 @@ template<class TPixel, unsigned int VImageDimension>
   Superclass::UpdateOutputInformation();
 }
 
-template<class TPixel, unsigned int VImageDimension>
-  void ImageToItk<TPixel, VImageDimension>
+template<class TOutputImage>
+  void mitk::ImageToItk<TOutputImage>
   ::GenerateOutputInformation()
 {
   mitk::Image::ConstPointer input = this->GetInput();
@@ -177,9 +157,9 @@ template<class TPixel, unsigned int VImageDimension>
   
   SizeType  size;
   double origin[ 4 ];   // itk2vtk() expects 3 dimensions, so we can't use VImageDimension if image is 2d!
-  double spacing[ VImageDimension ];
-  
-  for (unsigned int i=0; i < VImageDimension; ++i)
+  double *spacing = new double[ TOutputImage::GetImageDimension() ];
+
+  for (unsigned int i=0; i < TOutputImage::GetImageDimension(); ++i)
   {
     size[i]    = input->GetDimension(i);
     spacing[i] = input->GetSlicedGeometry()->GetSpacing()[i];
@@ -200,15 +180,15 @@ template<class TPixel, unsigned int VImageDimension>
   output->SetRegions( region );
   output->SetOrigin( origin );
   output->SetSpacing( spacing );
+  delete [] spacing;
 }
 
-template<class TPixel, unsigned int VImageDimension>
+template<class TOutputImage>
   void
-  ImageToItk<TPixel, VImageDimension>
+  mitk::ImageToItk<TOutputImage>
   ::PrintSelf(std::ostream& os, itk::Indent indent) const
 {
   Superclass::PrintSelf(os,indent);
 }
 
-}
 #endif //IMAGETOITK_TXX_INCLUDED_C1C2FCD2

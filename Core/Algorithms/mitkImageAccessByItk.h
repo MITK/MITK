@@ -20,12 +20,14 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITKIMAGEACCESSBYITK_H_HEADER_INCLUDED
 #define MITKIMAGEACCESSBYITK_H_HEADER_INCLUDED
  
+#include <itkCastImageFilter.h>
 #include <mitkImageToItk.h>
 
 #define _accessByItk(mitkImage, itkImageTypeFunction, pixeltype, dimension)            \
   if ( typeId == typeid(pixeltype) )                                                   \
 {                                                                                      \
-    typedef mitk::ImageToItk<pixeltype, dimension> ImageToItkType;                     \
+    typedef itk::Image<pixeltype, dimension> ImageType;                                \
+    typedef mitk::ImageToItk<ImageType> ImageToItkType;                                \
     ImageToItkType::Pointer imagetoitk = ImageToItkType::New();                        \
     imagetoitk->SetInput(mitkImage);                                                   \
     imagetoitk->Update();                                                              \
@@ -110,7 +112,8 @@ PURPOSE.  See the above copyright notices for more information.
 #define _accessByItk_1(mitkImage, itkImageTypeFunction, pixeltype, dimension, param1)            \
   if ( typeId == typeid(pixeltype) )                                                             \
   {                                                                                              \
-    typedef mitk::ImageToItk<pixeltype, dimension> ImageToItkType;                               \
+    typedef itk::Image<pixeltype, dimension> ImageType;                                          \
+    typedef mitk::ImageToItk<ImageType> ImageToItkType;                                          \
     ImageToItkType::Pointer imagetoitk = ImageToItkType::New();                                  \
     imagetoitk->SetInput(mitkImage);                                                             \
     imagetoitk->Update();                                                                        \
@@ -184,7 +187,8 @@ PURPOSE.  See the above copyright notices for more information.
 #define _accessByItk_2(mitkImage, itkImageTypeFunction, pixeltype, dimension, param1, param2)    \
   if ( typeId == typeid(pixeltype) )                                                             \
 {                                                                                                \
-    typedef mitk::ImageToItk<pixeltype, dimension> ImageToItkType;                               \
+    typedef itk::Image<pixeltype, dimension> ImageType;                                          \
+    typedef mitk::ImageToItk<ImageType> ImageToItkType;                                          \
     ImageToItkType::Pointer imagetoitk = ImageToItkType::New();                                  \
     imagetoitk->SetInput(mitkImage);                                                             \
     imagetoitk->Update();                                                                        \
@@ -251,7 +255,26 @@ PURPOSE.  See the above copyright notices for more information.
 {                                                                                                \
   const std::type_info& typeId=*mitkImage->GetPixelType().GetTypeId();                           \
   assert(mitkImage->GetDimension()==dimension);                                                  \
-_accessAllTypesByItk_2(mitkImage, itkImageTypeFunction, dimension, param1, param2)               \
+  _accessAllTypesByItk_2(mitkImage, itkImageTypeFunction, dimension, param1, param2)             \
+}
+
+namespace mitk 
+{
+  template < typename TPixel, unsigned int VImageDimension, class ItkOutputImageType > 
+  void _CastToItkImage2Access( itk::Image<TPixel, VImageDimension>* itkInputImage, itk::SmartPointer<ItkOutputImageType>& itkOutputImage)
+  {
+    typedef itk::Image<TPixel, VImageDimension> ItkInputImageType;
+    typedef itk::CastImageFilter< ItkInputImageType, ItkOutputImageType > CastImageFilterType;
+    CastImageFilterType::Pointer castImageFilter = CastImageFilterType::New();
+    castImageFilter->SetInput( itkInputImage );
+    castImageFilter->Update();
+    itkOutputImage = castImageFilter->GetOutput();
+  }
+
+  template <typename ItkOutputImageType> void CastToItkImage(const mitk::Image * mitkImage, itk::SmartPointer<ItkOutputImageType>& itkOutputImage)
+  {
+    AccessByItk_1(mitkImage, _CastToItkImage2Access, itkOutputImage);;
+  }
 }
 
 #endif // of MITKIMAGEACCESSBYITK_H_HEADER_INCLUDED

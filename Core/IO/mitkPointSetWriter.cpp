@@ -124,21 +124,21 @@ void mitk::PointSetWriter::WriteXML( mitk::PointSet* pointSet, std::ofstream& ou
         WriteStartElement( XML_POINT, out );
 
         WriteStartElement( XML_ID, out );
-        WriteCharacterData( ConvertToString<int>( it->Index() ).c_str() , out );
+        WriteCharacterData( ConvertToString( it->Index() ).c_str() , out );
         WriteEndElement( XML_ID, out, false );
 
         mitk::PointSet::PointType point = it->Value();
 
         WriteStartElement( XML_X, out );
-        WriteCharacterData( ConvertToString<mitk::ScalarType>( point[ 0 ] ).c_str(), out );
+        WriteCharacterData( ConvertToString( point[ 0 ] ).c_str(), out );
         WriteEndElement( XML_X, out, false );
 
         WriteStartElement( XML_Y, out );
-        WriteCharacterData( ConvertToString<mitk::ScalarType>( point[ 1 ] ).c_str(), out );
+        WriteCharacterData( ConvertToString( point[ 1 ] ).c_str(), out );
         WriteEndElement( XML_Y, out, false );
 
         WriteStartElement( XML_Z, out );
-        WriteCharacterData( ConvertToString<mitk::ScalarType>( point[ 2 ] ).c_str(), out );
+        WriteCharacterData( ConvertToString( point[ 2 ] ).c_str(), out );
         WriteEndElement( XML_Z, out, false );
 
         WriteEndElement( XML_POINT, out );

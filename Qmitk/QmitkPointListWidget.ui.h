@@ -26,6 +26,8 @@ PURPOSE.  See the above copyright notices for more information.
 ** place of a destructor.
 *****************************************************************************/
 
+const int QmitkPointListWidget::UNLIMITED = 999;
+
 void QmitkPointListWidget::init()
 {
   m_DataChangedCommand = itk::SimpleMemberCommand<QmitkPointListWidget>::New();

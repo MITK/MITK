@@ -486,7 +486,7 @@ bool QmitkStdMultiWidget::InitializeStandardViews(mitk::DataTreeIteratorBase * i
       }
 
       double diagonalLength  = const_cast<mitk::BoundingBox*>(geometry->GetBoundingBox())->GetDiagonalLength2();
-      if((diagonalLength>=mitk::eps) && (diagonalLength<=mitk::ScalarTypeNumericTraits::max()/10))
+      if((diagonalLength > mitk::eps) && (diagonalLength < mitk::large))
       {
         boundingBoxInitialized=true;
         multiplexUpdateController->SetBlockUpdate(true);

@@ -18,7 +18,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include "mitkExtrudedContour.h"
-#include "vtkTransform.h"
 #include "mitkVector.h"
 
 #include <vtkLinearExtrusionFilter.h>

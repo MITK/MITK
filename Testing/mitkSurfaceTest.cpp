@@ -22,7 +22,6 @@ PURPOSE.  See the above copyright notices for more information.
 //#include "mitkBoundingBox.h"
 
 #include "vtkPolyData.h"
-#include "vtkTransform.h"
 #include "vtkSphereSource.h"
 
 #include <fstream>
@@ -110,7 +109,7 @@ int mitkSurfaceTest(int argc, char* argv[])
   //mitk::Geometry3D::Pointer geometry = surface->GetTimeSlicedGeometry()->GetGeometry3D(0);
   //geometry->GetVtkTransform()->Identity();
   //geometry->GetVtkTransform()->Translate(10,10,10);
-  //geometry->TransferVtkToITKTransform();
+  //geometry->TransferVtkToItkTransform();
   //mitk::TimeSlicedGeometry* timeSlicedGeometry = surface->GetTimeSlicedGeometry();
   //timeSlicedGeometry->InitializeEvenlyTimed(geometry, 5);
 

@@ -24,7 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkPlaneGeometry.h"
 #include "mitkPicHelper.h"
 
-#include "ipFunc.h"
+#include "ipFunc/ipFunc.h"
 
 #include <vtkImageData.h>
 

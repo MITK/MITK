@@ -20,11 +20,13 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef _CommonFunctionality__h_
 #define _CommonFunctionality__h_
 
+#include <mitkImageAccessByItk.h>
+
 // std
 #include <string>
 #include <vector>
 
-#include <ipPic.h>
+#include <ipPic/ipPic.h>
 
 // itk includes
 #include <itkMinimumMaximumImageCalculator.h>
@@ -36,13 +38,13 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkDataTreeNode.h>
 #include <mitkSurface.h>
 #include <mitkDataTreeNodeFactory.h>
-#include <mitkImageToItkMultiplexer.h>
+#include <mitkImageCast.h>
 #include <mitkDataTree.h>
 #include <mitkPicFileReader.h>
 
 #include <qfiledialog.h>
-#include "ipPic.h"
-#include "ipFunc.h"
+#include "ipPic/ipPic.h"
+#include "ipFunc/ipFunc.h"
 
 #include <qstring.h>
 #include <qfiledialog.h>
@@ -71,10 +73,8 @@ PURPOSE.  See the above copyright notices for more information.
  * This class provides some data handling methods, like loading data or adding different 
  * types to the data tree...
  */
-class CommonFunctionality
+namespace CommonFunctionality
 {
-
-public:
 
   static const char* GetInternalFileExtensions() { return INTERNAL_FILE_EXTENSIONS; };
   static const char* GetExternalFileExtensions() { return EXTERNAL_FILE_EXTENSIONS; };
@@ -327,6 +327,74 @@ public:
     }
   }
 
+static mitk::DataTreeNode::Pointer FileOpen( const char * fileName )
+{
+  mitk::DataTreeNodeFactory::Pointer factory = mitk::DataTreeNodeFactory::New();
+
+  try
+  {
+    factory->SetFileName( fileName );
+    factory->Update();
+    return factory->GetOutput( 0 );
+  }
+  catch ( itk::ExceptionObject & ex )
+  {
+    itkGenericOutputMacro( << "Exception during file open: " << ex );
+    return NULL;
+  }
+}
+
+
+static mitk::DataTreeNode::Pointer FileOpenImageSequence(QString fileName)
+{
+  mitk::DataTreeNodeFactory::Pointer factory = mitk::DataTreeNodeFactory::New();
+
+  if (!fileName.contains("dcm") && !fileName.contains("DCM"))
+  {
+    int fnstart = fileName.findRev( QRegExp("[/\\\\]"), fileName.length() );
+    if(fnstart<0) fnstart=0;
+    int start = fileName.find( QRegExp("[0-9]"), fnstart );
+    if(start<0)
+    {
+      return FileOpen(fileName.ascii());;
+    }
+
+    char prefix[1024], pattern[1024];
+
+    strncpy(prefix, fileName.ascii(), start);
+    prefix[start]=0;
+
+    int stop=fileName.find( QRegExp("[^0-9]"), start );
+    sprintf(pattern, "%%s%%0%uu%s",stop-start,fileName.ascii()+stop);
+
+
+    factory->SetFilePattern( pattern );
+    factory->SetFilePrefix( prefix );
+  }
+  else
+  {
+//    factory->SetFileName( fileName );
+    factory->SetFilePattern( fileName );
+    factory->SetFilePrefix( fileName );
+  }
+  factory->Update();
+  return factory->GetOutput( 0 );
+
+}
+
+static mitk::DataTreeNode::Pointer FileOpenImageSequence()
+{
+  QString fileName = QFileDialog::getOpenFileName(NULL,GetExternalFileExtensions());
+
+  if ( !fileName.isNull() )
+  {
+    return FileOpenImageSequence(fileName);
+  }
+  else
+  {
+    return NULL;
+  }
+}
 
 static mitk::DataTreeNode::Pointer FileOpen()
 {
@@ -378,75 +446,6 @@ static mitk::DataTreeNode::Pointer OpenVolumeOrSliceStack()
   }
 }
 
-static mitk::DataTreeNode::Pointer FileOpen( const char * fileName )
-{
-  mitk::DataTreeNodeFactory::Pointer factory = mitk::DataTreeNodeFactory::New();
-
-  try
-  {
-    factory->SetFileName( fileName );
-    factory->Update();
-    return factory->GetOutput( 0 );
-  }
-  catch ( itk::ExceptionObject & ex )
-  {
-    itkGenericOutputMacro( << "Exception during file open: " << ex );
-    return NULL;
-  }
-}
-
-static mitk::DataTreeNode::Pointer FileOpenImageSequence()
-{
-  QString fileName = QFileDialog::getOpenFileName(NULL,GetExternalFileExtensions());
-
-  if ( !fileName.isNull() )
-  {
-    return FileOpenImageSequence(fileName);
-  }
-  else
-  {
-    return NULL;
-  }
-}
-
-static mitk::DataTreeNode::Pointer FileOpenImageSequence(QString fileName)
-{
-  mitk::DataTreeNodeFactory::Pointer factory = mitk::DataTreeNodeFactory::New();
-
-  if (!fileName.contains("dcm") && !fileName.contains("DCM"))
-  {
-    int fnstart = fileName.findRev( QRegExp("[/\\\\]"), fileName.length() );
-    if(fnstart<0) fnstart=0;
-    int start = fileName.find( QRegExp("[0-9]"), fnstart );
-    if(start<0)
-    {
-      return FileOpen(fileName.ascii());;
-    }
-
-    char prefix[1024], pattern[1024];
-
-    strncpy(prefix, fileName.ascii(), start);
-    prefix[start]=0;
-
-    int stop=fileName.find( QRegExp("[^0-9]"), start );
-    sprintf(pattern, "%%s%%0%uu%s",stop-start,fileName.ascii()+stop);
-
-
-    factory->SetFilePattern( pattern );
-    factory->SetFilePrefix( prefix );
-  }
-  else
-  {
-//    factory->SetFileName( fileName );
-    factory->SetFilePattern( fileName );
-    factory->SetFilePrefix( fileName );
-  }
-  factory->Update();
-  return factory->GetOutput( 0 );
-
-}
-
-
 template < typename TImageType >
 static void SaveImage(mitk::Image* image)
 {
@@ -463,7 +462,7 @@ static void SaveImage(mitk::Image* image)
     {
       if (fileName.contains(".mhd") != 0)
       {
-        typename itk::ImageFileWriter<TImageType>::Pointer writer = itk::ImageFileWriter<TImageType>::New();
+        itk::ImageFileWriter<TImageType>::Pointer writer = itk::ImageFileWriter<TImageType>::New();
         writer->SetInput( itkImage );
         writer->SetFileName( fileName.ascii() );
         writer->Update();
@@ -472,7 +471,7 @@ static void SaveImage(mitk::Image* image)
       {
         typedef itk::Image<unsigned char,3> OutputImage3DType;
         typedef itk::Image<unsigned char,2> OutputImage2DType;
-        typename itk::RescaleIntensityImageFilter<TImageType, OutputImage3DType>::Pointer rescaler = itk::RescaleIntensityImageFilter<TImageType, OutputImage3DType>::New();
+        itk::RescaleIntensityImageFilter<TImageType, OutputImage3DType>::Pointer rescaler = itk::RescaleIntensityImageFilter<TImageType, OutputImage3DType>::New();
         rescaler->SetInput(itkImage);
         rescaler->SetOutputMinimum(0);
         rescaler->SetOutputMaximum(255);
@@ -490,8 +489,9 @@ static void SaveImage(mitk::Image* image)
       }
       else 
       {
-        typedef itk::Image<typename TImageType::PixelType,2> OutputImage2DType;
-        typename itk::ImageSeriesWriter<TImageType, OutputImage2DType>::Pointer writer = itk::ImageSeriesWriter<TImageType, OutputImage2DType >::New();
+        typedef typename TImageType::PixelType PixelType;
+        typedef itk::Image<PixelType,2> OutputImage2DType;
+        itk::ImageSeriesWriter<TImageType, OutputImage2DType>::Pointer writer = itk::ImageSeriesWriter<TImageType, OutputImage2DType >::New();
         writer->SetInput( itkImage );
         int pos = fileName.findRev(".",fileName.length()-1);
         fileName.insert(pos,".%d");

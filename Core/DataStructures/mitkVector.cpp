@@ -17,7 +17,8 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 #include "mitkVector.h"
+#include <vtkSystemIncludes.h>
 
 const mitk::ScalarType mitk::eps     = vnl_math::float_eps*100;
 const mitk::ScalarType mitk::sqrteps = vnl_math::float_sqrteps;
-
+extern const double mitk::large      = VTK_LARGE_FLOAT;

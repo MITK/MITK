@@ -33,7 +33,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkUnsignedLongArray.h>
 #include <vtkUnsignedShortArray.h>
 
-#include "ipFunc.h"
+#include "ipFunc/ipFunc.h"
 
 //##ModelId=3E0B7882024B
 mitk::ImageDataItem::ImageDataItem(const ImageDataItem& aParent, unsigned int dimension, int offset) : 

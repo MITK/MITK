@@ -22,6 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkCommon.h"
 #include "mitkSurfaceSource.h"
 #include "mitkMesh.h"
+#include "mitkGeometry2D.h"
 
 class vtkPolyData;
 class vtkPoints;

@@ -67,9 +67,9 @@ protected:
   virtual void GenerateData();
 
   template < typename TPixel, unsigned int VImageDimension, typename TOutputPixel > 
-    void CutImageWithOutputTypeSelect( itk::Image< TPixel, VImageDimension >* inputItkImage, int boTimeStep=0, TPixel* dummy = NULL, TOutputPixel* dummy2=NULL  );
+    friend void CutImageWithOutputTypeSelect( itk::Image< TPixel, VImageDimension >* inputItkImage, mitk::BoundingObjectCutter* cutter, int boTimeStep=0, TOutputPixel* dummy=NULL );
   template < typename TPixel, unsigned int VImageDimension > 
-    void CutImage( itk::Image< TPixel, VImageDimension >* itkImage, int boTimeStep=0, TPixel* dummy = NULL );
+    friend void CutImage( itk::Image< TPixel, VImageDimension >* itkImage, mitk::BoundingObjectCutter* cutter, int boTimeStep );
   virtual void ComputeData(mitk::Image* input3D, int boTimeStep);
 
   //##Description 

@@ -33,7 +33,7 @@ class vtkCellArray;
 namespace mitk {
 
 //##Documentation
-//## @brief Create Coons-Patch-interpolated Surface from mitk::Mesh
+//## @brief Create ring around polygons contained in a Mesh
 //## @ingroup Process
 class PolygonToRingFilter : public SurfaceSource
 {

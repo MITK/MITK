@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkGeometry2DDataToSurfaceFilter.h"
 #include "mitkSurface.h"
+#include "mitkGeometry3D.h"
 #include "mitkGeometry2DData.h"
 #include "mitkPlaneGeometry.h"
 #include "mitkAbstractTransformGeometry.h"
@@ -28,7 +29,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 //##ModelId=3EF4A4A70345
 mitk::Geometry2DDataToSurfaceFilter::Geometry2DDataToSurfaceFilter()
-  : m_UseGeometryParametricBounds(true), m_XResolution(10), m_YResolution(10)
+  : m_UseGeometryParametricBounds(true), m_XResolution(10), m_YResolution(10), m_PlaceByGeometry(false)
 {
     m_VtkPlaneSource=vtkPlaneSource::New();
         m_VtkPlaneSource->SetXResolution(m_XResolution);
@@ -64,14 +65,28 @@ void mitk::Geometry2DDataToSurfaceFilter::GenerateOutputInformation()
 
     vtkPolyData* surface=NULL;
     //contains the Geometry2DData a PlaneGeometry?
-    mitk::PlaneGeometry::ConstPointer planeGeometry = dynamic_cast<const PlaneGeometry *>(input->GetGeometry2D());
+    mitk::PlaneGeometry::Pointer planeGeometry = dynamic_cast<PlaneGeometry *>(input->GetGeometry2D());
     if(planeGeometry.IsNotNull())
     {
       const PlaneGeometry* planeview=planeGeometry;
-      origin = planeview->GetOrigin();
-      right  = planeview->GetCornerPoint(false);
-      bottom = planeview->GetCornerPoint(true, false);
+      if(m_PlaceByGeometry)
+      {
+        origin.Fill(0.0);
+        FillVector3D(right,  planeview->GetExtent(0), 0, 0);
+        FillVector3D(bottom, 0, planeview->GetExtent(1), 0);
 
+        mitk::AffineGeometryFrame3D::TransformType* transform = planeGeometry->GetIndexToWorldTransform();
+        mitk::TimeSlicedGeometry::Pointer timeGeometry = output->GetTimeSlicedGeometry();
+        timeGeometry->SetIndexToWorldTransform(transform);
+        mitk::Geometry3D::Pointer g3d = timeGeometry->GetGeometry3D( 0 );
+        g3d->SetIndexToWorldTransform(transform);
+      }
+      else
+      {
+        origin = planeview->GetOrigin();
+        right  = planeview->GetCornerPoint(false);
+        bottom = planeview->GetCornerPoint(true, false);
+      }
         m_VtkPlaneSource->SetXResolution(1);
         m_VtkPlaneSource->SetYResolution(1);
 
@@ -113,6 +128,7 @@ void mitk::Geometry2DDataToSurfaceFilter::GenerateOutputInformation()
     surface->Update();
     vtkObject::SetGlobalWarningDisplay(w);
     output->SetVtkPolyData(surface);
+    output->CalculateBoundingBox();
 }
 
 //##ModelId=3EF56DD10039

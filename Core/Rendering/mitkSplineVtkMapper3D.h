@@ -21,6 +21,10 @@ public:
 
     virtual void Update( mitk::BaseRenderer* renderer );
 
+    bool SplinesAreAvailable();
+    
+    vtkPolyData* GetSplinesPolyData();
+    
 protected:
 
     SplineVtkMapper3D();

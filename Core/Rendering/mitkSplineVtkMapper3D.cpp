@@ -40,7 +40,6 @@ mitk::SplineVtkMapper3D::~SplineVtkMapper3D()
 vtkProp*
 mitk::SplineVtkMapper3D::GetProp()
 {
-    std::cout << "GetProp() called!" << std::endl;
     if ( GetDataTreeNode() != NULL && m_Assembly != NULL )
     {
         m_Assembly->SetUserTransform( GetDataTreeNode()->GetVtkTransform() );
@@ -54,7 +53,6 @@ void
 mitk::SplineVtkMapper3D::GenerateData()
 {
     Superclass::GenerateData();
-    std::cout << "GenerateData called" << std::endl;
     mitk::PointSet::Pointer input = const_cast<mitk::PointSet*>( this->GetInput( ) );
     input->Update();
 
@@ -66,7 +64,6 @@ mitk::SplineVtkMapper3D::GenerateData()
     if ( numberOfInputPoints >= 2 )
     {
         m_SplinesAvailable = true;
-        std::cout << "splines calculated" << std::endl;
         vtkCardinalSpline* splineX = vtkCardinalSpline::New();
         vtkCardinalSpline* splineY = vtkCardinalSpline::New();
         vtkCardinalSpline* splineZ = vtkCardinalSpline::New();
@@ -110,7 +107,8 @@ mitk::SplineVtkMapper3D::GenerateData()
         profileMapper->SetInput( profileData );
 
         m_SplinesActor->SetMapper( profileMapper );
-        float rgba[ 4 ] = {1.0f, 1.0f, 1.0f, 1.0f};
+        float rgba[ 4 ] = {1.0f, 0.0f, 0.0f, 1.0f};
+        this->GetDataTreeNode()->GetColor(rgba, NULL);
         m_SplinesActor->GetProperty()->SetColor( rgba );
     }
     else
@@ -175,3 +173,20 @@ void mitk::SplineVtkMapper3D::Update( mitk::BaseRenderer* renderer )
     }
     StandardUpdate();
 }
+
+bool mitk::SplineVtkMapper3D::SplinesAreAvailable()
+{
+    return m_SplinesAvailable;
+}
+
+    
+vtkPolyData* mitk::SplineVtkMapper3D::GetSplinesPolyData()
+{
+    itk::ProcessObject::Update();
+    if (m_SplinesAvailable)
+        return (dynamic_cast<vtkPolyDataMapper*>(m_SplinesActor->GetMapper()))->GetInput();
+    else
+        return vtkPolyData::New();
+}
+
+

@@ -32,6 +32,7 @@ See MITKCopyright.txt or http://www.mitk.org/ for details.
 
 #include <vtkTransformPolyDataFilter.h>
 #include <vtkTransform.h>
+#include <vtkImageChangeInformation.h>
 
 mitk::SurfaceToImageFilter::SurfaceToImageFilter()
 {
@@ -61,9 +62,14 @@ void mitk::SurfaceToImageFilter::GenerateData()
   vtkTransformPolyDataFilter * move=vtkTransformPolyDataFilter::New();
   move->SetInput(polydata);
   vtkTransform *transform=vtkTransform::New();
-  mitk::Vector3D spacing=GetImage()->GetSlicedGeometry()->GetSpacing();
-  spacing*=0.5;
-  transform->Translate(spacing[0],spacing[1],spacing[2]);
+  GetImage()->GetGeometry()->TransferItkToVtkTransform();
+  transform->SetMatrix(GetImage()->GetGeometry()->GetVtkTransform()->GetMatrix());
+  transform->Inverse();
+  transform->PostMultiply();
+  //mitk::Vector3D spacing=GetImage()->GetSlicedGeometry()->GetSpacing();
+  //spacing*=0.5;
+  //transform->Translate(spacing[0],spacing[1],spacing[2]);
+  transform->Translate(0.5,0.5,0.5);
   move->SetTransform(transform);
 
   polydata=move->GetOutput();
@@ -71,9 +77,9 @@ void mitk::SurfaceToImageFilter::GenerateData()
   vtkPolyDataNormals * normalsFilter = vtkPolyDataNormals::New();
   normalsFilter->SetInput( polydata );
   normalsFilter->SetFeatureAngle(50);
-  normalsFilter->SetConsistency(1);
-  normalsFilter->SetSplitting(1);
-  normalsFilter->SetFlipNormals(0);
+  normalsFilter->ConsistencyOn();
+  normalsFilter->SplittingOn();
+  normalsFilter->FlipNormalsOn();
   normalsFilter->Update();
 
   vtkPolyDataToImageStencil * surfaceConverter = vtkPolyDataToImageStencil::New();
@@ -82,6 +88,12 @@ void mitk::SurfaceToImageFilter::GenerateData()
   surfaceConverter->Update();
 
   vtkImageData * tmp = ( (mitk::Image*)GetImage() )->GetVtkImageData();
+
+  vtkImageChangeInformation* m_UnitSpacingImageFilter = vtkImageChangeInformation::New();
+  m_UnitSpacingImageFilter->SetInput(tmp);
+  m_UnitSpacingImageFilter->SetOutputSpacing(1.0,1.0,1.0);
+  tmp=m_UnitSpacingImageFilter->GetOutput();
+
   vtkImageMathematics * maths = vtkImageMathematics::New();
   maths->SetOperationToAddConstant();
   maths->SetConstantC(100);
@@ -100,11 +112,14 @@ void mitk::SurfaceToImageFilter::GenerateData()
   threshold->SetInput( stencil->GetOutput() );
   threshold->ThresholdByUpper(1);
   threshold->ReplaceInOn();
+  threshold->ReplaceOutOn();
   threshold->SetInValue(1);
+  threshold->SetOutValue(0);
   threshold->Update();
 
   mitk::Image::Pointer output = this->GetOutput();
   output->Initialize( threshold->GetOutput() );
+  output->SetGeometry( static_cast<mitk::Geometry3D*>(GetImage()->GetGeometry()->Clone().GetPointer()) );
   output->SetVolume( threshold->GetOutput()->GetScalarPointer() );
 
 }

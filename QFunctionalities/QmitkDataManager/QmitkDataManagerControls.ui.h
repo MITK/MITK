@@ -227,7 +227,6 @@ void QmitkDataManagerControls::SaveLightBox_clicked()
               return;
             }
             lbwriter->SetLightBox(plugin->lightboxManager()->getActiveLightbox());
-  itkGenericOutputMacro(<<"goooooooooooooooooooooooooooooooooooooooooooooo");
             lbwriter->Write();
           }
         }

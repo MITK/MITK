@@ -148,6 +148,10 @@ void QmitkSimpleExampleFunctionality::stereoSelectionChanged( int id )
     vtkrenderwindow->StereoRenderOff();
     break;
   case 1:
+    vtkrenderwindow->SetStereoTypeToRedBlue();
+    vtkrenderwindow->StereoRenderOn();
+    break;
+  case 2:
     vtkrenderwindow->SetStereoTypeToDresden();
     vtkrenderwindow->StereoRenderOn();
     break;

@@ -55,7 +55,7 @@ void ToolBar::SetWidget(QWidget* app)
   widget->hide();
   layout->addWidget(widget,1,0);
   connect(toolbar,SIGNAL(clicked(int)),widget,SLOT(show()));
-  itkGenericOutputMacro(<<"set widget");
+  /////itkGenericOutputMacro(<<"set widget");
 }
 
 void ToolBar::ConnectButton(int number)
@@ -65,7 +65,7 @@ void ToolBar::ConnectButton(int number)
     
   for (int i=number+1;i<5;++i)
     toolbar->find(i)->hide();
-  itkGenericOutputMacro(<<"connect buttons");
+  /////itkGenericOutputMacro(<<"connect buttons");
 } 
 
 void ToolBar::Reinitialize(bool on)
@@ -76,7 +76,7 @@ void ToolBar::Reinitialize(bool on)
     {
       toolbar->setButton(idLightbox+1);
     } 
-    itkGenericOutputMacro(<<"reinitialize");
+    /////itkGenericOutputMacro(<<"reinitialize");
   }
   else
   {
@@ -114,7 +114,7 @@ void ToolBar::SelectLightbox(int id)
     list=lbm->getLightboxes();  
     lb=list.take(idLightbox);
     emit LightboxSelected(lb);
-    itkGenericOutputMacro(<<"select lightbox");
+    /////itkGenericOutputMacro(<<"select lightbox");
 }
 
 void ToolBar::ToolbarMode(bool on)

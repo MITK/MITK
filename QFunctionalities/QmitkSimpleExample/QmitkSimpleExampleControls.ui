@@ -87,6 +87,11 @@
             </item>
             <item>
                 <property name="text">
+                    <string>red-blue stereo</string>
+                </property>
+            </item>
+            <item>
+                <property name="text">
                     <string>D4D stereo</string>
                 </property>
             </item>

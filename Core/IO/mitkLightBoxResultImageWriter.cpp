@@ -92,18 +92,18 @@ bool mitk::LightBoxResultImageWriter::SetSourceByTreeSearch(mitk::DataTreeIterat
 //const char * name;
 //if(it->Get()->GetStringProperty("name", name, NULL))
 //{
-//  itkGenericOutputMacro(<<"candidate: "<<name);
+//  itkDebugMacro(<<"candidate: "<<name);
 //}
 //else
 //{
-//  itkGenericOutputMacro(<<"candidate: no name");
+//  itkDebugMacro(<<"candidate: no name");
 //}
     if(it->Get()->GetBoolProperty("LoadedFromChili", LoadedFromChili) && LoadedFromChili)
     {
       mitk::Image::Pointer sourcecandidate=dynamic_cast<mitk::Image*>(it->Get()->GetData());
       if(sourcecandidate.IsNotNull())
       {
-itkGenericOutputMacro(<<"found sourcecandidate: ");
+itkDebugMacro(<<"found sourcecandidate: ");
         if(image->GetDimension()<=sourcecandidate->GetDimension())
         {
           int i, dim=image->GetDimension();
@@ -114,15 +114,15 @@ itkGenericOutputMacro(<<"found sourcecandidate: ");
           {
             SetSourceImage(sourcecandidate);
             return true;
-itkGenericOutputMacro(<<"dim incorrect: "<<i <<" "<<dim);
+itkDebugMacro(<<"dim incorrect: "<<i <<" "<<dim);
           }
         }
       }
     }
     ++it;
-  itkGenericOutputMacro(<<"xxxx");
+  itkDebugMacro(<<"xxxx");
   }
-  itkGenericOutputMacro(<<"yyyyyyyyyyyyyyyyyyyyy");
+  itkDebugMacro(<<"yyyyyyyyyyyyyyyyyyyyy");
   return false;
 }
 
@@ -143,7 +143,7 @@ QcLightbox* mitk::LightBoxResultImageWriter::GetLightBox() const
 
 void mitk::LightBoxResultImageWriter::GenerateData()
 {
-  itkGenericOutputMacro(<<"GenerateData ");
+  itkDebugMacro(<<"GenerateData ");
   const Image* image = GetInput();
   const Image* sourceimage = GetSourceImage();
   if((image==NULL) || (sourceimage==NULL) || (m_LightBox==NULL))
@@ -186,8 +186,8 @@ void mitk::LightBoxResultImageWriter::GenerateData()
   int smax, tmax;
   smax = image->GetDimension(2);
   tmax = image->GetDimension(3);
-itkGenericOutputMacro(<<"writing image: "<<m_ImageTypeName);
-itkGenericOutputMacro(<<"lv: "<<m_LevelWindow.GetMin() <<" "<<m_LevelWindow.GetMax());
+itkDebugMacro(<<"writing image: "<<m_ImageTypeName);
+itkDebugMacro(<<"lv: "<<m_LevelWindow.GetMin() <<" "<<m_LevelWindow.GetMax());
   for(s=smax-1;s>=0;--s)
   {
     resultslice->SetSliceNr(s);
@@ -222,9 +222,9 @@ itkGenericOutputMacro(<<"lv: "<<m_LevelWindow.GetMin() <<" "<<m_LevelWindow.GetM
       v/=isg.ps[2];
       itk2vtk(v, isg.w);
 
-itkGenericOutputMacro(<<"isg: o("<<isg.o[0]<<" "<<isg.o[1]<<" "<<isg.o[2]<<") u("<<isg.u[0]<<" "<<isg.u[1]<<" "<<isg.u[2]<<") v("<<isg.v[0]<<" "<<isg.v[1]<<" "<<isg.v[2]<<") w("<<isg.w[0]<<" "<<isg.w[1]<<" "<<isg.w[2]<<") "<<t);
+itkDebugMacro(<<"isg: o("<<isg.o[0]<<" "<<isg.o[1]<<" "<<isg.o[2]<<") u("<<isg.u[0]<<" "<<isg.u[1]<<" "<<isg.u[2]<<") v("<<isg.v[0]<<" "<<isg.v[1]<<" "<<isg.v[2]<<") w("<<isg.w[0]<<" "<<isg.w[1]<<" "<<isg.w[2]<<") "<<t);
 
-itkGenericOutputMacro(<<"writing slice: "<<s <<" "<<t);
+itkDebugMacro(<<"writing slice: "<<s <<" "<<t);
       cur=ipPicClone(resultslice->GetOutput()->GetPic());
       ipPicDelTag( cur, "SOURCE HEADER" );
 

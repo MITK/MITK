@@ -43,7 +43,7 @@ unsigned int mitk::FrameOfReferenceUIDManager::AddFrameOfReferenceUID(const char
     if(*it==forUIDstring)
       return i;
   }
-itkGenericOutputMacro(<<"adding uid "<<forUIDstring<< " as id "<<i);
+//itkGenericOutputMacro(<<"adding uid "<<forUIDstring<< " as id "<<i);
   m_FrameOfReferenceUIDs.push_back(forUIDstring);
   return i;
 }

@@ -160,6 +160,8 @@ bool QmitkFctMediator::addFunctionality(QmitkFunctionality * functionality)
 		    m_MainStack->raiseWidget(0+1);
 	}
 
+    functionality->createConnections();
+
     ++m_NumOfFuncs;
 
 	return true;

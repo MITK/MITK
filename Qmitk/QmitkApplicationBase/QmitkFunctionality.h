@@ -29,10 +29,28 @@ class QmitkFunctionality : public QObject
 protected:
 	virtual void setAvailability(bool available);
 public:
+    /*!
+    \brief method for creating the widget containing the functionality's controls, like sliders, buttons etc.
+    */
 	virtual QWidget * createControlWidget(QWidget *parent) = 0;
+    /*!
+    \brief method for creating the functionality's main widget
+    */
 	virtual QWidget * createMainWidget(QWidget * parent) = 0;
+    /*!
+    \brief method for creating the connections of main and control widget
+    */
+	virtual void createConnections()
+    {
+    };
+    /*!
+    \brief method for creating a QAction object, i.e., toolbar button and menu entry
+    */
 	virtual QAction * createAction(QActionGroup * parent) { return NULL; };
 
+    /*!
+    \brief method for defining the name of the functionality
+    */
 	virtual QString getFunctionalityName() = 0;
 
 	virtual void activated();

@@ -8,7 +8,11 @@
 #include "mitkStringProperty.h"
 
 #include <GL/glut.h>
-	
+
+//##Documentation
+//##@brief color to mark a selected point
+const float selectedColor[]={1.0,0.0,0.6}; //for selected!
+
 //##ModelId=3F0189F00378
 mitk::PointSetMapper2D::PointSetMapper2D()
 {
@@ -58,12 +62,19 @@ void mitk::PointSetMapper2D::Paint(mitk::BaseRenderer * renderer)
       it=input->GetPointSet()->GetPoints()->Begin();
       end=input->GetPointSet()->GetPoints()->End();
 
-      //bool list for the selection of the points
+      //iterator on the additional data of each point
       PointSet::DataType::PointDataContainerIterator selIt, selEnd;
       selIt=input->GetPointSet()->GetPointData()->Begin();
       selEnd=input->GetPointSet()->GetPointData()->End();
       
+      //for writing text 
       int j=0;
+
+      //for switching back to old color after using selected color
+      float unselectedColor[4];
+      //get current color to recall colorchange after paint
+      glGetFloatv(GL_CURRENT_COLOR,unselectedColor);
+
       while(it!=end)
       {
           mitk::Point3D p, projected_p;
@@ -100,19 +111,16 @@ void mitk::PointSetMapper2D::Paint(mitk::BaseRenderer * renderer)
 											l.append(buffer);
 									}
 	
-    		          for (unsigned int i = 0; i < l.size(); i++)
-		    		          glutBitmapCharacter (GLUT_BITMAP_HELVETICA_10, l[i]);
+    		        for (unsigned int i = 0; i < l.size(); i++)
+		    		      glutBitmapCharacter (GLUT_BITMAP_HELVETICA_10, l[i]);
 		        	}
 
-              if (selIt->Value())//selected
+              //check if the point is to be marked as selected 
+              if (selIt->Value().selected)
               {
-                float colorSel[]={1.0,0.0,0.6}; //for selected!
-
-                //current color for changing to a diferent color if selected
-                float currCol[4];
-                glGetFloatv(GL_CURRENT_COLOR,currCol);
-
-                glColor3f(colorSel[0],colorSel[1],colorSel[2]);//red
+                horz[0]=8;
+                vert[1]=8;
+                glColor3f(selectedColor[0],selectedColor[1],selectedColor[2]);//red
 
                 //a diamond around the point
                 glBegin (GL_LINE_LOOP);
@@ -126,14 +134,12 @@ void mitk::PointSetMapper2D::Paint(mitk::BaseRenderer * renderer)
                 glBegin (GL_POINTS);
                   tmp=pt2d;             glVertex2fv(&tmp[0]);
                 glEnd ();
-                
-                
-                glColor3f(currCol[0],currCol[1],currCol[2]);//the color before changing to select!
-
               }
-              else
+              else //if not selected
               {
-								glBegin (GL_LINES);
+                glColor3f(unselectedColor[0],unselectedColor[1],unselectedColor[2]);
+								//drawing crosses
+                glBegin (GL_LINES);
                     tmp=pt2d-horz;      glVertex2fv(&tmp[0]);
                     tmp=pt2d+horz;      glVertex2fv(&tmp[0]);
                     tmp=pt2d-vert;      glVertex2fv(&tmp[0]);

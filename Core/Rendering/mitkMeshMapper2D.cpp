@@ -4,13 +4,8 @@
 #include "mitkPlaneGeometry.h"
 #include "mitkColorProperty.h"
 #include <vtkTransform.h>
+#include <GL/glut.h>
 
-
-#ifdef WIN32
-	#include <glut.h>
-#else
-	#include <GL/glut.h>
-#endif
 
 //##Documentation
 //##@brief color to mark a selected point
@@ -65,7 +60,6 @@ void mitk::MeshMapper2D::Paint(mitk::BaseRenderer * renderer)
     //iterator on the additional data of each point
     Mesh::PointDataIterator dataIt;//, dataEnd;
     dataIt=itkMesh->GetPointData()->Begin();
-//    dataEnd=itkMesh->GetPointData()->End();
       
     //for switching back to old color after using selected color
     float unselectedColor[4];
@@ -75,27 +69,28 @@ void mitk::MeshMapper2D::Paint(mitk::BaseRenderer * renderer)
     {
       mitk::Point3D p, projected_p;
       float vtkp[3];
-      p.x= it->Value()[0];
-      p.y= it->Value()[1];
-      p.z= it->Value()[2];
-      vec2vtk(p, vtkp);
+
+      itk2vtk(it->Value(), vtkp);
       transform->TransformPoint(vtkp, vtkp);
-      vtk2vec(vtkp,p);
+      vtk2itk(vtkp,p);
 
       displayGeometry->Project(p, projected_p);
-      if(Vector3D(p-projected_p).length()<2.0)
+      Vector3D diff=p-projected_p;
+      if(diff.GetSquaredNorm()<4.0)
       {
         Point2D pt2d, tmp;
         displayGeometry->Map(projected_p, pt2d);
         displayGeometry->MMToDisplay(pt2d, pt2d);
 
-        Point2D horz(5,0),vert(0,5);
+        Vector2D horz,vert;
+        horz[0]=5; horz[1]=0;
+        vert[0]=0; vert[1]=5;
                         
         //check if the point is to be marked as selected 
         if (dataIt->Value().selected)
         {
-          horz.x=8;
-          vert.y=8;
+          horz[0]=8;
+          vert[1]=8;
           glColor3f(selectedColor[0],selectedColor[1],selectedColor[2]);//red
 
           switch (dataIt->Value().pointSpec)
@@ -104,10 +99,10 @@ void mitk::MeshMapper2D::Paint(mitk::BaseRenderer * renderer)
             {
               //a quad
               glBegin (GL_LINE_LOOP);
-                tmp=pt2d-horz+vert;      glVertex2fv(&tmp.x);
-                tmp=pt2d+horz+vert;      glVertex2fv(&tmp.x);
-                tmp=pt2d+horz-vert;      glVertex2fv(&tmp.x);
-                tmp=pt2d-horz-vert;      glVertex2fv(&tmp.x);
+                tmp=pt2d-horz+vert;      glVertex2fv(&tmp[0]);
+                tmp=pt2d+horz+vert;      glVertex2fv(&tmp[0]);
+                tmp=pt2d+horz-vert;      glVertex2fv(&tmp[0]);
+                tmp=pt2d-horz-vert;      glVertex2fv(&tmp[0]);
               glEnd ();
             }
             break;
@@ -115,10 +110,10 @@ void mitk::MeshMapper2D::Paint(mitk::BaseRenderer * renderer)
             {
               //a diamond around the point
               glBegin (GL_LINE_LOOP);
-                tmp=pt2d-horz;      glVertex2fv(&tmp.x);
-                tmp=pt2d+vert;      glVertex2fv(&tmp.x);
-                tmp=pt2d+horz;			glVertex2fv(&tmp.x);
-                tmp=pt2d-vert;      glVertex2fv(&tmp.x);
+                tmp=pt2d-horz;      glVertex2fv(&tmp[0]);
+                tmp=pt2d+vert;      glVertex2fv(&tmp[0]);
+                tmp=pt2d+horz;			glVertex2fv(&tmp[0]);
+                tmp=pt2d-vert;      glVertex2fv(&tmp[0]);
               glEnd ();
             }
             break;
@@ -128,7 +123,7 @@ void mitk::MeshMapper2D::Paint(mitk::BaseRenderer * renderer)
 
           //the actual point
           glBegin (GL_POINTS);
-            tmp=pt2d;             glVertex2fv(&tmp.x);
+            tmp=pt2d;             glVertex2fv(&tmp[0]);
           glEnd ();
         }
         else //if not selected
@@ -140,20 +135,20 @@ void mitk::MeshMapper2D::Paint(mitk::BaseRenderer * renderer)
             {
               //a quad
               glBegin (GL_LINE_LOOP);
-                tmp=pt2d-horz+vert;      glVertex2fv(&tmp.x);
-                tmp=pt2d+horz+vert;      glVertex2fv(&tmp.x);
-                tmp=pt2d+horz-vert;      glVertex2fv(&tmp.x);
-                tmp=pt2d-horz-vert;      glVertex2fv(&tmp.x);
+                tmp=pt2d-horz+vert;      glVertex2fv(&tmp[0]);
+                tmp=pt2d+horz+vert;      glVertex2fv(&tmp[0]);
+                tmp=pt2d+horz-vert;      glVertex2fv(&tmp[0]);
+                tmp=pt2d-horz-vert;      glVertex2fv(&tmp[0]);
               glEnd ();
             }
           case PTUNDEFINED:
             {
               //drawing crosses
               glBegin (GL_LINES);
-                  tmp=pt2d-horz;      glVertex2fv(&tmp.x);
-                  tmp=pt2d+horz;      glVertex2fv(&tmp.x);
-                  tmp=pt2d-vert;      glVertex2fv(&tmp.x);
-                  tmp=pt2d+vert;      glVertex2fv(&tmp.x);
+                  tmp=pt2d-horz;      glVertex2fv(&tmp[0]);
+                  tmp=pt2d+horz;      glVertex2fv(&tmp[0]);
+                  tmp=pt2d-vert;      glVertex2fv(&tmp[0]);
+                  tmp=pt2d+vert;      glVertex2fv(&tmp[0]);
               glEnd ();
             }
           }//switch
@@ -206,15 +201,12 @@ void mitk::MeshMapper2D::Paint(mitk::BaseRenderer * renderer)
 
           mitk::Point3D p, projected_p;
           float vtkp[3];
-          p.x = thisPoint[0];
-          p.y = thisPoint[1];
-          p.z = thisPoint[2];
-          vec2vtk(p, vtkp);
+          itk2vtk(thisPoint, vtkp);
           transform->TransformPoint(vtkp, vtkp);
-          vtk2vec(vtkp,p);
+          vtk2itk(vtkp,p);
           displayGeometry->Project(p, projected_p);
-
-          if(Vector3D(p-projected_p).length()<2.0)
+          Vector3D diff=p-projected_p;
+          if(diff.GetSquaredNorm()<4.0)
           {
             Point2D pt2d, tmp;
             displayGeometry->Map(projected_p, pt2d);
@@ -236,8 +228,8 @@ void mitk::MeshMapper2D::Paint(mitk::BaseRenderer * renderer)
                 glColor3f(selectedColor[0],selectedColor[1],selectedColor[2]);//red
                 //a line from lastPoint to thisPoint
                 glBegin (GL_LINES);
-                  glVertex2fv(&(*lastPoint).x);
-                  glVertex2fv(&pt2d.x);
+                  glVertex2fv(&(*lastPoint)[0]);
+                  glVertex2fv(&pt2d[0]);
                 glEnd ();
               }
               else //if not selected
@@ -245,8 +237,8 @@ void mitk::MeshMapper2D::Paint(mitk::BaseRenderer * renderer)
                 glColor3f(unselectedColor[0],unselectedColor[1],unselectedColor[2]);
 						    //drawing crosses
                 glBegin (GL_LINES);
-                  glVertex2fv(&(*lastPoint).x);
-                  glVertex2fv(&pt2d.x);
+                  glVertex2fv(&(*lastPoint)[0]);
+                  glVertex2fv(&pt2d[0]);
                 glEnd ();
               }
               //to draw the line to the next in iteration step
@@ -254,7 +246,7 @@ void mitk::MeshMapper2D::Paint(mitk::BaseRenderer * renderer)
               //and to search for the selection state of the line
               lastPointId = *cellIdIt;
             }//if..else
-          }//if <2.0
+          }//if <4.0
           ++cellIdIt;
         }//while cellIdIter
 
@@ -270,41 +262,27 @@ void mitk::MeshMapper2D::Paint(mitk::BaseRenderer * renderer)
             glColor3f(selectedColor[0],selectedColor[1],selectedColor[2]);//red
             //a line from lastPoint to firstPoint
             glBegin (GL_LINES);
-              glVertex2fv(&(*lastPoint).x);
-              glVertex2fv(&(*firstOfCell).x);
+              glVertex2fv(&(*lastPoint)[0]);
+              glVertex2fv(&(*firstOfCell)[0]);
             glEnd ();
           }
           else 
           {
             glColor3f(unselectedColor[0],unselectedColor[1],unselectedColor[2]);
             glBegin (GL_LINES);
-              glVertex2fv(&(*lastPoint).x);
-              glVertex2fv(&(*firstOfCell).x);
+              glVertex2fv(&(*lastPoint)[0]);
+              glVertex2fv(&(*firstOfCell)[0]);
             glEnd ();
           }
         }//if closed
         
-        //Axis-aligned bounding boxe(AABB) around the cell if selected
+        //Axis-aligned bounding box(AABB) around the cell if selected
         if (cellDataIt->Value().selected)
         {
-          mitk::PointSet::DataType::PointsContainerPointer pointsContainer = mitk::PointSet::DataType::PointsContainer::New();
-          Mesh::PointIdIterator bbIt = cellIt->Value()->PointIdsBegin();
-          Mesh::PointIdIterator bbEnd = cellIt->Value()->PointIdsEnd();
-          while(bbIt != bbEnd)
+          mitk::Mesh::DataType::BoundingBoxPointer aABB = input->GetBoundingBoxFromCell(cellIt->Index());
+          if (aABB.IsNotNull())
           {
-            mitk::PointSet::PointType point;
-            bool pointOk = itkMesh->GetPoint((*bbIt), &point);
-            if (pointOk)
-              pointsContainer->SetElement((*bbIt), point);
-            ++bbIt;
-          }
-
-          mitk::PointSet::DataType::BoundingBoxPointer aABB = mitk::PointSet::DataType::BoundingBoxType::New();
-          aABB->SetPoints(pointsContainer);
-          bool bBOk = aABB->ComputeBoundingBox();
-          if (bBOk)
-          {
-            mitk::PointSet::PointType min, max;
+            mitk::Mesh::PointType min, max;
             min = aABB->GetMinimum();
             max = aABB->GetMaximum();
 
@@ -312,20 +290,16 @@ void mitk::MeshMapper2D::Paint(mitk::BaseRenderer * renderer)
             Point2D min2D, max2D;
             Point3D p, projected_p;
             float vtkp[3];
-            vtkp[0] = min[0];
-            vtkp[1] = min[1];
-            vtkp[2] = min[2];
+            itk2vtk(min, vtkp);
             transform->TransformPoint(vtkp, vtkp);
-            vtk2vec(vtkp,p);
+            vtk2itk(vtkp,p);
             displayGeometry->Project(p, projected_p);
             displayGeometry->Map(projected_p, min2D);
             displayGeometry->MMToDisplay(min2D, min2D);
 
-            vtkp[0] = max[0];
-            vtkp[1] = max[1];
-            vtkp[2] = max[2];
+            itk2vtk(max, vtkp);
             transform->TransformPoint(vtkp, vtkp);
-            vtk2vec(vtkp,p);
+            vtk2itk(vtkp,p);
             displayGeometry->Project(p, projected_p);
             displayGeometry->Map(projected_p, max2D);
             displayGeometry->MMToDisplay(max2D, max2D);
@@ -334,10 +308,10 @@ void mitk::MeshMapper2D::Paint(mitk::BaseRenderer * renderer)
             glColor3f(selectedColor[0],selectedColor[1],selectedColor[2]);//red
             //a line from lastPoint to firstPoint
             glBegin(GL_LINE_LOOP);
-              glVertex2f(min2D.x, min2D.y);
-              glVertex2f(min2D.x, max2D.y);
-              glVertex2f(max2D.x, max2D.y);
-              glVertex2f(max2D.x, min2D.y);
+              glVertex2f(min2D[0], min2D[1]);
+              glVertex2f(min2D[0], max2D[1]);
+              glVertex2f(max2D[0], max2D[1]);
+              glVertex2f(max2D[0], min2D[1]);
             glEnd();
           }
         }
@@ -352,7 +326,6 @@ void mitk::MeshMapper2D::Paint(mitk::BaseRenderer * renderer)
     }
   }
 }
-
 
 void mitk::MeshMapper2D::Update()
 {

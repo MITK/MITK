@@ -179,7 +179,7 @@ void mitk::Geometry3D::InitializeGeometry(Geometry3D * newGeometry) const
   newGeometry->SetTimeBoundsInMS(m_TimeBoundsInMS);  
 
   newGeometry->GetVtkTransform()->SetMatrix(m_VtkIndexToWorldTransform->GetMatrix());
-	newGeometry->TransferVtkToITKTransform(); //MH
+	//newGeometry->TransferVtkToITKTransform(); //MH
 
 
   if(m_ParametricBoundingBox.IsNotNull())

@@ -165,9 +165,15 @@
 	</stateMachine>
 	<!-- Behaviour of a set of Points. a defined number of points can be set/removed/selected/deselectd/moved -->
 	<stateMachine NAME="pointsetinteractor">
-		<state NAME="nopoints" ID="1" START_STATE="TRUE">
+		<state NAME="nopoints or loaded points" ID="1" START_STATE="TRUE">
 			<transition NAME="addPoint but check n" NEXT_STATE_ID="3" EVENT_ID="3">
 				<action ID="32" />
+			</transition>
+			<transition NAME="Select or move point Space" NEXT_STATE_ID="10" EVENT_ID="1">
+				<action ID="30" />
+			</transition>
+			<transition NAME="checkn Delete" NEXT_STATE_ID="30" EVENT_ID="12">
+				<action ID="33" />
 			</transition>
 		</state>
 		<state NAME="space left" ID="2">

@@ -1,3 +1,4 @@
+#include <QmitkSimpleExample/QmitkSimpleExampleFunctionality.h>
 #include "QmitkMainTemplate.h"
 
 

@@ -50,7 +50,7 @@
 
 /**
   \defgroup Process Process Classes
-  \ingroup ProcessAndAdaptorClasses
+  \ingroup ProcessAdaptor
   This subcategory includes process (algorithm) classes developed specifically for mitk.
 */
 

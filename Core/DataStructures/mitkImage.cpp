@@ -517,7 +517,9 @@ bool mitk::Image::SetPicChannel(ipPicDescriptor *pic, int n)
   {
     ImageDataItemPointer ch;
     ch=GetChannelData(n);
-    ipFuncCopyTags(ch->GetPicDescriptor(), pic);
+    // commented the next line, because 
+    // it crashes when called from mitkDICOMFileReader for the Live3D data
+    // ipFuncCopyTags(ch->GetPicDescriptor(), pic);
     return true;
   }
   else

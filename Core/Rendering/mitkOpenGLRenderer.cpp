@@ -142,7 +142,7 @@ void mitk::OpenGLRenderer::Render()
             ImageMapper2D* imagemapper2d=dynamic_cast<ImageMapper2D*>(mapper.GetPointer());
             if(imagemapper2d!=NULL) {
 									imagemapper2d->m_IilImage = &m_IilImage;
-                	imagemapper2d->Paint(m_RenderWindow);
+                	imagemapper2d->Paint(this);
                  }
         }
     }

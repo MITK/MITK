@@ -30,6 +30,7 @@ int mitkMeshTest(int argc, char* argv[])
   mesh = mitk::Mesh::New();
 
   //try to get the itkmesh
+  std::cout << "Create a mesh and try to get the itkMesh";
   mitk::Mesh::DataType::Pointer itkdata = NULL;
   itkdata = mesh->GetMesh();
   if (itkdata.IsNull())
@@ -39,6 +40,7 @@ int mitkMeshTest(int argc, char* argv[])
   }
 
   //fresh mesh has to be empty!
+  std::cout << "Is the mesh empty?";
   if (mesh->GetSize() != 0)
   {
     std::cout<<"[FAILED]"<<std::endl;
@@ -61,6 +63,7 @@ int mitkMeshTest(int argc, char* argv[])
   }
   
   //get the point and check if it is still the same
+  std::cout << "Create an operation and add a point. Then try to get that point.";
   mitk::Point3D tempPoint;
   tempPoint.Fill(0);
   tempPoint = mesh->GetPoint(position);

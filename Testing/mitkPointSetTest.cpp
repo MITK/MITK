@@ -31,6 +31,7 @@ int mitkPointSetTest(int argc, char* argv[])
   pointSet = mitk::PointSet::New();
 
   //try to get the itkPointSet
+  std::cout << "try to get the itkPointSet from a newly created PointSet";
   mitk::PointSet::DataType::Pointer itkdata = NULL;
   itkdata = pointSet->GetPointSet();
   if (itkdata.IsNull())
@@ -40,6 +41,7 @@ int mitkPointSetTest(int argc, char* argv[])
   }
 
   //fresh PointSet has to be empty!
+  std::cout << "check if the PointSet is empty";
   if (pointSet->GetSize() != 0)
   {
     std::cout<<"[FAILED]"<<std::endl;
@@ -54,6 +56,7 @@ int mitkPointSetTest(int argc, char* argv[])
 	pointSet->ExecuteOperation(doOp);
 
   //now check new condition!
+  std::cout << "create an operation and add a point";
   if ( (pointSet->GetSize()!=1) ||
       (!pointSet->IndexExists(position)))
   {

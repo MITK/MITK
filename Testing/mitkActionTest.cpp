@@ -28,6 +28,7 @@ int mitkActionTest(int argc, char* argv[])
   mitk::Action* action = new mitk::Action(actionId);
 
   //check ActionID
+  std::cout << "check ActionId";
   if (action->GetActionId()!=actionId)
   {
     std::cout<<"[FAILED]"<<std::endl;
@@ -39,6 +40,7 @@ int mitkActionTest(int argc, char* argv[])
   action->AddProperty("intproperty", new mitk::IntProperty(10));
   action->AddProperty("floatproperty", new mitk::FloatProperty(10.05));
   
+  std::cout << "try adding properties and read them afterwards";
   bool boolproperty = false;
   boolproperty = dynamic_cast<mitk::BoolProperty *>(action->GetProperty("boolproperty"))->GetValue();
   if (boolproperty != true)

@@ -31,6 +31,7 @@ int mitkTransitionTest(int argc, char* argv[])
   mitk::Transition* transition = new mitk::Transition("transitionname", nextStateId, eventId);
 
   //check nextStateId
+  std::cout << "Check StateId";
   if (transition->GetNextStateId()!=nextStateId)
   {
     std::cout<<"[FAILED]"<<std::endl;
@@ -38,6 +39,7 @@ int mitkTransitionTest(int argc, char* argv[])
   }
 
   //check EventId
+  std::cout << "Check EventId";
   if (transition->GetEventId()!=eventId || !transition->IsEvent(eventId))
   {
     std::cout<<"[FAILED]"<<std::endl;
@@ -50,6 +52,7 @@ int mitkTransitionTest(int argc, char* argv[])
   transition->AddAction(firstAction);
 
   //check ActionCount
+  std::cout << "Check ActionCount after first addition of an action";
   if (transition->GetActionCount()!=count)
   {
     std::cout<<"[FAILED]"<<std::endl;
@@ -63,6 +66,7 @@ int mitkTransitionTest(int argc, char* argv[])
   transition->AddAction(secondAction);
 
   //check ActionCount
+  std::cout << "check action Count after second addition of an action";
   if (transition->GetActionCount()!=count)
   {
     std::cout<<"[FAILED]"<<std::endl;
@@ -72,6 +76,7 @@ int mitkTransitionTest(int argc, char* argv[])
   count = 1;
   
   //check ActionIterators
+  std::cout << "check ActionIterators";
   std::vector<mitk::Action*>::iterator iter = transition->GetActionBeginIterator();
   const std::vector<mitk::Action*>::iterator end = transition->GetActionEndIterator();
   while (iter != end)
@@ -86,6 +91,7 @@ int mitkTransitionTest(int argc, char* argv[])
   }
 
   //check setting State
+  std::cout << "check setting a statepointer and reading it again";
   int stateId = 10000;
   mitk::State * state = new mitk::State("statename", stateId);
   transition->SetNextState(state);

@@ -32,6 +32,7 @@ int mitkGlobalInteractionTest(int argc, char* argv[])
 
   globalInteraction->AddInteractor(firstInteractor);
   globalInteraction->AddInteractor(secondInteractor);
+  std::cout << "add two interactors to globalInteraction and check if they were registered";
   if ( !globalInteraction->InteractorRegistered(firstInteractor) ||
        !globalInteraction->InteractorRegistered(secondInteractor) )
   {
@@ -40,6 +41,7 @@ int mitkGlobalInteractionTest(int argc, char* argv[])
   }
 
   //remove Interactor
+  std::cout << "remove the first Interactor";
   if ( !globalInteraction->RemoveInteractor(secondInteractor) )
   {
     std::cout<<"[FAILED]"<<std::endl;
@@ -47,6 +49,7 @@ int mitkGlobalInteractionTest(int argc, char* argv[])
   }
 
   //check if really removed
+  std::cout << "check if the second is still registered";
   if ( globalInteraction->InteractorRegistered(secondInteractor) )
   {
     std::cout<<"[FAILED]"<<std::endl;
@@ -54,6 +57,7 @@ int mitkGlobalInteractionTest(int argc, char* argv[])
   }
   
   //still registered
+  std::cout << "check if the first is still registered (shouldn't be)";
   if ( !globalInteraction->InteractorRegistered(firstInteractor) )
   {
     std::cout<<"[FAILED]"<<std::endl;
@@ -61,6 +65,7 @@ int mitkGlobalInteractionTest(int argc, char* argv[])
   }
 
   //remove first too
+  std::cout << "remove the first, too";
   if ( !globalInteraction->RemoveInteractor(firstInteractor) )
   {
     std::cout<<"[FAILED]"<<std::endl;
@@ -68,6 +73,7 @@ int mitkGlobalInteractionTest(int argc, char* argv[])
   }
   
   //check if empty
+  std::cout << "check one of the two Interactors is registered";
   if ( globalInteraction->InteractorRegistered(firstInteractor) ||
        globalInteraction->InteractorRegistered(secondInteractor) )
   {
@@ -77,6 +83,8 @@ int mitkGlobalInteractionTest(int argc, char* argv[])
 
   //------------------
   //now check the same with Listener
+  std::cout << "check the addition of a Listener the same way";
+  std::cout << "add two listeners. Are they both registered?";
   globalInteraction->AddListener(firstInteractor);
   globalInteraction->AddListener(secondInteractor);
   if ( !globalInteraction->ListenerRegistered(firstInteractor) ||
@@ -86,7 +94,8 @@ int mitkGlobalInteractionTest(int argc, char* argv[])
     return EXIT_FAILURE;
   }
 
-  //remove Interactor
+  //remove Listener
+  std::cout << "remove second L.";
   if ( !globalInteraction->RemoveListener(secondInteractor) )
   {
     std::cout<<"[FAILED]"<<std::endl;
@@ -94,6 +103,7 @@ int mitkGlobalInteractionTest(int argc, char* argv[])
   }
 
   //check if really removed
+  std::cout << "check if second is still registered";
   if ( globalInteraction->ListenerRegistered(secondInteractor) )
   {
     std::cout<<"[FAILED]"<<std::endl;
@@ -101,6 +111,7 @@ int mitkGlobalInteractionTest(int argc, char* argv[])
   }
   
   //still registered
+  std::cout << "check if the first is still registered";
   if ( !globalInteraction->ListenerRegistered(firstInteractor) )
   {
     std::cout<<"[FAILED]"<<std::endl;
@@ -108,6 +119,7 @@ int mitkGlobalInteractionTest(int argc, char* argv[])
   }
 
   //remove first too
+  std::cout << "remove the first Listener, too";
   if ( !globalInteraction->RemoveListener(firstInteractor) )
   {
     std::cout<<"[FAILED]"<<std::endl;
@@ -115,6 +127,7 @@ int mitkGlobalInteractionTest(int argc, char* argv[])
   }
   
   //check if empty
+  std::cout << "Is one of them still registered?";
   if ( globalInteraction->ListenerRegistered(firstInteractor) ||
        globalInteraction->ListenerRegistered(secondInteractor) )
   {

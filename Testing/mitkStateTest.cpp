@@ -30,6 +30,7 @@ int mitkStateTest(int argc, char* argv[])
   mitk::State* state = new mitk::State("state", stateId);
 
   //check Id
+  std::cout << "check StateId";
   if (state->GetId()!=stateId)
   {
     std::cout<<"[FAILED]"<<std::endl;
@@ -43,6 +44,7 @@ int mitkStateTest(int argc, char* argv[])
   mitk::Transition* secondTransition = new mitk::Transition("secondTransition", count, count+1);
 
   //add transitions
+  std::cout << "add two transitions";
   if (	!state->AddTransition( firstTransition ) || !state->AddTransition( secondTransition ))
   {
     std::cout<<"[FAILED]"<<std::endl;
@@ -51,12 +53,14 @@ int mitkStateTest(int argc, char* argv[])
 
   count = 1;
   //check getting the transitions
+  std::cout << "try reading the first transition";
   if (state->GetTransition(count) != firstTransition)
   {
     std::cout<<"[FAILED]"<<std::endl;
     return EXIT_FAILURE;
   }
   ++count;
+  std::cout << "try reading the second transition";
   if (state->GetTransition(count) != secondTransition)
   {
     std::cout<<"[FAILED]"<<std::endl;
@@ -64,6 +68,7 @@ int mitkStateTest(int argc, char* argv[])
   }
 
   //check valid EventIds
+  std::cout << "check if the first EventId is valid";
   count = 1;
   if (!state->IsValidEvent(count))
   {
@@ -71,7 +76,15 @@ int mitkStateTest(int argc, char* argv[])
     return EXIT_FAILURE;
   }
   ++count;
+  std::cout << "check if the second EventId is valid";
   if (!state->IsValidEvent(count))
+  {
+    std::cout<<"[FAILED]"<<std::endl;
+    return EXIT_FAILURE;
+  }
+  ++count;
+  std::cout << "check if a non existent EventId is valid";
+  if (state->IsValidEvent(count))
   {
     std::cout<<"[FAILED]"<<std::endl;
     return EXIT_FAILURE;

@@ -29,6 +29,7 @@ int mitkEventTest(int argc, char* argv[])
   mitk::Event * event = new mitk::Event(renderer, 0, 1, 2, 3);
   
   //check Get...
+  std::cout << "check the get methods of the Event";
   if (event->GetSender() != renderer ||
     event->GetType() != 0 ||
     event->GetButton() != 1 ||

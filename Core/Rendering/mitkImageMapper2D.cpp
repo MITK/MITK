@@ -55,8 +55,22 @@ void mitk::ImageMapper2D::Paint(mitk::BaseRenderer * renderer)
 
     const mitk::DisplayGeometry* displayGeometry = renderer->GetDisplayGeometry();
 
-    Point2D topLeft=displayGeometry->GetOriginInUnits();
-    Point2D bottomRight=displayGeometry->GetOriginInUnits()+displayGeometry->GetSizeInUnits();
+    Vector2D oldtopLeft=displayGeometry->GetOriginInUnits();
+    Vector2D oldbottomRight=displayGeometry->GetOriginInUnits()+displayGeometry->GetSizeInUnits();
+
+    Vector2D topLeft;
+    Vector2D bottomRight;
+    topLeft=displayGeometry->GetOriginInDisplayUnits();
+    bottomRight=topLeft+displayGeometry->GetSizeInDisplayUnits();
+
+    displayGeometry->DisplayToMM(topLeft, topLeft); topLeft.x*=renderinfo.m_PixelsPerMM.x;  topLeft.y*=renderinfo.m_PixelsPerMM.y;
+    displayGeometry->DisplayToMM(bottomRight, bottomRight); bottomRight.x*=renderinfo.m_PixelsPerMM.x;  bottomRight.y*=renderinfo.m_PixelsPerMM.y;
+
+    //test - small differences noticed for unisotropic datasets.
+    if((Vector2D(oldtopLeft-topLeft).length()>0.1) || (Vector2D(oldbottomRight-bottomRight).length()>0.1))
+    {
+        bottomRight*=1.0;
+    }
 
     glMatrixMode (GL_PROJECTION);
     glLoadIdentity ();
@@ -185,7 +199,10 @@ void mitk::ImageMapper2D::GenerateData(mitk::BaseRenderer *renderer)
 
         m_Reslicer->SetBackgroundLevel(-1024);
 
-        m_Reslicer->SetOutputSpacing(planeview->getLengthOfOrientation1()/worldgeometry->GetWidthInUnits(), planeview->getLengthOfOrientation2()/worldgeometry->GetHeightInUnits(),1.0);
+
+        renderinfo.m_PixelsPerMM.set(planeview->getLengthOfOrientation1()/worldgeometry->GetWidthInUnits(), planeview->getLengthOfOrientation2()/worldgeometry->GetHeightInUnits());
+
+        m_Reslicer->SetOutputSpacing(renderinfo.m_PixelsPerMM.x, renderinfo.m_PixelsPerMM.y, 1.0);
         m_Reslicer->SetOutputExtent(0.0, worldgeometry->GetWidthInUnits()-1, 0.0, worldgeometry->GetHeightInUnits()-1, 0.0, 1.0);
 
         double origin[3];

@@ -84,8 +84,11 @@ namespace mitk {
       //##Documentation
       //## @brief internal id of the renderer the data is stored for
       int m_RendererId;
+      //##Documentation
+      //## @brief number of pixels per mm in x- and y-direction of the resampled image m_Pic
+      Vector2D m_PixelsPerMM;
       //##ModelId=3E6423D30002
-      RendererInfo() : m_LastUpdateTime(0), m_iilImage(NULL), m_Pic(NULL), m_RendererId(-1)
+      RendererInfo() : m_LastUpdateTime(0), m_iilImage(NULL), m_Pic(NULL), m_RendererId(-1), m_PixelsPerMM(0,0)
       {
       
       };

@@ -36,9 +36,10 @@ bool mitk::EventMapper::MapEvent(Event* event)
 	int i;
 	for (i = 0;
 		(i < ((int)(m_EventDescriptions.size()))) || 
-		!(m_EventDescriptions.at(i) == *event);
+		!(m_EventDescriptions[i] == *event);//insecure[] but .at(i) is not supported before std.vers 3.0
 		i++){}
-	if (!(m_EventDescriptions.at(i) == *event))//searched entry not found
+	if (!(m_EventDescriptions[i] == *event))//insecure
+		//searched entry not found
 		return false;
 
 	m_StateEvent.Set( (m_EventDescriptions.at(i)).GetId(), event );

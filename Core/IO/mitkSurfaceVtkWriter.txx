@@ -26,8 +26,6 @@ template <class VTKWRITER>
 mitk::SurfaceVtkWriter<VTKWRITER>::SurfaceVtkWriter()
 {
   this->SetNumberOfRequiredInputs( 1 );
-  this->SetNumberOfOutputs( 1 );
-  this->SetNthOutput( 0, mitk::Surface::New().GetPointer() );
   
   m_VtkWriter = VtkWriterType::New();
   

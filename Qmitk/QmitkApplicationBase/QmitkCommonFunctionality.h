@@ -298,22 +298,30 @@ public:
   {
     // widget plane are made visible again
     mitk::DataTreeIteratorClone it = dataTree->GetNext("name", new mitk::StringProperty("widget1Plane"));
-    mitk::DataTreeNode::Pointer node = it->Get();
-    if ( node.IsNotNull() )  {
-      node->SetVisibility(enable, NULL);
-    }
-
-    it = dataTree->GetNext("name", new mitk::StringProperty("widget2Plane"));
-    node = it->Get();
-    if ( node.IsNotNull() )  
+    if (it != NULL)
     {
-      node->SetVisibility(enable, NULL);
+      mitk::DataTreeNode::Pointer node = it->Get();
+      if ( node.IsNotNull() )  {
+        node->SetVisibility(enable, NULL);
+      }
+    }
+    it = dataTree->GetNext("name", new mitk::StringProperty("widget2Plane"));
+    if (it != NULL)
+    {
+      mitk::DataTreeNode::Pointer node = it->Get();
+      if ( node.IsNotNull() )  
+      {
+        node->SetVisibility(enable, NULL);
+      }
     }
     it = dataTree->GetNext("name", new mitk::StringProperty("widget3Plane"));
-    node = it->Get();
-    if ( node.IsNotNull() )  
+    if (it != NULL)
     {
-      node->SetVisibility(enable, NULL);
+      mitk::DataTreeNode::Pointer node = it->Get();
+      if ( node.IsNotNull() )  
+      {
+        node->SetVisibility(enable, NULL);
+      }
     }
   }
 

@@ -22,7 +22,7 @@ typedef itk::Point<ScalarType,3> ITKPoint3D;
 typedef itk::Vector<ScalarType,3> ITKVector3D;
 
 typedef class itk::NumericTraits<mitk::ScalarType> ScalarTypeNumericTraits;
-extern const ScalarType eps VCL_STATIC_CONST_INIT_FLOAT_DECL(0.000001);
+extern const ScalarType eps;
 
 template <class Tout>
 inline void FillITKVector3D(Tout& out, ScalarType x, ScalarType y, ScalarType z)

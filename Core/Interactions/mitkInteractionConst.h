@@ -7,7 +7,10 @@
 #define MITKINTERACTIONCONST_H
 
 namespace mitk {
-
+/* changes effect:
+/	TriangleROI.cpp
+/	ROI.cpp
+*/
 enum SideEffectId {
 	DONOTHING = 0,
 	INITNEWOBJECT = 5,

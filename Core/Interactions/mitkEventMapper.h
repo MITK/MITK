@@ -6,7 +6,6 @@
 #include "EventDescription.h"
 #include "StateEvent.h"
 #include "StateMachine.h"
-//#include "mitkInteractionConst.h"
 #include <qxml.h>
 #include <vector>
 #include <string>

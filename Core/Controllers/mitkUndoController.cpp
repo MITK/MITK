@@ -2,9 +2,9 @@
 #include "LimitedLinearUndo.h"
 
 //static member-variables init.
-mitk::UndoModel *m_CurUndoModel;
-mitk::UndoModelMap m_UndoModelList;
-mitk::UndoType m_CurUndoType;
+mitk::UndoModel* mitk::UndoController::m_CurUndoModel;
+mitk::UndoModelMap mitk::UndoController::m_UndoModelList;
+mitk::UndoType mitk::UndoController::m_CurUndoType;
 
 static const mitk::UndoType DEFAULTUNDOMODEL = mitk::LIMITEDLINEARUNDO;
 

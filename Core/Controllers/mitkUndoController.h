@@ -8,16 +8,16 @@
 
 
 namespace mitk {
-//##ModelId=3E93EE1D001F
+
 	enum UndoType
 	{
 		//NULL = 0,
 		LIMITEDLINEARUNDO = 1,
 		TREEUNDO = 2
 	};
-//##ModelId=3E9C45D5007E
+
 typedef std::map<UndoType, UndoModel*> UndoModelMap;
-//##ModelId=3E9C45D50092
+
 typedef std::map<UndoType, UndoModel*>::iterator UndoModelMapIter;
 
 
@@ -25,18 +25,16 @@ typedef std::map<UndoType, UndoModel*>::iterator UndoModelMapIter;
 class UndoController
 {
   public:
-	/**
-    * Constructor; Adds the new UndoType or if undoType exists , 
-	* switches it to undoType
-    **/
-    //##ModelId=3E956E3B03A8
-	UndoController(UndoType undoType);
+	//##ModelId=3E956E3B03A8
+	//##Documentation
+    //## Constructor; Adds the new UndoType or if undoType exists , 
+	//## switches it to undoType
+    UndoController(UndoType undoType);
 	
-	/**
-     * plain constructor
-     **/
     //##ModelId=3EA585FD0261
-	UndoController();
+	//##Documentation
+	//##plain constructor
+    UndoController();
 
     //##ModelId=3E5F543402C5
     bool SetOperationEvent(OperationEvent* operationEvent);
@@ -58,28 +56,20 @@ class UndoController
 	bool RemoveUndoModel(UndoType undoType);
 
   private:
-
-    /**
-     * current selected UndoModel
-     **/
-    //##ModelId=3E5F5DC701C5
-    static UndoModel *m_CurUndoModel;
-	
-	/**
-     * current selected Type of m_CurUndoModel
-     **/
+    //##ModelId=3EA93FC40068
+	//##Documentation
+    //## current selected UndoModel
+	static UndoModel *m_CurUndoModel;
     //##ModelId=3E9C45D50256
+	//##Documentation
+    //## current selected Type of m_CurUndoModel
 	static UndoType m_CurUndoType;
-
-    /**
-     * different UndoModels to select and activate
-     **/
     //##ModelId=3E9C45D5026A
-    static UndoModelMap m_UndoModelList;
+	//##Documentation
+    //## different UndoModels to select and activate
+	static UndoModelMap m_UndoModelList;
 
 };
 }//namespace mitk
-
-
 
 #endif /* UNDOCONTROLLER_H_HEADER_INCLUDED_C16EFF79 */

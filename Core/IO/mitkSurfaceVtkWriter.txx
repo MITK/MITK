@@ -102,9 +102,3 @@ const mitk::Surface* mitk::SurfaceVtkWriter<VTKWRITER>::GetInput()
     return static_cast< const mitk::Surface * >( this->ProcessObject::GetInput( 0 ) );
   }
 }
-
-template <class VTKWRITER>
-void mitk::SurfaceVtkWriter<VTKWRITER>::Write()
-{
-  GenerateData();
-}

@@ -50,6 +50,8 @@ public:
 
     itkNewMacro( Self );
 
+    mitkWriterMacro;
+
     typedef VTKWRITER VtkWriterType;
 
     /**
@@ -118,8 +120,6 @@ public:
      * @returns the 0'th input object of the filter.
      */
     const mitk::Surface* GetInput();
-
-    virtual void Write();
 
     VtkWriterType* GetVtkWriter()
     {

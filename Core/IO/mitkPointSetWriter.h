@@ -41,6 +41,8 @@ public:
 
     mitkClassMacro( PointSetWriter, itk::ProcessObject );
 
+    mitkWriterMacro;
+
     itkNewMacro( Self );
 
     typedef mitk::PointSet InputType;

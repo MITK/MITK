@@ -417,15 +417,18 @@ bool mitk::EventMapper::MapEvent(Event* event)
 		return false;
 
 	//search the event in the list of event descriptions, if found, then take the number and produce a stateevent
-    unsigned int i;
-    for (i = 0;
-		(i < m_EventDescriptions.size()) &&
-		!(m_EventDescriptions[i] == *event);//insecure[] but .at(i) is not supported before std.vers 3.0
-		i++){}
-	if (!(m_EventDescriptions[i] == *event))//searched entry not found
+    EventDescriptionVecIter i;
+	for (i = m_EventDescriptions.begin(); i!=m_EventDescriptions.end();i++)
+	{
+		if (*i == *event)
+			break;
+	}
+
+	if (i == m_EventDescriptions.end())//not found
 		return false;
+
 	//set the Menger_Var m_StateEvent and send to StateMachine, which does everything further!
-	m_StateEvent.Set( (m_EventDescriptions[i]).GetId(), event );
+	m_StateEvent.Set( (*i).GetId(), event );
 	/*
 	Group and Object EventId:
 	then EventMapper has the power to descide which operations hang together;

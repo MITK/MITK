@@ -12,7 +12,7 @@
 //EventMechanism:
 //If you change anything here, then change in EventMapper.cpp (Array of constants) as well.
 */
-//##Constants for States and Transitions
+//##Constants for Events thrown by the code (e.g.Yes-I-found-a-point-at-that-position)
 //## in the >XML-File< AND in the >code<
 #define StNO   203
 #define StYES  204

@@ -818,3 +818,9 @@ void QmitkMainTemplate::changeLevelWindow(mitk::LevelWindow* lw )
 mitk::DataTree::Pointer QmitkMainTemplate::GetTree() {
     return tree;
 }
+
+
+void QmitkMainTemplate::changeToBig3D()
+{
+  mitkMultiWidget->changeLayout();
+}

@@ -36,7 +36,7 @@ const mitk::LevelWindow & mitk::LevelWindowProperty::GetLevelWindow() const
 //##ModelId=3ED953090135
 void mitk::LevelWindowProperty::SetLevelWindow(const mitk::LevelWindow &levWin)
 {
-    if(m_LevWin != levWin)
+    if(m_LevWin != NULL && m_LevWin != levWin)
     {
         m_LevWin = levWin;
         Modified();

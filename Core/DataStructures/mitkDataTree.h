@@ -3,6 +3,7 @@
 
 #include "mitkCommon.h"
 #include "DataTreeNode.h"
+
 //#include "DataTreeIterator.h"
 #include "Geometry3D.h"
 #include <Tree/LinkedTree.h>
@@ -42,6 +43,15 @@ public:
 		*/
     //##ModelId=3ED91D050085
 	static mitk::BoundingBox::Pointer ComputeBoundingBox(mitk::DataTreeIterator * it);
+
+	/*!
+		\brief compute the bounding box of all visible parts of the data tree structure, for general 
+    rendering or renderer specific visibility property checking
+		@param it an iterator of a data tree structure
+		@param renderer the reference of the renderer
+		*/
+    //##ModelId=3ED91D050085
+  static mitk::BoundingBox::Pointer ComputeVisibleBoundingBox(mitk::DataTreeIterator * it, mitk::BaseRenderer* renderer = NULL);
 
  protected:
     //##ModelId=3E38F46A0190

@@ -92,7 +92,7 @@ MBI_STD::ostream& operator<<( MBI_STD::ostream& o, DataTreeNode::Pointer& dtn);
 #if ((defined(_MSC_VER)) && (_MSC_VER <= 1200))
 MBI_STD::istream& operator>>( MBI_STD::istream& i, mitk::DataTreeNode::Pointer& dtn );
 
-MBI_STD::ostream& operator<<( MBI_STD::ostream& o, DataTreeNode::Pointer& dtn);
+MBI_STD::ostream& operator<<( MBI_STD::ostream& o, mitk::DataTreeNode::Pointer& dtn);
 #endif
 
 

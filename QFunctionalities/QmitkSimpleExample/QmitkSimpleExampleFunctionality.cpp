@@ -12,6 +12,7 @@
 #include "PlaneGeometry.h"
 #include <mitkSurfaceData.h>
 #include <mitkColorProperty.h>
+#include <mitkLookupTable.h>
 
 #include <EventMapper.h>
 #include <GlobalInteraction.h>
@@ -32,7 +33,7 @@
 #endif
 
 QmitkSimpleExampleFunctionality::QmitkSimpleExampleFunctionality(QObject *parent, const char *name, QmitkStdMultiWidget *mitkStdMultiWidget, mitk::DataTreeIterator * it) : QmitkFunctionality(parent, name, it) ,
-controls(NULL), multiWidget(mitkStdMultiWidget), opacityprop(NULL)
+controls(NULL), multiWidget(mitkStdMultiWidget), opacityprop(NULL), lookupTableProp(NULL)
 {
     setAvailability(true);
 
@@ -142,10 +143,20 @@ void QmitkSimpleExampleFunctionality::selectSliceWidgetYZ(int x)
 
 void QmitkSimpleExampleFunctionality::selectSliceWidgetFP( int p )
 {
-  if( opacityprop.IsNotNull() ) {
+  bool update=false;
+  if( opacityprop.IsNotNull() ) 
+  {
 		opacityprop->SetValue(p/100.0);
-		multiWidget->updateMitkWidgets();
+    update = true;
 	}
+  if(lookupTableProp.IsNotNull())
+  {
+		lookupTableProp->GetLookupTable().ChangeOpacityForAll(p/100.0);
+    update = true;
+	}
+
+  if(update)
+    multiWidget->updateMitkWidgets();
 }
 
 void QmitkSimpleExampleFunctionality::initWidgets()
@@ -188,6 +199,8 @@ void QmitkSimpleExampleFunctionality::initWidgets()
 				node->SetColor(color);
 			}
 			
+      lookupTableProp=NULL;
+
 			// init pic opacity props
       if ( opacityprop.IsNull() ) {
 				opacityprop = new mitk::FloatProperty(1.0f);
@@ -198,6 +211,15 @@ void QmitkSimpleExampleFunctionality::initWidgets()
 			else {
 				opacityprop->SetValue(0.5f);
 				node->GetPropertyList()->SetProperty("opacity", opacityprop);
+        if(lookupTableProp.IsNull())
+        {
+          mitk::LookupTableProperty::Pointer lut = dynamic_cast<mitk::LookupTableProperty*>(node->GetPropertyList()->GetProperty("LookupTable").GetPointer());
+          if(lut.IsNotNull())
+          {
+            lookupTableProp = lut;
+            lookupTableProp->GetLookupTable().ChangeOpacityForAll(0.5f);
+          }
+        }
 			}
 		}
 	}

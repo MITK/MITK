@@ -14,6 +14,7 @@
 #include <OperationActor.h>
 
 #include <mitkFloatProperty.h>
+#include <mitkLookupTableProperty.h>
 
 class QmitkStdMultiWidget;
 class QmitkSimpleExampleControls;
@@ -147,6 +148,7 @@ protected:
 
 	mitk::FloatProperty::Pointer opacityprop;
 
+  mitk::LookupTableProperty::Pointer lookupTableProp;
 
 		
 };

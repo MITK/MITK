@@ -86,6 +86,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkInteractionConst.h>
 #include <QmitkStatusBar/QmitkStatusBar.h>
 
+QmitkMainTemplate* QmitkMainTemplate::m_Instance = NULL;
+
 void QmitkMainTemplate::fileNew()
 {
 
@@ -314,6 +316,7 @@ void QmitkMainTemplate::helpAbout()
 
 void QmitkMainTemplate::init()
 {
+  m_Instance = this;  
   mitkMultiWidget=NULL;
 
   //creating a QmitkStatusBar for Output on the QStatusBar and connecting it with the MainStatusBar
@@ -561,4 +564,9 @@ void QmitkMainTemplate::m_ShowPlanesCheckBox_clicked()
 void QmitkMainTemplate::destroy()
 {
   delete qfm;
+}
+
+QmitkMainTemplate* QmitkMainTemplate::getInstance()
+{
+    return m_Instance;
 }

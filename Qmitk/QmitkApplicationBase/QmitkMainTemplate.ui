@@ -719,11 +719,12 @@
     <forward>class QmitkSelectableGLWidget</forward>
 </forwards>
 <variables>
-    <variable>mitk::DataTree::Pointer tree;</variable>
-    <variable>QmitkStdMultiWidget* mitkMultiWidget;</variable>
-    <variable>QmitkFctMediator* qfm;</variable>
-    <variable>mitk::UndoController* undoController;</variable>
+    <variable access="private">static QmitkMainTemplate* m_Instance;</variable>
     <variable>std::string xmlFallBackPath;</variable>
+    <variable>mitk::UndoController* undoController;</variable>
+    <variable>QmitkFctMediator* qfm;</variable>
+    <variable>QmitkStdMultiWidget* mitkMultiWidget;</variable>
+    <variable>mitk::DataTree::Pointer tree;</variable>
 </variables>
 <signals>
     <signal>ShowWidgetPlanesToggled(bool)</signal>
@@ -767,6 +768,7 @@
     <function returnType="mitk::DataTree::Pointer">GetTree()</function>
     <function>setXMLFallBackPath( const char * anXmlFallBackPath )</function>
     <function access="private">destroy()</function>
+    <function specifier="static" returnType="QmitkMainTemplate *">getInstance()</function>
 </functions>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

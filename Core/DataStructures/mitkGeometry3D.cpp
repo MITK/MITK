@@ -51,11 +51,13 @@ void mitk::Geometry3D::Initialize()
   m_ObjectToNodeTransform = TransformType::New();
   m_ObjectToNodeTransform->SetIdentity();  
 
-  TransformType::Pointer worldtransform = TransformType::New();
-  worldtransform->SetIdentity();
-  SetIndexToWorldTransform(worldtransform);
+  if(m_IndexToWorldTransform.IsNull())
+    m_IndexToWorldTransform = TransformType::New();
+  m_IndexToWorldTransform->SetIdentity();
 
-  TransferItkToVtkTransform();
+  if(m_VtkIndexToWorldTransform==NULL)
+    m_VtkIndexToWorldTransform = vtkTransform::New();
+  m_VtkIndexToWorldTransform->Identity();
  
   m_ParametricTransform = m_IndexToWorldTransform;
 

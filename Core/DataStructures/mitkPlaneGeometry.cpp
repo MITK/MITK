@@ -111,6 +111,7 @@ void mitk::PlaneGeometry::Modified() const
 void mitk::PlaneGeometry::Initialize()
 {
   Superclass::Initialize();
+  m_Origin = m_IndexToWorldTransform->GetOffset().Get_vnl_vector().data_block();
 }
 
 void mitk::PlaneGeometry::InitializeStandardPlane(mitk::ScalarType width, mitk::ScalarType height, const Vector3D & spacing, mitk::PlaneGeometry::PlaneOrientation planeorientation, mitk::ScalarType zPosition, bool frontside)

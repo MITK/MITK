@@ -14,7 +14,6 @@ This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
 
-////coming from mitkGeometry2DDataToSurfaceFilter.cpp
 =========================================================================*/
 
 #include "mitkProbeFilter.h"
@@ -24,6 +23,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkPolyDataSource.h>
 #include <vtkProbeFilter.h>
 #include <itkImageRegion.h>
+#include <vtkDataSet.h>
+#include <vtkPolyData.h>
+#include <vtkImageData.h>
+
 
 mitk::ProbeFilter::ProbeFilter()
 {

@@ -33,6 +33,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkUnsignedLongArray.h>
 #include <vtkUnsignedShortArray.h>
 
+#include "ipFunc.h"
+
 //##ModelId=3E0B7882024B
 mitk::ImageDataItem::ImageDataItem(const ImageDataItem& aParent, unsigned int dimension, int offset) : 
   m_Data(NULL), m_PicDescriptor(NULL), m_VtkImageData(NULL), m_Offset(offset), m_IsComplete(false),
@@ -45,6 +47,7 @@ mitk::ImageDataItem::ImageDataItem(const ImageDataItem& aParent, unsigned int di
   m_PicDescriptor->dim=dimension;
   memcpy(m_PicDescriptor->n, aParent.GetPicDescriptor()->n, sizeof(unsigned int)*(dimension<=8?dimension:8));
   m_PicDescriptor->data=m_Data=static_cast<unsigned char*>(aParent.GetData())+offset;
+  ipFuncCopyTags(m_PicDescriptor, aParent.GetPicDescriptor());
 }
 
 //##ModelId=3E0B78820287

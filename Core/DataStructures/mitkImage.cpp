@@ -210,6 +210,8 @@ mitk::ImageDataItem::Pointer mitk::Image::GetVolumeData(int t, int n)
           m_Slices[posSl]=sl;
         }
       }
+      if(vol->GetPicDescriptor()->info->tags_head==NULL)
+        ipFuncCopyTags(vol->GetPicDescriptor(), m_Slices[GetSliceIndex(0,t,n)]->GetPicDescriptor());
       return m_Volumes[pos]=vol;
     }
 
@@ -295,6 +297,8 @@ mitk::ImageDataItem::Pointer mitk::Image::GetChannelData(int n)
           m_Volumes[posVol]=vol;
         }
       }
+      if(ch->GetPicDescriptor()->info->tags_head==NULL)
+        ipFuncCopyTags(ch->GetPicDescriptor(), m_Volumes[GetVolumeIndex(0,n)]->GetPicDescriptor());
     }
     return m_Channels[n]=ch;
   }
@@ -488,7 +492,15 @@ bool mitk::Image::SetPicVolume(ipPicDescriptor *pic, int t, int n)
   if((pic->dim==2) && ((m_Dimension==2) || ((m_Dimension>2) && (m_Dimensions[2]==1)))) return SetPicSlice(pic, 0, t, n);
   if(pic->dim!=3) return false;
   if((pic->n[0]!=m_Dimensions[0]) || (pic->n[1]!=m_Dimensions[1]) || (pic->n[2]!=m_Dimensions[2])) return false;
-  return SetVolume(pic->data,t,n); //@todo: add geometry!
+  if(SetVolume(pic->data,t,n)) //@todo: add geometry!
+  {
+    ImageDataItemPointer vol;
+    vol=GetVolumeData(t,n);
+    ipFuncCopyTags(vol->GetPicDescriptor(), pic);
+    return true;
+  }
+  else
+    return false;
 }
 
 bool mitk::Image::SetPicChannel(ipPicDescriptor *pic, int n)
@@ -501,7 +513,15 @@ bool mitk::Image::SetPicChannel(ipPicDescriptor *pic, int n)
   {
     if(pic->n[i]!=m_Dimensions[i]) return false;
   }
-  return SetChannel(pic->data,n); //@todo: add geometry!
+  if(SetChannel(pic->data,n)) //@todo: add geometry!
+  {
+    ImageDataItemPointer ch;
+    ch=GetChannelData(n);
+    ipFuncCopyTags(ch->GetPicDescriptor(), pic);
+    return true;
+  }
+  else
+    return false;
 }
 
 //##ModelId=3E102AE9004B

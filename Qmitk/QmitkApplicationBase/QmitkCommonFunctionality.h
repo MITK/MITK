@@ -31,7 +31,7 @@ public:
     static void MinMax(typename TImageType::Pointer image, float &min, float &max)
   {
     typedef itk::MinimumMaximumImageCalculator<TImageType> MinMaxCalcType;
-    MinMaxCalcType::Pointer minmax = MinMaxCalcType::New();
+    typename MinMaxCalcType::Pointer minmax = MinMaxCalcType::New();
     minmax->SetImage( image );
     minmax->ComputeMinimum();
     minmax->ComputeMaximum();
@@ -57,7 +57,7 @@ public:
     mitk::DataTreeNode::Pointer node = NULL;
     mitk::DataTreeIteratorClone subTree = ((mitk::DataTree *) it->GetTree())->GetNext("name", new mitk::StringProperty( str.c_str() ));
 
-    if (subTree->IsAtEnd() || subTree->Get() == NULL)
+    if (subTree->IsAtEnd() || subTree->Get().IsNull() )
     {
       node=mitk::DataTreeNode::New();
       mitk::StringProperty::Pointer nameProp = new mitk::StringProperty(str.c_str());
@@ -141,7 +141,7 @@ public:
     mitk::DataTreeNode::Pointer node = NULL;
     mitk::DataTreeIteratorClone subTree = ((mitk::DataTree *) it->GetTree())->GetNext("name", new mitk::StringProperty( str.c_str() ));
 
-    if (subTree->IsAtEnd() || subTree->Get() == NULL )
+    if (subTree->IsAtEnd() || subTree->Get().IsNull() )
     {
       node=mitk::DataTreeNode::New();
       mitk::StringProperty::Pointer nameProp = new mitk::StringProperty(str.c_str());
@@ -181,7 +181,7 @@ public:
     mitk::DataTreeNode::Pointer node = NULL;
     mitk::DataTreeIteratorClone subTree = ((mitk::DataTree *) it->GetTree())->GetNext("name", new mitk::StringProperty( str.c_str() ));
 
-    if (subTree->IsAtEnd() || subTree->Get() == NULL)
+    if (subTree->IsAtEnd() || subTree->Get().IsNull() )
     {
       node=mitk::DataTreeNode::New();
       mitk::StringProperty::Pointer nameProp = new mitk::StringProperty(str.c_str());

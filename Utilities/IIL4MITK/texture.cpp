@@ -2,7 +2,7 @@
 #include "texture.h"
 
 _iilTexture::_iilTexture (iilWidget* aParent) 
-	: parent(aParent), _width (0), _height (0), _model (0), _internal (0), _valid (false), _interpolation (false), _red (1.0), _green (1.0), _blue (1.0), _alpha (1.0)
+  :  _width (0), _height (0), _model (0), _internal (0), _valid (false), _interpolation (false), _red (1.0), _green (1.0), _blue (1.0), _alpha (1.0),parent(aParent)
 {	
 	assert (parent);
 

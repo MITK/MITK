@@ -32,23 +32,8 @@
 
 #include "ipPic.h"
 
-/*
-char *ipPicQueryTagString( ipPicDescriptor *pic, char *tag )
-{
-  ipPicTSV_t *tsv;
-
-  tsv = ipPicQueryTag( pic, tag );
-
-  if( tsv == NULL )
-    return( NULL ); 
-  else if( tsv->type != ipPicASCII )
-    return( NULL ); 
-  else
-    return( tag->value );
-}
-*/
-
-ipPicTSV_t *ipPicQueryTag( ipPicDescriptor *pic, char *tag )
+ipPicTSV_t *
+ipPicQueryTag( ipPicDescriptor *pic, char *tag )
 {
   _ipPicTagsElement_t *found;
 
@@ -59,8 +44,21 @@ ipPicTSV_t *ipPicQueryTag( ipPicDescriptor *pic, char *tag )
   else
     return( found->tsv );
 }
+ipPicTSV_t *
+ipPicQuerySubTag( ipPicTSV_t *parent, char *tag )
+{
+  _ipPicTagsElement_t *found;
 
-_ipPicTagsElement_t *_ipPicFindTag( _ipPicTagsElement_t *head, char *tag )
+  found = _ipPicFindTag( parent->value, tag );
+
+  if( found == NULL )
+    return( NULL );
+  else
+    return( found->tsv );
+}
+
+_ipPicTagsElement_t *
+_ipPicFindTag( _ipPicTagsElement_t *head, char *tag )
 {
   int i;
   char name[_ipPicTAGLEN+1];

@@ -98,6 +98,8 @@ int main( int argc, char *argv[] )
 
   ipPicAddSubTag( tsv3, tsv2 );
 
+  printf( "%i\n", ipPicQuerySubTag( tsv3, "X1X2X32" ) );
+
   ipPicDelSubTag( tsv, "TYPE" );
 
   ipPicPut( argv[2],

@@ -2,6 +2,7 @@
 #define PROPERTYLIST_H_HEADER_INCLUDED_C1C77D8D
 
 #include "mitkCommon.h"
+#include <itkObjectFactory.h>
 #include "BaseProperty.h"
 #include <string>
 #include <map> 
@@ -11,39 +12,29 @@ namespace mitk {
 //##ModelId=3E031F200392
 class PropertyList : public itk::Object
 {
-   public:
-	/** Standard class typedefs. */
-    //##ModelId=3E38FF6A022F
-	typedef PropertyList             Self;
-    //##ModelId=3E38FF6A0261
-	typedef itk::Object              Superclass;
-    //##ModelId=3E38FF6A0289
-	typedef itk::SmartPointer<Self>  Pointer;
-    //##ModelId=3E38FF6A02B1
-	typedef itk::SmartPointer<const Self>  ConstPointer;
+public:
+    mitkClassMacro(PropertyList, itk::Object);
 
-	/** Method for creation through the object factory. */
-	itkNewMacro(Self);
+    /** Method for creation through the object factory. */
+    itkNewMacro(Self);
 
-	/** Run-time type information (and related methods). */
-	itkTypeMacro(PropertyList,itk::Object);
-  public:
+public:
     //##ModelId=3D6A0E9E0029
     mitk::BaseProperty* GetProperty(const char *propertyKey);
 
     //##ModelId=3D78B966005F
-	bool SetProperty(const char* propertyKey, BaseProperty* property);
-    
-  protected:
-	 //##ModelId=3E38FEFE0125
+    bool SetProperty(const char* propertyKey, BaseProperty* property);
+
+protected:
+    //##ModelId=3E38FEFE0125
     PropertyList();
 
 
     //##ModelId=3E38FEFE0157
     virtual ~PropertyList();
 
-	//##ModelId=3D6A0F0B00BC
-	std::map<std::string,BaseProperty::Pointer> properties;
+    //##ModelId=3D6A0F0B00BC
+    std::map<std::string,BaseProperty::Pointer> properties;
 };
 
 } // namespace mitk

@@ -9,12 +9,13 @@
 	#define MBI_STD
 	#include <iostream.h>
 	#include <fstream.h>
-#include "BaseRenderer.h"
 #else
 	#define MBI_STD std
 	#include <iostream>
 	#include <fstream>
 #endif
+
+#include "PropertyList.h"
 
 namespace mitk {
 
@@ -22,21 +23,10 @@ namespace mitk {
 //##Documentation
 //## Contains the data (instance of BaseData) and a list of mappers, which can
 //## draw the data.
-class DataTreeNode : public ImageSource
+class DataTreeNode : public BaseData
 {
 public:
-	/** Standard class typedefs. */
-	//##ModelId=3E1EB44101C3
-	typedef DataTreeNode       Self;
-	//##ModelId=3E1EB44101E1
-	typedef ImageSource        Superclass;
-	//##ModelId=3E1EB44101F5
-	typedef itk::SmartPointer<Self>  Pointer;
-	//##ModelId=3E1EB44101FF
-	typedef itk::SmartPointer<const Self>  ConstPointer;
-
-	/** Run-time type information (and related methods). */
-	itkTypeMacro(DataTreeNode,ImageSource);
+    mitkClassMacro(DataTreeNode,BaseData);
 
 	itkNewMacro(Self);  
 
@@ -53,7 +43,25 @@ public:
     mitk::DataTreeNode& operator=(BaseData* right);
     //##ModelId=3E69331903C9
     virtual void SetMapper(MapperSlotId id, mitk::Mapper* mapper);
+    //##ModelId=3E860A5C0032
+    virtual void UpdateOutputInformation();
 
+    //##ModelId=3E860A5E011B
+    virtual void SetRequestedRegionToLargestPossibleRegion();
+
+    //##ModelId=3E860A5F03D9
+    virtual bool RequestedRegionIsOutsideOfTheBufferedRegion();
+
+    //##ModelId=3E860A620080
+    virtual bool VerifyRequestedRegion();
+
+    //##ModelId=3E860A640156
+    virtual void SetRequestedRegion(itk::DataObject *data);
+
+    //##ModelId=3E860A6601DB
+    virtual void CopyInformation(const itk::DataObject *data);
+    //##ModelId=3E3FE0420273
+    mitk::PropertyList::Pointer GetPropertyList() const;
 
 protected:
     //##ModelId=3E33F5D702AA
@@ -67,14 +75,16 @@ protected:
     mutable mitk::Mapper::Pointer mappers[10];
 
 	//##ModelId=3E32C49D0095
-	BaseData* m_Data;
+    BaseData::Pointer m_Data;
+
+    //##ModelId=3E861B84033C
+    PropertyList::Pointer m_PropertyList;
 };
 
 
 MBI_STD::istream& operator>>( MBI_STD::istream& i, DataTreeNode::Pointer& at );
 
 MBI_STD::ostream& operator<<( MBI_STD::ostream& o, DataTreeNode::Pointer& t);
-
 
 } // namespace mitk
 

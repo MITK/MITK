@@ -8,7 +8,7 @@ mitk::Mapper* mitk::DataTreeNode::GetMapper(MapperSlotId id) const
 
    if (mappers[id] == NULL) {
 
-     mappers[id] = MapperFactory::CreateMapper(GetData(),id);
+     mappers[id] = MapperFactory::CreateMapper(const_cast<DataTreeNode*>(this),id);
 
    }
 
@@ -40,6 +40,8 @@ void mitk::DataTreeNode::SetData(mitk::BaseData* baseData)
 mitk::DataTreeNode::DataTreeNode() : m_Data(NULL)
 {
     memset(mappers, 0, sizeof(mappers)); 
+
+    m_PropertyList = PropertyList::New();
 }
 
 
@@ -82,6 +84,47 @@ void mitk::DataTreeNode::SetMapper(MapperSlotId id, mitk::Mapper* mapper)
     mappers[id] = mapper;
 
     if (mapper!=NULL)
-        mapper->SetInput(GetData());
+        mapper->SetInput(this);
+}
+
+//##ModelId=3E860A5C0032
+void mitk::DataTreeNode::UpdateOutputInformation()
+{
+	if (this->GetSource())
+	{
+		this->GetSource()->UpdateOutputInformation();
+	}
+}
+
+//##ModelId=3E860A5E011B
+void mitk::DataTreeNode::SetRequestedRegionToLargestPossibleRegion()
+{
+}
+
+//##ModelId=3E860A5F03D9
+bool mitk::DataTreeNode::RequestedRegionIsOutsideOfTheBufferedRegion()
+{
+    return false;
+}
+
+//##ModelId=3E860A620080
+bool mitk::DataTreeNode::VerifyRequestedRegion()
+{
+    return GetData()!=NULL;
+}
+
+//##ModelId=3E860A640156
+void mitk::DataTreeNode::SetRequestedRegion(itk::DataObject *data)
+{
+}
+
+//##ModelId=3E860A6601DB
+void mitk::DataTreeNode::CopyInformation(const itk::DataObject *data)
+{
+}
+//##ModelId=3E3FE0420273
+mitk::PropertyList::Pointer mitk::DataTreeNode::GetPropertyList() const
+{
+    return m_PropertyList;
 }
 

@@ -47,6 +47,12 @@ public:
   //##ModelId=3E691E0901DB
   mitkClassMacro(BaseRenderer, itk::Object);
 
+  //##Documentation
+  //## @brief MapperSlotId defines which kind of mapper (e.g., 2D or 3D) shoud be used.
+  typedef int MapperSlotId;
+
+  enum StandardMapperSlot{Standard2D=1, Standard3D=2};
+
   //##ModelId=3D6A1791038B
   //##Documentation
   //## @brief @a iterator defines which part of the data tree is traversed for renderering.

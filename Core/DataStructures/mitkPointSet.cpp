@@ -154,9 +154,6 @@ const int mitk::PointSet::GetNumberOfSelected()
 //##Documentation
 //## @brief executes the given Operation
 void mitk::PointSet::ExecuteOperation(Operation* operation)
-/*Notes
-	a new point is set to unselected. if it is to be selected, then define in StateMachine as a additional sideeffect
-*/
 {
 	mitk::PointOperation *pointOp = dynamic_cast<mitk::PointOperation *>(operation);
 	if (pointOp == NULL)

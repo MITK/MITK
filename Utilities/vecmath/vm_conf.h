@@ -62,7 +62,7 @@
  * uses std:: namespace for sqrt, atan2, ...
  * depends on whether system include files exports these raw names
  */
-//#define VM_USE_STD_NAMESPACE
+#define VM_USE_STD_NAMESPACE
 
 /*
  * uses exception mechanizm (not supported now)
@@ -80,7 +80,7 @@
  * ----------------------------------------------------------- */
  
 // gcc earlier than egcs1.1.2, doesn't support namespace
-#if !(2 <= __GNUC__ && 91 <= __GNUC_MINOR__)
+#if !((__GNUC__ >= 2 && __GNUC_MINOR__ >= 91)|| (__GNUC__ >= 3))
 #undef VM_INCLUDE_NAMESPACE
 #undef VM_USE_STD_NAMESPACE
 #endif
@@ -118,16 +118,15 @@
 #ifdef _MSC_VER
 #  define VM_MATH_STD
 #  define VM_STRING_STD VM_STD
-#  ifdef VM_USE_OLDIOSTREAM
-#    define VM_IOSTREAM_STD
-#  else
-#    define VM_IOSTREAM_STD VM_STD
-#  endif
 #else
 #  define VM_MATH_STD VM_STD
 #  define VM_STRING_STD VM_STD
-#  define VM_IOSTREAM_STD
 #endif
 
+#ifdef VM_USE_OLDIOSTREAM
+#  define VM_IOSTREAM_STD
+#else
+#  define VM_IOSTREAM_STD VM_STD
+#endif
 
 #endif /* VM_CONF_H */

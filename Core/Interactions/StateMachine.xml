@@ -140,6 +140,13 @@
 			</transition>
 		</state>
 	</stateMachine>
+	<stateMachine NAME="vesseltreeinteraction">
+		<state NAME="neutral" ID="1" START_STATE="TRUE">
+			<transition NAME="do picking" NEXT_STATE_ID="1" EVENT_ID="5">
+				<action ID="1600" />
+			</transition>
+		</state>
+	</stateMachine>
 	<stateMachine NAME="focus">
 		<state NAME="neutral" ID="1" START_STATE="TRUE">
 			<transition NAME="changefocus" NEXT_STATE_ID="1" EVENT_ID="1">

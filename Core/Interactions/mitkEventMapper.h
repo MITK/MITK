@@ -6,7 +6,7 @@
 #include "mitkEventDescription.h"
 #include "mitkStateEvent.h"
 #include "mitkStateMachine.h"
-#include <qxml.h>
+#include <vtkXMLParser.h> 
 #include <vector>
 #include <string>
 #include <map>
@@ -36,7 +36,7 @@ struct ltstr
 //## That way a fine an raw Undo is possible (fine for ObjectID by ObjectID, raw for GroupID for GroupID)
 //## Here the ObjectEventID gets increased, 
 //## not the GroupEventId(must get increased by a StateMachine, that has the information when a new Group of operation starts)
-class EventMapper : public QXmlDefaultHandler
+class EventMapper : public vtkXMLParser
 {
   public:
   //##ModelId=3F02F896006D
@@ -77,13 +77,21 @@ class EventMapper : public QXmlDefaultHandler
 	//##Documentation
 	//## reads a Tag from an XML-file
 	//## adds Events to m_EventDescription
-	bool startElement( const QString&, const QString&, const QString& qName, const QXmlAttributes& atts );
 
 	//##ModelId=3E7B20EE01F5
   std::string GetStyleName();
 
 
   private:
+
+  //##
+  void  StartElement (const char *elementName, const char **atts);
+
+  //##
+  std::string ReadXMLStringAttribut( std::string name, const char** atts);
+
+  //##
+  int ReadXMLIntegerAttribut( std::string name, const char** atts );
   //##Documentation
   //## @brief converts the strings given by the XML-Behaviour-File to int
   inline const int convertConstString2ConstInt(std::string input);
@@ -123,6 +131,11 @@ class EventMapper : public QXmlDefaultHandler
   static const std::string BUTTONSTATE;
   //##ModelId=3E785B1B01A9
 	static const std::string KEY;
+  //##
+  static const std::string EVENTS;
+
+  //##
+  static const std::string EVENT;
 };
 } // namespace mitk
 

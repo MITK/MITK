@@ -34,6 +34,10 @@ const std::string mitk::EventMapper::BUTTONSTATE = "BUTTONSTATE";
 //##ModelId=3E77572902C4
 const std::string mitk::EventMapper::KEY = "KEY";
 
+const std::string mitk::EventMapper::EVENTS = "events";
+
+const std::string mitk::EventMapper::EVENT = "event";
+
 mitk::StateMachine *mitk::EventMapper::m_GlobalStateMachine;
 
 mitk::EventMapper::EventDescriptionVec mitk::EventMapper::m_EventDescriptions;
@@ -41,6 +45,8 @@ mitk::EventMapper::EventDescriptionVec mitk::EventMapper::m_EventDescriptions;
 mitk::StateEvent mitk::EventMapper::m_StateEvent;
 
 std::string mitk::EventMapper::m_StyleName;
+
+
 
 struct ltstr
 {
@@ -161,7 +167,7 @@ mitk::EventMapper::EventMapper()
     m_EventConstMap["Key_Pause"] = 0x1008;
     m_EventConstMap["Key_Print"] = 0x1009;
     m_EventConstMap["Key_SysReq"] = 0x100a;
-	m_EventConstMap["Key_Home"] = 0x1010;
+	  m_EventConstMap["Key_Home"] = 0x1010;
     m_EventConstMap["Key_End"] = 0x1011;
     m_EventConstMap["Key_Left"] = 0x1012;
     m_EventConstMap["Key_Up"] = 0x1013;
@@ -271,8 +277,8 @@ mitk::EventMapper::EventMapper()
     m_EventConstMap["Key_L"] = 0x4c;
     m_EventConstMap["Key_M"] = 0x4d;
     m_EventConstMap["Key_N"] = 0x4e;
-	m_EventConstMap["Key_O"] = 0x4f;
-	m_EventConstMap["Key_P"] = 0x50;
+	  m_EventConstMap["Key_O"] = 0x4f;
+	  m_EventConstMap["Key_P"] = 0x50;
     m_EventConstMap["Key_Q"] = 0x51;
     m_EventConstMap["Key_R"] = 0x52;
     m_EventConstMap["Key_S"] = 0x53;
@@ -486,15 +492,15 @@ bool mitk::EventMapper::LoadBehavior(std::string fileName)
 	  if ( fileName.empty() )
        return false;
 
-   QFile xmlFile( fileName.c_str() );
-   if ( !xmlFile.exists() )
-       return false;
-
-   QXmlInputSource source( &xmlFile );
-   QXmlSimpleReader reader;
    mitk::EventMapper* eventMapper = new EventMapper();
-   reader.setContentHandler( eventMapper );
-   reader.parse( source );
+   eventMapper->SetFileName( fileName.c_str() );
+
+   if ( eventMapper->Parse() )    
+   {
+     #ifdef INTERDEBUG
+     itkWarningMakro( << "mitk::EventMapper::LoadBehavior xml file cannot parse!" );
+     #endif
+   }
 
    delete eventMapper;
    return true;
@@ -515,43 +521,68 @@ inline const int mitk::EventMapper::convertConstString2ConstInt(std::string inpu
   return -1;//for didn't find anything
 }
 
-//##ModelId=3E788FC00308
-//##Documentation
-//## @brief reads a Tag from an XML-file
 //##
-//## adds Events to m_EventDescription
-bool mitk::EventMapper::startElement( const QString&, const QString&, const QString& qName, const QXmlAttributes& atts )
-//different EventStyles doesn't work yet!
-//if needed(!): count all StyleNames found and init that amount of vectors with the Events in it.
+//##
+void  mitk::EventMapper::StartElement (const char *elementName, const char **atts) 
 {
-	//qName.ascii(); //for debuging
-	if( qName == "events")
-	{
-		m_StyleName = atts.value( STYLE.c_str() ).latin1();
-	}
-	else if ( qName == "event")
-	{
-		//new entry in list of EventDescriptions
-		bool ok = false;//for error at converting 16 to 10 system
-		EventDescription eventDescr(
-              convertConstString2ConstInt( atts.value( TYPE.c_str()).latin1()),
-			  convertConstString2ConstInt( atts.value( BUTTON.c_str()).latin1()),
-			  (( atts.value((QString)(BUTTONSTATE.c_str())) ).remove(0,2) ).toInt( &ok, 16 ),
-			  convertConstString2ConstInt( atts.value( KEY.c_str()).latin1()),
-			                               atts.value( NAME.c_str()).latin1(),
-			                               atts.value( ID.c_str()).toInt() );
 
-        if (!ok)
-        {
-            mitk::StatusBar::DisplayText("error reading Event::Button, ButtonState or Key!");
-        }
-        m_EventDescriptions.push_back(eventDescr);
-	}
-	return true;
+  if ( elementName == EVENT )
+  {
+
+    // EventDescription(int type, int button, int buttonState,int key, std::string name, int id)
+		EventDescription eventDescr( convertConstString2ConstInt( ReadXMLStringAttribut( TYPE, atts )),
+			                           convertConstString2ConstInt( ReadXMLStringAttribut( BUTTON, atts )),
+			                           ReadXMLIntegerAttribut( BUTTONSTATE, atts ),
+			                           convertConstString2ConstInt( ReadXMLStringAttribut( KEY, atts )),
+			                           ReadXMLStringAttribut( NAME, atts ),
+			                           ReadXMLIntegerAttribut( ID, atts ));
+
+     m_EventDescriptions.push_back(eventDescr);  
+  }
+  else if ( elementName == EVENTS )
+    m_StyleName = ReadXMLStringAttribut( STYLE, atts ); 
+
 }
 
 //##ModelId=3E7B20EE01F5
 std::string mitk::EventMapper::GetStyleName()
 {
 	return m_StyleName;
+}
+
+//##
+std::string mitk::EventMapper::ReadXMLStringAttribut( std::string name, const char** atts )
+{
+  if(atts)
+    {
+     const char** attsIter = atts;  
+
+     while(*attsIter) 
+     {     
+       if ( name == *attsIter )
+       {
+        attsIter++;      
+        return *attsIter;
+       }
+      attsIter++;
+      attsIter++;
+     }
+    }
+
+    return std::string();
+}
+
+//##
+int mitk::EventMapper::ReadXMLIntegerAttribut( std::string name, const char** atts )
+{
+  std::string s = ReadXMLStringAttribut( name, atts );
+  static const std::string hex = "0x"; 
+  int result;
+
+  if ( s[0] == hex[0] && s[1] == hex[1] )
+    result = strtol( s.c_str(), NULL, 16 );
+  else 
+    result = atoi( s.c_str() );
+
+  return result;
 }

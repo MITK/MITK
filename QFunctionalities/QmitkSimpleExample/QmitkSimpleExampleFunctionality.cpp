@@ -92,7 +92,7 @@ void QmitkSimpleExampleFunctionality::activated()
 {
     assert( multiWidget != NULL );
     // init widget 4 as a 3D widget
-    //multiWidget->mitkWidget4->GetRenderer()->SetMapperID(2);
+    multiWidget->mitkWidget4->GetRenderer()->SetMapperID(2);
 }
 
 //void QmitkSimpleExampleFunctionality::deactivated()
@@ -278,7 +278,7 @@ void QmitkSimpleExampleFunctionality::ExecuteOperation(mitk::Operation* operatio
         if(execId<1200) //move
         {
             renderer->GetDisplayGeometry()->MoveBy(dcOperation->GetLastToCurrentDisplayVector()*(-1.0));
-            renderer->GetRenderWindow()->update();
+            renderer->GetRenderWindow()->Update();
         }
         else
         if(execId<1300) //zoom
@@ -287,7 +287,7 @@ void QmitkSimpleExampleFunctionality::ExecuteOperation(mitk::Operation* operatio
             distance = (distance > 0 ? 1 : (distance < 0 ? -1 : 0));
             float factor= 1.0 + distance * 0.05;;
             renderer->GetDisplayGeometry()->Zoom(factor, dcOperation->GetStartDisplayCoordinate());
-            renderer->GetRenderWindow()->update();
+            renderer->GetRenderWindow()->Update();
         }
         else
             return;

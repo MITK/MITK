@@ -21,28 +21,29 @@ typedef itk::RGBPixel< float > Color;
 class ColorProperty : public BaseProperty
 {
 protected:
-    //##ModelId=3E86A3B00061
-    mitk::Color m_Color;
+  //##ModelId=3E86A3B00061
+  mitk::Color m_Color;
 public:
-    mitkClassMacro(ColorProperty, BaseProperty);
-
-
-    //##ModelId=3E86A3450130
-    ColorProperty(const float color[3]);
-
-    //##ModelId=3ED9530801BD
-    ColorProperty(const mitk::Color & color);
-
-    //##ModelId=3E86A345014E
-    virtual ~ColorProperty();
-
-    //##ModelId=3E86A35F000B
-    virtual bool operator==(const BaseProperty& property) const;
-
-    //##ModelId=3E86AABB0371
-    const mitk::Color & GetColor() const;
-    //##ModelId=3E86AABB0399
-    void SetColor(const mitk::Color & color );
+  mitkClassMacro(ColorProperty, BaseProperty);
+  
+  ColorProperty(const float red, const float green, const float blue);
+  
+  //##ModelId=3E86A3450130
+  ColorProperty(const float color[3]);
+  
+  //##ModelId=3ED9530801BD
+  ColorProperty(const mitk::Color & color);
+  
+  //##ModelId=3E86A345014E
+  virtual ~ColorProperty();
+  
+  //##ModelId=3E86A35F000B
+  virtual bool operator==(const BaseProperty& property) const;
+  
+  //##ModelId=3E86AABB0371
+  const mitk::Color & GetColor() const;
+  //##ModelId=3E86AABB0399
+  void SetColor(const mitk::Color & color );
 };
 
 } // namespace mitk

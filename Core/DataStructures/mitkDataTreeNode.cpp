@@ -251,6 +251,22 @@ bool mitk::DataTreeNode::IsVisible(mitk::BaseRenderer* renderer, const char* nam
     return visible;
 }
 
+void mitk::DataTreeNode::SetColor(const mitk::Color &color, mitk::BaseRenderer* renderer, const char* name)
+{
+    mitk::ColorProperty::Pointer prop;
+    prop = new mitk::ColorProperty(color);
+    GetPropertyList(renderer)->SetProperty(name, prop);
+}
+
+void mitk::DataTreeNode::SetColor(float red, float green, float blue, mitk::BaseRenderer* renderer, const char* name)
+{
+  float color[3];
+  color[0]=red;
+  color[1]=green;
+  color[2]=blue;
+  SetColor(color, renderer, name);
+}
+
 //##ModelId=3EF196360303
 void mitk::DataTreeNode::SetColor(const float rgb[3], mitk::BaseRenderer* renderer, const char* name)
 {

@@ -20,6 +20,7 @@
 
 #include <map>
 #include "LevelWindow.h"
+#include "mitkColorProperty.h"
 
 class vtkTransform;
 
@@ -157,6 +158,14 @@ public:
     //## @sa GetVisibility
     bool IsVisible(mitk::BaseRenderer* renderer, const char* name = "visible") const;
 
+    //##Documentation
+    //## @brief Convenience method for setting color properties (instances of
+    //## ColorProperty)
+    void SetColor(const mitk::Color &color, mitk::BaseRenderer* renderer = NULL, const char* name = "color");
+    //##Documentation
+    //## @brief Convenience method for setting color properties (instances of
+    //## ColorProperty)
+    void SetColor(float red, float green, float blue, mitk::BaseRenderer* renderer = NULL, const char* name = "color");
     //##ModelId=3EF196360303
     //##Documentation
     //## @brief Convenience method for setting color properties (instances of

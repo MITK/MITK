@@ -6,6 +6,12 @@ mitk::ColorProperty::ColorProperty(const float color[3]) : m_Color(color)
 
 }
 
+//##ModelId=3E86A3450130
+mitk::ColorProperty::ColorProperty(const float red, const float green, const float blue)
+{
+  m_Color.Set(red, green, blue);
+}
+
 //##ModelId=3E86AABB030D
 mitk::ColorProperty::ColorProperty(const mitk::Color & color) : m_Color(color)
 {

@@ -1,0 +1,13 @@
+/**
+
+\page KnownProblemsPage Known Problems
+
+@bug (1) do something in 2D-widget (2) do something in 3D widget (3) try to zoom or pan in the same 
+2D-widget as in (1), it won't work, although all messages come through and Render is called. Seems to be 
+a OpenGL-context problem. It will work, if in (3) another 2D widget is used
+
+@bug switching to QmitkRegistration sometimes takes a long time, probably because of a resize of an 
+invisible OpenGL widget.
+
+ 
+*/

@@ -2,59 +2,73 @@
 #define FILEREADER_H_HEADER_INCLUDED_C1E7E521
 
 #include "mitkCommon.h"
-#include "Reader.h"
 
 namespace mitk {
 
 //##ModelId=3E186F28009B
 //##Documentation
-//## @brief Base class of readers that read from files
+//## @brief Interface class of readers that read from files
 //## @ingroup Process
-class FileReader : public Reader
+class FileReader
 {
-  protected:
+  public:
+    //##ModelId=3EF4A7BC0213
+    //##Documentation
+    //## @brief Get the specified the file to load.
+    //## 
+    //## Either the FileName or FilePrefix plus FilePattern are used to read.
+    virtual const char* GetFileName() const = 0;
+
+    //##ModelId=3EF4A7F70240
+    //##Documentation
+    //## @brief Specify the file to load.
+    //## 
+    //## Either the FileName or FilePrefix plus FilePattern are used to read.
+    virtual void SetFileName(const char* aFileName) = 0;
+
+    //##ModelId=3EF4A81800E9
+    //##Documentation
+    //## @brief Get the specified file prefix for the file(s) to load. 
+    //## 
+    //## You should specify either a FileName or FilePrefix. Use FilePrefix if
+    //## the data is stored in multiple files.
+    virtual const char* GetFilePrefix() const = 0;
+
+    //##ModelId=3EF4A826037E
+    //##Documentation
+    //## @brief Specify file prefix for the file(s) to load.
+    //## 
+    //## You should specify either a FileName or FilePrefix. Use FilePrefix if
+    //## the data is stored in multiple files.
+    virtual void SetFilePrefix(const char* aFilePrefix) = 0;
+
+    //##ModelId=3EF4A81E0305
+    //##Documentation
+    //## @brief Get the specified file pattern for the file(s) to load. The
+    //## sprintf format used to build filename from FilePrefix and number.
+    //## 
+    //## You should specify either a FileName or FilePrefix. Use FilePrefix if
+    //## the data is stored in multiple files.
+    virtual const char* GetFilePattern() const = 0;
+
+    //##ModelId=3EF4A84E03B8
+    //##Documentation
+    //## @brief Specified file pattern for the file(s) to load. The sprintf
+    //## format used to build filename from FilePrefix and number.
+    //## 
+    //## You should specify either a FileName or FilePrefix. Use FilePrefix if
+    //## the data is stored in multiple files.
+    virtual void SetFilePattern(const char* aFilePattern) = 0;
+
+protected:
     //##ModelId=3E188F1F027E
     FileReader();
 
-  
     //##ModelId=3E188F2800DC
     ~FileReader();
+public:
 
-  public:
-          
-  mitkClassMacro(FileReader, Reader);
-  
-  /** Method for creation through the object factory. */
-  itkNewMacro(Self);
-
-  /** Specify the file to load. This is forwarded to the IO instance. 
-   * Either the FileName or FilePrefix plus pattern are used to read
-   * files. */
-  itkSetStringMacro(FileName);
-  itkGetStringMacro(FileName);
-  
-  /** Specify file prefix for the image file(s). You should specify either
-   * a FileName or FilePrefix. Use FilePrefix if the data is stored
-   * in multiple files. */
-  itkSetStringMacro(FilePrefix);
-  itkGetStringMacro(FilePrefix);
-  
-  /** The sprintf format used to build filename from FilePrefix and number. */
-  itkSetStringMacro(FilePattern);
-  itkGetStringMacro(FilePattern);
-  
 protected:
-    //##ModelId=3E186FC80253
-  std::string m_FileName;
-    //##ModelId=3E1873B3030A
-  std::string m_FilePrefix;
-    //##ModelId=3E1873B30346
-  std::string m_FilePattern;
-
 };
-
 } // namespace mitk
-
-
-
 #endif /* FILEREADER_H_HEADER_INCLUDED_C1E7E521 */

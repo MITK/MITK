@@ -169,6 +169,7 @@ void mitk::PicFileReader::GenerateData()
 
 //##ModelId=3E1874D202D0
 mitk::PicFileReader::PicFileReader()
+    : m_FileName(""), m_FilePrefix(""), m_FilePattern("")
 {
 }
 

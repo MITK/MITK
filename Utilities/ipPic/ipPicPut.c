@@ -6,7 +6,10 @@
  *   writes a PicFile to disk
  *
  * $Log$
- * Revision 1.6  1998/09/04 17:45:54  andre
+ * Revision 1.7  1999/01/07 15:24:30  andre
+ * *** empty log message ***
+ *
+ * Revision 1.6  1998/09/04  17:45:54  andre
  * *** empty log message ***
  *
  * Revision 1.5  1998/05/06  14:13:15  andre
@@ -89,10 +92,13 @@ ipPicPut( char *outfile_name, ipPicDescriptor *pic )
   _ipPicWriteTags( pic->info->tags_head, outfile, ipPicEncryptionType(pic) );
 
   pic->info->pixel_start_in_file = ftell( outfile );
-  if( pic->type == ipPicNonUniform )
-    fwrite( pic->data, pic->bpe / 8, _ipPicElements(pic), outfile );
-  else
-    ipFWriteLE( pic->data, pic->bpe / 8, _ipPicElements(pic), outfile );
+  if( pic->data )
+    {
+      if( pic->type == ipPicNonUniform )
+        fwrite( pic->data, pic->bpe / 8, _ipPicElements(pic), outfile );
+      else
+        ipFWriteLE( pic->data, pic->bpe / 8, _ipPicElements(pic), outfile );
+    }
 
   if( outfile != stdout )
     fclose( outfile );

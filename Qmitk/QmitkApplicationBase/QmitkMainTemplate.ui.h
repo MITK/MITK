@@ -475,7 +475,7 @@ void QmitkMainTemplate::fileSaveAs()
 		if(node->GetData()!=NULL)
 		{
 			mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
-			if(image!=NULL)
+      if( image.IsNotNull() )
 			{
 				QString fileName = QFileDialog::getSaveFileName(NULL,"pvtk (*.pvtk)");
 				if ( !fileName.isNull() )
@@ -489,7 +489,7 @@ void QmitkMainTemplate::fileSaveAs()
 				}
 			}
 			mitk::SurfaceData::Pointer surface = dynamic_cast<mitk::SurfaceData*>(node->GetData());
-			if(image!=NULL)
+      if( image.IsNotNull() )
 			{
 				QString fileName = QFileDialog::getSaveFileName(NULL,"stl (*.stl);;vtk (*.vtk)");
 				if ( !fileName.isNull() )
@@ -627,8 +627,8 @@ void QmitkMainTemplate::init()
     tree=mitk::DataTree::New();
     tree->Register(); //FIXME: da DataTreeIterator keinen Smartpointer auf DataTree hält, wird tree sonst gelöscht.
     //create root of data tree (empty)
-    mitk::DataTreeNode::Pointer node=mitk::DataTreeNode::New();
-    tree->setRoot(node);     
+    //mitk::DataTreeNode::Pointer node=mitk::DataTreeNode::New();
+    //tree->setRoot(node);     
 }
 
 /*!
@@ -736,7 +736,7 @@ void QmitkMainTemplate::initWidgets( mitk::DataTreeIterator * it )
 			}
 			else
 				geometryMapper = dynamic_cast<mitk::Geometry2DDataVtkMapper3D*>(git->get()->GetMapper(2));
-			if(geometryMapper!=NULL)
+			if(geometryMapper.IsNotNull())
 				geometryMapper->SetDataIteratorForTexture(it);
 		}
 	}
@@ -814,7 +814,7 @@ void QmitkMainTemplate::changeLevelWindow(mitk::LevelWindow* lw )
         it->next();
 	
 		mitk::LevelWindowProperty::Pointer levWinProp = dynamic_cast<mitk::LevelWindowProperty*>(it->get()->GetPropertyList()->GetProperty("levelwindow").GetPointer());
-		if(levWinProp!=NULL) 
+    if( levWinProp.IsNotNull() ) 
         {
 			mitk::LevelWindow levWin = levWinProp->GetLevelWindow();
 
@@ -830,6 +830,8 @@ void QmitkMainTemplate::changeLevelWindow(mitk::LevelWindow* lw )
 	delete it;
   mitkMultiWidget->updateMitkWidgets();
 }
+
+
 mitk::DataTree::Pointer QmitkMainTemplate::GetTree() {
-    return tree;   
+    return tree;
 }

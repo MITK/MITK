@@ -34,8 +34,8 @@ public:
   typedef enum SMMode
   {
     DESELECTED = 0,
-    SELECTED,
-    SUBSELECTED
+    SELECTED = 1,
+    SUBSELECTED = 2
   };
 
   mitkClassMacro(Interactor,StateMachine);

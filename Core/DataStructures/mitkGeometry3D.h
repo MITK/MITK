@@ -229,6 +229,12 @@ public:
   void TransferVtkToITKTransform();
 
   //##Documentation
+  //## @brief Calculates a bounding-box around the geometry relative 
+  //## to a coordinate system defined by a transform
+  //##
+  mitk::BoundingBox::Pointer CalculateBoundingBoxRelativeToTransform(const mitk::AffineTransform3D* transform);
+
+  //##Documentation
   //## @brief clones the geometry
   //##
   //## Overwrite in all sub-classes.

@@ -191,6 +191,23 @@ vtkTransform* mitk::Geometry3D::GetVtkTransform()
   return m_VtkIndexToWorldTransform;
 }
 
+mitk::BoundingBox::Pointer mitk::Geometry3D::CalculateBoundingBoxRelativeToTransform(const mitk::AffineTransform3D* transform)
+{
+  mitk::BoundingBox::PointsContainer::Pointer pointscontainer=mitk::BoundingBox::PointsContainer::New();
+
+  mitk::BoundingBox::PointIdentifier pointid=0;
+
+  unsigned char i;
+  for(i=0; i<8; ++i)
+    pointscontainer->InsertElement( pointid++, transform->BackTransformPoint( GetCornerPoint(i) ));
+
+  mitk::BoundingBox::Pointer result = mitk::BoundingBox::New();
+  result->SetPoints(pointscontainer);
+  result->ComputeBoundingBox();
+
+  return result;
+}
+
 void mitk::Geometry3D::ExecuteOperation(Operation* operation)
 {  
   switch (operation->GetOperationType())

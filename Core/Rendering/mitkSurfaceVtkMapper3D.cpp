@@ -25,6 +25,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkActor.h>
 #include <vtkProperty.h>
 #include <vtkPolyDataMapper.h>
+#include <vtkPolyDataNormals.h>
 
 
 //##ModelId=3E70F60301D5
@@ -52,18 +53,22 @@ void mitk::SurfaceVtkMapper3D::GenerateOutputInformation()
 mitk::SurfaceVtkMapper3D::SurfaceVtkMapper3D()
 {
   m_VtkPolyDataMapper = vtkPolyDataMapper::New();
+  m_VtkPolyDataNormals = vtkPolyDataNormals::New();
 
   m_Actor = vtkActor::New();
   m_Actor->SetMapper(m_VtkPolyDataMapper);
 
   m_Prop3D = m_Actor;
   m_Prop3D->Register(NULL);
+
+  m_GenerateNormals = false;
 }
 
 //##ModelId=3E70F60301F5
 mitk::SurfaceVtkMapper3D::~SurfaceVtkMapper3D()
 {
   m_VtkPolyDataMapper->Delete();
+  m_VtkPolyDataNormals->Delete();
   m_Actor->Delete();
 }
 
@@ -106,7 +111,16 @@ void mitk::SurfaceVtkMapper3D::Update(mitk::BaseRenderer* renderer)
   //
   // set the input-object at time t for the mapper
   //
-  m_VtkPolyDataMapper->SetInput( input->GetVtkPolyData( timestep ) );
+
+  if ( m_GenerateNormals )
+  {
+    m_VtkPolyDataNormals->SetInput( input->GetVtkPolyData( timestep ) );
+    m_VtkPolyDataMapper->SetInput( m_VtkPolyDataNormals->GetOutput() );
+  }
+  else
+  {
+    m_VtkPolyDataMapper->SetInput( input->GetVtkPolyData( timestep ) );
+  }
 
   //
   // apply properties read from the PropertyList
@@ -150,6 +164,9 @@ void mitk::SurfaceVtkMapper3D::ApplyProperties(vtkActor* actor, mitk::BaseRender
   {
     m_VtkPolyDataMapper->SetScalarMode(scalarMode);
     m_VtkPolyDataMapper->ScalarVisibilityOn();
+    m_Actor->GetProperty()->SetSpecular (1);
+    m_Actor->GetProperty()->SetSpecularPower (50);
+    //m_Actor->GetProperty()->SetInterpolationToPhong();
   }
 
   mitk::LookupTableProperty::Pointer lookupTableProp;

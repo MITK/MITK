@@ -27,6 +27,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 class vtkActor;
 class vtkPolyDataMapper;
+class vtkPolyDataNormals;
 
 namespace mitk {
 
@@ -41,6 +42,10 @@ public:
   mitkClassMacro(SurfaceVtkMapper3D, BaseVtkMapper3D);
 
   itkNewMacro(Self);
+
+  itkSetMacro(GenerateNormals, bool);
+
+  itkGetMacro(GenerateNormals, bool);
 
   //##ModelId=3E70F60301D5
   virtual const mitk::Surface* GetInput();
@@ -66,11 +71,15 @@ protected:
   //##ModelId=3E70F60301F5
   virtual ~SurfaceVtkMapper3D();
 
+  bool m_GenerateNormals;
+
   //##ModelId=3E70F60301C9
   vtkActor* m_Actor;
 
   //##ModelId=3E70F60301CA
   vtkPolyDataMapper* m_VtkPolyDataMapper;
+
+  vtkPolyDataNormals* m_VtkPolyDataNormals;
 };
 
 } // namespace mitk

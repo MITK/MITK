@@ -37,6 +37,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkDataTreeNodeFactory.h>
 #include <mitkImageToItkMultiplexer.h>
 #include <mitkDataTree.h>
+#include <mitkPicFileReader.h>
 
 #include <qfiledialog.h>
 #include "ipPic.h"
@@ -407,7 +408,8 @@ static mitk::DataTreeNode::Pointer FileOpen()
         else
         {
           ipPicDescriptor * picImage = image->GetPic();
-          picImage = ipFuncRefl(picImage,3);
+          picImage = ipPicClone(picImage);
+          mitk::PicFileReader::ConvertHandedness(picImage);
           //set tag "REAL PIXEL SIZE"
           mitk::SlicedGeometry3D* slicedGeometry = image->GetSlicedGeometry();
           if (slicedGeometry != NULL)
@@ -431,6 +433,7 @@ static mitk::DataTreeNode::Pointer FileOpen()
             ((float*)pixelSizeTag->value)[2] = spacing[2];       
           }
           ipPicPut((char*)(fileName.ascii()), picImage);
+          ipPicFree(picImage);
         }
       }
       catch ( itk::ExceptionObject &err)

@@ -66,6 +66,11 @@ int mitkContourTest(int argc, char* argv[])
       return EXIT_FAILURE;      
     };
   
+  mitk::Contour::PathPointer path =  contour->GetContourPath();
+  if ( path.IsNull() )
+    {
+    return EXIT_FAILURE;
+    }
 
   std::cout<<"[TEST DONE]"<<std::endl;
   return EXIT_SUCCESS;

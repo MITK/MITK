@@ -8,7 +8,7 @@ void mitk::BaseRenderer::SetData(mitk::DataTreeIterator* iterator)
 }
 
 //##ModelId=3E3314720003
-mitk::BaseRenderer::SetWindowId(void *id)
+void mitk::BaseRenderer::SetWindowId(void *id)
 {
 }
 

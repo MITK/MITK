@@ -112,10 +112,10 @@ mitk::Geometry3D::Geometry3D(const mitk::Geometry3D& right) : m_Dimensions(NULL)
 }
 
 //##ModelId=3E3452F10393
-mitk::Geometry3D& mitk::Geometry3D::operator=(const mitk::Geometry3D& right)
-{
-    return Geometry3D(right);
-}
+// mitk::Geometry3D& mitk::Geometry3D::operator=(const mitk::Geometry3D& right)
+// {
+//     return Geometry3D(right);
+// }
 
 //##ModelId=3E3456C50067
 mitk::Geometry3D::~Geometry3D()

@@ -28,13 +28,13 @@ class BaseRenderer : public itk::Object
     virtual void SetData(mitk::DataTreeIterator* iterator);
 
     //##ModelId=3E330B930328
-    virtual Update() = 0;
+    virtual void Update() = 0;
 
     //##ModelId=3E330B9C02F9
-    virtual Render() = 0;
+    virtual void Render() = 0;
 
     //##ModelId=3E3314720003
-    virtual SetWindowId(void *id);
+    virtual void SetWindowId(void *id);
 
     //##ModelId=3E330C4D0395
     static const MapperSlotId defaultMapper;

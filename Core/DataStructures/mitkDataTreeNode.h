@@ -41,7 +41,7 @@ public:
 	//##ModelId=3E32C49D00A8
 	BaseData* GetData() const;
     //##ModelId=3E33F4E4025B
-    virtual SetData(mitk::BaseData* baseData);
+    virtual void SetData(mitk::BaseData* baseData);
     //##ModelId=3E33F5D7032D
     mitk::DataTreeNode& operator=(const DataTreeNode& right);
 

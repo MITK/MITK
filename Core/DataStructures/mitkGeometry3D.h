@@ -113,7 +113,7 @@ class Geometry3D : public itk::LightObject
     Geometry3D(const mitk::Geometry3D& right);
 
     //##ModelId=3E3452F10393
-    mitk::Geometry3D& operator=(const mitk::Geometry3D& right);
+  //    mitk::Geometry3D& operator=(const mitk::Geometry3D& right);
     //##ModelId=3E3456C50067
     virtual ~Geometry3D();
 

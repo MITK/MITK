@@ -31,7 +31,7 @@ mitk::BaseData* mitk::DataTreeNode::GetData() const
 
 
 //##ModelId=3E33F4E4025B
-mitk::DataTreeNode::SetData(mitk::BaseData* baseData)
+void mitk::DataTreeNode::SetData(mitk::BaseData* baseData)
 {
     m_Data=baseData;
 }

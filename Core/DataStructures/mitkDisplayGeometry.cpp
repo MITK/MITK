@@ -241,7 +241,7 @@ double mitk::DisplayGeometry::GetTime() const
 }
 
 //##ModelId=3E3AE91A035E
-mitk::DisplayGeometry::DisplayGeometry() : Geometry2D(10.0, 10.0), m_OriginInUnits(0,0), 
+mitk::DisplayGeometry::DisplayGeometry() : Geometry2D(10, 10), m_OriginInUnits(0,0), 
     m_ScaleFactorUnitsPerDisplayUnit(1.0), m_SizeInDisplayUnits(10,10), m_WorldGeometry(NULL)
 {
 }
@@ -300,11 +300,11 @@ void mitk::DisplayGeometry::Fit()
     float   x,y,w,h;
 
     int width, height;
+// @FIXME: try to remove all the casts
 
-    width=m_SizeInDisplayUnits.x;
-    height=m_SizeInDisplayUnits.y;
+    width=(int)m_SizeInDisplayUnits.x;
+    height=(int)m_SizeInDisplayUnits.y;
 
-// @FIXME: "silly assignment" (IDEA)
 	w = width;
 	h = height;
 
@@ -340,13 +340,15 @@ mitk::Point2D mitk::DisplayGeometry::GetOriginInDisplayUnits() const
 //##ModelId=3E3C666E0299
 unsigned int mitk::DisplayGeometry::GetDisplayWidth() const
 {
-    return m_SizeInDisplayUnits.x;
+  assert(m_SizeInDisplayUnits.x >= 0);  
+  return (unsigned int)m_SizeInDisplayUnits.x;
 }
 
 //##ModelId=3E3C668B0363
 unsigned int mitk::DisplayGeometry::GetDisplayHeight() const
 {
-    return m_SizeInDisplayUnits.y;
+  assert(m_SizeInDisplayUnits.y >= 0);  
+  return (unsigned int)m_SizeInDisplayUnits.y;
 }
 
 //##ModelId=3E3D86CB0039

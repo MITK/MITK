@@ -2,7 +2,7 @@
 #include <vtkTransform.h>
 
 //##ModelId=3E395F22035A
-mitk::PlaneGeometry::PlaneGeometry() : Geometry2D(10.0, 10.0), m_ScaleFactorMMPerUnitX(1.0), 
+mitk::PlaneGeometry::PlaneGeometry() : Geometry2D(10, 10), m_ScaleFactorMMPerUnitX(1.0), 
    m_ScaleFactorMMPerUnitY(1.0)
 {
 }
@@ -24,8 +24,8 @@ void mitk::PlaneGeometry::SetPlaneView(const mitk::PlaneView& aPlaneView)
 {
     m_PlaneView=aPlaneView;
 
-    m_WidthInUnits = m_PlaneView.getOrientation1().length();
-    m_HeightInUnits = m_PlaneView.getOrientation2().length();
+    m_WidthInUnits = (unsigned int)m_PlaneView.getOrientation1().length();
+    m_HeightInUnits = (unsigned int)m_PlaneView.getOrientation2().length();
 
     m_ScaleFactorMMPerUnitX=m_PlaneView.getOrientation1().length()/m_WidthInUnits;
     m_ScaleFactorMMPerUnitY=m_PlaneView.getOrientation2().length()/m_HeightInUnits;

@@ -3,7 +3,7 @@
 
 #include "mitkCommon.h"
 #include "ImageSource.h"
-
+#include "Mapper.h"
 namespace mitk {
 
 class Mapper;
@@ -28,12 +28,14 @@ class DataTreeNode : public ImageSource
     itkNewMacro(Self);  
 
 	//##ModelId=3D6A0E8C02CC
-    mitk::Mapper* GetMapper();
+    mitk::Mapper* GetMapper(MapperSlotId id);
+    BaseData* GetData();
 
   protected:
+    //TODO: change to stl-vector
     //##ModelId=3D6A0F8C0202
-	  mitk::Mapper* mappers;
-
+	  mitk::Mapper* mappers[10];
+  BaseData* data;
 };
 
 } // namespace mitk

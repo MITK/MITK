@@ -4,6 +4,8 @@
 #include "mitkCommon.h"
 #include "BaseVtkMapper3D.h"
 #include "mitkGeometry2DData.h"
+#include "DataTree.h"
+#include "ImageSliceSelector.h"
 
 class vtkActor;
 class vtkTexture;
@@ -11,6 +13,7 @@ class vtkPlaneSource;
 class vtkImageMapToWindowLevelColors;
 class vtkPolyData;
 class vtkPolyDataMapper;
+class vtkLookupTable;
 
 namespace mitk {
 
@@ -41,6 +44,8 @@ class Geometry2DDataVtkMapper3D : public BaseVtkMapper3D
   
     //##ModelId=3E691E09038C
     virtual void GenerateData();
+    //##ModelId=3E6E874F0007
+    virtual void SetDataIteratorForTexture(mitk::DataTreeIterator* iterator);
 
   protected:
     //##ModelId=3E691E09038E
@@ -67,8 +72,17 @@ class Geometry2DDataVtkMapper3D : public BaseVtkMapper3D
     //##ModelId=3E691E090362
     vtkPlaneSource* m_VtkPlaneSource;
 
+    //##ModelId=3E6E8AA4034C
+    vtkLookupTable *lut;
+
     //##ModelId=3E691E090363
     vtkImageMapToWindowLevelColors* m_LevelWindowFilter;
+    
+    //##ModelId=3E6E8AA40375
+    mitk::DataTreeIterator* m_DataTreeIterator;
+
+    //##ModelId=3E6E912903B1
+    mitk::ImageSliceSelector::Pointer m_SliceSelector;
 };
 
 } // namespace mitk

@@ -538,14 +538,14 @@ void mitk::Image::ComputeOffsetTable()
 int mitk::Image::GetSliceIndex(int s, int t, int n) const
 {
 	if(IsValidSlice(s,t,n)==false) return false;
-	return s+t*m_Dimensions[3]+n*m_ChannelNumber; //??
+	return s+t*m_Dimensions[2]+n*m_Dimensions[3]*m_Dimensions[2]; //??
 }
 
 //##ModelId=3E155C76012D
 int mitk::Image::GetVolumeIndex(int t, int n) const
 {
 	if(IsValidVolume(t,n)==false) return false;
-	return t+n*m_ChannelNumber; //??
+	return t+n*m_Dimensions[3]; //??
 }
 
 //##ModelId=3E1569310328

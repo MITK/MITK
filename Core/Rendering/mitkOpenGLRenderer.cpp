@@ -157,15 +157,15 @@ void mitk::OpenGLRenderer::Render()
                 if(mapper2d!=NULL) {
                     mapper2d->Paint(this);
                 }
+                else
+                if(dynamic_cast<BaseVtkMapper2D*>(mapper.GetPointer()) || dynamic_cast<BaseVtkMapper3D*>(mapper.GetPointer()))
+                    m_VtkMapperPresent=true;
             }
-            else
-            if(dynamic_cast<BaseVtkMapper2D*>(mapper.GetPointer()) || dynamic_cast<BaseVtkMapper3D*>(mapper.GetPointer()))
-                m_VtkMapperPresent=true;
         }
 
         delete it;
 
-       // if(m_VtkMapperPresent)
+        if(m_VtkMapperPresent)
             m_MitkVtkRenderWindow->MitkRender();
 }
 

@@ -2,6 +2,9 @@
 
 #include "PlaneGeometry.h"
 
+#include "DataTree.h"
+#include "ImageMapper2D.h"
+
 #include "vtkActor.h";
 #include "vtkTexture.h";
 #include "vtkPlaneSource.h"
@@ -15,18 +18,25 @@ vtkProp* mitk::Geometry2DDataVtkMapper3D::GetProp()
 }
 
 //##ModelId=3E691E09038E
-mitk::Geometry2DDataVtkMapper3D::Geometry2DDataVtkMapper3D()
+mitk::Geometry2DDataVtkMapper3D::Geometry2DDataVtkMapper3D() : m_DataTreeIterator(NULL)
 {
     m_Actor = vtkActor::New();
     m_VtkTexture = vtkTexture::New();
     m_VtkPlaneSource = vtkPlaneSource::New();
     m_VtkPolyDataMapper = vtkPolyDataMapper::New();
+    m_SliceSelector = mitk::ImageSliceSelector::New();
 
     m_VtkPolyDataMapper->SetInput(m_VtkPlaneSource->GetOutput());
     m_VtkPolyDataMapper->ImmediateModeRenderingOn();
 
     m_Actor->SetMapper(m_VtkPolyDataMapper);
-//    m_Actor->SetTexture(axialTexture);
+    m_Actor->GetProperty()->SetOpacity(1.0);
+
+    m_VtkTexture->InterpolateOn();
+//    m_VtkTexture->SetLookupTable(lut);
+//    m_VtkTexture->MapColorScalarsThroughLookupTableOn();
+  
+    //    m_Actor->SetTexture(axialTexture);
 
   //  axialTexture->SetInput(axialSection->GetOutput());
   //  axialTexture->InterpolateOn();
@@ -50,6 +60,7 @@ mitk::Geometry2DDataVtkMapper3D::Geometry2DDataVtkMapper3D()
 //##ModelId=3E691E090394
 mitk::Geometry2DDataVtkMapper3D::~Geometry2DDataVtkMapper3D()
 {
+    delete m_DataTreeIterator;
 }
 
 //##ModelId=3E691E090378
@@ -99,6 +110,35 @@ void mitk::Geometry2DDataVtkMapper3D::Update()
             m_VtkPlaneSource->SetOrigin(plane.point.x, plane.point.y, plane.point.z);
             m_VtkPlaneSource->SetPoint1(right.x, right.y, right.z);
             m_VtkPlaneSource->SetPoint2(bottom.x, bottom.y, bottom.z);
+
+            //if(m_DataTreeIterator)
+            //{
+            //    mitk::DataTreeIterator* it=m_DataTreeIterator->clone();
+            //    while(it->hasNext())
+            //    {
+            //        mitk::Mapper::Pointer mapper = it->next()->GetMapper(1);
+            //        mitk::ImageMapper2D* imagemapper = dynamic_cast<ImageMapper2D*>(mapper.GetPointer());
+
+            //        if(imagemapper)
+            //        {
+            //            mitk::Image::Pointer image4texture = dynamic_cast<Image*>(imagemapper->GetOutput(0));
+            //            if(image4texture)
+            //            {
+            //                m_SliceSelector->SetInput(image4texture);
+            //                m_SliceSelector->Modified();
+            //                ipPicDescriptor *p=m_SliceSelector->GetOutput()->GetPic();
+            //                if(p!=NULL)
+            //                {
+            //                ipPicPut("c:\\aa.pic",p);
+            //                m_VtkTexture->SetInput(m_SliceSelector->GetOutput()->GetVtkImageData());
+            //                m_VtkTexture->Modified();
+            //                m_Actor->SetTexture(m_VtkTexture);
+            //                }
+            //                break;
+            //            }
+            //        }
+            //    }
+            //}
         }
     }
 }
@@ -111,5 +151,12 @@ void mitk::Geometry2DDataVtkMapper3D::GenerateOutputInformation()
 //##ModelId=3E691E09038C
 void mitk::Geometry2DDataVtkMapper3D::GenerateData()
 {
+}
+
+//##ModelId=3E6E874F0007
+void mitk::Geometry2DDataVtkMapper3D::SetDataIteratorForTexture(mitk::DataTreeIterator* iterator)
+{
+    delete m_DataTreeIterator;
+    m_DataTreeIterator = iterator->clone();
 }
 

@@ -8,13 +8,13 @@ void mitk::ImageSliceSelector::GenerateOutputInformation()
 
 	itkDebugMacro(<<"GenerateOutputInformation()");
 
-	output->Initialize(input->GetType(), 2, input->GetDimensions(), input->GetChannelNumber());
+	output->Initialize(input->GetType(), 2, input->GetDimensions());
 }
 
 //##ModelId=3E1A0A320090
 void mitk::ImageSliceSelector::GenerateData()
 {
-	SetDataItem(GetSliceData(m_SliceNr, m_TimeNr, m_ChannelNr), m_ChannelNr);
+	SetDataItem(GetSliceData(m_SliceNr, m_TimeNr, m_ChannelNr), 0);
 }
 
 //##ModelId=3E1B196A0188

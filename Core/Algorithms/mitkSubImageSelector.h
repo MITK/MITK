@@ -17,24 +17,10 @@ namespace mitk {
 class SubImageSelector : public ImageToImageFilter
 {
 public:
-	/** Standard class typedefs. */
-	//##ModelId=3E18A01302C4
-	typedef SubImageSelector            Self;
-	//##ModelId=3E18A013030A
-	typedef ImageToImageFilter       Superclass;
-	//##ModelId=3E18A0130350
-	typedef itk::SmartPointer<Self>  Pointer;
-	//##ModelId=3E18A01303A1
-	typedef itk::SmartPointer<const Self>  ConstPointer;
-
 	/** Run-time type information (and related methods). */
-	itkTypeMacro(SubImageSelector,ImageToImageFilter);
+	mitkClassMacro(SubImageSelector,ImageToImageFilter);
 
 	itkNewMacro(Self);  
-
-
-
-
 
     //##ModelId=3E0B4663009F
 	virtual void SetPosNr(int p);

@@ -14,24 +14,12 @@ namespace mitk {
 class ImageChannelSelector : public SubImageSelector
 {
 public:
-	/** Standard class typedefs. */
-	//##ModelId=3E18A01301FC
-	typedef ImageChannelSelector     Self;
-	//##ModelId=3E18A0130224
-	typedef SubImageSelector         Superclass;
-	//##ModelId=3E18A013024C
-	typedef itk::SmartPointer<Self>  Pointer;
-	//##ModelId=3E18A0130274
-	typedef itk::SmartPointer<const Self>  ConstPointer;
-
-	/** Run-time type information (and related methods). */
-	itkTypeMacro(ImageChannelSelector,SubImageSelector);
+	mitkClassMacro(ImageChannelSelector,SubImageSelector);
 
 	itkNewMacro(Self);  
 
 	itkGetConstMacro(ChannelNr,int);
 	itkSetMacro(ChannelNr,int);
-
 
 protected:
 	//##ModelId=3E1B1980039C

@@ -5,6 +5,7 @@
 #include "Mapper2D.h"
 #include "mitkGeometry2DData.h"
 #include "mitkGLMapper2D.h"
+#include "DataTree.h"
 
 namespace mitk {
 
@@ -35,6 +36,7 @@ public:
     virtual void Paint(mitk::BaseRenderer * renderer);
     //##ModelId=3E67E1B90237
     virtual void Update();
+
 
 protected:
     //##ModelId=3E639E100243

@@ -18,6 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include "mitkSlicedData.h"
+#include "mitkBaseProcess.h"
 
 //##ModelId=3E141028018A
 void mitk::SlicedData::UpdateOutputInformation()
@@ -208,7 +209,7 @@ void mitk::SlicedData::CopyInformation(const itk::DataObject *data)
 
   if (slicedData)
   {
-    m_Geometry3D = dynamic_cast<Geometry3D*>(slicedData->GetSlicedGeometry()->Clone().GetPointer());//new SlicedGeometry3D(*slicedData->GetGeometry().GetPointer());
+    SetGeometry(dynamic_cast<Geometry3D*>(GetGeometry()->Clone().GetPointer()));//new SlicedGeometry3D(*slicedData->GetGeometry().GetPointer());
   }
   else
   {

@@ -181,8 +181,9 @@ float mitk::LevelWindow::GetRange() const
 }
 
 //##ModelId=3EF1627601A9
-void mitk::LevelWindow::SetAuto(ipPicDescriptor* pic)
+void mitk::LevelWindow::SetAuto(const ipPicDescriptor* aPic)
 {
+  ipPicDescriptor* pic = const_cast<ipPicDescriptor*>(aPic);
     if ( pic == NULL )
     {
         return;        

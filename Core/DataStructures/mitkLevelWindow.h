@@ -141,7 +141,7 @@ public:
     * \brief sets level/window to the min/max greyvalues of the given ipPicDescriptor
     */
     //##ModelId=3EF1627601A9
-    void SetAuto(ipPicDescriptor* pic);
+    void SetAuto(const ipPicDescriptor* pic);
 
     /*!
     * \brief equality operator implementation

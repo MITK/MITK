@@ -194,7 +194,7 @@ void mitk::CylindricToCartesianFilter::buildTransformShortCuts(int orig_xsize, i
         if(y!=xy0)
           r=r*(y>xy0?1.0:-1.0)*scale+xy0_orig;
         else
-          r=r*(x>xy0?1.0:-1.0)*scale+xy0_orig;
+          r=r*(x>xy0?-1.0:1.0)*scale+xy0_orig;
         rt=(ipInt2_t)r;
         int xtmp=x;
         if(x>xy0)
@@ -323,16 +323,6 @@ void mitk::CylindricToCartesianFilter::GenerateOutputInformation()
   spacing *= 1.0/scale;
   output->GetSlicedGeometry()->SetSpacing(spacing);
 
-  //output->GetSlicedGeometry()->SetGeometry2D(mitk::Image::BuildStandardPlaneGeometry2D(output->GetSlicedGeometry(), tmpDimensions).GetPointer(), 0);
-  //set the timebounds - after SetGeometry2D, so that the already created PlaneGeometry will also receive this timebounds.
-  //@fixme!!! will not work for not evenly timed data!
-  output->GetSlicedGeometry()->SetTimeBoundsInMS(input->GetSlicedGeometry()->GetTimeBoundsInMS());
-
-  //@fixme!!! for 4D-data: calculate the timebounds of the TimeSlicedGeometry: (calling GetTimeBoundsInMS() really does that!)
-  output->GetGeometry()->GetTimeBoundsInMS();
-
-  output->SetPropertyList(input->GetPropertyList()->Clone());
-  
   mitk::Point3iProperty::Pointer pointProp;
   pointProp = dynamic_cast<mitk::Point3iProperty*>(input->GetProperty("ORIGIN").GetPointer());
   if (pointProp.IsNotNull() )
@@ -344,19 +334,18 @@ void mitk::CylindricToCartesianFilter::GenerateOutputInformation()
     mitk::Point3iProperty::Pointer pointProp = new mitk::Point3iProperty(tp);
     output->SetProperty("ORIGIN", pointProp);
   }
-  // @todo convert transducer position into new coordinate system
-  /*	
-  Tag = ipPicQueryTag(picHeader, "ORIGIN");
-  if (Tag != NULL)
-  {
-  int z = ((int *) Tag->value)[1];
-  ((int *) Tag->value)[0] = picHeader->n[0]/2;
-  ((int *) Tag->value)[1] = picHeader->n[0]/2;
-  ((int *) Tag->value)[2] = z * scale;
-  }
-  */
-
   delete [] tmpDimensions;
+
+  //output->GetSlicedGeometry()->SetGeometry2D(mitk::Image::BuildStandardPlaneGeometry2D(output->GetSlicedGeometry(), tmpDimensions).GetPointer(), 0);
+  //set the timebounds - after SetGeometry2D, so that the already created PlaneGeometry will also receive this timebounds.
+  //@fixme!!! will not work for not evenly timed data!
+  output->GetSlicedGeometry()->SetTimeBoundsInMS(input->GetSlicedGeometry()->GetTimeBoundsInMS());
+  //@fixme!!! transfer matrix to timeslicedgeometry.
+  output->GetGeometry()->SetUnitsToMMAffineTransform(output->GetSlicedGeometry()->GetUnitsToMMAffineTransform());
+  //@fixme!!! for 4D-data: calculate the timebounds of the TimeSlicedGeometry: (calling GetTimeBoundsInMS() really does that!)
+  output->GetGeometry()->GetTimeBoundsInMS();
+
+  output->SetPropertyList(input->GetPropertyList()->Clone());
 
   m_TimeOfHeaderInitialization.Modified();
 }
@@ -369,7 +358,7 @@ void mitk::CylindricToCartesianFilter::GenerateData()
   mitk::ImageTimeSelector::Pointer timeSelector=mitk::ImageTimeSelector::New();
   timeSelector->SetInput(input);
 
-  ipPicDescriptor* pic_transformed;
+  ipPicDescriptor* pic_transformed=NULL;
   pic_transformed = ipPicNew();
   pic_transformed->dim=3;
   pic_transformed->bpe  = output->GetPixelType().GetBpe();
@@ -424,9 +413,22 @@ void mitk::CylindricToCartesianFilter::GenerateData()
 
       _ipPicFreeTags(pic_transformed->info->tags_head);
       pic_transformed->info->tags_head = _ipPicCloneTags(timeSelector->GetOutput()->GetPic()->info->tags_head);
+      if(input->GetDimension(2)>1)
+      {
 
-      ipPicTypeMultiplex9(_transform, timeSelector->GetOutput()->GetPic(), pic_transformed, m_OutsideValue, (float*)fr_pic->data, (float*)fphi_pic->data, fz, (short *)rt_pic->data, (unsigned int *)phit_pic->data, zt, coneCutOff_pic);
-      //	ipPicPut("1trf.pic",pic_transformed);	
+        ipPicTypeMultiplex9(_transform, timeSelector->GetOutput()->GetPic(), pic_transformed, m_OutsideValue, (float*)fr_pic->data, (float*)fphi_pic->data, fz, (short *)rt_pic->data, (unsigned int *)phit_pic->data, zt, coneCutOff_pic);
+        //	ipPicPut("1trf.pic",pic_transformed);	
+      }
+      else
+      {
+        ipPicDescriptor *doubleSlice=ipPicCopyHeader(timeSelector->GetOutput()->GetPic(), NULL);
+        doubleSlice->dim=3;
+        doubleSlice->n[2]=2;
+        doubleSlice->data=malloc(_ipPicSize(doubleSlice));
+        memcpy(doubleSlice->data, timeSelector->GetOutput()->GetPic()->data, _ipPicSize(doubleSlice)/2);
+        ipPicTypeMultiplex9(_transform, doubleSlice, pic_transformed, m_OutsideValue, (float*)fr_pic->data, (float*)fphi_pic->data, fz, (short *)rt_pic->data, (unsigned int *)phit_pic->data, zt, coneCutOff_pic);
+        ipPicFree(doubleSlice);
+      }
       output->SetPicVolume(pic_transformed, t, n);
     }
   }

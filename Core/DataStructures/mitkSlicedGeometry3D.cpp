@@ -284,7 +284,7 @@ void mitk::SlicedGeometry3D::SetSpacing(mitk::Vector3D aSpacing)
     UnitsToMM(bottomDV, bottomDV);
 
     mitk::PlaneGeometry::Pointer planegeometry=mitk::PlaneGeometry::New();
-    planegeometry->InitializeStandardPlane(rightDV.Get_vnl_vector(), bottomDV.Get_vnl_vector());
+    planegeometry->InitializeStandardPlane(rightDV.Get_vnl_vector(), bottomDV.Get_vnl_vector(), &m_Spacing);
     planegeometry->SetOrigin(origin);
     planegeometry->SetBounds(bounds);
     firstGeometry = planegeometry;

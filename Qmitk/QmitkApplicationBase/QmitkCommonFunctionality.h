@@ -298,7 +298,7 @@ public:
   {
     // widget plane are made visible again
     mitk::DataTreeIteratorClone it = dataTree->GetNext("name", new mitk::StringProperty("widget1Plane"));
-    if (it != NULL)
+    if (!it->IsAtEnd())
     {
       mitk::DataTreeNode::Pointer node = it->Get();
       if ( node.IsNotNull() )  {
@@ -306,7 +306,7 @@ public:
       }
     }
     it = dataTree->GetNext("name", new mitk::StringProperty("widget2Plane"));
-    if (it != NULL)
+    if (!it->IsAtEnd())
     {
       mitk::DataTreeNode::Pointer node = it->Get();
       if ( node.IsNotNull() )  
@@ -315,7 +315,7 @@ public:
       }
     }
     it = dataTree->GetNext("name", new mitk::StringProperty("widget3Plane"));
-    if (it != NULL)
+    if (!it->IsAtEnd())
     {
       mitk::DataTreeNode::Pointer node = it->Get();
       if ( node.IsNotNull() )  

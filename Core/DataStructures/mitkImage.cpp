@@ -47,7 +47,7 @@ vtkImageData* mitk::Image::GetVtkImageData(int t, int n)
     GetSource()->UpdateOutputInformation();
   }
   mitk::ImageDataItem::Pointer volume=GetVolumeData(t, n);
-  if(volume.IsNull()) 
+  if(volume.IsNull() || volume->GetVtkImageData() == NULL)
     return NULL;
   float* spacing = const_cast<float*>(GetUpdatedSlicedGeometry(t)->GetSpacing());
   volume->GetVtkImageData()->SetSpacing(spacing);

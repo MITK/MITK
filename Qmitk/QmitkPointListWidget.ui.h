@@ -40,6 +40,7 @@ void QmitkPointListWidget::init()
   m_DataChangedCommand->SetCallbackFunction(this, &QmitkPointListWidget::ItemsOfListUpdate);
 #endif
   m_CurrentObserverID = 0;
+  m_CurrentInteraction = NULL;
 }
 
 

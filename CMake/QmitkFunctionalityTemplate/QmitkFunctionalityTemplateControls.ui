@@ -1,0 +1,68 @@
+<!DOCTYPE UI><UI version="3.3" stdsetdef="1">
+<class>QmitkGraphCutSegmentationControls</class>
+<widget class="QWidget">
+    <property name="name">
+        <cstring>QmitkGraphCutSegmentationControls</cstring>
+    </property>
+    <property name="geometry">
+        <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>222</width>
+            <height>605</height>
+        </rect>
+    </property>
+    <property name="minimumSize">
+        <size>
+            <width>0</width>
+            <height>0</height>
+        </size>
+    </property>
+    <property name="caption">
+        <string>GraphCutSegmentation</string>
+    </property>
+    <grid>
+        <property name="name">
+            <cstring>unnamed</cstring>
+        </property>
+        <spacer row="1" column="0">
+            <property name="name">
+                <cstring>spacer2</cstring>
+            </property>
+            <property name="orientation">
+                <enum>Vertical</enum>
+            </property>
+            <property name="sizeType">
+                <enum>Expanding</enum>
+            </property>
+            <property name="sizeHint">
+                <size>
+                    <width>20</width>
+                    <height>550</height>
+                </size>
+            </property>
+        </spacer>
+        <widget class="QPushButton" row="0" column="0">
+            <property name="name">
+                <cstring>calcButton</cstring>
+            </property>
+            <property name="minimumSize">
+                <size>
+                    <width>200</width>
+                    <height>0</height>
+                </size>
+            </property>
+            <property name="text">
+                <string>Functionality Template</string>
+            </property>
+            <property name="default">
+                <bool>true</bool>
+            </property>
+        </widget>
+    </grid>
+</widget>
+<tabstops>
+    <tabstop>calcButton</tabstop>
+</tabstops>
+<layoutdefaults spacing="6" margin="11"/>
+</UI>

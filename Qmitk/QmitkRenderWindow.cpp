@@ -148,6 +148,7 @@ void mitk::QmitkRenderWindow::mouseMoveEvent(QMouseEvent *me)
 
 void mitk::QmitkRenderWindow::wheelEvent(QWheelEvent *we)
 {
+  we->ignore();
   /*  QGLWidget::wheelEvent(we);
   if (m_Renderer)
     m_Renderer->WheelEvent(we); */

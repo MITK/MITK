@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #ifndef _MITK_POINT_SET_READER__H_
-#define _MITK_POINT_SER_READER__H_
+#define _MITK_POINT_SET_READER__H_
 
 #include <mitkPointSetSource.h>
 #include <mitkFileReader.h>

@@ -120,7 +120,7 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
 
 void QmitkMainTemplate::fileOpenImageSequence()
 {
-  QString fileName = QFileDialog::getOpenFileName(NULL,"DKFZ Pic (*.seq *.pic *.pic.gz *.seq.gz);;stl files (*.stl);;DICOM files(*.dcm *.DCM)");
+  QString fileName = QFileDialog::getOpenFileName(NULL,"DKFZ Pic (*.seq *.pic *.pic.gz *.seq.gz);;Sets of 2D slices (*.pic *.pic.gz *.png *.dcm);;stl files (*.stl);;DICOM files(*.dcm *.DCM)");
 
   if ( !fileName.isNull() )
   {

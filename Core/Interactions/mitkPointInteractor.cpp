@@ -122,17 +122,18 @@ bool mitk::PointInteractor::ExecuteSideEffect(int sideEffectId, mitk::StateEvent
 	  if ( m_UndoEnabled )
     {
       PointOperation* undoOp = new mitk::PointOperation(OpMOVE, m_LastPoint, m_Id);
-			OperationEvent *operationEvent = new OperationEvent(m_Data,
-												doOp, undoOp,
-												objectEventId, groupEventId);
-			m_UndoController->SetOperationEvent(operationEvent);
-		}
+      OperationEvent *operationEvent = new OperationEvent(m_Data,
+							doOp, undoOp,
+							objectEventId, groupEventId);
+      m_UndoController->SetOperationEvent(operationEvent);
+    }
 		//execute the Operation
 		m_Data->ExecuteOperation(doOp);
 
   //  //increase the GroupEventId, so that the raw-Undo goes to here
 		//this->IncCurrGroupEventId();
-		//ok = true;
+
+	ok = true;
 	}
 	break;
 

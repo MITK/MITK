@@ -1,6 +1,10 @@
 #include "mitkLineInteractor.h"
 #include "mitkStatusBar.h"
 #include <mitkInteractionConst.h>
+#include <mitkLineOperation.h>
+#include <mitkPointOperation.h>
+#include <mitkPositionEvent.h>
+#include <mitkStateTransitionOperation.h>
 
 mitk::LineInteractor::LineInteractor(const char * type, DataTreeNode* dataTreeNode, int cellId, int pIdA, int pIdB)
 : Interactor(type, dataTreeNode), m_CellId(cellId), m_PIdA(pIdA), m_PIdB(pIdB)
@@ -48,25 +52,99 @@ bool mitk::LineInteractor::ExecuteSideEffect(int sideEffectId, mitk::StateEvent 
 	{
   case SeDONOTHING:
     ok = true;
-	  break;
-  case SeADD:
+  break;
+  case SeINITMOVE:
   {
+     mitk::PositionEvent const  *posEvent = dynamic_cast <const mitk::PositionEvent *> (stateEvent->GetEvent());
+                if (posEvent == NULL)
+      return false;
 
-  //  PointOperation* doOp = new mitk::PointOperation(OpINSERT, itkPoint, m_Id);
-		//if (m_UndoEnabled)
-		//{
-		//  //difference between OpDELETE and OpREMOVE is, that OpDELETE deletes a point at the end, and OpREMOVE deletes it from the given position
-  //    //remove is better, cause we need the position to add or remove the point anyway. We can get the last position from size()
-		//	PointOperation* undoOp = new mitk::PointOperation(OpREMOVE, itkPoint, m_Id);
-		//	OperationEvent *operationEvent = new OperationEvent(m_Data,
-		//															doOp, undoOp,
-		//															objectEventId, groupEventId);
-		//	m_UndoController->SetOperationEvent(operationEvent);
-		//}
-		//pointSet->ExecuteOperation(doOp);
+    //start of the Movement is stored to calculate the undoKoordinate in FinishMovement
+    mitk::vm2itk(posEvent->GetWorldPosition(), m_LastPoint);
+    //initialize a value to calculate the movement through all MouseMoveEvents from MouseClick to MouseRelease
+    ok = true;
+    break;
+  }
+  break;
+  case SeMOVE:
+  {
+    mitk::PositionEvent const  *posEvent = dynamic_cast <const mitk::PositionEvent *> (stateEvent->GetEvent());
+    if (posEvent == NULL)
+      return false;
+
+    mitk::ITKPoint3D newPoint;
+    mitk::vm2itk(posEvent->GetWorldPosition(), newPoint);
+
+    PointOperation* doOp = new mitk::PointOperation(OpMOVELINE, newPoint, m_Id);
+    //execute the Operation
+    //here no undo is stored, because the movement-steps aren't interesting. only the start and the end is interisting to store for undo.
+    m_Data->ExecuteOperation(doOp);
     ok = true;
   }
-    
+  break;
+  case SeFINISHMOVE:
+  {
+    mitk::PositionEvent const *posEvent = dynamic_cast <const mitk::PositionEvent *> (stateEvent->GetEvent());
+    if (posEvent == NULL)
+      return false;
+
+    //finish the movement:
+    // set undo-information and move it to the last position.
+    mitk::ITKPoint3D newPoint;
+    mitk::vm2itk(posEvent->GetWorldPosition(), newPoint);
+    PointOperation* doOp = new mitk::PointOperation(OpMOVELINE, newPoint, m_Id);
+    if ( m_UndoEnabled )
+    {
+      PointOperation* undoOp = new mitk::PointOperation(OpMOVELINE, m_LastPoint, m_Id);
+      OperationEvent *operationEvent = new OperationEvent(m_Data,
+                                                        doOp, undoOp,
+                                                        objectEventId, groupEventId);
+      m_UndoController->SetOperationEvent(operationEvent);
+    }
+    //execute the Operation
+    m_Data->ExecuteOperation(doOp);
+
+    //increase the GroupEventId, so that the raw-Undo goes to here
+    //this->IncCurrGroupEventId();
+   
+    ok = true;
+  }
+  break;
+  case SeSELECT:
+  {
+    mitk::ITKPoint3D newPoint;
+    newPoint.Fill(0);
+    LineOperation* doOp = new mitk::LineOperation(OpSELECTLINE, m_Id, m_PIdA, m_PIdB);
+    if ( m_UndoEnabled )
+    {
+      LineOperation* undoOp = new mitk::LineOperation(OpDESELECTLINE, m_Id, m_PIdA, m_PIdB);
+      OperationEvent *operationEvent = new OperationEvent(m_Data,
+                                                        doOp, undoOp,
+                                                        objectEventId, groupEventId);
+      m_UndoController->SetOperationEvent(operationEvent);
+    }
+    //execute the Operation
+    m_Data->ExecuteOperation(doOp);
+    ok = true;
+  }
+  break;
+  case SeDESELECT:
+  {
+    mitk::ITKPoint3D newPoint;
+    newPoint.Fill(0);
+    LineOperation* doOp = new mitk::LineOperation(OpDESELECTLINE, m_Id, m_PIdA, m_PIdB);
+    if ( m_UndoEnabled )
+    {
+      LineOperation* undoOp = new mitk::LineOperation(OpSELECTLINE, m_Id, m_PIdA, m_PIdB);
+      OperationEvent *operationEvent = new OperationEvent(m_Data,
+                                                        doOp, undoOp,
+                                                        objectEventId, groupEventId);
+      m_UndoController->SetOperationEvent(operationEvent);
+    }
+    //execute the Operation
+    m_Data->ExecuteOperation(doOp);
+    ok = true;
+  }
   break;
 
   default:

@@ -4,6 +4,7 @@
 #include "mitkCommon.h"
 #include <mitkInteractor.h>
 #include "mitkPointInteractor.h"
+#include <mitkVector.h>
 
 namespace mitk
 {
@@ -67,11 +68,15 @@ private:
 
   //##Documentation
   //## @brief the first point
-  PointInteractor *m_PointA;
+  PointInteractor::Pointer m_PointA;
 
   //##Documentation
   //## @brief the second point
-  PointInteractor *m_PointB;
+  PointInteractor::Pointer m_PointB;
+
+  //##Documentation
+  //## to make possible the undo of a movement of a line
+  ITKPoint3D m_LastPoint;
 
 };
 }

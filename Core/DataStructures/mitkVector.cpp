@@ -17,6 +17,6 @@ See MITKCopyright.txt or http://www.mitk.org/ for details.
 =========================================================================*/
 #include "mitkVector.h"
 
-const mitk::ScalarType mitk::eps = vnl_math::float_eps;
-const mitk::ScalarType mitk::epsSquared = vnl_math::float_eps * vnl_math::float_eps;
+const mitk::ScalarType mitk::eps     = vnl_math::float_eps;
+const mitk::ScalarType mitk::sqrteps = vnl_math::float_sqrteps;
 

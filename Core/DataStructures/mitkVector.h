@@ -33,7 +33,7 @@ typedef enum PointSpecificationType
 
 typedef class itk::NumericTraits<mitk::ScalarType> ScalarTypeNumericTraits;
 extern const ScalarType eps;
-extern const ScalarType epsSquared;
+extern const ScalarType sqrteps;
 
 template <class Tout>
   inline void FillVector3D(Tout& out, ScalarType x, ScalarType y, ScalarType z)
@@ -146,20 +146,20 @@ template <typename TCoordRep, unsigned int NPointDimension>
   inline bool Equal(const itk::Vector<TCoordRep, NPointDimension>& vector1, const itk::Vector<TCoordRep, NPointDimension>& vector2) 
 {
   typename itk::Vector<TCoordRep, NPointDimension>::VectorType diff = vector1-vector2;
-  return diff.GetSquaredNorm() < mitk::epsSquared; 
+  return diff.GetSquaredNorm() < mitk::eps; 
 }
 
 template <typename TCoordRep, unsigned int NPointDimension>
   inline bool Equal(const itk::Point<TCoordRep, NPointDimension>& vector1, const itk::Point<TCoordRep, NPointDimension>& vector2) 
 {
   typename itk::Point<TCoordRep, NPointDimension>::VectorType diff = vector1-vector2;
-  return diff.GetSquaredNorm() < mitk::epsSquared; 
+  return diff.GetSquaredNorm() < mitk::eps; 
 }
 
 inline bool Equal(const mitk::VnlVector& vector1, const mitk::VnlVector& vector2) 
 {
   mitk::VnlVector diff = vector1-vector2;
-  return diff.squared_magnitude() < mitk::epsSquared; 
+  return diff.squared_magnitude() < mitk::eps; 
 }
 
 inline bool Equal(double scalar1, double scalar2) 

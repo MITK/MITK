@@ -123,6 +123,10 @@ void mitk::DataTreeNodeFactory::GenerateData()
         {
             this->ReadFileTypeUVG();
         }
+        else if ( this->FileNameEndsWith( ".dvg" ) )
+        {
+            this->ReadFileTypeDVG();
+        }
         else if ( this->FileNameEndsWith( "HPSONOS.DB" ) || this->FileNameEndsWith( "hpsonos.db" ) )
         {
             this->ReadFileTypeHPSONOS();
@@ -408,6 +412,24 @@ void mitk::DataTreeNodeFactory::ReadFileTypeUVG()
 
     std::cout << "...finished!" << std::endl;
 }
+
+void mitk::DataTreeNodeFactory::ReadFileTypeDVG()
+{
+    std::cout << "Loading " << m_FileName << " as dvg... " << std::endl;
+
+    mitk::VesselGraphFileReader<Directed>::Pointer reader = mitk::VesselGraphFileReader<Directed>::New();
+    reader->SetFileName( m_FileName.c_str() );
+    reader->Update();
+    mitk::DataTreeNode::Pointer node = this->GetOutput();
+    node->SetData( reader->GetOutput() );
+
+    // set filename without path as string property
+    mitk::StringProperty::Pointer nameProp = new mitk::StringProperty( this->GetBaseFileName() );
+    node->SetProperty( "name", nameProp );
+
+    std::cout << "...finished!" << std::endl;
+}
+
 
 void mitk::DataTreeNodeFactory::ReadFileTypeHPSONOS()
 {

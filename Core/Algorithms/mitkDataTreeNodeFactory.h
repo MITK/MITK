@@ -162,6 +162,8 @@ protected:
     
     virtual void ReadFileTypeUVG();
     
+    virtual void ReadFileTypeDVG();
+    
     virtual void ReadFileTypeHPSONOS();
     
 #endif

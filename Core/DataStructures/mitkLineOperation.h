@@ -24,7 +24,7 @@ class LineOperation : public mitk::CellOperation
 	//## operationType is the type of that operation (see mitkOperation.h; e.g. move or add; Information for StateMachine::ExecuteOperation());
 	//## other Id's are to transmitt parameters for the operation: cellId: Id of the cell; a vector for movement; pIdA, pIdB: Id's of two points; id: the Id of a line in a cell
     LineOperation(OperationType operationType, int cellId, Vector3D vector, int pIdA = -1, int pIdB = -1, int id = -1);
-    LineOperation(OperationType operationType, int cellId, int pIdA = -1, int pIdB = -1, int id = -1);
+    LineOperation(OperationType operationType, int cellId = -1, int pIdA = -1, int pIdB = -1, int id = -1);
   
     virtual ~LineOperation(){};
 

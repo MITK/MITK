@@ -31,7 +31,7 @@ public:
 	//##ModelId=3E32E456028D
 	virtual void SetInput(const mitk::BaseData* data) = 0;
  //   //##ModelId=3E3C320001E4
- //   virtual void SetScreenSizeInScreenUnits(unsigned int widthInScreenUnits, unsigned int heightInScreenUnits);
+ //   virtual void SetDisplaySizeInDisplayUnits(unsigned int widthInDisplayUnits, unsigned int heightInDisplayUnits);
 
   protected:
     //##ModelId=3E3C337E0162
@@ -42,7 +42,7 @@ public:
     virtual ~Mapper();
 
     ////##ModelId=3E3C322800FC
-    //Vector2D m_ScreenSizeInScreenUnits;
+    //Vector2D m_DisplaySizeInDisplayUnits;
 };
 
 

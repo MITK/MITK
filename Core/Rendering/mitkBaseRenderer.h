@@ -3,7 +3,7 @@
 
 #include "DataTree.h"
 #include "mitkRenderWindow.h"
-#include "ScreenGeometry.h"
+#include "DisplayGeometry.h"
 
 namespace mitk {
 
@@ -62,8 +62,8 @@ class BaseRenderer : public itk::Object
     //##ModelId=3E3799250397
     virtual void InitSize(int w, int h);
 
-    itkGetConstObjectMacro(ScreenGeometry, mitk::ScreenGeometry);
-    itkSetObjectMacro(ScreenGeometry, mitk::ScreenGeometry);
+    itkGetConstObjectMacro(DisplayGeometry, mitk::DisplayGeometry);
+    itkSetObjectMacro(DisplayGeometry, mitk::DisplayGeometry);
 
   protected:
     //##ModelId=3E3D2F120050
@@ -80,7 +80,7 @@ class BaseRenderer : public itk::Object
     mitk::DataTreeIterator* m_DataTreeIterator;
 
     //##ModelId=3E3D2EEB0087
-    ScreenGeometry::Pointer m_ScreenGeometry;
+    DisplayGeometry::Pointer m_DisplayGeometry;
 
     //##ModelId=3E3D1FCA0272
     RenderWindow *m_RenderWindow;

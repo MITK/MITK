@@ -4,7 +4,7 @@
 #include "mitkCommon.h"
 #include "Mapper.h"
 #include "Geometry3D.h"
-#include "ScreenGeometry.h"
+#include "DisplayGeometry.h"
 
 namespace mitk {
 
@@ -25,7 +25,7 @@ public:
     //##ModelId=3E3C45A0009E
     virtual void SetGeometry3D(const mitk::Geometry3D* aGeometry3D);
     //##ModelId=3E3C468102DC
-    virtual void SetScreenGeometry(const mitk::ScreenGeometry* aScreenGeometry);
+    virtual void SetDisplayGeometry(const mitk::DisplayGeometry* aDisplayGeometry);
 
 	/** Method for creation through the object factory. */
 //	itkNewMacro(Self);
@@ -43,7 +43,7 @@ protected:
     //##ModelId=3E3C5C980267
     Geometry3D::ConstPointer m_Geometry3D;
     //##ModelId=3E3C5C98028F
-    ScreenGeometry::ConstPointer m_ScreenGeometry;
+    DisplayGeometry::ConstPointer m_DisplayGeometry;
     //##ModelId=3E33ECF20328
     int m_SliceNr;
 

@@ -57,35 +57,35 @@ public:
     //##ModelId=3E3ECC2D02B6
     //##Documentation
     //## TEMPORARY FOR IIL COMPATIBILITY - DO NOT USE!!!
-    virtual int xOriginInScreenUnits() const = 0;
+    virtual int xOriginInDisplayUnits() const = 0;
 
     //##ModelId=3E3ECC2F0290
     //##Documentation
     //## TEMPORARY FOR IIL COMPATIBILITY - DO NOT USE!!!
-    virtual int yOriginInScreenUnits() const = 0;
+    virtual int yOriginInDisplayUnits() const = 0;
 
     //##ModelId=3E3ECC3101CB
     //##Documentation
     //## TEMPORARY FOR IIL COMPATIBILITY - DO NOT USE!!!
-    virtual unsigned int screenHeightInScreenUnits() const = 0;
+    virtual unsigned int DisplayHeightInDisplayUnits() const = 0;
     //##ModelId=3E3ED0B003BB
     //##Documentation
     //## TEMPORARY FOR IIL COMPATIBILITY - DO NOT USE!!!
-    virtual unsigned int curHeightInScreenUnits() const {  return m_CurHeightInScreenUnits; }
+    virtual unsigned int curHeightInDisplayUnits() const {  return m_CurHeightInDisplayUnits; }
     //##ModelId=3E3ED4960370
     //##Documentation
     //## TEMPORARY FOR IIL COMPATIBILITY - DO NOT USE!!!
-    virtual float scaleFactorUnitsToScreen() const = 0;
+    virtual float scaleFactorUnitsToDisplay() const = 0;
     //##ModelId=3E3F8970034D
     //##Documentation
     //## TEMPORARY FOR IIL COMPATIBILITY - DO NOT USE!!!
-    virtual void pointUnitsToScreenUnits(int & x, int& y) const = 0;
+    virtual void pointUnitsToDisplayUnits(int & x, int& y) const = 0;
 
 
     //##ModelId=3E3ED0D301A8
     //##Documentation
     //## TEMPORARY FOR IIL COMPATIBILITY - DO NOT USE!!!
-    unsigned int m_CurHeightInScreenUnits;
+    unsigned int m_CurHeightInDisplayUnits;
 };
 
 } // namespace mitk

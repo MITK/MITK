@@ -20,13 +20,23 @@
 #include <vector>
 #include <algorithm>
 #include <iostream>
-
-
 #include <itkObject.h>
 
 namespace itk
 {
-
+/** \class TreeNode
+ *  \brief TreeNode class
+ * 
+ * This class derives from the Object class.
+ *
+ * The class is templated over the type of the elements.
+ *
+ * Template parameters for class TreeNode:
+ *
+ * - TValueType = Element type stored in the node
+ *
+ * \ingroup DataRepresentation 
+ */
 template <class TValueType>
 class TreeNode : public Object
 {
@@ -34,12 +44,11 @@ class TreeNode : public Object
 public:
 
   /** Standard typedefs */
-  typedef Object Superclass;
-  typedef TreeNode<TValueType> Self;
-  typedef SmartPointer<Self>  Pointer;
+  typedef Object                    Superclass;
+  typedef TreeNode<TValueType>      Self;
+  typedef SmartPointer<Self>        Pointer;
   typedef SmartPointer<const Self>  ConstPointer;
-
-  typedef std::vector<Pointer> ChildrenListType;
+  typedef std::vector<Pointer>      ChildrenListType;
 
   /** Method for creation through the object factory. */
   itkNewMacro( Self );
@@ -47,53 +56,65 @@ public:
   /** Run-time type information (and related methods). */ 
   itkTypeMacro( Self, Superclass );
 
-  //TreeNode( TValueType data, TreeNode<TValueType>* parent = NULL, int defaultChildrenCount = 3 );
+  /** Get the value of the node */
+  const TValueType& Get() const;
 
-  //TreeNode( TreeNode<TValueType>* parent = NULL, int defaultChildrenCount = 3 );
-
-  const TValueType& Get( ) const;
-
+  /** Set the current value of the node */
   TValueType Set( TValueType data);
 
+  /** Get the child node */
   TreeNode<TValueType>* GetChild( int number ) const;
 
+  /** Get the parent node */
   TreeNode<TValueType>* GetParent( ) const;
 
+  /** Return true if the node has children */
   bool HasChildren( ) const;
 
+  /** Return true if the node has a parent */
   bool HasParent( ) const;
 
+  /** Set the parent of the node */
   void SetParent( TreeNode<TValueType>* n );
 
+  /** Return the number of children */
   int CountChildren( ) const;
 
+  /** Remove a node from the node */
   bool Remove( TreeNode<TValueType> *n );
 
-  unsigned int GetNumberOfChildren( unsigned int depth=0, char * name=NULL ) const;
+  /** Get the number of children given a name and depth */
+  unsigned int GetNumberOfChildren(unsigned int depth=0, char * name=NULL ) const;
 
+  /** Replace a given child by a new one */
   bool ReplaceChild( TreeNode<TValueType> *oldChild, TreeNode<TValueType> *newChild );
 
+  /** Return the child position given a node */
   int ChildPosition( const TreeNode<TValueType> *node ) const;
-
+  /** Return the child position given a value */
   int ChildPosition( TValueType node ) const;
 
+  /** Add a child to the node */
   void AddChild( TreeNode<TValueType> *node );
 
+  /** Add a child to the node and specify the number in the children list */
   virtual void AddChild( int number, TreeNode<TValueType> *node );
 
+  /** Get the children list */
   virtual ChildrenListType* GetChildren( unsigned int depth=0, char * name=NULL) const;
   
-  // To work directly on the internal list of children
+  /** Get the internal list of children */
   virtual ChildrenListType& GetChildrenList() {return m_Children;}
 
-  virtual void SetData(TValueType data) {m_Data = data;}
+  /** Set the data of the node */
+  //virtual void SetData(TValueType data) {m_Data = data;}
 
 protected:
 
   TreeNode();
   virtual ~TreeNode();
   TValueType m_Data;
-  typename TreeNode<TValueType>::Pointer m_Parent;
+  Pointer m_Parent;
   ChildrenListType m_Children;
 };
 
@@ -104,4 +125,3 @@ protected:
 #endif
 
 #endif
-

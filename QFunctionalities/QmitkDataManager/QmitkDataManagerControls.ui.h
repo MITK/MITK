@@ -73,7 +73,7 @@ void QmitkDataManagerControls::SetDataTreeIterator(mitk::DataTreeIterator * it)
   if (tempIt->hasNext()) 
   {
     tempIt->next();
-    DataTreeViewItem * rootItem = new DataTreeViewItem(m_DataTreeView, "Loaded Data", "root", tempIt->clone());
+    QmitkDataTreeViewItem * rootItem = new QmitkDataTreeViewItem(m_DataTreeView, "Loaded Data", "root", tempIt->clone());
   }
   delete tempIt;
   UpdateRendererCombo();
@@ -81,7 +81,7 @@ void QmitkDataManagerControls::SetDataTreeIterator(mitk::DataTreeIterator * it)
 
 void QmitkDataManagerControls::RemoveButtonClicked()
 {
-  DataTreeViewItem *selected = dynamic_cast<DataTreeViewItem*>(m_DataTreeView->selectedItem());
+  QmitkDataTreeViewItem *selected = dynamic_cast<QmitkDataTreeViewItem*>(m_DataTreeView->selectedItem());
   if (selected == NULL) {
     std::cout << "nothing selected" << std::endl;
   } else {

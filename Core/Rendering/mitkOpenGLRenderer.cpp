@@ -11,6 +11,8 @@
 #include <vtkLight.h>
 #include <vtkRenderWindow.h>
 
+#include "PlaneGeometry.h"
+
 //##ModelId=3E33ECF301AD
 mitk::OpenGLRenderer::OpenGLRenderer() : m_IilImage(0),
     first(true) //FIXME provisorium
@@ -41,6 +43,7 @@ void mitk::OpenGLRenderer::SetData(mitk::DataTreeIterator* iterator)
     {
         while(it->hasNext())
         {
+            it->next();
             if(first) //FIXME: provisorium
             {
                 BaseData::Pointer data=it->get()->GetData();
@@ -57,7 +60,7 @@ void mitk::OpenGLRenderer::SetData(mitk::DataTreeIterator* iterator)
             //            mitk::LevelWindow lw;
             unsigned int dummy[] = {10,10,10};
             //Geometry3D geometry(3,dummy);
-            mitk::Mapper::Pointer mapper = it->next()->GetMapper(m_MapperID);
+            mitk::Mapper::Pointer mapper = it->get()->GetMapper(m_MapperID);
             if(mapper!=NULL)
             {
                 //                mapper->Update();
@@ -102,10 +105,11 @@ void mitk::OpenGLRenderer::Update()
     mitk::DataTreeIterator* it=m_DataTreeIterator->clone();
     while(it->hasNext())
     {
+        it->next();
         //      mitk::LevelWindow lw;
         unsigned int dummy[] = {10,10,10};
         //Geometry3D geometry(3,dummy);
-        mitk::Mapper::Pointer mapper = it->next()->GetMapper(m_MapperID);
+        mitk::Mapper::Pointer mapper = it->get()->GetMapper(m_MapperID);
         if(mapper!=NULL)
         {
             Mapper2D* mapper2d=dynamic_cast<Mapper2D*>(mapper.GetPointer());
@@ -145,6 +149,10 @@ void mitk::OpenGLRenderer::Render()
 
     if(m_DataTreeIterator==NULL) return;
 
+    PlaneGeometry* myPlaneGeom =
+        dynamic_cast<PlaneGeometry *>((mitk::Geometry2D*)(GetWorldGeometry()));
+    if(myPlaneGeom->GetPlaneView().normal.length()<0.1) return;
+
     glViewport (0, 0, m_Size[0], m_Size[1]);
     glMatrixMode( GL_PROJECTION );
     glLoadIdentity();
@@ -156,7 +164,8 @@ void mitk::OpenGLRenderer::Render()
     mitk::DataTreeIterator* it=m_DataTreeIterator->clone();
     while(it->hasNext())
     {
-        mitk::Mapper::Pointer mapper = it->next()->GetMapper(m_MapperID);
+        it->next();
+        mitk::Mapper::Pointer mapper = it->get()->GetMapper(m_MapperID);
         if(mapper!=NULL)
         {
             GLMapper2D* mapper2d=dynamic_cast<GLMapper2D*>(mapper.GetPointer());

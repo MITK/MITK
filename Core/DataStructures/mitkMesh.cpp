@@ -518,9 +518,12 @@ void mitk::Mesh::ExecuteOperation(Operation* operation)
       PointIdIterator it = cell->PointIdsBegin();
       PointIdIterator end = cell->PointIdsEnd();
       int pointId = lineOp->GetPIdA();
+      if (pointId<0)//if not initialized!!
+        return;
+
       while (it!=end)
       {
-        if ((*it)==pointId)
+        if ((*it)==(unsigned int)pointId)
         {
           break;
         }

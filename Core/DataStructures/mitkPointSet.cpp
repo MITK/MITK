@@ -169,23 +169,6 @@ void mitk::PointSet::ExecuteOperation(Operation* operation)
 	{
 	case OpNOTHING:
 		break;
-	//case OpADD://!!!!!#### shall not be used! Use Insert instead to know the position for undo-operation ####!!!!!
-	//	{
- //     unsigned long idoffset = m_PointSet->GetNumberOfPoints();
- //     mitk::ITKPoint3D a0 = pointOp->GetPoint();
- //     PointType a1;
- //     a1[0] = a0[0];
- //     a1[1] = a0[1];
- //     a1[2] = a0[2];
- //     m_PointSet->SetPoint(idoffset, a1);
- //     m_PointSet->SetPointData(idoffset, false);
-	//	}
-	//	break;
-  //case OpDELETE://!!!!####shall not be used anymore! Use remove(index) instead to know the position for undo-operation####!!!!
-		//{
-  //    m_PointSet->GetPoints()->DeleteIndex(m_PointSet->GetNumberOfPoints()-1);
-		//}
-		//break;
 	case OpINSERT://inserts the point at the given position 
 		{
       int position = pointOp->GetIndex();

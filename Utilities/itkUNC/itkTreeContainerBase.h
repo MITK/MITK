@@ -23,29 +23,10 @@
 #include <itkObjectFactory.h>
 #include <itkTreeNode.h>
 
-//#include <itkTreeIteratorBase.h>
-
 namespace itk
 {
 
-//template <class TValueType > class TreeIteratorBase;
 
-/** \class TreeContainerBase
- *  \brief Array class with size defined at construction time.
- * 
- * This class derives from the vnl_vector<> class. 
- * Its size is assigned at construction time (run time) and can 
- * not be changed afterwards except by using assignment to another
- * Array.
- *
- * The class is templated over the type of the elements.
- *
- * Template parameters for class Array:
- *
- * - TValueType = Element type stored at each location in the array.
- *
- * \ingroup DataRepresentation 
- */
 template <class TValueType>
 class TreeContainerBase : public Object
 {
@@ -65,29 +46,29 @@ public:
   /** Run-time type information (and related methods). */
   itkTypeMacro(TreeContainerBase, Object);
 
-  //typedef TreeIteratorBase<Self> IteratorType;
- // typedef int IteratorType;
+  /** Set the root element. 
+   * A new node is created and the element is added to the node */
+  virtual bool SetRoot( const TValueType element ) = 0;
 
-    virtual bool SetRoot( const TValueType element ) = 0;
-
-    virtual bool Contains( const TValueType element ) = 0;
-
-    virtual int Count() const = 0;
-
- //   virtual bool operator==( TreeContainerBase<TValueType>& tree ) = 0;
-
-  virtual bool IsLeaf( const TValueType element ) = 0;
-
-  virtual bool IsRoot( const TValueType element ) = 0;
-
-  virtual bool Clear( ) = 0;
-
-//  virtual bool SetRoot( IteratorType& pos ) = 0;
-  
+  /** Set the root has a node */
   virtual bool SetRoot( TreeNode<TValueType>* node) = 0;
 
-//  virtual bool Swap( IteratorType& v, IteratorType& w ) = 0;
+  /** Return true if the tree contains the element */
+  virtual bool Contains( const TValueType element ) = 0;
 
+  /** Return the number of nodes in the tree */
+  virtual int Count() const = 0;
+
+  /** Return if the element is a leaf */
+  virtual bool IsLeaf( const TValueType element ) = 0;
+  
+  /** Return if the element is root */
+  virtual bool IsRoot( const TValueType element ) = 0;
+
+  /** Clear the tree */
+  virtual bool Clear() = 0;
+
+  /** Get the root as a node */
   virtual const TreeNode<TValueType>* GetRoot() const = 0;
   
   /** Set if the tree is a subtree */
@@ -95,8 +76,8 @@ public:
 
 protected:
 
-  TreeContainerBase(){}; 
-  virtual ~TreeContainerBase(){}; 
+  TreeContainerBase() {}; 
+  virtual ~TreeContainerBase() {}; 
   bool  m_SubTree;
 
 };

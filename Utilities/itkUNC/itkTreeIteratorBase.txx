@@ -60,7 +60,7 @@ TreeIteratorBase<TTreeType>::TreeIteratorBase( const TTreeType* tree, const Tree
   m_End = NULL;
 }
 
-/** */
+/** Return the current value of the node */
 template <class TTreeType>
 const typename TreeIteratorBase<TTreeType>::ValueType& 
 TreeIteratorBase<TTreeType>::Get() const 
@@ -68,8 +68,7 @@ TreeIteratorBase<TTreeType>::Get() const
   return m_Position->Get();
 }
 
-
-/** */
+/** Set the current value of the node */
 template <class TTreeType>
 typename TreeIteratorBase<TTreeType>::ValueType& 
 TreeIteratorBase<TTreeType>::Set(ValueType element) 
@@ -79,8 +78,7 @@ TreeIteratorBase<TTreeType>::Set(ValueType element)
   return oldValue;
 }
 
-
-/** */
+/** Add a value to the node. This create a new child node */
 template <class TTreeType>
 bool 
 TreeIteratorBase<TTreeType>::Add(ValueType element)
@@ -105,33 +103,31 @@ TreeIteratorBase<TTreeType>::Add(ValueType element)
     }
 
   typename TreeNodeType::Pointer node = TreeNodeType::New();
-  node->SetData(element);
+  node->Set(element);
   node->SetParent(m_Position);
-  m_Position->AddChild( node) ; //m_Position) );
+  m_Position->AddChild( node);
   m_Tree->Modified();
   m_Tree->InvokeEvent( TreeAddEvent<TTreeType>(*this) );
   return true;
 }
 
-/** */
+/** Add a new element at a given position */
 template <class TTreeType>
 bool 
-TreeIteratorBase<TTreeType>::Add( int childPosition, ValueType element )
+TreeIteratorBase<TTreeType>::Add( int itkNotUsed(childPosition), ValueType element )
 {
   if ( m_Position ) 
     {
     typename TreeNodeType::Pointer node = TreeNodeType::New();
-    node->SetData(element);
+    node->Set(element);
     node->SetParent(m_Position);
-    m_Position->AddChild(node) ; // new TreeNodeType( element, m_Position ) );
+    m_Position->AddChild(node) ;
     m_Tree->Modified();
     m_Tree->InvokeEvent( TreeAddEvent<TTreeType>(*this) );
     return true;
     }
   return false;
 }
-
-
 
 /** Return true if the current pointed node is a leaf */
 template <class TTreeType>
@@ -140,7 +136,6 @@ TreeIteratorBase<TTreeType>::IsLeaf() const
 {
   return !(m_Position->HasChildren());
 } 
-
 
 /** Return true if the current pointed node is a root */
 template <class TTreeType>
@@ -159,62 +154,35 @@ TreeIteratorBase<TTreeType>::IsRoot( ) const
   return false;
 }
 
-
-/** TO FIX*/
+/** Add a subtree  */
 template <class TTreeType>
 bool 
 TreeIteratorBase<TTreeType>::Add( TTreeType& subTree ) 
 {
-std::cout << "reeIteratorBase<ValueType>::Add( TTreeType& subTree ) " << " TO FIX" << std::endl;
-/*
-    if ( subTree.Count() == 0 )
-        return false;
-
-    if ( m_Root == NULL ) {
-        ATIR i = subTree.ArbitraryTreeIterator( );
-        ValueType data = i->Get();
-        TreeNodeType* newNode = new LinkedNode<ValueType>( data, m_Position, 2 );
-
-        m_Root = newNode;
-        addTree( newNode, i );
-    m_Tree->InformTreeChangeListener(*this);
-        return true;
-    } else {
-
-        if ( m_Position == NULL )
-            return false;
-
-        ATIR i = subTree.arbitraryTreeIterator( );
-        ValueType data = i->get();
-        TreeNodeType* newNode = new LinkedNode<ValueType>( data, m_Position, 2 );
-        m_Position->AddChild( newNode );
-        addTree( newNode, i );
-    }*/
+  if ( subTree.Count() == 0 )
+    {
     return false;
-}
-
-
-/**
- * Private Methode, fügt rekursiv einen Baum als Unterbaum an
- * @param node aktueller Knoten, an den alle Kinder von i hinzugefügt
- *              werden sollen
- * @param i aktuelle Iteratorposition des Subbaums
- */
-/*template <class TTreeType>
-void TreeIteratorBase<TTreeType>::addTree( TreeNodeType *node, ATIR& i ) {
-
-    TIR children = i->children();
-    TreeNodeType* newNode = NULL;
-
-    while ( children->HasNext() ) {
-        ValueType data = children->Next();
-        newNode = new LinkedNode<ValueType>( data, node, 2 );
-        node->AddChild( newNode );
-        ATIR newPos = new WalkTreeIterator<ValueType>( children.get() );
-        addTree( newNode, newPos );
     }
-  m_Tree->InformTreeChangeListener(*this);
-}*/
+
+  if(!subTree.GetRoot())
+    {
+    return false;
+    }
+  
+  if ( m_Root == NULL ) 
+    {
+    m_Root = static_cast<const TreeNodeType*>(subTree.GetRoot());
+    } 
+  else 
+    {
+    if ( m_Position == NULL )
+      {
+      return false;
+      }
+    m_Position->AddChild( const_cast<TreeNodeType*>(static_cast<const TreeNodeType*>(subTree.GetRoot())) );
+    }
+  return true;
+}
 
 /** Return the subtree */
 template <class TTreeType>
@@ -228,8 +196,7 @@ TreeIteratorBase<TTreeType>::GetSubTree() const
   return NULL;
 }
 
-
-/** */
+/** Return true of the current node has a child */
 template <class TTreeType>
 bool 
 TreeIteratorBase<TTreeType>::HasChild( int number ) const
@@ -245,8 +212,7 @@ TreeIteratorBase<TTreeType>::HasChild( int number ) const
   return false;
 }
 
-
-/** */
+/** Return the current position of the child */
 template <class TTreeType>
 int 
 TreeIteratorBase<TTreeType>::ChildPosition( ValueType element ) const 
@@ -258,8 +224,7 @@ TreeIteratorBase<TTreeType>::ChildPosition( ValueType element ) const
   return m_Position->ChildPosition( element );
 }
 
-
-/** */
+/** Remove a child */
 template <class TTreeType>
 bool 
 TreeIteratorBase<TTreeType>::RemoveChild( int number ) 
@@ -283,7 +248,6 @@ TreeIteratorBase<TTreeType>::RemoveChild( int number )
   return false;
 }
 
-
 /** Count the number of children */
 template <class TTreeType>
 int 
@@ -295,7 +259,6 @@ TreeIteratorBase<TTreeType>::CountChildren() const
     }
   return m_Position->CountChildren( );
 }
-
 
 /** Return true of the pointed node has a parent */
 template <class TTreeType>
@@ -309,45 +272,46 @@ TreeIteratorBase<TTreeType>::HasParent( ) const
   return true;
 }
 
-
-/** */
+/** Disconnect the tree */
 template <class TTreeType>
 bool 
-TreeIteratorBase<TTreeType>::Disconnect( )
+TreeIteratorBase<TTreeType>::Disconnect()
 {
-    if ( m_Position == NULL )
-        return false;
-
-    if( m_Position->HasParent() == false )
-        return false;
-
-    TreeNodeType* parent = dynamic_cast<TreeNodeType*>(m_Position->GetParent());
-    m_Tree->InvokeEvent( TreeRemoveEvent<TTreeType>( *this ) );
-    parent->Remove( const_cast<TreeNodeType*>(m_Position) );
-    m_Tree->Modified();
-    int size = m_Position->CountChildren();
-
-    for( int i=0; i< size; i++ ) {
-        TreeNodeType* child = dynamic_cast<TreeNodeType*>(m_Position->GetChild(i));
-        parent->AddChild( child );
-        child->SetParent( parent );
+  if ( m_Position == NULL )
+    {
+    return false;
     }
 
-    m_Position = NULL;
-//  m_Tree->InformTreeChangeListener(*this);
-    return true;
+  if( m_Position->HasParent() == false )
+    {
+    return false;
+    }
+  
+  TreeNodeType* parent = dynamic_cast<TreeNodeType*>(m_Position->GetParent());
+  m_Tree->InvokeEvent( TreeRemoveEvent<TTreeType>( *this ) );
+  parent->Remove( const_cast<TreeNodeType*>(m_Position) );
+  m_Tree->Modified();
+  int size = m_Position->CountChildren();
+
+  for( int i=0; i< size; i++ ) 
+    {
+    TreeNodeType* child = dynamic_cast<TreeNodeType*>(m_Position->GetChild(i));
+    parent->AddChild( child );
+    child->SetParent( parent );
+    }
+
+  m_Position = NULL;
+  return true;
 }
 
-/** */
+/** Return the children list */
 template <class TTreeType>
 TreeIteratorBase<TTreeType>* 
-TreeIteratorBase<TTreeType>::Children( ) 
+TreeIteratorBase<TTreeType>::Children() 
 {
-//  TreeIteratorBase<TTreeType>& r = *this;
-//  return new ChildTreeIterator<ValueType>(r);
   itkGenericOutputMacro("Not implemented yet");
   ::itk::ExceptionObject e_(__FILE__, __LINE__, "Not implemented yet");
-  throw e_; /* Explicit naming to work around Intel compiler bug.  */ \
+  throw e_; /* Explicit naming to work around Intel compiler bug.  */
   return 0;
 }
 
@@ -365,15 +329,15 @@ TreeIteratorBase<TTreeType>::GetParent() const
   return m_Position->GetParent();
 }
 
-/**  */
+/** Return the list of parents */
 template <class TTreeType>
 TreeIteratorBase<TTreeType>* TreeIteratorBase<TTreeType>::Parents() 
 {
-  //TreeIteratorBase<TTreeType>& r = *this;
-  //return new RootTreeIterator<ValueType>(r);
+  itkGenericOutputMacro("Not implemented yet");
+  ::itk::ExceptionObject e_(__FILE__, __LINE__, "Not implemented yet");
+  throw e_; /* Explicit naming to work around Intel compiler bug.  */ 
   return 0;
 }
-
 
 /** Go to a child */
 template <class TTreeType>
@@ -394,7 +358,6 @@ bool TreeIteratorBase<TTreeType>::GoToChild( int number )
   return true;
 }
 
-
 /** Go to a parent */
 template <class TTreeType>
 bool TreeIteratorBase<TTreeType>::GoToParent( ) 
@@ -413,7 +376,7 @@ bool TreeIteratorBase<TTreeType>::GoToParent( )
   return true;
 }
 
-/** */
+/** Get a child given a number */
 template <class TTreeType>
 TreeIteratorBase<TTreeType>* TreeIteratorBase<TTreeType>::GetChild( int number ) const 
 {
@@ -429,9 +392,8 @@ TreeIteratorBase<TTreeType>* TreeIteratorBase<TTreeType>::GetChild( int number )
     return NULL;
     }
 //    return new WalkTreeIterator<ValueType,P>( child, m_Root, m_Tree, getType() );
-    return NULL;
+  return NULL;
 }
-
 
 /** Count the number of nodes from the beginning */
 template <class TTreeType>
@@ -450,8 +412,7 @@ int TreeIteratorBase<TTreeType>::Count()
   return size;
 }
 
-
-/**  */
+/**  Count the number of nodes */
 template <class TTreeType>
 int TreeIteratorBase<TTreeType>::Count(TreeNodeType* node ) 
 {
@@ -471,7 +432,6 @@ int TreeIteratorBase<TTreeType>::Count(TreeNodeType* node )
    }
   return size;
 }
-
 
 /** Get the node pointed by the iterator */
 template <class TTreeType>
@@ -543,8 +503,6 @@ TreeIteratorBase<TTreeType>::GetTree()
 
 
 } // namespace itk
-
-
 
 #endif
 

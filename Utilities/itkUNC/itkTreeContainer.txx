@@ -66,9 +66,8 @@ TreeContainer<TValueType>::SetRoot(const TValueType element)
     {
     return false;
     }
-  //m_Root = new TreeNode<TValueType>( element, NULL);
   m_Root = TreeNodeType::New();
-  m_Root->SetData(element);
+  m_Root->Set(element);
   m_Root->SetParent(NULL);
   return true;
 }
@@ -148,7 +147,6 @@ TreeContainer<TValueType>::Swap( IteratorType& v, IteratorType& w )
   return true;
 }
 
-
 /** Return true if the tree contains this element */
 template <class TValueType>
 bool 
@@ -166,7 +164,6 @@ TreeContainer<TValueType>::Contains( const TValueType element )
     }
   return false;
 }
-
 
 /** Equal operator */
 template <class TValueType>
@@ -215,7 +212,6 @@ TreeContainer<TValueType>::IsLeaf( TValueType element )
   return false;
 }
 
-
 /** Return true of the node containing the element is the root */
 template <class TValueType>
 bool 
@@ -241,7 +237,6 @@ TreeContainer<TValueType>::IsRoot( TValueType element )
   return false;
 }
 
-
 /** Clear the tree */
 template <class TValueType>
 bool TreeContainer<TValueType>::Clear() 
@@ -264,25 +259,6 @@ bool TreeContainer<TValueType>::Clear()
 }
 
 /** Get node given a value */
-/*template <class TValueType>
-TreeNode<TValueType>* 
-TreeContainer<TValueType>::GetNode(TValueType val)
-{
-  PreOrderTreeIterator<Self> it(this,m_Root);
-  it.GoToBegin();
-  while(!it.IsAtEnd())
-    {
-    if(it.Get() == val)
-      {
-      return it.GetNode();
-      }
-    ++it;
-    }
-
-  return NULL;
-}*/
-
-/** Get node given a value */
 template <class TValueType>
 const TreeNode<TValueType>* 
 TreeContainer<TValueType>::GetNode(TValueType val) const
@@ -299,7 +275,6 @@ TreeContainer<TValueType>::GetNode(TValueType val) const
     }
   return NULL;
 }
-
 
 /** Set the root of the tree from the iterator position */
 template <class TValueType>
@@ -344,55 +319,6 @@ TreeContainer<TValueType>::SetRoot( IteratorType& pos )
   return true;
 }
 
-
-/**
- *
- */
-/*template <class TValueType>
-bool TreeContainer<TValueType>::AddTreeChangeListener( TreeChangeListener* treeChangeListener ) {
-
-  typename std::vector<TreeChangeListener*>::iterator pos = std::find( m_TreeChangeListenerList.begin(), m_TreeChangeListenerList.end(), treeChangeListener );
-
-  if ( pos != m_TreeChangeListenerList.end() )
-    return false;
-
-  m_TreeChangeListenerList.push_back( treeChangeListener );
-  return true;
-}*/
-
-
-/**
- *
- */
-/*template <class TValueType>
-bool TreeContainer<TValueType>::RemoveTreeChangeListener( TreeChangeListener* treeChangeListener ) {
-
-  typename std::vector<TreeChangeListener*>::iterator pos = std::find( m_TreeChangeListenerList.begin(), m_TreeChangeListenerList.end(), treeChangeListener );
-
-  if ( pos == m_TreeChangeListenerList.end() )
-    return false;
-
-  m_TreeChangeListenerList.erase( pos );
-  return true;
-}*/
-
-/**
- *
- */
-/*template <class TValueType>
-void 
-TreeContainer<TValueType>::InformTreeChangeListener( IteratorType& changedTreePosition ) 
-{
-  typename std::vector<TreeChangeListener*>::iterator pos = m_TreeChangeListenerList.begin();
-  const typename std::vector<TreeChangeListener*>::iterator end = m_TreeChangeListenerList.end();
-
-  while ( pos != end ) 
-    {
-    (*pos)->TreeChanged( changedTreePosition );
-    pos++;
-    }
-}*/
-
 /** Add a child to a given parent */
 template <class TValueType>
 bool 
@@ -417,7 +343,6 @@ TreeContainer<TValueType>::Add(const TValueType child, const TValueType parent)
     }
   return false;
 }
-
 
 /** Print self */
 template <class TValueType>
@@ -445,7 +370,6 @@ PrintSelf(std::ostream &os, Indent indent) const
       }
     }
 }
-
 
 } // namespace itk
 

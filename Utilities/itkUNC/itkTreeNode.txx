@@ -23,31 +23,11 @@ namespace itk
 {
 
 /** Constructor */
-/*template <class TValueType>
-TreeNode<TValueType>::TreeNode( TValueType data, TreeNode<TValueType>* parent, int defaultChildrenCount )
-{
-  m_Parent = parent;
-  m_Children.reserve(defaultChildrenCount);
-  m_Data = data;
-}*/
-
-
-/** Constructor */
-/*template <class TValueType>
-TreeNode<TValueType>::TreeNode( TreeNode<TValueType>* parent, int defaultChildrenCount )
-{
-  m_Parent = parent;
-  m_Children.reserve(defaultChildrenCount);
-}*/
-
-/** Constructor */
 template <class TValueType>
 TreeNode<TValueType>::TreeNode()
 {
-  m_Children.reserve(3);
   m_Parent = NULL;
 }
-
 
 /** Destructor */
 template <class TValueType>
@@ -66,7 +46,6 @@ TreeNode<TValueType>::~TreeNode()
   m_Data = 0;
 }
 
-
 /** Return the parent node */
 template <class TValueType>
 TreeNode<TValueType>* 
@@ -75,7 +54,6 @@ TreeNode<TValueType>
 {
   return m_Parent;
 }
-
 
 /** Get a child */
 template <class TValueType>
@@ -93,16 +71,14 @@ TreeNode<TValueType>
     }
 }
 
-
 /** Set the value of a node */
 template <class TValueType>
 TValueType TreeNode<TValueType>::Set(TValueType data)
 {
-  TValueType help = this->data;
-  this->data = data;
+  TValueType help = m_Data;
+  m_Data = data;
   return help;
 }
-
 
 /** Get the data of node */
 template <class TValueType>
@@ -111,13 +87,7 @@ const TValueType& TreeNode<TValueType>::Get() const
   return m_Data;
 }
 
-
-/**
- * Überprüft, ob der aktuelle Knoten einen Vorgänger besitzt
- * @return true der aktuelle Knoten besitzt einen Vorgänger
- *         false der aktuelle Knoten besitzt keinen Vorgänger,
- *         d. h. der aktuelle Knoten ist der root
- */
+/** Return true if has a parent */
 template <class TValueType>
 bool 
 TreeNode<TValueType>::HasParent() const 
@@ -125,42 +95,29 @@ TreeNode<TValueType>::HasParent() const
   return (m_Parent)?true:false;
 }
 
-
-/**
- * Setzt den Vaterknoten
- * @param n Vaterkonten
- */
+/** Set the parent node */
 template <class TValueType>
 void 
-TreeNode<TValueType>::SetParent( TreeNode<TValueType>* n) 
+TreeNode<TValueType>::SetParent( TreeNode<TValueType>* node) 
 {
-  m_Parent = n;
+  m_Parent = node;
 }
 
-/**
- * Überprüft, ob der Knoten Nachfolger besitzt
- * @return true der aktuelle Knoten besitzt Kindknoten
- *               false der aktuelle Knoten besitzt keine Kindknoten,
- *         d. h. er ist ein Blattknoten (leaf)
- */
+/** Return true if the node has children */
 template <class TValueType>
-bool TreeNode<TValueType>::HasChildren( ) const {
-    return (m_Children.size()>0)?true:false;  // return m_Children.size() > 0; sollte auch reichen!!
+bool TreeNode<TValueType>::HasChildren() const 
+{
+  return (m_Children.size()>0)?true:false;
 }
 
-
-/**
- * Gibt die Anzahl der direkten Kindknoten zurück
- * @return Anzahl der unmitelbaren Kinder
- */
+/** Return the number of children */
 template <class TValueType>
 int 
 TreeNode<TValueType>
 ::CountChildren( ) const 
 {
-    return m_Children.size();
+  return m_Children.size();
 }
-
 
 /** Remove a child node from the current node */
 template <class TValueType>
@@ -179,33 +136,24 @@ TreeNode<TValueType>
   return false;
 }
 
-
-/**
- * Ersetzt einen Kindknoten durch einen neuen
- * @param oldChild zu ersetzender Kindknoten
- * @param newChild neuer Kindknoten
- * @return Erfolg der Operation
- */
+/** Replace a child by a new one */
 template <class TValueType>
-bool TreeNode<TValueType>::ReplaceChild( TreeNode<TValueType> *oldChild, TreeNode<TValueType> *newChild ) {
-    int size = m_Children.size();
+bool TreeNode<TValueType>::ReplaceChild( TreeNode<TValueType> *oldChild, TreeNode<TValueType> *newChild )
+{
+  int size = m_Children.size();
 
-    for ( int i=0; i<size; i++ ) {
-        if ( m_Children[i] == oldChild ) {
-            m_Children[i] = newChild;
-            return true;
-        }
+  for ( int i=0; i<size; i++ )
+    {
+    if ( m_Children[i] == oldChild )
+      {
+      m_Children[i] = newChild;
+      return true;
+      }
     }
-    return false;
+  return false;
 }
 
-
-/**
- * Liefert die Position des spezifizierten Kindknotens
- * @param node gesuchter Kindknoten
- * @return Position des Knotens, sollte der Node nicht enthalten sein
- * wird -1 zurück gegeben
- */
+/** Return the child position given a node */
 template <class TValueType>
 int TreeNode<TValueType>::ChildPosition( const TreeNode<TValueType> *node ) const 
 {
@@ -219,27 +167,19 @@ int TreeNode<TValueType>::ChildPosition( const TreeNode<TValueType> *node ) cons
   return -1;
 }
 
-/**
- * Liefert die Position des Kindknotens, der element enthält
- * @param element Element vom Typ TValueType
- * @return Position des Elements, sollte das Element nicht enthalten sein
- * wird -1 zurück gegeben
- */
+/** Return the child position given an element, the first child found. */
 template <class TValueType>
-int TreeNode<TValueType>::ChildPosition( TValueType element ) const {
-    for ( unsigned int i=0; i < m_Children.size(); i++ ) {
-        if ( m_Children[i]->Get() == element )
-            return i;
+int TreeNode<TValueType>::ChildPosition( TValueType element ) const 
+{
+  for ( unsigned int i=0; i < m_Children.size(); i++ ) 
+    {
+    if ( m_Children[i]->Get() == element )
+    return i;
     }
-
-    return -1;
+  return -1;
 }
 
-
-/**
- * Fügt einen Knoten als Kind hinzu
- * @param node neuer Kindknoten
- */
+/** Add a child node */
 template <class TValueType>
 void TreeNode<TValueType>::AddChild( TreeNode<TValueType> *node ) 
 {
@@ -247,33 +187,30 @@ void TreeNode<TValueType>::AddChild( TreeNode<TValueType> *node )
   m_Children.push_back(node);
 }
 
-/**
- * Fügt einen Knoten als Kind an die vorgegebene Position hinzu
- * oder ersetzt den an dieser Position existierenden Knoten
- * Fehlende Zwischenpositionen werden mit NULL aufgefüllt.
- * @param number position des neuen Knotens
- * @param node neuer Knoten
- */
+/** Add a child at a specific position in the children list */
 template <class TValueType>
 void 
 TreeNode<TValueType>
 ::AddChild( int number, TreeNode<TValueType> *node ) 
 {  
- int size = m_Children.size();
+  int size = m_Children.size();
 
-    if ( number > size ) {
-        for ( int i=size; i <= number; i++ )
-            m_Children[i] = NULL;
-
-        m_Children[number] = node;
-        return;
+  if ( number > size ) 
+    {
+    for ( int i=size; i <= number; i++ )
+      {
+      m_Children[i] = NULL;
+      }
+    m_Children[number] = node;
+    return;
     }
 
-    TreeNode<TValueType>* old = m_Children[number];
-    if ( old != NULL )
-        delete old;
-
-    m_Children[number] = node;
+  TreeNode<TValueType>* old = m_Children[number];
+  if ( old != NULL )
+    {
+    delete old;
+    }
+  m_Children[number] = node;
 }
 
 /** Get the number of children given a name and a depth */
@@ -308,7 +245,6 @@ TreeNode<TValueType>
 
   return cnt;
 }
-
 
 /** Get children given a name and a depth */
 template <class TValueType>

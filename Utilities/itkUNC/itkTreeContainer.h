@@ -24,25 +24,20 @@
 namespace itk
 {
 
-//template <class TValueType> class PreOrderTreeIterator;
-
 /** \class TreeContainer
- *  \brief Array class with size defined at construction time.
+ *  \brief TreeContainer class
  * 
- * This class derives from the vnl_vector<> class. 
- * Its size is assigned at construction time (run time) and can 
- * not be changed afterwards except by using assignment to another
- * Array.
+ * This class derives from the TreeContainerBase class.
  *
  * The class is templated over the type of the elements.
  *
- * Template parameters for class Array:
+ * Template parameters for class TreeContainer:
  *
- * - TValueType = Element type stored at each location in the array.
+ * - TValueType = Element type stored at each location in the Tree.
  *
  * \ingroup DataRepresentation 
  */
-template <class TValueType> //, class TTreeObjectSuperclass>
+template <class TValueType>
 class TreeContainer : public TreeContainerBase<TValueType>
 {
 
@@ -56,11 +51,8 @@ public:
   typedef TValueType ValueType;
   typedef TreeNode<ValueType> TreeNodeType;
 
-  /** Iterators typedef */
-//  typedef typename Superclass::IteratorType IteratorType;
-  
-   typedef TreeIteratorBase<Self> IteratorType;
-  //typedef PreOrderTreeIterator<Self> IteratorType;
+  /** Iterators typedef */ 
+  typedef TreeIteratorBase<Self> IteratorType;
   typedef PreOrderTreeIterator<Self> PreOrderIteratorType;
 
   /** Method for creation through the object factory. */
@@ -69,47 +61,49 @@ public:
   /** Run-time type information (and related methods). */
   itkTypeMacro(TreeContainer, TreeContainerBase);
  
-//  typedef typename TreeContainerBase<TValueType>::TreeChangeListener TreeChangeListener;
-
+  /** Constructor */
   TreeContainer( int defaultChildrenCount );
 
+  /** Constructor */
   TreeContainer( TreeContainer<TValueType>& tree );
 
+  /** Set the root as an element */
   virtual bool SetRoot( const TValueType element);
 
+  /** The the root as an iterator position */
   bool SetRoot( IteratorType& pos );
 
+  /** Set the root as a tree node */
   virtual bool SetRoot( TreeNode<TValueType>* node);
 
+  /** Return true if the element is in the tree*/
   bool Contains( const TValueType element ) ;
 
+  /** Return the number of elements in the tree */
   int Count() const;
 
+  /** Return true if the element is a leaf */
   bool IsLeaf( const TValueType element );
 
+  /** Return true if the element is a root */
   bool IsRoot( const TValueType element );
 
-  bool Clear( );
+  /** Clear the tree */
+  bool Clear();
 
+  /** operator equal */
   bool operator==( TreeContainer<TValueType>& tree );
 
-
+  /** Swap the iterators */
   bool Swap( IteratorType& v, IteratorType& w );
-/*
-  virtual bool AddTreeChangeListener(TreeChangeListener* treeChangeListener);
 
-  virtual bool RemoveTreeChangeListener(TreeChangeListener* treeChangeListener);
-
-  virtual void InformTreeChangeListener(IteratorType& changedTreePosition);
-*/
-  //TreeNode<TValueType>* GetRoot() {return m_Root;}
+  /** Get the root */
   const TreeNodeType* GetRoot() const {return m_Root;}
 
   /** Add a child to a given parent using values*/
   bool Add(const TValueType child, const TValueType parent);
 
   /** Get node given a value */
-  //TreeNode<TValueType>* GetNode(TValueType val);
   const TreeNodeType* GetNode(TValueType val) const;
 
 protected:
@@ -118,7 +112,6 @@ protected:
   virtual ~TreeContainer();
 
   typename TreeNodeType::Pointer    m_Root;
-//  std::vector<TreeChangeListener*>               m_TreeChangeListenerList;
   int   m_DefaultChildrenCount;
 
   void PrintSelf(std::ostream& os, Indent indent) const;

@@ -9,16 +9,22 @@
             <x>0</x>
             <y>0</y>
             <width>475</width>
-            <height>776</height>
+            <height>783</height>
         </rect>
     </property>
     <property name="sizePolicy">
         <sizepolicy>
             <hsizetype>7</hsizetype>
-            <vsizetype>7</vsizetype>
+            <vsizetype>3</vsizetype>
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
         </sizepolicy>
+    </property>
+    <property name="minimumSize">
+        <size>
+            <width>200</width>
+            <height>0</height>
+        </size>
     </property>
     <property name="font">
         <font>
@@ -33,90 +39,85 @@
     <property name="acceptDrops">
         <bool>false</bool>
     </property>
-    <widget class="QListView">
-        <column>
+    <vbox>
+        <property name="name">
+            <cstring>unnamed</cstring>
+        </property>
+        <property name="margin">
+            <number>5</number>
+        </property>
+        <property name="spacing">
+            <number>5</number>
+        </property>
+        <widget class="QPushButton">
+            <property name="name">
+                <cstring>m_RemoveButton</cstring>
+            </property>
             <property name="text">
-                <string>Column 1</string>
+                <string>Remove</string>
             </property>
-            <property name="clickable">
+        </widget>
+        <widget class="QListView">
+            <column>
+                <property name="text">
+                    <string>Column 1</string>
+                </property>
+                <property name="clickable">
+                    <bool>true</bool>
+                </property>
+                <property name="resizable">
+                    <bool>true</bool>
+                </property>
+            </column>
+        <item>
+            <property name="text">
+                <string>New Item</string>
+            </property>
+            <property name="pixmap">
+                <pixmap></pixmap>
+            </property>
+        </item>
+            <property name="name">
+                <cstring>m_DataTreeView</cstring>
+            </property>
+            <property name="sizePolicy">
+                <sizepolicy>
+                    <hsizetype>7</hsizetype>
+                    <vsizetype>3</vsizetype>
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                </sizepolicy>
+            </property>
+            <property name="minimumSize">
+                <size>
+                    <width>250</width>
+                    <height>0</height>
+                </size>
+            </property>
+            <property name="acceptDrops">
+                <bool>false</bool>
+            </property>
+            <property name="rootIsDecorated">
                 <bool>true</bool>
             </property>
-            <property name="resizable">
-                <bool>true</bool>
+        </widget>
+        <widget class="QmitkNodePropertiesView">
+            <property name="name">
+                <cstring>m_NodePropertiesView</cstring>
             </property>
-        </column>
-    <item>
-        <property name="text">
-            <string>New Item</string>
-        </property>
-        <property name="pixmap">
-            <pixmap></pixmap>
-        </property>
-    </item>
-        <property name="name">
-            <cstring>m_DataTreeView</cstring>
-        </property>
-        <property name="geometry">
-            <rect>
-                <x>10</x>
-                <y>40</y>
-                <width>455</width>
-                <height>361</height>
-            </rect>
-        </property>
-        <property name="minimumSize">
-            <size>
-                <width>250</width>
-                <height>0</height>
-            </size>
-        </property>
-        <property name="acceptDrops">
-            <bool>false</bool>
-        </property>
-        <property name="rootIsDecorated">
-            <bool>true</bool>
-        </property>
-    </widget>
-    <widget class="QPushButton">
-        <property name="name">
-            <cstring>m_RemoveButton</cstring>
-        </property>
-        <property name="geometry">
-            <rect>
-                <x>10</x>
-                <y>10</y>
-                <width>455</width>
-                <height>25</height>
-            </rect>
-        </property>
-        <property name="text">
-            <string>Remove</string>
-        </property>
-    </widget>
-    <widget class="QmitkNodePropertiesView">
-        <property name="name">
-            <cstring>m_NodePropertiesView</cstring>
-        </property>
-        <property name="geometry">
-            <rect>
-                <x>10</x>
-                <y>400</y>
-                <width>455</width>
-                <height>360</height>
-            </rect>
-        </property>
-        <property name="sizePolicy">
-            <sizepolicy>
-                <hsizetype>7</hsizetype>
-                <vsizetype>7</vsizetype>
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-            </sizepolicy>
-        </property>
-        <property name="acceptDrops">
-            <bool>false</bool>
-        </property>
-    </widget>
+            <property name="sizePolicy">
+                <sizepolicy>
+                    <hsizetype>7</hsizetype>
+                    <vsizetype>7</vsizetype>
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                </sizepolicy>
+            </property>
+            <property name="acceptDrops">
+                <bool>false</bool>
+            </property>
+        </widget>
+    </vbox>
 </widget>
 <customwidgets>
     <customwidget>

@@ -79,9 +79,7 @@ class MeshVtkMapper3D : public BaseVtkMapper3D
     vtkPolyDataMapper* m_TextVtkPolyDataMapper;
 
 		vtkAppendPolyData *m_Spheres;
-		vtkAppendPolyData *m_vtkTextList;
 		vtkPolyData *m_Contour;
-    vtkTubeFilter * m_tubefilter;
 };
 
 } // namespace mitk

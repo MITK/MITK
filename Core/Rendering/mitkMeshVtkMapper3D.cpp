@@ -51,9 +51,7 @@ vtkProp* mitk::MeshVtkMapper3D::GetProp()
 mitk::MeshVtkMapper3D::MeshVtkMapper3D() : m_PropAssemply(NULL)
 {
 	m_Spheres = vtkAppendPolyData::New();
-	m_vtkTextList = vtkAppendPolyData::New();
 	m_Contour = vtkPolyData::New();
-	m_tubefilter = vtkTubeFilter::New();
 
   m_SpheresActor = vtkActor::New();
   m_SpheresMapper = vtkPolyDataMapper::New();
@@ -65,10 +63,10 @@ mitk::MeshVtkMapper3D::MeshVtkMapper3D() : m_PropAssemply(NULL)
   m_ContourActor->GetProperty()->SetAmbient(1.0);
 
   m_PropAssemply = vtkPropAssembly::New();
-  m_PropAssemply->AddPart(m_ContourActor);
-  m_PropAssemply->AddPart(m_SpheresActor);
 
-  m_Prop3D = m_ContourActor;
+  // a vtkPropAssembly is not a sub-class of vtkProp3D, so
+  // we cannot use m_Prop3D.
+  m_Prop3D = NULL;
 }
 
 mitk::MeshVtkMapper3D::~MeshVtkMapper3D()
@@ -79,6 +77,7 @@ mitk::MeshVtkMapper3D::~MeshVtkMapper3D()
   m_SpheresMapper->Delete();
   m_PropAssemply->Delete();
   m_Spheres->Delete();
+	m_Contour->Delete();
 }
 
 void mitk::MeshVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
@@ -90,14 +89,9 @@ void mitk::MeshVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
   }
   m_PropAssemply->VisibilityOn();
 
-	m_Spheres->Delete();
-	m_vtkTextList->Delete();
-	m_Contour->Delete();
-	m_tubefilter->Delete();
-
-	m_Spheres = vtkAppendPolyData::New();
-	m_vtkTextList = vtkAppendPolyData::New();
-	m_tubefilter = vtkTubeFilter::New();
+  m_PropAssemply->GetParts()->RemoveAllItems();
+	m_Spheres->RemoveAllInputs();
+  m_Contour->Initialize();
 
   mitk::Mesh::Pointer input  = const_cast<mitk::Mesh*>(this->GetInput());
   mitk::Mesh::DataType::Pointer mesh;
@@ -112,36 +106,47 @@ void mitk::MeshVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
   // check for color prop and use it for rendering if it exists
   GetColor(rgba, renderer);
 
-  int pointSize = 2;
-  mitk::IntProperty::Pointer pointSizeProp = dynamic_cast<mitk::IntProperty *>(this->GetDataTreeNode()->GetProperty("pointsize").GetPointer());
-  if (pointSizeProp != NULL)
-    pointSize = pointSizeProp->GetValue();
+  if(mesh->GetNumberOfPoints()>0)
+  {
+    // build m_Spheres->GetOutput() vtkPolyData
+    int pointSize = 2;
+    mitk::IntProperty::Pointer pointSizeProp = dynamic_cast<mitk::IntProperty *>(this->GetDataTreeNode()->GetProperty("pointsize").GetPointer());
+    if (pointSizeProp != NULL)
+      pointSize = pointSizeProp->GetValue();
 
-  for (j=0, i=mesh->GetPoints()->Begin(); i!=mesh->GetPoints()->End() ; i++,j++)
-	{
-	  vtkSphereSource *sphere = vtkSphereSource::New();
+    for (j=0, i=mesh->GetPoints()->Begin(); i!=mesh->GetPoints()->End() ; i++,j++)
+	  {
+	    vtkSphereSource *sphere = vtkSphereSource::New();
 
-		sphere->SetRadius(pointSize);
-    sphere->SetCenter(i.Value()[0],i.Value()[1],i.Value()[2]);
+		  sphere->SetRadius(pointSize);
+      sphere->SetCenter(i.Value()[0],i.Value()[1],i.Value()[2]);
 
-		m_Spheres->AddInput(sphere->GetOutput());
-	}
+		  m_Spheres->AddInput(sphere->GetOutput());
+	  }
 
- // build contour vtkPolyData
-  m_Contour = MeshUtil<mitk::Mesh::MeshType>::meshToPolyData(mesh.GetPointer());
-  m_ContourMapper->SetInput(m_Contour);
+    // setup mapper, actor and add to assembly
+    m_SpheresMapper->SetInput(m_Spheres->GetOutput());
+    m_SpheresActor->GetProperty()->SetColor(rgba);
+    m_PropAssemply->AddPart(m_SpheresActor);
+  }
 
-  bool wireframe=true;
-  GetDataTreeNode()->GetVisibility(wireframe, renderer, "wireframe");
-  if(wireframe)
-    m_ContourActor->GetProperty()->SetRepresentationToWireframe();
-  else
-    m_ContourActor->GetProperty()->SetRepresentationToSurface();
+  if(mesh->GetNumberOfCells()>0)
+  {
+    // build m_Contour vtkPolyData
+    m_Contour = MeshUtil<mitk::Mesh::MeshType>::MeshToPolyData(mesh.GetPointer(), false, false, m_Contour);
 
-  m_ContourActor->GetProperty()->SetColor(rgba);
-  m_SpheresActor->GetProperty()->SetColor(rgba);
-
-  m_SpheresMapper->SetInput(m_Spheres->GetOutput());
+    if(m_Contour->GetNumberOfCells()>0)
+    {
+      // setup mapper, actor and add to assembly
+      m_ContourMapper->SetInput(m_Contour);
+      bool wireframe=true;
+      GetDataTreeNode()->GetVisibility(wireframe, renderer, "wireframe");
+      if(wireframe)
+        m_ContourActor->GetProperty()->SetRepresentationToWireframe();
+      else
+        m_ContourActor->GetProperty()->SetRepresentationToSurface();
+      m_ContourActor->GetProperty()->SetColor(rgba);
+      m_PropAssemply->AddPart(m_ContourActor);
+    }
+  }
 }
-
-

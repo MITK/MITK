@@ -57,6 +57,7 @@ void mitk::Geometry2DDataToSurfaceFilter::GenerateOutputInformation()
 
     if(input.IsNull()) return;
     if(input->GetGeometry2D()==NULL) return;
+    if(input->GetGeometry2D()->IsValid()==false) return;
 
     Point3D origin;
     Point3D right, bottom;

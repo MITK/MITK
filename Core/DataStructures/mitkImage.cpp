@@ -1,5 +1,5 @@
 #include "mitkImage.h"
-
+ 
 #include "mitkSlicedGeometry3D.h"
 #include "mitkPlaneGeometry.h"
 #include <vtkImageData.h>

@@ -1,5 +1,5 @@
 #include "mitkImage.h"
- 
+
 #include "mitkSlicedGeometry3D.h"
 #include "mitkPlaneGeometry.h"
 #include <vtkImageData.h>
@@ -544,39 +544,39 @@ void mitk::Image::Initialize(vtkImageData* vtkimagedata, int channels, int tDim,
 
   switch ( vtkimagedata->GetScalarType () ) 
   {
-    case VTK_BIT: 
-    case VTK_CHAR: 
-      pixelType.Initialize(typeid(char));
-      break;
-    case VTK_UNSIGNED_CHAR: 
-      pixelType.Initialize(typeid(unsigned char));
-      break;
-    case VTK_SHORT: 
-      pixelType.Initialize(typeid(short));
-      break;
-    case VTK_UNSIGNED_SHORT: 
-      pixelType.Initialize(typeid(unsigned short));
-      break;
-    case VTK_INT: 
-      pixelType.Initialize(typeid(int));
-      break;
-    case VTK_UNSIGNED_INT: 
-      pixelType.Initialize(typeid(unsigned int));
-      break;
-    case VTK_LONG: 
-      pixelType.Initialize(typeid(long));
-      break;
-    case VTK_UNSIGNED_LONG: 
-      pixelType.Initialize(typeid(unsigned long));
-      break;
-    case VTK_FLOAT:
-      pixelType.Initialize(typeid(float));
-      break;
-    case VTK_DOUBLE: 
-      pixelType.Initialize(typeid(double));
-      break;
-    default:
-      break;
+  case VTK_BIT: 
+  case VTK_CHAR: 
+    pixelType.Initialize(typeid(char));
+    break;
+  case VTK_UNSIGNED_CHAR: 
+    pixelType.Initialize(typeid(unsigned char));
+    break;
+  case VTK_SHORT: 
+    pixelType.Initialize(typeid(short));
+    break;
+  case VTK_UNSIGNED_SHORT: 
+    pixelType.Initialize(typeid(unsigned short));
+    break;
+  case VTK_INT: 
+    pixelType.Initialize(typeid(int));
+    break;
+  case VTK_UNSIGNED_INT: 
+    pixelType.Initialize(typeid(unsigned int));
+    break;
+  case VTK_LONG: 
+    pixelType.Initialize(typeid(long));
+    break;
+  case VTK_UNSIGNED_LONG: 
+    pixelType.Initialize(typeid(unsigned long));
+    break;
+  case VTK_FLOAT:
+    pixelType.Initialize(typeid(float));
+    break;
+  case VTK_DOUBLE: 
+    pixelType.Initialize(typeid(double));
+    break;
+  default:
+    break;
   }
   Initialize(pixelType, 
     m_Dimension, 
@@ -655,6 +655,19 @@ void mitk::Image::Initialize(ipPicDescriptor* pic, int channels, int tDim, int s
 
   m_Initialized = true;
 }
+
+void mitk::Image::SetSpacing(const float aSpacing[3])
+{
+  GetSlicedGeometry(0)->SetSpacing(aSpacing);
+  m_TimeSlicedGeometry->InitializeEvenlyTimed(GetSlicedGeometry(0), m_Dimensions[3]);
+}
+
+void mitk::Image::SetSpacing(mitk::Vector3D aSpacing)
+{
+  GetSlicedGeometry(0)->SetSpacing(aSpacing);
+  m_TimeSlicedGeometry->InitializeEvenlyTimed(GetSlicedGeometry(0), m_Dimensions[3]);
+}
+
 
 //##ModelId=3E155CF000F6
 bool mitk::Image::IsValidSlice(int s, int t, int n) const

@@ -14,15 +14,18 @@ class NodeViewCheckboxItem;
 
 class QmitkDataTreeViewItem : public QListViewItem
 {
-  public:
+
+	public:
     QmitkDataTreeViewItem( QListView *parent, const QString &s1 = 0, const QString &s2 = 0, mitk::DataTreeIterator * nodeIt = 0 );
     QmitkDataTreeViewItem( QmitkDataTreeViewItem * parent, mitk::DataTreeIterator * nodeIt );
     mitk::DataTreeNode::ConstPointer GetDataTreeNode() const;
     mitk::DataTreeIterator* GetDataTreeIterator() {return m_DataTreeIterator;}
-  protected:
-    mitk::DataTreeNode::ConstPointer m_TreeNode;   
+
+	protected:
+    mitk::DataTreeNode::ConstPointer m_TreeNode;
     mitk::DataTreeIterator* m_DataTreeIterator;
 };
+
 
 class QmitkNodeViewBaseItem {
   public:
@@ -60,7 +63,7 @@ class NodeViewCheckboxItem : public QCheckListItem, public QmitkNodeViewBaseItem
         boolProp->SetValue(state);
 	mitk::RenderWindow::UpdateAllInstances();
       };
-        
+
        QCheckListItem::stateChange(state);
       listView()->repaintContents();      
     };

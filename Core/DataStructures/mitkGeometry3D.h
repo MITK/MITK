@@ -77,7 +77,7 @@ public:
   //## @brief Get the parametric bounding-box
   //## 
   itkGetConstObjectMacro(ParametricBoundingBox, BoundingBox);
-#if ITK_VERSION_MINOR <= 6
+#if ( ITK_VERSION_MAJOR == 1 ) && ITK_VERSION_MINOR <= 6
   const BoundingBox::BoundsArrayType GetParametricBounds() const
 #else
   const BoundingBox::BoundsArrayType& GetParametricBounds() const

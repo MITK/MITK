@@ -4,7 +4,9 @@
 
 #include "DataTree.h"
 #include "mitkImageMapper2D.h"
+
 #include "mitkSurfaceData.h"
+#include "mitkGeometry2DDataToSurfaceDataFilter.h"
 
 #include "vtkActor.h"
 #include "vtkProperty.h"
@@ -48,8 +50,6 @@ mitk::Geometry2DDataVtkMapper3D::Geometry2DDataVtkMapper3D() : m_DataTreeIterato
         m_VtkTexture->InterpolateOn();
         m_VtkTexture->SetLookupTable(m_VtkLookupTable);
         m_VtkTexture->MapColorScalarsThroughLookupTableOn();
-
-    m_SurfaceCreator = mitk::Geometry2DDataToSurfaceDataFilter::New();
 
     //    m_Actor->SetTexture(axialTexture);
 
@@ -134,61 +134,59 @@ void mitk::Geometry2DDataVtkMapper3D::Update(mitk::BaseRenderer* renderer)
 
     if(input.IsNotNull())
     {
-//        mitk::PlaneGeometry::ConstPointer planeGeometry = dynamic_cast<const PlaneGeometry *>(input->GetGeometry2D());
-
-        m_SurfaceCreator->SetInput(input);
-        m_SurfaceCreator->Update(); //FIXME ohne das crash
-        m_VtkPolyDataMapper->SetInput(m_SurfaceCreator->GetOutput()->GetVtkPolyData());
-
-//        if(planeGeometry.IsNotNull())
+        mitk::Geometry2DDataToSurfaceDataFilter::Pointer surfaceCreator;
+        mitk::SmartPointerProperty::Pointer surfacecreatorprop;
+        surfacecreatorprop=dynamic_cast<mitk::SmartPointerProperty*>(GetDataTreeNode()->GetProperty("surfacegeometry", renderer).GetPointer());
+        if( (surfacecreatorprop.IsNull()) || 
+            (surfacecreatorprop->GetSmartPointer().IsNull()) ||
+            ((surfaceCreator=dynamic_cast<mitk::Geometry2DDataToSurfaceDataFilter*>(surfacecreatorprop->GetSmartPointer().GetPointer()))==NULL)
+          )
         {
-            //const PlaneView &plane=planeGeometry->GetPlaneView();
-            //Vector3D right, bottom;
-            //right=plane.point+plane.getOrientation1();
-            //bottom=plane.point+plane.getOrientation2();
+            surfaceCreator = mitk::Geometry2DDataToSurfaceDataFilter::New();
+            surfacecreatorprop=new mitk::SmartPointerProperty(surfaceCreator);
+            GetDataTreeNode()->SetProperty("surfacegeometry", surfacecreatorprop);
+        }
 
-            //m_VtkPlaneSource->SetXResolution(1);
-            //m_VtkPlaneSource->SetYResolution(1);
-            //m_VtkPlaneSource->SetOrigin(plane.point.x, plane.point.y, plane.point.z);
-            //m_VtkPlaneSource->SetPoint1(right.x, right.y, right.z);
-            //m_VtkPlaneSource->SetPoint2(bottom.x, bottom.y, bottom.z);
-            if(m_DataTreeIterator)
+        surfaceCreator->SetInput(input);
+        surfaceCreator->Update(); //FIXME ohne das crash
+        m_VtkPolyDataMapper->SetInput(surfaceCreator->GetOutput()->GetVtkPolyData());
+        
+        if(m_DataTreeIterator)
+        {
+            mitk::DataTreeIterator* it=m_DataTreeIterator->clone();
+            while(it->hasNext())
             {
-                mitk::DataTreeIterator* it=m_DataTreeIterator->clone();
-                while(it->hasNext())
+                it->next();
+                mitk::DataTreeNode* node=it->get();
+                mitk::Mapper::Pointer mapper = node->GetMapper(1);
+                mitk::ImageMapper2D* imagemapper = dynamic_cast<ImageMapper2D*>(mapper.GetPointer());
+
+                if(imagemapper)
                 {
-                    it->next();
-                    mitk::DataTreeNode* node=it->get();
-                    mitk::Mapper::Pointer mapper = node->GetMapper(1);
-                    mitk::ImageMapper2D* imagemapper = dynamic_cast<ImageMapper2D*>(mapper.GetPointer());
-
-                    if(imagemapper)
-                    {
-						mitk::SmartPointerProperty::Pointer rendererProp = dynamic_cast<mitk::SmartPointerProperty*>(GetDataTreeNode()->GetPropertyList()->GetProperty("renderer").GetPointer());
-						if(rendererProp.IsNotNull())
+					mitk::SmartPointerProperty::Pointer rendererProp = dynamic_cast<mitk::SmartPointerProperty*>(GetDataTreeNode()->GetPropertyList()->GetProperty("renderer").GetPointer());
+					if(rendererProp.IsNotNull())
+					{
+						mitk::BaseRenderer::Pointer renderer = dynamic_cast<mitk::BaseRenderer*>(rendererProp->GetSmartPointer().GetPointer());
+						if(renderer.IsNotNull())
 						{
-							mitk::BaseRenderer::Pointer renderer = dynamic_cast<mitk::BaseRenderer*>(rendererProp->GetSmartPointer().GetPointer());
-							if(renderer.IsNotNull())
-							{
-                                // check for level window prop and use it for display if it exists
-                                mitk::LevelWindow levelWindow;
-								if(node->GetLevelWindow(levelWindow, renderer))
-									m_VtkLookupTable->SetTableRange(levelWindow.GetMin(),levelWindow.GetMax());
+                            // check for level window prop and use it for display if it exists
+                            mitk::LevelWindow levelWindow;
+							if(node->GetLevelWindow(levelWindow, renderer))
+								m_VtkLookupTable->SetTableRange(levelWindow.GetMin(),levelWindow.GetMax());
 
-								imagemapper->GenerateAllData();
-								const ImageMapper2D::RendererInfo* ri=imagemapper->GetRendererInfo(renderer);
-								if((ri!=NULL) && (m_LastTextureUpdateTime<ri->m_LastUpdateTime))
-								{
-									ipPicDescriptor *p=ri->m_Pic;
-									vtkImageData* vtkimage=Pic2vtk::convert(p);
-									m_VtkTexture->SetInput(vtkimage); vtkimage->Delete(); vtkimage=NULL;
-									m_Actor->SetTexture(m_VtkTexture);
-									m_LastTextureUpdateTime=ri->m_LastUpdateTime;
-								}
-								break;
+							imagemapper->GenerateAllData();
+							const ImageMapper2D::RendererInfo* ri=imagemapper->GetRendererInfo(renderer);
+							if((ri!=NULL) && (m_LastTextureUpdateTime<ri->m_LastUpdateTime))
+							{
+								ipPicDescriptor *p=ri->m_Pic;
+								vtkImageData* vtkimage=Pic2vtk::convert(p);
+								m_VtkTexture->SetInput(vtkimage); vtkimage->Delete(); vtkimage=NULL;
+								m_Actor->SetTexture(m_VtkTexture);
+								m_LastTextureUpdateTime=ri->m_LastUpdateTime;
 							}
+							break;
 						}
-                    }
+					}
                 }
             }
         }

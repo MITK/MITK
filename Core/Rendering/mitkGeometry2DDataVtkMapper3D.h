@@ -7,7 +7,6 @@
 #include "DataTree.h"
 #include "ImageSliceSelector.h"
 #include "BaseRenderer.h"
-#include "mitkGeometry2DDataToSurfaceDataFilter.h"
 
 class vtkActor;
 class vtkTexture;
@@ -108,9 +107,6 @@ class Geometry2DDataVtkMapper3D : public BaseVtkMapper3D
     //##Documentation
     //## @brief timestamp of last update of texture (m_VtkTexture) from image data
 	unsigned long int m_LastTextureUpdateTime;
-
-    //##ModelId=3EF5B7D90186
-    mitk::Geometry2DDataToSurfaceDataFilter::Pointer m_SurfaceCreator;
 };
 
 } // namespace mitk

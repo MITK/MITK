@@ -118,7 +118,7 @@ void mitk::OpenGLRenderer::UpdateVtkActors()
     m_MitkVtkRenderWindow->AddRenderer( this->m_VtkRenderer );
   }
 
-  m_VtkRenderer->RemoveAllProps();
+   m_VtkRenderer->RemoveAllProps();
 
   //strange: when using a simple light, the backface of the planes are not shown (regardless of SetNumberOfLayers)
   //m_Light->Delete();
@@ -312,7 +312,9 @@ void mitk::OpenGLRenderer::Render()
   if(m_VtkMapperPresent) {
     m_MitkVtkRenderWindow->MitkRender();
   }
-}
+  else
+    m_RenderWindow->swapBuffers();
+ }
 
 /*!
 \brief Initialize the OpenGLRenderer
@@ -391,8 +393,10 @@ void mitk::OpenGLRenderer::Resize(int w, int h)
 //##ModelId=3E33145B005A
 void mitk::OpenGLRenderer::Paint( )
 {
+
+//  glFlush();
+//  m_RenderWindow->swapBuffers();
   Render();
-  glFlush();
 }
 
 

@@ -212,7 +212,7 @@ void mitk::PointSet::ExecuteOperation(Operation* operation)
 	case OpREMOVE://removes the point at position pointOperation.index
 		{
       unsigned int index = (unsigned)pointOp->GetIndex();
-			if (index < m_PointList->GetNumberOfPoints() )//checking, cause .at is not supported by older compilers
+			if (index < m_PointList->GetNumberOfPoints() )
 			{
         PointsContainer::Pointer position  = m_PointList->GetPoints();
         position->DeleteIndex(index);
@@ -261,7 +261,6 @@ void mitk::PointSet::UpdateOutputInformation()
 //@TODO check if order is correct 012345 or 024135
 
   m_Geometry3D->SetBoundingBox(mitkBounds);
- 
 }
 
 //##ModelId=3F0177E901FB

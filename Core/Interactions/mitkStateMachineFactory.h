@@ -52,17 +52,27 @@ namespace mitk {
 	typedef std::set<int>::iterator HistorySetIter;
 
     //##ModelId=3E68B2C600BD
-	  StateMachineFactory();
+    //##Documentation
+    //## Constructor
+    StateMachineFactory();
+
+    //##Documentation
+    //## Destructor
+    ~StateMachineFactory(){}
+
+    //##Documentation
+    //## @brief deletes all States, Transitions and Actions that have been build up
+    void DeleteAllStateMachines();
 
     //##ModelId=3E5B4144024F
-	//##Documentation
-	//## returns NULL if no entry with string type is found
-	  static State* GetStartState(const char * type);
+    //##Documentation
+    //## returns NULL if no entry with string type is found
+    static State* GetStartState(const char * type);
 
     //##ModelId=3E5B41730261
-	//##Documentation
-	//##loads the xml file filename and generates the necessary instances
-	  static bool LoadBehavior(std::string fileName);
+    //##Documentation
+    //##loads the xml file filename and generates the necessary instances
+    static bool LoadBehavior(std::string fileName);
 
     //##ModelId=3E6773790098
     void  StartElement (const char *elementName, const char **atts);
@@ -71,15 +81,16 @@ namespace mitk {
 
   private:
 
-  std::string ReadXMLStringAttribut( std::string name, const char** atts);
-  float ReadXMLFloatAttribut( std::string name, const char** atts );
-  double ReadXMLDoubleAttribut( std::string name, const char** atts );
-  int ReadXMLIntegerAttribut( std::string name, const char** atts );
-  bool ReadXMLBooleanAttribut( std::string name, const char** atts );
+    std::string ReadXMLStringAttribut( std::string name, const char** atts);
+    float ReadXMLFloatAttribut( std::string name, const char** atts );
+    double ReadXMLDoubleAttribut( std::string name, const char** atts );
+    int ReadXMLIntegerAttribut( std::string name, const char** atts );
+    bool ReadXMLBooleanAttribut( std::string name, const char** atts );
+
     //##ModelId=3E5B428F010B
-	//##Documentation
-	//## sets the pointers in Transition (setNextState(..)) according to the extracted xml-file content
-	  static bool ConnectStates(mitk::State::StateMap *states);
+    //##Documentation
+    //## sets the pointers in Transition (setNextState(..)) according to the extracted xml-file content
+    static bool ConnectStates(mitk::State::StateMap *states);
 
     //##ModelId=3E77572A010E
 	//##Documentation
@@ -91,7 +102,7 @@ namespace mitk {
 	  static StartStateMap m_StartStates;
 
     //##ModelId=3E68C269032E
-	  mitk::State::StateMap m_AllStates;
+	  mitk::State::StateMap m_AllStatesOfOneStateMachine;
 
     //##ModelId=3E6773290108
 	  State* m_AktState;
@@ -99,6 +110,10 @@ namespace mitk {
     Transition* m_AktTransition;
 
     Action* m_AktAction;
+
+    static std::vector<mitk::State *> m_AllStates;
+    static std::vector<mitk::Transition *> m_AllTransitions;
+    static std::vector<mitk::Action *> m_AllActions;
     
 
     //##ModelId=3E68B2C60040

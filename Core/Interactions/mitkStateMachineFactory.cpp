@@ -32,6 +32,9 @@ PURPOSE.  See the above copyright notices for more information.
 //##
 
 mitk::StateMachineFactory::StartStateMap mitk::StateMachineFactory::m_StartStates;
+std::vector<mitk::State *> mitk::StateMachineFactory::m_AllStates;
+std::vector<mitk::Transition *> mitk::StateMachineFactory::m_AllTransitions;
+std::vector<mitk::Action *> mitk::StateMachineFactory::m_AllActions;
 
 //XML StateMachine
 //##ModelId=3E7757280322
@@ -77,7 +80,42 @@ const std::string mitk::StateMachineFactory::VALUE = "VALUE";
 
 //##ModelId=3E68B2C600BD
 mitk::StateMachineFactory::StateMachineFactory()
-: m_AktState(NULL), m_AktTransition(NULL),	m_AktAction(NULL), m_AktStateMachineName(""){}
+: m_AktState(NULL), m_AktTransition(NULL),	m_AktAction(NULL), m_AktStateMachineName("")
+{}
+
+void mitk::StateMachineFactory::DeleteAllStateMachines()
+{
+  //delete all States, Actions and Transitions that have been build here
+  std::vector<mitk::Action *>::iterator actionIter = m_AllActions.begin();
+  std::vector<mitk::Action *>::iterator actionIterEnd = m_AllActions.end();
+  while (actionIter != actionIterEnd)
+  {
+    mitk::Action * action = *actionIter;
+    actionIter++;
+    delete action;
+  }
+
+  std::vector<mitk::Transition *>::iterator transitionIter = m_AllTransitions.begin();
+  std::vector<mitk::Transition *>::iterator transitionIterEnd = m_AllTransitions.end();
+  while (transitionIter != transitionIterEnd)
+  {
+    mitk::Transition * transition = *transitionIter;
+    transitionIter++;
+    delete transition;
+  }
+
+  std::vector<mitk::State *>::iterator stateIter = m_AllStates.begin();
+  std::vector<mitk::State *>::iterator stateIterEnd = m_AllStates.end();
+  while (stateIter != stateIterEnd)
+  {
+    mitk::State * state = *stateIter;
+    stateIter++;
+    delete state;
+  }
+
+
+}
+
 
 //##ModelId=3E5B4144024F
 //##Documentation
@@ -215,7 +253,8 @@ void  mitk::StateMachineFactory::StartElement (const char *elementName, const ch
     int id = ReadXMLIntegerAttribut( ID, atts );
 
 		m_AktState = new mitk::State(stateMachinName , id);
-		std::pair<mitk::State::StateMapIter,bool> ok = m_AllStates.insert(mitk::State::StateMap::value_type(id , m_AktState));
+    m_AllStates.push_back(m_AktState);//to be able to delete in destructor
+		std::pair<mitk::State::StateMapIter,bool> ok = m_AllStatesOfOneStateMachine.insert(mitk::State::StateMap::value_type(id , m_AktState));
 
 		if ( ok.second == false ) 
     { 
@@ -233,7 +272,7 @@ void  mitk::StateMachineFactory::StartElement (const char *elementName, const ch
     int nextStateId = ReadXMLIntegerAttribut( NEXT_STATE_ID, atts );
     int eventId = ReadXMLIntegerAttribut( EVENT_ID, atts );
     m_AktTransition = new Transition(transitionName, nextStateId, eventId);
-
+    m_AllTransitions.push_back(m_AktTransition);//to be able to delete in destructor
     if ( m_AktState )
 		  m_AktState->AddTransition( m_AktTransition );  
   }
@@ -243,6 +282,7 @@ void  mitk::StateMachineFactory::StartElement (const char *elementName, const ch
 
     int actionId = ReadXMLIntegerAttribut( ID, atts );
     m_AktAction = new Action( actionId );
+    m_AllActions.push_back(m_AktAction);//to be able to delete in destructor
     m_AktTransition->AddAction( m_AktAction );  
   } 
 
@@ -305,8 +345,8 @@ void mitk::StateMachineFactory::EndElement (const char *elementName)
 
   if ( name == STATE_MACHIN_NAME )
 	{
-			ok = ConnectStates(&m_AllStates);
-			m_AllStates.clear();
+			ok = ConnectStates(&m_AllStatesOfOneStateMachine);
+			m_AllStatesOfOneStateMachine.clear();
   } 
   else if ( name == STATE_MACHIN ) 
   {

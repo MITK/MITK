@@ -175,7 +175,7 @@ template<class TPixel, unsigned int VImageDimension>
   typename OutputImageType::Pointer output = this->GetOutput();
   
   SizeType  size;
-  double origin[ VImageDimension ];
+  double origin[ 4 ];   // itk2vtk() expects 3 dimensions, so we can't use VImageDimension if image is 2d!
   double spacing[ VImageDimension ];
   
   for (unsigned int i=0; i < VImageDimension; ++i)

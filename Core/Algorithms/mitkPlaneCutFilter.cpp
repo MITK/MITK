@@ -3,11 +3,11 @@
 #include "mitkVector.h"
 
 template <class T>
-void _planesSet(ipPicDescriptor *dest, mitk::PlaneView *planes, T outside_value, T * dummy=0)
+void _planesSet(ipPicDescriptor *dest, const mitk::PlaneView *planes, T outside_value, T * dummy=0)
 {
 	T *d=(T*)dest->data;
 
-    mitk::PlaneView **pl=&planes;
+    const mitk::PlaneView **pl=&planes;
 //    Plane3dList::iterator pl = planes->begin();
 //    Plane3dList::iterator end = planes->end();
 

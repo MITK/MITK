@@ -21,18 +21,18 @@ public:
     /** Method for creation through the object factory. */
     itkNewMacro(Self);
 
-	typedef enum {NewVolume, Set, SetInverse} CreationMode;
+	typedef enum {Fill, FillInverse} CreationMode;
 
     //##Documentation
     //## @brief Set background grey level
 	itkSetMacro(BackgroundLevel, float);
 	itkGetMacro(BackgroundLevel, float);
 
-	ipSetMacro(CreationMode, CreationMode);
-	ipGetMacro(CreationMode, CreationMode);
+	itkSetMacro(CreationMode, CreationMode);
+	itkGetMacro(CreationMode, CreationMode);
 
-//	ipSetMacro(Planes, PlaneView*);
-//	ipGetMacro(Planes, PlaneView*);
+	itkSetMacro(Planes, PlaneView*);
+	itkGetMacro(Planes, const PlaneView*);
 protected:
     virtual void GenerateData();
 
@@ -42,9 +42,9 @@ protected:
 
 	float m_BackgroundLevel;
 
-	PlaneView *m_Planes;
+	const PlaneView *m_Planes;
 
-	CreationMode mode;
+	CreationMode m_CreationMode;
 };
 
 } // namespace mitk

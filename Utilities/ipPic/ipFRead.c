@@ -7,7 +7,7 @@
  *   and swaps to the other endianess
  *
  * $Log$
- * Revision 1.6  1999/12/09 19:11:51  andre
+ * Revision 1.7  1999/12/09 19:12:09  andre
  * *** empty log message ***
  *
  * Revision 1.5  1999/11/29  09:34:34  andre
@@ -77,7 +77,7 @@ ipPicRemoveFile( char *path )
 {
   int status;
 
-  status =remove( path );
+  status = remove( path );
 
   if( !status )
     {

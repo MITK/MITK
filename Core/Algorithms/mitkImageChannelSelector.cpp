@@ -20,8 +20,7 @@ void mitk::ImageChannelSelector::GenerateOutputInformation()
   itkDebugMacro(<<"GenerateOutputInformation()");
 
   output->Initialize(input->GetPixelType(), input->GetDimension(), input->GetDimensions());
-  int dim=(input->GetDimension()<3?input->GetDimension():3);
-	output->Initialize(input->GetPixelType(), dim, input->GetDimensions());
+	output->Initialize(input->GetPixelType(), input->GetDimension(), input->GetDimensions());
 
   // initialize geometry
   output->SetPropertyList(input->GetPropertyList()->Clone());  

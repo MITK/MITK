@@ -652,3 +652,17 @@ unsigned int* mitk::Image::GetDimensions() const
 	return m_Dimensions;
 }
 
+const mitk::LevelWindow& mitk::Image::GetLevelWindow() const
+{
+    return m_LevelWindow;
+}
+
+float mitk::Image::GetScalarValueMin() const
+{
+    return -1.0f;
+}
+
+float mitk::Image::GetScalarValueMax() const
+{
+    return -1.0f;
+}

@@ -7,6 +7,7 @@
 #include "ImageDataItem.h"
 #include "PixelType.h"
 #include "BaseData.h"
+#include "LevelWindow.h"
 
 namespace mitk {
 
@@ -135,7 +136,17 @@ class Image : public SlicedData
     //##ModelId=3E1A11530384
     unsigned int* GetDimensions() const;
 
+    //##Documentation
+    //## @todo LevelWindow extraction/calculation not yet implemented. 
+    virtual const mitk::LevelWindow& GetLevelWindow() const;
 
+    //##Documentation
+    //## @todo calculation of min/max not yet implemented. Timestamp must be added to track last calculation!
+    virtual float GetScalarValueMin() const;
+
+    //##Documentation
+    //## @todo calculation of min/max not yet implemented. Timestamp must be added to track last calculation!
+    virtual float GetScalarValueMax() const;
   protected:
     //##ModelId=3E0B4A6A01EC
     virtual mitk::ImageDataItem::Pointer GetSliceData(int s = 0, int t = 0, int n = 0);
@@ -186,6 +197,8 @@ class Image : public SlicedData
 
     //##ModelId=3E19EA110292
 	bool m_Initialized;
+
+    mitk::LevelWindow m_LevelWindow;
 };
 
 } // namespace mitk

@@ -73,7 +73,7 @@ void mitk::OpenGLRenderer::SetData(mitk::DataTreeIterator* iterator)
               Image::Pointer image = dynamic_cast<Image*>(data.GetPointer());
               if(image.IsNotNull())
               {
-                SetWorldGeometry(image->GetUpdatedSlicedGeometry(GetTimeStep())->GetGeometry2D(GetSlice()));
+                SetWorldGeometry(image->GetUpdatedSlicedGeometry(0)->GetGeometry2D(0));
                 geometry_is_set=true;
               }
             }

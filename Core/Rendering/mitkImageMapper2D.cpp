@@ -300,16 +300,17 @@ void mitk::ImageMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
   GetLevelWindow(levelWindow, renderer);
 
 
-  mitk::LookupTableProperty::Pointer LookupTable;
-  LookupTable = dynamic_cast<mitk::LookupTableProperty*>(this->GetDataTreeNode()->GetProperty("LookupTable").GetPointer());
-	if (LookupTable.IsNull() )
+  mitk::LookupTableProperty::Pointer LookupTableProp;
+  LookupTableProp = dynamic_cast<mitk::LookupTableProperty*>(this->GetDataTreeNode()->GetProperty("LookupTable").GetPointer());
+	if (LookupTableProp.IsNull() )
 	{
 		m_iilMode = iilImage::INTENSITY_ALPHA;
 	  image->setColor(rgba[0], rgba[1], rgba[2], rgba[3]);
 	}
 	else {
 		m_iilMode = iilImage::COLOR_ALPHA;
-		image->setColors(LookupTable->GetLookupTable().GetRawLookupTable());
+		image->setColors(LookupTableProp->GetLookupTable().GetRawLookupTable());
+		
 	}
 
   mitk::BoolProperty::Pointer binary;

@@ -3,9 +3,24 @@
 mitk::LookupTableSource::LookupTableSource()
 {
     // Create the output.
-    OutputType::Pointer output = static_cast<OutputType*> ( this->MakeOutput( 0 ).GetPointer() );
-    Superclass::SetNumberOfRequiredOutputs( 1 );
-    Superclass::SetNthOutput( 0, output.GetPointer() );
+
+    std::cout << "mitk::LookupTableSource::LookupTableSource()... " << std::endl;
+//    OutputType::Pointer output = static_cast<OutputType*> ( this->MakeOutput( 0 ).GetPointer() );
+//    Superclass::SetNumberOfRequiredOutputs( 1 );
+//    Superclass::SetNthOutput( 0, output.GetPointer() );
+
+
+    // Create the output. We use static_cast<> here because we know the default
+  	// output must be of type TOutputImage
+  	OutputType::Pointer output = static_cast<OutputType*>(this->MakeOutput(0).GetPointer());
+
+   	if (output.GetPointer()==NULL) std::cout << "something went wrong..." << std::endl;
+    
+  	this->ProcessObject::SetNumberOfRequiredOutputs(1);
+  	this->ProcessObject::SetNthOutput(0, output.GetPointer());
+
+  
+    std::cout << "mitk::LookupTableSource::LookupTableSource() OK! " << std::endl;
 }
 
 
@@ -18,6 +33,7 @@ mitk::LookupTableSource::~LookupTableSource()
 mitk::LookupTableSource::DataObjectPointer
 mitk::LookupTableSource::MakeOutput ( unsigned int )
 {
+		std::cout << "mitk::LookupTableSource::MakeOutput()... " << std::endl;
     return OutputType::New().GetPointer();
 }
 
@@ -41,7 +57,11 @@ mitk::LookupTableSource::GetOutput()
     {
         return 0;
     }
-    return static_cast<OutputType*> ( Superclass::GetOutput( 0 ) );
+
+    std::cout << "returning lookuptable output ... " << std::endl;
+
+    if (static_cast<OutputType*> ( this->ProcessObject::GetOutput( 0 )) == NULL) std::cout << "oooops..." << std::endl;
+    return static_cast<OutputType*> ( this->ProcessObject::GetOutput( 0 ) );
 }
 
 
@@ -50,7 +70,7 @@ mitk::LookupTableSource::GetOutput()
 mitk::LookupTableSource::OutputType*
 mitk::LookupTableSource::GetOutput ( unsigned int idx )
 {
-    return static_cast<OutputType*> ( Superclass::GetOutput( idx ) );
+    return static_cast<OutputType*> ( this->ProcessObject::GetOutput( idx ) );
 }
 
 
@@ -59,7 +79,7 @@ mitk::LookupTableSource::GetOutput ( unsigned int idx )
 void
 mitk::LookupTableSource::GenerateInputRequestedRegion()
 {
-    Superclass::GenerateInputRequestedRegion();
+    this->ProcessObject::GenerateInputRequestedRegion();
 }
 
 

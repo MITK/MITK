@@ -211,3 +211,4 @@ void mitk::QmitkRenderWindow::focusOutEvent(QFocusEvent*) {};
 //it is removed by the linker. 
 #include "VtkQRenderWindowInteractor.h"
 VtkQRenderWindowInteractorFactory vtkQRenderWindowInteractorFactory;
+#include "mitkIncludeFFI.h"

@@ -72,38 +72,6 @@ void QmitkPointListWidget::ItemsOfListUpdate()
       this->InteractivePointList->insertItem(Item);              
 
     }
-
-    /////
-    //int i=0;
-    //
-    //int subindex =0;
-    //do
-    //{      
-    //  if (m_PointSet->IndexExists(subindex))
-    //  {         
-    //    std::stringstream  aStrStream;
-    //    aStrStream<<prefix<<i+1<<"  ("<< Pointlist->GetPoints()->GetElement(subindex)[0]<<",  "<<Pointlist->GetPoints()->GetElement(subindex)[1]<<",  "<<Pointlist->GetPoints()->GetElement(subindex)[2]<<")";
-    //    const std::string s = aStrStream.str();
-    //    const char * Item =s.c_str();				
-    //    this->InteractivePointList->insertItem(Item);        
-    //    i++;        
-    //  }
-    //  subindex++;
-    //}while (i<size);
-    ///////
-    //for (i =0 ;i<size; i++)
-    //{
-    //   std::stringstream aStrStream;
-    //   for (int subindex =0;i)
-    //   if (IndexExists(subindex))
-    //   {        
-    //     aStrStream<<prefix<<i+1<<"  ("<< Pointlist->GetPoints()->GetElement(i)[0]<<",  "<<Pointlist->GetPoints()->GetElement(i)[1]<<",  "<<Pointlist->GetPoints()->GetElement(i)[2]<<")";
-    //     const std::string s = aStrStream.str();
-    //     const char * Item =s.c_str();				
-    //     this->InteractivePointList->insertItem(Item);        
-    //   }
-    //   
-    //}        
   }
 }
 
@@ -121,14 +89,11 @@ void QmitkPointListWidget::SwitchInteraction( mitk::PointSetInteractor::Pointer 
 
       mitk::BoolProperty::Pointer contour = new mitk::BoolProperty(false);
       mitk::BoolProperty::Pointer close = new mitk::BoolProperty(true);
-
-
       mitk::StringProperty::Pointer label = new mitk::StringProperty(l);
-
-
+      
       //create a DataElement that holds the points
       mitk::PointSet::Pointer pointset = mitk::PointSet::New();
-
+      
       //connect data to refresh method
       pointset->AddObserver(itk::EndEvent(), m_DataChangedCommand);
 
@@ -149,6 +114,7 @@ void QmitkPointListWidget::SwitchInteraction( mitk::PointSetInteractor::Pointer 
       dataTreeNode->SetProperty("close",close);
       dataTreeNode->SetProperty("label",label);
       dataTreeNode->SetInteractor(*sop);
+      dataTreeNode->SetProperty("name", label); /// name is identical with label????
       *node = dataTreeNode;
 
       ////then add it to the existing DataTree

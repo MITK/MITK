@@ -5,7 +5,7 @@
 #include "mitkBaseVtkMapper3D.h"
 #include "mitkBaseRenderer.h"
 #include "mitkImage.h"
-
+#include <vtkVolumeProperty.h>
 class vtkVolumeRayCastMapper;
 class vtkVolume;
 class vtkObject;
@@ -36,6 +36,7 @@ public:
   virtual void Update(mitk::BaseRenderer* renderer);
 
   virtual void Update();
+  virtual void SetInput(const mitk::DataTreeNode * data);
 
   virtual void ApplyProperties(vtkActor* actor, mitk::BaseRenderer* renderer);
   static void AbortCallback(vtkObject *caller, unsigned long eid, void *clientdata, void *calldata);
@@ -52,7 +53,8 @@ protected:
   vtkActor* m_Actor;
   vtkVolume* m_Volume; 
 
-  vtkVolumeRayCastMapper* m_VtkVolumeMapper;
+   vtkVolumeProperty* m_VolumeProperty;
+   vtkVolumeRayCastMapper* m_VtkVolumeMapper;
 };
 
 } // namespace mitk

@@ -1,0 +1,134 @@
+-----------------------------------------------------
+ C++ port of unofficial javax.vecmath package
+         by Kenji Hiranabe
+
+                                3/5 ,1999 version 1.1-1.0
+                               5/25 ,1999 version 1.1-1.1
+                               6/12 ,1999 version 1.1-1.2
+                               10/5 ,1999 version 1.2-1.3
+                              10/22 ,1999 version 1.2-1.4
+-----------------------------------------------------
+
+* INTRODUCTION
+
+This is a C++ port of unofficial free implementation
+(source code release) of Java(TM) 3D API 1.2
+vecmath package.
+
+This package supports vector/point transformation math
+often utilized in computer graphics.
+
+The included classes are the followings.
+
+    * Tuples
+
+      Tuple2<T>      Tuple3<T>     Tuple4<T>
+        |             |             |
+        +Vector2<T>   +Vector3<T>   +Vector4<T>
+        +Point2<T>    +Point3<T>    +Point4<T>
+        +TexCoord2<T> +Color3<T>    +Quat4<T>
+                                    +Color4<T>
+      AxisAngle4<T>
+
+    * Matrices
+
+      Matrix3<T>     Matrix4<T>
+
+These classes are (optionally) in the namespace of 'kh_vecmath'.
+
+You can download the zipped or tar+gzipped source code from;
+
+       http://www.esm.co.jp/divisions/open-sys/java/vecmath/
+
+* FEATURES
+
+ ** Highest priority to SPEED. No 'new' operators, no arrays, no virual functions.
+ ** All files are *.h template header files. No need for linking libraries.
+ ** Has a test suite.
+ ** Aliasing-safe. i.e. v.cross(v,v1) or m.mul(m1,m) works.
+ ** optional IO stream and  string conversion support.
+ ** Java3D 1.2 specification is implemented, but no GVector and GMatrix yet.
+ ** Works with standard C++ library (STL).
+
+* INSTALL
+
+1. unzip and untar the downloaded file, like;
+      % gunzip vecmath-c++-1.1-1.1.tar.gz
+      % tar xvf vecmath-c++-1.1-1.1.tar
+2. place all *.h files into your header directory.
+      % cp vecmath-c++/*.h <yourdir>
+3. write your C++ code, hello-vecmath.cpp
+
+    #include <iostream>
+    #include <vecmath.h>
+    using namespace kh_vecmath;   // depends on vm_config.h
+    int main(int, char**) {
+       Matrix3d m(1,2,3,4,5,6,7,8,9);
+       Vector3d v(2,3,4);
+       cout << m*v;
+       return 0;
+    }
+
+4. compile, and run. don't forget to set include path to <yourdir>
+   when compilation.
+
+on unix, 
+    % g++ -I<yourdir> hello-vecmath.cpp -o hello-vecmath
+    % hello-vecmath
+
+5. (20,47,74) is printed, voila !
+6. if needed, configure "vm_conf.h".
+7. if needed, compile test programs(test-*.cpp) and run.
+on unix,
+    % cp Makefile.unix Makefile
+    % make test
+
+on Windows with Visual Studio, use 'vecmath.dsw'for workspace.
+
+* TESTED PLATFORMS AND COMPILERS
+
+(1) Sun Solaris2.6 on SPARCStation with gcc2.7.2(+ libstdc++-2.8.1.1),
+   gcc2.8.1 and egcs1.1.2
+
+for gcc2.7.2, gcc2.8.1 namespace is not supported. vm_conf.h will automaticlly
+turns off VM_INCLUDE_NAMESPACE and eliminates namespace kh_vecmath.
+
+(2) Visual C++ 6.0 sp2
+  (Thanks > "Lucas Ammon" <lammon@iam.unibe.ch>)
+
+(3) Windows 95 + Cygwin b20 egcs-2.91.66 19990314 (egcs-1.1.2 release)
+  (Thanks > Takayuki MATSUOKA <matsuoka@osaka.whoopeecamp.co.jp>)
+
+(4) IRIX6.4 + MIPSPro7.2
+  (Thanks > Katsuaki KAWACHI <kawachi@cim.pe.u-tokyo.ac.jp>)
+
+(5) Visual C++ 5.0
+  (Thanks > Takayuki MATSUOKA <matsuoka@osaka.whoopeecamp.co.jp>)
+  Add "/D TESTALL" and "/I .\\" to preprocessor macro when building
+  test project.
+
+..... please report on your platforms ! .....
+
+
+* TIPS
+
+** If you don't want namespace, #undef VM_INCLUDE_NAMESPAE in vm_conf.h.
+
+** If you don't want toString() method, #undef VM_INCLUDE_TOSTRING
+ in vm_conf.h. This may solve compilation errors in other compilers.
+
+** If you don't want cout << operation, #undef VM_INCLUDE_IO
+ in vm_conf.h. This may solve compilation errors in other compilers.
+
+** All the math functions such as sin,cos,atan2 are encapsulated
+in VmUtil.h. If you have your own faster version, adjust the file.
+
+* FEEDBACK
+
+Any bug reports or comments are welcome.
+If you think this package is useful, PLEASE give me feedback.
+I would like to hear what kind of applications you are working on !
+
+---
+  Eiwa System Management, Inc.  http://www.esm.co.jp/
+  Kenji Hiranabe                mailto:hiranabe@esm.co.jp

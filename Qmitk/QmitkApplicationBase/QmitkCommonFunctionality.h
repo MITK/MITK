@@ -34,7 +34,7 @@ class CommonFunctionality
       static void MinMax(typename TImageType::Pointer image, float &min, float &max)
       {
       typedef itk::MinimumMaximumImageCalculator<TImageType> MinMaxCalcType;
-      MinMaxCalcType::Pointer minmax = MinMaxCalcType::New();
+      typename MinMaxCalcType::Pointer minmax = MinMaxCalcType::New();
       minmax->SetImage( image );
       minmax->ComputeMinimum();
       minmax->ComputeMaximum();

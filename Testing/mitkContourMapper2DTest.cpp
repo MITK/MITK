@@ -6,7 +6,6 @@
 
 #include "mitkOpenGLRenderer.h"
 #include "mitkRenderWindow.h"
-#include "qwidget.h"
 
 #include <fstream>
 int mitkContourMapper2DTest(int argc, char* argv[])

@@ -88,7 +88,10 @@ typedef enum ESideEffects
   SeINSERTPOINT = 110,
   SeDELETEPOINT = 120,
   SeCLEAR = 130, //clear all elements from a list
-  SeTERMINATE_INTERACTION = 666
+  SeTERMINATE_INTERACTION = 666,
+  SeTRANSLATE = 1000,
+  SeROTATE = 1001,
+  SeSCALE = 1002
 };
 
 //Type of an Event;

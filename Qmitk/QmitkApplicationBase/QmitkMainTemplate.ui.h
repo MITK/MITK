@@ -324,17 +324,10 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
     mitk::ImageChannelSelector::Pointer channelSelector=mitk::ImageChannelSelector::New();
     mitk::ImageChannelSelector::Pointer DopplerChannelSelector=mitk::ImageChannelSelector::New();
 
+    channelSelector->SetInput(reader->GetOutput());
+    DopplerChannelSelector->SetInput(reader->GetOutput());
 
-    mitk::CylindricToCartesianFilter::Pointer cyl2cart = mitk::CylindricToCartesianFilter::New();;
-    mitk::CylindricToCartesianFilter::Pointer cyl2cartDoppler = mitk::CylindricToCartesianFilter::New();
-
-		cyl2cart->SetTargetXSize(128);
-		cyl2cartDoppler->SetTargetXSize(128); 
-		//
-    // insert just timeslice nr.0
-    // @TODO: insert complete 4D data
-    reader->Update();
-
+    reader->UpdateOutputInformation();
 		bool haveDoppler = false;
     if (reader->GetOutput()->IsValidChannel(0))
     {
@@ -346,36 +339,36 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
 				std::cout << "    have channel data 1 (doppler) ... " << std::endl;
 				haveDoppler = true;
 		}
+	
+    mitk::CylindricToCartesianFilter::Pointer cyl2cart = mitk::CylindricToCartesianFilter::New();;
+    mitk::CylindricToCartesianFilter::Pointer cyl2cartDoppler = mitk::CylindricToCartesianFilter::New();
 
-				
-    channelSelector->SetInput(reader->GetOutput());
-
-   
-    DopplerChannelSelector->SetInput(reader->GetOutput());
-
+		cyl2cart->SetTargetXSize(128);
+		cyl2cartDoppler->SetTargetXSize(128); 
 
     mitk::DataTreeIterator* it=tree->inorderIterator();
-
 
     //
     // switch to Backscatter information
     //    
     channelSelector->SetChannelNr(0);
-    channelSelector->Update();
-    ipPicPut("timeselect.pic",channelSelector->GetOutput()->GetPic());    
+    //channelSelector->Update();
+    //ipPicPut("timeselect.pic",channelSelector->GetOutput()->GetPic());    
         
+    mitk::ImageSliceSelector::Pointer sliceSelector=mitk::ImageSliceSelector::New();
     //
     // insert original (in cylinric coordinates) Backscatter information
     //
     node = mitk::DataTreeNode::New();
     node->SetData(channelSelector->GetOutput());
+    sliceSelector->SetInput(channelSelector->GetInput());
     mitk::StringProperty::Pointer ultrasoundProp = new mitk::StringProperty("OriginalBackscatter");    
     node->SetProperty("ultrasound",ultrasoundProp);
     mitk::StringProperty::Pointer nameProp = new mitk::StringProperty("OriginalBackscatter");
     node->SetProperty("fileName",nameProp);
     node->SetProperty("layer", new mitk::IntProperty(-11) );
     mitk::LevelWindow levelWindow;
-    levelWindow.SetAuto( channelSelector->GetOutput()->GetPic() );
+    levelWindow.SetAuto( sliceSelector->GetOutput()->GetPic() );
     node->SetLevelWindow(levelWindow, NULL);
     node->SetVisibility(false,NULL);
     node->Update();
@@ -393,8 +386,10 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
     node->SetProperty("fileName",nameProp);
     node->SetProperty("layer", new mitk::IntProperty(-10) );
 //    mitk::LevelWindow levelWindow;
-    cyl2cart->Update();
-    levelWindow.SetAuto( cyl2cart->GetOutput()->GetPic() );
+
+    sliceSelector->SetInput(cyl2cart->GetOutput());
+    sliceSelector->Update();
+    levelWindow.SetAuto( sliceSelector->GetOutput()->GetPic() );
     node->SetLevelWindow(levelWindow, NULL);
     node->Update();
     it->add(node);    
@@ -406,7 +401,7 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
   	  // switch to Doppler information
 	    //
   	  DopplerChannelSelector->SetChannelNr(1);
-	    DopplerChannelSelector->Update();
+	    //DopplerChannelSelector->Update();
 
 	    //
   	  // create a Doppler lookup table
@@ -434,7 +429,7 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
 
    		mitk::LevelWindowProperty::Pointer levWinProp = new mitk::LevelWindowProperty();
       mitk::LevelWindow levelWindow;
-      levelWindow.SetAuto( channelSelector->GetOutput()->GetPic() );
+      levelWindow.SetLevelWindow(128, 255);
 			levWinProp->SetLevelWindow(levelWindow);      
       // set the overwrite LevelWindow
       // if "levelwindow" is used if "levelWindow" is not available
@@ -460,23 +455,16 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
 	    node->SetProperty("layer", new mitk::IntProperty(-5) );
   	  cyl2cartDoppler->Update();
 
-      //mitk::LevelWindow levelWindow;
-	    levelWindow.SetAuto( cyl2cartDoppler->GetOutput()->GetPic() );
-			levWinProp->SetLevelWindow(levelWindow);      	    
       // set the overwrite LevelWindow
       // if "levelwindow" is used if "levelWindow" is not available
       // else "levelWindow" is used
       // "levelWindow" is not affected by the slider
       node->GetPropertyList()->SetProperty("levelWindow",levWinProp);
 
-
-
-    	node->SetProperty("LookupTable", LookupTableProp );
+     	node->SetProperty("LookupTable", LookupTableProp );
 	    node->Update();
   	  it->add(node);
 		}
-
-		
    
     mitkMultiWidget->levelWindowWidget->setLevelWindow(levelWindow);
 

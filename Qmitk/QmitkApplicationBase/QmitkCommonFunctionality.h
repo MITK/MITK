@@ -356,6 +356,7 @@ static mitk::DataTreeNode::Pointer OpenVolumeOrSliceStack()
       mitk::Image::Pointer imageData = dynamic_cast<mitk::Image*> (newNode->GetData()) ;
       if (imageData->GetDimension(2) == 1)
       {
+//        std::string dir = itksys::SystemTools::GetFilenamePath( std::string(fileName.ascii()) )
         newNode = CommonFunctionality::FileOpenImageSequence(fileName);
         imageData = dynamic_cast<mitk::Image*> (newNode->GetData());
       }
@@ -400,27 +401,36 @@ static mitk::DataTreeNode::Pointer FileOpenImageSequence()
 
 static mitk::DataTreeNode::Pointer FileOpenImageSequence(QString fileName)
 {
-  int fnstart = fileName.findRev( QRegExp("[/\\\\]"), fileName.length() );
-  if(fnstart<0) fnstart=0;
-  int start = fileName.find( QRegExp("[0-9]"), fnstart );
-  if(start<0)
-  {
-    return FileOpen(fileName.ascii());;
-  }
-
-  char prefix[1024], pattern[1024];
-
-  strncpy(prefix, fileName.ascii(), start);
-  prefix[start]=0;
-
-  int stop=fileName.find( QRegExp("[^0-9]"), start );
-  sprintf(pattern, "%%s%%0%uu%s",stop-start,fileName.ascii()+stop);
-
-
   mitk::DataTreeNodeFactory::Pointer factory = mitk::DataTreeNodeFactory::New();
 
-  factory->SetFilePattern( pattern );
-  factory->SetFilePrefix( prefix );
+  if (!fileName.contains("dcm") && !fileName.contains("DCM"))
+  {
+    int fnstart = fileName.findRev( QRegExp("[/\\\\]"), fileName.length() );
+    if(fnstart<0) fnstart=0;
+    int start = fileName.find( QRegExp("[0-9]"), fnstart );
+    if(start<0)
+    {
+      return FileOpen(fileName.ascii());;
+    }
+
+    char prefix[1024], pattern[1024];
+
+    strncpy(prefix, fileName.ascii(), start);
+    prefix[start]=0;
+
+    int stop=fileName.find( QRegExp("[^0-9]"), start );
+    sprintf(pattern, "%%s%%0%uu%s",stop-start,fileName.ascii()+stop);
+
+
+    factory->SetFilePattern( pattern );
+    factory->SetFilePrefix( prefix );
+  }
+  else
+  {
+//    factory->SetFileName( fileName );
+    factory->SetFilePattern( fileName );
+    factory->SetFilePrefix( fileName );
+  }
   factory->Update();
   return factory->GetOutput( 0 );
 
@@ -430,7 +440,7 @@ static mitk::DataTreeNode::Pointer FileOpenImageSequence(QString fileName)
 template < typename TImageType >
 static void SaveImage(mitk::Image* image)
 {
-  QString fileName = QFileDialog::getSaveFileName(QString("NewImage"),GetSaveFileExtensions());
+  QString fileName = QFileDialog::getSaveFileName(QString("NewImage.pic"),GetSaveFileExtensions());
   if (fileName == NULL ) 
   {
     fileName = QString("NewImage.mhd");
@@ -515,7 +525,7 @@ static void SaveImage(mitk::Image* image)
   }
   catch ( itk::ExceptionObject &err)
   {
-    std::cout << "Exception object caught! in texture measure calculations" <<std::endl;
+    std::cout << "Exception object caught!" <<std::endl;
     std::cout << err << std::endl;
     return;
   }

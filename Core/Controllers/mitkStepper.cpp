@@ -1,3 +1,21 @@
+/*=========================================================================
+
+  Program:   Medical Imaging & Interaction Toolkit
+  Module:    $RCSfile$
+  Language:  C++
+  Date:      $Date$
+  Version:   $Revision$
+
+Copyright (c) German Cancer Research Center, Division of Medical and
+Biological Informatics. All rights reserved.
+See MITKCopyright.txt or http://www.mitk.org/ for details.
+
+     This software is distributed WITHOUT ANY WARRANTY; without even
+     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+     PURPOSE.  See the above copyright notices for more information.
+
+=========================================================================*/
+
 #include "mitkStepper.h"
 
 mitk::Stepper::Stepper() : m_Pos(0), m_Steps(0), m_StepSize(1), m_PosToUnitFactor(1), m_ZeroLine(0)

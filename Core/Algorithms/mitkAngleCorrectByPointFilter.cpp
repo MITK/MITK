@@ -163,7 +163,7 @@ void mitk::AngleCorrectByPointFilter::GenerateData()
               if(fabs(cos_factor)>eps)
                 *out=((ScalarType)(*in)-128.0)/cos_factor;
               else
-                *out=0;
+                *out=((ScalarType)(*in)-128.0)/eps;
             }
             else
               *out=0;

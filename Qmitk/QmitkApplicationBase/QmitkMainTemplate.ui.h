@@ -254,6 +254,8 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
         mitkMultiWidget->levelWindowWidget->setLevelWindow(levelWindow);
 
 		initWidgets(it);
+
+    delete it;
 	}
 #endif
 #ifdef MITK_INTERNAL
@@ -271,11 +273,12 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
 		mitk::DSRFileReader::Pointer reader;
 
 		reader=mitk::DSRFileReader::New();
-		std::cout << "loading " << fileName << " as pic ... " << std::endl;
+		std::cout << "loading " << fileName << " as DSR ... " << std::endl;
 
 		reader->SetFileName(fileName);
     mitk::ImageTimeSelector::Pointer timeSelector=mitk::ImageTimeSelector::New();
 		timeSelector->SetInput(reader->GetOutput());
+	 	timeSelector->SetTimeNr(0);
 	    
 		mitk::CylindricToCartesianFilter::Pointer cyl2cart;
 		mitk::CylindricToCartesianFilter::Pointer cyl2cartDoppler;
@@ -284,84 +287,63 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
 		cyl2cartDoppler = mitk::CylindricToCartesianFilter::New();
 		
 		mitk::DataTreeIterator* it=tree->inorderIterator();
-        
-		// Doppler information
+
+	  // Backscatter information
+    timeSelector->SetChannelNr(0);
+		timeSelector->Update();
+		
+		cyl2cart->SetInput(timeSelector->GetOutput());
+		node=mitk::DataTreeNode::New();
+		node->SetData(cyl2cart->GetOutput());
+		it->add(node);
+
+    //set properties for Backscatter
+	  node->SetProperty("Backscatter",new mitk::BoolProperty(true));
+  	node->SetProperty("layer", new mitk::IntProperty(-10) );
+		mitk::LevelWindow levelWindow;
+		cyl2cart->Update();
+	  levelWindow.SetAuto( cyl2cart->GetOutput()->GetPic() );
+		node->SetLevelWindow(levelWindow, NULL);
+
+				        
+    node->Update();
+
+			// Doppler information
 		timeSelector->SetChannelNr(1);
-	 	timeSelector->SetTimeNr(0);
     timeSelector->Update();
 
-    // add original data to tree
-//		node=mitk::DataTreeNode::New();
-//		node->SetData(timeSelector->GetOutput());
-//		it->add(node);
-//
-//	  node->SetProperty("Doppler",new mitk::BoolProperty(true));
-//  	node->SetProperty("layer", new mitk::IntProperty(-10) );
-
-
-		// todo: HP map must be provided by DSRFilereader, since it
-		// may be dependend on data ( baseline shift)
-		mitk::LookupTableSource::Pointer LookupTableSource = new mitk::LookupTableSource();
-//		LookupTableSource->SetUseHPLookupTable();
-		mitk::LookupTableSource::OutputTypePointer LookupTable = LookupTableSource->GetOutput();
-    mitk::LookupTableProperty::Pointer LookupTableProp = new mitk::LookupTableProperty(*LookupTable);
-
-//    node->SetProperty("LookupTable", LookupTableProp );
-//   	node->Update();
-   
    	// add cartesian data to tree        
 		cyl2cartDoppler->SetInput(timeSelector->GetOutput());
-		it=tree->inorderIterator();
 
 		node=mitk::DataTreeNode::New();
 		node->SetData(cyl2cartDoppler->GetOutput());
 		it->add(node);
 		
+    //set properties for Doppler
 	  node->SetProperty("Doppler",new mitk::BoolProperty(true));
-  	node->SetProperty("layer", new mitk::IntProperty(-10) );
+  	node->SetProperty("layer", new mitk::IntProperty(-5) );
+
+    cyl2cartDoppler->Update();
+    levelWindow.SetAuto( cyl2cartDoppler->GetOutput()->GetPic() );
+		node->SetLevelWindow(levelWindow, NULL);
+
+		// TODO: HP map must be provided by DSRFilereader, since it
+		// may be dependend on data ( baseline shift)
+		mitk::LookupTableSource::Pointer LookupTableSource = new mitk::LookupTableSource();
+    // LookupTableSource->SetUseHPLookupTable();
+		mitk::LookupTableSource::OutputTypePointer LookupTable = LookupTableSource->GetOutput();
+    mitk::LookupTableProperty::Pointer LookupTableProp = new mitk::LookupTableProperty(*LookupTable);
 
   	node->SetProperty("LookupTable", LookupTableProp );
-		node->Update();
+
+
+    node->Update();
 		
-		mitk::LevelWindow levelWindow;
-    reader->Update();
-	  levelWindow.SetAuto( cyl2cartDoppler->GetOutput()->GetPic() );
-		node->SetLevelWindow(levelWindow, NULL);
     mitkMultiWidget->levelWindowWidget->setLevelWindow(levelWindow);
 
-                                
-	    // Backscatter information
-    timeSelector->SetChannelNr(0);
-		timeSelector->Update();
-		
-//		node->SetData(timeSelector->GetOutput());
-//		it->add(node);
-//
-//	 	node->SetProperty("layer", new mitk::IntProperty(-15) );
-//	  node->SetProperty("Backscatter",new mitk::BoolProperty(true));
-//
-//		node->SetLevelWindow(levelWindow, NULL);
-//		node->Update();
+    initWidgets(it);
 
-		
-		cyl2cart->SetInput(timeSelector->GetOutput());
-		node=mitk::DataTreeNode::New();
-		cyl2cart->Update();
-		node->SetData(cyl2cart->GetOutput());
-		it->add(node);
-
-  	node->SetProperty("layer", new mitk::IntProperty(-15) );
-	  node->SetProperty("Backscatter",new mitk::BoolProperty(true));
-		node->SetColor(1.0,1.0, 1.0, mitkMultiWidget->mitkWidget1->GetRenderer());
-		node->SetColor(1.0,1.0, 1.0, mitkMultiWidget->mitkWidget2->GetRenderer());
-		node->SetColor(1.0,1.0, 1.0, mitkMultiWidget->mitkWidget3->GetRenderer());				
-		node->SetColor(1.0,1.0, 1.0, mitkMultiWidget->mitkWidget4->GetRenderer());
-				        
-		node->SetLevelWindow(levelWindow, NULL);
-		node->Update();
-
-				
-		initWidgets(it);
+    delete it;
 	}
 #endif
 }

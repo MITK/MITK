@@ -71,6 +71,15 @@ bool mitk::PolygonInteractor::ExecuteAction( Action* action, mitk::StateEvent co
 
   switch (action->GetActionId())
 	{
+  case AcINITNEWOBJECT:
+    //Set a Property so that a BoundingBox is drawn arround the Polygon if selected
+    {
+      mitk::BoolProperty::Pointer showBoundingBox;
+      showBoundingBox = new mitk::BoolProperty(true);
+      m_DataTreeNode->GetPropertyList()->SetProperty("showBoundingBox", showBoundingBox);
+      ok = true;
+      break;
+    }
   case AcFINISHOBJECT:
     //finish the creation of the polygon
     {

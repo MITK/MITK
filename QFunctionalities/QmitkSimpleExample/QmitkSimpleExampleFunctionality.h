@@ -112,6 +112,11 @@ protected slots:
   */
   void selectSliceWidgetFP( int z );
 
+  /*!
+  qt slot for event processing from a qt widget defining the stereo mode of widget 4
+  */
+  void stereoSelectionChanged(int id);
+
   void treeChanged(mitk::DataTreeIterator& itpos);
 protected:
   void initNavigators();

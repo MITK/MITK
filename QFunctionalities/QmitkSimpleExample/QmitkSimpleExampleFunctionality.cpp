@@ -22,6 +22,9 @@
 #include <mitkDisplayVectorInteractor.h>
 #include <mitkBaseRenderer.h>
 #include <mitkInteractionConst.h>
+#include <mitkOpenGLRenderer.h>
+#include <mitkVtkRenderWindow.h>
+#include <vtkRenderWindow.h>
 
 #include <QmitkStepperAdapter.h>
 
@@ -114,6 +117,7 @@ void QmitkSimpleExampleFunctionality::createConnections()
     connect(controls, SIGNAL(yzSliderChanged(int)), this, SLOT(selectSliceWidgetYZ(int)) );
     connect(controls, SIGNAL(xzSliderChanged(int)), this, SLOT(selectSliceWidgetXZ(int)) );
     connect(controls, SIGNAL(fpSliderChanged(int)), this, SLOT(selectSliceWidgetFP(int)) );
+    connect(controls->getStereoSelect(), SIGNAL(activated(int)), this, SLOT(stereoSelectionChanged(int)) );
 }
 
 QAction * QmitkSimpleExampleFunctionality::createAction(QActionGroup *parent)
@@ -249,6 +253,24 @@ void QmitkSimpleExampleFunctionality::selectSliceWidgetFP( int p )
 
   if(update)
     multiWidget->updateMitkWidgets();
+}
+
+void QmitkSimpleExampleFunctionality::stereoSelectionChanged( int id )
+{
+  vtkRenderWindow * vtkrenderwindow =
+    ((mitk::OpenGLRenderer*)(multiWidget->mitkWidget4->GetRenderer().GetPointer()))->GetVtkRenderWindow();
+  switch(id)
+  {
+  case 0:
+    vtkrenderwindow->StereoRenderOff();
+    break;
+  case 1:
+    vtkrenderwindow->SetStereoTypeToDresden();
+    vtkrenderwindow->StereoRenderOn();
+    break;
+  }
+  multiWidget->mitkWidget4->GetRenderer()->SetMapperID(2);
+  multiWidget->mitkWidget4->GetRenderer()->GetRenderWindow()->Update();
 }
 
 void QmitkSimpleExampleFunctionality::initWidgets()

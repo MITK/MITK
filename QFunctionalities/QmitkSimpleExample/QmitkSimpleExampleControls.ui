@@ -8,8 +8,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>120</width>
-            <height>1057</height>
+            <width>122</width>
+            <height>879</height>
         </rect>
     </property>
     <property name="sizePolicy">
@@ -260,6 +260,21 @@
                         <cstring>sliceNavigatorTime</cstring>
                     </property>
                 </widget>
+                <widget class="QComboBox">
+                    <item>
+                        <property name="text">
+                            <string>stereo off</string>
+                        </property>
+                    </item>
+                    <item>
+                        <property name="text">
+                            <string>D4D stereo</string>
+                        </property>
+                    </item>
+                    <property name="name">
+                        <cstring>stereoSelect</cstring>
+                    </property>
+                </widget>
             </vbox>
         </widget>
         <spacer>
@@ -354,6 +369,7 @@
     <function returnType="QWidget *">getSliceNavigatorFrontal()</function>
     <function returnType="QWidget *">getSliceNavigatorSagittal()</function>
     <function returnType="QWidget *">getSliceNavigatorTime()</function>
+    <function returnType="QWidget *">getStereoSelect()</function>
 </functions>
 <layoutdefaults spacing="0" margin="0"/>
 <includehints>

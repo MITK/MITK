@@ -73,3 +73,9 @@ QWidget * QmitkSimpleExampleControls::getSliceNavigatorTime()
 {
     return sliceNavigatorTime;
 }
+
+
+QWidget* QmitkSimpleExampleControls::getStereoSelect()
+{
+    return stereoSelect;
+}

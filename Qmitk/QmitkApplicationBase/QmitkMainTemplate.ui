@@ -503,7 +503,7 @@
     <function>initializeFunctionality()</function>
     <function>initializeQfm()</function>
     <function returnType="mitk::DataTree *">getDataTree()</function>
-    <function returnType="QmitkMultiWidget *">getMultiWidget()</function>
+    <function returnType="QmitkStdMultiWidget *">getMultiWidget()</function>
 </functions>
 <pixmapinproject/>
 <layoutdefaults spacing="6" margin="11"/>

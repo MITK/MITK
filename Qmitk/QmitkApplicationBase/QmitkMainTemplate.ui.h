@@ -441,13 +441,9 @@ void QmitkMainTemplate::initWidgets( mitk::DataTreeNode::Pointer node )
 
 
 
-QmitkMultiWidget* QmitkMainTemplate::getMultiWidget()
+QmitkStdMultiWidget* QmitkMainTemplate::getMultiWidget()
 {
     return mitkMultiWidget;
 }
 
 
-void QmitkMainTemplate::newFunction()
-{
-
-}

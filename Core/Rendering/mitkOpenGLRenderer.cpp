@@ -138,8 +138,12 @@ void mitk::OpenGLRenderer::UpdateIncludingVtkActors()
     newRenderer = true;
 
     //strange: when using a simple light, the backface of the planes are not shown (regardless of SetNumberOfLayers)
-    //m_Light = vtkLight::New();
-    //m_VtkRenderer->AddLight( m_Light );
+    m_Light = vtkLight::New();
+    m_Light->SetLightTypeToCameraLight();
+    double pos[]= {0.5,0.2,1.0};
+    m_Light->SetPosition(pos);
+
+    m_VtkRenderer->AddLight( m_Light );
     //m_LightKit = vtkLightKit::New();
     //m_LightKit->AddLightsToRenderer(m_VtkRenderer);
   }
@@ -484,8 +488,8 @@ void mitk::OpenGLRenderer::Resize(int w, int h)
   BaseRenderer::Resize(w, h);
 
   //GetVtkRenderWindow()->SetSize(w,h); // this was originally done by VtkInteractor via 
-                                      // m_CameraController->Resize(...) in BaseRenderer, 
-                                      // but bug #32 forced us to put it here (vtkSizeBug)
+  //                                    // m_CameraController->Resize(...) in BaseRenderer, 
+  //                                    // but bug #32 forced us to put it here (vtkSizeBug)
 
   Update();
 }

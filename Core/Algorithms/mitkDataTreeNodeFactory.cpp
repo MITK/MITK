@@ -412,6 +412,9 @@ void mitk::DataTreeNodeFactory::ReadFileTypeHPSONOS()
     cyl2cart->SetTargetXSize( 128 );
     cyl2cartDoppler->SetTargetXSize( 128 );
 
+    //the outside value must be the value interpreted as v=0. In most cases this is 128.
+    cyl2cartDoppler->SetOutsideValue( 128 );
+
     //
     // switch to Backscatter information
     //
@@ -419,7 +422,7 @@ void mitk::DataTreeNodeFactory::ReadFileTypeHPSONOS()
 
     mitk::ImageSliceSelector::Pointer sliceSelector = mitk::ImageSliceSelector::New();
     //
-    // insert original (in cylinric coordinates) Backscatter information
+    // insert original (in cylindrical coordinates) Backscatter information
     //
     mitk::DataTreeNode::Pointer node = this->GetOutput( 0 );
     node->SetData( channelSelector->GetOutput() );
@@ -450,11 +453,7 @@ void mitk::DataTreeNodeFactory::ReadFileTypeHPSONOS()
     nameProp = new mitk::StringProperty( "TransformedBackscatter" );
     node->SetProperty( "name", nameProp );
     node->SetProperty( "layer", new mitk::IntProperty( -10 ) );
-    //    mitk::LevelWindow levelwindow;
-
-    sliceSelector->SetInput( cyl2cart->GetOutput() );
-    sliceSelector->Update();
-    levelwindow.SetAuto( sliceSelector->GetOutput()->GetPic() );
+   
     node->SetLevelWindow( levelwindow, NULL );
     node->Update();
 
@@ -526,7 +525,6 @@ void mitk::DataTreeNodeFactory::ReadFileTypeHPSONOS()
         nameProp = new mitk::StringProperty( "TransformedDoppler" );
         node->SetProperty( "name", nameProp );
         node->SetProperty( "layer", new mitk::IntProperty( -5 ) );
-        cyl2cartDoppler->Update();
 
         // set the overwrite LevelWindow
         // if "levelwindow" is used if "levelwindow" is not available

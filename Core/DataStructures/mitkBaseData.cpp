@@ -7,6 +7,8 @@
 mitk::BaseData::BaseData() : m_SmartSourcePointer(NULL), m_SourceOutputIndexDuplicate(0), m_Unregistering(false), m_ExternalReferenceCount(-1), m_CalculatingExternalReferenceCount(false)
 {
   m_Geometry3D = Geometry3D::New();
+  m_PropertyList = PropertyList::New();
+  
 }
 
 //##ModelId=3E3FE042031D
@@ -108,6 +110,26 @@ void mitk::BaseData::ConnectSource(itk::ProcessObject *arg, unsigned int idx) co
   }
 #endif
 }
+
+
+
+mitk::PropertyList::Pointer mitk::BaseData::GetPropertyList() const
+{
+	  return m_PropertyList;
+}
+
+
+mitk::BaseProperty::Pointer mitk::BaseData::GetProperty(const char *propertyKey) const
+{
+   return m_PropertyList->GetProperty(propertyKey);
+}
+
+void mitk::BaseData::SetProperty(const char *propertyKey,
+                                     BaseProperty* propertyValue)
+{
+    m_PropertyList->SetProperty(propertyKey, propertyValue);
+}
+
 
 void mitk::BaseData::ExecuteOperation(mitk::Operation* operation)
 {

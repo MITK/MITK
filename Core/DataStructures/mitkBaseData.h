@@ -7,6 +7,8 @@
 #include "mitkGeometry2D.h"
 #include "mitkOperationActor.h"
 
+#include "mitkPropertyList.h"
+
 namespace mitk {
 
 class BaseProcess;
@@ -141,6 +143,27 @@ public:
   //## @warning This method will normally be called internally by the sub-class of BaseData 
   //## during initialization.
   virtual void SetGeometry(Geometry3D* aGeometry3D);
+
+
+  //##Documentation
+  //## @brief Get the PropertyList 
+  //## @sa GetProperty
+  //## @sa m_PropertyList
+  mitk::PropertyList::Pointer GetPropertyList() const;
+
+  //##ModelId=3EF189DB0111
+  //##Documentation
+  //## @brief Get the property (instance of BaseProperty) with key @a propertyKey from the PropertyList
+  //## @sa GetPropertyList
+  //## @sa m_PropertyList
+  //## @sa m_MapOfPropertyLists
+  mitk::BaseProperty::Pointer GetProperty(const char *propertyKey) const;
+
+  void SetProperty(const char *propertyKey, BaseProperty* property);
+
+
+
+        
 protected:
   //##ModelId=3E3FE04202B9
   BaseData();
@@ -175,6 +198,12 @@ private:
   //##Documentation
   //## @brief Helps to deal with the weak-pointer-problem.
   friend class mitk::BaseProcess;
+
+  //##Documentation
+  //## @brief PropertyList, f.e. to hold pic-tags, tracking-data,..
+  //##
+  PropertyList::Pointer m_PropertyList;
+  
 };
 
 } // namespace mitk

@@ -57,38 +57,184 @@ public:
 template <typename MeshType, class ScalarAccessor=NullScalarAccessor<MeshType> >
 class MeshUtil
 {
-
   /*!
-  \brief implementation for VTK cell visitors
-  \todo documentation
+  \brief A visitor to create VTK cells by means of a class
+  defining the InsertImplementation interface
+  
+  The InsertImplementation interface defines the methods
+  \code
+    void InsertLine(vtkIdType *pts);
+    void InsertTriangle(vtkIdType *pts);
+    void InsertPolygon(vtkIdType npts, vtkIdType *pts);
+    void InsertQuad(vtkIdType *pts);
+  \endcode
+
+  This class calls the appropriate insert-method of the 
+  InsertImplementation according to the cell type of 
+  the visited cell \em and its actual contents: e.g.,
+  for a polygon cell with just two points, a line will
+  be created by calling InsertLine.
+  \sa ExactSwitchByCellType
+  \sa SingleCellArrayInsertImplementation
+  \sa DistributeInsertImplementation
   */
-  class VistVTKCellsClass
+  template <class InsertImplementation>
+  class SwitchByCellType : public InsertImplementation
   {
-    vtkCellArray* m_Cells;
-    int* m_LastCell;
-    int* m_TypeArray;
-  public:
     // typedef the itk cells we are interested in
     typedef typename itk::CellInterface< typename MeshType::CellPixelType, 
-                                         typename MeshType::CellTraits >  CellInterfaceType;
-    typedef itk::LineCell<CellInterfaceType>      floatLineCell;
-    typedef itk::PolygonCell<CellInterfaceType>      floatPolygonCell;
+      typename MeshType::CellTraits >  CellInterfaceType;
+    typedef itk::LineCell<CellInterfaceType>          floatLineCell;
     typedef itk::TriangleCell<CellInterfaceType>      floatTriangleCell;
+    typedef itk::PolygonCell<CellInterfaceType>       floatPolygonCell;
     typedef itk::QuadrilateralCell<CellInterfaceType> floatQuadrilateralCell;
 
-    /*! Set the vtkCellArray that will be constructed
+  public:
+    /*!
+    Visit a line and create the VTK_LINE cell   
     */
-    void SetCellArray(vtkCellArray* a) 
+    void Visit(unsigned long , floatLineCell* t)
     {
-      m_Cells = a;
+      unsigned long num = t->GetNumberOfVertices();
+      vtkIdType *pts = (vtkIdType*)t->PointIdsBegin();
+      if (num==2) // useless because itk::LineCell always returns 2
+        InsertLine(pts);
+    }
+
+    /*!
+    Visit a line and create the VTK_POLYGON cell   
+    */
+    void Visit(unsigned long , floatPolygonCell* t)
+    {
+      unsigned long num = t->GetNumberOfVertices();
+      vtkIdType *pts = (vtkIdType*)t->PointIdsBegin();
+      if (num > 3) 
+        InsertPolygon(num, pts);
+      else
+      if (num == 3) 
+        InsertTriangle(pts);
+      else
+      if (num==2)
+        InsertLine(pts);
+    }
+
+    /*!
+    Visit a triangle and create the VTK_TRIANGLE cell   
+    */
+    void Visit(unsigned long , floatTriangleCell* t)
+    {
+      unsigned long num = t->GetNumberOfVertices();
+      vtkIdType *pts = (vtkIdType*)t->PointIdsBegin();
+      if (num == 3) 
+        InsertTriangle(pts);
+      else
+      if (num==2)
+        InsertLine(pts);
     }
 
     /*! 
-    Set the cell counter pointer
+    Visit a triangle and create the VTK_QUAD cell 
     */
-    void SetCellCounter(int* i)
+    void Visit(unsigned long , floatQuadrilateralCell* t)
     {
-      m_LastCell = i;
+      unsigned long num = t->GetNumberOfVertices();
+      vtkIdType *pts = (vtkIdType*)t->PointIdsBegin();
+      if (num == 4) 
+        InsertQuad(pts);
+      else
+      if (num == 3) 
+        InsertTriangle(pts);
+      else
+      if (num==2)
+        InsertLine(pts);
+    }
+  };
+
+  /*!
+  \brief A visitor similar to SwitchByCellType, but with
+  exact matching of cell types
+  
+  Works as described in SwitchByCellType, but does exact
+  matching of cell types, e.g., for a polygon cell with just 
+  two points, \em no insert-method will be called, because
+  a polygon must have at least three points.
+  \sa SwitchByCellType
+  \sa SingleCellArrayInsertImplementation
+  \sa DistributeInsertImplementation
+  */
+  template <class InsertImplementation>
+  class ExactSwitchByCellType : public InsertImplementation
+  {
+    // typedef the itk cells we are interested in
+    typedef typename itk::CellInterface< typename MeshType::CellPixelType, 
+      typename MeshType::CellTraits >  CellInterfaceType;
+    typedef itk::LineCell<CellInterfaceType>          floatLineCell;
+    typedef itk::TriangleCell<CellInterfaceType>      floatTriangleCell;
+    typedef itk::PolygonCell<CellInterfaceType>       floatPolygonCell;
+    typedef itk::QuadrilateralCell<CellInterfaceType> floatQuadrilateralCell;
+
+  public:
+    /*!
+    Visit a line and create the VTK_LINE cell   
+    */
+    void Visit(unsigned long , floatLineCell* t)
+    {
+      unsigned long num = t->GetNumberOfVertices();
+      vtkIdType *pts = (vtkIdType*)t->PointIdsBegin();
+      if (num==2)
+        InsertLine(pts);
+    }
+
+    /*!
+    Visit a line and create the VTK_POLYGON cell   
+    */
+    void Visit(unsigned long , floatPolygonCell* t)
+    {
+      unsigned long num = t->GetNumberOfVertices();
+      vtkIdType *pts = (vtkIdType*)t->PointIdsBegin();
+      if (num > 3) 
+        InsertPolygon(num, pts);
+    }
+
+    /*!
+    Visit a triangle and create the VTK_TRIANGLE cell   
+    */
+    void Visit(unsigned long , floatTriangleCell* t)
+    {
+      unsigned long num = t->GetNumberOfVertices();
+      vtkIdType *pts = (vtkIdType*)t->PointIdsBegin();
+      if (num == 3) 
+        InsertTriangle(pts);
+    }
+
+    /*! 
+    Visit a triangle and create the VTK_QUAD cell 
+    */
+    void Visit(unsigned long , floatQuadrilateralCell* t)
+    {
+      unsigned long num = t->GetNumberOfVertices();
+      vtkIdType *pts = (vtkIdType*)t->PointIdsBegin();
+      if (num == 4) 
+        InsertQuad(pts);
+    }
+  };
+
+  /*!
+  \brief Implementation of the InsertImplementation interface of
+  SwitchByCellType to define a visitor that create cells 
+  according to their types and put them in a single
+  vtkCellArray (for vtkUnstructuredGrid construction)
+  */
+  class SingleCellArrayInsertImplementation
+  {
+    vtkCellArray* m_Cells;
+    int* m_TypeArray;
+  public:
+    /*! Set the vtkCellArray that will be constructed
+    */
+    void SetCellArray(vtkCellArray* cells)
+    {
+      m_Cells = cells;
     }
 
     /*!
@@ -99,99 +245,89 @@ class MeshUtil
       m_TypeArray = i;
     }
 
-    /*!
-    Visit a line and create the VTK_LINE cell   
-    */
-    void Visit(unsigned long , floatLineCell* t)
+    void InsertLine(vtkIdType *pts)
     {
-      m_Cells->InsertNextCell(2,  (vtkIdType*)t->PointIdsBegin());
-      m_TypeArray[*m_LastCell] = VTK_LINE;
-      (*m_LastCell)++;
+      cellId = m_Cells->InsertNextCell(2, pts);
+      m_TypeArray[cellId] = VTK_LINE;
     }
 
-    /*!
-    Visit a line and create the VTK_POLYGON cell   
-    */
-    void Visit(unsigned long , floatPolygonCell* t)
+    void InsertTriangle(vtkIdType *pts)
     {
- 
-      unsigned long num = t->GetNumberOfVertices();
-      if (num > 3) {
-        m_Cells->InsertNextCell(num, (vtkIdType*)t->PointIdsBegin());
-        m_TypeArray[*m_LastCell] = VTK_POLYGON;
-        (*m_LastCell)++;
-      }
+      cellId = m_Cells->InsertNextCell(3, pts);
+      m_TypeArray[cellId] = VTK_TRIANGLE;
     }
 
-    /*!
-    Visit a triangle and create the VTK_TRIANGLE cell   
-    */
-    void Visit(unsigned long , floatTriangleCell* t)
+    void InsertPolygon(vtkIdType npts, vtkIdType *pts)
     {
-      m_Cells->InsertNextCell(3,  (vtkIdType*)t->PointIdsBegin());
-      m_TypeArray[*m_LastCell] = VTK_TRIANGLE;
-      (*m_LastCell)++;
+      cellId = m_Cells->InsertNextCell(npts, pts);
+      m_TypeArray[cellId] = VTK_POLYGON;
     }
 
-    /*! 
-    Visit a triangle and create the VTK_QUAD cell 
-    */
-    void Visit(unsigned long , floatQuadrilateralCell* t)
+    void InsertQuad(vtkIdType *pts)
     {
-      m_Cells->InsertNextCell(4,  (vtkIdType*)t->PointIdsBegin());
-      m_TypeArray[*m_LastCell] = VTK_QUAD;
-      (*m_LastCell)++;
+      cellId = m_Cells->InsertNextCell(4, pts);
+      m_TypeArray[cellId] = VTK_QUAD;
     }
   };
 
-
-  typedef typename MeshType::CellType                CellType;
-  typedef typename itk::LineCell< CellType >         LineType;
-  typedef typename itk::PolygonCell< CellType >         PolygonType;
-  typedef typename itk::TriangleCell< CellType >     TriangleType;
-
-
-  /*! 
-  default line cell visitior definition 
+  /*!
+  \brief Implementation of the InsertImplementation interface of
+  SwitchByCellType to define a visitor that distributes cells 
+  according to their types (for vtkPolyData construction)
   */
-  typedef typename itk::CellInterfaceVisitorImplementation<
-                                      typename MeshType::CellPixelType,
-                                      typename MeshType::CellTraits,
-                                      LineType, 
-                                      VistVTKCellsClass>			LineVisitor;
+  class DistributeInsertImplementation
+  {
+    vtkCellArray* m_LineCells;
+    vtkCellArray* m_TriangleCells;
+    vtkCellArray* m_PolygonCells;
+    vtkCellArray* m_QuadCells;
+  public:
+    /*! Set the vtkCellArray that will be constructed
+    */
+    void SetCellArrays(vtkCellArray* lines, vtkCellArray* triangles, vtkCellArray* polygons, vtkCellArray* quads) 
+    {
+      m_LineCells = lines;
+      m_TriangleCells = triangles;
+      m_PolygonCells = polygons;
+      m_QuadCells = quads;
+    }
 
-  /*! 
-  default line cell visitior definition 
-  */
-  typedef typename itk::CellInterfaceVisitorImplementation<
-                                      typename MeshType::CellPixelType,
-                                      typename MeshType::CellTraits,
-                                      PolygonType, 
-                                      VistVTKCellsClass>			PolygonVisitor;
+    void InsertLine(vtkIdType *pts)
+    {
+      m_LineCells->InsertNextCell(2, pts);
+    }
 
-  /*! 
-  default triangle cell visitior definition 
-  */
-  typedef typename itk::CellInterfaceVisitorImplementation<typename MeshType::CellPixelType,
-    typename MeshType::CellTraits,
-    itk::TriangleCell<itk::CellInterface<typename MeshType::CellPixelType, typename MeshType::CellTraits >
-    >, VistVTKCellsClass>			TriangleVisitor;
+    void InsertTriangle(vtkIdType *pts)
+    {
+      m_TriangleCells->InsertNextCell(3, pts);
+    }
 
+    void InsertPolygon(vtkIdType npts, vtkIdType *pts)
+    {
+      m_PolygonCells->InsertNextCell(npts, pts);
+    }
 
-  /*! 
-  default quad cell visitior definition 
-  */
-  typedef typename itk::CellInterfaceVisitorImplementation<typename MeshType::CellPixelType, typename MeshType::CellTraits,
-    itk::QuadrilateralCell< itk::CellInterface<typename MeshType::CellPixelType, typename MeshType::CellTraits > >, 
-    VistVTKCellsClass> QuadrilateralVisitor;
+    void InsertQuad(vtkIdType *pts)
+    {
+      m_QuadCells->InsertNextCell(4, pts);
+    }
+  };
 
+  //typedef typename MeshType::CellType                CellType;
+  //typedef typename itk::LineCell< CellType >         LineType;
+  //typedef typename itk::PolygonCell< CellType >      PolygonType;
+  //typedef typename itk::TriangleCell< CellType >     TriangleType;
+
+  typedef SwitchByCellType<SingleCellArrayInsertImplementation> SingleCellArrayUserVisitorType;
+  typedef SwitchByCellType<DistributeInsertImplementation> DistributeUserVisitorType;
+  typedef ExactSwitchByCellType<DistributeInsertImplementation> ExactUserVisitorType;
 
 public:
 
   /*!
   create an itkMesh object from a vtkPolyData
   */
-  static typename MeshType::Pointer meshFromPolyData(vtkPolyData* poly)
+  static typename MeshType::Pointer MeshFromPolyData(vtkPolyData* poly)
   {
     // Create a new mesh
     typename MeshType::Pointer output = MeshType::New();
@@ -303,8 +439,40 @@ public:
   /*!
     create an vtkUnstructuredGrid object from an itkMesh
   */
-  static vtkUnstructuredGrid* meshToUnstructuredGrid(typename MeshType::Pointer mesh)
+  static vtkUnstructuredGrid* MeshToUnstructuredGrid(typename MeshType::Pointer mesh)
   {
+    /*! 
+    default SingleCellArray line cell visitior definition 
+    */
+    typedef typename itk::CellInterfaceVisitorImplementation<typename MeshType::CellPixelType,
+      typename MeshType::CellTraits,
+      itk::LineCell< typename MeshType::CellType >, 
+      SingleCellArrayUserVisitorType>			          SingleCellArrayLineVisitor;
+
+    /*! 
+    default SingleCellArray line cell visitior definition 
+    */
+    typedef typename itk::CellInterfaceVisitorImplementation<typename MeshType::CellPixelType,
+      typename MeshType::CellTraits,
+      itk::PolygonCell< typename MeshType::CellType >, 
+      SingleCellArrayUserVisitorType>			          SingleCellArrayPolygonVisitor;
+
+    /*! 
+    default SingleCellArray triangle cell visitior definition 
+    */
+    typedef typename itk::CellInterfaceVisitorImplementation<typename MeshType::CellPixelType,
+      typename MeshType::CellTraits,
+      itk::TriangleCell<itk::CellInterface<typename MeshType::CellPixelType, typename MeshType::CellTraits > >, 
+      SingleCellArrayUserVisitorType>			          SingleCellArrayTriangleVisitor;
+
+
+    /*! 
+    default SingleCellArray quad cell visitior definition
+    */
+    typedef typename itk::CellInterfaceVisitorImplementation<typename MeshType::CellPixelType, typename MeshType::CellTraits,
+      itk::QuadrilateralCell< itk::CellInterface<typename MeshType::CellPixelType, typename MeshType::CellTraits > >, 
+      SingleCellArrayUserVisitorType>               SingleCellArrayQuadrilateralVisitor;
+
 
 
     // Get the number of points in the mesh
@@ -344,15 +512,15 @@ public:
     typename MeshType::CellType::MultiVisitor::Pointer mv =
       typename MeshType::CellType::MultiVisitor::New();
     // 2. Create a triangle and quadrilateral visitor
-    typename TriangleVisitor::Pointer tv = TriangleVisitor::New();
-    typename QuadrilateralVisitor::Pointer qv =  QuadrilateralVisitor::New();
+    typename SingleCellArrayTriangleVisitor::Pointer      tv = SingleCellArrayTriangleVisitor::New();
+    typename SingleCellArrayQuadrilateralVisitor::Pointer qv = SingleCellArrayQuadrilateralVisitor::New();
     // 3. Set up the visitors
     int vtkCellCount = 0; // running counter for current cell being inserted into vtk
     int numCells = mesh->GetNumberOfCells();
     int *types = new int[numCells]; // type array for vtk 
     // create vtk cells and estimate the size
     vtkCellArray* cells = vtkCellArray::New();
-    cells->EstimateSize(numCells, 4);
+    cells->Allocate(numCells);
     // Set the TypeArray CellCount and CellArray for both visitors
     tv->SetTypeArray(types);
     tv->SetCellCounter(&vtkCellCount);
@@ -381,8 +549,48 @@ public:
   /*!
     create an vtkUnstructuredGrid object from an itkMesh
   */
-  static vtkPolyData* meshToPolyData(typename MeshType::Pointer mesh, bool onlyTriangles = false, bool useScalarAccessor = false)
+  static vtkPolyData* MeshToPolyData(typename MeshType::Pointer mesh, bool onlyTriangles = false, bool useScalarAccessor = false, vtkPolyData* polydata = NULL)
   {
+    /*! 
+    default Distribute line cell visitior definition 
+    */
+    typedef typename itk::CellInterfaceVisitorImplementation<typename MeshType::CellPixelType,
+      typename MeshType::CellTraits,
+      itk::LineCell< typename MeshType::CellType >, 
+      DistributeUserVisitorType>			          DistributeLineVisitor;
+
+    /*! 
+    default Distribute line cell visitior definition 
+    */
+    typedef typename itk::CellInterfaceVisitorImplementation<typename MeshType::CellPixelType,
+      typename MeshType::CellTraits,
+      itk::PolygonCell< typename MeshType::CellType >, 
+      DistributeUserVisitorType>			          DistributePolygonVisitor;
+
+    /*! 
+    default Distribute triangle cell visitior definition 
+    */
+    typedef typename itk::CellInterfaceVisitorImplementation<typename MeshType::CellPixelType,
+      typename MeshType::CellTraits,
+      itk::TriangleCell<itk::CellInterface<typename MeshType::CellPixelType, typename MeshType::CellTraits > >, 
+      DistributeUserVisitorType>			          DistributeTriangleVisitor;
+
+
+    /*! 
+    default Distribute quad cell visitior definition
+    */
+    typedef typename itk::CellInterfaceVisitorImplementation<typename MeshType::CellPixelType, typename MeshType::CellTraits,
+      itk::QuadrilateralCell< itk::CellInterface<typename MeshType::CellPixelType, typename MeshType::CellTraits > >, 
+      DistributeUserVisitorType>               DistributeQuadrilateralVisitor;
+
+
+    /*! 
+    default Distribute triangle cell visitior definition 
+    */
+    typedef typename itk::CellInterfaceVisitorImplementation<typename MeshType::CellPixelType,
+      typename MeshType::CellTraits,
+      itk::TriangleCell<itk::CellInterface<typename MeshType::CellPixelType, typename MeshType::CellTraits > >, 
+      ExactUserVisitorType>			              ExactTriangleVisitor;
 
 
     // Get the number of points in the mesh
@@ -393,11 +601,14 @@ public:
       std::cerr << "no points in Grid " << std::endl;
     }
     // Create a vtkUnstructuredGrid
-    vtkPolyData* vgrid = vtkPolyData::New();
+    if(polydata == NULL)
+      polydata = vtkPolyData::New();
+    else
+      polydata->Initialize();
+
     // Create the vtkPoints object and set the number of points
     vtkPoints* vpoints = vtkPoints::New();
     vpoints->SetNumberOfPoints(numPoints);
-
 
     vtkFloatArray * scalars = vtkFloatArray::New();
     scalars->SetNumberOfComponents(1);
@@ -407,11 +618,12 @@ public:
     // the vtkPoints object as we go
     typename MeshType::PointsContainer::Pointer points = mesh->GetPoints();
 
+    int idx=0;
     for(typename MeshType::PointsContainer::Iterator i = points->Begin();
-      i != points->End(); ++i)
+      i != points->End(); ++i, ++idx)
     {
       // Get the point index from the point container iterator
-      int idx = i->Index();
+      // int idx = i->Index(); //using this together with vtk::Points::SetPoint (no range checking!!) is unsafe!!
       
       typename MeshType::PointType p;
       p = i->Value();
@@ -434,74 +646,91 @@ public:
 
 
     // Set the points on the vtk grid
-    vgrid->SetPoints(vpoints);
-    vgrid->GetPointData()->SetScalars(scalars);
-    vgrid->GetPointData()->CopyAllOn();
+    polydata->SetPoints(vpoints);
+    polydata->GetPointData()->SetScalars(scalars);
+    polydata->GetPointData()->CopyAllOn();
 
 
     // Now create the cells using the MulitVisitor
     // 1. Create a MultiVisitor
     typedef typename MeshType::CellType::MultiVisitor MeshMV;
     typename MeshMV::Pointer mv = MeshMV::New();
-    // 2. Create a triangle and quadrilateral visitor
-    typename LineVisitor::Pointer lv = LineVisitor::New();
-    typename PolygonVisitor::Pointer pv = PolygonVisitor::New();
-    typename TriangleVisitor::Pointer tv = TriangleVisitor::New();
-    typename QuadrilateralVisitor::Pointer qv =  QuadrilateralVisitor::New();
-    // 3. Set up the visitors
-    int vtkCellCount = 0; // running counter for current cell being inserted into vtk
+
     int numCells = mesh->GetNumberOfCells();
-    int *types = new int[numCells]; // type array for vtk 
-    // create vtk cells and estimate the size
-    vtkCellArray* cells = vtkCellArray::New();
-    cells->EstimateSize(numCells, 4);
-    // Set the TypeArray CellCount and CellArray for both visitors
 
-    lv->SetTypeArray(types);
-    lv->SetCellCounter(&vtkCellCount);
-    lv->SetCellArray(cells);
-
-    pv->SetTypeArray(types);
-    pv->SetCellCounter(&vtkCellCount);
-    pv->SetCellArray(cells);
-
-    tv->SetTypeArray(types);
-    tv->SetCellCounter(&vtkCellCount);
-    tv->SetCellArray(cells);
-    qv->SetTypeArray(types);
-    qv->SetCellCounter(&vtkCellCount);
-    qv->SetCellArray(cells);
-    // add the visitors to the multivisitor
-
-    if (onlyTriangles) {
-      mv->AddVisitor(tv);
-      mesh->Accept(mv);
-      vgrid->SetStrips(cells);  
-    }
-    else 
+    if (onlyTriangles)
     {
+      // create vtk cells and allocate
+      vtkCellArray* trianglecells = vtkCellArray::New();
+      trianglecells->Allocate(numCells);
+
+      // 2. Create a triangle visitor and add it to the multivisitor
+      typename ExactTriangleVisitor::Pointer tv = ExactTriangleVisitor::New();
+      tv->SetCellArrays(NULL, trianglecells, NULL, NULL);
       mv->AddVisitor(tv);
-      mv->AddVisitor(lv);
-      mv->AddVisitor(pv);
-  //    mv->AddVisitor(qv);
-      // Now ask the mesh to accept the multivisitor which
+      // 3. Now ask the mesh to accept the multivisitor which
       // will Call Visit for each cell in the mesh that matches the
       // cell types of the visitors added to the MultiVisitor
       mesh->Accept(mv);
-      // Now set the cells on the vtk grid with the type array and cell array
-      vgrid->SetPolys(cells);  
-  //    vgrid->SetTriangles(cells);  
-      vgrid->SetLines(cells);
-    // Clean up vtk objects (no vtkSmartPointer ... )
+
+      // 4. Set the result into our vtkPolyData
+      if(trianglecells->GetNumberOfCells()>0)
+        polydata->SetStrips(trianglecells); 
+
+      // 5. Clean up vtk objects (no vtkSmartPointer ... )
+      trianglecells->Delete();
     }
-    cells->Delete();
+    else 
+    {
+      // create vtk cells and allocate
+      vtkCellArray* linecells = vtkCellArray::New();
+      vtkCellArray* trianglecells = vtkCellArray::New();
+      vtkCellArray* polygoncells = vtkCellArray::New();
+      linecells->Allocate(numCells);
+      trianglecells->Allocate(numCells);
+      polygoncells->Allocate(numCells);
+
+      // 2. Create a visitors
+      typename DistributeLineVisitor::Pointer lv          = DistributeLineVisitor::New();
+      typename DistributePolygonVisitor::Pointer pv       = DistributePolygonVisitor::New();
+      typename DistributeTriangleVisitor::Pointer tv      = DistributeTriangleVisitor::New();
+      typename DistributeQuadrilateralVisitor::Pointer qv = DistributeQuadrilateralVisitor::New();
+
+      lv->SetCellArrays(linecells, trianglecells, polygoncells, polygoncells);
+      pv->SetCellArrays(linecells, trianglecells, polygoncells, polygoncells);
+      tv->SetCellArrays(linecells, trianglecells, polygoncells, polygoncells);
+      qv->SetCellArrays(linecells, trianglecells, polygoncells, polygoncells);
+
+      // add the visitors to the multivisitor
+      mv->AddVisitor(tv);
+      mv->AddVisitor(lv);
+      mv->AddVisitor(pv);
+      mv->AddVisitor(qv);
+      // 3. Now ask the mesh to accept the multivisitor which
+      // will Call Visit for each cell in the mesh that matches the
+      // cell types of the visitors added to the MultiVisitor
+      mesh->Accept(mv);
+
+      // 4. Set the result into our vtkPolyData
+      if(linecells->GetNumberOfCells()>0)
+        polydata->SetLines(linecells);  
+      if(trianglecells->GetNumberOfCells()>0)
+        polydata->SetStrips(trianglecells); 
+      if(polygoncells->GetNumberOfCells()>0)
+        polydata->SetPolys(polygoncells);  
+
+      // 5. Clean up vtk objects (no vtkSmartPointer ... )
+      linecells->Delete();
+      trianglecells->Delete();
+      polygoncells->Delete();
+    }
     vpoints->Delete();
 
     //std::cout << "meshToUnstructuredGrid end" << std::endl;
-    return vgrid;
+    return polydata;
   }
 
-  static typename MeshType::Pointer translateMesh(typename MeshType::PointType vec, typename MeshType::Pointer inputMesh)
+  static typename MeshType::Pointer TranslateMesh(typename MeshType::PointType vec, typename MeshType::Pointer inputMesh)
   {
     typedef typename itk::TranslationTransform< typename MeshType::PixelType, 3>  TransformType;
     typedef typename itk::TransformMeshFilter<MeshType, MeshType, TransformType > MeshFilterType;

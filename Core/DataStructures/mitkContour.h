@@ -30,8 +30,18 @@ namespace mitk
       typedef itk::BoundingBox<unsigned long, 3, ScalarType>        BoundingBoxType;
       typedef BoundingBoxType::PointsContainer                      PointsContainer;
       typedef BoundingBoxType::PointsContainer::Pointer             PointsContainerPointer;
+      typedef BoundingBoxType::PointsContainerIterator              PointsContainerIterator;
 
-      //void ExecuteOperation(Operation* operation);
+      /**
+       * sets whether the contour should be closed or open.
+       * by default the contour is closed
+       */
+      itkSetMacro(Closed, bool);
+
+      /**
+       * returns if the contour is closed or opened
+       */
+      itkGetMacro(Closed, bool);
 
       /**
        * clean up the contour data
@@ -46,7 +56,7 @@ namespace mitk
       /**
        * return an itk parametric path of the contour 
        */
-      PathType::Pointer GetContourPath();
+      PathPointer GetContourPath();
 
       /**
        * set the current render window. This is helpful if one 
@@ -125,6 +135,10 @@ namespace mitk
        */
       BoundingBoxType::PointsContainer::Pointer m_Vertices;
 
+      /**
+       * decide whether th contour is open or closed 
+       */
+      bool m_Closed;
     };
 
   } // namespace mitk

@@ -1,14 +1,11 @@
 #include "mitkContour.h"
 
-//#include <mitkPointOperation.h>
-//#include <mitkOperationActor.h>
-//#include <mitkInteractionConst.h>
-
 mitk::Contour::Contour() :
 m_ContourPath (PathType::New()),
 m_CurrentWindow ( NULL ),
 m_BoundingBox (BoundingBoxType::New()),
-m_Vertices ( BoundingBoxType::PointsContainer::New() )
+m_Vertices ( BoundingBoxType::PointsContainer::New() ),
+m_Closed ( true )
 {
   m_Geometry3D->Initialize();
 }
@@ -27,32 +24,6 @@ void mitk::Contour::AddVertex(mitk::ITKPoint3D newPoint)
   m_ContourPath->AddVertex(idx);
 }
 
-//void mitk::Contour::ExecuteOperation(Operation* op)
-//{
-//  mitk::PointOperation * pointOp = dynamic_cast<mitk::PointOperation*>( op );
-//  if ( pointOp != NULL )
-//  {
-//    switch (op->GetOperationType())
-//    {
-//    case mitk::OpADD:
-//      {
-//      m_ContourPath = PathType::New();
-//      m_ContourPath->Initialize();    
-//      }
-//
-//    case mitk::OpMOVE:
-//      {
-//        //std::cout << "add vertex to contour" << std::endl;
-//        AddVertex(pointOp->GetPoint());
-//        UpdateOutputInformation();
-//        if (m_CurrentWindow != NULL) {
-//          m_CurrentWindow->Update();
-//        }
-//      }
-//    }
-//  }
-//}
-//
 void mitk::Contour::UpdateOutputInformation()
 {
   float mitkBounds[6];

@@ -477,6 +477,7 @@
 <slots>
     <slot>fileNew()</slot>
     <slot>fileOpen()</slot>
+    <slot>fileOpenImageSequence()</slot>
     <slot>initWidget( mitk::DataTreeIterator * it, QmitkSelectableGLWidget * widget, const Vector3f &amp; normal, const Vector3f &amp; right )</slot>
     <slot>initWidget( mitk::DataTreeIterator * it, QmitkSelectableGLWidget * widget, const Vector3f &amp; origin, const Vector3f &amp; right, const Vector3f &amp; bottom )</slot>
     <slot>fileSave()</slot>
@@ -493,7 +494,6 @@
     <slot>helpContents()</slot>
     <slot>helpAbout()</slot>
     <slot>initWidgets( mitk::DataTreeNode::Pointer node )</slot>
-    <slot>fileOpenImageSequence()</slot>
 </slots>
 <functions>
     <function access="protected">fileOpen( const char * fileName )</function>
@@ -503,6 +503,7 @@
     <function>initializeFunctionality()</function>
     <function>initializeQfm()</function>
     <function returnType="mitk::DataTree *">getDataTree()</function>
+    <function returnType="QmitkMultiWidget *">getMultiWidget()</function>
 </functions>
 <pixmapinproject/>
 <layoutdefaults spacing="6" margin="11"/>

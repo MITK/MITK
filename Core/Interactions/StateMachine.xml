@@ -32,4 +32,9 @@
 			<transition NAME="Übergang von 3 in 2" NEXT_STATE_ID="2" EVENT_ID="600" SIDE_EFFECT_ID="60" />
 		</state>
 	</stateMaschine>
+	<events STYLE="PowerPoint">
+			<event NAME="Einfügen" ID="1" TYPE="1" BUTTON_NUMBER="1" KEY="56" />
+			<event NAME="Einfügen" ID="2" TYPE="1" BUTTON_NUMBER="2" KEY="56" />
+			<event NAME="Einfügen" ID="3" TYPE="2" BUTTON_NUMBER="1" KEY="56" />
+	</events>
 </mitkInteraktionStates>

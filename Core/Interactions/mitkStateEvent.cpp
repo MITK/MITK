@@ -1,5 +1,9 @@
 #include "StateEvent.h"
 
+//##ModelId=3E5B7B9E0137
+mitk::StateEvent::StateEvent()
+{}
+
 //##ModelId=3E5B7A7603DA
 void mitk::StateEvent::Set(int id, Event const* event)
 {
@@ -19,12 +23,7 @@ int mitk::StateEvent::GetId() const
 }
 
 //##ModelId=3E5B7B030383
-const Event const* mitk::StateEvent::GetEvent() const
+Event const* mitk::StateEvent::GetEvent() const
 {
 	return m_Event;
 }
-
-//##ModelId=3E5B7B9E0137
-mitk::StateEvent::StateEvent()
-{}
-

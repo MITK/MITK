@@ -23,31 +23,11 @@ const std::string mitk::StateMachineFactory::NEXT_STATE_ID = "NEXT_STATE_ID";
 const std::string mitk::StateMachineFactory::EVENT_ID = "EVENT_ID";
 //##ModelId=3E775729017C
 const std::string mitk::StateMachineFactory::SIDE_EFFECT_ID = "SIDE_EFFECT_ID";
-//XML Event	  
-//##ModelId=3E77572901E9
-const std::string mitk::StateMachineFactory::TYPE = "TYPE";
-//##ModelId=3E7757290256
-const std::string mitk::StateMachineFactory::BUTTON_NUMBER = "BUTTON_NUMBER";
-//##ModelId=3E77572902C4
-const std::string mitk::StateMachineFactory::KEY = "KEY";
-//##ModelId=3E7757290341
-const std::string mitk::StateMachineFactory::TRUE = "TRUE";
-//##ModelId=3E77572903AE
-const std::string mitk::StateMachineFactory::FALSE = "FALSE";
 
 
 //##ModelId=3E68B2C600BD
 mitk::StateMachineFactory::StateMachineFactory()
 : m_AktState(NULL), 	m_AktStateMachineName(""){}
-
-//##ModelId=3E77572A0062
-//##Documentation
-//## Destructor, deletes all the reserved memory
-mitk::StateMachineFactory::~StateMachineFactory()
-{
-	
-}
-
 
 //##ModelId=3E5B4144024F
 //##Documentation
@@ -187,14 +167,6 @@ bool mitk::StateMachineFactory::startElement( const QString&, const QString&, co
 					atts.value(EVENT_ID.c_str()).toInt(),
 					atts.value(SIDE_EFFECT_ID.c_str()).toInt() );
 	}
-	else if ( qName == "events" )											//new events pattern, e.g. <events STYLE="PowerPoint">
-		//TODO: Events Loading!
-	{NULL;}
-
-	else if (qName == "event")											//new events, e.g. <event NAME="Einfügen" ID="1" TYPE="1" BUTTON_NUMBER="1" KEY="56" />
-			//ToDo: Events Loading!
-	{NULL;}
-
 	else
 		NULL;
 	

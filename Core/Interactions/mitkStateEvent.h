@@ -10,6 +10,9 @@ namespace mitk {
 class StateEvent
 {
   public:
+    //##ModelId=3E5B7B9E0137
+    StateEvent();
+  
     //##ModelId=3E5B7A7603DA
     void Set(int id, Event const* event);
 
@@ -20,11 +23,8 @@ class StateEvent
     int GetId() const;
 
     //##ModelId=3E5B7B030383
-    const Event const* GetEvent() const;
-
-    //##ModelId=3E5B7B9E0137
-    StateEvent();
-
+    Event const* GetEvent() const;
+    
   private:
     //##ModelId=3E5B7944016D
     int m_Id;

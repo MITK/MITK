@@ -20,7 +20,7 @@ class StateMachine
     bool SetEvent(StateEvent const* stateEvent);
 
     //##ModelId=3E5B2E660087
-    string GetName() const;
+	std::string GetName() const;
 
   protected:
     //##ModelId=3E5B2E170228

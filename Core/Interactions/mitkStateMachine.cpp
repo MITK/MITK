@@ -2,7 +2,8 @@
 
 //##ModelId=3E5B2DB301FD
 mitk::StateMachine::StateMachine(std::string type)
-: m_Type(type)  {}
+: m_Type(type)  
+{}
 
 //##ModelId=3E5B2DE30378
 bool mitk::StateMachine::SetEvent(StateEvent const* stateEvent)

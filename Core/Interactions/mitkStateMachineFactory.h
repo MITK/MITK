@@ -30,9 +30,6 @@ namespace mitk {
     //##ModelId=3E68B2C600BD
 	  StateMachineFactory();
 
-    //##ModelId=3E77572A0062
-	  ~StateMachineFactory();
-
     //##ModelId=3E5B4144024F
 	//##Documentation
 	//## returns NULL if no entry with string type is found
@@ -91,17 +88,7 @@ namespace mitk {
 	  static const std::string EVENT_ID;
     //##ModelId=3E775729017C
 	  static const std::string SIDE_EFFECT_ID;
-	  
-    //##ModelId=3E77572901E9
-	  static const std::string TYPE;
-    //##ModelId=3E7757290256
-	  static const std::string BUTTON_NUMBER;
-    //##ModelId=3E77572902C4
-	  static const std::string KEY;
-    //##ModelId=3E7757290341
-	  static const std::string TRUE;
-    //##ModelId=3E77572903AE
-	  static const std::string FALSE;
+	
 
 
 	  

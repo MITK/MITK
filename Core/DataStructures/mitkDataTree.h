@@ -24,6 +24,9 @@ class DataTree : public itk::Object, public ::LinkedTree<DataTreeNode::Pointer>
 
 	/** Run-time type information (and related methods). */
 	itkTypeMacro(DataTree,itk::Object);
+
+	// TreeIterator<DataTreeNode::Pointer>* getNext( const char* propertyName, const itk::BaseProperty* property,  TreeIterator<DataTreeNode::Pointer>* startPosition ){ return NULL;};
+	// TreeIterator<DataTreeNode::Pointer>* getNext( const char* propertyName, const itk::BaseProperty* property ){ return NULL;};
  protected:
     //##ModelId=3E38F46A0190
     DataTree();

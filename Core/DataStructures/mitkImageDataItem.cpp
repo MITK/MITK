@@ -108,7 +108,7 @@ mitk::ImageDataItem::ImageDataItem(const mitk::PixelType& type, unsigned int dim
 }
 
 //##ModelId=3E33F08A03B8
-#include "DataStructures/pic2vtk/pic2vtk.h"
+#include "pic2vtk/pic2vtk.h"
 void mitk::ImageDataItem::ConstructVtkImageData() const
 {
     m_VtkImageData=Pic2vtk::convert(m_PicDescriptor);    

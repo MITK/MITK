@@ -9,13 +9,13 @@
             <x>0</x>
             <y>0</y>
             <width>752</width>
-            <height>932</height>
+            <height>935</height>
         </rect>
     </property>
     <property name="minimumSize">
         <size>
-            <width>400</width>
-            <height>200</height>
+            <width>222</width>
+            <height>303</height>
         </size>
     </property>
     <property name="caption">
@@ -133,6 +133,9 @@
             </property>
             <property name="text">
                 <string>Show Planes</string>
+            </property>
+            <property name="checked">
+                <bool>true</bool>
             </property>
         </widget>
         <action name="layoutGroup"/>

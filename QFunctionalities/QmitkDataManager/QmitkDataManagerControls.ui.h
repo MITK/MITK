@@ -106,7 +106,7 @@ void QmitkDataManagerControls::UpdateRendererCombo() {
 void QmitkDataManagerControls::SetDataTreeIterator(mitk::DataTreeIteratorBase* it)
 {
     if (it == NULL) return;
-
+  m_QmitkTreeNodeSelector->SetDataTreeNodeIterator(*it);
   m_GlobalNodePropertiesView->SetDataTreeNode(NULL);
   m_RendererPropertiesView->SetDataTreeNode(NULL);
 
@@ -130,7 +130,7 @@ void QmitkDataManagerControls::RemoveButtonClicked()
   if (selected == NULL) {
   } else {
     mitk::DataTreeIteratorClone selectedIterator = selected->GetDataTreeIterator();
-    assert(selectedIterator != NULL);
+    assert(selectedIterator.IsNotNull());
     delete selected;
     selectedIterator->Remove();
     mitk::RenderWindow::UpdateAllInstances();
@@ -240,7 +240,7 @@ void QmitkDataManagerControls::m_ReInitButton_clicked()
   if (selected != NULL) 
   {
     mitk::DataTreeIteratorClone selectedIterator = selected->GetDataTreeIterator();
-    assert(selectedIterator != NULL);
+    assert(selectedIterator.IsNotNull());
     mitk::DataTreeNode* node = selectedIterator->Get();
     if (node != NULL )
     {

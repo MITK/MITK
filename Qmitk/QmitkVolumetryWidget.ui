@@ -1,0 +1,153 @@
+<!DOCTYPE UI><UI version="3.3" stdsetdef="1">
+<class>QmitkVolumetryWidget</class>
+<widget class="QWidget">
+    <property name="name">
+        <cstring>QmitkVolumetryWidget</cstring>
+    </property>
+    <property name="geometry">
+        <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>458</width>
+            <height>124</height>
+        </rect>
+    </property>
+    <property name="sizePolicy">
+        <sizepolicy>
+            <hsizetype>3</hsizetype>
+            <vsizetype>1</vsizetype>
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+        </sizepolicy>
+    </property>
+    <property name="caption">
+        <string>Form1</string>
+    </property>
+    <vbox>
+        <property name="name">
+            <cstring>unnamed</cstring>
+        </property>
+        <widget class="QLayoutWidget">
+            <property name="name">
+                <cstring>layout2</cstring>
+            </property>
+            <grid>
+                <property name="name">
+                    <cstring>unnamed</cstring>
+                </property>
+                <widget class="QLineEdit" row="2" column="1">
+                    <property name="name">
+                        <cstring>m_Result</cstring>
+                    </property>
+                </widget>
+                <widget class="QLabel" row="0" column="1">
+                    <property name="name">
+                        <cstring>m_TreeNodeNameLabel</cstring>
+                    </property>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>5</hsizetype>
+                            <vsizetype>1</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
+                    <property name="text">
+                        <string>Please select image!</string>
+                    </property>
+                </widget>
+                <widget class="QLayoutWidget" row="1" column="1">
+                    <property name="name">
+                        <cstring>layout1</cstring>
+                    </property>
+                    <hbox>
+                        <property name="name">
+                            <cstring>unnamed</cstring>
+                        </property>
+                        <widget class="QSlider">
+                            <property name="name">
+                                <cstring>m_ThresholdSlider</cstring>
+                            </property>
+                            <property name="maxValue">
+                                <number>1000</number>
+                            </property>
+                            <property name="orientation">
+                                <enum>Horizontal</enum>
+                            </property>
+                        </widget>
+                        <widget class="QLabel">
+                            <property name="name">
+                                <cstring>textLabel4</cstring>
+                            </property>
+                            <property name="text">
+                                <string>1000</string>
+                            </property>
+                        </widget>
+                    </hbox>
+                </widget>
+                <widget class="QLabel" row="1" column="0">
+                    <property name="name">
+                        <cstring>textLabel3</cstring>
+                    </property>
+                    <property name="text">
+                        <string>Thresh:</string>
+                    </property>
+                </widget>
+                <widget class="QPushButton" row="2" column="0">
+                    <property name="name">
+                        <cstring>m_CalcButton</cstring>
+                    </property>
+                    <property name="text">
+                        <string>Calc!</string>
+                    </property>
+                </widget>
+                <widget class="QLabel" row="0" column="0">
+                    <property name="name">
+                        <cstring>textLabel1</cstring>
+                    </property>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>5</hsizetype>
+                            <vsizetype>1</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
+                    <property name="text">
+                        <string>Node Name:</string>
+                    </property>
+                </widget>
+            </grid>
+        </widget>
+    </vbox>
+</widget>
+<connections>
+    <connection>
+        <sender>m_ThresholdSlider</sender>
+        <signal>valueChanged(int)</signal>
+        <receiver>textLabel4</receiver>
+        <slot>setNum(int)</slot>
+    </connection>
+    <connection>
+        <sender>m_CalcButton</sender>
+        <signal>clicked()</signal>
+        <receiver>QmitkVolumetryWidget</receiver>
+        <slot>CalculateVolume()</slot>
+    </connection>
+</connections>
+<includes>
+    <include location="local" impldecl="in declaration">mitkDataTreeNode.h</include>
+    <include location="global" impldecl="in implementation">string</include>
+    <include location="local" impldecl="in implementation">mitkImage.h</include>
+    <include location="local" impldecl="in implementation">mitkVolumeCalculator.h</include>
+    <include location="local" impldecl="in implementation">QmitkVolumetryWidget.ui.h</include>
+</includes>
+<variables>
+    <variable>const mitk::DataTreeNode* m_Node;</variable>
+</variables>
+<slots>
+    <slot>SetDataTreeNode( mitk::DataTreeNode * node )</slot>
+    <slot access="protected">CalculateVolume()</slot>
+</slots>
+<layoutdefaults spacing="6" margin="11"/>
+</UI>

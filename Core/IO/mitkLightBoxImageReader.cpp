@@ -123,7 +123,7 @@ void mitk::LightBoxImageReader::GenerateData()
             }
             pic = pFetchImage (m_LightBox, position);
             printf("\n add slice %u   x:%u y:%u\n", numberOfImages, pic->n[0],pic->n[1]);
-            output->SetPicSlice(pic, numberOfImages);
+            output->SetPicSlice(pic, zDim-1-numberOfImages);
             printf("\n add slice %u  successful\n", numberOfImages, pic->n[0],pic->n[1]);	   ++numberOfImages;
             //	if(numberOfImages==24) break;
         }

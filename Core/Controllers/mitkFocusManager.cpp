@@ -13,7 +13,7 @@ mitk::FocusManager::~FocusManager()
 }
 
 //##ModelId=3EDCAF7901C3
-bool mitk::FocusManager::AddElement(FocusElement *element)
+bool mitk::FocusManager::AddElement(FocusElement::Pointer element)
 {
   // Try find  
   mitk::FocusManager::FocusListIterator position = std::find(m_FocusList.begin(),m_FocusList.end(),element);
@@ -21,13 +21,13 @@ bool mitk::FocusManager::AddElement(FocusElement *element)
 		return false;
 	
   m_FocusList.push_back(element);
-	if (m_FocElement ==NULL)
+  if (m_FocElement.IsNull())
     m_FocElement = element;
 	return true;
 }
 
 //##ModelId=3EDCAF790230
-bool mitk::FocusManager::RemoveElement(mitk::FocusManager::FocusElement *element)
+bool mitk::FocusManager::RemoveElement(mitk::FocusManager::FocusElement::Pointer element)
 {
 	// Try find  
 	mitk::FocusManager::FocusListIterator position = std::find(m_FocusList.begin(),m_FocusList.end(),element);
@@ -43,13 +43,13 @@ bool mitk::FocusManager::RemoveElement(mitk::FocusManager::FocusElement *element
 }
 
 //##ModelId=3EDCAF7902BD
-mitk::FocusManager::FocusElement const* mitk::FocusManager::GetFocused() const 
+mitk::FocusManager::FocusElement::ConstPointer mitk::FocusManager::GetFocused() const 
 {
-	return m_FocElement;
+  return m_FocElement.GetPointer();
 }
 
 //##ModelId=3EDCAF7902FB
-bool mitk::FocusManager::SetFocused(FocusElement *element)
+bool mitk::FocusManager::SetFocused(FocusElement::Pointer element)
 {
   if (m_FocElement == element)
     return true;
@@ -75,15 +75,15 @@ bool mitk::FocusManager::IsFirst()
 }
 
 //##ModelId=3EDCAF7903D6
-mitk::FocusManager::FocusElement const* mitk::FocusManager::GetFirst() const
+mitk::FocusManager::FocusElement::ConstPointer mitk::FocusManager::GetFirst() const
 {
-	return m_FocusList.front();
+	return (m_FocusList.front()).GetPointer();
 }
 
 //##ModelId=3EDCAF7A002D
-mitk::FocusManager::FocusElement const* mitk::FocusManager::GetLast() const
+mitk::FocusManager::FocusElement::ConstPointer  mitk::FocusManager::GetLast() const
 {
-	return m_FocusList.back();
+	return (m_FocusList.back()).GetPointer();
 }
 
 //##ModelId=3EDCAF7A007B

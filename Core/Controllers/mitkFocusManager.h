@@ -18,17 +18,23 @@ namespace mitk {
 //## if the switch m_Loop is set to true, GetNext loops through the list; after
 //## the last it goes to the first.
 //## if it is not set, it returnes NULL if it steps behind the last Widget.
-  class FocusManager : public itk::Object
+  class FocusManager : public itk::LightObject
 {
   public:
   mitkClassMacro(FocusManager, itk::LightObject);
 
   //##ModelId=3F01770802B7
+  //##Documentation
+  //##@brief Element, that can be focused and held here.
+  //##
+  //## has to be an itk-Objekct in order to use itk-Smartpointer!
 	typedef mitk::BaseRenderer FocusElement;
+
 	//##ModelId=3F01770802C7
-	typedef std::vector<FocusElement*> FocusElementList;
-	//##ModelId=3F01770802D7
-	typedef std::vector<FocusElement*>::iterator FocusListIterator;
+  typedef std::vector<FocusElement::Pointer> FocusElementList;
+	
+  //##ModelId=3F01770802D7
+  typedef std::vector<FocusElement::Pointer>::iterator FocusListIterator;
 	
   //##Documentation
   //## Destructor
@@ -38,7 +44,7 @@ namespace mitk {
   //##Documentation
   //## Adds the widget into the set of managed Widgets after the focused
   //## widget and sets the focus to the added one
-  bool AddElement(FocusElement *element);
+  bool AddElement(FocusElement::Pointer element);
 
   //##ModelId=3EDCAF790230
 	//##Documentation
@@ -47,18 +53,18 @@ namespace mitk {
 	//## afterwards the focused widget is the one behind the deleted
 	//## or if the deleted was the last, then the one before the deleted
 	//## that way you can delete sequentialy from the back on or from front to back
-	bool RemoveElement(FocusElement *element);
+  bool RemoveElement(FocusElement::Pointer element);
 
   //##ModelId=3EDCAF7902BD
   //##Documentation
   //## returns the focused Widget
-  FocusElement const* GetFocused() const;
+  FocusElement::ConstPointer GetFocused() const;
 
   //##ModelId=3EDCAF7902FB
   //##Documentation
   //## searches the given Widget in List;
   //## if found, sets the focus to this widget and returns true
-  bool SetFocused(FocusElement *element);
+  bool SetFocused(FocusElement::Pointer element);
 
   //##ModelId=3EDCAF790378
   //##Documentation
@@ -73,12 +79,12 @@ namespace mitk {
   //##ModelId=3EDCAF7903D6
   //##Documentation
   //## returns the first widget in list
-  FocusElement const* GetFirst() const;
+  FocusElement::ConstPointer GetFirst() const;
 
   //##ModelId=3EDCAF7A002D
   //##Documentation
   //## returns the last widget in list
-  FocusElement const* GetLast() const;
+  FocusElement::ConstPointer GetLast() const;
 
 	//##ModelId=3EDCAF7A007B
   //##Documentation
@@ -116,7 +122,7 @@ private:
   //##ModelId=3F0185C802D7
 	//##Documentation
   //## holds the focused Widget
-	FocusElement *m_FocElement;
+	FocusElement::Pointer m_FocElement;
 
   //##ModelId=3EDCAF790155
 	//##Documentation

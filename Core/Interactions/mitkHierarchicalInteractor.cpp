@@ -61,8 +61,8 @@ bool mitk::HierarchicalInteractor::TransmitEvent( StateEvent const* stateEvent )
   while ( i != end )
   {
     //safety!
-    if ((*i) == NULL)
-      break;
+    /*if ((*i) == NULL)
+      break;*/
 
     ok = (*i)->HandleEvent( stateEvent ) || ok;
 

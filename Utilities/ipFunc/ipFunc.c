@@ -120,7 +120,7 @@ main (int argc, char **argv)
         printf("               MeanROI, Median, SDev, SDevC, SDevR, SDevROI\n");
         printf("               Var, VarC, VarR, VarROI\n");
         printf(" Segmentation: Label, RegGrow\n");
-        printf(" Misc:         Border, BorderX, DrawPoly, Frame, Convert\n");
+        printf(" Misc:         Border, BorderX, DrawPoly, Frame, Convert, MakeMorphSquareMask\n");
 		exit(1);
 	}
 	
@@ -1293,6 +1293,25 @@ main (int argc, char **argv)
 		ipFuncExtrC ( pic_old, &min, &max, begin, radius );
 		printf ( " min: %lf max: %lf \n", min, max );
 		free ( begin );
+	}
+    else if ( strcasecmp ( operation, "MakeMorphSquareMask" ) == 0 )
+	{
+		if ( ( (unsigned int) argc == 2 ) || 
+			( ( (unsigned int) argc == 3 ) && ( strcasecmp (argv[2], "-h") == 0 ) ) ||
+			( (unsigned int) argc !=  6 ) )  
+		{
+			printf ( " usage: ipFunc MakeMorphSquareMask infile outfile dim size\n" );
+			exit ( 1 );
+		}
+		sscanf  ( argv[4], "%d", &dim_mask );
+		sscanf  ( argv[5], "%d", &mask_size );
+
+		pic_new=ipPicCopyHeader(pic_old,NULL);
+		pic_new->dim=dim_mask;
+		for ( i = 0; i < pic_old->dim; i++ )
+			pic_new->n[i]=mask_size;
+		pic_new->data  = calloc ( _ipPicSize(pic_new), 1 );
+		ipFuncAddC(pic_new, 1.0, ipFuncKeep, pic_new);
 	}
     else
 		printf ( " illegal operation \n" );

@@ -24,7 +24,8 @@ m_ContourPath (PathType::New()),
 m_CurrentWindow ( NULL ),
 m_BoundingBox (BoundingBoxType::New()),
 m_Vertices ( BoundingBoxType::PointsContainer::New() ),
-m_Closed ( true )
+m_Closed ( true ),
+m_Selected ( false ) 
 {
   m_Geometry3D->Initialize();
 }
@@ -37,10 +38,10 @@ void mitk::Contour::AddVertex(mitk::Point3D newPoint)
   BoundingBoxType::PointType p;
   p.CastFrom(newPoint);
   m_Vertices->InsertElement(m_Vertices->Size(), p);
-
   ContinuousIndexType idx;
   idx.CastFrom(newPoint);
   m_ContourPath->AddVertex(idx);
+  m_BoundingBox->SetPoints(m_Vertices);
 }
 
 void mitk::Contour::UpdateOutputInformation()
@@ -66,6 +67,7 @@ void mitk::Contour::UpdateOutputInformation()
     mitkBounds[5] = tmp[5];
   }
   m_Geometry3D->SetBounds(mitkBounds);
+
 }
 
 void mitk::Contour::SetRequestedRegionToLargestPossibleRegion()
@@ -74,12 +76,12 @@ void mitk::Contour::SetRequestedRegionToLargestPossibleRegion()
 
 bool mitk::Contour::RequestedRegionIsOutsideOfTheBufferedRegion()
 {
-    return false;
+  return false;
 }
 
 bool mitk::Contour::VerifyRequestedRegion()
 {
-    return false;
+  return false;
 }
 
 void mitk::Contour::SetRequestedRegion(itk::DataObject*)
@@ -100,35 +102,55 @@ mitk::Contour::SetCurrentWindow(mitk::RenderWindow* rw)
 
 mitk::RenderWindow*
 mitk::Contour::GetCurrentWindow()
-  {
+{
   return m_CurrentWindow;
-  }
+}
 
 void
 mitk::Contour::Initialize()
-  {
+{
   m_ContourPath = PathType::New();
   m_ContourPath->Initialize();
   m_BoundingBox = BoundingBoxType::New();
   m_Vertices = BoundingBoxType::PointsContainer::New();
   m_Geometry3D->Initialize();
-  }
+}
 
 
 unsigned int 
 mitk::Contour::GetNumberOfPoints()
-  {
+{
   return m_Vertices->Size();
-  }
+}
 
 mitk::Contour::PointsContainerPointer
 mitk::Contour::GetPoints()
-  {
+{
   return m_Vertices;
-  }
+}
 
 void
 mitk::Contour::SetPoints(mitk::Contour::PointsContainerPointer points)
-  {
+{
   m_Vertices = points;
-  }
+}
+
+bool mitk::Contour::IsInside(mitk::Point3D point)
+{
+  unsigned int j = 0; 
+  unsigned int i = 0;
+  while( i<3 )
+    {
+    if( point[i] < m_Geometry3D->GetBounds()[j++] )
+      {
+      return false;
+      }
+    if( point[i] > m_Geometry3D->GetBounds()[j++] )
+      {
+      return false;
+      }
+    i++;
+    }
+  return true;
+
+}

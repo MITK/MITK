@@ -62,6 +62,11 @@ namespace mitk
        */
       itkGetMacro(Closed, bool);
 
+      itkSetMacro(Selected, bool);
+
+      itkGetMacro(Selected, bool);
+
+
       /**
        * clean up the contour data
        */
@@ -128,6 +133,8 @@ namespace mitk
        */
       virtual void SetRequestedRegion(itk::DataObject *data);
 
+      bool IsInside(mitk::Point3D point);
+
     protected:
       Contour();
       virtual ~Contour();
@@ -158,6 +165,8 @@ namespace mitk
        * decide whether th contour is open or closed 
        */
       bool m_Closed;
+
+      bool m_Selected;
     };
 
   } // namespace mitk

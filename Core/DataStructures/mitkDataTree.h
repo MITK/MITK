@@ -8,15 +8,20 @@
 #include <Tree/LinkedTree.h>
 
 namespace mitk {
+typedef ::LinkedTree<DataTreeNode::Pointer> DataTreeBase;
 
 //##ModelId=3E38F35101A0
-class DataTree : public itk::Object, public ::LinkedTree<DataTreeNode::Pointer>
+class DataTree : public itk::Object, public DataTreeBase 
 {
    public:
 	/** Standard class typedefs. */
+    //##ModelId=3E38FFC80202
 	typedef DataTree                 Self;
+    //##ModelId=3E38FFC80220
 	typedef itk::Object              Superclass;
+    //##ModelId=3E38FFC8023E
 	typedef itk::SmartPointer<Self>  Pointer;
+    //##ModelId=3E38FFC80266
 	typedef itk::SmartPointer<const Self>  ConstPointer;
 
 	/** Method for creation through the object factory. */

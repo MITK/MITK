@@ -1,7 +1,8 @@
 #include "DataTree.h"
 
 //##ModelId=3E38F46A0190
-mitk::DataTree::DataTree()
+mitk::DataTree::DataTree() : 
+    DataTreeBase( )
 {
 }
 

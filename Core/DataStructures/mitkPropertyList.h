@@ -27,13 +27,13 @@ class PropertyList : public itk::Object
 	itkTypeMacro(PropertyList,itk::Object);
   public:
     //##ModelId=3D6A0E9E0029
-    mitk::BaseProperty GetProperty(const char *propertyName);
+    mitk::BaseProperty* GetProperty(const char *propertyName);
 
     //##ModelId=3D78B966005F
     bool AddProperty(BaseProperty* property);
 
     //##ModelId=3D6A0F0B00BC
-    BaseProperty properties;
+    std::vector<BaseProperty::Pointer> properties;
   protected:
     //##ModelId=3E38FEFE0125
     PropertyList();

@@ -4,7 +4,7 @@ void mitk::TransferFunction::FillValues(std::vector<mitk::TransferFunction::RGBO
   for (unsigned int i=0;i<values.size();i++) {
     float ix = (float)i / values.size();
     values[i].m_Opacity =0.0f ;
-    for (mitk::TransferFunction::ElementSetType::iterator elemIt = elements.begin(); elemIt != elements.end(); elemIt++ ) {
+    for (mitk::TransferFunction::ElementSetType::const_iterator elemIt = elements.begin(); elemIt != elements.end(); elemIt++ ) {
       //values[i].m_Opacity += (*elemIt)->GetValueAt(ix); 
       values[i] = values[i] + (*elemIt)->GetRGBOAt(ix); 
     } 

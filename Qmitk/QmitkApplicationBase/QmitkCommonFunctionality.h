@@ -45,6 +45,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qfiledialog.h>
 #include <qregexp.h>
 
+#include <itkRescaleIntensityImageFilter.h>
 #include "itkImageSeriesReader.h"
 #include "itkImageSeriesWriter.h"
 #include "itkImageFileWriter.h"
@@ -386,11 +387,16 @@ public:
             writer->SetFileName( fileName.ascii() );
             writer->Update();
           }
-          else if (fileName.contains(".png") != 0)
+          else if (fileName.contains(".png") != 0 || fileName.contains(".tif") != 0 || fileName.contains(".jpg") != 0)
           {
+            typedef itk::Image<unsigned char,3> OutputImage3DType;
             typedef itk::Image<unsigned char,2> OutputImage2DType;
-            itk::ImageSeriesWriter<TImageType, OutputImage2DType>::Pointer writer = itk::ImageSeriesWriter<TImageType, OutputImage2DType >::New();
-            writer->SetInput( itkImage );
+            itk::RescaleIntensityImageFilter<TImageType, OutputImage3DType>::Pointer rescaler = itk::RescaleIntensityImageFilter<TImageType, OutputImage3DType>::New();
+            rescaler->SetInput(itkImage);
+            rescaler->SetOutputMinimum(0);
+            rescaler->SetOutputMaximum(255);
+            itk::ImageSeriesWriter<OutputImage3DType, OutputImage2DType>::Pointer writer = itk::ImageSeriesWriter<OutputImage3DType, OutputImage2DType >::New();
+            writer->SetInput( rescaler->GetOutput() );
             int pos = fileName.findRev(".",fileName.length()-1);
             fileName.insert(pos,".%d");
             writer->SetSeriesFormat( fileName.ascii() );

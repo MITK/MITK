@@ -1,6 +1,14 @@
 #ifndef MITKINTERACTCONST_H
 #define MITKINTERACTCONST_H
-
+/*Prefixes for Constants:
+E = Enumeration
+St = State Conditions; own generated Events from guarding states
+Op = Operations
+Se = SideEffects
+Type_ = Type of Event
+BS_ = ButtonStates and Buttons
+Key_ = Keys like in QT
+*/
 namespace mitk{
 
 /*

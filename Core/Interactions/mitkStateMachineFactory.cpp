@@ -1,4 +1,6 @@
 #include "StateMachineFactory.h"
+#include "QmitkStatusBar.h"
+
 
 //##Documentation
 //## this class builds up all the necessary structures for a statemachine.
@@ -94,18 +96,18 @@ bool mitk::StateMachineFactory::parse(mitk::State::StateMap *states, mitk::State
 	//nextStatesSet is empty, so deadlock!
 	if ( nextStatesSet.empty() )
 	{
-		std::cout<<"Warnung: Ein inkonsistenter Zustand (oder ein Endzustand) wird erzeugt!"<<endl;	
-		return true;//Jedoch erlaubt!!!z.B. als Endzustand
+      (QmitkStatusBar::GetInstance())->DisplayText("Warnung: Ein inkonsistenter Zustand (oder ein Endzustand) wird erzeugt!");    
+	  return true;//Jedoch erlaubt!!!z.B. als Endzustand
 	}
 	bool ok;
 	//go through all Transitions of thisState and look if we have allready been in this state
 	for (std::set<int>::iterator i = nextStatesSet.begin(); i != nextStatesSet.end();  i++)
 	{
-		if ( history->find(*i) == history->end() )//wenn wir noch nicht in dieser NextState waren
-		{
-			mitk::State::StateMapIter nextState = states->find(*i);//search the iterator for our nextState
-			ok = parse( states, nextState, history);//recusive path into the next state
-		}
+	  if ( history->find(*i) == history->end() )//wenn wir noch nicht in dieser NextState waren
+	  {
+	    mitk::State::StateMapIter nextState = states->find(*i);//search the iterator for our nextState
+		ok = parse( states, nextState, history);//recusive path into the next state
+      }
 	}
 	return ok;
 }
@@ -115,24 +117,25 @@ bool mitk::StateMachineFactory::parse(mitk::State::StateMap *states, mitk::State
 //## sets the pointers in Transition (setNextState(..)) according to the extracted xml-file content
 bool mitk::StateMachineFactory::ConnectStates(mitk::State::StateMap *states)
 {
-	if (states->size() > 1)//only one state; don't have to be parsed for deadlocks!
+    if (states->size() > 1)//only one state; don't have to be parsed for deadlocks!
 	{
-		//parse all the given states an check for deadlock or not connected states
-		HistorySet *history = new HistorySet;
-		mitk::State::StateMapIter firstState = states->begin(); 
-		//parse through all the given states, log the parsed elements in history
-		bool ok = parse( states, firstState, history);
+	  //parse all the given states an check for deadlock or not connected states
+	  HistorySet *history = new HistorySet;
+	  mitk::State::StateMapIter firstState = states->begin(); 
+	  //parse through all the given states, log the parsed elements in history
+	  bool ok = parse( states, firstState, history);
 
-		if ( (states->size() == history->size()) && ok )
-		{
-			delete history;
-		}
-		else //ether !ok or sizeA!=sizeB
-		{
-			delete history;
-			std::cout<<"Warnung: Ein unereichbarer Zustand wird aufgebaut. Ueberprüfen sie die Zustands- Konfigurations- Datei"<<endl;	
-			//return false;//better go on and build/ connect the states than quit
-		}
+        
+	  if ( (states->size() == history->size()) && ok )
+	  {
+	    delete history;
+	  }
+	  else //ether !ok or sizeA!=sizeB
+	  {
+	    delete history;
+        (QmitkStatusBar::GetInstance())->DisplayText("Warnung: Ein unereichbarer Zustand wird aufgebaut. Ueberprüfen sie die Zustands- Konfigurations- Datei");    
+		//return false;//better go on and build/ connect the states than quit
+      }
 	}
 	//connect all the states
 	for (mitk::State::StateMapIter tempState = states->begin(); tempState != states->end();  tempState++)
@@ -141,8 +144,8 @@ bool mitk::StateMachineFactory::ConnectStates(mitk::State::StateMap *states)
 		bool tempbool = ( ( tempState->second )->ConnectTransitions( states ) );
         if ( tempbool = false )
 		{
+       		(QmitkStatusBar::GetInstance())->DisplayText("Warnung: Das Verbinden der Zustände war NICHT erfolgreich!");    
             return false;//abort!
-			std::cout<<"Warnung: Das Verbinden der Zustände war NICHT erfolgreich!"<<endl;
 		}
 	}
 	return true;

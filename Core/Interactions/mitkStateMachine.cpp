@@ -4,8 +4,7 @@
 #include "OperationEvent.h"
 #include "UndoController.h"
 #include "mitkInteractionConst.h"
-
-
+#include "QmitkStatusBar.h"
 
 //##ModelId=3E5B2DB301FD
 //##Documentation
@@ -57,7 +56,6 @@ bool mitk::StateMachine::HandleEvent(StateEvent const* stateEvent, int objectEve
   }
   //Undo of the SideEffect is handled in ExecuteSideEffect(...)
   bool ok = ExecuteSideEffect(tempSideEffectId, stateEvent, objectEventId, groupEventId);
-		
 
 //Doku: if the operation didn't work, then we have already changed the state. 
 //Check, if we have already done a statechange, if yes, then recall all of thet ObjectEventId
@@ -69,11 +67,10 @@ bool mitk::StateMachine::HandleEvent(StateEvent const* stateEvent, int objectEve
   else if (!ok && !m_UndoEnabled && 
     m_UndoController->GetLastObjectEventIdInList()==objectEventId)
   {
-    std::cout<<"Error! Sender: StateMachine; Message: Operation could not be done!"<<std::endl;
+    (QmitkStatusBar::GetInstance())->DisplayText("Error! Sender: StateMachine; Message: Operation could not be done!", 10000);
   }
   return ok;
 }
-
 
 //##ModelId=3EDCAECB0175
 void mitk::StateMachine::EnableUndo(bool enable)
@@ -98,7 +95,7 @@ void mitk::StateMachine::ExecuteOperation(Operation* operation)
 			mitk::StateTransitionOperation* stateTransOp = dynamic_cast<mitk::StateTransitionOperation *>(operation);
 			if (stateTransOp == NULL)
 			{
-				std::cout<<"Error! see StateMachine.cpp"<<std::endl;
+				(QmitkStatusBar::GetInstance())->DisplayText("Error! see StateMachine.cpp", 10000);
 				return;
 			}
 			m_CurrentState = stateTransOp->GetState();

@@ -8,11 +8,13 @@ namespace mitk {
 
 //##ModelId=3E5B7929027D
 //##Documentation
-//## @brief Event for statechange
+//## @brief Class holding an mitk-event and the mitk-event-number for a statechange
 //## @ingroup Interaction
-//## Represents an event, with which a statechange of a statemachine shall be
-//## done. ID stores the nextStateId, Event all necessary information like
-//## MousePosition (case of PositionEvent).
+//## Holds an event, with which a statechange of a statemachine shall be
+//## done. iD represents the mitk-event-number, event all further necessary information like
+//## the MousePosition or a key.
+//## Not derived from event to hold only one object stateevent, pass it to the statemachines, 
+//## set the next event and reuse this object
 class StateEvent
 {
   public:
@@ -30,23 +32,21 @@ class StateEvent
   
     //##ModelId=3E5B7A7603DA
     //##Documentation
-    //## @brief to reset the params afterwards 
-    //##
-    //## (used in EventMapper for global variable m_StateEvent)
+    //## @brief to set the params and reuse an object
     void Set(int id, Event const* event);
 
     //##ModelId=3E5B7AEC0394
     int GetId() const;
 
     //##ModelId=3E5B7B030383
-	mitk::Event const* GetEvent() const;
+	  mitk::Event const* GetEvent() const;
     
   private:
     //##ModelId=3E5B7944016D
     int m_Id;
 
     //##ModelId=3E5B7A19010F
-	mitk::Event const* m_Event;
+	  mitk::Event const* m_Event;
 
 };
 

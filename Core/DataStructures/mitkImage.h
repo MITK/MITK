@@ -182,36 +182,57 @@ namespace mitk {
 
     //##ModelId=3E102AE9004B
     //##Documentation
-    //## initialize new (or re-initialize) image
+    //## initialize new (or re-initialize) image information
     //## @warning Initialize() by pic assumes a plane, evenly spaced geometry starting at (0,0,0).
     virtual void Initialize(const mitk::PixelType& type, unsigned int dimension, unsigned int *dimensions, unsigned int channels = 1);
 
     //##Documentation
-    //## initialize new (or re-initialize) image
-    //## @warning Initialize() by pic assumes a plane, evenly spaced geometry starting at (0,0,0).
-    //## shiftOriginToZero false: the origin of the geometry is used
-    virtual void Initialize(const mitk::PixelType& type, const mitk::Geometry3D& geometry, bool shiftOriginToZero = false);
+    //## initialize new (or re-initialize) image information
+    //##
+    //## @param shiftBoundingBoxMinimumToZero The bounding-box (in units) 
+    //## of @a geometry does not necessarily has its minimum of (0,0,0). 
+    //## If @a shiftBoundingBoxMinimumToZero is @a true it is shifted there
+    //## without changing the world coordinate in mm of the minimum position
+    //## (the translation in mm is changed accordingly).
+    virtual void Initialize(const mitk::PixelType& type, const mitk::Geometry3D& geometry, bool shiftBoundingBoxMinimumToZero = true);
+
+    //##Documentation
+    //## initialize new (or re-initialize) image information by another
+    //## mitk-image.
+    //## Only the header is used, not the data vector!
+    //##
+    virtual void Initialize(const mitk::Image* image);
 
     //##ModelId=3E102D2601DF
     //##Documentation
-    //## initialize new (or re-initialize) image by @a pic. Dimensions and @a
-    //## Geometry3D /@a Geometry2D  are set according to the tags in @a pic.
+    //## initialize new (or re-initialize) image information by @a pic. 
+    //## Dimensions and @a Geometry3D /@a Geometry2D are set according 
+    //## to the tags in @a pic.
+    //## Only the header is used, not the data vector! Use SetPicVolume(pic)
+    //## to set the data vector.
+    //##
     //## @param tDim override time dimension (@a n[3]) in @a pic (if >0 and <)
     //## @param sDim override z-space dimension (@a n[2]) in @a pic (if >0 and <)
     //## @warning Initialize() by pic assumes a plane, evenly spaced geometry starting at (0,0,0).
     virtual void Initialize(const ipPicDescriptor* pic, int channels = 1, int tDim = -1, int sDim = -1);
 
     //##Documentation
-    //## initialize new (or re-initialize) image by @a vtkimagedata, a vtk-image. Only the header is 
-    //## used, not the data vector! Use SetVolume(vtkimage->GetScalarPointer()) to set the data vector.
+    //## initialize new (or re-initialize) image information by @a vtkimagedata,
+    //## a vtk-image. 
+    //## Only the header is used, not the data vector! Use 
+    //## SetVolume(vtkimage->GetScalarPointer()) to set the data vector.
+    //##
     //## @param tDim override time dimension in @a vtkimagedata (if >0 and <)
     //## @param sDim override z-space dimension in @a vtkimagedata (if >0 and <)
     virtual void Initialize(vtkImageData* vtkimagedata, int channels = 1, int tDim = -1, int sDim = -1);
 
     //##ModelId=3E102D2601DF
     //##Documentation
-    //## initialize new (or re-initialize) image by @a itkimage, a templated itk-image. Only the header is 
-    //## used, not the data vector! Use SetVolume(itkimage->GetBufferPointer()) to set the data vector.
+    //## initialize new (or re-initialize) image information by @a itkimage, 
+    //## a templated itk-image. 
+    //## Only the header is used, not the data vector! Use 
+    //## SetVolume(itkimage->GetBufferPointer()) to set the data vector.
+    //##
     //## @param tDim override time dimension in @a itkimage (if >0 and <)
     //## @param sDim override z-space dimension in @a itkimage (if >0 and <)
     template <typename itkImageType> void InitializeByItk(const itkImageType* itkimage, int channels = 1, int tDim = -1, int sDim=-1)

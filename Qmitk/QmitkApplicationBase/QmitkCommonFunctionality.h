@@ -113,10 +113,17 @@ public:
       if( levWinProp.IsNull() )
       {
         levWinProp = new mitk::LevelWindowProperty();
+        node->GetPropertyList()->SetProperty("levelwindow", levWinProp);
       }
+  
+      double window = (extrema[1] - extrema[0])/10.0;
+      double level  = window/2;
+
       mitk::LevelWindow levWin = levWinProp->GetLevelWindow();
       levWin.SetRangeMin(extrema[0]);
       levWin.SetRangeMax(extrema[1]);
+      levWin.SetLevel( level );
+      levWin.SetWindow( window );
       levWinProp->SetLevelWindow(levWin);
 
     }

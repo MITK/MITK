@@ -1,17 +1,11 @@
 #include "mitkLineOperation.h"
 
-mitk::LineOperation::LineOperation(OperationType operationType, int cellId, int pIdA, int pIdB)
-: mitk::Operation(operationType), m_CellId(cellId), m_PIdA(pIdA), m_PIdB(pIdB)
+mitk::LineOperation::LineOperation(OperationType operationType, int cellId, Vector3D vector, int pIdA, int pIdB, int id)
+: mitk::CellOperation(operationType, cellId, vector), m_PIdA(pIdA), m_PIdB(pIdB), m_Id(id)
 {}
-
-mitk::LineOperation::~LineOperation()
-{
-}
-
-int mitk::LineOperation::GetCellId()
-{
-	return m_CellId;
-}
+mitk::LineOperation::LineOperation(OperationType operationType, int cellId, int pIdA, int pIdB, int id)
+: mitk::CellOperation(operationType, cellId), m_PIdA(pIdA), m_PIdB(pIdB), m_Id(id)
+{}
 
 int mitk::LineOperation::GetPIdA()
 {
@@ -21,6 +15,11 @@ int mitk::LineOperation::GetPIdA()
 int mitk::LineOperation::GetPIdB()
 {
 	return m_PIdB;
+}
+
+int mitk::LineOperation::GetId()
+{
+	return m_Id;
 }
 
 

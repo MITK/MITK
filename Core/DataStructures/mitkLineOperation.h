@@ -2,7 +2,7 @@
 #define MITKLINEOPERATION_H_INCLUDED
 
 #include "mitkCommon.h"
-#include "mitkOperation.h"
+#include "mitkCellOperation.h"
 
 
 namespace mitk {
@@ -13,28 +13,31 @@ namespace mitk {
 //## @ingroup Undo
 //##
 //## Stores everything for de-/ selecting, inserting , moving and removing a line.
-class LineOperation : public mitk::Operation
+class LineOperation : public mitk::CellOperation
 {
   public:
+    mitkClassMacro(LineOperation, CellOperation);
 	//##Documentation
 	//##@brief constructor.
 	//##
 	//## @params
 	//## operationType is the type of that operation (see mitkOperation.h; e.g. move or add; Information for StateMachine::ExecuteOperation());
-	//## point is the information of the point to add or is the information to change a point into; index is e.g. the position in a
-	//## list which describes the element to change
-  LineOperation(OperationType operationType, int cellId, int pIdA, int pIdB);
+	//## other Id's are to transmitt parameters for the operation: cellId: Id of the cell; a vector for movement; pIdA, pIdB: Id's of two points; id: the Id of a line in a cell
+    LineOperation(OperationType operationType, int cellId, Vector3D vector, int pIdA = -1, int pIdB = -1, int id = -1);
+    LineOperation(OperationType operationType, int cellId, int pIdA = -1, int pIdB = -1, int id = -1);
+  
+    virtual ~LineOperation(){};
 
-  virtual ~LineOperation();
-
-	int GetCellId();
+	//int GetCellId();
 	int GetPIdA();
   int GetPIdB();
+  int GetId();
 
   protected:
-  int m_CellId;
-	int m_PIdA;
+//  int m_CellId;
+  int m_PIdA;
   int m_PIdB;
+  int m_Id;
 };
 }//namespace mitk
 #endif /* MITKLINEOPERATION_H_INCLUDED*/

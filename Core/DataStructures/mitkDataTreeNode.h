@@ -35,14 +35,13 @@ class BaseRenderer;
 //## Contains the data (instance of BaseData), a list of mappers, which can
 //## draw the data, a transform (vtkTransform) and a list of properties
 //## (PropertyList).
-//class DataTreeNode : public BaseData
 class DataTreeNode : public itk::DataObject
 {
 public:
 
   typedef mitk::Geometry3D::Pointer Geometry3DPointer;
 
-  mitkClassMacro(DataTreeNode,BaseData);
+  mitkClassMacro(DataTreeNode,DataObject);
 
 	itkNewMacro(Self);  
 

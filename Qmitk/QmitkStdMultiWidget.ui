@@ -132,11 +132,15 @@
     </image>
 </images>
 <includes>
+    <include location="global" impldecl="in implementation">qframe.h</include>
     <include location="local" impldecl="in implementation">QmitkStdMultiWidget.ui.h</include>
 </includes>
 <slots>
     <slot>updateMitkWidgets()</slot>
 </slots>
+<functions>
+    <function access="protected">init()</function>
+</functions>
 <layoutdefaults spacing="6" margin="11"/>
 <includehints>
     <includehint>qmitkselectableglwidget.h</includehint>

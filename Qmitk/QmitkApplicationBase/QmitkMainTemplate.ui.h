@@ -494,12 +494,34 @@ void QmitkMainTemplate::initialize()
 		it->next();
 		planesSubTree=dynamic_cast<mitk::DataTreeBase*>(it->getSubTree());
 		
+		mitk::ColorProperty::Pointer colorprop;
+        QColor qcolor;
+		float color[3] = {1.0f,1.0f,1.0f};
+
+        colorprop = new mitk::ColorProperty(color);
+
+        mitk::DataTreeNode::Pointer planeNode;
 		// ... of widget 1
-		it->add(mitkMultiWidget->mitkWidget1->GetRenderer()->GetWorldGeometryNode());
+        planeNode=mitkMultiWidget->mitkWidget1->GetRenderer()->GetWorldGeometryNode();
+        qcolor=mitkMultiWidget->mitkWidget1->GetSelectionFrame()->paletteBackgroundColor();
+        color[0]=qcolor.red(); color[1]=qcolor.green(); color[2]=qcolor.blue();
+    	colorprop = new mitk::ColorProperty(color);
+		planeNode->GetPropertyList()->SetProperty("color", colorprop);
+		it->add(planeNode);
 		// ... of widget 2
-		it->add(mitkMultiWidget->mitkWidget2->GetRenderer()->GetWorldGeometryNode());
+        planeNode=mitkMultiWidget->mitkWidget2->GetRenderer()->GetWorldGeometryNode();
+        qcolor=mitkMultiWidget->mitkWidget2->GetSelectionFrame()->paletteBackgroundColor();
+        color[0]=qcolor.red(); color[1]=qcolor.green(); color[2]=qcolor.blue();
+    	colorprop = new mitk::ColorProperty(color);
+		planeNode->GetPropertyList()->SetProperty("color", colorprop);
+		it->add(planeNode);
 		// ... of widget 3
-		it->add(mitkMultiWidget->mitkWidget3->GetRenderer()->GetWorldGeometryNode());
+        planeNode=mitkMultiWidget->mitkWidget3->GetRenderer()->GetWorldGeometryNode();
+        qcolor=mitkMultiWidget->mitkWidget3->GetSelectionFrame()->paletteBackgroundColor();
+        color[0]=qcolor.red(); color[1]=qcolor.green(); color[2]=qcolor.blue();
+    	colorprop = new mitk::ColorProperty(color);
+		planeNode->GetPropertyList()->SetProperty("color", colorprop);
+		it->add(planeNode);
 
         connect(mitkMultiWidget->levelWindowWidget,SIGNAL(levelWindow(mitk::LevelWindow*)),this,SLOT(changeLevelWindow(mitk::LevelWindow*)) );
     }

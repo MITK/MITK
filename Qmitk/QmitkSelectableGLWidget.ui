@@ -27,7 +27,7 @@
         </property>
         <widget class="QFrame">
             <property name="name">
-                <cstring>frame4</cstring>
+                <cstring>SelectionFrame</cstring>
             </property>
             <property name="frameShape">
                 <enum>StyledPanel</enum>
@@ -47,7 +47,7 @@
                 </property>
                 <widget class="QFrame">
                     <property name="name">
-                        <cstring>SelectionFrame</cstring>
+                        <cstring>container</cstring>
                     </property>
                     <property name="sizePolicy">
                         <sizepolicy>
@@ -79,6 +79,7 @@
 <functions>
     <function access="private" specifier="non virtual">init()</function>
     <function returnType="mitk::OpenGLRenderer::Pointer">GetRenderer()</function>
+    <function returnType="QFrame *">GetSelectionFrame()</function>
 </functions>
 <pixmapinproject/>
 <layoutdefaults spacing="6" margin="11"/>

@@ -10,7 +10,7 @@
 void QmitkSelectableGLWidget::init()
 {	
     QHBoxLayout *hlayout;
-    hlayout=new QHBoxLayout(SelectionFrame);
+    hlayout=new QHBoxLayout(container);
     
     // create Renderer
     renderer=mitk::OpenGLRenderer::New();
@@ -21,7 +21,7 @@ void QmitkSelectableGLWidget::init()
         composedName+=name();
     else
         composedName+="QmitkGLWidget";
-    QWidget *mitkWidget = new mitk::QmitkGLWidget(renderer, SelectionFrame,composedName);
+    QWidget *mitkWidget = new mitk::QmitkGLWidget(renderer, container, composedName);
     hlayout->addWidget(mitkWidget);
 }
 
@@ -29,4 +29,10 @@ void QmitkSelectableGLWidget::init()
 mitk::OpenGLRenderer::Pointer QmitkSelectableGLWidget::GetRenderer()
 {
     return renderer;
+}
+
+
+QFrame* QmitkSelectableGLWidget::GetSelectionFrame()
+{
+    return SelectionFrame;
 }

@@ -10,9 +10,18 @@
 
 void QmitkStdMultiWidget::updateMitkWidgets()
 {
-  mitkWidget1->GetRenderer()->GetRenderWindow()->updateGL();
-  mitkWidget2->GetRenderer()->GetRenderWindow()->updateGL();
-  mitkWidget3->GetRenderer()->GetRenderWindow()->updateGL();
-  mitkWidget4->GetRenderer()->GetRenderWindow()->updateGL();
+  mitkWidget1->GetRenderer()->GetRenderWindow()->updateGL(); 
+  mitkWidget2->GetRenderer()->GetRenderWindow()->updateGL(); 
+  mitkWidget3->GetRenderer()->GetRenderWindow()->updateGL(); 
+  mitkWidget4->GetRenderer()->GetRenderWindow()->updateGL(); 
 }
   
+
+
+void QmitkStdMultiWidget::init()
+{
+  mitkWidget1->GetSelectionFrame()->setPaletteBackgroundColor ("red");
+  mitkWidget2->GetSelectionFrame()->setPaletteBackgroundColor ("green");
+  mitkWidget3->GetSelectionFrame()->setPaletteBackgroundColor ("blue");
+  mitkWidget4->GetSelectionFrame()->setPaletteBackgroundColor ("yellow");
+}

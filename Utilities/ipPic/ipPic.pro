@@ -1,12 +1,11 @@
 TEMPLATE = lib
-TARGET = ipPic
-CONFIG += warn_on debug
+TARGET = libipPic
+
+CONFIG	+= warn_on release
+unix:CONFIG += staticlib
 
 OBJECTS_DIR = obj
-
-unix {
-	CONFIG += staticlib
-}
+DESTDIR = .
 
 SOURCES = \
       ipPicInfo.c ipPicType.c                           \
@@ -21,6 +20,8 @@ SOURCES = \
       ipError.c                                         \
       ipPicSize.c ipPicElements.c                       \
       ipPicTSVSize.c ipPicTSVElements.c
+
+win32:SOURCES+= win32/zlib.lib
 
 HEADERS = ipPic.h ipTypes.h ipPicOldP.h ipPicAnnotation.h 
 

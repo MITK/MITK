@@ -34,11 +34,10 @@ protected:
 
 	virtual bool ExecuteSideEffect(int sideEffectId, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId);
 
-  //mitk::ITKPoint3D m_lastScalePosition;
-  mitk::ITKPoint3D m_lastScalePosition;
-  mitk::ITKPoint3D m_lastScaleData;
+  mitk::ITKVector3D m_LastTranslatePosition;
+  mitk::ITKPoint3D m_LastScalePosition;
+  mitk::ITKPoint3D m_FirstScalePosition; 
   mitk::ITKVector3D m_lastRotatePosition;
-  //mitk::ScalarType m_ScaleFactor;
 };
 
 } // namespace mitk

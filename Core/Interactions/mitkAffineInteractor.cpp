@@ -30,6 +30,18 @@ bool mitk::AffineInteractor::ExecuteSideEffect(int sideEffectId, mitk::StateEven
   {
     break;
   }
+  case SeTRANSLATESTART:
+  {
+    mitk::PositionEvent const  *posEvent = dynamic_cast <const mitk::PositionEvent *> (stateEvent->GetEvent());
+		if (posEvent == NULL) return false;    
+    //converting from Point3D to itk::Point
+		mitk::ITKPoint3D newPosition;
+		mitk::vm2itk(posEvent->GetWorldPosition(), newPosition);
+    m_LastTranslatePosition = newPosition.GetVectorFromOrigin();
+    //std::cout << "m_LastTranslatePosition: <" << m_LastTranslatePosition[0] << ", " << m_LastTranslatePosition[1] << ", " << m_LastTranslatePosition[2] << ">\n";
+    ok = true;
+    break;
+  }
   case SeTRANSLATE:
   {
     mitk::PositionEvent const  *posEvent = dynamic_cast <const mitk::PositionEvent *> (stateEvent->GetEvent());
@@ -39,7 +51,11 @@ bool mitk::AffineInteractor::ExecuteSideEffect(int sideEffectId, mitk::StateEven
 		mitk::ITKPoint3D newPosition;
 		mitk::vm2itk(posEvent->GetWorldPosition(), newPosition);
     
-    // create operation with new position
+    newPosition -=  m_LastTranslatePosition;  // compute difference between actual and last mouse position
+    
+    //std::cout << "newPosition: <" << newPosition[0] << ", " << newPosition[1] << ", " << newPosition[2] << ">\n";
+    
+    // create operation with position difference
     AffineTransformationOperation* doOp = new mitk::AffineTransformationOperation(OpMOVE, newPosition, 0.0, 0); // Index is not used here
 		if (m_UndoEnabled)	//write to UndoMechanism
 		{
@@ -58,6 +74,9 @@ bool mitk::AffineInteractor::ExecuteSideEffect(int sideEffectId, mitk::StateEven
 		}
 		//execute the Operation
 		geometry->ExecuteOperation(doOp);
+
+    mitk::vm2itk(posEvent->GetWorldPosition(), newPosition);  // save actual mouse position as last position
+    m_LastTranslatePosition = newPosition.GetVectorFromOrigin();
 
     ok = true;
 	  break;
@@ -129,13 +148,9 @@ bool mitk::AffineInteractor::ExecuteSideEffect(int sideEffectId, mitk::StateEven
     //converting from Point3D to itk::Point
 		mitk::ITKPoint3D newPosition;
 		mitk::vm2itk(posEvent->GetWorldPosition(), newPosition);
-    m_lastScalePosition = newPosition;
-  
-    const mitk::ScalarType* lastScale = geometry->GetScale();
-    m_lastScaleData[0] = lastScale[0];
-    m_lastScaleData[1] = lastScale[1];
-    m_lastScaleData[2] = lastScale[2];
- 
+    m_LastScalePosition = newPosition;
+    m_FirstScalePosition = newPosition;
+
     ok = true;
     break;
   }
@@ -147,52 +162,52 @@ bool mitk::AffineInteractor::ExecuteSideEffect(int sideEffectId, mitk::StateEven
 		mitk::ITKPoint3D newPosition;
 		mitk::vm2itk(posEvent->GetWorldPosition(), newPosition);    
     
-    mitk::ITKVector3D v = newPosition - m_lastScalePosition;
+    mitk::ITKVector3D v = newPosition - m_LastScalePosition;
 
     // calculate scale changes
     mitk::ITKPoint3D newScale;
-    newScale[0] = (geometry->GetXAxis() * v);  // Scalarprodukt of normalized Axis
-    newScale[1] = (geometry->GetYAxis() * v);  // and direction vector of mouse movement
-    newScale[2] = (geometry->GetZAxis() * v);  // is the length of the movement vectors
-                                               // projection onto the axis
+    newScale[0] = (geometry->GetXAxis() * v) / geometry->GetXAxis().GetNorm();  // Scalarprodukt of normalized Axis
+    newScale[1] = (geometry->GetYAxis() * v) / geometry->GetYAxis().GetNorm();  // and direction vector of mouse movement
+    newScale[2] = (geometry->GetZAxis() * v) / geometry->GetZAxis().GetNorm();  // is the length of the movement vectors
+                                                                                // projection onto the axis
 
-    std::cout << "  scalechange: <" << newScale[0] << ", " << newScale[1] << ", " << newScale[2] << ">\n";
-
-    //newScale[0] = m_lastScaleData[0] + newScale[0];
-    //newScale[1] = m_lastScaleData[1] + newScale[1];
-    //newScale[2] = m_lastScaleData[2] + newScale[2];
-    
     // calculate direction of mouse move (towards or away from the data object)
-    ITKPoint3D objectPosition = geometry->GetPosition();        
-    ScalarType dist1 = (newPosition - objectPosition).GetNorm();
-    ScalarType dist2 = (m_lastScalePosition - objectPosition).GetNorm();    
-    if(dist1 <= dist2)
-    {   // subtract scale change from initial scale when moving towards the object
-      std::cout << "- decrease scale: mousepos-dist: " << dist1 << ", downposdist: " << dist2 << "\n";
-      newScale[0] = m_lastScaleData[0] - fabs(newScale[0]); 
-      newScale[1] = m_lastScaleData[1] - fabs(newScale[1]);
-      newScale[2] = m_lastScaleData[2] - fabs(newScale[2]);
-    }
-    else
-    {   // add scale change to initial scale when moving away from the object
-      std::cout << "+ increase scale: mousepos-dist: " << dist1 << ", downposdist: " << dist2 << "\n";
-      newScale[0] = m_lastScaleData[0] + fabs(newScale[0]);
-      newScale[1] = m_lastScaleData[1] + fabs(newScale[1]);
-      newScale[2] = m_lastScaleData[2] + fabs(newScale[2]);
-    }    
+    ITKPoint3D objectPosition = geometry->GetTransform()->GetPosition();
+    //ScalarType xdif = fabs((newPosition - objectPosition)[0]) - fabs((m_FirstScalePosition - objectPosition)[0]);
+    //ScalarType ydif = fabs((newPosition - objectPosition)[1]) - fabs((m_FirstScalePosition - objectPosition)[1]);
+    //ScalarType zdif = fabs((newPosition - objectPosition)[2]) - fabs((m_FirstScalePosition - objectPosition)[2]);
+    ScalarType xdif = fabs((newPosition - objectPosition)[0]) - fabs((m_LastScalePosition - objectPosition)[0]);
+    ScalarType ydif = fabs((newPosition - objectPosition)[1]) - fabs((m_LastScalePosition - objectPosition)[1]);
+    ScalarType zdif = fabs((newPosition - objectPosition)[2]) - fabs((m_LastScalePosition - objectPosition)[2]);
 
-    // cap at a minimum scale factor of 1
-    newScale[0] = (newScale[0] < 1) ? 1 : newScale[0]; 
-    newScale[1] = (newScale[1] < 1) ? 1 : newScale[1];
-    newScale[2] = (newScale[2] < 1) ? 1 : newScale[2];
+    if(xdif < 0)
+      newScale[0] = - fabs(newScale[0]);
+    else
+      newScale[0] = + fabs(newScale[0]);
+    if(ydif < 0)
+      newScale[1] = - fabs(newScale[1]);
+    else
+      newScale[1] = + fabs(newScale[1]);
+    if(zdif < 0)
+      newScale[2] = - fabs(newScale[2]);
+    else
+      newScale[2] = + fabs(newScale[2]);
+ 
+
+    //std::cout << "  scalechange: <" << newScale[0] << ", " << newScale[1] << ", " << newScale[2] << ">\n";
+
+    m_LastScalePosition = newPosition;
 
     AffineTransformationOperation* doOp = new mitk::AffineTransformationOperation(OpSCALE, newScale, 0.0, 0); // Index is not used here
 
 		if (m_UndoEnabled)	//write to UndoMechanism
 		{     
-      mitk::ScalarType oldScale[3];
-      geometry->GetTransform()->GetScale(oldScale);   // Achtung, umstellen!
-      mitk::ITKPoint3D oldScaleData = oldScale;
+      //geometry->GetTransform()->GetScale(oldScale);   // Achtung, umstellen!
+      //mitk::ITKPoint3D oldScaleData = oldScale;
+      mitk::ITKPoint3D oldScaleData;
+      oldScaleData[0] = -newScale[0];
+      oldScaleData[1] = -newScale[1];
+      oldScaleData[2] = -newScale[2];
       
       AffineTransformationOperation* undoOp = new mitk::AffineTransformationOperation(OpSCALE, oldScaleData, 0.0, 0);
 			OperationEvent *operationEvent = new OperationEvent(geometry,

@@ -108,18 +108,18 @@ public:
   //itkGetVectorMacro(Orientation, const ScalarType, 3);
   //itkGetVectorMacro(Scale, const ScalarType, 3);
 
-  virtual void SetPosition(const ScalarType data[]);
-  virtual void SetOrientation(const ScalarType data[]);
-  virtual void SetScale(const ScalarType data[]);
+  //virtual void SetPosition(const ScalarType data[]);
+  //virtual void SetOrientation(const ScalarType data[]);
+  //virtual void SetScale(const ScalarType data[]);
 
-  virtual const ScalarType* GetPosition() const;
-  virtual const ScalarType* GetOrientation() const;
-  virtual const ScalarType* GetScale() const;
+  //virtual const ScalarType* GetPosition() const;
+  //virtual const ScalarType* GetOrientation() const;
+  //virtual const ScalarType* GetScale() const;
 
   const ITKVector3D GetXAxis();
   const ITKVector3D GetYAxis();
   const ITKVector3D GetZAxis();
-  void UpdateTransform();
+//  void UpdateTransform();
 protected:
   Geometry3D();
 
@@ -140,13 +140,13 @@ protected:
 
   vtkTransform* m_Transform;
   
-  ScalarType m_Position[3];
-  ScalarType m_Orientation[3];
-  ScalarType m_Scale[3];  
-  ScalarType m_Angle;
-  ITKPoint3D m_RotationVector;
+  //ScalarType m_Position[3];
+  //ScalarType m_Orientation[3];
+  //ScalarType m_Scale[3];  
+  //ScalarType m_Angle;
+  //ITKPoint3D m_RotationVector;
 
-  bool m_Modified;
+  //bool m_Modified;
 
 
   Geometry3D::Pointer m_BaseGeometry;  

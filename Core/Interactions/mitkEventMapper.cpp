@@ -42,7 +42,7 @@ bool mitk::EventMapper::MapEvent(Event* event)
 		//searched entry not found
 		return false;
 
-	m_StateEvent.Set( (m_EventDescriptions.at(i)).GetId(), event );
+	m_StateEvent.Set( (m_EventDescriptions[i]).GetId(), event );
 	m_StateMachine->HandleEvent(&m_StateEvent);
 	return true;
 }

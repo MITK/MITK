@@ -147,6 +147,7 @@ void mitk::SlicedData::SetRequestedRegion(itk::DataObject *data)
 		itkExceptionMacro( << "mitk::SlicedData::SetRequestedRegion(DataObject*) cannot cast " << typeid(data).name() << " to " << typeid(SlicedData*).name() );
 	}
 }
+
 //##ModelId=3E19EA3300BA
 mitk::SlicedData::SlicedData() : m_ChannelNumber(0)
 {

@@ -111,7 +111,11 @@ public:
     //##ModelId=3E48E2B40374
     virtual void MMToDisplay(const mitk::Vector2D &vec_mm, mitk::Vector2D &vec_display) const;
 
-  protected:
+    /** Return this objects modified time.  */
+    //##ModelId=3E66CC5A0118
+    virtual unsigned long GetMTime() const;
+
+protected:
     //##ModelId=3E3AE91A035E
     DisplayGeometry();
     //##ModelId=3E3AE91A037C

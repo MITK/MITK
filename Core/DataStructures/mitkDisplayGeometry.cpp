@@ -265,3 +265,11 @@ float mitk::DisplayGeometry::GetScaleFactorUnitsPerDisplayUnit() const
 {
     return m_ScaleFactorUnitsPerDisplayUnit;
 }
+
+//##ModelId=3E66CC5A0118
+unsigned long mitk::DisplayGeometry::GetMTime() const
+{
+    if(Geometry2D::GetMTime()<m_WorldGeometry->GetMTime())
+        Modified();
+    return Geometry2D::GetMTime();
+}

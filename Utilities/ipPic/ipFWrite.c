@@ -7,7 +7,10 @@
  *   and swaps to the other endianess
  *
  * $Log$
- * Revision 1.2  1997/09/15 13:21:09  andre
+ * Revision 1.3  1997/09/15 13:22:32  andre
+ * *** empty log message ***
+ *
+ * Revision 1.2  1997/09/15  13:21:09  andre
  * switched to new what string format
  *
  * Revision 1.1.1.1  1997/09/06  19:09:58  andre
@@ -24,7 +27,7 @@
  *  COPYRIGHT (c) 1993 by DKFZ (Dept. MBI) Heidelberg, FRG
  */
 #ifndef lint
-  static char *what = { "@(#)_ipFWrite\t\tDKFZ (Dept. MBI)\\t"__DATE__"\t$Revision$" };
+  static char *what = { "@(#)_ipFWrite\t\tDKFZ (Dept. MBI)\t"__DATE__"\t$Revision$" };
 #endif
 
 #include <stdio.h>

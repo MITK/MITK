@@ -267,3 +267,4 @@ void mitk::PointSetWriter::WriteIndent( std::ofstream& file )
     std::string spaces( m_IndentDepth * m_Indent, ' ' );
     file << spaces.c_str();
 }
+

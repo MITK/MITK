@@ -26,10 +26,28 @@ int mitk::PolygonInteractor::GetId()
 //##Documentation
 //##@brief makes sure, that one line is selected.
 //##if no line is selected, then the next line to the given point is selected
-//##if more than one line is selected, then all are deselected and the one next to the given point is selected
-void mitk::PolygonInteractor::SelectOneLine(ITKPoint3D itkPoint)
+//##if more than one line is selected, then all are deselected and the one next to the given point is selected.
+//## Returns true if success, false if an error occured
+bool mitk::PolygonInteractor::SelectOneLine(ITKPoint3D itkPoint)
 {
-  //@Todo:Implement!!!  with respect to undo!
+ // mitk::Mesh* data = dynamic_cast<mitk::Mesh*>(m_DataTreeNode->GetData());
+	//if (data == NULL)
+ // {
+ //   (StatusBar::GetInstance())->DisplayText("Error! Sender: PolygonInteractor; Message: Wrong type of Data!", 10000);
+ //   return false;
+ // }
+ // 
+ //// mitk::Mesh::CellDataContainerIterator it, end;
+ //// end = data->GetMesh()->GetCellData()->End();
+ ////	for (it = data->GetMesh()->GetCellData()->Begin(); it != end; it++)
+	////{
+ ////   
+ //// }
+
+ // mitk::Mesh:: cell;
+ // bool ok = data->GetMesh()->GetCellData(m_Id, cell)
+  return true;
+
 
 }
 
@@ -91,11 +109,9 @@ bool mitk::PolygonInteractor::ExecuteSideEffect(int sideEffectId, mitk::StateEve
       SelectOneLine(itkPoint);
       //now one line is selected
       
-      //create a new LineInteractor. thenconnect one old LineInteractor to the new point, 
-      //the new lineInteractor to the same new point and to the other old point.
-
-
-      
+      //create a new LineInteractor. then connect one old LineInteractor (is selected) to the new point, 
+      //the new lineInteractor to the same new point and to the other old point. With respect to undo!
+    
 
     }
     ok = true;

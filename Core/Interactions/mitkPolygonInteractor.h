@@ -50,7 +50,7 @@ private:
   //##@brief makes sure, that one line is selected.
   //##if no line is selected, then the next line to the given point is selected
   //##if more than one line is selected, then all are deselected and the one next to the given point is selected
-  void SelectOneLine(ITKPoint3D itkPoint);
+  bool SelectOneLine(ITKPoint3D itkPoint);
 
   //##Documentation
   //## @brief lower Line Interactors 
@@ -69,7 +69,7 @@ private:
   int m_LineIdCount;
   
   //##Documentation
-  //## @brief Identificationnumber of that Polygon
+  //## @brief Identificationnumber of that Polygon. Equal to the CellId in the Mesh
   int m_Id;
 
 };

@@ -1,66 +1,62 @@
 #ifndef MITKSTATUSBAR_H
 #define MITKSTATUSBAR_H
-#include "itkObject.h"
+#include <itkObject.h>
+#include "mitkStatusBarImplementation.h"
+
 
 namespace mitk {
 //##Documentation
-//## @brief Interface for a class, that provides to send a Message to the applications StatusBar
+//## @brief Sending a message to the applications StatusBar
 //## @ingroup Interaction
-//## has to be derived and implemented for each GUI platform
-//## is nearly equal to itk::OutputWindow, 
-//## no Window, but one line of text and a delay for clear. There are different Texts, that 
-//## can be displayed differently. 
-//## ToDo: create different views with different colors for the different Outputs!
+//## holds a GUI dependent StatusBarImplementation and sends the text further.
+//## nearly equal to itk::OutputWindow, 
+//## no Window, but one line of text and a delay for clear. 
+//## all mitk-classes use this class to display text on GUI-StatusBar.
+//## The mainapplication has to set the internal held StatusBarImplementation with SetInstance(..).
 class StatusBar : public itk::Object
 {
 public:
   itkTypeMacro(StatusBar, itk::Object);
   
-  typedef StatusBar	Self;
-  typedef itk::Object Superclass;
-	typedef itk::SmartPointer<Self> Pointer;
-	typedef itk::SmartPointer<const Self>  ConstPointer;
-  
   //##Documentation
-  //## @brief static method to get the singleton StatusBar-instance 
+  //## @brief static method to get the GUI dependent StatusBar-instance 
   //## so the methods DisplayText, etc. can be called
   //## No reference counting, cause of decentral static use!
-  static StatusBar* GetInstance();
+  static StatusBarImplementation* GetInstance();
 
   //##Documentation
-  //## @brief Supply a GUI- dependant StatusBar. Has to be set by the application
-  //## to connect the application dependant subclass of mitkStatusBar
+  //## @brief Supply a GUI- dependent StatusBar. Has to be set by the application
+  //## to connect the application dependent subclass of mitkStatusBar
   //## if you create an instance, then call ->Delete() on the supplied
   //## instance after setting it.
-  static void SetInstance(StatusBar* instance);
+  static void SetInstance(StatusBarImplementation* instance);
 
   //##Documentation
   //## @brief Send a string to the applications StatusBar
-  virtual void DisplayText(const char* t);
+  static void DisplayText(const char* t);
   //##Documentation
   //## @brief Send a string with a time delay to the applications StatusBar
-  virtual void DisplayText(const char* t, int ms);
-
-  virtual void DisplayErrorText(const char *t);
-  virtual void DisplayWarningText(const char *t);
-  virtual void DisplayWarningText(const char *t, int ms);
-  virtual void DisplayGenericOutputText(const char *t);
-  virtual void DisplayDebugText(const char *t);
+  static void DisplayText(const char* t, int ms);
+  static void DisplayErrorText(const char *t);
+  static void DisplayWarningText(const char *t);
+  static void DisplayWarningText(const char *t, int ms);
+  static void DisplayGenericOutputText(const char *t);
+  static void DisplayDebugText(const char *t);
 
   //##Documentation
   //## @brief removes any temporary message being shown.
-  virtual void Clear();
+  static void Clear();
 
   //##Documentation
   //## @brief Set the SizeGrip of the window 
   //## (the triangle in the lower right Windowcorner for changing the size) 
   //## to enabled or disabled 
-  virtual void SetSizeGripEnabled(bool enable);
+  static void SetSizeGripEnabled(bool enable);
 
 protected:
   StatusBar();
   virtual ~StatusBar();
-  static Pointer m_Instance;
+  static StatusBarImplementation* m_Instance;
 };
 
 }// end namespace mitk

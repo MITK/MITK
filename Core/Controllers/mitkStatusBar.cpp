@@ -5,14 +5,14 @@
 
 namespace mitk {
 
-StatusBar::Pointer StatusBar::m_Instance = NULL;
+StatusBarImplementation *StatusBar::m_Instance = NULL;
 
 /**
  * Display the text in the statusbar of the applikation
  */
 void StatusBar::DisplayText(const char* t)
 {
-    if (m_Instance.IsNotNull())
+    if (m_Instance != NULL)
         m_Instance->DisplayText(t);
 }
 
@@ -21,44 +21,44 @@ void StatusBar::DisplayText(const char* t)
  */
 void StatusBar::DisplayText(const char* t, int ms)
 {
-  if (m_Instance.IsNotNull())
+  if (m_Instance != NULL)
     m_Instance->DisplayText(t, ms);
 }
 
 void StatusBar::DisplayErrorText(const char *t)
 {
-  if (m_Instance.IsNotNull())
+  if (m_Instance != NULL)
     m_Instance->DisplayErrorText(t);
 }
 void StatusBar::DisplayWarningText(const char *t)
 {
-  if (m_Instance.IsNotNull())
+  if (m_Instance != NULL)
     m_Instance->DisplayWarningText(t);
 }
 void StatusBar::DisplayWarningText(const char *t, int ms)
 {
-  if (m_Instance.IsNotNull())
+  if (m_Instance != NULL)
     m_Instance->DisplayWarningText(t, ms);
 }
 void StatusBar::DisplayGenericOutputText(const char *t)
 {
-  if (m_Instance.IsNotNull())
+  if (m_Instance != NULL)
     m_Instance->DisplayGenericOutputText(t);
 }
 void StatusBar::DisplayDebugText(const char *t)
 {
-  if (m_Instance.IsNotNull())
+  if (m_Instance != NULL)
     m_Instance->DisplayDebugText(t);
 }
 
 void StatusBar::Clear()
 {
-  if ( m_Instance.IsNotNull())
+  if ( m_Instance != NULL)
     m_Instance->Clear();
 }
 void StatusBar::SetSizeGripEnabled(bool enable)
 {
-  if (m_Instance.IsNotNull())
+  if (m_Instance != NULL)
   {
     m_Instance->SetSizeGripEnabled(enable);
   }
@@ -66,12 +66,12 @@ void StatusBar::SetSizeGripEnabled(bool enable)
 /**
  * Get the instance of this StatusBar
  */
-StatusBar* StatusBar::GetInstance()
+StatusBarImplementation* StatusBar::GetInstance()
 {
-  if (m_Instance.IsNull())//if not set, then send a errormessage on OutputWindow
+  if (m_Instance == NULL)//if not set, then send a errormessage on OutputWindow
   {
     (itk::OutputWindow::GetInstance())->DisplayErrorText("No instance of mitk::StatusBar! Check Applikation!");
-
+    //return NULL; m_Instance then is null, so this is redundant!
   }
   
   return m_Instance;
@@ -80,7 +80,7 @@ StatusBar* StatusBar::GetInstance()
 /**
  * Set an instance of this; application must do this!See Header!
  */
-void StatusBar::SetInstance(StatusBar* instance)
+void StatusBar::SetInstance(StatusBarImplementation* instance)
 {
   if ( m_Instance == instance )
   {

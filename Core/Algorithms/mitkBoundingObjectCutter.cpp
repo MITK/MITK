@@ -5,7 +5,7 @@
 #include "mitkBoundingObject.h"
 #include "mitkGeometry3D.h"
 
-#include <QmitkStatusBar.h>
+#include <mitkStatusBar.h>
 
 #include <vtkTransform.h>
 
@@ -61,7 +61,7 @@ void mitk::BoundingObjectCutter::GenerateData()
   // check if image conversion failed
   if (itkImage.IsNull())
   {
-    QmitkStatusBar::GetInstance()->DisplayErrorText ("An internal error occurred. Can't convert Image. Please report to bugs@mitk.org");
+    mitk::StatusBar::GetInstance()->DisplayErrorText ("An internal error occurred. Can't convert Image. Please report to bugs@mitk.org");
     std::cout << " image is NULL...returning" << std::endl;
     return; // return and do nothing in case of failure
   }

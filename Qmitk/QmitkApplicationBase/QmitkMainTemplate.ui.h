@@ -285,9 +285,9 @@ void QmitkMainTemplate::init()
   mitkMultiWidget=NULL;
 
   //creating a QmitkStatusBar for Output on the QStatusBar and connecting it with the MainStatusBar
-  QmitkStatusBar::SetStatusBar(this->statusBar());
+  QmitkStatusBar *statusBar = new QmitkStatusBar(this->statusBar());
   //disabling the SizeGrip in the lower right corner
-  (QmitkStatusBar::GetInstance())->SetSizeGripEnabled(false);
+  statusBar->SetSizeGripEnabled(false);
 
   //this seems to be a bug of Qt3.1.1's designer: The object name of ToolBar is not initialized.
   ToolBar->setName("ToolBar");

@@ -1,4 +1,5 @@
 #include "StateMachine.h"
+#include "StateMachineFactory.h"
 #include "StateTransitionOperation.h"
 #include "OperationEvent.h"
 #include "UndoController.h"
@@ -7,8 +8,12 @@
 
 //##ModelId=3E5B2DB301FD
 mitk::StateMachine::StateMachine(std::string type)
-: m_Type(type), m_CurrentState(0)
-{}
+: m_Type(type)
+{
+	StateMachineFactory* stateMF = new StateMachineFactory();
+	m_CurrentState = stateMF->GetStartState(type);
+	delete stateMF;
+}
 
 //##ModelId=3E5B2E660087
 std::string mitk::StateMachine::GetType() const
@@ -32,19 +37,14 @@ bool mitk::StateMachine::HandleEvent(StateEvent const* stateEvent)
 	StateTransitionOperation* undoSTO = new StateTransitionOperation(mitk::STATETRANSITION, m_CurrentState);
 	StateTransitionOperation* redoSTO = new StateTransitionOperation(mitk::STATETRANSITION, tempState);//tempStateZeiger? mögl. Fehlerquelle
 	
-	//Dummy
-	//OperationActor *destination = new OperationActor;//hier StateMachine, also "this"???
-	//Dummy
-
-	OperationEvent *tempOE = new OperationEvent();//to get Object- and GroupEventId
 	OperationEvent *operationEvent = new OperationEvent(((mitk::OperationActor*)(this)), undoSTO, redoSTO, 
-						tempOE->GenerateObjectEventId(), tempOE->GenerateGroupEventId());
+		OperationEvent::GenerateObjectEventId(), OperationEvent::GenerateGroupEventId());
+
 	UndoController *undoController = new UndoController(mitk::LIMITEDLINEARUNDO);//switch to LLU or add LLU
 	undoController->SetOperationEvent(operationEvent);
 
 	//first following StateChange, then operation(SideEffect)
 	m_CurrentState = tempState;
-	
 	bool ok = ExecuteSideEffect(tempSideEffectId);//Undo in ExecuteSideEffect(...)
 	return ok;
 }

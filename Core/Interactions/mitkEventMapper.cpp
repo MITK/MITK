@@ -22,8 +22,9 @@ EventDescriptionVec mitk::EventMapper::m_EventDescriptions;
 mitk::StateEvent mitk::EventMapper::m_StateEvent;
 std::string mitk::EventMapper::m_StyleName;
 
-
 //##ModelId=3E5B349600CB
+//##Documentation
+//##
 void mitk::EventMapper::SetStateMachine(StateMachine *stateMachine)
 {
 //was mit alter Statemachine-Zeiger?
@@ -31,6 +32,9 @@ void mitk::EventMapper::SetStateMachine(StateMachine *stateMachine)
 }
 
 //##ModelId=3E5B34CF0041
+//##Documentation
+//## searches the Event in m_EventDescription
+//## and if included 
 bool mitk::EventMapper::MapEvent(Event* event)
 {
 	if (m_StateMachine == NULL)
@@ -51,6 +55,9 @@ bool mitk::EventMapper::MapEvent(Event* event)
 }
 
 //##ModelId=3E5B35140072
+//##Documentation
+//## loads an XML-File containing Events into m_EventDescriptions
+//## also involved: EventMapper::startEvent(...)
 bool mitk::EventMapper::LoadBehavior(std::string fileName)
 {
 	  if ( fileName.empty() )
@@ -71,6 +78,9 @@ bool mitk::EventMapper::LoadBehavior(std::string fileName)
 }
 
 //##ModelId=3E788FC00308
+//##Documentation
+//## reads a Tag from an XML-file
+//## adds Events to m_EventDescription
 bool mitk::EventMapper::startElement( const QString&, const QString&, const QString& qName, const QXmlAttributes& atts )
 {
 
@@ -92,9 +102,9 @@ bool mitk::EventMapper::startElement( const QString&, const QString&, const QStr
 	}
 	return true;
 }
+
 //##ModelId=3E7B20EE01F5
 std::string mitk::EventMapper::GetStyleName()
 {
 	return m_StyleName;
 }
-

@@ -34,8 +34,8 @@ namespace mitk {
     //##ModelId=3E5B2E170228
     virtual bool ExecuteSideEffect(int sideEffectId)= 0;
 
-  private:
-    //##ModelId=3E5B2D66027E
+  private:  
+	//##ModelId=3E5B2D66027E
 	std::string m_Type;
 
     //##ModelId=3E5B2D8F02B9

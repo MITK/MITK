@@ -1,34 +1,34 @@
 /****************************************************************************
 ** Constants for Interaction/Events of mitk Framework
 **
-**********************************************************************/
+****************************************************************************/
 
 #ifndef MITKINTERACTIONCONST_H
 #define MITKINTERACTIONCONST_H
 
 enum SideEffectId {
-	DoNothing = 0,
-	InitNewObject = 5,
-	InitEditObject = 6,
-	InitEditGroup = 7,
-	AddPoint = 10,
-	Snapping_Adding = 20,
-	CheckPoint = 30,
-	CheckIfLast = 31,
-	FinishObject = 40,
-	FinishGroup = 41,
-	SearchObject = 50,
-	SearchGroup = 51,
-	SearchAnotherObject = 52, //one object is selected and another object is to be added to selection
-	SelectPickedObject = 60, // select the picked object and deselect others
-	SelectAnotherObject = 61, //adds the picked object to the selection
-	SelectGroup = 62,
-    SelectAll = 63,
-	AddSelectedToGroup = 63,
-	DeselectObject = 70, //deselect picked from group
-	DeselectAll = 72
+	DONOTHING = 0,
+	INITNEWOBJECT = 5,
+	INITEDITOBJECT = 6,
+	INITEDITGROUP = 7,
+	ADDPOINT = 10,
+	SNAPPING_ADDING = 20,
+	CHECKPOINT = 30,
+	CHECKIFLAST = 31,
+	FINISHOBJECT = 40,
+	FINISHGROUP = 41,
+	SEARCHOBJECT = 50,
+	SEARCHGROUP = 51,
+	SEARCHANOTHEROBJECT = 52, //one object is selected and another object is to be added to selection
+	SELECTPICKEDOBJECT = 60, // select the picked object and deselect others
+	SELECTANOTHEROBJECT = 61, //adds the picked object to the selection
+	SELECTGROUP = 62,
+    SELECTALL = 63,
+	ADDSELECTEDTOGROUP = 63,
+	DESELECTOBJECT = 70, //deselect picked from group
+	DESELECTALL = 72
 };
-	
+
 enum Type {
 	None = 0,				// invalid event
 	Timer = 1,				// timer event

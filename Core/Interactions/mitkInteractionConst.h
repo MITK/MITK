@@ -3,6 +3,7 @@
 /*Prefixes for Constants:
 E = Enumeration
 St = State Conditions; own generated Events from guarding states
+EID = EventId's
 Op = Operations
 Se = SideEffects
 Type_ = Type of Event
@@ -35,6 +36,44 @@ typedef enum EConditions
   StLARGERNMINUS1 = 221,
 };
 
+//Constants for EventIds
+typedef enum EEventIds
+{
+  EIDLEFTMOUSEBTN = 1,
+  EIDRIGHTMOUSEBTN = 2,
+  EIDLEFTMOUSEBTNANDSHIFT = 3,
+  EIDMIDDLEMOUSEBTN = 4,
+  EIDLEFTMOUSEBTNANDCTRL = 5,
+  EIDSTRGANDN = 10,
+  EIDSTRGANDE = 11,
+  EIDDELETE = 12,
+  EIDLEFTMOUSERELEASE = 505,
+  EIDMIDDLEMOUSERELEASE = 506,
+  EIDRIGHTMOUSERELEASE = 507,
+  EIDLEFTMOUSERELEASEANDSHIFT = 508,
+  EIDMOUSEMOVE = 520,
+  EIDLEFTMOUSEBTNANDMOUSEMOVE = 530,
+  EIDRIGHTMOUSEBTNANDMOUSEMOVE = 531,
+  EIDMIDDLEMOUSEBTNANDMOUSEMOVE = 533,
+  EIDCTRLANDLEFTMOUSEBTNANDMOUSEMOVE = 534,
+  //own thrown events:
+  EIDNEW = 100,
+  EIDOLD = 1001,
+  EIDFINISHED = 1002,
+  EIDSTNO = 1003,
+  EIDSTYES = 1004,
+  EIDSAME = 1005,
+  EIDNOANDLASTOBJECT = 1006,
+  EIDNOANDNOTLASTOBJECT = 1007,
+  EIDLAST = 1008,
+  EIDNOTLAST = 1009,
+  EIDSTSMALERNMINUS1 = 1010,
+  EIDSTLARGERNMINUS1 = 1011,
+  EIDPOSITIONEVENT = 1012,
+  //external thrown events:
+  EIDCLEAR = 1100
+};
+
 //##Constants for Operations
 typedef enum EOperations
 {
@@ -47,7 +86,9 @@ typedef enum EOperations
   OpMOVELINE = 301, //move a line
   OpREMOVE = 400, //remove a point at position
   OpREMOVELINE = 401, //remove a line at position
-  OpDELETE = 500, //delete from the end
+  OpREMOVECELL = 402, //remove a cell
+  OpDELETE = 500, //delete 
+  OpUNDELETE = 501, //undo the delete 
   OpSTATECHANGE = 600, //change a state
   OpTERMINATE = 666, //change a state
   OpSELECTPOINT = 700,
@@ -99,7 +140,10 @@ typedef enum ESideEffects
   SeMOVE = 92,
   SeREMOVEPOINT = 100,
   SeREMOVE = 101,
+  SeREMOVELINE = 102,
+  SeREMOVEALL = 103,
   SeINSERTPOINT = 110,
+  SeINSERTLINE = 111,
   SeDELETEPOINT = 120,
   SeCLEAR = 130, //clear all elements from a list
   SeTERMINATE_INTERACTION = 666,

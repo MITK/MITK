@@ -11,8 +11,9 @@ namespace mitk {
 //##ModelId=3E93EE1D001F
 	enum UndoType
 	{
-		LIMITEDLINEARUNDO = 0,
-		TREEUNDO = 1
+		//NULL = 0,
+		LIMITEDLINEARUNDO = 1,
+		TREEUNDO = 2
 	};
 //##ModelId=3E9C45D5007E
 typedef std::map<UndoType, UndoModel*> UndoModelMap;
@@ -24,8 +25,18 @@ typedef std::map<UndoType, UndoModel*>::iterator UndoModelMapIter;
 class UndoController
 {
   public:
+	/**
+    * Constructor; Adds the new UndoType or if undoType exists , 
+	* switches it to undoType
+    **/
     //##ModelId=3E956E3B03A8
 	UndoController(UndoType undoType);
+	
+	/**
+     * plain constructor
+     **/
+    //##ModelId=3EA585FD0261
+	UndoController();
 
     //##ModelId=3E5F543402C5
     bool SetOperationEvent(OperationEvent* operationEvent);

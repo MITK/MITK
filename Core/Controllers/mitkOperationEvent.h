@@ -14,6 +14,8 @@ class OperationEvent
   public:
     //##ModelId=3E957AE700E6
     OperationEvent(OperationActor* destination, Operation* operation, Operation* undoOperation, int objectEventId, int groupEventId);
+    //##ModelId=3EA585FD0167
+	OperationEvent();
 
     //##ModelId=3E5F610D00BB
     Operation* GetOperation();

@@ -3,7 +3,7 @@
 
 #include "mitkCommon.h"
 #include "Event.h"
-#include "vecmath.h"
+#include "mitkVector.h"
 
 
 namespace mitk {
@@ -13,14 +13,14 @@ class PositionEvent : public Event
 {
   public:
     //##ModelId=3E5B79DE0133
-    Vector3f GetPosition() const;
+    Vector3D GetPosition() const;
 
     //##ModelId=3E5B7CF900F0
-    PositionEvent(int type, int button, int buttonState, int key, const Vector3f& position);
+    PositionEvent(int type, int button, int buttonState, int key, const Vector3D& position);
 
   private:
     //##ModelId=3E5B79D00395
-    Vector3f m_Position;
+    Vector3D m_Position;
 
 };
 

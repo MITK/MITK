@@ -8,25 +8,30 @@ mitk::UndoType m_CurUndoType;
 
 static const mitk::UndoType DEFAULTUNDOMODEL = mitk::LIMITEDLINEARUNDO;
 
+//##ModelId=3EA585FD0261
+mitk::UndoController::UndoController()
+{}
 
 mitk::UndoController::UndoController(UndoType undoType)
 {
-	switch (undoType)
+	if (SwitchUndoModel(undoType)==false) //existiert noch nicht in static-Liste
 	{
-		case LIMITEDLINEARUNDO:
-			m_CurUndoModel = new mitk::LimitedLinearUndo;
-			m_CurUndoType = undoType;
-			m_UndoModelList.insert(UndoModelMap::value_type(undoType, m_CurUndoModel));
-			break;
-		//case ###
-			//insert here, in add- and RemoveUndoModel new sets of UndoModels!
-            //break;
-		default :
-			m_CurUndoModel = new LimitedLinearUndo;
-			m_CurUndoType = undoType;
-			m_UndoModelList.insert(UndoModelMap::value_type(undoType, m_CurUndoModel));
+		switch (undoType)
+		{
+			case LIMITEDLINEARUNDO:
+				m_CurUndoModel = new mitk::LimitedLinearUndo;
+				m_CurUndoType = undoType;
+				m_UndoModelList.insert(UndoModelMap::value_type(undoType, m_CurUndoModel));
+				break;
+			//case ###
+				//insert here, in add- and RemoveUndoModel new sets of UndoModels!
+				//break;
+			default :
+				m_CurUndoModel = new LimitedLinearUndo;
+				m_CurUndoType = undoType;
+				m_UndoModelList.insert(UndoModelMap::value_type(undoType, m_CurUndoModel));
+		}
 	}
-
 }
 
 //##ModelId=3E5F543402C5

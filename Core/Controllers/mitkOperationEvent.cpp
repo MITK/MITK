@@ -25,6 +25,9 @@ mitk::OperationEvent::OperationEvent(OperationActor* destination,
 									 m_Swaped(false)
 {}
 
+//##ModelId=3EA585FD0167
+mitk::OperationEvent::OperationEvent()
+{}
 
 /**
  *swaps the Undo and Redo- operation and changes m_Swaped

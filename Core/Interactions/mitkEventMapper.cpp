@@ -26,8 +26,8 @@ std::string mitk::EventMapper::m_StyleName;
 //##ModelId=3E5B349600CB
 void mitk::EventMapper::SetStateMachine(StateMachine *stateMachine)
 {
-
-	mitk::EventMapper::m_StateMachine = stateMachine;//auskomentiert wegen linkerfehler Test
+//was mit alter Statemachine-Zeiger?
+	mitk::EventMapper::m_StateMachine = stateMachine;
 }
 
 //##ModelId=3E5B34CF0041

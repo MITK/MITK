@@ -47,7 +47,8 @@ void mitk::ImageMapper2D::Paint(mitk::BaseRenderer * renderer)
 
     if( (renderinfo.m_LastUpdateTime < renderer->GetMTime()) || 
         (renderinfo.m_LastUpdateTime < node->GetMTime()) ||
-        (renderinfo.m_LastUpdateTime < node->GetPropertyList()->GetMTime())
+        (renderinfo.m_LastUpdateTime < node->GetPropertyList()->GetMTime()) ||
+        (renderinfo.m_LastUpdateTime < node->GetPropertyList(renderer)->GetMTime())
         )
         GenerateData(renderer);
 

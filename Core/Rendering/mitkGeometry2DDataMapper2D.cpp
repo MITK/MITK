@@ -45,12 +45,10 @@ void mitk::Geometry2DDataMapper2D::Paint(mitk::BaseRenderer * renderer)
             assert(displayGeometry);
 
             //calculate intersection of the plane data with the border of the world geometry rectangle
-	        Vector2D vlineFrom;
-	        Vector2D vlineTo;
-    		bool intersecting = worldPlaneGeometry->GetPlaneView().intersectPlane2D( planeGeometry->GetPlaneView(), vlineFrom, vlineTo );
+	        Point2D lineFrom;
+	        Point2D lineTo;
+    		bool intersecting = worldPlaneGeometry->GetPlaneView().intersectPlane2D( planeGeometry->GetPlaneView(), lineFrom, lineTo );
 
-	        Point2D lineFrom=vlineFrom;
-	        Point2D lineTo=vlineTo;
 
             if(intersecting)
             {

@@ -358,12 +358,12 @@ void QmitkMainTemplate::fileExit()
 
 void QmitkMainTemplate::editUndo()
 {
-
+    undoController->Undo();
 }
 
 void QmitkMainTemplate::editRedo()
 {
-
+    undoController->Redo();
 }
 
 void QmitkMainTemplate::editCut()
@@ -405,6 +405,7 @@ void QmitkMainTemplate::helpAbout()
 void QmitkMainTemplate::init()
 {
     mitkMultiWidget=NULL;
+    undoController = new mitk::UndoController;
 
     //this seems to be a bug of Qt3.1.1's designer: The object name of ToolBar is not initialized.
     ToolBar->setName("ToolBar");
@@ -414,7 +415,7 @@ void QmitkMainTemplate::init()
     tree->Register(); //FIXME: da DataTreeIterator keinen Smartpointer auf DataTree hält, wird tree sonst gelöscht.
     //create root of data tree (empty)
     mitk::DataTreeNode::Pointer node=mitk::DataTreeNode::New();
-    tree->setRoot(node); 
+    tree->setRoot(node);     
 }
 
 /*!

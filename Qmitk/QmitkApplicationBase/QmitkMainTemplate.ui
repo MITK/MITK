@@ -449,6 +449,7 @@
 </connections>
 <includes>
     <include location="global" impldecl="in declaration">DataTree.h</include>
+    <include location="global" impldecl="in declaration">UndoController.h</include>
     <include location="global" impldecl="in implementation">QmitkStdMultiWidget.h</include>
     <include location="global" impldecl="in implementation">QmitkFctMediator.h</include>
     <include location="global" impldecl="in implementation">QmitkControlsRightFctLayoutTemplate.h</include>
@@ -470,10 +471,11 @@
     <forward>class QmitkSelectableGLWidget</forward>
 </forwards>
 <variables>
-    <variable>mitk::DataTreeBase* planesSubTree;</variable>
-    <variable>QmitkFctMediator* qfm;</variable>
-    <variable>QmitkStdMultiWidget* mitkMultiWidget;</variable>
     <variable>mitk::DataTree::Pointer tree;</variable>
+    <variable>QmitkStdMultiWidget* mitkMultiWidget;</variable>
+    <variable>QmitkFctMediator* qfm;</variable>
+    <variable>mitk::DataTreeBase* planesSubTree;</variable>
+    <variable>mitk::UndoController* undoController;</variable>
 </variables>
 <slots>
     <slot>fileNew()</slot>

@@ -134,7 +134,9 @@ void QmitkMainTemplate::fileOpenImageSequence()
 
     if ( !fileName.isNull() )
     {
-        int start = fileName.find( QRegExp("[0-9]"), 0 );
+        int fnstart = fileName.findRev( QRegExp("[/\\\\]"), fileName.length() );
+        if(fnstart<0) fnstart=0;
+        int start = fileName.find( QRegExp("[0-9]"), fnstart );
         if(start<0)
         {
             fileOpen(fileName.ascii());

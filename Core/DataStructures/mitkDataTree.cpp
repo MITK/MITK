@@ -94,7 +94,7 @@ void mitk::DataTree::treeChanged( TreeIterator<DataTreeNode::Pointer>& changedTr
 
 }
 
-MBI_STD::istream& operator>>( MBI_STD::istream& i, mitk::DataTreeNode::Pointer& dtn ) {
+MBI_STD::istream& mitk::operator>>( MBI_STD::istream& i, mitk::DataTreeNode::Pointer& dtn ) {
 
 	dtn = mitk::DataTreeNode::New();
    //i >> av.get();

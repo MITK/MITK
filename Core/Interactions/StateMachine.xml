@@ -2,117 +2,528 @@
 <mitkInteraktionStates xmlns="http://tempuri.org/StateMachine.xsd" STYLE="Powerpoint">
 	<stateMachine NAME="global">
 		<state NAME="neutral" ID="1" START_STATE="TRUE">
-			<transition NAME="new object" NEXT_STATE_ID="20" EVENT_ID="10" SIDE_EFFECT_ID="5" />
-			<transition NAME="object search" NEXT_STATE_ID="2" EVENT_ID="1" SIDE_EFFECT_ID="50" />
-		</state>
-		<state NAME="new object" ID="20">
-			<transition NAME="finished new object " NEXT_STATE_ID="3" EVENT_ID="202" SIDE_EFFECT_ID="40" />
-		</state>
-		<state NAME="object search" ID="2">
-			<transition NAME="nothing picked" NEXT_STATE_ID="1" EVENT_ID="203" SIDE_EFFECT_ID="72" />
-			<transition NAME="object picked" NEXT_STATE_ID="3" EVENT_ID="204" SIDE_EFFECT_ID="60" />
-			<transition NAME="same object picked" NEXT_STATE_ID="21" EVENT_ID="205" SIDE_EFFECT_ID="6" />
-		</state>
-		<state NAME="object selected" ID="3">
-			<transition NAME="object search" NEXT_STATE_ID="2" EVENT_ID="1" SIDE_EFFECT_ID="50" />
-			<transition NAME="object search add" NEXT_STATE_ID="4" EVENT_ID="3" SIDE_EFFECT_ID="52" />
-		</state>
-		<state NAME="edit object" ID="21">
-			<transition NAME="finished editing object" NEXT_STATE_ID="3" EVENT_ID="202" SIDE_EFFECT_ID="40" />
-		</state>
-		<state NAME="next object search" ID="4">
-			<transition NAME="No New and only one selected" NEXT_STATE_ID="3" EVENT_ID="206" SIDE_EFFECT_ID="0" />
-			<transition NAME="No New but more than 1 selected" NEXT_STATE_ID="6" EVENT_ID="207" SIDE_EFFECT_ID="0" />
-			<transition NAME="same-Check" NEXT_STATE_ID="5" EVENT_ID="205" SIDE_EFFECT_ID="31" />
-			<transition NAME="New Object Picked" NEXT_STATE_ID="6" EVENT_ID="200" SIDE_EFFECT_ID="61" />
-		</state>
-		<state NAME="last check" ID="5">
-			<transition NAME="neutral" NEXT_STATE_ID="1" EVENT_ID="208" SIDE_EFFECT_ID="72" />
-			<transition NAME="group selected" NEXT_STATE_ID="6" EVENT_ID="209" SIDE_EFFECT_ID="70" />
-		</state>
-		<state NAME="group selected" ID="6">
-			<transition NAME="edit group" NEXT_STATE_ID="22" EVENT_ID="11" SIDE_EFFECT_ID="7" />
-			<transition NAME="group search" NEXT_STATE_ID="7" EVENT_ID="1" SIDE_EFFECT_ID="51" />
-		</state>
-		<state NAME="group search" ID="7">
-			<transition NAME="neutral" NEXT_STATE_ID="1" EVENT_ID="203" SIDE_EFFECT_ID="72" />
-			<transition NAME="edit group" NEXT_STATE_ID="22" EVENT_ID="204" SIDE_EFFECT_ID="7" />
-		</state>
-		<state NAME="edit group" ID="22">
-			<transition NAME="finished editing group" NEXT_STATE_ID="6" EVENT_ID="202" SIDE_EFFECT_ID="41" />
+			<transition NAME="transmitt events" NEXT_STATE_ID="1" EVENT_ID="0">
+				<action ID="1200" />
+				<action ID="1201" />
+			</transition>
+			<!-- this is a * transition from state x into state x with all other eventId's not standing here -->
 		</state>
 	</stateMachine>
-	<stateMachine NAME="polygon">
-		<state NAME="new object" ID="1" START_STATE="TRUE">
-			<transition NAME="to draw object" NEXT_STATE_ID="2" EVENT_ID="1" SIDE_EFFECT_ID="10" />
+	<stateMachine NAME="leftmouse">
+		<state NAME="neutral" ID="1" START_STATE="TRUE">
+			<transition NAME="send Koordinates" NEXT_STATE_ID="1" EVENT_ID="1" SIDE_EFFECT_ID="80">
+				<action ID="80" />
+			</transition>
+			<transition NAME="send Koordinates Move" NEXT_STATE_ID="1" EVENT_ID="530" SIDE_EFFECT_ID="80">
+				<action ID="80" />
+			</transition>
 		</state>
-		<state NAME="draw object" ID="2">
-			<transition NAME="snapping" NEXT_STATE_ID="2" EVENT_ID="3" SIDE_EFFECT_ID="20" />
-			<transition NAME="to point check" NEXT_STATE_ID="3" EVENT_ID="1" SIDE_EFFECT_ID="30" />
+	</stateMachine>
+	<stateMachine NAME="seedroi">
+		<state NAME="neutral" ID="1" START_STATE="TRUE">
+			<transition NAME="send Koordinates" NEXT_STATE_ID="1" EVENT_ID="3">
+				<action ID="80" />
+			</transition>
 		</state>
-		<state NAME="point check" ID="3">
-			<transition NAME="new point" NEXT_STATE_ID="2" EVENT_ID="200" SIDE_EFFECT_ID="10" />
-			<transition NAME="old point" NEXT_STATE_ID="1" EVENT_ID="201" SIDE_EFFECT_ID="40" />
+	</stateMachine>
+	<stateMachine NAME="navigation">
+		<state NAME="neutral" ID="1" START_STATE="TRUE">
+			<transition NAME="send Koordinates press" NEXT_STATE_ID="1" EVENT_ID="1">
+				<action ID="90" />
+			</transition>
+			<transition NAME="send Koordinates move" NEXT_STATE_ID="1" EVENT_ID="530">
+				<action ID="90" />
+			</transition>
+			<transition NAME="send Koordinates release" NEXT_STATE_ID="1" EVENT_ID="505">
+				<action ID="42" />
+			</transition>
+		</state>
+	</stateMachine>
+	<stateMachine NAME="drag">
+		<state NAME="neutral" ID="1" START_STATE="TRUE">
+			<transition NAME="check picked" NEXT_STATE_ID="1" EVENT_ID="1">
+				<action ID="80" />
+			</transition>
+			<transition NAME="continue" NEXT_STATE_ID="1" EVENT_ID="530">
+				<action ID="90" />
+			</transition>
+			<transition NAME="exit" NEXT_STATE_ID="1" EVENT_ID="505">
+				<action ID="42" />
+			</transition>
+		</state>
+		<state NAME="picked guard" ID="2">
+			<transition NAME="yes" NEXT_STATE_ID="3" EVENT_ID="204">
+				<action ID="0" />
+			</transition>
+			<transition NAME="no" NEXT_STATE_ID="3" EVENT_ID="203">
+				<action ID="0" />
+			</transition>
+		</state>
+		<state NAME="move" ID="3">
+			<transition NAME="continue" NEXT_STATE_ID="3" EVENT_ID="530">
+				<action ID="90" />
+			</transition>
+			<transition NAME="exit" NEXT_STATE_ID="1" EVENT_ID="505">
+				<action ID="42" />
+			</transition>
+		</state>
+	</stateMachine>
+	<stateMachine NAME="move">
+		<state NAME="neutral" ID="1" START_STATE="TRUE">
+			<transition NAME="send Koordinates" NEXT_STATE_ID="1" EVENT_ID="4">
+				<action ID="1101" />
+			</transition>
+			<transition NAME="send Koordinates Move" NEXT_STATE_ID="1" EVENT_ID="533">
+				<action ID="1102" />
+			</transition>
+		</state>
+	</stateMachine>
+	<stateMachine NAME="zoom">
+		<state NAME="neutral" ID="1" START_STATE="TRUE">
+			<transition NAME="send Koordinates" NEXT_STATE_ID="1" EVENT_ID="2">
+				<action ID="1201" />
+			</transition>
+			<transition NAME="send Koordinates Move" NEXT_STATE_ID="1" EVENT_ID="531">
+				<action ID="1202" />
+			</transition>
+		</state>
+	</stateMachine>
+	<stateMachine NAME="picking">
+		<state NAME="neutral" ID="1" START_STATE="TRUE">
+			<transition NAME="do picking" NEXT_STATE_ID="1" EVENT_ID="3">
+				<action ID="1003" />
+			</transition>
 		</state>
 	</stateMachine>
 	<stateMachine NAME="focus">
-			<state NAME="neutral" ID="1" START_STATE="TRUE">
-				<transition NAME="changefocus" NEXT_STATE_ID="1" EVENT_ID="1" SIDE_EFFECT_ID="1000" />
-			</state>
+		<state NAME="neutral" ID="1" START_STATE="TRUE">
+			<transition NAME="changefocus" NEXT_STATE_ID="1" EVENT_ID="1">
+				<action ID="0" />
+			</transition>
+		</state>
+	</stateMachine>
+	<stateMachine NAME="meshmove">
+		<state NAME="neutral" ID="1" START_STATE="TRUE">
+			<transition NAME="check picked" NEXT_STATE_ID="2" EVENT_ID="1">
+				<action ID="30" />
+			</transition>
+		</state>
+		<state NAME="picked guard" ID="2">
+			<transition NAME="yes" NEXT_STATE_ID="3" EVENT_ID="204">
+				<action ID="0" />
+			</transition>
+			<transition NAME="no" NEXT_STATE_ID="1" EVENT_ID="203">
+				<action ID="0" />
+			</transition>
+		</state>
+		<state NAME="move" ID="3">
+			<transition NAME="continue" NEXT_STATE_ID="3" EVENT_ID="530">
+				<action ID="90" />
+			</transition>
+			<transition NAME="exit" NEXT_STATE_ID="1" EVENT_ID="505">
+				<action ID="666" />
+			</transition>
+		</state>
+	</stateMachine>
+	<stateMachine NAME="pointsetinteractor">
+		<state NAME="nopoints" ID="1" START_STATE="TRUE">
+			<transition NAME="addPoint but check n" NEXT_STATE_ID="3" EVENT_ID="3">
+				<action ID="32" />
+			</transition>
+		</state>
+		<state NAME="space left" ID="2">
+			<transition NAME="addPoint but check n" NEXT_STATE_ID="3" EVENT_ID="3">
+				<action ID="32" />
+			</transition>
+			<transition NAME="Select or move point Space" NEXT_STATE_ID="10" EVENT_ID="1">
+				<action ID="30" />
+			</transition>
+			<transition NAME="checkn Delete" NEXT_STATE_ID="30" EVENT_ID="12">
+				<action ID="33" />
+			</transition>
+			<transition NAME="clear all" NEXT_STATE_ID="1" EVENT_ID="700">
+				<action ID="130" />
+			</transition>
+		</state>
+		<state NAME="checkedN" ID="3">
+			<transition NAME="n smaler N" NEXT_STATE_ID="2" EVENT_ID="220">
+				<action ID="10" />
+			</transition>
+			<transition NAME="n greater equals N" NEXT_STATE_ID="4" EVENT_ID="221">
+				<action ID="10" />
+			</transition>
+		</state>
+		<state NAME="set full" ID="4">
+			<transition NAME="Select or move point FULL" NEXT_STATE_ID="20" EVENT_ID="1">
+				<action ID="30" />
+			</transition>
+			<transition NAME="checkn Delete selected Point" NEXT_STATE_ID="30" EVENT_ID="12">
+				<action ID="33" />
+			</transition>
+			<transition NAME="clear all" NEXT_STATE_ID="1" EVENT_ID="700">
+				<action ID="130" />
+			</transition>
+		</state>
+		<state NAME="picked NotFull" ID="10">
+			<transition NAME="StNo" NEXT_STATE_ID="2" EVENT_ID="203">
+				<action ID="72" />
+			</transition>
+			<transition NAME="StYes" NEXT_STATE_ID="11" EVENT_ID="204">
+				<action ID="34" />
+			</transition>
+		</state>
+		<state NAME="already selected Space" ID="11">
+			<transition NAME="StNo" NEXT_STATE_ID="2" EVENT_ID="203">
+				<action ID="60" />
+			</transition>
+			<transition NAME="StYes" NEXT_STATE_ID="12" EVENT_ID="204">
+				<action ID="8" />
+			</transition>
+		</state>
+		<state NAME="move Point Space" ID="12">
+			<transition NAME="move point" NEXT_STATE_ID="12" EVENT_ID="530">
+				<action ID="91" />
+			</transition>
+			<transition NAME="finish move" NEXT_STATE_ID="2" EVENT_ID="505">
+				<action ID="42" />
+			</transition>
+			<transition NAME="Safety init" NEXT_STATE_ID="12" EVENT_ID="1"> -->
+				<action ID="8" />
+	    </transition>
+		</state>
+		<state NAME="picked Full" ID="20">
+			<transition NAME="StNO" NEXT_STATE_ID="4" EVENT_ID="203">
+				<action ID="72" />
+			</transition>
+			<transition NAME="StYES" NEXT_STATE_ID="21" EVENT_ID="204">
+				<action ID="34" />
+			</transition>
+		</state>
+		<state NAME="selected Full" ID="21">
+			<transition NAME="StNo" NEXT_STATE_ID="4" EVENT_ID="203">
+				<action ID="60" />
+			</transition>
+			<transition NAME="StYes" NEXT_STATE_ID="22" EVENT_ID="204">
+				<action ID="8" />
+			</transition>
+		</state>
+		<state NAME="move Point Full" ID="22">
+			<!--  since the MouseMove Event is send by QT we don't have the information about the position of the point in the list -->
+			<!--  we had it before, when we checked, if it was picked, or if it was selected -->
+			<transition NAME="move point" NEXT_STATE_ID="22" EVENT_ID="530">
+				<action ID="91" />
+			</transition>
+			<transition NAME="finish move" NEXT_STATE_ID="4" EVENT_ID="505">
+				<action ID="42" />
+			</transition>
+			<transition NAME="Safety init" NEXT_STATE_ID="22" EVENT_ID="1">
+				<action ID="8" />
+			</transition>
+		</state>
+		<state NAME="checkn Delete" ID="30">
+			<transition NAME="StNo" NEXT_STATE_ID="2" EVENT_ID="203">
+				<action ID="100" />
+			</transition>
+			<transition NAME="StYes" NEXT_STATE_ID="1" EVENT_ID="204">
+				<action ID="100" />
+			</transition>
+		</state>
+	</stateMachine>
+	<stateMachine NAME="AffineInteractions ctrl-drag">
+    <state NAME="start" ID="0" START_STATE="TRUE">
+      <transition NAME="leftButtonPress" NEXT_STATE_ID="12" EVENT_ID="5">  <!-- CTRL+LBM_Down ==> SeCHECKELEMENT  -->
+				<action ID="30" />
+			</transition>            
+      <transition NAME="leftButtonPress" NEXT_STATE_ID="12" EVENT_ID="540">  <!-- SHIFT+CTRL+LBM_Down ==> SeADD  -->            
+				<action ID="11" />
+			</transition>       
+      <transition NAME="middleButtonPress" NEXT_STATE_ID="14" EVENT_ID="6">  <!-- CTRL+MBM_Down ==> SeCHECKELEMENT  -->
+				<action ID="30" />
+			</transition>       
+      <transition NAME="rightButtonPress" NEXT_STATE_ID="13" EVENT_ID="7">  <!-- CTRL+RBM_Down ==> SeCHECKELEMENT  -->
+				<action ID="30" />
+			</transition> 
+    </state>
+   <state NAME="picked guard Translate" ID="12">
+      <transition NAME="yes" NEXT_STATE_ID="2" EVENT_ID="204"> <!-- StYES -->
+				<action ID="1000" />
+			</transition> 
+      <transition NAME="no" NEXT_STATE_ID="0" EVENT_ID="203">  <!-- StNO -->
+				<action ID="0" />
+			</transition> 
+   </state>
+   <state NAME="picked guard Scale" ID="13">
+      <transition NAME="yes" NEXT_STATE_ID="3" EVENT_ID="204"> <!-- StYES -->
+				<action ID="1002" />
+			</transition> 
+      <transition NAME="no" NEXT_STATE_ID="0" EVENT_ID="203">  <!-- StNO -->
+				<action ID="0" />
+			</transition> 
+   </state>
+    <state NAME="picked guard Rotate" ID="14">
+      <transition NAME="yes" NEXT_STATE_ID="4" EVENT_ID="204"> <!-- StYES -->
+				<action ID="1004" />
+			</transition> 
+      <transition NAME="no" NEXT_STATE_ID="0" EVENT_ID="203">  <!-- StNO -->
+				<action ID="0" />
+			</transition> 
+    </state>
+    <state NAME="translating" ID="2">
+      <transition NAME="leftButtonMove" NEXT_STATE_ID="2" EVENT_ID="534"> <!-- CTRL+LBM_Move ==> SeTRANSLATE  -->
+				<action ID="1001" />
+			</transition> 
+      <transition NAME="leftButtonRelease" NEXT_STATE_ID="0" EVENT_ID="505"> <!-- LBM_Release ==> SeTRANSLATE  -->
+				<action ID="1001" />
+			</transition> 
+      <transition NAME="leftButtonRelease" NEXT_STATE_ID="0" EVENT_ID="537"> <!-- CTRL+LBM_Release ==> SeTRANSLATE  -->
+				<action ID="1001" />
+			</transition> 
+   </state>
+   <state NAME="rotating" ID="4">
+      <transition NAME="middleButtonMove" NEXT_STATE_ID="4" EVENT_ID="536">  <!-- CTRL+MBM_Move ==> SeROTATE  -->
+				<action ID="1005" />
+			</transition> 
+      <transition NAME="middleButtonRelease" NEXT_STATE_ID="0" EVENT_ID="506">  <!-- MBM_Release ==> SeROTATE  -->
+				<action ID="1005" />
+			</transition> 
+      <transition NAME="middleButtonRelease" NEXT_STATE_ID="0" EVENT_ID="539">  <!-- CTRL+MBM_Release ==> SeROTATE  -->
+				<action ID="1005" />
+			</transition> 
+   </state>
+   <state NAME="scaling" ID="3">
+      <transition NAME="rightButtonMove" NEXT_STATE_ID="3" EVENT_ID="535">  <!-- CTRL+RBM_Move ==> SeSCALE  -->
+				<action ID="1003" />
+			</transition> 
+      <transition NAME="rightButtonRelease" NEXT_STATE_ID="0" EVENT_ID="507">  <!-- RBM_Release ==> SeSCALE  -->
+        <action ID="1003" />
+			</transition> 
+      <transition NAME="rightButtonRelease" NEXT_STATE_ID="0" EVENT_ID="538">  <!-- CTRL+RBM_Release ==> SeSCALE  -->
+        <action ID="1003" />
+			</transition> 
+  </state>
+    </stateMachine>
+    
+	<stateMachine NAME="AffineInteractions ctrl-drag_marcus">
+		<state NAME="start" ID="0" START_STATE="TRUE">
+			<transition NAME="leftButtonPress" NEXT_STATE_ID="12" EVENT_ID="1"> <!-- 30 = SeCHECKELEMENT  -->
+				<action ID="30" />
+			</transition>
+			<transition NAME="rightButtonPress" NEXT_STATE_ID="13" EVENT_ID="2"> <!-- 1002 = SeSCALESTART  -->
+				<action ID="30" />
+			</transition>
+			<transition NAME="middleButtonPress" NEXT_STATE_ID="14" EVENT_ID="4"> <!-- 1004 = SeROTATESTART  -->
+				<action ID="30" />
+			</transition>
+		</state>
+		<state NAME="picked guard Translate" ID="12">
+			<transition NAME="yes" NEXT_STATE_ID="2" EVENT_ID="204"> <!-- StYES -->
+				<action ID="1000" />
+			</transition>
+			<transition NAME="no" NEXT_STATE_ID="0" EVENT_ID="203"> <!-- StNO -->
+				<action ID="0" />
+			</transition>
+		</state>
+		<state NAME="picked guard Scale" ID="13">
+			<transition NAME="yes" NEXT_STATE_ID="3" EVENT_ID="204"> <!-- StYES -->
+				<action ID="1002" />
+			</transition>
+			<transition NAME="no" NEXT_STATE_ID="0" EVENT_ID="203"> <!-- StNO -->
+				<action ID="0" />
+			</transition>
+		</state>
+		<state NAME="picked guard Rotate" ID="14">
+			<transition NAME="yes" NEXT_STATE_ID="4" EVENT_ID="204"> <!-- StYES -->
+				<action ID="1004" />
+			</transition>
+			<transition NAME="no" NEXT_STATE_ID="0" EVENT_ID="203"> <!-- StNO -->
+				<action ID="0" />
+			</transition>
+		</state>
+		<state NAME="translating" ID="2">
+			<transition NAME="leftButtonMove" NEXT_STATE_ID="2" EVENT_ID="530"> <!-- 1000 = SeTRANSLATE  -->
+				<action ID="1001" />
+			</transition>
+			<transition NAME="leftButtonRelease" NEXT_STATE_ID="0" EVENT_ID="505"> <!-- 1000 = SeTRANSLATE  -->
+				<action ID="1001" />
+			</transition>
+			<transition NAME="leftButtonRelease" NEXT_STATE_ID="0" EVENT_ID="537"> <!-- CTRL+LBM_Release ==> SeTRANSLATE  -->
+				<action ID="1001" />
+			</transition>			
+		</state>
+		<state NAME="scaling" ID="3">
+			<transition NAME="rightButtonMove" NEXT_STATE_ID="3" EVENT_ID="531"> <!-- 1003 = SeSCALE  -->
+				<action ID="1003" />
+			</transition>
+			<transition NAME="rightButtonRelease" NEXT_STATE_ID="0" EVENT_ID="507"> <!-- 1003 = SeSCALE  -->
+				<action ID="1003" />
+			</transition>
+			<transition NAME="rightButtonRelease" NEXT_STATE_ID="0" EVENT_ID="538">  <!-- CTRL+RBM_Release ==> SeSCALE  -->			
+				<action ID="1003" />
+			</transition>			
+		</state>
+		<state NAME="rotating" ID="4">
+			<transition NAME="middleButtonMove" NEXT_STATE_ID="4" EVENT_ID="533"> <!-- 1005 = SeROTATE  -->
+				<action ID="1005" />
+			</transition>
+			<transition NAME="middleButtonRelease" NEXT_STATE_ID="0" EVENT_ID="506"> <!-- 1005 = SeROTATE  -->
+				<action ID="1005" />
+			</transition>
+			<transition NAME="middleButtonRelease" NEXT_STATE_ID="0" EVENT_ID="539"> <!-- 1005 = SeROTATE  -->
+				<action ID="1005" />
+			</transition>
+		</state>
+	</stateMachine>
+	<stateMachine NAME="AffineInteractions click to select">
+		<state NAME="start" ID="1" START_STATE="TRUE">
+			<transition NAME="leftButtonPress" NEXT_STATE_ID="2" EVENT_ID="1"> <!-- 30 = SeCHECKELEMENT  -->
+				<action ID="30" />
+			</transition>
+		</state>
+		<state NAME="object selected check" ID="2">
+			<transition NAME="yes" NEXT_STATE_ID="10" EVENT_ID="204"> <!-- StYES -->
+				<action ID="0" />
+			</transition>
+			<transition NAME="no" NEXT_STATE_ID="1" EVENT_ID="203"> <!-- StNO -->
+				<action ID="0" />
+			</transition>
+		</state>
+		<state NAME="neutral" ID="10">
+			<transition NAME="leftButtonPress" NEXT_STATE_ID="20" EVENT_ID="1"> <!-- 30 = SeCHECKELEMENT  -->
+				<action ID="30" />
+			</transition>
+			<transition NAME="rightButtonPress" NEXT_STATE_ID="31" EVENT_ID="2"> <!-- 1002 = SeSCALESTART  -->
+				<action ID="1002" />
+			</transition>
+			<transition NAME="middleButtonPress" NEXT_STATE_ID="41" EVENT_ID="4"> <!-- 1004 = SeROTATESTART  -->
+				<action ID="1004" />
+			</transition>
+		</state>
+		<state NAME="object deselect check" ID="20">
+			<transition NAME="yes" NEXT_STATE_ID="21" EVENT_ID="204"> <!-- 1000 = SeTRANSLATESTART -->
+				<action ID="1000" />
+			</transition>
+			<transition NAME="no" NEXT_STATE_ID="1" EVENT_ID="203"> <!-- StNO -->
+				<action ID="0" />
+			</transition>
+		</state>
+		<state NAME="translating" ID="21">
+			<transition NAME="leftButtonMove" NEXT_STATE_ID="21" EVENT_ID="530"> <!-- 1001 = SeTRANSLATE  -->
+				<action ID="1000" />
+			</transition>
+			<transition NAME="leftButtonRelease" NEXT_STATE_ID="10" EVENT_ID="505"> <!-- 0 = no sideeffect  -->
+				<action ID="0" />
+			</transition>
+		</state>
+		<state NAME="scaling" ID="31">
+			<transition NAME="rightButtonMove" NEXT_STATE_ID="31" EVENT_ID="531"> <!-- 1003 = SeSCALE  -->
+				<action ID="1003" />
+			</transition>
+			<transition NAME="rightButtonRelease" NEXT_STATE_ID="10" EVENT_ID="507"> <!-- 0 = no sideeffect  -->
+				<action ID="0" />
+			</transition>
+		</state>
+		<state NAME="rotating" ID="41">
+			<transition NAME="middleButtonMove" NEXT_STATE_ID="41" EVENT_ID="533"> <!-- 1005 = SeROTATE  -->
+				<action ID="1005" />
+			</transition>
+			<transition NAME="middleButtonRelease" NEXT_STATE_ID="10" EVENT_ID="506"> <!-- 0 = no sideeffect  -->
+				<action ID="0" />
+			</transition>
+		</state>
 	</stateMachine>
 	<!-- -->
 	<!-- -->
 	<!-- EventDescriptions -->
 	<events STYLE="Powerpoint">
 		<!-- left MouseButton -->
-		<event NAME="left MouseBN" ID="1" TYPE="2" BUTTON="0x0001" BUTTONSTATE="0x0000" KEY="0xffff" />
-		<!-- <event NAME="DrawObject"   ID="2" TYPE="MouseButtonPress" BUTTON="LeftButton" BUTTONSTATE="NoButton" KEY="Key_unknown" />  -->
+		<event NAME="left MouseBN" ID="1" TYPE="Type_MouseButtonPress" BUTTON="BS_LeftButton" BUTTONSTATE="0x0000" KEY="Key_none" />
+		<!-- right MouseButton -->
+		<event NAME="right MouseBN" ID="2" TYPE="Type_MouseButtonPress" BUTTON="BS_RightButton" BUTTONSTATE="0x0000" KEY="Key_none" />
 		<!-- Shift + left MouseButton -->
-		<event NAME="left MouseBN + Shift" ID="3" TYPE="2" BUTTON="0x0001" BUTTONSTATE="0x0100" KEY="0xffff" />
-		<!-- <event NAME="Snapping_Adding"  ID="3" TYPE="MouseButtonPress" BUTTON="LeftButton" BUTTONSTATE="ShiftButton" KEY="Key_unknown" />-->
+		<event NAME="left MouseBN + Shift" ID="3" TYPE="Type_MouseButtonPress" BUTTON="BS_LeftButton" BUTTONSTATE="0x0100" KEY="Key_none" />
+		<!-- middle MouseButton -->
+		<event NAME="middle MouseBN" ID="4" TYPE="Type_MouseButtonPress" BUTTON="BS_MidButton" BUTTONSTATE="0x0000" KEY="Key_none" />
 		<!-- Strg + N -->
-		<event NAME="Strg + N" ID="10" TYPE="6" BUTTON="0x0000" BUTTONSTATE="0x0200" KEY="0x4e" />
-		<!-- <event NAME="NewObject" ID="1" TYPE="KeyPress" BUTTON="NoButton" BUTTONSTATE="ControlButton" KEY="Key_N" /> -->
+		<event NAME="Strg + N" ID="10" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0200" KEY="Key_N" />
 		<!-- Strg + E -->
-		<event NAME="Strg + E" ID="11" TYPE="6" BUTTON="0x0000" BUTTONSTATE="0x0200" KEY="0x45" />
-		<!-- <event NAME="Strg + E"  ID="4" TYPE="KeyPress" BUTTON="NoButton" BUTTONSTATE="ControlButton" KEY="Key_E" />-->
+		<event NAME="Strg + E" ID="11" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0200" KEY="Key_E" />
+		<!-- Delete -->
+		<event NAME="Delete" ID="12" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_Delete" />
+		<!-- leftMouseButtonRelease -->
+		<event NAME="leftMouseRelease" ID="505" TYPE="Type_MouseButtonRelease" BUTTON="BS_LeftButton" BUTTONSTATE="0x0001" KEY="Key_none" />
+		<!-- MiddleMouseButtonRelease -->
+		<event NAME="MiddleMouseRelease" ID="506" TYPE="Type_MouseButtonRelease" BUTTON="BS_MidButton" BUTTONSTATE="0x0004" KEY="Key_none" />
+		<!-- RightMouseButtonRelease -->
+		<event NAME="RightMouseRelease" ID="507" TYPE="Type_MouseButtonRelease" BUTTON="BS_RightButton" BUTTONSTATE="0x0002" KEY="Key_none" />
+		<!-- Shift + left MouseButtonRelease -->
+		<event NAME="left MouseBNRelease+Shift" ID="508" TYPE="Type_MouseButtonRelease" BUTTON="BS_LeftButton" BUTTONSTATE="0x0101" KEY="Key_none" />
+		<!-- MouseMove -->
+		<event NAME="MouseMove" ID="520" TYPE="Type_MouseMove" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_none" />
+		<!-- left MouseButton and MouseMove -->
+		<event NAME="leftBN+MouseMove" ID="530" TYPE="Type_MouseMove" BUTTON="BS_NoButton" BUTTONSTATE="0x0001" KEY="Key_none" />
+		<!-- right MouseButton and MouseMove -->
+		<event NAME="rightBN+MouseMove" ID="531" TYPE="Type_MouseMove" BUTTON="BS_NoButton" BUTTONSTATE="0x0002" KEY="Key_none" />
+		<!-- middle MouseButton and MouseMove -->
+		<event NAME="middleBN+MouseMove" ID="533" TYPE="Type_MouseMove" BUTTON="BS_NoButton" BUTTONSTATE="0x0004" KEY="Key_none" />
+
+    <!-- CTRL + left MouseButton and MouseMove -->
+    <event NAME="CTRL+leftBN+MouseMove" ID="534" TYPE="Type_MouseMove" BUTTON="BS_NoButton" BUTTONSTATE="0x0201" KEY="Key_none" />
+    <!-- CTRL + right MouseButton and MouseMove -->
+    <event NAME="CTRL+rightBN+MouseMove" ID="535" TYPE="Type_MouseMove" BUTTON="BS_NoButton" BUTTONSTATE="0x0202" KEY="Key_none" />
+    <!-- CTRL + middle MouseButton and MouseMove -->
+    <event NAME="CTRL+middleBN+MouseMove" ID="536" TYPE="Type_MouseMove" BUTTON="BS_NoButton" BUTTONSTATE="0x0204" KEY="Key_none" />
+
+		<!-- Ctrl + left MouseButton -->
+    <event NAME="CTRL+leftBN" ID="5" TYPE="Type_MouseButtonPress" BUTTON="BS_LeftButton" BUTTONSTATE="0x0200" KEY="Key_none" />
+    <!-- Ctrl + middle MouseButton -->
+    <event NAME="CTRL+middleBN" ID="6" TYPE="Type_MouseButtonPress" BUTTON="BS_MidButton" BUTTONSTATE="0x0200" KEY="Key_none" />
+
+    <!-- Ctrl + right MouseButton -->
+    <event NAME="CTRL+rightBN" ID="7" TYPE="Type_MouseButtonPress" BUTTON="BS_RightButton" BUTTONSTATE="0x0200" KEY="Key_none" />
+
+    <!-- CTRL + left MouseButtonRelease -->
+    <event NAME="CTRL+leftBNRelease" ID="537" TYPE="Type_MouseButtonRelease" BUTTON="BS_LeftButton" BUTTONSTATE="0x0201" KEY="Key_none" />
+    <!-- CTRL + right MouseButtonRelease -->
+    <event NAME="CTRL+rightBNRelease" ID="538" TYPE="Type_MouseButtonRelease" BUTTON="BS_RightButton" BUTTONSTATE="0x0202" KEY="Key_none" />
+    <!-- CTRL + middle MouseButtonRelease -->
+    <event NAME="CTRL+middleBNRelease" ID="539" TYPE="Type_MouseButtonRelease" BUTTON="BS_MidButton" BUTTONSTATE="0x0204" KEY="Key_none" />
+
+    <!-- Shift + Ctrl + left MouseButton -->
+    <event NAME="SHIFT+CTRL+middleBN" ID="540" TYPE="Type_MouseButtonPress" BUTTON="BS_LeftButton" BUTTONSTATE="0x0300" KEY="Key_none" />
+
+		
 		<!-- -->
-		<!-- eigens ausgeloeste Events/ intern -->
-		<!-- fuer State-Transition-Handling-->
-		<event NAME="new" ID="200" TYPE="1000" BUTTON="0x0000" BUTTONSTATE="0x0000" KEY="0xffff" />
-		<!--7<event NAME="IsNewPoint"  ID="200" TYPE="User" BUTTON="NoButton" BUTTONSTATE="NoButton" KEY="Key_none" />-->
-		<event NAME="old" ID="201" TYPE="1000" BUTTON="0x0000" BUTTONSTATE="0x0000" KEY="0xffff" />
-		<!--<event NAME="IsOldPoint"  ID="201" TYPE="User" BUTTON="NoButton" BUTTONSTATE="NoButton" KEY="Key_none" />-->
-		<event NAME="finished" ID="202" TYPE="1000" BUTTON="0x0000" BUTTONSTATE="0x0000" KEY="0xffff" />
-		<!--<event NAME="ready"  ID="202" TYPE="User" BUTTON="NoButton" BUTTONSTATE="NoButton" KEY="Key_none" />-->
-		<event NAME="no" ID="203" TYPE="1000" BUTTON="0x0000" BUTTONSTATE="0x0000" KEY="0xffff" />
-		<!--<event NAME="no"  ID="203" TYPE="User" BUTTON="NoButton" BUTTONSTATE="NoButton" KEY="Key_none" />-->
-		<event NAME="yes" ID="204" TYPE="1000" BUTTON="0x0000" BUTTONSTATE="0x0000" KEY="0xffff" />
-		<!--<event NAME="yes"  ID="204" TYPE="User" BUTTON="NoButton" BUTTONSTATE="NoButton" KEY="Key_none" />-->
-		<event NAME="same" ID="205" TYPE="1000" BUTTON="0x0000" BUTTONSTATE="0x0000" KEY="0xffff" />
-		<!--<event NAME="same"  ID="205" TYPE="User" BUTTON="NoButton" BUTTONSTATE="NoButton" KEY="Key_none" />-->
-		<event NAME="no and last object" ID="206" TYPE="1000" BUTTON="0x0000" BUTTONSTATE="0x0000" KEY="0xffff" />
-		<!--<event NAME="no&LastObject"  ID="206" TYPE="User" BUTTON="NoButton" BUTTONSTATE="NoButton" KEY="Key_none" />-->
-		<event NAME="no and not last object" ID="207" TYPE="1000" BUTTON="0x0000" BUTTONSTATE="0x0000" KEY="0xffff" />
-		<!--<event NAME="no&notLastObject"  ID="207" TYPE="User" BUTTON="NoButton" BUTTONSTATE="NoButton" KEY="Key_none" />-->
-		<event NAME="last" ID="208" TYPE="1000" BUTTON="0x0000" BUTTONSTATE="0x0000" KEY="0xffff" />
-		<!--<event NAME="last"  ID="208" TYPE="User" BUTTON="NoButton" BUTTONSTATE="NoButton" KEY="Key_none" />-->
-		<event NAME="not last" ID="209" TYPE="1000" BUTTON="0x0000" BUTTONSTATE="0x0000" KEY="0xffff" />
-		<!--<event NAME="not last"  ID="209" TYPE="User" BUTTON="NoButton" BUTTONSTATE="NoButton" KEY="Key_none" />-->
+		<!-- -->
+		<!-- own thrown events -->
+		<!-- *****Important*****: has to be set in mitkInteractionConst.h-->
+		<event NAME="new" ID="1000" TYPE="Type_User" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_none" />
+		<event NAME="old" ID="1001" TYPE="Type_User" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_none" />
+		<event NAME="finished" ID="1002" TYPE="Type_User" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_none" />
+		<event NAME="StNo" ID="1003" TYPE="Type_User" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_none" />
+		<event NAME="StYES" ID="1004" TYPE="Type_User" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_none" />
+		<event NAME="same" ID="1005" TYPE="Type_User" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_none" />
+		<event NAME="no	and last object" ID="1006" TYPE="Type_User" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_none" />
+		<event NAME="no and not last object" ID="1007" TYPE="Type_User" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_none" />
+		<event NAME="last" ID="1008" TYPE="Type_User" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_none" />
+		<event NAME="not last" ID="1009" TYPE="Type_User" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_none" />
+		<!-- for n-PointRoi-->
+		<event NAME="StSMALERNMINUS1 " ID="1010" TYPE="Type_User" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_none" />
+		<event NAME="StLARGERNMINUS1" ID="1011" TYPE="Type_User" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_none" />
+		<!-- -->
+		<!-- -->
 		<!-- Sonstiges -->
-		<event NAME="PositionEvent"  ID="500" TYPE="2" BUTTON="0x0001" BUTTONSTATE="0x0000" KEY="0xffff" />
-		<!-- MouseButtonPress -->
-		<event NAME="PositionEvent"  ID="505" TYPE="3" BUTTON="0x0001" BUTTONSTATE="0x0000" KEY="0xffff" />
-		<!-- MouseButtonRelease -->
-		<!-- DoubleClick <event NAME="PositionEvent"  ID="500" TYPE="4" BUTTON="" BUTTONSTATE="" KEY="" />-->
-		<!-- MouseMove <event NAME="PositionEvent"  ID="500" TYPE="5" BUTTON="" BUTTONSTATE="" KEY="" />-->
+		<event NAME="PositionEvent" ID="1012" TYPE="Type_MouseButtonPress" BUTTON="BS_LeftButton" BUTTONSTATE="0x0000" KEY="Key_none" />
+		<!-- DoubleClick <event NAME="PositionEvent"  		ID="510" TYPE="4" BUTTON="0x0001" BUTTONSTATE="0x0000" KEY="0xffff" />-->
+		<!-- for external thrown Events-->
+		<event NAME="clear" ID="1100" TYPE="Type_User" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_none" />
 	</events>
 </mitkInteraktionStates>
 <!-- DOKUMENTATION -->
 <!-- this is StateMachine.xml| includes Information about different StateMachines and Events. Used by EventMapper and StateMachineFactory-->
-<!-- Event: ether in Key or in Button, not in both! Key is only checked if the type is a keypressed(/released)-->
+<!-- ***WARNING*** do not use any &, % and so on in NAME -->
 <!-- -->
 <!-- -->
-<!-- <event NAME=""  ID="" TYPE="" BUTTON="" BUTTONSTATE="" KEY="" /> -->
-<!-- <transition NAME="" NEXT_STATE_ID="" EVENT_ID="" SIDE_EFFECT_ID="" /> -->
-<!-- <state NAME="" ID=""> </state> -->
+<!-- FAQ -->
+<!-- Question: the Application, that is loading this file doesn't act on the Interaction. Why? -->
+<!-- The QXMLFileLoader probably isn't able to load the file due to an error.-->
+<!-- Check the file for XML-Syntax like  "<" at beginning and "/>" at end -->

@@ -173,6 +173,11 @@ bool mitk::SlicedGeometry3D::IsValidSlice(int s) const
 }
 
 //##ModelId=3E3BE8CF010E
+/**
+ * @warning the values of passe the spacing parameter are not checked for correctness! 
+ *  When passing wrong values application can hang and/or crash --> 
+ * @todo Implement tests!
+ */
 void mitk::SlicedGeometry3D::SetSpacing(mitk::Vector3D aSpacing)
 {
   bool hasEvenlySpacedPlaneGeometry=false;

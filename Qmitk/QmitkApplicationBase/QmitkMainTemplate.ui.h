@@ -13,6 +13,7 @@
 #include <mitkSurfaceData.h>
 #include <mitkColorProperty.h>
 #include <mitkFloatProperty.h>
+#include <qregexp.h>
 
 mitk::FloatProperty::Pointer opacityprop=NULL;
 
@@ -61,7 +62,7 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
             //mitkMultiWidget->mitkWidget3->GetRenderer()->SetData(it);
             mitkMultiWidget->mitkWidget4->GetRenderer()->SetData(it);
 
-            //delete it;
+            delete it;
         }
     }
     else
@@ -103,6 +104,7 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
             //	   Vector3f(0,0,header->n[2])
             //	   );
             //       ipPicFree(header);
+            delete it;
         }
     }
     if(node != NULL)
@@ -126,6 +128,49 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
     }
 }
 
+void QmitkMainTemplate::fileOpenImageSequence()
+{
+    QString fileName = QFileDialog::getOpenFileName(NULL,"DKFZ Pic (*.seq *.pic *.pic.gz *.seq.gz);;stl files (*.stl)");
+
+    if ( !fileName.isNull() )
+    {
+        int start = fileName.find( QRegExp("[0-9]"), 0 );
+        if(start<0)
+        {
+            fileOpen(fileName.ascii());
+            return;
+        }
+        
+        char prefix[1024], pattern[1024];
+
+        strncpy(prefix, fileName.ascii(), start);
+        prefix[start]=0;
+
+        int stop=fileName.find( QRegExp("[^0-9]"), start );
+        sprintf(pattern, "%%s%%0%uu%s",stop-start,fileName.ascii()+stop);
+
+        mitk::PicFileReader::Pointer reader;
+        reader=mitk::PicFileReader::New();
+
+        std::cout << "loading " << fileName << " interpreted as image sequence mask: prefix " << prefix << " pattern: " << pattern << std::endl;
+
+        reader->SetFilePrefix(prefix);
+        reader->SetFilePattern(pattern);
+
+        mitk::DataTreeIterator* it=tree->inorderIterator();
+
+        mitk::DataTreeNode::Pointer node;
+        node=mitk::DataTreeNode::New();
+        node->SetData(reader->GetOutput());
+        it->add(node); 
+
+        initWidgets(node);
+
+        mitkMultiWidget->updateMitkWidgets();
+
+        delete it;
+    }
+}
 
 void QmitkMainTemplate::initWidget(mitk::DataTreeIterator* it,
 				   QmitkSelectableGLWidget* widget,
@@ -391,3 +436,4 @@ void QmitkMainTemplate::initWidgets( mitk::DataTreeNode::Pointer node )
                 Vector3f(bounds[0],bounds[2],bounds[5])
                 );
 }
+

@@ -56,6 +56,7 @@
     <item text="&amp;File" name="fileMenu">
         <action name="fileNewAction"/>
         <action name="fileOpenAction"/>
+        <action name="fileOpenImageSequenceAction"/>
         <action name="fileSaveAction"/>
         <action name="fileSaveAsAction"/>
         <separator/>
@@ -336,6 +337,17 @@
             <string></string>
         </property>
     </action>
+    <action>
+        <property name="name">
+            <cstring>fileOpenImageSequenceAction</cstring>
+        </property>
+        <property name="text">
+            <string>Open Image Sequence...</string>
+        </property>
+        <property name="toolTip">
+            <string>Open Image Sequence</string>
+        </property>
+    </action>
 </actions>
 <connections>
     <connection>
@@ -428,6 +440,12 @@
         <receiver>QmitkMainTemplate</receiver>
         <slot>helpAbout()</slot>
     </connection>
+    <connection>
+        <sender>fileOpenImageSequenceAction</sender>
+        <signal>activated()</signal>
+        <receiver>QmitkMainTemplate</receiver>
+        <slot>fileOpenImageSequence()</slot>
+    </connection>
 </connections>
 <includes>
     <include location="global" impldecl="in declaration">DataTree.h</include>
@@ -475,6 +493,7 @@
     <slot>helpContents()</slot>
     <slot>helpAbout()</slot>
     <slot>initWidgets( mitk::DataTreeNode::Pointer node )</slot>
+    <slot>fileOpenImageSequence()</slot>
 </slots>
 <functions>
     <function access="protected">fileOpen( const char * fileName )</function>

@@ -6,7 +6,7 @@
 
 //##ModelId=3EAD420E0088
 mitk::GlobalInteraction::GlobalInteraction(std::string type)
-: StateMachine(type)
+: StateMachine(type), m_Roi(NULL)
 {
 	//Quickimplementation ... Ivo: No Need of focus, cause glWidget sends the Event now.
 	//m_Focus = new mitk::Focus("focus");
@@ -192,7 +192,8 @@ and the Focus changes.
 
 //Quickimplementation
 	//ask if the statemachine of that roi can do anything with that event.
-	ok = m_Roi->HandleEvent(stateEvent);
+    if(m_Roi!=NULL)
+	    ok = m_Roi->HandleEvent(stateEvent);
 
 	return ok;
 }

@@ -110,7 +110,7 @@ void mitk::DisplayGeometry::DisplayToMM(const mitk::Point2D &pt_display, mitk::P
 void mitk::DisplayGeometry::MMToDisplay(const mitk::Point2D &pt_mm, mitk::Point2D &pt_display) const
 {
     if(m_WorldGeometry.IsNull()) return;
-    m_WorldGeometry->UnitsToMM(pt_mm, pt_display);
+    m_WorldGeometry->MMToUnits(pt_mm, pt_display);
 
     UnitsToDisplay(pt_display, pt_display);
 }
@@ -128,7 +128,7 @@ void mitk::DisplayGeometry::DisplayToMM(const mitk::Vector2D &vec_display, mitk:
 void mitk::DisplayGeometry::MMToDisplay(const mitk::Vector2D &vec_mm, mitk::Vector2D &vec_display) const
 {
     if(m_WorldGeometry.IsNull()) return;
-    m_WorldGeometry->UnitsToMM(vec_mm, vec_display);
+    m_WorldGeometry->MMToUnits(vec_mm, vec_display);
 
     UnitsToDisplay(vec_display, vec_display);
 }
@@ -201,7 +201,7 @@ void mitk::DisplayGeometry::ULDisplayToMM(const mitk::Point2D &pt_ULdisplay, mit
 void mitk::DisplayGeometry::MMToULDisplay(const mitk::Point2D &pt_mm, mitk::Point2D &pt_ULdisplay) const
 {
     if(m_WorldGeometry.IsNull()) return;
-    m_WorldGeometry->UnitsToMM(pt_mm, pt_ULdisplay);
+    m_WorldGeometry->MMToUnits(pt_mm, pt_ULdisplay);
 
     UnitsToULDisplay(pt_ULdisplay, pt_ULdisplay);
 }
@@ -219,7 +219,7 @@ void mitk::DisplayGeometry::ULDisplayToMM(const mitk::Vector2D &vec_ULdisplay, m
 void mitk::DisplayGeometry::MMToULDisplay(const mitk::Vector2D &vec_mm, mitk::Vector2D &vec_ULdisplay) const
 {
     if(m_WorldGeometry.IsNull()) return;
-    m_WorldGeometry->UnitsToMM(vec_mm, vec_ULdisplay);
+    m_WorldGeometry->MMToUnits(vec_mm, vec_ULdisplay);
 
     UnitsToULDisplay(vec_ULdisplay, vec_ULdisplay);
 }
@@ -267,7 +267,7 @@ void mitk::DisplayGeometry::SetSizeInDisplayUnits(unsigned int width, unsigned i
 }
 
 //##ModelId=3E3C36CD02D2
-void mitk::DisplayGeometry::SetOriginInUnits(const mitk::Point2D& origin_units)
+void mitk::DisplayGeometry::SetOriginInUnits(const mitk::Vector2D& origin_units)
 {
     m_OriginInUnits=origin_units;
     UnitsToDisplay(m_OriginInUnits, m_OriginInDisplayUnits);

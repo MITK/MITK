@@ -9,14 +9,32 @@ namespace mitk {
 
 //##ModelId=3E3AE8F401DD
 //##Documentation
-//## @brief Describes the geometry on the Display (inside a widget)
+//## @brief Describes the geometry on the display/screen for 2D display.
 //## @ingroup Geometry
-//## Describes the geometry on the Display (inside a widget). Can convert
-//## between Display units and data units (as stored in Geometry2D). Can depend
-//## on a Geometry2D describing the data. If so, it can directly convert from
-//## Display units to mm (via PointUnitsToMM) and vice versa (via
-//## PointMMToUnits). Also provides convenience methods for zooming and
-//## panning.
+//## The main purpose of this class is to convert between display coordinates
+//## (in display-units) and world coordinates (in mm).
+//## DisplayGeometry depends on the size of the display area (widget width and
+//## height, m_SizeInDisplayUnits) and on a Geometry2D (m_WoldGeometry). It
+//## represents a recangular view on this world-geometry. E.g., you can tell
+//## the DisplayGeometry to fit the world-geometry in the display area by
+//## calling Fit(). Provides methods for zooming and panning.
+//## @warning @em Units refers to the units of the underlying world-geometry.
+//## Take care, whether these are really the units you want to convert to.
+//## E.g., when you want to convert a point @a pt_display (which is 2D) given
+//## in display coordinates into a point in units of a BaseData-object @a datum
+//## (the requested point is 3D!), use
+//## @code
+//## displaygeometry->DisplayToMM(pt_display, pt_mm);
+//## datum->GetGeometry()->MMToUnits(pt_mm, pt_datum_units);
+//## @endcode
+//## Even, if you want to convert the 2D point @a pt_display into a 2D point in
+//## units on a certain 2D geometry @a certaingeometry, it is safer to use
+//## @code
+//## displaygeometry->DisplayToMM(pt_display, pt_mm);
+//## certaingeometry->MMToUnits(pt_mm, pt_certain_geometry_units);
+//## @endcode
+//## unless you can be sure that the underlying geometry of @a displaygeometry
+//## is really the @a certaingeometry.
 class DisplayGeometry : public Geometry2D
 {
 public:
@@ -49,7 +67,7 @@ public:
     //##ModelId=3E3C36920345
     virtual void SetSizeInDisplayUnits(unsigned int width, unsigned int height);
     //##ModelId=3E3C36CD02D2
-    virtual void SetOriginInUnits(const mitk::Point2D& origin_units);
+    virtual void SetOriginInUnits(const mitk::Vector2D& origin_units);
     //##ModelId=3E3C516B0045
     mitk::Point2D GetOriginInUnits() const;
     //##ModelId=3E3C51890107

@@ -62,6 +62,9 @@ public:
   //##Documentation
   //## @brief Do the rendering. 
   //## If necessary, Update() and UpdateVtkActors() is called first.
+  //## The order of rendering is: First update the VTK Actors and render them, 
+  //## then prepare 2D-rendering informations with layers and render them.
+  //## Due to that order, 2D-Layers or e.g. a video can be manually put in the background
   virtual void Render();
 
   //##ModelId=3EF59AD20235

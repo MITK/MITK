@@ -1,9 +1,9 @@
 #ifndef MITKCOORDINATESUPPLIER_H
 #define MITKCOORDINATESUPPLIER_H
 
-#include "mitkVector.h"
 #include "mitkCommon.h"
 #include "StateMachine.h"
+#include "mitkVector.h"
 
 namespace mitk {
 

@@ -1,11 +1,14 @@
+#include "mitkDisplayCoordinateOperation.h"
+//has to be on top, otherwise compiler error!
 #include "mitkCoordinateSupplier.h"
 #include "Operation.h"
 #include "OperationActor.h"
 #include "mitkPointOperation.h"
 #include "PositionEvent.h"
-#include "mitkDisplayCoordinateOperation.h"
+//and not here!
 #include <string>
 #include "mitkInteractionConst.h"
+
 
 //##ModelId=3EDDD8F2001B
 mitk::CoordinateSupplier::CoordinateSupplier(std::string type, mitk::OperationActor* operationActor)

@@ -9,7 +9,8 @@ mitk::UndoController::UndoModelMap mitk::UndoController::m_UndoModelList;
 //##ModelId=3EDCAECC0176
 mitk::UndoController::UndoType mitk::UndoController::m_CurUndoType;
 
-static const mitk::UndoController::UndoType DEFAULTUNDOMODEL = LIMITEDLINEARUNDO;
+const mitk::UndoController::UndoType mitk::UndoController::DEFAULTUNDOMODEL = LIMITEDLINEARUNDO;
+
 
 mitk::UndoController::UndoController(UndoType undoType)
 {

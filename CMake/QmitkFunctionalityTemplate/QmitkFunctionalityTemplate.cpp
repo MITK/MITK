@@ -37,22 +37,22 @@ PURPOSE.  See the above copyright notices for more information.
 QmitkFunctionalityTemplate::QmitkFunctionalityTemplate(QObject *parent, const char *name, QmitkStdMultiWidget *mitkStdMultiWidget, mitk::DataTreeIteratorBase* it) : QmitkFunctionality(parent, name, it) ,
 controls(NULL), multiWidget(mitkStdMultiWidget)
 {
-    setAvailability(true);
+  setAvailability(true);
 }
 QmitkFunctionalityTemplate::~QmitkFunctionalityTemplate()
 {
 }
 QWidget * QmitkFunctionalityTemplate::createMainWidget(QWidget *parent)
 {
-		return NULL;
+  return NULL;
 }
 QWidget * QmitkFunctionalityTemplate::createControlWidget(QWidget *parent)
 {
-    if (controls == NULL)
-    {
-        controls = new QmitkFunctionalityTemplateControls(parent);        
-    }
-    return controls;
+  if (controls == NULL)
+  {
+    controls = new QmitkFunctionalityTemplateControls(parent);        
+  }
+  return controls;
 }
 
 void QmitkFunctionalityTemplate::createConnections()
@@ -64,9 +64,9 @@ void QmitkFunctionalityTemplate::createConnections()
 }
 QAction * QmitkFunctionalityTemplate::createAction(QActionGroup *parent)
 {
-    QAction* action;
-    action = new QAction( tr( "Functionality Template" ), QPixmap((const char**)icon_xpm), tr( "&Functionality Template" ), CTRL + Key_G, parent, "functionality template" );
-    return action;
+  QAction* action;
+  action = new QAction( tr( "Functionality Template" ), QPixmap((const char**)icon_xpm), tr( "&Functionality Template" ), CTRL + Key_G, parent, "functionality template" );
+  return action;
 }
 
 void QmitkFunctionalityTemplate::treeChanged()

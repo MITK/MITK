@@ -36,7 +36,7 @@ mitk::VtkRenderWindow* mitk::VtkRenderWindow::New()
 }
 
 // Construct object so that light follows camera motion.
-mitk::VtkRenderWindow::VtkRenderWindow() : m_MitkRenderer(NULL), m_FinishRendering(false)
+mitk::VtkRenderWindow::VtkRenderWindow() : m_MitkRenderer(NULL), m_FinishRendering(true)
 {
 }
 
@@ -63,6 +63,7 @@ void mitk::VtkRenderWindow::Render()
 void mitk::VtkRenderWindow::CopyResultFrame()
 {
   //if we are not about to finish rendering, then we don't swap buffers!
+  //due to this, stereo doesn't work anymore!?!
   if (!m_FinishRendering)
     return;
 

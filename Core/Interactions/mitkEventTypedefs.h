@@ -8,6 +8,7 @@
 namespace mitk {
     
 typedef ::QMouseEvent MouseEvent;
+typedef ::QWheelEvent WheelEvent;
 class KeyEvent : public ::QKeyEvent
 {
 

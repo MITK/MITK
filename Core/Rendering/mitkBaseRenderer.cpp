@@ -219,6 +219,12 @@ void mitk::BaseRenderer::MouseMoveEvent(mitk::MouseEvent *me)
   }
 }
 
+void mitk::BaseRenderer::WheelEvent(mitk::WheelEvent *we)
+{
+  //mitk::Event event(this, ke->type(), Qt::NoButton, Qt::NoButton, ke->key());
+  //mitk::EventMapper::MapEvent(&event);
+}
+
 //##ModelId=3E6D5DD4002A
 void mitk::BaseRenderer::KeyPressEvent(mitk::KeyEvent *ke)
 {

@@ -187,6 +187,10 @@ public:
   //## @brief Mouse event dispatchers
   //## @note for internal use only. preliminary.
   virtual void MouseMoveEvent(mitk::MouseEvent*);
+  //##Documentation
+  //## @brief Wheel event dispatcher
+  //## @note for internal use only. preliminary.
+  virtual void WheelEvent(mitk::WheelEvent*);
   //##ModelId=3E6D5DD4002A
   //##Documentation
   //## @brief Key event dispatcher

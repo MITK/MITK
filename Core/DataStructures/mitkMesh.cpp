@@ -5,6 +5,8 @@
 
 #include <mitkLineOperation.h>
 #include <mitkPointOperation.h>
+#include "mitkVector.h"
+
 #include "mitkStatusBar.h"
 #include "mitkInteractionConst.h"
 
@@ -62,30 +64,122 @@ void mitk::Mesh::ExecuteOperation(Operation* operation)
 		break;
 	case OpINSERTLINE:
     //insert a line in the given cellId
+    //the points with the given PointIds have to be in the pointset.
     //needed: CellId, first PointID and second PointID
+    //if a cell aready exists, that the line gets added to the cell. 
+    //To identify where to add the Line, we detect the given PointId, that has to be in the Cell, too, and 
+    //insert the line behind that position. Ids have to be in order: <existingId>, <newId>
+    //Example: existing:1,2,4; inserting 2,3 so that:1,2,3,4
 		{
       int cellId = lineOp->GetCellId();
       int pIdA = lineOp->GetPIdA();
       int pIdB = lineOp->GetPIdB();
 
+      //the points of the given PointIds have to exist in the PointSet
+      bool ok;
+      ok = m_ItkData->GetPoints()->IndexExists(pIdA);
+      if (!ok) 
+        return;
+      ok = m_ItkData->GetPoints()->IndexExists(pIdB);
+      if (!ok) 
+        return;
+
+      //so the points do exsist. So now check, if there is already a cell with the given Id
       DataType::CellAutoPointer cell;
-      //check if the cellId already exists. If yes, then manually add the line, if no, then only add the line.
-      bool ok = m_ItkData->GetCell(cellId, cell);
+      ok = m_ItkData->GetCell(cellId, cell);
       if (ok)//it already exists
       {
-        if( cell->GetType() == CellType::LINE_CELL )
+        //now we check, which PointIds of the given PointIds already exist in the cell
+        //exactly one equal Id has to exist; if it doesn't, then we quit!
+        PointIdIterator pit = cell->PointIdsBegin();
+        PointIdIterator end = cell->PointIdsEnd();
+        bool aEx = false; //bool for pIdA exists
+        bool bEx = false; //bool for pIdB exists
+        int posA, posB;//position of the PointId in the cell
+        int i = 0;
+        while( pit != end )
         {
-//          LineType * line = static_cast<LineType *>( cell );
+          if (*pit = pIdA)
+          {
+            aEx = true;
+            posA = i;
+          }
+          if (*pit = pIdB)
+          {
+            bEx = true;
+            posB = i;
+          }
+          i++;
         }
+        if (aEx && bEx)
+          return;//none and both Ids are not allowed, cause then they already should be connected 
+                 //or a new cell has to be made by an Interactor
+
+        //now store the old points into an array and add the new PointIds into the desired place
+        unsigned int nuPoints = cell->GetNumberOfPoints();
+        //const unsigned int newNuPoints = nuPoints +2;
+        std::vector<unsigned int> newPoints;//pointIds[newNuPoints];
+        pit = cell->PointIdsBegin();
+        end = cell->PointIdsEnd();
+        i = 0;
+        while( pit != end )
+        {
+          if ((*pit) = pIdA)
+          {
+            //now we have found the place to add the other after
+            newPoints[i] = (*pit);//of pIdA
+            i++;
+            newPoints[i] = pIdB;
+          }
+          else
+            newPoints[i] = (*pit);
+
+          pit++;
+        }
+
+        //now we have the Ids, that existed before combined with the new ones so delete the old cell
+        //doesn't seem to be necessary!
+
+        //and build up a new one:
+        switch (newPoints.size())
+        {
+        case 3:
+          cell.TakeOwnership( new TriangleType );
+        default:
+          cell.TakeOwnership( new PolygonType );
+        }
+
+        //add the new pointIds to the Cell
+        for (i = 0; i < newPoints.size(); i++)
+        {
+          cell->SetPointId(i, newPoints[i]);
+        }
+
       }
-      else //create it
-      {}
-
-
+      else //if the cell didn't exist before, then create it
+      {
+        CellAutoPointer line;
+        line.TakeOwnership( new LineType );
+        line->SetPointId( 0, pIdA ); // line between points 0 and 1
+        line->SetPointId( 1, pIdB );
+        m_ItkData->SetCell( cellId, line );
+      }
 		}
 		break;
 	case OpMOVELINE://(moves the points of the given cellId)
 		{
+      //create two operations out of the one operation and call superclass
+
+      ITKPoint3D pointA, pointB;
+      m_ItkData->GetPoint(lineOp->GetPIdA(), &pointA);
+      m_ItkData->GetPoint(lineOp->GetPIdB(), &pointB);
+      //pointA += lineOp->GetVector();
+      //pointB += lineOp->GetVector();
+      mitk::PointOperation* operationA = new mitk::PointOperation(OpMOVE, pointA, lineOp->GetPIdA());
+      mitk::PointOperation* operationB = new mitk::PointOperation(OpMOVE, pointB, lineOp->GetPIdB());
+
+      Superclass::ExecuteOperation(operationA);
+      Superclass::ExecuteOperation(operationB);
 		}
 		break;
 	case OpREMOVELINE://(removes the line between the two given points of the cellId)

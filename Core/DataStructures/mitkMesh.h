@@ -19,6 +19,15 @@ namespace mitk {
 //##@brief DataStructure which stores a list of Points with data and cells
 //## @ingroup Geometry
 //##
+//## A mesh contains several cells that can be of different celltypes (Line, Triangle, Polygone...).
+//## A cell is always closed. If a linestrip is to be created, then declare several cells, each containing one line.
+//## The operations take care about the coherence. If a line is added to an existing LineCell, 
+//## then a TriangleCell is built with the old and the new parameter (and so on).
+//## Deletion is done the opposite way.
+//## Example for inserting a line into a TriangleCell:
+//## existing PIds ind the cell:1,2,4; 
+//## inserting 2,3 so that new PIds in Cell:1,2,3,4 
+//## The cell is now of type QuadrilateralCell
 class Mesh : public PointSet
 {
 public:
@@ -32,11 +41,15 @@ public:
   typedef MeshType DataType;
 
   typedef MeshType::CellType CellType;
+  typedef CellType::CellAutoPointer CellAutoPointer;
+  typedef MeshType::CellsContainer::Iterator CellIterator;
+  typedef MeshTraits::CellTraits CellTraits;
+  typedef CellTraits::PointIdIterator PointIdIterator;
+
   typedef itk::VertexCell<CellType> VertexType;
   typedef itk::LineCell<CellType> LineType;
   typedef itk::TriangleCell<CellType> TriangleType;
-  typedef itk::TetrahedronCell<CellType> TetrahedronType;
-  typedef itk::PolygonCell<CellType> PolygonType;
+    typedef itk::PolygonCell<CellType> PolygonType;
   
   //##Documentation
 	//## @brief returns the current number of cells in the mesh

@@ -109,7 +109,7 @@ void mitk::OpenGLRenderer::Update()
 								ImageMapper2D* imagemapper2d=dynamic_cast<ImageMapper2D*>(mapper.GetPointer());
 								imagemapper2d->m_IilImage = &m_IilImage;
                 mapper2d->SetDisplayGeometry(m_DisplayGeometry);
-                mapper2d->Update();
+								mapper2d->Update();
             }
             else
             if(dynamic_cast<BaseVtkMapper3D*>(mapper.GetPointer()))
@@ -124,7 +124,10 @@ void mitk::OpenGLRenderer::Update()
 void mitk::OpenGLRenderer::Render()
 {
 // TODO: 
-    if (m_LastUpdateTime<GetMTime() || GetDisplayGeometry()->GetMTime()<GetMTime()) {
+    if (m_LastUpdateTime<GetMTime() ||
+    	m_LastUpdateTime<GetDisplayGeometry()->GetMTime() ||
+     m_LastUpdateTime<GetDisplayGeometry()->GetWorldGeometry()->GetMTime() ) {
+				cout << "OpenGLRenderer calling its update..." << endl;
          Update();
     }
     glClear(GL_COLOR_BUFFER_BIT);

@@ -164,6 +164,23 @@ public:
   }
 
   //##Documentation
+  //## @brief Get the squared length of the diagonal of the bounding-box in mm
+  //## 
+  double GetDiagonalLength2() const
+  {
+    Vector3D diagonalvector = GetCornerPoint()-GetCornerPoint(false, false, false);
+    return diagonalvector.GetSquaredNorm();
+  }
+
+  //##Documentation
+  //## @brief Get the length of the diagonal of the bounding-box in mm
+  //## 
+  double GetDiagonalLength() const
+  {
+    return sqrt(GetDiagonalLength2());
+  }
+
+  //##Documentation
   //## @brief Get a VnlVector along bounding-box in the specified 
   //## @a direction (length is spacing)
   //##

@@ -2,6 +2,7 @@
 #include "MapperFactory.h"
 #include <vtkTransform.h>
 
+#include "mitkProperties.h"
 #include "mitkFloatProperty.h"
 #include "mitkBoolProperty.h"
 #include "mitkColorProperty.h"
@@ -243,6 +244,16 @@ bool mitk::DataTreeNode::GetLevelWindow(mitk::LevelWindow &levelWindow, mitk::Ba
     return true;
 }
 
+bool mitk::DataTreeNode::GetIntProperty(const char* propertyKey, int &intValue, mitk::BaseRenderer* renderer) const
+{
+    mitk::IntProperty::Pointer intprop = dynamic_cast<mitk::IntProperty*>(GetProperty(propertyKey, renderer).GetPointer());
+    if(intprop.IsNull())
+        return false;
+    
+    intValue = intprop->GetValue();
+    return true;
+}
+
 //##ModelId=3EF19424012B
 bool mitk::DataTreeNode::IsVisible(mitk::BaseRenderer* renderer, const char* name) const
 {
@@ -297,6 +308,13 @@ void mitk::DataTreeNode::SetLevelWindow(mitk::LevelWindow levelWindow, mitk::Bas
     mitk::LevelWindowProperty::Pointer prop;
     prop = new mitk::LevelWindowProperty(levelWindow);
     GetPropertyList(renderer)->SetProperty(name, prop);
+}
+
+void mitk::DataTreeNode::SetIntProperty(const char* propertyKey, int intValue, mitk::BaseRenderer* renderer)
+{
+    mitk::IntProperty::Pointer prop;
+    prop = new mitk::IntProperty(intValue);
+    GetPropertyList(renderer)->SetProperty(propertyKey, prop);
 }
 
 void mitk::DataTreeNode::SetProperty(const char *propertyKey, 

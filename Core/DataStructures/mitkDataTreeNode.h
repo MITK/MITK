@@ -146,6 +146,12 @@ public:
     //## @return @a true property was found
     bool GetLevelWindow(mitk::LevelWindow &levelWindow, mitk::BaseRenderer* renderer, const char* name = "levelwindow") const;
 
+    //##Documentation
+    //## @brief Convenience access method for int properties (instances of
+    //## IntProperty)
+    //## @return @a true property was found
+    bool GetIntProperty(const char* propertyKey, int &intValue, mitk::BaseRenderer* renderer=NULL) const;
+
     //##ModelId=3EF19424012B
     //##Documentation
     //## @brief Convenience access method for visibility properties (instances
@@ -190,6 +196,10 @@ public:
     //## (instances of LevelWindowProperty)
     void SetLevelWindow(mitk::LevelWindow levelWindow, mitk::BaseRenderer* renderer, const char* name = "levelwindow");
 
+    //##Documentation
+    //## @brief Convenience method for setting int properties (instances of
+    //## IntProperty)
+    void SetIntProperty(const char* propertyKey, int intValue, mitk::BaseRenderer* renderer=NULL);
 protected:
     //##ModelId=3E33F5D702AA
     DataTreeNode();

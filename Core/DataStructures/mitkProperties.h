@@ -4,7 +4,7 @@
 #include "mitkGenericProperty.h"
 
 namespace mitk {
-   typedef GenericProperty<int> IntegerProperty;
+   typedef GenericProperty<int> IntProperty;
    template class GenericProperty<int>;
 }  // namespace mitk
 #endif /* MITKPROPERTIES_H_HEADER_INCLUDED */

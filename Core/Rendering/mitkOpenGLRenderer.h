@@ -8,6 +8,8 @@
 
 #include "picimage.h"
 
+#include <itkCommand.h>
+
 class vtkRenderer;
 class vtkRenderWindow;
 class vtkLight;
@@ -80,6 +82,10 @@ protected:
 
     //##ModelId=3E33ECF301B7
     virtual ~OpenGLRenderer();
+
+    virtual void DataChangedEvent(const itk::Object *caller, const itk::EventObject &event);
+
+    itk::MemberCommand<mitk::OpenGLRenderer>::Pointer m_DataChangedCommand;
 
   private:
     //##ModelId=3E33145A0315

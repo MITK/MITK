@@ -2,8 +2,11 @@
 #define QCMITKSAMPLEPLUGIN_H
 
 #include <chili/plugin.h>
+#include "ToolBar.h"
+
 class QcTask;
 class SampleApp;
+class ToolBar;
 
 class QcEXPORT QcMITKSamplePlugin: public QcPlugin {
 
@@ -16,19 +19,21 @@ public:
 
     QString name(); 
     const char ** xpm();
-
-    virtual void 	lightboxFilled (QcLightbox* lightbox);
-
+    
     SampleApp *ap;
 
 public slots :
-    
-    void selectSerie (QcLightbox* lightbox);
-
+       
+    void selectSerie (QcLightbox*);
+    void ConnectWidget(bool );
+    virtual void 	lightboxFilled (QcLightbox* lightbox);
+    virtual void 	lightboxTiles (QcLightboxManager *lbm, int tiles);
 private:
 
     QcTask *task;
-
+    ToolBar *toolbar ;
+    int idLightbox;
+    void selectLightbox(int id);
 };
 
 

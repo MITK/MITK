@@ -1,18 +1,18 @@
 /*=========================================================================
 
-  Program:   Medical Imaging & Interaction Toolkit
-  Module:    $RCSfile$
-  Language:  C++
-  Date:      $Date$
-  Version:   $Revision$
+Program:   Medical Imaging & Interaction Toolkit
+Module:    $RCSfile$
+Language:  C++
+Date:      $Date$
+Version:   $Revision$
 
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/ for details.
 
-     This software is distributed WITHOUT ANY WARRANTY; without even
-     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-     PURPOSE.  See the above copyright notices for more information.
+This software is distributed WITHOUT ANY WARRANTY; without even
+the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
@@ -115,6 +115,16 @@ public:
     SetIndexToWorldTransform(transform);
   }
 
+  //##Documentation
+  //## @brief Change @a transform so that the third column of the 
+  //## transform-martix is perpendicular to the first two columns
+  //##
+  static void EnsurePerpendicularNormal(mitk::AffineTransform3D* transform);
+
+  //##Documentation
+  //## @brief Set origin of the plane (upper-left corner)
+  //##
+  //## The origin is equal to the offset of the m_IndexToWorldTransform
   void SetOrigin(const Point3D& origin)
   {
     if(origin!=GetOrigin())
@@ -125,21 +135,35 @@ public:
     }
   }
 
+  //##Documentation
+  //## @brief Origin of the plane (upper-left corner)
+  //##
+  //## The origin is equal to the offset of the m_IndexToWorldTransform
   const Point3D& GetOrigin() const
   {
     return m_Origin;
   }
 
+  //##Documentation
+  //## @brief Origin of the plane as VnlVector (upper-left corner)
+  //##
+  //## The origin is equal to the offset of the m_IndexToWorldTransform
   VnlVector GetOriginVnl() const
   {
     return const_cast<Self*>(this)->m_Origin.Get_vnl_vector();
   }
 
+  //##Documentation
+  //## @brief Normal of the plane
+  //##
   Vector3D GetNormal() const
   {
     return GetAxisVector(2);
   }
 
+  //##Documentation
+  //## @brief Normal of the plane as VnlVector
+  //##
   VnlVector GetNormalVnl() const
   {
     return GetAxisVector(2).Get_vnl_vector();
@@ -147,30 +171,55 @@ public:
 
   //##Documentation
   //## @brief Distance of the point from the plane
+  //## (bounding-box @em not considered)
+  //##
   ScalarType Distance(const Point3D& point ) const 
   {
-		return fabs(SignedDistance(point));
-	}
+    return fabs(SignedDistance(point));
+  }
 
   //##Documentation
   //## @brief Signed distance of the point from the plane
+  //## (bounding-box @em not considered)
   //##
   //## > 0 : point is in the direction of the direction vector.
   inline ScalarType SignedDistance(const Point3D& point ) const 
   {
     ScalarType len = GetNormalVnl().two_norm();
 
-		if( len == 0 )
-			return 0;
+    if( len == 0 )
+      return 0;
 
-		return (point-GetOrigin())*GetNormal() / len;
-	}
+    return (point-GetOrigin())*GetNormal() / len;
+  }
+  //##Documentation
+  //## @brief Distance of the plane from another plane
+  //## (bounding-box @em not considered)
+  //##
+  //## Result is 0 if planes are not parallel.
+  ScalarType Distance(const PlaneGeometry* plane) const 
+  {
+    return fabs(SignedDistance(plane));
+  }
+  //##Documentation
+  //## @brief Signed distance of the plane from another plane
+  //## (bounding-box @em not considered)
+  //##
+  //## Result is 0 if planes are not parallel.
+  inline ScalarType SignedDistance(const PlaneGeometry* plane) const 
+  {
+    if(IsParallel(plane))
+    {
+      return SignedDistance(plane->GetOrigin());
+    }
+    return 0;
+  }
   //##Documentation
   //## @brief Calculate the intersecting line of two planes
   //##
   //## @return @a true planes are intersecting
   //## @return @a false planes do not intersect
-  bool CrossLine( const PlaneGeometry* plane, ITKLine3D& crossline ) const
+  bool IntersectionLine( const PlaneGeometry* plane, Line3D& crossline ) const
   {
     VnlVector direction;
 
@@ -211,15 +260,15 @@ public:
   //##
   //## @return number of intersection points (0..2). First interection point (if existing) 
   //## is returned in @a lineFrom, second in @a lineTo.
-  int IntersectWithPlane2D(const PlaneGeometry* plane, Point2D& lineFrom, Point2D& lineTo ) const 
+  unsigned int IntersectWithPlane2D(const PlaneGeometry* plane, Point2D& lineFrom, Point2D& lineTo ) const 
   {
     VnlVector ptest;
     ptest = vnl_cross_3d(GetNormalVnl(), plane->GetNormalVnl());
     if(ptest.squared_magnitude()<vnl_math::float_sqrteps)
       return 0;
 
-    ITKLine3D crossline;
-    if (CrossLine( plane, crossline ) == false)
+    Line3D crossline;
+    if (IntersectionLine( plane, crossline ) == false)
       return 0;
 
     Point2D  point2; 
@@ -229,11 +278,143 @@ public:
     Map(crossline.GetPoint(), crossline.GetDirection(), direction2);
 
     return 
-      mitk::ITKLine3D::RectangleLineIntersection( 
-        0, 0, GetExtent(0), GetExtent(1), 
-        point2, direction2, lineFrom, lineTo );
+      mitk::Line3D::RectangleLineIntersection( 
+      0, 0, GetExtent(0), GetExtent(1), 
+      point2, direction2, lineFrom, lineTo );
   }
-  static void EnsurePerpendicularNormal(mitk::AffineTransform3D* transform);
+
+  //##Documentation
+  //## @brief Calculate the angle between two planes
+  //##
+  //## @return angle in radiants
+  double Angle( const PlaneGeometry* plane ) const 
+  {
+    return angle(plane->GetMatrixColumn(2), GetMatrixColumn(2));
+  }
+
+  //##Documentation
+  //## @brief Calculate the angle between the plane and a line
+  //##
+  //## @return angle in radiants
+  double Angle( const Line3D& line ) const 
+  {
+    return vnl_math::pi_over_2-angle(line.GetDirection().Get_vnl_vector(), GetMatrixColumn(2));
+  }
+
+  //##Documentation
+  //## @brief Calculate intersection point between the plane and a line
+  //##
+  //## @param intersectionPoint intersection point
+  //## @return @a true if @em unique intersection exists, i.e., if line
+  //## is @em not on or parallel to the plane
+  bool IntersectionPoint( const Line3D& line, mitk::Point3D & intersectionPoint ) const
+  {
+    Vector3D normal;
+    normal.Set_vnl_vector(GetMatrixColumn(2));
+
+    double t = normal*line.GetDirection();
+
+    if ( fabs(t) < mitk::eps )
+    {
+      return false;
+    }
+
+    Vector3D diff;
+    diff = GetOrigin() - line.GetPoint();
+    t = (normal*diff) / t;
+
+    intersectionPoint = line.GetPoint()+line.GetDirection()*t;
+
+    return true;
+  }
+
+  //##Documentation
+  //## @brief Calculate line parameter of intersection point between the 
+  //## plane and a line
+  //##
+  //## @param t parameter of line: intersection point is 
+  //## line.GetPoint()+t*line.GetDirection()
+  //## @return @a true if @em unique intersection exists, i.e., if line
+  //## is @em not on or parallel to the plane
+  bool IntersectionPointParam( const Line3D& line, double & t ) const
+  {
+    Vector3D normal;
+    normal.Set_vnl_vector(GetMatrixColumn(2));
+
+    t = normal*line.GetDirection();
+
+    if ( fabs(t) < mitk::eps )
+    {
+      return false;
+    }
+
+    Vector3D diff;
+    diff = GetOrigin() - line.GetPoint();
+    t = (normal*diff) / t;
+
+    return true;
+  }
+
+  //##Documentation
+  //## @brief Returns whether the plane is parallel to another plane
+  //##
+  bool IsParallel( const PlaneGeometry* plane ) const 
+  {
+    return Angle(plane) < mitk::eps;
+  } 
+
+  //##Documentation
+  //## @brief Returns whether the point is on the plane
+  //## (bounding-box @em not considered)
+  //##
+  bool IsOnPlane( const Point3D& point ) const 
+  {
+    return Distance(point) < mitk::eps;
+  }
+
+  //##Documentation
+  //## @brief Returns whether the line is on the plane 
+  //## (bounding-box @em not considered)
+  //##
+  bool IsOnPlane( const Line3D& line ) const
+  {
+    return ( (Distance( line.GetPoint() ) < mitk::eps) && (Distance( line.GetPoint2() ) < mitk::eps) );
+  }
+
+  //##Documentation
+  //## @brief Returns whether the plane is on the plane
+  //## (bounding-box @em not considered)
+  //##
+  bool IsOnPlane( const PlaneGeometry* plane ) const 
+  {
+    return ( IsParallel( plane ) && (Distance( plane->GetOrigin() ) < mitk::eps) );
+  }
+
+  //##Documentation
+  //## @brief Returns the lot from the point to the plane
+  //##
+  Point3D Lot( const Point3D& pt ) const
+  {
+    return pt-GetNormal()*Distance(pt);
+  }
+
+  //##Documentation
+  //## @brief Compares plane with another plane: @a true if IsOnPlane
+  //## (bounding-box @em not considered)
+  //##
+  bool operator==( const PlaneGeometry* plane ) const 
+  {
+    return IsOnPlane( plane );
+  }
+
+  //##Documentation
+  //## @brief Compares plane with another plane: @a false if IsOnPlane
+  //## (bounding-box @em not considered)
+  //##
+  bool operator!=( const PlaneGeometry* plane ) const 
+  {
+    return !IsOnPlane( plane );
+  }
 
 protected:
   //##ModelId=3E395F22035A
@@ -243,6 +424,10 @@ protected:
 
   virtual void InitializeGeometry(Self * newGeometry) const;
 
+  //##Documentation
+  //## @brief Upper-left corner of the plane
+  //## 
+  //## The origin is equal to the offset of the m_IndexToWorldTransform
   Point3D m_Origin;
 
   //##ModelId=3E3BE12C012B
@@ -263,6 +448,3 @@ protected:
 
 } // namespace mitk
 #endif /* PLANEGEOMETRY_H_HEADER_INCLUDED_C1C68A2C */
-
-
-

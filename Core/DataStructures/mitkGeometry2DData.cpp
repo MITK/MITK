@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include "mitkGeometry2DData.h"
-#include <itkProcessObject.h>
+#include "mitkBaseProcess.h"
 
 //##ModelId=3E639CD30201
 mitk::Geometry2DData::Geometry2DData()

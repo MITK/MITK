@@ -152,21 +152,34 @@ void mitk::OpenGLRenderer::UpdateIncludingVtkActors()
   //  m_LightKit->AddLightsToRenderer(m_VtkRenderer);
  // }
 
-  //    try
+  // Layer sceme to be able to sort the painting order.
+  // Nodes, without a layer are painted last, cause their order has no meaning.
+  // Nodes with a high layer are painted first (e.g. data necessary for stencil-buffer)
   if (m_DataTreeIterator.IsNotNull())
   {
     mitk::DataTreeIteratorClone it=m_DataTreeIterator;
+    typedef std::pair<int, vtkProp*> LayerMapperPair;
+    std::priority_queue<LayerMapperPair> layers;
+    int mapperNo = 0;
+
     while(!it->IsAtEnd())
     {
-      mitk::Mapper::Pointer mapper = it->Get()->GetMapper(m_MapperID);
+      mitk::DataTreeNode::Pointer node = it->Get();
+      mitk::Mapper::Pointer mapper = node->GetMapper(m_MapperID);
       if(mapper.IsNotNull())
       {
+        // mapper without a layer property are painted last
+        int layer=1;
+        node->GetIntProperty("layer", layer, this);
+
+        vtkProp *vtkprop = 0;
+
         BaseVtkMapper2D* anVtkMapper2D;
         anVtkMapper2D=dynamic_cast<BaseVtkMapper2D*>(mapper.GetPointer());
         if(anVtkMapper2D != NULL)
         {
           anVtkMapper2D->Update(this);
-          m_VtkRenderer->AddProp(anVtkMapper2D->GetProp());
+          vtkprop = anVtkMapper2D->GetProp();
         }
         else
         {
@@ -175,11 +188,25 @@ void mitk::OpenGLRenderer::UpdateIncludingVtkActors()
           if(anVtkMapper3D != NULL)
           {
             anVtkMapper3D->Update(this);
-            m_VtkRenderer->AddProp(anVtkMapper3D->GetProp());
+            vtkprop = anVtkMapper3D->GetProp();
+
           }
+        }
+        if(vtkprop!=NULL)
+        {
+          // pushing negative layer value, since default sort for
+          // priority_queue is lessthan
+          layers.push(LayerMapperPair(- (layer<<16) - mapperNo , vtkprop));
+          ++mapperNo;
         }
       }
       ++it;
+    }
+
+    while (!layers.empty()) 
+    {
+      m_VtkRenderer->AddProp(layers.top().second);
+      layers.pop();
     }
   }
 
@@ -307,10 +334,18 @@ void mitk::OpenGLRenderer::Render()
       gluOrtho2D( 0.0, m_Size[0], 0.0, m_Size[1] );
       glMatrixMode( GL_MODELVIEW );
 
-      mitk::DataTreeIteratorClone it = m_DataTreeIterator;
-      //mitk::DataTree::Pointer tree = dynamic_cast <mitk::DataTree *> (it->GetTree());
-      //	std::cout << "Render:: tree: " <<  *tree << std::endl;
+      //------------------
+      //rendering VTK-Mappers if present
+      if(m_VtkMapperPresent) 
+      {
+        m_RenderWindow->GetVtkRenderWindow()->SetFinishRendering(false);
+        //start vtk render process with the updated scenegraph       
+        m_RenderWindow->GetVtkRenderWindow()->MitkRender();
+      }
 
+      //------------------
+      //preparing and gaining information about 2D rendering for OpenGL
+      mitk::DataTreeIteratorClone it = m_DataTreeIterator;
       typedef std::pair<int, GLMapper2D*> LayerMapperPair;
       std::priority_queue<LayerMapperPair> layers;
       int mapperNo = 0;
@@ -336,12 +371,24 @@ void mitk::OpenGLRenderer::Render()
         ++it;
       }
 
-      while (!layers.empty()) {
+      //go through the generated list and let the sorted mappers paint
+      while (!layers.empty()) 
+      {
         layers.top().second->Paint(this);
         layers.pop();
       }
-      if(m_VtkMapperPresent) {
-        m_RenderWindow->GetVtkRenderWindow()->MitkRender();
+
+      ////if we didn't have vtk mappers, then swap now
+      //if(!m_VtkMapperPresent) 
+      //{
+      //  m_RenderWindow->SwapBuffers();
+      //}
+
+      //swap buffers
+      if (m_VtkMapperPresent)
+      {
+        m_RenderWindow->GetVtkRenderWindow()->SetFinishRendering(true);
+        m_RenderWindow->GetVtkRenderWindow()->CopyResultFrame();
       }
       else
         m_RenderWindow->SwapBuffers();
@@ -375,8 +422,12 @@ void mitk::OpenGLRenderer::InitRenderer(mitk::RenderWindow* renderwindow)
       vicc->GetVtkInteractor()->Disable();
     }
   }
+  m_LastUpdateTime = 0;
+  m_LastUpdateVtkActorsTime = 0;
   //we should disable vtk doublebuffering, but then it doesn't work
   //m_RenderWindow->GetVtkRenderWindow()->SwapBuffersOff();
+  if( this->m_VtkRenderer !=NULL )
+    m_RenderWindow->GetVtkRenderWindow()->AddRenderer( this->m_VtkRenderer );
 }
 
 /*!

@@ -40,7 +40,7 @@ public:
   RenderWindow(const char *name, mitk::BaseRenderer* renderer = NULL);
   virtual ~RenderWindow();
 
-  inline VtkRenderWindow* GetVtkRenderWindow()
+  inline VtkRenderWindow* GetVtkRenderWindow() const
   {
     return m_MitkVtkRenderWindow;
   }

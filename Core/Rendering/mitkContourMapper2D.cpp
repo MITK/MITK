@@ -95,8 +95,18 @@ void mitk::ContourMapper2D::Paint(mitk::BaseRenderer * renderer)
       vtk2itk(vtkp,p);
 
       displayGeometry->Project(p, projected_p);
-      Vector3D diff=p-projected_p;
-      if(diff.GetSquaredNorm()<1.0)
+      bool projectmode=false;
+      GetDataTreeNode()->GetVisibility(projectmode, renderer, "project");
+      bool drawit=false;
+      if(projectmode)
+        drawit=true;
+      else
+      {
+        Vector3D diff=p-projected_p;
+        if(diff.GetSquaredNorm()<1.0)
+          drawit=true;
+      }
+      if(drawit)
       {
         Point2D pt2d, tmp;
         displayGeometry->Map(projected_p, pt2d);

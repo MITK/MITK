@@ -3,25 +3,10 @@
 #include <mitkOperation.h>
 #include <mitkOperationActor.h>
 
-#include <qapplication.h>//@todo because of quickimplementation UpdateAllWidgets
-#include <qwidgetlist.h>//@todo because of quickimplementation UpdateAllWidgets
-
 #include <mitkPointOperation.h>
 #include "mitkStatusBar.h"
 #include "mitkInteractionConst.h"
-
-inline void UpdateAllWidgets()//@todo global quickimplementation. is to be changed into Modified Data...
-{
-    QWidgetList *list = QApplication::allWidgets();
-    QWidgetListIt it( *list );         // iterate over the widgets
-    QWidget * w;
-    while ( (w=it.current()) != 0 ) {  // for each widget...
-        ++it;
-        w->update();
-    }
-    delete list;                      // delete the list, not the widgets
-
-}
+#include "mitkRenderWindow.h"
 
 //##ModelId=3F0177E901BD
 mitk::PointSet::PointSet()
@@ -208,7 +193,7 @@ void mitk::PointSet::ExecuteOperation(Operation* operation)
 
   ((const itk::Object*)this)->InvokeEvent(itk::EndEvent());
 
-  UpdateAllWidgets();
+  mitk::RenderWindow::UpdateAllInstances();
 }
 
 //##ModelId=3F0177E901EE

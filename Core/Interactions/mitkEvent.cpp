@@ -10,6 +10,10 @@ m_ButtonState = buttonState;
 m_Key = key;
 }
 
+mitk::Event::~Event()
+{
+}
+
 //##ModelId=3E5B304700A7
 int mitk::Event::GetType() const
 {

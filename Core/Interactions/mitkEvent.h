@@ -28,6 +28,8 @@ class Event
     //## key: pressed key
     Event(int type, int button, int buttonState, int key);
 
+    virtual ~Event();
+
     //##ModelId=3E5B304700A7
     int GetType() const;
 

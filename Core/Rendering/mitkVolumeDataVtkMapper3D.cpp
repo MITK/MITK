@@ -3,25 +3,34 @@
 #include "mitkFloatProperty.h"
 #include "mitkBoolProperty.h"
 #include "mitkColorProperty.h"
+#include "mitkOpenGLRenderer.h"
 #include <vtkActor.h>
 #include <vtkProperty.h>
-#include <vtkPolyDataMapper.h>
-
-
-
-const mitk::VolumeData* mitk::VolumeDataVtkMapper3D::GetInput()
+#include <vtkVolumeRayCastMapper.h>
+#include <vtkVolume.h>
+#include <vtkVolumeProperty.h>
+#include <vtkColorTransferFunction.h>
+#include <vtkPiecewiseFunction.h>
+#include <vtkVolumeRayCastCompositeFunction.h>
+#include <vtkFiniteDifferenceGradientEstimator.h>
+#include <vtkRenderWindow.h>
+const mitk::Image* mitk::VolumeDataVtkMapper3D::GetInput()
 {
-  if (this->GetNumberOfInputs() < 1)
-  {
-    return 0;
-  }
+if (this->GetNumberOfInputs() < 1)
+{
+return 0;
+}
 
-  return static_cast<const mitk::VolumeData * > ( GetData() );
+return static_cast<const mitk::Image*> ( GetData() );
 }
 
 
 void mitk::VolumeDataVtkMapper3D::GenerateData()
 {
+
+
+
+
 }
 
 
@@ -32,40 +41,111 @@ void mitk::VolumeDataVtkMapper3D::GenerateOutputInformation()
 
 mitk::VolumeDataVtkMapper3D::VolumeDataVtkMapper3D()
 {
-  m_VtkPolyDataMapper = vtkPolyDataMapper::New();
+  m_VtkVolumeMapper = vtkVolumeRayCastMapper::New();
+vtkVolumeRayCastCompositeFunction* compositeFunction = vtkVolumeRayCastCompositeFunction::New();
+  m_VtkVolumeMapper->SetVolumeRayCastFunction(compositeFunction);
+  vtkFiniteDifferenceGradientEstimator* gradientEstimator = 
+	vtkFiniteDifferenceGradientEstimator::New();
+  m_VtkVolumeMapper->SetGradientEstimator(gradientEstimator);
+  gradientEstimator->Delete();
+//  m_Prop3D
+  m_Volume = vtkVolume::New();
+//  m_VtkVolumeMapper->SetInput(img->GetVtkImageData()); 
+  m_Volume->SetMapper( m_VtkVolumeMapper );
+ //  m_Volume->SetProperty(volumeProperty); 
+ m_Prop3D = m_Volume;
+  m_Prop3D->Register(NULL); 
 
-  m_Actor = vtkActor::New();
-  m_Actor->SetMapper(m_VtkPolyDataMapper);
-
-  m_Prop3D = m_Actor;
-  m_Prop3D->Register(NULL);
 }
 
 
 mitk::VolumeDataVtkMapper3D::~VolumeDataVtkMapper3D()
 {
-  m_VtkPolyDataMapper->Delete();
-  m_Actor->Delete();
-}
 
+}
+void mitk::VolumeDataVtkMapper3D::abortTest(void* test) {
+  vtkRenderWindow* renWin = reinterpret_cast<vtkRenderWindow*>(test);
+  assert(renWin);
+  if (renWin->GetEventPending()) {
+    renWin->SetAbortRender(1);    
+  }
+}
 
 void mitk::VolumeDataVtkMapper3D::Update(mitk::BaseRenderer* renderer)
 {
-  if(IsVisible(renderer)==false)
+ if(IsVisible(renderer)==false)
   {
-    m_Actor->VisibilityOff();
+//  FIXME: don't understand this 
+    if (m_Prop3D) {
+      std::cout << "visibility off" <<std::endl;
+      m_Prop3D->VisibilityOff();
+    }
     return;
   }
-  m_Actor->VisibilityOn();
+  if (m_Prop3D) {
+    m_Prop3D->VisibilityOn();
+  }
+  // FIXME
+  mitk::Image* img = const_cast<mitk::Image*>(GetInput());
+// dynamic_cast<mitk::Image*>(GetData());
+  if (img == NULL) {
+    std::cout << "Image == NULL" << std::endl;
+  } else {   
+  vtkVolumeProperty* volumeProperty = vtkVolumeProperty::New();
+  vtkPiecewiseFunction*	opacityTransferFunction, *gradientTransferFunction;
+  vtkColorTransferFunction* colorTransferFunction;
 
-  mitk::VolumeData::Pointer input  = const_cast<mitk::VolumeData*>(this->GetInput());
+  opacityTransferFunction  = vtkPiecewiseFunction::New();
+  colorTransferFunction    = vtkColorTransferFunction::New();
+//  gradientTransferFunction = vtkPiecewiseFunction::New();
+  mitk::LevelWindow levelWindow;
+  int lw_min,lw_max;
+  if (GetLevelWindow(levelWindow,renderer)) {
+    std::cout << "level window found" << std::endl;
+    lw_min = (int)levelWindow.GetMin();
+    lw_max = (int)levelWindow.GetMax();
+  } else {
+    lw_min = 0;
+    lw_max = 255;
+  }
 
-  m_VtkPolyDataMapper->SetInput(input->GetVtkPolyData());
+  opacityTransferFunction->AddPoint( lw_min, 0.0 );
+  opacityTransferFunction->AddPoint( lw_max, 0.9 );
+//  opacityTransferFunction->AddPoint( max+offset, 0.9 );
+  opacityTransferFunction->ClampingOff();
+  
+  colorTransferFunction->AddRGBPoint( lw_min, 1.0, 1.0, 1.0 );
+  colorTransferFunction->AddRGBPoint( lw_max, 1.0, 1.0, 1.0 );
+//  colorTransferFunction->AddRGBPoint( max+offset, 1.0, 1.0, 1.0 );
+  colorTransferFunction->ClampingOff();
+ 
+  volumeProperty->SetColor( colorTransferFunction );
+  volumeProperty->SetScalarOpacity( opacityTransferFunction ); 
+  volumeProperty->ShadeOn();
+  volumeProperty->SetDiffuse(0.7);
+  volumeProperty->SetAmbient(0.01);
+
+  m_Volume = vtkVolume::New();
+  m_VtkVolumeMapper->SetInput(img->GetVtkImageData()); 
+  m_Volume->SetMapper( m_VtkVolumeMapper );
+  m_Volume->SetProperty(volumeProperty); 
+  
+  m_Prop3D = m_Volume;
+  mitk::OpenGLRenderer* openGlRenderer = dynamic_cast<mitk::OpenGLRenderer*>(renderer);
+  assert(openGlRenderer);
+  
+  vtkRenderWindow* vtkRendWin;
+  vtkRendWin = (vtkRenderWindow*)openGlRenderer->GetVtkRenderWindow();
+  vtkRendWin->SetAbortCheckMethod(mitk::VolumeDataVtkMapper3D::abortTest,vtkRendWin); 
+  // mitk::VolumeData::Pointer input  = const_cast<mitk::VolumeData*>(this->GetInput());
+
+  // m_VtkPolyDataMapper->SetInput(input->GetVtkPolyData());
 
   //apply properties read from the PropertyList
-  ApplyProperties(m_Actor, renderer);
+  // ApplyProperties(m_Actor, renderer);
 
   StandardUpdate();
+  }
 }
 
 
@@ -75,53 +155,7 @@ void mitk::VolumeDataVtkMapper3D::Update()
 
 void mitk::VolumeDataVtkMapper3D::ApplyProperties(vtkActor* actor, mitk::BaseRenderer* renderer)
 {
-  bool useCellData;
-  if (dynamic_cast<mitk::BoolProperty *>(this->GetDataTreeNode()->GetProperty("useCellDataForColouring").GetPointer()) == NULL)
-    useCellData = false;
-  else
-    useCellData = dynamic_cast<mitk::BoolProperty *>(this->GetDataTreeNode()->GetProperty("useCellDataForColouring").GetPointer())->GetBool();
 
-  if (useCellData)
-  {
-
-    m_VtkPolyDataMapper->SetColorModeToDefault();
-    m_VtkPolyDataMapper->SetScalarRange(0,255);
-    m_VtkPolyDataMapper->ScalarVisibilityOn();
-    m_VtkPolyDataMapper->SetScalarModeToUseCellData();
-    m_Actor->GetProperty()->SetSpecular (1);
-    m_Actor->GetProperty()->SetSpecularPower (50);
-    m_Actor->GetProperty()->SetInterpolationToPhong();
-
-    /*
-    m_VtkPolyDataMapper->SetColorModeToDefault();
-    m_VtkPolyDataMapper->UseLookupTableScalarRangeOff();
-    m_MyMeshMapper->SetColorModeToMapScalars();
-    ////m_MyMesh->SetInput(delaunay->GetOutput());
-    m_VtkPolyDataMapper->SetScalarRange(0,255);
-    m_VtkPolyDataMapper->ScalarVisibilityOn();
-    m_VtkPolyDataMapper->SetScalarModeToUseCellData();
-    //float rgba[4]={1.0f,1.0f,1.0f,1.0f};
-    //// check for color prop and use it for rendering if it exists
-    //GetColor(rgba, renderer);
-    //m_Actor->GetProperty()->SetColor(rgba);
-
-    m_Actor->GetProperty()->SetAmbient (0.25);
-    //m_Actor->GetProperty()->SetDiffuse (0.5);
-    //m_Actor->GetProperty()->SetSpecular (1);
-    m_Actor->GetProperty()->SetSpecularPower (5);
-    m_Actor->GetProperty()->SetInterpolationToPhong();
-    */
-  }
-  else
-  {
-    Superclass::ApplyProperties(m_Actor, renderer);
-    m_VtkPolyDataMapper->ScalarVisibilityOff();
-  }
-
-  bool wireframe=false;
-  GetDataTreeNode()->GetVisibility(wireframe, renderer, "wireframe");
-  if(wireframe)
-    m_Actor->GetProperty()->SetRepresentationToWireframe();
-  else
-    m_Actor->GetProperty()->SetRepresentationToVolume();
 }
+
+

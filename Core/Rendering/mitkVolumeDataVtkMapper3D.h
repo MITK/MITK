@@ -3,10 +3,12 @@
 
 #include "mitkCommon.h"
 #include "BaseVtkMapper3D.h"
-#include "mitkVolumeData.h"
 #include "BaseRenderer.h"
+#include "mitkImage.h"
 
-class vtkActor;
+class vtkVolumeRayCastMapper;
+class vtkVolume;
+
 
 namespace mitk {
 
@@ -23,7 +25,7 @@ public:
   itkNewMacro(Self);
 
 
-  virtual const mitk::VolumeData* GetInput();
+  virtual const mitk::Image* GetInput();
 
 
   virtual void GenerateData();
@@ -36,7 +38,7 @@ public:
   virtual void Update();
 
   virtual void ApplyProperties(vtkActor* actor, mitk::BaseRenderer* renderer);
-
+  static void abortTest(void* test);
 protected:
 
   virtual void GenerateOutputInformation();
@@ -48,9 +50,9 @@ protected:
 
 
   vtkActor* m_Actor;
+  vtkVolume* m_Volume; 
 
-
-  vtkVolumeMapper* m_VtkVolumeMapper;
+  vtkVolumeRayCastMapper* m_VtkVolumeMapper;
 };
 
 } // namespace mitk

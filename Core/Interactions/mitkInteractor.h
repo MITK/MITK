@@ -3,13 +3,18 @@
 
 #include "mitkCommon.h"
 #include "mitkStateMachine.h"
-#include <mitkDataTreeNode.h>
+
 #include <string>
 
 namespace mitk {
 
+class DataTreeNode;
+
 //##Documentation
-//## @brief Interface for an Interactor, that is held by a DataTreeNode and holds its node
+//## @brief Interface for an Interactor.
+//##
+//## The Interactor is held with a SmartPointer by a DataTreeNode 
+//## and holds its Node with a Pointer. That way Smartpointer doesn't build a circle.
 //## @ingroup Interaction
 class Interactor : public StateMachine
 {
@@ -36,7 +41,7 @@ public:
 protected:
   //##Documentation
   //## @brief Pointer to the data, this object handles the Interaction for
-  DataTreeNode::Pointer m_DataTreeNode;
+  DataTreeNode* m_DataTreeNode;
 };
 
 }//namespace mitk

@@ -1,12 +1,13 @@
 #include "mitkAffineInteractor.h"
 #include "mitkInteractionConst.h"
+#include <mitkDataTreeNode.h>
 
-mitk::AfineInteractor::AfineInteractor(std::string type, DataTreeNode* dataTreeNode)
+mitk::AffineInteractor::AffineInteractor(std::string type, DataTreeNode* dataTreeNode)
 	 : Interactor(type, dataTreeNode)
 {
 }
 
-bool mitk::AfineInteractor::ExecuteSideEffect(int sideEffectId, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId)
+bool mitk::AffineInteractor::ExecuteSideEffect(int sideEffectId, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId)
 {
 	bool ok = false;//for return type bool
 

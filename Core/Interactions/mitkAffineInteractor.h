@@ -1,5 +1,5 @@
-#ifndef MITKAFINEINTERACTOR_H_HEADER_INCLUDED_C188C29F
-#define MITKAFINEINTERACTOR_H_HEADER_INCLUDED_C188C29F
+#ifndef MITKAFFINEINTERACTOR_H_HEADER_INCLUDED_C188C29F
+#define MITKAFFINEINTERACTOR_H_HEADER_INCLUDED_C188C29F
 
 #include "mitkCommon.h"
 #include "mitkInteractor.h"
@@ -7,14 +7,14 @@
 namespace mitk {
 
 //##Documentation
-//## @brief Interactor for afine transformations translate, rotate 
+//## @brief Interactor for Affine transformations translate, rotate 
 //## @ingroup Interaction
 //## 
 //## An object of this class can translate, rotate and scale the Data
-class AfineInteractor : public Interactor
+class AffineInteractor : public Interactor
 {
 public:
-  mitkClassMacro(AfineInteractor,Interactor);
+  mitkClassMacro(AffineInteractor,Interactor);
 
 	//##Documentation
 	//## @brief Constructor
@@ -22,11 +22,11 @@ public:
 	//## @params dataTreeNode is the node, this Interactor is connected to
 	//## type is the type of StateMachine like declared in the XML-Configure-File
 	//##
- 	AfineInteractor(std::string type, DataTreeNode* dataTreeNode);
+ 	AffineInteractor(std::string type, DataTreeNode* dataTreeNode);
 
   //##Documentation
 	//## @brief Destructor
-  ~AfineInteractor(){};
+  ~AffineInteractor(){};
 
 protected:
 
@@ -37,4 +37,4 @@ protected:
 
 
 
-#endif /* MITKAFINEINTERACTOR_H_HEADER_INCLUDED_C188C29F */
+#endif /* MITKAFFINEINTERACTOR_H_HEADER_INCLUDED_C188C29F */

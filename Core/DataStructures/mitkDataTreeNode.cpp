@@ -37,7 +37,7 @@ mitk::BaseData* mitk::DataTreeNode::GetData() const
     return m_Data;
 }
 
-mitk::StateMachine::Pointer mitk::DataTreeNode::GetInteractor() const
+mitk::Interactor::Pointer mitk::DataTreeNode::GetInteractor() const
 {
   return m_Interactor;
 }
@@ -54,7 +54,7 @@ void mitk::DataTreeNode::SetData(mitk::BaseData* baseData)
     }
 }
 
-void mitk::DataTreeNode::SetInteractor(mitk::StateMachine* interactor)
+void mitk::DataTreeNode::SetInteractor(mitk::Interactor* interactor)
 {
 	m_Interactor = interactor;
 }

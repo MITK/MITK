@@ -6,7 +6,10 @@
  *   writes a PicFile to disk
  *
  * $Log$
- * Revision 1.3  1998/05/18 12:13:54  andre
+ * Revision 1.4  1998/09/01 15:26:43  andre
+ * *** empty log message ***
+ *
+ * Revision 1.3  1998/05/18  12:13:54  andre
  * *** empty log message ***
  *
  * Revision 1.2  1997/09/15  13:21:19  andre
@@ -87,10 +90,12 @@ void ipPicPutSlice( char *outfile_name, ipPicDescriptor *pic, ipUInt4_t slice )
   rewind( outfile );
   fwrite( ipPicVERSION, 1, sizeof(ipPicTag_t), outfile );
 
+  fseek( outfile, 0, SEEK_CUR );
   ipFReadLE( &tags_len, sizeof(ipUInt4_t), 1, outfile );
   tags_len = tags_len - 3 * sizeof(ipUInt4_t)
                       - pic_in->dim * sizeof(ipUInt4_t);
 
+  fseek( outfile, 0, SEEK_CUR );
   ipFWriteLE( &(pic_in->type), sizeof(ipUInt4_t), 1, outfile );
   ipFWriteLE( &(pic_in->bpe), sizeof(ipUInt4_t), 1, outfile );
   ipFWriteLE( &(pic_in->dim), sizeof(ipUInt4_t), 1, outfile );

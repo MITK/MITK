@@ -11,7 +11,7 @@
 #include <mitkDataTreeNode.h>
 #include <mitkSurfaceData.h>
 
-#include <MeshUtil.h>
+//#include <MeshUtil.h>
 
 class CommonFunctionality
 {
@@ -108,7 +108,12 @@ public:
     }
 
     mitk::SurfaceData::Pointer surface = mitk::SurfaceData::New();
-    vtkPolyData* polys = MeshUtil<TMeshType>::meshToPolyData( itkMesh );
+//    vtkPolyData* polys = MeshUtil<TMeshType>::meshToPolyData( itkMesh );
+    /**
+     * @todo include Algorithms/itkMeshDeformation into Framework module so the upper line can be used
+     * and the conversion works correctly
+     */
+    vtkPolyData* polys = vtkPolyData::New();
     surface->SetVtkPolyData(polys);
     node->SetData( surface );
     node->SetProperty("layer", new mitk::IntProperty(1));

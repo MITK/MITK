@@ -19,6 +19,10 @@
 #include <map>
 #include <mitkSurfaceData.h>
 #include <mitkColorProperty.h>
+#include <mitkBoolProperty.h>
+#include <mitkLookupTableProperty.h>
+#include "mitkProperties.h"
+
 #include <mitkLevelWindowProperty.h>
 #include <mitkVesselTreeFileReader.h>
 #include <LevelWindow.h>
@@ -40,6 +44,9 @@
 #include <EventMapper.h>
 #include <GlobalInteraction.h>
 
+#include <mitkLookupTableSource.h>
+
+
 #ifdef MITK_DICOM_ENABLED
 #include <mitkDICOMFileReader.h>
 #endif
@@ -60,7 +67,7 @@ void QmitkMainTemplate::fileNew()
 
 void QmitkMainTemplate::fileOpen()
 {
-    QString fileName = QFileDialog::getOpenFileName(NULL,"all (*.seq *.pic *.pic.gz *.seq.gz *.pvtk *.stl *.vtk *.ves);;DKFZ Pic (*.seq *.pic *.pic.gz *.seq.gz);;surface files (*.stl *.vtk);;stl files (*.stl);;vtk surface files (*.vtk);;vtk image files (*.pvtk);;ves files (*.ves)");
+    QString fileName = QFileDialog::getOpenFileName(NULL,"all (*.seq *.pic *.pic.gz *.seq.gz *.pvtk *.stl *.vtk *.ves hpsonos.db HPSONOS.DB);;DKFZ Pic (*.seq *.pic *.pic.gz *.seq.gz);;surface files (*.stl *.vtk);;stl files (*.stl);;vtk surface files (*.vtk);;vtk image files (*.pvtk);;ves files (*.ves);;DSR Files (hpsonos.db HPSONOS.DB)");
 
     if ( !fileName.isNull() )
     {
@@ -251,120 +258,109 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
 #endif
 #ifdef MITK_INTERNAL
 	else
-    if(strstr(fileName, "Native")!=0)
+    if(strstr(fileName, "hpsonos.db")!=0 || strstr(fileName, "HPSONOS.DB")!=0)
 	{
+
+		if (strcmp(fileName,"HPSONOS.DB")==0)
+		{
+				std::cout << "renamed HPSONOS.DB to hpsonos.db" << std::endl;
+				fileName = "hpsonos.db";
+		}
+
+		
 		mitk::DSRFileReader::Pointer reader;
 
 		reader=mitk::DSRFileReader::New();
 		std::cout << "loading " << fileName << " as pic ... " << std::endl;
 
 		reader->SetFileName(fileName);
-        mitk::ImageTimeSelector::Pointer timeSelector=mitk::ImageTimeSelector::New();
+    mitk::ImageTimeSelector::Pointer timeSelector=mitk::ImageTimeSelector::New();
 		timeSelector->SetInput(reader->GetOutput());
 	    
 		mitk::CylindricToCartesianFilter::Pointer cyl2cart;
-      	cyl2cart = mitk::CylindricToCartesianFilter::New();
+		mitk::CylindricToCartesianFilter::Pointer cyl2cartDoppler;
+
+		cyl2cart = mitk::CylindricToCartesianFilter::New();
+		cyl2cartDoppler = mitk::CylindricToCartesianFilter::New();
+		
 		mitk::DataTreeIterator* it=tree->inorderIterator();
         
 		// Doppler information
-		/*timeSelector->SetChannelNr(1);
+		timeSelector->SetChannelNr(1);
 	 	timeSelector->SetTimeNr(0);
-        timeSelector->Update();
-       
-		mitk::CylindricToCartesianFilter::Pointer cyl2cart;
-      	cyl2cart = mitk::CylindricToCartesianFilter::New();
-        
-		cyl2cart->SetInput(timeSelector->GetOutput());
-		mitk::DataTreeIterator* it=tree->inorderIterator();
+    timeSelector->Update();
+
+    // add original data to tree
+//		node=mitk::DataTreeNode::New();
+//		node->SetData(timeSelector->GetOutput());
+//		it->add(node);
+//
+//	  node->SetProperty("Doppler",new mitk::BoolProperty(true));
+//  	node->SetProperty("layer", new mitk::IntProperty(-10) );
+
+
+		// TODO: HP map must be provided by DSRFilereader, since it
+		// may be dependend on data ( baseline shift)
+		mitk::LookupTableSource::Pointer LookupTableSource = new mitk::LookupTableSource();
+//		LookupTableSource->SetUseHPLookupTable();
+		mitk::LookupTableSource::OutputTypePointer LookupTable = LookupTableSource->GetOutput();
+    mitk::LookupTableProperty::Pointer LookupTableProp = new mitk::LookupTableProperty(*LookupTable);
+
+//    node->SetProperty("LookupTable", LookupTableProp );
+//   	node->Update();
+   
+   	// add cartesian data to tree        
+		cyl2cartDoppler->SetInput(timeSelector->GetOutput());
+		it=tree->inorderIterator();
 
 		node=mitk::DataTreeNode::New();
-		node->SetData(cyl2cart->GetOutput());
-		it->add(node); 
-		node->SetColor(0.3,0.9, 0.2, mitkMultiWidget->mitkWidget2->GetRenderer());
+		node->SetData(cyl2cartDoppler->GetOutput());
+		it->add(node);
+		
+	  node->SetProperty("Doppler",new mitk::BoolProperty(true));
+  	node->SetProperty("layer", new mitk::IntProperty(-10) );
+
+  	node->SetProperty("LookupTable", LookupTableProp );
 		node->Update();
-    */
-	    // Backscatter information	
-        timeSelector->SetChannelNr(0);
+		
+		mitk::LevelWindow levelWindow;
+    reader->Update();
+	  levelWindow.SetAuto( cyl2cartDoppler->GetOutput()->GetPic() );
+		node->SetLevelWindow(levelWindow, NULL);
+    mitkMultiWidget->levelWindowWidget->setLevelWindow(levelWindow);
+
+                                
+	    // Backscatter information
+    timeSelector->SetChannelNr(0);
 		timeSelector->Update();
+		
+//		node->SetData(timeSelector->GetOutput());
+//		it->add(node);
+//
+//	 	node->SetProperty("layer", new mitk::IntProperty(-15) );
+//	  node->SetProperty("Backscatter",new mitk::BoolProperty(true));
+//
+//		node->SetLevelWindow(levelWindow, NULL);
+//		node->Update();
+
+		
 		cyl2cart->SetInput(timeSelector->GetOutput());
 		node=mitk::DataTreeNode::New();
 		cyl2cart->Update();
 		node->SetData(cyl2cart->GetOutput());
-		it->add(node); 
-		//node->SetColor(0.0,0.9, 0.2, mitkMultiWidget->mitkWidget1->GetRenderer());
-		//node->SetColor(0.0,0.1, 0.9, mitkMultiWidget->mitkWidget3->GetRenderer());
+		it->add(node);
+
+  	node->SetProperty("layer", new mitk::IntProperty(-15) );
+	  node->SetProperty("Backscatter",new mitk::BoolProperty(true));
+		node->SetColor(1.0,1.0, 1.0, mitkMultiWidget->mitkWidget1->GetRenderer());
+		node->SetColor(1.0,1.0, 1.0, mitkMultiWidget->mitkWidget2->GetRenderer());
+		node->SetColor(1.0,1.0, 1.0, mitkMultiWidget->mitkWidget3->GetRenderer());				
+		node->SetColor(1.0,1.0, 1.0, mitkMultiWidget->mitkWidget4->GetRenderer());
+				        
+		node->SetLevelWindow(levelWindow, NULL);
 		node->Update();
 
-///************MeshHandle
-
-//		mitk::SurfaceData::Pointer surfaceDataHandle = mitk::SurfaceData::New();
-//		MyvtkAblationMeshHandle * myMeshHandle= MyvtkAblationMeshHandle::New();
-//		myMeshHandle->setRadius(5);
-//		myMeshHandle->setLength(100);
-//		myMeshHandle->GenerateMeshHandle();
-//
-//		surfaceDataHandle->SetVtkPolyData(myMeshHandle->GetPolyData());
-//        node=mitk::DataTreeNode::New();
-//		node->SetData(surfaceDataHandle);
-//		node->Update();
-//		it->add(node);		
-/////****************
-//
-//		mitk::SurfaceData::Pointer surfaceData = mitk::SurfaceData::New();
-//		MyvtkAblationMesh * myMesh= MyvtkAblationMesh::New();
-//		myMesh->setAngle(30);
-////		myMesh->setLength(20);
-//		
-//		//die Parametern sollten plausibel angegeben werden
-//    	myMesh->setWidthOfHead(20);
-//		myMesh->setNumberOfSectors(5);
-//		myMesh->setPartionsOfSector(1,1);
-//		myMesh->setPartionsOfSector(2,2);
-//		myMesh->setPartionsOfSector(3,3);
-//		myMesh->setPartionsOfSector(4,4);
-//		myMesh->setPartionsOfSector(5,5);
-//		myMesh->setSectorLength(1,50);
-//		myMesh->setSectorLength(2,50);
-//		myMesh->setSectorLength(3,50);
-//		myMesh->setSectorLength(4,50);
-//		myMesh->setSectorLength(5,50);
-//		myMesh->setTubeRadius(5);
-//
-//		myMesh->GenerateMesh();
-//		//Maptest****************************************
-//        int cellindex = myMesh->GetCellIndex("QE1.1");
-//		cellindex = myMesh->GetCellIndex("QE2.1");
-//		cellindex = myMesh->GetCellIndex("QE3.2");
-//		cellindex = myMesh->GetCellIndex("LE1.1");
-//		cellindex = myMesh->GetCellIndex("LE3.1");
-//		cellindex = myMesh->GetCellIndex("LE2.2");
-//        cellindex = myMesh->GetCellIndex("LE2.3");
-//		cellindex = myMesh->GetCellIndex("LE3.4");
-//		cellindex = myMesh->GetCellIndex("LE3.5");
-//		cellindex = myMesh->GetCellIndex("LE4.2");
-//		
-//
-//		myMesh->GetCellIndex("QE1.1");
-//       //Maptest*****************************************
-//
-//		surfaceData->SetVtkPolyData(myMesh->GetPolyData());
-//        node=mitk::DataTreeNode::New();
-//		node->SetData(surfaceData);
-//		bool wireframe=true;
-//		node->SetVisibility(wireframe, this->mitkMultiWidget->mitkWidget2->GetRenderer(),"wireframe");
-//		this->mitkMultiWidget->updateMitkWidgets(); 
-//		//		node->SetProperty("wireframe",true);
-//		it->add(node);
-//
-//		node->Update();
-		
-		mitk::LevelWindow levelWindow;
-        reader->Update();
-        levelWindow.SetAuto( cyl2cart->GetOutput()->GetPic() );
-		node->SetLevelWindow(levelWindow, NULL);
-		
-        mitkMultiWidget->levelWindowWidget->setLevelWindow(levelWindow);
-
+				
 		initWidgets(it);
 	}
 #endif

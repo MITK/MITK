@@ -29,7 +29,8 @@
 
 #include <mitkStringProperty.h>
 #include <qstring.h>
-
+#include "ImageTimeSelector.h"
+#include "ImageChannelSelector.h"
 //#include <mitkImageToItk.h>
 //#include <itkThresholdImageFilter.h>
 
@@ -41,6 +42,11 @@
 
 #ifdef MITK_DICOM_ENABLED
 #include <mitkDICOMFileReader.h>
+#endif
+
+#ifdef MITK_INTERNAL
+#include <mitkDSRFileReader.h>
+#include <mitkCylindricToCartesianFilter.h>
 #endif
 
 #include <mitkInteractionConst.h>
@@ -233,6 +239,68 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
 		node=mitk::DataTreeNode::New();
 		node->SetData(reader->GetOutput());
 		it->add(node); 
+
+        mitk::LevelWindow levelWindow;
+        reader->Update();
+        levelWindow.SetAuto( reader->GetOutput()->GetPic() );
+		node->SetLevelWindow(levelWindow, NULL);
+        mitkMultiWidget->levelWindowWidget->setLevelWindow(levelWindow);
+
+		initWidgets(it);
+	}
+#endif
+#ifdef MITK_INTERNAL
+	else
+    if(strstr(fileName, "Native")!=0)
+	{
+		mitk::DSRFileReader::Pointer reader;
+
+		reader=mitk::DSRFileReader::New();
+		std::cout << "loading " << fileName << " as pic ... " << std::endl;
+
+		reader->SetFileName(fileName);
+        mitk::ImageTimeSelector::Pointer timeSelector=mitk::ImageTimeSelector::New();
+		timeSelector->SetInput(reader->GetOutput());
+	    
+		mitk::CylindricToCartesianFilter::Pointer cyl2cart;
+      	cyl2cart = mitk::CylindricToCartesianFilter::New();
+		mitk::DataTreeIterator* it=tree->inorderIterator();
+        
+		// Doppler information
+		/*timeSelector->SetChannelNr(1);
+	 	timeSelector->SetTimeNr(0);
+        timeSelector->Update();
+       
+		mitk::CylindricToCartesianFilter::Pointer cyl2cart;
+      	cyl2cart = mitk::CylindricToCartesianFilter::New();
+        
+		cyl2cart->SetInput(timeSelector->GetOutput());
+		mitk::DataTreeIterator* it=tree->inorderIterator();
+
+		node=mitk::DataTreeNode::New();
+		node->SetData(cyl2cart->GetOutput());
+		it->add(node); 
+		node->SetColor(0.3,0.9, 0.2, mitkMultiWidget->mitkWidget2->GetRenderer());
+		node->Update();
+    */
+	    // Backscatter information	
+        timeSelector->SetChannelNr(0);
+		timeSelector->Update();
+		cyl2cart->SetInput(timeSelector->GetOutput());
+		node=mitk::DataTreeNode::New();
+		cyl2cart->Update();
+		node->SetData(cyl2cart->GetOutput());
+		it->add(node); 
+		node->SetColor(0.0,0.9, 0.2, mitkMultiWidget->mitkWidget1->GetRenderer());
+		node->SetColor(0.0,0.1, 0.9, mitkMultiWidget->mitkWidget3->GetRenderer());
+		node->Update();
+		
+		mitk::LevelWindow levelWindow;
+        reader->Update();
+        levelWindow.SetAuto( cyl2cart->GetOutput()->GetPic() );
+		node->SetLevelWindow(levelWindow, NULL);
+		
+        mitkMultiWidget->levelWindowWidget->setLevelWindow(levelWindow);
 
 		initWidgets(it);
 	}

@@ -44,7 +44,7 @@ void mitk::DICOMFileReader::GenerateOutputInformation()
         exit(-1);
 		pic = _dicomToPic( header, header_size,
                      image, image_size, color );
-		//pic->dim--;
+		pic->dim--;
 		
 	/*{
 		//ipInt4_t slices;
@@ -56,8 +56,9 @@ void mitk::DICOMFileReader::GenerateOutputInformation()
 		pic->n[pic->dim-1] = slices;
         //pic->dim++;
 	}*/
-		outputfile_name = "out.pic";
-		ipPicPut( const_cast<char *>(outputfile_name.c_str()),pic );
+		//outputfile_name = "out3DDicom.pic";
+		//ipPicPut( const_cast<char *>(outputfile_name.c_str()),pic );
+
 		
 		/////////////
 

@@ -1,4 +1,3 @@
-#include "mitkVector.h"
 #include "mitkDisplayVectorInteractor.h"
 #include "Operation.h"
 #include "mitkDisplayCoordinateOperation.h"

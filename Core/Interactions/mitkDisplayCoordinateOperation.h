@@ -3,8 +3,8 @@
 
 #include "mitkCommon.h"
 #include "BaseRenderer.h"
+#include "mitkVector.h"
 #include "Operation.h"
-#include "itkMacro.h"
 
 #define mitkGetMacro(name,type) \
   virtual type Get##name () \

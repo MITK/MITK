@@ -1,12 +1,17 @@
 #ifndef MITKINTERACTCONST_H
 #define MITKINTERACTCONST_H
+/*
+//UndoMechanism:
+//constants for UndoMechanism;
+*/
+//different UndoModels:
+#define LIMITEDLINEARUNDO 10
+#define TREEUNDO 20
 
 /*
-
-If you change anything here, then change in EventMapper.cpp (Array of constants) as well.
-
+//EventMechanism:
+//If you change anything here, then change in EventMapper.cpp (Array of constants) as well.
 */
-
 //##Constants for States and Transitions
 //## in the XML-File and in the code
 #define stNO 0
@@ -393,14 +398,7 @@ If you change anything here, then change in EventMapper.cpp (Array of constants)
 
 
 
-/*
-//
-//UndoMechanism:
-//constants for UndoMechanism;
-*/
-//different UndoModels:
-#define LIMITEDLINEARUNDO 10
-#define TREEUNDO 20
+
 
 
 #endif //ifndef MITKINTERACTCONST_H

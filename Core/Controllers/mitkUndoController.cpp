@@ -18,17 +18,17 @@ mitk::UndoController::UndoController(UndoType undoType)
 		switch (undoType)
 		{
 		case LIMITEDLINEARUNDO:
-				m_CurUndoModel = new mitk::LimitedLinearUndo;
-				m_CurUndoType = undoType;
-				m_UndoModelList.insert(UndoModelMap::value_type(undoType, m_CurUndoModel));
-				break;
-			//case ###
-				//insert here, in add- and RemoveUndoModel new sets of UndoModels!
-				//break;
-			default :
-				m_CurUndoModel = new LimitedLinearUndo;
-				m_CurUndoType = undoType;
-				m_UndoModelList.insert(UndoModelMap::value_type(undoType, m_CurUndoModel));
+			m_CurUndoModel = new mitk::LimitedLinearUndo;
+			m_CurUndoType = undoType;
+			m_UndoModelList.insert(UndoModelMap::value_type(undoType, m_CurUndoModel));
+		break;
+		//case ###
+		//insert here, in add- and RemoveUndoModel new sets of UndoModels!
+		//break;
+		default :
+			m_CurUndoModel = new LimitedLinearUndo;
+			m_CurUndoType = undoType;
+			m_UndoModelList.insert(UndoModelMap::value_type(undoType, m_CurUndoModel));
 		}
 	}
 }

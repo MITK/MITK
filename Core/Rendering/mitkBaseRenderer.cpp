@@ -141,6 +141,7 @@ void mitk::BaseRenderer::SetSlice(unsigned int slice)
         if(m_Slice >= slicedWorldGeometry->GetSlices())
           m_Slice = slicedWorldGeometry->GetSlices()-1;
         SetCurrentWorldGeometry2D(slicedWorldGeometry->GetGeometry2D(m_Slice));
+        m_CurrentWorldGeometry = slicedWorldGeometry;
       }
     }
     else
@@ -159,7 +160,10 @@ void mitk::BaseRenderer::SetTimeStep(unsigned int timeStep)
         m_TimeStep = m_TimeSlicedWorldGeometry->GetTimeSteps()-1;
       SlicedGeometry3D* slicedWorldGeometry=dynamic_cast<SlicedGeometry3D*>(m_TimeSlicedWorldGeometry->GetGeometry3D(m_TimeStep));
       if(slicedWorldGeometry!=NULL)
+      {
         SetCurrentWorldGeometry2D(slicedWorldGeometry->GetGeometry2D(m_Slice));
+        m_CurrentWorldGeometry = slicedWorldGeometry;
+      }
     }
     else
       Modified();
@@ -188,11 +192,13 @@ void mitk::BaseRenderer::SetWorldGeometry(mitk::Geometry3D* geometry)
       }
       assert(slicedWorldGeometry!=NULL); //only as long as the todo described in SetWorldGeometry is not done
       SetCurrentWorldGeometry2D(slicedWorldGeometry->GetGeometry2D(m_Slice)); // calls Modified()
+      m_CurrentWorldGeometry = slicedWorldGeometry;
     }
     else
     {
       Geometry2D* geometry2d=dynamic_cast<Geometry2D*>(geometry);
       SetCurrentWorldGeometry2D(geometry2d);
+      m_CurrentWorldGeometry = geometry2d;
       Modified();
     }
   }

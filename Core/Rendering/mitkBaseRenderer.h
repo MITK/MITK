@@ -143,6 +143,9 @@ public:
   virtual void SetWorldGeometry(mitk::Geometry3D* geometry);
   itkGetConstObjectMacro(WorldGeometry, mitk::Geometry3D);
   //##Documentation
+  //## @brief Get the current 3D-worldgeometry (m_CurrentWorldGeometry) used for 3D-rendering
+  itkGetConstObjectMacro(CurrentWorldGeometry, mitk::Geometry3D);
+  //##Documentation
   //## @brief Get the current 2D-worldgeometry (m_CurrentWorldGeometry2D) used for 2D-rendering
   itkGetConstObjectMacro(CurrentWorldGeometry2D, mitk::Geometry2D);
 
@@ -318,6 +321,10 @@ private:
   //## is used as m_CurrentWorldGeometry2D.
   //## \sa m_CurrentWorldGeometry2D
   TimeSlicedGeometry::Pointer m_TimeSlicedWorldGeometry;
+
+  //##Documentation
+  //## Pointer to the current 3D-worldgeometry. 
+  Geometry3D::Pointer m_CurrentWorldGeometry;
 
   //##ModelId=3EDD039F00A9
   //##Documentation

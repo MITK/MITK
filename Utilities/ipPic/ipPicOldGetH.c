@@ -6,7 +6,10 @@
  *   reads the header of a oldstyle PicFile from disk
  *
  * $Log$
- * Revision 1.2  1997/09/15 13:21:17  andre
+ * Revision 1.3  2000/01/13 14:03:07  andre
+ * *** empty log message ***
+ *
+ * Revision 1.2  1997/09/15  13:21:17  andre
  * switched to new what string format
  *
  * Revision 1.1.1.1  1997/09/06  19:09:59  andre
@@ -74,7 +77,7 @@ ipPicDescriptor * _ipPicOldGetHeader( FILE *infile, ipPicDescriptor *pic )
   if( old_pic.type == 1 )
     pic->type = ipPicUInt;
   else
-    pic->type = old_pic.conv;
+    pic->type = (ipPicType_t)old_pic.conv;
   pic->bpe = old_pic.type*8;
   pic->dim = old_pic.rank;
   pic->n[0] = old_pic.n1;

@@ -33,6 +33,13 @@ public:
 	//## @brief Sets the amount of precision
   void SetPrecision(unsigned int precision);
 
+  //##Documentation
+  //## @brief derived from mitk::Interactor; calculates Jurisdiction according to points
+  //##
+  //## standard mathod can not be used, since it doesn't calculate in points, only in BoundingBox of Points
+  virtual float CalculateJurisdiction(StateEvent const* stateEvent) const;
+
+
 protected:
   //##Documentation
   //## @brief select the point on the given position

@@ -11,6 +11,9 @@
 #include <mitkEventMapper.h>
 #include <mitkLineOperation.h>
 #include <mitkProperties.h>
+#include <vtkTransform.h>
+#include <mitkLine.h>
+#include <mitkPointSet.h>
 
 
 mitk::LineInteractor::LineInteractor(const char * type, DataTreeNode* dataTreeNode)
@@ -62,6 +65,114 @@ void mitk::LineInteractor::DeselectAllLines()
   }
 }
 
+float mitk::LineInteractor::CalculateJurisdiction(StateEvent const* stateEvent) const
+//go through all lines and check, if the given Point lies near a line
+{
+  float returnValue = 0;
+  
+  mitk::PositionEvent const  *posEvent = dynamic_cast <const mitk::PositionEvent *> (stateEvent->GetEvent());
+  //checking if a keyevent can be handled:
+  if (posEvent == NULL)
+  {
+    //check, if the current state has a transition waiting for that key event.
+    if (this->GetCurrentState()->GetTransition(stateEvent->GetId())!=NULL)
+    {
+      return 0.5;
+    }
+    else
+    {
+      return 0;
+    }
+  }
+
+  //Mouse event handling:
+  //on MouseMove do nothing! reimplement if needed differently
+  if (stateEvent->GetEvent()->GetType() == mitk::Type_MouseMove)
+  {
+    return 0;
+  }
+
+  //check on the right data-type
+  mitk::Mesh* mesh = dynamic_cast<mitk::Mesh*>(m_DataTreeNode->GetData());
+	if (mesh == NULL)
+		return 0;
+
+
+  //since we now have 3D picking in GlobalInteraction and all events send are DisplayEvents with 3D information,
+  //we concentrate on 3D coordinates
+  mitk::Point3D worldPoint = posEvent->GetWorldPosition();
+  float p[3];
+  itk2vtk(worldPoint, p);
+  //transforming the Worldposition to local coordinatesystem
+  m_DataTreeNode->GetData()->GetGeometry()->GetVtkTransform()->GetInverse()->TransformPoint(p, p);
+  vtk2itk(p, worldPoint);
+
+  //now check if the point lies on a line;
+  unsigned long lineId = 0;
+  unsigned long cellId = 0;
+
+  float distance = 5;
+  bool found =  mesh->SearchLine(worldPoint, distance, lineId, cellId);
+  if (found)
+    //how far away is the line from the point?
+  {
+    //get the cell
+    Mesh::CellAutoPointer cellAutoPointer;
+    if (!mesh->GetMesh()->GetCell(cellId,cellAutoPointer))
+    {
+      itkWarningMacro("Cell could not be found!Check LineInteractor");
+      return 0;
+    }
+    //get the two points according to the recieved lineId
+    mitk::PointSet::PointType pointA, pointB;
+    mitk::Mesh::PointIdConstIterator pointIdIt = cellAutoPointer.GetPointer()->PointIdsBegin();
+    mitk::Mesh::PointIdConstIterator pointIdEnd = cellAutoPointer.GetPointer()->PointIdsEnd();
+    //get to the desired index of pointIndexes according to lineId
+    int counter = 0;
+    while (pointIdIt != pointIdEnd)
+    {
+      if (counter == lineId)
+        break;
+      ++counter;
+      ++pointIdIt;
+    }
+
+    if ( ! mesh->GetMesh()->GetPoint((*pointIdIt), &pointA) )//get the PointA
+      return 0;
+    ++pointIdIt;
+    if (pointIdIt == pointIdEnd)//then it was the last and the first point
+      pointIdIt = cellAutoPointer.GetPointer()->PointIdsBegin();
+    if ( ! mesh->GetMesh()->GetPoint((*pointIdIt), &pointB) )//get the PointB
+      return 0;
+
+    //now we have the points and so we can calculate the distance
+    Line<PointSet::CoordinateType> *line = new Line<PointSet::CoordinateType>();
+    line->SetPoints(pointA, pointB);
+    
+    double pointDistance = line->distance(worldPoint);
+    
+    //because we searched for a line in the distance, we now can set it according to distance between 0 and 1
+    returnValue = 1 - ( pointDistance / distance );
+    
+    //and now between 0,5 and 1
+    returnValue = 0.5 + (returnValue / 2);
+  }
+  else //not found
+  {
+    returnValue = 0;
+  }
+
+
+  //now check all lower statemachines:
+  float lowerJurisdiction = this->CalculateLowerJurisdiction(stateEvent);
+  
+  if (returnValue<lowerJurisdiction)
+    returnValue = lowerJurisdiction;
+
+  return returnValue;
+}
+
+
 bool mitk::LineInteractor::ExecuteAction(Action* action, mitk::StateEvent const* stateEvent)
 {
   bool ok = false;//for return type bool
@@ -77,22 +188,6 @@ bool mitk::LineInteractor::ExecuteAction(Action* action, mitk::StateEvent const*
   
   switch (action->GetActionId())
 	{
-  case AcDONOTHING:
-    ok = true;
-  break;
-  //case AcTRANSMITEVENT:
-  //  {
-  //    //due to the use of guards-states the eventId can be changed from original to internal EventIds e.g. EIDYES.
-  //    //so we have remap the event and transmitt the original event with proper id
-  //    ok = m_PointInteractor->HandleEvent(mitk::EventMapper::RefreshStateEvent(const_cast<StateEvent*>(stateEvent)), objectEventId, groupEventId );
-  //    //check the state of the machine and according to that change the state/mode of this statemachine
-  //    int mode = m_PointInteractor->GetMode();
-  //    if (mode == mitk::Interactor::SMSELECTED)
-  //      this->SetMode(mitk::Interactor::SMSUBSELECTED);
-  //    else 
-  //      this->SetMode(mitk::Interactor::SMDESELECTED);
-  //  }
-	 // break;
   case AcADDLINE:
     {
       Operation* doOp = new mitk::Operation(OpADDLINE);
@@ -113,46 +208,7 @@ bool mitk::LineInteractor::ExecuteAction(Action* action, mitk::StateEvent const*
     ok = true;
   }
   break;
-  case AcCHECKPOINT:
-    //check if a point is hit
-    {
-      mitk::PositionEvent const  *posEvent = dynamic_cast <const mitk::PositionEvent *> (stateEvent->GetEvent());
-		  if (posEvent != NULL)
-      {
-        mitk::Point3D worldPoint = posEvent->GetWorldPosition();
-        
-        int PRECISION = 1;
-        mitk::IntProperty *precision = dynamic_cast<IntProperty*>(action->GetProperty("PRECISION"));
-        if (precision != NULL)
-        {
-          PRECISION = precision->GetValue();
-        }
-
-			  int position = mesh->SearchPoint(worldPoint, PRECISION);
-			  if (position>=0)//found a point near enough to the given point
-			  {
-          worldPoint = mesh->GetPoint(position);//get that point, the one meant by the user!
-				  mitk::Point2D displPoint;
-          displPoint[0] = worldPoint[0];
-          displPoint[1] = worldPoint[1];
-          //new Event with information YES and with the correct point
-          mitk::PositionEvent const* newPosEvent = new mitk::PositionEvent(posEvent->GetSender(), posEvent->GetType(), posEvent->GetButton(), posEvent->GetButtonState(), posEvent->GetKey(), displPoint, worldPoint);
-          mitk::StateEvent* newStateEvent = new mitk::StateEvent(EIDYES, newPosEvent);
-          //call HandleEvent to leave the guard-state
-          this->HandleEvent( newStateEvent );
-				  ok = true;
-			  }
-			  else
-			  {
-				  //new Event with information NO
-          mitk::StateEvent* newStateEvent = new mitk::StateEvent(EIDNO, posEvent);
-          this->HandleEvent(newStateEvent );
-				  ok = true;
-			  }
-		  }
-    }
-    break;
-  case AcCHECKELEMENT:
+  case AcCHECKLINE:
     //checks if the position of the mouse lies over a line
     {
       mitk::PositionEvent const  *posEvent = dynamic_cast <const mitk::PositionEvent *> (stateEvent->GetEvent());
@@ -162,7 +218,7 @@ bool mitk::LineInteractor::ExecuteAction(Action* action, mitk::StateEvent const*
 
         unsigned long lineId, cellId;
 
-        int PRECISION = 1;
+        int PRECISION = 5;
         mitk::IntProperty *precision = dynamic_cast<IntProperty*>(action->GetProperty("PRECISION"));
         if (precision != NULL)
         {

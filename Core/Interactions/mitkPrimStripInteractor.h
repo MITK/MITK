@@ -2,8 +2,8 @@
 #define MITKPRIMSTRIPINTERACTOR_H_HEADER_INCLUDED
 
 #include "mitkCommon.h"
-#include <mitkInteractor.h>
-#include <map>
+#include <mitkHierarchicalInteractor.h>
+#include "mitkLineInteractor.h"
 
 namespace mitk
 {
@@ -15,15 +15,11 @@ class DataTreeNode;
 //## Interact with a list of interactables e.g. lines and stripes
 //## The whole list can be selected by selecting all the other lower interactables.
 //## the selection of the whole dataSet is only possible by seting the property of the DataTreeNode.
-class PrimStripInteractor: public Interactor
+class PrimStripInteractor: public HierarchicalInteractor
 {
 public:
-  mitkClassMacro(PrimStripInteractor, Interactor);
+  mitkClassMacro(PrimStripInteractor, HierarchicalInteractor);
   
-  typedef int IdType;
-  typedef mitk::Interactor PrimElement;
-  typedef std::map<IdType, PrimElement*> PrimList;
-      
   //##Documentation
   //##@brief Constructor 
   PrimStripInteractor(const char * type, DataTreeNode* dataTreeNode);
@@ -32,10 +28,6 @@ public:
   //##@brief Destructor 
   virtual ~PrimStripInteractor();
 
-  //##Documentation
-  //##@brief returns the Id of this point
-  int GetId();
-
 protected:
   //##Documentation
   //## @brief Executes Actions
@@ -43,12 +35,20 @@ protected:
 
 private:
   //##Documentation
-  //## @brief store all different geometrical objects (primitives e.g. lines) with its ID's and pointer
-  PrimList m_PrimList;
+  //## @brief lower Line Interactor 
+  mitk::LineInteractor::Pointer m_LineInteractor;
 
   //##Documentation
-  //## @brief Identificationnumber of that strip
-  int m_Id;
+  //## @brief stores the current CellId this Statemachine works in
+  unsigned int m_CurrentCellId;
+
+  //##Documentation
+  //## @brief stores the coordinate in the beginning of a movement. It is neede to declare undo-information
+  Point3D m_MovementStart;
+
+  //##Documentation
+  //## @brief stores the coordinate of the last given MousePosition to calculate a vector
+  Point3D m_OldPoint;
 
 };
 }

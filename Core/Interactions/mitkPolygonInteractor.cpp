@@ -55,7 +55,7 @@ void mitk::PolygonInteractor::DeselectAllCells()
 
 float mitk::PolygonInteractor::CalculateJurisdiction(StateEvent const* stateEvent) const
 {
-  float returnJurisdiction = 0;
+  float returnValue = 0;
   
   mitk::PositionEvent const  *posEvent = dynamic_cast <const mitk::PositionEvent *> (stateEvent->GetEvent());
   //checking if a keyevent can be handled:
@@ -106,42 +106,36 @@ float mitk::PolygonInteractor::CalculateJurisdiction(StateEvent const* stateEven
 
     //distance between center and point 
     mitk::BoundingBox::PointType center = bBox->GetCenter();
-    returnJurisdiction = worldPoint.EuclideanDistanceTo(center);
+    returnValue = worldPoint.EuclideanDistanceTo(center);
     
     //now compared to size of boundingbox to get between 0 and 1;
-    returnJurisdiction = returnJurisdiction/( (bBox->GetMaximum().EuclideanDistanceTo(bBox->GetMinimum() ) ) );
+    returnValue = returnValue/( (bBox->GetMaximum().EuclideanDistanceTo(bBox->GetMinimum() ) ) );
     
     //shall be 1 if short length to center
-    returnJurisdiction = 1 - returnJurisdiction;
+    returnValue = 1 - returnValue;
 
     //check if the given position lies inside the data-object
     if (bBox->IsInside(worldPoint))
     {
       //mapped between 0,5 and 1
-      returnJurisdiction = 0.5 + (returnJurisdiction / 2);
+      returnValue = 0.5 + (returnValue / 2);
     }
     else
     {
       //set it in range between 0 and 0.5
-      returnJurisdiction = returnJurisdiction / 2;
+      returnValue = returnValue / 2;
     }
     ++cellIt;
   }
-
+  
 
 //now check all lower statemachines:
-  InteractorListConstIter i = m_AllInteractors.begin();
-  InteractorListConstIter end = m_AllInteractors.end();
+  float lowerJurisdiction = this->CalculateLowerJurisdiction(stateEvent);
+  
+  if (returnValue < lowerJurisdiction)
+    returnValue = lowerJurisdiction;
 
-  while ( i != end )
-  {
-    float currentJurisdiction = (*i)->CalculateJurisdiction( stateEvent );
-    if (returnJurisdiction < currentJurisdiction)
-      returnJurisdiction = currentJurisdiction;
-    i++;
-  }
-
-  return returnJurisdiction;
+  return returnValue;
 }
 
 
@@ -156,23 +150,6 @@ bool mitk::PolygonInteractor::ExecuteAction( Action* action, mitk::StateEvent co
 
   switch (action->GetActionId())
 	{
-  case AcDONOTHING:
-    ok = true;
-	  break;
-  //case AcTRANSMITEVENT:
-  //  {
-  //    //due to the use of guards-states the eventId can be changed from original to internal EventIds e.g. EIDYES.
-  //    //so we have remap the event and transmitt the original event with proper id
-  //    ok = m_LineInteractor->HandleEvent(mitk::EventMapper::RefreshStateEvent(const_cast<StateEvent*>(stateEvent)) );
-  //    //check the state of the machine and according to that change the state/mode of this statemachine
-  //    int mode = m_LineInteractor->GetMode();
-  //    if (mode == mitk::Interactor::SMSELECTED ||
-  //      mode == mitk::Interactor::SMSUBSELECTED)
-  //      this->SetMode(mitk::Interactor::SMSUBSELECTED);
-  //    else 
-  //      this->SetMode(mitk::Interactor::SMDESELECTED);
-  //  }
-	 // break;
   case AcINITNEWOBJECT:
     {
       //get the next cellId and set m_CurrentCellId
@@ -283,8 +260,15 @@ bool mitk::PolygonInteractor::ExecuteAction( Action* action, mitk::StateEvent co
       mitk::Point3D point = posEvent->GetWorldPosition();
       unsigned long cellId = 0;
       
+      int precision = 5;
+      mitk::IntProperty *precisionProperty = dynamic_cast<IntProperty*>(action->GetProperty("PRECISION"));
+      if (precisionProperty != NULL)
+      {
+        precision = precisionProperty->GetValue();
+      }
+
       //check wheather the mesh is hit.
-      if (mesh->EvaluatePosition(point, cellId))
+      if (mesh->EvaluatePosition(point, cellId, precision))
       {
         m_CurrentCellId = cellId;
         mitk::StateEvent* newStateEvent = new mitk::StateEvent(EIDYES, stateEvent->GetEvent());
@@ -402,4 +386,3 @@ bool mitk::PolygonInteractor::ExecuteAction( Action* action, mitk::StateEvent co
   }
   return ok;
 }
-

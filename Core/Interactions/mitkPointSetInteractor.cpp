@@ -667,8 +667,8 @@ bool mitk::PointSetInteractor::ExecuteAction( Action* action, mitk::StateEvent c
 
 void mitk::PointSetInteractor::Clear()
 {
-	mitk::Point3D itkPoint;
-  itkPoint.Fill(0);
+	mitk::Point3D point;
+  point.Fill(0);
 
 	mitk::PointSet* pointSet = dynamic_cast<mitk::PointSet*>(m_DataTreeNode->GetData());
 	if (pointSet == NULL)
@@ -682,11 +682,11 @@ void mitk::PointSetInteractor::Clear()
   end = points->End();
   while( it != end )
   {
-    itkPoint = pointSet->GetItkPoint(it->Index());
-    PointOperation* doOp = new mitk::PointOperation(OpDELETE, itkPoint, it->Index());
+    point = pointSet->GetPoint(it->Index());
+    PointOperation* doOp = new mitk::PointOperation(OpDELETE, point, it->Index());
 		if (m_UndoEnabled)	//write to UndoMechanism/ Can probably be removed!
 		{
-			PointOperation* undoOp = new mitk::PointOperation(OpADD, itkPoint, it->Index());
+			PointOperation* undoOp = new mitk::PointOperation(OpADD, point, it->Index());
 			OperationEvent *operationEvent = new OperationEvent(pointSet, doOp, undoOp);
 			m_UndoController->SetOperationEvent(operationEvent);
 	  }

@@ -44,6 +44,8 @@ protected:
   //## @brief Unselect all cells of a mesh
   virtual void DeselectAllCells();
 
+
+
 private:
 
   //##Documentation
@@ -65,8 +67,6 @@ private:
   //##Documentation
   //## @brief stores the coordinate of the last given MousePosition to calculate a vector
   Point3D m_OldPoint;
-
-
 
 };
 }

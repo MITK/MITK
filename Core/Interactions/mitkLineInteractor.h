@@ -13,6 +13,7 @@ class DataTreeNode;
 //##Documentation
 //## @brief Interaction with a line between two Points.
 //## @ingroup Interaction
+//##
 //## Interact with a line drawn between two declared points. 
 //## The line can be selected, which selects its edges (the two points), so that the line can be moved.
 class LineInteractor : public HierarchicalInteractor
@@ -27,6 +28,12 @@ public:
   //##Documentation
   //##@brief Destructor 
   virtual ~LineInteractor();
+
+  //##Documentation
+  //## @brief derived from mitk::HierarchicalInteractor; calculates Jurisdiction according to lines
+  //##
+  //## standard mathod can not be used, since it doesn't differ in cells or lines. It would calculate a boundingBox according to points.
+  virtual float CalculateJurisdiction(StateEvent const* stateEvent) const;
 
 protected:
   //##Documentation

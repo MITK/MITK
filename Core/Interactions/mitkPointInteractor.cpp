@@ -8,6 +8,7 @@
 #include <mitkInteractionConst.h>
 #include <mitkAction.h>
 #include <mitkProperties.h>
+#include <vtkTransform.h>
 
 
 mitk::PointInteractor::PointInteractor(const char * type, DataTreeNode* dataTreeNode)
@@ -71,6 +72,80 @@ void mitk::PointInteractor::DeselectAllPoints()
 	}
 }
 
+float mitk::PointInteractor::CalculateJurisdiction(StateEvent const* stateEvent) const
+//go through all points and check, if the given Point lies near a line
+{
+  float returnValue = 0;
+  
+  mitk::PositionEvent const  *posEvent = dynamic_cast <const mitk::PositionEvent *> (stateEvent->GetEvent());
+  //checking if a keyevent can be handled:
+  if (posEvent == NULL)
+  {
+    //check, if the current state has a transition waiting for that key event.
+    if (this->GetCurrentState()->GetTransition(stateEvent->GetId())!=NULL)
+    {
+      return 0.5;
+    }
+    else
+    {
+      return 0;
+    }
+  }
+
+  //Mouse event handling:
+  //on MouseMove do nothing! reimplement if needed differently
+  if (stateEvent->GetEvent()->GetType() == mitk::Type_MouseMove)
+  {
+    return 0;
+  }
+
+  //check on the right data-type
+  mitk::PointSet* pointSet = dynamic_cast<mitk::PointSet*>(m_DataTreeNode->GetData());
+	if (pointSet == NULL)
+		return 0;
+
+
+  //since we now have 3D picking in GlobalInteraction and all events send are DisplayEvents with 3D information,
+  //we concentrate on 3D coordinates
+  mitk::Point3D worldPoint = posEvent->GetWorldPosition();
+  float p[3];
+  itk2vtk(worldPoint, p);
+  //transforming the Worldposition to local coordinatesystem
+  m_DataTreeNode->GetData()->GetGeometry()->GetVtkTransform()->GetInverse()->TransformPoint(p, p);
+  vtk2itk(p, worldPoint);
+
+  float distance = 5;
+  int index = pointSet->SearchPoint(worldPoint, distance);
+  if (index>-1)
+    //how far away is the line from the point?
+  {
+    //TODO 
+    //get the point and calculate the jurisdiction out of it.
+    mitk::PointSet::PointType point;
+    bool ok = pointSet->GetPointSet()->GetPoint(index, &point);
+    returnValue = point.EuclideanDistanceTo(worldPoint);
+
+    //between 1 and 0.     1 if directly hit
+    returnValue = 1 - ( returnValue / distance );
+    if (returnValue<0 || returnValue>1)
+    {
+      itkWarningMacro("Difficulties in calculating Jurisdiction. Check PointInteractor");
+      return 0;
+    }
+    
+    //and now between 0,5 and 1
+    returnValue = 0.5 + (returnValue / 2);
+
+    return returnValue;
+  }
+  else //not found
+  {
+    return 0;
+  }
+
+}
+
+
 bool mitk::PointInteractor::ExecuteAction( Action* action, mitk::StateEvent const* stateEvent )
 {
 	bool ok = false;//for return type bool
@@ -87,9 +162,6 @@ bool mitk::PointInteractor::ExecuteAction( Action* action, mitk::StateEvent cons
   /*Each case must watch the type of the event!*/
   switch (action->GetActionId())
 	{
-  case AcDONOTHING:
-    ok = true;
-	  break;
   case AcADDPOINT:
 	{
 	  mitk::PositionEvent const  *posEvent = dynamic_cast <const mitk::PositionEvent *> (stateEvent->GetEvent());
@@ -141,7 +213,7 @@ bool mitk::PointInteractor::ExecuteAction( Action* action, mitk::StateEvent cons
 			//converting from Point3D to itk::Point
       mitk::Point3D worldPoint = posEvent->GetWorldPosition();
 
-      int PRECISION = 1;
+      int PRECISION = 4;
       mitk::IntProperty *precision = dynamic_cast<IntProperty*>(action->GetProperty("PRECISION"));
       if (precision != NULL)
       {
@@ -193,8 +265,8 @@ bool mitk::PointInteractor::ExecuteAction( Action* action, mitk::StateEvent cons
 			  //converting from Point3D to itk::Point
         mitk::Point3D worldPoint = posEvent->GetWorldPosition();
 
-        int PRECISION = 1;
-        mitk::IntProperty *precision = dynamic_cast<IntProperty*>(action->GetProperty("PRECISION"));
+        int PRECISION = 4;
+        mitk::IntProperty *precision = dynamic_cast<IntProperty*>(action->GetProperty("precision"));
         if (precision != NULL)
         {
           PRECISION = precision->GetValue();
@@ -434,4 +506,4 @@ case AcREMOVEPOINT:
   return ok;
 
 }
- 
+

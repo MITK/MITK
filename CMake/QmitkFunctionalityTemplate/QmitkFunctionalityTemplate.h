@@ -34,7 +34,9 @@ namespace mitk {
 */
 class QmitkFunctionalityTemplate : public QmitkFunctionality
 {  
-Q_OBJECTpublic:  
+  Q_OBJECT
+  
+  public:  
   /*!  
   \brief default constructor  
   */  

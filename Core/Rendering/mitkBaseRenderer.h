@@ -211,6 +211,8 @@ public:
 
   itkGetMacro(Size, int*);
 
+  itkGetObjectMacro(CameraController, mitk::CameraController);
+
   //##ModelId=3E6D5DD30322
   //##Documentation
   //## @brief Mouse event dispatchers

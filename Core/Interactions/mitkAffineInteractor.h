@@ -34,6 +34,8 @@ protected:
 
 	virtual bool ExecuteSideEffect(int sideEffectId, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId);
 
+  bool CheckSelected(const mitk::Point3D& worldPoint);
+
   mitk::ITKVector3D m_LastTranslatePosition;
   mitk::ITKPoint3D m_LastScalePosition;
   mitk::ITKPoint3D m_FirstScalePosition; 

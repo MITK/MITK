@@ -383,7 +383,7 @@ void QmitkMainTemplate::fileExit()
 
 void QmitkMainTemplate::editUndo()
 {
-    undoController->Undo();
+    undoController->Undo(true);
 }
 
 void QmitkMainTemplate::editRedo()

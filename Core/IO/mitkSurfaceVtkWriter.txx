@@ -59,7 +59,6 @@ void mitk::SurfaceVtkWriter<VTKWRITER>::GenerateData()
 
   if(input->GetTimeSlicedGeometry()->GetTimeSteps()>1)
   {
-    ::itk::OStringStream filename;
     
     int t, timesteps;
     const mitk::TimeBounds& timebounds = input->GetTimeSlicedGeometry()->GetTimeBoundsInMS();
@@ -67,19 +66,20 @@ void mitk::SurfaceVtkWriter<VTKWRITER>::GenerateData()
     timesteps = input->GetTimeSlicedGeometry()->GetTimeSteps();
     for(t = 0; t < timesteps; ++t)
     {
-      filename.flush();
-      filename << "w";//m_FileName.c_str() << "_S" << std::setprecision(0) << timebounds[0] << "_E" << std::setprecision(0) << timebounds[1] "_T" << t << m_Extension;
+      ::itk::OStringStream filename;
+      filename <<  m_FileName.c_str() << "_S" << std::setprecision(0) << timebounds[0] << "_E" << std::setprecision(0) << timebounds[1] << "_T" << t << m_Extension;
       m_VtkWriter->SetFileName(filename.str().c_str());
       m_VtkWriter->SetInput(input->GetVtkPolyData(t));
+      m_VtkWriter->Write();
     }
   }
   else
   {
     m_VtkWriter->SetFileName(m_FileName.c_str());
     m_VtkWriter->SetInput(input->GetVtkPolyData());
+    m_VtkWriter->Write();
   }
 
-  m_VtkWriter->Write();
 }
 
 

@@ -1,6 +1,7 @@
 #ifndef PIXELTYPE_H_HEADER_INCLUDED_C1EBF565
 #define PIXELTYPE_H_HEADER_INCLUDED_C1EBF565
 
+
 #include "mitkCommon.h"
 #include <ipPic.h>
 
@@ -14,7 +15,7 @@ class PixelType
 {
   public:
 	//##ModelId=3E1400C40198
-    PixelType(const type_info& aTypeId);
+    PixelType(const std::type_info& aTypeId);
 
     //##ModelId=3E1400150088
     PixelType(ipPicType_t type, int bpe);
@@ -24,7 +25,7 @@ class PixelType
     //##ModelId=3E1412720060
     PixelType(const mitk::PixelType & aPixelType);
     //##ModelId=3E14131D0246
-    inline const type_info * const GetTypeId() const
+    inline const std::type_info * const GetTypeId() const
     {
 		return m_TypeId;
     }
@@ -62,7 +63,7 @@ class PixelType
 
   private:
     //##ModelId=3E13FFAD038C
-    const type_info* m_TypeId;
+    const std::type_info* m_TypeId;
 
     //##ModelId=3E1400610236
     ipPicType_t m_Type;

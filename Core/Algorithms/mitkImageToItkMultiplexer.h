@@ -35,7 +35,7 @@ template <typename PixelType, unsigned int Dimension> void _calculateItkPipeline
    
 #define ItkFunctionMultiplexer(result, mitkimage, itkfunction)                                     \
 {                                                                                                  \
-	const type_info& typeId=*mitkimage->GetType().GetTypeId();                                     \
+	const std::type_info& typeId=*mitkimage->GetType().GetTypeId();                                     \
 	switch (mitkimage->GetDimension())                                                             \
 {                                                                                                  \
 	  case 2:                                                                                      \

@@ -15,7 +15,7 @@ mitk::PixelType::PixelType() : m_TypeId(NULL), m_Type(ipPicUnknown), m_Bpe(0)
 }
 
 //##ModelId=3E1400C40198
-mitk::PixelType::PixelType(const type_info& aTypeId) : m_TypeId(&aTypeId)
+mitk::PixelType::PixelType(const std::type_info& aTypeId) : m_TypeId(&aTypeId)
 {
 	if ( *m_TypeId == typeid(double) )
 	{

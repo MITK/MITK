@@ -76,7 +76,7 @@ mitk::ImageDataItem::~ImageDataItem()
 mitk::ImageDataItem::ImageDataItem(const mitk::PixelType& type, unsigned int dimension, unsigned int *dimensions) : 
 	m_Parent(NULL), m_Data(NULL), m_VtkImageData(NULL), m_PicDescriptor(NULL), m_IsComplete(false)
 {
-	const type_info & typeId=*type.GetTypeId();
+	const std::type_info & typeId=*type.GetTypeId();
 	m_PicDescriptor=ipPicNew();
 	m_PicDescriptor->bpe=type.GetBpe();
 	m_PicDescriptor->type=type.GetType();

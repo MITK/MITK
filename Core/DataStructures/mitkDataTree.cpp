@@ -31,8 +31,8 @@ TreeIterator<mitk::DataTreeNode::Pointer>* mitk::DataTree::GetNext( const char* 
     
     dtn = pos->next();
     mitk::PropertyList::Pointer propertyList = dtn->GetPropertyList();
-    
-    if ( property == propertyList->GetProperty( propertyKey ) )
+    mitk::BaseProperty::Pointer tmp = propertyList->GetProperty( propertyKey );
+    if ( (*property) == *(tmp) )
       return pos;			
   }
   

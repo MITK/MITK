@@ -14,7 +14,7 @@ namespace mitk {
 class LookupTableSource : public itk::Object //: public BaseProcess
 {
 public:
-	typedef enum {HP, Strain} LookupTableMode;
+	typedef enum {HP, Strain, DefaultLUT} LookupTableMode;
 
   mitkClassMacro(LookupTableSource,itk::Object);
 

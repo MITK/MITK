@@ -1,7 +1,7 @@
 #include "mitkLookupTableSource.h"
 #include <ipPic/ipPic.h>
 #include <vtkLookupTable.h>
-
+#include <fstream>
 extern "C"
 {
 #include "uscfunctions/usc.h"
@@ -13,7 +13,7 @@ mitk::LookupTableSource::~LookupTableSource()
 
 mitk::LookupTableSource::LookupTableSource()
 {
-	m_Mode = HP;
+	m_Mode = DefaultLUT;
 	m_LookupTable = NULL;
 
 }
@@ -36,26 +36,148 @@ mitk::LookupTableSource::OutputTypePointer mitk::LookupTableSource::GetOutput()
 			std::cout << "  creating HP LookupTable ... " << std::endl;
 
 			ipPicDescriptor *HPMap;
-			HPMap=usReadMap("a.map", ".", -1000,-1000);
+      
+      char MapFilename[20] = "a.map";
+      int	failed ;
 
-			vtkLookupTable *vtkLookupTable = vtkLookupTable::New();
-			ipUInt1_t *data = ((ipUInt1_t *)HPMap->data);
+      ifstream infile (MapFilename,ios::in);
+    	failed = infile.fail() ;
+    	infile.close() ;
+    
+    	if (!failed)  // do we have a HP LUT ?
+      {
+        std::cout << "  reading a.map ... " << std::endl;
+  			HPMap=usReadMap("a.map", ".", -1000,-1000);
 
-			int LookupTablesize =256;
-			float rgba[4];
-			vtkLookupTable->SetNumberOfColors(LookupTablesize);
-			for (int i=0; i<LookupTablesize; i++)
-			{
-				rgba[0] = ((ipUInt1_t *) data)[0 + i*3*LookupTablesize] /255.0f;
-				rgba[1] = ((ipUInt1_t *) data)[1 + i*3*LookupTablesize] /255.0f ;
-				rgba[2] = ((ipUInt1_t *) data)[2 + i*3*LookupTablesize] /255.0f ;
-				rgba[3] = 1;
-				vtkLookupTable->SetTableValue (i, rgba);
-			}
+	  		vtkLookupTable *vtkLookupTable = vtkLookupTable::New();
+		  	ipUInt1_t *data = ((ipUInt1_t *)HPMap->data);
 
-			m_LookupTable->SetVtkLookupTable(vtkLookupTable);
+  			int LookupTablesize = 256;
+	  		float rgba[4];
+		  	vtkLookupTable->SetNumberOfColors(LookupTablesize);
+  			for (int i=0; i<LookupTablesize; i++)
+	  		{
+		  		rgba[0] = ((ipUInt1_t *) data)[0 + i*3*LookupTablesize] /255.0f;
+			  	rgba[1] = ((ipUInt1_t *) data)[1 + i*3*LookupTablesize] /255.0f ;
+				  rgba[2] = ((ipUInt1_t *) data)[2 + i*3*LookupTablesize] /255.0f ;
+  				rgba[3] = 1;
+	  			vtkLookupTable->SetTableValue (i, rgba);
+		  	}
 
-	} else if (m_Mode ==Strain)
+  			m_LookupTable->SetVtkLookupTable(vtkLookupTable);
+     
+     } else { // no HP lut -> create custom LUT
+       std::cout << "  no a.map available! creating custom Doppler LookUpTable ... " << std::endl;
+       
+  			vtkLookupTable *vtkLookupTable = vtkLookupTable::New();      
+       // size is the no of different colors in the lut
+       int size=256; 
+       int lutSize = 256;
+       int repeats = lutSize / size;
+        
+        int factor = 1;
+        int i,n;
+        float rgba[4];
+        //int xDim = lutSize;
+        //int yDim = 3;
+
+        int quartalSize = size / 4;
+
+        int index;
+        
+        for (i=1; i<=quartalSize ; i++)
+        {
+          for (n=0; n<repeats ; n++)
+          {
+        
+            index = (i-1) * repeats + n;
+            rgba[0] = 0;                      // rot
+		    		rgba[1] = 1 - i/2.0/quartalSize;    // gruen
+    				rgba[2] = 1;                      // blau
+		    		rgba[3] = factor * 1;
+    				vtkLookupTable->SetTableValue (index, rgba);
+          }
+        }
+
+        // dunkelblau
+        for (i=1; i<=quartalSize ; i++)
+        {
+          for (n=0; n<repeats ; n++)
+          {
+        
+            index = (i-1) * repeats + repeats*quartalSize + n;
+            rgba[0] = 0;
+		    		rgba[1] = 0.5 - i/2.0/quartalSize;
+    				rgba[2] = 1- i/(float)(2*quartalSize);
+		    		rgba[3] = factor * 1;
+    				vtkLookupTable->SetTableValue (index, rgba);
+          }
+        }
+
+        
+   
+        // dunkelrot        
+        for (i=1; i<=quartalSize ; i++)
+        {
+          for (n=0; n<repeats ; n++)
+          {
+        
+            index = (i-1) * repeats + (2*repeats*quartalSize) + n;  
+            rgba[0] = 0.5 +  i/(float)(2*quartalSize);
+		    		rgba[1] = i/2.0/quartalSize;
+    				rgba[2] = 0;
+		    		rgba[3] = factor * 1;
+    				vtkLookupTable->SetTableValue (index, rgba);
+          }
+        }
+
+        
+      // hellrot
+        for (i=1; i<=quartalSize ; i++)
+        {
+          for (n=0; n<repeats ; n++)
+          {
+        
+            index = (i-1) * repeats + (3*repeats*quartalSize) + n;  
+            rgba[0] = 1;
+		    		rgba[1] = 0.5 + i/2.0/quartalSize;
+    				rgba[2] = 0;
+		    		rgba[3] = factor * 1;
+    				vtkLookupTable->SetTableValue (index, rgba);
+          }
+        }
+     
+      // the value 0 is mapped to black
+      // so we see the field-out-of-view as black
+      index = 0;
+      rgba[0] = 0;
+  		rgba[1] = 0;
+			rgba[2] = 0;
+   		rgba[3] = factor * 1;
+			vtkLookupTable->SetTableValue(index, rgba);
+
+      int mapZeroVelocityToBlack=1;
+      if (mapZeroVelocityToBlack == 1)
+      {
+        // map the middle value to black, so no velocity (v=0)
+        // is displayed as black, otherwise darkred
+        rgba[0] = 0; 	rgba[1] = 0; 	rgba[2] = 0;  rgba[3] = factor * 1;        
+        index = lutSize / 2 ; vtkLookupTable->SetTableValue(index, rgba);
+        index = lutSize / 2 -1; vtkLookupTable->SetTableValue(index, rgba);        
+        index = lutSize / 2 +1; vtkLookupTable->SetTableValue(index, rgba);
+      }
+      
+//			for (int i=0; i<size; i++)
+//			{
+//				vtkLookupTable->GetTableValue(i,&rgba[0]);
+//				cout << "i=" <<  i << " r=" << rgba[0] << " g=" << rgba[1]<< " b=" << rgba[2] << endl;
+//			}
+
+				m_LookupTable->SetVtkLookupTable(vtkLookupTable);
+      
+    }
+
+	} else if (m_Mode == Strain)
 	{
 			std::cout << "  creating Strain  LookupTable ... " << std::endl;
 			vtkLookupTable *vtkLookupTable = vtkLookupTable::New();
@@ -110,7 +232,7 @@ mitk::LookupTableSource::OutputTypePointer mitk::LookupTableSource::GetOutput()
 			// hellrot bis gelb
 			for (i=1 ; i<=sizeQuartal2 ; i++)
 			{
-		   	int index = (i-1) + sizeQuartal1;
+		   	int index = (i-1) + (int)sizeQuartal1;
       	rgba[0] = factor * 1;
       	rgba[1] = factor * (i/sizeQuartal2);
       	rgba[2] = factor * 0;
@@ -122,7 +244,7 @@ mitk::LookupTableSource::OutputTypePointer mitk::LookupTableSource::GetOutput()
 				//gruen
 			for(i=1 ; i<=sizeZeroStrain ; i++)
 			{
-      		int index = (i-1) + (sizeQuartal1+sizeQuartal2);
+      		int index = (i-1) + (int)(sizeQuartal1+sizeQuartal2);
       		rgba[0] = factor * 0; //1 - i/sizeZeroStrain;
       		rgba[1] = factor * 1;
       		rgba[2] = factor * 0; //i/sizeZeroStrain;
@@ -134,7 +256,7 @@ mitk::LookupTableSource::OutputTypePointer mitk::LookupTableSource::GetOutput()
 			// hellblau
 			for (i=1 ; i<=sizeQuartal3; i++)
 			{
-      		int index = (i-1) + ( sizeQuartal1 + sizeQuartal2 + sizeZeroStrain );
+      		int index = (i-1) + (int)( sizeQuartal1 + sizeQuartal2 + sizeZeroStrain );
       		rgba[0]= factor * 0;
       		rgba[1] = factor * (1 - i/sizeQuartal3);
       		rgba[2] = factor * 1;
@@ -145,7 +267,7 @@ mitk::LookupTableSource::OutputTypePointer mitk::LookupTableSource::GetOutput()
 			// blau
 			for(i=1 ; i<=sizeQuartal4 ; i++)
 			{
-		      int index = (i-1) + (sizeQuartal1+sizeQuartal2+sizeQuartal3 + sizeZeroStrain);
+		      int index = (i-1) + (int)(sizeQuartal1+sizeQuartal2+sizeQuartal3 + sizeZeroStrain);
     		  rgba[0] = factor * 0;
 		      rgba[1] = factor * 0;
     		  rgba[2] = factor * (1- i/sizeQuartal4);
@@ -174,8 +296,17 @@ mitk::LookupTableSource::OutputTypePointer mitk::LookupTableSource::GetOutput()
 
 
 	} else
-		m_LookupTable = NULL;
-
+  {
+    std::cout << "  creating default LookupTable... " << std::endl;
+		vtkLookupTable *vtkLookupTable = vtkLookupTable::New();
+		int size=256;
+		vtkLookupTable->SetNumberOfColors(size);
+    vtkLookupTable->Build();
+		m_LookupTable->SetVtkLookupTable(vtkLookupTable);
+  }
+  
+  
+        
 	std::cout << "mitk::LookupTableSource::GetOutput() ... " << std::endl;
 	return m_LookupTable;
 

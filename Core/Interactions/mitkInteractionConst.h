@@ -115,7 +115,8 @@ typedef enum EActions
   AcINITMOVE = 9,
   AcADDPOINT = 10,
   AcADD = 11,
-	AcADDLINE = 12,
+  AcADDLINE = 12,
+  AcADDANDFINISH = 13,
   AcSNAPPING_ADDING = 20,
   AcCHECKELEMENT = 30,		//check if there is a element close enough (picking)
   AcCHECKNMINUS1 = 32,  //check if the number of elements is equal to N-1

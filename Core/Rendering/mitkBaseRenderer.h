@@ -228,6 +228,7 @@ protected:
   //##Documentation
   //## @brief Contains whether the renderer that it is focused. The caller of 
   //## SetFocused is responsible for focus management, not the renderer itself.
+  //## is doubled because of mitk::FocusManager in GlobalInteraction!!! (ingmar)
   bool m_Focused;
 
 private:

@@ -2,8 +2,10 @@
 #include "PlaneGeometry.h"
 #include "EventMapper.h"
 #include "PositionEvent.h"
+#include "GlobalInteraction.h"
 #include "mitkDisplayPositionEvent.h"
 #include "mitkSmartPointerProperty.h"
+#include "mitkStatusBar.h"
 #include <vtkTransform.h>
 
 //##ModelId=3D6A1791038B
@@ -69,6 +71,13 @@ void mitk::BaseRenderer::InitSize(int w, int h)
 //##ModelId=3E3D2F120050
 mitk::BaseRenderer::BaseRenderer() : m_DataTreeIterator(NULL), m_RenderWindow(NULL), m_LastUpdateTime(0), m_MapperID(defaultMapper), m_CameraController(NULL), m_Focused(false)
 {
+  //adding this BaseRenderer to the List of all BaseRenderer
+  mitk::GlobalInteraction *globalInteraction = dynamic_cast<mitk::GlobalInteraction *>(EventMapper::GetGlobalStateMachine());
+  if (globalInteraction != NULL)
+	{
+    globalInteraction->AddFocusElement(this);
+  }
+
   SmartPointerProperty::Pointer rendererProp = new SmartPointerProperty((itk::Object*)this);
 
   m_WorldGeometry = mitk::PlaneGeometry::New();
@@ -125,6 +134,15 @@ void mitk::BaseRenderer::SetDisplayGeometry(mitk::DisplayGeometry* geometry2d)
 //##ModelId=3E6D5DD30322
 void mitk::BaseRenderer::MousePressEvent(mitk::MouseEvent *me)
 {
+  //set the Focus on the renderer
+  mitk::GlobalInteraction *globalInteraction = dynamic_cast<mitk::GlobalInteraction *>(EventMapper::GetGlobalStateMachine());
+  if (globalInteraction != NULL)
+  {
+    bool success = globalInteraction->SetFocus(this);
+    if (! success) 
+      (StatusBar::GetInstance())->DisplayText("Warning! from BaseRenderer.cpp: Couldn't focus this BaseRenderer!");
+  }
+
   if (m_CameraController)
     m_CameraController->MousePressEvent(me);
   if(m_MapperID==1)

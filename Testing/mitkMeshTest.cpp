@@ -41,6 +41,7 @@ int mitkMeshTest(int argc, char* argv[])
     return EXIT_FAILURE;
   }
   
+  //get the point and check if it is still the same
   mitk::Point3D tempPoint;
   tempPoint.Fill(0);
   tempPoint = mesh->GetItkPoint(position);
@@ -49,7 +50,6 @@ int mitkMeshTest(int argc, char* argv[])
     std::cout<<"[FAILED]"<<std::endl;
     return EXIT_FAILURE;
   }
-
 
 
   //well done!!! Passed!

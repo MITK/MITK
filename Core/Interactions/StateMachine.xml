@@ -634,14 +634,14 @@
 			</transition>
 		</state>
 		<state NAME="picked guard Translate" ID="12">
-			<transition NAME="yes" NEXT_STATE_ID="2" EVENT_ID="1004"> <!-- StYES -->
+			<transition NAME="yes" NEXT_STATE_ID="2" EVENT_ID="1004"> <!-- EIDYES -->
 				<action ID="1101" /><!--AcMODESELECT-->
 				<action ID="1000" />
 			</transition>
 			<transition NAME="no" NEXT_STATE_ID="0" EVENT_ID="1003"/> <!-- StNO -->
 		</state>
 		<state NAME="picked guard Scale" ID="13">
-			<transition NAME="yes" NEXT_STATE_ID="3" EVENT_ID="1004"> <!-- StYES -->
+			<transition NAME="yes" NEXT_STATE_ID="3" EVENT_ID="1004"> <!-- EIDYES -->
 				<action ID="1101" /><!--AcMODESELECT-->
 				<action ID="1002" />
 			</transition>
@@ -650,7 +650,7 @@
 			</transition>
 		</state>
 		<state NAME="picked guard Rotate" ID="14">
-			<transition NAME="yes" NEXT_STATE_ID="4" EVENT_ID="1004"> <!-- StYES -->
+			<transition NAME="yes" NEXT_STATE_ID="4" EVENT_ID="1004"> <!-- EIDYES -->
 				<action ID="1101" /><!--AcMODESELECT-->
 				<action ID="1004" />
 			</transition>
@@ -741,7 +741,7 @@
 			</transition>
 		</state>
 		<state NAME="picked guard Translate" ID="12">
-			<transition NAME="yes" NEXT_STATE_ID="2" EVENT_ID="1004"> <!-- StYES -->
+			<transition NAME="yes" NEXT_STATE_ID="2" EVENT_ID="1004"> <!-- EIDYES -->
 				<action ID="1000" />
 			</transition>
 			<transition NAME="no" NEXT_STATE_ID="0" EVENT_ID="1003"> <!-- StNO -->
@@ -749,7 +749,7 @@
 			</transition>
 		</state>
 		<state NAME="picked guard Scale" ID="13">
-			<transition NAME="yes" NEXT_STATE_ID="3" EVENT_ID="1004"> <!-- StYES -->
+			<transition NAME="yes" NEXT_STATE_ID="3" EVENT_ID="1004"> <!-- EIDYES -->
 				<action ID="1002" />
 			</transition>
 			<transition NAME="no" NEXT_STATE_ID="0" EVENT_ID="1003"> <!-- StNO -->
@@ -757,7 +757,7 @@
 			</transition>
 		</state>
 		<state NAME="picked guard Rotate" ID="14">
-			<transition NAME="yes" NEXT_STATE_ID="4" EVENT_ID="1004"> <!-- StYES -->
+			<transition NAME="yes" NEXT_STATE_ID="4" EVENT_ID="1004"> <!-- EIDYES -->
 				<action ID="1004" />
 			</transition>
 			<transition NAME="no" NEXT_STATE_ID="0" EVENT_ID="1003"> <!-- StNO -->
@@ -805,10 +805,10 @@
 			</transition>
 		</state>
 		<state NAME="object selected check" ID="2">
-			<transition NAME="yes" NEXT_STATE_ID="10" EVENT_ID="1004"> <!-- StYES -->
+			<transition NAME="yes" NEXT_STATE_ID="10" EVENT_ID="1004"> <!-- EIDYES -->
 				<action ID="0" />
 			</transition>
-			<transition NAME="no" NEXT_STATE_ID="1" EVENT_ID="1003"> <!-- StNO -->
+			<transition NAME="no" NEXT_STATE_ID="1" EVENT_ID="1003"> <!-- EIDNO -->
 				<action ID="0" />
 			</transition>
 		</state>
@@ -827,7 +827,7 @@
 			<transition NAME="yes" NEXT_STATE_ID="21" EVENT_ID="1004"> <!-- 1000 = SeTRANSLATESTART -->
 				<action ID="1000" />
 			</transition>
-			<transition NAME="no" NEXT_STATE_ID="1" EVENT_ID="1003"> <!-- StNO -->
+			<transition NAME="no" NEXT_STATE_ID="1" EVENT_ID="1003"> <!-- EIDNO -->
 				<action ID="0" />
 			</transition>
 		</state>

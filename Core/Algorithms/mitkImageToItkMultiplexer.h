@@ -202,18 +202,18 @@ MakeCastImageFilter(  ItkInputImageType* inputImage )
 
 namespace mitk 
 {
-  template <typename ItkOutputImageType> void CastToItkImage(mitk::Image * mitkimage, typename itk::SmartPointer<ItkOutputImageType>& itkoutputimage)
+  template <typename ItkOutputImageType> void CastToItkImage(const mitk::Image * mitkimage, typename itk::SmartPointer<ItkOutputImageType>& itkoutputimage)
   {
     FixedInputDimensionMitkToItkFunctionMultiplexer(itkoutputimage, ItkOutputImageType, mitkimage, ItkOutputImageType::ImageDimension, MakeCastImageFilter);
   }
 
-  template <typename ItkOutputImageType> void CastToMitkImage(itk::SmartPointer<ItkOutputImageType>& itkimage, itk::SmartPointer<mitk::Image>& mitkoutputimage)
+  template <typename ItkOutputImageType> void CastToMitkImage(const itk::SmartPointer<ItkOutputImageType>& itkimage, itk::SmartPointer<mitk::Image>& mitkoutputimage)
   {
     mitkoutputimage->InitializeByItk(itkimage.GetPointer());
     mitkoutputimage->SetVolume(itkimage->GetBufferPointer());
   }
 
-  template <typename ItkOutputImageType> void CastToMitkImage(ItkOutputImageType* itkimage, itk::SmartPointer<mitk::Image>& mitkoutputimage)
+  template <typename ItkOutputImageType> void CastToMitkImage(const ItkOutputImageType* itkimage, itk::SmartPointer<mitk::Image>& mitkoutputimage)
   {
     mitkoutputimage->InitializeByItk(itkimage);
     mitkoutputimage->SetVolume(itkimage->GetBufferPointer());

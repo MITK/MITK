@@ -19,15 +19,10 @@ static ipPicTSV_t *_ipPicRemoveTag( _ipPicTagsElement_t **head,
                                     char *tag );
 
 ipPicTSV_t *
-ipPicDelTag( ipPicDescriptor *pic, char *t )
+ipPicDelTag( ipPicDescriptor *pic, char *tag )
 {
   int i;
-  char tag[_ipPicTAGLEN];
   _ipPicTagsElement_t *which;
-
-  sprintf( tag, "%.*s", _ipPicTAGLEN, t );
-  for( i=strlen(tag); i<_ipPicTAGLEN; i++ )
-    tag[i] = ' ';
 
   which = _ipPicFindTag( pic->info->tags_head, tag );
 
@@ -35,18 +30,13 @@ ipPicDelTag( ipPicDescriptor *pic, char *t )
 }
 
 ipPicTSV_t *
-ipPicDelSubTag( ipPicTSV_t *parent, char *t )
+ipPicDelSubTag( ipPicTSV_t *parent, char *tag )
 {
   int i;
-  char tag[_ipPicTAGLEN];
   _ipPicTagsElement_t *which;
 
   if( parent->type != ipPicTSV )
     return( NULL );
-
-  sprintf( tag, "%.*s", _ipPicTAGLEN, t );
-  for( i=strlen(tag); i<_ipPicTAGLEN; i++ )
-    tag[i] = ' ';
 
   which = _ipPicFindTag( parent->value, tag );
 

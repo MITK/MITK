@@ -63,8 +63,11 @@ ipPicTSV_t *ipPicQueryTag( ipPicDescriptor *pic, char *tag )
 _ipPicTagsElement_t *_ipPicFindTag( _ipPicTagsElement_t *head, char *tag )
 {
   int i;
-  char name[_ipPicTAGLEN];
+  char name[_ipPicTAGLEN+1];
   _ipPicTagsElement_t *current;
+
+  if( !tag )
+    return( NULL );
 
   sprintf( name, "%.*s", _ipPicTAGLEN, tag );
   for( i=strlen(name); i<_ipPicTAGLEN; i++ )
@@ -78,5 +81,6 @@ _ipPicTagsElement_t *_ipPicFindTag( _ipPicTagsElement_t *head, char *tag )
 
       current = current->next;
     }
+
   return( NULL );
 }

@@ -1,5 +1,5 @@
 #include "mitkPropertyManager.h"
-#include "mitkBoolProperty.h"
+#include "mitkProperties.h"
 
 
 mitk::PropertyManager::PropertyManager() {

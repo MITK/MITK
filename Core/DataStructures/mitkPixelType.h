@@ -42,7 +42,7 @@ public:
   PixelType(ipPicType_t type, int bpe);
 
   //##ModelId=3E1400060113
-  PixelType(ipPicDescriptor* pic);
+  PixelType(const ipPicDescriptor* pic);
   //##ModelId=3E1412720060
   PixelType(const mitk::PixelType & aPixelType);
   //##ModelId=3E14131D0246

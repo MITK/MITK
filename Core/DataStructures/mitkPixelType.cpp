@@ -46,7 +46,7 @@ mitk::PixelType::PixelType(ipPicType_t type, int bpe) : m_Type(type), m_Bpe(bpe)
 }
 
 //##ModelId=3E1400060113
-mitk::PixelType::PixelType(ipPicDescriptor* pic)
+mitk::PixelType::PixelType(const ipPicDescriptor* pic)
 {
   if(pic!=NULL)
     Initialize(pic->type, pic->bpe);

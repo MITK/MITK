@@ -20,11 +20,12 @@ See MITKCopyright.txt or http://www.mitk.org/ for details.
 #include "mitkInteractionConst.h"
 #include "mitkEventMapper.h"
 #include "mitkEvent.h"
-#include "mitkStatusBar.h"
+#include <mitkStatusBar.h>
 #include "mitkAction.h"
 #include <mitkPositionEvent.h>
 #include <vtkWorldPointPicker.h>
 #include <mitkOpenGLRenderer.h>
+
 
 
 //##ModelId=3EAD420E0088
@@ -33,6 +34,8 @@ mitk::GlobalInteraction::GlobalInteraction(const char * type)
 {
   //build up the FocusManager
   m_FocusManager = new mitk::FocusManager();
+  m_InteractionDebugger = InteractionDebugger::New();
+  InteractionDebugger::Deactivate();
 }
 
 

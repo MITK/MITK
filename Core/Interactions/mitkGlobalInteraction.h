@@ -25,6 +25,7 @@ See MITKCopyright.txt or http://www.mitk.org/ for details.
 #include "mitkInteractor.h"
 #include <string>
 #include <vector>
+#include "mitkInteractionDebugger.h"
 
 namespace mitk {
 
@@ -190,6 +191,8 @@ class GlobalInteraction : public StateMachine
   //##Documentation
   //## @brief holds a list of BaseRenderer and one focused
   FocusManager* m_FocusManager;
+
+  InteractionDebugger::Pointer m_InteractionDebugger;
 
 };
 } // namespace mitk

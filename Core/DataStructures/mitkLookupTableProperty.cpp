@@ -24,21 +24,21 @@ bool mitk::LookupTableProperty::operator==(const BaseProperty& property) const
 
     if(other==NULL) return false;
 
-    return other->m_LookupTable==m_LookupTable;
+    return *(other->m_LookupTable)==*m_LookupTable;
 }
 
 //##ModelId=3ED953090133
 mitk::LookupTable & mitk::LookupTableProperty::GetLookupTable() 
 {
-    return m_LookupTable;
+    return *m_LookupTable;
 }
 
 //##ModelId=3ED953090135
 void mitk::LookupTableProperty::SetLookupTable(const mitk::LookupTable &aLookupTable)
 {
-    if(m_LookupTable != aLookupTable)
+    if(*m_LookupTable != aLookupTable)
     {
-        m_LookupTable = aLookupTable;
+        *m_LookupTable = aLookupTable;
         Modified();
     }
 }

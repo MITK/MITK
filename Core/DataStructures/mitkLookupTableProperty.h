@@ -16,7 +16,7 @@ class LookupTableProperty : public BaseProperty
 
 protected:
     //##ModelId=3ED953090113
-    mitk::LookupTable m_LookupTable;
+    mitk::LookupTable* m_LookupTable;
 
 public:
     mitkClassMacro(LookupTableProperty, BaseProperty);
@@ -25,7 +25,7 @@ public:
     LookupTableProperty();
 
     //##ModelId=3EF198D9012D
-    LookupTableProperty(const mitk::LookupTable &aLookupTable);
+    LookupTableProperty(const mitk::LookupTable& aLookupTable);
 
     //##ModelId=3ED953090122
     virtual ~LookupTableProperty();

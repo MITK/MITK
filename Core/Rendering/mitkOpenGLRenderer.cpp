@@ -77,21 +77,29 @@ void mitk::OpenGLRenderer::UpdateVtkActors()
     if(vicc!=NULL)
         vicc->GetVtkInteractor()->Enable();
 
-    m_LightKit->RemoveLightsFromRenderer(this->m_VtkRenderer);
+//    m_LightKit->RemoveLightsFromRenderer(this->m_VtkRenderer);
 	
-    m_MitkVtkRenderWindow->RemoveRenderer(m_VtkRenderer);
-    m_VtkRenderer->Delete();
-	
-    m_VtkRenderer = vtkRenderer::New();
-    m_VtkRenderer->SetLayer(0);
-    m_MitkVtkRenderWindow->AddRenderer( this->m_VtkRenderer );
+//    m_MitkVtkRenderWindow->RemoveRenderer(m_VtkRenderer);
+//    m_VtkRenderer->Delete();
+
+    m_VtkRenderer->RemoveAllProps();
+
+    if(m_VtkRenderer==NULL)
+    {
+        m_VtkRenderer = vtkRenderer::New();
+        m_VtkRenderer->SetLayer(0);
+        m_MitkVtkRenderWindow->AddRenderer( this->m_VtkRenderer );
+    }
 	
     //strange: when using a simple light, the backface of the planes are not shown (regardless of SetNumberOfLayers)
     //m_Light->Delete();
     //m_Light = vtkLight::New();
     //m_VtkRenderer->AddLight( m_Light );
-    m_LightKit = vtkLightKit::New();
-    m_LightKit->AddLightsToRenderer(m_VtkRenderer);
+    if(m_LightKit!=NULL)
+    {
+        m_LightKit = vtkLightKit::New();
+        m_LightKit->AddLightsToRenderer(m_VtkRenderer);
+    }
 	
     //    try
 	if (m_DataTreeIterator != NULL) 
@@ -209,8 +217,8 @@ void mitk::OpenGLRenderer::Render()
 	if(m_LastUpdateTime < dynamic_cast<mitk::DataTree*>(GetData()->getTree())->GetMTime() ) 
 	{
 		//yes: update vtk-actors
-		UpdateVtkActors();
         Update();
+		UpdateVtkActors();
     }
 	else
 	//has anything else changed (geometry to display, etc.)?
@@ -363,6 +371,14 @@ void mitk::OpenGLRenderer::InitSize(int w, int h)
     GetDisplayGeometry()->Fit();
     Modified();
     Update();
+}
+
+//##ModelId=3EF59AD20235
+void mitk::OpenGLRenderer::SetMapperID(const MapperSlotId mapperId)
+{
+    Superclass::SetMapperID(mapperId);
+    Update();
+	UpdateVtkActors();
 }
 
 //##ModelId=3EF162760271

@@ -46,6 +46,9 @@ class OpenGLRenderer : public BaseRenderer
     //##ModelId=3E3314B0005C
     virtual void SetWindowId(void *id);
 
+    //##ModelId=3EF59AD20235
+    virtual void SetMapperID(const MapperSlotId mapperId);
+
     //##ModelId=3EF162760271
     virtual void MakeCurrent();
 

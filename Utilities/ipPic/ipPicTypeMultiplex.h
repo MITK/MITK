@@ -8,7 +8,7 @@
  *	Beschreibung:	Multiplext einen Methodenaufruf entsprechend dem Bilddatentype.
  *					Das Type bestimmende Bild muss als erster Parameter übergeben werden.
  *					Bei der Methode muss es sich um eine template-Methode handeln.
- *					Die Anzahl der Parameter ist auf 6 beschränkt. 
+ *					Die Anzahl der Parameter ist auf 16 beschränkt. 
  *					
  *					Aufruf einer Methode mit zwei Parametern ohne Rückgabewert:
  *					ipPicTypeMultiplex2( funktionsname, parameter1, Parameter2 );

@@ -2,6 +2,7 @@
 #include "mitkImageTimeSelector.h"
 #include "mitkSlicedGeometry3D.h"
 #include "mitkPlaneGeometry.h"
+#include "mitkProperties.h"
 
 #include <ipPicTypeMultiplex.h>
 
@@ -322,10 +323,25 @@ void mitk::CylindricToCartesianFilter::GenerateOutputInformation()
 
   output->GetSlicedGeometry()->SetGeometry2D(mitk::Image::BuildStandardPlaneGeometry2D(output->GetSlicedGeometry(), tmpDimensions).GetPointer(), 0);
   //set the timebounds - after SetGeometry2D, so that the already created PlaneGeometry will also receive this timebounds.
+  //@fixme!!! will not work for not evenly timed data!
   output->GetSlicedGeometry()->SetTimeBoundsInMS(input->GetSlicedGeometry()->GetTimeBoundsInMS());
+
+  //@fixme!!! for 4D-data: calculate the timebounds of the TimeSlicedGeometry: (calling GetTimeBoundsInMS() really does that!)
+  output->GetGeometry()->GetTimeBoundsInMS();
 
   output->SetPropertyList(input->GetPropertyList()->Clone());
   
+  mitk::Point3iProperty::Pointer pointProp;
+  pointProp = dynamic_cast<mitk::Point3iProperty*>(input->GetProperty("ORIGIN").GetPointer());
+  if (pointProp.IsNotNull() )
+  {
+    Point3<int> tp = pointProp->GetValue();
+    tp.x = tmpDimensions[0]/2;
+    tp.y = tmpDimensions[0]/2;
+    tp.z = tp.z * scale;
+    mitk::Point3iProperty::Pointer pointProp = new mitk::Point3iProperty(tp);
+    output->SetProperty("ORIGIN", pointProp);
+  }
   // @todo convert transducer position into new coordinate system
   /*	
   Tag = ipPicQueryTag(picHeader, "ORIGIN");

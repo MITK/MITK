@@ -1,29 +1,34 @@
 #ifndef MITK_EVENT_TYPEDEFS
 #define MITK_EVENT_TYPEDEFS
 
-#include <qgl.h>
 #include <assert.h>
-#include <qptrlist.h> 
 #include <string>
+#include "mitkDisplayPositionEvent.h"
 namespace mitk {
-    
-typedef ::QMouseEvent MouseEvent;
-typedef ::QWheelEvent WheelEvent;
 
-class KeyEvent {
+class WheelEvent;
 
+class BaseEvent {
+  public:
+  BaseEvent(int type, int state, int x = 0,int y = 0, int globalX=0, int globalY = 0) : m_X(x), m_Y(y), m_GlobalX(globalX), m_GlobalY(globalY) , m_State(state),m_Type(type) {};
+  protected:
     int m_X;
     int m_Y;
     int m_GlobalX;
     int m_GlobalY;
-    int m_State;
-    int m_Ascii;
+    int m_State; 
     int m_Type;
+};
+
+typedef DisplayPositionEvent MouseEvent;
+
+class KeyEvent : public BaseEvent {
+    int m_Ascii;
     int m_Key;
     std::string m_Text;
   public:
-    KeyEvent ( int type, int key, int ascii, int state, const std::string & text = "", bool autorep = FALSE, ushort count = 1, int x=0, int y=0, int globalX=0, int globalY=0 )  :
- m_X(x), m_Y(y), m_GlobalX(globalX), m_GlobalY(globalY) , m_State(state),m_Ascii(ascii),m_Text(text),m_Type(type),m_Key(key)
+    KeyEvent ( int type, int key, int ascii, int state, const std::string & text = "", bool autorep = false, ushort count = 1, int x=0, int y=0, int globalX=0, int globalY=0 )  :
+ BaseEvent(type,state,x,y,globalX,globalY) ,m_Ascii(ascii),m_Text(text),m_Key(key)
     {
     };
     ~KeyEvent()
@@ -58,10 +63,10 @@ class KeyEvent {
     const char* text() const {
       return m_Text.c_str();
     }
-     int type() const {
+    int type() const {
       return m_Type;
     }
-      int key() const {
+    int key() const {
       return m_Key;
     }
     

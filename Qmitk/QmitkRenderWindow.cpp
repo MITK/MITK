@@ -2,7 +2,7 @@
 #include "mitkOpenGLRenderer.h"
 #include "mitkRenderWindow.h"
 #include <qcursor.h>
-
+#include "mitkDisplayPositionEvent.h"
 //##ModelId=3E1EB4410304
 mitk::QmitkRenderWindow::QmitkRenderWindow(mitk::BaseRenderer* renderer, QGLFormat glf, QWidget *parent, const char *name) 
   : QGLWidget(glf, parent, name), mitk::RenderWindow(name), m_Renderer(renderer)
@@ -119,30 +119,40 @@ void mitk::QmitkRenderWindow::mousePressEvent(QMouseEvent *me)
 {
   QGLWidget::mousePressEvent(me);
   if (m_Renderer)
-    m_Renderer->MousePressEvent(me);
+  {
+    Point2D p(me->x(), me->y());
+    mitk::MouseEvent event(NULL, me->type(), me->button(), me->state(), Qt::Key_unknown, p);
+    m_Renderer->MousePressEvent(&event);
+  }
 }
 
 //##ModelId=3E6D5DD4032E
 void mitk::QmitkRenderWindow::mouseReleaseEvent(QMouseEvent *me) 
 {
   QGLWidget::mouseReleaseEvent(me);
-  if (m_Renderer)
-    m_Renderer->MouseReleaseEvent(me);
+  if (m_Renderer) {
+    Point2D p(me->x(), me->y());
+    mitk::MouseEvent event(NULL, me->type(), me->button(), me->state(), Qt::Key_unknown, p);
+    m_Renderer->MouseReleaseEvent(&event);
+  }
 }
 
 //##ModelId=3E6D5DD40356
 void mitk::QmitkRenderWindow::mouseMoveEvent(QMouseEvent *me) 
 {
   QGLWidget::mouseMoveEvent(me);
-  if (m_Renderer)
-    m_Renderer->MouseMoveEvent(me);
+  if (m_Renderer) {
+    Point2D p(me->x(), me->y());
+    mitk::MouseEvent event(NULL, me->type(), me->button(), me->state(), Qt::Key_unknown, p);
+    m_Renderer->MouseMoveEvent(&event);
+}
 }
 
 void mitk::QmitkRenderWindow::wheelEvent(QWheelEvent *we)
 {
-  QGLWidget::wheelEvent(we);
+/*  QGLWidget::wheelEvent(we);
   if (m_Renderer)
-    m_Renderer->WheelEvent(we);
+    m_Renderer->WheelEvent(we); */
 }
 
 //##ModelId=3E6D5DD40388

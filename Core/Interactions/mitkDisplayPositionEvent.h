@@ -27,7 +27,7 @@ class DisplayPositionEvent : public Event
     DisplayPositionEvent(mitk::BaseRenderer* sender, int type, int button, int buttonState, int key, const mitk::Point2D& displPosition);
 
     const Point2D& GetDisplayPosition() const;
-    
+    void SetDisplayPosition(const mitk::Point2D& displPosition) { m_DisplayPosition = displPosition; }    
   private:
     Point2D m_DisplayPosition;
 };

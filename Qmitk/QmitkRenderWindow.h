@@ -1,6 +1,7 @@
 #ifndef QMITKRENDERWINDOW_H_HEADER_INCLUDED_C1C40D66
 #define QMITKRENDERWINDOW_H_HEADER_INCLUDED_C1C40D66
 
+#include <qgl.h>
 #include "mitkCommon.h"
 #include "mitkBaseRenderer.h"
 #include "mitkRenderWindow.h"

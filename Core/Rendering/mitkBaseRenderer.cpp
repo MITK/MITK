@@ -8,6 +8,7 @@
 #include "mitkSlicedGeometry3D.h"
 #include "mitkSliceNavigationController.h"
 #include "mitkStatusBar.h"
+#include "mitkInteractionConst.h"
 #include <vtkTransform.h>
 
 //##ModelId=3E3D2F120050
@@ -249,22 +250,22 @@ void mitk::BaseRenderer::MousePressEvent(mitk::MouseEvent *me)
     m_CameraController->MousePressEvent(me);
   if(m_MapperID==1)
   {
-    Point2D p(me->x(), me->y());
+    Point2D p(me->GetDisplayPosition().x, me->GetDisplayPosition().y);
     Point2D p_mm;
     Point3D position;
     GetDisplayGeometry()->ULDisplayToDisplay(p,p);
     GetDisplayGeometry()->DisplayToMM(p, p_mm);
     GetDisplayGeometry()->Map(p_mm, position);
-    mitk::PositionEvent event(this, me->type(), me->button(), me->state(), Qt::Key_unknown, p, position);
+    mitk::PositionEvent event(this, me->GetType(), me->GetButton(), me->GetButtonState(), mitk::Key_unknown, p, position);
     mitk::EventMapper::MapEvent(&event);
   }
   else if(m_MapperID==2)
   {
-    Point2D p(me->x(), me->y());
+    Point2D p(me->GetDisplayPosition().x, me->GetDisplayPosition().y);
     GetDisplayGeometry()->ULDisplayToDisplay(p,p);
     std::cout << "press event!" << std::endl;
-    mitk::DisplayPositionEvent event(this, me->type(), me->button(), me->state(), Qt::Key_unknown, p);
-    mitk::EventMapper::MapEvent(&event);
+    me->SetDisplayPosition(p);
+    mitk::EventMapper::MapEvent(me);
   }
 }
 
@@ -276,21 +277,21 @@ void mitk::BaseRenderer::MouseReleaseEvent(mitk::MouseEvent *me)
 
   if(m_MapperID==1)
   {
-    Point2D p(me->x(), me->y());
+    Point2D p(me->GetDisplayPosition().x, me->GetDisplayPosition().y);
     Point2D p_mm;
     Point3D position;
     GetDisplayGeometry()->ULDisplayToDisplay(p,p);
     GetDisplayGeometry()->DisplayToMM(p, p_mm);
     GetDisplayGeometry()->Map(p_mm, position);
-    mitk::PositionEvent event(this, me->type(), me->button(), me->state(), Qt::Key_unknown, p, position);
+    mitk::PositionEvent event(this, me->GetType(), me->GetButton(), me->GetButtonState(), mitk::Key_unknown, p, position);
     mitk::EventMapper::MapEvent(&event);
   }
   else if(m_MapperID==2)
   {
-    Point2D p(me->x(), me->y());
+    Point2D p(me->GetDisplayPosition().x, me->GetDisplayPosition().y);
     GetDisplayGeometry()->ULDisplayToDisplay(p,p);
-    mitk::DisplayPositionEvent event(this, me->type(), me->button(), me->state(), Qt::Key_unknown, p);
-    mitk::EventMapper::MapEvent(&event);
+    me->SetDisplayPosition(p);
+    mitk::EventMapper::MapEvent(me);
   }
 }
 
@@ -301,21 +302,21 @@ void mitk::BaseRenderer::MouseMoveEvent(mitk::MouseEvent *me)
     m_CameraController->MouseMoveEvent(me);
   if(m_MapperID==1)
   {
-    Point2D p(me->x(), me->y());
+    Point2D p(me->GetDisplayPosition().x, me->GetDisplayPosition().y);
     Point2D p_mm;
     Point3D position;
     GetDisplayGeometry()->ULDisplayToDisplay(p,p);
     GetDisplayGeometry()->DisplayToMM(p, p_mm);
     GetDisplayGeometry()->Map(p_mm, position);
-    mitk::PositionEvent event(this, me->type(), me->button(), me->state(), Qt::Key_unknown, p, position);
+    mitk::PositionEvent event(this, me->GetType(), me->GetButton(), me->GetButtonState(), mitk::Key_unknown, p, position);
     mitk::EventMapper::MapEvent(&event);
   }
   else if(m_MapperID==2)
   {
-    Point2D p(me->x(), me->y());
+    Point2D p(me->GetDisplayPosition().x, me->GetDisplayPosition().y);
     GetDisplayGeometry()->ULDisplayToDisplay(p,p);
-    mitk::DisplayPositionEvent event(this, me->type(), me->button(), me->state(), Qt::Key_unknown, p);
-    mitk::EventMapper::MapEvent(&event);
+    me->SetDisplayPosition(p);
+    mitk::EventMapper::MapEvent(me);
   }
 }
 
@@ -330,7 +331,7 @@ void mitk::BaseRenderer::KeyPressEvent(mitk::KeyEvent *ke)
 {
   if (m_CameraController)
     m_CameraController->KeyPressEvent(ke);
-  mitk::Event event(this, ke->type(), Qt::NoButton, Qt::NoButton, ke->key());
+  mitk::Event event(this, ke->type(), BS_NoButton, BS_NoButton, ke->key());
   mitk::EventMapper::MapEvent(&event);
 }
 

@@ -19,7 +19,7 @@ public:
   void AddProperty(const char* propertyKey, BaseProperty* property);
 
   int GetActionId() const;
-  mitk::BaseProperty::Pointer GetProperty( const char *propertyKey ) const;
+  mitk::BaseProperty* GetProperty( const char *propertyKey ) const;
 };
 
 } // namespace mitk

@@ -29,18 +29,24 @@ public:
   ~HierarchicalInteractor(){}
 
   //##Documentation
+  //## @brief Check the interaction mode
+  bool IsSubSelected() const;
+
+  //##Documentation
   //## @brief handles an Event accordingly to its current Modus
   virtual bool HandleEvent(StateEvent const* stateEvent, int objectEventId, int groupEventId);
 
   //##Documentation
   //## @brief Executes Side-Effects
-  //virtual bool ExecuteAction(Action* action, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId) = 0;
+  virtual bool ExecuteAction(Action* action, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId);
   
   //##Documentation
   //## @brief Adds an Interactor to the list of administrated Interactors
   bool AddInteractor(Interactor::Pointer interactor);
 
 protected:
+
+  bool TransmitEvent( StateEvent const* stateEvent, int objectEventId, int groupEventId );
   InteractorList m_SelectedInteractors;
   InteractorList m_AllInteractors;
 

@@ -211,10 +211,10 @@
 	<stateMachine NAME="move">
 		<state NAME="neutral" ID="1" START_STATE="TRUE">
 			<transition NAME="send Koordinates" NEXT_STATE_ID="1" EVENT_ID="4">
-				<action ID="1101" />
+				<action ID="1100" />
 			</transition>
 			<transition NAME="send Koordinates Move" NEXT_STATE_ID="1" EVENT_ID="533">
-				<action ID="1102" />
+				<action ID="0" /> <!-- ???? zuvor 1102 modulo?? bitte nachschauen -->
 			</transition>
 		</state>
 	</stateMachine>
@@ -627,6 +627,42 @@
 			</transition>
 		</state>
 	</stateMachine>
+	
+<!-- Behaviour of a HirachicalInteractor -->	
+	<stateMachine NAME="HirachicalInteractor">
+		<state NAME="notSelected" ID="0" START_STATE="TRUE">
+			<transition NAME="leftButtonPress" NEXT_STATE_ID="1" EVENT_ID="1"> 
+				<action ID="1101" />
+			</transition>		
+		</state>
+		<state NAME="selected" ID="1">
+			<transition NAME="checkSubSelected" NEXT_STATE_ID="2" EVENT_ID="1"> 
+				<action ID="38" >
+					<floatParam Name="threshold" Value="0.5" />
+				</action>
+			</transition>
+			<transition NAME="Esc" NEXT_STATE_ID="0" EVENT_ID="13"> 
+				<action ID="1100" />
+			</transition>			
+		</state>
+		<state NAME="checkSubSelected" ID="2">
+			<transition NAME="Yes" NEXT_STATE_ID="3" EVENT_ID="204"> <!-- necessary transition of the state subSelected -->	
+				<action ID="1102" />	<!-- the event will produced from the hirachical interactor -->				
+			</transition>		
+			<transition NAME="No" NEXT_STATE_ID="1" EVENT_ID="203"> <!-- necessary transition of the state subSelected -->					
+			</transition>			<!-- the event will produced from the hirachical interactor -->
+		</state>
+		<state NAME="subSelected" ID="3">
+			<transition NAME="SubInteractorDeselect" NEXT_STATE_ID="1" EVENT_ID="1020"> <!-- necessary transition of the state subSelected -->	
+				<action ID="1101" />												  <!-- the event will produced from the hirachical interactor -->
+			</transition>		
+			<transition NAME="Esc" NEXT_STATE_ID="1" EVENT_ID="13"> 
+				<action ID="1101" />
+			</transition>		
+		</state>
+	</stateMachine>	
+<!-- end of the HirachicalInteractor -->		
+	
 	<stateMachine NAME="AffineInteractions ctrl-drag_marcus">
 		<state NAME="start" ID="0" START_STATE="TRUE">
 			<transition NAME="leftButtonPress" NEXT_STATE_ID="12" EVENT_ID="1"> <!-- 30 = SeCHECKELEMENT  -->
@@ -773,6 +809,8 @@
 		<event NAME="Strg + E" ID="11" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0200" KEY="Key_E" />
 		<!-- Delete -->
 		<event NAME="Delete" ID="12" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_Delete" />
+		<!-- Esc -->
+		<event NAME="Escape" ID="13" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_Escape" />		
 		<!-- leftMouseButtonRelease -->
 		<event NAME="leftMouseRelease" ID="505" TYPE="Type_MouseButtonRelease" BUTTON="BS_LeftButton" BUTTONSTATE="0x0001" KEY="Key_none" />
 		<!-- MiddleMouseButtonRelease -->

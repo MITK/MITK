@@ -67,13 +67,16 @@ public:
   ~Interactor(){}
 
   //##Documentation
-  //## @brief Set the Mode of the Interactor to Selected, Subselected or Deselected
-  //## use enum SMMode for parameter
-  void SetMode(int mode);
+  //## @brief Get the Mode of the Interactor. Use enum SMMode for return parameter
+  SMMode GetMode() const;
 
   //##Documentation
-  //## @brief Get the Mode of the Interactor. Use enum SMMode for return parameter
-  const int GetMode() const;
+  //## @brief Check the interaction mode
+  bool IsNotSelected() const;
+
+  //##Documentation
+  //## @brief Check the interaction mode
+  bool IsSelected() const;
 
   //##Documentation
   //## @brief calculates how good the data, this statemachine handles, is hit by the event.
@@ -85,7 +88,7 @@ public:
 
   //##Documentation
   //## @brief Executes Side-Effects
-  virtual bool ExecuteAction(Action* action, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId) = 0;
+  virtual bool ExecuteAction(Action* action, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId);
 
 protected:
   //##Documentation
@@ -94,7 +97,7 @@ protected:
 
   //##Documentation
   //## @brief Mode of Selection
-  int m_Mode;
+  SMMode m_Mode;
 
 };
 

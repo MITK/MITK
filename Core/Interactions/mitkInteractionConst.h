@@ -71,6 +71,7 @@ typedef enum EEventIds
   EIDSTLARGERNMINUS1 = 1011,
   EIDPOSITIONEVENT = 1012,
   EIDEDIT = 1013,
+  EIDSUBDESELCT = 1020, 
   //external thrown events:
   EIDCLEAR = 1100
 };
@@ -125,6 +126,8 @@ typedef enum EActions
   AcCHECKGREATERZERO = 35, //check if the current number of elements is greater than 0
   AcCHECKGREATERTWO = 36, //check if the current number of elements is greater than two
   AcCHECKOPERATION = 37, //check if the operation is of one spectial type
+  AcCHECKONESUBINTERACTOR = 38,
+  AcCHECKSUBINTERACTORS = 39,
   AcFINISHOBJECT = 40,
   AcFINISHGROUP = 41,
   AcFINISHMOVEMENT = 42,
@@ -162,10 +165,12 @@ typedef enum EActions
   AcROTATE = 1005,
   AcINITAFFINEINTERACTIONS = 1006,
   AcFINISHAFFINEINTERACTIONS = 1007,
-  AcMODESELECT = 1100,
-  AcMODEDESELECT = 1101,
+  AcMODEDESELECT = 1100,  // set interactor in not selected mode
+  AcMODESELECT = 1101,  // set interactor in selected mode
+  AcMODESUBSELECT = 1102,  // set interacor in sub selected mode
+  // AcEVENTTRANSMIT = 1103, // transmit an 
   AcINFORMLISTENERS = 1200, //GlobalInteraction
-  AcASKINTERACTORS = 1201  //GlobalInteraction
+  AcASKINTERACTORS = 1201  //GlobalInteraction  
 };
 
 //Type of an Event;
@@ -238,9 +243,9 @@ typedef enum EEventType
   Type_LayoutDirectionChange = 90,		// the layout direction changed
   Type_Style = 91,				// internal style event
   Type_TabletPress = 92,			// tablet press
-  Type_TabletRelease = 93,			// tablet release
+  Type_TabletRelease = 93,			// tablet release  
   Type_User = 1000,				// first user event id
-  Type_MaxUser = 65535
+  Type_MaxUser = 65535 
 };
 
 

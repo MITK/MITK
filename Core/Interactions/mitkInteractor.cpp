@@ -3,6 +3,8 @@
 #include <mitkDisplayPositionEvent.h>
 #include <mitkPositionEvent.h>
 #include <mitkGeometry3D.h>
+#include <mitkAction.h>
+#include <mitkStatusBar.h>
 #include <vtkCamera.h>
 #include <vtkRenderer.h>
 #include <mitkOpenGLRenderer.h>
@@ -20,15 +22,50 @@ mitk::Interactor::Interactor(const char * type, DataTreeNode* dataTreeNode)
     m_DataTreeNode->SetInteractor(this);
 }
 
-void mitk::Interactor::SetMode(int mode)
-{
-  if ((-1<mode)&&(mode<3))//if mode in range from 0 to 2
-    m_Mode = mode;
-}
-
-const int mitk::Interactor::GetMode() const
+mitk::Interactor::SMMode mitk::Interactor::GetMode() const
 {
   return m_Mode;
+}
+
+bool mitk::Interactor::IsNotSelected() const 
+{
+  return (m_Mode==SMDESELECTED);
+}
+
+bool mitk::Interactor::IsSelected() const 
+{
+  return (m_Mode!=SMDESELECTED);
+}
+
+bool mitk::Interactor::ExecuteAction(Action* action, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId) 
+{
+
+  switch (action->GetActionId())
+  {
+    case AcMODEDESELECT:
+      {
+        m_Mode = SMDESELECTED;
+        // ToDo
+        // Operation op( OPSelect, ... )
+        // m_DataTreeNode->GetData()->ExecuteOperation( &op );
+        return true;
+      }
+    case AcMODESELECT:
+      {      
+        m_Mode = SMSELECTED;
+        // ToDo
+        // Operation op( OPSelect, ... )
+        // m_DataTreeNode->GetData()->ExecuteOperation( &op );
+        return true;
+      }
+    case AcMODESUBSELECT:
+      {
+        mitk::StatusBar::DisplayText("Error! in XML-Interaction: an simple Interactor can not set in sub selected", 1102);
+        return false;
+      }
+  }
+  
+  return false;
 }
 
 //##Documentation

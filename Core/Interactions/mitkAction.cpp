@@ -40,7 +40,7 @@ int Action::GetActionId() const
 /**
  *
  */
-mitk::BaseProperty::Pointer Action::GetProperty( const char *propertyKey ) const 
+mitk::BaseProperty* Action::GetProperty( const char *propertyKey ) const 
 {
   return m_PropertiesList->GetProperty( propertyKey );
 }

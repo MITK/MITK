@@ -5,6 +5,7 @@
 #include <mitkPointOperation.h>
 #include <mitkPositionEvent.h>
 #include <mitkStateTransitionOperation.h>
+#include <mitkDataTreeNode.h>
 
 mitk::LineInteractor::LineInteractor(const char * type, DataTreeNode* dataTreeNode, int cellId, int pIdA, int pIdB)
 : Interactor(type, dataTreeNode), m_CellId(cellId), m_PIdA(pIdA), m_PIdB(pIdB)
@@ -78,7 +79,7 @@ bool mitk::LineInteractor::ExecuteSideEffect(int sideEffectId, mitk::StateEvent 
     PointOperation* doOp = new mitk::PointOperation(OpMOVELINE, newPoint, m_Id);
     //execute the Operation
     //here no undo is stored, because the movement-steps aren't interesting. only the start and the end is interisting to store for undo.
-    m_Data->ExecuteOperation(doOp);
+    m_DataTreeNode->GetData()->ExecuteOperation(doOp);
     ok = true;
   }
   break;
@@ -96,13 +97,13 @@ bool mitk::LineInteractor::ExecuteSideEffect(int sideEffectId, mitk::StateEvent 
     if ( m_UndoEnabled )
     {
       PointOperation* undoOp = new mitk::PointOperation(OpMOVELINE, m_LastPoint, m_Id);
-      OperationEvent *operationEvent = new OperationEvent(m_Data,
+      OperationEvent *operationEvent = new OperationEvent(m_DataTreeNode->GetData(),
                                                         doOp, undoOp,
                                                         objectEventId, groupEventId);
       m_UndoController->SetOperationEvent(operationEvent);
     }
     //execute the Operation
-    m_Data->ExecuteOperation(doOp);
+    m_DataTreeNode->GetData()->ExecuteOperation(doOp);
 
     //increase the GroupEventId, so that the raw-Undo goes to here
     //this->IncCurrGroupEventId();
@@ -118,13 +119,13 @@ bool mitk::LineInteractor::ExecuteSideEffect(int sideEffectId, mitk::StateEvent 
     if ( m_UndoEnabled )
     {
       LineOperation* undoOp = new mitk::LineOperation(OpDESELECTLINE, m_Id, m_PIdA, m_PIdB);
-      OperationEvent *operationEvent = new OperationEvent(m_Data,
+      OperationEvent *operationEvent = new OperationEvent(m_DataTreeNode->GetData(),
                                                         doOp, undoOp,
                                                         objectEventId, groupEventId);
       m_UndoController->SetOperationEvent(operationEvent);
     }
     //execute the Operation
-    m_Data->ExecuteOperation(doOp);
+    m_DataTreeNode->GetData()->ExecuteOperation(doOp);
     ok = true;
   }
   break;
@@ -136,13 +137,13 @@ bool mitk::LineInteractor::ExecuteSideEffect(int sideEffectId, mitk::StateEvent 
     if ( m_UndoEnabled )
     {
       LineOperation* undoOp = new mitk::LineOperation(OpSELECTLINE, m_Id, m_PIdA, m_PIdB);
-      OperationEvent *operationEvent = new OperationEvent(m_Data,
+      OperationEvent *operationEvent = new OperationEvent(m_DataTreeNode->GetData(),
                                                         doOp, undoOp,
                                                         objectEventId, groupEventId);
       m_UndoController->SetOperationEvent(operationEvent);
     }
     //execute the Operation
-    m_Data->ExecuteOperation(doOp);
+    m_DataTreeNode->GetData()->ExecuteOperation(doOp);
     ok = true;
   }
   break;

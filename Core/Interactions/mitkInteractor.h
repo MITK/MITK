@@ -44,11 +44,6 @@ protected:
   //## @brief Pointer to the data, this object handles the Interaction for
   DataTreeNode* m_DataTreeNode;
 
-  //##Documentation
-  //## @brief pointer to the Data
-  OperationActor* m_Data;
-
-
 };
 
 }//namespace mitk

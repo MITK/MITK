@@ -10,13 +10,6 @@
 mitk::PointInteractor::PointInteractor(const char * type, DataTreeNode* dataTreeNode, int id)
 : Interactor(type, dataTreeNode), m_Id(id)
 {
-  m_Data = dynamic_cast<mitk::PointSet*>(dataTreeNode->GetData());
-  if (m_Data == NULL)
-  {
-    (StatusBar::GetInstance())->DisplayText("Message from mitkPointInteractor: Wrong Data!", 10000);
-    return;
-    //@TODO: call exception!!!
-  }
 }
 
 mitk::PointInteractor::~PointInteractor()
@@ -64,12 +57,12 @@ bool mitk::PointInteractor::ExecuteSideEffect(int sideEffectId, mitk::StateEvent
 		  //difference between OpDELETE and OpREMOVE is, that OpDELETE deletes a point at the end, and OpREMOVE deletes it from the given position
       //remove is better, cause we need the position to add or remove the point anyway. We can get the last position from size()
 			PointOperation* undoOp = new mitk::PointOperation(OpREMOVE, itkPoint, m_Id);
-			OperationEvent *operationEvent = new OperationEvent(m_Data,
+			OperationEvent *operationEvent = new OperationEvent(m_DataTreeNode->GetData(),
 																	doOp, undoOp,
 																	objectEventId, groupEventId);
 			m_UndoController->SetOperationEvent(operationEvent);
 		}
-		m_Data->ExecuteOperation(doOp);
+		m_DataTreeNode->GetData()->ExecuteOperation(doOp);
 
 		ok = true;
     break;
@@ -101,7 +94,7 @@ bool mitk::PointInteractor::ExecuteSideEffect(int sideEffectId, mitk::StateEvent
     PointOperation* doOp = new mitk::PointOperation(OpMOVE, newPoint, m_Id);
     //execute the Operation
     //here no undo is stored, because the movement-steps aren't interesting. only the start and the end is interisting to store for undo.
-		m_Data->ExecuteOperation(doOp);
+		m_DataTreeNode->GetData()->ExecuteOperation(doOp);
 
     ok = true;
     break;
@@ -122,13 +115,13 @@ bool mitk::PointInteractor::ExecuteSideEffect(int sideEffectId, mitk::StateEvent
 	  if ( m_UndoEnabled )
     {
       PointOperation* undoOp = new mitk::PointOperation(OpMOVE, m_LastPoint, m_Id);
-      OperationEvent *operationEvent = new OperationEvent(m_Data,
+      OperationEvent *operationEvent = new OperationEvent(m_DataTreeNode->GetData(),
 							doOp, undoOp,
 							objectEventId, groupEventId);
       m_UndoController->SetOperationEvent(operationEvent);
     }
 		//execute the Operation
-		m_Data->ExecuteOperation(doOp);
+		m_DataTreeNode->GetData()->ExecuteOperation(doOp);
 
   //  //increase the GroupEventId, so that the raw-Undo goes to here
 		//this->IncCurrGroupEventId();
@@ -139,49 +132,49 @@ bool mitk::PointInteractor::ExecuteSideEffect(int sideEffectId, mitk::StateEvent
 
 	case SeREMOVE://remove the given Point from the list
   {
-    PointOperation* doOp = new mitk::PointOperation(OpREMOVE, ((PointSet*)(m_Data))->GetItkPoint(m_Id), m_Id);
+    PointOperation* doOp = new mitk::PointOperation(OpREMOVE, ((PointSet*)(m_DataTreeNode->GetData()))->GetItkPoint(m_Id), m_Id);
 		if (m_UndoEnabled)	//write to UndoMechanism
     {
-			PointOperation* undoOp = new mitk::PointOperation(OpINSERT, ((PointSet*)(m_Data))->GetItkPoint(m_Id), m_Id);
-		  OperationEvent *operationEvent = new OperationEvent(m_Data,
+			PointOperation* undoOp = new mitk::PointOperation(OpINSERT, ((PointSet*)(m_DataTreeNode->GetData()))->GetItkPoint(m_Id), m_Id);
+		  OperationEvent *operationEvent = new OperationEvent(m_DataTreeNode->GetData(),
 			  											doOp, undoOp,
 															objectEventId, groupEventId);
 			m_UndoController->SetOperationEvent(operationEvent);
 		}
 		//execute the Operation
-		m_Data->ExecuteOperation(doOp);
+		m_DataTreeNode->GetData()->ExecuteOperation(doOp);
    	ok = true;
   }
 	break;
 
   case SeSELECT:
 	{
-    PointOperation* doOp = new mitk::PointOperation(OpSELECTPOINT, ((PointSet*)(m_Data))->GetItkPoint(m_Id), m_Id);
+    PointOperation* doOp = new mitk::PointOperation(OpSELECTPOINT, ((PointSet*)(m_DataTreeNode->GetData()))->GetItkPoint(m_Id), m_Id);
 		if (m_UndoEnabled)	
     {
-			PointOperation* undoOp = new mitk::PointOperation(OpDESELECTPOINT, ((PointSet*)(m_Data))->GetItkPoint(m_Id), m_Id);
-			OperationEvent *operationEvent = new OperationEvent(m_Data,
+			PointOperation* undoOp = new mitk::PointOperation(OpDESELECTPOINT, ((PointSet*)(m_DataTreeNode->GetData()))->GetItkPoint(m_Id), m_Id);
+			OperationEvent *operationEvent = new OperationEvent(m_DataTreeNode->GetData(),
 																doOp, undoOp,
 																objectEventId, groupEventId);
 			m_UndoController->SetOperationEvent(operationEvent);
 		}
-		m_Data->ExecuteOperation(doOp);
+		m_DataTreeNode->GetData()->ExecuteOperation(doOp);
 		ok = true;
 	}
 	break;
 
   case SeDESELECT:
 	{
-    PointOperation* doOp = new mitk::PointOperation(OpDESELECTPOINT, ((PointSet*)(m_Data))->GetItkPoint(m_Id), m_Id);
+    PointOperation* doOp = new mitk::PointOperation(OpDESELECTPOINT, ((PointSet*)(m_DataTreeNode->GetData()))->GetItkPoint(m_Id), m_Id);
 		if (m_UndoEnabled)	
     {
-			PointOperation* undoOp = new mitk::PointOperation(OpSELECTPOINT, ((PointSet*)(m_Data))->GetItkPoint(m_Id), m_Id);
-			OperationEvent *operationEvent = new OperationEvent(m_Data,
+			PointOperation* undoOp = new mitk::PointOperation(OpSELECTPOINT, ((PointSet*)(m_DataTreeNode->GetData()))->GetItkPoint(m_Id), m_Id);
+			OperationEvent *operationEvent = new OperationEvent(m_DataTreeNode->GetData(),
 																doOp, undoOp,
 																objectEventId, groupEventId);
 			m_UndoController->SetOperationEvent(operationEvent);
 		}
-		m_Data->ExecuteOperation(doOp);
+		m_DataTreeNode->GetData()->ExecuteOperation(doOp);
 		ok = true;
 	}
 	break;

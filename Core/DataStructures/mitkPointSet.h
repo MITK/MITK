@@ -16,7 +16,7 @@ namespace mitk {
 //##ModelId=3F0177E803A1
 //##Documentation
 //##@brief DataStructure which stores a list of Points 
-//## @ingroup Geometry
+//## @ingroup Data
 //##
 //## Each Entry (Point) in the the PointSet has a additional value (bool) to store
 //## the selected/unselected state of the Entry(Point).

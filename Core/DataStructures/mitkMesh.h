@@ -17,7 +17,7 @@ namespace mitk {
 
 //##Documentation
 //##@brief DataStructure which stores a list of Points with data and cells
-//## @ingroup Geometry
+//## @ingroup Data
 //##
 //## A mesh contains several cells that can be of different celltypes (Line, Triangle, Polygone...).
 //## A cell is always closed. If a linestrip is to be created, then declare several cells, each containing one line.

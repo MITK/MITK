@@ -127,3 +127,4 @@ class EventMapper : public QXmlDefaultHandler
 } // namespace mitk
 
 #endif /* EVENTMAPPER_H_HEADER_INCLUDED_C187864A */
+

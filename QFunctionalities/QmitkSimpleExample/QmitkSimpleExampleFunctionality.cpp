@@ -110,7 +110,7 @@ void QmitkSimpleExampleFunctionality::createConnections()
 QAction * QmitkSimpleExampleFunctionality::createAction(QActionGroup *parent)
 {
     QAction* action;
-    action = new QAction( tr( "Left" ), QPixmap((const char**)slicer_xpm), tr( "&Left" ), CTRL + Key_L, parent, "simple example" );
+    action = new QAction( tr( "Simple Example" ), QPixmap((const char**)slicer_xpm), tr( "&Simple Example" ), CTRL + Key_L, parent, "simple example" );
     return action;
 }
 

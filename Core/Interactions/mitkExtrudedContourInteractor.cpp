@@ -144,6 +144,7 @@ bool mitk::ExtrudedContourInteractor::ExecuteAction(mitk::Action* action, mitk::
         Release(eventPoint);
         ok = true;
         m_Started = false;
+        InvokeEvent(itk::EndEvent());
       }
       break;
     }

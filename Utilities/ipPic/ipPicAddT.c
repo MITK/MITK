@@ -24,6 +24,10 @@ ipPicAddTag( ipPicDescriptor *pic, ipPicTSV_t *tsv )
 void
 ipPicAddSubTag( ipPicTSV_t *parent, ipPicTSV_t *tsv )
 {
+  if( parent->type != ipPicTSV )
+    return;
+
+  parent->n[0]++;
   parent->value = _ipPicInsertTag( parent->value, tsv );
 }
 
@@ -60,5 +64,6 @@ _ipPicInsertTag( _ipPicTagsElement_t *head, ipPicTSV_t *tsv )
       new->prev = current;
       current->next = new;
     }
+
   return( head );
 }

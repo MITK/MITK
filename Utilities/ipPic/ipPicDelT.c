@@ -14,34 +14,63 @@
 
 #include "ipPic.h"
 
-static _ipPicTagsElement_t *_ipPicRemoveTag( _ipPicTagsElement_t *head, char *tag );
+static ipPicTSV_t *_ipPicRemoveTag( _ipPicTagsElement_t **head,
+                                    _ipPicTagsElement_t *which,
+                                    char *tag );
 
-void
+ipPicTSV_t *
 ipPicDelTag( ipPicDescriptor *pic, char *t )
 {
   int i;
   char tag[_ipPicTAGLEN];
+  _ipPicTagsElement_t *which;
 
   sprintf( tag, "%.*s", _ipPicTAGLEN, t );
   for( i=strlen(tag); i<_ipPicTAGLEN; i++ )
     tag[i] = ' ';
 
-  pic->info->tags_head = _ipPicRemoveTag( pic->info->tags_head, tag );
+  which = _ipPicFindTag( pic->info->tags_head, tag );
+
+  return( _ipPicRemoveTag( &(pic->info->tags_head), which, tag ) );
 }
 
-_ipPicTagsElement_t *
-_ipPicRemoveTag( _ipPicTagsElement_t *head, char *tag )
+ipPicTSV_t *
+ipPicDelSubTag( ipPicTSV_t *parent, char *t )
 {
+  int i;
+  char tag[_ipPicTAGLEN];
   _ipPicTagsElement_t *which;
 
-  which = _ipPicFindTag( head, tag );
+  if( parent->type != ipPicTSV )
+    return( NULL );
+
+  sprintf( tag, "%.*s", _ipPicTAGLEN, t );
+  for( i=strlen(tag); i<_ipPicTAGLEN; i++ )
+    tag[i] = ' ';
+
+  which = _ipPicFindTag( parent->value, tag );
+
+  if( which )
+    parent->n[0]--;
+
+  return( _ipPicRemoveTag( (_ipPicTagsElement_t **)&(parent->value), which, tag ) );
+}
+
+ipPicTSV_t *
+_ipPicRemoveTag( _ipPicTagsElement_t **head, _ipPicTagsElement_t *which, char *tag )
+{
+  ipPicTSV_t *tsv = NULL;
 
   if( which != NULL )
     {
+      tsv = which->tsv;
+
       if( which->prev == NULL )              /* which is the current head */
         {
-          head = which->next;
-          head->prev = NULL;
+          *head = which->next;
+
+          if( *head )
+            (*head)->prev = NULL;
         }
       else if( which->next == NULL )         /* which is the current tail */
         {
@@ -55,5 +84,6 @@ _ipPicRemoveTag( _ipPicTagsElement_t *head, char *tag )
 
       free( which );
     }
-  return( head );
+
+  return( tsv );
 }

@@ -27,34 +27,12 @@ int main( int argc, char *argv[] )
   a.position_x = 64;
   a.position_y = 46;
 
-  /*tsv = malloc( sizeof(ipPicTSV_t) );
-  strcpy( tsv->tag, "MIN/MAX");
-  tsv->type = ipPicUInt;
-  tsv->bpe = 8;
-  tsv->dim = 1;
-  tsv->n[0] = 2;
-  tsv->value = malloc( 1*2 );
-  ((ipUInt1_t *)tsv->value)[0] = 0;
-  ((ipUInt1_t *)tsv->value)[1] = 100;
-  ipPicAddTag( pic, tsv ); /**/
-
-  tsv = malloc( sizeof(ipPicTSV_t) );
-  strcpy( tsv->tag, "LEVEL/WINDOW");
-  tsv->type = ipPicInt;
-  tsv->bpe = 16;
-  tsv->dim = 1;
-  tsv->n[0] = 2;
-  tsv->value = malloc( (tsv->bpe/8)*2 );
-  ((ipInt2_t *)tsv->value)[0] = 50;
-  ((ipInt2_t *)tsv->value)[1] = 100;
-  ipPicAddTag( pic, tsv ); /**/
-
   tsv = malloc( sizeof(ipPicTSV_t) );
   strcpy( tsv->tag, "ANNOTATION");
   tsv->type = ipPicTSV;
   tsv->bpe = 32;
   tsv->dim = 0;
-  tsv->n[0] = 4;
+  tsv->n[0] = 0;
   tsv->value = NULL;
   ipPicAddTag( pic, tsv ); /**/
 
@@ -105,12 +83,12 @@ int main( int argc, char *argv[] )
   tsv3->type = ipPicTSV;
   tsv3->bpe = 32;
   tsv3->dim = 1;
-  tsv3->n[0] = 1;
+  tsv3->n[0] = 0;
   tsv3->value = NULL;
   ipPicAddSubTag( tsv, tsv3 );
 
   tsv2 = malloc( sizeof(ipPicTSV_t) );
-  strcpy( tsv2->tag, "TYPE");
+  strcpy( tsv2->tag, "X1X2X3");
   tsv2->type = ipPicUInt;
   tsv2->bpe = 32;
   tsv2->dim = 1;
@@ -119,6 +97,8 @@ int main( int argc, char *argv[] )
   *(ipUInt4_t *)tsv2->value = a.type;
 
   ipPicAddSubTag( tsv3, tsv2 );
+
+  ipPicDelSubTag( tsv, "ANNOTATION" );
 
   ipPicPut( argv[2],
             pic );

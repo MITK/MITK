@@ -5,6 +5,8 @@ class QmitkDataManager;
 class QmitkRegistration;
 class QmitkSimpleExampleFunctionality;
 class QmitkSimpleTumorSegmentation;
+class QmitkLevelSets;
+class QmitkNoiseSuppression;
 
 /*!
 	\brief This application demonstrates how to code a new MITK application 
@@ -51,5 +53,16 @@ protected:
 		QmitkRegistration * registrationFunc;
 
     QmitkSimpleTumorSegmentation * tumorSegFunc;
+
+    /*!
+		 functionality for noise filters
+		 */
+		QmitkNoiseSuppression * m_NoiseFilters;
+
+    /*!
+		 level set segmentation tool
+		 */
+		QmitkLevelSets * m_LevelSetTool;
+
 
 };

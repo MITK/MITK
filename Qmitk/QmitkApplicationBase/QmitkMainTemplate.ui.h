@@ -38,8 +38,12 @@
 #include <StateMachine.h>
 #include <EventMapper.h>
 #include <GlobalInteraction.h>
-#include <mitkInteractionConst.h>
 
+#ifdef MITK_DICOM_ENABLED
+#include <mitkDICOMFileReader.h>
+#endif
+
+#include <mitkInteractionConst.h>
 
 mitk::FloatProperty::Pointer opacityprop=NULL;
 
@@ -213,6 +217,26 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
 		initWidgets(it);
 		delete it;
 	}
+#ifdef MITK_DICOM_ENABLED
+	else
+    if(strstr(fileName, "DCM")!=0)
+	{
+		mitk::DICOMFileReader::Pointer reader;
+
+		reader=mitk::DICOMFileReader::New();
+		std::cout << "loading " << fileName << " as pic ... " << std::endl;
+
+		reader->SetFileName(fileName);
+
+		mitk::DataTreeIterator* it=tree->inorderIterator();
+
+		node=mitk::DataTreeNode::New();
+		node->SetData(reader->GetOutput());
+		it->add(node); 
+
+		initWidgets(it);
+	}
+#endif
 }
 
 void QmitkMainTemplate::fileOpenImageSequence()

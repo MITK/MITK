@@ -32,16 +32,15 @@ public:
 
     //##ModelId=3D78B966005F
     //##Documentation
-    //## @brief Set a property in the list/map (if it is not already - with the identical value - in it). 
+    //## @brief Set a property in the list/map 
     //## 
     //## Each property gets a key (@a propertyKey) to make it accessible. 
-    //## This method uses the operator== of BaseProperty.
-    bool SetProperty(const char* propertyKey, BaseProperty* property);
+    void SetProperty(const char* propertyKey, BaseProperty* property);
 
     //##ModelId=3ED94AAE0075
     //##Documentation
     //## @brief Get the timestamp of the last change of the map or the last change of one of 
-    //## the property store in the list (whichever is later).
+    //## the properties store in the list (whichever is later).
     virtual unsigned long GetMTime() const;
 
     //##ModelId=3EF1B0160286

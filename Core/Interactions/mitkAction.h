@@ -16,7 +16,7 @@ public:
   Action( int actionId );
   ~Action();
   
-  bool AddProperty(const char* propertyKey, BaseProperty* property);
+  void AddProperty(const char* propertyKey, BaseProperty* property);
 
   int GetActionId() const;
   mitk::BaseProperty::Pointer GetProperty( const char *propertyKey ) const;

@@ -22,9 +22,9 @@ Action::~Action()
 /**
  *
  */
-bool Action::AddProperty(const char* propertyKey, BaseProperty* property) 
+void Action::AddProperty(const char* propertyKey, BaseProperty* property) 
 {
-  return m_PropertiesList->SetProperty( propertyKey,  property );
+  return;
 }
 
 

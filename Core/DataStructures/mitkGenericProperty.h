@@ -17,7 +17,6 @@ class GenericProperty : public BaseProperty
    
     mitkClassMacro(GenericProperty, BaseProperty);
 //    itkNewMacro(Self);
-
     //##ModelId=3EF99E2C0290
     GenericProperty() {};
     GenericProperty(T x) : m_Value(x) {};	
@@ -29,16 +28,11 @@ class GenericProperty : public BaseProperty
         if(other==NULL) return false;
         return other->m_Value==m_Value;
     }
-
-    virtual T GetValue() const
-    {
-      return m_Value;
-    }
-
-
-    virtual void SetValue(T x) {
-	m_Value = x;
-    }	
+    
+    itkSetMacro(Value,T);
+    itkGetConstMacro(Value,T);
+    
+   	
     std::string GetValueAsString() const {
        std::stringstream myStr;
        myStr << GetValue() ;

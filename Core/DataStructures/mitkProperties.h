@@ -25,8 +25,11 @@ namespace mitk {
    typedef GenericProperty<Point3<int> > Point3iProperty;
    template class GenericProperty<Point3<int> >;
    
-//   typedef GenericProperty<int> IntProperty;
-//   template class GenericProperty<int>;
             
-}  // namespace mitk
+} // namespace mitk  
+
+// itkSetMacro needs this: 
+int operator!=(const Point3<int>& left, const Point3<int>& right);
+int operator!=(const Point3d& left, const Point3d& right);
+
 #endif /* MITKPROPERTIES_H_HEADER_INCLUDED */

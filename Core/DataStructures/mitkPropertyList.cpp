@@ -14,7 +14,7 @@ mitk::BaseProperty::Pointer mitk::PropertyList::GetProperty(const char *property
 }
 
 //##ModelId=3D78B966005F
-bool mitk::PropertyList::SetProperty(const char* propertyKey, BaseProperty* property)
+void mitk::PropertyList::SetProperty(const char* propertyKey, BaseProperty* property)
 {
     std::map<std::string,BaseProperty::Pointer>::iterator it;
     
@@ -24,9 +24,10 @@ bool mitk::PropertyList::SetProperty(const char* propertyKey, BaseProperty* prop
         //yes?
     {
         //is the property contained in the list identical to the new one?
-        if( *it->second == *property)
+        if( it->second == property) {
             // yes? do nothing and return.
-            return false;
+            return;
+	}
         //no? erase the old entry.
         m_Properties.erase(it);
     }
@@ -34,7 +35,7 @@ bool mitk::PropertyList::SetProperty(const char* propertyKey, BaseProperty* prop
     //no? add/replace it.
 	//std::pair<std::map<std::string,BaseProperty::Pointer>::iterator, bool> o=
         m_Properties.insert ( std::pair<std::string,BaseProperty::Pointer>( propertyKey, property ) );
-    return true;
+   Modified();
 }
 
 //##ModelId=3E38FEFE0125
@@ -64,6 +65,7 @@ unsigned long mitk::PropertyList::GetMTime() const
 //##ModelId=3EF1B0160286
 bool mitk::PropertyList::DeleteProperty(const char* propertyKey)
 {
+    Modified();
     return m_Properties.erase(propertyKey)>0;
 }
 

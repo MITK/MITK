@@ -29,7 +29,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkMatrix4x4.h>
 
 // Standard Constructor for the new makro. sets the geometry to 3 dimensions
-mitk::Geometry3D::Geometry3D() : m_ParametricBoundingBox(NULL), m_VtkIndexToWorldTransform(NULL)
+mitk::Geometry3D::Geometry3D() : m_ParametricBoundingBox(NULL), m_VtkIndexToWorldTransform(NULL), m_FrameOfReferenceID(0)
 {
   Initialize();
 }
@@ -47,13 +47,12 @@ void mitk::Geometry3D::Initialize()
   SetFloatBounds(b);
 
   m_IndexToObjectTransform = TransformType::New();
-  m_IndexToObjectTransform->SetIdentity();
   m_ObjectToNodeTransform = TransformType::New();
-  m_ObjectToNodeTransform->SetIdentity();  
 
   if(m_IndexToWorldTransform.IsNull())
     m_IndexToWorldTransform = TransformType::New();
-  m_IndexToWorldTransform->SetIdentity();
+  else
+    m_IndexToWorldTransform->SetIdentity();
 
   if(m_VtkIndexToWorldTransform==NULL)
     m_VtkIndexToWorldTransform = vtkTransform::New();
@@ -62,6 +61,8 @@ void mitk::Geometry3D::Initialize()
   m_ParametricTransform = m_IndexToWorldTransform;
 
   m_TimeBoundsInMS[0]=-ScalarTypeNumericTraits::max(); m_TimeBoundsInMS[1]=ScalarTypeNumericTraits::max();
+
+  m_FrameOfReferenceID = 0;
 }
 
 void mitk::Geometry3D::TransferItkToVtkTransform()
@@ -181,6 +182,8 @@ void mitk::Geometry3D::InitializeGeometry(Geometry3D * newGeometry) const
 
   if(m_ParametricBoundingBox.IsNotNull())
     newGeometry->SetParametricBounds(m_ParametricBoundingBox->GetBounds());
+
+  newGeometry->SetFrameOfReferenceID(GetFrameOfReferenceID());
 }
 
 vtkTransform* mitk::Geometry3D::GetVtkTransform()

@@ -104,9 +104,11 @@ public:
   itkGetConstReferenceMacro(TimeBoundsInMS, TimeBounds);
   virtual void SetTimeBoundsInMS(const TimeBounds& timebounds);
 
-  Point3D GetCornerPoint(unsigned char id) const
+  Point3D GetCornerPoint(int id) const
   {
+    assert(id >= 0);
     assert(m_BoundingBox.IsNotNull());
+
     BoundingBox::BoundsArrayType bounds = m_BoundingBox->GetBounds();
 
     Point3D cornerpoint;
@@ -219,6 +221,9 @@ public:
   //##ModelId=3E3453C703AF
   virtual void Initialize();
 
+  itkGetConstMacro(FrameOfReferenceID, unsigned int);
+  itkSetMacro(FrameOfReferenceID, unsigned int);
+
   void TransferItkToVtkTransform();
 
   void TransferVtkToITKTransform();
@@ -266,6 +271,8 @@ protected:
   vtkTransform* m_VtkIndexToWorldTransform;
   
   mitk::Transform3D::Pointer m_ParametricTransform;
+
+  unsigned int m_FrameOfReferenceID;
 };
 
 } // namespace mitk

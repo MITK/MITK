@@ -1,0 +1,14 @@
+/**
+\page DirectoryStructurePage Directory Structure
+
+\warning This is a proposal, which is not yet passed. 
+
+There are seven directories on the top level, each containing several sub-directories that contain the implementation (thus the depth of the directory structure is limited to two):
+\li DataStructures: contains sub-directories with data classes. Classes in a directory may reference classes in other data-directories, but \em not in any of the other six directories at the top level.
+\li Algorithms: contains sub-directories with algorithms, which may reference other algorithms and data-structures. 
+\li Controllers: contains sub-directories with controllers in the sense of the model-view-controller design-pattern, which may reference other controllers, algorithms and data-structures.
+\li Mappers: contains sub-directories with mapper classes, which may reference other mappers and all above mentioned directories.
+\li Interactions: contains sub-directories with interaction classes, which may reference other mappers and all above mentioned directories.
+\li AppModule: contains classes with GUI, which can be used within applications. This includes widgets and combinations of widgets as well as functionalities. Classes in all directories except the applications-directory may be referenced.
+\li Applications: Each directory includes the files required for at least one application. Classes in all directories may be referenced.
+*/

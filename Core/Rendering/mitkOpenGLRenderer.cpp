@@ -167,7 +167,7 @@ mitk::OpenGLRenderer::~OpenGLRenderer() {
 */
 //##ModelId=3E33145B0096
 void mitk::OpenGLRenderer::Initialize( ) {
-    glClearColor(1.0, 1.0, 1.0, 1.0);
+    glClearColor(0.0, 0.0, 0.0, 1.0);
     glColor3f(1.0, 0.0, 0.0);
 }
 
@@ -176,14 +176,14 @@ void mitk::OpenGLRenderer::Initialize( ) {
 */
 //##ModelId=3E33145B00D2
 void mitk::OpenGLRenderer::Resize( int w, int h) {
-//    glViewport (0, 0, w, h);
+    glViewport (0, 0, w, h);
     glMatrixMode( GL_PROJECTION );
     glLoadIdentity();
     gluOrtho2D( 0.0, w, 0.0, h );
     glMatrixMode( GL_MODELVIEW );
 
     m_ScreenGeometry->SetSizeInScreenUnits(w, h);
-//    m_ScreenGeometry->Fit();
+    m_ScreenGeometry->Fit();
     Update();
 //    m_VtkRenderWindow->SetSize(w,h); //FIXME?
 }

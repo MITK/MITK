@@ -64,9 +64,9 @@ int mitk::PointSet::SearchPoint(Point3D point, float distance )
   PointsContainer::Iterator it, end;
   end = m_ItkData->GetPoints()->End();
   int bestIndex=-1;
+  distance = distance*distance;
   ScalarType bestDist=distance;
   ScalarType dist, tmp;
-  distance = distance*distance;
  	for (it = m_ItkData->GetPoints()->Begin(), i=0; it != end; ++it, ++i)
 	{
     bool ok = m_ItkData->GetPoints()->GetElementIfIndexExists(it->Index(), &out);

@@ -25,6 +25,7 @@
 #include <DataTree.h>
 #include <mitkFloatProperty.h>
 #include <qregexp.h>
+#include <string>
 
 #include <mitkStringProperty.h>
 #include <qstring.h>
@@ -584,12 +585,24 @@ void QmitkMainTemplate::init()
     mitkMultiWidget=NULL;
 
     //initialize interaction sub-system: undo-controller, statemachine-factory and global-interaction
+    
+    // test for environment variable MITKCONF
+    char* mitkConf = getenv("MITKCONF");
+    std::string xmlFileName;
+
+    if (mitkConf != NULL) {
+       xmlFileName = mitkConf;
+    } else {
+       xmlFileName = "../../Framework/SceneInteraction";
+    }
+    xmlFileName += "/PointStateMachine.xml";
+    std::cout << "Loading behavior file: " << xmlFileName << std::endl;
     //create undo-controller
     undoController = new mitk::UndoController;
 
 	//create statemachine-factory:
 	mitk::StateMachineFactory* stateMachineFactory = new mitk::StateMachineFactory();
-	bool smLoadOK = stateMachineFactory->LoadBehavior("../../Framework/SceneInteraction/PointStateMachine.xml");
+	bool smLoadOK = stateMachineFactory->LoadBehavior(xmlFileName);
 
     //could the behavior file be found?
     if(smLoadOK)
@@ -597,7 +610,7 @@ void QmitkMainTemplate::init()
       	//create eventmapper-factory:
     	mitk::EventMapper* eventMapper = new mitk::EventMapper();
     	//Load all possible Events from List
-    	bool eventLoadOK = eventMapper->LoadBehavior("../../Framework/SceneInteraction/PointStateMachine.xml");
+    	bool eventLoadOK = eventMapper->LoadBehavior(xmlFileName);
         //could the behavior file be found?
         if(eventLoadOK)
         {

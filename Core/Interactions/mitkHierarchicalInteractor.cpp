@@ -19,8 +19,8 @@ bool mitk::HierarchicalInteractor::HandleEvent(StateEvent const* stateEvent, int
 {
   bool ok = Interactor::HandleEvent( stateEvent, objectEventId, groupEventId );
 
-  if ( IsSubSelected() ) {
-
+  if ( IsSubSelected() ) 
+  {
     ok = TransmitEvent( stateEvent, objectEventId, groupEventId ) || ok ;
   }
 
@@ -57,25 +57,22 @@ bool mitk::HierarchicalInteractor::ExecuteAction(Action* action, mitk::StateEven
   {
     case AcMODEDESELECT:
       {
-        // ToDo
-        // Operation op( OPSelect, ... )
-        // m_DataTreeNode->GetData()->ExecuteOperation( &op );
-        m_Mode = SMDESELECTED;
+        //declare operations for modechange:
+        this->CreateModeOperation(SMDESELECTED, objectEventId, groupEventId);
         m_SelectedInteractors.clear();
         return true;
       }
     case AcMODESELECT:
       { 
-        // ToDo
-        // Operation op( OPSelect, ... )
-        // m_DataTreeNode->GetData()->ExecuteOperation( &op );
-        m_Mode = SMSELECTED;
+        //declare operations for modechange:
+        this->CreateModeOperation(SMSELECTED, objectEventId, groupEventId);
         m_SelectedInteractors.clear();
         return true;
       }
     case AcMODESUBSELECT:
       {
-        m_Mode = SMSUBSELECTED;
+        //declare operations for modechange:
+        this->CreateModeOperation(SMSUBSELECTED, objectEventId, groupEventId);
         return true;
       }
     case AcCHECKONESUBINTERACTOR:
@@ -162,7 +159,7 @@ bool mitk::HierarchicalInteractor::ExecuteAction(Action* action, mitk::StateEven
         return true;
       }
     default:
-      return Interactor::ExecuteAction( action, stateEvent, objectEventId, groupEventId);
+      return Superclass::ExecuteAction( action, stateEvent, objectEventId, groupEventId);
   }   
 }
 

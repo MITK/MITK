@@ -103,6 +103,7 @@ libipFunc_a_SOURCES = \
       SelInv.c        \
       SelMM.c         \
       SetErrno.c      \
+      SetTag.c        \
       Skewness.c      \
       SkewnessR.c     \
       Shp.c           \

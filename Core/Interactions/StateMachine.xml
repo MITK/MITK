@@ -182,7 +182,7 @@
       </transition>
     </state>
   </stateMachine>
-  <stateMachine NAME="drag">
+  <stateMachine name="drag">
     <state NAME="neutral" ID="1" START_STATE="TRUE">
       <transition NAME="check picked" NEXT_STATE_ID="1" EVENT_ID="1">
         <action ID="80" />
@@ -219,12 +219,14 @@
       <transition NAME="continue" NEXT_STATE_ID="1" EVENT_ID="534">
         <action ID="90" />
       </transition>
-      <transition NAME="exit" NEXT_STATE_ID="1" EVENT_ID="505">
+<!--            <transition NAME="exit" NEXT_STATE_ID="1" EVENT_ID="505">
         <action ID="42" />
       </transition>
+-->      
       <transition NAME="exit" NEXT_STATE_ID="1" EVENT_ID="537">
         <action ID="42" />
       </transition>
+      
     </state>
     <state NAME="picked guard" ID="2">
       <transition NAME="yes" NEXT_STATE_ID="3" EVENT_ID="1004">

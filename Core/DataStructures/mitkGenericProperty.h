@@ -1,6 +1,9 @@
 #ifndef MITKGENERICPROPERTY_H_HEADER_INCLUDED_C1061CEE
 #define MITKGENERICPROPERTY_H_HEADER_INCLUDED_C1061CEE
 
+#include <string>
+#include <sstream>
+
 #include "mitkCommon.h"
 #include "BaseProperty.h"
 
@@ -26,12 +29,18 @@ class GenericProperty : public BaseProperty
         if(other==NULL) return false;
         return other->m_Value==m_Value;
     }
-    virtual T GetValue() {
+    virtual T GetValue() const {
 	return m_Value;
     }
     virtual void SetValue(T x) {
 	m_Value = x;
     }	
+    std::string GetValueAsString() const {
+       std::stringstream myStr;
+       myStr << GetValue() ;
+       return myStr.str(); 
+    }
+    
   protected:
     //##ModelId=3EF99E45001F
     T m_Value;

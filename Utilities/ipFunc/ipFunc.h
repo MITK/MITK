@@ -132,8 +132,7 @@
 #include <time.h>
 #include <sys/timeb.h>
 #endif
-#include <ipPic.h>
-#include <ipTypes.h>
+#include <ipPic/ipPic.h>
 /* 
    Diese Datei wird in der ipFuncP.h includet
    #include <meschach/matrix2.h>

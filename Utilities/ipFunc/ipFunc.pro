@@ -1,5 +1,7 @@
 TEMPLATE	= lib
-CONFIG		= qt warn_on release
+unix:CONFIG	= qt staticlib warn_on release
+win32:CONFIG	= qt warn_on release
+
 HEADERS		= gradient.h \
 		  ipAdministrative.h \
 		  ipArithmeticAndLogical.h \
@@ -85,7 +87,7 @@ SOURCES		= AddC.c \
 		  SDevC.c \
 		  SDevR.c \
 		  SDevROI.c \
-		  ScBl.c \
+#		  ScBl.c \
 		  ScFact.c \
 		  ScNN.c \
 		  Scale.c \
@@ -114,11 +116,7 @@ SOURCES		= AddC.c \
 		  _BorderX.c \
 		  _DrawPoly.c 
 
-INCLUDEPATH = ../../DataStructures ../../DataStructures/ipPic
+INCLUDEPATH = ../../DataStructures
 
-TARGET = libipFunc
-
-
-DESTDIR = lib
-
-INTERFACES	= 
+unix:TARGET = ipFunc
+win32:TARGET = libipFunc

@@ -57,8 +57,8 @@
  * @author Ulrike Guennel @date 07.7.1995 
  *
  * $Log$
- * Revision 1.1  2000/05/24 11:41:08  tobiask
- * Initial revision
+ * Revision 1.2  2000/05/24 15:29:43  tobiask
+ * Changed the installation paths of the package.
  *
  * Revision 1.4  2000/05/04 12:52:11  ivo
  * inserted BSD style license

@@ -72,8 +72,8 @@
  *    7.6.1990  by J.D.  (small improvements) 
  *   18.3.1994  by U.G.  (new pic format)
  *   $Log$
- *   Revision 1.1  2000/05/24 11:41:08  tobiask
- *   Initial revision
+ *   Revision 1.2  2000/05/24 15:29:43  tobiask
+ *   Changed the installation paths of the package.
  *
  *   Revision 1.4  2000/05/04 12:52:11  ivo
  *   inserted BSD style license

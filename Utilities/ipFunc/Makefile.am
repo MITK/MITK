@@ -1,7 +1,7 @@
-INCLUDES = -I..
+INCLUDES = -I../ipPic
 
 lib_LIBRARIES = libipFunc.a
-include_HEADERS = ipFunc.h
+pkginclude_HEADERS = ipFunc.h
 noinst_HEADERS =		\
       gradient.h               	\
       ipArithmeticAndLogical.h 	\

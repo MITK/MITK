@@ -128,8 +128,8 @@
 #ifndef WIN32
 #include <sys/resource.h>
 #endif
-#include <ipPic/ipPic.h>
-#include <ipPic/ipTypes.h>
+#include <ipPic.h>
+#include <ipTypes.h>
 /* 
    Diese Datei wird in der ipFuncP.h includet
    #include <meschach/matrix2.h>

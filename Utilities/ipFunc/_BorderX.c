@@ -60,8 +60,8 @@
  *
  * UPDATES
  * $Log$
- * Revision 1.1  2000/05/24 11:41:08  tobiask
- * Initial revision
+ * Revision 1.2  2000/05/24 15:29:44  tobiask
+ * Changed the installation paths of the package.
  *
  * Revision 1.3  2000/05/04 12:52:11  ivo
  * inserted BSD style license

@@ -66,10 +66,10 @@ PACKAGE = @PACKAGE@
 RANLIB = @RANLIB@
 VERSION = @VERSION@
 
-INCLUDES = -I..
+INCLUDES = -I../ipPic
 
 lib_LIBRARIES = libipFunc.a
-include_HEADERS = ipFunc.h
+pkginclude_HEADERS = ipFunc.h
 noinst_HEADERS =        gradient.h               	      ipArithmeticAndLogical.h 	      ipFuncP.h                	      ipGeometrical.h          	      ipLocal.h                	      ipMorphological.h        	      ipPointOperators.h       	      ipStatistical.h            
 
 
@@ -103,7 +103,7 @@ CFLAGS = @CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
 LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(LDFLAGS) -o $@
-HEADERS =  $(include_HEADERS) $(noinst_HEADERS)
+HEADERS =  $(noinst_HEADERS) $(pkginclude_HEADERS)
 
 DIST_COMMON =  Makefile.am Makefile.in
 
@@ -182,19 +182,19 @@ libipFunc.a: $(libipFunc_a_OBJECTS) $(libipFunc_a_DEPENDENCIES)
 	$(AR) cru libipFunc.a $(libipFunc_a_OBJECTS) $(libipFunc_a_LIBADD)
 	$(RANLIB) libipFunc.a
 
-install-includeHEADERS: $(include_HEADERS)
+install-pkgincludeHEADERS: $(pkginclude_HEADERS)
 	@$(NORMAL_INSTALL)
-	$(mkinstalldirs) $(DESTDIR)$(includedir)
-	@list='$(include_HEADERS)'; for p in $$list; do \
+	$(mkinstalldirs) $(DESTDIR)$(pkgincludedir)
+	@list='$(pkginclude_HEADERS)'; for p in $$list; do \
 	  if test -f "$$p"; then d= ; else d="$(srcdir)/"; fi; \
-	  echo " $(INSTALL_DATA) $$d$$p $(DESTDIR)$(includedir)/$$p"; \
-	  $(INSTALL_DATA) $$d$$p $(DESTDIR)$(includedir)/$$p; \
+	  echo " $(INSTALL_DATA) $$d$$p $(DESTDIR)$(pkgincludedir)/$$p"; \
+	  $(INSTALL_DATA) $$d$$p $(DESTDIR)$(pkgincludedir)/$$p; \
 	done
 
-uninstall-includeHEADERS:
+uninstall-pkgincludeHEADERS:
 	@$(NORMAL_UNINSTALL)
-	list='$(include_HEADERS)'; for p in $$list; do \
-	  rm -f $(DESTDIR)$(includedir)/$$p; \
+	list='$(pkginclude_HEADERS)'; for p in $$list; do \
+	  rm -f $(DESTDIR)$(pkgincludedir)/$$p; \
 	done
 
 tags: TAGS
@@ -353,20 +353,20 @@ installcheck: installcheck-am
 install-exec-am: install-libLIBRARIES
 install-exec: install-exec-am
 
-install-data-am: install-includeHEADERS
+install-data-am: install-pkgincludeHEADERS
 install-data: install-data-am
 
 install-am: all-am
 	@$(MAKE) $(AM_MAKEFLAGS) install-exec-am install-data-am
 install: install-am
-uninstall-am: uninstall-libLIBRARIES uninstall-includeHEADERS
+uninstall-am: uninstall-libLIBRARIES uninstall-pkgincludeHEADERS
 uninstall: uninstall-am
 all-am: Makefile $(LIBRARIES) $(HEADERS)
 all-redirect: all-am
 install-strip:
 	$(MAKE) $(AM_MAKEFLAGS) AM_INSTALL_PROGRAM_FLAGS=-s install
 installdirs:
-	$(mkinstalldirs)  $(DESTDIR)$(libdir) $(DESTDIR)$(includedir)
+	$(mkinstalldirs)  $(DESTDIR)$(libdir) $(DESTDIR)$(pkgincludedir)
 
 
 mostlyclean-generic:
@@ -404,10 +404,10 @@ maintainer-clean: maintainer-clean-am
 .PHONY: mostlyclean-libLIBRARIES distclean-libLIBRARIES \
 clean-libLIBRARIES maintainer-clean-libLIBRARIES uninstall-libLIBRARIES \
 install-libLIBRARIES mostlyclean-compile distclean-compile \
-clean-compile maintainer-clean-compile uninstall-includeHEADERS \
-install-includeHEADERS tags mostlyclean-tags distclean-tags clean-tags \
-maintainer-clean-tags distdir info-am info dvi-am dvi check check-am \
-installcheck-am installcheck install-exec-am install-exec \
+clean-compile maintainer-clean-compile uninstall-pkgincludeHEADERS \
+install-pkgincludeHEADERS tags mostlyclean-tags distclean-tags \
+clean-tags maintainer-clean-tags distdir info-am info dvi-am dvi check \
+check-am installcheck-am installcheck install-exec-am install-exec \
 install-data-am install-data install-am install uninstall-am uninstall \
 all-redirect all-am all installdirs mostlyclean-generic \
 distclean-generic clean-generic maintainer-clean-generic clean \

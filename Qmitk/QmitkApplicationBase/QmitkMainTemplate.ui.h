@@ -11,6 +11,7 @@
 #include "QmitkSelectableGLWidget.h"
 #include "QLevelWindowWidget.h"
 #include <vtkSTLReader.h>
+#include <vtkImageWriter.h>
 #include <mitkSurfaceData.h>
 #include <mitkColorProperty.h>
 #include <mitkLevelWindowProperty.h>
@@ -238,6 +239,31 @@ void QmitkMainTemplate::fileSave()
 
 void QmitkMainTemplate::fileSaveAs()
 {
+    mitk::DataTreeIterator* it=tree->inorderIterator()->clone();
+    while(it->hasNext()) 
+    {
+        it->next();
+		mitk::DataTreeNode::Pointer node=it->get();
+		if(node->GetData()!=NULL)
+		{
+			mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
+			if(image!=NULL)
+			{
+				QString fileName = QFileDialog::getSaveFileName(NULL,"vtk (*.vtk)");
+				if ( !fileName.isNull() )
+				{
+					if(fileName.endsWith(".vtk")==false) fileName+=".vtk";
+					vtkImageWriter *writer=vtkImageWriter::New();
+					writer->SetInput(image->GetVtkImageData());
+					writer->SetFileName(fileName.ascii());
+					writer->SetFileDimensionality(3);
+					writer->DebugOn();
+					writer->Write();
+					writer->Delete();
+				}
+			}
+		}
+    }
 
 }
 
@@ -431,9 +457,9 @@ void QmitkMainTemplate::parseCommandLine()
     //            number= atoi(qApp->argv()[++i]);
     //        }
     //    }
+//    if(qApp->argc()>1)
+        fileOpen(qApp->argv()[i]);
     }
-    if(qApp->argc()>1)
-        fileOpen(qApp->argv()[qApp->argc()-1]);
 }
 
 

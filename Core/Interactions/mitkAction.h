@@ -6,7 +6,10 @@
 
 
 namespace mitk {
-
+//##Documentation
+//## @brief represents an action, that is executed after a certain event (in statemachine-mechanism)
+//##
+//## @ingroup Interaction
 class Action 
 {
   int m_ActionId;

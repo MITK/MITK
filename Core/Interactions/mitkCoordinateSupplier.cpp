@@ -25,54 +25,64 @@ bool mitk::CoordinateSupplier::ExecuteSideEffect(int sideEffectId, mitk::StateEv
         return false;
 	
     const PositionEvent* posEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
-    if(posEvent==NULL) return false;
-
-    switch (sideEffectId)
+    if(posEvent!=NULL)
     {
-        case SeNEWPOINT:
+        switch (sideEffectId)
         {
-			mitk::Point3D newPoint = posEvent->GetWorldPosition();
-            vm2itk(newPoint, m_Point);
-
-			PointOperation* doOp = new mitk::PointOperation(OpADD, m_Point, 0);
-			//Undo
-            if (m_UndoEnabled)
+            case SeNEWPOINT:
             {
-				PointOperation* undoOp = new PointOperation(OpDELETE, m_Point, 0);
-                OperationEvent *operationEvent = new OperationEvent(m_Destination, doOp, undoOp,
-																	objectEventId, groupEventId);
-                m_UndoController->SetOperationEvent(operationEvent);
+			    mitk::Point3D newPoint = posEvent->GetWorldPosition();
+                vm2itk(newPoint, m_Point);
+
+			    PointOperation* doOp = new mitk::PointOperation(OpADD, m_Point, 0);
+			    //Undo
+                if (m_UndoEnabled)
+                {
+				    PointOperation* undoOp = new PointOperation(OpDELETE, m_Point, 0);
+                    OperationEvent *operationEvent = new OperationEvent(m_Destination, doOp, undoOp,
+																	    objectEventId, groupEventId);
+                    m_UndoController->SetOperationEvent(operationEvent);
+                }
+                //execute the Operation
+			    m_Destination->ExecuteOperation(doOp);
+                ok = true;
+                break;
             }
-            //execute the Operation
-			m_Destination->ExecuteOperation(doOp);
-            ok = true;
+            case SeMOVEPOINT:
+            {
+                mitk::ITKPoint3D movePoint;
+                vm2itk(posEvent->GetWorldPosition(), movePoint);
+
+                PointOperation* doOp = new mitk::PointOperation(OpMOVE, movePoint, 0);
+			    //Undo
+                if (m_UndoEnabled)
+                {
+				    PointOperation* undoOp = new PointOperation(OpMOVE, m_Point, 0);
+                    OperationEvent *operationEvent = new OperationEvent(m_Destination, doOp, undoOp,
+																	    objectEventId, groupEventId);
+                    m_UndoController->SetOperationEvent(operationEvent);
+                }
+                m_Point = movePoint;//set the new point for storage
+                //execute the Operation
+			    m_Destination->ExecuteOperation(doOp);
+                ok = true;
+                break;
+            }
+     
+            default:
+                ok = false;
             break;
         }
-        case SeMOVEPOINT:
-        {
-            mitk::ITKPoint3D movePoint;
-            vm2itk(posEvent->GetWorldPosition(), movePoint);
 
-            PointOperation* doOp = new mitk::PointOperation(OpMOVE, movePoint, 0);
-			//Undo
-            if (m_UndoEnabled)
-            {
-				PointOperation* undoOp = new PointOperation(OpMOVE, m_Point, 0);
-                OperationEvent *operationEvent = new OperationEvent(m_Destination, doOp, undoOp,
-																	objectEventId, groupEventId);
-                m_UndoController->SetOperationEvent(operationEvent);
-            }
-            m_Point = movePoint;//set the new point for storage
-            //execute the Operation
-			m_Destination->ExecuteOperation(doOp);
-            ok = true;
-            break;
-        }
- 
-        default:
-            ok = false;
-           break;
+       return ok;
+    }
+    
+    const mitk::DisplayPositionEvent* displPosEvent = dynamic_cast<const mitk::DisplayPositionEvent *>(stateEvent->GetEvent());
+    if(displPosEvent!=NULL)
+    {
+        std::cout<<"DisplayPositionEvent"<<std::endl;
+        return true;
     }
 
-    return ok;
+	return false;
 }

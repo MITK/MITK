@@ -3,7 +3,7 @@
 #include "PlaneGeometry.h"
 
 #include "DataTree.h"
-#include "ImageMapper2D.h"
+#include "mitkImageMapper2D.h"
 
 #include "vtkActor.h"
 #include "vtkProperty.h"

@@ -1,6 +1,6 @@
 #include "mitkOpenGLRenderer.h"
 #include "Mapper.h"
-#include "ImageMapper2D.h"
+#include "mitkImageMapper2D.h"
 #include "BaseVtkMapper2D.h"
 #include "BaseVtkMapper3D.h"
 #include "LevelWindow.h"

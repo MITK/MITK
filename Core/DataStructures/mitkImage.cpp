@@ -660,19 +660,28 @@ void mitk::Image::Initialize(ipPicDescriptor* pic, int channels, int tDim, int s
 //##ModelId=3E155CF000F6
 bool mitk::Image::IsValidSlice(int s, int t, int n) const
 {
-  return ((s>=0) && (s<(int)m_Dimensions[2]) && (t>=0) && (t< (int) m_Dimensions[3]) && (n>=0) && (n< (int)GetNumberOfChannels()));
+  if(m_Initialized)
+    return ((s>=0) && (s<(int)m_Dimensions[2]) && (t>=0) && (t< (int) m_Dimensions[3]) && (n>=0) && (n< (int)GetNumberOfChannels()));
+  else
+    return false;
 }
 
 //##ModelId=3E155D2501A7
 bool mitk::Image::IsValidVolume(int t, int n) const
 {
-  return IsValidSlice(0, t, n);
+  if(m_Initialized)
+    return IsValidSlice(0, t, n);
+  else
+    return false;
 }
 
 //##ModelId=3E157C53030B
 bool mitk::Image::IsValidChannel(int n) const
 {
-  return IsValidSlice(0, 0, n);
+  if(m_Initialized)
+    return IsValidSlice(0, 0, n);
+  else
+    return false;
 }
 
 //##ModelId=3E19EA110396

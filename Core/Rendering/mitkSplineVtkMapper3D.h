@@ -20,10 +20,17 @@ public:
     virtual vtkProp* GetProp();
 
     virtual void Update( mitk::BaseRenderer* renderer );
-
+    
     bool SplinesAreAvailable();
     
     vtkPolyData* GetSplinesPolyData();
+    
+    vtkPolyData* GetPointsPolyData();
+    
+    vtkActor* GetSplinesActor();
+    
+    vtkActor* GetPointsActor();
+    
     
 protected:
 

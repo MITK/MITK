@@ -18,7 +18,7 @@ mitk::SplineVtkMapper3D::SplineVtkMapper3D()
     m_Assembly = vtkAssembly::New();
     m_SplinesAddedToAssembly = false;
     m_SplinesAvailable = false;
-    
+
     m_Assembly->AddPart( m_Prop3D );
 }
 
@@ -108,7 +108,7 @@ mitk::SplineVtkMapper3D::GenerateData()
 
         m_SplinesActor->SetMapper( profileMapper );
         float rgba[ 4 ] = {1.0f, 0.0f, 0.0f, 1.0f};
-        this->GetDataTreeNode()->GetColor(rgba, NULL);
+        this->GetDataTreeNode()->GetColor( rgba, NULL );
         m_SplinesActor->GetProperty()->SetColor( rgba );
     }
     else
@@ -116,7 +116,7 @@ mitk::SplineVtkMapper3D::GenerateData()
         m_SplinesAvailable = false;
     }
 
-        
+
     if ( m_SplinesAvailable )
     {
         if ( ! m_SplinesAddedToAssembly )
@@ -154,11 +154,11 @@ mitk::SplineVtkMapper3D::GenerateOutputInformation()
 void mitk::SplineVtkMapper3D::Update( mitk::BaseRenderer* renderer )
 {
     Superclass::Update( renderer );
-    
+
     if ( IsVisible( renderer ) == false )
     {
         if ( m_SplinesActor != NULL )
-            m_SplinesActor->VisibilityOff(); 
+            m_SplinesActor->VisibilityOff();
 
         if ( m_Assembly != NULL )
             m_Assembly->VisibilityOff();
@@ -179,14 +179,42 @@ bool mitk::SplineVtkMapper3D::SplinesAreAvailable()
     return m_SplinesAvailable;
 }
 
-    
+
 vtkPolyData* mitk::SplineVtkMapper3D::GetSplinesPolyData()
 {
     itk::ProcessObject::Update();
-    if (m_SplinesAvailable)
-        return (dynamic_cast<vtkPolyDataMapper*>(m_SplinesActor->GetMapper()))->GetInput();
+    if ( m_SplinesAvailable )
+        return ( dynamic_cast<vtkPolyDataMapper*>( m_SplinesActor->GetMapper() ) )->GetInput();
     else
         return vtkPolyData::New();
+}
+
+vtkActor* mitk::SplineVtkMapper3D::GetSplinesActor()
+{
+    itk::ProcessObject::Update();
+    if ( m_SplinesAvailable )
+        return m_SplinesActor;
+    else
+        return vtkActor::New();
+}
+
+
+vtkPolyData* mitk::SplineVtkMapper3D::GetPointsPolyData()
+{
+    itk::ProcessObject::Update();
+    if (m_vtkPointList->GetOutput())
+        return m_vtkPointList->GetOutput();
+    else
+        return vtkPolyData::New();
+}
+
+vtkActor* mitk::SplineVtkMapper3D::GetPointsActor()
+{
+    itk::ProcessObject::Update();
+    if (m_Actor)
+        return m_Actor;
+    else
+        return vtkActor::New();
 }
 
 

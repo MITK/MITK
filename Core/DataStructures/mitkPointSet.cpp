@@ -1,10 +1,7 @@
 #include "mitkPointSet.h"
-
 #include <mitkOperation.h>
 #include <mitkOperationActor.h>
-
 #include <mitkPointOperation.h>
-#include "mitkStatusBar.h"
 #include "mitkInteractionConst.h"
 #include "mitkRenderWindow.h"
 
@@ -28,7 +25,7 @@ int mitk::PointSet::GetSize()
 }
 
 //##ModelId=3F0177E901CC
-mitk::PointSet::DataType* mitk::PointSet::GetPointSet() const
+mitk::PointSet::DataType::Pointer mitk::PointSet::GetPointSet() const
 {
   return m_ItkData;
 }
@@ -115,9 +112,9 @@ bool mitk::PointSet::GetSelectInfo(int position)
 {
   if (m_ItkData->GetPoints()->IndexExists(position))
 	{
-    bool selected = false;
-    m_ItkData->GetPointData(position, &selected);
-    return selected;
+    PointDataType pointData = {0, false, PTUNDEFINED};
+    m_ItkData->GetPointData(position, &pointData);
+    return pointData.selected;
 	}
 	else
 		return false;
@@ -126,13 +123,23 @@ bool mitk::PointSet::GetSelectInfo(int position)
 //##ModelId=3F05B07B0147
 const int mitk::PointSet::GetNumberOfSelected()
 {
-    int numberOfSelected = 0;
-    for (PointDataIterator it = m_ItkData->GetPointData()->Begin(); it != m_ItkData->GetPointData()->End(); it++)
-    {
-        if (it->Value() == true)
-            numberOfSelected++;
-    }
-    return numberOfSelected;
+  int numberOfSelected = 0;
+  for (PointDataIterator it = m_ItkData->GetPointData()->Begin(); it != m_ItkData->GetPointData()->End(); it++)
+  {
+    if (it->Value().selected == true)
+      numberOfSelected++;
+  }
+  return numberOfSelected;
+}
+
+int mitk::PointSet::SearchSelectedPoint()
+{
+  for (PointDataIterator it = m_ItkData->GetPointData()->Begin(); it != m_ItkData->GetPointData()->End(); it++)
+  {
+    if (it->Value().selected == true)
+      return it->Index();
+  }
+  return -1;
 }
 
 //##ModelId=3F0177E901BF
@@ -140,30 +147,30 @@ const int mitk::PointSet::GetNumberOfSelected()
 //## @brief executes the given Operation
 void mitk::PointSet::ExecuteOperation(Operation* operation)
 {
-	mitk::PointOperation *pointOp = dynamic_cast<mitk::PointOperation *>(operation);
-	if (pointOp == NULL)
-	{
-		mitk::StatusBar::DisplayText("Recieved wrong type of operation!See mitkPointSetInteractor.cpp", 10000);
-		return;
-	}
 
 	switch (operation->GetOperationType())
 	{
 	case OpNOTHING:
 		break;
-	case OpINSERT://inserts the point at the given position and select it. In the most cases the point is wanted to be selected.
+	case OpINSERT://inserts the point at the given position and selects it. 
 		{
+      mitkCheckOperationTypeMacro(PointOperation, operation, pointOp);
+      
       int position = pointOp->GetIndex();
 
       PointType pt;
       pt.CastFrom(pointOp->GetPoint());
 
       m_ItkData->GetPoints()->InsertElement(position, pt);
-      m_ItkData->GetPointData()->InsertElement(position, pointOp->GetSelected());
+
+      PointDataType pointData = {pointOp->GetIndex(), pointOp->GetSelected(), pointOp->GetPointType()};
+      m_ItkData->GetPointData()->InsertElement(position, pointData);
 		}
 		break;
 	case OpMOVE://moves the point given by index
 		{
+      mitkCheckOperationTypeMacro(PointOperation, operation, pointOp);
+
 			PointType pt;
       pt.CastFrom(pointOp->GetPoint());
       m_ItkData->SetPoint(pointOp->GetIndex(), pt);
@@ -171,20 +178,41 @@ void mitk::PointSet::ExecuteOperation(Operation* operation)
 		break;
 	case OpREMOVE://removes the point at given by position 
 		{
+      mitkCheckOperationTypeMacro(PointOperation, operation, pointOp);
+
       m_ItkData->GetPoints()->DeleteIndex((unsigned)pointOp->GetIndex());
       m_ItkData->GetPointData()->DeleteIndex((unsigned)pointOp->GetIndex());
 		}
 		break;
-	case OpSELECTPOINT://select the given point
+  case OpSELECTPOINT://select the given point
 		{
-      m_ItkData->SetPointData(pointOp->GetIndex(), true);
+      mitkCheckOperationTypeMacro(PointOperation, operation, pointOp);
+
+      PointDataType pointData = {0, false, PTUNDEFINED};
+      m_ItkData->GetPointData(pointOp->GetIndex(), &pointData);
+      pointData.selected = true;
+      m_ItkData->SetPointData(pointOp->GetIndex(), pointData);
 		}
 		break;
 	case OpDESELECTPOINT://unselect the given point
 		{
-		  m_ItkData->SetPointData(pointOp->GetIndex(), false);
+      mitkCheckOperationTypeMacro(PointOperation, operation, pointOp);
+
+      PointDataType pointData = {0, false, PTUNDEFINED};
+      m_ItkData->GetPointData(pointOp->GetIndex(), &pointData);
+      pointData.selected = false;
+      m_ItkData->SetPointData(pointOp->GetIndex(), pointData);
 		}
 		break;
+  case OpSETPOINTTYPE:
+    {
+      mitkCheckOperationTypeMacro(PointOperation, operation, pointOp);
+      PointDataType pointData = {0, false, PTUNDEFINED};
+      m_ItkData->GetPointData(pointOp->GetIndex(), &pointData);
+      pointData.pointSpec = pointOp->GetPointType();
+      m_ItkData->SetPointData(pointOp->GetIndex(), pointData);
+    }
+    break;
 	default:
 		NULL;
 	}
@@ -214,7 +242,6 @@ void mitk::PointSet::UpdateOutputInformation()
   mitkBounds[3] = itkBounds[3];
   mitkBounds[4] = itkBounds[4];
   mitkBounds[5] = itkBounds[5];
-//@TODO check if order is correct 012345 or 024135; Bounds/BoundingBox and so on.
 
   m_Geometry3D->SetBounds(mitkBounds);
 }

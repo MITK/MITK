@@ -1,25 +1,33 @@
 #ifndef MITKPointSet_H_HEADER_INCLUDED
 #define MITKPointSet_H_HEADER_INCLUDED
 
-#include "mitkCommon.h"
+#include <mitkCommon.h>
+#include <mitkVector.h>
 #include <mitkBaseData.h>
 #include <itkPoint.h>
 #include <itkPointSet.h>
 #include <itkCovariantVector.h>
 #include <itkMesh.h>
 #include <itkDefaultDynamicMeshTraits.h>
+#include <itkPolygonCell.h>
   
-const unsigned int Dimension = 3;
+const unsigned int PointDimension = 3;
+const unsigned int MaxTopologicalDimension = 3;
+
 
 namespace mitk {
 
 //##ModelId=3F0177E803A1
 //##Documentation
-//##@brief DataStructure which stores a list of Points 
+//##@brief DataStructure which stores a set/list of Points 
 //## @ingroup Data
 //##
 //## Each Entry (Point) in the the PointSet has a additional value (bool) to store
-//## the selected/unselected state of the Entry(Point).
+//## the selected/unselected state of the entry(Point).
+//## Then each point has a type, like Startpoint or edge...
+//## The class uses an itkMesh internaly. It can behave like a PointSet or due to the itkMesh like a PointList.
+//## Inserting a point is accompanied by an event, containing an index. The new point is set into ths list 
+//## at the indexed position. At the same time an internal ID is set in data of the point.
 class PointSet : public BaseData
 {
 public:
@@ -27,17 +35,41 @@ public:
 
   itkNewMacro(Self);
 
-  typedef mitk::ScalarType PixelType;
-  typedef itk::DefaultDynamicMeshTraits<bool, 3, 3, mitk::ScalarType> MeshTraits;
-  typedef itk::Mesh<PixelType, Dimension, MeshTraits> MeshType;  
-  typedef MeshType DataType;
+  
+  typedef mitk::ScalarType CoordinateType;
+  typedef mitk::ScalarType InterpolationWeightType;
+	//##Documentation
+	//##@brief struct for data of a point
+  typedef struct PointDataType 
+  {
+		unsigned int id;  //to give the point a special ID
+    bool selected;  //information about if the point is selected
+		mitk::PointSpecificationType pointSpec;  //specifies the type of the point
+  };
+  //##Documentation
+	//##@brief cellDataType, that stores all indexes of the lines, that are selected
+	//## e.g.: points A,B and C.Between A and B there is a line with index 0.
+	//## if vector of cellData contains 1 and 2, then the lines between B and C and C and A is selected.
+  typedef std::vector<int> SelectedLinesType;
+  typedef std::vector<int>::iterator SelectedLinesIter;
+  typedef struct CellDataType 
+  {
+    bool selected; //used to set the whole cell on selected
+    SelectedLinesType selectedLines;//indexes of selected lines. 0 is between pointId 0 and 1
+    bool closed; //is the polygon already finished and closed
+  };
 
+  typedef itk::DefaultDynamicMeshTraits<
+    PointDataType, PointDimension, MaxTopologicalDimension, 
+    CoordinateType, InterpolationWeightType, CellDataType > MeshTraits;
+  typedef itk::Mesh<PointDataType, PointDimension, MeshTraits> MeshType;  
+
+  typedef MeshType DataType;
   typedef DataType::PointType PointType;
   typedef DataType::PointsContainer PointsContainer;
   typedef DataType::PointsContainerIterator PointsIterator;
   typedef DataType::PointDataContainer PointDataContainer;
   typedef DataType::PointDataContainerIterator PointDataIterator;
-  
 
   //##ModelId=3F0177E901BF
   //##Documentation
@@ -51,8 +83,8 @@ public:
 
   //##ModelId=3F0177E901CC
   //##Documentation
-	//## @brief returns the point-list with points and selected Information
-  DataType* GetPointSet() const;
+	//## @brief returns the pointset
+  virtual DataType::Pointer GetPointSet() const;
 
   //##ModelId=3F0177E901CE
   //##Documentation
@@ -60,6 +92,10 @@ public:
   //##
   //## check if index exists. If it doesn't exist, then return 0,0,0
 	const PointType GetPoint(int position);
+
+  //##Documentation
+  //## @brief searches a selected point and returns the id of that point. if no point is found, then -1 is returned
+  virtual int SearchSelectedPoint();
 
   //##Documentation
 	//## @brief Get the point on the given position in itkPoint3D

@@ -2,19 +2,17 @@
 #define MITKMESH_H_HEADER_INCLUDED
 
 #include "mitkPointSet.h"
-#include <mitkCommon.h>
-#include <itkDefaultDynamicMeshTraits.h>
-#include "itkMesh.h"
-#include "itkVertexCell.h"
-#include "itkLineCell.h"
-#include "itkTriangleCell.h"
-#include "itkTetrahedronCell.h"
-#include "itkPolygonCell.h"
-  
-//const unsigned int Dimension = 3;
+
+
+#include <vtkCellArray.h>
+#include <vtkFloatArray.h>
+#include <vtkPointData.h>
+#include <vtkPolyData.h>
+#include <vtkIdType.h>
+#include <vtkPoints.h>
 
 namespace mitk {
-
+  
 //##Documentation
 //##@brief DataStructure which stores a list of Points with data and cells
 //## @ingroup Data
@@ -35,31 +33,53 @@ public:
 
   itkNewMacro(Self);
 
-  typedef mitk::ScalarType PixelType;
-  typedef itk::DefaultDynamicMeshTraits<bool, 3, 3, mitk::ScalarType> MeshTraits;
-  typedef itk::Mesh<PixelType, Dimension, MeshTraits> MeshType;  
-  typedef MeshType DataType;
-
-  typedef MeshType::CellType CellType;
+  typedef Superclass::DataType::CellType CellType;
   typedef CellType::CellAutoPointer CellAutoPointer;
-  typedef MeshType::CellsContainer::Pointer CellContainerPointer;
-  typedef MeshType::CellDataContainer::Iterator CellDataContainerIterator;
-  typedef MeshType::CellsContainer::Iterator CellIterator;
-  typedef MeshTraits::CellTraits CellTraits;
+  typedef Superclass::MeshTraits::CellTraits CellTraits;
+  typedef CellTraits::PointIdConstIterator PointIdConstIterator;
   typedef CellTraits::PointIdIterator PointIdIterator;
+  typedef DataType::CellDataContainer CellDataContainer;
+  typedef DataType::CellDataContainerIterator CellDataIterator;
+  typedef Superclass::DataType::CellsContainer::Iterator CellIterator;
+  typedef Superclass::DataType::CellsContainer::ConstIterator ConstCellIterator;
+  typedef itk::PolygonCell< CellType > PolygonType;
+  typedef MeshType::CellType::MultiVisitor MeshMultiVisitor;    
 
-  typedef itk::VertexCell<CellType> VertexType;
-  typedef itk::LineCell<CellType> LineType;
-  typedef itk::TriangleCell<CellType> TriangleType;
-    typedef itk::PolygonCell<CellType> PolygonType;
-  
   //##Documentation
 	//## @brief returns the current number of cells in the mesh
 	virtual unsigned long GetNumberOfCells();
 
   //##Documentation
 	//## @brief returns the mesh 
-  const DataType::Pointer GetMesh() const;
+  virtual DataType::Pointer GetMesh() const;
+
+  //##Documentation
+	//## @brief checks if the given point is in a cell and returns that cellId.
+  //## Basicaly it searches lines and points that are hit.
+  virtual bool EvaluatePosition(Point3D point, unsigned long &cellId);
+
+  //##Documentation
+	//## @brief searches for the next new cellId and returns that id
+  unsigned long GetNewCellId();
+
+  //##Documentation
+	//## @brief returns the first cell that includes the given pointId
+  virtual int SearchFirstCell(unsigned long pointId);
+
+  //##Documentation
+	//## @brief searches for a line, that is hit by the given point.
+  //## Then returns the lineId and the cellId
+  virtual bool SearchLine(Point3D point, float distance , unsigned long &lineId, unsigned long &cellId);
+
+  //##Documentation
+	//## @brief searches a line according to the cellId and lineId and 
+  //## returns the PointIds, that assign the line; if successful, then return param = true;
+  virtual bool GetPointIds(unsigned long cellId, unsigned long lineId, int &idA, int &idB);
+
+  //##Documentation
+	//## @brief creates a BoundingBox and computes it with the given points of the cell
+  //## Returns the BoundingBox != IsNull() if successful.
+  virtual DataType::BoundingBoxPointer GetBoundingBoxFromCell(unsigned long cellId);
 
   //##Documentation
   //## @brief executes the given Operation
@@ -68,6 +88,11 @@ public:
 protected:
 	Mesh();
 	virtual ~Mesh();
+  
+  //##Documentation
+  //## @brief searches a selected cell and returns the id of that cell. if no cell is found, then -1 is returned
+  virtual int SearchSelectedCell();
+
 };
 
 } // namespace mitk

@@ -6,6 +6,7 @@
 #include "mitkImageToImageFilter.h"
 #include "mitkTimeSlicedGeometry.h"
 #include <itkEventObject.h>
+#include <itkCommand.h>
 
 namespace mitk {
 

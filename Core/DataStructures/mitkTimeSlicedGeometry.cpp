@@ -38,6 +38,7 @@ mitk::Geometry3D* mitk::TimeSlicedGeometry::GetGeometry3D(int t) const
 
 const mitk::TimeBounds& mitk::TimeSlicedGeometry::GetTimeBoundsInMS() const
 {
+  //@todo calculation should be moved into a method and called when first or last time-slice is changed.
   TimeBounds timebounds;
 
   mitk::Geometry3D::Pointer geometry3d;
@@ -120,6 +121,7 @@ void mitk::TimeSlicedGeometry::InitializeEvenlyTimed(mitk::Geometry3D* geometry3
   SetBounds(geometry3D->GetBounds());
   SetGeometry3D(geometry3D, 0);
   SetEvenlyTimed();
+  GetTimeBoundsInMS(); //@todo see GetTimeBoundsInMS
 
   geometry3D->UnRegister();
 }

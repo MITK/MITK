@@ -470,6 +470,7 @@
     <forward>class QmitkSelectableGLWidget</forward>
 </forwards>
 <variables>
+    <variable>mitk::DataTreeBase* planesSubTree;</variable>
     <variable>QmitkFctMediator* qfm;</variable>
     <variable>QmitkStdMultiWidget* mitkMultiWidget;</variable>
     <variable>mitk::DataTree::Pointer tree;</variable>

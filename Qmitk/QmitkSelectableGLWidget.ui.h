@@ -25,7 +25,6 @@ PURPOSE.  See the above copyright notices for more information.
 ** init() function in place of a constructor, and a destroy() function in
 ** place of a destructor.
 *****************************************************************************/
-
 void QmitkSelectableGLWidget::init()
 {
     QLayout *hlayout;
@@ -42,7 +41,7 @@ void QmitkSelectableGLWidget::init()
         composedName+=name();
     else
         composedName+="QmitkGLWidget";
-    mitkWidget = new mitk::QmitkRenderWindow(renderer, this, composedName);
+    mitkWidget = new mitk::QmitkRenderWindow(renderer,QGLFormat( QGL::StencilBuffer ), this, composedName);
     
     //initialize SliceNavigationController
     sliceNavigationController = new mitk::SliceNavigationController("navigation");

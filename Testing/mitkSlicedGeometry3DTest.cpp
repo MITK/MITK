@@ -58,7 +58,8 @@ int mitkSlicedGeometry3DTest(int argc, char* argv[])
 
   std::cout << "Testing SlicedGeometry3D::InitializeEvenlySpaced(planegeometry3, zSpacing = 1, slices = 5, flipped = false): " <<std::endl;
   mitk::SlicedGeometry3D::Pointer slicedWorldGeometry=mitk::SlicedGeometry3D::New();
-  slicedWorldGeometry->InitializeEvenlySpaced(planegeometry3, 1, 5, false);
+  unsigned int numSlices = 5;
+  slicedWorldGeometry->InitializeEvenlySpaced(planegeometry3, 1, numSlices, false);
 
   std::cout << "Testing availability and type (PlaneGeometry) of first geometry in the SlicedGeometry3D: ";
   mitk::PlaneGeometry* accessedplanegeometry3 = dynamic_cast<mitk::PlaneGeometry*>(slicedWorldGeometry->GetGeometry2D(0));
@@ -69,10 +70,54 @@ int mitkSlicedGeometry3DTest(int argc, char* argv[])
   }
   std::cout<<"[PASSED]"<<std::endl;
 
-  std::cout << "Testing whether the first geometry in the SlicedGeometry3D is identical to planegeometry3 by axis comparison: "<<std::endl;
+  std::cout << "Testing whether the first geometry in the SlicedGeometry3D is identical to planegeometry3 by axis comparison and origin: "<<std::endl;
   if((mitk::Equal(accessedplanegeometry3->GetAxisVector(0), planegeometry3->GetAxisVector(0))==false) || 
      (mitk::Equal(accessedplanegeometry3->GetAxisVector(1), planegeometry3->GetAxisVector(1))==false) || 
-     (mitk::Equal(accessedplanegeometry3->GetAxisVector(2), planegeometry3->GetAxisVector(2))==false))
+     (mitk::Equal(accessedplanegeometry3->GetAxisVector(2), planegeometry3->GetAxisVector(2))==false) ||
+     (mitk::Equal(accessedplanegeometry3->GetOrigin(), planegeometry3->GetOrigin())==false))
+  {
+    std::cout<<"[FAILED]"<<std::endl;
+    return EXIT_FAILURE;
+  }
+  std::cout<<"[PASSED]"<<std::endl;
+
+  std::cout << "Testing availability and type (PlaneGeometry) of the last geometry in the SlicedGeometry3D: ";
+  mitk::PlaneGeometry* accessedplanegeometry3last = dynamic_cast<mitk::PlaneGeometry*>(slicedWorldGeometry->GetGeometry2D(numSlices-1));
+  mitk::Point3D origin3last; origin3last = planegeometry3->GetOrigin()+slicedWorldGeometry->GetDirectionVector()*(numSlices-1);
+  if(accessedplanegeometry3last==NULL)
+  {
+    std::cout<<"[FAILED]"<<std::endl;
+    return EXIT_FAILURE;
+  }
+  std::cout<<"[PASSED]"<<std::endl;
+
+  std::cout << "Testing whether the last geometry in the SlicedGeometry3D is identical to planegeometry3 by axis comparison: "<<std::endl;
+  if((mitk::Equal(accessedplanegeometry3last->GetAxisVector(0), planegeometry3->GetAxisVector(0))==false) || 
+     (mitk::Equal(accessedplanegeometry3last->GetAxisVector(1), planegeometry3->GetAxisVector(1))==false) || 
+     (mitk::Equal(accessedplanegeometry3last->GetAxisVector(2), planegeometry3->GetAxisVector(2))==false) ||
+     (mitk::Equal(accessedplanegeometry3last->GetOrigin(), origin3last)==false) ||
+     (mitk::Equal(accessedplanegeometry3last->GetUnitsToMMAffineTransform()->GetOffset(), origin3last.GetVectorFromOrigin())==false))
+  {
+    std::cout<<"[FAILED]"<<std::endl;
+    return EXIT_FAILURE;
+  }
+  std::cout<<"[PASSED]"<<std::endl;
+
+  std::cout << "Again for first slice - Testing availability and type (PlaneGeometry) of first geometry in the SlicedGeometry3D: ";
+  accessedplanegeometry3 = dynamic_cast<mitk::PlaneGeometry*>(slicedWorldGeometry->GetGeometry2D(0));
+  if(accessedplanegeometry3==NULL)
+  {
+    std::cout<<"[FAILED]"<<std::endl;
+    return EXIT_FAILURE;
+  }
+  std::cout<<"[PASSED]"<<std::endl;
+
+  std::cout << "Again for first slice - Testing whether the first geometry in the SlicedGeometry3D is identical to planegeometry3 by axis comparison and origin: "<<std::endl;
+  if((mitk::Equal(accessedplanegeometry3->GetAxisVector(0), planegeometry3->GetAxisVector(0))==false) || 
+     (mitk::Equal(accessedplanegeometry3->GetAxisVector(1), planegeometry3->GetAxisVector(1))==false) || 
+     (mitk::Equal(accessedplanegeometry3->GetAxisVector(2), planegeometry3->GetAxisVector(2))==false) ||
+     (mitk::Equal(accessedplanegeometry3->GetOrigin(), planegeometry3->GetOrigin())==false) ||
+     (mitk::Equal(accessedplanegeometry3->GetUnitsToMMAffineTransform()->GetOffset(), planegeometry3->GetOrigin().GetVectorFromOrigin())==false))
   {
     std::cout<<"[FAILED]"<<std::endl;
     return EXIT_FAILURE;

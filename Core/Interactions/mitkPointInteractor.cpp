@@ -281,7 +281,7 @@ bool mitk::PointInteractor::ExecuteAction( Action* action, mitk::StateEvent cons
 	unsigned int upos = (unsigned int) position;//comparison signed unsigned int
 	if (upos == m_LastPosition)//found the same point again
 	{
-          mitk::StateEvent* newStateEvent = new mitk::StateEvent(EIDYES, posEvent);
+         mitk::StateEvent* newStateEvent = new mitk::StateEvent(EIDYES, posEvent);
           //call HandleEvent to leave the guard-state
           this->HandleEvent( newStateEvent );
 	  ok = true;

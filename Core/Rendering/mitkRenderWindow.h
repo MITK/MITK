@@ -23,6 +23,14 @@ public:
     RenderWindow(QWidget *parent = 0, const char *name = 0) : RenderWindowBase(parent, name)
     {
     };
+
+    //##Documentation
+    //## @brief Makes the renderwindow the current widget for 
+    //## (e.g., if the renderwindow is an OpenGL-widget) 
+    //## OpenGL operations, i.e. makes the widget's rendering context the current 
+    //## OpenGL rendering context.
+    virtual void MakeCurrent() {};
+
     //iil compatibility
     //##ModelId=3E3ECC130380
     //##Documentation

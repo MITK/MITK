@@ -19,12 +19,12 @@ void mitk::ImageChannelSelector::GenerateOutputInformation()
 
 	itkDebugMacro(<<"GenerateOutputInformation()");
 
-    output->Initialize(input->GetType(), input->GetDimension(), input->GetDimensions(), 1);
+    output->Initialize(input->GetPixelType(), input->GetDimension(), input->GetDimensions());
 }
 
 //##ModelId=3E3BD0C903DC
 void mitk::ImageChannelSelector::GenerateData()
 {
-	itkExceptionMacro("not yet implemented.");
+	SetDataItem(GetChannelData(m_ChannelNr), 0);
 }
 

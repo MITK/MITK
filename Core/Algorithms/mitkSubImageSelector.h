@@ -36,6 +36,8 @@ public:
 protected:
 	//##ModelId=3E1A0FC903A5
 	mitk::ImageDataItem::Pointer GetSliceData(int s = 0, int t = 0, int n = 0);
+	mitk::ImageDataItem::Pointer GetVolumeData(int t = 0, int n = 0);
+	mitk::ImageDataItem::Pointer GetChannelData(int n = 0);
 
 	//##ModelId=3E1A123E0396
 	void SetDataItem(mitk::ImageDataItem::Pointer dataItem, int n = 0);

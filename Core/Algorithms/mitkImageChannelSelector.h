@@ -26,13 +26,14 @@ public:
 protected:
 	//##ModelId=3E1B1980039C
 	ImageChannelSelector();
+
 	//##ModelId=3E1B198003B0
 	virtual ~ImageChannelSelector();
-    //##ModelId=3E3BD0C70343
+
+	//##ModelId=3E3BD0C70343
     virtual void GenerateOutputInformation();
 
 	//##ModelId=3E3BD0C903DC
-    //##ModelId=3E3BD0C903DC
     virtual void GenerateData();
 
     //##ModelId=3E1B1A0C005E

@@ -8,7 +8,7 @@ void mitk::ImageSliceSelector::GenerateOutputInformation()
 
 	itkDebugMacro(<<"GenerateOutputInformation()");
 
-	output->Initialize(input->GetType(), 2, input->GetDimensions());
+	output->Initialize(input->GetPixelType(), 2, input->GetDimensions());
 }
 
 //##ModelId=3E1A0A320090

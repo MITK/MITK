@@ -12,6 +12,18 @@ mitk::ImageDataItem::Pointer mitk::SubImageSelector::GetSliceData(int s, int t, 
 	return input->GetSliceData(s,t,n);
 }
 
+mitk::ImageDataItem::Pointer mitk::SubImageSelector::GetVolumeData(int t, int n)
+{
+	mitk::Image::Pointer input  = const_cast<mitk::Image*>(this->GetInput());
+	return input->GetVolumeData(t,n);
+}
+
+mitk::ImageDataItem::Pointer mitk::SubImageSelector::GetChannelData(int n)
+{
+	mitk::Image::Pointer input  = const_cast<mitk::Image*>(this->GetInput());
+	return input->GetChannelData(n);
+}
+
 //##ModelId=3E1A123E0396
 void mitk::SubImageSelector::SetDataItem(mitk::ImageDataItem::Pointer dataItem, int n)
 {

@@ -36,9 +36,11 @@ protected:
 
     //##ModelId=3E1A0A320090
     virtual void GenerateData();
-    //##ModelId=3E1B196A0188
+
+	//##ModelId=3E1B196A0188
     ImageSliceSelector();
-    //##ModelId=3E1B196A01C4
+
+	//##ModelId=3E1B196A01C4
     virtual ~ImageSliceSelector();
 
     //##ModelId=3E1A0B390283

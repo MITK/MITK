@@ -46,14 +46,14 @@ bool mitk::PicHelper::GetSpacing(ipPicDescriptor* pic, Vector3D & spacing)
       if( dicomFindElement( (unsigned char *) tsv->value, 0x0018, 0x0088, &data, &len ) )
       {
         ok=true;
-        sscanf( (char *) data, "%lf", &spacing );
-        itkGenericOutputMacro( "spacing:   %5.2f mm\n" << spacing_z );
+        sscanf( (char *) data, "%lf", &spacing_z );
+//        itkGenericOutputMacro( "spacing:  " << spacing_z << " mm");
       }
       if( dicomFindElement( (unsigned char *) tsv->value, 0x0018, 0x0050, &data, &len ) )
       {
         ok=true;
         sscanf( (char *) data, "%lf", &thickness );
-        itkGenericOutputMacro( "thickness: %5.2f mm\n" << thickness );
+//        itkGenericOutputMacro( "thickness: " << thickness << " mm");
 
         if( thickness == 0 )
           thickness = 1;
@@ -62,7 +62,7 @@ bool mitk::PicHelper::GetSpacing(ipPicDescriptor* pic, Vector3D & spacing)
         && len>0 && ((char *)data)[0] )
       {
         sscanf( (char *) data, "%lf\\%lf", &fy, &fx );    // row / column value 
-        itkGenericOutputMacro( "fx, fy:    %5.2f/%5.2f mm\n" << fx << fy );
+//        itkGenericOutputMacro( "fx, fy: " << fx << "/" << fy  << " mm");
         return false;
       }
       if(ok)

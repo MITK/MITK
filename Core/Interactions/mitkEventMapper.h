@@ -39,89 +39,89 @@ struct ltstr
 class EventMapper : public QXmlDefaultHandler
 {
   public:
-    //##ModelId=3F02F896006D
-    EventMapper();
-    //##ModelId=3F02F896008C
-    ~EventMapper();
+  //##ModelId=3F02F896006D
+  EventMapper();
+  //##ModelId=3F02F896008C
+  ~EventMapper();
 
 	//##ModelId=3F0177080269
 	typedef std::vector<mitk::EventDescription> EventDescriptionVec;
 	//##ModelId=3F0177080288
 	typedef std::vector<mitk::EventDescription>::iterator EventDescriptionVecIter;
 
-    typedef std::map<const char*, int, ltstr> ConstMap;
-    typedef std::map<const char*, int, ltstr>::iterator ConstMapIter;
+  typedef std::map<const char*, int, ltstr> ConstMap;
+  typedef std::map<const char*, int, ltstr>::iterator ConstMapIter;
 
-    //##ModelId=3E5B349600CB
-    //##Documentation
+  //##ModelId=3E5B349600CB
+  //##Documentation
 	//## set the global StateMachine. If temporaryly changed,
 	//## then copy the old statemachine with GetStateMachine()
-    static void SetGlobalStateMachine(StateMachine* stateMachine);
+  static void SetGlobalStateMachine(StateMachine* stateMachine);
 
-    //##ModelId=3EDCA746026F
+  //##ModelId=3EDCA746026F
 	static StateMachine* GetGlobalStateMachine();
 
-    //##ModelId=3E5B34CF0041
+  //##ModelId=3E5B34CF0041
 	//##Documentation
 	//## searches the Event in m_EventDescription
 	//## and if included
-    static bool MapEvent(Event* event);
+  static bool MapEvent(Event* event);
 
-    //##ModelId=3E5B35140072
+  //##ModelId=3E5B35140072
 	//##Documentation
 	//## loads an XML-File containing Events into m_EventDescriptions
 	//## also involved: EventMapper::startEvent(...)
 	static bool LoadBehavior(std::string fileName);
 
-    //##ModelId=3E788FC00308
+  //##ModelId=3E788FC00308
 	//##Documentation
 	//## reads a Tag from an XML-file
 	//## adds Events to m_EventDescription
 	bool startElement( const QString&, const QString&, const QString& qName, const QXmlAttributes& atts );
 
 	//##ModelId=3E7B20EE01F5
-    std::string GetStyleName();
+  std::string GetStyleName();
 
 
   private:
-    //##Documentation
-    //## @brief converts the strings given by the XML-Behaviour-File to int
-    inline const int convertConstString2ConstInt(std::string input);
+  //##Documentation
+  //## @brief converts the strings given by the XML-Behaviour-File to int
+  inline const int convertConstString2ConstInt(std::string input);
 
-    //##Documentation
-    //## @brief maps the strings to int for convertion from XML-Behaviour-File
-    ConstMap m_EventConstMap;
+  //##Documentation
+  //## @brief maps the strings to int for convertion from XML-Behaviour-File
+  ConstMap m_EventConstMap;
 
-    //##ModelId=3E5B33F303CA
-    //##Documentation
-    //## @brief stores the information for the connection between QT-Events and the internal EventId.
-    //## gets this information from xml-File
+  //##ModelId=3E5B33F303CA
+  //##Documentation
+  //## @brief stores the information for the connection between QT-Events and the internal EventId.
+  //## gets this information from xml-File
 	static EventDescriptionVec m_EventDescriptions;
 
-    //##ModelId=3E5B343701F1
-    static StateMachine *m_GlobalStateMachine;
+  //##ModelId=3E5B343701F1
+  static StateMachine *m_GlobalStateMachine;
 
 	//##ModelId=3E956E3A036B
-    static StateEvent m_StateEvent;
+  static StateEvent m_StateEvent;
 
 	//##ModelId=3E7B1EB800CC
-    //##Documentation
-    //## @brief stores the name of the Event-Style loaded
-    static std::string m_StyleName;
+  //##Documentation
+  //## @brief stores the name of the Event-Style loaded
+  static std::string m_StyleName;
 
-    //##ModelId=3E788FC000E5
+  //##ModelId=3E788FC000E5
 	static const std::string STYLE;
-    //##ModelId=3E788FC0025C
+  //##ModelId=3E788FC0025C
 	static const std::string NAME;
-    //##ModelId=3E788FC002AA
+  //##ModelId=3E788FC002AA
 	static const std::string ID;
-    //##ModelId=3E785B1B00FD
+  //##ModelId=3E785B1B00FD
 	static const std::string TYPE;
-    //##ModelId=3E785B1B015B
+  //##ModelId=3E785B1B015B
 	static const std::string BUTTON;
-    //##ModelId=3E8B08FA01AA
-    static const std::string BUTTONSTATE;
-    //##ModelId=3E785B1B01A9
+  //##ModelId=3E8B08FA01AA
+  static const std::string BUTTONSTATE;
+  //##ModelId=3E785B1B01A9
 	static const std::string KEY;
 };
 } // namespace mitk

@@ -62,6 +62,7 @@ public:
      */
     itkGetStringMacro( FilePattern );
     
+    
 protected:
 
     /**
@@ -80,6 +81,14 @@ protected:
      * appropriate reader function.
      */
     virtual void GenerateData();
+  
+    
+    /**
+     * Resizes the number of outputs of the factory.
+     * The outputs are initialized by empty DataTreeNodes
+     * @param num the new number of outputs
+     */
+    virtual void ResizeOutputs( const unsigned int& num );
   
     /**
      * Checks if the file name m_FileName ends with the given name.

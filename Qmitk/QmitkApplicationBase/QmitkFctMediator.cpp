@@ -137,7 +137,7 @@ bool QmitkFctMediator::addFunctionality(QmitkFunctionality * functionality)
     if(m_MainStack!=NULL)
     {
         QWidget * mainWidget = functionality->createMainWidget(m_MainStack);
-        if(mainWidget!=NULL)
+        if((mainWidget!=NULL) && (mainWidget!=m_DefaultMain))
             m_MainStack->addWidget(mainWidget, m_NumOfFuncs+1);
         else
             m_MainStack->addWidget(new QWidget(m_MainStack, "QmitkFctMediator::dummyMain"), m_NumOfFuncs+1);

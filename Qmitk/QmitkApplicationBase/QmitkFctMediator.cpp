@@ -47,6 +47,9 @@ void QmitkFctMediator::initialize(QWidget *aLayoutTemplate)
     if(aLayoutTemplate==NULL)
         return;
 
+    if(m_NumOfFuncs>0)
+        itkGenericOutputMacro(<<"Number of functionalities >0 ("<<m_NumOfFuncs<<") at initialize().");
+
     // why is this cast done ? I remember we wanted an option for playing controls right...
     m_LayoutTemplate = static_cast<QWidget*>(aLayoutTemplate->child("LayoutTemplate", "QmitkControlsRightFctLayoutTemplate"));
 
@@ -67,7 +70,7 @@ void QmitkFctMediator::initialize(QWidget *aLayoutTemplate)
         //m_MainStack->setSizePolicy( QSizePolicy( QSizePolicy::Minimum, QSizePolicy::Minimum, 1, 0, m_MainStack->sizePolicy().hasHeightForWidth()) );
 
         m_DefaultMain = new QWidget(m_MainStack,"QmitkFctMediator::m_DefaultMain");
-        m_MainStack->addWidget(m_DefaultMain);
+        m_MainStack->addWidget(m_DefaultMain, 0);
 
         connect( m_MainStack, SIGNAL(aboutToShow(int)), this, SLOT(functionalitySelected(int)) );
     }

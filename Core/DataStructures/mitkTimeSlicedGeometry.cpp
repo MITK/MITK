@@ -46,7 +46,7 @@ const mitk::TimeBounds& mitk::TimeSlicedGeometry::GetTimeBoundsInMS() const
   assert(geometry3d.IsNotNull());
   timebounds[0] = geometry3d->GetTimeBoundsInMS()[0];
 
-  geometry3d = m_Geometry3Ds[m_TimeSteps-1];
+  geometry3d = GetGeometry3D(m_TimeSteps-1);
   assert(geometry3d.IsNotNull());
   timebounds[1]=geometry3d->GetTimeBoundsInMS()[1];
 
@@ -179,7 +179,14 @@ mitk::Geometry3D::Pointer mitk::TimeSlicedGeometry::Clone() const
   unsigned int t;
   for(t=0; t<m_TimeSteps; ++t)
   {
-    newGeometry->SetGeometry3D(m_Geometry3Ds[t]->Clone(), t);
+    if(m_Geometry3Ds[t]==NULL)
+    {
+      assert(m_EvenlyTimed);
+    }
+    else
+    {
+      newGeometry->SetGeometry3D(m_Geometry3Ds[t]->Clone(), t);
+    }
   }
   return newGeometry.GetPointer();
 }

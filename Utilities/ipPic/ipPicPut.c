@@ -52,6 +52,9 @@
  *   writes a PicFile to disk
  *
  * $Log$
+ * Revision 1.15  2003/02/18 12:28:23  andre
+ * write compressed pic files
+ *
  * Revision 1.14  2002/11/13 17:53:00  ivo
  * new ipPic added.
  *
@@ -119,7 +122,7 @@ ipPicPut( char *outfile_name, ipPicDescriptor *pic )
     {
       fprintf( stderr, "ipPicPut: sorry, can't write (was encrypted !!!)\n" );
       return( -1 );
-    } 
+    }
 
   if( outfile_name == NULL )
     outfile = stdout;
@@ -128,8 +131,18 @@ ipPicPut( char *outfile_name, ipPicDescriptor *pic )
   else
     {
       ipPicRemoveFile( outfile_name );
-      outfile = fopen( outfile_name, "wb" );
+
+      if( ipPicGetWriteCompression() )
+        {
+          char buff[1024];
+
+          sprintf( buff, "%s.gz", outfile_name );
+          outfile = ipPicFOpen( buff, "wb" );
+        }
+      else
+        outfile = fopen( outfile_name, "wb" );
     }
+
 
   if( outfile == NULL )
     {
@@ -144,32 +157,40 @@ ipPicPut( char *outfile_name, ipPicDescriptor *pic )
 
   /* write oufile */
   if( ipPicEncryptionType(pic) == ' ' )
-    fwrite( ipPicVERSION, 1, sizeof(ipPicTag_t), outfile );
+    ipPicFWrite( ipPicVERSION, 1, sizeof(ipPicTag_t), outfile );
   else
-    fwrite( pic->info->version, 1, sizeof(ipPicTag_t), outfile );
+    ipPicFWrite( pic->info->version, 1, sizeof(ipPicTag_t), outfile );
 
-  ipFWriteLE( &len, sizeof(ipUInt4_t), 1, outfile );
+  ipPicFWriteLE( &len, sizeof(ipUInt4_t), 1, outfile );
 
-  ipFWriteLE( &(pic->type), sizeof(ipUInt4_t), 1, outfile );
-  ipFWriteLE( &(pic->bpe), sizeof(ipUInt4_t), 1, outfile );
-  ipFWriteLE( &(pic->dim), sizeof(ipUInt4_t), 1, outfile );
+  ipPicFWriteLE( &(pic->type), sizeof(ipUInt4_t), 1, outfile );
+  ipPicFWriteLE( &(pic->bpe), sizeof(ipUInt4_t), 1, outfile );
+  ipPicFWriteLE( &(pic->dim), sizeof(ipUInt4_t), 1, outfile );
 
-  ipFWriteLE( pic->n, sizeof(ipUInt4_t), pic->dim, outfile );
+  ipPicFWriteLE( pic->n, sizeof(ipUInt4_t), pic->dim, outfile );
 
   _ipPicWriteTags( pic->info->tags_head, outfile, ipPicEncryptionType(pic) );
 
-  pic->info->pixel_start_in_file = ftell( outfile );
+  if( ipPicGetWriteCompression() )
+    pic->info->pixel_start_in_file = ipPicFTell( outfile );
+  else
+    pic->info->pixel_start_in_file = ftell( outfile );
 
   if( pic->data )
     {
       if( pic->type == ipPicNonUniform )
-        fwrite( pic->data, pic->bpe / 8, _ipPicElements(pic), outfile );
+        ipPicFWrite( pic->data, pic->bpe / 8, _ipPicElements(pic), outfile );
       else
-        ipFWriteLE( pic->data, pic->bpe / 8, _ipPicElements(pic), outfile );
+        ipPicFWriteLE( pic->data, pic->bpe / 8, _ipPicElements(pic), outfile );
     }
 
   if( outfile != stdout )
-    fclose( outfile );
+    {
+      if( ipPicGetWriteCompression() )
+        ipPicFClose( outfile );
+      else
+        fclose( outfile );
+    }
 
   return( 0 );
 }
@@ -273,14 +294,14 @@ void _ipPicWriteTags( _ipPicTagsElement_t *head, FILE *stream, char encryption_t
       len +=                   3 * sizeof(ipUInt4_t)  /* type, bpe, dim */
              + current->tsv->dim * sizeof(ipUInt4_t); /* n[]            */
 
-      fwrite( current->tsv->tag, 1, sizeof(ipPicTag_t), stream );
+      ipPicFWrite( current->tsv->tag, 1, sizeof(ipPicTag_t), stream );
 
-      ipFWriteLE( &len, sizeof(ipUInt4_t), 1, stream );
+      ipPicFWriteLE( &len, sizeof(ipUInt4_t), 1, stream );
 
-      ipFWriteLE( &(current->tsv->type), sizeof(ipUInt4_t), 1, stream );
-      ipFWriteLE( &(current->tsv->bpe), sizeof(ipUInt4_t), 1, stream );
-      ipFWriteLE( &(current->tsv->dim), sizeof(ipUInt4_t), 1, stream );
-      ipFWriteLE( &(current->tsv->n), sizeof(ipUInt4_t), current->tsv->dim, stream );
+      ipPicFWriteLE( &(current->tsv->type), sizeof(ipUInt4_t), 1, stream );
+      ipPicFWriteLE( &(current->tsv->bpe), sizeof(ipUInt4_t), 1, stream );
+      ipPicFWriteLE( &(current->tsv->dim), sizeof(ipUInt4_t), 1, stream );
+      ipPicFWriteLE( &(current->tsv->n), sizeof(ipUInt4_t), current->tsv->dim, stream );
 
       if( current->tsv->type == ipPicTSV )
         {
@@ -290,7 +311,7 @@ void _ipPicWriteTags( _ipPicTagsElement_t *head, FILE *stream, char encryption_t
         }
       else
         {
-          ipFWriteLE( current->tsv->value, current->tsv->bpe / 8, elements, stream );
+          ipPicFWriteLE( current->tsv->value, current->tsv->bpe / 8, elements, stream );
         }
 
       current = current->next;

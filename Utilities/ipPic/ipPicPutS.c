@@ -52,6 +52,9 @@
  *   writes a PicFile to disk
  *
  * $Log$
+ * Revision 1.11  2003/02/18 12:28:23  andre
+ * write compressed pic files
+ *
  * Revision 1.10  2002/11/13 17:53:00  ivo
  * new ipPic added.
  *
@@ -107,10 +110,14 @@ void ipPicPutSlice( char *outfile_name, ipPicDescriptor *pic, ipUInt4_t slice )
     {
       if( slice == 1 )
         {
+          ipBool_t compression;
+
           pic->n[pic->dim] = 1;
           pic->dim += 1;
 
+          compression = ipPicSetWriteCompression( ipFalse );
           ipPicPut( outfile_name, pic );
+          ipPicSetWriteCompression( compression );
 
           pic->dim -= 1;
           pic->n[pic->dim] = 0;

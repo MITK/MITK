@@ -53,6 +53,9 @@
  *   and swaps to the other endianess
  *
  * $Log$
+ * Revision 1.8  2003/02/18 12:28:23  andre
+ * write compressed pic files
+ *
  * Revision 1.7  2002/11/13 17:52:59  ivo
  * new ipPic added.
  *
@@ -90,7 +93,33 @@
 
 #include "ipPic.h"
 
-size_t _ipFWrite( void *ptr, size_t size, size_t nitems, FILE *stream )
+#ifdef USE_ZLIB
+ipBool_t _ipPicCanWriteCompressed = ipTrue;
+#else
+ipBool_t _ipPicCanWriteCompressed = ipFalse;
+#endif
+
+
+static ipBool_t write_compressed = ipFalse;
+
+ipBool_t
+ipPicGetWriteCompression( void )
+{
+  return( write_compressed );
+}
+
+ipBool_t
+ipPicSetWriteCompression( ipBool_t compression )
+{
+  ipBool_t compression_old = write_compressed;
+
+  write_compressed = compression;
+
+  return( compression_old );
+}
+
+size_t
+ipFWriteCvt( void *ptr, size_t size, size_t nitems, FILE *stream )
 {
   size_t bytes_return;
 
@@ -98,6 +127,35 @@ size_t _ipFWrite( void *ptr, size_t size, size_t nitems, FILE *stream )
   buff = malloc( size * nitems );
   _ipCpCvtEndian( ptr, buff, size*nitems, size );
   bytes_return = fwrite( buff, size, nitems, stream);
+  free( buff );
+
+  return( bytes_return );
+}
+
+size_t
+_ipPicFWrite( const void *ptr, size_t size, size_t nitems, ipPicFile_t stream)
+{
+  size_t bytes_return;
+
+#ifdef USE_ZLIB
+  if( write_compressed )
+    bytes_return = gzwrite( stream, (void *)ptr, size*nitems);
+  else
+#endif
+    bytes_return = fwrite( ptr, size, nitems, (FILE *)stream );
+
+  return( bytes_return );
+}
+
+size_t
+ipPicFWriteCvt( void *ptr, size_t size, size_t nitems, ipPicFile_t stream )
+{
+  size_t bytes_return;
+
+  void *buff;
+  buff = malloc( size * nitems );
+  _ipCpCvtEndian( ptr, buff, size*nitems, size );
+  bytes_return = ipPicFWrite( buff, size, nitems, stream);
   free( buff );
 
   return( bytes_return );

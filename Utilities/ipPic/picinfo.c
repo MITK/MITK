@@ -52,6 +52,9 @@
  *   prints information about a picfile
  *
  * $Log$
+ * Revision 1.5  2002/04/18 19:09:13  ivo
+ * compression (zlib) activated.
+ *
  * Revision 1.4  2000/05/04 12:52:42  ivo
  * inserted BSD style license
  *
@@ -87,7 +90,12 @@
 */
 #include <stdio.h>
 #include <stdlib.h>
+
+#ifndef WIN32
 #include <strings.h>
+#else
+#include <string.h>
+#endif
 
 #include <limits.h>
 

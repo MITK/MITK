@@ -14,7 +14,7 @@ CFLAGS = $(DEBUG) $(COPTIONS) $(INCPATHS)
 LDFLAGS = $(DEBUG) $(LIBPATHS)
 
 LIBS = -lipPic -ldmalloc
-LIBS = -lipPic
+LIBS = -lipPic -lz
 
 .o:.c
 
@@ -47,6 +47,9 @@ DISTFILES = Makefile                                                     \
             *.ps
 
 picinfo	:libipPic.a picinfo.o 
+	$(CC) $(LDFLAGS) -o $@ $@.o $(LIBS)
+
+pic2seq	:libipPic.a pic2seq.o 
 	$(CC) $(LDFLAGS) -o $@ $@.o $(LIBS)
 
 test	:libipPic.a test.o
@@ -89,6 +92,8 @@ dist:$(DISTFILES)
 	@rm -rf $(distdir)
 
 picinfo.o	:picinfo.c ipPic.h
+
+pic2seq.o	:pic2seq.c ipPic.h
 
 test.o	:test.c ipPic.h
 

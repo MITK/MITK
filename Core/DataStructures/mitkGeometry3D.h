@@ -118,7 +118,7 @@ public:
     mitk::Geometry2D::ConstPointer GetGeometry2D(int s, int t) const;
 
     //##ModelId=3DCBF5D40253
-    mitk::BoundingBox::ConstPointer GetBoundingBox(int t = 0) const;
+    virtual mitk::BoundingBox::ConstPointer GetBoundingBox(int t = 0) const;
 
     //##ModelId=3DCBF5E9037F
     double GetTime(int t) const;

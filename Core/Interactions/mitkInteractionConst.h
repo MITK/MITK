@@ -80,7 +80,8 @@ typedef enum EOperations
 {
   OpNOTHING = 0,
   OpTEST = 1,
-  OpADD = 100, //add a point at the end
+  OpADD = 100, //add a point
+	OpADDLINE = 1001, //add a line
   OpINSERT = 200, //insert a point at position
   OpINSERTLINE = 201, //insert a line at position
   OpMOVE = 300, //move a point
@@ -114,6 +115,7 @@ typedef enum EActions
   AcINITMOVE = 9,
   AcADDPOINT = 10,
   AcADD = 11,
+	AcADDLINE = 12,
   AcSNAPPING_ADDING = 20,
   AcCHECKELEMENT = 30,		//check if there is a element close enough (picking)
   AcCHECKNMINUS1 = 32,  //check if the number of elements is equal to N-1

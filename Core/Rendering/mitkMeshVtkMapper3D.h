@@ -62,18 +62,12 @@ class MeshVtkMapper3D : public BaseVtkMapper3D
 
     virtual vtkProp* GetProp();
 
-    virtual void GenerateData();
-
-    //##Documentation
-    //## @brief Called by BaseRenderer when an update is required
-    virtual void Update(mitk::BaseRenderer* renderer);
-
-
   protected:
-    virtual void GenerateOutputInformation();
     MeshVtkMapper3D();
 
     virtual ~MeshVtkMapper3D();
+
+    virtual void GenerateData(mitk::BaseRenderer* renderer);
 
     vtkPropAssembly* m_PropAssemply;
 

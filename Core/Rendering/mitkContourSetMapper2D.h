@@ -54,17 +54,10 @@ public:
      */
     const mitk::ContourSet * GetInput(void);
 
-    /**
-     * reimplemented from Baseclass
-     */
-    virtual void Update();
-
 protected:
     ContourSetMapper2D();
 
     virtual ~ContourSetMapper2D();
-
-    virtual void GenerateOutputInformation();
 };
 
 } // namespace mitk

@@ -30,11 +30,16 @@ PURPOSE.  See the above copyright notices for more information.
 //##ModelId=3D6A0E8C02CC
 mitk::Mapper* mitk::DataTreeNode::GetMapper(MapperSlotId id) const
 {
-  if (mappers[id].IsNull()) 
+  if( (id >= m_Mappers.size()) || (m_Mappers[id].IsNull()) ) 
   {
-    mappers[id] = MapperFactory::CreateMapper(const_cast<DataTreeNode*>(this),id);
+    if(id >= m_Mappers.capacity())
+    {
+//      int i, size=id-m_Mappers.capacity()+10;
+      m_Mappers.resize(id+10);
+    }
+    m_Mappers[id] = MapperFactory::CreateMapper(const_cast<DataTreeNode*>(this),id);
   }
-  return mappers[id];
+  return m_Mappers[id];
 }
 
 //##ModelId=3E32C49D00A8
@@ -55,10 +60,10 @@ void mitk::DataTreeNode::SetData(mitk::BaseData* baseData)
   {
     m_Data=baseData;
 
-    int i;
-    for(i=0;i<10;++i) //@FIXME replace mapper array with vector!!!!
-      mappers[i]=NULL;
+    m_Mappers.clear();
+    m_Mappers.resize(10);
 
+    m_DataReferenceChangedTime.Modified();
     Modified();
   }
 }
@@ -71,7 +76,7 @@ void mitk::DataTreeNode::SetInteractor(mitk::Interactor* interactor)
 //##ModelId=3E33F5D702AA
 mitk::DataTreeNode::DataTreeNode() : m_Data(NULL)
 {
-  memset(mappers, 0, sizeof(mappers)); 
+  m_Mappers.resize(10);
 
   m_PropertyList = PropertyList::New();
 }
@@ -127,10 +132,10 @@ MBI_STD::ostream& operator<<( MBI_STD::ostream& o, mitk::DataTreeNode::Pointer& 
 //##ModelId=3E69331903C9
 void mitk::DataTreeNode::SetMapper(MapperSlotId id, mitk::Mapper* mapper)
 {
-  mappers[id] = mapper;
+  m_Mappers[id] = mapper;
 
   if (mapper!=NULL)
-    mapper->SetInput(this);
+    mapper->SetDataTreeNode(this);
 }
 
 //##ModelId=3E860A5C0032

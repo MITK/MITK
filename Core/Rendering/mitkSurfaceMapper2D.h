@@ -52,9 +52,6 @@ public:
     //##ModelId=3EF18053039D
     virtual void Paint(mitk::BaseRenderer * renderer);
 
-    //##ModelId=3EF1805303D9
-    virtual void Update();
-
     //##Documentation
     //## @brief The Surface to map can be explicitly set by this method. If
     //## it is set, it is used instead of the data stored in the DataTreeNode.
@@ -73,8 +70,6 @@ protected:
 
     //##ModelId=3EF180540019
     virtual ~SurfaceMapper2D();
-    //##ModelId=3EF18054002E
-    virtual void GenerateOutputInformation();
 
     //##ModelId=3EF18053031B
 	vtkPlane* m_Plane;

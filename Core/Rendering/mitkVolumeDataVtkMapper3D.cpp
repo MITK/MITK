@@ -42,26 +42,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 const mitk::Image* mitk::VolumeDataVtkMapper3D::GetInput()
 {
-  if (this->GetNumberOfInputs() < 1)
-  {
-    return 0;
-  }
-
   return static_cast<const mitk::Image*> ( GetData() );
 }
-
-
-void mitk::VolumeDataVtkMapper3D::GenerateData()
-{
-  
- 
-}
-
-
-void mitk::VolumeDataVtkMapper3D::GenerateOutputInformation()
-{
-}
-
 
 mitk::VolumeDataVtkMapper3D::VolumeDataVtkMapper3D()
 {
@@ -117,7 +99,7 @@ void mitk::VolumeDataVtkMapper3D::AbortCallback(vtkObject *caller, unsigned long
   // }
 }
 
-void mitk::VolumeDataVtkMapper3D::Update(mitk::BaseRenderer* renderer)
+void mitk::VolumeDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
 {
 
   if(IsVisible(renderer)==false ||
@@ -241,13 +223,6 @@ void mitk::VolumeDataVtkMapper3D::Update(mitk::BaseRenderer* renderer)
   vtkRendWin = (vtkRenderWindow*)openGlRenderer->GetVtkRenderWindow();
   vtkRendWin->AddObserver(vtkCommand::AbortCheckEvent,cbc); 
 */
-  StandardUpdate();
-
-}
-
-
-void mitk::VolumeDataVtkMapper3D::Update()
-{
 }
 
 void mitk::VolumeDataVtkMapper3D::ApplyProperties(vtkActor* actor, mitk::BaseRenderer* renderer)

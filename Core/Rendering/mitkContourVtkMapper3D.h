@@ -46,18 +46,9 @@ class ContourVtkMapper3D : public BaseVtkMapper3D
     itkNewMacro(Self);
 
 
-    virtual void GenerateData();
-
-    virtual void GenerateOutputInformation();
 
     virtual const mitk::Contour* GetInput();
 
-
-    //##Documentation
-    //## @brief Called by BaseRenderer when an update is required
-    virtual void Update(mitk::BaseRenderer* renderer);
-
-    virtual void Update();
 
     virtual vtkProp* GetProp();
 
@@ -67,6 +58,8 @@ class ContourVtkMapper3D : public BaseVtkMapper3D
     ContourVtkMapper3D();
    
     virtual ~ContourVtkMapper3D();
+
+    virtual void GenerateData(mitk::BaseRenderer* renderer);
 
     vtkPolyDataMapper* m_PointVtkPolyDataMapper;
     vtkPolyDataMapper* m_VtkPolyDataMapper;

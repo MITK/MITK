@@ -47,12 +47,8 @@ int mitk::ImageMapper2D::numRenderer = 0;
 
 mitk::ImageMapper2D::ImageMapper2D() : m_SliceSelector(NULL)
 {
-  // Modify superclass default values, can be overridden by subclasses
-  this->SetNumberOfRequiredInputs(1);
-
   m_SliceSelector = ImageSliceSelector::New();
   m_Reslicer = vtkImageReslice::New();
-
 }
 
 //##ModelId=3E32DCF60043
@@ -60,12 +56,6 @@ mitk::ImageMapper2D::~ImageMapper2D()
 {
   //@FIXME: durch die folgende Zeile sollte doch wohl der desctructor von RendererInfo aufgerufen werden. Das passiert aber nie. Deshalb wird bei der Programm-Beendung auch das iil4mitkImage und damit die textur nicht rechtzeitig freigegeben und das Programm crashed.
   m_RendererInfo.clear();
-}
-
-//##ModelId=3E3D834B003A
-void mitk::ImageMapper2D::GenerateData()
-{
-
 }
 
 void mitk::ImageMapper2D::Paint(mitk::BaseRenderer * renderer)
@@ -141,11 +131,6 @@ void mitk::ImageMapper2D::Paint(mitk::BaseRenderer * renderer)
 //##ModelId=3E3D834B0008
 const mitk::ImageMapper2D::InputImageType *mitk::ImageMapper2D::GetInput(void)
 {
-  if (this->GetNumberOfInputs() < 1)
-  {
-    return 0;
-  }
-
   return static_cast<const mitk::ImageMapper2D::InputImageType * >
     ( GetData() );
 }
@@ -158,15 +143,6 @@ int mitk::ImageMapper2D::GetAssociatedChannelNr(mitk::BaseRenderer *renderer)
     renderinfo.m_RendererId = ImageMapper2D::numRenderer++;
 
   return renderinfo.m_RendererId;
-}
-
-//##ModelId=3E8607D20380
-void mitk::ImageMapper2D::GenerateOutputInformation()
-{
-  mitk::Image::Pointer output = this->GetOutput();
-  mitk::PixelType pt(typeid(int));
-  unsigned int dim[]={256,256};
-  output->Initialize(mitk::PixelType(typeid(short int)), 2, dim, 10);
 }
 
 //##ModelId=3ED932B00140
@@ -342,12 +318,7 @@ void mitk::ImageMapper2D::GenerateData(mitk::BaseRenderer *renderer)
 
 
 
-    mitk::Image::Pointer output = this->GetOutput();
-
-    //if(renderinfo.m_RendererId < 10)
-    //	output->SetPicSlice(pic,0,0,renderinfo.m_RendererId);
-    output->Modified();
-    renderinfo.m_LastUpdateTime=output->GetMTime();
+    renderinfo.m_LastUpdateTime.Modified();
 
     inputData->SetSpacing(spacing);
   }
@@ -421,7 +392,7 @@ void mitk::ImageMapper2D::Update(mitk::BaseRenderer* renderer)
     return;
 
   RendererInfo& renderinfo=m_RendererInfo[renderer];
-  DataTreeNode* node=GetDataTreeNode();
+  const DataTreeNode* node=GetDataTreeNode();
   iil4mitkPicImage*& image = renderinfo.m_iil4mitkImage;
 
   if(
@@ -448,8 +419,6 @@ void mitk::ImageMapper2D::Update(mitk::BaseRenderer* renderer)
     ApplyProperties(renderer);
     // since we have checked that nothing important has changed, we can set m_LastUpdateTime
     // to the current time
-    mitk::Image::Pointer output = this->GetOutput();
-    output->Modified();
-    renderinfo.m_LastUpdateTime=output->GetMTime();
+    renderinfo.m_LastUpdateTime.Modified();
   }
 }

@@ -38,10 +38,6 @@ class BaseVtkMapper2D : public Mapper2D
   public:
     //##ModelId=3E3AA40002D4
     virtual vtkProp* GetProp() = 0;
-    //##ModelId=3EF19F880369
-    //##Documentation
-    //## @brief Called by BaseRenderer when an update is required
-    virtual void Update(mitk::BaseRenderer* renderer) = 0;
 
 
   protected:

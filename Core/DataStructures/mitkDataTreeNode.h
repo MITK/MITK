@@ -59,6 +59,7 @@ class DataTreeNode : public itk::DataObject
 public:
 
   typedef mitk::Geometry3D::Pointer Geometry3DPointer;
+  typedef std::vector<Mapper::Pointer> MapperVector;
 
   mitkClassMacro(DataTreeNode,DataObject);
 
@@ -273,6 +274,14 @@ public:
   //## @brief Get the timestamp of the last change of the contents of this node or 
   //## the referenced BaseData.
   virtual unsigned long GetMTime() const;
+
+  //##Documentation
+  //## @brief Get the timestamp of the last change of the reference to the 
+  //## BaseData.
+  unsigned long GetDataReferenceChangedTime() const
+  {
+    return m_DataReferenceChangedTime.GetMTime();
+  }
 protected:
   //##ModelId=3E33F5D702AA
   DataTreeNode();
@@ -283,8 +292,7 @@ protected:
   //##ModelId=3D6A0F8C0202
   //##Documentation
   //## @brief Mapper-slots
-  //## @todo change to stl-vector
-  mutable mitk::Mapper::Pointer mappers[10];
+  mutable MapperVector m_Mappers;
 
   //##ModelId=3E32C49D0095
   //##Documentation
@@ -308,6 +316,10 @@ protected:
   //##Documentation
   //## @brief Interactor, that handles the Interaction
   Interactor::Pointer m_Interactor;
+
+  //##Documentation
+  //## @brief Timestamp of the last change of m_Data
+  itk::TimeStamp m_DataReferenceChangedTime;
 };
 
 

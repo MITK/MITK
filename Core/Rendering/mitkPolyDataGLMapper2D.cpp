@@ -47,23 +47,13 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <itkProcessObject.h>
 
-const mitk::BaseData *mitk::PolyDataGLMapper2D::GetInput( void )
-{
-    if ( this->GetNumberOfInputs() < 1 )
-    {
-        return 0;
-    }
-
-    return dynamic_cast<const mitk::BaseData * > ( GetData() );
-}
-
 void mitk::PolyDataGLMapper2D::Paint( mitk::BaseRenderer * renderer )
 {
     if ( IsVisible( renderer ) == false )
         return ;
 
     // ok, das ist aus GenerateData kopiert
-    mitk::BaseData::Pointer input = const_cast<mitk::BaseData*>( this->GetInput() );
+    mitk::BaseData::Pointer input = const_cast<mitk::BaseData*>( GetData() );
 
     assert( input );
 
@@ -207,7 +197,7 @@ void mitk::PolyDataGLMapper2D::Paint( mitk::BaseRenderer * renderer )
 
 vtkPolyDataMapper* mitk::PolyDataGLMapper2D::GetVtkPolyDataMapper()
 {
-    mitk::DataTreeNode::Pointer node = this->GetDataTreeNode();
+    mitk::DataTreeNode::ConstPointer node = this->GetDataTreeNode();
     if ( node.IsNull() )
         return NULL;
 
@@ -215,7 +205,7 @@ vtkPolyDataMapper* mitk::PolyDataGLMapper2D::GetVtkPolyDataMapper()
     if ( mitkMapper.IsNull() )
         return NULL;
 
-    ( ( itk::ProcessObject* ) mitkMapper.GetPointer() ) ->Update();
+    mitkMapper->Update(NULL);
 
     vtkActor* actor = dynamic_cast<vtkActor*>( mitkMapper->GetProp() );
 
@@ -252,13 +242,6 @@ bool mitk::PolyDataGLMapper2D::IsConvertibleToVtkPolyData()
 {
     return ( GetVtkPolyDataMapper() != NULL );
 }
-
-
-
-void mitk::PolyDataGLMapper2D::Update()
-{}
-
-
 
 mitk::PolyDataGLMapper2D::PolyDataGLMapper2D()
 {

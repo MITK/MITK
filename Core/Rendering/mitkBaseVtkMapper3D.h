@@ -48,10 +48,6 @@ public:
   //##Documentation
   //## @brief Apply color and opacity read from the PropertyList
   virtual void ApplyProperties(vtkActor* actor, mitk::BaseRenderer* renderer);
-  //##ModelId=3EF19F3000A5
-  //##Documentation
-  //## @brief Called by BaseRenderer when an update is required
-  virtual void Update(mitk::BaseRenderer* renderer) = 0;
 
 
 

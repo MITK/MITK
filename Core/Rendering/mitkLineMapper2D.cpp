@@ -39,10 +39,6 @@ mitk::LineMapper2D::~LineMapper2D()
 
 const mitk::PointSet *mitk::LineMapper2D::GetInput(void)
 {
-	if (this->GetNumberOfInputs() < 1)
-	{
-		return 0;
-	}
   return static_cast<const mitk::PointSet * > ( GetData() );
 }
 
@@ -141,12 +137,4 @@ void mitk::LineMapper2D::Paint(mitk::BaseRenderer * renderer)
     //drawing the points
     mitk::PointSetMapper2D::Paint(renderer);
   }
-}
-
-void mitk::LineMapper2D::Update()
-{
-}
-
-void mitk::LineMapper2D::GenerateOutputInformation()
-{
 }

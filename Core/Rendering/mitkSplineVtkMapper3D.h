@@ -38,7 +38,6 @@ public:
 
     virtual vtkProp* GetProp();
 
-    virtual void Update( mitk::BaseRenderer* renderer );
     
     bool SplinesAreAvailable();
     
@@ -59,7 +58,7 @@ protected:
 
     virtual void GenerateData();
 
-    virtual void GenerateOutputInformation();
+    virtual void GenerateData(mitk::BaseRenderer * renderer);
     
     vtkActor* m_SplinesActor;
     

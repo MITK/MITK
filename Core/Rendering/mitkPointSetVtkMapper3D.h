@@ -61,35 +61,16 @@ class PointSetVtkMapper3D : public BaseVtkMapper3D
     //##ModelId=3E70F60301D5
     virtual const mitk::PointSet* GetInput();
 
-    //##ModelId=3E70F60301E9
-    virtual void GenerateData();
-
-    //##ModelId=3EF19FA803BF
-    //##Documentation
-    //## @brief Called by BaseRenderer when an update is required
-    virtual void Update(mitk::BaseRenderer* renderer);
-
-
   protected:
-    //##ModelId=3E70F60301F2
-    virtual void GenerateOutputInformation();
     //##ModelId=3E70F60301F4
     PointSetVtkMapper3D();
 
     //##ModelId=3E70F60301F5
     virtual ~PointSetVtkMapper3D();
 
-    //##ModelId=3E70F60301C9
+    virtual void GenerateData(mitk::BaseRenderer* renderer);
 
      vtkActor *m_Actor;
- //   vtkAssembly *m_Actor;
-//    vtkActor* m_PointActor;
-//	  vtkFollower* m_TextActor;
-// 	  vtkActor* m_TextActor;
-
-
-    
-    //##ModelId=3E70F60301CA
     vtkPolyDataMapper* m_PointVtkPolyDataMapper;
     vtkPolyDataMapper* m_TextVtkPolyDataMapper;
     vtkPolyDataMapper* m_VtkPolyDataMapper;    

@@ -52,18 +52,12 @@ public:
     //##ModelId=3E67D77A0109
     virtual void Paint(mitk::BaseRenderer * renderer);
 
-    //##ModelId=3E67E1B90237
-    virtual void Update();
-
 protected:
     //##ModelId=3E639E100243
     Geometry2DDataMapper2D();
 
     //##ModelId=3E639E100257
     virtual ~Geometry2DDataMapper2D();
-
-    //##ModelId=3E67E285024E
-    virtual void GenerateOutputInformation();
 
     SurfaceMapper2D::Pointer m_SurfaceMapper;
 };

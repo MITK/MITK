@@ -40,25 +40,12 @@ PURPOSE.  See the above copyright notices for more information.
 
 const mitk::Mesh* mitk::MeshVtkMapper3D::GetInput()
 {
-  if (this->GetNumberOfInputs() < 1)
-  {
-    return 0;
-  }
-
   return static_cast<const mitk::Mesh * > ( GetData() );
 }
 
 vtkProp* mitk::MeshVtkMapper3D::GetProp()
 {
   return m_PropAssemply;
-}
-
-void mitk::MeshVtkMapper3D::GenerateData()
-{
-}
-
-void mitk::MeshVtkMapper3D::GenerateOutputInformation()
-{
 }
 
 mitk::MeshVtkMapper3D::MeshVtkMapper3D() : m_PropAssemply(NULL)
@@ -94,7 +81,7 @@ mitk::MeshVtkMapper3D::~MeshVtkMapper3D()
   m_Spheres->Delete();
 }
 
-void mitk::MeshVtkMapper3D::Update(mitk::BaseRenderer* renderer)
+void mitk::MeshVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
 {
   if(IsVisible(renderer)==false)
   {
@@ -155,8 +142,6 @@ void mitk::MeshVtkMapper3D::Update(mitk::BaseRenderer* renderer)
   m_SpheresActor->GetProperty()->SetColor(rgba);
 
   m_SpheresMapper->SetInput(m_Spheres->GetOutput());
-
-  StandardUpdate();
 }
 
 

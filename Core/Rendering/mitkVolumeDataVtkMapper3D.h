@@ -49,25 +49,17 @@ public:
 
   virtual const mitk::Image* GetInput();
 
-  virtual void GenerateData();
-
-  //##Documentation
-  //## @brief Called by BaseRenderer when an update is required
-  virtual void Update(mitk::BaseRenderer* renderer);
-
-  virtual void Update();
-
   virtual void ApplyProperties(vtkActor* actor, mitk::BaseRenderer* renderer);
   static void AbortCallback(vtkObject *caller, unsigned long eid, void *clientdata, void *calldata);
 protected:
 
-  virtual void GenerateOutputInformation();
 
   VolumeDataVtkMapper3D();
 
 
   virtual ~VolumeDataVtkMapper3D();
 
+  virtual void GenerateData(mitk::BaseRenderer* renderer);
 
   vtkActor* m_Actor;
   vtkVolume* m_Volume; 

@@ -55,18 +55,12 @@ public:
     //##ModelId=3F0189F00373
     virtual void Paint(mitk::BaseRenderer * renderer);
 
-    //##ModelId=3F0189F00376
-    virtual void Update();
-
 protected:
     //##ModelId=3F0189F00378
     PointSetMapper2D();
 
     //##ModelId=3F0189F00382
     virtual ~PointSetMapper2D();
-
-    //##ModelId=3F0189F00384
-    virtual void GenerateOutputInformation();
 };
 
 } // namespace mitk

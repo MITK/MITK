@@ -47,8 +47,8 @@ int mitkContourMapper2DTest(int argc, char* argv[])
   std::cout<<"[PASSED]"<<std::endl;
   } 
   
-  contourMapper->SetInput( node );
-  contourMapper->Update();
+  contourMapper->SetDataTreeNode( node );
+  contourMapper->Update(NULL);
   mitk::Contour* testContour = (mitk::Contour*)contourMapper->GetInput();
   std::cout << testContour << std::endl;
   

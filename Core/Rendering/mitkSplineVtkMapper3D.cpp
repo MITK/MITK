@@ -71,7 +71,6 @@ mitk::SplineVtkMapper3D::GetProp()
 void
 mitk::SplineVtkMapper3D::GenerateData()
 {
-    Superclass::GenerateData();
     mitk::PointSet::Pointer input = const_cast<mitk::PointSet*>( this->GetInput( ) );
     input->Update();
 
@@ -154,25 +153,10 @@ mitk::SplineVtkMapper3D::GenerateData()
     }
 }
 
-void
-mitk::SplineVtkMapper3D::GenerateOutputInformation()
+
+void mitk::SplineVtkMapper3D::GenerateData( mitk::BaseRenderer* renderer )
 {
-    Superclass::GenerateOutputInformation();
-    mitk::Image::Pointer output = this->GetOutput();
-    mitk::PixelType pt( typeid( int ) );
-    unsigned int dim[] = {256, 256};
-    output->Initialize( mitk::PixelType( typeid( short int ) ), 2, dim, 10 );
-    SlicedData::RegionType::SizeType size = {0, 0, 0, 0, 0};
-    SlicedData::RegionType region( size );
-    output->SetRequestedRegion( &region );
-}
-
-
-
-
-void mitk::SplineVtkMapper3D::Update( mitk::BaseRenderer* renderer )
-{
-    Superclass::Update( renderer );
+    Superclass::GenerateData( renderer );
 
     if ( IsVisible( renderer ) == false )
     {
@@ -190,7 +174,6 @@ void mitk::SplineVtkMapper3D::Update( mitk::BaseRenderer* renderer )
         if ( m_Assembly != NULL )
             m_Assembly->VisibilityOn();
     }
-    StandardUpdate();
 }
 
 bool mitk::SplineVtkMapper3D::SplinesAreAvailable()
@@ -201,7 +184,7 @@ bool mitk::SplineVtkMapper3D::SplinesAreAvailable()
 
 vtkPolyData* mitk::SplineVtkMapper3D::GetSplinesPolyData()
 {
-    itk::ProcessObject::Update();
+    Mapper::Update(NULL);
     if ( m_SplinesAvailable )
         return ( dynamic_cast<vtkPolyDataMapper*>( m_SplinesActor->GetMapper() ) )->GetInput();
     else
@@ -210,7 +193,7 @@ vtkPolyData* mitk::SplineVtkMapper3D::GetSplinesPolyData()
 
 vtkActor* mitk::SplineVtkMapper3D::GetSplinesActor()
 {
-    itk::ProcessObject::Update();
+    Mapper::Update(NULL);
     if ( m_SplinesAvailable )
         return m_SplinesActor;
     else
@@ -220,7 +203,7 @@ vtkActor* mitk::SplineVtkMapper3D::GetSplinesActor()
 
 vtkPolyData* mitk::SplineVtkMapper3D::GetPointsPolyData()
 {
-    itk::ProcessObject::Update();
+    Mapper::Update(NULL);
     if (m_vtkPointList->GetOutput())
         return m_vtkPointList->GetOutput();
     else
@@ -229,7 +212,7 @@ vtkPolyData* mitk::SplineVtkMapper3D::GetPointsPolyData()
 
 vtkActor* mitk::SplineVtkMapper3D::GetPointsActor()
 {
-    itk::ProcessObject::Update();
+    Mapper::Update(NULL);
     if (m_Actor)
         return m_Actor;
     else

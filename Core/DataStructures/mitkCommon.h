@@ -45,4 +45,13 @@ typedef  int MapperSlotId;
 	typedef itk::SmartPointer<const Self>  ConstPointer; \
     itkTypeMacro(className,SuperClassName)
 
+/** Get a smart const pointer to an object.  Creates the member 
+ * Get"name"() (e.g., GetPoints()). */
+#define mitkGetObjectMacroConst(name,type) \
+  virtual type * Get##name () const \
+  { \
+    itkDebugMacro("returning " #name " address " << this->m_##name ); \
+    return this->m_##name.GetPointer(); \
+  } 
+
 

@@ -39,22 +39,7 @@ PURPOSE.  See the above copyright notices for more information.
 //##ModelId=3E70F60301D5
 const mitk::PointSet* mitk::PointSetVtkMapper3D::GetInput()
 {
-    if (this->GetNumberOfInputs() < 1)
-    {
-        return 0;
-    }
-
     return static_cast<const mitk::PointSet * > ( GetData() );
-}
-
-//##ModelId=3E70F60301E9
-void mitk::PointSetVtkMapper3D::GenerateData()
-{
-}
-
-//##ModelId=3E70F60301F2
-void mitk::PointSetVtkMapper3D::GenerateOutputInformation()
-{
 }
 
 //##ModelId=3E70F60301F4
@@ -111,7 +96,7 @@ mitk::PointSetVtkMapper3D::~PointSetVtkMapper3D()
 }
 
 //##ModelId=3EF19FA803BF
-void mitk::PointSetVtkMapper3D::Update(mitk::BaseRenderer* renderer)
+void mitk::PointSetVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
 {
     if(IsVisible(renderer)==false)
     {
@@ -275,8 +260,4 @@ void mitk::PointSetVtkMapper3D::Update(mitk::BaseRenderer* renderer)
 
   //    m_Actor->AddPart(m_PointActor);
   //    m_Actor->AddPart(m_TextActor);			
-
-  StandardUpdate();
 }
-
-

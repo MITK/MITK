@@ -60,7 +60,7 @@ void mitk::DICOMFileReader::GenerateOutputInformation()
     if( !image )
       throw itk::ImageFileReaderException(__FILE__, __LINE__, "Could not get image.");;
     pic = _dicomToPic( header, header_size,
-      image, image_size, color );
+      image, image_size, color, ipTrue);
 
     if( pic == NULL)
     {

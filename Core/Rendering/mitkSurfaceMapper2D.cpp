@@ -69,11 +69,6 @@ const mitk::Surface *mitk::SurfaceMapper2D::GetInput(void)
   if(m_Surface.IsNotNull())
     return m_Surface;
 
-  if (this->GetNumberOfInputs() < 1)
-  {
-    return 0;
-  }
-
   return static_cast<const mitk::Surface * > ( GetData() );
 }
 
@@ -255,14 +250,4 @@ void mitk::SurfaceMapper2D::Paint(mitk::BaseRenderer * renderer)
       }
     }
   }
-}
-
-//##ModelId=3EF1805303D9
-void mitk::SurfaceMapper2D::Update()
-{
-}
-
-//##ModelId=3EF18054002E
-void mitk::SurfaceMapper2D::GenerateOutputInformation()
-{
 }

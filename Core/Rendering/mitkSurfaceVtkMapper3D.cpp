@@ -31,22 +31,7 @@ PURPOSE.  See the above copyright notices for more information.
 //##ModelId=3E70F60301D5
 const mitk::Surface* mitk::SurfaceVtkMapper3D::GetInput()
 {
-  if (this->GetNumberOfInputs() < 1)
-  {
-    return 0;
-  }
-
   return static_cast<const mitk::Surface * > ( GetData() );
-}
-
-//##ModelId=3E70F60301E9
-void mitk::SurfaceVtkMapper3D::GenerateData()
-{
-}
-
-//##ModelId=3E70F60301F2
-void mitk::SurfaceVtkMapper3D::GenerateOutputInformation()
-{
 }
 
 //##ModelId=3E70F60301F4
@@ -73,7 +58,7 @@ mitk::SurfaceVtkMapper3D::~SurfaceVtkMapper3D()
 }
 
 //##ModelId=3EF19FA803BF
-void mitk::SurfaceVtkMapper3D::Update(mitk::BaseRenderer* renderer)
+void mitk::SurfaceVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
 {
   if(IsVisible(renderer)==false)
   {
@@ -126,13 +111,6 @@ void mitk::SurfaceVtkMapper3D::Update(mitk::BaseRenderer* renderer)
   // apply properties read from the PropertyList
   //
   ApplyProperties(m_Actor, renderer);
-
-  StandardUpdate();
-}
-
-//##ModelId=3EF1B44001D5
-void mitk::SurfaceVtkMapper3D::Update()
-{
 }
 
 void mitk::SurfaceVtkMapper3D::ApplyProperties(vtkActor* actor, mitk::BaseRenderer* renderer)

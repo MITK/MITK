@@ -219,7 +219,7 @@ void mitk::OpenGLRenderer::Update(mitk::DataTreeNode* datatreenode)
           m_VtkMapperPresent=true;
         }
         else
-          mapper2d->Update();
+          mapper2d->Update(this);
         //ImageMapper2D* imagemapper2d=dynamic_cast<ImageMapper2D*>(mapper.GetPointer());
       }
       else

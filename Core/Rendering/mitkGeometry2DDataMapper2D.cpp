@@ -46,11 +46,6 @@ mitk::Geometry2DDataMapper2D::~Geometry2DDataMapper2D()
 //##ModelId=3E6423D20341
 const mitk::Geometry2DData *mitk::Geometry2DDataMapper2D::GetInput(void)
 {
-  if (this->GetNumberOfInputs() < 1)
-  {
-    return 0;
-  }
-  
   return static_cast<const mitk::Geometry2DData * > ( GetData() );
 }
 
@@ -143,20 +138,10 @@ void mitk::Geometry2DDataMapper2D::Paint(mitk::BaseRenderer * renderer)
       
       if(m_SurfaceMapper.IsNull())
         m_SurfaceMapper=mitk::SurfaceMapper2D::New();
-      m_SurfaceMapper->SetInput(GetDataTreeNode());
+      m_SurfaceMapper->SetDataTreeNode(GetDataTreeNode());
       m_SurfaceMapper->SetSurface(surfaceCreator->GetOutput());
       
       m_SurfaceMapper->Paint(renderer);
     }
   }
-}
-
-//##ModelId=3E67E1B90237
-void mitk::Geometry2DDataMapper2D::Update()
-{
-}
-
-//##ModelId=3E67E285024E
-void mitk::Geometry2DDataMapper2D::GenerateOutputInformation()
-{
 }

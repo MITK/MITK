@@ -18,6 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include "mitkMapper3D.h"
+#include "mitkDataTreeNode.h"
 
 //##ModelId=3E3AE1C5010C
 mitk::Mapper3D::Mapper3D()

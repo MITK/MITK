@@ -50,26 +50,16 @@ public:
   //##ModelId=3E70F60301D5
   virtual const mitk::Surface* GetInput();
 
-  //##ModelId=3E70F60301E9
-  virtual void GenerateData();
-
-  //##ModelId=3EF19FA803BF
-  //##Documentation
-  //## @brief Called by BaseRenderer when an update is required
-  virtual void Update(mitk::BaseRenderer* renderer);
-  //##ModelId=3EF1B44001D5
-  virtual void Update();
-
   virtual void ApplyProperties(vtkActor* actor, mitk::BaseRenderer* renderer);
 
 protected:
-  //##ModelId=3E70F60301F2
-  virtual void GenerateOutputInformation();
   //##ModelId=3E70F60301F4
   SurfaceVtkMapper3D();
 
   //##ModelId=3E70F60301F5
   virtual ~SurfaceVtkMapper3D();
+
+  virtual void GenerateData(mitk::BaseRenderer* renderer);
 
   bool m_GenerateNormals;
 

@@ -47,14 +47,10 @@ public:
 
   virtual void Paint(mitk::BaseRenderer * renderer);
 
-  virtual void Update();
-
 protected:
   LineMapper2D();
 
   virtual ~LineMapper2D();
-
-  virtual void GenerateOutputInformation();
 };
 
 } // namespace mitk

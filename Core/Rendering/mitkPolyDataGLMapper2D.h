@@ -60,21 +60,10 @@ public:
     itkSetMacro( ColorByPointData, bool );
 
     /**
-     * Returns the mitk::BaseData object associated with this mapper.
-     * @returns the mitk::BaseData associated with this mapper.
-     */
-    const mitk::BaseData * GetInput( void );
-
-    /**
      * Renders a cut through a poly-data by lines.
      * @param renderer the render to render in.
      */
     virtual void Paint( mitk::BaseRenderer * renderer );
-
-    /**
-     * Standard update method as provided by itk::ProcessObject.
-     */
-    virtual void Update();
 
 protected:
 

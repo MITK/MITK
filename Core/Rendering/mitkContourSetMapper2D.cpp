@@ -124,19 +124,5 @@ void mitk::ContourSetMapper2D::Paint(mitk::BaseRenderer * renderer)
 
 const mitk::ContourSet* mitk::ContourSetMapper2D::GetInput(void)
 {
-	if (this->GetNumberOfInputs() < 1)
-	{
-		return 0;
-	}
-
-    return static_cast<const mitk::ContourSet * > ( GetData() );
-}
-
-
-void mitk::ContourSetMapper2D::Update()
-{
-}
-
-void mitk::ContourSetMapper2D::GenerateOutputInformation()
-{
+	return static_cast<const mitk::ContourSet * > ( GetData() );
 }

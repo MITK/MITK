@@ -45,11 +45,6 @@ mitk::PointSetMapper2D::~PointSetMapper2D()
 //##ModelId=3F0189F00366
 const mitk::PointSet *mitk::PointSetMapper2D::GetInput(void)
 {
-	if (this->GetNumberOfInputs() < 1)
-	{
-		return 0;
-	}
-
     return static_cast<const mitk::PointSet * > ( GetData() );
 }
 
@@ -172,16 +167,6 @@ void mitk::PointSetMapper2D::Paint(mitk::BaseRenderer * renderer)
  					j++;
       }
   }
-}
-
-//##ModelId=3F0189F00376
-void mitk::PointSetMapper2D::Update()
-{
-}
-
-//##ModelId=3F0189F00384
-void mitk::PointSetMapper2D::GenerateOutputInformation()
-{
 }
 
 

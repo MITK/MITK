@@ -57,25 +57,12 @@ class LineVtkMapper3D : public PointSetVtkMapper3D
 
     itkNewMacro(Self);
 
-    //##Documentation
-    //## @brief Called by BaseRenderer when an update is required
-    virtual void Update(mitk::BaseRenderer* renderer);
     
-    virtual void Update();
-
   protected:
-    virtual void GenerateOutputInformation();
     LineVtkMapper3D();
     virtual ~LineVtkMapper3D();
 
-  //vtkActor *m_Actor;
-  //vtkPolyDataMapper* m_PointVtkPolyDataMapper;
-  //vtkPolyDataMapper* m_TextVtkPolyDataMapper;
-  //vtkPolyDataMapper* m_VtkPolyDataMapper;    
-	//vtkAppendPolyData *m_VtkPointList;
-	//vtkAppendPolyData *m_VtkTextList;
-	//vtkPolyData *m_Contour;
-  //vtkTubeFilter * m_Tubefilter;
+    virtual void GenerateData(mitk::BaseRenderer* renderer);
 };
 
 } // namespace mitk

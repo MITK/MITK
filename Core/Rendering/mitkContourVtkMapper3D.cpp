@@ -43,12 +43,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkPolyDataMapper.h>
 #include <stdlib.h>
 
-
-void mitk::ContourVtkMapper3D::GenerateData()
-{
-}
-
-
 mitk::ContourVtkMapper3D::ContourVtkMapper3D()
 {
     m_VtkPolyDataMapper = vtkPolyDataMapper::New();
@@ -67,7 +61,7 @@ mitk::ContourVtkMapper3D::~ContourVtkMapper3D()
     m_Actor->Delete();
 }
 
-void mitk::ContourVtkMapper3D::Update(mitk::BaseRenderer* renderer)
+void mitk::ContourVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
 {
     if(IsVisible(renderer)==false)
     {
@@ -138,13 +132,6 @@ void mitk::ContourVtkMapper3D::Update(mitk::BaseRenderer* renderer)
       m_Actor->GetProperty()->SetColor(rgba);
       m_Actor->SetMapper(m_VtkPolyDataMapper);
     }
-
-  
-    StandardUpdate();
-}
-
-void mitk::ContourVtkMapper3D::Update()
-{
 }
 
 vtkProp* mitk::ContourVtkMapper3D::GetProp()
@@ -152,23 +139,7 @@ vtkProp* mitk::ContourVtkMapper3D::GetProp()
   return m_Actor;
 }
 
-void mitk::ContourVtkMapper3D::GenerateOutputInformation()
-{
-    mitk::Image::Pointer output = this->GetOutput();
-    mitk::PixelType pt( typeid( int ) );
-    unsigned int dim[] = {256, 256};
-    output->Initialize( mitk::PixelType( typeid( short int ) ), 2, dim, 10 );
-    SlicedData::RegionType::SizeType size = {0,0,0,0,0};
-    SlicedData::RegionType region(size);
-    output->SetRequestedRegion(&region);
-}
-
-
 const mitk::Contour* mitk::ContourVtkMapper3D::GetInput()
 {
-    if (this->GetNumberOfInputs() < 1)
-    {
-        return 0;
-    }
     return static_cast<const mitk::Contour* > ( GetData() );
 }

@@ -54,11 +54,6 @@ class Geometry2DDataVtkMapper3D : public BaseVtkMapper3D
     //## @brief Get the Geometry2DData to map
     virtual const mitk::Geometry2DData *GetInput();
   
-    //##ModelId=3E691E09038A
-    virtual void Update();
-  
-    //##ModelId=3E691E09038C
-    virtual void GenerateData();
     //##ModelId=3E6E874F0007
     //##Documentation
     //## @brief The first image found when traversing the @a iterator (stored in m_DataTreeIterator)
@@ -68,11 +63,6 @@ class Geometry2DDataVtkMapper3D : public BaseVtkMapper3D
 	//## @warning Works only when the node to the Geometry2DData was created by 
     //## calling BaseRenderer::GetCurrentWorldGeometry2DNode()
     virtual void SetDataIteratorForTexture(const mitk::DataTreeIteratorBase* iterator);
-    //##ModelId=3EF19F850151
-    //##Documentation
-    //## @brief Called by BaseRenderer when an update is required
-    virtual void Update(mitk::BaseRenderer* renderer);
-
 
   protected:
     //##ModelId=3E691E09038E
@@ -80,8 +70,8 @@ class Geometry2DDataVtkMapper3D : public BaseVtkMapper3D
 
     //##ModelId=3E691E090394
     virtual ~Geometry2DDataVtkMapper3D();
-    //##ModelId=3E691E090396
-    virtual void GenerateOutputInformation();
+
+    virtual void GenerateData(mitk::BaseRenderer* renderer);
 
     //##ModelId=3E691E090331
     //##Documentation

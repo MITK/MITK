@@ -112,28 +112,7 @@ mitk::Geometry2DDataVtkMapper3D::~Geometry2DDataVtkMapper3D()
 //##ModelId=3E691E090380
 const mitk::Geometry2DData *mitk::Geometry2DDataVtkMapper3D::GetInput()
 {
-  if (this->GetNumberOfInputs() < 1)
-  {
-    return 0;
-  }
-
   return static_cast<const mitk::Geometry2DData * > ( GetData() );
-}
-
-//##ModelId=3E691E09038A
-void mitk::Geometry2DDataVtkMapper3D::Update()
-{
-
-}
-
-//##ModelId=3E691E090396
-void mitk::Geometry2DDataVtkMapper3D::GenerateOutputInformation()
-{
-}
-
-//##ModelId=3E691E09038C
-void mitk::Geometry2DDataVtkMapper3D::GenerateData()
-{
 }
 
 //##ModelId=3E6E874F0007
@@ -147,7 +126,7 @@ void mitk::Geometry2DDataVtkMapper3D::SetDataIteratorForTexture(const mitk::Data
 }
 
 //##ModelId=3EF19F850151
-void mitk::Geometry2DDataVtkMapper3D::Update(mitk::BaseRenderer* renderer)
+void mitk::Geometry2DDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
 {
   if(IsVisible(renderer)==false)
   {
@@ -246,6 +225,5 @@ void mitk::Geometry2DDataVtkMapper3D::Update(mitk::BaseRenderer* renderer)
     //apply properties read from the PropertyList
     ApplyProperties(m_Actor, renderer);
   }
-  StandardUpdate();
 }
 

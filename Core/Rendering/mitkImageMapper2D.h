@@ -76,8 +76,6 @@ public:
   //## @brief Get the Image to map
   const InputImageType * GetInput(void);
 
-  //##ModelId=3E3D834B003A
-  virtual void GenerateData();
   //##ModelId=3ED94AAD0315
   virtual void GenerateAllData();
 
@@ -96,7 +94,7 @@ public:
     //##ModelId=3E6423D203E0
     //##Documentation
     //## @brief timestamp of last update of stored data
-    unsigned long int m_LastUpdateTime;
+    itk::TimeStamp m_LastUpdateTime;
     //##ModelId=3E6423D203E1
     //##Documentation
     //## @brief stored iil4mitkPicImage containing the texture to display
@@ -113,7 +111,7 @@ public:
     //## @brief number of pixels per mm in x- and y-direction of the resampled image m_Pic
     Vector2D m_PixelsPerMM;
     //##ModelId=3E6423D30002
-    RendererInfo() : m_LastUpdateTime(0), m_iil4mitkImage(NULL), m_Pic(NULL), m_RendererId(-1)
+    RendererInfo() :  m_iil4mitkImage(NULL), m_Pic(NULL), m_RendererId(-1)
     {
       m_PixelsPerMM.Fill(0);
     };
@@ -129,10 +127,7 @@ public:
   //## @brief Get the internal id of the renderer
   //## @sa RendererInfo
   virtual int GetAssociatedChannelNr(mitk::BaseRenderer *renderer);
-  //##ModelId=3ED932B00140
-  //##Documentation
-  //## @brief Generate the data needed for rendering into @a renderer
-  virtual void GenerateData(mitk::BaseRenderer *renderer);
+
   //##ModelId=3ED94AAD0326
   //##Documentation
   //## @brief Get the RendererInfo for @a renderer
@@ -148,9 +143,8 @@ protected:
   //##ModelId=3E32DCF60043
   virtual ~ImageMapper2D();
 
-  //##ModelId=3E8607D20380
-  virtual void GenerateOutputInformation();
-
+  virtual void GenerateData(mitk::BaseRenderer *renderer);
+  
   //##ModelId=3E6E83AB0347
   //##Documentation
   //## @brief Number of renderers data is stored for

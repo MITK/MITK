@@ -42,44 +42,44 @@ class BaseRenderer;
 class SurfaceMapper2D : public GLMapper2D
 {
 public:
-    mitkClassMacro(SurfaceMapper2D, GLMapper2D);
+  mitkClassMacro(SurfaceMapper2D, GLMapper2D);
 
-    itkNewMacro(Self);
+  itkNewMacro(Self);
 
-    //##ModelId=3EF18053036B
-    const mitk::Surface * GetInput(void);
+  //##ModelId=3EF18053036B
+  const mitk::Surface * GetInput(void);
 
-    //##ModelId=3EF18053039D
-    virtual void Paint(mitk::BaseRenderer * renderer);
+  //##ModelId=3EF18053039D
+  virtual void Paint(mitk::BaseRenderer * renderer);
 
-    //##Documentation
-    //## @brief The Surface to map can be explicitly set by this method. If
-    //## it is set, it is used instead of the data stored in the DataTreeNode.
-    //## 
-    //## This enables to use the mapper also internally from other mappers.
-	itkSetConstObjectMacro(Surface, Surface);
-    //##Documentation
-    //## @brief Get the Surface set explicitly.
-    //##
-    //## @return NULL is returned if no Surface is set to be used instead of DataTreeNode::GetData().
-    //## @sa SetSurface
-	itkGetConstObjectMacro(Surface, Surface);
+  //##Documentation
+  //## @brief The Surface to map can be explicitly set by this method. If
+  //## it is set, it is used instead of the data stored in the DataTreeNode.
+  //## 
+  //## This enables to use the mapper also internally from other mappers.
+  itkSetConstObjectMacro(Surface, Surface);
+  //##Documentation
+  //## @brief Get the Surface set explicitly.
+  //##
+  //## @return NULL is returned if no Surface is set to be used instead of DataTreeNode::GetData().
+  //## @sa SetSurface
+  itkGetConstObjectMacro(Surface, Surface);
 protected:
-    //##ModelId=3EF180540006
-    SurfaceMapper2D();
+  //##ModelId=3EF180540006
+  SurfaceMapper2D();
 
-    //##ModelId=3EF180540019
-    virtual ~SurfaceMapper2D();
+  //##ModelId=3EF180540019
+  virtual ~SurfaceMapper2D();
 
-    //##ModelId=3EF18053031B
-	vtkPlane* m_Plane;
-    //##ModelId=3EF18053034D
-	vtkCutter* m_Cutter;
+  //##ModelId=3EF18053031B
+  vtkPlane* m_Plane;
+  //##ModelId=3EF18053034D
+  vtkCutter* m_Cutter;
 
-   mitk::Surface::ConstPointer m_Surface;
+  mitk::Surface::ConstPointer m_Surface;
 
-   vtkLookupTable *m_LUT;
-   
+  vtkLookupTable *m_LUT;
+
 };
 
 } // namespace mitk

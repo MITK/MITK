@@ -183,7 +183,7 @@ void mitk::SurfaceMapper2D::Paint(mitk::BaseRenderer * renderer)
     vtkPoints *vpoints=contour->GetPoints();
     vtkCellArray *vpolys=contour->GetLines();
     //vtkPointData *vpointdata=contour->GetPointData(); /* \todo remove line! */
-    
+
     vtkCellData *vcelldata=contour->GetCellData();
     vtkDataArray* vcellscalars=vcelldata->GetScalars();
 
@@ -245,7 +245,7 @@ void mitk::SurfaceMapper2D::Paint(mitk::BaseRenderer * renderer)
           else 
           {
           }
-        }	
+        }
 
         //draw the line
         glBegin (GL_LINE_LOOP);        

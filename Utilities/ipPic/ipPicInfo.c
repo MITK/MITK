@@ -100,7 +100,7 @@ void _ipPicInfoPrintTags( FILE *stream, _ipPicTagsElement_t* head, ipUInt4_t lev
         {
           _ipPicInfoPrintTags( stream,
                                current->tsv->value,
-                               ++level,
+                               level+1,
                                flags );
         }
       else

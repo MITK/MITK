@@ -59,6 +59,7 @@ libipFunc_a_SOURCES = \
       Grad.c          \
       Grav.c          \
       Hist.c          \
+      Histo.c		\
       HitMiss.c       \
       HitMissI.c      \
       Inertia.c       \

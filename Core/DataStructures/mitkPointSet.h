@@ -98,12 +98,6 @@ public:
   virtual int SearchSelectedPoint();
 
   //##Documentation
-	//## @brief Get the point on the given position in itkPoint3D
-  //##
-  //## check if index exists. If it doesn't exist, then return 0,0,0
-  const mitk::Point3D GetItkPoint(int position);
-
-  //##Documentation
 	//## @brief returns true if a point exists at this position
   virtual bool IndexExists(int position);
 

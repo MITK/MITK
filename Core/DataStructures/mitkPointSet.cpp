@@ -77,24 +77,6 @@ const mitk::PointSet::PointType mitk::PointSet::GetPoint(int position)
     return out;
 }
 
-const mitk::Point3D mitk::PointSet::GetItkPoint(int position)
-{
-	mitk::Point3D itkout;
-  PointType out;
-  out.Fill(0);
-  
-  //if the Index exists... if not, then return 0,0,0
-  if (m_ItkData->GetPoints()->IndexExists(position))
-  {
-    m_ItkData->GetPoint(position, &out);
-  }
-
-  itkout[0] = out[0];
-  itkout[1] = out[1];
-  itkout[2] = out[2];
-  return itkout;
-}
-
 bool mitk::PointSet::IndexExists(int position)
 {
   return m_ItkData->GetPoints()->IndexExists(position);

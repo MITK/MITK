@@ -396,7 +396,7 @@ void mitk::DataTreeNodeFactory::ReadFileTypeUVG()
 {
     std::cout << "Loading " << m_FileName << " as uvg... " << std::endl;
 
-    mitk::VesselGraphFileReader::Pointer reader = mitk::VesselGraphFileReader::New();
+    mitk::VesselGraphFileReader<Undirected>::Pointer reader = mitk::VesselGraphFileReader<Undirected>::New();
     reader->SetFileName( m_FileName.c_str() );
     reader->Update();
     mitk::DataTreeNode::Pointer node = this->GetOutput();

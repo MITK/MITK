@@ -38,18 +38,18 @@ public:
   
   typedef mitk::ScalarType CoordinateType;
   typedef mitk::ScalarType InterpolationWeightType;
-	//##Documentation
-	//##@brief struct for data of a point
+  //##Documentation
+  //##@brief struct for data of a point
   typedef struct PointDataType 
   {
-		unsigned int id;  //to give the point a special ID
+    unsigned int id;  //to give the point a special ID
     bool selected;  //information about if the point is selected
-		mitk::PointSpecificationType pointSpec;  //specifies the type of the point
+    mitk::PointSpecificationType pointSpec;  //specifies the type of the point
   };
   //##Documentation
-	//##@brief cellDataType, that stores all indexes of the lines, that are selected
-	//## e.g.: points A,B and C.Between A and B there is a line with index 0.
-	//## if vector of cellData contains 1 and 2, then the lines between B and C and C and A is selected.
+  //##@brief cellDataType, that stores all indexes of the lines, that are selected
+  //## e.g.: points A,B and C.Between A and B there is a line with index 0.
+  //## if vector of cellData contains 1 and 2, then the lines between B and C and C and A is selected.
   typedef std::vector<unsigned int> SelectedLinesType;
   typedef SelectedLinesType::iterator SelectedLinesIter;
   typedef struct CellDataType 
@@ -74,74 +74,74 @@ public:
   //##ModelId=3F0177E901BF
   //##Documentation
   //## @brief executes the given Operation
-	virtual void ExecuteOperation(Operation* operation);
+  virtual void ExecuteOperation(Operation* operation);
 
   //##ModelId=3F0177E901C1
   //##Documentation
-	//## @brief returns the current size of the point-list
-	virtual int GetSize();
+  //## @brief returns the current size of the point-list
+  virtual int GetSize();
 
   //##ModelId=3F0177E901CC
   //##Documentation
-	//## @brief returns the pointset
+  //## @brief returns the pointset
   virtual DataType::Pointer GetPointSet() const;
 
   //##ModelId=3F0177E901CE
   //##Documentation
-	//## @brief Get the point on the given position
+  //## @brief Get the point on the given position
   //##
   //## check if index exists. If it doesn't exist, then return 0,0,0
-	const PointType GetPoint(int position);
+  const PointType GetPoint(int position);
 
   //##Documentation
   //## @brief searches a selected point and returns the id of that point. if no point is found, then -1 is returned
   virtual int SearchSelectedPoint();
 
   //##Documentation
-	//## @brief returns true if a point exists at this position
+  //## @brief returns true if a point exists at this position
   virtual bool IndexExists(int position);
 
   //##ModelId=3F0177E901DC
-	//##Documentation
-	//## @brief to get the state selected/unselected of the point on the position
-	virtual bool GetSelectInfo(int position);
+  //##Documentation
+  //## @brief to get the state selected/unselected of the point on the position
+  virtual bool GetSelectInfo(int position);
 
   //##ModelId=3F05B07B0147
   //##Documentation
-	//## @brief returns the number of selected points
-	virtual const int GetNumberOfSelected();
+  //## @brief returns the number of selected points
+  virtual const int GetNumberOfSelected();
 
   //##ModelId=3F0177E901DE
-	//##Documentation
-	//## @brief searches a point in the List == point +/- distance
-	//##
-	//## returns -1 if no point is found
-	//## or the position in the list of the first match
-	int SearchPoint(Point3D point, float distance);
+  //##Documentation
+  //## @brief searches a point in the List == point +/- distance
+  //##
+  //## returns -1 if no point is found
+  //## or the position in the list of the first match
+  int SearchPoint(Point3D point, float distance);
 
-	//virtual methods, that need to be implemented
+  //virtual methods, that need to be implemented
   //##ModelId=3F0177E901EE
-	virtual void UpdateOutputInformation();
+  virtual void UpdateOutputInformation();
   //##ModelId=3F0177E901FB
-	virtual void SetRequestedRegionToLargestPossibleRegion();
+  virtual void SetRequestedRegionToLargestPossibleRegion();
   //##ModelId=3F0177E901FD
-	virtual bool RequestedRegionIsOutsideOfTheBufferedRegion();
+  virtual bool RequestedRegionIsOutsideOfTheBufferedRegion();
   //##ModelId=3F0177E901FF
-	virtual bool VerifyRequestedRegion();
+  virtual bool VerifyRequestedRegion();
   //##ModelId=3F0177E9020B
-	virtual void SetRequestedRegion(itk::DataObject *data);
+  virtual void SetRequestedRegion(itk::DataObject *data);
 
 protected:
   //##ModelId=3F0177E901BD
-	PointSet();
+  PointSet();
 
   //##ModelId=3F0177E901BE
-	virtual ~PointSet();
+  virtual ~PointSet();
 
   //##ModelId=3F0177E90190
-	//##Documentation
-	//## @brief Data from ITK; List of Points; the object, the operations are ment for
-	DataType::Pointer m_ItkData;
+  //##Documentation
+  //## @brief Data from ITK; List of Points; the object, the operations are ment for
+  DataType::Pointer m_ItkData;
 };
 
 } // namespace mitk

@@ -138,7 +138,7 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
 
 			reader=mitk::PicFileReader::New();
 			std::cout << "loading " << fileName << " as pic ... " << std::endl;
-			//            reader->Register(); //FIXME: das WeakPointer problem!
+			//            reader->Register(); //@FIXME: das WeakPointer problem!
 
 			reader->SetFileName(fileName);
 
@@ -299,7 +299,7 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
 //  	node->SetProperty("layer", new mitk::IntProperty(-10) );
 
 
-		// TODO: HP map must be provided by DSRFilereader, since it
+		// todo: HP map must be provided by DSRFilereader, since it
 		// may be dependend on data ( baseline shift)
 		mitk::LookupTableSource::Pointer LookupTableSource = new mitk::LookupTableSource();
 //		LookupTableSource->SetUseHPLookupTable();
@@ -625,7 +625,7 @@ void QmitkMainTemplate::init()
 
     //create the data tree
     tree=mitk::DataTree::New();
-    tree->Register(); //FIXME: da DataTreeIterator keinen Smartpointer auf DataTree hält, wird tree sonst gelöscht.
+    tree->Register(); //@FIXME: da DataTreeIterator keinen Smartpointer auf DataTree hält, wird tree sonst gelöscht.
     //create root of data tree (empty)
     //mitk::DataTreeNode::Pointer node=mitk::DataTreeNode::New();
     //tree->setRoot(node);     
@@ -712,7 +712,7 @@ void QmitkMainTemplate::initializeQfm()
     qfm->initialize(this);
 }
 
-// FIXME: probably obsolete
+// @FIXME: probably obsolete
 // mitk::DataTree* QmitkMainTemplate::getDataTree()
 // {
 //     return tree;

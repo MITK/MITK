@@ -14,7 +14,7 @@ void QmitkStdMultiWidget::updateMitkWidgets()
   mitkWidget1->GetRenderer()->GetRenderWindow()->updateGL(); 
   mitkWidget2->GetRenderer()->GetRenderWindow()->updateGL(); 
   mitkWidget3->GetRenderer()->GetRenderWindow()->updateGL(); 
-  mitkWidget4->GetRenderer()->GetRenderWindow()->updateGL(); 
+ // mitkWidget4->GetRenderer()->GetRenderWindow()->updateGL();
 }
 
 void QmitkStdMultiWidget::init()

@@ -138,7 +138,12 @@ public:
     return m_IndexToWorldTransform->TransformPoint(cornerpoint);
   }
 
-  Vector3D GetAxisVector(int direction) const
+  //##Documentation
+  //## @brief Get vector along bounding-box in the specified @a direction in mm
+  //##
+  //## The length of the vector is the size of the bounding-box in the 
+  //## specified @a direction in mm
+  Vector3D GetAxisVector(unsigned int direction) const
   {
     Vector3D frontToBack;
     frontToBack.Set_vnl_vector(m_IndexToWorldTransform->GetMatrix().GetVnlMatrix().get_column(direction));
@@ -147,11 +152,20 @@ public:
   }
 
   //##Documentation
+  //## @brief Get a VnlVector along bounding-box in the specified 
+  //## @a direction (length is spacing)
+  //##
+  VnlVector GetMatrixColumn(unsigned int direction) const
+  {
+    return m_IndexToWorldTransform->GetMatrix().GetVnlMatrix().get_column(direction);
+  }
+
+  //##Documentation
   //## @brief Get the extent of the bounding-box in the specified @a direction in mm
   //##
   ScalarType GetExtentInMM(int direction) const
   {
-    return m_IndexToWorldTransform->GetMatrix().GetVnlMatrix().get_column(direction).magnitude()*GetExtent(direction); //
+    return m_IndexToWorldTransform->GetMatrix().GetVnlMatrix().get_column(direction).magnitude()*GetExtent(direction);
   }
 
   //##Documentation

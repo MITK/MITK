@@ -57,6 +57,7 @@ mitk::Geometry2DDataVtkMapper3D::Geometry2DDataVtkMapper3D() : m_DataTreeIterato
 
   m_Actor = vtkActor::New();
   m_Actor->SetMapper(m_VtkPolyDataMapper);
+  m_Actor->GetProperty()->SetAmbient(0.5);
 
   m_Prop3D = m_Actor;
   m_Prop3D->Register(NULL);

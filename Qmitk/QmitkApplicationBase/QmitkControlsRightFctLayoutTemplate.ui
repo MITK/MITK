@@ -23,9 +23,17 @@
             <property name="name">
                 <cstring>MainSplitter</cstring>
             </property>
+            <property name="sizePolicy">
+                <sizepolicy>
+                    <hsizetype>5</hsizetype>
+                    <vsizetype>5</vsizetype>
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                </sizepolicy>
+            </property>
             <property name="minimumSize">
                 <size>
-                    <width>57</width>
+                    <width>5</width>
                     <height>50</height>
                 </size>
             </property>
@@ -38,8 +46,8 @@
                 </property>
                 <property name="sizePolicy">
                     <sizepolicy>
-                        <hsizetype>1</hsizetype>
-                        <vsizetype>1</vsizetype>
+                        <hsizetype>5</hsizetype>
+                        <vsizetype>5</vsizetype>
                         <horstretch>1</horstretch>
                         <verstretch>0</verstretch>
                     </sizepolicy>
@@ -57,8 +65,8 @@
                 </property>
                 <property name="sizePolicy">
                     <sizepolicy>
-                        <hsizetype>1</hsizetype>
-                        <vsizetype>1</vsizetype>
+                        <hsizetype>5</hsizetype>
+                        <vsizetype>5</vsizetype>
                         <horstretch>0</horstretch>
                         <verstretch>1</verstretch>
                     </sizepolicy>
@@ -84,7 +92,8 @@
     <include location="local" impldecl="in implementation">QmitkControlsRightFctLayoutTemplate.ui.h</include>
 </includes>
 <functions>
-    <function access="private" specifier="non virtual">init()</function>
+    <function access="protected">init()</function>
+    <function>setControlSizeHint( QSize * size )</function>
 </functions>
 <pixmapinproject/>
 <layoutdefaults spacing="6" margin="11"/>

@@ -23,6 +23,7 @@ class QmitkFctMediator : public QObject
 {
 	Q_OBJECT
 protected:
+    QWidget*      m_LayoutTemplate;
 	QWidgetStack* m_MainStack;
     QWidgetStack* m_ControlStack;
 	QButtonGroup* m_ButtonMenu;

@@ -33,6 +33,15 @@
 //#include <mitkImageToItk.h>
 //#include <itkThresholdImageFilter.h>
 
+#include <StateMachineFactory.h>
+#include <UndoController.h>
+#include <StateMachine.h>
+#include <EventMapper.h>
+#include <GlobalInteraction.h>
+#include <SeedRoi.h>
+#include <mitkInteractionConst.h>
+
+
 mitk::FloatProperty::Pointer opacityprop=NULL;
 
 void QmitkMainTemplate::fileNew()
@@ -416,7 +425,30 @@ void QmitkMainTemplate::helpAbout()
 void QmitkMainTemplate::init()
 {
     mitkMultiWidget=NULL;
+
+    //initialize interaction sub-system: undo-controller, statemachine-factory and global-interaction
+    //create undo-controller
     undoController = new mitk::UndoController;
+
+	//create statemachine-factory:
+	mitk::StateMachineFactory* stateMachineFactory = new mitk::StateMachineFactory();
+	bool smLoadOK = stateMachineFactory->LoadBehavior("../../Framework/SceneInteraction/PointStateMachine.xml");
+
+    //could the behavior file be found?
+    if(smLoadOK)
+    {
+      	//create eventmapper-factory:
+    	mitk::EventMapper* eventMapper = new mitk::EventMapper();
+    	//Load all possible Events from List
+    	bool eventLoadOK = eventMapper->LoadBehavior("../../Framework/SceneInteraction/PointStateMachine.xml");
+        //could the behavior file be found?
+        if(eventLoadOK)
+        {
+	        //set up the global StateMachine and register it to EventMapper
+	        mitk::GlobalInteraction* globalInteraction = new mitk::GlobalInteraction("global");
+        	mitk::EventMapper::SetGlobalStateMachine(globalInteraction);
+        }
+    }
 
     //this seems to be a bug of Qt3.1.1's designer: The object name of ToolBar is not initialized.
     ToolBar->setName("ToolBar");
@@ -495,7 +527,7 @@ void QmitkMainTemplate::initializeQfm()
     //create an QmitkButtonFctLayoutTemplate. This is an simple example for an layout of the different widgets, of which
     //a functionality and the management consists: the main widget, the control widget and a menu for selecting the
     //active functionality.
-    QmitkControlsRightFctLayoutTemplate* layoutTemplate=new QmitkControlsRightFctLayoutTemplate(MainWidget, "QmitkControlsLeftFctLayoutTemplate");
+    QmitkControlsRightFctLayoutTemplate* layoutTemplate=new QmitkControlsRightFctLayoutTemplate(MainWidget, "LayoutTemplate");
     hlayout->addWidget(layoutTemplate);
 
     //let the QmitkFctMediator know about the layout. This includes the toolbar and the layoutTemplate.

@@ -11,8 +11,15 @@
 #include <qaction.h>
 #include <qabstractlayout.h> 
 #include <qlayout.h>
+#include <qsplitter.h>
 
 #include <stdio.h>
+
+#include <qapplication.h>
+#include <QmitkControlsRightFctLayoutTemplate.h>
+
+const QSizePolicy ignored(QSizePolicy::Ignored, QSizePolicy::Ignored);
+const QSizePolicy preferred(QSizePolicy::Preferred, QSizePolicy::Preferred);
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -21,7 +28,7 @@
 QmitkFctMediator::QmitkFctMediator(QObject *parent, const char *name) : QObject(parent, name), 
     m_MainStack(NULL), m_ControlStack(NULL), m_ButtonMenu(NULL), m_ToolBar(NULL), m_DefaultMain(NULL), 
     m_FunctionalityActionGroup(NULL),
-    m_NumOfFuncs(0), m_CurrentFunctionality(0)
+    m_NumOfFuncs(0), m_CurrentFunctionality(0), m_LayoutTemplate(NULL)
 {
 
 }
@@ -39,6 +46,8 @@ void QmitkFctMediator::initialize(QWidget *aLayoutTemplate)
     if(aLayoutTemplate==NULL)
         return;
 
+    m_LayoutTemplate = static_cast<QWidget*>(aLayoutTemplate->child("LayoutTemplate", "QmitkControlsRightFctLayoutTemplate"));
+
     QWidget *w;
 
     if((w=static_cast<QWidget*>(aLayoutTemplate->child("MainParent", "QWidget")))!=NULL)
@@ -47,7 +56,7 @@ void QmitkFctMediator::initialize(QWidget *aLayoutTemplate)
         hlayout->setAutoAdd(true);
         m_MainStack = new QWidgetStack(w, "QmitkFctMediator::mainStack");
 
-        m_MainStack->setSizePolicy( QSizePolicy( QSizePolicy::Minimum, QSizePolicy::Minimum, 1, 0, m_MainStack->sizePolicy().hasHeightForWidth()) );
+        //m_MainStack->setSizePolicy( QSizePolicy( QSizePolicy::Minimum, QSizePolicy::Minimum, 1, 0, m_MainStack->sizePolicy().hasHeightForWidth()) );
 
         m_DefaultMain = new QWidget(m_MainStack,"QmitkFctMediator::m_DefaultMain");
         m_MainStack->addWidget(m_DefaultMain);
@@ -60,7 +69,7 @@ void QmitkFctMediator::initialize(QWidget *aLayoutTemplate)
 		QHBoxLayout* hlayout=new QHBoxLayout(w);
         hlayout->setAutoAdd(true);
         m_ControlStack = new QWidgetStack(w, "QmitkFctMediator::controlStack");
-        m_ControlStack->setSizePolicy( QSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum, 0, 1, m_ControlStack->sizePolicy().hasHeightForWidth()) );
+        //m_ControlStack->setSizePolicy( QSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum, 0, 1, m_ControlStack->sizePolicy().hasHeightForWidth()) );
     }
 
     if((w=static_cast<QWidget*>(aLayoutTemplate->child("ButtonMenuParent", "QButtonGroup")))!=NULL)
@@ -138,7 +147,10 @@ bool QmitkFctMediator::addFunctionality(QmitkFunctionality * functionality)
     {
         QWidget * mainWidget = functionality->createMainWidget(m_MainStack);
         if((mainWidget!=NULL) && (mainWidget!=m_DefaultMain))
+        {
+            mainWidget->setSizePolicy(ignored);
             m_MainStack->addWidget(mainWidget, m_NumOfFuncs+1);
+        }
         else
             m_MainStack->addWidget(new QWidget(m_MainStack, "QmitkFctMediator::dummyMain"), m_NumOfFuncs+1);
     }
@@ -146,7 +158,10 @@ bool QmitkFctMediator::addFunctionality(QmitkFunctionality * functionality)
     {
         QWidget * controlWidget = functionality->createControlWidget(m_ControlStack);
         if(controlWidget!=NULL)
+        {
+            controlWidget->setSizePolicy(ignored);
             m_ControlStack->addWidget(controlWidget, m_NumOfFuncs);
+        }
         else
             m_ControlStack->addWidget(new QWidget(m_ControlStack, "QmitkFctMediator::dummyControl"), m_NumOfFuncs);
     }
@@ -233,12 +248,38 @@ void QmitkFctMediator::raiseFunctionality(int id)
 	    ((QButtonGroup*)m_ToolBar)->setButton(id);
 
 	selecting(id);
-	m_ControlStack->raiseWidget(id);
-    if(strcmp(m_MainStack->widget(id+1)->name(),"QmitkFctMediator::dummyMain")!=0)
-	    m_MainStack->raiseWidget(id+1);
-    else
-        m_MainStack->raiseWidget(0);
-	functionalitySelected(id+1);
+    QWidget *oldVisibleWidget, *newVisibleWidget;
+QSize osize, nsize;
+
+    oldVisibleWidget = m_ControlStack->visibleWidget();
+    newVisibleWidget = m_ControlStack->widget(id);
+    if((oldVisibleWidget!=NULL) && (oldVisibleWidget!=newVisibleWidget))
+    {
+        osize=oldVisibleWidget->minimumSizeHint();
+        oldVisibleWidget->setSizePolicy(ignored);
+        newVisibleWidget->setSizePolicy(preferred);
+    }
+    m_ControlStack->raiseWidget(newVisibleWidget);
+
+m_LayoutTemplate->layout()->activate();
+nsize=newVisibleWidget->minimumSizeHint();
+
+    oldVisibleWidget = m_MainStack->visibleWidget();
+    newVisibleWidget = m_MainStack->widget(id+1);
+    if(strcmp(newVisibleWidget->name(),"QmitkFctMediator::dummyMain")==0)
+	    newVisibleWidget = m_MainStack->widget(0);
+    if((oldVisibleWidget!=NULL) && (oldVisibleWidget!=newVisibleWidget))
+    {
+        oldVisibleWidget->setSizePolicy(ignored);
+        newVisibleWidget->setSizePolicy(preferred);
+    }
+    m_MainStack->raiseWidget(newVisibleWidget);
+
+    if(m_LayoutTemplate!=NULL)
+        ((QmitkControlsRightFctLayoutTemplate*)m_LayoutTemplate)->setControlSizeHint(&nsize);
+//    QApplication::sendPostedEvents(0, QEvent::LayoutHint);
+
+    functionalitySelected(id+1);
 }
 
 void QmitkFctMediator::raiseFunctionality(QAction* action)

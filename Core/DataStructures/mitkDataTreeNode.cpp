@@ -220,7 +220,7 @@ bool mitk::DataTreeNode::GetName(char &nodeName, mitk::BaseRenderer* renderer, c
         nameProp = new mitk::StringProperty("Unnamed");
         GetPropertyList(renderer)->SetProperty(name,nameProp);
     }
-    nodeName = (char)nameProp->GetString();
+    memcpy(&nodeName, nameProp->GetString(), strlen(nameProp->GetString()) + 1 );
     return true;
 }
 

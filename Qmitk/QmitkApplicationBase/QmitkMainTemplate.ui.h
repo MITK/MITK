@@ -10,7 +10,6 @@
 #include "mitkGeometry2DDataVtkMapper3D.h"
 #include "QmitkSelectableGLWidget.h"
 #include "QLevelWindowWidget.h"
-#include "MyvtkAblationMesh.h"
 #include <vtkSTLReader.h>
 #include <vtkSTLWriter.h>
 #include <vtkPolyDataReader.h>
@@ -47,6 +46,7 @@
 #ifdef MITK_INTERNAL
 #include <mitkDSRFileReader.h>
 #include <mitkCylindricToCartesianFilter.h>
+#include "MyvtkAblationMesh.h"
 #endif
 
 #include <mitkInteractionConst.h>

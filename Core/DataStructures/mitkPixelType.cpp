@@ -93,15 +93,15 @@ void mitk::PixelType::Initialize(const std::type_info& aTypeId)
   }
   else if ( *m_TypeId == typeid(itk::RGBPixel<unsigned char>) )
   {
-    //		itkExceptionMacro("Pixel type currently not supported.");
+    itkExceptionMacro("Pixel type currently not supported.");
   }
   else if ( *m_TypeId == typeid(itk::RGBAPixel<unsigned char>) )
   {
-    //		itkExceptionMacro("Pixel type currently not supported.");
+    itkExceptionMacro("Pixel type currently not supported.");
   }
   else
   {
-    //		itkExceptionMacro("Pixel type currently not supported.");
+    itkExceptionMacro("Pixel type currently not supported.");
   }
 }
 
@@ -122,7 +122,7 @@ void mitk::PixelType::Initialize(ipPicType_t type, int bpe)
     case 32: 		m_TypeId=&typeid(int); break;
     case 64: 		m_TypeId=&typeid(long); break;
     default:		m_TypeId=NULL;
-      //										itkExceptionMacro("Pixel type currently not supported.");
+      					itkExceptionMacro("Pixel type currently not supported.");
                       }
                       break;
     case ipPicUInt:    switch(bpe)
@@ -132,7 +132,7 @@ void mitk::PixelType::Initialize(ipPicType_t type, int bpe)
     case 32: 		m_TypeId=&typeid(unsigned int); break;
     case 64: 		m_TypeId=&typeid(unsigned long); break;
     default:		m_TypeId=NULL;
-      //										itkExceptionMacro("Pixel type currently not supported.");
+        				itkExceptionMacro("Pixel type currently not supported.");
                       }
                       break;
     case ipPicFloat:   switch(bpe)
@@ -140,13 +140,13 @@ void mitk::PixelType::Initialize(ipPicType_t type, int bpe)
     case 32: 		m_TypeId=&typeid(float); break;
     case 64: 		m_TypeId=&typeid(double); break;
     default:		m_TypeId=NULL;
-      //										itkExceptionMacro("Pixel type currently not supported.");
+      					itkExceptionMacro("Pixel type currently not supported.");
                       }
                       break;
     case ipPicNonUniform: m_TypeId=&typeid(void*); break;
     case ipPicTSV:     m_TypeId=&typeid(void*); break;
     default:		m_TypeId=NULL;
-      //					itkExceptionMacro("Pixel type currently not supported.");
+      				itkExceptionMacro("Pixel type currently not supported.");
       break;
   }
 }

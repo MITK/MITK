@@ -16,8 +16,37 @@ Static declarations are also forbidden and result into an exception, because the
 when the scope of the variable is left while the reference count is still greater than zero. 
 \li Note that using smart pointers requires using real pointers when setting input, but returning 
 smart pointers on output (taken from <a href="http://www.itk.org/Doxygen12/html/itkMacro_8h.html">itkMacro.h</a>.).
+\li testing a SmartPointer against NULL is done with the IsNull() and IsNotNull() methods. A simple ==NULL issues a warning.
+
 \li Set- and Get-methods can be created with the macros @a itkSetObjectMacro(name,type) and 
 @a itkGetObjectMacro(name,type), respectively, if the @a type is derived from @a itk::LightObject or
 @a itk::Object. There are also macros for other types, e.g., strings, see 
 <a href="http://www.itk.org/Doxygen12/html/itkMacro_8h.html">itkMacro.h</a>.
+\li when using inner classes of a parent class which is templated, you have
+to use the typename keyword for gcc 3.x and standard compliance:
+@code
+class LinkedTree : public Tree<T> {
+
+public:
+    typedef typename LinkedTree<T>::TreeChangeListener TreeChangeListener;
+    [...]
+}    
+@endcode
+
+@code TreeChangeListener @endcode is an inner class of @code Tree @endcode .
+
+Another example:
+@code
+typename std::vector<TreeChangeListener*>::iterator pos = treeChangeListenerList.begin();
+@endcode
+@code iterator @endcode is an inner class of @code vector @endcode .
+
+
+
+
+
+
+
+
+
 */

@@ -206,11 +206,11 @@ bool mitk::PolygonInteractor::ExecuteSideEffect(int sideEffectId, mitk::StateEve
 //  }
 //  break;
   case SeMODESELECT:
-    m_Mode = SMMode::SELECTED;
+    m_Mode = SMSELECTED;
     ok = true;
     break;
   case SeMODEDESELECT:
-    m_Mode = SMMode::DESELECTED;
+    m_Mode = SMDESELECTED;
     ok = true;
     break;
   default:

@@ -147,15 +147,14 @@ bool mitk::LineInteractor::ExecuteSideEffect(int sideEffectId, mitk::StateEvent 
   }
   break;
   case SeMODESELECT:
-    m_Mode = SMMode::SELECTED;
+    m_Mode = SMSELECTED;
     ok = true;
     break;
   case SeMODEDESELECT:
-    m_Mode = SMMode::DESELECTED;
+    m_Mode = SMDESELECTED;
     ok = true;
     break;
   default:
-    m_Mode = SMMode::DESELECTED;
     (StatusBar::GetInstance())->DisplayText("Message from mitkLineInteractor: I do not understand the SideEffect!", 10000);
     return false;
     //a false here causes the statemachine to undo its last statechange.

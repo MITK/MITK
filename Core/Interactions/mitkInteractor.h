@@ -33,9 +33,9 @@ public:
   //## See class documentation for further details
   typedef enum SMMode
   {
-    DESELECTED = 0,
-    SELECTED = 1,
-    SUBSELECTED = 2
+    SMDESELECTED = 0,
+    SMSELECTED,
+    SMSUBSELECTED
   };
 
   mitkClassMacro(Interactor,StateMachine);

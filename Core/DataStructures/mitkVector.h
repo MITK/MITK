@@ -38,26 +38,26 @@ extern const ScalarType epsSquared;
 template <class Tout>
   inline void FillVector3D(Tout& out, ScalarType x, ScalarType y, ScalarType z)
 {
-  out[0] = (Tout) x;
-  out[1] = (Tout) y;
-  out[2] = (Tout) z;
+  out[0] = x;
+  out[1] = y;
+  out[2] = z;
 }
 
 
 template <class Tin, class Tout>
   inline void itk2vtk(const Tin& in, Tout& out)
 {
-  out[0]=(Tout) in[0];
-  out[1]=(Tout) in[1];
-  out[2]=(Tout) in[2];
+  out[0]=in[0];
+  out[1]=in[1];
+  out[2]=in[2];
 }
 
 template <class Tin, class Tout>
   inline void vtk2itk(const Tin& in, Tout& out)
 {
-  out[0]=(Tout) in[0];
-  out[1]=(Tout) in[1];
-  out[2]=(Tout) in[2];
+  out[0]=in[0];
+  out[1]=in[1];
+  out[2]=in[2];
 }
 
 template <class Tin, class Tout>

@@ -98,9 +98,18 @@ void mitk::SliceNavigationController::Update()
       if(worldTimeSlicedGeometry==NULL)
       {
         m_CreatedWorldGeometry->Initialize(1);
+        m_BlockUpdate = true;
+        m_Time->SetSteps(0);
+        m_Time->SetPos(0);
+        m_BlockUpdate = false;
       }
       else
       {
+        m_BlockUpdate = true;
+        m_Time->SetSteps(worldTimeSlicedGeometry->GetTimeSteps());
+        m_Time->SetPos(0);
+        m_BlockUpdate = false;
+
         m_CreatedWorldGeometry->Initialize(worldTimeSlicedGeometry->GetTimeSteps());
         //@todo implement for non-evenly-timed geometry!
         m_CreatedWorldGeometry->SetEvenlyTimed();

@@ -7,7 +7,7 @@
 #include <qaction.h>
 #include <qslider.h>
 
-#include "example.xpm"
+#include "slicer.xpm"
 
 #include "PlaneGeometry.h"
 #include <mitkSurfaceData.h>
@@ -86,7 +86,7 @@ void QmitkSimpleExampleFunctionality::createConnections()
 QAction * QmitkSimpleExampleFunctionality::createAction(QActionGroup *parent)
 {
     QAction* action;
-    action = new QAction( tr( "Left" ), QPixmap((const char**)example_xpm), tr( "&Left" ), CTRL + Key_L, parent, "simple example" );
+    action = new QAction( tr( "Left" ), QPixmap((const char**)slicer_xpm), tr( "&Left" ), CTRL + Key_L, parent, "simple example" );
     //    action = new QAction( tr( "Left" ), QPixmap(textleft_xpm), tr( "&Left" ), CTRL + Key_L, parent, "simple example" );
     return action;
 }

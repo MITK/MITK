@@ -4,6 +4,8 @@
 #include "mitkVector.h"
 #include <vnl/vnl_vector.h>
 #include <vnl/vnl_cross.h>
+#include <itkTransform.h>
+#include <itkMatrix.h>
 
 namespace mitk {
 
@@ -91,7 +93,8 @@ public:
   void SetPoints( const itk::Point<TCoordRep,NPointDimension>& point1, const itk::Point<TCoordRep,NPointDimension>& point2 ) {
 
     this->m_Point = point1;
-    this->m_Direction.sub( point2, point1 );
+    //this->m_Direction.sub( point2, point1 );
+    m_Direction = point2 - point1;
   }
 
   //##Documentation
@@ -160,7 +163,7 @@ public:
 
   //##Documentation
   //## @brief Project a point on the line
-  itk::Vector<TCoordRep,NPointDimension> Project( const itk::Point<TCoordRep,NPointDimension>& point ) const
+  itk::Point<TCoordRep,NPointDimension> Project( const itk::Point<TCoordRep,NPointDimension>& point ) const
   {
     if(m_Direction.GetNorm()==0) 
       return this->m_Point;
@@ -168,10 +171,12 @@ public:
     itk::Vector<TCoordRep,NPointDimension> diff;
     diff = point-this->m_Point;
 
-    itk::Vector<TCoordRep,NPointDimension> normalizedDirection=m_Direction; 
+    itk::Vector<TCoordRep,NPointDimension> normalizedDirection = m_Direction; 
     normalizedDirection.Normalize();
 
-    return this->m_Point+(diff*normalizedDirection)*normalizedDirection;
+    normalizedDirection *= dot_product(diff.Get_vnl_vector(), normalizedDirection.Get_vnl_vector());
+
+    return this->m_Point + normalizedDirection;
   }
 
   //##Documentation

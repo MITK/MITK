@@ -219,7 +219,7 @@ void mitk::PolygonToRingFilter::BuildVtkTube(vtkPoints *vPoints, vtkCellArray *p
   double max=0; int idmax=0; Vector3D sl0=*(sl->begin());
   for(i=0;i<m_RingResolution;++i)
   {
-    s=sfirst.at(i);
+    s=sfirst[i];
     double tmp=s*sl0;
     if(tmp>max)
     {

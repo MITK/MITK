@@ -139,12 +139,32 @@ void mitk::BoundingObjectGroup::UpdateOutputInformation()
   bounds[3] = globalMaxPoint[1] - centerPoint[1]; // y Max
   bounds[4] = globalMinPoint[2] - centerPoint[2]; // z Min
   bounds[5] = globalMaxPoint[2] - centerPoint[2]; // z Max
-  m_Geometry3D->SetBounds(bounds);
 
-  /* the objects position is the center of all sub bounding objects */
-  m_Geometry3D->GetVtkTransform()->Identity();
-  m_Geometry3D->GetVtkTransform()->Translate(centerPoint[0], centerPoint[1], centerPoint[2]);
-  m_Geometry3D->TransferVtkToITKTransform();  
+  mitk::TimeSlicedGeometry::Pointer timeGeometry = const_cast< mitk::TimeSlicedGeometry *>(this->GetTimeSlicedGeometry());
+  mitk::Geometry3D::Pointer geometry3d = timeGeometry->GetGeometry3D(0);
+  unsigned int timesteps = timeGeometry->GetTimeSteps();
+  if(geometry3d.IsNull())
+  {
+    assert(timesteps==0);
+    timeGeometry->SetBounds(bounds);
+
+    /* the objects position is the center of all sub bounding objects */
+    timeGeometry->GetVtkTransform()->Identity();
+    timeGeometry->GetVtkTransform()->Translate(centerPoint[0], centerPoint[1], centerPoint[2]);
+    timeGeometry->TransferVtkToITKTransform();
+  }
+  else
+  {
+    assert(timesteps>0);
+    geometry3d->SetBounds(bounds);
+
+    /* the objects position is the center of all sub bounding objects */
+    geometry3d->GetVtkTransform()->Identity();
+    geometry3d->GetVtkTransform()->Translate(centerPoint[0], centerPoint[1], centerPoint[2]);
+    geometry3d->TransferVtkToITKTransform();
+
+    timeGeometry->InitializeEvenlyTimed(geometry3d, timesteps);
+  }
 }
 
 void mitk::BoundingObjectGroup::AddBoundingObject(mitk::BoundingObject::Pointer boundingObject)

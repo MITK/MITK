@@ -49,40 +49,6 @@ mitk::ImageDataItem::~ImageDataItem()
   }
 }
 
-//#define ALLOCATE_ITK_IMAGE(type, typeId, dimension, dimensions) \
-//	if ( typeId == typeid(type) )                               \
-//	{                                                           \
-//		m_itkImageObject=itk::Image<type, dimension>::New();    \
-//	}                                                           
-//
-//#define ALLOCATE_ALL_ITK_IMAGES(typeId, dimension, dimensions)                            \
-//{                                                                                         \
-//	ALLOCATE_ITK_IMAGE(double, typeId, dimension, dimensions) else                        \
-//	ALLOCATE_ITK_IMAGE(float, typeId, dimension, dimensions) else                         \
-//	ALLOCATE_ITK_IMAGE(long, typeId, dimension, dimensions) else                          \
-//	ALLOCATE_ITK_IMAGE(unsigned long, typeId, dimension, dimensions) else                 \
-//	ALLOCATE_ITK_IMAGE(int, typeId, dimension, dimensions) else                           \
-//	ALLOCATE_ITK_IMAGE(unsigned int, typeId, dimension, dimensions) else                  \
-//	ALLOCATE_ITK_IMAGE(short, typeId, dimension, dimensions) else                         \
-//	ALLOCATE_ITK_IMAGE(unsigned short, typeId, dimension, dimensions) else                \
-//	ALLOCATE_ITK_IMAGE(char, typeId, dimension, dimensions) else                          \
-//	ALLOCATE_ITK_IMAGE(unsigned char, typeId, dimension, dimensions) else                 \
-//	if ( typeId == typeid(itk::RGBPixel<unsigned char>) )                                 \
-//	{                                                                                     \
-//		itkExceptionMacro("Pixel type currently not supported.");                         \
-//	}                                                                                     \
-//	else                                                                                  \
-//	if ( typeId == typeid(itk::RGBAPixel<unsigned char>) )                                \
-//	{                                                                                     \
-//		itkExceptionMacro("Pixel type currently not supported.");                         \
-//	}                                                                                     \
-//	else                                                                                  \
-//	{                                                                                     \
-//		itkExceptionMacro("Pixel type currently not supported.");                         \
-//	}                                                                                     \
-//}                                                                                         \
-////	ALLOCATE_ITK_IMAGE(itk::RGBPixel<unsigned char>, typeId, dimension, dimensions) else                          \
-////	ALLOCATE_ITK_IMAGE(itk::RGBAPixel<unsigned char>, typeId, dimension, dimensions) else                          \
 
 //##ModelId=3E159C240213
 mitk::ImageDataItem::ImageDataItem(const mitk::PixelType& type, unsigned int dimension, unsigned int *dimensions) : 
@@ -96,26 +62,6 @@ m_Parent(NULL), m_Data(NULL), m_VtkImageData(NULL), m_PicDescriptor(NULL), m_IsC
   memcpy(m_PicDescriptor->n, dimensions, sizeof(unsigned int)*(dimension<=8?dimension:8));
   m_PicDescriptor->data=m_Data=new unsigned char[_ipPicSize(m_PicDescriptor)];
   
-  //if(dimension==2)
-  //	ALLOCATE_ALL_ITK_IMAGES(typeId, 2, dimensions)
-  //else
-  //if(dimension==3)
-  //	ALLOCATE_ALL_ITK_IMAGES(typeId, 3, dimensions)
-  //else
-  //if(dimension==4)
-  //	ALLOCATE_ALL_ITK_IMAGES(typeId, 4, dimensions)
-  ////else
-  ////if(dimension==5)
-  ////	ALLOCATE_ALL_ITK_IMAGES(typeId, 5, dimensions)
-  ////else
-  ////if(dimension==6)
-  ////	ALLOCATE_ALL_ITK_IMAGES(typeId, 6, dimensions)
-  ////else
-  ////if(dimension==7)
-  ////	ALLOCATE_ALL_ITK_IMAGES(typeId, 7, dimensions)
-  ////else
-  ////if(dimension==8)
-  ////	ALLOCATE_ALL_ITK_IMAGES(typeId, 8, dimensions)
 }
 
 //##ModelId=3E33F08A03B8
@@ -227,9 +173,6 @@ void mitk::ImageDataItem::ConstructVtkImageData() const
   m_VtkImageData->GetPointData()->SetScalars(scalars);
 
   scalars->Delete();
-
-  //    m_VtkImageData=Pic2vtk::convert(m_PicDescriptor);
-  //m_VtkImageData->GetPointData()->GetScalars()->SetVoidArray(m_PicDescriptor->data, _ipPicElements(m_PicDescriptor), 1);
 }
 
 //##ModelId=3E70F51001F2

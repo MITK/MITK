@@ -6,6 +6,8 @@
 #include <fstream>
 int mitkImageSliceSelectorTest(int argc, char* argv[])
 {
+  int slice_nr = 1;
+
 	//Read pic-Image from file
 	mitk::PicFileReader::Pointer reader = mitk::PicFileReader::New();
 	  reader->SetFileName(argv[1]);
@@ -13,7 +15,7 @@ int mitkImageSliceSelectorTest(int argc, char* argv[])
   //Take a slice
 	mitk::ImageSliceSelector::Pointer slice = mitk::ImageSliceSelector::New();
 	  slice->SetInput(reader->GetOutput());
-	  slice->SetSliceNr(1);
+	  slice->SetSliceNr(slice_nr);
 	  slice->Update();
 
   std::cout << "Testing IsInitialized(): ";
@@ -31,6 +33,23 @@ int mitkImageSliceSelectorTest(int argc, char* argv[])
     return EXIT_FAILURE;
   }
   std::cout<<"[PASSED]"<<std::endl;
+
+  std::cout << "Testing whether the slice is identical with a slice loaded by ipPicGetSlice:";
+  ipPicDescriptor *picslice = ipPicGetSlice(argv[1], NULL, (reader->GetOutput()->GetDimension(2)-1-slice_nr)+1);
+  int i, size = _ipPicSize(picslice);
+  char * p1 = (char*)slice->GetPic()->data;
+  char * p2 = (char*)picslice->data;
+
+  for(i=0; i<size; ++i, ++p1, ++p2)
+  {
+    if((*p1) != (*p2))
+    {
+      std::cout<<"[FAILED]"<<std::endl;
+      return EXIT_FAILURE;
+    }
+  }
+  std::cout<<"[PASSED]"<<std::endl;
+  ipPicFree(picslice);
 
   try
   {

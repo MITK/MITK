@@ -140,31 +140,30 @@ float mitk::Interactor::CalculateJurisdiction(StateEvent const* stateEvent) cons
     }
     else//3D information from a 2D window.
     {
-      mitk::Point3D const point = posEvent->GetWorldPosition();
-      mitk::BoundingBox::PointType itkPoint;
+      mitk::Point3D worldPoint = posEvent->GetWorldPosition();
       float p[3];
-      itk2vtk(point, p);
+      itk2vtk(worldPoint, p);
       //transforming the Worldposition to local coordinatesystem
       m_DataTreeNode->GetData()->GetGeometry()->GetVtkTransform()->GetInverse()->TransformPoint(p, p);
-      vtk2itk(p, itkPoint);
+      vtk2itk(p, worldPoint);
 
       //check if the given position lies inside the data-object
-      if (bBox->IsInside(itkPoint))
+      if (bBox->IsInside(worldPoint))
       {
         //how near inside the center?
         mitk::BoundingBox::PointType center = bBox->GetCenter();
         //distance between center and point 
-        returnvalue = 1 - itkPoint.SquaredEuclideanDistanceTo(center);
-        //now in rage of 0.5 to 1 compared to size of boundingbox;
+        returnvalue = 1 - worldPoint.SquaredEuclideanDistanceTo(center);
+        //now compared to size of boundingbox;
         returnvalue = returnvalue/( (bBox->GetMaximum() - bBox->GetMinimum()).GetNorm() / 2);
         
-        //map between 0.5 and 1
+        //now map between 0.5 and 1
         returnvalue = 0.5 + (returnvalue / 2);
       }
       else
       {
         //calculate the distance between the point and the BoundingBox
-        //and set it in range between 0 and 0.5
+        //and set it in range between 0 and 0.5 //TODO
         returnvalue = 0;
       }
     }

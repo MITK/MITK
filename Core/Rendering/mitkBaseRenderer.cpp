@@ -10,7 +10,11 @@ void mitk::BaseRenderer::SetData(mitk::DataTreeIterator* iterator)
     if(m_DataTreeIterator != iterator)
     {
         delete m_DataTreeIterator;
-        m_DataTreeIterator = iterator->clone();
+				m_DataTreeIterator = NULL;
+			
+				if (iterator != NULL) {
+					m_DataTreeIterator = iterator->clone();
+				}
         Modified();
     }
 }

@@ -564,7 +564,7 @@
 		</state>
 		<state NAME="picked guard Translate" ID="12">
 			<transition NAME="yes" NEXT_STATE_ID="2" EVENT_ID="204"> <!-- StYES -->
-				<action ID="1006" />
+				<action ID="1101" /><!--AcMODESELECT-->
 				<action ID="1000" />
 			</transition>
 			<transition NAME="no" NEXT_STATE_ID="0" EVENT_ID="203"> <!-- StNO -->
@@ -573,7 +573,7 @@
 		</state>
 		<state NAME="picked guard Scale" ID="13">
 			<transition NAME="yes" NEXT_STATE_ID="3" EVENT_ID="204"> <!-- StYES -->
-				<action ID="1006" />
+				<action ID="1101" /><!--AcMODESELECT-->
 				<action ID="1002" />
 			</transition>
 			<transition NAME="no" NEXT_STATE_ID="0" EVENT_ID="203"> <!-- StNO -->
@@ -582,7 +582,7 @@
 		</state>
 		<state NAME="picked guard Rotate" ID="14">
 			<transition NAME="yes" NEXT_STATE_ID="4" EVENT_ID="204"> <!-- StYES -->
-				<action ID="1006" />
+				<action ID="1101" /><!--AcMODESELECT-->
 				<action ID="1004" />
 			</transition>
 			<transition NAME="no" NEXT_STATE_ID="0" EVENT_ID="203"> <!-- StNO -->
@@ -594,12 +594,10 @@
 				<action ID="1001" />
 			</transition>
 			<transition NAME="leftButtonRelease" NEXT_STATE_ID="0" EVENT_ID="505"> <!-- LBM_Release ==> SeTRANSLATE  -->
-				<!--<action ID="1001" />-->
-				<action ID="1007" />
+				<action ID="1100" /><!--AcMODEDESELECT-->
 			</transition>
 			<transition NAME="leftButtonRelease" NEXT_STATE_ID="0" EVENT_ID="537"> <!-- CTRL+LBM_Release ==> SeTRANSLATE  -->
-				<!--<action ID="1001" />-->
-				<action ID="1007" />
+				<action ID="1100" /><!--AcMODEDESELECT-->
 			</transition>
 		</state>
 		<state NAME="rotating" ID="4">
@@ -607,12 +605,10 @@
 				<action ID="1005" />
 			</transition>
 			<transition NAME="middleButtonRelease" NEXT_STATE_ID="0" EVENT_ID="506"> <!-- MBM_Release ==> SeROTATE  -->
-				<!--<action ID="1005" />-->
-				<action ID="1007" />
+				<action ID="1100" /><!--AcMODEDESELECT-->
 			</transition>
 			<transition NAME="middleButtonRelease" NEXT_STATE_ID="0" EVENT_ID="539"> <!-- CTRL+MBM_Release ==> SeROTATE  -->
-				<!--<action ID="1005" />-->
-				<action ID="1007" />
+				<action ID="1100" /><!--AcMODEDESELECT-->
 			</transition>
 		</state>
 		<state NAME="scaling" ID="3">
@@ -620,12 +616,10 @@
 				<action ID="1003" />
 			</transition>
 			<transition NAME="rightButtonRelease" NEXT_STATE_ID="0" EVENT_ID="507"> <!-- RBM_Release ==> SeSCALE  -->
-				<!--<action ID="1003" />-->
-				<action ID="1007" />
+				<action ID="1100" /><!--AcMODEDESELECT-->
 			</transition>
 			<transition NAME="rightButtonRelease" NEXT_STATE_ID="0" EVENT_ID="538"> <!-- CTRL+RBM_Release ==> SeSCALE  -->
-				<!--<action ID="1003" />-->
-				<action ID="1007" />
+				<action ID="1100" /><!--AcMODEDESELECT-->
 			</transition>
 		</state>
 	</stateMachine>

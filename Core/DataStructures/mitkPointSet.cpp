@@ -35,15 +35,8 @@ mitk::PointSet::DataType::Pointer mitk::PointSet::GetPointSet() const
 //##@brief searches a point in the list with a given precision
 int mitk::PointSet::SearchPoint(Point3D point, float distance )
 {
-//in is the given point to search
 //out is the point which is checked to be the searched point
-//pout is a pointer on out to work with itkPointSet
-  PointType in, out;
-
-  //converting point:
-  in[0] = point[0];
-  in[1] = point[1];
-  in[2] = point[2];
+  PointType out;
   out.Fill(0);
 
   //searching the first point in the Set, that is +- distance far away from the given point
@@ -52,16 +45,16 @@ int mitk::PointSet::SearchPoint(Point3D point, float distance )
   end = m_ItkData->GetPoints()->End();
  	for (it = m_ItkData->GetPoints()->Begin(), i=0; it != end; it++, i++)
 	{
-    bool ok = m_ItkData->GetPoints()->GetElementIfIndexExists(it->Index(), &out);//could be optimized
+    bool ok = m_ItkData->GetPoints()->GetElementIfIndexExists(it->Index(), &out);
     if (!ok)
       return -1;
-    else if (in == out)//if totaly equal
+    else if (point == out)//if totaly equal
       return it->Index();
 
     //distance calculation
-		if ( ( in[0] >= ( out[0] - distance ) ) && ( in[0] <= ( out[0] + distance ) ) &&
-			 ( in[1] >= ( out[1] - distance ) ) && ( in[1] <= ( out[1] + distance ) ) &&
-			 ( in[2] >= ( out[2] - distance ) ) && ( in[2] <= ( out[2] + distance ) ) )
+		if ( ( point[0] >= ( out[0] - distance ) ) && ( point[0] <= ( out[0] + distance ) ) &&
+			 ( point[1] >= ( out[1] - distance ) ) && ( point[1] <= ( out[1] + distance ) ) &&
+			 ( point[2] >= ( out[2] - distance ) ) && ( point[2] <= ( out[2] + distance ) ) )
       return it->Index();
 	}
 	return -1;

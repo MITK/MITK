@@ -476,7 +476,7 @@ bool mitk::EventMapper::MapEvent(Event* event)
   bool ok;
 
   #ifdef INTERDEBUG
-  std::cout<<"thrown event-type: "<<event->GetType()<<std::endl;
+  std::cout<<"thrown event-type: "<<m_StateEvent.GetId()<<std::endl;
   mitk::InteractionDebugger::Set("EventMapper", "Thrown event-type: ");
   #endif
 

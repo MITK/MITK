@@ -167,6 +167,11 @@ void mitk::PointSet::ExecuteOperation(Operation* operation)
       m_PointSet->SetPointData(idoffset, false);
 		}
 		break;
+  case OpDELETE://!!!!####shall not be used anymore! Use remove(index) instead to know the position for undo-operation####!!!!
+		{
+      m_PointSet->GetPoints()->DeleteIndex(m_PointSet->GetNumberOfPoints()-1);
+		}
+		break;
 	case OpINSERT://inserts the point at the given position 
 		{
       int position = pointOp->GetIndex();
@@ -182,24 +187,15 @@ void mitk::PointSet::ExecuteOperation(Operation* operation)
 		}
 		break;
 	case OpMOVE://moves the point given by index
-		{//check if working!
+		{
       unsigned int index = pointOp->GetIndex();
       PointsContainer::Pointer itkPoints = m_PointSet->GetPoints();
-			if (index < m_PointSet->GetNumberOfPoints() )//checking, cause .at is not supported by older compilers
+			if (index < m_PointSet->GetNumberOfPoints() )
 			{
         PointType pt;
         pt.CastFrom(pointOp->GetPoint());
         m_PointSet->SetPoint(index, pt);
 			}
-		}
-		break;
-	case OpDELETE://!!!!####shall not be used anymore! Use remove(index) instead to know the position for undo-operation####!!!!
-		{
-   //   PointsContainer::Pointer position = m_PointSet->GetPoints();
-   //   position->DeleteIndex(position->size()-1);
-			//m_SelectList.pop_back();
-
-      m_PointSet->GetPoints()->DeleteIndex(m_PointSet->GetNumberOfPoints()-1);
 		}
 		break;
 	case OpREMOVE://removes the point at given by position 

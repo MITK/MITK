@@ -86,7 +86,7 @@ ipPicDescriptor *ipFuncLabel ( ipPicDescriptor *pic_old,
 
 /* definition of macros                                                */
 
-#define LABEL1( type, pic_old, pic_new, no_label )                      \
+#define LABEL1( type, pic_old, pic_new, no_label, type_new )            \
 {                                                                       \
   ipUInt4_t       i, j;        /* loop index                         */ \
   ipUInt4_t       offset;      /* offset of actual pixel             */ \
@@ -104,14 +104,14 @@ ipPicDescriptor *ipFuncLabel ( ipPicDescriptor *pic_old,
          if ( (( type * )pic_old->data )[offset]  )                     \
             {                                                           \
               if ( in_lab )                                             \
-                (( ipInt2_t * )pic_new->data )[offset] =                \
-                                              (ipInt2_t) no_label;      \
+                (( type_new * )pic_new->data )[offset] =                \
+                                              (type_new) no_label;      \
               else                                                      \
                 {                                                       \
                    in_lab = ipTrue;                                     \
                    no_label++;                                          \
-                   (( ipInt2_t * )pic_new->data )[offset] =             \
-                                                 (ipInt2_t) no_label;   \
+                   (( type_new * )pic_new->data )[offset] =             \
+                                                 (type_new) no_label;   \
                 }                                                       \
             }                                                           \
          else in_lab = ipFalse;                                         \
@@ -240,21 +240,34 @@ ipPicDescriptor *ipFuncLabel ( ipPicDescriptor *pic_old,
   pic_new->data = calloc ( _ipPicElements ( pic_new ), pic_new->bpe / 8 );
   if ( pic_new == NULL )
     {
-        free ( hist );
         _ipFuncSetErrno ( ipFuncPICNEW_ERROR );
         return ( ipFuncERROR );
     }
 
   /* preparation of image                                              */
 
-  ipPicFORALL_2 ( LABEL1, pic_old, pic_new, no_label );
+  ipPicFORALL_3 ( LABEL1, pic_old, pic_new, no_label, ipInt2_t );
+
+  if(no_label>SHRT_MAX)
+  {
+	  ipPicFree(pic_new);
+	  pic_new = ipPicCopyHeader ( pic_old, NULL );
+	  pic_new->type = ipPicUInt;
+	  pic_new->bpe  = 32;
+	  pic_new->data = calloc ( _ipPicElements ( pic_new ), pic_new->bpe / 8 );
+	  if ( pic_new == NULL )
+		{
+			_ipFuncSetErrno ( ipFuncPICNEW_ERROR );
+			return ( ipFuncERROR );
+		}
+	  ipPicFORALL_3 ( LABEL1, pic_old, pic_new, no_label, ipUInt4_t );
+  }
 
   /* allocation and initialisation of vectors                          */
  
   a      = malloc ( ( no_label + 1 ) * sizeof ( ipUInt4_t ) );
   if ( a == NULL ) 
     {
-        free ( hist );
         ipPicFree ( pic_new );
         _ipFuncSetErrno ( ipFuncPICNEW_ERROR );
         return ( ipFuncERROR );
@@ -262,7 +275,6 @@ ipPicDescriptor *ipFuncLabel ( ipPicDescriptor *pic_old,
   a_new  = malloc ( ( no_label + 1 ) * sizeof ( ipUInt4_t ) );
   if ( a_new == NULL )
     {
-        free ( hist );
         free ( a );
         ipPicFree ( pic_new );
         _ipFuncSetErrno ( ipFuncPICNEW_ERROR );
@@ -273,7 +285,6 @@ ipPicDescriptor *ipFuncLabel ( ipPicDescriptor *pic_old,
     {
         free ( a );
         free ( a_new );
-        free ( hist );
         ipPicFree ( pic_new );
         _ipFuncSetErrno ( ipFuncPICNEW_ERROR );
         return ( ipFuncERROR );

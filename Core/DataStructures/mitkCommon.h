@@ -5,6 +5,8 @@
 #include "itkProcessObject.h"
 #include "ipPic.h"
 #include "vtkImageData.h"
+#include "vtkImageReslice.h"
+#include "image.h"
 typedef  int MapperSlotId;
 //typedef	Tree<mitk::DataTreeNode::Pointer> DataTree;
 //typedef	TreeIterator<mitk::DataTreeNode::Pointer> DataTreeIterator;

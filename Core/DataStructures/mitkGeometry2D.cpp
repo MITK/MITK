@@ -21,7 +21,7 @@ bool mitk::Geometry2D::Map(const mitk::Point3D &pt3d_mm, mitk::Point2D &pt2d_mm)
   pt3d_units = GetUnitsToMMAffineTransform()->BackTransformPoint(pt3d_mm);
   pt2d_mm[0]=pt3d_units[0]*m_UnitsToMMAffineTransform->GetMatrix().GetVnlMatrix().get_column(0).magnitude();
   pt2d_mm[1]=pt3d_units[1]*m_UnitsToMMAffineTransform->GetMatrix().GetVnlMatrix().get_column(1).magnitude();
-
+  pt3d_units[2]=0;
   return const_cast<BoundingBox*>(m_BoundingBox.GetPointer())->IsInside(pt3d_units);
 }
 
@@ -117,7 +117,7 @@ bool mitk::Geometry2D::Project(const mitk::Point3D &pt3d_mm, mitk::Point3D &proj
   pt3d_units[2] = 0;
   projectedPt3d_mm = GetUnitsToMMAffineTransform()->TransformPoint(pt3d_units);
   return const_cast<BoundingBox*>(m_BoundingBox.GetPointer())->IsInside(pt3d_units);
- }
+}
 
 //##ModelId=3EF48F170280
 bool mitk::Geometry2D::Map(const mitk::Point3D & atPt3d_mm, const mitk::Vector3D &vec3d_mm, mitk::Vector2D &vec2d_mm) const

@@ -12,7 +12,7 @@
 
 mitk::BoundingObjectCutter::BoundingObjectCutter()
 : m_UseInsideValue(false), m_OutsideValue(0), m_InsideValue(1), m_BoundingObject(NULL), 
-  m_ConfidenceFactor(1.92), m_UseRegionGrower(true), m_SegmentationFilter(NULL)
+  m_UseRegionGrower(true), m_SegmentationFilter(NULL) /* m_ConfidenceFactor(1.92), */
 {  
 }
 
@@ -73,7 +73,19 @@ void mitk::BoundingObjectCutter::GenerateData()
   regionOfInterestFilter->SetRegionOfInterest(regionOfInterest);
   regionOfInterestFilter->SetInput(itkImage);  
   ItkImageType::Pointer itkImageCut = regionOfInterestFilter->GetOutput();  
-  itkImageCut->Update();  // Cut the region of interest out of the source image
+  try 
+  {
+    itkImageCut->Update();  // Cut the region of interest out of the source image
+  } 
+  catch (itk::ExceptionObject & error) 
+  {
+    std::cout << "Cutting not possible, bounding box is outside of the source image.\n";
+    std::cout << error;
+    (mitk::StatusBar::GetInstance())->DisplayText("Cutting not possible, bounding box is outside of the source image.\n", 5000);
+    return;
+  }
+
+
 
   ItkImageIteratorType it(itkImageCut, itkImageCut->GetRequestedRegion());
   mitk::ITKPoint3D p;
@@ -99,27 +111,9 @@ void mitk::BoundingObjectCutter::GenerateData()
 
     if (m_UseRegionGrower)
     {
-      std::cout << " cutting done, now starting region grower.\n";
-      //// now start a region growing filter
-      //ConnectedFilterType::Pointer confidenceConnected = ConnectedFilterType::New();
-      //confidenceConnected->SetInput( itkImageCut );
-      ////confidenceConnected->SetMultiplier( 1.88 );
-      //confidenceConnected->SetMultiplier( m_ConfidenceFactor );
-      //confidenceConnected->SetNumberOfIterations( 5 );
-      //confidenceConnected->SetReplaceValue( 10000 );
-      //
-      //// Set seedpoint to center of image
-      //ItkImageType::IndexType index; 
-      //index[0] = static_cast<ItkImageType::IndexType::IndexValueType>(size[0] / 2.0);
-      //index[1] = static_cast<ItkImageType::IndexType::IndexValueType>(size[1] / 2.0);
-      //index[2] = static_cast<ItkImageType::IndexType::IndexValueType>(size[2] / 2.0);
-      //confidenceConnected->SetSeed( index );
-      //
-      //confidenceConnected->SetInitialNeighborhoodRadius( 2 );
-    
-      //MultiplyImageFilterType::Pointer multiplyFilter = MultiplyImageFilterType::New();
-      //multiplyFilter->SetInput1(confidenceConnected->GetOutput());
-      //multiplyFilter->SetInput2(itkImageCut);
+//      std::cout << " cutting done, now starting region grower.\n";
+      if (m_SegmentationFilter.IsNull())
+        return;   // Throw exceptioin????
 
       m_SegmentationFilter->SetInput( itkImageCut );
 

@@ -73,8 +73,8 @@ public:
   itkGetMacro(UseRegionGrower, bool);
   itkBooleanMacro(UseRegionGrower);
 
-  itkSetClampMacro(ConfidenceFactor, float, 0.0, 10.0);
-  itkGetMacro(ConfidenceFactor, float);
+  //itkSetClampMacro(ConfidenceFactor, float, 0.0, 10.0);
+  //itkGetMacro(ConfidenceFactor, float);
   
   itkSetObjectMacro(SegmentationFilter, ImageToImageFilterType);
   itkGetObjectMacro(SegmentationFilter, ImageToImageFilterType);
@@ -89,7 +89,7 @@ protected:
   PixelType m_OutsideValue;
   bool m_UseInsideValue;
   bool m_UseRegionGrower;
-  float m_ConfidenceFactor;
+  //float m_ConfidenceFactor;
   ImageToImageFilterType::Pointer m_SegmentationFilter;
 
 };

@@ -71,9 +71,7 @@ bool mitk::StateMachineFactory::LoadBehavior(std::string fileName)
 
    if ( stateMachineFactory->Parse() )    
    {
-     #ifdef INTERDEBUG
-     itkWarningMakro( << "xml file cannot parse!!" );
-     #endif
+     mitk::StatusBar::DisplayErrorText( "No appropriate statemachine found! Check string in constructor of interactor!" );
    }
   
    delete stateMachineFactory;

@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkImageToItkMultiplexer.h>
 #include <mitkStringProperty.h>
 #include <mitkLevelWindowProperty.h>
+#include <mitkDataTreeNodeFactory.h>
 
 template < typename TImageType >
 mitk::DataTreeNode::Pointer 

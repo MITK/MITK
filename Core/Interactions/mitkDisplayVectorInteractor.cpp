@@ -80,6 +80,13 @@ bool mitk::DisplayVectorInteractor::ExecuteAction(Action* action, mitk::StateEve
   //    ok = true;
   //    break;
   //  }
+  case AcSENDCOORDINATES:
+    {
+      DisplayCoordinateOperation* doOp = new mitk::DisplayCoordinateOperation(OpSENDCOORDINATES,  posEvent->GetSender(), posEvent->GetDisplayPosition(), posEvent->GetDisplayPosition(), posEvent->GetDisplayPosition());
+      m_Destination->ExecuteOperation(doOp);
+      ok = true;
+      break;
+    }
   case AcINITMOVE:
     {
       DisplayCoordinateOperation* doOp = new mitk::DisplayCoordinateOperation(OpSELECTPOINT,  posEvent->GetSender(), posEvent->GetDisplayPosition(), posEvent->GetDisplayPosition(), posEvent->GetDisplayPosition());

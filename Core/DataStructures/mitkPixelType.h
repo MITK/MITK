@@ -36,10 +36,10 @@ public:
   itkTypeMacro(PixelType, None);
 
   //##ModelId=3E1400C40198
-  PixelType(const std::type_info& aTypeId);
+  PixelType(const std::type_info& aTypeId, int numberOfComponents = 1);
 
   //##ModelId=3E1400150088
-  PixelType(ipPicType_t type, int bpe);
+  PixelType(ipPicType_t type, int bpe, int numberOfComponents = 1);
 
   //##ModelId=3E1400060113
   PixelType(const ipPicDescriptor* pic);
@@ -65,21 +65,34 @@ public:
     return m_Bpe;
   }
 
+  inline int GetNumberOfComponents() const
+  {
+    return m_NumberOfComponents;    
+  }
+  
+  inline int GetBitsPerComponent() const
+  {
+    return m_BitsPerComponent;    
+  }
+  
+  
   //##ModelId=3E1550B401ED
   inline PixelType& operator=(const PixelType& aPixelType)
   {
     m_TypeId=aPixelType.GetTypeId();
     m_Type=aPixelType.GetType();
     m_Bpe=aPixelType.GetBpe();
+    m_NumberOfComponents = aPixelType.GetNumberOfComponents();
+    m_BitsPerComponent = aPixelType.GetBitsPerComponent();
     return *this;
   }
   //##ModelId=3E15F73502BB
   PixelType();
 
-  void Initialize(const std::type_info& aTypeId);
+  void Initialize(const std::type_info& aTypeId, int numberOfCompontents = 1);
 
   //##ModelId=3E140E4F00E9
-  void Initialize(ipPicType_t type, int bpe);
+  void Initialize(ipPicType_t type, int bpe, int numberOfComponents = 1);
 
 private:
   //##ModelId=3E13FFAD038C
@@ -90,6 +103,10 @@ private:
 
   //##ModelId=3E14006C02E6
   int m_Bpe;
+  
+  int m_NumberOfComponents;
+  
+  int m_BitsPerComponent;
 
 };
 

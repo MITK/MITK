@@ -63,6 +63,12 @@ public:
   {
     return m_Offset;
   }
+  
+  PixelType GetPixelType() const
+  {
+    return m_PixelType;    
+  }
+  
   //##ModelId=3E19F8F0032C
   ImageDataItem::ConstPointer GetParent() const
   {
@@ -97,6 +103,8 @@ protected:
   int m_Offset;
   //##ModelId=3E156DC500D4
   bool m_IsComplete;
+  
+  PixelType m_PixelType;
   
 private:
   //##ModelId=3D7B425E0337

@@ -125,6 +125,7 @@ void mitk::GlobalInteraction::FillJurisdictionMap(mitk::StateEvent const* stateE
       float value = (*it)->CalculateJurisdiction(stateEvent);
       if (value > swell)
       {
+        ///TODO: hier werden die gleichen IDs überschrieben!
         m_JurisdictionMap.insert(InteractorMap::value_type(value, (*it)));
       }
     }
@@ -214,11 +215,21 @@ bool mitk::GlobalInteraction::ExecuteAction(int actionId, mitk::StateEvent const
         FillJurisdictionMap(stateEvent, objectEventId, groupEventId, 0);
       
       
-      if (m_JurisdictionMap.empty())//no jurisdiction value above 0 could be found, so take all
+      //no jurisdiction value above 0 could be found, so take all to convert to old scheme
+      if (m_JurisdictionMap.empty())
         FillJurisdictionMap(stateEvent, objectEventId, groupEventId, -1);
 
       //ask the next Interactor to handle that event
       AskCurrentInteractor(stateEvent, objectEventId, groupEventId);
+      
+      //after asking for jurisdiction and sending the events to the interactors,
+      //interactors should change the mode. We can now clear the jurisdictionmap.
+      m_JurisdictionMap.clear();
+    }
+    else
+    {
+      //checking if the selected one is still in Mode Subselected or selected
+      //...//todo
     }
     ok = true;
     break;

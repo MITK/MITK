@@ -350,8 +350,8 @@ void mitk::Geometry3D::SetSpacing(mitk::Vector3D aSpacing)
 
     mitk::Vector4D col;
     m_TransformUnitsToMM.getColumn(0, &col); col*=aSpacing.x; m_TransformUnitsToMM.setColumn(0, col);
-    m_TransformUnitsToMM.getColumn(1, &col); col*=aSpacing.x; m_TransformUnitsToMM.setColumn(1, col);
-    m_TransformUnitsToMM.getColumn(2, &col); col*=aSpacing.x; m_TransformUnitsToMM.setColumn(2, col);
+    m_TransformUnitsToMM.getColumn(1, &col); col*=aSpacing.y; m_TransformUnitsToMM.setColumn(1, col);
+    m_TransformUnitsToMM.getColumn(2, &col); col*=aSpacing.z; m_TransformUnitsToMM.setColumn(2, col);
 
     m_TransformMMToUnits.invert(m_TransformUnitsToMM);
 

@@ -8,17 +8,15 @@
 #include <qlabel.h>
 
 QcMITKSamplePlugin::QcMITKSamplePlugin( QWidget *parent )
-        : QcPlugin( parent )
+  : QcPlugin( parent )
 {
-  QHBoxLayout *layout;
-  SampleApp *ap; 
-
   task = new QcTask( xpm(), parent, name() );
-  ap=new SampleApp( task );
-  //ap->setText( "Hello, World!" );
+  QGridLayout* layout = new QGridLayout(task,0,0,0,-1,"plugin_area");
+  SampleApp *ap; 
+  ap = new SampleApp(task,"sample",0);
 
-  layout = new QHBoxLayout( task ); 
-  layout->addWidget( ap ); 
+  ap->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
+  layout->addWidget(ap,0,0,0);
 }
 
 QString 

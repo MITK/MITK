@@ -5,7 +5,6 @@
 #include "mitkCommon.h"
 #include "StateMachine.h"
 #include "Roi.h"
-//#include "DataTree.h"
 #include <string>
 #include <vector>
 

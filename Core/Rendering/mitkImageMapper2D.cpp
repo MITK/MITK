@@ -344,7 +344,8 @@ void mitk::ImageMapper2D::Update(mitk::BaseRenderer* renderer)
   if(
       (image == NULL) ||
       (renderinfo.m_RendererId < 0) ||
-      (renderinfo.m_LastUpdateTime < node->GetMTime())
+      (renderinfo.m_LastUpdateTime < node->GetMTime()) ||
+      (renderinfo.m_LastUpdateTime < renderer->GetMTime())
     )
     GenerateData(renderer);
   else

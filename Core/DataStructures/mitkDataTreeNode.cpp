@@ -54,6 +54,11 @@ void mitk::DataTreeNode::SetData(mitk::BaseData* baseData)
   if(m_Data!=baseData)
   {
     m_Data=baseData;
+
+    int i;
+    for(i=0;i<10;++i) //@FIXME replace mapper array with vector!!!!
+      mappers[i]=NULL;
+
     Modified();
   }
 }

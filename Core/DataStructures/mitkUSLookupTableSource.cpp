@@ -174,9 +174,9 @@ vtkLookupTable* mitk::USLookupTableSource::BuildDSRDopplerLookupTable()
                 rgba[ 3 ] = factor * 1;
                 index = lutSize / 2 ;
                 vtkLookupTable->SetTableValue( index, rgba );
-                index = lutSize / 2 - 1;
-                vtkLookupTable->SetTableValue( index, rgba );
-                index = lutSize / 2 + 1;
+//                index = lutSize / 2 - 1;
+//                vtkLookupTable->SetTableValue( index, rgba );
+//                index = lutSize / 2 + 1;
                 vtkLookupTable->SetTableValue( index, rgba );
             }
 
@@ -197,13 +197,14 @@ vtkLookupTable* mitk::USLookupTableSource::BuildStrainRateLookupTable()
         std::cout << "  creating StrainRate  LookupTable ... " << std::endl;
         vtkLookupTable *vtkLookupTable = vtkLookupTable::New();
 
-        int size = 256;
-
+        int lutSize = 256;
+				vtkLookupTable->SetNumberOfTableValues(lutSize);
+				
         //   xDim = size;
         //   yDim = 3;
         float rgba[ 4 ];
 
-        float quartal = size / 8.0f;
+        float quartal = lutSize / 8.0f;
 
         float sizeQuartal1 = 3 * quartal; //quartal-1;
 
@@ -301,12 +302,45 @@ vtkLookupTable* mitk::USLookupTableSource::BuildStrainRateLookupTable()
         vtkLookupTable->SetTableValue ( index, rgba );
         vtkLookupTable->SetTableValue ( index + 1, rgba );
 
-        //   for (int i=0; i<size; i++)
-        //   {
-        //    vtkLookupTable->GetTableValue(i,&rgba[0]);
-        //    cout << "i=" <<  i << " r=" << rgba[0] << " g=" << rgba[1]<< " b=" << rgba[2] << endl;
-        //   }
+        bool mapZeroStrainRateToBlack = true;
+        if ( mapZeroStrainRateToBlack )
+            {
+                // map the middle value to black, so no velocity (v=0)
+                // is displayed as black
+                rgba[ 0 ] = 0;
+                rgba[ 1 ] = 0;
+                rgba[ 2 ] = 0;
+                rgba[ 3 ] = factor * 1;
+                
+//                index = lutSize / 2 -1;  // FIXME: this should be lutSize/2 !!!!????
+                index = 128 ;  // FIXME: this should be lutSize/2 !!!!????
+                std::cout  << "  setting table value " << index << " to zero " << std::endl;
+                
+                vtkLookupTable->SetTableValue( index, rgba );
+            }
+        
 
+//           for (int i=0; i<lutSize; i++)
+//           {
+//            vtkLookupTable->GetTableValue(i,&rgba[0]);
+//            cout << "i=" <<  i << " r=" << rgba[0] << " g=" << rgba[1]<< " b=" << rgba[2] << endl;
+//           }
+
+//        std::cout << "  created with " << vtkLookupTable->GetNumberOfColors() << " colors .. " << std::endl;
+//        std::cout << "  created with " << vtkLookupTable->GetNumberOfTableValues() << " colors .. " << std::endl;
+//					float data[2];
+//					vtkLookupTable->GetTableRange (data);
+//					std::cout << "  data0=" << data[0] << "  data1=" << data[1] << std::endl;
+//					vtkLookupTable->GetTableValue (200, rgba);
+//					std::cout << "  r=" << rgba[0] << "  g=" << rgba[1] << "  b=" << rgba[2]<< "  a=" << rgba[3]<< std::endl;
+//					float rgb[3];
+//					vtkLookupTable->GetColor (200, rgb);
+//					std::cout << "  r=" << rgb[0] << "  g=" << rgb[1] << "  b=" << rgb[2]<< std::endl;
+//					unsigned char *p = 	vtkLookupTable->GetPointer(200);
+//					std::cout << "  p0=" << (int)p[0] << "  p1=" << (int)p[1] << "  p2=" << (int)p[2]<< std::endl;
+//					p = 	vtkLookupTable->GetPointer(128);
+//					std::cout << "  p0=" << (unsigned int)p[0] << "  p1=" <<(unsigned int) p[1] << "  p2=" << (unsigned int)p[2]<< std::endl;
+					
         return( vtkLookupTable );
 
 }

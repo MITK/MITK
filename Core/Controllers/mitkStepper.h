@@ -30,8 +30,14 @@ public:
   itkGetMacro(StepSize, unsigned int);
   itkSetClampMacro(StepSize, unsigned int, 0, m_Steps);
 
-  itkGetMacro(StepToUnitFactor, mitk::ScalarType);
-  itkSetMacro(StepToUnitFactor, mitk::ScalarType);
+  virtual float ConvertPosToUnit(unsigned int posValue);
+  virtual unsigned int ConvertUnitToPos(float unitValue);
+
+  itkGetMacro(PosToUnitFactor, float);
+  itkSetMacro(PosToUnitFactor, float);
+
+  itkGetMacro(ZeroLine, float);
+  itkSetMacro(ZeroLine, float);
 
   itkGetStringMacro(UnitName);
   itkSetStringMacro(UnitName);
@@ -48,6 +54,9 @@ public:
   //##ModelId=3DF8B92703A4
   void Next();
 protected:
+  Stepper();
+  virtual ~Stepper();
+
   //##ModelId=3DD524BD00DC
   unsigned int m_Pos;
   //##ModelId=3DF8F73C0076
@@ -55,7 +64,8 @@ protected:
   //##ModelId=3DF8F74101AE
   unsigned int m_StepSize;
 
-  mitk::ScalarType m_StepToUnitFactor;
+  float m_PosToUnitFactor;
+  float m_ZeroLine;
 
   std::string m_UnitName;
 

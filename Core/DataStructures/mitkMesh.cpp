@@ -9,7 +9,6 @@
 #include <mitkInteractionConst.h>
 #include <mitkLine.h>
 
-const int PRECISION = 1;
 
 mitk::Mesh::Mesh()
 {
@@ -37,75 +36,73 @@ unsigned long mitk::Mesh::GetNumberOfCells()
 //search a line that is close enough according to the given position 
 bool mitk::Mesh::SearchLine(Point3D point, float distance , unsigned long &lineId, unsigned long &cellId)
 {
-//in is the given point to search at
-//out is the id of the line and the id of the cell
+//
+//
 //returns true if a line is found
-  PointType givenPoint;
-  givenPoint[0] = point[0];
-  givenPoint[1] = point[1];
-  givenPoint[2] = point[2];
 
   //iterate through all cells.
-  ConstCellIterator it = m_ItkData->GetCells()->Begin();
-  ConstCellIterator end = m_ItkData->GetCells()->End();
-  while( it != end)
+  ConstCellIterator cellIt = m_ItkData->GetCells()->Begin();
+  ConstCellIterator cellEnd = m_ItkData->GetCells()->End();
+  while( cellIt != cellEnd)
   {
-    int posA, posB;
-    //get the pairs of ids and combine them into a line.
-    int numberOfPoints = it->Value()->GetNumberOfPoints();
-    if (numberOfPoints>1)
+    if (cellIt.Value()->GetNumberOfPoints() >1)
     {
-      for(posA = 1, posB = 0; posA < numberOfPoints; ++posA, ++posB)
+      //then iterate through all indexes of points in it->Value()
+      PointIdIterator inAIt = cellIt.Value()->PointIdsBegin();//for the first point
+      PointIdIterator inBIt = cellIt.Value()->PointIdsBegin();//for the second point
+      PointIdIterator inEnd = cellIt.Value()->PointIdsEnd();
+      ++inAIt;//so it points to the point before inBIt
+      int currentLineId = 0;
+      while(inAIt != inEnd)
       {
-        //then compare the line with the given point
-        //first getting the points:
-        PointType pointA, pointB;
-        int okA = m_ItkData->GetPoint(posA, &pointA);
-        int okB = m_ItkData->GetPoint(posB, &pointB);
-        if (okA &&okB)
+        mitk::PointSet::PointType pointA, pointB;
+        if ( m_ItkData->GetPoint((*inAIt), &pointA) &&
+              m_ItkData->GetPoint((*inBIt), &pointB))
         {
-          //we emagine a line going from pointA to pointB
-          //and look if the point lies on that line
           Line<CoordinateType> *line = new Line<CoordinateType>();
           line->SetPoints(pointA, pointB);
-          double distance = line->distance(givenPoint);
-          if (distance < PRECISION)
+          double thisDistance = line->distance(point);
+          if (thisDistance < distance)
           {
-            cellId = it->Index();
-            lineId = posB;
+            cellId = cellIt->Index();
+            lineId = currentLineId;
             return true;
           }
         }
+        ++inAIt;
+        ++inBIt;
+        ++currentLineId;
       }
-      //if mesh closed, then search line from last to first
+
+      //if the cell is closed, then check the line from the last index to the first index
+      //if inAIt points to inEnd, then inBIt points to the last index.
       CellDataType cellData;
-      bool dataOk = m_ItkData->GetCellData(it->Index(), &cellData);
+      bool dataOk = m_ItkData->GetCellData(cellIt->Index(), &cellData);
       if (dataOk)
       {
         if (cellData.closed)
-        //the cell is closed, so compare the line between the first and the last point
         {
-          PointType pointA, pointB;
-          int okA = m_ItkData->GetPoint(0, &pointA);
-          int okB = m_ItkData->GetPoint(numberOfPoints-1, &pointB);
-          if (okA &&okB)
+          //get the points
+          PointIdIterator inAIt = cellIt.Value()->PointIdsBegin();//for the first point
+          //inBIt points to last.
+          mitk::PointSet::PointType pointA, pointB;
+          if ( m_ItkData->GetPoint((*inAIt), &pointA) &&
+                m_ItkData->GetPoint((*inBIt), &pointB))
           {
-            //we emagine a line going from pointA to pointB
-            //and look if the point lies on that line
             Line<CoordinateType> *line = new Line<CoordinateType>();
             line->SetPoints(pointA, pointB);
-            double distance = line->distance(givenPoint);
-            if (distance < PRECISION)
+            double thisDistance = line->distance(point);
+            if (thisDistance < distance)
             {
-              cellId = it->Index();
-              lineId = numberOfPoints-1;
+              cellId = cellIt->Index();
+              lineId = currentLineId;
               return true;
             }
           }
         }
       }
     }
-    ++it;
+    ++cellIt;
   }
 	return false;
 }
@@ -129,9 +126,9 @@ int mitk::Mesh::SearchFirstCell(unsigned long pointId)
 
 //due to not implemented itk::CellInterface::EvaluatePosition and errors in using vtkCell::EvaluatePosition (changing iterator!) we must implement it in mitk::Mesh
 //make it easy and look for hit points and hit lines: needs to be done anyway!
-bool mitk::Mesh::EvaluatePosition(mitk::Point3D point, unsigned long &cellId)
+bool mitk::Mesh::EvaluatePosition(mitk::Point3D point, unsigned long &cellId, float precision)
 {
-  int pointId = this->SearchPoint(point, PRECISION);
+  int pointId = this->SearchPoint(point, precision);
   if (pointId > -1)
   {
     //search the cell the point lies inside
@@ -139,7 +136,7 @@ bool mitk::Mesh::EvaluatePosition(mitk::Point3D point, unsigned long &cellId)
     return true;
   }
   unsigned long lineId = 0;
-  if( this->SearchLine(point, PRECISION, lineId, cellId))
+  if( this->SearchLine(point, precision, lineId, cellId))
   {
     return true;
   }
@@ -769,6 +766,7 @@ void mitk::Mesh::ExecuteOperation(Operation* operation)
 }
 
 mitk::Mesh::DataType::BoundingBoxPointer mitk::Mesh::GetBoundingBoxFromCell(unsigned long cellId)
+//itk::CellInterface has also a GetBoundingBox, but it returns CoordRepType [PointDimension *2]
 {
   DataType::BoundingBoxPointer bBoxPointer = NULL;
   CellAutoPointer cellAutoPointer;

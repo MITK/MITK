@@ -1222,9 +1222,13 @@ vtkImageData* Pic2vtk::loadVtkImage( char* fileName ) {
 	
 
 	reader->SetFileName( fileName );
-
+	reader->Update();
+	
 	if ( reader->OpenVTKFile() == 0 )
+	{
+		std::cout << "something happend ..." << std::endl;
 		return NULL;
+	}
 
 	// int test = reader->IsFileStructuredPoints(); /* \todo remove line! */
 
@@ -1232,7 +1236,14 @@ vtkImageData* Pic2vtk::loadVtkImage( char* fileName ) {
 	//int a = reader->GetFileType(); /* \todo remove line! */
 	//char * kk = reader->GetHeader(); /* \todo remove line! */
 
-	// vtkStructuredPoints* points = reader->GetOutput();
-	return NULL;
+	vtkStructuredPoints* points = reader->GetOutput();
+	std::cout << "dim: " << ((vtkImageData *)points)->GetDataDimension() << std::endl;
+	std::cout << "size: " << ((vtkImageData *)points)->GetScalarSize() << std::endl;
+	std::cout << "min: " << ((vtkImageData *)points)->GetScalarTypeMin () << std::endl;
+	std::cout << "min: " << ((vtkImageData *)points)->GetScalarTypeMax () 	<< std::endl;
+	std::cout << "scalars: " << ((vtkImageData *)points)->GetNumberOfScalarComponents () << std::endl;
+	 
+	return (vtkImageData *)points;
+	//return NULL;
  }
 

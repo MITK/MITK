@@ -10,16 +10,13 @@
 #endif // _MSC_VER > 1000
 
 #include "QmitkFunctionality.h"
-#include "QmitkStdMultiWidget.h"
-#include "QmitkSimpleExampleControls.h"
-
-#include <mitkSurfaceData.h>
-#include <mitkColorProperty.h>
-#include <mitkFloatProperty.h>
 
 #include <OperationActor.h>
 
-#include <qlist.h>
+#include <mitkFloatProperty.h>
+
+class QmitkStdMultiWidget;
+class QmitkSimpleExampleControls;
 
 /*!\class
 \brief MITK example demonstrating how a new application functionality can be implemented

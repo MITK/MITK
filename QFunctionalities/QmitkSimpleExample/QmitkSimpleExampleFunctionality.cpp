@@ -1,18 +1,24 @@
 #include "QmitkSimpleExampleFunctionality.h"
+#include "QmitkStdMultiWidget.h"
 #include "QmitkSelectableGLWidget.h"
-#include "PlaneGeometry.h"
+
+#include "QmitkSimpleExampleControls.h"
+
 #include <qaction.h>
 #include <qslider.h>
+
 #include "example.xpm"
+
+#include "PlaneGeometry.h"
 #include <mitkSurfaceData.h>
 #include <mitkColorProperty.h>
-#include <mitkFloatProperty.h>
-#include <algorithm>
 
 #include <EventMapper.h>
 #include <GlobalInteraction.h>
 #include <SeedRoi.h>
 #include <SeedOperation.h>
+
+#include <algorithm>
 
 #if (defined(_MSC_VER) && (_MSC_VER <= 1200))
   #include <xutility>

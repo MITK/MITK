@@ -35,7 +35,7 @@ controls(NULL), multiWidget(mitkStdMultiWidget), opacityprop(NULL)
     mitk::GlobalInteraction* globalInteraction = dynamic_cast<mitk::GlobalInteraction*>(mitk::EventMapper::GetGlobalStateMachine());
     if(globalInteraction!=NULL)
     {
-	    mitk::SeedRoi* seedRoi = new mitk::SeedRoi("seedroi", this);
+	    mitk::SeedRoi* seedRoi = new mitk::SeedRoi("navigation", this);
 	    globalInteraction->AddStateMachine(seedRoi);
     }
 }
@@ -43,6 +43,7 @@ controls(NULL), multiWidget(mitkStdMultiWidget), opacityprop(NULL)
 QmitkSimpleExampleFunctionality::~QmitkSimpleExampleFunctionality()
 {
 }
+
 QString QmitkSimpleExampleFunctionality::getFunctionalityName()
 {
     return "simple example";
@@ -169,16 +170,16 @@ void QmitkSimpleExampleFunctionality::initWidgets()
 				count++;
 			}
 			// init pic color props
-			mitk::ColorProperty::Pointer colorprop;
-			if (count == 1) {
+			if (count == 1) 
+            {
 				float color[3] = {1.0f,1.0f,1.0f};
-				colorprop = new mitk::ColorProperty(color);
+				node->SetColor(color);
 			}
-			else {
+			else 
+            {
 				float color[3] = {1.0f,0.0f,0.0f};
-				colorprop = new mitk::ColorProperty(color);
+				node->SetColor(color);
 			}
-			node->GetPropertyList()->SetProperty("color", colorprop);
 			
 			// init pic opacity props
 			if (opacityprop == NULL) {

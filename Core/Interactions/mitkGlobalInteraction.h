@@ -95,6 +95,10 @@ class GlobalInteraction : public StateMachine
   bool RemoveInteractor(Interactor* interactor);
 
   //##Documentation
+  //## @brief returns true, if the given interactor is already added to the Interactor-List
+  bool InteractorRegistered (Interactor* interactor);
+
+  //##Documentation
   //## @brief add a Listener to the list of all Listeners that are informed of an event
   //##
   //## returns true in case of success
@@ -105,6 +109,10 @@ class GlobalInteraction : public StateMachine
   //##
   //## returns true in case of success
   bool RemoveListener(StateMachine* listener);
+
+  //##Documentation
+  //## @brief returns true, if the given interactor is already added to the Listener-List
+  bool ListenerRegistered (Interactor* interactor);
 
   //##Documentation
   //## @brief adds an element in the list in FocusManager

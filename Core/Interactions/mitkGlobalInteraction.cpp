@@ -79,6 +79,21 @@ void mitk::GlobalInteraction::AddInteractor(mitk::Interactor* interactor)
   }
 }
 
+bool mitk::GlobalInteraction::InteractorRegistered (mitk::Interactor* interactor)
+{
+  if ( std::find(m_InteractorList.begin(), m_InteractorList.end(), interactor) == m_InteractorList.end() )
+    return false;
+  else
+    return true;
+}
+
+bool mitk::GlobalInteraction::ListenerRegistered (mitk::Interactor* interactor)
+{
+  if ( std::find(m_ListenerList.begin(), m_ListenerList.end(), interactor) == m_ListenerList.end() )
+    return false;
+  else
+    return true;
+}
 
 bool mitk::GlobalInteraction::RemoveInteractor(mitk::Interactor* interactor)
 {

@@ -344,79 +344,89 @@
 	</stateMachine>
 
 	
+	<!-- affine interactions standard statemachine  -->
 	<stateMachine NAME="AffineInteractions ctrl-drag">
-		<state NAME="start" ID="0" START_STATE="TRUE">
-			<transition NAME="leftButtonPress" NEXT_STATE_ID="12" EVENT_ID="5">  <!-- CTRL+LBM_Down ==> SeCHECKELEMENT  -->
+    <state NAME="start" ID="0" START_STATE="TRUE">
+      <transition NAME="leftButtonPress" NEXT_STATE_ID="12" EVENT_ID="5">  <!-- CTRL+LBM_Down ==> SeCHECKELEMENT  -->
 				<action ID="30" />
 			</transition>            
-			<transition NAME="leftButtonPress" NEXT_STATE_ID="12" EVENT_ID="540">  <!-- SHIFT+CTRL+LBM_Down ==> SeADD  -->            
+      <transition NAME="leftButtonPress" NEXT_STATE_ID="12" EVENT_ID="540">  <!-- SHIFT+CTRL+LBM_Down ==> SeADD  -->            
 				<action ID="11" />
 			</transition>       
-			<transition NAME="middleButtonPress" NEXT_STATE_ID="14" EVENT_ID="6">  <!-- CTRL+MBM_Down ==> SeCHECKELEMENT  -->
+      <transition NAME="middleButtonPress" NEXT_STATE_ID="14" EVENT_ID="6">  <!-- CTRL+MBM_Down ==> SeCHECKELEMENT  -->
 				<action ID="30" />
 			</transition>       
-			<transition NAME="rightButtonPress" NEXT_STATE_ID="13" EVENT_ID="7">  <!-- CTRL+RBM_Down ==> SeCHECKELEMENT  -->
+      <transition NAME="rightButtonPress" NEXT_STATE_ID="13" EVENT_ID="7">  <!-- CTRL+RBM_Down ==> SeCHECKELEMENT  -->
 				<action ID="30" />
 			</transition> 
-		</state>
-		<state NAME="picked guard Translate" ID="12">
-			<transition NAME="yes" NEXT_STATE_ID="2" EVENT_ID="204"> <!-- StYES -->
+    </state>
+   <state NAME="picked guard Translate" ID="12">
+      <transition NAME="yes" NEXT_STATE_ID="2" EVENT_ID="204"> <!-- StYES -->
+				<action ID="1006" />
 				<action ID="1000" />
 			</transition> 
-			<transition NAME="no" NEXT_STATE_ID="0" EVENT_ID="203">  <!-- StNO -->
+      <transition NAME="no" NEXT_STATE_ID="0" EVENT_ID="203">  <!-- StNO -->
 				<action ID="0" />
 			</transition> 
-		</state>
-		<state NAME="picked guard Scale" ID="13">
-			<transition NAME="yes" NEXT_STATE_ID="3" EVENT_ID="204"> <!-- StYES -->
+   </state>
+   <state NAME="picked guard Scale" ID="13">
+      <transition NAME="yes" NEXT_STATE_ID="3" EVENT_ID="204"> <!-- StYES -->
+        <action ID="1006" />
 				<action ID="1002" />
 			</transition> 
-			<transition NAME="no" NEXT_STATE_ID="0" EVENT_ID="203">  <!-- StNO -->
+      <transition NAME="no" NEXT_STATE_ID="0" EVENT_ID="203">  <!-- StNO -->
 				<action ID="0" />
 			</transition> 
-		</state>
-		<state NAME="picked guard Rotate" ID="14">
-			<transition NAME="yes" NEXT_STATE_ID="4" EVENT_ID="204"> <!-- StYES -->
+   </state>
+    <state NAME="picked guard Rotate" ID="14">
+      <transition NAME="yes" NEXT_STATE_ID="4" EVENT_ID="204"> <!-- StYES -->
+        <action ID="1006" />
 				<action ID="1004" />
 			</transition> 
-			<transition NAME="no" NEXT_STATE_ID="0" EVENT_ID="203">  <!-- StNO -->
+      <transition NAME="no" NEXT_STATE_ID="0" EVENT_ID="203">  <!-- StNO -->
 				<action ID="0" />
 			</transition> 
-		</state>
-		<state NAME="translating" ID="2">
-			<transition NAME="leftButtonMove" NEXT_STATE_ID="2" EVENT_ID="534"> <!-- CTRL+LBM_Move ==> SeTRANSLATE  -->
+    </state>
+    <state NAME="translating" ID="2">
+      <transition NAME="leftButtonMove" NEXT_STATE_ID="2" EVENT_ID="534"> <!-- CTRL+LBM_Move ==> SeTRANSLATE  -->
 				<action ID="1001" />
 			</transition> 
-			<transition NAME="leftButtonRelease" NEXT_STATE_ID="0" EVENT_ID="505"> <!-- LBM_Release ==> SeTRANSLATE  -->
-				<action ID="1001" />
+      <transition NAME="leftButtonRelease" NEXT_STATE_ID="0" EVENT_ID="505"> <!-- LBM_Release ==> SeTRANSLATE  -->
+				<!--<action ID="1001" />-->
+				<action ID="1007" />
 			</transition> 
-			<transition NAME="leftButtonRelease" NEXT_STATE_ID="0" EVENT_ID="537"> <!-- CTRL+LBM_Release ==> SeTRANSLATE  -->
-				<action ID="1001" />
+      <transition NAME="leftButtonRelease" NEXT_STATE_ID="0" EVENT_ID="537"> <!-- CTRL+LBM_Release ==> SeTRANSLATE  -->
+				<!--<action ID="1001" />-->
+				<action ID="1007" />
 			</transition> 
-		</state>
-		<state NAME="rotating" ID="4">
-			<transition NAME="middleButtonMove" NEXT_STATE_ID="4" EVENT_ID="536">  <!-- CTRL+MBM_Move ==> SeROTATE  -->
+   </state>
+   <state NAME="rotating" ID="4">
+      <transition NAME="middleButtonMove" NEXT_STATE_ID="4" EVENT_ID="536">  <!-- CTRL+MBM_Move ==> SeROTATE  -->
 				<action ID="1005" />
 			</transition> 
-			<transition NAME="middleButtonRelease" NEXT_STATE_ID="0" EVENT_ID="506">  <!-- MBM_Release ==> SeROTATE  -->
-				<action ID="1005" />
+      <transition NAME="middleButtonRelease" NEXT_STATE_ID="0" EVENT_ID="506">  <!-- MBM_Release ==> SeROTATE  -->
+				<!--<action ID="1005" />-->
+				<action ID="1007" />
 			</transition> 
-			<transition NAME="middleButtonRelease" NEXT_STATE_ID="0" EVENT_ID="539">  <!-- CTRL+MBM_Release ==> SeROTATE  -->
-				<action ID="1005" />
+      <transition NAME="middleButtonRelease" NEXT_STATE_ID="0" EVENT_ID="539">  <!-- CTRL+MBM_Release ==> SeROTATE  -->
+				<!--<action ID="1005" />-->
+				<action ID="1007" />
 			</transition> 
-		</state>
-		<state NAME="scaling" ID="3">
-			<transition NAME="rightButtonMove" NEXT_STATE_ID="3" EVENT_ID="535">  <!-- CTRL+RBM_Move ==> SeSCALE  -->
+   </state>
+   <state NAME="scaling" ID="3">
+      <transition NAME="rightButtonMove" NEXT_STATE_ID="3" EVENT_ID="535">  <!-- CTRL+RBM_Move ==> SeSCALE  -->
 				<action ID="1003" />
 			</transition> 
-			<transition NAME="rightButtonRelease" NEXT_STATE_ID="0" EVENT_ID="507">  <!-- RBM_Release ==> SeSCALE  -->
-				<action ID="1003" />
+      <transition NAME="rightButtonRelease" NEXT_STATE_ID="0" EVENT_ID="507">  <!-- RBM_Release ==> SeSCALE  -->
+        <!--<action ID="1003" />-->
+        <action ID="1007" />
 			</transition> 
-			<transition NAME="rightButtonRelease" NEXT_STATE_ID="0" EVENT_ID="538">  <!-- CTRL+RBM_Release ==> SeSCALE  -->
-				<action ID="1003" />
+      <transition NAME="rightButtonRelease" NEXT_STATE_ID="0" EVENT_ID="538">  <!-- CTRL+RBM_Release ==> SeSCALE  -->
+        <!--<action ID="1003" />-->
+        <action ID="1007" />
 			</transition> 
-		</state>
-	</stateMachine>
+  </state>
+    </stateMachine>
     
 	<stateMachine NAME="AffineInteractions ctrl-drag_marcus">
 		<state NAME="start" ID="0" START_STATE="TRUE">

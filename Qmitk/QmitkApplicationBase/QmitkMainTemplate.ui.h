@@ -54,6 +54,7 @@
 
 #include <mitkParRecFileReader.h>
 #include <mitkInteractionConst.h>
+#include <QmitkApplicationBase/QmitkStatusBar.h>
 
 mitk::FloatProperty::Pointer opacityprop=NULL;
 
@@ -533,6 +534,11 @@ void QmitkMainTemplate::helpAbout()
 void QmitkMainTemplate::init()
 {
   mitkMultiWidget=NULL;
+
+  //creating a QmitkStatusBar for Output on the QStatusBar and connecting it with the MainStatusBar
+  QmitkStatusBar::SetStatusBar(this->statusBar());
+  //disabling the SizeGrip in the lower right corner
+  (QmitkStatusBar::GetInstance())->SetSizeGripEnabled(false);
 
   //initialize interaction sub-system: undo-controller, statemachine-factory and global-interaction
 

@@ -16,66 +16,66 @@ namespace mitk {
 class CylindricToCartesianFilter : public ImageToImageFilter
 {
 public:
-    mitkClassMacro(CylindricToCartesianFilter, ImageToImageFilter);
+  mitkClassMacro(CylindricToCartesianFilter, ImageToImageFilter);
 
-	itkNewMacro(Self);
+  itkNewMacro(Self);
 
-    //##Documentation
-    //## @brief Set background grey level
-	itkSetMacro(OutsideValue, float);
-    //##Documentation
-    //## @brief Get background grey level
-	itkGetMacro(OutsideValue, float);
+  //##Documentation
+  //## @brief Set background grey level
+  itkSetMacro(OutsideValue, float);
+  //##Documentation
+  //## @brief Get background grey level
+  itkGetMacro(OutsideValue, float);
 
-    //##Documentation
-    //## @brief Set the size in x-direction of the converted image.
-	//## 
-	//## A value of 0 (default) means that the filter uses the x-size of the input image.
-	itkSetMacro(TargetXSize, unsigned int);
-    //##Documentation
-    //## @brief Get the size in x-direction of the converted image.
-	itkGetMacro(TargetXSize, unsigned int);
+  //##Documentation
+  //## @brief Set the size in x-direction of the converted image.
+  //## 
+  //## A value of 0 (default) means that the filter uses the x-size of the input image.
+  itkSetMacro(TargetXSize, unsigned int);
+  //##Documentation
+  //## @brief Get the size in x-direction of the converted image.
+  itkGetMacro(TargetXSize, unsigned int);
 
-	//##Documentation
-	//## @brief Build some tables to speed up transformation, e.g., to avoid repeated calulations of the same sinus/cosinus.
-	//## @todo Free tables if they were already previously allocated
-    void buildTransformShortCuts(int orig_xsize, int orig_ysize, int orig_zsize, int new_xsize, ipPicDescriptor * &rt_pic, ipPicDescriptor * &phit_pic, ipPicDescriptor * &fr_pic, ipPicDescriptor * &fphi_pic, unsigned int * &zt, float * &fz);
+  //##Documentation
+  //## @brief Build some tables to speed up transformation, e.g., to avoid repeated calulations of the same sinus/cosinus.
+  //## @todo Free tables if they were already previously allocated
+  void buildTransformShortCuts(int orig_xsize, int orig_ysize, int orig_zsize, int new_xsize, ipPicDescriptor * &rt_pic, ipPicDescriptor * &phit_pic, ipPicDescriptor * &fr_pic, ipPicDescriptor * &fphi_pic, unsigned int * &zt, float * &fz);
 
-	//##Documentation
-	//## @brief Build some tables to speed up transformation of images that only contain data within a sector
-	//## @todo Free tables if they were already previously allocated
-	void buildConeCutOffShortCut(int orig_xsize, int orig_ysize, ipPicDescriptor *rt_pic, ipPicDescriptor *fr_pic, float a, float b, ipPicDescriptor * &coneCutOff_pic);
+  //##Documentation
+  //## @brief Build some tables to speed up transformation of images that only contain data within a sector
+  //## @todo Free tables if they were already previously allocated
+  void buildConeCutOffShortCut(int orig_xsize, int orig_ysize, ipPicDescriptor *rt_pic, ipPicDescriptor *fr_pic, float a, float b, ipPicDescriptor * &coneCutOff_pic);
 protected:
-	ipPicDescriptor * rt_pic, * phit_pic, *fr_pic, * fphi_pic, * coneCutOff_pic;
-	float * fz;
-	unsigned int * zt;
-    //##Description 
-    //## @brief Cut off line for images that only contain data within a sector
-	//## 
-	//## y=a x+b
-	float a;
-    //##Description 
-    //## @brief Cut off line for images that only contain data within a sector
-	//## 
-	//## y=a x+b
-	float b;
+  ipPicDescriptor * rt_pic, * phit_pic, *fr_pic, * fphi_pic, * coneCutOff_pic;
+  float * fz;
+  unsigned int * zt;
+  //##Description 
+  //## @brief Cut off line for images that only contain data within a sector
+  //## 
+  //## y=a x+b
+  float a;
+  //##Description 
+  //## @brief Cut off line for images that only contain data within a sector
+  //## 
+  //## y=a x+b
+  float b;
 
-    //##Description 
-    //## @brief Time when Header was last initialized
-    itk::TimeStamp m_TimeOfHeaderInitialization;
-  protected:
-    virtual void GenerateData();
+  //##Description 
+  //## @brief Time when Header was last initialized
+  itk::TimeStamp m_TimeOfHeaderInitialization;
+protected:
+  virtual void GenerateData();
 
-	virtual void GenerateOutputInformation();
+  virtual void GenerateOutputInformation();
 
-	virtual void GenerateInputRequestedRegion();
+  virtual void GenerateInputRequestedRegion();
 
-	CylindricToCartesianFilter();
+  CylindricToCartesianFilter();
 
-    ~CylindricToCartesianFilter();
+  ~CylindricToCartesianFilter();
 
-	float m_OutsideValue;
-	unsigned int m_TargetXSize;
+  float m_OutsideValue;
+  unsigned int m_TargetXSize;
 };
 
 } // namespace mitk

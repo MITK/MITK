@@ -13,7 +13,7 @@ class DataTreeNode;
 
 //##Documentation
 //## @brief Interface for an Interactor.
-//##
+//## @ingroup Interaction
 //## The Interactor is held with a SmartPointer by a DataTreeNode 
 //## and holds its Node with a Pointer. That way Smartpointer doesn't build a circle.
 //## Different Modes: In order to work with hierarchical StateMachines and not to send Events to all StateMachines, a StateMachine can be 
@@ -23,7 +23,9 @@ class DataTreeNode;
 //## SUBSELECTED: a hierarchical lower statemachine has just handled an event so this statemachine wants to pass the event to this machine
 //## Guidelines for the modevalues: Selected if the coresponding data is selected, deselected if deselect of data, subselect if submachine is selected
 //## in moving the machine is selected. After a new insert the machine is selected, since the data is also selected
-//## @ingroup Interaction
+//## In method ExecuteAction(..) the different actions are divided up through switch/case statements. Each block has to check
+//## the appropriate type of event to process the actions. Especially in guarding states (a state, that checks certain conditions (e.g. is picked)
+//## the according Event must be called to continue in states. No return false here!
 class Interactor : public StateMachine
 {
 public:

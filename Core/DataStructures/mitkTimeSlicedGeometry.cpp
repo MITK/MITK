@@ -62,7 +62,7 @@ bool mitk::TimeSlicedGeometry::SetGeometry3D(mitk::Geometry3D* geometry3D, int t
     m_Geometry3Ds[t]=geometry3D;
     if((t==0) && (geometry3D!=NULL))
     {
-      m_TransformMMToUnits = geometry3D->GetTransformUnitsToMM();
+      m_TransformUnitsToMM = geometry3D->GetTransformUnitsToMM();
       m_TransformMMToUnits.invert(m_TransformUnitsToMM);
     }
     return true;

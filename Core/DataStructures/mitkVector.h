@@ -3,7 +3,8 @@
 
 #include "SpaceGeometry.h"
 #include <itkPoint.h>
-#include <FLOAT.H>
+
+
 
 namespace mitk {
 typedef float ScalarType;
@@ -17,8 +18,8 @@ typedef Matrix4f  Matrix4D;
 typedef itk::Point<ScalarType,3> ITKPoint3D;
 typedef itk::Vector<ScalarType,3> ITKVector3D;
 
-#define ScalarTypeMax DBL_MAX
-#define ScalarTypeMin -DBL_MAX
+#define ScalarTypeMax 3.402823466e+38F
+#define ScalarTypeMin -3.402823466e+38F
 
 //itk vs. vecmath conversion
 template <class T>

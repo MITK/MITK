@@ -29,7 +29,7 @@ void QmitkMainTemplate::fileNew()
 
 void QmitkMainTemplate::fileOpen()
 {
-    QString fileName = QFileDialog::getOpenFileName(NULL,"DKFZ Pic (*.seq *.pic *.pic.gz *.seq.gz);;stl files (*.stl);;ves files (*.ves)");
+    QString fileName = QFileDialog::getOpenFileName(NULL,"all (*.seq *.pic *.pic.gz *.seq.gz *.stl *.ves);;DKFZ Pic (*.seq *.pic *.pic.gz *.seq.gz);;stl files (*.stl);;ves files (*.ves)");
 
     if ( !fileName.isNull() )
     {
@@ -104,6 +104,10 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
                 //	   );
                 //       ipPicFree(header);
                 delete it;
+
+			    mitk::LevelWindowProperty::Pointer levWinProp = new mitk::LevelWindowProperty();
+			    levWinProp->SetLevelWindow(reader->GetOutput()->GetLevelWindow());
+			    node->GetPropertyList()->SetProperty("levelwindow",levWinProp);
             }
         }
         else if( strstr(fileName, ".ves")!=0 )
@@ -120,20 +124,6 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
 
             initWidgets(it);
             delete it;
-        }
-        if(node != NULL)
-        {
-
-			mitk::LevelWindowProperty::Pointer levWinProp = new mitk::LevelWindowProperty();
-			levWinProp->GetLevelWindow().SetRangeMin(-1024);
-			levWinProp->GetLevelWindow().SetRangeMax(4096);
-			levWinProp->GetLevelWindow().SetMin(-1024);
-			levWinProp->GetLevelWindow().SetMax(4096);
-
-			node->GetPropertyList()->SetProperty("levelwindow",levWinProp);
-
-			connect(mitkMultiWidget->levelWindowWidget,SIGNAL(levelWindow(mitk::LevelWindow*)),this,SLOT(changeLevelWindow(mitk::LevelWindow*)) );
-
         }
 }
 
@@ -341,6 +331,8 @@ void QmitkMainTemplate::initialize()
 
 		mitkMultiWidget = new QmitkStdMultiWidget(defaultMain, "QmitkMainTemplate::QmitkStdMultiWidget");
         layoutdraw->addWidget(mitkMultiWidget);
+
+        connect(mitkMultiWidget->levelWindowWidget,SIGNAL(levelWindow(mitk::LevelWindow*)),this,SLOT(changeLevelWindow(mitk::LevelWindow*)) );
     }
     initializeFunctionality();
 }
@@ -450,12 +442,14 @@ void QmitkMainTemplate::changeLevelWindow(mitk::LevelWindow* lw )
 {
 	
 	mitk::DataTreeIterator* it=tree->inorderIterator()->clone();
-	while(it->hasNext()) {
-    it->next();
+	while(it->hasNext()) 
+    {
+        it->next();
 	
 		mitk::LevelWindowProperty::Pointer levWinProp = dynamic_cast<mitk::LevelWindowProperty*>(it->get()->GetPropertyList()->GetProperty("levelwindow").GetPointer());
-		if(levWinProp!=NULL) {
-			mitk::LevelWindow& levWin = levWinProp->GetLevelWindow();
+		if(levWinProp!=NULL) 
+        {
+			mitk::LevelWindow levWin = levWinProp->GetLevelWindow();
 
 			levWin.SetMin(lw->GetMin());
 			levWin.SetMax(lw->GetMax());

@@ -44,7 +44,7 @@ class StateEvent
     //## @brief Constructor
     //## @params id: mitk internal EventID
     //##        event: the information about the appeared event
-    StateEvent(int id, Event const* event);
+    StateEvent(int id, Event const* event = NULL );
 
     //##ModelId=3F02F89601A5
     ~StateEvent();

@@ -61,20 +61,22 @@ public:
   const TimeBounds& GetTimeBoundsInMS() const;
 
   //##ModelId=3DDE65D1028A
-  void MMToUnits(const mitk::Point3D &pt_mm, mitk::Point3D &pt_units, float t = 0) const;
+  void MMToUnits(const mitk::Point3D &pt_mm, mitk::Point3D &pt_units) const;
 
   //##ModelId=3DDE65DC0151
-  void UnitsToMM(const mitk::Point3D &pt_units, mitk::Point3D &pt_mm, float t = 0) const;
+  void UnitsToMM(const mitk::Point3D &pt_units, mitk::Point3D &pt_mm) const;
 
   //##ModelId=3E3B986602CF
-  void MMToUnits(const mitk::Vector3D &vec_mm, mitk::Vector3D &vec_units, float t = 0) const;
+  void MMToUnits(const mitk::Vector3D &vec_mm, mitk::Vector3D &vec_units) const;
   //##ModelId=3E3B987503A3
-  void UnitsToMM(const mitk::Vector3D &vec_units, mitk::Vector3D &vec_mm, float t = 0) const;
+  void UnitsToMM(const mitk::Vector3D &vec_units, mitk::Vector3D &vec_mm) const;
 
   //##ModelId=3ED91D050305
   virtual void SetBoundingBox(const float bounds[6]);
   
-  vtkTransform* GetTransform();  
+  vtkTransform* GetTransform();
+
+  itkGetConstMacro(TransformUnitsToMM, const mitk::Matrix4D &);
   
   //##ModelId=3E3453C703AF
   virtual void Initialize();

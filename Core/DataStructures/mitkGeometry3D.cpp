@@ -60,37 +60,25 @@ void mitk::Geometry3D::SetTimeBoundsInMS(const mitk::TimeBounds& timebounds)
 */
 
 //##ModelId=3DDE65D1028A
-/*!
-\todo use parameter t or removed it!!!
-*/
-void mitk::Geometry3D::MMToUnits(const mitk::Point3D &pt_mm, mitk::Point3D &pt_units, float t) const
+void mitk::Geometry3D::MMToUnits(const mitk::Point3D &pt_mm, mitk::Point3D &pt_units) const
 {
   m_TransformMMToUnits.transform(pt_mm, &pt_units);
 }
 
 //##ModelId=3DDE65DC0151
-/*!
-\todo use parameter t or removed it!!!
-*/
-void mitk::Geometry3D::UnitsToMM(const mitk::Point3D &pt_units, mitk::Point3D &pt_mm, float t) const
+void mitk::Geometry3D::UnitsToMM(const mitk::Point3D &pt_units, mitk::Point3D &pt_mm) const
 {
   m_TransformUnitsToMM.transform(pt_units, &pt_mm);
 }
 
 //##ModelId=3E3B986602CF
-/*!
-\todo use parameter t or removed it!!!
-*/
-void mitk::Geometry3D::MMToUnits(const mitk::Vector3D &vec_mm, mitk::Vector3D &vec_units, float t) const
+void mitk::Geometry3D::MMToUnits(const mitk::Vector3D &vec_mm, mitk::Vector3D &vec_units) const
 {
   m_TransformMMToUnits.transform(vec_mm, &vec_units);
 }
 
 //##ModelId=3E3B987503A3
-/*!
-\todo use parameter t or removed it!!!
-*/
-void mitk::Geometry3D::UnitsToMM(const mitk::Vector3D &vec_units, mitk::Vector3D &vec_mm, float t) const
+void mitk::Geometry3D::UnitsToMM(const mitk::Vector3D &vec_units, mitk::Vector3D &vec_mm) const
 {
   m_TransformUnitsToMM.transform(vec_units, &vec_mm);
 }
@@ -105,7 +93,7 @@ void mitk::Geometry3D::Initialize()
 // Standard Constructor for the new makro. sets the geometry to 3 dimensions
 mitk::Geometry3D::Geometry3D() : m_BoundingBox(NULL)
 {
-  m_TimeBoundsInMS[0]=-DBL_MAX; m_TimeBoundsInMS[1]=DBL_MAX;
+  m_TimeBoundsInMS[0]=-ScalarTypeNumericTraits::max(); m_TimeBoundsInMS[1]=ScalarTypeNumericTraits::max();
 
   m_TransformMMToUnits.setIdentity();
   m_TransformUnitsToMM.setIdentity();
@@ -152,6 +140,7 @@ mitk::Geometry3D::Pointer mitk::Geometry3D::Clone() const
 {
   mitk::Geometry3D::Pointer newGeometry = Geometry3D::New();
   newGeometry->Initialize();
+  newGeometry->SetBoundingBox(m_BoundingBox);
   newGeometry->GetTransform()->SetMatrix(m_Transform->GetMatrix());
   //newGeometry->GetRelativeTransform()->SetMatrix(m_RelativeTransform->GetMatrix());
   newGeometry->SetPosition(GetPosition());

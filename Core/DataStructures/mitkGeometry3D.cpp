@@ -78,6 +78,24 @@ void mitk::Geometry3D::TransferItkToVtkTransform()
   vtkmatrix->Delete();
 }
 
+void mitk::Geometry3D::TransferVtkToITKTransform()
+{
+  vtkMatrix4x4* vtkmatrix = m_VtkIndexToWorldTransform->GetMatrix();
+  itk::Matrix<mitk::ScalarType,3,3>::InternalMatrixType& vlnMatrix = const_cast<itk::Matrix<mitk::ScalarType,3,3>::InternalMatrixType&>(m_IndexToWorldTransform->GetMatrix().GetVnlMatrix());  
+
+  for ( int i=0; i < 3; ++i)
+    for( int j=0; j < 3; ++j )
+      vlnMatrix.put( i, j, vtkmatrix->GetElement( i, j ) );      
+
+  itk::AffineTransform<mitk::ScalarType>::OffsetType offset;
+  offset[0] = vtkmatrix->GetElement( 0, 3 );
+  offset[1] = vtkmatrix->GetElement( 1, 3 );
+  offset[2] = vtkmatrix->GetElement( 2, 3 );
+  m_IndexToWorldTransform->SetOffset( offset );
+  m_IndexToWorldTransform->Modified();
+}
+
+
 void mitk::Geometry3D::SetTimeBoundsInMS(const TimeBounds& timebounds)
 {
   if(m_TimeBoundsInMS != timebounds)
@@ -188,6 +206,7 @@ void mitk::Geometry3D::ExecuteOperation(Operation* operation)
     m_VtkIndexToWorldTransform->PostMultiply();
     m_VtkIndexToWorldTransform->Translate(newPos[0], newPos[1], newPos[2]);    
     m_VtkIndexToWorldTransform->PreMultiply();
+    TransferVtkToITKTransform();
     break;
   }
 	case OpSCALE:
@@ -217,6 +236,7 @@ void mitk::Geometry3D::ExecuteOperation(Operation* operation)
     m_VtkIndexToWorldTransform->Translate(+center[0], +center[1], +center[2]);   
     m_VtkIndexToWorldTransform->Translate(pos[0], pos[1], pos[2]);
     m_VtkIndexToWorldTransform->PreMultiply();
+    TransferVtkToITKTransform();
     break;
   }
   case OpROTATE:
@@ -237,6 +257,7 @@ void mitk::Geometry3D::ExecuteOperation(Operation* operation)
     m_VtkIndexToWorldTransform->RotateWXYZ(angle, rotationVector[0], rotationVector[1], rotationVector[2]);
     m_VtkIndexToWorldTransform->Translate(center[0], center[1], center[2]);
     m_VtkIndexToWorldTransform->PreMultiply();
+    TransferVtkToITKTransform();
     break;  
   }
   default:

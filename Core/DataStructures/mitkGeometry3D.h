@@ -221,6 +221,8 @@ public:
 
   void TransferItkToVtkTransform();
 
+  void TransferVtkToITKTransform();
+
   //##Documentation
   //## @brief clones the geometry
   //##

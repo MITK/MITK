@@ -6,7 +6,10 @@
  *   writes a PicFile to disk
  *
  * $Log$
- * Revision 1.4  1997/10/20 13:35:40  andre
+ * Revision 1.5  1998/05/06 14:13:15  andre
+ * added info->pixel_start_in_file
+ *
+ * Revision 1.4  1997/10/20  13:35:40  andre
  * *** empty log message ***
  *
  * Revision 1.3  1997/09/15  13:21:18  andre
@@ -80,7 +83,9 @@ ipPicPut( char *outfile_name, ipPicDescriptor *pic )
 
   ipFWriteLE( pic->n, sizeof(ipUInt4_t), pic->dim, outfile );
 
-  _ipPicWriteTags( pic->info->tags_head, outfile );
+  _ipPicWriteTags( pic->info->tags_head, outfile, ipPicEncryptionType(pic) );
+
+  pic->info->pixel_start_in_file = ftell( outfile );
 
   ipFWriteLE( pic->data, pic->bpe / 8, _ipPicElements(pic), outfile );
 
@@ -151,7 +156,7 @@ ipUInt4_t _ipPicTagsNumber( _ipPicTagsElement_t *head )
   return( tags_number );
 }
 
-void _ipPicWriteTags( _ipPicTagsElement_t *head, FILE *stream )
+void _ipPicWriteTags( _ipPicTagsElement_t *head, FILE *stream, char encryption_type )
 {
   _ipPicTagsElement_t *current = head;
 
@@ -201,7 +206,8 @@ void _ipPicWriteTags( _ipPicTagsElement_t *head, FILE *stream )
       if( current->tsv->type == ipPicTSV )
         {
           _ipPicWriteTags( current->tsv->value,
-                           stream );
+                           stream,
+                           encryption_type );
         }
       else
         {

@@ -53,6 +53,7 @@
 #include <mitkDICOMFileReader.h>
 #include <mitkDSRFileReader.h>
 #include <mitkCylindricToCartesianFilter.h>
+#include <itksys/SystemTools.hxx>
 #endif
 
 #include <mitkParRecFileReader.h>
@@ -299,19 +300,19 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
 
     delete it;
   }
-  else if(strstr(fileName, "hpsonos.db")!=0 || strstr(fileName, "HPSONOS.DB")!=0)
+  else if(itksys::SystemTools::Strucmp(itksys::SystemTools::GetFilenameName(fileName).c_str(), "HPSONOS.DB")==0)
   {
 
-    if (strstr(fileName, "HPSONOS.DB")!=0)
-    {
-      std::cout << "renamed HPSONOS.DB to hpsonos.db" << std::endl;
-      std::string newFileName(fileName);
+    //if (strstr(fileName, "HPSONOS.DB")!=0)
+    //{
+    //  std::cout << "renamed HPSONOS.DB to hpsonos.db" << std::endl;
+    //  std::string newFileName(fileName);
 
-      int length = newFileName.length();
-      newFileName.replace(length-10,10,"hpsonos.db");
-      std::cout << "new filename: " << newFileName << std::endl;
-      fileName = newFileName.c_str();
-    }
+    //  int length = newFileName.length();
+    //  newFileName.replace(length-10,10,"hpsonos.db");
+    //  std::cout << "new filename: " << newFileName << std::endl;
+    //  fileName = newFileName.c_str();
+    //}
 
 
     mitk::DSRFileReader::Pointer reader;

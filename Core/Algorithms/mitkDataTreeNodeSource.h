@@ -1,7 +1,7 @@
 #ifndef _MITK_DATA_TREE_NODE_SOURCE_H
 #define _MITK_DATA_TREE_NODE_SOURCE_H
 
-#include "mitkBaseProcess.h"
+#include "itkProcessObject.h"
 #include "mitkDataTreeNode.h"
 
 namespace mitk
@@ -16,10 +16,10 @@ namespace mitk
  * DataObject. This is also true for subclasses of mitk::BaseProcess and thus
  * for mitk::DataTreeNodeSource.
  */
-class DataTreeNodeSource : public BaseProcess
+  class DataTreeNodeSource : public itk::ProcessObject
 {
 public:
-    mitkClassMacro( DataTreeNodeSource, BaseProcess );
+    mitkClassMacro( DataTreeNodeSource, itk::ProcessObject );
 
     itkNewMacro( Self );
 

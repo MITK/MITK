@@ -8,7 +8,7 @@
 
 class vtkVolumeRayCastMapper;
 class vtkVolume;
-
+class vtkObject;
 
 namespace mitk {
 
@@ -38,7 +38,7 @@ public:
   virtual void Update();
 
   virtual void ApplyProperties(vtkActor* actor, mitk::BaseRenderer* renderer);
-  static void abortTest(void* test);
+  static void AbortCallback(vtkObject *caller, unsigned long eid, void *clientdata, void *calldata);
 protected:
 
   virtual void GenerateOutputInformation();

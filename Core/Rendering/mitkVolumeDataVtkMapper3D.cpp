@@ -1,3 +1,4 @@
+#include <qapplication.h>
 #include "mitkVolumeDataVtkMapper3D.h"
 #include "DataTreeNode.h"
 #include "mitkFloatProperty.h"
@@ -14,6 +15,9 @@
 #include <vtkVolumeRayCastCompositeFunction.h>
 #include <vtkFiniteDifferenceGradientEstimator.h>
 #include <vtkRenderWindow.h>
+#include <vtkCallbackCommand.h>
+// extern QApplication* qApp;
+
 const mitk::Image* mitk::VolumeDataVtkMapper3D::GetInput()
 {
 if (this->GetNumberOfInputs() < 1)
@@ -63,12 +67,20 @@ mitk::VolumeDataVtkMapper3D::~VolumeDataVtkMapper3D()
 {
 
 }
-void mitk::VolumeDataVtkMapper3D::abortTest(void* test) {
-  vtkRenderWindow* renWin = reinterpret_cast<vtkRenderWindow*>(test);
+void mitk::VolumeDataVtkMapper3D::AbortCallback(vtkObject *caller, unsigned long eid, void *clientdata, void *calldata) {
+  // std::cout << "abort test called" << std::endl;
+  vtkRenderWindow* renWin = dynamic_cast<vtkRenderWindow*>(caller);
   assert(renWin);
-  if (renWin->GetEventPending()) {
-    renWin->SetAbortRender(1);    
-  }
+  // FIXME: qApp->hasPendingEvents is always true, renWin->GetEventPending is
+  // always false. So aborting the render doesn't work this way.
+
+  // if (
+  //   qApp->hasPendingEvents()
+  // )
+  // {
+  // std::cout << "setting abort render" << std::endl;
+  //   renWin->SetAbortRender(1);    
+  // }
 }
 
 void mitk::VolumeDataVtkMapper3D::Update(mitk::BaseRenderer* renderer)
@@ -92,12 +104,11 @@ void mitk::VolumeDataVtkMapper3D::Update(mitk::BaseRenderer* renderer)
     std::cout << "Image == NULL" << std::endl;
   } else {   
   vtkVolumeProperty* volumeProperty = vtkVolumeProperty::New();
-  vtkPiecewiseFunction*	opacityTransferFunction, *gradientTransferFunction;
+  vtkPiecewiseFunction *opacityTransferFunction, *gradientTransferFunction;
   vtkColorTransferFunction* colorTransferFunction;
 
   opacityTransferFunction  = vtkPiecewiseFunction::New();
   colorTransferFunction    = vtkColorTransferFunction::New();
-//  gradientTransferFunction = vtkPiecewiseFunction::New();
   mitk::LevelWindow levelWindow;
   int lw_min,lw_max;
   if (GetLevelWindow(levelWindow,renderer)) {
@@ -133,16 +144,16 @@ void mitk::VolumeDataVtkMapper3D::Update(mitk::BaseRenderer* renderer)
   m_Prop3D = m_Volume;
   mitk::OpenGLRenderer* openGlRenderer = dynamic_cast<mitk::OpenGLRenderer*>(renderer);
   assert(openGlRenderer);
-  
+  vtkCallbackCommand* cbc = vtkCallbackCommand::New(); 
+  cbc->SetCallback(mitk::VolumeDataVtkMapper3D::AbortCallback); 
   vtkRenderWindow* vtkRendWin;
   vtkRendWin = (vtkRenderWindow*)openGlRenderer->GetVtkRenderWindow();
-  vtkRendWin->SetAbortCheckMethod(mitk::VolumeDataVtkMapper3D::abortTest,vtkRendWin); 
+  vtkRendWin->AddObserver(vtkCommand::AbortCheckEvent,cbc); 
   // mitk::VolumeData::Pointer input  = const_cast<mitk::VolumeData*>(this->GetInput());
 
   // m_VtkPolyDataMapper->SetInput(input->GetVtkPolyData());
 
   //apply properties read from the PropertyList
-  // ApplyProperties(m_Actor, renderer);
 
   StandardUpdate();
   }

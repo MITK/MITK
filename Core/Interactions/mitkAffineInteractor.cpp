@@ -1,4 +1,4 @@
-#include "mitkAfineInteractor.h"
+#include "mitkAffineInteractor.h"
 #include "mitkInteractionConst.h"
 
 mitk::AfineInteractor::AfineInteractor(std::string type, DataTreeNode* dataTreeNode)

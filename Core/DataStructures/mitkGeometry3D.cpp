@@ -7,6 +7,7 @@
 
 #include <vecmath.h>
 #include <vtkTransform.h>
+#include <vtkMatrix4x4.h>
 
 #ifdef MBI_INTERNAL
 extern "C"
@@ -135,14 +136,11 @@ mitk::Geometry3D::Geometry3D() : m_TimeSteps(0)
 {
   m_TransformMMToUnits.setIdentity();
   m_TransformUnitsToMM.setIdentity();
-  //New
+
   m_BaseGeometry = NULL; // there is no base geometry, this one is independend (until SetBaseGeometry() is called)
   
   m_Transform = vtkTransform::New();  
   m_Transform->PostMultiply();
-  m_Origin[0] = 0.0;
-  m_Origin[1] = 0.0;
-  m_Origin[2] = 0.0;
 
   m_Position[0] = 0.0;
   m_Position[1] = 0.0;
@@ -186,18 +184,17 @@ void mitk::Geometry3D::SetMasterTransform(const vtkTransform * transform)
 
 }
 
-/*!
-\todo set m_Origin, m_Orientation,... in the new Geometry - Need to write acces Methods for the member variables first.
-*/
 mitk::Geometry3D::Pointer mitk::Geometry3D::Clone()
 {
   mitk::Geometry3D::Pointer newGeometry = Geometry3D::New();
   newGeometry->Initialize(m_TimeSteps);
   newGeometry->GetTransform()->SetMatrix(m_Transform->GetMatrix());
   //newGeometry->GetRelativeTransform()->SetMatrix(m_RelativeTransform->GetMatrix());
+  newGeometry->SetPosition(m_Position);
+  newGeometry->SetOrientation(m_Orientation);
+  newGeometry->SetScale(m_Scale);
   
-  return newGeometry;
-  
+  return newGeometry;  
 }
 
 void mitk::Geometry3D::ExecuteOperation(Operation* operation)
@@ -243,9 +240,6 @@ void mitk::Geometry3D::ExecuteOperation(Operation* operation)
   GetTransform()->GetOrientation(m_Orientation);  // save orientation
   
   GetTransform()->Identity();
-  
-  // shift back to actor's origin
-  GetTransform()->Translate(-m_Origin[0], -m_Origin[1], -m_Origin[2]);
 
   // scale
   GetTransform()->Scale(m_Scale[0], m_Scale[1], m_Scale[2]);
@@ -253,15 +247,52 @@ void mitk::Geometry3D::ExecuteOperation(Operation* operation)
   // rotate
   GetTransform()->RotateY(m_Orientation[1]);
   GetTransform()->RotateX(m_Orientation[0]);
-  GetTransform()->RotateZ(m_Orientation[2]);  
+  GetTransform()->RotateZ(m_Orientation[2]);
   if (angle != 0.0)
   {
-    GetTransform()->RotateWXYZ(angle, rotationVector[0], rotationVector[1], rotationVector[2]);
-    std::cout << "Rotation: angle = " << angle << ", axis = <" << rotationVector[0] <<", " << rotationVector[1] << ", " << rotationVector[2] << ">\n";
-  }    
-  // move back from origin and translate
-  GetTransform()->Translate(m_Origin[0] + m_Position[0], m_Origin[1] + m_Position[1], m_Origin[2] + m_Position[2]);
-  
-  //std::cout << "Position:  <" << m_Position[0] <<", " << m_Position[1] << ", " << m_Position[2] << ">\n";
-  //std::cout << "Scale:  <" << m_Scale[0] <<", " << m_Scale[1] << ", " << m_Scale[2] << ">\n";
+    GetTransform()->RotateWXYZ(angle, rotationVector[0], rotationVector[1], rotationVector[2]);    
+  }
+
+  // move back from origin and translate  
+  GetTransform()->Translate(m_Position[0], m_Position[1], m_Position[2]);
 }
+
+const mitk::ITKVector3D mitk::Geometry3D::GetXAxis()
+{
+  vtkMatrix4x4* m = GetTransform()->GetMatrix();
+  mitk::ITKVector3D v;
+  v[0] = m->Element[0][0];
+  v[1] = m->Element[1][0];
+  v[2] = m->Element[2][0];
+  v.Normalize();  
+  return v;
+}
+
+const mitk::ITKVector3D mitk::Geometry3D::GetYAxis()
+{
+  vtkMatrix4x4* m = GetTransform()->GetMatrix();
+  mitk::ITKVector3D v;
+  v[0] = m->Element[0][1];
+  v[1] = m->Element[1][1];
+  v[2] = m->Element[2][1];
+  v.Normalize();
+  return v;
+}
+const mitk::ITKVector3D mitk::Geometry3D::GetZAxis()
+{
+  vtkMatrix4x4* m = GetTransform()->GetMatrix();
+  mitk::ITKVector3D v;
+  v[0] = m->Element[0][2];
+  v[1] = m->Element[1][2];
+  v[2] = m->Element[2][2];
+  v.Normalize();
+  return v;
+}
+
+//printmatrix(vtkMatrix4x4* m)
+//{
+//  std::cout << "matrix: " << m->Element[0][0] << ", " << m->Element[0][1] << ", " << m->Element[0][2] << ", " << m->Element[0][3] << std::endl;
+//  std::cout << "        " << m->Element[1][0] << ", " << m->Element[1][1] << ", " << m->Element[1][2] << ", " << m->Element[0][3] << std::endl;
+//  std::cout << "        " << m->Element[2][0] << ", " << m->Element[2][1] << ", " << m->Element[2][2] << ", " << m->Element[0][3] << std::endl;
+//  std::cout << "        " << m->Element[3][0] << ", " << m->Element[3][1] << ", " << m->Element[3][2] << ", " << m->Element[3][3] << std::endl;
+//}

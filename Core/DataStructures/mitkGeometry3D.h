@@ -96,20 +96,18 @@ public:
   //##Documentation
   //##@brief executes affine operations (translate, rotate, scale)
   void ExecuteOperation(Operation* operation);
-
-  //mitk::ScalarType* GetScale();
-  
-  itkSetVectorMacro(Origin, ScalarType, 3);
+   
   itkSetVectorMacro(Position, ScalarType, 3);
   itkSetVectorMacro(Orientation, ScalarType, 3);
-  itkSetVectorMacro(Scale, ScalarType, 3);
-  itkSetVectorMacro(Center, ScalarType, 3);  
+  itkSetVectorMacro(Scale, ScalarType, 3); 
 
-  itkGetVectorMacro(Origin, const ScalarType, 3);
   itkGetVectorMacro(Position, const ScalarType, 3);
   itkGetVectorMacro(Orientation, const ScalarType, 3);
   itkGetVectorMacro(Scale, const ScalarType, 3);
-  itkGetVectorMacro(Center, const ScalarType, 3);  
+  
+  const ITKVector3D GetXAxis();
+  const ITKVector3D GetYAxis();
+  const ITKVector3D GetZAxis();
 protected:
   Geometry3D();
 
@@ -130,11 +128,9 @@ protected:
 
   vtkTransform* m_Transform;
   
-  ScalarType m_Origin[3];
   ScalarType m_Position[3];
   ScalarType m_Orientation[3];
-  ScalarType m_Scale[3];
-  ScalarType m_Center[3];
+  ScalarType m_Scale[3];  
 
   Geometry3D::Pointer m_BaseGeometry;  
 };

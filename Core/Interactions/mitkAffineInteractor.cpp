@@ -130,10 +130,11 @@ bool mitk::AffineInteractor::ExecuteSideEffect(int sideEffectId, mitk::StateEven
 		mitk::ITKPoint3D newPosition;
 		mitk::vm2itk(posEvent->GetWorldPosition(), newPosition);
     m_lastScalePosition = newPosition;
-    mitk::ScalarType lastScale[3];
-    // Save initial scale
-    geometry->GetTransform()->GetScale(lastScale);
-    m_lastScaleData = lastScale;
+  
+    const mitk::ScalarType* lastScale = geometry->GetScale();
+    m_lastScaleData[0] = lastScale[0];
+    m_lastScaleData[1] = lastScale[1];
+    m_lastScaleData[2] = lastScale[2];
  
     ok = true;
     break;
@@ -144,14 +145,28 @@ bool mitk::AffineInteractor::ExecuteSideEffect(int sideEffectId, mitk::StateEven
 		if (posEvent == NULL) return false;    
     //converting from Point3D to itk::Point
 		mitk::ITKPoint3D newPosition;
-		mitk::vm2itk(posEvent->GetWorldPosition(), newPosition);
+		mitk::vm2itk(posEvent->GetWorldPosition(), newPosition); 
     
+          //std::cout << "newPosition:  <" << newPosition[0] <<", " << newPosition[1] << ", " << newPosition[2] << ">\n";    
+          //std::cout << "m_lastScalePosition:  <" << m_lastScalePosition[0] <<", " << m_lastScalePosition[1] << ", " << m_lastScalePosition[2] << ">\n";    
     
-    mitk::ITKPoint3D newScale;
-    newScale[0] = m_lastScaleData[0] + (newPosition[0] - m_lastScalePosition[0]);// * m_ScaleFactor;
-    newScale[1] = m_lastScaleData[1] + (newPosition[1] - m_lastScalePosition[1]);// * m_ScaleFactor;
-    newScale[2] = m_lastScaleData[2] + (newPosition[2] - m_lastScalePosition[2]);// * m_ScaleFactor;
+    mitk::ITKVector3D v = newPosition - m_lastScalePosition;
+    //const ScalarType* pos = geometry->GetPosition();
+    //v[0] -= pos[0];
+    //v[1] -= pos[1];
+    //v[2] -= pos[2];
 
+          //std::cout << "v:  <" << v[0] <<", " << v[1] << ", " << v[2] << ">\n";
+          //std::cout << "m_lastScaleData:  <" << m_lastScaleData[0] <<", " << m_lastScaleData[1] << ", " << m_lastScaleData[2] << ">\n";
+
+    mitk::ITKPoint3D newScale;
+    newScale[0] = m_lastScaleData[0] + (geometry->GetXAxis() * v);  // Scalarprodukt of normalized Axis 
+    newScale[1] = m_lastScaleData[1] + (geometry->GetYAxis() * v);  // and direction vector of mouse movement 
+    newScale[2] = m_lastScaleData[2] + (geometry->GetZAxis() * v);  // is the length of the movement vectors 
+                                                                    // projection onto the axis
+    
+          //std::cout << "newScale:  <" << newScale[0] <<", " << newScale[1] << ", " << newScale[2] << ">\n";
+    
     newScale[0] = (newScale[0] < 1) ? 1 : newScale[0]; // cap at a minimum scale factor of 1
     newScale[1] = (newScale[1] < 1) ? 1 : newScale[1];
     newScale[2] = (newScale[2] < 1) ? 1 : newScale[2];
@@ -161,7 +176,7 @@ bool mitk::AffineInteractor::ExecuteSideEffect(int sideEffectId, mitk::StateEven
 		if (m_UndoEnabled)	//write to UndoMechanism
 		{     
       mitk::ScalarType oldScale[3];
-      geometry->GetTransform()->GetScale(oldScale);
+      geometry->GetTransform()->GetScale(oldScale);   // Achtung, umstellen!
       mitk::ITKPoint3D oldScaleData = oldScale;
       
       AffineTransformationOperation* undoOp = new mitk::AffineTransformationOperation(OpSCALE, oldScaleData, 0.0, 0);

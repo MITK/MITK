@@ -54,6 +54,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <itksys/SystemTools.hxx>
 
+#include "mitkSurfaceVtkWriter.h"
 #include <vtkSTLWriter.h>
 #include <vtkPolyDataWriter.h>
 
@@ -423,21 +424,19 @@ static mitk::DataTreeNode::Pointer FileOpen()
         {
           if(fileName.endsWith(".stl")==true)
           {
-            vtkSTLWriter *writer=vtkSTLWriter::New();
-            writer->SetInput( surface->GetVtkPolyData() );
+            mitk::SurfaceVtkWriter<vtkSTLWriter>::Pointer writer=mitk::SurfaceVtkWriter<vtkSTLWriter>::New();
+            writer->SetInput( surface );
             writer->SetFileName(fileName.ascii());
-            writer->SetFileTypeToBinary();
+            writer->GetVtkWriter()->SetFileTypeToBinary();
             writer->Write();
-            writer->Delete();
           }
           else 
           {
             if (fileName.endsWith(".vtk")==false) fileName += ".vtk";
-            vtkPolyDataWriter * polyWriter = vtkPolyDataWriter::New();
-            polyWriter->SetInput( surface->GetVtkPolyData() );
-            polyWriter->SetFileName(fileName.ascii());
-            polyWriter->Write();
-            polyWriter->Delete();
+            mitk::SurfaceVtkWriter<vtkPolyDataWriter>::Pointer writer=mitk::SurfaceVtkWriter<vtkPolyDataWriter>::New();
+            writer->SetInput( surface );
+            writer->SetFileName(fileName.ascii());
+            writer->Write();
           }
         }
     }

@@ -112,7 +112,7 @@ class GlobalInteraction : public StateMachine
   //## @brief Returns the pointer to the FocusManager
   //##
   //## to add the observer for an event
-  mitk::FocusManager* mitk::GlobalInteraction::GetFocusManager();
+  FocusManager* GetFocusManager();
 
   protected:
 

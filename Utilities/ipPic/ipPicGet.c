@@ -52,6 +52,9 @@
  *   reads a PicFile from disk
  *
  * $Log$
+ * Revision 1.12  2002/02/27 08:54:43  andre
+ * zlib changes
+ *
  * Revision 1.11  2000/05/04 12:52:37  ivo
  * inserted BSD style license
  *
@@ -124,7 +127,8 @@ _ipPicOpenPicFileIn( char *path )
   return( infile );
 }
 
-ipPicDescriptor *ipPicGet( char *infile_name, ipPicDescriptor *pic )
+ipPicDescriptor *
+ipPicGet( char *infile_name, ipPicDescriptor *pic )
 {
   FILE *infile;
 
@@ -133,21 +137,16 @@ ipPicDescriptor *ipPicGet( char *infile_name, ipPicDescriptor *pic )
 
   ipUInt4_t to_read;
 
-  if( infile_name == NULL )
-    infile = stdin;
-  else if( strcmp(infile_name, "stdin") == 0 )
-    infile = stdin;
-  else
-    infile = fopen( infile_name, "rb" );
+  infile = _ipPicOpenPicFileIn( infile_name );
 
-  if( infile == NULL )
+  if( !infile )
     {
       /*ipPrintErr( "ipPicGet: sorry, error opening infile\n" );*/
       return( NULL );
     }
 
   /* read infile */
-  fread( tag_name, 1, 4, infile );
+  ipPicFRead( tag_name, 1, 4, infile );
 
   if( strncmp( "\037\213", tag_name, 2 ) == 0 )
     {
@@ -163,7 +162,7 @@ ipPicDescriptor *ipPicGet( char *infile_name, ipPicDescriptor *pic )
         _ipPicOldGet( infile,
                       pic );
       if( infile != stdin )
-        fclose( infile );
+        ipPicFClose( infile );
       return( pic );
     }
 
@@ -172,7 +171,7 @@ ipPicDescriptor *ipPicGet( char *infile_name, ipPicDescriptor *pic )
 
   ipPicClear( pic );
 
-  fread( &(tag_name[4]), 1, sizeof(ipPicTag_t)-4, infile );
+  ipPicFRead( &(tag_name[4]), 1, sizeof(ipPicTag_t)-4, infile );
   strncpy( pic->info->version, tag_name, _ipPicTAGLEN );
 
   ipPicFReadLE( &len, sizeof(ipUInt4_t), 1, infile );
@@ -187,7 +186,7 @@ ipPicDescriptor *ipPicGet( char *infile_name, ipPicDescriptor *pic )
   to_read = len -        3 * sizeof(ipUInt4_t)
                 - pic->dim * sizeof(ipUInt4_t);
 #if 0
-  fseek( infile, to_read, SEEK_CUR );
+  ipPicFSeek( infile, to_read, SEEK_CUR );
 #else
   pic->info->tags_head = _ipPicReadTags( pic->info->tags_head, to_read, infile, ipPicEncryptionType(pic) );
 #endif
@@ -203,12 +202,12 @@ ipPicDescriptor *ipPicGet( char *infile_name, ipPicDescriptor *pic )
 
   pic->info->pixel_start_in_file = ipPicFTell( infile );
   if( pic->type == ipPicNonUniform )
-    fread( pic->data, pic->bpe / 8, _ipPicElements(pic), infile );
+    ipPicFRead( pic->data, pic->bpe / 8, _ipPicElements(pic), infile );
   else
     ipPicFReadLE( pic->data, pic->bpe / 8, _ipPicElements(pic), infile );
 
   if( infile != stdin )
-    fclose( infile );
+    ipPicFClose( infile );
 
 #ifdef WIN
   GlobalUnlock( pic->hdata );
@@ -217,7 +216,8 @@ ipPicDescriptor *ipPicGet( char *infile_name, ipPicDescriptor *pic )
   return( pic );
 }
 
-_ipPicTagsElement_t *_ipPicReadTags( _ipPicTagsElement_t *head, ipUInt4_t bytes_to_read, FILE *stream, char encryption_type )
+_ipPicTagsElement_t *
+_ipPicReadTags( _ipPicTagsElement_t *head, ipUInt4_t bytes_to_read, FILE *stream, char encryption_type )
 {
   while( bytes_to_read > 0 )
     {
@@ -230,7 +230,7 @@ _ipPicTagsElement_t *_ipPicReadTags( _ipPicTagsElement_t *head, ipUInt4_t bytes_
 
       tsv = malloc( sizeof(ipPicTSV_t) );
 
-      fread( &tag_name, sizeof(ipPicTag_t), 1, stream );
+      ipPicFRead( &tag_name, sizeof(ipPicTag_t), 1, stream );
       strncpy( tsv->tag, tag_name, _ipPicTAGLEN );
       tsv->tag[_ipPicTAGLEN] = '\0';
 

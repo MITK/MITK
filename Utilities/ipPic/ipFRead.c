@@ -53,6 +53,9 @@
  *   and swaps to the other endianess
  *
  * $Log$
+ * Revision 1.10  2002/02/27 08:54:43  andre
+ * zlib changes
+ *
  * Revision 1.9  2000/05/04 12:52:35  ivo
  * inserted BSD style license
  *
@@ -125,6 +128,24 @@ ipPicFReadCvt( void *ptr, size_t size, size_t nitems, ipPicFile_t stream )
   return( bytes_return );
 }
 
+int
+ipPicAccess( char *path, int mode )
+{
+  int status;
+
+  status = access( path, mode );
+
+  if( status == -1 )
+    {
+      char buff[1024];
+
+      sprintf( buff, "%s.gz", path );
+
+      status = access( buff, mode );
+    }
+
+  return( status );
+}
 int
 ipPicRemoveFile( char *path )
 {

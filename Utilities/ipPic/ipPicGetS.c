@@ -52,6 +52,9 @@
  *   reads a slice from a PicFile
  *
  * $Log$
+ * Revision 1.5  2002/02/27 08:54:43  andre
+ * zlib changes
+ *
  * Revision 1.4  2000/05/04 12:52:38  ivo
  * inserted BSD style license
  *
@@ -95,7 +98,7 @@ ipPicDescriptor *ipPicGetSlice( char *infile_name, ipPicDescriptor *pic, ipUInt4
   else if( strcmp(infile_name, "stdin") == 0 )
     infile = stdin;
   else
-    infile = fopen( infile_name, "rb" );
+    infile = _ipPicOpenPicFileIn( infile_name );
 
   if( infile == NULL )
     {
@@ -104,7 +107,7 @@ ipPicDescriptor *ipPicGetSlice( char *infile_name, ipPicDescriptor *pic, ipUInt4
     }
 
   /* read infile */
-  fread( &(tag_name[0]), 1, 4, infile );
+  ipPicFRead( &(tag_name[0]), 1, 4, infile );
 
   if( strncmp( ipPicVERSION, tag_name, 4 ) != 0 )
     {
@@ -117,7 +120,7 @@ ipPicDescriptor *ipPicGetSlice( char *infile_name, ipPicDescriptor *pic, ipUInt4
                            pic,
                            slice );
       if( infile != stdin )
-        fclose( infile );
+        ipPicFClose( infile );
       return( pic );
     }
 
@@ -127,7 +130,7 @@ ipPicDescriptor *ipPicGetSlice( char *infile_name, ipPicDescriptor *pic, ipUInt4
 
   ipPicClear( pic );
 
-  fread( &(tag_name[4]), 1, sizeof(ipPicTag_t)-4, infile );
+  ipPicFRead( &(tag_name[4]), 1, sizeof(ipPicTag_t)-4, infile );
   strncpy( pic->info->version, tag_name, _ipPicTAGLEN );
 
   ipFReadLE( &len, sizeof(ipUInt4_t), 1, infile );
@@ -141,7 +144,7 @@ ipPicDescriptor *ipPicGetSlice( char *infile_name, ipPicDescriptor *pic, ipUInt4
 
   skip = len -        3 * sizeof(ipUInt4_t)
              - pic->dim * sizeof(ipUInt4_t);
-  fseek( infile, skip, SEEK_CUR );
+  ipPicFSeek( infile, skip, SEEK_CUR );
 
   picsize = _ipPicSize(pic);
 
@@ -158,14 +161,14 @@ ipPicDescriptor *ipPicGetSlice( char *infile_name, ipPicDescriptor *pic, ipUInt4
 
   picsize = _ipPicSize(pic);
 
-  fseek( infile, picsize * (slice - 1), SEEK_CUR );
+  ipPicFSeek( infile, picsize * (slice - 1), SEEK_CUR );
 
   pic->data = malloc( picsize );
 
   ipFReadLE( pic->data, pic->bpe / 8, _ipPicElements(pic), infile );
 
   if( infile != stdin )
-    fclose( infile );
+    ipPicFClose( infile );
 
   return( pic );
 }

@@ -17,7 +17,7 @@ class UndoModel
   //##ModelId=3E95950F02B1
   UndoModel();
 
-  ~UndoModel();
+  virtual ~UndoModel();
 
   //##ModelId=3E5F5C6C00DF
   virtual bool SetOperationEvent(OperationEvent* operationEvent) = 0;

@@ -114,17 +114,7 @@ QAction * QmitkSimpleExampleFunctionality::createAction(QActionGroup *parent)
 }
 void QmitkSimpleExampleFunctionality::initNavigators()
 {
-  //\todo unwanted recursion: here we want to set the new worldgeometry according to the boundingbox of the (sub-)tree. Unfortuantely, the
-  //old worldgeometries are included in the tree and thus considered in the boundingbox-calculation.... Current solution: make them temporarily invisible
-  //and use ComputeVisibleBoundingBox.
-  mitk::DataTreeNode::Pointer node;
-  bool v1,v2,v3,v4;
-  node = multiWidget->mitkWidget1->GetRenderer()->GetCurrentWorldGeometry2DNode(); node->GetVisibility(v1, NULL); node->SetVisibility(false, NULL);
-  node = multiWidget->mitkWidget2->GetRenderer()->GetCurrentWorldGeometry2DNode(); node->GetVisibility(v2, NULL); node->SetVisibility(false, NULL);
-  node = multiWidget->mitkWidget3->GetRenderer()->GetCurrentWorldGeometry2DNode(); node->GetVisibility(v3, NULL); node->SetVisibility(false, NULL);
-  node = multiWidget->mitkWidget4->GetRenderer()->GetCurrentWorldGeometry2DNode(); node->GetVisibility(v4, NULL); node->SetVisibility(false, NULL);
-
-  const mitk::BoundingBox::Pointer boundingbox = mitk::DataTree::ComputeVisibleBoundingBox(m_DataTreeIterator);
+  const mitk::BoundingBox::Pointer boundingbox = mitk::DataTree::ComputeVisibleBoundingBox(m_DataTreeIterator, NULL, "includeInBoundingBox");
   if(boundingbox->GetPoints()->Size()>0)
   {
     mitk::Geometry3D::Pointer geometry = mitk::Geometry3D::New();
@@ -134,11 +124,6 @@ void QmitkSimpleExampleFunctionality::initNavigators()
     sliceNavigatorFrontal->SetInputWorldGeometry(geometry.GetPointer());     sliceNavigatorFrontal->Update();
     sliceNavigatorSagittal->SetInputWorldGeometry(geometry.GetPointer());    sliceNavigatorSagittal->Update();
   }
-
- multiWidget->mitkWidget1->GetRenderer()->GetCurrentWorldGeometry2DNode()->SetVisibility(v1, NULL);
- multiWidget->mitkWidget2->GetRenderer()->GetCurrentWorldGeometry2DNode()->SetVisibility(v2, NULL);
- multiWidget->mitkWidget3->GetRenderer()->GetCurrentWorldGeometry2DNode()->SetVisibility(v3, NULL);
- multiWidget->mitkWidget4->GetRenderer()->GetCurrentWorldGeometry2DNode()->SetVisibility(v4, NULL);
 }
 
 void QmitkSimpleExampleFunctionality::treeChanged(mitk::DataTreeIterator& itpos)

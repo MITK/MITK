@@ -74,7 +74,6 @@ protected:
   PixelType m_InsideValue;
   PixelType m_OutsideValue;
   bool m_UseInsideValue;
-  
 
 };
 

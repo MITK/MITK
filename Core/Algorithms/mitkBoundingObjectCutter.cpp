@@ -57,13 +57,13 @@ void mitk::BoundingObjectCutter::GenerateData()
   const mitk::BoundingBox::PointType maxPoint = boundingBox->GetMaximum();
   float* posPoint = m_BoundingObject->GetGeometry()->GetVtkTransform()->GetPosition();
   ItkImageType::IndexType start;
-  start[0] = posPoint[0] + minPoint[0] + 0.5; // first index on X
-  start[1] = posPoint[1] + minPoint[1] + 0.5; // first index on Y
-  start[2] = posPoint[2] + minPoint[2] + 0.5; // first index on Z
+  start[0] = static_cast<ItkImageType::IndexType::IndexValueType>(posPoint[0] + minPoint[0] + 0.5); // first index on X
+  start[1] = static_cast<ItkImageType::IndexType::IndexValueType>(posPoint[1] + minPoint[1] + 0.5); // first index on Y
+  start[2] = static_cast<ItkImageType::IndexType::IndexValueType>(posPoint[2] + minPoint[2] + 0.5); // first index on Z
   ItkImageType::SizeType size;
-  size[0] = maxPoint[0] - minPoint[0]; // size along X
-  size[1] = maxPoint[1] - minPoint[1]; // size along Y
-  size[2] = maxPoint[2] - minPoint[2]; // size along Z
+  size[0] = static_cast<ItkImageType::SizeType::SizeValueType>(maxPoint[0] - minPoint[0]); // size along X
+  size[1] = static_cast<ItkImageType::SizeType::SizeValueType>(maxPoint[1] - minPoint[1]); // size along Y
+  size[2] = static_cast<ItkImageType::SizeType::SizeValueType>(maxPoint[2] - minPoint[2]); // size along Z
   ItkRegionType regionOfInterest;
   regionOfInterest.SetSize( size );
   regionOfInterest.SetIndex( start );
@@ -98,15 +98,15 @@ void mitk::BoundingObjectCutter::GenerateData()
     // now start a regiongrowing filter
     ConnectedFilterType::Pointer confidenceConnected = ConnectedFilterType::New();
     confidenceConnected->SetInput( itkImageCut );
-    confidenceConnected->SetMultiplier( 1.78 );
+    confidenceConnected->SetMultiplier( 1.88 );
     confidenceConnected->SetNumberOfIterations( 5 );
     confidenceConnected->SetReplaceValue( 10000 );
     
     // Set seedpoint to center of image
     ItkImageType::IndexType index; 
-    index[0] = size[0] / 2.0;
-    index[1] = size[1] / 2.0;
-    index[2] = size[2] / 2.0;
+    index[0] = static_cast<ItkImageType::IndexType::IndexValueType>(size[0] / 2.0);
+    index[1] = static_cast<ItkImageType::IndexType::IndexValueType>(size[1] / 2.0);
+    index[2] = static_cast<ItkImageType::IndexType::IndexValueType>(size[2] / 2.0);
     confidenceConnected->SetSeed( index );
     
     confidenceConnected->SetInitialNeighborhoodRadius( 2 );

@@ -32,6 +32,9 @@ template<class T>
 class Vector3 : public Tuple3<T> {
 /*
  * $Log$
+ * Revision 1.4  2003/11/04 14:19:17  nolden
+ * gcc2 compatibility fix
+ *
  * Revision 1.3  2003/04/22 14:42:11  max
  * made inclusions of vecmath header files "local" (for gcc 3.3 support)
  *
@@ -90,7 +93,9 @@ public:
     void cross(const Vector3& v1, const Vector3& v2) {
         // store on stack once for aliasing-safty
         // i.e. safe when a.cross(a, b)
-        set(
+ 
+        // this-> is necessary for compatibility with std::set in gcc2
+        this->set(
             v1.y*v2.z - v1.z*v2.y,
             v1.z*v2.x - v1.x*v2.z,
             v1.x*v2.y - v1.y*v2.x
@@ -103,7 +108,8 @@ public:
       * @param v1 the un-normalized vector
       */
     void normalize(const Vector3& v1) {
-        set(v1);
+        // this-> is necessary for compatibility with std::set in gcc2
+        this->set(v1);
         normalize();
     }
 

@@ -32,6 +32,9 @@ template<class T>
 class Vector2 : public Tuple2<T> {
 /*
  * $Log$
+ * Revision 1.3  2003/11/04 14:19:17  nolden
+ * gcc2 compatibility fix
+ *
  * Revision 1.2  2003/04/22 14:42:11  max
  * made inclusions of vecmath header files "local" (for gcc 3.3 support)
  *
@@ -117,7 +120,8 @@ public:
       * @param v1 the un-normalized vector
       */
     void normalize(const Vector2& v1) {
-        set(v1);
+        // "this->" is necessary for compatibility with std::set in gcc2
+        this->set(v1);
         normalize();
     }
 

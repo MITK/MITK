@@ -5,6 +5,7 @@
 #include "mitkCommon.h"
 #include <chili/qclightbox.h>
 
+
 namespace mitk {
 
 class LightBoxImageReader : public ImageSource 
@@ -37,7 +38,6 @@ protected:
 };
 
 } // namespace mitk
-
 
 
 #endif /* LIGHTBOXIMAGEREADER_H_HEADER_INCLUDED_C1F48A22 */

@@ -1,7 +1,9 @@
 #include "mitkLightBoxImageReader.h"
 #include <ipFunc.h>
 #include <itkImageFileReader.h>
-
+#include "mitkPlaneGeometry.h"
+#include <chili/ipPicUtil.h>
+#include <vtkTransform.h>
 
 void mitk::LightBoxImageReader::SetLightBox(QcLightbox* lightbox)
 {
@@ -40,13 +42,19 @@ void mitk::LightBoxImageReader::GenerateOutputInformation()
 
     int position, numberOfImages=0;
     ipPicDescriptor*  pic=NULL;
-
+    interSliceGeometry_t *interSliceGeometry;
+    
     for (position = 0; position < m_LightBox->getFrames (); ++position) //ehemals position < m_LightBox->images
     {
         if (m_LightBox->fetchHeader(position) != NULL)  //ehemals: if (m_LightBox->image_list[position].type == DB_OBJECT_IMAGE) 
         {
             if(pic==NULL) // only build header
+            {
                 pic = m_LightBox->fetchHeader(position);
+                interSliceGeometry=m_LightBox->fetchDicomGeometry(position);
+                //QcEXPORT interSliceGeometry_t *fetchDicomGeometry( position );
+            }
+           
             ++numberOfImages;
             //            tagImageType = ipPicQueryTag (pic, tagIMAGE_TYPE);
             //     break;
@@ -81,6 +89,41 @@ void mitk::LightBoxImageReader::GenerateOutputInformation()
 
     itkGenericOutputMacro(<<"initialisize output");
     output->Initialize(header);
+
+    mitk::Vector3D rightVector;
+    mitk::Vector3D downVector;
+    mitk::Vector3D spacing;
+    
+    itkGenericOutputMacro(<<"rightVector");
+
+    mitk::vtk2itk(interSliceGeometry->u, rightVector);
+    mitk::vtk2itk(interSliceGeometry->v, downVector);
+    mitk::vtk2itk(interSliceGeometry->ps, spacing);
+
+    rightVector=rightVector*output->GetDimension(0);
+    downVector=downVector*output->GetDimension(1);
+
+    mitk::PlaneGeometry::Pointer planegeometry = PlaneGeometry::New();
+    
+    planegeometry->InitializeStandardPlane( rightVector,downVector,&spacing);
+  
+    mitk::Point3D origin;
+    mitk::vtk2itk(interSliceGeometry->o, origin);
+    itkGenericOutputMacro(<<"setorigin");
+    planegeometry->SetOrigin(origin);
+
+    SlicedGeometry3D::Pointer slicedGeometry = SlicedGeometry3D::New();
+    itkGenericOutputMacro(<<"InitializeEvenlySpaced");
+    slicedGeometry->InitializeEvenlySpaced(planegeometry, output->GetDimension(2));
+    
+    itkGenericOutputMacro(<<"InitializeEvenlyTimed");
+    TimeSlicedGeometry::Pointer timeSliceGeometry = TimeSlicedGeometry::New();
+    
+    timeSliceGeometry->InitializeEvenlyTimed(slicedGeometry, output->GetDimension(3));
+    timeSliceGeometry->TransferItkToVtkTransform();
+    
+    itkGenericOutputMacro(<<"SetGeometry");
+    output->SetGeometry(timeSliceGeometry);  
 
     itkGenericOutputMacro(<<" modifie ");
     m_ReadHeaderTime.Modified();

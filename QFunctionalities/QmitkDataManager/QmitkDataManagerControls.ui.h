@@ -12,10 +12,6 @@ void QmitkDataManagerControls::SetDataTreeIterator(mitk::DataTreeIterator * it)
   m_DataTreeIterator = it->clone();
   mitk::DataTreeIterator* tempIt = m_DataTreeIterator->clone();
   
-  //if (treeLayout != NULL && treeLayout->parent() != NULL && treeLayout->findWidget(dataTreeView) != -1) {
-  //  treeLayout->remove(dataTreeView);
-  //}
-
   QHBoxLayout * hl = (QHBoxLayout *)this->layout(); 
 
   if (hl->findWidget(dataTreeView) == -1) {

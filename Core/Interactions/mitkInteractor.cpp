@@ -38,7 +38,7 @@ float mitk::Interactor::CalculateJurisdiction(StateEvent const* stateEvent) cons
   float returnvalue = 0.0;
   //if it is a key event that can be handled in the current state, then return 0.5
   mitk::DisplayPositionEvent const  *disPosEvent = dynamic_cast <const mitk::DisplayPositionEvent *> (stateEvent->GetEvent());
-	
+
   //Key event handling:
   if (disPosEvent == NULL)
   {
@@ -53,7 +53,7 @@ float mitk::Interactor::CalculateJurisdiction(StateEvent const* stateEvent) cons
     }
 
   }
-  
+
   //Mouse event handling:
   else//if we have 2d or 3d position
   {
@@ -68,7 +68,7 @@ float mitk::Interactor::CalculateJurisdiction(StateEvent const* stateEvent) cons
       return 0;
 
     mitk::PositionEvent const  *posEvent = dynamic_cast <const mitk::PositionEvent *> (stateEvent->GetEvent());
-	  if (posEvent == NULL) //2D information from a 3D window
+    if (posEvent == NULL) //2D information from a 3D window
     {
       //get camera and calculate the distance between the center of this boundingbox and the camera
       vtkCamera* camera = dynamic_cast<mitk::OpenGLRenderer*>(posEvent->GetSender())->GetVtkRenderer()->GetActiveCamera();
@@ -81,7 +81,7 @@ float mitk::Interactor::CalculateJurisdiction(StateEvent const* stateEvent) cons
       mitk::BoundingBox::PointType center = bBox->GetCenter();
       returnvalue = center.SquaredEuclideanDistanceTo(normal);
       //map between 0.5 and 1
-      
+
     }
     else//3D information from a 2D window.
     {
@@ -91,7 +91,7 @@ float mitk::Interactor::CalculateJurisdiction(StateEvent const* stateEvent) cons
       p[0] = point.x;p[1] = point.y;p[2] = point.z;
       //transforming the Worldposition to local coordinatesystem
       m_DataTreeNode->GetData()->GetGeometry()->GetVtkTransform()->GetInverse()->TransformPoint(p, p);
-      
+
       itkPoint[0] = p[0];itkPoint[1] = p[1];itkPoint[2] = p[2];
 
       //check if the given position lies inside the data-object
@@ -103,7 +103,7 @@ float mitk::Interactor::CalculateJurisdiction(StateEvent const* stateEvent) cons
         returnvalue = 1 - itkPoint.SquaredEuclideanDistanceTo(center);
         //now in rage of 0.5 to 1 compared to size of boundingbox;
         returnvalue = returnvalue/( (bBox->GetMaximum() - bBox->GetMinimum()).GetNorm() / 2);
-        
+
         //map between 0.5 and 1
         returnvalue = 0.5 + (returnvalue / 2);
       }

@@ -520,7 +520,7 @@ void mitk::Mesh::ExecuteOperation(Operation* operation)
             for(it = oldPolygon->PointIdsBegin(); it != oldend; ++it)
               newPolygonCell->AddPointId(*it);
           }
-          newPolygonCell->SetPointIds(0, newPolygonCell->GetNumberOfPoints(), newPolygonCell->PointIdsBegin());
+          oldPolygon->SetPointIds(0, newPolygonCell->GetNumberOfPoints(), newPolygonCell->PointIdsBegin());
         }
       }
     }

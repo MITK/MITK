@@ -6,7 +6,10 @@
  *   Allocates memory for a new PicDescriptor
  *
  * $Log$
- * Revision 1.2  1997/09/15 13:21:16  andre
+ * Revision 1.3  1999/11/27 19:15:08  andre
+ * *** empty log message ***
+ *
+ * Revision 1.2  1997/09/15  13:21:16  andre
  * switched to new what string format
  *
  * Revision 1.1.1.1  1997/09/06  19:09:59  andre
@@ -43,6 +46,7 @@ ipPicDescriptor *ipPicNew( void )
       pic->info->tags_head = NULL;
 
       pic->info->write_protect = ipFalse;
+      pic->info->pixel_start_in_file = 0;
     }
 
   return( pic );

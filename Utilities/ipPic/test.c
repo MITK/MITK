@@ -23,6 +23,18 @@ int main( int argc, char *argv[] )
   pic = ipPicGet( argv[1],
                   NULL );
 
+  pic->info->tags_head = NULL;
+  pic->dim = 2;
+  pic->n[0] = 90;
+  pic->n[1] = 90;
+  ipPicPutSlice( argv[2],
+            pic, 1 );
+  ipPicPutSlice( argv[2],
+            pic, 2 );
+exit(1);
+
+
+
   a.type = ipPicAText;
   a.location_x = 30;
   a.location_y = 35;

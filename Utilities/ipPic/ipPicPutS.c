@@ -6,7 +6,10 @@
  *   writes a PicFile to disk
  *
  * $Log$
- * Revision 1.4  1998/09/01 15:26:43  andre
+ * Revision 1.5  1999/11/27 19:15:08  andre
+ * *** empty log message ***
+ *
+ * Revision 1.4  1998/09/01  15:26:43  andre
  * *** empty log message ***
  *
  * Revision 1.3  1998/05/18  12:13:54  andre
@@ -43,20 +46,22 @@ void ipPicPutSlice( char *outfile_name, ipPicDescriptor *pic, ipUInt4_t slice )
                            NULL );
 
   if( pic_in == NULL )
-    if( slice == 1 )
-      {
-        pic->n[pic->dim] = 1;
-        pic->dim += 1;
+    {
+      if( slice == 1 )
+        {
+          pic->n[pic->dim] = 1;
+          pic->dim += 1;
 
-        ipPicPut( outfile_name, pic );
+          ipPicPut( outfile_name, pic );
 
-        pic->dim -= 1;
-        pic->n[pic->dim] = 0;
+          pic->dim -= 1;
+          pic->n[pic->dim] = 0;
 
+          return;
+        }
+      else
         return;
-      }
-    else
-      return;
+    }
 
   outfile = fopen( outfile_name, "r+b" );
 
@@ -90,19 +95,15 @@ void ipPicPutSlice( char *outfile_name, ipPicDescriptor *pic, ipUInt4_t slice )
   rewind( outfile );
   fwrite( ipPicVERSION, 1, sizeof(ipPicTag_t), outfile );
 
-  fseek( outfile, 0, SEEK_CUR );
-  ipFReadLE( &tags_len, sizeof(ipUInt4_t), 1, outfile );
-  tags_len = tags_len - 3 * sizeof(ipUInt4_t)
-                      - pic_in->dim * sizeof(ipUInt4_t);
+  fseek( outfile, sizeof(ipUInt4_t), SEEK_CUR ); /* skip tags_len */
 
-  fseek( outfile, 0, SEEK_CUR );
   ipFWriteLE( &(pic_in->type), sizeof(ipUInt4_t), 1, outfile );
   ipFWriteLE( &(pic_in->bpe), sizeof(ipUInt4_t), 1, outfile );
   ipFWriteLE( &(pic_in->dim), sizeof(ipUInt4_t), 1, outfile );
 
   ipFWriteLE( pic_in->n, sizeof(ipUInt4_t), pic_in->dim, outfile );
 
-  fseek( outfile, tags_len + _ipPicSize(pic) * (slice - 1), SEEK_CUR );
+  fseek( outfile, pic_in->info->pixel_start_in_file + _ipPicSize(pic) * (slice - 1), SEEK_SET );
 
   ipFWriteLE( pic->data, pic->bpe / 8, _ipPicElements(pic), outfile );
 

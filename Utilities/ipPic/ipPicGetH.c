@@ -6,7 +6,10 @@
  *   reads the Header of a  PicFile from disk
  *
  * $Log$
- * Revision 1.2  1997/09/15 13:21:13  andre
+ * Revision 1.3  1999/11/27 19:15:26  andre
+ * *** empty log message ***
+ *
+ * Revision 1.2  1997/09/15  13:21:13  andre
  * switched to new what string format
  *
  * Revision 1.1.1.1  1997/09/06  19:09:59  andre
@@ -30,17 +33,12 @@
 
 ipPicDescriptor *ipPicGetHeader( char *infile_name, ipPicDescriptor *pic )
 {
-  FILE *infile;
+  ipFile_t  infile;
 
   ipPicTag_t tag_name;
   ipUInt4_t len;
 
-  if( infile_name == NULL )
-    infile = stdin;
-  else if( strcmp(infile_name, "stdin") == 0 )
-    infile = stdin;
-  else
-    infile = fopen( infile_name, "rb" );
+  infile = _ipPicOpenPicFileIn( infile_name );
 
   if( infile == NULL )
     {
@@ -49,7 +47,7 @@ ipPicDescriptor *ipPicGetHeader( char *infile_name, ipPicDescriptor *pic )
     }
 
   /* read infile */
-  fread( &(tag_name[0]), 1, 4, infile );
+  ipFRead( &(tag_name[0]), 1, 4, infile );
 
   if( strncmp( ipPicVERSION, tag_name, 4 ) != 0 )
     {
@@ -71,7 +69,7 @@ ipPicDescriptor *ipPicGetHeader( char *infile_name, ipPicDescriptor *pic )
 
   pic->info->write_protect = ipTrue;
 
-  fread( &(tag_name[4]), 1, sizeof(ipPicTag_t)-4, infile );
+  ipFRead( &(tag_name[4]), 1, sizeof(ipPicTag_t)-4, infile );
   strncpy( pic->info->version, tag_name, _ipPicTAGLEN );
 
   ipFReadLE( &len, sizeof(ipUInt4_t), 1, infile );

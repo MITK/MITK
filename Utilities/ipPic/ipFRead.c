@@ -7,7 +7,10 @@
  *   and swaps to the other endianess
  *
  * $Log$
- * Revision 1.2  1997/09/15 13:21:08  andre
+ * Revision 1.3  1999/11/27 19:15:08  andre
+ * *** empty log message ***
+ *
+ * Revision 1.2  1997/09/15  13:21:08  andre
  * switched to new what string format
  *
  * Revision 1.1.1.1  1997/09/06  19:09:58  andre
@@ -32,11 +35,12 @@
 
 #include "ipPic.h"
 
-size_t _ipFRead( void *ptr, size_t size, size_t nitems, FILE *stream )
+size_t
+_ipFRead( void *ptr, size_t size, size_t nitems, FILE *stream )
 {
   size_t bytes_return;
 
-  bytes_return = fread( ptr, size, nitems, stream);
+  bytes_return = ipFRead( ptr, size, nitems, stream);
   _ipCvtEndian( ptr, size*nitems, size );
 
   return( bytes_return );

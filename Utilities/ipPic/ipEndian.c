@@ -7,7 +7,10 @@
  *   between different machine representations
  *
  * $Log$
- * Revision 1.3  1998/11/11 11:11:26  andre
+ * Revision 1.4  1999/11/27 19:15:08  andre
+ * *** empty log message ***
+ *
+ * Revision 1.3  1998/11/11  11:11:26  andre
  * *** empty log message ***
  *
  * Revision 1.2  1997/09/15  13:21:07  andre
@@ -65,19 +68,6 @@ void _ipCvtEndian( void *data, unsigned long int len, unsigned char bytes )
         ((char *)data)[i+i2] = ((char *)data)[i+bytes-i2-1];
         ((char *)data)[i+bytes-i2-1] = buff;
       }
-}
-
-void _ipCp( void *source, void *destination, unsigned long int len )
-{
-  unsigned long int i;
-
-  if( !source )
-    return;
-  if( !destination )
-    return;
-
-  for( i=0; i<len; i++ )
-    ((char *)destination)[i] = ((char *)source)[i];
 }
 
 void _ipCpCvtEndian( void *source, void *destination, unsigned long int len, unsigned char bytes )

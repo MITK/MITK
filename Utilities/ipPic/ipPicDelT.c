@@ -21,7 +21,6 @@ static ipPicTSV_t *_ipPicRemoveTag( _ipPicTagsElement_t **head,
 ipPicTSV_t *
 ipPicDelTag( ipPicDescriptor *pic, char *tag )
 {
-  int i;
   _ipPicTagsElement_t *which;
 
   which = _ipPicFindTag( pic->info->tags_head, tag );
@@ -32,7 +31,6 @@ ipPicDelTag( ipPicDescriptor *pic, char *tag )
 ipPicTSV_t *
 ipPicDelSubTag( ipPicTSV_t *parent, char *tag )
 {
-  int i;
   _ipPicTagsElement_t *which;
 
   if( parent->type != ipPicTSV )

@@ -21,13 +21,6 @@ unsigned int mitk::Image::GetDimension(int i) const
 	return -1;
 }
 
-//##ModelId=3DCBE46F026D
-mitk::DICOM *mitk::Image::GetDicom() const
-{
-	itkExceptionMacro("DICOM not yet supported."); 
-	return NULL;
-}
-
 //##ModelId=3E0B494802D6
 void* mitk::Image::GetData()
 {

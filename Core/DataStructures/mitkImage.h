@@ -65,10 +65,6 @@ class Image : public SlicedData
     //##ModelId=3DCBC6040068
     unsigned int GetDimension(int i) const;
 
-    //##ModelId=3DCBE46F026D
-    virtual mitk::DICOM *GetDicom() const;
-
-
     //##ModelId=3E0B494802D6
     virtual void* GetData();
 

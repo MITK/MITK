@@ -1,6 +1,7 @@
 #include <pic2vtk/pic2vtk.h>
 #include <vtkStructuredPointsReader.h>
 #include <vtkImageCast.h> 
+#include <vtkImageData.h> 
 #include <iostream>
 
 /**
@@ -233,7 +234,7 @@ ipPicDescriptor* Pic2vtk::convertVectorImage( vtkImageData* vtkImage ) {
 	int dim[3];
 	vtkImage->GetDimensions(dim);
 
-	int vectorDim = vtkImage->GetNumberOfScalarComponents();
+	unsigned int vectorDim = vtkImage->GetNumberOfScalarComponents();
 
 	register unsigned long size;
 	register unsigned long volumeSize;
@@ -643,7 +644,7 @@ vtkImageData* Pic2vtk::convertVectorImage( ipPicDescriptor* pic ) {
 	unsigned long volumeSize = 0;
 
 	int dim = pic->dim - 1;
-	int vectorDim = pic->n[dim];
+	unsigned int vectorDim = pic->n[dim];
 
 	std::cout << "   pic dimension = " << dim << std::endl;
 	std::cout << "   pic vector dim = " << vectorDim << std::endl;

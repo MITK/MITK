@@ -8,8 +8,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>558</width>
-            <height>461</height>
+            <width>739</width>
+            <height>904</height>
         </rect>
     </property>
     <property name="caption">
@@ -139,7 +139,13 @@
 </includes>
 <slots>
     <slot>updateMitkWidgets()</slot>
-    <slot>changeLayout()</slot>
+    <slot>changeLayoutTo2DImagesUp()</slot>
+    <slot>changeLayoutTo2DImagesLeft()</slot>
+    <slot>changeLayoutToDefault()</slot>
+    <slot>changeLayoutToBig3D()</slot>
+    <slot>changeLayoutToWidget1()</slot>
+    <slot>changeLayoutToWidget2()</slot>
+    <slot>changeLayoutToWidget3()</slot>
 </slots>
 <functions>
     <function access="protected">init()</function>

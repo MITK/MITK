@@ -820,7 +820,35 @@ mitk::DataTree::Pointer QmitkMainTemplate::GetTree() {
 }
 
 
-void QmitkMainTemplate::changeToBig3D()
+void QmitkMainTemplate::changeTo2DImagesUpLayout()
 {
-  mitkMultiWidget->changeLayout();
+  mitkMultiWidget->changeLayoutTo2DImagesUp();
+}
+void QmitkMainTemplate::changeTo2DImagesLeftLayout()
+{
+  mitkMultiWidget->changeLayoutTo2DImagesLeft();
+}
+void QmitkMainTemplate::changeToDefaultLayout()
+{
+  mitkMultiWidget->changeLayoutToDefault();
+}
+
+void QmitkMainTemplate::changeToBig3DLayout()
+{
+  mitkMultiWidget->changeLayoutToBig3D();
+}
+
+void QmitkMainTemplate::changeToWidget1Layout()
+{
+  mitkMultiWidget->changeLayoutToWidget1();
+}
+
+void QmitkMainTemplate::changeToWidget2Layout()
+{
+  mitkMultiWidget->changeLayoutToWidget2();
+}
+
+void QmitkMainTemplate::changeToWidget3Layout()
+{
+  mitkMultiWidget->changeLayoutToWidget3();
 }

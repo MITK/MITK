@@ -8,8 +8,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>675</width>
-            <height>644</height>
+            <width>739</width>
+            <height>904</height>
         </rect>
     </property>
     <property name="caption">
@@ -120,8 +120,16 @@
             </property>
         </widget>
         <separator/>
-        <action name="layoutGroup"/>
         <separator/>
+        <action name="layoutGroup"/>
+    </toolbar>
+    <toolbar dock="2">
+        <property name="name">
+            <cstring>Toolbar</cstring>
+        </property>
+        <property name="label">
+            <string>Toolbar</string>
+        </property>
     </toolbar>
 </toolbars>
 <actions>
@@ -402,133 +410,104 @@
         </action>
         <action>
             <property name="name">
-                <cstring>big3DLayout</cstring>
+                <cstring>Two2DUpperLayout</cstring>
             </property>
             <property name="toggleAction">
                 <bool>true</bool>
             </property>
             <property name="text">
-                <string>big 3D</string>
+                <string>2D images up</string>
+            </property>
+        </action>
+        <action>
+            <property name="name">
+                <cstring>TwoDLeftLayout</cstring>
+            </property>
+            <property name="toggleAction">
+                <bool>true</bool>
+            </property>
+            <property name="text">
+                <string>2D images left</string>
+            </property>
+        </action>
+        <action>
+            <property name="name">
+                <cstring>Big3D</cstring>
+            </property>
+            <property name="toggleAction">
+                <bool>true</bool>
+            </property>
+            <property name="text">
+                <string>Big 3D</string>
+            </property>
+        </action>
+        <action>
+            <property name="name">
+                <cstring>Widget1</cstring>
+            </property>
+            <property name="toggleAction">
+                <bool>true</bool>
+            </property>
+            <property name="text">
+                <string>Widget1</string>
+            </property>
+        </action>
+        <action>
+            <property name="name">
+                <cstring>Widget2</cstring>
+            </property>
+            <property name="toggleAction">
+                <bool>true</bool>
+            </property>
+            <property name="text">
+                <string>Widget2</string>
+            </property>
+        </action>
+        <action>
+            <property name="name">
+                <cstring>Widget3</cstring>
+            </property>
+            <property name="toggleAction">
+                <bool>true</bool>
+            </property>
+            <property name="text">
+                <string>Widget3</string>
             </property>
         </action>
     </actiongroup>
 </actions>
 <images>
     <image name="image0">
-        <data format="XPM.GZ" length="706">789cad91cf0ac2300cc6ef7d8ab0dc86382d3206e223281e05f190760e3d4c41e741c477b77fb7ce5544f04ba0f9fa2349a1590a9bf512d28c5d1b6a8e12e4812e9096b7babe6f778b074b380795394c93114bc62061753eed758daac68991b652db6256706b4b6365915b4bda564ad60a6fabca8c8dea1f0495ccf94eec2dea8c4fc34f045be28707c0122441025b056f434141f44808e8a71eecabeb419465178ec440bb6700fc9e21703d1160490c381201be27d4f7df7eced90b38969ae0</data>
+        <data format="XPM.GZ" length="706">789cad91cf0ac2300cc6ef7d8ab0dc8a38375106e223281e05f190760e3d6c82ce8388ef6effac5be72a22f825d07cfd91a4d098c376b3021eb36b4df549823cd205787e2bcbfb6ebf7cb0284d41e51c9268c4a23148589fab83ae51d53831d2566a9b4db3c4dadc5891cdac256d0b256b85b34561c606f50f824ae67c27f6167586a7e127822d71c33d6009922081adbcb7a1202f7ac407f4530ff6d5f520cabc8b868440bb6700dc9e21687a02c09210684800b81e5fdf7ffbb9602f2ef09adc</data>
     </image>
     <image name="image1">
-        <data format="XPM.GZ" length="751">789c8d92cd0ac2300c80ef7b8ab2de866c3aa54ec447503c0ae2a14db7e9610a3a0f22bebbfd59593a3a58ba423fc29734ac59424ec73d49b2e8d5f2f60604aefc4912f96e9acff9b2fb46719e13f56dc8229e45714a801c1ef7529fa93ad3b9098d4263b12a728bdc2014cc226804064b601acb0ed7166b83a560d2a0b4a8b2a651a55132c16d360d86c9d04074192e284855b3db5482cb084e018502ec38a30289aa59a7ae9da3d8eb53d5ae8fe2913ebe53f6b79bece079b023f0fc1c3bc3859cc1420ef5cb85fa0cefd63bc379a638e3f3784ee07777ef20fc427edbe80f19cdb32b</data>
+        <data format="XPM.GZ" length="751">789c8d925f0b823010c0dff729867b93c8341423fa08458f41f4b0ddd47ab0a0ec21a2efdefe38bcc9046f0ef6e3f8dded70494c4fc73d8d13f2ea7877030a57fea4b17cb7ede77cd97d499465547d1b9a460b122d29d0c3e35ee9335367b632a151682cd7656a911b14656e1134420e19e41aab1e0b8b8d41290a69505a5459a9b1d62873c16d76190c936181e8335ce88a95db4c82cb08ce008502ec38a30689aa59a7699ca3d8eb5337ae8fe2893ebe530db79bede079b023f0fc1c3be3859cd1420ef3cb85fa8cef3638e379e638d3f3784ee077f7ef20fc427e5bf207f059b31a</data>
     </image>
     <image name="image2">
-        <data format="XPM.GZ" length="3262">789c7dd5595322491007f0773f0561be191b3974377d101bfba080b75cde6eec43f551a20e028a224eec77dfecccacd29d5957ac805fe43fb38ba203be6d35ae86278dad6f1bcf4bb3bc2b1ac5c43c35b6ca97e974fde75f7ffcd8d80cc306fd0751dc08377fdbd81c2d1b45a33f7bac6ac023019afcc72ed899b5cdacb6a96a07cd661648dd8aeb077bcf9bf398b13367e8ab33ad8f9dc3809dd60e0367688ac366d8665fab5bea80ddf6f51bb5d671e41cf13c53aa33cd47ce52875c6cadd6c3da51e0fa2156bb7c4b5de8fc421c35b59e7acbbc4aedf683de52bf175babfd6d76dbf7676a974f9c5bfc619a5c9d491d87ce5a37b55ba133f6c4ad409da863f529db900d5f6fa82e63a9776bc7268e63ae1b509749c4f5485c58a9c36eed244f8224e7ba73298693da6994c429f7c395ba14e3c05bf277626b75de363bf7f5a9380dc478a48ed507ce598bf30f626bb57e583b6bb93a1eabcbac60efb30b67289ddb326f2cce12cdf79db57ea6aeb4ffc259eac8e7d1a6ebb5a57e2ef6fda7de32bfa3d67e58794bff40dcd67edcf3963abf9f76e1f397ce26661f897d7ee42c757c57bbfe4367adb7bd4b764b5ce49ae7f335b19b073d6fc9c76ab79faeb7d4cfc4c6f56f7b4b3d14979118f8bc4ce9fa61c73997fdbe897dff4a6d343f73d6fc42ede6ad9da50e7c3e39ed47f3cf6a573ff096ebdd8af350f36b6fa9cfd43a0f78bf79e9fbe762aa8b416dd446edf293da45925745c2b6e222523fa95331bc88cb5cebfcfd565454e7df132cd5b97a476dc5c0f34a9a574a7fa1b6eac05bfa737119491d16de52bf51a762786557bebf29f6f92bb5cbcf9dab94ebda5fe69abf76d6faa35ae783115be7fac715aad4cf3b576b3f7cf7b65c7f515bcd6b7f15a92fbd25affd959b7fe1cd75e0fbabb2344ff2f76257c707b5bbfe54ad799888ad33ff5ed9b4caad5cef4e6c2331f0fd4a71fa066583da8a47cb8f07021accb1e0556285967c8b1357ff256ff00eeff101bfd3baa7d7535a8fff93b734b39eebe6cb35aa2ff3339cd035ea35e7e7193d2fbe9a4fb36e659ece9df06bf848fc94ff98ebd61375cebecc1b3a1f391337bb5eb75fe6cb7fcd76ebebf9cf742e0fb8c417bf5e69adf00dd73fe769ce3b6ed379bce2cea7f5485d1dec620f77ebebb83ced730ff7f1000ff1e8d33ac613ece3008738c2319ee299e479f6395ee0255ee135def06a62802146d8c218134ce991e150be8fb00d08bffe19c8a1801c7328a1c2315894fbf30d6eff230d30813bb887077af51da6947f943ccc600e0b788245bd1b98e3129ef11296b4e6f002af5c5b6146f9b1fcdec21bace11db661875607bab08367b46272077ab8072bd8853d3f7f1f0e704da919553b94ea72cf2174e97df5e0088eb10f27751efaf27b4d73eacc21af3ad9c37749d2ead1f9f761b7de0f0c757ebd8b8e4ff9675a23daed0ac638a0f97d5cc87cea1fc3299cd11ad33bebc3395cd07387d725bd3ea5fdf761209f2f1dfd155cd379dd409356002144d0821812482183363dc774e30e3edf3fb83060eabf1c5253f0a33425f5f7a16f2afa7cdff57efbfbf78d7f001c80fdf1</data>
+        <data format="XPM.GZ" length="3262">789c7dd55b532a471007f0773f0565bf59a93eecc22e4ba5f2a08077b979379587d9cb887a105014f154be7b7aba7b46734e0c3805bffa77f70ee3167cdbaa5d0d4f6a5bdf369e97667957d48a8979aa6d952fd3e9facfbffef8b1b119c735fa8b1a492ddefc6d6373b4ac15b5feecb172804702d4f9c12ed899b5f5ccd954ce51bd9e45925bb17bb2f782b91e3376e60d7d75a6f9d83be67e6c39c7756fa88be9d9665fab9bea88dd0ef98d5a731c793722de7fa9ceb4bee12d39e4626b358f9d1b91ef8744edeb9bea42e717e2465df356b0ccabd47e3f182cf9bdd85aed6fb3dba13f53fbfad4bb29f3727526390ebd3537cecdc81b7be2665d9daa751e9eb20dd9f0f586ea22e19b07bbce894992847303ea3295bc212e2ac961d739356994b2d1bb14c38973ab9126ad06fb4a5d8a71109c737e27b656e76db3f3904fc5ad488c47ea447de09dc9f51ec4d66a7ee89c357c8ec7ea32937c9f9d7b43e9dd6eb2c7e22cd1fabeb7e6676adf7fe12d39f279b49b34afe0fc5c1cfa4f8339c78eda5f7f152cfd03715bfb712f5872fe3ced22d45f7a1b9977240ef5236fc9f15dedfb0fbd356f07cb7e9be2c2683d9faf69fa79d00b96fa44edf7d30d96fc4c6c7cff76b0e4b1b88cc5c0e765c27e60c73b97fdbe8943ff4a6db47ee6adf50b75a5f9da5b72e0f3c9693f5affacf6f94170c9f9ad388fb57e1d2cf94c9d6a3fef372f43ff5c4cb918d4466dd4be7ee25c247955246c2b2e62f5933a15c38b988e4f72fe7e2b4aca655ea936ea1d7525069e57d2bc52fa0b75a58e82f9f7097371194b0e8b60c96fd4a9185ed955e8af8b43fd95dad7cfbdab9473ed2f8dd65f7b6bfea8d6f960c4d6aadd8f2b54699877aed67ef81e2cf35fd495d66b7f15ab2f83a55efb2b3fff2258aecff75745bbd3fa7bb1cff141edaf3f556b3d4cc4d6aaf9f7caa695b172bd3bb18dc5c0f7abb5d658cb06b5158f961f4f04349863c1abc40a2df916273effa5dee01ddee3037ea7754fefa7b41effa7ded24c37d7cf976b545fd6cf7042d7706bceaf337a5d7c359f66ddca3c9d3be1f7f051f153fdc75cbf9ea873f665bda1f39133f1b3ddbafdb2befcd76cbfbe9eff4ce7f2804b7c09eb95d60adf70fd733dcd79c76d3a8f57dcf9b41ea9ab835dece1aebb8eafa77deee13e1ee0211e7d5ac778827d1ce0104738c6533c937a9e7d8e17788957788d37bcea18618c0d6c628229b6e899e150be8fb00d08bf3e0ce450408e399450e1182cb6e4fb1b6effa31a600277700f0ff4ee3b4ca9fe51ea61067358c0132cdc6e608e4b78c64b58d29ac30bbc72b6c28ceac7f27b0b6fb08677d8861d5a1de8c20e9ed14ac81de8e11eac6017f6c2fc7d38c03555cd28ed5055977b0ea14b9fab0747708c7d3871f5d097df6b9ae36a0e79b9ca1ebe4b25ad1e9d7f1f76dd7e60a8f3dd2e3aa12abcd21ad16e5730c601cdefe342e653ff184ee18cd6983e591fcee1825e3bbc2ee9fd29edbf0f03f9ffd2d15fc1359dd70dd469451043039a90400a2dc8a04daf09ddb883cff70f2e0c18f7c8a145bf84ee495fa7d4df87bea9e8fffbaef7dbdfbf6ffc0397b0fd2b</data>
     </image>
     <image name="image3">
-        <data format="XPM.GZ" length="691">789cd3d7528808f055d0d2e72a2e492cc94c5648ce482c52d04a29cdcdad8c8eb5ade6523232520022530543251d2e253d856405bffcbc54103b11c8563600020b13105719ce4d067193415c0b130b23886c12989b6c610691d5c30a064846391104931032ca10f144651884cb8099202198ce24b81ea01444254c0aa1271159026c065c0fb204f17af0d8039742721b0a4846f60f0a80ea1d74f1832c536bcd05000906830d</data>
+        <data format="XPM.GZ" length="691">789cd3d7528808f055d0d2e72a2e492cc94c5648ce482c52d04a29cdcdad8c8eb5ade6523232520022530543251d2e253d856405bffcbc54103b11c8563600020b63105719ce4d027193415c0b630b43886c12989b64610a91d5c30a064846391104931032ca10f144651884cb8099202198ce24b81ea01444254c0aa1271159026c065c0fb204f17af0d8039742721b0a4846f60f0a80ea1d74f1832c536bcd0500f66b8305</data>
     </image>
     <image name="image4">
-        <data format="XPM.GZ" length="691">789cd3d7528808f055d0d2e72a2e492cc94c5648ce482c52d04a29cdcdad8c8eb5ade6523232520022530543251d2e253d856405bffcbc54103b09c8563600020b13103711ce4d067195415c0b130b23886c32989b6c610691d5c30ae82da39c980482983249893008114e82c928c35443f581144064908c014981a521323043f4e00663d1039522494f52228a1eb8dbf4108e47f827194718a0fa9fb8701b40995a6b2e0039e78d24</data>
+        <data format="XPM.GZ" length="691">789cd3d7528808f055d0d2e72a2e492cc94c5648ce482c52d04a29cdcdad8c8eb5ade6523232520022530543251d2e253d856405bffcbc54103b09c8563600020b63103711ce4d027195415c0b630b43886c32989b64610a91d5c30ae82da39c980482983249893008114e82c928c35443f581144064908c014981a521323043f4e00663d1039522494f52228a1eb8dbf4108e47f827194718a0fa9fb8701b40995a6b2e00275b8d1c</data>
     </image>
     <image name="image5">
-        <data format="XPM.GZ" length="676">789cadd0bd0ac2301007f03d4f71e4b622a9960e82f8088aa3200e9728e850855a0711dfdd2635e9d54471302925d75ffecd479ec17ab5802c1797869aa30173a01ab2ddb5aa6e9bedfc2e645140fb94309123211518589e4f7b3bc6768c63d76c49be9c96b6d4a1342e986c4c90bdff249814e4112eea8b20fbd940daef3dfc2a6c953721a4b46852a42921e4baa2487467818290f2f2222f5af5a207e227d3a74cb75a94e972d1ded84952b73390c74c3c01030d7fd3</data>
+        <data format="XPM.GZ" length="676">789cadd0bd0ac2301007f03d4f71f4b620a95607417c04c5511087bb28e8500b5a0711dfdd7e98f46aa238989492eb2fffe623d5b05e2d40a7ea525279b4600f7406bdbbe6f96db39ddf559265503d131825039518b0b02c4efb7a8cd518874dab4b72e5745c97ec4b6e82d12604c5fb4f825141199162be088a9ff5a4fadec1af22567913428a0b9321a68850d30d05c2ad79f242c6c98b9cb0e9847be226d3a74cbb5a906973c1dec44962b7d393c74c3d01fe6d7fd1</data>
     </image>
     <image name="image6">
-        <data format="XPM.GZ" length="736">789c9d92cb0ac2301045f7fd8aa1d915b15abb08889fa0b814c4c5649aa00b15b42e44fc773b79486d6305ef043a87cb21509267b0592f21cb936b8df58180f67881acba1d8ff7ed6ef148d2a280e64898a6a3241d03c1ea7cd2bc8b6617131b460a284b46f54662ac18cb6246c6306a4649121d1a8fda21321a1b7b6934c38df0893468d3a95cc30636f3cdc18faaed2872d377c87d893a8e40e55caaa8e36070b4ad620e1aae628e4dccb15131c7ed11c7efbf1c9fbe13fe54df09cd5f0eb566e81d3ce7c90bfe74ac50</data>
+        <data format="XPM.GZ" length="736">789c9d92cb0ac2301045f7f98ad0ec8a58dbba88889fa0b814c4c564d2a08b2a685d88f8ef76f290da4605ef043a87cb215092a57cb35ef2346397069a0372dcc399a7fa5ad7b7ed6e71674951f0f6489e2723968c39f2d5e958d12eda5d4c6c0831a02c09d50b15a1269ce6251a4358114a25670e8d47ed10088d8dbd349aef8df0893460d3ab5c4306b4f3c981b7aaeb28743374d07d117b8e00e55cd4d873203895ad620e18aa628e4dccb15131c7ed11c7efbf1c9fa113fed4d009cd5f0e76e6db3b78ccd91390c8ac22</data>
     </image>
     <image name="image7">
-        <data format="XPM.GZ" length="767">789c7d92cb0e82301045f77c45c3ec88f18106498c9fa07169625c9481b62ed4c4c7c218ffddced40ad6ea1d487ab83d0102834cac570b910d92f3455e7628d0c893c8eaeb7e7fdb6ce7f724cd73618fd1508cd25e92f6058ae5f1d0d01aec1a861c42edb19c10aa37222112969332779b2b462c0bd7368458e0180bc29ab1c129f28d24a1b271aef1a8143f52349d062861c317414a096dcdcdbbe856fcba5061651be093d7be21a89bd730f9062b84da87a9ebb4099ccfe93a9f133a4afb091d6d5cb4d1a163d830ca501577a8fae1d82aeaf08698637e3a9c98c3e39cd7f7816fc77fdfd6a0f9f3873c66c91312a1c9d3</data>
+        <data format="XPM.GZ" length="767">789c7d92cd8ac2301446f77d8ad0bb2bc3682b1d0a838fa0b81c185c24374de2c211fc5988f8eee6de185b639cefb690d32f075ad249257e560b514d8ac3511e3728d0c9bda8f469bb3dffaee797a26c1ae1af7a2aeaf2a3283f058ae5eeafa735f8354c398436623723340f548448d8cdba3a6c568caa6b43db13628b0db6849a51e3176a4249687c82eb221ac3af94cda8014adaf0439052c25073f328c6157f2e2854be01be791d1b02dddf872936a810740cd3d8199238cf33769e27758c8d933ad685586753c7b1e18ca32aef50f5c6f155d6e10d39c7bd753839872738f7f38157279eef60d0fcf3875cbf8b1bf23fc9c6</data>
     </image>
 </images>
 <connections>
     <connection>
-        <sender>fileNewAction</sender>
+        <sender>standardLayout</sender>
         <signal>activated()</signal>
         <receiver>QmitkMainTemplate</receiver>
-        <slot>fileNew()</slot>
-    </connection>
-    <connection>
-        <sender>fileOpenAction</sender>
-        <signal>activated()</signal>
-        <receiver>QmitkMainTemplate</receiver>
-        <slot>fileOpen()</slot>
-    </connection>
-    <connection>
-        <sender>fileSaveAction</sender>
-        <signal>activated()</signal>
-        <receiver>QmitkMainTemplate</receiver>
-        <slot>fileSave()</slot>
-    </connection>
-    <connection>
-        <sender>fileSaveAsAction</sender>
-        <signal>activated()</signal>
-        <receiver>QmitkMainTemplate</receiver>
-        <slot>fileSaveAs()</slot>
-    </connection>
-    <connection>
-        <sender>filePrintAction</sender>
-        <signal>activated()</signal>
-        <receiver>QmitkMainTemplate</receiver>
-        <slot>filePrint()</slot>
-    </connection>
-    <connection>
-        <sender>fileExitAction</sender>
-        <signal>activated()</signal>
-        <receiver>QmitkMainTemplate</receiver>
-        <slot>fileExit()</slot>
-    </connection>
-    <connection>
-        <sender>editUndoAction</sender>
-        <signal>activated()</signal>
-        <receiver>QmitkMainTemplate</receiver>
-        <slot>editUndo()</slot>
-    </connection>
-    <connection>
-        <sender>editRedoAction</sender>
-        <signal>activated()</signal>
-        <receiver>QmitkMainTemplate</receiver>
-        <slot>editRedo()</slot>
-    </connection>
-    <connection>
-        <sender>editCutAction</sender>
-        <signal>activated()</signal>
-        <receiver>QmitkMainTemplate</receiver>
-        <slot>editCut()</slot>
-    </connection>
-    <connection>
-        <sender>editCopyAction</sender>
-        <signal>activated()</signal>
-        <receiver>QmitkMainTemplate</receiver>
-        <slot>editCopy()</slot>
-    </connection>
-    <connection>
-        <sender>editPasteAction</sender>
-        <signal>activated()</signal>
-        <receiver>QmitkMainTemplate</receiver>
-        <slot>editPaste()</slot>
-    </connection>
-    <connection>
-        <sender>editFindAction</sender>
-        <signal>activated()</signal>
-        <receiver>QmitkMainTemplate</receiver>
-        <slot>editFind()</slot>
-    </connection>
-    <connection>
-        <sender>helpIndexAction</sender>
-        <signal>activated()</signal>
-        <receiver>QmitkMainTemplate</receiver>
-        <slot>helpIndex()</slot>
-    </connection>
-    <connection>
-        <sender>helpContentsAction</sender>
-        <signal>activated()</signal>
-        <receiver>QmitkMainTemplate</receiver>
-        <slot>helpContents()</slot>
-    </connection>
-    <connection>
-        <sender>helpAboutAction</sender>
-        <signal>activated()</signal>
-        <receiver>QmitkMainTemplate</receiver>
-        <slot>helpAbout()</slot>
+        <slot>changeToDefaultLayout()</slot>
     </connection>
     <connection>
         <sender>fileOpenImageSequenceAction</sender>
@@ -537,10 +516,130 @@
         <slot>fileOpenImageSequence()</slot>
     </connection>
     <connection>
-        <sender>big3DLayout</sender>
+        <sender>helpAboutAction</sender>
         <signal>activated()</signal>
         <receiver>QmitkMainTemplate</receiver>
-        <slot>changeToBig3D()</slot>
+        <slot>helpAbout()</slot>
+    </connection>
+    <connection>
+        <sender>helpContentsAction</sender>
+        <signal>activated()</signal>
+        <receiver>QmitkMainTemplate</receiver>
+        <slot>helpContents()</slot>
+    </connection>
+    <connection>
+        <sender>helpIndexAction</sender>
+        <signal>activated()</signal>
+        <receiver>QmitkMainTemplate</receiver>
+        <slot>helpIndex()</slot>
+    </connection>
+    <connection>
+        <sender>editFindAction</sender>
+        <signal>activated()</signal>
+        <receiver>QmitkMainTemplate</receiver>
+        <slot>editFind()</slot>
+    </connection>
+    <connection>
+        <sender>editPasteAction</sender>
+        <signal>activated()</signal>
+        <receiver>QmitkMainTemplate</receiver>
+        <slot>editPaste()</slot>
+    </connection>
+    <connection>
+        <sender>editCopyAction</sender>
+        <signal>activated()</signal>
+        <receiver>QmitkMainTemplate</receiver>
+        <slot>editCopy()</slot>
+    </connection>
+    <connection>
+        <sender>editCutAction</sender>
+        <signal>activated()</signal>
+        <receiver>QmitkMainTemplate</receiver>
+        <slot>editCut()</slot>
+    </connection>
+    <connection>
+        <sender>editRedoAction</sender>
+        <signal>activated()</signal>
+        <receiver>QmitkMainTemplate</receiver>
+        <slot>editRedo()</slot>
+    </connection>
+    <connection>
+        <sender>editUndoAction</sender>
+        <signal>activated()</signal>
+        <receiver>QmitkMainTemplate</receiver>
+        <slot>editUndo()</slot>
+    </connection>
+    <connection>
+        <sender>fileExitAction</sender>
+        <signal>activated()</signal>
+        <receiver>QmitkMainTemplate</receiver>
+        <slot>fileExit()</slot>
+    </connection>
+    <connection>
+        <sender>filePrintAction</sender>
+        <signal>activated()</signal>
+        <receiver>QmitkMainTemplate</receiver>
+        <slot>filePrint()</slot>
+    </connection>
+    <connection>
+        <sender>fileSaveAsAction</sender>
+        <signal>activated()</signal>
+        <receiver>QmitkMainTemplate</receiver>
+        <slot>fileSaveAs()</slot>
+    </connection>
+    <connection>
+        <sender>fileSaveAction</sender>
+        <signal>activated()</signal>
+        <receiver>QmitkMainTemplate</receiver>
+        <slot>fileSave()</slot>
+    </connection>
+    <connection>
+        <sender>fileOpenAction</sender>
+        <signal>activated()</signal>
+        <receiver>QmitkMainTemplate</receiver>
+        <slot>fileOpen()</slot>
+    </connection>
+    <connection>
+        <sender>fileNewAction</sender>
+        <signal>activated()</signal>
+        <receiver>QmitkMainTemplate</receiver>
+        <slot>fileNew()</slot>
+    </connection>
+    <connection>
+        <sender>Two2DUpperLayout</sender>
+        <signal>activated()</signal>
+        <receiver>QmitkMainTemplate</receiver>
+        <slot>changeTo2DImagesUpLayout()</slot>
+    </connection>
+    <connection>
+        <sender>TwoDLeftLayout</sender>
+        <signal>activated()</signal>
+        <receiver>QmitkMainTemplate</receiver>
+        <slot>changeTo2DImagesLeftLayout()</slot>
+    </connection>
+    <connection>
+        <sender>Big3D</sender>
+        <signal>activated()</signal>
+        <receiver>QmitkMainTemplate</receiver>
+        <slot>changeToBig3DLayout()</slot>
+    </connection>
+    <connection>
+        <sender>Widget1</sender>
+        <signal>activated()</signal>
+        <receiver>QmitkMainTemplate</receiver>
+        <slot>changeToWidget1Layout()</slot>
+    </connection>
+    <connection>
+        <sender>Widget2</sender>
+        <signal>activated()</signal>
+        <receiver>QmitkMainTemplate</receiver>
+        <slot>changeToWidget2Layout()</slot>
+    </connection>
+    <connection>
+        <sender>Widget3</sender>
+        <signal>activated()</signal>
+        <receiver>QmitkMainTemplate</receiver>
+        <slot>changeToWidget3Layout()</slot>
     </connection>
 </connections>
 <includes>
@@ -593,7 +692,13 @@
     <slot>helpAbout()</slot>
     <slot>initWidgets( mitk::DataTreeIterator * it )</slot>
     <slot>changeLevelWindow( mitk::LevelWindow * lw )</slot>
-    <slot>changeToBig3D()</slot>
+    <slot>changeTo2DImagesUpLayout()</slot>
+    <slot>changeTo2DImagesLeftLayout()</slot>
+    <slot>changeToDefaultLayout()</slot>
+    <slot>changeToBig3DLayout()</slot>
+    <slot>changeToWidget1Layout()</slot>
+    <slot>changeToWidget2Layout()</slot>
+    <slot>changeToWidget3Layout()</slot>
 </slots>
 <functions>
     <function access="protected">fileOpen( const char * fileName )</function>

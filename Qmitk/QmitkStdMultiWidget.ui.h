@@ -58,16 +58,16 @@ void QmitkStdMultiWidget::init()
 
 }
 
-void QmitkStdMultiWidget::changeLayout()
+void QmitkStdMultiWidget::changeLayoutTo2DImagesUp()
 {
    
     delete QmitkStdMultiWidgetLayout ;
     
-    std::cout << "changing layout ... " << std::endl;
-    QmitkStdMultiWidgetLayout = new QHBoxLayout( this, 2, 2, "QmitkStdMultiWidgetLayout");
+    std::cout << "changing layout to 2D images up... " << std::endl;
+    QmitkStdMultiWidgetLayout = new QHBoxLayout( this, 0,02, "QmitkStdMultiWidgetLayout");
 
-    layout4 = new QHBoxLayout( 0, 0, 6, "layout4");
-    layout3 = new QGridLayout( 0, 2, 1, 0, 6, "layout3");
+    QHBoxLayout  * layout4 = new QHBoxLayout( 0, 0, 6, "layout4");
+    QGridLayout *layout3 = new QGridLayout( 0, 2, 1, 0, 6, "layout3");
 
     QHBoxLayout *TwoDLayout = new QHBoxLayout( 0, 0, 6, "2DLayout");
     
@@ -75,14 +75,16 @@ void QmitkStdMultiWidget::changeLayout()
     mitkWidget2->setMaximumSize(2000,200);
     mitkWidget3->setMaximumSize(2000,200);    
     
-//    layout3->addWidget( mitkWidget2, 0, 1 );
-//    layout3->addWidget( mitkWidget3, 0,2 );
-//    layout3->addWidget( mitkWidget1, 0, 0 );
    TwoDLayout ->addWidget( mitkWidget1 );
    TwoDLayout ->addWidget( mitkWidget2 );
    TwoDLayout ->addWidget( mitkWidget3 );
    
-   
+   if (mitkWidget1->isHidden()) mitkWidget1->show();
+   if (mitkWidget2->isHidden()) mitkWidget2->show();
+   if (mitkWidget3->isHidden()) mitkWidget3->show();
+   if (mitkWidget4->isHidden()) mitkWidget4->show();
+      
+      
    layout3->addLayout( TwoDLayout , 0, 0 );
    layout3->addWidget( mitkWidget4, 1, 0 );
     
@@ -93,4 +95,167 @@ void QmitkStdMultiWidget::changeLayout()
 
 }
 
+   
+void QmitkStdMultiWidget::changeLayoutTo2DImagesLeft()
+{
+   
+    delete QmitkStdMultiWidgetLayout ;
     
+    std::cout << "changing layout to 2D images left... " << std::endl;
+    QmitkStdMultiWidgetLayout = new QHBoxLayout( this, 0,0, "QmitkStdMultiWidgetLayout");
+
+    QHBoxLayout *layout4 = new QHBoxLayout( 0, 0, 6, "layout4");
+    QGridLayout *layout3 = new QGridLayout( 0, 1, 2, 0, 6, "layout3");
+
+    QVBoxLayout *TwoDLayout = new QVBoxLayout( 0, 0, 6, "2DLayout");
+    
+    mitkWidget1->setMaximumSize(300,300);
+    mitkWidget2->setMaximumSize(300,300);
+    mitkWidget3->setMaximumSize(300,300);    
+    
+   TwoDLayout ->addWidget( mitkWidget1 );
+   TwoDLayout ->addWidget( mitkWidget2 );
+   TwoDLayout ->addWidget( mitkWidget3 );
+   
+   if (mitkWidget1->isHidden()) mitkWidget1->show();
+   if (mitkWidget2->isHidden()) mitkWidget2->show();
+   if (mitkWidget3->isHidden()) mitkWidget3->show();
+   if (mitkWidget4->isHidden()) mitkWidget4->show();
+   
+   
+   layout3->addLayout( TwoDLayout , 0, 0 );
+   layout3->addWidget( mitkWidget4, 0,1 );
+    
+    
+    layout4->addLayout( layout3 );
+    layout4->addWidget( levelWindowWidget );
+    QmitkStdMultiWidgetLayout->addLayout( layout4 );
+
+}
+    
+void QmitkStdMultiWidget::changeLayoutToDefault()
+{
+   
+    delete QmitkStdMultiWidgetLayout ;
+    
+    std::cout << "changing layout to defualt... " << std::endl;
+    QmitkStdMultiWidgetLayout = new QHBoxLayout( this, 0, 0, "QmitkStdMultiWidgetLayout");
+
+    QHBoxLayout *layout4 = new QHBoxLayout( 0, 0, 6, "layout4");
+    QGridLayout *layout3 = new QGridLayout( 0, 2, 2, 0, 6, "layout3");
+
+   
+    mitkWidget1->setMaximumSize(2000,2000);
+    mitkWidget2->setMaximumSize(2000,2000);
+    mitkWidget3->setMaximumSize(2000,2000);    
+    
+   layout3 ->addWidget( mitkWidget1,0,0 );
+   layout3 ->addWidget( mitkWidget2,0,1 );
+   layout3 ->addWidget( mitkWidget3,1,0 );
+   
+   if (mitkWidget1->isHidden()) mitkWidget1->show();
+   if (mitkWidget2->isHidden()) mitkWidget2->show();
+   if (mitkWidget3->isHidden()) mitkWidget3->show();
+   if (mitkWidget4->isHidden()) mitkWidget4->show();
+   
+   layout3->addWidget( mitkWidget4, 1,1 );
+    
+    
+    layout4->addLayout( layout3 );
+    layout4->addWidget( levelWindowWidget );
+    QmitkStdMultiWidgetLayout->addLayout( layout4 );
+
+}
+
+
+void QmitkStdMultiWidget::changeLayoutToBig3D()
+{
+   
+    delete QmitkStdMultiWidgetLayout ;
+    
+    std::cout << "changing layout to big 3D ..." << std::endl;
+    QmitkStdMultiWidgetLayout = new QHBoxLayout( this, 0, 0, "QmitkStdMultiWidgetLayout");
+
+    QHBoxLayout *layout4 = new QHBoxLayout( 0, 0, 6, "layout4");
+    mitkWidget1->hide();
+    mitkWidget2->hide();
+    mitkWidget3->hide();	
+   if (mitkWidget4->isHidden()) mitkWidget4->show();
+   
+    layout4->addWidget( mitkWidget4 );
+    layout4->addWidget( levelWindowWidget );
+    QmitkStdMultiWidgetLayout->addLayout( layout4 );
+
+}
+
+void QmitkStdMultiWidget::changeLayoutToWidget1()
+{
+   
+    delete QmitkStdMultiWidgetLayout ;
+    
+    std::cout << "changing layout to big Widget1 ..." << std::endl;
+    QmitkStdMultiWidgetLayout = new QHBoxLayout( this, 0, 0, "QmitkStdMultiWidgetLayout");
+
+    QHBoxLayout *layout4 = new QHBoxLayout( 0, 0, 6, "layout4");
+    
+    mitkWidget1->setMaximumSize(2000,2000);    
+
+   
+    mitkWidget2->hide();
+    mitkWidget3->hide();
+    mitkWidget4->hide();	
+   if (mitkWidget1->isHidden()) mitkWidget1->show();
+   
+    layout4->addWidget( mitkWidget1 );
+    layout4->addWidget( levelWindowWidget );
+    QmitkStdMultiWidgetLayout->addLayout( layout4 );
+
+}
+void QmitkStdMultiWidget::changeLayoutToWidget2()
+{
+   
+    delete QmitkStdMultiWidgetLayout ;
+    
+    std::cout << "changing layout to big Widget2 ..." << std::endl;
+    QmitkStdMultiWidgetLayout = new QHBoxLayout( this, 0, 0, "QmitkStdMultiWidgetLayout");
+
+    QHBoxLayout *layout4 = new QHBoxLayout( 0, 0, 6, "layout4");
+    
+    mitkWidget2->setMaximumSize(2000,2000);    
+ 
+    
+    mitkWidget1->hide();
+    mitkWidget3->hide();
+    mitkWidget4->hide();	
+   if (mitkWidget2->isHidden()) mitkWidget2->show();    
+   
+    layout4->addWidget( mitkWidget2 );
+    layout4->addWidget( levelWindowWidget );
+    QmitkStdMultiWidgetLayout->addLayout( layout4 );
+
+}
+
+void QmitkStdMultiWidget::changeLayoutToWidget3()
+{
+   
+    delete QmitkStdMultiWidgetLayout ;
+    
+    std::cout << "changing layout to big Widget1 ..." << std::endl;
+    QmitkStdMultiWidgetLayout = new QHBoxLayout( this, 0, 0, "QmitkStdMultiWidgetLayout");
+
+    QHBoxLayout *layout4 = new QHBoxLayout( 0, 0, 6, "layout4");
+    
+    mitkWidget3->setMaximumSize(2000,2000);    
+ 
+   
+    mitkWidget1->hide();
+    mitkWidget2->hide();
+    mitkWidget4->hide();	
+  if (mitkWidget3->isHidden()) mitkWidget3->show();
+  
+    layout4->addWidget( mitkWidget3 );
+    layout4->addWidget( levelWindowWidget );
+    QmitkStdMultiWidgetLayout->addLayout( layout4 );
+
+}
+

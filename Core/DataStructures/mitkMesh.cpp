@@ -340,6 +340,12 @@ void mitk::Mesh::ExecuteOperation(Operation* operation)
       }
       bool ok;
       int cellId = lineOp->GetCellId();
+      if (cellId<0)//cellId isn't set
+      {
+        cellId = this->SearchSelectedCell();
+        if (cellId < 0 )//still not found
+          return;
+      }
       CellAutoPointer cellAutoPointer;
       ok = m_ItkData->GetCell(cellId, cellAutoPointer);//get directly the celldata!TODO
       if (ok) 

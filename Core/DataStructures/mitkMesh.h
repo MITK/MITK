@@ -77,6 +77,10 @@ public:
   virtual bool GetPointIds(unsigned long cellId, unsigned long lineId, int &idA, int &idB);
 
   //##Documentation
+  //## @brief searches a selected cell and returns the id of that cell. if no cell is found, then -1 is returned
+  virtual int SearchSelectedCell();
+
+  //##Documentation
 	//## @brief creates a BoundingBox and computes it with the given points of the cell
   //## Returns the BoundingBox != IsNull() if successful.
   virtual DataType::BoundingBoxPointer GetBoundingBoxFromCell(unsigned long cellId);
@@ -88,10 +92,6 @@ public:
 protected:
 	Mesh();
 	virtual ~Mesh();
-  
-  //##Documentation
-  //## @brief searches a selected cell and returns the id of that cell. if no cell is found, then -1 is returned
-  virtual int SearchSelectedCell();
 
 };
 

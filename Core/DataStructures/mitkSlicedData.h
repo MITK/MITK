@@ -24,7 +24,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkBaseData.h"
 #include "mitkTimeSlicedGeometry.h"
 #include "mitkSlicedGeometry3D.h"
-#include "itkProcessObject.h"
 #include "itkIndex.h"
 #include "itkOffset.h"
 #include "itkSize.h"

@@ -22,6 +22,55 @@ typedef itk::Point<ScalarType,3> ITKPoint3D;
 typedef itk::Vector<ScalarType,3> ITKVector3D;
 
 typedef class itk::NumericTraits<mitk::ScalarType> ScalarTypeNumericTraits;
+static const ScalarType eps VCL_STATIC_CONST_INIT_FLOAT_DECL(0.000001);
+
+template <class Tout>
+inline void FillITKVector3D(Tout& out, ScalarType x, ScalarType y, ScalarType z)
+{
+  out[0] = x;
+  out[1] = y;
+  out[2] = z;
+}
+
+template <class Tin, class Tout>
+inline void itk2vtk(const Tin& in, Tout out)
+{
+  out[0]=in[0];
+  out[1]=in[1];
+  out[2]=in[2];
+}
+
+template <class Tin, class Tout>
+inline void vtk2itk(const Tin& in, Tout out)
+{
+  out[0]=in[0];
+  out[1]=in[1];
+  out[2]=in[2];
+}
+
+template <class Tin, class Tout>
+inline void vnl2vtk(const vnl_vector<Tin>& in, Tout *out)
+{
+  int i;
+  for(i=0; i<in.size();++i)
+    out[i]=in[i];
+}
+
+template <class Tin>
+inline void vtk2vnl(const Tin *in, vnl_vector<Tin>& out)
+{
+  int i;
+  for(i=0; i<out.size();++i)
+    out[i]=in[i];
+}
+
+template <class Tin>
+inline void vtk2vnlref(const Tin *in, vnl_vector_ref<Tin>& out)
+{
+  int i;
+  for(i=0; i<out.size();++i)
+    out[i]=in[i];
+}
 
 //itk vs. vecmath conversion
 template <class T>

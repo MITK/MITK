@@ -459,6 +459,10 @@ bool mitk::EventMapper::MapEvent(Event* event)
 	*/
   bool ok;
 
+  #ifdef INTERDEBUG
+  std::cout<<"thrown event-type: "<<event->GetType()<<std::endl;
+  #endif
+
   switch (event->GetType())
   {
     case mitk::Type_MouseButtonPress://Increase

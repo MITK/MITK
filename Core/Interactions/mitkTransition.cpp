@@ -1,8 +1,8 @@
 #include "Transition.h"
 
 //##ModelId=3E5A3A77006F
-mitk::Transition::Transition(std::string name, int id, int nextStateId, int eventId, int sideEffectId)
-: m_Name(name), m_Id(id), m_NextState(NULL), m_EventId(eventId), m_SideEffectId(sideEffectId)
+mitk::Transition::Transition(std::string name, int nextStateId, int eventId, int sideEffectId)
+: m_Name(name), m_NextState(NULL), m_EventId(eventId), m_SideEffectId(sideEffectId)
 {
 }
 
@@ -13,9 +13,14 @@ std::string mitk::Transition::GetName() const
 }
 
 //##ModelId=3E5A3BCE00E0
-State* mitk::Transition::GetNextState() const
+mitk::State* mitk::Transition::GetNextState() const
 {
 	return m_NextState;
+}
+
+int mitk::Transition::GetNextStateId() const
+{
+	return m_NextStateId;
 }
 
 //##ModelId=3E5A3BF100F5
@@ -38,7 +43,7 @@ bool mitk::Transition::IsEvent(int eventId) const
 }
 
 //##ModelId=3E6370080067
-mitk::Transition::setNextState(State* state) const
+mitk::Transition::setNextState(State* state)
 {
 	m_NextState = state;
 }

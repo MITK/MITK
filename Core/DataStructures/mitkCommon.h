@@ -7,9 +7,11 @@
 #include "vtkImageData.h"
 #include "vtkImageReslice.h"
 #include "image.h"
+
 typedef  int MapperSlotId;
 //typedef	Tree<mitk::DataTreeNode::Pointer> DataTree;
 //typedef	TreeIterator<mitk::DataTreeNode::Pointer> DataTreeIterator;
+
 
 #define mitkClassMacro(className,SuperClassName) \
 	typedef className				Self; \
@@ -17,6 +19,7 @@ typedef  int MapperSlotId;
 	typedef itk::SmartPointer<Self> Pointer; \
 	typedef itk::SmartPointer<const Self>  ConstPointer; \
     itkTypeMacro(className,SuperClassName)
+
 
 
 

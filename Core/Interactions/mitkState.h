@@ -3,8 +3,13 @@
 
 #include "mitkCommon.h"
 #include "Transition.h"
-//# include <string>!!!
-//# include <map>!!!
+#include <map>
+#include <string>
+
+//##ModelId=3E6907B400B4
+typedef std::map<int,mitk::State *> StateMap;
+//##ModelId=3E6907B400C4
+typedef std::map<int,mitk::Transition> TransitionMap;
 
 namespace mitk {
 
@@ -13,10 +18,10 @@ class State
 {
   public:
     //##ModelId=3E5B2A9203BD
-    State(string name, int id);
+	  State(std::string name, int id);
 
     //##ModelId=3E5B2B2E0304
-    bool AddTransition(string transitionName, int transitionId, int nextStateId, int eventId, int sideEffectId) const;
+	  bool AddTransition(std::string transitionName, int nextStateId, int eventId, int sideEffectId) const;
 
     //##ModelId=3E5B2B9000AC
     //##Documentation
@@ -33,17 +38,25 @@ class State
     //##Documentation
     //## locates an eventId in the hashmap and returns true if located, else
     //## false
-    bool locateTransition(int eventId) const;
+    bool LocateTransition(int eventId) const;
+
+    //##ModelId=3E68C573013F
+	//##Documentation
+    //## searches dedicated States of all Transitions and
+	//## sets *nextState of these Transitions.
+	//## allStates is a List of all build States of that StateMachine
+	bool ConnectTransitions(StateMap *allStates) const;
+
 
   private:
     //##ModelId=3E5B2A220069
-	  std::string m_Name;
+	std::string m_Name;
 
     //##ModelId=3E5B2A350338
     int m_Id;
 
     //##ModelId=3E5B2A460057
-	std::map<int,Transition> m_Transitions;
+	TransitionMap m_Transitions;
 
 };
 

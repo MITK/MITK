@@ -4,6 +4,7 @@
 #include "mitkCommon.h"
 #include "State.h"
 #include <qxml.h>
+#include <map>
 
 namespace mitk {
 
@@ -16,27 +17,45 @@ namespace mitk {
 class StateMachineFactory
 {
   public:
+    //##ModelId=3E68B2C600BD
+	  StateMachineFactorty();
+
     //##ModelId=3E5B4144024F
+	//##Documentation
+	//## returns NULL if no entry with string type is found
 	  static State* GetStartState(std::string type);
 
     //##ModelId=3E5B41730261
+	//##Documentation
+	//##loads the xml file filename and generates the necessary instances
 	  static bool LoadBehavior(std::string fileName);
 
 
     //##ModelId=3E6773790098
-      bool StartElement( const QString&, const QString&, const QString& , const QXmlAttributes& );
+	  bool StartElement (const QString&, const QString&, const QString & qName, const QXmlAttributes & atts );
 
-    //##ModelId=3E67737901E0
-      bool EndElement( const QString&, const QString&, const QString& );
+    //##ModelId=3E6907B40180
+	  bool EndElement( const QString&, const QString&, const QString & qName );
+		  
 
   private:
     //##ModelId=3E5B428F010B
-    static bool ConnectStates(vector<State*> states);
+	//##Documentation
+	//## sets the pointers in Transition (setNextState(..)) according to the extracted xml-file content
+	  static bool ConnectStates(StateMap *states);
 
 	//##ModelId=3E5B423003DF
-	map<std::string,State*> m_StartStates;
+	  StateMap m_StartStates;
+
+    //##ModelId=3E68C269032E
+	  StateMap m_AllStates;
+
     //##ModelId=3E6773290108
-	State* m_AktState;
+	  State* m_AktState;
+
+    //##ModelId=3E68B2C60040
+	  std::string m_AktStateMachineName;
+
 };
 
 } // namespace mitk

@@ -25,8 +25,12 @@ PURPOSE.  See the above copyright notices for more information.
 std::set<mitk::RenderWindow*> mitk::RenderWindow::instances;
 
 mitk::RenderWindow::RenderWindow(const char *name, mitk::BaseRenderer* renderer) 
-  : m_MitkVtkRenderWindow(NULL), m_Name(name), m_Renderer(renderer)
+  : m_MitkVtkRenderWindow(NULL), m_Renderer(renderer)
 {
+  if(name == NULL)
+    m_Name = "renderwindow";
+  else
+    m_Name = name;
   instances.insert(this);
   m_MitkVtkRenderWindow = mitk::VtkRenderWindow::New();
 }

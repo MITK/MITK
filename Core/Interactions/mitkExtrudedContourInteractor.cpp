@@ -166,7 +166,7 @@ void mitk::ExtrudedContourInteractor::Press(mitk::Point3D& point)
 
 void mitk::ExtrudedContourInteractor::Move(mitk::Point3D& point)
 {
-  assert(m_Contour!=NULL);
+  assert(m_Contour.IsNotNull());
 
   m_Contour->AddVertex( point );
 //  m_Parent->UpdateWidgets();

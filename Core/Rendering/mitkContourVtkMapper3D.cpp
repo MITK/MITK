@@ -89,31 +89,42 @@ void mitk::ContourVtkMapper3D::Update(mitk::BaseRenderer* renderer)
 		  vtkCellArray *lines = vtkCellArray::New();
      
       Contour::InputType idx = input->GetContourPath()->StartOfInput();
-      Contour::OutputType point;
 
       Contour::InputType end = input->GetContourPath()->EndOfInput();
       if (end > 50000) end = 0;
       vtkIdType ptIndex = 0;
+      vtkIdType lastPointIndex = 0;
 
-      while ( idx != end )
+      mitk::Contour::PointsContainerPointer contourPoints = input->GetPoints();
+      mitk::Contour::PointsContainerIterator pointsIt = contourPoints->Begin();
+      unsigned int counter = 0;
+      
+      while ( pointsIt != contourPoints->End() )
       {
-        point = input->GetContourPath()->Evaluate(idx);
-				int cell[2] = {ptIndex-1,ptIndex};
-        points->InsertPoint(ptIndex, point[0],point[1],point[2]);
-				if (ptIndex>0)
+        if (counter %2 == 0)
         {
-					lines->InsertNextCell(2,cell);
+          Contour::BoundingBoxType::PointType point;
+          point = pointsIt.Value();
+          points->InsertPoint(ptIndex, point[0],point[1],point[2]);
+          if (ptIndex>0)
+          {
+            int cell[2] = {ptIndex-1,ptIndex};
+            lines->InsertNextCell((vtkIdType)2,(vtkIdType*) cell);
+         }
+          lastPointIndex = ptIndex;
+          ptIndex++;
         }
-        ptIndex++;
-        idx+=1;
+        counter++;
+        pointsIt++;
+        idx+=5;
 			}
 
-      int cell[2] = {ptIndex-1,0};
-			lines->InsertNextCell(2,cell);
+      int cell[2] = {lastPointIndex,0};
+		  lines->InsertNextCell((vtkIdType)2,(vtkIdType*) cell);
       
 
 			m_Contour->SetPoints(points);
-		  points->Delete();
+	//	  points->Delete();
   		m_Contour->SetLines(lines);
 			m_Contour->Update();
 

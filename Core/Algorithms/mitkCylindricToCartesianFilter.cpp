@@ -407,7 +407,7 @@ void mitk::CylindricToCartesianFilter::GenerateData()
 
     buildConeCutOffShortCut(input->GetDimension(0),input->GetDimension(1), rt_pic, fr_pic, a, b, coneCutOff_pic);
     //		ipPicPut("C:\\temp\\rt_90.pic",rt_pic);
-    ipPicPut("C:\\temp\\coneCutOff.pic", coneCutOff_pic);
+    //ipPicPut("C:\\temp\\coneCutOff.pic", coneCutOff_pic);
   }
 
   int n,t;
@@ -465,13 +465,9 @@ void mitk::CylindricToCartesianFilter::GenerateInputRequestedRegion()
   requestedRegion.SetIndex(0, 0);
   requestedRegion.SetIndex(1, 0);
   requestedRegion.SetIndex(2, 0);
-  //requestedRegion.SetIndex(3, 0);
-  //requestedRegion.SetIndex(4, 0);
   requestedRegion.SetSize(0, input->GetDimension(0));
   requestedRegion.SetSize(1, input->GetDimension(1));
   requestedRegion.SetSize(2, input->GetDimension(2));
-  //requestedRegion.SetSize(3, output->GetDimension(3));
-  //requestedRegion.SetSize(4, output->GetNumberOfChannels());
 
   input->SetRequestedRegion( & requestedRegion );
 }

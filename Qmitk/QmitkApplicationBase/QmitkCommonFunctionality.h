@@ -1,3 +1,6 @@
+#ifndef __Qmitk_CommonFunctionality_H
+#define __Qmitk_CommonFunctionality_H
+
 /*=========================================================================
 
   Program:   Medical Imaging & Interaction Toolkit
@@ -35,6 +38,10 @@ See MITKCopyright.txt or http://www.mitk.org/ for details.
 #include <mitkSurface.h>
 #include <mitkDataTreeNodeFactory.h>
 
+#include <qfiledialog.h>
+#include "ipPic.h"
+#include "ipFunc.h"
+
 #include <qstring.h>
 #include <qfiledialog.h>
 #include <qregexp.h>
@@ -64,7 +71,8 @@ public:
   * the referenced datatree
   */
   template < typename TImageType >
-    static void AddItkImageToDataTree(typename TImageType::Pointer itkImage, mitk::DataTreeIteratorBase* iterator, std::string str)
+    static mitk::DataTreeNode::Pointer 
+    AddItkImageToDataTree(typename TImageType::Pointer itkImage, mitk::DataTreeIteratorBase* iterator, std::string str)
   {
     mitk::DataTreeIteratorClone it=iterator;
 
@@ -105,6 +113,7 @@ public:
       mitk::BoolProperty::Pointer binProp = new mitk::BoolProperty(true);
       node->GetPropertyList()->SetProperty("binary",binProp);
     }
+    return node;
   }
 
 
@@ -217,16 +226,45 @@ public:
     levelWindow.SetAuto( image->GetPic() );
     levWinProp->SetLevelWindow(levelWindow);
     node->GetPropertyList()->SetProperty("levelwindow",levWinProp);
-
-    //CommonFunctionality::MinMax<TImageType>(itkImage,extrema[0],extrema[1]);
-    //if (extrema[0] == 0 && extrema[1] ==1)
-    //{
-    //  mitk::BoolProperty::Pointer binProp = new mitk::BoolProperty(true);
-    //  node->GetPropertyList()->SetProperty("binary",binProp);
-    //}
-
     return node;
   }
+
+
+/*  static void SaveImage(std::string imageName, mitk::DataTreeIteratorBase* iterator)
+{
+  std::cout << "1" << std::endl;
+  mitk::DataTreeIteratorBase* it=iterator->clone();
+  mitk::DataTreeNode::Pointer node = NULL;
+  mitk::DataTreeIterator* subTree = ((mitk::DataTree *) it->getTree())->GetNext("name", new mitk::StringProperty( imageName ));
+
+  std::cout << "2" << std::endl;
+
+  if (subTree != NULL && subTree->get() != NULL)
+  {
+    node = subTree->get();
+    mitk::BaseData::Pointer data=node->GetData();
+
+    if (data.IsNotNull())
+    {
+      std::cout << "3" << std::endl;
+
+      mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(data.GetPointer());
+      ipPicDescriptor * picImage = image->GetPic();
+
+      std::cout << "4" << std::endl;
+      picImage = ipFuncRefl(picImage,3);
+
+      char* fileName = (char*) QFileDialog::getSaveFileName(QString(imageName),"DKFZ Pic (*.seq *.pic *.pic.gz *.seq.gz *.dcm)").ascii();
+      if (fileName == NULL ) 
+      {
+        fileName = (char*)imageName.c_str();
+      }
+      ipPicPut(fileName, picImage);
+    }
+
+  }
+}
+*/
 
     static mitk::DataTreeNode::Pointer FileOpen()
     {
@@ -297,5 +335,6 @@ public:
         return NULL;
       }
     }
+
 };
 #endif // _CommonFunctionality__h_

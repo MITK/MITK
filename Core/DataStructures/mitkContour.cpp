@@ -12,7 +12,7 @@ mitk::Contour::Contour() :
 m_ContourPath (PathType::New()),
 m_CurrentWindow ( NULL ),
 m_BoundingBox (BoundingBoxType::New()),
-m_Vertices ( BoundingBoxType::PointsContainer::New() )  
+m_Vertices ( BoundingBoxType::PointsContainer::New() )
 {
   m_Geometry3D->Initialize();
 }
@@ -36,13 +36,12 @@ void mitk::Contour::ExecuteOperation(Operation* op)
   mitk::PointOperation * pointOp = dynamic_cast<mitk::PointOperation*>( op );
   if ( pointOp != NULL )
   {
-
     switch (op->GetOperationType())
     {
     case mitk::OpADD:
       {
-        m_ContourPath = PathType::New();
-        m_ContourPath->Initialize();
+      m_ContourPath = PathType::New();
+      m_ContourPath->Initialize();    
       }
 
     case mitk::OpMOVE:
@@ -112,3 +111,48 @@ mitk::Contour::SetCurrentWindow(mitk::RenderWindow* rw)
 {
   m_CurrentWindow = rw;
 }
+
+mitk::RenderWindow*
+mitk::Contour::GetCurrentWindow()
+  {
+  return m_CurrentWindow;
+  }
+
+void
+mitk::Contour::Initialize()
+  {
+  m_ContourPath = PathType::New();
+  m_ContourPath->Initialize();
+  m_BoundingBox = BoundingBoxType::New();
+  m_Vertices = BoundingBoxType::PointsContainer::New();
+  m_Geometry3D->Initialize();
+  }
+
+void
+mitk::Contour::Continue(mitk::ITKPoint3D newPoint)
+  {
+  //std::cout << "add vertex to contour" << std::endl;
+  AddVertex(newPoint);
+  UpdateOutputInformation();
+  if (m_CurrentWindow != NULL) {
+    m_CurrentWindow->Update();
+    }
+  }
+
+unsigned int 
+mitk::Contour::GetNumberOfPoints()
+  {
+  return m_Vertices->Size();
+  }
+
+mitk::Contour::PointsContainerPointer
+mitk::Contour::GetPoints()
+  {
+  return m_Vertices;
+  }
+
+void
+mitk::Contour::SetPoints(mitk::Contour::PointsContainerPointer points)
+  {
+  m_Vertices = points;
+  }

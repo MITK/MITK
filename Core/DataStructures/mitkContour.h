@@ -23,16 +23,26 @@ public:
   typedef PathType::OutputType                                  OutputType;
   typedef PathType::OffsetType                                  OffsetType;
   typedef itk::BoundingBox<unsigned long, 3, ScalarType>        BoundingBoxType;
-
+  typedef BoundingBoxType::PointsContainer                      PointsContainer;
+  typedef BoundingBoxType::PointsContainer::Pointer             PointsContainerPointer;
 
  	void ExecuteOperation(Operation* operation);
 
   void AddVertex(mitk::ITKPoint3D newPoint);
 
+  void Initialize();
+
+  void Continue(mitk::ITKPoint3D newPoint);
+
   PathType::Pointer GetContourPath();
 
-
   void SetCurrentWindow(mitk::RenderWindow* rw);
+  mitk::RenderWindow* GetCurrentWindow();
+
+  unsigned int GetNumberOfPoints();
+
+  PointsContainerPointer GetPoints();
+  void SetPoints(PointsContainerPointer points);
 
 	//virtual methods, that need to be implemented
 	virtual void UpdateOutputInformation();

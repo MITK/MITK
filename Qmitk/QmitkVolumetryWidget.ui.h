@@ -35,7 +35,7 @@ void QmitkVolumetryWidget::SetDataTreeNode(mitk::DataTreeNode* node)
   std::string name;
   if (node->GetName(name))
   {
-    m_TreeNodeNameLabel->setText(name);
+    m_TreeNodeNameLabel->setText( name.c_str() );
   }
 }
 
@@ -53,7 +53,7 @@ void QmitkVolumetryWidget::CalculateVolume()
       volCalc->ComputeVolume();
       std::stringstream vs;
       vs << volCalc->GetVolume() << " ml";
-      m_Result->setText(vs.str());
+      m_Result->setText(vs.str().c_str() );
       std::cout << "Volume:" << vs.str() << std::endl;
     }
   }

@@ -100,7 +100,7 @@ mitk::BoundingBox::ConstPointer mitk::Geometry3D::GetBoundingBox(int t) const
 
     m_BoundingBox->ComputeBoundingBox();
 
-    return m_BoundingBox;
+    return m_BoundingBox.GetPointer();
 }
 
 //##ModelId=3DCBF5E9037F

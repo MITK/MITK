@@ -64,11 +64,12 @@ unsigned long mitk::Mesh::GetNumberOfCells()
 }
 
 //search a line that is close enough according to the given position 
-bool mitk::Mesh::SearchLine(Point3D point, float distance , unsigned long &lineId, unsigned long &cellId)
+bool mitk::Mesh::SearchLine(Point3D point, float distance, unsigned long &lineId, unsigned long &cellId)
 {
 //
 //
 //returns true if a line is found
+  ScalarType bestDist=distance;
 
   //iterate through all cells.
   ConstCellIterator cellIt = m_ItkData->GetCells()->Begin();
@@ -92,11 +93,11 @@ bool mitk::Mesh::SearchLine(Point3D point, float distance , unsigned long &lineI
           Line<CoordinateType> *line = new Line<CoordinateType>();
           line->SetPoints(pointA, pointB);
           double thisDistance = line->Distance(point);
-          if (thisDistance < distance)
+          if (thisDistance < bestDist)
           {
             cellId = cellIt->Index();
             lineId = currentLineId;
-            return true;
+            bestDist = thisDistance;
           }
         }
         ++inAIt;
@@ -122,11 +123,11 @@ bool mitk::Mesh::SearchLine(Point3D point, float distance , unsigned long &lineI
             Line<CoordinateType> *line = new Line<CoordinateType>();
             line->SetPoints(pointA, pointB);
             double thisDistance = line->Distance(point);
-            if (thisDistance < distance)
+            if (thisDistance < bestDist)
             {
               cellId = cellIt->Index();
               lineId = currentLineId;
-              return true;
+              bestDist = thisDistance;
             }
           }
         }
@@ -134,7 +135,7 @@ bool mitk::Mesh::SearchLine(Point3D point, float distance , unsigned long &lineI
     }
     ++cellIt;
   }
-	return false;
+	return (bestDist < distance);
 }
 
 int mitk::Mesh::SearchFirstCell(unsigned long pointId)

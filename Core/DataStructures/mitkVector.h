@@ -44,7 +44,7 @@ inline void FillITKVector3D(Tout& out, ScalarType x, ScalarType y, ScalarType z)
 }
 
 template <class Tin, class Tout>
-inline void itk2vtk(const Tin& in, Tout out)
+inline void itk2vtk(const Tin& in, Tout& out)
 {
   out[0]=in[0];
   out[1]=in[1];
@@ -52,7 +52,7 @@ inline void itk2vtk(const Tin& in, Tout out)
 }
 
 template <class Tin, class Tout>
-inline void vtk2itk(const Tin& in, Tout out)
+inline void vtk2itk(const Tin& in, Tout& out)
 {
   out[0]=in[0];
   out[1]=in[1];

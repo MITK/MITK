@@ -35,10 +35,14 @@ class BaseRenderer;
 //## Contains the data (instance of BaseData), a list of mappers, which can
 //## draw the data, a transform (vtkTransform) and a list of properties
 //## (PropertyList).
-class DataTreeNode : public BaseData
+//class DataTreeNode : public BaseData
+class DataTreeNode : public itk::DataObject
 {
 public:
-    mitkClassMacro(DataTreeNode,BaseData);
+
+  typedef mitk::Geometry3D::Pointer Geometry3DPointer;
+
+  mitkClassMacro(DataTreeNode,BaseData);
 
 	itkNewMacro(Self);  
 
@@ -207,6 +211,17 @@ public:
     //## @brief Convenience method for setting int properties (instances of
     //## IntProperty)
     void SetIntProperty(const char* propertyKey, int intValue, mitk::BaseRenderer* renderer=NULL);
+
+    //##Documentation
+    //## @brief Returns the Geometry3D Object that describes the geometry of the node.
+    //## The geometry contains the vtkTransform used on various mappers.
+    //## IntProperty)
+    mitk::Geometry3D* GetGeometry();
+    //##Documentation
+    //## @brief Sets the Geometry3D Object that describes the geometry of the node.
+    //## The geometry contains the vtkTransform used on various mappers.
+    //## IntProperty)
+    void SetGeometry(mitk::Geometry3D* newGeometry);
 protected:
     //##ModelId=3E33F5D702AA
     DataTreeNode();
@@ -233,6 +248,8 @@ protected:
     //## will be forked into the user-transformation of the vtkProp3D.
     //## A vtkInteractorStyle will change the user-transformation of 
     //## vtkProp3D and therewith m_VtkTransform.
+    //## @deprecated The vtkTransform is moved to the Geometry3D Property
+    //## of DataTreeNode. Use GetGeometry()->GetTransform() instead.
 	mutable vtkTransform* m_VtkTransform;
 
 	//##ModelId=3E32C49D0095
@@ -257,6 +274,8 @@ protected:
 	//##Documentation
 	//## @brief StateMachine, that handles the Interaction
     mitk::StateMachine::Pointer m_Interactor;
+        
+    Geometry3D::Pointer m_Geometry3D;
 };
 
 

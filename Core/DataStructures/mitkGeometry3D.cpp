@@ -1,6 +1,7 @@
 #include "Geometry3D.h"
 #include "PlaneGeometry.h"
 #include <vecmath.h>
+#include <vtkTransform.h> 
 
 #ifdef MBI_INTERNAL
 extern "C"
@@ -183,7 +184,9 @@ double mitk::Geometry3D::GetTime(int t) const
 //##ModelId=3DE763C500C4
 /*!
 \todo use parameter t or removed it!!!
+\deprecated New method returns a vtkTransform
 */
+
 mitk::Geometry3D::TransformPointer mitk::Geometry3D::GetTransfrom() const
 {
   itkExceptionMacro("Transform not yet supported."); 	
@@ -318,6 +321,9 @@ void mitk::Geometry3D::Initialize(unsigned int dimension, const unsigned int* di
     planegeometry->SetPlaneView(view_std);
     planegeometry->SetSizeInUnits(m_Dimensions[0], m_Dimensions[1]);
   }
+  //New
+  m_Transform = vtkTransform::New();  
+  m_BaseGeometry = NULL; // there is no base geometry, this one is independend (until SetBaseGeometry() is called)
 }
 
 //##ModelId=3E15572E0269
@@ -332,6 +338,16 @@ mitk::Geometry3D::Geometry3D(const mitk::Geometry3D& right) : m_Dimensions(NULL)
   Initialize(right.GetDataDimension(),right.GetDimensions());
 }
 
+// Standard Constructor for the new makro. sets the geometry to 3 dimensions
+mitk::Geometry3D::Geometry3D(): m_Dimension(0), m_Dimensions(NULL), m_EvenlySpaced(true)
+{
+  unsigned int * dims = new unsigned int[3];
+  dims[0] = dims[1] = dims[2] = 1;
+  Initialize(3, dims);
+  delete dims;                        
+}
+
+
 //##ModelId=3E3452F10393
 // mitk::Geometry3D& mitk::Geometry3D::operator=(const mitk::Geometry3D& right)
 // {
@@ -342,7 +358,7 @@ mitk::Geometry3D::Geometry3D(const mitk::Geometry3D& right) : m_Dimensions(NULL)
 mitk::Geometry3D::~Geometry3D()
 {
   if(m_Dimensions!=NULL)
-    delete m_Dimensions;
+    delete m_Dimensions;  
 }
 
 //##ModelId=3E3BE1F10106
@@ -479,4 +495,60 @@ void mitk::Geometry3D::SetSpacing(ipPicDescriptor* pic)
   // nur fuer Testdatensatz
   // spacing = Vector3D(1/3.0,1/4.0,1/5.0);
   SetSpacing(spacing);
+}
+
+//New:
+
+/*!
+    /brief Returns the actual global transformation
+    There are 4 cases:
+    - the local transformation has not changed and the transformation of the base geometry has not changed
+    - the local transformation has not changed but the transformation of the base geometry has changed
+    - the local transformation has changed and the transformation of the base geometry has not changed
+    - both the local and the base transformations have changed    
+*/
+vtkTransform* mitk::Geometry3D::GetTransform()
+{
+/*  bool baseGeometryChanged = (m_BaseTransformTimeStamp != m_BaseGeometry->GetTransform()->GetMTime());
+  bool ownGeometryChanged =  (m_TransformTimeStamp != m_RelativeTransform->GetMTime());
+  if (ownGeometryChanged)
+    if (baseGeometryChanged)
+    { // case 4
+      // must update relative tranform, so that basetransform * relativetransform = own transform
+      // and must update own transform somehow...
+    }
+    else
+    { // case 3
+      // must update relative tranform, so that basetransform * relativetransform = own transform
+
+    }
+  else  //own Geometry has not changed
+    if (baseGeometryChanged)
+    { // case 2
+      // must update own transform, so that basetransform * relative transform = own transform
+      m_Transform = m_BaseGeometry->GetTransform()
+      return m_Transform;  
+    }
+    else
+    { // case 1
+      // nothing has changed, just return the transform
+      return m_Transform;
+    }
+*/
+  return m_Transform;
+}
+
+void mitk::Geometry3D::SetBaseGeometry(mitk::Geometry3D* base)
+{
+  m_Transform->SetInput(base->GetTransform());
+  m_BaseGeometry = base;
+}
+
+mitk::Geometry3D::Pointer mitk::Geometry3D::Clone()
+{
+  Geometry3D::Pointer newGeometry = new Geometry3D( *this);
+  newGeometry->GetTransform()->SetMatrix(m_Transform->GetMatrix());
+  //newGeometry->GetRelativeTransform()->SetMatrix(m_RelativeTransform->GetMatrix());
+  return newGeometry;
+
 }

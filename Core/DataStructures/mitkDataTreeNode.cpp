@@ -8,6 +8,7 @@
 #include "mitkBoolProperty.h"
 #include "mitkColorProperty.h"
 #include "mitkLevelWindowProperty.h"
+#include "Geometry3D.h"
 
 //##ModelId=3D6A0E8C02CC
 mitk::Mapper* mitk::DataTreeNode::GetMapper(MapperSlotId id) const
@@ -34,12 +35,6 @@ mitk::Mapper* mitk::DataTreeNode::GetMapper(MapperSlotId id) const
 mitk::BaseData* mitk::DataTreeNode::GetData() const
 {
     return m_Data;
-}
-
-//##ModelId=3ED91D050121
-vtkTransform* mitk::DataTreeNode::GetVtkTransform() const
-{
-  return m_VtkTransform;
 }
 
 mitk::StateMachine::Pointer mitk::DataTreeNode::GetInteractor() const
@@ -70,6 +65,8 @@ mitk::DataTreeNode::DataTreeNode() : m_Data(NULL)
     m_PropertyList = PropertyList::New();
     
     m_VtkTransform = vtkTransform::New();
+
+    m_Geometry3D = Geometry3D::New();
 }
 
 
@@ -335,4 +332,21 @@ void mitk::DataTreeNode::SetProperty(const char *propertyKey,
                                      const mitk::BaseRenderer* renderer)
 {
     GetPropertyList(renderer)->SetProperty(propertyKey, propertyValue);
+}
+
+//##ModelId=3ED91D050121
+vtkTransform* mitk::DataTreeNode::GetVtkTransform() const
+{
+  //return m_VtkTransform;
+  return m_Geometry3D->GetTransform();
+}
+
+mitk::Geometry3D* mitk::DataTreeNode::GetGeometry()
+{
+  return m_Geometry3D.GetPointer();
+}
+
+void mitk::DataTreeNode::SetGeometry(mitk::Geometry3D* newGeometry)
+{
+  m_Geometry3D = newGeometry;
 }

@@ -145,14 +145,14 @@ template <class T, unsigned int NVectorDimension>
 template <typename TCoordRep, unsigned int NPointDimension>
   inline bool Equal(const itk::Vector<TCoordRep, NPointDimension>& vector1, const itk::Vector<TCoordRep, NPointDimension>& vector2) 
 {
-  itk::Vector<TCoordRep, NPointDimension>::VectorType diff = vector1-vector2;
+  typename itk::Vector<TCoordRep, NPointDimension>::VectorType diff = vector1-vector2;
   return diff.GetSquaredNorm() < mitk::epsSquared; 
 }
 
 template <typename TCoordRep, unsigned int NPointDimension>
   inline bool Equal(const itk::Point<TCoordRep, NPointDimension>& vector1, const itk::Point<TCoordRep, NPointDimension>& vector2) 
 {
-  itk::Point<TCoordRep, NPointDimension>::VectorType diff = vector1-vector2;
+  typename itk::Point<TCoordRep, NPointDimension>::VectorType diff = vector1-vector2;
   return diff.GetSquaredNorm() < mitk::epsSquared; 
 }
 

@@ -13,28 +13,17 @@
 //##ModelId=3D6A0E8C02CC
 mitk::Mapper* mitk::DataTreeNode::GetMapper(MapperSlotId id) const
 {
-    // @todo
-    
-    if (mappers[id].IsNull()) {
-        
-        mappers[id] = MapperFactory::CreateMapper(const_cast<DataTreeNode*>(this),id);
-        
-    }
-    
-    // mappers[id]->AddInput(GetData());
-    
-    return mappers[id];
-    
-    
-    
-    //  return NULL;
-    
+  if (mappers[id].IsNull()) 
+  {
+    mappers[id] = MapperFactory::CreateMapper(const_cast<DataTreeNode*>(this),id);
+  }
+  return mappers[id];
 }
 
 //##ModelId=3E32C49D00A8
 mitk::BaseData* mitk::DataTreeNode::GetData() const
 {
-    return m_Data;
+  return m_Data;
 }
 
 mitk::Interactor::Pointer mitk::DataTreeNode::GetInteractor() const
@@ -45,52 +34,52 @@ mitk::Interactor::Pointer mitk::DataTreeNode::GetInteractor() const
 //##ModelId=3E33F4E4025B
 void mitk::DataTreeNode::SetData(mitk::BaseData* baseData)
 {
-    if(m_Data!=baseData)
-    {
-        m_Data=baseData;
-        //@bug with the following line, the actor-mode of the vtkInteractor does not work any more
-        m_Geometry3D->SetBaseGeometry(m_Data->GetGeometry());
-        Modified();
-    }
+  if(m_Data!=baseData)
+  {
+    m_Data=baseData;
+    //@bug with the following line, the actor-mode of the vtkInteractor does not work any more
+    m_Geometry3D->SetBaseGeometry(m_Data->GetGeometry());
+    Modified();
+  }
 }
 
 void mitk::DataTreeNode::SetInteractor(mitk::Interactor* interactor)
 {
-	m_Interactor = interactor;
+  m_Interactor = interactor;
 }
 
 //##ModelId=3E33F5D702AA
 mitk::DataTreeNode::DataTreeNode() : m_Data(NULL)
 {
-    memset(mappers, 0, sizeof(mappers)); 
-    
-    m_PropertyList = PropertyList::New();
-    
-    m_VtkTransform = vtkTransform::New();
+  memset(mappers, 0, sizeof(mappers)); 
 
-    m_Geometry3D = Geometry3D::New();
+  m_PropertyList = PropertyList::New();
+
+  m_VtkTransform = vtkTransform::New();
+
+  m_Geometry3D = Geometry3D::New();
 }
 
 
 //##ModelId=3E33F5D702D3
 mitk::DataTreeNode::~DataTreeNode()
 {
-    m_VtkTransform->Delete();
+  m_VtkTransform->Delete();
 }
 
 //##ModelId=3E33F5D7032D
 mitk::DataTreeNode& mitk::DataTreeNode::operator=(const DataTreeNode& right)
 {
-    mitk::DataTreeNode* node=mitk::DataTreeNode::New();
-    node->SetData(right.GetData());
-    return *node;
+  mitk::DataTreeNode* node=mitk::DataTreeNode::New();
+  node->SetData(right.GetData());
+  return *node;
 }
 
 mitk::DataTreeNode& mitk::DataTreeNode::operator=(mitk::BaseData* right)
 {
-    mitk::DataTreeNode* node=mitk::DataTreeNode::New();
-    node->SetData(right);
-    return *node;
+  mitk::DataTreeNode* node=mitk::DataTreeNode::New();
+  node->SetData(right);
+  return *node;
 }
 
 #if (_MSC_VER > 1200) || !defined(_MSC_VER)
@@ -100,9 +89,9 @@ MBI_STD::istream& mitk::operator>>( MBI_STD::istream& i, mitk::DataTreeNode::Poi
 MBI_STD::istream& operator>>( MBI_STD::istream& i, mitk::DataTreeNode::Pointer& dtn ) 
 #endif
 {
-    dtn = mitk::DataTreeNode::New();
-    //i >> av.get();
-    return i;
+  dtn = mitk::DataTreeNode::New();
+  //i >> av.get();
+  return i;
 }
 
 #if (_MSC_VER > 1200) || !defined(_MSC_VER)
@@ -112,29 +101,29 @@ MBI_STD::ostream& mitk::operator<<( MBI_STD::ostream& o, mitk::DataTreeNode::Poi
 MBI_STD::ostream& operator<<( MBI_STD::ostream& o, mitk::DataTreeNode::Pointer& dtn)
 #endif
 {
-    if(dtn->GetData()!=NULL)
-        o<<dtn->GetData()->GetNameOfClass();
-    else
-        o<<"empty data";
-    return o;
+  if(dtn->GetData()!=NULL)
+    o<<dtn->GetData()->GetNameOfClass();
+  else
+    o<<"empty data";
+  return o;
 }
 
 //##ModelId=3E69331903C9
 void mitk::DataTreeNode::SetMapper(MapperSlotId id, mitk::Mapper* mapper)
 {
-    mappers[id] = mapper;
-    
-    if (mapper!=NULL)
-        mapper->SetInput(this);
+  mappers[id] = mapper;
+
+  if (mapper!=NULL)
+    mapper->SetInput(this);
 }
 
 //##ModelId=3E860A5C0032
 void mitk::DataTreeNode::UpdateOutputInformation()
 {
-    if (this->GetSource())
-    {
-        this->GetSource()->UpdateOutputInformation();
-    }
+  if (this->GetSource())
+  {
+    this->GetSource()->UpdateOutputInformation();
+  }
 }
 
 //##ModelId=3E860A5E011B
@@ -145,13 +134,13 @@ void mitk::DataTreeNode::SetRequestedRegionToLargestPossibleRegion()
 //##ModelId=3E860A5F03D9
 bool mitk::DataTreeNode::RequestedRegionIsOutsideOfTheBufferedRegion()
 {
-    return false;
+  return false;
 }
 
 //##ModelId=3E860A620080
 bool mitk::DataTreeNode::VerifyRequestedRegion()
 {
-    return GetData()!=NULL;
+  return GetData()!=NULL;
 }
 
 //##ModelId=3E860A640156
@@ -166,63 +155,63 @@ void mitk::DataTreeNode::CopyInformation(const itk::DataObject *data)
 //##ModelId=3E3FE0420273
 mitk::PropertyList::Pointer mitk::DataTreeNode::GetPropertyList(const mitk::BaseRenderer* renderer) const
 {
-    if(renderer==NULL)
-        return m_PropertyList;
-    
-    mitk::PropertyList::Pointer & propertyList = m_MapOfPropertyLists[renderer];
-    
-    if(propertyList.IsNull())
-        propertyList = mitk::PropertyList::New();
-    
-    assert(m_MapOfPropertyLists[renderer].IsNotNull());
-    
-    return propertyList;
+  if(renderer==NULL)
+    return m_PropertyList;
+
+  mitk::PropertyList::Pointer & propertyList = m_MapOfPropertyLists[renderer];
+
+  if(propertyList.IsNull())
+    propertyList = mitk::PropertyList::New();
+
+  assert(m_MapOfPropertyLists[renderer].IsNotNull());
+
+  return propertyList;
 }
 
 //##ModelId=3EF189DB0111
 mitk::BaseProperty::Pointer mitk::DataTreeNode::GetProperty(const char *propertyKey, const mitk::BaseRenderer* renderer) const
 {
-    if(propertyKey==NULL)
-      return NULL;
+  if(propertyKey==NULL)
+    return NULL;
 
-    std::map<const mitk::BaseRenderer*,mitk::PropertyList::Pointer>::const_iterator it;
-    
-    //does a renderer-specific PropertyList exist?
-    it=m_MapOfPropertyLists.find(renderer);
-    if(it==m_MapOfPropertyLists.end())
-        //no? use the renderer-independent one!
-        return m_PropertyList->GetProperty(propertyKey);
-    
-    //does the renderer-specific PropertyList contain the @a propertyKey?
-    //and is it enabled
-    mitk::BaseProperty::Pointer property;
-    property=it->second->GetProperty(propertyKey);
-    if(property.IsNotNull() && property->GetEnabled())
-        //yes? return it
-        return property;
-    
+  std::map<const mitk::BaseRenderer*,mitk::PropertyList::Pointer>::const_iterator it;
+
+  //does a renderer-specific PropertyList exist?
+  it=m_MapOfPropertyLists.find(renderer);
+  if(it==m_MapOfPropertyLists.end())
     //no? use the renderer-independent one!
     return m_PropertyList->GetProperty(propertyKey);
+
+  //does the renderer-specific PropertyList contain the @a propertyKey?
+  //and is it enabled
+  mitk::BaseProperty::Pointer property;
+  property=it->second->GetProperty(propertyKey);
+  if(property.IsNotNull() && property->GetEnabled())
+    //yes? return it
+    return property;
+
+  //no? use the renderer-independent one!
+  return m_PropertyList->GetProperty(propertyKey);
 }
 
 bool mitk::DataTreeNode::GetBoolProperty(const char* propertyKey, bool& boolValue, mitk::BaseRenderer* renderer) const
 {
-    mitk::BoolProperty::Pointer boolprop = dynamic_cast<mitk::BoolProperty*>(GetProperty(propertyKey, renderer).GetPointer());
-    if(boolprop.IsNull())
-        return false;
-    
-    boolValue = boolprop->GetBool();
-    return true;
+  mitk::BoolProperty::Pointer boolprop = dynamic_cast<mitk::BoolProperty*>(GetProperty(propertyKey, renderer).GetPointer());
+  if(boolprop.IsNull())
+    return false;
+
+  boolValue = boolprop->GetBool();
+  return true;
 }
 
 bool mitk::DataTreeNode::GetIntProperty(const char* propertyKey, int &intValue, mitk::BaseRenderer* renderer) const
 {
-    mitk::IntProperty::Pointer intprop = dynamic_cast<mitk::IntProperty*>(GetProperty(propertyKey, renderer).GetPointer());
-    if(intprop.IsNull())
-        return false;
-    
-    intValue = intprop->GetValue();
-    return true;
+  mitk::IntProperty::Pointer intprop = dynamic_cast<mitk::IntProperty*>(GetProperty(propertyKey, renderer).GetPointer());
+  if(intprop.IsNull())
+    return false;
+
+  intValue = intprop->GetValue();
+  return true;
 }
 
 bool mitk::DataTreeNode::GetStringProperty(const char* propertyKey, const char* string, mitk::BaseRenderer* renderer) const
@@ -241,41 +230,41 @@ bool mitk::DataTreeNode::GetStringProperty(const char* propertyKey, const char* 
 
 bool mitk::DataTreeNode::GetColor(float rgb[3], mitk::BaseRenderer* renderer, const char* propertyKey) const
 {
-    mitk::ColorProperty::Pointer colorprop = dynamic_cast<mitk::ColorProperty*>(GetProperty(propertyKey, renderer).GetPointer());
-    if(colorprop.IsNull())
-        return false;
-    
-    memcpy(rgb, colorprop->GetColor().GetDataPointer(), 3*sizeof(float));
-    return true;
+  mitk::ColorProperty::Pointer colorprop = dynamic_cast<mitk::ColorProperty*>(GetProperty(propertyKey, renderer).GetPointer());
+  if(colorprop.IsNull())
+    return false;
+
+  memcpy(rgb, colorprop->GetColor().GetDataPointer(), 3*sizeof(float));
+  return true;
 }
 
 //##ModelId=3EF19420016B
 bool mitk::DataTreeNode::GetOpacity(float &opacity, mitk::BaseRenderer* renderer, const char* propertyKey) const
 {
-    mitk::FloatProperty::Pointer opacityprop = dynamic_cast<mitk::FloatProperty*>(GetProperty(propertyKey, renderer).GetPointer());
-    if(opacityprop.IsNull())
-        return false;
-    
-    opacity=opacityprop->GetValue();
-    return true;
+  mitk::FloatProperty::Pointer opacityprop = dynamic_cast<mitk::FloatProperty*>(GetProperty(propertyKey, renderer).GetPointer());
+  if(opacityprop.IsNull())
+    return false;
+
+  opacity=opacityprop->GetValue();
+  return true;
 }
 
 //##ModelId=3EF194220204
 bool mitk::DataTreeNode::GetLevelWindow(mitk::LevelWindow &levelWindow, mitk::BaseRenderer* renderer, const char* propertyKey) const
 {
-    mitk::LevelWindowProperty::Pointer levWinProp = dynamic_cast<mitk::LevelWindowProperty*>(GetProperty(propertyKey, renderer).GetPointer());
-    if(levWinProp.IsNull())
-        return false;
-    
-    levelWindow=levWinProp->GetLevelWindow();
-    return true;
+  mitk::LevelWindowProperty::Pointer levWinProp = dynamic_cast<mitk::LevelWindowProperty*>(GetProperty(propertyKey, renderer).GetPointer());
+  if(levWinProp.IsNull())
+    return false;
+
+  levelWindow=levWinProp->GetLevelWindow();
+  return true;
 }
 
 void mitk::DataTreeNode::SetColor(const mitk::Color &color, mitk::BaseRenderer* renderer, const char* propertyKey)
 {
-    mitk::ColorProperty::Pointer prop;
-    prop = new mitk::ColorProperty(color);
-    GetPropertyList(renderer)->SetProperty(propertyKey, prop);
+  mitk::ColorProperty::Pointer prop;
+  prop = new mitk::ColorProperty(color);
+  GetPropertyList(renderer)->SetProperty(propertyKey, prop);
 }
 
 void mitk::DataTreeNode::SetColor(float red, float green, float blue, mitk::BaseRenderer* renderer, const char* propertyKey)
@@ -290,47 +279,47 @@ void mitk::DataTreeNode::SetColor(float red, float green, float blue, mitk::Base
 //##ModelId=3EF196360303
 void mitk::DataTreeNode::SetColor(const float rgb[3], mitk::BaseRenderer* renderer, const char* propertyKey)
 {
-    mitk::ColorProperty::Pointer prop;
-    prop = new mitk::ColorProperty(rgb);
-    GetPropertyList(renderer)->SetProperty(propertyKey, prop);
+  mitk::ColorProperty::Pointer prop;
+  prop = new mitk::ColorProperty(rgb);
+  GetPropertyList(renderer)->SetProperty(propertyKey, prop);
 }
 
 //##ModelId=3EF1966703D6
 void mitk::DataTreeNode::SetVisibility(bool visible, mitk::BaseRenderer* renderer, const char* propertyKey)
 {
-    mitk::BoolProperty::Pointer prop;
-    prop = new mitk::BoolProperty(visible);
-    GetPropertyList(renderer)->SetProperty(propertyKey, prop);
+  mitk::BoolProperty::Pointer prop;
+  prop = new mitk::BoolProperty(visible);
+  GetPropertyList(renderer)->SetProperty(propertyKey, prop);
 }
 
 //##ModelId=3EF196880095
 void mitk::DataTreeNode::SetOpacity(float opacity, mitk::BaseRenderer* renderer, const char* propertyKey)
 {
-    mitk::FloatProperty::Pointer prop;
-    prop = new mitk::FloatProperty(opacity);
-    GetPropertyList(renderer)->SetProperty(propertyKey, prop);
+  mitk::FloatProperty::Pointer prop;
+  prop = new mitk::FloatProperty(opacity);
+  GetPropertyList(renderer)->SetProperty(propertyKey, prop);
 }
 
 //##ModelId=3EF1969A0181
 void mitk::DataTreeNode::SetLevelWindow(mitk::LevelWindow levelWindow, mitk::BaseRenderer* renderer, const char* propertyKey)
 {
-    mitk::LevelWindowProperty::Pointer prop;
-    prop = new mitk::LevelWindowProperty(levelWindow);
-    GetPropertyList(renderer)->SetProperty(propertyKey, prop);
+  mitk::LevelWindowProperty::Pointer prop;
+  prop = new mitk::LevelWindowProperty(levelWindow);
+  GetPropertyList(renderer)->SetProperty(propertyKey, prop);
 }
 
 void mitk::DataTreeNode::SetIntProperty(const char* propertyKey, int intValue, mitk::BaseRenderer* renderer)
 {
-    mitk::IntProperty::Pointer prop;
-    prop = new mitk::IntProperty(intValue);
-    GetPropertyList(renderer)->SetProperty(propertyKey, prop);
+  mitk::IntProperty::Pointer prop;
+  prop = new mitk::IntProperty(intValue);
+  GetPropertyList(renderer)->SetProperty(propertyKey, prop);
 }
 
 void mitk::DataTreeNode::SetProperty(const char *propertyKey, 
                                      BaseProperty* propertyValue, 
                                      const mitk::BaseRenderer* renderer)
 {
-    GetPropertyList(renderer)->SetProperty(propertyKey, propertyValue);
+  GetPropertyList(renderer)->SetProperty(propertyKey, propertyValue);
 }
 
 //##ModelId=3ED91D050121

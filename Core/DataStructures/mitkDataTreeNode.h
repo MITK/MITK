@@ -7,13 +7,13 @@
 #include "mitkInteractor.h"
 
 #ifdef MBI_NO_STD_NAMESPACE
-	#define MBI_STD
-	#include <iostream.h>
-	#include <fstream.h>
+#define MBI_STD
+#include <iostream.h>
+#include <fstream.h>
 #else
-	#define MBI_STD std
-	#include <iostream>
-	#include <fstream>
+#define MBI_STD std
+#include <iostream>
+#include <fstream>
 #endif
 
 #include "mitkPropertyList.h"
@@ -43,11 +43,11 @@ public:
 
   mitkClassMacro(DataTreeNode,DataObject);
 
-	itkNewMacro(Self);  
+  itkNewMacro(Self);  
 
-	//##ModelId=3D6A0E8C02CC
-	mitk::Mapper* GetMapper(MapperSlotId id) const;
-	//##ModelId=3E32C49D00A8
+  //##ModelId=3D6A0E8C02CC
+  mitk::Mapper* GetMapper(MapperSlotId id) const;
+  //##ModelId=3E32C49D00A8
   //##Documentation
   //## @brief Get the data object (instance of BaseData, e.g., an Image)
   //## managed by this DataTreeNode
@@ -119,7 +119,7 @@ public:
   //## @sa m_PropertyList
   //## @sa m_MapOfPropertyLists
   mitk::BaseProperty::Pointer GetProperty(const char *propertyKey, const mitk::BaseRenderer* renderer = NULL) const;
-  
+
   void SetProperty(const char *propertyKey, BaseProperty* property, const mitk::BaseRenderer* renderer = NULL);	
 
   //##Documentation
@@ -312,7 +312,7 @@ protected:
   //##Documentation
   //## @brief Interactor, that handles the Interaction
   Interactor::Pointer m_Interactor;
-      
+
   Geometry3D::Pointer m_Geometry3D;
 };
 

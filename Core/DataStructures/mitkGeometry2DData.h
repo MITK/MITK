@@ -8,6 +8,8 @@
 namespace mitk {
 
 //##ModelId=3E639C6C02C1
+//##Documentation
+//## @brief Data class containing Geometry2D objects
 class Geometry2DData : public BaseData
 {
 public:

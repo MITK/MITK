@@ -31,3 +31,16 @@ mitk::PropertyList::~PropertyList()
 {
 }
 
+unsigned long mitk::PropertyList::GetMTime() const
+{
+    std::map<std::string,BaseProperty::Pointer>::const_iterator it=m_Properties.begin();
+	for(;it!=m_Properties.end();++it)
+	{
+		if(Superclass::GetMTime()<it->second->GetMTime())
+		{
+			Modified();
+			break;
+		}
+	}
+    return Superclass::GetMTime();
+}

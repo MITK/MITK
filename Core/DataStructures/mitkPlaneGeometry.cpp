@@ -1,4 +1,5 @@
 #include "PlaneGeometry.h"
+#include <vtkTransform.h>
 
 //##ModelId=3E395F22035A
 mitk::PlaneGeometry::PlaneGeometry() : Geometry2D(10.0, 10.0), m_ScaleFactorMMPerUnitX(1.0), m_ScaleFactorMMPerUnitY(1.0)
@@ -78,3 +79,12 @@ void mitk::PlaneGeometry::MMToUnits(const mitk::Vector2D &vec_mm, mitk::Vector2D
     vec_units.y=vec_mm.y*(1.0/m_ScaleFactorMMPerUnitY);
 }
 
+//##ModelId=3ED91D060363
+void mitk::PlaneGeometry::TransformGeometry(const vtkTransform * transform)
+{
+	float p[3], n[3];
+	// the const_casts in the following are safe, since the used TransformNormalAtPoint/TransformPoint methods
+	// do not change anything
+	vec2vtk(m_PlaneView.normal, n); const_cast<vtkTransform *>(transform)->TransformNormalAtPoint(p, n, n); vtk2vec(n, m_PlaneView.normal);
+	vec2vtk(m_PlaneView.point, p); const_cast<vtkTransform *>(transform)->TransformPoint(p, p); vtk2vec(p, m_PlaneView.point);
+}

@@ -14,10 +14,14 @@ typedef ::LinkedTree<mitk::DataTreeNode::Pointer> DataTreeBase;
 typedef DataTreeBase::TreeChangeListener DataTreeBaseTreeChangeListener;
 
 //##ModelId=3E394E99028E
+//##Documentation
+//## @brief typedef to an iterator on the data tree
 typedef	::TreeIterator<DataTreeNode::Pointer> DataTreeIterator;
 
 
 //##ModelId=3E38F35101A0
+//##Documentation
+//## @brief Main run-time data management class defining a data tree
 class DataTree : public itk::Object, public DataTreeBase, public DataTreeBaseTreeChangeListener
 {
 
@@ -48,6 +52,7 @@ class DataTree : public itk::Object, public DataTreeBase, public DataTreeBaseTre
 		\brief compute the bounding box of data tree structure
 		@param it an iterator of a data tree structure
 		*/
+    //##ModelId=3ED91D050085
 	static mitk::BoundingBox::Pointer ComputeBoundingBox(mitk::DataTreeIterator * it);
 
  protected:

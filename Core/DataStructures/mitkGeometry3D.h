@@ -14,10 +14,15 @@ namespace mitk {
 #endif
 
 //##ModelId=3E8600D800C5
+//##Documentation
+//## @brief Standard 3D-BoundingBox typedef (float)
+//## Standard 3D-BoundingBox typedef to get rid of template arguments (3D,
+//## float).
 typedef itk::BoundingBox<> BoundingBox;
 
 //##ModelId=3DCBF389032B
 //##Documentation
+//## @brief Describes the geometry of a data object
 //## Describes the geometry of a data object, e.g., an Image. At least, it can
 //## return the bounding box of the data object. If the data object consists of
 //## slices, a Geometry2D can be requested for each slice and conversions
@@ -175,8 +180,10 @@ public:
     //## Set the spacing according to the tags in @ pic.
     virtual void SetSpacing(ipPicDescriptor* pic);
 
+    //##ModelId=3ED91D050299
     virtual void SetBoundingBox(const mitk::BoundingBox* boundingBox,  int t=0);
 
+    //##ModelId=3ED91D050305
 	virtual void SetBoundingBox(const float bounds[6],  int t=0);
 protected:
     //##ModelId=3E3453C703AF
@@ -199,6 +206,7 @@ protected:
     //##ModelId=3E3BE8BF0288
     mitk::Vector3D m_Spacing;
 	
+    //##ModelId=3ED91D050269
 	mutable std::vector<mitk::BoundingBox::ConstPointer> m_BoundingBoxes;
 
     //##ModelId=3E3BE8BF02BA

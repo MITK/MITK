@@ -1,16 +1,19 @@
 #include "LevelWindow.h"
 #include <algorithm>
 
+//##ModelId=3ED91D060288
 mitk::LevelWindow::LevelWindow() : m_Min(-1024), m_Max(4096), m_RangeMin(-1024), m_RangeMax(4096)
 {
 
 }
 
+//##ModelId=3ED91D060298
 mitk::LevelWindow::LevelWindow(const mitk::LevelWindow& levWin)
 {
     *this=levWin;
 }
 
+//##ModelId=3ED91D06029A
 mitk::LevelWindow::~LevelWindow()
 {
 }

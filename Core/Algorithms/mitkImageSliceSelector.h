@@ -9,6 +9,7 @@ namespace mitk {
 
 //##ModelId=3DCBFE35015D
 //##Documentation
+//## @brief Provides access to a slice of the input image
 //## Provides access to a slice of the input image. If the input is generated
 //## by a ProcessObject, only the required data is requested.
 class ImageSliceSelector : public SubImageSelector

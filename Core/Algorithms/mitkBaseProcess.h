@@ -10,6 +10,7 @@ class BaseData;
 
 //##ModelId=3DCBF9BC011A
 //##Documentation
+//## @brief Superclass of all classes generating some kind of mitk::BaseData.
 //## Superclass of all classes generating some kind of mitk::BaseData. 
 //## 
 //## In itk and vtk the generated result of a ProcessObject is only guaranteed

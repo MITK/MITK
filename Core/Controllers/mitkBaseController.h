@@ -13,9 +13,10 @@ class BaseRenderer;
 
 //##ModelId=3DF8F7EA01DA
 //##Documentation
+//## @brief Baseclass for renderer slice-/camera-control
 //## Tells the render (subclass of BaseRenderer) which slice (subclass
 //## SliceNavigationController) or from which direction (subclass
-//## CameraController) it has to render. Contains two Steppers for stepping
+//## CameraController) it has to render. Contains two Stepper for stepping
 //## through the slices or through different camera views (e.g., for the
 //## creation of a movie around the data), respectively, and through time, if
 //## there is 3D+t data.
@@ -52,13 +53,14 @@ class BaseController : public itk::Object
     BaseController();
 
     //##ModelId=3E3AE32B0070
-    //##ModelId=3E3AE32B0070
     virtual ~BaseController();
 
     //##ModelId=3DF8C0140176
     Stepper m_Time;
     //##ModelId=3E189CAA0265
     Stepper m_Slice;
+    //BaseRenderer::Pointer m_BaseRenderer;
+
 };
 
 } // namespace mitk

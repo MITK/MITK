@@ -132,6 +132,7 @@ mitk::BoundingBox::ConstPointer mitk::Geometry3D::GetBoundingBox(int t) const
     return boundingBox.GetPointer();
 }
 
+//##ModelId=3ED91D050299
 void mitk::Geometry3D::SetBoundingBox(const mitk::BoundingBox* boundingBox,  int t)
 {
 	if(IsValidTime(t))
@@ -140,6 +141,7 @@ void mitk::Geometry3D::SetBoundingBox(const mitk::BoundingBox* boundingBox,  int
 		itkExceptionMacro("tried to set boundingbox for an invalid point of time (t:"<<t<<")");
 }
 
+//##ModelId=3ED91D050305
 void mitk::Geometry3D::SetBoundingBox(const float bounds[6],  int t)
 {
 	if(IsValidTime(t))

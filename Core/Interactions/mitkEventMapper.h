@@ -1,82 +1,154 @@
 #ifndef EVENTMAPPER_H_HEADER_INCLUDED_C187864A
+
 #define EVENTMAPPER_H_HEADER_INCLUDED_C187864A
 
+
+
 #include "mitkCommon.h"
+
 #include "Event.h"
+
 #include "EventDescription.h"
+
 #include "StateEvent.h"
+
 #include "StateMachine.h"
+
 #include <qxml.h>
+
 #include <vector>
+
 #include <string>
 
+
+
 //##ModelId=3E788FC0001A
+
 typedef std::vector<mitk::EventDescription> EventDescriptionVec;
 
+
+
 //##ModelId=3EAEC3AE01DF
+
 typedef std::vector<mitk::EventDescription>::iterator EventDescriptionVecIter;
+
+
 
 struct StringIntArrayStruct {//for mapping string from xml-file to int
 	const char * text;
 	int id;
 };
 
+
+
 namespace mitk {
 
+
+
 //##ModelId=3E5A390401F2
+
 class EventMapper : public QXmlDefaultHandler
+
 {
+
   public:
+
     //##ModelId=3E5B349600CB
+
     static void SetStateMachine(StateMachine* stateMachine);
 
+
+
     //##ModelId=3E5B34CF0041
+
     static bool MapEvent(Event* event);
 
+
+
     //##ModelId=3E5B35140072
+
 	static bool LoadBehavior(std::string fileName);
 
+
+
     //##ModelId=3E788FC00308
+
 	bool startElement( const QString&, const QString&, const QString& qName, const QXmlAttributes& atts );
+
     //##ModelId=3E7B20EE01F5
+
     std::string GetStyleName();
 
 
+
+
+
   private:
+
     //##ModelId=3E5B33F303CA
+
 	static EventDescriptionVec m_EventDescriptions;
 
+
+
     //##ModelId=3E5B343701F1
+
     static StateMachine *m_StateMachine;
 
+
+
 	//##ModelId=3E956E3A036B
+
     static StateEvent m_StateEvent;
 
+
+
 	//##ModelId=3E7B1EB800CC
+
     static std::string m_StyleName;
 
+
+
     //##ModelId=3E788FC000E5
+
 	static const std::string STYLE;
+
     //##ModelId=3E788FC0025C
+
 	static const std::string NAME;
+
     //##ModelId=3E788FC002AA
+
 	static const std::string ID;
+
     //##ModelId=3E785B1B00FD
+
 	static const std::string TYPE;
+
     //##ModelId=3E785B1B015B
+
 	static const std::string BUTTON;
+
     //##ModelId=3E8B08FA01AA
+
     static const std::string BUTTONSTATE;
+
     //##ModelId=3E785B1B01A9
+
 	static const std::string KEY;
 
+
+
 public:
+
 	//##Constants for EventMapping... In StateMachines do: case EventMapper::KeyPress
+
 	//##SideEffectId
 
-	static const int DONOTHING;
+
+/*	static const int DONOTHING;
 	static const int INITNEWOBJECT;
-/*	static const int INITEDITOBJECT = 6;
+	static const int INITEDITOBJECT = 6;
 	static const int INITEDITGROUP = 7;
 	static const int ADDPOINT = 10;
 	static const int SNAPPING_ADDING = 20;
@@ -95,7 +167,10 @@ public:
 	static const int DESELECTOBJECT = 70; //deselect picked from group
 	static const int DESELECTALL = 72;
 
+
+
 	//Type
+
 	static const int None = 0;				// invalid event
 	static const int Timer = 1;				// timer event
 	static const int MouseButtonPress = 2;			// mouse button pressed
@@ -167,7 +242,10 @@ public:
 	static const int User = 1000;				// first user event id
 	static const int MaxUser = 65535;		
 
+
+
 	//##ButtonState
+
 	// mouse/keyboard state values
     static const int NoButton        = 0x0000;
     static const int LeftButton      = 0x0001;
@@ -431,11 +509,18 @@ public:
 
 };
 
+
+
 } // namespace mitk
 
 
-const int mitk::EventMapper::DONOTHING = 0;
-const int mitk::EventMapper::INITNEWOBJECT = 5;
+
+
+//const int mitk::EventMapper::DONOTHING = 0;
+//const int mitk::EventMapper::INITNEWOBJECT = 5;
+
+
 
 
 #endif /* EVENTMAPPER_H_HEADER_INCLUDED_C187864A */
+

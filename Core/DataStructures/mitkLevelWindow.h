@@ -6,17 +6,21 @@
 
 namespace mitk {
 
-/*!
-* class implements level window data structure
-* current min and max value are stored in m_Min and m_Max.
-* The maximum and minimum of valid value range is stored in
-* m_RangeMin and m_RangeMax
-*/
+//##ModelId=3E0B12240067
+//##Documentation
+//## @brief Class to store level/window values
+//## class implements level window data structure
+//## current min and max value are stored in m_Min and m_Max.
+//## The maximum and minimum of valid value range is stored in
+//## m_RangeMin and m_RangeMax
 class LevelWindow
 {
 public:
+    //##ModelId=3ED91D060288
     LevelWindow();
+    //##ModelId=3ED91D060298
     LevelWindow(const mitk::LevelWindow& levWin);
+    //##ModelId=3ED91D06029A
     virtual ~LevelWindow();
 
 //    mitkClassMacro(LevelWindow, itk::Object);
@@ -131,7 +135,6 @@ public:
     */
     //##ModelId=3EA969CD007F
     virtual LevelWindow& operator=(const LevelWindow& levWin);
-
 
 protected:
 

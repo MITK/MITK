@@ -5,10 +5,13 @@
 #include "mitkVector.h"
 #include "itkTransform.h"
 
+class vtkTransform;
+
 namespace mitk {
 
 //##ModelId=3DDE4DEC0291
 //##Documentation
+//## @brief Describes the geometry of a two-dimensional object
 //## Describes the geometry of a two-dimensional object. Most often, this will
 //## be a plane, which is represented by the sub-class PlaneGeometry. But
 //## curved surfaces are also possible. Can transform between world coordinates
@@ -66,6 +69,9 @@ public:
     virtual void MMToUnits(const mitk::Vector2D &vec_mm, mitk::Vector2D &vec_units) const;
     //##ModelId=3E3C3A92033E
     virtual void SetSizeInUnits(unsigned int width, unsigned int height);
+
+    //##ModelId=3ED91D05019E
+	virtual void TransformGeometry(const vtkTransform * transform);
 
     //##ModelId=3E395E0802E6
     Geometry2D(unsigned int width_units, unsigned int height_units);

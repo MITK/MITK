@@ -5,12 +5,14 @@
 #include "Geometry2D.h"
 #include "SpaceGeometry.h"
 
+class vtkTransform;
+
 namespace mitk {
 
 
 //##ModelId=3DDE570F010A
 //##Documentation
-//## Describes a two-dimensional, plane and rectangular surface.
+//## @brief Describes a two-dimensional, plane and rectangular surface
 class PlaneGeometry : public Geometry2D
 {
 public:
@@ -28,6 +30,9 @@ public:
     virtual const mitk::PlaneView& GetPlaneView() const;
     //##ModelId=3E396ABE0385
     virtual void SetPlaneView(const mitk::PlaneView& aPlaneView);
+
+    //##ModelId=3ED91D060363
+	virtual void TransformGeometry(const vtkTransform * transform);
 
     /** Method for creation through the object factory. */
     itkNewMacro(Self);

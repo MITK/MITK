@@ -48,6 +48,7 @@ void mitk::DataTree::treeChanged( TreeIterator<DataTreeNode::Pointer>& changedTr
 	Modified();
 }
 
+//##ModelId=3ED91D050085
 mitk::BoundingBox::Pointer mitk::DataTree::ComputeBoundingBox(mitk::DataTreeIterator * it)
 {
 		mitk::DataTreeIterator* _it=it->clone();

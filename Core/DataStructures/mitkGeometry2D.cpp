@@ -60,3 +60,9 @@ void mitk::Geometry2D::SetSizeInUnits(unsigned int width, unsigned int height)
     m_HeightInUnits = height;
     Modified();
 }
+
+//##ModelId=3ED91D05019E
+void mitk::Geometry2D::TransformGeometry(const vtkTransform * transform)
+{
+
+}

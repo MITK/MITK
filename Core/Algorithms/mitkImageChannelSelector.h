@@ -9,6 +9,7 @@ namespace mitk {
 
 //##ModelId=3E0B46B200FD
 //##Documentation
+//## @brief Provides access to a channel of the input image
 //## Provides access to a channel of the input image. If the input is generated
 //## by a ProcessObject, only the required data is requested.
 class ImageChannelSelector : public SubImageSelector

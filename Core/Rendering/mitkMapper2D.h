@@ -12,6 +12,7 @@ namespace mitk {
 
 //##ModelId=3E3AA308024B
 //##Documentation
+//## @brief Base class of all Mappers for 2D display
 //## Base class of all Mappers for 2D display, i.e., a frontal view on a plane
 //## display area, so nothing rotated in 3D space as, e.g., a plane in 3D space
 //## (such things are done by subclasses of Mapper3D).

@@ -8,6 +8,8 @@
 namespace mitk {
 
 //##ModelId=3E3FDF05028B
+//##Documentation
+//## @brief Property for strings
 class StringProperty : public BaseProperty
 {
 protected:

@@ -9,6 +9,8 @@ class vtkImageData;
 namespace mitk {
 
 //##ModelId=3D7B424502D7
+//##Documentation
+//## @brief Internal class for managing references on sub-images
 class ImageDataItem : public itk::LightObject
 {
   public:

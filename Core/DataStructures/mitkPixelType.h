@@ -7,6 +7,8 @@
 namespace mitk {
 
 //##ModelId=3DF45FE9023C
+//##Documentation
+//## @brief Class for defining the data type of pixels 
 class PixelType
 {
   public:

@@ -10,6 +10,11 @@
 namespace mitk {
 
 //##ModelId=3E031F200392
+//##Documentation
+//## @brief List of properties (instances of subclasses of BaseProperty)
+//## List of properties (instances of subclasses of BaseProperty). The
+//## properties are stored in a map, thus each property is associated with a
+//## key of type string. 
 class PropertyList : public itk::Object
 {
 public:
@@ -25,6 +30,8 @@ public:
     //##ModelId=3D78B966005F
     bool SetProperty(const char* propertyKey, BaseProperty* property);
 
+    //##ModelId=3ED94AAE0075
+    virtual unsigned long GetMTime() const;
 protected:
     //##ModelId=3E38FEFE0125
     PropertyList();

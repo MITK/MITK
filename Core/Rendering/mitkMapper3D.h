@@ -8,6 +8,8 @@
 namespace mitk {
 
 //##ModelId=3E3AA2F60390
+//##Documentation
+//## @brief Base class of all mappers for 3D display
 class Mapper3D : public Mapper
 {
 public:

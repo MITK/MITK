@@ -17,6 +17,7 @@ class SubImageSelector;
 
 //##ModelId=3DCBC1E300FE
 //##Documentation
+//## @brief Image class for storing images
 //## Image class for storing images. Can be asked for header information, the
 //## data vector, ipPicDescriptors or vtkImageData objects. If not the complete
 //## data is required, the appropriate SubImageSelector class should be used
@@ -173,14 +174,17 @@ class Image : public SlicedData
     //##ModelId=3E1A11530384
     unsigned int* GetDimensions() const;
 
+    //##ModelId=3ED91D060027
     //##Documentation
     //## @todo LevelWindow extraction/calculation not yet implemented. 
     virtual const mitk::LevelWindow& GetLevelWindow() const;
 
+    //##ModelId=3ED91D060085
     //##Documentation
     //## @todo calculation of min/max not yet implemented. Timestamp must be added to track last calculation!
     virtual float GetScalarValueMin() const;
 
+    //##ModelId=3ED91D0600E2
     //##Documentation
     //## @todo calculation of min/max not yet implemented. Timestamp must be added to track last calculation!
     virtual float GetScalarValueMax() const;
@@ -242,6 +246,7 @@ class Image : public SlicedData
     //##ModelId=3E19EA110292
 	bool m_Initialized;
 
+    //##ModelId=3ED91D0503C2
     mitk::LevelWindow m_LevelWindow;
 };
 

@@ -17,6 +17,7 @@ namespace mitk {
 
 //##ModelId=3E14379B00E8
 //##Documentation
+//## @brief Super class of data objects consisting of slices
 //## Super class of data objects consisting of slices, e.g., images or a stack
 //## of contours. (GetGeometry will return a Geometry3D containing Geometry2D
 //## objects).

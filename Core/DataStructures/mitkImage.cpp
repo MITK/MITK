@@ -667,16 +667,19 @@ unsigned int* mitk::Image::GetDimensions() const
 	return m_Dimensions;
 }
 
+//##ModelId=3ED91D060027
 const mitk::LevelWindow& mitk::Image::GetLevelWindow() const
 {
     return m_LevelWindow;
 }
 
+//##ModelId=3ED91D060085
 float mitk::Image::GetScalarValueMin() const
 {
     return -1.0f;
 }
 
+//##ModelId=3ED91D0600E2
 float mitk::Image::GetScalarValueMax() const
 {
     return -1.0f;

@@ -22,7 +22,7 @@ class GlobalInteraction : public StateMachine
 	GlobalInteraction(std::string type);
 
     //##ModelId=3E7F497F01AE
-    virtual bool ExecuteSideEffect(int sideEffectId);
+    virtual bool ExecuteSideEffect(int sideEffectId, Event const* event);
 
 	private:    
 	//##ModelId=3EAD4EF903A5

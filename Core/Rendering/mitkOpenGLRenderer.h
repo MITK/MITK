@@ -18,6 +18,8 @@ namespace mitk {
 class VtkRenderWindow;
 
 //##ModelId=3C6E9AD90215
+//##Documentation
+//## @brief OpenGL-based implementation of BaseRenderer
 class OpenGLRenderer : public BaseRenderer
 {
   public:
@@ -62,6 +64,7 @@ protected:
     //##ModelId=3E33ECF301B7
     virtual ~OpenGLRenderer();
 
+    //##ModelId=3ED91D060305
 	virtual void UpdateVtkActors();
 
     //##ModelId=3E70F51002BA
@@ -83,10 +86,8 @@ protected:
     //##ModelId=3E33145B001E
     vtkLight* m_Light;
 
+    //##ModelId=3ED91D0602E6
     vtkLightKit* m_LightKit;
-
-public: //FIXME
-    //##ModelId=3E64243803E7
 };
 
 } // namespace mitk

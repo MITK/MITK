@@ -11,6 +11,7 @@ class Event
   public:
     //##ModelId=3E5B3007000F
     //##Documentation
+
     //## @params:
     //## type: type of Event: Mouse or Key Event? (from QEvent->type)
     //## button: mouse-button

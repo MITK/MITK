@@ -6,6 +6,8 @@
 #include "mitkStatusBar.h"
 #include "mitkInteractionConst.h"
 #include <itkMacro.h>
+#include "mitkInteractor.h"
+
 
 //##ModelId=3E5B2DB301FD
 //##Documentation
@@ -45,12 +47,18 @@ bool mitk::StateMachine::HandleEvent(StateEvent const* stateEvent, int objectEve
   if (m_CurrentState == NULL)
   return false;//m_CurrentState needs to be set first!
 
-  //get Transition from m_Current State with equals ID
+  //get the Transition from m_CurrentState which waits for this EventId
   const Transition *tempTransition = m_CurrentState->GetTransition(stateEvent->GetId());
-  if (tempTransition == NULL) return false;
+  if (tempTransition == NULL) //no transition in this state for that EventId
+  {
+    return false;
+  }
+
   //get next State
   State *tempNextState = tempTransition->GetNextState();
-  if (tempNextState == NULL) return false;
+  if (tempNextState == NULL) //wrong built up statemachine!
+    return false;
+
   //and ActionId to execute later on
   if ( m_CurrentState->GetId() != tempNextState->GetId() )//statechange only if there is a real statechange
   {
@@ -58,7 +66,7 @@ bool mitk::StateMachine::HandleEvent(StateEvent const* stateEvent, int objectEve
     {
       //UNDO for this statechange
 	  StateTransitionOperation* doOp = new StateTransitionOperation(OpSTATECHANGE, tempNextState);
-      StateTransitionOperation* undoOp = new StateTransitionOperation(OpSTATECHANGE, m_CurrentState);
+    StateTransitionOperation* undoOp = new StateTransitionOperation(OpSTATECHANGE, m_CurrentState);
 	  OperationEvent *operationEvent = new OperationEvent(((mitk::OperationActor*)(this)),
 														doOp, undoOp,
 														objectEventId ,groupEventId);
@@ -81,13 +89,12 @@ std::cout<<this->GetType()<<": Changing from State "<<m_CurrentState->GetName()<
   {
     if ( !ExecuteAction(*actionIdIterator, stateEvent, objectEventId, groupEventId) )
     {
-      ok = false;
-
       #ifdef INTERDEBUG
       itkWarningMacro( << "Warning: no action defind for " << *actionIdIterator << " in " << m_Type );
-      #endif            
-    }
+      #endif
 
+      ok = false;
+    }
     actionIdIterator++;
   }
   return ok;

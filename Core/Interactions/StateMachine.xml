@@ -542,8 +542,8 @@
 			</transition>
 		</state>
 	</stateMachine>
-<!-- Behaviour of a Polygon -->
-	<stateMachine NAME="polygoninteractor">
+<!-- Behaviour of a Strip of primitives (lines ad points) -->
+	<stateMachine NAME="primstripinteractor">
 		<state NAME="unselected" ID="0" START_STATE="TRUE">
 			<transition NAME="forceSSD" NEXT_STATE_ID="1" EVENT_ID="3">
 	 			<action ID="5" /> <!--AcINITNEWOBJECT-->
@@ -559,7 +559,6 @@
 			<transition NAME="finish" NEXT_STATE_ID="4" EVENT_ID="2">
 				 <action ID="2000" /> <!--AcTRANSMITEVENT-->
 				 <action ID="1101" /> <!--AcMODESELECT-->
-				 <action ID="40" /><!--AcFINISHOBJECT-->
 			</transition>
 			<transition NAME="SubInteractorDeselect" NEXT_STATE_ID="4" EVENT_ID="1020"> <!-- necessary transition of the state subSelected -->
 				<action ID="1101" /><!--AcMODEDESELECT--><!-- the event will produced from the hirachical interactor -->
@@ -615,7 +614,39 @@
 			 	<action ID="42" />
 			</transition>
 		</state>
-
+	</stateMachine>
+<!-- Behaviour of a Polygon -->
+	<stateMachine NAME="polygoninteractor">
+		<state NAME="unselected" ID="0" START_STATE="TRUE">
+			<transition NAME="buildUp" NEXT_STATE_ID="1" EVENT_ID="3">
+				<action ID="1550"/><!--AcFORCESUBINTERACTORS-->
+	 			<action ID="1102" /> <!--AcMODESUBSELECT-->
+	 			<action ID="2000" /> <!--AcTRANSMITEVENT-->
+			</transition>
+			<transition NAME="checkSubSelect" NEXT_STATE_ID="2" EVENT_ID="1">
+				<action ID="38"><!--AcCHECKONESUBINTERACTOR-->
+					<floatParam Name="threshold" Value="0.5" />
+				</action>
+			</transition>
+		</state>
+		<state NAME="buildUp" ID="1">
+			<transition NAME="finish" NEXT_STATE_ID="3" EVENT_ID="2">
+				<action ID="2000" /> <!--AcTRANSMITEVENT-->
+				<action ID="40" /> <!--AcFINISHOBJECT-->
+	 			<action ID="1102" /> <!--AcMODESUBSELECT-->
+			</transition>
+		</state>
+		<state NAME="checkSubSelected" ID="2">
+			<transition NAME="Yes" NEXT_STATE_ID="3" EVENT_ID="1004"> <!-- necessary transition of the state subSelected -->
+				<action ID="1102" /> <!--AcMODESUBSELECT--> <!-- the event will produced from the hirachical interactor -->
+			</transition>
+			<transition NAME="No" NEXT_STATE_ID="0" EVENT_ID="1003" /> <!-- necessary transition of the state subSelected -->
+		</state>
+		<state NAME="subSelected" ID="3">
+			<transition NAME="SubInteractorDeselect" NEXT_STATE_ID="1" EVENT_ID="1020"> <!-- necessary transition of the state subSelected -->
+				<action ID="1101" /><!--AcMODEDESELECT--><!-- the event will produced from the hirachical interactor -->
+			</transition>
+		</state>
 	</stateMachine>
 	<!-- affine interactions standard statemachine  -->
 	<stateMachine NAME="AffineInteractions ctrl-drag">

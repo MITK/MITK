@@ -65,10 +65,12 @@ public:
   //##@brief derived from vtkRenderWindow to only swap buffer if we are about to finish the rendering
   virtual void CopyResultFrame();
 
+#if WIN32
   // Description:
-  // Initialize OpenGL for this window with Stencil Buffer enabled
-  // virtual void SetupPixelFormat(HDC hDC, DWORD dwFlags, int debug, 
-  //                              int bpp=16, int zbpp=16);
+  // Initialize OpenGL for this window with Stencil Buffer enabled (yet only Windows supported)
+   virtual void SetupPixelFormat(HDC hDC, DWORD dwFlags, int debug, 
+                                int bpp=16, int zbpp=16);
+#endif
 
 protected:
   VtkRenderWindow();

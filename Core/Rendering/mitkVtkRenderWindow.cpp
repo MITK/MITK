@@ -87,10 +87,9 @@ void mitk::VtkRenderWindow::CopyResultFrame()
   this->Frame();
 }
 
-
+#if WIN32 //(yet only Windows supported)
 //derived to enable Stencil Buffer in pfd
-/*
- * void mitk::VtkRenderWindow::SetupPixelFormat(HDC hDC, DWORD dwFlags, 
+void mitk::VtkRenderWindow::SetupPixelFormat(HDC hDC, DWORD dwFlags, 
                                                   int debug, int bpp, 
                                                   int zbpp)
 {
@@ -154,4 +153,4 @@ void mitk::VtkRenderWindow::CopyResultFrame()
       this->StereoCapableWindow = 0;
     }
 }
-*/
+#endif

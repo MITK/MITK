@@ -9,6 +9,7 @@
 ** These will automatically be called by the form's constructor and
 ** destructor.
 *****************************************************************************/
+#include "mitkTransferFunctionProperty.h"
 
 void QmitkTransferFunctionWidget::SetDataTreeNode( mitk::DataTreeNode* node)
 {
@@ -29,7 +30,17 @@ void QmitkTransferFunctionWidget::PropertyChange( QListViewItem * PropertyItem )
       if (tf) {
         std::cout << "TF access" << std::endl;
         m_TransferFunctionCanvas->SetTransferFunction(tf);
+	UpdateMinMaxLabels();
       }
     }
   }
+}
+
+
+void QmitkTransferFunctionWidget::UpdateMinMaxLabels()
+{
+    if (m_TransferFunctionCanvas->GetTransferFunction().IsNotNull()) {
+      m_MinLabel->setText(QString::number(m_TransferFunctionCanvas->GetTransferFunction()->GetMin()));
+      m_MaxLabel->setText(QString::number(m_TransferFunctionCanvas->GetTransferFunction()->GetMax()));
+    }
 }

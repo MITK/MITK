@@ -1,7 +1,7 @@
 
 CC = gcc -Wall -pedantic -ansi -Wno-comment
-CC = cc -mips2
 CC = cc -fullwarn -woff 1009,1174
+CC = cc -mips2
 
 DEBUG = -O2
 DEBUG = -g

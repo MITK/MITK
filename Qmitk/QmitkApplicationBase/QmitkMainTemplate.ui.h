@@ -26,8 +26,6 @@
 #include "mitkProperties.h"
 
 #include <mitkLevelWindowProperty.h>
-#include <mitkVesselTreeFileReader.h>
-#include <mitkVesselGraphFileReader.h>
 #include <mitkLevelWindow.h>
 #include <mitkDataTree.h>
 #include <mitkFloatProperty.h>
@@ -50,6 +48,8 @@
 #include <mitkUSLookupTableSource.h>
 
 #ifdef MBI_INTERNAL
+#include <mitkVesselTreeFileReader.h>
+#include <mitkVesselGraphFileReader.h>
 #include <mitkDICOMFileReader.h>
 #include <mitkDSRFileReader.h>
 #include <mitkCylindricToCartesianFilter.h>
@@ -71,7 +71,7 @@ void QmitkMainTemplate::fileOpen()
 #ifdef MBI_INTERNAL
   QString fileName = QFileDialog::getOpenFileName(NULL,"all (*.seq *.pic *.pic.gz *.seq.gz *.pvtk *.stl *.vtk *.ves *.uvg *.par *.dcm hpsonos.db HPSONOS.DB);;DKFZ Pic (*.seq *.pic *.pic.gz *.seq.gz);;surface files (*.stl *.vtk);;stl files (*.stl);;vtk surface files (*.vtk);;vtk image files (*.pvtk);;vessel files (*.ves *.uvg);;par/rec files (*.par);;DSR files (hpsonos.db HPSONOS.DB);;DICOM files (*.dcm)");
 #else
-  QString fileName = QFileDialog::getOpenFileName(NULL,"all (*.seq *.pic *.pic.gz *.seq.gz *.pvtk *.stl *.vtk *.ves *.uvg *.par);;DKFZ Pic (*.seq *.pic *.pic.gz *.seq.gz);;surface files (*.stl *.vtk);;stl files (*.stl);;vtk surface files (*.vtk);;vtk image files (*.pvtk);;vessel files (*.ves *.uvg);;par/rec files (*.par)");
+  QString fileName = QFileDialog::getOpenFileName(NULL,"all (*.seq *.pic *.pic.gz *.seq.gz *.pvtk *.stl *.vtk *.ves *.uvg *.par);;DKFZ Pic (*.seq *.pic *.pic.gz *.seq.gz);;surface files (*.stl *.vtk);;stl files (*.stl);;vtk surface files (*.vtk);;vtk image files (*.pvtk);;par/rec files (*.par)");
 #endif
 
   if ( !fileName.isNull() )
@@ -243,6 +243,7 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
       initWidgets(it);
     }
   }
+#ifdef MBI_INTERNAL
   else if( strstr(fileName, ".ves")!=0 )
   {
     mitk::VesselTreeFileReader::Pointer reader = mitk::VesselTreeFileReader::New();
@@ -273,7 +274,6 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
 	  initWidgets(it);
 	  delete it;
   }
-#ifdef MBI_INTERNAL
   else if(strstr(fileName, "DCM")!=0)
   {
     mitk::DICOMFileReader::Pointer reader;

@@ -22,21 +22,23 @@ class BaseProperty : public itk::Object
 public:
 
     //##ModelId=3E3FF04D0369
-	mitkClassMacro(BaseProperty,itk::Object);
+  mitkClassMacro(BaseProperty,itk::Object);
 
-    //##ModelId=3E3FE04203D1
-    //##Documentation
-    //## @brief Subclasses must implement this operator==, which
-    //## is used by PropertyList to check whether a property has been changed.
+  //##ModelId=3E3FE04203D1
+  //##Documentation
+  //## @brief Subclasses must implement this operator==, which
+  //## is used by PropertyList to check whether a property has been changed.
   virtual bool operator==(const BaseProperty& property) const = 0;
   virtual std::string GetValueAsString() const;
+  itkSetMacro(Enabled,bool);
+  itkGetConstMacro(Enabled,bool);
 protected:
-    //##ModelId=3E38FF0902A7
+  //##ModelId=3E38FF0902A7
     BaseProperty();
 
     //##ModelId=3E38FF0902CF
     virtual ~BaseProperty();
-
+    bool m_Enabled;
 };
 
 } // namespace mitk

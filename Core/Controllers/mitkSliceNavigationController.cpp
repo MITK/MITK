@@ -71,22 +71,27 @@ void mitk::SliceNavigationController::Update()
       // initialize the viewplane
       mitk::PlaneGeometry::Pointer planegeometry = mitk::PlaneGeometry::New();
 
+      ScalarType viewSpacing = 1;
+
       switch(m_ViewDirection)
       {
         case Original:
           assert(false);
           break;
         case Transversal:
-          planegeometry->InitializeStandardPlane(m_InputWorldGeometry, PlaneGeometry::Transversal, m_InputWorldGeometry->GetExtentInMM(2), false);
-          m_Slice->SetSteps((int)m_InputWorldGeometry->GetExtentInMM(2)+1.0);
+          planegeometry->InitializeStandardPlane(m_InputWorldGeometry, PlaneGeometry::Transversal, m_InputWorldGeometry->GetExtent(2)-1, false);
+          m_Slice->SetSteps((int)m_InputWorldGeometry->GetExtent(2));
+          viewSpacing=m_InputWorldGeometry->GetExtentInMM(2)/m_InputWorldGeometry->GetExtent(2);
           break;
         case Frontal:
           planegeometry->InitializeStandardPlane(m_InputWorldGeometry, PlaneGeometry::Frontal);
-          m_Slice->SetSteps((int)m_InputWorldGeometry->GetExtentInMM(1)+1.0);
+          m_Slice->SetSteps((int)m_InputWorldGeometry->GetExtent(1)+1.0);
+          viewSpacing=m_InputWorldGeometry->GetExtentInMM(1)/m_InputWorldGeometry->GetExtent(1);
           break;
         case Sagittal:
           planegeometry->InitializeStandardPlane(m_InputWorldGeometry, PlaneGeometry::Sagittal);
-          m_Slice->SetSteps((int)m_InputWorldGeometry->GetExtentInMM(0)+1.0);
+          m_Slice->SetSteps((int)m_InputWorldGeometry->GetExtent(0)+1.0);
+          viewSpacing=m_InputWorldGeometry->GetExtentInMM(0)/m_InputWorldGeometry->GetExtent(0);
           break;
         default:
           itkExceptionMacro("unknown ViewDirection");
@@ -95,7 +100,7 @@ void mitk::SliceNavigationController::Update()
       m_Slice->SetPos(0);
 
       mitk::SlicedGeometry3D::Pointer slicedWorldGeometry=mitk::SlicedGeometry3D::New();
-      slicedWorldGeometry->InitializeEvenlySpaced(planegeometry, 1, m_Slice->GetSteps(), (m_ViewDirection==Frontal?true:false));
+      slicedWorldGeometry->InitializeEvenlySpaced(planegeometry, viewSpacing, m_Slice->GetSteps(), (m_ViewDirection==Frontal?true:false));
 
       // initialize TimeSlicedGeometry
       m_CreatedWorldGeometry = TimeSlicedGeometry::New();

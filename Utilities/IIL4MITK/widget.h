@@ -17,10 +17,10 @@ public:
     }
     //##Documentation
     //## TEMPORARY FOR IIL COMPATIBILITY - DO NOT USE!!!
-  virtual iilWidget* sharedWidget() const {return NULL;};
+  virtual iilWidget* sharedWidget() const {return NULL;}
     //##Documentation
     //## TEMPORARY FOR IIL COMPATIBILITY - DO NOT USE!!!
-  virtual bool isVisible (const iilItem* const item) {return true;};
+  virtual bool isVisible (const iilItem* const item) {return true;}
 };
 
 typedef iilWidget RenderWindowBase;

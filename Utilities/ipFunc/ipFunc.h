@@ -498,6 +498,12 @@ ipInt4_t       ipFuncHist   ( ipPicDescriptor *pic_old,
                               ipUInt4_t       **hist,
                               ipUInt4_t       *size_hist );
 
+ipInt4_t       ipFuncHisto  ( ipPicDescriptor *pic_old,   
+                              ipFloat8_t      *min_gv,  
+                              ipFloat8_t      *max_gv,
+                              ipUInt4_t       **hist,
+                              ipUInt4_t       *size_hist );
+
 ipPicDescriptor *ipFuncSelInv ( ipPicDescriptor *pic_old,   
                                 ipFloat8_t      gv_low,  
                                 ipFloat8_t      gv_up, 

@@ -457,7 +457,7 @@
     <include location="global" impldecl="in implementation">DataTreeNode.h</include>
     <include location="global" impldecl="in implementation">PlaneGeometry.h</include>
     <include location="global" impldecl="in implementation">PicFileReader.h</include>
-    <include location="global" impldecl="in implementation">ipPic.h</include>
+    <include location="global" impldecl="in implementation">ipPic/ipPic.h</include>
     <include location="global" impldecl="in implementation">qstring.h</include>
     <include location="global" impldecl="in implementation">qapplication.h</include>
     <include location="local" impldecl="in implementation">QmitkMainTemplate.ui.h</include>

@@ -262,8 +262,8 @@ void mitk::DisplayGeometry::Fit()
   w = width;
   h = height;
 
-  const ScalarType& widthInMM(m_WorldGeometry->GetExtentInMM(0));
-  const ScalarType& heightInMM(m_WorldGeometry->GetExtentInMM(1));
+  const ScalarType& widthInMM(m_WorldGeometry->GetParametricExtentInMM(0));
+  const ScalarType& heightInMM(m_WorldGeometry->GetParametricExtentInMM(1));
   mitk::ScalarType aspRatio=((mitk::ScalarType)widthInMM)/heightInMM;
 
   x = (mitk::ScalarType)w/widthInMM;

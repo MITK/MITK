@@ -95,7 +95,7 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
     if(stlreader->GetOutput()!=NULL)
     {
       mitk::SurfaceData::Pointer surface = mitk::SurfaceData::New();
-      surface->SetVtkPolyData(stlreader->GetOutput());            
+      surface->SetVtkPolyData(stlreader->GetOutput());
 
       mitk::DataTreeIterator* it=tree->inorderIterator();
 
@@ -149,16 +149,16 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
 
       node=mitk::DataTreeNode::New();
       node->SetData(reader->GetOutput());
-      it->add(node); 
+      it->add(node);
 
       QString tmpName = fileName;
-      tmpName = tmpName.right(tmpName.length() - tmpName.findRev("/") - 1);     
+      tmpName = tmpName.right(tmpName.length() - tmpName.findRev("/") - 1);
       mitk::StringProperty::Pointer nameProp = new mitk::StringProperty(tmpName.ascii());
       node->SetProperty("fileName",nameProp);
 
       // disable volume rendering by default
       node->SetProperty("volumerendering",new mitk::BoolProperty(false));
-      
+
       mitk::LevelWindowProperty::Pointer levWinProp = new mitk::LevelWindowProperty();
       mitk::LevelWindow levelWindow;
       reader->UpdateLargestPossibleRegion();
@@ -169,9 +169,9 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
       mitkMultiWidget->levelWindowWidget->setLevelWindow(levelWindow);
 
 
-        
+
       // example usage of a lookup table
-      /*  
+      /*
   		mitk::LookupTableSource::Pointer LookupTableSource = new mitk::LookupTableSource();
       //LookupTableSource->SetUseHPDopplerLookupTable();
       //LookupTableSource->SetUseStrainLookupTable();
@@ -195,10 +195,10 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
 
     node=mitk::DataTreeNode::New();
     node->SetData(reader->GetOutput());
-    it->add(node); 
+    it->add(node);
 
     QString tmpName = fileName;
-    tmpName = tmpName.right(tmpName.length() - tmpName.findRev("/") - 1);     
+    tmpName = tmpName.right(tmpName.length() - tmpName.findRev("/") - 1);
     mitk::StringProperty::Pointer nameProp = new mitk::StringProperty(tmpName.ascii());
     node->SetProperty("fileName",nameProp);
 
@@ -221,7 +221,7 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
     if(vtkreader->GetOutput()!=NULL)
     {
       mitk::Image::Pointer image = mitk::Image::New();
-      image->Initialize(vtkreader->GetOutput());            
+      image->Initialize(vtkreader->GetOutput());
       image->SetVolume(vtkreader->GetOutput()->GetScalarPointer());
 
       vtkreader->Delete();
@@ -230,10 +230,10 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
 
       node=mitk::DataTreeNode::New();
       node->SetData(image);
-      it->add(node); 
+      it->add(node);
 
       QString tmpName = fileName;
-      tmpName = tmpName.right(tmpName.length() - tmpName.findRev("/") - 1);     
+      tmpName = tmpName.right(tmpName.length() - tmpName.findRev("/") - 1);
       mitk::StringProperty::Pointer nameProp = new mitk::StringProperty(tmpName.ascii());
       node->SetProperty("fileName",nameProp);
 
@@ -251,13 +251,13 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
   {
     mitk::VesselTreeFileReader::Pointer reader = mitk::VesselTreeFileReader::New();
     std::cout << "loading " << fileName << " as ves ... " << std::endl;
-    reader->SetFileName(fileName);          
+    reader->SetFileName(fileName);
     reader->Update();
     mitk::DataTreeIterator* it=tree->inorderIterator();
 
     node=mitk::DataTreeNode::New();
     node->SetData(reader->GetOutput());
-    it->add(node); 
+    it->add(node);
 
     initWidgets(it);
     delete it;
@@ -266,13 +266,13 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
   {
 	  mitk::VesselGraphFileReader::Pointer reader = mitk::VesselGraphFileReader::New();
 	  std::cout << "loading " << fileName << " as uvg ... " << std::endl;
-	  reader->SetFileName(fileName);          
+	  reader->SetFileName(fileName);
 	  reader->Update();
 	  mitk::DataTreeIterator* it=tree->inorderIterator();
 
 	  node=mitk::DataTreeNode::New();
 	  node->SetData(reader->GetOutput());
-	  it->add(node); 
+	  it->add(node);
 
 	  initWidgets(it);
 	  delete it;
@@ -291,7 +291,7 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
 
     node=mitk::DataTreeNode::New();
     node->SetData(reader->GetOutput());
-    it->add(node); 
+    it->add(node);
 
     mitk::LevelWindow levelWindow;
     reader->Update();
@@ -355,7 +355,7 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
     timeSelector->SetChannelNr(1);
     timeSelector->Update();
 
-    // add cartesian data to tree        
+    // add cartesian data to tree
     cyl2cartDoppler->SetInput(timeSelector->GetOutput());
 
     node=mitk::DataTreeNode::New();
@@ -444,7 +444,7 @@ void QmitkMainTemplate::initWidget(mitk::DataTreeIterator* it,
 
   mitk::PlaneGeometry::Pointer plane = mitk::PlaneGeometry::New();
 
-  //ohne den Pointer-Umweg meckert gcc  
+  //ohne den Pointer-Umweg meckert gcc
   mitk::PlaneView* view = new mitk::PlaneView(Plane<float>(Vector3f(0,0,0),normal),
     right,
     Vector2f(0,0),
@@ -466,14 +466,14 @@ void QmitkMainTemplate::initWidget(mitk::DataTreeIterator* it,
 
 void QmitkMainTemplate::initWidget(mitk::DataTreeIterator* it,
                                    QmitkSelectableGLWidget* widget,
-                                   const Vector3f& origin, 
+                                   const Vector3f& origin,
                                    const Vector3f& right,
-                                   const Vector3f& bottom) 
+                                   const Vector3f& bottom)
 {
 
   mitk::PlaneGeometry::Pointer plane = mitk::PlaneGeometry::New();
 
-  //ohne den Pointer-Umweg meckert gcc  
+  //ohne den Pointer-Umweg meckert gcc
   mitk::PlaneView* view = new mitk::PlaneView(origin,right,bottom);
   plane->SetPlaneView(*view);
   delete view;
@@ -493,7 +493,7 @@ void QmitkMainTemplate::fileSave()
 void QmitkMainTemplate::fileSaveAs()
 {
   mitk::DataTreeIterator* it=tree->inorderIterator()->clone();
-  while(it->hasNext()) 
+  while(it->hasNext())
   {
     it->next();
     mitk::DataTreeNode::Pointer node=it->get();
@@ -520,7 +520,7 @@ void QmitkMainTemplate::fileSaveAs()
         QString fileName = QFileDialog::getSaveFileName(NULL,"stl (*.stl);;vtk (*.vtk)");
         if ( !fileName.isNull() )
         {
-          if(fileName.endsWith(".vtk")) 
+          if(fileName.endsWith(".vtk"))
           {
             vtkPolyDataWriter *writer=vtkPolyDataWriter ::New();
             writer->SetInput(surface->GetVtkPolyData());
@@ -618,7 +618,7 @@ void QmitkMainTemplate::init()
   if (mitkConf != NULL) {
     xmlFileName = mitkConf;
   } else {
-    xmlFileName = "../../Framework/SceneInteraction";
+    xmlFileName = "../../Interactions/mitkBaseInteraction";
   }
   xmlFileName += "/PointStateMachine.xml";
   if(QFile::exists(xmlFileName.c_str())==false)
@@ -660,13 +660,13 @@ void QmitkMainTemplate::init()
   tree->Register(); //@FIXME: da DataTreeIterator keinen Smartpointer auf DataTree hält, wird tree sonst gelöscht.
   //create root of data tree (empty)
   //mitk::DataTreeNode::Pointer node=mitk::DataTreeNode::New();
-  //tree->setRoot(node);     
+  //tree->setRoot(node);
 }
 
 /*!
 \brief basic initialization of main widgets
 
-The method is should be called at the end of the initialize-method of its 
+The method is should be called at the end of the initialize-method of its
 subclasses.
 */
 void QmitkMainTemplate::initialize()
@@ -726,13 +726,13 @@ void QmitkMainTemplate::initializeFunctionality()
 /*!
 \brief this method initializes the Qmitk functionality mediator
 
-When subclassing this template class the developer can overwrite the method 
+When subclassing this template class the developer can overwrite the method
 to provide different layout templates
 */
 void QmitkMainTemplate::initializeQfm()
 {
   QHBoxLayout *hlayout;
-  hlayout=new QHBoxLayout(MainWidget);   
+  hlayout=new QHBoxLayout(MainWidget);
 
   //create an QmitkFctMediator. This is an invisible object that controls, manages and mediates functionalities
   qfm=new QmitkFctMediator(MainWidget);
@@ -777,7 +777,7 @@ void QmitkMainTemplate::initWidgets( mitk::DataTreeIterator * it )
   }
 
   const mitk::BoundingBox::BoundsArrayType bounds = mitk::DataTree::ComputeBoundingBox(it)->GetBounds();
-  printf("\nboundingbox\n");   
+  printf("\nboundingbox\n");
 
   /*            initWidget(it,
   mitkMultiWidget->mitkWidget1,
@@ -791,7 +791,7 @@ void QmitkMainTemplate::initWidgets( mitk::DataTreeIterator * it )
     Vector3f(bounds[1],bounds[3],bounds[5]),
     Vector3f(bounds[0],bounds[2],bounds[5])
     );
-  printf("\nw1 init\n");   
+  printf("\nw1 init\n");
 
   // YZ
   initWidget(it,mitkMultiWidget->mitkWidget2,
@@ -844,12 +844,12 @@ void QmitkMainTemplate::changeLevelWindow(mitk::LevelWindow* lw )
 {
 
   mitk::DataTreeIterator* it=tree->inorderIterator()->clone();
-  while(it->hasNext()) 
+  while(it->hasNext())
   {
     it->next();
 
     mitk::LevelWindowProperty::Pointer levWinProp = dynamic_cast<mitk::LevelWindowProperty*>(it->get()->GetPropertyList()->GetProperty("levelwindow").GetPointer());
-    if( levWinProp.IsNotNull() ) 
+    if( levWinProp.IsNotNull() )
     {
       mitk::LevelWindow levWin = levWinProp->GetLevelWindow();
 
@@ -860,7 +860,7 @@ void QmitkMainTemplate::changeLevelWindow(mitk::LevelWindow* lw )
 
       levWinProp->SetLevelWindow(levWin);
 
-    }                  
+    }
   }
   delete it;
   mitkMultiWidget->updateMitkWidgets();

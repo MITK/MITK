@@ -16,6 +16,7 @@
 #include <mitkLevelWindowProperty.h>
 #include <mitkVesselTreeFileReader.h>
 #include <LevelWindow.h>
+#include <DataTree.h>
 #include <mitkFloatProperty.h>
 #include <qregexp.h>
 
@@ -90,7 +91,7 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
                 node->SetData(reader->GetOutput());
                 it->add(node); 
 
-                initWidgets(node);
+                initWidgets(it);
 
                 //mitk::DataTreeNode::Pointer node2=mitk::DataTreeNode::New();
                 //node2->SetData(mitkMultiWidget->mitkWidget3->GetRenderer()->GetWorldGeometry2DData());
@@ -178,9 +179,9 @@ void QmitkMainTemplate::fileOpenImageSequence()
         mitk::DataTreeNode::Pointer node;
         node=mitk::DataTreeNode::New();
         node->SetData(reader->GetOutput());
-        it->add(node); 
+        it->add(node);
 
-        initWidgets(node);
+        initWidgets(it);
 
         mitkMultiWidget->updateMitkWidgets();
 
@@ -390,24 +391,12 @@ mitk::DataTree* QmitkMainTemplate::getDataTree()
 }
 
 
-void QmitkMainTemplate::initWidgets( mitk::DataTreeNode::Pointer node )
+void QmitkMainTemplate::initWidgets( mitk::DataTreeIterator * it )
 {
 		
-	mitk::DataTreeIterator* it=tree->inorderIterator();
-	   
-	printf("\nrequesting boundingbox\n");   
-            mitk::BoundingBox::ConstPointer bb = node->GetData()->GetGeometry()->GetBoundingBox();
-	  printf("boundsArrayType\n");
-            const mitk::BoundingBox::BoundsArrayType bounds = bb->GetBounds();
+	const mitk::BoundingBox::BoundsArrayType bounds = mitk::DataTree::ComputeBoundingBox(it)->GetBounds();
 	printf("\nboundingbox\n");   
 
-            //sliderYZ->setMinValue(bounds[0]);
-            //sliderYZ->setMaxValue(bounds[1]);
-            //sliderXZ->setMinValue(bounds[2]);
-            //sliderXZ->setMaxValue(bounds[3]);
-            //sliderXY->setMinValue(bounds[4]);
-            //sliderXY->setMaxValue(bounds[5]);
-            //// XY
             initWidget(it,
                 mitkMultiWidget->mitkWidget1,
                 Vector3f(bounds[0],bounds[2],bounds[4]),
@@ -428,7 +417,7 @@ void QmitkMainTemplate::initWidgets( mitk::DataTreeNode::Pointer node )
                 Vector3f(bounds[0],bounds[2],bounds[4]),
                 Vector3f(bounds[1],bounds[2],bounds[4]),
                 Vector3f(bounds[0],bounds[2],bounds[5])
-                );
+            );
 }
 
 

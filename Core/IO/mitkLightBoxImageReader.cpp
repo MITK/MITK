@@ -45,7 +45,7 @@ QcLightbox* mitk::LightBoxImageReader::GetLightBox() const
 void mitk::LightBoxImageReader::GenerateOutputInformation()
 {
     int RealPosition;
-    std::list<imageInfo> imInfo;
+    SliceInfoArray sliceInfos;
 
     itkDebugMacro(<<"GenerateOutputInformation");
 
@@ -69,13 +69,13 @@ void mitk::LightBoxImageReader::GenerateOutputInformation()
     
     itkDebugMacro(<<"Reading lightbox for GenerateOutputInformation()");
 
-    int position, numberOfImages=0,numberOfTimePoints=0,numberOfTimePoints2=0,number=0,counter=0;
+    int position, numberOfImages=0,numberOfTimePoints=0,numberOfSlicesInCurrentTimePoint=0;
     ipPicDescriptor*  pic2=NULL;
     interSliceGeometry_t *isg;
     mitk::Point3D originCurrentSlice;
     mitk::Point3D originLastSlice;
     mitk::Point3D originFirstSlice;
-    imageInfo imagInfo;
+    sliceInfo sliceInfo;
 
     //virtually sort the lightbox
     m_ImageNumbers.clear();
@@ -115,7 +115,7 @@ void mitk::LightBoxImageReader::GenerateOutputInformation()
               //timeconv1=ConvertTime(pic2);
 
               //check if we are still on the same slice
-              if (originCurrentSlice == originLastSlice || originCurrentSlice == originFirstSlice)
+              if (originCurrentSlice == originLastSlice)
               {
                   /*if (numberOfTimePoints==1 && number==1)
                   {
@@ -125,37 +125,13 @@ void mitk::LightBoxImageReader::GenerateOutputInformation()
                   }*/
                   //yes? so this is another time frame
                   ++numberOfTimePoints;
-                  //again at the first slice? this should not happen anymore due to the sorting. will be removed
-                  if (originCurrentSlice == originFirstSlice && originLastSlice != originFirstSlice)
-                    ++counter;
               }
               else
               {
-                  if (numberOfTimePoints==numberOfTimePoints2)
-                    ++number;
-                  else
-                  {
-                    if (number==0)
-                    {
-                      number=1;
-                      numberOfTimePoints2=numberOfTimePoints;                        
-                    }
-                    else
-                    {
-                      if (counter<1)
-                      {
-                        imagInfo.timePoints=number;
-                        imagInfo.nbOfTimePoints=numberOfTimePoints2;  
-                        //imagInfo.imagetime=imagetime;
-                        imagInfo.startPosition=originCurrentSlice;
-                        imInfo.push_back(imagInfo);
-                        number=1;
-                        numberOfTimePoints2=numberOfTimePoints;
-                      }
-                    }
-                  }
-                  if (counter<1)
-                    numberOfTimePoints=1;
+                  sliceInfo.numberOfTimePoints=numberOfTimePoints;  
+                  sliceInfo.startPosition=originLastSlice;
+                  sliceInfos.push_back(sliceInfo);
+                  numberOfTimePoints=1;
               }
             }
 
@@ -165,20 +141,7 @@ void mitk::LightBoxImageReader::GenerateOutputInformation()
         }
         
     }
-    imagInfo.timePoints=number+1;
-    imagInfo.nbOfTimePoints=numberOfTimePoints2;
-    //imagInfo.imagetime=imagetime;
-    imagInfo.startPosition=originCurrentSlice;
-    imInfo.push_back(imagInfo);
-    
-    if (imInfo.size() !=1)
-    {
-        itkDebugMacro(<<"problem number of time points");
-        
-    }
-    //itkDebugMacro(<<"numberofimages " << numberOfImages);
-    itkDebugMacro(<<"numberOfTimePoints" << numberOfTimePoints);
-    
+
     if(numberOfImages==0)
     {
         itk::ImageFileReaderException e(__FILE__, __LINE__);
@@ -189,15 +152,43 @@ void mitk::LightBoxImageReader::GenerateOutputInformation()
         return;
     }
 
+    //add information for last slice
+    sliceInfo.numberOfTimePoints=numberOfTimePoints;
+    sliceInfo.startPosition=originCurrentSlice;
+    sliceInfos.push_back(sliceInfo);
 
+    //check whether all slices have the same number of time points
+    bool differentNumberOfTimePoints = false;
+    SliceInfoArray::iterator slit, slend =sliceInfos.end();
+    for(slit = sliceInfos.begin(); slit!=slend;++slit)
+    {
+        if(slit->numberOfTimePoints != numberOfTimePoints)
+        {
+          itkWarningMacro(<<"problem: different number of time points in slices - taking minimum");
+          if(slit->numberOfTimePoints < numberOfTimePoints)
+            numberOfTimePoints = slit->numberOfTimePoints;
+          differentNumberOfTimePoints = true;
+        }
+    }
+    int numberOfSlices = sliceInfos.size();
+    if(differentNumberOfTimePoints)
+    {
+      itkWarningMacro(<<"minimum of numberOfTimePoints is" << numberOfTimePoints);
+    }
+    else
+    {
+      itkDebugMacro(<<"numberOfTimePoints" << numberOfTimePoints);
+      if(numberOfSlices != numberOfImages/numberOfTimePoints)
+      {
+        itkWarningMacro(<<"numberOfSlices!=numberOfImages/numberOfTimePoints: " << numberOfSlices << " != " << numberOfImages/numberOfTimePoints);
+      }
+    }
+
+
+    //build pic-header to initialize output information
     itkDebugMacro(<<"copy header");
     RealPosition=GetRealPosition(0, m_ImageNumbers);
     ipPicDescriptor *header=ipPicCopyHeader(m_LightBox->fetchHeader(RealPosition), NULL);
-    itkDebugMacro(<<"copy tags ");
-    //ipFuncCopyTags(header, pic);
-    interSliceGeometry_t *interSliceGeometry;
-    interSliceGeometry=m_LightBox->fetchDicomGeometry(RealPosition);
-
     //@FIXME: was ist, wenn die Bilder nicht alle gleich gross sind?
     if(numberOfImages>1)
     {  
@@ -205,21 +196,23 @@ void mitk::LightBoxImageReader::GenerateOutputInformation()
         if (numberOfTimePoints>1)
         {
             header->dim=4;
-            header->n[2]=numberOfImages/numberOfTimePoints;
+            header->n[2]=numberOfSlices;
             header->n[3]=numberOfTimePoints;
         }
         else
         {
             header->dim=3;
-            header->n[2]=numberOfImages;
+            header->n[2]=numberOfSlices;
             itkDebugMacro(<<"dim=3:" );
         }
        
     }
-
     itkDebugMacro(<<"initialize output");
     output->Initialize(header);
 
+    //build geometry
+    interSliceGeometry_t *interSliceGeometry;
+    interSliceGeometry=m_LightBox->fetchDicomGeometry(RealPosition);
     if(interSliceGeometry!=NULL)
     {
       mitk::Vector3D rightVector;
@@ -407,39 +400,14 @@ mitk::Vector3D mitk::LightBoxImageReader::GetSpacingFromLB(LocalImageInfoArray& 
 
     return spacing;
 }
-
-//double mitk::LightBoxImageReader::ConvertTime(ipPicDescriptor*  pic)
-//{
-//    ipPicTSV_t *tsv;
-//    void* data;
-//    ipUInt4_t len;
-//    int i;   
-//    char imagetime[13];
-//    int time[13];
-//    char zero = '0';
-//    double timeconv='0';
-//
-//    tsv=ipPicQueryTag(pic,"SOURCE HEADER");
-//    dicomFindElement((unsigned char*) tsv->value, 0x0008, 0x0033, &data, &len);
-//    sscanf( (char *) data, "%s", &imagetime );
-//
-//    for(i=0;i<10;++i)
-//    {
-//      time[i] = (int)imagetime[i] - (int)zero; 
-//      //itkDebugMacro(<<"time: "<<time[i]);
-//    }
-//
-//    timeconv=(time[0]*10+time[1])*60;
-//    timeconv=(timeconv+time[2]*10+time[3])*60;
-//    timeconv=(timeconv+time[4]*10+time[5]);
-//    timeconv=timeconv+time[7]*0.1+time[8]*0.01+time[9]*0.001;
-//    return timeconv;
-//}
-
 bool mitk::LightBoxImageReader::ImageOriginLesser ( const LocalImageInfo& elem1, const LocalImageInfo& elem2 )
 {
   if(mitk::Equal(elem1.origin, elem2.origin))
+  {
+    if(elem1.imageNumber == elem2.imageNumber)
+      return elem1.pos < elem2.pos;
     return elem1.imageNumber < elem2.imageNumber;
+  }
   return elem1.origin**elem1.direction < elem2.origin**elem2.direction;
 };
 
@@ -520,7 +488,7 @@ itkDebugMacro(<<"DIRECTION: "<<direction);
     std::sort(imageNumbers.begin(), imageNumbers.end(), ImageOriginLesser);
 }
 
-int mitk::LightBoxImageReader::GetRealPosition(int position, LocalImageInfoArray& liste)
+int mitk::LightBoxImageReader::GetRealPosition(int position, LocalImageInfoArray& list)
 {
   return liste[position].pos;
 }

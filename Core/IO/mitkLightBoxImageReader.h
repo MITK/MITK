@@ -62,6 +62,18 @@ protected:
     typedef std::vector<LocalImageInfo> LocalImageInfoArray;
 
     //##Description 
+    //## @brief Struct to store time information of the slices
+    typedef struct _sliceInfo
+    {
+      int numberOfTimePoints;
+      //float imagetime;
+      mitk::Point3D startPosition;
+    } sliceInfo;
+    //##Description 
+    //## @brief Vector of structs to store time information of the slices
+    typedef std::list<sliceInfo> SliceInfoArray;
+
+    //##Description 
     //## @brief Functors for sorting the image slices
     static bool ImageOriginLesser ( const LocalImageInfo& elem1, const LocalImageInfo& elem2 );
     static bool ImageNumberLesser ( const LocalImageInfo& elem1, const LocalImageInfo& elem2 );
@@ -98,13 +110,6 @@ protected:
 };
 
 } // namespace mitk
-typedef struct imageInfo
-{
-  int timePoints;
-  int nbOfTimePoints;
-  //float imagetime;
-  mitk::Point3D startPosition;
-}imageInfo;
 
 
 #endif /* LIGHTBOXIMAGEREADER_H_HEADER_INCLUDED_C1F48A22 */

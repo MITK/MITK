@@ -501,7 +501,7 @@ bool mitk::EventMapper::LoadBehavior(std::string fileName)
    mitk::EventMapper* eventMapper = new EventMapper();
    eventMapper->SetFileName( fileName.c_str() );
 
-   if ( eventMapper->Parse() )    
+   if ( ! eventMapper->Parse() )    
    {
      #ifdef INTERDEBUG
      //itkWarningMacro("mitk::EventMapper::LoadBehavior xml file cannot parse!" );

@@ -11,27 +11,20 @@ enum SideEffectId {
 	InitNewObject = 5,
 	InitEditObject = 6,
 	InitEditGroup = 7,
-	
 	AddPoint = 10,
-	
 	Snapping_Adding = 20,
-
 	CheckPoint = 30,
 	CheckIfLast = 31,
-
 	FinishObject = 40,
 	FinishGroup = 41,
-
 	SearchObject = 50,
 	SearchGroup = 51,
 	SearchAnotherObject = 52, //one object is selected and another object is to be added to selection
-	
 	SelectPickedObject = 60, // select the picked object and deselect others
 	SelectAnotherObject = 61, //adds the picked object to the selection
 	SelectGroup = 62,
     SelectAll = 63,
 	AddSelectedToGroup = 63,
-	
 	DeselectObject = 70, //deselect picked from group
 	DeselectAll = 72
 };
@@ -201,14 +194,12 @@ enum Key {
         Key_Hyper_L = 0x1056,
         Key_Hyper_R = 0x1057,
         Key_Help = 0x1058,
-
         // International input method support (X keycode - 0xEE00)
         // Only interesting if you are writing your own input method
         Key_Muhenkan =  0x1122,  // Cancel Conversion
         Key_Henkan =  0x1123,  // Start/Stop Conversion
         Key_Hiragana_Katakana = 0x1127,  // Hiragana/Katakana toggle
         Key_Zenkaku_Hankaku = 0x112A,  // Zenkaku/Hankaku toggle
-
         Key_Space = 0x20,               // 7 bit printable ASCII
         Key_Any = Key_Space,
         Key_Exclam = 0x21,
@@ -279,9 +270,7 @@ enum Key {
         Key_Bar = 0x7c,
         Key_BraceRight = 0x7d,
         Key_AsciiTilde = 0x7e,
-
         // Latin 1 codes adapted from X: keysymdef.h,v 1.21 94/08/28 16:17:06
-
         Key_nobreakspace = 0x0a0,
         Key_exclamdown = 0x0a1,
         Key_cent = 0x0a2,
@@ -378,7 +367,6 @@ enum Key {
         Key_yacute = 0x0fd,
         Key_thorn = 0x0fe,
         Key_ydiaeresis = 0x0ff,
-
         Key_unknown = 0xffff,
 		Key_none = Key_unknown
 };

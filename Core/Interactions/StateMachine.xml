@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<mitkInteraktionStates STYLE="Powerpoint">
-	<stateMaschine NAME="global">
+<mitkInteraktionStates xmlns="http://tempuri.org/StateMachine.xsd" STYLE="Powerpoint">
+	<stateMachine NAME="global">
 		<state NAME="neutral" ID="1" START_STATE="TRUE">
 			<transition NAME="new object" NEXT_STATE_ID="20" EVENT_ID="10" SIDE_EFFECT_ID="5" />
 			<transition NAME="object search" NEXT_STATE_ID="2" EVENT_ID="1" SIDE_EFFECT_ID="50" />
@@ -22,8 +22,8 @@
 		</state>
 		<state NAME="next object search" ID="4">
 			<transition NAME="No New and only one selected" NEXT_STATE_ID="3" EVENT_ID="206" SIDE_EFFECT_ID="0" />
-			<transition NAME="No New but >1 selected" NEXT_STATE_ID="6" EVENT_ID="207" SIDE_EFFECT_ID="0" />
-			<transition NAME="same->Check" NEXT_STATE_ID="5" EVENT_ID="205" SIDE_EFFECT_ID="31" />
+			<transition NAME="No New but &gt;1 selected" NEXT_STATE_ID="6" EVENT_ID="207" SIDE_EFFECT_ID="0" />
+			<transition NAME="same-&gt;Check" NEXT_STATE_ID="5" EVENT_ID="205" SIDE_EFFECT_ID="31" />
 			<transition NAME="New Object Picked" NEXT_STATE_ID="6" EVENT_ID="200" SIDE_EFFECT_ID="61" />
 		</state>
 		<state NAME="last check" ID="5">
@@ -41,8 +41,8 @@
 		<state NAME="edit group" ID="22">
 			<transition NAME="finished editing group" NEXT_STATE_ID="6" EVENT_ID="202" SIDE_EFFECT_ID="41" />
 		</state>
-	</stateMaschine>
-	<stateMaschine NAME="polygon">
+	</stateMachine>
+	<stateMachine NAME="polygon">
 		<state NAME="new object" ID="1" START_STATE="TRUE">
 			<transition NAME="to draw object" NEXT_STATE_ID="2" EVENT_ID="1" SIDE_EFFECT_ID="10" />
 		</state>
@@ -54,7 +54,7 @@
 			<transition NAME="new point" NEXT_STATE_ID="2" EVENT_ID="200" SIDE_EFFECT_ID="10" />
 			<transition NAME="old point" NEXT_STATE_ID="1" EVENT_ID="201" SIDE_EFFECT_ID="40" />
 		</state>
-	</stateMaschine>
+	</stateMachine>
 	<events STYLE="Powerpoint">
 		<!-- left MouseButton -->
 		<event NAME="left MouseBN" ID="1" TYPE="2" BUTTON="0x0001" BUTTONSTATE="0x0000" KEY="0xffff" />

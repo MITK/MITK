@@ -146,7 +146,7 @@ bool mitk::StateMachineFactory::startElement( const QString&, const QString&, co
 		//evtl. unterschied in STYLES PowerPoint oder PhotoShop usw...
 	}
 
-	else if ( qName == "stateMaschine" ) 									//e.g. <stateMaschine NAME="global">
+	else if ( qName == "stateMachine" ) 									//e.g. <stateMachine NAME="global">
 	{
 		m_AktStateMachineName = atts.value( NAME.c_str() ).latin1() ;
 	}
@@ -184,7 +184,7 @@ bool mitk::StateMachineFactory::endElement( const QString&, const QString&, cons
 {
 	//abfangen atts.value(#) fehler!
 
-    if (qName == "stateMaschine")
+    if (qName == "stateMachine")
 	{
 			bool ok = ConnectStates(&m_AllStates);
 			m_AllStates.clear();

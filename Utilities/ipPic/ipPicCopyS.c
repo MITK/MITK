@@ -50,9 +50,13 @@
  */
 
  /*$Log$
-  *Revision 1.4  2000/05/04 12:52:36  ivo
-  *inserted BSD style license
+  *Revision 1.5  2002/04/23 11:06:25  ivo
+  *ipPicCopySlice behaves now in the same way as ipPicGetSlice:
+  *2D-slices are copied, no longer hyper-planes of dimension dim-1.
   *
+ /*Revision 1.4  2000/05/04 12:52:36  ivo
+ /*inserted BSD style license
+ /*
   *Revision 1.3  2000/05/04 12:35:58  ivo
   *some doxygen comments.
   *
@@ -84,20 +88,22 @@ ipPicDescriptor *_ipPicCopySlice( ipPicDescriptor *pic, ipPicDescriptor *pic_in,
 
   ipPicClear( pic );
 
-
-  if( slice < 1
-      || slice > pic_in->n[pic_in->dim - 1] )
-    {
-      return( pic );
-    }
-
   pic->type = pic_in->type;
   pic->bpe = pic_in->bpe;
   pic->dim = 2;
   pic->n[0] = pic_in->n[0];
   pic->n[1] = pic_in->n[1];
+  pic->data = NULL;
 
-  picsize = _ipPicSize( pic );
+  picsize = _ipPicSize(pic);
+
+  if( slice < 1
+      || slice > _ipPicSize(pic_in) / picsize )
+    {
+	  ipPicClear(pic);
+      return( pic );
+    }
+
   pic->data = malloc( picsize );
 
   memcpy( pic->data,

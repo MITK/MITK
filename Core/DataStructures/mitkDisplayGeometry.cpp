@@ -184,9 +184,7 @@ void mitk::DisplayGeometry::SetOriginInUnits(const mitk::Point2D& origin_units)
 //##ModelId=3E3C38660226
 void mitk::DisplayGeometry::Fit()
 {
-	// FIXME
-		bool fixed=false;
-    if(m_WorldGeometry==NULL || !fixed) return;
+    if(m_WorldGeometry==NULL) return;
 
     float   x,y,w,h;
 

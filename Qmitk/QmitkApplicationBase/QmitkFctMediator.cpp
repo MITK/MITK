@@ -146,7 +146,7 @@ bool QmitkFctMediator::addFunctionality(QmitkFunctionality * functionality)
     if(m_MainStack!=NULL)
     {
         QWidget * mainWidget = functionality->createMainWidget(m_MainStack);
-        if((mainWidget!=NULL) && (mainWidget!=m_DefaultMain))
+        if((mainWidget!=NULL) && (mainWidget->parent()!=m_DefaultMain))
         {
             mainWidget->setSizePolicy(ignored);
             m_MainStack->addWidget(mainWidget, m_NumOfFuncs+1);

@@ -72,6 +72,15 @@ int mitkContourTest(int argc, char* argv[])
     return EXIT_FAILURE;
     }
 
+  contour->UpdateOutputInformation();
+  contour->SetClosed(false);
+
+  if (contour->GetClosed())
+    {
+    std::cout<<"[FAILED] "<<std::endl;
+      return EXIT_FAILURE;
+    }
+
   std::cout<<"[TEST DONE]"<<std::endl;
   return EXIT_SUCCESS;
 }

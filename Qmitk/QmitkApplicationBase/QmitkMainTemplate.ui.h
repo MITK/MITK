@@ -55,8 +55,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qstring.h>
 #include "mitkImageTimeSelector.h"
 #include "mitkImageChannelSelector.h"
-//#include <mitkImageToItk.h>
-//#include <itkThresholdImageFilter.h>
 
 #include <mitkStateMachineFactory.h>
 #include <mitkUndoController.h>

@@ -16,6 +16,8 @@ class SlicedGeometry3D;
 class PicHelper
 {
 public:
+  static const char *GetNameOfClass() { return "PicHelper"; }
+
   static bool GetSpacing(ipPicDescriptor* pic, Vector3D & spacing);
 
   static bool SetSpacing(ipPicDescriptor* pic, SlicedGeometry3D* slicedgeometry);

@@ -18,6 +18,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include "mitkDICOMFileReader.h"
+#include "mitkPicFileReader.h"
+
 #include <itkImageFileReader.h>
 
 extern "C"
@@ -59,7 +61,6 @@ void mitk::DICOMFileReader::GenerateOutputInformation()
       throw itk::ImageFileReaderException(__FILE__, __LINE__, "Could not get image.");;
     pic = _dicomToPic( header, header_size,
       image, image_size, color );
-    pic->dim--;
 
     if( pic == NULL)
     {
@@ -92,28 +93,8 @@ void mitk::DICOMFileReader::GenerateData()
 
   if( m_FileName != "")
   {
-
-    //left to right handed conversion
-    if(pic->dim==3)
-    {
-      ipPicDescriptor* slice=ipPicCopyHeader(pic, NULL);
-      slice->dim=2;
-      int size=_ipPicSize(slice);
-      slice->data=malloc(size);
-      unsigned char *p_first=(unsigned char *)pic->data;
-      unsigned char *p_last=(unsigned char *)pic->data;
-      p_last+=size*(pic->n[2]-1);
-
-      int i, smid=pic->n[2]/2;
-      for(i=0; i<smid;++i,p_last-=size, p_first+=size)
-      {
-        memcpy(slice->data, p_last, size);
-        memcpy(p_last, p_first, size);
-        memcpy(p_first, slice->data, size);
-      }
-      ipPicFree(slice);
-    }
-    output->SetPicVolume(pic);
+    PicFileReader::ConvertHandedness(pic);
+    output->SetPicChannel(pic);
   }
 }
 

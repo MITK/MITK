@@ -23,13 +23,13 @@ bool mitk::LevelWindowProperty::operator==(const BaseProperty& property) const
 }
 
 //##ModelId=3E86AABB0371
-mitk::LevelWindow & mitk::LevelWindowProperty::GetLevelWindow()
+const mitk::LevelWindow & mitk::LevelWindowProperty::GetLevelWindow() const
 {
     return m_LevWin;
 }
 
 //##ModelId=3E86AABB0399
-void mitk::LevelWindowProperty::SetLevelWindow(mitk::LevelWindow &levWin )
+void mitk::LevelWindowProperty::SetLevelWindow(const mitk::LevelWindow &levWin )
 {
     if(m_LevWin != levWin)
     {

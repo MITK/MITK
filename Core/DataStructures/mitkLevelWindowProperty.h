@@ -14,7 +14,7 @@ class LevelWindowProperty : public BaseProperty
 
 protected:
     //##ModelId=3E86A3B00061
-	mitk::LevelWindow m_LevWin;
+    mitk::LevelWindow m_LevWin;
 
 public:
     mitkClassMacro(LevelWindowProperty, BaseProperty);
@@ -30,10 +30,10 @@ public:
     virtual bool operator==(const BaseProperty& property) const;
 
     //##ModelId=3E86AABB0371
-		mitk::LevelWindow & GetLevelWindow();
+    const mitk::LevelWindow & GetLevelWindow() const;
 
-		//##ModelId=3E86AABB0399
-		void SetLevelWindow(mitk::LevelWindow &levWin);
+    //##ModelId=3E86AABB0399
+    void SetLevelWindow(const mitk::LevelWindow &levWin);
 };
 
 } // namespace mitk

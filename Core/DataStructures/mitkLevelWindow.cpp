@@ -1,6 +1,20 @@
 #include "LevelWindow.h"
 #include <algorithm>
 
+mitk::LevelWindow::LevelWindow() : m_Min(-1024), m_Max(4096), m_RangeMin(-1024), m_RangeMax(4096)
+{
+
+}
+
+mitk::LevelWindow::LevelWindow(const mitk::LevelWindow& levWin)
+{
+    *this=levWin;
+}
+
+mitk::LevelWindow::~LevelWindow()
+{
+}
+
 //##ModelId=3E0B12640203
 float mitk::LevelWindow::GetLevel() const
 {
@@ -142,13 +156,6 @@ float mitk::LevelWindow::GetRange() const
 {
 	return  (m_RangeMax > 0) ? (m_RangeMax - m_RangeMin) : (m_RangeMin - m_RangeMax);
 }
-
-//float mitk::LevelWindow::GetLevel() const
-//{
-//	return m_Min + (m_Max - m_Min) / 2;
-//};
-//
-//
 
 /*!
  * \brief equality operator inplementation

@@ -30,18 +30,6 @@ class SliceNavigationController : public BaseController
 	/** Run-time type information (and related methods). */
 	itkTypeMacro(SliceNavigationController,BaseController);
  
-    //##ModelId=3E3AE7F403C9
-    typedef SliceNavigationController Self;
-
-    //##ModelId=3E3AE7F403DD
-    typedef BaseController Superclass;
-
-    //##ModelId=3E3AE7F50009
-    typedef itk::SmartPointer<Self> Pointer;
-
-    //##ModelId=3E3AE7F50027
-    typedef itk::SmartPointer<const Self> ConstPointer;
-
     //##ModelId=3DD524D7038C
     const mitk::Geometry3D* GetGeometry();
 

@@ -10,3 +10,14 @@ bool mitk::PropertyList::AddProperty(BaseProperty* property)
 {
 }
 
+//##ModelId=3E38FEFE0125
+mitk::PropertyList::PropertyList()
+{
+}
+
+
+//##ModelId=3E38FEFE0157
+mitk::PropertyList::~PropertyList()
+{
+}
+

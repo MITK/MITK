@@ -72,6 +72,8 @@ void mitk::ContourSetMapper2D::Paint(mitk::BaseRenderer * renderer)
       mitk::Point3D p, projected_p;
       float vtkp[3];
 
+      glLineWidth(3.0);
+
       if (nextContour->GetClosed())
       {
         glBegin (GL_LINE_LOOP);
@@ -80,6 +82,7 @@ void mitk::ContourSetMapper2D::Paint(mitk::BaseRenderer * renderer)
       {
         glBegin (GL_LINE_STRIP);
       }
+
       
       float rgba[4]={1.0f,1.0f,1.0f,1.0f};
       if ( nextContour->GetSelected() )
@@ -115,7 +118,10 @@ void mitk::ContourSetMapper2D::Paint(mitk::BaseRenderer * renderer)
         //      idx += 1;
       }
 
+
       glEnd ();
+
+      glLineWidth(1.0);
 
       contourIt++;
     }

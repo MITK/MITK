@@ -70,6 +70,8 @@ void mitk::ContourMapper2D::Paint(mitk::BaseRenderer * renderer)
       glBegin (GL_LINE_STRIP);
       }
 
+    glLineWidth(2.0);
+
 
     //Contour::InputType end = input->GetContourPath()->EndOfInput();
     //if (end > 50000) end = 0;
@@ -104,6 +106,7 @@ void mitk::ContourMapper2D::Paint(mitk::BaseRenderer * renderer)
       //      idx += 1;
       }
 
+    glLineWidth(1.0);
     glEnd ();
 
     }

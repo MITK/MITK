@@ -180,5 +180,4 @@ bool mitk::GlobalInteraction::ExecuteSideEffect(int sideEffectId, mitk::StateEve
 
 void mitk::GlobalInteraction::ExecuteOperation(mitk::Operation* operation)
 {
-	NULL;
 }

@@ -1,9 +1,9 @@
 #ifndef GLOBALINTERACTION_H_HEADER_INCLUDED_C152938A
 #define GLOBALINTERACTION_H_HEADER_INCLUDED_C152938A
 
+#include "Focus.h"
 #include "mitkCommon.h"
 #include "StateMachine.h"
-#include "Focus.h"
 //#include "DataTree.h"
 #include <string>
 #include <vector>

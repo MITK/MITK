@@ -18,18 +18,15 @@ void QmitkSimpleExampleControls::sliderFP_valueChanged( int val)
     fpSliderChanged(val);
 }
 
-
 void QmitkSimpleExampleControls::sliderYZ_valueChanged( int val)
 {
     yzSliderChanged(val);
 }
 
-
 void QmitkSimpleExampleControls::sliderXZ_valueChanged( int val)
 {
     xzSliderChanged(val);
 }
-
 
 QSlider* QmitkSimpleExampleControls::getSliderXY()
 {
@@ -52,4 +49,9 @@ QSlider* QmitkSimpleExampleControls::getSliderYZ()
 QSlider* QmitkSimpleExampleControls::getSliderFP()
 {
     return sliderFP;
+}
+
+QWidget* QmitkSimpleExampleControls::getSliceNavigator()
+{
+    return sliceNavigator;
 }

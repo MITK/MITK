@@ -9,7 +9,7 @@
             <x>0</x>
             <y>0</y>
             <width>122</width>
-            <height>585</height>
+            <height>588</height>
         </rect>
     </property>
     <property name="sizePolicy">
@@ -242,7 +242,7 @@
                 </widget>
                 <widget class="QmitkSliderNavigator">
                     <property name="name">
-                        <cstring>qmitkSliderNavigator2</cstring>
+                        <cstring>sliceNavigator</cstring>
                     </property>
                 </widget>
             </vbox>
@@ -335,6 +335,7 @@
     <function returnType="QSlider *">getSliderXZ()</function>
     <function returnType="QSlider *">getSliderYZ()</function>
     <function returnType="QSlider *">getSliderFP()</function>
+    <function returnType="QWidget *">getSliceNavigator()</function>
 </functions>
 <layoutdefaults spacing="0" margin="0"/>
 <includehints>

@@ -23,6 +23,8 @@
 #include <mitkBaseRenderer.h>
 #include <mitkInteractionConst.h>
 
+#include <QmitkStepperAdapter.h>
+
 #include <algorithm>
 
 #if (defined(_MSC_VER) && (_MSC_VER <= 1200))
@@ -71,6 +73,11 @@ QWidget * QmitkSimpleExampleFunctionality::createControlWidget(QWidget *parent)
     {
         controls = new QmitkSimpleExampleControls(parent);
         //connect(slider, SIGNAL(valueChanged(int)), lcd, SLOT(display(int)));
+        sliceNavigator = mitk::SliceNavigationController::New();
+        QmitkStepperAdapter* stepperAdapter;
+        sliceNavigator->GetSlice()->SetPos(7);
+        sliceNavigator->GetSlice()->SetSteps(17);
+        stepperAdapter=new QmitkStepperAdapter(controls->getSliceNavigator(), sliceNavigator->GetSlice(), "slicenavigatorFromSimpleExemple");
     }
     return controls;
 }

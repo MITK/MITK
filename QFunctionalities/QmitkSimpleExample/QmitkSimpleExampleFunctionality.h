@@ -15,6 +15,7 @@
 
 #include <mitkFloatProperty.h>
 #include <mitkLookupTableProperty.h>
+#include <mitkSliceNavigationController.h>
 
 class QmitkStdMultiWidget;
 class QmitkSimpleExampleControls;
@@ -150,6 +151,7 @@ protected:
 
   mitk::LookupTableProperty::Pointer lookupTableProp;
 
+  mitk::SliceNavigationController::Pointer sliceNavigator;
 		
 };
 

@@ -173,7 +173,8 @@ protected:
     virtual void ReadFileSeriesTypeDCM();
     
     virtual void ReadFileSeriesTypeITKImageSeriesReader();
-    
+   
+    virtual void SetDefaultImageProperties(DataTreeNode::Pointer &node);
 };
    
 }

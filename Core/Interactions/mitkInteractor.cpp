@@ -120,7 +120,11 @@ float mitk::Interactor::CalculateJurisdiction(StateEvent const* stateEvent) cons
     if (posEvent == NULL) //2D information from a 3D window
     {
       //get camera and calculate the distance between the center of this boundingbox and the camera
-      vtkCamera* camera = dynamic_cast<mitk::OpenGLRenderer*>(posEvent->GetSender())->GetVtkRenderer()->GetActiveCamera();
+      mitk::OpenGLRenderer* oglRenderer = dynamic_cast<mitk::OpenGLRenderer*>(stateEvent->GetEvent()->GetSender());
+      if (oglRenderer == NULL)
+        return 0;
+      
+      vtkCamera* camera = oglRenderer->GetVtkRenderer()->GetActiveCamera();
       if (camera == NULL)
       {
         return 0;

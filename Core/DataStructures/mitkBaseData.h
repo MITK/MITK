@@ -21,6 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define BASEDATA_H_HEADER_INCLUDED_C1EBB6FA
 
 #include <itkDataObject.h>
+#include <map>
 #include "mitkCommon.h"
 #include "mitkGeometry3D.h"
 #include "mitkGeometry2D.h"
@@ -31,6 +32,8 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk {
 
 class BaseProcess;
+class XMLWriter;
+class XMLReader;
 
 //##ModelId=3D6A0D7D00EC
 //##Documentation
@@ -187,6 +190,15 @@ public:
   void SetProperty(const char *propertyKey, BaseProperty* property);
 
   itk::SmartPointerForwardReference<mitk::BaseProcess> GetSource() const;
+
+  //## 
+  virtual bool WriteXML( XMLWriter& xmlWriter );
+
+  //## 
+  virtual bool ReadXML( XMLReader& xmlReader );
+
+  //##
+  static BaseData* CreateObject( const char* className );
 
 protected:
   //##ModelId=3E3FE04202B9

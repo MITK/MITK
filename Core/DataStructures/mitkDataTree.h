@@ -32,6 +32,8 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk 
 {
 
+class XMLWriter;
+
 //##ModelId=3EA93EC901B8
 typedef itk::TreeContainer<mitk::DataTreeNode::Pointer> DataTreeBase;
 
@@ -131,12 +133,16 @@ public:
   {
     return ComputeTimeBoundsInMS(it, "visible", renderer, boolPropertyKey);
   }
+
+  //## 
+  static bool Save( const mitk::DataTreeIteratorBase* it, const char* fileName );
 protected:
   //##ModelId=3E38F46A0190
   DataTree();
 
   //##ModelId=3E38F46A01AE
   virtual ~DataTree();
+  static bool Save( const mitk::DataTreeIteratorBase* it, mitk::XMLWriter& xmlWriter );
 };
 
 } // namespace mitk

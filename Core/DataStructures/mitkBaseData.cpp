@@ -19,6 +19,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkBaseData.h"
 #include "mitkBaseProcess.h"
+#include <mitkXMLWriter.h>
+#include <itkObjectFactoryBase.h>
 
 #define MITK_WEAKPOINTER_PROBLEM_WORKAROUND_ENABLED
 
@@ -163,4 +165,23 @@ void mitk::BaseData::SetPropertyList(PropertyList *pList)
 void mitk::BaseData::ExecuteOperation(mitk::Operation* operation)
 {
   //empty by default. override if needed!
+}
+
+
+bool mitk::BaseData::WriteXML( XMLWriter& xmlWriter ) 
+{
+	xmlWriter.BeginNode("dataTreeNode");
+	xmlWriter.WriteProperty( "className", typeid( *this ).name() );
+	xmlWriter.EndNode();
+	return true;
+}
+
+bool mitk::BaseData::ReadXML( XMLReader& xmlReader )
+{
+	return false;
+}
+
+mitk::BaseData* mitk::BaseData::CreateObject( const char* className ) 
+{
+	return dynamic_cast<mitk::BaseData*>( itk::ObjectFactoryBase::CreateInstance( className ).GetPointer() );
 }

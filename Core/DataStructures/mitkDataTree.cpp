@@ -18,6 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include "mitkDataTree.h"
+#include <mitkXMLWriter.h>
 
 
 //##ModelId=3E38F46A0190
@@ -155,4 +156,54 @@ mitk::TimeBounds mitk::DataTree::ComputeTimeBoundsInMS(mitk::DataTreeIteratorBas
   }
 
   return timebounds;
+}
+
+bool mitk::DataTree::Save( const mitk::DataTreeIteratorBase* it, const char* fileName ) 
+{
+	if ( fileName == NULL || it == NULL || it->IsAtEnd() )
+		return false;
+
+	mitk::XMLWriter writer( fileName );
+	writer.WriteComment( "MITK Data Tree" );
+	writer.BeginNode( "mitkDataTree" );
+
+	if ( !Save( it, writer ) )
+		writer.WriteComment( "Error" );
+
+	writer.EndNode();
+	return true;
+}
+
+bool mitk::DataTree::Save( const mitk::DataTreeIteratorBase* it, mitk::XMLWriter& xmlWriter ) 
+{
+	if ( it == NULL || it->IsAtEnd() )
+		return false;
+
+	mitk::DataTreeNode* node = it->Get();
+
+	if (node) 
+	{
+		mitk::BaseData* data = node->GetData();
+		xmlWriter.BeginNode("dataTreeNode");
+		xmlWriter.WriteProperty( "className", typeid( *data ).name() );
+		mitk::PropertyList* propertyList = node->GetPropertyList();
+
+		if ( propertyList )
+			propertyList->WriteXML( xmlWriter );
+
+		if ( it->HasChild() ) 
+		{
+			DataTreeChildIterator children(*it);
+
+			while (!children.IsAtEnd())
+			{
+				Save( &children, xmlWriter );
+				++children;
+			}
+		}
+	}
+
+	xmlWriter.EndNode();
+
+	return true;
 }

@@ -1,5 +1,5 @@
 #include "GlobalInteraction.h"
-#include "mitkInteractionConst.h"
+#include "EventMapper.h"
 
 //##ModelId=3EAD420E0088
 mitk::GlobalInteraction::GlobalInteraction(std::string type)
@@ -11,10 +11,10 @@ bool mitk::GlobalInteraction::ExecuteSideEffect(int sideEffectId)
 {
 	switch (sideEffectId)
 	{
-	case mitk::DONOTHING:
+	case mitk::EventMapper::DONOTHING:
 		return true;
 		//break;
-	case mitk::INITNEWOBJECT:
+	case mitk::EventMapper::INITNEWOBJECT:
         //UNDO
 		//Operation:
 		//mitk::TriangleROI* triangleROI = new mitk::TriangleROI("TriangleROI");

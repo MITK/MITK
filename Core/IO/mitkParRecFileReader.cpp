@@ -43,6 +43,9 @@ void mitk::ParRecFileReader::GenerateOutputInformation()
     mitk::PixelType type;
     unsigned int dimension=0;
     unsigned int dimensions[4]={0,0,1,1};
+    float sliceThickness=0.0;
+    float sliceGap=0.0;
+    float sliceSpacing=0.0;
     mitk::Vector3D thickness(1.0,1.0,1.0);
     mitk::Vector3D gap(0.0,0.0,0.0);
     mitk::Vector3D spacing;
@@ -95,26 +98,34 @@ void mitk::ParRecFileReader::GenerateOutputInformation()
         if(strstr(s,"FOV (ap,fh,rl) [mm]"))
         {
           p=s+strcspn(s,"0123456789");
-          sscanf(p,"%f %f %f", &thickness.z, &thickness.x, &thickness.y);
+          sscanf(p,"%f %f %f", &thickness.x, &thickness.y, &thickness.z);
         }
-        //else
-        //if(strstr(s,"Slice thickness [mm]"))
-        //{
-        //  p=s+strcspn(s,"0123456789");
-        //  sscanf(p,"%f", &thickness.z);
-        //}
-        //else
-        //if(strstr(s,"Slice gap [mm]"))
-        //{
-        //  p=s+strcspn(s,"0123456789");
-        //  sscanf(p,"%f", &gap.z);
-        //}
+        else
+        if(strstr(s,"Slice thickness [mm]"))
+        {
+          p=s+strcspn(s,"0123456789");
+          sscanf(p,"%f", &sliceThickness);
+        }
+        else
+        if(strstr(s,"Slice gap [mm]"))
+        {
+          p=s+strcspn(s,"-0123456789");
+          sscanf(p,"%f", &sliceGap);
+        }
       }
       fclose(f);
 
+//C:\home\ivo\data\coronaries\ucsf-wholeheart-2.par
+      sliceSpacing = sliceThickness+sliceGap;
+      if(fabs(thickness.x/dimensions[2]-sliceSpacing)<0.0001)
+        thickness.x=thickness.y;
+      else
+      if(fabs(thickness.y/dimensions[2]-sliceSpacing)<0.0001)
+        thickness.y=thickness.x;
+      thickness.z=sliceSpacing;
+
       thickness.x/=dimensions[0];
       thickness.y/=dimensions[1];
-      thickness.z/=dimensions[2];
       spacing=thickness+gap;
 
       if((dimension>0) && (dimensions[0]>0) && (dimensions[1]>0))
@@ -173,31 +184,31 @@ void mitk::ParRecFileReader::GenerateData()
     void *data = malloc(sliceSize);
 
     bool ignore4Dtopogram=false;
-    if(output->GetDimension(3)>1)
     {
-      int volumeSize=sliceSize*output->GetDimension(2);
+      int slicePlusTimeSize=output->GetDimension(0)*output->GetDimension(1)*output->GetDimension(3)*output->GetPixelType().GetBpe()/8;
+    if(output->GetDimension(3)>1)
       ignore4Dtopogram=true;
 
       for(;t<tmax;++t)
         for(;z<zmax;++z)
         {
 			    if(ignore4Dtopogram)
-            fseek(f,volumeSize*z+(sliceSize+1)*t,SEEK_SET);				  
+            fseek(f,slicePlusTimeSize*z+(sliceSize+1)*t,SEEK_SET);				  
           else
-            fseek(f,volumeSize*z+sliceSize*t,SEEK_SET);				  
+            fseek(f,slicePlusTimeSize*z+sliceSize*t,SEEK_SET);				  
       	  fread(data, sliceSize, 1, f);
           output->SetSlice(data,z,t,0);
         }
     }
-    else
-    {
-      for(;z<zmax;++z)
-      {
-        fseek(f,sliceSize*z,SEEK_SET);				  
-      	fread(data, sliceSize, 1, f);
-        output->SetSlice(data,z,0,0);
-      }
-    }
+    //else
+    //{
+    //  for(;z<zmax;++z)
+    //  {
+    //    fseek(f,sliceSize*z,SEEK_SET);				  
+    //  	fread(data, sliceSize, 1, f);
+    //    output->SetSlice(data,z,0,0);
+    //  }
+    //}
     free(data);
   }
 }

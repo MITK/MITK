@@ -33,6 +33,7 @@ namespace mitk {
 //##Documentation
 //## @brief Interactor for displaying different slices in orthogonal views.
 //## @ingroup Interaction
+//## This includes the interaction of Zooming and Panning.
 class DisplayVectorInteractor : public StateMachine
 {
   public:

@@ -354,7 +354,14 @@ void mitk::OpenGLRenderer::InitRenderer(mitk::RenderWindow* renderwindow)
   //m_MitkVtkRenderWindow->SetNumberOfLayers(2);
 
   if(m_CameraController.IsNotNull())
-    ((VtkInteractorCameraController*)m_CameraController.GetPointer())->SetRenderWindow(m_MitkVtkRenderWindow);
+  {
+    VtkInteractorCameraController* vicc=dynamic_cast<VtkInteractorCameraController*>(m_CameraController.GetPointer());
+    if(vicc!=NULL)
+    {
+      vicc->SetRenderWindow(m_MitkVtkRenderWindow);
+      vicc->GetVtkInteractor()->Disable();
+    }
+  }
 
   //we should disable vtk doublebuffering, but then it doesn't work
   //m_MitkVtkRenderWindow->SwapBuffersOff();

@@ -18,10 +18,10 @@ namespace mitk {
 //## if the switch m_Loop is set to true, GetNext loops through the list; after
 //## the last it goes to the first.
 //## if it is not set, it returnes NULL if it steps behind the last Widget.
-  class FocusManager : public itk::LightObject
+  class FocusManager : public itk::Object
 {
   public:
-  mitkClassMacro(FocusManager, itk::LightObject);
+  mitkClassMacro(FocusManager, itk::Object);
 
   //##ModelId=3F01770802B7
   //##Documentation
@@ -133,7 +133,7 @@ private:
 
 //##Documentation
 //## @brief connect to this Event to get noticed when the focus changes
-itkEventMacro( FocusEvent , itk::AnyEvent );
+itkEventMacro( FocusEvent , itk::AnyEvent ); 
 
 } // namespace mitk
 

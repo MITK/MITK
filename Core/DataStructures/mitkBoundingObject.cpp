@@ -3,11 +3,12 @@
 #include "mitkVector.h"
 
 mitk::BoundingObject::BoundingObject()
+  : m_Positive(true)
 {
   m_Geometry3D->Initialize();
 }
 
-mitk::BoundingObject::~BoundingObject()
+mitk::BoundingObject::~BoundingObject() 
 {
 } 
 
@@ -32,7 +33,7 @@ void mitk::BoundingObject::SetRequestedRegion(itk::DataObject *data)
 
 void mitk::BoundingObject::UpdateOutputInformation()
 {  
-  float bounds[6]={0,1,0,1,0,1};  
+  float bounds[6]={0,1,0,1,0,1};  //{xmin,x_max, ymin,y_max,zmin,z_max}
   
   // calculate vector from origin (in the center of the cuboid) to each corner
   mitk::ScalarType p[3];

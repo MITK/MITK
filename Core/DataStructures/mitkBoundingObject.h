@@ -21,10 +21,15 @@ public:
   virtual bool VerifyRequestedRegion();
   void SetRequestedRegion(itk::DataObject *data);
 
-  virtual bool IsInside(mitk::ITKPoint3D p)=0;  
+  virtual bool IsInside(mitk::ITKPoint3D p)=0;
+
+  itkGetMacro(Positive, bool);
+  itkSetMacro(Positive, bool);
+  itkBooleanMacro(Positive);
 protected:
   BoundingObject();
   virtual ~BoundingObject();
+  bool m_Positive; // If true, the Boundingobject describes a positive volume, if false a negative volume
 };
 
 }

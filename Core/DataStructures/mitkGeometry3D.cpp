@@ -163,14 +163,17 @@ void mitk::Geometry3D::ExecuteOperation(Operation* operation)
     data[0] = 1 + (newScale[0] / GetXAxis().GetNorm());
     data[1] = 1 + (newScale[1] / GetYAxis().GetNorm());
     data[2] = 1 + (newScale[2] / GetZAxis().GetNorm());  
-    
+
+    mitk::ITKPoint3D center = const_cast<mitk::BoundingBox*>(m_BoundingBox.GetPointer())->GetCenter();
     ScalarType pos[3];
     m_Transform->GetPosition(pos);
     m_Transform->PostMultiply();
     m_Transform->Translate(-pos[0], -pos[1], -pos[2]);
+    m_Transform->Translate(-center[0], -center[1], -center[2]);   
     m_Transform->PreMultiply();
     m_Transform->Scale(data[0], data[1], data[2]);
     m_Transform->PostMultiply();
+    m_Transform->Translate(+center[0], +center[1], +center[2]);   
     m_Transform->Translate(pos[0], pos[1], pos[2]);
     m_Transform->PreMultiply();
     break;

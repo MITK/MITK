@@ -3,7 +3,7 @@
 
 #include "mitkCommon.h"
 #include <vecmath.h>
-#include "Event.h"
+#include "mitkDisplayPositionEvent.h"
 #include "mitkVector.h"
 
 
@@ -17,7 +17,7 @@ namespace mitk {
 //## Stores DisplayPosition from Mouse.
 //## Later on the WorldPosition according to a BaseRender can be calculated and
 //## set.
-class PositionEvent : public Event
+class PositionEvent : public DisplayPositionEvent
 {
   public:
     //##ModelId=3E5B7CF900F0
@@ -30,9 +30,6 @@ class PositionEvent : public Event
     //##        worldPosition:
     PositionEvent(mitk::BaseRenderer* sender, int type, int button, int buttonState, int key, const mitk::Point2D& displPosition, const mitk::Point3D& worldPosition);
 
-	//##ModelId=3E5B79DE0133
-    const Point2D& GetDisplayPosition() const;
-	
     //##ModelId=3EDC8EEC00F8
 	const Point3D& GetWorldPosition() const;
 
@@ -41,9 +38,6 @@ class PositionEvent : public Event
 
     
   private:
-    //##ModelId=3E5B79D00395
-    Point2D m_DisplayPosition;
-	
     //##ModelId=3EDC8EEC008A
 	Point3D m_WorldPosition;
 };

@@ -36,7 +36,7 @@ mitk::Geometry2D* mitk::SlicedGeometry3D::GetGeometry2D(int s) const
         direction = m_DirectionVector*m_Spacing[2];
 
         mitk::PlaneGeometry::Pointer requestedslice;
-        requestedslice = dynamic_cast<mitk::PlaneGeometry*>(firstslice->Clone().GetPointer());
+        requestedslice = static_cast<mitk::PlaneGeometry*>(firstslice->Clone().GetPointer());
         requestedslice->SetOrigin(requestedslice->GetOrigin()+direction*s);
         geometry2d = requestedslice;
         m_Geometry2Ds[s] = geometry2d;
@@ -148,10 +148,14 @@ void mitk::SlicedGeometry3D::InitializeEvenlySpaced(mitk::Geometry2D* geometry2D
   }
   else
   {
+    directionVector *= -1.0;
     m_UnitsToMMAffineTransform = AffineTransform3D::New();
     m_UnitsToMMAffineTransform->SetMatrix(geometry2D->GetUnitsToMMAffineTransform()->GetMatrix());
-    m_UnitsToMMAffineTransform->SetOffset(geometry2D->GetUnitsToMMAffineTransform()->GetOffset()+directionVector*slices);
-    directionVector *= -1.0;
+
+    AffineTransform3D::OutputVectorType scaleVector;
+    FillVector3D(scaleVector, 1.0, 1.0, -1.0);
+    m_UnitsToMMAffineTransform->Scale(scaleVector, true);
+    m_UnitsToMMAffineTransform->SetOffset(geometry2D->GetUnitsToMMAffineTransform()->GetOffset());
   }
 
   mitk::Vector3D spacing;

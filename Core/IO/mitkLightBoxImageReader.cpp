@@ -68,13 +68,14 @@ void mitk::LightBoxImageReader::GenerateOutputInformation()
     
     itkDebugMacro(<<"Reading lightbox for GenerateOutputInformation()");
 
-    int position, numberOfImages=0,numberOfTimePoints=0,numberOfTimePoints2=0,number=0;
+    int position, numberOfImages=0,numberOfTimePoints=0,numberOfTimePoints2=0,number=0,counter=0;
     ipPicDescriptor*  pic=NULL;
     ipPicDescriptor*  pic2=NULL;
     interSliceGeometry_t *interSliceGeometry;
     interSliceGeometry_t *isg;
     mitk::Point3D origin1;
     mitk::Point3D origin0;
+    mitk::Point3D origin;
     imageInfo imagInfo;
     //ipPicTSV_t *tsv;
     //void* data;
@@ -104,12 +105,14 @@ void mitk::LightBoxImageReader::GenerateOutputInformation()
                 if(interSliceGeometry!=NULL)
                 {
                   mitk::vtk2itk(interSliceGeometry->o,origin0);
+                 origin=origin0;
+                 itkGenericOutputMacro(<<"origin   "<<origin);
 //DEBUG itkGenericOutputMacro(<<"5b:"<<numberOfImages);
                 }
                 //timeconv0=ConvertTime(pic);
             }
 //DEBUG itkGenericOutputMacro(<<"6:"<<numberOfImages);
-
+            
             //image time
             //pic2 = m_LightBox->fetchHeader(RealPosition);
             isg=m_LightBox->fetchDicomGeometry(RealPosition);
@@ -119,7 +122,7 @@ void mitk::LightBoxImageReader::GenerateOutputInformation()
               mitk::vtk2itk(isg->o,origin1);
               //timeconv1=ConvertTime(pic2);
 
-              if (origin1 == origin0)
+              if (origin1 == origin0 || origin1== origin)
               {
                   /*if (numberOfTimePoints==1 && number==1)
                   {
@@ -128,6 +131,8 @@ void mitk::LightBoxImageReader::GenerateOutputInformation()
                       sscanf( (char *) data, "%f", &imagetime );
                   }*/
                   ++numberOfTimePoints;
+                  if (origin1== origin && origin0 !=origin)
+                    ++counter;
               }
               else
               {
@@ -142,16 +147,20 @@ void mitk::LightBoxImageReader::GenerateOutputInformation()
                     }
                     else
                     {
-                      imagInfo.timePoints=number;
-                      imagInfo.nbOfTimePoints=numberOfTimePoints2;  
-                      //imagInfo.imagetime=imagetime;
-                      imagInfo.startPosition=origin1;
-                      imInfo.push_back(imagInfo);
-                      number=1;
-                      numberOfTimePoints2=numberOfTimePoints;
+                      if (counter<1)
+                      {
+                        imagInfo.timePoints=number;
+                        imagInfo.nbOfTimePoints=numberOfTimePoints2;  
+                        //imagInfo.imagetime=imagetime;
+                        imagInfo.startPosition=origin1;
+                        imInfo.push_back(imagInfo);
+                        number=1;
+                        numberOfTimePoints2=numberOfTimePoints;
+                      }
                     }
                   }
-                  numberOfTimePoints=1;
+                  if (counter<1)
+                    numberOfTimePoints=1;
               }
             }
 
@@ -283,13 +292,14 @@ void mitk::LightBoxImageReader::GenerateData()
 
     mitk::Image::Pointer output = this->GetOutput();
 
-    int position, numberOfImages=0,time=0;;
+    int position, numberOfImages=0,time=0,time1=0,time2=0;
     ipPicDescriptor*  pic0=NULL;
     ipPicDescriptor*  pic=NULL;
     interSliceGeometry_t* isg0;
     interSliceGeometry_t* isg;
     mitk::Point3D origin1;
     mitk::Point3D origin0;
+    mitk::Point3D origin;
 
     //sort image
     std::list<int> imageNumbers;    
@@ -298,18 +308,20 @@ void mitk::LightBoxImageReader::GenerateData()
         
     int zDim=(output->GetDimension()>2?output->GetDimensions()[2]:1);
     itkGenericOutputMacro(<<" zdim is "<<zDim);
-    pic0 = m_LightBox->fetchPic (0);// pFetchImage (m_LightBox, position);
-    isg0 = m_LightBox->fetchDicomGeometry(0);
+    RealPosition=GetRealPosition(0,imageNumbers);
+    pic0 = m_LightBox->fetchPic (RealPosition);// pFetchImage (m_LightBox, position);
+    isg0 = m_LightBox->fetchDicomGeometry(RealPosition);
     if(isg0!=NULL)
     {
       mitk::vtk2itk(isg0->o,origin0);
+      origin=origin0;
+      itkGenericOutputMacro(<<"origin    "<<origin);
     }
     else
     {
       itkWarningMacro(<<"interSliceGeometry is NULL");
     }
-    RealPosition=GetRealPosition(0,imageNumbers);
-    pic0 = m_LightBox->fetchPic (RealPosition);
+        
     output->SetPicSlice(pic0, zDim-1-numberOfImages,time);
     for (position = 1; position < m_LightBox->getFrames (); ++position) 
     {
@@ -334,16 +346,24 @@ void mitk::LightBoxImageReader::GenerateData()
             if(isg!=NULL)
             {
               mitk::vtk2itk(isg->o,origin1);
-              if (origin1 != origin0)
+              if (origin1 != origin0 && origin1!=origin)
               {
                   itkGenericOutputMacro("origin1: "<<origin1<<" origin0: "<<origin0);
                   ++numberOfImages;
-                  time=0;
+                  time=time1;
                   origin0=origin1;                
               }
               else 
               {
                   ++time;
+                  if (origin1==origin && origin0 != origin)
+                  {
+                    ++time2;
+                    time1=time2;
+                    time=time2;
+                    numberOfImages=0;
+                  }
+
               }
             }
             else
@@ -461,7 +481,7 @@ std::list<int> mitk::LightBoxImageReader::SortImage()
         dicomFindElement((unsigned char*) tsv->value, 0x0020, 0x0013, &data, &len);
         sscanf( (char *) data, "%d", &imageNumber );
         imageNumbers.push_back(imageNumber);
-        itkGenericOutputMacro(<<"number image: "<<imageNumber);
+        //itkGenericOutputMacro(<<"number image: "<<imageNumber);
     }
     return imageNumbers;
 }
@@ -473,8 +493,8 @@ int mitk::LightBoxImageReader::GetRealPosition(int position, std::list<int> list
     std::list <int> liste2=liste;
     liste2.sort();
     
-    int maxNumber=liste2.back();//number of images for a layer
-
+    int minNumber=*liste2.begin();
+    int maxNumber=liste2.back()+1-minNumber;//number of images for a layer
     int layer=position/maxNumber;//number of the layer
     int number=position%maxNumber;//number in the layer
 
@@ -485,7 +505,7 @@ int mitk::LightBoxImageReader::GetRealPosition(int position, std::list<int> list
 
     RealPosition=layer*maxNumber;
 
-    while (*Iter!=number+1)
+    while (*Iter!=number+minNumber && Iter!=liste.end())
     {
        Iter++;
        RealPosition++;

@@ -6,6 +6,7 @@
 #include "mitkDataTree.h"
 #include "mitkImageSliceSelector.h"
 
+
 #include "picimage.h"
 
 #include <itkCommand.h>
@@ -72,6 +73,24 @@ class OpenGLRenderer : public BaseRenderer
     //## @brief returns the vtk-renderer associated with the OpenGL renderer.
     vtkRenderer * GetVtkRenderer(){return m_VtkRenderer;};
 
+  //##Documentation
+  //## @brief Updates the contents of all renderwindows
+  static void UpdateAllInstancesIncludingVtkActors() 
+  {
+    const RenderWindow::RenderWindowSet& instances = RenderWindow::GetInstances();
+    for (RenderWindow::RenderWindowSet::const_iterator iter = instances.begin();iter != instances.end();iter++) 
+    {
+      OpenGLRenderer * openglrenderer = dynamic_cast<OpenGLRenderer*>((BaseRenderer*)((*iter)->GetRenderer()));
+      if(openglrenderer)
+      {
+        openglrenderer->UpdateIncludingVtkActors();
+        openglrenderer->GetRenderWindow()->Repaint();
+
+      }
+      else
+        (*iter)->Update();
+    }
+  }
 protected:
     //##ModelId=3E33145B005A
     virtual void Paint();

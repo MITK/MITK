@@ -1,0 +1,2 @@
+"*background:		gray75",
+"*annotation.background:	yellow",

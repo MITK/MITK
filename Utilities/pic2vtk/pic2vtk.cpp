@@ -1,7 +1,7 @@
-#include "pic2vtk.h"
+#include <pic2vtk/pic2vtk.h>
 #include <vtkStructuredPointsReader.h>
 #include <vtkImageCast.h> 
-
+#include <iostream>
 
 /**
  * konvertiert ein vtkImageReader in ein pic-Image 
@@ -731,7 +731,7 @@ vtkImageData* Pic2vtk::convertVectorImage( ipPicDescriptor* pic ) {
 	} else if ( pic->type == ipPicUInt && pic->bpe == 16 ) {
 		inData->SetScalarType( VTK_UNSIGNED_SHORT );
 		inData->AllocateScalars();
-		cout << " memory = " << inData->GetActualMemorySize() << std::endl;
+		std::cout << " memory = " << inData->GetActualMemorySize() << std::endl;
 		fflush(stdout);
 		
 		register unsigned short* s = (unsigned short*) pic->data;

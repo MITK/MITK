@@ -56,7 +56,7 @@ void ITK_EXPORT GenerateTimeInInputRegion(const TOutputData* output, TInputData*
   assert(output!=NULL);
   assert(input!=NULL);
 
-  typename const TOutputData::RegionType& outputRegion = output->GetRequestedRegion();
+  const typename TOutputData::RegionType& outputRegion = output->GetRequestedRegion();
   typename TInputData::RegionType inputRegion;
 
   if(outputRegion.GetSize(3)<1)

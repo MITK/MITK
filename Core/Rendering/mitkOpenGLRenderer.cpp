@@ -88,14 +88,16 @@ void mitk::OpenGLRenderer::SetData(const mitk::DataTreeIteratorBase* iterator)
         BaseData::Pointer data=it->Get()->GetData();
         if(data.IsNotNull())
         {
-          if(geometry_is_set==false)
-          {
             Image::Pointer image = dynamic_cast<Image*>(data.GetPointer());
-            if(image.IsNotNull())
+            if((image.IsNotNull()) && (image->GetUpdatedGeometry()!=NULL))
             {
-              SetWorldGeometry(image->GetUpdatedSlicedGeometry(0)->GetGeometry2D(0));
+              mitk::PlaneGeometry::Pointer planegeometry = mitk::PlaneGeometry::New();
+              planegeometry->InitializeStandardPlane(
+                image->GetGeometry(),
+                PlaneGeometry::Transversal, 
+                image->GetGeometry()->GetExtent(2)-1, false);
+              SetWorldGeometry(planegeometry);
               geometry_is_set=true;
-            }
           }
           //@todo add connections
           //data->AddObserver(itk::EndEvent(), m_DataChangedCommand);

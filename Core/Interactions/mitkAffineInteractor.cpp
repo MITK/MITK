@@ -102,13 +102,13 @@ bool mitk::AffineInteractor::ExecuteAction(Action* action, mitk::StateEvent cons
       mitk::StateEvent* newStateEvent = NULL;
       if (this->CheckSelected(worldPoint))
       {
-        newStateEvent = new mitk::StateEvent(StYES, posEvent);
+        newStateEvent = new mitk::StateEvent(EIDYES, posEvent);
         selected = new mitk::BoolProperty(true);
         color = new mitk::ColorProperty(1.0, 1.0, 0.0); // if selected, color is yellow
       }
       else
       {
-        newStateEvent = new mitk::StateEvent(StNO, posEvent);
+        newStateEvent = new mitk::StateEvent(EIDNO, posEvent);
         selected = new mitk::BoolProperty(false);
         mitk::BoundingObject* b = dynamic_cast<mitk::BoundingObject*>(m_DataTreeNode->GetData());
         if(b != NULL)
@@ -134,12 +134,12 @@ bool mitk::AffineInteractor::ExecuteAction(Action* action, mitk::StateEvent cons
       mitk::StateEvent* newStateEvent = NULL;
       if (this->CheckSelected(worldPoint))
       {
-        newStateEvent = new mitk::StateEvent(StYES, posEvent);
+        newStateEvent = new mitk::StateEvent(EIDYES, posEvent);
         m_DataTreeNode->GetPropertyList()->SetProperty("selected", new mitk::BoolProperty(true));  // TODO: Generate an Select Operation and send it to the undo controller ?
       }
       else  // if not selected, do nothing (don't deselect)
       {
-        newStateEvent = new mitk::StateEvent(StNO, posEvent);
+        newStateEvent = new mitk::StateEvent(EIDNO, posEvent);
       }
       //call HandleEvent to leave the guard-state
       this->HandleEvent( newStateEvent );

@@ -159,7 +159,7 @@ bool mitk::PointInteractor::ExecuteAction( Action* action, mitk::StateEvent cons
 
         //new Event with information YES and with the correct point
         mitk::PositionEvent const* newPosEvent = new mitk::PositionEvent(posEvent->GetSender(), posEvent->GetType(), posEvent->GetButton(), posEvent->GetButtonState(), posEvent->GetKey(), displPoint, worldPoint);
-        mitk::StateEvent* newStateEvent = new mitk::StateEvent(StYES, newPosEvent);
+        mitk::StateEvent* newStateEvent = new mitk::StateEvent(EIDYES, newPosEvent);
         //call HandleEvent to leave the guard-state
         this->HandleEvent( newStateEvent );
 				ok = true;
@@ -167,7 +167,7 @@ bool mitk::PointInteractor::ExecuteAction( Action* action, mitk::StateEvent cons
 			else
 			{
 				//new Event with information NO
-        mitk::StateEvent* newStateEvent = new mitk::StateEvent(StNO, posEvent);
+        mitk::StateEvent* newStateEvent = new mitk::StateEvent(EIDNO, posEvent);
         this->HandleEvent( newStateEvent );
 				ok = true;
 			}
@@ -177,7 +177,7 @@ bool mitk::PointInteractor::ExecuteAction( Action* action, mitk::StateEvent cons
       mitk::DisplayPositionEvent const  *disPosEvent = dynamic_cast <const mitk::DisplayPositionEvent *> (stateEvent->GetEvent());
 			if (disPosEvent != NULL)
       {//2d Koordinates for 3D Interaction; return false to redo the last statechange
-        mitk::StateEvent* newStateEvent = new mitk::StateEvent(StNO, posEvent);
+        mitk::StateEvent* newStateEvent = new mitk::StateEvent(EIDNO, posEvent);
         this->HandleEvent( newStateEvent );
 				ok = true;
       }
@@ -203,7 +203,7 @@ bool mitk::PointInteractor::ExecuteAction( Action* action, mitk::StateEvent cons
 			  int position = pointSet->SearchPoint(worldPoint, PRECISION);
 			  if (position == m_LastPosition)//found the same point again
 			  {
-          mitk::StateEvent* newStateEvent = new mitk::StateEvent(StYES, posEvent);
+          mitk::StateEvent* newStateEvent = new mitk::StateEvent(EIDYES, posEvent);
           //call HandleEvent to leave the guard-state
           this->HandleEvent( newStateEvent );
 				  ok = true;
@@ -211,7 +211,7 @@ bool mitk::PointInteractor::ExecuteAction( Action* action, mitk::StateEvent cons
 			  else
 			  {
 				  //new Event with information NO
-          mitk::StateEvent* newStateEvent = new mitk::StateEvent(StNO, posEvent);
+          mitk::StateEvent* newStateEvent = new mitk::StateEvent(EIDNO, posEvent);
           this->HandleEvent( newStateEvent );
 				  ok = true;
 			  }
@@ -221,7 +221,7 @@ bool mitk::PointInteractor::ExecuteAction( Action* action, mitk::StateEvent cons
         mitk::DisplayPositionEvent const  *disPosEvent = dynamic_cast <const mitk::DisplayPositionEvent *> (stateEvent->GetEvent());
 			  if (disPosEvent != NULL)
         {//2d Koordinates for 3D Interaction; return false to redo the last statechange
-          mitk::StateEvent* newStateEvent = new mitk::StateEvent(StNO, posEvent);
+          mitk::StateEvent* newStateEvent = new mitk::StateEvent(EIDNO, posEvent);
           this->HandleEvent( newStateEvent );
 				  ok = true;
         }
@@ -289,13 +289,13 @@ case AcCHECKGREATERONE:
   {
     if (pointSet->GetSize()>1)
     {
-      mitk::StateEvent* newStateEvent = new mitk::StateEvent(StYES, stateEvent->GetEvent());
+      mitk::StateEvent* newStateEvent = new mitk::StateEvent(EIDYES, stateEvent->GetEvent());
       this->HandleEvent( newStateEvent );
 	    ok = true;
     }
     else 
     {
-      mitk::StateEvent* newStateEvent = new mitk::StateEvent(StNO, stateEvent->GetEvent());
+      mitk::StateEvent* newStateEvent = new mitk::StateEvent(EIDNO, stateEvent->GetEvent());
       this->HandleEvent( newStateEvent );
 		  ok = true;
     }

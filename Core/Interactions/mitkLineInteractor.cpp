@@ -82,7 +82,7 @@ bool mitk::LineInteractor::ExecuteAction(Action* action, mitk::StateEvent const*
   break;
   //case AcTRANSMITEVENT:
   //  {
-  //    //due to the use of guards-states the eventId can be changed from original to internal EventIds e.g. StYES.
+  //    //due to the use of guards-states the eventId can be changed from original to internal EventIds e.g. EIDYES.
   //    //so we have remap the event and transmitt the original event with proper id
   //    ok = m_PointInteractor->HandleEvent(mitk::EventMapper::RefreshStateEvent(const_cast<StateEvent*>(stateEvent)), objectEventId, groupEventId );
   //    //check the state of the machine and according to that change the state/mode of this statemachine
@@ -137,7 +137,7 @@ bool mitk::LineInteractor::ExecuteAction(Action* action, mitk::StateEvent const*
           displPoint[1] = worldPoint[1];
           //new Event with information YES and with the correct point
           mitk::PositionEvent const* newPosEvent = new mitk::PositionEvent(posEvent->GetSender(), posEvent->GetType(), posEvent->GetButton(), posEvent->GetButtonState(), posEvent->GetKey(), displPoint, worldPoint);
-          mitk::StateEvent* newStateEvent = new mitk::StateEvent(StYES, newPosEvent);
+          mitk::StateEvent* newStateEvent = new mitk::StateEvent(EIDYES, newPosEvent);
           //call HandleEvent to leave the guard-state
           this->HandleEvent( newStateEvent );
 				  ok = true;
@@ -145,7 +145,7 @@ bool mitk::LineInteractor::ExecuteAction(Action* action, mitk::StateEvent const*
 			  else
 			  {
 				  //new Event with information NO
-          mitk::StateEvent* newStateEvent = new mitk::StateEvent(StNO, posEvent);
+          mitk::StateEvent* newStateEvent = new mitk::StateEvent(EIDNO, posEvent);
           this->HandleEvent(newStateEvent );
 				  ok = true;
 			  }
@@ -174,7 +174,7 @@ bool mitk::LineInteractor::ExecuteAction(Action* action, mitk::StateEvent const*
 			  {
           m_CurrentLineId = lineId;
           m_CurrentCellId = cellId;
-          mitk::StateEvent* newStateEvent = new mitk::StateEvent(StYES, posEvent);
+          mitk::StateEvent* newStateEvent = new mitk::StateEvent(EIDYES, posEvent);
           //call HandleEvent to leave the guard-state
           this->HandleEvent( newStateEvent );
 				  ok = true;
@@ -182,7 +182,7 @@ bool mitk::LineInteractor::ExecuteAction(Action* action, mitk::StateEvent const*
 	  		else //not found
 		  	{
 				  //new Event with information NO
-          mitk::StateEvent* newStateEvent = new mitk::StateEvent(StNO, posEvent);
+          mitk::StateEvent* newStateEvent = new mitk::StateEvent(EIDNO, posEvent);
           this->HandleEvent(newStateEvent );
 				  ok = true;
 			  }
@@ -211,7 +211,7 @@ bool mitk::LineInteractor::ExecuteAction(Action* action, mitk::StateEvent const*
             m_CurrentCellId == cellId &&
             m_CurrentLineId == lineId )//found the same line again
 			  {
-          mitk::StateEvent* newStateEvent = new mitk::StateEvent(StYES, posEvent);
+          mitk::StateEvent* newStateEvent = new mitk::StateEvent(EIDYES, posEvent);
           //call HandleEvent to leave the guard-state
           this->HandleEvent( newStateEvent );
 				  ok = true;
@@ -219,7 +219,7 @@ bool mitk::LineInteractor::ExecuteAction(Action* action, mitk::StateEvent const*
 	  		else //not found
 		  	{
 				  //new Event with information NO
-          mitk::StateEvent* newStateEvent = new mitk::StateEvent(StNO, posEvent);
+          mitk::StateEvent* newStateEvent = new mitk::StateEvent(EIDNO, posEvent);
           this->HandleEvent(newStateEvent );
 				  ok = true;
 			  }

@@ -68,7 +68,7 @@ bool mitk::PolygonInteractor::ExecuteAction( Action* action, mitk::StateEvent co
 	  break;
   //case AcTRANSMITEVENT:
   //  {
-  //    //due to the use of guards-states the eventId can be changed from original to internal EventIds e.g. StYES.
+  //    //due to the use of guards-states the eventId can be changed from original to internal EventIds e.g. EIDYES.
   //    //so we have remap the event and transmitt the original event with proper id
   //    ok = m_LineInteractor->HandleEvent(mitk::EventMapper::RefreshStateEvent(const_cast<StateEvent*>(stateEvent)) );
   //    //check the state of the machine and according to that change the state/mode of this statemachine
@@ -135,14 +135,14 @@ bool mitk::PolygonInteractor::ExecuteAction( Action* action, mitk::StateEvent co
       if(mesh->SearchLine(worldPoint, PRECISION, lineId, cellId))//line found
       {
         m_CurrentCellId = cellId;
-        mitk::StateEvent* newStateEvent = new mitk::StateEvent(StYES, stateEvent->GetEvent());
+        mitk::StateEvent* newStateEvent = new mitk::StateEvent(EIDYES, stateEvent->GetEvent());
         this->HandleEvent( newStateEvent );
         ok = true;
       }
       else
 		  {
 			  //new Event with information NO
-        mitk::StateEvent* newStateEvent = new mitk::StateEvent(StNO, stateEvent->GetEvent());
+        mitk::StateEvent* newStateEvent = new mitk::StateEvent(EIDNO, stateEvent->GetEvent());
         this->HandleEvent( newStateEvent );
 			  ok = true;
 			}

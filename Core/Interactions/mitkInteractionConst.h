@@ -2,7 +2,6 @@
 #define MITKINTERACTCONST_H
 /*Prefixes for Constants:
 E = Enumeration
-St = State Conditions; own generated Events from guarding states
 EID = EventId's
 Op = Operations
 Ac = Action
@@ -18,27 +17,8 @@ namespace mitk{
 */
 //different UndoModels:
 typedef enum EUndoModels{LIMITEDLINEARUNDO=10, TREEUNDO=20};
-//#define LIMITEDLINEARUNDO 10
-//#define TREEUNDO 20
 
-/*
-//EventMechanism:
-//If you change anything here, then change in mitkEventMapper.cpp (Array of constants) as well.
-*/
-
-//##Constants for Events thrown by the code (e.g.Yes-I-found-a-point-at-that-position)
-//## in the >XML-File< AND in the >code<
-typedef enum EConditions
-{
-  StSELECT = 1003,
-  StDESELECT = 1004,
-  StNO = 203,
-  StYES = 204,
-  StSMALLERNMINUS1 = 1010,
-  StLARGERNMINUS1 = 1011
-};
-
-//Constants for EventIds
+//Constants for EventIds; use the according constant to throgh an event in the code
 typedef enum EEventIds
 {
   EIDLEFTMOUSEBTN = 1,
@@ -205,6 +185,16 @@ typedef enum EActions
   AcFORCESUBINTERACTORS = 1550,
   AcTRANSMITEVENT = 2000  //to transmit an event to a lower Interactor/Statemachine
 };
+
+
+/*
+//!!!!!!!!!!!!!!!!!!!!!!!!
+//!!!!!!!!!!!!!!!!!!!!!!!!
+//EventMechanism:
+//If you change anything from here on, then change in mitkEventMapper.cpp (Array of constants) as well.
+//!!!!!!!!!!!!!!!!!!!!!!!!
+//!!!!!!!!!!!!!!!!!!!!!!!!
+*/
 
 //Type of an Event;
 typedef enum EEventType

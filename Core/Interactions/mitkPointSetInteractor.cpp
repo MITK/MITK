@@ -107,12 +107,12 @@ bool mitk::PointSetInteractor::ExecuteAction( Action* action, mitk::StateEvent c
 	    mitk::PositionEvent const  *posEvent = dynamic_cast <const mitk::PositionEvent *> (stateEvent->GetEvent());
 		  if (posEvent != NULL) 
       {
-        mitk::StateEvent* newStateEvent = new mitk::StateEvent(StYES, stateEvent->GetEvent());
+        mitk::StateEvent* newStateEvent = new mitk::StateEvent(EIDYES, stateEvent->GetEvent());
         this->HandleEvent( newStateEvent );
       }
       else 
       {
-        mitk::StateEvent* newStateEvent = new mitk::StateEvent(StNO, stateEvent->GetEvent());
+        mitk::StateEvent* newStateEvent = new mitk::StateEvent(EIDNO, stateEvent->GetEvent());
         this->HandleEvent( newStateEvent );
       }
     }
@@ -415,7 +415,7 @@ bool mitk::PointSetInteractor::ExecuteAction( Action* action, mitk::StateEvent c
           displPoint[0] = worldPoint[0]; displPoint[1] = worldPoint[1];
           //new Event with information YES and with the correct point
   			  mitk::PositionEvent const* newPosEvent = new mitk::PositionEvent(posEvent->GetSender(), Type_None, BS_NoButton, BS_NoButton, Key_none, displPoint, pt);
-          mitk::StateEvent* newStateEvent = new mitk::StateEvent(StYES, newPosEvent);
+          mitk::StateEvent* newStateEvent = new mitk::StateEvent(EIDYES, newPosEvent);
           //call HandleEvent to leave the guard-state
           this->HandleEvent( newStateEvent );
 				  ok = true;
@@ -423,7 +423,7 @@ bool mitk::PointSetInteractor::ExecuteAction( Action* action, mitk::StateEvent c
 			  else
 			  {
 				  //new Event with information NO
-          mitk::StateEvent* newStateEvent = new mitk::StateEvent(StNO, posEvent);
+          mitk::StateEvent* newStateEvent = new mitk::StateEvent(EIDNO, posEvent);
           this->HandleEvent(newStateEvent );
 				  ok = true;
 			  }
@@ -433,7 +433,7 @@ bool mitk::PointSetInteractor::ExecuteAction( Action* action, mitk::StateEvent c
         mitk::DisplayPositionEvent const  *disPosEvent = dynamic_cast <const mitk::DisplayPositionEvent *> (stateEvent->GetEvent());
 			  if (disPosEvent != NULL)
         {//2d Koordinates for 3D Interaction; return false to redo the last statechange
-          mitk::StateEvent* newStateEvent = new mitk::StateEvent(StNO, posEvent);
+          mitk::StateEvent* newStateEvent = new mitk::StateEvent(EIDNO, posEvent);
           this->HandleEvent(newStateEvent );
 				  ok = true;
         }
@@ -442,8 +442,8 @@ bool mitk::PointSetInteractor::ExecuteAction( Action* action, mitk::StateEvent c
     }
     case AcCHECKSELECTED:
         /*check, if the given point is selected:
-          if no, then send StNO
-          if yes, then send StYES*/
+          if no, then send EIDNO
+          if yes, then send EIDYES*/
 
         //check, if: because of the need to look up the point again, it is possible, that we grab the wrong point in case there are two same points
         //so maybe we do have to set a global index for further computation, as long, as the mouse is moved...
@@ -462,19 +462,19 @@ bool mitk::PointSetInteractor::ExecuteAction( Action* action, mitk::StateEvent c
 					  posEvent->GetType(), posEvent->GetButton(), posEvent->GetButtonState(), posEvent->GetKey(),
 					  posEvent->GetDisplayPosition(), posEvent->GetWorldPosition());
 
-				    if (pointSet->GetSelectInfo(position))//if selected on true, then call Event StYES
+				    if (pointSet->GetSelectInfo(position))//if selected on true, then call Event EIDYES
             {
-              mitk::StateEvent* newStateEvent = new mitk::StateEvent( StYES, newPosEvent );
+              mitk::StateEvent* newStateEvent = new mitk::StateEvent( EIDYES, newPosEvent );
               this->HandleEvent( newStateEvent );
 				      ok = true;
 
               //saving the spot for calculating the direction vector in moving
 					    m_LastPoint = posEvent->GetWorldPosition();
             }
-            else //not selected then call event StNO
+            else //not selected then call event EIDNO
             {
               //new Event with information NO
-              mitk::StateEvent* newStateEvent = new mitk::StateEvent( StNO, newPosEvent );
+              mitk::StateEvent* newStateEvent = new mitk::StateEvent( EIDNO, newPosEvent );
               this->HandleEvent( newStateEvent );
 				      ok = true;
             }
@@ -490,7 +490,7 @@ bool mitk::PointSetInteractor::ExecuteAction( Action* action, mitk::StateEvent c
         {
           if (m_N<0)//number of points not limited->pass on "Amount of points in Set is smaller then N-1"
           {
-            mitk::StateEvent* newStateEvent = new mitk::StateEvent(StSMALLERNMINUS1, stateEvent->GetEvent());
+            mitk::StateEvent* newStateEvent = new mitk::StateEvent(EIDSTSMALERNMINUS1, stateEvent->GetEvent());
             this->HandleEvent( newStateEvent );
 				    ok = true;
           }
@@ -499,14 +499,14 @@ bool mitk::PointSetInteractor::ExecuteAction( Action* action, mitk::StateEvent c
             if (pointSet->GetSize()<(m_N-1))
             //pointset after addition won't be full
             {
-              mitk::StateEvent* newStateEvent = new mitk::StateEvent(StSMALLERNMINUS1, stateEvent->GetEvent());
+              mitk::StateEvent* newStateEvent = new mitk::StateEvent(EIDSTSMALERNMINUS1, stateEvent->GetEvent());
               this->HandleEvent( newStateEvent );
 				      ok = true;
             }
             else //(pointSet->GetSize()>=(m_N-1))
             //after the addition of a point, the container will be full
             {
-              mitk::StateEvent* newStateEvent = new mitk::StateEvent(StLARGERNMINUS1, stateEvent->GetEvent());
+              mitk::StateEvent* newStateEvent = new mitk::StateEvent(EIDSTLARGERNMINUS1, stateEvent->GetEvent());
               this->HandleEvent(newStateEvent );
 				      ok = true;
             }//else
@@ -517,13 +517,13 @@ bool mitk::PointSetInteractor::ExecuteAction( Action* action, mitk::StateEvent c
         {
             if (pointSet->GetSize()<=1)//the number of points in the list is 1 (or smaler)
             {
-                mitk::StateEvent* newStateEvent = new mitk::StateEvent(StYES, stateEvent->GetEvent());
+                mitk::StateEvent* newStateEvent = new mitk::StateEvent(EIDYES, stateEvent->GetEvent());
                 this->HandleEvent( newStateEvent );
 				        ok = true;
             }
             else //more than 1 points in list, so stay in the state!
             {
-                mitk::StateEvent* newStateEvent = new mitk::StateEvent(StNO, stateEvent->GetEvent());
+                mitk::StateEvent* newStateEvent = new mitk::StateEvent(EIDNO, stateEvent->GetEvent());
                 this->HandleEvent(newStateEvent );
 				        ok = true;
             }

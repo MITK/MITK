@@ -302,7 +302,7 @@ typedef enum EEventType
 
 //##ButtonState
 // mouse/keyboard state values
-//QT combinations: left MouseButton + ControlButton: 0x201
+//QT combinations if MOUSEBUTTONRelease: left MouseButton + ControlButton: 0x201
 typedef enum EButtonStates
 {
   BS_NoButton        = 0x0000,

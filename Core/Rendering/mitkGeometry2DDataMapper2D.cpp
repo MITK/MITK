@@ -1,3 +1,4 @@
+#include <GL/gl.h>
 #include "mitkGeometry2DDataMapper2D.h"
 
 #include "mitkBaseRenderer.h"

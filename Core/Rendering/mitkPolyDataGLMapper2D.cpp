@@ -1,3 +1,4 @@
+#include <GL/gl.h>
 #include "mitkPolyDataGLMapper2D.h"
 
 #include "mitkBaseRenderer.h"

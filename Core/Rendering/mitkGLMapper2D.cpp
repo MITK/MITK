@@ -1,3 +1,4 @@
+#include "GL/gl.h"
 #include "mitkGLMapper2D.h"
 
 //##ModelId=3E681470037E

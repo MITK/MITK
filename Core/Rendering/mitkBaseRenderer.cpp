@@ -4,8 +4,12 @@
 //##ModelId=3D6A1791038B
 void mitk::BaseRenderer::SetData(mitk::DataTreeIterator* iterator)
 {
-    m_DataTreeIterator = iterator;
-    Modified();
+    if(m_DataTreeIterator != iterator)
+    {
+        delete m_DataTreeIterator;
+        m_DataTreeIterator = iterator->clone();
+        Modified();
+    }
 }
 
 //##ModelId=3E3314720003
@@ -65,6 +69,7 @@ mitk::BaseRenderer::BaseRenderer() : m_DataTreeIterator(NULL), m_RenderWindow(NU
 //##ModelId=3E3D2F12008C
 mitk::BaseRenderer::~BaseRenderer()
 {
+    delete m_DataTreeIterator;
 }
 
 //##ModelId=3E66CC590379

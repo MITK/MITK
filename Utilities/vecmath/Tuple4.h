@@ -31,6 +31,9 @@ template<class T>
 class Tuple4 {
 /*
  * $Log$
+ * Revision 1.2  2003/02/08 16:25:42  peter
+ * added istream >> operator
+ *
  * Revision 1.1  2002/11/16 12:25:36  mark
  * vecmath bibliothek
  * in cvs, da einige bugs behoben
@@ -544,6 +547,27 @@ template <class T>
 VM_IOSTREAM_STD::ostream& operator<<(VM_IOSTREAM_STD::ostream& o, const VM_VECMATH_NS::Tuple4<T>& t1) {
     return o << "(" << t1.x << "," << t1.y << "," << t1.z << "," << t1.w << ")";
 }
+
+// Anfang Änderung Marcus
+template <class T>
+VM_IOSTREAM_STD::istream& operator>>(VM_IOSTREAM_STD::istream& i, const VM_VECMATH_NS::Tuple4<T>& t1) {
+
+	char c;
+
+	i >> c;
+	i >> t1.x;
+	i >> c;
+	i >> t1.y;
+	i >> c;
+	i >> t1.z;	
+	i >> c;
+	i >> t1.w;
+	i >> c;
+
+    return o;
+}
+// Ende Änderung Marcus
+
 #endif
 
 VM_BEGIN_NS

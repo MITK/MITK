@@ -1221,6 +1221,54 @@ VM_IOSTREAM_STD::ostream& operator<<(VM_IOSTREAM_STD::ostream& o, const VM_VECMA
     "  ["<<t1.m20<<","<<t1.m21<<","<<t1.m22<<","<<t1.m23<<"]" << endl <<
     "  ["<<t1.m30<<","<<t1.m31<<","<<t1.m32<<","<<t1.m33<<"]""] ]";
 }
+
+template <class T>
+VM_IOSTREAM_STD::istream& operator>>(VM_IOSTREAM_STD::istream& i, const VM_VECMATH_NS::Matrix4<T>& m ) {
+
+	char c;
+
+	i >> c;
+	i >> c;
+	i >> (T) m.m00;
+	i >> c;
+	i >> (T) m.m01;
+	i >> c;
+	i >> (T) m.m02;
+	i >> c;
+	i >> (T) m.m03;
+	i >> c; 
+	i>> c;
+	i >> (T) m.m10;
+	i >> c;
+	i >> (T) m.m11;
+	i >> c;
+	i >> (T) m.m12;
+	i >> c;
+	i >> (T) m.m13;
+	i >> c;
+	i >> c;
+	i >> (T) m.m20;
+	i >> c;
+	i >> (T) m.m21;
+	i >> c;
+	i >> (T) m.m22;
+	i >> c;
+	i >> (T) m.m23;
+	i >> c;
+	i >> c;
+	i >> (T) m.m30;
+	i >> c;
+	i >> (T) m.m31;
+	i >> c;
+	i >> (T) m.m32;
+	i >> c;
+	i >> (T) m.m33;
+	i >> c;
+	i >> c;
+
+    return  i; 
+}
+
 #endif
 
 

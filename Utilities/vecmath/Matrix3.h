@@ -845,10 +845,45 @@ VM_END_NS
 template <class T>
 VM_IOSTREAM_STD::ostream& operator<<(VM_IOSTREAM_STD::ostream& o, const VM_VECMATH_NS::Matrix3<T>& t1) {
     return  o << 
-        "[ ["<<t1.m00<<","<<t1.m01<<","<<t1.m02<<"]" << endl <<
-        "  ["<<t1.m10<<","<<t1.m11<<","<<t1.m12<<"]" << endl <<
+		"[ ["<<t1.m00<<","<<t1.m01<<","<<t1.m02<<"]" << VM_IOSTREAM_STD::endl <<
+		"  ["<<t1.m10<<","<<t1.m11<<","<<t1.m12<<"]" << VM_IOSTREAM_STD::endl <<
         "  ["<<t1.m20<<","<<t1.m21<<","<<t1.m22<<"] ]";
 }
+
+// Anfang Änderung Marcus
+template <class T>
+VM_IOSTREAM_STD::istream& operator>>(VM_IOSTREAM_STD::istream& i, const VM_VECMATH_NS::Matrix3<T>& t1) {
+
+	char c;
+
+	i >> c;
+	i >> c;
+	i >> (T) t1.m00;
+	i >> c;
+	i >> (T) t1.m01;
+	i >> c;
+	i >> (T) t1.m02;
+	i >> c; 
+	i >> c;
+	i >> (T) t1.m10;
+	i >> c;
+	i >> (T) t1.m11;
+	i >> c;
+	i >> (T) t1.m12;
+	i >> c;
+	i >> c;
+	i >> (T) t1.m20;
+	i >> c;
+	i >> (T) t1.m21;
+	i >> c;
+	i >> (T) t1.m22;
+	i >> c;
+	i >> c;
+
+	return i;
+}
+// Ende Änderung Marcus
+
 #endif /* VM_INCLUDE_IO */
 
 

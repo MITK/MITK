@@ -78,6 +78,27 @@ VM_IOSTREAM_STD::ostream& operator<<(VM_IOSTREAM_STD::ostream& o, const VM_VECMA
     return o << "(" << a1.x << "," << a1.y << ","
              << a1.z  << "," << a1.angle << ")";
 }
+
+// Anfang Änderung Marcus
+template <class T>
+VM_IOSTREAM_STD::istream& operator>>(VM_IOSTREAM_STD::istream& i, const VM_VECMATH_NS::AxisAngle4<T>& a1) {
+
+	char c;
+
+	i >> c;
+	i >> a1.x;
+	i >> c;
+	i >> a1.y;
+	i >> c;
+	i >> a1.z;
+	i >> c;
+	i >> a1.angle;
+	i >> c;
+
+    return i;
+}
+// Ende Änderung Marcus
+
 #endif
 
 #endif /* AXISANGLE4_H */

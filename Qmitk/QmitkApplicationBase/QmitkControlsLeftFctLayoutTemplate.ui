@@ -1,0 +1,92 @@
+<!DOCTYPE UI><UI version="3.2" stdsetdef="1">
+<class>QmitkControlsLeftFctLayoutTemplate</class>
+<widget class="QWidget">
+    <property name="name">
+        <cstring>QmitkControlsLeftFctLayoutTemplate</cstring>
+    </property>
+    <property name="geometry">
+        <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>700</width>
+            <height>681</height>
+        </rect>
+    </property>
+    <property name="caption">
+        <string>Form2</string>
+    </property>
+    <hbox>
+        <property name="name">
+            <cstring>unnamed</cstring>
+        </property>
+        <property name="margin">
+            <number>0</number>
+        </property>
+        <property name="spacing">
+            <number>0</number>
+        </property>
+        <widget class="QSplitter">
+            <property name="name">
+                <cstring>MainSplitter</cstring>
+            </property>
+            <property name="orientation">
+                <enum>Horizontal</enum>
+            </property>
+            <widget class="QFrame">
+                <property name="name">
+                    <cstring>ControlParent</cstring>
+                </property>
+                <property name="sizePolicy">
+                    <sizepolicy>
+                        <hsizetype>5</hsizetype>
+                        <vsizetype>5</vsizetype>
+                        <horstretch>0</horstretch>
+                        <verstretch>1</verstretch>
+                    </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                    <size>
+                        <width>50</width>
+                        <height>50</height>
+                    </size>
+                </property>
+                <property name="frameShape">
+                    <enum>StyledPanel</enum>
+                </property>
+                <property name="frameShadow">
+                    <enum>Raised</enum>
+                </property>
+            </widget>
+            <widget class="QFrame">
+                <property name="name">
+                    <cstring>MainParent</cstring>
+                </property>
+                <property name="sizePolicy">
+                    <sizepolicy>
+                        <hsizetype>5</hsizetype>
+                        <vsizetype>5</vsizetype>
+                        <horstretch>1</horstretch>
+                        <verstretch>0</verstretch>
+                    </sizepolicy>
+                </property>
+                <property name="frameShape">
+                    <enum>StyledPanel</enum>
+                </property>
+                <property name="frameShadow">
+                    <enum>Raised</enum>
+                </property>
+            </widget>
+        </widget>
+    </hbox>
+</widget>
+<includes>
+    <include location="global" impldecl="in implementation">qvaluelist.h</include>
+    <include location="local" impldecl="in implementation">QmitkControlsLeftFctLayoutTemplate.ui.h</include>
+</includes>
+<functions>
+    <function access="protected">init()</function>
+    <function>setControlSizeHint( QSize * size )</function>
+</functions>
+<pixmapinproject/>
+<layoutdefaults spacing="6" margin="11"/>
+</UI>

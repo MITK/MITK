@@ -47,7 +47,14 @@ void QmitkFctMediator::initialize(QWidget *aLayoutTemplate)
     if(aLayoutTemplate==NULL)
         return;
 
+    // why is this cast done ? I remember we wanted an option for playing controls right...
     m_LayoutTemplate = static_cast<QWidget*>(aLayoutTemplate->child("LayoutTemplate", "QmitkControlsRightFctLayoutTemplate"));
+
+    if ( m_LayoutTemplate == NULL) {
+      m_LayoutTemplate = static_cast<QWidget*>(aLayoutTemplate->child("LayoutTemplate", "QmitkControlsLeftFctLayoutTemplate"));
+    }
+
+    assert (m_LayoutTemplate);
 
     QWidget *w;
 

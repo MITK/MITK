@@ -5,9 +5,6 @@
 #if !defined(AFX_QUSFUNCTIONALITYMANAGER_H__1DC0BA6E_9B8D_4D63_8A63_5B661CE33712__INCLUDED_)
 #define AFX_QUSFUNCTIONALITYMANAGER_H__1DC0BA6E_9B8D_4D63_8A63_5B661CE33712__INCLUDED_
 
-#if _MSC_VER > 1000
-#pragma once
-#endif // _MSC_VER > 1000
 
 //#include <QmitkBaseFctMediator.h>
 #include <QmitkFunctionality.h>

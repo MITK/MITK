@@ -57,3 +57,40 @@ void QmitkStdMultiWidget::init()
   planeNode->SetColor(color);
 
 }
+
+void QmitkStdMultiWidget::changeLayout()
+{
+   
+    delete QmitkStdMultiWidgetLayout ;
+    
+    std::cout << "changing layout ... " << std::endl;
+    QmitkStdMultiWidgetLayout = new QHBoxLayout( this, 2, 2, "QmitkStdMultiWidgetLayout");
+
+    layout4 = new QHBoxLayout( 0, 0, 6, "layout4");
+    layout3 = new QGridLayout( 0, 2, 1, 0, 6, "layout3");
+
+    QHBoxLayout *TwoDLayout = new QHBoxLayout( 0, 0, 6, "2DLayout");
+    
+    mitkWidget1->setMaximumSize(2000,200);
+    mitkWidget2->setMaximumSize(2000,200);
+    mitkWidget3->setMaximumSize(2000,200);    
+    
+//    layout3->addWidget( mitkWidget2, 0, 1 );
+//    layout3->addWidget( mitkWidget3, 0,2 );
+//    layout3->addWidget( mitkWidget1, 0, 0 );
+   TwoDLayout ->addWidget( mitkWidget1 );
+   TwoDLayout ->addWidget( mitkWidget2 );
+   TwoDLayout ->addWidget( mitkWidget3 );
+   
+   
+   layout3->addLayout( TwoDLayout , 0, 0 );
+   layout3->addWidget( mitkWidget4, 1, 0 );
+    
+    
+    layout4->addLayout( layout3 );
+    layout4->addWidget( levelWindowWidget );
+    QmitkStdMultiWidgetLayout->addLayout( layout4 );
+
+}
+
+    

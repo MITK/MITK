@@ -20,22 +20,32 @@ public:
     mitkClassMacro(CameraController, BaseController);
 
     /** Method for creation through the object factory. */
-    itkNewMacro(Self);
+    //itkNewMacro(Self);
+    CameraController(const char * type = NULL);
 
     //##ModelId=3E6D5DD400A3
+    //##Documentation
+    //## @brief Implemented in sub-classes.
     virtual void Resize(int w, int h);
 
     //##ModelId=3E6D5DD400C1
+    //##Documentation
+    //## @brief Implemented in sub-classes.
     virtual void MousePressEvent(mitk::MouseEvent*);
     //##ModelId=3E6D5DD400D5
+    //##Documentation
+    //## @brief Implemented in sub-classes.
     virtual void MouseReleaseEvent(mitk::MouseEvent*);
     //##ModelId=3E6D5DD400F3
+    //##Documentation
+    //## @brief Implemented in sub-classes.
     virtual void MouseMoveEvent(mitk::MouseEvent*);
     //##ModelId=3E6D5DD40107
+    //##Documentation
+    //## @brief Implemented in sub-classes.
     virtual void KeyPressEvent(mitk::KeyEvent*);
 protected:
-    //##ModelId=3E3AE7440312
-    CameraController();
+    //CameraController();
 
     //##ModelId=3E3AE75803CF
     virtual ~CameraController();

@@ -38,7 +38,7 @@ namespace mitk {
     //##ModelId=3E5B4144024F
 	//##Documentation
 	//## returns NULL if no entry with string type is found
-	  static State* GetStartState(std::string type);
+	  static State* GetStartState(const char * type);
 
     //##ModelId=3E5B41730261
 	//##Documentation

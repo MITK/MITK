@@ -23,7 +23,7 @@ public:
 
   //##Documentation
   //##@brief Constructor 
-  PointInteractor(std::string type, DataTreeNode* dataTreeNode, int id);
+  PointInteractor(const char * type, DataTreeNode* dataTreeNode, int id);
 
   //##Documentation
   //##@brief Destructor 

@@ -25,7 +25,7 @@ public:
       
   //##Documentation
   //##@brief Constructor 
-  PolygonInteractor(std::string type, DataTreeNode* dataTreeNode);
+  PolygonInteractor(const char * type, DataTreeNode* dataTreeNode);
 
   //##Documentation
   //##@brief Destructor 

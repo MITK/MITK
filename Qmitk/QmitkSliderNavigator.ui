@@ -9,12 +9,12 @@
             <x>0</x>
             <y>0</y>
             <width>140</width>
-            <height>35</height>
+            <height>38</height>
         </rect>
     </property>
     <property name="sizePolicy">
         <sizepolicy>
-            <hsizetype>3</hsizetype>
+            <hsizetype>5</hsizetype>
             <vsizetype>1</vsizetype>
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
@@ -22,7 +22,7 @@
     </property>
     <property name="minimumSize">
         <size>
-            <width>140</width>
+            <width>0</width>
             <height>20</height>
         </size>
     </property>
@@ -83,6 +83,12 @@
                             <horstretch>0</horstretch>
                             <verstretch>0</verstretch>
                         </sizepolicy>
+                    </property>
+                    <property name="minimumSize">
+                        <size>
+                            <width>50</width>
+                            <height>0</height>
+                        </size>
                     </property>
                     <property name="maxValue">
                         <number>0</number>

@@ -72,7 +72,8 @@ void mitk::PlaneGeometry::SetThicknessBySpacing(const Vector3D* spacing)
 //##ModelId=3E3B9C6E02B5
 bool mitk::PlaneGeometry::Map(const mitk::Point3D &pt3d_mm, mitk::Point2D &pt2d_mm) const
 {
-  return m_PlaneView.map(pt3d_mm, pt2d_mm);
+  m_PlaneView.map(pt3d_mm, pt2d_mm);
+  return m_PlaneView.inView(pt2d_mm);
 }
 
 //##ModelId=3E3B9C7101BF
@@ -123,7 +124,8 @@ void mitk::PlaneGeometry::TransformGeometry(const vtkTransform * transform)
 //##ModelId=3EF492640343
 bool mitk::PlaneGeometry::Map(const mitk::Point3D & atPt3d_mm, const mitk::Vector3D &vec3d_mm, mitk::Vector2D &vec2d_mm) const
 {
-  return m_PlaneView.map(vec3d_mm, vec2d_mm);
+  m_PlaneView.map(vec3d_mm, vec2d_mm);
+  return m_PlaneView.inView(vec2d_mm);
 }
 
 //##ModelId=3EF49267006C
@@ -153,7 +155,7 @@ mitk::Geometry3D::Pointer mitk::PlaneGeometry::Clone() const
   newGeometry->Initialize();
   newGeometry->SetBoundingBox(m_BoundingBox);
   newGeometry->SetTimeBoundsInMS(m_TimeBoundsInMS);  
-  newGeometry->GetTransform()->SetMatrix(m_Transform->GetMatrix());
+  newGeometry->GetVtkTransform()->SetMatrix(m_Transform->GetMatrix());
   //newGeometry->GetRelativeTransform()->SetMatrix(m_RelativeTransform->GetMatrix());
   newGeometry->SetPlaneView(m_PlaneView);
   newGeometry->SetWidthInUnits(m_WidthInUnits);

@@ -33,7 +33,7 @@ namespace mitk {
   //## 
   //## Because of the use of Smartpointers in DataTree and the use of observer-technologies, a StateMachine is a Subclass of itk::Object.
   //## default of m_UndoEnabled is true;
-  StateMachine(std::string type);
+  StateMachine(const char * type);
 
   ~StateMachine(){}
 

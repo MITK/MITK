@@ -3,10 +3,15 @@
 #include "mitkRenderWindow.h"
 #include "mitkSlicedGeometry3D.h"
 #include "mitkPlaneGeometry.h"
+#include "mitkOperation.h"
+#include "mitkOperationActor.h"
+#include "mitkPositionEvent.h"
+#include "mitkInteractionConst.h"
 #include <itkCommand.h>
 
 //##ModelId=3E189B1D008D
-mitk::SliceNavigationController::SliceNavigationController() : m_ViewDirection(Transversal), m_BlockUpdate(false), m_CreatedWorldGeometry(NULL), m_InputWorldGeometry(NULL)
+mitk::SliceNavigationController::SliceNavigationController(const char * type) 
+  : BaseController(type), m_ViewDirection(Transversal), m_BlockUpdate(false), m_CreatedWorldGeometry(NULL), m_InputWorldGeometry(NULL)
 {
   itk::SimpleMemberCommand<SliceNavigationController>::Pointer sliceStepperChangedCommand, timeStepperChangedCommand;
   sliceStepperChangedCommand = itk::SimpleMemberCommand<SliceNavigationController>::New();
@@ -134,7 +139,7 @@ void mitk::SliceNavigationController::SendCreatedWorldGeometry()
   //Send the geometry. Do this even if nothing was changed, because maybe Update() was only called to 
   //re-send the old geometry.
   if(!m_BlockUpdate)
-    InvokeEvent(GeometrySendEvent (m_CreatedWorldGeometry, 0));
+    InvokeEvent(GeometrySendEvent(m_CreatedWorldGeometry, 0));
 }
 
 //##ModelId=3DD524D7038C
@@ -145,7 +150,7 @@ void mitk::SliceNavigationController::SendSlice()
     if(m_CreatedWorldGeometry.IsNotNull())
     {
       InvokeEvent(GeometrySliceEvent(m_CreatedWorldGeometry, m_Slice->GetPos()));
-      mitk::RenderWindow::UpdateAllInstances();
+      InvokeEvent(UpdateEvent());
     }
   }
 }
@@ -157,7 +162,7 @@ void mitk::SliceNavigationController::SendTime()
     if(m_CreatedWorldGeometry.IsNotNull())
     {
       InvokeEvent(GeometryTimeEvent(m_CreatedWorldGeometry, m_Time->GetPos()));
-      mitk::RenderWindow::UpdateAllInstances();
+      InvokeEvent(UpdateEvent());
     }
   }
 }
@@ -172,4 +177,130 @@ void mitk::SliceNavigationController::SetGeometryTime(const itk::EventObject & g
 
 void mitk::SliceNavigationController::SetGeometrySlice(const itk::EventObject & geometrySliceEvent)
 {
+}
+
+bool mitk::SliceNavigationController::ExecuteSideEffect(int sideEffectId, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId)
+{
+    bool ok = false;
+    //if (m_Destination == NULL)
+    //    return false;
+	
+    const PositionEvent* posEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
+    if(posEvent!=NULL)
+    {
+      switch (sideEffectId)
+      {
+        case SeNEWPOINT:
+       // {
+			    //mitk::Point3D newPoint = posEvent->GetWorldPosition();
+       //   vm2itk(newPoint, m_OldPoint);
+
+			    //PointOperation* doOp = new mitk::PointOperation(OpADD, m_OldPoint, 0);
+			    ////Undo
+       //   if (m_UndoEnabled)
+       //   {
+				   // PointOperation* undoOp = new PointOperation(OpDELETE, m_OldPoint, 0);
+       //     OperationEvent *operationEvent = new OperationEvent(m_Destination, doOp, undoOp,
+						 //                                     					    objectEventId, groupEventId);
+       //     m_UndoController->SetOperationEvent(operationEvent);
+       //   }
+       //   //execute the Operation
+			    //m_Destination->ExecuteOperation(doOp);
+       //   ok = true;
+       //   break;
+       // }
+        case SeINITMOVEMENT:
+       // {//move the point to the coordinate //not used, cause same to MovePoint... check xml-file
+       //   mitk::ITKPoint3D movePoint;
+       //   vm2itk(posEvent->GetWorldPosition(), movePoint);
+
+       //   PointOperation* doOp = new mitk::PointOperation(OpMOVE, movePoint, 0);
+       //   //execute the Operation
+			    //m_Destination->ExecuteOperation(doOp);
+       //   ok = true;
+       //   break;
+       // }
+        case SeMOVEPOINT:
+       // {
+       //   mitk::ITKPoint3D movePoint;
+       //   vm2itk(posEvent->GetWorldPosition(), movePoint);
+
+       //   PointOperation* doOp = new mitk::PointOperation(OpMOVE, movePoint, 0);
+       //   //execute the Operation
+			    //m_Destination->ExecuteOperation(doOp);
+       //   ok = true;
+       //   break;
+       // }
+       // case SeFINISHMOVEMENT:
+        {
+       // {/*finishes a Movement from the coordinate supplier: 
+       //   gets the lastpoint from the undolist and writes an undo-operation so 
+       //   that the movement of the coordinatesupplier is undoable.*/
+       //   mitk::ITKPoint3D movePoint, oldMovePoint;
+       //   oldMovePoint.Fill(0);
+       //   vm2itk(posEvent->GetWorldPosition(), movePoint);
+       //   PointOperation* doOp = new mitk::PointOperation(OpMOVE, movePoint, 0);
+       //   if (m_UndoEnabled )
+       //   {
+       //     //get the last Position from the UndoList
+       //     OperationEvent *lastOperationEvent = m_UndoController->GetLastOfType(m_Destination, OpMOVE);
+       //     if (lastOperationEvent != NULL)
+       //     {
+       //       PointOperation* lastOp = dynamic_cast<PointOperation *>(lastOperationEvent->GetOperation());
+       //       if (lastOp != NULL)
+       //       {
+       //         oldMovePoint = lastOp->GetPoint();
+       //       }
+       //     }
+       //     PointOperation* undoOp = new PointOperation(OpMOVE, oldMovePoint, 0);
+       //     OperationEvent *operationEvent = new OperationEvent(m_Destination, doOp, undoOp,
+						 //                                                   objectEventId, groupEventId);
+       //     m_UndoController->SetOperationEvent(operationEvent);
+       //   }
+       //   //execute the Operation
+	  		  //m_Destination->ExecuteOperation(doOp);
+
+
+          mitk::Point3D point, projected_point; 
+          point = posEvent->GetWorldPosition();
+          
+          //@todo add time to PositionEvent and use here!!
+          SlicedGeometry3D* slicedWorldGeometry=dynamic_cast<SlicedGeometry3D*>(m_CreatedWorldGeometry->GetGeometry3D(0));
+          if(slicedWorldGeometry!=NULL)
+          {
+            int best_slice = -1;
+            double best_distance = itk::NumericTraits<double>::infinity();
+
+            int s, slices;
+            slices = slicedWorldGeometry->GetSlices();
+            for(s=0; s < slices; ++s)
+            {
+              slicedWorldGeometry->GetGeometry2D(s)->Project(point, projected_point);
+              Vector3D dist = projected_point-point;
+              if(dist.lengthSquared() < best_distance)
+              {
+                best_distance = dist.lengthSquared();
+                best_slice    = s;
+              }
+            }
+            if(best_slice >= 0)
+              GetSlice()->SetPos(best_slice);
+          }
+          ok = true;
+          break;
+        }
+        default:
+          ok = true;
+          break;
+        }
+       return ok;
+    }
+
+    const mitk::DisplayPositionEvent* displPosEvent = dynamic_cast<const mitk::DisplayPositionEvent *>(stateEvent->GetEvent());
+    if(displPosEvent!=NULL)
+    {
+        return true;
+    }
+
+	return false;
 }

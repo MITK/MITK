@@ -74,7 +74,7 @@ public:
   //##ModelId=3ED91D050305
   virtual void SetBoundingBox(const float bounds[6]);
   
-  vtkTransform* GetTransform();
+  vtkTransform* GetVtkTransform();
 
   itkGetConstMacro(TransformUnitsToMM, const mitk::Matrix4D &);
   

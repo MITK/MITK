@@ -3,7 +3,7 @@
 
 #include <assert.h>
 #include <mitkRenderWindow.h>
-#include <qgl.h>
+#include <mitkGL.h>
 
 class iilItem;
 

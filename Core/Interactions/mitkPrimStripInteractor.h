@@ -26,7 +26,7 @@ public:
       
   //##Documentation
   //##@brief Constructor 
-  PrimStripInteractor(std::string type, DataTreeNode* dataTreeNode);
+  PrimStripInteractor(const char * type, DataTreeNode* dataTreeNode);
 
   //##Documentation
   //##@brief Destructor 

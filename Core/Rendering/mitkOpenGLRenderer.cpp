@@ -29,7 +29,7 @@ mitk::OpenGLRenderer::OpenGLRenderer() : m_VtkMapperPresent(false),
 	m_VtkRenderer(NULL), m_MitkVtkRenderWindow(NULL), m_LastUpdateVtkActorsTime(0)
 {
   m_CameraController=NULL;
-  m_CameraController = VtkInteractorCameraController::New();
+  m_CameraController = new VtkInteractorCameraController();
   VtkInteractorCameraController* vicc=dynamic_cast<VtkInteractorCameraController*>(m_CameraController.GetPointer());
   vicc->SetRenderer(this);
 

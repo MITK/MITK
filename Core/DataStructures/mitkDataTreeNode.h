@@ -56,7 +56,7 @@ public:
   //##Documentation
   //## @brief Get the transformation applied prior to displaying the data as
   //## a vtkTransform
-  //## \deprecated use GetData()->GetGeometry()->GetTransform() instead
+  //## \deprecated use GetData()->GetGeometry()->GetVtkTransform() instead
   vtkTransform* GetVtkTransform() const;
   //##Documentation
   //## @brief Get the Interactor 

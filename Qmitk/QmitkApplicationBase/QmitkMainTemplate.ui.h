@@ -7,7 +7,6 @@
 ** place of a destructor.
 *****************************************************************************/
 
-#include "mitkGeometry2DDataVtkMapper3D.h"
 #include "QmitkSelectableGLWidget.h"
 #include "QLevelWindowWidget.h"
 #include <vtkSTLReader.h>
@@ -20,15 +19,16 @@
 #include <vtkStructuredPointsWriter.h>
 #include <map>
 #include <mitkSurfaceData.h>
+
+#include <mitkProperties.h>
+#include <mitkLookupTableProperty.h>
 #include <mitkColorProperty.h>
 #include <mitkBoolProperty.h>
-#include <mitkLookupTableProperty.h>
-#include "mitkProperties.h"
-
+#include <mitkFloatProperty.h>
 #include <mitkLevelWindowProperty.h>
+
 #include <mitkLevelWindow.h>
 #include <mitkDataTree.h>
-#include <mitkFloatProperty.h>
 #include <qregexp.h>
 #include <string>
 
@@ -67,9 +67,6 @@
 #include <mitkInteractionConst.h>
 #include <QmitkStatusBar/QmitkStatusBar.h>
 
-
-mitk::FloatProperty::Pointer opacityprop=NULL;
-
 void QmitkMainTemplate::fileNew()
 {
 
@@ -86,12 +83,12 @@ void QmitkMainTemplate::fileOpen()
   if ( !fileName.isNull() )
   {
     fileOpen(fileName.ascii());
-    mitkMultiWidget->updateMitkWidgets();
   }
 }
 
 void QmitkMainTemplate::fileOpen( const char * fileName )
 {
+  mitk::DataTreeIterator* it=NULL;
   mitk::DataTreeNode::Pointer node=NULL;
   if(strstr(fileName, ".stl")!=0)
   {
@@ -106,15 +103,11 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
       mitk::SurfaceData::Pointer surface = mitk::SurfaceData::New();
       surface->SetVtkPolyData(stlreader->GetOutput());
 
-      mitk::DataTreeIterator* it=tree->inorderIterator();
+      it=tree->inorderIterator();
 
       node=mitk::DataTreeNode::New();
       node->SetData(surface);
       it->add(node);
-
-      initWidgets(it);
-
-      delete it;
     }
   }
   else if(strstr(fileName, ".vtk")!=0)
@@ -130,15 +123,11 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
       mitk::SurfaceData::Pointer surface = mitk::SurfaceData::New();
       surface->SetVtkPolyData(reader->GetOutput());
 
-      mitk::DataTreeIterator* it=tree->inorderIterator();
+      it=tree->inorderIterator();
 
       node=mitk::DataTreeNode::New();
       node->SetData(surface);
       it->add(node);
-
-      initWidgets(it);
-
-      delete it;
     }
   }
   else if((strstr(fileName, ".pic")!=0) || (strstr(fileName, ".seq")!=0))
@@ -154,7 +143,7 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
 
       reader->SetFileName(fileName);
 
-      mitk::DataTreeIterator* it=tree->inorderIterator();
+      it=tree->inorderIterator();
 
       node=mitk::DataTreeNode::New();
       
@@ -186,7 +175,7 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
 
       mitkMultiWidget->levelWindowWidget->setLevelWindow(levelWindow);
 
-      initWidgets(it);
+      //mitkMultiWidget->initWidgets(it);
     }
   }
   else if(strstr(fileName, ".par")!=0)
@@ -198,7 +187,7 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
     std::cout << "loading " << fileName << " as par/rec ... " << std::endl;
     reader->SetFileName(fileName);
 
-    mitk::DataTreeIterator* it=tree->inorderIterator();
+    it=tree->inorderIterator();
 
     node=mitk::DataTreeNode::New();
     node->SetData(reader->GetOutput());
@@ -220,7 +209,7 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
     node->GetPropertyList()->SetProperty("levelwindow",levWinProp);
 
     mitkMultiWidget->levelWindowWidget->setLevelWindow(levelWindow);
-    initWidgets(it);
+    //mitkMultiWidget->initWidgets(it);
   }
   else if(strstr(fileName, ".pvtk")!=0)
   {
@@ -236,7 +225,7 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
 
       vtkreader->Delete();
 
-      mitk::DataTreeIterator* it=tree->inorderIterator();
+      it=tree->inorderIterator();
 
       node=mitk::DataTreeNode::New();
       node->SetData(image);
@@ -257,7 +246,7 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
       node->GetPropertyList()->SetProperty("levelwindow",levWinProp);
 
       mitkMultiWidget->levelWindowWidget->setLevelWindow(levelWindow);
-      initWidgets(it);
+      //mitkMultiWidget->initWidgets(it);
     }
   }
 #ifdef MBI_INTERNAL
@@ -267,14 +256,11 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
     std::cout << "loading " << fileName << " as ves ... " << std::endl;
     reader->SetFileName(fileName);
     reader->Update();
-    mitk::DataTreeIterator* it=tree->inorderIterator();
+    it=tree->inorderIterator();
 
     node=mitk::DataTreeNode::New();
     node->SetData(reader->GetOutput());
     it->add(node);
-
-    initWidgets(it);
-    delete it;
   }
   else if( strstr(fileName, ".uvg")!=0 )
   {
@@ -282,14 +268,11 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
     std::cout << "loading " << fileName << " as uvg ... " << std::endl;
     reader->SetFileName(fileName);
     reader->Update();
-    mitk::DataTreeIterator* it=tree->inorderIterator();
+    it=tree->inorderIterator();
 
     node=mitk::DataTreeNode::New();
     node->SetData(reader->GetOutput());
     it->add(node);
-
-    initWidgets(it);
-    delete it;
   }
   else if(strstr(fileName, "DCM")!=0 || strstr(fileName, "dcm")!=0)
   {
@@ -300,7 +283,7 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
 
     reader->SetFileName(fileName);
 
-    mitk::DataTreeIterator* it=tree->inorderIterator();
+    it=tree->inorderIterator();
 
     node=mitk::DataTreeNode::New();
     node->SetData(reader->GetOutput());
@@ -314,10 +297,6 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
     levelWindow.SetAuto( reader->GetOutput()->GetPic() );
     node->SetLevelWindow(levelWindow, NULL);
     mitkMultiWidget->levelWindowWidget->setLevelWindow(levelWindow);
-
-    initWidgets(it);
-
-    delete it;
   }
   else if(itksys::SystemTools::Strucmp(itksys::SystemTools::GetFilenameName(fileName).c_str(), "HPSONOS.DB")==0)
   {
@@ -366,7 +345,7 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
     cyl2cart->SetTargetXSize(128);
     cyl2cartDoppler->SetTargetXSize(128); 
 
-    mitk::DataTreeIterator* it=tree->inorderIterator();
+    it=tree->inorderIterator();
 
     //
     // switch to Backscatter information
@@ -495,10 +474,6 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
     }
 
     mitkMultiWidget->levelWindowWidget->setLevelWindow(levelWindow);
-
-    initWidgets(it);
-
-    delete it;
   }
 #else
   if(strstr(fileName, "DCM")!=0 || strstr(fileName, "dcm")!=0)
@@ -554,7 +529,7 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
       std::cout << ex << std::endl;
       return;
     }
-    mitk::DataTreeIterator* it=tree->inorderIterator();
+    it=tree->inorderIterator();
 
     CommonFunctionality::AddItkImageToDataTree<ImageType>(reader->GetOutput(),it,fileName);
 
@@ -566,16 +541,21 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
     //reader->Update();
     //node->SetLevelWindow(levelWindow, NULL);
     //mitkMultiWidget->levelWindowWidget->setLevelWindow(levelWindow);
-
-    initWidgets(it);
-
-    delete it;
   }
 #endif
+  if(it!=NULL)
+  {
+    mitkMultiWidget->texturizePlaneSubTree(it);
+    mitkMultiWidget->updateMitkWidgets();
+    mitkMultiWidget->fit();
+    delete it;
+  }
 }
 
 void QmitkMainTemplate::fileOpenImageSequence()
 {
+  mitk::DataTreeIterator* it=NULL;
+
   QString fileName = QFileDialog::getOpenFileName(NULL,"DKFZ Pic (*.seq *.pic *.pic.gz *.seq.gz);;stl files (*.stl)");
 
   if ( !fileName.isNull() )
@@ -611,57 +591,15 @@ void QmitkMainTemplate::fileOpenImageSequence()
     node=mitk::DataTreeNode::New();
     node->SetData(reader->GetOutput());
     it->add(node);
+  }
 
-    initWidgets(it);
-
+  if(it!=NULL)
+  {
+    mitkMultiWidget->texturizePlaneSubTree(it);
     mitkMultiWidget->updateMitkWidgets();
-
+    mitkMultiWidget->fit();
     delete it;
   }
-}
-
-void QmitkMainTemplate::initWidget(mitk::DataTreeIterator* it,
-                                   QmitkSelectableGLWidget* widget,
-                                   const Vector3f& normal, const Vector3f& right )
-{
-
-  mitk::PlaneGeometry::Pointer plane = mitk::PlaneGeometry::New();
-
-  //ohne den Pointer-Umweg meckert gcc
-  mitk::PlaneView* view = new mitk::PlaneView(Plane<float>(Vector3f(0,0,0),normal), right   );
-  plane->SetPlaneView(*view);
-  delete view;
-
-  widget->GetRenderer()->SetData(it);
-  widget->GetRenderer()->SetWorldGeometry(plane);
-  widget->GetRenderer()->GetDisplayGeometry()->Fit();
-
-  //mitk::DataTreeNode::Pointer node=mitk::DataTreeNode::New();
-  //node->SetData(widget->GetRenderer()->GetWorldGeometry2DData());
-  //it->add(node);
-
-  widget->update();
-}
-
-void QmitkMainTemplate::initWidget(mitk::DataTreeIterator* it,
-                                   QmitkSelectableGLWidget* widget,
-                                   const Vector3f& origin,
-                                   const Vector3f& right,
-                                   const Vector3f& bottom)
-{
-
-  mitk::PlaneGeometry::Pointer plane = mitk::PlaneGeometry::New();
-
-  //ohne den Pointer-Umweg meckert gcc
-  mitk::PlaneView* view = new mitk::PlaneView(origin,right,bottom);
-  plane->SetPlaneView(*view);
-  delete view;
-
-  widget->GetRenderer()->SetData(it);
-  widget->GetRenderer()->SetWorldGeometry(plane);
-  widget->GetRenderer()->GetDisplayGeometry()->Fit();
-
-  widget->update();
 }
 
 void QmitkMainTemplate::fileSave()
@@ -862,35 +800,12 @@ void QmitkMainTemplate::initialize()
     mitkMultiWidget = new QmitkStdMultiWidget(defaultMain, "QmitkMainTemplate::QmitkStdMultiWidget");
     layoutdraw->addWidget(mitkMultiWidget);
 
-
     // add the diplayed planes of the multiwidget to a node to which the subtree @a planesSubTree points ...
+    
     mitk::DataTreeIterator* it=tree->inorderIterator();
-    mitk::DataTreeNode::Pointer node=mitk::DataTreeNode::New();
-    it->add(node);
-    it->next();
-    it->next();
-    planesSubTree=dynamic_cast<mitk::DataTreeBase*>(it->getSubTree());
-
-    float white[3] = {1.0f,1.0f,1.0f};
-    mitk::DataTreeNode::Pointer planeNode;
-    // ... of widget 1
-    planeNode=mitkMultiWidget->mitkWidget1->GetRenderer()->GetCurrentWorldGeometry2DNode();
-    planeNode->SetColor(white, mitkMultiWidget->mitkWidget4->GetRenderer());
-    planeNode->SetProperty("fileName", new mitk::StringProperty("widget1Plane"));
-    planeNode->SetProperty("includeInBoundingBox", new mitk::BoolProperty(false));
-    it->add(planeNode);
-    // ... of widget 2
-    planeNode=mitkMultiWidget->mitkWidget2->GetRenderer()->GetCurrentWorldGeometry2DNode();
-    planeNode->SetColor(white, mitkMultiWidget->mitkWidget4->GetRenderer());
-    planeNode->SetProperty("fileName", new mitk::StringProperty("widget2Plane"));
-    planeNode->SetProperty("includeInBoundingBox", new mitk::BoolProperty(false));
-    it->add(planeNode);
-    // ... of widget 3
-    planeNode=mitkMultiWidget->mitkWidget3->GetRenderer()->GetCurrentWorldGeometry2DNode();
-    planeNode->SetColor(white, mitkMultiWidget->mitkWidget4->GetRenderer());
-    planeNode->SetProperty("fileName", new mitk::StringProperty("widget3Plane"));
-    planeNode->SetProperty("includeInBoundingBox", new mitk::BoolProperty(false));
-    it->add(planeNode);
+    mitkMultiWidget->addPlaneSubTree(it);
+    mitkMultiWidget->setData(it);
+    delete it;
 
     connect(mitkMultiWidget->levelWindowWidget,SIGNAL(levelWindow(mitk::LevelWindow*)),this,SLOT(changeLevelWindow(mitk::LevelWindow*)) );
   }
@@ -936,61 +851,6 @@ void QmitkMainTemplate::initializeQfm()
 //     return tree;
 //}
 
-
-void QmitkMainTemplate::initWidgets( mitk::DataTreeIterator * it )
-{
-
-  mitk::DataTreeIterator *git = planesSubTree->inorderIterator();
-  while(git->hasNext())
-  {
-    git->next();
-    if(dynamic_cast<mitk::Geometry2DData*>(git->get()->GetData())!=NULL)
-    {
-      mitk::Geometry2DDataVtkMapper3D::Pointer geometryMapper;
-      if(git->get()->GetMapper(2)==NULL)
-      {
-        geometryMapper = mitk::Geometry2DDataVtkMapper3D::New();
-        it->get()->SetMapper(2, geometryMapper);
-      }
-      else
-        geometryMapper = dynamic_cast<mitk::Geometry2DDataVtkMapper3D*>(git->get()->GetMapper(2));
-      if(geometryMapper.IsNotNull())
-        geometryMapper->SetDataIteratorForTexture(it);
-    }
-  }
-
-  const mitk::BoundingBox::BoundsArrayType bounds = mitk::DataTree::ComputeBoundingBox(it)->GetBounds();
-  printf("\nboundingbox\n");
-
-  /*            initWidget(it,
-  mitkMultiWidget->mitkWidget1,
-  Vector3f(bounds[0],bounds[2],bounds[4]),
-  Vector3f(bounds[1],bounds[2],bounds[4]),
-  Vector3f(bounds[0],bounds[3],bounds[4])
-  );*/
-  initWidget(it,
-    mitkMultiWidget->mitkWidget1,
-    Vector3f(bounds[0],bounds[3],bounds[5]),
-    Vector3f(bounds[1],bounds[3],bounds[5]),
-    Vector3f(bounds[0],bounds[2],bounds[5])
-    );
-  printf("\nw1 init\n");
-
-  // YZ
-  initWidget(it,mitkMultiWidget->mitkWidget2,
-    Vector3f(bounds[0],bounds[2],bounds[4]),
-    Vector3f(bounds[0],bounds[3],bounds[4]),
-    Vector3f(bounds[0],bounds[2],bounds[5])
-    );
-  // XZ
-  initWidget(it,
-    mitkMultiWidget->mitkWidget3,
-    Vector3f(bounds[0],bounds[2],bounds[4]),
-    Vector3f(bounds[1],bounds[2],bounds[4]),
-    Vector3f(bounds[0],bounds[2],bounds[5])
-    );
-  mitkMultiWidget->mitkWidget4->GetRenderer()->SetData(it);
-}
 
 
 

@@ -1,7 +1,7 @@
 #include "mitkInteractor.h"
 #include <mitkDataTreeNode.h>
 
-mitk::Interactor::Interactor(std::string type, DataTreeNode* dataTreeNode)
+mitk::Interactor::Interactor(const char * type, DataTreeNode* dataTreeNode)
 : mitk::StateMachine(type), m_DataTreeNode(dataTreeNode)
 {
   if (m_DataTreeNode != NULL)

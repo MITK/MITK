@@ -1,4 +1,4 @@
-<!DOCTYPE UI><UI version="3.1" stdsetdef="1">
+<!DOCTYPE UI><UI version="3.2" stdsetdef="1">
 <class>QmitkMainTemplate</class>
 <widget class="QMainWindow">
     <property name="name">
@@ -8,8 +8,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>739</width>
-            <height>904</height>
+            <width>752</width>
+            <height>920</height>
         </rect>
     </property>
     <property name="caption">
@@ -668,15 +668,12 @@
     <variable>mitk::DataTree::Pointer tree;</variable>
     <variable>QmitkStdMultiWidget* mitkMultiWidget;</variable>
     <variable>QmitkFctMediator* qfm;</variable>
-    <variable>mitk::DataTreeBase* planesSubTree;</variable>
     <variable>mitk::UndoController* undoController;</variable>
 </variables>
 <slots>
     <slot>fileNew()</slot>
     <slot>fileOpen()</slot>
     <slot>fileOpenImageSequence()</slot>
-    <slot>initWidget( mitk::DataTreeIterator * it, QmitkSelectableGLWidget * widget, const Vector3f &amp; normal, const Vector3f &amp; right )</slot>
-    <slot>initWidget( mitk::DataTreeIterator * it, QmitkSelectableGLWidget * widget, const Vector3f &amp; origin, const Vector3f &amp; right, const Vector3f &amp; bottom )</slot>
     <slot>fileSave()</slot>
     <slot>fileSaveAs()</slot>
     <slot>filePrint()</slot>
@@ -690,7 +687,6 @@
     <slot>helpIndex()</slot>
     <slot>helpContents()</slot>
     <slot>helpAbout()</slot>
-    <slot>initWidgets( mitk::DataTreeIterator * it )</slot>
     <slot>changeLevelWindow( mitk::LevelWindow * lw )</slot>
     <slot>changeTo2DImagesUpLayout()</slot>
     <slot>changeTo2DImagesLeftLayout()</slot>

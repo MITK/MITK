@@ -31,7 +31,7 @@ class GlobalInteraction : public StateMachine
   typedef std::vector<StateMachine*>::iterator StateMachineListIter;
 
   //##ModelId=3EAD420E0088
-  GlobalInteraction(std::string type);
+  GlobalInteraction(const char * type);
 
 
   //##ModelId=3EF099E90065

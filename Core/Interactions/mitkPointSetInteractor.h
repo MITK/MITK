@@ -24,7 +24,7 @@ class PointSetInteractor : public Interactor
     //##@brief Constructor with Param n for limited Set of Points
     //##
     //## if no n is set, then the number of points is unlimited*
-    PointSetInteractor(std::string type, DataTreeNode* dataTreeNode, int n = -1);
+    PointSetInteractor(const char * type, DataTreeNode* dataTreeNode, int n = -1);
 
     //##ModelId=3F017B320103
   	virtual ~PointSetInteractor();

@@ -69,7 +69,8 @@ class SliceNavigationController : public BaseController
 {
 public:
   mitkClassMacro(SliceNavigationController,BaseController);
-  itkNewMacro(Self);
+  //itkNewMacro(Self);
+  SliceNavigationController(const char * type = NULL);
 
   enum ViewDirection{Transversal, Sagittal, Frontal, Original};
 
@@ -88,6 +89,8 @@ public:
   virtual void SendSlice();
 
   virtual void SendTime();
+
+  itkEventMacro( UpdateEvent      , itk::AnyEvent );
 
   class TimeSlicedGeometryEvent : public itk::AnyEvent 
   { 
@@ -160,6 +163,32 @@ public:
     ConnectGeometryTimeEvent(receiver);
   }
 
+  template <typename T> void ConnectUpdateRequest(T* receiver)
+  {
+    typedef typename itk::SimpleMemberCommand<T>::Pointer SimpleMemberCommandPointer;
+    SimpleMemberCommandPointer eventSimpleCommand = itk::SimpleMemberCommand<T>::New();
+  #ifdef WIN32
+    eventSimpleCommand->SetCallbackFunction(receiver, T::UpdateRequest);
+  #else
+    eventSimpleCommand->SetCallbackFunction(receiver, &T::UpdateRequest);
+  #endif
+    AddObserver(UpdateEvent(), eventSimpleCommand);
+    receiver->AddStateMachine(this);
+  }
+
+  template <typename T> void ConnectRepaintRequest(T* receiver)
+  {
+    typedef typename itk::SimpleMemberCommand<T>::Pointer SimpleMemberCommandPointer;
+    SimpleMemberCommandPointer eventSimpleCommand = itk::SimpleMemberCommand<T>::New();
+  #ifdef WIN32
+    eventSimpleCommand->SetCallbackFunction(receiver, T::RepaintRequest);
+  #else
+    eventSimpleCommand->SetCallbackFunction(receiver, &T::RepaintRequest);
+  #endif
+    AddObserver(UpdateEvent(), eventSimpleCommand);
+    receiver->AddStateMachine(this);
+  }
+
   virtual void SetGeometry(const itk::EventObject & geometrySliceEvent);
 
   virtual void SetGeometrySlice(const itk::EventObject & geometrySliceEvent);
@@ -167,11 +196,12 @@ public:
   virtual void SetGeometryTime(const itk::EventObject & geometryTimeEvent);
 
 protected:
-  //##ModelId=3E189B1D008D
-  SliceNavigationController();
+  //SliceNavigationController();
 
   //##ModelId=3E189B1D00BF
   virtual ~SliceNavigationController();
+
+	virtual bool ExecuteSideEffect(int sideEffectId, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId);
 
   mitk::Geometry3D::ConstPointer m_InputWorldGeometry;
 

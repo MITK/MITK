@@ -3,6 +3,7 @@
 
 #include "mitkCommon.h"
 #include "mitkStepper.h"
+#include "mitkStateMachine.h"
 #include <itkObjectFactory.h>
 
 namespace mitk {
@@ -20,15 +21,16 @@ class BaseRenderer;
 //## creation of a movie around the data), respectively, and through time, if
 //## there is 3D+t data.
 //## @note not yet implemented
-class BaseController : public itk::Object
+class BaseController : public StateMachine
 {
 public:
   /** Standard class typedefs. */
   //##ModelId=3E6D5DD301B0
-  mitkClassMacro(BaseController, itk::Object);
+  mitkClassMacro(BaseController, StateMachine);
 
   /** Method for creation through the object factory. */
-  itkNewMacro(Self);
+  //itkNewMacro(Self);
+  BaseController(const char * type = NULL);
 
   //##ModelId=3DF8F5CA03D8
   //##Documentation
@@ -41,8 +43,7 @@ public:
   mitk::Stepper* GetTime();
 
 protected:
-  //##ModelId=3E3AE32B0048
-  BaseController();
+  //BaseController();
 
   //##ModelId=3E3AE32B0070
   virtual ~BaseController();

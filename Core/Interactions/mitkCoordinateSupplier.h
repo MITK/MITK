@@ -26,7 +26,7 @@ public:
     //## @brief Constructor with needed arguments
     //## @params: type: string, that describes the StateMachine-Scheme to take from all SM (see XML-File)
     //##    operationActor: the Data, operations (+ points) are send to
-	CoordinateSupplier(std::string type, OperationActor* operationActor);
+	CoordinateSupplier(const char * type, OperationActor* operationActor);
 
 protected:
     //##ModelId=3F0189F00269

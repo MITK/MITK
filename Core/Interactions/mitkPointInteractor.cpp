@@ -7,7 +7,7 @@
 #include <mitkPointSet.h>
 #include <mitkInteractionConst.h>
 
-mitk::PointInteractor::PointInteractor(std::string type, DataTreeNode* dataTreeNode, int id)
+mitk::PointInteractor::PointInteractor(const char * type, DataTreeNode* dataTreeNode, int id)
 : Interactor(type, dataTreeNode), m_Id(id)
 {
   m_Data = dynamic_cast<mitk::PointSet*>(dataTreeNode->GetData());

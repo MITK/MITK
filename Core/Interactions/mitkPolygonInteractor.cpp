@@ -2,7 +2,7 @@
 #include "mitkStatusBar.h"
 #include <mitkInteractionConst.h>
 
-mitk::PolygonInteractor::PolygonInteractor(std::string type, DataTreeNode* dataTreeNode)
+mitk::PolygonInteractor::PolygonInteractor(const char * type, DataTreeNode* dataTreeNode)
 : Interactor(type, dataTreeNode)
 {
   m_PrimStrip = new PrimStripInteractor("primstrip", dataTreeNode);

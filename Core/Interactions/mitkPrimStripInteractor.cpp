@@ -2,7 +2,7 @@
 #include "mitkStatusBar.h"
 #include <mitkInteractionConst.h>
 
-mitk::PrimStripInteractor::PrimStripInteractor(std::string type, DataTreeNode* dataTreeNode)
+mitk::PrimStripInteractor::PrimStripInteractor(const char * type, DataTreeNode* dataTreeNode)
 : Interactor(type, dataTreeNode)
 {
 }

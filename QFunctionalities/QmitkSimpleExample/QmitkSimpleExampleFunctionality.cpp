@@ -1,52 +1,37 @@
 #include "QmitkSimpleExampleFunctionality.h"
-#include "QmitkStdMultiWidget.h"
-#include "QmitkSelectableGLWidget.h"
-
 #include "QmitkSimpleExampleControls.h"
 
 #include <qaction.h>
-#include <qslider.h>
-
 #include "slicer.xpm"
 
-#include "mitkPlaneGeometry.h"
-#include <mitkSurfaceData.h>
-#include <mitkColorProperty.h>
-#include <mitkLookupTable.h>
-
+// for slice-navigation
 #include <mitkEventMapper.h>
 #include <mitkGlobalInteraction.h>
-#include <mitkCoordinateSupplier.h>
-#include <mitkPointOperation.h>
-#include <mitkDisplayCoordinateOperation.h>
-#include <mitkDisplayVectorInteractor.h>
 #include <mitkBaseRenderer.h>
-#include <mitkInteractionConst.h>
+#include "QmitkRenderWindow.h"
+#include "QmitkSelectableGLWidget.h"
+#include "QmitkStdMultiWidget.h"
+#include <QmitkStepperAdapter.h>
+
+// for stereo setting
 #include <mitkOpenGLRenderer.h>
 #include <mitkVtkRenderWindow.h>
 #include <vtkRenderWindow.h>
 #include <mitkVesselGraphInteractor.h>
 
-#include <QmitkStepperAdapter.h>
-
-#include <algorithm>
-
-#if (defined(_MSC_VER) && (_MSC_VER <= 1200))
-  #include <xutility>
-#else
-  #define _MAX	max
-  #define _MIN	min
-#endif
+// for zoom/pan
+#include <mitkDisplayCoordinateOperation.h>
+#include <mitkDisplayVectorInteractor.h>
+#include <mitkInteractionConst.h>
 
 QmitkSimpleExampleFunctionality::QmitkSimpleExampleFunctionality(QObject *parent, const char *name, QmitkStdMultiWidget *mitkStdMultiWidget, mitk::DataTreeIterator * it) : QmitkFunctionality(parent, name, it) ,
-controls(NULL), multiWidget(mitkStdMultiWidget), opacityprop(NULL), lookupTableProp(NULL)
+controls(NULL), multiWidget(mitkStdMultiWidget)
 {
     setAvailability(true);
 
     mitk::GlobalInteraction* globalInteraction = dynamic_cast<mitk::GlobalInteraction*>(mitk::EventMapper::GetGlobalStateMachine());
     if(globalInteraction!=NULL)
     {
-	    globalInteraction->AddStateMachine(new mitk::CoordinateSupplier("navigation", this));//sends PointOperations
 	    globalInteraction->AddStateMachine(new mitk::DisplayVectorInteractor("move", this));//sends DisplayCoordinateOperation
 	    globalInteraction->AddStateMachine(new mitk::DisplayVectorInteractor("zoom", this));//sends DisplayCoordinateOperation
         globalInteraction->AddStateMachine(new mitk::DisplayVectorInteractor("picking", new mitk::VesselGraphInteractor( it ) ) ); //allows picking of vessels
@@ -80,45 +65,49 @@ QWidget * QmitkSimpleExampleFunctionality::createControlWidget(QWidget *parent)
     {
         controls = new QmitkSimpleExampleControls(parent);
 
-        sliceNavigatorTransversal = mitk::SliceNavigationController::New();
+        multiplexUpdateController = new mitk::MultiplexUpdateController("navigation");
+        multiplexUpdateController->AddRenderWindow(multiWidget->mitkWidget1->GetRenderer()->GetRenderWindow());
+        multiplexUpdateController->AddRenderWindow(multiWidget->mitkWidget2->GetRenderer()->GetRenderWindow());
+        multiplexUpdateController->AddRenderWindow(multiWidget->mitkWidget3->GetRenderer()->GetRenderWindow());
+        multiplexUpdateController->AddRenderWindow(multiWidget->mitkWidget4->GetRenderer()->GetRenderWindow());
+
+        sliceNavigatorTransversal = new mitk::SliceNavigationController("navigation");
         sliceNavigatorTransversal->SetViewDirection(mitk::SliceNavigationController::Transversal);
         sliceNavigatorTransversal->ConnectGeometrySliceEvent(multiWidget->mitkWidget1->GetRenderer().GetPointer());
+        sliceNavigatorTransversal->ConnectRepaintRequest(multiplexUpdateController.GetPointer());
         new QmitkStepperAdapter(controls->getSliceNavigatorTransversal(), sliceNavigatorTransversal->GetSlice(), "sliceNavigatorTransversalFromSimpleExample");
 
-        sliceNavigatorSagittal = mitk::SliceNavigationController::New();
+        sliceNavigatorSagittal = new mitk::SliceNavigationController("navigation");
         sliceNavigatorSagittal->SetViewDirection(mitk::SliceNavigationController::Sagittal);
         sliceNavigatorSagittal->ConnectGeometrySliceEvent(multiWidget->mitkWidget2->GetRenderer().GetPointer());
+        sliceNavigatorSagittal->ConnectRepaintRequest(multiplexUpdateController.GetPointer());
         new QmitkStepperAdapter(controls->getSliceNavigatorSagittal(), sliceNavigatorSagittal->GetSlice(), "sliceNavigatorSagittalFromSimpleExample");
 
-        sliceNavigatorFrontal = mitk::SliceNavigationController::New();
+        sliceNavigatorFrontal = new mitk::SliceNavigationController("navigation");
         sliceNavigatorFrontal->SetViewDirection(mitk::SliceNavigationController::Frontal);
         sliceNavigatorFrontal->ConnectGeometrySliceEvent(multiWidget->mitkWidget3->GetRenderer().GetPointer());
+        sliceNavigatorFrontal->ConnectRepaintRequest(multiplexUpdateController.GetPointer());
         new QmitkStepperAdapter(controls->getSliceNavigatorFrontal(), sliceNavigatorFrontal->GetSlice(), "sliceNavigatorFrontalFromSimpleExample");
 
-        sliceNavigatorTime = mitk::SliceNavigationController::New();
+        sliceNavigatorTime = new mitk::SliceNavigationController(NULL);
         sliceNavigatorTime->ConnectGeometryTimeEvent(multiWidget->mitkWidget1->GetRenderer().GetPointer(), false);
         sliceNavigatorTime->ConnectGeometryTimeEvent(multiWidget->mitkWidget2->GetRenderer().GetPointer(), false);
         sliceNavigatorTime->ConnectGeometryTimeEvent(multiWidget->mitkWidget3->GetRenderer().GetPointer(), false);
         sliceNavigatorTime->ConnectGeometryTimeEvent(multiWidget->mitkWidget4->GetRenderer().GetPointer(), false);
+        sliceNavigatorTime->ConnectRepaintRequest(multiplexUpdateController.GetPointer());
         new QmitkStepperAdapter(controls->getSliceNavigatorTime(), sliceNavigatorTime->GetTime(), "sliceNavigatorTimeFromSimpleExample");
 
-        typedef itk::ReceptorMemberCommand<QmitkSimpleExampleFunctionality>::Pointer ReceptorMemberCommandPointer;
-        ReceptorMemberCommandPointer eventReceptorCommand = itk::ReceptorMemberCommand<QmitkSimpleExampleFunctionality>::New();
-        eventReceptorCommand->SetCallbackFunction(this, &QmitkSimpleExampleFunctionality::SliderNavigatorEvent);
-        sliceNavigatorTransversal->AddObserver(mitk::SliceNavigationController::GeometrySliceEvent(NULL,0), eventReceptorCommand);
-        sliceNavigatorSagittal->AddObserver(mitk::SliceNavigationController::GeometrySliceEvent(NULL,0), eventReceptorCommand);
-        sliceNavigatorFrontal->AddObserver(mitk::SliceNavigationController::GeometrySliceEvent(NULL,0), eventReceptorCommand);
-        sliceNavigatorTime->AddObserver(mitk::SliceNavigationController::GeometryTimeEvent(NULL,0), eventReceptorCommand);
+        mitk::GlobalInteraction* globalInteraction = dynamic_cast<mitk::GlobalInteraction*>(mitk::EventMapper::GetGlobalStateMachine());
+        if(globalInteraction!=NULL)
+        {
+    	    globalInteraction->AddStateMachine(multiplexUpdateController);
+        }
     }
     return controls;
 }
 
 void QmitkSimpleExampleFunctionality::createConnections()
 {
-    connect(controls, SIGNAL(xySliderChanged(int)), this, SLOT(selectSliceWidgetXY(int)) );
-    connect(controls, SIGNAL(yzSliderChanged(int)), this, SLOT(selectSliceWidgetYZ(int)) );
-    connect(controls, SIGNAL(xzSliderChanged(int)), this, SLOT(selectSliceWidgetXZ(int)) );
-    connect(controls, SIGNAL(fpSliderChanged(int)), this, SLOT(selectSliceWidgetFP(int)) );
     connect(controls->getStereoSelect(), SIGNAL(activated(int)), this, SLOT(stereoSelectionChanged(int)) );
 }
 
@@ -129,6 +118,7 @@ QAction * QmitkSimpleExampleFunctionality::createAction(QActionGroup *parent)
     //    action = new QAction( tr( "Left" ), QPixmap(textleft_xpm), tr( "&Left" ), CTRL + Key_L, parent, "simple example" );
     return action;
 }
+
 void QmitkSimpleExampleFunctionality::initNavigators()
 {
   const mitk::BoundingBox::Pointer boundingbox = mitk::DataTree::ComputeVisibleBoundingBox(m_DataTreeIterator, NULL, "includeInBoundingBox");
@@ -158,104 +148,41 @@ void QmitkSimpleExampleFunctionality::initNavigators()
       geometry=timegeometry;
     }
 
-    sliceNavigatorTransversal->SetInputWorldGeometry(geometry.GetPointer()); sliceNavigatorTransversal->Update();
-    sliceNavigatorSagittal->SetInputWorldGeometry(geometry.GetPointer());    sliceNavigatorSagittal->Update();
-    sliceNavigatorFrontal->SetInputWorldGeometry(geometry.GetPointer());     sliceNavigatorFrontal->Update();
-    sliceNavigatorTime->SetInputWorldGeometry(geometry.GetPointer());        sliceNavigatorTime->Update();
+    multiplexUpdateController->SetBlockUpdate(true);
+      sliceNavigatorTransversal->SetInputWorldGeometry(geometry.GetPointer()); sliceNavigatorTransversal->Update();
+      sliceNavigatorSagittal->SetInputWorldGeometry(geometry.GetPointer());    sliceNavigatorSagittal->Update();
+      sliceNavigatorFrontal->SetInputWorldGeometry(geometry.GetPointer());     sliceNavigatorFrontal->Update();
+      sliceNavigatorTime->SetInputWorldGeometry(geometry.GetPointer());        sliceNavigatorTime->Update();
+    multiplexUpdateController->SetBlockUpdate(false);
+    multiplexUpdateController->UpdateRequest();
   }
-}
-
-void QmitkSimpleExampleFunctionality::SliderNavigatorEvent(const itk::EventObject & geometryTimeEvent)
-{
-  if((dynamic_cast<const mitk::TimeSlicedGeometry*>(multiWidget->mitkWidget1->GetRenderer()->GetWorldGeometry())==NULL) &&
-    (dynamic_cast<const mitk::TimeSlicedGeometry*>(sliceNavigatorTransversal->GetCreatedWorldGeometry())!=NULL))
-    sliceNavigatorTransversal->SendCreatedWorldGeometry();
-  if((dynamic_cast<const mitk::TimeSlicedGeometry*>(multiWidget->mitkWidget2->GetRenderer()->GetWorldGeometry())==NULL) &&
-    (dynamic_cast<const mitk::TimeSlicedGeometry*>(sliceNavigatorSagittal->GetCreatedWorldGeometry())!=NULL))
-    sliceNavigatorSagittal->SendCreatedWorldGeometry();
-  if((dynamic_cast<const mitk::TimeSlicedGeometry*>(multiWidget->mitkWidget3->GetRenderer()->GetWorldGeometry())==NULL) &&
-    (dynamic_cast<const mitk::TimeSlicedGeometry*>(sliceNavigatorFrontal->GetCreatedWorldGeometry())!=NULL))
-    sliceNavigatorFrontal->SendCreatedWorldGeometry();
-  sliceNavigatorTime->SendCreatedWorldGeometry();
 }
 
 void QmitkSimpleExampleFunctionality::treeChanged(mitk::DataTreeIterator& itpos)
 {
-  if(isActivated())
-    initNavigators();
+  initNavigators();
 }
 
 void QmitkSimpleExampleFunctionality::activated()
 {
   QmitkFunctionality::activated();
-    assert( multiWidget != NULL );
-    // init widget 4 as a 3D widget
-    multiWidget->mitkWidget4->GetRenderer()->SetMapperID(2);
+  assert( multiWidget != NULL );
+  // init widget 4 as a 3D widget
+  multiWidget->mitkWidget4->GetRenderer()->SetMapperID(2);
 
-    initNavigators();
+  multiplexUpdateController->SetBlockUpdate(true);
+    sliceNavigatorTransversal->Update();
+    sliceNavigatorSagittal->Update();
+    sliceNavigatorFrontal->Update();
+    sliceNavigatorTime->Update();
+  multiplexUpdateController->SetBlockUpdate(false);
+  multiplexUpdateController->UpdateRequest();
 }
 
 //void QmitkSimpleExampleFunctionality::deactivated()
 //{
 //
 //}
-
-void QmitkSimpleExampleFunctionality::selectSliceWidgetXY( int z )
-{
-    const mitk::Geometry2D* g2d = multiWidget->mitkWidget1->GetRenderer()->GetCurrentWorldGeometry2D();
-    const mitk::PlaneGeometry* pg = dynamic_cast<const mitk::PlaneGeometry*>(g2d);
-    mitk::PlaneView pv = pg->GetPlaneView();
-    pv.point.z = z;
-    mitk::PlaneGeometry::Pointer plane = mitk::PlaneGeometry::New();  
-    plane->SetPlaneView(pv);
-    multiWidget->mitkWidget1->GetRenderer()->SetWorldGeometry(plane);
-    multiWidget->updateMitkWidgets();
-    //std::cout << "Slider:" << z << std::endl;
-}
-
-void QmitkSimpleExampleFunctionality::selectSliceWidgetXZ(int y)
-{
-    const mitk::Geometry2D* g2d = multiWidget->mitkWidget3->GetRenderer()->GetCurrentWorldGeometry2D();
-    const mitk::PlaneGeometry* pg = dynamic_cast<const mitk::PlaneGeometry*>(g2d);
-    mitk::PlaneView pv = pg->GetPlaneView();
-    pv.point.y=y;
-    mitk::PlaneGeometry::Pointer plane = mitk::PlaneGeometry::New();  
-    plane->SetPlaneView(pv);
-    multiWidget->mitkWidget3->GetRenderer()->SetWorldGeometry(plane);
-    multiWidget->updateMitkWidgets();
-    //std::cout << "Slider:" << y << std::endl;
-}
-
-void QmitkSimpleExampleFunctionality::selectSliceWidgetYZ(int x)
-{
-    const mitk::Geometry2D* g2d = multiWidget->mitkWidget2->GetRenderer()->GetCurrentWorldGeometry2D();
-    const mitk::PlaneGeometry* pg = dynamic_cast<const mitk::PlaneGeometry*>(g2d);
-    mitk::PlaneView pv = pg->GetPlaneView();
-    pv.point.x = x;
-    mitk::PlaneGeometry::Pointer plane = mitk::PlaneGeometry::New();  
-    plane->SetPlaneView(pv);
-    multiWidget->mitkWidget2->GetRenderer()->SetWorldGeometry(plane);
-    multiWidget->updateMitkWidgets();
-    //std::cout << "Slider:" << x << std::endl;
-}
-
-void QmitkSimpleExampleFunctionality::selectSliceWidgetFP( int p )
-{
-  bool update=false;
-  if( opacityprop.IsNotNull() ) 
-  {
-		opacityprop->SetValue(p/100.0);
-    update = true;
-	}
-  if(lookupTableProp.IsNotNull())
-  {
-		lookupTableProp->GetLookupTable().ChangeOpacityForAll(p/100.0);
-    update = true;
-	}
-
-  if(update)
-    multiWidget->updateMitkWidgets();
-}
 
 void QmitkSimpleExampleFunctionality::stereoSelectionChanged( int id )
 {
@@ -275,119 +202,11 @@ void QmitkSimpleExampleFunctionality::stereoSelectionChanged( int id )
   multiWidget->mitkWidget4->GetRenderer()->GetRenderWindow()->Repaint();
 }
 
-void QmitkSimpleExampleFunctionality::initWidgets()
-{
-	int count = 0;
-	mitk::DataTreeIterator* it=m_DataTreeIterator->clone();
-	while (it->hasNext()) {
-		it->next();
-		mitk::DataTreeNode::Pointer node = it->get();
-		mitk::BaseData::Pointer data=node->GetData();
-    if((data.IsNotNull()) && (dynamic_cast<mitk::Geometry2DData*>(node->GetData()) == NULL ))
-		{
-			// get 
-			if ((data->GetUpdatedGeometry())!=NULL ) 
-			{
-				mitk::BoundingBox::ConstPointer bb = data->GetGeometry()->GetBoundingBox();
-				printf("boundsArrayType\n");
-				const mitk::BoundingBox::BoundsArrayType bounds = bb->GetBounds();
-				printf("\nboundingbox\n");
-
-				// init slider limits
-				controls->sliderYZ->setMinValue(std::_MIN<int>(bounds[0],controls->sliderYZ->minValue()));
-				controls->sliderYZ->setMaxValue(std::_MAX<int>(bounds[1],controls->sliderYZ->maxValue()));
-				controls->sliderXZ->setMinValue(std::_MIN<int>(bounds[2],controls->sliderXZ->minValue()));
-				controls->sliderXZ->setMaxValue(std::_MAX<int>(bounds[3],controls->sliderXZ->maxValue()));
-				controls->sliderXY->setMinValue(std::_MIN<int>(bounds[4],controls->sliderXY->minValue()));
-				controls->sliderXY->setMaxValue(std::_MAX<int>(bounds[5],controls->sliderXY->maxValue()));
-				count++;
-			}
-
-      lookupTableProp=NULL;
-		}
-	}
-	delete it;
-}
-
-
 void QmitkSimpleExampleFunctionality::ExecuteOperation(mitk::Operation* operation)
 {
 
     bool ok;//as return
 
-    mitk::PointOperation* pointoperation=dynamic_cast<mitk::PointOperation*>(operation);
-    if(pointoperation!=NULL)
-    {
-    /****NAVIGATION inside the volume****/
-        switch (operation->GetOperationType())
-        {
-        case mitk::OpMOVE:
-                {
-                    mitk::ITKPoint3D point;
-                    mitk::Point3D seed;
-
-                    point = pointoperation->GetPoint();
-                    mitk::itk2vm(point, seed);
-
-                    const mitk::Geometry2D* g2d;
-                    const mitk::PlaneGeometry* pg;
-                    mitk::PlaneView pv;
-                    mitk::PlaneGeometry::Pointer plane;
-            
-                    int v;
-                    v=(int)seed.x;
-                    if(controls->getSliderYZ()->value()!=v)
-                    {
-                        g2d = multiWidget->mitkWidget2->GetRenderer()->GetCurrentWorldGeometry2D();
-                        pg = dynamic_cast<const mitk::PlaneGeometry*>(g2d);
-                        pv = pg->GetPlaneView();
-                        pv.point.x = v; 
-                        plane = mitk::PlaneGeometry::New();  
-                        plane->SetPlaneView(pv);
-                        multiWidget->mitkWidget2->GetRenderer()->SetWorldGeometry(plane);
-                        controls->getSliderYZ()->blockSignals(true);
-                        controls->getSliderYZ()->setValue(v);
-                        controls->getSliderYZ()->blockSignals(false);
-                    }
-                    v=(int)seed.y;
-                    if(controls->getSliderXZ()->value()!=v)
-                    {
-                        g2d = multiWidget->mitkWidget3->GetRenderer()->GetCurrentWorldGeometry2D();
-                        pg = dynamic_cast<const mitk::PlaneGeometry*>(g2d);
-                        pv = pg->GetPlaneView();
-                        pv.point.y = v;
-                        plane  = mitk::PlaneGeometry::New();  
-                        plane->SetPlaneView(pv);
-                        multiWidget->mitkWidget3->GetRenderer()->SetWorldGeometry(plane);
-                        controls->getSliderXZ()->blockSignals(true);
-                        controls->getSliderXZ()->setValue(v);
-                        controls->getSliderXZ()->blockSignals(false);
-                    }
-
-                    v=(int)seed.z;
-                    if(controls->getSliderXY()->value()!=v)
-                    {
-                        g2d = multiWidget->mitkWidget1->GetRenderer()->GetCurrentWorldGeometry2D();
-                        pg = dynamic_cast<const mitk::PlaneGeometry*>(g2d);
-                        pv = pg->GetPlaneView();
-                        pv.point.z = v;
-                        plane = mitk::PlaneGeometry::New();  
-                        plane->SetPlaneView(pv);
-                        multiWidget->mitkWidget1->GetRenderer()->SetWorldGeometry(plane);
-                        controls->getSliderXY()->blockSignals(true);
-                        controls->getSliderXY()->setValue(v);
-                        controls->getSliderXY()->blockSignals(false);
-                    }
-                    multiWidget->updateMitkWidgets();
-                    ok = true;
-                }
-                break;
-            case mitk::OpNOTHING:
-                break;
-            default:
-                ;
-        }
-    }
     mitk::DisplayCoordinateOperation* dcOperation=dynamic_cast<mitk::DisplayCoordinateOperation*>(operation);
     if( dcOperation != NULL )
     {

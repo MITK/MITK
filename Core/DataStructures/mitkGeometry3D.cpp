@@ -113,7 +113,7 @@ mitk::Geometry3D::~Geometry3D()
 
 void mitk::Geometry3D::SetBaseGeometry(mitk::Geometry3D* base)
 {
-  m_Transform->SetInput(base->GetTransform());
+  m_Transform->SetInput(base->GetVtkTransform());
   m_BaseGeometry = base;
 }
 
@@ -132,11 +132,11 @@ mitk::Geometry3D::Pointer mitk::Geometry3D::Clone() const
 
   newGeometry->SetBoundingBox(m_BoundingBox);
   newGeometry->SetTimeBoundsInMS(m_TimeBoundsInMS);  
-  newGeometry->GetTransform()->SetMatrix(m_Transform->GetMatrix());
+  newGeometry->GetVtkTransform()->SetMatrix(m_Transform->GetMatrix());
   return newGeometry;  
 }
 
-vtkTransform* mitk::Geometry3D::GetTransform()
+vtkTransform* mitk::Geometry3D::GetVtkTransform()
 {
   return m_Transform;
 }
@@ -202,7 +202,7 @@ void mitk::Geometry3D::ExecuteOperation(Operation* operation)
 
 const mitk::ITKVector3D mitk::Geometry3D::GetXAxis()
 {
-  vtkMatrix4x4* m = GetTransform()->GetMatrix();
+  vtkMatrix4x4* m = GetVtkTransform()->GetMatrix();
   mitk::ITKVector3D v;
   v[0] = m->Element[0][0];
   v[1] = m->Element[1][0];
@@ -213,7 +213,7 @@ const mitk::ITKVector3D mitk::Geometry3D::GetXAxis()
 
 const mitk::ITKVector3D mitk::Geometry3D::GetYAxis()
 {
-  vtkMatrix4x4* m = GetTransform()->GetMatrix();
+  vtkMatrix4x4* m = GetVtkTransform()->GetMatrix();
   mitk::ITKVector3D v;
   v[0] = m->Element[0][1];
   v[1] = m->Element[1][1];
@@ -223,7 +223,7 @@ const mitk::ITKVector3D mitk::Geometry3D::GetYAxis()
 }
 const mitk::ITKVector3D mitk::Geometry3D::GetZAxis()
 {
-  vtkMatrix4x4* m = GetTransform()->GetMatrix();
+  vtkMatrix4x4* m = GetVtkTransform()->GetMatrix();
   mitk::ITKVector3D v;
   v[0] = m->Element[0][2];
   v[1] = m->Element[1][2];

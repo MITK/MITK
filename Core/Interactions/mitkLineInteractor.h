@@ -21,7 +21,7 @@ public:
     
   //##Documentation
   //##@brief Constructor 
-  LineInteractor(std::string type, DataTreeNode* dataTreeNode, int cellId, int pIdA, int pIdB);
+  LineInteractor(const char * type, DataTreeNode* dataTreeNode, int cellId, int pIdA, int pIdB);
 
   //##Documentation
   //##@brief Destructor 

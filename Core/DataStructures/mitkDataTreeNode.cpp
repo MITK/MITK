@@ -321,7 +321,7 @@ vtkTransform* mitk::DataTreeNode::GetVtkTransform() const
 {
   assert(m_Data!=NULL);
   assert(m_Data->GetGeometry()!=NULL);
-  return m_Data->GetGeometry()->GetTransform();
+  return m_Data->GetGeometry()->GetVtkTransform();
 }
 
 unsigned long mitk::DataTreeNode::GetMTime() const

@@ -2,7 +2,7 @@
 #include "mitkStatusBar.h"
 #include <mitkInteractionConst.h>
 
-mitk::LineInteractor::LineInteractor(std::string type, DataTreeNode* dataTreeNode, int cellId, int pIdA, int pIdB)
+mitk::LineInteractor::LineInteractor(const char * type, DataTreeNode* dataTreeNode, int cellId, int pIdA, int pIdB)
 : Interactor(type, dataTreeNode), m_CellId(cellId), m_PIdA(pIdA), m_PIdB(pIdB)
 {
   m_PointA = new PointInteractor("pointinteractor", dataTreeNode, pIdA);

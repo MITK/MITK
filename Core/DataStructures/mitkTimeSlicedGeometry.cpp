@@ -173,7 +173,7 @@ mitk::Geometry3D::Pointer mitk::TimeSlicedGeometry::Clone() const
 {
   mitk::TimeSlicedGeometry::Pointer newGeometry = TimeSlicedGeometry::New();
   newGeometry->Initialize(m_TimeSteps);
-  newGeometry->GetTransform()->SetMatrix(m_Transform->GetMatrix());
+  newGeometry->GetVtkTransform()->SetMatrix(m_Transform->GetMatrix());
   //newGeometry->GetRelativeTransform()->SetMatrix(m_RelativeTransform->GetMatrix());
   newGeometry->SetEvenlyTimed(m_EvenlyTimed);
   unsigned int t;

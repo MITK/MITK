@@ -15,7 +15,7 @@
 
 typedef itk::FixedArray< mitk::ScalarType, 3*2 > BoundsArrayType;
 
-mitk::AffineInteractor::AffineInteractor(std::string type, DataTreeNode* dataTreeNode)
+mitk::AffineInteractor::AffineInteractor(const char * type, DataTreeNode* dataTreeNode)
 	 : Interactor(type, dataTreeNode)
 {
   //m_ScaleFactor = 1.0;  
@@ -59,7 +59,7 @@ bool mitk::AffineInteractor::ExecuteSideEffect(int sideEffectId, mitk::StateEven
     p[1] = worldPoint.y;
     p[2] = worldPoint.z;
     p[3] = 1;
-    geometry->GetTransform()->GetInverse()->TransformPoint(p, p);
+    geometry->GetVtkTransform()->GetInverse()->TransformPoint(p, p);
 		mitk::ITKPoint3D itkPoint;
     itkPoint[0] = p[0]/p[3];
     itkPoint[1] = p[1]/p[3];
@@ -127,7 +127,7 @@ bool mitk::AffineInteractor::ExecuteSideEffect(int sideEffectId, mitk::StateEven
 		if (m_UndoEnabled)	//write to UndoMechanism
 		{
       mitk::ScalarType pos[3];
-      geometry->GetTransform()->GetPosition(pos);
+      geometry->GetVtkTransform()->GetPosition(pos);
       mitk::ITKPoint3D oldPosition;
       oldPosition[0] = pos[0];
       oldPosition[1] = pos[1];
@@ -171,7 +171,7 @@ bool mitk::AffineInteractor::ExecuteSideEffect(int sideEffectId, mitk::StateEven
     mitk::ITKVector3D newPosition = dummy.GetVectorFromOrigin();
 		      
     mitk::ScalarType position[3];
-    geometry->GetTransform()->GetPosition(position);
+    geometry->GetVtkTransform()->GetPosition(position);
     mitk::ITKVector3D dataPosition = position;
 
     newPosition -= dataPosition;  // calculate vector from center of the data object to the mouse position
@@ -239,7 +239,7 @@ bool mitk::AffineInteractor::ExecuteSideEffect(int sideEffectId, mitk::StateEven
                                                                                 // projection onto the axis
 
     // calculate direction of mouse move (towards or away from the data object)
-    ITKPoint3D objectPosition = geometry->GetTransform()->GetPosition();
+    ITKPoint3D objectPosition = geometry->GetVtkTransform()->GetPosition();
     //ScalarType xdif = fabs((newPosition - objectPosition)[0]) - fabs((m_FirstScalePosition - objectPosition)[0]);
     //ScalarType ydif = fabs((newPosition - objectPosition)[1]) - fabs((m_FirstScalePosition - objectPosition)[1]);
     //ScalarType zdif = fabs((newPosition - objectPosition)[2]) - fabs((m_FirstScalePosition - objectPosition)[2]);

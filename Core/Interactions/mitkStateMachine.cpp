@@ -11,10 +11,13 @@
 //## Constructor
 //## daclares a new StateMachine and connects
 //## it to a StateMachine of Type type;
-mitk::StateMachine::StateMachine(std::string type)
-: m_Type(type)
+mitk::StateMachine::StateMachine(const char * type) : m_CurrentState(NULL)
 {
-	m_CurrentState = mitk::StateMachineFactory::GetStartState(type);
+  if(type!=NULL)
+  {
+    m_Type = type;
+	  m_CurrentState = mitk::StateMachineFactory::GetStartState(type);
+  }
   m_UndoController = new UndoController(LIMITEDLINEARUNDO);//switch to LLU or add LLU
 	m_UndoEnabled = true;
 }

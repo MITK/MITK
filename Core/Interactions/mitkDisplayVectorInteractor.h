@@ -19,7 +19,7 @@ class DisplayVectorInteractor : public StateMachine
     //##ModelId=3EF222410127
     virtual void ExecuteOperation(Operation* operation);
     //##ModelId=3EF2229F00F0
-    DisplayVectorInteractor(std::string type, mitk::OperationActor* destination=NULL);
+    DisplayVectorInteractor(const char * type, mitk::OperationActor* destination=NULL);
 
     //##ModelId=3EF2229F010E
     virtual ~DisplayVectorInteractor();

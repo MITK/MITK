@@ -174,7 +174,7 @@ mitk::Geometry3D::Pointer mitk::AbstractTransformGeometry::Clone() const
   newGeometry->Initialize();
   newGeometry->SetBoundingBox(m_BoundingBox);
   newGeometry->SetTimeBoundsInMS(m_TimeBoundsInMS);  
-  newGeometry->GetTransform()->SetMatrix(m_Transform->GetMatrix());
+  newGeometry->GetVtkTransform()->SetMatrix(m_Transform->GetMatrix());
   //newGeometry->GetRelativeTransform()->SetMatrix(m_RelativeTransform->GetMatrix());
   newGeometry->SetVtkAbstractTransform(m_VtkAbstractTransform);
   newGeometry->SetPlaneView(m_PlaneView);

@@ -111,7 +111,7 @@ bool mitk::DisplayVectorInteractor::ExecuteSideEffect(int sideEffectId, mitk::St
 }
 
 //##ModelId=3EF2229F00F0
-mitk::DisplayVectorInteractor::DisplayVectorInteractor(std::string type, mitk::OperationActor* destination)
+mitk::DisplayVectorInteractor::DisplayVectorInteractor(const char * type, mitk::OperationActor* destination)
 : mitk::StateMachine(type), m_Destination(destination),
 m_Sender(NULL),
 m_StartDisplayCoordinate(0,0),

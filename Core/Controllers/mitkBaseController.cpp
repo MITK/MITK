@@ -1,8 +1,7 @@
 #include "mitkBaseController.h"
 #include "mitkBaseRenderer.h"
 
-//##ModelId=3E3AE32B0048
-mitk::BaseController::BaseController() : m_LastUpdateTime(0)
+mitk::BaseController::BaseController(const char * type) : StateMachine(type), m_LastUpdateTime(0)
 {
   m_Slice = Stepper::New();
   m_Time  = Stepper::New();

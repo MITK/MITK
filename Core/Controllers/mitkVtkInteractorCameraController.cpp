@@ -4,7 +4,7 @@
 //#include <vtkInteractorStyleTrackball.h>
 
 //##ModelId=3E6D600F009A
-mitk::VtkInteractorCameraController::VtkInteractorCameraController() : m_VtkInteractor(NULL)
+mitk::VtkInteractorCameraController::VtkInteractorCameraController(const char * type) : CameraController(type), m_VtkInteractor(NULL)
 {
   m_VtkInteractor = mitk::VtkQRenderWindowInteractor::New();
   vtkInteractorStyleSwitch* interactorswitch = dynamic_cast<vtkInteractorStyleSwitch*>(m_VtkInteractor->GetInteractorStyle());
@@ -81,3 +81,9 @@ vtkRenderWindowInteractor* mitk::VtkInteractorCameraController::GetVtkInteractor
 {
   return m_VtkInteractor;
 }
+
+bool mitk::VtkInteractorCameraController::ExecuteSideEffect(int sideEffectId, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId)
+{
+  return false;
+}
+

@@ -5,7 +5,7 @@
 
 
 //##ModelId=3EAD420E0088
-mitk::GlobalInteraction::GlobalInteraction(std::string type)
+mitk::GlobalInteraction::GlobalInteraction(const char * type)
 : StateMachine(type)
 {
 //build up the FocusManager

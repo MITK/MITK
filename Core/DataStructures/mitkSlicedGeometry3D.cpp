@@ -356,7 +356,7 @@ mitk::Geometry3D::Pointer mitk::SlicedGeometry3D::Clone() const
   mitk::SlicedGeometry3D::Pointer newGeometry = SlicedGeometry3D::New();
   newGeometry->Initialize(m_Slices);
   newGeometry->SetTimeBoundsInMS(m_TimeBoundsInMS);  
-  newGeometry->GetTransform()->SetMatrix(m_Transform->GetMatrix());
+  newGeometry->GetVtkTransform()->SetMatrix(m_Transform->GetMatrix());
   //newGeometry->GetRelativeTransform()->SetMatrix(m_RelativeTransform->GetMatrix());
   newGeometry->SetEvenlySpaced(m_EvenlySpaced);
   newGeometry->SetSpacing(GetSpacing());

@@ -21,7 +21,8 @@ public:
   //##ModelId=3E6D600F0068
   mitkClassMacro(VtkInteractorCameraController, CameraController);
 
-  itkNewMacro(Self);
+  //itkNewMacro(Self);
+  VtkInteractorCameraController(const char * type = NULL);
 
   //##ModelId=3EF162760380
   //##Documentation
@@ -45,12 +46,14 @@ public:
   //##Documentation
   //## @brief Set the BaseRenderer to be controlled by this vtk-based camera controller
   virtual bool SetRenderer(mitk::BaseRenderer* renderer);
+
 protected:
-  //##ModelId=3E6D600F009A
-  VtkInteractorCameraController();
+  //VtkInteractorCameraController();
 
   //##ModelId=3E6D600F009B
   virtual ~VtkInteractorCameraController();
+
+  virtual bool ExecuteSideEffect(int sideEffectId, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId);
 
   //##ModelId=3E6D600F0060
   VtkQRenderWindowInteractor* m_VtkInteractor;

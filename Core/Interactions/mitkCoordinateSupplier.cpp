@@ -11,7 +11,7 @@
 
 
 //##ModelId=3F0189F0025B
-mitk::CoordinateSupplier::CoordinateSupplier(std::string type, mitk::OperationActor* operationActor)
+mitk::CoordinateSupplier::CoordinateSupplier(const char * type, mitk::OperationActor* operationActor)
 : mitk::StateMachine(type), m_Destination(operationActor)
 {
 }

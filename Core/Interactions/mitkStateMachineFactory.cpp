@@ -39,7 +39,7 @@ mitk::StateMachineFactory::StateMachineFactory()
 //##ModelId=3E5B4144024F
 //##Documentation
 //## returns NULL if no entry with string type is found
-mitk::State* mitk::StateMachineFactory::GetStartState(std::string type)
+mitk::State* mitk::StateMachineFactory::GetStartState(const char * type)
 {
 	StartStateMapIter tempState = m_StartStates.find(type);
 	if( tempState != m_StartStates.end() )

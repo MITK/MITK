@@ -29,7 +29,7 @@ public:
   //## type is the type of StateMachine like declared in the XML-Configure-File
   //##
   //## Interactor connects itself to the DataTreeNode-Interactor-pointer through call of SetInteractor(this)
-  Interactor(std::string type, DataTreeNode* dataTreeNode);
+  Interactor(const char * type, DataTreeNode* dataTreeNode);
 
   //##Documentation
   //## @brief Destructor

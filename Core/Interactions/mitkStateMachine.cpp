@@ -4,7 +4,6 @@
 #include "UndoController.h"
 
 
-#include "StupidErrorNotification.h"
 
 //##ModelId=3E5B2DB301FD
 mitk::StateMachine::StateMachine(std::string type)

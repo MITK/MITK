@@ -124,8 +124,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include <values.h>
 #ifndef WIN32
+#include <values.h>
 #include <sys/time.h>
 #include <sys/resource.h>
 #else

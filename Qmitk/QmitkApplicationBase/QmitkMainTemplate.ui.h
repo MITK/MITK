@@ -27,6 +27,9 @@
 #include <mitkFloatProperty.h>
 #include <qregexp.h>
 
+#include <mitkStringProperty.h>
+#include <qstring.h>
+
 //#include <mitkImageToItk.h>
 //#include <itkThresholdImageFilter.h>
 
@@ -115,13 +118,21 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
 			reader->SetFileName(fileName);
 
 
+
 			mitk::DataTreeIterator* it=tree->inorderIterator();
 
 			node=mitk::DataTreeNode::New();
 			node->SetData(reader->GetOutput());
 			it->add(node); 
+            
+         QString tmpName = fileName;
+         tmpName = tmpName.right(tmpName.length() - tmpName.findRev("/") - 1);     
+         mitk::StringProperty::Pointer nameProp = new mitk::StringProperty(tmpName.ascii());
 
+         node->GetPropertyList()->SetProperty("fileName",nameProp);
+        
 			initWidgets(it);
+
 
 	/*
 	the following is for testing the itk-adaptor - will be removed soon.

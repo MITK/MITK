@@ -52,8 +52,8 @@
 /** @brief sets the greyvalues of all pixels outside a given
  *  range to the an extremal greyvalue
 
- *  Sets the greyvalue of all pixels which is not included
- *  in [gv_low, gv_up] to a the min or max possible greyvalue. Very similar to
+ *  Sets the greyvalue of pixels that are smaller than gv_low to this value and
+ *  those larger than gv_up to that value. Very similar to
  *  and used by ipFuncLevWin().
  *
  *  @param pic_old    pointer to original image
@@ -100,8 +100,8 @@ ipPicDescriptor *ipFuncSelMM ( ipPicDescriptor *pic_old,
        help = (( type * )pic->data )[i];                                     \
        (( type * )pic_new->data )[i] =                                       \
           ( help < ( type ) gv_up ) ?                                        \
-            (( help > ( type ) gv_low ) ? help : ( type ) gv_low - 1 ) :     \
-            ( type ) gv_up + 1;                                              \
+            (( help > ( type ) gv_low ) ? help : ( type ) gv_low  ) :        \
+            ( type ) gv_up ;                                                 \
     }                                                                        \
 }                                                                             
 

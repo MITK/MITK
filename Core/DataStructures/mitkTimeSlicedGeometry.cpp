@@ -223,6 +223,24 @@ bool mitk::TimeSlicedGeometry::IsValidTime(int t) const
   return (t>=0) && (t< (int)m_TimeSteps);
 }
 
+void mitk::TimeSlicedGeometry::CopyTimes(const mitk::TimeSlicedGeometry* timeslicedgeometry, unsigned int t, unsigned int endtimeindex)
+{
+  if(endtimeindex >= timeslicedgeometry->GetTimeSteps())
+    endtimeindex = timeslicedgeometry->GetTimeSteps()-1;
+  if(endtimeindex >= this->GetTimeSteps())
+    endtimeindex = this->GetTimeSteps()-1;
+  for(; t <= endtimeindex; ++t)
+  {
+    mitk::Geometry3D* geometry3d = GetGeometry3D(t);
+    mitk::Geometry3D* othergeometry3d = timeslicedgeometry->GetGeometry3D(t);
+    assert((geometry3d!=NULL) && (othergeometry3d!=NULL));
+
+    geometry3d->SetTimeBoundsInMS(othergeometry3d->GetTimeBoundsInMS());
+
+    GetTimeBoundsInMS(); //@todo see GetTimeBoundsInMS
+  }
+}
+
 mitk::AffineGeometryFrame3D::Pointer mitk::TimeSlicedGeometry::Clone() const
 {
   Self::Pointer newGeometry = Self::New();

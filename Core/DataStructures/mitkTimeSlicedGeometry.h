@@ -62,6 +62,7 @@ public:
   virtual int MSToTimeStep(mitk::ScalarType time_in_ms) const;
 
   virtual mitk::ScalarType TimeStepToMS(int timestep) const;
+
 protected:
   virtual void Initialize(unsigned int timeSteps);
 public:
@@ -70,6 +71,22 @@ public:
   //## identical to the provided Geometry3D except of the time bounds.
   //##
   virtual void InitializeEvenlyTimed(mitk::Geometry3D* geometry3D, unsigned int timeSteps);
+
+  //##Documentation
+  //## @brief Copy the m_TimeBoundsInMS of the geometries contained
+  //## in @a timeslicedgeometry into the geometries contained in this
+  //## TimeSlicedGeometry object.
+  //##
+  //## Useful for initialization of the TimeSlicedGeometry of the 
+  //## output in GenerateOutputInformation() methods of process objects, 
+  //## see for example BoundingObjectCutter::GenerateOutputInformation().
+  //## @param @a t start time index 
+  //## @param @a endtimeindex (endtimeindex) is the time index of 
+  //## the last geometry whose time-bounds are copied. If 
+  //## @a timeslicedgeometry or this TimeSlicedGeometry object does
+  //## not contain enough geometries, @a endtimeindex is reduced
+  //## appropriately.
+  void CopyTimes(const mitk::TimeSlicedGeometry* timeslicedgeometry, unsigned int t=0, unsigned int endtimeindex = itk::NumericTraits<unsigned int>::max());
 
   //##Documentation
   //## @brief duplicates the geometry

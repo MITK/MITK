@@ -20,7 +20,7 @@ class Operation
     OperationType GetOperationType();
 
     //##ModelId=3E7F4D7D01AE
-    virtual void Execute();
+    virtual void Execute() = 0;
 
   private:
     //##ModelId=3E5F6A9001E9

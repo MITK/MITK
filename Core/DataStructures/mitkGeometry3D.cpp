@@ -2,7 +2,7 @@
 #include "PlaneGeometry.h"
 #include <vecmath.h>
 
-#ifdef MITK_DICOM_ENABLED
+#ifdef MBI_INTERNAL
 extern "C"
 {
 #include "ipDicom.h"
@@ -25,7 +25,7 @@ unsigned int mitk::Geometry3D::GetDataDimension() const
 mitk::Geometry2D::ConstPointer mitk::Geometry3D::GetGeometry2D(int s, int t) const
 {
   mitk::Geometry2D::ConstPointer geometry2d = NULL;
-
+  
   if(IsValidSlice(s, t))
   {
     int pos=s+t*m_Dimensions[2];
@@ -40,13 +40,13 @@ mitk::Geometry2D::ConstPointer mitk::Geometry3D::GetGeometry2D(int s, int t) con
       if(firstslice != NULL)
       {
         mitk::PlaneView view=firstslice->GetPlaneView();
-
+        
         Vector3D n=view.normal;
         n.normalize();
-
+        
         Vector3D zStep;
         zStep=n.dot(m_Spacing)*n;
-
+        
         mitk::PlaneGeometry::Pointer requestedslice;
         requestedslice = mitk::PlaneGeometry::New();
         view.point+=zStep*s;
@@ -64,35 +64,35 @@ mitk::BoundingBox::ConstPointer mitk::Geometry3D::GetBoundingBox(int t) const
 {
   if(m_BoundingBoxes[t].IsNotNull())
     return m_BoundingBoxes[t];
-
+  
   mitk::BoundingBox::Pointer boundingBox=mitk::BoundingBox::New();
-
+  
   mitk::BoundingBox::PointsContainer::Pointer pointscontainer=mitk::BoundingBox::PointsContainer::New();
   float nullpoint[]={0,0,0};
   mitk::BoundingBox::PointType p(nullpoint);
-
+  
   assert(m_EvenlySpaced);
-
+  
   int s, slices;
   mitk::BoundingBox::PointIdentifier pointid=0;
-
+  
   slices=( GetDataDimension()<=2 ? 1 : GetDimensions()[2] );
-
+  
   for(s=0;s<slices;++s)
   {
     const PlaneGeometry* planegeometry =
       dynamic_cast<const PlaneGeometry *>(GetGeometry2D(s,t).GetPointer());
     assert(planegeometry != NULL);
-
+    
     const PlaneView& planeview=planegeometry->GetPlaneView();
     Point3D pt;
-
+    
     Vector3D n=planeview.normal;
     n.normalize();
-
+    
     Vector3D zStep;
     zStep=n.dot(m_Spacing)*n;
-
+    
     //add the four edge points of the upper AND lower boundery of the plane geometry to the bounding box calculator.
     pt=planeview.point;
     p[0]=pt.x; p[1]=pt.y; p[2]=pt.z;
@@ -100,21 +100,21 @@ mitk::BoundingBox::ConstPointer mitk::Geometry3D::GetBoundingBox(int t) const
     pt+=zStep;
     p[0]=pt.x; p[1]=pt.y; p[2]=pt.z;
     pointscontainer->InsertElement(pointid++, p);
-
+    
     pt=planeview.point+planeview.getOrientation1(); 
     p[0]=pt.x; p[1]=pt.y; p[2]=pt.z;
     pointscontainer->InsertElement(pointid++, p);
     pt+=zStep;
     p[0]=pt.x; p[1]=pt.y; p[2]=pt.z;
     pointscontainer->InsertElement(pointid++, p);
-
+    
     pt+=planeview.getOrientation2();
     p[0]=pt.x; p[1]=pt.y; p[2]=pt.z;
     pointscontainer->InsertElement(pointid++, p);
     pt+=zStep;
     p[0]=pt.x; p[1]=pt.y; p[2]=pt.z;
     pointscontainer->InsertElement(pointid++, p);
-
+    
     pt=planeview.point+planeview.getOrientation2();
     p[0]=pt.x; p[1]=pt.y; p[2]=pt.z;
     pointscontainer->InsertElement(pointid++, p);
@@ -122,13 +122,13 @@ mitk::BoundingBox::ConstPointer mitk::Geometry3D::GetBoundingBox(int t) const
     p[0]=pt.x; p[1]=pt.y; p[2]=pt.z;
     pointscontainer->InsertElement(pointid++, p);
   }
-
+  
   boundingBox->SetPoints(pointscontainer);
-
+  
   boundingBox->ComputeBoundingBox();
-
+  
   m_BoundingBoxes[t]=boundingBox;
-
+  
   return boundingBox.GetPointer();
 }
 
@@ -147,23 +147,23 @@ void mitk::Geometry3D::SetBoundingBox(const float bounds[6],  int t)
   if(IsValidTime(t))
   {
     mitk::BoundingBox::Pointer boundingBox=mitk::BoundingBox::New();
-
+    
     mitk::BoundingBox::PointsContainer::Pointer pointscontainer=mitk::BoundingBox::PointsContainer::New();
     float nullpoint[]={0,0,0};
     mitk::BoundingBox::PointType p(nullpoint);
-
+    
     mitk::BoundingBox::PointIdentifier pointid=0;
-
+    
     p[0]=bounds[0]; p[1]=bounds[2]; p[2]=bounds[4];
     pointscontainer->InsertElement(pointid++, p);
-
+    
     p[0]=bounds[1]; p[2]=bounds[3]; p[2]=bounds[5];
     pointscontainer->InsertElement(pointid++, p);
-
+    
     boundingBox->SetPoints(pointscontainer);
-
+    
     boundingBox->ComputeBoundingBox();
-
+    
     m_BoundingBoxes[t]=boundingBox;
   }
   else
@@ -172,7 +172,7 @@ void mitk::Geometry3D::SetBoundingBox(const float bounds[6],  int t)
 
 //##ModelId=3DCBF5E9037F
 /*!
-  \todo use parameter t or removed it!!!
+\todo use parameter t or removed it!!!
 */
 double mitk::Geometry3D::GetTime(int t) const
 {
@@ -182,7 +182,7 @@ double mitk::Geometry3D::GetTime(int t) const
 
 //##ModelId=3DE763C500C4
 /*!
-  \todo use parameter t or removed it!!!
+\todo use parameter t or removed it!!!
 */
 mitk::Geometry3D::TransformPointer mitk::Geometry3D::GetTransfrom() const
 {
@@ -192,7 +192,7 @@ mitk::Geometry3D::TransformPointer mitk::Geometry3D::GetTransfrom() const
 
 //##ModelId=3DDE65D1028A
 /*!
-  \todo use parameter t or removed it!!! 
+\todo use parameter t or removed it!!! 
 */
 void mitk::Geometry3D::MMToUnits(const mitk::Point3D &pt_mm, mitk::Point3D &pt_units, float t) const
 {
@@ -201,7 +201,7 @@ void mitk::Geometry3D::MMToUnits(const mitk::Point3D &pt_mm, mitk::Point3D &pt_u
 
 //##ModelId=3DDE65DC0151
 /*!
-  \todo use parameter t or removed it!!!
+\todo use parameter t or removed it!!!
 */
 void mitk::Geometry3D::UnitsToMM(const mitk::Point3D &pt_units, mitk::Point3D &pt_mm, float t) const
 {
@@ -210,7 +210,7 @@ void mitk::Geometry3D::UnitsToMM(const mitk::Point3D &pt_units, mitk::Point3D &p
 
 //##ModelId=3E3B986602CF
 /*!
-  \todo use parameter t or removed it!!!
+\todo use parameter t or removed it!!!
 */
 void mitk::Geometry3D::MMToUnits(const mitk::Vector3D &vec_mm, mitk::Vector3D &vec_units, float t) const
 {
@@ -219,7 +219,7 @@ void mitk::Geometry3D::MMToUnits(const mitk::Vector3D &vec_mm, mitk::Vector3D &v
 
 //##ModelId=3E3B987503A3
 /*!
-  \todo use parameter t or removed it!!!
+\todo use parameter t or removed it!!!
 */
 void mitk::Geometry3D::UnitsToMM(const mitk::Vector3D &vec_units, mitk::Vector3D &vec_mm, float t) const
 {
@@ -253,9 +253,9 @@ bool mitk::Geometry3D::SetGeometry2D(ipPicDescriptor* pic, int s, int t)
     origin.set(0,0,s);               UnitsToMM(origin, origin);
     right.set(m_Dimensions[0],0,0);  UnitsToMM(right, right);
     bottom.set(0,m_Dimensions[1],0); UnitsToMM(bottom, bottom);
-
+    
     PlaneView view_std(origin, right, bottom);
-
+    
     mitk::PlaneGeometry::Pointer planegeometry=mitk::PlaneGeometry::New();
     planegeometry->SetPlaneView(view_std);
     planegeometry->SetSizeInUnits(m_Dimensions[0], m_Dimensions[1]);
@@ -279,31 +279,31 @@ void mitk::Geometry3D::Initialize(unsigned int dimension, const unsigned int* di
     for(i=0,p=m_Dimensions+m_Dimension;i<4-m_Dimension;++i, ++p)
       *p=1;
   }
-
+  
   unsigned int i;
   for(i=0;i<4;++i)
   {
     m_LargestPossibleRegion.SetIndex(i, 0);
     m_LargestPossibleRegion.SetSize (i, m_Dimensions[i]);
   }
-
+  
   m_Geometry2Ds.clear();
-
+  
   Geometry2D::ConstPointer gnull=NULL;
   int num=m_Dimensions[2]*m_Dimensions[3];
-
+  
   m_Geometry2Ds.reserve(num);
   m_Geometry2Ds.assign(num, gnull);
-
+  
   //initialize m_TransformOfOrigin and m_Spacing (and m_TransformUnitsToMM/m_TransformMMToUnits).
   m_TransformOfOrigin.setIdentity();
   SetSpacing(Vector3D(1.0,1.0,1.0));
-
+  
   //initialize bounding box array
   BoundingBox::ConstPointer bnull=NULL;
   m_BoundingBoxes.reserve(m_Dimensions[3]);
   m_BoundingBoxes.assign(num, bnull);
-
+  
   //does the Geometry has 2D slices?
   if(num>0)
   {
@@ -312,7 +312,7 @@ void mitk::Geometry3D::Initialize(unsigned int dimension, const unsigned int* di
     right.set(m_Dimensions[0],0,0); UnitsToMM(right, right);
     bottom.set(0,m_Dimensions[1],0); UnitsToMM(bottom, bottom);
     PlaneView view_std(mitk::Point3D(0,0,0), right, bottom);
-
+    
     mitk::PlaneGeometry::Pointer planegeometry=mitk::PlaneGeometry::New();
     m_Geometry2Ds[0]=planegeometry;
     planegeometry->SetPlaneView(view_std);
@@ -361,32 +361,32 @@ bool mitk::Geometry3D::IsValidTime(int t) const
 void mitk::Geometry3D::SetSpacing(mitk::Vector3D aSpacing)
 {
   m_Spacing = aSpacing;
-
+  
   m_TransformUnitsToMM=m_TransformOfOrigin;
-
+  
   mitk::Vector4D col;
   m_TransformUnitsToMM.getColumn(0, &col); col*=aSpacing.x; m_TransformUnitsToMM.setColumn(0, col);
   m_TransformUnitsToMM.getColumn(1, &col); col*=aSpacing.y; m_TransformUnitsToMM.setColumn(1, col);
   m_TransformUnitsToMM.getColumn(2, &col); col*=aSpacing.z; m_TransformUnitsToMM.setColumn(2, col);
-
+  
   m_TransformMMToUnits.invert(m_TransformUnitsToMM);
-
+  
   //re-initialize bounding box array, since the spacing influences the size of the bounding box
   int num=m_Dimensions[2]*m_Dimensions[3];
   BoundingBox::ConstPointer bnull=NULL;
   m_BoundingBoxes.clear();
   m_BoundingBoxes.reserve(m_Dimensions[3]);
   m_BoundingBoxes.assign(num, bnull);
-
+  
   //in case of evenly-spaced data: re-initialize instances of Geometry2D, since the spacing influences them
   if(m_EvenlySpaced)
   {
     m_Geometry2Ds.clear();
-
+    
     Geometry2D::ConstPointer gnull=NULL;
     m_Geometry2Ds.reserve(num);
     m_Geometry2Ds.assign(num, gnull);
-
+    
     //does the Geometry has 2D slices?
     if(num>0)
     {
@@ -395,14 +395,14 @@ void mitk::Geometry3D::SetSpacing(mitk::Vector3D aSpacing)
       right.set(m_Dimensions[0],0,0);  UnitsToMM(right, right);
       bottom.set(0,m_Dimensions[1],0); UnitsToMM(bottom, bottom);
       PlaneView view_std(mitk::Point3D(0,0,0), right, bottom);
-
+      
       mitk::PlaneGeometry::Pointer planegeometry=mitk::PlaneGeometry::New();
       m_Geometry2Ds[0]=planegeometry;
       planegeometry->SetPlaneView(view_std);
       planegeometry->SetSizeInUnits(m_Dimensions[0], m_Dimensions[1]);
     }
   }
-
+  
   Modified();
 }
 
@@ -423,9 +423,9 @@ void mitk::Geometry3D::SetEvenlySpaced(bool on)
 void mitk::Geometry3D::SetSpacing(ipPicDescriptor* pic)
 {
   Vector3D spacing(m_Spacing);
-
+  
   ipPicTSV_t *tsv;
-
+  
   tsv = ipPicQueryTag( pic, "PIXEL SIZE" );
   if(tsv)
   {
@@ -438,27 +438,29 @@ void mitk::Geometry3D::SetSpacing(ipPicDescriptor* pic)
           spacing.set(((ipFloat8_t*)tsv->value)[0], ((ipFloat8_t*)tsv->value)[1],((ipFloat8_t*)tsv->value)[2]);
     }
   }
-#ifdef MITK_DICOM_ENABLED
+#ifdef MBI_INTERNAL
   else
   {		
     tsv = ipPicQueryTag( pic, "SOURCE HEADER" );
     if( tsv )
     {
-      ipFloat8_t spacing = 0;
+      void *data;
+      ipUInt4_t len;
+      ipFloat8_t spacing_z = 0;
       ipFloat8_t thickness = 1;
       ipFloat8_t fx = 1;
       ipFloat8_t fy = 1;
-
+      
       if( dicomFindElement( (unsigned char *) tsv->value, 0x0018, 0x0088, &data, &len ) )
       {
         sscanf( (char *) data, "%lf", &spacing );
-        itkDebugMacro( "spacing:   %5.2f mm\n" << spacing );
+        itkDebugMacro( "spacing:   %5.2f mm\n" << spacing_z );
       }
       if( dicomFindElement( (unsigned char *) tsv->value, 0x0018, 0x0050, &data, &len ) )
       {
         sscanf( (char *) data, "%lf", &thickness );
         itkDebugMacro( "thickness: %5.2f mm\n" << thickness );
-
+        
         if( thickness == 0 )
           thickness = 1;
       }
@@ -468,8 +470,8 @@ void mitk::Geometry3D::SetSpacing(ipPicDescriptor* pic)
         sscanf( (char *) data, "%lf\\%lf", &fy, &fx );    // row / column value 
         itkDebugMacro( "fx, fy:    %5.2f/%5.2f mm\n" << fx << fy );
       }
-
-      spacing.set(fx, fy,( spacing > 0 ? spacing : thickness));
+      
+      spacing.set(fx, fy,( spacing_z > 0 ? spacing_z : thickness));
     }
   }
 #endif

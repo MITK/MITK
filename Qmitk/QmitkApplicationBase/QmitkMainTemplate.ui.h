@@ -51,7 +51,7 @@
 #include <mitkDICOMFileReader.h>
 #endif
 
-#ifdef MITK_INTERNAL
+#ifdef MBI_INTERNAL
 #include <mitkDSRFileReader.h>
 #include <mitkCylindricToCartesianFilter.h>
 #endif
@@ -258,7 +258,7 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
     delete it;
 	}
 #endif
-#ifdef MITK_INTERNAL
+#ifdef MBI_INTERNAL
 	else
     if(strstr(fileName, "hpsonos.db")!=0 || strstr(fileName, "HPSONOS.DB")!=0)
 	{

@@ -1,6 +1,6 @@
 #include "mitkDICOMFileReader.h"
 #include <itkImageFileReader.h>
-#ifdef MITK_DICOM_ENABLED
+#ifdef MBI_INTERNAL
 extern "C"
 {
 #include "ipDicom.h"

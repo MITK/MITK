@@ -154,15 +154,19 @@ _ipPicReadTagsMem( _ipPicTagsElement_t *head, ipUInt4_t bytes_to_read,
              && ( tsv->type == ipPicASCII
                   || tsv->type == ipPicNonUniform ) )
            {
-             int i;
-         
-             for( i = 0; i < elements * tsv->bpe/8; i++ )
+             if( tsv->type == ipPicNonUniform )
                {
-                 if( i % 2 )
-                   ((ipUInt1_t *)tsv->value)[i] = (255 - ((ipUInt1_t *)tsv->value)[i]) ^ i;
-                 else
-                   ((ipUInt1_t *)tsv->value)[i] = ((ipUInt1_t *)tsv->value)[i] ^ i;
+                  sprintf( tsv->tag, "*** ENCRYPTED ***" );
+                  tsv->tag[_ipPicTAGLEN] = '\0';
                }
+  
+             if( tsv->value )
+               free( tsv->value );
+  
+             tsv->value = strdup( "*** ENCRYPTED ***" );
+             tsv->n[0] = strlen(tsv->value);
+             tsv->type = ipPicASCII;
+             tsv->dim = 1;
            }
         }
 

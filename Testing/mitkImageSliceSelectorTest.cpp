@@ -109,7 +109,7 @@ int mitkImageSliceSelectorTest(int argc, char* argv[])
     std::cout<<"Part 1 [FAILED]"<<std::endl;
     return EXIT_FAILURE;
   }
-  catch ( itk::ExceptionObject & ex )
+  catch ( itk::ExceptionObject )
   {
     std::cout<<"Part 1 [PASSED] ";
     //after such an exception, we need to call ResetPipeline.
@@ -120,7 +120,7 @@ int mitkImageSliceSelectorTest(int argc, char* argv[])
   {
 	  slice->UpdateLargestPossibleRegion();
   }
-  catch ( itk::ExceptionObject & ex )
+  catch ( itk::ExceptionObject )
   {
     std::cout<<"Part 2 [FAILED]"<<std::endl;
     return EXIT_FAILURE;

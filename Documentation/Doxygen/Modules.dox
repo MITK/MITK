@@ -31,7 +31,8 @@
 */
 
 /**
-  \defgroup Algorithm Algorithm and Adaptor Classes \anchor AlgorithmAndAdaptorClasses
+  \defgroup Algorithm Algorithm and Adaptor Classes 
+  \anchor AlgorithmAndAdaptorClasses
 
   This category includes algorithm classes developed specifically for mitk and (mainly) adaptor 
   classes for the integration of algorithms from other toolkits (currently vtk, itk).
@@ -82,8 +83,9 @@
 
   This category includes classes that support the developer to create 
   software that allows the user to interact with the data. This includes 
-  complex interactions that have several states (e.g., scaling an object 
-  vs rotating it) and a concept to realize an undo/redo-mechanism. 
+  complex interactions that have multiple states (e.g., moving a handle of an 
+  active contour vs changing its local elasicity) and a concept to realize an 
+  undo/redo-mechanism. 
    
   A detailed description of the rationale for these classes can be found in
   \ref InteractionPage.

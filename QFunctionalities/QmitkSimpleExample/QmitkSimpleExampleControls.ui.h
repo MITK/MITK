@@ -51,7 +51,19 @@ QSlider* QmitkSimpleExampleControls::getSliderFP()
     return sliderFP;
 }
 
-QWidget* QmitkSimpleExampleControls::getSliceNavigator()
+QWidget* QmitkSimpleExampleControls::getSliceNavigatorTransversal()
 {
-    return sliceNavigator;
+    return sliceNavigatorTransversal;
+}
+
+
+QWidget* QmitkSimpleExampleControls::getSliceNavigatorFrontal()
+{
+    return sliceNavigatorFrontal;
+}
+
+
+QWidget* QmitkSimpleExampleControls::getSliceNavigatorSagittal()
+{
+    return sliceNavigatorSagittal;
 }

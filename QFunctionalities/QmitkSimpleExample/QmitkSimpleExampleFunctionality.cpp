@@ -46,6 +46,8 @@ controls(NULL), multiWidget(mitkStdMultiWidget), opacityprop(NULL), lookupTableP
 	    globalInteraction->AddStateMachine(new mitk::DisplayVectorInteractor("move", this));//sends DisplayCoordinateOperation
 	    //globalInteraction->AddStateMachine(new mitk::DisplayVectorInteractor("zoom", this));//sends DisplayCoordinateOperation
     }
+
+    m_DataTreeIterator->getTree()->addTreeChangeListener(this);
 }
 
 QmitkSimpleExampleFunctionality::~QmitkSimpleExampleFunctionality()
@@ -73,11 +75,20 @@ QWidget * QmitkSimpleExampleFunctionality::createControlWidget(QWidget *parent)
     {
         controls = new QmitkSimpleExampleControls(parent);
         //connect(slider, SIGNAL(valueChanged(int)), lcd, SLOT(display(int)));
-        sliceNavigator = mitk::SliceNavigationController::New();
-        QmitkStepperAdapter* stepperAdapter;
-        sliceNavigator->GetSlice()->SetPos(7);
-        sliceNavigator->GetSlice()->SetSteps(17);
-        stepperAdapter=new QmitkStepperAdapter(controls->getSliceNavigator(), sliceNavigator->GetSlice(), "slicenavigatorFromSimpleExemple");
+        sliceNavigatorTransversal = mitk::SliceNavigationController::New();
+        sliceNavigatorTransversal->SetViewDirection(mitk::SliceNavigationController::Transversal);
+        sliceNavigatorTransversal->AddRenderer(multiWidget->mitkWidget1->GetRenderer());
+        new QmitkStepperAdapter(controls->getSliceNavigatorTransversal(), sliceNavigatorTransversal->GetSlice(), "sliceNavigatorTransversalFromSimpleExemple");
+
+        sliceNavigatorSagittal = mitk::SliceNavigationController::New();
+        sliceNavigatorSagittal->SetViewDirection(mitk::SliceNavigationController::Sagittal);
+        sliceNavigatorSagittal->AddRenderer(multiWidget->mitkWidget2->GetRenderer());
+        new QmitkStepperAdapter(controls->getSliceNavigatorSagittal(), sliceNavigatorSagittal->GetSlice(), "sliceNavigatorSagittalFromSimpleExemple");
+
+        sliceNavigatorFrontal = mitk::SliceNavigationController::New();
+        sliceNavigatorFrontal->SetViewDirection(mitk::SliceNavigationController::Frontal);
+        sliceNavigatorFrontal->AddRenderer(multiWidget->mitkWidget3->GetRenderer());
+        new QmitkStepperAdapter(controls->getSliceNavigatorFrontal(), sliceNavigatorFrontal->GetSlice(), "sliceNavigatorFrontalFromSimpleExemple");
     }
     return controls;
 }
@@ -97,11 +108,31 @@ QAction * QmitkSimpleExampleFunctionality::createAction(QActionGroup *parent)
     //    action = new QAction( tr( "Left" ), QPixmap(textleft_xpm), tr( "&Left" ), CTRL + Key_L, parent, "simple example" );
     return action;
 }
+
+void QmitkSimpleExampleFunctionality::treeChanged(mitk::DataTreeIterator& itpos)
+{
+  if(controls->isVisible())
+  {
+    const mitk::BoundingBox::Pointer boundingbox = mitk::DataTree::ComputeBoundingBox(m_DataTreeIterator);
+    if(boundingbox->GetPoints()->Size()>0)
+    {
+      mitk::Geometry3D::Pointer geometry = mitk::Geometry3D::New();
+      geometry->Initialize(1);
+      geometry->SetBoundingBox(boundingbox);
+      sliceNavigatorTransversal->SetGeometry(geometry.GetPointer());
+      sliceNavigatorFrontal->SetGeometry(geometry.GetPointer());
+      sliceNavigatorSagittal->SetGeometry(geometry.GetPointer());
+    }
+  }
+}
+
 void QmitkSimpleExampleFunctionality::activated()
 {
     assert( multiWidget != NULL );
     // init widget 4 as a 3D widget
     multiWidget->mitkWidget4->GetRenderer()->SetMapperID(2);
+
+    treeChanged(*m_DataTreeIterator);
 }
 
 //void QmitkSimpleExampleFunctionality::deactivated()
@@ -194,7 +225,7 @@ void QmitkSimpleExampleFunctionality::initWidgets()
 				controls->sliderXY->setMaxValue(std::_MAX<int>(bounds[5],controls->sliderXY->maxValue()));
 				count++;
 			}
-			
+
       lookupTableProp=NULL;
 		}
 	}

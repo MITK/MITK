@@ -28,7 +28,7 @@ and createAction(..) from QmitkFunctionality. A QmitkFctMediator object gets pas
 functionality and positions the widgets in the application window controlled by a 
 layout template.
 */
-class QmitkSimpleExampleFunctionality : public QmitkFunctionality, public mitk::OperationActor
+class QmitkSimpleExampleFunctionality : public QmitkFunctionality, public mitk::OperationActor, public mitk::DataTreeBaseTreeChangeListener
 {
     Q_OBJECT
 public:
@@ -111,6 +111,7 @@ protected slots:
   */
   void selectSliceWidgetFP( int z );
 
+  void treeChanged(mitk::DataTreeIterator& itpos);
 protected:
 
 	/*!
@@ -151,7 +152,9 @@ protected:
 
   mitk::LookupTableProperty::Pointer lookupTableProp;
 
-  mitk::SliceNavigationController::Pointer sliceNavigator;
+  mitk::SliceNavigationController::Pointer sliceNavigatorTransversal;
+  mitk::SliceNavigationController::Pointer sliceNavigatorFrontal;
+  mitk::SliceNavigationController::Pointer sliceNavigatorSagittal;
 		
 };
 

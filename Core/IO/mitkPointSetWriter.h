@@ -85,12 +85,6 @@ public:
     PointSet* GetInput( const unsigned int& num );
 
     
-    /**
-     * Explicitly calls GenerateData(), since the pipelines Update()
-     * is broken. This will be fixed.
-     */
-    void Write();
-
 protected:
 
     /**

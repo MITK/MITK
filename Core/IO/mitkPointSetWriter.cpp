@@ -30,7 +30,9 @@ const char* mitk::PointSetWriter::VERSION_STRING = "0.1" ;
 
 mitk::PointSetWriter::PointSetWriter()
 {
-    this->SetNumberOfInputs( 1 );
+    this->SetNumberOfRequiredInputs( 1 );
+    this->SetNumberOfOutputs( 1 );
+    this->SetNthOutput( 0, mitk::PointSet::New().GetPointer() );
     m_Indent = 2;
     m_IndentDepth = 0;
 }
@@ -47,7 +49,7 @@ mitk::PointSetWriter::~PointSetWriter()
 void mitk::PointSetWriter::GenerateData()
 {
     m_IndentDepth = 0;
-    
+
     //
     // Opening the file to write to
     //
@@ -65,16 +67,16 @@ void mitk::PointSetWriter::GenerateData()
     }
 
     //
-    // Here the actual xml writing takes place
+    // Here the actual xml writing begins
     //
     WriteXMLHeader( out );
     WriteStartElement( XML_POINT_SET_FILE, out );
     WriteStartElement( XML_FILE_VERSION, out );
     WriteCharacterData( VERSION_STRING, out );
     WriteEndElement( XML_FILE_VERSION, out, false );
-    
+
     //
-    // for each input object write its xml representation to 
+    // for each input object write its xml representation to
     // the stream
     //
     for ( unsigned int i = 0 ; i < this->GetNumberOfInputs(); ++i )
@@ -83,7 +85,7 @@ void mitk::PointSetWriter::GenerateData()
         assert( pointSet.IsNotNull() );
         WriteXML( pointSet.GetPointer(), out );
     }
-    
+
     WriteEndElement( XML_POINT_SET_FILE, out );
 
     out.close();
@@ -178,13 +180,6 @@ mitk::PointSet* mitk::PointSetWriter::GetInput( const unsigned int& num )
     return dynamic_cast<InputType*> ( this->ProcessObject::GetInput( num ) );
 }
 
-
-
-
-void mitk::PointSetWriter::Write()
-{
-    this->GenerateData();
-}
 
 
 

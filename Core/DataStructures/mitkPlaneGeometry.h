@@ -21,8 +21,14 @@ public:
 
 //    itkGetConstReferenceMacro(PlaneView, PlaneView);
     //##ModelId=3E395E3E0077
+    //##Documentation
+    //## @brief Get the planeview, i.e., the instance of a class with methods
+    //## for plane rectangles in 3D space
     virtual const mitk::PlaneView& GetPlaneView() const;
     //##ModelId=3E396ABE0385
+    //##Documentation
+    //## @brief Set the planeview, i.e., the instance of a class with methods
+    //## for plane rectangles in 3D space
     virtual void SetPlaneView(const mitk::PlaneView& aPlaneView);
 
     //##ModelId=3ED91D060363
@@ -58,11 +64,23 @@ protected:
     virtual ~PlaneGeometry();
 
     //##ModelId=3E3A3F03034E
+    //##Documentation
+    //## @brief instance of class with methods for plane rectangles in 3D space
     mitk::PlaneView m_PlaneView;
 
     //##ModelId=3E3BE12C012B
+    //##Documentation
+    //## @brief factor to convert x-coordinates from mm to units and vice versa
+    //## 
+    //## Is calculated in SetPlaneView from the value of m_WidthInUnits and the
+    //## PlaneView
     float m_ScaleFactorMMPerUnitX;
     //##ModelId=3E3BE12C0167
+    //##Documentation
+    //## @brief factor to convert y-coordinates from mm to units and vice versa
+    //## 
+    //## Is calculated in SetPlaneView from the value of m_HeightInUnits and
+    //## the PlaneView
     float m_ScaleFactorMMPerUnitY;
 };
 

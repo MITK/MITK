@@ -62,8 +62,7 @@ public:
     //## weak-pointer-problem.
     virtual int GetExternalReferenceCount() const;
 
-   /** @fn void mitk::BaseData::UpdateOutputInformation()=0
-   * @brief Update the information for this BaseData so that it can be used
+   /* @brief Update the information for this BaseData so that it can be used
    * as an output of a BaseProcess. 
    *
    * This method is used in the pipeline mechanism to propagate information and 
@@ -72,15 +71,17 @@ public:
    * BaseProcess::UpdateOutputInformation() which determines modified
    * times, LargestPossibleRegions, and any extra meta data like spacing,
    * origin, etc. */
+    //##ModelId=3EDD06DC017A
+   void UpdateOutputInformation()=0;
 
-  /** @fn void mitk::BaseData::SetRequestedRegionToLargestPossibleRegion()=0
-   * @brief Set the RequestedRegion to the LargestPossibleRegion.
+   /* @brief Set the RequestedRegion to the LargestPossibleRegion.
    *
    * This forces a filter to produce all of the output in one execution
    * (i.e. not streaming) on the next call to Update(). */
+    //##ModelId=3EDD06DC035E
+  void SetRequestedRegionToLargestPossibleRegion()=0;
 
-  /** @fn bool mitk::BaseData::RequestedRegionIsOutsideOfTheBufferedRegion()=0
-   * @brief Determine whether the RequestedRegion is outside of the BufferedRegion.
+   /* @brief Determine whether the RequestedRegion is outside of the BufferedRegion.
    *
    * BufferedRegion. This method returns true if the RequestedRegion
    * is outside the BufferedRegion (true if at least one pixel is
@@ -90,9 +91,10 @@ public:
    * inside the BufferedRegion from the previous execution (and the
    * current filter is up to date), then a given filter does not need
    * to re-execute */
+    //##ModelId=3EDD06DD017A
+  bool RequestedRegionIsOutsideOfTheBufferedRegion()=0;
 
-  /** @fn bool mitk::BaseData::VerifyRequestedRegion()=0
-   * @brief Verify that the RequestedRegion is within the LargestPossibleRegion.
+   /* @brief Verify that the RequestedRegion is within the LargestPossibleRegion.
    *
    * If the RequestedRegion is not within the LargestPossibleRegion,
    * then the filter cannot possibly satisfy the request. This method
@@ -102,9 +104,10 @@ public:
    * PropagateRequestedRegion().  PropagateRequestedRegion() throws a
    * InvalidRequestedRegionError exception if the requested region is
    * not within the LargestPossibleRegion. */
+    //##ModelId=3EDD09370191
+  virtual bool VerifyRequestedRegion() = 0;
 
-  /** @fn void mitk::BaseData::CopyInformation(const itk::DataObject*)=0
-   * @brief Copy information from the specified data set.
+   /* @brief Copy information from the specified data set.
    *
    * This method is part of the pipeline execution model. By default, a 
    * BaseProcess will copy meta-data from the first input to all of its
@@ -114,12 +117,15 @@ public:
    * The default implementation of this method is empty. If a subclass
    * overrides this method, it should always call its superclass'
    * version. */
+    //##ModelId=3EDD06DE0274
+  void CopyInformation(const itk::DataObject*) {};
   
-  /** @fn void mitk::BaseData::SetRequestedRegion(itk::DataObject *data)=0
-   * @brief Set the requested region from this data object to match the requested
+   /* @brief Set the requested region from this data object to match the requested
    * region of the data object passed in as a parameter.
    * 
    * This method is implemented in the concrete subclasses of BaseData. */
+    //##ModelId=3EDD06DF017A
+  void SetRequestedRegion(itk::DataObject *data)=0;
 protected:
     //##ModelId=3E3FE04202B9
     BaseData();

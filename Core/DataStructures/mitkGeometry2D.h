@@ -27,10 +27,18 @@ public:
 	/** Method for creation through the object factory. */
 	//itkNewMacro(Self);
 
+	/** @brief get the width of the described area in units, e.g., for an image: the
+      * number of pixels in x-direction*/
     itkGetConstMacro(WidthInUnits, unsigned int);
+	/** @brief set the width of the described area in units, e.g., for an image: the
+      * number of pixels in x-direction*/
     itkSetMacro(WidthInUnits, unsigned int);
 
+	/** @brief get the height of the described area in units, e.g., for an image: the
+      * number of pixels in y-direction*/
     itkGetConstMacro(HeightInUnits, unsigned int);
+	/** @brief set the height of the described area in units, e.g., for an image: the
+      * number of pixels in y-direction*/
     itkSetMacro(HeightInUnits, unsigned int);
 
 	//##ModelId=3DDE65E00122

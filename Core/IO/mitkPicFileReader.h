@@ -27,6 +27,10 @@ public:
     itkSetStringMacro(FilePattern);
     itkGetStringMacro(FilePattern);
 
+    virtual void EnlargeOutputRequestedRegion(itk::DataObject *output);
+
+    static void ConvertHandedness(ipPicDescriptor* pic);
+
 protected:
     //##ModelId=3E187255016C
     virtual void GenerateData();
@@ -47,7 +51,7 @@ protected:
 
     //##ModelId=3EA6ADB80138
     int m_StartFileIndex;
-  protected:
+
     //##ModelId=3E186FC80253
     std::string m_FileName;
 

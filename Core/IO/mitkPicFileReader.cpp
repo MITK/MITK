@@ -99,6 +99,38 @@ void mitk::PicFileReader::GenerateOutputInformation()
     m_ReadHeaderTime.Modified();
 }
 
+void mitk::PicFileReader::ConvertHandedness(ipPicDescriptor* pic)
+{
+  //left to right handed conversion
+  if(pic->dim>=3)
+  {
+      ipPicDescriptor* slice=ipPicCopyHeader(pic, NULL);
+      slice->dim=2;
+      int size=_ipPicSize(slice);
+      slice->data=malloc(size);
+
+      int v, volumes = (pic->dim>3? 1 : pic->n[3]);
+      int volume_size = size*pic->n[2];
+
+      for(v=0; v<volumes; ++v)
+      {
+        unsigned char *p_first=(unsigned char *)pic->data;
+        unsigned char *p_last=(unsigned char *)pic->data;
+        p_first+=v*volume_size;
+        p_last+=size*(pic->n[2]-1)+v*volume_size;
+
+        int i, smid=pic->n[2]/2;
+        for(i=0; i<smid;++i,p_last-=size, p_first+=size)
+        {
+            memcpy(slice->data, p_last, size);
+            memcpy(p_last, p_first, size);
+            memcpy(p_first, slice->data, size);
+        }
+      }
+      ipPicFree(slice);
+  }
+}
+
 //##ModelId=3E187255016C
 void mitk::PicFileReader::GenerateData()
 {
@@ -114,30 +146,34 @@ void mitk::PicFileReader::GenerateData()
     if( m_FileName != "")
     {
         char * c=const_cast<char *>(m_FileName.c_str());
+
         ipPicDescriptor* pic=ipPicGet(const_cast<char *>(m_FileName.c_str()), NULL);
-
-        //left to right handed conversion
-        if(pic->dim==3)
-        {
-            ipPicDescriptor* slice=ipPicCopyHeader(pic, NULL);
-            slice->dim=2;
-            int size=_ipPicSize(slice);
-            slice->data=malloc(size);
-            unsigned char *p_first=(unsigned char *)pic->data;
-            unsigned char *p_last=(unsigned char *)pic->data;
-            p_last+=size*(pic->n[2]-1);
-
-            int i, smid=pic->n[2]/2;
-            for(i=0; i<smid;++i,p_last-=size, p_first+=size)
-            {
-                memcpy(slice->data, p_last, size);
-                memcpy(p_last, p_first, size);
-                memcpy(p_first, slice->data, size);
-            }
-            ipPicFree(slice);
-        }
-
+        ConvertHandedness(pic);
         output->SetPicChannel(pic);
+
+        //slice-wise reading
+        //currently much too slow.
+        //else
+        //{
+        //  int sstart, smax;
+        //  int tstart, tmax;
+
+        //  sstart=output->GetRequestedRegion().GetIndex(2);
+        //  smax=sstart+output->GetRequestedRegion().GetSize(2);
+
+        //  tstart=output->GetRequestedRegion().GetIndex(3);
+        //  tmax=tstart+output->GetRequestedRegion().GetSize(3);
+
+        //  int s,t;
+        //  for(s=sstart; s<smax; ++s)
+        //  {
+        //    for(t=tstart; t<tmax; ++t)
+        //    {
+        //      ipPicDescriptor* pic=ipPicGetSlice(const_cast<char *>(m_FileName.c_str()), NULL, t*smax+s+1);
+        //      output->SetPicSlice(pic,s,t);
+        //    }
+        //  }
+        //}
     }
     else
     {
@@ -165,6 +201,11 @@ void mitk::PicFileReader::GenerateData()
             }
         }
     }
+}
+
+void mitk::PicFileReader::EnlargeOutputRequestedRegion(itk::DataObject *output)
+{
+  output->SetRequestedRegionToLargestPossibleRegion();
 }
 
 //##ModelId=3E1874D202D0

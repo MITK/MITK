@@ -2,7 +2,6 @@
 #include "mitkInteractionConst.h"
 #include <mitkDataTreeNode.h>
 #include "mitkGeometry3D.h"
-//#include "mitkAffineTransformationOperation.h"
 #include "mitkRotationOperation.h"
 #include "mitkPointOperation.h"
 #include "mitkPositionEvent.h"
@@ -17,17 +16,14 @@
 
 #include <math.h>
 
-typedef itk::FixedArray< mitk::ScalarType, 3*2 > BoundsArrayType;
-
 mitk::AffineInteractor::AffineInteractor(const char * type, DataTreeNode* dataTreeNode)
 	 : Interactor(type, dataTreeNode)
 {
-  //m_ScaleFactor = 1.0;
 }
 
 bool mitk::AffineInteractor::ExecuteAction(int actionId, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId)
 {
-	bool ok = false;//for return type bool
+	bool ok = false;
 
   mitk::Geometry3D* geometry = m_DataTreeNode->GetData()->GetGeometry();
 	if (geometry == NULL)
@@ -36,12 +32,11 @@ bool mitk::AffineInteractor::ExecuteAction(int actionId, mitk::StateEvent const*
   /* Each case must watch the type of the event! */
   switch (actionId)
 	{
-   case AcNEWPOINT:
+  case AcNEWPOINT:
   {
     //ok = true;
     break;
   }
-
   case AcCHECKELEMENT:
   {
     mitk::PositionEvent const  *posEvent = dynamic_cast <const mitk::PositionEvent *> (stateEvent->GetEvent());
@@ -64,7 +59,7 @@ bool mitk::AffineInteractor::ExecuteAction(int actionId, mitk::StateEvent const*
         prop = new mitk::BoolProperty(false);
       }
 
-      // write new state (selected/not selected) to the property
+      /* write new state (selected/not selected) to the property */
       m_DataTreeNode->GetPropertyList()->SetProperty("selected", prop);
     }
     else // DisplayEvent from 3D Window or else Event
@@ -76,7 +71,6 @@ bool mitk::AffineInteractor::ExecuteAction(int actionId, mitk::StateEvent const*
 		ok = true;
     break;
   }
-
   case AcADD:
   {
     mitk::PositionEvent const  *posEvent = dynamic_cast <const mitk::PositionEvent *> (stateEvent->GetEvent());
@@ -99,25 +93,14 @@ bool mitk::AffineInteractor::ExecuteAction(int actionId, mitk::StateEvent const*
 		ok = true;
     break;
   }
-
   case AcTRANSLATESTART:
   {
-    // if we are not selected, don't do anything
-    //bool selected = false;
-    //if (m_DataTreeNode->GetBoolProperty("selected", selected) == false)        // if property does not exist
-    //  m_DataTreeNode->SetProperty("selected", new mitk::BoolProperty(false));  // create it
-    //if (selected == false)
-    //{
-    //  ok = true;
-    //  break;
-    //}
-
     mitk::PositionEvent const  *posEvent = dynamic_cast <const mitk::PositionEvent *> (stateEvent->GetEvent());
 		if (posEvent == NULL) return false;
     //converting from Point3D to itk::Point
-		mitk::ITKPoint3D newPosition;
-		mitk::vm2itk(posEvent->GetWorldPosition(), newPosition);
-    m_LastTranslatePosition = newPosition.GetVectorFromOrigin();
+		//mitk::ITKPoint3D newPosition;
+		mitk::vm2itk(posEvent->GetWorldPosition(), m_LastMousePosition);
+    //m_LastTranslatePosition = newPosition.GetVectorFromOrigin();
     ok = true;
     break;
   }
@@ -130,10 +113,11 @@ bool mitk::AffineInteractor::ExecuteAction(int actionId, mitk::StateEvent const*
 		mitk::ITKPoint3D newPosition;
 		mitk::vm2itk(posEvent->GetWorldPosition(), newPosition);
 
-    newPosition -=  m_LastTranslatePosition;  // compute difference between actual and last mouse position
+    newPosition -=  m_LastMousePosition.GetVectorFromOrigin();  // compute difference between actual and last mouse position
 
-    // create operation with position difference
-    //AffineTransformationOperation* doOp = new mitk::AffineTransformationOperation(OpMOVE, newPosition, 0.0, 0); // Index is not used here
+    mitk::vm2itk(posEvent->GetWorldPosition(), m_LastMousePosition);  // save current mouse position as last position
+
+    /* create operation with position difference */
     mitk::PointOperation* doOp = new mitk::PointOperation(OpMOVE, newPosition, 0); // Index is not used here
 		if (m_UndoEnabled)	//write to UndoMechanism
 		{
@@ -150,12 +134,8 @@ bool mitk::AffineInteractor::ExecuteAction(int actionId, mitk::StateEvent const*
 																	objectEventId, groupEventId);
 			m_UndoController->SetOperationEvent(operationEvent);
 		}
-		//execute the Operation
+		/* execute the Operation */
 		geometry->ExecuteOperation(doOp);
-
-    mitk::vm2itk(posEvent->GetWorldPosition(), newPosition);  // save actual mouse position as last position
-    m_LastTranslatePosition = newPosition.GetVectorFromOrigin();
-
     ok = true;
 	  break;
   }
@@ -164,10 +144,10 @@ bool mitk::AffineInteractor::ExecuteAction(int actionId, mitk::StateEvent const*
     mitk::PositionEvent const  *posEvent = dynamic_cast <const mitk::PositionEvent *> (stateEvent->GetEvent());
 		if (posEvent == NULL) return false;
     //converting from Point3D to itk::Point
-		mitk::ITKPoint3D newPosition;
-		mitk::vm2itk(posEvent->GetWorldPosition(), newPosition);
+		//mitk::ITKPoint3D newPosition;
+		mitk::vm2itk(posEvent->GetWorldPosition(), m_LastMousePosition);
     // save mouse down position
-    m_lastRotatePosition = newPosition.GetVectorFromOrigin();
+    //m_lastRotatePosition = newPosition.GetVectorFromOrigin();
     ok = true;
     break;
   }
@@ -185,20 +165,22 @@ bool mitk::AffineInteractor::ExecuteAction(int actionId, mitk::StateEvent const*
     geometry->GetVtkTransform()->GetPosition(position);
     mitk::ITKVector3D dataPosition = position;
 
-    newPosition -= dataPosition;  // calculate vector from center of the data object to the mouse position
+    newPosition -= dataPosition;  // calculate vector from center of the data object to the current mouse position
 
-    mitk::ITKVector3D startPosition = m_lastRotatePosition - dataPosition;  // calculate vector from center of the data object to the last mouse position
+    mitk::ITKVector3D startPosition = m_LastMousePosition.GetVectorFromOrigin() - dataPosition;  // calculate vector from center of the data object to the last mouse position
 
-    mitk::ITKVector3D rotationaxis;   // calculate rotation axis (by calculating the cross produkt of the vectors)
+    /* calculate rotation axis (by calculating the cross produkt of the vectors) */
+    mitk::ITKVector3D rotationaxis;   
     rotationaxis[0] =  startPosition[1] * newPosition[2] - startPosition[2] * newPosition[1];
     rotationaxis[1] =  startPosition[2] * newPosition[0] - startPosition[0] * newPosition[2];
     rotationaxis[2] =  startPosition[0] * newPosition[1] - startPosition[1] * newPosition[0];
 
+    /* calculate rotation angle in degrees */
     mitk::ScalarType angle = atan2(rotationaxis.GetNorm(), newPosition * startPosition) * (180/vnl_math::pi);
 
-    m_lastRotatePosition = dummy.GetVectorFromOrigin(); // save actual mouse position as last mouse position
+    m_LastMousePosition = dummy; // save current mouse position as last mouse position
 
-    // create operation with center of rotation, angle and axis
+    /* create operation with center of rotation, angle and axis and send it to the geometry and Undo controller */
     mitk::RotationOperation* doOp = new mitk::RotationOperation(OpROTATE, ITKPoint3D(position) , rotationaxis, angle);
 
     if (m_UndoEnabled)	//write to UndoMechanism
@@ -209,9 +191,8 @@ bool mitk::AffineInteractor::ExecuteAction(int actionId, mitk::StateEvent const*
 																	objectEventId, groupEventId);
 			m_UndoController->SetOperationEvent(operationEvent);
 		}
-		//execute the Operation
+		/* execute the Operation */
 		geometry->ExecuteOperation(doOp);
-
     ok = true;
 	  break;
   }
@@ -219,12 +200,8 @@ bool mitk::AffineInteractor::ExecuteAction(int actionId, mitk::StateEvent const*
   {
     mitk::PositionEvent const  *posEvent = dynamic_cast <const mitk::PositionEvent *> (stateEvent->GetEvent());
 		if (posEvent == NULL) return false;
-    //converting from Point3D to itk::Point
-		mitk::ITKPoint3D newPosition;
-		mitk::vm2itk(posEvent->GetWorldPosition(), newPosition);
-    m_LastScalePosition = newPosition;
-    m_FirstScaleVector.Fill(0);
-    m_Grow[0] = m_Grow[1] = m_Grow[2] = false;
+    /*converting from Point3D to itk::Point */
+		mitk::vm2itk(posEvent->GetWorldPosition(), m_LastMousePosition);
 
     ok = true;
     break;
@@ -237,37 +214,34 @@ bool mitk::AffineInteractor::ExecuteAction(int actionId, mitk::StateEvent const*
 		mitk::ITKPoint3D newPosition;
 		mitk::vm2itk(posEvent->GetWorldPosition(), newPosition);
 
-    mitk::ITKVector3D v = newPosition - m_LastScalePosition;
-
-    // calculate scale changes
+    mitk::ITKVector3D v = newPosition - m_LastMousePosition;
+    /* calculate scale changes */
     mitk::ITKPoint3D newScale;
     newScale[0] = (geometry->GetXAxis() * v) / geometry->GetXAxis().GetNorm();  // Scalarprodukt of normalized Axis
     newScale[1] = (geometry->GetYAxis() * v) / geometry->GetYAxis().GetNorm();  // and direction vector of mouse movement
     newScale[2] = (geometry->GetZAxis() * v) / geometry->GetZAxis().GetNorm();  // is the length of the movement vectors
                                                                                 // projection onto the axis
-     // calculate direction of mouse move (towards or away from the data object)
-     ITKPoint3D objectPosition = geometry->GetVtkTransform()->GetPosition();
-     ScalarType xdif = fabs((newPosition - objectPosition)[0]) - fabs((m_LastScalePosition - objectPosition)[0]);
-     ScalarType ydif = fabs((newPosition - objectPosition)[1]) - fabs((m_LastScalePosition - objectPosition)[1]);
-     ScalarType zdif = fabs((newPosition - objectPosition)[2]) - fabs((m_LastScalePosition - objectPosition)[2]);
- 
-     if(xdif < 0)
-       newScale[0] = - fabs(newScale[0]);
-     else
-       newScale[0] = + fabs(newScale[0]);
-     if(ydif < 0)
-       newScale[1] = - fabs(newScale[1]);
-     else
-       newScale[1] = + fabs(newScale[1]);
-     if(zdif < 0)
-       newScale[2] = - fabs(newScale[2]);
-     else
-       newScale[2] = + fabs(newScale[2]);
+    /* convert movement to local object coordinate system and mirror it to the positive quadrant */
+    ITKVector3D start;
+    ITKVector3D end;
+    mitk::ScalarType convert[3];
+    itk2vtk(m_LastMousePosition, convert);
+    geometry->GetVtkTransform()->GetInverse()->TransformPoint(convert, convert);  // transform start point to local object coordinates
+    start[0] = fabs(convert[0]);  start[1] = fabs(convert[1]);  start[2] = fabs(convert[2]);  // mirror it to the positive quadrant
+    itk2vtk(newPosition, convert);
+    geometry->GetVtkTransform()->GetInverse()->TransformPoint(convert, convert);  // transform end point to local object coordinates
+    end[0] = fabs(convert[0]);  end[1] = fabs(convert[1]);  end[2] = fabs(convert[2]);  // mirror it to the positive quadrant
 
-    m_LastScalePosition = newPosition;
+    /* check if mouse movement is towards or away from the objects axes and adjust scale factors accordingly */
+    ITKVector3D vLocal = start - end;
+    newScale[0] = (vLocal[0] > 0.0) ? -fabs(newScale[0]) : +fabs(newScale[0]);
+    newScale[1] = (vLocal[1] > 0.0) ? -fabs(newScale[1]) : +fabs(newScale[1]);
+    newScale[2] = (vLocal[2] > 0.0) ? -fabs(newScale[2]) : +fabs(newScale[2]);
+    
+    m_LastMousePosition = newPosition;  // update lastPosition for next mouse move
 
+    /* generate Operation and send it to the receiving geometry */
     PointOperation* doOp = new mitk::PointOperation(OpSCALE, newScale, 0); // Index is not used here
-
 		if (m_UndoEnabled)	//write to UndoMechanism
 		{
       mitk::ITKPoint3D oldScaleData;
@@ -281,9 +255,8 @@ bool mitk::AffineInteractor::ExecuteAction(int actionId, mitk::StateEvent const*
 																	objectEventId, groupEventId);
 			m_UndoController->SetOperationEvent(operationEvent);
 		}
-		//execute the Operation
+		/* execute the Operation */
 		geometry->ExecuteOperation(doOp);
-
     ok = true;
 	  break;
   }
@@ -300,7 +273,6 @@ bool mitk::AffineInteractor::CheckSelected(const mitk::Point3D& worldPoint)
     if (m_DataTreeNode->GetBoolProperty("selected", selected) == false)        // if property does not exist
       m_DataTreeNode->SetProperty("selected", new mitk::BoolProperty(false));  // create it
 
-
     // check if mouseclick has hit the object
     mitk::ITKPoint3D itkPoint;
     mitk::BoundingObject::Pointer boundingObject = dynamic_cast<mitk::BoundingObject*>(m_DataTreeNode->GetData());
@@ -315,8 +287,6 @@ bool mitk::AffineInteractor::CheckSelected(const mitk::Point3D& worldPoint)
     {
       m_DataTreeNode->GetData()->UpdateOutputInformation(); // update bounding box @TODO: Is this neccessary?
       BoundingBox* box = const_cast <BoundingBox*> (m_DataTreeNode->GetData()->GetGeometry()->GetBoundingBox());
-//      BoundsArrayType bounds = box->GetBounds();
-
       ScalarType p[4];
       p[0] = worldPoint.x;
       p[1] = worldPoint.y;
@@ -326,11 +296,10 @@ bool mitk::AffineInteractor::CheckSelected(const mitk::Point3D& worldPoint)
       itkPoint[0] = p[0]/p[3];
       itkPoint[1] = p[1]/p[3];
       itkPoint[2] = p[2]/p[3];
-
-      // reaply scaling, because bounding box is scaled
-      itkPoint[0] *= m_DataTreeNode->GetData()->GetGeometry()->GetXAxis().GetNorm();
-      itkPoint[1] *= m_DataTreeNode->GetData()->GetGeometry()->GetYAxis().GetNorm();
-      itkPoint[2] *= m_DataTreeNode->GetData()->GetGeometry()->GetZAxis().GetNorm();
+      //// reaply scaling, because bounding box is scaled
+      //itkPoint[0] *= m_DataTreeNode->GetData()->GetGeometry()->GetXAxis().GetNorm();
+      //itkPoint[1] *= m_DataTreeNode->GetData()->GetGeometry()->GetYAxis().GetNorm();
+      //itkPoint[2] *= m_DataTreeNode->GetData()->GetGeometry()->GetZAxis().GetNorm();
       selected = box->IsInside(itkPoint); // check if point is inside the datas bounding box
     }
     return selected;

@@ -8,7 +8,7 @@
 namespace mitk {
 
 //##Documentation
-//## @brief Interactor for Affine transformations translate, rotate
+//## @brief Interactor for Affine transformations translate, rotate and scale
 //## @ingroup Interaction
 //##
 //## An object of this class can translate, rotate and scale the data objects
@@ -36,15 +36,9 @@ protected:
 
   bool CheckSelected(const mitk::Point3D& worldPoint);
 
-  mitk::ITKVector3D m_LastTranslatePosition;
-  mitk::ITKPoint3D m_LastScalePosition;
-  mitk::ITKVector3D m_FirstScaleVector;
-  mitk::ITKVector3D m_lastRotatePosition;
-  bool m_Grow[3];
+  mitk::ITKPoint3D m_LastMousePosition;
 };
 
 } // namespace mitk
-
-
 
 #endif /* MITKAFFINEINTERACTOR_H_HEADER_INCLUDED_C188C29F */

@@ -6,6 +6,7 @@ mitk::BoundingObjectGroup::BoundingObjectGroup()
 {
   m_Geometry3D->Initialize();
   m_BoundingObjects = mitk::BoundingObjectGroup::BoundingObjectContainer::New();
+  SetVtkPolyData(NULL);
 }
 
 mitk::BoundingObjectGroup::~BoundingObjectGroup()
@@ -46,50 +47,69 @@ void mitk::BoundingObjectGroup::UpdateOutputInformation()
   }
   mitk::BoundingBox::Pointer boundingBox;
   mitk::BoundingBox::PointType minPoint;
-  mitk::BoundingBox::PointType maxPoint;
   mitk::BoundingBox::PointType globalMinPoint;  
   mitk::BoundingBox::PointType globalMaxPoint;
   float* posPoint;
 
-  //initialize globalMin/MaxPoints
+  /* Initialize globalMin/MaxPoints */
   boundingObjectsIterator.Value()->UpdateOutputInformation();
   boundingBox = const_cast<mitk::BoundingBox*>(boundingObjectsIterator.Value()->GetGeometry()->GetBoundingBox());
+  
   minPoint = boundingBox->GetMinimum();
-  maxPoint = boundingBox->GetMaximum();
-  posPoint = boundingObjectsIterator.Value()->GetGeometry()->GetVtkTransform()->GetPosition();
-
-  globalMinPoint[0] = posPoint[0] + minPoint[0];
-  globalMinPoint[1] = posPoint[1] + minPoint[1];
-  globalMinPoint[2] = posPoint[2] + minPoint[2];
-  globalMaxPoint[0] = posPoint[0] + maxPoint[0];
-  globalMaxPoint[1] = posPoint[1] + maxPoint[1];
-  globalMaxPoint[2] = posPoint[2] + maxPoint[2];
-  std::cout << "local Boundingbox 1: " << globalMinPoint[0] << ", " << globalMaxPoint[0] << ", " << globalMinPoint[1] << ", " << globalMaxPoint[1] << ", " << globalMinPoint[2] << ", " << globalMaxPoint[2] << ".\n";
-  boundingObjectsIterator++;  
+  mitk::ScalarType min[3];
+  min[0] = minPoint[0];   min[1] = minPoint[1];   min[2] = minPoint[2];
+  boundingObjectsIterator.Value()->GetGeometry()->GetVtkTransform()->TransformPoint(min, min);
+  globalMinPoint[0] = min[0];   globalMinPoint[1] = min[1];   globalMinPoint[2] = min[2];  
+  globalMaxPoint[0] = min[0];   globalMaxPoint[1] = min[1];   globalMaxPoint[2] = min[2];
+  //boundingObjectsIterator++;  
   while (boundingObjectsIterator != boundingObjectsIteratorEnd) // calculate a bounding box that includes all BoundingObjects
   {  
     boundingObjectsIterator.Value()->UpdateOutputInformation();    
     boundingBox = const_cast<mitk::BoundingBox*>(boundingObjectsIterator.Value()->GetGeometry()->GetBoundingBox());
-    minPoint = boundingBox->GetMinimum();
-    maxPoint = boundingBox->GetMaximum();
-    posPoint = boundingObjectsIterator.Value()->GetGeometry()->GetVtkTransform()->GetPosition();
 
-    minPoint[0] = posPoint[0] + minPoint[0];
-    minPoint[1] = posPoint[1] + minPoint[1];
-    minPoint[2] = posPoint[2] + minPoint[2];
-    maxPoint[0] = posPoint[0] + maxPoint[0];
-    maxPoint[1] = posPoint[1] + maxPoint[1];
-    maxPoint[2] = posPoint[2] + maxPoint[2];
+    /* create all 8 points of the bounding box */
+    mitk::BoundingBox::PointsContainerPointer points = mitk::BoundingBox::PointsContainer::New();
+    mitk::ITKPoint3D p;
+    p = boundingBox->GetMinimum();
+    points->InsertElement(0, p);
+    p[0] = -p[0];
+    points->InsertElement(1, p);
+    p = boundingBox->GetMinimum();
+    p[1] = -p[1];    
+    points->InsertElement(2, p);
+    p = boundingBox->GetMinimum();
+    p[2] = -p[2];    
+    points->InsertElement(3, p);
+    p = boundingBox->GetMaximum();
+    points->InsertElement(4, p);
+    p[0] = -p[0];
+    points->InsertElement(5, p);
+    p = boundingBox->GetMaximum();
+    p[1] = -p[1];    
+    points->InsertElement(6, p);
+    p = boundingBox->GetMaximum();
+    p[2] = -p[2];    
+    points->InsertElement(7, p);
+    mitk::BoundingBox::PointsContainerConstIterator pointsIterator = points->Begin();
+    mitk::BoundingBox::PointsContainerConstIterator pointsIteratorEnd = points->End();
+    while (pointsIterator != pointsIteratorEnd) // for each vertex of the bounding box
+    {
+      minPoint = pointsIterator->Value();
+      min[0] = minPoint[0];   min[1] = minPoint[1];   min[2] = minPoint[2];
+      boundingObjectsIterator.Value()->GetGeometry()->GetVtkTransform()->TransformPoint(min, min);  // transform vertex point to world coordinates
 
-    globalMinPoint[0] = (minPoint[0] < globalMinPoint[0]) ? minPoint[0] : globalMinPoint[0];
-    globalMinPoint[1] = (minPoint[1] < globalMinPoint[1]) ? minPoint[1] : globalMinPoint[1];
-    globalMinPoint[2] = (minPoint[2] < globalMinPoint[2]) ? minPoint[2] : globalMinPoint[2];
-
-    globalMaxPoint[0] = (maxPoint[0] > globalMaxPoint[0]) ? maxPoint[0] : globalMaxPoint[0];
-    globalMaxPoint[1] = (maxPoint[1] > globalMaxPoint[1]) ? maxPoint[1] : globalMaxPoint[1];
-    globalMaxPoint[2] = (maxPoint[2] > globalMaxPoint[2]) ? maxPoint[2] : globalMaxPoint[2];
+      globalMinPoint[0] = (min[0] < globalMinPoint[0]) ? min[0] : globalMinPoint[0];  // check if world point
+      globalMinPoint[1] = (min[1] < globalMinPoint[1]) ? min[1] : globalMinPoint[1];  // has a lower or a
+      globalMinPoint[2] = (min[2] < globalMinPoint[2]) ? min[2] : globalMinPoint[2];  // higher value as
+      globalMaxPoint[0] = (min[0] > globalMaxPoint[0]) ? min[0] : globalMaxPoint[0];  // the last known highest
+      globalMaxPoint[1] = (min[1] > globalMaxPoint[1]) ? min[1] : globalMaxPoint[1];  // value
+      globalMaxPoint[2] = (min[2] > globalMaxPoint[2]) ? min[2] : globalMaxPoint[2];  // in each axis
+      pointsIterator++;
+    }
     boundingObjectsIterator++;
   }
+
+  /* BoundingBox is centered around the center of all sub bounding objects */
   mitk::BoundingBox::PointType centerPoint;
   centerPoint[0] = (globalMinPoint[0] + globalMaxPoint[0])/ 2.0;
   centerPoint[1] = (globalMinPoint[1] + globalMaxPoint[1])/ 2.0;
@@ -101,10 +121,12 @@ void mitk::BoundingObjectGroup::UpdateOutputInformation()
   bounds[3] = globalMaxPoint[1] - centerPoint[1]; // y Max
   bounds[4] = globalMinPoint[2] - centerPoint[2]; // z Min
   bounds[5] = globalMaxPoint[2] - centerPoint[2]; // z Max
-
-  m_Geometry3D->GetVtkTransform()->Identity();
-  m_Geometry3D->GetVtkTransform()->Translate((globalMinPoint[0] + globalMaxPoint[0])/ 2.0, (globalMinPoint[1] + globalMaxPoint[1])/ 2.0, (globalMinPoint[2] + globalMaxPoint[2])/ 2.0);
   m_Geometry3D->SetBoundingBox(bounds);
+
+  /* the objects position is the center of all sub bounding objects */
+  m_Geometry3D->GetVtkTransform()->Identity();
+  m_Geometry3D->GetVtkTransform()->Translate(centerPoint[0], centerPoint[1], centerPoint[2]);
+  
 }
 
 void mitk::BoundingObjectGroup::AddBoundingObject(mitk::BoundingObject::Pointer boundingObject)

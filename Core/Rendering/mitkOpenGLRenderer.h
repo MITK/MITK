@@ -34,6 +34,7 @@ class vtkRenderer;
 class vtkRenderWindow;
 class vtkLight;
 class vtkLightKit;
+class vtkWorldPointPicker;
 
 namespace mitk {
 //##ModelId=3C6E9AD90215
@@ -98,6 +99,8 @@ public:
     return m_VtkRenderer;
   };
 
+  virtual void PickWorldPoint(const Point2D& displayPoint, Point3D& worldPoint) const;
+
   //##Documentation
   //## @brief Updates the contents of all renderwindows
   static void UpdateAllInstancesIncludingVtkActors() 
@@ -161,10 +164,10 @@ private:
   //##Documentation
   //## @brief Timestamp of last call of UpdateVtkActors().
   unsigned long m_LastUpdateVtkActorsTime;
+
+  vtkWorldPointPicker *m_WorldPointPicker;
 };
 
 } // namespace mitk
-
-
 
 #endif /* MITKOPENGLRENDERER_H_HEADER_INCLUDED_C1C29F6D */

@@ -351,6 +351,13 @@ void mitk::BaseRenderer::MouseMoveEvent(mitk::MouseEvent *me)
   }
 }
 
+void mitk::BaseRenderer::PickWorldPoint(const mitk::Point2D& displayPoint, mitk::Point3D& worldPoint) const
+{
+  mitk::Point2D worldPoint2D;
+  GetDisplayGeometry()->DisplayToMM(displayPoint, worldPoint2D);
+  GetDisplayGeometry()->Map(worldPoint2D, worldPoint);
+}
+
 void mitk::BaseRenderer::WheelEvent(mitk::WheelEvent *we)
 {
   //mitk::Event event(this, ke->type(), Qt::NoButton, Qt::NoButton, ke->key());

@@ -34,6 +34,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkRenderWindow.h>
 #include <vtkTransform.h>
 #include <vtkCamera.h>
+#include <vtkWorldPointPicker.h>
 
 #include "mitkPlaneGeometry.h"
 #include "mitkProperties.h"
@@ -49,7 +50,9 @@ mitk::OpenGLRenderer::OpenGLRenderer() : m_VtkMapperPresent(false),
   m_VtkRenderer(NULL), m_LastUpdateVtkActorsTime(0)
 {
   m_CameraController=NULL;//\*todo remove line
-  m_CameraController = new VtkInteractorCameraController();  
+  m_CameraController = new VtkInteractorCameraController();
+
+  m_WorldPointPicker = vtkWorldPointPicker::New();
 
   m_DataChangedCommand = itk::MemberCommand<mitk::OpenGLRenderer>::New();
 #ifdef WIN32
@@ -533,4 +536,16 @@ void mitk::OpenGLRenderer::DataChangedEvent(const itk::Object *caller, const itk
   {
     m_RenderWindow->Update();
   }
+}
+
+void mitk::OpenGLRenderer::PickWorldPoint(const mitk::Point2D& displayPoint, mitk::Point3D& worldPoint) const
+{
+  if(m_VtkMapperPresent)
+  {
+    //m_WorldPointPicker->SetTolerance (0.0001);
+    m_WorldPointPicker->Pick(displayPoint[0], displayPoint[1], 0, m_VtkRenderer);
+    vtk2itk(m_WorldPointPicker->GetPickPosition(), worldPoint);
+  }
+  else
+    Superclass::PickWorldPoint(displayPoint, worldPoint);
 }

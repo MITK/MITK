@@ -155,6 +155,7 @@ public:
   //## The DisplayGeometry describes which part of the Geometry2D m_CurrentWorldGeometry2D
   //## is displayed.
   virtual void SetDisplayGeometry(mitk::DisplayGeometry* geometry2d);
+  itkGetConstObjectMacro(DisplayGeometry, mitk::DisplayGeometry);
   itkGetObjectMacro(DisplayGeometry, mitk::DisplayGeometry);
 
   //##Documentation
@@ -210,6 +211,15 @@ public:
   //##Documentation
   //## @brief Get timestamp of last call of SetDisplayGeometry
   unsigned long  GetDisplayGeometryUpdateTime() { return m_CurrentWorldGeometry2DUpdateTime; };
+
+  //##Documentation
+  //## @brief Perform a picking: find the x,y,z world coordinate of a 
+  //## display x,y coordinate.
+  //## @warning Has to be overwritten in subclasses for the 3D-case.
+  //##
+  //## Implemented here only for 2D-rendering by using 
+  //## m_DisplayGeometry
+  virtual void PickWorldPoint(const Point2D& diplayPosition, Point3D& worldPosition) const;
 
   //##Documentation
   //## @brief Get the MapperSlotId to use.

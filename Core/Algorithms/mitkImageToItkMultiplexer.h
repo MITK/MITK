@@ -1,21 +1,30 @@
-/*template <typename PixelType, unsigned int Dimension> void _calculateItkPipelineFunction(mitk::Image* result, mitk::Image* mitksource, itk::ImageSource< mitk::ImageToItk<PixelType, Dimension> >* itkpipelinefunction)
-{
-  typedef mitk::ImageToItk<PixelType, Dimension> ImageToItkType;
-  typedef itk::Image<type, dimension> ImageType;
-    typedef itk::ImageSource< ImageType > ImageFilterType;
-  
-  ImageToItkType::Pointer myImageToItkFilter = ImageToItkType::New();
-    myImageToItkFilter->SetInput(mitksource);
-    
-    ImageFilterType::Pointer itkpipeline = itkpipelinefunction(myImageToItkFilter->GetOutput()).GetPointer();
-    itkpipeline->Update();
-    //	itkpipeline->SetInput(myItkImage);
-    //	itkpipeline->Update();
-    
-    result->Initialize(itkpipeline->GetOutput());
-    result->SetVolume(itkpipeline->GetOutput()->GetBufferPointer());
-}
+#include <mitkImageToItk.h>
+#include <itkCastImageFilter.h>
+
+/*!
+* \brief method creates a cast image filter and casts the image of ItkInputImageType
+* to type ItkOutputImageType. The method needs to be called via the 
+* mitkImageToItkMultiplexer 
+*
+* \code
+*  mitk::Image::Pointer inputMitkImage;
+*  ... // set inputMitkImage
+*  ITKImageType::Pointer resultItkImage = ITKImageType::New();
+*  FixedInputDimensionMitkToItkFunctionMultiplexer(resultItkImage, ITKImageType, inputMitkImage, dimension, MakeCastImageFilter);
+*
+* \endcode
 */
+template <  typename  ItkInputImageType,  typename ItkOutputImageType > 
+itk::ImageSource < ItkOutputImageType > ::Pointer 
+MakeCastImageFilter(  ItkInputImageType* inputImage )
+{
+  typedef itk::CastImageFilter < ItkInputImageType , 
+    ItkOutputImageType > myFilterType;
+  myFilterType::Pointer myFilter = myFilterType::New();
+  myFilter->SetInput( inputImage );
+  return myFilter.GetPointer();
+}
+
 #define _calculateItkPipelineFunction(result, mitksource, itkpipelinefunction, type, dimension)    \
   if ( typeId == typeid(type) )                                                                  \
 {                                                                                              \

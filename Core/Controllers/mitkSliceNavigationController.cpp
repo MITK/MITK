@@ -289,7 +289,7 @@ bool mitk::SliceNavigationController::ExecuteAction( Action* action, mitk::State
           if(slicedWorldGeometry!=NULL)
           {
             int best_slice = -1;
-            double best_distance = itk::NumericTraits<double>::infinity();
+            double best_distance = itk::NumericTraits<double>::max();
 
             int s, slices;
             slices = slicedWorldGeometry->GetSlices();

@@ -239,8 +239,8 @@ ipPicDescriptor* Pic2vtk::convertVectorImage( vtkImageData* vtkImage ) {
 
 	unsigned int vectorDim = vtkImage->GetNumberOfScalarComponents();
 
-	register unsigned long size;
-	register unsigned long volumeSize;
+	unsigned long size = 0;
+	unsigned long volumeSize = 0;
 	
 	if ( dim[2] > 1 ) {
 		pic->dim = 3 + 1;
@@ -1226,11 +1226,11 @@ vtkImageData* Pic2vtk::loadVtkImage( char* fileName ) {
 	if ( reader->OpenVTKFile() == 0 )
 		return NULL;
 
-	int test = reader->IsFileStructuredPoints();
+	// int test = reader->IsFileStructuredPoints(); /* \todo remove line! */
 
 
-	int a = reader->GetFileType();
-	char * kk = reader->GetHeader();
+	//int a = reader->GetFileType(); /* \todo remove line! */
+	//char * kk = reader->GetHeader(); /* \todo remove line! */
 
 	// vtkStructuredPoints* points = reader->GetOutput();
 	return NULL;

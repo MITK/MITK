@@ -173,7 +173,7 @@ void mitk::SurfaceMapper2D::Paint(mitk::BaseRenderer * renderer)
 
     vtkPoints *vpoints=contour->GetPoints();
     vtkCellArray *vpolys=contour->GetLines();
-    vtkPointData *vpointdata=contour->GetPointData();
+    //vtkPointData *vpointdata=contour->GetPointData(); /* \todo remove line! */
     
     vtkCellData *vcelldata=contour->GetCellData();
     vtkDataArray* vcellscalars=vcelldata->GetScalars();

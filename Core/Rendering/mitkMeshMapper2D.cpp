@@ -119,7 +119,7 @@ void mitk::MeshMapper2D::Paint(mitk::BaseRenderer * renderer)
             }
             break;
           default:
-            NULL;
+            break;
           }//switch
 
           //the actual point
@@ -151,6 +151,10 @@ void mitk::MeshMapper2D::Paint(mitk::BaseRenderer * renderer)
                   tmp=pt2d-vert;      glVertex2fv(&tmp[0]);
                   tmp=pt2d+vert;      glVertex2fv(&tmp[0]);
               glEnd ();
+            }
+	  default:
+            {
+	      break;
             }
           }//switch
         }//else

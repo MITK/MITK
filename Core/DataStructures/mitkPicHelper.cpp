@@ -170,7 +170,7 @@ bool mitk::PicHelper::SetGeometry2D(ipPicDescriptor* pic, int s, SlicedGeometry3
 
         zPosition += pixelSize[2] / 2.0f;    // first half slice thickness
 
-        if((s==-1) || (slice==s))
+        if((s==-1) || (slice== (unsigned int) s))
         {
           Vector3D spacing;
           spacing = pixelSize;

@@ -59,7 +59,11 @@ public:
 
   virtual void Repaint();
 
+  virtual QSize minimumSizeHint () const;
+
   virtual QSizePolicy sizePolicy() const;
+
+  virtual QSize sizeHint () const;
 
 protected:
   //##ModelId=3E3314590396

@@ -223,9 +223,19 @@ void mitk::QmitkRenderWindow::Repaint()
   repaint();
 };
 
+QSize mitk::QmitkRenderWindow::minimumSizeHint () const
+{
+  return QSize(100, 100);
+}
+
 QSizePolicy mitk::QmitkRenderWindow::sizePolicy() const
 {
   return QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding, 0, 0);
+}
+
+QSize mitk::QmitkRenderWindow::sizeHint () const 
+{
+  return QSize(100, 100);
 }
 
 //##ModelId=3E6D5DD403B0

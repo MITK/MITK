@@ -43,6 +43,8 @@ public:
   //##ModelId=3E86AABB0371
   const mitk::Color & GetColor() const;
   //##ModelId=3E86AABB0399
+  const mitk::Color & GetValue() const;
+  std::string mitk::ColorProperty::GetValueAsString() const;
   void SetColor(const mitk::Color & color );
 };
 

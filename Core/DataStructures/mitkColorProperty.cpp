@@ -1,3 +1,4 @@
+#include <sstream>
 #include "mitkColorProperty.h"
 
 //##ModelId=3E86A3450130
@@ -47,4 +48,14 @@ void mitk::ColorProperty::SetColor(const mitk::Color & color )
         m_Color = color;
         Modified();
     }
+}
+
+std::string mitk::ColorProperty::GetValueAsString() const {
+  std::stringstream myStr;
+  myStr << GetValue() ;
+  return myStr.str(); 
+}
+const mitk::Color & mitk::ColorProperty::GetValue() const
+{
+    return GetColor();
 }

@@ -29,12 +29,10 @@ namespace mitk {
 
 //##ModelId=3E5B79B5012A
 //##Documentation
-//## @brief Event, that also stores coordinates
+//## @brief Event that stores coordinates
 //## @ingroup Interaction
 //## 
-//## Stores DisplayPosition from Mouse.
-//## Later on the WorldPosition according to a BaseRender can be calculated and
-//## set.
+//## Stores display position of the mouse and 3D world position in mm.
 class PositionEvent : public DisplayPositionEvent
 {
 public:
@@ -48,17 +46,6 @@ public:
   //##        worldPosition: the 3D position e.g. from a picking 
   //##        
   PositionEvent(BaseRenderer* sender, int type, int button, int buttonState, int key, const Point2D& displPosition, const Point3D& worldPosition);
-
-  //##ModelId=3EDC8EEC00F8
-  const Point3D& GetWorldPosition() const;
-
-  //##ModelId=3EDC8EEC0136
-  void SetWorldPosition(const Point3D& worldPosition);
-
-
-private:
-  //##ModelId=3EDC8EEC008A
-  Point3D m_WorldPosition;
 };
 
 } // namespace mitk

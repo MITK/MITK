@@ -147,10 +147,6 @@ class GlobalInteraction : public StateMachine
   //##ModelId=3E7F497F01AE
   virtual bool ExecuteAction(Action* action, mitk::StateEvent const* stateEvent);
 
-  //##Documentation
-  //##@brief calculating the worldcoorinate and returning it in an event
-  virtual bool GetWorldCoordinate(const DisplayPositionEvent *diplayPositionEvent, PositionEvent* positionEvent);
-
   private:
 
   //##Documentation

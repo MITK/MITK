@@ -246,55 +246,10 @@ mitk::FocusManager* mitk::GlobalInteraction::GetFocusManager()
   return m_FocusManager;
 }
 
-bool mitk::GlobalInteraction::GetWorldCoordinate(const mitk::DisplayPositionEvent *displayPositionEvent, mitk::PositionEvent* positionEvent)
-{
-  /* pick a Prop3D and assume its position as event 3D coordinates */
-  //also possible to take the Sender of the event!
-  const mitk::Point2D displayPoint = displayPositionEvent->GetDisplayPosition();
-  const FocusManager::FocusElement* fe = this->GetFocus();
-  FocusManager::FocusElement* fe2 =  const_cast <FocusManager::FocusElement*>(fe);
-  mitk::OpenGLRenderer* glRenderer = dynamic_cast<mitk::OpenGLRenderer*>(fe2);
-  if (glRenderer == NULL)
-    return false;
-
-  vtkWorldPointPicker *worldPicker = vtkWorldPointPicker::New();
-  //picker->SetTolerance (0.0001);
-  worldPicker->Pick(displayPoint[0], displayPoint[1], 0, glRenderer->GetVtkRenderer());
-  mitk::Point3D worldPoint;
-  vtk2itk(worldPicker->GetPickPosition(), worldPoint);
-  positionEvent->SetWorldPosition(worldPoint);
-  return true;
-}
-
 //##ModelId=3E7F497F01AE
 bool mitk::GlobalInteraction::ExecuteAction(Action* action, mitk::StateEvent const* stateEvent)
 {
   bool ok = false;
-  
- 
-  //check if we already have a PositionEvent with 3D worldcoordinates.
-  //if we have a DiplayPositionEvent, we check if the Event is thrown by a mouseclick.
-  //If so, compute the worldcoodinates through this->GetWorldPosition()
-  mitk::PositionEvent const  *posEvent = dynamic_cast <const mitk::PositionEvent *> (stateEvent->GetEvent());
-  if (posEvent == NULL)
-    if (stateEvent->GetEvent()->GetType() == Type_MouseButtonPress)
-    {
-      mitk::DisplayPositionEvent const  *displayEvent = dynamic_cast <const mitk::DisplayPositionEvent *> (stateEvent->GetEvent());
-      if (displayEvent!=NULL)
-      {
-        mitk::Point3D worldPoint;
-        worldPoint.Fill(0);
-
-        PositionEvent* positionEvent = new PositionEvent(displayEvent->GetSender(), displayEvent->GetType(), displayEvent->GetButton(),
-          displayEvent->GetButtonState(), displayEvent->GetKey(), displayEvent->GetDisplayPosition(), worldPoint);
-        ok = GetWorldCoordinate(displayEvent, positionEvent);
-        if (ok)
-        {
-          mitk::EventMapper::SetStateEvent(positionEvent);
-        }
-      }
-    }
-
 
   ok = false;
   switch (action->GetActionId())

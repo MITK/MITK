@@ -28,11 +28,12 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk {
 
 //##Documentation
-//## @brief Event, which is fired after a mouse event has been invoked in a 3D-Scene.
-//## 
+//## @brief Event that stores coordinates
 //## @ingroup Interaction
 //## 
-//## Stores DisplayPosition of the Mouse.
+//## Stores display position of the mouse. If requested, the correspondent 
+//## 3D world position in mm is calculated via picking (delegated to the 
+//## BaseRenderer).
 class DisplayPositionEvent : public Event
 {
   public:
@@ -44,14 +45,20 @@ class DisplayPositionEvent : public Event
     //##        displPosition: the 2D Position of the mouse
     DisplayPositionEvent(BaseRenderer* sender, int type, int button, int buttonState, int key, const Point2D& displPosition);
 
-    const Point2D& GetDisplayPosition() const;
+    const Point2D& GetDisplayPosition() const
+    {
+      	return m_DisplayPosition;
+    }
+
     void SetDisplayPosition(const Point2D& displPosition) { m_DisplayPosition = displPosition; }
-  private:
+
+    const Point3D& GetWorldPosition() const;
+  protected:
     Point2D m_DisplayPosition;
+    mutable Point3D m_WorldPosition;
+    mutable bool m_WorldPositionIsSet;
 };
 
 } // namespace mitk
-
-
 
 #endif /* DISPLAYPOSITIONozsiEVENT_H_HEADER_INCLUDED_C184F366 */

@@ -63,6 +63,8 @@ const std::type_info& BoundingObjectCutter::GetOutputPixelType()
 
 void BoundingObjectCutter::GenerateInputRequestedRegion()
 {
+  if((m_BoundingObject.IsNull()) || (m_BoundingObject->GetTimeSlicedGeometry()->GetTimeSteps() == 0))
+    return;
   // we have already calculated the spatial part of the 
   // input-requested-region in m_InputRequestedRegion in 
   // GenerateOutputInformation (which is called before 
@@ -176,7 +178,7 @@ void BoundingObjectCutter::GenerateData()
   if(input.IsNull())
     return;  
 
-  if(m_BoundingObject.IsNull())
+  if((m_BoundingObject.IsNull()) || (m_BoundingObject->GetTimeSlicedGeometry()->GetTimeSteps() == 0))
     return;
 
   m_InputTimeSelector->SetInput(input);

@@ -18,6 +18,8 @@
 class QActionGroup;
 
 #include "DataTree.h"
+#include "QmitkSelectableGLWidget.h"
+#include "vecmath.h"
 
 /*!
  \brief class providing a standard interface for MITK application functionality
@@ -102,6 +104,15 @@ public:
 	 */
 	mitk::DataTreeIterator * getDataTree();
 
+
+  /*!
+	 \brief initialize the widgets
+	 */
+  void initWidget(mitk::DataTreeIterator* it,
+				   QmitkSelectableGLWidget* widget,
+				   const Vector3f& origin,
+				   const Vector3f& right,
+				   const Vector3f& bottom);
 signals:
 	void signal_dummy();
 	void availabilityChanged(QmitkFunctionality*);

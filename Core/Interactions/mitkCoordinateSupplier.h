@@ -36,10 +36,10 @@ protected:
 	virtual bool ExecuteSideEffect(int sideEffectId, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId);
 
 private:
-    //##ModelId=3F0189F0023B
-	ITKPoint3D m_Point;
-    //##ModelId=3F0189F0024A
-    OperationActor* m_Destination;
+  //##ModelId=3F0189F0024A
+  OperationActor* m_Destination;
+  ITKPoint3D m_OldPoint;
+
 };
 
 } // namespace mitk

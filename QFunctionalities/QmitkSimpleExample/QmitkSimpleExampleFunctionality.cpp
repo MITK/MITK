@@ -36,7 +36,7 @@ controls(NULL), multiWidget(mitkStdMultiWidget), opacityprop(NULL)
     if(globalInteraction!=NULL)
     {
 	    mitk::SeedRoi* seedRoi = new mitk::SeedRoi("seedroi", this);
-	    globalInteraction->SetRoi(seedRoi);
+	    globalInteraction->AddStateMachine(seedRoi);
     }
 }
 

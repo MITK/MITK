@@ -2,7 +2,7 @@
 #define MITKCYLINDRICTOCARTESIANFILTER_H_HEADER_INCLUDED_C1F48A22
 
 #include "mitkCommon.h"
-#include "ImageToImageFilter.h"
+#include "mitkImageToImageFilter.h"
 
 #define M_PI       3.14159265358979323846
 //#endif

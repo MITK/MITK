@@ -1,4 +1,4 @@
-#include "SubImageSelector.h"
+#include "mitkSubImageSelector.h"
 
 //##ModelId=3E0B4663009F
 void mitk::SubImageSelector::SetPosNr(int p)

@@ -1,5 +1,5 @@
 #include "mitkCylindricToCartesianFilter.h"
-#include "ImageTimeSelector.h"
+#include "mitkImageTimeSelector.h"
 
 #include <ipPicTypeMultiplex.h>
 #include <iostream.h>

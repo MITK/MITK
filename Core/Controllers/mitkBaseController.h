@@ -2,8 +2,8 @@
 #define BASECONTROLLER_H_HEADER_INCLUDED_C1E745A3
 
 #include "mitkCommon.h"
-#include "Navigator.h"
-#include "Stepper.h"
+#include "mitkNavigator.h"
+#include "mitkStepper.h"
 #include <itkObjectFactory.h>
 
 namespace mitk {

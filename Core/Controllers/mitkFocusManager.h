@@ -2,7 +2,7 @@
 #define MITKFOCUSMANAGER_H_HEADER_INCLUDED_C135A197
 
 #include "mitkCommon.h"
-#include "BaseRenderer.h"
+#include "mitkBaseRenderer.h"
 #include <vector>
 #include <itkEventObject.h>
 

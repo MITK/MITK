@@ -2,7 +2,7 @@
 #define MITKVTKINTERACTORCAMERACONTROLLER_H_HEADER_INCLUDED_C1C53722
 
 #include "mitkCommon.h"
-#include "CameraController.h"
+#include "mitkCameraController.h"
 #include "vtkRenderWindowInteractor.h"
 
 class vtkRenderWindow;

@@ -1,4 +1,4 @@
-#include "OperationEvent.h"
+#include "mitkOperationEvent.h"
 
 //##ModelId=3E9B07B40374
 int mitk::OperationEvent::m_CurrObjectEventId = 0;

@@ -1,4 +1,4 @@
-#include "SliceNavigationController.h"
+#include "mitkSliceNavigationController.h"
 
 //##ModelId=3DD524D7038C
 /*!

@@ -1,4 +1,4 @@
-#include "FileReader.h"
+#include "mitkFileReader.h"
 
 //##ModelId=3E188F1F027E
 mitk::FileReader::FileReader()

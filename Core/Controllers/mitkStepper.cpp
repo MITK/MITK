@@ -1,4 +1,4 @@
-#include "Stepper.h"
+#include "mitkStepper.h"
 
 //##ModelId=3DF8B9DD0141
 unsigned int mitk::Stepper::GetPos()

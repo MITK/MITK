@@ -1,4 +1,4 @@
-#include "ImageChannelSelector.h"
+#include "mitkImageChannelSelector.h"
 
 //##ModelId=3E1B1980039C
 mitk::ImageChannelSelector::ImageChannelSelector() : m_ChannelNr(0)

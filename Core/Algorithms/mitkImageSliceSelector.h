@@ -2,8 +2,8 @@
 #define IMAGESLICESELECTOR_H_HEADER_INCLUDED_C1E4BE7B
 
 #include "mitkCommon.h"
-#include "ImageToImageFilter.h"
-#include "SubImageSelector.h"
+#include "mitkImageToImageFilter.h"
+#include "mitkSubImageSelector.h"
 
 namespace mitk {
 

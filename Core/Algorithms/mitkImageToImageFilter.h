@@ -2,7 +2,7 @@
 #define IMAGETOIMAGEFILTER_H_HEADER_INCLUDED_C1E5E869
 
 #include "mitkCommon.h"
-#include "ImageSource.h"
+#include "mitkImageSource.h"
 
 namespace mitk {
 

@@ -1,4 +1,4 @@
-#include "ImageToImageFilter.h"
+#include "mitkImageToImageFilter.h"
 
 //##ModelId=3E1A06100338
 mitk::ImageToImageFilter::ImageToImageFilter()

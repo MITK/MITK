@@ -1,4 +1,4 @@
-#include "PicFileReader.h"
+#include "mitkPicFileReader.h"
 #include <itkImageFileReader.h>
 
 //##ModelId=3E1878400265

@@ -1,4 +1,4 @@
-#include "ImageSliceSelector.h"
+#include "mitkImageSliceSelector.h"
 
 //##ModelId=3E1A0A2E027F
 void mitk::ImageSliceSelector::GenerateOutputInformation()

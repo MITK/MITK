@@ -1,4 +1,4 @@
-#include "LimitedLinearUndo.h"
+#include "mitkLimitedLinearUndo.h"
 
 //##ModelId=3E5F5D8C00B2
 bool mitk::LimitedLinearUndo::SetOperationEvent(OperationEvent* operationEvent)

@@ -1,4 +1,4 @@
-#include "CameraController.h"
+#include "mitkCameraController.h"
 
 //##ModelId=3E3AE7440312
 mitk::CameraController::CameraController()

@@ -2,7 +2,7 @@
 #define UNDOMODEL_H_HEADER_INCLUDED_C16ED098
 
 #include "mitkCommon.h"
-#include "OperationEvent.h"
+#include "mitkOperationEvent.h"
 
 namespace mitk {
 //##ModelId=3E5F564C03D4

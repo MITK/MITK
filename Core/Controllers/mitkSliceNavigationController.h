@@ -2,8 +2,8 @@
 #define SLICENAVIGATIONCONTROLLER_H_HEADER_INCLUDED_C1C55A2F
 
 #include "mitkCommon.h"
-#include "BaseController.h"
-#include "ImageToImageFilter.h"
+#include "mitkBaseController.h"
+#include "mitkImageToImageFilter.h"
 
 namespace mitk {
 

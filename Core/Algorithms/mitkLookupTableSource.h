@@ -3,7 +3,7 @@
 
 #include "mitkLookupTable.h"
 #include "mitkCommon.h"
-#include "BaseProcess.h"
+#include "mitkBaseProcess.h"
 
 namespace mitk
 {

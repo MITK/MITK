@@ -2,9 +2,9 @@
 #define OPERATIONEVENT_H_HEADER_INCLUDED_C16E83FC
 
 #include "mitkCommon.h"
-#include "Operation.h"
-#include "OperationActor.h"
-#include "UndoModel.h"
+#include "mitkOperation.h"
+#include "mitkOperationActor.h"
+#include "mitkUndoModel.h"
 
 
 

@@ -2,8 +2,8 @@
 #define LIMITEDLINEARUNDO_H_HEADER_INCLUDED_C16E9C96
 
 #include "mitkCommon.h"
-#include "OperationEvent.h"
-#include "UndoModel.h"
+#include "mitkOperationEvent.h"
+#include "mitkUndoModel.h"
 #include <vector>
 
 namespace mitk {
@@ -33,7 +33,7 @@ public:
   //##Documentation
   //## @brief same like Undo() but with the possibility to fine or raw undo(Group or ObjectEventId)
   //## @params fine: if set to true, then all operations with the same ObjectId are undone
-  //## if set to false, then all operations with the same GroupEventId are undone (see UndoController.h)
+  //## if set to false, then all operations with the same GroupEventId are undone (see mitkUndoController.h)
   virtual bool Undo(bool fine);
 
   //##ModelId=3E5F5D8C00DA

@@ -1,4 +1,4 @@
-#include "BaseController.h"
+#include "mitkBaseController.h"
 
 //##ModelId=3E3AE32B0048
 mitk::BaseController::BaseController()

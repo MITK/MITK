@@ -2,7 +2,7 @@
 #define IMAGESOURCE_H_HEADER_INCLUDED_C1E7D6EC
 
 #include "mitkCommon.h"
-#include "BaseProcess.h"
+#include "mitkBaseProcess.h"
 #include "mitkImage.h"
 
 namespace mitk {

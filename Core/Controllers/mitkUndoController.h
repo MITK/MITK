@@ -2,8 +2,8 @@
 #define UNDOCONTROLLER_H_HEADER_INCLUDED_C16EFF79
 
 #include "mitkCommon.h"
-#include "UndoModel.h"
-#include "OperationEvent.h"
+#include "mitkUndoModel.h"
+#include "mitkOperationEvent.h"
 #include <map>
 
 

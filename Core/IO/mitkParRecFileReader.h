@@ -2,8 +2,8 @@
 #define PARRECFILEREADER_H_HEADER_INCLUDED_C1F48A22
 
 #include "mitkCommon.h"
-#include "FileReader.h"
-#include "ImageSource.h"
+#include "mitkFileReader.h"
+#include "mitkImageSource.h"
 
 namespace mitk {
 //##Documentation

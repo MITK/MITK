@@ -2,7 +2,7 @@
 #define CAMERACONTROLLER_H_HEADER_INCLUDED_C1C53722
 
 #include "mitkCommon.h"
-#include "BaseController.h"
+#include "mitkBaseController.h"
 #include "mitkEventTypedefs.h"
 
 namespace mitk {

@@ -1,4 +1,4 @@
-#include "ImageSource.h"
+#include "mitkImageSource.h"
 
 mitk::ImageSource::ImageSource()
 {

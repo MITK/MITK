@@ -1,5 +1,5 @@
-#include "UndoController.h"
-#include "LimitedLinearUndo.h"
+#include "mitkUndoController.h"
+#include "mitkLimitedLinearUndo.h"
 #include "mitkInteractionConst.h"
 
 //static member-variables init.

@@ -26,10 +26,6 @@ PURPOSE.  See the above copyright notices for more information.
 ** place of a destructor.
 *****************************************************************************/
 
-mitk::PointSetInteractor::Pointer QmitkPointListWidget::m_CurrentInteraction;
-mitk::PolygonInteractor::Pointer QmitkPointListWidget::m_CurrentPolygonInteraction;
-unsigned long QmitkPointListWidget::m_CurrentObserverID;
-
 void QmitkPointListWidget::init()
 {
   m_DataChangedCommand = itk::SimpleMemberCommand<QmitkPointListWidget>::New();
@@ -40,6 +36,7 @@ void QmitkPointListWidget::init()
 #endif
   m_CurrentObserverID = 0;
   m_CurrentInteraction = NULL;
+  m_CurrentPolygonInteraction = NULL;
 }
 
 

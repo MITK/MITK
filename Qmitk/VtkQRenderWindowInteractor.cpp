@@ -324,8 +324,9 @@ VtkQRenderWindowInteractorFactory::VtkQRenderWindowInteractorFactory( )
 VtkQRenderWindowInteractorFactory::~VtkQRenderWindowInteractorFactory( )
 
 {
-  //m_Factory->Delete();
   vtkObjectFactory::UnRegisterFactory( this );
+  SetReferenceCount( GetReferenceCount() - 1 ); // referenz m_Factory = NULL
+  m_Factory = NULL;
 }
 
 //##

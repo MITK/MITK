@@ -1,13 +1,10 @@
-TEMPLATE	= lib
+TEMPLATE = lib
+TARGET = ipFunc
+LANGUAGE = C
+CONFIG = qt warn_on debug
 
 unix {
-	CONFIG = qt staticlib warn_on release
-	TARGET = ipFunc
-}
-
-win32 {
-	CONFIG = qt warn_on release
-	TARGET = libipFunc
+	CONFIG += staticlib
 }
 
 INCLUDEPATH = ../../DataStructures

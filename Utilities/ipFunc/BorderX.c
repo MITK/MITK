@@ -85,11 +85,9 @@ ipPicDescriptor *ipFuncBorderX ( ipPicDescriptor *pic_old,
 
 /* definition of macros                                                           */
 
-
 #define BORDER( type, pic, size, value )                                           \
 {                                                                                  \
-  ipUInt4_t      i, j, k;          /* loop index                                */ \
-  ipUInt4_t      offset;           /* offset of pixels in pic_new               */ \
+  ipUInt4_t      i;                /* loop index                                */ \
   ipUInt4_t      anf[_ipPicNDIM];  /*                                           */ \
   ipUInt4_t      end[_ipPicNDIM];  /*                                           */ \
   ipUInt4_t      ind[_ipPicNDIM];  /* loop index vector                         */ \
@@ -180,7 +178,7 @@ ipPicDescriptor *ipFuncBorderX ( ipPicDescriptor *pic_old,
        }                                                                           \
      end[i] = pic->n[i];                                                           \
      anf[i] = 0;                                                                   \
-    }                                                                              \
+    }\
 }
 
 /* ------------------------------------------------------------------------------ */
@@ -195,8 +193,6 @@ ipPicDescriptor *ipFuncBorderX ( ipPicDescriptor *pic_old,
 {
   ipPicDescriptor *pic_new;            /* pointer to transformed image            */
   ipInt4_t       i;                    /* loop index                              */
-  ipUInt4_t      end[_ipPicNDIM];      /* end of image                            */
-  ipUInt4_t      beg[_ipPicNDIM];      /* end of image                            */
   ipUInt4_t      size[_ipPicNDIM];     /*                                         */
   ipFloat8_t     max_gv, min_gv;
 

@@ -347,6 +347,7 @@ bool mitk::Image::SetSlice(void *data, int s, int t, int n)
 	{
 		sl=GetSliceData(s,t,n);
 		memcpy(sl->GetData(), data, m_OffsetTable[2]*m_PixelType.GetBpe()/8);
+        sl->Modified();
 		//we have changed the data: call Modified()! 
 		Modified();
 	}
@@ -370,6 +371,7 @@ bool mitk::Image::SetVolume(void *data, int t, int n)
 	{
 		vol=GetVolumeData(t,n);
 		memcpy(vol->GetData(), data, m_OffsetTable[3]*m_PixelType.GetBpe()/8);
+        vol->Modified();
 		vol->SetComplete(true);
 		//we have changed the data: call Modified()! 
 		Modified();

@@ -756,7 +756,7 @@ void mitk::DataTreeNodeFactory::ReadFileSeriesTypeDCM()
 
   // Get the DICOM filenames from the directory
   NameGeneratorType::Pointer nameGenerator = NameGeneratorType::New();
-  nameGenerator->SetDirectory( m_FilePrefix.c_str() );
+  nameGenerator->SetDirectory( dir.c_str() );
 
   const StringContainer & seriesUID = nameGenerator->GetSeriesUIDs();
 

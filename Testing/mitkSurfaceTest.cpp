@@ -58,24 +58,41 @@ int mitkSurfaceTest(int argc, char* argv[])
   std::cout<<"[PASSED]"<<std::endl;
   } 
 
-  float bounds[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-  polys->ComputeBounds();
-  polys->GetBounds( bounds );
+  {
+    float bounds[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+    polys->ComputeBounds();
+    polys->GetBounds( bounds );
 
-  std::cout << "Testing GetBoundingBox() ";
-  surface->UpdateOutputInformation();
+    std::cout << "Testing GetBoundingBox() ";
+    surface->UpdateOutputInformation();
+    surface->SetRequestedRegionToLargestPossibleRegion();
+    //  mitk::BoundingBox bb = const_cast<mitk::BoundingBox*>(
+    mitk::BoundingBox* bb = const_cast<mitk::BoundingBox*>(surface->GetGeometry()->GetBoundingBox());
+    mitk::BoundingBox::BoundsArrayType surfBounds = bb->GetBounds();
+
+    if ( bounds[0] != surfBounds[0] 
+    || bounds[1] != surfBounds[1] 
+    || bounds[2] != surfBounds[2] 
+    || bounds[3] != surfBounds[3] 
+    || bounds[4] != surfBounds[4] 
+    || bounds[5] != surfBounds[5] 
+    ) {
+      std::cout<<"[FAILED]"<<std::endl;
+      return EXIT_FAILURE;
+    }
+    else {
+      std::cout<<"[PASSED]"<<std::endl;
+    } 
+  }
+
+
+  std::cout << "Testing mitk::Surface::Initialize( timesteps): ";
+  surface->Initialize(5);
+  surface->Update();
   surface->SetRequestedRegionToLargestPossibleRegion();
-//  mitk::BoundingBox bb = const_cast<mitk::BoundingBox*>(
-  mitk::BoundingBox* bb = const_cast<mitk::BoundingBox*>(surface->GetGeometry()->GetBoundingBox());
-  mitk::BoundingBox::BoundsArrayType surfBounds = bb->GetBounds();
+  mitk::Surface::RegionType requestedRegion = surface->GetRequestedRegion();
 
-  if ( bounds[0] != surfBounds[0] 
-      || bounds[1] != surfBounds[1] 
-      || bounds[2] != surfBounds[2] 
-      || bounds[3] != surfBounds[3] 
-      || bounds[4] != surfBounds[4] 
-      || bounds[5] != surfBounds[5] 
-      ) {
+  if ( requestedRegion.GetSize(3) != 5 ) {
     std::cout<<"[FAILED]"<<std::endl;
     return EXIT_FAILURE;
   }
@@ -85,22 +102,57 @@ int mitkSurfaceTest(int argc, char* argv[])
 
   std::cout << "Testing mitk::Surface::Testing 4D surface data creation: ";
 
-  surface = mitk::Surface::New();
-  mitk::Geometry3D::Pointer geometry = surface->GetGeometry();
-  geometry->GetVtkTransform()->Identity();
-  geometry->GetVtkTransform()->Translate(10,10,10);
-  geometry->TransferVtkToITKTransform();
-  mitk::TimeSlicedGeometry* timeSlicedGeometry = surface->GetTimeSlicedGeometry();
-  timeSlicedGeometry->InitializeEvenlyTimed(geometry, 5);
+//  surface = mitk::Surface::New();
+  //mitk::Geometry3D::Pointer geometry = surface->GetTimeSlicedGeometry()->GetGeometry3D(0);
+  //geometry->GetVtkTransform()->Identity();
+  //geometry->GetVtkTransform()->Translate(10,10,10);
+  //geometry->TransferVtkToITKTransform();
+  //mitk::TimeSlicedGeometry* timeSlicedGeometry = surface->GetTimeSlicedGeometry();
+  //timeSlicedGeometry->InitializeEvenlyTimed(geometry, 5);
 
-  if (surface.IsNull()) {
+  float bounds[5][6];
+  for (int i=0;i<5;i++) {
+    vtkSphereSource* sphereSource = vtkSphereSource::New();
+    sphereSource->SetCenter(0,0,0);
+    sphereSource->SetRadius(1.0 * (i+1.0));
+    sphereSource->SetThetaResolution(10);
+    sphereSource->SetPhiResolution(10);
+    sphereSource->Update();
+    sphereSource->GetOutput()->ComputeBounds();
+    sphereSource->GetOutput()->GetBounds( bounds[i] );
+    surface->SetVtkPolyData( sphereSource->GetOutput(),i );
+  }
+
+  surface->UpdateOutputInformation();
+  surface->SetRequestedRegionToLargestPossibleRegion();
+
+  bool passed = true;
+  for (int i=0;i<5;i++) 
+  {
+    mitk::BoundingBox::BoundsArrayType surfBounds = (const_cast<mitk::BoundingBox*>(surface->GetTimeSlicedGeometry()->GetGeometry3D(i)->GetBoundingBox()))->GetBounds();
+
+    if ( bounds[i][0] != surfBounds[0] 
+    || bounds[i][1] != surfBounds[1] 
+    || bounds[i][2] != surfBounds[2] 
+    || bounds[i][3] != surfBounds[3] 
+    || bounds[i][4] != surfBounds[4] 
+    || bounds[i][5] != surfBounds[5] )
+    {
+      passed = false;
+      break;
+    }
+  }
+
+  if (!passed)
+  {
     std::cout<<"[FAILED]"<<std::endl;
     return EXIT_FAILURE;
   }
-  else {
-  std::cout<<"[PASSED]"<<std::endl;
-  } 
-
+  else 
+  {
+    std::cout<<"[PASSED]"<<std::endl;
+  }
+  
   //std::cout << "Testing mitk::Surface::*TESTED_METHOD_DESCRIPTION: ";
   //// METHOD_TEST_CODE
   //if (surface.IsNull()) {

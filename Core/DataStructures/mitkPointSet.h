@@ -52,7 +52,7 @@ public:
   //##ModelId=3F0177E901CC
   //##Documentation
 	//## @brief returns the point-list with points and selected Information
-  const DataType::Pointer GetPointSet() const;
+  DataType* GetPointSet() const;
 
   //##ModelId=3F0177E901CE
   //##Documentation

@@ -43,7 +43,7 @@ int mitk::PointSet::GetSize()
 }
 
 //##ModelId=3F0177E901CC
-const mitk::PointSet::DataType::Pointer mitk::PointSet::GetPointSet() const
+mitk::PointSet::DataType* mitk::PointSet::GetPointSet() const
 {
   return m_ItkData;
 }

@@ -131,7 +131,8 @@ void mitk::Geometry2DDataVtkMapper3D::Update()
 //                mitk::DataTreeIterator* it=m_DataTreeIterator->clone();
 //                while(it->hasNext())
 //                {
-//                    mitk::Mapper::Pointer mapper = it->next()->GetMapper(1);
+//                    it->next();
+//                    mitk::Mapper::Pointer mapper = it->get()->GetMapper(1);
 //                    mitk::ImageMapper2D* imagemapper = dynamic_cast<ImageMapper2D*>(mapper.GetPointer());
 //
 //                    if(imagemapper)

@@ -72,11 +72,32 @@ class FileWriter
     //## the data is stored in multiple files.
     virtual void SetFilePattern(const char* aFilePattern) = 0;
 
+    virtual void Write() = 0;
 protected:
     FileWriter();
 
     virtual ~FileWriter();
 };
+
+#define mitkWriterMacro                                                     \
+virtual void Write()                                                        \
+{                                                                           \
+  if ( this->GetInput() == NULL )                                           \
+    {                                                                       \
+    itkExceptionMacro(<<"Write:Please specify an input!");                  \
+    return;                                                                 \
+    }                                                                       \
+  /* Fill in image information.*/                                           \
+  this->UpdateOutputInformation();                                          \
+  this->GetInput()->SetRequestedRegionToLargestPossibleRegion();            \
+  this->PropagateRequestedRegion(NULL);                                     \
+  this->UpdateOutputData(NULL);                                             \
+}                                                                           \
+virtual void Update()                                                       \
+{                                                                           \
+  Write();                                                                  \
+}                                                                           
+
 } // namespace mitk
 #endif /* FILEWRITER_H_HEADER_INCLUDED */
 

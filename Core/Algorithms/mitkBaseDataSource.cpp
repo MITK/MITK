@@ -5,7 +5,7 @@ mitk::BaseDataSource::BaseDataSource()
 {
     // Create the output.
     //OutputType::Pointer output = static_cast<OutputType*> ( this->MakeOutput( 0 ).GetPointer() );
-    //Superclass::SetNumberOfRequiredOutputs( 1 );
+    Superclass::SetNumberOfRequiredOutputs( 1 );
     //Superclass::SetNthOutput( 0, output.GetPointer() );
 }
 
@@ -34,6 +34,10 @@ void mitk::BaseDataSource::SetOutput( OutputType* output )
     this->SetNthOutput( 0, output );
 }
 
+void mitk::BaseDataSource::SetOutput( unsigned int idx, OutputType* output )
+{
+    this->SetNthOutput(idx, output);    
+}
 
 
 

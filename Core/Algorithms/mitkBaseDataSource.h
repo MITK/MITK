@@ -27,27 +27,32 @@ public:
     virtual itk::DataObject::Pointer MakeOutput ( unsigned int idx );
 
     /**
-     * Allows to set the output of the base data source. According to the itk
-     * this method is outdated and should not be used. Instead GraftOutput(...)
-     * should be used.
-     * @param output the intended output of the vessel graph source
+     * Allows to set the output of the base data source. 
+     * @param output the intended output of the base data source
      */
-    void SetOutput( OutputType* output );
+    virtual void SetOutput( OutputType* output );
+    
+    /**
+     * Allows to set the n-th output of the base data source. 
+     * @param output the intended output of the base data source
+     */
+    virtual void SetOutput( unsigned int idx, OutputType* output );
     
     /**
      * Returns the output with index 0 of the base data source
      * @returns the output
      */
-    OutputType* GetOutput();
+    virtual OutputType* GetOutput();
     
     /**
      * Returns the n'th output of the base data source
      * @param idx the index of the wanted output
      * @returns the output with index idx.
      */
-    OutputType* GetOutput ( unsigned int idx );
+    virtual OutputType* GetOutput ( unsigned int idx );
     
 protected:
+
     BaseDataSource();
     
     virtual ~BaseDataSource();

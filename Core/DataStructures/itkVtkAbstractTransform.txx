@@ -87,7 +87,7 @@ TransformVector(const InputVectorType &vect) const
   float vtkvec[3];
   mitk::vnl2vtk(vect.Get_vnl_vector(), vtkvec);
   m_VtkAbstractTransform->TransformVectorAtPoint(vtkpt, vtkvec, vtkvec);
-  mitk::vtk2vnlref(vtkvec, outputvector.Get_vnl_vector());
+  mitk::vtk2itk(vtkvec, outputvector);
   return outputvector;
 }
 

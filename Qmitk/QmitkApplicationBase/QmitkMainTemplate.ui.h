@@ -390,10 +390,7 @@ void QmitkMainTemplate::initWidget(mitk::DataTreeIterator* it,
     mitk::PlaneGeometry::Pointer plane = mitk::PlaneGeometry::New();
 
     //ohne den Pointer-Umweg meckert gcc  
-    mitk::PlaneView* view = new mitk::PlaneView(origin,right,bottom,
-        Vector2f(0,0),
-        Vector2f(0,0)
-        );
+    mitk::PlaneView* view = new mitk::PlaneView(origin,right,bottom);
     plane->SetPlaneView(*view);
     delete view;
 
@@ -469,7 +466,7 @@ void QmitkMainTemplate::filePrint()
 
 void QmitkMainTemplate::fileExit()
 {
-
+  qApp->quit();
 }
 
 void QmitkMainTemplate::editUndo()

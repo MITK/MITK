@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkPlaneGeometry.h"
 #include <vtkTransform.h>
+#include <vnl/vnl_cross.h>
 
 //##ModelId=3E395F22035A
 mitk::PlaneGeometry::PlaneGeometry() : 
@@ -306,6 +307,27 @@ void mitk::PlaneGeometry::InitializeStandardPlane(const VnlVector& rightVector, 
   ScalarType bounds[6]={0, width, 0, height, 0, 1};
   SetBounds(bounds);
   SetIndexToWorldTransform(transform);
+}
+
+void mitk::PlaneGeometry::InitializePlane(const mitk::Point3D& origin, const mitk::Vector3D& normal)
+{
+  VnlVector rightVectorVnl(3), downVectorVnl;
+
+  if( mitk::Equal( normal[1], 0.0f ) == false )
+  {
+    FillVector3D( rightVectorVnl, 1.0f, -normal[0]/normal[1], 0.0f ); 
+    rightVectorVnl.normalize();
+  }
+  else
+  {
+    FillVector3D( rightVectorVnl, 0.0f, 1.0f, 0.0f );
+  }
+  downVectorVnl = vnl_cross_3d( normal.Get_vnl_vector(), rightVectorVnl );
+  downVectorVnl.normalize();
+
+  InitializeStandardPlane( rightVectorVnl, downVectorVnl );
+
+  SetOrigin(origin);
 }
 
 mitk::AffineGeometryFrame3D::Pointer mitk::PlaneGeometry::Clone() const

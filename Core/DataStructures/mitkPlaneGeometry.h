@@ -94,6 +94,13 @@ public:
   //## the vectors are normalized and multiplied by the respective spacing before they are set in the matrix.
   virtual void InitializeStandardPlane(const VnlVector& rightVector, const VnlVector& downVector, const Vector3D * spacing = NULL);
 
+  //##Documentation
+  //## @brief Initialize plane by origin and normal (size is 1.0 mm in
+  //## all directions, direction of right-/down-vector valid but 
+  //## undefined).
+  //## 
+  virtual void InitializePlane(const Point3D& origin, const Vector3D& normal);
+
   AffineGeometryFrame3D::Pointer Clone() const;
 
   //##Documentation

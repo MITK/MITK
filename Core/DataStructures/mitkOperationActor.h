@@ -3,12 +3,15 @@
 
 #include "mitkCommon.h"
 //#include "OperationEvent.h"
-namespace mitk {
+
+namespace mitk 
+{
+class Operation;
 class OperationEvent;
 //##ModelId=3E5F62430388
 class OperationActor
 {
-  public:
+public:
     //##ModelId=3E5F62530359
     virtual void SetOperation(Operation* operation) = 0;
 

@@ -16,7 +16,7 @@ mitk::BaseData::~BaseData()
 }
 
 //##ModelId=3DCBE2BA0139
-mitk::Geometry3D::ConstPointer mitk::BaseData::GetGeometry() const
+mitk::Geometry3D::Pointer mitk::BaseData::GetGeometry() const
 {
     const_cast<BaseData*>(this)->SetRequestedRegionToLargestPossibleRegion();
 

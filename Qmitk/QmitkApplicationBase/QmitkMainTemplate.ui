@@ -493,8 +493,8 @@
     <slot>helpIndex()</slot>
     <slot>helpContents()</slot>
     <slot>helpAbout()</slot>
-    <slot>initWidgets( mitk::DataTreeNode::Pointer node )</slot>
-    <slot>changeLevelWindow( mitk::LevelWindow* lw )</slot>
+    <slot>initWidgets( mitk::DataTreeIterator * it )</slot>
+    <slot>changeLevelWindow( mitk::LevelWindow * lw )</slot>
 </slots>
 <functions>
     <function access="protected">fileOpen( const char * fileName )</function>

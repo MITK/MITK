@@ -124,7 +124,7 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
             node->SetData(reader->GetOutput());
             it->add(node); 
 
-            initWidgets(node);
+            initWidgets(it);
             delete it;
         }
         if(node != NULL)

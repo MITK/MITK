@@ -20,9 +20,11 @@ mitk::BaseVtkMapper3D::~BaseVtkMapper3D()
 
 vtkProp* mitk::BaseVtkMapper3D::GetProp()
 {
-	if(GetDataTreeNode()!=NULL)
+	if(GetDataTreeNode()!=NULL && 
+           m_Prop3D != NULL) {
 		m_Prop3D->SetUserTransform(GetDataTreeNode()->GetVtkTransform());
-	return m_Prop3D;
+	} 
+        return m_Prop3D;
 }
 
 //##ModelId=3EF180C70065

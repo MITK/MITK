@@ -80,8 +80,8 @@ public:
      * @warning multiple load not (yet) supported
      */
     itkGetStringMacro( FilePattern );
-    
-    
+        
+    static void SetDefaultImageProperties(DataTreeNode::Pointer &node);
 protected:
 
     /**
@@ -173,8 +173,6 @@ protected:
     virtual void ReadFileSeriesTypeDCM();
     
     virtual void ReadFileSeriesTypeITKImageSeriesReader();
-   
-    virtual void SetDefaultImageProperties(DataTreeNode::Pointer &node);
 };
    
 }

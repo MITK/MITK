@@ -1029,7 +1029,4 @@ void mitk::DataTreeNodeFactory::SetDefaultImageProperties(mitk::DataTreeNode::Po
         node->SetProperty( "volumerendering", new mitk::BoolProperty( false ) );
         node->SetProperty( "iilInterpolation", new mitk::BoolProperty( false ) );
         node->SetProperty( "vtkInterpolation", new mitk::BoolProperty( false ) );
-	
-	
-
 }; 

@@ -211,7 +211,7 @@ public:
       m_Dimension, 
       tmpDimensions,
       channels);
-#if ITK_VERSION_MINOR == 6
+#if ITK_VERSION_MINOR > 5
     typename itkImageType::SpacingType spacinglist = itkimage->GetSpacing();  
 #else
     const double *spacinglist = itkimage->GetSpacing();  

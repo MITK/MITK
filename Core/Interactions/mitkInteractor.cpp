@@ -131,8 +131,12 @@ float mitk::Interactor::CalculateJurisdiction(StateEvent const* stateEvent) cons
       }
       float normal[3];
       camera->GetViewPlaneNormal(normal);
-      mitk::BoundingBox::PointType center = bBox->GetCenter();
-      returnvalue = center.SquaredEuclideanDistanceTo(normal);
+      
+      mitk::BoundingBox::PointType center,n;
+      n[0] = normal[0];
+      n[1] = normal[1];
+      n[2] = normal[2];
+      returnvalue = center.SquaredEuclideanDistanceTo( n );
       //map between 0.5 and 1
 
     }

@@ -8,6 +8,7 @@
 #include <mitkLightBoxImageReader.h>
 #include "SampleApp.h"
 #include "QcMITKSamplePlugin.h"
+#include "mitkLevelWindowProperty.h"
 
 #include <qlabel.h>
 
@@ -101,6 +102,11 @@ void QcMITKSamplePlugin::selectSerie (QcLightbox* lightbox)
 
   it->add(node);
 
+  mitk::LevelWindowProperty::Pointer levWinProp = new mitk::LevelWindowProperty();
+  mitk::LevelWindow levelwindow;
+  levelwindow.SetAuto( reader->GetOutput()->GetPic() );
+  levWinProp->SetLevelWindow( levelwindow );
+  node->GetPropertyList()->SetProperty( "levelwindow", levWinProp );
 
 
   ap->getMultiWidget()->texturizePlaneSubTree( tree->inorderIterator());

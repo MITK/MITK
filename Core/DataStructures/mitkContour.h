@@ -80,7 +80,7 @@ namespace mitk
       /**
        * return an itk parametric path of the contour 
        */
-      PathPointer GetContourPath();
+      PathPointer GetContourPath() const;
 
       /**
        * set the current render window. This is helpful if one 
@@ -91,17 +91,17 @@ namespace mitk
       /**
        * returns the points to the current render window
        */
-      mitk::RenderWindow* GetCurrentWindow();
+      mitk::RenderWindow* GetCurrentWindow() const;
 
       /**
        * returns the number of points stored in the contour
        */
-      unsigned int GetNumberOfPoints();
+      unsigned int GetNumberOfPoints() const;
 
       /**
        * returns the container of the contour points
        */
-      PointsContainerPointer GetPoints();
+      PointsContainerPointer GetPoints() const;
 
       /**
        * set the contour points container.
@@ -138,6 +138,8 @@ namespace mitk
     protected:
       Contour();
       virtual ~Contour();
+
+      virtual void PrintSelf(std::ostream& os, itk::Indent indent) const;
 
     private:
 

@@ -89,7 +89,7 @@ void mitk::Contour::SetRequestedRegion(itk::DataObject*)
 }
 
 mitk::Contour::PathType::Pointer 
-mitk::Contour::GetContourPath()
+mitk::Contour::GetContourPath() const
 {
   return m_ContourPath;
 }
@@ -101,7 +101,7 @@ mitk::Contour::SetCurrentWindow(mitk::RenderWindow* rw)
 }
 
 mitk::RenderWindow*
-mitk::Contour::GetCurrentWindow()
+mitk::Contour::GetCurrentWindow() const
 {
   return m_CurrentWindow;
 }
@@ -118,13 +118,13 @@ mitk::Contour::Initialize()
 
 
 unsigned int 
-mitk::Contour::GetNumberOfPoints()
+mitk::Contour::GetNumberOfPoints() const
 {
   return m_Vertices->Size();
 }
 
 mitk::Contour::PointsContainerPointer
-mitk::Contour::GetPoints()
+mitk::Contour::GetPoints() const
 {
   return m_Vertices;
 }
@@ -153,4 +153,22 @@ bool mitk::Contour::IsInside(mitk::Point3D point)
     }
   return true;
 
+}
+
+void mitk::Contour::PrintSelf( std::ostream& os, itk::Indent indent) const
+{
+  Superclass::PrintSelf( os, indent );
+
+  os << indent << "Number of verticies:  " << GetNumberOfPoints() << std::endl;
+
+  mitk::Contour::PointsContainerIterator pointsIt = m_Vertices->Begin(), end = m_Vertices->End();
+  
+  os << indent << "Verticies:  " << std::endl;
+
+  int i = 0;
+  while ( pointsIt != end )
+  {
+    os << indent << indent << i << ": " << pointsIt.Value() << std::endl;
+    ++pointsIt; ++i;
+  }
 }

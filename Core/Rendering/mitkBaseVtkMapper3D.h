@@ -21,7 +21,7 @@ namespace mitk {
 class BaseVtkMapper3D : public Mapper3D
 {
 public:
-  mitkClassMacro(Mapper,BaseVtkMapper3D);
+  mitkClassMacro(BaseVtkMapper3D, Mapper3D);
 
   //##ModelId=3E32C93D0000
   virtual vtkProp* GetProp();

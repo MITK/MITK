@@ -58,7 +58,7 @@
 #ifndef _ipTypes_h
 #define _ipTypes_h
 
-#if defined (__mips) || (_IBMR2) || (sun) || (__i386__) || (__convex__) || (__alpha) || (__hppa) || (WIN32)
+#if defined (__mips) || (_IBMR2) || (sun) || (__i386__) || (__convex__) || (__alpha) || (__hppa) || (WIN32) || (__PPC__)
   typedef    signed char  ipInt1_t;
   typedef   signed short  ipInt2_t;
   typedef     signed int  ipInt4_t;

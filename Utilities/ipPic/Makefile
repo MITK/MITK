@@ -67,7 +67,7 @@ install	:libipPic.a picinfo
 	( cd /usr/local ; rdist )
 
 clean:
-	-rm *.o *.a core picinfo test
+	-rm *.o *.a core picinfo pic2seq test
 
 
 #distname: version.c

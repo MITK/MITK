@@ -594,3 +594,13 @@ int mitk::EventMapper::ReadXMLIntegerAttribut( std::string name, const char** at
 
   return result;
 }
+
+void mitk::EventMapper::SetStateEvent(mitk::Event* event)
+{
+  const Event* oldEvent = m_StateEvent.GetEvent();
+  m_StateEvent.Set( m_StateEvent.GetId(), event );
+
+  //delete the old event and set the new one
+  //caution!!causes in a crash! FixMe/ToDo
+  //delete oldEvent;
+}

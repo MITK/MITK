@@ -19,6 +19,8 @@ struct ltstr
     return strcmp(s1, s2) < 0;
   }
 };
+//for friendship wor to set the stateevent after calculating
+class GlobalInteraction;
 
 //##ModelId=3E5A390401F2
 //##Documentation
@@ -81,6 +83,13 @@ class EventMapper : public vtkXMLParser
 	//##ModelId=3E7B20EE01F5
   std::string GetStyleName();
 
+  //friendship because of SetStateEvent for computing WorldCoordinates
+  friend GlobalInteraction;
+
+  protected:
+  //##Documentation
+	//##@brief method only for GlobalInteraction to change the Event (from DiplayPositionEvent to PositionEvent)
+  static void SetStateEvent(Event* event);
 
   private:
 

@@ -63,7 +63,16 @@ The structure is the following (from \ref ExampleA) :
 
 The identification numbers (ID) inside a statemachine has to be unique. Each statemachine has to have one state, that is defined as the start-state of that statemachine. This means, initialy, the current state of the statemachine is the start-state. 
 
-During startup the structure of all statemachines are ckecked for not having states, that have no transitions leading out of it (dead states), or states, that have no transitions leading into it (magic states) [Bin99 p. 183]. If an error is found, an error-message will be displayed and the statemachine will be loaded.
+So a statemachine is defined through a few lines of xml-code, which is loaded at runtime. This allows us to change the sequence in interaction in the xml-file and restart the application, where the changes are applied right away. 
+The definition of one single statemachine is called the \a statemachine-pattern. Since this pattern is build up during startup with objects (states, transitions and actions) and these objects only hold information about what interaction may be done at the current state, we can also reuse the pattern. 
+
+\subsubsection ReusePattern Reuse of Interaction Patterns
+If we for example have a pattern called "pointset", which defines how the user can set different points into the scene and there is an instance of a statemachine called "PointSetInteractor".  This statemachine has a pointer pointing to the current state in its assigned statemachine pattern. Several events are send to the statemachine, which moves the pointer from one state to the next, according to the transitions, and executes the actions, referenced in the transitions. 
+But now a new instance of the class "PointSetInteractor" has to be build. So we reuse the pattern and let the current state pointer of the new object point to the startstate of the pattern "pointset". The implementation of the actions is \b not done inside a class of the pattern (\a state, \a transition, \a action), it is done inside a statemachine class (see the reference for mitkStatemachine).
+
+\subsection StartupInteraction Loading Statemachines at Runtime
+During startup all statemachine-patterns are ckecked for not having states, that have no transitions leading out of it (dead states), or states, that have no transitions leading into it (magic states) [Bin99 p. 183]. If an error is found, an error-message will be displayed \b and the statemachine will be loaded.
+
 
 \subsection references References
 [Bin99] Robert V. Binder. Testing Object-Oriented Systems: Models, Patterns, and Tools. Addison-Wesley, 1999

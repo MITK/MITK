@@ -1,11 +1,12 @@
 #include "mitkImageMapper2D.h"
-#include "mitkRenderWindow.h"
+//#include "mitkRenderWindow.h"
 #include "widget.h"
 #include "picimage.h"
 #include "pic2vtk.h"
 #include "PlaneGeometry.h"
 #include "BaseRenderer.h"
 #include "DataTreeNode.h"
+#include "mitkRenderWindow.h"
 
 #include <vtkImageReslice.h>
 #include <vtkTransform.h>
@@ -55,29 +56,17 @@ void mitk::ImageMapper2D::Paint(mitk::BaseRenderer * renderer)
 	
 	Point2D topLeft=displayGeometry->GetOriginInUnits();
 	Point2D bottomRight=displayGeometry->GetOriginInUnits()+displayGeometry->GetSizeInUnits();
-	Point2D topLeftGL(topLeft.x, displayGeometry->GetWorldGeometry()->GetHeightInUnits()-topLeft.y);
-	Point2D bottomRightGL(bottomRight.x, displayGeometry->GetWorldGeometry()->GetHeightInUnits()-bottomRight.y);
 	
 	glMatrixMode (GL_PROJECTION);
 	glLoadIdentity ();
-	// fixed images upside down bug, original line seemed to be correct...
-	gluOrtho2D(topLeftGL.x, bottomRightGL.x, bottomRightGL.y, topLeftGL.y );
-	// workaround, FIXME  !!!
-	//gluOrtho2D(topLeftGL.x, bottomRightGL.x, topLeftGL.y, bottomRightGL.y );
-	glMatrixMode( GL_MODELVIEW );
+    gluOrtho2D(topLeft.x, bottomRight.x, topLeft.y, bottomRight.y );
+    glMatrixMode( GL_MODELVIEW );
 	
-	Vector2D bottom(0, image->height());
-	displayGeometry->UnitsToDisplay(bottom, bottom);
-	assert(bottom.y >= 0);
-	renderer->GetRenderWindow()->m_CurHeightInDisplayUnits = (unsigned int)(bottom.y);
-
-
 	GLdouble eqn0[4] = {0.0, 1.0, 0.0, 0.0};	
 	GLdouble eqn1[4] = {1.0, 0.0, 0.0, 0.0};
 	GLdouble eqn2[4] = {-1.0, 0.0 , 0.0, image->width()};	
 	GLdouble eqn3[4] = {0, -1.0, 0.0, image->height() };
 
-	
 	glClipPlane (GL_CLIP_PLANE0, eqn0);
 	glEnable (GL_CLIP_PLANE0);
 	glClipPlane (GL_CLIP_PLANE1, eqn1);

@@ -65,7 +65,7 @@ void mitk::Geometry2DDataMapper2D::Paint(mitk::BaseRenderer * renderer)
                 displayGeometry->MMToDisplay(lineTo, lineTo);
 
                 //convert display coordinates ( (0,0) is top-left ) in GL coordinates ( (0,0) is bottom-left )
-                float toGL=displayGeometry->GetSizeInDisplayUnits().y;
+//                float toGL=//displayGeometry->GetDisplayHeight(); displayGeometry->GetWorldGeometry()->GetHeightInUnits();
 //                lineFrom.y=toGL-lineFrom.y;
 //                lineTo.y=toGL-lineTo.y;
 

@@ -41,6 +41,9 @@ public:
     //##ModelId=3E3AEBEF039C
     virtual void UnitsToDisplay(const mitk::Point2D &pt_units, mitk::Point2D &pt_display) const;
 
+    virtual void ULDisplayToUnits(const mitk::Point2D &pt_ULdisplay, mitk::Point2D &pt_units) const;
+    virtual void UnitsToULDisplay(const mitk::Point2D &pt_units, mitk::Point2D &pt_ULdisplay) const;
+
     //##ModelId=3E3C36920345
     virtual void SetSizeInDisplayUnits(unsigned int width, unsigned int height);
     //##ModelId=3E3C36CD02D2
@@ -71,6 +74,9 @@ public:
     //##ModelId=3E3B02760128
     virtual void UnitsToDisplay(const mitk::Vector2D &vec_units, mitk::Vector2D &vec_display) const;
 
+    virtual void ULDisplayToUnits(const mitk::Vector2D &vec_ULdisplay, mitk::Vector2D &vec_units) const;
+    virtual void UnitsToULDisplay(const mitk::Vector2D &vec_units, mitk::Vector2D &vec_ULdisplay) const;
+
     //##ModelId=3E3B994B02A6
     virtual void MMToUnits(const mitk::Vector2D &vec_mm, mitk::Vector2D &vec_units) const;
     //##ModelId=3E3B994802B6
@@ -89,18 +95,28 @@ public:
     virtual void SetScaleFactor(float unitsPerDisplayUnit);
     //##ModelId=3E3ED45900A1
     float GetScaleFactorUnitsPerDisplayUnit() const;
+
     //##ModelId=3E48D5B40210
     virtual void DisplayToMM(const mitk::Point2D &pt_display, mitk::Point2D &pt_mm) const;
-
-
     //##ModelId=3E48D5D7027E
     virtual void MMToDisplay(const mitk::Point2D &pt_mm, mitk::Point2D &pt_display) const;
+
     //##ModelId=3E48E2AE03A7
     virtual void DisplayToMM(const mitk::Vector2D &vec_display, mitk::Vector2D &vec_mm) const;
-
-
     //##ModelId=3E48E2B40374
     virtual void MMToDisplay(const mitk::Vector2D &vec_mm, mitk::Vector2D &vec_display) const;
+
+    virtual void ULDisplayToMM(const mitk::Point2D &pt_ULdisplay, mitk::Point2D &pt_mm) const;
+    virtual void MMToULDisplay(const mitk::Point2D &pt_mm, mitk::Point2D &pt_ULdisplay) const;
+
+    virtual void ULDisplayToMM(const mitk::Vector2D &vec_ULdisplay, mitk::Vector2D &vec_mm) const;
+    virtual void MMToULDisplay(const mitk::Vector2D &vec_mm, mitk::Vector2D &vec_ULdisplay) const;
+
+    virtual void ULDisplayToDisplay(const mitk::Point2D &pt_ULdisplay, mitk::Point2D &pt_display) const;
+    virtual void DisplayToULDisplay(const mitk::Point2D &pt_display, mitk::Point2D &pt_ULdisplay) const;
+
+    virtual void ULDisplayToDisplay(const mitk::Vector2D &vec_ULdisplay, mitk::Vector2D &vec_display) const;
+    virtual void DisplayToULDisplay(const mitk::Vector2D &vec_display, mitk::Vector2D &vec_ULdisplay) const;
 
     /** Return this objects modified time.  */
     //##ModelId=3E66CC5A0118

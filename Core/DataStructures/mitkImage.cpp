@@ -1,4 +1,5 @@
 #include "mitkImage.h"
+#include <vtkImageData.h>
 
 //##ModelId=3DCBC2B50345
 const mitk::PixelType& mitk::Image::GetType(int n) const

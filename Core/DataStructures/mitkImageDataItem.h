@@ -4,6 +4,8 @@
 #include "mitkCommon.h"
 #include "PixelType.h"
 
+class vtkImageData;
+
 namespace mitk {
 
 //##ModelId=3D7B424502D7
@@ -21,9 +23,6 @@ class ImageDataItem : public itk::LightObject
 
     //##ModelId=3E0B6F060308
     typedef itk::SmartPointer<const Self> ConstPointer;
-
-    //##ModelId=3E0B7133029B
-    itk::DataObject::Pointer m_itkImageObject;
 
     //##ModelId=3E0B7882024B
 	ImageDataItem(const ImageDataItem& aParent, unsigned int dimension, int offset = 0);

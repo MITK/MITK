@@ -30,14 +30,10 @@ class Geometry2DDataVtkMapper3D : public BaseVtkMapper3D
 
     //##ModelId=3E691E090376
     virtual vtkProp* GetProp();
-    //##ModelId=3E691E090378
-    virtual void SetInput(const mitk::Geometry2DData *input);
 
     //##ModelId=3E691E090380
     virtual const mitk::Geometry2DData *GetInput();
   
-    //##ModelId=3E691E090382
-    virtual void SetInput(const mitk::BaseData* data);
   
     //##ModelId=3E691E09038A
     virtual void Update();

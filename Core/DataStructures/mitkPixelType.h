@@ -2,6 +2,7 @@
 #define PIXELTYPE_H_HEADER_INCLUDED_C1EBF565
 
 #include "mitkCommon.h"
+#include <ipPic.h>
 
 namespace mitk {
 

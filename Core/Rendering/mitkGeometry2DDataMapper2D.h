@@ -25,12 +25,8 @@ public:
     itkNewMacro(Self);
 
     /** Set/Get the image input of this process object.  */
-    //##ModelId=3E6423D20337
-    virtual void SetInput( const mitk::Geometry2DData *input );
     //##ModelId=3E6423D20341
     const mitk::Geometry2DData * GetInput(void);
-    //##ModelId=3E6423D2034B
-    virtual void SetInput( const mitk::BaseData* data );
 
     //##ModelId=3E67D77A0109
     virtual void Paint(mitk::BaseRenderer * renderer);

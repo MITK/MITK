@@ -12,15 +12,6 @@ mitk::Geometry2DDataMapper2D::~Geometry2DDataMapper2D()
 {
 }
 
-//##ModelId=3E6423D20337
-void mitk::Geometry2DDataMapper2D::SetInput(const mitk::Geometry2DData *input)
-{
-	// Process object is not const-correct so the const_cast is required here
-	this->ProcessObject::SetNthInput(0,
-		const_cast< mitk::Geometry2DData * >( input ) );
-
-}
-
 //##ModelId=3E6423D20341
 const mitk::Geometry2DData *mitk::Geometry2DDataMapper2D::GetInput(void)
 {
@@ -29,16 +20,8 @@ const mitk::Geometry2DData *mitk::Geometry2DDataMapper2D::GetInput(void)
 		return 0;
 	}
 
-	return static_cast<const mitk::Geometry2DData * >
-		(this->ProcessObject::GetInput(0) );
+    return static_cast<const mitk::Geometry2DData * > ( GetData() );
 }
-
-//##ModelId=3E6423D2034B
-void mitk::Geometry2DDataMapper2D::SetInput(const mitk::BaseData* data)
-{
-	SetInput(dynamic_cast<const mitk::Geometry2DData *>(data));
-}
-
 
 //##ModelId=3E67D77A0109
 void mitk::Geometry2DDataMapper2D::Paint(mitk::BaseRenderer * renderer)

@@ -2,6 +2,7 @@
 #define LEVELWINDOW_H_HEADER_INCLUDED_C1F4F02C
 
 #include "mitkCommon.h"
+#include <itkObjectFactory.h>
 
 namespace mitk {
 

@@ -2,6 +2,7 @@
 #define BASEPROCESS_H_HEADER_INCLUDED_C19BE6FC
 
 #include "mitkCommon.h"
+#include <itkProcessObject.h>
 
 namespace mitk {
 

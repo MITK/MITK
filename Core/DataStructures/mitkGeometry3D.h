@@ -5,6 +5,7 @@
 #include "Geometry2D.h"
 #include <itkImageRegion.h>
 #include <itkBoundingBox.h>
+#include <ipPic.h>
 
 namespace mitk {
 

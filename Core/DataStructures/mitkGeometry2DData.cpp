@@ -1,4 +1,5 @@
 #include "mitkGeometry2DData.h"
+#include <itkProcessObject.h>
 
 //##ModelId=3E639CD30201
 mitk::Geometry2DData::Geometry2DData()

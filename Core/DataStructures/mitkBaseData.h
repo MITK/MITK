@@ -1,6 +1,8 @@
 #ifndef BASEDATA_H_HEADER_INCLUDED_C1EBB6FA
 #define BASEDATA_H_HEADER_INCLUDED_C1EBB6FA
 
+#include <itkDataObject.h>
+
 #include "mitkCommon.h"
 #include "Geometry3D.h"
 #include "Geometry2D.h"
@@ -47,9 +49,6 @@ public:
     //## setting of the update extent is missing.
     virtual mitk::Geometry2D::ConstPointer GetGeometry2D(int s, int t) const;
 
-    //##ModelId=3E3FE0420273
-    mitk::PropertyList::Pointer GetPropertyList();
-
     //##ModelId=3E8600DB0188
     virtual void UnRegister() const;
 
@@ -62,8 +61,6 @@ protected:
     ~BaseData();
     //##ModelId=3E15551A03CE
     Geometry3DPointer m_Geometry3D;
-    //##ModelId=3E3FE0420242
-    PropertyList::Pointer m_PropertyList;
 
     //##ModelId=3E8600D9006D
     mutable itk::SmartPointer<mitk::BaseProcess> m_SmartSourcePointer;

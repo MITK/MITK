@@ -1,5 +1,6 @@
 #include "Geometry3D.h"
 #include "PlaneGeometry.h"
+#include <vecmath.h>
 
 #ifdef MITK_DICOM_ENABLED
 extern "C"

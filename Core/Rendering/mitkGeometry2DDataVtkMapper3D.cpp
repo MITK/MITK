@@ -79,13 +79,7 @@ mitk::Geometry2DDataVtkMapper3D::~Geometry2DDataVtkMapper3D()
     m_VtkTexture->Delete();
 }
 
-//##ModelId=3E691E090378
-void mitk::Geometry2DDataVtkMapper3D::SetInput(const mitk::Geometry2DData *input)
-{
-    // Process object is not const-correct so the const_cast is required here
-    this->ProcessObject::SetNthInput(0,
-        const_cast< mitk::Geometry2DData * >( input ) );
-}
+
 
 //##ModelId=3E691E090380
 const mitk::Geometry2DData *mitk::Geometry2DDataVtkMapper3D::GetInput()
@@ -95,14 +89,7 @@ const mitk::Geometry2DData *mitk::Geometry2DDataVtkMapper3D::GetInput()
         return 0;
     }
 
-    return static_cast<const mitk::Geometry2DData * >
-        (this->ProcessObject::GetInput(0) );
-}
-
-//##ModelId=3E691E090382
-void mitk::Geometry2DDataVtkMapper3D::SetInput(const mitk::BaseData* data)
-{
-    SetInput(dynamic_cast<const mitk::Geometry2DData *>(data));
+    return static_cast<const mitk::Geometry2DData * > ( GetData() );
 }
 
 //##ModelId=3E691E09038A

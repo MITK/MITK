@@ -6,7 +6,7 @@
 //##ModelId=3E3FE04202B9
 mitk::BaseData::BaseData() : m_SmartSourcePointer(NULL), m_SourceOutputIndexDuplicate(0), m_Unregistering(false), m_ExternalReferenceCount(-1), m_CalculatingExternalReferenceCount(false)
 {
-    m_PropertyList = PropertyList::New();
+
 }
 
 //##ModelId=3E3FE042031D
@@ -25,12 +25,6 @@ mitk::Geometry3D::ConstPointer mitk::BaseData::GetGeometry() const
     const_cast<BaseData*>(this)->UpdateOutputInformation();
 
     return m_Geometry3D;
-}
-
-//##ModelId=3E3FE0420273
-mitk::PropertyList::Pointer mitk::BaseData::GetPropertyList() 
-{
-    return m_PropertyList;
 }
 
 //##ModelId=3E3C4ACB0046

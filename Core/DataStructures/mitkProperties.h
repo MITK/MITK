@@ -22,6 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkGenericProperty.h"
 #include "mitkVector.h"
+#include "mitkTransferFunction.h"
 #include <string>
 
 namespace mitk {
@@ -43,8 +44,8 @@ namespace mitk {
 
    typedef GenericProperty<itk::Point<int, 3> > Point3iProperty;
    template class GenericProperty<itk::Point<int, 3> >;
-   
-            
+    
+   typedef GenericProperty<mitk::TransferFunction::Pointer> TransferFunctionProperty;
 } // namespace mitk  
 
 #endif /* MITKPROPERTIES_H_HEADER_INCLUDED */

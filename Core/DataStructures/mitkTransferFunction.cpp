@@ -12,6 +12,23 @@ void mitk::TransferFunction::FillValues(std::vector<mitk::TransferFunction::RGBO
   return;
 }
 void mitk::TransferFunction::UpdateVtkFunctions() {
-             
+    std::vector<mitk::TransferFunction::RGBO> values(100);
+    FillValues(values,m_Elements);
+    if (m_ScalarOpacityFunction->GetSize() > 0) {
+      m_ScalarOpacityFunction->RemoveAllPoints();
+      m_ColorTransferFunction->RemoveAllPoints();
+    }  
+ //   std::cout << "Fill TF: ";
+    for (unsigned int x = 0; x < values.size() ; x++) {
+      float fx = m_Min + x * (float)(m_Max - m_Min)/values.size(); 
+  //    std::cout << fx << "/" << values[x].m_Opacity << " ";
+      m_ScalarOpacityFunction->AddPoint(fx, values[x].m_Opacity);
+      m_ColorTransferFunction->AddRGBPoint(fx, values[x].m_Red / 255.0, values[x].m_Green / 255.0, values[x].m_Blue / 255.0); 
+    }
+ //   std::cout << std::endl;
+   if (m_Elements.size() > 1) {
+     m_Valid = true;
+     std::cout << "TF is now valid" << std::endl;
+   } 
 };
 

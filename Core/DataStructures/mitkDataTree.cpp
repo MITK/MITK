@@ -90,8 +90,46 @@ mitk::BoundingBox::Pointer mitk::DataTree::ComputeBoundingBox(mitk::DataTreeIter
   return result;
 }
 
-const mitk::TimeBounds mitk::DataTree::ComputeTimeBoundsInMS(mitk::DataTreeIterator * it, const char* boolPropertyKey, mitk::BaseRenderer* renderer, const char* boolPropertyKey2)
+mitk::TimeBounds mitk::DataTree::ComputeTimeBoundsInMS(mitk::DataTreeIterator * it, const char* boolPropertyKey, mitk::BaseRenderer* renderer, const char* boolPropertyKey2)
 {
   TimeBounds timebounds;
+
+  mitk::DataTreeIterator* _it=it->clone();
+
+  mitk::ScalarType stmin, stmax, cur;
+
+  stmin=-ScalarTypeNumericTraits::max();
+  stmax= ScalarTypeNumericTraits::max();
+
+  timebounds[0]=stmax; timebounds[1]=stmin;
+
+  while (_it->hasNext())
+  {
+    _it->next();
+    mitk::DataTreeNode::Pointer node = _it->get();
+    if (node->GetData() != NULL && node->GetData()->GetUpdatedGeometry() != NULL && node->IsOn(boolPropertyKey, renderer) && node->IsOn(boolPropertyKey2, renderer))
+    {
+      mitk::Geometry3D::ConstPointer geometry = node->GetData()->GetGeometry();
+
+      cur=geometry->GetTimeBoundsInMS()[0];
+      //is it after than -infinity, but before everything else that we found until now?
+      if((cur>stmin) && (cur<timebounds[0]))
+        timebounds[0] = cur;
+
+      cur=geometry->GetTimeBoundsInMS()[1];
+      //is it before than infinity, but after everything else that we found until now?
+      if((cur<stmax) && (cur>timebounds[1]))
+        timebounds[1] = cur;
+    }
+  }
+
+  if(!(timebounds[0]<stmax))
+  {
+    timebounds[0] = stmin;
+    timebounds[1] = stmax;
+  }
+
+  delete _it;
+
   return timebounds;
 }

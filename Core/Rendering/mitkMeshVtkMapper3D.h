@@ -42,6 +42,7 @@ class vtkActor;
 class vtkAssembly;
 class vtkFollower;
 class vtkPolyDataMapper;
+class vtkPropAssembly;
 
 namespace mitk {
 
@@ -58,6 +59,8 @@ class MeshVtkMapper3D : public BaseVtkMapper3D
 
     virtual const mitk::Mesh* GetInput();
 
+    virtual vtkProp* GetProp();
+
     virtual void GenerateData();
 
     //##Documentation
@@ -71,16 +74,18 @@ class MeshVtkMapper3D : public BaseVtkMapper3D
 
     virtual ~MeshVtkMapper3D();
 
+    vtkPropAssembly* m_PropAssemply;
 
-    vtkActor *m_Actor;
-    vtkPolyDataMapper* m_PointVtkPolyDataMapper;
+    vtkActor *m_SpheresActor;
+    vtkActor *m_ContourActor;
+    vtkPolyDataMapper* m_ContourMapper;
+    vtkPolyDataMapper* m_SpheresMapper;
+
     vtkPolyDataMapper* m_TextVtkPolyDataMapper;
-    vtkPolyDataMapper* m_VtkPolyDataMapper;    
 
-
-		vtkAppendPolyData *m_vtkMesh;
+		vtkAppendPolyData *m_Spheres;
 		vtkAppendPolyData *m_vtkTextList;
-		vtkPolyData *m_contour;
+		vtkPolyData *m_Contour;
     vtkTubeFilter * m_tubefilter;
 };
 

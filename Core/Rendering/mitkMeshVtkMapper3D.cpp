@@ -21,6 +21,7 @@ See MITKCopyright.txt or http://www.mitk.org/ for details.
 #include "mitkStringProperty.h"
 #include "mitkColorProperty.h"
 #include "mitkOpenGLRenderer.h"
+#include "../Algorithms/itkMeshDeformation/MeshUtil.h"
 
 
 #include <vtkActor.h>
@@ -28,6 +29,7 @@ See MITKCopyright.txt or http://www.mitk.org/ for details.
 #include <vtkAssembly.h>
 #include <vtkProp3DCollection.h>
 #include <vtkRenderer.h>
+#include <vtkPropAssembly.h>
 
 
 #include <vtkProperty.h>
@@ -44,6 +46,11 @@ const mitk::Mesh* mitk::MeshVtkMapper3D::GetInput()
   return static_cast<const mitk::Mesh * > ( GetData() );
 }
 
+vtkProp* mitk::MeshVtkMapper3D::GetProp()
+{
+  return m_PropAssemply;
+}
+
 void mitk::MeshVtkMapper3D::GenerateData()
 {
 }
@@ -52,44 +59,54 @@ void mitk::MeshVtkMapper3D::GenerateOutputInformation()
 {
 }
 
-mitk::MeshVtkMapper3D::MeshVtkMapper3D()
+mitk::MeshVtkMapper3D::MeshVtkMapper3D() : m_PropAssemply(NULL)
 {
-  m_VtkPolyDataMapper = vtkPolyDataMapper::New();
-  m_Actor = vtkActor::New();
-  m_Actor->SetMapper(m_VtkPolyDataMapper);
-  
-	m_Prop3D = m_Actor;
-	m_Prop3D->Register(NULL);
-
-	m_vtkMesh = vtkAppendPolyData::New();
+	m_Spheres = vtkAppendPolyData::New();
 	m_vtkTextList = vtkAppendPolyData::New();
-	m_contour = vtkPolyData::New();
+	m_Contour = vtkPolyData::New();
 	m_tubefilter = vtkTubeFilter::New();
+
+  m_SpheresActor = vtkActor::New();
+  m_SpheresMapper = vtkPolyDataMapper::New();
+  m_SpheresActor->SetMapper(m_SpheresMapper);
+
+  m_ContourActor = vtkActor::New();
+  m_ContourMapper = vtkPolyDataMapper::New();
+  m_ContourActor->SetMapper(m_ContourMapper);
+
+  m_PropAssemply = vtkPropAssembly::New();
+  m_PropAssemply->AddPart(m_ContourActor);
+  m_PropAssemply->AddPart(m_SpheresActor);
+
+  m_Prop3D = m_ContourActor;
 }
 
 mitk::MeshVtkMapper3D::~MeshVtkMapper3D()
 {
-  m_VtkPolyDataMapper->Delete();
-  m_Actor->Delete();
+  m_ContourActor->Delete();
+  m_SpheresActor->Delete();
+  m_ContourMapper->Delete();
+  m_SpheresMapper->Delete();
+  m_PropAssemply->Delete();
+  m_Spheres->Delete();
 }
 
 void mitk::MeshVtkMapper3D::Update(mitk::BaseRenderer* renderer)
 {
   if(IsVisible(renderer)==false)
   {
-    m_Actor->VisibilityOff();
+    m_PropAssemply->VisibilityOff();
     return;
   }
-  m_Actor->VisibilityOn();
+  m_PropAssemply->VisibilityOn();
 
-	m_vtkMesh->Delete();
+	m_Spheres->Delete();
 	m_vtkTextList->Delete();
-	m_contour->Delete();
+	m_Contour->Delete();
 	m_tubefilter->Delete();
 
-	m_vtkMesh = vtkAppendPolyData::New();
+	m_Spheres = vtkAppendPolyData::New();
 	m_vtkTextList = vtkAppendPolyData::New();
-	m_contour = vtkPolyData::New();
 	m_tubefilter = vtkTubeFilter::New();
 
   mitk::Mesh::Pointer input  = const_cast<mitk::Mesh*>(this->GetInput());
@@ -112,11 +129,24 @@ void mitk::MeshVtkMapper3D::Update(mitk::BaseRenderer* renderer)
 		sphere->SetRadius(2);
     sphere->SetCenter(i.Value()[0],i.Value()[1],i.Value()[2]);
 
-		m_vtkMesh->AddInput(sphere->GetOutput());
+		m_Spheres->AddInput(sphere->GetOutput());
 	}
 
-  m_VtkPolyDataMapper->SetInput(m_vtkMesh->GetOutput());
-  m_Actor->GetProperty()->SetColor(rgba);
+ // build contour vtkPolyData
+  m_Contour = MeshUtil<mitk::Mesh::MeshType>::meshToPolyData(mesh.GetPointer());
+  m_ContourMapper->SetInput(m_Contour);
+
+  bool wireframe=true;
+  GetDataTreeNode()->GetVisibility(wireframe, renderer, "wireframe");
+  if(wireframe)
+    m_ContourActor->GetProperty()->SetRepresentationToWireframe();
+  else
+    m_ContourActor->GetProperty()->SetRepresentationToSurface();
+
+  m_ContourActor->GetProperty()->SetColor(rgba);
+  m_SpheresActor->GetProperty()->SetColor(rgba);
+
+  m_SpheresMapper->SetInput(m_Spheres->GetOutput());
 
   StandardUpdate();
 }

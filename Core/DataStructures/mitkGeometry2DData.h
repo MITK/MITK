@@ -39,9 +39,9 @@ public:
 
     //##ModelId=3E66CC5A030E
 	virtual void SetRequestedRegion(itk::DataObject *data);
+
     //##ModelId=3E67D85E00B7
     virtual void CopyInformation(const itk::DataObject *data);
-
 
 protected:
     //##ModelId=3E639CD30201

@@ -93,7 +93,7 @@ void QmitkSimpleExampleFunctionality::selectSliceWidgetXZ(int y)
     const mitk::Geometry2D* g2d = multiWidget->mitkWidget3->GetRenderer()->GetWorldGeometry();
     const mitk::PlaneGeometry* pg = dynamic_cast<const mitk::PlaneGeometry*>(g2d);
     mitk::PlaneView pv = pg->GetPlaneView();
-    pv.point.x=y; //y = y;
+    pv.point.y=y;
     mitk::PlaneGeometry::Pointer plane = mitk::PlaneGeometry::New();  
     plane->SetPlaneView(pv);
     multiWidget->mitkWidget3->GetRenderer()->SetWorldGeometry(plane);

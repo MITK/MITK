@@ -159,7 +159,7 @@ void mitk::Surface::CalculateBoundingBox()
 }
 
 //##ModelId=3E70F66100B0
-void mitk::Surface::SetRequestedRegionToLargestPossibleRegion() //by arin
+void mitk::Surface::SetRequestedRegionToLargestPossibleRegion()
 {
   m_RequestedRegion = GetLargestPossibleRegion();
 }

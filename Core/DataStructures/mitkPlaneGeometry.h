@@ -287,7 +287,7 @@ public:
 
     return 
       mitk::Line3D::RectangleLineIntersection( 
-      0, 0, GetExtent(0), GetExtent(1), 
+      0, 0, GetExtentInMM(0), GetExtentInMM(1), 
       point2, direction2, lineFrom, lineTo );
   }
 

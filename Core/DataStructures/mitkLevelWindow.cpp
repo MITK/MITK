@@ -2,25 +2,25 @@
 #include <algorithm>
 
 //##ModelId=3E0B12640203
-float mitk::LevelWindow::GetLevel()
+float mitk::LevelWindow::GetLevel() const
 {
-	return (m_Max-m_Min)/2.0;
+	return (m_Max-m_Min)/2.0 + m_Min;
 }
 
 //##ModelId=3E0B12960165
-float mitk::LevelWindow::GetWindow()
+float mitk::LevelWindow::GetWindow() const
 {
 	return (m_Max-m_Min);
 }
 
 //##ModelId=3E0B130203B9
-float mitk::LevelWindow::GetMin()
+float mitk::LevelWindow::GetMin() const
 {
 	return m_Min;
 }
 
 //##ModelId=3E0B130A0049
-float mitk::LevelWindow::GetMax()
+float mitk::LevelWindow::GetMax() const
 {
 	return m_Max;
 }
@@ -28,41 +28,44 @@ float mitk::LevelWindow::GetMax()
 //##ModelId=3E0B130E037A
 void mitk::LevelWindow::SetLevel(float level)
 {
-	double window = GetWindow();
+	float halfWindow = (m_Max - m_Min) / 2;
+	m_Min = level - halfWindow;
+	m_Max = level + halfWindow;
+	//double window = GetWindow();
 
-	m_Min = level - window / 2.0;
-	m_Max = level + window / 2.0;
-  
-	if( m_Min < m_RangeMin )
-    {
-		m_Min = m_RangeMin;
-		m_Max = m_Min + window;
-    }
-	if( m_Max > m_RangeMax )
-    {
-		m_Max = m_RangeMax;
-		m_Min = m_Max - window;
-    }
+	//m_Min = level - window / 2.0;
+	//m_Max = level + window / 2.0;
+
+	testValues();
+	//if( m_Min < m_RangeMin )
+ //   {
+	//	m_Min = m_RangeMin;
+	//	m_Max = m_Min + window;
+ //   }
+	//if( m_Max > m_RangeMax )
+ //   {
+	//	m_Max = m_RangeMax;
+	//	m_Min = m_Max - window;
+ //   }
 }
 
 //##ModelId=3E0B131C0168
 void mitk::LevelWindow::SetWindow(float window)
 {
-	double level = GetLevel();
+	float level = m_Min + (m_Max - m_Min) / 2;	
+	float halfWindow = window / 2;
 
-	m_Min = level - window / 2.0;
-	m_Max = level + window / 2.0;
-  
-	if( m_Min < m_RangeMin )
-    {
-		m_Min = m_RangeMin;
-		m_Max = m_Min + window;
-    }
-	if( m_Max > m_RangeMax )
-    {
-		m_Max = m_RangeMax;
-		m_Min = m_Max - window;
-    }
+	m_Min = level - halfWindow;
+	m_Max = level + halfWindow;
+	testValues();
+
+	//double level = GetLevel();
+
+	//m_Min = level - window / 2.0;
+	//m_Max = level + window / 2.0;
+
+	//testValues();
+
 }
 
 //##ModelId=3E0B132303A3
@@ -70,39 +73,32 @@ void mitk::LevelWindow::SetLevelWindow(float level, float window)
 {
 	m_Min = level - window / 2.0;
 	m_Max = level + window / 2.0;
-  
-	if( m_Min < m_RangeMin )
-    {
-		m_Min = m_RangeMin;
-		m_Max = m_Min + window;
-    }
-	if( m_Max > m_RangeMax )
-    {
-		m_Max = m_RangeMax;
-		m_Min = m_Max - window;
-    }
+
+	testValues();
+	//if( m_Min < m_RangeMin )
+ //   {
+	//	m_Min = m_RangeMin;
+	//	m_Max = m_Min + window;
+ //   }
+	//if( m_Max > m_RangeMax )
+ //   {
+	//	m_Max = m_RangeMax;
+	//	m_Min = m_Max - window;
+ //   }
 }
 
 //##ModelId=3E0B13320187
 void mitk::LevelWindow::SetMin(float min)
 {
-	if( m_Min < m_RangeMin )
-		m_Min = m_RangeMin;
-	else
-		m_Min = min;
-	if(m_Min>m_Max)
-		m_Max=m_Min;
+	m_Min = min;
+	testValues(); 
 }
 
 //##ModelId=3E0B1339006F
 void mitk::LevelWindow::SetMax(float max)
 {
-	if( max > m_RangeMax )
-		m_Max = m_RangeMax;
-	else
-		m_Max = max;
-	if(m_Max<m_Min)
-		m_Min=m_Max;
+	m_Max = max	;
+	testValues();
 }
 
 //##ModelId=3E0B133D0292
@@ -111,24 +107,92 @@ void mitk::LevelWindow::SetMinMax(float min, float max)
 	if(min>max)
 		std::swap(min,max);
 
-	if( m_Min < m_RangeMin )
-		m_Min = m_RangeMin;
-	else
-		m_Min = min;
-	if( max > m_RangeMax )
-		m_Max = m_RangeMax;
-	else
-		m_Max = max;
+	SetMin(min);
+	SetMax(max);
 }
 
-//##ModelId=3E345B580260
-mitk::LevelWindow::LevelWindow()
+//##ModelId=3E0B13320187
+void mitk::LevelWindow::SetRangeMin(float min)
 {
+	m_RangeMin = min;
+	testValues();
 }
 
-
-//##ModelId=3E345B58029C
-mitk::LevelWindow::~LevelWindow()
+//##ModelId=3E0B13320187
+void mitk::LevelWindow::SetRangeMax(float max)
 {
+		m_RangeMax = max;
+		testValues();
+}
+
+float mitk::LevelWindow::GetRangeMin() const
+{
+	return m_RangeMin;
+}
+
+float mitk::LevelWindow::GetRangeMax() const
+{
+	return m_RangeMax;
+}
+
+float mitk::LevelWindow::GetRange() const
+{
+	return  (m_RangeMax > 0) ? (m_RangeMax - m_RangeMin) : (m_RangeMin - m_RangeMax);
+}
+
+//float mitk::LevelWindow::GetLevel() const
+//{
+//	return m_Min + (m_Max - m_Min) / 2;
+//};
+//
+//
+
+/*!
+ * \brief equality operator inplementation
+ */
+bool mitk::LevelWindow::operator==(const mitk::LevelWindow& levWin) const
+{
+		if ( m_RangeMin == levWin.GetRangeMin() && 
+			 m_RangeMax == levWin.GetRangeMax() && 
+			 m_Min == levWin.GetMin() && m_Max == levWin.GetMax()) {
+         
+				 return true;
+			 }
+		else {
+			return false;	
+		}
+}
+
+/*!
+ * \brief equality operator inplementation
+ */
+bool mitk::LevelWindow::operator!=(const mitk::LevelWindow& levWin) const
+{
+		if ( m_RangeMin == levWin.GetRangeMin() && 
+			 m_RangeMax == levWin.GetRangeMax() && 
+			 m_Min == levWin.GetMin() && m_Max == levWin.GetMax()) {
+         
+				 return false;
+			 }
+		else {
+			return true;	
+		}
+}
+
+/*!
+ * \brief non equality operator inplementation
+ */
+mitk::LevelWindow& mitk::LevelWindow::operator=(const mitk::LevelWindow& levWin)
+{
+	if (this == &levWin) {
+		return *this;
+	}
+	else {
+		m_RangeMin = levWin.GetRangeMin();
+		m_RangeMax = levWin.GetRangeMax();
+		m_Min= levWin.GetMin();
+		m_Max= levWin.GetMax();
+		return *this;
+	}
 }
 

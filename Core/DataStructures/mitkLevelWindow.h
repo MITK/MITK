@@ -6,11 +6,17 @@
 
 namespace mitk {
 
-//##ModelId=3E0B12240067
+/*!
+ * class implements level window data structure 
+ * current min and max value are stored in m_Min and m_Max.
+ * The maximum and minimum of valid value range is stored in 
+ * m_RangeMin and m_RangeMax
+ */ 
 class LevelWindow : public itk::Object
 {
   public:
-	/** Standard class typedefs. */
+
+		/** Standard class typedefs. */
     //##ModelId=3E33EEF40183
 	typedef LevelWindow              Self;
     //##ModelId=3E33EEF401AB
@@ -26,54 +32,135 @@ class LevelWindow : public itk::Object
 	/** Run-time type information (and related methods). */
     itkTypeMacro(itk::Object,LevelWindow);
 
-    //##ModelId=3E0B12640203
-    float GetLevel();
+		/*!
+		*	\brief method returns the level value, i.e. the center of  
+		*				current grey value interval
+		*/
+		float GetLevel() const;
 
-    //##ModelId=3E0B12960165
-    float GetWindow();
+    /*!
+		 * \brief returns the current window size
+		 */
+    float GetWindow() const;
 
-    //##ModelId=3E0B130203B9
-    float GetMin();
+    /*!
+		 * getter for window minimum value
+		 */
+    float GetMin() const;
 
-    //##ModelId=3E0B130A0049
-    float GetMax();
+    /*!
+		 * getter for window maximum value
+		 */
+    float GetMax() const;
 
-    //##ModelId=3E0B130E037A
+    /*!
+		 * setter for level value
+		 */
     void SetLevel(float level);
 
-    //##ModelId=3E0B131C0168
+    /*!
+		 * setter for window value
+		 */
     void SetWindow(float window);
 
-    //##ModelId=3E0B132303A3
+    /*!
+		 * 
+		 */
     void SetLevelWindow(float level, float window);
 
-    //##ModelId=3E0B13320187
+    /*!
+		 * setter for window minimum value
+		 */
     void SetMin(float min);
 
-    //##ModelId=3E0B1339006F
+    /*!
+		 * setter for window maximum value
+		 */
     void SetMax(float max);
 
-    //##ModelId=3E0B133D0292
+    /*!
+		 * setter for window min and max values
+		 */
     void SetMinMax(float min, float max);
 
-  protected:
-    //##ModelId=3E345B580260
-    LevelWindow();
+    /*!
+		 * setter for total range minimum value
+		 */
+    void SetRangeMin(float min);
 
-    //##ModelId=3E345B58029C
-    virtual ~LevelWindow();
+    /*!
+		 * setter for total range maximum value
+		 */
+    void SetRangeMax(float max);
 
-    //##ModelId=3E0B122C0393
+    /*!
+		 * getter for total range minimum value
+		 */
+    float GetRangeMin() const;
+
+    /*!
+		 * getter for total range maximum value
+		 */
+    float GetRangeMax() const;
+
+		/**! 
+		* \brief method returns the size of the grey value range
+		*/
+		float GetRange() const; 
+
+	
+    /*!
+     * \brief equality operator implementation
+		 */
+		virtual bool operator==(const LevelWindow& levWin) const;
+
+    /*!
+    	* \brief non equality operator implementation
+		 */
+		virtual bool operator!=(const LevelWindow& levWin) const;
+
+		/*!
+     * \brief implementation necessary because operator made 
+		 *	private in itk::Object
+		 */
+		virtual LevelWindow& operator=(const LevelWindow& levWin);
+
+	
+	protected:
+
+    /*!
+		 * lower limit of current window
+		 */
     float m_Min;
 
-    //##ModelId=3E0B123D0167
+    /*!
+		 * upper limit of current window
+		 */
     float m_Max;
 
-    //##ModelId=3E19538C0312
-	float m_RangeMin;
+    /*!
+		 * minimum gray value of the window
+		 */
+		float m_RangeMin;
 
-    //##ModelId=3E19538C0326
-	float m_RangeMax;
+    /*!
+		 * maximum gray value of the window
+		 */
+		float m_RangeMax;
+
+		/*!
+		 * confidence tests
+		 */
+		inline void testValues() {	
+			if ( m_Min < m_RangeMin )
+				m_Min = m_RangeMin;
+
+			if ( m_Max > m_RangeMax ) 
+				m_Max = m_RangeMax;
+
+			if ( m_Min > m_Max )
+				m_Min = m_Max;
+		}
 
 };
 

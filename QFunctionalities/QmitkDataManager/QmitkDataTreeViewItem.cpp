@@ -31,7 +31,7 @@ QmitkDataTreeViewItem::QmitkDataTreeViewItem( QListView *parent, const QString &
   m_TreeNode = nodeIt->Get();
   QListViewItem::setText(0,QString("All Datasets"));
 
-  mitk::DataTreeChildIterator it(nodeIt->GetTree(), nodeIt->GetNode());
+  mitk::DataTreeChildIterator it(*nodeIt);
   while (!it.IsAtEnd())
   {
     QmitkDataTreeViewItem * nextItem = new QmitkDataTreeViewItem(this,&it);
@@ -67,7 +67,7 @@ QmitkDataTreeViewItem::QmitkDataTreeViewItem( QmitkDataTreeViewItem * parent, mi
   }
   
   QListViewItem::setText(2,QString(ss.str().c_str()));
-  mitk::DataTreeChildIterator it(nodeIt->GetTree(), nodeIt->GetNode());
+  mitk::DataTreeChildIterator it(*nodeIt);
   while (!it.IsAtEnd())
   {
     QmitkDataTreeViewItem * nextItem = new QmitkDataTreeViewItem(this,&it);

@@ -37,6 +37,8 @@ class QmitkDataTreeViewItem : public QListViewItem
 	public:
     QmitkDataTreeViewItem( QListView *parent, const QString &s1, const QString &s2, mitk::DataTreeIteratorBase * nodeIt );
     QmitkDataTreeViewItem( QmitkDataTreeViewItem * parent, mitk::DataTreeIteratorBase * nodeIt );
+    virtual ~QmitkDataTreeViewItem() {}
+
     mitk::DataTreeNode::ConstPointer GetDataTreeNode() const;
     mitk::DataTreeIteratorBase* GetDataTreeIterator() {return m_DataTreeIterator.GetPointer();}
 

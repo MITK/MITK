@@ -53,13 +53,10 @@ public:
   virtual void GenerateOutputInformation();
 
   virtual void GenerateData();
-  
-
-//  virtual void SetBoundingObject(mitk::Ellipsoid* _arg);
-//  virtual const mitk::Ellipsoid* GetBoundingObject();
 
   itkSetObjectMacro(BoundingObject, mitk::BoundingObject);
   itkGetObjectMacro(BoundingObject, mitk::BoundingObject);
+
 
   itkSetMacro(InsideValue,  mitk::BoundingObjectCutter::PixelType);
   itkGetMacro(InsideValue,  mitk::BoundingObjectCutter::PixelType);
@@ -72,14 +69,10 @@ public:
   itkSetMacro(UseRegionGrower, bool);
   itkGetMacro(UseRegionGrower, bool);
   itkBooleanMacro(UseRegionGrower);
-
-  //itkSetClampMacro(ConfidenceFactor, float, 0.0, 10.0);
-  //itkGetMacro(ConfidenceFactor, float);
   
   itkSetObjectMacro(SegmentationFilter, ImageToImageFilterType);
   itkGetObjectMacro(SegmentationFilter, ImageToImageFilterType);
 
-  //ItkImageType::Pointer m_ItkImage;
 protected:
   BoundingObjectCutter();
   virtual ~BoundingObjectCutter();
@@ -89,9 +82,7 @@ protected:
   PixelType m_OutsideValue;
   bool m_UseInsideValue;
   bool m_UseRegionGrower;
-  //float m_ConfidenceFactor;
   ImageToImageFilterType::Pointer m_SegmentationFilter;
-
 };
 
 } // namespace mitk

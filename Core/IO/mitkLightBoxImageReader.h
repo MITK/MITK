@@ -34,10 +34,17 @@ protected:
     /** Time when Header was last read. */
     itk::TimeStamp m_ReadHeaderTime;
     //double ConvertTime(ipPicDescriptor*  pic);
+    std::list<int> SortImage();
     QcLightbox* m_LightBox;
 };
 
 } // namespace mitk
-
+typedef struct imageInfo
+{
+  int timePoints;
+  int nbOfTimePoints;
+  //float imagetime;
+  mitk::Point3D startPosition;
+}imageInfo;
 
 #endif /* LIGHTBOXIMAGEREADER_H_HEADER_INCLUDED_C1F48A22 */

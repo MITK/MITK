@@ -2,6 +2,7 @@
 #include <vtkStructuredPointsReader.h>
 #include <vtkImageCast.h> 
 #include <vtkImageData.h> 
+#include <vtkDataObject.h> 
 #include <iostream>
 
 /**
@@ -1242,7 +1243,45 @@ vtkImageData* Pic2vtk::loadVtkImage( char* fileName ) {
 	std::cout << "min: " << ((vtkImageData *)points)->GetScalarTypeMin () << std::endl;
 	std::cout << "min: " << ((vtkImageData *)points)->GetScalarTypeMax () 	<< std::endl;
 	std::cout << "scalars: " << ((vtkImageData *)points)->GetNumberOfScalarComponents () << std::endl;
-	 
+	((vtkImageData *)points)->SetNumberOfScalarComponents (3);
+ 	std::cout << "scalars: " << ((vtkImageData *)points)->GetNumberOfScalarComponents () << std::endl;
+	
+	int dims[3];
+	((vtkImageData *)points)->GetDimensions (dims);
+	std::cout << "dim1 = " << dims[0] << " dims2 = " << dims[1] << " dims3 = " << dims[2] << std::endl;
+	dims[2] = 2;
+	((vtkImageData *)points)->SetDimensions (dims);
+	((vtkImageData *)points)->GetDimensions (dims);
+	std::cout << "dim1 = " << dims[0] << " dims2 = " << dims[1] << " dims3 = " << dims[2] << std::endl;
+	std::cout << "dim: " << ((vtkImageData *)points)->GetDataDimension() << std::endl;
+	
+
+	int extent[6];
+	((vtkImageData *)points)->GetExtent (extent);
+	std::cout << "e1 = " << extent[0] << " e2 = " << extent[1] << " e3 = " << extent[2] << std::endl;
+	std::cout << "e4 = " << extent[3] << " e5 = " << extent[4] << " e6 = " << extent[5] << std::endl;
+
+	((vtkImageData *)points)->GetUpdateExtent (extent);
+	std::cout << "e1 = " << extent[0] << " e2 = " << extent[1] << " e3 = " << extent[2] << std::endl;
+	std::cout << "e4 = " << extent[3] << " e5 = " << extent[4] << " e6 = " << extent[5] << std::endl;
+	
+	((vtkImageData *)points)->GetExtent (extent);
+	((vtkImageData *)points)->SetUpdateExtent (extent);
+	std::cout << "e1 = " << extent[0] << " e2 = " << extent[1] << " e3 = " << extent[2] << std::endl;
+	std::cout << "e4 = " << extent[3] << " e5 = " << extent[4] << " e6 = " << extent[5] << std::endl;
+
+	((vtkImageData *)points)->GetExtent (extent);
+	((vtkImageData *)points)->SetWholeExtent (extent);
+	std::cout << "e1 = " << extent[0] << " e2 = " << extent[1] << " e3 = " << extent[2] << std::endl;
+	std::cout << "e4 = " << extent[3] << " e5 = " << extent[4] << " e6 = " << extent[5] << std::endl;
+	
+	float s[3];
+	((vtkImageData *)points)->GetSpacing (s);
+	std::cout << "s1 = " << s[0] << " s2 = " << s[1] << " s3 = " << s[2] << std::endl;
+
+	((vtkDataObject*)points)->Update();
+	
+			
 	return (vtkImageData *)points;
 	//return NULL;
  }

@@ -36,11 +36,17 @@ mitk::Geometry2D::ConstPointer mitk::Geometry3D::GetGeometry2D(int s, int t) con
         //as the plane of the first slice shifted by m_Spacing*s.
         if((m_EvenlySpaced) && (geometry2d==NULL))
         {
-            Vector3D zStep(0,0,m_Spacing.z);
             const PlaneGeometry* firstslice=dynamic_cast<const PlaneGeometry*> (m_Geometry2Ds[0].GetPointer());
             if(firstslice!=NULL)
             {
                 mitk::PlaneView view=firstslice->GetPlaneView();
+                
+                Vector3D n=view.normal;
+                n.normalize();
+
+                Vector3D zStep;
+                zStep=n.dot(m_Spacing)*n;
+
                 mitk::PlaneGeometry::Pointer requestedslice;
                 requestedslice = mitk::PlaneGeometry::New();
                 view.point+=zStep*s;
@@ -78,20 +84,38 @@ mitk::BoundingBox::ConstPointer mitk::Geometry3D::GetBoundingBox(int t) const
         const PlaneView& planeview=planegeometry->GetPlaneView();
         Point3D pt;
 
-        //add the four edge points of the plane geometry to the bounding box calculator.
+        Vector3D n=planeview.normal;
+        n.normalize();
+
+        Vector3D zStep;
+        zStep=n.dot(m_Spacing)*n;
+
+        //add the four edge points of the upper AND lower boundery of the plane geometry to the bounding box calculator.
         pt=planeview.point;
         p[0]=pt.x; p[1]=pt.y; p[2]=pt.z;
         pointscontainer->InsertElement(pointid++, p);
+        pt+=zStep;
+        p[0]=pt.x; p[1]=pt.y; p[2]=pt.z;
+        pointscontainer->InsertElement(pointid++, p);
         
-        pt=planeview.point+planeview.getOrientation1();
+        pt=planeview.point+planeview.getOrientation1(); 
+        p[0]=pt.x; p[1]=pt.y; p[2]=pt.z;
+        pointscontainer->InsertElement(pointid++, p);
+        pt+=zStep;
         p[0]=pt.x; p[1]=pt.y; p[2]=pt.z;
         pointscontainer->InsertElement(pointid++, p);
         
         pt+=planeview.getOrientation2();
         p[0]=pt.x; p[1]=pt.y; p[2]=pt.z;
         pointscontainer->InsertElement(pointid++, p);
+        pt+=zStep;
+        p[0]=pt.x; p[1]=pt.y; p[2]=pt.z;
+        pointscontainer->InsertElement(pointid++, p);
         
         pt=planeview.point+planeview.getOrientation2();
+        p[0]=pt.x; p[1]=pt.y; p[2]=pt.z;
+        pointscontainer->InsertElement(pointid++, p);
+        pt+=zStep;
         p[0]=pt.x; p[1]=pt.y; p[2]=pt.z;
         pointscontainer->InsertElement(pointid++, p);
     }

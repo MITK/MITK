@@ -138,7 +138,7 @@ bool mitk::Mesh::EvaluatePosition(mitk::Point3D point, unsigned long &cellId)
     cellId = this->SearchFirstCell(pointId);
     return true;
   }
-  unsigned long lineId = -1;
+  unsigned long lineId = 0;
   if( this->SearchLine(point, PRECISION, lineId, cellId))
   {
     return true;
@@ -209,7 +209,7 @@ bool mitk::Mesh::EvaluatePosition(mitk::Point3D point, unsigned long &cellId)
 
 unsigned long mitk::Mesh::GetNewCellId()
 {
-  unsigned long nextCellId = -1;
+  long nextCellId = -1;
   ConstCellIterator it = m_ItkData->GetCells()->Begin();
   ConstCellIterator end = m_ItkData->GetCells()->End();
   while (it!=end)

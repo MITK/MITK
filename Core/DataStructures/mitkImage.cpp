@@ -503,6 +503,21 @@ void mitk::Image::Initialize(ipPicDescriptor* pic, int channels, int sDim, int t
 
     SetRequestedRegionToLargestPossibleRegion();
 
+	// initialize level-window
+	ipPicTSV_t *tsv = ipPicQueryTag( pic, "LEVEL/WINDOW" );
+	if( tsv != NULL )
+	{
+		double level;
+		double window;
+#define GET_C_W( type, tsv, C, W )			\
+		level = ((type *)tsv->value)[0];    \
+		window = ((type *)tsv->value)[1];
+		
+		ipPicFORALL_2( GET_C_W, tsv, level, window );
+
+		m_LevelWindow.SetLevelWindow( level, window );
+	}
+
 	m_Initialized = true;
 }
 

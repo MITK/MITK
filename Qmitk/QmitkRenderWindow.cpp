@@ -191,13 +191,17 @@ void mitk::QmitkRenderWindow::keyPressEvent(QKeyEvent *ke)
 }
 
 //##ModelId=3EF59AD202B7
+//check for update
 void mitk::QmitkRenderWindow::Update()
 {
   update();
 };
 
+//force an update
 void mitk::QmitkRenderWindow::Repaint()
 {
+  //hide();//strongest update! but flickering widgets in zoom!
+  //show();
   updateGL();
 };
 

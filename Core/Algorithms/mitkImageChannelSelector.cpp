@@ -14,17 +14,22 @@ mitk::ImageChannelSelector::~ImageChannelSelector()
 //##ModelId=3E3BD0C70343
 void mitk::ImageChannelSelector::GenerateOutputInformation()
 {
-	mitk::Image::ConstPointer input  = this->GetInput();
-	mitk::Image::Pointer output = this->GetOutput();
+  mitk::Image::ConstPointer input  = this->GetInput();
+  mitk::Image::Pointer output = this->GetOutput();
 
-	itkDebugMacro(<<"GenerateOutputInformation()");
+  itkDebugMacro(<<"GenerateOutputInformation()");
 
-    output->Initialize(input->GetPixelType(), input->GetDimension(), input->GetDimensions());
+  output->Initialize(input->GetPixelType(), input->GetDimension(), input->GetDimensions());
+  int dim=(input->GetDimension()<3?input->GetDimension():3);
+	output->Initialize(input->GetPixelType(), dim, input->GetDimensions());
+
+  // initialize geometry
+  output->SetGeometry(input->GetGeometry());
 }
 
 //##ModelId=3E3BD0C903DC
 void mitk::ImageChannelSelector::GenerateData()
 {
-	SetDataItem(GetChannelData(m_ChannelNr), 0);
+  SetDataItem(GetChannelData(m_ChannelNr), 0);
 }
 

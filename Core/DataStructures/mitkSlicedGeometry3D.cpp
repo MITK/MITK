@@ -17,7 +17,7 @@ mitk::Geometry2D::ConstPointer mitk::SlicedGeometry3D::GetGeometry2D(int s, int 
   
   if(IsValidSlice(s, t))
   {
-    int pos=s+t*m_Dimensions[2];
+    int pos=s+t*m_Slices;
     geometry2d = m_Geometry2Ds[pos];
     //if (a) we don't have a Geometry2D stored for the requested slice, 
     //(b) m_EvenlySpaced is activated and (c) the first slice (s=0,t=0) 
@@ -51,6 +51,8 @@ mitk::Geometry2D::ConstPointer mitk::SlicedGeometry3D::GetGeometry2D(int s, int 
 //##ModelId=3DCBF5D40253
 mitk::BoundingBox::ConstPointer mitk::SlicedGeometry3D::GetBoundingBox(int t) const
 {
+  assert(m_BoundingBoxes.size()>0);
+
   if(m_BoundingBoxes[t].IsNotNull())
     return m_BoundingBoxes[t];
   
@@ -62,12 +64,10 @@ mitk::BoundingBox::ConstPointer mitk::SlicedGeometry3D::GetBoundingBox(int t) co
   
   assert(m_EvenlySpaced);
   
-  int s, slices;
+  int s;
   mitk::BoundingBox::PointIdentifier pointid=0;
   
-  slices=( GetDataDimension()<=2 ? 1 : GetDimensions()[2] );
-  
-  for(s=0;s<slices;++s)
+  for(s=0;s<m_Slices;++s)
   {
     const PlaneGeometry* planegeometry =
       dynamic_cast<const PlaneGeometry *>(GetGeometry2D(s,t).GetPointer());
@@ -142,7 +142,7 @@ bool mitk::SlicedGeometry3D::SetGeometry2D(const mitk::Geometry2D* geometry2D, i
 {
   if(IsValidSlice(s,t))
   {
-    m_Geometry2Ds[s*m_Dimensions[2]+t*m_Dimensions[3]]=geometry2D;
+    m_Geometry2Ds[s*m_Slices+t*m_TimeSteps]=geometry2D;
     return true;
   }
   return false;
@@ -155,15 +155,15 @@ bool mitk::SlicedGeometry3D::SetGeometry2D(ipPicDescriptor* pic, int s, int t)
   {
     //construct standard view
     mitk::Point3D origin, right, bottom;
-    origin.set(0,0,s);               UnitsToMM(origin, origin);
-    right.set(m_Dimensions[0],0,0);  UnitsToMM(right, right);
-    bottom.set(0,m_Dimensions[1],0); UnitsToMM(bottom, bottom);
+    origin.set(0,0,s);         UnitsToMM(origin, origin);
+    right.set(pic->n[0],0,0);  UnitsToMM(right, right);
+    bottom.set(0,pic->n[1],0); UnitsToMM(bottom, bottom);
     
     PlaneView view_std(origin, right, bottom);
     
     mitk::PlaneGeometry::Pointer planegeometry=mitk::PlaneGeometry::New();
     planegeometry->SetPlaneView(view_std);
-    planegeometry->SetSizeInUnits(m_Dimensions[0], m_Dimensions[1]);
+    planegeometry->SetSizeInUnits(pic->n[0], pic->n[1]);
     SetGeometry2D(planegeometry, s, t);
     return true;
   }
@@ -171,14 +171,15 @@ bool mitk::SlicedGeometry3D::SetGeometry2D(ipPicDescriptor* pic, int s, int t)
 }
 
 //##ModelId=3E3453C703AF
-void mitk::SlicedGeometry3D::Initialize(unsigned int dimension, const unsigned int* dimensions)
+void mitk::SlicedGeometry3D::Initialize(unsigned int slices, unsigned int timeSteps)
 {
-  Geometry3D::Initialize(dimension, dimensions);
+  Superclass::Initialize(timeSteps);
+  m_Slices = slices;
 
   m_Geometry2Ds.clear();
   
   Geometry2D::ConstPointer gnull=NULL;
-  int num=m_Dimensions[2]*m_Dimensions[3];
+  int num=m_Slices*m_TimeSteps;
   
   m_Geometry2Ds.reserve(num);
   m_Geometry2Ds.assign(num, gnull);
@@ -186,27 +187,12 @@ void mitk::SlicedGeometry3D::Initialize(unsigned int dimension, const unsigned i
   //initialize m_TransformOfOrigin and m_Spacing (and m_TransformUnitsToMM/m_TransformMMToUnits).
   m_TransformOfOrigin.setIdentity();
   SetSpacing(Vector3D(1.0,1.0,1.0));
-  
-  //does the Geometry has 2D slices?
-  if(num>0)
-  {
-    //construct standard view
-    mitk::Point3D right, bottom;
-    right.set(m_Dimensions[0],0,0); UnitsToMM(right, right);
-    bottom.set(0,m_Dimensions[1],0); UnitsToMM(bottom, bottom);
-    PlaneView view_std(mitk::Point3D(0,0,0), right, bottom);
-    
-    mitk::PlaneGeometry::Pointer planegeometry=mitk::PlaneGeometry::New();
-    m_Geometry2Ds[0]=planegeometry;
-    planegeometry->SetPlaneView(view_std);
-    planegeometry->SetSizeInUnits(m_Dimensions[0], m_Dimensions[1]);
-  }
 }
 
 //##ModelId=3E15572E0269
-mitk::SlicedGeometry3D::SlicedGeometry3D() : m_EvenlySpaced(true)
+mitk::SlicedGeometry3D::SlicedGeometry3D() : m_Slices(0), m_EvenlySpaced(true)
 {
-  Initialize(m_Dimension, m_Dimensions);
+  Initialize(m_Slices, m_TimeSteps);
 }
 
 //##ModelId=3E3456C50067
@@ -218,12 +204,32 @@ mitk::SlicedGeometry3D::~SlicedGeometry3D()
 //##ModelId=3E3BE1F10106
 bool mitk::SlicedGeometry3D::IsValidSlice(int s, int t) const
 {
-  return ((s>=0) && (s<(int)m_Dimensions[2]) && (t>=0) && (t< (int)m_Dimensions[3]));
+  return ((s>=0) && (s<(int)m_Slices) && (t>=0) && (t< (int)m_TimeSteps));
 }
 
 //##ModelId=3E3BE8CF010E
 void mitk::SlicedGeometry3D::SetSpacing(mitk::Vector3D aSpacing)
 {
+  bool hasEvenlySpacedPlaneGeometry=false;
+  mitk::Point3D origin, rightDV, bottomDV;
+  unsigned int width, height;
+  //in case of evenly-spaced data: re-initialize instances of Geometry2D, since the spacing influences them
+  if((m_EvenlySpaced) && (m_Geometry2Ds.size()>0))
+  {
+    mitk::Geometry2D::ConstPointer firstGeometry = m_Geometry2Ds[0].GetPointer();
+
+    const PlaneGeometry* constplanegeometry=dynamic_cast<const PlaneGeometry*>(firstGeometry.GetPointer());
+    if(constplanegeometry != NULL)
+    {
+      MMToUnits(constplanegeometry->GetPlaneView().point, origin);
+      MMToUnits(constplanegeometry->GetPlaneView().getOrientation1(), rightDV);
+      MMToUnits(constplanegeometry->GetPlaneView().getOrientation2(), bottomDV);
+      width  = constplanegeometry->GetWidthInUnits();
+      height = constplanegeometry->GetHeightInUnits();
+      hasEvenlySpacedPlaneGeometry=true;
+    }
+  }
+
   m_Spacing = aSpacing;
   
   m_TransformUnitsToMM=m_TransformOfOrigin;
@@ -236,37 +242,45 @@ void mitk::SlicedGeometry3D::SetSpacing(mitk::Vector3D aSpacing)
   m_TransformMMToUnits.invert(m_TransformUnitsToMM);
   
   //re-initialize bounding box array, since the spacing influences the size of the bounding box
-  int num=m_Dimensions[2]*m_Dimensions[3];
+  int num=m_Slices*m_TimeSteps;
   BoundingBox::ConstPointer bnull=NULL;
   m_BoundingBoxes.clear();
-  m_BoundingBoxes.reserve(m_Dimensions[3]);
+  m_BoundingBoxes.reserve(m_TimeSteps);
   m_BoundingBoxes.assign(num, bnull);
   
+  mitk::Geometry2D::ConstPointer firstGeometry;
+
   //in case of evenly-spaced data: re-initialize instances of Geometry2D, since the spacing influences them
-  if(m_EvenlySpaced)
+  if(hasEvenlySpacedPlaneGeometry)
   {
-    m_Geometry2Ds.clear();
-    
-    Geometry2D::ConstPointer gnull=NULL;
-    m_Geometry2Ds.reserve(num);
-    m_Geometry2Ds.assign(num, gnull);
-    
-    //does the Geometry has 2D slices?
-    if(num>0)
-    {
-      //construct standard view
-      mitk::Point3D right, bottom;
-      right.set(m_Dimensions[0],0,0);  UnitsToMM(right, right);
-      bottom.set(0,m_Dimensions[1],0); UnitsToMM(bottom, bottom);
-      PlaneView view_std(mitk::Point3D(0,0,0), right, bottom);
-      
-      mitk::PlaneGeometry::Pointer planegeometry=mitk::PlaneGeometry::New();
-      m_Geometry2Ds[0]=planegeometry;
-      planegeometry->SetPlaneView(view_std);
-      planegeometry->SetSizeInUnits(m_Dimensions[0], m_Dimensions[1]);
-    }
+    //create planegeometry according to new spacing
+    UnitsToMM(origin, origin);
+    UnitsToMM(rightDV, rightDV);
+    UnitsToMM(bottomDV, bottomDV);
+
+    PlaneView view_std(origin, origin+rightDV, origin+bottomDV);
+
+    mitk::PlaneGeometry::Pointer planegeometry=mitk::PlaneGeometry::New();
+    planegeometry->SetPlaneView(view_std);
+    planegeometry->SetSizeInUnits(width, height);
+    firstGeometry = planegeometry;
   }
+  else
+  if((m_EvenlySpaced) && (m_Geometry2Ds.size()>0))
+    firstGeometry = m_Geometry2Ds[0].GetPointer();
+
+  //clear and reserve
+  m_Geometry2Ds.clear();
+
+  Geometry2D::ConstPointer gnull=NULL;
+  num=m_Slices*m_TimeSteps;
   
+  m_Geometry2Ds.reserve(num);
+  m_Geometry2Ds.assign(num, gnull);
+
+  if(num>0)
+    m_Geometry2Ds[0] = firstGeometry;
+ 
   Modified();
 }
 
@@ -348,7 +362,7 @@ void mitk::SlicedGeometry3D::SetSpacing(ipPicDescriptor* pic)
 mitk::Geometry3D::Pointer mitk::SlicedGeometry3D::Clone()
 {
   mitk::SlicedGeometry3D::Pointer newGeometry = SlicedGeometry3D::New();
-  newGeometry->Initialize(m_Dimension, m_Dimensions);
+  newGeometry->Initialize(m_Slices, m_TimeSteps);
   newGeometry->GetTransform()->SetMatrix(m_Transform->GetMatrix());
   //newGeometry->GetRelativeTransform()->SetMatrix(m_RelativeTransform->GetMatrix());
   return newGeometry.GetPointer();

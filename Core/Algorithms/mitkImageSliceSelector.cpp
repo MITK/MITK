@@ -9,6 +9,13 @@ void mitk::ImageSliceSelector::GenerateOutputInformation()
 	itkDebugMacro(<<"GenerateOutputInformation()");
 
 	output->Initialize(input->GetPixelType(), 2, input->GetDimensions());
+
+  // initialize geometry
+  SlicedGeometry3D::Pointer geometry = SlicedGeometry3D::New();
+  geometry->Initialize(1, 1);
+  geometry->SetGeometry2D(input->GetSlicedGeometry()->GetGeometry2D(m_SliceNr, m_TimeNr).GetPointer(), 0, 0);
+  geometry->SetEvenlySpaced(input->GetSlicedGeometry()->GetEvenlySpaced());
+  output->SetGeometry(geometry);
 }
 
 //##ModelId=3E1A0A320090

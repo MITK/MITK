@@ -9,10 +9,6 @@ class vtkTransform;
 
 namespace mitk {
 
-#if _MSC_VER < 1300
-#define GImageDimension 4
-#endif
-
 //##ModelId=3DCBF389032B
 //##Documentation
 //## @brief Describes the geometry of a data object consisting of slices
@@ -92,6 +88,10 @@ public:
   //##ModelId=3E3BE8CF010E
   virtual void SetSpacing(mitk::Vector3D aSpacing);
   virtual void SetSpacing(const float aSpacing[3]);
+
+
+ 	itkGetMacro(EvenlySpaced, bool);
+
   //##ModelId=3E3C13F802A6
   virtual void SetEvenlySpaced(bool on = true);
   //##ModelId=3E3C2C37031B
@@ -102,7 +102,7 @@ public:
   virtual Geometry3D::Pointer Clone();
 
   //##ModelId=3E3453C703AF
-  virtual void Initialize(unsigned int dimension, const unsigned int* dimensions);
+  virtual void Initialize(unsigned int slices, unsigned int timeSteps);
 
 protected:
   SlicedGeometry3D();
@@ -118,6 +118,8 @@ protected:
 
   //##ModelId=3E3C13B70180
   bool m_EvenlySpaced;
+
+  unsigned int m_Slices;
 };
 
 } // namespace mitk

@@ -10,10 +10,6 @@ class vtkTransform;
 
 namespace mitk {
 
-#if _MSC_VER < 1300
-#define GImageDimension 4
-#endif
-
 //##ModelId=3E8600D800C5
 //##Documentation
 //## @brief Standard 3D-BoundingBox typedef (float)
@@ -48,39 +44,6 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-#if !(_MSC_VER < 1300)
-  //##ModelId=3E1552A603AC
-  static const int GImageDimension=4;
-#endif
-
-  //##ModelId=3E14493003CF
-  typedef itk::ImageRegion<GImageDimension> RegionType;
-
-  /** Index typedef support. An index is used to access pixel values. */
-  //##ModelId=3E15551A0246
-  typedef itk::Index<GImageDimension>  IndexType;
-  //##ModelId=3E15551A0278
-  typedef IndexType::IndexValueType  IndexValueType;
-
-  /** Offset typedef support. An offset represent relative position
-  * between indices. */
-  //##ModelId=3E15551A02AA
-  typedef itk::Offset<GImageDimension>  OffsetType;
-  //##ModelId=3E15551A02DC
-  typedef OffsetType::OffsetValueType OffsetValueType;
-
-  /** Size typedef support. A size is used to define region bounds. */
-  //##ModelId=3E15551A030E
-  typedef itk::Size<GImageDimension>  SizeType;
-  //##ModelId=3E15551A0340
-  typedef SizeType::SizeValueType SizeValueType;
-
-  //##ModelId=3DCBF3AD0110
-  const unsigned int *GetDimensions() const;
-
-  //##ModelId=3DDE649E00A3
-  unsigned int GetDataDimension() const;
-
   //##ModelId=3DCBF5D40253
   virtual mitk::BoundingBox::ConstPointer GetBoundingBox(int t = 0) const;
 
@@ -92,12 +55,6 @@ public:
 
   //##ModelId=3DDE65DC0151
   void UnitsToMM(const mitk::Point3D &pt_units, mitk::Point3D &pt_mm, float t = 0) const;
-
-  //##ModelId=3E144966003D
-  const RegionType& GetLargestPossibleRegion() const 
-  {
-    return m_LargestPossibleRegion;
-  }
 
   //##ModelId=3E3B986602CF
   void MMToUnits(const mitk::Vector3D &vec_mm, mitk::Vector3D &vec_units, float t = 0) const;
@@ -116,7 +73,7 @@ public:
   vtkTransform* GetTransform();  
   
   //##ModelId=3E3453C703AF
-  virtual void Initialize(unsigned int dimension, const unsigned int* dimensions);
+  virtual void Initialize(unsigned int timeSteps);
 
   void SetBaseGeometry(mitk::Geometry3D* base);  
   
@@ -134,14 +91,6 @@ protected:
   //##ModelId=3E3456C50067
   virtual ~Geometry3D();
 
-  //##ModelId=3E14493100B0
-  RegionType m_LargestPossibleRegion;
-
-  //##ModelId=3E1896DB01DA
-  unsigned int m_Dimension;
-  //##ModelId=3E1896DB0249
-  unsigned int *m_Dimensions;
-
   //##ModelId=3ED91D050269
   mutable std::vector<mitk::BoundingBox::ConstPointer> m_BoundingBoxes;
 
@@ -152,6 +101,8 @@ protected:
   //##ModelId=3E3BE8BF02EC
   mitk::Matrix4D m_TransformOfOrigin;
 
+  unsigned int m_TimeSteps;
+
   //New:
   vtkTransform* m_Transform;
   //vtkTransform* m_RelativeTransform;
@@ -159,7 +110,6 @@ protected:
   //Geometry3D::ConstPointer m_BaseGeometry;  
   //unsigned long m_TransformTimeStamp;
   //unsigned long m_BaseTransformTimeStamp;
-
 };
 
 } // namespace mitk

@@ -118,6 +118,11 @@ public:
   //## implemented in the concrete subclasses of DataObject.
   virtual void SetRequestedRegion(SlicedData::RegionType *region);
 
+  const RegionType& GetLargestPossibleRegion() const 
+  {
+    return m_LargestPossibleRegion;
+  }
+
   //##ModelId=3E144ED20089
   //##Documentation
   //## Get the region object that defines the size and starting index
@@ -127,6 +132,7 @@ public:
   {
     return m_RequestedRegion;
   }
+
   //##ModelId=3E14713503B7
   virtual bool IsSliceSet(int s = 0, int t = 0, int n = 0) const = 0;
   //##ModelId=3E147163027C
@@ -138,7 +144,10 @@ public:
 
   //##Documentation
   //## @brief Get the number of channels
-  itkGetConstMacro(NumberOfChannels, unsigned int); 
+  unsigned int GetNumberOfChannels() const
+  {
+    return m_LargestPossibleRegion.GetSize(4);
+  }
 
   //##Documentation
   //## @brief Return the Geometry2D of the slice (@a s, @a t). 
@@ -185,15 +194,14 @@ protected:
   //##ModelId=3E19EA3300CE
   virtual ~SlicedData();
 
+  RegionType m_LargestPossibleRegion;
+
   //##ModelId=3E143BF10135
   RegionType          m_RequestedRegion;
   //##ModelId=3E143BF10149
   RegionType          m_BufferedRegion;
   //##ModelId=3E144ED20075
   bool                m_UseLargestPossibleRegion;
-
-  //##ModelId=3E19EA1200A9
-  unsigned int m_NumberOfChannels;
 
   //##Documentation
   //## Additional pointer to the contents of m_Geometry3D, 

@@ -119,12 +119,6 @@ void mitk::AbstractTransformGeometry::MMToUnits(const mitk::Vector2D &vec_mm, mi
   vec_units.y=vec_mm.y*(1.0/m_ScaleFactorMMPerUnitY);
 }
 
-//##ModelId=3EF4A266024C
-void mitk::AbstractTransformGeometry::TransformGeometry(const vtkTransform * transform)
-{
-  itkWarningMacro("Sorry, transform of an AbstractTransformGeometry not yet supported.");
-}
-
 //##ModelId=3EF4A2660288
 bool mitk::AbstractTransformGeometry::Map(const mitk::Point3D & atPt3d_mm, const mitk::Vector3D &vec3d_mm, mitk::Vector2D &vec2d_mm) const
 {

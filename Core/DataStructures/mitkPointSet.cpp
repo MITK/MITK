@@ -28,6 +28,7 @@ mitk::PointSet::PointSet()
 {
   //init new itk::PointSet
   m_PointList = PointSetType::New();
+  m_Geometry3D->Initialize(1);
 }
 
 //##ModelId=3F0177E901BE

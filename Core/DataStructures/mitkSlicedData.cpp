@@ -34,15 +34,13 @@ void mitk::SlicedData::SetRequestedRegionToLargestPossibleRegion()
   if(GetGeometry()==NULL) 
     return;
   int i;
-  const Geometry3D::RegionType::IndexType & index = GetGeometry()->GetLargestPossibleRegion().GetIndex();
-  const Geometry3D::RegionType::SizeType & size = GetGeometry()->GetLargestPossibleRegion().GetSize();
-  for(i=0;i<4;++i)
+  const RegionType::IndexType & index = GetLargestPossibleRegion().GetIndex();
+  const RegionType::SizeType & size = GetLargestPossibleRegion().GetSize();
+  for(i=0;i<VmitkImageDimension;++i)
   {
     m_RequestedRegion.SetIndex(i, index[i]);
     m_RequestedRegion.SetSize(i, size[i]);
   }
-  m_RequestedRegion.SetIndex(4, 0);
-  m_RequestedRegion.SetSize(4, m_NumberOfChannels);
 }
 
 //##ModelId=3E14104300AC
@@ -58,8 +56,8 @@ bool mitk::SlicedData::RequestedRegionIsOutsideOfTheBufferedRegion()
   const IndexType &requestedRegionIndex = m_RequestedRegion.GetIndex();
 
   const SizeType& requestedRegionSize = m_RequestedRegion.GetSize();
-  const Geometry3D::SizeType& largestPossibleRegionSize
-    = GetGeometry()->GetLargestPossibleRegion().GetSize();
+  const SizeType& largestPossibleRegionSize
+    = GetLargestPossibleRegion().GetSize();
 
   // are whole channels requested?
   int c, cEnd;
@@ -107,18 +105,14 @@ bool mitk::SlicedData::VerifyRequestedRegion()
   // Note that the test is indeed against the largest possible region
   // rather than the buffered region; see DataObject::VerifyRequestedRegion.
   const IndexType &requestedRegionIndex = m_RequestedRegion.GetIndex();
-  const Geometry3D::IndexType &largestPossibleRegionIndex
-    = GetGeometry()->GetLargestPossibleRegion().GetIndex();
+  const IndexType &largestPossibleRegionIndex
+    = GetLargestPossibleRegion().GetIndex();
 
   const SizeType& requestedRegionSize = m_RequestedRegion.GetSize();
-  const Geometry3D::SizeType& largestPossibleRegionSize
-    = GetGeometry()->GetLargestPossibleRegion().GetSize();
+  const SizeType& largestPossibleRegionSize
+    = GetLargestPossibleRegion().GetSize();
 
-#if _MSC_VER < 1300
-  for (i=0; i< GImageDimension; ++i)
-#else
-  for (i=0; i< Geometry3D::GImageDimension; ++i)
-#endif
+  for (i=0; i< VmitkImageDimension; ++i)
   {
     if ( (requestedRegionIndex[i] < largestPossibleRegionIndex[i]) ||
       ((requestedRegionIndex[i] + static_cast<long>(requestedRegionSize[i]))
@@ -126,14 +120,6 @@ bool mitk::SlicedData::VerifyRequestedRegion()
     {
       return false;
     }
-  }
-  if ((i==4) && 
-    ((requestedRegionIndex[i] < 0) ||
-    ((requestedRegionIndex[i] + static_cast<long>(requestedRegionSize[i]))
-    > m_NumberOfChannels))
-    )
-  {
-    return false;
   }
 
   return true;
@@ -178,8 +164,14 @@ void mitk::SlicedData::SetRequestedRegion(SlicedData::RegionType *region)
 
 
 //##ModelId=3E19EA3300BA
-mitk::SlicedData::SlicedData() : m_NumberOfChannels(0)
+mitk::SlicedData::SlicedData()
 {
+  unsigned int i;
+  for(i=0;i<4;++i)
+  {
+    m_LargestPossibleRegion.SetIndex(i, 0);
+    m_LargestPossibleRegion.SetSize (i, 1);
+  }
 }
 
 

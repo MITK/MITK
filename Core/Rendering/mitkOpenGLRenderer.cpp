@@ -248,16 +248,6 @@ void mitk::OpenGLRenderer::Render()
     return;
   }
 
-  //has someone transformed our worldgeometry-node? if so, incorporate this transform into
-  //the worldgeometry itself and reset the transform of the node to identity
-  /*	if(m_WorldGeometryTransformTime<m_WorldGeometryNode->GetVtkTransform()->GetMTime())
-  {
-  vtkTransform *i;
-  m_WorldGeometry->TransformGeometry(m_WorldGeometryNode->GetVtkTransform());
-  m_WorldGeometryNode->GetVtkTransform()->Identity();
-  m_WorldGeometryTransformTime=GetWorldGeometryNode()->GetVtkTransform()->GetMTime();
-  }
-  */
   //has the data tree been changed?
   if(dynamic_cast<mitk::DataTree*>(GetData()->getTree()) == NULL ) return;
   //	if(m_LastUpdateTime<((mitk::DataTree*)GetData()->getTree())->GetMTime())

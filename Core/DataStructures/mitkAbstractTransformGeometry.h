@@ -56,11 +56,6 @@ public:
   //## AbstractTransformGeometry
   virtual void SetPlaneView(const mitk::PlaneView& aPlaneView);
   
-  //##ModelId=3EF4A266024C
-  //##Documentation
-  //## @todo not yet implemented
-  virtual void TransformGeometry(const vtkTransform * transform);
-  
   //##ModelId=3EF4A2660256
   virtual bool Map(const mitk::Point3D &pt3d_mm, mitk::Point2D &pt2d_mm) const;
   

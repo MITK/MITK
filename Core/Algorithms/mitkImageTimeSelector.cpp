@@ -19,7 +19,24 @@ void mitk::ImageTimeSelector::GenerateOutputInformation()
 
 	itkDebugMacro(<<"GenerateOutputInformation()");
 
-	output->Initialize(input->GetPixelType(), (input->GetDimension()<3?input->GetDimension():3), input->GetDimensions());
+  int dim=(input->GetDimension()<3?input->GetDimension():3);
+	output->Initialize(input->GetPixelType(), dim, input->GetDimensions());
+
+  // initialize geometry
+  SlicedGeometry3D::Pointer geometry = SlicedGeometry3D::New();
+  geometry->Initialize(input->GetDimensions()[2], 1);
+  geometry->SetGeometry2D(input->GetSlicedGeometry()->GetGeometry2D(0, m_TimeNr).GetPointer(), 0, 0);
+  if(input->GetSlicedGeometry()->GetEvenlySpaced())
+    geometry->SetEvenlySpaced();
+  else
+  {
+    int s;
+    for(s=1;s<dim;++s)
+    {
+      geometry->SetGeometry2D(input->GetSlicedGeometry()->GetGeometry2D(s, m_TimeNr), s, 0);
+    }
+  }
+  output->SetGeometry(geometry);
 }
 
 //##ModelId=3E3BD0CE0194

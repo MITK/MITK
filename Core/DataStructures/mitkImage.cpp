@@ -468,23 +468,30 @@ void mitk::Image::Initialize(const mitk::PixelType& type, unsigned int dimension
     for(i=0,p=m_Dimensions+m_Dimension;i<4-m_Dimension;++i, ++p)
       *p=1;
   }
-  m_NumberOfChannels=channels;
+
+  unsigned int i;
+  for(i=0;i<4;++i)
+  {
+    m_LargestPossibleRegion.SetIndex(i, 0);
+    m_LargestPossibleRegion.SetSize (i, m_Dimensions[i]);
+  }
+  m_LargestPossibleRegion.SetIndex(i, 0);
+  m_LargestPossibleRegion.SetSize(i, channels);
 
   m_PixelType=type;
   SetGeometry(SlicedGeometry3D::New());
-  m_SlicedGeometry=(SlicedGeometry3D*) m_Geometry3D.GetPointer();
-  m_Geometry3D->Initialize(dimension, dimensions);
+  m_SlicedGeometry->Initialize(m_Dimensions[2], m_Dimensions[3]);
 
   ImageDataItemPointer dnull=NULL;
 
-  m_Channels.reserve(m_NumberOfChannels);
-  m_Channels.assign(m_NumberOfChannels, dnull);
+  m_Channels.reserve(GetNumberOfChannels());
+  m_Channels.assign(GetNumberOfChannels(), dnull);
 
-  m_Volumes.reserve(m_NumberOfChannels*m_Dimensions[3]);
-  m_Volumes.assign(m_NumberOfChannels*m_Dimensions[3], dnull);
+  m_Volumes.reserve(GetNumberOfChannels()*m_Dimensions[3]);
+  m_Volumes.assign(GetNumberOfChannels()*m_Dimensions[3], dnull);
 
-  m_Slices.reserve(m_NumberOfChannels*m_Dimensions[3]*m_Dimensions[2]);
-  m_Slices.assign(m_NumberOfChannels*m_Dimensions[3]*m_Dimensions[2], dnull);
+  m_Slices.reserve(GetNumberOfChannels()*m_Dimensions[3]*m_Dimensions[2]);
+  m_Slices.assign(GetNumberOfChannels()*m_Dimensions[3]*m_Dimensions[2], dnull);
 
   ComputeOffsetTable();
 
@@ -596,16 +603,24 @@ void mitk::Image::Initialize(ipPicDescriptor* pic, int channels, int tDim, int s
     for(i=0,p=m_Dimensions+m_Dimension;i<4-m_Dimension;++i, ++p)
       *p=1;
   }
-  m_NumberOfChannels=channels;
 
   if((m_Dimension>2) && (sDim>=0))
     m_Dimensions[2]=sDim;
   if((m_Dimension>3) && (tDim>=0))
     m_Dimensions[3]=tDim;
 
+  unsigned int i;
+  for(i=0;i<4;++i)
+  {
+    m_LargestPossibleRegion.SetIndex(i, 0);
+    m_LargestPossibleRegion.SetSize (i, m_Dimensions[i]);
+  }
+  m_LargestPossibleRegion.SetIndex(i, 0);
+  m_LargestPossibleRegion.SetSize(i, channels);
+
   m_PixelType=PixelType(pic);
   SetGeometry(SlicedGeometry3D::New());
-  m_SlicedGeometry->Initialize(m_Dimension, m_Dimensions);
+  m_SlicedGeometry->Initialize(m_Dimensions[2], m_Dimensions[3]);
 
   m_SlicedGeometry->SetSpacing(pic);
   m_SlicedGeometry->SetGeometry2D(pic, 0, 0);
@@ -613,14 +628,14 @@ void mitk::Image::Initialize(ipPicDescriptor* pic, int channels, int tDim, int s
 
   ImageDataItemPointer dnull=NULL;
 
-  m_Channels.reserve(m_NumberOfChannels);
-  m_Channels.assign(m_NumberOfChannels, dnull);
+  m_Channels.reserve(GetNumberOfChannels());
+  m_Channels.assign(GetNumberOfChannels(), dnull);
 
-  m_Volumes.reserve(m_NumberOfChannels*m_Dimensions[3]);
-  m_Volumes.assign(m_NumberOfChannels*m_Dimensions[3], dnull);
+  m_Volumes.reserve(GetNumberOfChannels()*m_Dimensions[3]);
+  m_Volumes.assign(GetNumberOfChannels()*m_Dimensions[3], dnull);
 
-  m_Slices.reserve(m_NumberOfChannels*m_Dimensions[3]*m_Dimensions[2]);
-  m_Slices.assign(m_NumberOfChannels*m_Dimensions[3]*m_Dimensions[2], dnull);
+  m_Slices.reserve(GetNumberOfChannels()*m_Dimensions[3]*m_Dimensions[2]);
+  m_Slices.assign(GetNumberOfChannels()*m_Dimensions[3]*m_Dimensions[2], dnull);
 
   ComputeOffsetTable();
 
@@ -635,7 +650,7 @@ void mitk::Image::Initialize(ipPicDescriptor* pic, int channels, int tDim, int s
 //##ModelId=3E155CF000F6
 bool mitk::Image::IsValidSlice(int s, int t, int n) const
 {
-  return ((s>=0) && (s<(int)m_Dimensions[2]) && (t>=0) && (t< (int) m_Dimensions[3]) && (n>=0) && (n< (int)m_NumberOfChannels));
+  return ((s>=0) && (s<(int)m_Dimensions[2]) && (t>=0) && (t< (int) m_Dimensions[3]) && (n>=0) && (n< (int)GetNumberOfChannels()));
 }
 
 //##ModelId=3E155D2501A7

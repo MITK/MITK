@@ -42,6 +42,7 @@ public:
 
   typedef MeshType::CellType CellType;
   typedef CellType::CellAutoPointer CellAutoPointer;
+  typedef MeshType::CellsContainer::Pointer CellContainerPointer;
   typedef MeshType::CellsContainer::Iterator CellIterator;
   typedef MeshTraits::CellTraits CellTraits;
   typedef CellTraits::PointIdIterator PointIdIterator;

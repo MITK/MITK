@@ -200,11 +200,7 @@ void mitk::Mesh::ExecuteOperation(Operation* operation)
 		break;
 	case OpREMOVECELL:
 		{
-      //int cellId = lineOp->GetCellId();
-      //DataType::CellAutoPointer cell;
-      //bool ok = m_ItkData->GetCell(lineOp->GetCellId(), cell);
-      //m_ItkData->SetCell(lineOp->GetCellId(),NULL)
-      
+      m_ItkData->GetCells()->DeleteIndex(lineOp->GetCellId());
 		}
 		break;
 	case OpSELECTLINE://(select the given line)

@@ -5,13 +5,13 @@
 #include "DataTree.h"
 #include "ImageMapper2D.h"
 
-#include "vtkActor.h";
-#include "vtkTexture.h";
+#include "vtkActor.h"
+#include "vtkTexture.h"
 #include "vtkPlaneSource.h"
 #include "vtkPolyDataMapper.h"
 //#include "vtkImageMapToWindowLevelColors";
 
-#include "Pic2vtk.h"
+#include "pic2vtk.h"
 
 //##ModelId=3E691E090376
 vtkProp* mitk::Geometry2DDataVtkMapper3D::GetProp()

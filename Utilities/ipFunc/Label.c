@@ -188,15 +188,12 @@ ipPicDescriptor *ipFuncLabel ( ipPicDescriptor *pic_old,
                                ipUInt4_t       *no_lab )
 {
   ipPicDescriptor *pic_new;      /* pointer to new image structure     */
-  ipUInt4_t       i, j, k, l;    /* loop index                         */
+  ipUInt4_t       i;             /* loop index                         */
   ipUInt4_t       *a;            /* pointer to list with all anchestors*/
   ipUInt4_t       *a_new;        /* look up table for new labels       */
   ipUInt4_t       *a_sort;       /* pointer to list of sorted anchest. */
-  ipUInt4_t       no_gv;         /* number of different greyvalues     */
-  ipUInt4_t       *hist;         /* pointer to greyvalue histogram     */
   ipUInt4_t       no_label;      /* number of labels                   */
   ipUInt4_t       new_label;     /*                                    */
-  ipUInt4_t       size_hist;     /* size of histogram                  */
   ipUInt4_t       size[_ipPicNDIM];
   ipFloat8_t      min, max;      /* extreme greyvalues in image        */
   
@@ -369,3 +366,4 @@ ipPicDescriptor *ipFuncLabel ( ipPicDescriptor *pic_old,
 
 }
 #endif
+

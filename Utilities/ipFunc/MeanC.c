@@ -47,9 +47,6 @@
 /**@file
  *  this function calculates the mean of all greyvalues which are included
  *  by a circle 
-
-/**  this function calculates the mean of all greyvalues which are included
- *  by a circle 
  *
  *  @param pic_old   pointer to riginal image
  *  @param center    coordiantest of the center of the circle
@@ -81,8 +78,6 @@ ipFloat8_t ipFuncMeanC  ( ipPicDescriptor *pic_old,
 
 #define MEAN( type, pic, beg, end, size, center, radius )                          \
 {                                                                                  \
-  ipUInt4_t      i;                /* loop index                                */ \
-  ipUInt4_t      offset;           /* offset of pixels in pic_new               */ \
   ipUInt4_t      ind[_ipPicNDIM];  /* loop index vector                         */ \
   ipUInt4_t      off[_ipPicNDIM];  /* used to calculate offset of image pixels  */ \
   ipUInt4_t      dist[_ipPicNDIM]; /* used to calculate offset of image pixels  */ \
@@ -146,7 +141,7 @@ ipFloat8_t ipFuncMeanC  ( ipPicDescriptor *pic_old,
                           ipUInt4_t       radius )
 {
   ipInt4_t       help;
-  ipInt4_t       i;                    /* loop index                              */
+  ipUInt4_t       i;                   /* loop index                              */
   ipFloat8_t     mean;
   ipUInt4_t      count;
   ipUInt4_t      end[_ipPicNDIM];      /* end of window                           */
@@ -175,7 +170,7 @@ ipFloat8_t ipFuncMeanC  ( ipPicDescriptor *pic_old,
       else begin[i] = help;
 
       help = center[i] + radius;
-      if ( help > pic_old->n[i] )
+      if ( (ipUInt4_t) help > pic_old->n[i] )
         {
            _ipFuncSetErrno ( ipFuncDATA_ERROR );
            return ( ipFuncERROR );

@@ -131,8 +131,6 @@ ipPicDescriptor *ipFuncMultI ( ipPicDescriptor *pic_1,
 {
 
   ipPicDescriptor *pic_new;         /* pointer to new image             */
-  ipUInt4_t       bpe;              /* length of elements of pic_new    */
-  ipUInt4_t       error;            /*                                  */ 
   ipUInt4_t       i;                /* loop index                       */
   ipFloat8_t      max_gv;           /* max. possible greyvalue          */
   ipFloat8_t      min_gv;           /* min. possible greyvalue          */
@@ -141,7 +139,6 @@ ipPicDescriptor *ipFuncMultI ( ipPicDescriptor *pic_1,
   ipFloat8_t      smin, smax;       /* product of extreme greyvalues    */
   ipFloat8_t      min_max12;        /* product of min1 and max2         */
   ipFloat8_t      min_max21;        /* product of min2 and max1         */
-  ipPicType_t     type;             /* type of new image                */
 
 
   /* check image data                                                   */
@@ -285,3 +282,4 @@ ipPicDescriptor *ipFuncMultI ( ipPicDescriptor *pic_1,
   return pic_new;
 }
 #endif
+

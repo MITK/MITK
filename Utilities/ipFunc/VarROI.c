@@ -136,11 +136,9 @@ ipFloat8_t ipFuncVarROI  ( ipPicDescriptor *pic_old,
    ipPicDescriptor *pic_help;       /* contains edge of ROI             */
    ipUInt4_t       min_x, max_x;    /* min, max x-coordinate of ROI     */
    ipUInt4_t       min_y, max_y;    /* min, max y-coordinate of ROI     */
-   ipUInt4_t       i, j;            /* loop variable                    */
-   ipUInt4_t       beg, end;        /*                                  */
+   ipUInt4_t       i;               /* loop variable                    */
    ipUInt4_t       count=0;         /* number of pixels in ROI          */
    ipFloat8_t      diff;            /* difference between two points    */
-   ipUInt4_t       y;
 
    /* check image data                                                  */
 
@@ -167,11 +165,13 @@ ipFloat8_t ipFuncVarROI  ( ipPicDescriptor *pic_old,
 
    /* check whether ROI is in image                                     */
 
+   /* Expression is always false. 
    if ( min_x < 0 ) 
      {
         _ipFuncSetErrno ( ipFuncDATA_ERROR );
         return ( ipFuncERROR );
      }
+   */
 
    if ( max_x > pic_old->n[0] ) 
      {
@@ -179,11 +179,13 @@ ipFloat8_t ipFuncVarROI  ( ipPicDescriptor *pic_old,
         return ( ipFuncERROR );
      }
 
+   /* Expression is always false.
    if ( min_y < 0 ) 
      {
         _ipFuncSetErrno ( ipFuncDATA_ERROR );
         return ( ipFuncERROR );
      }
+   */
 
    if ( max_y > pic_old->n[1] ) 
      {
@@ -264,3 +266,4 @@ ipFloat8_t ipFuncVarROI  ( ipPicDescriptor *pic_old,
 } 
 
 #endif
+

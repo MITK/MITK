@@ -84,8 +84,8 @@ ipPicDescriptor *ipFuncExp ( ipPicDescriptor *pic_old,
 
 #define EXP( type, pic, min_gv, max_gv )                                 \
 {                                                                        \
-  ipUInt4_t  i, no_elem;                                                 \
-  ipFloat8_t a, b;                                                       \
+  ipUInt4_t  no_elem;                                                    \
+  ipFloat8_t a;                                                          \
                                                                          \
   a =  log ( max_gv - min_gv + 1 ) / ( max_gv - min_gv );                \
                                                                          \
@@ -112,7 +112,7 @@ ipPicDescriptor *ipFuncExp ( ipPicDescriptor *pic_old,
 {
 
   ipPicDescriptor *pic_new;  /* inverted picture                        */
-  ipUInt4_t       i, j;      /* loopindex                               */
+  ipUInt4_t       i;         /* loopindex                               */
   ipFloat8_t      max_gv;    /* max. possible greyvalue                 */
   ipFloat8_t      min_gv;    /* min. possible greyvalue                 */
 

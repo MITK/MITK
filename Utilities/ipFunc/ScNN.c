@@ -157,10 +157,9 @@ ipPicDescriptor *_ipFuncScNN( ipPicDescriptor *pic_old,
                              ipPicDescriptor *pic_new ) 
 {
 
-  ipUInt4_t       i, j;               /* loopindex                      */
+  ipUInt4_t       i;               /* loopindex                      */
   ipInt4_t        n[_ipPicNDIM];      /* no. of pixels in each dimension*/
   ipFloat8_t      weights[_ipPicNDIM];
-  ipUInt4_t       ind[_ipPicNDIM];    /* vector of loop indices (image) */ 
   ipUInt4_t       size[_ipPicNDIM];                                    
   char            is_color=0;
 

@@ -109,8 +109,8 @@ ipInt4_t ipFuncExtr ( ipPicDescriptor *pic,
                       ipFloat8_t      *max )
 {
 
-  ipFloat8_t min_c;            
-  ipFloat8_t max_c;
+  ipFloat8_t min_c = 0.0;            
+  ipFloat8_t max_c = 0.0;
 
   /* check data                                               */
 
@@ -126,3 +126,4 @@ ipInt4_t ipFuncExtr ( ipPicDescriptor *pic,
   return( ipFuncOK );
 }
 #endif
+

@@ -140,3 +140,4 @@ ipPicDescriptor *ipFuncLevWin ( ipPicDescriptor *pic_old,
    return ( pic_new );
 }
 #endif
+

@@ -265,8 +265,7 @@ ipPicDescriptor *ipFuncDrawPoly ( ipPicDescriptor *pic_old,
    ipFloat8_t      *a, *b;          /* Gerade y = ax+b                  */
    ipFloat8_t      diff;            /* difference between two points    */
    ipPicDescriptor *pic_help;
-   ipUInt4_t       i, j;
-   ipUInt4_t       beg, end;
+   ipUInt4_t       i;
 
    /* check data                                                        */
 
@@ -296,21 +295,28 @@ ipPicDescriptor *ipFuncDrawPoly ( ipPicDescriptor *pic_old,
 
    /* check whether ROI is in image                                     */
 
+   /* Expression is always false.
    if ( min_x < 0 ) 
      {
        _ipFuncSetErrno ( ipFuncDATA_ERROR );
        return ( ipFuncERROR );
      }
+   */
+
    if ( max_x > pic_old->n[0] ) 
      {
        _ipFuncSetErrno ( ipFuncDATA_ERROR );
        return ( ipFuncERROR );
      }
+
+   /* Expression is always false.
    if ( min_y < 0 ) 
      {
        _ipFuncSetErrno ( ipFuncDATA_ERROR );
        return ( ipFuncERROR );
      }
+   */
+
    if ( max_y > pic_old->n[1] ) 
      {
        _ipFuncSetErrno ( ipFuncDATA_ERROR );

@@ -91,7 +91,7 @@ ipInt4_t  ipFuncHisto( ipPicDescriptor *pic_old,
     {                                                                    \
        index = ( ipUInt4_t )                                             \
                ( factor * ( (( type * ) pic->data)[i] - ( type )*min_gv ) );\
-       if ( ( index >= 0 ) && ( index <= *size_hist ) )                  \
+       if ( ( index <= *size_hist ) )                                    \
           ( hist_help[index] )++;                                        \
     }                                                                    \
 } 
@@ -183,3 +183,4 @@ ipInt4_t  ipFuncHisto( ipPicDescriptor *pic_old,
   return ( ipFuncOK );
 }
 #endif
+

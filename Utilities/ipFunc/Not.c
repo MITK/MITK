@@ -73,7 +73,6 @@ ipPicDescriptor *ipFuncNot ( ipPicDescriptor *pic_old,
 #define NOT( type, pic )                                                 \
 {                                                                        \
   ipUInt4_t  i, no_elem;                                                 \
-  type       help;                                                       \
                                                                          \
   no_elem = _ipPicElements ( pic );                                      \
   for ( i = 0; i < no_elem; i++ )                                        \
@@ -94,8 +93,6 @@ ipPicDescriptor *ipFuncNot ( ipPicDescriptor *pic_old,
 {
 
   ipPicDescriptor *pic_new;  /* inverted picture                        */
-  ipUInt4_t       i, j;      /* loopindex                               */
-  ipUInt1_t       laenge;    /* length of a pictureelement              */
 
 
   /* check data                                                         */
@@ -120,3 +117,4 @@ ipPicDescriptor *ipFuncNot ( ipPicDescriptor *pic_old,
   return pic_new;
 }
 #endif
+

@@ -121,8 +121,6 @@ ipPicDescriptor *ipFuncFillArea ( ipPicDescriptor *pic_old,
 {
 
   ipPicDescriptor *pic_new;  /* inverted picture                        */
-  ipUInt4_t       i, j;      /* loopindex                               */
-  ipUInt1_t       laenge;    /* length of a pictureelement              */
   ipFloat8_t      a, b;      /* parameter der Gerade y = ax + b         */
   ipUInt4_t       beg[2];    /* Anfangswerte                            */
   ipUInt4_t       end[2];    /* Endwerte                                */
@@ -206,3 +204,4 @@ ipPicDescriptor *ipFuncFillArea ( ipPicDescriptor *pic_old,
 
   return pic_new;
 }
+

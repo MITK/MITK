@@ -101,7 +101,6 @@ ipPicDescriptor *ipFuncGausF   ( ipPicDescriptor *pic_old,
   ipUInt4_t       sum;               /* sum of all mask elements         */
   ipUInt4_t       nn, nfac, kfac;    /* used to calculate bin. coeff     */
   ipUInt4_t       *bin;              /* binomial coeffizients            */
-  ipFloat8_t      help;
 
   /* check data                                                          */
 
@@ -217,3 +216,4 @@ ipPicDescriptor *ipFuncGausF   ( ipPicDescriptor *pic_old,
 }
 
 #endif
+

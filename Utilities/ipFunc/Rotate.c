@@ -72,6 +72,9 @@
  *    7.6.1990  by J.D.  (small improvements) 
  *   18.3.1994  by U.G.  (new pic format)
  *   $Log$
+ *   Revision 1.3  2003/08/21 08:20:06  tobiask
+ *   Removed warnings.
+ *
  *   Revision 1.2  2000/05/24 15:29:43  tobiask
  *   Changed the installation paths of the package.
  *
@@ -124,12 +127,11 @@ ipPicDescriptor *ipFuncRotate( ipPicDescriptor *pic,
 {
   ipPicDescriptor *pic_return;
   ipUInt4_t *p_index[_ipPicNDIM];
-  ipUInt4_t r_index[_ipPicNDIM];
   ipUInt4_t index[_ipPicNDIM];
   ipUInt4_t coeff_sum[_ipPicNDIM];
   ipUInt1_t coefficient[_ipPicNDIM]; 
   ipUInt4_t r_size[_ipPicNDIM];
-  ipUInt4_t r_offset,i,j,gr;
+  ipUInt4_t r_offset,i;
   int  order_alloc = 0;
 
   /*
@@ -187,7 +189,7 @@ ipPicDescriptor *ipFuncRotate( ipPicDescriptor *pic,
       for( i=0; i<_ipPicNDIM; i++ ) tt[i] = 0;
       for( i=0; i< pic->dim; i++ ) 
         { 
-          if( order[i] > 0 && order[i]<= pic->dim )
+          if( order[i] > 0 && order[i]<= (ipInt4_t) pic->dim )
             tt[ order[i]-1 ]++;
           else
             i = _ipPicNDIM + 1;
@@ -216,7 +218,7 @@ ipPicDescriptor *ipFuncRotate( ipPicDescriptor *pic,
       ipUInt4_t *tmp;
 
       d1 = order [i]-1; 
-      d2 = (d1+1 >= pic->dim ) ? ( 0 ) : ( d1+1 ); 
+      d2 = (d1+1 >= (ipInt4_t) pic->dim ) ? ( 0 ) : ( d1+1 ); 
 
       switch( grad[d1]  )
         {

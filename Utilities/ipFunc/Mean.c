@@ -109,3 +109,4 @@ ipFloat8_t ipFuncMean ( ipPicDescriptor *pic )
   return( mean );
 }
 #endif
+

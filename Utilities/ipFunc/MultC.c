@@ -140,7 +140,6 @@ ipPicDescriptor *ipFuncMultC ( ipPicDescriptor *pic_old,
 {
 
   ipPicDescriptor *pic_new;         /* pointer to new image             */
-  ipUInt4_t       i;                /* loop index                       */
   ipFloat8_t      max_gv;           /* max. possible greyvalue          */
   ipFloat8_t      min_gv;           /* min. possible greyvalue          */
   ipFloat8_t      min1, max1;       /* extreme greyvalues of 1. image   */ 
@@ -268,3 +267,4 @@ ipPicDescriptor *ipFuncMultC ( ipPicDescriptor *pic_old,
   return pic_new;
 }
 #endif
+

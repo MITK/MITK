@@ -164,7 +164,6 @@ ipPicDescriptor *ipFuncEqual ( ipPicDescriptor *pic_old,
   ipFloat8_t      min_gv;    /* min. possible greyvalue                 */
   ipUInt4_t       *hist;     /* greylevel histogram                     */
   ipUInt4_t       size_hist; /* no. of elements in histogram            */
-  ipUInt4_t       i;         /* loop index                              */
   ipFloat4_t      factor;  
   ipFloat8_t      help;
 
@@ -226,3 +225,4 @@ ipPicDescriptor *ipFuncEqual ( ipPicDescriptor *pic_old,
   return ( pic_new );
 }
 #endif
+

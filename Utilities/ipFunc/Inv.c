@@ -115,9 +115,6 @@ ipPicDescriptor *ipFuncInv ( ipPicDescriptor *pic_old,
 {
 
   ipPicDescriptor *pic_new;  /* inverted picture                        */
-  ipUInt4_t       i, j;      /* loopindex                               */
-  ipUInt1_t       laenge;    /* length of a pictureelement              */
-
 
   /* check data                                                         */
 
@@ -139,3 +136,4 @@ ipPicDescriptor *ipFuncInv ( ipPicDescriptor *pic_old,
   return pic_new;
 }
 #endif
+

@@ -60,6 +60,11 @@ void mitk::ContourMapper2D::Paint(mitk::BaseRenderer * renderer)
 
     mitk::Point3D p, projected_p;
     float vtkp[3];
+    float lineWidth = 3.0;
+
+    if (dynamic_cast<mitk::FloatProperty *>(this->GetDataTreeNode()->GetProperty("Width").GetPointer()) != NULL)
+      lineWidth = dynamic_cast<mitk::FloatProperty*>(this->GetDataTreeNode()->GetProperty("Width").GetPointer())->GetValue();
+    glLineWidth(lineWidth);
 
     if (input->GetClosed())
       {
@@ -69,9 +74,6 @@ void mitk::ContourMapper2D::Paint(mitk::BaseRenderer * renderer)
       {
       glBegin (GL_LINE_STRIP);
       }
-
-    glLineWidth(2.0);
-
 
     //Contour::InputType end = input->GetContourPath()->EndOfInput();
     //if (end > 50000) end = 0;
@@ -105,9 +107,9 @@ void mitk::ContourMapper2D::Paint(mitk::BaseRenderer * renderer)
       pointsIt++;
       //      idx += 1;
       }
+    glEnd ();
 
     glLineWidth(1.0);
-    glEnd ();
 
     }
   }

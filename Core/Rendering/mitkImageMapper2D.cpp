@@ -90,7 +90,7 @@ void mitk::ImageMapper2D::Paint(mitk::BaseRenderer * renderer)
   //test - small differences noticed for unisotropic datasets.
   if((Vector2D(oldtopLeft-topLeft).GetSquaredNorm()>0.1) || (Vector2D(oldbottomRight-bottomRight).GetSquaredNorm()>0.1))
   {
-    itkWarningMacro("oldtopLeft!=topLeft in ImageMapper2D");
+    //itkWarningMacro("oldtopLeft!=topLeft in ImageMapper2D");
   }
 
   glMatrixMode (GL_PROJECTION);
@@ -284,6 +284,7 @@ void mitk::ImageMapper2D::GenerateData(mitk::BaseRenderer *renderer)
 
     //	std::cout << vtkoutput <<std::endl;
     ipPicDescriptor* pic = Pic2vtk::convert(vtkoutput);
+//    ipPicPut("G:/home/boettger/tmp/mapperoutput.pic",pic);
     assert(pic);
     if(pic->dim==1)
     {
@@ -299,7 +300,8 @@ void mitk::ImageMapper2D::GenerateData(mitk::BaseRenderer *renderer)
     //std::cout << "Pic dimensions:" << pic->dim << std::endl;
 
 //   image->setImage(pic, iil4mitkImage::INTENSITY_ALPHA);
-    image->setImage(pic, m_iil4mitkMode);
+	  image->setImage(pic, m_iil4mitkMode);
+    image->setInterpolation( false );
     image->setRegion(0,0,pic->n[0],pic->n[1]);
 
     renderinfo.m_LastUpdateTime.Modified();

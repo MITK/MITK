@@ -44,6 +44,7 @@ bool mitk::CoordinateSupplier::ExecuteAction(Action* action, mitk::StateEvent co
         return false;
 	
     const PositionEvent* posEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
+    
     if(posEvent!=NULL)
     {
       switch (action->GetActionId())
@@ -122,7 +123,13 @@ bool mitk::CoordinateSupplier::ExecuteAction(Action* action, mitk::StateEvent co
         }
        return ok;
     }
-    
+    else if(action->GetActionId() == AcREMOVEPOINT)
+    {
+      mitk::Point3D p;
+      m_Destination->ExecuteOperation( new mitk::PointOperation(OpREMOVE, p ) );
+      ok = true;
+    }
+ 
     const mitk::DisplayPositionEvent* displPosEvent = dynamic_cast<const mitk::DisplayPositionEvent *>(stateEvent->GetEvent());
     if(displPosEvent!=NULL)
     {

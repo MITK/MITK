@@ -59,7 +59,7 @@
     <include location="local" impldecl="in declaration">mitkVector.h</include>
     <include location="local" impldecl="in declaration">mitkPointSetInteractor.h</include>
     <include location="local" impldecl="in declaration">itkCommand.h</include>
-    <include location="local" impldecl="in declaration">mitkBoolProperty.h</include>
+    <include location="local" impldecl="in declaration">mitkGenericProperty.h</include>
     <include location="local" impldecl="in declaration">mitkStringProperty.h</include>
     <include location="global" impldecl="in declaration">sstream</include>
     <include location="global" impldecl="in declaration">string</include>

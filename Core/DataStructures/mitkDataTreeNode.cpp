@@ -48,6 +48,8 @@ void mitk::DataTreeNode::SetData(mitk::BaseData* baseData)
     if(m_Data!=baseData)
     {
         m_Data=baseData;
+        //@bug with the following line, the actor-mode of the vtkInteractor does not work any more
+        m_Geometry3D->SetBaseGeometry(m_Data->GetGeometry());
         Modified();
     }
 }

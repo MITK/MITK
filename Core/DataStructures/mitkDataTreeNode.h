@@ -66,6 +66,8 @@ public:
     //##Documentation
     //## @brief Set the data object (instance of BaseData, e.g., an Image)
     //## managed by this DataTreeNode
+    //## @bug the actor-mode of the vtkInteractor does not work any more, if the transform of the 
+    //## data-tree-node is connected to the transform of the basedata via vtkTransform->SetInput.
     virtual void SetData(mitk::BaseData* baseData);
 	//##Documentation
 	//## @brief Set the Interactor

@@ -2,13 +2,15 @@
 #define BASERENDERER_H_HEADER_INCLUDED_C1CCA0F4
 
 #include "DataTree.h"
-#include "mitkRenderWindow.h"
 #include "Geometry2D.h"
 #include "DisplayGeometry.h"
 #include "mitkGeometry2DData.h"
 #include "CameraController.h"
+#include "mitkEventTypedefs.h"
 
 namespace mitk {
+
+class RenderWindow;
 
 //##ModelId=3C6E9AA90306
 //##Documentation

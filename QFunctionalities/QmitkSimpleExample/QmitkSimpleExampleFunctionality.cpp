@@ -74,6 +74,7 @@ QWidget * QmitkSimpleExampleFunctionality::createControlWidget(QWidget *parent)
         sliceNavigatorTransversal = new mitk::SliceNavigationController("navigation");
         sliceNavigatorTransversal->SetViewDirection(mitk::SliceNavigationController::Transversal);
         sliceNavigatorTransversal->ConnectGeometrySliceEvent(multiWidget->mitkWidget1->GetRenderer().GetPointer());
+        sliceNavigatorTransversal->ConnectGeometrySendEvent(multiWidget->mitkWidget4->GetRenderer().GetPointer());
         sliceNavigatorTransversal->ConnectRepaintRequest(multiplexUpdateController.GetPointer());
         new QmitkStepperAdapter(controls->getSliceNavigatorTransversal(), sliceNavigatorTransversal->GetSlice(), "sliceNavigatorTransversalFromSimpleExample");
 

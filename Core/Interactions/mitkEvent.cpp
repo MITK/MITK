@@ -16,6 +16,7 @@ mitk::Event::~Event()
 {
 }
 
+//##ModelId=3EF1D2A00139
 mitk::BaseRenderer* mitk::Event::GetSender() const
 {
     return m_Sender;

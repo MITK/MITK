@@ -33,6 +33,7 @@ class Event
     //##ModelId=3EF099E8023A
     virtual ~Event();
 
+    //##ModelId=3EF1D2A00139
     mitk::BaseRenderer* GetSender() const;
 
     //##ModelId=3E5B304700A7
@@ -51,6 +52,7 @@ class Event
     int GetButtonState() const;
 
   protected:
+    //##ModelId=3EF1D2A000D6
     mitk::BaseRenderer* m_Sender;
 
     //##ModelId=3E5B2F860321

@@ -31,7 +31,7 @@ public:
     //## by the object
     //## @warning no time support yet. @t is ignored.
     //## @todo time support needs to be added
-    const mitk::Geometry2D * GetGeometry2D(int t = 0)
+    const mitk::Geometry2D * GetGeometry2D(int t = 0) const
     {
         return m_Geometry2D.GetPointer(); 
     };

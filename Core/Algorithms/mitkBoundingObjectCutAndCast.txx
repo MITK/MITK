@@ -54,7 +54,7 @@ void BoundingObjectCutAndCast<TPixel>::GenerateData()
   if(m_BoundingObject.IsNull())
     return;
 
-  Access3DByItk(input, CutImageFixedOutputType);
+  AccessByItk(input, CutImageFixedOutputType);
 
   m_TimeOfHeaderInitialization.Modified();
 }

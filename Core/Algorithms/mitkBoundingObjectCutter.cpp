@@ -165,7 +165,7 @@ void BoundingObjectCutter::GenerateData()
   if(m_BoundingObject.IsNull())
     return;
 
-  Access3DByItk(input, CutImage);
+  AccessByItk(input, CutImage);
 
   m_TimeOfHeaderInitialization.Modified();
 }

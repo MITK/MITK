@@ -77,7 +77,7 @@ ipPicDescriptor *_ipFuncScBL( ipPicDescriptor *pic_old,
 
 /* definition of macros                                                 */
 
-#define SCBL4ALL( type, pic_old, pic_new, size, scale, n, shift, step )  \
+#define SCBL4ALL( type, pic_old, pic_new, size, scale, n, shift, step, RND )  \
 {                                                                        \
    ipFloat8_t       factor[_ipPicNDIM];   /*                           */\
    ipFloat8_t       help1[_ipPicNDIM];    /*                           */\
@@ -248,8 +248,8 @@ ipPicDescriptor *_ipFuncScBL( ipPicDescriptor *pic_old,
                                        factor[0] = weights[ind_i[0]*_ipPicNDIM] * \
                                                    factor[1];            \
                                        help = help + factor[0] *         \
-                                              (( type * ) pic_old->data )\
-                                              [offset[0]];               \
+                                              ((( type * ) pic_old->data )\
+                                              [offset[0]]+RND);               \
                                      }                                   \
                                    }                                     \
                                  }                                       \
@@ -275,11 +275,18 @@ ipPicDescriptor *_ipFuncScBL( ipPicDescriptor *pic_old,
    }                                                                     \
 }
 #define SCBL( type, pic_old, pic_new, size, scale, n )                 \
-		SCBL4ALL( type, pic_old, pic_new, size, scale, n, 0, 1 )
+		SCBL4ALL( type, pic_old, pic_new, size, scale, n, 0, 1, 0 )
 #define SCBLCOLOR( type, pic_old, pic_new, size, scale, n )            \
-		SCBL4ALL( type, pic_old, pic_new, size, scale, n, 0, 3 )       \
-		SCBL4ALL( type, pic_old, pic_new, size, scale, n, 1, 3 )       \
-		SCBL4ALL( type, pic_old, pic_new, size, scale, n, 2, 3 )
+		SCBL4ALL( type, pic_old, pic_new, size, scale, n, 0, 3, 0 )       \
+		SCBL4ALL( type, pic_old, pic_new, size, scale, n, 1, 3, 0 )       \
+		SCBL4ALL( type, pic_old, pic_new, size, scale, n, 2, 3, 0 )
+
+#define SCBL_INT( type, pic_old, pic_new, size, scale, n )                 \
+		SCBL4ALL( type, pic_old, pic_new, size, scale, n, 0, 1, 0.5 )
+#define SCBLCOLOR_INT( type, pic_old, pic_new, size, scale, n )            \
+		SCBL4ALL( type, pic_old, pic_new, size, scale, n, 0, 3, 0.5  )       \
+		SCBL4ALL( type, pic_old, pic_new, size, scale, n, 1, 3, 0.5  )       \
+		SCBL4ALL( type, pic_old, pic_new, size, scale, n, 2, 3, 0.5  )
 
 
 /* -------------------------------------------------------------------  */
@@ -363,13 +370,27 @@ ipPicDescriptor *_ipFuncScBL( ipPicDescriptor *pic_old,
  
   /* macro to scale an image ( for all data types )s)                   */
 
-  if(is_color==0)
+  if(pic_old->type==ipPicFloat)
   {
-	  ipPicFORALL_4 ( SCBL, pic_old, pic_new, size, scale, n ); 
+	if(is_color==0)
+	{
+		ipPicFORALL_4 ( SCBL, pic_old, pic_new, size, scale, n ); 
+	}
+	else
+	{
+ 		ipPicFORALL_4 ( SCBLCOLOR, pic_old, pic_new, size, scale, n ); 
+	}
   }
   else
   {
- 	  ipPicFORALL_4 ( SCBLCOLOR, pic_old, pic_new, size, scale, n ); 
+	if(is_color==0)
+	{
+		ipPicFORALL_4 ( SCBL_INT, pic_old, pic_new, size, scale, n ); 
+	}
+	else
+	{
+ 		ipPicFORALL_4 ( SCBLCOLOR_INT, pic_old, pic_new, size, scale, n ); 
+	}
   }
 
   return pic_new;

@@ -21,23 +21,23 @@ class PositionEvent : public Event
 {
   public:
     //##ModelId=3E5B7CF900F0
-    PositionEvent(int type, int button, int buttonState, int key, const Vector3D& displPosition);
+    PositionEvent(int type, int button, int buttonState, int key, const Point3D& displPosition);
 
 	//##ModelId=3E5B79DE0133
-    Vector3D GetDisplayPosition() const;
+    Point3D GetDisplayPosition() const;
 	
     //##ModelId=3EDC8EEC00F8
-	Vector3D GetWorldPosition() const;
+	Point3D GetWorldPosition() const;
 
     //##ModelId=3EDC8EEC0136
-	void SetWorldPosition(Vector3D& worldPosition);
+	void SetWorldPosition(Point3D& worldPosition);
     
   private:
     //##ModelId=3E5B79D00395
-    Vector3D m_DisplayPosition;
+    Point3D m_DisplayPosition;
 	
     //##ModelId=3EDC8EEC008A
-	Vector3D m_WorldPosition;
+	Point3D m_WorldPosition;
 };
 
 } // namespace mitk

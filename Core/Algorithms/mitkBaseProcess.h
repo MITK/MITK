@@ -26,9 +26,13 @@ public:
     mitkClassMacro(BaseProcess, itk::ProcessObject);
 
     //##ModelId=3E8600DC03E2
+    //##Documentation
+    //## @brief Helps to deal with the weak-pointer-problem.
     virtual void UnRegister() const;
 
     //##ModelId=3E8600DD000E
+    //##Documentation
+    //## @brief Helps to deal with the weak-pointer-problem.
     virtual int GetExternalReferenceCount() const;
 protected:
     //##ModelId=3E8600DD0036
@@ -36,20 +40,35 @@ protected:
     //##ModelId=3E8600DD004A
     virtual ~BaseProcess();
 
-    /** Protected methods for setting outputs.
-    * Subclasses make use of them for getting output. 
-    * These are only overwritten because of itk::DataObject::connectSource being 
-    * private and non-virtual:
-    * the important stuff is done in mitk::BaseData::connectSource.*/
     //##ModelId=3E8600DD0072
+    //##Documentation
+    //## @brief Protected methods for setting outputs.
+    //## 
+    //## Subclasses make use of them for getting output. 
+    //## These are only overwritten because of itk::DataObject::connectSource being 
+    //## private and non-virtual: the important stuff is done in 
+    //## mitk::BaseData::connectSource.
     virtual void SetNthOutput(unsigned int num, itk::DataObject *output);
     //##ModelId=3E8600DD00F4
+    //##Documentation
+    //## @brief Protected methods for setting outputs.
+    //## 
+    //## Subclasses make use of them for getting output. 
+    //## These are only overwritten because of itk::DataObject::connectSource being 
+    //## private and non-virtual: the important stuff is done in 
+    //## mitk::BaseData::connectSource.
     virtual void AddOutput(itk::DataObject *output);
 private:
     //##ModelId=3E8600DC0356
+    //##Documentation
+    //## @brief Helps to deal with the weak-pointer-problem.
     mutable bool m_Unregistering;
+    //##Documentation
+    //## @brief Helps to deal with the weak-pointer-problem.
     //##ModelId=3E8600DC037E
     mutable bool m_CalculatingExternalReferenceCount;
+    //##Documentation
+    //## @brief Helps to deal with the weak-pointer-problem.
     //##ModelId=3E8600DC03B0
     mutable int m_ExternalReferenceCount;
 };

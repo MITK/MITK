@@ -38,6 +38,9 @@ class OpenGLRenderer : public BaseRenderer
     virtual void Update();
 
     //##ModelId=3E330D2903CC
+    //##Documentation
+    //## @brief Do the rendering. 
+    //## If necessary, Update() and UpdateVtkActors() is called first.
     virtual void Render();
 
     //##ModelId=3E3314B0005C

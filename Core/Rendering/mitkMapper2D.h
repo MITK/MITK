@@ -17,8 +17,7 @@ namespace mitk {
 //## Base class of all Mappers for 2D display, i.e., a frontal view on a plane
 //## display area, so nothing rotated in 3D space as, e.g., a plane in 3D space
 //## (such things are done by subclasses of Mapper3D).
-//## 
-//## [not yet used:] SetGeometry3D() tells the Mapper2D which slices will
+//## @note [not yet used:] SetGeometry3D() tells the Mapper2D which slices will
 //## potentially be requested.
 class Mapper2D : public Mapper
 {
@@ -26,10 +25,10 @@ public:
 	mitkClassMacro(Mapper2D,Mapper);
 
     //##ModelId=3E3C45A0009E
-     virtual void SetGeometry3D(const mitk::Geometry3D* aGeometry3D);
-
-    //##ModelId=3E3C468102DC
-  //    virtual void SetDisplayGeometry(const mitk::DisplayGeometry* aDisplayGeometry);
+    //##Documentation
+    //## @brief Set Geometry3D containing the all possible Geometry2D that may be requested for mapping
+    //## @sa m_Geometry3D
+    virtual void SetGeometry3D(const mitk::Geometry3D* aGeometry3D);
 
 	/** Method for creation through the object factory. */
 //	itkNewMacro(Self);
@@ -41,16 +40,13 @@ protected:
     virtual ~Mapper2D();
 
     //##ModelId=3EDD039F03E6
+    //##Documentation
+    //## @brief Set Geometry3D containing the all possible Geometry2D that may be requested for mapping
+    //## @note not yet implemented
+    //## The idea was that this allows storing/pre-fetching of data required for mapping.
+    //## Should be called by SliceNavigationController.
+    //## @todo check design and implement when implementing (sub-)classes of SliceNavigationController
     Geometry3D::ConstPointer m_Geometry3D;
-    //##ModelId=3E33ECF20328
-    int m_SliceNr;
-
-    //##ModelId=3E3AE0CA0129
-    int m_TimeNr;
-
-    //##ModelId=3E3AE0CC00E6
-    int m_ChannelNr;
-
 };
 
 } // namespace mitk

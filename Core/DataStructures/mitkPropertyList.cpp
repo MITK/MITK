@@ -16,6 +16,14 @@ mitk::BaseProperty::Pointer mitk::PropertyList::GetProperty(const char *property
 //##ModelId=3D78B966005F
 bool mitk::PropertyList::SetProperty(const char* propertyKey, BaseProperty* property)
 {
+    std::map<std::string,BaseProperty::Pointer>::const_iterator it;
+    
+    it=m_Properties.find( propertyKey );
+    //is the property with the identical value already contained in the list?
+    if((it!=m_Properties.end()) && (*it->second==*property))
+        //yes? return!
+        return false;
+    //no? add/replace it.
 	m_Properties.insert ( std::pair<std::string,BaseProperty::Pointer>( propertyKey, property ) );	
     return true;
 }

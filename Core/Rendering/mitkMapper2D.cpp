@@ -1,7 +1,7 @@
 #include "Mapper2D.h"
 
 //##ModelId=3E3C46810341
-mitk::Mapper2D::Mapper2D() : m_SliceNr(0), m_TimeNr(0), m_ChannelNr(0)
+mitk::Mapper2D::Mapper2D()
 {
 }
 
@@ -17,12 +17,3 @@ void mitk::Mapper2D::SetGeometry3D(const mitk::Geometry3D* aGeometry3D)
     m_Geometry3D = aGeometry3D;
     Modified();
 }
-
-//void mitk::Mapper2D::SetDisplayGeometry(const mitk::DisplayGeometry* aDisplayGeometry)
-//{
-//    m_DisplayGeometry = aDisplayGeometry;
-//    Modified();
-//}
-
-
-

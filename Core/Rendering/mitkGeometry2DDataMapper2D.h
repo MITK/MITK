@@ -26,15 +26,16 @@ public:
 
     itkNewMacro(Self);
 
-    /** Set/Get the image input of this process object.  */
     //##ModelId=3E6423D20341
+    //##Documentation
+    //## @brief Get the Geometry2DData to map
     const mitk::Geometry2DData * GetInput(void);
 
     //##ModelId=3E67D77A0109
     virtual void Paint(mitk::BaseRenderer * renderer);
+
     //##ModelId=3E67E1B90237
     virtual void Update();
-
 
 protected:
     //##ModelId=3E639E100243
@@ -42,11 +43,9 @@ protected:
 
     //##ModelId=3E639E100257
     virtual ~Geometry2DDataMapper2D();
+
     //##ModelId=3E67E285024E
     virtual void GenerateOutputInformation();
-
-
-
 };
 
 } // namespace mitk

@@ -212,7 +212,7 @@ void mitk::OpenGLRenderer::Render()
 	
 	mitk::DataTreeIterator* it=m_DataTreeIterator->clone();
 	mitk::DataTree::Pointer tree = dynamic_cast <mitk::DataTree *> (it->getTree());
-	std::cout << "Render:: tree: " <<  *tree << std::endl;
+//	std::cout << "Render:: tree: " <<  *tree << std::endl;
 	
 	while(it->hasNext())
 	{        

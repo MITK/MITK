@@ -1,6 +1,7 @@
 #include "BaseRenderer.h"
 #include "PlaneGeometry.h"
 #include "EventMapper.h"
+#include "PositionEvent.h"
 #include "mitkSmartPointerProperty.h"
 #include <vtkTransform.h>
 
@@ -120,8 +121,15 @@ void mitk::BaseRenderer::MousePressEvent(mitk::MouseEvent *me)
 {
   if (m_CameraController)
     m_CameraController->MousePressEvent(me);
-  mitk::Event event(me->type(), me->button(), me->state(), Qt::Key_unknown);
-  mitk::EventMapper::MapEvent(&event);
+  if(m_MapperID==1)
+  {
+	  Point2D p(me->x(), me->y());
+	  Point3D position;
+	  GetDisplayGeometry()->DisplayToMM(p, p);
+	  GetDisplayGeometry()->Map(p, position);
+	  mitk::PositionEvent event(me->type(), me->button(), me->state(), Qt::Key_unknown, position);
+	  mitk::EventMapper::MapEvent(&event);
+  }
 }
 
 //##ModelId=3E6D5DD30372
@@ -129,8 +137,16 @@ void mitk::BaseRenderer::MouseReleaseEvent(mitk::MouseEvent *me)
 {
   if (m_CameraController)
     m_CameraController->MouseReleaseEvent(me);
-  mitk::Event event(me->type(), me->button(), me->state(), Qt::Key_unknown);
-  mitk::EventMapper::MapEvent(&event);
+
+  if(m_MapperID==1)
+  {
+	  Point2D p(me->x(), me->y());
+	  Point3D position;
+	  GetDisplayGeometry()->DisplayToMM(p, p);
+	  GetDisplayGeometry()->Map(p, position);
+	  mitk::PositionEvent event(me->type(), me->button(), me->state(), Qt::Key_unknown, position);
+	  mitk::EventMapper::MapEvent(&event);
+  }
 }
 
 //##ModelId=3E6D5DD303C2
@@ -138,8 +154,15 @@ void mitk::BaseRenderer::MouseMoveEvent(mitk::MouseEvent *me)
 {
   if (m_CameraController)
     m_CameraController->MouseMoveEvent(me);
-  mitk::Event event(me->type(), me->button(), me->state(), Qt::Key_unknown);
-  mitk::EventMapper::MapEvent(&event);
+  if(m_MapperID==1)
+  {
+	  Point2D p(me->x(), me->y());
+	  Point3D position;
+	  GetDisplayGeometry()->DisplayToMM(p, p);
+	  GetDisplayGeometry()->Map(p, position);
+	  mitk::PositionEvent event(me->type(), me->button(), me->state(), Qt::Key_unknown, position);
+	  mitk::EventMapper::MapEvent(&event);
+  }
 }
 
 //##ModelId=3E6D5DD4002A

@@ -3,24 +3,26 @@
 
 #include <vtkInteractorStyleTrackballCamera.h> 
 
-//##ModelId=3E3AE7440312
+//##ModelId=3E6D600F009A
 mitk::VtkInteractorCameraController::VtkInteractorCameraController() : m_VtkInteractor(NULL) 
 {
     m_VtkInteractor = mitk::VtkQRenderWindowInteractor::New();
     m_VtkInteractor->SetInteractorStyle(vtkInteractorStyleTrackballCamera::New());
 }
 
-//##ModelId=3E3AE75803CF
+//##ModelId=3E6D600F009B
 mitk::VtkInteractorCameraController::~VtkInteractorCameraController()
 {
 }
 
+//##ModelId=3E6D600F006B
 void mitk::VtkInteractorCameraController::Resize(int w, int h)
 {
     if(m_VtkInteractor)
         m_VtkInteractor->SetSize(w, h);
 }
 
+//##ModelId=3E6D600F0075
 void mitk::VtkInteractorCameraController::MousePressEvent(mitk::MouseEvent *me)
 {
     if(m_VtkInteractor)
@@ -37,24 +39,28 @@ void mitk::VtkInteractorCameraController::MousePressEvent(mitk::MouseEvent *me)
 //        me->x(), this->Size[1] - me->y() - 1);
 }
 
+//##ModelId=3E6D600F007D
 void mitk::VtkInteractorCameraController::MouseReleaseEvent(mitk::MouseEvent *me)
 {
     if(m_VtkInteractor)
         m_VtkInteractor->MouseReleaseEvent(me);
 }
 
+//##ModelId=3E6D600F0080
 void mitk::VtkInteractorCameraController::MouseMoveEvent(mitk::MouseEvent *me)
 {
     if(m_VtkInteractor)
         m_VtkInteractor->MouseMoveEvent(me);
 }
 
+//##ModelId=3E6D600F0088
 void mitk::VtkInteractorCameraController::KeyPressEvent(mitk::KeyEvent *ke)
 {
     if(m_VtkInteractor)
         m_VtkInteractor->KeyPressEvent(ke);
 }
 
+//##ModelId=3E6D600F0093
 bool mitk::VtkInteractorCameraController::AddRenderer(mitk::BaseRenderer* renderer)
 {
     bool res = CameraController::AddRenderer(renderer);
@@ -68,6 +74,7 @@ bool mitk::VtkInteractorCameraController::AddRenderer(mitk::BaseRenderer* render
     return res;
 }
 
+//##ModelId=3E6D600F0090
 void mitk::VtkInteractorCameraController::SetRenderWindow(vtkRenderWindow* aren)
 {
     m_VtkInteractor->SetRenderWindow(aren);

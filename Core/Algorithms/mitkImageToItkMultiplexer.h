@@ -1,4 +1,5 @@
-template <typename PixelType, unsigned int Dimension> void _calculateItkPipelineFunction(mitk::Image* result, mitk::Image* mitksource, itk::ImageSource< mitk::ImageToItk<PixelType, Dimension> >* itkpipelinefunction)
+t
+emplate <typename PixelType, unsigned int Dimension> void _calculateItkPipelineFunction(mitk::Image* result, mitk::Image* mitksource, itk::ImageSource< mitk::ImageToItk<PixelType, Dimension> >* itkpipelinefunction)
 {
   typedef mitk::ImageToItk<PixelType, Dimension> ImageToItkType;
   typedef itk::Image<type, dimension> ImageType;                                  \

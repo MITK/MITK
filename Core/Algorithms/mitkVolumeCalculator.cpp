@@ -56,10 +56,12 @@ void mitk::VolumeCalculator::ComputeVolume()
     for (unsigned int timeStep = 0; timeStep<m_Image->GetDimension(3); timeStep++) {
       m_TimeSelector->SetTimeNr(timeStep);
       m_TimeSelector->Update();
-      AccessByItk_1(m_TimeSelector->GetOutput(),InternalCompute,this);
+      AccessFixedDimensionByItk_1(m_TimeSelector->GetOutput(),InternalCompute,3,this);
       m_Volumes[timeStep] = m_Volume;
     }
+  } else if (m_Image->GetDimension() == 3) {
+    AccessFixedDimensionByItk_1(m_Image,InternalCompute,3,this);
   } else {
-    AccessByItk_1(m_Image,InternalCompute,this);
+    m_Volume = 0;
   }
 }

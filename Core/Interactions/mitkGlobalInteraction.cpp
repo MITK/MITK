@@ -2,28 +2,24 @@
 #include "mitkInteractionConst.h"
 #include "Event.h"
 #include "mitkStatusBar.h"
-//#include "Focus.h"
-
 
 
 //##ModelId=3EAD420E0088
 mitk::GlobalInteraction::GlobalInteraction(std::string type)
 : StateMachine(type)
 {
-	//Quickimplementation ... Ivo: No Need of focus, cause glWidget sends the Event now.
-	//m_Focus = new mitk::Focus("focus");
+//build up the FocusManager
+  m_FocusManager = new mitk::FocusManager();
 }
 
 inline mitk::StateEvent* GenerateEmptyStateEvent(int eventId)
 {
-    mitk::Event *noEvent = new mitk::Event(NULL,
+  mitk::Event *noEvent = new mitk::Event(NULL,
         mitk::Type_User,
         mitk::BS_NoButton,
-		mitk::BS_NoButton,
+		    mitk::BS_NoButton,
         mitk::Key_none);
-    mitk::StateEvent *stateEvent = new mitk::StateEvent(eventId, noEvent);
-    //mitk::StateEvent *stateEvent = new mitk::StateEvent();
-	//stateEvent->Set( eventId, noEvent );
+  mitk::StateEvent *stateEvent = new mitk::StateEvent(eventId, noEvent);
 	return stateEvent;
 }
 
@@ -31,36 +27,30 @@ inline mitk::StateEvent* GenerateEmptyStateEvent(int eventId)
 bool mitk::GlobalInteraction::ExecuteSideEffect(int sideEffectId, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId)
 {
   bool ok = false;
-  //if the Event is a PositionEvent, then get the worldCoordinates through Focus
-  /*Quickimplementation... no need of focus, since the qglwidget send the event
-  if ( (stateEvent->GetEvent() )->GetType()== MouseButtonPress)
-  {
-    ok = m_Focus->HandleEvent(stateEvent,...);//give it to Focus which calculates accordingly to it's Statemachine the worldcoordinates
-	//for debugging
-	if (!ok)
-	  (StatusBar::GetInstance())->DisplayText("Error! Sender: PositionEvent;   Message: HandleEvent returned false", 10000);
-  }
-  */
-     
-  ok = false;
+
   switch (sideEffectId)
   {
   case SeDONOTHING:
     ok = true;
 	break;
   default:
-  //unknown event!
-	ok = true;
+	  ok = true;
   }
 
 /*
 @todo: List of all StateMachines/Interactables that are beneath 
-the focused BaseRenderer (Focus-StateMachine).
+the focused BaseRenderer.
 register at DataTree, that if anything changes, the list can be refreshed.
 If a new object is generated here, the new object flows into the m_SelectedElements
 and the Focus changes.
-*/
 
+multiple hierarchie in StateMachines:
+this StateMachine sends all events to all SM under the focused Node.
+Each SM can have further SM included (in member_var e.g.) and has to descide, 
+whether to send the event further down or to stop it.
+From outside each SM seems be be one class, but inside it is divided up in many 
+SM to reduce the complexibility.
+*/
   //Quickimplementation; is to be changed with List from DataTree
   //send the event to all in List
   for (StateMachineListIter it = m_LocalStateMachines.begin(); it != m_LocalStateMachines.end(); it++)
@@ -92,3 +82,24 @@ bool mitk::GlobalInteraction::RemoveStateMachine(mitk::StateMachine* stateMachin
   position = m_LocalStateMachines.erase(position);
   return true;
 }
+
+bool mitk::GlobalInteraction::AddFocusElement(mitk::FocusManager::FocusElement* element)
+{
+  return m_FocusManager->AddElement(element);
+}
+
+bool mitk::GlobalInteraction::RemoveFocusElement(mitk::FocusManager::FocusElement* element)
+{
+  return m_FocusManager->RemoveElement(element);
+}
+
+const mitk::FocusManager::FocusElement* mitk::GlobalInteraction::GetFocus() 
+{
+  return m_FocusManager->GetFocused();
+}
+
+bool mitk::GlobalInteraction::SetFocus(mitk::FocusManager::FocusElement* element)
+{
+  return m_FocusManager->SetFocused(element);
+}
+

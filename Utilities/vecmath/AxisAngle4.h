@@ -17,9 +17,9 @@
 #ifndef AXISANGLE4_H
 #define AXISANGLE4_H
 
-#include <VmUtil.h>
-#include <AxisAngle4_.h>
-#include <Quat4_.h>
+#include "VmUtil.h"
+#include "AxisAngle4_.h"
+#include "Quat4_.h"
 
 VM_BEGIN_NS
 

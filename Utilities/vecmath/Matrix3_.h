@@ -17,9 +17,9 @@
 #ifndef MATRIX3__H
 #define MATRIX3__H
 
-#include <VmUtil.h>
-#include <Point3.h>
-#include <Vector3.h>
+#include "VmUtil.h"
+#include "Point3.h"
+#include "Vector3.h"
 
 VM_BEGIN_NS
 
@@ -40,6 +40,9 @@ protected:
     static T cos(T t) { return VmUtil<T>::cos(t); }
 /*
  * $Log$
+ * Revision 1.2  2003/04/22 14:42:11  max
+ * made inclusions of vecmath header files "local" (for gcc 3.3 support)
+ *
  * Revision 1.1  2002/11/16 12:25:36  mark
  * vecmath bibliothek
  * in cvs, da einige bugs behoben

@@ -17,8 +17,8 @@
 #ifndef VECTOR2_H
 #define VECTOR2_H
 
-#include <VmUtil.h>
-#include <Tuple2.h>
+#include "VmUtil.h"
+#include "Tuple2.h"
 
 VM_BEGIN_NS
 
@@ -32,6 +32,9 @@ template<class T>
 class Vector2 : public Tuple2<T> {
 /*
  * $Log$
+ * Revision 1.2  2003/04/22 14:42:11  max
+ * made inclusions of vecmath header files "local" (for gcc 3.3 support)
+ *
  * Revision 1.1  2002/11/16 12:25:36  mark
  * vecmath bibliothek
  * in cvs, da einige bugs behoben

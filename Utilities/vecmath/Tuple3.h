@@ -17,7 +17,7 @@
 #ifndef TUPLE3_H
 #define TUPLE3_H
 
-#include <VmUtil.h>
+#include "VmUtil.h"
 
 VM_BEGIN_NS
 
@@ -31,6 +31,9 @@ template<class T>
 class Tuple3 {
 /*
  * $Log$
+ * Revision 1.3  2003/04/22 14:42:11  max
+ * made inclusions of vecmath header files "local" (for gcc 3.3 support)
+ *
  * Revision 1.2  2003/02/08 16:25:58  peter
  * added istream >> operator
  *

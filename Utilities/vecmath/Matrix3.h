@@ -17,10 +17,10 @@
 #ifndef MATRIX3_H
 #define MATRIX3_H
 
-#include <VmUtil.h>
-#include <Matrix3_.h>
-#include <AxisAngle4_.h>
-#include <Quat4_.h>
+#include "VmUtil.h"
+#include "Matrix3_.h"
+#include "AxisAngle4_.h"
+#include "Quat4_.h"
 
 VM_BEGIN_NS
 

@@ -17,11 +17,11 @@
 #ifndef MATRIX4_H
 #define MATRIX4_H
 
-#include <VmUtil.h>
-#include <Quat4.h>      // not very good. use temlate export later
-#include <AxisAngle4.h>
-#include <Matrix4_.h>
-#include <Matrix3.h>   // not very good. use template export later
+#include "VmUtil.h"
+#include "Quat4.h"      // not very good. use temlate export later
+#include "AxisAngle4.h"
+#include "Matrix4_.h"
+#include "Matrix3.h"   // not very good. use template export later
 
 VM_BEGIN_NS
 

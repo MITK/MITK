@@ -17,8 +17,8 @@
 #ifndef AXISANGLE4__H
 #define AXISANGLE4__H
 
-#include <VmUtil.h>
-#include <Matrix4_.h>
+#include "VmUtil.h"
+#include "Matrix4_.h"
 
 VM_BEGIN_NS
 
@@ -33,6 +33,9 @@ template<class T>
 class AxisAngle4 {
 /*
  * $Log$
+ * Revision 1.2  2003/04/22 14:42:11  max
+ * made inclusions of vecmath header files "local" (for gcc 3.3 support)
+ *
  * Revision 1.1  2002/11/16 12:25:36  mark
  * vecmath bibliothek
  * in cvs, da einige bugs behoben

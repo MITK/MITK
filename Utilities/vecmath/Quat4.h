@@ -17,9 +17,9 @@
 #ifndef QUAT4_H
 #define QUAT4_H
 
-#include <VmUtil.h>
-#include <Quat4_.h>
-#include <AxisAngle4_.h>
+#include "VmUtil.h"
+#include "Quat4_.h"
+#include "AxisAngle4_.h"
 
 VM_BEGIN_NS
 

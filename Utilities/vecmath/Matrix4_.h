@@ -17,10 +17,10 @@
 #ifndef MATRIX4__H
 #define MATRIX4__H
 
-#include <VmUtil.h>
-#include <Matrix3_.h>
-#include <Vector4.h>
-#include <Point4.h>
+#include "VmUtil.h"
+#include "Matrix3_.h"
+#include "Vector4.h"
+#include "Point4.h"
 
 VM_BEGIN_NS
 
@@ -35,6 +35,9 @@ protected:
     static T abs(T t) { return VmUtil<T>::abs(t); }
 /*
  * $Log$
+ * Revision 1.2  2003/04/22 14:42:11  max
+ * made inclusions of vecmath header files "local" (for gcc 3.3 support)
+ *
  * Revision 1.1  2002/11/16 12:25:36  mark
  * vecmath bibliothek
  * in cvs, da einige bugs behoben

@@ -17,7 +17,7 @@
 #ifndef VECTOR3_H
 #define VECTOR3_H
 
-#include <Tuple3.h>
+#include "Tuple3.h"
 
 VM_BEGIN_NS
 
@@ -32,6 +32,9 @@ template<class T>
 class Vector3 : public Tuple3<T> {
 /*
  * $Log$
+ * Revision 1.3  2003/04/22 14:42:11  max
+ * made inclusions of vecmath header files "local" (for gcc 3.3 support)
+ *
  * Revision 1.2  2002/12/09 13:02:33  tobias
  * added functions cart2sphere() and sphere2cart() for transformation from
  * cartesian to spherical coordinates and vice versa

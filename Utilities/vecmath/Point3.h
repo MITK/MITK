@@ -17,9 +17,9 @@
 #ifndef POINT3_H
 #define POINT3_H
 
-#include <VmUtil.h>
-#include <Tuple3.h>
-#include <Point4.h>
+#include "VmUtil.h"
+#include "Tuple3.h"
+#include "Point4.h"
 
 VM_BEGIN_NS
 
@@ -32,6 +32,9 @@ template<class T>
 class Point3 : public Tuple3<T> {
 /*
  * $Log$
+ * Revision 1.2  2003/04/22 14:42:11  max
+ * made inclusions of vecmath header files "local" (for gcc 3.3 support)
+ *
  * Revision 1.1  2002/11/16 12:25:36  mark
  * vecmath bibliothek
  * in cvs, da einige bugs behoben

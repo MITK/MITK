@@ -17,9 +17,9 @@
 #ifndef VECTOR4_H
 #define VECTOR4_H
 
-#include <VmUtil.h>
-#include <Tuple4.h>
-#include <Tuple3.h>
+#include "VmUtil.h"
+#include "Tuple4.h"
+#include "Tuple3.h"
 
 VM_BEGIN_NS
 
@@ -32,6 +32,9 @@ template<class T>
 class Vector4 : public Tuple4<T> {
 /*
  * $Log$
+ * Revision 1.2  2003/04/22 14:42:11  max
+ * made inclusions of vecmath header files "local" (for gcc 3.3 support)
+ *
  * Revision 1.1  2002/11/16 12:25:36  mark
  * vecmath bibliothek
  * in cvs, da einige bugs behoben

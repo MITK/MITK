@@ -16,27 +16,28 @@ namespace mitk {
 //## associated BaseRenderer will display.
 class SliceNavigationController : public BaseController
 {
-  public:
-	mitkClassMacro(SliceNavigationController,BaseController);
- 
-    //##ModelId=3DD524D7038C
-    const mitk::Geometry3D* GetGeometry();
+public:
+  mitkClassMacro(SliceNavigationController,BaseController);
+  itkNewMacro(Self);
 
-    //##ModelId=3DD524F9001A
-    virtual void SetGeometry2D(const mitk::Geometry2D &aGeometry2D);
+  //##ModelId=3DD524D7038C
+  const mitk::Geometry3D* GetGeometry();
 
-    //##ModelId=3E3AA1E20393
-    virtual void SetGeometry3D(const mitk::Geometry3D &aGeometry3D);
+  //##ModelId=3DD524F9001A
+  virtual void SetGeometry2D(const mitk::Geometry2D &aGeometry2D);
 
-    //##ModelId=3DFF3D9A038E
-    virtual void SetPoint(const mitk::Point3D &point);
+  //##ModelId=3E3AA1E20393
+  virtual void SetGeometry3D(const mitk::Geometry3D &aGeometry3D);
 
-  protected:
-    //##ModelId=3E189B1D008D
-    SliceNavigationController();
+  //##ModelId=3DFF3D9A038E
+  virtual void SetPoint(const mitk::Point3D &point);
 
-    //##ModelId=3E189B1D00BF
-    virtual ~SliceNavigationController();
+protected:
+  //##ModelId=3E189B1D008D
+  SliceNavigationController();
+
+  //##ModelId=3E189B1D00BF
+  virtual ~SliceNavigationController();
 
 };
 

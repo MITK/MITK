@@ -22,6 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkBoundingObject.h"
 #include <mitkContour.h>
+#include <mitkPlaneGeometry.h>
 
 class vtkLinearExtrusionFilter;
 class vtkPlanes;
@@ -50,12 +51,26 @@ public:
   virtual bool IsInside(const Point3D& p) const;
   virtual void UpdateOutputInformation();
 
+  //##Documentation
+  //## @brief Contour to extrude
   itkGetConstObjectMacro(Contour, mitk::Contour);
   itkSetObjectMacro(Contour, mitk::Contour);
 
+  //##Documentation
+  //## @brief Vector to specify the direction of the extrusion
   mitkGetVectorMacro(Vector, mitk::Vector3D);
   mitkSetVectorMacro(Vector, mitk::Vector3D);
+  itkGetConstMacro(AutomaticVectorGeneration, bool);
+  itkSetMacro(AutomaticVectorGeneration, bool);
+  itkBooleanMacro(AutomaticVectorGeneration);
 
+  //##Documentation
+  //## @brief Optional vector to specify the orientation of the bounding-box
+  mitkGetVectorMacro(RightVector, mitk::Vector3D);
+  mitkSetVectorMacro(RightVector, mitk::Vector3D);
+
+  //##Documentation
+  //## @brief Optional geometry for clipping the extruded contour
   itkGetConstObjectMacro(ClippingGeometry, mitk::Geometry3D);
   itkSetObjectMacro(ClippingGeometry, mitk::Geometry3D);
 
@@ -64,16 +79,25 @@ protected:
   ExtrudedContour();
   virtual ~ExtrudedContour();
 
-  void CalculateExtrusion();
+  void BuildSurface();
+  void BuildGeometry();
 
   mitk::Contour::Pointer m_Contour;
   mitk::Vector3D m_Vector;
+  mitk::Vector3D m_RightVector;
   mitk::Geometry3D::Pointer m_ClippingGeometry;
+
+  bool m_AutomaticVectorGeneration;
 
   vtkPolygon* m_Polygon;
   float m_ProjectedContourBounds[6];
-  float m_Origin[3];
+  mitk::PlaneGeometry::Pointer m_ProjectionPlane;
+  //##Documentation
+  //## @brief For fast projection on plane
+  float m_Right[3];
+  float m_Down[3];
   float m_Normal[3];
+  float m_Origin[3];
 
   vtkLinearExtrusionFilter* m_ExtrusionFilter;
   vtkTriangleFilter *m_TriangleFilter;

@@ -273,3 +273,10 @@ void mitk::DataTreeNode::SetLevelWindow(mitk::LevelWindow levelWindow, mitk::Bas
     GetPropertyList(renderer)->SetProperty(name, prop);
 }
 
+void mitk::DataTreeNode::SetProperty(const char *propertyKey, 
+                                     BaseProperty* propertyValue, 
+	                             const mitk::BaseRenderer* renderer = NULL)
+{
+    GetPropertyList(renderer)->SetProperty(propertyKey, propertyValue);
+}	
+

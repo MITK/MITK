@@ -105,6 +105,9 @@ public:
     //## @sa m_PropertyList
     //## @sa m_MapOfPropertyLists
     mitk::BaseProperty::Pointer GetProperty(const char *propertyKey, const mitk::BaseRenderer* renderer = NULL) const;
+    
+    void SetProperty(const char *propertyKey, BaseProperty* property, const mitk::BaseRenderer* renderer = NULL);	
+
     //##ModelId=3EF1941C011F
     //##Documentation
     //## @brief Convenience access method for color properties (instances of

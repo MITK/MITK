@@ -9,7 +9,7 @@
             <x>0</x>
             <y>0</y>
             <width>227</width>
-            <height>73</height>
+            <height>76</height>
         </rect>
     </property>
     <property name="sizePolicy">
@@ -86,7 +86,10 @@
                                 </size>
                             </property>
                             <property name="text">
-                                <string>&gt;</string>
+                                <string></string>
+                            </property>
+                            <property name="pixmap">
+                                <pixmap>image0</pixmap>
                             </property>
                         </widget>
                         <widget class="QPushButton">
@@ -108,7 +111,10 @@
                                 </size>
                             </property>
                             <property name="text">
-                                <string>O</string>
+                                <string></string>
+                            </property>
+                            <property name="pixmap">
+                                <pixmap>image1</pixmap>
                             </property>
                         </widget>
                         <widget class="QFrame">
@@ -199,6 +205,14 @@
         </widget>
     </vbox>
 </widget>
+<images>
+    <image name="image0">
+        <data format="XPM.GZ" length="312">789cd3d7528808f055d0d2e72a2e492cc94c5648ce482c52d04a29cdcdad8c8eb5ade65232345630345130523054d2e15252564856f0cbcf4b05b1f5806c6503300073f59411002280240413800b2104a042c80260215401a010ba801e4101fc86e27718bad3913c576bcd05005ac6366b</data>
+    </image>
+    <image name="image1">
+        <data format="XPM.GZ" length="394">789cd3d7528808f055d0d2e72a2e492cc94c5648ce482c52d04a29cdcdad8c8eb5ade6523234530022230543251d2e253d856405bffcbc54105b19c856360003b0141a008b29a380513198187a58d55a7301006a793f51</data>
+    </image>
+</images>
 <connections>
     <connection>
         <sender>goButton</sender>

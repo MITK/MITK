@@ -3,6 +3,7 @@
 #include "widget.h"
 #include "picimage.h"
 #include "pic2vtk.h"
+#include "mitkTimeSlicedGeometry.h"
 #include "mitkPlaneGeometry.h"
 #include "mitkBaseRenderer.h"
 #include "mitkDataTreeNode.h"
@@ -53,6 +54,9 @@ void mitk::ImageMapper2D::Paint(mitk::BaseRenderer * renderer)
   iilPicImage*& image = renderinfo.m_iilImage;
 
   Update(renderer);
+
+  if(image==NULL)
+    return;
 
   const mitk::DisplayGeometry* displayGeometry = renderer->GetDisplayGeometry();
 
@@ -164,10 +168,24 @@ void mitk::ImageMapper2D::GenerateData(mitk::BaseRenderer *renderer)
 
   if(input.IsNotNull())
   {
-    vtkImageData* inputData = input->GetVtkImageData();
-    const PlaneView* planeview=NULL;
+    const TimeSlicedGeometry* inputtimegeometry = dynamic_cast<const TimeSlicedGeometry*>(input->GetGeometry());
+
+    assert(inputtimegeometry!=NULL);
 
     const Geometry2D* worldgeometry = renderer->GetCurrentWorldGeometry2D();
+
+    assert(worldgeometry!=NULL);
+
+    int timestep=0;
+    ScalarType time = worldgeometry->GetTimeBoundsInMS()[0];
+    if(time>-ScalarTypeNumericTraits::max())
+      timestep = inputtimegeometry->MSToTimeStep(time);
+
+    if(inputtimegeometry->IsValidTime(timestep)==false)
+      return;
+
+    vtkImageData* inputData = input->GetVtkImageData(timestep);
+    const PlaneView* planeview=NULL;
 
     if(dynamic_cast<const PlaneGeometry *>(worldgeometry)!=NULL)
     {
@@ -175,15 +193,15 @@ void mitk::ImageMapper2D::GenerateData(mitk::BaseRenderer *renderer)
       m_Reslicer->SetResliceTransform(NULL);
     }
     else
-      if(dynamic_cast<const AbstractTransformGeometry *>(worldgeometry)!=NULL)
-      {
-        const AbstractTransformGeometry *abstractGeometry=dynamic_cast<const AbstractTransformGeometry *>(worldgeometry);
-        planeview=&abstractGeometry->GetPlaneView();
-        m_Reslicer->SetResliceTransform(abstractGeometry->GetVtkAbstractTransform());
-        //m_Reslicer->DebugOn();
-      }
-      else
-        return;
+    if(dynamic_cast<const AbstractTransformGeometry *>(worldgeometry)!=NULL)
+    {
+      const AbstractTransformGeometry *abstractGeometry=dynamic_cast<const AbstractTransformGeometry *>(worldgeometry);
+      planeview=&abstractGeometry->GetPlaneView();
+      m_Reslicer->SetResliceTransform(abstractGeometry->GetVtkAbstractTransform());
+      //m_Reslicer->DebugOn();
+    }
+    else
+      return;
 
     assert(planeview!=NULL);
     assert(planeview->normal.length()>0.1);

@@ -249,7 +249,7 @@ void mitk::DataTreeNodeFactory::ReadFileTypePIC()
 
         // set filename without path as string property
         mitk::StringProperty::Pointer nameProp = new mitk::StringProperty( this->GetBaseFileName() );
-        node->SetProperty( "fileName", nameProp );
+        node->SetProperty( "name", nameProp );
 
         // disable volume rendering by default
         node->SetProperty( "volumerendering", new mitk::BoolProperty( false ) );
@@ -284,7 +284,7 @@ void mitk::DataTreeNodeFactory::ReadFileTypePAR()
 
     // set filename without path as string property
     mitk::StringProperty::Pointer nameProp = new mitk::StringProperty( this->GetBaseFileName() );
-    node->SetProperty( "fileName", nameProp );
+    node->SetProperty( "name", nameProp );
 
     // add level-window property
     mitk::LevelWindowProperty::Pointer levWinProp = new mitk::LevelWindowProperty();
@@ -318,7 +318,7 @@ void mitk::DataTreeNodeFactory::ReadFileTypePVTK()
 
         // set filename without path as string property
         mitk::StringProperty::Pointer nameProp = new mitk::StringProperty( this->GetBaseFileName() );
-        node->SetProperty( "fileName", nameProp );
+        node->SetProperty( "name", nameProp );
 
         // add level-window property
         mitk::LevelWindowProperty::Pointer levWinProp = new mitk::LevelWindowProperty();
@@ -348,7 +348,7 @@ void mitk::DataTreeNodeFactory::ReadFileTypeVES()
 
     // set filename without path as string property
     mitk::StringProperty::Pointer nameProp = new mitk::StringProperty( this->GetBaseFileName() );
-    node->SetProperty( "fileName", nameProp );
+    node->SetProperty( "name", nameProp );
 
     std::cout << "...finished!" << std::endl;
 }
@@ -368,7 +368,7 @@ void mitk::DataTreeNodeFactory::ReadFileTypeUVG()
 
     // set filename without path as string property
     mitk::StringProperty::Pointer nameProp = new mitk::StringProperty( this->GetBaseFileName() );
-    node->SetProperty( "fileName", nameProp );
+    node->SetProperty( "name", nameProp );
 
     std::cout << "...finished!" << std::endl;
 }
@@ -427,7 +427,7 @@ void mitk::DataTreeNodeFactory::ReadFileTypeHPSONOS()
     mitk::StringProperty::Pointer ultrasoundProp = new mitk::StringProperty( "OriginalBackscatter" );
     node->SetProperty( "ultrasound", ultrasoundProp );
     mitk::StringProperty::Pointer nameProp = new mitk::StringProperty( "OriginalBackscatter" );
-    node->SetProperty( "fileName", nameProp );
+    node->SetProperty( "name", nameProp );
     node->SetProperty( "layer", new mitk::IntProperty( -11 ) );
     mitk::LevelWindow levelwindow;
     levelwindow.SetAuto( sliceSelector->GetOutput()->GetPic() );
@@ -447,7 +447,7 @@ void mitk::DataTreeNodeFactory::ReadFileTypeHPSONOS()
     ultrasoundProp = new mitk::StringProperty( "TransformedBackscatter" );
     node->SetProperty( "ultrasound", ultrasoundProp );
     nameProp = new mitk::StringProperty( "TransformedBackscatter" );
-    node->SetProperty( "fileName", nameProp );
+    node->SetProperty( "name", nameProp );
     node->SetProperty( "layer", new mitk::IntProperty( -10 ) );
     //    mitk::LevelWindow levelwindow;
 
@@ -491,7 +491,7 @@ void mitk::DataTreeNodeFactory::ReadFileTypeHPSONOS()
         ultrasoundProp = new mitk::StringProperty( "OriginalDoppler" );
         node->SetProperty( "ultrasound", ultrasoundProp );
         nameProp = new mitk::StringProperty( "OriginalDoppler" );
-        node->SetProperty( "fileName", nameProp );
+        node->SetProperty( "name", nameProp );
         node->SetProperty( "layer", new mitk::IntProperty( -6 ) );
 
 
@@ -523,7 +523,7 @@ void mitk::DataTreeNodeFactory::ReadFileTypeHPSONOS()
         ultrasoundProp = new mitk::StringProperty( "TransformedDoppler" );
         node->SetProperty( "ultrasound", ultrasoundProp );
         nameProp = new mitk::StringProperty( "TransformedDoppler" );
-        node->SetProperty( "fileName", nameProp );
+        node->SetProperty( "name", nameProp );
         node->SetProperty( "layer", new mitk::IntProperty( -5 ) );
         cyl2cartDoppler->Update();
 
@@ -563,7 +563,7 @@ void mitk::DataTreeNodeFactory::ReadFileTypeDCM()
 
     // set filename without path as string property
     mitk::StringProperty::Pointer nameProp = new mitk::StringProperty( this->GetBaseFileName() );
-    node->SetProperty( "fileName", nameProp );
+    node->SetProperty( "name", nameProp );
 
     // add Level-Window property
     mitk::LevelWindow levelwindow;
@@ -653,7 +653,7 @@ void mitk::DataTreeNodeFactory::ReadFileTypeITKImageIOFactory()
 
     // set filename without path as string property
     mitk::StringProperty::Pointer nameProp = new mitk::StringProperty( this->GetBaseFileName() );
-    node->SetProperty( "fileName", nameProp );
+    node->SetProperty( "name", nameProp );
     std::cout << "...finished!" << std::endl;
 }
 
@@ -673,7 +673,7 @@ void mitk::DataTreeNodeFactory::ReadFileSeriesTypePIC()
     // set filename without path as string property
     std::string filename = this->GetBaseFilePrefix() + "pic";
     mitk::StringProperty::Pointer nameProp = new mitk::StringProperty( filename );
-    node->SetProperty( "fileName", nameProp );
+    node->SetProperty( "name", nameProp );
 
     // disable volume rendering by default
     node->SetProperty( "volumerendering", new mitk::BoolProperty( false ) );

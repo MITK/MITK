@@ -359,19 +359,19 @@ void QmitkStdMultiWidget::addPlaneSubTree(mitk::DataTreeIterator * it)
     // ... of widget 1
     planeNode=mitkWidget1->GetRenderer()->GetCurrentWorldGeometry2DNode();
     planeNode->SetColor(white, mitkWidget4->GetRenderer());
-    planeNode->SetProperty("fileName", new mitk::StringProperty("widget1Plane"));
+    planeNode->SetProperty("name", new mitk::StringProperty("widget1Plane"));
     planeNode->SetProperty("includeInBoundingBox", new mitk::BoolProperty(false));
     it->add(planeNode);
     // ... of widget 2
     planeNode=mitkWidget2->GetRenderer()->GetCurrentWorldGeometry2DNode();
     planeNode->SetColor(white, mitkWidget4->GetRenderer());
-    planeNode->SetProperty("fileName", new mitk::StringProperty("widget2Plane"));
+    planeNode->SetProperty("name", new mitk::StringProperty("widget2Plane"));
     planeNode->SetProperty("includeInBoundingBox", new mitk::BoolProperty(false));
     it->add(planeNode);
     // ... of widget 3
     planeNode=mitkWidget3->GetRenderer()->GetCurrentWorldGeometry2DNode();
     planeNode->SetColor(white, mitkWidget4->GetRenderer());
-    planeNode->SetProperty("fileName", new mitk::StringProperty("widget3Plane"));
+    planeNode->SetProperty("name", new mitk::StringProperty("widget3Plane"));
     planeNode->SetProperty("includeInBoundingBox", new mitk::BoolProperty(false));
     it->add(planeNode);
 

@@ -50,13 +50,13 @@ public:
     image->SetVolume(itkImage->GetBufferPointer());
 
     mitk::DataTreeNode::Pointer node = NULL;
-    mitk::DataTreeIterator* subTree = ((mitk::DataTree *) it->getTree())->GetNext("fileName", new mitk::StringProperty( str.c_str() ));
+    mitk::DataTreeIterator* subTree = ((mitk::DataTree *) it->getTree())->GetNext("name", new mitk::StringProperty( str.c_str() ));
 
     if (subTree == NULL || subTree->get() == NULL)
     {
       node=mitk::DataTreeNode::New();
       mitk::StringProperty::Pointer nameProp = new mitk::StringProperty(str.c_str());
-      node->SetProperty("fileName",nameProp);
+      node->SetProperty("name",nameProp);
       it->add(node);
     }
     else
@@ -96,13 +96,13 @@ public:
     mitk::DataTreeIterator* it=iterator->clone();
 
     mitk::DataTreeNode::Pointer node = NULL;
-    mitk::DataTreeIterator* subTree = ((mitk::DataTree *) it->getTree())->GetNext("fileName", new mitk::StringProperty( str.c_str() ));
+    mitk::DataTreeIterator* subTree = ((mitk::DataTree *) it->getTree())->GetNext("name", new mitk::StringProperty( str.c_str() ));
 
     if (subTree == NULL || subTree->get() == NULL )
     {
       node=mitk::DataTreeNode::New();
       mitk::StringProperty::Pointer nameProp = new mitk::StringProperty(str.c_str());
-      node->SetProperty("fileName",nameProp);
+      node->SetProperty("name",nameProp);
       it->add(node);
     }
     else
@@ -137,13 +137,13 @@ public:
     mitk::DataTreeIterator* it=iterator->clone();
 
     mitk::DataTreeNode::Pointer node = NULL;
-    mitk::DataTreeIterator* subTree = ((mitk::DataTree *) it->getTree())->GetNext("fileName", new mitk::StringProperty( str.c_str() ));
+    mitk::DataTreeIterator* subTree = ((mitk::DataTree *) it->getTree())->GetNext("name", new mitk::StringProperty( str.c_str() ));
 
     if (subTree == NULL || subTree->get() == NULL )
     {
       node=mitk::DataTreeNode::New();
       mitk::StringProperty::Pointer nameProp = new mitk::StringProperty(str.c_str());
-      node->SetProperty("fileName",nameProp);
+      node->SetProperty("name",nameProp);
       it->add(node);
     }
     else
@@ -179,13 +179,13 @@ public:
     image->SetPicVolume(pic);
 
     mitk::DataTreeNode::Pointer node = NULL;
-    mitk::DataTreeIterator* subTree = ((mitk::DataTree *) it->getTree())->GetNext("fileName", new mitk::StringProperty( str.c_str() ));
+    mitk::DataTreeIterator* subTree = ((mitk::DataTree *) it->getTree())->GetNext("name", new mitk::StringProperty( str.c_str() ));
 
     if (subTree == NULL || subTree->get() == NULL)
     {
       node=mitk::DataTreeNode::New();
       mitk::StringProperty::Pointer nameProp = new mitk::StringProperty(str.c_str());
-      node->SetProperty("fileName",nameProp);
+      node->SetProperty("name",nameProp);
       it->add(node);
     }
     else

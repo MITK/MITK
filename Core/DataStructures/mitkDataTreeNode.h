@@ -156,9 +156,9 @@ public:
 
   //##Documentation
   //## @brief Convenience access method for accessing the name of an object (instance of
-  //## StringProperty with property-key "fileName")
+  //## StringProperty with property-key "name")
   //## @return @a true property was found
-  bool GetName(char &nodeName, mitk::BaseRenderer* renderer, const char* propertyKey = "fileName") const
+  bool GetName(char &nodeName, mitk::BaseRenderer* renderer, const char* propertyKey = "name") const
   {
     return GetStringProperty(propertyKey, &nodeName, renderer);
   }

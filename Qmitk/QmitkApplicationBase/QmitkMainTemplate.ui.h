@@ -62,10 +62,7 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
             it->add(node);
 
             //FIXME: das folgende sollte überflüssig sein. Problem ist aber, das es z.Z. noch keine Möglichkeit gibt festzustellen, wann der Baum zuletzt geändert wurde.
-            //mitkMultiWidget->mitkWidget1->GetRenderer()->SetData(it);
-            //mitkMultiWidget->mitkWidget2->GetRenderer()->SetData(it);
-            //mitkMultiWidget->mitkWidget3->GetRenderer()->SetData(it);
-            mitkMultiWidget->mitkWidget4->GetRenderer()->SetData(it);
+            initWidgets(it);
 
             delete it;
         }
@@ -98,9 +95,6 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
                 //it->add(node2);
 
 
-                mitkMultiWidget->mitkWidget4->GetRenderer()->SetMapperID(2);
-                mitkMultiWidget->mitkWidget4->GetRenderer()->SetData(it);
-                mitkMultiWidget->mitkWidget4->GetRenderer()->GetDisplayGeometry()->Fit();
                 // schräg
                 //initWidget(it,
                 //	   mitkMultiWidget->mitkWidget4,
@@ -237,11 +231,11 @@ void QmitkMainTemplate::initWidget(mitk::DataTreeIterator* it,
     widget->GetRenderer()->SetWorldGeometry(plane);
     widget->GetRenderer()->GetDisplayGeometry()->Fit();
 
-    mitk::Geometry2DDataVtkMapper3D::Pointer geometryMapper = mitk::Geometry2DDataVtkMapper3D::New();
+    //mitk::Geometry2DDataVtkMapper3D::Pointer geometryMapper = mitk::Geometry2DDataVtkMapper3D::New();
     mitk::DataTreeNode::Pointer node=mitk::DataTreeNode::New();
     node->SetData(widget->GetRenderer()->GetWorldGeometry2DData());
-    geometryMapper->SetDataIteratorForTexture(it);
-    node->SetMapper(2, geometryMapper);
+    //geometryMapper->SetDataIteratorForTexture(it);
+    //node->SetMapper(2, geometryMapper);
     it->add(node);
 
     widget->update();
@@ -418,6 +412,7 @@ void QmitkMainTemplate::initWidgets( mitk::DataTreeIterator * it )
                 Vector3f(bounds[1],bounds[2],bounds[4]),
                 Vector3f(bounds[0],bounds[2],bounds[5])
             );
+    mitkMultiWidget->mitkWidget4->GetRenderer()->SetData(it);
 }
 
 

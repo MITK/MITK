@@ -117,12 +117,34 @@ void QmitkSimpleExampleFunctionality::initNavigators()
   const mitk::BoundingBox::Pointer boundingbox = mitk::DataTree::ComputeVisibleBoundingBox(m_DataTreeIterator, NULL, "includeInBoundingBox");
   if(boundingbox->GetPoints()->Size()>0)
   {
+    // const mitk::BoundingBox::Pointer bb=boundingbox;
+    //const mitk::BoundingBox::BoundsArrayType bounds = bb->GetBounds();
+    // float boundingbox[6]={-2*bounds[1],2*bounds[1],-2*bounds[3],2*bounds[3],-2*bounds[5],2*bounds[5]};
     mitk::Geometry3D::Pointer geometry = mitk::Geometry3D::New();
     geometry->Initialize();
     geometry->SetBoundingBox(boundingbox);
+
+    //lets see if we have data with a limited live-span ...
+    mitk::TimeBounds timebounds = mitk::DataTree::ComputeTimeBoundsInMS(m_DataTreeIterator, NULL, "includeInBoundingBox");
+    if(timebounds[1]<mitk::ScalarTypeNumericTraits::max())
+    {
+      mitk::TimeSlicedGeometry::Pointer timegeometry = mitk::TimeSlicedGeometry::New();
+      timegeometry->Initialize(10);
+      timegeometry->SetTimeBoundsInMS(timebounds); //@bug really required?
+      timegeometry->SetEvenlyTimed();
+      mitk::ScalarType duration = timebounds[1]-timebounds[0];
+      timebounds[1] = timebounds[0]+duration/10.0;
+
+      timegeometry->SetGeometry3D(geometry, 0);
+      geometry->SetTimeBoundsInMS(timebounds);
+
+      geometry=timegeometry;
+    }
+
     sliceNavigatorTransversal->SetInputWorldGeometry(geometry.GetPointer()); sliceNavigatorTransversal->Update();
     sliceNavigatorFrontal->SetInputWorldGeometry(geometry.GetPointer());     sliceNavigatorFrontal->Update();
     sliceNavigatorSagittal->SetInputWorldGeometry(geometry.GetPointer());    sliceNavigatorSagittal->Update();
+    sliceNavigatorTime->SetInputWorldGeometry(geometry.GetPointer());        sliceNavigatorTime->Update();
   }
 }
 

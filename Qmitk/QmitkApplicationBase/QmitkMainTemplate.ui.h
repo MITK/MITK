@@ -108,16 +108,15 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
       }
       delete it;
   }
-  
+  mitk::DataTreeIterator* it = tree->inorderIterator();
   mitkMultiWidget->texturizePlaneSubTree( tree->inorderIterator());
   mitkMultiWidget->updateMitkWidgets();
   mitkMultiWidget->fit();
+  delete it;
 }
 
 void QmitkMainTemplate::fileOpenImageSequence()
 {
-  mitk::DataTreeIterator* it=NULL;
-
   QString fileName = QFileDialog::getOpenFileName(NULL,"DKFZ Pic (*.seq *.pic *.pic.gz *.seq.gz);;stl files (*.stl)");
 
   if ( !fileName.isNull() )
@@ -139,24 +138,29 @@ void QmitkMainTemplate::fileOpenImageSequence()
     int stop=fileName.find( QRegExp("[^0-9]"), start );
     sprintf(pattern, "%%s%%0%uu%s",stop-start,fileName.ascii()+stop);
 
-    mitk::PicFileReader::Pointer reader;
-    reader=mitk::PicFileReader::New();
 
-    std::cout << "loading " << fileName << " interpreted as image sequence mask: prefix " << prefix << " pattern: " << pattern << std::endl;
+    mitk::DataTreeNodeFactory::Pointer factory = mitk::DataTreeNodeFactory::New();
+  
+    factory->SetFilePattern( pattern );
+    factory->SetFilePrefix( prefix );
+    factory->Update();
 
-    reader->SetFilePrefix(prefix);
-    reader->SetFilePattern(pattern);
-
-    mitk::DataTreeIterator* it=tree->inorderIterator();
-
-    mitk::DataTreeNode::Pointer node;
-    node=mitk::DataTreeNode::New();
-    node->SetData(reader->GetOutput());
-    it->add(node);
-  }
-
-  if(it!=NULL)
-  {
+    for (unsigned int i = 0 ; i < factory->GetNumberOfOutputs( ); ++i)
+    {
+      mitk::DataTreeIterator* it = tree->inorderIterator( );
+      mitk::DataTreeNode::Pointer node = factory->GetOutput( i );
+      if ( node.IsNotNull( ) )
+      {
+        it->add( node );
+        mitk::LevelWindowProperty::Pointer lw = dynamic_cast<mitk::LevelWindowProperty*>(node->GetProperty("levelwindow").GetPointer( ) );
+        if ( lw.IsNotNull( ) )
+        {
+          mitkMultiWidget->levelWindowWidget->setLevelWindow( lw->GetLevelWindow() );
+        }
+      }
+      delete it;
+    }
+    mitk::DataTreeIterator* it = tree->inorderIterator();
     mitkMultiWidget->texturizePlaneSubTree(it);
     mitkMultiWidget->updateMitkWidgets();
     mitkMultiWidget->fit();

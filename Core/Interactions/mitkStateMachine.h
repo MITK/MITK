@@ -34,7 +34,7 @@ namespace mitk {
   //## default of m_UndoEnabled is true;
   StateMachine(std::string type);
 
-  ~StateMachine(){};
+  ~StateMachine(){}
 
   //##ModelId=3E5B2E660087
   std::string GetType() const;

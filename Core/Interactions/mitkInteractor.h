@@ -27,7 +27,7 @@ public:
 
   //##Documentation
   //## @brief Destructor
-  ~Interactor(){};
+  ~Interactor(){}
 
   //##Documentation
   //## @brief Executes Side-Effects

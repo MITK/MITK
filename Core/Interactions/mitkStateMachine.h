@@ -53,7 +53,7 @@ class StateMachine : public itk::Object, public mitk::OperationActor
   //## default of m_UndoEnabled is true;
   StateMachine(const char * type);
 
-  ~StateMachine(){}
+  ~StateMachine();
 
   //##ModelId=3E5B2E660087
   std::string GetType() const;

@@ -199,6 +199,10 @@ void mitk::PointSet::ExecuteOperation(Operation* operation)
 //##ModelId=3F0177E901EE
 void mitk::PointSet::UpdateOutputInformation()
 {
+  if ( this->GetSource( ) )
+  {
+      this->GetSource( )->UpdateOutputInformation( );
+  }
   const DataType::BoundingBoxType *bb = m_ItkData->GetBoundingBox();
   BoundingBox::BoundsArrayType itkBounds = bb->GetBounds();
   float mitkBounds[6];

@@ -24,19 +24,20 @@ namespace mitk {
 //## Interactors do change data according to the recieved event. They do not need to revieve all events, only
 //## those they are interested in.
 //##
-//## To divide these two types of statemachine this class holds three lists:
-//## m_ListenerList, m_InteractorList and m_SelectedList
+//## To divide these two types of statemachine this class holds three lists and one map:
+//## m_ListenerList, m_InteractorList, m_SelectedList and m_JurisdictionMap
 //## The list m_ListenerList holds all listeners.
 //## m_InteractorList holds all Interactors, and the List m_SelectedList holds all machines, that were set to SELECTED or SUBSELECTED.
+//## m_JurisdictionMap maps values returned from CalculateJurisdiction to the asked Interactors.
+//## Through this map stepping through interactors, that were not selected and could handle that event, can be done.
+//## 
 //## First the listeners are informed with the event.
 //## Then the selected or subselected Interactors are asked if they can handle that event.
-//## They can handle it, if the machine or a submachine has an according transition.
-//## They can't handle it, if the event is not defined in that state (has no transition waiting for that event).
-//## In that case, all statemachines in m_InteractorList are asked to handle that event.
-//## If a machine can handle the event, then it turns into the modus SELECTED or if a submachine could
-//## handle the event, then in modus SUBSELECTED and is asked directly when the next event appears.
-//##
-//##
+//## They can handle it, if the mode of the interactor after HandleEvent(..) is still in SMSELECTED or SMSUBSELECTED.
+//## They can't handle it, if the mode changed to SMDESELECTED. Then the interactor is removed from the selected-list.
+//## In that case, all interactors are asked to calculate and return their area of jurisdiction.
+//## An iterator is held on one interactor in the map. With the iterator, the map can be looped through so 
+//## so that several geometric objects, that lie on top of each other, can be selected.
 class GlobalInteraction : public StateMachine
 {
   public:
@@ -48,6 +49,10 @@ class GlobalInteraction : public StateMachine
   typedef std::vector<Interactor*> InteractorList;
 
   typedef std::vector<Interactor*>::iterator InteractorListIter;
+
+  typedef std::map<float, Interactor*> InteractorMap;
+  
+  typedef std::map<float, Interactor*>::iterator  InteractorMapIter;
 
   //##ModelId=3EAD420E0088
   GlobalInteraction(const char * type);
@@ -124,9 +129,14 @@ class GlobalInteraction : public StateMachine
   bool AskSelected(mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId);
 
   //##Documentation
-  //##@brief asking all Interactors, hwo can handle the event
-  void AskAllInteractors(mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId);
+  //##@brief asking next interactor of m_JurisdictionMap
+  void AskCurrentInteractor(mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId);
 
+  //##Documentation
+  //##@brief filling m_JurisdictionMap 
+  //##
+  //## @ params swell: if the calculated jurisdictionvalue is above swell, then add it to the map
+  void FillJurisdictionMap(mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId, float swell);
 
   //##Documentation
   //## @brief list of all listening statemachines, that want to recieve all events
@@ -139,6 +149,17 @@ class GlobalInteraction : public StateMachine
   //##Documentation
   //## @brief list of all interactors, that are in Mode SELECTED or SUBSELECTED
   InteractorList m_SelectedList; //or id of position in vector
+
+  //##Documentation
+  //## @brief map for sorting all interactors by the value returned from CalculateJurisdiction(..).
+  //##
+  //## With that list certain interactors can be looped through like diving through layers
+  InteractorMap m_JurisdictionMap;
+
+
+  //##Documentation
+  //## @brief iterator on an entry in m_JurisdictionMap for stepping through interactors
+  InteractorMapIter m_CurrentInteractor;
 
   //##ModelId=3EF099E80373
   //##Documentation

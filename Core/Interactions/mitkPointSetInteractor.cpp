@@ -671,6 +671,10 @@ bool mitk::PointSetInteractor::ExecuteAction(int actionId, mitk::StateEvent cons
     //otherwise it will end up in a different state, but without done Action.
     //if a transition really has no Action, than call donothing
 	}
+  
+  //setting Mode: No substatemachines, so no SMSUBSELECTED
+  //orientating on value ok:
+  mitkSetModeOkMacro(ok);
   return ok;
 }
 

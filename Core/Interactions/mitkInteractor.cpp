@@ -6,11 +6,13 @@
 #include <vtkCamera.h>
 #include <vtkRenderer.h>
 #include <mitkOpenGLRenderer.h>
+#include "mitkInteractionConst.h"
+
 
 
 
 mitk::Interactor::Interactor(const char * type, DataTreeNode* dataTreeNode)
-: mitk::StateMachine(type), m_DataTreeNode(dataTreeNode), m_Mode(SMSELECTED)
+: mitk::StateMachine(type), m_DataTreeNode(dataTreeNode), m_Mode(SMDESELECTED)
 {
   if (m_DataTreeNode != NULL)
     m_DataTreeNode->SetInteractor(this);
@@ -53,10 +55,15 @@ float mitk::Interactor::CalculateJurisdiction(StateEvent const* stateEvent) cons
   //Mouse event handling:
   else//if we have 2d or 3d position
   {
+    if (stateEvent->GetEvent()->GetType() == mitk::Type_MouseMove)//on MouseMove do nothing! reimplement if needed differently
+    {
+      return 0;
+    }
+
     //compute the center of the data taken care of
     mitk::BoundingBox *bBox = const_cast<mitk::BoundingBox*>(m_DataTreeNode->GetData()->GetGeometry()->GetBoundingBox());
     if (bBox == NULL)
-      return 0.0;
+      return 0;
 
     mitk::PositionEvent const  *posEvent = dynamic_cast <const mitk::PositionEvent *> (stateEvent->GetEvent());
 	  if (posEvent == NULL) //2D information from a 3D window
@@ -65,7 +72,7 @@ float mitk::Interactor::CalculateJurisdiction(StateEvent const* stateEvent) cons
       vtkCamera* camera = dynamic_cast<mitk::OpenGLRenderer*>(posEvent->GetSender())->GetVtkRenderer()->GetActiveCamera();
       if (camera == NULL)
       {
-        return 0.0;
+        return 0;
       }
       float normal[3];
       camera->GetViewPlaneNormal(normal);
@@ -99,7 +106,7 @@ float mitk::Interactor::CalculateJurisdiction(StateEvent const* stateEvent) cons
       {
         //calculate the distance between the point and the BoundingBox
         //and set it in range between 0 and 0.5
-        returnvalue = 0.0;
+        returnvalue = 0;
       }
     }
 

@@ -18,7 +18,6 @@ void mitk::Mapper2D::SetGeometry3D(const mitk::Geometry3D* aGeometry3D)
     Modified();
 }
 
-//##ModelId=3E3C468102DC
 //void mitk::Mapper2D::SetDisplayGeometry(const mitk::DisplayGeometry* aDisplayGeometry)
 //{
 //    m_DisplayGeometry = aDisplayGeometry;

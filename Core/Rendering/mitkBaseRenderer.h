@@ -36,9 +36,11 @@ class BaseRenderer : public itk::Object
     //##ModelId=3D6A1791038B
     virtual void SetData(mitk::DataTreeIterator* iterator);
 
+    //##ModelId=3E6423D20245
     virtual mitk::DataTreeIterator* GetData()  const {
 		    return m_DataTreeIterator;
     };
+    //##ModelId=3E6423D20264
    mitk::RenderWindow* GetRenderWindow() const {
 		return m_RenderWindow;
 	 }
@@ -92,6 +94,7 @@ class BaseRenderer : public itk::Object
     //##ModelId=3E3D1FCA0272
     RenderWindow* m_RenderWindow;
 
+    //##ModelId=3E6423D20213
     unsigned long m_LastUpdateTime;
 };
 

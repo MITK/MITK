@@ -81,6 +81,4 @@ public:
 
 } // namespace mitk
 
-
-
 #endif /* GEOMETRY2D_H_HEADER_INCLUDED_C1F4D8E0 */

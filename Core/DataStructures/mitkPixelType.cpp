@@ -145,4 +145,3 @@ void mitk::PixelType::Initialize(ipPicType_t type, int bpe)
 
 	}
 }
-

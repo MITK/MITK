@@ -42,8 +42,6 @@ protected:
 
     //##ModelId=3E3C5C980267
     Geometry3D::ConstPointer m_Geometry3D;
-    //##ModelId=3E3C5C98028F
-  //   DisplayGeometry::ConstPointer m_DisplayGeometry;
     //##ModelId=3E33ECF20328
     int m_SliceNr;
 

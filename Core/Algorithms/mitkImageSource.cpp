@@ -261,4 +261,3 @@ vtkImageData* mitk::ImageSource::GetVtkImageData()
     Update();
     return GetOutput()->GetVtkImageData();
 }
-

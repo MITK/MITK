@@ -3,7 +3,7 @@
 #ifdef MBI_INTERNAL
 extern "C"
 {
-#include "ipDicom/ipDicom.h"
+#include "ipDicom.h"
 }
 #endif
 

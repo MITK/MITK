@@ -69,7 +69,7 @@ void mitk::HistogramGenerator::InternalCompute(itk::Image< TPixel, VImageDimensi
   histogramGenerator->SetMarginalScale( 10.0 );
   histogramGenerator->Compute();
   
-  m_Histogram = histogramGenerator->GetOutput();
+  m_Histogram = (HistogramType*)(histogramGenerator->GetOutput());
 
 }
 

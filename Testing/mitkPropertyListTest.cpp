@@ -69,6 +69,19 @@ int mitkPropertyListTest(int argc, char* argv[])
     return EXIT_FAILURE;
   }
   std::cout<<"[PASSED]"<<std::endl;
+ 
+  std::cout << "Testing MTime correctness when calling SetProperty twice: ";
+  boolProp = new mitk::BoolProperty(true);
+  propList->SetProperty("test",boolProp); 
+  tBefore = propList->GetMTime();
+  propList->SetProperty("test",boolProp); 
+  tAfter = propList->GetMTime();
+  
+  if (tBefore != tAfter) {
+    std::cout<<"[FAILED]"<<std::endl;
+    return EXIT_FAILURE;
+  }
+  std::cout<<"[PASSED]"<<std::endl;
   
 
   std::cout<<"[TEST DONE]"<<std::endl;

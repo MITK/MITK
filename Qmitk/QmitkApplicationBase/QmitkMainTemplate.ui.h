@@ -16,7 +16,7 @@
 #include <vtkPolyDataWriter.h>
 #include <vtkPImageWriter.h>
 #include <vtkPImageWriter.h>
-
+#include <map>
 #include <mitkSurfaceData.h>
 #include <mitkColorProperty.h>
 #include <mitkLevelWindowProperty.h>
@@ -46,7 +46,6 @@
 #ifdef MITK_INTERNAL
 #include <mitkDSRFileReader.h>
 #include <mitkCylindricToCartesianFilter.h>
-#include "MyvtkAblationMesh.h"
 #endif
 
 #include <mitkInteractionConst.h>
@@ -294,14 +293,69 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
 		//node->SetColor(0.0,0.9, 0.2, mitkMultiWidget->mitkWidget1->GetRenderer());
 		//node->SetColor(0.0,0.1, 0.9, mitkMultiWidget->mitkWidget3->GetRenderer());
 		node->Update();
-		mitk::SurfaceData::Pointer surfaceData = mitk::SurfaceData::New();
-		MyvtkAblationMesh  myMesh ;//= MyvtkAblationMesh::New();
-		myMesh.SetData();
-		surfaceData->SetVtkPolyData(myMesh.GetPolyData());
-        node=mitk::DataTreeNode::New();
-		node->SetData(surfaceData);
-		it->add(node);
-		node->Update();
+
+///************MeshHandle
+
+//		mitk::SurfaceData::Pointer surfaceDataHandle = mitk::SurfaceData::New();
+//		MyvtkAblationMeshHandle * myMeshHandle= MyvtkAblationMeshHandle::New();
+//		myMeshHandle->setRadius(5);
+//		myMeshHandle->setLength(100);
+//		myMeshHandle->GenerateMeshHandle();
+//
+//		surfaceDataHandle->SetVtkPolyData(myMeshHandle->GetPolyData());
+//        node=mitk::DataTreeNode::New();
+//		node->SetData(surfaceDataHandle);
+//		node->Update();
+//		it->add(node);		
+/////****************
+//
+//		mitk::SurfaceData::Pointer surfaceData = mitk::SurfaceData::New();
+//		MyvtkAblationMesh * myMesh= MyvtkAblationMesh::New();
+//		myMesh->setAngle(30);
+////		myMesh->setLength(20);
+//		
+//		//die Parametern sollten plausibel angegeben werden
+//    	myMesh->setWidthOfHead(20);
+//		myMesh->setNumberOfSectors(5);
+//		myMesh->setPartionsOfSector(1,1);
+//		myMesh->setPartionsOfSector(2,2);
+//		myMesh->setPartionsOfSector(3,3);
+//		myMesh->setPartionsOfSector(4,4);
+//		myMesh->setPartionsOfSector(5,5);
+//		myMesh->setSectorLength(1,50);
+//		myMesh->setSectorLength(2,50);
+//		myMesh->setSectorLength(3,50);
+//		myMesh->setSectorLength(4,50);
+//		myMesh->setSectorLength(5,50);
+//		myMesh->setTubeRadius(5);
+//
+//		myMesh->GenerateMesh();
+//		//Maptest****************************************
+//        int cellindex = myMesh->GetCellIndex("QE1.1");
+//		cellindex = myMesh->GetCellIndex("QE2.1");
+//		cellindex = myMesh->GetCellIndex("QE3.2");
+//		cellindex = myMesh->GetCellIndex("LE1.1");
+//		cellindex = myMesh->GetCellIndex("LE3.1");
+//		cellindex = myMesh->GetCellIndex("LE2.2");
+//        cellindex = myMesh->GetCellIndex("LE2.3");
+//		cellindex = myMesh->GetCellIndex("LE3.4");
+//		cellindex = myMesh->GetCellIndex("LE3.5");
+//		cellindex = myMesh->GetCellIndex("LE4.2");
+//		
+//
+//		myMesh->GetCellIndex("QE1.1");
+//       //Maptest*****************************************
+//
+//		surfaceData->SetVtkPolyData(myMesh->GetPolyData());
+//        node=mitk::DataTreeNode::New();
+//		node->SetData(surfaceData);
+//		bool wireframe=true;
+//		node->SetVisibility(wireframe, this->mitkMultiWidget->mitkWidget2->GetRenderer(),"wireframe");
+//		this->mitkMultiWidget->updateMitkWidgets(); 
+//		//		node->SetProperty("wireframe",true);
+//		it->add(node);
+//
+//		node->Update();
 		
 		mitk::LevelWindow levelWindow;
         reader->Update();

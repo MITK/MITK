@@ -6,7 +6,7 @@
 #include "mitkVector.h"
 
 namespace mitk {
-  class DisplayPositionEvent;
+class DisplayPositionEvent;
 
 //##Documentation
 //## @brief Interactor for Affine transformations translate, rotate and scale
@@ -19,21 +19,21 @@ class AffineInteractor : public Interactor
 public:
   mitkClassMacro(AffineInteractor,Interactor);
 
-	//##Documentation
-	//## @brief Constructor
-	//##
-	//## @params dataTreeNode is the node, this Interactor is connected to
-	//## type is the type of StateMachine like declared in the XML-Configure-File
-	//##
- 	AffineInteractor(const char * type, DataTreeNode* dataTreeNode);
+  //##Documentation
+  //## @brief Constructor
+  //##
+  //## @params dataTreeNode is the node, this Interactor is connected to
+  //## type is the type of StateMachine like declared in the XML-Configure-File
+  //##
+  AffineInteractor(const char * type, DataTreeNode* dataTreeNode);
 
   //##Documentation
-	//## @brief Destructor
+  //## @brief Destructor
   ~AffineInteractor(){};
 
 protected:
 
-	virtual bool ExecuteAction(Action* action, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId);
+  virtual bool ExecuteAction(Action* action, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId);
 
   bool CheckSelected(const mitk::Point3D& worldPoint);
   bool ConvertDisplayEventToWorldPosition(mitk::DisplayPositionEvent const* displayEvent, mitk::ITKPoint3D& worldPoint);

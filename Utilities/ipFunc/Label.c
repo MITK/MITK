@@ -345,6 +345,14 @@ ipPicDescriptor *ipFuncLabel ( ipPicDescriptor *pic_old,
 
   *no_lab = new_label;
 
+  if((new_label<=SHRT_MAX) && ( pic_new->bpe != 16 ))
+  {
+     ipPicDescriptor * tmp;
+     tmp=ipFuncConvert(pic_new, ipPicInt, 16);
+     ipPicFree(pic_new);
+     pic_new=tmp;
+  }
+
   /* free memory                                                      */
 
 

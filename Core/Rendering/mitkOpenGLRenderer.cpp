@@ -227,6 +227,11 @@ void mitk::OpenGLRenderer::Render()
   if(GetData() == NULL)
   {
     glClear(GL_COLOR_BUFFER_BIT);
+     if(m_VtkMapperPresent) {
+      //    m_MitkVtkRenderWindow->MitkRender();
+     } else
+      m_RenderWindow->swapBuffers();
+      
     return;
   }
 
@@ -349,6 +354,7 @@ void mitk::OpenGLRenderer::InitRenderer(mitk::RenderWindow* renderwindow)
 
   //we should disable vtk doublebuffering, but then it doesn't work
   //m_MitkVtkRenderWindow->SwapBuffersOff();
+
 }
 
 /*!
@@ -365,8 +371,10 @@ mitk::OpenGLRenderer::~OpenGLRenderer() {
 */
 //##ModelId=3E33145B0096
 void mitk::OpenGLRenderer::Initialize( ) {
+
   glClearColor(0.0, 0.0, 0.0, 1.0);
   glColor3f(1.0, 0.0, 0.0);
+  
 }
 
 /*!

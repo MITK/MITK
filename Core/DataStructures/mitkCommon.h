@@ -33,7 +33,7 @@ PURPOSE.  See the above copyright notices for more information.
 //#include "vtkImageData.h"
 //#include "vtkImageReslice.h"
 //
-typedef  int MapperSlotId;
+typedef  unsigned int MapperSlotId;
 //typedef	Tree<mitk::DataTreeNode::Pointer> DataTree;
 //typedef	TreeIterator<mitk::DataTreeNode::Pointer> DataTreeIteratorClone;
 

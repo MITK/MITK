@@ -230,8 +230,17 @@ void mitk::SlicedData::SetGeometry(Geometry3D* aGeometry3D)
     m_TimeSlicedGeometry = dynamic_cast<TimeSlicedGeometry*>(aGeometry3D);
     if(m_TimeSlicedGeometry==NULL)
     {
-      SlicedGeometry3D* slicedGeometry = dynamic_cast<SlicedGeometry3D*>(aGeometry3D);
-      assert(slicedGeometry!=NULL);
+      SlicedGeometry3D::Pointer slicedGeometry = dynamic_cast<SlicedGeometry3D*>(aGeometry3D);
+      if(slicedGeometry.IsNull())
+      {
+        Geometry2D* geometry2d = dynamic_cast<Geometry2D*>(aGeometry3D);
+        assert(geometry2d!=NULL);
+        slicedGeometry = SlicedGeometry3D::New();
+        slicedGeometry->Initialize(1);
+        slicedGeometry->SetGeometry2D(geometry2d, 0);
+      }
+      assert(slicedGeometry.IsNotNull());
+
       TimeSlicedGeometry::Pointer timeSlicedGeometry = TimeSlicedGeometry::New();
       m_Geometry3D = m_TimeSlicedGeometry = timeSlicedGeometry;   
       m_TimeSlicedGeometry->Initialize(1);

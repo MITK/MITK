@@ -406,7 +406,7 @@ void QmitkMainTemplate::fileExit()
 
 void QmitkMainTemplate::editUndo()
 {
-    undoController->Undo(true);//true is for fine undo
+    undoController->Undo();
 }
 
 void QmitkMainTemplate::editRedo()
@@ -416,12 +416,14 @@ void QmitkMainTemplate::editRedo()
 
 void QmitkMainTemplate::editCut()
 {
-
+    //TEST!!!
+    undoController->Undo(false);
 }
 
 void QmitkMainTemplate::editCopy()
 {
-
+    //TEST!!!!
+    undoController->Redo(false);
 }
 
 void QmitkMainTemplate::editPaste()

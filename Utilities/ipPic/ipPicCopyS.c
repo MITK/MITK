@@ -1,12 +1,13 @@
 
-/*
- * $RCSfile$
- *--------------------------------------------------------------------
- * DESCRIPTION
- *   copys a slice from a pic into a new pic
- *
- * $Log$
- * Revision 1.2  1997/09/15 13:21:11  andre
+/** @file
+ *  copys a slice from a pic into a new pic
+ */
+
+ /*$Log$
+  *Revision 1.3  2000/05/04 12:35:58  ivo
+  *some doxygen comments.
+  *
+ * Revision 1.2  1997/09/15  13:21:11  andre
  * switched to new what string format
  *
  * Revision 1.1.1.1  1997/09/06  19:09:58  andre

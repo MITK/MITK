@@ -6,7 +6,10 @@
  *   Allocates memory for a new PicDescriptor
  *
  * $Log$
- * Revision 1.3  1999/11/27 19:15:08  andre
+ * Revision 1.4  2000/05/04 12:36:00  ivo
+ * some doxygen comments.
+ *
+ * Revision 1.3  1999/11/27  19:15:08  andre
  * *** empty log message ***
  *
  * Revision 1.2  1997/09/15  13:21:16  andre

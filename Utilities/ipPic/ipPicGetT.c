@@ -6,7 +6,10 @@
  *   reads a tag from a PicFile
  *
  * $Log$
- * Revision 1.8  1999/11/28 18:21:37  andre
+ * Revision 1.9  2000/05/04 12:35:59  ivo
+ * some doxygen comments.
+ *
+ * Revision 1.8  1999/11/28  18:21:37  andre
  * *** empty log message ***
  *
  * Revision 1.7  1999/11/28  16:27:21  andre

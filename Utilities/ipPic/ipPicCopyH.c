@@ -1,19 +1,17 @@
 
-/*
- * $RCSfile$
- *--------------------------------------------------------------------
- * DESCRIPTION
- *   copys the header from a pic into a new pic
- *
- *
- *--------------------------------------------------------------------
- *  COPYRIGHT (c) 1993 by DKFZ (Dept. MBI) Heidelberg, FRG
+/** @file
+ *	copys the header from a pic into a new pic
  */
+
 #ifndef lint
   static char *what = { "@(#)ipPicCopyHeader\t\tDKFZ (Dept. MBI)\t"__DATE__"\t$Revision$" };
 #endif
 
 #include "ipPic.h"
+
+/** copys the header from a pic into a new pic
+ *
+ */
 
 ipPicDescriptor *ipPicCopyHeader( ipPicDescriptor *pic, ipPicDescriptor *pic_new )
 {

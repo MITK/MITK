@@ -1,10 +1,15 @@
 
-/*
- *--------------------------------------------------------------------
- * DESCRIPTION
- *   writes a PicStructure to memory block
- *
- * FUNCTION DECLARATION
+/** @file 
+ *  writes a PicStructure to memory block
+ */
+
+#ifndef lint
+  static char *what = { "@(#)ipPicPutMem\t\tDKFZ (Dept. MBI)\t"__DATE__"\t$Revision$" };
+#endif
+
+#include "ipPic.h" 
+
+ /** FUNCTION DECLARATION
  *  
  *
  * PARAMETERS
@@ -19,11 +24,7 @@
  *  COPYRIGHT (c) 1998 by DKFZ (Dept. MBI) Heidelberg, FRG
  */
 
-#ifndef lint
-  static char *what = { "@(#)ipPicPutMem\t\tDKFZ (Dept. MBI)\t"__DATE__"\t$Revision$" };
-#endif
 
-#include "ipPic.h"
 
 void _ipPicWriteTagsMem( _ipPicTagsElement_t *head, ipUInt1_t **mem_ptr )
 {

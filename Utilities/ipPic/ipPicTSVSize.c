@@ -1,17 +1,17 @@
-/*
- * ipPicTSVSize.c
- *---------------------------------------------------------------------
- * DESCRIPTION
+/** @file
  *  calculates the size of the TSV's value in bytes
+ */
+
+#ifndef lint
+  static char *what = { "@(#)_ipPicTSVSize\t\tDKFZ (Dept. MBI)\t"__DATE__"\t$Revision$" };
+#endif
+
+#include "ipPic.h"
+
+ /**  calculates the size of the TSV's value in bytes
+ *  @param tsv	the tsv
  *
- * FUNCTION DECLARATION
- *  ipUInt4_t _ipPicTSVSize( ipPicTSV_t *tsv )
- *
- * PARAMETERS
- *  tsv			the tsv
- *
- * RETURN VALUES
- *  the size of the tsv in bytes
+ *  @return the size of the tsv in bytes
  *
  *
  * AUTHOR & DATE
@@ -19,15 +19,8 @@
  *
  * UPDATES
  *  none
- *
- *---------------------------------------------------------------------
- * COPYRIGHT (c) 1995 by DKFZ (Dept. MBI) HEIDELBERG, FRG
  */
-#ifndef lint
-  static char *what = { "@(#)_ipPicTSVSize\t\tDKFZ (Dept. MBI)\t"__DATE__"\t$Revision$" };
-#endif
 
-#include "ipPic.h"
 
 ipUInt4_t _ipPicTSVSize( ipPicTSV_t *tsv )
 {

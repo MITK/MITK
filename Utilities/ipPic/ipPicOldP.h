@@ -6,8 +6,11 @@
  *   the old pic header
  *
  * $Log$
- * Revision 1.1  1997/09/06 19:09:59  andre
- * Initial revision
+ * Revision 1.2  2000/05/04 12:36:01  ivo
+ * some doxygen comments.
+ *
+ * Revision 1.1.1.1  1997/09/06  19:09:59  andre
+ * initial import
  *
  * Revision 0.0  1993/03/26  12:56:26  andre
  * Initial revision

@@ -7,7 +7,10 @@
  *   and swaps to the other endianess
  *
  * $Log$
- * Revision 1.3  1997/09/15 13:22:32  andre
+ * Revision 1.4  2000/05/04 12:35:57  ivo
+ * some doxygen comments.
+ *
+ * Revision 1.3  1997/09/15  13:22:32  andre
  * *** empty log message ***
  *
  * Revision 1.2  1997/09/15  13:21:09  andre

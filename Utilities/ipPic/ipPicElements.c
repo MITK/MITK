@@ -1,14 +1,8 @@
 
-/*
- * $RCSfile$
- *--------------------------------------------------------------------
- * DESCRIPTION
- *   calculates number of Elements in the data
- *
- *
- *--------------------------------------------------------------------
- *  COPYRIGHT (c) 1993 by DKFZ (Dept. MBI) Heidelberg, FRG
+/** @file 
+ *  calculates number of Elements in the data
  */
+
 #ifndef lint
   static char *what = { "@(#)_ipPicElements\t\tDKFZ (Dept. MBI)\t"__DATE__"\t$Revision$" };
 #endif

@@ -1,33 +1,22 @@
-/*
- * ipPicClone.c
- *---------------------------------------------------------------------
- * DESCRIPTION
+/** @file
  *  creates the clone of a pic
- *
- * FUNCTION DECLARATION
- *  ipPicDescriptor *ipPicClone( ipPicDescriptor *pic )
- *
- * PARAMETERS
- *   pic		the original pic
- *
- * RETURN VALUES
- *  the exact copy
- *
- *
- * AUTHOR & DATE
- *  Andre Schroeter	28.09.94
- *
- * UPDATES
- *   none
- *
- *---------------------------------------------------------------------
- * COPYRIGHT (c) 1994 by DKFZ (Dept. MBI) HEIDELBERG, FRG
  */
 #ifndef lint
   static char *what = { "@(#)ipPicClone\t\tDKFZ (Dept. MBI)\t"__DATE__"\t$Revision$" };
 #endif
 
 #include "ipPic.h"
+
+/**
+ * creates the clone of a pic
+ * @param pic		the original pic
+ *
+ * @return the exact copy
+ *
+ *
+ * AUTHOR & DATE
+ *
+ */
 
 ipPicDescriptor *ipPicClone( ipPicDescriptor *pic )
 {

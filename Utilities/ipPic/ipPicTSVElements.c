@@ -1,17 +1,17 @@
-/*
- * ipPicTSVElements.c
- *---------------------------------------------------------------------
- * DESCRIPTION
+/** @file
  *  calculates the number of elements in the TSV's value
+ */
+
+#ifndef lint
+  static char *what = { "@(#)_ipPicTSVElements\tDKFZ (Dept. MBI)\t"__DATE__"\t$Revision$" };
+#endif
+
+#include "ipPic.h"
+
+ /**  calculates the number of elements in the TSV's value
+ * @param tsv	the tsv
  *
- * FUNCTION DECLARATION
- *  ipUInt4_t _ipPicTSVElements( ipPicTSV_t *tsv )
- *
- * PARAMETERS
- *  tsv			the tsv
- *
- * RETURN VALUES
- *  the number of elements in the tsv
+ * @return the number of elements in the tsv
  *
  *
  * AUTHOR & DATE
@@ -19,15 +19,9 @@
  *
  * UPDATES
  *  none
- *
- *---------------------------------------------------------------------
- * COPYRIGHT (c) 1995 by DKFZ (Dept. MBI) HEIDELBERG, FRG
  */
-#ifndef lint
-  static char *what = { "@(#)_ipPicTSVElements\tDKFZ (Dept. MBI)\t"__DATE__"\t$Revision$" };
-#endif
 
-#include "ipPic.h"
+
 
 ipUInt4_t _ipPicTSVElements( ipPicTSV_t *tsv )
 {

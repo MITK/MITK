@@ -6,7 +6,10 @@
  *   reads the Header of a  PicFile from disk
  *
  * $Log$
- * Revision 1.6  1999/11/28 16:27:21  andre
+ * Revision 1.7  2000/05/04 12:35:59  ivo
+ * some doxygen comments.
+ *
+ * Revision 1.6  1999/11/28  16:27:21  andre
  * *** empty log message ***
  *
  * Revision 1.5  1999/11/28  00:36:09  andre

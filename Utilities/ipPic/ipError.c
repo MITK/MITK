@@ -1,27 +1,7 @@
-/*
- * ipError.c
- *---------------------------------------------------------------------
- * DESCRIPTION
- *  maps ipError_t type values to printable strings
- *
- * FUNCTION DECLARATION
- *  char *ipErrorStr( ipError_t error )
- *
- * PARAMETERS
- *   error		the error number
- *
- * RETURN VALUES
- *  the printable string
- *
- * AUTHOR & DATE
- *  Andre Schroeter	05.04.1995
- *
- * UPDATES
- *  none
- *
- *---------------------------------------------------------------------
- * COPYRIGHT (c) 1995 by DKFZ (Dept. MBI) HEIDELBERG, FRG
- */
+/** @file 
+  * maps @c ipError_t type values to printable strings
+*/
+
 #ifndef lint
   static char *what = { "@(#)ipError\t\t\tDKFZ (Dept. MBI)\t"__DATE__"\t$Revision$" };
 #endif
@@ -29,6 +9,13 @@
 #include <stdio.h>
 
 #include "ipTypes.h"
+
+/** maps ipError_t type values to printable strings
+ *  @param error	 the error number
+ *  @return the printable string
+ *
+ *  AUTHOR & DATE
+ */
 
 char *ipErrorStr( ipError_t error )
 {

@@ -6,7 +6,10 @@
  *   frees all space used by a picDescriptor
  *
  * $Log$
- * Revision 1.4  1998/09/16 18:37:34  andre
+ * Revision 1.5  2000/05/04 12:35:59  ivo
+ * some doxygen comments.
+ *
+ * Revision 1.4  1998/09/16  18:37:34  andre
  * added ipPicFreeTag
  *
  * Revision 1.3  1998/09/16  18:32:45  andre

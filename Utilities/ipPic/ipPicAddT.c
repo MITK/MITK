@@ -1,12 +1,6 @@
 
-/*
- * ipPicAddT.c
- *--------------------------------------------------------------------
- * DESCRIPTION
- *   inserts a tsv into the pic
- *
- *--------------------------------------------------------------------
- *  COPYRIGHT (c) 1994 by DKFZ (Dept. MBI) Heidelberg, FRG
+/** @file
+ *  inserts a tsv into the pic
  */
 #ifndef lint
   static char *what = { "@(#)ipPicAddTag\t\tDKFZ (Dept. MBI)\t"__DATE__"\t$Revision$" };

@@ -1,34 +1,26 @@
-/*
- * ipPicInfo.c
- *---------------------------------------------------------------------
- * DESCRIPTION
+/** @file
  *  prints information about an ipPicDescriptor
- *
- * FUNCTION DECLARATION
- *  void _ipPicInfo( FILE *stream, ipPicDescriptor *pic, ipUInt4_t flags )
- *
- * PARAMETERS
- *  stream	the output FILE*
- *  pic		the pic	
- *  flags	which information to show	
- *
- * RETURN VALUES
- *  none
- *
- * AUTHOR & DATE
- *  Andre Schroeter	03.10.94
- *
- * UPDATES
- *   none
- *
- *---------------------------------------------------------------------
- * COPYRIGHT (c) 1994 by DKFZ (Dept. MBI) HEIDELBERG, FRG
  */
+
 #ifndef lint
   static char *what = { "@(#)_ipPicInfo\t\tDKFZ (Dept. MBI)\t"__DATE__"\t$Revision$" };
 #endif
 
 #include "ipPic.h"
+
+/** prints information about an ipPicDescriptor
+ *
+ *  @param stream	the output FILE*
+ *  @param pic		the pic	
+ *  @param flags	which information to show	
+ *
+ *  @return none
+ *
+ * AUTHOR & DATE
+ *  Andre Schroeter	03.10.94
+ *
+ */
+
 
 #define INT_MAX 5
 #define ASCII_MAX 60

@@ -6,7 +6,10 @@
  *   writes a PicFile to disk
  *
  * $Log$
- * Revision 1.9  1999/11/27 19:40:44  andre
+ * Revision 1.10  2000/05/04 12:36:01  ivo
+ * some doxygen comments.
+ *
+ * Revision 1.9  1999/11/27  19:40:44  andre
  * *** empty log message ***
  *
  * Revision 1.8  1999/11/27  19:24:19  andre

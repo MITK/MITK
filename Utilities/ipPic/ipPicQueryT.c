@@ -1,36 +1,25 @@
-/*
- * ipPicQueryT.c
- *---------------------------------------------------------------------
- * DESCRIPTION
+/** @file
  *  searches for a tag
- *
- * FUNCTION DECLARATION
- *  ipPicTSV_t *ipPicQueryTag( ipPicDescriptor *pic, char *tag )
- *  _ipPicTagsElement_t *_ipPicFindTag( _ipPicTagsElement_t *head, char *tag )
- *
- * PARAMETERS
- *  pic			the pic
- *  tag			the tag to search for
- *  head		the head of the tags list
- *
- * RETURN VALUES
- *  
- *  
+ */
+
+#ifndef lint
+  static char *what = { "@(#)ipPicQueryTag\t\tDKFZ (Dept. MBI)\t"__DATE__"\t$Revision$" };
+#endif
+
+#include "ipPic.h"
+
+/** searches for a tag
+ * 
+ * @param pic	the pic
+ * @param tag	the tag to search for
+ * @param head	the head of the tags list
  *
  * AUTHOR & DATE
  *  Andre Schroeter	27.08.94
  *
  * UPDATES
  *  none
- *
- *---------------------------------------------------------------------
- * COPYRIGHT (c) 1994 by DKFZ (Dept. MBI) HEIDELBERG, FRG
  */
-#ifndef lint
-  static char *what = { "@(#)ipPicQueryTag\t\tDKFZ (Dept. MBI)\t"__DATE__"\t$Revision$" };
-#endif
-
-#include "ipPic.h"
 
 ipPicTSV_t *
 ipPicQueryTag( ipPicDescriptor *pic, char *tag )

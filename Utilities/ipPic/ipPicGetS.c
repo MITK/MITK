@@ -6,7 +6,10 @@
  *   reads a slice from a PicFile
  *
  * $Log$
- * Revision 1.2  1997/09/15 13:21:14  andre
+ * Revision 1.3  2000/05/04 12:35:59  ivo
+ * some doxygen comments.
+ *
+ * Revision 1.2  1997/09/15  13:21:14  andre
  * switched to new what string format
  *
  * Revision 1.1.1.1  1997/09/06  19:09:59  andre

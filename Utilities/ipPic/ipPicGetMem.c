@@ -1,8 +1,13 @@
 
-/*
- *--------------------------------------------------------------------
- * DESCRIPTION
- *   creates a PicStructure from memory block
+/** @file 
+ * creates a PicStructure from memory block
+ */
+#ifndef lint
+  static char *what = { "@(#)ipPicGetMem\t\tDKFZ (Dept. MBI)\t"__DATE__"\t$Revision$" };
+#endif
+
+#include "ipPic.h"
+/** creates a PicStructure from memory block
  *
  * FUNCTION DECLARATION
  *  
@@ -13,17 +18,9 @@
  * AUTHOR & DATE
  *  Harald Evers   15.7.98
  *
- * UPDATES
- *
- *--------------------------------------------------------------------
- *  COPYRIGHT (c) 1998 by DKFZ (Dept. MBI) Heidelberg, FRG
  */
 
-#ifndef lint
-  static char *what = { "@(#)ipPicGetMem\t\tDKFZ (Dept. MBI)\t"__DATE__"\t$Revision$" };
-#endif
 
-#include "ipPic.h"
 
 ipPicDescriptor *ipPicGetMem( ipUInt1_t *mem_pic )
 {

@@ -1,18 +1,16 @@
 
-/*
- * ipPicDelT.c
- *--------------------------------------------------------------------
- * DESCRIPTION
- *   inserts a tsv into the pic
- *
- *--------------------------------------------------------------------
- *  COPYRIGHT (c) 1994 by DKFZ (Dept. MBI) Heidelberg, FRG
+/** @file
+ *   deletes a tsv from the pic
  */
 #ifndef lint
   static char *what = { "@(#)ipPicDelTag\t\tDKFZ (Dept. MBI)\t"__DATE__"\t$Revision$" };
 #endif
 
 #include "ipPic.h"
+/**  deletes a tsv from the pic
+ */
+
+
 
 static ipPicTSV_t *_ipPicRemoveTag( _ipPicTagsElement_t **head,
                                     _ipPicTagsElement_t *which,

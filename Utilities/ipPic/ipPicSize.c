@@ -1,12 +1,22 @@
+/** @file 
+ *  calculates the size of the image data
+ */
 
-/*
- * $RCSfile$
- *--------------------------------------------------------------------
- * DESCRIPTION
- *   calculates the size of the image data
+#ifndef lint
+  static char *what = { "@(#)_ipPicSize\t\tDKFZ (Dept. MBI)\t"__DATE__"\t$Revision$" };
+#endif
+
+#include "ipPic.h"
+
+/** calculates the size of the image data
+ *  @param pic pointer to image
+ *  @return size of image data
  *
  * $Log$
- * Revision 1.2  1997/09/15 13:21:20  andre
+ * Revision 1.3  2000/05/04 12:36:01  ivo
+ * some doxygen comments.
+ *
+ * Revision 1.2  1997/09/15  13:21:20  andre
  * switched to new what string format
  *
  * Revision 1.1.1.1  1997/09/06  19:09:59  andre
@@ -14,16 +24,7 @@
  *
  * Revision 0.0  1993/04/26  15:28:03  andre
  * Initial revision, NO error checking
- *
- *
- *--------------------------------------------------------------------
- *  COPYRIGHT (c) 1993 by DKFZ (Dept. MBI) Heidelberg, FRG
  */
-#ifndef lint
-  static char *what = { "@(#)_ipPicSize\t\tDKFZ (Dept. MBI)\t"__DATE__"\t$Revision$" };
-#endif
-
-#include "ipPic.h"
 
 ipUInt4_t _ipPicSize(
 #if defined(__cplusplus) || defined(c_plusplus)

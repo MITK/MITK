@@ -7,7 +7,10 @@
  *   between different machine representations
  *
  * $Log$
- * Revision 1.5  1999/11/27 23:59:45  andre
+ * Revision 1.6  2000/05/04 12:35:57  ivo
+ * some doxygen comments.
+ *
+ * Revision 1.5  1999/11/27  23:59:45  andre
  * *** empty log message ***
  *
  * Revision 1.4  1999/11/27  19:15:08  andre

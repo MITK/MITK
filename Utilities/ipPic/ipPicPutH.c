@@ -1,13 +1,8 @@
 
-/*
- * $RCSfile$
- *--------------------------------------------------------------------
- * DESCRIPTION
- *   writes a PicFile Header to disk
- *
- *--------------------------------------------------------------------
- *  COPYRIGHT (c) 1993 by DKFZ (Dept. MBI) Heidelberg, FRG
+/** @file 
+ *  writes a PicFile Header to disk
  */
+
 #ifndef lint
   static char *what = { "@(#)ipPicPutHeader\t\tDKFZ (Dept. MBI)\t"__DATE__"\t$Revision$" };
 #endif
@@ -30,7 +25,7 @@ void ipPicPutHeader( char *outfile_name, ipPicDescriptor *pic )
   if( outfile == NULL )
     {
       /*ipPrintErr( "ipPicPut: sorry, error opening outfile\n" );*/
-      return();
+      return;
     }
 
   len =          3 * sizeof(ipUInt4_t)

@@ -1,5 +1,6 @@
 #include "DataTreeNode.h"
 #include "MapperFactory.h"
+#include <vtkTransform.h>
 
 //##ModelId=3D6A0E8C02CC
 mitk::Mapper* mitk::DataTreeNode::GetMapper(MapperSlotId id) const
@@ -28,12 +29,20 @@ mitk::BaseData* mitk::DataTreeNode::GetData() const
   return m_Data;
 }
 
-
+//##ModelId=3ED91D050121
+vtkTransform* mitk::DataTreeNode::GetVtkTransform() const
+{
+  return m_VtkTransform;
+}
 
 //##ModelId=3E33F4E4025B
 void mitk::DataTreeNode::SetData(mitk::BaseData* baseData)
 {
-    m_Data=baseData;
+	if(m_Data!=baseData)
+	{
+		m_Data=baseData;
+		Modified();
+	}
 }
 
 //##ModelId=3E33F5D702AA
@@ -42,13 +51,15 @@ mitk::DataTreeNode::DataTreeNode() : m_Data(NULL)
     memset(mappers, 0, sizeof(mappers)); 
 
     m_PropertyList = PropertyList::New();
+
+	m_VtkTransform = vtkTransform::New();
 }
 
 
 //##ModelId=3E33F5D702D3
 mitk::DataTreeNode::~DataTreeNode()
 {
-
+	m_VtkTransform->Delete();
 }
 
 //##ModelId=3E33F5D7032D

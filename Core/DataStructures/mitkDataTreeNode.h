@@ -17,12 +17,16 @@
 
 #include "PropertyList.h"
 
+class vtkTransform;
+
 namespace mitk {
 
 //##ModelId=3E031E2C0143
 //##Documentation
-//## Contains the data (instance of BaseData) and a list of mappers, which can
-//## draw the data.
+//## @brief Class for nodes of the DataTree
+//## Contains the data (instance of BaseData), a list of mappers, which can
+//## draw the data, a transform (vtkTransform) and a list of properties
+//## (PropertyList).
 class DataTreeNode : public BaseData
 {
 public:
@@ -34,6 +38,9 @@ public:
 	mitk::Mapper* GetMapper(MapperSlotId id) const;
 	//##ModelId=3E32C49D00A8
 	BaseData* GetData() const;
+    //##ModelId=3ED91D050121
+	vtkTransform* GetVtkTransform() const;
+
     //##ModelId=3E33F4E4025B
     virtual void SetData(mitk::BaseData* baseData);
     //##ModelId=3E33F5D7032D
@@ -70,15 +77,19 @@ protected:
     //##ModelId=3E33F5D702D3
     virtual ~DataTreeNode();
 
-	//TODO: change to stl-vector
+	//@todo change to stl-vector
 	//##ModelId=3D6A0F8C0202
     mutable mitk::Mapper::Pointer mappers[10];
+
+    //##ModelId=3ED91D0500D3
+	mutable vtkTransform* m_VtkTransform;
 
 	//##ModelId=3E32C49D0095
     BaseData::Pointer m_Data;
 
     //##ModelId=3E861B84033C
     PropertyList::Pointer m_PropertyList;
+
 };
 
 

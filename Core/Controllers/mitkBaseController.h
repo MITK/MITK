@@ -4,7 +4,6 @@
 #include "mitkCommon.h"
 #include "Navigator.h"
 #include "Stepper.h"
-#include "mitkRenderWindow.h"
 #include <itkObjectFactory.h>
 
 namespace mitk {

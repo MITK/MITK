@@ -3,6 +3,7 @@
 
 #include "mitkCommon.h"
 #include "BaseController.h"
+#include "mitkEventTypedefs.h"
 
 namespace mitk {
 

@@ -50,7 +50,7 @@ ipPicDescriptor *ipPicGetMem( ipUInt1_t *mem_pic )
   mem_ptr += sizeof(ipUInt4_t);
   memcpy( &(pic->dim),  mem_ptr, sizeof(ipUInt4_t) );
   mem_ptr += sizeof(ipUInt4_t);
-  memcpy( &(pic->n),  mem_ptr, sizeof(ipUInt4_t) );
+  memcpy( &(pic->n),  mem_ptr, pic->dim * sizeof(ipUInt4_t) );
   mem_ptr += pic->dim*sizeof(ipUInt4_t);
 
   to_read = len -        3 * sizeof(ipUInt4_t)

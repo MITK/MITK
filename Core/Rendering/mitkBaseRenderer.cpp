@@ -35,7 +35,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkStatusBar.h"
 #include "mitkInteractionConst.h"
 
-#include <vtkTransform.h>
+#include <vtkLinearTransform.h>
 
 //##ModelId=3E3D2F120050
 mitk::BaseRenderer::BaseRenderer() : 

@@ -27,7 +27,7 @@ PURPOSE.  See the above copyright notices for more information.
 class vtkCutter;
 class vtkPlane;
 class vtkLookupTable;
-class vtkTransform;
+class vtkLinearTransform;
 
 
 namespace mitk {
@@ -68,7 +68,7 @@ public:
   //## @sa SetSurface
   itkGetConstObjectMacro(Surface, Surface);
 
-  void PaintCells(vtkPolyData* contour, const Geometry2D* worldGeometry, const DisplayGeometry* displayGeometry, vtkTransform * vtktransform, vtkLookupTable *lut = NULL);
+  void PaintCells(vtkPolyData* contour, const Geometry2D* worldGeometry, const DisplayGeometry* displayGeometry, vtkLinearTransform * vtktransform, vtkLookupTable *lut = NULL);
 protected:
   //##ModelId=3EF180540006
   SurfaceMapper2D();

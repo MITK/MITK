@@ -35,7 +35,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkAbstractTransformGeometry.h"
 
 #include <vtkImageReslice.h>
-#include <vtkTransform.h>
+#include <vtkLinearTransform.h>
 #include <vtkMatrix4x4.h>
 #include <vtkLookupTable.h>
 #include <vtkImageData.h>
@@ -170,6 +170,9 @@ void mitk::ImageMapper2D::GenerateData(mitk::BaseRenderer *renderer)
 
   assert(worldgeometry!=NULL);
 
+  if(worldgeometry->IsValid()==false)
+    return;
+
   int timestep=0;
   ScalarType time = worldgeometry->GetTimeBoundsInMS()[0];
   if(time>-ScalarTypeNumericTraits::max())
@@ -221,7 +224,7 @@ void mitk::ImageMapper2D::GenerateData(mitk::BaseRenderer *renderer)
     //inplane = v-normal*(v*normal);
     //origin -= inplane;
 
-    vtkTransform * vtktransform = GetDataTreeNode()->GetVtkTransform();
+    vtkLinearTransform * vtktransform = GetDataTreeNode()->GetVtkTransform();
           
     vtkLinearTransform * inversetransform = vtktransform->GetLinearInverse();
     m_Reslicer->SetResliceTransform(inversetransform); 

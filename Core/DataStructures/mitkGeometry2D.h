@@ -23,8 +23,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkCommon.h"
 #include "mitkGeometry3D.h"
 
-class vtkTransform;
-
 namespace mitk {
 
 //##ModelId=3DDE4DEC0291

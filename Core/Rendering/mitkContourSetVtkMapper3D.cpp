@@ -34,7 +34,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkAssembly.h>
 #include <vtkProp3DCollection.h>
 #include <vtkRenderer.h>
-#include <vtkTransform.h>
+#include <vtkLinearTransform.h>
 #include <vtkTubeFilter.h>
 #include <vtkPolygon.h>
 

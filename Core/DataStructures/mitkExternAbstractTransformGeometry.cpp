@@ -18,7 +18,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include "mitkExternAbstractTransformGeometry.h"
-#include <vtkTransform.h>
 #include <vtkAbstractTransform.h>
 
 mitk::ExternAbstractTransformGeometry::ExternAbstractTransformGeometry()

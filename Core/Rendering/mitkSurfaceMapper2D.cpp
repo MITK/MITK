@@ -37,7 +37,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkCellData.h>
 #include <vtkDataArray.h>
 #include <vtkPolyData.h>
-#include <vtkTransform.h>
 #include <vtkLinearTransform.h>
 
 //##ModelId=3EF180540006
@@ -125,7 +124,7 @@ void mitk::SurfaceMapper2D::Paint(mitk::BaseRenderer * renderer)
     Point3D point;
     Vector3D normal;
 
-    vtkTransform * vtktransform = GetDataTreeNode()->GetVtkTransform();
+    vtkLinearTransform * vtktransform = GetDataTreeNode()->GetVtkTransform();
     if(worldPlaneGeometry.IsNotNull())
     {
       // set up vtkPlane according to worldGeometry
@@ -194,7 +193,7 @@ void mitk::SurfaceMapper2D::Paint(mitk::BaseRenderer * renderer)
   }
 }
 
-void mitk::SurfaceMapper2D::PaintCells(vtkPolyData* contour, const mitk::Geometry2D* worldGeometry, const mitk::DisplayGeometry* displayGeometry, vtkTransform * vtktransform, vtkLookupTable *lut)
+void mitk::SurfaceMapper2D::PaintCells(vtkPolyData* contour, const mitk::Geometry2D* worldGeometry, const mitk::DisplayGeometry* displayGeometry, vtkLinearTransform * vtktransform, vtkLookupTable *lut)
 {
   vtkPoints    *vpoints = contour->GetPoints();
   vtkCellArray *vpolys  = contour->GetLines();

@@ -44,6 +44,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkWeakPointerProperty.h"
 #include <vtkActor.h>
 #include <vtkImageData.h>
+#include <vtkLinearTransform.h>
 
 #include "pic2vtk.h"
 
@@ -128,6 +129,7 @@ void mitk::Geometry2DDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
       )
     {
       surfaceCreator = mitk::Geometry2DDataToSurfaceFilter::New();
+      surfaceCreator->PlaceByGeometryOn();
       surfacecreatorprop=new mitk::SmartPointerProperty(surfaceCreator);
       GetDataTreeNode()->SetProperty("surfacegeometry", surfacecreatorprop);
     }
@@ -210,5 +212,6 @@ void mitk::Geometry2DDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
 
     //apply properties read from the PropertyList
     ApplyProperties(m_Actor, renderer);
+    m_Prop3D->SetUserTransform(GetDataTreeNode()->GetVtkTransform());
   }
 }

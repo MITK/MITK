@@ -25,7 +25,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkPlaneGeometry.h"
 #include "itkVtkAbstractTransform.h"
 
-class vtkTransform;
 class vtkAbstractTransform;
 
 namespace mitk {

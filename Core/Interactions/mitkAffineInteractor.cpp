@@ -188,12 +188,7 @@ bool mitk::AffineInteractor::ExecuteAction(Action* action, mitk::StateEvent cons
       mitk::PointOperation* doOp = new mitk::PointOperation(OpMOVE, newPosition, 0); // Index is not used here
       if (m_UndoEnabled)	//write to UndoMechanism
       {
-        mitk::ScalarType pos[3];
-        geometry->GetVtkTransform()->GetPosition(pos);
-        mitk::Point3D oldPosition;
-        oldPosition[0] = pos[0];
-        oldPosition[1] = pos[1];
-        oldPosition[2] = pos[2];
+        mitk::Point3D oldPosition=geometry->GetCornerPoint(0);
 
         PointOperation* undoOp = new mitk::PointOperation(OpMOVE, oldPosition, 0);
         OperationEvent *operationEvent = new OperationEvent(geometry, doOp, undoOp);
@@ -218,9 +213,7 @@ bool mitk::AffineInteractor::ExecuteAction(Action* action, mitk::StateEvent cons
       }
       mitk::Vector3D newPosition = p.GetVectorFromOrigin();
 
-      mitk::ScalarType position[3];
-      geometry->GetVtkTransform()->GetPosition(position);
-      mitk::Vector3D dataPosition = position;
+      mitk::Point3D dataPosition = geometry->GetCenter();
 
       newPosition -= dataPosition;  // calculate vector from center of the data object to the current mouse position
 
@@ -237,11 +230,11 @@ bool mitk::AffineInteractor::ExecuteAction(Action* action, mitk::StateEvent cons
       m_LastMousePosition = p; // save current mouse position as last mouse position
 
       /* create operation with center of rotation, angle and axis and send it to the geometry and Undo controller */
-      mitk::RotationOperation* doOp = new mitk::RotationOperation(OpROTATE, Point3D(position) , rotationaxis, angle);
+      mitk::RotationOperation* doOp = new mitk::RotationOperation(OpROTATE, dataPosition, rotationaxis, angle);
 
       if (m_UndoEnabled)	//write to UndoMechanism
       {
-        RotationOperation* undoOp = new mitk::RotationOperation(OpROTATE, Point3D(position) , rotationaxis, -angle);
+        RotationOperation* undoOp = new mitk::RotationOperation(OpROTATE, dataPosition, rotationaxis, -angle);
         OperationEvent *operationEvent = new OperationEvent(geometry, doOp, undoOp);
         m_UndoController->SetOperationEvent(operationEvent);
       }

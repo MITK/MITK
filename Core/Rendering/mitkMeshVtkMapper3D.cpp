@@ -16,15 +16,15 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-
 #include "mitkMeshVtkMapper3D.h"
 #include "mitkDataTreeNode.h"
 #include "mitkProperties.h"
 //#include "mitkStringProperty.h"
 //#include "mitkColorProperty.h"
 #include "mitkOpenGLRenderer.h"
+#ifndef VCL_VC60
 #include "mitkMeshUtil.h"
-
+#endif
 
 #include <vtkActor.h>
 #include <vtkFollower.h>
@@ -137,7 +137,11 @@ void mitk::MeshVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
   if(mesh->GetNumberOfCells()>0)
   {
     // build m_Contour vtkPolyData
+#ifdef VCL_VC60
+    itkExceptionMacro(<<"MeshVtkMapper3D currently not working for MS Visual C++ 6.0, because MeshUtils are currently not supported.");
+#else
     m_Contour = MeshUtil<mitk::Mesh::MeshType>::MeshToPolyData(mesh.GetPointer(), false, false, m_Contour);
+#endif
 
     if(m_Contour->GetNumberOfCells()>0)
     {

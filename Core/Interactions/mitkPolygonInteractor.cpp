@@ -25,7 +25,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkMesh.h>
 #include <mitkAction.h>
 #include <mitkProperties.h>
-#include <vtkTransform.h>
+#include <vtkLinearTransform.h>
 
 
 mitk::PolygonInteractor::PolygonInteractor(const char * type, DataTreeNode* dataTreeNode)

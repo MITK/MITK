@@ -18,7 +18,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include "mitkPlaneGeometry.h"
-#include <vtkTransform.h>
 #include <vnl/vnl_cross.h>
 
 //##ModelId=3E395F22035A
@@ -61,9 +60,9 @@ void mitk::PlaneGeometry::SetIndexToWorldTransform(mitk::AffineTransform3D* tran
   vtk2itk(m_IndexToWorldTransform->GetOffset(), m_Origin);
 }
 
-void mitk::PlaneGeometry::TransferVtkToITKTransform()
+void mitk::PlaneGeometry::TransferVtkToItkTransform()
 {
-  Superclass::TransferVtkToITKTransform();
+  Superclass::TransferVtkToItkTransform();
 
   vtk2itk(m_IndexToWorldTransform->GetOffset(), m_Origin);
 }

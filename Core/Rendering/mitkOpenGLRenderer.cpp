@@ -34,7 +34,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkLight.h>
 #include <vtkLightKit.h>
 #include <vtkRenderWindow.h>
-#include <vtkTransform.h>
+#include <vtkLinearTransform.h>
 #include <vtkCamera.h>
 #include <vtkWorldPointPicker.h>
 

@@ -28,7 +28,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkRenderer.h>
 #include <mitkOpenGLRenderer.h>
 #include "mitkInteractionConst.h"
-#include <vtkTransform.h>
+#include <vtkLinearTransform.h>
 #include <itkVector.h>
 #include <mitkModeOperation.h>
 

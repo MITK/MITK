@@ -4,7 +4,6 @@
 #include "mitkCommon.h"
 #include "itkTransform.h"
 
-class vtkTransform;
 class vtkAbstractTransform;
 
 namespace itk {

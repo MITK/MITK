@@ -30,7 +30,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkEventMapper.h>
 #include <mitkLineOperation.h>
 #include <mitkProperties.h>
-#include <vtkTransform.h>
+#include <vtkLinearTransform.h>
 #include <mitkLine.h>
 #include <mitkPointSet.h>
 

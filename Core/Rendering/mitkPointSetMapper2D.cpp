@@ -23,7 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkPlaneGeometry.h"
 #include "mitkColorProperty.h"
 #include "mitkProperties.h"
-#include <vtkTransform.h>
+#include <vtkLinearTransform.h>
 #include "mitkStringProperty.h"
 
 #include <GL/glut.h>
@@ -69,7 +69,7 @@ void mitk::PointSetMapper2D::Paint(mitk::BaseRenderer * renderer)
       //apply color and opacity read from the PropertyList
       ApplyProperties(renderer);
 
-      vtkTransform* transform = GetDataTreeNode()->GetVtkTransform();
+      vtkLinearTransform* transform = GetDataTreeNode()->GetVtkTransform();
 
       //List of the Points
       PointSet::DataType::PointsContainerConstIterator it, end;

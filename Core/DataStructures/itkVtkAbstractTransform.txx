@@ -1,5 +1,4 @@
 #include "itkVtkAbstractTransform.h"
-#include <vtkTransform.h>
 #include <vtkAbstractTransform.h>
 #include <mitkVector.h>
 
@@ -85,7 +84,7 @@ TransformVector(const InputVectorType &vect) const
   vnl_vector<TScalarType> vnl_vec;
   float vtkpt[3]={0,0,0};
   float vtkvec[3];
-  mitk::vnl2vtk(vect.Get_vnl_vector(), vtkvec);
+  mitk::vnl2vtk<TScalarType, float>(vect.Get_vnl_vector(), vtkvec);
   m_VtkAbstractTransform->TransformVectorAtPoint(vtkpt, vtkvec, vtkvec);
   mitk::vtk2itk(vtkvec, outputvector);
   return outputvector;
@@ -103,9 +102,9 @@ TransformVector(const InputVnlVectorType &vect) const
   OutputVnlVectorType outputvector;
   float vtkpt[3]={0,0,0};
   float vtkvec[3];
-  mitk::vnl2vtk(vect, vtkvec);
+  mitk::vnl2vtk<TScalarType, float>(vect, vtkvec);
   m_VtkAbstractTransform->TransformVectorAtPoint(vtkpt, vtkvec, vtkvec);
-  mitk::vtk2vnl(vtkvec, outputvector);
+  mitk::vtk2itk(vtkvec, outputvector);
   return outputvector;
 }
 
@@ -175,7 +174,7 @@ BackTransform(const OutputVnlVectorType &vect ) const
   float vtkvec[3];
   mitk::itk2vtk(vect, vtkvec);
   m_InverseVtkAbstractTransform->TransformVectorAtPoint(vtkpt, vtkvec, vtkvec);
-  mitk::vtk2vnl(vtkvec, outputvector);
+  mitk::vtk2itk(vtkvec, outputvector);
   return outputvector;
 }
 

@@ -25,8 +25,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkLine.h"
 #include <vnl/vnl_cross.h>
 
-class vtkTransform;
-
 namespace mitk {
 
 
@@ -64,6 +62,7 @@ public:
       m_Origin = origin;
       m_IndexToWorldTransform->SetOffset(m_Origin.GetVectorFromOrigin());
       Modified();
+      TransferItkToVtkTransform();
     }
   }
 
@@ -422,7 +421,7 @@ public:
 
   virtual void SetIndexToWorldTransform(mitk::AffineTransform3D* transform);
 
-  virtual void TransferVtkToITKTransform();
+  virtual void TransferVtkToItkTransform();
 
   virtual void SetBounds(const BoundingBox::BoundsArrayType& bounds);
 

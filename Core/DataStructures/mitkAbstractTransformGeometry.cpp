@@ -18,7 +18,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include "mitkAbstractTransformGeometry.h"
-#include <vtkTransform.h>
 #include <vtkAbstractTransform.h>
 
 //##ModelId=3EF4A266029C

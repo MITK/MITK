@@ -24,7 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkColorProperty.h"
 #include "mitkProperties.h"
 
-#include <vtkTransform.h>
+#include <vtkLinearTransform.h>
 #include <GL/glut.h>
 
 #include <algorithm>
@@ -77,7 +77,7 @@ void mitk::MeshMapper2D::Paint(mitk::BaseRenderer * renderer)
     //apply color and opacity read from the PropertyList
     ApplyProperties(renderer);
 
-    vtkTransform* transform = GetDataTreeNode()->GetVtkTransform();
+    vtkLinearTransform* transform = GetDataTreeNode()->GetVtkTransform();
 
     //List of the Points
     Mesh::DataType::PointsContainerConstIterator it, end;

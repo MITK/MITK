@@ -115,6 +115,7 @@ void mitk::Geometry2DDataMapper2D::Paint(mitk::BaseRenderer * renderer)
       {
         surfaceCreator = mitk::Geometry2DDataToSurfaceFilter::New();
         surfacecreatorprop=new mitk::SmartPointerProperty(surfaceCreator);
+        surfaceCreator->PlaceByGeometryOn();
         GetDataTreeNode()->SetProperty("surfacegeometry", surfacecreatorprop);
       }
       

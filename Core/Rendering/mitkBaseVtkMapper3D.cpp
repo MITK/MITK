@@ -22,7 +22,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkProp3D.h>
 #include <vtkActor.h>
 #include <vtkProperty.h>
-#include <vtkTransform.h>
 #include <vtkLinearTransform.h>
 
 //##ModelId=3E3424950213

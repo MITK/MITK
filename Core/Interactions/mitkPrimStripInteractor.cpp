@@ -22,7 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkPositionEvent.h>
 #include <mitkDataTreeNode.h>
 #include <mitkMesh.h>
-#include <vtkTransform.h>
+#include <vtkLinearTransform.h>
 #include <mitkAction.h>
 #include <mitkLineOperation.h>
 #include <mitkProperties.h>

@@ -22,7 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkPlaneGeometry.h"
 #include "mitkColorProperty.h"
 #include "mitkProperties.h"
-#include <vtkTransform.h>
+#include <vtkLinearTransform.h>
 
 #include <GL/glut.h>
 
@@ -53,7 +53,7 @@ void mitk::ContourMapper2D::Paint(mitk::BaseRenderer * renderer)
     //apply color and opacity read from the PropertyList
     ApplyProperties(renderer);
 
-    vtkTransform* transform = GetDataTreeNode()->GetVtkTransform();
+    vtkLinearTransform* transform = GetDataTreeNode()->GetVtkTransform();
 
     //    Contour::OutputType point;
     Contour::BoundingBoxType::PointType point;

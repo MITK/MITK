@@ -35,7 +35,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkTubeFilter.h>
 #include <vtkVectorText.h>
 #include <vtkTextSource.h>
-#include <vtkTransform.h>
+#include <vtkLinearTransform.h>
 #include <vtkTransformPolyDataFilter.h>
 
 

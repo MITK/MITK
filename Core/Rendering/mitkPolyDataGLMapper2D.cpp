@@ -39,7 +39,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkCellData.h>
 #include <vtkDataArray.h>
 #include <vtkPolyData.h>
-#include <vtkTransform.h>
 #include <vtkLinearTransform.h>
 #include <vtkActor.h>
 #include <vtkPolyDataMapper.h>
@@ -63,7 +62,7 @@ void mitk::PolyDataGLMapper2D::Paint( mitk::BaseRenderer * renderer )
     assert( vtkpolydata );
 
 
-    vtkTransform * vtktransform = GetDataTreeNode() ->GetVtkTransform();
+    vtkLinearTransform * vtktransform = GetDataTreeNode() ->GetVtkTransform();
     vtkLinearTransform * inversetransform = vtktransform->GetLinearInverse();
 
     Geometry2D::ConstPointer worldGeometry = renderer->GetCurrentWorldGeometry2D();

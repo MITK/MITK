@@ -18,7 +18,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include "mitkTimeSlicedGeometry.h"
-#include <vtkTransform.h>
 
 mitk::Geometry3D* mitk::TimeSlicedGeometry::GetGeometry3D(int t) const
 {

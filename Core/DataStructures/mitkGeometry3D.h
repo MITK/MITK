@@ -25,8 +25,11 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkAffineGeometryFrame.h>
 #include "mitkOperationActor.h"
 #include <itkBoundingBox.h>
+#include <itkIndex.h>
 
-class vtkTransform;
+class vtkLinearTransform;
+class vtkMatrixToLinearTransform;
+class vtkMatrix4x4;
 class Operation;
 
 namespace mitk {
@@ -72,6 +75,7 @@ public:
   itkNewMacro(Self);
 
   virtual void SetFloatBounds(const float bounds[6]);
+  virtual void SetFloatBounds(const double bounds[6]);
 
   //##Documentation
   //## @brief Get the parametric bounding-box
@@ -215,10 +219,12 @@ public:
   //## @note This changes the matrix in the transform, @a not the bounds, which are given in units!
   virtual void SetExtentInMM(int direction, ScalarType extentInMM);
 
-  vtkTransform* GetVtkTransform() const
+  vtkLinearTransform* GetVtkTransform() const
   {
-    return m_VtkIndexToWorldTransform;
+    return (vtkLinearTransform*)m_VtkIndexToWorldTransform;
   }
+
+  virtual void Translate(const Vector3D & vector);
 
   itkGetConstObjectMacro(ParametricTransform, mitk::Transform3D);
 
@@ -234,9 +240,10 @@ public:
   //##ModelId=3E3B987503A3
   void IndexToWorld(const mitk::Point3D &atPt3d_units, const mitk::Vector3D &vec_units, mitk::Vector3D &vec_mm) const;
 
-  template <typename TIndexType>
-  void WorldToIndex(const mitk::Point3D &pt_mm, TIndexType &index) const
+  template <unsigned int VIndexDimension>
+     void WorldToIndex(const mitk::Point3D &pt_mm, itk::Index<VIndexDimension> &index) const
   {
+    typedef itk::Index<VIndexDimension> IndexType;
     mitk::Point3D pt_units;
     WorldToIndex(pt_mm, pt_units);
     int i, dim=index.GetIndexDimension();
@@ -246,7 +253,7 @@ public:
       dim=3;
     }
     for(i=0;i<3;++i)
-      index[i]=(typename TIndexType::IndexValueType)pt_units[i];
+      index[i]=(typename IndexType::IndexValueType)pt_units[i];
   }
 
   //##ModelId=3E3453C703AF
@@ -280,7 +287,9 @@ public:
 
   void TransferItkToVtkTransform();
 
-  void TransferVtkToITKTransform();
+  virtual void TransferVtkToItkTransform();
+
+  virtual void SetIndexToWorldTransformByVtkMatrix(vtkMatrix4x4* vtkmatrix);
 
   //##Documentation
   //## @brief Calculates a bounding-box around the geometry relative 
@@ -338,7 +347,7 @@ protected:
 
   mutable mitk::TimeBounds m_TimeBoundsInMS;
 
-  vtkTransform* m_VtkIndexToWorldTransform;
+  vtkMatrix4x4* m_VtkMatrix;
   
   mitk::Transform3D::Pointer m_ParametricTransform;
 
@@ -355,6 +364,7 @@ protected:
 
 private:
   float m_FloatSpacing[3];
+  vtkMatrixToLinearTransform* m_VtkIndexToWorldTransform;
 };
 
 } // namespace mitk

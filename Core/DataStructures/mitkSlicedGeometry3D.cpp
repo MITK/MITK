@@ -19,7 +19,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkSlicedGeometry3D.h"
 #include "mitkPlaneGeometry.h"
-#include <vtkTransform.h> 
 
 #ifdef MBI_INTERNAL
 extern "C"

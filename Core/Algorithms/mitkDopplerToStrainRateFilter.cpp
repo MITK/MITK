@@ -23,6 +23,7 @@ void mitk::DopplerToStrainRateFilter::GenerateOutputInformation()
 	for(i=0;i<input->GetDimension();++i)
 		tmpDimensions[i]=input->GetDimension(i);
 
+  //@todo maybe we should shift the following somehow in ImageToImageFilter
 	output->Initialize(input->GetPixelType(),
 										input->GetDimension(),
 										tmpDimensions,
@@ -30,23 +31,10 @@ void mitk::DopplerToStrainRateFilter::GenerateOutputInformation()
 
     output->GetSlicedGeometry()->SetSpacing(input->GetSlicedGeometry()->GetSpacing());
 
-	// initialize the spacing of the output
-	// @todo position of input image is not yet used to calculate position of the output
-    //mitk::Point3D origin, right, bottom;
-    //origin.set(0,0,0);                output->GetGeometry()->UnitsToMM(origin, origin);
-    //right.set(tmpDimensions[0],0,0);  output->GetGeometry()->UnitsToMM(right, right);
-    //bottom.set(0,tmpDimensions[1],0); output->GetGeometry()->UnitsToMM(bottom, bottom);
-
-    //PlaneView view_std(origin, right, bottom);
-
-    //mitk::PlaneGeometry::Pointer planegeometry=mitk::PlaneGeometry::New();
-    //planegeometry->SetPlaneView(view_std);
-    //planegeometry->SetThicknessBySpacing(input->GetSlicedGeometry()->GetSpacing());
-    //planegeometry->SetSizeInUnits(tmpDimensions[0], tmpDimensions[1]);
-
-    //output->GetSlicedGeometry()->SetGeometry2D(planegeometry.GetPointer(), 0);
     output->GetSlicedGeometry()->SetGeometry2D(mitk::Image::BuildStandardPlaneGeometry2D(output->GetSlicedGeometry(), tmpDimensions).GetPointer(), 0);
     output->GetSlicedGeometry()->SetEvenlySpaced();
+    //set the timebounds - after SetGeometry2D, so that the already created PlaneGeometry will also receive this timebounds.
+    output->GetSlicedGeometry()->SetTimeBoundsInMS(input->GetSlicedGeometry()->GetTimeBoundsInMS());
 
 	  output->SetPropertyList(input->GetPropertyList()->Clone());    
 	

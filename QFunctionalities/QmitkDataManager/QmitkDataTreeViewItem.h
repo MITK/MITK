@@ -55,14 +55,11 @@ class NodeViewCheckboxItem : public QCheckListItem, public QmitkNodeViewBaseItem
     virtual void stateChange ( bool state) {
    mitk::BoolProperty* boolProp = dynamic_cast<mitk::BoolProperty*>(m_Property.GetPointer());
 //      if (m_PropertyList->SetProperty((const char *)text(),new mitk::BoolProperty(state))) {
-   std::cout << "entering stateChange: " << state << std::endl;
    if (boolProp != NULL && boolProp->GetBool() != state) {
-        std::cout << "entering actual changing" << std::endl;
          
         boolProp->SetBool(state);
 	mitk::RenderWindow::UpdateAllInstances();
       };
-        std::cout << "calling superclass" << std::endl;
         
        QCheckListItem::stateChange(state);
       listView()->repaintContents();      

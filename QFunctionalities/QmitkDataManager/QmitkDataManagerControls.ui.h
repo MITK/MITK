@@ -83,7 +83,6 @@ void QmitkDataManagerControls::RemoveButtonClicked()
 {
   QmitkDataTreeViewItem *selected = dynamic_cast<QmitkDataTreeViewItem*>(m_DataTreeView->selectedItem());
   if (selected == NULL) {
-    std::cout << "nothing selected" << std::endl;
   } else {
     mitk::DataTreeIterator* selectedIterator = selected->GetDataTreeIterator();
     assert(selectedIterator != NULL);

@@ -73,10 +73,8 @@ void QmitkNodeViewBaseItem::updateEnabledAppearance() {
       if ((listViewItem = dynamic_cast<NodeViewPropertyItem*>(this)) ||
 	  (listViewItem = dynamic_cast<NodeViewCheckboxItem*>(this))) {
 	if (isPropEnabled()) {
-	  std::cout << "nodeViewItem Enabled" << std::endl;
 	  listViewItem->setPixmap(0,enabledPix);
 	} else {
-	  std::cout << "nodeViewItem Disabled" << std::endl;
 	  listViewItem->setPixmap(0,disabledPix);
 
 	}

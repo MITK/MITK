@@ -39,7 +39,7 @@ class BaseProcess;
 //## Base of all data objects, e.g., images, contours, surfaces etc. Inherits
 //## from itk::DataObject and thus can be included in a pipeline.
 //## Inherits also from OperationActor and can be used as a destination for Undo
-class BaseData : public itk::DataObject , public OperationActor
+class BaseData : public itk::DataObject, public OperationActor
 {
 public:
   //##ModelId=3E10262200CE
@@ -186,8 +186,8 @@ public:
 
   void SetProperty(const char *propertyKey, BaseProperty* property);
 
+  itk::SmartPointerForwardReference<mitk::BaseProcess> GetSource() const;
 
-      
 protected:
   //##ModelId=3E3FE04202B9
   BaseData();
@@ -225,14 +225,13 @@ private:
   mutable int m_ExternalReferenceCount;
 
   //##Documentation
-  //## @brief Helps to deal with the weak-pointer-problem.
-  friend class mitk::BaseProcess;
-
-  //##Documentation
   //## @brief PropertyList, f.e. to hold pic-tags, tracking-data,..
   //##
-  PropertyList::Pointer m_PropertyList;
-  
+  PropertyList::Pointer m_PropertyList;  
+
+  //##Documentation
+  //## @brief Helps to deal with the weak-pointer-problem.
+  friend class mitk::BaseProcess;
 };
 
 } // namespace mitk

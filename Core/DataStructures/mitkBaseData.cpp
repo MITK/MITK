@@ -56,6 +56,11 @@ void mitk::BaseData::SetGeometry(Geometry3D* aGeometry3D)
   m_Geometry3D = aGeometry3D;
 }
 
+itk::SmartPointerForwardReference<mitk::BaseProcess> mitk::BaseData::GetSource() const
+{
+  return m_SmartSourcePointer.GetPointer();
+}
+
 //##ModelId=3E8600DB02DC
 int mitk::BaseData::GetExternalReferenceCount() const
 {

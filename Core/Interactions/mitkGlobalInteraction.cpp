@@ -71,8 +71,8 @@ bool mitk::GlobalInteraction::RemoveInteractor(mitk::Interactor* interactor)
       if ((*it).second == interactor)
       {
         m_JurisdictionMap.erase(it);
-        if (m_CurrentInteractor == it)
-          m_CurrentInteractor ==NULL;
+        if (m_CurrentInteractorIter == it)
+          m_CurrentInteractorIter == m_JurisdictionMap.end();
         break;
       }
     }
@@ -131,33 +131,36 @@ void mitk::GlobalInteraction::FillJurisdictionMap(mitk::StateEvent const* stateE
   }
   //set the iterator to the first element to start stepping through interactors
   if (! m_JurisdictionMap.empty())
-    m_CurrentInteractor = m_JurisdictionMap.begin();
+    m_CurrentInteractorIter = m_JurisdictionMap.begin();
   else
-    m_CurrentInteractor = NULL;
+    m_CurrentInteractorIter = m_JurisdictionMap.end();
 }
 
 void mitk::GlobalInteraction::AskCurrentInteractor(mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId)
 {
-  if ( m_CurrentInteractor != NULL)
+  if (m_JurisdictionMap.empty())
+    return;
+
+  if ( m_CurrentInteractorIter != m_JurisdictionMap.end())//not set
   {
-    (*m_CurrentInteractor).second->HandleEvent(stateEvent, objectEventId, groupEventId);
+    (*m_CurrentInteractorIter).second->HandleEvent(stateEvent, objectEventId, groupEventId);
 
     //if after handling an event Interactor is in mode SELECTED or SUBSELECTED
-    if ( ((*m_CurrentInteractor).second->GetMode() == mitk::Interactor::SMSELECTED ) || 
-          ((*m_CurrentInteractor).second->GetMode() == mitk::Interactor::SMSUBSELECTED) )
+    if ( ((*m_CurrentInteractorIter).second->GetMode() == mitk::Interactor::SMSELECTED ) || 
+          ((*m_CurrentInteractorIter).second->GetMode() == mitk::Interactor::SMSUBSELECTED) )
     {
       m_SelectedList.clear();
-      m_SelectedList.push_back((*m_CurrentInteractor).second);
+      m_SelectedList.push_back((*m_CurrentInteractorIter).second);
       //clear the map to ask the selected interactor next time
       m_JurisdictionMap.clear();
-      m_CurrentInteractor = NULL;
+      m_CurrentInteractorIter = m_JurisdictionMap.end();
     }
     else //if the event could not be handled, then go to next interactor
     {
-      m_CurrentInteractor++;
+      m_CurrentInteractorIter++;
       //if at end, then loop to the begining
-      if (m_CurrentInteractor == m_JurisdictionMap.end())
-        m_CurrentInteractor= m_JurisdictionMap.begin();
+      if (m_CurrentInteractorIter == m_JurisdictionMap.end())
+        m_CurrentInteractorIter= m_JurisdictionMap.begin();
     }
   }
 }

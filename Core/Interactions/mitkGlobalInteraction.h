@@ -159,7 +159,7 @@ class GlobalInteraction : public StateMachine
 
   //##Documentation
   //## @brief iterator on an entry in m_JurisdictionMap for stepping through interactors
-  InteractorMapIter m_CurrentInteractor;
+  InteractorMapIter m_CurrentInteractorIter;
 
   //##ModelId=3EF099E80373
   //##Documentation

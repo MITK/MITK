@@ -91,16 +91,29 @@ bool mitk::StateMachine::HandleEvent(StateEvent const* stateEvent)
 	    OperationEvent *operationEvent = new OperationEvent(((mitk::OperationActor*)(this)), doOp, undoOp);
 	    m_UndoController->SetOperationEvent(operationEvent);
     }
-
+//#define INTERDEBUG
             #ifdef INTERDEBUG
             //Debug StateChanges through cout output! Thus very slow!
-            std::cout<<this->GetType()<<": Changing from StateId "<<m_CurrentState->GetId()<<" to StateId "<<tempNextState->GetId()<<std::endl;
-            std::cout<<this->GetType()<<": Changing from State "<<m_CurrentState->GetName()<<" to State "<<tempNextState->GetName()<<std::endl;
+            //itkWarningMacro(<<this->GetType()<<": Changing from StateId "<<m_CurrentState->GetId()<<" to StateId "<<tempNextState->GetId());
+            itkWarningMacro(<<": Changing from State "<<m_CurrentState->GetName()<<" to State "<<tempNextState->GetName() << " via Transition " << tempTransition->GetName() << " due to Event " << stateEvent->GetId());
             #endif
 
     //first following StateChange(or calling ExecuteOperation(tempNextStateOp)), then operation(action)
     m_CurrentState = tempNextState;
   }
+  else
+  {
+    #ifdef INTERDEBUG
+    if( (tempTransition != m_CurrentState->GetTransition(0)) //dont show 0 events
+        && (m_CurrentState->GetName()!="neutral"))
+    {
+      //Debug StateChanges through cout output! Thus very slow!
+      //itkWarningMacro(<<this->GetType()<<": Changing from StateId "<<m_CurrentState->GetId()<<" to StateId "<<tempNextState->GetId());
+      itkWarningMacro(<<": Keeping State "<<m_CurrentState->GetName()<< " at Transition " << tempTransition->GetName() << " due to Event " << stateEvent->GetId());
+    }
+    #endif
+  }
+
 
   std::vector<Action*>::iterator actionIdIterator = tempTransition->GetActionBeginIterator();
   const std::vector<Action*>::iterator actionIdIteratorEnd = tempTransition->GetActionEndIterator();

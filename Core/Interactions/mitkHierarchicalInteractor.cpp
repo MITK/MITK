@@ -41,33 +41,60 @@ bool mitk::HierarchicalInteractor::IsSubSelected() const
 //## Then send the event to lower statemachines and afterwards check if they are still sub/selected
 bool mitk::HierarchicalInteractor::HandleEvent(StateEvent const* stateEvent)
 {
+  ////DEBUG only: remember states of sub-interactors
+  //typedef std::map<Interactor::Pointer, State*> SisType;
+  //SisType selectedInteractorStates;
+  //typedef std::pair <Interactor::Pointer, State*> SisPair;
+  //InteractorListIter i = m_SelectedInteractors.begin();
+  //const InteractorListIter end = m_SelectedInteractors.end();
+  //while ( i != end )
+  //{
+  //  selectedInteractorStates.insert(SisPair(*i, (*i)->GetCurrentState());
+  //  ++i;
+  //}
+
+  //first do a standard HandleEvent
   bool ok = Interactor::HandleEvent( stateEvent );
 
-  if (!ok)
+  if (!ok && IsSubSelected() )
   {
-    if ( IsSubSelected() ) 
+    ok = TransmitEvent( EventMapper::RefreshStateEvent(const_cast<StateEvent*>(stateEvent)) );
+
+    //check if we still have a selected subinteractor. if not, then send deselectEvent
+    bool subSelected = false;
+    InteractorListIter i = m_SelectedInteractors.begin();
+    const InteractorListIter end = m_SelectedInteractors.end();
+
+    while ( i != end )
     {
-      ok = TransmitEvent( EventMapper::RefreshStateEvent(const_cast<StateEvent*>(stateEvent)) );
-
-      //check if we still have a selected subinteractor. if not, then send deselectEvent
-      bool subSelected = false;
-      InteractorListIter i = m_SelectedInteractors.begin();
-      const InteractorListIter end = m_SelectedInteractors.end();
-
-      while ( i != end )
-      {
-        subSelected = ( (*i)->IsSelected() || subSelected );
-        ++i;
-      }
-
-      if ( !subSelected ) 
-      {
-        StateEvent sd( EIDSUBDESELECT, stateEvent->GetEvent() );
-        ok = Interactor::HandleEvent( &sd );
-        if (!ok)
-          itkWarningMacro("No SSD Transition defined! Redesign Interaction!!!");
-      }
+      subSelected = ( (*i)->IsSelected() || subSelected );
+      ++i;
     }
+
+    if ( !subSelected ) 
+    {
+      StateEvent sd( EIDSUBDESELECT, stateEvent->GetEvent() );
+      ok = Interactor::HandleEvent( &sd );
+      if (!ok)
+        itkWarningMacro("No SSD Transition defined! Redesign Interaction!!! State: " << GetCurrentState()->GetName() << " EventId: " << stateEvent->GetId());
+      if(IsSubSelected())
+        itkWarningMacro("Mode SubSelected, but no selected sub-interactor!!! Redesign Interaction!!! State: " << GetCurrentState()->GetName() << " EventId: " << stateEvent->GetId());
+    }
+  }
+  else
+  {
+    //DEBUG only: check selection mode!
+    bool subSelected = false;
+    InteractorListIter i = m_SelectedInteractors.begin();
+    const InteractorListIter end = m_SelectedInteractors.end();
+
+    while ( i != end )
+    {
+      subSelected = ( (*i)->IsSelected() || subSelected );
+      ++i;
+    }
+    if(IsSubSelected()!=subSelected)
+      itkWarningMacro("IsSubSelected()="<<IsSubSelected()<<"!=subSelected!!! Redesign Interaction!!! State: " << GetCurrentState()->GetName() << " EventId: " << stateEvent->GetId());
   }
   return ok;
 }

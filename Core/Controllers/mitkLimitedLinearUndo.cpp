@@ -19,6 +19,12 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkLimitedLinearUndo.h"
 
+mitk::LimitedLinearUndo::~LimitedLinearUndo()
+{
+  this->Clear();
+}
+
+
 //##ModelId=3E5F5D8C00B2
 bool mitk::LimitedLinearUndo::SetOperationEvent(OperationEvent* operationEvent)
 {
@@ -136,14 +142,14 @@ bool mitk::LimitedLinearUndo::Redo(bool fine)
 //##ModelId=3F04519601A4
 void mitk::LimitedLinearUndo::Clear()
 {
-  m_UndoList.clear();
-  m_RedoList.clear();
+  m_UndoList.clear();//TODO delete all elements
+  m_RedoList.clear();//TODO delete all elements
 }
 
 //##ModelId=3F04519601B5
 void mitk::LimitedLinearUndo::ClearRedoList()
 {
-  m_RedoList.clear();
+  m_RedoList.clear();//TODO delete all elements
 }
 
 //##ModelId=3F04519601D3

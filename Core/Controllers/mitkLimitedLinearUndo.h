@@ -38,6 +38,14 @@ public:
   //##ModelId=3E5F5D8C00B2
   virtual bool SetOperationEvent(OperationEvent* operationEvent);
 
+  //##Documentation
+  //## Constructor
+  LimitedLinearUndo(){}
+
+  //##Documentation
+  //## Destructor
+  ~LimitedLinearUndo();
+
   //##ModelId=3E5F5D8C00C6
   //##Documentation
   //## @brief Undoes the last changes

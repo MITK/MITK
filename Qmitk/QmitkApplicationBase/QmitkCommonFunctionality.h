@@ -67,9 +67,10 @@ public:
 
     mitk::LevelWindowProperty::Pointer levWinProp = new mitk::LevelWindowProperty();
     mitk::LevelWindow levelWindow;
-    levelWindow.SetAuto( image->GetPic() );
-    levWinProp->SetLevelWindow(levelWindow);
-    node->GetPropertyList()->SetProperty("levelwindow",levWinProp);
+    //levelWindow.SetAuto( image->GetPic() );
+    //levWinProp->SetLevelWindow(levelWindow);
+    //node->GetPropertyList()->SetProperty("levelwindow",levWinProp);
+    node->SetProperty("volumerendering",new mitk::BoolProperty(false));
 
     float extrema[2];
     extrema[0] = 0;

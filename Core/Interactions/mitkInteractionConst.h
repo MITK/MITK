@@ -46,6 +46,7 @@ typedef enum EOperations
   OpREMOVE = 400, //remove at position
   OpDELETE = 500, //delete from the end
   OpSTATECHANGE = 600, //change a state
+  OpTERMINATE = 666, //change a state
   OpSELECTPOINT = 700,
   OpDESELECTPOINT = 800,
   OpNAVIGATE = 900,
@@ -83,7 +84,8 @@ typedef enum ESideEffects
   SeMOVESELECTED = 91,
   SeREMOVEPOINT = 100,
   SeINSERTPOINT = 110,
-  SeDELETEPOINT = 120
+  SeDELETEPOINT = 120,
+  SeTERMINATE_INTERACTION = 666
 };
 
 //Type of an Event;

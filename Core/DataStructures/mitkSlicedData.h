@@ -129,6 +129,9 @@ public:
     virtual bool IsVolumeSet(int t = 0, int n = 0) const = 0;
     //##ModelId=3E1550BD0272
     virtual bool IsChannelSet(int n = 0) const = 0;
+    //##ModelId=3E34513B016D
+    virtual void CopyInformation(const DataObject *data);
+
 
 	itkGetConstMacro(ChannelNumber, unsigned int); 
 

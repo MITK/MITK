@@ -6,9 +6,25 @@
 namespace mitk {
 
 //##ModelId=3E0B12240067
-class LevelWindow
+class LevelWindow : public itk::Object
 {
   public:
+	/** Standard class typedefs. */
+    //##ModelId=3E33EEF40183
+	typedef LevelWindow              Self;
+    //##ModelId=3E33EEF401AB
+    typedef itk::Object              Superclass;
+    //##ModelId=3E33EEF401C9
+	typedef itk::SmartPointer<Self>  Pointer;
+    //##ModelId=3E33EEF401F1
+	typedef itk::SmartPointer<const Self>  ConstPointer;
+
+	/** Method for creation through the object factory. */
+	itkNewMacro(Self);
+
+	/** Run-time type information (and related methods). */
+    itkTypeMacro(itk::Object,LevelWindow);
+
     //##ModelId=3E0B12640203
     float GetLevel();
 
@@ -40,7 +56,13 @@ class LevelWindow
     void SetMinMax(float min, float max);
 
   protected:
+    //##ModelId=3E345B580260
+    LevelWindow();
+
     //##ModelId=3E0B122C0393
+    //##ModelId=3E345B58029C
+    virtual ~LevelWindow();
+
     float m_Min;
 
     //##ModelId=3E0B123D0167

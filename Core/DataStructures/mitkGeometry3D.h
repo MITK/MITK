@@ -95,11 +95,10 @@ class Geometry3D : public itk::LightObject
 		return m_LargestPossibleRegion;
     }
     //##ModelId=3E15572E0269
-    Geometry3D(unsigned int dimension, unsigned int* dimensions);
+    Geometry3D(unsigned int dimension, const unsigned int* dimensions);
 
     //##ModelId=3E15578402BD
     virtual bool SetGeometry2D(mitk::Geometry2D geometry2D, int s, int t = 0);
-
   
     //##ModelId=3E155839024F
     //##Documentation
@@ -110,8 +109,19 @@ class Geometry3D : public itk::LightObject
     //## read-only geometry.
     //## @return true geometry successfully updated.
     virtual bool SetGeometry2D(ipPicDescriptor* pic, int s = 0, int t = 0);
+    //##ModelId=3E3452F10253
+    Geometry3D(const mitk::Geometry3D& right);
+
+    //##ModelId=3E3452F10393
+    mitk::Geometry3D& operator=(const mitk::Geometry3D& right);
+    //##ModelId=3E3456C50067
+    virtual ~Geometry3D();
+
 
   protected:
+    //##ModelId=3E3453C703AF
+    virtual void Initialize(unsigned int dimension, const unsigned int* dimensions);
+
     //##ModelId=3E14493100B0
     RegionType m_LargestPossibleRegion;
 

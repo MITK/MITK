@@ -14,7 +14,7 @@ class BaseData : public itk::DataObject
     typedef Geometry3D::Pointer Geometry3DPointer;
 
     //##ModelId=3DCBE2BA0139
-    const mitk::Geometry3D& GetGeometry();
+    const mitk::Geometry3D& GetGeometry() const;
 
   protected:
     //##ModelId=3E15551A03CE

@@ -121,3 +121,14 @@ void mitk::LevelWindow::SetMinMax(float min, float max)
 		m_Max = max;
 }
 
+//##ModelId=3E345B580260
+mitk::LevelWindow::LevelWindow()
+{
+}
+
+
+//##ModelId=3E345B58029C
+mitk::LevelWindow::~LevelWindow()
+{
+}
+

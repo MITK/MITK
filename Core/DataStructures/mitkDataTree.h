@@ -4,7 +4,7 @@
 
 namespace mitk {
 
-typedef	::Tree<DataTreeNode::Pointer> DataTree;
+typedef	::LinkedTree<DataTreeNode::Pointer> DataTree;
 typedef	::TreeIterator<DataTreeNode::Pointer> DataTreeIterator;
 
 }

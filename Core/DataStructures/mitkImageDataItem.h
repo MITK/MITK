@@ -65,15 +65,20 @@ class ImageDataItem : public itk::LightObject
     //##ModelId=3E19F8F10111
     vtkImageData* GetVtkImageData() const
     {
+        if(m_VtkImageData==NULL)
+            ConstructVtkImageData();
         return m_VtkImageData;
     }
+    //##ModelId=3E33F08A03B8
+    virtual void ConstructVtkImageData() const;
+
   protected:
     //##ModelId=3D7B42E90201
     void* m_Data;
     //##ModelId=3E0B487201C0
     ipPicDescriptor* m_PicDescriptor;
     //##ModelId=3E0B488C0380
-    vtkImageData* m_VtkImageData;
+    mutable vtkImageData* m_VtkImageData;
     //##ModelId=3E0B89080207
 	int m_Offset;
     //##ModelId=3E156DC500D4

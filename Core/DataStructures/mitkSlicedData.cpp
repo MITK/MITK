@@ -87,6 +87,8 @@ bool mitk::SlicedData::RequestedRegionIsOutsideOfTheBufferedRegion()
 //##ModelId=3E14105B00F7
 bool mitk::SlicedData::VerifyRequestedRegion()
 {
+    if(m_Geometry3D==NULL) return false;
+
 	unsigned int i;
 
 	// Is the requested region within the LargestPossibleRegion?
@@ -154,5 +156,23 @@ mitk::SlicedData::SlicedData() : m_ChannelNumber(0)
 //##ModelId=3E19EA3300CE
 mitk::SlicedData::~SlicedData()
 {
+}
+
+//##ModelId=3E34513B016D
+void mitk::SlicedData::CopyInformation(const DataObject *data)
+{
+	const mitk::SlicedData *slicedData;
+
+	slicedData = dynamic_cast<const mitk::SlicedData*>(data);
+
+	if (slicedData)
+	{
+        m_Geometry3D = new Geometry3D(slicedData->GetGeometry());
+    }
+	else
+	{
+		// pointer could not be cast back down
+		itkExceptionMacro( << "mitk::SlicedData::CopyInformation(const DataObject *data) cannot cast " << typeid(data).name() << " to " << typeid(SlicedData*).name() );
+	}
 }
 

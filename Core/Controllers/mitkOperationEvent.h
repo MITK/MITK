@@ -16,11 +16,15 @@ class OperationEvent
     //##ModelId=3E5F6123006D
     Operation GetUndoOperation();
 
-    //##ModelId=3E5F612E0203
-    void SetOperation(Operation *operation);
+    //##ModelId=3E957AE700E6
+    OperationEvent(OperationActor destination, Operation* operation, Operation* undoOperation, int objectEventId, int groupEventId);
 
-    //##ModelId=3E5F61390386
-    void SetUndoOperation(Operation *operation);
+
+  protected:
+    //##ModelId=3E957C1102E3
+    void swapOperations();
+
+
 
   private:
     //##ModelId=3E5F61DB00D6

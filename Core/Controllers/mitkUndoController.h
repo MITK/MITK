@@ -15,6 +15,9 @@ namespace mitk {
 class UndoController
 {
   public:
+    //##ModelId=3E956E3B03A8
+	UndoController(){m_UndoModel = NULL;}//hier vielleicht Parameter Zeiger mit UndoModel?
+
     //##ModelId=3E5F543402C5
     bool SetOperationEvent(OperationEvent* operationEvent);
 
@@ -29,7 +32,7 @@ class UndoController
 
   private:
     //##ModelId=3E5F5DC701C5
-    UndoModel m_UndoModel;
+    UndoModel *m_UndoModel;
 
 };
 }//namespace mitk

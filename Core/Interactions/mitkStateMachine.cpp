@@ -31,3 +31,6 @@ std::string mitk::StateMachine::GetName() const
 	return m_Type;
 }
 
+bool mitk::StateMachine::ExecuteSideEffect(int sideEffectId){return true;}
+
+

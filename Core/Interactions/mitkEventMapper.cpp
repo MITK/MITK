@@ -1,5 +1,5 @@
 #include "EventMapper.h"
-
+#include <string>
 //XML Event	  
 //##ModelId=3E788FC000E5
 const std::string mitk::EventMapper::STYLE = "STYLE";
@@ -20,11 +20,17 @@ const std::string mitk::EventMapper::KEY = "KEY";
 //##ModelId=3E77572903AE
 //const std::string mitk::EventMapper::ISFALSE = "FALSE";
 
+mitk::StateMachine *mitk::EventMapper::m_StateMachine;
+EventDescriptionVec mitk::EventMapper::m_EventDescriptions;//for Linker ->no undefined reference
+//##ModelId=3E956E3A036B
+mitk::StateEvent mitk::EventMapper::m_StateEvent;
+std::string mitk::EventMapper::m_StyleName;
 
 //##ModelId=3E5B349600CB
-void mitk::EventMapper::SetStateMachine(StateMachine* stateMachine)
+void mitk::EventMapper::SetStateMachine(StateMachine *stateMachine)
 {
-	m_StateMachine = stateMachine;
+
+	mitk::EventMapper::m_StateMachine = stateMachine;//auskomentiert wegen linkerfehler Test
 }
 
 //##ModelId=3E5B34CF0041

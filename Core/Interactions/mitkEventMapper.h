@@ -42,8 +42,14 @@ class EventMapper : public QXmlDefaultHandler
 	static EventDescriptionVec m_EventDescriptions;
 
     //##ModelId=3E5B343701F1
-    static StateMachine* m_StateMachine;
+    static StateMachine *m_StateMachine;
   
+	//##ModelId=3E956E3A036B
+    static StateEvent m_StateEvent;
+    
+	//##ModelId=3E7B1EB800CC
+    static std::string m_StyleName;
+
     //##ModelId=3E788FC000E5
 	static const std::string STYLE;
     //##ModelId=3E788FC0025C
@@ -62,10 +68,7 @@ class EventMapper : public QXmlDefaultHandler
 	//static const std::string ISTRUE;
     //##ModelId=3E785B1B0245
 	//static const std::string ISFALSE;
-    //##ModelId=3E7B139E0233
-    static StateEvent m_StateEvent;
-    //##ModelId=3E7B1EB800CC
-    static std::string m_StyleName;
+    
 
 };
 

@@ -12,15 +12,13 @@ mitk::Operation mitk::OperationEvent::GetUndoOperation()
 	return *m_UndoOperation;
 }
 
-//##ModelId=3E5F612E0203
-void mitk::OperationEvent::SetOperation(Operation *operation)
+//##ModelId=3E957AE700E6
+mitk::OperationEvent::OperationEvent(OperationActor destination, Operation* operation, Operation* undoOperation, int objectEventId, int groupEventId)
 {
-	m_Operation = operation;
 }
 
-//##ModelId=3E5F61390386
-void mitk::OperationEvent::SetUndoOperation(Operation *operation)
+//##ModelId=3E957C1102E3
+void mitk::OperationEvent::swapOperations()
 {
-	m_UndoOperation = operation;
 }
 

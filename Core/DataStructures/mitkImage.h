@@ -7,6 +7,7 @@
 #include "PixelType.h"
 #include "BaseData.h"
 #include "LevelWindow.h"
+#include "PlaneGeometry.h"
 //#include "mitkImageToItk.h"
 
 namespace mitk {
@@ -337,3 +338,4 @@ class Image : public SlicedData
 } // namespace mitk
 
 #endif /* MITKIMAGE_H_HEADER_INCLUDED_C1C2FCD2 */
+

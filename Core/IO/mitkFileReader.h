@@ -65,10 +65,11 @@ protected:
     FileReader();
 
     //##ModelId=3E188F2800DC
-    ~FileReader();
+    virtual ~FileReader();
 public:
 
 protected:
 };
 } // namespace mitk
 #endif /* FILEREADER_H_HEADER_INCLUDED_C1E7E521 */
+

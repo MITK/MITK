@@ -130,6 +130,11 @@ void mitk::BaseData::SetProperty(const char *propertyKey,
     m_PropertyList->SetProperty(propertyKey, propertyValue);
 }
 
+void mitk::BaseData::SetPropertyList(PropertyList *pList)
+{
+    m_PropertyList = pList;
+}
+
 
 void mitk::BaseData::ExecuteOperation(mitk::Operation* operation)
 {

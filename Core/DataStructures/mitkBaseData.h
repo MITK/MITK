@@ -151,6 +151,12 @@ public:
   //## @sa m_PropertyList
   mitk::PropertyList::Pointer GetPropertyList() const;
 
+  //##Documentation
+  //## @brief Set the PropertyList
+  //## @sa SetProperty
+  //## @sa m_PropertyList
+  void SetPropertyList(PropertyList* propertyList);
+  
   //##ModelId=3EF189DB0111
   //##Documentation
   //## @brief Get the property (instance of BaseProperty) with key @a propertyKey from the PropertyList

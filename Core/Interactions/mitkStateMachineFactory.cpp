@@ -73,7 +73,7 @@ const std::string mitk::StateMachineFactory::DOUBLE_PARAMETER = "doubleParameter
 
 const std::string mitk::StateMachineFactory::STRING_PARAMETER = "stringParameter";
 
-const std::string mitk::StateMachineFactory::VALUE = "value";
+const std::string mitk::StateMachineFactory::VALUE = "VALUE";
 
 //##ModelId=3E68B2C600BD
 mitk::StateMachineFactory::StateMachineFactory()

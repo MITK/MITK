@@ -29,13 +29,14 @@ public:
 protected:
 	//##ModelId=3E1B1975031E
 	ImageTimeSelector();
+
 	//##ModelId=3E1B1975033C
 	virtual ~ImageTimeSelector();
-    //##ModelId=3E3BD0CC0232
+
+	//##ModelId=3E3BD0CC0232
     virtual void GenerateOutputInformation();
 
 	//##ModelId=3E3BD0CE0194
-    //##ModelId=3E3BD0CE0194
     virtual void GenerateData();
 
     //##ModelId=3E1B1A0501C7
@@ -43,8 +44,6 @@ protected:
 
 	//##ModelId=3E1B1A08024D
 	int m_ChannelNr;
-
-
 };
 
 } // namespace mitk

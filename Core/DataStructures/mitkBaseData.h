@@ -39,8 +39,16 @@ public:
     //## 
     //## @warning GetGeometry not yet completely implemented. 
     //## @todo Appropriate setting of the update extent is missing.
+    mitk::Geometry3D::ConstPointer GetUpdatedGeometry();
+
+    //##Documentation
+    //## @brief Return the Geometry3D of the data as non-const pointer. 
+	//## 
+	//## @em No update will be called. Normally used in GenerateOutputInformation of 
+	//## subclasses of BaseProcess.
     mitk::Geometry3D::Pointer GetGeometry() const;
-    //##ModelId=3E3C4ACB0046
+
+	//##ModelId=3E3C4ACB0046
     //##Documentation
     //## @brief Return the Geometry2D of the slice (@a s, @a t). 
 	//## 

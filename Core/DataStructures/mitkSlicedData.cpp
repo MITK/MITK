@@ -118,7 +118,7 @@ bool mitk::SlicedData::VerifyRequestedRegion()
 	if ((i==4) && 
 		((requestedRegionIndex[i] < 0) ||
 		((requestedRegionIndex[i] + static_cast<long>(requestedRegionSize[i]))
-			> m_ChannelNumber))
+			> m_NumberOfChannels))
 		)
 	{
 		return false;
@@ -148,8 +148,25 @@ void mitk::SlicedData::SetRequestedRegion(itk::DataObject *data)
 	}
 }
 
+void mitk::SlicedData::SetRequestedRegion(SlicedData::RegionType *region)
+{
+	m_UseLargestPossibleRegion=false;
+
+	if(region!=NULL)
+	{
+		m_RequestedRegion = *region;
+		m_RequestedRegionInitialized = true;
+	}
+	else
+	{
+		// pointer could not be cast back down
+		itkExceptionMacro( << "mitk::SlicedData::SetRequestedRegion(SlicedData::RegionType*) cannot cast " << typeid(region).name() << " to " << typeid(SlicedData*).name() );
+	}
+}
+
+
 //##ModelId=3E19EA3300BA
-mitk::SlicedData::SlicedData() : m_ChannelNumber(0)
+mitk::SlicedData::SlicedData() : m_NumberOfChannels(0)
 {
 }
 

@@ -109,6 +109,12 @@ public:
     //## implemented in the concrete subclasses of DataObject.
 	virtual void SetRequestedRegion(itk::DataObject *data);
 
+    //##Documentation
+    //## Set the requested region from this data object to match the requested
+    //## region of the data object passed in as a parameter.  This method is
+    //## implemented in the concrete subclasses of DataObject.
+	virtual void SetRequestedRegion(SlicedData::RegionType *region);
+
     //##ModelId=3E144ED20089
     //##Documentation
     //## Get the region object that defines the size and starting index
@@ -129,7 +135,7 @@ public:
 
     //##Documentation
     //## @brief Get the number of channels
-	itkGetConstMacro(ChannelNumber, unsigned int); 
+	itkGetConstMacro(NumberOfChannels, unsigned int); 
 protected:
     //##ModelId=3E19EA3300BA
     SlicedData();
@@ -144,7 +150,7 @@ protected:
 	bool                m_UseLargestPossibleRegion;
 
     //##ModelId=3E19EA1200A9
-	unsigned int m_ChannelNumber;
+	unsigned int m_NumberOfChannels;
   private:
 
 };

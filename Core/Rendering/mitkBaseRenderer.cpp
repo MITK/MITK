@@ -16,6 +16,9 @@ mitk::BaseRenderer::BaseRenderer() :
   m_DataTreeIterator(NULL), m_RenderWindow(NULL), m_LastUpdateTime(0), m_MapperID(defaultMapper), m_CameraController(NULL), m_Focused(false), 
   m_WorldGeometry(NULL),  m_TimeSlicedWorldGeometry(NULL), m_CurrentWorldGeometry2D(NULL), m_Slice(0), m_TimeStep(0)
 {
+  m_Size[0] = 0;
+  m_Size[1] = 0;
+
   //adding this BaseRenderer to the List of all BaseRenderer
   mitk::GlobalInteraction *globalInteraction = dynamic_cast<mitk::GlobalInteraction *>(EventMapper::GetGlobalStateMachine());
   if (globalInteraction != NULL)
@@ -102,6 +105,8 @@ void mitk::BaseRenderer::InitRenderer(mitk::RenderWindow* renderwindow)
 //##ModelId=3E3799250397
 void mitk::BaseRenderer::InitSize(int w, int h)
 {
+  m_Size[0] = w;
+  m_Size[1] = h;
   GetDisplayGeometry()->SetSizeInDisplayUnits(w, h, false);
   GetDisplayGeometry()->Fit();
 }

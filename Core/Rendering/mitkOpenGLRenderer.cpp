@@ -450,8 +450,7 @@ void mitk::OpenGLRenderer::Paint( )
 void mitk::OpenGLRenderer::InitSize(int w, int h)
 {
   m_RenderWindow->SetSize(w,h);
-  GetDisplayGeometry()->SetSizeInDisplayUnits(w, h);
-  GetDisplayGeometry()->Fit();
+  Superclass::InitSize(w, h);
   Modified();
   Update();
   if(m_VtkRenderer!=NULL)

@@ -17,7 +17,7 @@ class LevelWindow : public itk::Object
   public:
 
 		/** Standard class typedefs. */
-    //##ModelId=3E0B12240067
+    //##ModelId=3E33EEF40183
 	typedef LevelWindow              Self;
     //##ModelId=3E33EEF401AB
     typedef itk::Object              Superclass;

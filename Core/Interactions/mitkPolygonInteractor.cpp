@@ -12,6 +12,7 @@
 #include <mitkAction.h>
 #include <mitkEventMapper.h>
 #include <mitkProperties.h>
+#include <vtkTransform.h>
 
 
 mitk::PolygonInteractor::PolygonInteractor(const char * type, DataTreeNode* dataTreeNode)
@@ -51,6 +52,98 @@ void mitk::PolygonInteractor::DeselectAllCells()
 		}
 	}
 }
+
+float mitk::PolygonInteractor::CalculateJurisdiction(StateEvent const* stateEvent) const
+{
+  float returnJurisdiction = 0;
+  
+  mitk::PositionEvent const  *posEvent = dynamic_cast <const mitk::PositionEvent *> (stateEvent->GetEvent());
+  //checking if a keyevent can be handled:
+  if (posEvent == NULL)
+  {
+    //check, if the current state has a transition waiting for that key event.
+    if (this->GetCurrentState()->GetTransition(stateEvent->GetId())!=NULL)
+    {
+      return 0.5;
+    }
+    else
+    {
+      return 0;
+    }
+  }
+
+  //Mouse event handling:
+  //on MouseMove do nothing! reimplement if needed differently
+  if (stateEvent->GetEvent()->GetType() == mitk::Type_MouseMove)
+  {
+    return 0;
+  }
+
+  //check on the right data-type
+  mitk::Mesh* mesh = dynamic_cast<mitk::Mesh*>(m_DataTreeNode->GetData());
+	if (mesh == NULL)
+		return false;
+
+
+  //go throgh all cells and get the BoundingBox:
+  Mesh::ConstCellIterator cellIt = mesh->GetMesh()->GetCells()->Begin();
+  Mesh::ConstCellIterator cellEnd = mesh->GetMesh()->GetCells()->End();
+  while( cellIt != cellEnd )
+  {
+
+    Mesh::DataType::BoundingBoxPointer bBox = mesh->GetBoundingBoxFromCell( cellIt->Index() );
+    if (bBox == NULL)
+      return 0;
+    
+    //since we now have 3D picking in GlobalInteraction and all events send are DisplayEvents with 3D information,
+    //we concentrate on 3D coordinates
+    mitk::Point3D worldPoint = posEvent->GetWorldPosition();
+    float p[3];
+    itk2vtk(worldPoint, p);
+    //transforming the Worldposition to local coordinatesystem
+    m_DataTreeNode->GetData()->GetGeometry()->GetVtkTransform()->GetInverse()->TransformPoint(p, p);
+    vtk2itk(p, worldPoint);
+
+    //distance between center and point 
+    mitk::BoundingBox::PointType center = bBox->GetCenter();
+    returnJurisdiction = worldPoint.EuclideanDistanceTo(center);
+    
+    //now compared to size of boundingbox to get between 0 and 1;
+    returnJurisdiction = returnJurisdiction/( (bBox->GetMaximum().EuclideanDistanceTo(bBox->GetMinimum() ) ) );
+    
+    //shall be 1 if short length to center
+    returnJurisdiction = 1 - returnJurisdiction;
+
+    //check if the given position lies inside the data-object
+    if (bBox->IsInside(worldPoint))
+    {
+      //mapped between 0,5 and 1
+      returnJurisdiction = 0.5 + (returnJurisdiction / 2);
+    }
+    else
+    {
+      //set it in range between 0 and 0.5
+      returnJurisdiction = returnJurisdiction / 2;
+    }
+    ++cellIt;
+  }
+
+
+//now check all lower statemachines:
+  InteractorListConstIter i = m_AllInteractors.begin();
+  InteractorListConstIter end = m_AllInteractors.end();
+
+  while ( i != end )
+  {
+    float currentJurisdiction = (*i)->CalculateJurisdiction( stateEvent );
+    if (returnJurisdiction < currentJurisdiction)
+      returnJurisdiction = currentJurisdiction;
+    i++;
+  }
+
+  return returnJurisdiction;
+}
+
 
 bool mitk::PolygonInteractor::ExecuteAction( Action* action, mitk::StateEvent const* stateEvent )
 {

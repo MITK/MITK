@@ -29,6 +29,12 @@ public:
   //##@brief Destructor 
   virtual ~PolygonInteractor();
 
+  //##Documentation
+  //## @brief derived from mitk::HierarchicalInteractor; calculates Jurisdiction according to cells of a mesh
+  //##
+  //## standard mathod can not be used, since it doesn't differ in cells. It would calculate a boundingBox according to points.
+  virtual float CalculateJurisdiction(StateEvent const* stateEvent) const;
+
 protected:
   //##Documentation
   //## @brief Executes Actions

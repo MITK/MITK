@@ -43,9 +43,6 @@ public:
     itkGetObjectMacro(Geometry,Geometry3D);
     itkSetObjectMacro(Geometry,Geometry3D);
 
-    itkGetObjectMacro(LevelWindow,LevelWindow);
-    itkSetObjectMacro(LevelWindow,LevelWindow);
-
     itkGetConstMacro(SliceNr,int);
     itkSetMacro(SliceNr,int);
 
@@ -59,7 +56,7 @@ protected:
     //##ModelId=3E33ECF2030B
     Geometry3D::Pointer m_Geometry;
     //##ModelId=3E33ECF20317
-    LevelWindow::Pointer m_LevelWindow;
+    LevelWindow m_LevelWindow;
 
     //##ModelId=3E3AE0DC023D
     int m_SliceNr;

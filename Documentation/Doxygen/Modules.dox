@@ -1,7 +1,7 @@
 /**
   \defgroup DataManagement Data Management Classes
 
-  This category includes the data classes themselves as well as management classes to organize the
+  \brief This category includes the data classes themselves as well as management classes to organize the
   data during run-time in a tree structure (data tree, mitk::DataTree).
 */
 
@@ -9,7 +9,7 @@
   \defgroup DataTree Data Tree Classes
   \ingroup DataManagement
 
-  This subcategory includes the data tree classes, which organizes the
+  \brief This subcategory includes the data tree classes, which organizes the
   data during run-time in a tree structure.
 */
 
@@ -17,8 +17,9 @@
   \defgroup Data Data Classes
   \ingroup DataManagement
 
-  This subcategory includes the data classes, e.g., for images (mitk::Image), 
+  \brief This subcategory includes the data classes, e.g., for images (mitk::Image), 
   surfaces (mitk::SurfaceData), vessel-trees (mitk::VesselTreeData), etc. 
+
   Data access classes are only included, if there is no equivalent in itk (see 
   \ref ProcessAndAdaptorClasses "Process and Adaptor Classes" below).
 */
@@ -27,7 +28,7 @@
   \defgroup Geometry Geometry Classes
   \ingroup DataManagement
 
-  This subcategory includes the geometry classes, which describe the geometry of the 
+  \brief This subcategory includes the geometry classes, which describe the geometry of the 
   data in space and time.
 */
 
@@ -35,30 +36,33 @@
   \defgroup IO IO Classes
   \ingroup DataManagement
 
-  This subcategory includes the IO classes to read or write data objects.
+  \brief This subcategory includes the IO classes to read or write data objects.
 */
 
 /**
   \defgroup ProcessAdaptor Process and Adaptor Classes 
   \anchor ProcessAndAdaptorClasses
 
-  This category includes process (algorithm) classes developed specifically for mitk and 
+  \brief This category includes process (algorithm) classes developed specifically for mitk and 
   (mainly) adaptor classes for the integration of algorithms from other toolkits 
   (currently vtk, itk).
+
   The itk adaptor classes are also useful for data access to mitk data objects.
 */
 
 /**
   \defgroup Process Process Classes
   \ingroup ProcessAdaptor
-  This subcategory includes process (algorithm) classes developed specifically for mitk.
+
+  \brief This subcategory includes process (algorithm) classes developed specifically for mitk.
 */
 
 /**
   \defgroup Visualization Visualization and Visualization Organization Classes
 
-  This category includes renderwindows (currently one for OpenGL), renderers (currently only one, 
+  \brief This category includes renderwindows (currently one for OpenGL), renderers (currently only one, 
   for OpenGL-based renderwindows), mappers  and classes for navigating in the data.
+
   Mappers visualize data objects of a specific classes by creating rendering primitives that 
   interface to the graphics library (e.g., OpenGL, vtk). 
   Renderers organize the rendering process. A Renderer contains a reference to a (sub-) data tree 
@@ -69,7 +73,7 @@
  \defgroup Renderer Renderer and RenderWindow Classes
  \ingroup Visualization
 
- Renderers organize the rendering process. A Renderer contains a reference to a (sub-) data tree
+ \brief Renderers organize the rendering process. A Renderer contains a reference to a (sub-) data tree
  and asks the mappers of the data objects to render the data into the renderwindow it is associated to.
 */
 
@@ -77,7 +81,7 @@
  \defgroup Mapper Mapper Classes
  \ingroup Visualization
 
- Mappers visualize data objects of a specific classes by creating rendering primitives 
+ \brief Mappers visualize data objects of a specific classes by creating rendering primitives 
  that interface to the graphics library (e.g., OpenGL, vtk).
 */
 
@@ -85,24 +89,25 @@
  \defgroup NavigationControl Navigation Control Classes
  \ingroup Visualization
 
- The classes in this category tell the render (subclass of mitk::BaseRenderer) which 
+ \brief The classes in this category tell the render (subclass of mitk::BaseRenderer) which 
  slice (subclass mitk::SliceNavigationController) or from which direction (subclass
- mitk::CameraController) it has to render. Contains two Stepper for stepping
- through the slices or through different camera views (e.g., for the
- creation of a movie around the data), respectively, and through time, if
+ mitk::CameraController) it has to render.
+ 
+ Contains two Stepper for stepping through the slices or through different camera views (e.g., 
+ for the creation of a movie around the data), respectively, and through time, if
  there is 3D+t data.
 */
 
 /**
   \defgroup InteractionUndo Interaction and Undo Classes
 
-  This category includes classes that support the developer to create 
-  software that allows the user to interact with the data. This includes 
-  complex interactions that have multiple states (e.g., moving a handle of an 
-  active contour vs changing its local elasicity) and a concept to realize an 
-  undo/redo-mechanism. 
-   
-  A detailed description of the rationale for these classes can be found in
+  \brief This category includes classes that support the developer to create 
+  software that allows the user to interact with the data. 
+  
+  This includes complex interactions that have multiple states (e.g., moving a handle of an 
+  active contour vs changing its local elasicity) and a concept to realize an undo/redo-mechanism.
+     
+  \todo A detailed description of the rationale for these classes can be found in
   \ref InteractionPage.
 */
 
@@ -110,11 +115,13 @@
   \defgroup Interaction Interaction Classes
   \ingroup InteractionUndo
 
-  This subcategory includes interaction classes (subclasses of mitk::StateMachine) that change
-  the data according to the input of the user. For undo-support, the change is done by
-  sending an OperationEvent to the respective data object, which changes itself accordingly.
+  \brief This subcategory includes interaction classes (subclasses of mitk::StateMachine) that change
+  the data according to the input of the user. 
+  
+  For undo-support, the change is done by sending an OperationEvent to the respective 
+  data object, which changes itself accordingly.
    
-  A detailed description of the rationale for these classes can be found in
+  \todo A detailed description of the rationale for these classes can be found in
   \ref InteractionPage.
 */
 
@@ -122,11 +129,12 @@
   \defgroup Undo Undo Classes
   \ingroup InteractionUndo
 
-  This subcategory includes classes the undo/redo-specific classes. For undo-support, the 
-  change is done by sending an OperationEvent to the respective data object, which changes 
-  itself accordingly.
+  \brief This subcategory includes classes the undo/redo-specific classes. 
   
-  A detailed description of the rationale for these classes can be found in
+  For undo-support, the change is done by sending an OperationEvent to the respective data object, 
+  which changes itself accordingly.
+  
+  \todo A detailed description of the rationale for these classes can be found in
   \ref InteractionPage.
 */
  
@@ -134,8 +142,9 @@
 /**
   \defgroup Application Application-level Classes
 
-  This category includes classes on the application-level, e.g., pre-defined widgets. It also
-  includes the concept to organize an application in so-called "functionalities" (subclasses of 
+  \todo This category includes classes on the application-level, e.g., pre-defined widgets. 
+  
+  It also includes the concept to organize an application in so-called "functionalities" (subclasses of 
   QmitkFunctionality). Each functionality can have its own workspace area (or share one workspace 
   with other functionalities) and a control area. Functionalities are added to an instance of
   QmitkFctMediator, which organizes the switching between the functionalities. This is a 

@@ -26,4 +26,17 @@ public:
 		to the application template
 	 */
 	virtual void initializeFunctionality();
+
+protected:
+
+		/*! 
+			\brief opens the specified file and initializes the application
+			@param fileName 
+		*/
+		virtual void fileOpen( const char * fileName );
+
+protected:
+
+		QmitkSimpleExampleFunctionality * simpleFunc;
+
 };

@@ -7,7 +7,10 @@
  *   and swaps to the other endianess
  *
  * $Log$
- * Revision 1.3  1999/11/27 19:15:08  andre
+ * Revision 1.4  1999/11/28 16:27:20  andre
+ * *** empty log message ***
+ *
+ * Revision 1.3  1999/11/27  19:15:08  andre
  * *** empty log message ***
  *
  * Revision 1.2  1997/09/15  13:21:08  andre
@@ -36,11 +39,22 @@
 #include "ipPic.h"
 
 size_t
-_ipFRead( void *ptr, size_t size, size_t nitems, FILE *stream )
+ipFReadCvt( void *ptr, size_t size, size_t nitems, FILE *stream )
 {
   size_t bytes_return;
 
-  bytes_return = ipFRead( ptr, size, nitems, stream);
+  bytes_return = fread( ptr, size, nitems, stream );
+  _ipCvtEndian( ptr, size*nitems, size );
+
+  return( bytes_return );
+}
+
+size_t
+ipPicFReadCvt( void *ptr, size_t size, size_t nitems, ipPicFile_t stream )
+{
+  size_t bytes_return;
+
+  bytes_return = ipPicFRead( ptr, size, nitems, stream );
   _ipCvtEndian( ptr, size*nitems, size );
 
   return( bytes_return );

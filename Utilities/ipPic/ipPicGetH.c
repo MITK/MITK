@@ -6,7 +6,10 @@
  *   reads the Header of a  PicFile from disk
  *
  * $Log$
- * Revision 1.5  1999/11/28 00:36:09  andre
+ * Revision 1.6  1999/11/28 16:27:21  andre
+ * *** empty log message ***
+ *
+ * Revision 1.5  1999/11/28  00:36:09  andre
  * *** empty log message ***
  *
  * Revision 1.4  1999/11/27  20:02:41  andre
@@ -37,9 +40,10 @@
 
 #include "ipPic.h"
 
-ipPicDescriptor *ipPicGetHeader( char *infile_name, ipPicDescriptor *pic )
+ipPicDescriptor *
+ipPicGetHeader( char *infile_name, ipPicDescriptor *pic )
 {
-  ipFile_t  infile;
+  ipPicFile_t  infile;
 
   ipPicTag_t tag_name;
   ipUInt4_t len;
@@ -53,7 +57,7 @@ ipPicDescriptor *ipPicGetHeader( char *infile_name, ipPicDescriptor *pic )
     }
 
   /* read infile */
-  ipFRead( &(tag_name[0]), 1, 4, infile );
+  ipPicFRead( &(tag_name[0]), 1, 4, infile );
 
   if( strncmp( "\037\213", tag_name, 2 ) == 0 )
     {
@@ -69,7 +73,7 @@ ipPicDescriptor *ipPicGetHeader( char *infile_name, ipPicDescriptor *pic )
         _ipPicOldGetHeader( infile,
                             pic );
       if( infile != stdin )
-        ipFClose( infile );
+        ipPicFClose( infile );
       return( pic );
     }
 
@@ -80,20 +84,20 @@ ipPicDescriptor *ipPicGetHeader( char *infile_name, ipPicDescriptor *pic )
 
   pic->info->write_protect = ipTrue;
 
-  ipFRead( &(tag_name[4]), 1, sizeof(ipPicTag_t)-4, infile );
+  ipPicFRead( &(tag_name[4]), 1, sizeof(ipPicTag_t)-4, infile );
   strncpy( pic->info->version, tag_name, _ipPicTAGLEN );
 
-  ipFReadLE( &len, sizeof(ipUInt4_t), 1, infile );
+  ipPicFReadLE( &len, sizeof(ipUInt4_t), 1, infile );
 
-  ipFReadLE( &(pic->type), sizeof(ipUInt4_t), 1, infile );
-  ipFReadLE( &(pic->bpe), sizeof(ipUInt4_t), 1, infile );
-  ipFReadLE( &(pic->dim), sizeof(ipUInt4_t), 1, infile );
+  ipPicFReadLE( &(pic->type), sizeof(ipUInt4_t), 1, infile );
+  ipPicFReadLE( &(pic->bpe), sizeof(ipUInt4_t), 1, infile );
+  ipPicFReadLE( &(pic->dim), sizeof(ipUInt4_t), 1, infile );
 
-  ipFReadLE( &(pic->n), sizeof(ipUInt4_t), pic->dim, infile );
+  ipPicFReadLE( &(pic->n), sizeof(ipUInt4_t), pic->dim, infile );
 
 
   if( infile != stdin )
-    ipFClose( infile );
+    ipPicFClose( infile );
 
   return( pic );
 }

@@ -6,7 +6,10 @@
  *   reads a tag from a PicFile
  *
  * $Log$
- * Revision 1.6  1999/11/28 00:36:09  andre
+ * Revision 1.7  1999/11/28 16:27:21  andre
+ * *** empty log message ***
+ *
+ * Revision 1.6  1999/11/28  00:36:09  andre
  * *** empty log message ***
  *
  * Revision 1.5  1999/11/27  19:32:13  andre
@@ -34,9 +37,10 @@
 
 #include "ipPic.h"
 
-ipPicDescriptor *ipPicGetTags( char *infile_name, ipPicDescriptor *pic )
+ipPicDescriptor *
+ipPicGetTags( char *infile_name, ipPicDescriptor *pic )
 {
-  ipFile_t infile;
+  ipPicFile_t infile;
 
   ipPicTag_t tag_name;
   ipUInt4_t dummy;
@@ -58,28 +62,28 @@ ipPicDescriptor *ipPicGetTags( char *infile_name, ipPicDescriptor *pic )
     pic->info->write_protect = ipFalse;
 
   /* read infile */
-  ipFRead( &(tag_name[0]), 1, 4, infile );
+  ipPicFRead( &(tag_name[0]), 1, 4, infile );
 
   if( strncmp( ipPicVERSION, tag_name, 4 ) != 0 )
     {
       if( infile != stdin )
-        ipFClose( infile );
+        ipPicFClose( infile );
       return( pic );
     }
 
   if( pic == NULL )
     pic = ipPicNew();
 
-  ipFRead( &(tag_name[4]), 1, sizeof(ipPicTag_t)-4, infile );
+  ipPicFRead( &(tag_name[4]), 1, sizeof(ipPicTag_t)-4, infile );
   /*strncpy( pic->info->version, tag_name, _ipPicTAGLEN );*/
 
-  ipFReadLE( &len, sizeof(ipUInt4_t), 1, infile );
+  ipPicFReadLE( &len, sizeof(ipUInt4_t), 1, infile );
 
-  ipFReadLE( &dummy, sizeof(ipUInt4_t), 1, infile );
-  ipFReadLE( &dummy, sizeof(ipUInt4_t), 1, infile );
-  ipFReadLE( &dim, sizeof(ipUInt4_t), 1, infile );
+  ipPicFReadLE( &dummy, sizeof(ipUInt4_t), 1, infile );
+  ipPicFReadLE( &dummy, sizeof(ipUInt4_t), 1, infile );
+  ipPicFReadLE( &dim, sizeof(ipUInt4_t), 1, infile );
 
-  ipFReadLE( n, sizeof(ipUInt4_t), dim, infile );
+  ipPicFReadLE( n, sizeof(ipUInt4_t), dim, infile );
 
 
   to_read = len -        3 * sizeof(ipUInt4_t)
@@ -90,7 +94,7 @@ ipPicDescriptor *ipPicGetTags( char *infile_name, ipPicDescriptor *pic )
   pic->info->pixel_start_in_file = ftell( infile );
 
   if( infile != stdin )
-    ipFClose( infile );
+    ipPicFClose( infile );
 
   return( pic );
 }

@@ -36,7 +36,7 @@ void mitk::DopplerToStrainRateFilter::GenerateOutputInformation()
 //	spacing *= 1.0/scale;
 //
 //	
-    output->GetGeometry()->SetSpacing(input->GetGeometry()->GetSpacing());
+    output->GetSlicedGeometry()->SetSpacing(input->GetSlicedGeometry()->GetSpacing());
 
 	// initialize the spacing of the output
 	// @todo position of input image is not yet used to calculate position of the output
@@ -51,8 +51,8 @@ void mitk::DopplerToStrainRateFilter::GenerateOutputInformation()
     planegeometry->SetPlaneView(view_std);
     planegeometry->SetSizeInUnits(tmpDimensions[0], tmpDimensions[1]);
 
-    output->GetGeometry()->SetGeometry2D(planegeometry.GetPointer(), 0, 0);
-    output->GetGeometry()->SetEvenlySpaced();
+    output->GetSlicedGeometry()->SetGeometry2D(planegeometry.GetPointer(), 0, 0);
+    output->GetSlicedGeometry()->SetEvenlySpaced();
 
 	// @todo convert transducer position into new coordinate system
 /*	

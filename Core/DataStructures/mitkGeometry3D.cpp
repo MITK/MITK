@@ -1,5 +1,10 @@
 #include "mitkGeometry3D.h"
 #include "mitkPlaneGeometry.h"
+#include "mitkOperation.h"
+#include "mitkPointOperation.h"
+#include "mitkInteractionConst.h"
+#include "mitkStatusBar.h"
+
 #include <vecmath.h>
 #include <vtkTransform.h> 
 
@@ -204,4 +209,69 @@ mitk::Geometry3D::Pointer mitk::Geometry3D::Clone()
   //newGeometry->GetRelativeTransform()->SetMatrix(m_RelativeTransform->GetMatrix());
   return newGeometry;
 
+}
+
+void mitk::Geometry3D::ExecuteOperation(Operation* operation)
+{
+  mitk::PointOperation *pointOp = dynamic_cast<mitk::PointOperation *>(operation);
+	if (pointOp == NULL)
+	{
+		(StatusBar::GetInstance())->DisplayText("Recieved wrong type of operation!See mitkAffineInteractor.cpp", 10000);
+		return;
+	}
+
+  switch (operation->GetOperationType())
+	{
+	case OpNOTHING:
+		break;
+	case OpMOVE:
+  {
+    mitk::ITKPoint3D newPos = pointOp->GetPoint();
+    //std::cout << "Geometry: received move Operation: <" << newPos[0] << ", " << newPos[1] << ", " << newPos[2] << ">\n";    
+    GetTransform()->GetMatrix()->SetElement(0, 3, newPos[0]);
+    GetTransform()->GetMatrix()->SetElement(1, 3, newPos[1]);
+    GetTransform()->GetMatrix()->SetElement(2, 3, newPos[2]);
+    float pos[3];     
+    GetTransform()->GetPosition(pos);
+    std::cout << "Geometry: new Position: <" << pos[0] << ", " << pos[1] << ", " << pos[2] << ">\n";
+    break;
+  }		
+	case OpSCALE:
+  {
+    mitk::ITKPoint3D newScale = pointOp->GetPoint();
+    //std::cout << "Geometry: received scale Operation: <" << newScale[0] << ", " << newScale[1] << ", " << newScale[2] << ">\n";    
+    double scale[3];     
+    GetTransform()->GetScale(scale);
+    //std::cout << "Geometry: old Scale: <" << scale[0] << ", " << scale[1] << ", " << scale[2] << ">\n";
+    
+    double e;
+    e = GetTransform()->GetMatrix()->GetElement(0, 0);
+    e = e / scale[0];
+    e = e * newScale[0];
+    GetTransform()->GetMatrix()->SetElement(0, 0, e);
+    e = GetTransform()->GetMatrix()->GetElement(1, 1);
+    e = e / scale[1];
+    e = e * newScale[1];
+    GetTransform()->GetMatrix()->SetElement(1, 1, e);
+    e = GetTransform()->GetMatrix()->GetElement(2, 2);
+    e = e / scale[2];
+    e = e * newScale[2];
+    GetTransform()->GetMatrix()->SetElement(2, 2, e);
+
+    //GetTransform()->GetMatrix()->Modified();
+    
+    //GetTransform()->Scale(newScale[0], newScale[1], newScale[2]);     
+
+    GetTransform()->GetScale(scale);
+    
+    std::cout << "Geometry: new Scale: <" << scale[0] << ", " << scale[1] << ", " << scale[2] << ">\n";
+    break;
+  }
+  case OpROTATE:
+  {
+    break;  
+  }
+  default:
+    NULL;
+	}
 }

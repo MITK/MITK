@@ -50,7 +50,9 @@ typedef enum EOperations
   OpSELECTPOINT = 700,
   OpDESELECTPOINT = 800,
   OpNAVIGATE = 900,
-  OpZOOM = 1000
+  OpZOOM = 1000,
+  OpSCALE = 1100,
+  OpROTATE = 1200
 };
 
 //##Constants for EventMapping...
@@ -89,9 +91,11 @@ typedef enum ESideEffects
   SeDELETEPOINT = 120,
   SeCLEAR = 130, //clear all elements from a list
   SeTERMINATE_INTERACTION = 666,
-  SeTRANSLATE = 1000,
-  SeROTATE = 1001,
-  SeSCALE = 1002
+  SeTRANSLATE = 1000,  
+  SeSCALESTART = 1002,
+  SeSCALE = 1003,
+  SeROTATESTART = 1004,
+  SeROTATE = 1005,
 };
 
 //Type of an Event;

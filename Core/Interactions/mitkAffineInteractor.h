@@ -3,6 +3,7 @@
 
 #include "mitkCommon.h"
 #include "mitkInteractor.h"
+#include "mitkVector.h"
 
 namespace mitk {
 
@@ -31,6 +32,12 @@ public:
 protected:
 
 	virtual bool ExecuteSideEffect(int sideEffectId, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId);
+
+  mitk::ITKPoint3D m_lastScalePosition;
+  mitk::ITKPoint3D m_lastScaleData;
+  mitk::ITKPoint3D m_lastRotatePosition;
+  mitk::ITKPoint3D m_lastRotateData;
+  float m_ScaleFactor;
 };
 
 } // namespace mitk

@@ -42,7 +42,7 @@ controls(NULL), multiWidget(mitkStdMultiWidget), opacityprop(NULL), lookupTableP
     {
 	    globalInteraction->AddStateMachine(new mitk::CoordinateSupplier("navigation", this));//sends PointOperations
 	    globalInteraction->AddStateMachine(new mitk::DisplayVectorInteractor("move", this));//sends DisplayCoordinateOperation
-	    globalInteraction->AddStateMachine(new mitk::DisplayVectorInteractor("zoom", this));//sends DisplayCoordinateOperation
+	    //globalInteraction->AddStateMachine(new mitk::DisplayVectorInteractor("zoom", this));//sends DisplayCoordinateOperation
     }
 }
 

@@ -2,11 +2,14 @@
 #define GEOMETRY3D_H_HEADER_INCLUDED_C1EBD0AD
 
 #include "mitkCommon.h"
+#include "mitkOperationActor.h"
 #include "mitkVector.h"
 #include <itkImageRegion.h>
 #include <itkBoundingBox.h>
 
+
 class vtkTransform;
+class Operation;
 
 namespace mitk {
 
@@ -36,7 +39,7 @@ typedef itk::BoundingBox<unsigned long, 3, mitk::ScalarType>   BoundingBox;
 //## itk::DataObject::UpdateOutputInformation().
 //## 
 //## Rule: everything is in mm (ms) if not stated otherwise.
-class Geometry3D : public itk::Object
+class Geometry3D : public itk::Object, public OperationActor
 {
 public:
   mitkClassMacro(Geometry3D, itk::Object);
@@ -84,6 +87,12 @@ public:
   virtual void SetMasterTransform(const vtkTransform * transform);
 
   virtual Pointer Clone();
+
+  //##Documentation
+  //##@brief executes affine operations (translate, rotate, scale)
+  //## 
+  //## executes affine operations (translate, rotate, scale) 
+  void ExecuteOperation(Operation* operation);
 
 protected:
   Geometry3D();

@@ -68,7 +68,7 @@
 
 /* include-Files                                                        */
 
-#include "ipFunc.h"   
+#include "ipFuncP.h"   
  
 ipPicDescriptor *_ipFuncScBL( ipPicDescriptor *pic_old,           
                               ipPicDescriptor *pic_new ) ;
@@ -299,7 +299,7 @@ ipPicDescriptor *_ipFuncScBL( ipPicDescriptor *pic_old,
 {
 
   ipUInt4_t       i;                  /* loopindex                      */
-  ipInt4_t        n[_ipPicNDIM];      /* no. of pixels in each dimension*/
+  ipUInt4_t        n[_ipPicNDIM];     /* no. of pixels in each dimension*/
   ipFloat8_t      scale[_ipPicNDIM];  /* scaling factors                */
   ipUInt4_t       size[_ipPicNDIM];                                    
   ipUInt4_t       sizeo[_ipPicNDIM];                                    

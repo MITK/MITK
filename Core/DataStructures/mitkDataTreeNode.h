@@ -231,19 +231,19 @@ public:
   //##Documentation
   //## @brief Convenience method for setting visibility properties (instances
   //## of BoolProperty)
-  void SetVisibility(bool visible, mitk::BaseRenderer* renderer, const char* propertyKey = "visible");
+  void SetVisibility(bool visible, mitk::BaseRenderer* renderer = NULL, const char* propertyKey = "visible");
 
   //##ModelId=3EF196880095
   //##Documentation
   //## @brief Convenience method for setting opacity properties (instances of
   //## FloatProperty)
-  void SetOpacity(float opacity, mitk::BaseRenderer* renderer, const char* propertyKey = "opacity");
+  void SetOpacity(float opacity, mitk::BaseRenderer* renderer = NULL, const char* propertyKey = "opacity");
 
   //##ModelId=3EF1969A0181
   //##Documentation
   //## @brief Convenience method for setting level-window properties
   //## (instances of LevelWindowProperty)
-  void SetLevelWindow(mitk::LevelWindow levelWindow, mitk::BaseRenderer* renderer, const char* propertyKey = "levelwindow");
+  void SetLevelWindow(mitk::LevelWindow levelWindow, mitk::BaseRenderer* renderer = NULL, const char* propertyKey = "levelwindow");
 
   //##Documentation
   //## @brief Convenience method for setting int properties (instances of

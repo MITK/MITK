@@ -40,7 +40,7 @@ void mitk::PlaneGeometry::Initialize()
 
 void mitk::PlaneGeometry::EnsurePerpendicularNormal(mitk::AffineTransform3D* transform)
 {
-  //ensure row(3) of transform to be perpendicular to plane, keep length.
+  //ensure row(2) of transform to be perpendicular to plane, keep length.
   VnlVector normal = vnl_cross_3d(transform->GetMatrix().GetVnlMatrix().get_column(0),transform->GetMatrix().GetVnlMatrix().get_column(1));
   normal.normalize();
   ScalarType len = transform->GetMatrix().GetVnlMatrix().get_column(2).two_norm();

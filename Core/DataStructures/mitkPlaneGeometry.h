@@ -161,7 +161,9 @@ public:
   //##
   Vector3D GetNormal() const
   {
-    return GetAxisVector(2);
+    Vector3D frontToBack;
+    frontToBack.Set_vnl_vector(m_IndexToWorldTransform->GetMatrix().GetVnlMatrix().get_column(2));
+    return frontToBack;
   }
 
   //##Documentation
@@ -169,7 +171,7 @@ public:
   //##
   VnlVector GetNormalVnl() const
   {
-    return GetAxisVector(2).Get_vnl_vector();
+    return m_IndexToWorldTransform->GetMatrix().GetVnlMatrix().get_column(2);
   }
 
   //##Documentation
@@ -398,7 +400,8 @@ public:
   //##
   Point3D Lot( const Point3D& pt ) const
   {
-    return pt-GetNormal()*Distance(pt);
+    ScalarType len = GetNormalVnl().two_norm();
+    return pt-GetNormal()*Distance(pt)/len;
   }
 
   //##Documentation

@@ -517,7 +517,7 @@
 				<action ID="1510" /> <!--AcCHECKBOUNDINGBOX-->
 			</transition>
 		</state>
-		<state NAME="polygonmoves" ID="20">
+		<state NAME="primstripmoves" ID="20">
 			<transition NAME="mousemove" NEXT_STATE_ID="20" EVENT_ID="530">
 				<action ID="92" />
 			</transition>
@@ -549,14 +549,16 @@
 			</transition>
 		</state>
 		<state NAME="checkSubSelected" ID="2">
-			<transition NAME="Yes" NEXT_STATE_ID="3" EVENT_ID="1004"> <!-- necessary transition of the state subSelected -->
+			<transition NAME="EIDYes" NEXT_STATE_ID="3" EVENT_ID="1004"> <!-- necessary transition of the state subSelected -->
 				<action ID="1102" /> <!--AcMODESUBSELECT--> <!-- the event will produced from the hirachical interactor -->
+				<action ID="1550"/><!--AcFORCESUBINTERACTORS-->
+				<action ID="2000" /> <!--AcTRANSMITEVENT-->
 			</transition>
-			<transition NAME="No" NEXT_STATE_ID="0" EVENT_ID="1003" /> <!-- necessary transition of the state subSelected -->
+			<transition NAME="EIDNo" NEXT_STATE_ID="0" EVENT_ID="1003" /> <!-- necessary transition of the state subSelected -->
 		</state>
 		<state NAME="subSelected" ID="3">
-			<transition NAME="SubInteractorDeselect" NEXT_STATE_ID="1" EVENT_ID="1020"> <!-- necessary transition of the state subSelected -->
-				<action ID="1101" /><!--AcMODEDESELECT--><!-- the event will produced from the hirachical interactor -->
+			<transition NAME="SubInteractorDeselect" NEXT_STATE_ID="0" EVENT_ID="1020"> <!-- necessary transition of the state subSelected -->
+				<action ID="1100" /><!--AcMODEDESELECT--><!-- the event will produced from the hirachical interactor -->
 			</transition>
 		</state>
 	</stateMachine>

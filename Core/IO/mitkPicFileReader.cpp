@@ -20,6 +20,8 @@ void mitk::PicFileReader::GenerateOutputInformation()
 
 	ipPicDescriptor* header=ipPicGetHeader(const_cast<char *>(m_FileName.c_str()), NULL);
 
+    header=ipPicGetTags(const_cast<char *>(m_FileName.c_str()), header);
+
 	if( header == NULL)
 	{
 		itk::ImageFileReaderException e(__FILE__, __LINE__);

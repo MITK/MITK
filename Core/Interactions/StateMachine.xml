@@ -1273,6 +1273,17 @@
       </transition>
     </state>
   </stateMachine>
+  <!-- Behaviour for connecting points using mitk::ConnectPointsInteractor -->
+  <stateMachine NAME="connectpointsinteractor">
+    <state NAME="ready" ID="1" START_STATE="TRUE">
+      <transition NAME="addPoint but check n" NEXT_STATE_ID="1" EVENT_ID="3">
+        <action ID="10" /> <!--AcADDPOINT-->
+      </transition>
+      <transition NAME="remove" NEXT_STATE_ID="1" EVENT_ID="12">
+	  <action ID="100" /> <!--AcREMOVEPOINT-->
+     </transition>
+    </state>
+  </stateMachine>
   <!-- -->
   <!-- -->
   <!-- EventDescriptions -->

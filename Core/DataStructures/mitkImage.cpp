@@ -192,7 +192,7 @@ mitk::ImageDataItem::Pointer mitk::Image::GetVolumeData(int t, int n)
 		m_RequestedRegion.SetSize(0, m_Dimensions[0]);
 		m_RequestedRegion.SetSize(1, m_Dimensions[1]);
 		m_RequestedRegion.SetSize(2, m_Dimensions[2]);
-		m_RequestedRegion.SetSize(3, m_Dimensions[3]);
+		m_RequestedRegion.SetSize(3, 1);
 		m_RequestedRegion.SetSize(4, 1);
 		m_RequestedRegionInitialized=true;
 		GetSource()->Update();
@@ -272,7 +272,7 @@ mitk::ImageDataItem::Pointer mitk::Image::GetChannelData(int n)
 		m_RequestedRegion.SetSize(1, m_Dimensions[1]);
 		m_RequestedRegion.SetSize(2, m_Dimensions[2]);
 		m_RequestedRegion.SetSize(3, m_Dimensions[3]);
-		m_RequestedRegion.SetSize(4, m_NumberOfChannels);
+		m_RequestedRegion.SetSize(4, 1);
 		m_RequestedRegionInitialized=true;
 		GetSource()->Update();
 		// did it work?

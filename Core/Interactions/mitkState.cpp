@@ -38,6 +38,21 @@ int mitk::State::GetId() const
 	return m_Id;
 }
 
+
+//##ModelId=3E7757280208
+//##Documentation
+//## gives all next States back. To parse through all States.
+std::set<int> mitk::State::GetAllNextStates() const
+{
+	std::set<int> tempset;
+
+	for (TransMapConstIter i= m_Transitions.begin(); i != m_Transitions.end(); i++)
+	{
+		tempset.insert( (i->second).GetNextStateId() );
+	}
+	return tempset;
+}
+
 //##ModelId=3E64B4360017
 bool mitk::State::LocateTransition(int eventId) const
 {

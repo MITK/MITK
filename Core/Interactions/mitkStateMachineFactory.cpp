@@ -9,30 +9,30 @@
 StartStateMap mitk::StateMachineFactory::m_StartStates;
 
 //XML StateMachine
-//##ModelId=3E72243D031F
+//##ModelId=3E7757280322
 const std::string mitk::StateMachineFactory::STYLE = "STYLE";
-//##ModelId=3E72243D033E
+//##ModelId=3E775728037F
 const std::string mitk::StateMachineFactory::NAME = "NAME";
-//##ModelId=3E72243D036D
+//##ModelId=3E77572803DD
 const std::string mitk::StateMachineFactory::ID = "ID";	  
-//##ModelId=3E72243D038C
+//##ModelId=3E7757290053
 const std::string mitk::StateMachineFactory::START_STATE = "START_STATE";
-//##ModelId=3E72243D03BB
+//##ModelId=3E77572900B1
 const std::string mitk::StateMachineFactory::NEXT_STATE_ID = "NEXT_STATE_ID";
-//##ModelId=3E72243E0002
+//##ModelId=3E775729010E
 const std::string mitk::StateMachineFactory::EVENT_ID = "EVENT_ID";
-//##ModelId=3E72243E0031
+//##ModelId=3E775729017C
 const std::string mitk::StateMachineFactory::SIDE_EFFECT_ID = "SIDE_EFFECT_ID";
 //XML Event	  
-//##ModelId=3E72243E005F
+//##ModelId=3E77572901E9
 const std::string mitk::StateMachineFactory::TYPE = "TYPE";
-//##ModelId=3E72243E009E
+//##ModelId=3E7757290256
 const std::string mitk::StateMachineFactory::BUTTON_NUMBER = "BUTTON_NUMBER";
-//##ModelId=3E72243E00CD
+//##ModelId=3E77572902C4
 const std::string mitk::StateMachineFactory::KEY = "KEY";
-//##ModelId=3E72243E010B
+//##ModelId=3E7757290341
 const std::string mitk::StateMachineFactory::TRUE = "TRUE";
-//##ModelId=3E72243E013A
+//##ModelId=3E77572903AE
 const std::string mitk::StateMachineFactory::FALSE = "FALSE";
 
 
@@ -40,7 +40,7 @@ const std::string mitk::StateMachineFactory::FALSE = "FALSE";
 mitk::StateMachineFactory::StateMachineFactory()
 : m_AktState(NULL), 	m_AktStateMachineName(""){}
 
-//##ModelId=3E72243E0188
+//##ModelId=3E77572A0062
 //##Documentation
 //## Destructor, deletes all the reserved memory
 mitk::StateMachineFactory::~StateMachineFactory()
@@ -83,14 +83,34 @@ bool mitk::StateMachineFactory::LoadBehavior(std::string fileName)
    return true;
 }
 
+//##ModelId=3E77572A010E
 //##Documentation
 //## recusive method, that parses this brand of 
-//## the stateMachine and returns if correct
-/*bool parse(State *state, std::set *history)
+//## the stateMachine; if the history has the same 
+//## size at the end, then the StateMachine is correct
+bool mitk::StateMachineFactory::parse(StateMap *states, StateMapIter thisState, HistorySet *history)
 {
-	for (StateMapIter tempState = states->begin(); tempState != states->end();  tempState++)
+
+	std::set<int> nextStatesSet = (thisState->second)->GetAllNextStates();
 	
-}*/
+	//go through all Transitions of thisState and look if we have allready been in this state
+	for (std::set<int>::iterator i = nextStatesSet.begin(); i != nextStatesSet.end();  i++)
+	{
+		if ( history->find(*i) == history->end() )//wenn wir noch nicht in dieser NextState waren
+		{
+			history->insert(*i);//log our path
+			StateMapIter nextState = states->find(*i);//search the iterator for our nextState
+			return parse( states, nextState, history);//recusive path into the next state
+		}
+		else if ( nextStatesSet.size()<= 1 )//wenn gleiche State oder wenn kein nextState vorhanden, dann Deadlock
+		{
+			return false;
+		}
+		
+
+	}
+	return true;
+}
 
 //##ModelId=3E5B428F010B
 //##Documentation
@@ -98,15 +118,22 @@ bool mitk::StateMachineFactory::LoadBehavior(std::string fileName)
 bool mitk::StateMachineFactory::ConnectStates(StateMap *states)
 {
 	//parse all the given states an check for deadlock or not connected states
-/*	std::set *history = new std::set;
-	bool ok = parse(states->begin(), history);
-	if !( (states->size() == history.size()) || ok )
+	HistorySet *history = new HistorySet;
+
+	StateMapIter firstState = states->begin(); 
+	//parse through all the given states, log the parsed elements in history
+	bool ok = parse( states, firstState, history);
+
+	if ( (states->size() == history->size()) && ok )
+	{
+		delete history;
+	}
+	else //ether !ok or sizeA!=sizeB
 	{
 		delete history;
 		return false;
 	}
-	else delete history;
-	*/
+
 
 	//connect all the states
 	for (StateMapIter tempState = states->begin(); tempState != states->end();  tempState++)
@@ -123,7 +150,8 @@ bool mitk::StateMachineFactory::ConnectStates(StateMap *states)
 //##ModelId=3E6773790098
 bool mitk::StateMachineFactory::startElement( const QString&, const QString&, const QString& qName, const QXmlAttributes& atts )
 {
-	//qName.ascii(); //for debuging
+
+	qName.ascii(); //for debuging
 	
 	//abfangen atts.value(#) fehler!
 

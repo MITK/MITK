@@ -5,6 +5,7 @@
 #include "Transition.h"
 #include <string>
 #include <map>
+#include <set>
 
 
 //##ModelId=3E6907B400B4
@@ -12,10 +13,13 @@ typedef std::map<int,mitk::State*> StateMap;
 //##ModelId=3E6907B400C4
 typedef std::map<int,mitk::Transition> TransitionMap;
 
-//##ModelId=3E72243D0263
+//##ModelId=3E775728018B
 typedef std::map<int,mitk::State *>::iterator StateMapIter;
-//##ModelId=3E72243D0273
+//##ModelId=3E77572801AB
 typedef std::map<int,mitk::Transition>::iterator TransMapIter;
+
+//##ModelId=3E775728019B
+typedef std::map<int,mitk::Transition>::const_iterator TransMapConstIter;
 
 
 namespace mitk {
@@ -40,6 +44,11 @@ class State
 
     //##ModelId=3E5B2C14016A
     int GetId() const;
+
+    //##ModelId=3E7757280208
+	//##Documentation
+    //## gives all next States back. To parse through all States.
+	std::set<int> GetAllNextStates() const;
 
     //##ModelId=3E64B4360017
     //##Documentation

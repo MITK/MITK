@@ -5,17 +5,16 @@
 #include "State.h"
 #include <qxml.h>
 
-//##ModelId=3E72243D0244
+//##ModelId=3E775728016C
 typedef std::map<std::string,mitk::State*> StartStateMap;
-//##ModelId=3E72243D0253
+//##ModelId=3E775728017C
 typedef std::map<std::string,mitk::State *>::iterator StartStateMapIter;
 
-/*typedef std::map<int,mitk::State *> StateMap;
-typedef std::map<int,mitk::Transition> TransitionMap;
+//##ModelId=3E775728014D
+typedef std::set<int> HistorySet;
+//##ModelId=3E775728015C
+typedef std::set<int>::iterator HistorySetIter;
 
-typedef std::map<int,mitk::State *>::iterator StateMapIter;
-typedef std::map<int,mitk::Transition>::iterator TransMapIter;
-*/
 
 namespace mitk {
 
@@ -31,7 +30,7 @@ namespace mitk {
     //##ModelId=3E68B2C600BD
 	  StateMachineFactory();
 
-    //##ModelId=3E72243E0188
+    //##ModelId=3E77572A0062
 	  ~StateMachineFactory();
 
     //##ModelId=3E5B4144024F
@@ -60,7 +59,11 @@ namespace mitk {
 	//## sets the pointers in Transition (setNextState(..)) according to the extracted xml-file content
 	  static bool ConnectStates(StateMap *states);
 
-	  
+    //##ModelId=3E77572A010E
+	//##Documentation
+	//## recusive method, that parses this brand of 
+	//## the stateMachine and returns if correct
+	  static bool parse(StateMap *states, StateMapIter thisState, HistorySet *history);
 
 	//##ModelId=3E5B423003DF
 	  static StartStateMap m_StartStates;
@@ -74,30 +77,30 @@ namespace mitk {
     //##ModelId=3E68B2C60040
 	  std::string m_AktStateMachineName;
 
-    //##ModelId=3E72243D031F
+    //##ModelId=3E7757280322
 	  static const std::string STYLE;
-    //##ModelId=3E72243D033E
+    //##ModelId=3E775728037F
 	  static const std::string NAME;
-    //##ModelId=3E72243D036D
+    //##ModelId=3E77572803DD
 	  static const std::string ID;	  
-    //##ModelId=3E72243D038C
+    //##ModelId=3E7757290053
 	  static const std::string START_STATE;
-    //##ModelId=3E72243D03BB
+    //##ModelId=3E77572900B1
 	  static const std::string NEXT_STATE_ID;
-    //##ModelId=3E72243E0002
+    //##ModelId=3E775729010E
 	  static const std::string EVENT_ID;
-    //##ModelId=3E72243E0031
+    //##ModelId=3E775729017C
 	  static const std::string SIDE_EFFECT_ID;
 	  
-    //##ModelId=3E72243E005F
+    //##ModelId=3E77572901E9
 	  static const std::string TYPE;
-    //##ModelId=3E72243E009E
+    //##ModelId=3E7757290256
 	  static const std::string BUTTON_NUMBER;
-    //##ModelId=3E72243E00CD
+    //##ModelId=3E77572902C4
 	  static const std::string KEY;
-    //##ModelId=3E72243E010B
+    //##ModelId=3E7757290341
 	  static const std::string TRUE;
-    //##ModelId=3E72243E013A
+    //##ModelId=3E77572903AE
 	  static const std::string FALSE;
 
 

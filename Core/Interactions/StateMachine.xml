@@ -2,17 +2,21 @@
 <mitkInteraktionStates STYLE="Powerpoint">
 	<stateMaschine NAME="global">
 		<state NAME="start" ID="1" START_STATE="TRUE">
+			<transition NAME="Übergang von 1 in 1" NEXT_STATE_ID="1" EVENT_ID="150" SIDE_EFFECT_ID="15" />
 			<transition NAME="Übergang von 1 in 2" NEXT_STATE_ID="2" EVENT_ID="100" SIDE_EFFECT_ID="10" />
-			<transition NAME="Übergang von 1 in 3" NEXT_STATE_ID="3" EVENT_ID="400" SIDE_EFFECT_ID="40" />
 		</state>
 		<state NAME="mitte" ID="2">
-			<transition NAME="Übergang von 2 in 3" NEXT_STATE_ID="3" EVENT_ID="200" SIDE_EFFECT_ID="20" />
-			<transition NAME="Übergang von 2 in 1" NEXT_STATE_ID="1" EVENT_ID="500" SIDE_EFFECT_ID="50" />
+			<transition NAME="Übergang von 2 in 3" NEXT_STATE_ID="3" EVENT_ID="400" SIDE_EFFECT_ID="40" />
 		</state>
 		<state NAME="ende" ID="3">
-			<transition NAME="Übergang von 3 in 1" NEXT_STATE_ID="1" EVENT_ID="300" SIDE_EFFECT_ID="30" />
-			<transition NAME="Übergang von 3 in 2" NEXT_STATE_ID="2" EVENT_ID="600" SIDE_EFFECT_ID="60" />
+			<transition NAME="Übergang von 3 in 1" NEXT_STATE_ID="1" EVENT_ID="500" SIDE_EFFECT_ID="50" />
+			<transition NAME="Übergang von 3 in 4" NEXT_STATE_ID="4" EVENT_ID="600" SIDE_EFFECT_ID="60" />
 		</state>
+		<state NAME="own" ID="4">
+			<transition NAME="Übergang von 4 in 4" NEXT_STATE_ID="4" EVENT_ID="700" SIDE_EFFECT_ID="70" />
+			<transition NAME="Übergang von 4 in 1" NEXT_STATE_ID="1" EVENT_ID="800" SIDE_EFFECT_ID="80" />
+		</state>
+
 	</stateMaschine>
 	<stateMaschine NAME="local">
 		<state NAME="start" ID="1" START_STATE="TRUE">

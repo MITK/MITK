@@ -2,25 +2,21 @@
 
 \page KnownProblemsPage Known Problems
 
-@bug (1) do something in 2D-widget (2) do something in 3D widget (3) try to zoom or pan in the same 
-2D-widget as in (1), it won't work, although all messages come through and Render is called. Seems to be 
-a OpenGL-context problem. It will work, if in (3) another 2D widget is used
+@bug 1:(1) do something in 2D-widget (2) do something in 3D widget (3) try to zoom or pan in the same 2D-widget as in (1), it won't work, although all messages come through and Render is called. Seems to be a OpenGL-context problem. It will work, if in (3) another 2D widget is used -->solved (Ingmar)
 
-@bug switching from QmitkRegistration to another functionality sometimes takes a long time, probably because of a resize of an invisible OpenGL widget.
+@bug 2:switching from QmitkRegistration to another functionality sometimes takes a long time, probably because of a resize of an invisible OpenGL widget.
 
-@bug QmitkRegistration: application crashes when pressing the "start registration" button without previously selecting both, fixed and moving image.
+@bug 3:QmitkRegistration: application crashes when pressing the "start registration" button without previously selecting both, fixed and moving image.
 
-@bug after the removal of all previously defined points in the mapped view (coronary mapping fucntionality) 
-the application crashes.
+@bug 4:after the removal of all previously defined points in the mapped view (coronary mapping fucntionality) the application crashes. -->solved (Ingmar)
 
-@bug functionalities influence each other because they all work on the same data, i.e. when changing colors of the 2D planes in one functionality it will be the same color in the other functionalities and so on. Also all data sets added to the tree are visible in all functionlities
+@bug 5:functionalities influence each other because they all work on the same data, i.e. when changing colors of the 2D planes in one functionality it will be the same color in the other functionalities and so on. Also all data sets added to the tree are visible in all functionlities
 
-@bug 1) in coronary mapping: events of the fourth (mapped view)window are processed and change the view in the other three slices. One can even define new points in the mapped view with strange coordinates 2) after loading more data sets the defined mapping points (originally painted yellow) are painted white. 3) level window does not affect mapped view window
+@bug 6:1) in coronary mapping: events of the fourth (mapped view)window are processed and change the view in the other three slices. One can even define new points in the mapped view with strange coordinates -->solved (Ingmar) 2) after loading more data sets the defined mapping points (originally painted yellow) are painted white. -->like bug 5! Color has to be set by each functionality in a property 3) level window does not affect mapped view window
 
+@bug 7:functionalities: the activated method is called twice - side effect when adding a state machine to GlobalInteraction in activated and removing it in deactivated one statemachine will remain. By the way, the same state machine pointer can be added more than once shouldn't this be impossible??? -->quickimplement, so has to be replaced
 
-@bug functionalities: the activated method is called twice - side effect when adding a state machine to GlobalInteraction in activated and removing it in deactivated one statemachine will remain. By the way, the same state machine pointer can be added more than once shouldn't this be impossible??? 
-
-@todo derive Mapper from BaseProcess or ProcessObject instead of ImageSource
-@todo remove Geometry2DData; derive Geometry3D from BaseData; derive a class StackedGeometry from Geometry3D, which contains Geometry2D's; derive Geometry2D from Geometry3D.
-@todo derive DataTreeNode from DataObject instead of BaseData, since otherwise we have duplicated Geometry information.
+@todo 1: derive Mapper from BaseProcess or ProcessObject instead of ImageSource
+@todo 2: remove Geometry2DData; derive Geometry3D from BaseData; derive a class StackedGeometry from Geometry3D, which contains Geometry2D's; derive Geometry2D from Geometry3D.
+@todo 3: derive DataTreeNode from DataObject instead of BaseData, since otherwise we have duplicated Geometry information.
 */

@@ -82,11 +82,11 @@ bool mitk::StateMachine::HandleEvent(StateEvent const* stateEvent)
   {
     if ( m_UndoEnabled )	//write to UndoMechanism if Undo is enabled
     {
-      //UNDO for this statechange
-	  StateTransitionOperation* doOp = new StateTransitionOperation(OpSTATECHANGE, tempNextState);
-    StateTransitionOperation* undoOp = new StateTransitionOperation(OpSTATECHANGE, m_CurrentState);
-	  OperationEvent *operationEvent = new OperationEvent(((mitk::OperationActor*)(this)), doOp, undoOp);
-	  m_UndoController->SetOperationEvent(operationEvent);
+      //UNDO for this statechange; since we directly change the state, we don't need the do-Operation in case m_UndoEnables == false
+  	  StateTransitionOperation* doOp = new StateTransitionOperation(OpSTATECHANGE, tempNextState);
+      StateTransitionOperation* undoOp = new StateTransitionOperation(OpSTATECHANGE, m_CurrentState);
+	    OperationEvent *operationEvent = new OperationEvent(((mitk::OperationActor*)(this)), doOp, undoOp);
+	    m_UndoController->SetOperationEvent(operationEvent);
     }
 
             #ifdef INTERDEBUG

@@ -135,7 +135,6 @@ bool mitk::GlobalInteraction::AskSelected(mitk::StateEvent const* stateEvent)
       if ((*it)->GetMode()==Interactor::SMDESELECTED)
       {
         it = m_SelectedList.erase(it);
-        //it = m_SelectedList.begin();//TODO fix!!!
       }
       else
       {
@@ -158,7 +157,7 @@ void mitk::GlobalInteraction::FillJurisdictionMap(mitk::StateEvent const* stateE
       float value = (*it)->CalculateJurisdiction(stateEvent);
       if (value > threshold)
       {
-        ///TODO: hier werden die gleichen IDs überschrieben!
+        ///TODO: hier werden die gleichen IDs überschrieben! von map auf vector umändern!
         m_JurisdictionMap.insert(InteractorMap::value_type(value, (*it)));
       }
     }
@@ -270,7 +269,6 @@ bool mitk::GlobalInteraction::ExecuteAction(Action* action, mitk::StateEvent con
         ok = GetWorldCoordinate(displayEvent, positionEvent);
         if (ok)
         {
-          // int id = stateEvent->GetId(); \todo remove this line
           mitk::EventMapper::SetStateEvent(positionEvent);
         }
       }

@@ -270,6 +270,7 @@
 	<stateMachine NAME="pointsetinteractor">
 		<state NAME="no points or loaded points" ID="1" START_STATE="TRUE">
 			<transition NAME="addPoint but check n" NEXT_STATE_ID="3" EVENT_ID="3">
+				<action ID="1101" /> <!--AcMODESELECT-->
 				<action ID="32" />
 			</transition>
 			<transition NAME="Select or move point Space" NEXT_STATE_ID="10" EVENT_ID="1">
@@ -291,6 +292,7 @@
 			</transition>
 			<transition NAME="clear all" NEXT_STATE_ID="1" EVENT_ID="700">
 				<action ID="130" />
+				<action ID="1100" /> <!--AcMODEDESELECT-->
 			</transition>
 		</state>
 		<state NAME="checkedN" ID="3">
@@ -310,6 +312,7 @@
 			</transition>
 			<transition NAME="clear all" NEXT_STATE_ID="1" EVENT_ID="700">
 				<action ID="130" />
+				<action ID="1100" /> <!--AcMODEDESELECT-->
 			</transition>
 		</state>
 		<state NAME="picked NotFull" ID="10">
@@ -374,6 +377,7 @@
 			</transition>
 			<transition NAME="StYes" NEXT_STATE_ID="1" EVENT_ID="1004">
 				<action ID="100" />
+				<action ID="1100" /> <!--AcMODEDESELECT-->
 			</transition>
 		</state>
 		<state NAME="checkedPositionEventSmallerN" ID="40">
@@ -404,7 +408,9 @@
 	 			<action ID="1050" /><!--AcSETSTARTPOINT-->
 			</transition>
 			<transition NAME="checkpicked" NEXT_STATE_ID="2" EVENT_ID="1">
-				 <action ID="30" />
+				 <action ID="30" > <!--AcCHECKELEMENT-->
+				 	<intParam Name="precision" Value="4" />
+				 </action>
 			</transition>
 		</state>
 		<state NAME="selected" ID="1">
@@ -415,8 +421,10 @@
 			<transition NAME="remove" NEXT_STATE_ID="5" EVENT_ID="12">
 			 	<action ID="1500" /> <!--AcCHECKGREATERONE-->
 			</transition>
-			<transition NAME="checkselectedpick" NEXT_STATE_ID="3" EVENT_ID="1">
-			 	<action ID="34" /><!--AcCHECKSELECTED-->
+			<transition NAME="checkSamePick" NEXT_STATE_ID="3" EVENT_ID="1">
+			 	<action ID="34" ><!--AcCHECKSELECTED-->
+			 		<intParam Name="precision" Value="4" />
+				</action>
 			</transition>
 			<transition NAME="deselect all" NEXT_STATE_ID="0" EVENT_ID="2">
 				<action ID="72" /><!--AcDESELECTALL-->
@@ -424,15 +432,13 @@
 			</transition>
 		</state>
 		<state NAME="checkpicked" ID="2">
-			<transition NAME="StNo" NEXT_STATE_ID="0" EVENT_ID="1003">
-				<action ID="0" />
-			</transition>
+			<transition NAME="StNo" NEXT_STATE_ID="0" EVENT_ID="1003" />
 			<transition NAME="StYes" NEXT_STATE_ID="1" EVENT_ID="1004">
 			 	<action ID="1101" /><!--AcMODESELECT-->
 			 	<action ID="65" /><!--AcSELECT-->
 			</transition>
 		</state>
-		<state NAME="checkselectedpicked" ID="3">
+		<state NAME="checkStillPicked" ID="3">
 			<transition NAME="StNo" NEXT_STATE_ID="0" EVENT_ID="1003">
 				<action ID="72" /><!--AcDESELECTALL-->
 				<action ID="1100" /><!--AcMODEDESELECT-->
@@ -470,11 +476,13 @@
 			 	<action ID="72" /> <!--AcDESELECTALL-->
 			 	<action ID="12" /><!--AcADDLINE -->
 			</transition>
-			<transition NAME="checkpick" NEXT_STATE_ID="2" EVENT_ID="1">
-	 			<action ID="30" /><!--AcCHECKELEMENT-->
+			<transition NAME="checkPointPick" NEXT_STATE_ID="2" EVENT_ID="1">
+	 			<action ID="38"><!--AcCHECKONESUBINTERACTOR-->
+	 				<floatParam Name="threshold" Value="0.5" />
+				</action>
 			</transition>
 		</state>
-		<state NAME="buildlineSSD" ID="1">
+		<state NAME="createLineSSD" ID="1">
 			<transition NAME="addLine" NEXT_STATE_ID="1" EVENT_ID="3">
 			 	<action ID="2000" /><!--AcTRANSMITEVENT-->
 			 	<action ID="72" /><!--AcDESELECTALL-->
@@ -489,54 +497,49 @@
 				<action ID="1101" /><!--AcMODEDESELECT--><!-- the event will produced from the hirachical interactor -->
 			</transition>
 		</state>
-		<state NAME="checkpick" ID="2">
-			<transition NAME="StNo" NEXT_STATE_ID="0" EVENT_ID="1003">
-				<action ID="0" />
+		<state NAME="checkSubInteractor" ID="2">
+			<transition NAME="EIDNo" NEXT_STATE_ID="3" EVENT_ID="1003">
+				<action ID="22" /><!--AcCHECKLINE-->
 			</transition>
-			<transition NAME="StYes" NEXT_STATE_ID="1" EVENT_ID="1004">
+			<transition NAME="EIDYes" NEXT_STATE_ID="10" EVENT_ID="1004">
+				<action ID="72" /><!--AcDESELECTALL-->
+				<action ID="1102" /><!--AcMODESUBSELECT-->
+				<action ID="2000" /><!--AcTRANSMITEVENT-->
+			</transition>
+		</state>
+		<state NAME="checkLinePicked" ID="3">
+			<transition NAME="EIDNo" NEXT_STATE_ID="0" EVENT_ID="1003" />
+			<transition NAME="EIDYes" NEXT_STATE_ID="20" EVENT_ID="1004">
 				<action ID="1101" /><!--AcMODESELECT-->
 				<action ID="65" /><!--AcSELECT-->
 			</transition>
 		</state>
-		<state NAME="checkpointpicked" ID="3">
-			<transition NAME="StNo" NEXT_STATE_ID="5" EVENT_ID="1003">
-				<action ID="34" /><!--AcCHECKSELECTED-->
-			</transition>
-			<transition NAME="StYes" NEXT_STATE_ID="10" EVENT_ID="1004">
-				<action ID="72" /><!--AcDESELECTALL-->
+		<state NAME="SSD" ID="10">
+			<transition NAME="SubInteractorDeselect" NEXT_STATE_ID="0" EVENT_ID="1020"> <!-- necessary transition of the state subSelected -->
+				<action ID="1101" /><!--AcMODEDESELECT--><!-- the event will produced from the hirachical interactor -->
 			</transition>
 		</state>
-		<state NAME="moves" ID="4">
-			<transition NAME="mousemove" NEXT_STATE_ID="4" EVENT_ID="530">
+		<state NAME="selected" ID="20">
+			<transition NAME="checkSamePick" NEXT_STATE_ID="21" EVENT_ID="1">
+	 			<action ID="34" /><!--AcCHECKSELECTED-->
+			</transition>
+		</state>
+		<state NAME="checkStillPicked" ID="21">
+			<transition NAME="EIDYes" NEXT_STATE_ID="22" EVENT_ID="1004">
+				<action ID="8" /> <!--AcINITMOVEMENT-->
+			</transition>
+			<transition NAME="EIDNo" NEXT_STATE_ID="0" EVENT_ID="1003">
+				<action ID="72" /><!--AcDESELECTALL-->
+				<action ID="1100" /><!--AcMODEDESELECT-->
+			</transition>
+		</state>
+		<state NAME="moves" ID="22">
+			<transition NAME="mousemove" NEXT_STATE_ID="22" EVENT_ID="530">
 				<action ID="92" />
 			</transition>
-			<transition NAME="finishmove" NEXT_STATE_ID="1" EVENT_ID="505">
+			<transition NAME="finishmove" NEXT_STATE_ID="20" EVENT_ID="505">
 			 	<action ID="42" />
 			</transition>
-		</state>
-		<state NAME="checkLineHit" ID="5">
-			<transition NAME="StNo" NEXT_STATE_ID="0" EVENT_ID="1003">
-				<action ID="1100" /><!--AcMODEDESELECT-->
-				<action ID="72" /><!--AcDESELECTALL-->
-			</transition>
-			<transition NAME="StYes" NEXT_STATE_ID="4" EVENT_ID="1004">
-				<action ID="8" /><!--AcINITMOVEMENT-->
-			</transition>
-		</state>
-		<state NAME="pointselected" ID="10">
-			<transition NAME="checkhitpoint" NEXT_STATE_ID="11" EVENT_ID="1">
-			 	<action ID="21" /> <!--AcCHECKPOINT-->
-			</transition>
-		</state>
-		<state NAME="checkhitpoint" ID="11">
-			<transition NAME="StNo" NEXT_STATE_ID="4" EVENT_ID="1003">
-				<action ID="76" /><!--AcDESELECTPOINT-->
-			</transition>
-			<transition NAME="StYes" NEXT_STATE_ID="12" EVENT_ID="1004" />
-		</state>
-		<state NAME="transmitt2point" ID="12">
-			<transition NAME="transmitt" NEXT_STATE_ID="12" EVENT_ID="530" />
-			<transition NAME="transmitt" NEXT_STATE_ID="10" EVENT_ID="505" />
 		</state>
 	</stateMachine>
 <!-- Behaviour of a Polygon -->
@@ -583,6 +586,7 @@
 		<state NAME="CheckSubSelect" ID="5">
 			<transition NAME="EIDYES" NEXT_STATE_ID="10" EVENT_ID="1004">
 				<action ID="1102" /> <!--AcMODESUBSELECT-->
+				<action ID="2000" /> <!--AcTRANSMITEVENT-->
 			</transition>
 			<transition NAME="EIDNO" NEXT_STATE_ID="6" EVENT_ID="1003" >
 				<action ID="1510" /> <!--AcCHECKBOUNDINGBOX-->
@@ -597,13 +601,10 @@
 				<action ID="1100" /> <!--AcMODEDESELECT-->
 			</transition>
 		</state>
-				->
 		<state NAME="SSD" ID="10">
-			<transition NAME="checkSubSelected" NEXT_STATE_ID="5" EVENT_ID="1">
-			 	<action ID="38" /><!--AcCHECKONESUBINTERACTOR-->
-			</transition>
-			<transition NAME="SubInteractorDeselect" NEXT_STATE_ID="4" EVENT_ID="1020"> <!-- necessary transition of the state subSelected -->
+			<transition NAME="SubInteractorDeselect" NEXT_STATE_ID="6" EVENT_ID="1020"> <!-- necessary transition of the state subSelected -->
 				<action ID="1101" /><!--AcMODESELECT-->
+				<action ID="1510" /> <!--AcCHECKBOUNDINGBOX-->
 			</transition>
 		</state>
 		<state NAME="polygonmoves" ID="20">

@@ -61,7 +61,7 @@ protected:
     //##ModelId=3E639CD30233
     virtual ~Geometry2DData();
 
-    //##ModelId=3E66CC5A0227
+    //##ModelId=3EDD039F01D2
 	Geometry2D::ConstPointer m_Geometry2D;
 };
 

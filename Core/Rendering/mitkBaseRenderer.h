@@ -130,14 +130,14 @@ protected:
 	bool m_Focused;
 
 private:
-    //##ModelId=3E3D2EEB0087
+    //##ModelId=3EDD039F002C
 	//##Documentation
 	//## ConstPointer to the displaygeometry. The displaygeometry describes the
 	//## geometry of the visible area in the window controlled by the renderer 
 	//## in case we are doing 2D-rendering. 
 	//## It is const, since we are not allowed to change it.
     DisplayGeometry::Pointer m_DisplayGeometry;
-    //##ModelId=3E66B9FA022D
+    //##ModelId=3EDD039F00A9
 	//##Documentation
 	//## ConstPointer to the worldgeometry. The worldgeometry describes the
 	//## maximal area to be rendered in case we are doing 2D-rendering. 

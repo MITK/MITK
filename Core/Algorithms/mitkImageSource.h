@@ -259,7 +259,7 @@ protected:
     //##ModelId=3E1886F100A6
   struct ThreadStruct
   {
-        //##ModelId=3E1886F10197
+        //##ModelId=3EDD039F0359
    Pointer Filter;
   };
   

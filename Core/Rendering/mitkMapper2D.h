@@ -40,7 +40,7 @@ protected:
     //##ModelId=3E3C4681035F
     virtual ~Mapper2D();
 
-    //##ModelId=3E3C5C980267
+    //##ModelId=3EDD039F03E6
     Geometry3D::ConstPointer m_Geometry3D;
     //##ModelId=3E33ECF20328
     int m_SliceNr;

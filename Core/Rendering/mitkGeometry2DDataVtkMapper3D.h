@@ -75,9 +75,10 @@ class Geometry2DDataVtkMapper3D : public BaseVtkMapper3D
     //##ModelId=3E6E8AA40375
     mitk::DataTreeIterator* m_DataTreeIterator;
 
-    //##ModelId=3E6E912903B1
+    //##ModelId=3EDD039F0230
     mitk::ImageSliceSelector::Pointer m_SliceSelector;
 
+    //##ModelId=3EDD039F0240
 	unsigned long int m_LastTextureUpdateTime;
 };
 

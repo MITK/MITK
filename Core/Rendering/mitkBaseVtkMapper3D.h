@@ -45,7 +45,7 @@ public:
     itkSetMacro(ChannelNr,int);
 
 protected:
-    //##ModelId=3E33ECF2030B
+    //##ModelId=3EDD039F0117
     Geometry3D::Pointer m_Geometry;
     //##ModelId=3ED91D050038
     LevelWindow m_LevelWindow;

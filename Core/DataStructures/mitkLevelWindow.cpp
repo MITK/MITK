@@ -111,30 +111,33 @@ void mitk::LevelWindow::SetMinMax(float min, float max)
 	SetMax(max);
 }
 
-//##ModelId=3E0B13320187
+//##ModelId=3EA969CD005D
 void mitk::LevelWindow::SetRangeMin(float min)
 {
 	m_RangeMin = min;
 	testValues();
 }
 
-//##ModelId=3E0B13320187
+//##ModelId=3EA969CD0067
 void mitk::LevelWindow::SetRangeMax(float max)
 {
 		m_RangeMax = max;
 		testValues();
 }
 
+//##ModelId=3EA969CD0069
 float mitk::LevelWindow::GetRangeMin() const
 {
 	return m_RangeMin;
 }
 
+//##ModelId=3EA969CD006B
 float mitk::LevelWindow::GetRangeMax() const
 {
 	return m_RangeMax;
 }
 
+//##ModelId=3EA969CD0072
 float mitk::LevelWindow::GetRange() const
 {
 	return  (m_RangeMax > 0) ? (m_RangeMax - m_RangeMin) : (m_RangeMin - m_RangeMax);
@@ -150,6 +153,7 @@ float mitk::LevelWindow::GetRange() const
 /*!
  * \brief equality operator inplementation
  */
+//##ModelId=3EA969CD0074
 bool mitk::LevelWindow::operator==(const mitk::LevelWindow& levWin) const
 {
 		if ( m_RangeMin == levWin.GetRangeMin() && 
@@ -166,6 +170,7 @@ bool mitk::LevelWindow::operator==(const mitk::LevelWindow& levWin) const
 /*!
  * \brief equality operator inplementation
  */
+//##ModelId=3EA969CD007C
 bool mitk::LevelWindow::operator!=(const mitk::LevelWindow& levWin) const
 {
 		if ( m_RangeMin == levWin.GetRangeMin() && 
@@ -182,6 +187,7 @@ bool mitk::LevelWindow::operator!=(const mitk::LevelWindow& levWin) const
 /*!
  * \brief non equality operator inplementation
  */
+//##ModelId=3EA969CD007F
 mitk::LevelWindow& mitk::LevelWindow::operator=(const mitk::LevelWindow& levWin)
 {
 	if (this == &levWin) {

@@ -154,6 +154,11 @@ void mitk::ImageMapper2D::GenerateData(mitk::BaseRenderer *renderer)
 
   if(input!=NULL)
   {
+    iil4mitkPicImage* image;
+    image = new iil4mitkPicImage(512);
+    renderinfo.Set_iil4mitkImage(image);
+
+    ApplyProperties(renderer);
     const TimeSlicedGeometry* inputtimegeometry = dynamic_cast<const TimeSlicedGeometry*>(input->GetUpdatedGeometry());
 
     assert(inputtimegeometry!=NULL);
@@ -293,11 +298,6 @@ void mitk::ImageMapper2D::GenerateData(mitk::BaseRenderer *renderer)
 
     //std::cout << "Pic dimensions:" << pic->dim << std::endl;
 
-    iil4mitkPicImage* image;
-    image = new iil4mitkPicImage(512);
-    renderinfo.Set_iil4mitkImage(image);
-
-    ApplyProperties(renderer);
 //   image->setImage(pic, iil4mitkImage::INTENSITY_ALPHA);
     image->setImage(pic, m_iil4mitkMode);
     image->setRegion(0,0,pic->n[0],pic->n[1]);
@@ -427,7 +427,7 @@ void mitk::ImageMapper2D::Update(mitk::BaseRenderer* renderer)
       (renderinfo.m_LastUpdateTime < node->GetPropertyList(renderer)->GetMTime())
     )
   {
-    ApplyProperties(renderer);
+    GenerateData(renderer);
     // since we have checked that nothing important has changed, we can set m_LastUpdateTime
     // to the current time
     renderinfo.m_LastUpdateTime.Modified();

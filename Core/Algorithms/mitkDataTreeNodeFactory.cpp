@@ -792,11 +792,16 @@ void mitk::DataTreeNodeFactory::ReadFileSeriesTypeDCM()
             // add level-window property
             mitk::LevelWindowProperty::Pointer levWinProp = new mitk::LevelWindowProperty();
             mitk::LevelWindow levelwindow;
-
             levelwindow.SetAuto( image->GetPic() );
             levWinProp->SetLevelWindow( levelwindow );
-
             node->GetPropertyList()->SetProperty( "levelwindow", levWinProp );
+
+
+            // set filename without path as string property
+            std::string filename = this->GetBaseFilePrefix() + "dcm";
+            mitk::StringProperty::Pointer nameProp = new mitk::StringProperty( filename );
+            node->SetProperty( "name", nameProp );
+
         }
         catch ( const std::exception & e )
         {

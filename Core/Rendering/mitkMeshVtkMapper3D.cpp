@@ -111,7 +111,7 @@ void mitk::MeshVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
     // build m_Spheres->GetOutput() vtkPolyData
     int pointSize = 2;
     mitk::IntProperty::Pointer pointSizeProp = dynamic_cast<mitk::IntProperty *>(this->GetDataTreeNode()->GetProperty("pointsize").GetPointer());
-    if (pointSizeProp != NULL)
+    if (pointSizeProp.IsNotNull())
       pointSize = pointSizeProp->GetValue();
 
     for (j=0, i=mesh->GetPoints()->Begin(); i!=mesh->GetPoints()->End() ; i++,j++)

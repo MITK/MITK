@@ -183,7 +183,7 @@ void mitk::PointSetVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
 
   int pointSize = 2;
   mitk::IntProperty::Pointer pointSizeProp = dynamic_cast<mitk::IntProperty *>(this->GetDataTreeNode()->GetProperty("pointsize").GetPointer());
-  if (pointSizeProp != NULL)
+  if (pointSizeProp.IsNotNull())
     pointSize = pointSizeProp->GetValue();
             
   for (j=0, i=itkPointSet->GetPoints()->Begin(); i!=itkPointSet->GetPoints()->End() ; i++,j++)

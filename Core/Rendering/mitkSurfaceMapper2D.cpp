@@ -134,7 +134,7 @@ void mitk::SurfaceMapper2D::Paint(mitk::BaseRenderer * renderer)
       if(worldAbstractGeometry.IsNotNull())
       {
         AbstractTransformGeometry::ConstPointer surfaceAbstractGeometry = dynamic_cast<const AbstractTransformGeometry*>(input->GetTimeSlicedGeometry()->GetGeometry3D(0));
-        if(surfaceAbstractGeometry!=NULL) //@todo substitude by operator== after implementation, see bug id 28
+        if(surfaceAbstractGeometry.IsNotNull()) //@todo substitude by operator== after implementation, see bug id 28
         {
           PaintCells(vtkpolydata, worldGeometry, renderer->GetDisplayGeometry(), vtktransform, (useCellData ? m_LUT : NULL));
           return;

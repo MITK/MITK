@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include "mitkImage.h"
-#include "mitkAbstractTransformGeometry.h"
+#include "mitkExternAbstractTransformGeometry.h"
 #include "mitkPlaneGeometry.h"
 #include "mitkTimeSlicedGeometry.h"
 #include "mitkSlicedGeometry3D.h"
@@ -47,7 +47,7 @@ int mitkAbstractTransformGeometryTest(int argc, char* argv[])
   xyPlane->SetSizeInUnits(width, height);
 
   std::cout << "Creating AbstractTransformGeometry: " <<std::endl;
-  mitk::AbstractTransformGeometry::Pointer abstractgeometry=mitk::AbstractTransformGeometry::New();
+  mitk::ExternAbstractTransformGeometry::Pointer abstractgeometry=mitk::ExternAbstractTransformGeometry::New();
 
   std::cout << "Setting xyPlane as parameter plane of AbstractTransformGeometry: "<<std::endl;
   abstractgeometry->SetPlane(xyPlane);

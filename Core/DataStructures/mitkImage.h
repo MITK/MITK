@@ -232,7 +232,7 @@ namespace mitk {
         tmpDimensions,
         channels);
 #if ITK_VERSION_MINOR > 5
-      typename const itkImageType::SpacingType itkspacing = itkimage->GetSpacing();  
+      const typename itkImageType::SpacingType & itkspacing = itkimage->GetSpacing();  
 #else
       const double *itkspacing = itkimage->GetSpacing();  
 #endif 
@@ -244,7 +244,7 @@ namespace mitk {
         spacing[2]=itkspacing[2];
 
       Point3D origin;
-      typename const itkImageType::PointType itkorigin = itkimage->GetOrigin();  
+      const typename itkImageType::PointType & itkorigin = itkimage->GetOrigin();  
       FillVector3D(origin, itkorigin[0], 0.0, 0.0);
       if(m_Dimension>=2)
         origin[1]=itkorigin[1];

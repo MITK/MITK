@@ -1,5 +1,6 @@
 #include "mitkDopplerToStrainRateFilter.h"
 #include "mitkImageTimeSelector.h"
+#include "mitkProperties.h"
 
 #include <iostream.h>
 #include <string>
@@ -58,15 +59,17 @@ void mitk::DopplerToStrainRateFilter::GenerateData()
   mitk::Image::Pointer output = this->GetOutput();
 
 
-  // m_origin aus image->GetPropertyList()
-  // m_Origin in units
-
+  mitk::Point3iProperty::Pointer pointProp;
+	pointProp = dynamic_cast<mitk::Point3iProperty*>(input->GetProperty("ORIGIN").GetPointer());
+	if (pointProp.IsNotNull() )
+	{
+				m_Origin = pointProp->GetValue();
+	}
   
   std::cout << "compute Strain Rate Image .... " << std::endl;
   std::cout << "  origin.x=" << m_Origin.x << " origin.y=" << m_Origin.y << " origin.z=" << m_Origin.z << std::endl;
 	std::cout << "  distance=" << m_Distance << std::endl;
 	std::cout << "  NoStrainIntervall=" << m_NoStrainInterval << std::endl;
-
 
   const float *spacing = input->GetSlicedGeometry()->GetSpacing();
 //	std::cout << "   in: xres=" << spacing[0] << " yres=" << spacing[1] << " zres=" << spacing[2] << std::endl;
@@ -93,8 +96,7 @@ void mitk::DopplerToStrainRateFilter::GenerateData()
 	long vol_size = slice_size*zDim;
 	
 	
-//  ipPicDescriptor *picDoppler = timeSelector->GetOutput()->GetPic();
-   ipPicDescriptor *picDoppler;
+  ipPicDescriptor *picDoppler;
   
  	int x,y,z,time;							// loop-counter
 	int strainRate;						// the computed Strain Rate
@@ -121,6 +123,8 @@ void mitk::DopplerToStrainRateFilter::GenerateData()
 
 	tmax = t + output->GetRequestedRegion().GetSize(3);
 	nmax = n + output->GetRequestedRegion().GetSize(4);
+
+	if (m_Distance<1) m_Distance=1;
   
 	for(;n<nmax;++n)//output->GetNumberOfChannels();++n)
 	{
@@ -134,7 +138,8 @@ void mitk::DopplerToStrainRateFilter::GenerateData()
 
 			_ipPicFreeTags(picStrainRate->info->tags_head);
 			picStrainRate->info->tags_head = _ipPicCloneTags(timeSelector->GetOutput()->GetPic()->info->tags_head);
-      
+
+#define       WRITE_ANGLE_PIC
 #ifdef WRITE_ANGLE_PIC
 	ipPicDescriptor *anglePic;
 	ipBool_t isAnglePicWritten = ipFalse;
@@ -155,12 +160,15 @@ void mitk::DopplerToStrainRateFilter::GenerateData()
 		
 		
 				for (y=1; y<yDim; y++) {
-				
+
+					if (y<m_Origin.y) continue;  // cannot compute StrainRate above Transducer-Position
+					
 					for (x=0; x<xDim; x++) {
 
-						if ((m_Origin.x - x)==0) {
-							
-							int yTmp = ( (y-m_Distance)<0 )  ? 0 : (y-m_Distance);
+						if ((m_Origin.x - x)==0) {  // winkelhalbierende
+
+							int yDistanceInUnits = (int)( m_Distance/spacing[1]);
+							int yTmp = ( (y-yDistanceInUnits)<0 )  ? 0 : (y-yDistanceInUnits);
 							v1 = ((ipUInt1_t *)picDoppler->data)[z*slice_size + yTmp*xDim + x] ;
 							v2 = ((ipUInt1_t *)picDoppler->data)[z*slice_size + y*xDim + x] ;
 						
@@ -169,16 +177,17 @@ void mitk::DopplerToStrainRateFilter::GenerateData()
 							// compute angle to transducer position
 							// m_Origin is given in units, not in mm
 							alpha = atan( (float) (m_Origin.x - x)  / (float) (m_Origin.y - y) );
-
+							
 							// m_Distance is given in mm
-							dx = sin(alpha) * m_Distance;
-							dy = cos(alpha) * m_Distance;
+							dx = -sin(alpha) * m_Distance;
+							dy = -cos(alpha) * m_Distance;
 
+							
 							// convert to units
 							dx = dx/spacing[0];
 							dy = dy/spacing[1];
 
-
+//#define WEIGTHED												
 #ifdef WEIGTHED												
 							weightX = dx - floor(dx);
 							weightY = dy - floor(dy);
@@ -187,16 +196,16 @@ void mitk::DopplerToStrainRateFilter::GenerateData()
 							dyFloor = (int) floor(dy);
 						
 							x1 = x + dxFloor;					// lower left
-							y1 = y - dyFloor;
+							y1 = y + dyFloor;
 						
 							x2 = x + (dxFloor+1);			// lower right
-							y2 = y - dyFloor;
+							y2 = y + dyFloor;
 		
 							x3 = x + (dxFloor+1);			// upper right
-							y3 = y - (dyFloor+1);
+							y3 = y + (dyFloor+1);
 		
 							x4 = x + dxFloor;					// upper left
-							y4 = y - (dyFloor+1);
+							y4 = y + (dyFloor+1);
 						
 							vTmp1 = ((ipUInt1_t *)picDoppler->data)[z*slice_size + y1*xDim + x1];
 							vTmp2 = ((ipUInt1_t *)picDoppler->data)[z*slice_size + y2*xDim + x2];
@@ -205,25 +214,35 @@ void mitk::DopplerToStrainRateFilter::GenerateData()
 						
 							v1 = (int) ((1-weightX)*(1-weightY)*vTmp1 + weightX*(1-weightY)*vTmp2 + weightX*weightY*vTmp3 + (1-weightX)*weightY*vTmp4);
 							v2 = ((ipUInt1_t *)picDoppler->data)[z*slice_size + y*xDim + x] ;
-#endif
+#else
 							x1 = (int)(x + dx);
-							y1 = (int)(y - dy);
-
+							y1 = (int)(y + dy);
+							if (y1<0) y1=0;
+							
+#endif
 							v1 = ((ipUInt1_t *)picDoppler->data)[z*slice_size + y1*xDim + x1];
 							v2 = ((ipUInt1_t *)picDoppler->data)[z*slice_size + y*xDim + x] ;
-
-
 						}
+
+						if (v1==128) {  // schaue in Gegenrichtung, falls keine SRI hier berechenbar
+							x1 = (int)(x - dx);
+							y1 = (int)(y - dy);
+							if (y1>yDim) y1=yDim;
+							//swap v1 and v2, otherwise StrainRate is calculate in false direction
+							v1 = v2;								
+							v2 = ((ipUInt1_t *)picDoppler->data)[z*slice_size + y1*xDim + x1];
+						}									
 					
 						if ( 	(v1==0 ) || (v2==0)  ||	// wenn keine Geschwindigkeit vorhanden
 																					// oder wenn nur ganz kleine Geschwindigkeit vorhanden
-							(v1>(128-m_NoStrainInterval) && v1<(128+m_NoStrainInterval)) ||
-							(v2>(128-m_NoStrainInterval) && v2<(128+m_NoStrainInterval))) {
+							(v1>=(128-m_NoStrainInterval) && v1<=(128+m_NoStrainInterval)) ||
+							(v2>=(128-m_NoStrainInterval) && v2<=(128+m_NoStrainInterval))) {
 							
 							strainRate = 128;  // this means no deformation
+							// this is neccessay due to the Cyl2Cart filter
 
 						} else {
-							strainRate = ( (v1 - v2)/m_Distance + 128 );
+							strainRate = (int)( (v1 - v2)/2 + 128 );
 							if (strainRate==128) strainRate=129;
 						}
 						
@@ -233,10 +252,12 @@ void mitk::DopplerToStrainRateFilter::GenerateData()
 						if (strainRate > maxStrainRate)
 						  maxStrainRate = strainRate;
 
-
 						if (strainRate<0 ) {
 							//strainRate = -strainRate;
-							cout << " error: neg. strainRate ... exit() " << endl;
+							std::cout << " error: neg. strainRate ... exit() " << std::endl;
+							std::cout << " x=" << x << " y=" << y << " z=" << z << std::endl;
+							std::cout << " v1=" << v1 << " v2=" << v2 << " dist=" << m_Distance << std::endl;
+							std::cout << " sr=" << strainRate  << std::endl;
 							exit(0);
 							}
 						
@@ -246,8 +267,11 @@ void mitk::DopplerToStrainRateFilter::GenerateData()
 						// cout << "z: " << z << " y: " << y << " x: " << x << " strainrate: " << strainRate << endl;
 					
 #ifdef WRITE_ANGLE_PIC
-						if (!isAnglePicWritten)					
-							((ipInt1_t *)anglePic->data)[y*xDim + x] = (int) ( (alpha/1.6)*128);
+//						if (!isAnglePicWritten)
+//					((ipInt1_t *)anglePic->data)[y*xDim + x] = (int) ( (alpha/1.6)*128);
+						if (!isAnglePicWritten)
+							((ipInt1_t *)anglePic->data)[y*xDim + x] = (int) ( dx);
+
 #endif
 						
 					}  // x
@@ -259,6 +283,9 @@ void mitk::DopplerToStrainRateFilter::GenerateData()
 			} // z
 			
 	//isStrainComputed = ipTrue;
+	std::string filenameD;
+	filenameD ="doppler.pic";
+	ipPicPut(const_cast<char *>(filenameD.c_str()),picDoppler);
 
 #define WRITE_STRAIN_PIC
 #ifdef WRITE_STRAIN_PIC	
@@ -268,8 +295,9 @@ void mitk::DopplerToStrainRateFilter::GenerateData()
 #endif
 	
 #ifdef WRITE_ANGLE_PIC
-	sprintf(filename,"angle.pic");
-	ipPicPut(filename,anglePic);	
+	std::string filename2;
+	filename2="angle.pic";
+	ipPicPut(const_cast<char *>(filename2.c_str()),anglePic);	
 #endif
 		((ipUInt1_t *)picStrainRate->data)[0]=0;
 		((ipUInt1_t *)picStrainRate->data)[1]=255;
@@ -291,6 +319,11 @@ mitk::DopplerToStrainRateFilter::DopplerToStrainRateFilter()
     m_Origin.z = 0;
     
 }
+
+float mitk::DopplerToStrainRateFilter::GetLimit()
+{	return (128/m_Distance);
+}
+
 
 mitk::DopplerToStrainRateFilter::~DopplerToStrainRateFilter()
 {

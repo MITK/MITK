@@ -21,18 +21,14 @@ public:
 
 	itkNewMacro(Self);
 
-  itkSetMacro(Distance, int);
-	itkGetMacro(Distance, int);
+  itkSetMacro(Distance, float);
+	itkGetMacro(Distance, float);
 
   itkSetMacro(NoStrainInterval, int);
 	itkGetMacro(NoStrainInterval, int);
 
-//  itkSetMacro(Origin, Point3<int>);
-//	itkGetMacro(Origin, Point3<int>);
-	
-  void SetOrigin(Point3<int> origin){m_Origin = origin;};
-  Point3<int> GetOrigin(){return m_Origin;};
-  
+	float GetLimit();
+
 protected:
 
   //##Description 
@@ -55,7 +51,7 @@ protected:
 
 private:
 
-  int m_Distance;
+  float m_Distance;
   int m_NoStrainInterval;
   Point3<int> m_Origin;  
     

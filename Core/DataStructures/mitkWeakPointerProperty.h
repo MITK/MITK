@@ -22,6 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkCommon.h"
 #include "mitkBaseProperty.h"
+#include "itkWeakPointer.h"
 
 namespace mitk {
 
@@ -45,7 +46,7 @@ class WeakPointerProperty : public BaseProperty
     //##ModelId=3ED952AD02B7
     itk::Object::Pointer GetWeakPointer() const;
 
-    //##ModelId=3ED952AD02F6
+  //##ModelId=3ED952AD02F6
     void SetWeakPointer(itk::Object* pointer);
   protected:
     //##ModelId=3ED95309021C

@@ -1,6 +1,20 @@
 #include "BaseController.h"
 
+//##ModelId=3E3AE32B0048
+mitk::BaseController::BaseController()
+{
+}
+
+
+//##ModelId=3E3AE32B0070
+mitk::BaseController::~BaseController()
+{
+}
+
 //##ModelId=3DF8F5CA03D8
+/*!
+  \todo implement it!
+  */
 mitk::Stepper &mitk::BaseController::GetSlice()
 {
 	itkExceptionMacro("BaseController not yet implemented."); 	
@@ -8,6 +22,9 @@ mitk::Stepper &mitk::BaseController::GetSlice()
 }
 
 //##ModelId=3DF8F61101E3
+/*!
+  \todo implement it!
+  */
 mitk::Stepper &mitk::BaseController::GetTime()
 {
 	itkExceptionMacro("BaseController not yet implemented."); 	
@@ -52,15 +69,3 @@ bool mitk::BaseController::AddNavigator(mitk::Navigator* navigator)
 	itkExceptionMacro("BaseController not yet implemented."); 	
 	return false;
 }
-
-//##ModelId=3E3AE32B0048
-mitk::BaseController::BaseController()
-{
-}
-
-
-//##ModelId=3E3AE32B0070
-mitk::BaseController::~BaseController()
-{
-}
-

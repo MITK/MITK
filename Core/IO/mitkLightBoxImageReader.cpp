@@ -83,20 +83,14 @@ void mitk::LightBoxImageReader::GenerateOutputInformation()
 
     int RealPosition;
     std::list<int> imageNumbers;    
-    std::list <int>::iterator Iter;
     imageNumbers=SortImage();
         
 //DEBUG itkGenericOutputMacro(<<"4");
     for (position = 0; position < m_LightBox->getFrames (); ++position) //ehemals position < m_LightBox->images
     {
-        // sort image
-        Iter=imageNumbers.begin();
-        RealPosition=0;
-        while (*Iter!=position+1 && Iter!=imageNumbers.end())
-        {
-          Iter++;
-          RealPosition++;
-        }
+        //GetRealPosition of image
+        RealPosition=GetRealPosition(position,imageNumbers);
+
         if (m_LightBox->fetchHeader(RealPosition) != NULL)  //ehemals: if (m_LightBox->image_list[position].type == DB_OBJECT_IMAGE) 
         {
             if(pic==NULL) // only build header
@@ -300,8 +294,7 @@ void mitk::LightBoxImageReader::GenerateData()
     std::list<int> imageNumbers;    
     imageNumbers=SortImage();
     int RealPosition;
-    std::list <int>::iterator Iter;
-    
+        
     int zDim=(output->GetDimension()>2?output->GetDimensions()[2]:1);
     itkGenericOutputMacro(<<" zdim is "<<zDim);
     pic0 = m_LightBox->fetchPic (0);// pFetchImage (m_LightBox, position);
@@ -314,18 +307,13 @@ void mitk::LightBoxImageReader::GenerateData()
     {
       itkWarningMacro(<<"interSliceGeometry is NULL");
     }
+    RealPosition=GetRealPosition(0,imageNumbers);
+    pic0 = m_LightBox->fetchPic (RealPosition);
     output->SetPicSlice(pic0, zDim-1-numberOfImages,time);
-    
     for (position = 1; position < m_LightBox->getFrames (); ++position) 
     {
-        //sort image
-        Iter=imageNumbers.begin();
-        RealPosition=0;
-        while (*Iter!=position+1)
-        {
-          Iter++;
-          RealPosition++;
-        }
+        //GetRealPosition of image
+        RealPosition=GetRealPosition(position,imageNumbers);
 
         if (m_LightBox->fetchHeader(RealPosition) != NULL)//ehemals (m_LightBox->image_list[position].type == DB_OBJECT_IMAGE) 
         {
@@ -477,7 +465,32 @@ std::list<int> mitk::LightBoxImageReader::SortImage()
     return imageNumbers;
 }
 
+int mitk::LightBoxImageReader::GetRealPosition(int position, std::list<int> liste)
+{
+    int RealPosition=0;
+    std::list <int>::iterator Iter;
+    std::list <int> liste2=liste;
+    liste2.sort();
+    
+    int maxNumber=liste2.back();//number of images for a layer
 
+    int layer=position/maxNumber;//number of the layer
+    int number=position%maxNumber;//number in the layer
+
+    Iter=liste.begin();
+    for (int i=0;i<layer;++i)
+      for (int j=0;j<maxNumber;++j)
+         Iter++;
+
+    RealPosition=layer*maxNumber;
+
+    while (*Iter!=number+1)
+    {
+       Iter++;
+       RealPosition++;
+    }
+    return RealPosition;
+}
 
 
 mitk::LightBoxImageReader::LightBoxImageReader() : m_LightBox(NULL)

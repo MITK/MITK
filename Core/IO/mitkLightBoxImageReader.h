@@ -52,6 +52,7 @@ protected:
     /** Time when Header was last read. */
     itk::TimeStamp m_ReadHeaderTime;
     //double ConvertTime(ipPicDescriptor*  pic);
+    int GetRealPosition(int position, std::list<int> liste);
     std::list<int> SortImage();
     QcLightbox* m_LightBox;
 };

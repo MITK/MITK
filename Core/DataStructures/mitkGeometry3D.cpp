@@ -28,28 +28,10 @@ void mitk::Geometry3D::SetBoundingBox(const float bounds[6])
   
   mitk::BoundingBox::PointIdentifier pointid=0;
   
-  //add the four edge points of the upper AND lower boundery of the plane geometry to the bounding box calculator.
+  //add the upper-left-front and lower-right-back edge points of the plane geometry to the bounding box calculator.
   p[0]=bounds[0]; p[1]=bounds[2]; p[2]=bounds[4];
   pointscontainer->InsertElement(pointid++, p);
-
-  //p[0]=bounds[0]; p[1]=bounds[2]; p[2]=bounds[5];
-  //pointscontainer->InsertElement(pointid++, p);
-
-  //p[0]=bounds[0]; p[1]=bounds[3]; p[2]=bounds[4];
-  //pointscontainer->InsertElement(pointid++, p);
-
-  //p[0]=bounds[0]; p[1]=bounds[3]; p[2]=bounds[5];
-  //pointscontainer->InsertElement(pointid++, p);
-
-  //p[0]=bounds[1]; p[1]=bounds[2]; p[2]=bounds[4];
-  //pointscontainer->InsertElement(pointid++, p);
-
-  //p[0]=bounds[1]; p[1]=bounds[2]; p[2]=bounds[5];
-  //pointscontainer->InsertElement(pointid++, p);
-
-  //p[0]=bounds[1]; p[1]=bounds[3]; p[2]=bounds[4];
-  //pointscontainer->InsertElement(pointid++, p);
-
+ 
   p[0]=bounds[1]; p[1]=bounds[3]; p[2]=bounds[5];
   pointscontainer->InsertElement(pointid++, p);
 
@@ -144,6 +126,8 @@ mitk::Geometry3D::Geometry3D() : m_BoundingBox(NULL)
   m_Scale[0] = 50.0;
   m_Scale[1] = 50.0;
   m_Scale[2] = 50.0;
+  m_Modified = true;
+  //UpdateTransform();
 }
 
 //##ModelId=3E3456C50067
@@ -152,10 +136,6 @@ mitk::Geometry3D::~Geometry3D()
 
 }
 
-vtkTransform* mitk::Geometry3D::GetTransform()
-{
-  return m_Transform;
-}
 
 void mitk::Geometry3D::SetBaseGeometry(mitk::Geometry3D* base)
 {
@@ -168,20 +148,25 @@ void mitk::Geometry3D::SetMasterTransform(const vtkTransform * transform)
 
 }
 
-/*!
-\todo set m_Origin, m_Orientation,... in the new Geometry - Need to write acces Methods for the member variables first.
-*/
 mitk::Geometry3D::Pointer mitk::Geometry3D::Clone() const
 {
   mitk::Geometry3D::Pointer newGeometry = Geometry3D::New();
   newGeometry->Initialize();
   newGeometry->GetTransform()->SetMatrix(m_Transform->GetMatrix());
   //newGeometry->GetRelativeTransform()->SetMatrix(m_RelativeTransform->GetMatrix());
-  newGeometry->SetPosition(m_Position);
-  newGeometry->SetOrientation(m_Orientation);
-  newGeometry->SetScale(m_Scale);
+  newGeometry->SetPosition(GetPosition());
+  newGeometry->SetOrientation(GetOrientation());
+  newGeometry->SetScale(GetScale());
+  newGeometry->UpdateTransform();
   
   return newGeometry;  
+}
+
+vtkTransform* mitk::Geometry3D::GetTransform()
+{
+  //if (m_Modified)
+  //  UpdateTransform();
+  return m_Transform;
 }
 
 void mitk::Geometry3D::ExecuteOperation(Operation* operation)
@@ -191,10 +176,7 @@ void mitk::Geometry3D::ExecuteOperation(Operation* operation)
 	{
 		(StatusBar::GetInstance())->DisplayText("Recieved wrong type of operation!See mitkAffineInteractor.cpp", 10000);
 		return;
-	}
-  ScalarType angle = 0.0;
-  mitk::ITKPoint3D rotationVector;
- 
+	} 
   switch (operation->GetOperationType())
 	{
 	case OpNOTHING:
@@ -202,46 +184,58 @@ void mitk::Geometry3D::ExecuteOperation(Operation* operation)
 	case OpMOVE:
   {
     mitk::ITKPoint3D newPos = affineOp->GetPoint();
-    m_Position[0] = newPos[0];
-    m_Position[1] = newPos[1];
-    m_Position[2] = newPos[2];
+    ScalarType data[3];
+    data[0] = newPos[0];
+    data[1] = newPos[1];
+    data[2] = newPos[2];
+    SetPosition(data);
     break;
   }
 	case OpSCALE:
   {
-    mitk::ITKPoint3D newScale = affineOp->GetPoint();    
-    m_Scale[0] = newScale[0];
-    m_Scale[1] = newScale[1];
-    m_Scale[2] = newScale[2];
+    mitk::ITKPoint3D newScale = affineOp->GetPoint();
+    ScalarType data[3];
+    data[0] = newScale[0];
+    data[1] = newScale[1];
+    data[2] = newScale[2];
+    SetScale(data);
     break;
   }
   case OpROTATE:
   {
-    rotationVector = affineOp->GetPoint();
-    angle = affineOp->GetAngle();
+    m_RotationVector = affineOp->GetPoint();
+    m_Angle = affineOp->GetAngle();
+    m_Modified = true;
     break;  
   }
   default:
     NULL;
 	}
-  GetTransform()->GetOrientation(m_Orientation);  // save orientation
+  UpdateTransform();
+}
+
+void mitk::Geometry3D::UpdateTransform()
+{ 
   
-  GetTransform()->Identity();
+  m_Transform->Identity();
 
   // scale
-  GetTransform()->Scale(m_Scale[0], m_Scale[1], m_Scale[2]);
+  m_Transform->Scale(m_Scale[0], m_Scale[1], m_Scale[2]);
 
   // rotate
-  GetTransform()->RotateY(m_Orientation[1]);
-  GetTransform()->RotateX(m_Orientation[0]);
-  GetTransform()->RotateZ(m_Orientation[2]);
-  if (angle != 0.0)
+  m_Transform->RotateY(m_Orientation[1]);
+  m_Transform->RotateX(m_Orientation[0]);
+  m_Transform->RotateZ(m_Orientation[2]);
+  if (m_Angle != 0.0)
   {
-    GetTransform()->RotateWXYZ(angle, rotationVector[0], rotationVector[1], rotationVector[2]);    
+    m_Transform->RotateWXYZ(m_Angle, m_RotationVector[0], m_RotationVector[1], m_RotationVector[2]);    
+    m_Transform->GetOrientation(m_Orientation);  // save orientation
+    m_Angle = 0.0;
   }
 
   // move back from origin and translate  
-  GetTransform()->Translate(m_Position[0], m_Position[1], m_Position[2]);
+  m_Transform->Translate(m_Position[0], m_Position[1], m_Position[2]);
+  m_Modified = false;
 }
 
 const mitk::ITKVector3D mitk::Geometry3D::GetXAxis()
@@ -283,3 +277,52 @@ const mitk::ITKVector3D mitk::Geometry3D::GetZAxis()
 //  std::cout << "        " << m->Element[2][0] << ", " << m->Element[2][1] << ", " << m->Element[2][2] << ", " << m->Element[0][3] << std::endl;
 //  std::cout << "        " << m->Element[3][0] << ", " << m->Element[3][1] << ", " << m->Element[3][2] << ", " << m->Element[3][3] << std::endl;
 //}
+
+
+void mitk::Geometry3D::SetPosition(const mitk::ScalarType data[]) 
+{   
+  if ((m_Position[0] != data[0]) || (m_Position[1] != data[1]) || (m_Position[2] != data[2])) 
+  { 
+    m_Position[0] = data[0]; 
+    m_Position[1] = data[1]; 
+    m_Position[2] = data[2]; 
+    m_Modified = true; 
+  }
+}
+
+void mitk::Geometry3D::SetOrientation(const mitk::ScalarType data[])
+{   
+  if ((m_Orientation[0] != data[0]) || (m_Orientation[1] != data[1]) || (m_Orientation[2] != data[2])) 
+  { 
+    m_Orientation[0] = data[0]; 
+    m_Orientation[1] = data[1]; 
+    m_Orientation[2] = data[2]; 
+    m_Modified = true; 
+  }
+}
+
+void mitk::Geometry3D::SetScale(const mitk::ScalarType data[])
+{   
+  if ((m_Scale[0] != data[0]) || (m_Scale[1] != data[1]) || (m_Scale[2] != data[2])) 
+  {
+    m_Scale[0] = data[0];
+    m_Scale[1] = data[1];
+    m_Scale[2] = data[2];
+    m_Modified = true;
+  }
+}
+
+const mitk::ScalarType* mitk::Geometry3D::GetPosition() const
+{
+  return m_Position;
+}
+
+const mitk::ScalarType* mitk::Geometry3D::GetOrientation() const
+{
+  return m_Orientation;
+}
+
+const mitk::ScalarType* mitk::Geometry3D::GetScale() const
+{
+  return m_Scale;
+}

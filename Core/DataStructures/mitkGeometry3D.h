@@ -96,19 +96,28 @@ public:
 
   //##Documentation
   //##@brief executes affine operations (translate, rotate, scale)
-  void ExecuteOperation(Operation* operation);
-   
-  itkSetVectorMacro(Position, const ScalarType, 3);
-  itkSetVectorMacro(Orientation, const ScalarType, 3);
-  itkSetVectorMacro(Scale, const ScalarType, 3); 
+  void ExecuteOperation(Operation* operation); 
 
-  itkGetVectorMacro(Position, const ScalarType, 3);
-  itkGetVectorMacro(Orientation, const ScalarType, 3);
-  itkGetVectorMacro(Scale, const ScalarType, 3);
-  
+  //itkSetVectorMacro(Position, ScalarType, 3);
+  //itkSetVectorMacro(Orientation, ScalarType, 3);
+  //itkSetVectorMacro(Scale, ScalarType, 3); 
+
+  //itkGetVectorMacro(Position, const ScalarType, 3);
+  //itkGetVectorMacro(Orientation, const ScalarType, 3);
+  //itkGetVectorMacro(Scale, const ScalarType, 3);
+
+  virtual void SetPosition(const ScalarType data[]);
+  virtual void SetOrientation(const ScalarType data[]);
+  virtual void SetScale(const ScalarType data[]);
+
+  virtual const ScalarType* GetPosition() const;
+  virtual const ScalarType* GetOrientation() const;
+  virtual const ScalarType* GetScale() const;
+
   const ITKVector3D GetXAxis();
   const ITKVector3D GetYAxis();
   const ITKVector3D GetZAxis();
+  void UpdateTransform();
 protected:
   Geometry3D();
 
@@ -132,6 +141,11 @@ protected:
   ScalarType m_Position[3];
   ScalarType m_Orientation[3];
   ScalarType m_Scale[3];  
+  ScalarType m_Angle;
+  ITKPoint3D m_RotationVector;
+
+  bool m_Modified;
+
 
   Geometry3D::Pointer m_BaseGeometry;  
 };

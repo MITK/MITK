@@ -21,7 +21,8 @@ See MITKCopyright.txt or http://www.mitk.org/ for details.
 #include <mitkOperationActor.h>
 #include <mitkPointOperation.h>
 #include "mitkInteractionConst.h"
-#include "mitkRenderWindow.h"
+
+#include "mitkRenderWindow.h"//*\todo remove later, when update ok!
 
 //##ModelId=3F0177E901BD
 mitk::PointSet::PointSet()
@@ -224,7 +225,7 @@ void mitk::PointSet::ExecuteOperation(Operation* operation)
 
   ((const itk::Object*)this)->InvokeEvent(itk::EndEvent());
 
-  mitk::RenderWindow::UpdateAllInstances();
+  mitk::RenderWindow::UpdateAllInstances(); //*todo has to be done here, cause of update-pipeline not working yet
 }
 
 //##ModelId=3F0177E901EE

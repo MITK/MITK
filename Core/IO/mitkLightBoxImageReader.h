@@ -39,7 +39,7 @@ public:
     mitk::Vector3D GetSpacingFromLB();
 
     void SetLightBox(QcLightbox* lightbox);
-    QcLightbox* GetLightBox();
+    QcLightbox* GetLightBox() const;
 
 protected:
     virtual void GenerateData();

@@ -37,7 +37,7 @@ void mitk::LightBoxImageReader::SetLightBox(QcLightbox* lightbox)
     }
 }
 
-QcLightbox* mitk::LightBoxImageReader::GetLightBox()
+QcLightbox* mitk::LightBoxImageReader::GetLightBox() const
 {
     return m_LightBox;
 }

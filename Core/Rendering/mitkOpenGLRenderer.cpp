@@ -20,6 +20,8 @@
 #include <queue>
 #include <utility>
 
+#include "mitkGL.h"
+
 
 //##ModelId=3E33ECF301AD
 mitk::OpenGLRenderer::OpenGLRenderer() : m_VtkMapperPresent(false), 
@@ -177,8 +179,10 @@ void mitk::OpenGLRenderer::UpdateIncludingVtkActors()
   }
 
   if(newRenderer)
+  {
+    m_VtkRenderer->ResetCamera();
     m_VtkRenderer->GetActiveCamera()->Elevation(-90);
-  
+  }
   //    catch( ::itk::ExceptionObject ee)
   //    {
   //        printf("%s\n",ee.what());
@@ -426,6 +430,8 @@ void mitk::OpenGLRenderer::InitSize(int w, int h)
   GetDisplayGeometry()->Fit();
   Modified();
   Update();
+  if(m_VtkRenderer!=NULL)
+    m_VtkRenderer->ResetCamera();
 }
 
 //##ModelId=3EF59AD20235

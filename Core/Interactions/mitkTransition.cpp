@@ -3,7 +3,7 @@
 
 //##ModelId=3E5A3A77006F
 mitk::Transition::Transition(std::string name, int nextStateId, int eventId )
-: m_Name(name), m_NextStateId(nextStateId), m_EventId(eventId), m_NextState(NULL)
+  : m_Name(name), m_NextState(NULL),  m_NextStateId(nextStateId), m_EventId(eventId)
 {	 
   static int counter = 0;
   std::cout << name << " " << counter++ << std::endl;

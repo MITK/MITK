@@ -481,7 +481,7 @@ bool QmitkStdMultiWidget::InitializeStandardViews(mitk::DataTreeIteratorBase * i
         mitk::ScalarType duration = timebounds[1]-timebounds[0];
 
         mitk::TimeSlicedGeometry::Pointer timegeometry = mitk::TimeSlicedGeometry::New();
-        timegeometry->InitializeEvenlyTimed(geometry, duration);
+        timegeometry->InitializeEvenlyTimed(geometry, (unsigned int) duration);
         timegeometry->SetTimeBoundsInMS(timebounds); //@bug really required? FIXME
 
         timebounds[1] = timebounds[0]+1.0f;

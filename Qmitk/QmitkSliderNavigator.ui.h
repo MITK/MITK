@@ -18,9 +18,9 @@ void QmitkSliderNavigator::Refetch()
     slider->setMaxValue(m_Stepper->GetSteps()-1);
     slider->setValue(m_Stepper->GetPos());
     
-    spinBox->setMinValue(m_Stepper->ConvertPosToUnit(0));
-    spinBox->setMaxValue(m_Stepper->ConvertPosToUnit(m_Stepper->GetSteps()));
-    spinBox->setValue(m_Stepper->ConvertPosToUnit(m_Stepper->GetPos()));
+    spinBox->setMinValue( (int) m_Stepper->ConvertPosToUnit(0) );
+    spinBox->setMaxValue( (int) m_Stepper->ConvertPosToUnit(m_Stepper->GetSteps()));
+    spinBox->setValue((int) m_Stepper->ConvertPosToUnit(m_Stepper->GetPos()) );
     
     m_InRefetch=false;
   }
@@ -30,7 +30,7 @@ void QmitkSliderNavigator::Refetch()
 void QmitkSliderNavigator::SetStepper( mitk::Stepper * stepper)
 {
     m_Stepper = stepper;
-    m_InRefetch = (m_Stepper==NULL); // this avoids trying to use m_Stepper until it is set to something != NULL (additionally to the avoiding recursions during refetching)
+    m_InRefetch = ( m_Stepper.IsNull() ); // this avoids trying to use m_Stepper until it is set to something != NULL (additionally to the avoiding recursions during refetching)
 }
 
 
@@ -49,7 +49,7 @@ void QmitkSliderNavigator::init()
 void QmitkSliderNavigator::spinBox_valueChanged( int )
 {
   if(!m_InRefetch)
-    m_Stepper->SetPos(m_Stepper->ConvertPosToUnit(spinBox->value()));
+    m_Stepper->SetPos( (int) m_Stepper->ConvertPosToUnit(spinBox->value()) );
 }
 
 int QmitkSliderNavigator::GetPos()

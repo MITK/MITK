@@ -17,7 +17,7 @@
 
 
 mitk::LineInteractor::LineInteractor(const char * type, DataTreeNode* dataTreeNode)
-: HierarchicalInteractor(type, dataTreeNode), m_CurrentCellId(0), m_CurrentLineId(0)
+  : HierarchicalInteractor(type, dataTreeNode), m_CurrentLineId(0), m_CurrentCellId(0)
 {
     m_PointInteractor = new mitk::PointInteractor("pointinteractor",dataTreeNode);
     this->AddInteractor((Interactor::Pointer)m_PointInteractor);
@@ -51,7 +51,7 @@ void mitk::LineInteractor::DeselectAllLines()
   if (cellDataIt != cellDataEnd)
   {
     mitk::PointSet::SelectedLinesType selectedLines = cellDataIt->Value().selectedLines;
-    for (int i = 0; i < selectedLines.size(); i++)
+    for (unsigned int i = 0; i < selectedLines.size(); i++)
 		{
       mitk::LineOperation* doOp = new mitk::LineOperation(OpDESELECTLINE, cellDataIt->Index(), -1, -1, selectedLines[i]);
 			if (m_UndoEnabled)

@@ -31,7 +31,7 @@ public:
   //##Documentation
   //##@brief Enumeration of the different modes an Interactor can be into. 
   //## See class documentation for further details
-  enum SMMode
+  typedef enum SMMode
   {
     DESELECTED = 0,
     SELECTED,

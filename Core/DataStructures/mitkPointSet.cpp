@@ -151,7 +151,7 @@ void mitk::PointSet::ExecuteOperation(Operation* operation)
 	mitk::PointOperation *pointOp = dynamic_cast<mitk::PointOperation *>(operation);
 	if (pointOp == NULL)
 	{
-		(StatusBar::GetInstance())->DisplayText("Recieved wrong type of operation!See mitkSetOfPointsInteractor.cpp", 10000);
+		(StatusBar::GetInstance())->DisplayText("Recieved wrong type of operation!See mitkPointSetInteractor.cpp", 10000);
 		return;
 	}
 

@@ -31,8 +31,8 @@ void mitk::PlaneGeometry::SetPlaneView(const mitk::PlaneView& aPlaneView)
 
   ComputeBoundingBox();
 
-  m_WidthInUnits = (unsigned int)m_PlaneView.getOrientation1().length();
-  m_HeightInUnits = (unsigned int)m_PlaneView.getOrientation2().length();
+  m_WidthInUnits = (unsigned int) (m_PlaneView.getOrientation1().length()+0.5);
+  m_HeightInUnits = (unsigned int) (m_PlaneView.getOrientation2().length()+0.5);
 
   Modified();
 }

@@ -61,8 +61,8 @@ void mitk::AbstractTransformGeometry::SetPlaneView(const mitk::PlaneView& aPlane
 {
   m_PlaneView=aPlaneView;
 
-  m_WidthInUnits = m_PlaneView.getOrientation1().length();
-  m_HeightInUnits = m_PlaneView.getOrientation2().length();
+  m_WidthInUnits = (unsigned int) (m_PlaneView.getOrientation1().length()+0.5);
+  m_HeightInUnits = (unsigned int) (m_PlaneView.getOrientation2().length()+0.5);
 
   //@todo correct calculation missing!
   float bounds[6]={0.0, m_PlaneView.getOrientation1().length(), 0.0, m_PlaneView.getOrientation2().length(), 0.0, 1.0};

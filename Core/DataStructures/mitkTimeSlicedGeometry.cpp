@@ -39,11 +39,11 @@ const mitk::TimeBounds& mitk::TimeSlicedGeometry::GetTimeBoundsInMS() const
   mitk::Geometry3D::Pointer geometry3d;
 
   geometry3d = m_Geometry3Ds[0];
-  assert(geometry3d!=NULL);
+  assert(geometry3d.IsNotNull());
   timebounds[0] = geometry3d->GetTimeBoundsInMS()[0];
 
   geometry3d = m_Geometry3Ds[m_TimeSteps-1];
-  assert(geometry3d!=NULL);
+  assert(geometry3d.IsNotNull());
   timebounds[1]=geometry3d->GetTimeBoundsInMS()[1];
 
   m_TimeBoundsInMS = timebounds;

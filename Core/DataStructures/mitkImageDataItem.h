@@ -69,7 +69,7 @@ public:
   
 protected:
   //##ModelId=3D7B42E90201
-  void* m_Data;
+  unsigned char* m_Data;
   //##ModelId=3E0B487201C0
   ipPicDescriptor* m_PicDescriptor;
   //##ModelId=3E0B488C0380

@@ -29,7 +29,7 @@ mitk::ImageDataItem::ImageDataItem(const ImageDataItem& aParent, unsigned int di
   m_PicDescriptor->type=type.GetType();
   m_PicDescriptor->dim=dimension;
   memcpy(m_PicDescriptor->n, aParent.GetPicDescriptor()->n, sizeof(unsigned int)*(dimension<=8?dimension:8));
-  m_PicDescriptor->data=m_Data=static_cast<char*>(aParent.GetData())+offset;
+  m_PicDescriptor->data=m_Data=static_cast<unsigned char*>(aParent.GetData())+offset;
 }
 
 //##ModelId=3E0B78820287

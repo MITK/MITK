@@ -79,7 +79,8 @@ public:
   
   template <typename T> void ConnectGeometrySliceEvent(T* receiver)
   {
-    itk::ReceptorMemberCommand<T>::Pointer eventReceptorCommand = itk::ReceptorMemberCommand<T>::New();
+    typedef typename itk::ReceptorMemberCommand<T>::Pointer ReceptorMemberCommandPointer;
+    ReceptorMemberCommandPointer eventReceptorCommand = itk::ReceptorMemberCommand<T>::New();
   #ifdef WIN32
     eventReceptorCommand->SetCallbackFunction(receiver, T::SetGeometryTime);
   #else
@@ -90,7 +91,8 @@ public:
 
   template <typename T> void ConnectGeometryTimeEvent(T* receiver)
   {
-    itk::ReceptorMemberCommand<T>::Pointer eventReceptorCommand = itk::ReceptorMemberCommand<T>::New();
+    typedef typename itk::ReceptorMemberCommand<T>::Pointer ReceptorMemberCommandPointer;
+    ReceptorMemberCommandPointer eventReceptorCommand = itk::ReceptorMemberCommand<T>::New();
   #ifdef WIN32
     eventReceptorCommand->SetCallbackFunction(receiver, T::SetGeometryTime);
   #else

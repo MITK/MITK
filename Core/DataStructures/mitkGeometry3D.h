@@ -97,6 +97,7 @@ public:
   //##@brief executes affine operations (translate, rotate, scale)
   void ExecuteOperation(Operation* operation);
 
+  mitk::ScalarType* GetScale();
 protected:
   Geometry3D();
 
@@ -116,6 +117,12 @@ protected:
   unsigned int m_TimeSteps;
 
   vtkTransform* m_Transform;
+  
+  ScalarType m_Origin[3];
+  ScalarType m_Position[3];
+  ScalarType m_Orientation[3];
+  ScalarType m_Scale[3];
+  ScalarType m_Center[3];
 
   Geometry3D::Pointer m_BaseGeometry;  
 };

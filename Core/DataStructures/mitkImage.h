@@ -327,6 +327,8 @@ namespace mitk {
     //## @brief reset image to non-initialized state, release memory
     virtual void Clear();
 
+    virtual void SetGeometry(Geometry3D* aGeometry3D);
+
     //##ModelId=3ED91D060027
     //##Documentation
     //## @todo LevelWindow extraction/calculation not yet implemented. 

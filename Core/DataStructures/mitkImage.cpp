@@ -991,3 +991,9 @@ void mitk::Image::Clear()
     }
   }
 }
+
+void mitk::Image::SetGeometry(Geometry3D* aGeometry3D)
+{
+  Superclass::SetGeometry(aGeometry3D);
+  m_Geometry3D->ImageGeometryOn();
+}

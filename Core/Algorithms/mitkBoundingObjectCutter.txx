@@ -13,14 +13,14 @@ namespace mitk
 {
 
 template <typename TPixel>
-BoundingObjectCutter<typename TPixel>::BoundingObjectCutter()
+BoundingObjectCutter<TPixel>::BoundingObjectCutter()
   : m_UseInsideValue(false), m_OutsideValue(0), m_InsideValue(1), m_BoundingObject(NULL), 
   m_OutsidePixelCount(0), m_InsidePixelCount(0)
 {
 }
 
 template <typename TPixel>
-BoundingObjectCutter<typename TPixel>::~BoundingObjectCutter()
+BoundingObjectCutter<TPixel>::~BoundingObjectCutter()
 {
 }
 
@@ -28,13 +28,13 @@ BoundingObjectCutter<typename TPixel>::~BoundingObjectCutter()
  * \todo check if this is no conflict to the ITK filter writing rules -> ITK SoftwareGuide p.512
  */
 template <typename TPixel>
-void BoundingObjectCutter<typename TPixel>::GenerateOutputInformation()
+void BoundingObjectCutter<TPixel>::GenerateOutputInformation()
 {
   itkDebugMacro(<<"GenerateOutputInformation()");
 }
 
 template <typename TPixel>
-void BoundingObjectCutter<typename TPixel>::GenerateData()
+void BoundingObjectCutter<TPixel>::GenerateData()
 {
   /* Get pointer to output of filter */
   Image::Pointer outputImage = this->GetOutput();
@@ -126,18 +126,18 @@ void BoundingObjectCutter<typename TPixel>::GenerateData()
   globalMaxPoint[2] = (globalMaxPoint[2] > imageMaxPoint[2]) ? imageMaxPoint[2] : globalMaxPoint[2];
   /* calculate regíon of interest in pixel values */
   ItkRegionType regionOfInterest;
-  ItkImageType::IndexType start;
+  typename ItkImageType::IndexType start;
   itkImage->TransformPhysicalPointToIndex(globalMinPoint, start);
   regionOfInterest.SetIndex(start);
-  ItkImageType::SizeType size;  
-  size[0] = static_cast<ItkImageType::SizeType::SizeValueType>((globalMaxPoint[0] - globalMinPoint[0])/ itkImage->GetSpacing()[0]); // number of pixels along X axis
-  size[1] = static_cast<ItkImageType::SizeType::SizeValueType>((globalMaxPoint[1] - globalMinPoint[1])/ itkImage->GetSpacing()[1]); // number of pixels along Y axis
-  size[2] = static_cast<ItkImageType::SizeType::SizeValueType>((globalMaxPoint[2] - globalMinPoint[2])/ itkImage->GetSpacing()[2]); // number of pixels along Z axis
+  typename ItkImageType::SizeType size;  
+  size[0] = static_cast<typename ItkImageType::SizeType::SizeValueType>((globalMaxPoint[0] - globalMinPoint[0])/ itkImage->GetSpacing()[0]); // number of pixels along X axis
+  size[1] = static_cast<typename ItkImageType::SizeType::SizeValueType>((globalMaxPoint[1] - globalMinPoint[1])/ itkImage->GetSpacing()[1]); // number of pixels along Y axis
+  size[2] = static_cast<typename ItkImageType::SizeType::SizeValueType>((globalMaxPoint[2] - globalMinPoint[2])/ itkImage->GetSpacing()[2]); // number of pixels along Z axis
   regionOfInterest.SetSize(size);  
   regionOfInterest.Crop(itkImage->GetLargestPossibleRegion());  // fit region into source image
   /* Create output Image and output region */
   ItkRegionType outputRegion;
-  ItkImageType::IndexType outputStart;
+  typename ItkImageType::IndexType outputStart;
   outputStart[0] = 0;   // 3D Image. Output image starts at index (0, 0, 0)
   outputStart[1] = 0;
   outputStart[2] = 0;

@@ -6,24 +6,12 @@
 namespace mitk {
 
 //##ModelId=3D6A0ED703CF
-class BaseProperty : public itk::LightObject
+class BaseProperty : public itk::Object
 {
 public:
-    /** Standard class typedefs. */
-    //##ModelId=3E394E9901A5
-    typedef BaseProperty             Self;
-    //##ModelId=3E394E9901E1
-    typedef itk::LightObject         Superclass;
-    //##ModelId=3E394E990209
-    typedef itk::SmartPointer<Self>  Pointer;
-    //##ModelId=3E394E990231
-    typedef itk::SmartPointer<const Self>  ConstPointer;
 
-    /** Method for creation through the object factory. */
-    itkNewMacro(Self);
+	mitkClassMacro(BaseProperty,itk::Object);
 
-    /** Run-time type information (and related methods). */
-    itkTypeMacro(BaseProperty,itk::LightObject);
 protected:
     //##ModelId=3E38FF0902A7
     BaseProperty();
@@ -31,6 +19,7 @@ protected:
     //##ModelId=3E38FF0902CF
     virtual ~BaseProperty();
 
+	virtual bool operator==(const BaseProperty& property ) const = 0;
 };
 
 } // namespace mitk

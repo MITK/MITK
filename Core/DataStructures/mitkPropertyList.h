@@ -3,6 +3,8 @@
 
 #include "mitkCommon.h"
 #include "BaseProperty.h"
+#include <string>
+#include <map> 
 
 namespace mitk {
 
@@ -27,21 +29,21 @@ class PropertyList : public itk::Object
 	itkTypeMacro(PropertyList,itk::Object);
   public:
     //##ModelId=3D6A0E9E0029
-    mitk::BaseProperty* GetProperty(const char *propertyName);
+    mitk::BaseProperty* GetProperty(const char *propertyKey);
 
     //##ModelId=3D78B966005F
-    bool AddProperty(BaseProperty* property);
-
-    //##ModelId=3D6A0F0B00BC
-    std::vector<BaseProperty::Pointer> properties;
+	bool SetProperty(const char* propertyKey, BaseProperty* property);
+    
   protected:
-    //##ModelId=3E38FEFE0125
+	 //##ModelId=3E38FEFE0125
     PropertyList();
 
 
     //##ModelId=3E38FEFE0157
     virtual ~PropertyList();
 
+	//##ModelId=3D6A0F0B00BC
+	std::map<std::string,BaseProperty::Pointer> properties;
 };
 
 } // namespace mitk

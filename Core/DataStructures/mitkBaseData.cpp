@@ -1,9 +1,24 @@
 #include "BaseData.h"
 
+mitk::BaseData::BaseData() 
+{
+	m_PropertyList = PropertyList::New();
+}
+
+mitk::BaseData::~BaseData() 
+{
+
+}
+
 //##ModelId=3DCBE2BA0139
 const mitk::Geometry3D& mitk::BaseData::GetGeometry() const
 {
 	return *m_Geometry3D.GetPointer();
+}
+
+mitk::PropertyList::Pointer mitk::BaseData::GetPropertyList() 
+{
+	return m_PropertyList;
 }
 
 //##ModelId=3E3C4ACB0046

@@ -10,4 +10,3 @@ mitk::BaseProperty::BaseProperty()
 mitk::BaseProperty::~BaseProperty()
 {
 }
-

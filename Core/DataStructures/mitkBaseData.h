@@ -4,6 +4,7 @@
 #include "mitkCommon.h"
 #include "Geometry3D.h"
 #include "Geometry2D.h"
+#include "PropertyList.h"
 
 namespace mitk {
 
@@ -12,10 +13,14 @@ namespace mitk {
 //## Base of all data objects, e.g., images, contours, surfaces etc. Inherits
 //## from itk::DataObject and thus can be included in a pipeline.
 class BaseData : public itk::DataObject
-{
+{	
   public:
     //##ModelId=3E10262200CE
     typedef Geometry3D::Pointer Geometry3DPointer;
+
+	mitkClassMacro(mitk::BaseData,itk::DataObject)
+
+	//itkNewMacro(Self);  
 
     //##ModelId=3DCBE2BA0139
     const mitk::Geometry3D& GetGeometry() const;
@@ -31,10 +36,13 @@ class BaseData : public itk::DataObject
     //## setting of the update extent is missing.
     virtual mitk::Geometry2D::ConstPointer GetGeometry2D(int s, int t);
 
+	mitk::PropertyList::Pointer GetPropertyList();
 
   protected:
-    //##ModelId=3E15551A03CE
+	BaseData();
+	~BaseData();
     Geometry3DPointer m_Geometry3D;
+	PropertyList::Pointer m_PropertyList;
 };
 
 } // namespace mitk

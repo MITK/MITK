@@ -29,6 +29,7 @@ public:
 
     //##ModelId=3E3FF04F00E1
     virtual bool operator==(const BaseProperty& property ) const;
+    virtual std::string GetValueAsString() const;
 };
 
 } // namespace mitk

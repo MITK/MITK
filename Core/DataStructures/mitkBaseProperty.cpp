@@ -10,3 +10,8 @@ mitk::BaseProperty::BaseProperty()
 mitk::BaseProperty::~BaseProperty()
 {
 }
+
+std::string mitk::BaseProperty::GetValueAsString() const
+{
+   return "GetValueAsString not implemented"; 
+}

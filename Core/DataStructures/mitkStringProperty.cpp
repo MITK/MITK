@@ -22,3 +22,9 @@ bool mitk::StringProperty::operator==(const BaseProperty& property ) const
 
     return other->m_String==m_String;
 }
+
+std::string mitk::StringProperty::GetValueAsString() const 
+{
+  return m_String;
+}
+

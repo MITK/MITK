@@ -1,6 +1,7 @@
 #ifndef BASEPROPERTY_H_HEADER_INCLUDED_C1F4DF54
 #define BASEPROPERTY_H_HEADER_INCLUDED_C1F4DF54
 
+#include <string>
 #include "mitkCommon.h"
 
 namespace mitk {
@@ -27,13 +28,15 @@ public:
     //##Documentation
     //## @brief Subclasses must implement this operator==, which
     //## is used by PropertyList to check whether a property has been changed.
-	virtual bool operator==(const BaseProperty& property) const = 0;
+  virtual bool operator==(const BaseProperty& property) const = 0;
+  virtual std::string GetValueAsString() const;
 protected:
     //##ModelId=3E38FF0902A7
     BaseProperty();
 
     //##ModelId=3E38FF0902CF
     virtual ~BaseProperty();
+
 };
 
 } // namespace mitk

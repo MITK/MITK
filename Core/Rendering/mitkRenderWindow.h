@@ -4,6 +4,7 @@
 #include <qgl.h>
 #include <widget.h>
 #include <set>
+#include <string>
 class iilItem;
 
 namespace mitk {

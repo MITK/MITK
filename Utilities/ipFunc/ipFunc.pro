@@ -1,7 +1,9 @@
 TEMPLATE = lib
 TARGET = ipFunc
 LANGUAGE = C
-CONFIG = qt warn_on debug
+CONFIG += warn_on debug
+
+OBJECTS_DIR = obj
 
 INCLUDEPATH = ../../DataStructures
 

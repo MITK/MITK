@@ -21,6 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkDataTreeNode.h"
 #include "mitkProperties.h"
 #include "mitkColorProperty.h"
+#include "mitkLookupTableProperty.h"
 #include <vtkActor.h>
 #include <vtkProperty.h>
 #include <vtkPolyDataMapper.h>
@@ -130,7 +131,6 @@ void mitk::SurfaceVtkMapper3D::ApplyProperties(vtkActor* actor, mitk::BaseRender
 
   if (useCellData)
   {
-
     m_VtkPolyDataMapper->SetColorModeToDefault();
     m_VtkPolyDataMapper->SetScalarRange(0,255);
     m_VtkPolyDataMapper->ScalarVisibilityOn();
@@ -138,31 +138,36 @@ void mitk::SurfaceVtkMapper3D::ApplyProperties(vtkActor* actor, mitk::BaseRender
     m_Actor->GetProperty()->SetSpecular (1);
     m_Actor->GetProperty()->SetSpecularPower (50);
     m_Actor->GetProperty()->SetInterpolationToPhong();
-
-    /*
-    m_VtkPolyDataMapper->SetColorModeToDefault();
-    m_VtkPolyDataMapper->UseLookupTableScalarRangeOff();
-    m_MyMeshMapper->SetColorModeToMapScalars();
-    ////m_MyMesh->SetInput(delaunay->GetOutput());
-    m_VtkPolyDataMapper->SetScalarRange(0,255);
-    m_VtkPolyDataMapper->ScalarVisibilityOn();
-    m_VtkPolyDataMapper->SetScalarModeToUseCellData();
-    //float rgba[4]={1.0f,1.0f,1.0f,1.0f};
-    //// check for color prop and use it for rendering if it exists
-    //GetColor(rgba, renderer);
-    //m_Actor->GetProperty()->SetColor(rgba);
-
-    m_Actor->GetProperty()->SetAmbient (0.25);
-    //m_Actor->GetProperty()->SetDiffuse (0.5);
-    //m_Actor->GetProperty()->SetSpecular (1);
-    m_Actor->GetProperty()->SetSpecularPower (5);
-    m_Actor->GetProperty()->SetInterpolationToPhong();
-    */
   }
   else
   {
     Superclass::ApplyProperties(m_Actor, renderer);
     m_VtkPolyDataMapper->ScalarVisibilityOff();
+  }
+
+  int scalarMode = VTK_COLOR_MODE_DEFAULT;
+  if(this->GetDataTreeNode()->GetIntProperty("scalar mode", scalarMode, renderer))
+  {
+    m_VtkPolyDataMapper->SetScalarMode(scalarMode);
+    m_VtkPolyDataMapper->ScalarVisibilityOn();
+  }
+
+  mitk::LookupTableProperty::Pointer lookupTableProp;
+  lookupTableProp = dynamic_cast<mitk::LookupTableProperty*>(this->GetDataTreeNode()->GetProperty("LookupTable", renderer).GetPointer());
+	if (lookupTableProp.IsNotNull() )
+	{
+    m_VtkPolyDataMapper->SetLookupTable(lookupTableProp->GetLookupTable().GetVtkLookupTable());
+  }
+
+  mitk::LevelWindow levelWindow;
+  if(this->GetDataTreeNode()->GetLevelWindow(levelWindow, renderer, "levelWindow"))
+  {
+    m_VtkPolyDataMapper->SetScalarRange(levelWindow.GetMin(),levelWindow.GetMax());
+  }
+  else
+  if(this->GetDataTreeNode()->GetLevelWindow(levelWindow, renderer))
+  {
+    m_VtkPolyDataMapper->SetScalarRange(levelWindow.GetMin(),levelWindow.GetMax());
   }
 
   bool wireframe=false;

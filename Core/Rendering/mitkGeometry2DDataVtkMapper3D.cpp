@@ -181,8 +181,12 @@ void mitk::Geometry2DDataVtkMapper3D::Update(mitk::BaseRenderer* renderer)
               if(node->GetLevelWindow(levelWindow, renderer))
                 m_VtkLookupTable->SetTableRange(levelWindow.GetMin(),levelWindow.GetMax());
               
-              imagemapper->GenerateAllData();
+              //we have to do this before GenerateAllData() is called there may be
+              //no RendererInfo for renderer yet, thus GenerateAllData won't update
+              //the (non-existing) RendererInfo for renderer. By calling GetRendererInfo
+              //a RendererInfo will be created for renderer (if it does not exist yet).
               const ImageMapper2D::RendererInfo* ri=imagemapper->GetRendererInfo(renderer);
+              imagemapper->GenerateAllData();
               if((ri!=NULL) && (m_LastTextureUpdateTime<ri->m_LastUpdateTime))
               {
                 ipPicDescriptor *p=ri->m_Pic;

@@ -37,6 +37,7 @@ libipFunc_a_SOURCES = \
       CompressM.c     \
       Conv.c          \
       Convert.c       \
+      CopyTags.c      \
       Curtosis.c      \
       CurtosisR.c     \
       Dila.c          \

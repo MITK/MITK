@@ -32,3 +32,10 @@ mitk::BaseData* mitk::Mapper::GetData() const
     return static_cast<const mitk::DataTreeNode *> (const_cast<mitk::Mapper*>(this)->ProcessObject::GetInput(0))->GetData();
 }
 
+//##ModelId=3E86B0EA00B0
+mitk::DataTreeNode* mitk::Mapper::GetDataTreeNode() const
+{
+    mitk::DataTreeNode* node= static_cast<mitk::DataTreeNode *> (const_cast<mitk::Mapper*>(this)->ProcessObject::GetInput(0));
+    return node;
+}
+

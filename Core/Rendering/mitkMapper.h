@@ -29,6 +29,9 @@ public:
 	virtual void SetInput(const mitk::DataTreeNode* data);
     //##ModelId=3E860B9A0378
     BaseData* GetData() const;
+    //##ModelId=3E86B0EA00B0
+    mitk::DataTreeNode* GetDataTreeNode() const;
+
 
  //   //##ModelId=3E3C320001E4
  //   virtual void SetDisplaySizeInDisplayUnits(unsigned int widthInDisplayUnits, unsigned int heightInDisplayUnits);

@@ -11,6 +11,8 @@
 #include "vtkPolyDataMapper.h"
 #include "vtkLookupTable.h"
 //#include "vtkImageMapToWindowLevelColors";
+#include "mitkColorProperty.h"
+#include "mitkFloatProperty.h"
 
 #include "pic2vtk.h"
 
@@ -144,6 +146,20 @@ void mitk::Geometry2DDataVtkMapper3D::Update()
 //                }
 //            }
         }
+        //query and set color
+        const mitk::DataTreeNode* node=GetDataTreeNode();
+        float rgba[4]={1.0f,1.0f,1.0f,1.0f};
+        if(node!=NULL)
+        {
+            mitk::ColorProperty::Pointer colorprop = dynamic_cast<mitk::ColorProperty*>(node->GetPropertyList()->GetProperty("color").GetPointer());
+            if(colorprop!=NULL)
+                memcpy(rgba, colorprop->GetColor().GetDataPointer(), 3*sizeof(float));
+            mitk::FloatProperty::Pointer opacityprop = dynamic_cast<mitk::FloatProperty*>(node->GetPropertyList()->GetProperty("opacity").GetPointer());
+            if(opacityprop!=NULL)
+                rgba[3]=opacityprop->GetValue();
+        }
+        m_Actor->GetProperty()->SetColor(rgba);
+        m_Actor->GetProperty()->SetOpacity(rgba[3]);
     }
 }
 

@@ -141,7 +141,7 @@ void mitk::OpenGLRenderer::Render()
         std::cout << "OpenGLRenderer calling its update..." << std::endl;
         Update();
     }
-
+    else
     if(m_MapperID==2) //FIXME: in 3D mode wird sonst nix geupdated, da z.Z. weder camera noch Änderung des Baums beachtet wird!!!
         Update();
 

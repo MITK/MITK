@@ -1,15 +1,22 @@
 #include "PropertyList.h"
 
 //##ModelId=3D6A0E9E0029
-mitk::BaseProperty* mitk::PropertyList::GetProperty(const char *propertyKey) 
+mitk::BaseProperty::Pointer mitk::PropertyList::GetProperty(const char *propertyKey) 
 {
-	return properties.find( propertyKey )->second;
+    std::map<std::string,BaseProperty::Pointer>::const_iterator it;
+    
+    it=m_Properties.find( propertyKey );
+
+    if(it!=m_Properties.end())
+	    return it->second;
+    else 
+        return NULL;
 }
 
 //##ModelId=3D78B966005F
 bool mitk::PropertyList::SetProperty(const char* propertyKey, BaseProperty* property)
 {
-	properties.insert ( std::pair<std::string,BaseProperty::Pointer>( propertyKey, property ) );	
+	m_Properties.insert ( std::pair<std::string,BaseProperty::Pointer>( propertyKey, property ) );	
     return true;
 }
 

@@ -20,7 +20,7 @@ public:
 
 public:
     //##ModelId=3D6A0E9E0029
-    mitk::BaseProperty* GetProperty(const char *propertyKey);
+    mitk::BaseProperty::Pointer GetProperty(const char *propertyKey);
 
     //##ModelId=3D78B966005F
     bool SetProperty(const char* propertyKey, BaseProperty* property);
@@ -34,7 +34,7 @@ protected:
     virtual ~PropertyList();
 
     //##ModelId=3D6A0F0B00BC
-    std::map<std::string,BaseProperty::Pointer> properties;
+    std::map<std::string,BaseProperty::Pointer> m_Properties;
 };
 
 } // namespace mitk

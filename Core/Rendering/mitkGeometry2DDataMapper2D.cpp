@@ -1,6 +1,8 @@
 #include "mitkGeometry2DDataMapper2D.h"
 #include "BaseRenderer.h"
 #include "PlaneGeometry.h"
+#include "mitkColorProperty.h"
+#include "mitkFloatProperty.h"
 
 //##ModelId=3E639E100243
 mitk::Geometry2DDataMapper2D::Geometry2DDataMapper2D()
@@ -61,6 +63,21 @@ void mitk::Geometry2DDataMapper2D::Paint(mitk::BaseRenderer * renderer)
                 lineFrom.y=toGL-lineFrom.y;
                 lineTo.y=toGL-lineTo.y;
 
+                //query and set color
+                const mitk::DataTreeNode* node=GetDataTreeNode();
+                float rgba[4]={1.0f,1.0f,1.0f,1.0f};
+                if(node!=NULL)
+                {
+                    mitk::ColorProperty::Pointer colorprop = dynamic_cast<mitk::ColorProperty*>(node->GetPropertyList()->GetProperty("color").GetPointer());
+                    if(colorprop!=NULL)
+                        memcpy(rgba, colorprop->GetColor().GetDataPointer(), 3*sizeof(float));
+                    mitk::FloatProperty::Pointer opacityprop = dynamic_cast<mitk::FloatProperty*>(node->GetPropertyList()->GetProperty("opacity").GetPointer());
+                    if(opacityprop!=NULL)
+                        rgba[3]=opacityprop->GetValue();
+                }
+                glColor4fv(rgba);
+
+                //draw
                 glBegin (GL_LINE_LOOP);
                     glVertex2fv(&lineFrom.x);
                     glVertex2fv(&lineTo.x);

@@ -10,18 +10,20 @@ namespace mitk {
 //##ModelId=3E3FDF05028B
 class StringProperty : public BaseProperty
 {
-  protected:
+protected:
     //##ModelId=3E3FDF21017D
     std::string m_String;
 
 public:
+    mitkClassMacro(StringProperty, BaseProperty);
+
     //##ModelId=3E3FF04F005F
-	StringProperty( const char* string );
-	itkGetStringMacro(String)
-	itkSetStringMacro(String)
+    StringProperty( const char* string );
+    itkGetStringMacro(String);
+    itkSetStringMacro(String);
 
     //##ModelId=3E3FF04F00E1
-	virtual bool operator==(const BaseProperty& property ) const;
+    virtual bool operator==(const BaseProperty& property ) const;
 };
 
 } // namespace mitk

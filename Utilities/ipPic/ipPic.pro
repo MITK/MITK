@@ -25,3 +25,5 @@ SOURCES = \
 HEADERS = ipPic.h ipTypes.h ipPicOldP.h ipPicAnnotation.h 
 
 INCLUDEPATH = .. .
+win32:INCLUDEPATH+=win32
+

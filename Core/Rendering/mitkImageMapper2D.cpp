@@ -369,9 +369,16 @@ void mitk::ImageMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
     m_Reslicer->SetInterpolationModeToNearestNeighbor();
 
 
+  bool useColor=false;
+  GetDataTreeNode()->GetBoolProperty("use color", useColor, renderer);
   mitk::LookupTableProperty::Pointer LookupTableProp;
-  LookupTableProp = dynamic_cast<mitk::LookupTableProperty*>(this->GetDataTreeNode()->GetProperty("LookupTable").GetPointer());
-	if (LookupTableProp.IsNull() )
+  if(useColor==false)
+  {
+    LookupTableProp = dynamic_cast<mitk::LookupTableProperty*>(this->GetDataTreeNode()->GetProperty("LookupTable").GetPointer());
+    if(LookupTableProp.IsNull())
+      useColor=true;
+  }
+	if(useColor)
 	{
 		m_iil4mitkMode = iil4mitkImage::INTENSITY_ALPHA;
 	  image->setColor(rgba[0], rgba[1], rgba[2], rgba[3]);

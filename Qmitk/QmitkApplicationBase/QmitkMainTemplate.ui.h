@@ -196,6 +196,7 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
             levelWindow.SetAuto( reader->GetOutput()->GetPic() );
 			levWinProp->SetLevelWindow(levelWindow);
 			node->GetPropertyList()->SetProperty("levelwindow",levWinProp);
+            mitkMultiWidget->levelWindowWidget->setLevelWindow(levelWindow);
 		}
 	}
 	else if( strstr(fileName, ".ves")!=0 )

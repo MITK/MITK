@@ -186,6 +186,7 @@ void mitk::SurfaceMapper2D::Paint(mitk::BaseRenderer * renderer)
     vtkCellData *vcelldata=contour->GetCellData();
     vtkDataArray* vcellscalars=vcelldata->GetScalars();
 
+
     int i,numberOfCells=vpolys->GetNumberOfCells();
 
     Point3D p; Point2D p2d, last, first;
@@ -233,9 +234,16 @@ void mitk::SurfaceMapper2D::Paint(mitk::BaseRenderer * renderer)
 
         if (useCellData) {  // color each cell according to cell data
           float *color;
-          vcellscalars->GetComponent(i,0);
-          color = m_LUT->GetColor( vcellscalars->GetComponent(i,0) );
-          glColor3f(color[0],color[1],color[2]);
+
+          if (vcellscalars != NULL )
+          {
+            vcellscalars->GetComponent(i,0);
+            color = m_LUT->GetColor( vcellscalars->GetComponent(i,0) );
+            glColor3f(color[0],color[1],color[2]);
+          }
+          else 
+          {
+          }
         }	
 
         //draw the line

@@ -121,12 +121,35 @@ void mitk::SurfaceVtkMapper3D::ApplyProperties(vtkActor* actor, mitk::BaseRender
   else
     useCellData = dynamic_cast<mitk::BoolProperty *>(this->GetDataTreeNode()->GetProperty("useCellDataForColouring").GetPointer())->GetValue();
 
+  bool usePointData;
+  if (dynamic_cast<mitk::BoolProperty *>(this->GetDataTreeNode()->GetProperty("usePointDataForColouring").GetPointer()) == NULL)
+    usePointData = false;
+  else
+    usePointData = dynamic_cast<mitk::BoolProperty *>(this->GetDataTreeNode()->GetProperty("usePointDataForColouring").GetPointer())->GetValue();
+
   if (useCellData)
   {
     m_VtkPolyDataMapper->SetColorModeToDefault();
     m_VtkPolyDataMapper->SetScalarRange(0,255);
     m_VtkPolyDataMapper->ScalarVisibilityOn();
     m_VtkPolyDataMapper->SetScalarModeToUseCellData();
+    m_Actor->GetProperty()->SetSpecular (1);
+    m_Actor->GetProperty()->SetSpecularPower (50);
+    m_Actor->GetProperty()->SetInterpolationToPhong();
+  }
+  else if (usePointData)
+  {
+    float scalarsMin = 0;
+    if (dynamic_cast<mitk::FloatProperty *>(this->GetDataTreeNode()->GetProperty("ScalarsRangeMinimum").GetPointer()) != NULL)
+      scalarsMin = dynamic_cast<mitk::FloatProperty*>(this->GetDataTreeNode()->GetProperty("ScalarsRangeMinimum").GetPointer())->GetValue();
+
+    float scalarsMax = 0.1;
+    if (dynamic_cast<mitk::FloatProperty *>(this->GetDataTreeNode()->GetProperty("ScalarsRangeMaximum").GetPointer()) != NULL)
+      scalarsMax = dynamic_cast<mitk::FloatProperty*>(this->GetDataTreeNode()->GetProperty("ScalarsRangeMaximum").GetPointer())->GetValue();
+
+    m_VtkPolyDataMapper->SetScalarRange(scalarsMin,scalarsMax);
+    m_VtkPolyDataMapper->SetColorModeToMapScalars();
+    m_VtkPolyDataMapper->ScalarVisibilityOn();
     m_Actor->GetProperty()->SetSpecular (1);
     m_Actor->GetProperty()->SetSpecularPower (50);
     m_Actor->GetProperty()->SetInterpolationToPhong();

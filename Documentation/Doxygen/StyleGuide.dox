@@ -34,8 +34,10 @@ Assignment of a just created instance to a normal pointer, e.g.,
 is decreased immediately to zero and the object is destroyed. Use @code itk::Object::Pointer nocrash = itk::Object::New()@endcode. 
 Static declarations are also forbidden and result into an exception when the scope of the variable is left, because the destructor is called 
 while the reference count is still greater than zero. 
-\li Note that using smart pointers requires using real pointers when setting input, but returning 
-smart pointers on output (taken from <a href="http://www.itk.org/Doxygen12/html/itkMacro_8h.html">itkMacro.h</a>).
+\li Note that using smart pointers requires using real (normal) pointers when setting input. If you want to return a newly created
+smart pointer that is not also kept within the class (e.g., if you write a \a Clone method), you have to return a  
+smart pointer on output (compare <a href="http://www.itk.org/Doxygen12/html/itkMacro_8h.html">itkMacro.h</a>). If the 
+smart pointer is kept within the class, returning a real (normal) pointer is sufficient.
 \li Testing a SmartPointer against NULL is done with the IsNull() and IsNotNull() methods. A simple ==NULL issues a warning.
 \li Set- and Get-methods can be created with the macros @a itkSetObjectMacro(name,type) and 
 @a itkGetObjectMacro(name,type), respectively, if the @a type is derived from @a itk::LightObject or

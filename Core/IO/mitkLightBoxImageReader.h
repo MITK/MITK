@@ -22,14 +22,15 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkImageSource.h"
 #include "mitkCommon.h"
-#include <chili/qclightbox.h>
 
+class QcLightbox;
 
 namespace mitk {
 
 //##Documentation
 //## @brief Read images from Chili LightBox
 //## @ingroup Process
+//## @ingroup Chili
 class LightBoxImageReader : public ImageSource 
 {
 public:
@@ -42,6 +43,14 @@ public:
     //##Description 
     //## @brief Set the lightbox to read from
     void SetLightBox(QcLightbox* lightbox);
+
+    //##Description 
+    //## @brief Set the lightbox to read from to the current lightbox
+    //##
+    //## The current lightbox at the time of the method
+    //## call is set as lightbox to read from.
+  //## \sa SetLightBox
+    void SetLightBoxToCurrentLightBox();
 
     //##Description 
     //## @brief Get the lightbox to read from

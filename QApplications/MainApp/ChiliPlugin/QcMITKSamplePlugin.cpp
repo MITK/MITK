@@ -14,6 +14,7 @@
 #include "mitkLevelWindowProperty.h"
 #include "mitkStringProperty.h"
 #include "ToolBar.h"
+#include <mitkChiliPlugin.h>
 
 #include "ipFunc.h"
 
@@ -37,6 +38,8 @@ QcMITKSamplePlugin::QcMITKSamplePlugin( QWidget *parent )
   activated =false;
    
   s_PluginInstance = this;
+
+  mitk::ChiliPlugin::SetPluginInstance(s_PluginInstance);
 }
 
 QString 

@@ -1,0 +1,51 @@
+#-----------------------------------------------------------------------------
+#
+# MITKConfig.cmake - MITK CMake configuration file for external projects.
+#
+# This file is configured by MITK and used by the UseMITK.cmake module
+# to load MITK's settings for an external project.
+
+# The MITK source tree.
+SET(MITK_SOURCE_DIR "@MITK_SOURCE_DIR@")
+
+# The MITK include file directories.
+SET(MITK_INCLUDE_DIRS "@MITK_INCLUDE_DIRS@")
+SET(QMITK_INCLUDE_DIRS "@QMITK_INCLUDE_DIRS@")
+SET(QMITKCHILIPLUGIN_INCLUDE_DIRS "@QMITKCHILIPLUGIN_INCLUDE_DIRS@")
+
+# The MITK library directories.
+SET(MITK_LIBRARY_DIRS "@MITK_LIBRARY_DIRS@")
+SET(QMITK_LIBRARY_DIRS "@QMITK_LIBRARY_DIRS@")
+SET(QMITKCHILIPLUGIN_LIBRARY_DIRS "@QMITKCHILIPLUGIN_LIBRARY_DIRS@")
+
+# The C and C++ flags added by MITK to the cmake-configured flags.
+SET(MITK_REQUIRED_C_FLAGS "@MITK_REQUIRED_C_FLAGS@")
+SET(MITK_REQUIRED_CXX_FLAGS "@MITK_REQUIRED_CXX_FLAGS@")
+
+# The MITK version number
+SET(MITK_VERSION_MAJOR "@MITK_VERSION_MAJOR@")
+SET(MITK_VERSION_MINOR "@MITK_VERSION_MINOR@")
+SET(MITK_VERSION_PATCH "@MITK_VERSION_PATCH@")
+
+# The build settings file.
+SET(MITK_BUILD_SETTINGS_FILE "@MITK_BUILD_SETTINGS_FILE@")
+
+# Whether MITK was built with shared libraries.
+SET(MITK_BUILD_SHARED "@BUILD_SHARED_LIBS@")
+
+# Whether Qmitk was built.
+SET(BUILD_QMITK "@BUILD_QMITK@")
+
+# Whether QChili support was built.
+SET(BUILD_MITK_QCHILI_PLUGIN "@BUILD_MITK_QCHILI_PLUGIN@")
+
+# A list of all libraries for MITK.  Those listed here should
+# automatically pull in their dependencies.
+SET(MITK_LIBRARIES @MITK_LIBRARIES@)
+SET(QMITK_LIBRARIES @QMITK_LIBRARIES@)
+SET(QMITKCHILIPLUGIN_LIBRARIES @QMITKCHILIPLUGIN_LIBRARIES@)
+
+# The MITK library dependencies.
+IF(NOT MITK_NO_LIBRARY_DEPENDS)
+  INCLUDE("@MITK_LIBRARY_DEPENDS_FILE@")
+ENDIF(NOT MITK_NO_LIBRARY_DEPENDS)

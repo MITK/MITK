@@ -36,6 +36,7 @@ class Image;
 * slices), which is already in the Chili database and has to be provided 
 * to the writer.
 * @ingroup Process
+* @ingroup Chili
 */
 class LightBoxResultImageWriter : public BaseProcess
 {
@@ -58,7 +59,20 @@ public:
   virtual void SetSourceImage(const mitk::Image *source); 
   bool SetSourceByTreeSearch(mitk::DataTreeIteratorBase* iterator);
 
+  //##Description 
+  //## @brief Set the lightbox to write into
   void SetLightBox(QcLightbox* lightbox);
+
+  //##Description 
+  //## @brief Set the lightbox to write into to the current lightbox
+  //##
+  //## The current lightbox at the time of the method
+  //## call is set as lightbox to write into.
+  //## \sa SetLightBox
+  void SetLightBoxToCurrentLightBox();
+
+  //##Description 
+  //## @brief Get the lightbox to write into
   QcLightbox* GetLightBox() const;
 
   itkSetStringMacro( ImageTypeName );

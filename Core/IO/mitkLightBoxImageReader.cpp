@@ -18,15 +18,23 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include "mitkLightBoxImageReader.h"
-#include <ipFunc.h>
-#include <itkImageFileReader.h>
 #include "mitkPlaneGeometry.h"
 #include "mitkFrameOfReferenceUIDManager.h"
-#include <chili/isg.h>
+#include <mitkChiliPlugin.h>
+#include <itkImageFileReader.h>
 #include <vtkTransform.h>
-#include <ipDicom/ipDicom.h>
 #include <list>
 #include <vnl/vnl_cross.h>
+
+#ifdef CHILIPLUGIN
+#include "QcMITKSamplePlugin.h"
+#include <chili/plugin.h>
+#include <chili/qclightbox.h>
+#include <chili/isg.h>
+#include <ipDicom/ipDicom.h>
+#include <ipFunc.h>
+#include <qmessagebox.h>
+#endif
 
 void mitk::LightBoxImageReader::SetLightBox(QcLightbox* lightbox)
 {
@@ -37,6 +45,18 @@ void mitk::LightBoxImageReader::SetLightBox(QcLightbox* lightbox)
     }
 }
 
+void mitk::LightBoxImageReader::SetLightBoxToCurrentLightBox()
+{
+#ifdef CHILIPLUGIN
+  QcPlugin* plugin = mitk::ChiliPlugin::GetPluginInstance();
+  if(plugin==NULL)
+  {
+    itkExceptionMacro(<<"GetPluginInstance()==NULL: Plugin is not initialized correctly !");
+  }
+  SetLightBox(plugin->lightboxManager()->getActiveLightbox());
+#endif
+}
+
 QcLightbox* mitk::LightBoxImageReader::GetLightBox() const
 {
     return m_LightBox;
@@ -44,6 +64,7 @@ QcLightbox* mitk::LightBoxImageReader::GetLightBox() const
 
 void mitk::LightBoxImageReader::GenerateOutputInformation()
 {
+#ifdef CHILIPLUGIN
     int RealPosition;
     SliceInfoArray sliceInfos;
 
@@ -267,10 +288,12 @@ void mitk::LightBoxImageReader::GenerateOutputInformation()
 
     itkDebugMacro(<<" modified ");    
     m_ReadHeaderTime.Modified();
+#endif
 }
 
 void mitk::LightBoxImageReader::GenerateData()
 {
+#ifdef CHILIPLUGIN
     itkDebugMacro(<<"GenerateData ");
     if(m_LightBox==NULL)
     {
@@ -368,12 +391,14 @@ itkDebugMacro("setting slice: "<<numberOfImages<<" lb pos: "<<RealPosition<< "or
         }
     }
     itkDebugMacro(<<"fertig ");
+#endif
 }
 
 mitk::Vector3D mitk::LightBoxImageReader::GetSpacingFromLB(LocalImageInfoArray& imageNumbers)
 {
-    mitk::Vector3D spacing=(1.0 ,1.0 , 1.0);     
+    mitk::Vector3D spacing=(1.0 ,1.0 , 1.0);
 
+#ifdef CHILIPLUGIN
     interSliceGeometry_t*  isg_t  = m_LightBox->fetchDicomGeometry(0);
     if(isg_t!=NULL)
     {
@@ -397,9 +422,10 @@ mitk::Vector3D mitk::LightBoxImageReader::GetSpacingFromLB(LocalImageInfoArray& 
       Vector3D toNext = it->origin-origin0;
       spacing[2]=toNext.GetNorm();
     }
-
+#endif
     return spacing;
 }
+
 bool mitk::LightBoxImageReader::ImageOriginLesser ( const LocalImageInfo& elem1, const LocalImageInfo& elem2 )
 {
   if(mitk::Equal(elem1.origin, elem2.origin))
@@ -418,6 +444,7 @@ bool mitk::LightBoxImageReader::ImageNumberLesser ( const LocalImageInfo& elem1,
 
 void mitk::LightBoxImageReader::SortImage(LocalImageInfoArray& imageNumbers)
 {
+#ifdef CHILIPLUGIN
     ipPicDescriptor*  pic=NULL;
     ipPicTSV_t *tsv;
     void* data;
@@ -486,6 +513,7 @@ itkDebugMacro(<<"DIRECTION: "<<direction);
     }
 
     std::sort(imageNumbers.begin(), imageNumbers.end(), ImageOriginLesser);
+#endif
 }
 
 int mitk::LightBoxImageReader::GetRealPosition(int position, LocalImageInfoArray& list)

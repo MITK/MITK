@@ -19,14 +19,17 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkLightBoxResultImageWriter.h"
 
+#ifdef CHILIPLUGIN
 #include <chili/plugin.h>
 #include <chili/qclightbox.h>
 #include <chili/isg.h>
 #include <ipDicom/ipDicom.h>
+#endif
 
 #include <mitkImage.h>
 #include <mitkImageSliceSelector.h>
 #include <mitkFrameOfReferenceUIDManager.h>
+#include <mitkChiliPlugin.h>
 
 #include <itkRootTreeIterator.h>
 #include <itkImageFileReader.h>
@@ -135,6 +138,18 @@ void mitk::LightBoxResultImageWriter::SetLightBox(QcLightbox* lightbox)
   }
 }
 
+void mitk::LightBoxResultImageWriter::SetLightBoxToCurrentLightBox()
+{
+#ifdef CHILIPLUGIN
+  QcPlugin* plugin = mitk::ChiliPlugin::GetPluginInstance();
+  if(plugin==NULL)
+  {
+    itkExceptionMacro(<<"GetPluginInstance()==NULL: Plugin is not initialized correctly !");
+  }
+  SetLightBox(plugin->lightboxManager()->getActiveLightbox());
+#endif
+}
+
 QcLightbox* mitk::LightBoxResultImageWriter::GetLightBox() const
 {
   return m_LightBox;
@@ -143,6 +158,7 @@ QcLightbox* mitk::LightBoxResultImageWriter::GetLightBox() const
 
 void mitk::LightBoxResultImageWriter::GenerateData()
 {
+#ifdef CHILIPLUGIN
   itkDebugMacro(<<"GenerateData ");
   const Image* image = GetInput();
   const Image* sourceimage = GetSourceImage();
@@ -243,6 +259,7 @@ itkDebugMacro(<<"writing slice: "<<s <<" "<<t);
       prev = cur;
     }
   }
+#endif
 }
 
 void mitk::LightBoxResultImageWriter::Write() const

@@ -19,7 +19,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 #ifndef MITKINTERACTCONST_H
 #define MITKINTERACTCONST_H
+
 //##Documentation
+//## @file mitkInteractionConst.h
 //## @brief Constants for most interaction classes, due to the generic StateMachines.
 //##
 //## @ingroup Interaction

@@ -572,3 +572,9 @@ QmitkMainTemplate* QmitkMainTemplate::getInstance()
 {
     return m_Instance;
 }
+
+
+QmitkFctMediator* QmitkMainTemplate::getFctMediator()
+{
+    return qfm;
+}

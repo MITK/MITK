@@ -769,6 +769,7 @@
     <function>setXMLFallBackPath( const char * anXmlFallBackPath )</function>
     <function access="private">destroy()</function>
     <function specifier="static" returnType="QmitkMainTemplate *">getInstance()</function>
+    <function specifier="non virtual" returnType="QmitkFctMediator *">getFctMediator()</function>
 </functions>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

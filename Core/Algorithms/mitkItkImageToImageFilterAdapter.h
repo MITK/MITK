@@ -16,10 +16,11 @@ namespace mitk {
 //## Either call SetSingleFilter() to encapsulate one itk::ImageToImageFilter, 
 //## or SetFirstFilter() and SetLastFilter() to encapsulate a whole itk pipeline.
 //## @ingroup Process
+template <typename TPixel> 
 class ItkImageToImageFilterAdapter : public ImageToImageFilter
 {
 public:
-  typedef short PixelType;
+  typedef TPixel PixelType;
   typedef itk::Image<PixelType, 3> ItkImageType;
   typedef itk::ImageToImageFilter<ItkImageType, ItkImageType> ImageToImageFilterType;
 
@@ -29,10 +30,8 @@ public:
 
   itkSetObjectMacro(FirstFilter, ImageToImageFilterType);
   itkGetObjectMacro(FirstFilter, ImageToImageFilterType);
-  
   itkSetObjectMacro(LastFilter, ImageToImageFilterType);
   itkGetObjectMacro(LastFilter, ImageToImageFilterType);
-
   void SetSingleFilter(ImageToImageFilterType::Pointer filter);
 
   virtual void GenerateOutputInformation();
@@ -45,7 +44,8 @@ protected:
   ImageToImageFilterType::Pointer m_FirstFilter;  // Start of Filter Pipeline
   ImageToImageFilterType::Pointer m_LastFilter;   // End of Filter Pipeline
 };
-
 } // namespace mitk
+
+#include "mitkItkImageToImageFilterAdapter.txx"  // because it is a template
 
 #endif /* ITKIMAGETOIMAGEFILTERADAPTER_H_HEADER_INCLUDED_C1E5E869 */

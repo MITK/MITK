@@ -141,7 +141,7 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
          tmpName = tmpName.right(tmpName.length() - tmpName.findRev("/") - 1);     
          mitk::StringProperty::Pointer nameProp = new mitk::StringProperty(tmpName.ascii());
 
-         node->GetPropertyList()->SetProperty("fileName",nameProp);
+         node->SetProperty("fileName",nameProp);
         
 			initWidgets(it);
 

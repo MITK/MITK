@@ -76,7 +76,7 @@ mitk::BoundingBox::Pointer mitk::DataTree::ComputeBoundingBox(mitk::DataTreeIter
         while (pointsIt != nextPoints->End() )
         {
           pointscontainer->InsertElement( pointid++, pointsIt->Value());
-          pointsIt++;
+          ++pointsIt;
         }
       }
     }
@@ -105,16 +105,19 @@ mitk::BoundingBox::Pointer mitk::DataTree::ComputeVisibleBoundingBox(mitk::DataT
   {
     _it->next();
     mitk::DataTreeNode::Pointer node = _it->get();
-    if (node->GetData() != NULL && node->GetData()->GetGeometry()!=NULL && node->IsVisible(renderer) ) 
+    if (node->GetData() != NULL && node->GetData()->GetUpdatedGeometry()!=NULL && node->IsVisible(renderer)) 
     {
       mitk::BoundingBox::ConstPointer nextBoundingBox = node->GetData()->GetGeometry()->GetBoundingBox();
       const mitk::BoundingBox::PointsContainer * nextPoints = nextBoundingBox->GetPoints();
-      mitk::BoundingBox::PointsContainer::ConstIterator pointsIt = nextPoints->Begin();
-    
-      while (pointsIt != nextPoints->End() )
+      if(nextPoints!=NULL)
       {
-        pointscontainer->InsertElement( pointid++, pointsIt->Value());
-        pointsIt++;
+        mitk::BoundingBox::PointsContainer::ConstIterator pointsIt = nextPoints->Begin();
+      
+        while (pointsIt != nextPoints->End() )
+        {
+          pointscontainer->InsertElement( pointid++, pointsIt->Value());
+          ++pointsIt;
+        }
       }
     }
   }

@@ -23,6 +23,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkAction.h>
 #include <mitkProperties.h>
 #include <mitkStringProperty.h>
+#include <mitkConfig.h>
+#include <itksys/SystemTools.hxx>
 
 
 //##Documentation
@@ -140,14 +142,42 @@ bool mitk::StateMachineFactory::LoadBehavior(std::string fileName)
    mitk::StateMachineFactory* stateMachineFactory = new StateMachineFactory();
    stateMachineFactory->SetFileName( fileName.c_str() );
 
-   if ( stateMachineFactory->Parse() )    
+   if ( stateMachineFactory->Parse()==0 )    
    {
-     mitk::StatusBar::DisplayErrorText( "No appropriate statemachine found! Check string in constructor of interactor!" );
+     mitk::StatusBar::DisplayErrorText( "Could not parse behavior!" );
    }
   
    stateMachineFactory->Delete();
    return true;
 }
+
+bool mitk::StateMachineFactory::LoadStandardBehavior()
+{
+  std::string xmlFileName;
+
+  const char* mitkConf = itksys::SystemTools::GetEnv("MITKCONF");
+  if (mitkConf != NULL) 
+  {
+    xmlFileName  = mitkConf;
+    xmlFileName += "/";
+    xmlFileName = itksys::SystemTools::ConvertToOutputPath(xmlFileName.c_str());
+    xmlFileName += "StateMachine.xml";
+    if(itksys::SystemTools::FileExists(xmlFileName.c_str()))
+      return LoadBehavior(xmlFileName);
+  } 
+  xmlFileName = "StateMachine.xml";
+
+  if(itksys::SystemTools::FileExists(xmlFileName.c_str()))
+    return LoadBehavior(xmlFileName);
+
+  xmlFileName = MITK_ROOT;
+  xmlFileName += "Interactions/mitkBaseInteraction/StateMachine.xml";
+  if(itksys::SystemTools::FileExists(xmlFileName.c_str()))
+    return LoadBehavior(xmlFileName);
+
+  return false;
+}
+
 
 //##ModelId=3E77572A010E
 //##Documentation

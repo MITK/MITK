@@ -64,6 +64,8 @@ namespace mitk {
 class GlobalInteraction : public StateMachine
 {
   public:
+  mitkClassMacro(GlobalInteraction, StateMachine);
+
   //##ModelId=3F0177080324
   typedef std::vector<StateMachine*> StateMachineList;
   //##ModelId=3F0177080334
@@ -141,6 +143,10 @@ class GlobalInteraction : public StateMachine
   //##
   //## to add the observer for an event
   FocusManager* GetFocusManager();
+
+  static bool StandardInteractionSetup(const char * XMLbehaviorFile=NULL);
+
+  static GlobalInteraction* GetGlobalInteraction();
 
   protected:
 

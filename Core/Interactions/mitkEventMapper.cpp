@@ -35,7 +35,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkStatusBar.h"
 #include "mitkInteractionConst.h"
 #include <mitkInteractionDebugger.h>
-
+#include <mitkConfig.h>
+#include <itksys/SystemTools.hxx>
 
 //XML Event
 //##ModelId=3E788FC000E5
@@ -525,6 +526,33 @@ bool mitk::EventMapper::LoadBehavior(std::string fileName)
 
    eventMapper->Delete();
    return true;
+}
+
+bool mitk::EventMapper::LoadStandardBehavior()
+{
+  std::string xmlFileName;
+
+  const char* mitkConf = itksys::SystemTools::GetEnv("MITKCONF");
+  if (mitkConf != NULL) 
+  {
+    xmlFileName  = mitkConf;
+    xmlFileName += "/";
+    xmlFileName = itksys::SystemTools::ConvertToOutputPath(xmlFileName.c_str());
+    xmlFileName += "StateMachine.xml";
+    if(itksys::SystemTools::FileExists(xmlFileName.c_str()))
+      return LoadBehavior(xmlFileName);
+  } 
+  xmlFileName = "StateMachine.xml";
+
+  if(itksys::SystemTools::FileExists(xmlFileName.c_str()))
+    return LoadBehavior(xmlFileName);
+
+  xmlFileName = MITK_ROOT;
+  xmlFileName += "Interactions/mitkBaseInteraction/StateMachine.xml";
+  if(itksys::SystemTools::FileExists(xmlFileName.c_str()))
+    return LoadBehavior(xmlFileName);
+
+  return false;
 }
 
 //##Documentation

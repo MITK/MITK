@@ -71,8 +71,18 @@ namespace mitk {
 
     //##ModelId=3E5B41730261
     //##Documentation
-    //##loads the xml file filename and generates the necessary instances
+    //## loads the xml file filename and generates the necessary instances
     static bool LoadBehavior(std::string fileName);
+
+    //##Documentation
+    //## Try to load standard behavior file "StateMachine.xml"
+    //##
+    //## Search strategy:
+    //## \li try environment variable "MITKCONF" (path to "StateMachine.xml")
+    //## \li try "./StateMachine.xml"
+    //## \li try via source directory (using MITKROOT from cmake-created 
+    //## mitkConfig.h) "MITKROOT/Interactions/mitkBaseInteraction/StateMachine.xml"
+    static bool LoadStandardBehavior();
 
     //##ModelId=3E6773790098
     void  StartElement (const char *elementName, const char **atts);

@@ -291,3 +291,33 @@ bool mitk::GlobalInteraction::ExecuteAction(Action* action, mitk::StateEvent con
   }
   return ok;
 }
+
+#include <mitkStateMachineFactory.h>
+#include <mitkEventMapper.h>
+bool mitk::GlobalInteraction::StandardInteractionSetup(const char * XMLbehaviorFile)
+{
+  bool result;
+  // load interaction patterns from XML-file
+  if(XMLbehaviorFile==NULL)
+    result=mitk::StateMachineFactory::LoadStandardBehavior();
+  else
+    result=mitk::StateMachineFactory::LoadBehavior(XMLbehaviorFile);
+  if(result==false)
+    return false;
+  // load event-mappings from XML-file
+  if(XMLbehaviorFile==NULL)
+    result=mitk::EventMapper::LoadStandardBehavior();
+  else
+    result=mitk::EventMapper::LoadBehavior(XMLbehaviorFile);
+  if(result==false)
+    return false;
+  // setup interaction mechanism by creating GlobalInteraction and 
+  // registering it to EventMapper
+  mitk::EventMapper::SetGlobalStateMachine(new mitk::GlobalInteraction("global"));
+  return true;
+}
+
+mitk::GlobalInteraction* mitk::GlobalInteraction::GetGlobalInteraction()
+{
+  return dynamic_cast<mitk::GlobalInteraction*>(mitk::EventMapper::GetGlobalStateMachine());
+}

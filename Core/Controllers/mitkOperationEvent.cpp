@@ -57,13 +57,13 @@ int mitk::OperationEvent::GetCurrObjectEventId()
 //##ModelId=3EF099E90269
 int mitk::OperationEvent::IncCurrGroupEventId()
 {
-	return m_CurrGroupEventId++;
+	return ++m_CurrGroupEventId;
 }
 
 //##ModelId=3EF099E90289
 int mitk::OperationEvent::IncCurrObjectEventId()
 {
-	return m_CurrObjectEventId++;
+	return ++m_CurrObjectEventId;
 }
 
 //##ModelId=3E9B07B502AC

@@ -72,6 +72,8 @@ class ImageDataItem : public itk::LightObject
     //##ModelId=3E33F08A03B8
     virtual void ConstructVtkImageData() const;
 
+    virtual void Modified() const;
+
   protected:
     //##ModelId=3D7B42E90201
     void* m_Data;
@@ -83,7 +85,6 @@ class ImageDataItem : public itk::LightObject
 	int m_Offset;
     //##ModelId=3E156DC500D4
 	bool m_IsComplete;
-
 
   private:
     //##ModelId=3D7B425E0337

@@ -111,6 +111,12 @@ mitk::ImageDataItem::ImageDataItem(const mitk::PixelType& type, unsigned int dim
 #include "pic2vtk/pic2vtk.h"
 void mitk::ImageDataItem::ConstructVtkImageData() const
 {
-    m_VtkImageData=Pic2vtk::convert(m_PicDescriptor);    
+    m_VtkImageData=Pic2vtk::convert(m_PicDescriptor);
+    m_VtkImageData->GetPointData()->GetScalars()->SetVoidArray(m_PicDescriptor->data, _ipPicElements(m_PicDescriptor), 1);
 }
 
+void mitk::ImageDataItem::Modified() const
+{
+    if(m_VtkImageData)
+        m_VtkImageData->Modified();
+}

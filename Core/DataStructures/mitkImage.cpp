@@ -52,6 +52,8 @@ vtkImageData* mitk::Image::GetVtkImageData()
 	m_CompleteData=GetChannelData();
 	if(m_CompleteData==NULL) 
 		return NULL;
+	float* spacing = const_cast<float*>(GetGeometry()->GetSpacing());
+	m_CompleteData->GetVtkImageData()->SetSpacing(spacing);
 	return m_CompleteData->GetVtkImageData();
 }
 

@@ -16,7 +16,7 @@
 #include "mitkBoundingObject.h"
 
 #include <math.h>
-
+ 
 #include <vtkWorldPointPicker.h>
 #include <vtkPicker.h>
 #include "mitkOpenGLRenderer.h"
@@ -67,7 +67,7 @@ bool mitk::AffineInteractor::ExecuteAction(int actionId, mitk::StateEvent const*
       {
         //vicc->GetVtkInteractor()->GetInteractorStyle()->Off();
         //vicc->GetVtkInteractor()->Disable();
-        std::cout << "******************* disable vtk interactor *******************\n";
+        //std::cout << "******************* disable vtk interactor *******************\n";
       }
     }
     ok = true;
@@ -266,7 +266,6 @@ bool mitk::AffineInteractor::ExecuteAction(int actionId, mitk::StateEvent const*
     }
     mitk::ITKVector3D newPosition = p.GetVectorFromOrigin();
 
-    std::cout << "  Rotation. Worldposition = " << newPosition << std::endl;
     mitk::ScalarType position[3];
     geometry->GetVtkTransform()->GetPosition(position);
     mitk::ITKVector3D dataPosition = position;
@@ -311,13 +310,21 @@ bool mitk::AffineInteractor::ExecuteAction(int actionId, mitk::StateEvent const*
   //}
   case AcSCALE:
   {
-		if (posEvent == NULL)
-      return false;
-    //converting from Point3D to itk::Point
-		mitk::ITKPoint3D newPosition;
-		mitk::vm2itk(posEvent->GetWorldPosition(), newPosition);
+    std::cout << "  Scale!!!!!!!!!!!!!. ist hier ********************XxxXXXXXxxXX" << std::endl;
+    mitk::ITKPoint3D p;
+		if (posEvent != NULL)   // 3D coordinate in event
+    {
+		  mitk::vm2itk(posEvent->GetWorldPosition(), p);          //converting from Point3D to itk::Point      
+    }
+    else if (displayEvent != NULL)  // 2D coordinate in event
+    {
+      if(ConvertDisplayEventToWorldPosition(displayEvent, p) == false)
+        return false;
+    }
+    std::cout << "  Scale. Worldposition = " << p << std::endl;
 
-    mitk::ITKVector3D v = newPosition - m_LastMousePosition;
+    mitk::ITKVector3D v = p - m_LastMousePosition;
+    std::cout << "  Scale.        v = " << v << std::endl;
     /* calculate scale changes */
     mitk::ITKPoint3D newScale;
     newScale[0] = (geometry->GetXAxis() * v) / geometry->GetXAxis().GetNorm();  // Scalarprodukt of normalized Axis
@@ -331,7 +338,7 @@ bool mitk::AffineInteractor::ExecuteAction(int actionId, mitk::StateEvent const*
     itk2vtk(m_LastMousePosition, convert);
     geometry->GetVtkTransform()->GetInverse()->TransformPoint(convert, convert);  // transform start point to local object coordinates
     start[0] = fabs(convert[0]);  start[1] = fabs(convert[1]);  start[2] = fabs(convert[2]);  // mirror it to the positive quadrant
-    itk2vtk(newPosition, convert);
+    itk2vtk(p, convert);
     geometry->GetVtkTransform()->GetInverse()->TransformPoint(convert, convert);  // transform end point to local object coordinates
     end[0] = fabs(convert[0]);  end[1] = fabs(convert[1]);  end[2] = fabs(convert[2]);  // mirror it to the positive quadrant
 
@@ -341,7 +348,7 @@ bool mitk::AffineInteractor::ExecuteAction(int actionId, mitk::StateEvent const*
     newScale[1] = (vLocal[1] > 0.0) ? -fabs(newScale[1]) : +fabs(newScale[1]);
     newScale[2] = (vLocal[2] > 0.0) ? -fabs(newScale[2]) : +fabs(newScale[2]);
     
-    m_LastMousePosition = newPosition;  // update lastPosition for next mouse move
+    m_LastMousePosition = p;  // update lastPosition for next mouse move
 
     /* generate Operation and send it to the receiving geometry */
     PointOperation* doOp = new mitk::PointOperation(OpSCALE, newScale, 0); // Index is not used here

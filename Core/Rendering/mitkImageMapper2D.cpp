@@ -192,7 +192,9 @@ void mitk::ImageMapper2D::GenerateData(mitk::BaseRenderer *renderer)
     if(dynamic_cast<const PlaneGeometry *>(worldgeometry)!=NULL)
     {
       planeview=&dynamic_cast<const PlaneGeometry *>(worldgeometry)->GetPlaneView();
-      m_Reslicer->SetResliceTransform(NULL);
+      vtkTransform * vtktransform = GetDataTreeNode()->GetVtkTransform();
+      vtkLinearTransform * inversetransform = vtktransform->GetLinearInverse();
+      m_Reslicer->SetResliceTransform(inversetransform);
     }
     else
     if(dynamic_cast<const AbstractTransformGeometry *>(worldgeometry)!=NULL)

@@ -108,16 +108,19 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
       }
       delete it;
   }
-  mitk::DataTreeIterator* it = tree->inorderIterator();
-  mitkMultiWidget->texturizePlaneSubTree( tree->inorderIterator());
-  mitkMultiWidget->updateMitkWidgets();
-  mitkMultiWidget->fit();
-  delete it;
+  if (factory->GetOutput()->GetData() != NULL) //assure that we have at least one valid output
+  {
+    mitk::DataTreeIterator* it = tree->inorderIterator();
+    mitkMultiWidget->texturizePlaneSubTree( tree->inorderIterator());
+    mitkMultiWidget->updateMitkWidgets();
+    mitkMultiWidget->fit();
+    delete it;
+  }
 }
 
 void QmitkMainTemplate::fileOpenImageSequence()
 {
-  QString fileName = QFileDialog::getOpenFileName(NULL,"DKFZ Pic (*.seq *.pic *.pic.gz *.seq.gz);;stl files (*.stl)");
+  QString fileName = QFileDialog::getOpenFileName(NULL,"DKFZ Pic (*.seq *.pic *.pic.gz *.seq.gz);;stl files (*.stl);;DICOM files(*.dcm *.DCM)");
 
   if ( !fileName.isNull() )
   {
@@ -160,11 +163,14 @@ void QmitkMainTemplate::fileOpenImageSequence()
       }
       delete it;
     }
-    mitk::DataTreeIterator* it = tree->inorderIterator();
-    mitkMultiWidget->texturizePlaneSubTree(it);
-    mitkMultiWidget->updateMitkWidgets();
-    mitkMultiWidget->fit();
-    delete it;
+    if (factory->GetOutput()->GetData() != NULL) //assure that we have at least one valid output
+    {
+      mitk::DataTreeIterator* it = tree->inorderIterator();
+      mitkMultiWidget->texturizePlaneSubTree(it);
+      mitkMultiWidget->updateMitkWidgets();
+      mitkMultiWidget->fit();
+      delete it;
+    }
   }
 }
 

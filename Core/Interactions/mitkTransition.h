@@ -11,10 +11,10 @@ class Transition
 {
   public:
     //##ModelId=3E5A3A77006F
-    Transition(string tName, int tId, int tnextStateId, int tEventId, int tSideEffectId);
+    Transition(string name, int id, int nextStateId, int eventId, int sideEffectId);
 
     //##ModelId=3E5A3BAE03B5
-    string GetName() const;
+    std::string GetName() const;
 
     //##ModelId=3E5A3BCE00E0
     State* GetNextState() const;
@@ -23,29 +23,29 @@ class Transition
     int GetSideEffectId() const;
 
     //##ModelId=3E5A3C1D0289
-    bool IsEvent(int tEventId) const;
+    bool IsEvent(int eventId) const;
 
     //##ModelId=3E6370080067
-    setNextState(State* tState) const;
+    setNextState(State* state) const;
 
   private:
     //##ModelId=3E5A39C102B2
-    string name;
+    string m_Name;
 
     //##ModelId=3E5A39E9002F
-    int id;
+    int m_Id;
 
     //##ModelId=3E5A3A060366
-    State* nextState;
+    State* m_NextState;
 
     //##ModelId=3E5A3A280007
-    int nextStateId;
+    int m_NextStateId;
 
     //##ModelId=3E5A3A3C0331
-    int eventId;
+    int m_EventId;
 
     //##ModelId=3E5A3A55017F
-    int sideEffectId;
+    int m_SideEffectId;
 
 };
 

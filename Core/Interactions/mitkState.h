@@ -13,7 +13,7 @@ class State
 {
   public:
     //##ModelId=3E5B2A9203BD
-    State(string stateName, int stateId);
+    State(string name, int id);
 
     //##ModelId=3E5B2B2E0304
     bool AddTransition(string transitionName, int transitionId, int nextStateId, int eventId, int sideEffectId) const;
@@ -24,7 +24,7 @@ class State
     Transition* GetTransition(int eventId) const;
 
     //##ModelId=3E5B2C0503D5
-    string GetName() const;
+    std::string GetName() const;
 
     //##ModelId=3E5B2C14016A
     int GetId() const;
@@ -33,17 +33,17 @@ class State
     //##Documentation
     //## locates an eventId in the hashmap and returns true if located, else
     //## false
-    bool locateTransition(int tEventId) const;
+    bool locateTransition(int eventId) const;
 
   private:
     //##ModelId=3E5B2A220069
-	  std::string name;
+	  std::string m_Name;
 
     //##ModelId=3E5B2A350338
-    int id;
+    int m_Id;
 
     //##ModelId=3E5B2A460057
-	std::map<int,Transition> transitions;
+	std::map<int,Transition> m_Transitions;
 
 };
 

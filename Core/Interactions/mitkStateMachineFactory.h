@@ -22,17 +22,24 @@ class StateMachineFactory
     //##ModelId=3E5B41730261
 	  static bool LoadBehavior(std::string fileName);
 
+
+    //##ModelId=3E6773790098
+      bool StartElement( const QString&, const QString&, const QString& , const QXmlAttributes& );
+
+    //##ModelId=3E67737901E0
+      bool EndElement( const QString&, const QString&, const QString& );
+
   private:
     //##ModelId=3E5B428F010B
     static bool ConnectStates(vector<State*> states);
 
-    //##ModelId=3E5B423003DF
-	map<std::string,State*> startStates;
-
+	//##ModelId=3E5B423003DF
+	map<std::string,State*> m_StartStates;
+    //##ModelId=3E6773290108
+	State* m_AktState;
 };
 
 } // namespace mitk
-
 
 
 #endif /* STATEMACHINEFACTORY_H_HEADER_INCLUDED_C19AEDDD */

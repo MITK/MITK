@@ -27,6 +27,7 @@
 
 #include <mitkLevelWindowProperty.h>
 #include <mitkVesselTreeFileReader.h>
+#include <mitkVesselGraphFileReader.h>
 #include <LevelWindow.h>
 #include <DataTree.h>
 #include <mitkFloatProperty.h>
@@ -46,7 +47,7 @@
 #include <EventMapper.h>
 #include <GlobalInteraction.h>
 
-#include <mitkLookupTableSource.h>
+#include <mitkUSLookupTableSource.h>
 
 #ifdef MBI_INTERNAL
 #include <mitkDICOMFileReader.h>
@@ -68,9 +69,9 @@ void QmitkMainTemplate::fileNew()
 void QmitkMainTemplate::fileOpen()
 {
 #ifdef MBI_INTERNAL
-  QString fileName = QFileDialog::getOpenFileName(NULL,"all (*.seq *.pic *.pic.gz *.seq.gz *.pvtk *.stl *.vtk *.ves *.par *.dcm hpsonos.db HPSONOS.DB);;DKFZ Pic (*.seq *.pic *.pic.gz *.seq.gz);;surface files (*.stl *.vtk);;stl files (*.stl);;vtk surface files (*.vtk);;vtk image files (*.pvtk);;ves files (*.ves);;par/rec files (*.par);;DSR files (hpsonos.db HPSONOS.DB);;DICOM files (*.dcm)");
+  QString fileName = QFileDialog::getOpenFileName(NULL,"all (*.seq *.pic *.pic.gz *.seq.gz *.pvtk *.stl *.vtk *.ves *.uvg *.par *.dcm hpsonos.db HPSONOS.DB);;DKFZ Pic (*.seq *.pic *.pic.gz *.seq.gz);;surface files (*.stl *.vtk);;stl files (*.stl);;vtk surface files (*.vtk);;vtk image files (*.pvtk);;vessel files (*.ves *.uvg);;par/rec files (*.par);;DSR files (hpsonos.db HPSONOS.DB);;DICOM files (*.dcm)");
 #else
-  QString fileName = QFileDialog::getOpenFileName(NULL,"all (*.seq *.pic *.pic.gz *.seq.gz *.pvtk *.stl *.vtk *.ves *.par);;DKFZ Pic (*.seq *.pic *.pic.gz *.seq.gz);;surface files (*.stl *.vtk);;stl files (*.stl);;vtk surface files (*.vtk);;vtk image files (*.pvtk);;ves files (*.ves);;par/rec files (*.par)");
+  QString fileName = QFileDialog::getOpenFileName(NULL,"all (*.seq *.pic *.pic.gz *.seq.gz *.pvtk *.stl *.vtk *.ves *.uvg *.par);;DKFZ Pic (*.seq *.pic *.pic.gz *.seq.gz);;surface files (*.stl *.vtk);;stl files (*.stl);;vtk surface files (*.vtk);;vtk image files (*.pvtk);;vessel files (*.ves *.uvg);;par/rec files (*.par)");
 #endif
 
   if ( !fileName.isNull() )
@@ -178,9 +179,6 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
       mitk::LookupTableProperty::Pointer LookupTableProp = new mitk::LookupTableProperty(*LookupTable);
     	node->SetProperty("LookupTable", LookupTableProp );
       */
-
-
-
       initWidgets(it);
     }
   }
@@ -263,6 +261,21 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
 
     initWidgets(it);
     delete it;
+  }
+  else if( strstr(fileName, ".uvg")!=0 )
+  {
+	  mitk::VesselGraphFileReader::Pointer reader = mitk::VesselGraphFileReader::New();
+	  std::cout << "loading " << fileName << " as uvg ... " << std::endl;
+	  reader->SetFileName(fileName);          
+	  reader->Update();
+	  mitk::DataTreeIterator* it=tree->inorderIterator();
+
+	  node=mitk::DataTreeNode::New();
+	  node->SetData(reader->GetOutput());
+	  it->add(node); 
+
+	  initWidgets(it);
+	  delete it;
   }
 #ifdef MBI_INTERNAL
   else if(strstr(fileName, "DCM")!=0)
@@ -359,7 +372,7 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
 
     // TODO: HP map must be provided by DSRFilereader, since it
     // may be dependend on data ( baseline shift)
-    mitk::LookupTableSource::Pointer LookupTableSource = new mitk::LookupTableSource();
+    mitk::USLookupTableSource::Pointer LookupTableSource = mitk::USLookupTableSource::New();
     // LookupTableSource->SetUseHPLookupTable();
     mitk::LookupTableSource::OutputTypePointer LookupTable = LookupTableSource->GetOutput();
     mitk::LookupTableProperty::Pointer LookupTableProp = new mitk::LookupTableProperty(*LookupTable);

@@ -202,7 +202,8 @@ void mitk::QmitkRenderWindow::Repaint()
 {
   //hide();//strongest update! but flickering widgets in zoom!
   //show();
-  updateGL();
+  //updateGL();//not strong enough
+  repaint();
 };
 
 //##ModelId=3E6D5DD403B0

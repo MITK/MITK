@@ -20,7 +20,7 @@ while true; do
   if [ ! -f suspend ]; then
     echo "Now doing a make clean and make Continuous"
     $MAKECMD clean; 	
-    $MAKECMD ContinuousStart ContinuousUpdate ContinuousBuild ContinuousSubmit;
+    $MAKECMD ContinuousStart ContinuousUpdate ContinuousBuild ContinuousTest ContinuousCoverage ContinuousSubmit;
 	echo "Sleeping for 5 minutes now...";
         sleep 300;
   else 

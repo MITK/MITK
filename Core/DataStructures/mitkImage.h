@@ -102,6 +102,7 @@ class Image : public SlicedData
     //##ModelId=3E102AE9004B
     //##Documentation
     //## initialize new (or re-initialize) image
+    //## @warning Initialize() by pic assumes a plane, evenly spaced geometry starting at (0,0,0).
     virtual void Initialize(const mitk::PixelType& type, unsigned int dimension, unsigned int *dimensions, unsigned int channels = 1);
 
     //##ModelId=3E102D2601DF
@@ -110,6 +111,7 @@ class Image : public SlicedData
     //## Geometry3D /@a Geometry2D  are set according to the tags in @a pic.
     //## @param tDim override time dimension (@a n[3]) in @a pic (if >0 and <)
     //## @param sDim override z-space dimension (@a n[2]) in @a pic (if >0 and <)
+    //## @warning Initialize() by pic assumes a plane, evenly spaced geometry starting at (0,0,0).
     virtual void Initialize(ipPicDescriptor* pic, int channels = 1, int tDim = -1, int sDim = -1);
 
     //##ModelId=3E102D2601DF

@@ -38,8 +38,8 @@ public:
     //## setting the update extent appropriately and calling
     //## UpdateOutputInformation).
     //## 
-    //## @warning GetGeometry not yet completely implemented. Appropriate
-    //## setting of the update extent is missing.
+    //## @warning GetGeometry not yet completely implemented. 
+    //## @todo Appropriate setting of the update extent is missing.
         mitk::Geometry3D::ConstPointer GetGeometry() const;
     //##ModelId=3E3C4ACB0046
     //##Documentation
@@ -51,8 +51,8 @@ public:
     //## setting the update extent appropriately and calling
     //## UpdateOutputInformation).
     //## 
-    //## @warning GetGeometry2D not yet completely implemented. Appropriate
-    //## setting of the update extent is missing.
+    //## @warning GetGeometry2D not yet completely implemented.
+    //## @todo Appropriate setting of the update extent is missing.
     virtual mitk::Geometry2D::ConstPointer GetGeometry2D(int s, int t) const;
 
     //##ModelId=3E8600DB0188

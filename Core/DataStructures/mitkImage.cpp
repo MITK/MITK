@@ -477,7 +477,6 @@ void mitk::Image::Initialize(ipPicDescriptor* pic, int channels, int tDim, int s
 	m_PixelType=PixelType(pic);
 	m_Geometry3D=new Geometry3D(m_Dimension, m_Dimensions);
 
-    itkWarningMacro("Initialize() by pic assumes a plane, evenly spaced geometry starting at (0,0,0)."); 
     m_Geometry3D->SetSpacing(pic);
     m_Geometry3D->SetGeometry2D(pic, 0, 0);
     m_Geometry3D->SetEvenlySpaced();

@@ -18,9 +18,6 @@ mitk::BaseData::~BaseData()
 //##ModelId=3DCBE2BA0139
 mitk::Geometry3D::ConstPointer mitk::BaseData::GetGeometry() const
 {
-
-    itkDebugMacro("GetGeometry not yet completely implemented. Appropriate setting of the update extent is missing.");
-
     const_cast<BaseData*>(this)->SetRequestedRegionToLargestPossibleRegion();
 
     const_cast<BaseData*>(this)->UpdateOutputInformation();
@@ -31,8 +28,6 @@ mitk::Geometry3D::ConstPointer mitk::BaseData::GetGeometry() const
 //##ModelId=3E3C4ACB0046
 mitk::Geometry2D::ConstPointer mitk::BaseData::GetGeometry2D(int s, int t) const
 {
-    itkDebugMacro("GetGeometry2D not yet completely implemented. Appropriate setting of the update extent is missing.");
-
     const_cast<BaseData*>(this)->SetRequestedRegionToLargestPossibleRegion();
 
     const_cast<BaseData*>(this)->UpdateOutputInformation();

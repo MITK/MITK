@@ -5,8 +5,18 @@
 
 namespace mitk 
 {
+
 class Operation;
 class OperationEvent;
+
+/** Macro for checking the type of an operation*/
+#define mitkCheckOperationTypeMacro(OperationType, operation, newOperationName) \
+  mitk::OperationType *newOperationName= dynamic_cast<mitk::OperationType *>(operation);\
+	if (newOperationName == NULL)\
+	{\
+    itkWarningMacro("Recieved wrong type of operation!");\
+		return;\
+	}\
 
 //##ModelId=3E5F62430388
 //##Documentation

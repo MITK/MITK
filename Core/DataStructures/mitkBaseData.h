@@ -24,7 +24,7 @@ public:
     //##ModelId=3E10262200CE
     typedef Geometry3D::Pointer Geometry3DPointer;
 
-    mitkClassMacro(mitk::BaseData,itk::DataObject)
+    mitkClassMacro(BaseData,itk::DataObject)
 
     //itkNewMacro(Self);  
 

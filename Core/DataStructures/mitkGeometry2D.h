@@ -23,21 +23,6 @@ namespace mitk {
 class Geometry2D : public itk::Object
 {
 public:
-    //##ModelId=3E1896DA03A6
-    typedef Geometry2D Self;
-
-	
-    //##ModelId=3E1896DA03E2
-    typedef itk::Object Superclass;
-
-    
-    //##ModelId=3E1896DB0036
-    typedef itk::SmartPointer<Self> Pointer;
-
-    
-    //##ModelId=3E3B00C9012B
-    typedef itk::SmartPointer<const Self> ConstPointer;
-
     mitkClassMacro(Geometry2D, itk::Object);
 
 	/** Method for creation through the object factory. */

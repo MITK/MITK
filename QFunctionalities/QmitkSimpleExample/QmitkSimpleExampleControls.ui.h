@@ -29,27 +29,3 @@ void QmitkSimpleExampleControls::sliderXZ_valueChanged( int val)
 {
     xzSliderChanged(val);
 }
-
-
-QSlider* QmitkSimpleExampleControls::getSliderXY()
-{
-    return sliderXY;
-}
-
-
-QSlider* QmitkSimpleExampleControls::getSliderXZ()
-{
-    return sliderXZ;
-}
-
-
-QSlider* QmitkSimpleExampleControls::getSliderYZ()
-{
-    return sliderYZ;
-
-}
-
-QSlider* QmitkSimpleExampleControls::getSliderFP()
-{
-    return sliderFP;
-}

@@ -1,11 +1,8 @@
-SOURCES	+= ../../Functionalities/QmitkSimpleExample/QmitkSimpleExampleFunctionality.cpp
-HEADERS	+= ../../Functionalities/QmitkSimpleExample/QmitkSimpleExampleFunctionality.h
+INCLUDEPATH	+= ../../Framework/QmitkApplicationBase ../../Functionalities/QmitkSimpleExample
 
 # an example of a functionality
+HEADERS	+= ../../Functionalities/QmitkSimpleExample/QmitkSimpleExampleFunctionality.h 
 		
+SOURCES	+= ../../Functionalities/QmitkSimpleExample/QmitkSimpleExampleFunctionality.cpp 
 
-FORMS	= ../../Functionalities/QmitkSimpleExample/QmitkSimpleExampleControls.ui \
-	C:/home/ivo/c/ip++/AppModules/QmitkNavigators/QmitkSliderNavigator.ui
-TEMPLATE	=app
-INCLUDEPATH	+= ../../Framework/QmitkApplicationBase ../../Functionalities/QmitkSimpleExample
-LANGUAGE	= C++
+FORMS += ../../Functionalities/QmitkSimpleExample/QmitkSimpleExampleControls.ui

@@ -52,12 +52,12 @@ void mitk::LineMapper2D::Paint(mitk::BaseRenderer * renderer)
     vtkTransform* transform = GetDataTreeNode()->GetVtkTransform();
 
     //List of the Points
-    PointSet::PointSetType::PointsContainerConstIterator it, end;
+    PointSet::DataType::PointsContainerConstIterator it, end;
     it = input->GetPointSet()->GetPoints()->Begin();
     end = --input->GetPointSet()->GetPoints()->End();//the last before end, because lines from n to n+1
 
     //bool list for the selection of the points
-    PointSet::PointSetType::PointDataContainerIterator selIt, selItNext;
+    PointSet::DataType::PointDataContainerIterator selIt, selItNext;
     selIt=input->GetPointSet()->GetPointData()->Begin();
     
     int j=0;

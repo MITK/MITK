@@ -534,11 +534,17 @@ void QmitkMainTemplate::initWidgets( mitk::DataTreeIterator * it )
 	const mitk::BoundingBox::BoundsArrayType bounds = mitk::DataTree::ComputeBoundingBox(it)->GetBounds();
 	printf("\nboundingbox\n");   
 
-            initWidget(it,
+/*            initWidget(it,
                 mitkMultiWidget->mitkWidget1,
                 Vector3f(bounds[0],bounds[2],bounds[4]),
                 Vector3f(bounds[1],bounds[2],bounds[4]),
                 Vector3f(bounds[0],bounds[3],bounds[4])
+                );*/
+            initWidget(it,
+                mitkMultiWidget->mitkWidget1,
+                Vector3f(bounds[0],bounds[3],bounds[5]),
+                Vector3f(bounds[1],bounds[3],bounds[5]),
+                Vector3f(bounds[0],bounds[2],bounds[5])
                 );
 	printf("\nw1 init\n");   
 

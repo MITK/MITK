@@ -64,8 +64,8 @@ void mitk::Geometry2DDataMapper2D::Paint(mitk::BaseRenderer * renderer)
 
                 //convert display coordinates ( (0,0) is top-left ) in GL coordinates ( (0,0) is bottom-left )
                 float toGL=displayGeometry->GetSizeInDisplayUnits().y;
-                lineFrom.y=toGL-lineFrom.y;
-                lineTo.y=toGL-lineTo.y;
+//                lineFrom.y=toGL-lineFrom.y;
+//                lineTo.y=toGL-lineTo.y;
 
                 //query and set color
                 const mitk::DataTreeNode* node=GetDataTreeNode();

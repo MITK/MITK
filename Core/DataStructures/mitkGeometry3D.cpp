@@ -154,7 +154,7 @@ void mitk::Geometry3D::SetBoundingBox(const float bounds[6],  int t)
 		
 		mitk::BoundingBox::PointIdentifier pointid=0;
 		
-        p[0]=bounds[0]; p[1]=bounds[2]; p[2]=bounds[3];
+        p[0]=bounds[0]; p[1]=bounds[2]; p[2]=bounds[4];
         pointscontainer->InsertElement(pointid++, p);
 
         p[0]=bounds[1]; p[2]=bounds[3]; p[2]=bounds[5];

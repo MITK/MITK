@@ -123,7 +123,7 @@ void mitk::BaseRenderer::MousePressEvent(mitk::MouseEvent *me)
     m_CameraController->MousePressEvent(me);
   if(m_MapperID==1)
   {
-	  Point2D p(me->x(), me->y());
+	  Point2D p(me->x(), GetDisplayGeometry()->GetDisplayHeight()-me->y());
 	  Point3D position;
 	  GetDisplayGeometry()->DisplayToMM(p, p);
 	  GetDisplayGeometry()->Map(p, position);
@@ -140,7 +140,7 @@ void mitk::BaseRenderer::MouseReleaseEvent(mitk::MouseEvent *me)
 
   if(m_MapperID==1)
   {
-	  Point2D p(me->x(), me->y());
+	  Point2D p(me->x(), GetDisplayGeometry()->GetDisplayHeight()-me->y());
 	  Point3D position;
 	  GetDisplayGeometry()->DisplayToMM(p, p);
 	  GetDisplayGeometry()->Map(p, position);
@@ -156,7 +156,7 @@ void mitk::BaseRenderer::MouseMoveEvent(mitk::MouseEvent *me)
     m_CameraController->MouseMoveEvent(me);
   if(m_MapperID==1)
   {
-	  Point2D p(me->x(), me->y());
+	  Point2D p(me->x(), GetDisplayGeometry()->GetDisplayHeight()-me->y());
 	  Point3D position;
 	  GetDisplayGeometry()->DisplayToMM(p, p);
 	  GetDisplayGeometry()->Map(p, position);

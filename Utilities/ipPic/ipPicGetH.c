@@ -6,7 +6,10 @@
  *   reads the Header of a  PicFile from disk
  *
  * $Log$
- * Revision 1.3  1999/11/27 19:15:26  andre
+ * Revision 1.4  1999/11/27 20:02:41  andre
+ * *** empty log message ***
+ *
+ * Revision 1.3  1999/11/27  19:15:26  andre
  * *** empty log message ***
  *
  * Revision 1.2  1997/09/15  13:21:13  andre
@@ -49,7 +52,12 @@ ipPicDescriptor *ipPicGetHeader( char *infile_name, ipPicDescriptor *pic )
   /* read infile */
   ipFRead( &(tag_name[0]), 1, 4, infile );
 
-  if( strncmp( ipPicVERSION, tag_name, 4 ) != 0 )
+  if( strncmp( "\037\213", tag_name, 2 ) == 0 )
+    {
+      fprintf( stderr, "ipPicGetHeader: sorry, can't read compressed file\n" );
+      return( NULL );
+    }
+  else if( strncmp( ipPicVERSION, tag_name, 4 ) != 0 )
     {
       if( pic == NULL )
         pic = _ipPicOldGetHeader( infile,

@@ -482,7 +482,8 @@ void mitk::OpenGLRenderer::Resize(int w, int h)
 
   BaseRenderer::Resize(w, h);
 
-//  GetVtkRenderWindow()->SetSize(w,h); //done by VtkInteractor via m_CameraController->Resize(...) in BaseRenderer 
+  GetVtkRenderWindow()->SetSize(w,h); // this was originally done by VtkInteractor via 
+                                      // m_CameraController->Resize(...) in BaseRenderer                                      
 
   Update();
 }

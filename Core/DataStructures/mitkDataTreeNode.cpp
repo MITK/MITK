@@ -4,6 +4,7 @@
 
 #include "mitkProperties.h"
 #include "mitkFloatProperty.h"
+#include "mitkStringProperty.h"
 #include "mitkBoolProperty.h"
 #include "mitkColorProperty.h"
 #include "mitkLevelWindowProperty.h"
@@ -208,6 +209,18 @@ bool mitk::DataTreeNode::GetColor(float rgb[3], mitk::BaseRenderer* renderer, co
         return false;
     
     memcpy(rgb, colorprop->GetColor().GetDataPointer(), 3*sizeof(float));
+    return true;
+}
+
+bool mitk::DataTreeNode::GetName(char &nodeName, mitk::BaseRenderer* renderer, const char* name) const
+{
+    mitk::StringProperty::Pointer nameProp = dynamic_cast<mitk::StringProperty*>(GetProperty(name, renderer).GetPointer());
+    if(nameProp.IsNull())
+    {
+        nameProp = new mitk::StringProperty("Unnamed");
+        GetPropertyList(renderer)->SetProperty(name,nameProp);
+    }
+    nodeName = (char)nameProp->GetString();
     return true;
 }
 

@@ -22,7 +22,7 @@ public:
 
     //##ModelId=3E3FF04F005F
     StringProperty( const char* string );
-    StringProperty( string  s );
+    StringProperty( std::string  s );
     
     itkGetStringMacro(String);
     itkSetStringMacro(String);

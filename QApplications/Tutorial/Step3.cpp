@@ -52,7 +52,7 @@ int main(int argc, char* argv[])
       mitk::DataTreeNode::Pointer node = nodeReader->GetOutput();
       it.Add(node);
 
-      //Part IV: We want all images to be volum-rendered
+      //Part IV: We want all images to be volume-rendered
       // Check, if the data is an image by dynamic_cast-ing the data
       // contained in the node. Warning: dynamic_cast's are rather slow,
       // do not use it too often!

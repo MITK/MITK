@@ -122,8 +122,8 @@ void mitk::ContourVtkMapper3D::Update(mitk::BaseRenderer* renderer)
 
 			m_Contour->SetPoints(points);
 		  points->Delete();
-//  		m_Contour->SetLines(lines);
-  		m_Contour->SetPolys(polys);
+  		m_Contour->SetLines(lines);
+//  		m_Contour->SetPolys(polys);
 		  polys->Delete();
 			m_Contour->Update();
 

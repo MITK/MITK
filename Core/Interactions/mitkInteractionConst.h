@@ -62,8 +62,8 @@ typedef enum EEventIds
   EIDNEW = 1000,
   EIDOLD = 1001,
   EIDFINISHED = 1002,
-  EIDSTNO = 1003,
-  EIDSTYES = 1004,
+  EIDNO = 1003,
+  EIDYES = 1004,
   EIDSAME = 1005,
   EIDNOANDLASTOBJECT = 1006,
   EIDNOANDNOTLASTOBJECT = 1007,
@@ -73,7 +73,7 @@ typedef enum EEventIds
   EIDSTLARGERNMINUS1 = 1011,
   EIDPOSITIONEVENT = 1012,
   EIDEDIT = 1013,
-  EIDSUBDESELCT = 1020, 
+  EIDSUBDESELECT = 1020,
   //external thrown events:
   EIDCLEAR = 1100
 };
@@ -94,6 +94,7 @@ typedef enum EOperations
   OpOPENCELL = 251, //close a cell (to a polygon)
   OpMOVE = 300, //move a point
   OpMOVELINE = 301, //move a line
+  OpMOVECELL = 302, //move a line
   OpREMOVE = 400, //remove a point at position
   OpREMOVELINE = 401, //remove a line at position
   OpREMOVECELL = 402, //remove a cell
@@ -200,6 +201,8 @@ typedef enum EActions
   AcINFORMLISTENERS = 1200, //GlobalInteraction
   AcASKINTERACTORS = 1201,  //GlobalInteraction
   AcCHECKGREATERONE = 1500,
+  AcCHECKBOUNDINGBOX = 1510,
+  AcFORCESUBINTERACTORS = 1550,
   AcTRANSMITEVENT = 2000  //to transmit an event to a lower Interactor/Statemachine
 };
 
@@ -273,9 +276,9 @@ typedef enum EEventType
   Type_LayoutDirectionChange = 90,		// the layout direction changed
   Type_Style = 91,				// internal style event
   Type_TabletPress = 92,			// tablet press
-  Type_TabletRelease = 93,			// tablet release  
+  Type_TabletRelease = 93,			// tablet release
   Type_User = 1000,				// first user event id
-  Type_MaxUser = 65535 
+  Type_MaxUser = 65535
 };
 
 

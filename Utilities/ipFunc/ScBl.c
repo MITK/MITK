@@ -90,6 +90,7 @@ ipPicDescriptor *_ipFuncScBL( ipPicDescriptor *pic_old,
    ipUInt4_t        ind_o[_ipPicNDIM];    /* loop index (outer loops)  */\
    ipUInt4_t        ind_i[_ipPicNDIM];    /* loop index (inner loops)  */\
    ipUInt4_t        n_i[_ipPicNDIM];      /* loop index (inner loops)  */\
+   ipUInt4_t        pic_elements;         /* number of elements of pic_old */ \
    type             help;                                                \
                                                                          \
    /* initialize vectors                                               */\
@@ -109,6 +110,8 @@ ipPicDescriptor *_ipFuncScBL( ipPicDescriptor *pic_old,
                                                                          \
    for ( i = pic_new->dim; i < _ipPicNDIM; i++ )                         \
      n_i[i] = 1;                                                         \
+                                                                         \
+   pic_elements = _ipPicElements(pic_old);                               \
                                                                          \
    off_new = 0;                                                          \
    switch ( pic_new->dim )                                               \
@@ -240,11 +243,12 @@ ipPicDescriptor *_ipFuncScBL( ipPicDescriptor *pic_old,
                                      for ( ind_i[0] = 0; ind_i[0] < n_i[0];\
                                            ind_i[0]++ )                  \
                                      {                                   \
-                                       factor[0] = weights[ind_i[0]*_ipPicNDIM] * \
-                                                   factor[1];            \
                                        offset[0] = ( ipUInt4_t )help2[0]+\
                                                    ind_i[0] * size[0] +  \
                                                    offset[1];            \
+                                       if(pic_elements<=offset[0]) continue; \
+                                       factor[0] = weights[ind_i[0]*_ipPicNDIM] * \
+                                                   factor[1];            \
                                        help = help + factor[0] *         \
                                               (( type * ) pic_old->data )\
                                               [offset[0]];               \
@@ -303,7 +307,10 @@ ipPicDescriptor *_ipFuncScBL( ipPicDescriptor *pic_old,
   /* initialisation of vectors                                          */
    
   for ( i = 0; i < pic_new->dim; i++ )                                    
-    n[i] = pic_new->n[i] - 2;                                                 
+//	  if(pic_new->n[i]>=pic_old->n[i])
+		n[i] = pic_new->n[i];//ivo  - 2;
+//	  else
+//		  n[i] = pic_new->n[i]-1;
                                                                           
   for ( i = pic_new->dim; i < _ipPicNDIM; i++ )                           
     n[i] = 0;                                                            
@@ -330,7 +337,7 @@ ipPicDescriptor *_ipFuncScBL( ipPicDescriptor *pic_old,
   pic_new->bpe  = pic_old->bpe;
   pic_new->type = pic_old->type;
   pic_new->data = malloc ( _ipPicSize ( pic_new ) );
-
+memset(pic_new->data,17,_ipPicSize(pic_new));
   if ( pic_new == NULL )
     {
        _ipFuncSetErrno ( ipFuncDATA_ERROR );

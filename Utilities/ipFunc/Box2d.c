@@ -84,7 +84,7 @@
   ipInt4_t    end_x, end_y;                                              \
   ipBool_t    found;                                                      \
                                                                           \
-  for ( l = 0; l < pic->dim; l++ )                                        \
+  for ( l = 0; l < (ipInt4_t) pic->dim; l++ )                             \
     {                                                                     \
        i = 0;                                                             \
        found = ipFalse;                                                   \
@@ -141,11 +141,8 @@ ipUInt4_t _ipFuncBox2d ( ipPicDescriptor *pic_old,
                          ipUInt4_t       **beg,
                          ipUInt4_t       **end )            
 {
-
-  ipUInt4_t       n[_ipPicNDIM];          /* number of pixels in each   */
-                                          /* dimension                  */
   ipUInt4_t       size[_ipPicNDIM];       /* size of each direction     */
-  ipUInt4_t       i, j, k, l;             /* loop index                 */
+  ipUInt4_t       i;                      /* loop index                 */
   ipUInt4_t       *help_beg, *help_end;
   ipUInt4_t       order[] = { 0,  1,
                               1,  0 };

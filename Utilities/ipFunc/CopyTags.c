@@ -70,3 +70,4 @@ void ipFuncCopyTags(ipPicDescriptor *pic_new, ipPicDescriptor *pic_old)
 		pic_new->info->write_protect = pic_old->info->write_protect;     
    }
 }
+

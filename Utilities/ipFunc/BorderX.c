@@ -192,7 +192,7 @@ ipPicDescriptor *ipFuncBorderX ( ipPicDescriptor *pic_old,
                                  ipPicDescriptor *pic_rtn )
 {
   ipPicDescriptor *pic_new;            /* pointer to transformed image            */
-  ipInt4_t       i;                    /* loop index                              */
+  ipUInt4_t       i;                   /* loop index                              */
   ipUInt4_t      size[_ipPicNDIM];     /*                                         */
   ipFloat8_t     max_gv, min_gv;
 
@@ -254,3 +254,4 @@ ipPicDescriptor *ipFuncBorderX ( ipPicDescriptor *pic_old,
   return ( pic_new );
 }
 #endif
+

@@ -98,3 +98,4 @@ ipPicDescriptor *ipFuncClose ( ipPicDescriptor *pic_old,
 }
 
 #endif
+

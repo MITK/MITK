@@ -96,7 +96,7 @@ ipFloat8_t ipFuncCurtosis ( ipPicDescriptor *pic );
 ipFloat8_t ipFuncCurtosis ( ipPicDescriptor *pic )
 {
 
-           ipFloat8_t curt;
+  ipFloat8_t curt;
   ipFloat8_t mean, std;            
              
 
@@ -104,9 +104,8 @@ ipFloat8_t ipFuncCurtosis ( ipPicDescriptor *pic )
 
   if ( _ipFuncError ( pic ) != ipOK ) return ( ipFuncERROR );
 
-  if (  _ipPicElements ( pic ) == 1 ) 
-    curt = 0;
-  else
+  curt = 0.0;
+  if (  _ipPicElements ( pic ) != 1 ) 
     {
        
        mean =  ipFuncMean ( pic );
@@ -120,3 +119,4 @@ ipFloat8_t ipFuncCurtosis ( ipPicDescriptor *pic )
   return( curt );
 }
 #endif
+

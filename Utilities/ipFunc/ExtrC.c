@@ -166,7 +166,7 @@ ipUInt4_t  ipFuncExtrC ( ipPicDescriptor *pic_old,
                          ipUInt4_t       radius )
 {
   ipInt4_t       help;
-  ipInt4_t       i;                    /* loop index                              */
+  ipUInt4_t       i;                   /* loop index                              */
   ipUInt4_t      end[_ipPicNDIM];      /* end of window                           */
   ipUInt4_t      begin[_ipPicNDIM];    /* beginning of window                     */
   ipUInt4_t      centr[_ipPicNDIM];    /* beginning of window                     */
@@ -192,7 +192,7 @@ ipUInt4_t  ipFuncExtrC ( ipPicDescriptor *pic_old,
       else begin[i] = ( ipUInt4_t )help;
 
       help = center[i] + radius;
-      if ( help > pic_old->n[i] )
+      if ( (ipUInt4_t) help > pic_old->n[i] )
         {
            _ipFuncSetErrno ( ipFuncDATA_ERROR );
            return ( ipFuncERROR );
@@ -223,3 +223,4 @@ ipUInt4_t  ipFuncExtrC ( ipPicDescriptor *pic_old,
 }
 
 #endif
+

@@ -82,7 +82,6 @@ ipPicDescriptor *ipFuncConv( ipPicDescriptor *pic_old,
 {                                                                        \
    ipInt4_t         ind[_ipPicNDIM];                                     \
    ipInt4_t         off[_ipPicNDIM];                                     \
-   ipInt4_t         n[_ipPicNDIM];                                       \
    ipUInt4_t        i;                                                   \
    ipInt4_t         offset;                                              \
    ipFloat8_t       help, min_gv, max_gv;                                \
@@ -163,11 +162,9 @@ ipPicDescriptor *ipFuncConv( ipPicDescriptor *pic_old,
 {
 
   ipPicDescriptor *pic_new;           /* convolved  image               */
-  ipUInt4_t       i, j;               /* loopindex                      */
+  ipUInt4_t       i;                  /* loopindex                      */
   ipInt4_t        beg[_ipPicNDIM];
   ipInt4_t        end[_ipPicNDIM];
-  ipUInt4_t       ind[_ipPicNDIM];    /* vector of loop indices (image) */ 
-  ipInt4_t        ind_m[_ipPicNDIM];  /* vector of loop indices (mask)  */ 
   ipFuncMasc_t    *m;                 /* length of mask and offsets     */
   ipUInt4_t       size[_ipPicNDIM];                                    
 

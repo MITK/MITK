@@ -50,9 +50,9 @@ class GlobalInteraction : public StateMachine
 
   typedef std::vector<Interactor*>::iterator InteractorListIter;
 
-  typedef std::map<float, Interactor*> InteractorMap;
+  typedef std::multimap<float, Interactor*> InteractorMap;
   
-  typedef std::map<float, Interactor*>::iterator  InteractorMapIter;
+  typedef InteractorMap::iterator  InteractorMapIter;
 
   //##ModelId=3EAD420E0088
   GlobalInteraction(const char * type);

@@ -98,7 +98,7 @@ void mitk::PointSetWriter::WriteXML( mitk::PointSet* pointSet, std::ofstream& ou
 {
     WriteStartElement( XML_POINT_SET, out );
     mitk::PointSet::PointsContainer* pointsContainer = pointSet->GetPointSet()->GetPoints();
-    mitk::PointSet::PointsContainer::Iterator it, end;
+    mitk::PointSet::PointsContainer::Iterator it;
     for ( it = pointsContainer->Begin(); it != pointsContainer->End(); ++it )
     {
         WriteStartElement( XML_POINT, out );

@@ -269,7 +269,7 @@ void mitk::ImageMapper2D::GenerateData(mitk::BaseRenderer *renderer)
     renderinfo.m_PixelsPerMM[1]= height/heightInMM;
 
     m_Reslicer->SetOutputSpacing(1.0/renderinfo.m_PixelsPerMM[0], 1.0/renderinfo.m_PixelsPerMM[1], 1.0);
-    m_Reslicer->SetOutputExtent(0, width-1, 0, height-1, 0, 1);
+    m_Reslicer->SetOutputExtent(0, (int)width-1, 0, (int)height-1, 0, 1);
 
     //calulate the originarray and the orientations for the reslice-filter
     double originarray[3];

@@ -77,22 +77,23 @@ void mitk::SurfaceMapper2D::Paint(mitk::BaseRenderer * renderer)
 {
   if(IsVisible(renderer)==false) return;
 
-  // ok, das ist aus GenerateData kopiert
   mitk::Surface::Pointer input  = const_cast<mitk::Surface*>(this->GetInput());
 
-  assert(input);
+  if(input.IsNull())
+    return;
+
+  //
+  // get the TimeSlicedGeometry of the input object
+  //
+  const TimeSlicedGeometry* inputTimeGeometry = dynamic_cast< const TimeSlicedGeometry* >( input->GetUpdatedGeometry() );
+  if(( inputTimeGeometry == NULL ) || ( inputTimeGeometry->GetTimeSteps() == 0 ) )
+    return;
 
   bool useCellData;
   if (dynamic_cast<mitk::BoolProperty *>(this->GetDataTreeNode()->GetProperty("useCellDataForColouring").GetPointer()) == NULL)
     useCellData = false;
   else
     useCellData = dynamic_cast<mitk::BoolProperty *>(this->GetDataTreeNode()->GetProperty("useCellDataForColouring").GetPointer())->GetValue();
-
-  //
-  // get the TimeSlicedGeometry of the input object
-  //
-  const TimeSlicedGeometry* inputTimeGeometry = dynamic_cast< const TimeSlicedGeometry* >( input->GetUpdatedGeometry() );
-  assert( inputTimeGeometry != NULL );
 
   //
   // get the world time

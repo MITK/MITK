@@ -73,7 +73,8 @@ void mitk::SurfaceVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
   //
   mitk::Surface::Pointer input  = const_cast< mitk::Surface* >( this->GetInput() );
   const TimeSlicedGeometry* inputTimeGeometry = dynamic_cast< const TimeSlicedGeometry* >( input->GetUpdatedGeometry() );
-  assert( inputTimeGeometry != NULL );
+  if(( inputTimeGeometry == NULL ) || ( inputTimeGeometry->GetTimeSteps() == 0 ) )
+    return;
 
   //
   // get the world time

@@ -76,15 +76,15 @@ void mitk::vtkPointSetXMLParser::CharacterDataHandler ( const char *inData, int 
     {
         m_CurrentPointId = ParsePointIdentifier( inData, inLength );
     }
-    if ( currentElement == mitk::PointSetWriter::XML_X )
+    else if ( currentElement == mitk::PointSetWriter::XML_X )
     {
         m_CurrentPoint[ 0 ] = ParseScalarType( inData, inLength );
     }
-    if ( currentElement == mitk::PointSetWriter::XML_Y )
+    else if ( currentElement == mitk::PointSetWriter::XML_Y )
     {
         m_CurrentPoint[ 1 ] = ParseScalarType( inData, inLength );
     }
-    if ( currentElement == mitk::PointSetWriter::XML_Z )
+    else if ( currentElement == mitk::PointSetWriter::XML_Z )
     {
         m_CurrentPoint[ 2 ] = ParseScalarType( inData, inLength );
     }

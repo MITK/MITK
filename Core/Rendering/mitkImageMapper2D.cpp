@@ -71,7 +71,8 @@ void mitk::ImageMapper2D::GenerateData()
 void mitk::ImageMapper2D::Paint(mitk::BaseRenderer * renderer)
 {
   mitk::Image* input  = const_cast<mitk::ImageMapper2D::InputImageType *>(this->GetInput());
-  if((input == NULL) || (input->IsInitialized()==false))
+  if(input == NULL) 
+    //|| ((input->GetSource().GetPointer()==NULL) && (input->IsInitialized()==false)))
     return;
 
   if(IsVisible(renderer)==false) return;
@@ -177,9 +178,6 @@ void mitk::ImageMapper2D::GenerateData(mitk::BaseRenderer *renderer)
 
   mitk::Image* input  = const_cast<mitk::ImageMapper2D::InputImageType *>(this->GetInput());
 
-  if((input == NULL) || (input->IsInitialized()==false))
-    return;
-
   if(image!= NULL)
   {
     delete image;
@@ -214,6 +212,9 @@ void mitk::ImageMapper2D::GenerateData(mitk::BaseRenderer *renderer)
       return;
 
     vtkImageData* inputData = input->GetVtkImageData(timestep);
+    if(inputData==NULL)
+      return;
+
     float spacing[3];
     inputData->GetSpacing(spacing);
 
@@ -416,7 +417,7 @@ void mitk::ImageMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
 void mitk::ImageMapper2D::Update(mitk::BaseRenderer* renderer)
 {
   mitk::Image* input  = const_cast<mitk::ImageMapper2D::InputImageType *>(this->GetInput());
-  if((input == NULL) || (input->IsInitialized()==false))
+  if(input == NULL)
     return;
 
   RendererInfo& renderinfo=m_RendererInfo[renderer];

@@ -7,7 +7,7 @@
 ** place of a destructor.
 *****************************************************************************/
 #include <utility>
-#include "mitkBoolProperty.h"
+#include "mitkProperties.h"
 #include "mitkEventMapper.h"
 #include "mitkFocusManager.h"
 void QmitkDataManagerControls::init() { 

@@ -2,6 +2,7 @@
 #include "mitkInteractionConst.h"
 #include "mitkEvent.h"
 #include "mitkStatusBar.h"
+#include "mitkAction.h"
 
 
 //##ModelId=3EAD420E0088
@@ -194,11 +195,11 @@ mitk::FocusManager* mitk::GlobalInteraction::GetFocusManager()
 
 
 //##ModelId=3E7F497F01AE
-bool mitk::GlobalInteraction::ExecuteAction(int actionId, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId)
+bool mitk::GlobalInteraction::ExecuteAction(Action* action, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId)
 {
   bool ok = false;
 
-  switch (actionId)
+  switch (action->GetActionId())
   {
   case AcDONOTHING:
     ok = true;

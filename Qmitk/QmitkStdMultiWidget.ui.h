@@ -8,7 +8,7 @@
 *****************************************************************************/
 
 #include "mitkProperties.h"
-#include <mitkBoolProperty.h>
+#include <mitkProperties.h>
 #include <mitkStringProperty.h>
 #include <mitkGeometry2DDataVtkMapper3D.h>
 #include <vtkRenderer.h>

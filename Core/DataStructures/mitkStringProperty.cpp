@@ -2,14 +2,14 @@
 
 //##ModelId=3E3FF04F005F
 mitk::StringProperty::StringProperty( const char* string ) 
-: m_String( string ) 
+: m_Value( string ) 
 {
 
 }
 
 //##ModelId=3E3FF04F005F
 mitk::StringProperty::StringProperty( std::string s )
-: m_String( s )
+: m_Value( s )
 {
 
 }
@@ -20,11 +20,11 @@ bool mitk::StringProperty::operator==(const BaseProperty& property ) const
 
     if(other==NULL) return false;
 
-    return other->m_String==m_String;
+    return other->m_Value==m_Value;
 }
 
 std::string mitk::StringProperty::GetValueAsString() const 
 {
-  return m_String;
+  return m_Value;
 }
 

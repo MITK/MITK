@@ -1,4 +1,5 @@
 #include "mitkTransition.h"
+#include "mitkAction.h"
 
 //##ModelId=3E5A3A77006F
 mitk::Transition::Transition(std::string name, int nextStateId, int eventId )
@@ -9,11 +10,11 @@ mitk::Transition::Transition(std::string name, int nextStateId, int eventId )
 }
 
 //##
-void mitk::Transition::AddActionID( int actionId ) 
+void mitk::Transition::AddAction( Action* action ) 
 {
-  m_ActionIds.push_back( actionId );
+  m_Actions.push_back( action );
 
-  int count = m_ActionIds.size();
+  int count = m_Actions.size();
   std::cout << count << std::cout;  
 }
 
@@ -42,20 +43,20 @@ int mitk::Transition::GetEventId() const
 //##
 int mitk::Transition::GetActionCount() const 
 {
-  int size = m_ActionIds.size();
+  int size = m_Actions.size();
   return size; 
 }
 
 //##
-std::vector<int>::iterator mitk::Transition::GetActionIdBeginIterator() const
+std::vector<mitk::Action*>::iterator mitk::Transition::GetActionBeginIterator() const
 {
-  return m_ActionIds.begin();
+  return m_Actions.begin();
 }
 
 //##
-const std::vector<int>::iterator mitk::Transition::GetActionIdEndIterator() const
+const std::vector<mitk::Action*>::iterator mitk::Transition::GetActionEndIterator() const
 {
-  return m_ActionIds.end();
+  return m_Actions.end();
 }
 
 //##ModelId=3E5A3C1D0289

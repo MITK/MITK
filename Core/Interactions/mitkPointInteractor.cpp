@@ -6,6 +6,7 @@
 #include <mitkDataTreeNode.h>
 #include <mitkPointSet.h>
 #include <mitkInteractionConst.h>
+#include <mitkAction.h>
 
 mitk::PointInteractor::PointInteractor(const char * type, DataTreeNode* dataTreeNode, int id)
 : Interactor(type, dataTreeNode), m_Id(id)
@@ -27,12 +28,12 @@ int mitk::PointInteractor::GetId()
 //## SeMOVE (moves the point), 
 //## SeFINISHMOVE (writes the movement to undo), 
 //## SeREMOVE, SeSELECT, SeDESELECT
-bool mitk::PointInteractor::ExecuteAction(int actionId, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId)
+bool mitk::PointInteractor::ExecuteAction(Action* action, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId)
 {
 	bool ok = false;//for return type bool
 
   /*Each case must watch the type of the event!*/
-  switch (actionId)
+  switch (action->GetActionId())
 	{
   case AcDONOTHING:
     ok = true;

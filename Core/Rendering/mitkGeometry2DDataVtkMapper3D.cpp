@@ -16,7 +16,7 @@
 #include "vtkLookupTable.h"
 //#include "vtkImageMapToWindowLevelColors";
 #include "mitkColorProperty.h"
-#include "mitkFloatProperty.h"
+#include "mitkProperties.h"
 #include "mitkLookupTableProperty.h"
 
 

@@ -85,7 +85,7 @@ public:
 
   //##Documentation
   //## @brief Executes Side-Effects
-  virtual bool ExecuteAction(int actionId, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId) = 0;
+  virtual bool ExecuteAction(Action* action, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId) = 0;
 
 protected:
   //##Documentation

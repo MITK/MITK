@@ -1,6 +1,9 @@
 #include "mitkStateMachineFactory.h"
 #include "mitkStatusBar.h"
 #include <vtkXMLDataElement.h>
+#include <mitkAction.h>
+#include <mitkProperties.h>
+#include <mitkStringProperty.h>
 
 
 //##Documentation
@@ -41,10 +44,21 @@ const std::string mitk::StateMachineFactory::STATE_MACHIN_NAME = "stateMachine";
 
 const std::string mitk::StateMachineFactory::ACTION = "action";
 
+const std::string mitk::StateMachineFactory::BOOL_PARAMETER = "boolParameter";
+
+const std::string mitk::StateMachineFactory::INT_PARAMETER = "intParameter";
+
+const std::string mitk::StateMachineFactory::FLOAT_PARAMETER = "floatParameter";
+
+const std::string mitk::StateMachineFactory::DOUBLE_PARAMETER = "doubleParameter";
+
+const std::string mitk::StateMachineFactory::STRING_PARAMETER = "stringParameter";
+
+const std::string mitk::StateMachineFactory::VALUE = "value";
 
 //##ModelId=3E68B2C600BD
 mitk::StateMachineFactory::StateMachineFactory()
-: m_AktState(NULL), m_AktTransition(NULL),	m_AktStateMachineName(""){}
+: m_AktState(NULL), m_AktTransition(NULL),	m_AktAction(NULL), m_AktStateMachineName(""){}
 
 //##ModelId=3E5B4144024F
 //##Documentation
@@ -198,8 +212,59 @@ void  mitk::StateMachineFactory::StartElement (const char *elementName, const ch
   {
 
     int actionId = ReadXMLIntegerAttribut( ID, atts );
-    m_AktTransition->AddActionID(actionId);  
+    m_AktAction = new Action( actionId );
+    m_AktTransition->AddAction( m_AktAction );  
+  } 
+
+  else if ( name == BOOL_PARAMETER )
+  {
+    if ( !m_AktAction )
+      return;
+
+    bool value = ReadXMLBooleanAttribut( VALUE, atts );    
+    std::string name = ReadXMLStringAttribut( NAME, atts );    
+    m_AktAction->AddProperty( name.c_str(), new BoolProperty( value ) );  
   }  
+
+  else if ( name == INT_PARAMETER )
+  {
+    if ( !m_AktAction )
+      return;
+
+    int value = ReadXMLIntegerAttribut( VALUE, atts );    
+    std::string name = ReadXMLStringAttribut( NAME, atts );    
+    m_AktAction->AddProperty( name.c_str(), new IntProperty( value ) );  
+  }
+
+  else if ( name == FLOAT_PARAMETER )
+  {
+    if ( !m_AktAction )
+      return;
+
+    float value = ReadXMLIntegerAttribut( VALUE, atts ); 
+    std::string name = ReadXMLStringAttribut( NAME, atts );    
+    m_AktAction->AddProperty( name.c_str(), new FloatProperty( value ) );    
+  }
+
+  else if ( name == DOUBLE_PARAMETER )
+  {
+    if ( !m_AktAction )
+      return;
+
+    double value = ReadXMLDoubleAttribut( VALUE, atts );
+    std::string name = ReadXMLStringAttribut( NAME, atts );    
+    m_AktAction->AddProperty( name.c_str(), new DoubleProperty( value ) );      
+  }
+
+  else if ( name == STRING_PARAMETER )
+  {
+    if ( !m_AktAction )
+      return;
+
+    std::string value = ReadXMLStringAttribut( VALUE, atts );
+    std::string name = ReadXMLStringAttribut( NAME, atts );    
+    m_AktAction->AddProperty( name.c_str(), new StringProperty( value ) );        
+  }
 }
 
 //##
@@ -221,6 +286,9 @@ void mitk::StateMachineFactory::EndElement (const char *elementName)
   else if ( name == TRANSITION ) 
   {
     m_AktTransition = NULL;
+  } else if ( name == ACTION ) 
+  {
+    m_AktAction = NULL;
   }
 }
 
@@ -253,6 +321,19 @@ int mitk::StateMachineFactory::ReadXMLIntegerAttribut( std::string name, const c
   return atoi( s.c_str() );
 }
 
+//##
+float mitk::StateMachineFactory::ReadXMLFloatAttribut( std::string name, const char** atts )
+{
+  std::string s = ReadXMLStringAttribut( name, atts );
+  return (float) atof( s.c_str() );
+}
+
+//##
+double mitk::StateMachineFactory::ReadXMLDoubleAttribut( std::string name, const char** atts )
+{
+  std::string s = ReadXMLStringAttribut( name, atts );
+  return atof( s.c_str() );
+}
 
 //##
 bool mitk::StateMachineFactory::ReadXMLBooleanAttribut( std::string name, const char** atts )

@@ -36,7 +36,7 @@ public:
 protected:
   //##Documentation
   //## @brief Executes Side-Effects
-  virtual bool ExecuteAction(int actionId, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId);
+  virtual bool ExecuteAction(Action* action, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId);
 
 private:
   //##Documentation

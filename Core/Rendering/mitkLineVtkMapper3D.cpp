@@ -72,7 +72,7 @@ void mitk::LineVtkMapper3D::Update()
 //	if (dynamic_cast<mitk::BoolProperty *>(this->GetDataTreeNode()->GetProperty("close").GetPointer()) == NULL)
 //	  close = false;
 //	else
-//		close = dynamic_cast<mitk::BoolProperty *>(this->GetDataTreeNode()->GetProperty("close").GetPointer())->GetBool();
+//		close = dynamic_cast<mitk::BoolProperty *>(this->GetDataTreeNode()->GetProperty("close").GetPointer())->GetValue();
 //
 //  if (close) 
 //  {
@@ -130,7 +130,7 @@ void mitk::LineVtkMapper3D::Update(mitk::BaseRenderer* renderer)
 	if (dynamic_cast<mitk::BoolProperty *>(this->GetDataTreeNode()->GetProperty("contour").GetPointer()) == NULL)
 		makeContour = false;
 	else
-		makeContour = dynamic_cast<mitk::BoolProperty *>(this->GetDataTreeNode()->GetProperty("contour").GetPointer())->GetBool();
+		makeContour = dynamic_cast<mitk::BoolProperty *>(this->GetDataTreeNode()->GetProperty("contour").GetPointer())->GetValue();
 
   vtkPoints *points = vtkPoints::New();
   vtkCellArray *polys = vtkCellArray::New();
@@ -147,7 +147,7 @@ void mitk::LineVtkMapper3D::Update(mitk::BaseRenderer* renderer)
   if (dynamic_cast<mitk::BoolProperty *>(this->GetDataTreeNode()->GetProperty("close").GetPointer()) == NULL)
     close = false;
   else
-    close = dynamic_cast<mitk::BoolProperty *>(this->GetDataTreeNode()->GetProperty("close").GetPointer())->GetBool();
+    close = dynamic_cast<mitk::BoolProperty *>(this->GetDataTreeNode()->GetProperty("close").GetPointer())->GetValue();
 
   if (close) 
   {
@@ -186,7 +186,7 @@ void mitk::LineVtkMapper3D::Update(mitk::BaseRenderer* renderer)
     }
 		else 
     {
-	  	const char * pointLabel =dynamic_cast<mitk::StringProperty *>(this->GetDataTreeNode()->GetProperty("label").GetPointer())->GetString();
+	  	const char * pointLabel =dynamic_cast<mitk::StringProperty *>(this->GetDataTreeNode()->GetProperty("label").GetPointer())->GetValue();
 			char buffer[20];
  	    std::string l = pointLabel;
 			if (input->GetSize()>1)

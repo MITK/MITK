@@ -114,7 +114,7 @@ class GlobalInteraction : public StateMachine
   protected:
 
   //##ModelId=3E7F497F01AE
-  virtual bool ExecuteAction(int actionId, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId);
+  virtual bool ExecuteAction(Action* action, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId);
 
   private:
 

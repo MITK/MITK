@@ -10,7 +10,7 @@
 
 #include <mitkOperationActor.h>
 
-#include <mitkFloatProperty.h>
+#include <mitkProperties.h>
 #include <mitkLookupTableProperty.h>
 #include <mitkSliceNavigationController.h>
 #include <mitkMultiplexUpdateController.h>

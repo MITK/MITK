@@ -6,6 +6,7 @@
 #include <mitkPositionEvent.h>
 #include <mitkStateTransitionOperation.h>
 #include <mitkDataTreeNode.h>
+#include <mitkAction.h>
 
 mitk::LineInteractor::LineInteractor(const char * type, DataTreeNode* dataTreeNode, int cellId, int pIdA, int pIdB)
 : Interactor(type, dataTreeNode), m_CellId(cellId), m_PIdA(pIdA), m_PIdB(pIdB)
@@ -45,11 +46,11 @@ int mitk::LineInteractor::GetPointIdB()
 //## SeFINISHMOVE, SeREMOVE (removes the line, not the points),
 //## SeREMOVEALL (removes the line and the two points), SeSELECT(select the line, not the points),
 //## SeDESELECT(deselect the line, not the points)
-bool mitk::LineInteractor::ExecuteAction(int actionId, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId)
+bool mitk::LineInteractor::ExecuteAction(Action* action, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId)
 {
   bool ok = false;//for return type bool
   
-  switch (actionId)
+  switch (action->GetActionId())
 	{
   case AcDONOTHING:
     ok = true;

@@ -33,7 +33,7 @@ public:
 
 protected:
 
-	virtual bool ExecuteAction(int actionId, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId);
+	virtual bool ExecuteAction(Action* action, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId);
 
   bool CheckSelected(const mitk::Point3D& worldPoint);
   bool ConvertDisplayEventToWorldPosition(mitk::DisplayPositionEvent const* displayEvent, mitk::ITKPoint3D& worldPoint);

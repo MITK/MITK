@@ -9,7 +9,7 @@
 #include "mitkDataTreeNode.h"
 
 #include "mitkLookupTableProperty.h"
-#include "mitkBoolProperty.h"
+#include "mitkProperties.h"
 #include "mitkLevelWindowProperty.h"
 
 #include "mitkRenderWindow.h"

@@ -3,7 +3,6 @@
 #include "mitkSlicedGeometry3D.h"
 #include "mitkPlaneGeometry.h"
 #include "mitkProperties.h"
-#include "mitkFloatProperty.h"
 
 #include <ipPicTypeMultiplex.h>
 

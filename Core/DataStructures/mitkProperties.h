@@ -3,10 +3,21 @@
 
 #include "mitkGenericProperty.h"
 #include "vecmath.h"
+#include <string>
 
 namespace mitk {
+
+   typedef GenericProperty<bool> BoolProperty;
+   template class GenericProperty<bool>;
+
    typedef GenericProperty<int> IntProperty;
    template class GenericProperty<int>;
+
+   typedef GenericProperty<float> FloatProperty;
+   template class GenericProperty<float>;
+
+   typedef GenericProperty<double> DoubleProperty;
+   template class GenericProperty<double>;
 
    typedef GenericProperty<Point3d> Point3dProperty;
    template class GenericProperty<Point3d>;

@@ -23,8 +23,7 @@
 #include <mitkProperties.h>
 #include <mitkLookupTableProperty.h>
 #include <mitkColorProperty.h>
-#include <mitkBoolProperty.h>
-#include <mitkFloatProperty.h>
+#include <mitkProperties.h>
 #include <mitkLevelWindowProperty.h>
 
 #include <mitkLevelWindow.h>

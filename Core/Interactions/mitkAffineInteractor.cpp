@@ -8,10 +8,10 @@
 #include "mitkDisplayPositionEvent.h"
 #include "vtkTransform.h"
 #include <mitkRenderWindow.h>
-#include <mitkBoolProperty.h>
-
+#include <mitkProperties.h>
 #include <itkBoundingBox.h>
 #include <itkFixedArray.h>
+#include <mitkAction.h>
 
 #include "mitkBoundingObject.h"
 
@@ -37,7 +37,7 @@ mitk::AffineInteractor::AffineInteractor(const char * type, DataTreeNode* dataTr
 {
 }
 
-bool mitk::AffineInteractor::ExecuteAction(int actionId, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId)
+bool mitk::AffineInteractor::ExecuteAction(Action* action, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId)
 {
 	bool ok = false;
 
@@ -49,7 +49,7 @@ bool mitk::AffineInteractor::ExecuteAction(int actionId, mitk::StateEvent const*
   /* Display  events - 2D coordinates from a 3D window */
   mitk::DisplayPositionEvent const  *displayEvent = dynamic_cast <const mitk::DisplayPositionEvent *> (stateEvent->GetEvent());
   /* Each case must watch the type of the event! */
-  switch (actionId)
+  switch (action->GetActionId())
 	{
   case AcINITAFFINEINTERACTIONS:
   {

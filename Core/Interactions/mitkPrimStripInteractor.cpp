@@ -1,6 +1,7 @@
 #include "mitkPrimStripInteractor.h"
 #include "mitkStatusBar.h"
 #include <mitkInteractionConst.h>
+#include "mitkAction.h"
 
 mitk::PrimStripInteractor::PrimStripInteractor(const char * type, DataTreeNode* dataTreeNode)
 : Interactor(type, dataTreeNode)
@@ -17,11 +18,11 @@ int mitk::PrimStripInteractor::GetId()
 }
 
 
-bool mitk::PrimStripInteractor::ExecuteAction(int actionId, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId)
+bool mitk::PrimStripInteractor::ExecuteAction(Action* action, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId)
 {
   bool ok = false;//for return type bool
   
-  switch (actionId)
+  switch (action->GetActionId())
 	{
   case AcDONOTHING:
     ok = true;

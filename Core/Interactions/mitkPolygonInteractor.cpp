@@ -7,6 +7,7 @@
 #include <mitkPointOperation.h>
 #include <mitkDataTreeNode.h>
 #include <mitkMesh.h>
+#include "mitkAction.h"
 
 
 mitk::PolygonInteractor::PolygonInteractor(const char * type, DataTreeNode* dataTreeNode)
@@ -52,7 +53,7 @@ bool mitk::PolygonInteractor::SelectOneLine(ITKPoint3D itkPoint)
 }
 
 
-bool mitk::PolygonInteractor::ExecuteAction(int actionId, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId)
+bool mitk::PolygonInteractor::ExecuteAction(Action* action, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId)
 {
   bool ok = false;//for return type bool
   
@@ -62,7 +63,7 @@ bool mitk::PolygonInteractor::ExecuteAction(int actionId, mitk::StateEvent const
 		return false;
 
   
-  switch (actionId)
+  switch (action->GetActionId())
 	{
   case AcDONOTHING:
     ok = true;

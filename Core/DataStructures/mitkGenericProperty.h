@@ -29,9 +29,13 @@ class GenericProperty : public BaseProperty
         if(other==NULL) return false;
         return other->m_Value==m_Value;
     }
-    virtual T GetValue() const {
-	return m_Value;
+
+    virtual T GetValue() const
+    {
+      return m_Value;
     }
+
+
     virtual void SetValue(T x) {
 	m_Value = x;
     }	

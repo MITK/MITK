@@ -108,8 +108,11 @@ QWidget * QmitkSimpleExampleFunctionality::createControlWidget(QWidget *parent)
 
 void QmitkSimpleExampleFunctionality::createConnections()
 {
+  if ( controls ) 
+  {
     connect(controls->getStereoSelect(), SIGNAL(activated(int)), this, SLOT(stereoSelectionChanged(int)) );
     connect(controls->getReInitializeNavigatorsButton(), SIGNAL(clicked()), this, SLOT(initNavigators()) );
+  }
 }
 
 QAction * QmitkSimpleExampleFunctionality::createAction(QActionGroup *parent)

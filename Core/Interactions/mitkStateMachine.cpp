@@ -81,8 +81,8 @@ std::cout<<this->GetType()<<": Changing from State "<<m_CurrentState->GetName()<
     m_CurrentState = tempNextState;
   }
 
-  std::vector<int>::iterator actionIdIterator = tempTransition->GetActionIdBeginIterator();
-  const std::vector<int>::iterator actionIdIteratorEnd = tempTransition->GetActionIdEndIterator();
+  std::vector<Action*>::iterator actionIdIterator = tempTransition->GetActionBeginIterator();
+  const std::vector<Action*>::iterator actionIdIteratorEnd = tempTransition->GetActionEndIterator();
   bool ok = true;
 
   while ( actionIdIterator != actionIdIteratorEnd ) 

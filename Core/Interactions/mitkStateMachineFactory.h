@@ -53,6 +53,8 @@ namespace mitk {
   private:
 
   std::string ReadXMLStringAttribut( std::string name, const char** atts);
+  float ReadXMLFloatAttribut( std::string name, const char** atts );
+  double ReadXMLDoubleAttribut( std::string name, const char** atts );
   int ReadXMLIntegerAttribut( std::string name, const char** atts );
   bool ReadXMLBooleanAttribut( std::string name, const char** atts );
     //##ModelId=3E5B428F010B
@@ -76,6 +78,8 @@ namespace mitk {
 	  State* m_AktState;
 
     Transition* m_AktTransition;
+
+    Action* m_AktAction;
     
 
     //##ModelId=3E68B2C60040
@@ -109,6 +113,19 @@ namespace mitk {
     static const std::string STATE_MACHIN_NAME;
 
     static const std::string ACTION;
+
+    static const std::string BOOL_PARAMETER;
+
+    static const std::string INT_PARAMETER;
+
+    static const std::string FLOAT_PARAMETER;
+
+    static const std::string DOUBLE_PARAMETER;
+
+    static const std::string STRING_PARAMETER;
+
+    static const std::string VALUE;
+
 };
 
 } // namespace mitk

@@ -8,6 +8,7 @@
 
 namespace mitk {
 class State;
+class Action;
 
 //##ModelId=3E5A399E033E
 //##Documentation
@@ -21,7 +22,7 @@ class Transition
   //##ModelId=3E5A3A77006F
 	Transition(std::string name, int nextStateId, int eventId);
 
-  void AddActionID( int actionId );
+  void AddAction( Action* action );
 
   //##ModelId=3E5A3BAE03B5
   std::string GetName() const;
@@ -39,10 +40,10 @@ class Transition
   int GetActionCount() const;
 
   //##
-  std::vector<int>::iterator GetActionIdBeginIterator() const;
+  std::vector<Action*>::iterator GetActionBeginIterator() const;
 
   //##
-  const std::vector<int>::iterator GetActionIdEndIterator() const;
+  const std::vector<Action*>::iterator GetActionEndIterator() const;
 
   //##ModelId=3E5A3C1D0289
   bool IsEvent(int eventId) const;
@@ -64,7 +65,7 @@ class Transition
   int m_EventId;
 
   //##ModelId=3E5A3A55017F
-  mutable std::vector<int> m_ActionIds;
+  mutable std::vector<Action*> m_Actions;
 
 };
 

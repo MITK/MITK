@@ -8,6 +8,7 @@
 //and not here!
 #include <string>
 #include "mitkInteractionConst.h"
+#include "mitkAction.h"
 
 
 //##ModelId=3F0189F0025B
@@ -17,7 +18,7 @@ mitk::CoordinateSupplier::CoordinateSupplier(const char * type, mitk::OperationA
 }
 
 //##ModelId=3F0189F00269
-bool mitk::CoordinateSupplier::ExecuteAction(int actionId, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId)
+bool mitk::CoordinateSupplier::ExecuteAction(Action* action, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId)
 {
     bool ok = false;
     if (m_Destination == NULL)
@@ -26,7 +27,7 @@ bool mitk::CoordinateSupplier::ExecuteAction(int actionId, mitk::StateEvent cons
     const PositionEvent* posEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
     if(posEvent!=NULL)
     {
-      switch (actionId)
+      switch (action->GetActionId())
       {
         case AcNEWPOINT:
         {

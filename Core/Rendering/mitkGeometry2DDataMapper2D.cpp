@@ -6,7 +6,7 @@
 #include "mitkPlaneGeometry.h"
 
 #include "mitkColorProperty.h"
-#include "mitkFloatProperty.h"
+#include "mitkProperties.h"
 #include "mitkSmartPointerProperty.h"
 
 #include "mitkGeometry2DDataToSurfaceDataFilter.h"

@@ -45,7 +45,7 @@ void TestFunction()
   node->SetProperty("boolProp", new mitk::BoolProperty(true) );
   mitk::BoolProperty::Pointer boolProp = dynamic_cast<mitk::BoolProperty *>(node->GetProperty("boolProp").GetPointer());
   BOOST_CHECK(boolProp.IsNotNull() );
-  BOOST_CHECK(boolProp->GetBool() == true);
+  BOOST_CHECK(boolProp->GetValue() == true);
 
   node->SetVisibility(false,NULL);
   BOOST_CHECK(node->IsVisible(NULL) == false );

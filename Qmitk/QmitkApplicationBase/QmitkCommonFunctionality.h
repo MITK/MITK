@@ -7,7 +7,6 @@
 #include <itkMinimumMaximumImageCalculator.h>
 
 // mitk includes
-#include <mitkBoolProperty.h>
 #include <mitkProperties.h>
 #include <mitkLevelWindowProperty.h>
 #include <mitkStringProperty.h>

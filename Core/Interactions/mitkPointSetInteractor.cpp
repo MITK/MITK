@@ -5,7 +5,7 @@
 #include "mitkStatusBar.h"
 #include <mitkDataTreeNode.h>
 #include <mitkInteractionConst.h>
-
+#include "mitkAction.h"
 
 //how precise must the user pick the point
 //default value
@@ -89,7 +89,7 @@ void mitk::PointSetInteractor::SelectPoint(int position, int objectEventId, int 
 }
 
 //##ModelId=3F017B320105
-bool mitk::PointSetInteractor::ExecuteAction(int actionId, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId)
+bool mitk::PointSetInteractor::ExecuteAction(Action* action, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId)
 {
 	bool ok = false;//for return type bool
 
@@ -103,7 +103,7 @@ bool mitk::PointSetInteractor::ExecuteAction(int actionId, mitk::StateEvent cons
   mitk::PointSet::PointsContainer *points = itkpointSet->GetPoints();
 
   /*Each case must watch the type of the event!*/
-  switch (actionId)
+  switch (action->GetActionId())
 	{
   case AcDONOTHING:
     ok = true;

@@ -5,7 +5,7 @@
 
 class QWidget;
 #include <mitkDataTree.h>
-#include "mitkBoolProperty.h"
+#include "mitkProperties.h"
 #include "mitkRenderWindow.h"
 #include "itkCommand.h"
 #include "QmitkDataManagerControls.h"
@@ -55,9 +55,9 @@ class NodeViewCheckboxItem : public QCheckListItem, public QmitkNodeViewBaseItem
     virtual void stateChange ( bool state) {
    mitk::BoolProperty* boolProp = dynamic_cast<mitk::BoolProperty*>(m_Property.GetPointer());
 //      if (m_PropertyList->SetProperty((const char *)text(),new mitk::BoolProperty(state))) {
-   if (boolProp != NULL && boolProp->GetBool() != state) {
+   if (boolProp != NULL && boolProp->GetValue() != state) {
          
-        boolProp->SetBool(state);
+        boolProp->SetValue(state);
 	mitk::RenderWindow::UpdateAllInstances();
       };
         

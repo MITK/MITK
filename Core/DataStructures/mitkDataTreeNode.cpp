@@ -3,9 +3,7 @@
 #include <vtkTransform.h>
 
 #include "mitkProperties.h"
-#include "mitkFloatProperty.h"
 #include "mitkStringProperty.h"
-#include "mitkBoolProperty.h"
 #include "mitkColorProperty.h"
 #include "mitkLevelWindowProperty.h"
 #include "mitkGeometry3D.h"
@@ -194,7 +192,7 @@ bool mitk::DataTreeNode::GetBoolProperty(const char* propertyKey, bool& boolValu
   if(boolprop.IsNull())
     return false;
 
-  boolValue = boolprop->GetBool();
+  boolValue = boolprop->GetValue();
   return true;
 }
 
@@ -217,7 +215,7 @@ bool mitk::DataTreeNode::GetStringProperty(const char* propertyKey, const char* 
   } 
   else 
   {
-    memcpy((void*)string, stringProp->GetString(), strlen(stringProp->GetString()) + 1 );
+    memcpy((void*)string, stringProp->GetValue(), strlen(stringProp->GetValue()) + 1 );
     return true;
   }
 }

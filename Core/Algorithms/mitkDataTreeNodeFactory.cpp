@@ -34,7 +34,6 @@
 #include "mitkPicVolumeTimeSeriesReader.h"
 #include "mitkStringProperty.h"
 #include "mitkProperties.h"
-#include "mitkBoolProperty.h"
 #include "mitkLevelWindowProperty.h"
 #include "mitkParRecFileReader.h"
 #include "mitkImage.h"

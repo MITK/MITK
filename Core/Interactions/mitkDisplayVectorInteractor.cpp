@@ -3,6 +3,7 @@
 #include "mitkDisplayCoordinateOperation.h"
 #include "mitkDisplayPositionEvent.h"
 #include "mitkInteractionConst.h"
+#include "mitkAction.h"
 
 //##ModelId=3EF222410127
 void mitk::DisplayVectorInteractor::ExecuteOperation(Operation* operation)
@@ -31,12 +32,14 @@ void mitk::DisplayVectorInteractor::ExecuteOperation(Operation* operation)
 }
 
 //##ModelId=3EF2224401CB
-bool mitk::DisplayVectorInteractor::ExecuteAction(int actionId, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId)
+bool mitk::DisplayVectorInteractor::ExecuteAction(Action* action, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId)
 {
   bool ok=false;
   
   const DisplayPositionEvent* posEvent=dynamic_cast<const DisplayPositionEvent*>(stateEvent->GetEvent());
   if(posEvent==NULL) return false;
+
+  const int actionId = action->GetActionId();
   switch(actionId%100)
   {
   case 0:

@@ -5,8 +5,7 @@
 #include "mitkPlaneGeometry.h"
 #include "mitkSurfaceData.h"
 #include "mitkColorProperty.h"
-#include "mitkFloatProperty.h"
-#include "mitkBoolProperty.h"
+#include "mitkProperties.h"
 #include "mitkAbstractTransformGeometry.h"
 #include "mitkBaseVtkMapper3D.h"
 

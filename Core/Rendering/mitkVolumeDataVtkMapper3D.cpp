@@ -1,8 +1,7 @@
 #include "mitkLevelWindow.h"
 #include "mitkVolumeDataVtkMapper3D.h"
 #include "mitkDataTreeNode.h"
-#include "mitkFloatProperty.h"
-#include "mitkBoolProperty.h"
+#include "mitkProperties.h"
 #include "mitkColorProperty.h"
 #include "mitkOpenGLRenderer.h"
 #include <vtkActor.h>
@@ -110,7 +109,7 @@ void mitk::VolumeDataVtkMapper3D::Update(mitk::BaseRenderer* renderer)
   if(IsVisible(renderer)==false ||
       GetDataTreeNode() == NULL || 
       dynamic_cast<mitk::BoolProperty*>(GetDataTreeNode()->GetProperty("volumerendering",renderer).GetPointer())==NULL ||  
-      dynamic_cast<mitk::BoolProperty*>(GetDataTreeNode()->GetProperty("volumerendering",renderer).GetPointer())->GetBool() == false 
+      dynamic_cast<mitk::BoolProperty*>(GetDataTreeNode()->GetProperty("volumerendering",renderer).GetPointer())->GetValue() == false 
     )
   {
     //  FIXME: don't understand this 

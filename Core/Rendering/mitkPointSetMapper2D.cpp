@@ -3,9 +3,9 @@
 #include "mitkBaseRenderer.h"
 #include "mitkPlaneGeometry.h"
 #include "mitkColorProperty.h"
-#include "mitkFloatProperty.h"
-#include "mitkStringProperty.h"
+#include "mitkProperties.h"
 #include <vtkTransform.h>
+#include "mitkStringProperty.h"
 
 
 #ifdef WIN32
@@ -95,7 +95,7 @@ void mitk::PointSetMapper2D::Paint(mitk::BaseRenderer * renderer)
 							{}
 							else {
 
-									const char * pointLabel =dynamic_cast<mitk::StringProperty *>(this->GetDataTreeNode()->GetProperty("label").GetPointer())->GetString();
+									const char * pointLabel =dynamic_cast<mitk::StringProperty *>(this->GetDataTreeNode()->GetProperty("label").GetPointer())->GetValue();
 									char buffer[20];
 						 	    std::string l = pointLabel;
 									if (input->GetSize()>1)

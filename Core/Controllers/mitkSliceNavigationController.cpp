@@ -7,6 +7,7 @@
 #include "mitkOperationActor.h"
 #include "mitkPositionEvent.h"
 #include "mitkInteractionConst.h"
+#include "mitkAction.h"
 #include <itkCommand.h>
 
 //##ModelId=3E189B1D008D
@@ -196,7 +197,7 @@ void mitk::SliceNavigationController::SetGeometrySlice(const itk::EventObject & 
 {
 }
 
-bool mitk::SliceNavigationController::ExecuteAction(int actionId, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId)
+bool mitk::SliceNavigationController::ExecuteAction( Action* action, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId)
 {
     bool ok = false;
     //if (m_Destination == NULL)
@@ -207,7 +208,7 @@ bool mitk::SliceNavigationController::ExecuteAction(int actionId, mitk::StateEve
     {
       if(m_CreatedWorldGeometry.IsNull())
         return true;
-      switch (actionId)
+      switch (action->GetActionId())
       {
         case AcNEWPOINT:
        // {

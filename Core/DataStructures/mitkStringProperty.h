@@ -15,7 +15,7 @@ class StringProperty : public BaseProperty
 {
 protected:
     //##ModelId=3E3FDF21017D
-    std::string m_String;
+    std::string m_Value;
 
 public:
     mitkClassMacro(StringProperty, BaseProperty);
@@ -24,8 +24,8 @@ public:
     StringProperty( const char* string );
     StringProperty( std::string  s );
     
-    itkGetStringMacro(String);
-    itkSetStringMacro(String);
+    itkGetStringMacro(Value);
+    itkSetStringMacro(Value);
 
     //##ModelId=3E3FF04F00E1
     virtual bool operator==(const BaseProperty& property ) const;

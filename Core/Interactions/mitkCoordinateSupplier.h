@@ -33,7 +33,7 @@ protected:
 	//##Documentation
 	//## @brief 
 	//##
-	virtual bool ExecuteAction(int actionId, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId);
+	virtual bool ExecuteAction(Action* action, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId);
 
 private:
   //##ModelId=3F0189F0024A

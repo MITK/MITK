@@ -1,8 +1,6 @@
 #include "mitkContourVtkMapper3D.h"
 #include "mitkDataTreeNode.h"
-#include "mitkBoolProperty.h"
-#include "mitkFloatProperty.h"
-#include "mitkStringProperty.h"
+#include "mitkProperties.h"
 #include "mitkColorProperty.h"
 #include "mitkOpenGLRenderer.h"
 

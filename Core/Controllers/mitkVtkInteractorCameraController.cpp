@@ -5,6 +5,7 @@
 #include <vtkRenderWindowInteractor.h>
 #include <vtkCommand.h>
 #include "mitkVtkRenderWindow.h"
+#include "mitkAction.h"
 
 //##ModelId=3E6D600F009A
 mitk::VtkInteractorCameraController::VtkInteractorCameraController(const char * type) : CameraController(type), m_VtkInteractor(NULL)
@@ -224,7 +225,7 @@ vtkRenderWindowInteractor* mitk::VtkInteractorCameraController::GetVtkInteractor
   return m_VtkInteractor;
 }
 
-bool mitk::VtkInteractorCameraController::ExecuteAction(int actionId, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId)
+bool mitk::VtkInteractorCameraController::ExecuteAction(Action* action, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId)
 {
   return false;
 }

@@ -1,8 +1,6 @@
 #include "mitkPointSetVtkMapper3D.h"
 #include "mitkDataTreeNode.h"
-#include "mitkBoolProperty.h"
-#include "mitkFloatProperty.h"
-#include "mitkStringProperty.h"
+#include "mitkProperties.h"
 #include "mitkColorProperty.h"
 #include "mitkOpenGLRenderer.h"
 
@@ -17,6 +15,7 @@
 #include <vtkProperty.h>
 #include <vtkPolyDataMapper.h>
 #include <stdlib.h>
+#include "mitkStringProperty.h"
 
 //##ModelId=3E70F60301D5
 const mitk::PointSet* mitk::PointSetVtkMapper3D::GetInput()
@@ -128,7 +127,7 @@ void mitk::PointSetVtkMapper3D::Update(mitk::BaseRenderer* renderer)
 		if (dynamic_cast<mitk::BoolProperty *>(this->GetDataTreeNode()->GetProperty("contour").GetPointer()) == NULL)
 			makeContour = false;
 		else
-			makeContour = dynamic_cast<mitk::BoolProperty *>(this->GetDataTreeNode()->GetProperty("contour").GetPointer())->GetBool();
+			makeContour = dynamic_cast<mitk::BoolProperty *>(this->GetDataTreeNode()->GetProperty("contour").GetPointer())->GetValue();
 
 		if (makeContour)
 		{
@@ -150,7 +149,7 @@ void mitk::PointSetVtkMapper3D::Update(mitk::BaseRenderer* renderer)
 			if (dynamic_cast<mitk::BoolProperty *>(this->GetDataTreeNode()->GetProperty("close").GetPointer()) == NULL)
 				close = false;
 			else
-				close = dynamic_cast<mitk::BoolProperty *>(this->GetDataTreeNode()->GetProperty("close").GetPointer())->GetBool();
+				close = dynamic_cast<mitk::BoolProperty *>(this->GetDataTreeNode()->GetProperty("close").GetPointer())->GetValue();
 
 			if (close) {
 				int cell[2] = {j-1,0};
@@ -192,7 +191,7 @@ for (j=0, i=pointList->GetPoints()->Begin(); i!=pointList->GetPoints()->End() ; 
 			{}
 			else {
 
-				const char * pointLabel =dynamic_cast<mitk::StringProperty *>(this->GetDataTreeNode()->GetProperty("label").GetPointer())->GetString();
+				const char * pointLabel =dynamic_cast<mitk::StringProperty *>(this->GetDataTreeNode()->GetProperty("label").GetPointer())->GetValue();
 				char buffer[20];
  	      std::string l = pointLabel;
 				if (input->GetSize()>1)

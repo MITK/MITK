@@ -2,8 +2,7 @@
 #include "mitkBaseRenderer.h"
 #include "mitkPlaneGeometry.h"
 #include "mitkColorProperty.h"
-#include "mitkFloatProperty.h"
-#include "mitkStringProperty.h"
+#include "mitkProperties.h"
 #include <vtkTransform.h>
 
 

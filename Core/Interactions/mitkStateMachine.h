@@ -69,7 +69,7 @@ class StateMachine : public itk::Object, public mitk::OperationActor
   //##
   //## Each statechange has actions, which can be assigned by it's number.
   //## If you are developing a new statemachine, declare all your operations here and send them to Undo-Controller and to the Data.
-  virtual bool ExecuteAction(int actionId, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId)= 0;
+  virtual bool ExecuteAction(Action* action, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId)= 0;
 
   //##Documentation
   //## @brief returns the current state

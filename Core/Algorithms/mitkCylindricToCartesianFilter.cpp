@@ -176,6 +176,7 @@ void mitk::CylindricToCartesianFilter::buildTransformShortCuts(int orig_xsize, i
 	xy0_orig=(int)(((double)orig_xsize)/2+0.5); 
 
 	new_zsize=orig_ysize/scale;
+	// \bug y compared to x 
 	for(y=0;y<new_xsize;++y)
 	{
 		rt_xzero=rtp; *rtp=0;

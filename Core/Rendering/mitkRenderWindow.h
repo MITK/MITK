@@ -2,26 +2,22 @@
 #define MITKRENDERWINDOW_H_HEADER_INCLUDED_C1EBD0AD
 
 #include <qgl.h> 
+#include <widget.h>
 
 class iilItem; 
 
 namespace mitk {
 
-class RenderWindow : public QGLWidget
+class RenderWindow : public RenderWindowBase
 {
 public:
     //##ModelId=3E3ECC130358
-    RenderWindow(QGLFormat glf, QWidget *parent = 0, const char *name = 0) : QGLWidget(glf, parent, name) {};
+    RenderWindow(QGLFormat glf, QWidget *parent = 0, const char *name = 0) : RenderWindowBase(glf, parent, name) {};
 
     //##ModelId=3E3ECC13036D
-    RenderWindow(QWidget *parent = 0, const char *name = 0) : QGLWidget(parent, name) {};
+    RenderWindow(QWidget *parent = 0, const char *name = 0) : RenderWindowBase(parent, name) {};
 
     //iil compatibility
-
-    //##ModelId=3E3ECC130377
-    //##Documentation
-    //## TEMPORARY FOR IIL COMPATIBILITY - DO NOT USE!!!
-    virtual RenderWindow* sharedWidget() const = 0;
 
     /*!
     \brief Gets the position of the top-left corner of the viewport.

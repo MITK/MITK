@@ -19,6 +19,9 @@
 #include <DataTree.h>
 #include <mitkFloatProperty.h>
 #include <qregexp.h>
+#include <vtkImageThreshold.h>
+#include <vtkImageData.h>
+#include <vtkPointData.h>
 
 mitk::FloatProperty::Pointer opacityprop=NULL;
 
@@ -88,6 +91,29 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
                 node->SetData(reader->GetOutput());
                 it->add(node); 
 
+ /*   node=mitk::DataTreeNode::New();
+    node->SetData(reader->GetOutput());
+    it->add(node); */
+/*
+	mitk::Image::Pointer img=reader->GetOutput();
+//	mitk::Image::Pointer img=dynamic_cast<mitk::Image*>((*it).get()->GetData());
+	img->Update();
+
+	vtkImageThreshold *threshold=vtkImageThreshold::New();
+		threshold->DebugOn();
+		threshold->SetInput(img->GetVtkImageData());
+		threshold->ThresholdByLower(200);
+		threshold->SetInValue(0);
+		threshold->Update();
+
+	mitk::Image::Pointer result=mitk::Image::New();
+		result->Initialize(img->GetPic());
+		result->SetVolume(threshold->GetOutput()->GetPointData()->GetScalars()->GetVoidPointer(0));
+	
+    node=mitk::DataTreeNode::New();
+    node->SetData(result);
+    it->add(node); 
+*/
                 initWidgets(it);
 
                 //mitk::DataTreeNode::Pointer node2=mitk::DataTreeNode::New();
@@ -227,7 +253,6 @@ void QmitkMainTemplate::initWidget(mitk::DataTreeIterator* it,
     //geometryMapper->SetDataIteratorForTexture(it);
     //node->SetMapper(2, geometryMapper);
     it->add(node);
-
     widget->update();
 }
 

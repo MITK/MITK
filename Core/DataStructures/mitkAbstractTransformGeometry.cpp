@@ -162,3 +162,4 @@ void mitk::AbstractTransformGeometry::Modified() const
 
   Superclass::Modified();
 }
+

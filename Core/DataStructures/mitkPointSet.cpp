@@ -282,3 +282,4 @@ bool mitk::PointSet::VerifyRequestedRegion()
 void mitk::PointSet::SetRequestedRegion(itk::DataObject*)
 {
 }
+

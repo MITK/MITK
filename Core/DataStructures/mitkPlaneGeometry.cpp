@@ -103,3 +103,4 @@ void mitk::PlaneGeometry::Modified() const
 
   Superclass::Modified();
 }
+

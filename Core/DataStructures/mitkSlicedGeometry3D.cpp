@@ -367,3 +367,4 @@ mitk::Geometry3D::Pointer mitk::SlicedGeometry3D::Clone()
   //newGeometry->GetRelativeTransform()->SetMatrix(m_RelativeTransform->GetMatrix());
   return newGeometry.GetPointer();
 }
+

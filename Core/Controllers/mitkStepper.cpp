@@ -64,3 +64,4 @@ unsigned int mitk::Stepper::ConvertUnitToPos(float unitValue)
     posValue = m_Steps-1;
   return posValue;
 }
+

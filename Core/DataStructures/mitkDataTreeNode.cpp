@@ -352,3 +352,4 @@ void mitk::DataTreeNode::SetGeometry(mitk::Geometry3D* newGeometry)
 {
   m_Geometry3D = newGeometry;
 }
+

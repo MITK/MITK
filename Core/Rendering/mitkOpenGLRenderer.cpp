@@ -15,9 +15,11 @@
 #include <vtkTransform.h>
 
 #include "PlaneGeometry.h"
-
+#include "mitkProperties.h"
+#include <queue>
+#include <utility>
 //##ModelId=3E33ECF301AD
-mitk::OpenGLRenderer::OpenGLRenderer() : m_VtkMapperPresent(NULL)
+mitk::OpenGLRenderer::OpenGLRenderer() : m_VtkMapperPresent(false)
 {
     m_CameraController=NULL;
     m_CameraController = VtkInteractorCameraController::New();
@@ -250,6 +252,8 @@ void mitk::OpenGLRenderer::Render()
 	mitk::DataTree::Pointer tree = dynamic_cast <mitk::DataTree *> (it->getTree());
 //	std::cout << "Render:: tree: " <<  *tree << std::endl;
 	
+	typedef pair<int, GLMapper2D*> LayerMapperPair;
+ 	priority_queue<LayerMapperPair> layers;
 	while(it->hasNext())
 	{        
 		it->next();
@@ -260,13 +264,27 @@ void mitk::OpenGLRenderer::Render()
 		{
 			GLMapper2D* mapper2d=dynamic_cast<GLMapper2D*>(mapper.GetPointer());
 			if(mapper2d!=NULL) {
-				mapper2d->Paint(this);
+				int layer;
+			IntegerProperty::Pointer layerprop = 
+	                    dynamic_cast<IntegerProperty*>(node->GetProperty("layer",this).GetPointer());
+			     if (layerprop.IsNotNull()) {
+			          layer = layerprop->GetValue();
+			      } else {
+				// mapper without a layer property are painted first
+				layer = -1;
+			      }
+			      // pushing negative layer value, since default sort for
+			      // priority_queue is lessthan 
+			      layers.push(LayerMapperPair(-layer,mapper2d));
 			}
 		}
 	}
 	
 	delete it;
-	
+	while (!layers.empty()) {
+		layers.top().second->Paint(this);
+		layers.pop();
+        }
 	if(m_VtkMapperPresent) {
 		m_MitkVtkRenderWindow->MitkRender();
 	}

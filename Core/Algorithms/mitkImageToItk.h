@@ -35,13 +35,15 @@ public:
   typedef typename TOutputImage::RegionType       RegionType;
   typedef typename TOutputImage::PixelType        PixelType;
   
-//	/** Set/Get the image input of this process object.  */
-//	virtual void SetInput( const InputImageType *image);
-//	virtual void SetInput( unsigned int, const InputImageType * image);
-//	const InputImageType * GetInput(void);
-//	const InputImageType * GetInput(unsigned int idx);
+	const mitk::Image * GetInput(void);
+	const mitk::Image * GetInput(unsigned int idx);
 
-	void SetMitkImage(mitk::Image::Pointer image, int n = 0);
+  virtual void SetInput(const mitk::Image *input);
+  virtual void SetInput(unsigned int index, const mitk::Image * image);
+	//void SetMitkImage(mitk::Image::Pointer image, int n = 0);
+
+  itkGetMacro(Channel, int);
+  itkSetMacro(Channel, int);
 	
 protected:
 	ImageToItk();

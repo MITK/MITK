@@ -208,7 +208,7 @@ bool mitk::SliceNavigationController::ExecuteAction( Action* action, mitk::State
           if (baseRenderer!=NULL)
            if (baseRenderer->GetMapperID() == 1)
            {
-            mitk::Point3D point, projected_point; 
+            mitk::Point3D point;
             point = posEvent->GetWorldPosition();
             
             //@todo add time to PositionEvent and use here!!
@@ -220,14 +220,24 @@ bool mitk::SliceNavigationController::ExecuteAction( Action* action, mitk::State
 
               int s, slices;
               slices = slicedWorldGeometry->GetSlices();
-              for(s=0; s < slices; ++s)
+              if(slicedWorldGeometry->GetEvenlySpaced())
               {
-                slicedWorldGeometry->GetGeometry2D(s)->Project(point, projected_point);
-                Vector3D dist = projected_point-point;
-                if(dist.GetSquaredNorm() < best_distance)
+                mitk::Point3D pointInUnits;
+                slicedWorldGeometry->MMToUnits(point, pointInUnits);
+                best_slice = pointInUnits[2];
+              }
+              else
+              {
+                mitk::Point3D projected_point;
+                for(s=0; s < slices; ++s)
                 {
-                  best_distance = dist.GetSquaredNorm();
-                  best_slice    = s;
+                  slicedWorldGeometry->GetGeometry2D(s)->Project(point, projected_point);
+                  Vector3D dist = projected_point-point;
+                  if(dist.GetSquaredNorm() < best_distance)
+                  {
+                    best_distance = dist.GetSquaredNorm();
+                    best_slice    = s;
+                  }
                 }
               }
               if(best_slice >= 0)

@@ -34,8 +34,10 @@ void mitk::DICOMFileReader::GenerateOutputInformation()
       &header, &header_size,
       &image, &image_size );
 
+    if( !header )
+      throw itk::ImageFileReaderException(__FILE__, __LINE__, "Could not get header.");;
     if( !image )
-      exit(-1);
+      throw itk::ImageFileReaderException(__FILE__, __LINE__, "Could not get image.");;
     pic = _dicomToPic( header, header_size,
       image, image_size, color );
     pic->dim--;

@@ -4,6 +4,7 @@
 class QmitkDataManager;
 class QmitkRegistration;
 class QmitkSimpleExampleFunctionality;
+class QmitkSimpleTumorSegmentation;
 
 /*!
 	\brief This application demonstrates how to code a new MITK application 
@@ -48,5 +49,7 @@ protected:
 		 AppModule for image fusion
 		 */
 		QmitkRegistration * registrationFunc;
+
+    QmitkSimpleTumorSegmentation * tumorSegFunc;
 
 };

@@ -141,6 +141,7 @@ mitk::ImageDataItem::Pointer mitk::Image::GetVolumeData(int t, int n)
 	if((ch.IsNotNull()) && (ch->IsComplete()))
 	{
 		vol=new ImageDataItem(*ch, 3, (t*m_OffsetTable[3])*m_PixelType.GetBpe()/8);
+		vol->SetComplete(true);
 		return m_Volumes[pos]=vol;
 	}
 

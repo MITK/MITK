@@ -33,6 +33,8 @@ See MITKCopyright.txt or http://www.mitk.org/ for details.
 #include <itkMacro.h>
 #include "mitkStatusBar.h"
 #include "mitkInteractionConst.h"
+#include <mitkInteractionDebugger.h>
+
 
 //XML Event
 //##ModelId=3E788FC000E5
@@ -473,6 +475,7 @@ bool mitk::EventMapper::MapEvent(Event* event)
 
   #ifdef INTERDEBUG
   std::cout<<"thrown event-type: "<<event->GetType()<<std::endl;
+  mitk::InteractionDebugger::Set("EventMapper", "Thrown event-type: ");
   #endif
 
   switch (event->GetType())

@@ -25,7 +25,16 @@ public:
         //itkNewMacro(Self);  
 
         //##ModelId=3DCBE2BA0139
-        const mitk::Geometry3D& GetGeometry() const;
+    //##Documentation
+    //## Return the Geometry3D of the data. The method does not
+    //## simply return the value of the m_Geometry3D member. Before doing this, it
+    //## makes sure that the Geometry3D is up-to-date before returning it (by
+    //## setting the update extent appropriately and calling
+    //## UpdateOutputInformation).
+    //## 
+    //## @warning GetGeometry not yet completely implemented. Appropriate
+    //## setting of the update extent is missing.
+        mitk::Geometry3D::ConstPointer GetGeometry() const;
     //##ModelId=3E3C4ACB0046
     //##Documentation
     //## Return the Geometry2D of the slice (@a s, @a t). The method does not
@@ -36,7 +45,7 @@ public:
     //## 
     //## @warning GetGeometry2D not yet completely implemented. Appropriate
     //## setting of the update extent is missing.
-    virtual mitk::Geometry2D::ConstPointer GetGeometry2D(int s, int t);
+    virtual mitk::Geometry2D::ConstPointer GetGeometry2D(int s, int t) const;
 
     //##ModelId=3E3FE0420273
     mitk::PropertyList::Pointer GetPropertyList();

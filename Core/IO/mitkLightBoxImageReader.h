@@ -17,7 +17,7 @@ public:
     /** Method for creation through the object factory. */
     itkNewMacro(Self);
 
-    //Vector3<float> GetSpacingFromLB();
+    mitk::Vector3D GetSpacingFromLB();
 
     void SetLightBox(QcLightbox* lightbox);
     QcLightbox* GetLightBox();
@@ -33,7 +33,7 @@ protected:
 
     /** Time when Header was last read. */
     itk::TimeStamp m_ReadHeaderTime;
-
+    //double ConvertTime(ipPicDescriptor*  pic);
     QcLightbox* m_LightBox;
 };
 

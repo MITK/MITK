@@ -4,7 +4,7 @@
 #include <qlayout.h>
 #include <qbuttongroup.h>
 
-ToolBar::ToolBar(QWidget* parent,QWidget* ap)
+ToolBar::ToolBar(QWidget* parent)
 {
     
     toolbar=new QButtonGroup(parent);
@@ -48,9 +48,7 @@ void ToolBar::SetWidget(QWidget* ap)
   widget=ap;
   widget->hide();
   layout->addWidget(widget,1,0);
-  for (int i=1;i<5;++i)
-    connect(toolbar->find(i),SIGNAL(clicked()),widget,SLOT(show()));
-  connect(toolbar->find(5),SIGNAL(clicked()),widget,SLOT(hide()));
+  connect(toolbar,SIGNAL(clicked(int)),widget,SLOT(show()));  
 }
 
 

@@ -14,7 +14,7 @@ class ToolBar: public QWidget
     //Q_OBJECT
 
 public:
-    ToolBar(QWidget* parent,QWidget* ap);
+    ToolBar(QWidget* parent);
     ~ToolBar();
     void SetWidget(QWidget* ap);
     QButtonGroup* GetToolBar();

@@ -7,6 +7,12 @@ mitk::StringProperty::StringProperty( const char* string )
 
 }
 
+//##ModelId=3E3FF04F005F
+mitk::StringProperty::StringProperty( string s )
+: m_String( s )
+{
+
+}
 //##ModelId=3E3FF04F00E1
 bool mitk::StringProperty::operator==(const BaseProperty& property ) const 
 {	

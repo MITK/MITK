@@ -1,20 +1,52 @@
 #include "mitkImage.h"
-#include "mitkPicFileReader.h"
+#include "mitkDataTreeNodeFactory.h"
 #include "mitkCylindricToCartesianFilter.h"
 #include "mitkImageSliceSelector.h"
+#include <itksys/SystemTools.hxx>
 
 #include <fstream>
 int mitkImageSliceSelectorTest(int argc, char* argv[])
 {
   int slice_nr = 1;
+  std::cout << "Loading file: ";
+  if(argc==0)
+  {
+    std::cout<<"no file specified [FAILED]"<<std::endl;
+    return EXIT_FAILURE;
+  }
+  mitk::Image::Pointer image = NULL;
+  mitk::DataTreeNodeFactory::Pointer factory = mitk::DataTreeNodeFactory::New();
+  try
+  {
+    factory->SetFileName( argv[1] );
+    factory->Update();
 
-	//Read pic-Image from file
-	mitk::PicFileReader::Pointer reader = mitk::PicFileReader::New();
-	  reader->SetFileName(argv[1]);
+    if(factory->GetNumberOfOutputs()<1)
+    {
+      std::cout<<"file could not be loaded [FAILED]"<<std::endl;
+      return EXIT_FAILURE;
+    }
+    mitk::DataTreeNode::Pointer node = factory->GetOutput( 0 );
+    image = dynamic_cast<mitk::Image*>(node->GetData());
+    if(image==NULL)
+    {
+      std::cout<<"file not an image - test will not be applied [PASSED]"<<std::endl;
+      std::cout<<"[TEST DONE]"<<std::endl;
+      return EXIT_SUCCESS;
+    }
+  }
+  catch ( itk::ExceptionObject & ex )
+  {
+    std::cout << "Exception: " << ex << "[FAILED]" << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  if(image->GetDimension(2)<2)
+    slice_nr = 0;
 
   //Take a slice
 	mitk::ImageSliceSelector::Pointer slice = mitk::ImageSliceSelector::New();
-	  slice->SetInput(reader->GetOutput());
+	  slice->SetInput(image);
 	  slice->SetSliceNr(slice_nr);
 	  slice->Update();
 
@@ -34,38 +66,41 @@ int mitkImageSliceSelectorTest(int argc, char* argv[])
   }
   std::cout<<"[PASSED]"<<std::endl;
 
-  std::cout << "Testing whether the slice is identical with a slice loaded by ipPicGetSlice:";
-  ipPicDescriptor *picslice = ipPicGetSlice(argv[1], NULL, (reader->GetOutput()->GetDimension(2)-1-slice_nr)+1);
-  int i, size = _ipPicSize(picslice);
-  char * p1 = (char*)slice->GetPic()->data;
-  char * p2 = (char*)picslice->data;
-  //picslice->info->write_protect=ipFalse;
-  //ipPicPut("C:\\1aaaaIPPIC.pic", picslice);
-  //ipPicPut("C:\\1aaaaSEL.pic", slice->GetPic());
-  for(i=0; i<size; ++i, ++p1, ++p2)
+  if(itksys::SystemTools::LowerCase(itksys::SystemTools::GetFilenameExtension(argv[1])).find(".pic")!=std::string::npos)
   {
-    if((*p1) != (*p2))
+    std::cout << "Testing whether the slice is identical with a slice loaded by ipPicGetSlice:";
+    ipPicDescriptor *picslice = ipPicGetSlice(argv[1], NULL, (image->GetDimension(2)-1-slice_nr)+1);
+    int i, size = _ipPicSize(picslice);
+    char * p1 = (char*)slice->GetPic()->data;
+    char * p2 = (char*)picslice->data;
+    //picslice->info->write_protect=ipFalse;
+    //ipPicPut("C:\\1aaaaIPPIC.pic", picslice);
+    //ipPicPut("C:\\1aaaaSEL.pic", slice->GetPic());
+    for(i=0; i<size; ++i, ++p1, ++p2)
     {
-      std::cout<<"[FAILED]"<<std::endl;
-      return EXIT_FAILURE;
+      if((*p1) != (*p2))
+      {
+        std::cout<<"[FAILED]"<<std::endl;
+        return EXIT_FAILURE;
+      }
     }
+    std::cout<<"[PASSED]"<<std::endl;
+    ipPicFree(picslice);
   }
-  std::cout<<"[PASSED]"<<std::endl;
-  ipPicFree(picslice);
 
   try
   {
     std::cout << "Testing another, smaller (!!) input with the same slice-selector(): ";
     //Use CylindricToCartesianFilter
 	  mitk::CylindricToCartesianFilter::Pointer cyl2cart = mitk::CylindricToCartesianFilter::New();
-      cyl2cart->SetInput(reader->GetOutput());
+      cyl2cart->SetInput(image);
       //the output size of this filter is smaller than the of the input!!
       cyl2cart->SetTargetXSize( 64 );
 
     //Use the same slice-selector again, this time to take a slice of the filtered image
       //which is smaller than the one of the old input!!
 	  slice->SetInput(cyl2cart->GetOutput());
-	    slice->SetSliceNr(1);
+      slice->SetSliceNr(1);
 
       //The requested region is still the old one,
       //therefore the following should result in an exception! 
@@ -108,9 +143,9 @@ int mitkImageSliceSelectorTest(int argc, char* argv[])
   }
   std::cout<<"[PASSED]"<<std::endl;
 
-  if(reader->GetOutput()->GetDimension(3) > 1)
+  if(image->GetDimension(3) > 1)
   {
-    int time=reader->GetOutput()->GetDimension(3)-1;
+    int time=image->GetDimension(3)-1;
 
     std::cout << "Testing 3D+t: Setting time to " << time << ": ";
 	  slice->SetTimeNr(time);
@@ -139,7 +174,7 @@ int mitkImageSliceSelectorTest(int argc, char* argv[])
     std::cout<<"[PASSED]"<<std::endl;
 
     std::cout << "Testing 3D+t: First slice in reader available: ";
-    if(reader->GetOutput()->IsSliceSet(0, time)==false)
+    if(image->IsSliceSet(0, time)==false)
     {
       std::cout<<"[FAILED]"<<std::endl;
       return EXIT_FAILURE;

@@ -3,13 +3,18 @@
 #include "mitkPicHelper.h"
 #include "mitkTimeSlicedGeometry.h"
 #include "mitkSlicedGeometry3D.h"
+#include <itksys/SystemTools.hxx>
 
 #include <fstream>
 int mitkPicFileReaderTest(int argc, char* argv[])
 {
   //independently read header of pic file
-  ipPicDescriptor *picheader;
-  picheader = ipPicGetHeader(argv[1], NULL);
+  ipPicDescriptor *picheader=NULL;
+  if(argc>=1)
+  {
+    if(itksys::SystemTools::LowerCase(itksys::SystemTools::GetFilenameExtension(argv[1])).find(".pic")!=std::string::npos)
+      picheader = ipPicGetHeader(argv[1], NULL);
+  }
   if(picheader==NULL)
   {
     std::cout<<"file not found/not a pic-file - test not applied [PASSED]"<<std::endl;
@@ -139,6 +144,8 @@ int mitkPicFileReaderTest(int argc, char* argv[])
     return EXIT_FAILURE;
   }
   std::cout<<"[PASSED]"<<std::endl;
+
+  ipPicFree(picheader);
 
   std::cout<<"[TEST DONE]"<<std::endl;
   return EXIT_SUCCESS;

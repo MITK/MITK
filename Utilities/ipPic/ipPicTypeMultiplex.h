@@ -437,6 +437,32 @@ else if ( pic->type == ipPicComplex && pic->bpe == 64 ) {						\
  * mit Rückgabewert
  */
 
+#define ipPicTypeMultiplexR0( function, pic, returnValue )								\
+{																					\
+  	if ( ( pic->type == ipPicInt || pic->type == ipPicUInt ) && pic->bpe == 1 ) {			\
+	} else if ( pic->type == ipPicInt && pic->bpe == 8 ) {									\
+		returnValue = function<char>( pic );												\
+	} else if ( pic->type == ipPicUInt && pic->bpe == 8 ) {									\
+		returnValue = function<unsigned char>( pic );									\
+	} else if ( pic->type == ipPicInt && pic->bpe == 16 ) {									\
+		returnValue = function<short>( pic );											\
+	} else if ( pic->type == ipPicUInt && pic->bpe == 16 ) {								\
+		returnValue = function<unsigned short>( pic );									\
+	} else if ( pic->type == ipPicInt && pic->bpe == 32 ) {									\
+		returnValue = function<int>( pic );												\
+	} else if ( pic->type == ipPicUInt && pic->bpe == 32 ) {								\
+		returnValue = function<unsigned int>( pic );										\
+	} else if ( pic->type == ipPicInt && pic->bpe == 64 ) {									\
+		returnValue = function<long>( pic );												\
+	} else if ( pic->type == ipPicUInt && pic->bpe == 64 ) {								\
+		returnValue = function<unsigned long>( pic );									\
+	} else if ( pic->type == ipPicFloat && pic->bpe == 32 ) {								\
+		returnValue = function<float>( pic );											\
+	} else if ( pic->type == ipPicFloat && pic->bpe == 64 ) {								\
+		returnValue = function<double>( pic );											\
+	}																				\
+}
+
 #define ipPicTypeMultiplexR1( function, pic, returnValue, param1 )								\
 {																					\
   	if ( ( pic->type == ipPicInt || pic->type == ipPicUInt ) && pic->bpe == 1 ) {			\

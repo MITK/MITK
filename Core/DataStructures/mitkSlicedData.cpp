@@ -31,7 +31,7 @@ void mitk::SlicedData::UpdateOutputInformation()
 void mitk::SlicedData::SetRequestedRegionToLargestPossibleRegion()
 {
   m_UseLargestPossibleRegion = true;
-  if(GetGeometry()==NULL) 
+  if(GetGeometry().IsNull()) 
     return;
   int i;
   const Geometry3D::RegionType::IndexType & index = GetGeometry()->GetLargestPossibleRegion().GetIndex();

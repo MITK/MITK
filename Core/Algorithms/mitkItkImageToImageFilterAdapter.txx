@@ -10,13 +10,13 @@ namespace mitk
 {
 
 template <typename TPixel>
-ItkImageToImageFilterAdapter<typename TPixel>::ItkImageToImageFilterAdapter()
+ItkImageToImageFilterAdapter< TPixel>::ItkImageToImageFilterAdapter()
 : m_FirstFilter(NULL), m_LastFilter(NULL)
 {
 }
 
 template <typename TPixel>
-ItkImageToImageFilterAdapter<typename TPixel>::~ItkImageToImageFilterAdapter()
+ItkImageToImageFilterAdapter< TPixel>::~ItkImageToImageFilterAdapter()
 {
 }
 
@@ -24,16 +24,16 @@ ItkImageToImageFilterAdapter<typename TPixel>::~ItkImageToImageFilterAdapter()
  * \todo check if this is no conflict to the ITK filter writing rules -> ITK SoftwareGuide p.512
  */  
 template <typename TPixel>
-void ItkImageToImageFilterAdapter<typename TPixel>::GenerateOutputInformation()
+void ItkImageToImageFilterAdapter< TPixel>::GenerateOutputInformation()
 {
   itkDebugMacro(<<"GenerateOutputInformation()");
 }
 
 template <typename TPixel>
-void ItkImageToImageFilterAdapter<typename TPixel>::GenerateData()
+void ItkImageToImageFilterAdapter< TPixel>::GenerateData()
 {
   mitk::Image::Pointer outputImage = this->GetOutput();
-  ImageToImageFilter::InputImageConstPointer inputImage = this->GetInput();
+  typename ImageToImageFilter::InputImageConstPointer inputImage = this->GetInput();
   if(inputImage.IsNull())
   {
     outputImage = NULL;
@@ -80,7 +80,7 @@ void ItkImageToImageFilterAdapter<typename TPixel>::GenerateData()
 }
 
 template <typename TPixel>
-void ItkImageToImageFilterAdapter<typename TPixel>::SetSingleFilter(ImageToImageFilterType::Pointer filter)
+void ItkImageToImageFilterAdapter<TPixel>::SetSingleFilter(ImageToImageFilterType::Pointer filter)
 {
   SetFirstFilter(filter);
   SetLastFilter(filter);

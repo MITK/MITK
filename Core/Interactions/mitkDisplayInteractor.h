@@ -27,37 +27,35 @@ namespace mitk {
 
 //##Documentation
 //## @brief The class handles zooming and panning events
-//## @ingroup Undo
+//## @ingroup Interaction
 //##
 //##  One can connect it via itk::GlobalInteraction->AddStateMachine(new mitk::DisplayVectorInteractor("move", new DisplayInterActor()));
 //##  to the global state machine.
-  class DisplayInteractor : public mitk::OperationActor
-  {
-  public:
+class DisplayInteractor : public mitk::OperationActor
+{
+public:
 
-    /*! \brief constructor for renderer specific zooming panning initialization
+  /*! \brief constructor for renderer specific zooming panning initialization
 
-    The window associated with the passed renderer will be the only one where
-    this interactor works on.
-    */
-    DisplayInteractor(mitk::BaseRenderer *ren = 0);
+  The window associated with the passed renderer will be the only one where
+  this interactor works on.
+  */
+  DisplayInteractor(mitk::BaseRenderer *ren = 0);
 
-    /*! 
-    \brief implementation of ExecuteOperation from mitk::OperationActor interface
+  /*! 
+  \brief implementation of ExecuteOperation from mitk::OperationActor interface
+  this method triggers the zooming and panning stuff in the appropriate renderer
+  */
+  virtual void ExecuteOperation(mitk::Operation* operation);
 
-    this method triggers the zooming and panning stuff in the appropriate renderer
-    */
-    virtual void ExecuteOperation(mitk::Operation* operation);
+private:
 
-  private:
+  /*!
+  the renderer which can be affected by the interactor instance
+  */
+  mitk::BaseRenderer * m_ParentRenderer;
 
-    /*!
-    the renderer which can be affected by the interactor instance
-    */
-    mitk::BaseRenderer * m_ParentRenderer;
-
-  };
-
+};
 
 } // end of namespace mitk 
 

@@ -39,7 +39,6 @@ QWidget * QmitkSimpleExampleFunctionality::createMainWidget(QWidget *parent)
 	connect(controls, SIGNAL(xzSliderChanged(int)), this, SLOT(selectSliceWidgetXZ(int)) );
 	connect(controls, SIGNAL(fpSliderChanged(int)), this, SLOT(selectSliceWidgetFP(int)) );
 	
-
 	return multiWidget;
 }
 
@@ -56,7 +55,7 @@ QWidget * QmitkSimpleExampleFunctionality::createControlWidget(QWidget *parent)
 QAction * QmitkSimpleExampleFunctionality::createAction(QActionGroup *parent)
 {
     QAction* action;
-    action = new QAction( tr( "Left" ), QPixmap::fromMimeSource( "example.xpm" ), tr( "&Left" ), CTRL + Key_L, parent, "simple example" );
+    action = new QAction( tr( "Left" ), QPixmap::fromMimeSource( "slicer.xpm" ), tr( "&Left" ), CTRL + Key_L, parent, "simple example" );
 //    action = new QAction( tr( "Left" ), QPixmap::fromMimeSource( "textleft.xpm" ), tr( "&Left" ), CTRL + Key_L, parent, "simple example" );
     return action;
 }

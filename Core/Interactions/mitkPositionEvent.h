@@ -16,7 +16,7 @@ class PositionEvent : public Event
     Vector3f GetPosition() const;
 
     //##ModelId=3E5B7CF900F0
-    PositionEvent(int type, int buttonNumber, int key, const Vector3f& position);
+    PositionEvent(int type, int button, int buttonState, int key, const Vector3f& position);
 
   private:
     //##ModelId=3E5B79D00395

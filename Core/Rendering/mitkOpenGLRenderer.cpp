@@ -30,8 +30,7 @@ mitk::OpenGLRenderer::OpenGLRenderer() : m_VtkMapperPresent(false),
   m_VtkRenderer(NULL), m_LastUpdateVtkActorsTime(0)
 {
   m_CameraController=NULL;
-  m_CameraController = new VtkInteractorCameraController();
-  VtkInteractorCameraController* vicc=dynamic_cast<VtkInteractorCameraController*>(m_CameraController.GetPointer());
+  m_CameraController = new VtkInteractorCameraController();  
 
   m_DataChangedCommand = itk::MemberCommand<mitk::OpenGLRenderer>::New();
 #ifdef WIN32
@@ -135,7 +134,7 @@ void mitk::OpenGLRenderer::UpdateIncludingVtkActors()
   }
 
   //    try
-  if (m_DataTreeIterator != NULL)
+  if (m_DataTreeIterator.IsNotNull())
   {
     mitk::DataTreeIteratorClone it=m_DataTreeIterator;
     while(!it->IsAtEnd())
@@ -220,7 +219,7 @@ void mitk::OpenGLRenderer::Update(mitk::DataTreeNode* datatreenode)
 //##ModelId=3E330D260255
 void mitk::OpenGLRenderer::Update()
 {
-  if(m_DataTreeIterator == NULL) return;
+  if(m_DataTreeIterator.IsNull()) return;
 
   m_VtkMapperPresent=false;
 

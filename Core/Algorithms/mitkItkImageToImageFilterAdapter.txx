@@ -47,7 +47,7 @@ void ItkImageToImageFilterAdapter< TPixel>::GenerateData()
   }
   /* convert input mitk image to itk image */
   mitk::Image::Pointer inputImageMitk = const_cast<mitk::Image*>(inputImage.GetPointer());  // const away cast, because FixedInput...Multiplexer Macro needs non const Pointer
-  ItkImageType::Pointer itkImage = ItkImageType::New();
+  typename ItkImageType::Pointer itkImage = ItkImageType::New();
   //FixedInputDimensionMitkToItkFunctionMultiplexer(itkImage, ItkImageType , inputImageMitk, 3, MakeCastImageFilter);    
   CastToItkImage(inputImageMitk, itkImage);
   /* check if image conversion failed */
@@ -80,7 +80,7 @@ void ItkImageToImageFilterAdapter< TPixel>::GenerateData()
 }
 
 template <typename TPixel>
-void ItkImageToImageFilterAdapter<TPixel>::SetSingleFilter(ImageToImageFilterType::Pointer filter)
+void ItkImageToImageFilterAdapter<TPixel>::SetSingleFilter(typename ImageToImageFilterType::Pointer filter)
 {
   SetFirstFilter(filter);
   SetLastFilter(filter);

@@ -53,7 +53,7 @@ void BoundingObjectCutter<TPixel>::GenerateData()
   }
   /* convert input mitk image to itk image */
   Image::Pointer inputImageMitk = const_cast<mitk::Image*>(inputImageMitkPointer.GetPointer());  // const away cast, because FixedInput...Multiplexer Macro needs non const Pointer
-  ItkImageType::Pointer itkImage = ItkImageType::New();  
+  typename ItkImageType::Pointer itkImage = ItkImageType::New();  
   CastToItkImage(inputImageMitk, itkImage);
   /* check if image conversion failed */
   if (itkImage.IsNull())
@@ -163,7 +163,7 @@ void BoundingObjectCutter<TPixel>::GenerateData()
   outputStart[2] = 0;
   outputRegion.SetIndex( outputStart );
   outputRegion.SetSize( size );                         // output image has the same size as the input region  
-  ItkImageType::Pointer itkOutputImage = ItkImageType::New();  // create new image
+  typename ItkImageType::Pointer itkOutputImage = ItkImageType::New();  // create new image
   itkOutputImage->SetRegions( outputRegion );           // set region data for the new image
   itkOutputImage->SetSpacing(itkImage->GetSpacing());   // copy spacing
   double outputOrigin[3] = {0, 0, 0};                   // Origin in local coordinates

@@ -290,13 +290,16 @@ private:
   //## very strange when suddenly the image-slice changes its geometry).
   //## \sa SetWorldGeometry
   Geometry3D::Pointer m_WorldGeometry;
-  //##ModelId=3EDD039F002C
+
   //##Documentation
-  //## Pointer to the displaygeometry. The displaygeometry describes the
-  //## geometry of the \em visible area in the window controlled by the renderer 
-  //## in case we are doing 2D-rendering. 
-  //## It is const, since we are not allowed to change it.
-  DisplayGeometry::Pointer m_DisplayGeometry;
+  //## m_TimeSlicedWorldGeometry is set by SetWorldGeometry if the passed Geometry3D is a 
+  //## TimeSlicedGeometry (or a sub-class of it). If it contains instances of SlicedGeometry3D,
+  //## m_Slice and m_TimeStep (set via SetSlice and SetTimeStep, respectively) define
+  //## which 2D geometry stored in m_TimeSlicedWorldGeometry (if available) 
+  //## is used as m_CurrentWorldGeometry2D.
+  //## \sa m_CurrentWorldGeometry2D
+  TimeSlicedGeometry::Pointer m_TimeSlicedWorldGeometry;
+
   //##ModelId=3EDD039F00A9
   //##Documentation
   //## Pointer to the current 2D-worldgeometry. The 2D-worldgeometry 
@@ -308,14 +311,13 @@ private:
   //## very strange when suddenly the image-slice changes its geometry).
   Geometry2D::Pointer m_CurrentWorldGeometry2D;
 
+  //##ModelId=3EDD039F002C
   //##Documentation
-  //## m_TimeSlicedWorldGeometry is set by SetWorldGeometry if the passed Geometry3D is a 
-  //## TimeSlicedGeometry (or a sub-class of it). If it contains instances of SlicedGeometry3D,
-  //## m_Slice and m_TimeStep (set via SetSlice and SetTimeStep, respectively) define
-  //## which 2D geometry stored in m_TimeSlicedWorldGeometry (if available) 
-  //## is used as m_CurrentWorldGeometry2D.
-  //## \sa m_CurrentWorldGeometry2D
-  TimeSlicedGeometry::Pointer m_TimeSlicedWorldGeometry;
+  //## Pointer to the displaygeometry. The displaygeometry describes the
+  //## geometry of the \em visible area in the window controlled by the renderer 
+  //## in case we are doing 2D-rendering. 
+  //## It is const, since we are not allowed to change it.
+  DisplayGeometry::Pointer m_DisplayGeometry;
 
   //##Documentation
   //## Defines together with m_Slice which 2D geometry stored in m_TimeSlicedWorldGeometry 

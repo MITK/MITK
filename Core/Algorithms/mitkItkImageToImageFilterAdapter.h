@@ -32,7 +32,7 @@ public:
   itkGetObjectMacro(FirstFilter, ImageToImageFilterType);
   itkSetObjectMacro(LastFilter, ImageToImageFilterType);
   itkGetObjectMacro(LastFilter, ImageToImageFilterType);
-  void SetSingleFilter(ImageToImageFilterType::Pointer filter);
+  void SetSingleFilter(typename ImageToImageFilterType::Pointer filter);
 
   virtual void GenerateOutputInformation();
   virtual void GenerateData();
@@ -41,8 +41,8 @@ protected:
 	ItkImageToImageFilterAdapter();
 	virtual ~ItkImageToImageFilterAdapter();
 
-  ImageToImageFilterType::Pointer m_FirstFilter;  // Start of Filter Pipeline
-  ImageToImageFilterType::Pointer m_LastFilter;   // End of Filter Pipeline
+  typename ImageToImageFilterType::Pointer m_FirstFilter;  // Start of Filter Pipeline
+  typename ImageToImageFilterType::Pointer m_LastFilter;   // End of Filter Pipeline
 };
 } // namespace mitk
 

@@ -13,8 +13,8 @@
 
 //##ModelId=3E3D2F120050
 mitk::BaseRenderer::BaseRenderer() : 
-  m_DataTreeIterator(NULL), m_RenderWindow(NULL), m_LastUpdateTime(0), m_MapperID(defaultMapper), m_CameraController(NULL), m_Focused(false), 
-  m_WorldGeometry(NULL),  m_TimeSlicedWorldGeometry(NULL), m_CurrentWorldGeometry2D(NULL), m_Slice(0), m_TimeStep(0)
+  m_MapperID(defaultMapper), m_DataTreeIterator(NULL), m_RenderWindow(NULL), m_LastUpdateTime(0), m_CameraController(NULL), m_Focused(false), 
+  m_WorldGeometry(NULL), m_TimeSlicedWorldGeometry(NULL), m_CurrentWorldGeometry2D(NULL), m_Slice(0), m_TimeStep(0)
 {
   m_Size[0] = 0;
   m_Size[1] = 0;

@@ -26,7 +26,7 @@ public:
 
   typedef TPixel PixelType;
   typedef itk::Image<PixelType, 3> ItkImageType;
-  typedef ItkImageType::RegionType ItkRegionType;
+  typedef typename ItkImageType::RegionType ItkRegionType;
   typedef itk::ImageRegionIteratorWithIndex< ItkImageType > ItkImageIteratorType;
 
   virtual void GenerateOutputInformation();

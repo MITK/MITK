@@ -25,7 +25,6 @@ PURPOSE.  See the above copyright notices for more information.
 ** init() function in place of a constructor, and a destroy() function in
 ** place of a destructor.
 *****************************************************************************/
-
 #include <mitkProperties.h>
 #include <mitkStringProperty.h>
 #include <mitkGeometry2DDataVtkMapper3D.h>
@@ -285,7 +284,6 @@ void QmitkStdMultiWidget::changeLayoutToWidget2()
 
 void QmitkStdMultiWidget::changeLayoutToWidget3()
 {
-   
     delete QmitkStdMultiWidgetLayout ;
     
     std::cout << "changing layout to big Widget1 ..." << std::endl;
@@ -304,7 +302,34 @@ void QmitkStdMultiWidget::changeLayoutToWidget3()
     layout4->addWidget( mitkWidget3 );
     layout4->addWidget( levelWindowWidget );
     QmitkStdMultiWidgetLayout->addLayout( layout4 );
+}
 
+void QmitkStdMultiWidget::changeLayoutTo2x2Dand3DWidget()
+{
+   delete QmitkStdMultiWidgetLayout ;
+    
+   std::cout << "changing layout to 2 x 2D and 3D Widget" << std::endl;
+
+   QmitkStdMultiWidgetLayout = new QHBoxLayout( this, 0, 0, "QmitkStdMultiWidgetLayout");
+
+   QVBoxLayout *layout1 = new QVBoxLayout( );
+   QHBoxLayout *layout2 = new QHBoxLayout( );
+   
+   mitkWidget1->setMaximumSize(2000,2000);
+   mitkWidget2->setMaximumSize(2000,2000);
+    
+   layout1->addWidget( mitkWidget1 );
+   layout1->addWidget( mitkWidget2 );
+   layout2->addLayout( layout1 );
+   layout2->addWidget( mitkWidget4 );
+   layout2->addWidget( levelWindowWidget );
+   
+   if (mitkWidget1->isHidden()) mitkWidget1->show();
+   if (mitkWidget2->isHidden()) mitkWidget2->show();
+   if (!mitkWidget3->isHidden()) mitkWidget3->hide();
+   if (mitkWidget4->isHidden()) mitkWidget4->show();    
+    
+   QmitkStdMultiWidgetLayout->addLayout( layout2 );   
 }
 
 void QmitkStdMultiWidget::setData( mitk::DataTreeIteratorBase* it )

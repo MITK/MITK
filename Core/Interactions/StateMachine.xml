@@ -378,6 +378,19 @@
       </transition>
     </state>
   </stateMachine>
+  <stateMachine NAME="PressMoveRelease">
+    <state NAME="neutral" ID="1" START_STATE="TRUE">
+      <transition NAME="send Koordinates press" NEXT_STATE_ID="1" EVENT_ID="1">
+        <action ID="80" />
+      </transition>
+      <transition NAME="send Koordinates move" NEXT_STATE_ID="1" EVENT_ID="530">
+        <action ID="90" />
+      </transition>
+      <transition NAME="send Koordinates release" NEXT_STATE_ID="1" EVENT_ID="505">
+        <action ID="42" />
+      </transition>
+    </state>
+  </stateMachine>
   <stateMachine name="drag">
     <state NAME="neutral" ID="1" START_STATE="TRUE">
       <transition NAME="check picked" NEXT_STATE_ID="1" EVENT_ID="1">
@@ -420,6 +433,9 @@
       </transition>
 -->      
       <transition NAME="exit" NEXT_STATE_ID="1" EVENT_ID="537">
+        <action ID="42" />
+      </transition>
+      <transition NAME="exit" NEXT_STATE_ID="1" EVENT_ID="505">
         <action ID="42" />
       </transition>
     <transition NAME="remove" NEXT_STATE_ID="1" EVENT_ID="12">

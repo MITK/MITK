@@ -25,7 +25,7 @@ mitk::Geometry2DData::Geometry2DData()
 {
   m_SlicedGeometry = SlicedGeometry3D::New();
   SetGeometry(m_SlicedGeometry);
-//  m_SlicedGeometry->Initialize(1);
+  //  m_SlicedGeometry->Initialize(1);
 }
 
 //##ModelId=3E639CD30233
@@ -36,19 +36,20 @@ mitk::Geometry2DData::~Geometry2DData()
 //##ModelId=3E6423D2030E
 void mitk::Geometry2DData::SetGeometry2D(mitk::Geometry2D *geometry2d)
 {
-    m_SlicedGeometry->SetGeometry2D(geometry2d, 0);
-    m_Geometry2D=geometry2d;
-    Modified();
+  m_SlicedGeometry->SetGeometry2D(geometry2d, 0);
+  m_Geometry2D=geometry2d;
+  Modified();
 }
 
 //##ModelId=3E66CC5A0295
 void mitk::Geometry2DData::UpdateOutputInformation()
 {
+  if(m_Geometry2D.IsNotNull())
     SetPipelineMTime(m_Geometry2D->GetMTime());
-	if (this->GetSource())
-	{
-		this->GetSource()->UpdateOutputInformation();
-	}
+  if (this->GetSource())
+  {
+    this->GetSource()->UpdateOutputInformation();
+  }
 }
 
 //##ModelId=3E66CC5A02B4
@@ -62,15 +63,15 @@ bool mitk::Geometry2DData::RequestedRegionIsOutsideOfTheBufferedRegion()
 {
   if(m_Geometry2D.IsNull()) return true;
 
-	return false;
+  return false;
 }
 
 //##ModelId=3E66CC5A02F0
 bool mitk::Geometry2DData::VerifyRequestedRegion()
 {
-    if(m_Geometry2D.IsNull()) return false;
+  if(m_Geometry2D.IsNull()) return false;
 
-    return true;
+  return true;
 }
 
 //##ModelId=3E66CC5A030E
@@ -83,4 +84,3 @@ void mitk::Geometry2DData::SetRequestedRegion(itk::DataObject *data)
 void mitk::Geometry2DData::CopyInformation(const itk::DataObject *data)
 {
 }
-

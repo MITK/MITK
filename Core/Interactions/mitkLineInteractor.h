@@ -3,7 +3,7 @@
 
 #include "mitkCommon.h"
 #include <mitkInteractor.h>
-#include <mitkPointInteractor.h>
+#include "mitkPointInteractor.h"
 
 namespace mitk
 {
@@ -64,6 +64,14 @@ private:
   //##Documentation
   //## @brief stores the ID of the line
   int m_Id;
+
+  //##Documentation
+  //## @brief the first point
+  PointInteractor *m_PointA;
+
+  //##Documentation
+  //## @brief the second point
+  PointInteractor *m_PointB;
 
 };
 }

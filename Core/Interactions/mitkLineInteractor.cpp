@@ -5,6 +5,8 @@
 mitk::LineInteractor::LineInteractor(std::string type, DataTreeNode* dataTreeNode, int cellId, int pIdA, int pIdB)
 : Interactor(type, dataTreeNode), m_CellId(cellId), m_PIdA(pIdA), m_PIdB(pIdB)
 {
+  m_PointA = new PointInteractor("pointinteractor", dataTreeNode, pIdA);
+  m_PointB = new PointInteractor("pointinteractor", dataTreeNode, pIdB);
 }
 
 mitk::LineInteractor::~LineInteractor()

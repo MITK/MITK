@@ -1,5 +1,5 @@
-#ifndef MITKGEOMSTRIPINTERACTOR_H_HEADER_INCLUDED
-#define MITKGEOMSTRIPINTERACTOR_H_HEADER_INCLUDED
+#ifndef MITKPRIMSTRIPINTERACTOR_H_HEADER_INCLUDED
+#define MITKPRIMSTRIPINTERACTOR_H_HEADER_INCLUDED
 
 #include "mitkCommon.h"
 #include <mitkInteractor.h>
@@ -15,10 +15,10 @@ class DataTreeNode;
 //## Interact with a list of interactables e.g. lines and stripes
 //## The whole list can be selected by selecting all the other lower interactables.
 //## the selection of the whole dataSet is only possible by seting the property of the DataTreeNode.
-class GeomStripInteractor : public Interactor
+class PrimStripInteractor: public Interactor
 {
 public:
-  mitkClassMacro(GeomStripInteractor, Interactor);
+  mitkClassMacro(PrimStripInteractor, Interactor);
   
   typedef int IdType;
   typedef mitk::Interactor PrimElement;
@@ -26,11 +26,11 @@ public:
       
   //##Documentation
   //##@brief Constructor 
-  GeomStripInteractor(std::string type, DataTreeNode* dataTreeNode);
+  PrimStripInteractor(std::string type, DataTreeNode* dataTreeNode);
 
   //##Documentation
   //##@brief Destructor 
-  virtual ~GeomStripInteractor();
+  virtual ~PrimStripInteractor();
 
   //##Documentation
   //##@brief returns the Id of this point

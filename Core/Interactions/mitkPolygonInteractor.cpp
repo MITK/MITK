@@ -5,6 +5,7 @@
 mitk::PolygonInteractor::PolygonInteractor(std::string type, DataTreeNode* dataTreeNode)
 : Interactor(type, dataTreeNode)
 {
+  m_PrimStrip = new PrimStripInteractor("primstrip", dataTreeNode);
 }
 
 mitk::PolygonInteractor::~PolygonInteractor()

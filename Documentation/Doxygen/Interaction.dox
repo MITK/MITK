@@ -2,7 +2,7 @@
 
 \page InteractionPage Interaction and Undo/Redo Concepts
  
-\section Interaction in MITK 
+\section InteractionIntroduction Interaction in MITK 
 
 \b Interaction is one of the most important tasks in clinically useful image processing software. 
 Due to that, MITK has a special interaction concept, with which the developer can map the desired interaction. 
@@ -11,8 +11,14 @@ of the interaction is stored in an XML-file that is loaded by the application du
 That even allows the storage of different interaction patterns, e.g. an interaction behaviour like in MS PowerPoint, 
 in Adobe Photoshop or like the interaction behaviour on a medical image retrieval system.
 
-To be able to separate the sequence of interaction and the implementation of the interaction, 
-we developed a statemachine-concept (by Mealy), that consists of events, states, transitions and actions.
+\section Statemachines Statemachines to realize Interaction
+The interaction in MITK is realized with the concept of statemachines (by Mealy).
+This concept allows to build the steps of interaction with different states, which each have different conditions, very alike the different interactions that may have to be build to develop medical imaging applications.
+Furthermore statemachines can be implemented using object oriented programming (OOP). Due to that we can abstract from the section of code, that implements the interaction and focus on the sequence of interaction. What steps must the user do frst before the program can compute a result? For example he has to declare three points in space first and these points are the input of a filter so only after the definition of the points, the filter can produce a result. The according interaction sequence will inform the filter after the third point is set and not before that. Now the filter after an adaption only needs two points as an input. The sequence of the interaction can be easily changed if it is build up as a sequence of objects and not hard implemented in a e.g. switch/case block. Or the user wants to add a point in the scene with the right mouse button instead of the left. Wouldn't it be nice to only change the definition of an interaction sequence rather than having to search through the code and changing every single if/else condition?
+
+\subsection Statemachine Statemachine
+So a separation of the definition of a sequence in interaction and its implementation is a usefull step in the development of an interactive application.
+To be able to do that, we implemented the concept of statemachines with several classes: States, Transitions and Actions define the interaction pattern. The Statemachine itself adds the handling of events, that are send to it.
 
 \image html statemachine.jpg
 \image latex statemachine.eps "statemachine" 
@@ -22,7 +28,8 @@ we developed a statemachine-concept (by Mealy), that consists of events, states,
 Several actions can be defined in one transition. The execution of an action is the active part of the statemachine. Here is where the statemachine can make changes in data, e.g. add a Point into a list.
 
 
-\b Guard \b States are a special kind of states. The action that is executed sends a new event to the statemachine, which leads out of the guard state. So the statemachine will only stay in a guard state for a short time. This kind of state is used to check different conditions, e.g. is an Object is picked of a set of points will be full after the addition of one point.
+\subsection GuardState Guard States
+Guard States are a special kind of states. The action, that is executed after the state is set as current state, sends a new event to the statemachine, which leads out of the guard state. So the statemachine will only stay in a guard state for a short time. This kind of state is used to check different conditions, e.g. is an Object is picked of a set of points will be full after the addition of one point.
 
 \image html statemachine_guard.jpg
 \image latex statemachine_guard.eps "statemachine" 

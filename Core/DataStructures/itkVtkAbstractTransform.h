@@ -20,7 +20,16 @@ public:
   typedef Transform< TScalarType, 3, 3 >  Superclass;
   typedef SmartPointer<Self>        Pointer;
   typedef SmartPointer<const Self>  ConstPointer;
-  
+  typedef typename Superclass::OutputPointType OutputPointType;
+  typedef typename Superclass::OutputVectorType OutputVectorType;
+  typedef typename Superclass::OutputVnlVectorType OutputVnlVectorType;
+  typedef typename Superclass::OutputCovariantVectorType OutputCovariantVectorType;
+  typedef typename Superclass::InputPointType InputPointType;
+  typedef typename Superclass::InputVectorType InputVectorType;
+  typedef typename Superclass::InputVnlVectorType InputVnlVectorType;
+  typedef typename Superclass::InputCovariantVectorType InputCovariantVectorType;
+
+
   itkNewMacro(Self);
   
   //##Documentation

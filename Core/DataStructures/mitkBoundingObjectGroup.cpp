@@ -2,7 +2,7 @@
 #include "vtkTransform.h"
 
 mitk::BoundingObjectGroup::BoundingObjectGroup()
-:  m_Counter(0)
+:  m_Counter(0), m_CSGMode(Difference) //m_CSGMode(Union) m_CSGMode(Intersection)
 {
   m_Geometry3D->Initialize();
   m_BoundingObjects = mitk::BoundingObjectGroup::BoundingObjectContainer::New();
@@ -118,21 +118,57 @@ bool mitk::BoundingObjectGroup::IsInside(mitk::ITKPoint3D p)
   mitk::BoundingObjectGroup::BoundingObjectContainer::ConstIterator boundingObjectsIterator = m_BoundingObjects->Begin();
   const mitk::BoundingObjectGroup::BoundingObjectContainer::ConstIterator boundingObjectsIteratorEnd = m_BoundingObjects->End();
   
-  bool inside = false; // initialize with true for intersection, with false for union
-  while (boundingObjectsIterator != boundingObjectsIteratorEnd) // check each BoundingObject
+  bool inside; // initialize with true for intersection, with false for union
+  
+  switch(m_CSGMode)
   {
-    // calculate union: each point, that is inside least one BoundingObject is considered inside the group
-    inside = boundingObjectsIterator.Value()->IsInside(p) || inside;  
-    if (inside) // shortcut, it is enough to find one object that contains the point
+    case Intersection:
+    {
+      inside = true;
+      while (boundingObjectsIterator != boundingObjectsIteratorEnd) // check each BoundingObject
+      {       // calculate intersection: each point, that is inside each BoundingObject is considered inside the group
+        inside = boundingObjectsIterator.Value()->IsInside(p) && inside;
+        if (!inside) // shortcut, it is enough to find one object that does not contain the point
+          break;
+        boundingObjectsIterator++;
+      }
       break;
-    // calculate intersection: each point, that is inside each BoundingObject is considered inside the group
-    //inside = boundingObjectsIterator.Value()->IsInside(p) && inside;  
-    //if (inside) // shortcut, it is enough to find one object that does not contain the point
-    //  break;
-    boundingObjectsIterator++;
+    }
+    case Difference:
+    {
+      bool posInside = false;
+      bool negInside = false;
+      while (boundingObjectsIterator != boundingObjectsIteratorEnd) // check each BoundingObject
+      {
+        // calculate union: each point, that is inside least one BoundingObject is considered inside the group        
+        if (boundingObjectsIterator.Value()->GetPositive())
+          posInside = boundingObjectsIterator.Value()->IsInside(p) || posInside;
+        else
+          negInside = boundingObjectsIterator.Value()->IsInside(p) || negInside;
+        
+        boundingObjectsIterator++;
+      }
+      if (posInside && !negInside)
+        inside = true;
+      else
+        inside = false;
+      break;
+    }
+    case Union:
+    default:
+    {
+      inside = false;
+      while (boundingObjectsIterator != boundingObjectsIteratorEnd) // check each BoundingObject
+      {       // calculate union: each point, that is inside least one BoundingObject is considered inside the group
+        inside = boundingObjectsIterator.Value()->IsInside(p) || inside;  
+        if (inside) // shortcut, it is enough to find one object that contains the point
+          break;
+        boundingObjectsIterator++;
+      }
+      break;
+    }
   }
   return inside;
-
 }
 
 unsigned int mitk::BoundingObjectGroup::GetCount() const

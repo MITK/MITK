@@ -14,6 +14,14 @@ class BoundingObjectGroup : public mitk::BoundingObject
 public:
   typedef itk::VectorContainer<unsigned int ,mitk::BoundingObject::Pointer> BoundingObjectContainer;
 
+  enum CSGMode
+   {
+      Union,
+      Intersection,
+      Difference
+   };
+
+
   mitkClassMacro(BoundingObjectGroup, mitk::BoundingObject);// itk::VectorContainer<unsigned int ,mitk::BoundingObject::Pointer>);  
   itkNewMacro(Self);
 
@@ -27,6 +35,9 @@ public:
   itkSetObjectMacro(BoundingObjects, mitk::BoundingObjectGroup::BoundingObjectContainer);
   itkGetObjectMacro(BoundingObjects, mitk::BoundingObjectGroup::BoundingObjectContainer);
 
+  itkSetMacro(CSGMode, mitk::BoundingObjectGroup::CSGMode);
+  itkGetMacro(CSGMode, mitk::BoundingObjectGroup::CSGMode);
+
   void AddBoundingObject(mitk::BoundingObject::Pointer boundingObject);
   unsigned int GetCount() const;
 
@@ -36,6 +47,7 @@ protected:
 
   mitk::BoundingObjectGroup::BoundingObjectContainer::Pointer m_BoundingObjects;
   unsigned int m_Counter;
+  CSGMode m_CSGMode;
 };
 
 }

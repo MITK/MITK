@@ -3,6 +3,8 @@
 
 #include "mitkCommon.h"
 #include "Transition.h"
+//# include <string>!!!
+//# include <map>!!!
 
 namespace mitk {
 
@@ -35,13 +37,13 @@ class State
 
   private:
     //##ModelId=3E5B2A220069
-    string name;
+	  std::string name;
 
     //##ModelId=3E5B2A350338
     int id;
 
     //##ModelId=3E5B2A460057
-    hashMap<Transition> transitions;
+	std::map<int,Transition> transitions;
 
 };
 

@@ -3,6 +3,7 @@
 
 #include "mitkCommon.h"
 #include "State.h"
+#include <qxml.h>
 
 namespace mitk {
 
@@ -16,17 +17,17 @@ class StateMachineFactory
 {
   public:
     //##ModelId=3E5B4144024F
-    static State* GetStartState(string type);
+	  static State* GetStartState(std::string type);
 
     //##ModelId=3E5B41730261
-    static bool LoadBehavior(string fileName);
+	  static bool LoadBehavior(std::string fileName);
 
   private:
     //##ModelId=3E5B428F010B
     static bool ConnectStates(vector<State*> states);
 
     //##ModelId=3E5B423003DF
-    map<string,State*> startStates;
+	map<std::string,State*> startStates;
 
 };
 

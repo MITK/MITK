@@ -8,10 +8,12 @@
 #include "PixelType.h"
 #include "BaseData.h"
 #include "LevelWindow.h"
+//#include "mitkImageToItk.h"
 
 namespace mitk {
 
 class SubImageSelector;
+//template <class TPixel, unsigned int VImageDimension=2> class ImageToItk;
 
 //##ModelId=3DCBC1E300FE
 //##Documentation
@@ -25,6 +27,7 @@ class SubImageSelector;
 class Image : public SlicedData
 {
     friend class SubImageSelector;
+//    template <typename, unsigned int> friend class ImageToItk;
 
   public:
 	/** Standard class typedefs. */
@@ -115,14 +118,48 @@ class Image : public SlicedData
     //## initialize new (or re-initialize) image
     virtual void Initialize(const mitk::PixelType& type, unsigned int dimension, unsigned int *dimensions, unsigned int channels = 1);
 
-
     //##ModelId=3E102D2601DF
     //##Documentation
     //## initialize new (or re-initialize) image by @a pic. Dimensions and @a
     //## Geometry3D /@a Geometry2D  are set according to the tags in @a pic.
     //## @param tDim override time dimension (@a n[3]) in @a pic (if >0 and <)
+    //## @param sDim override z-space dimension (@a n[2]) in @a pic (if >0 and <)
     virtual void Initialize(ipPicDescriptor* pic, int channels = 1, int tDim = -1, int sDim = -1);
-    //##ModelId=3E155CF000F6
+
+    //##ModelId=3E102D2601DF
+    //##Documentation
+    //## initialize new (or re-initialize) image by @a itkimage, an templated itk-image. Dimensions and @a
+    //## Geometry3D /@a Geometry2D  are set according to the tags in @a pic.
+    //## @param tDim override time dimension in @a itkimage (if >0 and <)
+    //## @param sDim override z-space dimension in @a itkimage (if >0 and <)
+	template <typename itkImageType> void Initialize(itkImageType* itkimage, int channels = 1, int tDim = -1, int sDim=-1)
+	{
+		if(itkimage==NULL) return;
+
+		m_Dimension=itkimage->GetImageDimension();
+		unsigned int i, *tmpDimensions=new unsigned int[m_Dimension>4?m_Dimension:4];
+		for(i=0;i<m_Dimension;++i) tmpDimensions[i]=itkimage->GetLargestPossibleRegion().GetSize().GetSize()[i];
+		if(m_Dimension<4)
+		{
+			unsigned int *p;
+			for(i=0,p=tmpDimensions+m_Dimension;i<4-m_Dimension;++i, ++p)
+				*p=1;
+		}
+
+		if((m_Dimension>2) && (sDim>=0))
+			tmpDimensions[2]=sDim;
+		if((m_Dimension>3) && (tDim>=0))
+			tmpDimensions[3]=tDim;
+
+		Initialize(mitk::PixelType(typeid(typename itkImageType::PixelType)), 
+			m_Dimension, 
+			tmpDimensions,
+			channels);
+
+		delete tmpDimensions;
+	};
+  
+	//##ModelId=3E155CF000F6
     virtual bool IsValidSlice(int s = 0, int t = 0, int n = 0) const;
 
 
@@ -147,13 +184,20 @@ class Image : public SlicedData
     //##Documentation
     //## @todo calculation of min/max not yet implemented. Timestamp must be added to track last calculation!
     virtual float GetScalarValueMax() const;
-  protected:
+
     //##ModelId=3E0B4A6A01EC
+    //##Documentation
+    //## @warning for internal use only
     virtual mitk::ImageDataItem::Pointer GetSliceData(int s = 0, int t = 0, int n = 0);
     //##ModelId=3E0B4A82001A
+    //##Documentation
+    //## @warning for internal use only
     virtual mitk::ImageDataItem::Pointer GetVolumeData(int t = 0, int n = 0);
     //##ModelId=3E0B4A9100BC
+    //##Documentation
+    //## @warning for internal use only
     virtual mitk::ImageDataItem::Pointer GetChannelData(int n = 0);
+  protected:
     //##ModelId=3E155C940248
     int GetSliceIndex(int s = 0, int t = 0, int n = 0) const;
 

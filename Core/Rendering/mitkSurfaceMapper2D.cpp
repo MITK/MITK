@@ -119,6 +119,7 @@ void mitk::SurfaceMapper2D::Paint(mitk::BaseRenderer * renderer)
     Point3D point;
     Vector3D normal;
 
+    vtkTransform * vtktransform = GetDataTreeNode()->GetVtkTransform();
     if(worldPlaneGeometry.IsNotNull())
     {
       // set up vtkPlane according to worldGeometry
@@ -134,7 +135,7 @@ void mitk::SurfaceMapper2D::Paint(mitk::BaseRenderer * renderer)
         AbstractTransformGeometry::ConstPointer surfaceAbstractGeometry = dynamic_cast<const AbstractTransformGeometry*>(input->GetTimeSlicedGeometry()->GetGeometry3D(0));
         if(surfaceAbstractGeometry!=NULL) //@todo substitude by operator== after implementation, see bug id 28
         {
-          PaintCells(vtkpolydata, worldGeometry, renderer->GetDisplayGeometry(), (useCellData ? m_LUT : NULL));
+          PaintCells(vtkpolydata, worldGeometry, renderer->GetDisplayGeometry(), vtktransform, (useCellData ? m_LUT : NULL));
           return;
         }
         else
@@ -159,7 +160,6 @@ void mitk::SurfaceMapper2D::Paint(mitk::BaseRenderer * renderer)
     //This might be quite slow. Thus, the idea is, to perform an inverse transform of the plane instead.
     //@todo It probably does not work for scaling operations yet:scaling operations have to be 
     //dealed with after the cut is performed by scaling the contour.
-    vtkTransform * vtktransform = GetDataTreeNode()->GetVtkTransform();
     vtkLinearTransform * inversetransform = vtktransform->GetLinearInverse();
     inversetransform->TransformPoint(vp, vp);
     inversetransform->TransformNormalAtPoint(vp, vnormal, vnormal);
@@ -179,11 +179,11 @@ void mitk::SurfaceMapper2D::Paint(mitk::BaseRenderer * renderer)
     ApplyProperties(renderer);
 
     // travers the cut contour
-    PaintCells(m_Cutter->GetOutput(), worldGeometry, renderer->GetDisplayGeometry(), (useCellData ? m_LUT : NULL));
+    PaintCells(m_Cutter->GetOutput(), worldGeometry, renderer->GetDisplayGeometry(), vtktransform, (useCellData ? m_LUT : NULL));
   }
 }
 
-void mitk::SurfaceMapper2D::PaintCells(vtkPolyData* contour, const mitk::Geometry2D* worldGeometry, const mitk::DisplayGeometry* displayGeometry, vtkLookupTable *lut)
+void mitk::SurfaceMapper2D::PaintCells(vtkPolyData* contour, const mitk::Geometry2D* worldGeometry, const mitk::DisplayGeometry* displayGeometry, vtkTransform * vtktransform, vtkLookupTable *lut)
 {
   vtkPoints    *vpoints = contour->GetPoints();
   vtkCellArray *vpolys  = contour->GetLines();
@@ -204,6 +204,8 @@ void mitk::SurfaceMapper2D::PaintCells(vtkPolyData* contour, const mitk::Geometr
     vpolys->GetNextCell(cellSize, cell);
 
     vpoints->GetPoint(cell[0], vp);
+    //take transformation via vtktransform into account 	 
+    vtktransform->TransformPoint(vp, vp);
     vtk2itk(vp, p);
 
     //convert 3D point (in mm) to 2D point on slice (also in mm)
@@ -217,6 +219,8 @@ void mitk::SurfaceMapper2D::PaintCells(vtkPolyData* contour, const mitk::Geometr
     for(j=1;j<cellSize;++j)
     {
       vpoints->GetPoint(cell[j], vp);
+      //take transformation via vtktransform into account 	 
+      vtktransform->TransformPoint(vp, vp);
       vtk2itk(vp, p);
 
       //convert 3D point (in mm) to 2D point on slice (also in mm)

@@ -122,47 +122,80 @@ public:
   
   void SetProperty(const char *propertyKey, BaseProperty* property, const mitk::BaseRenderer* renderer = NULL);	
 
-  //##ModelId=3EF1941C011F
   //##Documentation
-  //## @brief Convenience access method for color properties (instances of
-  //## ColorProperty)
+  //## @brief Convenience access method for bool properties (instances of
+  //## BoolProperty)
   //## @return @a true property was found
-  bool GetName(char &nodeName, mitk::BaseRenderer* renderer, const char* name = "fileName") const;
-
-  //##ModelId=3EF1941C011F
-  //##Documentation
-  //## @brief Convenience access method for color properties (instances of
-  //## ColorProperty)
-  //## @return @a true property was found
-  bool GetColor(float rgb[3], mitk::BaseRenderer* renderer, const char* name = "color") const;
-
-  //##ModelId=3EF1941E01D6
-  //##Documentation
-  //## @brief Convenience access method for visibility properties (instances
-  //## of BoolProperty)
-  //## @return @a true property was found
-  //## @sa IsVisible
-  bool GetVisibility(bool &visible, mitk::BaseRenderer* renderer, const char* name = "visible") const;
-
-  //##ModelId=3EF19420016B
-  //##Documentation
-  //## @brief Convenience access method for opacity properties (instances of
-  //## FloatProperty)
-  //## @return @a true property was found
-  bool GetOpacity(float &opacity, mitk::BaseRenderer* renderer, const char* name = "opacity") const;
-
-  //##ModelId=3EF194220204
-  //##Documentation
-  //## @brief Convenience access method for color properties (instances of
-  //## LevelWindoProperty)
-  //## @return @a true property was found
-  bool GetLevelWindow(mitk::LevelWindow &levelWindow, mitk::BaseRenderer* renderer, const char* name = "levelwindow") const;
+  bool GetBoolProperty(const char* propertyKey, bool &boolValue, mitk::BaseRenderer* renderer=NULL) const;
 
   //##Documentation
   //## @brief Convenience access method for int properties (instances of
   //## IntProperty)
   //## @return @a true property was found
   bool GetIntProperty(const char* propertyKey, int &intValue, mitk::BaseRenderer* renderer=NULL) const;
+
+  //##Documentation
+  //## @brief Convenience access method for string properties (instances of
+  //## StringProperty)
+  //## @return @a true property was found
+  bool GetStringProperty(const char* propertyKey, const char* string, mitk::BaseRenderer* renderer) const;
+
+  //##ModelId=3EF1941C011F
+  //##Documentation
+  //## @brief Convenience access method for color properties (instances of
+  //## ColorProperty)
+  //## @return @a true property was found
+  bool GetColor(float rgb[3], mitk::BaseRenderer* renderer, const char* propertyKey = "color") const;
+
+  //##ModelId=3EF194220204
+  //##Documentation
+  //## @brief Convenience access method for level-window properties (instances of
+  //## LevelWindowProperty)
+  //## @return @a true property was found
+  bool GetLevelWindow(mitk::LevelWindow &levelWindow, mitk::BaseRenderer* renderer, const char* propertyKey = "levelwindow") const;
+
+  //##Documentation
+  //## @brief Convenience access method for accessing the name of an object (instance of
+  //## StringProperty with property-key "fileName")
+  //## @return @a true property was found
+  bool GetName(char &nodeName, mitk::BaseRenderer* renderer, const char* propertyKey = "fileName") const
+  {
+    return GetStringProperty(propertyKey, &nodeName, renderer);
+  }
+
+  //##ModelId=3EF1941E01D6
+  //##Documentation
+  //## @brief Convenience access method for visibility properties (instances
+  //## of BoolProperty with property-key "visibile")
+  //## @return @a true property was found
+  //## @sa IsVisible
+  bool GetVisibility(bool &visible, mitk::BaseRenderer* renderer, const char* propertyKey = "visible") const
+  {
+    return GetBoolProperty(propertyKey, visible, renderer);
+  }
+
+  //##ModelId=3EF19420016B
+  //##Documentation
+  //## @brief Convenience access method for opacity properties (instances of
+  //## FloatProperty)
+  //## @return @a true property was found
+  bool GetOpacity(float &opacity, mitk::BaseRenderer* renderer, const char* propertyKey = "opacity") const;
+
+  //##Documentation
+  //## @brief Convenience access method for boolean properties (instances
+  //## of BoolProperty). Return value is the value of the property. If the property is 
+  //## not found, the value of @a defaultIsOn is returned.
+  //## 
+  //## Thus, the return value has a different meaning than in the
+  //## GetBoolProperty method!
+  //## @sa GetBoolProperty
+  bool IsOn(const char* propertyKey, mitk::BaseRenderer* renderer, bool defaultIsOn = true) const
+  {
+    if(propertyKey==NULL) 
+      return defaultIsOn;
+    GetBoolProperty(propertyKey, defaultIsOn, renderer);
+    return defaultIsOn;
+  }
 
   //##ModelId=3EF19424012B
   //##Documentation
@@ -174,39 +207,43 @@ public:
   //## Thus, the return value has a different meaning than in the
   //## GetVisibility method!
   //## @sa GetVisibility
-  bool IsVisible(mitk::BaseRenderer* renderer, const char* name = "visible") const;
+  //## @sa IsOn
+  bool IsVisible(mitk::BaseRenderer* renderer, const char* propertyKey = "visible", bool defaultIsOn = true) const
+  {
+    return IsOn(propertyKey, renderer, defaultIsOn);
+  }
 
   //##Documentation
   //## @brief Convenience method for setting color properties (instances of
   //## ColorProperty)
-  void SetColor(const mitk::Color &color, mitk::BaseRenderer* renderer = NULL, const char* name = "color");
+  void SetColor(const mitk::Color &color, mitk::BaseRenderer* renderer = NULL, const char* propertyKey = "color");
   //##Documentation
   //## @brief Convenience method for setting color properties (instances of
   //## ColorProperty)
-  void SetColor(float red, float green, float blue, mitk::BaseRenderer* renderer = NULL, const char* name = "color");
+  void SetColor(float red, float green, float blue, mitk::BaseRenderer* renderer = NULL, const char* propertyKey = "color");
   //##ModelId=3EF196360303
   //##Documentation
   //## @brief Convenience method for setting color properties (instances of
   //## ColorProperty)
-  void SetColor(const float rgb[3], mitk::BaseRenderer* renderer = NULL, const char* name = "color");
+  void SetColor(const float rgb[3], mitk::BaseRenderer* renderer = NULL, const char* propertyKey = "color");
 
   //##ModelId=3EF1966703D6
   //##Documentation
   //## @brief Convenience method for setting visibility properties (instances
   //## of BoolProperty)
-  void SetVisibility(bool visible, mitk::BaseRenderer* renderer, const char* name = "visible");
+  void SetVisibility(bool visible, mitk::BaseRenderer* renderer, const char* propertyKey = "visible");
 
   //##ModelId=3EF196880095
   //##Documentation
   //## @brief Convenience method for setting opacity properties (instances of
   //## FloatProperty)
-  void SetOpacity(float opacity, mitk::BaseRenderer* renderer, const char* name = "opacity");
+  void SetOpacity(float opacity, mitk::BaseRenderer* renderer, const char* propertyKey = "opacity");
 
   //##ModelId=3EF1969A0181
   //##Documentation
   //## @brief Convenience method for setting level-window properties
   //## (instances of LevelWindowProperty)
-  void SetLevelWindow(mitk::LevelWindow levelWindow, mitk::BaseRenderer* renderer, const char* name = "levelwindow");
+  void SetLevelWindow(mitk::LevelWindow levelWindow, mitk::BaseRenderer* renderer, const char* propertyKey = "levelwindow");
 
   //##Documentation
   //## @brief Convenience method for setting int properties (instances of

@@ -16,9 +16,7 @@ void mitk::vtkPointSetXMLParser::StartElement ( const char *name, const char **a
     //
     if ( currentElement == mitk::PointSetWriter::XML_POINT_SET )
     {
-        mitk::PointSet::Pointer pointSet = mitk::PointSet::New();
-        m_PointSetList.push_back( pointSet );
-        m_CurrentPointSet = pointSet;
+        m_CurrentPointSet = mitk::PointSet::New();
     }
     //
     // when a new point begins, initialize it to zero.
@@ -54,11 +52,22 @@ void mitk::vtkPointSetXMLParser::EndElement ( const char *name )
     }
     m_ParseStack.pop();
 
+
+    //
+    // After a complete point set has been parsed, its
+    // output information is updated and it is inserted into the list
+    // of parsed point sets.
+    //
+    if (currentElement == mitk::PointSetWriter::XML_POINT_SET)
+    {
+        m_CurrentPointSet->UpdateOutputInformation();
+        m_PointSetList.push_back( m_CurrentPointSet );
+    }
     //
     // if we have finished parsing a point, insert it to the current
     // point set.
     //
-    if ( currentElement == mitk::PointSetWriter::XML_POINT )
+    else if ( currentElement == mitk::PointSetWriter::XML_POINT )
     {
         mitk::PointOperation popInsert( mitk::OpINSERT, m_CurrentPoint, m_CurrentPointId );
         mitk::PointOperation popDeactivate( mitk::OpDESELECTPOINT, m_CurrentPoint, m_CurrentPointId );

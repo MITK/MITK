@@ -16,4 +16,7 @@ the application crashes.
 @bug functionalities influence each other because they all work on the same data, i.e. when changing colors of the 2D planes in one functionality it will be the same color in the other functionalities and so on. Also all data sets added to the tree are visible in all functionlities
 
 @bug 1) in coronary mapping: events of the fourth (mapped view)window are processed and change the view in the other three slices. One can even define new points in the mapped view with strange coordinates 2) after loading more data sets the defined mapping points (originally painted yellow) are painted white. 3) level window does not affect mapped view window
+
+
+@ bug functionalities: the activated method is called twice - side effect when adding a state machine to GlobalInteraction in activated and removing it in deactivated one statemachine will remain. By the way, the same state machine pointer can be added more than once shouldn't this be impossible??? 
 */

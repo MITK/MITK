@@ -137,6 +137,8 @@ const int mitk::PointSet::GetNumberOfSelected()
 }
 
 //##ModelId=3F0177E901BF
+//##Documentation
+//## @brief executes the given Operation
 void mitk::PointSet::ExecuteOperation(Operation* operation)
 /*Notes
 	a new point is set to unselected. if it is to be selected, then define in StateMachine as a additional sideeffect
@@ -227,7 +229,7 @@ void mitk::PointSet::ExecuteOperation(Operation* operation)
 
     ((const itk::Object*)this)->InvokeEvent(itk::EndEvent());
 
-    UpdateAllWidgets();
+  UpdateAllWidgets();
 }
 
 //##ModelId=3F0177E901EE

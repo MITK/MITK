@@ -33,15 +33,17 @@ public:
   typedef PointSetType::PointDataContainer PointDataContainer;
 
   //##ModelId=3F0177E901BF
+  //##Documentation
+  //## @brief executes the given Operation
 	void ExecuteOperation(Operation* operation);
 
   //##ModelId=3F0177E901C1
-	//##Documentation
+  //##Documentation
 	//## @brief returns the current size of the point-list
 	int GetSize();
 
   //##ModelId=3F0177E901CC
-	//##Documentation
+  //##Documentation
 	//## @brief returns the point-list with points and selected Information
   const PointSetType::Pointer GetPointList() const;
 

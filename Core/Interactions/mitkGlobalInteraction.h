@@ -4,6 +4,7 @@
 #include "Focus.h"
 #include "mitkCommon.h"
 #include "StateMachine.h"
+#include "Roi.h"
 //#include "DataTree.h"
 #include <string>
 #include <vector>
@@ -32,6 +33,12 @@ class GlobalInteraction : public StateMachine
     //##ModelId=3EDCAECA0194
 	virtual void ExecuteOperation(mitk::Operation* operation);
 
+    //##ModelId=3EDDD76302BB
+	//##Documentation
+	//## quickimplementation!!!
+	//## method is to be excluded from GlobalInteraction
+	void SetRoi(Roi* roi);
+
 	private:
 	//##ModelId=3EAD4EF903A5
 //	std::vector<Roi*> m_SelectedElements;//ERROR!!!
@@ -39,17 +46,22 @@ class GlobalInteraction : public StateMachine
     //##ModelId=3EAD4F3A03C6
     Focus* m_Focus;
 
-    //##ModelId=3EAD4F51010C
+    //##ModelId=3EDDD763029D
     //Group* m_Group;
 
     //##ModelId=3EAD502B01EC
- //   DataTree* m_DataTree;
+//   DataTree* m_DataTree;
+
+	//##Documentation
+	//## quickimplementation! Thought is a list of StateMachines to be asked.
+	//## take the information from BaseRenderer and parse through the tree and save all interactables
+	//## if Tree changes, then build up a new list.
+	//## if a new object is added to the tree, then pudh the old one in Undo and set the new 
+	//## to the current (m_selectedElements)...
+	Roi* m_Roi;
+
 
 };
-
-
 } // namespace mitk
-
-
 
 #endif /* GLOBALINTERACTION_H_HEADER_INCLUDED_C152938A */

@@ -8,7 +8,8 @@
 mitk::GlobalInteraction::GlobalInteraction(std::string type)
 : StateMachine(type)
 {
-	m_Focus = new mitk::Focus("focus");
+	//Quickimplementation ... Ivo: No Need of focus, cause glWidget sends the Event now.
+	//m_Focus = new mitk::Focus("focus");
 }
 
 inline mitk::StateEvent* GenerateEmptyStateEvent(int eventId)
@@ -27,6 +28,7 @@ bool mitk::GlobalInteraction::ExecuteSideEffect(int sideEffectId, mitk::StateEve
 {
 	bool ok = false;
 	//if the Event is a PositionEvent, then get the worldCoordinates through Focus
+	/*Quickimplementation... no need of focus, since the qglwidget send the event
 	if ( (stateEvent->GetEvent() )->GetType()== MouseButtonPress)
 	{
 		ok = m_Focus->HandleEvent(stateEvent);//give it to Focus which calculates accordingly to it's Statemachine the worldcoordinates
@@ -35,6 +37,8 @@ bool mitk::GlobalInteraction::ExecuteSideEffect(int sideEffectId, mitk::StateEve
 		if (!ok)
 			std::cout<<"Error! Sender: PositionEvent;   Message: HandleEvent returned false"<<std::endl;
 	}
+	*/
+
 
 	//actually it is very unclean to write numbers in code (EventId's), but here:
 	//The xml-File has to be written, with all the EventNames and EventID's,
@@ -44,7 +48,7 @@ bool mitk::GlobalInteraction::ExecuteSideEffect(int sideEffectId, mitk::StateEve
 	switch (sideEffectId)
 	{
 	case DONOTHING:
-		std::cout << "DoNothing"<< std::endl;
+		//std::cout << "DoNothing"<< std::endl;
 		ok = true;
 		break;
 	case INITNEWOBJECT:
@@ -175,10 +179,33 @@ bool mitk::GlobalInteraction::ExecuteSideEffect(int sideEffectId, mitk::StateEve
 		//unknown event!
 		ok = true;
 	}
+
+/*
+now ask all the other StateMachines!
+ToDo:
+List of all StateMachines/Interactables that are beneath 
+the focused BaseRenderer (Focus-StateMachine).
+register at DataTree, that if anything changes, the list can be refreshed.
+If a new object is generated here, the new object flows into the m_SelectedElements
+and the Focus changes.
+*/
+
+//Quickimplementation
+	//ask if the statemachine of that roi can do anything with that event.
+	ok = m_Roi->HandleEvent(stateEvent);
+
 	return ok;
 }
 
 //##ModelId=3EDCAECA0194
 void mitk::GlobalInteraction::ExecuteOperation(mitk::Operation* operation)
 {
+//if nothing more needs to be done, then move to statemachine.cpp and not virtual
+	operation->Execute();
+}
+
+//##ModelId=3EDDD76302BB
+void mitk::GlobalInteraction::SetRoi(Roi* roi)
+{
+	m_Roi = roi;
 }

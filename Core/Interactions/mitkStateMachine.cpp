@@ -46,8 +46,8 @@ bool mitk::StateMachine::HandleEvent(StateEvent const* stateEvent)
 	if (m_UndoEnabled)	//write to UndoMechanism
 	{
 		//UNDO StateTransitionOperation
-		StateTransitionOperation* undoSTO = new StateTransitionOperation(mitk::STATETRANSITION, m_CurrentState);
-		StateTransitionOperation* redoSTO = new StateTransitionOperation(mitk::STATETRANSITION, tempState);//tempStateZeiger? mögl. Fehlerquelle
+		StateTransitionOperation* undoSTO = new StateTransitionOperation(mitk::STATETRANSITION, 0, m_CurrentState);
+		StateTransitionOperation* redoSTO = new StateTransitionOperation(mitk::STATETRANSITION, 0, tempState);//tempStateZeiger? mögl. Fehlerquelle
 	
 		OperationEvent *operationEvent = new OperationEvent(((mitk::OperationActor*)(this)), undoSTO, redoSTO, 
 																OperationEvent::GenerateObjectEventId(), 

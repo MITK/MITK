@@ -61,7 +61,14 @@ namespace mitk {
     //## each statechange has a sideeffect, which can be assigned by it's number
     //## if you are developing a new statemachine, you put all your operations here!
     //## dependant on the SideEffectNumber / build of the StateMachine-Definition
+	//## First Undo, then SideEffectOperation
     virtual bool ExecuteSideEffect(int sideEffectId, mitk::StateEvent const* stateEvent)= 0;
+
+	//##ModelId=3EDCAECB00B9
+	//##Documentation
+	//## if true, then UndoFunctionality is enabled
+	//## default on true;
+	bool m_UndoEnabled;
 
   private:
 	//##ModelId=3E5B2D66027E
@@ -70,11 +77,7 @@ namespace mitk {
     //##ModelId=3E5B2D8F02B9
     State* m_CurrentState;
 
-    //##ModelId=3EDCAECB00B9
-	//##Documentation
-	//## if true, then UndoFunctionality is enabled
-	//## default on true;
-	bool m_UndoEnabled;
+    
 
   protected:
     //##ModelId=3EDCAECB0128

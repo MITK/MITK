@@ -85,10 +85,10 @@ bool mitk::StateMachineFactory::parse(StateMap *states, StateMapIter thisState, 
 
 	//remove loops in nextStatesSet; 
 	//nether do we have to go there, nor will it clear a deadlock
-	std::set<int>::iterator position = nextStatesSet.find((thisState->second)->GetId());
+	std::set<int>::iterator position = nextStatesSet.find((thisState->second)->GetId());//look for the same state in nextStateSet
 	if (position != nextStatesSet.end())
-	{
-		nextStatesSet.erase(position);
+	{//found the same state we are in!
+		nextStatesSet.erase(position);//delete it, cause, we don't have to go there a second time!
 	}
 
 	//nextStatesSet is empty, so deadlock!
@@ -131,7 +131,7 @@ bool mitk::StateMachineFactory::ConnectStates(StateMap *states)
 	{
 		delete history;
 		std::cout<<"Warnung: Ein unereichbarer Zustand wird aufgebaut. Ueberprüfen sie die Zustands- Konfigurations- Datei'statemachineFactory.cpp"<<endl;	
-		//return false;//better go on and build connect the states than quit
+		//return false;//better go on and build/ connect the states than quit
 	}
 
 	//connect all the states

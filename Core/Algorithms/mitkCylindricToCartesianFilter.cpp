@@ -336,7 +336,7 @@ void mitk::CylindricToCartesianFilter::GenerateOutputInformation()
   if (pointProp.IsNotNull() )
   {
     Point3<int> tp = pointProp->GetValue();
-    tp.z = tp.y * scale;
+    tp.z = tmpDimensions[2]-tp.y * scale;
     tp.x = tmpDimensions[0]/2;
     tp.y = tmpDimensions[0]/2;
     mitk::Point3iProperty::Pointer pointProp = new mitk::Point3iProperty(tp);

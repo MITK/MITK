@@ -90,7 +90,7 @@ void mitk::AngleCorrectByPointFilter::GenerateData()
   ITKVector3D assumed_direction;
   ScalarType &x(p[0]),&y(p[1]),&z(p[2]);
   ITKVector3D down;
-  FillITKVector3D(down,0.0,0.0,1.0);
+  FillITKVector3D(down,0.0,0.0,-1.0);
 
   int xDim = input->GetDimension(0);
   int yDim = input->GetDimension(1);
@@ -150,23 +150,23 @@ void mitk::AngleCorrectByPointFilter::GenerateData()
         {
           for (x=0; x<xDim; ++x, ++in, ++out) 
           {
-            tx_direction = p-tx_position;
+            tx_direction = tx_position-p;
             tx_direction.Normalize();
 
             //are we within the acquisition cone?
-            if(tx_direction*down>vnl_math::pi_over_4)
+//            if(-tx_direction*down>vnl_math::pi_over_4)
             {
               assumed_direction = center-p;
               assumed_direction.Normalize();
-              ScalarType cos_factor = -tx_direction*assumed_direction;
+              ScalarType cos_factor = tx_direction*assumed_direction;
 
               if(fabs(cos_factor)>eps)
                 *out=((ScalarType)(*in)-128.0)/cos_factor;
               else
                 *out=((ScalarType)(*in)-128.0)/eps;
             }
-            else
-              *out=0;
+            //else
+            //  *out=0;
           }
         }
       }

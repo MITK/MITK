@@ -50,9 +50,11 @@ public:
     //##ModelId=3E3FE0420273
     mitk::PropertyList::Pointer GetPropertyList();
 
+    //##ModelId=3E8600DB0188
     virtual void UnRegister() const;
 
-    virtual int GetRealReferenceCount() const;
+    //##ModelId=3E8600DB02DC
+    virtual int GetExternalReferenceCount() const;
 protected:
     //##ModelId=3E3FE04202B9
     BaseData();
@@ -63,13 +65,19 @@ protected:
     //##ModelId=3E3FE0420242
     PropertyList::Pointer m_PropertyList;
 
+    //##ModelId=3E8600D9006D
     mutable itk::SmartPointer<mitk::BaseProcess> m_SmartSourcePointer;
+    //##ModelId=3E8600D9021B
     mutable unsigned int m_SourceOutputIndexDuplicate;
+    //##ModelId=3E8600DC0053
     virtual void ConnectSource(itk::ProcessObject *arg, unsigned int idx) const;
 private:
+    //##ModelId=3E8600D90384
     mutable bool m_Unregistering;
-    mutable bool m_CalculatingRealReferenceCount;
-    mutable int m_RealReferenceCount;
+    //##ModelId=3E8600DA0118
+    mutable bool m_CalculatingExternalReferenceCount;
+    //##ModelId=3E8600DA02B3
+    mutable int m_ExternalReferenceCount;
 
     friend class mitk::BaseProcess;
 };

@@ -23,11 +23,15 @@ class BaseProcess : public itk::ProcessObject
 public:
     mitkClassMacro(BaseProcess, itk::ProcessObject);
 
+    //##ModelId=3E8600DC03E2
     virtual void UnRegister() const;
 
-    virtual int GetRealReferenceCount() const;
+    //##ModelId=3E8600DD000E
+    virtual int GetExternalReferenceCount() const;
 protected:
+    //##ModelId=3E8600DD0036
     BaseProcess();
+    //##ModelId=3E8600DD004A
     virtual ~BaseProcess();
 
     /** Protected methods for setting outputs.
@@ -35,12 +39,17 @@ protected:
     * These are only overwritten because of itk::DataObject::connectSource being 
     * private and non-virtual:
     * the important stuff is done in mitk::BaseData::connectSource.*/
+    //##ModelId=3E8600DD0072
     virtual void SetNthOutput(unsigned int num, itk::DataObject *output);
+    //##ModelId=3E8600DD00F4
     virtual void AddOutput(itk::DataObject *output);
 private:
+    //##ModelId=3E8600DC0356
     mutable bool m_Unregistering;
-    mutable bool m_CalculatingRealReferenceCount;
-    mutable int m_RealReferenceCount;
+    //##ModelId=3E8600DC037E
+    mutable bool m_CalculatingExternalReferenceCount;
+    //##ModelId=3E8600DC03B0
+    mutable int m_ExternalReferenceCount;
 };
 
 } // namespace mitk

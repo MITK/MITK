@@ -3,23 +3,26 @@
 
 #define MITK_WEAKPOINTER_PROBLEM_WORKAROUND_ENABLED
 
-mitk::BaseProcess::BaseProcess() : m_Unregistering(false), m_RealReferenceCount(-1), m_CalculatingRealReferenceCount(false)
+//##ModelId=3E8600DD0036
+mitk::BaseProcess::BaseProcess() : m_Unregistering(false), m_ExternalReferenceCount(-1), m_CalculatingExternalReferenceCount(false)
 {
 
 }
 
+//##ModelId=3E8600DD004A
 mitk::BaseProcess::~BaseProcess()
 {
 
 }
 
-int mitk::BaseProcess::GetRealReferenceCount() const
+//##ModelId=3E8600DD000E
+int mitk::BaseProcess::GetExternalReferenceCount() const
 {
-    if(m_CalculatingRealReferenceCount==false) //this is only needed because a smart-pointer to m_Outputs (private!!) must be created by calling GetOutputs.
+    if(m_CalculatingExternalReferenceCount==false) //this is only needed because a smart-pointer to m_Outputs (private!!) must be created by calling GetOutputs.
     {
-        m_CalculatingRealReferenceCount = true;
+        m_CalculatingExternalReferenceCount = true;
 
-        m_RealReferenceCount = -1;
+        m_ExternalReferenceCount = -1;
 
         DataObjectPointerArray outputs = const_cast<mitk::BaseProcess*>(this)->GetOutputs();
 
@@ -32,26 +35,27 @@ int mitk::BaseProcess::GetRealReferenceCount() const
             if((outputs[idx]) && (outputs[idx]->GetReferenceCount()==2)) //2 because the outputs array also holds a reference!
                 --realReferenceCount;
         }
-        m_RealReferenceCount = realReferenceCount;
-        if(m_RealReferenceCount<0)
-            m_RealReferenceCount=0;
+        m_ExternalReferenceCount = realReferenceCount;
+        if(m_ExternalReferenceCount<0)
+            m_ExternalReferenceCount=0;
     }
     else
         return -1;
-    m_CalculatingRealReferenceCount = false; //do not move in if-part!!!
-    return m_RealReferenceCount;
+    m_CalculatingExternalReferenceCount = false; //do not move in if-part!!!
+    return m_ExternalReferenceCount;
 }
 
+//##ModelId=3E8600DC03E2
 void mitk::BaseProcess::UnRegister() const
 {
 #ifdef MITK_WEAKPOINTER_PROBLEM_WORKAROUND_ENABLED
-    if((m_Unregistering==false) && (m_CalculatingRealReferenceCount==false))
+    if((m_Unregistering==false) && (m_CalculatingExternalReferenceCount==false))
     {
         m_Unregistering=true;
 
-        int realReferenceCount = GetRealReferenceCount();
+        int realReferenceCount = GetExternalReferenceCount();
         if(realReferenceCount<0)
-            m_RealReferenceCount=0;
+            m_ExternalReferenceCount=0;
 
         if(realReferenceCount==0)
         {
@@ -86,6 +90,7 @@ void mitk::BaseProcess::UnRegister() const
 * does not do a Register()/UnRegister() because of the 
 * desire to break the reference counting loop.
 */
+//##ModelId=3E8600DD0072
 void mitk::BaseProcess::SetNthOutput(unsigned int idx, itk::DataObject *output)
 {
 #ifdef MITK_WEAKPOINTER_PROBLEM_WORKAROUND_ENABLED
@@ -109,6 +114,7 @@ void mitk::BaseProcess::SetNthOutput(unsigned int idx, itk::DataObject *output)
 * Adds an output to the first null position in the output list.
 * Expands the list memory if necessary
 */
+//##ModelId=3E8600DD00F4
 void mitk::BaseProcess::AddOutput(itk::DataObject *output)
 {
 #ifdef MITK_WEAKPOINTER_PROBLEM_WORKAROUND_ENABLED

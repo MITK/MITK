@@ -907,7 +907,7 @@ main (int argc, char **argv)
 		sscanf  ( argv[6], "%lf", &gv );
 		pic_new = ipFuncSelInv ( pic_old, gv_low, gv_up, gv, pic_ret );
 	}
-    else if ( strcasecmp ( operation, "LevWind" ) == 0 )
+    else if ( strcasecmp ( operation, "LevWin" ) == 0 )
 	{
 		if ( ( (unsigned int) argc == 2 ) || 
 			( ( (unsigned int) argc == 3 ) && ( strcasecmp (argv[2], "-h") == 0 ) ) || 

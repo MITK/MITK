@@ -9,7 +9,7 @@
             <x>0</x>
             <y>0</y>
             <width>122</width>
-            <height>659</height>
+            <height>585</height>
         </rect>
     </property>
     <property name="sizePolicy">
@@ -32,7 +32,7 @@
     <property name="mouseTracking">
         <bool>false</bool>
     </property>
-    <vbox>
+    <hbox>
         <property name="name">
             <cstring>unnamed</cstring>
         </property>
@@ -52,7 +52,7 @@
                 </property>
                 <widget class="QLayoutWidget">
                     <property name="name">
-                        <cstring>layout6</cstring>
+                        <cstring>layout15</cstring>
                     </property>
                     <hbox>
                         <property name="name">
@@ -60,242 +60,224 @@
                         </property>
                         <widget class="QLayoutWidget">
                             <property name="name">
-                                <cstring>layout15</cstring>
+                                <cstring>layout3</cstring>
                             </property>
-                            <hbox>
+                            <vbox>
                                 <property name="name">
                                     <cstring>unnamed</cstring>
                                 </property>
-                                <widget class="QLayoutWidget">
+                                <widget class="QSlider">
                                     <property name="name">
-                                        <cstring>layout3</cstring>
+                                        <cstring>sliderXY</cstring>
                                     </property>
-                                    <vbox>
-                                        <property name="name">
-                                            <cstring>unnamed</cstring>
-                                        </property>
-                                        <widget class="QSlider">
-                                            <property name="name">
-                                                <cstring>sliderXY</cstring>
-                                            </property>
-                                            <property name="sizePolicy">
-                                                <sizepolicy>
-                                                    <hsizetype>0</hsizetype>
-                                                    <vsizetype>7</vsizetype>
-                                                    <horstretch>0</horstretch>
-                                                    <verstretch>0</verstretch>
-                                                </sizepolicy>
-                                            </property>
-                                            <property name="orientation">
-                                                <enum>Vertical</enum>
-                                            </property>
-                                        </widget>
-                                        <widget class="QLabel">
-                                            <property name="name">
-                                                <cstring>textLabel1</cstring>
-                                            </property>
-                                            <property name="sizePolicy">
-                                                <sizepolicy>
-                                                    <hsizetype>1</hsizetype>
-                                                    <vsizetype>5</vsizetype>
-                                                    <horstretch>0</horstretch>
-                                                    <verstretch>0</verstretch>
-                                                </sizepolicy>
-                                            </property>
-                                            <property name="text">
-                                                <string>x-y</string>
-                                            </property>
-                                            <property name="alignment">
-                                                <set>AlignCenter</set>
-                                            </property>
-                                        </widget>
-                                    </vbox>
+                                    <property name="sizePolicy">
+                                        <sizepolicy>
+                                            <hsizetype>0</hsizetype>
+                                            <vsizetype>7</vsizetype>
+                                            <horstretch>0</horstretch>
+                                            <verstretch>0</verstretch>
+                                        </sizepolicy>
+                                    </property>
+                                    <property name="orientation">
+                                        <enum>Vertical</enum>
+                                    </property>
                                 </widget>
-                                <widget class="QLayoutWidget">
+                                <widget class="QLabel">
                                     <property name="name">
-                                        <cstring>layout3_3</cstring>
+                                        <cstring>textLabel1</cstring>
                                     </property>
-                                    <vbox>
-                                        <property name="name">
-                                            <cstring>unnamed</cstring>
-                                        </property>
-                                        <widget class="QSlider">
-                                            <property name="name">
-                                                <cstring>sliderYZ</cstring>
-                                            </property>
-                                            <property name="sizePolicy">
-                                                <sizepolicy>
-                                                    <hsizetype>0</hsizetype>
-                                                    <vsizetype>7</vsizetype>
-                                                    <horstretch>0</horstretch>
-                                                    <verstretch>0</verstretch>
-                                                </sizepolicy>
-                                            </property>
-                                            <property name="orientation">
-                                                <enum>Vertical</enum>
-                                            </property>
-                                        </widget>
-                                        <widget class="QLabel">
-                                            <property name="name">
-                                                <cstring>textLabel1_3</cstring>
-                                            </property>
-                                            <property name="sizePolicy">
-                                                <sizepolicy>
-                                                    <hsizetype>1</hsizetype>
-                                                    <vsizetype>5</vsizetype>
-                                                    <horstretch>0</horstretch>
-                                                    <verstretch>0</verstretch>
-                                                </sizepolicy>
-                                            </property>
-                                            <property name="text">
-                                                <string>y-z</string>
-                                            </property>
-                                            <property name="alignment">
-                                                <set>AlignCenter</set>
-                                            </property>
-                                        </widget>
-                                    </vbox>
-                                </widget>
-                                <widget class="QLayoutWidget">
-                                    <property name="name">
-                                        <cstring>layout3_2</cstring>
+                                    <property name="sizePolicy">
+                                        <sizepolicy>
+                                            <hsizetype>1</hsizetype>
+                                            <vsizetype>5</vsizetype>
+                                            <horstretch>0</horstretch>
+                                            <verstretch>0</verstretch>
+                                        </sizepolicy>
                                     </property>
-                                    <vbox>
-                                        <property name="name">
-                                            <cstring>unnamed</cstring>
-                                        </property>
-                                        <widget class="QSlider">
-                                            <property name="name">
-                                                <cstring>sliderXZ</cstring>
-                                            </property>
-                                            <property name="sizePolicy">
-                                                <sizepolicy>
-                                                    <hsizetype>0</hsizetype>
-                                                    <vsizetype>7</vsizetype>
-                                                    <horstretch>0</horstretch>
-                                                    <verstretch>0</verstretch>
-                                                </sizepolicy>
-                                            </property>
-                                            <property name="orientation">
-                                                <enum>Vertical</enum>
-                                            </property>
-                                        </widget>
-                                        <widget class="QLabel">
-                                            <property name="name">
-                                                <cstring>textLabel1_2</cstring>
-                                            </property>
-                                            <property name="sizePolicy">
-                                                <sizepolicy>
-                                                    <hsizetype>1</hsizetype>
-                                                    <vsizetype>5</vsizetype>
-                                                    <horstretch>0</horstretch>
-                                                    <verstretch>0</verstretch>
-                                                </sizepolicy>
-                                            </property>
-                                            <property name="text">
-                                                <string>x-z</string>
-                                            </property>
-                                            <property name="alignment">
-                                                <set>AlignCenter</set>
-                                            </property>
-                                        </widget>
-                                    </vbox>
-                                </widget>
-                                <widget class="QLayoutWidget">
-                                    <property name="name">
-                                        <cstring>layout9</cstring>
+                                    <property name="text">
+                                        <string>x-y</string>
                                     </property>
-                                    <vbox>
-                                        <property name="name">
-                                            <cstring>unnamed</cstring>
-                                        </property>
-                                        <widget class="QSlider">
-                                            <property name="name">
-                                                <cstring>sliderFP</cstring>
-                                            </property>
-                                            <property name="sizePolicy">
-                                                <sizepolicy>
-                                                    <hsizetype>0</hsizetype>
-                                                    <vsizetype>7</vsizetype>
-                                                    <horstretch>0</horstretch>
-                                                    <verstretch>0</verstretch>
-                                                </sizepolicy>
-                                            </property>
-                                            <property name="orientation">
-                                                <enum>Vertical</enum>
-                                            </property>
-                                        </widget>
-                                        <widget class="QLabel">
-                                            <property name="name">
-                                                <cstring>textLabel1_4</cstring>
-                                            </property>
-                                            <property name="sizePolicy">
-                                                <sizepolicy>
-                                                    <hsizetype>1</hsizetype>
-                                                    <vsizetype>5</vsizetype>
-                                                    <horstretch>0</horstretch>
-                                                    <verstretch>0</verstretch>
-                                                </sizepolicy>
-                                            </property>
-                                            <property name="text">
-                                                <string>fp</string>
-                                            </property>
-                                            <property name="alignment">
-                                                <set>AlignCenter</set>
-                                            </property>
-                                        </widget>
-                                    </vbox>
+                                    <property name="alignment">
+                                        <set>AlignCenter</set>
+                                    </property>
                                 </widget>
-                            </hbox>
+                            </vbox>
                         </widget>
-                        <spacer>
+                        <widget class="QLayoutWidget">
                             <property name="name">
-                                <cstring>spacer5</cstring>
+                                <cstring>layout3_3</cstring>
                             </property>
-                            <property name="orientation">
-                                <enum>Horizontal</enum>
+                            <vbox>
+                                <property name="name">
+                                    <cstring>unnamed</cstring>
+                                </property>
+                                <widget class="QSlider">
+                                    <property name="name">
+                                        <cstring>sliderYZ</cstring>
+                                    </property>
+                                    <property name="sizePolicy">
+                                        <sizepolicy>
+                                            <hsizetype>0</hsizetype>
+                                            <vsizetype>7</vsizetype>
+                                            <horstretch>0</horstretch>
+                                            <verstretch>0</verstretch>
+                                        </sizepolicy>
+                                    </property>
+                                    <property name="orientation">
+                                        <enum>Vertical</enum>
+                                    </property>
+                                </widget>
+                                <widget class="QLabel">
+                                    <property name="name">
+                                        <cstring>textLabel1_3</cstring>
+                                    </property>
+                                    <property name="sizePolicy">
+                                        <sizepolicy>
+                                            <hsizetype>1</hsizetype>
+                                            <vsizetype>5</vsizetype>
+                                            <horstretch>0</horstretch>
+                                            <verstretch>0</verstretch>
+                                        </sizepolicy>
+                                    </property>
+                                    <property name="text">
+                                        <string>y-z</string>
+                                    </property>
+                                    <property name="alignment">
+                                        <set>AlignCenter</set>
+                                    </property>
+                                </widget>
+                            </vbox>
+                        </widget>
+                        <widget class="QLayoutWidget">
+                            <property name="name">
+                                <cstring>layout3_2</cstring>
                             </property>
-                            <property name="sizeType">
-                                <enum>Expanding</enum>
+                            <vbox>
+                                <property name="name">
+                                    <cstring>unnamed</cstring>
+                                </property>
+                                <widget class="QSlider">
+                                    <property name="name">
+                                        <cstring>sliderXZ</cstring>
+                                    </property>
+                                    <property name="sizePolicy">
+                                        <sizepolicy>
+                                            <hsizetype>0</hsizetype>
+                                            <vsizetype>7</vsizetype>
+                                            <horstretch>0</horstretch>
+                                            <verstretch>0</verstretch>
+                                        </sizepolicy>
+                                    </property>
+                                    <property name="orientation">
+                                        <enum>Vertical</enum>
+                                    </property>
+                                </widget>
+                                <widget class="QLabel">
+                                    <property name="name">
+                                        <cstring>textLabel1_2</cstring>
+                                    </property>
+                                    <property name="sizePolicy">
+                                        <sizepolicy>
+                                            <hsizetype>1</hsizetype>
+                                            <vsizetype>5</vsizetype>
+                                            <horstretch>0</horstretch>
+                                            <verstretch>0</verstretch>
+                                        </sizepolicy>
+                                    </property>
+                                    <property name="text">
+                                        <string>x-z</string>
+                                    </property>
+                                    <property name="alignment">
+                                        <set>AlignCenter</set>
+                                    </property>
+                                </widget>
+                            </vbox>
+                        </widget>
+                        <widget class="QLayoutWidget">
+                            <property name="name">
+                                <cstring>layout9</cstring>
                             </property>
-                            <property name="sizeHint">
-                                <size>
-                                    <width>16</width>
-                                    <height>20</height>
-                                </size>
-                            </property>
-                        </spacer>
+                            <vbox>
+                                <property name="name">
+                                    <cstring>unnamed</cstring>
+                                </property>
+                                <widget class="QSlider">
+                                    <property name="name">
+                                        <cstring>sliderFP</cstring>
+                                    </property>
+                                    <property name="sizePolicy">
+                                        <sizepolicy>
+                                            <hsizetype>0</hsizetype>
+                                            <vsizetype>7</vsizetype>
+                                            <horstretch>0</horstretch>
+                                            <verstretch>0</verstretch>
+                                        </sizepolicy>
+                                    </property>
+                                    <property name="orientation">
+                                        <enum>Vertical</enum>
+                                    </property>
+                                </widget>
+                                <widget class="QLabel">
+                                    <property name="name">
+                                        <cstring>textLabel1_4</cstring>
+                                    </property>
+                                    <property name="sizePolicy">
+                                        <sizepolicy>
+                                            <hsizetype>1</hsizetype>
+                                            <vsizetype>5</vsizetype>
+                                            <horstretch>0</horstretch>
+                                            <verstretch>0</verstretch>
+                                        </sizepolicy>
+                                    </property>
+                                    <property name="text">
+                                        <string>fp</string>
+                                    </property>
+                                    <property name="alignment">
+                                        <set>AlignCenter</set>
+                                    </property>
+                                </widget>
+                            </vbox>
+                        </widget>
                     </hbox>
+                </widget>
+                <widget class="QmitkSliderNavigator">
+                    <property name="name">
+                        <cstring>qmitkSliderNavigator2</cstring>
+                    </property>
                 </widget>
             </vbox>
         </widget>
-        <widget class="QmitkSliderNavigator">
+        <spacer>
             <property name="name">
-                <cstring>qmitkSliderNavigator2</cstring>
+                <cstring>spacer5</cstring>
             </property>
-            <property name="sizePolicy">
-                <sizepolicy>
-                    <hsizetype>3</hsizetype>
-                    <vsizetype>1</vsizetype>
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                </sizepolicy>
+            <property name="orientation">
+                <enum>Horizontal</enum>
             </property>
-        </widget>
-    </vbox>
+            <property name="sizeType">
+                <enum>Expanding</enum>
+            </property>
+            <property name="sizeHint">
+                <size>
+                    <width>16</width>
+                    <height>20</height>
+                </size>
+            </property>
+        </spacer>
+    </hbox>
 </widget>
 <customwidgets>
     <customwidget>
         <class>QmitkSliderNavigator</class>
-        <header location="global">C:/home/ivo/c/ip++Binary/Applications/MITKSampleApp/QmitkSliderNavigator.h</header>
+        <header location="global">QmitkSliderNavigator.h</header>
         <sizehint>
             <width>-1</width>
             <height>-1</height>
         </sizehint>
         <container>0</container>
         <sizepolicy>
-            <hordata>1</hordata>
-            <verdata>3</verdata>
+            <hordata>5</hordata>
+            <verdata>5</verdata>
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
         </sizepolicy>

@@ -185,8 +185,11 @@ public:
   virtual void SetBoundingBox(const float bounds[6],  int t=0);
   
   vtkTransform* GetTransform();  
+  
   void SetBaseGeometry(mitk::Geometry3D* base);  
-  mitk::Geometry3D::Pointer Clone();
+  
+  Pointer Clone();
+
 protected:
   //##ModelId=3E3453C703AF
   virtual void Initialize(unsigned int dimension, const unsigned int* dimensions);

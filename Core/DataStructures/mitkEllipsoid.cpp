@@ -3,15 +3,17 @@
 #include "mitkVector.h"
 #include "vtkSphereSource.h"
 
-mitk::Ellipsoid::Ellipsoid()
+mitk::Ellipsoid::Ellipsoid():BoundingObject()
 {
-  m_Geometry3D->Initialize();
+  //m_Geometry3D->Initialize();
   vtkSphereSource* sphere = vtkSphereSource::New();
   sphere->SetRadius(1.0);
   sphere->SetThetaResolution(20);
   sphere->SetPhiResolution(20);
+  sphere->Update();
   SetVtkPolyData(sphere->GetOutput());
-  sphere->Delete();
+  std::cout << GetVtkPolyData()<< ", " << sphere->GetOutput() << std::endl;
+  //sphere->Delete();
 }
 
 mitk::Ellipsoid::~Ellipsoid()
@@ -28,18 +30,9 @@ bool mitk::Ellipsoid::IsInside(Point3D worldPoint)
   p[3] = 1;
   m_Geometry3D->GetVtkTransform()->GetInverse()->TransformPoint(p, p);
 	mitk::Point3D itkPoint;
-
-  // reapply scaling
-  p[0] = p[0] * m_Geometry3D->GetXAxis().GetNorm();
-  p[1] = p[1] * m_Geometry3D->GetYAxis().GetNorm();
-  p[2] = p[2] * m_Geometry3D->GetZAxis().GetNorm(); 
-
-  // check of point is inside the ellipsoid
-  return (   pow(p[0], 2)/pow(m_Geometry3D->GetXAxis().GetNorm(), 2) 
-           + pow(p[1], 2)/pow(m_Geometry3D->GetYAxis().GetNorm(), 2)
-           + pow(p[2], 2)/pow(m_Geometry3D->GetZAxis().GetNorm(), 2)
-          <= 1);
+  return (pow(p[0], 2) + pow(p[1], 2) + pow(p[2], 2) <= 1);
 }
+
 
 mitk::ScalarType mitk::Ellipsoid::GetVolume()
 {

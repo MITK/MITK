@@ -27,17 +27,10 @@ PURPOSE.  See the above copyright notices for more information.
 *****************************************************************************/
 #include <mitkProperties.h>
 #include <mitkStringProperty.h>
+#include <mitkLevelWindowProperty.h>
 #include <mitkGeometry2DDataVtkMapper3D.h>
 #include <vtkRenderer.h>
 #include <mitkOpenGLRenderer.h>
-
-void QmitkStdMultiWidget::updateMitkWidgets()
-{
-  mitkWidget1->GetRenderer()->GetRenderWindow()->Repaint(); 
-  mitkWidget2->GetRenderer()->GetRenderWindow()->Repaint(); 
-  mitkWidget3->GetRenderer()->GetRenderWindow()->Repaint(); 
-  mitkWidget4->GetRenderer()->GetRenderWindow()->Repaint();
-}
 
 void QmitkStdMultiWidget::init()
 {
@@ -58,22 +51,22 @@ void QmitkStdMultiWidget::init()
   color[0]=qcolor.red()/255.0; color[1]=qcolor.green()/255.0; color[2]=qcolor.blue()/255.0;
   planeNode=mitkWidget1->GetRenderer()->GetCurrentWorldGeometry2DNode();
   planeNode->SetColor(color);
-  layer = new mitk::IntProperty(1);	
-  planeNode->SetProperty("layer",layer); 	  
+  layer = new mitk::IntProperty(1);
+  planeNode->SetProperty("layer",layer);
   // ... of widget 2
   qcolor=mitkWidget2->paletteBackgroundColor();
   color[0]=qcolor.red()/255.0; color[1]=qcolor.green()/255.0; color[2]=qcolor.blue()/255.0;
   planeNode=mitkWidget2->GetRenderer()->GetCurrentWorldGeometry2DNode();
   planeNode->SetColor(color);
-  layer = new mitk::IntProperty(1);	
-  planeNode->SetProperty("layer",layer); 	  
+  layer = new mitk::IntProperty(1);
+  planeNode->SetProperty("layer",layer);
   // ... of widget 3
   qcolor=mitkWidget3->paletteBackgroundColor();
   color[0]=qcolor.red()/255.0; color[1]=qcolor.green()/255.0; color[2]=qcolor.blue()/255.0;
   planeNode=mitkWidget3->GetRenderer()->GetCurrentWorldGeometry2DNode();
   planeNode->SetColor(color);
-  layer = new mitk::IntProperty(1);	
-  planeNode->SetProperty("layer",layer); 	  
+  layer = new mitk::IntProperty(1);
+  planeNode->SetProperty("layer",layer);
   // ... of widget 4
   qcolor=mitkWidget4->paletteBackgroundColor();
   color[0]=qcolor.red()/255.0; color[1]=qcolor.green()/255.0; color[2]=qcolor.blue()/255.0;
@@ -120,7 +113,7 @@ void QmitkStdMultiWidget::changeLayoutTo2DImagesUp()
 
   mitkWidget1->setMaximumSize(2000,200);
   mitkWidget2->setMaximumSize(2000,200);
-  mitkWidget3->setMaximumSize(2000,200);    
+  mitkWidget3->setMaximumSize(2000,200);
 
   TwoDLayout ->addWidget( mitkWidget1 );
   TwoDLayout ->addWidget( mitkWidget2 );
@@ -153,7 +146,7 @@ void QmitkStdMultiWidget::changeLayoutTo2DImagesLeft()
 
   mitkWidget1->setMaximumSize(300,300);
   mitkWidget2->setMaximumSize(300,300);
-  mitkWidget3->setMaximumSize(300,300);    
+  mitkWidget3->setMaximumSize(300,300);
 
   TwoDLayout ->addWidget( mitkWidget1 );
   TwoDLayout ->addWidget( mitkWidget2 );
@@ -230,7 +223,7 @@ void QmitkStdMultiWidget::changeLayoutToWidget1()
 
   QHBoxLayout *layout4 = new QHBoxLayout( 0, 0, 6, "layout4");
 
-  mitkWidget1->setMaximumSize(2000,2000);    
+  mitkWidget1->setMaximumSize(2000,2000);
 
   mitkWidget2->hide();
   mitkWidget3->hide();
@@ -254,7 +247,7 @@ void QmitkStdMultiWidget::changeLayoutToWidget2()
   mitkWidget1->hide();
   mitkWidget3->hide();
   mitkWidget4->hide();	
-  if (mitkWidget2->isHidden()) mitkWidget2->show();    
+  if (mitkWidget2->isHidden()) mitkWidget2->show();
 
   layout4->addWidget( mitkWidget2 );
   layout4->addWidget( levelWindowWidget );
@@ -270,7 +263,7 @@ void QmitkStdMultiWidget::changeLayoutToWidget3()
 
   QHBoxLayout *layout4 = new QHBoxLayout( 0, 0, 6, "layout4");
 
-  mitkWidget3->setMaximumSize(2000,2000);    
+  mitkWidget3->setMaximumSize(2000,2000);
 
   mitkWidget1->hide();
   mitkWidget2->hide();
@@ -305,9 +298,9 @@ void QmitkStdMultiWidget::changeLayoutTo2x2Dand3DWidget()
   if (mitkWidget1->isHidden()) mitkWidget1->show();
   if (mitkWidget2->isHidden()) mitkWidget2->show();
   if (!mitkWidget3->isHidden()) mitkWidget3->hide();
-  if (mitkWidget4->isHidden()) mitkWidget4->show();    
+  if (mitkWidget4->isHidden()) mitkWidget4->show();
 
-  QmitkStdMultiWidgetLayout->addLayout( layout2 );   
+  QmitkStdMultiWidgetLayout->addLayout( layout2 );
 }
 
 void QmitkStdMultiWidget::changeLayoutToRowWidget3And4()
@@ -323,8 +316,8 @@ void QmitkStdMultiWidget::changeLayoutToRowWidget3And4()
   if (mitkWidget3->isHidden()) mitkWidget3->show();
   if (mitkWidget4->isHidden()) mitkWidget4->show();
 
-  mitkWidget3->setMaximumSize(2000,2000);    
-  mitkWidget4->setMaximumSize(2000,2000);    
+  mitkWidget3->setMaximumSize(2000,2000);
+  mitkWidget4->setMaximumSize(2000,2000);
 
   layout4 ->addWidget( mitkWidget3);
   layout4 ->addWidget( mitkWidget4);
@@ -347,8 +340,8 @@ void QmitkStdMultiWidget::changeLayoutToColumnWidget3And4()//doesn't work yet
   if (mitkWidget3->isHidden()) mitkWidget3->show();
   if (mitkWidget4->isHidden()) mitkWidget4->show();
 
-  mitkWidget3->setMaximumSize(2000,2000);    
-  mitkWidget4->setMaximumSize(2000,2000);    
+  mitkWidget3->setMaximumSize(2000,2000);
+  mitkWidget4->setMaximumSize(2000,2000);
 
   layout3 ->addWidget( mitkWidget3,0,0 );
   layout3 ->addWidget( mitkWidget4,1,0 );
@@ -358,9 +351,7 @@ void QmitkStdMultiWidget::changeLayoutToColumnWidget3And4()//doesn't work yet
   QmitkStdMultiWidgetLayout->addLayout( layout4 );
 }
 
-
-
-void QmitkStdMultiWidget::setData( mitk::DataTreeIteratorBase* it )
+void QmitkStdMultiWidget::SetData( mitk::DataTreeIteratorBase* it )
 {
   mitkWidget1->GetRenderer()->SetData(it);
   mitkWidget2->GetRenderer()->SetData(it);
@@ -368,7 +359,7 @@ void QmitkStdMultiWidget::setData( mitk::DataTreeIteratorBase* it )
   mitkWidget4->GetRenderer()->SetData(it);
 }
 
-void QmitkStdMultiWidget::fit()
+void QmitkStdMultiWidget::Fit()
 {
   vtkRenderer * vtkrenderer;
   mitkWidget1->GetRenderer()->GetDisplayGeometry()->Fit();
@@ -389,21 +380,7 @@ void QmitkStdMultiWidget::fit()
   vtkObject::SetGlobalWarningDisplay(w);
 }
 
-void QmitkStdMultiWidget::initWidget(mitk::DataTreeIteratorBase* it,
-                                     QmitkSelectableGLWidget* widget,
-                                     const mitk::Vector3D& origin,
-                                     const mitk::Vector3D& right,
-                                     const mitk::Vector3D& bottom)
-{
-
-}
-
-void QmitkStdMultiWidget::initWidgets( mitk::DataTreeIteratorBase* it )
-{
-
-}
-
-void QmitkStdMultiWidget::addPlaneSubTree(mitk::DataTreeIteratorBase* it)
+void QmitkStdMultiWidget::AddDisplayPlaneSubTree(mitk::DataTreeIteratorBase* it)
 {
   // add the diplayed planes of the multiwidget to a node to which the subtree @a planesSubTree points ...
 
@@ -437,34 +414,6 @@ void QmitkStdMultiWidget::addPlaneSubTree(mitk::DataTreeIteratorBase* it)
   planesIterator = dit;
 }
 
-void QmitkStdMultiWidget::texturizePlaneSubTree(mitk::DataTreeIteratorBase* it)
-{
-  if(planesSubTree == NULL)
-    return;
-
-  assert(planesIterator.IsNotNull());
-  mitk::DataTreeIteratorClone git = planesIterator; //planesSubTree->inorderIterator();
-
-  while(!git->IsAtEnd())
-  {
-    if(dynamic_cast<mitk::Geometry2DData*>(git->Get()->GetData())!=NULL)
-    {
-      mitk::Geometry2DDataVtkMapper3D::Pointer geometryMapper;
-      if(git->Get()->GetMapper(2)==NULL)
-      {
-        geometryMapper = mitk::Geometry2DDataVtkMapper3D::New();
-        it->Get()->SetMapper(2, geometryMapper);
-      }
-      else
-        geometryMapper = dynamic_cast<mitk::Geometry2DDataVtkMapper3D*>(git->Get()->GetMapper(2));
-      if(geometryMapper.IsNotNull())
-        geometryMapper->SetDataIteratorForTexture(it);
-    }
-    ++git;
-  }
-}
-
-
 mitk::MultiplexUpdateController* QmitkStdMultiWidget::GetMultiplexUpdateController()
 {
   return multiplexUpdateController.GetPointer();
@@ -476,6 +425,18 @@ mitk::SliceNavigationController* QmitkStdMultiWidget::GetTimeNavigationControlle
   return timeNavigationController.GetPointer();
 }
 
+void QmitkStdMultiWidget::EnableStandardLevelWindow()
+{
+  levelWindowWidget->disconnect(this);
+  connect(levelWindowWidget,SIGNAL(levelWindow(mitk::LevelWindow*)),this,SLOT(changeLevelWindow(mitk::LevelWindow*)) );
+  levelWindowWidget->show();
+}
+
+void QmitkStdMultiWidget::DisableStandardLevelWindow()
+{
+  levelWindowWidget->disconnect(this);
+  levelWindowWidget->hide();
+}
 
 bool QmitkStdMultiWidget::InitializeStandardViews(mitk::DataTreeIteratorBase * it)
 {
@@ -524,7 +485,8 @@ bool QmitkStdMultiWidget::InitializeStandardViews(mitk::DataTreeIteratorBase * i
         geometry=timegeometry;
       }
 
-      if(const_cast<mitk::BoundingBox*>(geometry->GetBoundingBox())->GetDiagonalLength2()>=mitk::eps)
+      double diagonalLength  = const_cast<mitk::BoundingBox*>(geometry->GetBoundingBox())->GetDiagonalLength2();
+      if((diagonalLength>=mitk::eps) && (diagonalLength<=mitk::ScalarTypeNumericTraits::max()/10))
       {
         boundingBoxInitialized=true;
         multiplexUpdateController->SetBlockUpdate(true);
@@ -534,7 +496,7 @@ bool QmitkStdMultiWidget::InitializeStandardViews(mitk::DataTreeIteratorBase * i
         timeNavigationController->SetInputWorldGeometry(geometry.GetPointer());  timeNavigationController->Update();
         multiplexUpdateController->SetBlockUpdate(false);
         multiplexUpdateController->UpdateRequest();
-        fit();
+        Fit();
       }
     }
   }
@@ -575,10 +537,18 @@ bool QmitkStdMultiWidget::InitializeStandardViews( mitk::Geometry3D * geometry )
     timeNavigationController->SetInputWorldGeometry(clonedgeometry.GetPointer());  timeNavigationController->Update();
     multiplexUpdateController->SetBlockUpdate(false);
     multiplexUpdateController->UpdateRequest();
-    fit();
+    Fit();
     boundingBoxInitialized=true; 
   }
   return boundingBoxInitialized;
+}
+
+void QmitkStdMultiWidget::Repaint()
+{
+  mitkWidget1->GetRenderer()->GetRenderWindow()->Repaint(); 
+  mitkWidget2->GetRenderer()->GetRenderWindow()->Repaint(); 
+  mitkWidget3->GetRenderer()->GetRenderWindow()->Repaint(); 
+  mitkWidget4->GetRenderer()->GetRenderWindow()->Repaint();
 }
 
 void QmitkStdMultiWidget::wheelEvent( QWheelEvent * e )
@@ -587,13 +557,10 @@ void QmitkStdMultiWidget::wheelEvent( QWheelEvent * e )
   emit WheelMoved( e );
 }
 
-
 mitk::DisplayVectorInteractor* QmitkStdMultiWidget::GetMoveAndZoomInteractor()
 {
   return m_MoveAndZoomInteractor;
 }
-
-
 
 void QmitkStdMultiWidget::ReInitializeStandardViews()
 {
@@ -612,6 +579,46 @@ void QmitkStdMultiWidget::ReInitializeStandardViews()
   timeNavigationController->Update();
   multiplexUpdateController->SetBlockUpdate(false);
   multiplexUpdateController->UpdateRequest();
-
 }
 
+QmitkRenderWindow* QmitkStdMultiWidget::GetRenderWindow1() const
+{
+  return mitkWidget1->GetRenderWindow();
+}
+
+QmitkRenderWindow* QmitkStdMultiWidget::GetRenderWindow2() const
+{
+  return mitkWidget2->GetRenderWindow();
+}
+
+QmitkRenderWindow* QmitkStdMultiWidget::GetRenderWindow3() const
+{
+  return mitkWidget3->GetRenderWindow();
+}
+
+QmitkRenderWindow* QmitkStdMultiWidget::GetRenderWindow4() const
+{
+  return mitkWidget4->GetRenderWindow();
+}
+
+void QmitkStdMultiWidget::changeLevelWindow(mitk::LevelWindow* lw)
+{
+  mitk::DataTreeIteratorClone it = mitkWidget1->GetRenderer()->GetData();
+  while(!it->IsAtEnd())
+  {
+    mitk::LevelWindowProperty::Pointer levWinProp = dynamic_cast<mitk::LevelWindowProperty*>(it->Get()->GetPropertyList()->GetProperty("levelwindow").GetPointer());
+    if( levWinProp.IsNotNull() )
+    {
+      mitk::LevelWindow levWin = levWinProp->GetLevelWindow();
+
+      levWin.SetMin(lw->GetMin());
+      levWin.SetMax(lw->GetMax());
+      levWin.SetRangeMin(lw->GetRangeMin());
+      levWin.SetRangeMax(lw->GetRangeMax());
+
+      levWinProp->SetLevelWindow(levWin);
+    }
+    ++it;
+  }
+  Repaint();
+}

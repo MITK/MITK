@@ -133,10 +133,8 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
     }
     if (factory->GetOutput()->GetData() != NULL) //assure that we have at least one valid output
     {
-      mitk::DataTreePreOrderIterator it(tree);
-      mitkMultiWidget->texturizePlaneSubTree(&it);
-      mitkMultiWidget->updateMitkWidgets();
-      mitkMultiWidget->fit();
+      mitkMultiWidget->Repaint();
+      mitkMultiWidget->Fit();
     }
   }
   catch ( itk::ExceptionObject & ex )
@@ -191,10 +189,8 @@ void QmitkMainTemplate::fileOpenImageSequence()
     }
     if (factory->GetOutput()->GetData() != NULL) //assure that we have at least one valid output
     {
-      mitk::DataTreePreOrderIterator it(tree);
-      mitkMultiWidget->texturizePlaneSubTree(&it);
-      mitkMultiWidget->updateMitkWidgets();
-      mitkMultiWidget->fit();
+      mitkMultiWidget->Repaint();
+      mitkMultiWidget->Fit();
     }
   }
 }
@@ -399,10 +395,11 @@ void QmitkMainTemplate::initialize()
     // add the diplayed planes of the multiwidget to a node to which the subtree @a planesSubTree points ...
     
     mitk::DataTreePreOrderIterator it(tree);
-    mitkMultiWidget->addPlaneSubTree(&it);
-    mitkMultiWidget->setData(&it);
 
-    connect(mitkMultiWidget->levelWindowWidget,SIGNAL(levelWindow(mitk::LevelWindow*)),this,SLOT(changeLevelWindow(mitk::LevelWindow*)) );
+    mitkMultiWidget->SetData(&it);
+
+    mitkMultiWidget->AddDisplayPlaneSubTree(&it);
+    mitkMultiWidget->EnableStandardLevelWindow();
   }
   initializeFunctionality();
 }
@@ -476,37 +473,9 @@ void QmitkMainTemplate::parseCommandLine()
   }
 }
 
-
-
-void QmitkMainTemplate::changeLevelWindow(mitk::LevelWindow* lw )
-{
-
-  mitk::DataTreePreOrderIterator it(tree);
-  while(!it.IsAtEnd())
-  {
-    mitk::LevelWindowProperty::Pointer levWinProp = dynamic_cast<mitk::LevelWindowProperty*>(it.Get()->GetPropertyList()->GetProperty("levelwindow").GetPointer());
-    if( levWinProp.IsNotNull() )
-    {
-      mitk::LevelWindow levWin = levWinProp->GetLevelWindow();
-
-      levWin.SetMin(lw->GetMin());
-      levWin.SetMax(lw->GetMax());
-      levWin.SetRangeMin(lw->GetRangeMin());
-      levWin.SetRangeMax(lw->GetRangeMax());
-
-      levWinProp->SetLevelWindow(levWin);
-
-    }
-    ++it;
-  }
-  mitkMultiWidget->updateMitkWidgets();
-}
-
-
 mitk::DataTree::Pointer QmitkMainTemplate::GetTree() {
   return tree;
 }
-
 
 void QmitkMainTemplate::changeTo2DImagesUpLayout()
 {

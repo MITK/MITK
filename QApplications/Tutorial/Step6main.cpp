@@ -13,6 +13,7 @@ int main(int argc, char* argv[])
   }
 
   Step6 mainWindow(argc, argv, NULL, "mainwindow");
+  mainWindow.Initialize();
   qtapplication.setMainWidget(&mainWindow);
   mainWindow.show();
 

@@ -56,7 +56,7 @@ mitk::OpenGLRenderer* QmitkSelectableGLWidget::GetRenderer()
 
 
 
-QWidget* QmitkSelectableGLWidget::GetQRenderWindow()
+QmitkRenderWindow* QmitkSelectableGLWidget::GetRenderWindow() const
 {
     return mitkWidget;
 }

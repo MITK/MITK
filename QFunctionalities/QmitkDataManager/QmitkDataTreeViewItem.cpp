@@ -24,7 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "enabled.xpm"
 #include "disabled.xpm"
 QmitkDataTreeViewItem::QmitkDataTreeViewItem( QListView *parent, const QString &s1 , const QString &s2 , mitk::DataTreeIteratorBase* nodeIt )
-    : QListViewItem( parent, s1, s2 ), m_DataTreeIterator(NULL)
+  : QListViewItem( parent, s1, s2 ), m_DataTreeIterator(NULL)
 {
   assert(nodeIt!=NULL);
   m_DataTreeIterator = nodeIt;
@@ -49,25 +49,32 @@ QmitkDataTreeViewItem::QmitkDataTreeViewItem( QmitkDataTreeViewItem * parent, mi
 
   m_TreeNode = nodeIt->Get();
   char name[256];
-  
-  if (m_TreeNode->GetName(*name, NULL)) {
-	  QListViewItem::setText(0,QString(name));
-  } else {
-	  QListViewItem::setText(0,"No name!");
-  }  	
-  
-  std::stringstream ss;
-  ss << m_TreeNode->GetReferenceCount() << "/";
-  mitk::BaseData::ConstPointer bd = m_TreeNode->GetData();
-   if (bd.IsNotNull()) {
-	  QListViewItem::setText(1,QString(bd->GetNameOfClass())) ;
-     ss << m_TreeNode->GetData()->GetReferenceCount();
-   } else {
-	  QListViewItem::setText(1,QString("empty DataTreeNode"));
-	ss << "-";	
+
+  if(m_TreeNode.IsNotNull())
+  {
+    if (m_TreeNode->GetName(*name, NULL)) {
+      QListViewItem::setText(0,QString(name));
+    } else {
+      QListViewItem::setText(0,"No name!");
+    }
+
+    std::stringstream ss;
+    ss << m_TreeNode->GetReferenceCount() << "/";
+    mitk::BaseData::ConstPointer bd = m_TreeNode->GetData();
+    if (bd.IsNotNull()) {
+      QListViewItem::setText(1,QString(bd->GetNameOfClass())) ;
+      ss << m_TreeNode->GetData()->GetReferenceCount();
+    } else {
+      QListViewItem::setText(1,QString("empty DataTreeNode"));
+      ss << "-";
+    }
+    QListViewItem::setText(2,QString(ss.str().c_str()));
   }
-  
-  QListViewItem::setText(2,QString(ss.str().c_str()));
+  else
+  {
+    QListViewItem::setText(0,"NULL node!");
+  }
+
   mitk::DataTreeChildIterator it(*nodeIt);
   while (!it.IsAtEnd())
   {
@@ -78,25 +85,25 @@ QmitkDataTreeViewItem::QmitkDataTreeViewItem( QmitkDataTreeViewItem * parent, mi
 }
 
 mitk::DataTreeNode::ConstPointer QmitkDataTreeViewItem::GetDataTreeNode() const {
-	return m_TreeNode;
+  return m_TreeNode;
 }
 
 void QmitkNodeViewBaseItem::updateEnabledAppearance() {
-      static const QPixmap enabledPix((const char **)enabled_xpm);
-      static const QPixmap disabledPix((const char **)disabled_xpm);
-      // ok, we are instanceof QListViewItem, but the cast
-      // is ugly:
-      QListViewItem* listViewItem = NULL;
-      listViewItem = dynamic_cast<NodeViewPropertyItem*>(this);
-      if ((listViewItem = dynamic_cast<NodeViewPropertyItem*>(this)) ||
-	  (listViewItem = dynamic_cast<NodeViewCheckboxItem*>(this))) {
-	if (isPropEnabled()) {
-	  listViewItem->setPixmap(0,enabledPix);
-	} else {
-	  listViewItem->setPixmap(0,disabledPix);
-
-	}
-
+  static const QPixmap enabledPix((const char **)enabled_xpm);
+  static const QPixmap disabledPix((const char **)disabled_xpm);
+  // ok, we are instanceof QListViewItem, but the cast
+  // is ugly:
+  QListViewItem* listViewItem = NULL;
+  listViewItem = dynamic_cast<NodeViewPropertyItem*>(this);
+  if ((listViewItem = dynamic_cast<NodeViewPropertyItem*>(this)) ||
+    (listViewItem = dynamic_cast<NodeViewCheckboxItem*>(this))) {
+      if (isPropEnabled()) {
+        listViewItem->setPixmap(0,enabledPix);
+      } else {
+        listViewItem->setPixmap(0,disabledPix);
 
       }
+
+
     }
+}

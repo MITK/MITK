@@ -1,4 +1,4 @@
-<!DOCTYPE UI><UI version="3.2" stdsetdef="1">
+<!DOCTYPE UI><UI version="3.3" stdsetdef="1">
 <class>QmitkSelectableGLWidget</class>
 <widget class="QWidget">
     <property name="name">
@@ -34,14 +34,14 @@
     <include location="local" impldecl="in implementation">QmitkSelectableGLWidget.ui.h</include>
 </includes>
 <variables>
-    <variable>QWidget *mitkWidget;</variable>
+    <variable>QmitkRenderWindow *mitkWidget;</variable>
     <variable>mitk::OpenGLRenderer::Pointer renderer;</variable>
     <variable>mitk::SliceNavigationController::Pointer sliceNavigationController;</variable>
 </variables>
 <functions>
     <function access="private" specifier="non virtual">init()</function>
     <function returnType="mitk::OpenGLRenderer *">GetRenderer()</function>
-    <function returnType="QWidget *">GetQRenderWindow()</function>
+    <function returnType="QmitkRenderWindow *">GetRenderWindow() const</function>
     <function returnType="mitk::SliceNavigationController *">GetSliceNavigationController()</function>
     <function access="protected">wheelEvent( QWheelEvent * e )</function>
 </functions>

@@ -839,7 +839,6 @@
     <slot>helpIndex()</slot>
     <slot>helpContents()</slot>
     <slot>helpAbout()</slot>
-    <slot>changeLevelWindow( mitk::LevelWindow * lw )</slot>
     <slot>changeTo2DImagesUpLayout()</slot>
     <slot>changeTo2DImagesLeftLayout()</slot>
     <slot>changeToDefaultLayout()</slot>

@@ -15,9 +15,11 @@ public:
   Step6( int argc, char* argv[], QWidget *parent=0, const char *name=0 );
   ~Step6() {};
 
+  virtual void Initialize();
+
 protected:
   void Load(int argc, char* argv[]);
-  void SetupWidgets();
+  virtual void SetupWidgets();
 
   template < typename TPixel, unsigned int VImageDimension > 
   void RegionGrowing( itk::Image<typename TPixel, VImageDimension>* itkImage, mitk::Geometry3D* geometry);

@@ -18,7 +18,6 @@ Step7::Step7( int argc, char* argv[], QWidget *parent, const char *name )
 {
 }
 
-
 void Step7::StartRegionGrowing()
 {
   Step6::StartRegionGrowing();

@@ -414,6 +414,7 @@ bool mitk::Image::SetPicSlice(ipPicDescriptor *pic, int s, int t, int n)
 bool mitk::Image::SetPicVolume(ipPicDescriptor *pic, int t, int n)
 {
 	if(pic==NULL) return false;
+    if((pic->dim==2) && ((m_Dimension==2) || ((m_Dimension>2) && (m_Dimensions[2]==1)))) return SetPicSlice(pic, 0, t, n);
 	if(pic->dim!=3) return false;
 	if((pic->n[0]!=m_Dimensions[0]) || (pic->n[1]!=m_Dimensions[1]) || (pic->n[2]!=m_Dimensions[2])) return false;
 	return SetVolume(pic->data,t,n); //FIXME: check dim; add geometry!

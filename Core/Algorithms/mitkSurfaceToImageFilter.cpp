@@ -17,14 +17,15 @@ See MITKCopyright.txt or http://www.mitk.org/ for details.
 =========================================================================*/
 
 #include "mitkSurfaceToImageFilter.h"
+#include "mitkTimeHelper.h"
 
 #include <vtkPolyData.h>
-
 #include <vtkPolyDataToImageStencil.h>
 #include <vtkImageStencil.h>
 #include <vtkImageData.h>
 #include <vtkPolyData.h>
 #include <vtkTriangleFilter.h>
+#include <vtkLinearExtrusionFilter.h>
 #include <vtkDataSetTriangleFilter.h>
 #include <vtkImageThreshold.h>
 #include <vtkImageMathematics.h>
@@ -38,46 +39,130 @@ See MITKCopyright.txt or http://www.mitk.org/ for details.
 mitk::SurfaceToImageFilter::SurfaceToImageFilter()
 {
   m_MakeOutputBinaryOn = false;
+  m_BackgroundValue = -1;
 }
 
 mitk::SurfaceToImageFilter::~SurfaceToImageFilter()
 {
 }
 
+void mitk::SurfaceToImageFilter::GenerateInputRequestedRegion()
+{
+  mitk::Image* output = this->GetOutput();
+  if((output->IsInitialized()==false) )
+    return;
+  // we have already calculated the spatial part of the 
+  // input-requested-region in m_InputRequestedRegion in 
+  // GenerateOutputInformation (which is called before 
+  // GenerateInputRequestedRegion).
+  GenerateTimeInInputRegion(output, const_cast< mitk::Image * > ( this->GetImage() ));
+//  GenerateTimeInInputRegion(output, this->GetImage()->GetLargestPossibleRegion() );
+}
+
 void mitk::SurfaceToImageFilter::GenerateOutputInformation()
 {
   mitk::Surface::ConstPointer input  = this->GetInput();
+  mitk::Image *inputImage = (mitk::Image*)this->GetImage();
   mitk::Image::Pointer output = this->GetOutput();
 
+    // set input-requested-region, because we access it later in
+  // GenerateInputRequestedRegion (there we just set the time)
+//  inputImage->SetRequestedRegion( inputImage->GetLargestPossibleRegion() );
+
+ 
   itkDebugMacro(<<"GenerateOutputInformation()");
 
   if(input.IsNull()) return;
 
-//  output->SetGeometry(static_cast<Geometry3D*>(input->GetGeometry()->Clone().GetPointer()));
+  unsigned int dimension = inputImage->GetDimension();
+  unsigned int *dimensions = new unsigned int [dimension];
+  memcpy(dimensions, inputImage->GetDimensions(), dimension*sizeof(unsigned int));
+  mitk::PixelType pixelType;
+  pixelType.Initialize(typeid(int));
+  output->Initialize( pixelType, dimension, dimensions);
+  delete [] dimensions;
+
+  // set the spacing
+  mitk::Vector3D spacing = inputImage->GetSlicedGeometry()->GetSpacing();
+  output->SetSpacing(spacing);
+  output->SetRequestedRegionToLargestPossibleRegion();
+
+  // Position the output Image to match the corresponding region of the input image
+  mitk::SlicedGeometry3D* slicedGeometry = output->GetSlicedGeometry();
+  const mitk::SlicedData::IndexType& start = inputImage->GetLargestPossibleRegion().GetIndex();
+  slicedGeometry->GetVtkTransform()->Translate(start[0], start[1], start[2]);
+  slicedGeometry->TransferVtkToITKTransform();
+
+  mitk::TimeSlicedGeometry* timeSlicedGeometry = output->GetTimeSlicedGeometry();
+  timeSlicedGeometry->InitializeEvenlyTimed(slicedGeometry, output->GetDimension(3));
+  timeSlicedGeometry->CopyTimes(inputImage->GetTimeSlicedGeometry());
+
+  //  m_TimeOfHeaderInitialization.Modified();
 }
 
 void mitk::SurfaceToImageFilter::GenerateData()
 {
-  vtkPolyData * polydata = ( (mitk::Surface*)GetInput() )->GetVtkPolyData();
+  mitk::Image::ConstPointer inputImage = this->GetImage();
+  mitk::Image::Pointer output = this->GetOutput();
 
+
+
+  if(inputImage.IsNull())
+    return;  
+
+  if(output->IsInitialized()==false )
+    return;
+
+  mitk::Image::RegionType outputRegion = output->GetRequestedRegion();
+  //const mitk::TimeSlicedGeometry *outputTimeGeometry = output->GetTimeSlicedGeometry();
+  //const mitk::TimeSlicedGeometry *inputTimeGeometry = input->GetTimeSlicedGeometry();
+  //const mitk::TimeSlicedGeometry *boundingObjectTimeGeometry = m_BoundingObject->GetTimeSlicedGeometry();
+  //ScalarType timeInMS;
+
+  int timestep=0;
+  int tstart=outputRegion.GetIndex(3);
+  int tmax=tstart+outputRegion.GetSize(3);
+
+  if ( tmax > 0)
+  {
+    int t;
+    for(t=tstart;t<tmax;++t)
+    {
+      Stencil3DImage( t );
+    }
+  }
+  else 
+  {
+      Stencil3DImage( 0 );
+  }
+}
+
+void mitk::SurfaceToImageFilter::Stencil3DImage(int time)
+{
+  const mitk::TimeSlicedGeometry *surfaceTimeGeometry = GetInput()->GetTimeSlicedGeometry();
+  const mitk::TimeSlicedGeometry *imageTimeGeometry = GetImage()->GetTimeSlicedGeometry();
+  
+  int surfaceTimeStep = surfaceTimeGeometry->TimeStepToMS( imageTimeGeometry->TimeStepToMS(time) );
+  
+  vtkPolyData * polydata = ( (mitk::Surface*)GetInput() )->GetVtkPolyData( surfaceTimeStep );
   vtkTransformPolyDataFilter * move=vtkTransformPolyDataFilter::New();
   move->SetInput(polydata);
   vtkTransform *transform=vtkTransform::New();
-  GetImage()->GetGeometry()->TransferItkToVtkTransform();
-  transform->SetMatrix(GetImage()->GetGeometry()->GetVtkTransform()->GetMatrix());
-  transform->Inverse();
+  surfaceTimeGeometry->GetGeometry3D( surfaceTimeStep )->TransferItkToVtkTransform();
+  transform->SetMatrix(surfaceTimeGeometry->GetGeometry3D( surfaceTimeStep )->GetVtkTransform()->GetMatrix());
+//  transform->Inverse();
   transform->PostMultiply();
-  transform->Translate(0.5,0.5,0.5); /// warum????
+  //  transform->Translate(0.5,0.5,0.5); /// warum????
   move->SetTransform(transform);
-
+  move->Update();
   polydata=move->GetOutput();
- 
+
   vtkPolyDataNormals * normalsFilter = vtkPolyDataNormals::New();
   normalsFilter->SetInput( polydata );
   normalsFilter->SetFeatureAngle(50);
-  normalsFilter->ConsistencyOn();
-  normalsFilter->SplittingOn();
-  normalsFilter->FlipNormalsOn();
+  normalsFilter->SetConsistency(1);
+  normalsFilter->SetSplitting(1);
+  normalsFilter->SetFlipNormals(0);
   normalsFilter->Update();
 
   vtkPolyDataToImageStencil * surfaceConverter = vtkPolyDataToImageStencil::New();
@@ -85,25 +170,23 @@ void mitk::SurfaceToImageFilter::GenerateData()
   surfaceConverter->SetTolerance( 0.0 );
   surfaceConverter->Update();
 
-  vtkImageData * tmp = ( (mitk::Image*)GetImage() )->GetVtkImageData();
-
-  vtkImageChangeInformation* m_UnitSpacingImageFilter = vtkImageChangeInformation::New();
-  m_UnitSpacingImageFilter->SetInput(tmp);
-  m_UnitSpacingImageFilter->SetOutputSpacing(1.0,1.0,1.0);
-  tmp=m_UnitSpacingImageFilter->GetOutput();
-
+  vtkImageData * tmp = ( (mitk::Image*)GetImage() )->GetVtkImageData( time );
   vtkImageMathematics * maths = vtkImageMathematics::New();
   maths->SetOperationToAddConstant();
-  maths->SetConstantC(100);
+  maths->SetConstantC(0);
   maths->SetConstantK(100);
   maths->SetInput1(tmp);
   maths->Update();
 
+  vtkImageCast * castFilter = vtkImageCast::New();
+  castFilter->SetOutputScalarTypeToInt();
+  castFilter->SetInput( tmp );
+
   vtkImageStencil * stencil = vtkImageStencil::New();
   stencil->SetStencil( surfaceConverter->GetOutput() );
-  stencil->SetBackgroundValue( 0 );
+  stencil->SetBackgroundValue( m_BackgroundValue );
   stencil->ReverseStencilOff();
-  stencil->SetInput( maths->GetOutput() );
+  stencil->SetInput( castFilter->GetOutput() );
   stencil->Update();
 
   if (m_MakeOutputBinaryOn)
@@ -118,24 +201,20 @@ void mitk::SurfaceToImageFilter::GenerateData()
     threshold->Update();
 
     vtkImageCast * castFilter = vtkImageCast::New();
-    castFilter->SetOutputScalarTypeToUnsignedChar();
+    castFilter->SetOutputScalarTypeToInt();
     castFilter->SetInput(threshold->GetOutput() );
     castFilter->Update();
 
     mitk::Image::Pointer output = this->GetOutput();
-    output->Initialize( castFilter->GetOutput() );
-    output->SetGeometry( static_cast<mitk::Geometry3D*>(GetImage()->GetGeometry()->Clone().GetPointer()) );
-    output->SetVolume( castFilter->GetOutput()->GetScalarPointer() );
+    //output->Initialize( castFilter->GetOutput() );
+    //output->SetGeometry( static_cast<mitk::Geometry3D*>(GetImage()->GetGeometry()->Clone().GetPointer()) );
+    output->SetVolume( stencil->GetOutput()->GetScalarPointer(), time );
   }
   else
   {
     mitk::Image::Pointer output = this->GetOutput();
-    output->Initialize( stencil->GetOutput() );
-    output->SetGeometry( static_cast<mitk::Geometry3D*>(GetImage()->GetGeometry()->Clone().GetPointer()) );
-    output->SetVolume( stencil->GetOutput()->GetScalarPointer() );
+    output->SetVolume( stencil->GetOutput()->GetScalarPointer(), time );
   }
-  
-
 }
 
 

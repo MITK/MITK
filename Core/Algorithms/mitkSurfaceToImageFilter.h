@@ -39,6 +39,8 @@ namespace mitk {
  * User can decide if he wants to keep the original values or create a binary image 
  * by setting MakeBinaryOutputOn (default is false). If set to true all voxels inside the 
  * surface are set to one and all outside voxel are set to zero.
+ *
+ *  The pixel type of the output image is currently always integer
  * 
  * @ingroup SurfaceFilters
  * @ingroup Process
@@ -52,6 +54,10 @@ public:
   itkSetMacro(MakeOutputBinaryOn, bool);
   itkGetMacro(MakeOutputBinaryOn, bool);
 
+	itkGetConstMacro(BackgroundValue,float);
+	itkSetMacro(BackgroundValue,float);
+
+  virtual void GenerateInputRequestedRegion();
 
   virtual void GenerateOutputInformation();
 
@@ -72,7 +78,11 @@ protected:
   //##ModelId=3EF4A4A70363
   virtual ~SurfaceToImageFilter();
 
+  void Stencil3DImage(int time = 0);
+
   bool m_MakeOutputBinaryOn;
+
+  float m_BackgroundValue;
 
 };
 

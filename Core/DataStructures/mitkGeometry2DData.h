@@ -15,7 +15,6 @@ namespace mitk {
 class Geometry2DData : public BaseData
 {
 public:
-    //##ModelId=3E6423D202FA
     mitkClassMacro(Geometry2DData, BaseData);
 
     itkNewMacro(Self);
@@ -62,6 +61,7 @@ protected:
     //##ModelId=3E639CD30233
     virtual ~Geometry2DData();
 
+    //##ModelId=3E66CC5A0227
 	Geometry2D::ConstPointer m_Geometry2D;
 };
 

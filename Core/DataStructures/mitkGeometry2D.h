@@ -4,7 +4,6 @@
 #include "mitkCommon.h"
 #include "mitkVector.h"
 #include "itkTransform.h"
-#include "ImageSliceSelector.h"
 
 class vtkTransform;
 

@@ -6,12 +6,12 @@ mitk::Geometry2DData::Geometry2DData()
 {
 }
 
-
 //##ModelId=3E639CD30233
 mitk::Geometry2DData::~Geometry2DData()
 {
 }
 
+//##ModelId=3E6423D2030E
 void mitk::Geometry2DData::SetGeometry2D( const mitk::Geometry2D *geometry2d, int t )
 {
     m_Geometry2D=geometry2d;
@@ -57,6 +57,7 @@ void mitk::Geometry2DData::SetRequestedRegion(itk::DataObject *data)
 {
 
 }
+
 //##ModelId=3E67D85E00B7
 void mitk::Geometry2DData::CopyInformation(const itk::DataObject *data)
 {

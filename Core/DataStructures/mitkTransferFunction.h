@@ -24,6 +24,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkDataObject.h>
 #include <itkObjectFactory.h>
 #include <set>
+#include <vtkColorTransferFunction.h>
+#include <vtkPiecewiseFunction.h>
+
 namespace mitk
 {
 
@@ -35,10 +38,11 @@ namespace mitk
   class TransferFunction : public itk::DataObject 
   {
     public:
-      TransferFunction() {}
+      TransferFunction(int min, int max) : m_Min(min), m_Max(max) {}
+      TransferFunction() : m_Min(0), m_Max(255) {}
       mitkClassMacro(TransferFunction, itk::DataObject);
       itkNewMacro(Self);
-      
+       
       class RGBO {
         public:
 	RGBO(int red, int green, int blue, float opacity) : m_Red(red),m_Green(green),m_Blue(blue),m_Opacity(opacity) {}
@@ -62,9 +66,12 @@ namespace mitk
       class Element;
       typedef std::set<mitk::TransferFunction::Element*> ElementSetType; 	
       static void FillValues(std::vector<mitk::TransferFunction::RGBO> &values, const ElementSetType &elements);
+      vtkColorTransferFunction* m_ColorTransferFunction;
+      // vtkColorTransferFunction* m_ColorTransferFunction;
+      
       ElementSetType m_Elements;
       ElementSetType& GetElements() { return m_Elements; }
-
+      
       class Handle {
 
         public:
@@ -93,13 +100,19 @@ namespace mitk
       };
       class Element {
         public:
+          /** triggers recalculation
+           */
+          void UpdateVtkFunctions();
+          
           typedef std::vector<Handle*> HandleSetType;
           HandleSetType m_Handles;
           virtual float GetValueAt(float x) const = 0 ;
           virtual RGBO GetRGBOAt(float x) {
              return RGBO(m_Red,m_Green,m_Blue,GetValueAt(x));
           }
-          Element() : m_Red(127),m_Green(127),m_Blue(127) {}
+          Element() : m_Red(127),m_Green(127),m_Blue(127), m_ColorTransferFunction(vtkColorTransferFunction::New())  {
+          
+          }
           virtual ~Element() {
             for (HandleSetType::iterator it = m_Handles.begin() ; it != m_Handles.end(); it++ ) {
               delete *it;
@@ -112,6 +125,7 @@ namespace mitk
           virtual void UpdateConstraints() {};
           int m_Red,m_Green,m_Blue;
         protected:
+
       };
       class SimpleElement : public Element {
         public:
@@ -177,6 +191,8 @@ namespace mitk
       };
 
     protected:
+          int m_Min;
+          int m_Max;
   };
 }
 #endif 

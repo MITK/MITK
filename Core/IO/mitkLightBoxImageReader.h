@@ -10,28 +10,28 @@ namespace mitk {
 class LightBoxImageReader : public Reader
 {
 public:
-	/** Standard class typedefs. */
-        mitkClassMacro(LightBoxImageReader, Reader);
+    /** Standard class typedefs. */
+    mitkClassMacro(LightBoxImageReader, Reader);
 
-	/** Method for creation through the object factory. */
-	itkNewMacro(Self);
+    /** Method for creation through the object factory. */
+    itkNewMacro(Self);
 
-	void SetLightBox(lightbox_t lightbox);
-	lightbox_t GetLightBox();
+    void SetLightBox(lightbox_t lightbox);
+    lightbox_t GetLightBox();
 
 protected:
-	virtual void GenerateData();
+    virtual void GenerateData();
 
-	virtual void GenerateOutputInformation();
+    virtual void GenerateOutputInformation();
 
-	LightBoxImageReader();
+    LightBoxImageReader();
 
-	~LightBoxImageReader();
+    ~LightBoxImageReader();
 
-	/** Time when Header was last read. */
-	itk::TimeStamp m_ReadHeaderTime;
+    /** Time when Header was last read. */
+    itk::TimeStamp m_ReadHeaderTime;
 
-	lightbox_t m_LightBox;
+    lightbox_t m_LightBox;
 };
 
 } // namespace mitk

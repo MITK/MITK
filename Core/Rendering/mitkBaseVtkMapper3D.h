@@ -3,13 +3,16 @@
 
 #include "mitkCommon.h"
 #include "Mapper.h"
-#include <vtkProp.h>
 #include "Mapper3D.h"
+
+class vtkProp;
+class vtkProp3D;
 
 namespace mitk {
 
 //##ModelId=3E32C62B00BE
 //##Documentation
+//## @brief Base class of all vtk-based 3D-Mappers
 //## Base class of all vtk-based 3D-Mappers. Those must implement the abstract
 //## method vtkProp* GetProp().
 class BaseVtkMapper3D : public Mapper3D
@@ -29,11 +32,10 @@ public:
     itkTypeMacro(Mapper,BaseVtkMapper3D);
 
     //##ModelId=3E32C93D0000
-    virtual vtkProp* GetProp() = 0;
+    virtual vtkProp* GetProp();
   protected:
     //##ModelId=3E3424950213
     BaseVtkMapper3D();
-
   
     //##ModelId=3E3424950231
     virtual ~BaseVtkMapper3D();
@@ -55,7 +57,7 @@ public:
 protected:
     //##ModelId=3E33ECF2030B
     Geometry3D::Pointer m_Geometry;
-    //##ModelId=3E33ECF20317
+    //##ModelId=3ED91D050038
     LevelWindow m_LevelWindow;
 
     //##ModelId=3E3AE0DC023D
@@ -66,6 +68,9 @@ protected:
 
     //##ModelId=3E33ECF203B5
     int m_ChannelNr;
+
+    //##ModelId=3ED91D050046
+	vtkProp3D* m_Prop3D;
 };
 
 } // namespace mitk

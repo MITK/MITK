@@ -64,8 +64,8 @@ template <class Tin, class Tout>
   inline void vnl2vtk(const vnl_vector<Tin>& in, Tout *out)
 {
   unsigned int i;
-  for(i=0; i<in.size();++i)
-    out[i]=(Tout) in[i];
+  for(i=0; i<in.size();++i)     
+    out[i]=(Tout) (in[i]);
 }
 
 template <class Tin, class Tout>
@@ -73,7 +73,7 @@ template <class Tin, class Tout>
 {
   unsigned int i;
   for(i=0; i<out.size();++i)
-    out[i]=(Tout) in[i];
+    out[i]=(Tout) (in[i]);
 }
 
 template <class Tin, class Tout>
@@ -81,7 +81,7 @@ template <class Tin, class Tout>
 {
   unsigned int i;
   for(i=0; i<out.size();++i)
-    out[i]=(Tout) in[i];
+    out[i]=(Tout) (in[i]);
 }
 
 template <class Tin, class Tout, unsigned int n>
@@ -89,7 +89,7 @@ template <class Tin, class Tout, unsigned int n>
 {
   unsigned int i;
   for(i=0; i<in.size();++i)
-    out[i]=(Tout) in[i];
+    out[i]=(Tout) (in[i]);
 }
 
 template <class Tin, class Tout, unsigned int n>
@@ -97,7 +97,7 @@ template <class Tin, class Tout, unsigned int n>
 {
   unsigned int i;
   for(i=0; i<out.size();++i)
-    out[i]=(Tout) in[i];
+    out[i]=(Tout) (in[i]);
 }
 
 template <class T, unsigned int NVectorDimension>

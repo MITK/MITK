@@ -49,7 +49,9 @@ class Image : public SlicedData
   public:
 
 	//##ModelId=3DCBC2B50345
-    const mitk::PixelType& GetType(int n = 0) const;
+    //##Documentation
+	//## @brief Returns the PixelType of channel @a n.
+    const mitk::PixelType& GetPixelType(int n = 0) const;
 
     //##ModelId=3DCBC5AA0112
     //##Documentation
@@ -225,7 +227,7 @@ class Image : public SlicedData
     m_Geometry3D->SetGeometry2D(planegeometry.GetPointer(), 0, 0);
     m_Geometry3D->SetEvenlySpaced();
 
-		delete tmpDimensions;
+		delete [] tmpDimensions;
 	};
   
 	//##ModelId=3E155CF000F6

@@ -2,7 +2,7 @@
 #include <vtkImageData.h>
 
 //##ModelId=3DCBC2B50345
-const mitk::PixelType& mitk::Image::GetType(int n) const
+const mitk::PixelType& mitk::Image::GetPixelType(int n) const
 {
 	return m_PixelType;
 }
@@ -46,7 +46,7 @@ vtkImageData* mitk::Image::GetVtkImageData(int t, int n)
     mitk::ImageDataItem::Pointer volume=GetVolumeData(t, n);
 	if(volume.IsNull()) 
 		return NULL;
-	float* spacing = const_cast<float*>(GetGeometry()->GetSpacing());
+	float* spacing = const_cast<float*>(GetUpdatedGeometry()->GetSpacing());
 	volume->GetVtkImageData()->SetSpacing(spacing);
 	return volume->GetVtkImageData();
 }

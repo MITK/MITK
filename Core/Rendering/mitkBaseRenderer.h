@@ -30,12 +30,19 @@ class BaseRenderer : public itk::Object
 	/** Run-time type information (and related methods). */
     itkTypeMacro(itk::Object,BaseRenderer);
 
-    //##ModelId=3E330B640353
+	  //##ModelId=3E330B640353
     typedef int MapperSlotId;
 
     //##ModelId=3D6A1791038B
     virtual void SetData(mitk::DataTreeIterator* iterator);
 
+    virtual mitk::DataTreeIterator* GetData()  const {
+		    return m_DataTreeIterator;
+    };
+   mitk::RenderWindow* GetRenderWindow() const {
+		return m_RenderWindow;
+	 }
+  
     //##ModelId=3E330B930328
     virtual void Update() = 0;
 
@@ -83,7 +90,7 @@ class BaseRenderer : public itk::Object
     DisplayGeometry::Pointer m_DisplayGeometry;
 
     //##ModelId=3E3D1FCA0272
-    RenderWindow *m_RenderWindow;
+    RenderWindow* m_RenderWindow;
 
     unsigned long m_LastUpdateTime;
 };

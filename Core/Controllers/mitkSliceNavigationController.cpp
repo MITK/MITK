@@ -98,30 +98,27 @@ void mitk::SliceNavigationController::Update()
           assert(false);
           break;
         case Transversal:
-          //planegeometry->InitializeStandardPlane(
-          //  m_InputWorldGeometry->GetExtent(0), m_InputWorldGeometry->GetExtent(1), 
-          //  m_InputWorldGeometry->GetIndexToWorldTransform(), 
-          //  PlaneGeometry::Transversal, 
-          //  m_InputWorldGeometry->GetExtent(2)-1, false);
-          planegeometry->InitializeStandardPlane(m_InputWorldGeometry, PlaneGeometry::Transversal, m_InputWorldGeometry->GetExtent(2)-1, false);
+          planegeometry->InitializeStandardPlane(
+            m_InputWorldGeometry->GetExtent(0), m_InputWorldGeometry->GetExtent(1), 
+            m_InputWorldGeometry->GetIndexToWorldTransform(), 
+            PlaneGeometry::Transversal, 
+            m_InputWorldGeometry->GetExtent(2)-1, false);
           m_Slice->SetSteps((int)m_InputWorldGeometry->GetExtent(2));
           viewSpacing=m_InputWorldGeometry->GetExtentInMM(2)/m_InputWorldGeometry->GetExtent(2);
           break;
         case Frontal:
-          //planegeometry->InitializeStandardPlane(
-          //  m_InputWorldGeometry->GetExtent(0), m_InputWorldGeometry->GetExtent(2), 
-          //  m_InputWorldGeometry->GetIndexToWorldTransform(), 
-          //  PlaneGeometry::Frontal);
-          planegeometry->InitializeStandardPlane(m_InputWorldGeometry, PlaneGeometry::Frontal);
+          planegeometry->InitializeStandardPlane(
+            m_InputWorldGeometry->GetExtent(0), m_InputWorldGeometry->GetExtent(2), 
+            m_InputWorldGeometry->GetIndexToWorldTransform(), 
+            PlaneGeometry::Frontal);
           m_Slice->SetSteps((int)(m_InputWorldGeometry->GetExtent(1)+1.0));
           viewSpacing=m_InputWorldGeometry->GetExtentInMM(1)/m_InputWorldGeometry->GetExtent(1);
           break;
         case Sagittal:
-          //planegeometry->InitializeStandardPlane(
-          //  m_InputWorldGeometry->GetExtent(1), m_InputWorldGeometry->GetExtent(2), 
-          //  m_InputWorldGeometry->GetIndexToWorldTransform(), 
-          //  PlaneGeometry::Sagittal);
-          planegeometry->InitializeStandardPlane(m_InputWorldGeometry, PlaneGeometry::Sagittal);
+          planegeometry->InitializeStandardPlane(
+            m_InputWorldGeometry->GetExtent(1), m_InputWorldGeometry->GetExtent(2), 
+            m_InputWorldGeometry->GetIndexToWorldTransform(), 
+            PlaneGeometry::Sagittal);
           m_Slice->SetSteps((int)(m_InputWorldGeometry->GetExtent(0)+1.0));
           viewSpacing=m_InputWorldGeometry->GetExtentInMM(0)/m_InputWorldGeometry->GetExtent(0);
           break;

@@ -128,8 +128,15 @@ bool mitk::StateMachineFactory::parse(mitk::State::StateMap *states, mitk::State
 	  if ( history->find(*i) == history->end() )//wenn wir noch nicht in dieser NextState waren
 	  {
 	    mitk::State::StateMapIter nextState = states->find(*i);//search the iterator for our nextState
-		ok = parse( states, nextState, history);//recusive path into the next state
+      if (nextState == states->end())
+      {
+        std::cout<<std::endl<<"Didn't find a state in StateMap!Check your statemachine behavior file!"<<std::endl;
+        //you don't really see the warning in output! itkWarningMacro not possible due to this pointer!
+        ok = false;
       }
+      else
+  		  ok = parse( states, nextState, history);//recusive path into the next state
+    }
 	}
 	return ok;
 }
@@ -192,7 +199,11 @@ void  mitk::StateMachineFactory::StartElement (const char *elementName, const ch
 		std::pair<mitk::State::StateMapIter,bool> ok = m_AllStates.insert(mitk::State::StateMap::value_type(id , m_AktState));
 
 		if ( ok.second == false ) 
+    { 
+      std::cout<<std::endl;
+      std::cout<<"Warning from StateMachineFactory: STATE_ID was not unique or something else didn't work in insert!"<<std::endl;
 			return; //STATE_ID was not unique or something else didn't work in insert! EXITS the process
+    }
 		if ( ReadXMLBooleanAttribut( START_STATE, atts ) )
 			m_StartStates.insert(StartStateMap::value_type(m_AktStateMachineName, m_AktState));  
   } 

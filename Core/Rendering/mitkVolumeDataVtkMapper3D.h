@@ -30,7 +30,7 @@ class vtkVolumeRayCastMapper;
 class vtkVolumeTextureMapper2D;
 class vtkVolume;
 class vtkObject;
-class vtkImageCast;
+class vtkImageShiftScale;
 class vtkImageChangeInformation;
 
 namespace mitk {
@@ -63,7 +63,7 @@ protected:
 
   vtkActor* m_Actor;
   vtkVolume* m_Volume; 
-  vtkImageCast* m_ImageCast;
+  vtkImageShiftScale* m_ImageCast;
   vtkImageChangeInformation* m_UnitSpacingImageFilter; 
   vtkVolumeProperty* m_VolumeProperty;
   //vtkVolumeRayCastMapper* m_VtkVolumeMapper;

@@ -34,7 +34,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkFiniteDifferenceGradientEstimator.h>
 #include <vtkRenderWindow.h>
 #include <vtkCallbackCommand.h>
-#include <vtkImageCast.h>
+#include <vtkImageShiftScale.h>
 #include <vtkImageChangeInformation.h>
 #include <vtkImageWriter.h>
 #include <vtkVolumeTextureMapper2D.h> 
@@ -66,7 +66,7 @@ mitk::VolumeDataVtkMapper3D::VolumeDataVtkMapper3D()
   m_VolumeProperty = vtkVolumeProperty::New();
   m_Volume->SetProperty(m_VolumeProperty); 
 
-  m_ImageCast = vtkImageCast::New(); 
+  m_ImageCast = vtkImageShiftScale::New(); 
   m_ImageCast->SetOutputScalarTypeToUnsignedShort();
   m_ImageCast->ClampOverflowOn();
 
@@ -141,7 +141,7 @@ void mitk::VolumeDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
   vtkImageData* inputData = input->GetVtkImageData(timestep);
   if(inputData==NULL)
     return;
-  m_ImageCast->SetInput( inputData ); 
+  m_ImageCast->SetInput( inputData );
 
 //  m_ImageCast->Update();    
   m_VtkVolumeMapper->SetInput( m_UnitSpacingImageFilter->GetOutput() );
@@ -152,6 +152,8 @@ void mitk::VolumeDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
 
   opacityTransferFunction  = vtkPiecewiseFunction::New();
   colorTransferFunction    = vtkColorTransferFunction::New();
+
+  m_ImageCast->SetShift(0);
 
   mitk::LookupTableProperty::Pointer LookupTableProp;
   LookupTableProp = dynamic_cast<mitk::LookupTableProperty*>(this->GetDataTreeNode()->GetProperty("LookupTable").GetPointer());
@@ -167,18 +169,26 @@ void mitk::VolumeDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
   {
     mitk::LevelWindow levelWindow;
     int lw_min,lw_max;
-    if (GetLevelWindow(levelWindow,renderer)) {
+    if (GetLevelWindow(levelWindow,renderer) || GetLevelWindow(levelWindow,renderer,"levelWindow"))
+    {
       lw_min = (int)levelWindow.GetMin();
       lw_max = (int)levelWindow.GetMax();
       //      std::cout << "levwin:" << levelWindow << std::endl;
-    } else {
+      if(lw_min<0)
+      {
+        m_ImageCast->SetShift(-lw_min);
+        lw_max+=-lw_min;
+        lw_min=0;
+      }
+    } 
+    else 
+    {
       lw_min = 0;
       lw_max = 255;
     }
-    //opacityTransferFunction->AddPoint( lw_min, 0.0 );
-    //opacityTransferFunction->AddPoint( lw_max, 0.8 );
-    opacityTransferFunction->AddPoint( (lw_min+lw_max)/2, 0.0 );
-    opacityTransferFunction->AddPoint( lw_max, 0.5 );
+
+    opacityTransferFunction->AddPoint( lw_min, 0.0 );
+    opacityTransferFunction->AddPoint( lw_max, 0.8 );
     opacityTransferFunction->ClampingOn();
 
     //colorTransferFunction->AddRGBPoint( lw_min, 0.0, 0.0, 1.0 );

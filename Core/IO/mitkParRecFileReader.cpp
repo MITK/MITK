@@ -172,17 +172,14 @@ void mitk::ParRecFileReader::GenerateData()
       throw itk::ImageFileReaderException(__FILE__, __LINE__, "Could not open rec-file.");
     }
 
-    int z, zmax;
-    int t, tmax;
-    
-    z=output->GetRequestedRegion().GetIndex(2);
-    t=output->GetRequestedRegion().GetIndex(3);
-    
-    zmax=z+output->GetRequestedRegion().GetSize(2);
-    tmax=t+output->GetRequestedRegion().GetSize(3);
-    
-    int sliceSize=output->GetDimension(0)*output->GetDimension(1)*output->GetPixelType().GetBpe()/8;
-    void *data = malloc(sliceSize);
+    int zstart, zmax;
+    int tstart, tmax;
+
+    zstart=output->GetRequestedRegion().GetIndex(2);
+    tstart=output->GetRequestedRegion().GetIndex(3);
+
+    zmax=zstart+output->GetRequestedRegion().GetSize(2);
+    tmax=tstart+output->GetRequestedRegion().GetSize(3);
 
     bool ignore4Dtopogram=false;
     {
@@ -190,8 +187,9 @@ void mitk::ParRecFileReader::GenerateData()
     if(output->GetDimension(3)>1)
       ignore4Dtopogram=true;
 
-      for(;t<tmax;++t)
-        for(;z<zmax;++z)
+      int z,t;
+      for(t=tstart;t<tmax;++t)
+        for(z=zstart;z<zmax;++z)
         {
 			    if(ignore4Dtopogram)
             fseek(f,slicePlusTimeSize*z+(sliceSize+1)*t,SEEK_SET);				  

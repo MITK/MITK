@@ -128,6 +128,13 @@ mitk::SplineVtkMapper3D::GenerateData()
         float rgba[ 4 ] = {1.0f, 0.0f, 0.0f, 1.0f};
         this->GetDataTreeNode()->GetColor( rgba, NULL );
         m_SplinesActor->GetProperty()->SetColor( rgba );
+
+        float lineWidth;
+        if (dynamic_cast<mitk::FloatProperty *>(this->GetDataTreeNode()->GetProperty("linewidth").GetPointer()) == NULL)
+          lineWidth = 1.0;
+        else
+          lineWidth = dynamic_cast<mitk::FloatProperty *>(this->GetDataTreeNode()->GetProperty("linewidth").GetPointer())->GetValue();
+        m_SplinesActor->GetProperty()->SetLineWidth(lineWidth);
     }
     else
     {

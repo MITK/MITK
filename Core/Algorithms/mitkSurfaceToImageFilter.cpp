@@ -28,6 +28,7 @@ See MITKCopyright.txt or http://www.mitk.org/ for details.
 #include <vtkDataSetTriangleFilter.h>
 #include <vtkImageThreshold.h>
 #include <vtkImageMathematics.h>
+#include <vtkImageCast.h>
 #include <vtkPolyDataNormals.h>
 
 #include <vtkTransformPolyDataFilter.h>
@@ -117,10 +118,15 @@ void mitk::SurfaceToImageFilter::GenerateData()
   threshold->SetOutValue(0);
   threshold->Update();
 
+  vtkImageCast * castFilter = vtkImageCast::New();
+  castFilter->SetOutputScalarTypeToUnsignedChar();
+  castFilter->SetInput(threshold->GetOutput() );
+  castFilter->Update();
+  
   mitk::Image::Pointer output = this->GetOutput();
-  output->Initialize( threshold->GetOutput() );
+  output->Initialize( castFilter->GetOutput() );
   output->SetGeometry( static_cast<mitk::Geometry3D*>(GetImage()->GetGeometry()->Clone().GetPointer()) );
-  output->SetVolume( threshold->GetOutput()->GetScalarPointer() );
+  output->SetVolume( castFilter->GetOutput()->GetScalarPointer() );
 
 }
 

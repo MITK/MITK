@@ -38,8 +38,9 @@ protected:
 
   mitk::ITKVector3D m_LastTranslatePosition;
   mitk::ITKPoint3D m_LastScalePosition;
-  mitk::ITKPoint3D m_FirstScalePosition;
+  mitk::ITKVector3D m_FirstScaleVector;
   mitk::ITKVector3D m_lastRotatePosition;
+  bool m_Grow[3];
 };
 
 } // namespace mitk

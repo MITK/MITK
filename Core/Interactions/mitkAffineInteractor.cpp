@@ -2,7 +2,9 @@
 #include "mitkInteractionConst.h"
 #include <mitkDataTreeNode.h>
 #include "mitkGeometry3D.h"
-#include "mitkAffineTransformationOperation.h"
+//#include "mitkAffineTransformationOperation.h"
+#include "mitkRotationOperation.h"
+#include "mitkPointOperation.h"
 #include "mitkPositionEvent.h"
 #include "vtkTransform.h"
 #include <mitkRenderWindow.h>
@@ -131,7 +133,8 @@ bool mitk::AffineInteractor::ExecuteAction(int actionId, mitk::StateEvent const*
     newPosition -=  m_LastTranslatePosition;  // compute difference between actual and last mouse position
 
     // create operation with position difference
-    AffineTransformationOperation* doOp = new mitk::AffineTransformationOperation(OpMOVE, newPosition, 0.0, 0); // Index is not used here
+    //AffineTransformationOperation* doOp = new mitk::AffineTransformationOperation(OpMOVE, newPosition, 0.0, 0); // Index is not used here
+    mitk::PointOperation* doOp = new mitk::PointOperation(OpMOVE, newPosition, 0); // Index is not used here
 		if (m_UndoEnabled)	//write to UndoMechanism
 		{
       mitk::ScalarType pos[3];
@@ -141,7 +144,7 @@ bool mitk::AffineInteractor::ExecuteAction(int actionId, mitk::StateEvent const*
       oldPosition[1] = pos[1];
       oldPosition[2] = pos[2];
 
-      AffineTransformationOperation* undoOp = new mitk::AffineTransformationOperation(OpMOVE, oldPosition, 0.0, 0);
+      PointOperation* undoOp = new mitk::PointOperation(OpMOVE, oldPosition, 0);
 			OperationEvent *operationEvent = new OperationEvent(geometry,
 																	doOp, undoOp,
 																	objectEventId, groupEventId);
@@ -195,16 +198,12 @@ bool mitk::AffineInteractor::ExecuteAction(int actionId, mitk::StateEvent const*
 
     m_lastRotatePosition = dummy.GetVectorFromOrigin(); // save actual mouse position as last mouse position
 
-    dummy[0] = rotationaxis[0];  // encapsulate rotation vector into a ITKPoint3D for the Operation
-    dummy[1] = rotationaxis[1];
-    dummy[2] = rotationaxis[2];
-
-    // create operation with angle and axis
-    AffineTransformationOperation* doOp = new mitk::AffineTransformationOperation(OpROTATE, dummy, angle, 0); // Index is not used here
+    // create operation with center of rotation, angle and axis
+    mitk::RotationOperation* doOp = new mitk::RotationOperation(OpROTATE, ITKPoint3D(position) , rotationaxis, angle);
 
     if (m_UndoEnabled)	//write to UndoMechanism
 		{
-      AffineTransformationOperation* undoOp = new mitk::AffineTransformationOperation(OpROTATE, dummy, -angle, 0); // Index is not used here
+      RotationOperation* undoOp = new mitk::RotationOperation(OpROTATE, ITKPoint3D(position) , rotationaxis, -angle);
 			OperationEvent *operationEvent = new OperationEvent(geometry,
 																	doOp, undoOp,
 																	objectEventId, groupEventId);
@@ -224,7 +223,8 @@ bool mitk::AffineInteractor::ExecuteAction(int actionId, mitk::StateEvent const*
 		mitk::ITKPoint3D newPosition;
 		mitk::vm2itk(posEvent->GetWorldPosition(), newPosition);
     m_LastScalePosition = newPosition;
-    m_FirstScalePosition = newPosition;
+    m_FirstScaleVector.Fill(0);
+    m_Grow[0] = m_Grow[1] = m_Grow[2] = false;
 
     ok = true;
     break;
@@ -245,32 +245,28 @@ bool mitk::AffineInteractor::ExecuteAction(int actionId, mitk::StateEvent const*
     newScale[1] = (geometry->GetYAxis() * v) / geometry->GetYAxis().GetNorm();  // and direction vector of mouse movement
     newScale[2] = (geometry->GetZAxis() * v) / geometry->GetZAxis().GetNorm();  // is the length of the movement vectors
                                                                                 // projection onto the axis
-
-    // calculate direction of mouse move (towards or away from the data object)
-    ITKPoint3D objectPosition = geometry->GetVtkTransform()->GetPosition();
-    //ScalarType xdif = fabs((newPosition - objectPosition)[0]) - fabs((m_FirstScalePosition - objectPosition)[0]);
-    //ScalarType ydif = fabs((newPosition - objectPosition)[1]) - fabs((m_FirstScalePosition - objectPosition)[1]);
-    //ScalarType zdif = fabs((newPosition - objectPosition)[2]) - fabs((m_FirstScalePosition - objectPosition)[2]);
-    ScalarType xdif = fabs((newPosition - objectPosition)[0]) - fabs((m_LastScalePosition - objectPosition)[0]);
-    ScalarType ydif = fabs((newPosition - objectPosition)[1]) - fabs((m_LastScalePosition - objectPosition)[1]);
-    ScalarType zdif = fabs((newPosition - objectPosition)[2]) - fabs((m_LastScalePosition - objectPosition)[2]);
-
-    if(xdif < 0)
-      newScale[0] = - fabs(newScale[0]);
-    else
-      newScale[0] = + fabs(newScale[0]);
-    if(ydif < 0)
-      newScale[1] = - fabs(newScale[1]);
-    else
-      newScale[1] = + fabs(newScale[1]);
-    if(zdif < 0)
-      newScale[2] = - fabs(newScale[2]);
-    else
-      newScale[2] = + fabs(newScale[2]);
+     // calculate direction of mouse move (towards or away from the data object)
+     ITKPoint3D objectPosition = geometry->GetVtkTransform()->GetPosition();
+     ScalarType xdif = fabs((newPosition - objectPosition)[0]) - fabs((m_LastScalePosition - objectPosition)[0]);
+     ScalarType ydif = fabs((newPosition - objectPosition)[1]) - fabs((m_LastScalePosition - objectPosition)[1]);
+     ScalarType zdif = fabs((newPosition - objectPosition)[2]) - fabs((m_LastScalePosition - objectPosition)[2]);
+ 
+     if(xdif < 0)
+       newScale[0] = - fabs(newScale[0]);
+     else
+       newScale[0] = + fabs(newScale[0]);
+     if(ydif < 0)
+       newScale[1] = - fabs(newScale[1]);
+     else
+       newScale[1] = + fabs(newScale[1]);
+     if(zdif < 0)
+       newScale[2] = - fabs(newScale[2]);
+     else
+       newScale[2] = + fabs(newScale[2]);
 
     m_LastScalePosition = newPosition;
 
-    AffineTransformationOperation* doOp = new mitk::AffineTransformationOperation(OpSCALE, newScale, 0.0, 0); // Index is not used here
+    PointOperation* doOp = new mitk::PointOperation(OpSCALE, newScale, 0); // Index is not used here
 
 		if (m_UndoEnabled)	//write to UndoMechanism
 		{
@@ -279,7 +275,7 @@ bool mitk::AffineInteractor::ExecuteAction(int actionId, mitk::StateEvent const*
       oldScaleData[1] = -newScale[1];
       oldScaleData[2] = -newScale[2];
 
-      AffineTransformationOperation* undoOp = new mitk::AffineTransformationOperation(OpSCALE, oldScaleData, 0.0, 0);
+      PointOperation* undoOp = new mitk::PointOperation(OpSCALE, oldScaleData, 0);
 			OperationEvent *operationEvent = new OperationEvent(geometry,
 																	doOp, undoOp,
 																	objectEventId, groupEventId);

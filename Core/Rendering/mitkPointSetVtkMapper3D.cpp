@@ -194,6 +194,7 @@ void mitk::PointSetVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
     sphere->SetCenter(i.Value()[0],i.Value()[1],i.Value()[2]);
 
     m_vtkPointList->AddInput(sphere->GetOutput());
+    sphere->Delete();
 
     if (dynamic_cast<mitk::StringProperty *>(this->GetDataTreeNode()->GetProperty("label").GetPointer()) == NULL)
     {}
@@ -227,7 +228,9 @@ void mitk::PointSetVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
       //# Move the label to a new position.
       vtkTransformPolyDataFilter *labelTransform = vtkTransformPolyDataFilter::New();
       labelTransform->SetTransform(aLabelTransform);
+      aLabelTransform->Delete();
       labelTransform->SetInput(label->GetOutput());
+      label->Delete();
 
       //	      m_TextActor = vtkFollower::New();
       //		    m_TextVtkPolyDataMapper = vtkPolyDataMapper::New();
@@ -244,6 +247,7 @@ void mitk::PointSetVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
       //		    m_Actor->AddPart(m_TextActor);
 
       m_vtkPointList->AddInput(labelTransform->GetOutput());
+      labelTransform->Delete();
     }
 
 

@@ -254,6 +254,7 @@ void mitk::OpenGLRenderer::Render()
             
             typedef std::pair<int, GLMapper2D*> LayerMapperPair;
             std::priority_queue<LayerMapperPair> layers;
+	    int mapperNo = 0;
             while(it->hasNext())
             {        
                 it->next();
@@ -275,7 +276,8 @@ void mitk::OpenGLRenderer::Render()
                         }
                         // pushing negative layer value, since default sort for
                         // priority_queue is lessthan 
-                        layers.push(LayerMapperPair(-layer,mapper2d));
+                        layers.push(LayerMapperPair(- (layer<<16) - mapperNo ,mapper2d));
+			mapperNo++;
                     }
                 }
             }

@@ -18,8 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include "mitkBoundingObject.h"
-#include "vtkTransform.h"
-#include "mitkVector.h"
+#include "mitkBaseProcess.h"
 
 mitk::BoundingObject::BoundingObject()
   : Surface(), m_Positive(true)
@@ -31,27 +30,27 @@ mitk::BoundingObject::~BoundingObject()
 {
 } 
 
-void mitk::BoundingObject::SetRequestedRegionToLargestPossibleRegion()
-{
-}
-
-bool mitk::BoundingObject::RequestedRegionIsOutsideOfTheBufferedRegion()
-{
-  return ! VerifyRequestedRegion();
-}
-
-bool mitk::BoundingObject::VerifyRequestedRegion()
-{
-  assert(m_Geometry3D.IsNotNull());
-  return true;
-}
-
-void mitk::BoundingObject::SetRequestedRegion(itk::DataObject *data)
-{
-}
+//void mitk::BoundingObject::SetRequestedRegionToLargestPossibleRegion()
+//{
+//}
+//
+//bool mitk::BoundingObject::RequestedRegionIsOutsideOfTheBufferedRegion()
+//{
+//  return ! VerifyRequestedRegion();
+//}
+//
+//bool mitk::BoundingObject::VerifyRequestedRegion()
+//{
+//  assert(m_Geometry3D.IsNotNull());
+//  return true;
+//}
 
 void mitk::BoundingObject::UpdateOutputInformation()
 {  
+  if ( this->GetSource() )
+  {
+    this->GetSource()->UpdateOutputInformation();
+  }
   ScalarType bounds[6]={0,1,0,1,0,1};  //{xmin,x_max, ymin,y_max,zmin,z_max}
   /* bounding box around the unscaled bounding object */ 
   bounds[0] = - 1;

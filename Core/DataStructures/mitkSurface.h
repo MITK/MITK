@@ -68,6 +68,8 @@ public:
   
   virtual void Resize( unsigned int timeSteps );
   
+  virtual void SetGeometry(Geometry3D* aGeometry3D);
+
   virtual TimeSlicedGeometry* GetTimeSlicedGeometry();
 
   virtual void Initialize(unsigned int timeSteps=1);

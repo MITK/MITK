@@ -58,6 +58,23 @@ void mitk::Surface::Initialize(unsigned int timeSteps)
   m_PolyDataSeries.assign(timeSteps, pdnull);
 }
 
+void mitk::Surface::SetGeometry(mitk::Geometry3D* aGeometry3D)
+{
+  if(aGeometry3D!=NULL)
+  {
+    TimeSlicedGeometry::Pointer timeSlicedGeometry = dynamic_cast<TimeSlicedGeometry*>(aGeometry3D);
+    if(timeSlicedGeometry.IsNull())
+    {
+      timeSlicedGeometry = TimeSlicedGeometry::New();
+      m_Geometry3D = timeSlicedGeometry;   
+      timeSlicedGeometry->InitializeEvenlyTimed(aGeometry3D, 1);
+    }
+    Superclass::SetGeometry(timeSlicedGeometry);
+  }
+  else
+    Superclass::SetGeometry(NULL);
+}
+
 //##ModelId=3E70F66100A5
 vtkPolyData* mitk::Surface::GetVtkPolyData( unsigned int t )
 {

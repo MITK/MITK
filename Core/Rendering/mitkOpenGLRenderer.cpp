@@ -9,6 +9,7 @@
 
 #include <vtkRenderer.h>
 #include <vtkLight.h>
+#include <vtkLightKit.h>
 #include <vtkRenderWindow.h>
 
 #include "PlaneGeometry.h"
@@ -27,6 +28,8 @@ void mitk::OpenGLRenderer::SetData(mitk::DataTreeIterator* iterator)
 {
     BaseRenderer::SetData(iterator);
 
+    m_LightKit->RemoveLightsFromRenderer(this->m_VtkRenderer);
+
     m_MitkVtkRenderWindow->RemoveRenderer(m_VtkRenderer);
     m_VtkRenderer->Delete();
 
@@ -34,9 +37,12 @@ void mitk::OpenGLRenderer::SetData(mitk::DataTreeIterator* iterator)
     m_VtkRenderer->SetLayer(0);
     m_MitkVtkRenderWindow->AddRenderer( this->m_VtkRenderer );
 
-    m_Light->Delete();
-    m_Light = vtkLight::New();
-    m_VtkRenderer->AddLight( m_Light );
+    //strange: when using a simple light, the backface of the planes are not shown (regardless of SetNumberOfLayers)
+    //m_Light->Delete();
+    //m_Light = vtkLight::New();
+    //m_VtkRenderer->AddLight( m_Light );
+    m_LightKit = vtkLightKit::New();
+    m_LightKit->AddLightsToRenderer(m_VtkRenderer);
 
     //    try
     mitk::DataTreeIterator* it=m_DataTreeIterator->clone();
@@ -197,13 +203,19 @@ void mitk::OpenGLRenderer::InitRenderer(mitk::RenderWindow* renderwindow)
 
     m_MitkVtkRenderWindow = mitk::VtkRenderWindow::New();
     m_MitkVtkRenderWindow->SetMitkRenderer(this);
-    m_MitkVtkRenderWindow->SetNumberOfLayers(2);
+    /**@todo SetNumberOfLayers commented out, because otherwise the backface of the planes are not shown (only, when a light is added).
+    * But we need SetNumberOfLayers(2) later, when we want to prevent vtk to clear the widget before it renders (i.e., when we render something in the scene before vtk).
+    */
+    //m_MitkVtkRenderWindow->SetNumberOfLayers(2);
 
     m_VtkRenderer = vtkRenderer::New();
     m_MitkVtkRenderWindow->AddRenderer( m_VtkRenderer );
 
-    m_Light = vtkLight::New();
-    m_VtkRenderer->AddLight( m_Light );
+    //strange: when using a simple light, the backface of the planes are not shown (regardless of SetNumberOfLayers)
+    //m_Light = vtkLight::New();
+    //m_VtkRenderer->AddLight( m_Light );
+    m_LightKit = vtkLightKit::New();
+    m_LightKit->AddLightsToRenderer(m_VtkRenderer);
 
     if(m_CameraController)
         ((VtkInteractorCameraController*)m_CameraController.GetPointer())->SetRenderWindow(m_MitkVtkRenderWindow);

@@ -11,6 +11,7 @@
 class vtkRenderer;
 class vtkRenderWindow;
 class vtkLight;
+class vtkLightKit;
 
 namespace mitk {
 
@@ -79,6 +80,8 @@ protected:
 
     //##ModelId=3E33145B001E
     vtkLight* m_Light;
+
+    vtkLightKit* m_LightKit;
 
 public: //FIXME
     //##ModelId=3E64243803E7

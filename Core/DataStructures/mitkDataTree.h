@@ -12,7 +12,7 @@ namespace mitk {
 typedef ::LinkedTree<DataTreeNode::Pointer> DataTreeBase;
 
 //##ModelId=3E38F35101A0
-class DataTree : public itk::Object, public DataTreeBase, public DataTreeBase::TreeChangeListener 
+class DataTree : public itk::Object, public DataTreeBase
 {
    public:
 	/** Standard class typedefs. */
@@ -41,6 +41,7 @@ class DataTree : public itk::Object, public DataTreeBase, public DataTreeBase::T
     //##ModelId=3E38F46A01AE
     virtual ~DataTree();
 
+    //##ModelId=3EA6ADB7029F
 	void treeChanged( TreeIterator<DataTreeNode::Pointer>& changedTreePosition );	
 
 };

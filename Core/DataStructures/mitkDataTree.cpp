@@ -41,6 +41,7 @@ TreeIterator<mitk::DataTreeNode::Pointer>* mitk::DataTree::GetNext( const char* 
 /**
  *
  */
+//##ModelId=3EA6ADB7029F
 void mitk::DataTree::treeChanged( TreeIterator<DataTreeNode::Pointer>& changedTreePosition ) {
 
 	Modified();

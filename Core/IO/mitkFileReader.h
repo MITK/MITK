@@ -9,14 +9,6 @@ namespace mitk {
 //##ModelId=3E186F28009B
 class FileReader : public Reader
 {
-public:
-  /** Standard class typedefs. */
-    //##ModelId=3E1873B300BB
-  typedef FileReader         Self;
-    //##ModelId=3E1873B300E3
-  typedef Reader			 Superclass;
-    //##ModelId=3E1873B30115
-  typedef itk::SmartPointer<Self>  Pointer;
   protected:
     //##ModelId=3E188F1F027E
     FileReader();
@@ -26,12 +18,11 @@ public:
     ~FileReader();
 
   public:
+          
+  mitkClassMacro(FileReader, Reader);
   
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
-
-  /** Run-time type information (and related methods). */
-  itkTypeMacro(FileReader, Reader);
 
   /** Specify the file to load. This is forwarded to the IO instance. 
    * Either the FileName or FilePrefix plus pattern are used to read

@@ -42,6 +42,7 @@ protected:
     //##ModelId=3E19EA120063
 	itk::TimeStamp m_ReadHeaderTime;
 
+    //##ModelId=3EA6ADB80138
     int m_StartFileIndex;
 };
 

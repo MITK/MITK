@@ -75,6 +75,5 @@ public:
 
 };
 
-#define mitkEnum Qt
 }
 #endif

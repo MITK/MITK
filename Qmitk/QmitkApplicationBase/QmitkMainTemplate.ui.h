@@ -14,8 +14,10 @@
 #include <vtkSTLWriter.h>
 #include <vtkPolyDataReader.h>
 #include <vtkPolyDataWriter.h>
-#include <vtkPImageWriter.h>
-#include <vtkPImageWriter.h>
+#include <vtkImageData.h>
+#include <vtkStructuredPoints.h>
+#include <vtkStructuredPointsReader.h>
+#include <vtkStructuredPointsWriter.h>
 #include <map>
 #include <mitkSurfaceData.h>
 #include <mitkColorProperty.h>
@@ -211,6 +213,41 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
 
     mitkMultiWidget->levelWindowWidget->setLevelWindow(levelWindow);
     initWidgets(it);
+  }
+  else if(strstr(fileName, ".pvtk")!=0)
+  {
+    vtkStructuredPointsReader *vtkreader = vtkStructuredPointsReader::New();
+    vtkreader->SetFileName(fileName);
+    vtkreader->Update();
+
+    if(vtkreader->GetOutput()!=NULL)
+    {
+      mitk::Image::Pointer image = mitk::Image::New();
+      image->Initialize(vtkreader->GetOutput());            
+      image->SetVolume(vtkreader->GetOutput()->GetScalarPointer());
+
+      vtkreader->Delete();
+
+      mitk::DataTreeIterator* it=tree->inorderIterator();
+
+      node=mitk::DataTreeNode::New();
+      node->SetData(image);
+      it->add(node); 
+
+      QString tmpName = fileName;
+      tmpName = tmpName.right(tmpName.length() - tmpName.findRev("/") - 1);     
+      mitk::StringProperty::Pointer nameProp = new mitk::StringProperty(tmpName.ascii());
+      node->SetProperty("fileName",nameProp);
+
+      mitk::LevelWindowProperty::Pointer levWinProp = new mitk::LevelWindowProperty();
+      mitk::LevelWindow levelWindow;
+      levelWindow.SetAuto( image->GetPic() );
+      levWinProp->SetLevelWindow(levelWindow);
+      node->GetPropertyList()->SetProperty("levelwindow",levWinProp);
+
+      mitkMultiWidget->levelWindowWidget->setLevelWindow(levelWindow);
+      initWidgets(it);
+    }
   }
   else if( strstr(fileName, ".ves")!=0 )
   {
@@ -456,9 +493,10 @@ void QmitkMainTemplate::fileSaveAs()
         if ( !fileName.isNull() )
         {
           if(fileName.endsWith(".pvtk")==false) fileName+=".pvtk";
-          vtkPImageWriter *writer=vtkPImageWriter::New();
+          vtkStructuredPointsWriter *writer=vtkStructuredPointsWriter::New();
           writer->SetInput(image->GetVtkImageData());
           writer->SetFileName(fileName.ascii());
+          writer->SetFileTypeToBinary();
           writer->Write();
           writer->Delete();
         }

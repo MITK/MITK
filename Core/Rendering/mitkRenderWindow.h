@@ -14,6 +14,8 @@ namespace mitk {
 class RenderWindow : public RenderWindowBase
 {
 public:
+    typedef std::set<RenderWindow*> RenderWindowSet;
+
     //##ModelId=3E3ECC130358
     RenderWindow(QGLFormat glf, QWidget *parent = 0, const char *name = 0) : RenderWindowBase(glf, parent, name)
     {
@@ -42,16 +44,27 @@ public:
   //##Documentation
   //## @brief Updates the contents of all renderwindows
   static void UpdateAllInstances() {
-    for (std::set<RenderWindow*>::iterator iter = instances.begin();iter != instances.end();iter++) {
+    for (RenderWindowSet::iterator iter = instances.begin();iter != instances.end();iter++) {
 	(*iter)->Update();
     }
   }
-  
+  static const RenderWindowSet& GetInstances() {
+    return instances;
+  } 
+  //## @brief return the first RenderWindow created with the given name 
+  static const RenderWindow* GetByName(const std::string& name) {
+    for (RenderWindowSet::const_iterator iter = instances.begin();iter != instances.end();iter++) {
+	if (name == (*iter)->name()) {
+          return *iter;
+        }
+    }
+    return NULL;
+  }   
   virtual ~RenderWindow() {
     instances.erase(this);
   }
 protected:
-  static std::set<RenderWindow*> instances;
+  static RenderWindowSet instances;
 };
 
 } // namespace mitk

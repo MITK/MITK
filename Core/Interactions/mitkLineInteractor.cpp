@@ -37,7 +37,7 @@ See MITKCopyright.txt or http://www.mitk.org/ for details.
 mitk::LineInteractor::LineInteractor(const char * type, DataTreeNode* dataTreeNode)
   : HierarchicalInteractor(type, dataTreeNode), m_CurrentLineId(0), m_CurrentCellId(0)
 {
-    m_PointInteractor = new mitk::PointInteractor("pointinteractor",dataTreeNode);
+    m_PointInteractor = new mitk::PointSnapInteractor("pointSNAPinteractor",dataTreeNode);
     this->AddInteractor((Interactor::Pointer)m_PointInteractor);
     m_LastPoint.Fill(0);
 }
@@ -47,7 +47,7 @@ mitk::LineInteractor::~LineInteractor()
     //delete m_PointInteractor;
 }
 
-void mitk::LineInteractor::DeselectAllLines()
+void mitk::LineInteractor::DeselectAllLines()//\*todo: move to mitkMesh.cpp
 {
   mitk::Mesh* mesh = dynamic_cast<mitk::Mesh*>(m_DataTreeNode->GetData());
 	if (mesh == NULL)
@@ -197,6 +197,16 @@ bool mitk::LineInteractor::ExecuteAction(Action* action, mitk::StateEvent const*
 {
   bool ok = false;//for return type bool
 
+  //has to be done here, cause otherwise different precisions are possible in CheckLine and CheckSelected;
+  // this should not be, cause then strange interaction is possible! e.g. picking (checkLine) selects a line and picking it again to move it (checkselected) 
+  //deselects it, cause the precision is lower!!! 
+  int PRECISION = 5;
+  mitk::IntProperty *precision = dynamic_cast<IntProperty*>(action->GetProperty("precision"));
+  if (precision != NULL)
+  {
+    PRECISION = precision->GetValue();
+  }
+
   //checking corresponding Data; has to be a PointSet or a subclass
 	mitk::Mesh* mesh = dynamic_cast<mitk::Mesh*>(m_DataTreeNode->GetData());
 	if (mesh == NULL)
@@ -234,13 +244,6 @@ bool mitk::LineInteractor::ExecuteAction(Action* action, mitk::StateEvent const*
 
         unsigned long lineId, cellId;
 
-        int PRECISION = 5;
-        mitk::IntProperty *precision = dynamic_cast<IntProperty*>(action->GetProperty("PRECISION"));
-        if (precision != NULL)
-        {
-          PRECISION = precision->GetValue();
-        }
-        
         bool found = mesh->SearchLine(worldPoint, PRECISION, lineId, cellId);
 			  if (found)//found a point near enough to the given point
 			  {
@@ -259,6 +262,14 @@ bool mitk::LineInteractor::ExecuteAction(Action* action, mitk::StateEvent const*
 				  ok = true;
 			  }
 		  }
+      else //not a positionEvent, so call warning and go on with EIDNO. that way we don't risk to hang up in a guard-state
+      {
+        itkWarningMacro("recieved wrong event-type! Check mitkLineOperation::AcCHECKLINE.");
+        //new Event with information NO
+        mitk::StateEvent* newStateEvent = new mitk::StateEvent(EIDNO, stateEvent->GetEvent());
+        this->HandleEvent(newStateEvent );
+				ok = true;
+      }
     }
     break;
   case AcCHECKSELECTED:
@@ -270,13 +281,6 @@ bool mitk::LineInteractor::ExecuteAction(Action* action, mitk::StateEvent const*
         mitk::Point3D worldPoint = posEvent->GetWorldPosition();
 
         unsigned long lineId, cellId;
-
-        int PRECISION = 1;
-        mitk::IntProperty *precision = dynamic_cast<IntProperty*>(action->GetProperty("PRECISION"));
-        if (precision != NULL)
-        {
-          PRECISION = precision->GetValue();
-        }
 
         bool found = mesh->SearchLine(worldPoint, PRECISION, lineId, cellId);
         if (found && 
@@ -295,7 +299,15 @@ bool mitk::LineInteractor::ExecuteAction(Action* action, mitk::StateEvent const*
           this->HandleEvent(newStateEvent );
 				  ok = true;
 			  }
-		  }    
+		  }
+      else //not a positionEvent, so call warning and go on with EIDNO. that way we don't risk to hang up in a guard-state
+      {
+        itkWarningMacro("recieved wrong event-type! Check mitkLineOperation::AcCHECKLINE.");
+        //new Event with information NO
+        mitk::StateEvent* newStateEvent = new mitk::StateEvent(EIDNO, stateEvent->GetEvent());
+        this->HandleEvent(newStateEvent );
+				ok = true;
+      }
     }
     break;
   case AcREMOVE:

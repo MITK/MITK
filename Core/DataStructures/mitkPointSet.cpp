@@ -219,8 +219,8 @@ void mitk::PointSet::ExecuteOperation(Operation* operation)
         std::cout<<"Numbers in List before remove:"<<m_PointList->GetNumberOfPoints();
 #endif
         PointsContainer::Pointer pc = m_PointList->GetPoints();
-        PointsContainer::iterator posIt = &((*pc)[index]);
-        pc->erase(posIt);
+        itk::Point<mitk::ScalarType, 3>* position = &((*pc)[index]);
+        pc->erase(position);
 
 #ifdef INTERDEBUG
         std::cout<<"Numbers in List after remove:"<<m_PointList->GetNumberOfPoints()<<std::endl;

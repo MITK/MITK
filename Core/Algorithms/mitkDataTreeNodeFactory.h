@@ -92,12 +92,12 @@ protected:
     /**
      * @returns the plain filename, that is, without any directory.
      */
-    virtual const char* GetBaseFileName();
+    virtual std::string GetBaseFileName();
     
     /**
      * @returns the directory of the file name m_FileName. 
      */
-    virtual const char* GetDirectory();
+    virtual std::string GetDirectory();
 
     virtual void ReadFileTypeSTL();
     

@@ -110,16 +110,16 @@ bool mitk::DataTreeNodeFactory::FileNameEndsWith( const std::string& name )
 
 
 
-const char* mitk::DataTreeNodeFactory::GetBaseFileName()
+std::string mitk::DataTreeNodeFactory::GetBaseFileName()
 {
-    return itksys::SystemTools::GetFilenameName( m_FileName ).c_str();
+    return itksys::SystemTools::GetFilenameName( m_FileName );
 }
 
 
 
-const char* mitk::DataTreeNodeFactory::GetDirectory()
+std::string mitk::DataTreeNodeFactory::GetDirectory()
 {
-    return itksys::SystemTools::GetFilenamePath( m_FileName ).c_str();
+    return itksys::SystemTools::GetFilenamePath( m_FileName );
 }
 
 

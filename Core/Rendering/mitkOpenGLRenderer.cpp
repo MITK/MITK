@@ -21,6 +21,7 @@
 #include <utility>
 
 #include "mitkGL.h"
+#include <GL/glu.h>
 
 
 //##ModelId=3E33ECF301AD

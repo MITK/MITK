@@ -1291,7 +1291,9 @@
       </transition>   
     </state>
     <state NAME="CheckPicking" ID="2">
-      <transition NAME="noPicked" NEXT_STATE_ID="4" EVENT_ID="1003" /> 
+      <transition NAME="noPicked" NEXT_STATE_ID="4" EVENT_ID="1003" > 
+        <action ID="66" /> <!-- AcSELECTPOINT  -->
+      </transition>
       <transition NAME="yesPicked" NEXT_STATE_ID="3" EVENT_ID="1004">
         <action ID="69"/>  <!-- AcSELECTSUBOBJECT  -->
       </transition>
@@ -1303,40 +1305,63 @@
       <transition NAME="delete" NEXT_STATE_ID="1" EVENT_ID="12" >
         <action ID="104"/>  <!-- AcREMOVESELECTEDSUBOBJECT -->
       </transition>
+      <transition NAME="deselectAll" NEXT_STATE_ID="1" EVENT_ID="13" >
+        <action ID="72"/>  <!-- AcDESELECTALL -->
+      </transition>
     </state>
     <state NAME="OnePointPicked" ID="4">
-      <transition NAME="goToCheckPicking" NEXT_STATE_ID="6" EVENT_ID="5"/>
+      <transition NAME="goToCheckPicking" NEXT_STATE_ID="6" EVENT_ID="5">
+        <action ID="31"/>  <!-- AcCHECKOBJECT  -->
+      </transition>
+      <transition NAME="deselectAll" NEXT_STATE_ID="1" EVENT_ID="13" >
+        <action ID="72"/>  <!-- AcDESELECTALL -->
+      </transition>
     </state>
     <state NAME="CheckPicking" ID="5">
-      <transition NAME="noPicked" NEXT_STATE_ID="7" EVENT_ID="1003" />
+      <transition NAME="noPicked" NEXT_STATE_ID="7" EVENT_ID="1003" >
+        <action ID="66" /> <!-- AcSELECTPOINT  -->
+      </transition>
       <transition NAME="yesPicked" NEXT_STATE_ID="8" EVENT_ID="1004" >
         <action ID="69"/>    <!-- AcSELECTSUBOBJECT  -->
       </transition>
     </state>
     <state NAME="CheckPicking" ID="6">
-      <transition NAME="noPicked" NEXT_STATE_ID="9" EVENT_ID="1003" />
-      <transition NAME="yesPicked" NEXT_STATE_ID="4" EVENT_ID="1004" />
+      <transition NAME="noPicked" NEXT_STATE_ID="9" EVENT_ID="1003" >
+        <action ID="66" /> <!-- AcSELECTPOINT  -->
+      </transition>
+      <transition NAME="yesPicked" NEXT_STATE_ID="7" EVENT_ID="1004" >
+        <action ID="69"/>    <!-- AcSELECTSUBOBJECT  -->
+      </transition>
     </state>
     <state NAME="OneVesselOnePointPicked" ID="7" >
-      <transition NAME="ENew" NEXT_STATE_ID="1" EVENT_ID="13">
+      <transition NAME="ENew" NEXT_STATE_ID="3" EVENT_ID="1000">
         <action ID="72"/>   <!-- AcDESELECTALL -->
         <action ID="81"/>   <!-- AcNEWSUBOBJECT -->
-        <action ID="69"/>  <!-- AcSELECTSUBOBJECT  -->
+        <action ID="65"/>  <!-- AcSELECT  -->
       </transition>
-      <transition NAME="goToCheckPicking" NEXT_STATE_ID="5" EVENT_ID="5" />
+      <!--transition NAME="goToCheckPicking" NEXT_STATE_ID="5" EVENT_ID="5" /-->
+      <transition NAME="deselectAll" NEXT_STATE_ID="1" EVENT_ID="13" >
+        <action ID="72"/>  <!-- AcDESELECTALL -->
+      </transition>
     </state>
     <state NAME="TwoVesselsPicked" ID="8" >
-      <transition NAME="ENew" NEXT_STATE_ID="1" EVENT_ID="13">
+      <transition NAME="ENew" NEXT_STATE_ID="3" EVENT_ID="1000">
         <action ID="72"/>   <!-- AcDESELECTALL -->
         <action ID="81"/>  <!-- AcNEWSUBOBJECT -->
-        <action ID="69"/>  <!-- AcSELECTSUBOBJECT  -->
+        <action ID="65"/>  <!-- AcSELECT  -->
       </transition>
       <transition NAME="goToCheckPicking" NEXT_STATE_ID="5" EVENT_ID="5" />
+      <transition NAME="deselectAll" NEXT_STATE_ID="1" EVENT_ID="13" >
+        <action ID="72"/>  <!-- AcDESELECTALL -->
+      </transition>
     </state>
     <state NAME="TwoPointsPicked" ID="9" >
-      <transition NAME="ENew" NEXT_STATE_ID="1" EVENT_ID="13">
+      <transition NAME="ENew" NEXT_STATE_ID="3" EVENT_ID="1000">
         <action ID="81"/>  <!-- AcNEWSUBOBJECT -->
-        <action ID="69"/>  <!-- AcSELECTSUBOBJECT  -->
+        <action ID="65"/>  <!-- AcSELECT  -->
+      </transition>
+      <transition NAME="deselectAll" NEXT_STATE_ID="1" EVENT_ID="13" >
+        <action ID="72"/>  <!-- AcDESELECTALL -->
       </transition>
     </state>
     <!--

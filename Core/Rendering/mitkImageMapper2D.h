@@ -9,6 +9,7 @@
 #include "ImageSliceSelector.h"
 
 #include <map>
+#include <assert.h>
 #include "mitkGLMapper2D.h"
 #include "ImageChannelSelector.h"
 #include "BaseRenderer.h"
@@ -16,6 +17,7 @@
 class iilPicImage;
 class Vtk2itk;
 class vtkImageReslice;
+class vtkLookupTable;
 
 namespace mitk {
 
@@ -153,6 +155,10 @@ protected:
   //## @brief Map of instances of RendererInfo
   //## @sa RendererInfo
   std::map<mitk::BaseRenderer*,RendererInfo> m_RendererInfo;
+
+private:
+	int m_iilMode;
+	
 };
 
 } // namespace mitk

@@ -6,12 +6,16 @@
 #include "PlaneGeometry.h"
 #include "BaseRenderer.h"
 #include "DataTreeNode.h"
+
+#include "mitkLookupTableProperty.h"
+
 #include "mitkRenderWindow.h"
 #include "mitkAbstractTransformGeometry.h"
 
 #include <vtkImageReslice.h>
 #include <vtkTransform.h>
 #include <vtkMatrix4x4.h>
+#include <vtkLookupTable.h>
 
 int mitk::ImageMapper2D::numRenderer = 0;
 
@@ -251,11 +255,13 @@ void mitk::ImageMapper2D::GenerateData(mitk::BaseRenderer *renderer)
 
     image = new iilPicImage(NULL, "ll", 512);
 
-    image->setImage(pic, iilImage::INTENSITY_ALPHA);
+    ApplyProperties(renderer);
+//   image->setImage(pic, iilImage::INTENSITY_ALPHA);
+	  image->setImage(pic, m_iilMode);
     image->setInterpolation(true);
     image->setRegion(0,0,pic->n[0],pic->n[1]);
 
-    ApplyProperties(renderer);
+
 
     mitk::Image::Pointer output = this->GetOutput();
 
@@ -291,13 +297,27 @@ void mitk::ImageMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
   // check for level window prop and use it for display if it exists
   GetLevelWindow(levelWindow, renderer);
 
+
+  mitk::LookupTableProperty::Pointer LookupTable;
+  LookupTable = dynamic_cast<mitk::LookupTableProperty*>(this->GetDataTreeNode()->GetProperty("LookupTable").GetPointer());
+	if (LookupTable.IsNull() )
+	{
+		m_iilMode = iilImage::INTENSITY_ALPHA;
+	  image->setColor(rgba[0], rgba[1], rgba[2], rgba[3]);
+	}
+	else {
+		m_iilMode = iilImage::COLOR_ALPHA;
+		image->setColors(LookupTable->GetLookupTable().GetRawLookupTable());
+	}
+  
   // set the properties
   image->setExtrema(levelWindow.GetMin(), levelWindow.GetMax());
-  image->setColor(rgba[0], rgba[1], rgba[2], rgba[3]);
+//  image->setColor(rgba[0], rgba[1], rgba[2], rgba[3]);
 }
 
 void mitk::ImageMapper2D::Update(mitk::BaseRenderer* renderer)
 {
+
   RendererInfo& renderinfo=m_RendererInfo[renderer];
   DataTreeNode* node=GetDataTreeNode();
   iilPicImage*& image = renderinfo.m_iilImage;

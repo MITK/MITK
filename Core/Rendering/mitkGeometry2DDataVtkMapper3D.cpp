@@ -17,6 +17,9 @@
 //#include "vtkImageMapToWindowLevelColors";
 #include "mitkColorProperty.h"
 #include "mitkFloatProperty.h"
+#include "mitkLookupTableProperty.h"
+
+
 #include "mitkLevelWindowProperty.h"
 #include "mitkSmartPointerProperty.h"
 #include <vtkActor.h>
@@ -45,6 +48,9 @@ mitk::Geometry2DDataVtkMapper3D::Geometry2DDataVtkMapper3D() : m_DataTreeIterato
     m_VtkLookupTable->SetHueRange (0, 0);
     m_VtkLookupTable->SetValueRange (0, 1);
     m_VtkLookupTable->Build ();
+    
+	m_VtkLookupTableDefault = m_VtkLookupTable;
+  
     
   m_VtkTexture = vtkTexture::New();
     m_VtkTexture->InterpolateOn();
@@ -168,7 +174,7 @@ void mitk::Geometry2DDataVtkMapper3D::Update(mitk::BaseRenderer* renderer)
         mitk::Mapper::Pointer mapper = node->GetMapper(1);
         mitk::ImageMapper2D* imagemapper = dynamic_cast<ImageMapper2D*>(mapper.GetPointer());
         
-        if(imagemapper)
+        if((node->IsVisible(renderer)) && (imagemapper))
         {
           mitk::SmartPointerProperty::Pointer rendererProp = dynamic_cast<mitk::SmartPointerProperty*>(GetDataTreeNode()->GetPropertyList()->GetProperty("renderer").GetPointer());
           if(rendererProp.IsNotNull())
@@ -176,11 +182,26 @@ void mitk::Geometry2DDataVtkMapper3D::Update(mitk::BaseRenderer* renderer)
             mitk::BaseRenderer::Pointer renderer = dynamic_cast<mitk::BaseRenderer*>(rendererProp->GetSmartPointer().GetPointer());
             if(renderer.IsNotNull())
             {
+
+							// check for LookupTable
+							mitk::LookupTableProperty::Pointer lut;
+						  lut = dynamic_cast<mitk::LookupTableProperty*>(node->GetPropertyList()->GetProperty("LookupTable").GetPointer());
+							if (lut.IsNotNull() )
+							{
+								m_VtkLookupTable = lut->GetLookupTable().GetVtkLookupTable();
+						    m_VtkTexture->SetLookupTable(m_VtkLookupTable);
+//						    m_VtkTexture->Modified();
+							} else {
+								m_VtkLookupTable = m_VtkLookupTableDefault;
+							}
+							
+							
               // check for level window prop and use it for display if it exists
               mitk::LevelWindow levelWindow;
               if(node->GetLevelWindow(levelWindow, renderer))
                 m_VtkLookupTable->SetTableRange(levelWindow.GetMin(),levelWindow.GetMax());
-              
+
+             
               //we have to do this before GenerateAllData() is called there may be
               //no RendererInfo for renderer yet, thus GenerateAllData won't update
               //the (non-existing) RendererInfo for renderer. By calling GetRendererInfo

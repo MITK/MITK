@@ -103,6 +103,10 @@ class Geometry2DDataVtkMapper3D : public BaseVtkMapper3D
     //## @brief lookup-table for texture (m_VtkTexture)
     vtkLookupTable *m_VtkLookupTable;
 
+    //##Documentation
+    //## @brief default lookup-table for texture (m_VtkTexture)
+    vtkLookupTable *m_VtkLookupTableDefault;
+
     //##ModelId=3EDD039F0240
     //##Documentation
     //## @brief timestamp of last update of texture (m_VtkTexture) from image data

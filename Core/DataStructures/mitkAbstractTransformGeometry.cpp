@@ -3,7 +3,7 @@
 #include <vtkAbstractTransform.h>
 
 //##ModelId=3EF4A266029C
-mitk::AbstractTransformGeometry::AbstractTransformGeometry() : Geometry2D(10.0, 10.0), m_ScaleFactorMMPerUnitX(1.0), 
+mitk::AbstractTransformGeometry::AbstractTransformGeometry() : Geometry2D(10.0, 10.0), m_ScaleFactorMMPerUnitX(1.0),
 m_ScaleFactorMMPerUnitY(1.0), m_VtkAbstractTransform(NULL), m_InverseVtkAbstractTransform(NULL), m_LastVtkAbstractTransformTimeStamp(0)
 {
 }
@@ -25,13 +25,13 @@ void mitk::AbstractTransformGeometry::SetVtkAbstractTransform(vtkAbstractTransfo
 {
   if(m_VtkAbstractTransform==aVtkAbstractTransform)
     return;
-  
+
   if(m_VtkAbstractTransform!=NULL)
     m_VtkAbstractTransform->UnRegister(NULL);
-  
+
   if(m_InverseVtkAbstractTransform!=NULL)
     m_InverseVtkAbstractTransform->UnRegister(NULL);
-  
+
   m_VtkAbstractTransform=aVtkAbstractTransform;
   if(m_VtkAbstractTransform!=NULL)
   {
@@ -40,14 +40,14 @@ void mitk::AbstractTransformGeometry::SetVtkAbstractTransform(vtkAbstractTransfo
   }
 
   m_LastVtkAbstractTransformTimeStamp = m_VtkAbstractTransform->GetMTime();
-  
+
   Modified();
 }
 
 //##ModelId=3EF4A266024F
 itk::Transform<float,3,2>::Pointer mitk::AbstractTransformGeometry::GetTransfrom() const
 {
-  itkExceptionMacro("Transform not yet supported."); 	
+  itkExceptionMacro("Transform not yet supported.");
   return NULL;
 }
 
@@ -61,13 +61,13 @@ const mitk::PlaneView& mitk::AbstractTransformGeometry::GetPlaneView() const
 void mitk::AbstractTransformGeometry::SetPlaneView(const mitk::PlaneView& aPlaneView)
 {
   m_PlaneView=aPlaneView;
-  
+
   m_WidthInUnits = m_PlaneView.getOrientation1().length();
   m_HeightInUnits = m_PlaneView.getOrientation2().length();
-  
+
   m_ScaleFactorMMPerUnitX=m_PlaneView.getOrientation1().length()/m_WidthInUnits;
   m_ScaleFactorMMPerUnitY=m_PlaneView.getOrientation2().length()/m_HeightInUnits;
-  
+
   Modified();
 }
 
@@ -75,7 +75,7 @@ void mitk::AbstractTransformGeometry::SetPlaneView(const mitk::PlaneView& aPlane
 bool mitk::AbstractTransformGeometry::Map(const mitk::Point3D &pt3d_mm, mitk::Point2D &pt2d_mm) const
 {
   if(m_InverseVtkAbstractTransform==NULL) return false;
-  
+
   float vtkpt[3];
   vec2vtk(pt3d_mm, vtkpt);
   m_InverseVtkAbstractTransform->TransformPoint(vtkpt, vtkpt);
@@ -132,7 +132,7 @@ void mitk::AbstractTransformGeometry::TransformGeometry(const vtkTransform * tra
 bool mitk::AbstractTransformGeometry::Map(const mitk::Point3D & atPt3d_mm, const mitk::Vector3D &vec3d_mm, mitk::Vector2D &vec2d_mm) const
 {
   if(m_InverseVtkAbstractTransform==NULL) return false;
-  
+
   float vtkpt[3], vtkvec[3];
   vec2vtk(atPt3d_mm, vtkpt);
   vec2vtk(vec3d_mm, vtkvec);
@@ -162,6 +162,6 @@ unsigned long mitk::AbstractTransformGeometry::GetMTime() const
     m_LastVtkAbstractTransformTimeStamp=m_VtkAbstractTransform->GetMTime();
     Modified();
   }
-  
+
   return Superclass::GetMTime();
 }

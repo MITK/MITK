@@ -124,8 +124,11 @@ void mitk::ContourSetVtkMapper3D::Update(mitk::BaseRenderer* renderer)
         idx+=1;
       }
 
-      int cell[2] = {lastPointIndex,firstPointIndex};
-      lines->InsertNextCell((vtkIdType)2,(vtkIdType*) cell);
+      if (nextContour->GetClosed())
+      {
+        int cell[2] = {lastPointIndex,firstPointIndex};
+        lines->InsertNextCell((vtkIdType)2,(vtkIdType*) cell);
+      }
       contourIt++;
     }
 

@@ -295,10 +295,15 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
   else if(strstr(fileName, "hpsonos.db")!=0 || strstr(fileName, "HPSONOS.DB")!=0)
   {
 
-    if (strcmp(fileName,"HPSONOS.DB")==0)
+    if (strstr(fileName, "HPSONOS.DB")!=0)
     {
       std::cout << "renamed HPSONOS.DB to hpsonos.db" << std::endl;
-      fileName = "hpsonos.db";
+      std::string newFileName(fileName);
+
+      int length = newFileName.length();
+      newFileName.replace(length-10,10,"hpsonos.db");
+      std::cout << "new filename: " << newFileName << std::endl;
+      fileName = newFileName.c_str();
     }
 
 

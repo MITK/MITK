@@ -1,11 +1,12 @@
 #ifndef EVENTMAPPER_H_HEADER_INCLUDED_C187864A
 #define EVENTMAPPER_H_HEADER_INCLUDED_C187864A
 
-//#include "mitkCommon.h"
+#include "mitkCommon.h"
 #include "Event.h"
 #include "EventDescription.h"
 #include "StateEvent.h"
 #include "StateMachine.h"
+#include "mitkInteractionConst.h"
 #include <qxml.h>
 #include <vector>
 #include <string>
@@ -52,13 +53,15 @@ class EventMapper : public QXmlDefaultHandler
     //##ModelId=3E785B1B00FD
 	static const std::string TYPE;
     //##ModelId=3E785B1B015B
-	static const std::string BUTTON_NUMBER;
+	static const std::string BUTTON;
+    //##ModelId=3E8B08FA01AA
+    static const std::string BUTTONSTATE;
     //##ModelId=3E785B1B01A9
 	static const std::string KEY;
     //##ModelId=3E785B1B01F7
-	static const std::string TRUE;
+	//static const std::string ISTRUE;
     //##ModelId=3E785B1B0245
-	static const std::string FALSE;
+	//static const std::string ISFALSE;
     //##ModelId=3E7B139E0233
     static StateEvent m_StateEvent;
     //##ModelId=3E7B1EB800CC

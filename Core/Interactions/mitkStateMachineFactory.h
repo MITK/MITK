@@ -1,9 +1,12 @@
 #ifndef STATEMACHINEFACTORY_H_HEADER_INCLUDED_C19AEDDD
 #define STATEMACHINEFACTORY_H_HEADER_INCLUDED_C19AEDDD
 
-// #include "mitkCommon.h"
+#include "mitkCommon.h"
 #include "State.h"
+#include "mitkInteractionConst.h"
 #include <qxml.h>
+#include <iostream>
+
 
 //##ModelId=3E775728016C
 typedef std::map<std::string,mitk::State*> StartStateMap;
@@ -89,9 +92,9 @@ namespace mitk {
     //##ModelId=3E775729017C
 	  static const std::string SIDE_EFFECT_ID;
     //##ModelId=3E7F18FF0131
-	  static const std::string TRUE;
+	  static const std::string ISTRUE;
     //##ModelId=3E7F18FF01FD
-	  static const std::string FALSE;
+	  static const std::string ISFALSE;
 	
 
 

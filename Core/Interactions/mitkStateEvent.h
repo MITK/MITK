@@ -1,7 +1,7 @@
 #ifndef STATEEVENT_H_HEADER_INCLUDED_C188E5BF
 #define STATEEVENT_H_HEADER_INCLUDED_C188E5BF
 
-//#include "mitkCommon.h"
+#include "mitkCommon.h"
 #include "Event.h"
 
 namespace mitk {

@@ -24,9 +24,9 @@ const std::string mitk::StateMachineFactory::EVENT_ID = "EVENT_ID";
 //##ModelId=3E775729017C
 const std::string mitk::StateMachineFactory::SIDE_EFFECT_ID = "SIDE_EFFECT_ID";
 //##ModelId=3E7F18FF0131
-const std::string mitk::StateMachineFactory::TRUE = "TRUE";
+const std::string mitk::StateMachineFactory::ISTRUE = "TRUE";
 //##ModelId=3E7F18FF01FD
-const std::string mitk::StateMachineFactory::FALSE = "FALSE";
+const std::string mitk::StateMachineFactory::ISFALSE = "FALSE";
 
 
 
@@ -89,9 +89,9 @@ bool mitk::StateMachineFactory::parse(StateMap *states, StateMapIter thisState, 
 		}
 		else if ( nextStatesSet.size()<= 1 )//wenn gleiche State oder wenn kein nextState vorhanden, dann Deadlock
 		{
-			return false;
+			std::cout<<"Warnung: Ein inkonsistenter Zustand wird erzeugt!"<<endl;
+			return true;//erlaubt!!!
 		}
-		
 
 	}
 	return true;
@@ -151,14 +151,14 @@ bool mitk::StateMachineFactory::startElement( const QString&, const QString&, co
 		m_AktStateMachineName = atts.value( NAME.c_str() ).latin1() ;
 	}
 
-	else if ( qName == "state" )											//e.g. <state NAME="start" ID="1" START_STATE="TRUE">
+	else if ( qName == "state" )											//e.g. <state NAME="start" ID="1" START_STATE="ISTRUE">
 	{
 		m_AktState = new mitk::State( atts.value ( NAME.c_str() ).latin1(), ( atts.value ( ID.c_str() ) ).toInt() );
 		std::pair<StateMapIter,bool> ok = m_AllStates.insert( StateMap::value_type( ( atts.value( ID.c_str() ) ).toInt(), m_AktState ) );
 		//insert into m_AllStates, which stores all States that aren't connected yet!
 		if (ok.second == false) 
 			return false;//STATE_ID was not unique or something else didn't work in insert! EXITS the process
-		if ( atts.value( START_STATE.c_str() ) == TRUE.c_str() )
+		if ( atts.value( START_STATE.c_str() ) == ISTRUE.c_str() )
 			m_StartStates.insert(StartStateMap::value_type(m_AktStateMachineName, m_AktState));
 			//if it is a startstate, then set a pointer into m_StartStates
 	}

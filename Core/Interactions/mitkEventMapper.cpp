@@ -10,13 +10,15 @@ const std::string mitk::EventMapper::ID = "ID";
 //##ModelId=3E77572901E9
 const std::string mitk::EventMapper::TYPE = "TYPE";
 //##ModelId=3E7757290256
-const std::string mitk::EventMapper::BUTTON_NUMBER = "BUTTON_NUMBER";
+const std::string mitk::EventMapper::BUTTON = "BUTTON";
+//##ModelId=3E8B08FA01AA
+const std::string mitk::EventMapper::BUTTONSTATE = "BUTTONSTATE";
 //##ModelId=3E77572902C4
 const std::string mitk::EventMapper::KEY = "KEY";
 //##ModelId=3E7757290341
-const std::string mitk::EventMapper::TRUE = "TRUE";
+//const std::string mitk::EventMapper::ISTRUE = "TRUE";
 //##ModelId=3E77572903AE
-const std::string mitk::EventMapper::FALSE = "FALSE";
+//const std::string mitk::EventMapper::ISFALSE = "FALSE";
 
 
 //##ModelId=3E5B349600CB
@@ -79,7 +81,8 @@ bool mitk::EventMapper::startElement( const QString&, const QString&, const QStr
 		EventDescription tempEventDescr( atts.value( NAME.c_str() ).latin1(), 
 										 atts.value( ID.c_str() ).toInt(), 
 										 atts.value( TYPE.c_str() ).toInt(),
-										 atts.value( BUTTON_NUMBER.c_str() ).toInt(), 
+										 atts.value( BUTTON.c_str() ).toInt(), 
+										 atts.value( BUTTONSTATE.c_str() ).toInt(), 
 										 atts.value( KEY.c_str() ).toInt() );
 		m_EventDescriptions.push_back(tempEventDescr);
 	}

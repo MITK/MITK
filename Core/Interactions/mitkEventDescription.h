@@ -1,7 +1,7 @@
 #ifndef EVENTDESCRIPTION_H_HEADER_INCLUDED_C188FC4D
 #define EVENTDESCRIPTION_H_HEADER_INCLUDED_C188FC4D
 
-//#include "mitkCommon.h"
+#include "mitkCommon.h"
 #include "Event.h"
 #include <string>
 
@@ -12,7 +12,7 @@ class EventDescription : public Event
 {
   public:
     //##ModelId=3E5B30A30095
-	EventDescription(std::string name, int id, int type, int buttonNumber, int key);
+	EventDescription(std::string name, int id, int type, int button, int buttonState, int key);
 
     //##ModelId=3E5B3103030A
 	std::string GetName() const;

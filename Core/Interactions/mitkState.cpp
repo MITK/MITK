@@ -1,5 +1,6 @@
 #include "State.h"
 
+        
 //##ModelId=3E5B2A9203BD
 mitk::State::State(std::string stateName, int stateId)
 : m_Name(stateName), m_Id(stateId)

@@ -1,7 +1,7 @@
 #ifndef STATEMACHINE_H_HEADER_INCLUDED_C18896BD
 #define STATEMACHINE_H_HEADER_INCLUDED_C18896BD
 
-//#include "mitkCommon.h"
+#include "mitkCommon.h"
 #include <itkObject.h>
 #include "State.h"
 #include "StateEvent.h"

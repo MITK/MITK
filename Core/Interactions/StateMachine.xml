@@ -1,12 +1,23 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<mitkInteraktionStates xmlns="http://tempuri.org/StateMachine.xsd" STYLE="Powerpoint">
+<!-- Event_Id = 0: this is a * transition with all other eventId's not declared in that state -->
+<mitkInteraktionStates xmlns="http://tempuri.org/StateMachine.xsd" STYLE="User001">
 	<stateMachine NAME="global">
 		<state NAME="neutral" ID="1" START_STATE="TRUE">
-			<transition NAME="transmitt events" NEXT_STATE_ID="1" EVENT_ID="0">
+			<transition NAME="edit objects" NEXT_STATE_ID="2" EVENT_ID="1013"><!--EIDEDIT-->
+				<action ID="0" />
+			</transition>
+			<transition NAME="transmitt to all" NEXT_STATE_ID="1" EVENT_ID="0">
 				<action ID="1200" />
 				<action ID="1201" />
 			</transition>
-			<!-- this is a * transition from state x into state x with all other eventId's not standing here -->
+		</state>
+		<state NAME="edit object" ID="2">
+			<transition NAME="ready" NEXT_STATE_ID="1" EVENT_ID="1002"><!--EIDFINISHED-->
+				<action ID="0" />
+			</transition>
+			<transition NAME="transmitt to interactors only" NEXT_STATE_ID="2" EVENT_ID="0">
+				<action ID="1201" />
+			</transition>
 		</state>
 	</stateMachine>
 	<stateMachine NAME="leftmouse">

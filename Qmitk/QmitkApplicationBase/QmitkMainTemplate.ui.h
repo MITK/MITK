@@ -57,7 +57,7 @@
 
 #include <mitkParRecFileReader.h>
 #include <mitkInteractionConst.h>
-#include <QmitkApplicationBase/QmitkStatusBar.h>
+#include <QmitkStatusBar/QmitkStatusBar.h>
 
 mitk::FloatProperty::Pointer opacityprop=NULL;
 

@@ -1,0 +1,106 @@
+#include "mitkContourMapper2D.h"
+#include "mitkBaseRenderer.h"
+#include "mitkPlaneGeometry.h"
+#include "mitkColorProperty.h"
+#include "mitkFloatProperty.h"
+#include "mitkStringProperty.h"
+#include <vtkTransform.h>
+
+
+#ifdef WIN32
+#include <glut.h>
+#else
+#include <GL/glut.h>
+#endif
+
+
+//##ModelId=3F0189F00378
+mitk::ContourMapper2D::ContourMapper2D()
+{
+}
+
+//##ModelId=3F0189F00382
+mitk::ContourMapper2D::~ContourMapper2D()
+{
+}
+
+
+//##ModelId=3F0189F00373
+void mitk::ContourMapper2D::Paint(mitk::BaseRenderer * renderer)
+{
+  if(IsVisible(renderer)==false) return;
+
+  ////	@FIXME: Logik fuer update
+  bool updateNeccesary=true;
+
+  if (updateNeccesary) {
+    mitk::Contour::Pointer input =  const_cast<mitk::Contour*>(this->GetInput());
+
+    // ok, das ist aus GenerateData kopiert
+    mitk::DisplayGeometry::Pointer displayGeometry = renderer->GetDisplayGeometry();
+    assert(displayGeometry.IsNotNull());
+
+    //apply color and opacity read from the PropertyList
+    ApplyProperties(renderer);
+
+    vtkTransform* transform = GetDataTreeNode()->GetVtkTransform();
+
+
+    Contour::InputType idx = input->GetContourPath()->StartOfInput();
+    Contour::OutputType point;
+
+    mitk::Point3D p, projected_p;
+    float vtkp[3];
+
+    glBegin (GL_LINE_LOOP);
+
+    
+    Contour::InputType end = input->GetContourPath()->EndOfInput();
+    if (end > 50000) end = 0;
+    while ( idx != end )
+    {
+      point = input->GetContourPath()->Evaluate(idx);
+
+      p.x= point[0];
+      p.y= point[1];
+      p.z= point[2];
+      vec2vtk(p, vtkp);
+      transform->TransformPoint(vtkp, vtkp);
+      vtk2vec(vtkp,p);
+
+      displayGeometry->Project(p, projected_p);
+      if(Vector3D(p-projected_p).length()< 1) {
+        Point2D pt2d, tmp;
+        displayGeometry->Map(projected_p, pt2d);
+        displayGeometry->MMToDisplay(pt2d, pt2d);
+        glVertex2fv(&pt2d.x);
+      }
+
+      idx += 1;
+    }
+    glEnd ();
+  
+  }
+}
+
+
+
+//##ModelId=3F0189F00366
+const mitk::Contour* mitk::ContourMapper2D::GetInput(void)
+{
+	if (this->GetNumberOfInputs() < 1)
+	{
+		return 0;
+	}
+
+    return static_cast<const mitk::Contour * > ( GetData() );
+}
+
+
+void mitk::ContourMapper2D::Update()
+{
+}
+
+void mitk::ContourMapper2D::GenerateOutputInformation()
+{
+}

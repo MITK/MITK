@@ -1,0 +1,66 @@
+/*=========================================================================
+
+Program:   Medical Imaging & Interaction Toolkit
+Module:    $RCSfile$
+Language:  C++
+Date:      $Date$
+Version:   $Revision$
+
+Copyright (c) German Cancer Research Center, Division of Medical and
+Biological Informatics. All rights reserved.
+See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
+
+This software is distributed WITHOUT ANY WARRANTY; without even
+the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE.  See the above copyright notices for more information.
+
+=========================================================================*/
+
+
+#ifndef DATATREEHELPER_H_HEADER_INCLUDED_C1C7797C
+#define DATATREEHELPER_H_HEADER_INCLUDED_C1C7797C
+
+#include "mitkCommon.h"
+#include "mitkDataTree.h"
+
+namespace mitk 
+{
+
+//##Documentation
+//## @brief Convenience methods for common tasks concerning the data tree
+//## @ingroup DataTree
+class DataTreeHelper
+{
+public:
+  //##Documentation
+  //## @brief Search a data tree for (the first) iterator to a given node
+  static DataTreeIteratorClone FindIteratorToNode(mitk::DataTreeBase* tree, const DataTreeNode* node, const DataTreeIteratorBase* startPosition = NULL );
+
+  //##Documentation
+  //## @brief Add itk-image to data tree
+  //##
+  //## The itk-image is converted into an mitk::Image.
+  //## @param itkImage the itk-image to be added
+  //## @param iterator the iterator used for adding the node, containing the image
+  //## @param name string with the name of the image, stored in the property "name"
+  //## @param replaceByName if @a true, the tree is searched starting at 
+  //##   @a iterator for a node called @a name, which data is replaced with 
+  //##   @a itkImage
+  template < typename TImageType >
+  static mitk::DataTreeNode::Pointer 
+  AddItkImageToDataTree(TImageType* itkImage, mitk::DataTreeIteratorBase* iterator, const char* name=NULL, bool replaceByName=false);
+
+protected:
+  DataTreeHelper();
+
+  virtual ~DataTreeHelper();
+};
+
+} // namespace mitk
+
+#ifndef MITK_MANUAL_INSTANTIATION
+#include "mitkDataTreeHelper.txx"  // because it has templated methods
+#endif
+
+#endif /* DATATREEHELPER_H_HEADER_INCLUDED_C1C7797C */
+

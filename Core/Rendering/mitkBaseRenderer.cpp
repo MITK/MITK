@@ -144,8 +144,7 @@ void mitk::BaseRenderer::MousePressEvent(mitk::MouseEvent *me)
     GetDisplayGeometry()->ULDisplayToDisplay(p,p);
     std::cout << "press event!" << std::endl;
     mitk::DisplayPositionEvent event(this, me->type(), me->button(), me->state(), Qt::Key_unknown, p);
-    if (! mitk::EventMapper::MapEvent(&event))
-        std::cerr << "error, event was not mapped!" << std::endl;
+    mitk::EventMapper::MapEvent(&event);
   }
 }
 

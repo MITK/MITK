@@ -11,6 +11,9 @@ namespace mitk {
     class OperationActor;
 
 //##ModelId=3EF221E9001C
+//##Documentation
+//## @brief Interactor for displaying different slices in orthogonal views.
+//## @ingroup Interaction
 class DisplayVectorInteractor : public StateMachine
 {
   public:

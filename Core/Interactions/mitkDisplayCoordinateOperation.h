@@ -16,6 +16,9 @@
 namespace mitk {
 
 //##ModelId=3EF1CC2B03BD
+//##Documentation
+//## @brief Operation with informations necessary for operations of DisplayVectorInteractor
+//## @ingroup Undo
 class DisplayCoordinateOperation : public Operation
 {
   public:

@@ -10,7 +10,7 @@
 #include "itkImageRegion.h"
 
 #if _MSC_VER < 1300
-#define VImageDimension 5
+#define VmitkImageDimension 5
 #endif
 
 namespace mitk {
@@ -25,7 +25,7 @@ class SlicedData : public BaseData
 protected:
 #if !(_MSC_VER < 1300)
     //##ModelId=3E144ED20061
-	static const int VImageDimension=5;
+	static const int VmitkImageDimension=5;
 #endif
 public:
 	/** Standard typedefs. */
@@ -43,24 +43,24 @@ public:
 
 	/** Region typedef support. A region is used to specify a subset of a @a SlicedData. */
     //##ModelId=3E143BF1002F
-	typedef itk::ImageRegion<VImageDimension>  RegionType;
+	typedef itk::ImageRegion<VmitkImageDimension>  RegionType;
 
 	/** Index typedef support. An index is used to access pixel values. */
     //##ModelId=3E144ED10331
-	typedef itk::Index<VImageDimension>  IndexType;
+	typedef itk::Index<VmitkImageDimension>  IndexType;
     //##ModelId=3E144ED10346
 	typedef IndexType::IndexValueType  IndexValueType;
 	  
 	/** Offset typedef support. An offset represent relative position
 	* between indices. */
     //##ModelId=3E144ED1035A
-	typedef itk::Offset<VImageDimension>  OffsetType;
+	typedef itk::Offset<VmitkImageDimension>  OffsetType;
     //##ModelId=3E144ED1036D
 	typedef OffsetType::OffsetValueType OffsetValueType;
 
 	/** Size typedef support. A size is used to define region bounds. */
     //##ModelId=3E144ED10377
-	typedef itk::Size<VImageDimension>  SizeType;
+	typedef itk::Size<VmitkImageDimension>  SizeType;
     //##ModelId=3E144ED10382
 	typedef SizeType::SizeValueType SizeValueType;
     

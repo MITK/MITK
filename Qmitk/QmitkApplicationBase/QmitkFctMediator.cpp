@@ -99,7 +99,7 @@ bool QmitkFctMediator::addFunctionality(QmitkFunctionality * functionality)
 
 	connect(functionality, SIGNAL(availabilityChanged()), this, SLOT(checkAvailability()));
 
-    QPushButton* funcButton(NULL); 
+    QPushButton* funcButton=NULL; 
     if(m_ButtonMenu!=NULL)
     {
         QLayout * menuLayout = m_ButtonMenu->layout();

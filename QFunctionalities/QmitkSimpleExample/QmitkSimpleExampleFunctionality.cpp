@@ -9,6 +9,15 @@
 #include <mitkFloatProperty.h>
 #include <algorithm>
 
+#if ((defined(_MSC_VER)) && (_MSC_VER <= 1200))
+  #include <xutility>
+#else
+#ifndef _MAX
+  #define _MAX	max
+  #define _MIN	min
+#endif
+#endif
+
 QmitkSimpleExampleFunctionality::QmitkSimpleExampleFunctionality(QObject *parent, const char *name, QmitkStdMultiWidget *mitkStdMultiWidget, mitk::DataTreeIterator * it) : QmitkFunctionality(parent, name, it) ,
 controls(NULL), multiWidget(mitkStdMultiWidget), opacityprop(NULL)
 {
@@ -119,60 +128,107 @@ void QmitkSimpleExampleFunctionality::initWidgets()
 {
 	int count = 0;
 	mitk::DataTreeIterator* it=dataTree->clone();
+
 	while (it->hasNext()) {
 
 		it->next();
 		printf("\nrequesting boundingbox\n");   
 
+
+
 		mitk::DataTreeNode::Pointer node = it->get();
+
 		
+
 		if (node->GetData() != NULL ) {
 
+
+
 			// get 
+
 			if (node->GetData()->GetGeometry() != NULL	) {
+
 				mitk::BoundingBox::ConstPointer bb = node->GetData()->GetGeometry()->GetBoundingBox();
+
 				printf("boundsArrayType\n");
+
 				const mitk::BoundingBox::BoundsArrayType bounds = bb->GetBounds();
+
 				printf("\nboundingbox\n");   
+
 			
+
 				// init slider limits
-				controls->sliderYZ->setMinValue( std::min<int>(bounds[0],controls->sliderYZ->minValue()));
-				controls->sliderYZ->setMaxValue(std::max<int>(bounds[1],controls->sliderYZ->maxValue()));
-				controls->sliderXZ->setMinValue(std::min<int>(bounds[2],controls->sliderXZ->minValue()));
-				controls->sliderXZ->setMaxValue(std::max<int>(bounds[3],controls->sliderXZ->maxValue()));
-				controls->sliderXY->setMinValue(std::min<int>(bounds[4],controls->sliderXY->minValue()));
-				controls->sliderXY->setMaxValue(std::max<int>(bounds[5],controls->sliderXY->maxValue()));
+
+				controls->sliderYZ->setMinValue(std::_MIN<int>(bounds[0],controls->sliderYZ->minValue()));
+
+				controls->sliderYZ->setMaxValue(std::_MAX<int>(bounds[1],controls->sliderYZ->maxValue()));
+
+				controls->sliderXZ->setMinValue(std::_MIN<int>(bounds[2],controls->sliderXZ->minValue()));
+
+				controls->sliderXZ->setMaxValue(std::_MAX<int>(bounds[3],controls->sliderXZ->maxValue()));
+
+				controls->sliderXY->setMinValue(std::_MIN<int>(bounds[4],controls->sliderXY->minValue()));
+
+				controls->sliderXY->setMaxValue(std::_MAX<int>(bounds[5],controls->sliderXY->maxValue()));
+
 				
+
 				count++;
+
 			}
 
+
+
 			// init pic color props
+
 			mitk::ColorProperty::Pointer colorprop;
+
 			if (count == 1) {
+
 				float color[3] = {1.0f,1.0f,1.0f};
+
 				colorprop = new mitk::ColorProperty(color);
+
 			}
+
 			else {
+
 				float color[3] = {1.0f,0.0f,0.0f};
+
 				colorprop = new mitk::ColorProperty(color);
+
 			}
+
 			node->GetPropertyList()->SetProperty("color", colorprop);
 			
 			// init pic opacity props
+
 			if (opacityprop == NULL) {
+
 				opacityprop = new mitk::FloatProperty(1.0f);
+
 			}
 
+
+
 			if (count == 1) {
+
 				node->GetPropertyList()->SetProperty("opacity", new mitk::FloatProperty(1.0f) );
 			}
+
 			else {
+
 				opacityprop->SetValue(0.5f);
+
 				node->GetPropertyList()->SetProperty("opacity", opacityprop);
 			}
 			
+
 		}
 	}
 	delete it;
+
+
 
 }

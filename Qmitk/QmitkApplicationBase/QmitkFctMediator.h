@@ -76,6 +76,7 @@ public:
 	virtual bool addFunctionality(QmitkFunctionality * functionality);
 
 	virtual QmitkFunctionality* getFunctionalityByName(const char * name);
+  virtual int getFunctionalityIdByName( const char * name );
 	virtual QWidget * getMainParent();
 	virtual QWidget * getControlParent();
 	virtual QButtonGroup * getButtonMenu();

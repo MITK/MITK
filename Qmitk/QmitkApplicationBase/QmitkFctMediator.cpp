@@ -274,6 +274,20 @@ QmitkFunctionality* QmitkFctMediator::getFunctionalityByName(const char *name)
 	return NULL;
 }
 
+int QmitkFctMediator::getFunctionalityIdByName( const char * name ) {
+
+	QmitkFunctionality *functionality;
+  int id = 0;
+
+	for ( functionality = qfl.first(); functionality != NULL; functionality = qfl.next(), id++ ) 
+  {
+		if(strcmp(functionality->getFunctionalityName().ascii(),name)==0)
+			return id;
+  }
+
+	return -1;
+}
+
 void QmitkFctMediator::raiseFunctionality(int id)
 {
     QAction *action;

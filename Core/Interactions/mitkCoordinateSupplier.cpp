@@ -80,7 +80,7 @@ bool mitk::CoordinateSupplier::ExecuteSideEffect(int sideEffectId, mitk::StateEv
     const mitk::DisplayPositionEvent* displPosEvent = dynamic_cast<const mitk::DisplayPositionEvent *>(stateEvent->GetEvent());
     if(displPosEvent!=NULL)
     {
-        std::cout<<"DisplayPositionEvent"<<std::endl;
+        //std::cout<<"DisplayPositionEvent"<<std::endl;
         return true;
     }
 

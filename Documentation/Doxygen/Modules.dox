@@ -20,7 +20,15 @@
   This subcategory includes the data classes, e.g., for images (mitk::Image), 
   surfaces (mitk::SurfaceData), vessel-trees (mitk::VesselTreeData), etc. 
   Data access classes are only included, if there is no equivalent in itk (see 
-  \ref AlgorithmAndAdaptorClasses "Algorithm and Adaptor Classes" below).
+  \ref ProcessAndAdaptorClasses "Process and Adaptor Classes" below).
+*/
+
+/**
+  \defgroup Geometry Geometry Classes
+  \ingroup DataManagement
+
+  This subcategory includes the geometry classes, which describe the geometry of the 
+  data in space and time.
 */
 
 /**
@@ -31,12 +39,19 @@
 */
 
 /**
-  \defgroup Algorithm Algorithm and Adaptor Classes 
-  \anchor AlgorithmAndAdaptorClasses
+  \defgroup ProcessAdaptor Process and Adaptor Classes 
+  \anchor ProcessAndAdaptorClasses
 
-  This category includes algorithm classes developed specifically for mitk and (mainly) adaptor 
-  classes for the integration of algorithms from other toolkits (currently vtk, itk).
+  This category includes process (algorithm) classes developed specifically for mitk and 
+  (mainly) adaptor classes for the integration of algorithms from other toolkits 
+  (currently vtk, itk).
   The itk adaptor classes are also useful for data access to mitk data objects.
+*/
+
+/**
+  \defgroup Process Process Classes
+  \ingroup ProcessAndAdaptorClasses
+  This subcategory includes process (algorithm) classes developed specifically for mitk.
 */
 
 /**

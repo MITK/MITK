@@ -21,8 +21,12 @@ class DataTreeNode;
 //## DESELECTED: this statemachine doesn't wait for an event
 //## SELECTED: this statemachine just has handled an event and waits for the next one
 //## SUBSELECTED: a hierarchical lower statemachine has just handled an event so this statemachine wants to pass the event to this machine
-//## Guidelines for the modevalues: Selected if the coresponding data is selected, deselected if deselect of data, subselect if submachine is selected
-//## in moving the machine is selected. After a new insert the machine is selected, since the data is also selected
+//## Guidelines for the modevalues: Selected if the coresponding data is selected, deselected if deselect of data, 
+//## subselect if a subobject is selected (and a submachine is selected).
+//## Set the mode in each hierachical lavel of a statemachine! Each statemachine has to to this on its own in ExecuteAction, cause only here 
+//## can be recognized if a substatemachine has to be selected or this statemachine has to be selected.
+//##
+//## In moving the machine is selected. After a new insert the machine is selected, since the data is also selected
 //## In method ExecuteAction(..) the different actions are divided up through switch/case statements. Each block has to check
 //## the appropriate type of event to process the actions. Especially in guarding states (a state, that checks certain conditions (e.g. is picked)
 //## the according Event must be called to continue in states. No return false here!
@@ -63,6 +67,14 @@ public:
   //##Documentation
   //## @brief Get the Mode of the Interactor. Use enum SMMode for return parameter
   const int GetMode() const;
+
+  //##Documentation
+  //## @brief calculates how good the data, this statemachine handles, is hit by the event.
+  //## 
+  //## Returns a value between 0 and 1.
+  //## Standard function to override if needed.
+  //## (Used by GlobalInteraction to descide which DESELECTED statemachine to send the event to.)
+  virtual float CalculateJurisdiction(StateEvent const* stateEvent) const;
 
   //##Documentation
   //## @brief Executes Side-Effects

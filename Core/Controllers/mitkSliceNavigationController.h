@@ -20,17 +20,22 @@ public:
   mitkClassMacro(SliceNavigationController,BaseController);
   itkNewMacro(Self);
 
+  enum ViewDirection{Transversal, Sagittal, Frontal, Original};
+
   //##ModelId=3DD524D7038C
   const mitk::Geometry3D* GetGeometry();
 
-  //##ModelId=3DD524F9001A
-  virtual void SetGeometry2D(const mitk::Geometry2D &aGeometry2D);
-
   //##ModelId=3E3AA1E20393
-  virtual void SetGeometry3D(const mitk::Geometry3D &aGeometry3D);
+  virtual void SetGeometry(const mitk::Geometry3D* aGeometry3D);
 
-  //##ModelId=3DFF3D9A038E
-  virtual void SetPoint(const mitk::Point3D &point);
+  //##ModelId=3DD524F9001A
+  virtual void SetGeometry2D(const mitk::Geometry2D* aGeometry2D);
+
+  itkSetMacro(ViewDirection, ViewDirection);
+
+  itkGetMacro(ViewDirection, ViewDirection);
+
+  virtual bool AddRenderer(mitk::BaseRenderer* renderer);
 
 protected:
   //##ModelId=3E189B1D008D
@@ -39,6 +44,21 @@ protected:
   //##ModelId=3E189B1D00BF
   virtual ~SliceNavigationController();
 
+  virtual void SliceStepperChanged();
+
+  virtual void TimeStepperChanged();
+
+  mitk::Geometry3D::ConstPointer m_Geometry3D;
+
+  mitk::Geometry2D::ConstPointer m_Geometry2D;
+
+  mitk::PlaneGeometry::Pointer m_Plane;
+
+  Vector3D m_NormalizedSliceDirection;
+
+  ViewDirection m_ViewDirection;
+
+  bool m_BlockUpdate;
 };
 
 } // namespace mitk

@@ -35,6 +35,36 @@ int mitkContourTest(int argc, char* argv[])
     } 
 
 
+  std::cout << "Testing mitk::Contour::GetPoints()";
+  mitk::Contour::PointsContainerPointer points = contour->GetPoints();
+  if ( points.IsNull() )   
+    {
+      std::cout<<"[FAILED]"<<std::endl;
+      return EXIT_FAILURE;
+    }
+  else 
+    {
+    std::cout<<"[PASSED]"<<std::endl;
+    } 
+
+  std::cout << "Testing mitk::Contour::Initialize()";
+  contour->Initialize();
+  if (contour->GetNumberOfPoints() != 0)   
+    {
+      std::cout<<"[FAILED]"<<std::endl;
+      return EXIT_FAILURE;
+    }
+  else 
+    {
+    std::cout<<"[PASSED]"<<std::endl;
+    } 
+
+  contour->SetPoints(points);
+  if ( contour->GetNumberOfPoints() != 3)
+    {
+      std::cout<<"[FAILED]"<<std::endl;
+      return EXIT_FAILURE;      
+    };
   
 
   std::cout<<"[TEST DONE]"<<std::endl;

@@ -9,6 +9,7 @@
 #include "vtkTexture.h"
 #include "vtkPlaneSource.h"
 #include "vtkPolyDataMapper.h"
+#include "vtkLookupTable.h"
 //#include "vtkImageMapToWindowLevelColors";
 
 #include "pic2vtk.h"

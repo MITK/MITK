@@ -52,6 +52,9 @@
  *   reads a slice from a PicFile
  *
  * $Log$
+ * Revision 1.7  2002/02/27 09:05:15  andre
+ * zlib changes
+ *
  * Revision 1.6  2002/02/27 09:02:56  andre
  * zlib changes
  *
@@ -136,13 +139,13 @@ ipPicDescriptor *ipPicGetSlice( char *infile_name, ipPicDescriptor *pic, ipUInt4
   ipPicFRead( &(tag_name[4]), 1, sizeof(ipPicTag_t)-4, infile );
   strncpy( pic->info->version, tag_name, _ipPicTAGLEN );
 
-  ipFReadLE( &len, sizeof(ipUInt4_t), 1, infile );
+  ipPicFReadLE( &len, sizeof(ipUInt4_t), 1, infile );
 
-  ipFReadLE( &(pic->type), sizeof(ipUInt4_t), 1, infile );
-  ipFReadLE( &(pic->bpe), sizeof(ipUInt4_t), 1, infile );
-  ipFReadLE( &(pic->dim), sizeof(ipUInt4_t), 1, infile );
+  ipPicFReadLE( &(pic->type), sizeof(ipUInt4_t), 1, infile );
+  ipPicFReadLE( &(pic->bpe), sizeof(ipUInt4_t), 1, infile );
+  ipPicFReadLE( &(pic->dim), sizeof(ipUInt4_t), 1, infile );
 
-  ipFReadLE( &(pic->n), sizeof(ipUInt4_t), pic->dim, infile );
+  ipPicFReadLE( &(pic->n), sizeof(ipUInt4_t), pic->dim, infile );
 
 
   skip = len -        3 * sizeof(ipUInt4_t)
@@ -168,7 +171,7 @@ ipPicDescriptor *ipPicGetSlice( char *infile_name, ipPicDescriptor *pic, ipUInt4
 
   pic->data = malloc( picsize );
 
-  ipFReadLE( pic->data, pic->bpe / 8, _ipPicElements(pic), infile );
+  ipPicFReadLE( pic->data, pic->bpe / 8, _ipPicElements(pic), infile );
 
   if( infile != stdin )
     ipPicFClose( infile );

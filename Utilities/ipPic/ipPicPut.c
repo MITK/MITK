@@ -52,6 +52,9 @@
  *   writes a PicFile to disk
  *
  * $Log$
+ * Revision 1.12  2002/02/27 09:06:28  andre
+ * zlib changes
+ *
  * Revision 1.11  2000/05/04 12:52:40  ivo
  * inserted BSD style license
  *
@@ -120,7 +123,10 @@ ipPicPut( char *outfile_name, ipPicDescriptor *pic )
   else if( strcmp(outfile_name, "stdout") == 0 )
     outfile = stdout;
   else
-    outfile = fopen( outfile_name, "wb" );
+    {
+      ipPicRemoveFile( outfile_name );
+      outfile = fopen( outfile_name, "wb" );
+    }
 
   if( outfile == NULL )
     {

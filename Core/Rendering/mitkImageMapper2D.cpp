@@ -50,6 +50,10 @@ void mitk::ImageMapper2D::GenerateData()
 
 void mitk::ImageMapper2D::Paint(mitk::BaseRenderer * renderer)
 {
+  mitk::Image* input  = const_cast<mitk::ImageMapper2D::InputImageType *>(this->GetInput());
+  if((input == NULL) || (input->IsInitialized()==false))
+    return;
+
   if(IsVisible(renderer)==false) return;
 
   RendererInfo& renderinfo=m_RendererInfo[renderer];
@@ -151,7 +155,10 @@ void mitk::ImageMapper2D::GenerateData(mitk::BaseRenderer *renderer)
 
   iilPicImage*& image = renderinfo.m_iilImage;
 
-  mitk::Image::Pointer input  = const_cast<mitk::ImageMapper2D::InputImageType *>(this->GetInput());
+  mitk::Image* input  = const_cast<mitk::ImageMapper2D::InputImageType *>(this->GetInput());
+
+  if((input == NULL) || (input->IsInitialized()==false))
+    return;
 
   if(image!= NULL)
   {
@@ -168,7 +175,7 @@ void mitk::ImageMapper2D::GenerateData(mitk::BaseRenderer *renderer)
   if(renderinfo.m_RendererId < 0)
     renderinfo.m_RendererId = ImageMapper2D::numRenderer++;
 
-  if(input.IsNotNull())
+  if(input!=NULL)
   {
     const TimeSlicedGeometry* inputtimegeometry = dynamic_cast<const TimeSlicedGeometry*>(input->GetUpdatedGeometry());
 
@@ -359,6 +366,9 @@ void mitk::ImageMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
 
 void mitk::ImageMapper2D::Update(mitk::BaseRenderer* renderer)
 {
+  mitk::Image* input  = const_cast<mitk::ImageMapper2D::InputImageType *>(this->GetInput());
+  if((input == NULL) || (input->IsInitialized()==false))
+    return;
 
   RendererInfo& renderinfo=m_RendererInfo[renderer];
   DataTreeNode* node=GetDataTreeNode();

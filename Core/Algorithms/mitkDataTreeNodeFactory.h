@@ -151,6 +151,8 @@ protected:
     
     virtual void ReadFileSeriesTypeDCM();
     
+    virtual void ReadFileSeriesTypeITKImageSeriesReader();
+    
     std::string m_FileName;
 
     std::string m_FilePrefix;

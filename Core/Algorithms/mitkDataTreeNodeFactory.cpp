@@ -1,7 +1,11 @@
 #include "mitkDataTreeNodeFactory.h"
 
+// C-Standard library includes
+#include <stdlib.h>
+
 // STL-related includes
 #include <vector>
+#include <map>
 
 // VTK-related includes
 #include <vtkSTLReader.h>
@@ -11,6 +15,7 @@
 
 // ITK-related includes
 #include <itksys/SystemTools.hxx>
+#include <itksys/Directory.hxx>
 #include <itkImage.h>
 #include <itkImageSeriesReader.h>
 #include <itkDICOMImageIO2.h>
@@ -21,6 +26,7 @@
 #include <itkImageSeriesReader.h>
 #include <itkDICOMImageIO2.h>
 #include <itkDICOMSeriesFileNames.h>
+#include <itkNumericSeriesFileNames.h>
 
 // MITK-related includes
 #include "mitkSurfaceData.h"
@@ -121,6 +127,10 @@ void mitk::DataTreeNodeFactory::GenerateData()
         else if ( this->FilePatternEndsWith( ".dcm" ) || this->FilePatternEndsWith( ".DCM" ) )
         {
             this->ReadFileSeriesTypeDCM();
+        }
+        else if ( this->FilePatternEndsWith( ".png" ) || this->FilePatternEndsWith( ".PNG" ) )
+        {
+            this->ReadFileSeriesTypeITKImageSeriesReader();
         }
     }
 }
@@ -248,10 +258,10 @@ void mitk::DataTreeNodeFactory::ReadFileTypePIC()
         mitk::LevelWindowProperty::Pointer levWinProp = new mitk::LevelWindowProperty();
         mitk::LevelWindow levelwindow;
 
-        levelwindow.SetAuto( reader->GetOutput() ->GetPic() );
+        levelwindow.SetAuto( reader->GetOutput()->GetPic() );
         levWinProp->SetLevelWindow( levelwindow );
 
-        node->GetPropertyList() ->SetProperty( "levelwindow", levWinProp );
+        node->GetPropertyList()->SetProperty( "levelwindow", levWinProp );
     }
     std::cout << "...finished!" << std::endl;
 }
@@ -279,9 +289,9 @@ void mitk::DataTreeNodeFactory::ReadFileTypePAR()
     // add level-window property
     mitk::LevelWindowProperty::Pointer levWinProp = new mitk::LevelWindowProperty();
     mitk::LevelWindow levelwindow;
-    levelwindow.SetAuto( reader->GetOutput() ->GetPic() );
+    levelwindow.SetAuto( reader->GetOutput()->GetPic() );
     levWinProp->SetLevelWindow( levelwindow );
-    node->GetPropertyList() ->SetProperty( "levelwindow", levWinProp );
+    node->GetPropertyList()->SetProperty( "levelwindow", levWinProp );
 
     std::cout << "...finished!" << std::endl;
 }
@@ -299,7 +309,7 @@ void mitk::DataTreeNodeFactory::ReadFileTypePVTK()
     {
         mitk::Image::Pointer image = mitk::Image::New();
         image->Initialize( vtkreader->GetOutput() );
-        image->SetVolume( vtkreader->GetOutput() ->GetScalarPointer() );
+        image->SetVolume( vtkreader->GetOutput()->GetScalarPointer() );
         mitk::DataTreeNode::Pointer node = this->GetOutput();
         node->SetData( image );
 
@@ -315,7 +325,7 @@ void mitk::DataTreeNodeFactory::ReadFileTypePVTK()
         mitk::LevelWindow levelwindow;
         levelwindow.SetAuto( image->GetPic() );
         levWinProp->SetLevelWindow( levelwindow );
-        node->GetPropertyList() ->SetProperty( "levelwindow", levWinProp );
+        node->GetPropertyList()->SetProperty( "levelwindow", levWinProp );
     }
 
     vtkreader->Delete();
@@ -384,12 +394,12 @@ void mitk::DataTreeNodeFactory::ReadFileTypeHPSONOS()
     reader->UpdateOutputInformation();
 
     bool haveDoppler = false;
-    if ( reader->GetOutput() ->IsValidChannel( 0 ) )
+    if ( reader->GetOutput()->IsValidChannel( 0 ) )
     {
         std::cout << "    have channel data 0 (backscatter) ... " << std::endl;
     }
 
-    if ( reader->GetOutput() ->IsValidChannel( 1 ) )
+    if ( reader->GetOutput()->IsValidChannel( 1 ) )
     {
         std::cout << "    have channel data 1 (doppler) ... " << std::endl;
         haveDoppler = true;
@@ -420,7 +430,7 @@ void mitk::DataTreeNodeFactory::ReadFileTypeHPSONOS()
     node->SetProperty( "fileName", nameProp );
     node->SetProperty( "layer", new mitk::IntProperty( -11 ) );
     mitk::LevelWindow levelwindow;
-    levelwindow.SetAuto( sliceSelector->GetOutput() ->GetPic() );
+    levelwindow.SetAuto( sliceSelector->GetOutput()->GetPic() );
     node->SetLevelWindow( levelwindow, NULL );
     node->SetVisibility( false, NULL );
     node->Update();
@@ -443,7 +453,7 @@ void mitk::DataTreeNodeFactory::ReadFileTypeHPSONOS()
 
     sliceSelector->SetInput( cyl2cart->GetOutput() );
     sliceSelector->Update();
-    levelwindow.SetAuto( sliceSelector->GetOutput() ->GetPic() );
+    levelwindow.SetAuto( sliceSelector->GetOutput()->GetPic() );
     node->SetLevelWindow( levelwindow, NULL );
     node->Update();
 
@@ -493,7 +503,7 @@ void mitk::DataTreeNodeFactory::ReadFileTypeHPSONOS()
         // if "levelwindow" is used if "levelwindow" is not available
         // else "levelwindow" is used
         // "levelwindow" is not affected by the slider
-        node->GetPropertyList() ->SetProperty( "levelWindow", levWinProp );
+        node->GetPropertyList()->SetProperty( "levelWindow", levWinProp );
 
         node->SetProperty( "LookupTable", LookupTableProp );
         node->SetVisibility( false, NULL );
@@ -521,7 +531,7 @@ void mitk::DataTreeNodeFactory::ReadFileTypeHPSONOS()
         // if "levelwindow" is used if "levelwindow" is not available
         // else "levelwindow" is used
         // "levelwindow" is not affected by the slider
-        node->GetPropertyList() ->SetProperty( "levelWindow", levWinProp );
+        node->GetPropertyList()->SetProperty( "levelWindow", levWinProp );
 
         node->SetProperty( "LookupTable", LookupTableProp );
         node->Update();
@@ -557,7 +567,7 @@ void mitk::DataTreeNodeFactory::ReadFileTypeDCM()
 
     // add Level-Window property
     mitk::LevelWindow levelwindow;
-    levelwindow.SetAuto( reader->GetOutput() ->GetPic() );
+    levelwindow.SetAuto( reader->GetOutput()->GetPic() );
     node->SetLevelWindow( levelwindow, NULL );
 
     std::cout << "...finished!" << std::endl;
@@ -634,7 +644,7 @@ void mitk::DataTreeNodeFactory::ReadFileTypeITKImageIOFactory()
     mitk::PixelType pixelType( imageIO->GetPixelType() );
     image->Initialize( pixelType, ndim, dimensions );
     image->SetVolume( buffer );
-    image->GetSlicedGeometry() ->SetSpacing( spacing );
+    image->GetSlicedGeometry()->SetSpacing( spacing );
     free( buffer );
     buffer = NULL;
 
@@ -672,10 +682,10 @@ void mitk::DataTreeNodeFactory::ReadFileSeriesTypePIC()
     mitk::LevelWindowProperty::Pointer levWinProp = new mitk::LevelWindowProperty();
     mitk::LevelWindow levelwindow;
 
-    levelwindow.SetAuto( reader->GetOutput() ->GetPic() );
+    levelwindow.SetAuto( reader->GetOutput()->GetPic() );
     levWinProp->SetLevelWindow( levelwindow );
 
-    node->GetPropertyList() ->SetProperty( "levelwindow", levWinProp );
+    node->GetPropertyList()->SetProperty( "levelwindow", levWinProp );
 
     std::cout << "...finished!" << std::endl;
 }
@@ -728,7 +738,7 @@ void mitk::DataTreeNodeFactory::ReadFileSeriesTypeDCM()
             mitk::Image::Pointer image = mitk::Image::New();
             image->InitializeByItk( reader->GetOutput() );
             image->SetVolume( reader->GetOutput()->GetBufferPointer() );
-            
+
             //add the mitk image to the node
             mitk::DataTreeNode::Pointer node = this->GetOutput( i );
             node->SetData( image );
@@ -745,11 +755,164 @@ void mitk::DataTreeNodeFactory::ReadFileSeriesTypeDCM()
 
             node->GetPropertyList()->SetProperty( "levelwindow", levWinProp );
         }
-        catch ( const std::exception& e )
+        catch ( const std::exception & e )
         {
             itkWarningMacro( << e.what() );
             return ;
         }
+    }
+}
+
+
+void mitk::DataTreeNodeFactory::ReadFileSeriesTypeITKImageSeriesReader()
+{
+    typedef itk::Image<int, 3> ImageType;
+    typedef itk::ImageSeriesReader< ImageType > ReaderType;
+    typedef itk::NumericSeriesFileNames NameGenerator;
+    typedef std::vector<std::string> StringContainer;
+    typedef std::map<unsigned int, std::string> SortedStringContainer;
+
+    StringContainer unmatchedFiles;
+    StringContainer matchedFiles;
+    unsigned int minNumber = 0;
+    unsigned int maxNumber = 0;
+
+    //
+    // Load Directory
+    //
+    std::string directory = this->GetDirectory();
+    itksys::Directory itkDir;
+    if ( !itkDir.Load ( directory.c_str() ) )
+    {
+        itkWarningMacro ( << "Directory " << directory << " cannot be read!" );
+        return ;
+    }
+
+    //
+    // Get a list of all files in the directory
+    //
+    for ( unsigned long i = 0; i < itkDir.GetNumberOfFiles(); i++ )
+    {
+        // Only read files
+        std::string filename = directory + "/" + itkDir.GetFile( i );
+        if ( itksys::SystemTools::FileIsDirectory( filename.c_str() ) )
+            continue;
+
+        // store the filenames without path
+        unmatchedFiles.push_back( itkDir.GetFile( i ) );
+    }
+
+    //
+    // Match the file list against the file prefix and extension,
+    // the result should be only the files that should be read
+    //
+    std::string prefix = this->GetBaseFilePrefix();
+    std::string patternExtension = itksys::SystemTools::LowerCase( itksys::SystemTools::GetFilenameLastExtension( m_FilePattern ) );
+    for ( StringContainer::iterator it = unmatchedFiles.begin() ; it != unmatchedFiles.end() ; ++it )
+    {
+        std::string extension = itksys::SystemTools::LowerCase( itksys::SystemTools::GetFilenameLastExtension( *it ) );
+        if ( it->find( prefix ) == 0 && extension == patternExtension )
+            matchedFiles.push_back( *it );
+    }
+    if ( matchedFiles.size() == 0 )
+    {
+        itkWarningMacro( << "Sorry, none of the files matched the prefix!" )
+        return ;
+    }
+
+
+    //
+    // parse the file names from back to front for digits
+    // and convert them to a number. Store the filename and number
+    // in a SortedStringContainer
+    //
+    SortedStringContainer sortedFiles;
+    for ( StringContainer::iterator it = matchedFiles.begin() ; it != matchedFiles.end() ; ++it )
+    {
+        std::string baseFilename = itksys::SystemTools::GetFilenameWithoutLastExtension( *it );
+        std::string number;
+        for ( unsigned int i = baseFilename.length() - 1; i >= 0; --i )
+        {
+            char character = baseFilename[ i ];
+            //do we have a digit?
+            if ( character >= '0' && character <= '9' )
+            {
+                number.insert( 0, &character, 1 );
+            }
+            else
+            {
+                //end of digit series found, jump out of loop!
+                break;
+            }
+        }
+        if ( number.length() == 0 )
+        {
+            // The file is not numbered, this is an error!
+            // Nevertheless, we try the next files.
+            itkWarningMacro( << "The filename " << *it << "does not contain a valid digit sequence!" );
+        }
+        else
+        {
+            // convert the number string into an integer and
+            // insert the filname (including directory) into the SortedStringContainer
+            unsigned int num = atoi( number.c_str() );
+            sortedFiles.insert( std::make_pair( num, directory + "/" + *it ) );
+        }
+    }
+    if ( sortedFiles.size() == 0 )
+    {
+        itkWarningMacro( << "Sorry, no numbered files found, I can't load anything..." )
+        return ;
+    }
+
+    //
+    // Convert the sorted string container in a plain sorted vector of strings;
+    //
+    StringContainer filesToLoad;
+    for ( SortedStringContainer::iterator it = sortedFiles.begin() ; it != sortedFiles.end() ; ++it )
+    {
+        filesToLoad.push_back( it->second );
+        std::cout << it->second << std::endl;
+    }
+
+
+    //
+    // Finally, initialize the ITK-reader and load the files!
+    //
+    ReaderType::Pointer reader = ReaderType::New();
+    reader->SetFileNames( filesToLoad );
+    try
+    {
+        reader->Update();
+        ResizeOutputs( reader->GetNumberOfOutputs() );
+        for ( unsigned int i = 0; i < reader->GetNumberOfOutputs(); ++i )
+        {
+            //Initialize mitk image from itk
+            mitk::Image::Pointer image = mitk::Image::New();
+            image->InitializeByItk( reader->GetOutput( i ) );
+            image->SetVolume( reader->GetOutput( i )->GetBufferPointer() );
+
+            //add the mitk image to the node
+            mitk::DataTreeNode::Pointer node = this->GetOutput( i );
+            node->SetData( image );
+
+            // disable volume rendering by default
+            node->SetProperty( "volumerendering", new mitk::BoolProperty( false ) );
+
+            // add level-window property
+            mitk::LevelWindowProperty::Pointer levWinProp = new mitk::LevelWindowProperty();
+            mitk::LevelWindow levelwindow;
+
+            levelwindow.SetAuto( image->GetPic() );
+            levWinProp->SetLevelWindow( levelwindow );
+
+            node->GetPropertyList()->SetProperty( "levelwindow", levWinProp );
+        }
+    }
+    catch ( const std::exception & e )
+    {
+        itkWarningMacro( << e.what() );
+        return ;
     }
 }
 

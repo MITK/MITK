@@ -1,0 +1,7 @@
+#include "itkObject.h"
+#include "itkRegion.h"
+#include "vecmath.h"
+#include "itkTransform.h"
+#include "itkProcessObject.h"
+#include "ipPic.h"
+#include "vtkImageData.h"

@@ -2,10 +2,8 @@
 #define MITKGEOMETRY2DDATAMAPPER2D_H_HEADER_INCLUDED_C19C0BFB
 
 #include "mitkCommon.h"
-#include "Mapper2D.h"
-#include "mitkGeometry2DData.h"
 #include "mitkGLMapper2D.h"
-#include "DataTree.h"
+#include "mitkSurfaceDataMapper2D.h"
 
 namespace mitk {
 
@@ -47,6 +45,8 @@ protected:
 
     //##ModelId=3E67E285024E
     virtual void GenerateOutputInformation();
+
+    SurfaceDataMapper2D::Pointer m_SurfaceMapper;
 };
 
 } // namespace mitk

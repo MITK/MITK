@@ -360,10 +360,9 @@ void mitk::CylindricToCartesianFilter::GenerateOutputInformation()
   //set the timebounds - after SetGeometry2D, so that the already created PlaneGeometry will also receive this timebounds.
   //@fixme!!! will not work for not evenly timed data!
   output->GetSlicedGeometry()->SetTimeBoundsInMS(input->GetSlicedGeometry()->GetTimeBoundsInMS());
+  output->GetTimeSlicedGeometry()->InitializeEvenlyTimed(output->GetSlicedGeometry(), output->GetTimeSlicedGeometry()->GetTimeSteps());
   //@fixme!!! transfer matrix to timeslicedgeometry.
   output->GetGeometry()->SetIndexToWorldTransform(output->GetSlicedGeometry()->GetIndexToWorldTransform());
-  //@fixme!!! for 4D-data: calculate the timebounds of the TimeSlicedGeometry: (calling GetTimeBoundsInMS() really does that!)
-  output->GetGeometry()->GetTimeBoundsInMS();
 
   output->SetPropertyList(input->GetPropertyList()->Clone());
 

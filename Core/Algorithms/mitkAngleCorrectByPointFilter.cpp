@@ -62,8 +62,7 @@ void mitk::AngleCorrectByPointFilter::GenerateOutputInformation()
   //@fixme!!! will not work for not evenly timed data!
   output->GetSlicedGeometry()->SetTimeBoundsInMS(input->GetSlicedGeometry()->GetTimeBoundsInMS());
 
-  //@fixme!!! for 4D-data: calculate the timebounds of the TimeSlicedGeometry: (calling GetTimeBoundsInMS() really does that!)
-  output->GetGeometry()->GetTimeBoundsInMS();
+  output->GetTimeSlicedGeometry()->InitializeEvenlyTimed(output->GetSlicedGeometry(), output->GetTimeSlicedGeometry()->GetTimeSteps());
 
   output->SetPropertyList(input->GetPropertyList()->Clone());    
 

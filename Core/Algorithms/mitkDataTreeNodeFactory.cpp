@@ -60,51 +60,61 @@ mitk::DataTreeNodeFactory::~DataTreeNodeFactory()
 
 void mitk::DataTreeNodeFactory::GenerateData()
 {
-    if ( this->FileNameEndsWith( ".stl" ) )
+    if ( m_FileName != "" )
     {
-        this->ReadFileTypeSTL();
-    }
-    else if ( this->FileNameEndsWith( ".vtk" ) )
-    {
-        this->ReadFileTypeVTK();
-    }
-    else if ( this->FileNameEndsWith( ".pic" ) || this->FileNameEndsWith( ".seq" ) )
-    {
-        this->ReadFileTypePIC();
-    }
-    else if ( this->FileNameEndsWith( ".par" ) )
-    {
-        this->ReadFileTypePAR();
-    }
-    else if ( this->FileNameEndsWith( ".pvtk" ) )
-    {
-        this->ReadFileTypePVTK();
-    }
+        if ( this->FileNameEndsWith( ".stl" ) )
+        {
+            this->ReadFileTypeSTL();
+        }
+        else if ( this->FileNameEndsWith( ".vtk" ) )
+        {
+            this->ReadFileTypeVTK();
+        }
+        else if ( this->FileNameEndsWith( ".pic" ) || this->FileNameEndsWith( ".pic.gz" ) || this->FileNameEndsWith( ".seq" ) )
+        {
+            this->ReadFileTypePIC();
+        }
+        else if ( this->FileNameEndsWith( ".par" ) )
+        {
+            this->ReadFileTypePAR();
+        }
+        else if ( this->FileNameEndsWith( ".pvtk" ) )
+        {
+            this->ReadFileTypePVTK();
+        }
 #ifdef MBI_INTERNAL
-    else if ( this->FileNameEndsWith( ".DCM" ) || this->FileNameEndsWith( ".dcm" ) )
-    {
-        this->ReadFileTypeDCM();
-    }
-    else if ( this->FileNameEndsWith( ".ves" ) )
-    {
-        this->ReadFileTypeVES();
-    }
-    else if ( this->FileNameEndsWith( ".uvg" ) )
-    {
-        this->ReadFileTypeUVG();
-    }
-    else if ( this->FileNameEndsWith( "HPSONOS.DB" ) || this->FileNameEndsWith( "hpsonos.db" ) )
-    {
-        this->ReadFileTypeHPSONOS();
-    }
+        else if ( this->FileNameEndsWith( ".DCM" ) || this->FileNameEndsWith( ".dcm" ) )
+        {
+            this->ReadFileTypeDCM();
+        }
+        else if ( this->FileNameEndsWith( ".ves" ) )
+        {
+            this->ReadFileTypeVES();
+        }
+        else if ( this->FileNameEndsWith( ".uvg" ) )
+        {
+            this->ReadFileTypeUVG();
+        }
+        else if ( this->FileNameEndsWith( "HPSONOS.DB" ) || this->FileNameEndsWith( "hpsonos.db" ) )
+        {
+            this->ReadFileTypeHPSONOS();
+        }
 #endif
-    //else if (this->FileNameEndsWith("."))
-    //{
-    //    //put your new filetype in here!
-    //}
-    else if ( m_FileName != "" )
+        //else if (this->FileNameEndsWith("."))
+        //{
+        //    //put your new filetype in here!
+        //}
+        else
+        {
+            this->ReadFileTypeITKImageIOFactory();
+        }
+    }
+    else if ( m_FilePattern != "" && m_FilePrefix != "" )
     {
-        this->ReadFileTypeITKImageIOFactory();
+        if ( this->FilePatternEndsWith( ".pic" ) || this->FilePatternEndsWith( ".pic.gz" ) )
+        {
+            this->ReadFileSeriesTypePIC();
+        }
     }
 }
 
@@ -118,9 +128,21 @@ bool mitk::DataTreeNodeFactory::FileNameEndsWith( const std::string& name )
 
 
 
+bool mitk::DataTreeNodeFactory::FilePatternEndsWith( const std::string& name )
+{
+    return m_FilePattern.find( name ) != std::string::npos;
+}
+
+
+
 std::string mitk::DataTreeNodeFactory::GetBaseFileName()
 {
     return itksys::SystemTools::GetFilenameName( m_FileName );
+}
+
+std::string mitk::DataTreeNodeFactory::GetBaseFilePrefix()
+{
+    return itksys::SystemTools::GetFilenameName( m_FilePrefix );
 }
 
 
@@ -532,7 +554,7 @@ void mitk::DataTreeNodeFactory::ReadFileTypeITKImageIOFactory()
     const unsigned int MAXDIM = 4;
 
     std::cout << "loading " << m_FileName << " via itk::ImageIOFactory... " << std::endl;
-    
+
     // Check to see if we can read the file given the name or prefix
     if ( m_FileName == "" )
     {
@@ -588,15 +610,15 @@ void mitk::DataTreeNodeFactory::ReadFileTypeITKImageIOFactory()
 
     std::cout << "ioRegion: " << ioRegion << std::endl;
     imageIO->SetIORegion( ioRegion );
-    
-    
+
+
     void* buffer = malloc( imageIO->GetImageSizeInBytes() );
     imageIO->Read( buffer );
     mitk::Image::Pointer image = mitk::Image::New();
     mitk::PixelType pixelType( imageIO->GetPixelType() );
     image->Initialize( pixelType, ndim, dimensions );
     image->SetVolume( buffer );
-    image->GetSlicedGeometry()->SetSpacing(spacing);
+    image->GetSlicedGeometry() ->SetSpacing( spacing );
     free( buffer );
     buffer = NULL;
 
@@ -609,4 +631,41 @@ void mitk::DataTreeNodeFactory::ReadFileTypeITKImageIOFactory()
     std::cout << "...finished!" << std::endl;
 }
 
+void mitk::DataTreeNodeFactory::ReadFileSeriesTypePIC()
+{
+    std::cout << "loading image series with prefix " << m_FilePrefix << " and pattern " << m_FilePattern << " as pic..." << std::endl;
+
+    mitk::PicFileReader::Pointer reader;
+    reader = mitk::PicFileReader::New();
+    reader->SetFilePrefix( m_FilePrefix.c_str() );
+    reader->SetFilePattern( m_FilePattern.c_str() );
+    reader->UpdateLargestPossibleRegion();
+    
+    mitk::DataTreeNode::Pointer node = this->GetOutput();
+    node->SetData( reader->GetOutput() );
+
+    // set filename without path as string property
+    std::string filename = this->GetBaseFilePrefix() + "pic";
+    mitk::StringProperty::Pointer nameProp = new mitk::StringProperty( filename );
+    node->SetProperty( "fileName", nameProp );
+
+    // disable volume rendering by default
+    node->SetProperty( "volumerendering", new mitk::BoolProperty( false ) );
+
+    // add level-window property
+    mitk::LevelWindowProperty::Pointer levWinProp = new mitk::LevelWindowProperty();
+    mitk::LevelWindow levelwindow;
+
+    levelwindow.SetAuto( reader->GetOutput() ->GetPic() );
+    levWinProp->SetLevelWindow( levelwindow );
+
+    node->GetPropertyList()->SetProperty( "levelwindow", levWinProp );
+    
+    std::cout << "...finished!" << std::endl;
+}
+
+void mitk::DataTreeNodeFactory::ReadFileSeriesTypeDCM()
+{
+    itkWarningMacro( "<< DICOM series not yet supported!" )
+}
 

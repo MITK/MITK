@@ -5,7 +5,6 @@
 #include "mitkFileReader.h"
 
 #include <string>
-#include <itkImageIOBase.h>
 
 namespace mitk
 {
@@ -75,6 +74,7 @@ protected:
      */
     virtual ~DataTreeNodeFactory();
     
+   
     /**
      * Determines of which file type a given file is and calls the 
      * appropriate reader function.
@@ -91,9 +91,23 @@ protected:
     virtual bool FileNameEndsWith(const std::string& name);
     
     /**
+     * Checks if the file pattern m_FilePattern ends with the given name.
+     * Currently, this check is done by a dumb search for name in 
+     * the filename.
+     * @param name the extension of the file
+     * @returns true, if the filepattern contains name.
+     */
+    virtual bool FilePatternEndsWith(const std::string& name);
+    
+    /**
      * @returns the plain filename, that is, without any directory.
      */
     virtual std::string GetBaseFileName();
+    
+    /**
+     * @returns the plain file prefix, that is, without any directory.
+     */
+    virtual std::string GetBaseFilePrefix();
     
     /**
      * @returns the directory of the file name m_FileName. 
@@ -123,6 +137,10 @@ protected:
     virtual void ReadFileTypeHPSONOS();
     
 #endif
+
+    virtual void ReadFileSeriesTypePIC();
+    
+    virtual void ReadFileSeriesTypeDCM();
     
     std::string m_FileName;
 

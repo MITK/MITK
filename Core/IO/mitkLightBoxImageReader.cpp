@@ -476,12 +476,20 @@ std::list<int> mitk::LightBoxImageReader::SortImage()
 
     for (int position = 0; position < m_LightBox->getFrames (); ++position)
     {
-        pic = m_LightBox->fetchHeader(position);
-        tsv=ipPicQueryTag(pic,"SOURCE HEADER");
+      pic = m_LightBox->fetchHeader(position);
+      tsv=ipPicQueryTag(pic,"SOURCE HEADER");
+      if (tsv)
+      {
         dicomFindElement((unsigned char*) tsv->value, 0x0020, 0x0013, &data, &len);
         sscanf( (char *) data, "%d", &imageNumber );
         imageNumbers.push_back(imageNumber);
         //itkGenericOutputMacro(<<"number image: "<<imageNumber);
+      }
+      else
+      {
+        imageNumbers.push_back(position);
+        itkWarningMacro(<<"DICOM header not available (pic tag SOURCE HEADER is NULL)");
+      }
     }
     return imageNumbers;
 }

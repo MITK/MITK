@@ -62,7 +62,10 @@ mitk::Geometry2D::ConstPointer mitk::Geometry3D::GetGeometry2D(int s, int t) con
 //##ModelId=3DCBF5D40253
 mitk::BoundingBox::ConstPointer mitk::Geometry3D::GetBoundingBox(int t) const
 {
-    mitk::BoundingBox::Pointer m_BoundingBox=mitk::BoundingBox::New();
+	if(m_BoundingBoxes[t]!=NULL)
+		return m_BoundingBoxes[t];
+
+    mitk::BoundingBox::Pointer boundingBox=mitk::BoundingBox::New();
 
     mitk::BoundingBox::PointsContainer::Pointer pointscontainer=mitk::BoundingBox::PointsContainer::New();
     float nullpoint[]={0,0,0};
@@ -120,11 +123,49 @@ mitk::BoundingBox::ConstPointer mitk::Geometry3D::GetBoundingBox(int t) const
         pointscontainer->InsertElement(pointid++, p);
     }
    
-    m_BoundingBox->SetPoints(pointscontainer);
+    boundingBox->SetPoints(pointscontainer);
 
-    m_BoundingBox->ComputeBoundingBox();
+    boundingBox->ComputeBoundingBox();
 
-    return m_BoundingBox.GetPointer();
+	m_BoundingBoxes[t]=boundingBox;
+
+    return boundingBox.GetPointer();
+}
+
+void mitk::Geometry3D::SetBoundingBox(const mitk::BoundingBox* boundingBox,  int t)
+{
+	if(IsValidTime(t))
+		m_BoundingBoxes[t]=boundingBox;
+	else
+		itkExceptionMacro("tried to set boundingbox for an invalid point of time (t:"<<t<<")");
+}
+
+void mitk::Geometry3D::SetBoundingBox(const float bounds[6],  int t)
+{
+	if(IsValidTime(t))
+	{
+		mitk::BoundingBox::Pointer boundingBox=mitk::BoundingBox::New();
+		
+		mitk::BoundingBox::PointsContainer::Pointer pointscontainer=mitk::BoundingBox::PointsContainer::New();
+		float nullpoint[]={0,0,0};
+		mitk::BoundingBox::PointType p(nullpoint);
+		
+		mitk::BoundingBox::PointIdentifier pointid=0;
+		
+        p[0]=bounds[0]; p[1]=bounds[2]; p[2]=bounds[3];
+        pointscontainer->InsertElement(pointid++, p);
+
+        p[0]=bounds[1]; p[2]=bounds[3]; p[2]=bounds[5];
+        pointscontainer->InsertElement(pointid++, p);
+
+		boundingBox->SetPoints(pointscontainer);
+
+		boundingBox->ComputeBoundingBox();
+
+		m_BoundingBoxes[t]=boundingBox;
+	}
+	else
+		itkExceptionMacro("tried to set boundingbox for an invalid point of time (t:"<<t<<")");
 }
 
 //##ModelId=3DCBF5E9037F
@@ -240,6 +281,11 @@ void mitk::Geometry3D::Initialize(unsigned int dimension, const unsigned int* di
     //initialize m_TransformOfOrigin and m_Spacing (and m_TransformUnitsToMM/m_TransformMMToUnits).
     m_TransformOfOrigin.setIdentity();
     SetSpacing(Vector3D(1.0,1.0,1.0));
+
+	//initilize bounding box array
+	BoundingBox::ConstPointer bnull=NULL;
+	m_BoundingBoxes.reserve(m_Dimensions[3]);
+    m_BoundingBoxes.assign(num, bnull);
 
     //does the Geometry has 2D slices?
     if(num>0)

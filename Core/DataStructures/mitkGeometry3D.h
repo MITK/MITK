@@ -175,6 +175,9 @@ public:
     //## Set the spacing according to the tags in @ pic.
     virtual void SetSpacing(ipPicDescriptor* pic);
 
+    virtual void SetBoundingBox(const mitk::BoundingBox* boundingBox,  int t=0);
+
+	virtual void SetBoundingBox(const float bounds[6],  int t=0);
 protected:
     //##ModelId=3E3453C703AF
     virtual void Initialize(unsigned int dimension, const unsigned int* dimensions);
@@ -195,6 +198,8 @@ protected:
     mutable std::vector<Geometry2D::ConstPointer> m_Geometry2Ds;
     //##ModelId=3E3BE8BF0288
     mitk::Vector3D m_Spacing;
+	
+	mutable std::vector<mitk::BoundingBox::ConstPointer> m_BoundingBoxes;
 
     //##ModelId=3E3BE8BF02BA
     mitk::Matrix4D m_TransformUnitsToMM;

@@ -25,8 +25,37 @@ mitk::OpenGLRenderer::OpenGLRenderer() : first(true) //FIXME provisorium
 //##ModelId=3E3D28AB0018
 void mitk::OpenGLRenderer::SetData(mitk::DataTreeIterator* iterator)
 {
-    BaseRenderer::SetData(iterator);
+	if(iterator!=GetData())
+	{
+		BaseRenderer::SetData(iterator);
 
+		//initialize world geometry: use first slice of first node containing an image
+		mitk::DataTreeIterator* it=m_DataTreeIterator->clone();
+		while(it->hasNext())
+		{
+			it->next();
+			BaseData::Pointer data=it->get()->GetData();
+			if(data!=NULL)
+			{
+				Image::Pointer image = dynamic_cast<Image*>(data.GetPointer());
+				if(image!=NULL)
+				{
+					SetWorldGeometry(image->GetGeometry2D(0, 0));
+					break;
+				}
+			}
+		}
+		delete it;
+
+		//update the vtk-based mappers
+		UpdateVtkActors();
+
+		Modified();
+	}
+}
+
+void mitk::OpenGLRenderer::UpdateVtkActors()
+{
     m_LightKit->RemoveLightsFromRenderer(this->m_VtkRenderer);
 
     m_MitkVtkRenderWindow->RemoveRenderer(m_VtkRenderer);
@@ -49,26 +78,9 @@ void mitk::OpenGLRenderer::SetData(mitk::DataTreeIterator* iterator)
         while(it->hasNext())
         {
             it->next();
-            if(first) //FIXME: provisorium
-            {
-                BaseData::Pointer data=it->get()->GetData();
-                if(data!=NULL)
-                {
-                    Image::Pointer image = dynamic_cast<Image*>(data.GetPointer());
-                    if(image!=NULL)
-                    {
-                        SetWorldGeometry(image->GetGeometry2D(0, 0));
-                        first=false;
-                    }
-                }
-            }
-            //            mitk::LevelWindow lw;
-            unsigned int dummy[] = {10,10,10};
-            //Geometry3D geometry(3,dummy);
             mitk::Mapper::Pointer mapper = it->get()->GetMapper(m_MapperID);
             if(mapper!=NULL)
             {
-                //                mapper->Update();
                 BaseVtkMapper2D* anVtkMapper2D;
                 anVtkMapper2D=dynamic_cast<BaseVtkMapper2D*>(mapper.GetPointer());
                 if(anVtkMapper2D!=NULL)
@@ -99,8 +111,6 @@ void mitk::OpenGLRenderer::SetData(mitk::DataTreeIterator* iterator)
     //            printf("test\n");
     //    }
     delete it;
-
-    Modified();
 }
 
 //##ModelId=3E330D260255
@@ -136,10 +146,18 @@ void mitk::OpenGLRenderer::Update()
 //##ModelId=3E330D2903CC
 void mitk::OpenGLRenderer::Render()
 {
-    // TODO: Änderung des Baums beachten!!!
+	//has the data tree been changed?
+	if(m_LastUpdateTime<((mitk::DataTree*)GetData()->getTree())->GetMTime()) 
+	{
+		//yes: update vtk-actors
+		UpdateVtkActors();
+        Update();
+    }
+	else
+	//has anything else changed (geometry to display, etc.)?
     if (m_LastUpdateTime<GetMTime() ||
         m_LastUpdateTime<GetDisplayGeometry()->GetMTime() ||
-        m_LastUpdateTime<GetDisplayGeometry()->GetWorldGeometry()->GetMTime() ) 
+        m_LastUpdateTime<GetDisplayGeometry()->GetWorldGeometry()->GetMTime())
     {
         //std::cout << "OpenGLRenderer calling its update..." << std::endl;
         Update();

@@ -62,6 +62,8 @@ protected:
     //##ModelId=3E33ECF301B7
     virtual ~OpenGLRenderer();
 
+	virtual void UpdateVtkActors();
+
     //##ModelId=3E70F51002BA
     bool first;
 

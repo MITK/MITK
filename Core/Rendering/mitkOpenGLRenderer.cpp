@@ -12,7 +12,8 @@
 #include <vtkRenderWindow.h>
 
 //##ModelId=3E33ECF301AD
-mitk::OpenGLRenderer::OpenGLRenderer() : m_IilImage(0)
+mitk::OpenGLRenderer::OpenGLRenderer() : m_IilImage(0),
+    first(true) //FIXME provisorium
 {
     m_CameraController=NULL;
     m_CameraController = VtkInteractorCameraController::New();
@@ -35,13 +36,12 @@ void mitk::OpenGLRenderer::SetData(mitk::DataTreeIterator* iterator)
     m_Light = vtkLight::New();
     m_VtkRenderer->AddLight( m_Light );
 
-    bool first=true; //FIXME provisorium
     //    try
     mitk::DataTreeIterator* it=m_DataTreeIterator->clone();
     {
         while(it->hasNext())
         {
-            if(first)
+            if(first) //FIXME: provisorium
             {
                 BaseData::Pointer data=it->get()->GetData();
                 if(data!=NULL)
@@ -123,50 +123,56 @@ void mitk::OpenGLRenderer::Update()
     }
 
     delete it;
+    Modified();
     m_LastUpdateTime=GetMTime();
 }
 //##ModelId=3E330D2903CC
 void mitk::OpenGLRenderer::Render()
 {
-    // TODO: 
+    // TODO: Änderung des Baums beachten!!!
     if (m_LastUpdateTime<GetMTime() ||
         m_LastUpdateTime<GetDisplayGeometry()->GetMTime() ||
-        m_LastUpdateTime<GetDisplayGeometry()->GetWorldGeometry()->GetMTime() ) {
-            std::cout << "OpenGLRenderer calling its update..." << std::endl;
-            Update();
-        }
-        glClear(GL_COLOR_BUFFER_BIT);
+        m_LastUpdateTime<GetDisplayGeometry()->GetWorldGeometry()->GetMTime() ) 
+    {
+        std::cout << "OpenGLRenderer calling its update..." << std::endl;
+        Update();
+    }
 
-        if(m_DataTreeIterator==NULL) return;
+    if(m_MapperID==2) //FIXME: in 3D mode wird sonst nix geupdated, da z.Z. weder camera noch Änderung des Baums beachtet wird!!!
+        Update();
 
-        glViewport (0, 0, m_Size[0], m_Size[1]);
-        glMatrixMode( GL_PROJECTION );
-        glLoadIdentity();
-        gluOrtho2D( 0.0, m_Size[0], 0.0, m_Size[1] );
-        glMatrixMode( GL_MODELVIEW );
+    glClear(GL_COLOR_BUFFER_BIT);
 
-        bool m_VtkMapperPresent=false;
+    if(m_DataTreeIterator==NULL) return;
 
-        mitk::DataTreeIterator* it=m_DataTreeIterator->clone();
-        while(it->hasNext())
+    glViewport (0, 0, m_Size[0], m_Size[1]);
+    glMatrixMode( GL_PROJECTION );
+    glLoadIdentity();
+    gluOrtho2D( 0.0, m_Size[0], 0.0, m_Size[1] );
+    glMatrixMode( GL_MODELVIEW );
+
+    bool m_VtkMapperPresent=false;
+
+    mitk::DataTreeIterator* it=m_DataTreeIterator->clone();
+    while(it->hasNext())
+    {
+        mitk::Mapper::Pointer mapper = it->next()->GetMapper(m_MapperID);
+        if(mapper!=NULL)
         {
-            mitk::Mapper::Pointer mapper = it->next()->GetMapper(m_MapperID);
-            if(mapper!=NULL)
-            {
-                GLMapper2D* mapper2d=dynamic_cast<GLMapper2D*>(mapper.GetPointer());
-                if(mapper2d!=NULL) {
-                    mapper2d->Paint(this);
-                }
-                else
+            GLMapper2D* mapper2d=dynamic_cast<GLMapper2D*>(mapper.GetPointer());
+            if(mapper2d!=NULL) {
+                mapper2d->Paint(this);
+            }
+            else
                 if(dynamic_cast<BaseVtkMapper2D*>(mapper.GetPointer()) || dynamic_cast<BaseVtkMapper3D*>(mapper.GetPointer()))
                     m_VtkMapperPresent=true;
-            }
         }
+    }
 
-        delete it;
+    delete it;
 
-        if(m_VtkMapperPresent)
-            m_MitkVtkRenderWindow->MitkRender();
+    if(m_VtkMapperPresent)
+        m_MitkVtkRenderWindow->MitkRender();
 }
 
 /*!

@@ -61,6 +61,9 @@ protected:
     //##ModelId=3E33ECF301B7
     virtual ~OpenGLRenderer();
 
+    //##ModelId=3E6FE86C00E7
+    bool first;
+
   private:
     //##ModelId=3E33145A0315
     bool m_InitNeeded;

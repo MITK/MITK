@@ -28,7 +28,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkActor.h>
 #include <vtkProperty.h>
 #include <vtkTubeFilter.h>
-
+#include <mitkProperties.h>
 
 mitk::SplineVtkMapper3D::SplineVtkMapper3D()
         : m_SplinesActor( NULL ), m_Assembly( NULL )
@@ -156,24 +156,38 @@ mitk::SplineVtkMapper3D::GenerateData()
 
 void mitk::SplineVtkMapper3D::GenerateData( mitk::BaseRenderer* renderer )
 {
-    Superclass::GenerateData( renderer );
+  bool doNotDrawPoints;
+  if (dynamic_cast<mitk::BoolProperty *>(this->GetDataTreeNode()->GetProperty("dontdrawpoints").GetPointer()) == NULL)
+    doNotDrawPoints = false;
+  else
+    doNotDrawPoints = dynamic_cast<mitk::BoolProperty *>(this->GetDataTreeNode()->GetProperty("dontdrawpoints").GetPointer())->GetValue();
 
-    if ( IsVisible( renderer ) == false )
+  Superclass::GenerateData( renderer );
+
+  if ( IsVisible( renderer ) == false )
+  {
+    if ( m_SplinesActor != NULL )
+      m_SplinesActor->VisibilityOff();
+    if ( m_Prop3D && doNotDrawPoints )
+      m_Prop3D->VisibilityOff();
+    if ( m_Assembly != NULL )
+      m_Assembly->VisibilityOff();
+  }
+  else
+  {
+    if ( m_SplinesActor != NULL )
+      m_SplinesActor->VisibilityOn();
+    if ( m_Prop3D )
     {
-        if ( m_SplinesActor != NULL )
-            m_SplinesActor->VisibilityOff();
-
-        if ( m_Assembly != NULL )
-            m_Assembly->VisibilityOff();
+      if ( doNotDrawPoints )
+        m_Prop3D->VisibilityOff();
+      else
+        m_Prop3D->VisibilityOn();
     }
-    else
-    {
-        if ( m_SplinesActor != NULL )
-            m_SplinesActor->VisibilityOn();
 
-        if ( m_Assembly != NULL )
-            m_Assembly->VisibilityOn();
-    }
+    if ( m_Assembly != NULL )
+      m_Assembly->VisibilityOn();
+  }
 }
 
 bool mitk::SplineVtkMapper3D::SplinesAreAvailable()

@@ -16,7 +16,7 @@
 #include "PlaneGeometry.h"
 
 //##ModelId=3E33ECF301AD
-mitk::OpenGLRenderer::OpenGLRenderer() : first(true) //FIXME provisorium
+mitk::OpenGLRenderer::OpenGLRenderer() : m_VtkMapperPresent(NULL)
 {
     m_CameraController=NULL;
     m_CameraController = VtkInteractorCameraController::New();
@@ -54,6 +54,7 @@ void mitk::OpenGLRenderer::SetData(mitk::DataTreeIterator* iterator)
 		}
 		
 		//update the vtk-based mappers
+        Update(); //this is only called to check, whether we have vtk-based mappers!
 		UpdateVtkActors();
 		
 		Modified();
@@ -63,6 +64,18 @@ void mitk::OpenGLRenderer::SetData(mitk::DataTreeIterator* iterator)
 //##ModelId=3ED91D060305
 void mitk::OpenGLRenderer::UpdateVtkActors()
 {
+    VtkInteractorCameraController* vicc=dynamic_cast<VtkInteractorCameraController*>(m_CameraController.GetPointer());
+
+    if (m_VtkMapperPresent == false)
+    {
+        if(vicc!=NULL)
+            vicc->GetVtkInteractor()->Disable();
+        return;
+    }
+
+    if(vicc!=NULL)
+        vicc->GetVtkInteractor()->Enable();
+
     m_LightKit->RemoveLightsFromRenderer(this->m_VtkRenderer);
 	
     m_MitkVtkRenderWindow->RemoveRenderer(m_VtkRenderer);
@@ -126,6 +139,9 @@ void mitk::OpenGLRenderer::UpdateVtkActors()
 void mitk::OpenGLRenderer::Update()
 {
     if(m_DataTreeIterator == NULL) return;
+
+    m_VtkMapperPresent=false;
+
     mitk::DataTreeIterator* it=m_DataTreeIterator->clone();
     while(it->hasNext())
     {
@@ -145,6 +161,8 @@ void mitk::OpenGLRenderer::Update()
             else
                 if(dynamic_cast<BaseVtkMapper3D*>(mapper.GetPointer()))
                     mapper->Update();
+			if(dynamic_cast<BaseVtkMapper2D*>(mapper.GetPointer()) || dynamic_cast<BaseVtkMapper3D*>(mapper.GetPointer()))
+				m_VtkMapperPresent=true;
         }
     }
 	
@@ -208,8 +226,6 @@ void mitk::OpenGLRenderer::Render()
 	gluOrtho2D( 0.0, m_Size[0], 0.0, m_Size[1] );
 	glMatrixMode( GL_MODELVIEW );
 	
-	bool m_VtkMapperPresent=false;
-	
 	mitk::DataTreeIterator* it=m_DataTreeIterator->clone();
 	mitk::DataTree::Pointer tree = dynamic_cast <mitk::DataTree *> (it->getTree());
 //	std::cout << "Render:: tree: " <<  *tree << std::endl;
@@ -226,9 +242,6 @@ void mitk::OpenGLRenderer::Render()
 			if(mapper2d!=NULL) {
 				mapper2d->Paint(this);
 			}
-			else
-				if(dynamic_cast<BaseVtkMapper2D*>(mapper.GetPointer()) || dynamic_cast<BaseVtkMapper3D*>(mapper.GetPointer()))
-					m_VtkMapperPresent=true;
 		}
 	}
 	

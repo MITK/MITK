@@ -69,10 +69,11 @@ protected:
     virtual ~OpenGLRenderer();
 
     //##ModelId=3ED91D060305
+    //##Documentation
+    //## @brief Update the vtk-based-mappers by adding the produced actors to the m_VtkRenderer.
+    //## 
+    //## @warning Always call Update() before, which checks, whether there are vtk-based-mappers.
 	virtual void UpdateVtkActors();
-
-    //##ModelId=3E70F51002BA
-    bool first;
 
   private:
     //##ModelId=3E33145A0315
@@ -80,6 +81,8 @@ protected:
 
     //##ModelId=3E33145A0347
     bool m_ResizeNeeded;
+
+    bool m_VtkMapperPresent;
 
     //##ModelId=3E33145A0383
     vtkRenderer* m_VtkRenderer;

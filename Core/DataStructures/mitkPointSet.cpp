@@ -253,11 +253,12 @@ void mitk::PointSet::UpdateOutputInformation()
 
   //for assignment see Geometry3d::SetBoundingBox(const float bounds)
   mitkBounds[0] = itkBounds[0];
-  mitkBounds[1] = itkBounds[2];
-  mitkBounds[2] = itkBounds[4];
-  mitkBounds[3] = itkBounds[1];
-  mitkBounds[4] = itkBounds[3];
+  mitkBounds[1] = itkBounds[1];
+  mitkBounds[2] = itkBounds[2];
+  mitkBounds[3] = itkBounds[3];
+  mitkBounds[4] = itkBounds[4];
   mitkBounds[5] = itkBounds[5];
+//@TODO check if order is correct 012345 or 024135
 
   m_Geometry3D->SetBoundingBox(mitkBounds);
  

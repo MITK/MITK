@@ -22,6 +22,11 @@ public:
     
     SampleApp *ap;
 
+    static QcPlugin* GetPluginInstance()
+    {
+      return s_PluginInstance;
+    }
+
 public slots :
        
     void selectSerie (QcLightbox*);
@@ -33,6 +38,8 @@ private:
     QcTask *task;
     ToolBar *toolbar ;
     bool activated;
+
+    static QcPlugin* s_PluginInstance;
 };
 
 

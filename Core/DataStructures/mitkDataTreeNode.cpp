@@ -37,7 +37,7 @@ void mitk::DataTreeNode::SetData(mitk::BaseData* baseData)
 }
 
 //##ModelId=3E33F5D702AA
-mitk::DataTreeNode::DataTreeNode()
+mitk::DataTreeNode::DataTreeNode() : m_Data(NULL)
 {
     memset(mappers, 0, sizeof(mappers)); 
 }

@@ -52,7 +52,7 @@ void mitk::Geometry2DDataMapper2D::Paint(mitk::BaseRenderer * renderer)
         mitk::Geometry2DData::Pointer input  = const_cast<mitk::Geometry2DData*>(this->GetInput());
 
         PlaneGeometry::ConstPointer planeGeometry = dynamic_cast<const PlaneGeometry *>(input->GetGeometry2D());
-        PlaneGeometry::Pointer worldPlaneGeometry = dynamic_cast<PlaneGeometry*>(renderer->GetWorldGeometry());
+        PlaneGeometry::ConstPointer worldPlaneGeometry = dynamic_cast<const PlaneGeometry*>(renderer->GetWorldGeometry());
 
         if((planeGeometry!=NULL) && (worldPlaneGeometry!=NULL))
         {

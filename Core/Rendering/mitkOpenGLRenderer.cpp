@@ -52,7 +52,7 @@ void mitk::OpenGLRenderer::SetData(mitk::DataTreeIterator* iterator)
                     Image::Pointer image = dynamic_cast<Image*>(data.GetPointer());
                     if(image!=NULL)
                     {
-                        m_DisplayGeometry->SetWorldGeometry(image->GetGeometry2D(0, 0));
+                        SetWorldGeometry(image->GetGeometry2D(0, 0));
                         first=false;
                     }
                 }
@@ -117,7 +117,7 @@ void mitk::OpenGLRenderer::Update()
             {
                 ImageMapper2D* imagemapper2d=dynamic_cast<ImageMapper2D*>(mapper.GetPointer());
                 //								imagemapper2d->m_IilImage = &m_IilImage;
-                //								mapper2d->SetDisplayGeometry(m_DisplayGeometry);
+                //								mapper2d->SetDisplayGeometry(GetDisplayGeometry());
                 mapper2d->Update();
             }
             else
@@ -151,7 +151,6 @@ void mitk::OpenGLRenderer::Render()
 
     PlaneGeometry* myPlaneGeom =
         dynamic_cast<PlaneGeometry *>((mitk::Geometry2D*)(GetWorldGeometry()));
-    if(myPlaneGeom->GetPlaneView().normal.length()<0.1) return;
 
     glViewport (0, 0, m_Size[0], m_Size[1]);
     glMatrixMode( GL_PROJECTION );
@@ -245,8 +244,8 @@ void mitk::OpenGLRenderer::Resize(int w, int h)
     gluOrtho2D( 0.0, w, 0.0, h );
     glMatrixMode( GL_MODELVIEW );
 
-    m_DisplayGeometry->SetSizeInDisplayUnits(w, h);
-    m_DisplayGeometry->Fit();
+    GetDisplayGeometry()->SetSizeInDisplayUnits(w, h);
+    GetDisplayGeometry()->Fit();
 
     Update();
     //    m_MitkVtkRenderWindow->SetSize(w,h); //FIXME?
@@ -274,7 +273,7 @@ void mitk::OpenGLRenderer::SetWindowId(void * id)
 void mitk::OpenGLRenderer::InitSize(int w, int h)
 {
     m_MitkVtkRenderWindow->SetSize(w,h);
-    m_DisplayGeometry->Fit();
+    GetDisplayGeometry()->Fit();
     Modified();
     Update();
 }

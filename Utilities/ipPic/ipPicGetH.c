@@ -6,7 +6,10 @@
  *   reads the Header of a  PicFile from disk
  *
  * $Log$
- * Revision 1.4  1999/11/27 20:02:41  andre
+ * Revision 1.5  1999/11/28 00:36:09  andre
+ * *** empty log message ***
+ *
+ * Revision 1.4  1999/11/27  20:02:41  andre
  * *** empty log message ***
  *
  * Revision 1.3  1999/11/27  19:15:26  andre
@@ -66,7 +69,7 @@ ipPicDescriptor *ipPicGetHeader( char *infile_name, ipPicDescriptor *pic )
         _ipPicOldGetHeader( infile,
                             pic );
       if( infile != stdin )
-        fclose( infile );
+        ipFClose( infile );
       return( pic );
     }
 
@@ -90,7 +93,7 @@ ipPicDescriptor *ipPicGetHeader( char *infile_name, ipPicDescriptor *pic )
 
 
   if( infile != stdin )
-    fclose( infile );
+    ipFClose( infile );
 
   return( pic );
 }

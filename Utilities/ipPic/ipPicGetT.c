@@ -6,7 +6,10 @@
  *   reads a tag from a PicFile
  *
  * $Log$
- * Revision 1.5  1999/11/27 19:32:13  andre
+ * Revision 1.6  1999/11/28 00:36:09  andre
+ * *** empty log message ***
+ *
+ * Revision 1.5  1999/11/27  19:32:13  andre
  * *** empty log message ***
  *
  * Revision 1.2.2.2  1998/03/25  15:03:36  andre
@@ -60,7 +63,7 @@ ipPicDescriptor *ipPicGetTags( char *infile_name, ipPicDescriptor *pic )
   if( strncmp( ipPicVERSION, tag_name, 4 ) != 0 )
     {
       if( infile != stdin )
-        fclose( infile );
+        ipFClose( infile );
       return( pic );
     }
 
@@ -87,7 +90,7 @@ ipPicDescriptor *ipPicGetTags( char *infile_name, ipPicDescriptor *pic )
   pic->info->pixel_start_in_file = ftell( infile );
 
   if( infile != stdin )
-    fclose( infile );
+    ipFClose( infile );
 
   return( pic );
 }

@@ -514,8 +514,8 @@ void QmitkMainTemplate::initWidgets( mitk::DataTreeIterator * it )
 			}
 			else
 				geometryMapper = dynamic_cast<mitk::Geometry2DDataVtkMapper3D*>(git->get()->GetMapper(2));
-//			if(geometryMapper!=NULL)
-//				geometryMapper->SetDataIteratorForTexture(it);
+			if(geometryMapper!=NULL)
+				geometryMapper->SetDataIteratorForTexture(it);
 		}
 	}
 	

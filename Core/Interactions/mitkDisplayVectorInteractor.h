@@ -2,8 +2,8 @@
 #define MITKDISPLAYVECTORINTERACTOR_H_HEADER_INCLUDED_C10DC4EB
 
 #include "mitkCommon.h"
-#include "Roi.h"
 #include "BaseRenderer.h"
+#include "Roi.h"
 
 namespace mitk {
 
@@ -44,3 +44,4 @@ class DisplayVectorInteractor : public Roi
 
 
 #endif /* MITKDISPLAYVECTORINTERACTOR_H_HEADER_INCLUDED_C10DC4EB */
+

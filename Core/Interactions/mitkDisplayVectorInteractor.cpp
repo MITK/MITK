@@ -101,3 +101,4 @@ mitk::DisplayVectorInteractor::~DisplayVectorInteractor()
 {
 }
 
+

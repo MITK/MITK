@@ -176,8 +176,8 @@ void QmitkSimpleExampleFunctionality::initWidgets()
 				mitk::BoundingBox::ConstPointer bb = data->GetGeometry()->GetBoundingBox();
 				printf("boundsArrayType\n");
 				const mitk::BoundingBox::BoundsArrayType bounds = bb->GetBounds();
-				printf("\nboundingbox\n");   
-			
+				printf("\nboundingbox\n");
+
 				// init slider limits
 				controls->sliderYZ->setMinValue(std::_MIN<int>(bounds[0],controls->sliderYZ->minValue()));
 				controls->sliderYZ->setMaxValue(std::_MAX<int>(bounds[1],controls->sliderYZ->maxValue()));
@@ -193,6 +193,7 @@ void QmitkSimpleExampleFunctionality::initWidgets()
 	}
 	delete it;
 }
+
 
 void QmitkSimpleExampleFunctionality::ExecuteOperation(mitk::Operation* operation)
 {

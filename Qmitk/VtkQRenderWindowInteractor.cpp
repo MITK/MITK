@@ -321,6 +321,13 @@ VtkQRenderWindowInteractorFactory::VtkQRenderWindowInteractorFactory( )
   m_Factory = this;
 }
 
+VtkQRenderWindowInteractorFactory::~VtkQRenderWindowInteractorFactory( )
+
+{
+  //m_Factory->Delete();
+  vtkObjectFactory::UnRegisterFactory( this );
+}
+
 //##
 const char* VtkQRenderWindowInteractorFactory::GetVTKSourceVersion()
 {

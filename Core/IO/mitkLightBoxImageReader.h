@@ -27,6 +27,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk {
 
+//##Documentation
+//## @brief Read images from Chili LightBox
+//## @ingroup Process
 class LightBoxImageReader : public ImageSource 
 {
 public:
@@ -36,10 +39,17 @@ public:
     /** Method for creation through the object factory. */
     itkNewMacro(Self);
 
+    //##Description 
+    //## @brief Set the lightbox to read from
     void SetLightBox(QcLightbox* lightbox);
+
+    //##Description 
+    //## @brief Get the lightbox to read from
     QcLightbox* GetLightBox() const;
 
 protected:
+    //##Description 
+    //## @brief Struct used to sort the image slices
     typedef struct _localImageInfo
     {
       int pos;
@@ -47,8 +57,12 @@ protected:
       mitk::Vector3D origin;
       mitk::Vector3D* direction;
     } LocalImageInfo;
+    //##Description 
+    //## @brief Vector of structs used to sort the image slices
     typedef std::vector<LocalImageInfo> LocalImageInfoArray;
 
+    //##Description 
+    //## @brief Functors for sorting the image slices
     static bool ImageOriginLesser ( const LocalImageInfo& elem1, const LocalImageInfo& elem2 );
     static bool ImageNumberLesser ( const LocalImageInfo& elem1, const LocalImageInfo& elem2 );
 
@@ -60,16 +74,27 @@ protected:
 
     ~LightBoxImageReader();
 
-    /** Time when Header was last read. */
+    //##Description 
+    //## @brief Time when Header was last read
     itk::TimeStamp m_ReadHeaderTime;
-    //double ConvertTime(ipPicDescriptor*  pic);
-    int GetRealPosition(int position, LocalImageInfoArray& liste);
+
+    //##Description 
+    //## @brief Convert the position of the sorted image slices into the lightbox position
+    //##
+    //## @param position The position in the virtually sorted lightbox
+    //## @param list The list with the image number of the virtually sorted lightbox, created by 
+    //## SortImage()
+    int GetRealPosition(int position, LocalImageInfoArray& list);
+
+    //##Description 
+    //## @brief Virtually sort the lightbox
     void SortImage(LocalImageInfoArray& imageNumbers);
+
     mitk::Vector3D GetSpacingFromLB(LocalImageInfoArray& imageNumbers);
+    
     QcLightbox* m_LightBox;
 
     LocalImageInfoArray m_ImageNumbers;
-
 };
 
 } // namespace mitk

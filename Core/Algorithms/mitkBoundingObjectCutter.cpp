@@ -109,18 +109,11 @@ void mitk::BoundingObjectCutter::GenerateData()
 
     mitk::Image::Pointer outputImage = this->GetOutput();
 
-    if (m_UseRegionGrower)
+    if (m_UseRegionGrower && m_SegmentationFilter.IsNotNull())
     {
-//      std::cout << " cutting done, now starting region grower.\n";
-      if (m_SegmentationFilter.IsNull())
-        return;   // Throw exceptioin????
-
       m_SegmentationFilter->SetInput( itkImageCut );
-
       try
       {
-        //multiplyFilter->Update();
-        //confidenceConnected->Update();
         m_SegmentationFilter->Update();
       }
       catch( itk::ExceptionObject & excep )
@@ -129,11 +122,8 @@ void mitk::BoundingObjectCutter::GenerateData()
         std::cerr << excep << std::endl;
       }
       // convert the itk image back to an mitk image and set it as output for this filter
-      //outputImage->InitializeByItk(confidenceConnected->GetOutput());
-      //outputImage->SetVolume(confidenceConnected->GetOutput()->GetBufferPointer());
       outputImage->InitializeByItk(m_SegmentationFilter->GetOutput());
       outputImage->SetVolume(m_SegmentationFilter->GetOutput()->GetBufferPointer());
-
     }
     else
     {

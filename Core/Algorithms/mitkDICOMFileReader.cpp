@@ -1,11 +1,9 @@
 #include "mitkDICOMFileReader.h"
 #include <itkImageFileReader.h>
-#ifdef MBI_INTERNAL
 extern "C"
 {
 #include "ipDicom.h"
 }
-#endif
 
 void mitk::DICOMFileReader::GenerateOutputInformation()
 {

@@ -128,6 +128,23 @@ std::cout<<this->GetType()<<": Undo: Changing from State "<<m_CurrentState->GetN
 			m_CurrentState = stateTransOp->GetState();
 		}
 		break;
+  case OpDELETE:
+    {
+      //delete this!
+      //before all lower statemachines has to be deleted in a sideeffect
+      //this->Delete();//might not work!!!check itk!
+    }
+  case OpUNDELETE:
+    {
+      //this is just new! and now the m_CurrentState has to be set on a special State
+      //that way a delete of a StateMachine can be undone 
+      //IMPORTANT: The type has to be the same!!!Done by a higher instance, that creates this!
+      mitk::StateTransitionOperation* stateTransOp = dynamic_cast<mitk::StateTransitionOperation *>(operation);
+			if (stateTransOp != NULL)
+      {
+        m_CurrentState = stateTransOp->GetState();
+      }
+    }
 	default:
 		;
 	}

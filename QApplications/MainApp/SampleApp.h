@@ -2,6 +2,7 @@
 
 class QmitkDataManager;
 class QmitkRegistration;
+class ReggiPerfusionMatching;
 class QmitkSimpleExampleFunctionality;
 class QmitkSimpleTumorSegmentation;
 class QmitkLevelSets;
@@ -52,7 +53,7 @@ protected:
 		/*!
 		 AppModule for image fusion
 		 */
-		QmitkRegistration * registrationFunc;
+		ReggiPerfusionMatching * registrationFunc;
 
     QmitkSimpleTumorSegmentation * tumorSegFunc;
 

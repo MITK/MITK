@@ -24,7 +24,4 @@ int mitk::LineOperation::GetPIdB()
 	return m_PIdB;
 }
 
-mitk::ITKPoint3D mitk::LineOperation::GetVector()
-{
-	return m_Vector;
-}
+

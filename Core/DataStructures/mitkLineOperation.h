@@ -1,5 +1,5 @@
-#ifndef MITKLINEOPERATION
-#define MITKLINEOPERATION
+#ifndef MITKLINEOPERATION_H_INCLUDED
+#define MITKLINEOPERATION_H_INCLUDED
 
 #include "mitkCommon.h"
 #include "mitkOperation.h"
@@ -25,22 +25,19 @@ class LineOperation : public mitk::Operation
 	//## point is the information of the point to add or is the information to change a point into; index is e.g. the position in a
 	//## list which describes the element to change
     LineOperation(OperationType operationType,
-					int cellId, int pIdA, int pIdB, ITKPoint3D vector);
+					int cellId, int pIdA, int pIdB);
 
     virtual ~LineOperation();
 
 	int GetCellId();
 	int GetPIdA();
   int GetPIdB();
-  ITKPoint3D GetVector();
 
-  private:
+  protected:
   int m_CellId;
 	int m_PIdA;
   int m_PIdB;
-  //##Documentation
-  //## @brief additional information for the Movement of a line
-  ITKPoint3D m_Vector;
 };
 }//namespace mitk
-#endif /* MITKLINEOPERATION*/
+#endif /* MITKLINEOPERATION_H_INCLUDED*/
+

@@ -9,79 +9,90 @@ class QWidget;
 #include "mitkRenderWindow.h"
 #include "itkCommand.h"
 #include "QmitkDataManagerControls.h"
+class NodeViewPropertyItem;
+class NodeViewCheckboxItem;
 
 class QmitkDataTreeViewItem : public QListViewItem
 {
-public:
-  QmitkDataTreeViewItem( QListView *parent, const QString &s1 = 0, const QString &s2 = 0, mitk::DataTreeIterator * nodeIt = 0 );
-  QmitkDataTreeViewItem( QmitkDataTreeViewItem * parent, mitk::DataTreeIterator * nodeIt );
-  mitk::DataTreeNode::ConstPointer GetDataTreeNode() const;
-  mitk::DataTreeIterator* GetDataTreeIterator() {return m_DataTreeIterator;}
-protected:
-  mitk::DataTreeNode::ConstPointer m_TreeNode;   
-  mitk::DataTreeIterator* m_DataTreeIterator;
+  public:
+    QmitkDataTreeViewItem( QListView *parent, const QString &s1 = 0, const QString &s2 = 0, mitk::DataTreeIterator * nodeIt = 0 );
+    QmitkDataTreeViewItem( QmitkDataTreeViewItem * parent, mitk::DataTreeIterator * nodeIt );
+    mitk::DataTreeNode::ConstPointer GetDataTreeNode() const;
+    mitk::DataTreeIterator* GetDataTreeIterator() {return m_DataTreeIterator;}
+  protected:
+    mitk::DataTreeNode::ConstPointer m_TreeNode;   
+    mitk::DataTreeIterator* m_DataTreeIterator;
+};
+
+class QmitkNodeViewBaseItem {
+  public:
+    QmitkNodeViewBaseItem(mitk::PropertyList::Pointer propList, mitk::BaseProperty::Pointer property) : m_PropertyList(propList),m_Property(property) {};
+    bool isPropEnabled() {
+      return m_Property->GetEnabled();
+    }  
+    void setPropEnabled(bool enable) {
+      m_Property->SetEnabled(enable);
+    } 
+    void updateEnabledAppearance();    
+    virtual ~QmitkNodeViewBaseItem() {}
+  protected:
+    bool  m_PropEnabled ;
+    mitk::PropertyList::Pointer m_PropertyList;
+    mitk::BaseProperty::Pointer m_Property;
 };
 
 
-class NodeViewCheckboxItem : public QCheckListItem {
+class NodeViewCheckboxItem : public QCheckListItem, public QmitkNodeViewBaseItem {
   public:
-    NodeViewCheckboxItem(QListView* parent,QString name,bool value, bool isDefault, mitk::PropertyList::Pointer propList) : 
-	QCheckListItem(parent,name,QCheckListItem::CheckBox),m_PropertyList(propList) 
-    {
-      setTristate(true);
-      if(isDefault) {
-        setState(QCheckListItem::NoChange);
-      } else { 
-        setState(value?QCheckListItem::On:QCheckListItem::Off);	
+    NodeViewCheckboxItem(QListView* parent,QString name,bool value, bool isDefault, mitk::PropertyList::Pointer propList,mitk::BaseProperty::Pointer property) : 
+      QCheckListItem(parent,name,QCheckListItem::CheckBox) , QmitkNodeViewBaseItem(propList,property)
+      {
+        setOn(value);
       }
-    };
 
+    virtual ~NodeViewCheckboxItem() {}
   protected:
-    mitk::PropertyList::Pointer m_PropertyList;
-    virtual void newStateChange ( bool newState ) {
-      std::cout << "newStateChange called:" << std::endl;
-      if (!newState) {
-      // newState can be off or unchanged
-        if(state()==QCheckListItem::NoChange) {
-          m_PropertyList->DeleteProperty((const char *)text());
-          mitk::RenderWindow::UpdateAllInstances();
-        } 
-      }
-      if (m_PropertyList->SetProperty((const char *)text(),new mitk::BoolProperty(newState))) {
+    virtual void stateChange ( bool state) {
+   mitk::BoolProperty* boolProp = dynamic_cast<mitk::BoolProperty*>(m_Property.GetPointer());
+//      if (m_PropertyList->SetProperty((const char *)text(),new mitk::BoolProperty(state))) {
+   std::cout << "entering stateChange: " << state << std::endl;
+   if (boolProp != NULL && boolProp->GetBool() != state) {
+        std::cout << "entering actual changing" << std::endl;
+         
+        boolProp->SetBool(state);
 	mitk::RenderWindow::UpdateAllInstances();
-      }      
+      };
+        std::cout << "calling superclass" << std::endl;
+        
+       QCheckListItem::stateChange(state);
       listView()->repaintContents();      
     };
 };
 
-class NodeViewPropertyItem : public QListViewItem {
+class NodeViewPropertyItem : public QListViewItem, public QmitkNodeViewBaseItem {
   public:
-    NodeViewPropertyItem(QListView* parent,QString propClassName, QString name,QString value, bool isDefault, mitk::PropertyList::Pointer propList) : 
-	QListViewItem(parent,propClassName, name, value),m_PropertyList(propList) {
-
-};
- protected:
-    mitk::PropertyList::Pointer m_PropertyList;
-  
+    NodeViewPropertyItem(QListView* parent,QString propClassName, QString name,QString value, bool isDefault, mitk::PropertyList::Pointer propList,mitk::BaseProperty::Pointer property) : 
+      QListViewItem(parent,propClassName, name, value) , QmitkNodeViewBaseItem(propList,property){ };
+    virtual ~NodeViewPropertyItem() {}
 };
 class QmitkDataManagerControls;	
 class QmitkFocusChangeCommand : public itk::Command {
- protected:
+  protected:
     QmitkDataManagerControls* m_QmitkDataManagerControls; 
-public: 
+  public: 
     mitkClassMacro(QmitkFocusChangeCommand,itk::Command);
     itkNewMacro(Self);
     virtual void Execute (itk::Object *caller, const itk::EventObject &event) {
       DoAction();
     }
     virtual void Execute (const itk::Object *caller, const itk::EventObject &event) {
- 	DoAction();
+      DoAction();
     } 
     void DoAction(); 
     void SetQmitkDataManagerControls(QmitkDataManagerControls* dmc) {
       m_QmitkDataManagerControls = dmc;
     }
-  
+
 };
 
 

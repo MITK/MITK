@@ -85,6 +85,10 @@ MBI_STD::ostream& mitk::operator<<( MBI_STD::ostream& o, mitk::DataTreeNode::Poi
 MBI_STD::ostream& operator<<( MBI_STD::ostream& o, mitk::DataTreeNode::Pointer& dtn)
 #endif
 {
+	if(dtn->GetData()!=NULL)
+	  o<<dtn->GetData()->GetNameOfClass();
+	else
+		o<<"empty data";
     return o;
 }
 

@@ -38,20 +38,17 @@ void mitk::PointSetInteractor::UnselectAll(int objectEventId, int groupEventId)
 		return;
 
   mitk::PointSet::DataType *itkPointSet = pointSet->GetPointSet();
-  
   mitk::PointSet::PointsContainer::Iterator it, end;
   end = itkPointSet->GetPoints()->End();
-  bool selected;
   for (it = itkPointSet->GetPoints()->Begin(); it != end; it++)
 	{
     int position = it->Index();
-    selected = false;//safety
-    itkPointSet->GetPointData(position, &selected);
-    if ( selected )//then declare an operation which unselects this point; UndoOperation as well!
+    PointSet::PointDataType pointData;
+    itkPointSet->GetPointData(position, &pointData);
+    if ( pointData.selected )//then declare an operation which unselects this point; UndoOperation as well!
 		{
 			mitk::Point3D noPoint;
 			noPoint.Fill(0);
-
       mitk::PointOperation* doOp = new mitk::PointOperation(OpDESELECTPOINT, noPoint, position);
 			if (m_UndoEnabled)
 			{

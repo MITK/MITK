@@ -161,10 +161,10 @@ bool mitk::PointSetInteractor::ExecuteAction( Action* action, mitk::StateEvent c
     ok = true;
 	  break;
   case AcCHECKOPERATION:
-    //to check if the given Event is a PositionEvent. Other Events (DisplayEvent without WorldPosition) can't be yet used to add points due to a missing axsis.
+    //to check if the given Event is a DisplayPositionEvent.
     {
-	    mitk::PositionEvent const  *posEvent = dynamic_cast <const mitk::PositionEvent *> (stateEvent->GetEvent());
-		  if (posEvent != NULL) 
+	    mitk::DisplayPositionEvent const  *dispPosEvent = dynamic_cast <const mitk::DisplayPositionEvent *> (stateEvent->GetEvent());
+		  if (dispPosEvent != NULL) 
       {
         mitk::StateEvent* newStateEvent = new mitk::StateEvent(EIDYES, stateEvent->GetEvent());
         this->HandleEvent( newStateEvent );
@@ -183,7 +183,7 @@ bool mitk::PointSetInteractor::ExecuteAction( Action* action, mitk::StateEvent c
 		the other operation is the add operation: There the first empty place have to be found and the new point inserted into that space
     */
 	{
-	  mitk::PositionEvent const  *posEvent = dynamic_cast <const mitk::PositionEvent *> (stateEvent->GetEvent());
+	  mitk::DisplayPositionEvent const  *posEvent = dynamic_cast <const mitk::DisplayPositionEvent *> (stateEvent->GetEvent());
 		if (posEvent == NULL) 
       //check if it is a DisplayEvent thrown in a 3D window.
       //Then the z-information is missing.
@@ -565,21 +565,21 @@ bool mitk::PointSetInteractor::ExecuteAction( Action* action, mitk::StateEvent c
         }
         break;
     case AcCHECKEQUALS1:
+      {
+        if (pointSet->GetSize()<=1)//the number of points in the list is 1 (or smaler)
         {
-            if (pointSet->GetSize()<=1)//the number of points in the list is 1 (or smaler)
-            {
-                mitk::StateEvent* newStateEvent = new mitk::StateEvent(EIDYES, stateEvent->GetEvent());
-                this->HandleEvent( newStateEvent );
-				        ok = true;
-            }
-            else //more than 1 points in list, so stay in the state!
-            {
-                mitk::StateEvent* newStateEvent = new mitk::StateEvent(EIDNO, stateEvent->GetEvent());
-                this->HandleEvent(newStateEvent );
-				        ok = true;
-            }
+          mitk::StateEvent* newStateEvent = new mitk::StateEvent(EIDYES, stateEvent->GetEvent());
+          this->HandleEvent( newStateEvent );
+          ok = true;
         }
-        break;
+        else //more than 1 points in list, so stay in the state!
+        {
+          mitk::StateEvent* newStateEvent = new mitk::StateEvent(EIDNO, stateEvent->GetEvent());
+          this->HandleEvent(newStateEvent );
+          ok = true;
+        }
+      }
+      break;
 	case AcSELECTPICKEDOBJECT://and deselect others
 		{
       mitk::PositionEvent const  *posEvent = dynamic_cast <const mitk::PositionEvent *> (stateEvent->GetEvent());
@@ -642,12 +642,12 @@ bool mitk::PointSetInteractor::ExecuteAction( Action* action, mitk::StateEvent c
 			}
 		}
 		break;
-    case AcDESELECTALL:
-		{
-            this->UnselectAll();//undo-supported able deselect of all points in the DataList
-            ok = true;
-        }
-	    break;
+  case AcDESELECTALL:
+    {
+      this->UnselectAll();//undo-supported able deselect of all points in the DataList
+      ok = true;
+    }
+    break;
 	case AcFINISHMOVEMENT:
 		{
       mitk::PositionEvent const *posEvent = dynamic_cast <const mitk::PositionEvent *> (stateEvent->GetEvent());
@@ -705,11 +705,6 @@ bool mitk::PointSetInteractor::ExecuteAction( Action* action, mitk::StateEvent c
 		}
 	default:
     return Superclass::ExecuteAction( action, stateEvent );
-    //mitk::StatusBar::DisplayText("Message from mitkPointSetInteractor: I do not understand the Action!", 10000);
-	  //ok = false;
-    //a false here causes the statemachine to undo its last statechange.
-    //otherwise it will end up in a different state, but without done Action.
-    //if a transition really has no Action, than call donothing
 	}
   
   return ok;

@@ -45,7 +45,7 @@ class Geometry2DDataVtkMapper3D : public BaseVtkMapper3D
     //##ModelId=3E691E09038C
     virtual void GenerateData();
     //##ModelId=3E6E874F0007
-    virtual void SetDataIteratorForTexture(mitk::DataTreeIterator* iterator);
+    virtual void SetDataIteratorForTexture(mitk::DataTreeIterator* iterator) {};
 
   protected:
     //##ModelId=3E691E09038E

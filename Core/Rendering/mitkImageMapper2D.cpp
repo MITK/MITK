@@ -170,7 +170,7 @@ void mitk::ImageMapper2D::GenerateData(mitk::BaseRenderer *renderer)
 
   if(input.IsNotNull())
   {
-    const TimeSlicedGeometry* inputtimegeometry = dynamic_cast<const TimeSlicedGeometry*>(input->GetGeometry());
+    const TimeSlicedGeometry* inputtimegeometry = dynamic_cast<const TimeSlicedGeometry*>(input->GetUpdatedGeometry());
 
     assert(inputtimegeometry!=NULL);
 

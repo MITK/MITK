@@ -44,17 +44,8 @@ void mitk::DopplerToStrainRateFilter::GenerateOutputInformation()
     output->GetSlicedGeometry()->SetGeometry2D(planegeometry.GetPointer(), 0, 0);
     output->GetSlicedGeometry()->SetEvenlySpaced();
 
-	// @todo convert transducer position into new coordinate system
-/*	
-	Tag = ipPicQueryTag(picHeader, "ORIGIN");
-	if (Tag != NULL)
-	{
-		int z = ((int *) Tag->value)[1];
-		((int *) Tag->value)[0] = picHeader->n[0]/2;
-		((int *) Tag->value)[1] = picHeader->n[0]/2;
-		((int *) Tag->value)[2] = z * scale;
-	}
-*/
+	  output->SetPropertyList(input->GetPropertyList()->Clone());    
+	
 
 		delete [] tmpDimensions;
 

@@ -17,6 +17,9 @@ void mitk::ImageSliceSelector::GenerateOutputInformation()
   geometry->SetEvenlySpaced(input->GetSlicedGeometry()->GetEvenlySpaced());
   geometry->SetSpacing(input->GetSlicedGeometry()->GetSpacing());
 
+
+  geometry->SetSpacing(input->GetSlicedGeometry()->GetSpacing());
+  output->SetPropertyList(input->GetPropertyList()->Clone());
   output->SetGeometry(geometry);
 }
 

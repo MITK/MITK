@@ -24,6 +24,8 @@ void mitk::ImageChannelSelector::GenerateOutputInformation()
 	output->Initialize(input->GetPixelType(), dim, input->GetDimensions());
 
   // initialize geometry
+  output->GetSlicedGeometry()->SetSpacing(input->GetSlicedGeometry()->GetSpacing());
+  output->SetPropertyList(input->GetPropertyList()->Clone());  
 	output->SetGeometry(input->GetGeometry());
 }
 

@@ -43,7 +43,8 @@ void mitk::ImageTimeSelector::GenerateOutputInformation()
 //	std::cout << "   in: xres=" << spacing[0] << " yres=" << spacing[1] << " zres=" << spacing[2] << std::endl;
   
   geometry->SetSpacing(input->GetSlicedGeometry()->GetSpacing());
-  
+
+  output->SetPropertyList(input->GetPropertyList()->Clone());
   output->SetGeometry(geometry);
 
 //  spacing = input->GetSlicedGeometry()->GetSpacing();

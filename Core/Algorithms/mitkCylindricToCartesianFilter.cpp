@@ -334,7 +334,8 @@ void mitk::CylindricToCartesianFilter::GenerateOutputInformation()
 
   output->GetSlicedGeometry()->SetGeometry2D(planegeometry.GetPointer(), 0, 0);
   output->GetSlicedGeometry()->SetEvenlySpaced();
-
+  output->SetPropertyList(input->GetPropertyList()->Clone());
+  
   // @todo convert transducer position into new coordinate system
   /*	
   Tag = ipPicQueryTag(picHeader, "ORIGIN");

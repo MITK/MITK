@@ -58,4 +58,5 @@ void mitk::Geometry2D::SetSizeInUnits(unsigned int width, unsigned int height)
 {
     m_WidthInUnits  = width;
     m_HeightInUnits = height;
+    Modified();
 }

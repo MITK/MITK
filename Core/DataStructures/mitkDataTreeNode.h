@@ -113,7 +113,7 @@ public:
   //## of the @a renderer, if available there, otherwise use the BaseRenderer-independent PropertyList.
   //## 
   //## If @a renderer is @a NULL or the @a propertyKey cannot be found 
-  //## in the PropertyList specific to @a renderer, the BaseRenderer-independent 
+  //## in the PropertyList specific to @a renderer or is disabled there, the BaseRenderer-independent 
   //## PropertyList of this DataTreeNode is queried.
   //## @sa GetPropertyList
   //## @sa m_PropertyList

@@ -24,88 +24,84 @@ namespace mitk {
 	class StateMachine : public itk::Object, public mitk::OperationActor
 {
   public:
-  //mitkClassMacro(StateMachine,itk::Object);
-  //itkNewMacro(Self);  //Can't use because of abstract class!
+  mitkClassMacro(StateMachine,itk::Object);
+
+  //##ModelId=3E5B2DB301FD
+  //##Documentation
+  //## Constructor
+  //## connects the current State to a
+  //## StateMachine of Type type;
+  //## default of m_UndoEnabled is true;
+  StateMachine(std::string type);
+
+  ~StateMachine();
 
   //##ModelId=3E5B2E660087
- std::string GetType() const;
+  std::string GetType() const;
 
- //##ModelId=3E5B2DE30378
- //##Documentation
- //## @brief handles an Event accordingly to its current State
- //##
- //## statechange with Undo functionality;
- //## groupEventId and objectEventId are use to combine Operations so that
- //## they can be undone together or seperately.
- //## EventMapper gives each event a new objectEventId
- //## and a StateMachine::ExecuteSideEffect can descide weather it gets a
- //## new GroupEventId or not, depending on its state (e.g. finishedNewObject then new GroupEventId)
- bool HandleEvent(StateEvent const* stateEvent, int objectEventId, int groupEventId);
+  //##ModelId=3E5B2DE30378
+  //##Documentation
+  //## @brief handles an Event accordingly to its current State
+  //##
+  //## statechange with Undo functionality;
+  //## groupEventId and objectEventId are use to combine Operations so that
+  //## they can be undone together or seperately.
+  //## EventMapper gives each event a new objectEventId
+  //## and a StateMachine::ExecuteSideEffect can descide weather it gets a
+  //## new GroupEventId or not, depending on its state (e.g. finishedNewObject then new GroupEventId)
+  bool HandleEvent(StateEvent const* stateEvent, int objectEventId, int groupEventId);
 
- //##ModelId=3EDCAECB0175
- //##Documentation
- //## if set to true, then UndoFunctionality is enabled
- //## if false, then Undo is disabled
- void EnableUndo(bool enable);
+  //##ModelId=3EDCAECB0175
+  //##Documentation
+  //## if set to true, then UndoFunctionality is enabled
+  //## if false, then Undo is disabled
+  void EnableUndo(bool enable);
 
- //##Documentation
- //## so that UndoModel can call ExecuteOperation for Undo!
- friend class UndoModel;
+  //##Documentation
+  //## so that UndoModel can call ExecuteOperation for Undo!
+  friend class UndoModel;
 
  protected:
- //##ModelId=3E5B2DB301FD
- //##Documentation
- //## Constructor
- //## connects the current State to a
- //## StateMachine of Type type;
- //## default of m_UndoEnabled is true;
- StateMachine(std::string type);
 
- //##Documentation
- //## Default-Constructor
- StateMachine(){};
+  //##ModelId=3E5B2E170228
+  //##Documentation
+  //## each statechange has a sideeffect, which can be assigned by it's number
+  //## if you are developing a new statemachine, you put all your operations here!
+  //## dependant on the SideEffectNumber / build of the StateMachine-Definition
+  //## First Undo, then SideEffectOperation
+  virtual bool ExecuteSideEffect(int sideEffectId, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId)= 0;
 
- ~StateMachine();
+  //##ModelId=3EDCAECB00B9
+  //##Documentation
+  //## if true, then UndoFunctionality is enabled
+  //## default on true;
+  bool m_UndoEnabled;
 
- //##ModelId=3E5B2E170228
- //##Documentation
- //## each statechange has a sideeffect, which can be assigned by it's number
- //## if you are developing a new statemachine, you put all your operations here!
- //## dependant on the SideEffectNumber / build of the StateMachine-Definition
- //## First Undo, then SideEffectOperation
- virtual bool ExecuteSideEffect(int sideEffectId, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId)= 0;
+  //Documentation
+  //##ModelId=3EF099EA03C0
+  //## @brief friend protected function of OperationEvent, that way all StateMachines can increment!
+  int IncCurrGroupEventId();
 
- //##ModelId=3EDCAECB00B9
- //##Documentation
- //## if true, then UndoFunctionality is enabled
- //## default on true;
- bool m_UndoEnabled;
-
- //Documentation
- //##ModelId=3EF099EA03C0
- //## @brief friend protected function of OperationEvent, that way all StateMachines can increment!
- int IncCurrGroupEventId();
-
- //##ModelId=3EDCAECB0128
- //##Documentation
- //## holds an UndoController, that can be accessed from all StateMachines. For ExecutreSideEffect
- UndoController* m_UndoController;
+  //##ModelId=3EDCAECB0128
+  //##Documentation
+  //## holds an UndoController, that can be accessed from all StateMachines. For ExecutreSideEffect
+  UndoController* m_UndoController;
 
  private:
- //##ModelId=3EAEEDC603D9
- //##Documentation
- //## from OperationActor; a stateMachine has to be an OperationActor
- //## due to the UndoMechanism. Else no destination for Undo/Redo of StateMachines
- //## can be set.
- //## is set private here and in superclass it is set public, so UndoController
- //## can reach ist, but it can't be overwritten by a subclass
- void ExecuteOperation(Operation* operation);
+  //##ModelId=3EAEEDC603D9
+  //##Documentation
+  //## from OperationActor; a stateMachine has to be an OperationActor
+  //## due to the UndoMechanism. Else no destination for Undo/Redo of StateMachines
+  //## can be set.
+  //## is set private here and in superclass it is set public, so UndoController
+  //## can reach ist, but it can't be overwritten by a subclass
+  void ExecuteOperation(Operation* operation);
 
- //##ModelId=3E5B2D66027E
- std::string m_Type;
+  //##ModelId=3E5B2D66027E
+  std::string m_Type;
 
- //##ModelId=3E5B2D8F02B9
- State* m_CurrentState;
+  //##ModelId=3E5B2D8F02B9
+  State* m_CurrentState;
  };
 
  } // namespace mitk

@@ -17,13 +17,6 @@ public:
 
   mitkClassMacro(Interactor,StateMachine);
 
-  itkNewMacro(Self);
-
-  //##Documentation
-  //## @brief Executes Side-Effects
-  virtual bool ExecuteSideEffect(int sideEffectId, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId);
-
-protected:
   //##Documentation
   //## @brief Constructor
   //##
@@ -32,11 +25,16 @@ protected:
   //##
   //## Interactor connects itself to the DataTreeNode-Interactor-pointer through call of SetInteractor(this)
   Interactor(std::string type, DataTreeNode* dataTreeNode);
-  //##Documentation
-  //## @brief Default Constructor
-  Interactor(){};
 
+  //##Documentation
+  //## @brief Destructor
   ~Interactor(){};
+
+  //##Documentation
+  //## @brief Executes Side-Effects
+  virtual bool ExecuteSideEffect(int sideEffectId, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId);
+
+protected:
 
   //##Documentation
   //## @brief Pointer to the data, this object handles the Interaction for

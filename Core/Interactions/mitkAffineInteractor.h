@@ -16,18 +16,19 @@ class AfineInteractor : public Interactor
 public:
   mitkClassMacro(AfineInteractor,Interactor);
 
-  itkNewMacro(Self);  
 	//##Documentation
 	//## @brief Constructor
 	//##
 	//## @params dataTreeNode is the node, this Interactor is connected to
 	//## type is the type of StateMachine like declared in the XML-Configure-File
 	//##
+ 	AfineInteractor(std::string type, DataTreeNode* dataTreeNode);
+
+  //##Documentation
+	//## @brief Destructor
+  ~AfineInteractor(){};
 
 protected:
- 	AfineInteractor(std::string type, DataTreeNode* dataTreeNode);
-  AfineInteractor(){};
-  ~AfineInteractor(){};
 
 	virtual bool ExecuteSideEffect(int sideEffectId, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId);
 };

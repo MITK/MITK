@@ -83,7 +83,7 @@ void mitk::Geometry2DDataMapper2D::Paint(mitk::BaseRenderer * renderer)
       //float aaaa[2]={10,11};
       Point2D lineFrom;// =(float[2]){10,11}; 
       Point2D lineTo;
-      bool intersecting = worldPlaneGeometry->IntersectWithPlane2D( input_planeGeometry, lineFrom, lineTo );
+      bool intersecting = worldPlaneGeometry->IntersectWithPlane2D( input_planeGeometry, lineFrom, lineTo ) > 0;
       
       if(intersecting)
       {

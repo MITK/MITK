@@ -1,5 +1,6 @@
 #include <QmitkRenderWindow.h>
 #include <ComfortGLWidget.h>
+#include <vtkRenderer.h>
 
 #include <mitkDataTreeNodeFactory.h>
 #include <mitkProperties.h>
@@ -14,12 +15,15 @@
 //##
 //## As in Step2 and Step3, load one or more data sets (many image, 
 //## surface and other formats), but create 3 views on the data.
-//## The QmitkRenderWindow is used for displaying a 3D view as in Step3.
+//## The QmitkRenderWindow is used for displaying a 3D view as in Step3,
+//## but without volume-rendering.
 //## Furthermore, we create two 2D views for slicing through the data. 
 //## We use the class ComfortGLWidget, which is based on the class 
 //## QmitkRenderWindow, but additionally provides sliders 
 //## to slice through the data. We create two instances of
 //## ComfortGLWidget, one for transversal and one for sagittal slicing.
+//## The two slices are also shown at their correct position in 3D as
+//## well as intersection-line, each in the other 2D view.
 int main(int argc, char* argv[])
 {
   QApplication qtapplication( argc, argv );
@@ -53,15 +57,6 @@ int main(int argc, char* argv[])
       // use the iterator to add the read node to the tree
       mitk::DataTreeNode::Pointer node = nodeReader->GetOutput();
       it.Add(node);
-
-      //Part IV: We want all images to be volum-rendered
-      // Check, if the data is an image by dynamic_cast-ing the data
-      // contained in the node. Warning: dynamic_cast's are rather slow,
-      // do not use it too often!
-      mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
-      if(image.IsNotNull())
-        // set the property "volumerendering" to the Boolean value "true"
-        node->SetProperty("volumerendering", new mitk::BoolProperty(true));
     }
     catch(...)
     {

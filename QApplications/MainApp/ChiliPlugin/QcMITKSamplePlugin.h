@@ -26,6 +26,7 @@ public slots :
        
     void selectSerie (QcLightbox*);
     void ConnectWidget(bool );
+    void Reinitialize(bool);
     virtual void 	lightboxFilled (QcLightbox* lightbox);
     virtual void 	lightboxTiles (QcLightboxManager *lbm, int tiles);
 private:
@@ -34,6 +35,7 @@ private:
     ToolBar *toolbar ;
     int idLightbox;
     void selectLightbox(int id);
+    bool activated;
 };
 
 

@@ -25,18 +25,19 @@ QcMITKSamplePlugin::QcMITKSamplePlugin( QWidget *parent )
   //QGridLayout* layout = new QGridLayout(task,0,0,0,-1,"plugin_area");
   
   ap = new SampleApp(task,"sample",0);
-  toolbar =new ToolBar(task,ap);
+  toolbar =new ToolBar(task);
   toolbar->SetWidget(ap);
 
   QButtonGroup* tb;
   tb=toolbar->GetToolBar();
   for (int i=1;i<5;++i)
     connect(tb->find(i),SIGNAL(toggled(bool)),this,SLOT(ConnectWidget(bool)));
+  connect(tb->find(5),SIGNAL(toggled(bool)),this,SLOT(Reinitialize(bool)));
 
   idLightbox=0;
+  activated =false;
   //ap = new SampleApp(task,"sample",0);
-  //ap->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
-  
+  //ap->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);  
   //layout->addWidget(ap,0,0,0);
   //layout->activate();
  
@@ -82,15 +83,10 @@ return new QcMITKSamplePlugin( parent );
 void 	QcMITKSamplePlugin::lightboxFilled (QcLightbox* lightbox)
 {
   itkGenericOutputMacro(<<"lightbox filled");
-  //if (lightbox && lightbox->isActive())
-  //ap = new SampleApp(task,"sample",0);
-  //toolbar =new ToolBar(task,ap);
-  //toolbar->SetWidget(ap);
-
   QcLightboxManager *lbm=lightboxManager();
   QPtrList<QcLightbox> list;
   list=lbm->getLightboxes();
-  if ((list.take(idLightbox))->isActive())
+  if (activated&&(list.take(idLightbox))->isActive())
     selectSerie(lightbox);
 }
 
@@ -108,7 +104,7 @@ void QcMITKSamplePlugin::ConnectWidget(bool on)
   tb=toolbar->GetToolBar();
   int id=tb->id(tb->selected());
     
-  if (on==true)
+  if (on)
   { 
     ap = new SampleApp(task,"sample",0);
     toolbar->SetWidget(ap);
@@ -119,11 +115,14 @@ void QcMITKSamplePlugin::ConnectWidget(bool on)
 
 void QcMITKSamplePlugin::selectLightbox(int id)
 {
+  activated=true;
   idLightbox=id;
+
   QcLightboxManager *lbm=lightboxManager();
   QPtrList<QcLightbox> list;
-  list=lbm->getLightboxes();
   QcLightbox* lb;
+
+  list=lbm->getLightboxes();  
   lb=list.take(id);
   selectSerie(lb);
 }
@@ -164,3 +163,14 @@ void QcMITKSamplePlugin::selectSerie (QcLightbox* lightbox)
   ap->getMultiWidget()->updateMitkWidgets();
   ap->getMultiWidget()->fit();
 }
+
+void QcMITKSamplePlugin::Reinitialize(bool on)
+{
+  if (on)
+  {
+    QButtonGroup* tb;
+    tb=toolbar->GetToolBar();
+    tb->setButton(idLightbox+1);
+  }   
+}
+

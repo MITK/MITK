@@ -86,17 +86,17 @@ bool mitk::GlobalInteraction::RemoveInteractor(mitk::Interactor* interactor)
   return true;
 }
 
-void mitk::GlobalInteraction::InformListeners(mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId)
+void mitk::GlobalInteraction::InformListeners(mitk::StateEvent const* stateEvent)
 {
   for (StateMachineListIter it = m_ListenerList.begin(); it != m_ListenerList.end(); it++)
   {
     if((*it)!=NULL)
-	    (*it)->HandleEvent(stateEvent, objectEventId, groupEventId);
+	    (*it)->HandleEvent(stateEvent);
   }
 
 }
 
-bool mitk::GlobalInteraction::AskSelected(mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId)
+bool mitk::GlobalInteraction::AskSelected(mitk::StateEvent const* stateEvent)
 {
   bool ok, oneOk;
   ok = false;
@@ -107,7 +107,7 @@ bool mitk::GlobalInteraction::AskSelected(mitk::StateEvent const* stateEvent, in
     if((*it)!=NULL && !m_SelectedList.empty())
     {
       //Interactor are in Mode SELECTED or SUBSELECTED
-	    oneOk = (*it)->HandleEvent(stateEvent, objectEventId, groupEventId);
+	    oneOk = (*it)->HandleEvent(stateEvent);
       
       //if one HandleEvent did succeed, then set returnvalue on true;
       if (oneOk)
@@ -130,7 +130,7 @@ bool mitk::GlobalInteraction::AskSelected(mitk::StateEvent const* stateEvent, in
   return ok;
 }
 
-void mitk::GlobalInteraction::FillJurisdictionMap(mitk::StateEvent const* stateEvent, int , int, float swell)
+void mitk::GlobalInteraction::FillJurisdictionMap(mitk::StateEvent const* stateEvent, float threshold)
 {
   for (InteractorListIter it = m_InteractorList.begin(); it != m_InteractorList.end(); it++)
   {
@@ -138,7 +138,7 @@ void mitk::GlobalInteraction::FillJurisdictionMap(mitk::StateEvent const* stateE
     {
       //first ask for CalculateJurisdiction(..) and write it into the map if > 0
       float value = (*it)->CalculateJurisdiction(stateEvent);
-      if (value > swell)
+      if (value > threshold)
       {
         ///TODO: hier werden die gleichen IDs überschrieben!
         m_JurisdictionMap.insert(InteractorMap::value_type(value, (*it)));
@@ -152,14 +152,14 @@ void mitk::GlobalInteraction::FillJurisdictionMap(mitk::StateEvent const* stateE
     m_CurrentInteractorIter = m_JurisdictionMap.end();
 }
 
-void mitk::GlobalInteraction::AskCurrentInteractor(mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId)
+void mitk::GlobalInteraction::AskCurrentInteractor(mitk::StateEvent const* stateEvent)
 {
   if (m_JurisdictionMap.empty())
     return;
 
   if ( m_CurrentInteractorIter != m_JurisdictionMap.end())//not set
   {
-    (*m_CurrentInteractorIter).second->HandleEvent(stateEvent, objectEventId, groupEventId);
+    (*m_CurrentInteractorIter).second->HandleEvent(stateEvent);
 
     //if after handling an event Interactor is in mode SELECTED or SUBSELECTED
     if ( ((*m_CurrentInteractorIter).second->GetMode() == mitk::Interactor::SMSELECTED ) || 
@@ -227,7 +227,7 @@ bool mitk::GlobalInteraction::GetWorldCoordinate(const mitk::DisplayPositionEven
 }
 
 //##ModelId=3E7F497F01AE
-bool mitk::GlobalInteraction::ExecuteAction(Action* action, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId)
+bool mitk::GlobalInteraction::ExecuteAction(Action* action, mitk::StateEvent const* stateEvent)
 {
   bool ok = false;
   
@@ -264,22 +264,22 @@ bool mitk::GlobalInteraction::ExecuteAction(Action* action, mitk::StateEvent con
     ok = true;
 	break;
   case AcINFORMLISTENERS:
-    InformListeners(stateEvent, objectEventId, groupEventId);
+    InformListeners(stateEvent);
     ok = true;
     break;
   case AcASKINTERACTORS:
-    if (! AskSelected(stateEvent, objectEventId, groupEventId))//no selected
+    if (! AskSelected(stateEvent))//no selected
     {
       //if m_JurisdictionMap is empty, then fill it.
       if (m_JurisdictionMap.empty())
-        FillJurisdictionMap(stateEvent, objectEventId, groupEventId, 0);
+        FillJurisdictionMap(stateEvent, 0);
       
       //no jurisdiction value above 0 could be found, so take all to convert to old scheme
       if (m_JurisdictionMap.empty())
-        FillJurisdictionMap(stateEvent, objectEventId, groupEventId, -1);
+        FillJurisdictionMap(stateEvent, -1);
 
       //ask the next Interactor to handle that event
-      AskCurrentInteractor(stateEvent, objectEventId, groupEventId);
+      AskCurrentInteractor(stateEvent);
       
       //after asking for jurisdiction and sending the events to the interactors,
       //interactors should change the mode. We can now clear the jurisdictionmap.

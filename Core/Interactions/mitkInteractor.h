@@ -81,8 +81,8 @@ public:
   virtual float CalculateJurisdiction(StateEvent const* stateEvent) const;
 
   //##Documentation
-  //## @brief Executes Side-Effects
-  virtual bool ExecuteAction(Action* action, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId);
+  //## @brief Executes Actions 
+  virtual bool ExecuteAction(Action* action, mitk::StateEvent const* stateEvent);
 
 protected:
   //##Documentation
@@ -91,7 +91,7 @@ protected:
   
   //##Documentation
   //## @brief creates a ModeOperation with the transmitted mode and sends it to this. Undo supported!
-  void CreateModeOperation(ModeType mode, int objectEventId, int groupEventId);
+  void CreateModeOperation(ModeType mode);
 
   //##Documentation
   //## @brief Pointer to the data, this object handles the Interaction for

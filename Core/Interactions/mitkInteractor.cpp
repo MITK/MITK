@@ -37,33 +37,31 @@ bool mitk::Interactor::IsSelected() const
   return (m_Mode!=SMDESELECTED);
 }
 
-void mitk::Interactor::CreateModeOperation(ModeType mode, int objectEventId, int groupEventId)
+void mitk::Interactor::CreateModeOperation(ModeType mode)
 {
   mitk::ModeOperation* doOp = new mitk::ModeOperation(OpMODECHANGE, mode);
 	if (m_UndoEnabled)
 	{
     mitk::ModeOperation* undoOp = new mitk::ModeOperation(OpMODECHANGE, this->GetMode());
-		OperationEvent *operationEvent = new OperationEvent(this,
-					  									doOp, undoOp,
-						  								objectEventId, groupEventId);
+		OperationEvent *operationEvent = new OperationEvent(this, doOp, undoOp);
 		m_UndoController->SetOperationEvent(operationEvent);
 	}
 	this->ExecuteOperation(doOp);
 }
 
-bool mitk::Interactor::ExecuteAction(Action* action, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId) 
+bool mitk::Interactor::ExecuteAction(Action* action, mitk::StateEvent const* stateEvent) 
 {
 
   switch (action->GetActionId())
   {
     case AcMODEDESELECT:
       {
-        this->CreateModeOperation(SMDESELECTED, objectEventId, groupEventId);
+        this->CreateModeOperation(SMDESELECTED);
         return true;
       }
     case AcMODESELECT:
       {      
-        this->CreateModeOperation(SMSELECTED, objectEventId, groupEventId);
+        this->CreateModeOperation(SMSELECTED);
         return true;
       }
     case AcMODESUBSELECT:

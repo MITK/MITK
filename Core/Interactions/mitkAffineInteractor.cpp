@@ -37,7 +37,7 @@ mitk::AffineInteractor::AffineInteractor(const char * type, DataTreeNode* dataTr
 {
 }
 
-bool mitk::AffineInteractor::ExecuteAction(Action* action, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId)
+bool mitk::AffineInteractor::ExecuteAction(Action* action, mitk::StateEvent const* stateEvent)
 {
   bool ok = false;
 
@@ -122,7 +122,7 @@ bool mitk::AffineInteractor::ExecuteAction(Action* action, mitk::StateEvent cons
       /* write new state (selected/not selected) to the property */
       m_DataTreeNode->GetPropertyList()->SetProperty("selected", selected);
       m_DataTreeNode->GetPropertyList()->SetProperty("color", color);
-      this->HandleEvent( newStateEvent, objectEventId, groupEventId );
+      this->HandleEvent( newStateEvent );
       ok = true;
       break;
     }
@@ -142,7 +142,7 @@ bool mitk::AffineInteractor::ExecuteAction(Action* action, mitk::StateEvent cons
         newStateEvent = new mitk::StateEvent(StNO, posEvent);
       }
       //call HandleEvent to leave the guard-state
-      this->HandleEvent( newStateEvent, objectEventId, groupEventId );
+      this->HandleEvent( newStateEvent );
       ok = true;
       break;
     }
@@ -192,7 +192,7 @@ bool mitk::AffineInteractor::ExecuteAction(Action* action, mitk::StateEvent cons
         oldPosition[2] = pos[2];
 
         PointOperation* undoOp = new mitk::PointOperation(OpMOVE, oldPosition, 0);
-        OperationEvent *operationEvent = new OperationEvent(geometry, doOp, undoOp, objectEventId, groupEventId);
+        OperationEvent *operationEvent = new OperationEvent(geometry, doOp, undoOp);
         m_UndoController->SetOperationEvent(operationEvent);
       }
       /* execute the Operation */
@@ -238,7 +238,7 @@ bool mitk::AffineInteractor::ExecuteAction(Action* action, mitk::StateEvent cons
       if (m_UndoEnabled)	//write to UndoMechanism
       {
         RotationOperation* undoOp = new mitk::RotationOperation(OpROTATE, Point3D(position) , rotationaxis, -angle);
-        OperationEvent *operationEvent = new OperationEvent(geometry, doOp, undoOp, objectEventId, groupEventId);
+        OperationEvent *operationEvent = new OperationEvent(geometry, doOp, undoOp);
         m_UndoController->SetOperationEvent(operationEvent);
       }
       /* execute the Operation */
@@ -294,7 +294,7 @@ bool mitk::AffineInteractor::ExecuteAction(Action* action, mitk::StateEvent cons
         oldScaleData[2] = -newScale[2];
 
         PointOperation* undoOp = new mitk::PointOperation(OpSCALE, oldScaleData, 0);
-        OperationEvent *operationEvent = new OperationEvent(geometry, doOp, undoOp, objectEventId, groupEventId);
+        OperationEvent *operationEvent = new OperationEvent(geometry, doOp, undoOp);
         m_UndoController->SetOperationEvent(operationEvent);
       }
       /* execute the Operation */

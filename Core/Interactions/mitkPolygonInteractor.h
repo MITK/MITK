@@ -31,12 +31,12 @@ public:
 
 protected:
   //##Documentation
-  //## @brief Executes Side-Effects
-  virtual bool ExecuteAction(Action* action, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId);
+  //## @brief Executes Actions
+  virtual bool ExecuteAction( Action* action, mitk::StateEvent const* stateEvent );
   
   //##Documentation
   //## @brief Unselect all cells of a mesh
-  virtual void DeselectAllCells(int objectEventId, int groupEventId);
+  virtual void DeselectAllCells();
 
 private:
 

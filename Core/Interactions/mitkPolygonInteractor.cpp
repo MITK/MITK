@@ -26,7 +26,7 @@ mitk::PolygonInteractor::~PolygonInteractor()
   //delete m_LineInteractor;
 }
 
-void mitk::PolygonInteractor::DeselectAllCells(int objectEventId, int groupEventId)  
+void mitk::PolygonInteractor::DeselectAllCells()  
 {
   mitk::Mesh* mesh = dynamic_cast<mitk::Mesh*>(m_DataTreeNode->GetData());
 	if (mesh == NULL)
@@ -44,9 +44,7 @@ void mitk::PolygonInteractor::DeselectAllCells(int objectEventId, int groupEvent
 			if (m_UndoEnabled)
 			{
 				mitk::LineOperation* undoOp = new mitk::LineOperation(OpSELECTCELL, cellDataIt->Index());
-				OperationEvent *operationEvent = new OperationEvent(mesh,
-																	doOp, undoOp,
-																	objectEventId, groupEventId);
+				OperationEvent *operationEvent = new OperationEvent(mesh, doOp, undoOp);
 				m_UndoController->SetOperationEvent(operationEvent);
 			}
 			mesh->ExecuteOperation(doOp);
@@ -54,7 +52,7 @@ void mitk::PolygonInteractor::DeselectAllCells(int objectEventId, int groupEvent
 	}
 }
 
-bool mitk::PolygonInteractor::ExecuteAction(Action* action, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId)
+bool mitk::PolygonInteractor::ExecuteAction( Action* action, mitk::StateEvent const* stateEvent )
 {
   bool ok = false;//for return type bool
   
@@ -72,7 +70,7 @@ bool mitk::PolygonInteractor::ExecuteAction(Action* action, mitk::StateEvent con
   //  {
   //    //due to the use of guards-states the eventId can be changed from original to internal EventIds e.g. StYES.
   //    //so we have remap the event and transmitt the original event with proper id
-  //    ok = m_LineInteractor->HandleEvent(mitk::EventMapper::RefreshStateEvent(const_cast<StateEvent*>(stateEvent)), objectEventId, groupEventId );
+  //    ok = m_LineInteractor->HandleEvent(mitk::EventMapper::RefreshStateEvent(const_cast<StateEvent*>(stateEvent)) );
   //    //check the state of the machine and according to that change the state/mode of this statemachine
   //    int mode = m_LineInteractor->GetMode();
   //    if (mode == mitk::Interactor::SMSELECTED ||
@@ -92,9 +90,7 @@ bool mitk::PolygonInteractor::ExecuteAction(Action* action, mitk::StateEvent con
 		  if (m_UndoEnabled)
 		  {
 			  LineOperation* undoOp = new mitk::LineOperation(OpDELETECELL, m_CurrentCellId);
-			  OperationEvent *operationEvent = new OperationEvent(mesh,
-																	  doOp, undoOp,
-																	  objectEventId, groupEventId);
+			  OperationEvent *operationEvent = new OperationEvent(mesh, doOp, undoOp);
 			  m_UndoController->SetOperationEvent(operationEvent);
 		  }
       mesh->ExecuteOperation(doOp);
@@ -108,9 +104,7 @@ bool mitk::PolygonInteractor::ExecuteAction(Action* action, mitk::StateEvent con
 		  if (m_UndoEnabled)
 		  {
 		  	LineOperation* lineUndoOp = new mitk::LineOperation(OpOPENCELL, m_CurrentCellId);
-			  OperationEvent *operationEvent = new OperationEvent(mesh,
-				  													lineDoOp, lineUndoOp,
-					  												objectEventId, groupEventId);
+			  OperationEvent *operationEvent = new OperationEvent(mesh, lineDoOp, lineUndoOp);
 			  m_UndoController->SetOperationEvent(operationEvent);
 		  }
 		  //execute the Operation
@@ -142,14 +136,14 @@ bool mitk::PolygonInteractor::ExecuteAction(Action* action, mitk::StateEvent con
       {
         m_CurrentCellId = cellId;
         mitk::StateEvent* newStateEvent = new mitk::StateEvent(StYES, stateEvent->GetEvent());
-        this->HandleEvent(newStateEvent, objectEventId, groupEventId );
+        this->HandleEvent( newStateEvent );
         ok = true;
       }
       else
 		  {
 			  //new Event with information NO
         mitk::StateEvent* newStateEvent = new mitk::StateEvent(StNO, stateEvent->GetEvent());
-        this->HandleEvent(newStateEvent, objectEventId, groupEventId );
+        this->HandleEvent( newStateEvent );
 			  ok = true;
 			}
     }
@@ -172,13 +166,13 @@ bool mitk::PolygonInteractor::ExecuteAction(Action* action, mitk::StateEvent con
       if (aABB->IsInside(worldPoint))
       {
         mitk::StateEvent* newStateEvent = new mitk::StateEvent(EIDYES, stateEvent->GetEvent());
-        this->HandleEvent( newStateEvent, objectEventId, groupEventId );
+        this->HandleEvent( newStateEvent );
 
       }
       else
       {
         mitk::StateEvent* newStateEvent = new mitk::StateEvent(EIDNO, stateEvent->GetEvent());
-        this->HandleEvent(newStateEvent, objectEventId, groupEventId );
+        this->HandleEvent(newStateEvent );
       }
     }
     ok = true;
@@ -201,14 +195,14 @@ bool mitk::PolygonInteractor::ExecuteAction(Action* action, mitk::StateEvent con
       {
         m_CurrentCellId = cellId;
         mitk::StateEvent* newStateEvent = new mitk::StateEvent(EIDYES, stateEvent->GetEvent());
-        this->HandleEvent( newStateEvent, objectEventId, groupEventId );
+        this->HandleEvent( newStateEvent );
 
       }
       else
       {
         m_CurrentCellId = 0;
         mitk::StateEvent* newStateEvent = new mitk::StateEvent(EIDNO, stateEvent->GetEvent());
-        this->HandleEvent(newStateEvent, objectEventId, groupEventId );
+        this->HandleEvent(newStateEvent );
       }
     }
     ok = true;
@@ -219,9 +213,7 @@ bool mitk::PolygonInteractor::ExecuteAction(Action* action, mitk::StateEvent con
 		  if (m_UndoEnabled)
 		  {
 		  	LineOperation* lineUndoOp = new mitk::LineOperation(OpDESELECTCELL, m_CurrentCellId);
-			  OperationEvent *operationEvent = new OperationEvent(mesh,
-				  													lineDoOp, lineUndoOp,
-					  												objectEventId, groupEventId);
+			  OperationEvent *operationEvent = new OperationEvent(mesh, lineDoOp, lineUndoOp);
 			  m_UndoController->SetOperationEvent(operationEvent);
 		  }
       mesh->ExecuteOperation(lineDoOp );
@@ -237,9 +229,7 @@ bool mitk::PolygonInteractor::ExecuteAction(Action* action, mitk::StateEvent con
 		    if (m_UndoEnabled)
 		    {
 		  	  LineOperation* lineUndoOp = new mitk::LineOperation(OpSELECTCELL, m_CurrentCellId);
-			    OperationEvent *operationEvent = new OperationEvent(mesh,
-				  													  lineDoOp, lineUndoOp,
-					  												  objectEventId, groupEventId);
+			    OperationEvent *operationEvent = new OperationEvent(mesh, lineDoOp, lineUndoOp);
 			    m_UndoController->SetOperationEvent(operationEvent);
 		    }
         mesh->ExecuteOperation(lineDoOp );
@@ -303,9 +293,7 @@ bool mitk::PolygonInteractor::ExecuteAction(Action* action, mitk::StateEvent con
       {
         Vector3D vectorBack = m_MovementStart - newPoint;
         CellOperation* undoOp = new mitk::CellOperation(OpMOVECELL, m_CurrentCellId, vectorBack);
-        OperationEvent *operationEvent = new OperationEvent(m_DataTreeNode->GetData(),
-                                            							  doOp, undoOp,
-							                                              objectEventId, groupEventId);
+        OperationEvent *operationEvent = new OperationEvent(m_DataTreeNode->GetData(), doOp, undoOp);
         m_UndoController->SetOperationEvent(operationEvent);
       }
 		  //execute the Operation
@@ -317,7 +305,7 @@ bool mitk::PolygonInteractor::ExecuteAction(Action* action, mitk::StateEvent con
     ok = true;
     break;
   default:
-    return Superclass::ExecuteAction(action, stateEvent, objectEventId, groupEventId);
+    return Superclass::ExecuteAction(action, stateEvent);
   }
   return ok;
 }

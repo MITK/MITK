@@ -5,6 +5,10 @@ int mitk::OperationEvent::m_CurrObjectEventId = 0;
 //##ModelId=3E9B07B5002B
 int mitk::OperationEvent::m_CurrGroupEventId = 0;
 
+bool mitk::OperationEvent::m_IncrObjectEventId = false;
+bool mitk::OperationEvent::m_IncrGroupEventId = false;
+
+
 //##ModelId=3E5F610D00BB
 mitk::Operation* mitk::OperationEvent::GetOperation()
 {
@@ -13,11 +17,12 @@ mitk::Operation* mitk::OperationEvent::GetOperation()
 
 //##ModelId=3E957AE700E6
 mitk::OperationEvent::OperationEvent(OperationActor* destination, 
-									 Operation* operation, Operation* undoOperation,
-									 int objectEventId, int groupEventId)
+									 Operation* operation, Operation* undoOperation)
 : m_Destination(destination), m_Operation(operation), m_UndoOperation(undoOperation),
-  m_ObjectEventId(objectEventId), m_GroupEventId(groupEventId), m_Swaped(false)
+  m_Swaped(false)
 {
+  m_ObjectEventId = this->GetCurrObjectEventId();
+  m_GroupEventId = this->GetCurrGroupEventId();
 }
 
 //##ModelId=3F0451960212
@@ -42,10 +47,19 @@ void mitk::OperationEvent::SwapOperations()
 		m_Swaped = true;
 }
 
-//##ModelId=3E9B07B50220
-int mitk::OperationEvent::GetCurrGroupEventId()
+void mitk::OperationEvent::ExecuteIncrement()
 {
-	return m_CurrGroupEventId;
+  if (m_IncrObjectEventId)
+  {
+    ++m_CurrObjectEventId;
+    m_IncrObjectEventId = false;
+  }
+  
+  if (m_IncrGroupEventId)
+  {
+    ++m_CurrGroupEventId;
+    m_IncrGroupEventId = false;
+  }
 }
 
 //##ModelId=3E9B07B501A7
@@ -54,16 +68,22 @@ int mitk::OperationEvent::GetCurrObjectEventId()
 	return m_CurrObjectEventId;
 }
 
-//##ModelId=3EF099E90269
-int mitk::OperationEvent::IncCurrGroupEventId()
+//##ModelId=3E9B07B50220
+int mitk::OperationEvent::GetCurrGroupEventId()
 {
-	return ++m_CurrGroupEventId;
+	return m_CurrGroupEventId;
 }
 
 //##ModelId=3EF099E90289
-int mitk::OperationEvent::IncCurrObjectEventId()
+void mitk::OperationEvent::IncCurrObjectEventId()
 {
-	return ++m_CurrObjectEventId;
+	m_IncrObjectEventId = true;
+}
+
+//##ModelId=3EF099E90269
+void mitk::OperationEvent::IncCurrGroupEventId()
+{
+	m_IncrGroupEventId = true;
 }
 
 //##ModelId=3E9B07B502AC
@@ -72,14 +92,15 @@ mitk::OperationActor* mitk::OperationEvent::GetDestination()
 	return m_Destination;
 }
 
+//##ModelId=3EF099E90259
+int mitk::OperationEvent::GetObjectEventId()
+{
+	return m_ObjectEventId;
+}
+
 //##ModelId=3EF099E90249
 int mitk::OperationEvent::GetGroupEventId()
 {
 	return m_GroupEventId;
 }
 
-//##ModelId=3EF099E90259
-int mitk::OperationEvent::GetObjectEventId()
-{
-	return m_ObjectEventId;
-}

@@ -36,15 +36,15 @@ public:
 protected:
   //##Documentation
   //## @brief select the point on the given position
-  virtual void SelectPoint(int position, int objectEventId, int groupEventId);
+  virtual void SelectPoint(int position);
 
   //##Documentation
   //## @brief unselect all points that exist in mesh
-  virtual void DeselectAllPoints(int objectEventId, int groupEventId);
+  virtual void DeselectAllPoints();
 
   //##Documentation
-  //## @brief Executes Side-Effects
-  virtual bool ExecuteAction(Action* action, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId);
+  //## @brief Executes Actions
+  virtual bool ExecuteAction(Action* action, mitk::StateEvent const* stateEvent);
 
 
 private:

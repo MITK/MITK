@@ -176,7 +176,7 @@ void mitk::SliceNavigationController::SetGeometrySlice(const itk::EventObject & 
 {
 }
 
-bool mitk::SliceNavigationController::ExecuteAction( Action* action, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId)
+bool mitk::SliceNavigationController::ExecuteAction( Action* action, mitk::StateEvent const* stateEvent)
 {
     bool ok = false;
     //if (m_Destination == NULL)
@@ -189,48 +189,8 @@ bool mitk::SliceNavigationController::ExecuteAction( Action* action, mitk::State
         return true;
       switch (action->GetActionId())
       {
-        case AcNEWPOINT:
-       // {
-			    //mitk::Point3D newPoint = posEvent->GetWorldPosition();
-       //   vm2itk(newPoint, m_OldPoint);
-
-			    //PointOperation* doOp = new mitk::PointOperation(OpADD, m_OldPoint, 0);
-			    ////Undo
-       //   if (m_UndoEnabled)
-       //   {
-				   // PointOperation* undoOp = new PointOperation(OpDELETE, m_OldPoint, 0);
-       //     OperationEvent *operationEvent = new OperationEvent(m_Destination, doOp, undoOp,
-						 //                                     					    objectEventId, groupEventId);
-       //     m_UndoController->SetOperationEvent(operationEvent);
-       //   }
-       //   //execute the Operation
-			    //m_Destination->ExecuteOperation(doOp);
-       //   ok = true;
-       //   break;
-       // }
-        case AcINITMOVEMENT:
-       // {//move the point to the coordinate //not used, cause same to MovePoint... check xml-file
-       //   mitk::Point3D movePoint;
-       //   vm2itk(posEvent->GetWorldPosition(), movePoint);
-
-       //   PointOperation* doOp = new mitk::PointOperation(OpMOVE, movePoint, 0);
-       //   //execute the Operation
-			    //m_Destination->ExecuteOperation(doOp);
-       //   ok = true;
-       //   break;
-       // }
         case AcMOVEPOINT:
         {
-       //   mitk::Point3D movePoint;
-       //   vm2itk(posEvent->GetWorldPosition(), movePoint);
-
-       //   PointOperation* doOp = new mitk::PointOperation(OpMOVE, movePoint, 0);
-       //   //execute the Operation
-			    //m_Destination->ExecuteOperation(doOp);
-       //   ok = true;
-       //   break;
-       // }
-          //checkif this event comes from a 2D -Widget. only then a change of slices is wanted
           mitk::BaseRenderer* baseRenderer = posEvent->GetSender();
           if (baseRenderer==NULL)
             {
@@ -294,8 +254,7 @@ bool mitk::SliceNavigationController::ExecuteAction( Action* action, mitk::State
        //       }
        //     }
        //     PointOperation* undoOp = new PointOperation(OpMOVE, oldMovePoint, 0);
-       //     OperationEvent *operationEvent = new OperationEvent(m_Destination, doOp, undoOp,
-						 //                                                   objectEventId, groupEventId);
+       //     OperationEvent *operationEvent = new OperationEvent(m_Destination, doOp, undoOp);
        //     m_UndoController->SetOperationEvent(operationEvent);
        //   }
        //   //execute the Operation

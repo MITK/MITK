@@ -18,7 +18,7 @@ mitk::CoordinateSupplier::CoordinateSupplier(const char * type, mitk::OperationA
 }
 
 //##ModelId=3F0189F00269
-bool mitk::CoordinateSupplier::ExecuteAction(Action* action, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId)
+bool mitk::CoordinateSupplier::ExecuteAction(Action* action, mitk::StateEvent const* stateEvent)
 {
     bool ok = false;
     if (m_Destination == NULL)
@@ -38,8 +38,7 @@ bool mitk::CoordinateSupplier::ExecuteAction(Action* action, mitk::StateEvent co
           if (m_UndoEnabled)
           {
 				    PointOperation* undoOp = new PointOperation(OpDELETE, m_OldPoint, 0);
-            OperationEvent *operationEvent = new OperationEvent(m_Destination, doOp, undoOp,
-						                                      					    objectEventId, groupEventId);
+            OperationEvent *operationEvent = new OperationEvent( m_Destination, doOp, undoOp );
             m_UndoController->SetOperationEvent(operationEvent);
           }
           //execute the Operation
@@ -88,8 +87,7 @@ bool mitk::CoordinateSupplier::ExecuteAction(Action* action, mitk::StateEvent co
               }
             }
             PointOperation* undoOp = new PointOperation(OpMOVE, oldMovePoint, 0);
-            OperationEvent *operationEvent = new OperationEvent(m_Destination, doOp, undoOp,
-						                                                    objectEventId, groupEventId);
+            OperationEvent *operationEvent = new OperationEvent(m_Destination, doOp, undoOp);
             m_UndoController->SetOperationEvent(operationEvent);
           }
           //execute the Operation

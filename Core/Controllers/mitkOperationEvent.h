@@ -7,7 +7,6 @@
 #include "mitkUndoModel.h"
 
 
-
 namespace mitk {
 //##ModelId=3E5F60F301A4
 //##Documentation
@@ -15,11 +14,15 @@ namespace mitk {
 //## @ingroup Undo
 //## includes a generation of Group and ObjectEventId's, to seperate different OperationEvents
 //## and to undo them in a fine or in a raw mode.
+//## to seperate the different EventIds and to make sure, that during an EventHandling no StateMachine increases an ID 
+//## so that an other StateMachine only gets an increased Id, the StateMachine can only set a flag of bool, that an Id has to be increased.
+//## When the EventMapper recieves a new event, it first executes the incrementations and then sends the Events to the next StateMachine
 class OperationEvent
 {		
 public:
   //##ModelId=3E957AE700E6
-  OperationEvent(OperationActor* destination, Operation* operation, Operation* undoOperation, int objectEventId, int groupEventId );
+  //OperationEvent(OperationActor* destination, Operation* operation, Operation* undoOperation, int objectEventId, int groupEventId );
+  OperationEvent(OperationActor* destination, Operation* operation, Operation* undoOperation );
 
   //##ModelId=3F0451960212
   ~OperationEvent();
@@ -63,8 +66,6 @@ public:
   //## @brief Returns the ObjectEventId for this object
   int GetObjectEventId();
 
-
-
   friend class UndoModel;	
   friend class StateMachine;//for IncCurrGroupEventId
   friend class EventMapper;//for IncCurrObjectEventId
@@ -76,16 +77,19 @@ protected:
   //## that it has been swapped and do is undo and undo is do
   void SwapOperations();
 
-  //##ModelId=3EF099E90269
   //##Documentation
-  //## @brief increments the current GroupEventId and returns the new value
-  static int IncCurrGroupEventId();
+  //## @brief executes the incrementation of objectEventId and groupEventId if they are set to be incremented
+  static void ExecuteIncrement();
 
   //##ModelId=3EF099E90289
   //##Documentation
-  //## @brief increments the current ObjectEventId and returns the new value
-  static int IncCurrObjectEventId();
+  //## @brief sets the current ObjectEventId to be incremended when ExecuteIncrement is called
+  static void IncCurrObjectEventId();
 
+  //##ModelId=3EF099E90269
+  //##Documentation
+  //## @brief sets the current GroupEventId to be incremended when ExecuteIncrement is called
+  static void IncCurrGroupEventId();
 
 private:
   //##ModelId=3E9B07B40374
@@ -93,6 +97,10 @@ private:
 
   //##ModelId=3E9B07B5002B
   static int m_CurrGroupEventId;
+  
+  static bool m_IncrObjectEventId;
+  
+  static bool m_IncrGroupEventId;
 
   //##ModelId=3E5F61DB00D6
   OperationActor* m_Destination;

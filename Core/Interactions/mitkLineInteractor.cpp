@@ -26,7 +26,7 @@ mitk::LineInteractor::~LineInteractor()
     //delete m_PointInteractor;
 }
 
-void mitk::LineInteractor::DeselectAllLines(int objectEventId, int groupEventId)
+void mitk::LineInteractor::DeselectAllLines()
 {
   mitk::Mesh* mesh = dynamic_cast<mitk::Mesh*>(m_DataTreeNode->GetData());
 	if (mesh == NULL)
@@ -54,9 +54,7 @@ void mitk::LineInteractor::DeselectAllLines(int objectEventId, int groupEventId)
 			if (m_UndoEnabled)
 			{
 				mitk::LineOperation* undoOp = new mitk::LineOperation(OpSELECTLINE, cellDataIt->Index(), -1, -1, selectedLines[i]);
-				OperationEvent *operationEvent = new OperationEvent(mesh,
-																	doOp, undoOp,
-																	objectEventId, groupEventId);
+				OperationEvent *operationEvent = new OperationEvent(mesh, doOp, undoOp);
 				m_UndoController->SetOperationEvent(operationEvent);
 			}
 			mesh->ExecuteOperation(doOp);
@@ -64,7 +62,7 @@ void mitk::LineInteractor::DeselectAllLines(int objectEventId, int groupEventId)
   }
 }
 
-bool mitk::LineInteractor::ExecuteAction(Action* action, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId)
+bool mitk::LineInteractor::ExecuteAction(Action* action, mitk::StateEvent const* stateEvent)
 {
   bool ok = false;//for return type bool
 
@@ -101,9 +99,7 @@ bool mitk::LineInteractor::ExecuteAction(Action* action, mitk::StateEvent const*
 		  if (m_UndoEnabled)
 		  {
 		  	Operation* undoOp = new mitk::Operation(OpDELETELINE);
-			  OperationEvent *operationEvent = new OperationEvent(mesh,
-				  													doOp, undoOp,
-					  												objectEventId, groupEventId);
+			  OperationEvent *operationEvent = new OperationEvent(mesh, doOp, undoOp);
 			  m_UndoController->SetOperationEvent(operationEvent);
 		  }
 		  //execute the Operation
@@ -113,7 +109,7 @@ bool mitk::LineInteractor::ExecuteAction(Action* action, mitk::StateEvent const*
     break;
   case AcDESELECTALL:
   {
-    this->DeselectAllLines(objectEventId, groupEventId);//undo-supported able deselect of all points in the DataList
+    this->DeselectAllLines();//undo-supported able deselect of all points in the DataList
     ok = true;
   }
   break;
@@ -143,14 +139,14 @@ bool mitk::LineInteractor::ExecuteAction(Action* action, mitk::StateEvent const*
           mitk::PositionEvent const* newPosEvent = new mitk::PositionEvent(posEvent->GetSender(), posEvent->GetType(), posEvent->GetButton(), posEvent->GetButtonState(), posEvent->GetKey(), displPoint, worldPoint);
           mitk::StateEvent* newStateEvent = new mitk::StateEvent(StYES, newPosEvent);
           //call HandleEvent to leave the guard-state
-          this->HandleEvent( newStateEvent, objectEventId, groupEventId );
+          this->HandleEvent( newStateEvent );
 				  ok = true;
 			  }
 			  else
 			  {
 				  //new Event with information NO
           mitk::StateEvent* newStateEvent = new mitk::StateEvent(StNO, posEvent);
-          this->HandleEvent(newStateEvent, objectEventId, groupEventId );
+          this->HandleEvent(newStateEvent );
 				  ok = true;
 			  }
 		  }
@@ -180,14 +176,14 @@ bool mitk::LineInteractor::ExecuteAction(Action* action, mitk::StateEvent const*
           m_CurrentCellId = cellId;
           mitk::StateEvent* newStateEvent = new mitk::StateEvent(StYES, posEvent);
           //call HandleEvent to leave the guard-state
-          this->HandleEvent( newStateEvent, objectEventId, groupEventId );
+          this->HandleEvent( newStateEvent );
 				  ok = true;
   			}
 	  		else //not found
 		  	{
 				  //new Event with information NO
           mitk::StateEvent* newStateEvent = new mitk::StateEvent(StNO, posEvent);
-          this->HandleEvent(newStateEvent, objectEventId, groupEventId );
+          this->HandleEvent(newStateEvent );
 				  ok = true;
 			  }
 		  }
@@ -217,14 +213,14 @@ bool mitk::LineInteractor::ExecuteAction(Action* action, mitk::StateEvent const*
 			  {
           mitk::StateEvent* newStateEvent = new mitk::StateEvent(StYES, posEvent);
           //call HandleEvent to leave the guard-state
-          this->HandleEvent( newStateEvent, objectEventId, groupEventId );
+          this->HandleEvent( newStateEvent );
 				  ok = true;
   			}
 	  		else //not found
 		  	{
 				  //new Event with information NO
           mitk::StateEvent* newStateEvent = new mitk::StateEvent(StNO, posEvent);
-          this->HandleEvent(newStateEvent, objectEventId, groupEventId );
+          this->HandleEvent(newStateEvent );
 				  ok = true;
 			  }
 		  }    
@@ -242,9 +238,7 @@ bool mitk::LineInteractor::ExecuteAction(Action* action, mitk::StateEvent const*
 			if (m_UndoEnabled)	//write to UndoMechanism
       {
 				LineOperation* undoOp = new mitk::LineOperation(OpDESELECTLINE, m_CurrentCellId, 0, 0, m_CurrentLineId);
-				OperationEvent *operationEvent = new OperationEvent(mesh,
-																	doOp, undoOp,
-																	objectEventId, groupEventId);
+				OperationEvent *operationEvent = new OperationEvent(mesh, doOp, undoOp);
 				m_UndoController->SetOperationEvent(operationEvent);
 			}
 
@@ -261,9 +255,7 @@ bool mitk::LineInteractor::ExecuteAction(Action* action, mitk::StateEvent const*
 			if (m_UndoEnabled)	//write to UndoMechanism
       {
 				LineOperation* undoOp = new mitk::LineOperation(OpSELECTLINE, m_CurrentCellId, 0, 0, m_CurrentLineId);
-				OperationEvent *operationEvent = new OperationEvent(mesh,
-																	doOp, undoOp,
-																	objectEventId, groupEventId);
+				OperationEvent *operationEvent = new OperationEvent( mesh, doOp, undoOp );
 				m_UndoController->SetOperationEvent(operationEvent);
 			}
 
@@ -338,9 +330,7 @@ bool mitk::LineInteractor::ExecuteAction(Action* action, mitk::StateEvent const*
       if ( m_UndoEnabled )
       {
         LineOperation* undoOp = new mitk::LineOperation(OpMOVELINE, m_CurrentCellId, m_LastPoint-newPoint, idA, idB, m_CurrentLineId);
-        OperationEvent *operationEvent = new OperationEvent(m_DataTreeNode->GetData(),
-                                                          doOp, undoOp,
-                                                          objectEventId, groupEventId);
+        OperationEvent *operationEvent = new OperationEvent(m_DataTreeNode->GetData(), doOp, undoOp);
         m_UndoController->SetOperationEvent(operationEvent);
       }
       //execute the Operation
@@ -353,7 +343,7 @@ bool mitk::LineInteractor::ExecuteAction(Action* action, mitk::StateEvent const*
   }
   break;
   default:
-    return Superclass::ExecuteAction(action, stateEvent, objectEventId, groupEventId);
+    return Superclass::ExecuteAction( action, stateEvent );
   }
   return ok;
 }

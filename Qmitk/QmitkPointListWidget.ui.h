@@ -38,9 +38,9 @@ void QmitkPointListWidget::PointSelect( int ItemIndex )
   mitk::GlobalInteraction* globalInteraction = dynamic_cast<mitk::GlobalInteraction*>(mitk::EventMapper::GetGlobalStateMachine());
   if(globalInteraction!=NULL)
   {
-    globalInteraction->HandleEvent(stateEvent, mitk::OperationEvent::GetCurrObjectEventId(), mitk::OperationEvent::GetCurrGroupEventId());
+    globalInteraction->HandleEvent( stateEvent );
     stateEvent->Set(mitk::EIDLEFTMOUSERELEASE , &event);
-    globalInteraction->HandleEvent(stateEvent, mitk::OperationEvent::GetCurrObjectEventId(), mitk::OperationEvent::GetCurrGroupEventId());
+    globalInteraction->HandleEvent( stateEvent );
   }
   delete stateEvent;
 

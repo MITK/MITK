@@ -44,12 +44,11 @@ class StateMachine : public itk::Object, public mitk::OperationActor
   //## @brief handles an Event accordingly to its current State
   //##
   //## statechange with Undo functionality;
-  //## groupEventId and objectEventId are use to combine Operations so that
-  //## they can be undone together or seperately.
   //## EventMapper gives each event a new objectEventId
   //## and a StateMachine::ExecuteAction can descide weather it gets a
-  //## new GroupEventId or not, depending on its state (e.g. finishedNewObject then new GroupEventId)
-  virtual bool HandleEvent(StateEvent const* stateEvent, int objectEventId, int groupEventId);
+  //## new GroupEventId or not, depending on its state (e.g. finishedNewObject then new GroupEventId).
+  //## Object- and group-EventId can also be accessed through static methods from OperationEvent
+  virtual bool HandleEvent(StateEvent const* stateEvent);
 
   //##ModelId=3EDCAECB0175
   //##Documentation
@@ -69,7 +68,8 @@ class StateMachine : public itk::Object, public mitk::OperationActor
   //##
   //## Each statechange has actions, which can be assigned by it's number.
   //## If you are developing a new statemachine, declare all your operations here and send them to Undo-Controller and to the Data.
-  virtual bool ExecuteAction(Action* action, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId)= 0;
+  //## Object- and group-EventId can also be accessed through static methods from OperationEvent
+  virtual bool ExecuteAction(Action* action, mitk::StateEvent const* stateEvent)= 0;
 
   //##Documentation
   //## @brief returns the current state
@@ -83,8 +83,8 @@ class StateMachine : public itk::Object, public mitk::OperationActor
 
   //Documentation
   //##ModelId=3EF099EA03C0
-  //## @brief friend protected function of OperationEvent, that way all StateMachines can increment GroupEventId!
-  int IncCurrGroupEventId();
+  //## @brief friend protected function of OperationEvent, that way all StateMachines can set GroupEventId to be incremented!
+  void IncCurrGroupEventId();
 
   //##ModelId=3EDCAECB0128
   //##Documentation

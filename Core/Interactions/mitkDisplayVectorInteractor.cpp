@@ -32,7 +32,7 @@ void mitk::DisplayVectorInteractor::ExecuteOperation(Operation* operation)
 }
 
 //##ModelId=3EF2224401CB
-bool mitk::DisplayVectorInteractor::ExecuteAction(Action* action, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId)
+bool mitk::DisplayVectorInteractor::ExecuteAction(Action* action, mitk::StateEvent const* stateEvent)
 {
   bool ok=false;
   
@@ -53,8 +53,7 @@ bool mitk::DisplayVectorInteractor::ExecuteAction(Action* action, mitk::StateEve
   //      DisplayCoordinateOperation* undoOp = new DisplayCoordinateOperation(OpTEST, m_Sender, m_StartDisplayCoordinate, m_LastDisplayCoordinate, m_CurrentDisplayCoordinate);
   //      
   //      
-  //      OperationEvent *operationEvent = new OperationEvent(this, doOp, undoOp,
-  //        objectEventId, groupEventId);
+  //      OperationEvent *operationEvent = new OperationEvent(this, doOp, undoOp);
   //      m_UndoController->SetOperationEvent(operationEvent);
   //    }
   //    
@@ -71,8 +70,7 @@ bool mitk::DisplayVectorInteractor::ExecuteAction(Action* action, mitk::StateEve
         DisplayCoordinateOperation* undoOp = new DisplayCoordinateOperation(OpSELECTPOINT, m_Sender, m_StartDisplayCoordinate, m_LastDisplayCoordinate, m_CurrentDisplayCoordinate);
         
         
-        OperationEvent *operationEvent = new OperationEvent(this, doOp, undoOp,
-          objectEventId, groupEventId);
+        OperationEvent *operationEvent = new OperationEvent(this, doOp, undoOp);
         m_UndoController->SetOperationEvent(operationEvent);
       }
       
@@ -89,8 +87,7 @@ bool mitk::DisplayVectorInteractor::ExecuteAction(Action* action, mitk::StateEve
         DisplayCoordinateOperation* undoOp = new mitk::DisplayCoordinateOperation(OpMOVE,  posEvent->GetSender(), m_StartDisplayCoordinate, m_LastDisplayCoordinate, m_CurrentDisplayCoordinate);
         
         
-        OperationEvent *operationEvent = new OperationEvent(m_Destination, doOp, undoOp,
-          objectEventId, groupEventId);
+        OperationEvent *operationEvent = new OperationEvent(m_Destination, doOp, undoOp);
         m_UndoController->SetOperationEvent(operationEvent);
       }
       
@@ -112,8 +109,7 @@ bool mitk::DisplayVectorInteractor::ExecuteAction(Action* action, mitk::StateEve
         DisplayCoordinateOperation* undoOp = new mitk::DisplayCoordinateOperation(OpZOOM,  posEvent->GetSender(), m_StartDisplayCoordinate, m_LastDisplayCoordinate, m_CurrentDisplayCoordinate);
         
         
-        OperationEvent *operationEvent = new OperationEvent(m_Destination, doOp, undoOp,
-          objectEventId, groupEventId);
+        OperationEvent *operationEvent = new OperationEvent(m_Destination, doOp, undoOp);
         m_UndoController->SetOperationEvent(operationEvent);
       }
       

@@ -18,7 +18,7 @@ int mitk::PrimStripInteractor::GetId()
 }
 
 
-bool mitk::PrimStripInteractor::ExecuteAction(Action* action, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId)
+bool mitk::PrimStripInteractor::ExecuteAction(Action* action, mitk::StateEvent const* stateEvent)
 {
   bool ok = false;//for return type bool
   

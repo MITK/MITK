@@ -117,7 +117,7 @@ class GlobalInteraction : public StateMachine
   protected:
 
   //##ModelId=3E7F497F01AE
-  virtual bool ExecuteAction(Action* action, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId);
+  virtual bool ExecuteAction(Action* action, mitk::StateEvent const* stateEvent);
 
   //##Documentation
   //##@brief calculating the worldcoorinate and returning it in an event
@@ -127,23 +127,23 @@ class GlobalInteraction : public StateMachine
 
   //##Documentation
   //##@brief informing all statemachines that are held in the list m_ListenerList
-  void InformListeners(mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId);
+  void InformListeners(mitk::StateEvent const* stateEvent);
 
   //##Documentation
   //##@brief asking the selected Interactor if an event can be handled
   //##
   //## returns false if no Interactor could handle the event
-  bool AskSelected(mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId);
+  bool AskSelected(mitk::StateEvent const* stateEvent);
 
   //##Documentation
   //##@brief asking next interactor of m_JurisdictionMap
-  void AskCurrentInteractor(mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId);
+  void AskCurrentInteractor(mitk::StateEvent const* stateEvent);
 
   //##Documentation
   //##@brief filling m_JurisdictionMap 
   //##
   //## @ params swell: if the calculated jurisdictionvalue is above swell, then add it to the map
-  void FillJurisdictionMap(mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId, float swell);
+  void FillJurisdictionMap(mitk::StateEvent const* stateEvent, float threshold);
 
   //##Documentation
   //## @brief list of all listening statemachines, that want to recieve all events

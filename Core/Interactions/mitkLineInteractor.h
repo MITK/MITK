@@ -31,11 +31,11 @@ public:
 protected:
   //##Documentation
   //## @brief unselect all Lines that exist in the mesh
-  virtual void DeselectAllLines(int objectEventId, int groupEventId);
+  virtual void DeselectAllLines();
 
   //##Documentation
-  //## @brief Executes Side-Effects
-  virtual bool ExecuteAction(Action* action, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId);
+  //## @brief Executes Actions
+  virtual bool ExecuteAction(Action* action, mitk::StateEvent const* stateEvent);
 
 private:
   //##Documentation

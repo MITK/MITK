@@ -26,7 +26,7 @@ class DisplayVectorInteractor : public StateMachine
 
   protected:
     //##ModelId=3EF2224401CB
-    virtual bool ExecuteAction(Action* action, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId);
+    virtual bool ExecuteAction(Action* action, mitk::StateEvent const* stateEvent);
 
   private:
     //##ModelId=3EF1D2A002DD

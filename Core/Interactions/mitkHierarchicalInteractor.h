@@ -34,11 +34,11 @@ public:
 
   //##Documentation
   //## @brief handles an Event accordingly to its current Modus
-  virtual bool HandleEvent(StateEvent const* stateEvent, int objectEventId, int groupEventId);
+  virtual bool HandleEvent( StateEvent const* stateEvent );
 
   //##Documentation
-  //## @brief Executes Side-Effects
-  virtual bool ExecuteAction(Action* action, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId);
+  //## @brief Executes Actions
+  virtual bool ExecuteAction( Action* action, mitk::StateEvent const* stateEvent );
   
   //##Documentation
   //## @brief Adds an Interactor to the list of administrated Interactors
@@ -47,7 +47,7 @@ public:
 protected:
   //##Documentation
   //## @brief transmitts the event
-  bool TransmitEvent( StateEvent const* stateEvent, int objectEventId, int groupEventId );
+  bool TransmitEvent( StateEvent const* stateEvent );
 
   //##Documentation
   //## @brief stores pointers on hierarchical lower Interactors, that are in Mode selected or Subselected

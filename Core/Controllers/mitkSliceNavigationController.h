@@ -201,7 +201,7 @@ protected:
   //##ModelId=3E189B1D00BF
   virtual ~SliceNavigationController();
 
-	virtual bool ExecuteAction( Action* action, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId);
+	virtual bool ExecuteAction( Action* action, mitk::StateEvent const* stateEvent);
 
   mitk::Geometry3D::ConstPointer m_InputWorldGeometry;
 

@@ -37,25 +37,25 @@ class PointSetInteractor : public Interactor
 
  	  //##Documentation
 	  //## @brief Sets the amount of precision
-    void SetPrecision(unsigned int precision);
+    void SetPrecision( unsigned int precision );
 
   protected:
     //##ModelId=3F017B320105
-    virtual bool ExecuteAction(Action* action, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId);
+    virtual bool ExecuteAction( Action* action, mitk::StateEvent const* stateEvent );
 
     //##ModelId=3F017B320121
     //##Documentation
     //## @brief deselects the Points in the PointSet.
     //## supports Undo if enabled
     //## @params needed for declaring operations
-    void UnselectAll(int objectEventId, int groupEventId);
+    void UnselectAll();
 
     //##ModelId=3F05C0700185
     //##Documentation
     //## @brief Selects the point.
     //## supports Undo if enabled.
     //## @params needed for declaring operations
-    void SelectPoint(int position, int objectEventId, int groupEventId);
+    void SelectPoint( int position );
 
   private:
 

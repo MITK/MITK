@@ -461,23 +461,22 @@ bool mitk::EventMapper::MapEvent(Event* event)
   switch (event->GetType())
   {
     case mitk::Type_MouseButtonPress://Increase
-      ok = m_GlobalStateMachine->HandleEvent(&m_StateEvent, mitk::OperationEvent::IncCurrObjectEventId(), mitk::OperationEvent::GetCurrGroupEventId());
+      mitk::OperationEvent::IncCurrObjectEventId();
       break;
     case mitk::Type_MouseMove://same
-      ok = m_GlobalStateMachine->HandleEvent(&m_StateEvent, mitk::OperationEvent::GetCurrObjectEventId(), mitk::OperationEvent::GetCurrGroupEventId());
       break;
     case mitk::Type_MouseButtonRelease://same
-      ok = m_GlobalStateMachine->HandleEvent(&m_StateEvent, mitk::OperationEvent::GetCurrObjectEventId(), mitk::OperationEvent::GetCurrGroupEventId());
       break;
     case mitk::Type_User://same
-      ok = m_GlobalStateMachine->HandleEvent(&m_StateEvent, mitk::OperationEvent::GetCurrObjectEventId(), mitk::OperationEvent::GetCurrGroupEventId());
       break;
     case mitk::Type_KeyPress://Increase
-      ok = m_GlobalStateMachine->HandleEvent(&m_StateEvent, mitk::OperationEvent::IncCurrObjectEventId(), mitk::OperationEvent::GetCurrGroupEventId());
+      mitk::OperationEvent::IncCurrObjectEventId();
       break;
     default://increase
-      ok = m_GlobalStateMachine->HandleEvent(&m_StateEvent, mitk::OperationEvent::IncCurrObjectEventId(), mitk::OperationEvent::GetCurrGroupEventId());
+      mitk::OperationEvent::IncCurrObjectEventId();
   }
+  mitk::OperationEvent::ExecuteIncrement();
+  ok = m_GlobalStateMachine->HandleEvent(&m_StateEvent);
 
   return ok;
 }

@@ -42,7 +42,7 @@ const mitk::State* mitk::StateMachine::GetCurrentState() const
 }
 
 //##ModelId=3E5B2DE30378
-bool mitk::StateMachine::HandleEvent(StateEvent const* stateEvent, int objectEventId, int groupEventId)
+bool mitk::StateMachine::HandleEvent(StateEvent const* stateEvent)
 {
   if (m_CurrentState == NULL)
   return false;//m_CurrentState needs to be set first!
@@ -67,9 +67,7 @@ bool mitk::StateMachine::HandleEvent(StateEvent const* stateEvent, int objectEve
       //UNDO for this statechange
 	  StateTransitionOperation* doOp = new StateTransitionOperation(OpSTATECHANGE, tempNextState);
     StateTransitionOperation* undoOp = new StateTransitionOperation(OpSTATECHANGE, m_CurrentState);
-	  OperationEvent *operationEvent = new OperationEvent(((mitk::OperationActor*)(this)),
-														doOp, undoOp,
-														objectEventId ,groupEventId);
+	  OperationEvent *operationEvent = new OperationEvent(((mitk::OperationActor*)(this)), doOp, undoOp);
 	  m_UndoController->SetOperationEvent(operationEvent);
     }
 
@@ -89,7 +87,7 @@ bool mitk::StateMachine::HandleEvent(StateEvent const* stateEvent, int objectEve
 
   while ( actionIdIterator != actionIdIteratorEnd ) 
   {
-    if ( !ExecuteAction(*actionIdIterator, stateEvent, objectEventId, groupEventId) )
+    if ( !ExecuteAction(*actionIdIterator, stateEvent) )
     {
       #ifdef INTERDEBUG
       itkWarningMacro( << "Warning: no action defind for " << *actionIdIterator << " in " << m_Type );
@@ -109,9 +107,9 @@ void mitk::StateMachine::EnableUndo(bool enable)
 }
 
 //##ModelId=3EF099EA03C0
-int mitk::StateMachine::IncCurrGroupEventId()
+void mitk::StateMachine::IncCurrGroupEventId()
 {
-	return mitk::OperationEvent::IncCurrGroupEventId();
+	mitk::OperationEvent::IncCurrGroupEventId();
 }
 
 void mitk::StateMachine::ExecuteOperation(Operation* operation)

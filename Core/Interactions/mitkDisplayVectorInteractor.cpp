@@ -1,7 +1,7 @@
 #include "mitkDisplayVectorInteractor.h"
 #include "Operation.h"
 #include "mitkDisplayCoordinateOperation.h"
-#include "PositionEvent.h"
+#include "mitkDisplayPositionEvent.h"
 #include "mitkInteractionConst.h"
 
 //##ModelId=3EF222410127
@@ -35,7 +35,7 @@ bool mitk::DisplayVectorInteractor::ExecuteSideEffect(int sideEffectId, mitk::St
 {
     bool ok=false;
 
-    const PositionEvent* posEvent=dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
+    const DisplayPositionEvent* posEvent=dynamic_cast<const DisplayPositionEvent*>(stateEvent->GetEvent());
     if(posEvent==NULL) return false;
     switch(sideEffectId%100)
     {
@@ -53,7 +53,7 @@ bool mitk::DisplayVectorInteractor::ExecuteSideEffect(int sideEffectId, mitk::St
             }
 
             //execute the Operation
-            this->ExecuteOperation(doOp);
+            m_Destination->ExecuteOperation(doOp);
             ok = true;
             break;
         }

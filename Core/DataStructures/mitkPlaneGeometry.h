@@ -37,8 +37,6 @@ public:
     /** Method for creation through the object factory. */
     itkNewMacro(Self);
 
-    //##ModelId=3E3AEB7C001C
-    virtual itk::Transform<float,3,2>::Pointer GetTransfrom() const;
     //##ModelId=3E3B9C6E02B5
     virtual bool Map(const mitk::Point3D &pt3d_mm, mitk::Point2D &pt2d_mm) const;
 

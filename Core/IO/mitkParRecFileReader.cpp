@@ -144,9 +144,9 @@ void mitk::ParRecFileReader::GenerateOutputInformation()
     }
     
     output->Initialize(type, dimension, dimensions);
-    output->GetGeometry()->SetSpacing(spacing);
-    output->GetGeometry()->SetGeometry2D((ipPicDescriptor*)1, 0, 0);
-    output->GetGeometry()->SetEvenlySpaced();
+    output->GetSlicedGeometry()->SetSpacing(spacing);
+    output->GetSlicedGeometry()->SetGeometry2D((ipPicDescriptor*)1, 0, 0);
+    output->GetSlicedGeometry()->SetEvenlySpaced();
   }
   
   m_ReadHeaderTime.Modified();

@@ -4,6 +4,7 @@
 #include "mitkCommon.h"
 #include "mitkBaseData.h"
 #include "mitkGeometry2D.h"
+#include "mitkSlicedGeometry3D.h"
 
 namespace mitk {
 
@@ -63,6 +64,7 @@ protected:
 
     //##ModelId=3EDD039F01D2
 	Geometry2D::ConstPointer m_Geometry2D;
+  SlicedGeometry3D::Pointer m_SlicedGeometry;
 };
 
 } // namespace mitk

@@ -220,7 +220,7 @@ public:
       spacing.y=spacinglist[1];
     if(m_Dimension>=3)
       spacing.z=spacinglist[2];
-    m_Geometry3D->SetSpacing(spacing);
+    m_SlicedGeometry->SetSpacing(spacing);
     
     mitk::Point3D origin, right, bottom;
     origin.set(0,0,0);               m_Geometry3D->UnitsToMM(origin, origin);
@@ -233,8 +233,8 @@ public:
     planegeometry->SetPlaneView(view_std);
     planegeometry->SetSizeInUnits(m_Dimensions[0], m_Dimensions[1]);
     
-    m_Geometry3D->SetGeometry2D(planegeometry.GetPointer(), 0, 0);
-    m_Geometry3D->SetEvenlySpaced();
+    m_SlicedGeometry->SetGeometry2D(planegeometry.GetPointer(), 0, 0);
+    m_SlicedGeometry->SetEvenlySpaced();
     
     delete [] tmpDimensions;
   };

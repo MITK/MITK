@@ -61,9 +61,6 @@ public:
   //## @todo not yet implemented
   virtual void TransformGeometry(const vtkTransform * transform);
   
-  //##ModelId=3EF4A266024F
-  virtual itk::Transform<float,3,2>::Pointer GetTransfrom() const;
-  
   //##ModelId=3EF4A2660256
   virtual bool Map(const mitk::Point3D &pt3d_mm, mitk::Point2D &pt2d_mm) const;
   

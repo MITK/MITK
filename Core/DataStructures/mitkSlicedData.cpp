@@ -31,7 +31,7 @@ void mitk::SlicedData::UpdateOutputInformation()
 void mitk::SlicedData::SetRequestedRegionToLargestPossibleRegion()
 {
   m_UseLargestPossibleRegion = true;
-  if(GetGeometry().IsNull()) 
+  if(GetGeometry()==NULL) 
     return;
   int i;
   const Geometry3D::RegionType::IndexType & index = GetGeometry()->GetLargestPossibleRegion().GetIndex();
@@ -197,7 +197,7 @@ void mitk::SlicedData::CopyInformation(const itk::DataObject *data)
 
   if (slicedData)
   {
-    m_Geometry3D = new Geometry3D(*slicedData->GetGeometry().GetPointer());
+    m_Geometry3D = slicedData->GetGeometry()->Clone();//new SlicedGeometry3D(*slicedData->GetGeometry().GetPointer());
   }
   else
   {
@@ -206,3 +206,34 @@ void mitk::SlicedData::CopyInformation(const itk::DataObject *data)
   }
 }
 
+const mitk::Geometry2D* mitk::SlicedData::GetGeometry2D(int s, int t) const
+{
+  const_cast<SlicedData*>(this)->SetRequestedRegionToLargestPossibleRegion();
+
+  const_cast<SlicedData*>(this)->UpdateOutputInformation();
+
+  return m_SlicedGeometry->GetGeometry2D(s,t);
+}
+
+mitk::SlicedGeometry3D* mitk::SlicedData::GetSlicedGeometry() const
+{
+  return m_SlicedGeometry;
+}
+
+const mitk::SlicedGeometry3D* mitk::SlicedData::GetUpdatedSlicedGeometry()
+{
+  SetRequestedRegionToLargestPossibleRegion();
+
+  UpdateOutputInformation();
+
+  return m_SlicedGeometry;
+}
+
+void mitk::SlicedData::SetGeometry(Geometry3D* aGeometry3D)
+{
+  m_SlicedGeometry = dynamic_cast<SlicedGeometry3D*>(aGeometry3D);
+
+  assert(m_SlicedGeometry==aGeometry3D);
+
+  Superclass::SetGeometry(m_SlicedGeometry);
+}

@@ -46,7 +46,7 @@ vtkImageData* mitk::Image::GetVtkImageData(int t, int n)
   mitk::ImageDataItem::Pointer volume=GetVolumeData(t, n);
   if(volume.IsNull()) 
     return NULL;
-  float* spacing = const_cast<float*>(GetUpdatedGeometry()->GetSpacing());
+  float* spacing = const_cast<float*>(GetUpdatedSlicedGeometry()->GetSpacing());
   volume->GetVtkImageData()->SetSpacing(spacing);
   return volume->GetVtkImageData();
 }
@@ -471,7 +471,9 @@ void mitk::Image::Initialize(const mitk::PixelType& type, unsigned int dimension
   m_NumberOfChannels=channels;
 
   m_PixelType=type;
-  m_Geometry3D=new Geometry3D(dimension, dimensions);
+  SetGeometry(SlicedGeometry3D::New());
+  m_SlicedGeometry=(SlicedGeometry3D*) m_Geometry3D.GetPointer();
+  m_Geometry3D->Initialize(dimension, dimensions);
 
   ImageDataItemPointer dnull=NULL;
 
@@ -559,7 +561,7 @@ void mitk::Image::Initialize(vtkImageData* vtkimagedata, int channels, int tDim,
     spacing.y=spacinglist[1];
   if(m_Dimension>=3)
     spacing.z=spacinglist[2];
-  m_Geometry3D->SetSpacing(spacing);
+  m_SlicedGeometry->SetSpacing(spacing);
 
   mitk::Point3D origin, right, bottom;
   origin.set(0,0,0);               m_Geometry3D->UnitsToMM(origin, origin);
@@ -572,8 +574,8 @@ void mitk::Image::Initialize(vtkImageData* vtkimagedata, int channels, int tDim,
   planegeometry->SetPlaneView(view_std);
   planegeometry->SetSizeInUnits(m_Dimensions[0], m_Dimensions[1]);
 
-  m_Geometry3D->SetGeometry2D(planegeometry.GetPointer(), 0, 0);
-  m_Geometry3D->SetEvenlySpaced();
+  m_SlicedGeometry->SetGeometry2D(planegeometry.GetPointer(), 0, 0);
+  m_SlicedGeometry->SetEvenlySpaced();
 
   delete [] tmpDimensions;
 }
@@ -602,11 +604,12 @@ void mitk::Image::Initialize(ipPicDescriptor* pic, int channels, int tDim, int s
     m_Dimensions[3]=tDim;
 
   m_PixelType=PixelType(pic);
-  m_Geometry3D=new Geometry3D(m_Dimension, m_Dimensions);
+  SetGeometry(SlicedGeometry3D::New());
+  m_SlicedGeometry->Initialize(m_Dimension, m_Dimensions);
 
-  m_Geometry3D->SetSpacing(pic);
-  m_Geometry3D->SetGeometry2D(pic, 0, 0);
-  m_Geometry3D->SetEvenlySpaced();
+  m_SlicedGeometry->SetSpacing(pic);
+  m_SlicedGeometry->SetGeometry2D(pic, 0, 0);
+  m_SlicedGeometry->SetEvenlySpaced();
 
   ImageDataItemPointer dnull=NULL;
 

@@ -4,6 +4,8 @@
 //##ModelId=3E639CD30201
 mitk::Geometry2DData::Geometry2DData()
 {
+  m_SlicedGeometry = SlicedGeometry3D::New();
+  SetGeometry(m_SlicedGeometry);
 }
 
 //##ModelId=3E639CD30233
@@ -14,6 +16,7 @@ mitk::Geometry2DData::~Geometry2DData()
 //##ModelId=3E6423D2030E
 void mitk::Geometry2DData::SetGeometry2D( const mitk::Geometry2D *geometry2d, int t )
 {
+    m_SlicedGeometry->SetGeometry2D(geometry2d, 0, t);
     m_Geometry2D=geometry2d;
     Modified();
 }

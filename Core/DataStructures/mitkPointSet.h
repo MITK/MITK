@@ -19,7 +19,7 @@ public:
 
   itkNewMacro(Self);
 
-  typedef	itk::DefaultStaticMeshTraits<unsigned short, 3, 3, double> MeshTraits;//bool as extrainfo for later selected; double as PointRepresentation
+  typedef	itk::DefaultStaticMeshTraits<unsigned short, 3, 3, mitk::ScalarType> MeshTraits;//bool as extrainfo for later selected; double as PointRepresentation
   typedef itk::PointSet<bool,3,MeshTraits> PointSetType;
   typedef PointSetType::PointType PointType;
   typedef PointSetType::PointsContainer PointsContainer;

@@ -245,7 +245,9 @@ void mitk::PointSet::ExecuteOperation(Operation* operation)
 //##ModelId=3F0177E901EE
 void mitk::PointSet::UpdateOutputInformation()
 {
+  m_Geometry3D->SetBoundingBox(m_PointList->GetBoundingBox());
 }
+
 //##ModelId=3F0177E901FB
 void mitk::PointSet::SetRequestedRegionToLargestPossibleRegion()
 {

@@ -56,7 +56,7 @@ mitk::BoundingBox::Pointer mitk::DataTree::ComputeBoundingBox(mitk::DataTreeIter
   mitk::BoundingBox::Pointer m_BoundingBox=mitk::BoundingBox::New();
   mitk::BoundingBox::PointsContainer::Pointer pointscontainer=mitk::BoundingBox::PointsContainer::New();
   
-  float nullpoint[]={0,0,0};
+  mitk::ScalarType nullpoint[]={0,0,0};
   mitk::BoundingBox::PointType p(nullpoint);
   
   mitk::BoundingBox::PointIdentifier pointid=0;
@@ -65,16 +65,19 @@ mitk::BoundingBox::Pointer mitk::DataTree::ComputeBoundingBox(mitk::DataTreeIter
   {
     _it->next();
     mitk::DataTreeNode::Pointer node = _it->get();
-    if (node->GetData() != NULL && node->GetData()->GetUpdatedGeometry().IsNotNull()) 
+    if (node->GetData() != NULL && node->GetData()->GetUpdatedGeometry()!=NULL) 
     {
       mitk::BoundingBox::ConstPointer nextBoundingBox = node->GetData()->GetGeometry()->GetBoundingBox();
       const mitk::BoundingBox::PointsContainer * nextPoints = nextBoundingBox->GetPoints();
-      mitk::BoundingBox::PointsContainer::ConstIterator pointsIt = nextPoints->Begin();
-    
-      while (pointsIt != nextPoints->End() )
+      if(nextPoints!=NULL)
       {
-        pointscontainer->InsertElement( pointid++, pointsIt->Value());
-        pointsIt++;
+        mitk::BoundingBox::PointsContainer::ConstIterator pointsIt = nextPoints->Begin();
+      
+        while (pointsIt != nextPoints->End() )
+        {
+          pointscontainer->InsertElement( pointid++, pointsIt->Value());
+          pointsIt++;
+        }
       }
     }
   }
@@ -93,7 +96,7 @@ mitk::BoundingBox::Pointer mitk::DataTree::ComputeVisibleBoundingBox(mitk::DataT
   mitk::BoundingBox::Pointer m_BoundingBox=mitk::BoundingBox::New();
   mitk::BoundingBox::PointsContainer::Pointer pointscontainer=mitk::BoundingBox::PointsContainer::New();
   
-  float nullpoint[]={0,0,0};
+  mitk::ScalarType nullpoint[]={0,0,0};
   mitk::BoundingBox::PointType p(nullpoint);
   
   mitk::BoundingBox::PointIdentifier pointid=0;
@@ -102,7 +105,7 @@ mitk::BoundingBox::Pointer mitk::DataTree::ComputeVisibleBoundingBox(mitk::DataT
   {
     _it->next();
     mitk::DataTreeNode::Pointer node = _it->get();
-    if (node->GetData() != NULL && node->GetData()->GetGeometry().IsNotNull() && node->IsVisible(renderer) ) 
+    if (node->GetData() != NULL && node->GetData()->GetGeometry()!=NULL && node->IsVisible(renderer) ) 
     {
       mitk::BoundingBox::ConstPointer nextBoundingBox = node->GetData()->GetGeometry()->GetBoundingBox();
       const mitk::BoundingBox::PointsContainer * nextPoints = nextBoundingBox->GetPoints();

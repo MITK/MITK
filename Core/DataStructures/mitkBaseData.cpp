@@ -16,7 +16,7 @@ mitk::BaseData::~BaseData()
 }
 
 //##ModelId=3DCBE2BA0139
-mitk::Geometry3D::ConstPointer mitk::BaseData::GetUpdatedGeometry()
+const mitk::Geometry3D* mitk::BaseData::GetUpdatedGeometry()
 {
   SetRequestedRegionToLargestPossibleRegion();
 
@@ -25,19 +25,14 @@ mitk::Geometry3D::ConstPointer mitk::BaseData::GetUpdatedGeometry()
   return m_Geometry3D.GetPointer();
 }
 
-mitk::Geometry3D::Pointer mitk::BaseData::GetGeometry() const
+mitk::Geometry3D* mitk::BaseData::GetGeometry() const
 {
   return m_Geometry3D.GetPointer();
 }
 
-//##ModelId=3E3C4ACB0046
-mitk::Geometry2D::ConstPointer mitk::BaseData::GetGeometry2D(int s, int t) const
+void mitk::BaseData::SetGeometry(Geometry3D* aGeometry3D)
 {
-  const_cast<BaseData*>(this)->SetRequestedRegionToLargestPossibleRegion();
-
-  const_cast<BaseData*>(this)->UpdateOutputInformation();
-
-  return m_Geometry3D->GetGeometry2D(s,t);
+  m_Geometry3D = aGeometry3D;
 }
 
 //##ModelId=3E8600DB02DC

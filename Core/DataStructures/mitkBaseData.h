@@ -37,28 +37,14 @@ public:
   //## 
   //## @warning GetGeometry not yet completely implemented. 
   //## @todo Appropriate setting of the update extent is missing.
-  mitk::Geometry3D::ConstPointer GetUpdatedGeometry();
+  const mitk::Geometry3D* GetUpdatedGeometry();
 
   //##Documentation
   //## @brief Return the Geometry3D of the data as non-const pointer. 
   //## 
   //## @em No update will be called. Normally used in GenerateOutputInformation of 
   //## subclasses of BaseProcess.
-  mitk::Geometry3D::Pointer GetGeometry() const;
-
-  //##ModelId=3E3C4ACB0046
-  //##Documentation
-  //## @brief Return the Geometry2D of the slice (@a s, @a t). 
-  //## 
-  //## The method does not
-  //## simply call GetGeometry()->GetGeometry2D(). Before doing this, it
-  //## makes sure that the Geometry2D is up-to-date before returning it (by
-  //## setting the update extent appropriately and calling
-  //## UpdateOutputInformation).
-  //## 
-  //## @warning GetGeometry2D not yet completely implemented.
-  //## @todo Appropriate setting of the update extent is missing.
-  virtual mitk::Geometry2D::ConstPointer GetGeometry2D(int s, int t) const;
+  mitk::Geometry3D* GetGeometry() const;
 
   //##ModelId=3E8600DB0188
   //##Documentation
@@ -149,6 +135,12 @@ public:
   //## and get the necessary information from the parameter operation.
   void ExecuteOperation(Operation* operation);
 
+  //##Documentation
+  //## @brief Set the Geometry3D of the data, which will be referenced (not copied!). 
+  //## 
+  //## @warning This method will normally be called internally by the sub-class of BaseData 
+  //## during initialization.
+  virtual void SetGeometry(Geometry3D* aGeometry3D);
 protected:
   //##ModelId=3E3FE04202B9
   BaseData();

@@ -229,7 +229,7 @@ template<class TPixel, unsigned int VImageDimension>
   for (int i=0; i < VImageDimension; ++i)
   {
     size[i]    = input->GetDimension(i);
-    spacing[i] = input->GetGeometry()->GetSpacing()[i];
+    spacing[i] = input->GetSlicedGeometry()->GetSpacing()[i];
   }
   
   mitk::Point3D mitkorigin(0,0,0);

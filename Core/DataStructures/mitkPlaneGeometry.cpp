@@ -2,9 +2,12 @@
 #include <vtkTransform.h>
 
 //##ModelId=3E395F22035A
-mitk::PlaneGeometry::PlaneGeometry() : Geometry2D(10, 10), m_ScaleFactorMMPerUnitX(1.0), 
-   m_ScaleFactorMMPerUnitY(1.0)
+mitk::PlaneGeometry::PlaneGeometry() : 
+  m_ScaleFactorMMPerUnitX(1.0), 
+  m_ScaleFactorMMPerUnitY(1.0)
 {
+  Geometry2D::SetWidthInUnits(10);
+  Geometry2D::SetHeightInUnits(10);
 }
 
 
@@ -31,13 +34,6 @@ void mitk::PlaneGeometry::SetPlaneView(const mitk::PlaneView& aPlaneView)
     m_ScaleFactorMMPerUnitY=m_PlaneView.getOrientation2().length()/m_HeightInUnits;
 
     Modified();
-}
-
-//##ModelId=3E3AEB7C001C
-itk::Transform<float,3,2>::Pointer mitk::PlaneGeometry::GetTransfrom() const
-{
-	itkExceptionMacro("Transform not yet supported."); 	
-	return NULL;
 }
 
 //##ModelId=3E3B9C6E02B5

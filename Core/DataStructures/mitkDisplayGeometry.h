@@ -97,11 +97,8 @@ public:
     //##ModelId=3E3AEB54017D
     virtual void MMToUnits(const mitk::Point2D &pt_mm, mitk::Point2D &pt_units) const;
 
-    //##ModelId=3E3AEB56037E
-    virtual itk::Transform<float,3,2>::Pointer GetTransfrom() const;
-
     //##ModelId=3E3AEB620231
-    virtual double GetTime() const;
+    virtual double GetTime(int t) const;
 
     //##ModelId=3E3B02710239
     virtual void DisplayToUnits(const mitk::Vector2D &vec_display, mitk::Vector2D &vec_units) const;

@@ -5,7 +5,7 @@
 #include <itkPoint.h>
 
 namespace mitk {
-
+typedef double ScalarType;
 typedef View3f   PlaneView;
 typedef Vector3f Vector3D;
 typedef Point3f  Point3D;
@@ -13,8 +13,8 @@ typedef Vector2f Vector2D;
 typedef Point2f  Point2D;
 typedef Vector4f  Vector4D;
 typedef Matrix4f  Matrix4D;
-typedef itk::Point<float,3> ITKPoint3D;
-typedef itk::Vector<float,3> ITKVector3D;
+typedef itk::Point<ScalarType,3> ITKPoint3D;
+typedef itk::Vector<ScalarType,3> ITKVector3D;
 
 //itk vs. vecmath conversion
 template <class T>

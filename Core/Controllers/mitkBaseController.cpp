@@ -31,16 +31,6 @@ mitk::Stepper &mitk::BaseController::GetTime()
 	return m_Time;
 }
 
-//##ModelId=3DD528260235
-/*!
-  \todo implement it!
-  */
-bool mitk::BaseController::RemoveNavigator(mitk::Navigator* navigator)
-{
-	itkExceptionMacro("BaseController not yet implemented."); 	
-	return false;
-}
-
 //##ModelId=3DD52870008D
 /*!
   \todo implement it!
@@ -58,14 +48,4 @@ bool mitk::BaseController::RemoveRenderer(mitk::BaseRenderer* renderer)
 bool mitk::BaseController::AddRenderer(mitk::BaseRenderer* renderer)
 {
 	return true;
-}
-
-//##ModelId=3DD5268F0013
-/*!
-  \todo implement it!
-  */
-bool mitk::BaseController::AddNavigator(mitk::Navigator* navigator)
-{
-	itkExceptionMacro("BaseController not yet implemented."); 	
-	return false;
 }

@@ -33,24 +33,10 @@ void mitk::Geometry2D::MMToUnits(const mitk::Point2D &pt_mm, mitk::Point2D &pt_u
 {
 }
 
-//##ModelId=3DE78B870238
-itk::Transform<float,3,2>::Pointer mitk::Geometry2D::GetTransfrom() const
-{
-	itkExceptionMacro("Transform not yet supported.");
-    return NULL;
-}
-
-//##ModelId=3E02DFAF02AD
-double mitk::Geometry2D::GetTime() const
-{
-	return -1;
-}
-
 //##ModelId=3E395E0802E6
-mitk::Geometry2D::Geometry2D(unsigned int width_units, unsigned int height_units) : m_WidthInUnits(width_units), m_HeightInUnits(height_units)
+mitk::Geometry2D::Geometry2D() : m_WidthInUnits(1), m_HeightInUnits(1)
 {
 }
-
 
 //##ModelId=3E395E080318
 mitk::Geometry2D::~Geometry2D()
@@ -80,14 +66,6 @@ void mitk::Geometry2D::SetSizeInUnits(unsigned int width, unsigned int height)
     Modified();
 }
 
-//##ModelId=3ED91D05019E
-/*!
-  \todo implement the method! 
-*/
-void mitk::Geometry2D::TransformGeometry(const vtkTransform * transform)
-{
-
-}
 //##ModelId=3EF48EA10320
 bool mitk::Geometry2D::Project(const mitk::Point3D &pt3d_mm, mitk::Point3D &projectedPt3d_mm) const
 {

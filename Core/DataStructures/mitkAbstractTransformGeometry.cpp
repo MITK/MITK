@@ -3,9 +3,13 @@
 #include <vtkAbstractTransform.h>
 
 //##ModelId=3EF4A266029C
-mitk::AbstractTransformGeometry::AbstractTransformGeometry() : Geometry2D(10.0, 10.0), m_ScaleFactorMMPerUnitX(1.0),
-m_ScaleFactorMMPerUnitY(1.0), m_VtkAbstractTransform(NULL), m_InverseVtkAbstractTransform(NULL), m_LastVtkAbstractTransformTimeStamp(0)
+mitk::AbstractTransformGeometry::AbstractTransformGeometry() : 
+  m_ScaleFactorMMPerUnitX(1.0), m_ScaleFactorMMPerUnitY(1.0), 
+  m_VtkAbstractTransform(NULL), m_InverseVtkAbstractTransform(NULL), 
+  m_LastVtkAbstractTransformTimeStamp(0)
 {
+  Geometry2D::SetWidthInUnits(10);
+  Geometry2D::SetHeightInUnits(10);
 }
 
 
@@ -42,13 +46,6 @@ void mitk::AbstractTransformGeometry::SetVtkAbstractTransform(vtkAbstractTransfo
   m_LastVtkAbstractTransformTimeStamp = m_VtkAbstractTransform->GetMTime();
 
   Modified();
-}
-
-//##ModelId=3EF4A266024F
-itk::Transform<float,3,2>::Pointer mitk::AbstractTransformGeometry::GetTransfrom() const
-{
-  itkExceptionMacro("Transform not yet supported.");
-  return NULL;
 }
 
 //##ModelId=3EF4A2660241

@@ -1,9 +1,8 @@
 #include "mitkCylindricToCartesianFilter.h"
 #include "mitkImageTimeSelector.h"
+#include "mitkSlicedGeometry3D.h"
 
 #include <ipPicTypeMultiplex.h>
-#include <iostream.h>
-
 
 template <class T>
 void _transform(ipPicDescriptor *pic, ipPicDescriptor *dest, T outsideValue, float *fr, float *fphi, float *fz, short *rt, unsigned int *phit, unsigned int *zt, ipPicDescriptor *coneCutOff_pic)  //...t=truncated
@@ -313,19 +312,19 @@ void mitk::CylindricToCartesianFilter::GenerateOutputInformation()
     input->GetNumberOfChannels());
 
   // initialize the spacing of the output
-  const float *spacinglist = input->GetGeometry()->GetSpacing();
+  const float *spacinglist = input->GetSlicedGeometry()->GetSpacing();
   Vector3D spacing(spacinglist[0],spacinglist[0],1.0);
   if(input->GetDimension()>=2)
     spacing.z=spacinglist[1];
   spacing *= 1.0/scale;
-  output->GetGeometry()->SetSpacing(spacing);
+  output->GetSlicedGeometry()->SetSpacing(spacing);
 
   // initialize the spacing of the output
   // @todo position of input image is not yet used to calculate position of the output
   mitk::Point3D origin, right, bottom;
-  origin.set(0,0,0);                output->GetGeometry()->UnitsToMM(origin, origin);
-  right.set(tmpDimensions[0],0,0);  output->GetGeometry()->UnitsToMM(right, right);
-  bottom.set(0,tmpDimensions[1],0); output->GetGeometry()->UnitsToMM(bottom, bottom);
+  origin.set(0,0,0);                output->GetSlicedGeometry()->UnitsToMM(origin, origin);
+  right.set(tmpDimensions[0],0,0);  output->GetSlicedGeometry()->UnitsToMM(right, right);
+  bottom.set(0,tmpDimensions[1],0); output->GetSlicedGeometry()->UnitsToMM(bottom, bottom);
 
   PlaneView view_std(origin, right, bottom);
 
@@ -333,8 +332,8 @@ void mitk::CylindricToCartesianFilter::GenerateOutputInformation()
   planegeometry->SetPlaneView(view_std);
   planegeometry->SetSizeInUnits(tmpDimensions[0], tmpDimensions[1]);
 
-  output->GetGeometry()->SetGeometry2D(planegeometry.GetPointer(), 0, 0);
-  output->GetGeometry()->SetEvenlySpaced();
+  output->GetSlicedGeometry()->SetGeometry2D(planegeometry.GetPointer(), 0, 0);
+  output->GetSlicedGeometry()->SetEvenlySpaced();
 
   // @todo convert transducer position into new coordinate system
   /*	

@@ -171,7 +171,7 @@ void QmitkSimpleExampleFunctionality::initWidgets()
     if((data.IsNotNull()) && (dynamic_cast<mitk::Geometry2DData*>(node->GetData()) == NULL ))
 		{
 			// get 
-			if ((data->GetUpdatedGeometry()).IsNotNull() ) 
+			if ((data->GetUpdatedGeometry())!=NULL ) 
 			{
 				mitk::BoundingBox::ConstPointer bb = data->GetGeometry()->GetBoundingBox();
 				printf("boundsArrayType\n");

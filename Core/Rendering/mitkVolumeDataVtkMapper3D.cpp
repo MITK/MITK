@@ -88,7 +88,7 @@ void mitk::VolumeDataVtkMapper3D::Update(mitk::BaseRenderer* renderer)
   {
 //  FIXME: don't understand this 
     if (m_Prop3D) {
-      std::cout << "visibility off" <<std::endl;
+//      std::cout << "visibility off" <<std::endl;
 
       m_Prop3D->VisibilityOff();
     }

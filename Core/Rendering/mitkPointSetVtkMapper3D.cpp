@@ -117,9 +117,9 @@ void mitk::PointSetVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
 
 
     mitk::PointSet::Pointer input  = const_cast<mitk::PointSet*>(this->GetInput());
-    mitk::PointSet::DataType::Pointer pointList;
+    mitk::PointSet::DataType::Pointer itkPointSet;
 
-		pointList = input->GetPointSet();
+    itkPointSet = input->GetPointSet();
 
     mitk::PointSet::PointsContainer::Iterator i;
 
@@ -140,7 +140,7 @@ void mitk::PointSetVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
 		  vtkPoints *points = vtkPoints::New();
 		  vtkCellArray *polys = vtkCellArray::New();
 
-      for (j=0, i=pointList->GetPoints()->Begin(); i!=pointList->GetPoints()->End() ; i++,j++)
+      for (j=0, i=itkPointSet->GetPoints()->Begin(); i!=itkPointSet->GetPoints()->End() ; i++,j++)
 			{
 				int cell[2] = {j-1,j};
         points->InsertPoint(j,i.Value()[0],i.Value()[1],i.Value()[2]);
@@ -178,7 +178,7 @@ void mitk::PointSetVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
 	}
 
   float rgba[4]={1.0f,1.0f,1.0f,1.0f};
-  // check for color prop and use it for rendering if it exists
+  // check for color prop and use it for rendering of PTUNDEFINED points if it exists
   GetColor(rgba, renderer);
 
   int pointSize = 2;
@@ -186,7 +186,7 @@ void mitk::PointSetVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
   if (pointSizeProp != NULL)
     pointSize = pointSizeProp->GetValue();
             
-  for (j=0, i=pointList->GetPoints()->Begin(); i!=pointList->GetPoints()->End() ; i++,j++)
+  for (j=0, i=itkPointSet->GetPoints()->Begin(); i!=itkPointSet->GetPoints()->End() ; i++,j++)
   {
     vtkSphereSource *sphere = vtkSphereSource::New();
 

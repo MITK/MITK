@@ -9,7 +9,7 @@
             <x>0</x>
             <y>0</y>
             <width>140</width>
-            <height>26</height>
+            <height>35</height>
         </rect>
     </property>
     <property name="sizePolicy">
@@ -49,7 +49,7 @@
                 </property>
                 <widget class="QSlider">
                     <property name="name">
-                        <cstring>slider1</cstring>
+                        <cstring>slider</cstring>
                     </property>
                     <property name="sizePolicy">
                         <sizepolicy>
@@ -71,7 +71,7 @@
                 </widget>
                 <widget class="QSpinBox">
                     <property name="name">
-                        <cstring>spinBox1</cstring>
+                        <cstring>spinBox</cstring>
                     </property>
                     <property name="sizePolicy">
                         <sizepolicy>
@@ -86,5 +86,36 @@
         </widget>
     </vbox>
 </widget>
+<connections>
+    <connection>
+        <sender>slider</sender>
+        <signal>valueChanged(int)</signal>
+        <receiver>QmitkSliderNavigator</receiver>
+        <slot>slider_valueChanged(int)</slot>
+    </connection>
+    <connection>
+        <sender>spinBox</sender>
+        <signal>valueChanged(int)</signal>
+        <receiver>QmitkSliderNavigator</receiver>
+        <slot>spinBox_valueChanged(int)</slot>
+    </connection>
+</connections>
+<includes>
+    <include location="global" impldecl="in declaration">mitkStepper.h</include>
+    <include location="local" impldecl="in implementation">QmitkSliderNavigator.ui.h</include>
+</includes>
+<variables>
+    <variable>mitk::Stepper::Pointer m_Stepper;</variable>
+    <variable>bool m_InRefetch;</variable>
+</variables>
+<slots>
+    <slot>Refetch()</slot>
+    <slot>SetStepper( mitk::Stepper * stepper )</slot>
+    <slot>slider_valueChanged( int )</slot>
+    <slot>spinBox_valueChanged( int )</slot>
+</slots>
+<functions>
+    <function>init()</function>
+</functions>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

@@ -28,7 +28,7 @@ mitk::OpenGLRenderer::OpenGLRenderer() : m_VtkMapperPresent(false)
   m_CameraController->AddRenderer(this);
 
   m_DataChangedCommand = itk::MemberCommand<mitk::OpenGLRenderer>::New();
-#ifndef WIN32
+#ifdef WIN32
   m_DataChangedCommand->SetCallbackFunction(this, DataChangedEvent);
 #else
   m_DataChangedCommand->SetCallbackFunction(this, &DataChangedEvent);

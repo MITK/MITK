@@ -60,13 +60,13 @@ void mitk::PointSetMapper2D::Paint(mitk::BaseRenderer * renderer)
 
       //List of the Points
       PointSet::PointSetType::PointsContainerConstIterator it, end;
-      it=input->GetPointList()->GetPoints()->Begin();
-      end=input->GetPointList()->GetPoints()->End();
+      it=input->GetPointSet()->GetPoints()->Begin();
+      end=input->GetPointSet()->GetPoints()->End();
 
       //bool list for the selection of the points
       PointSet::PointSetType::PointDataContainerIterator selIt, selEnd;
-      selIt=input->GetPointList()->GetPointData()->Begin();
-      selEnd=input->GetPointList()->GetPointData()->End();
+      selIt=input->GetPointSet()->GetPointData()->Begin();
+      selEnd=input->GetPointSet()->GetPointData()->End();
       
       int j=0;
       while(it!=end)

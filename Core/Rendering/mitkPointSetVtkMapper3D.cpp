@@ -116,7 +116,7 @@ void mitk::PointSetVtkMapper3D::Update(mitk::BaseRenderer* renderer)
     mitk::PointSet::Pointer input  = const_cast<mitk::PointSet*>(this->GetInput());
     mitk::PointSet::PointSetType::Pointer pointList;
 
-		pointList = input->GetPointList();
+		pointList = input->GetPointSet();
 
     mitk::PointSet::PointsContainer::Iterator i;
 

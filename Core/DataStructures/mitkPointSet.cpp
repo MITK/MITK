@@ -43,7 +43,7 @@ int mitk::PointSet::GetSize()
 }
 
 //##ModelId=3F0177E901CC
-const mitk::PointSet::PointSetType::Pointer mitk::PointSet::GetPointList() const
+const mitk::PointSet::PointSetType::Pointer mitk::PointSet::GetPointSet() const
 {
   return m_PointSet;
 }
@@ -56,65 +56,79 @@ int mitk::PointSet::SearchPoint(ITKPoint3D point, float distance )
 //in is the given point to search
 //out is the point which is checked to be the searched point
 //pout is a pointer on out to work with itkPointSet
-  PointType in, out, *pout;
+  PointType in, out;
 
   //converting point:
   in[0] = point[0];
   in[1] = point[1];
   in[2] = point[2];
   out.Fill(0);
-  pout = &out;
 
-  //searching the first point in the List, that is +- distance far away from the given point
+  //searching the first point in the Set, that is +- distance far away from the given point
   unsigned int i;
- 	for (i=0; i < m_PointSet->GetNumberOfPoints(); i++)
+  PointsContainer::Iterator it, end;
+  end = m_PointSet->GetPoints()->End();
+ 	for (it = m_PointSet->GetPoints()->Begin(), i=0; it != end; it++, i++)
 	{
-    m_PointSet->GetPoint(i, pout);//changes out
-    if (in == out)//if totaly equal
-      return i;
+    bool ok = m_PointSet->GetPoints()->GetElementIfIndexExists(it->Index(), &out);//could be optimized
+    if (!ok)
+      return -1;
+    else if (in == out)//if totaly equal
+      return it->Index();
 
     //distance calculation
 		if ( ( in[0] >= ( out[0] - distance ) ) && ( in[0] <= ( out[0] + distance ) ) &&
 			 ( in[1] >= ( out[1] - distance ) ) && ( in[1] <= ( out[1] + distance ) ) &&
 			 ( in[2] >= ( out[2] - distance ) ) && ( in[2] <= ( out[2] + distance ) ) )
-      return i;
+      return it->Index();
 	}
 	return -1;
 }
 
 //##ModelId=3F0177E901CE
+//##Documentation
+//##@brief check if index exists. If it doesn't exist, then return 0,0,0
 const mitk::PointSet::PointType mitk::PointSet::GetPoint(int position)
 {
-	if ((int)m_PointSet->GetNumberOfPoints()< position)
-	{
-    return NULL;
-	}
   PointType out;
   out.Fill(0);
-  m_PointSet->GetPoint(position, &out);
-  return out;
+
+  if (m_PointSet->GetPoints()->IndexExists(position))
+  {
+    m_PointSet->GetPoint(position, &out);
+    return out;
+  }
+  else
+    return out;
 }
 
 const mitk::ITKPoint3D mitk::PointSet::GetItkPoint(int position)
 {
-  if ((int)m_PointSet->GetNumberOfPoints()< position)
-	{
-    return NULL;
-	}
 	mitk::ITKPoint3D itkout;
   PointType out;
   out.Fill(0);
-  m_PointSet->GetPoint(position, &out);
+  
+  //if the Index exists... if not, then return 0,0,0
+  if (m_PointSet->GetPoints()->IndexExists(position))
+  {
+    m_PointSet->GetPoint(position, &out);
+  }
+
   itkout[0] = out[0];
   itkout[1] = out[1];
   itkout[2] = out[2];
   return itkout;
 }
 
+bool mitk::PointSet::IndexExists(int position)
+{
+  return m_PointSet->GetPoints()->IndexExists(position);
+}
+
 //##ModelId=3F0177E901DC
 bool mitk::PointSet::GetSelectInfo(int position)
 {
-  if ( m_PointSet->GetNumberOfPoints() > position )
+  if (m_PointSet->GetPoints()->IndexExists(position))
 	{
     bool selected = false;
     m_PointSet->GetPointData(position, &selected);
@@ -155,56 +169,45 @@ void mitk::PointSet::ExecuteOperation(Operation* operation)
 	{
 	case OpNOTHING:
 		break;
-	case OpADD://!!!!!#### shall not be used! Use Insert instead to know the position for undo-operation ####!!!!!
-		{
-      unsigned long idoffset = m_PointSet->GetNumberOfPoints();
-      mitk::ITKPoint3D a0 = pointOp->GetPoint();
-      PointType a1;
-      a1[0] = a0[0];
-      a1[1] = a0[1];
-      a1[2] = a0[2];
-      m_PointSet->SetPoint(idoffset, a1);
-      m_PointSet->SetPointData(idoffset, false);
-		}
-		break;
-  case OpDELETE://!!!!####shall not be used anymore! Use remove(index) instead to know the position for undo-operation####!!!!
-		{
-      m_PointSet->GetPoints()->DeleteIndex(m_PointSet->GetNumberOfPoints()-1);
-		}
-		break;
+	//case OpADD://!!!!!#### shall not be used! Use Insert instead to know the position for undo-operation ####!!!!!
+	//	{
+ //     unsigned long idoffset = m_PointSet->GetNumberOfPoints();
+ //     mitk::ITKPoint3D a0 = pointOp->GetPoint();
+ //     PointType a1;
+ //     a1[0] = a0[0];
+ //     a1[1] = a0[1];
+ //     a1[2] = a0[2];
+ //     m_PointSet->SetPoint(idoffset, a1);
+ //     m_PointSet->SetPointData(idoffset, false);
+	//	}
+	//	break;
+  //case OpDELETE://!!!!####shall not be used anymore! Use remove(index) instead to know the position for undo-operation####!!!!
+		//{
+  //    m_PointSet->GetPoints()->DeleteIndex(m_PointSet->GetNumberOfPoints()-1);
+		//}
+		//break;
 	case OpINSERT://inserts the point at the given position 
 		{
       int position = pointOp->GetIndex();
 
-      if (m_PointSet->GetNumberOfPoints() >= ((unsigned)(position)))
-			{
-        PointType pt;
-        pt.CastFrom(pointOp->GetPoint());
+      PointType pt;
+      pt.CastFrom(pointOp->GetPoint());
 
-        m_PointSet->GetPoints()->InsertElement(position, pt);
-        m_PointSet->GetPointData()->InsertElement(position, false);
-			}
+      m_PointSet->GetPoints()->InsertElement(position, pt);
+      m_PointSet->GetPointData()->InsertElement(position, false);
 		}
 		break;
 	case OpMOVE://moves the point given by index
 		{
-      unsigned int index = pointOp->GetIndex();
-      PointsContainer::Pointer itkPoints = m_PointSet->GetPoints();
-			if (index < m_PointSet->GetNumberOfPoints() )
-			{
-        PointType pt;
-        pt.CastFrom(pointOp->GetPoint());
-        m_PointSet->SetPoint(index, pt);
-			}
+			PointType pt;
+      pt.CastFrom(pointOp->GetPoint());
+      m_PointSet->SetPoint(pointOp->GetIndex(), pt);
 		}
 		break;
 	case OpREMOVE://removes the point at given by position 
 		{
-      unsigned int index = (unsigned)pointOp->GetIndex();
-			if (index < m_PointSet->GetNumberOfPoints() )
-			{
-        m_PointSet->GetPoints()->DeleteIndex(index);
-			}
+      m_PointSet->GetPoints()->DeleteIndex((unsigned)pointOp->GetIndex());
+      m_PointSet->GetPointData()->DeleteIndex((unsigned)pointOp->GetIndex());
 		}
 		break;
 	case OpSELECTPOINT://select the given point
@@ -223,7 +226,7 @@ void mitk::PointSet::ExecuteOperation(Operation* operation)
 	//to tell the mappers, that the data is modifierd and has to be updated
 	this->Modified();
 
-    ((const itk::Object*)this)->InvokeEvent(itk::EndEvent());
+  ((const itk::Object*)this)->InvokeEvent(itk::EndEvent());
 
   UpdateAllWidgets();
 }

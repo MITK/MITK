@@ -53,12 +53,12 @@ void mitk::LineMapper2D::Paint(mitk::BaseRenderer * renderer)
 
     //List of the Points
     PointSet::PointSetType::PointsContainerConstIterator it, end;
-    it = input->GetPointList()->GetPoints()->Begin();
-    end = --input->GetPointList()->GetPoints()->End();//the last before end, because lines from n to n+1
+    it = input->GetPointSet()->GetPoints()->Begin();
+    end = --input->GetPointSet()->GetPoints()->End();//the last before end, because lines from n to n+1
 
     //bool list for the selection of the points
     PointSet::PointSetType::PointDataContainerIterator selIt, selItNext;
-    selIt=input->GetPointList()->GetPointData()->Begin();
+    selIt=input->GetPointSet()->GetPointData()->Begin();
     
     int j=0;
     while(it!=end)

@@ -6,8 +6,10 @@
 #include <itkPoint.h>
 #include <itkPointSet.h>
 #include <itkCovariantVector.h>
-#include <vector>
+#include <itkMesh.h>
 #include <itkDefaultDynamicMeshTraits.h>
+  
+const unsigned int Dimension = 3;
 
 namespace mitk {
 
@@ -25,12 +27,17 @@ public:
 
   itkNewMacro(Self);
 
+  typedef mitk::ScalarType PixelType;
   typedef itk::DefaultDynamicMeshTraits<bool, 3, 3, mitk::ScalarType> MeshTraits;
-  typedef itk::PointSet<bool,3,MeshTraits> PointSetType;
+  typedef itk::Mesh<PixelType, Dimension, MeshTraits> MeshType;  
+  typedef MeshType PointSetType;
+
   typedef PointSetType::PointType PointType;
   typedef PointSetType::PointsContainer PointsContainer;
-  typedef PointSetType::PointDataContainer::Iterator PointDataIterator;
+  typedef PointSetType::PointsContainerIterator PointsIterator;
   typedef PointSetType::PointDataContainer PointDataContainer;
+  typedef PointSetType::PointDataContainerIterator PointDataIterator;
+  
 
   //##ModelId=3F0177E901BF
   //##Documentation
@@ -45,16 +52,24 @@ public:
   //##ModelId=3F0177E901CC
   //##Documentation
 	//## @brief returns the point-list with points and selected Information
-  const PointSetType::Pointer GetPointList() const;
+  const PointSetType::Pointer GetPointSet() const;
 
   //##ModelId=3F0177E901CE
   //##Documentation
 	//## @brief Get the point on the given position
+  //##
+  //## check if index exists. If it doesn't exist, then return 0,0,0
 	const PointType GetPoint(int position);
 
   //##Documentation
 	//## @brief Get the point on the given position in itkPoint3D
+  //##
+  //## check if index exists. If it doesn't exist, then return 0,0,0
   const mitk::ITKPoint3D GetItkPoint(int position);
+
+  //##Documentation
+	//## @brief returns true if a point exists at this position
+  bool IndexExists(int position);
 
   //##ModelId=3F0177E901DC
 	//##Documentation

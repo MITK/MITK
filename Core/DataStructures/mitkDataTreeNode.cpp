@@ -66,14 +66,24 @@ mitk::DataTreeNode& mitk::DataTreeNode::operator=(mitk::BaseData* right)
     return *node;
 }
 
-//##ModelId=3E33F5D703D7
-MBI_STD::istream& mitk::operator>>( MBI_STD::istream& i, DataTreeNode::Pointer& at )
+#if (_MSC_VER > 1200) || !defined(_MSC_VER)
+MBI_STD::istream& mitk::operator>>( MBI_STD::istream& i, mitk::DataTreeNode::Pointer& dtn )
+#endif
+#if ((defined(_MSC_VER)) && (_MSC_VER <= 1200))
+MBI_STD::istream& operator>>( MBI_STD::istream& i, mitk::DataTreeNode::Pointer& dtn ) 
+#endif
 {
-    return i;
+   dtn = mitk::DataTreeNode::New();
+   //i >> av.get();
+   return i;
 }
 
-//##ModelId=3E33F5D8007B
-MBI_STD::ostream& mitk::operator<<( MBI_STD::ostream& o, DataTreeNode::Pointer& t)
+#if (_MSC_VER > 1200) || !defined(_MSC_VER)
+MBI_STD::ostream& mitk::operator<<( MBI_STD::ostream& o, DataTreeNode::Pointer& dtn)
+#endif
+#if ((defined(_MSC_VER)) && (_MSC_VER <= 1200))
+MBI_STD::ostream& operator<<( MBI_STD::ostream& o, DataTreeNode::Pointer& dtn)
+#endif
 {
     return o;
 }
@@ -127,4 +137,3 @@ mitk::PropertyList::Pointer mitk::DataTreeNode::GetPropertyList() const
 {
     return m_PropertyList;
 }
-

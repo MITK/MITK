@@ -21,6 +21,7 @@ namespace mitk {
 //##ModelId=3EA93EC901B8
 
 typedef ::LinkedTree<mitk::DataTreeNode::Pointer> DataTreeBase;
+//##ModelId=3EA9438F0346
 typedef DataTreeBase::TreeChangeListener DataTreeBaseTreeChangeListener;
 
 
@@ -93,20 +94,10 @@ class DataTree : public itk::Object, public DataTreeBase, public DataTreeBaseTre
 
 };
 
-
-
 //##ModelId=3E394E99028E
-
 typedef	::TreeIterator<DataTreeNode::Pointer> DataTreeIterator;
 
-#if (_MSC_VER > 1200) || !defined(_MSC_VER)
-MBI_STD::istream& operator>>( MBI_STD::istream& i, DataTreeNode::Pointer& dtn );
-#endif
 } // namespace mitk
-
-#if ((defined(_MSC_VER)) && (_MSC_VER <= 1200))
-MBI_STD::istream& operator>>( MBI_STD::istream& i, mitk::DataTreeNode::Pointer& dtn );
-#endif
 
 #endif /* DATATREE_H_HEADER_INCLUDED_C1C7797C */
 

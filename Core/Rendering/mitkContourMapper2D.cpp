@@ -36,8 +36,6 @@ void mitk::ContourMapper2D::Paint(mitk::BaseRenderer * renderer)
 
     vtkTransform* transform = GetDataTreeNode()->GetVtkTransform();
 
-
-    Contour::InputType idx = input->GetContourPath()->StartOfInput();
     //    Contour::OutputType point;
     Contour::BoundingBoxType::PointType point;
 

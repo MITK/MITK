@@ -177,7 +177,7 @@ void QmitkStdMultiWidget::changeLayoutToDefault()
 {
   delete QmitkStdMultiWidgetLayout ;
 
-  std::cout << "changing layout to defualt... " << std::endl;
+  std::cout << "changing layout to default... " << std::endl;
   QmitkStdMultiWidgetLayout = new QHBoxLayout( this, 0, 0, "QmitkStdMultiWidgetLayout");
 
   QHBoxLayout *layout4 = new QHBoxLayout( 0, 0, 6, "layout4");

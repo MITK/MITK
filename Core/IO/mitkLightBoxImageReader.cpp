@@ -131,6 +131,48 @@ void mitk::LightBoxImageReader::GenerateData()
     printf("\n fertig \n");
 }
 
+mitk::LightBoxImageReader::GetSpacingFromLB()
+{
+
+Vector3<float>  OrganicerPluginFrame::getSpacingFromLB( )
+{
+
+   Vector3<float> spacing(1.0, 1.0, 1.0);
+
+   image_t* image;
+ 
+   float slice[2];
+   ipPicDescriptor* slices[2];  
+
+   float posz;
+  
+    for(int p = 0,counter = 0;  p < m_LightBox->images,counter < 2; ++p,++counter){
+        switch( lightbox->image_list[0].type){
+      
+        case DB_OBJECT_IMAGE:{          
+	         slices[counter] = pFetchImage(m_LightBox,p);
+       
+                image = (image_t*)m_LightBox->image_list[p].db_struct;
+	         posz = (float)image->sliceLocation;
+	
+                 interSliceGeometry_t*  isg_t  = fetchDicomGeometry(m_LightBox,p);
+ 
+                   slice[counter] = (float)isg_t->o[2];
+           break;
+	}
+        default:
+	  break;
+        }    	
+    }
+   float result = fabs(slice[0]-slice[1]);
+    spacing.z = result;
+   cout<<" spacing x: "<<spacing.x<<" y: "<<spacing.y<<" z: "<<spacing.z<<endl; 
+   return spacing;
+}
+
+
+
+
 mitk::LightBoxImageReader::LightBoxImageReader() : m_LightBox(NULL)
 {
 }

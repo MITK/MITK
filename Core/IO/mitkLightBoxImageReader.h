@@ -16,6 +16,7 @@ public:
     /** Method for creation through the object factory. */
     itkNewMacro(Self);
 
+    Vector3<float> GetSpacingFromLB();
 
     void SetLightBox(lightbox_t lightbox);
     lightbox_t GetLightBox();

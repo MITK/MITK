@@ -145,29 +145,44 @@ bool mitk::AffineInteractor::ExecuteSideEffect(int sideEffectId, mitk::StateEven
 		if (posEvent == NULL) return false;    
     //converting from Point3D to itk::Point
 		mitk::ITKPoint3D newPosition;
-		mitk::vm2itk(posEvent->GetWorldPosition(), newPosition); 
-    
-          //std::cout << "newPosition:  <" << newPosition[0] <<", " << newPosition[1] << ", " << newPosition[2] << ">\n";    
-          //std::cout << "m_lastScalePosition:  <" << m_lastScalePosition[0] <<", " << m_lastScalePosition[1] << ", " << m_lastScalePosition[2] << ">\n";    
+		mitk::vm2itk(posEvent->GetWorldPosition(), newPosition);    
     
     mitk::ITKVector3D v = newPosition - m_lastScalePosition;
-    //const ScalarType* pos = geometry->GetPosition();
-    //v[0] -= pos[0];
-    //v[1] -= pos[1];
-    //v[2] -= pos[2];
 
-          //std::cout << "v:  <" << v[0] <<", " << v[1] << ", " << v[2] << ">\n";
-          //std::cout << "m_lastScaleData:  <" << m_lastScaleData[0] <<", " << m_lastScaleData[1] << ", " << m_lastScaleData[2] << ">\n";
-
+    // calculate scale changes
     mitk::ITKPoint3D newScale;
-    newScale[0] = m_lastScaleData[0] + (geometry->GetXAxis() * v);  // Scalarprodukt of normalized Axis 
-    newScale[1] = m_lastScaleData[1] + (geometry->GetYAxis() * v);  // and direction vector of mouse movement 
-    newScale[2] = m_lastScaleData[2] + (geometry->GetZAxis() * v);  // is the length of the movement vectors 
-                                                                    // projection onto the axis
+    newScale[0] = (geometry->GetXAxis() * v);  // Scalarprodukt of normalized Axis
+    newScale[1] = (geometry->GetYAxis() * v);  // and direction vector of mouse movement
+    newScale[2] = (geometry->GetZAxis() * v);  // is the length of the movement vectors
+                                               // projection onto the axis
+
+    std::cout << "  scalechange: <" << newScale[0] << ", " << newScale[1] << ", " << newScale[2] << ">\n";
+
+    //newScale[0] = m_lastScaleData[0] + newScale[0];
+    //newScale[1] = m_lastScaleData[1] + newScale[1];
+    //newScale[2] = m_lastScaleData[2] + newScale[2];
     
-          //std::cout << "newScale:  <" << newScale[0] <<", " << newScale[1] << ", " << newScale[2] << ">\n";
-    
-    newScale[0] = (newScale[0] < 1) ? 1 : newScale[0]; // cap at a minimum scale factor of 1
+    // calculate direction of mouse move (towards or away from the data object)
+    ITKPoint3D objectPosition = geometry->GetPosition();        
+    ScalarType dist1 = (newPosition - objectPosition).GetNorm();
+    ScalarType dist2 = (m_lastScalePosition - objectPosition).GetNorm();    
+    if(dist1 <= dist2)
+    {   // subtract scale change from initial scale when moving towards the object
+      std::cout << "- decrease scale: mousepos-dist: " << dist1 << ", downposdist: " << dist2 << "\n";
+      newScale[0] = m_lastScaleData[0] - fabs(newScale[0]); 
+      newScale[1] = m_lastScaleData[1] - fabs(newScale[1]);
+      newScale[2] = m_lastScaleData[2] - fabs(newScale[2]);
+    }
+    else
+    {   // add scale change to initial scale when moving away from the object
+      std::cout << "+ increase scale: mousepos-dist: " << dist1 << ", downposdist: " << dist2 << "\n";
+      newScale[0] = m_lastScaleData[0] + fabs(newScale[0]);
+      newScale[1] = m_lastScaleData[1] + fabs(newScale[1]);
+      newScale[2] = m_lastScaleData[2] + fabs(newScale[2]);
+    }    
+
+    // cap at a minimum scale factor of 1
+    newScale[0] = (newScale[0] < 1) ? 1 : newScale[0]; 
     newScale[1] = (newScale[1] < 1) ? 1 : newScale[1];
     newScale[2] = (newScale[2] < 1) ? 1 : newScale[2];
 

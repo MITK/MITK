@@ -17,7 +17,7 @@
 #ifndef VMUTIL_H
 #define VMUTIL_H
 
-#include <vm_conf.h>
+#include "vm_conf.h"
 
 #ifdef VM_STD_C_HEADERS
 #  include <cstddef>
@@ -32,15 +32,11 @@
 #endif
 
 #ifdef VM_INCLUDE_IO
-#  ifdef _MSC_VER
 #    ifdef VM_USE_OLDIOSTREAM
 #      include <iostream.h>
 #    else
 #      include <iostream>
 #    endif
-#  else
-#    include <iostream.h>
-#  endif
 #  ifdef VM_INCLUDE_TOSTRING
 #     include <string>
 #       ifdef VM_USE_STRINGSTREAM
@@ -49,7 +45,7 @@
 #       else
 #         ifdef _MSC_VER
 #           ifdef VM_USE_OLDIOSTREAM
-#             include <strstrea.h>
+#             include <strstream.h>
 #             define VM_TOSTRING strstream s; s << *this << ends; VM_STRING_STD::string str = s.str(); s.rdbuf()->freeze(0); return str;
 #           else
 #             include <strstream>

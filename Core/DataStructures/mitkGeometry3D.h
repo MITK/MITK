@@ -153,6 +153,15 @@ public:
   }
 
   //##Documentation
+  //## @brief Get the center of the bounding-box in mm
+  //## 
+  Point3D GetCenter() const 
+  {    
+    assert(m_BoundingBox.IsNotNull());
+    return m_IndexToWorldTransform->TransformPoint(m_BoundingBox->GetCenter());  
+  }
+
+  //##Documentation
   //## @brief Get a VnlVector along bounding-box in the specified 
   //## @a direction (length is spacing)
   //##

@@ -3,39 +3,55 @@
 
 #include "mitkCommon.h"
 #include "mitkDataTreeNode.h"
-
-//#include "DataTreeIterator.h"
 #include "mitkGeometry3D.h"
-#include <Tree/LinkedTree.h>
 
-namespace mitk {
+#include <itkTreeContainer.h>
+#include <itkTreeIteratorClone.h>
+#include <itkPreOrderTreeIterator.h>
+#include <itkChildTreeIterator.h>
+
+namespace mitk 
+{
+
 //##ModelId=3EA93EC901B8
-typedef ::LinkedTree<mitk::DataTreeNode::Pointer> DataTreeBase;
-//##ModelId=3EA9438F0346
-typedef DataTreeBase::TreeChangeListener DataTreeBaseTreeChangeListener;
+typedef itk::TreeContainer<typename mitk::DataTreeNode::Pointer> DataTreeBase;
+
+//##Documentation
+//## @brief typedef to a base-iterator on the data tree
+//## @ingroup DataTree
+typedef	itk::TreeIteratorBase<DataTreeBase> DataTreeIteratorBase;
 
 //##ModelId=3E394E99028E
 //##Documentation
 //## @brief typedef to an iterator on the data tree
 //## @ingroup DataTree
-typedef	::TreeIterator<DataTreeNode::Pointer> DataTreeIterator;
+typedef	itk::TreeIteratorClone<DataTreeIteratorBase> DataTreeIteratorClone;
 
+//##Documentation
+//## @brief typedef to a preorder-iterator on the data tree
+//## @ingroup DataTree
+typedef	itk::PreOrderTreeIterator<DataTreeBase> DataTreePreOrderIterator;
+
+//##Documentation
+//## @brief typedef to a children-iterator on the data tree
+//## @ingroup DataTree
+typedef	itk::ChildTreeIterator<DataTreeBase> DataTreeChildIterator;
 
 //##ModelId=3E38F35101A0
 //##Documentation
 //## @brief Main run-time data management class defining a data tree
 //## @ingroup DataTree
-class DataTree : public itk::Object, public DataTreeBase, public DataTreeBaseTreeChangeListener
+class DataTree : public DataTreeBase
 {
 
 public:
-  mitkClassMacro(DataTree, itk::Object);    
+  mitkClassMacro(DataTree, DataTreeBase);    
 
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
   //##ModelId=3E3FE0430148
-  TreeIterator<mitk::DataTreeNode::Pointer>* GetNext( const char* propertyName, const mitk::BaseProperty* property,  TreeIterator<mitk::DataTreeNode::Pointer>* startPosition = NULL );
+  DataTreeIteratorClone GetNext( const char* propertyName, const mitk::BaseProperty* property,  DataTreeIteratorBase* startPosition = NULL );
 
   //##ModelId=3ED91D050085
   //##Documentation
@@ -45,7 +61,7 @@ public:
   //## and is set to @a false, the node is ignored for the bounding-box calculation.
   //## @param renderer see @a boolPropertyKey
   //## @param boolPropertyKey2 a second condition that is applied additionally to @a boolPropertyKey
-  static mitk::BoundingBox::Pointer ComputeBoundingBox(mitk::DataTreeIterator * it, const char* boolPropertyKey = NULL, mitk::BaseRenderer* renderer = NULL, const char* boolPropertyKey2 = NULL);
+  static mitk::BoundingBox::Pointer ComputeBoundingBox(mitk::DataTreeIteratorBase* it, const char* boolPropertyKey = NULL, mitk::BaseRenderer* renderer = NULL, const char* boolPropertyKey2 = NULL);
 
   //##ModelId=3ED91D050085
   //##Documentation
@@ -57,7 +73,7 @@ public:
   //## @param renderer the reference to the renderer
   //## @param boolPropertyKey if a BoolProperty with this boolPropertyKey exists for a node (for @a renderer) 
   //## and is set to @a false, the node is ignored for the bounding-box calculation.
-  static mitk::BoundingBox::Pointer ComputeVisibleBoundingBox(mitk::DataTreeIterator * it, mitk::BaseRenderer* renderer = NULL, const char* boolPropertyKey = NULL)
+  static mitk::BoundingBox::Pointer ComputeVisibleBoundingBox(mitk::DataTreeIteratorBase* it, mitk::BaseRenderer* renderer = NULL, const char* boolPropertyKey = NULL)
   {
     return ComputeBoundingBox(it, "visible", renderer, boolPropertyKey);
   }
@@ -72,7 +88,7 @@ public:
   //## and is set to @a false, the node is ignored for the time-bounds calculation.
   //## @param renderer see @a boolPropertyKey
   //## @param boolPropertyKey2 a second condition that is applied additionally to @a boolPropertyKey
-  static TimeBounds mitk::DataTree::ComputeTimeBoundsInMS(mitk::DataTreeIterator * it, const char* boolPropertyKey, mitk::BaseRenderer* renderer, const char* boolPropertyKey2);
+  static TimeBounds mitk::DataTree::ComputeTimeBoundsInMS(mitk::DataTreeIteratorBase* it, const char* boolPropertyKey, mitk::BaseRenderer* renderer, const char* boolPropertyKey2);
 
   //##Documentation
   //## @brief Compute the time-bounds of all visible parts of the data tree structure, for general 
@@ -85,7 +101,7 @@ public:
   //## @param boolPropertyKey if a BoolProperty with this boolPropertyKey exists for a node (for @a renderer) 
   //## and is set to @a false, the node is ignored for the time-bounds calculation.
   //## @param renderer see @a boolPropertyKey
-  static TimeBounds mitk::DataTree::ComputeTimeBoundsInMS(mitk::DataTreeIterator * it, mitk::BaseRenderer* renderer, const char* boolPropertyKey)
+  static TimeBounds mitk::DataTree::ComputeTimeBoundsInMS(mitk::DataTreeIteratorBase* it, mitk::BaseRenderer* renderer, const char* boolPropertyKey)
   {
     return ComputeTimeBoundsInMS(it, "visible", renderer, boolPropertyKey);
   }
@@ -95,10 +111,6 @@ protected:
 
   //##ModelId=3E38F46A01AE
   virtual ~DataTree();
-
-  //##ModelId=3EA6ADB7029F
-  void treeChanged( TreeIterator<DataTreeNode::Pointer>& changedTreePosition );	
-
 };
 
 } // namespace mitk

@@ -16,7 +16,7 @@
 //
 typedef  int MapperSlotId;
 //typedef	Tree<mitk::DataTreeNode::Pointer> DataTree;
-//typedef	TreeIterator<mitk::DataTreeNode::Pointer> DataTreeIterator;
+//typedef	TreeIterator<mitk::DataTreeNode::Pointer> DataTreeIteratorClone;
 
 
 #define mitkClassMacro(className,SuperClassName) \

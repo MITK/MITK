@@ -342,7 +342,7 @@ void mitk::CylindricToCartesianFilter::GenerateOutputInformation()
   //@fixme!!! will not work for not evenly timed data!
   output->GetSlicedGeometry()->SetTimeBoundsInMS(input->GetSlicedGeometry()->GetTimeBoundsInMS());
   //@fixme!!! transfer matrix to timeslicedgeometry.
-  output->GetGeometry()->SetUnitsToMMAffineTransform(output->GetSlicedGeometry()->GetUnitsToMMAffineTransform());
+  output->GetGeometry()->SetIndexToWorldTransform(output->GetSlicedGeometry()->GetIndexToWorldTransform());
   //@fixme!!! for 4D-data: calculate the timebounds of the TimeSlicedGeometry: (calling GetTimeBoundsInMS() really does that!)
   output->GetGeometry()->GetTimeBoundsInMS();
 

@@ -5,7 +5,7 @@
 #include "mitkDisplayPositionEvent.h"
 //##ModelId=3E1EB4410304
 mitk::QmitkRenderWindow::QmitkRenderWindow(mitk::BaseRenderer* renderer, QGLFormat glf, QWidget *parent, const char *name) 
-  : QGLWidget(glf, parent, name), mitk::RenderWindow(name, renderer)
+  : QGLWidget(glf, parent, name), mitk::RenderWindow(name, renderer), m_InitNeeded(false), m_ResizeNeeded(false), m_InResize(false)
 {
   InitRenderer();
   setFocusPolicy(QWidget::StrongFocus);
@@ -14,7 +14,7 @@ mitk::QmitkRenderWindow::QmitkRenderWindow(mitk::BaseRenderer* renderer, QGLForm
 
 //##ModelId=3E1EB4410318
 mitk::QmitkRenderWindow::QmitkRenderWindow(mitk::BaseRenderer* renderer, QWidget *parent, const char *name)
-: QGLWidget(parent, name), mitk::RenderWindow(name, renderer)
+: QGLWidget(parent, name), mitk::RenderWindow(name, renderer), m_InitNeeded(false), m_ResizeNeeded(false), m_InResize(false)
 {
   InitRenderer();
   setFocusPolicy(QWidget::StrongFocus);
@@ -52,11 +52,15 @@ void mitk::QmitkRenderWindow::initializeGL()
 //##ModelId=3E33145A001C
 void mitk::QmitkRenderWindow::resizeGL( int w, int h ) 
 {
+  if(m_InResize) //@FIXME CRITICAL probably related to VtkSizeBug
+    return;
+  m_InResize = true;
   if(QGLWidget::isVisible())
   {
     m_Renderer->Resize(w, h);
     updateGL();
   }
+  m_InResize = false;
 }
 
 /*!
@@ -88,7 +92,7 @@ void mitk::QmitkRenderWindow::showEvent ( QShowEvent * )
   if(m_ResizeNeeded)
   {
     m_ResizeNeeded=false;
-    m_Renderer->InitSize(width(),height());
+    m_Renderer->InitSize(width()-40,height()-40);
     //m_Renderer->SetSize(width(),height());
     //    resizeGL(width(),height());
   }
@@ -160,8 +164,7 @@ void mitk::QmitkRenderWindow::keyPressEvent(QKeyEvent *ke)
   if (m_Renderer)
   {
     QPoint cp = mapFromGlobal(QCursor::pos());
-    //mitk::KeyEvent mke(ke->type(), ke->key(), ke->ascii(), ke->state(), ke->text().latin1(), ke->isAutoRepeat(), ke->count(), cp.x(), cp.y(), QCursor::pos().x(), QCursor::pos().y());
-    mitk::KeyEvent mke(ke->type(), ke->key(), ke->ascii(), ke->state(), ke->text(), ke->isAutoRepeat(), ke->count(), cp.x(), cp.y(), QCursor::pos().x(), QCursor::pos().y());
+    mitk::KeyEvent mke(ke->type(), ke->key(), ke->ascii(), ke->state(), ke->text().ascii(), ke->isAutoRepeat(), ke->count(), cp.x(), cp.y(), QCursor::pos().x(), QCursor::pos().y());
     m_Renderer->KeyPressEvent(&mke);
     if(mke.isAccepted())
       ke->accept();

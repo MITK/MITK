@@ -25,7 +25,7 @@ public:
 
   enum PlaneOrientation {Transversal, Sagittal, Frontal};
 
-  virtual void SetUnitsToMMAffineTransform(mitk::AffineTransform3D* transform);
+  virtual void SetIndexToWorldTransform(mitk::AffineTransform3D* transform);
 
   virtual void SetBounds(const BoundingBox::BoundsArrayType& bounds);
 
@@ -94,14 +94,14 @@ public:
     matrix.GetVnlMatrix().set_column(2, normal);
     transform->SetMatrix(matrix);
     transform->SetOffset(const_cast<Point3D&>(m_Origin).Get_vnl_vector().data_block());
-    SetUnitsToMMAffineTransform(transform);
+    SetIndexToWorldTransform(transform);
   }
 
   void SetOrigin(const Point3D& origin)
   {
     if(origin!=GetOrigin())
     {
-      m_UnitsToMMAffineTransform->SetOffset(const_cast<Point3D&>(origin).Get_vnl_vector().data_block());
+      m_IndexToWorldTransform->SetOffset(const_cast<Point3D&>(origin).Get_vnl_vector().data_block());
       m_Origin = origin;
       Modified();
     }

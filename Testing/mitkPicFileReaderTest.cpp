@@ -120,9 +120,9 @@ int mitkPicFileReaderTest(int argc, char* argv[])
 
   std::cout << "Testing consistency of spacing from matrix and stored spacing in the first SlicedGeometry3D: ";
   mitk::Vector3D spacing;
-  spacing[0] = slicedgeometry->GetUnitsToMMAffineTransform()->GetMatrix().GetVnlMatrix().get_column(0).two_norm();
-  spacing[1] = slicedgeometry->GetUnitsToMMAffineTransform()->GetMatrix().GetVnlMatrix().get_column(1).two_norm();
-  spacing[2] = slicedgeometry->GetUnitsToMMAffineTransform()->GetMatrix().GetVnlMatrix().get_column(2).two_norm();
+  spacing[0] = slicedgeometry->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(0).two_norm();
+  spacing[1] = slicedgeometry->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(1).two_norm();
+  spacing[2] = slicedgeometry->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(2).two_norm();
   mitk::Vector3D readspacing=slicedgeometry->GetSpacing();
   mitk::Vector3D dist = spacing-readspacing;
   if(dist.GetSquaredNorm()>mitk::eps)
@@ -144,6 +144,19 @@ int mitkPicFileReaderTest(int argc, char* argv[])
     return EXIT_FAILURE;
   }
   std::cout<<"[PASSED]"<<std::endl;
+
+  if(picheader->dim==4)
+  {
+    std::cout << "4D dataset: Testing that timebounds are not infinite: ";
+    if((slicedgeometry->GetTimeBoundsInMS()[0] == -mitk::ScalarTypeNumericTraits::max()) && 
+       (slicedgeometry->GetTimeBoundsInMS()[1] ==  mitk::ScalarTypeNumericTraits::max())
+      )
+    {
+      std::cout<<"[FAILED]"<<std::endl;
+      return EXIT_FAILURE;
+    }
+    std::cout<<"[PASSED]"<<std::endl;
+  }
 
   ipPicFree(picheader);
 

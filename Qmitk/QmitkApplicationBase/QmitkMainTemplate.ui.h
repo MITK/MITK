@@ -97,11 +97,11 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
 
     for (unsigned int i = 0 ; i < factory->GetNumberOfOutputs( ); ++i)
     {
-        mitk::DataTreeIterator* it = tree->inorderIterator( );
+        mitk::DataTreePreOrderIterator it(tree);
         mitk::DataTreeNode::Pointer node = factory->GetOutput( i );
         if ( node.IsNotNull( ) )
         {
-            it->add( node );
+            it.Add( node );
             mitk::LevelWindowProperty::Pointer lw = dynamic_cast<mitk::LevelWindowProperty*>(node->GetProperty("levelwindow").GetPointer( ) );
             if ( lw.IsNotNull( ) )
             {
@@ -109,15 +109,13 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
             }
   //          it->removeChild(it->childPosition(node));
         }
-        delete it;
     }
     if (factory->GetOutput()->GetData() != NULL) //assure that we have at least one valid output
     {
-      mitk::DataTreeIterator* it = tree->inorderIterator();
-      mitkMultiWidget->texturizePlaneSubTree( tree->inorderIterator());
+      mitk::DataTreePreOrderIterator it(tree);
+      mitkMultiWidget->texturizePlaneSubTree(&it);
       mitkMultiWidget->updateMitkWidgets();
       mitkMultiWidget->fit();
-      delete it;
     }
   }
   catch ( itk::ExceptionObject & ex )
@@ -158,26 +156,24 @@ void QmitkMainTemplate::fileOpenImageSequence()
 
     for (unsigned int i = 0 ; i < factory->GetNumberOfOutputs( ); ++i)
     {
-      mitk::DataTreeIterator* it = tree->inorderIterator( );
+      mitk::DataTreePreOrderIterator it(tree);
       mitk::DataTreeNode::Pointer node = factory->GetOutput( i );
       if ( node.IsNotNull( ) )
       {
-        it->add( node );
+        it.Add( node );
         mitk::LevelWindowProperty::Pointer lw = dynamic_cast<mitk::LevelWindowProperty*>(node->GetProperty("levelwindow").GetPointer( ) );
         if ( lw.IsNotNull( ) )
         {
           mitkMultiWidget->levelWindowWidget->setLevelWindow( lw->GetLevelWindow() );
         }
       }
-      delete it;
     }
     if (factory->GetOutput()->GetData() != NULL) //assure that we have at least one valid output
     {
-      mitk::DataTreeIterator* it = tree->inorderIterator();
-      mitkMultiWidget->texturizePlaneSubTree(it);
+      mitk::DataTreePreOrderIterator it(tree);
+      mitkMultiWidget->texturizePlaneSubTree(&it);
       mitkMultiWidget->updateMitkWidgets();
       mitkMultiWidget->fit();
-      delete it;
     }
   }
 }
@@ -189,11 +185,10 @@ void QmitkMainTemplate::fileSave()
 
 void QmitkMainTemplate::fileSaveAs()
 {
-  mitk::DataTreeIterator* it=tree->inorderIterator()->clone();
-  while(it->hasNext())
+  mitk::DataTreePreOrderIterator it(tree);
+  while(!it.IsAtEnd())
   {
-    it->next();
-    mitk::DataTreeNode::Pointer node=it->get();
+    mitk::DataTreeNode::Pointer node=it.Get();
     if(node->GetData()!=NULL)
     {
       mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
@@ -237,6 +232,7 @@ void QmitkMainTemplate::fileSaveAs()
         }
       }
     }
+    ++it;
   }
 
 }
@@ -311,7 +307,7 @@ void QmitkMainTemplate::init()
 
   //create the data tree
   tree=mitk::DataTree::New();
-  tree->Register(); //@FIXME: da DataTreeIterator keinen Smartpointer auf DataTree hält, wird tree sonst gelöscht.
+  tree->Register(); //@FIXME: da DataTreeIteratorClone keinen Smartpointer auf DataTree hält, wird tree sonst gelöscht.
 }
 
 /*!
@@ -381,10 +377,9 @@ void QmitkMainTemplate::initialize()
 
     // add the diplayed planes of the multiwidget to a node to which the subtree @a planesSubTree points ...
     
-    mitk::DataTreeIterator* it=tree->inorderIterator();
-    mitkMultiWidget->addPlaneSubTree(it);
-    mitkMultiWidget->setData(it);
-    delete it;
+    mitk::DataTreePreOrderIterator it(tree);
+    mitkMultiWidget->addPlaneSubTree(&it);
+    mitkMultiWidget->setData(&it);
 
     connect(mitkMultiWidget->levelWindowWidget,SIGNAL(levelWindow(mitk::LevelWindow*)),this,SLOT(changeLevelWindow(mitk::LevelWindow*)) );
   }
@@ -465,12 +460,10 @@ void QmitkMainTemplate::parseCommandLine()
 void QmitkMainTemplate::changeLevelWindow(mitk::LevelWindow* lw )
 {
 
-  mitk::DataTreeIterator* it=tree->inorderIterator()->clone();
-  while(it->hasNext())
+  mitk::DataTreePreOrderIterator it(tree);
+  while(!it.IsAtEnd())
   {
-    it->next();
-
-    mitk::LevelWindowProperty::Pointer levWinProp = dynamic_cast<mitk::LevelWindowProperty*>(it->get()->GetPropertyList()->GetProperty("levelwindow").GetPointer());
+    mitk::LevelWindowProperty::Pointer levWinProp = dynamic_cast<mitk::LevelWindowProperty*>(it.Get()->GetPropertyList()->GetProperty("levelwindow").GetPointer());
     if( levWinProp.IsNotNull() )
     {
       mitk::LevelWindow levWin = levWinProp->GetLevelWindow();
@@ -483,8 +476,8 @@ void QmitkMainTemplate::changeLevelWindow(mitk::LevelWindow* lw )
       levWinProp->SetLevelWindow(levWin);
 
     }
+    ++it;
   }
-  delete it;
   mitkMultiWidget->updateMitkWidgets();
 }
 

@@ -32,7 +32,7 @@ public:
   itkNewMacro(Self);
 
   //##ModelId=3E3D28AB0018
-  void SetData(mitk::DataTreeIterator* iterator);
+  void SetData(const mitk::DataTreeIteratorBase* iterator);
 
   virtual void Update(mitk::DataTreeNode* datatreenode);
 

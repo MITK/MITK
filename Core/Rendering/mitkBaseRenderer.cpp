@@ -51,20 +51,18 @@ mitk::BaseRenderer::BaseRenderer() :
 //##ModelId=3E3D2F12008C
 mitk::BaseRenderer::~BaseRenderer()
 {
-  delete m_DataTreeIterator;
+
 }
 
 //##ModelId=3D6A1791038B
-void mitk::BaseRenderer::SetData(mitk::DataTreeIterator* iterator)
+void mitk::BaseRenderer::SetData(const mitk::DataTreeIteratorBase* iterator)
 {
   if(m_DataTreeIterator != iterator)
   {
-    delete m_DataTreeIterator;
-    m_DataTreeIterator = NULL;
-
-    if (iterator != NULL) {
-      m_DataTreeIterator = iterator->clone();
-    }
+    if (iterator != NULL)
+      m_DataTreeIterator = iterator;
+    else
+      m_DataTreeIterator = NULL;
     Modified();
   }
 }
@@ -89,7 +87,7 @@ void mitk::BaseRenderer::Resize(int w, int h)
   m_Size[1] = h;
 
   if(m_CameraController)
-    m_CameraController->Resize(w, h);
+    m_CameraController->Resize(w-8, h-34); //@FIXME CRITICAL workaround for VtkSizeBug
 
   GetDisplayGeometry()->SetSizeInDisplayUnits(w, h);
   //@FIXME: die nächste Zeile ist nur da, weil der Anpassungsvorgang in SetSizeInDisplayUnits leider noch nicht richtig funktioniert.
@@ -174,7 +172,8 @@ void mitk::BaseRenderer::SetWorldGeometry(mitk::Geometry3D* geometry)
     }
     else
     {
-      SetCurrentWorldGeometry2D(dynamic_cast<Geometry2D*>(geometry));
+      Geometry2D* geometry2d=dynamic_cast<Geometry2D*>(geometry);
+      SetCurrentWorldGeometry2D(geometry2d);
       Modified();
     }
   }
@@ -264,7 +263,7 @@ void mitk::BaseRenderer::MousePressEvent(mitk::MouseEvent *me)
   }
   else if(m_MapperID==2)
   {
-    //fix for strange offset in 3D coordinates!
+    //fix for strange offset in 3D coordinates! //@FIXME CRITICAL probably related to VtkSizeBug
     if (me->GetType() == Type_MouseButtonPress)
     {
       Point2D ptest(me->GetDisplayPosition());

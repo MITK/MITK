@@ -32,15 +32,15 @@ int mitkImageMapper2DTest(int argc, char* argv[])
 
   std::cout << "Creating tree: ";
   mitk::DataTree* tree;
-  (tree=mitk::DataTree::New())->Register(); //@FIXME: da DataTreeIterator keinen Smartpointer auf DataTree hält, wird tree sonst gelöscht.
+  (tree=mitk::DataTree::New())->Register(); //@FIXME: da DataTreeIteratorClone keinen Smartpointer auf DataTree hält, wird tree sonst gelöscht.
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "Creating iterator on tree: ";
-  mitk::DataTreeIterator* it = tree->inorderIterator( );
+  mitk::DataTreePreOrderIterator it(tree);
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "Adding node via iterator: ";
-  it->add(node);
+  it.Add(node);
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "Adding level-window property: ";
@@ -59,7 +59,7 @@ int mitkImageMapper2DTest(int argc, char* argv[])
 renderwindow->GetRenderer()->InitSize(400,400); //ohne dies leider kein Bild. Vermutlich noch Problem mit SwapBuffers (aufruf über vtkRenderWindow::Frame())
 
   std::cout << "RenderWindow::SetData(iterator): ";
-  renderwindow->GetRenderer()->SetData(it);
+  renderwindow->GetRenderer()->SetData(&it);
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "RenderWindow::Update(): ";

@@ -30,9 +30,13 @@ class KeyEvent : public BaseEvent
   std::string m_Text;
   int m_Key;
 public:
-  KeyEvent(int type, int key, int ascii, int state, const std::string & text = "", bool autorep = false, unsigned short count = 1, int x=0, int y=0, int globalX=0, int globalY=0 )
-    : BaseEvent(type,state,x,y,globalX,globalY) ,m_Ascii(ascii),m_Text(text),m_Key(key)
+  KeyEvent(int type, int key, int ascii, int state, const char * text = NULL, bool autorep = false, unsigned short count = 1, int x=0, int y=0, int globalX=0, int globalY=0 )
+    : BaseEvent(type,state,x,y,globalX,globalY) ,m_Ascii(ascii),m_Key(key)
   {
+    if(text!=NULL)
+      m_Text = text;
+    else
+      m_Text = "";
   };
   ~KeyEvent()
   {

@@ -95,7 +95,6 @@ void mitk::DopplerToStrainRateFilter::GenerateData()
 
   float alpha;								// the beam-angle, angle betwen current point and beam-point
   float dx, dy;								// projection of this->distance to x- and y-axis
-
   int x1;					// a square, where the velocity v1 lies in
   int y1;					// the points are used for interpolation
 

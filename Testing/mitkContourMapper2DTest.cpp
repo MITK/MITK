@@ -34,15 +34,15 @@ int mitkContourMapper2DTest(int argc, char* argv[])
   std::cout << testContour << std::endl;
   
   mitk::DataTree::Pointer dataTree = mitk::DataTree::New();
-  mitk::DataTreeIterator* it = dataTree->inorderIterator();
+  mitk::DataTreePreOrderIterator it(dataTree);
   
-  it->add( node );
+  it.Add( node );
   
-  mitk::BoundingBox::Pointer bounds = mitk::DataTree::ComputeBoundingBox(it);
+  mitk::BoundingBox::Pointer bounds = mitk::DataTree::ComputeBoundingBox(&it);
   
   std::cout << "bounds: " << bounds << std::endl;
 
-  bounds = mitk::DataTree::ComputeVisibleBoundingBox(it);
+  bounds = mitk::DataTree::ComputeVisibleBoundingBox(&it);
   std::cout << "visible bounds: " << bounds << std::endl;
   
   mitk::OpenGLRenderer::Pointer renderer = mitk::OpenGLRenderer::New();
@@ -52,7 +52,7 @@ int mitkContourMapper2DTest(int argc, char* argv[])
   
   std::cout<<"Testing mitk::BaseRenderer::SetData()"<<std::endl;
   
-  renderer->SetData(it);
+  renderer->SetData(&it);
 
   std::cout<<"testing mitk::OpenGLRenderer::GetRenderWindow()"<<std::endl;
   /*  mitk::RenderWindow* window = renderer->GetRenderWindow();

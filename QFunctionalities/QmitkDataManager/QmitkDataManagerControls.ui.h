@@ -12,11 +12,15 @@
 #include "mitkFocusManager.h"
 #include "mitkPointSetWriter.h"
 
+#include <itksys/SystemTools.hxx>
+
 #include <qfiledialog.h>
+
 #include "ipPic.h"
 #include "ipFunc.h"
 
 void QmitkDataManagerControls::init() { 
+  m_DataTreeIterator = NULL;
   while (m_DataTreeView->columns() > 0 ) {
 	m_DataTreeView->removeColumn(0);
   }
@@ -33,6 +37,11 @@ void QmitkDataManagerControls::init() {
 
     fm->AddObserver(fe,fcc);
   }
+}
+
+void QmitkDataManagerControls::destroy() 
+{
+
 }
 
 // init the combobox with all   
@@ -68,20 +77,21 @@ void QmitkDataManagerControls::UpdateRendererCombo() {
   }
   m_RendererPropertiesView->SetRenderWindow(m_RenderWindowCombo->currentText()); 
 }
-void QmitkDataManagerControls::SetDataTreeIterator(mitk::DataTreeIterator * it)
+void QmitkDataManagerControls::SetDataTreeIterator(mitk::DataTreeIteratorBase* it)
 {
+    if (it == NULL) return;
+
     while (m_DataTreeView->firstChild()) {
 	    delete m_DataTreeView->firstChild();
      }
-    m_DataTreeIterator = it->clone();
-    mitk::DataTreeIterator* tempIt = m_DataTreeIterator->clone();
+    m_DataTreeIterator = it;
+    mitk::DataTreeIteratorClone tempIt = m_DataTreeIterator;
 
-  if (tempIt->hasNext()) 
+  if (!tempIt->IsAtEnd()) 
   {
-    tempIt->next();
-    QmitkDataTreeViewItem * rootItem = new QmitkDataTreeViewItem(m_DataTreeView, "Loaded Data", "root", tempIt->clone());
+    QmitkDataTreeViewItem * rootItem = new QmitkDataTreeViewItem(m_DataTreeView, "Loaded Data", "root", tempIt.GetPointer());
+    ++tempIt;
   }
-  delete tempIt;
   UpdateRendererCombo();
 }
 
@@ -90,9 +100,9 @@ void QmitkDataManagerControls::RemoveButtonClicked()
   QmitkDataTreeViewItem *selected = dynamic_cast<QmitkDataTreeViewItem*>(m_DataTreeView->selectedItem());
   if (selected == NULL) {
   } else {
-    mitk::DataTreeIterator* selectedIterator = selected->GetDataTreeIterator();
+    mitk::DataTreeIteratorBase* selectedIterator = selected->GetDataTreeIterator();
     assert(selectedIterator != NULL);
-    selectedIterator->remove();
+    selectedIterator->Remove();
     delete selected;
   } 
 }
@@ -102,13 +112,13 @@ void QmitkDataManagerControls::SaveButton_clicked()
 {
   QmitkDataTreeViewItem *selected = dynamic_cast<QmitkDataTreeViewItem*>(m_DataTreeView->selectedItem());
   if (selected != NULL) {
-    std::string m_SelectedItemsName = std::string(selected->text(0).ascii());
+    std::string selectedItemsName = std::string(selected->text(0).ascii());
   
-    mitk::DataTreeIterator* selectedIterator = selected->GetDataTreeIterator();
-//    mitk::DataTreeIterator* selectedIterator = ((mitk::DataTree *) m_DataTreeIterator->getTree())->GetNext("name", new mitk::StringProperty( m_SelectedItemsName  ));
+    mitk::DataTreeIteratorBase* selectedIterator = selected->GetDataTreeIterator();
+//    mitk::DataTreeIteratorBase* selectedIterator = ((mitk::DataTree *) m_DataTreeIterator->getTree())->GetNext("name", new mitk::StringProperty( selectedItemsName  ));
     if (selectedIterator != NULL)
     {
-      mitk::DataTreeNode* node = selectedIterator->get();
+      mitk::DataTreeNode* node = selectedIterator->Get();
       std::cout << "2" << std::endl;
       if (node != NULL ){
         mitk::BaseData::Pointer data=node->GetData();
@@ -118,27 +128,30 @@ void QmitkDataManagerControls::SaveButton_clicked()
           mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(data.GetPointer());
           if(image.IsNotNull())
           {
+            selectedItemsName = itksys::SystemTools::GetFilenameWithoutExtension(selectedItemsName);
+            selectedItemsName += ".pic";
+
             ipPicDescriptor * picImage = image->GetPic();
 
             picImage = ipFuncRefl(picImage,3);
 
-            QString fileName = QFileDialog::getSaveFileName(QString(m_SelectedItemsName),"DKFZ Pic (*.seq *.pic *.pic.gz *.seq.gz *.dcm)");
-            if (fileName == NULL ) 
+            QString fileName = QFileDialog::getSaveFileName(QString(selectedItemsName),"DKFZ Pic (*.seq *.pic *.pic.gz *.seq.gz *.dcm)");
+            if (fileName != NULL ) 
             {
-              fileName = QString(m_SelectedItemsName.c_str());
+              ipPicPut((char *)fileName.ascii(), picImage);
             }
-
-            ipPicPut((char *)fileName.ascii(), picImage);
           }
           mitk::PointSet::Pointer pointset = dynamic_cast<mitk::PointSet*>(data.GetPointer());
           if(pointset.IsNotNull())
           {
-            QString fileName = QFileDialog::getSaveFileName(QString(m_SelectedItemsName),"DKFZ PointSetFile (.mps)");
+            selectedItemsName = itksys::SystemTools::GetFilenameWithoutExtension(selectedItemsName);
+            selectedItemsName += ".mps";
+            QString fileName = QFileDialog::getSaveFileName(QString(selectedItemsName),"MITK Point-Sets (*.mps)");
             if (fileName != NULL ) 
             {
               mitk::PointSetWriter::Pointer writer = mitk::PointSetWriter::New();
               writer->SetInput( pointset );
-              writer->SetFileName( fileName.latin1() );
+              writer->SetFileName( fileName.ascii() );
               writer->Update();
             }
           }

@@ -43,21 +43,30 @@ int mitk::PointSet::SearchPoint(Point3D point, float distance )
   unsigned int i;
   PointsContainer::Iterator it, end;
   end = m_ItkData->GetPoints()->End();
- 	for (it = m_ItkData->GetPoints()->Begin(), i=0; it != end; it++, i++)
+  int bestIndex=-1;
+  ScalarType bestDist=distance;
+  ScalarType dist, tmp;
+  distance = distance*distance;
+ 	for (it = m_ItkData->GetPoints()->Begin(), i=0; it != end; ++it, ++i)
 	{
     bool ok = m_ItkData->GetPoints()->GetElementIfIndexExists(it->Index(), &out);
     if (!ok)
       return -1;
-    else if (point == out)//if totaly equal
+    else 
+    if (point == out)//if totaly equal
       return it->Index();
 
     //distance calculation
-		if ( ( point[0] >= ( out[0] - distance ) ) && ( point[0] <= ( out[0] + distance ) ) &&
-			 ( point[1] >= ( out[1] - distance ) ) && ( point[1] <= ( out[1] + distance ) ) &&
-			 ( point[2] >= ( out[2] - distance ) ) && ( point[2] <= ( out[2] + distance ) ) )
-      return it->Index();
+    tmp=out[0]-point[0]; dist  = tmp*tmp;
+    tmp=out[1]-point[1]; dist += tmp*tmp;
+    tmp=out[2]-point[2]; dist += tmp*tmp;
+    if(dist<bestDist)
+    {
+      bestIndex = it->Index();
+      bestDist  = dist;
+    }
 	}
-	return -1;
+	return bestIndex;
 }
 
 //##ModelId=3F0177E901CE

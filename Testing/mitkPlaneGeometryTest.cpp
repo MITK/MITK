@@ -185,7 +185,7 @@ int mitkPlaneGeometryTest(int argc, char* argv[])
   std::cout << "Changing the UnitsToMMTransform to a rotated version by SetUnitsToMMTransform() (keep origin): "<<std::endl;
   mitk::AffineTransform3D::Pointer transform = mitk::AffineTransform3D::New();
   mitk::AffineTransform3D::MatrixType::InternalMatrixType vnlmatrix;
-  vnlmatrix = planegeometry->GetUnitsToMMAffineTransform()->GetMatrix().GetVnlMatrix();
+  vnlmatrix = planegeometry->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix();
   mitk::VnlVector axis(3);
   mitk::FillVector3D(axis, 1.0, 1.0, 1.0); axis.normalize();
   vnl_quaternion<mitk::ScalarType> rotation(axis, 0.123);
@@ -193,14 +193,14 @@ int mitkPlaneGeometryTest(int argc, char* argv[])
   mitk::Matrix3D matrix;
   matrix = vnlmatrix;
   transform->SetMatrix(matrix);
-  transform->SetOffset(planegeometry->GetUnitsToMMAffineTransform()->GetOffset());
+  transform->SetOffset(planegeometry->GetIndexToWorldTransform()->GetOffset());
   
   right.Set_vnl_vector( rotation.rotation_matrix_transpose()*right.Get_vnl_vector() );
   bottom.Set_vnl_vector(rotation.rotation_matrix_transpose()*bottom.Get_vnl_vector());
   normal.Set_vnl_vector(rotation.rotation_matrix_transpose()*normal.Get_vnl_vector());
-  planegeometry->SetUnitsToMMAffineTransform(transform);
+  planegeometry->SetIndexToWorldTransform(transform);
 
-  std::cout << "Testing whether SetUnitsToMMAffineTransform kept origin: ";
+  std::cout << "Testing whether SetIndexToWorldTransform kept origin: ";
   if(mitk::Equal(planegeometry->GetOrigin(), origin)==false)
   {
     std::cout<<"[FAILED]"<<std::endl;

@@ -81,8 +81,6 @@ mitk::Geometry2DDataVtkMapper3D::Geometry2DDataVtkMapper3D() : m_DataTreeIterato
 //##ModelId=3E691E090394
 mitk::Geometry2DDataVtkMapper3D::~Geometry2DDataVtkMapper3D()
 {
-  delete m_DataTreeIterator;
-
   m_VtkPlaneSource->Delete();
   m_VtkPolyDataMapper->Delete();
   m_Actor->Delete();
@@ -120,10 +118,13 @@ void mitk::Geometry2DDataVtkMapper3D::GenerateData()
 }
 
 //##ModelId=3E6E874F0007
-void mitk::Geometry2DDataVtkMapper3D::SetDataIteratorForTexture(mitk::DataTreeIterator* iterator)
+void mitk::Geometry2DDataVtkMapper3D::SetDataIteratorForTexture(const mitk::DataTreeIteratorBase* iterator)
 {
-  delete m_DataTreeIterator;
-  m_DataTreeIterator = iterator->clone();
+  if(m_DataTreeIterator != iterator)
+  {
+    m_DataTreeIterator = iterator;
+    Modified();
+  }
 }
 
 //##ModelId=3EF19F850151
@@ -164,13 +165,12 @@ void mitk::Geometry2DDataVtkMapper3D::Update(mitk::BaseRenderer* renderer)
     surfaceCreator->Update(); //@FIXME ohne das crash
     m_VtkPolyDataMapper->SetInput(surfaceCreator->GetOutput()->GetVtkPolyData());
 
-    if(m_DataTreeIterator)
+    if(m_DataTreeIterator.IsNotNull())
     {
-      mitk::DataTreeIterator* it=m_DataTreeIterator->clone();
-      while(it->hasNext())
+      mitk::DataTreeIteratorClone it=m_DataTreeIterator.GetPointer();
+      while(!it->IsAtEnd())
       {
-        it->next();
-        mitk::DataTreeNode* node=it->get();
+        mitk::DataTreeNode* node=it->Get();
         mitk::Mapper::Pointer mapper = node->GetMapper(1);
         mitk::ImageMapper2D* imagemapper = dynamic_cast<ImageMapper2D*>(mapper.GetPointer());
 
@@ -220,6 +220,7 @@ void mitk::Geometry2DDataVtkMapper3D::Update(mitk::BaseRenderer* renderer)
             }
           }
         }
+        ++it;
       }
     }
 

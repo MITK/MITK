@@ -197,7 +197,6 @@ void mitk::ImageMapper2D::GenerateData(mitk::BaseRenderer *renderer)
     vtkImageData* inputData = input->GetVtkImageData(timestep);
     float spacing[3];
     inputData->GetSpacing(spacing);
-    inputData->SetSpacing(1,1,1);
 
     //how many pixels we really want to sample: width x height pixels
     mitk::ScalarType width, height;
@@ -226,6 +225,7 @@ void mitk::ImageMapper2D::GenerateData(mitk::BaseRenderer *renderer)
            
       vtkLinearTransform * inversetransform = vtktransform->GetLinearInverse();
       m_Reslicer->SetResliceTransform(inversetransform); 
+      inputData->SetSpacing(1,1,1); //spacing already included in transform!
     }
     else
     if(dynamic_cast<const VtkAbstractTransformGeometry *>(worldgeometry)!=NULL)

@@ -86,15 +86,16 @@ void mitk::PointSetMapper2D::Paint(mitk::BaseRenderer * renderer)
 
           displayGeometry->Project(p, projected_p);
           Vector3D diff=p-projected_p;
-          if(diff.GetSquaredNorm()<4.0)
+          ScalarType scalardiff = diff.GetSquaredNorm();
+          if(scalardiff<4.0)
           {
               Point2D pt2d, tmp;
               displayGeometry->Map(projected_p, pt2d);
               displayGeometry->MMToDisplay(pt2d, pt2d);
 
               Vector2D horz,vert;
-              horz[0]=8; horz[1]=0;
-              vert[0]=0; vert[1]=8;
+              horz[0]=8.0-scalardiff*2; horz[1]=0;
+              vert[0]=0;                vert[1]=8.0-scalardiff*2;
                               
 							// now paint text if available
               glRasterPos2f ( pt2d[0] + 5, pt2d[1] + 5);

@@ -36,14 +36,14 @@ public:
   //##ModelId=3D6A1791038B
   //##Documentation
   //## @brief @a iterator defines which part of the data tree is traversed for renderering.
-  virtual void SetData(mitk::DataTreeIterator* iterator);
+  virtual void SetData(const mitk::DataTreeIteratorBase* iterator);
 
   //##ModelId=3E6423D20245
   //##Documentation
-  //## @brief Get the DataTreeIterator defining which part of the data tree is traversed for renderering.
-  virtual mitk::DataTreeIterator* GetData() const
+  //## @brief Get the DataTreeIteratorClone defining which part of the data tree is traversed for renderering.
+  virtual mitk::DataTreeIteratorBase* GetData() const
   {
-    return m_DataTreeIterator;
+    return m_DataTreeIterator.GetPointer();
   };
   //##ModelId=3E6423D20264
   //##Documentation
@@ -247,8 +247,8 @@ protected:
 
   //##ModelId=3E330D6902E8
   //##Documentation
-  //## @brief The DataTreeIterator defining which part of the data tree is traversed for renderering.
-  mitk::DataTreeIterator* m_DataTreeIterator;
+  //## @brief The DataTreeIteratorClone defining which part of the data tree is traversed for renderering.
+  mitk::DataTreeIteratorClone m_DataTreeIterator;
 
   //##ModelId=3E3D1FCA0272
   //##Documentation

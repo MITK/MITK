@@ -8,6 +8,7 @@
 #include <mitkLightBoxImageReader.h>
 #include "SampleApp.h"
 #include "QcMITKSamplePlugin.h"
+#include "mitkProperties.h"
 #include "mitkLevelWindowProperty.h"
 
 #include <qlabel.h>
@@ -79,14 +80,6 @@ void QcMITKSamplePlugin::selectSerie (QcLightbox* lightbox)
   
   mitk::Image::Pointer image = mitk::Image::New();
   
-  //Variante 1
-  //ipPicDescriptor* pic;
-  //pic=lightbox->fetchVolume();
-
-  //image->Initialize(pic);
-  //image->SetPicVolume(pic);
-
-  //Variante 2
   mitk::LightBoxImageReader::Pointer reader=mitk::LightBoxImageReader::New();
   reader->SetLightBox(lightbox);
   
@@ -94,62 +87,22 @@ void QcMITKSamplePlugin::selectSerie (QcLightbox* lightbox)
   image->Update();
   mitk::DataTree::Pointer tree = ap->GetTree();
   
-  mitk::DataTreeIterator* it = tree->inorderIterator();
+  mitk::DataTreePreOrderIterator it(tree);
 
   mitk::DataTreeNode::Pointer node = mitk::DataTreeNode::New();
 
   node->SetData(image);
 
-  it->add(node);
+  it.Add(node);
 
   mitk::LevelWindowProperty::Pointer levWinProp = new mitk::LevelWindowProperty();
   mitk::LevelWindow levelwindow;
   levelwindow.SetAuto( reader->GetOutput()->GetPic() );
   levWinProp->SetLevelWindow( levelwindow );
   node->GetPropertyList()->SetProperty( "levelwindow", levWinProp );
+  node->SetProperty( "volumerendering", new mitk::BoolProperty( false ) );
 
-
-  ap->getMultiWidget()->texturizePlaneSubTree( tree->inorderIterator());
+  ap->getMultiWidget()->texturizePlaneSubTree(&it);
   ap->getMultiWidget()->updateMitkWidgets();
   ap->getMultiWidget()->fit();
-  
-
 }
-
-/*
-  
-  ipPicDescriptor* pic;
-  
-  QcLightbox* lightbox;
-  
-  mitk::LightBoxImageReader::Pointer reader=mitk::LightBoxImageReader::New();
-  reader->SetLightBox(
-
-
-  connect(lightbox,lightboxReloadPics(lightbox),this,SLOT(
-  
-  pic= von der qclightbox
-  
-  mitk::Image::Pointer image = mitk::Image::New();
-  
-  image->Initialize(pic);
-  image->SetPicVolume(pic);
-
-  mitk::DataTree::Pointer tree = ap->GetTree();
-  
-  mitk::DataTreeIterator* it = tree->inorderIterator();
-
-  mitk::DataTreeNode::Pointer node = mitk::DataTreeNode::New();
-
-  node->SetData(image);
-
-  it->add(node);
-
-
-
-  ap->getMultiWidget()->texturizePlaneSubTree( tree->inorderIterator());
-  ap->getMultiWidget()->updateMitkWidgets();
-  ap->getMultiWidget()->fit();
-
-
-*/

@@ -89,7 +89,7 @@ GetAxisVector(direction).GetNorm() ==GetExtentInMM(direction)
   std::cout << "Changing the UnitsToMMTransform to a rotated version by SetUnitsToMMTransform(): ";
   mitk::AffineTransform3D::Pointer transform = mitk::AffineTransform3D::New();
   mitk::AffineTransform3D::MatrixType::InternalMatrixType vnlmatrix;
-  vnlmatrix = planegeometry->GetUnitsToMMAffineTransform()->GetMatrix().GetVnlMatrix();
+  vnlmatrix = planegeometry->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix();
   mitk::VnlVector axis(3);
   mitk::FillVector3D(axis, 1.0, 1.0, 1.0); axis.normalize();
   vnl_quaternion<mitk::ScalarType> rotation(axis, 0.123);
@@ -97,12 +97,12 @@ GetAxisVector(direction).GetNorm() ==GetExtentInMM(direction)
   mitk::Matrix3D matrix;
   matrix = vnlmatrix;
   transform->SetMatrix(matrix);
-  transform->SetOffset(planegeometry->GetUnitsToMMAffineTransform()->GetOffset());
+  transform->SetOffset(planegeometry->GetIndexToWorldTransform()->GetOffset());
   
   right.Set_vnl_vector( rotation.rotation_matrix_transpose()*right.Get_vnl_vector() );
   bottom.Set_vnl_vector(rotation.rotation_matrix_transpose()*bottom.Get_vnl_vector());
   normal.Set_vnl_vector(rotation.rotation_matrix_transpose()*normal.Get_vnl_vector());
-  planegeometry->SetUnitsToMMAffineTransform(transform);
+  planegeometry->SetIndexToWorldTransform(transform);
 
   std::cout << "Testing width, height and thickness (in mm) of rotated version: ";
   if((planegeometry->GetExtentInMM(0) != widthInMM) || (planegeometry->GetExtentInMM(1) != heightInMM) || (planegeometry->GetExtentInMM(2) != thicknessInMM))

@@ -39,7 +39,7 @@ int main(int argc, char **argv) {
   if (factory->GetNumberOfOutputs() > 1) {
     fl_alert("WARNING: More than one image in file. Only showing first one."); 
   }
-  mitk::DataTreeIterator* it = tree->inorderIterator( );
+  mitk::DataTreeIteratorBase* it = tree->inorderIterator( );
   mitk::DataTreeNode::Pointer node = factory->GetOutput( 0 );
   assert(node.IsNotNull());
   {

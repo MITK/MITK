@@ -114,9 +114,9 @@ void mitk::TimeSlicedGeometry::InitializeEvenlyTimed(mitk::Geometry3D* geometry3
   Initialize(timeSteps);
 
   AffineTransform3D::Pointer transform = AffineTransform3D::New();
-  transform->SetMatrix(geometry3D->GetUnitsToMMAffineTransform()->GetMatrix());
-  transform->SetOffset(geometry3D->GetUnitsToMMAffineTransform()->GetOffset());
-  SetUnitsToMMAffineTransform(transform);
+  transform->SetMatrix(geometry3D->GetIndexToWorldTransform()->GetMatrix());
+  transform->SetOffset(geometry3D->GetIndexToWorldTransform()->GetOffset());
+  SetIndexToWorldTransform(transform);
 
   SetBounds(geometry3D->GetBounds());
   SetGeometry3D(geometry3D, 0);

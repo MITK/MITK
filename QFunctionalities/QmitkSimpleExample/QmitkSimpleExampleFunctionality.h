@@ -11,12 +11,10 @@
 #include <mitkOperationActor.h>
 
 #include <mitkProperties.h>
-#include <mitkLookupTableProperty.h>
-#include <mitkSliceNavigationController.h>
-#include <mitkMultiplexUpdateController.h>
 
 class QmitkStdMultiWidget;
 class QmitkSimpleExampleControls;
+namespace mitk { class DisplayInteractor; }
 
 /*!\class
 \brief MITK example demonstrating how a new application functionality can be implemented
@@ -26,7 +24,7 @@ and createAction(..) from QmitkFunctionality. A QmitkFctMediator object gets pas
 functionality and positions the widgets in the application window controlled by a 
 layout template.
 */
-class QmitkSimpleExampleFunctionality : public QmitkFunctionality, public mitk::OperationActor, public mitk::DataTreeBaseTreeChangeListener
+class QmitkSimpleExampleFunctionality : public QmitkFunctionality
 {
   Q_OBJECT
 public:
@@ -34,7 +32,7 @@ public:
   /*!
   \brief default constructor
   */
-  QmitkSimpleExampleFunctionality(QObject *parent=0, const char *name=0, QmitkStdMultiWidget *mitkStdMultiWidget = NULL, mitk::DataTreeIterator * dataIt = NULL);
+  QmitkSimpleExampleFunctionality(QObject *parent=0, const char *name=0, QmitkStdMultiWidget *mitkStdMultiWidget = NULL, mitk::DataTreeIteratorBase* dataIt = NULL);
 
   /*!
   \brief default destructor
@@ -63,19 +61,6 @@ public:
   */
   virtual QAction * createAction(QActionGroup *parent);
 
-  /*! 
-  * \brief returns the name of this functionality object
-  */
-  virtual QString getFunctionalityName();
-
-  //##Documentation
-  //## \brief Implementation of OperationActor-method. Used for scrolling
-  //## through the slices by clicking into the images.
-  //## 
-  //## mitk::Operation is expected to be an mitk::PointOperation. 
-  //## The slices of widgets 1,2,3 are moved so that the seed point is on them.
-  virtual void ExecuteOperation(mitk::Operation* operation);
-
   virtual void activated();
 
 protected slots:
@@ -84,7 +69,7 @@ protected slots:
   */
   void stereoSelectionChanged(int id);
 
-  void treeChanged(mitk::DataTreeIterator& itpos);
+  void treeChanged();
 
   void initNavigators();
 protected:
@@ -100,14 +85,7 @@ protected:
   */
   QmitkSimpleExampleControls * controls;
 
-  mitk::LookupTableProperty::Pointer lookupTableProp;
-
-  mitk::SliceNavigationController::Pointer sliceNavigatorTransversal;
-  mitk::SliceNavigationController::Pointer sliceNavigatorFrontal;
-  mitk::SliceNavigationController::Pointer sliceNavigatorSagittal;
-  mitk::SliceNavigationController::Pointer sliceNavigatorTime;
-
-  mitk::MultiplexUpdateController::Pointer multiplexUpdateController;
+  mitk::DisplayInteractor* moveNzoom;
 
   bool m_NavigatorsInitialized;
 };

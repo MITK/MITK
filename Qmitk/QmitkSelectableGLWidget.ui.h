@@ -9,9 +9,11 @@
 
 void QmitkSelectableGLWidget::init()
 {
-    QHBoxLayout *hlayout;
-    hlayout=new QHBoxLayout(container);
-    
+    QLayout *hlayout;
+    hlayout=layout();
+    hlayout->setMargin(2);
+    hlayout->setAutoAdd(true);
+
     // create Renderer
     renderer=mitk::OpenGLRenderer::New();
     
@@ -21,18 +23,37 @@ void QmitkSelectableGLWidget::init()
         composedName+=name();
     else
         composedName+="QmitkGLWidget";
-    QWidget *mitkWidget = new mitk::QmitkRenderWindow(renderer, container, composedName);
-    hlayout->addWidget(mitkWidget);
+    mitkWidget = new mitk::QmitkRenderWindow(renderer, this, composedName);
+    
+    //initialize SliceNavigationController
+    sliceNavigationController = new mitk::SliceNavigationController("navigation");
+    sliceNavigationController->ConnectGeometrySliceEvent(renderer.GetPointer());
 }
 
 
-mitk::OpenGLRenderer::Pointer QmitkSelectableGLWidget::GetRenderer()
+mitk::OpenGLRenderer* QmitkSelectableGLWidget::GetRenderer()
 {
-    return renderer;
+    return renderer.GetPointer();
 }
 
 
-QFrame* QmitkSelectableGLWidget::GetSelectionFrame()
+
+QWidget* QmitkSelectableGLWidget::GetQRenderWindow()
 {
-    return SelectionFrame;
+    return mitkWidget;
+}
+
+
+mitk::SliceNavigationController* QmitkSelectableGLWidget::GetSliceNavigationController()
+{
+    return sliceNavigationController.GetPointer();
+}
+
+
+void QmitkSelectableGLWidget::wheelEvent( QWheelEvent * e )
+{
+  if (e->orientation() * e->delta()  > 0) 
+      sliceNavigationController->GetSlice()->Next();
+  else
+      sliceNavigationController->GetSlice()->Previous();
 }

@@ -224,7 +224,14 @@ QWidget * QmitkFctMediator::getDefaultMain()
 void QmitkFctMediator::selecting(int id)
 {
 	if(id!=m_CurrentFunctionality)
+  {    
 		qfl.at(m_CurrentFunctionality)->deactivated();
+    if(qfl.at(m_CurrentFunctionality)->m_Activated)
+    {
+      itkGenericOutputMacro(<<"Method deactivated() of functionality '"<<qfl.at(m_CurrentFunctionality)->getFunctionalityName().latin1()<< "' did not call QmitkFunctionality::deactivated().");
+      qfl.at(m_CurrentFunctionality)->m_Activated = false;
+    }
+  }
 }
 
 void QmitkFctMediator::functionalitySelected(int id)
@@ -232,6 +239,11 @@ void QmitkFctMediator::functionalitySelected(int id)
     if(id==0) return;
 	m_CurrentFunctionality=id-1; //kommt von m_MainStack und der hat einen Eintrag mehr (wg. m_DefaultMain)
 	qfl.at(m_CurrentFunctionality)->activated();		
+  if(qfl.at(m_CurrentFunctionality)->m_Activated==false)
+  {
+    itkGenericOutputMacro(<<"Method activated() of functionality '"<<qfl.at(m_CurrentFunctionality)->getFunctionalityName().latin1()<< "' did not call QmitkFunctionality::activated(). treeChanged() will not work!!");
+    qfl.at(m_CurrentFunctionality)->m_Activated = true;
+  }
 }
 
 QmitkFunctionality* QmitkFctMediator::getFunctionalityByName(const char *name)

@@ -716,7 +716,7 @@
     <slot>FullScreenMode( bool fullscreen )</slot>
 </slots>
 <functions>
-    <function access="protected">fileOpen( const char * fileName )</function>
+    <function>fileOpen( const char * fileName )</function>
     <function access="private" specifier="non virtual">init()</function>
     <function>initialize()</function>
     <function>initializeFunctionality()</function>

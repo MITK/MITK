@@ -28,11 +28,11 @@ void mitk::PlaneGeometry::EnsurePerpendicularNormal(mitk::AffineTransform3D* tra
   transform->SetMatrix(matrix);
 }
 
-void mitk::PlaneGeometry::SetUnitsToMMAffineTransform(mitk::AffineTransform3D* transform)
+void mitk::PlaneGeometry::SetIndexToWorldTransform(mitk::AffineTransform3D* transform)
 {
   EnsurePerpendicularNormal(transform);
 
-  Superclass::SetUnitsToMMAffineTransform(transform);
+  Superclass::SetIndexToWorldTransform(transform);
 
   m_Origin = transform->GetOffset().Get_vnl_vector().data_block();
 }
@@ -239,7 +239,7 @@ void mitk::PlaneGeometry::InitializeStandardPlane(const mitk::Geometry3D* geomet
       itkExceptionMacro("unknown PlaneOrientation");
   }
 
-  InitializeStandardPlane(width, height, geometry3D->GetUnitsToMMAffineTransform(), planeorientation, zPosition, frontside);
+  InitializeStandardPlane(width, height, geometry3D->GetIndexToWorldTransform(), planeorientation, zPosition, frontside);
 
   ScalarType bounds[6]={0, widthInMM, 0, heightInMM, 0, 1};
   SetBounds(bounds);
@@ -248,7 +248,7 @@ void mitk::PlaneGeometry::InitializeStandardPlane(const mitk::Geometry3D* geomet
   SetExtentInMM(1, heightInMM);
 
   mitk::Point3D  origin; 
-  originVector = geometry3D->GetUnitsToMMAffineTransform()->TransformVector(originVector);
+  originVector = geometry3D->GetIndexToWorldTransform()->TransformVector(originVector);
   origin = GetOrigin()+originVector;
   SetOrigin(origin);
 }
@@ -286,7 +286,7 @@ void mitk::PlaneGeometry::InitializeStandardPlane(const VnlVector& rightVector, 
   transform->SetOffset(const_cast<Point3D&>(m_Origin).Get_vnl_vector().data_block());
   ScalarType bounds[6]={0, width, 0, height, 0, 1};
   SetBounds(bounds);
-  SetUnitsToMMAffineTransform(transform);
+  SetIndexToWorldTransform(transform);
 }
 
 mitk::AffineGeometryFrame3D::Pointer mitk::PlaneGeometry::Clone() const

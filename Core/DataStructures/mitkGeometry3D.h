@@ -80,7 +80,7 @@ public:
     return bounds[direction*2+1]-bounds[direction*2];
   }
 
-  virtual void SetUnitsToMMAffineTransform(mitk::AffineTransform3D* transform);
+  virtual void SetIndexToWorldTransform(mitk::AffineTransform3D* transform);
 
   itkGetConstReferenceMacro(TimeBoundsInMS, TimeBounds);
   virtual void SetTimeBoundsInMS(const TimeBounds& timebounds);
@@ -104,7 +104,7 @@ public:
       default: assert(id < 8);
     }
 
-    return m_UnitsToMMAffineTransform->TransformPoint(cornerpoint);
+    return m_IndexToWorldTransform->TransformPoint(cornerpoint);
   }
 
   Point3D GetCornerPoint(bool xFront=true, bool yFront=true, bool zFront=true) const
@@ -117,13 +117,13 @@ public:
     cornerpoint[1] = (yFront ? bounds[2] : bounds[3]);
     cornerpoint[2] = (zFront ? bounds[4] : bounds[5]);
 
-    return m_UnitsToMMAffineTransform->TransformPoint(cornerpoint);
+    return m_IndexToWorldTransform->TransformPoint(cornerpoint);
   }
 
   Vector3D GetAxisVector(int direction) const
   {
     Vector3D frontToBack;
-    frontToBack.Set_vnl_vector(m_UnitsToMMAffineTransform->GetMatrix().GetVnlMatrix().get_column(direction));
+    frontToBack.Set_vnl_vector(m_IndexToWorldTransform->GetMatrix().GetVnlMatrix().get_column(direction));
     frontToBack *= GetExtent(direction);
     return frontToBack;
   }
@@ -133,7 +133,7 @@ public:
   //##
   ScalarType GetExtentInMM(int direction) const
   {
-    return m_UnitsToMMAffineTransform->GetMatrix().GetVnlMatrix().get_column(direction).magnitude()*GetExtent(direction); //
+    return m_IndexToWorldTransform->GetMatrix().GetVnlMatrix().get_column(direction).magnitude()*GetExtent(direction); //
   }
 
   //##Documentation
@@ -146,14 +146,14 @@ public:
     if(fabs(len - extentInMM)>=mitk::epsSquared)
     {
       AffineTransform3D::MatrixType::InternalMatrixType vnlmatrix;
-      vnlmatrix = m_UnitsToMMAffineTransform->GetMatrix().GetVnlMatrix();
+      vnlmatrix = m_IndexToWorldTransform->GetMatrix().GetVnlMatrix();
       if(len>extentInMM)
         vnlmatrix.set_column(direction, vnlmatrix.get_column(direction)/len*extentInMM);
       else
         vnlmatrix.set_column(direction, vnlmatrix.get_column(direction)*extentInMM/len);
       Matrix3D matrix;
       matrix = vnlmatrix;
-      m_UnitsToMMAffineTransform->SetMatrix(matrix);
+      m_IndexToWorldTransform->SetMatrix(matrix);
       Modified();
     }
   }
@@ -219,7 +219,7 @@ protected:
 
   mutable mitk::TimeBounds m_TimeBoundsInMS;
 
-  vtkTransform* m_VtkUnitsToMMAffineTransform;
+  vtkTransform* m_VtkIndexToWorldTransform;
   
   mitk::Transform3D::Pointer m_ParametricTransform;
 };

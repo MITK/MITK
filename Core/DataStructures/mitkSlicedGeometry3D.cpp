@@ -143,21 +143,21 @@ void mitk::SlicedGeometry3D::InitializeEvenlySpaced(mitk::Geometry2D* geometry2D
     //because it may not be changed by us. But we know that SetSpacing creates a new transform without changing
     //the old (coming from geometry2D), so we can use the fifth line instead. We check this at (**).
     //AffineTransform3D::Pointer transform = AffineTransform3D::New();
-    //transform->SetMatrix(geometry2D->GetUnitsToMMAffineTransform()->GetMatrix());
-    //transform->SetOffset(geometry2D->GetUnitsToMMAffineTransform()->GetOffset());
-    //SetUnitsToMMAffineTransform(transform);
-    m_UnitsToMMAffineTransform = const_cast<AffineTransform3D*>(geometry2D->GetUnitsToMMAffineTransform());
+    //transform->SetMatrix(geometry2D->GetIndexToWorldTransform()->GetMatrix());
+    //transform->SetOffset(geometry2D->GetIndexToWorldTransform()->GetOffset());
+    //SetIndexToWorldTransform(transform);
+    m_IndexToWorldTransform = const_cast<AffineTransform3D*>(geometry2D->GetIndexToWorldTransform());
   }
   else
   {
     directionVector *= -1.0;
-    m_UnitsToMMAffineTransform = AffineTransform3D::New();
-    m_UnitsToMMAffineTransform->SetMatrix(geometry2D->GetUnitsToMMAffineTransform()->GetMatrix());
+    m_IndexToWorldTransform = AffineTransform3D::New();
+    m_IndexToWorldTransform->SetMatrix(geometry2D->GetIndexToWorldTransform()->GetMatrix());
 
     AffineTransform3D::OutputVectorType scaleVector;
     FillVector3D(scaleVector, 1.0, 1.0, -1.0);
-    m_UnitsToMMAffineTransform->Scale(scaleVector, true);
-    m_UnitsToMMAffineTransform->SetOffset(geometry2D->GetUnitsToMMAffineTransform()->GetOffset());
+    m_IndexToWorldTransform->Scale(scaleVector, true);
+    m_IndexToWorldTransform->SetOffset(geometry2D->GetIndexToWorldTransform()->GetOffset());
   }
 
   mitk::Vector3D spacing;
@@ -169,13 +169,13 @@ void mitk::SlicedGeometry3D::InitializeEvenlySpaced(mitk::Geometry2D* geometry2D
   SetSpacing(spacing);
   SetEvenlySpaced();
 
-  assert(m_UnitsToMMAffineTransform.GetPointer() != geometry2D->GetUnitsToMMAffineTransform()); // (**) see above.
+  assert(m_IndexToWorldTransform.GetPointer() != geometry2D->GetIndexToWorldTransform()); // (**) see above.
 
   geometry2D->UnRegister();
 }
 
   //mitk::Vector3D oldspacing;
-  //const AffineTransform3D::MatrixType::InternalMatrixType & vnlmatrix = m_UnitsToMMAffineTransform->GetMatrix().GetVnlMatrix();
+  //const AffineTransform3D::MatrixType::InternalMatrixType & vnlmatrix = m_IndexToWorldTransform->GetMatrix().GetVnlMatrix();
   //oldspacing[0] = vnlmatrix.get_column(0).two_norm();
   //oldspacing[1] = vnlmatrix.get_column(1).two_norm();
   //oldspacing[2] = vnlmatrix.get_column(2).two_norm();
@@ -192,8 +192,8 @@ void mitk::SlicedGeometry3D::InitializeEvenlySpaced(mitk::Geometry2D* geometry2D
   //  AffineTransform3D::MatrixType newmatrix;
   //  newmatrix = newvnlmatrix;
   //  transform->SetMatrix(newmatrix);
-  //  transform->SetOffset(m_UnitsToMMAffineTransform->GetOffset());    
-  //  SetUnitsToMMAffineTransform(transform);
+  //  transform->SetOffset(m_IndexToWorldTransform->GetOffset());    
+  //  SetIndexToWorldTransform(transform);
   //}
 
 //void mitk::SlicedGeometry3D::InitializeMatrixByFirstSliceAndSpacing(...)
@@ -264,7 +264,7 @@ void mitk::SlicedGeometry3D::SetSpacing(mitk::Vector3D aSpacing)
 
   AffineTransform3D::MatrixType::InternalMatrixType vnlmatrix;
 
-  vnlmatrix = m_UnitsToMMAffineTransform->GetMatrix().GetVnlMatrix();
+  vnlmatrix = m_IndexToWorldTransform->GetMatrix().GetVnlMatrix();
 
   mitk::VnlVector col;
   col = vnlmatrix.get_column(0); col.normalize(); col*=aSpacing[0]; vnlmatrix.set_column(0, col);
@@ -276,9 +276,9 @@ void mitk::SlicedGeometry3D::SetSpacing(mitk::Vector3D aSpacing)
 
   AffineTransform3D::Pointer transform = AffineTransform3D::New();
   transform->SetMatrix(matrix);
-  transform->SetOffset(m_UnitsToMMAffineTransform->GetOffset());
+  transform->SetOffset(m_IndexToWorldTransform->GetOffset());
 
-  SetUnitsToMMAffineTransform(transform.GetPointer());
+  SetIndexToWorldTransform(transform.GetPointer());
   
   mitk::Geometry2D::Pointer firstGeometry;
 

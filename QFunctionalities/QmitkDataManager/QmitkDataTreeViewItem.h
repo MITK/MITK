@@ -16,14 +16,14 @@ class QmitkDataTreeViewItem : public QListViewItem
 {
 
 	public:
-    QmitkDataTreeViewItem( QListView *parent, const QString &s1 = 0, const QString &s2 = 0, mitk::DataTreeIterator * nodeIt = 0 );
-    QmitkDataTreeViewItem( QmitkDataTreeViewItem * parent, mitk::DataTreeIterator * nodeIt );
+    QmitkDataTreeViewItem( QListView *parent, const QString &s1, const QString &s2, mitk::DataTreeIteratorBase * nodeIt );
+    QmitkDataTreeViewItem( QmitkDataTreeViewItem * parent, mitk::DataTreeIteratorBase * nodeIt );
     mitk::DataTreeNode::ConstPointer GetDataTreeNode() const;
-    mitk::DataTreeIterator* GetDataTreeIterator() {return m_DataTreeIterator;}
+    mitk::DataTreeIteratorBase* GetDataTreeIterator() {return m_DataTreeIteratorBase;}
 
 	protected:
     mitk::DataTreeNode::ConstPointer m_TreeNode;
-    mitk::DataTreeIterator* m_DataTreeIterator;
+    mitk::DataTreeIteratorBase *m_DataTreeIteratorBase;
 };
 
 

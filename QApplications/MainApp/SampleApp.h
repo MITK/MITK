@@ -37,14 +37,6 @@ public:
 
   virtual void initializeQfm();
 
-//protected:
-
-		/*! 
-			\brief opens the specified file and initializes the application
-			@param fileName 
-		*/
-		virtual void fileOpen( const char * fileName );
-
 protected:
 
 		QmitkSimpleExampleFunctionality * simpleFunc;

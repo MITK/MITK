@@ -42,7 +42,7 @@ mitk::OpenGLRenderer::OpenGLRenderer() : m_VtkMapperPresent(false),
 }
 
 //##ModelId=3E3D28AB0018
-void mitk::OpenGLRenderer::SetData(mitk::DataTreeIterator* iterator)
+void mitk::OpenGLRenderer::SetData(const mitk::DataTreeIteratorBase* iterator)
 {
   if(iterator!=GetData())
   {
@@ -54,35 +54,26 @@ void mitk::OpenGLRenderer::SetData(mitk::DataTreeIterator* iterator)
     if (iterator != NULL)
     {
       //initialize world geometry: use first slice of first node containing an image
-      mitk::DataTreeIterator* it=m_DataTreeIterator->clone();
-      bool notfirst=false;
-      do
+      mitk::DataTreeIteratorClone it=m_DataTreeIterator;
+      while ( !it->IsAtEnd() )
       {
-        if ( notfirst )
-          it->next();
-        else
-          notfirst = true;
-
-        if(it->isValid())
+        BaseData::Pointer data=it->Get()->GetData();
+        if(data.IsNotNull())
         {
-          BaseData::Pointer data=it->get()->GetData();
-          if(data.IsNotNull())
+          if(geometry_is_set==false)
           {
-            if(geometry_is_set==false)
+            Image::Pointer image = dynamic_cast<Image*>(data.GetPointer());
+            if(image.IsNotNull())
             {
-              Image::Pointer image = dynamic_cast<Image*>(data.GetPointer());
-              if(image.IsNotNull())
-              {
-                SetWorldGeometry(image->GetUpdatedSlicedGeometry(0)->GetGeometry2D(0));
-                geometry_is_set=true;
-              }
+              SetWorldGeometry(image->GetUpdatedSlicedGeometry(0)->GetGeometry2D(0));
+              geometry_is_set=true;
             }
-            //@todo add connections
-            //data->AddObserver(itk::EndEvent(), m_DataChangedCommand);
           }
+          //@todo add connections
+          //data->AddObserver(itk::EndEvent(), m_DataChangedCommand);
         }
-      } while(it->hasNext() );
-      delete it;
+        ++it;
+      }
     }
 
     //update the vtk-based mappers
@@ -146,41 +137,32 @@ void mitk::OpenGLRenderer::UpdateIncludingVtkActors()
   //    try
   if (m_DataTreeIterator != NULL)
   {
-    mitk::DataTreeIterator* it=m_DataTreeIterator->clone();
-    bool notfirst=false;
-    do
+    mitk::DataTreeIteratorClone it=m_DataTreeIterator;
+    while(!it->IsAtEnd())
     {
-      if ( notfirst )
-        it->next();
-      else
-        notfirst = true;
-
-      if(it->isValid())
+      mitk::Mapper::Pointer mapper = it->Get()->GetMapper(m_MapperID);
+      if(mapper.IsNotNull())
       {
-        mitk::Mapper::Pointer mapper = it->get()->GetMapper(m_MapperID);
-        if(mapper.IsNotNull())
+        BaseVtkMapper2D* anVtkMapper2D;
+        anVtkMapper2D=dynamic_cast<BaseVtkMapper2D*>(mapper.GetPointer());
+        if(anVtkMapper2D != NULL)
         {
-          BaseVtkMapper2D* anVtkMapper2D;
-          anVtkMapper2D=dynamic_cast<BaseVtkMapper2D*>(mapper.GetPointer());
-          if(anVtkMapper2D != NULL)
+          anVtkMapper2D->Update(this);
+          m_VtkRenderer->AddProp(anVtkMapper2D->GetProp());
+        }
+        else
+        {
+          BaseVtkMapper3D* anVtkMapper3D;
+          anVtkMapper3D=dynamic_cast<BaseVtkMapper3D*>(mapper.GetPointer());
+          if(anVtkMapper3D != NULL)
           {
-            anVtkMapper2D->Update(this);
-            m_VtkRenderer->AddProp(anVtkMapper2D->GetProp());
-          }
-          else
-          {
-            BaseVtkMapper3D* anVtkMapper3D;
-            anVtkMapper3D=dynamic_cast<BaseVtkMapper3D*>(mapper.GetPointer());
-            if(anVtkMapper3D != NULL)
-            {
-              anVtkMapper3D->Update(this);
-              m_VtkRenderer->AddProp(anVtkMapper3D->GetProp());
-            }
+            anVtkMapper3D->Update(this);
+            m_VtkRenderer->AddProp(anVtkMapper3D->GetProp());
           }
         }
       }
-    } while(it->hasNext());
-    delete it;
+      ++it;
+    }
   }
 
   if(newRenderer)
@@ -242,22 +224,13 @@ void mitk::OpenGLRenderer::Update()
 
   m_VtkMapperPresent=false;
 
-  mitk::DataTreeIterator* it=m_DataTreeIterator->clone();
+  mitk::DataTreeIteratorClone it=m_DataTreeIterator;
 
-  bool notfirst=false;
-  do
+  while(!it->IsAtEnd())
   {
-    if ( notfirst )
-      it->next();
-    else
-      notfirst = true;
-
-    if(it->isValid())
-      Update(it->get());    
-
-  } while(it->hasNext() );
-
-  delete it;
+    Update(it->Get());    
+    ++it;
+  }
   Modified();
   m_LastUpdateTime=GetMTime();
 }
@@ -284,8 +257,8 @@ void mitk::OpenGLRenderer::Render()
   }
 
   //has the data tree been changed?
-  if(dynamic_cast<mitk::DataTree*>(GetData()->getTree()) == NULL ) return;
-  if(m_LastUpdateVtkActorsTime < dynamic_cast<mitk::DataTree*>(GetData()->getTree())->GetMTime() )
+  if(dynamic_cast<mitk::DataTree*>(GetData()->GetTree()) == NULL ) return;
+  if(m_LastUpdateVtkActorsTime < dynamic_cast<mitk::DataTree*>(GetData()->GetTree())->GetMTime() )
   {
     //yes: update vtk-actors
     UpdateIncludingVtkActors();
@@ -316,44 +289,35 @@ void mitk::OpenGLRenderer::Render()
       gluOrtho2D( 0.0, m_Size[0], 0.0, m_Size[1] );
       glMatrixMode( GL_MODELVIEW );
 
-      mitk::DataTreeIterator* it=m_DataTreeIterator->clone();
-      mitk::DataTree::Pointer tree = dynamic_cast <mitk::DataTree *> (it->getTree());
+      mitk::DataTreeIteratorClone it = m_DataTreeIterator;
+      //mitk::DataTree::Pointer tree = dynamic_cast <mitk::DataTree *> (it->GetTree());
       //	std::cout << "Render:: tree: " <<  *tree << std::endl;
 
       typedef std::pair<int, GLMapper2D*> LayerMapperPair;
       std::priority_queue<LayerMapperPair> layers;
       int mapperNo = 0;
 
-      bool notfirst=false;
-      do
+      while ( !it->IsAtEnd() )
       {
-        if ( notfirst )
-          it->next();
-        else
-          notfirst = true;
-
-        if(it->isValid())
+        mitk::DataTreeNode::Pointer node = it->Get();
+        mitk::Mapper::Pointer mapper = node->GetMapper(m_MapperID);
+        if(mapper.IsNotNull())
         {
-          mitk::DataTreeNode::Pointer node = it->get();
-          mitk::Mapper::Pointer mapper = node->GetMapper(m_MapperID);
-          if(mapper.IsNotNull())
+          GLMapper2D* mapper2d=dynamic_cast<GLMapper2D*>(mapper.GetPointer());
+          if(mapper2d!=NULL)
           {
-            GLMapper2D* mapper2d=dynamic_cast<GLMapper2D*>(mapper.GetPointer());
-            if(mapper2d!=NULL)
-            {
-              // mapper without a layer property are painted first
-              int layer=-1;
-              node->GetIntProperty("layer", layer, this);
-              // pushing negative layer value, since default sort for
-              // priority_queue is lessthan
-              layers.push(LayerMapperPair(- (layer<<16) - mapperNo ,mapper2d));
-              mapperNo++;
-            }
+            // mapper without a layer property are painted first
+            int layer=-1;
+            node->GetIntProperty("layer", layer, this);
+            // pushing negative layer value, since default sort for
+            // priority_queue is lessthan
+            layers.push(LayerMapperPair(- (layer<<16) - mapperNo ,mapper2d));
+            mapperNo++;
           }
         }
-      } while(it->hasNext() );
+        ++it;
+      }
 
-      delete it;
       while (!layers.empty()) {
         layers.top().second->Paint(this);
         layers.pop();
@@ -430,8 +394,9 @@ void mitk::OpenGLRenderer::Resize(int w, int h)
 
   BaseRenderer::Resize(w, h);
 
+//  GetVtkRenderWindow()->SetSize(w,h); //done bei VtkInteractor via m_CameraController->Resize(...) in BaseRenderer 
+
   Update();
-  //    m_RenderWindow->GetVtkRenderWindow()->SetSize(w,h); //@FIXME?
 }
 
 /*!

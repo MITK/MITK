@@ -4,29 +4,31 @@
 #include "mitkStringProperty.h"
 #include "enabled.xpm"
 #include "disabled.xpm"
-QmitkDataTreeViewItem::QmitkDataTreeViewItem( QListView *parent, const QString &s1 , const QString &s2 , mitk::DataTreeIterator * nodeIt )
-    : QListViewItem( parent, s1, s2 ),m_DataTreeIterator(nodeIt)
+QmitkDataTreeViewItem::QmitkDataTreeViewItem( QListView *parent, const QString &s1 , const QString &s2 , mitk::DataTreeIteratorBase* nodeIt )
+    : QListViewItem( parent, s1, s2 ),m_DataTreeIteratorBase(NULL)
 {
-  m_TreeNode = nodeIt->get();
+  assert(nodeIt!=NULL);
+  m_DataTreeIteratorBase = nodeIt;
+
+  m_TreeNode = nodeIt->Get();
   QListViewItem::setText(0,QString("All Datasets"));
 
-  mitk::DataTreeIterator * it = nodeIt->clone()->children();
-  if (it!= NULL) 
+  mitk::DataTreeChildIterator it(nodeIt->GetTree(), nodeIt->GetNode());
+  while (!it.IsAtEnd())
   {
-    while (it->hasNext())
-    {
-      it->next();
-      QmitkDataTreeViewItem * nextItem = new QmitkDataTreeViewItem(this,it);
-    }
+    QmitkDataTreeViewItem * nextItem = new QmitkDataTreeViewItem(this,&it);
+    ++it;
   }
-  delete it;
   setOpen(true);
 }
 
-QmitkDataTreeViewItem::QmitkDataTreeViewItem( QmitkDataTreeViewItem * parent, mitk::DataTreeIterator * nodeIt )
-: QListViewItem(parent),m_DataTreeIterator(nodeIt) {
-  m_DataTreeIterator = nodeIt->clone();
-  m_TreeNode = nodeIt->get();
+QmitkDataTreeViewItem::QmitkDataTreeViewItem( QmitkDataTreeViewItem * parent, mitk::DataTreeIteratorBase * nodeIt )
+: QListViewItem(parent),m_DataTreeIteratorBase(NULL) 
+{
+  assert(nodeIt!=NULL);
+  m_DataTreeIteratorBase = nodeIt;
+
+  m_TreeNode = nodeIt->Get();
   char name[256];
   
   if (m_TreeNode->GetName(*name, NULL)) {
@@ -47,18 +49,15 @@ QmitkDataTreeViewItem::QmitkDataTreeViewItem( QmitkDataTreeViewItem * parent, mi
   }
   
   QListViewItem::setText(2,QString(ss.str().c_str()));
-  mitk::DataTreeIterator * it = nodeIt->clone()->children();
-  if (it!= NULL && it->hasNext()) 
+  mitk::DataTreeChildIterator it(nodeIt->GetTree(), nodeIt->GetNode());
+  while (!it.IsAtEnd())
   {
-    while (it->hasNext())
-    {
-      it->next();
-      QmitkDataTreeViewItem * nextItem = new QmitkDataTreeViewItem(this,it);
-    }
-  } 
-  delete it;
+    QmitkDataTreeViewItem * nextItem = new QmitkDataTreeViewItem(this,&it);
+    ++it;
+  }
   setOpen(true);
 }
+
 mitk::DataTreeNode::ConstPointer QmitkDataTreeViewItem::GetDataTreeNode() const {
 	return m_TreeNode;
 }

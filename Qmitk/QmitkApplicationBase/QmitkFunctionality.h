@@ -10,12 +10,11 @@
 #include <qtoolbutton.h>
 #include <qaction.h>
 
-
 class QActionGroup;
 
 #include "mitkDataTree.h"
-#include "QmitkSelectableGLWidget.h"
-#include "vecmath.h"
+
+class QmitkFctMediator;
 
 /*!
  \brief class providing a standard interface for MITK application functionality
@@ -33,7 +32,6 @@ class QmitkFunctionality : public QObject
 	Q_OBJECT
 	bool m_Available;
   bool m_Activated;
-
 public:
 
 	/*!
@@ -41,7 +39,7 @@ public:
 		@param parent the parent widget
 		@param name the name of the functionality widget
 		*/
-	QmitkFunctionality(QObject *parent=0, const char *name=0, mitk::DataTreeIterator * dataIt=NULL);
+	QmitkFunctionality(QObject *parent=0, const char *name=0, mitk::DataTreeIteratorBase* dataIt=NULL);
 		
 	/*!
 		default destructor
@@ -71,7 +69,7 @@ public:
   /*!
   \brief method for defining the name of the functionality
   */
-	virtual QString getFunctionalityName() = 0;
+	virtual QString getFunctionalityName();
 
   /*!
   \brief called when a functionality becomes active/visible. Often, event-handlers are connected (e.g., 
@@ -100,14 +98,17 @@ public:
 	 \brief setter method for data tree attribute
 	 @param it the reference to a data tree ieterator object
 	 */
-	void setDataTree(mitk::DataTreeIterator * it);
+	void setDataTree(mitk::DataTreeIteratorBase* it);
 
 	/*!
 	 \brief getter for dataTree attribute. It returns the 
 					reference to a data tree iterator object
 	 */
-	mitk::DataTreeIterator * getDataTree();
+	mitk::DataTreeIteratorBase* getDataTree();
 
+  virtual void treeChanged(const itk::EventObject & treeChangedEvent);
+
+  virtual void treeChanged();
 
 signals:
 	void signal_dummy();
@@ -120,9 +121,12 @@ protected:
 	/*!
 			a reference to a data tree iterator object
 	 */
-	mitk::DataTreeIterator*	m_DataTreeIterator;
+	mitk::DataTreeIteratorClone m_DataTreeIterator;
 
+  bool m_TreeChangedWhileInActive;
 
+  unsigned long m_ObserverTag;
+  friend class QmitkFctMediator;
 };
 
 #endif // !defined(AFX_QUSFUNCTIONALITY_H__1DC0BA6E_9B8D_4D63_8A63_5B661CE33712__INCLUDED_)

@@ -327,7 +327,8 @@ void mitk::DisplayGeometry::Fit()
   else
     h = (int) (w/aspRatio);
 
-  SetScaleFactor(widthInUnits/w);
+  if(w>0)
+    SetScaleFactor(widthInUnits/w);
 
   mitk::Vector2D origin_display;
   origin_display[0]=-(width-w)/2.0;

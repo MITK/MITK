@@ -41,6 +41,9 @@
                         <property name="name">
                             <cstring>unnamed</cstring>
                         </property>
+                        <property name="spacing">
+                            <number>0</number>
+                        </property>
                         <widget class="QmitkSelectableGLWidget" row="0" column="1">
                             <property name="name">
                                 <cstring>mitkWidget2</cstring>
@@ -94,6 +97,22 @@
 </widget>
 <customwidgets>
     <customwidget>
+        <class>QmitkSelectableGLWidget</class>
+        <header location="global">QmitkSelectableGLWidget.h</header>
+        <sizehint>
+            <width>-1</width>
+            <height>-1</height>
+        </sizehint>
+        <container>0</container>
+        <sizepolicy>
+            <hordata>3</hordata>
+            <verdata>3</verdata>
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+        </sizepolicy>
+        <pixmap>image0</pixmap>
+    </customwidget>
+    <customwidget>
         <class>QLevelWindowWidget</class>
         <header location="global">QLevelWindowWidget/QLevelWindowWidget.h</header>
         <sizehint>
@@ -111,29 +130,10 @@
         <signal>levelWindow(mitk::LevelWindow*)</signal>
         <slot access="public" specifier="">slot()</slot>
     </customwidget>
-    <customwidget>
-        <class>QmitkSelectableGLWidget</class>
-        <header location="global">QmitkSelectableGLWidget.h</header>
-        <sizehint>
-            <width>-1</width>
-            <height>-1</height>
-        </sizehint>
-        <container>0</container>
-        <sizepolicy>
-            <hordata>3</hordata>
-            <verdata>3</verdata>
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-        </sizepolicy>
-        <pixmap>image1</pixmap>
-    </customwidget>
 </customwidgets>
 <images>
     <image name="image0">
         <data format="XPM.GZ" length="45">789cd3d7528808f055d0d2e72a2e492cc94c5648ce482c52d04a29cdcdad8c8eb5ade6523250004143a55a6b2e0026630c4f</data>
-    </image>
-    <image name="image1">
-        <data format="XPM.GZ" length="2910">789cb595db522a571086ef7d0acabeb352bd9903c34ca57201088a0a02a21b4de5624e829c541814d895774f4fafeea91da452c9455ceaf055ffddfdf75a6bf4db5969d4eb94cebe9dacb3307b894bf1245c95ce92cd62b1fbfd8fdf7e9c9cda7689be2dcb29d9a7bf9c9cf6b3525ceabe2ed31c70450065fe626e17ec33a7c2aec4ad82390e46ef17bc15f625ff5638b6381fa29cad72be9877c29a3f5696f8bdb06ffa032a4bfc463896fc576589bf31fbaac781b0c6df0ddbeae75a58fb6f72b6cbca7825acf55ce6c0d67a7dc38eec270c0b36fb71a92cfaa46013ef09bbc25ccfb11c5ff8ddb0abf538df091cdf09b8de5a3816fd43ceaee52a3799c34a20f977ca260eecaf62173c104e647f5f94a55ec7b06749fc4e59f6c72fd8c417cab6993f14ae487e53d9c431660e2b4925e4f8b3614ffcc35459fa750b36fecacad26f2facf32c95e53cf87c3dbbaafe6d65f1b313ae48fdbdb2c4af85a51ff27df7a8be67fcd70c17fa0be144fcf1fb5275fc8acde7895b61f59f156ce2bc7fd5a81a54238e7f1a563d7ecfd98f02a98f2dc3a1ceb729d8cc93294bbf7365c7e2f8a7b0ce5f5516fd4a59f49073e00656e0727c6638d4f9de94cdfdc50fe150fcd50a36e7152b4bbf4ec1e6fef78453f1d7301cd9c24fcad29fe70be2223e5296fa50b0d1af955d335f45d813bff5824d3d4f58e7792cd8c46f94a5df47c1661ebe1fa11b79727ef7c29a3f54967850b0c94f8553f1cfef6f1847a9c7ff0ca06b389679d111f624bf2eacfe26c2a9e8f9fd8b5cad8733c3b12d3c51ae3acc63659fef2bbe0a7be6fdc6b9b2e42f8543f1db309cc8fec25c59fcf0df872889d290ef1b2e0c17f92dc389f8ef67ff7efdac47c010a3232bc604d3433d3ee31827f882539ce19cd68256fe5ce22bbee13bae7ed653ed31ae31c30d7ee0276e71877bfa5dc33a36689d63f3401f52ed0c5ba4b8c04b6ce38a561baff01a6f28a78e9d037d444e727597546dbcc51ef671c09fef7088f747f4537272c1951ff03b8ef0119fb08c16b18dce11fd8c7cbbac1e61053daca28f0169db8000107ed1cf69be3644549bd4104342bd1e20e51a5b783ea2dfe18a54a35c9dcf0c63d24de085f45d987ed12f68075734e523665c7b850398c11c16f4a90ccb23fadccf2b3e91827cc11b757b8715ace9991dd1cfb1061baa5b860ff2fd49b5e94c296f0b3b1cc2fe88be0e35d25bb88714ead0807340f29242135a47f50db8804b3ed74b7afab08636a6a4dfd07e5e1de863ba550d3af721edf8806f032dd851ed6bb881ce97f34ae80ee6fa47e802d0e4659ae3967cb768fe0ef4a07fa04fe9c636b10303fa09e119a6b0e4b5872bb88321dcff5d4f19ab7f5e5fdfaffffa3efe2ffa3f7f3df90bdf8dabe4</data>
     </image>
 </images>
 <includes>
@@ -143,10 +143,15 @@
     <include location="global" impldecl="in implementation">mitkDataTree.h</include>
     <include location="global" impldecl="in implementation">mitkPlaneGeometry.h</include>
     <include location="global" impldecl="in declaration">mitkDataTree.h</include>
+    <include location="global" impldecl="in declaration">mitkMultiplexUpdateController.h</include>
+    <include location="global" impldecl="in declaration">mitkSliceNavigationController.h</include>
     <include location="local" impldecl="in implementation">QmitkStdMultiWidget.ui.h</include>
 </includes>
 <variables>
+    <variable>mitk::DataTreeIteratorClone planesIterator;</variable>
     <variable>mitk::DataTreeBase* planesSubTree;</variable>
+    <variable>mitk::MultiplexUpdateController::Pointer multiplexUpdateController;</variable>
+    <variable>mitk::SliceNavigationController::Pointer timeNavigationController;</variable>
 </variables>
 <slots>
     <slot>updateMitkWidgets()</slot>
@@ -157,15 +162,18 @@
     <slot>changeLayoutToWidget1()</slot>
     <slot>changeLayoutToWidget2()</slot>
     <slot>changeLayoutToWidget3()</slot>
-    <slot>setData( mitk::DataTreeIterator * it )</slot>
+    <slot>setData( mitk::DataTreeIteratorBase * it )</slot>
     <slot>fit()</slot>
-    <slot>initWidget( mitk::DataTreeIterator * it, QmitkSelectableGLWidget * widget, const mitk::Vector3D &amp; origin, const mitk::Vector3D &amp; right, const mitk::Vector3D &amp; bottom )</slot>
-    <slot>initWidgets( mitk::DataTreeIterator * it )</slot>
-    <slot>addPlaneSubTree( mitk::DataTreeIterator * it )</slot>
-    <slot>texturizePlaneSubTree( mitk::DataTreeIterator * it )</slot>
+    <slot>initWidget( mitk::DataTreeIteratorBase * it, QmitkSelectableGLWidget * widget, const mitk::Vector3D &amp; origin, const mitk::Vector3D &amp; right, const mitk::Vector3D &amp; bottom )</slot>
+    <slot>initWidgets( mitk::DataTreeIteratorBase * it )</slot>
+    <slot>addPlaneSubTree( mitk::DataTreeIteratorBase * it )</slot>
+    <slot>texturizePlaneSubTree( mitk::DataTreeIteratorBase * it )</slot>
+    <slot returnType="bool">InitializeStandardViews( mitk::DataTreeIteratorBase * it )</slot>
 </slots>
 <functions>
     <function access="private" specifier="non virtual">init()</function>
+    <function returnType="mitk::MultiplexUpdateController *">GetMultiplexUpdateController()</function>
+    <function returnType="mitk::SliceNavigationController *">GetTimeNavigationController()</function>
 </functions>
 <layoutdefaults spacing="6" margin="11"/>
 <includehints>

@@ -58,6 +58,7 @@ protected:
   //##ModelId=3E33145902C4
   bool m_ResizeNeeded;
 
+  bool m_InResize;
 public:
   //iil compatibility
 

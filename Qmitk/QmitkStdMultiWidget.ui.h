@@ -23,10 +23,12 @@ void QmitkStdMultiWidget::updateMitkWidgets()
 
 void QmitkStdMultiWidget::init()
 {
-  mitkWidget1->GetSelectionFrame()->setPaletteBackgroundColor ("red");
-  mitkWidget2->GetSelectionFrame()->setPaletteBackgroundColor ("green");
-  mitkWidget3->GetSelectionFrame()->setPaletteBackgroundColor ("blue");
-  mitkWidget4->GetSelectionFrame()->setPaletteBackgroundColor ("yellow");
+  mitkWidget1->setPaletteBackgroundColor ("red");
+  mitkWidget2->setPaletteBackgroundColor ("green");
+  mitkWidget3->setPaletteBackgroundColor ("blue");
+  mitkWidget4->setPaletteBackgroundColor ("yellow");
+
+  planesIterator = NULL;
 
   //transfer colors in WorldGeometry-Nodes of the associated Renderer
   QColor qcolor;
@@ -34,31 +36,53 @@ void QmitkStdMultiWidget::init()
   mitk::DataTreeNode::Pointer planeNode;
   mitk::IntProperty::Pointer  layer;
   // ... of widget 1
-  qcolor=mitkWidget1->GetSelectionFrame()->paletteBackgroundColor();
+  qcolor=mitkWidget1->paletteBackgroundColor();
   color[0]=qcolor.red()/255.0; color[1]=qcolor.green()/255.0; color[2]=qcolor.blue()/255.0;
   planeNode=mitkWidget1->GetRenderer()->GetCurrentWorldGeometry2DNode();
   planeNode->SetColor(color);
   layer = new mitk::IntProperty(1);	
   planeNode->SetProperty("layer",layer); 	  
   // ... of widget 2
-  qcolor=mitkWidget2->GetSelectionFrame()->paletteBackgroundColor();
+  qcolor=mitkWidget2->paletteBackgroundColor();
   color[0]=qcolor.red()/255.0; color[1]=qcolor.green()/255.0; color[2]=qcolor.blue()/255.0;
   planeNode=mitkWidget2->GetRenderer()->GetCurrentWorldGeometry2DNode();
   planeNode->SetColor(color);
   layer = new mitk::IntProperty(2);	
   planeNode->SetProperty("layer",layer); 	  
   // ... of widget 3
-  qcolor=mitkWidget3->GetSelectionFrame()->paletteBackgroundColor();
+  qcolor=mitkWidget3->paletteBackgroundColor();
   color[0]=qcolor.red()/255.0; color[1]=qcolor.green()/255.0; color[2]=qcolor.blue()/255.0;
   planeNode=mitkWidget3->GetRenderer()->GetCurrentWorldGeometry2DNode();
   planeNode->SetColor(color);
   layer = new mitk::IntProperty(3);	
   planeNode->SetProperty("layer",layer); 	  
   // ... of widget 4
-  qcolor=mitkWidget4->GetSelectionFrame()->paletteBackgroundColor();
+  qcolor=mitkWidget4->paletteBackgroundColor();
   color[0]=qcolor.red()/255.0; color[1]=qcolor.green()/255.0; color[2]=qcolor.blue()/255.0;
   planeNode=mitkWidget4->GetRenderer()->GetCurrentWorldGeometry2DNode();
   planeNode->SetColor(color);
+  
+  //initialize timeNavigationController
+  timeNavigationController = new mitk::SliceNavigationController(NULL);
+  timeNavigationController->ConnectGeometryTimeEvent(mitkWidget1->GetRenderer(), false);
+  timeNavigationController->ConnectGeometryTimeEvent(mitkWidget2->GetRenderer(), false);
+  timeNavigationController->ConnectGeometryTimeEvent(mitkWidget3->GetRenderer(), false);
+  timeNavigationController->ConnectGeometryTimeEvent(mitkWidget4->GetRenderer(), false);
+  mitkWidget1->GetSliceNavigationController()->ConnectGeometrySendEvent(mitkWidget4->GetRenderer());
+  
+  //initialize update-controller
+  multiplexUpdateController = new mitk::MultiplexUpdateController("navigation");
+  multiplexUpdateController->AddRenderWindow(mitkWidget1->GetRenderer()->GetRenderWindow());
+  multiplexUpdateController->AddRenderWindow(mitkWidget2->GetRenderer()->GetRenderWindow());
+  multiplexUpdateController->AddRenderWindow(mitkWidget3->GetRenderer()->GetRenderWindow());
+  multiplexUpdateController->AddRenderWindow(mitkWidget4->GetRenderer()->GetRenderWindow());
+  
+  //connect sliceNavigationControllers to update-controller
+  mitkWidget1->GetSliceNavigationController()->ConnectRepaintRequest(multiplexUpdateController.GetPointer());
+  mitkWidget2->GetSliceNavigationController()->ConnectRepaintRequest(multiplexUpdateController.GetPointer());
+  mitkWidget3->GetSliceNavigationController()->ConnectRepaintRequest(multiplexUpdateController.GetPointer());
+  mitkWidget4->GetSliceNavigationController()->ConnectRepaintRequest(multiplexUpdateController.GetPointer());
+  timeNavigationController->ConnectRepaintRequest(multiplexUpdateController.GetPointer());
 }
 
 void QmitkStdMultiWidget::changeLayoutTo2DImagesUp()
@@ -261,7 +285,7 @@ void QmitkStdMultiWidget::changeLayoutToWidget3()
 
 }
 
-void QmitkStdMultiWidget::setData( mitk::DataTreeIterator * it )
+void QmitkStdMultiWidget::setData( mitk::DataTreeIteratorBase* it )
 {
   mitkWidget1->GetRenderer()->SetData(it);
   mitkWidget2->GetRenderer()->SetData(it);
@@ -279,18 +303,18 @@ void QmitkStdMultiWidget::fit()
 
   int w=vtkObject::GetGlobalWarningDisplay();
   vtkObject::GlobalWarningDisplayOff();
-  vtkrenderer = ((mitk::OpenGLRenderer*)(mitkWidget1->GetRenderer().GetPointer()))->GetVtkRenderer();
+  vtkrenderer = ((mitk::OpenGLRenderer*)(mitkWidget1->GetRenderer()))->GetVtkRenderer();
   if(vtkrenderer!=NULL) vtkrenderer->ResetCamera();
-  vtkrenderer = ((mitk::OpenGLRenderer*)(mitkWidget2->GetRenderer().GetPointer()))->GetVtkRenderer();
+  vtkrenderer = ((mitk::OpenGLRenderer*)(mitkWidget2->GetRenderer()))->GetVtkRenderer();
   if(vtkrenderer!=NULL) vtkrenderer->ResetCamera();
-  vtkrenderer = ((mitk::OpenGLRenderer*)(mitkWidget3->GetRenderer().GetPointer()))->GetVtkRenderer();
+  vtkrenderer = ((mitk::OpenGLRenderer*)(mitkWidget3->GetRenderer()))->GetVtkRenderer();
   if(vtkrenderer!=NULL) vtkrenderer->ResetCamera();
-  vtkrenderer = ((mitk::OpenGLRenderer*)(mitkWidget4->GetRenderer().GetPointer()))->GetVtkRenderer();
+  vtkrenderer = ((mitk::OpenGLRenderer*)(mitkWidget4->GetRenderer()))->GetVtkRenderer();
   if(vtkrenderer!=NULL) vtkrenderer->ResetCamera();
   vtkObject::SetGlobalWarningDisplay(w);
 }
 
-void QmitkStdMultiWidget::initWidget(mitk::DataTreeIterator* it,
+void QmitkStdMultiWidget::initWidget(mitk::DataTreeIteratorBase* it,
                                    QmitkSelectableGLWidget* widget,
 		        const mitk::Vector3D& origin,
                                    const mitk::Vector3D& right,
@@ -310,7 +334,7 @@ void QmitkStdMultiWidget::initWidget(mitk::DataTreeIterator* it,
 */
 }
 
-void QmitkStdMultiWidget::initWidgets( mitk::DataTreeIterator * it )
+void QmitkStdMultiWidget::initWidgets( mitk::DataTreeIteratorBase* it )
 {
 /*
   const mitk::BoundingBox::BoundsArrayType bounds = mitk::DataTree::ComputeBoundingBox(it)->GetBounds();
@@ -345,16 +369,15 @@ void QmitkStdMultiWidget::initWidgets( mitk::DataTreeIterator * it )
 */
 }
 
-void QmitkStdMultiWidget::addPlaneSubTree(mitk::DataTreeIterator * it)
+void QmitkStdMultiWidget::addPlaneSubTree(mitk::DataTreeIteratorBase* it)
 {
     // add the diplayed planes of the multiwidget to a node to which the subtree @a planesSubTree points ...
-    it=it->clone();
     
     mitk::DataTreeNode::Pointer node=mitk::DataTreeNode::New();
-    it->add(node);
-    it->next();
-    it->next();
-    planesSubTree=dynamic_cast<mitk::DataTreeBase*>(it->getSubTree());
+    mitk::DataTreeIteratorClone dit = it;
+    dit->Add(node);
+    dit->GoToChild(dit->ChildPosition(node));
+    planesSubTree=dynamic_cast<mitk::DataTreeBase*>(dit->GetSubTree());
 
     float white[3] = {1.0f,1.0f,1.0f};
     mitk::DataTreeNode::Pointer planeNode;
@@ -363,45 +386,123 @@ void QmitkStdMultiWidget::addPlaneSubTree(mitk::DataTreeIterator * it)
     planeNode->SetColor(white, mitkWidget4->GetRenderer());
     planeNode->SetProperty("name", new mitk::StringProperty("widget1Plane"));
     planeNode->SetProperty("includeInBoundingBox", new mitk::BoolProperty(false));
-    it->add(planeNode);
+    dit->Add(planeNode);
     // ... of widget 2
     planeNode=mitkWidget2->GetRenderer()->GetCurrentWorldGeometry2DNode();
     planeNode->SetColor(white, mitkWidget4->GetRenderer());
     planeNode->SetProperty("name", new mitk::StringProperty("widget2Plane"));
     planeNode->SetProperty("includeInBoundingBox", new mitk::BoolProperty(false));
-    it->add(planeNode);
+    dit->Add(planeNode);
     // ... of widget 3
     planeNode=mitkWidget3->GetRenderer()->GetCurrentWorldGeometry2DNode();
     planeNode->SetColor(white, mitkWidget4->GetRenderer());
     planeNode->SetProperty("name", new mitk::StringProperty("widget3Plane"));
     planeNode->SetProperty("includeInBoundingBox", new mitk::BoolProperty(false));
-    it->add(planeNode);
+    dit->Add(planeNode);
 
-    delete it;
+    planesIterator = dit;
 }
 
-void QmitkStdMultiWidget::texturizePlaneSubTree(mitk::DataTreeIterator * it)
+void QmitkStdMultiWidget::texturizePlaneSubTree(mitk::DataTreeIteratorBase* it)
 {
   if(planesSubTree == NULL)
       return;
 
-  mitk::DataTreeIterator *git = planesSubTree->inorderIterator();
-  while(git->hasNext())
+  assert(planesIterator.IsNotNull());
+  mitk::DataTreeIteratorClone git = planesIterator; //planesSubTree->inorderIterator();
+
+  while(!git->IsAtEnd())
   {
-    git->next();
-    if(dynamic_cast<mitk::Geometry2DData*>(git->get()->GetData())!=NULL)
+    if(dynamic_cast<mitk::Geometry2DData*>(git->Get()->GetData())!=NULL)
     {
       mitk::Geometry2DDataVtkMapper3D::Pointer geometryMapper;
-      if(git->get()->GetMapper(2)==NULL)
+      if(git->Get()->GetMapper(2)==NULL)
       {
         geometryMapper = mitk::Geometry2DDataVtkMapper3D::New();
-        it->get()->SetMapper(2, geometryMapper);
+        it->Get()->SetMapper(2, geometryMapper);
       }
       else
-        geometryMapper = dynamic_cast<mitk::Geometry2DDataVtkMapper3D*>(git->get()->GetMapper(2));
+        geometryMapper = dynamic_cast<mitk::Geometry2DDataVtkMapper3D*>(git->Get()->GetMapper(2));
       if(geometryMapper.IsNotNull())
         geometryMapper->SetDataIteratorForTexture(it);
-    } 
+    }
+    ++git;
   }
-  delete git;
+}
+
+
+mitk::MultiplexUpdateController* QmitkStdMultiWidget::GetMultiplexUpdateController()
+{
+    return multiplexUpdateController.GetPointer();
+}
+
+
+mitk::SliceNavigationController* QmitkStdMultiWidget::GetTimeNavigationController()
+{
+    return timeNavigationController.GetPointer();
+}
+
+
+bool QmitkStdMultiWidget::InitializeStandardViews(mitk::DataTreeIteratorBase * it)
+{
+  bool boundingBoxInitialized = false;
+
+  mitk::SliceNavigationController* sliceNavigatorTransversal = mitkWidget1->GetSliceNavigationController();
+  mitk::SliceNavigationController* sliceNavigatorSagittal       = mitkWidget2->GetSliceNavigationController();
+  mitk::SliceNavigationController* sliceNavigatorFrontal        = mitkWidget3->GetSliceNavigationController();
+
+  sliceNavigatorTransversal->SetViewDirection(mitk::SliceNavigationController::Transversal);
+  sliceNavigatorSagittal->SetViewDirection(mitk::SliceNavigationController::Sagittal);
+  sliceNavigatorFrontal->SetViewDirection(mitk::SliceNavigationController::Frontal);
+
+  if(it==NULL)
+  {
+    multiplexUpdateController->SetBlockUpdate(true);
+    sliceNavigatorTransversal->Update();
+    sliceNavigatorSagittal->Update();
+    sliceNavigatorFrontal->Update();
+    timeNavigationController->Update();
+    multiplexUpdateController->SetBlockUpdate(false);
+    multiplexUpdateController->UpdateRequest();
+  }
+  else
+  {
+    const mitk::BoundingBox::Pointer boundingbox = mitk::DataTree::ComputeVisibleBoundingBox(it, NULL, "includeInBoundingBox");
+    if(boundingbox->GetPoints()->Size()>0)
+    { 
+      mitk::Geometry3D::Pointer geometry = mitk::Geometry3D::New();
+      geometry->Initialize();
+      geometry->SetBounds(boundingbox->GetBounds());
+
+      //lets see if we have data with a limited live-span ...
+      mitk::TimeBounds timebounds = mitk::DataTree::ComputeTimeBoundsInMS(it, NULL, "includeInBoundingBox");
+      if(timebounds[1]<mitk::ScalarTypeNumericTraits::max())
+      {
+        mitk::ScalarType duration = timebounds[1]-timebounds[0];
+
+        mitk::TimeSlicedGeometry::Pointer timegeometry = mitk::TimeSlicedGeometry::New();
+        timegeometry->InitializeEvenlyTimed(geometry, duration);
+        timegeometry->SetTimeBoundsInMS(timebounds); //@bug really required? FIXME
+
+        timebounds[1] = timebounds[0]+1.0f;
+        geometry->SetTimeBoundsInMS(timebounds);
+
+        geometry=timegeometry;
+      }
+
+      if(const_cast<mitk::BoundingBox*>(geometry->GetBoundingBox())->GetDiagonalLength2()>=mitk::eps)
+      {
+        boundingBoxInitialized=true;	
+        multiplexUpdateController->SetBlockUpdate(true);
+        sliceNavigatorTransversal->SetInputWorldGeometry(geometry.GetPointer()); sliceNavigatorTransversal->Update();
+        sliceNavigatorSagittal->SetInputWorldGeometry(geometry.GetPointer());    sliceNavigatorSagittal->Update();
+        sliceNavigatorFrontal->SetInputWorldGeometry(geometry.GetPointer());     sliceNavigatorFrontal->Update();
+        timeNavigationController->SetInputWorldGeometry(geometry.GetPointer());        timeNavigationController->Update();
+        multiplexUpdateController->SetBlockUpdate(false);
+        multiplexUpdateController->UpdateRequest();
+        fit();
+      }
+    }
+  }
+  return boundingBoxInitialized;
 }

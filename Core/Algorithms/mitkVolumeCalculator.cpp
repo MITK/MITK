@@ -21,14 +21,27 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkImageRegionConstIterator.h>
 
 mitk::VolumeCalculator::VolumeCalculator() : m_Image(NULL), m_Threshold(0)
-{}
+{
+  m_TimeSelector = ImageTimeSelector::New();
+}
 
 mitk::VolumeCalculator::~VolumeCalculator()
 {}
 
 void mitk::VolumeCalculator::ComputeVolume()
 {
-  AccessByItk(m_Image,InternalCompute);
+  if (m_Image->GetDimension() == 4) {
+    m_TimeSelector->SetInput(m_Image);
+    m_Volumes.resize(m_Image->GetDimension(3));
+    for (unsigned int timeStep = 0; timeStep<m_Image->GetDimension(3); timeStep++) {
+      m_TimeSelector->SetTimeNr(timeStep);
+      m_TimeSelector->Update();
+      AccessByItk(m_TimeSelector->GetOutput(),InternalCompute);
+      m_Volumes[timeStep] = m_Volume;
+    }
+  } else {
+    AccessByItk(m_Image,InternalCompute);
+  }
 }
 
 template < typename TPixel, unsigned int VImageDimension >

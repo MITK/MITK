@@ -25,6 +25,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkCommon.h"
 #include "mitkImage.h"
+#include "mitkImageTimeSelector.h"
 
 namespace mitk
 {
@@ -43,7 +44,9 @@ namespace mitk
     // TODO: calculate if needed in GetHistogram()
     void ComputeVolume();
     itkGetMacro(Volume,float);
-
+    std::vector<float> GetVolumes() {
+      return m_Volumes;
+    }
   protected:
     VolumeCalculator();
 
@@ -55,6 +58,8 @@ namespace mitk
     mitk::Image::ConstPointer m_Image;
     int m_Threshold;
     float m_Volume;
+    std::vector<float> m_Volumes;
+    mitk::ImageTimeSelector::Pointer m_TimeSelector;
   };
 
 } // namespace mitk

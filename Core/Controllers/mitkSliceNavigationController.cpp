@@ -188,6 +188,8 @@ bool mitk::SliceNavigationController::ExecuteSideEffect(int sideEffectId, mitk::
     const PositionEvent* posEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
     if(posEvent!=NULL)
     {
+      if(m_CreatedWorldGeometry.IsNull())
+        return true;
       switch (sideEffectId)
       {
         case SeNEWPOINT:

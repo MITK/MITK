@@ -38,6 +38,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkImageChangeInformation.h>
 #include <vtkImageWriter.h>
 #include <vtkVolumeTextureMapper2D.h> 
+#include <vtkLODProp3D.h>
+#include <vtkImageResample.h>
+#include <vtkRenderWindow.h>
+#include <mitkVtkRenderWindow.h>
 
 
 const mitk::Image* mitk::VolumeDataVtkMapper3D::GetInput()
@@ -47,25 +51,50 @@ const mitk::Image* mitk::VolumeDataVtkMapper3D::GetInput()
 
 mitk::VolumeDataVtkMapper3D::VolumeDataVtkMapper3D()
 {
-  //m_VtkVolumeMapper = vtkVolumeRayCastMapper::New();
-	m_VtkVolumeMapper = vtkVolumeTextureMapper2D::New();
+  
+  
+  
+  //  m_VtkVolumeMapper = vtkVolumeRayCastMapper::New();
+	// m_VtkVolumeMapper = vtkVolumeTextureMapper2D::New();
 
-  //vtkVolumeRayCastCompositeFunction* compositeFunction = vtkVolumeRayCastCompositeFunction::New();
-  //m_VtkVolumeMapper->SetVolumeRayCastFunction(compositeFunction);
-  //compositeFunction->Delete();
+  m_LowResMapper =  vtkVolumeTextureMapper2D::New();
+  m_MedResMapper =  vtkVolumeTextureMapper2D::New();
+  m_HiResMapper = vtkVolumeRayCastMapper::New();
+        
+  vtkVolumeRayCastCompositeFunction* compositeFunction = vtkVolumeRayCastCompositeFunction::New();
+  m_HiResMapper->SetVolumeRayCastFunction(compositeFunction);
+  compositeFunction->Delete();
   vtkFiniteDifferenceGradientEstimator* gradientEstimator = 
   vtkFiniteDifferenceGradientEstimator::New();
-  m_VtkVolumeMapper->SetGradientEstimator(gradientEstimator);
+/* if (dynamic_cast<vtkVolumeRayCastMapper*>(m_VtkVolumeMapper)){ 
+  dynamic_cast<vtkVolumeRayCastMapper*>(m_VtkVolumeMapper)->SetGradientEstimator(gradientEstimator);
+  } else if (dynamic_cast<vtkVolumeTextureMapper2D*>(m_VtkVolumeMapper)){ 
+  dynamic_cast<vtkVolumeTextureMapper2D*>(m_VtkVolumeMapper)->SetGradientEstimator(gradientEstimator);
+  } */ 
+  m_LowResMapper->SetGradientEstimator(gradientEstimator);
+  m_MedResMapper->SetGradientEstimator(gradientEstimator);
+  m_HiResMapper->SetGradientEstimator(gradientEstimator);
+
   gradientEstimator->Delete();
 
-  m_Volume = vtkVolume::New();
-  m_Volume->SetMapper( m_VtkVolumeMapper );
-  m_Prop3D = m_Volume;
-  m_Prop3D->Register(NULL); 
- 
   m_VolumeProperty = vtkVolumeProperty::New();
-  m_Volume->SetProperty(m_VolumeProperty); 
-
+  m_VolumeLOD = vtkLODProp3D::New();
+  m_VolumeLOD->AddLOD(m_LowResMapper,m_VolumeProperty,0.0);
+  m_VolumeLOD->AddLOD(m_MedResMapper,m_VolumeProperty,0.0);
+  m_VolumeLOD->AddLOD(m_HiResMapper,m_VolumeProperty,0.0);
+  
+  m_Resampler = vtkImageResample::New();
+  m_Resampler->SetAxisMagnificationFactor(0,0.5);
+  m_Resampler->SetAxisMagnificationFactor(1,0.5);
+  m_Resampler->SetAxisMagnificationFactor(2,0.5);
+  
+  //m_Volume = vtkVolume::New();
+  // m_Volume->SetMapper( m_VtkVolumeMapper );
+  // m_Volume->SetProperty(m_VolumeProperty); 
+  // m_Prop3D = m_Volume;
+  m_Prop3D = m_VolumeLOD;
+  m_Prop3D->Register(NULL); 
+  
   m_ImageCast = vtkImageShiftScale::New(); 
   m_ImageCast->SetOutputScalarTypeToUnsignedShort();
   m_ImageCast->ClampOverflowOn();
@@ -78,10 +107,16 @@ mitk::VolumeDataVtkMapper3D::VolumeDataVtkMapper3D()
 
 mitk::VolumeDataVtkMapper3D::~VolumeDataVtkMapper3D()
 {
-  m_VtkVolumeMapper->Delete();
-  m_Volume->Delete();
+  // m_VtkVolumeMapper->Delete();
+  //m_Volume->Delete();
   m_UnitSpacingImageFilter->Delete();
   m_ImageCast->Delete();
+  m_LowResMapper->Delete();
+  m_MedResMapper->Delete();
+  m_HiResMapper->Delete();
+  m_Resampler->Delete();
+  m_VolumeProperty->Delete();
+  m_VolumeLOD->Delete();
 }
 void mitk::VolumeDataVtkMapper3D::AbortCallback(vtkObject *caller, unsigned long eid, void *clientdata, void *calldata) {
   // std::cout << "abort test called" << std::endl;
@@ -144,9 +179,14 @@ void mitk::VolumeDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
   m_ImageCast->SetInput( inputData );
 
 //  m_ImageCast->Update();    
-  m_VtkVolumeMapper->SetInput( m_UnitSpacingImageFilter->GetOutput() );
-  m_Volume->SetMapper( m_VtkVolumeMapper );
-
+  //m_VtkVolumeMapper->SetInput( m_UnitSpacingImageFilter->GetOutput() );
+  //m_Volume->SetMapper( m_VtkVolumeMapper );
+  m_Resampler->SetInput(m_UnitSpacingImageFilter->GetOutput());  
+    
+  m_LowResMapper->SetInput(m_Resampler->GetOutput());
+  m_MedResMapper->SetInput(m_UnitSpacingImageFilter->GetOutput());
+  m_HiResMapper->SetInput(m_UnitSpacingImageFilter->GetOutput());
+  
   vtkPiecewiseFunction *opacityTransferFunction;
   vtkColorTransferFunction* colorTransferFunction;
 
@@ -155,15 +195,30 @@ void mitk::VolumeDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
 
   m_ImageCast->SetShift(0);
 
-  mitk::LookupTableProperty::Pointer LookupTableProp;
-  LookupTableProp = dynamic_cast<mitk::LookupTableProperty*>(this->GetDataTreeNode()->GetProperty("LookupTable").GetPointer());
-  if (LookupTableProp.IsNotNull() )
-  {
-    LookupTableProp->GetLookupTable().CreateColorTransferFunction(colorTransferFunction);
-    colorTransferFunction->ClampingOn();
-    LookupTableProp->GetLookupTable().CreateOpacityTransferFunction(opacityTransferFunction);
-    opacityTransferFunction->ClampingOn();
+  
+mitk::TransferFunctionProperty::Pointer tranferFunctionProp = dynamic_cast<mitk::TransferFunctionProperty*>(this->GetDataTreeNode()->GetProperty("TransferFunction").GetPointer());
+  if (tranferFunctionProp.IsNull()) {
+   // create one
+    mitk::TransferFunction::Pointer newTF = mitk::TransferFunction::New();
+    newTF->SetMin(-10);
+    newTF->SetMax(+310);
+    this->GetDataTreeNode()->SetProperty("TransferFunction", new TransferFunctionProperty(newTF.GetPointer()));
+  } 
+    
+  mitk::LookupTableProperty::Pointer lookupTableProp;
+  lookupTableProp = dynamic_cast<mitk::LookupTableProperty*>(this->GetDataTreeNode()->GetProperty("LookupTable").GetPointer());
+ mitk::TransferFunctionProperty::Pointer transferFunctionProp = dynamic_cast<mitk::TransferFunctionProperty*>(this->GetDataTreeNode()->GetProperty("TransferFunction").GetPointer());
+  if (transferFunctionProp.IsNotNull() && transferFunctionProp->GetValue()->GetValid())   {
 
+    opacityTransferFunction = transferFunctionProp->GetValue()->GetScalarOpacityFunction();
+    colorTransferFunction = transferFunctionProp->GetValue()->GetColorTransferFunction(); 
+    std::cout << "Updated transfer functions in mapper" << std::endl;
+  } else if (lookupTableProp.IsNotNull() )
+{
+    lookupTableProp->GetLookupTable().CreateColorTransferFunction(colorTransferFunction);
+    colorTransferFunction->ClampingOn();
+    lookupTableProp->GetLookupTable().CreateOpacityTransferFunction(opacityTransferFunction);
+    opacityTransferFunction->ClampingOn();
   }
   else
   {
@@ -219,8 +274,16 @@ void mitk::VolumeDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
 
   m_VolumeProperty->SetDiffuse(0.99);
   m_VolumeProperty->SetAmbient(0.99);
-
-  m_Volume->Update();
+  mitk::OpenGLRenderer* openGlRenderer = dynamic_cast<mitk::OpenGLRenderer*>(renderer);
+  assert(openGlRenderer);
+  vtkRenderWindow* vtkRendWin = dynamic_cast<vtkRenderWindow*>(openGlRenderer->GetVtkRenderWindow());
+  if (vtkRendWin) {
+    vtkRendWin->SetDesiredUpdateRate(20.0);
+  } else {
+    std::cout << "no vtk renderwindow" << std::endl;
+  }
+  //m_Volume->Update();
+  // m_VolumeLOD->Update();
   // m_Prop3D = m_Volume;
 
   // now add an AbortCheckEvent callback for cancelling the rendering 
@@ -233,6 +296,8 @@ void mitk::VolumeDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
   vtkRendWin = (vtkRenderWindow*)openGlRenderer->GetVtkRenderWindow();
   vtkRendWin->AddObserver(vtkCommand::AbortCheckEvent,cbc); 
 */
+//  colorTransferFunction->Delete();
+//  opacityTransferFunction->Delete();
 }
 
 void mitk::VolumeDataVtkMapper3D::ApplyProperties(vtkActor* actor, mitk::BaseRenderer* renderer)

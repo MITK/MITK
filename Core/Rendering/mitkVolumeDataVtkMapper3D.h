@@ -28,10 +28,13 @@ PURPOSE.  See the above copyright notices for more information.
 
 class vtkVolumeRayCastMapper;
 class vtkVolumeTextureMapper2D;
+class vtkVolumeMapper;
 class vtkVolume;
 class vtkObject;
 class vtkImageShiftScale;
 class vtkImageChangeInformation;
+class vtkLODProp3D;
+class vtkImageResample;
 
 namespace mitk {
 
@@ -62,13 +65,18 @@ protected:
   virtual void GenerateData(mitk::BaseRenderer* renderer);
 
   vtkActor* m_Actor;
-  vtkVolume* m_Volume; 
+  // vtkVolume* m_Volume; 
   vtkImageShiftScale* m_ImageCast;
   vtkImageChangeInformation* m_UnitSpacingImageFilter; 
   vtkVolumeProperty* m_VolumeProperty;
   //vtkVolumeRayCastMapper* m_VtkVolumeMapper;
-	vtkVolumeTextureMapper2D* m_VtkVolumeMapper;
-
+	// vtkVolumeMapper* m_VtkVolumeMapper;
+	// vtkVolumeTextureMapper2D* m_VtkVolumeMapper;
+  vtkVolumeTextureMapper2D* m_LowResMapper;
+  vtkVolumeTextureMapper2D* m_MedResMapper;
+  vtkVolumeRayCastMapper* m_HiResMapper;
+  vtkLODProp3D* m_VolumeLOD;
+  vtkImageResample* m_Resampler; 
 };
 
 } // namespace mitk

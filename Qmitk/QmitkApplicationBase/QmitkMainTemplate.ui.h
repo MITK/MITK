@@ -104,7 +104,6 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
           if ( lw.IsNotNull( ) )
           {
               mitkMultiWidget->levelWindowWidget->setLevelWindow( lw->GetLevelWindow() );
-              std::cout << "lw" << std::endl;
           }
       }
       delete it;

@@ -89,7 +89,7 @@ virtual void Write()                                                        \
     }                                                                       \
   /* Fill in image information.*/                                           \
   this->UpdateOutputInformation();                                          \
-  this->GetInput()->SetRequestedRegionToLargestPossibleRegion();            \
+  (*this->GetInputs().begin())->SetRequestedRegionToLargestPossibleRegion();\
   this->PropagateRequestedRegion(NULL);                                     \
   this->UpdateOutputData(NULL);                                             \
 }                                                                           \

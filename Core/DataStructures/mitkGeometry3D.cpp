@@ -265,8 +265,3 @@ void mitk::Geometry3D::ExecuteOperation(Operation* operation)
   //std::cout << "Position:  <" << m_Position[0] <<", " << m_Position[1] << ", " << m_Position[2] << ">\n";
   //std::cout << "Scale:  <" << m_Scale[0] <<", " << m_Scale[1] << ", " << m_Scale[2] << ">\n";
 }
-
-mitk::ScalarType* mitk::Geometry3D::GetScale()
-{
-  return m_Scale;
-}

@@ -19,7 +19,7 @@ public:
   //## @brief Get the number of time-steps
   itkGetConstMacro(TimeSteps, unsigned int);
 
-  const TimeBounds& GetTimeBoundsInMS() const;
+  virtual const TimeBounds& GetTimeBoundsInMS() const;
   //##Documentation
   //## @brief Set/Get whether the TimeSlicedGeometry is evenly-timed (m_EvenlyTimed)
   //## 
@@ -39,7 +39,11 @@ public:
   virtual const mitk::BoundingBox* GetBoundingBox() const;
 
   virtual bool IsValidTime(int t) const;
-  
+
+  virtual int MSToTimeStep(mitk::ScalarType time_in_ms) const;
+
+  virtual mitk::ScalarType TimeStepToMS(int timestep) const;
+
   virtual void Initialize(unsigned int timeSteps);
 
   //##Documentation

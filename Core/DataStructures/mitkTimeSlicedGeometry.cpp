@@ -20,9 +20,13 @@ mitk::Geometry3D* mitk::TimeSlicedGeometry::GetGeometry3D(int t) const
       requestedgeometry = firstgeometry->Clone();
 
       TimeBounds timebounds = requestedgeometry->GetTimeBoundsInMS();
-      mitk::ScalarType later = (timebounds[1]-timebounds[0])*t;
-      timebounds[0]+=later; timebounds[1]+=later;
-      requestedgeometry->SetTimeBoundsInMS(timebounds);
+      if(timebounds[1]<ScalarTypeNumericTraits::max())
+      {
+        mitk::ScalarType later = (timebounds[1]-timebounds[0])*t;
+        timebounds[0]+=later; timebounds[1]+=later;
+        requestedgeometry->SetTimeBoundsInMS(timebounds);
+      }
+
       geometry3d = requestedgeometry;
       m_Geometry3Ds[t] = geometry3d;
     }
@@ -66,6 +70,31 @@ bool mitk::TimeSlicedGeometry::SetGeometry3D(mitk::Geometry3D* geometry3D, int t
   return false;
 }
 
+int mitk::TimeSlicedGeometry::MSToTimeStep(mitk::ScalarType time_in_ms) const
+{
+  assert(m_EvenlyTimed);
+  {
+    if(time_in_ms < m_TimeBoundsInMS[0])
+      return -1;
+    if(time_in_ms >= m_TimeBoundsInMS[1])
+      return m_TimeSteps;
+    if(m_TimeBoundsInMS[0]==m_TimeBoundsInMS[1])
+      return 0;
+    if((m_TimeBoundsInMS[0]>-ScalarTypeNumericTraits::max()) && (m_TimeBoundsInMS[1]<ScalarTypeNumericTraits::max()))
+      return (int) (time_in_ms - m_TimeBoundsInMS[0])/(m_TimeBoundsInMS[1]-m_TimeBoundsInMS[0])*m_TimeSteps;
+    return 0;
+  }
+  return 0;
+}
+
+mitk::ScalarType mitk::TimeSlicedGeometry::TimeStepToMS(int timestep) const
+{
+  assert(m_EvenlyTimed);
+  if(IsValidTime(timestep)==false)
+    return ScalarTypeNumericTraits::max();
+  return ((mitk::ScalarType)timestep)/m_TimeSteps*(m_TimeBoundsInMS[1]-m_TimeBoundsInMS[0])+m_TimeBoundsInMS[0];
+}
+
 void mitk::TimeSlicedGeometry::Initialize(unsigned int timeSteps)
 {
   m_TimeSteps = timeSteps;
@@ -102,7 +131,7 @@ const mitk::BoundingBox* mitk::TimeSlicedGeometry::GetBoundingBox() const
   mitk::BoundingBox::PointIdentifier pointid=0;
 
   for(t=0; t<m_TimeSteps; ++t)
-  {    
+  {
     geometry3d = GetGeometry3D(t);
     assert(geometry3d!=NULL);
     nextBoundingBox = geometry3d->GetBoundingBox();
@@ -150,7 +179,7 @@ mitk::Geometry3D::Pointer mitk::TimeSlicedGeometry::Clone() const
   unsigned int t;
   for(t=0; t<m_TimeSteps; ++t)
   {
-    newGeometry->SetGeometry3D(m_Geometry3Ds[t], t);
+    newGeometry->SetGeometry3D(m_Geometry3Ds[t]->Clone(), t);
   }
   return newGeometry.GetPointer();
 }

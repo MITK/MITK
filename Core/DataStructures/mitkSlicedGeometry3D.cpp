@@ -41,6 +41,7 @@ mitk::Geometry2D* mitk::SlicedGeometry3D::GetGeometry2D(int s) const
         mitk::PlaneGeometry::Pointer requestedslice;
         requestedslice = mitk::PlaneGeometry::New();
         requestedslice->Initialize();
+        requestedslice->SetTimeBoundsInMS(firstslice->GetTimeBoundsInMS());
         view.point+=direction*s;
         requestedslice->SetPlaneView(view);
         requestedslice->SetThickness(firstslice->GetThickness());
@@ -337,18 +338,44 @@ void mitk::SlicedGeometry3D::SetDirectionVector(const mitk::Vector3D& directionV
   }
 }
 
+void mitk::SlicedGeometry3D::SetTimeBoundsInMS(const mitk::TimeBounds& timebounds)
+{
+  Superclass::SetTimeBoundsInMS(timebounds);
+
+  int s;
+  for(s=0; s<m_Slices; ++s)
+  {
+    if(m_Geometry2Ds[s]!=NULL)
+    {
+      m_Geometry2Ds[s]->SetTimeBoundsInMS(timebounds);
+    }
+  }
+  m_TimeBoundsInMS = timebounds;
+}
+
 mitk::Geometry3D::Pointer mitk::SlicedGeometry3D::Clone() const
 {
   mitk::SlicedGeometry3D::Pointer newGeometry = SlicedGeometry3D::New();
   newGeometry->Initialize(m_Slices);
+  newGeometry->SetTimeBoundsInMS(m_TimeBoundsInMS);  
   newGeometry->GetTransform()->SetMatrix(m_Transform->GetMatrix());
   //newGeometry->GetRelativeTransform()->SetMatrix(m_RelativeTransform->GetMatrix());
   newGeometry->SetEvenlySpaced(m_EvenlySpaced);
-  newGeometry->SetSpacing(newGeometry->GetSpacing());
+  newGeometry->SetSpacing(GetSpacing());
   unsigned int s;
   for(s=0; s<m_Slices; ++s)
   {
-    newGeometry->SetGeometry2D(m_Geometry2Ds[s], s);
+    if(m_Geometry2Ds[s]==NULL)
+    {
+      assert(m_EvenlySpaced);
+    }
+    else
+    {
+      Geometry3D::Pointer geometry = m_Geometry2Ds[s]->Clone();
+      Geometry2D* geometry2d = dynamic_cast<Geometry2D*>(geometry.GetPointer());
+      assert(geometry2d!=NULL);
+      newGeometry->SetGeometry2D(geometry2d, s);
+    }
   }
   return newGeometry.GetPointer();
 }

@@ -58,7 +58,7 @@ public:
   virtual void SetTimeBoundsInMS(const mitk::TimeBounds& timebounds);
 
   //##ModelId=3DCBF5E9037F
-  const TimeBounds& GetTimeBoundsInMS() const;
+  virtual const TimeBounds& GetTimeBoundsInMS() const;
 
   //##ModelId=3DDE65D1028A
   void MMToUnits(const mitk::Point3D &pt_mm, mitk::Point3D &pt_units) const;

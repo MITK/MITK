@@ -81,6 +81,8 @@ public:
   //## @return @a true: geometry successfully updated.
   virtual bool SetGeometry2D(ipPicDescriptor* pic, int s = 0);
 
+  virtual void SetTimeBoundsInMS(const mitk::TimeBounds& timebounds);
+
   //##ModelId=3DCBF5D40253
   virtual const mitk::BoundingBox* GetBoundingBox() const;
 

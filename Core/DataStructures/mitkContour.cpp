@@ -42,6 +42,7 @@ void mitk::Contour::AddVertex(mitk::Point3D newPoint)
   idx.CastFrom(newPoint);
   m_ContourPath->AddVertex(idx);
   m_BoundingBox->SetPoints(m_Vertices);
+  Modified();
 }
 
 void mitk::Contour::UpdateOutputInformation()
@@ -133,9 +134,10 @@ void
 mitk::Contour::SetPoints(mitk::Contour::PointsContainerPointer points)
 {
   m_Vertices = points;
+  Modified();
 }
 
-bool mitk::Contour::IsInside(mitk::Point3D point)
+bool mitk::Contour::IsInside(const mitk::Point3D& point) const
 {
   unsigned int j = 0; 
   unsigned int i = 0;

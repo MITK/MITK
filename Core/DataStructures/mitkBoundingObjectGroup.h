@@ -49,7 +49,7 @@ public:
   bool RequestedRegionIsOutsideOfTheBufferedRegion();
   virtual bool VerifyRequestedRegion();
   void SetRequestedRegion(itk::DataObject *data);
-  virtual bool IsInside(mitk::Point3D p);
+  virtual bool IsInside(const mitk::Point3D& p) const;
 
   itkSetObjectMacro(BoundingObjects, mitk::BoundingObjectGroup::BoundingObjectContainer);
   itkGetObjectMacro(BoundingObjects, mitk::BoundingObjectGroup::BoundingObjectContainer);

@@ -40,7 +40,7 @@ public:
   virtual bool VerifyRequestedRegion();
   void SetRequestedRegion(itk::DataObject *data);
 
-  virtual bool IsInside(mitk::Point3D p)=0;
+  virtual bool IsInside(const mitk::Point3D& p) const=0;
 
   virtual mitk::ScalarType GetVolume();
   itkGetMacro(Positive, bool);

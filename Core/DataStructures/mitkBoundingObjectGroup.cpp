@@ -173,7 +173,7 @@ void mitk::BoundingObjectGroup::AddBoundingObject(mitk::BoundingObject::Pointer 
   UpdateOutputInformation();
 }
 
-bool mitk::BoundingObjectGroup::IsInside(mitk::Point3D p)
+bool mitk::BoundingObjectGroup::IsInside(const mitk::Point3D& p) const
 {
   mitk::BoundingObjectGroup::BoundingObjectContainer::ConstIterator boundingObjectsIterator = m_BoundingObjects->Begin();
   const mitk::BoundingObjectGroup::BoundingObjectContainer::ConstIterator boundingObjectsIteratorEnd = m_BoundingObjects->End();

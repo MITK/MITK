@@ -39,7 +39,7 @@ mitk::Ellipsoid::~Ellipsoid()
 {
 }
 
-bool mitk::Ellipsoid::IsInside(Point3D worldPoint)
+bool mitk::Ellipsoid::IsInside(const Point3D& worldPoint) const
 {
   // transform point from world to object coordinates
   ScalarType p[4];

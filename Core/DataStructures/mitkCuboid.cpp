@@ -40,7 +40,7 @@ mitk::Cuboid::~Cuboid()
 
 }
 
-bool mitk::Cuboid::IsInside(Point3D worldPoint)
+bool mitk::Cuboid::IsInside(const Point3D& worldPoint) const
 {
   // transform point from world to object coordinates
   ScalarType p[4];

@@ -133,7 +133,7 @@ namespace mitk
        */
       virtual void SetRequestedRegion(itk::DataObject *data);
 
-      bool IsInside(mitk::Point3D point);
+      bool IsInside(const mitk::Point3D& point) const;
 
     protected:
       Contour();

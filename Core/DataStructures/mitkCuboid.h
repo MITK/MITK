@@ -34,7 +34,7 @@ public:
   itkNewMacro(Self);
 
   virtual mitk::ScalarType GetVolume();
-  virtual bool IsInside(Point3D p);
+  virtual bool IsInside(const Point3D& p)  const;
 
 protected:
   Cuboid();

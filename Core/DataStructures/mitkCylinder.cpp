@@ -40,7 +40,7 @@ mitk::Cylinder::~Cylinder()
 
 }
 
-bool mitk::Cylinder::IsInside(Point3D worldPoint)
+bool mitk::Cylinder::IsInside(const Point3D& worldPoint) const
 {
   // transform point from world to object coordinates
   ScalarType p[4];

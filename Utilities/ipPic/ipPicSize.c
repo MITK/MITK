@@ -59,6 +59,9 @@
  *  @return size of image data
  *
  * $Log$
+ * Revision 1.7  2004/07/02 11:40:49  max
+ * Fixed bug resulting in ipUInt4_t range overflow using float volumes of a size larger than 512x512x512.
+ *
  * Revision 1.6  2002/11/13 17:53:00  ivo
  * new ipPic added.
  *
@@ -86,13 +89,15 @@ ipUInt4_t _ipPicSize(
 {
   ipUInt4_t i;
   ipUInt4_t elements;
-
+  ipUInt4_t bytesPerElement;
   if( pic->dim == 0 )
     return( 0 );
 
   elements = pic->n[0];
   for( i = 1; i < pic->dim; i++ )
     elements *= pic->n[i];
-
-  return( elements * pic->bpe / 8 );
+  
+  bytesPerElement = pic->bpe / 8;
+  
+  return( elements * bytesPerElement );
 }

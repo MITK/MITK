@@ -48,6 +48,7 @@ const char* mitk::PointSetWriter::VERSION_STRING = "0.1" ;
 
 
 mitk::PointSetWriter::PointSetWriter()
+    : m_FileName(""), m_FilePrefix(""), m_FilePattern("")
 {
     this->SetNumberOfRequiredInputs( 1 );
     this->SetNumberOfOutputs( 1 );

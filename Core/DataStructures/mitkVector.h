@@ -188,5 +188,21 @@ inline bool Equal(double scalar1, double scalar2)
 
 } // namespace mitk
 
+#define mitkSetConstReferenceMacro(name,type) \
+  virtual void Set##name (const type & _arg) \
+  { \
+    itkDebugMacro("setting " << #name " to " << _arg ); \
+    if (this->m_##name != _arg) \
+      { \
+      this->m_##name = _arg; \
+      this->Modified(); \
+      } \
+  }
+
+#define mitkSetVectorMacro(name,type) \
+  mitkSetConstReferenceMacro(name,type)
+
+#define mitkGetVectorMacro(name,type) \
+  itkGetConstReferenceMacro(name,type)
 
 #endif /* MITKVECTOR_H_HEADER_INCLUDED_C1EBD0AD */

@@ -217,11 +217,11 @@ bool mitk::DataTreeNode::GetName(char &nodeName, mitk::BaseRenderer* renderer, c
     mitk::StringProperty::Pointer nameProp = dynamic_cast<mitk::StringProperty*>(GetProperty(name, renderer).GetPointer());
     if(nameProp.IsNull())
     {
-        nameProp = new mitk::StringProperty("Unnamed");
-        GetPropertyList(renderer)->SetProperty(name,nameProp);
+      return false;
+    } else {
+      memcpy(&nodeName, nameProp->GetString(), strlen(nameProp->GetString()) + 1 );
+      return true;
     }
-    memcpy(&nodeName, nameProp->GetString(), strlen(nameProp->GetString()) + 1 );
-    return true;
 }
 
 //##ModelId=3EF1941E01D6

@@ -21,7 +21,6 @@ See MITKCopyright.txt or http://www.mitk.org/ for details.
 #include "mitkStateTransitionOperation.h"
 #include "mitkOperationEvent.h"
 #include "mitkUndoController.h"
-#include "mitkStatusBar.h"
 #include "mitkInteractionConst.h"
 #include <itkMacro.h>
 #include "mitkInteractor.h"
@@ -38,9 +37,12 @@ mitk::StateMachine::StateMachine(const char * type) : m_CurrentState(NULL)
   {
     m_Type = type;
 	  m_CurrentState = mitk::StateMachineFactory::GetStartState(type);
+    if (m_CurrentState == NULL)
+      itkWarningMacro("Error from "<<this->GetNameOfClass()<<"; Message: did not recieve a pointer for start-state");
   }
-  else
-    mitk::StatusBar::DisplayText("Error! Sender: StateMachine; Message: Type of StateMachine is NULL!", 10000);
+  //else
+  //  itkWarningMacro("Error from "<<this->GetNameOfClass()<<"; Message: Type of StateMachine is NULL!");
+  //\*todo: check the process with BaseControllers, cause they are always instantiated with type ==NULL! So here we can't check and warn the user.
   
   m_UndoController = new UndoController(LIMITEDLINEARUNDO);//switch to LLU or add LLU
 	m_UndoEnabled = true;
@@ -63,7 +65,7 @@ const mitk::State* mitk::StateMachine::GetCurrentState() const
 bool mitk::StateMachine::HandleEvent(StateEvent const* stateEvent)
 {
   if (m_CurrentState == NULL)
-  return false;//m_CurrentState needs to be set first!
+    return false;//m_CurrentState needs to be set first!
 
   //get the Transition from m_CurrentState which waits for this EventId
   const Transition *tempTransition = m_CurrentState->GetTransition(stateEvent->GetId());
@@ -141,7 +143,7 @@ void mitk::StateMachine::ExecuteOperation(Operation* operation)
 			mitk::StateTransitionOperation* stateTransOp = dynamic_cast<mitk::StateTransitionOperation *>(operation);
 			if (stateTransOp == NULL)
 			{
-				mitk::StatusBar::DisplayText("Error! see mitkStateMachine.cpp", 10000);
+				itkWarningMacro("Error! see mitkStateMachine.cpp");
 				return;
 			}
 #ifdef INTERDEBUG

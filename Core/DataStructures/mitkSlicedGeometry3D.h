@@ -146,6 +146,9 @@ protected:
   //##ModelId=3E3456C50067
   virtual ~SlicedGeometry3D();
 
+  //## set spacing from a pic tag
+  void SetSpacing( const ipPicTSV_t* tsv );
+
   //##ModelId=3E3968CC000E
   //##Documentation
   //## Container for the 2D-geometries contained within this SliceGeometry3D .

@@ -200,6 +200,10 @@ void mitk::DataTreeNodeFactory::ReadFileTypeSTL()
         surface->SetVtkPolyData( stlReader->GetOutput() );
         mitk::DataTreeNode::Pointer node = this->GetOutput();
         node->SetData( surface );
+
+				// set filename without path as string property
+        mitk::StringProperty::Pointer nameProp = new mitk::StringProperty( this->GetBaseFileName() );
+        node->SetProperty( "name", nameProp );
     }
 
     stlReader->Delete();
@@ -224,6 +228,10 @@ void mitk::DataTreeNodeFactory::ReadFileTypeVTK()
         surface->SetVtkPolyData( reader->GetOutput() );
         mitk::DataTreeNode::Pointer node = this->GetOutput();
         node->SetData( surface );
+
+				// set filename without path as string property
+        mitk::StringProperty::Pointer nameProp = new mitk::StringProperty( this->GetBaseFileName() );
+        node->SetProperty( "name", nameProp );
     }
 
     reader->Delete();
@@ -429,6 +437,7 @@ void mitk::DataTreeNodeFactory::ReadFileTypeHPSONOS()
     sliceSelector->SetInput( channelSelector->GetInput() );
     mitk::StringProperty::Pointer ultrasoundProp = new mitk::StringProperty( "OriginalBackscatter" );
     node->SetProperty( "ultrasound", ultrasoundProp );
+
     mitk::StringProperty::Pointer nameProp = new mitk::StringProperty( "OriginalBackscatter" );
     node->SetProperty( "name", nameProp );
     node->SetProperty( "layer", new mitk::IntProperty( -11 ) );
@@ -449,6 +458,7 @@ void mitk::DataTreeNodeFactory::ReadFileTypeHPSONOS()
     node->SetData( cyl2cart->GetOutput() );
     ultrasoundProp = new mitk::StringProperty( "TransformedBackscatter" );
     node->SetProperty( "ultrasound", ultrasoundProp );
+		
     nameProp = new mitk::StringProperty( "TransformedBackscatter" );
     node->SetProperty( "name", nameProp );
     node->SetProperty( "layer", new mitk::IntProperty( -10 ) );

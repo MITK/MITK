@@ -20,6 +20,8 @@
 #include <vtkMatrix4x4.h>
 #include <vtkLookupTable.h>
 
+#include "GL/glu.h"
+
 int mitk::ImageMapper2D::numRenderer = 0;
  
 

@@ -48,9 +48,6 @@ public:
   typedef typename ItkImageType::RegionType ItkRegionType;
   typedef itk::ImageRegionIteratorWithIndex< ItkImageType > ItkImageIteratorType;
 
-  virtual void GenerateOutputInformation();
-  virtual void GenerateData();
-
   void SetBoundingObject( const mitk::BoundingObject* boundingObject );
   const mitk::BoundingObject* GetBoundingObject() const;
   itkSetMacro(InsideValue,  PixelType);
@@ -67,6 +64,10 @@ protected:
   BoundingObjectCutter();
   virtual ~BoundingObjectCutter();
 
+  virtual void GenerateInputRequestedRegion();
+  virtual void GenerateOutputInformation();
+  virtual void GenerateData();
+
   mitk::BoundingObject::Pointer m_BoundingObject; // BoundingObject that will be cut
   PixelType m_InsideValue;                        // Value for inside pixels, if UseInsideValue is true
   PixelType m_OutsideValue;                       // Value for outside pixels
@@ -75,6 +76,14 @@ protected:
                                                   // (else they keep their original value)
   unsigned int m_OutsidePixelCount;
   unsigned int m_InsidePixelCount;
+
+  //##Description 
+  //## @brief Region of input needed for cutting
+  typename mitk::SlicedData::RegionType m_InputRequestedRegion;
+
+  //##Description 
+  //## @brief Time when Header was last initialized
+  itk::TimeStamp m_TimeOfHeaderInitialization;
 };
 } // namespace mitk
 

@@ -123,7 +123,7 @@ public:
    
     bool m_IilInterpolation;
     //##ModelId=3E6423D30002
-    RendererInfo() :  m_iil4mitkImage(NULL), m_Renderer(NULL), m_ObserverId(0), m_Pic(NULL), m_RendererId(-1), m_IilInterpolation(true)
+    RendererInfo() :  m_RendererId(-1), m_iil4mitkImage(NULL), m_Renderer(NULL), m_ObserverId(0), m_Pic(NULL), m_IilInterpolation(true)
     {
       m_PixelsPerMM.Fill(0);
     };

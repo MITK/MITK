@@ -1,0 +1,63 @@
+<!DOCTYPE UI><UI version="3.1" stdsetdef="1">
+<class>QmitkDataManagerControls</class>
+<widget class="QWidget">
+    <property name="name">
+        <cstring>QmitkDataManagerControls</cstring>
+    </property>
+    <property name="geometry">
+        <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>561</width>
+            <height>623</height>
+        </rect>
+    </property>
+    <property name="sizePolicy">
+        <sizepolicy>
+            <hsizetype>1</hsizetype>
+            <vsizetype>1</vsizetype>
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+        </sizepolicy>
+    </property>
+    <property name="font">
+        <font>
+            <family>Arial</family>
+            <pointsize>10</pointsize>
+        </font>
+    </property>
+    <property name="caption">
+        <string>Form1</string>
+    </property>
+    <property name="mouseTracking">
+        <bool>false</bool>
+    </property>
+    <hbox>
+        <property name="name">
+            <cstring>unnamed</cstring>
+        </property>
+        <property name="margin">
+            <number>4</number>
+        </property>
+        <property name="spacing">
+            <number>4</number>
+        </property>
+    </hbox>
+</widget>
+<includes>
+    <include location="global" impldecl="in implementation">mitkStringProperty.h</include>
+    <include location="global" impldecl="in implementation">qlistview.h</include>
+    <include location="global" impldecl="in declaration">DataTree.h</include>
+    <include location="local" impldecl="in declaration">DataTreeView.h</include>
+    <include location="local" impldecl="in implementation">QmitkDataManagerControls.ui.h</include>
+</includes>
+<variables>
+    <variable>QHBoxLayout * treeLayout;</variable>
+    <variable>mitk::DataTreeIterator * m_DataTreeIterator;</variable>
+    <variable>DataTreeView * dataTreeView;</variable>
+</variables>
+<functions>
+    <function>SetDataTreeIterator( mitk::DataTreeIterator * it )</function>
+</functions>
+<layoutdefaults spacing="0" margin="0"/>
+</UI>

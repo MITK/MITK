@@ -67,7 +67,9 @@ void mitk::LineMapper2D::Paint(mitk::BaseRenderer * renderer)
     //List of the Points
     PointSet::DataType::PointsContainerConstIterator it, end;
     it = input->GetPointSet()->GetPoints()->Begin();
-    end = --input->GetPointSet()->GetPoints()->End();//the last before end, because lines from n to n+1
+    end = input->GetPointSet()->GetPoints()->End();//the last before end, because lines from n to n+1
+		if (end!=it)  // otherwise PointSet is empty
+				end--;
 
     //bool list for the selection of the points
     PointSet::DataType::PointDataContainerIterator selIt, selItNext;

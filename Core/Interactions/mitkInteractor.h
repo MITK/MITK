@@ -101,7 +101,6 @@ protected:
   //## @brief Mode of Selection
   ModeType m_Mode;
 
-
 };
 
 }//namespace mitk

@@ -14,6 +14,7 @@
 #include <mitkSurfaceData.h>
 #include <mitkColorProperty.h>
 #include <mitkLevelWindowProperty.h>
+#include <mitkVesselTreeFileReader.h>
 #include <LevelWindow.h>
 #include <mitkFloatProperty.h>
 #include <qregexp.h>
@@ -27,7 +28,7 @@ void QmitkMainTemplate::fileNew()
 
 void QmitkMainTemplate::fileOpen()
 {
-    QString fileName = QFileDialog::getOpenFileName(NULL,"DKFZ Pic (*.seq *.pic *.pic.gz *.seq.gz);;stl files (*.stl)");
+    QString fileName = QFileDialog::getOpenFileName(NULL,"DKFZ Pic (*.seq *.pic *.pic.gz *.seq.gz);;stl files (*.stl);;ves files (*.ves)");
 
     if ( !fileName.isNull() )
     {
@@ -109,6 +110,21 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
                 //       ipPicFree(header);
                 delete it;
             }
+        }
+        else if( strstr(fileName, ".ves")!=0 )
+        {
+            mitk::VesselTreeFileReader::Pointer reader = mitk::VesselTreeFileReader::New();
+            std::cout << "loading " << fileName << " as ves ... " << std::endl;
+            reader->SetFileName(fileName);          
+            reader->Update();
+            mitk::DataTreeIterator* it=tree->inorderIterator();
+
+            node=mitk::DataTreeNode::New();
+            node->SetData(reader->GetOutput());
+            it->add(node); 
+
+            initWidgets(node);
+            delete it;
         }
         if(node != NULL)
         {

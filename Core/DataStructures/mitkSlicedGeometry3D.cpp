@@ -282,6 +282,11 @@ void mitk::SlicedGeometry3D::SetSpacing(ipPicDescriptor* pic)
         if(tsv->bpe==64)
           spacing.set(((ipFloat8_t*)tsv->value)[0], ((ipFloat8_t*)tsv->value)[1],((ipFloat8_t*)tsv->value)[2]);
     }
+    if(spacing.x<=0 || spacing.y<=0 || spacing.z<=0)
+    {
+      itkWarningMacro(<< "illegal spacing by tag PIXEL SIZE: " << spacing << ". Setting spacing to (1,1,1).");
+      spacing.set(1,1,1);
+    }
   }
 #ifdef MBI_INTERNAL
   else

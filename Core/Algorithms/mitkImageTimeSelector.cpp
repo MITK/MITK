@@ -39,6 +39,30 @@ void mitk::ImageTimeSelector::GenerateOutputInformation()
 //##ModelId=3E3BD0CE0194
 void mitk::ImageTimeSelector::GenerateData()
 {
-	SetDataItem(GetVolumeData(m_TimeNr, m_ChannelNr), 0);
+  const Image::RegionType& requestedRegion = GetOutput()->GetRequestedRegion();
+
+  //do we really need a complete volume at a time?
+  if(requestedRegion.GetSize(2)>1)
+  	SetVolumeItem(GetVolumeData(m_TimeNr, m_ChannelNr), 0);
+  else
+  //no, so take just a slice!
+    SetSliceItem(GetSliceData(requestedRegion.GetIndex(2), m_TimeNr, m_ChannelNr), requestedRegion.GetIndex(2), 0);
 }
 
+void mitk::ImageTimeSelector::GenerateInputRequestedRegion()
+{
+  Superclass::GenerateInputRequestedRegion();
+
+  mitk::ImageToImageFilter::InputImagePointer input =
+    const_cast< mitk::ImageToImageFilter::InputImageType * > ( this->GetInput() );
+  mitk::Image::Pointer output = this->GetOutput();
+
+  Image::RegionType requestedRegion;
+  requestedRegion = output->GetRequestedRegion();
+  requestedRegion.SetIndex(3, m_TimeNr);
+  requestedRegion.SetIndex(4, m_ChannelNr);
+  requestedRegion.SetSize(3, 1);
+  requestedRegion.SetSize(4, 1);
+
+  input->SetRequestedRegion( & requestedRegion );
+}

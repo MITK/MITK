@@ -25,11 +25,29 @@ mitk::ImageDataItem::Pointer mitk::SubImageSelector::GetChannelData(int n)
 }
 
 //##ModelId=3E1A123E0396
-void mitk::SubImageSelector::SetDataItem(mitk::ImageDataItem::Pointer dataItem, int n)
+void mitk::SubImageSelector::SetChannelItem(mitk::ImageDataItem::Pointer dataItem, int n)
 {
 	mitk::Image::Pointer output  = this->GetOutput();
 	if(output->IsValidChannel(n)==false) return;
 	output->m_Channels[n]=dataItem;
+}
+
+void mitk::SubImageSelector::SetVolumeItem(mitk::ImageDataItem::Pointer dataItem, int t, int n)
+{
+	mitk::Image::Pointer output  = this->GetOutput();
+	if(output->IsValidVolume(t,n)==false) return;
+  int pos;
+  pos=output->GetVolumeIndex(t,n);
+	output->m_Volumes[pos]=dataItem;
+}
+
+void mitk::SubImageSelector::SetSliceItem(mitk::ImageDataItem::Pointer dataItem, int s, int t, int n)
+{
+	mitk::Image::Pointer output  = this->GetOutput();
+	if(output->IsValidSlice(s,t,n)==false) return;
+  int pos;
+  pos=output->GetSliceIndex(s,t,n);
+	output->m_Slices[pos]=dataItem;
 }
 
 //##ModelId=3E1B19AD02A6

@@ -34,6 +34,8 @@ protected:
     //##ModelId=3E1A0A2E027F
     virtual void GenerateOutputInformation();
 
+  virtual void GenerateInputRequestedRegion();
+
     //##ModelId=3E1A0A320090
     virtual void GenerateData();
 

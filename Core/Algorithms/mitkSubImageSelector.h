@@ -40,7 +40,9 @@ protected:
 	mitk::ImageDataItem::Pointer GetChannelData(int n = 0);
 
 	//##ModelId=3E1A123E0396
-	void SetDataItem(mitk::ImageDataItem::Pointer dataItem, int n = 0);
+	void SetSliceItem(mitk::ImageDataItem::Pointer dataItem, int s = 0, int t = 0, int n = 0);
+	void SetVolumeItem(mitk::ImageDataItem::Pointer dataItem, int t = 0, int n = 0);
+	void SetChannelItem(mitk::ImageDataItem::Pointer dataItem, int n = 0);
 };
 
 } // namespace mitk

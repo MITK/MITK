@@ -36,10 +36,12 @@ protected:
 	//##ModelId=3E3BD0CC0232
     virtual void GenerateOutputInformation();
 
+  virtual void GenerateInputRequestedRegion();
+
 	//##ModelId=3E3BD0CE0194
     virtual void GenerateData();
 
-    //##ModelId=3E1B1A0501C7
+  //##ModelId=3E1B1A0501C7
 	int m_TimeNr;
 
 	//##ModelId=3E1B1A08024D

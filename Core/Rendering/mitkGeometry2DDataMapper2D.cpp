@@ -25,6 +25,7 @@ const mitk::Geometry2DData *mitk::Geometry2DDataMapper2D::GetInput(void)
     return static_cast<const mitk::Geometry2DData * > ( GetData() );
 }
 
+
 //##ModelId=3E67D77A0109
 void mitk::Geometry2DDataMapper2D::Paint(mitk::BaseRenderer * renderer)
 {
@@ -36,19 +37,24 @@ void mitk::Geometry2DDataMapper2D::Paint(mitk::BaseRenderer * renderer)
 
         mitk::Geometry2DData::Pointer input  = const_cast<mitk::Geometry2DData*>(this->GetInput());
 
-        PlaneGeometry::ConstPointer planeGeometry = dynamic_cast<const PlaneGeometry *>(input->GetGeometry2D());
+        PlaneGeometry::ConstPointer input_planeGeometry = dynamic_cast<const PlaneGeometry *>(input->GetGeometry2D());
         PlaneGeometry::ConstPointer worldPlaneGeometry = dynamic_cast<const PlaneGeometry*>(renderer->GetWorldGeometry());
 
-        if((planeGeometry!=NULL) && (worldPlaneGeometry!=NULL))
+        if((input_planeGeometry!=NULL) && (worldPlaneGeometry!=NULL))
         {
             mitk::DisplayGeometry::Pointer displayGeometry = renderer->GetDisplayGeometry();
             assert(displayGeometry);
+
+			//we want to take the transform of the datatreenode into account. Thus, copy
+			//the geometry and transform it with the transform of the datatreenode.
+			PlaneGeometry::Pointer planeGeometry = PlaneGeometry::New();
+			planeGeometry->SetPlaneView(input_planeGeometry->GetPlaneView());
+			planeGeometry->TransformGeometry(GetDataTreeNode()->GetVtkTransform());
 
             //calculate intersection of the plane data with the border of the world geometry rectangle
 	        Point2D lineFrom;
 	        Point2D lineTo;
     		bool intersecting = worldPlaneGeometry->GetPlaneView().intersectPlane2D( planeGeometry->GetPlaneView(), lineFrom, lineTo );
-
 
             if(intersecting)
             {

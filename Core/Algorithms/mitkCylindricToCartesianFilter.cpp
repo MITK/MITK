@@ -320,23 +320,10 @@ void mitk::CylindricToCartesianFilter::GenerateOutputInformation()
   spacing *= 1.0/scale;
   output->GetSlicedGeometry()->SetSpacing(spacing);
 
-  // initialize the spacing of the output
-  // @todo position of input image is not yet used to calculate position of the output
-  //mitk::Point3D origin, right, bottom;
-  //origin.set(0,0,0);                output->GetSlicedGeometry()->UnitsToMM(origin, origin);
-  //right.set(tmpDimensions[0],0,0);  output->GetSlicedGeometry()->UnitsToMM(right, right);
-  //bottom.set(0,tmpDimensions[1],0); output->GetSlicedGeometry()->UnitsToMM(bottom, bottom);
-
-  //PlaneView view_std(origin, right, bottom);
-
-  //mitk::PlaneGeometry::Pointer planegeometry=mitk::PlaneGeometry::New();
-  //planegeometry->SetPlaneView(view_std);
-  //planegeometry->SetThicknessBySpacing(&spacing);
-  //planegeometry->SetSizeInUnits(tmpDimensions[0], tmpDimensions[1]);
-
-  //output->GetSlicedGeometry()->SetGeometry2D(planegeometry.GetPointer(), 0);
-  //output->GetSlicedGeometry()->SetEvenlySpaced();
   output->GetSlicedGeometry()->SetGeometry2D(mitk::Image::BuildStandardPlaneGeometry2D(output->GetSlicedGeometry(), tmpDimensions).GetPointer(), 0);
+  //set the timebounds - after SetGeometry2D, so that the already created PlaneGeometry will also receive this timebounds.
+  output->GetSlicedGeometry()->SetTimeBoundsInMS(input->GetSlicedGeometry()->GetTimeBoundsInMS());
+
   output->SetPropertyList(input->GetPropertyList()->Clone());
   
   // @todo convert transducer position into new coordinate system
@@ -381,19 +368,21 @@ void mitk::CylindricToCartesianFilter::GenerateData()
   pic_transformed->n[2] = output->GetDimension(2);
   pic_transformed->data=malloc(_ipPicSize(pic_transformed));
 
-  int n, nmax;
-  int t, tmax;
+  int nstart, nmax;
+  int tstart, tmax;
 
-  t=output->GetRequestedRegion().GetIndex(3);
-  n=output->GetRequestedRegion().GetIndex(4);
+  tstart=output->GetRequestedRegion().GetIndex(3);
+  nstart=output->GetRequestedRegion().GetIndex(4);
 
-  tmax=t+output->GetRequestedRegion().GetSize(3);
-  nmax=n+output->GetRequestedRegion().GetSize(4);
-  for(;n<nmax;++n)//output->GetNumberOfChannels();++n)
+  tmax=tstart+output->GetRequestedRegion().GetSize(3);
+  nmax=nstart+output->GetRequestedRegion().GetSize(4);
+
+  int n,t;
+  for(n=nstart;n<nmax;++n)//output->GetNumberOfChannels();++n)
   {
     timeSelector->SetChannelNr(n);
 
-    for(t=0;t<tmax;++t)
+    for(t=tstart;t<tmax;++t)
     {
       timeSelector->SetTimeNr(t);
 

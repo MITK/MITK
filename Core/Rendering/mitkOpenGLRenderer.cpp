@@ -136,8 +136,8 @@ void mitk::OpenGLRenderer::UpdateIncludingVtkActors()
     //strange: when using a simple light, the backface of the planes are not shown (regardless of SetNumberOfLayers)
     //m_Light = vtkLight::New();
     //m_VtkRenderer->AddLight( m_Light );
-    m_LightKit = vtkLightKit::New();
-    m_LightKit->AddLightsToRenderer(m_VtkRenderer);
+    //m_LightKit = vtkLightKit::New();
+    //m_LightKit->AddLightsToRenderer(m_VtkRenderer);
   }
 
   m_VtkRenderer->RemoveAllProps();
@@ -146,11 +146,11 @@ void mitk::OpenGLRenderer::UpdateIncludingVtkActors()
   //m_Light->Delete();
   //m_Light = vtkLight::New();
   //m_VtkRenderer->AddLight( m_Light );
-  if(m_LightKit!=NULL)
-  {
-    m_LightKit = vtkLightKit::New();
-    m_LightKit->AddLightsToRenderer(m_VtkRenderer);
-  }
+  //if(m_LightKit!=NULL)
+  //{
+  //  m_LightKit = vtkLightKit::New();
+  //  m_LightKit->AddLightsToRenderer(m_VtkRenderer);
+ // }
 
   //    try
   if (m_DataTreeIterator.IsNotNull())

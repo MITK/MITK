@@ -6,7 +6,10 @@
  *   reads a PicFile from disk
  *
  * $Log$
- * Revision 1.9  1999/11/28 18:22:42  andre
+ * Revision 1.10  2000/02/16 14:29:20  andre
+ * *** empty log message ***
+ *
+ * Revision 1.9  1999/11/28  18:22:42  andre
  * *** empty log message ***
  *
  * Revision 1.8  1999/11/28  16:29:43  andre
@@ -59,6 +62,16 @@ _ipPicOpenPicFileIn( char *path )
     infile = stdin;
   else
     infile = ipPicFOpen( path, "rb" );
+
+  if( !infile )
+    {
+      char buff[1024];
+
+      sprintf( buff, "%s.gz", path ); 
+
+      infile = ipPicFOpen( buff, "rb" ); 
+    }
+
   return( infile );
 }
 

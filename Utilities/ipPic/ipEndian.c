@@ -7,7 +7,10 @@
  *   between different machine representations
  *
  * $Log$
- * Revision 1.2  1997/09/15 13:21:07  andre
+ * Revision 1.3  1998/11/11 11:11:26  andre
+ * *** empty log message ***
+ *
+ * Revision 1.2  1997/09/15  13:21:07  andre
  * switched to new what string format
  *
  * Revision 1.1.1.1  1997/09/06  19:09:58  andre
@@ -52,6 +55,9 @@ void _ipCvtEndian( void *data, unsigned long int len, unsigned char bytes )
   unsigned char i2;
   char buff;
 
+  if( !data )
+    return;
+
   for( i=0; i<len; i+=bytes )
     for( i2=0; i2<bytes/2; i2++ )
       {
@@ -65,6 +71,11 @@ void _ipCp( void *source, void *destination, unsigned long int len )
 {
   unsigned long int i;
 
+  if( !source )
+    return;
+  if( !destination )
+    return;
+
   for( i=0; i<len; i++ )
     ((char *)destination)[i] = ((char *)source)[i];
 }
@@ -73,6 +84,11 @@ void _ipCpCvtEndian( void *source, void *destination, unsigned long int len, uns
 {
   unsigned long int i;
   unsigned char i2;
+
+  if( !source )
+    return;
+  if( !destination )
+    return;
 
   for( i=0; i<len; i+=bytes )
     for( i2=0; i2<bytes; i2++ )

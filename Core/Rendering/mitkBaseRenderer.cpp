@@ -115,6 +115,7 @@ void mitk::BaseRenderer::SetWorldGeometry(const mitk::Geometry2D* geometry2d)
     m_WorldGeometry = geometry2d;
     m_WorldGeometryData->SetGeometry2D(m_WorldGeometry);
     m_DisplayGeometry->SetWorldGeometry(m_WorldGeometry);
+    m_WorldGeometryUpdateTime.Modified();
     Modified();
   }
 }
@@ -127,6 +128,7 @@ void mitk::BaseRenderer::SetDisplayGeometry(mitk::DisplayGeometry* geometry2d)
   {
     m_DisplayGeometry = geometry2d;
     m_DisplayGeometryData->SetGeometry2D(m_DisplayGeometry);
+    m_DisplayGeometryUpdateTime.Modified();
     Modified();
   }
 }

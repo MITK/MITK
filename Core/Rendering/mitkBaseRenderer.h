@@ -149,6 +149,13 @@ public:
   itkGetObjectMacro(WorldGeometryNode, mitk::DataTreeNode);
 
   //##Documentation
+  //## @brief Get timestamp of last call of SetWorldGeometry
+  unsigned long  GetWorldGeometryUpdateTime() { return m_WorldGeometryUpdateTime; };
+  //##Documentation
+  //## @brief Get timestamp of last call of SetDisplayGeometry
+  unsigned long  GetDisplayGeometryUpdateTime() { return m_WorldGeometryUpdateTime; };
+
+  //##Documentation
   //## @brief Get the MapperSlotId to use.
   itkGetMacro(MapperID, MapperSlotId);
   //##Documentation
@@ -248,6 +255,12 @@ private:
   //## very strange when suddenly the image-slice changes its geometry).
   Geometry2D::ConstPointer m_WorldGeometry;
 
+  //##Documentation
+  //## @brief timestamp of last call of SetWorldGeometry
+  itk::TimeStamp m_WorldGeometryUpdateTime;
+  //##Documentation
+  //## @brief timestamp of last call of SetDisplayGeometry
+  itk::TimeStamp m_DisplayGeometryUpdateTime;
 protected:
   //##ModelId=3E66BDF000F4
   //##Documentation

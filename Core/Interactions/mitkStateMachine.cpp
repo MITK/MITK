@@ -40,21 +40,22 @@ bool mitk::StateMachine::HandleEvent(StateEvent const* stateEvent, int objectEve
   if (tempNextState == NULL) return false;
   //and SideEffectId to execute later on
   int tempSideEffectId = tempTransition->GetSideEffectId();
-
-  if ( ( m_CurrentState->GetId() != tempNextState->GetId() ) && ( m_UndoEnabled ) )	//write to UndoMechanism if there is a real statechange and Undo is enabled
+  if ( m_CurrentState->GetId() != tempNextState->GetId() )//statechange only if there is a real statechange
   {
-    //UNDO for this statechange
-	StateTransitionOperation* doOp = new StateTransitionOperation(OpSTATECHANGE, tempNextState);
-	StateTransitionOperation* undoOp = new StateTransitionOperation(OpSTATECHANGE, m_CurrentState);
-	OperationEvent *operationEvent = new OperationEvent(((mitk::OperationActor*)(this)), 
+    if ( m_UndoEnabled )	//write to UndoMechanism if Undo is enabled
+    {
+      //UNDO for this statechange
+	  StateTransitionOperation* doOp = new StateTransitionOperation(OpSTATECHANGE, tempNextState);
+      StateTransitionOperation* undoOp = new StateTransitionOperation(OpSTATECHANGE, m_CurrentState);
+	  OperationEvent *operationEvent = new OperationEvent(((mitk::OperationActor*)(this)), 
 														doOp, undoOp,
 														objectEventId ,groupEventId);
-	m_UndoController->SetOperationEvent(operationEvent);
+	  m_UndoController->SetOperationEvent(operationEvent);
+    }
+    //first following StateChange(or calling ExecuteOperation(tempNextStateOp)), then operation(SideEffect)
+    m_CurrentState = tempNextState;	
   }
-
-  //first following StateChange(or calling ExecuteOperation(tempNextStateOp)), then operation(SideEffect)
-  m_CurrentState = tempNextState;	
-  //Undo is handled in ExecuteSideEffect(...)
+  //Undo of the SideEffect is handled in ExecuteSideEffect(...)
   bool ok = ExecuteSideEffect(tempSideEffectId, stateEvent, objectEventId, groupEventId);
 		
 
@@ -72,6 +73,8 @@ bool mitk::StateMachine::HandleEvent(StateEvent const* stateEvent, int objectEve
   }
   return ok;
 }
+
+
 //##ModelId=3EDCAECB0175
 void mitk::StateMachine::EnableUndo(bool enable)
 {
@@ -102,6 +105,6 @@ void mitk::StateMachine::ExecuteOperation(Operation* operation)
 		}
 		break;
 	default:
-		NULL;
+		;
 	}
 }

@@ -65,9 +65,18 @@ public:
   }
 
   //##Documentation
-  //## @brief Set/change start point of the line
-  void SetPoint( const itk::Point<TCoordRep,NPointDimension>& point1 ) {
+  //## @brief Get point on the line with parameter @a t
+  //##
+  //## @return m_Point+t*m_Direction
+  const itk::Point<TCoordRep,NPointDimension> GetPoint(TCoordRep t) const 
+  {
+    return m_Point+m_Direction*t;
+  }
 
+  //##Documentation
+  //## @brief Set/change start point of the line
+  void SetPoint( const itk::Point<TCoordRep,NPointDimension>& point1 ) 
+  {
     itk::Vector<TCoordRep,NPointDimension> point2;
     point2 = m_Point + m_Direction;
 
@@ -123,7 +132,7 @@ public:
     point2 = m_Point + m_Direction;
 
     m_Point = point1;
-    direction = point2 - point1;
+    m_Direction = point2 - point1;
   }
 
   //##Documentation
@@ -144,7 +153,7 @@ public:
   //## @brief Get end point of the line
   itk::Point<TCoordRep,NPointDimension> GetPoint2() const 
   {
-    itk::Vector<TCoordRep,NPointDimension> point2;
+    itk::Point<TCoordRep,NPointDimension> point2;
     point2 = m_Point+m_Direction;
     return point2;
   }
@@ -172,7 +181,7 @@ public:
 
   //##Documentation
   //## @brief Distance of a point from the line
-  double distance( const itk::Point<TCoordRep,NPointDimension>& point ) const 
+  double Distance( const itk::Point<TCoordRep,NPointDimension>& point ) const 
   {
     itk::Vector<TCoordRep,NPointDimension> diff;
     diff =  Project(point)-point;
@@ -348,7 +357,7 @@ protected:
   itk::Vector<TCoordRep,NPointDimension> m_Direction;
 };
 
-typedef Line<ScalarType, 3> ITKLine3D;
+typedef Line<ScalarType, 3> Line3D;
 
 } // namespace mitk
 #endif /* MITKLINE_H_HEADER_INCLUDED_C19C01E2 */

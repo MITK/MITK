@@ -168,8 +168,7 @@ public:
   void SetProperty(const char *propertyKey, BaseProperty* property);
 
 
-
-        
+      
 protected:
   //##ModelId=3E3FE04202B9
   BaseData();
@@ -177,6 +176,11 @@ protected:
   ~BaseData();
   //##ModelId=3E15551A03CE
   Geometry3DPointer m_Geometry3D;
+
+#if ITK_VERSION_MINOR > 6
+  bool m_RequestedRegionInitialized;
+  bool m_LastRequestedRegionWasOutsideOfTheBufferedRegion;
+#endif
 
   //##ModelId=3E8600D9006D
   mutable itk::SmartPointer<mitk::BaseProcess> m_SmartSourcePointer;

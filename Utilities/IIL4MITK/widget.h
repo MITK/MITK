@@ -21,6 +21,8 @@ public:
     //##Documentation
     //## TEMPORARY FOR IIL COMPATIBILITY - DO NOT USE!!!
   virtual bool isVisible (const iilItem* const item) {return true;}
+  virtual bool isVisible (const float, const float,
+  			  const float, const float) {return true;}
 };
 
 typedef iilWidget RenderWindowBase;

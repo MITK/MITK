@@ -107,7 +107,6 @@ void QmitkDataManagerControls::UpdateRendererCombo() {
 void QmitkDataManagerControls::SetDataTreeIterator(mitk::DataTreeIteratorBase* it)
 {
     if (it == NULL) return;
-  m_QmitkTreeNodeSelector->SetDataTreeNodeIterator(*it);
   m_GlobalNodePropertiesView->SetDataTreeNode(NULL);
   m_RendererPropertiesView->SetDataTreeNode(NULL);
 

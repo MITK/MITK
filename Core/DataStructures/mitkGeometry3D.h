@@ -143,7 +143,7 @@ public:
   void SetExtentInMM(int direction, ScalarType extentInMM)
   {
     ScalarType len = GetExtentInMM(direction);
-    if(fabs(len - extentInMM)>=mitk::epsSquared)
+    if(fabs(len - extentInMM)>=mitk::eps)
     {
       AffineTransform3D::MatrixType::InternalMatrixType vnlmatrix;
       vnlmatrix = m_IndexToWorldTransform->GetMatrix().GetVnlMatrix();

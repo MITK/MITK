@@ -93,8 +93,6 @@ void mitk::SurfaceMapper2D::Paint(mitk::BaseRenderer * renderer)
   else
     useCellData = dynamic_cast<mitk::BoolProperty *>(this->GetDataTreeNode()->GetProperty("useCellDataForColouring").GetPointer())->GetValue();
 
-  input->Update();
-  
   //
   // get the TimeSlicedGeometry of the input object
   //
@@ -116,13 +114,9 @@ void mitk::SurfaceMapper2D::Paint(mitk::BaseRenderer * renderer)
     timestep = inputTimeGeometry->MSToTimeStep( time );
   if( inputTimeGeometry->IsValidTime( timestep ) == false )
     return;
-  //std::cout << "time: "<< time << std::endl;
-  //std::cout << "timestep: "<<timestep << std::endl;
-  
 
   vtkPolyData * vtkpolydata = input->GetVtkPolyData( timestep );
   assert(vtkpolydata);
-
 
   vtkTransform * vtktransform = GetDataTreeNode()->GetVtkTransform();
   vtkLinearTransform * inversetransform = vtktransform->GetLinearInverse();

@@ -15,12 +15,12 @@
 * \endcode
 */
 template <  typename  ItkInputImageType,  typename ItkOutputImageType > 
-itk::ImageSource < ItkOutputImageType > ::Pointer 
+typename itk::ImageSource < ItkOutputImageType > ::Pointer 
 MakeCastImageFilter(  ItkInputImageType* inputImage )
 {
   typedef itk::CastImageFilter < ItkInputImageType , 
     ItkOutputImageType > myFilterType;
-  myFilterType::Pointer myFilter = myFilterType::New();
+  typename myFilterType::Pointer myFilter = myFilterType::New();
   myFilter->SetInput( inputImage );
   return myFilter.GetPointer();
 }

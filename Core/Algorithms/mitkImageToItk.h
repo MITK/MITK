@@ -23,7 +23,7 @@ public:
 	itkNewMacro(Self);  
 	
 	/** Superclass typedefs. */
-	typedef Superclass::OutputImageRegionType OutputImageRegionType;
+	typedef typename Superclass::OutputImageRegionType OutputImageRegionType;
 
 	/** Some convenient typedefs. */
 	typedef mitk::Image                    InputImageType;

@@ -195,7 +195,7 @@ template<class TPixel, unsigned int VImageDimension>
     
     itkDebugMacro("do not copyMem ...");
     typedef itk::ImportImageContainer< unsigned long, TPixel >   ImportContainerType;
-    ImportContainerType::Pointer import;
+    typename ImportContainerType::Pointer import;
     
     import = ImportContainerType::New();
     import->Initialize();

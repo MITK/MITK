@@ -36,6 +36,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkSurface.h>
 #include <mitkDataTreeNodeFactory.h>
 #include <mitkImageToItkMultiplexer.h>
+#include <mitkDataTree.h>
 
 #include <qfiledialog.h>
 #include "ipPic.h"
@@ -50,6 +51,11 @@ PURPOSE.  See the above copyright notices for more information.
 #include "itkImageSeriesWriter.h"
 #include "itkImageFileWriter.h"
 #include "itkNumericSeriesFileNames.h"
+
+#include <itksys/SystemTools.hxx>
+
+#include <vtkSTLWriter.h>
+#include <vtkPolyDataWriter.h>
 
 
 class CommonFunctionality
@@ -257,43 +263,7 @@ public:
   }
 
 
-/*  static void SaveImage(std::string imageName, mitk::DataTreeIteratorBase* iterator)
-{
-  std::cout << "1" << std::endl;
-  mitk::DataTreeIteratorBase* it=iterator->clone();
-  mitk::DataTreeNode::Pointer node = NULL;
-  mitk::DataTreeIterator* subTree = ((mitk::DataTree *) it->getTree())->GetNext("name", new mitk::StringProperty( imageName ));
-
-  std::cout << "2" << std::endl;
-
-  if (subTree != NULL && subTree->get() != NULL)
-  {
-    node = subTree->get();
-    mitk::BaseData::Pointer data=node->GetData();
-
-    if (data.IsNotNull())
-    {
-      std::cout << "3" << std::endl;
-
-      mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(data.GetPointer());
-      ipPicDescriptor * picImage = image->GetPic();
-
-      std::cout << "4" << std::endl;
-      picImage = ipFuncRefl(picImage,3);
-
-      char* fileName = (char*) QFileDialog::getSaveFileName(QString(imageName),"DKFZ Pic (*.seq *.pic *.pic.gz *.seq.gz *.dcm)").ascii();
-      if (fileName == NULL ) 
-      {
-        fileName = (char*)imageName.c_str();
-      }
-      ipPicPut(fileName, picImage);
-    }
-
-  }
-}
-*/
-
-    static mitk::DataTreeNode::Pointer FileOpen()
+static mitk::DataTreeNode::Pointer FileOpen()
     {
 #ifdef MBI_INTERNAL
       QString fileName = QFileDialog::getOpenFileName(NULL,"all (*.seq *.pic *.pic.gz *.seq.gz *.pvtk *.stl *.vtk *.ves *.uvg *.par *.dcm hpsonos.db HPSONOS.DB);;DKFZ Pic (*.seq *.pic *.pic.gz *.seq.gz);;surface files (*.stl *.vtk);;stl files (*.stl);;vtk surface files (*.vtk);;vtk image files (*.pvtk);;vessel files (*.ves *.uvg);;par/rec files (*.par);;DSR files (hpsonos.db HPSONOS.DB);;DICOM files (*.dcm)");
@@ -302,7 +272,15 @@ public:
 #endif
       if ( !fileName.isNull() )
       {
-        return FileOpen(fileName.ascii());
+        mitk::DataTreeNode::Pointer result = FileOpen(fileName.ascii());
+        if ( result.IsNull() )
+        {
+          return FileOpenImageSequence(fileName);
+        }
+        else 
+        {
+          return result;
+        }
       }
       else
       {
@@ -333,34 +311,40 @@ public:
 
       if ( !fileName.isNull() )
       {
-        int fnstart = fileName.findRev( QRegExp("[/\\\\]"), fileName.length() );
-        if(fnstart<0) fnstart=0;
-        int start = fileName.find( QRegExp("[0-9]"), fnstart );
-        if(start<0)
-        {
-          return FileOpen(fileName.ascii());;
-        }
-
-        char prefix[1024], pattern[1024];
-
-        strncpy(prefix, fileName.ascii(), start);
-        prefix[start]=0;
-
-        int stop=fileName.find( QRegExp("[^0-9]"), start );
-        sprintf(pattern, "%%s%%0%uu%s",stop-start,fileName.ascii()+stop);
-
-
-        mitk::DataTreeNodeFactory::Pointer factory = mitk::DataTreeNodeFactory::New();
-
-        factory->SetFilePattern( pattern );
-        factory->SetFilePrefix( prefix );
-        factory->Update();
-        return factory->GetOutput( 0 );
+        return FileOpenImageSequence(fileName);
       }
       else
       {
         return NULL;
       }
+    }
+
+    static mitk::DataTreeNode::Pointer FileOpenImageSequence(QString fileName)
+    {      
+      int fnstart = fileName.findRev( QRegExp("[/\\\\]"), fileName.length() );
+      if(fnstart<0) fnstart=0;
+      int start = fileName.find( QRegExp("[0-9]"), fnstart );
+      if(start<0)
+      {
+        return FileOpen(fileName.ascii());;
+      }
+
+      char prefix[1024], pattern[1024];
+
+      strncpy(prefix, fileName.ascii(), start);
+      prefix[start]=0;
+
+      int stop=fileName.find( QRegExp("[^0-9]"), start );
+      sprintf(pattern, "%%s%%0%uu%s",stop-start,fileName.ascii()+stop);
+
+
+      mitk::DataTreeNodeFactory::Pointer factory = mitk::DataTreeNodeFactory::New();
+
+      factory->SetFilePattern( pattern );
+      factory->SetFilePrefix( prefix );
+      factory->Update();
+      return factory->GetOutput( 0 );
+
     }
 
 
@@ -378,7 +362,7 @@ public:
         typename TImageType::Pointer itkImage = TImageType::New();
         mitk::CastToItkImage( image, itkImage );
         
-        if (fileName.contains(".pic") == 0 )
+        if ( fileName.contains(".pic") == 0 )
         {
           if (fileName.contains(".mhd") != 0)
           {
@@ -429,6 +413,66 @@ public:
         return;
       }
     }
+
+    static void SaveSurface(mitk::Surface* surface, std::string name = 0)
+    {
+      std::string selectedItemsName = itksys::SystemTools::GetFilenameWithoutExtension(name);
+      selectedItemsName += ".stl";
+      QString fileName = QFileDialog::getSaveFileName(QString(selectedItemsName),"Surface Data(*.stl *.vtk)");
+        if (fileName != NULL ) 
+        {
+          if(fileName.endsWith(".stl")==true)
+          {
+            vtkSTLWriter *writer=vtkSTLWriter::New();
+            writer->SetInput( surface->GetVtkPolyData() );
+            writer->SetFileName(fileName.ascii());
+            writer->SetFileTypeToBinary();
+            writer->Write();
+            writer->Delete();
+          }
+          else 
+          {
+            if (fileName.endsWith(".vtk")==false) fileName += ".vtk";
+            vtkPolyDataWriter * polyWriter = vtkPolyDataWriter::New();
+            polyWriter->SetInput( surface->GetVtkPolyData() );
+            polyWriter->SetFileName(fileName.ascii());
+            polyWriter->Write();
+            polyWriter->Delete();
+          }
+        }
+    }
+
+    static mitk::Image* GetFirstImageInDataTree(mitk::DataTree::Pointer dataTree)
+    {
+      mitk::DataTreePreOrderIterator dataTreeIterator( dataTree );
+
+      if ( dataTree.IsNull() )
+      {
+        std::cout << "iterator to data tree is NULL. I cannot work without datatree !!"  << std::endl;
+        return NULL;
+      }
+
+      mitk::DataTreeIteratorClone it = dataTreeIterator;
+      while ( !it->IsAtEnd() )
+      {
+        mitk::DataTreeNode::Pointer node = it->Get();
+        if ( node->GetData() != NULL )
+        {
+          // access the original image
+          mitk::Image::Pointer img = dynamic_cast<mitk::Image*>( node->GetData() );
+
+          // enquiry whether img is NULL
+          if ( img.IsNotNull() )
+          {
+            return img;
+          }
+        }
+        ++it;
+      }
+      std::cout << "No node containing an mitk::Image found, returning NULL..." << std::endl;
+      return NULL;
+    }
+
 
 };
 #endif // _CommonFunctionality__h_

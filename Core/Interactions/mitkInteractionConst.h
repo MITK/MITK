@@ -6,6 +6,8 @@
 #ifndef MITKINTERACTIONCONST_H
 #define MITKINTERACTIONCONST_H
 
+namespace mitk {
+
 enum SideEffectId {
 	DONOTHING = 0,
 	INITNEWOBJECT = 5,
@@ -367,7 +369,7 @@ enum Key {
         Key_yacute = 0x0fd,
         Key_thorn = 0x0fe,
         Key_ydiaeresis = 0x0ff,
-        Key_unknown = 0xffff,
+        Key_unknown = 0xffff, 
 		Key_none = Key_unknown
 };
 
@@ -724,4 +726,6 @@ stringIntArray mitkConstArray[] = {
        "Key_unknown", 0xffff,
 		"Key_none", 0xffff
 };
+
+}//namespace mitk
 #endif // MITKINTERACTIONCONST_H

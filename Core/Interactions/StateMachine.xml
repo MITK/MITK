@@ -92,7 +92,7 @@
 	</events>
 </mitkInteraktionStates>
 <!-- DOKUMENTATION -->
-<!--this is StateMachine.xml| includes Information about different StateMachines and Events. Used by EventMapper and StateMachineFactory-->
+<!-- this is StateMachine.xml| includes Information about different StateMachines and Events. Used by EventMapper and StateMachineFactory-->
 <!-- Event: ether in Key or in Button, not in both! Key is only checked if the type is a keypressed(/released)-->
 <!-- -->
 <!-- -->

@@ -1,3 +1,6 @@
+#ifndef MITKIMAGETOITKMULTIPLEXER_H_HEADER_INCLUDED
+#define MITKIMAGETOITKMULTIPLEXER_H_HEADER_INCLUDED
+ 
 #include <mitkImageToItk.h>
 #include <itkCastImageFilter.h>
 
@@ -187,3 +190,5 @@ namespace mitk
     mitkoutputimage->SetVolume(itkimage->GetBufferPointer());
   }
 }
+
+#endif // of MITKIMAGETOITKMULTIPLEXER_H_HEADER_INCLUDED

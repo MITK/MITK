@@ -1,10 +1,19 @@
 #ifndef STATEMACHINEFACTORY_H_HEADER_INCLUDED_C19AEDDD
 #define STATEMACHINEFACTORY_H_HEADER_INCLUDED_C19AEDDD
 
-#include "mitkCommon.h"
+// #include "mitkCommon.h"
 #include "State.h"
 #include <qxml.h>
-#include <map>
+
+typedef std::map<std::string,mitk::State*> StartStateMap;
+typedef std::map<std::string,mitk::State *>::iterator StartStateMapIter;
+
+/*typedef std::map<int,mitk::State *> StateMap;
+typedef std::map<int,mitk::Transition> TransitionMap;
+
+typedef std::map<int,mitk::State *>::iterator StateMapIter;
+typedef std::map<int,mitk::Transition>::iterator TransMapIter;
+*/
 
 namespace mitk {
 
@@ -14,7 +23,7 @@ namespace mitk {
 //## according to the structur all States are generated.
 //## Then all transitions are generated and the pointers are set
 //## (Transition::setNextState(State* tState))
-class StateMachineFactory
+	class StateMachineFactory : public QXmlDefaultHandler
 {
   public:
     //##ModelId=3E68B2C600BD
@@ -28,7 +37,7 @@ class StateMachineFactory
     //##ModelId=3E5B41730261
 	//##Documentation
 	//##loads the xml file filename and generates the necessary instances
-	  static bool LoadBehavior(std::string fileName);
+	  bool LoadBehavior(std::string fileName);
 
 
     //##ModelId=3E6773790098
@@ -45,7 +54,7 @@ class StateMachineFactory
 	  static bool ConnectStates(StateMap *states);
 
 	//##ModelId=3E5B423003DF
-	  StateMap m_StartStates;
+	  static StartStateMap m_StartStates;
 
     //##ModelId=3E68C269032E
 	  StateMap m_AllStates;
@@ -56,6 +65,18 @@ class StateMachineFactory
     //##ModelId=3E68B2C60040
 	  std::string m_AktStateMachineName;
 
+	  static const std::string STYLE;
+	  static const std::string NAME;
+	  static const std::string ID;	  
+	  static const std::string START_STATE;
+	  static const std::string NEXT_STATE_ID;
+	  static const std::string EVENT_ID;
+	  static const std::string SIDE_EFFECT_ID;
+	  
+	  static const std::string TYPE;
+	  static const std::string BUTTON_NUMBER;
+	  static const std::string KEY;
+	  
 };
 
 } // namespace mitk

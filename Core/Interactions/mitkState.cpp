@@ -7,33 +7,23 @@ mitk::State::State(std::string stateName, int stateId)
 }
 
 //##ModelId=3E5B2B2E0304
-bool mitk::State::AddTransition(std::string transitionName, int nextStateId, int eventId, int sideEffectId) const
+bool mitk::State::AddTransition(std::string transitionName, int nextStateId, int eventId, int sideEffectId)
 {
-/*	Transition tempTransition(transitionName, nextStateId, eventId, sideEffectId);
-	m_Transitions.insert(std::pair<int,Transition>(eventId, tempTransition));
-##################################################################################################
-	incorect!
-	
-	
-	
-	*/		
-	return (bool) true;//ToDo: checking the status of insert
+	Transition tempTransition(transitionName, nextStateId, eventId, sideEffectId);
+	std::pair<TransMapIter,bool> ok = m_Transitions.insert(TransitionMap::value_type( eventId, tempTransition));
+    return (bool) ok.second;
 
 }
 
 //##ModelId=3E5B2B9000AC
-mitk::Transition* mitk::State::GetTransition(int eventId) const
+const mitk::Transition* mitk::State::GetTransition(int eventId) const
 {
-/*
-	Transition *tempTransition = m_Transitions.find(eventId);
-	if( tempTransition != m_Transitions.end() )
-        return tempTransition;
+
+	TransitionMap::const_iterator tempTrans = m_Transitions.find(eventId);
+	if( tempTrans != m_Transitions.end() )
+        return &(*tempTrans).second;
 	else
 		return NULL;
-		################################################################
-		incorect
-		*/
-	return NULL;
 }
 
 //##ModelId=3E5B2C0503D5
@@ -62,20 +52,15 @@ bool mitk::State::LocateTransition(int eventId) const
 //## searches dedicated States of all Transitions and 
 //## sets *nextState of these Transitions.
 //## allStates is a List of all build States of that StateMachine
-bool mitk::State::ConnectTransitions(StateMap *allStates) const
+bool mitk::State::ConnectTransitions(StateMap *allStates)
 {
-/*	std::iterator tempTransition = m_Transitions.begin();
-	
-	for (int i = 0; i < m_Transitions.size(); i++, tempTransition++)
+	for (TransMapIter i= m_Transitions.begin(); i != m_Transitions.end(); i++)
 	{
-        State *tempState = allStates.find(tempTransition.GetNextStateId());
-        if( tempState != allStates.end() )
-            tempTransition.setNextState(tempState);
+		StateMapIter sIter = allStates->find(((*i).second).GetNextStateId());
+        if( sIter != allStates->end() )
+            ((*i).second).setNextState((*sIter).second);
         else
             return false;//State not found!
 	}
-	################################################################################
-	incorect!
-	*/
 	return true;
 }

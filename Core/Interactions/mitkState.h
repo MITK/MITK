@@ -1,15 +1,18 @@
 #ifndef STATE_H_HEADER_INCLUDED_C19A8A5D
 #define STATE_H_HEADER_INCLUDED_C19A8A5D
 
-#include "mitkCommon.h"
+// #include "mitkCommon.h"
 #include "Transition.h"
-#include <map>
 #include <string>
+#include <map>
 
-//##ModelId=3E6907B400B4
-typedef std::map<int,mitk::State *> StateMap;
-//##ModelId=3E6907B400C4
+
+typedef std::map<int,mitk::State*> StateMap;
 typedef std::map<int,mitk::Transition> TransitionMap;
+
+typedef std::map<int,mitk::State *>::iterator StateMapIter;
+typedef std::map<int,mitk::Transition>::iterator TransMapIter;
+
 
 namespace mitk {
 
@@ -21,12 +24,12 @@ class State
 	  State(std::string name, int id);
 
     //##ModelId=3E5B2B2E0304
-	  bool AddTransition(std::string transitionName, int nextStateId, int eventId, int sideEffectId) const;
+	  bool AddTransition(std::string transitionName, int nextStateId, int eventId, int sideEffectId);
 
     //##ModelId=3E5B2B9000AC
     //##Documentation
     //## hashmap-lookup and returning the Transition. if not located, then NULL
-    Transition* GetTransition(int eventId) const;
+    const Transition* GetTransition(int eventId) const;
 
     //##ModelId=3E5B2C0503D5
     std::string GetName() const;
@@ -45,7 +48,7 @@ class State
     //## searches dedicated States of all Transitions and
 	//## sets *nextState of these Transitions.
 	//## allStates is a List of all build States of that StateMachine
-	bool ConnectTransitions(StateMap *allStates) const;
+	bool ConnectTransitions(StateMap *allStates);
 
 
   private:

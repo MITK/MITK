@@ -2,31 +2,31 @@
 <mitkInteraktionStates STYLE="Powerpoint">
 	<stateMaschine NAME="global">
 		<state NAME="start" ID="1" START_STATE="TRUE">
-			<transition NAME="neues Element" NEXT_STATE_ID="2" EVENT="1" SIDE_EFFECT="0" />
-			<transition NAME="Einfügen" NEXT_STATE_ID="3" EVENT="2" SIDE_EFFECT="5" />
-			<transition NAME="Selektieren" NEXT_STATE_ID="5" EVENT="5" SIDE_EFFECT="3" />
+			<transition NAME="neues Element" NEXT_STATE_ID="2" EVENT_ID="1" SIDE_EFFECT_ID="0" />
+			<transition NAME="Einfügen" NEXT_STATE_ID="3" EVENT_ID="2" SIDE_EFFECT_ID="5" />
+			<transition NAME="Selektieren" NEXT_STATE_ID="5" EVENT_ID="5" SIDE_EFFECT_ID="3" />
 		</state>
 	</stateMaschine>
 	<stateMaschine NAME="closedPoligon">
 		<state NAME="start" ID="1" START_STATE="TRUE">
-			<transition NAME="neues Element" NEXT_STATE_ID="5" EVENT="1" SIDE_EFFECT="0" />
-			<transition NAME="Einfügen" NEXT_STATE_ID="4" EVENT="2" SIDE_EFFECT="5" />
-			<transition NAME="Selektieren" NEXT_STATE_ID="3" EVENT="5" SIDE_EFFECT="3" />
+			<transition NAME="neues Element" NEXT_STATE_ID="5" EVENT_ID="1" SIDE_EFFECT_ID="0" />
+			<transition NAME="Einfügen" NEXT_STATE_ID="4" EVENT_ID="2" SIDE_EFFECT_ID="5" />
+			<transition NAME="Selektieren" NEXT_STATE_ID="3" EVENT_ID="5" SIDE_EFFECT_ID="3" />
 		</state>
 		<state NAME="selektiert" ID="2">
-			<transition NAME="neues Element" NEXT_STATE_ID="2" EVENT="1" SIDE_EFFECT="0" />
-			<transition NAME="Einfügen" NEXT_STATE_ID="1" EVENT="2" SIDE_EFFECT="5" />
+			<transition NAME="neues Element" NEXT_STATE_ID="2" EVENT_ID="1" SIDE_EFFECT_ID="0" />
+			<transition NAME="Einfügen" NEXT_STATE_ID="1" EVENT_ID="2" SIDE_EFFECT_ID="5" />
 		</state>
 	</stateMaschine>
 	<stateMaschine NAME="openPoligon">
 		<state NAME="start" ID="1" START_STATE="TRUE">
-			<transition NAME="neues Element" NEXT_STATE_ID="5" EVENT="1" SIDE_EFFECT="0" />
-			<transition NAME="Einfügen" NEXT_STATE_ID="4" EVENT="2" SIDE_EFFECT="5" />
-			<transition NAME="Selektieren" NEXT_STATE_ID="3" EVENT="5" SIDE_EFFECT="3" />
+			<transition NAME="neues Element" NEXT_STATE_ID="5" EVENT_ID="1" SIDE_EFFECT_ID="0" />
+			<transition NAME="Einfügen" NEXT_STATE_ID="4" EVENT_ID="2" SIDE_EFFECT_ID="5" />
+			<transition NAME="Selektieren" NEXT_STATE_ID="3" EVENT_ID="5" SIDE_EFFECT_ID="3" />
 		</state>
 		<state NAME="selektiert" ID="2">
-			<transition NAME="neues Element" NEXT_STATE_ID="2" EVENT="1" SIDE_EFFECT="0" />
-			<transition NAME="Einfügen" NEXT_STATE_ID="1" EVENT="2" SIDE_EFFECT="5" />
+			<transition NAME="neues Element" NEXT_STATE_ID="2" EVENT_ID="1" SIDE_EFFECT_ID="0" />
+			<transition NAME="Einfügen" NEXT_STATE_ID="1" EVENT_ID="2" SIDE_EFFECT_ID="5" />
 		</state>
 	</stateMaschine>
 	<events STYLE="PowerPoint">

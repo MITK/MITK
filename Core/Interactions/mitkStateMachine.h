@@ -19,7 +19,7 @@ namespace mitk {
 //## @ingroup Interaction
 //## realizes the methods, that every statemachine has to have.
 //## Undo can be enabled and disabled through EnableUndo
-//## Developers must derive its statemachines and implement ExecuteSideEffect
+//## Developers must derive its statemachines and implement ExecuteAction
 class StateMachine : public itk::Object, public mitk::OperationActor
 {
   public:
@@ -47,7 +47,7 @@ class StateMachine : public itk::Object, public mitk::OperationActor
   //## groupEventId and objectEventId are use to combine Operations so that
   //## they can be undone together or seperately.
   //## EventMapper gives each event a new objectEventId
-  //## and a StateMachine::ExecuteSideEffect can descide weather it gets a
+  //## and a StateMachine::ExecuteAction can descide weather it gets a
   //## new GroupEventId or not, depending on its state (e.g. finishedNewObject then new GroupEventId)
   bool HandleEvent(StateEvent const* stateEvent, int objectEventId, int groupEventId);
 
@@ -69,7 +69,7 @@ class StateMachine : public itk::Object, public mitk::OperationActor
   //##
   //## Each statechange has actions, which can be assigned by it's number.
   //## If you are developing a new statemachine, declare all your operations here and send them to Undo-Controller and to the Data.
-  virtual bool ExecuteSideEffect(int sideEffectId, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId)= 0;
+  virtual bool ExecuteAction(int actionId, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId)= 0;
 
   //##Documentation
   //## @brief returns the current state
@@ -88,7 +88,7 @@ class StateMachine : public itk::Object, public mitk::OperationActor
 
   //##ModelId=3EDCAECB0128
   //##Documentation
-  //## @brief holds an UndoController, that can be accessed from all StateMachines. For ExecutreSideEffect
+  //## @brief holds an UndoController, that can be accessed from all StateMachines. For ExecuteAction
   UndoController* m_UndoController;
 
  private:

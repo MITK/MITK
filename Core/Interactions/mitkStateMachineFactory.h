@@ -3,7 +3,7 @@
 
 #include "mitkCommon.h"
 #include "mitkState.h"
-#include <qxml.h>
+#include <vtkXMLParser.h> 
 #include <iostream>
 
 
@@ -20,7 +20,7 @@ namespace mitk {
 //## statemachine. 
 //## During Build-Process each statemachine is paresed for well formed  Style.
 //## No changes are to ber done after the Build-Process.
-	class StateMachineFactory : public QXmlDefaultHandler
+	class StateMachineFactory : public vtkXMLParser
 {
   public:
 	//##ModelId=3F0177090046
@@ -46,13 +46,15 @@ namespace mitk {
 	  static bool LoadBehavior(std::string fileName);
 
     //##ModelId=3E6773790098
-	  bool startElement( const QString&, const QString&, const QString& qName, const QXmlAttributes& atts );
+    void  StartElement (const char *elementName, const char **atts);
 
-    //##ModelId=3E6907B40180
-	  bool endElement( const QString&, const QString&, const QString & qName );
-		  
+    void  EndElement (const char *elementName);
 
   private:
+
+  std::string ReadXMLStringAttribut( std::string name, const char** atts);
+  int ReadXMLIntegerAttribut( std::string name, const char** atts );
+  bool ReadXMLBooleanAttribut( std::string name, const char** atts );
     //##ModelId=3E5B428F010B
 	//##Documentation
 	//## sets the pointers in Transition (setNextState(..)) according to the extracted xml-file content
@@ -72,6 +74,9 @@ namespace mitk {
 
     //##ModelId=3E6773290108
 	  State* m_AktState;
+
+    Transition* m_AktTransition;
+    
 
     //##ModelId=3E68B2C60040
 	  std::string m_AktStateMachineName;
@@ -94,6 +99,16 @@ namespace mitk {
 	  static const std::string ISTRUE;
     //##ModelId=3E7F18FF01FD
 	  static const std::string ISFALSE;
+
+    static const std::string STATE_MACHIN;
+
+    static const std::string TRANSITION;    
+
+    static const std::string STATE;
+
+    static const std::string STATE_MACHIN_NAME;
+
+    static const std::string ACTION;
 };
 
 } // namespace mitk

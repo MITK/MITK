@@ -52,7 +52,7 @@ bool mitk::PolygonInteractor::SelectOneLine(ITKPoint3D itkPoint)
 }
 
 
-bool mitk::PolygonInteractor::ExecuteSideEffect(int sideEffectId, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId)
+bool mitk::PolygonInteractor::ExecuteAction(int actionId, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId)
 {
   bool ok = false;//for return type bool
   
@@ -62,12 +62,12 @@ bool mitk::PolygonInteractor::ExecuteSideEffect(int sideEffectId, mitk::StateEve
 		return false;
 
   
-  switch (sideEffectId)
+  switch (actionId)
 	{
-  case SeDONOTHING:
+  case AcDONOTHING:
     ok = true;
 	  break;
-  case SeINSERTPOINT:
+  case AcINSERTPOINT:
     //add a new point to the List of Points
     {
       mitk::PositionEvent const  *posEvent = dynamic_cast <const mitk::PositionEvent *> (stateEvent->GetEvent());
@@ -96,7 +96,7 @@ bool mitk::PolygonInteractor::ExecuteSideEffect(int sideEffectId, mitk::StateEve
     }
     ok = true;
 	  break;
-  case SeINSERTLINE:
+  case AcINSERTLINE:
     {
       mitk::PositionEvent const  *posEvent = dynamic_cast <const mitk::PositionEvent *> (stateEvent->GetEvent());
 		  if (posEvent == NULL) 
@@ -116,7 +116,7 @@ bool mitk::PolygonInteractor::ExecuteSideEffect(int sideEffectId, mitk::StateEve
     }
     ok = true;
     break;
-  case SeCHECKGREATERZERO:
+  case AcCHECKGREATERZERO:
     {
       //check if the number of points is greater to zero.
       if (data->GetSize()>0)
@@ -133,7 +133,7 @@ bool mitk::PolygonInteractor::ExecuteSideEffect(int sideEffectId, mitk::StateEve
       }
     }
     break;
-    case SeCHECKGREATERTWO:
+    case AcCHECKGREATERTWO:
     {
       //check if the number of points is greater to two.
       if (data->GetSize()>2)
@@ -152,7 +152,7 @@ bool mitk::PolygonInteractor::ExecuteSideEffect(int sideEffectId, mitk::StateEve
     break;
 
 
-//  case SeREMOVE:
+//  case AcREMOVE:
 //  {
 //    mitk::ITKPoint3D newPoint;
 //    newPoint.Fill(0);
@@ -171,7 +171,7 @@ bool mitk::PolygonInteractor::ExecuteSideEffect(int sideEffectId, mitk::StateEve
 //    ok = true;
 //  }
 //  break;
-//  case SeREMOVEALL://remove Line and the two points
+//  case AcREMOVEALL://remove Line and the two points
 //  {
 //    //removing the line
 //    mitk::ITKPoint3D newPoint;
@@ -221,20 +221,20 @@ bool mitk::PolygonInteractor::ExecuteSideEffect(int sideEffectId, mitk::StateEve
 //    ok = true;
 //  }
 //  break;
-  case SeMODESELECT:
+  case AcMODESELECT:
     m_Mode = SMSELECTED;
     ok = true;
     break;
-  case SeMODEDESELECT:
+  case AcMODEDESELECT:
     m_Mode = SMDESELECTED;
     ok = true;
     break;
   default:
-    mitk::StatusBar::DisplayText("Message from mitkPolygonInteractor: I do not understand the SideEffect!", 10000);
+    mitk::StatusBar::DisplayText("Message from mitkPolygonInteractor: I do not understand the Action!", 10000);
     return false;
     //a false here causes the statemachine to undo its last statechange.
-    //otherwise it will end up in a different state, but without done SideEffect.
-    //if a transition really has no SideEffect, than call donothing
+    //otherwise it will end up in a different state, but without done Action.
+    //if a transition really has no Action, than call donothing
   }
   return ok;
 }

@@ -21,23 +21,23 @@ int mitk::PointInteractor::GetId()
 }
 
 //##Documentation
-//## implemented SideEffects: SeDONOTHING, 
+//## implemented Actions: SeDONOTHING, 
 //## SeADD (adds a points to the Data),
 //## SeINITMOVE (stores start of movement for undo), 
 //## SeMOVE (moves the point), 
 //## SeFINISHMOVE (writes the movement to undo), 
 //## SeREMOVE, SeSELECT, SeDESELECT
-bool mitk::PointInteractor::ExecuteSideEffect(int sideEffectId, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId)
+bool mitk::PointInteractor::ExecuteAction(int actionId, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId)
 {
 	bool ok = false;//for return type bool
 
   /*Each case must watch the type of the event!*/
-  switch (sideEffectId)
+  switch (actionId)
 	{
-  case SeDONOTHING:
+  case AcDONOTHING:
     ok = true;
 	  break;
-  case SeADD:
+  case AcADD:
 	/*
 	declare a point in the data-structure
   */
@@ -67,7 +67,7 @@ bool mitk::PointInteractor::ExecuteSideEffect(int sideEffectId, mitk::StateEvent
     break;
 	}
 
-  case SeINITMOVE:
+  case AcINITMOVE:
   {
     mitk::PositionEvent const  *posEvent = dynamic_cast <const mitk::PositionEvent *> (stateEvent->GetEvent());
 		if (posEvent == NULL)
@@ -81,7 +81,7 @@ bool mitk::PointInteractor::ExecuteSideEffect(int sideEffectId, mitk::StateEvent
     break;
   }
 	
-  case SeMOVE://moves the point
+  case AcMOVE://moves the point
 	{
     mitk::PositionEvent const  *posEvent = dynamic_cast <const mitk::PositionEvent *> (stateEvent->GetEvent());
 		if (posEvent == NULL)
@@ -98,7 +98,7 @@ bool mitk::PointInteractor::ExecuteSideEffect(int sideEffectId, mitk::StateEvent
     break;
 	}
 
-  case SeFINISHMOVE:
+  case AcFINISHMOVE:
 	{
     mitk::PositionEvent const *posEvent = dynamic_cast <const mitk::PositionEvent *> (stateEvent->GetEvent());
 		if (posEvent == NULL)
@@ -127,7 +127,7 @@ bool mitk::PointInteractor::ExecuteSideEffect(int sideEffectId, mitk::StateEvent
 	}
 	break;
 
-	case SeREMOVE://remove the given Point from the list
+	case AcREMOVE://remove the given Point from the list
   {
     PointOperation* doOp = new mitk::PointOperation(OpREMOVE, ((PointSet*)(m_DataTreeNode->GetData()))->GetItkPoint(m_Id), m_Id);
 		if (m_UndoEnabled)	//write to UndoMechanism
@@ -143,7 +143,7 @@ bool mitk::PointInteractor::ExecuteSideEffect(int sideEffectId, mitk::StateEvent
    	ok = true;
   }
 	break;
-  case SeSELECT:
+  case AcSELECT:
 	{
     PointOperation* doOp = new mitk::PointOperation(OpSELECTPOINT, ((PointSet*)(m_DataTreeNode->GetData()))->GetItkPoint(m_Id), m_Id);
 		if (m_UndoEnabled)	
@@ -158,7 +158,7 @@ bool mitk::PointInteractor::ExecuteSideEffect(int sideEffectId, mitk::StateEvent
     ok = true;
 	}
 	break;
-  case SeDESELECT:
+  case AcDESELECT:
 	{
     PointOperation* doOp = new mitk::PointOperation(OpDESELECTPOINT, ((PointSet*)(m_DataTreeNode->GetData()))->GetItkPoint(m_Id), m_Id);
 		if (m_UndoEnabled)	
@@ -173,20 +173,20 @@ bool mitk::PointInteractor::ExecuteSideEffect(int sideEffectId, mitk::StateEvent
 		ok = true;
 	}
 	break;
-  case SeMODESELECT:
+  case AcMODESELECT:
     m_Mode = SMSELECTED;
     ok = true;
     break;
-  case SeMODEDESELECT:
+  case AcMODEDESELECT:
     m_Mode = SMDESELECTED;
     ok = true;
     break;
 	default:
-    mitk::StatusBar::DisplayText("Message from mitkPointInteractor: I do not understand the SideEffect!", 10000);
+    mitk::StatusBar::DisplayText("Message from mitkPointInteractor: I do not understand the Action!", 10000);
     return false;
     //a false here causes the statemachine to undo its last statechange.
-    //otherwise it will end up in a different state, but without done SideEffect.
-    //if a transition really has no SideEffect, than call donothing
+    //otherwise it will end up in a different state, but without done Action.
+    //if a transition really has no Action, than call donothing
   }
   return ok;
 

@@ -33,8 +33,8 @@ controls(NULL), multiWidget(mitkStdMultiWidget), m_NavigatorsInitialized(false)
     mitk::GlobalInteraction* globalInteraction = dynamic_cast<mitk::GlobalInteraction*>(mitk::EventMapper::GetGlobalStateMachine());
     if(globalInteraction!=NULL)
     {
-	    globalInteraction->AddStateMachine(new mitk::DisplayVectorInteractor("move", this));//sends DisplayCoordinateOperation
-	    globalInteraction->AddStateMachine(new mitk::DisplayVectorInteractor("zoom", this));//sends DisplayCoordinateOperation
+	    globalInteraction->AddListener(new mitk::DisplayVectorInteractor("move", this));//sends DisplayCoordinateOperation
+	    globalInteraction->AddListener(new mitk::DisplayVectorInteractor("zoom", this));//sends DisplayCoordinateOperation
     }
 
     m_DataTreeIterator->getTree()->addTreeChangeListener(this);
@@ -100,7 +100,7 @@ QWidget * QmitkSimpleExampleFunctionality::createControlWidget(QWidget *parent)
         mitk::GlobalInteraction* globalInteraction = dynamic_cast<mitk::GlobalInteraction*>(mitk::EventMapper::GetGlobalStateMachine());
         if(globalInteraction!=NULL)
         {
-    	    globalInteraction->AddStateMachine(multiplexUpdateController);
+    	    globalInteraction->AddListener(multiplexUpdateController);
         }
     }
     return controls;

@@ -1,5 +1,6 @@
 #include "mitkStateMachineFactory.h"
 #include "mitkStatusBar.h"
+#include <vtkXMLDataElement.h>
 
 
 //##Documentation
@@ -30,11 +31,20 @@ const std::string mitk::StateMachineFactory::ISTRUE = "TRUE";
 //##ModelId=3E7F18FF01FD
 const std::string mitk::StateMachineFactory::ISFALSE = "FALSE";
 
+const std::string mitk::StateMachineFactory::STATE_MACHIN = "stateMachine";
+
+const std::string mitk::StateMachineFactory::STATE = "state";
+
+const std::string mitk::StateMachineFactory::TRANSITION = "transition";
+
+const std::string mitk::StateMachineFactory::STATE_MACHIN_NAME = "stateMachine";
+
+const std::string mitk::StateMachineFactory::ACTION = "action";
 
 
 //##ModelId=3E68B2C600BD
 mitk::StateMachineFactory::StateMachineFactory()
-: m_AktState(NULL), 	m_AktStateMachineName(""){}
+: m_AktState(NULL), m_AktTransition(NULL),	m_AktStateMachineName(""){}
 
 //##ModelId=3E5B4144024F
 //##Documentation
@@ -56,15 +66,15 @@ bool mitk::StateMachineFactory::LoadBehavior(std::string fileName)
    if ( fileName.empty() )
        return false;
 
-   QFile xmlFile( fileName.c_str() );
-   if ( !xmlFile.exists() )
-       return false;
-
-   QXmlInputSource source( &xmlFile );
-   QXmlSimpleReader reader;
    mitk::StateMachineFactory* stateMachineFactory = new StateMachineFactory();
-   reader.setContentHandler( stateMachineFactory );//this???
-   reader.parse( source );
+   stateMachineFactory->SetFileName( fileName.c_str() );
+
+   if ( stateMachineFactory->Parse() )    
+   {
+     #ifdef INTERDEBUG
+     itkWarningMakro( << "xml file cannot parse!!" );
+     #endif
+   }
   
    delete stateMachineFactory;
    return true;
@@ -151,64 +161,108 @@ bool mitk::StateMachineFactory::ConnectStates(mitk::State::StateMap *states)
 	return true;
 }
 
-
 //##ModelId=3E6773790098
-bool mitk::StateMachineFactory::startElement( const QString&, const QString&, const QString& qName, const QXmlAttributes& atts )
-{
+void  mitk::StateMachineFactory::StartElement (const char *elementName, const char **atts) {
 
-	qName.ascii(); //for debuging
-	
-	//abfangen atts.value(#) fehler!
-/*
-	if( qName == "mitkInteraktionStates" )								//e.g.<mitkInteraktionStates STYLE="Powerpoint">
-	{
-		NULL;//new statemachine pattern
-		//evtl. unterschied in STYLES PowerPoint oder PhotoShop usw...
-	}
+  std::string name(elementName);
 
-	else*/ if ( qName == "stateMachine" ) 									//e.g. <stateMachine NAME="global">
-	{
-		m_AktStateMachineName = atts.value( NAME.c_str() ).latin1() ;
-	}
+	if ( name == STATE_MACHIN ) 					
+  { 
+    m_AktStateMachineName = ReadXMLStringAttribut( NAME, atts ); 
+  } 
+  
+  else if ( name == STATE )   
+  {
+    std::string stateMachinName = ReadXMLStringAttribut( NAME, atts ) ;
+    int id = ReadXMLIntegerAttribut( ID, atts );
 
-	else if ( qName == "state" )											//e.g. <state NAME="start" ID="1" START_STATE="ISTRUE">
-	{
-		m_AktState = new mitk::State( atts.value ( NAME.c_str() ).latin1(), ( atts.value ( ID.c_str() ) ).toInt() );
-		std::pair<mitk::State::StateMapIter,bool> ok = m_AllStates.insert( mitk::State::StateMap::value_type( ( atts.value( ID.c_str() ) ).toInt(), m_AktState ) );
-		//insert into m_AllStates, which stores all States that aren't connected yet!
-		if (ok.second == false) 
-			return false;//STATE_ID was not unique or something else didn't work in insert! EXITS the process
-		if ( atts.value( START_STATE.c_str() ) == ISTRUE.c_str() )
-			m_StartStates.insert(StartStateMap::value_type(m_AktStateMachineName, m_AktState));
-			//if it is a startstate, then set a pointer into m_StartStates
-	}
+		m_AktState = new mitk::State(stateMachinName , id);
+		std::pair<mitk::State::StateMapIter,bool> ok = m_AllStates.insert(mitk::State::StateMap::value_type(id , m_AktState));
 
-	else if ( qName == "transition" )										//e.g. <transition NAME="neues Element" NEXT_STATE_ID="2" EVENT="1" SIDE_EFFECT="0" />
-	{
-//		int a = atts.value( NEXT_STATE_ID.c_str() ).toInt(); //for debugging
+		if ( ok.second == false ) 
+			return; //STATE_ID was not unique or something else didn't work in insert! EXITS the process
+		if ( ReadXMLBooleanAttribut( START_STATE, atts ) )
+			m_StartStates.insert(StartStateMap::value_type(m_AktStateMachineName, m_AktState));  
+  } 
+  
+  else if ( name == TRANSITION )   
+  {
+    std::string transitionName = ReadXMLStringAttribut( NAME, atts ) ;
+    int nextStateId = ReadXMLIntegerAttribut( NEXT_STATE_ID, atts );
+    int eventId = ReadXMLIntegerAttribut( EVENT_ID, atts );
+    m_AktTransition = new Transition(transitionName, nextStateId, eventId);
 
-		m_AktState->AddTransition( 
-					atts.value(NAME.c_str()).latin1(), 
-					atts.value(NEXT_STATE_ID.c_str()).toInt(),
-					atts.value(EVENT_ID.c_str()).toInt(),
-					atts.value(SIDE_EFFECT_ID.c_str()).toInt() );
-	}
-	/*else
-		NULL;*/
-	
-    return true;
+    if ( m_AktState )
+		  m_AktState->AddTransition( m_AktTransition );  
+  }
+
+  else if ( name == ACTION )
+  {
+
+    int actionId = ReadXMLIntegerAttribut( ID, atts );
+    m_AktTransition->AddActionID(actionId);  
+  }  
 }
 
-//##ModelId=3E6907B40180
-bool mitk::StateMachineFactory::endElement( const QString&, const QString&, const QString & qName )
+//##
+void mitk::StateMachineFactory::EndElement (const char *elementName) 
 {
-	//abfangen atts.value(#) fehler!
-    bool ok = true;
-	qName.ascii();
-    if (qName == "stateMachine")
+  bool ok = true;
+  std::string name(elementName);
+
+  if ( name == STATE_MACHIN_NAME )
 	{
 			ok = ConnectStates(&m_AllStates);
 			m_AllStates.clear();
-	}
-	return ok;
+  } 
+  else if ( name == STATE_MACHIN ) 
+  {
+    // m_AktState = NULL;
+    // m_StartStates = NULL;
+  } 
+  else if ( name == TRANSITION ) 
+  {
+    m_AktTransition = NULL;
+  }
+}
+
+//##
+std::string mitk::StateMachineFactory::ReadXMLStringAttribut( std::string name, const char** atts )
+{
+  if(atts)
+    {
+     const char** attsIter = atts;  
+
+     while(*attsIter) 
+     {     
+       if ( name == *attsIter )
+       {
+        attsIter++;      
+        return *attsIter;
+       }
+      attsIter++;
+      attsIter++;
+     }
+    }
+
+    return std::string();
+}
+
+//##
+int mitk::StateMachineFactory::ReadXMLIntegerAttribut( std::string name, const char** atts )
+{
+  std::string s = ReadXMLStringAttribut( name, atts );
+  return atoi( s.c_str() );
+}
+
+
+//##
+bool mitk::StateMachineFactory::ReadXMLBooleanAttribut( std::string name, const char** atts )
+{
+  std::string s = ReadXMLStringAttribut( name, atts );
+
+  if ( s == ISTRUE )
+    return true;
+  else
+    return false;
 }

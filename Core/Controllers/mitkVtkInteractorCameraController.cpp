@@ -223,7 +223,7 @@ vtkRenderWindowInteractor* mitk::VtkInteractorCameraController::GetVtkInteractor
   return m_VtkInteractor;
 }
 
-bool mitk::VtkInteractorCameraController::ExecuteSideEffect(int sideEffectId, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId)
+bool mitk::VtkInteractorCameraController::ExecuteAction(int actionId, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId)
 {
   return false;
 }

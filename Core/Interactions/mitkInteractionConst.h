@@ -5,7 +5,7 @@ E = Enumeration
 St = State Conditions; own generated Events from guarding states
 EID = EventId's
 Op = Operations
-Se = SideEffects
+Ac = Action
 Type_ = Type of Event
 BS_ = ButtonStates and Buttons
 Key_ = Keys like in QT
@@ -102,61 +102,61 @@ typedef enum EOperations
 };
 
 //##Constants for EventMapping...
-//##SideEffectId
-typedef enum ESideEffects
+//## ActionId
+typedef enum EActions
 {
-  SeDONOTHING = 0,
-  SeINITNEWOBJECT = 5,
-  SeINITEDITOBJECT = 6,
-  SeINITEDITGROUP = 7,
-  SeINITMOVEMENT = 8,
-  SeINITMOVE = 9,
-  SeADDPOINT = 10,
-  SeADD = 11,
-  SeSNAPPING_ADDING = 20,
-  SeCHECKELEMENT = 30,		//check if there is a element close enough (picking)
-  SeCHECKNMINUS1 = 32,  //check if the number of elements is equal to N-1
-  SeCHECKEQUALS1 = 33,  //check if the number of elements in the data is equal to 1
-  SeCHECKSELECTED = 34, //check if the given element is selected or not
-  SeCHECKGREATERZERO = 35, //check if the current number of elements is greater than 0
-  SeCHECKGREATERTWO = 36, //check if the current number of elements is greater than two
-  SeFINISHOBJECT = 40,
-  SeFINISHGROUP = 41,
-  SeFINISHMOVEMENT = 42,
-  SeFINISHMOVE = 43,
-  SeSEARCHOBJECT = 50,
-  SeSEARCHGROUP = 51,
-  SeSEARCHANOTHEROBJECT = 52, //one object is selected and another object is to be added to selection
-  SeSELECTPICKEDOBJECT = 60, // select the picked object and deselect others
-  SeSELECTANOTHEROBJECT = 61, //adds the picked object to the selection
-  SeSELECTGROUP = 62,
-  SeSELECTALL = 63,
-  SeADDSELECTEDTOGROUP = 64,
-  SeSELECT = 65,
-  SeDESELECTOBJECT = 70, //deselect picked from group
-  SeDESELECTALL = 72,
-  SeDESELECT = 75,
-  SeNEWPOINT = 80,
-  SeMOVEPOINT = 90,
-  SeMOVESELECTED = 91,
-  SeMOVE = 92,
-  SeREMOVEPOINT = 100,
-  SeREMOVE = 101,
-  SeREMOVELINE = 102,
-  SeREMOVEALL = 103,
-  SeINSERTPOINT = 110,
-  SeINSERTLINE = 111,
-  SeDELETEPOINT = 120,
-  SeCLEAR = 130, //clear all elements from a list
-  SeTERMINATE_INTERACTION = 666,
-  SeTRANSLATESTART = 1000,  
-  SeTRANSLATE = 1001,  
-  SeSCALESTART = 1002,
-  SeSCALE = 1003,
-  SeROTATESTART = 1004,
-  SeROTATE = 1005,
-  SeMODESELECT = 1100,
-  SeMODEDESELECT = 1101
+  AcDONOTHING = 0,
+  AcINITNEWOBJECT = 5,
+  AcINITEDITOBJECT = 6,
+  AcINITEDITGROUP = 7,
+  AcINITMOVEMENT = 8,
+  AcINITMOVE = 9,
+  AcADDPOINT = 10,
+  AcADD = 11,
+  AcSNAPPING_ADDING = 20,
+  AcCHECKELEMENT = 30,		//check if there is a element close enough (picking)
+  AcCHECKNMINUS1 = 32,  //check if the number of elements is equal to N-1
+  AcCHECKEQUALS1 = 33,  //check if the number of elements in the data is equal to 1
+  AcCHECKSELECTED = 34, //check if the given element is selected or not
+  AcCHECKGREATERZERO = 35, //check if the current number of elements is greater than 0
+  AcCHECKGREATERTWO = 36, //check if the current number of elements is greater than two
+  AcFINISHOBJECT = 40,
+  AcFINISHGROUP = 41,
+  AcFINISHMOVEMENT = 42,
+  AcFINISHMOVE = 43,
+  AcSEARCHOBJECT = 50,
+  AcSEARCHGROUP = 51,
+  AcSEARCHANOTHEROBJECT = 52, //one object is selected and another object is to be added to selection
+  AcSELECTPICKEDOBJECT = 60, // select the picked object and deselect others
+  AcSELECTANOTHEROBJECT = 61, //adds the picked object to the selection
+  AcSELECTGROUP = 62,
+  AcSELECTALL = 63,
+  AcADDSELECTEDTOGROUP = 64,
+  AcSELECT = 65,
+  AcDESELECTOBJECT = 70, //deselect picked from group
+  AcDESELECTALL = 72,
+  AcDESELECT = 75,
+  AcNEWPOINT = 80,
+  AcMOVEPOINT = 90,
+  AcMOVESELECTED = 91,
+  AcMOVE = 92,
+  AcREMOVEPOINT = 100,
+  AcREMOVE = 101,
+  AcREMOVELINE = 102,
+  AcREMOVEALL = 103,
+  AcINSERTPOINT = 110,
+  AcINSERTLINE = 111,
+  AcDELETEPOINT = 120,
+  AcCLEAR = 130, //clear all elements from a list
+  AcTERMINATE_INTERACTION = 666,
+  AcTRANSLATESTART = 1000,  
+  AcTRANSLATE = 1001,  
+  AcSCALESTART = 1002,
+  AcSCALE = 1003,
+  AcROTATESTART = 1004,
+  AcROTATE = 1005,
+  AcMODESELECT = 1100,
+  AcMODEDESELECT = 1101
 };
 
 //Type of an Event;

@@ -23,21 +23,21 @@ public:
 	//##ModelId=3F0177080382
 	typedef std::map<int,mitk::State*> StateMap;
 	//##ModelId=3F0177080393
-	typedef std::map<int,mitk::Transition> TransitionMap;
+	typedef std::map<int,mitk::Transition*> TransitionMap;
 
 	//##ModelId=3F01770803B1
-	typedef std::map<int,mitk::State *>::iterator StateMapIter;
+	typedef std::map<int,mitk::State*>::iterator StateMapIter;
 	//##ModelId=3F01770803C0
-	typedef std::map<int,mitk::Transition>::iterator TransMapIter;
+	typedef std::map<int,mitk::Transition*>::iterator TransMapIter;
 
 	//##ModelId=3F01770803D0
-	typedef std::map<int,mitk::Transition>::const_iterator TransMapConstIter;
+	typedef std::map<int,mitk::Transition*>::const_iterator TransMapConstIter;
     
 	//##ModelId=3E5B2A9203BD
 	State(std::string name, int id);
 
     //##ModelId=3E5B2B2E0304
-	bool AddTransition(std::string transitionName, int nextStateId, int eventId, int sideEffectId);
+	bool AddTransition( Transition* transition );
 
   //##ModelId=3E5B2B9000AC
   //##Documentation

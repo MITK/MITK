@@ -14,7 +14,7 @@ class DataTreeNode;
 //## @brief Interaction with a point
 //## @ingroup Interaction
 //## Interact with a point: set point, select point, move point and remove point
-//## All Set-operations are done through the method "ExecuteSideEffect".
+//## All Set-operations are done through the method "ExecuteAction".
 //## the identificationnumber of this point is set by this points and evalued from an empty place in the DataStructure
 class PointInteractor : public Interactor
 {
@@ -36,7 +36,7 @@ public:
 protected:
   //##Documentation
   //## @brief Executes Side-Effects
-  virtual bool ExecuteSideEffect(int sideEffectId, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId);
+  virtual bool ExecuteAction(int actionId, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId);
 
 private:
   //##Documentation

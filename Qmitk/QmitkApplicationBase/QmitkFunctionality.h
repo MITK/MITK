@@ -75,15 +75,15 @@ public:
 
   /*!
   \brief called when a functionality becomes active/visible. Often, event-handlers are connected (e.g., 
-  GlobalStateMachine::AddStateMachine()) in activated() and the connection is removed in deactivated()
-  (e.g., GlobalStateMachine::RemoveStateMachine()).
+  GlobalStateMachine::AddInteractor() or AddListener()) in activated() and the connection is removed in deactivated()
+  (e.g., GlobalStateMachine::RemoveInteractor() or RemoveListener()).
   */
 	virtual void activated();
 
   /*!
   \brief called when a functionality is deactivated, i.e., is no longer active/visible. Often, event-handlers are connected (e.g., 
-  GlobalStateMachine::AddStateMachine()) in activated() and the connection is removed in deactivated()
-  (e.g., GlobalStateMachine::RemoveStateMachine()).
+  GlobalStateMachine::AddInteractor() or AddListener()) in activated() and the connection is removed in deactivated()
+  (e.g., GlobalStateMachine::RemoveInteractor() or RemoveListener()).
   */
 	virtual void deactivated();
 

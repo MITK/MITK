@@ -1,10 +1,20 @@
 #include "mitkTransition.h"
 
 //##ModelId=3E5A3A77006F
-mitk::Transition::Transition(std::string name, int nextStateId, int eventId, int sideEffectId)
-: m_Name(name), m_NextStateId(nextStateId), m_EventId(eventId), m_SideEffectId(sideEffectId)
+mitk::Transition::Transition(std::string name, int nextStateId, int eventId )
+: m_Name(name), m_NextStateId(nextStateId), m_EventId(eventId), m_NextState(NULL)
+{	 
+  static int counter = 0;
+  std::cout << name << " " << counter++ << std::endl;
+}
+
+//##
+void mitk::Transition::AddActionID( int actionId ) 
 {
-	 m_NextState = NULL;
+  m_ActionIds.push_back( actionId );
+
+  int count = m_ActionIds.size();
+  std::cout << count << std::cout;  
 }
 
 //##ModelId=3E5A3BAE03B5
@@ -24,27 +34,38 @@ int mitk::Transition::GetNextStateId() const
 	return m_NextStateId;
 }
 
-//##ModelId=3E5A3BF100F5
-int mitk::Transition::GetSideEffectId() const
+int mitk::Transition::GetEventId() const 
 {
-	return m_SideEffectId;
+  return m_EventId;
+}
+
+//##
+int mitk::Transition::GetActionCount() const 
+{
+  int size = m_ActionIds.size();
+  return size; 
+}
+
+//##
+std::vector<int>::iterator mitk::Transition::GetActionIdBeginIterator() const
+{
+  return m_ActionIds.begin();
+}
+
+//##
+const std::vector<int>::iterator mitk::Transition::GetActionIdEndIterator() const
+{
+  return m_ActionIds.end();
 }
 
 //##ModelId=3E5A3C1D0289
 bool mitk::Transition::IsEvent(int eventId) const
 {
-	if (eventId == m_EventId)
-	{
-		return true;
-	}
-	else
-	{
-		return false;
-	}
+	return (eventId == m_EventId);
 }
 
 //##ModelId=3E6370080067
-void mitk::Transition::setNextState(State* state)
+void mitk::Transition::SetNextState(State* state)
 {
 	m_NextState = state;
 }

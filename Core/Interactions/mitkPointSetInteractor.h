@@ -41,7 +41,7 @@ class PointSetInteractor : public Interactor
 
   protected:
     //##ModelId=3F017B320105
-    virtual bool ExecuteSideEffect(int sideEffectId, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId);
+    virtual bool ExecuteAction(int actionId, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId);
 
     //##ModelId=3F017B320121
     //##Documentation

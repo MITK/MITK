@@ -51,7 +51,7 @@ protected:
   //##ModelId=3E6D600F009B
   virtual ~VtkInteractorCameraController();
 
-  virtual bool ExecuteSideEffect(int sideEffectId, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId);
+  virtual bool ExecuteAction(int actionId, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId);
 
   //##ModelId=3E6D600F0060
   vtkRenderWindowInteractor* m_VtkInteractor;

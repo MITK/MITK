@@ -12,6 +12,7 @@ mitk::GlobalInteraction::GlobalInteraction(const char * type)
   m_FocusManager = new mitk::FocusManager();
 }
 
+
 inline mitk::StateEvent* GenerateEmptyStateEvent(int eventId)
 {
   mitk::Event *noEvent = new mitk::Event(NULL,
@@ -23,65 +24,78 @@ inline mitk::StateEvent* GenerateEmptyStateEvent(int eventId)
 	return stateEvent;
 }
 
-//##ModelId=3E7F497F01AE
-bool mitk::GlobalInteraction::ExecuteSideEffect(int sideEffectId, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId)
+
+void mitk::GlobalInteraction::AddListener(mitk::StateMachine* listener)
 {
-  bool ok = false;
-
-  switch (sideEffectId)
+  if ( std::find(m_ListenerList.begin(), m_ListenerList.end(),listener) == m_ListenerList.end() )
   {
-  case SeDONOTHING:
-    ok = true;
-	break;
-  default:
-	  ok = true;
-  }
-
-/*
-@todo: List of all StateMachines/Interactables that are beneath 
-the focused BaseRenderer.
-register at DataTree, that if anything changes, the list can be refreshed.
-If a new object is generated here, the new object flows into the m_SelectedElements
-and the Focus changes.
-
-multiple hierarchie in StateMachines:
-this StateMachine sends all events to all SM under the focused Node.
-Each SM can have further SM included (in member_var e.g.) and has to descide, 
-whether to send the event further down or to stop it.
-From outside each SM seems be be one class, but inside it is divided up in many 
-SM to reduce the complexibility.
-*/
-  //Quickimplementation; is to be changed with List from DataTree
-  //send the event to all in List
-  for (StateMachineListIter it = m_LocalStateMachines.begin(); it != m_LocalStateMachines.end(); it++)
-  {
-    if((*it)!=NULL)
-      ok = (*it)->HandleEvent(stateEvent, objectEventId, groupEventId);
-  }
-  return true;//return ok;
-}
-
-
-
-//##ModelId=3EF099E90065
-void mitk::GlobalInteraction::AddStateMachine(mitk::StateMachine* stateMachine)
-{
-  if ( std::find(m_LocalStateMachines.begin(), m_LocalStateMachines.end(),stateMachine) == m_LocalStateMachines.end() )
-  {
-    m_LocalStateMachines.push_back(stateMachine);
+    m_ListenerList.push_back(listener);
   }
 }
 
-//##ModelId=3EF099E900D2
-bool mitk::GlobalInteraction::RemoveStateMachine(mitk::StateMachine* stateMachine)
+
+bool mitk::GlobalInteraction::RemoveListener(mitk::StateMachine* listener)
 {
-  // Try find  
-  StateMachineListIter position = std::find(m_LocalStateMachines.begin(), m_LocalStateMachines.end(),stateMachine);
-  if (position == m_LocalStateMachines.end())
+  // Try find
+  StateMachineListIter position = std::find(m_ListenerList.begin(), m_ListenerList.end(),listener);
+  if (position == m_ListenerList.end())
     return false;
-  position = m_LocalStateMachines.erase(position);
+  position = m_ListenerList.erase(position);
   return true;
 }
+
+void mitk::GlobalInteraction::AddInteractor(mitk::Interactor* interactor)
+{
+  if ( std::find(m_InteractorList.begin(), m_InteractorList.end(),interactor) == m_InteractorList.end() )
+  {
+    m_InteractorList.push_back(interactor);
+  }
+}
+
+
+bool mitk::GlobalInteraction::RemoveInteractor(mitk::Interactor* interactor)
+{
+  // Try find
+  InteractorListIter position = std::find(m_InteractorList.begin(), m_InteractorList.end(),interactor);
+  if (position == m_InteractorList.end())
+    return false;
+  position = m_InteractorList.erase(position);
+  return true;
+}
+
+
+void mitk::GlobalInteraction::InformListeners(mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId)
+{
+  for (StateMachineListIter it = m_ListenerList.begin(); it != m_ListenerList.end(); it++)
+  {
+     if((*it)!=NULL)
+	   (*it)->HandleEvent(stateEvent, objectEventId, groupEventId);
+  }
+
+}
+
+bool mitk::GlobalInteraction::AskSelected(mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId)
+{
+  bool ok;
+  for (InteractorListIter it = m_SelectedList.begin(); it != m_SelectedList.end(); it++)
+  {
+    if((*it)!=NULL)
+	  ok = (*it)->HandleEvent(stateEvent, objectEventId, groupEventId);
+  }
+
+  return ok;
+}
+
+void mitk::GlobalInteraction::AskAllInteractors(mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId)
+{
+  for (InteractorListIter it = m_InteractorList.begin(); it != m_InteractorList.end(); it++)
+    {
+      if((*it)!=NULL)
+        (*it)->HandleEvent(stateEvent, objectEventId, groupEventId);
+    }
+
+}
+
 
 bool mitk::GlobalInteraction::AddFocusElement(mitk::FocusManager::FocusElement* element)
 {
@@ -93,7 +107,7 @@ bool mitk::GlobalInteraction::RemoveFocusElement(mitk::FocusManager::FocusElemen
   return m_FocusManager->RemoveElement(element);
 }
 
-const mitk::FocusManager::FocusElement* mitk::GlobalInteraction::GetFocus() 
+const mitk::FocusManager::FocusElement* mitk::GlobalInteraction::GetFocus()
 {
   return m_FocusManager->GetFocused();
 }
@@ -108,3 +122,24 @@ mitk::FocusManager* mitk::GlobalInteraction::GetFocusManager()
   return m_FocusManager;
 }
 
+
+
+//##ModelId=3E7F497F01AE
+bool mitk::GlobalInteraction::ExecuteAction(int actionId, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId)
+{
+  bool ok = false;
+
+  switch (actionId)
+  {
+  case AcDONOTHING:
+    ok = true;
+	break;
+  default:
+	  ok = true;
+  }
+
+  InformListeners(stateEvent, objectEventId, groupEventId);
+  AskAllInteractors(stateEvent, objectEventId, groupEventId);
+
+  return ok;
+}

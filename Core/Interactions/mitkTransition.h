@@ -3,6 +3,7 @@
 
 #include "mitkCommon.h"
 #include <string>
+#include <vector>
 
 
 namespace mitk {
@@ -13,12 +14,14 @@ class State;
 //## @brief Connection of two states
 //## @ingroup Interaction
 //## A transition connects two states. 
-//## Also a SideEffect is stored, that has to be executed after the statechange
+//## Also a Action is stored, that has to be executed after the statechange
 class Transition
 {
   public:
   //##ModelId=3E5A3A77006F
-	Transition(std::string name, int nextStateId, int eventId, int sideEffectId);
+	Transition(std::string name, int nextStateId, int eventId);
+
+  void AddActionID( int actionId );
 
   //##ModelId=3E5A3BAE03B5
   std::string GetName() const;
@@ -29,14 +32,23 @@ class Transition
   //##ModelId=3E68CB99014B
 	int GetNextStateId() const;
 
-  //##ModelId=3E5A3BF100F5
-  int GetSideEffectId() const;
+  //##
+  int GetEventId() const;
+
+  //##
+  int GetActionCount() const;
+
+  //##
+  std::vector<int>::iterator GetActionIdBeginIterator() const;
+
+  //##
+  const std::vector<int>::iterator GetActionIdEndIterator() const;
 
   //##ModelId=3E5A3C1D0289
   bool IsEvent(int eventId) const;
 
   //##ModelId=3E6370080067
-  void setNextState(State* state);
+  void SetNextState(State* state);
 
   private:
   //##ModelId=3E5A39C102B2
@@ -52,7 +64,7 @@ class Transition
   int m_EventId;
 
   //##ModelId=3E5A3A55017F
-  int m_SideEffectId;
+  mutable std::vector<int> m_ActionIds;
 
 };
 

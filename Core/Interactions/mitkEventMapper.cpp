@@ -446,7 +446,7 @@ bool mitk::EventMapper::MapEvent(Event* event)
 	Undo must recall all these coherent operations, so all of the same objectId.
 	But Undo has also the power to recall more operationsets, for example a set for building up a new object,
 	so that a newly build up object is deleted after a Undo and not only the latest set point.
-	The StateMachines::ExecuteSideEffect have the power to descide weather a new GroupID has to be calculated
+	The StateMachines::ExecuteAction have the power to descide weather a new GroupID has to be calculated
 	(by example after the editing of a new object)
 
   A user interaction with the mouse is started by a mousePressEvent, continues with a MouseMove and finishes with a MouseReleaseEvent

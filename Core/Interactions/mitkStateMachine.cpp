@@ -5,6 +5,9 @@
 #include "mitkUndoController.h"
 #include "mitkStatusBar.h"
 #include "mitkInteractionConst.h"
+#include <itkMacro.h>
+
+#define INTERDEBUG
 
 //##ModelId=3E5B2DB301FD
 //##Documentation
@@ -50,8 +53,7 @@ bool mitk::StateMachine::HandleEvent(StateEvent const* stateEvent, int objectEve
   //get next State
   State *tempNextState = tempTransition->GetNextState();
   if (tempNextState == NULL) return false;
-  //and SideEffectId to execute later on
-  int tempSideEffectId = tempTransition->GetSideEffectId();
+  //and ActionId to execute later on
   if ( m_CurrentState->GetId() != tempNextState->GetId() )//statechange only if there is a real statechange
   {
     if ( m_UndoEnabled )	//write to UndoMechanism if Undo is enabled
@@ -69,27 +71,26 @@ bool mitk::StateMachine::HandleEvent(StateEvent const* stateEvent, int objectEve
 std::cout<<this->GetType()<<": Changing from StateId "<<m_CurrentState->GetId()<<" to StateId "<<tempNextState->GetId()<<std::endl;
 std::cout<<this->GetType()<<": Changing from State "<<m_CurrentState->GetName()<<" to State "<<tempNextState->GetName()<<std::endl;
 #endif
-    //first following StateChange(or calling ExecuteOperation(tempNextStateOp)), then operation(SideEffect)
+    //first following StateChange(or calling ExecuteOperation(tempNextStateOp)), then operation(action)
     m_CurrentState = tempNextState;
   }
-  //Undo of the SideEffect is handled in ExecuteSideEffect(...)
-  bool ok = ExecuteSideEffect(tempSideEffectId, stateEvent, objectEventId, groupEventId);
 
-//Doku: if the operation didn't work, then we have already changed the state.
-//Check, if we have already done a statechange, if yes, then recall all of thet ObjectEventId
-  if ((!ok) && m_UndoEnabled &&
-    m_UndoController->GetLastObjectEventIdInList()==objectEventId)//oder objectEventId
+  std::vector<int>::iterator actionIdIterator = tempTransition->GetActionIdBeginIterator();
+  const std::vector<int>::iterator actionIdIteratorEnd = tempTransition->GetActionIdEndIterator();
+  bool ok = true;
+
+  while ( actionIdIterator != actionIdIteratorEnd ) 
   {
-    ok = m_UndoController->Undo(true);//fine undo!
-#ifdef INTERDEBUG
-//debug
-std::cout<<this->GetType()<<": going back! now in StateId "<<m_CurrentState->GetId()<<std::endl;
-#endif
-  }
-  else if (!ok && !m_UndoEnabled &&
-    m_UndoController->GetLastObjectEventIdInList()==objectEventId)
-  {
-    mitk::StatusBar::DisplayText("Error! Sender: StateMachine; Message: Operation could not be done!", 10000);
+    if ( !ExecuteAction(*actionIdIterator, stateEvent, objectEventId, groupEventId) )
+    {
+      ok = false;
+
+      #ifdef INTERDEBUG
+      itkWarningMacro( << "Warning: no action defind for " << *actionIdIterator << " in " << m_Type );
+      #endif            
+    }
+
+    actionIdIterator++;
   }
   return ok;
 }
@@ -131,7 +132,7 @@ std::cout<<this->GetType()<<": Undo: Changing from State "<<m_CurrentState->GetN
   case OpDELETE:
     {
       //delete this!
-      //before all lower statemachines has to be deleted in a sideeffect
+      //before all lower statemachines has to be deleted in a action
       //this->Delete();//might not work!!!check itk!
     }
   case OpUNDELETE:

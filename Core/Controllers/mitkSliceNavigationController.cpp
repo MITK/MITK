@@ -196,7 +196,7 @@ void mitk::SliceNavigationController::SetGeometrySlice(const itk::EventObject & 
 {
 }
 
-bool mitk::SliceNavigationController::ExecuteSideEffect(int sideEffectId, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId)
+bool mitk::SliceNavigationController::ExecuteAction(int actionId, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId)
 {
     bool ok = false;
     //if (m_Destination == NULL)
@@ -207,9 +207,9 @@ bool mitk::SliceNavigationController::ExecuteSideEffect(int sideEffectId, mitk::
     {
       if(m_CreatedWorldGeometry.IsNull())
         return true;
-      switch (sideEffectId)
+      switch (actionId)
       {
-        case SeNEWPOINT:
+        case AcNEWPOINT:
        // {
 			    //mitk::Point3D newPoint = posEvent->GetWorldPosition();
        //   vm2itk(newPoint, m_OldPoint);
@@ -228,7 +228,7 @@ bool mitk::SliceNavigationController::ExecuteSideEffect(int sideEffectId, mitk::
        //   ok = true;
        //   break;
        // }
-        case SeINITMOVEMENT:
+        case AcINITMOVEMENT:
        // {//move the point to the coordinate //not used, cause same to MovePoint... check xml-file
        //   mitk::ITKPoint3D movePoint;
        //   vm2itk(posEvent->GetWorldPosition(), movePoint);
@@ -239,7 +239,7 @@ bool mitk::SliceNavigationController::ExecuteSideEffect(int sideEffectId, mitk::
        //   ok = true;
        //   break;
        // }
-        case SeMOVEPOINT:
+        case AcMOVEPOINT:
        // {
        //   mitk::ITKPoint3D movePoint;
        //   vm2itk(posEvent->GetWorldPosition(), movePoint);
@@ -250,7 +250,7 @@ bool mitk::SliceNavigationController::ExecuteSideEffect(int sideEffectId, mitk::
        //   ok = true;
        //   break;
        // }
-       // case SeFINISHMOVEMENT:
+       // case AcFINISHMOVEMENT:
         {
        // {/*finishes a Movement from the coordinate supplier: 
        //   gets the lastpoint from the undolist and writes an undo-operation so 

@@ -8,12 +8,10 @@ mitk::State::State(std::string stateName, int stateId)
 }
 
 //##ModelId=3E5B2B2E0304
-bool mitk::State::AddTransition(std::string transitionName, int nextStateId, int eventId, int sideEffectId)
+bool mitk::State::AddTransition( Transition* transition )
 {
-	Transition tempTransition(transitionName, nextStateId, eventId, sideEffectId);
-	std::pair<TransMapIter,bool> ok = m_Transitions.insert(TransitionMap::value_type( eventId, tempTransition));
+  std::pair<TransMapIter,bool> ok = m_Transitions.insert(TransitionMap::value_type( transition->GetEventId(), transition ));
     return (bool) ok.second;
-
 }
 
 //##ModelId=3E5B2B9000AC
@@ -22,13 +20,13 @@ const mitk::Transition* mitk::State::GetTransition(int eventId) const
 
 	TransitionMap::const_iterator tempTrans = m_Transitions.find(eventId);
 	if( tempTrans != m_Transitions.end() )
-        return &(*tempTrans).second;
+        return (*tempTrans).second;
 	else //can a Transition with ID 0 be found?
     {
         tempTrans = m_Transitions.find(0);
         if ( tempTrans != m_Transitions.end() )//found transition 0 (= transmitt all events to other local StateMachines)
         {
-            return &(*tempTrans).second;
+            return (*tempTrans).second;
         }
         else
             return NULL;
@@ -57,7 +55,7 @@ std::set<int> mitk::State::GetAllNextStates() const
 
 	for (TransMapConstIter i= m_Transitions.begin(); i != m_Transitions.end(); i++)
 	{
-		tempset.insert( (i->second).GetNextStateId() );
+		tempset.insert( (i->second)->GetNextStateId() );
 	}
 	return tempset;
 }
@@ -83,9 +81,9 @@ bool mitk::State::ConnectTransitions(StateMap *allStates)
 {
 	for (TransMapIter i= m_Transitions.begin(); i != m_Transitions.end(); i++)
 	{
-		StateMapIter sIter = allStates->find(((*i).second).GetNextStateId());
+		StateMapIter sIter = allStates->find(((*i).second)->GetNextStateId());
         if( sIter != allStates->end() )
-            ((*i).second).setNextState((*sIter).second);
+            ((*i).second)->SetNextState((*sIter).second);
         else
             return false;//State not found!
 	}

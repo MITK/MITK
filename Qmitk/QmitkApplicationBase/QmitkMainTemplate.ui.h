@@ -317,6 +317,7 @@ void QmitkMainTemplate::initialize()
     xmlFileName = xmlFallBackPath;
   }
   xmlFileName += "/PointStateMachine.xml";
+
   if(QFile::exists(xmlFileName.c_str())==false)
     xmlFileName = "PointStateMachine.xml";
 

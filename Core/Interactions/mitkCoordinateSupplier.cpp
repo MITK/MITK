@@ -17,7 +17,7 @@ mitk::CoordinateSupplier::CoordinateSupplier(const char * type, mitk::OperationA
 }
 
 //##ModelId=3F0189F00269
-bool mitk::CoordinateSupplier::ExecuteSideEffect(int sideEffectId, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId)
+bool mitk::CoordinateSupplier::ExecuteAction(int actionId, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId)
 {
     bool ok = false;
     if (m_Destination == NULL)
@@ -26,9 +26,9 @@ bool mitk::CoordinateSupplier::ExecuteSideEffect(int sideEffectId, mitk::StateEv
     const PositionEvent* posEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
     if(posEvent!=NULL)
     {
-      switch (sideEffectId)
+      switch (actionId)
       {
-        case SeNEWPOINT:
+        case AcNEWPOINT:
         {
 			    mitk::Point3D newPoint = posEvent->GetWorldPosition();
           vm2itk(newPoint, m_OldPoint);
@@ -47,7 +47,7 @@ bool mitk::CoordinateSupplier::ExecuteSideEffect(int sideEffectId, mitk::StateEv
           ok = true;
           break;
         }
-        case SeINITMOVEMENT:
+        case AcINITMOVEMENT:
         {//move the point to the coordinate //not used, cause same to MovePoint... check xml-file
           mitk::ITKPoint3D movePoint;
           vm2itk(posEvent->GetWorldPosition(), movePoint);
@@ -58,7 +58,7 @@ bool mitk::CoordinateSupplier::ExecuteSideEffect(int sideEffectId, mitk::StateEv
           ok = true;
           break;
         }
-        case SeMOVEPOINT:
+        case AcMOVEPOINT:
         {
           mitk::ITKPoint3D movePoint;
           vm2itk(posEvent->GetWorldPosition(), movePoint);
@@ -69,7 +69,7 @@ bool mitk::CoordinateSupplier::ExecuteSideEffect(int sideEffectId, mitk::StateEv
           ok = true;
           break;
         }
-        case SeFINISHMOVEMENT:
+        case AcFINISHMOVEMENT:
         {/*finishes a Movement from the coordinate supplier: 
           gets the lastpoint from the undolist and writes an undo-operation so 
           that the movement of the coordinatesupplier is undoable.*/

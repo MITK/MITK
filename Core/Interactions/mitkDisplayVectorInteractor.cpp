@@ -31,13 +31,13 @@ void mitk::DisplayVectorInteractor::ExecuteOperation(Operation* operation)
 }
 
 //##ModelId=3EF2224401CB
-bool mitk::DisplayVectorInteractor::ExecuteSideEffect(int sideEffectId, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId)
+bool mitk::DisplayVectorInteractor::ExecuteAction(int actionId, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId)
 {
   bool ok=false;
   
   const DisplayPositionEvent* posEvent=dynamic_cast<const DisplayPositionEvent*>(stateEvent->GetEvent());
   if(posEvent==NULL) return false;
-  switch(sideEffectId%100)
+  switch(actionId%100)
   {
   case 0:
     {
@@ -78,7 +78,7 @@ bool mitk::DisplayVectorInteractor::ExecuteSideEffect(int sideEffectId, mitk::St
   case 2:
     {
       int opId;
-      if(sideEffectId<1200)
+      if(actionId<1200)
         opId=OpMOVE;
       else
         opId=OpZOOM;

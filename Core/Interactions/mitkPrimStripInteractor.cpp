@@ -17,21 +17,21 @@ int mitk::PrimStripInteractor::GetId()
 }
 
 
-bool mitk::PrimStripInteractor::ExecuteSideEffect(int sideEffectId, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId)
+bool mitk::PrimStripInteractor::ExecuteAction(int actionId, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId)
 {
   bool ok = false;//for return type bool
   
-  switch (sideEffectId)
+  switch (actionId)
 	{
-  case SeDONOTHING:
+  case AcDONOTHING:
     ok = true;
 	  break;
   default:
-    mitk::StatusBar::DisplayText("Message from mitkPrimStripInteractor: I do not understand the SideEffect!", 10000);
+    mitk::StatusBar::DisplayText("Message from mitkPrimStripInteractor: I do not understand the Action!", 10000);
     return false;
     //a false here causes the statemachine to undo its last statechange.
-    //otherwise it will end up in a different state, but without done SideEffect.
-    //if a transition really has no SideEffect, than call donothing
+    //otherwise it will end up in a different state, but without done Action.
+    //if a transition really has no Action, than call donothing
   }
   return ok;
 }

@@ -89,7 +89,7 @@ void mitk::PointSetInteractor::SelectPoint(int position, int objectEventId, int 
 }
 
 //##ModelId=3F017B320105
-bool mitk::PointSetInteractor::ExecuteSideEffect(int sideEffectId, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId)
+bool mitk::PointSetInteractor::ExecuteAction(int actionId, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId)
 {
 	bool ok = false;//for return type bool
 
@@ -103,12 +103,12 @@ bool mitk::PointSetInteractor::ExecuteSideEffect(int sideEffectId, mitk::StateEv
   mitk::PointSet::PointsContainer *points = itkpointSet->GetPoints();
 
   /*Each case must watch the type of the event!*/
-  switch (sideEffectId)
+  switch (actionId)
 	{
-  case SeDONOTHING:
+  case AcDONOTHING:
     ok = true;
 	  break;
-	case SeADDPOINT:
+	case AcADDPOINT:
 		/*
 		declare two operations: one for the selected state: deselect the last one selected and select the new one
 		the other operation is the add operation: There the first empty place have to be found and the new point inserted into that space
@@ -173,7 +173,7 @@ bool mitk::PointSetInteractor::ExecuteSideEffect(int sideEffectId, mitk::StateEv
 		ok = true;
     break;
 	}
-  case SeINITMOVEMENT:
+  case AcINITMOVEMENT:
   {
     mitk::PositionEvent const  *posEvent = dynamic_cast <const mitk::PositionEvent *> (stateEvent->GetEvent());
 		if (posEvent == NULL)
@@ -188,7 +188,7 @@ bool mitk::PointSetInteractor::ExecuteSideEffect(int sideEffectId, mitk::StateEv
     ok = true;
     break;
   }
-	case SeMOVESELECTED://moves all selected Elements
+	case AcMOVESELECTED://moves all selected Elements
 	{
     mitk::PositionEvent const  *posEvent = dynamic_cast <const mitk::PositionEvent *> (stateEvent->GetEvent());
 		if (posEvent == NULL)
@@ -232,7 +232,7 @@ bool mitk::PointSetInteractor::ExecuteSideEffect(int sideEffectId, mitk::StateEv
     ok = true;
     break;
 	}
-	case SeREMOVEPOINT://remove the given Point from the list
+	case AcREMOVEPOINT://remove the given Point from the list
 	{
     //if the point to be removed is given by the positionEvent:
 	  mitk::PositionEvent const  *posEvent = dynamic_cast <const mitk::PositionEvent *> (stateEvent->GetEvent());
@@ -367,7 +367,7 @@ bool mitk::PointSetInteractor::ExecuteSideEffect(int sideEffectId, mitk::StateEv
     }//else
   }
 	break;
-	//case SeDELETEPOINT://delete last element in list
+	//case AcDELETEPOINT://delete last element in list
 	//	{
 	//		mitk::PositionEvent const  *posEvent = dynamic_cast <const mitk::PositionEvent *> (stateEvent->GetEvent());
 	//		if (posEvent == NULL) return false;
@@ -393,7 +393,7 @@ bool mitk::PointSetInteractor::ExecuteSideEffect(int sideEffectId, mitk::StateEv
 	//	}
 	//	break;
 
-	case SeCHECKELEMENT:
+	case AcCHECKELEMENT:
 		/*checking if the Point transmitted is close enough to one point. Then generate a new event with the point and let this statemaschine handle the event.*/
 		{
       mitk::PositionEvent const  *posEvent = dynamic_cast <const mitk::PositionEvent *> (stateEvent->GetEvent());
@@ -435,12 +435,14 @@ bool mitk::PointSetInteractor::ExecuteSideEffect(int sideEffectId, mitk::StateEv
         mitk::DisplayPositionEvent const  *disPosEvent = dynamic_cast <const mitk::DisplayPositionEvent *> (stateEvent->GetEvent());
 			  if (disPosEvent != NULL)
         {//2d Koordinates for 3D Interaction; return false to redo the last statechange
-          return false;
+          mitk::StateEvent* newStateEvent = new mitk::StateEvent(StNO, posEvent);
+          this->HandleEvent(newStateEvent, objectEventId, groupEventId );
+				  ok = true;
         }
       }
       break;
     }
-    case SeCHECKSELECTED:
+    case AcCHECKSELECTED:
         /*check, if the given point is selected:
           if no, then send StNO
           if yes, then send StYES*/
@@ -483,12 +485,12 @@ bool mitk::PointSetInteractor::ExecuteSideEffect(int sideEffectId, mitk::StateEv
           }
           else //the position wasn't set properly. @todo if necessary: search the given point in list and set var position
           {
-          mitk::StatusBar::DisplayText("Message from mitkPointSetInteractor: Error in SideEffects! Check Config XML-file", 10000);
+          mitk::StatusBar::DisplayText("Message from mitkPointSetInteractor: Error in Actions! Check Config XML-file", 10000);
             ok = false;
           }
         }
         break;
-    case SeCHECKNMINUS1://generate Events if the set will be full after the addition of the point or not.
+    case AcCHECKNMINUS1://generate Events if the set will be full after the addition of the point or not.
         {
           if (m_N<0)//number of points not limited->pass on "Amount of points in Set is smaller then N-1"
           {
@@ -515,7 +517,7 @@ bool mitk::PointSetInteractor::ExecuteSideEffect(int sideEffectId, mitk::StateEv
           }//else
         }
         break;
-    case SeCHECKEQUALS1:
+    case AcCHECKEQUALS1:
         {
             if (pointSet->GetSize()<=1)//the number of points in the list is 1 (or smaler)
             {
@@ -531,7 +533,7 @@ bool mitk::PointSetInteractor::ExecuteSideEffect(int sideEffectId, mitk::StateEv
             }
         }
         break;
-	case SeSELECTPICKEDOBJECT://and deselect others
+	case AcSELECTPICKEDOBJECT://and deselect others
 		{
       mitk::PositionEvent const  *posEvent = dynamic_cast <const mitk::PositionEvent *> (stateEvent->GetEvent());
 			if (posEvent == NULL) return false;
@@ -567,7 +569,7 @@ bool mitk::PointSetInteractor::ExecuteSideEffect(int sideEffectId, mitk::StateEv
 			}
 		}
 		break;
-	case SeDESELECTOBJECT:
+	case AcDESELECTOBJECT:
 		{
       mitk::PositionEvent const  *posEvent = dynamic_cast <const mitk::PositionEvent *> (stateEvent->GetEvent());
 			if (posEvent == NULL) 
@@ -599,13 +601,13 @@ bool mitk::PointSetInteractor::ExecuteSideEffect(int sideEffectId, mitk::StateEv
 			}
 		}
 		break;
-    case SeDESELECTALL:
+    case AcDESELECTALL:
 		{
             this->UnselectAll(objectEventId, groupEventId);//undo-supported able deselect of all points in the DataList
             ok = true;
         }
 	    break;
-	case SeFINISHMOVEMENT:
+	case AcFINISHMOVEMENT:
 		{
       mitk::PositionEvent const *posEvent = dynamic_cast <const mitk::PositionEvent *> (stateEvent->GetEvent());
 			if (posEvent == NULL)
@@ -658,16 +660,16 @@ bool mitk::PointSetInteractor::ExecuteSideEffect(int sideEffectId, mitk::StateEv
 			ok = true;
 		}
 		break;
-	case SeCLEAR:
+	case AcCLEAR:
 		{
 			this->Clear();
 		}
 	default:
-    mitk::StatusBar::DisplayText("Message from mitkPointSetInteractor: I do not understand the SideEffect!", 10000);
+    mitk::StatusBar::DisplayText("Message from mitkPointSetInteractor: I do not understand the Action!", 10000);
 	  ok = false;
     //a false here causes the statemachine to undo its last statechange.
-    //otherwise it will end up in a different state, but without done SideEffect.
-    //if a transition really has no SideEffect, than call donothing
+    //otherwise it will end up in a different state, but without done Action.
+    //if a transition really has no Action, than call donothing
 	}
   return ok;
 }

@@ -8,10 +8,10 @@
 namespace mitk {
 
 //##Documentation
-//## @brief Interactor for Affine transformations translate, rotate 
+//## @brief Interactor for Affine transformations translate, rotate
 //## @ingroup Interaction
-//## 
-//## An object of this class can translate, rotate and scale the data objects 
+//##
+//## An object of this class can translate, rotate and scale the data objects
 //## by modifying its geometry.
 class AffineInteractor : public Interactor
 {
@@ -32,13 +32,13 @@ public:
 
 protected:
 
-	virtual bool ExecuteSideEffect(int sideEffectId, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId);
+	virtual bool ExecuteAction(int actionId, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId);
 
   bool CheckSelected(const mitk::Point3D& worldPoint);
 
   mitk::ITKVector3D m_LastTranslatePosition;
   mitk::ITKPoint3D m_LastScalePosition;
-  mitk::ITKPoint3D m_FirstScalePosition; 
+  mitk::ITKPoint3D m_FirstScalePosition;
   mitk::ITKVector3D m_lastRotatePosition;
 };
 

@@ -39,22 +39,22 @@ int mitk::LineInteractor::GetPointIdB()
 }
 
 //##Documentation
-//## implemented SideEffects: SeDONOTHING, 
+//## implemented Actions: SeDONOTHING, 
 //## SeADD(adds a line between two points to the specified cell(m_CellId) in the data), 
 //## SeINITMOVE, SeMOVE(moves the line and the two points), 
 //## SeFINISHMOVE, SeREMOVE (removes the line, not the points),
 //## SeREMOVEALL (removes the line and the two points), SeSELECT(select the line, not the points),
 //## SeDESELECT(deselect the line, not the points)
-bool mitk::LineInteractor::ExecuteSideEffect(int sideEffectId, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId)
+bool mitk::LineInteractor::ExecuteAction(int actionId, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId)
 {
   bool ok = false;//for return type bool
   
-  switch (sideEffectId)
+  switch (actionId)
 	{
-  case SeDONOTHING:
+  case AcDONOTHING:
     ok = true;
   break;
-  case SeINITMOVE:
+  case AcINITMOVE:
   {
      mitk::PositionEvent const  *posEvent = dynamic_cast <const mitk::PositionEvent *> (stateEvent->GetEvent());
                 if (posEvent == NULL)
@@ -66,7 +66,7 @@ bool mitk::LineInteractor::ExecuteSideEffect(int sideEffectId, mitk::StateEvent 
     break;
   }
   break;
-  case SeMOVE:
+  case AcMOVE:
   {
     mitk::PositionEvent const  *posEvent = dynamic_cast <const mitk::PositionEvent *> (stateEvent->GetEvent());
     if (posEvent == NULL)
@@ -82,7 +82,7 @@ bool mitk::LineInteractor::ExecuteSideEffect(int sideEffectId, mitk::StateEvent 
     ok = true;
   }
   break;
-  case SeFINISHMOVE:
+  case AcFINISHMOVE:
   {
     mitk::PositionEvent const *posEvent = dynamic_cast <const mitk::PositionEvent *> (stateEvent->GetEvent());
     if (posEvent == NULL)
@@ -110,7 +110,7 @@ bool mitk::LineInteractor::ExecuteSideEffect(int sideEffectId, mitk::StateEvent 
     ok = true;
   }
   break;
-  case SeSELECT:
+  case AcSELECT:
   {
     mitk::ITKPoint3D newPoint;
     newPoint.Fill(0);
@@ -128,7 +128,7 @@ bool mitk::LineInteractor::ExecuteSideEffect(int sideEffectId, mitk::StateEvent 
     ok = true;
   }
   break;
-  case SeDESELECT:
+  case AcDESELECT:
   {
     mitk::ITKPoint3D newPoint;
     newPoint.Fill(0);
@@ -146,20 +146,20 @@ bool mitk::LineInteractor::ExecuteSideEffect(int sideEffectId, mitk::StateEvent 
     ok = true;
   }
   break;
-  case SeMODESELECT:
+  case AcMODESELECT:
     m_Mode = SMSELECTED;
     ok = true;
     break;
-  case SeMODEDESELECT:
+  case AcMODEDESELECT:
     m_Mode = SMDESELECTED;
     ok = true;
     break;
   default:
-    mitk::StatusBar::DisplayText("Message from mitkLineInteractor: I do not understand the SideEffect!", 10000);
+    mitk::StatusBar::DisplayText("Message from mitkLineInteractor: I do not understand the Action!", 10000);
     return false;
     //a false here causes the statemachine to undo its last statechange.
-    //otherwise it will end up in a different state, but without done SideEffect.
-    //if a transition really has no SideEffect, than call donothing
+    //otherwise it will end up in a different state, but without done Action.
+    //if a transition really has no Actions, than call donothing
   }
   return ok;
 }

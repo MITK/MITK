@@ -24,7 +24,7 @@ bool mitk::PropertyList::SetProperty(const char* propertyKey, BaseProperty* prop
         //yes?
     {
         //is the property contained in the list identical to the new one?
-        if(it->second==property)
+        if( *it->second == *property)
             // yes? do nothing and return.
             return false;
         //no? erase the old entry.

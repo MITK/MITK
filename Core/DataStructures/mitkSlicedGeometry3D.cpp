@@ -370,19 +370,29 @@ void mitk::SlicedGeometry3D::InitializeGeometry(Self * newGeometry) const
   newGeometry->SetSpacing(GetSpacing());
   newGeometry->SetDirectionVector(GetDirectionVector());
 
-  unsigned int s;
-  for(s=0; s<m_Slices; ++s)
+  if(m_EvenlySpaced)
   {
-    if(m_Geometry2Ds[s]==NULL)
+    AffineGeometryFrame3D::Pointer geometry = m_Geometry2Ds[0]->Clone();
+    Geometry2D* geometry2d = dynamic_cast<Geometry2D*>(geometry.GetPointer());
+    assert(geometry2d!=NULL);
+    newGeometry->SetGeometry2D(geometry2d, 0);
+  }
+  else
+  {
+    unsigned int s;
+    for(s=0; s<m_Slices; ++s)
     {
-      assert(m_EvenlySpaced);
-    }
-    else
-    {
-      AffineGeometryFrame3D::Pointer geometry = m_Geometry2Ds[s]->Clone();
-      Geometry2D* geometry2d = dynamic_cast<Geometry2D*>(geometry.GetPointer());
-      assert(geometry2d!=NULL);
-      newGeometry->SetGeometry2D(geometry2d, s);
+      if(m_Geometry2Ds[s]==NULL)
+      {
+        assert(m_EvenlySpaced);
+      }
+      else
+      {
+        AffineGeometryFrame3D::Pointer geometry = m_Geometry2Ds[s]->Clone();
+        Geometry2D* geometry2d = dynamic_cast<Geometry2D*>(geometry.GetPointer());
+        assert(geometry2d!=NULL);
+        newGeometry->SetGeometry2D(geometry2d, s);
+      }
     }
   }
 }

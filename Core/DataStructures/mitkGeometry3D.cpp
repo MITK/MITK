@@ -189,6 +189,8 @@ void mitk::Geometry3D::ExecuteOperation(Operation* operation)
     ITKVector3D rotationVector = rotateOp->GetVectorOfRotation();
     ITKPoint3D center = rotateOp->GetCenterOfRotation();
     ScalarType angle = rotateOp->GetAngleOfRotation();
+    angle = (angle < -360) ? -360 : angle;
+    angle = (angle >  360) ?  360 : angle;
     m_Transform->PostMultiply();
     m_Transform->Translate(-center[0], -center[1], -center[2]);
     m_Transform->RotateWXYZ(angle, rotationVector[0], rotationVector[1], rotationVector[2]);

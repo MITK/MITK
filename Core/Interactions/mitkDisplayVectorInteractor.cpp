@@ -39,28 +39,31 @@ bool mitk::DisplayVectorInteractor::ExecuteAction(Action* action, mitk::StateEve
   const DisplayPositionEvent* posEvent=dynamic_cast<const DisplayPositionEvent*>(stateEvent->GetEvent());
   if(posEvent==NULL) return false;
 
-  const int actionId = action->GetActionId();
-  switch(actionId%100)
+  int actionId = action->GetActionId();
+  //initzoom and initmove is the same!
+  if (actionId == AcINITZOOM)
+    actionId = AcINITMOVE;
+  switch(actionId)
   {
-  case 0:
-    {
-      DisplayCoordinateOperation* doOp = new mitk::DisplayCoordinateOperation(OpTEST,  posEvent->GetSender(), posEvent->GetDisplayPosition(), posEvent->GetDisplayPosition(), posEvent->GetDisplayPosition());
-      if (m_UndoEnabled)	//write to UndoMechanism
-      {
-        DisplayCoordinateOperation* undoOp = new DisplayCoordinateOperation(OpTEST, m_Sender, m_StartDisplayCoordinate, m_LastDisplayCoordinate, m_CurrentDisplayCoordinate);
-        
-        
-        OperationEvent *operationEvent = new OperationEvent(this, doOp, undoOp,
-          objectEventId, groupEventId);
-        m_UndoController->SetOperationEvent(operationEvent);
-      }
-      
-      //execute the Operation
-      m_Destination->ExecuteOperation(doOp);
-      ok = true;
-      break;
-    }
-  case 1:
+  //case 0:
+  //  {
+  //    DisplayCoordinateOperation* doOp = new mitk::DisplayCoordinateOperation(OpTEST,  posEvent->GetSender(), posEvent->GetDisplayPosition(), posEvent->GetDisplayPosition(), posEvent->GetDisplayPosition());
+  //    if (m_UndoEnabled)	//write to UndoMechanism
+  //    {
+  //      DisplayCoordinateOperation* undoOp = new DisplayCoordinateOperation(OpTEST, m_Sender, m_StartDisplayCoordinate, m_LastDisplayCoordinate, m_CurrentDisplayCoordinate);
+  //      
+  //      
+  //      OperationEvent *operationEvent = new OperationEvent(this, doOp, undoOp,
+  //        objectEventId, groupEventId);
+  //      m_UndoController->SetOperationEvent(operationEvent);
+  //    }
+  //    
+  //    //execute the Operation
+  //    m_Destination->ExecuteOperation(doOp);
+  //    ok = true;
+  //    break;
+  //  }
+  case AcINITMOVE:
     {
       DisplayCoordinateOperation* doOp = new mitk::DisplayCoordinateOperation(OpSELECTPOINT,  posEvent->GetSender(), posEvent->GetDisplayPosition(), posEvent->GetDisplayPosition(), posEvent->GetDisplayPosition());
       if (m_UndoEnabled)	//write to UndoMechanism
@@ -78,17 +81,35 @@ bool mitk::DisplayVectorInteractor::ExecuteAction(Action* action, mitk::StateEve
       ok = true;
       break;
     }
-  case 2:
+  case AcMOVE:
     {
-      int opId;
-      if(actionId<1200)
-        opId=OpMOVE;
-      else
-        opId=OpZOOM;
-      DisplayCoordinateOperation* doOp = new DisplayCoordinateOperation(opId,  m_Sender, m_StartDisplayCoordinate, m_CurrentDisplayCoordinate, posEvent->GetDisplayPosition());
+      DisplayCoordinateOperation* doOp = new DisplayCoordinateOperation(OpMOVE,  m_Sender, m_StartDisplayCoordinate, m_CurrentDisplayCoordinate, posEvent->GetDisplayPosition());
       if (m_UndoEnabled)	//write to UndoMechanism
       {
-        DisplayCoordinateOperation* undoOp = new mitk::DisplayCoordinateOperation(opId,  posEvent->GetSender(), m_StartDisplayCoordinate, m_LastDisplayCoordinate, m_CurrentDisplayCoordinate);
+        DisplayCoordinateOperation* undoOp = new mitk::DisplayCoordinateOperation(OpMOVE,  posEvent->GetSender(), m_StartDisplayCoordinate, m_LastDisplayCoordinate, m_CurrentDisplayCoordinate);
+        
+        
+        OperationEvent *operationEvent = new OperationEvent(m_Destination, doOp, undoOp,
+          objectEventId, groupEventId);
+        m_UndoController->SetOperationEvent(operationEvent);
+      }
+      
+      //make Operation
+      m_LastDisplayCoordinate=m_CurrentDisplayCoordinate;
+      m_CurrentDisplayCoordinate=posEvent->GetDisplayPosition();
+      std::cout << m_CurrentDisplayCoordinate << std::endl;
+      
+      //execute the Operation
+      m_Destination->ExecuteOperation(doOp);
+      ok = true;
+      break;
+    }
+  case AcZOOM:
+    {
+      DisplayCoordinateOperation* doOp = new DisplayCoordinateOperation(OpZOOM,  m_Sender, m_StartDisplayCoordinate, m_CurrentDisplayCoordinate, posEvent->GetDisplayPosition());
+      if (m_UndoEnabled)	//write to UndoMechanism
+      {
+        DisplayCoordinateOperation* undoOp = new mitk::DisplayCoordinateOperation(OpZOOM,  posEvent->GetSender(), m_StartDisplayCoordinate, m_LastDisplayCoordinate, m_CurrentDisplayCoordinate);
         
         
         OperationEvent *operationEvent = new OperationEvent(m_Destination, doOp, undoOp,

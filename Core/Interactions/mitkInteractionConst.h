@@ -191,14 +191,16 @@ typedef enum EActions
   AcROTATE = 1005,
   AcINITAFFINEINTERACTIONS = 1006,
   AcFINISHAFFINEINTERACTIONS = 1007,
+  AcINITZOOM = 1011,
+  AcZOOM = 1012,
   AcSETSTARTPOINT = 1050,
   AcMODEDESELECT = 1100,  // set interactor in not selected mode
   AcMODESELECT = 1101,  // set interactor in selected mode
   AcMODESUBSELECT = 1102,  // set interacor in sub selected mode
   AcINFORMLISTENERS = 1200, //GlobalInteraction
   AcASKINTERACTORS = 1201,  //GlobalInteraction
-  AcTRANSMITEVENT = 2000,  //to transmit an event to a lower Interactor/Statemachine
-  AcCHECKGREATERONE = 1500
+  AcCHECKGREATERONE = 1500,
+  AcTRANSMITEVENT = 2000  //to transmit an event to a lower Interactor/Statemachine
 };
 
 //Type of an Event;

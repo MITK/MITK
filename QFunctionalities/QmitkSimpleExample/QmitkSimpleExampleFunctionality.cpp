@@ -33,8 +33,7 @@ controls(NULL), multiWidget(mitkStdMultiWidget), m_NavigatorsInitialized(false)
     mitk::GlobalInteraction* globalInteraction = dynamic_cast<mitk::GlobalInteraction*>(mitk::EventMapper::GetGlobalStateMachine());
     if(globalInteraction!=NULL)
     {
-	    globalInteraction->AddListener(new mitk::DisplayVectorInteractor("move", this));//sends DisplayCoordinateOperation
-	    globalInteraction->AddListener(new mitk::DisplayVectorInteractor("zoom", this));//sends DisplayCoordinateOperation
+	    globalInteraction->AddListener(new mitk::DisplayVectorInteractor("moveNzoom", this));//sends DisplayCoordinateOperation
     }
 
     m_DataTreeIterator->getTree()->addTreeChangeListener(this);
@@ -217,37 +216,36 @@ void QmitkSimpleExampleFunctionality::stereoSelectionChanged( int id )
 
 void QmitkSimpleExampleFunctionality::ExecuteOperation(mitk::Operation* operation)
 {
+  bool ok;//as return
 
-    bool ok;//as return
-
-    mitk::DisplayCoordinateOperation* dcOperation=dynamic_cast<mitk::DisplayCoordinateOperation*>(operation);
-    if( dcOperation != NULL )
+  mitk::DisplayCoordinateOperation* dcOperation=dynamic_cast<mitk::DisplayCoordinateOperation*>(operation);
+  if( dcOperation != NULL )
+  {
+  /****ZOOM & MOVE of the whole volume****/
+    mitk::BaseRenderer* renderer = dcOperation->GetRenderer();
+    if( renderer == NULL )
+      return;
+    switch (operation->GetOperationType())
     {
-    /****ZOOM & MOVE of the whole volume****/
-        mitk::BaseRenderer* renderer = dcOperation->GetRenderer();
-        if( renderer == NULL )
-            return;
-        switch (operation->GetOperationType())
-        {
-            case mitk::OpMOVE :
-                {
-                    renderer->GetDisplayGeometry()->MoveBy(dcOperation->GetLastToCurrentDisplayVector()*(-1.0));
-                    renderer->GetRenderWindow()->Repaint();
-                    ok = true;
-                }
-                break;
-            case mitk::OpZOOM :
-                {
-                    float distance = dcOperation->GetLastToCurrentDisplayVector().y;
-                    distance = (distance > 0 ? 1 : (distance < 0 ? -1 : 0));
-                    float factor= 1.0 + distance * 0.05;
-                    renderer->GetDisplayGeometry()->Zoom(factor, dcOperation->GetStartDisplayCoordinate());
-                    renderer->GetRenderWindow()->Repaint();
-                    ok = true;
-                }
-                break;
-            default:
-                ;
-        }
+      case mitk::OpMOVE :
+      {
+        renderer->GetDisplayGeometry()->MoveBy(dcOperation->GetLastToCurrentDisplayVector()*(-1.0));
+        renderer->GetRenderWindow()->Repaint();
+        ok = true;
+      }
+      break;
+      case mitk::OpZOOM :
+      {
+        float distance = dcOperation->GetLastToCurrentDisplayVector().y;
+        distance = (distance > 0 ? 1 : (distance < 0 ? -1 : 0));
+        float factor= 1.0 + distance * 0.05;
+        renderer->GetDisplayGeometry()->Zoom(factor, dcOperation->GetStartDisplayCoordinate());
+        renderer->GetRenderWindow()->Repaint();
+        ok = true;
+      }
+      break;
+      default:
+      ;
     }
+  }
 }

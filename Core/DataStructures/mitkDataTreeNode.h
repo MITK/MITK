@@ -13,9 +13,13 @@ class DataTreeNode : public ImageSource
 {
   public:
 	/** Standard class typedefs. */
+    //##ModelId=3E1EB44101C3
 	typedef DataTreeNode       Self;
+    //##ModelId=3E1EB44101E1
 	typedef ImageSource        Superclass;
+    //##ModelId=3E1EB44101F5
 	typedef itk::SmartPointer<Self>  Pointer;
+    //##ModelId=3E1EB44101FF
 	typedef itk::SmartPointer<const Self>  ConstPointer;
 	  
 	/** Run-time type information (and related methods). */

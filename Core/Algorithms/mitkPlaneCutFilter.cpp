@@ -41,10 +41,12 @@ void mitk::PlaneCutFilter::GenerateData()
     output->SetPicVolume(pic_result);
 }
 
-mitk::PlaneCutFilter::PlaneCutFilter() : m_Planes(NULL)
+mitk::PlaneCutFilter::PlaneCutFilter() : m_BackgroundLevel(0), m_Planes(NULL)
 {
 }
 
 mitk::PlaneCutFilter::~PlaneCutFilter()
 {
 }
+
+

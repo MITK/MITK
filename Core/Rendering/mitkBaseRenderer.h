@@ -116,11 +116,13 @@ public:
   //## also set to point to it. m_TimeSlicedWorldGeometry is set to NULL.
   //## \li if it is a TimeSlicedGeometry, m_TimeSlicedWorldGeometry is also set to point to it. 
   //## If m_TimeSlicedWorldGeometry contains instances of SlicedGeometry3D, m_CurrentWorldGeometry2D is set to 
-  //## one of geometries stored in the SlicedGeometry3D according to the value of m_Slice;  @todo otherwise
+  //## one of geometries stored in the SlicedGeometry3D according to the value of m_Slice;  otherwise
   //## a PlaneGeometry describing the top of the bounding-box of the Geometry3D is set as the 
   //## m_CurrentWorldGeometry2D.
-  //## \li @todo otherwise a PlaneGeometry describing the top of the bounding-box of the Geometry3D
+  //## \li otherwise a PlaneGeometry describing the top of the bounding-box of the Geometry3D
   //## is set as the m_CurrentWorldGeometry2D. m_TimeSlicedWorldGeometry is set to NULL.
+  //## @todo add calculation of PlaneGeometry describing the top of the bounding-box of the Geometry3D
+  //## when the passed Geometry3D is not sliced.
   //## \sa m_WorldGeometry 
   //## \sa m_TimeSlicedWorldGeometry 
   //## \sa m_CurrentWorldGeometry2D

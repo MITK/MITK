@@ -118,7 +118,7 @@ void main (int argc, char **argv)
         printf(" Statistic:    Extr, ExtrC, ExtrR, ExtrROI, Mean, MeanC, MeanR\n");
         printf("               MeanROI, Median, SDev, SDevC, SDevR, SDevROI\n");
         printf("               Var, VarC, VarR, VarROI\n");
-        printf(" Segmentation: Label\n");
+        printf(" Segmentation: Label, RegGrow\n");
         printf(" Misc:         Border, BorderX, DrawPoly, Frame, Convert\n");
 		exit(1);
 	}
@@ -153,6 +153,34 @@ void main (int argc, char **argv)
 		}
 		pic_new = ipFuncLabel ( pic_old, &no_label );
 		printf ("Number of Labels: %d \n", no_label );
+	}
+    else if ( strcasecmp ( operation, "RegGrow" ) == 0 )
+	{
+		ipUInt4_t blabel, rlabel, kind;
+
+		if ( ( (unsigned int) argc == 2 ) || 
+			( ( (unsigned int) argc == 3 ) && ( strcasecmp (argv[2], "-h") == 0 ) ) ||
+			( (unsigned int) argc != pic_old->dim * 2 + 8 ) )  
+		{
+			printf ( " usage: ipFunc RegGrow infile outfile beg_seed1...beg_seedn end_seed1...end_seedn border_label region_label std_dev_factor(double!!) kind(0=show border,1=show region)\n" );
+			exit ( 1 );
+		}
+		begin  = malloc ( _ipPicNDIM * sizeof ( ipUInt4_t ) );
+		length = malloc ( _ipPicNDIM * sizeof ( ipUInt4_t ) );
+		for ( i = 0; i < pic_old->dim; i++ )
+			sscanf  ( argv[4+i], "%d", &begin[i] );
+		for ( i = 0; i < pic_old->dim; i++ )
+			sscanf  ( argv[4+pic_old->dim+i], "%d", &length[i] );
+        printf ( " %d %d %d       %d %d %d \n", begin[0], begin[1], begin[2], length[0], length[1], length[2] );
+
+		sscanf  ( argv[4+pic_old->dim*2], "%d", &blabel );
+		sscanf  ( argv[5+pic_old->dim*2], "%d", &rlabel );
+		s_der=atof(argv[6+pic_old->dim*2]);
+		sscanf  ( argv[7+pic_old->dim*2], "%d", &kind );
+
+		pic_new = ipFuncRegGrow ( pic_old, pic_old->dim, begin, length, blabel, rlabel, s_der, kind );
+		free ( begin );
+		free ( length );
 	}
     else if ( strcasecmp ( operation, "Convert" ) == 0 )
 	{

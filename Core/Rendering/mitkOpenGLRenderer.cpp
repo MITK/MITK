@@ -250,68 +250,68 @@ void mitk::OpenGLRenderer::Render()
     UpdateVtkActors();
   }
   else
-    //has anything else changed (geometry to display, etc.)?
-    if (m_LastUpdateTime<GetMTime() ||
-      m_LastUpdateTime<GetDisplayGeometry()->GetMTime() ||
-      m_LastUpdateTime<GetDisplayGeometry()->GetWorldGeometry()->GetMTime())
+  //has anything else changed (geometry to display, etc.)?
+  if (m_LastUpdateTime<GetMTime() ||
+    m_LastUpdateTime<GetDisplayGeometry()->GetMTime() ||
+    m_LastUpdateTime<GetDisplayGeometry()->GetWorldGeometry()->GetMTime())
+  {
+    //std::cout << "OpenGLRenderer calling its update..." << std::endl;
+    Update();
+  }
+  else
+  if(m_MapperID==2) 
+  { //@todo in 3D mode wird sonst nix geupdated, da z.Z. weder camera noch Änderung des Baums beachtet wird!!!
+    Update();
+  }
+
+  glClear(GL_COLOR_BUFFER_BIT);
+
+  PlaneGeometry* myPlaneGeom =
+    dynamic_cast<PlaneGeometry *>((mitk::Geometry2D*)(GetWorldGeometry()));
+
+  glViewport (0, 0, m_Size[0], m_Size[1]);
+  glMatrixMode( GL_PROJECTION );
+  glLoadIdentity();
+  gluOrtho2D( 0.0, m_Size[0], 0.0, m_Size[1] );
+  glMatrixMode( GL_MODELVIEW );
+
+  mitk::DataTreeIterator* it=m_DataTreeIterator->clone();
+  mitk::DataTree::Pointer tree = dynamic_cast <mitk::DataTree *> (it->getTree());
+  //	std::cout << "Render:: tree: " <<  *tree << std::endl;
+
+  typedef std::pair<int, GLMapper2D*> LayerMapperPair;
+  std::priority_queue<LayerMapperPair> layers;
+  int mapperNo = 0;
+  while(it->hasNext())
+  {        
+    it->next();
+
+    mitk::DataTreeNode::Pointer node = it->get();
+    mitk::Mapper::Pointer mapper = node->GetMapper(m_MapperID);
+    if(mapper.IsNotNull())
     {
-      //std::cout << "OpenGLRenderer calling its update..." << std::endl;
-      Update();
+      GLMapper2D* mapper2d=dynamic_cast<GLMapper2D*>(mapper.GetPointer());
+      if(mapper2d!=NULL) 
+      {
+        // mapper without a layer property are painted first
+        int layer=-1;
+        node->GetIntProperty("layer", layer, this);
+        // pushing negative layer value, since default sort for
+        // priority_queue is lessthan 
+        layers.push(LayerMapperPair(- (layer<<16) - mapperNo ,mapper2d));
+        mapperNo++;
+      }
     }
-    else
-      if(m_MapperID==2) 
-      { //@todo in 3D mode wird sonst nix geupdated, da z.Z. weder camera noch Änderung des Baums beachtet wird!!!
-        Update();
-      }
+  }
 
-      glClear(GL_COLOR_BUFFER_BIT);
-
-      PlaneGeometry* myPlaneGeom =
-        dynamic_cast<PlaneGeometry *>((mitk::Geometry2D*)(GetWorldGeometry()));
-
-      glViewport (0, 0, m_Size[0], m_Size[1]);
-      glMatrixMode( GL_PROJECTION );
-      glLoadIdentity();
-      gluOrtho2D( 0.0, m_Size[0], 0.0, m_Size[1] );
-      glMatrixMode( GL_MODELVIEW );
-
-      mitk::DataTreeIterator* it=m_DataTreeIterator->clone();
-      mitk::DataTree::Pointer tree = dynamic_cast <mitk::DataTree *> (it->getTree());
-      //	std::cout << "Render:: tree: " <<  *tree << std::endl;
-
-      typedef std::pair<int, GLMapper2D*> LayerMapperPair;
-      std::priority_queue<LayerMapperPair> layers;
-      int mapperNo = 0;
-      while(it->hasNext())
-      {        
-        it->next();
-
-        mitk::DataTreeNode::Pointer node = it->get();
-        mitk::Mapper::Pointer mapper = node->GetMapper(m_MapperID);
-        if(mapper.IsNotNull())
-        {
-          GLMapper2D* mapper2d=dynamic_cast<GLMapper2D*>(mapper.GetPointer());
-          if(mapper2d!=NULL) 
-          {
-            // mapper without a layer property are painted first
-            int layer=-1;
-            node->GetIntProperty("layer", layer, this);
-            // pushing negative layer value, since default sort for
-            // priority_queue is lessthan 
-            layers.push(LayerMapperPair(- (layer<<16) - mapperNo ,mapper2d));
-            mapperNo++;
-          }
-        }
-      }
-
-      delete it;
-      while (!layers.empty()) {
-        layers.top().second->Paint(this);
-        layers.pop();
-      }
-      if(m_VtkMapperPresent) {
-        m_MitkVtkRenderWindow->MitkRender();
-      }
+  delete it;
+  while (!layers.empty()) {
+    layers.top().second->Paint(this);
+    layers.pop();
+  }
+  if(m_VtkMapperPresent) {
+    m_MitkVtkRenderWindow->MitkRender();
+  }
 }
 
 /*!

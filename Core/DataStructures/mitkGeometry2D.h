@@ -8,14 +8,14 @@ namespace mitk {
 //##ModelId=3DDE4DEC0291
 //##Documentation
 //## Rule: everything is in mm (ms) if not stated otherwise.
-class Geometry2D : public itk::LightObject
+class Geometry2D : public itk::Object
 {
 public:
 	/** Standard class typedefs. */
     //##ModelId=3E1896DA03A6
 	typedef Geometry2D         Self;
     //##ModelId=3E1896DA03E2
-	typedef itk::LightObject   Superclass;
+	typedef itk::Object        Superclass;
     //##ModelId=3E1896DB0036
 	typedef itk::SmartPointer<Self> Pointer;
 
@@ -23,7 +23,7 @@ public:
 	itkNewMacro(Self);
 
 	/** Run-time type information (and related methods). */
-	itkTypeMacro(Geometry2D, itk::LightObject);
+	itkTypeMacro(Geometry2D, itk::Object);
 
 	//##ModelId=3DDE65E00122
 	virtual void MapPoint(const Point3f &pt3d, Point2f &pt2d);
@@ -55,6 +55,9 @@ public:
     virtual ~Geometry2D();
     //##ModelId=3E395E0802E6
     Geometry2D();
+    //##ModelId=3E396B86022E
+    Vector3f m_Resolution;
+
 
 };
 

@@ -23,15 +23,19 @@ public:
     typedef itk::SmartPointer<Self> Pointer;
     //##ModelId=3E395F170322
     typedef itk::SmartPointer<const Self>  ConstPointer;
+//    itkGetConstReferenceMacro(PlaneView, PlaneView);
+    //##ModelId=3E395E3E0077
+    virtual const mitk::PlaneView& GetPlaneView();
+    //##ModelId=3E396ABE0385
+    virtual void SetPlaneView(const mitk::PlaneView& aPlaneView);
+
+
 
     /** Method for creation through the object factory. */
     itkNewMacro(Self);
 
     /** Run-time type information (and related methods). */
     itkTypeMacro(PlaneGeometry,Geometry2D);
-
-    //##ModelId=3E395E3E0077
-    virtual const mitk::PlaneView& GetView();
 
 protected:
     //##ModelId=3E395F22035A
@@ -40,7 +44,7 @@ protected:
     virtual ~PlaneGeometry();
 
     //##ModelId=3E3963A90022
-    mitk::PlaneView m_View;
+    mitk::PlaneView m_PlaneView;
 };
 
 } // namespace mitk

@@ -1,4 +1,5 @@
 #include "Geometry3D.h"
+#include "PlaneGeometry.h"
 
 //##ModelId=3DCBF3AD0110
 const unsigned int *mitk::Geometry3D::GetDimensions() const
@@ -42,13 +43,13 @@ mitk::Geometry3D::TransformPointer mitk::Geometry3D::GetTransfrom() const
 //##ModelId=3DDE65D1028A
 void mitk::Geometry3D::PointMMToUnits(const Point3f &pt_mm, Point3f &pt_units, float t) const
 {
-	itkExceptionMacro("Conversions not yet supported."); 	
+    pt_units.set(pt_mm.x/m_Resolution.x, pt_mm.y/m_Resolution.y, pt_mm.z/m_Resolution.z);
 }
 
 //##ModelId=3DDE65DC0151
 void mitk::Geometry3D::PointUnitsToMM(const Point3f &pt_units, Point3f &pt_mm, float t) const
 {
-	itkExceptionMacro("Conversions not yet supported."); 	
+    pt_mm.set(pt_units.x*m_Resolution.x, pt_units.y*m_Resolution.y, pt_units.z*m_Resolution.z);
 }
 
 //##ModelId=3DCBC65C017C
@@ -97,6 +98,27 @@ void mitk::Geometry3D::Initialize(unsigned int dimension, const unsigned int* di
 		m_LargestPossibleRegion.SetIndex(i, 0);
 		m_LargestPossibleRegion.SetSize (i, 1);
 	}
+
+    m_Geometry2Ds.clear();
+
+    Geometry2D::Pointer gnull=NULL;
+    int num=m_LargestPossibleRegion.GetSize(2)*m_LargestPossibleRegion.GetSize(3);
+
+    m_Geometry2Ds.reserve(num);
+    m_Geometry2Ds.assign(num, gnull);
+    
+    m_Resolution.set(1.0, 1.0, 1.0);
+
+    //construct standard view
+    Point3f o1, o2; bool rightHanded=true;
+	Vector2f viewport(0,0);
+	o1.set(m_LargestPossibleRegion.GetSize(0),0,0); PointUnitsToMM(o1, o1);
+    o2.set(0,m_LargestPossibleRegion.GetSize(1),0); PointUnitsToMM(o2, o2);
+    PlaneView view_std(Point3f(0,0,0), o1, o2, viewport, viewport, rightHanded);
+
+    mitk::PlaneGeometry::Pointer planegeometry=mitk::PlaneGeometry::New();
+    m_Geometry2Ds[0]=planegeometry;
+    planegeometry->SetPlaneView(view_std);
 }
 
 //##ModelId=3E15572E0269

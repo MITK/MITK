@@ -6,17 +6,17 @@
  *   writes a PicFile to disk
  *
  * $Log$
- * Revision 1.7  1999/01/07 15:24:30  andre
+ * Revision 1.8  1999/11/27 19:24:19  andre
  * *** empty log message ***
  *
- * Revision 1.6  1998/09/04  17:45:54  andre
- * *** empty log message ***
- *
- * Revision 1.5  1998/05/06  14:13:15  andre
+ * Revision 1.3.2.3  1998/03/25  15:03:36  andre
  * added info->pixel_start_in_file
  *
- * Revision 1.4  1997/10/20  13:35:40  andre
+ * Revision 1.3.2.2  1997/10/09  11:03:53  andre
  * *** empty log message ***
+ *
+ * Revision 1.3.2.1  1997/09/15  13:46:15  andre
+ * added encryption
  *
  * Revision 1.3  1997/09/15  13:21:18  andre
  * switched to new what string format
@@ -54,12 +54,6 @@ ipPicPut( char *outfile_name, ipPicDescriptor *pic )
       return( -1 );
     }
 
-  if( ipPicEncryptionType(pic) != ' ' )
-    {
-      fprintf( stderr, "ipPicPut: sorry, can't write (was encrypted !!!)\n" );
-      return( -1 );
-    }
-
   if( outfile_name == NULL )
     outfile = stdout;
   else if( strcmp(outfile_name, "stdout") == 0 )
@@ -79,7 +73,10 @@ ipPicPut( char *outfile_name, ipPicDescriptor *pic )
                  + pic->dim * sizeof(ipUInt4_t);
 
   /* write oufile */
-  fwrite( ipPicVERSION, 1, sizeof(ipPicTag_t), outfile );
+  if( ipPicEncryptionType(pic) == ' ' )
+    fwrite( ipPicVERSION, 1, sizeof(ipPicTag_t), outfile );
+  else
+    fwrite( pic->info->version, 1, sizeof(ipPicTag_t), outfile );
 
   ipFWriteLE( &len, sizeof(ipUInt4_t), 1, outfile );
 
@@ -92,6 +89,7 @@ ipPicPut( char *outfile_name, ipPicDescriptor *pic )
   _ipPicWriteTags( pic->info->tags_head, outfile, ipPicEncryptionType(pic) );
 
   pic->info->pixel_start_in_file = ftell( outfile );
+
   if( pic->data )
     {
       if( pic->type == ipPicNonUniform )
@@ -222,7 +220,27 @@ void _ipPicWriteTags( _ipPicTagsElement_t *head, FILE *stream, char encryption_t
         }
       else
         {
-          ipFWriteLE( current->tsv->value, current->tsv->bpe / 8, elements, stream );
+          if( encryption_type == 'e'
+              && ( current->tsv->type == ipPicASCII
+                   || current->tsv->type == ipPicNonUniform ) )
+            {
+              char *buff = malloc( elements * current->tsv->bpe/8 );
+              int i;
+
+              for( i = 0; i < elements * current->tsv->bpe/8; i++ )
+                {
+                  if( i % 2 )
+                    ((ipUInt1_t *)buff)[i] = 255 - (((ipUInt1_t *)current->tsv->value)[i] ^ i);
+                  else
+                    ((ipUInt1_t *)buff)[i] = ((ipUInt1_t *)current->tsv->value)[i] ^ i;
+                }
+
+              ipFWriteLE( buff, current->tsv->bpe / 8, elements, stream );
+
+              free( buff );
+            }
+          else
+            ipFWriteLE( current->tsv->value, current->tsv->bpe / 8, elements, stream );
         }
 
       current = current->next;

@@ -110,6 +110,8 @@ protected:
   
   //##ModelId=3E70F66100CA
   virtual ~Surface();
+
+  void CalculateBoundingBox();
   
   //##ModelId=3E70F6610099
   VTKPolyDataSeries m_PolyDataSeries;

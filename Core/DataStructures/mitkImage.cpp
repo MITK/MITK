@@ -21,8 +21,10 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkSlicedGeometry3D.h"
 #include "mitkPlaneGeometry.h"
-#include <vtkImageData.h>
 #include "mitkPicHelper.h"
+#include "ipFunc.h"
+
+#include <vtkImageData.h>
 
 //##ModelId=3DCBC2B50345
 const mitk::PixelType& mitk::Image::GetPixelType(int n) const
@@ -199,9 +201,12 @@ mitk::ImageDataItem::Pointer mitk::Image::GetVolumeData(int t, int n)
           int offset = s*size;
           memcpy(static_cast<char*>(vol->GetData())+offset, sl->GetData(), size);
 
+          ipPicDescriptor * pic = sl->GetPicDescriptor();
+
           // replace old slice with reference to volume
           sl=new ImageDataItem(*vol, 2, s*size);
           sl->SetComplete(true);
+          ipFuncCopyTags(sl->GetPicDescriptor(), pic);
           m_Slices[posSl]=sl;
         }
       }
@@ -280,9 +285,13 @@ mitk::ImageDataItem::Pointer mitk::Image::GetChannelData(int n)
           int offset = t*m_OffsetTable[3]*m_PixelType.GetBpe()/8;
           memcpy(static_cast<char*>(ch->GetData())+offset, vol->GetData(), size);
 
+          ipPicDescriptor * pic = vol->GetPicDescriptor();
+
           // replace old volume with reference to channel
           vol=new ImageDataItem(*ch, 3, offset);
           vol->SetComplete(true);
+          ipFuncCopyTags(vol->GetPicDescriptor(), pic);
+
           m_Volumes[posVol]=vol;
         }
       }
@@ -461,7 +470,15 @@ bool mitk::Image::SetPicSlice(ipPicDescriptor *pic, int s, int t, int n)
   if(pic==NULL) return false;
   if(pic->dim!=2) return false;
   if((pic->n[0]!=m_Dimensions[0]) || (pic->n[1]!=m_Dimensions[1])) return false;
-  return SetSlice(pic->data,s,t,n); //@todo: add geometry!
+  if(SetSlice(pic->data,s,t,n)) //@todo: add geometry!
+  {
+    ImageDataItemPointer sl;
+    sl=GetSliceData(s,t,n);
+    ipFuncCopyTags(sl->GetPicDescriptor(), pic);
+    return true;
+  }
+  else
+    return false;
 }
 
 //##ModelId=3E102818024D

@@ -9,6 +9,9 @@
 namespace mitk {
 
 //##ModelId=3E32C62B00BE
+//##Documentation
+//## Base class of all vtk-based 3D-Mappers. Those must implement the abstract
+//## method vtkProp* GetProp().
 class BaseVtkMapper3D : public Mapper3D
 {
 public:

@@ -17,20 +17,10 @@ class BaseRenderer : public itk::Object
 {
   public:
 	/** Standard class typedefs. */
-    //##ModelId=3E33ECF200C6
-	typedef BaseRenderer             Self;
-    //##ModelId=3E33ECF200F8
-    typedef itk::Object              Superclass;
-    //##ModelId=3E33ECF20116
-	typedef itk::SmartPointer<Self>  Pointer;
-    //##ModelId=3E33ECF20134
-	typedef itk::SmartPointer<const Self>  ConstPointer;
+    mitkClassMacro(BaseRenderer, itk::Object);
 
 	/** Method for creation through the object factory. */
 //	itkNewMacro(Self);
-
-	/** Run-time type information (and related methods). */
-    itkTypeMacro(itk::Object,BaseRenderer);
 
 	  //##ModelId=3E330B640353
     typedef int MapperSlotId;
@@ -84,6 +74,8 @@ class BaseRenderer : public itk::Object
     itkGetObjectMacro(DisplayGeometry2DData, mitk::Geometry2DData);
     itkGetObjectMacro(WorldGeometry2DData, mitk::Geometry2DData);
 
+    itkGetMacro(MapperID, MapperSlotId);
+    itkSetMacro(MapperID, MapperSlotId);
 protected:
     //##ModelId=3E3D2F120050
     BaseRenderer();

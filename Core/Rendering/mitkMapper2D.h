@@ -11,6 +11,13 @@
 namespace mitk {
 
 //##ModelId=3E3AA308024B
+//##Documentation
+//## Base class of all Mappers for 2D display, i.e., a frontal view on a plane
+//## display area, so nothing rotated in 3D space as, e.g., a plane in 3D space
+//## (such things are done by subclasses of Mapper3D).
+//## 
+//## [not yet used:] SetGeometry3D() tells the Mapper2D which slices will
+//## potentially be requested.
 class Mapper2D : public Mapper
 {
 public:

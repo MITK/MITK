@@ -19,22 +19,10 @@ class OpenGLRenderer : public BaseRenderer
 {
   public:
     /** Standard class typedefs. */
-    //##ModelId=3E33ECF2026A
-    typedef OpenGLRenderer              Self;
-    //##ModelId=3E33ECF20275
-    typedef BaseRenderer             Superclass;
-    //##ModelId=3E33ECF20288
-    typedef itk::SmartPointer<Self>  Pointer;
-    //##ModelId=3E33ECF20292
-    typedef itk::SmartPointer<const Self>  ConstPointer;
+    mitkClassMacro(OpenGLRenderer,BaseRenderer);
 
     /** Method for creation through the object factory. */
     itkNewMacro(Self);
-
-    /** Run-time type information (and related methods). */
-    itkTypeMacro(BaseRenderer,OpenGLRenderer);
-
-
     
     //##ModelId=3E3D28AB0018
     void SetData(mitk::DataTreeIterator* iterator);
@@ -85,9 +73,10 @@ class OpenGLRenderer : public BaseRenderer
 
     //##ModelId=3E33145B001E
     vtkLight* m_Light;
+
   public: //FIXME
     //##ModelId=3E64243803E7
-		iilPicImage* m_IilImage;
+	iilPicImage* m_IilImage;
 };
 
 } // namespace mitk

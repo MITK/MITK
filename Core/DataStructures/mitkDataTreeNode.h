@@ -9,6 +9,7 @@
 	#define MBI_STD
 	#include <iostream.h>
 	#include <fstream.h>
+#include "BaseRenderer.h"
 #else
 	#define MBI_STD std
 	#include <iostream>
@@ -50,6 +51,9 @@ public:
 
     //##ModelId=3E34248B02E0
     mitk::DataTreeNode& operator=(BaseData* right);
+    //##ModelId=3E69331903C9
+    virtual void SetMapper(MapperSlotId id, mitk::Mapper* mapper);
+
 
 protected:
     //##ModelId=3E33F5D702AA

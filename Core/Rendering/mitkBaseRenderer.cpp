@@ -43,7 +43,7 @@ void mitk::BaseRenderer::InitSize(int w, int h)
 }
 
 //##ModelId=3E3D2F120050
-mitk::BaseRenderer::BaseRenderer() : m_DataTreeIterator(NULL), m_RenderWindow(NULL), m_LastUpdateTime(0)
+mitk::BaseRenderer::BaseRenderer() : m_DataTreeIterator(NULL), m_RenderWindow(NULL), m_LastUpdateTime(0), m_MapperID(defaultMapper)
 {
     m_WorldGeometry = mitk::PlaneGeometry::New();
 

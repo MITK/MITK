@@ -9,6 +9,11 @@
 namespace mitk {
 
 //##ModelId=3D6A0EE70237
+//##Documentation
+//## Base class of all Mappers, 2D as well as 3D. 
+//## 
+//## Subclasses of mitk::Mapper control the creation of rendering primitives
+//## that interface to the graphics library (e.g., OpenGL, vtk). 
 class Mapper : public ImageSource
 {
 public:

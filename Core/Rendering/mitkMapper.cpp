@@ -9,7 +9,8 @@
 //##ModelId=3E3C337E0162
 mitk::Mapper::Mapper() //: m_DisplaySizeInDisplayUnits(10.0, 10.0)
 {
-
+	// Modify superclass default values, can be overridden by subclasses
+	this->SetNumberOfRequiredInputs(1);
 }
 
 

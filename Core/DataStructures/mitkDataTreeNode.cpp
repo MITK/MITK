@@ -76,3 +76,12 @@ MBI_STD::ostream& mitk::operator<<( MBI_STD::ostream& o, DataTreeNode::Pointer& 
     return o;
 }
 
+//##ModelId=3E69331903C9
+void mitk::DataTreeNode::SetMapper(MapperSlotId id, mitk::Mapper* mapper)
+{
+    mappers[id] = mapper;
+
+    if (mapper!=NULL)
+        mapper->SetInput(GetData());
+}
+

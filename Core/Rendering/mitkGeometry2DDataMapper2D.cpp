@@ -7,7 +7,6 @@ mitk::Geometry2DDataMapper2D::Geometry2DDataMapper2D()
 {
 }
 
-
 //##ModelId=3E639E100257
 mitk::Geometry2DDataMapper2D::~Geometry2DDataMapper2D()
 {

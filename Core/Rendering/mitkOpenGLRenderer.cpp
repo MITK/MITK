@@ -24,6 +24,7 @@ void mitk::OpenGLRenderer::SetData(mitk::DataTreeIterator* iterator)
     m_VtkRenderer->Delete();
 
     m_VtkRenderer = vtkRenderer::New();
+    m_VtkRenderer->SetLayer(0);
     m_VtkRenderWindow->AddRenderer( this->m_VtkRenderer );
 
     m_Light->Delete();
@@ -52,7 +53,7 @@ void mitk::OpenGLRenderer::SetData(mitk::DataTreeIterator* iterator)
             //            mitk::LevelWindow lw;
             unsigned int dummy[] = {10,10,10};
             //Geometry3D geometry(3,dummy);
-            mitk::Mapper::Pointer mapper = it->next()->GetMapper(defaultMapper);
+            mitk::Mapper::Pointer mapper = it->next()->GetMapper(m_MapperID);
             if(mapper!=NULL)
             {
                 //                mapper->Update();
@@ -100,7 +101,7 @@ void mitk::OpenGLRenderer::Update()
         //      mitk::LevelWindow lw;
         unsigned int dummy[] = {10,10,10};
         //Geometry3D geometry(3,dummy);
-        mitk::Mapper::Pointer mapper = it->next()->GetMapper(defaultMapper);
+        mitk::Mapper::Pointer mapper = it->next()->GetMapper(m_MapperID);
         if(mapper!=NULL)
         {
             Mapper2D* mapper2d=dynamic_cast<Mapper2D*>(mapper.GetPointer());
@@ -133,10 +134,13 @@ void mitk::OpenGLRenderer::Render()
         glClear(GL_COLOR_BUFFER_BIT);
 
         if(m_DataTreeIterator==NULL) return;
+
+        bool m_VtkMapperPresent=false;
+
         mitk::DataTreeIterator* it=m_DataTreeIterator->clone();
         while(it->hasNext())
         {
-            mitk::Mapper::Pointer mapper = it->next()->GetMapper(defaultMapper);
+            mitk::Mapper::Pointer mapper = it->next()->GetMapper(m_MapperID);
             if(mapper!=NULL)
             {
                 GLMapper2D* mapper2d=dynamic_cast<GLMapper2D*>(mapper.GetPointer());
@@ -144,10 +148,15 @@ void mitk::OpenGLRenderer::Render()
                     mapper2d->Paint(this);
                 }
             }
+            else
+            if(dynamic_cast<BaseVtkMapper2D*>(mapper.GetPointer()) || dynamic_cast<BaseVtkMapper3D*>(mapper.GetPointer()))
+                m_VtkMapperPresent=true;
         }
 
         delete it;
-        //    m_VtkRenderWindow->Render();
+
+       // if(m_VtkMapperPresent)
+            m_VtkRenderWindow->Render();
 }
 
 /*!
@@ -161,9 +170,13 @@ void mitk::OpenGLRenderer::InitRenderer(mitk::RenderWindow* renderwindow)
 
     m_InitNeeded = true;
     m_ResizeNeeded = true;
+
     m_VtkRenderWindow = vtkRenderWindow::New();
+    m_VtkRenderWindow->SetNumberOfLayers(2);
+
     m_VtkRenderer = vtkRenderer::New();
     m_VtkRenderWindow->AddRenderer( m_VtkRenderer );
+
     m_Light = vtkLight::New();
     m_VtkRenderer->AddLight( m_Light );
     //we should disable vtk doublebuffering, but then it doesn't work

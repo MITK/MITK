@@ -40,6 +40,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <map>
 #include "mitkLevelWindow.h"
 #include "mitkColorProperty.h"
+#include "mitkStringProperty.h"
 
 class vtkTransform;
 
@@ -181,6 +182,20 @@ public:
   bool GetName(char &nodeName, mitk::BaseRenderer* renderer, const char* propertyKey = "name") const
   {
     return GetStringProperty(propertyKey, &nodeName, renderer);
+  }
+
+  bool GetName(std::string &nodeName, mitk::BaseRenderer* renderer = NULL, const char* propertyKey = "name") const
+  {
+    mitk::StringProperty::Pointer stringProp = dynamic_cast<mitk::StringProperty*>(GetProperty(propertyKey, renderer).GetPointer());
+    if(stringProp.IsNull())
+    {
+      return false;
+    } 
+    else 
+    {
+      nodeName = stringProp->GetValue();
+      return true;
+    }
   }
 
   //##ModelId=3EF1941E01D6

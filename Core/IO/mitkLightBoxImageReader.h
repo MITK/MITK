@@ -1,9 +1,9 @@
-#ifndef PICFILEREADER_H_HEADER_INCLUDED_C1F48A22
-#define PICFILEREADER_H_HEADER_INCLUDED_C1F48A22
+#ifndef LIGHTBOXIMAGEREADER_H_HEADER_INCLUDED_C1F48A22
+#define LIGHTBOXIMAGEREADER_H_HEADER_INCLUDED_C1F48A22
 
 #include "mitkCommon.h"
 #include "Reader.h"
-#include <include/plugin.h>
+#include "../../Applications/MITKSamplePlugIn/include/plugin.h"
 
 namespace mitk {
 
@@ -15,6 +15,7 @@ public:
 
     /** Method for creation through the object factory. */
     itkNewMacro(Self);
+
 
     void SetLightBox(lightbox_t lightbox);
     lightbox_t GetLightBox();
@@ -38,4 +39,4 @@ protected:
 
 
 
-#endif /* PICFILEREADER_H_HEADER_INCLUDED_C1F48A22 */
+#endif /* LIGHTBOXIMAGEREADER_H_HEADER_INCLUDED_C1F48A22 */

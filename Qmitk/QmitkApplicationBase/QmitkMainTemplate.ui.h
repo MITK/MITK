@@ -160,13 +160,13 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
       // disable volume rendering by default
       node->SetProperty("volumerendering",new mitk::BoolProperty(false));
 
-//	    mitk::USLookupTableSource::Pointer LookupTableSource = mitk::USLookupTableSource::New();
-//  	  LookupTableSource->SetUseStrainRateLookupTable();
-//	    LookupTableSource->Update();
-//  	  mitk::LookupTableSource::OutputTypePointer LookupTable = LookupTableSource->GetOutput();
-//	    mitk::LookupTableProperty::Pointer LookupTableProp = new mitk::LookupTableProperty(*LookupTable);
-//			node->SetProperty("LookupTable", LookupTableProp );
-      
+      //	    mitk::USLookupTableSource::Pointer LookupTableSource = mitk::USLookupTableSource::New();
+      //  	  LookupTableSource->SetUseStrainRateLookupTable();
+      //	    LookupTableSource->Update();
+      //  	  mitk::LookupTableSource::OutputTypePointer LookupTable = LookupTableSource->GetOutput();
+      //	    mitk::LookupTableProperty::Pointer LookupTableProp = new mitk::LookupTableProperty(*LookupTable);
+      //			node->SetProperty("LookupTable", LookupTableProp );
+
       mitk::LevelWindowProperty::Pointer levWinProp = new mitk::LevelWindowProperty();
       mitk::LevelWindow levelWindow;
       reader->UpdateLargestPossibleRegion();
@@ -193,6 +193,9 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
     node=mitk::DataTreeNode::New();
     node->SetData(reader->GetOutput());
     it->add(node);
+
+    // disable volume rendering by default
+    node->SetProperty("volumerendering",new mitk::BoolProperty(false));
 
     QString tmpName = fileName;
     tmpName = tmpName.right(tmpName.length() - tmpName.findRev("/") - 1);
@@ -229,6 +232,9 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
       node->SetData(image);
       it->add(node);
 
+      // disable volume rendering by default
+      node->SetProperty("volumerendering",new mitk::BoolProperty(false));
+
       QString tmpName = fileName;
       tmpName = tmpName.right(tmpName.length() - tmpName.findRev("/") - 1);
       mitk::StringProperty::Pointer nameProp = new mitk::StringProperty(tmpName.ascii());
@@ -262,18 +268,18 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
   }
   else if( strstr(fileName, ".uvg")!=0 )
   {
-	  mitk::VesselGraphFileReader::Pointer reader = mitk::VesselGraphFileReader::New();
-	  std::cout << "loading " << fileName << " as uvg ... " << std::endl;
-	  reader->SetFileName(fileName);
-	  reader->Update();
-	  mitk::DataTreeIterator* it=tree->inorderIterator();
+    mitk::VesselGraphFileReader::Pointer reader = mitk::VesselGraphFileReader::New();
+    std::cout << "loading " << fileName << " as uvg ... " << std::endl;
+    reader->SetFileName(fileName);
+    reader->Update();
+    mitk::DataTreeIterator* it=tree->inorderIterator();
 
-	  node=mitk::DataTreeNode::New();
-	  node->SetData(reader->GetOutput());
-	  it->add(node);
+    node=mitk::DataTreeNode::New();
+    node->SetData(reader->GetOutput());
+    it->add(node);
 
-	  initWidgets(it);
-	  delete it;
+    initWidgets(it);
+    delete it;
   }
   else if(strstr(fileName, "DCM")!=0)
   {
@@ -289,6 +295,9 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
     node=mitk::DataTreeNode::New();
     node->SetData(reader->GetOutput());
     it->add(node);
+
+    // disable volume rendering by default
+    node->SetProperty("volumerendering",new mitk::BoolProperty(false));
 
     mitk::LevelWindow levelWindow;
     reader->Update();
@@ -321,7 +330,7 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
     std::cout << "loading " << fileName << " as DSR ... " << std::endl;
 
     reader->SetFileName(fileName);
-    
+
     mitk::ImageChannelSelector::Pointer channelSelector=mitk::ImageChannelSelector::New();
     mitk::ImageChannelSelector::Pointer DopplerChannelSelector=mitk::ImageChannelSelector::New();
 
@@ -329,23 +338,23 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
     DopplerChannelSelector->SetInput(reader->GetOutput());
 
     reader->UpdateOutputInformation();
-		bool haveDoppler = false;
+    bool haveDoppler = false;
     if (reader->GetOutput()->IsValidChannel(0))
     {
-				std::cout << "    have channel data 0 (backscatter) ... " << std::endl;
-		}
+      std::cout << "    have channel data 0 (backscatter) ... " << std::endl;
+    }
 
     if (reader->GetOutput()->IsValidChannel(1))
     {
-				std::cout << "    have channel data 1 (doppler) ... " << std::endl;
-				haveDoppler = true;
-		}
-	
+      std::cout << "    have channel data 1 (doppler) ... " << std::endl;
+      haveDoppler = true;
+    }
+
     mitk::CylindricToCartesianFilter::Pointer cyl2cart = mitk::CylindricToCartesianFilter::New();;
     mitk::CylindricToCartesianFilter::Pointer cyl2cartDoppler = mitk::CylindricToCartesianFilter::New();
 
-		cyl2cart->SetTargetXSize(128);
-		cyl2cartDoppler->SetTargetXSize(128); 
+    cyl2cart->SetTargetXSize(128);
+    cyl2cartDoppler->SetTargetXSize(128); 
 
     mitk::DataTreeIterator* it=tree->inorderIterator();
 
@@ -355,7 +364,7 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
     channelSelector->SetChannelNr(0);
     //channelSelector->Update();
     //ipPicPut("timeselect.pic",channelSelector->GetOutput()->GetPic());    
-        
+
     mitk::ImageSliceSelector::Pointer sliceSelector=mitk::ImageSliceSelector::New();
     //
     // insert original (in cylinric coordinates) Backscatter information
@@ -374,6 +383,8 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
     node->SetVisibility(false,NULL);
     node->Update();
     it->add(node);    
+    // disable volume rendering by default
+    node->SetProperty("volumerendering",new mitk::BoolProperty(false));
 
     //
     // insert transformed (in cartesian coordinates) Backscatter information
@@ -386,7 +397,7 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
     nameProp = new mitk::StringProperty("TransformedBackscatter");
     node->SetProperty("fileName",nameProp);
     node->SetProperty("layer", new mitk::IntProperty(-10) );
-//    mitk::LevelWindow levelWindow;
+    //    mitk::LevelWindow levelWindow;
 
     sliceSelector->SetInput(cyl2cart->GetOutput());
     sliceSelector->Update();
@@ -394,67 +405,71 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
     node->SetLevelWindow(levelWindow, NULL);
     node->Update();
     it->add(node);    
+    // disable volume rendering by default
+    node->SetProperty("volumerendering",new mitk::BoolProperty(false));
 
     if (haveDoppler)
     {
-				
-	    //
-  	  // switch to Doppler information
-	    //
-  	  DopplerChannelSelector->SetChannelNr(1);
-	    //DopplerChannelSelector->Update();
 
-	    //
-  	  // create a Doppler lookup table
-    	// TODO: HP map must be provided by DSRFilereader, since it
-	    // may be dependend on data ( baseline shift)
-  	  //
-	    mitk::USLookupTableSource::Pointer LookupTableSource = mitk::USLookupTableSource::New();
-  	  LookupTableSource->SetUseDSRDopplerLookupTable();
-	    LookupTableSource->Update();
-  	  mitk::LookupTableSource::OutputTypePointer LookupTable = LookupTableSource->GetOutput();
-	    mitk::LookupTableProperty::Pointer LookupTableProp = new mitk::LookupTableProperty(*LookupTable);
+      //
+      // switch to Doppler information
+      //
+      DopplerChannelSelector->SetChannelNr(1);
+      //DopplerChannelSelector->Update();
 
-
-			//
-	    // insert original (in cylindric coordinates) Doppler information
-  	  //
-	    node=mitk::DataTreeNode::New();
-	 	  node->SetData(DopplerChannelSelector->GetOutput());
-	    ultrasoundProp = new mitk::StringProperty("OriginalDoppler");
-  	  node->SetProperty("ultrasound",ultrasoundProp);
-	    nameProp = new mitk::StringProperty("OriginalDoppler");
-	    node->SetProperty("fileName",nameProp);
-	    node->SetProperty("layer", new mitk::IntProperty(-6) );
+      //
+      // create a Doppler lookup table
+      // TODO: HP map must be provided by DSRFilereader, since it
+      // may be dependend on data ( baseline shift)
+      //
+      mitk::USLookupTableSource::Pointer LookupTableSource = mitk::USLookupTableSource::New();
+      LookupTableSource->SetUseDSRDopplerLookupTable();
+      LookupTableSource->Update();
+      mitk::LookupTableSource::OutputTypePointer LookupTable = LookupTableSource->GetOutput();
+      mitk::LookupTableProperty::Pointer LookupTableProp = new mitk::LookupTableProperty(*LookupTable);
 
 
-   		mitk::LevelWindowProperty::Pointer levWinProp = new mitk::LevelWindowProperty();
+      //
+      // insert original (in cylindric coordinates) Doppler information
+      //
+      node=mitk::DataTreeNode::New();
+      node->SetData(DopplerChannelSelector->GetOutput());
+      ultrasoundProp = new mitk::StringProperty("OriginalDoppler");
+      node->SetProperty("ultrasound",ultrasoundProp);
+      nameProp = new mitk::StringProperty("OriginalDoppler");
+      node->SetProperty("fileName",nameProp);
+      node->SetProperty("layer", new mitk::IntProperty(-6) );
+
+
+      mitk::LevelWindowProperty::Pointer levWinProp = new mitk::LevelWindowProperty();
       mitk::LevelWindow levelWindow;
       levelWindow.SetLevelWindow(128, 255);
-			levWinProp->SetLevelWindow(levelWindow);      
+      levWinProp->SetLevelWindow(levelWindow);      
       // set the overwrite LevelWindow
       // if "levelwindow" is used if "levelWindow" is not available
       // else "levelWindow" is used
       // "levelWindow" is not affected by the slider
       node->GetPropertyList()->SetProperty("levelWindow",levWinProp);
 
-	    node->SetProperty("LookupTable", LookupTableProp );
-  	  node->SetVisibility(false,NULL);
-	    node->Update();
-  	  it->add(node);
+      node->SetProperty("LookupTable", LookupTableProp );
+      node->SetVisibility(false,NULL);
+      node->Update();
+      it->add(node);
+      // disable volume rendering by default
+      node->SetProperty("volumerendering",new mitk::BoolProperty(false));
 
-			//
-  	  // insert transformed (in cartesian coordinates) Doppler information
-    	//
-	    cyl2cartDoppler->SetInput(DopplerChannelSelector->GetOutput());
-  	  node=mitk::DataTreeNode::New();
-	    node->SetData(cyl2cartDoppler->GetOutput());
-  	  ultrasoundProp = new mitk::StringProperty("TransformedDoppler");
-	    node->SetProperty("ultrasound",ultrasoundProp);
-	    nameProp = new mitk::StringProperty("TransformedDoppler");
-  	  node->SetProperty("fileName",nameProp);
-	    node->SetProperty("layer", new mitk::IntProperty(-5) );
-  	  cyl2cartDoppler->Update();
+      //
+      // insert transformed (in cartesian coordinates) Doppler information
+      //
+      cyl2cartDoppler->SetInput(DopplerChannelSelector->GetOutput());
+      node=mitk::DataTreeNode::New();
+      node->SetData(cyl2cartDoppler->GetOutput());
+      ultrasoundProp = new mitk::StringProperty("TransformedDoppler");
+      node->SetProperty("ultrasound",ultrasoundProp);
+      nameProp = new mitk::StringProperty("TransformedDoppler");
+      node->SetProperty("fileName",nameProp);
+      node->SetProperty("layer", new mitk::IntProperty(-5) );
+      cyl2cartDoppler->Update();
 
       // set the overwrite LevelWindow
       // if "levelwindow" is used if "levelWindow" is not available
@@ -462,11 +477,13 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
       // "levelWindow" is not affected by the slider
       node->GetPropertyList()->SetProperty("levelWindow",levWinProp);
 
-     	node->SetProperty("LookupTable", LookupTableProp );
-	    node->Update();
-  	  it->add(node);
-		}
-   
+      node->SetProperty("LookupTable", LookupTableProp );
+      node->Update();
+      it->add(node);
+      // disable volume rendering by default
+      node->SetProperty("volumerendering",new mitk::BoolProperty(false));
+    }
+
     mitkMultiWidget->levelWindowWidget->setLevelWindow(levelWindow);
 
     initWidgets(it);
@@ -891,7 +908,7 @@ void QmitkMainTemplate::initWidgets( mitk::DataTreeIterator * it )
     Vector3f(bounds[1],bounds[2],bounds[4]),
     Vector3f(bounds[0],bounds[2],bounds[5])
     );
-    mitkMultiWidget->mitkWidget4->GetRenderer()->SetData(it);
+  mitkMultiWidget->mitkWidget4->GetRenderer()->SetData(it);
 }
 
 

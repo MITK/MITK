@@ -18,7 +18,7 @@ class SmartPointerProperty : public BaseProperty
     //##ModelId=3ED94B4203C1
     virtual bool operator==(const BaseProperty& property) const;
     //##ModelId=3ED94B7500F2
-    SmartPointerProperty();
+    SmartPointerProperty(itk::Object* pointer);
 
     //##ModelId=3ED94B750111
     virtual ~SmartPointerProperty();

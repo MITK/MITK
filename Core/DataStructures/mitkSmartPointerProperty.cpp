@@ -11,8 +11,9 @@ bool mitk::SmartPointerProperty::operator==(const BaseProperty& property) const
 }
 
 //##ModelId=3ED94B7500F2
-mitk::SmartPointerProperty::SmartPointerProperty()
+mitk::SmartPointerProperty::SmartPointerProperty(itk::Object* pointer) : m_SmartPointer(pointer)
 {
+    Modified();
 }
 
 //##ModelId=3ED94B750111

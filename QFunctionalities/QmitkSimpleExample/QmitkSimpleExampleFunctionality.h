@@ -24,73 +24,110 @@
 One needs to reimplement the methods createControlWidget(..), createMainWidget(..) 
 and createAction(..) from QmitkFunctionality. A QmitkFctMediator object gets passed a reference of a 
 functionality and positions the widgets in the application window controlled by a 
-layout template
+layout template.
 */
 class QmitkSimpleExampleFunctionality : public QmitkFunctionality
 {
     Q_OBJECT
 public:
 
-    /*!
-    \brief default constructor
-    */
-    QmitkSimpleExampleFunctionality(QObject *parent=0, const char *name=0, QmitkStdMultiWidget *mitkStdMultiWidget=NULL);
+  /*!
+  \brief default constructor
+  */
+	QmitkSimpleExampleFunctionality(QObject *parent=0, const char *name=0, QmitkStdMultiWidget *mitkStdMultiWidget = NULL, mitk::DataTreeIterator * dataIt = NULL);
 
-    /*!
-    \brief default destructor
-    */
-    virtual ~QmitkSimpleExampleFunctionality();
+  /*!
+  \brief default destructor
+  */
+  virtual ~QmitkSimpleExampleFunctionality();
 
-    /*!
-    \brief method for creating the widget containing the application controls, like sliders, buttons etc.
-    */
-    virtual QWidget * createControlWidget(QWidget *parent);
+  /*!
+  \brief method for creating the widget containing the application 
+					controls, like sliders, buttons etc.
+  */
+  virtual QWidget * createControlWidget(QWidget *parent);
 
-    /*!
-    \brief method for creating the applications main widget
-    */
-    virtual QWidget * createMainWidget(QWidget * parent);
+  /*!
+  \brief method for creating the applications main widget
+  */
+  virtual QWidget * createMainWidget(QWidget * parent);
 
-    /*!
-    \brief method for creating the connections of main and control widget
-    */
-    virtual void createConnections();
+	/*!
+  \brief method for creating the connections of main and control widget
+  */
+  virtual void createConnections();
 
-    /*!
-    \brief method for creating an QAction object, i.e. button & menu entry
-    */
-    virtual QAction * createAction(QActionGroup *parent);
+  /*!
+  \brief method for creating an QAction object, i.e. button & menu entry
+	@param parent the parent QWidget
+  */
+  virtual QAction * createAction(QActionGroup *parent);
 
-    virtual QString getFunctionalityName();
+	/*! 
+		* \brief returns the name of this functionality object
+		*/
+  virtual QString getFunctionalityName();
+
+
+	/*!
+	 \brief  inits the widgets of a functionality, 
+						i.e. initializing slider etc.
+	 */
+	void initWidgets();
+
 
 protected slots:
-    /*!
-    qt slot for event processing from a slider control
-    */
-    void selectSliceWidgetXY( int z );
 
-    /*!
-    qt slot for event processing from a slider control
-    */
-    void selectSliceWidgetXZ( int z );
+	/*!
+  qt slot for event processing from a slider control,
+		controls transversal view
+  */
+  void selectSliceWidgetXY( int z );
 
-    /*!
-    qt slot for event processing from a slider control
-    */
-    void selectSliceWidgetYZ( int z );
+  /*!
+  qt slot for event processing from a slider control
+			controls sagital view
+  */
+  void selectSliceWidgetXZ( int z );
 
-    /*!
-    qt slot for event processing from a slider control
-    */
-    void selectSliceWidgetFP( int z );
+  /*!
+  qt slot for event processing from a slider control
+			controls axial view
+  */
+  void selectSliceWidgetYZ( int z );
+
+  /*!
+  qt slot for event processing from a slider control
+  */
+  void selectSliceWidgetFP( int z );
 
 protected:
-    QmitkStdMultiWidget * multiWidget;
-    QmitkSimpleExampleControls * controls;
-    int count;
-    mitk::FloatProperty::Pointer opacityprop;
 
+	/*!
+	* default main widget containing 4 windows showing 3 
+	* orthogonal slices of the volume and a 3d render window
+	*/
+	QmitkStdMultiWidget * multiWidget;
 
+	/*!
+	* controls containing sliders for scrolling through the slices
+	*/
+	QmitkSimpleExampleControls * controls;
+  
+	/*!
+	* ???
+	*/
+//	int count;
+  
+	/*!
+	* property for opacity for showing image overlays.
+	* This property can be adjusted over a slider in 
+	* the control widget.
+	* 
+	*/
+	mitk::FloatProperty::Pointer opacityprop;
+
+		
 };
 
 #endif // !defined(AFX_QMITKSIMPLEEXAMPLEFUNCTIONALITY_H__1DC0BA6E_9B8D_4D63_8A63_5B661CE33712__INCLUDED_)

@@ -3,9 +3,11 @@
 
 mitk::BaseDataSource::BaseDataSource()
 {
-    OutputType::Pointer output = static_cast<OutputType*> ( this->MakeOutput( 0 ).GetPointer() );
-    Superclass::SetNumberOfRequiredOutputs( 1 );
-    Superclass::SetNthOutput( 0, output.GetPointer() );
+    // Pure virtual functions may not be called in the constructor...
+    // see ( see Bjarne Stroustrup's C++ PL 3rd ed section 15.4.3 )
+    //OutputType::Pointer output = static_cast<OutputType*> ( this->MakeOutput( 0 ).GetPointer() );
+    //Superclass::SetNumberOfRequiredOutputs( 1 );
+    //Superclass::SetNthOutput( 0, output.GetPointer() );
 }
 
 

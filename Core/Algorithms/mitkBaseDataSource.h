@@ -30,7 +30,9 @@ public:
      * Allocates a new output object and returns it. This function
      * is pure virtual because mitk::BaseData contains pure virtual functions
      * and can not directly be instantiated. This must be done by subclasses, which
-     * know which subclasses of mitk::BaseData they want to instantiate.
+     * know which subclasses of mitk::BaseData they want to instantiate. Thus, these 
+     * classes have to set their output themselves via this->SetOutput(MakeOutput(0))
+     * in the constructor!
      * @param idx the index of the output for which an object should be created
      * @returns the new object
      */

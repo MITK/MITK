@@ -3,6 +3,9 @@
 #include "OperationEvent.h"
 #include "UndoController.h"
 
+
+#include "StupidErrorNotification.h"
+
 //##ModelId=3E5B2DB301FD
 mitk::StateMachine::StateMachine(std::string type)
 : m_Type(type), m_CurrentState(0)

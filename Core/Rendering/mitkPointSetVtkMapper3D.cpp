@@ -257,8 +257,4 @@ for (j=0, i=pointList->GetPoints()->Begin(); i!=pointList->GetPoints()->End() ; 
     StandardUpdate();
 }
 
-//##ModelId=3EF1B44001D5
-void mitk::PointSetVtkMapper3D::Update()
-{
-}
 

@@ -49,9 +49,6 @@ class PointSetVtkMapper3D : public BaseVtkMapper3D
     //##Documentation
     //## @brief Called by BaseRenderer when an update is required
     virtual void Update(mitk::BaseRenderer* renderer);
-    //##ModelId=3EF1B44001D5
-    virtual void Update();
-
 
 
   protected:

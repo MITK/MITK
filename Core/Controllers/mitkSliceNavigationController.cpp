@@ -245,7 +245,7 @@ bool mitk::SliceNavigationController::ExecuteAction( Action* action, mitk::State
        //   break;
        // }
         case AcMOVEPOINT:
-       // {
+        {
        //   mitk::ITKPoint3D movePoint;
        //   vm2itk(posEvent->GetWorldPosition(), movePoint);
 
@@ -255,37 +255,16 @@ bool mitk::SliceNavigationController::ExecuteAction( Action* action, mitk::State
        //   ok = true;
        //   break;
        // }
-       // case AcFINISHMOVEMENT:
-        {
-       // {/*finishes a Movement from the coordinate supplier: 
-       //   gets the lastpoint from the undolist and writes an undo-operation so 
-       //   that the movement of the coordinatesupplier is undoable.*/
-       //   mitk::ITKPoint3D movePoint, oldMovePoint;
-       //   oldMovePoint.Fill(0);
-       //   vm2itk(posEvent->GetWorldPosition(), movePoint);
-       //   PointOperation* doOp = new mitk::PointOperation(OpMOVE, movePoint, 0);
-       //   if (m_UndoEnabled )
-       //   {
-       //     //get the last Position from the UndoList
-       //     OperationEvent *lastOperationEvent = m_UndoController->GetLastOfType(m_Destination, OpMOVE);
-       //     if (lastOperationEvent != NULL)
-       //     {
-       //       PointOperation* lastOp = dynamic_cast<PointOperation *>(lastOperationEvent->GetOperation());
-       //       if (lastOp != NULL)
-       //       {
-       //         oldMovePoint = lastOp->GetPoint();
-       //       }
-       //     }
-       //     PointOperation* undoOp = new PointOperation(OpMOVE, oldMovePoint, 0);
-       //     OperationEvent *operationEvent = new OperationEvent(m_Destination, doOp, undoOp,
-						 //                                                   objectEventId, groupEventId);
-       //     m_UndoController->SetOperationEvent(operationEvent);
-       //   }
-       //   //execute the Operation
-	  		  //m_Destination->ExecuteOperation(doOp);
-
           //checkif this event comes from a 2D -Widget. only then a change of slices is wanted
           mitk::BaseRenderer* baseRenderer = posEvent->GetSender();
+          if (baseRenderer==NULL)
+            {
+              mitk::GlobalInteraction *globalInteraction = dynamic_cast<mitk::GlobalInteraction *>(mitk::EventMapper::GetGlobalStateMachine());
+              if (globalInteraction!=NULL)
+              {
+                baseRenderer = const_cast<mitk::BaseRenderer *>(globalInteraction->GetFocus());
+              }
+            }
           if (baseRenderer!=NULL)
            if (baseRenderer->GetMapperID() == 1)
            {
@@ -318,6 +297,78 @@ bool mitk::SliceNavigationController::ExecuteAction( Action* action, mitk::State
           ok = true;
           break;
         }
+        case AcFINISHMOVEMENT:
+        {
+       // /*finishes a Movement from the coordinate supplier: 
+       //   gets the lastpoint from the undolist and writes an undo-operation so 
+       //   that the movement of the coordinatesupplier is undoable.*/
+       //   mitk::ITKPoint3D movePoint, oldMovePoint;
+       //   oldMovePoint.Fill(0);
+       //   vm2itk(posEvent->GetWorldPosition(), movePoint);
+       //   PointOperation* doOp = new mitk::PointOperation(OpMOVE, movePoint, 0);
+       //   if (m_UndoEnabled )
+       //   {
+       //     //get the last Position from the UndoList
+       //     OperationEvent *lastOperationEvent = m_UndoController->GetLastOfType(m_Destination, OpMOVE);
+       //     if (lastOperationEvent != NULL)
+       //     {
+       //       PointOperation* lastOp = dynamic_cast<PointOperation *>(lastOperationEvent->GetOperation());
+       //       if (lastOp != NULL)
+       //       {
+       //         oldMovePoint = lastOp->GetPoint();
+       //       }
+       //     }
+       //     PointOperation* undoOp = new PointOperation(OpMOVE, oldMovePoint, 0);
+       //     OperationEvent *operationEvent = new OperationEvent(m_Destination, doOp, undoOp,
+						 //                                                   objectEventId, groupEventId);
+       //     m_UndoController->SetOperationEvent(operationEvent);
+       //   }
+       //   //execute the Operation
+	  		  //m_Destination->ExecuteOperation(doOp);
+         
+          //mitk::BaseRenderer *baseRenderer = posEvent->GetSender();
+          //if (baseRenderer==NULL)
+          //  {
+          //    mitk::GlobalInteraction *globalInteraction = dynamic_cast<mitk::GlobalInteraction *>(mitk::EventMapper::GetGlobalStateMachine());
+          //    if (globalInteraction!=NULL)
+          //    {
+          //      baseRenderer = const_cast<mitk::BaseRenderer *>(globalInteraction->GetFocus());
+          //    }
+          //  }
+          //  if (baseRenderer!=NULL)
+          //  {
+          //    if (baseRenderer->GetMapperID() == 1)
+          //    {
+          //      mitk::Point3D point, projected_point; 
+          //      point = posEvent->GetWorldPosition();
+          //      
+          //      //@todo add time to PositionEvent and use here!!
+          //      SlicedGeometry3D* slicedWorldGeometry=dynamic_cast<SlicedGeometry3D*>(m_CreatedWorldGeometry->GetGeometry3D(0));
+          //      if(slicedWorldGeometry!=NULL)
+          //      {
+          //        int best_slice = -1;
+          //        double best_distance = itk::NumericTraits<double>::max();
+
+          //        int s, slices;
+          //        slices = slicedWorldGeometry->GetSlices();
+          //        for(s=0; s < slices; ++s)
+          //        {
+          //          slicedWorldGeometry->GetGeometry2D(s)->Project(point, projected_point);
+          //          Vector3D dist = projected_point-point;
+          //          if(dist.lengthSquared() < best_distance)
+          //          {
+          //            best_distance = dist.lengthSquared();
+          //            best_slice    = s;
+          //          }
+          //        }
+          //        if(best_slice >= 0)
+          //          GetSlice()->SetPos(best_slice);
+          //      }
+          //    }
+          //  }
+            ok = true;
+            break;
+          }
         default:
           ok = true;
           break;

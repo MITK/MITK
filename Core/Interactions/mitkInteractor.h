@@ -11,7 +11,7 @@ namespace mitk {
 
 class DataTreeNode;
 
-/** Macro for setting the Mode of this interactor */
+/** Macro for setting the mode of this interactor */
 #define mitkSetModeOkMacro(ok) \
   if (ok) \
     this->SetMode(SMSELECTED); \

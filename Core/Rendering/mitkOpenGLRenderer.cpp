@@ -147,6 +147,7 @@ void mitk::OpenGLRenderer::Update()
 void mitk::OpenGLRenderer::Render()
 {
 	//has the data tree been changed?
+	if(GetData()==NULL) return;
 	if(m_LastUpdateTime<((mitk::DataTree*)GetData()->getTree())->GetMTime()) 
 	{
 		//yes: update vtk-actors
@@ -305,3 +306,4 @@ void mitk::OpenGLRenderer::InitSize(int w, int h)
     Modified();
     Update();
 }
+

@@ -79,11 +79,17 @@ void mitk::VolumeDataVtkMapper3D::AbortCallback(vtkObject *caller, unsigned long
 
 void mitk::VolumeDataVtkMapper3D::Update(mitk::BaseRenderer* renderer)
 {
- if(IsVisible(renderer)==false)
+
+ if(IsVisible(renderer)==false ||
+    GetDataTreeNode() == NULL || 
+    dynamic_cast<mitk::BoolProperty*>(GetDataTreeNode()->GetProperty("volumerendering",renderer).GetPointer())==NULL ||  
+    dynamic_cast<mitk::BoolProperty*>(GetDataTreeNode()->GetProperty("volumerendering",renderer).GetPointer())->GetBool() == false 
+  )
   {
 //  FIXME: don't understand this 
     if (m_Prop3D) {
       std::cout << "visibility off" <<std::endl;
+
       m_Prop3D->VisibilityOff();
     }
     return;

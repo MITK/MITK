@@ -3,10 +3,7 @@
 
 #include "mitkCommon.h"
 #include <mitkHierarchicalInteractor.h>
-#include "mitkLineInteractor.h"
-#include "mitkPointSetInteractor.h"
-#include <mitkVector.h>
-#include <map>
+#include "mitkPrimStripInteractor.h"
 
 namespace mitk
 {
@@ -44,21 +41,15 @@ protected:
   //## @brief Unselect all cells of a mesh
   virtual void DeselectAllCells();
 
-
-
 private:
 
   //##Documentation
   //## @brief lower Line Interactor 
-  mitk::LineInteractor::Pointer m_LineInteractor;
+  mitk::PrimStripInteractor::Pointer m_PrimStripInteractor;
 
   //##Documentation
   //## @brief stores the current CellId this Statemachine works in
   unsigned int m_CurrentCellId;
-
-  //##Documentation
-  //## @brief stores the position of the last added point to add the line afterwards
-  //int m_PointIndex;
 
   //##Documentation
   //## @brief stores the coordinate in the beginning of a movement. It is neede to declare undo-information

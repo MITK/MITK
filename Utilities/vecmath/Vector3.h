@@ -32,6 +32,10 @@ template<class T>
 class Vector3 : public Tuple3<T> {
 /*
  * $Log$
+ * Revision 1.2  2002/12/09 13:02:33  tobias
+ * added functions cart2sphere() and sphere2cart() for transformation from
+ * cartesian to spherical coordinates and vice versa
+ *
  * Revision 1.1  2002/11/16 12:25:36  mark
  * vecmath bibliothek
  * in cvs, da einige bugs behoben
@@ -153,6 +157,40 @@ public:
         T sin = c.length();
 
         return VmUtil<T>::abs(VmUtil<T>::atan2(sin, dot(v1)));
+    }
+
+	/**
+      * Transforms cartesian into spherical coordinates
+	  * Spherical coordinates are encoded as follows:
+	  * x: azimuth angle in xy-plane from x-axis, [-PI,PI]
+      * y: polar angle from z-axis, [0,PI]
+	  * z: distance from origin (radius)
+      * @return the vector in spherical coordinates
+      */
+    Vector3 cart2sphere() const {
+           
+		T radius = length();
+		if (radius == 0) return Vector3( 0, 0, 0 );
+
+		T polar = VmUtil<T>::acos( z / radius );
+		T azimuth = VmUtil<T>::atan2( y, x );
+		return Vector3( azimuth, polar, radius );
+    }
+
+	/**
+      * Transforms spherical into cartesian coordinates
+	  * Spherical coordinates are encoded as follows:
+	  * x: azimuth angle in xy-plane from x-axis, [-PI,PI]
+      * y: polar angle from z-axis, [0,PI]
+	  * z: distance from origin (radius)
+      * @return the vector in cartesian coordinates
+      */
+    Vector3 sphere2cart() const {
+           
+		T cartX = z * VmUtil<T>::cos( x ) * VmUtil<T>::sin( y );
+		T cartY = z * VmUtil<T>::sin( x ) * VmUtil<T>::sin( y );
+		T cartZ = z * VmUtil<T>::cos( y );
+		return Vector3( cartX, cartY, cartZ );
     }
 
     // copy constructor and operator = is made by complier

@@ -48,7 +48,7 @@
 
 #include "ipFuncP.h"
 
-#ifdef WIN32
+#ifdef _WIN32
 #define strcasecmp _stricmp
 #define PATH_MAX 255
 #endif

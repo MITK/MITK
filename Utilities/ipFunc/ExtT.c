@@ -80,7 +80,7 @@ ipInt4_t _ipFuncExtT ( ipPicType_t type,
 
 
 
-#ifdef WIN32
+#ifdef _WIN32
 #include <float.h>
 #endif
  

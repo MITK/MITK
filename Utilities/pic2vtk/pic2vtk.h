@@ -45,6 +45,10 @@ public:
 	static vtkImageData* convert( ipPicDescriptor* pic, unsigned long mask, int move );	
 	static ipPicDescriptor* convert( vtkImageData* vtkImage );
 	static ipPicDescriptor* convertSigned2Unsigned( ipPicDescriptor*, unsigned long* offset = NULL );
+
+	static vtkImageData* convertVectorImage( ipPicDescriptor* pic );
+	static ipPicDescriptor* convertVectorImage( vtkImageData* vtkImage );
+	
 };
 
 #endif // Pic2vtk_h

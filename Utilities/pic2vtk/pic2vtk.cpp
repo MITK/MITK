@@ -1,4 +1,4 @@
-#include "Pic2vtk.h"
+#include "pic2vtk.h"
 #include <vtkStructuredPointsReader.h>
 #include <vtkImageCast.h> 
 
@@ -209,6 +209,262 @@ ipPicDescriptor* Pic2vtk::convert( vtkImageData* vtkImage ) {
 }
 
 
+
+
+/**
+ * konvertiert ein vektorwertiges vtkImageData in ein vector pic-Image
+ */
+ipPicDescriptor* Pic2vtk::convertVectorImage( vtkImageData* vtkImage ) {
+
+	std::cout << "Pic2vtk::convertVectorImage()... converting  vector vtkImage to vector pic image" << std::endl;
+	
+	if ( vtkImage == NULL )
+		return NULL;
+
+	std::cout << "   vtk dimension: " << vtkImage->GetDataDimension() << std::endl;
+	std::cout << "   vtk vector dim = " << vtkImage->GetNumberOfScalarComponents() << std::endl;
+		
+	ipPicDescriptor* pic = ipPicNew();
+
+	if ( pic == NULL )
+		return NULL;
+
+		
+	int dim[3];
+	vtkImage->GetDimensions(dim);
+
+	int vectorDim = vtkImage->GetNumberOfScalarComponents();
+
+	register unsigned long size;
+	register unsigned long volumeSize;
+	
+	if ( dim[2] > 1 ) {
+		pic->dim = 3 + 1;
+
+		pic->n[0] = dim[0];
+		pic->n[1] = dim[1];
+		pic->n[2] = dim[2];
+		pic->n[3] = vectorDim;
+
+		volumeSize = dim[0] * dim[1] * dim[2];
+		size = volumeSize * vectorDim;
+		
+	
+	} else if( dim[1] > 1 ) {
+		pic->dim = 2 + 1;
+
+		pic->n[0] = dim[0];
+		pic->n[1] = dim[1];
+		pic->n[2] = vectorDim;
+
+		volumeSize = dim[0] * dim[1];
+		size = volumeSize * vectorDim;
+
+		
+	} else if ( dim[1] > 1 ) {
+		pic->dim = 1 + 1;
+
+		pic->n[0] = dim[0];
+		pic->n[1] = vectorDim;
+
+		volumeSize = dim[0];
+		size = volumeSize * vectorDim;
+
+	}
+
+
+
+	switch ( vtkImage->GetScalarType () ) {
+
+	case VTK_BIT: {
+
+
+			std::cout << "WARNING: VTK_BIT vector images not supported yet ... " << std::endl;
+			
+//		pic->type = ipPicInt;
+//		pic->bpe = 8;
+//		unsigned int vtkSize = size>>3;
+//
+//		if (vtkSize%8)
+//			vtkSize++;
+//
+//		register unsigned char *s = (unsigned char*) vtkImage->GetScalarPointer();
+//		register unsigned char *a = new unsigned char[size];
+//		pic->data = a;
+//
+//		for ( register unsigned int i = 0; i < vtkSize; i++ ) {
+//
+//			for ( int k=0; k < 8; k++ )
+//				*a++ = 0x80 & (*s<<k);
+//
+//			s++;
+//		}
+
+		break;
+	}
+	case VTK_CHAR: {
+
+		pic->type = ipPicInt;
+		pic->bpe = 8;
+
+		register char *s = (char*) vtkImage->GetScalarPointer();
+		register char *a = new char[size];
+		pic->data = a;
+
+#define COPYVECTORDATAVTK2PIC	\
+		for ( unsigned long i = 0; i < volumeSize; i++ ) \
+		{ \
+			for ( unsigned int j = 0; j<vectorDim; j++) \
+			{ \
+				*(a+ j*volumeSize) = *s++; \
+			} \
+			a++; \
+		}
+		
+		COPYVECTORDATAVTK2PIC
+
+			
+		break;
+	}
+	case VTK_UNSIGNED_CHAR: {
+
+		pic->type = ipPicUInt;
+		pic->bpe = 8;
+
+		register unsigned char *s = (unsigned char*) vtkImage->GetScalarPointer();
+		register unsigned char *a = new unsigned char[size];
+		pic->data = a;
+
+		COPYVECTORDATAVTK2PIC
+
+		break;
+	}
+	case VTK_SHORT: {
+
+		pic->type = ipPicInt;
+		pic->bpe = 16;
+
+		register short *s = (short*) vtkImage->GetScalarPointer();
+		register short *a = new short[size];
+		pic->data = a;
+
+		COPYVECTORDATAVTK2PIC
+
+		break;
+	}
+	case VTK_UNSIGNED_SHORT: {
+
+		pic->type = ipPicUInt;
+		pic->bpe = 16;
+
+		register unsigned short *s = (unsigned short*) vtkImage->GetScalarPointer();
+		register unsigned short *a = new unsigned short[size];
+		pic->data = a;
+
+
+		COPYVECTORDATAVTK2PIC
+
+		break;
+	}
+	case VTK_INT: {
+
+		pic->type = ipPicInt;
+		pic->bpe = 32;
+
+		register int *s = (int*) vtkImage->GetScalarPointer();
+		register int *a = new int[size];
+		pic->data = a;
+
+		COPYVECTORDATAVTK2PIC
+
+		break;
+	}
+	case VTK_UNSIGNED_INT: {
+
+		pic->type = ipPicUInt;
+		pic->bpe = 32;
+
+		register unsigned int *s = (unsigned int*) vtkImage->GetScalarPointer();
+		register unsigned int *a = new unsigned int[size];
+		pic->data = a;
+
+		COPYVECTORDATAVTK2PIC
+
+		break;
+	}
+	case VTK_LONG: {
+
+		pic->type = ipPicInt;
+		pic->bpe = 64;
+
+		register long *s = (long*) vtkImage->GetScalarPointer();
+		register long *a = new long[size];
+		pic->data = a;
+
+		COPYVECTORDATAVTK2PIC
+
+		break;
+	}
+	case VTK_UNSIGNED_LONG: {
+
+		pic->type = ipPicUInt;
+		pic->bpe = 64;
+
+		register unsigned long *s = (unsigned long*) vtkImage->GetScalarPointer();
+		register unsigned long *a = new unsigned long[size];
+		pic->data = a;
+		
+		COPYVECTORDATAVTK2PIC
+		
+		break;
+	}
+	case VTK_FLOAT: {
+
+		pic->type = ipPicFloat;
+		pic->bpe = 32;
+
+		register float *s = (float*) vtkImage->GetScalarPointer();
+		register float *a = new float[size];
+		pic->data = a;
+
+		COPYVECTORDATAVTK2PIC
+
+		break;
+	}
+	case VTK_DOUBLE: {
+
+		pic->type = ipPicFloat;
+		pic->bpe = 64;
+
+		register double *s = (double*) vtkImage->GetScalarPointer();
+		register double *a = new double[size];
+		pic->data = a;
+
+		COPYVECTORDATAVTK2PIC
+
+		break;
+	}
+	default:
+		ipPicFree( pic );
+		return NULL;
+	}
+
+	// add tag tp result pic
+  ipPicTSV_t *tsv;
+  tsv = (ipPicTSV_t *) malloc( sizeof(ipPicTSV_t) );
+  strcpy( tsv->tag, "VectorValued" );
+  tsv->type = ipPicASCII;
+  tsv->bpe = 8;
+  tsv->dim = 1;
+  tsv->value = strdup( "." );
+  tsv->n[0] = strlen((char *) tsv->value);
+  ipPicAddTag( pic, tsv );
+
+	return pic;
+}
+
+
+
 /**
  * konvertiert ein pic-Image in ein vtkImageReader
  */ 
@@ -217,6 +473,7 @@ vtkImageData* Pic2vtk::convert( ipPicDescriptor* pic ) {
 	if ( pic == NULL )
 		return NULL;
 
+						
 	vtkImageData *inData = vtkImageData::New();
 
 	if ( inData == NULL )
@@ -366,6 +623,185 @@ vtkImageData* Pic2vtk::convert( ipPicDescriptor* pic ) {
 }
 
 
+/**
+ * konvertiert ein vector pic-Image in ein vector vtkImageData
+ */
+vtkImageData* Pic2vtk::convertVectorImage( ipPicDescriptor* pic ) {
+
+	std::cout << "Pic2vtk::convertVectorImage()... converting vector pic image to vector vtkImage " << std::endl;
+
+	if ( pic == NULL )
+		return NULL;
+
+
+	vtkImageData *inData = vtkImageData::New();
+
+	if ( inData == NULL )
+		return NULL;
+
+	unsigned long size = 0;
+	unsigned long volumeSize = 0;
+
+	int dim = pic->dim - 1;
+	int vectorDim = pic->n[dim];
+
+	std::cout << "   pic dimension = " << dim << std::endl;
+	std::cout << "   pic vector dim = " << vectorDim << std::endl;
+	
+	
+	if ( dim == 1 ) {
+		inData->SetDimensions( pic->n[0] -1, 1, 1);
+		volumeSize = pic->n[0];
+		size = volumeSize * vectorDim;
+		inData->SetOrigin( ((float) pic->n[0]) / 2.0f, 0, 0 );
+	} else if ( dim == 2 ) {
+		inData->SetDimensions( pic->n[0] , pic->n[1] , 1 );
+		volumeSize = pic->n[0]* pic->n[1];
+		size = volumeSize * vectorDim;
+		inData->SetOrigin( ((float) pic->n[0]) / 2.0f, ((float) pic->n[1]) / 2.0f, 0 );
+	} else if ( dim >= 3 ) {
+		inData->SetDimensions( pic->n[0], pic->n[1], pic->n[2] );
+		volumeSize = pic->n[0]* pic->n[1]* pic->n[2];
+		size = volumeSize * vectorDim;
+		inData->SetOrigin( 0, 0, 0 );
+	} else {
+		inData->Delete () ;
+		return NULL;
+	}
+
+//	std::cout << " size = " << size << std::endl;
+//	std::cout << " volumeSize = " << volumeSize << std::endl;
+	
+	inData->SetNumberOfScalarComponents(vectorDim);
+
+
+	if ( ( pic->type == ipPicInt || pic->type == ipPicUInt ) && pic->bpe == 1 ) {
+		inData->SetScalarType( VTK_BIT );
+		inData->AllocateScalars();
+		size = size>>3;
+
+		std::cout << "WARNING: 1 bit vector not supported yet ..." << std::endl;
+//		register unsigned char* s = (unsigned char*) pic->data;
+//		register unsigned char* a = (unsigned char*) inData->GetScalarPointer();
+//
+//		for ( register unsigned long i = 0; i < size ; i++ )
+//			for ( register unsigned int j = 0; j<vectorDim; j++)
+//			{
+//				*a++ = *(s + i*size);
+//			}
+
+	} else if ( pic->type == ipPicInt && pic->bpe == 8 ) {
+		inData->SetScalarType( VTK_CHAR );
+		inData->AllocateScalars();
+
+		register char* s = (char*) pic->data;
+		register char* a = (char*) inData->GetScalarPointer();
+
+#define COPYVECTORDATAPIC2VTK		\
+		for ( register unsigned long i = 0; i < volumeSize ; i++ ) \
+		{ \
+			for ( register unsigned int j = 0; j<vectorDim; j++)	\
+			{	\
+				*a++ = *(s + j*volumeSize);	\
+			}	\
+			s++; \
+		}
+			
+
+			COPYVECTORDATAPIC2VTK
+
+	} else if ( pic->type == ipPicUInt && pic->bpe == 8 ) {
+		inData->SetScalarType( VTK_UNSIGNED_CHAR );
+		inData->AllocateScalars();
+
+		register unsigned char* s = (unsigned char*) pic->data;
+		register unsigned char* a = (unsigned char*) inData->GetScalarPointer();
+
+		COPYVECTORDATAPIC2VTK
+
+	} else if ( pic->type == ipPicInt && pic->bpe == 16 ) {
+		inData->SetScalarType( VTK_SHORT );
+		inData->AllocateScalars();
+
+		register short* s = (short*) pic->data;
+		register short* a = (short*) inData->GetScalarPointer();
+
+		COPYVECTORDATAPIC2VTK
+
+	} else if ( pic->type == ipPicUInt && pic->bpe == 16 ) {
+		inData->SetScalarType( VTK_UNSIGNED_SHORT );
+		inData->AllocateScalars();
+		cout << " memory = " << inData->GetActualMemorySize() << std::endl;
+		fflush(stdout);
+		
+		register unsigned short* s = (unsigned short*) pic->data;
+		register unsigned short* a = (unsigned short*) inData->GetScalarPointer();
+		
+		COPYVECTORDATAPIC2VTK
+
+
+		
+	} else if ( pic->type == ipPicInt && pic->bpe == 32 ) {
+		inData->SetScalarType( VTK_INT );
+		inData->AllocateScalars();
+
+		register int* s = (int*) pic->data;
+		register int* a = (int*) inData->GetScalarPointer();
+
+		COPYVECTORDATAPIC2VTK
+
+	} else if ( pic->type == ipPicUInt && pic->bpe == 32 ) {
+		inData->SetScalarType( VTK_UNSIGNED_INT );
+		inData->AllocateScalars();
+
+		register unsigned int* s = (unsigned int*) pic->data;
+		register unsigned int* a = (unsigned int*) inData->GetScalarPointer();
+
+		COPYVECTORDATAPIC2VTK
+		
+	} else if ( pic->type == ipPicInt && pic->bpe == 64 ) {
+		inData->SetScalarType( VTK_LONG );
+		inData->AllocateScalars();
+
+		register long* s = (long*) pic->data;
+		register long* a = (long*) inData->GetScalarPointer();
+
+		COPYVECTORDATAPIC2VTK
+		
+	} else if ( pic->type == ipPicUInt && pic->bpe == 64 ) {
+		inData->SetScalarType( VTK_UNSIGNED_LONG );
+		inData->AllocateScalars();
+
+		register unsigned long* s = (unsigned long*) pic->data;
+		register unsigned long* a = (unsigned long*) inData->GetScalarPointer();
+
+		COPYVECTORDATAPIC2VTK
+		
+	} else if ( pic->type == ipPicFloat && pic->bpe == 32 ) {
+		inData->SetScalarType( VTK_FLOAT );
+		inData->AllocateScalars();
+
+		register float* s = (float*) pic->data;
+		register float* a = (float*) inData->GetScalarPointer();
+
+		COPYVECTORDATAPIC2VTK
+	} else if ( pic->type == ipPicFloat && pic->bpe == 64 ) {
+		inData->SetScalarType( VTK_DOUBLE );
+		inData->AllocateScalars();
+
+		register double* s = (double*) pic->data;
+		register double* a = (double*) inData->GetScalarPointer();
+
+		COPYVECTORDATAPIC2VTK
+
+	} else {
+		inData->Delete();
+		return NULL;
+	}
+
+			
+	return inData;
+}
 
 /**
  * läd ein unkomprimiertes pic file

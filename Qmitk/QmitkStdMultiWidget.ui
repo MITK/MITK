@@ -8,8 +8,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>614</width>
-            <height>520</height>
+            <width>558</width>
+            <height>461</height>
         </rect>
     </property>
     <property name="caption">
@@ -27,39 +27,68 @@
         </property>
         <widget class="QLayoutWidget">
             <property name="name">
-                <cstring>layout1</cstring>
+                <cstring>layout4</cstring>
             </property>
-            <grid>
+            <hbox>
                 <property name="name">
                     <cstring>unnamed</cstring>
                 </property>
-                <property name="margin">
-                    <number>1</number>
-                </property>
-                <property name="spacing">
-                    <number>3</number>
-                </property>
-                <widget class="QmitkSelectableGLWidget" row="0" column="0">
+                <widget class="QLayoutWidget">
                     <property name="name">
-                        <cstring>mitkWidget1</cstring>
+                        <cstring>layout3</cstring>
+                    </property>
+                    <grid>
+                        <property name="name">
+                            <cstring>unnamed</cstring>
+                        </property>
+                        <widget class="QmitkSelectableGLWidget" row="0" column="1">
+                            <property name="name">
+                                <cstring>mitkWidget2</cstring>
+                            </property>
+                        </widget>
+                        <widget class="QmitkSelectableGLWidget" row="1" column="1">
+                            <property name="name">
+                                <cstring>mitkWidget4</cstring>
+                            </property>
+                        </widget>
+                        <widget class="QmitkSelectableGLWidget" row="1" column="0">
+                            <property name="name">
+                                <cstring>mitkWidget3</cstring>
+                            </property>
+                        </widget>
+                        <widget class="QmitkSelectableGLWidget" row="0" column="0">
+                            <property name="name">
+                                <cstring>mitkWidget1</cstring>
+                            </property>
+                        </widget>
+                    </grid>
+                </widget>
+                <widget class="QLevelWindowWidget">
+                    <property name="name">
+                        <cstring>levelWindowWidget</cstring>
+                    </property>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>1</hsizetype>
+                            <vsizetype>3</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
+                    <property name="minimumSize">
+                        <size>
+                            <width>25</width>
+                            <height>50</height>
+                        </size>
+                    </property>
+                    <property name="maximumSize">
+                        <size>
+                            <width>25</width>
+                            <height>2000</height>
+                        </size>
                     </property>
                 </widget>
-                <widget class="QmitkSelectableGLWidget" row="1" column="0">
-                    <property name="name">
-                        <cstring>mitkWidget3</cstring>
-                    </property>
-                </widget>
-                <widget class="QmitkSelectableGLWidget" row="1" column="1">
-                    <property name="name">
-                        <cstring>mitkWidget4</cstring>
-                    </property>
-                </widget>
-                <widget class="QmitkSelectableGLWidget" row="0" column="1">
-                    <property name="name">
-                        <cstring>mitkWidget2</cstring>
-                    </property>
-                </widget>
-            </grid>
+            </hbox>
         </widget>
     </hbox>
 </widget>
@@ -75,6 +104,22 @@
         <sizepolicy>
             <hordata>3</hordata>
             <verdata>3</verdata>
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+        </sizepolicy>
+        <pixmap>image0</pixmap>
+    </customwidget>
+    <customwidget>
+        <class>QLevelWindowWidget</class>
+        <header location="global">../../AppModule/QLevelWindowWidget/QLevelWindowWidget.h</header>
+        <sizehint>
+            <width>-1</width>
+            <height>-1</height>
+        </sizehint>
+        <container>0</container>
+        <sizepolicy>
+            <hordata>5</hordata>
+            <verdata>5</verdata>
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
         </sizepolicy>
@@ -98,5 +143,6 @@
     <includehint>qmitkselectableglwidget.h</includehint>
     <includehint>qmitkselectableglwidget.h</includehint>
     <includehint>qmitkselectableglwidget.h</includehint>
+    <includehint>qlevelwindowwidget.h</includehint>
 </includehints>
 </UI>

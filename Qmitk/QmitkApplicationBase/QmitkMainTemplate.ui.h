@@ -9,9 +9,12 @@
 
 #include "mitkGeometry2DDataVtkMapper3D.h"
 #include "QmitkSelectableGLWidget.h"
+#include "QLevelWindowWidget.h"
 #include <vtkSTLReader.h>
 #include <mitkSurfaceData.h>
 #include <mitkColorProperty.h>
+#include <mitkLevelWindowProperty.h>
+#include <LevelWindow.h>
 #include <mitkFloatProperty.h>
 #include <qregexp.h>
 
@@ -110,6 +113,21 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
         if(node != NULL)
         {
             static int count = 0;
+
+						mitk::LevelWindowProperty::Pointer levWinProp = new mitk::LevelWindowProperty();
+						levWinProp->GetLevelWindow().SetRangeMin(-1024);
+						levWinProp->GetLevelWindow().SetRangeMax(4096);
+						levWinProp->GetLevelWindow().SetMin(-1024);
+						levWinProp->GetLevelWindow().SetMax(4096);
+
+						node->GetPropertyList()->SetProperty("levelwindow",levWinProp);
+
+
+
+						connect(mitkMultiWidget->levelWindowWidget,SIGNAL(levelWindow(mitk::LevelWindow*)),this,SLOT(changeLevelWindow(mitk::LevelWindow*)) );
+
+						
+
             if(count>0)
             {
                 //sliderFP->setMinValue(0);
@@ -123,6 +141,7 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
                 //mitk::FloatProperty::Pointer 
                 opacityprop = new mitk::FloatProperty(0.5f);
                 node->GetPropertyList()->SetProperty("opacity", opacityprop);
+
             }
             ++count;
         }
@@ -313,11 +332,6 @@ void QmitkMainTemplate::init()
     tree->setRoot(node); 
 }
 
-void QmitkMainTemplate::destroy()
-{
-    tree->clear();
-}
-
 /*!
 	\brief basic initialization of main widgets
 
@@ -448,4 +462,30 @@ void QmitkMainTemplate::parseCommandLine()
     }
     if(qApp->argc()>1)
         fileOpen(qApp->argv()[qApp->argc()-1]);
+}
+
+
+
+void QmitkMainTemplate::changeLevelWindow(mitk::LevelWindow* lw )
+{
+	
+	mitk::DataTreeIterator* it=tree->inorderIterator()->clone();
+	while(it->hasNext()) {
+    it->next();
+	
+		mitk::LevelWindowProperty::Pointer levWinProp = dynamic_cast<mitk::LevelWindowProperty*>(it->get()->GetPropertyList()->GetProperty("levelwindow").GetPointer());
+		if(levWinProp!=NULL) {
+			mitk::LevelWindow& levWin = levWinProp->GetLevelWindow();
+
+			levWin.SetMin(lw->GetMin());
+			levWin.SetMax(lw->GetMax());
+			levWin.SetRangeMin(lw->GetRangeMin());
+			levWin.SetRangeMax(lw->GetRangeMax());
+			
+			levWinProp->SetLevelWindow(levWin);
+
+		}                  
+	}
+	delete it;
+  mitkMultiWidget->updateMitkWidgets();
 }

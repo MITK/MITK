@@ -57,13 +57,6 @@
                             <verstretch>0</verstretch>
                         </sizepolicy>
                     </property>
-                    <property name="paletteBackgroundColor">
-                        <color>
-                            <red>85</red>
-                            <green>0</green>
-                            <blue>255</blue>
-                        </color>
-                    </property>
                     <property name="frameShape">
                         <enum>StyledPanel</enum>
                     </property>

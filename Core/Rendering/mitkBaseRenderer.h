@@ -10,9 +10,13 @@ class BaseRenderer : public itk::Object
 {
   public:
 	/** Standard class typedefs. */
+    //##ModelId=3E33ECF200C6
 	typedef BaseRenderer             Self;
+    //##ModelId=3E33ECF200F8
     typedef itk::Object              Superclass;
+    //##ModelId=3E33ECF20116
 	typedef itk::SmartPointer<Self>  Pointer;
+    //##ModelId=3E33ECF20134
 	typedef itk::SmartPointer<const Self>  ConstPointer;
 
 	/** Method for creation through the object factory. */
@@ -50,6 +54,9 @@ class BaseRenderer : public itk::Object
 
     //##ModelId=3E33163A0261
     virtual void InitRenderer();
+    //##ModelId=3E3799250397
+    virtual void InitSize(int w, int h);
+
 
   protected:
     //##ModelId=3D6A17780230

@@ -35,3 +35,8 @@ void mitk::BaseRenderer::InitRenderer()
 {
 }
 
+//##ModelId=3E3799250397
+void mitk::BaseRenderer::InitSize(int w, int h)
+{
+}
+

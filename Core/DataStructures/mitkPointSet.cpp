@@ -227,7 +227,7 @@ bool mitk::PointSet::RequestedRegionIsOutsideOfTheBufferedRegion()
 //##ModelId=3F0177E901FF
 bool mitk::PointSet::VerifyRequestedRegion()
 {
-    return false;
+    return true;
 }
 //##ModelId=3F0177E9020B
 void mitk::PointSet::SetRequestedRegion(itk::DataObject*)

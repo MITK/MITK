@@ -1,6 +1,7 @@
 #include <QmitkSimpleExample/QmitkSimpleExampleFunctionality.h>
 #include "QmitkMainTemplate.h"
 
+class QmitkDataManager;
 
 /*!
 	\brief This application demonstrates how to code a new MITK application 
@@ -39,5 +40,5 @@ protected:
 protected:
 
 		QmitkSimpleExampleFunctionality * simpleFunc;
-
+		QmitkDataManager * m_DataManager;
 };

@@ -169,7 +169,7 @@ void mitk::PointSet::ExecuteOperation(Operation* operation)
 	{
 	case OpNOTHING:
 		break;
-	case OpINSERT://inserts the point at the given position 
+	case OpINSERT://inserts the point at the given position and select it. In the most cases the point is wanted to be selected.
 		{
       int position = pointOp->GetIndex();
 
@@ -177,7 +177,7 @@ void mitk::PointSet::ExecuteOperation(Operation* operation)
       pt.CastFrom(pointOp->GetPoint());
 
       m_PointSet->GetPoints()->InsertElement(position, pt);
-      m_PointSet->GetPointData()->InsertElement(position, false);
+      m_PointSet->GetPointData()->InsertElement(position, true);
 		}
 		break;
 	case OpMOVE://moves the point given by index

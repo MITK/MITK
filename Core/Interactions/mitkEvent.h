@@ -24,7 +24,8 @@ class Event
     //##ModelId=3E5B3007000F
     //##Documentation
     //## @params:
-    //## type: type of Event: Mouse or Key Event? (from QEvent->type)
+	//## sender: needed for DisplayCoordinateOperation in DisplayVectorInteractor....???? if not needed, then set on NULL
+    //## type: type of Event: Mouse or Key Event? (look in mitkInteractionConst.h)
     //## button: mouse-button
     //## buttonState: which other key hast been pressed? (Mouse/Keyboard modifier-keys)
     //## key: pressed key

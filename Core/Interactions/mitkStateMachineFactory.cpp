@@ -6,7 +6,7 @@
 //##
 //##
 
-StartStateMap mitk::StateMachineFactory::m_StartStates;
+mitk::StateMachineFactory::StartStateMap mitk::StateMachineFactory::m_StartStates;
 
 //XML StateMachine
 //##ModelId=3E7757280322
@@ -73,7 +73,7 @@ bool mitk::StateMachineFactory::LoadBehavior(std::string fileName)
 //## recusive method, that parses this brand of 
 //## the stateMachine; if the history has the same 
 //## size at the end, then the StateMachine is correct
-bool mitk::StateMachineFactory::parse(StateMap *states, StateMapIter thisState, HistorySet *history)
+bool mitk::StateMachineFactory::parse(mitk::State::StateMap *states, mitk::State::StateMapIter thisState, HistorySet *history)
 {
 	history->insert((thisState->second)->GetId());//log our path  //or thisState->first
 	std::set<int> nextStatesSet = (thisState->second)->GetAllNextStates();
@@ -103,7 +103,7 @@ bool mitk::StateMachineFactory::parse(StateMap *states, StateMapIter thisState, 
 	{
 		if ( history->find(*i) == history->end() )//wenn wir noch nicht in dieser NextState waren
 		{
-			StateMapIter nextState = states->find(*i);//search the iterator for our nextState
+			mitk::State::StateMapIter nextState = states->find(*i);//search the iterator for our nextState
 			ok = parse( states, nextState, history);//recusive path into the next state
 		}
 	}
@@ -113,13 +113,13 @@ bool mitk::StateMachineFactory::parse(StateMap *states, StateMapIter thisState, 
 //##ModelId=3E5B428F010B
 //##Documentation
 //## sets the pointers in Transition (setNextState(..)) according to the extracted xml-file content
-bool mitk::StateMachineFactory::ConnectStates(StateMap *states)
+bool mitk::StateMachineFactory::ConnectStates(mitk::State::StateMap *states)
 {
 	if (states->size() > 1)//only one state; don't have to be parsed for deadlocks!
 	{
 		//parse all the given states an check for deadlock or not connected states
 		HistorySet *history = new HistorySet;
-		StateMapIter firstState = states->begin(); 
+		mitk::State::StateMapIter firstState = states->begin(); 
 		//parse through all the given states, log the parsed elements in history
 		bool ok = parse( states, firstState, history);
 
@@ -135,7 +135,7 @@ bool mitk::StateMachineFactory::ConnectStates(StateMap *states)
 		}
 	}
 	//connect all the states
-	for (StateMapIter tempState = states->begin(); tempState != states->end();  tempState++)
+	for (mitk::State::StateMapIter tempState = states->begin(); tempState != states->end();  tempState++)
 	{
 		//searched through the States and Connects all Transitions
 		bool tempbool = ( ( tempState->second )->ConnectTransitions( states ) );
@@ -171,7 +171,7 @@ bool mitk::StateMachineFactory::startElement( const QString&, const QString&, co
 	else if ( qName == "state" )											//e.g. <state NAME="start" ID="1" START_STATE="ISTRUE">
 	{
 		m_AktState = new mitk::State( atts.value ( NAME.c_str() ).latin1(), ( atts.value ( ID.c_str() ) ).toInt() );
-		std::pair<StateMapIter,bool> ok = m_AllStates.insert( StateMap::value_type( ( atts.value( ID.c_str() ) ).toInt(), m_AktState ) );
+		std::pair<mitk::State::StateMapIter,bool> ok = m_AllStates.insert( mitk::State::StateMap::value_type( ( atts.value( ID.c_str() ) ).toInt(), m_AktState ) );
 		//insert into m_AllStates, which stores all States that aren't connected yet!
 		if (ok.second == false) 
 			return false;//STATE_ID was not unique or something else didn't work in insert! EXITS the process

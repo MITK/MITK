@@ -2,10 +2,10 @@
 #define BASEDATA_H_HEADER_INCLUDED_C1EBB6FA
 
 #include <itkDataObject.h>
-
 #include "mitkCommon.h"
 #include "Geometry3D.h"
 #include "Geometry2D.h"
+#include "OperationActor.h"
 
 namespace mitk {
 
@@ -17,7 +17,8 @@ class BaseProcess;
 //## @ingroup Data
 //## Base of all data objects, e.g., images, contours, surfaces etc. Inherits
 //## from itk::DataObject and thus can be included in a pipeline.
-class BaseData : public itk::DataObject
+//## Inherits also from OperationActor and can be used as a destination for Undo
+class BaseData : public itk::DataObject , public OperationActor
 {
 public:
     //##ModelId=3E10262200CE
@@ -134,6 +135,14 @@ public:
    //## 
    //## This method is implemented in the concrete subclasses of BaseData. 
   void SetRequestedRegion(itk::DataObject *data)=0;
+
+   //##Documentation
+   //##@brief overwrite if the Data can be called by an Interactor (StateMachine).
+   //## 
+   //## Empty by default. Overwrite and implement all the necessary operations here 
+   //## and get the necessary information from the parameter operation.
+  void ExecuteOperation(Operation* operation);
+
 protected:
     //##ModelId=3E3FE04202B9
     BaseData();

@@ -27,8 +27,9 @@ bool mitk::LimitedLinearUndo::Undo(bool fine)
 		{
 			//get the last operation from the static undo-list
 			OperationEvent* operationEvent = m_UndoList.back();
-			//in execute the undo and redo gets switched and the operation is send to the destination
-			Execute( operationEvent );
+			this->SwapOperations(operationEvent);
+			operationEvent->GetDestination()->ExecuteOperation(operationEvent->GetOperation());
+			
 			m_RedoList.push_back(operationEvent);//set in redo //!!!TODO:store the param fine
 			m_UndoList.pop_back();//delete last operation from undo-list
 		} while ((m_UndoList.back())->GetCurrObjectEventId() == CurrObjectEventId);
@@ -40,13 +41,14 @@ bool mitk::LimitedLinearUndo::Undo(bool fine)
 		{
 			//get the last operation from the static undo-list
 			OperationEvent* operationEvent = m_UndoList.back();
-			//in execute the undo and redo gets switched and the operation is send to the destination
-			Execute( operationEvent );
+			this->SwapOperations(operationEvent);
+			operationEvent->GetDestination()->ExecuteOperation(operationEvent->GetOperation());
+
 			m_RedoList.push_back(operationEvent);//set in redo//!!!TODO:store the param fine
 			m_UndoList.pop_back();//delete last operation from undo-list
 		} while ((m_UndoList.back())->GetCurrGroupEventId() == CurrGroupEventId);
 	}
-	
+
 	return true;
 }
 
@@ -57,7 +59,10 @@ bool mitk::LimitedLinearUndo::Redo()
 	if(m_RedoList.size()<=0) return false;
 
 	OperationEvent* operationEvent = m_RedoList.back();
-	Execute( operationEvent );
+
+	this->SwapOperations(operationEvent);
+	operationEvent->GetDestination()->ExecuteOperation(operationEvent->GetOperation());
+
 	m_UndoList.push_back(operationEvent);
 	m_RedoList.pop_back();
 

@@ -48,11 +48,11 @@ bool mitk::GlobalInteraction::ExecuteSideEffect(int sideEffectId, mitk::StateEve
 	ok = false;
 	switch (sideEffectId)
 	{
-	case DONOTHING:
+	case SeDONOTHING:
 		//std::cout << "DoNothing"<< std::endl;
 		ok = true;
 		break;
-	case INITNEWOBJECT:
+	case SeINITNEWOBJECT:
 		std::cout<<"InitObject"<<std::endl;
         //UNDO
 		//Operation:
@@ -65,7 +65,7 @@ bool mitk::GlobalInteraction::ExecuteSideEffect(int sideEffectId, mitk::StateEve
 			ok = HandleEvent(nextStateEvent, groupEventId, objectEventId);
 		}
 		break;
-	case INITEDITOBJECT:
+	case SeINITEDITOBJECT:
 		std::cout<<"InitEditObject"<<std::endl;
 		{
 			//202 for finished editing object
@@ -75,7 +75,7 @@ bool mitk::GlobalInteraction::ExecuteSideEffect(int sideEffectId, mitk::StateEve
 			ok = HandleEvent(nextStateEvent, groupEventId, objectEventId);
 		}
 		break;
-	case INITEDITGROUP:
+	case SeINITEDITGROUP:
 		std::cout<<"InitEditGroup"<<std::endl;
 		{
 			//202 for finished editing group
@@ -85,19 +85,19 @@ bool mitk::GlobalInteraction::ExecuteSideEffect(int sideEffectId, mitk::StateEve
 			ok = HandleEvent(nextStateEvent, groupEventId, objectEventId);
 		}
 		break;
-	case ADDPOINT:
+	case SeADDPOINT:
 		std::cout<<"AddPoint"<<std::endl;
 		ok = true;
 		break;
-	case SNAPPING_ADDING:
+	case SeSNAPPING_ADDING:
 		std::cout<<"SnappingAdding"<<std::endl;
 		ok = true;
 		break;
-	case CHECKPOINT:
+	case SeCHECKPOINT:
 		std::cout<<"CheckPoint"<<std::endl;
 		ok = true;
 		break;
-	case CHECKIFLAST:
+	case SeCHECKIFLAST:
 		std::cout<<"CheckIfLast"<<std::endl;
 		{
 			//208 for neutral
@@ -106,19 +106,19 @@ bool mitk::GlobalInteraction::ExecuteSideEffect(int sideEffectId, mitk::StateEve
 			ok = HandleEvent(nextStateEvent, groupEventId, objectEventId);
 		}
 		break;
-	case FINISHOBJECT:
+	case SeFINISHOBJECT:
 		std::cout<<"FinishObject"<<std::endl;
 		{
 			mitk::StateEvent* nextStateEvent = GenerateEmptyStateEvent(202);
 			ok = HandleEvent(nextStateEvent, IncCurrGroupEventId(), objectEventId);
 		}
 		break;
-	case FINISHGROUP:
+	case SeFINISHGROUP:
 		std::cout<<"FinishGroup"<<std::endl;
 		//don't forget to increase GroiupEventId
 		ok = true;
 		break;
-	case SEARCHOBJECT:
+	case SeSEARCHOBJECT:
 		std::cout<<"SearchObject- Object Found!"<<std::endl;
 		//create new event and send to StateMachine, which handles the statechange and the SideEffect
 		{
@@ -129,7 +129,7 @@ bool mitk::GlobalInteraction::ExecuteSideEffect(int sideEffectId, mitk::StateEve
 			ok = HandleEvent(nextStateEvent, groupEventId, objectEventId);
 		}
 		break;
-	case SEARCHGROUP:
+	case SeSEARCHGROUP:
 		std::cout<<"SearchGroup"<<std::endl;
 		{
 			//203 for neutral; no group found
@@ -138,7 +138,7 @@ bool mitk::GlobalInteraction::ExecuteSideEffect(int sideEffectId, mitk::StateEve
 			ok = HandleEvent(nextStateEvent, groupEventId, objectEventId);
 		}
 		break;
-	case SEARCHANOTHEROBJECT:
+	case SeSEARCHANOTHEROBJECT:
 		std::cout<<"SearchAnotherObject"<<std::endl;
 		{
 			//200 for New Object Picked
@@ -149,31 +149,31 @@ bool mitk::GlobalInteraction::ExecuteSideEffect(int sideEffectId, mitk::StateEve
 			ok = HandleEvent(nextStateEvent, groupEventId, objectEventId);
 		}
 		break;
-	case SELECTPICKEDOBJECT:
+	case SeSELECTPICKEDOBJECT:
 		std::cout<<"SelectPickedObject"<<std::endl;
 		ok = true;
 		break;
-	case SELECTANOTHEROBJECT:
+	case SeSELECTANOTHEROBJECT:
 		std::cout<<"SelectAnotherObject"<<std::endl;
 		ok = true;
 		break;
-	case SELECTGROUP:
+	case SeSELECTGROUP:
 		std::cout<<"SelectGroup"<<std::endl;
 		ok = true;
 		break;
-	case SELECTALL:
+	case SeSELECTALL:
 		std::cout<<"SelectAll"<<std::endl;
 		ok = true;
 		break;
-	case ADDSELECTEDTOGROUP:
+	case SeADDSELECTEDTOGROUP:
 		std::cout<<"AddSelectedGroup"<<std::endl;
 		ok = true;
 		break;
-	case DESELECTOBJECT:
+	case SeDESELECTOBJECT:
 		std::cout<<"DeselectObject"<<std::endl;
 		ok = true;
 		break;
-	case DESELECTALL:
+	case SeDESELECTALL:
 		std::cout<<"DeselectAll"<<std::endl;
 		ok = true;
 		break;
@@ -194,26 +194,14 @@ and the Focus changes.
 	//send the event to all in List
 	for (StateMachineListIter it = m_LocalStateMachines.begin(); it != m_LocalStateMachines.end(); it++)
 	{
-        ok = (*it)->HandleEvent(stateEvent, groupEventId, objectEventId);
+        if((*it)!=NULL)
+            ok = (*it)->HandleEvent(stateEvent, groupEventId, objectEventId);
 	}
 
 	return true;
 }
 
-//##ModelId=3EDCAECA0194
-void mitk::GlobalInteraction::ExecuteOperation(mitk::Operation* operation)
-{
-//if nothing more needs to be done, then move to statemachine.cpp and not virtual
-	operation->Execute();
-}
 
-/*
-//##ModelId=3EDDD76302BB
-void mitk::GlobalInteraction::SetRoi(Roi* roi)
-{
-	m_Roi = roi;
-}
-*/
 
 //##ModelId=3EF099E90065
 void mitk::GlobalInteraction::AddStateMachine(mitk::StateMachine* stateMachine)

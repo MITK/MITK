@@ -6,8 +6,8 @@
 #include "OperationActor.h"
 #include "State.h"
 #include "StateEvent.h"
+#include "UndoModel.h"
 #include "UndoController.h"
-
 #include <string>
 
 
@@ -47,18 +47,15 @@ namespace mitk {
 	//## new GroupEventId or not, depending on its state (e.g. finishedNewObject then new GroupEventId)
     bool HandleEvent(StateEvent const* stateEvent, int groupEventId, int objectEventId);
 
-    //##ModelId=3EAEEDC603D9
-	//##Documentation
-    //## from OperationActor; a stateMachine has to be an OperationActor
-	//## due to the UndoMechanism. Else no destination for Undo/Redo of StateMachines
-	//## can be set.
-	virtual void ExecuteOperation(Operation* operation) = 0;
-
     //##ModelId=3EDCAECB0175
 	//##Documentation
     //## if set to true, then UndoFunctionality is enabled
 	//## if false, then Undo is disabled
 	void EnableUndo(bool enable);
+
+	//##Documentation
+	//## so that UndoModel can call ExecuteOperation for Undo!
+	friend class UndoModel;
 
   protected:
     //##ModelId=3E5B2E170228
@@ -80,22 +77,26 @@ namespace mitk {
 	//## @brief friend protected function of OperationEvent, that way all StateMachines can increment!
 	int IncCurrGroupEventId();
 
+	//##ModelId=3EDCAECB0128
+	//##Documentation
+	//## holds an UndoController, that can be accessed from all StateMachines. For ExecutreSideEffect
+	UndoController* m_UndoController;
+
   private:
+	//##ModelId=3EAEEDC603D9
+	//##Documentation
+    //## from OperationActor; a stateMachine has to be an OperationActor
+	//## due to the UndoMechanism. Else no destination for Undo/Redo of StateMachines
+	//## can be set.
+	//## is set private here and in superclass it is set public, so UndoController 
+	//## can reach ist, but it can't be overwritten by a subclass
+	void ExecuteOperation(Operation* operation);
+
 	//##ModelId=3E5B2D66027E
 	std::string m_Type;
 
     //##ModelId=3E5B2D8F02B9
     State* m_CurrentState;
-
-    
-
-  protected:
-    //##ModelId=3EDCAECB0128
-	//##Documentation
-	//## holds an UndoController, that can be accessed from all StateMachines
-	UndoController* m_UndoController;
-
-
 };
 
 } // namespace mitk

@@ -109,3 +109,7 @@ void mitk::BaseData::ConnectSource(itk::ProcessObject *arg, unsigned int idx) co
 #endif
 }
 
+void mitk::BaseData::ExecuteOperation(mitk::Operation* operation)
+{
+	//empty by default. override if needed!
+}

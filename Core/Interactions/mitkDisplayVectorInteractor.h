@@ -3,7 +3,7 @@
 
 #include "mitkCommon.h"
 #include "BaseRenderer.h"
-#include "Roi.h"
+#include "StateMachine.h"
 
 namespace mitk {
 
@@ -11,7 +11,7 @@ namespace mitk {
     class OperationActor;
 
 //##ModelId=3EF221E9001C
-class DisplayVectorInteractor : public Roi
+class DisplayVectorInteractor : public StateMachine
 {
   public:
     //##ModelId=3EF222410127

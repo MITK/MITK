@@ -34,7 +34,7 @@ class Image : public SlicedData
 	mitkClassMacro(Image, SlicedData);    
 
     //##ModelId=3E18748C0045
-    itkNewMacro(Self);  
+    itkNewMacro(Self);
 
 	/** Smart Pointer type to a ImageDataItem. */
     //##ModelId=3E0B7B3C00F0
@@ -188,6 +188,7 @@ class Image : public SlicedData
     //##Documentation
     //## @warning for internal use only
     virtual mitk::ImageDataItem::Pointer GetChannelData(int n = 0);
+
   protected:
     //##ModelId=3E155C940248
     int GetSliceIndex(int s = 0, int t = 0, int n = 0) const;

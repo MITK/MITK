@@ -29,7 +29,7 @@ mitk::OperationEvent::OperationEvent(OperationActor* destination,
 //##ModelId=3E957C1102E3
 //##Documentation
 //##  swaps the Undo and Redo- operation and changes m_Swaped
-void mitk::OperationEvent::swapOperations()
+void mitk::OperationEvent::SwapOperations()
 {
 	Operation *tempOperation = m_Operation;
 	m_Operation = m_UndoOperation;

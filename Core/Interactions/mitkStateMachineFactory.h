@@ -7,17 +7,6 @@
 #include <iostream>
 
 
-//##ModelId=3E775728016C
-typedef std::map<std::string,mitk::State*> StartStateMap;
-//##ModelId=3E775728017C
-typedef std::map<std::string,mitk::State *>::iterator StartStateMapIter;
-
-//##ModelId=3E775728014D
-typedef std::set<int> HistorySet;
-//##ModelId=3E775728015C
-typedef std::set<int>::iterator HistorySetIter;
-
-
 namespace mitk {
 
 //##ModelId=3E5A39550068
@@ -34,6 +23,15 @@ namespace mitk {
 	class StateMachineFactory : public QXmlDefaultHandler
 {
   public:
+	//##ModelId=3E775728016C
+	typedef std::map<std::string,mitk::State*> StartStateMap;
+	//##ModelId=3E775728017C
+	typedef std::map<std::string,mitk::State *>::iterator StartStateMapIter;
+	//##ModelId=3E775728014D
+	typedef std::set<int> HistorySet;
+	//##ModelId=3E775728015C
+	typedef std::set<int>::iterator HistorySetIter;
+
     //##ModelId=3E68B2C600BD
 	  StateMachineFactory();
 
@@ -58,19 +56,19 @@ namespace mitk {
     //##ModelId=3E5B428F010B
 	//##Documentation
 	//## sets the pointers in Transition (setNextState(..)) according to the extracted xml-file content
-	  static bool ConnectStates(StateMap *states);
+	  static bool ConnectStates(mitk::State::StateMap *states);
 
     //##ModelId=3E77572A010E
 	//##Documentation
 	//## recusive method, that parses this brand of 
 	//## the stateMachine and returns if correct
-	  static bool parse(StateMap *states, StateMapIter thisState, HistorySet *history);
+	  static bool parse(mitk::State::StateMap *states, mitk::State::StateMapIter thisState, HistorySet *history);
 
 	//##ModelId=3E5B423003DF
 	  static StartStateMap m_StartStates;
 
     //##ModelId=3E68C269032E
-	  StateMap m_AllStates;
+	  mitk::State::StateMap m_AllStates;
 
     //##ModelId=3E6773290108
 	  State* m_AktState;

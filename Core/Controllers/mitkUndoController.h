@@ -8,22 +8,18 @@
 
 
 namespace mitk {
-
-//##ModelId=3EDCAEC901C3
-typedef int UndoType;
-
-//##ModelId=3E9C45D5007E
-typedef std::map<UndoType, UndoModel*> UndoModelMap;
-
-//##ModelId=3E9C45D50092
-typedef std::map<UndoType, UndoModel*>::iterator UndoModelMapIter;
-
-static const mitk::UndoType DEFAULTUNDOMODEL = 111;
-
 //##ModelId=3E5F53AA026C
 class UndoController
 {
   public:
+	//##ModelId=3EDCAEC901C3
+	typedef int UndoType;
+	//##ModelId=3E9C45D5007E
+	typedef std::map<UndoType, UndoModel*> UndoModelMap;
+	//##ModelId=3E9C45D50092
+	typedef std::map<UndoType, UndoModel*>::iterator UndoModelMapIter;
+	static const UndoType DEFAULTUNDOMODEL = 111;
+
 	//##ModelId=3E956E3B03A8
 	//##Documentation
     //## Constructor; Adds the new UndoType or if undoType exists ,

@@ -37,7 +37,12 @@ mitk::BaseData* mitk::DataTreeNode::GetData() const
 //##ModelId=3ED91D050121
 vtkTransform* mitk::DataTreeNode::GetVtkTransform() const
 {
-    return m_VtkTransform;
+  return m_VtkTransform;
+}
+
+mitk::StateMachine::Pointer mitk::DataTreeNode::GetInteractor() const
+{
+  return m_Interactor;
 }
 
 //##ModelId=3E33F4E4025B
@@ -48,6 +53,11 @@ void mitk::DataTreeNode::SetData(mitk::BaseData* baseData)
         m_Data=baseData;
         Modified();
     }
+}
+
+void mitk::DataTreeNode::SetInteractor(mitk::StateMachine* interactor)
+{
+	m_Interactor = interactor;
 }
 
 //##ModelId=3E33F5D702AA

@@ -22,9 +22,10 @@ class UndoModel
     virtual bool Redo() = 0;
 
 protected:
-
-	//##ModelId=3E9B07B601A9
-    void Execute(OperationEvent* operationEvent);
+	//##Documentation
+	//## @brief friend method from OperationEvent.
+	//## changes the two Operations from undo to redo and redo to undo and also sets a swapped flag
+	void SwapOperations(OperationEvent *operationEvent);
 
 };
 

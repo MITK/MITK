@@ -20,7 +20,7 @@ class DisplayCoordinateOperation : public Operation
 {
   public:
     //##ModelId=3EF1D349027C
-    DisplayCoordinateOperation(mitk::OperationType operationType, int execId, 
+    DisplayCoordinateOperation(mitk::OperationType operationType, 
         mitk::BaseRenderer* renderer,
         const mitk::Point2D& startDisplayCoordinate, 
         const mitk::Point2D& lastDisplayCoordinate, 
@@ -29,8 +29,7 @@ class DisplayCoordinateOperation : public Operation
   
     //##ModelId=3EF1CCBB03B0
     virtual ~DisplayCoordinateOperation();
-    //##ModelId=3EF1D3BB03A3
-    virtual void Execute();
+
     //##ModelId=3EF1D5CF0235
     mitk::BaseRenderer* GetRenderer();
 
@@ -42,12 +41,6 @@ class DisplayCoordinateOperation : public Operation
     mitk::Vector2D GetStartToCurrentDisplayVector();
     mitk::Vector2D GetStartToLastDisplayVector();
 
-    //##ModelId=3EF1D5C80393
-	//##Documentation
-	//##Constants for Operation::m_ExecutionId
-	static const int NOTHING;
-    //##ModelId=3EF1D5C803C6
-	static const int PRINTPOINT;
 
   private:
     //##ModelId=3EF1D2A00053

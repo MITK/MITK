@@ -2,21 +2,29 @@
 #include "Operation.h"
 #include "mitkDisplayCoordinateOperation.h"
 #include "PositionEvent.h"
+#include "mitkInteractionConst.h"
 
 //##ModelId=3EF222410127
 void mitk::DisplayVectorInteractor::ExecuteOperation(Operation* operation)
 {
-    DisplayCoordinateOperation* dcOperation = dynamic_cast<DisplayCoordinateOperation*>(operation);
+    DisplayCoordinateOperation* dcOperation = static_cast<DisplayCoordinateOperation*>(operation);
     if(dcOperation==NULL) return;
 
-    switch(operation->GetExecutionId()%100)
+    switch(operation->GetOperationType())
     {
-    case 1:
+    case OpTEST:
         m_Sender=dcOperation->GetRenderer();
         m_StartDisplayCoordinate=dcOperation->GetStartDisplayCoordinate();
         m_LastDisplayCoordinate=dcOperation->GetLastDisplayCoordinate();
         m_CurrentDisplayCoordinate=dcOperation->GetCurrentDisplayCoordinate();
-            std::cout << m_CurrentDisplayCoordinate << std::endl;
+        std::cout << m_CurrentDisplayCoordinate << std::endl;
+
+		std::cout<<"Message from DisplayVectorInteractor.cpp::ExecuteOperation() : "
+            << "StartDisplayCoordinate:" <<     m_StartDisplayCoordinate 
+            << "LastDisplayCoordinate:" <<      m_LastDisplayCoordinate 
+            << "CurrentDisplayCoordinate:" <<   m_CurrentDisplayCoordinate 
+            << std::endl;
+
         break;
     }
 
@@ -33,36 +41,39 @@ bool mitk::DisplayVectorInteractor::ExecuteSideEffect(int sideEffectId, mitk::St
     {
         case 1:
         {
+			DisplayCoordinateOperation* doOp = new mitk::DisplayCoordinateOperation(OpTEST,  posEvent->GetSender(), posEvent->GetDisplayPosition(), posEvent->GetDisplayPosition(), posEvent->GetDisplayPosition());
             if (m_UndoEnabled)	//write to UndoMechanism
             {
-                DisplayCoordinateOperation* undo = new DisplayCoordinateOperation(POINT, sideEffectId, m_Sender, m_StartDisplayCoordinate, m_LastDisplayCoordinate, m_CurrentDisplayCoordinate);
-                DisplayCoordinateOperation* redo = new mitk::DisplayCoordinateOperation(POINT, sideEffectId,  posEvent->GetSender(), posEvent->GetDisplayPosition(), posEvent->GetDisplayPosition(), posEvent->GetDisplayPosition());
+                DisplayCoordinateOperation* undoOp = new DisplayCoordinateOperation(OpTEST, m_Sender, m_StartDisplayCoordinate, m_LastDisplayCoordinate, m_CurrentDisplayCoordinate);
+                
 
-                OperationEvent *operationEvent = new OperationEvent(this, redo, undo,
+                OperationEvent *operationEvent = new OperationEvent(this, doOp, undoOp,
 																    groupEventId, 
 																    objectEventId);
-                //m_UndoController->SwitchUndoModel(LIMITEDLINEARUNDO);//no need to keep on switching and testing!
                 m_UndoController->SetOperationEvent(operationEvent);
             }
 
-            //make Operation
-            mitk::DisplayCoordinateOperation* dcOperation = new mitk::DisplayCoordinateOperation(POINT, sideEffectId, posEvent->GetSender(), posEvent->GetDisplayPosition(), posEvent->GetDisplayPosition(), posEvent->GetDisplayPosition());
             //execute the Operation
-            this->ExecuteOperation(dcOperation);
+            this->ExecuteOperation(doOp);
             ok = true;
             break;
         }
         case 2:
         {
-            if (m_UndoEnabled)	//write to UndoMechanism
+            int opId;
+            if(sideEffectId<1200)
+                opId=OpMOVE;
+            else
+                opId=OpZOOM;
+            DisplayCoordinateOperation* doOp = new DisplayCoordinateOperation(opId,  m_Sender, m_StartDisplayCoordinate, m_CurrentDisplayCoordinate, posEvent->GetDisplayPosition());
+			if (m_UndoEnabled)	//write to UndoMechanism
             {
-                DisplayCoordinateOperation* undo = new mitk::DisplayCoordinateOperation(POINT, sideEffectId,  posEvent->GetSender(), m_StartDisplayCoordinate, m_LastDisplayCoordinate, m_CurrentDisplayCoordinate);
-                DisplayCoordinateOperation* redo = new DisplayCoordinateOperation(POINT, sideEffectId, m_Sender, m_StartDisplayCoordinate, m_CurrentDisplayCoordinate, posEvent->GetDisplayPosition());
+                DisplayCoordinateOperation* undoOp = new mitk::DisplayCoordinateOperation(opId,  posEvent->GetSender(), m_StartDisplayCoordinate, m_LastDisplayCoordinate, m_CurrentDisplayCoordinate);
 
-                OperationEvent *operationEvent = new OperationEvent(m_Destination, redo, undo,
+
+                OperationEvent *operationEvent = new OperationEvent(m_Destination, doOp, undoOp,
 																    groupEventId, 
 																    objectEventId);
-                //m_UndoController->SwitchUndoModel(LIMITEDLINEARUNDO);//no need to keep on switching and testing!
                 m_UndoController->SetOperationEvent(operationEvent);
             }
 
@@ -70,9 +81,9 @@ bool mitk::DisplayVectorInteractor::ExecuteSideEffect(int sideEffectId, mitk::St
             m_LastDisplayCoordinate=m_CurrentDisplayCoordinate;
             m_CurrentDisplayCoordinate=posEvent->GetDisplayPosition();
             std::cout << m_CurrentDisplayCoordinate << std::endl;
-            mitk::DisplayCoordinateOperation* dcOperation = new mitk::DisplayCoordinateOperation(POINT, sideEffectId, m_Sender, m_StartDisplayCoordinate, m_LastDisplayCoordinate, m_CurrentDisplayCoordinate);
+            
             //execute the Operation
-            m_Destination->ExecuteOperation(dcOperation);
+            m_Destination->ExecuteOperation(doOp);
             ok = true;
             break;
         }
@@ -85,14 +96,14 @@ bool mitk::DisplayVectorInteractor::ExecuteSideEffect(int sideEffectId, mitk::St
 
 //##ModelId=3EF2229F00F0
 mitk::DisplayVectorInteractor::DisplayVectorInteractor(std::string type, mitk::OperationActor* destination)
-: mitk::Roi(type), m_Destination(destination),
+: mitk::StateMachine(type), m_Destination(destination),
     m_Sender(NULL),
     m_StartDisplayCoordinate(0,0),
     m_LastDisplayCoordinate(0,0),
     m_CurrentDisplayCoordinate(0,0)
 {
-    if(m_Destination==NULL)
-        m_Destination=this;
+	if(m_Destination==NULL)
+         m_Destination=this;
 }
 
 

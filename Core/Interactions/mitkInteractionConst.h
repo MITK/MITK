@@ -1,28 +1,62 @@
 #ifndef MITKINTERACTCONST_H
 #define MITKINTERACTCONST_H
+
+/*
+
+If you change anything here, then change in EventMapper.cpp (Array of constants) as well.
+
+*/
+
+//##Constants for States and Transitions
+//## in the XML-File and in the code
+#define stNO 0
+#define stYES 1
+
+//##Constants for Operations
+//## Typedef int OperationType
+
+#define OpTEST 1
+#define OpADD  100 //add at the end
+#define OpINSERT  200 //insert at position
+#define OpMOVE 300//move
+#define OpREMOVE 400//remove at position
+#define OpDELETE 500//delete from the end
+#define OpSTATECHANGE 600//change a state
+#define OpSELECTPOINT 700
+#define OpDESELECTPOINT 800
+#define OpNAVIGATE 900
+#define OpZOOM 1000
+#define OpNOTHING 9999
+
+
 //##Constants for EventMapping...
 //##SideEffectId
-#define DONOTHING 0
-#define INITNEWOBJECT 5
-#define INITEDITOBJECT 6
-#define INITEDITGROUP 7
-#define ADDPOINT 10
-#define SNAPPING_ADDING 20
-#define CHECKPOINT 30
-#define CHECKIFLAST 31
-#define FINISHOBJECT 40
-#define FINISHGROUP 41
-#define SEARCHOBJECT 50
-#define SEARCHGROUP 51
-#define SEARCHANOTHEROBJECT 52 //one object is selected and another object is to be added to selection
-#define SELECTPICKEDOBJECT 60 // select the picked object and deselect others
-#define SELECTANOTHEROBJECT 61 //adds the picked object to the selection
-#define SELECTGROUP 62
-#define SELECTALL 63
-#define ADDSELECTEDTOGROUP 64
-#define DESELECTOBJECT 70 //deselect picked from group
-#define DESELECTALL 72
-#define NEWPOINT 80
+#define SeDONOTHING 0
+#define SeINITNEWOBJECT 5
+#define SeINITEDITOBJECT 6
+#define SeINITEDITGROUP 7
+#define SeADDPOINT 10
+#define SeSNAPPING_ADDING 20
+#define SeCHECKPOINT 30
+#define SeCHECKIFLAST 31
+#define SeFINISHOBJECT 40
+#define SeFINISHGROUP 41
+#define SeSEARCHOBJECT 50
+#define SeSEARCHGROUP 51
+#define SeSEARCHANOTHEROBJECT 52 //one object is selected and another object is to be added to selection
+#define SeSELECTPICKEDOBJECT 60 // select the picked object and deselect others
+#define SeSELECTANOTHEROBJECT 61 //adds the picked object to the selection
+#define SeSELECTGROUP 62
+#define SeSELECTALL 63
+#define SeADDSELECTEDTOGROUP 64
+#define SeDESELECTOBJECT 70 //deselect picked from group
+#define SeDESELECTALL 72
+#define SeNEWPOINT 80
+#define SeMOVEPOINT 90
+#define SeREMOVEPOINT 100
+#define SeINSERTPOINT 110
+#define SeDELETEPOINT 120
+
 
 	//Type
 #define None 0				// invalid event
@@ -94,7 +128,7 @@
 #define TabletPress 92			// tablet press
 #define TabletRelease 93			// tablet release
 #define User 1000				// first user event id
-#define MaxUser 65535		
+#define MaxUser 65535
 
 	//##ButtonState
 	// mouse/keyboard state values
@@ -113,9 +147,9 @@
 	//##Key
 #define Key_Escape 0x1000            // misc keys
 #define Key_Tab 0x1001
-#define Key_Backtab 0x1002 
+#define Key_Backtab 0x1002
 #define Key_BackTab 0x1002 //= Key_Backtab
-#define Key_Backspace 0x1003 
+#define Key_Backspace 0x1003
 #define Key_BackSpace 0x1003 //= Key_Backspace
 #define Key_Return 0x1004
 #define Key_Enter 0x1005
@@ -130,9 +164,9 @@
 #define Key_Up 0x1013
 #define Key_Right 0x1014
 #define Key_Down 0x1015
-#define Key_Prior 0x1016 
+#define Key_Prior 0x1016
 #define Key_PageUp Key_Prior
-#define Key_Next 0x1017 
+#define Key_Next 0x1017
 #define Key_PageDown Key_Next
 #define Key_Shift 0x1020             // modifiers
 #define Key_Control 0x1021
@@ -354,7 +388,7 @@
 #define Key_yacute 0x0fd
 #define Key_thorn 0x0fe
 #define Key_ydiaeresis 0x0ff
-#define Key_unknown 0xffff 
+#define Key_unknown 0xffff
 #define Key_none 0xffff//= Key_unknown
 
 
@@ -367,5 +401,6 @@
 //different UndoModels:
 #define LIMITEDLINEARUNDO 10
 #define TREEUNDO 20
+
 
 #endif //ifndef MITKINTERACTCONST_H

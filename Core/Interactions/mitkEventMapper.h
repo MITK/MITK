@@ -10,12 +10,6 @@
 #include <vector>
 #include <string>
 
-//##ModelId=3E788FC0001A
-typedef std::vector<mitk::EventDescription> EventDescriptionVec;
-
-//##ModelId=3EAEC3AE01DF
-typedef std::vector<mitk::EventDescription>::iterator EventDescriptionVecIter;
-
 //##ModelId=3EDCAEC900E8
 struct StringIntArrayStruct
 {//for mapping string from xml-file to int
@@ -39,6 +33,11 @@ namespace mitk {
 class EventMapper : public QXmlDefaultHandler
 {
   public:
+	//##ModelId=3E788FC0001A
+	typedef std::vector<mitk::EventDescription> EventDescriptionVec;
+	//##ModelId=3EAEC3AE01DF
+	typedef std::vector<mitk::EventDescription>::iterator EventDescriptionVecIter;
+
     //##ModelId=3E5B349600CB
     //##Documentation
 	//## set the global StateMachine. If temporaryly changed,

@@ -38,12 +38,19 @@ class OperationEvent
 	
     //##ModelId=3EF099E90259
 	int GetObjectEventId();
+	
+
 
 	friend class UndoModel;	
 	friend class StateMachine;//for IncCurrGroupEventId
 	friend class EventMapper;//for IncCurrObjectEventId
 
   protected:
+	//##ModelId=3E957C1102E3
+	//##Documentation
+	//## @brief swaps the two operations and sets a flag, 
+	//## that it has been swapped and do is undo and undo is do
+    void SwapOperations();
     
     //##ModelId=3EF099E90269
 	//##Documentation
@@ -56,9 +63,6 @@ class OperationEvent
 	static int IncCurrObjectEventId();
 
 	  
-	//##ModelId=3E957C1102E3
-    void swapOperations();
-
   private:
     //##ModelId=3E9B07B40374
 	static int m_CurrObjectEventId;

@@ -8,20 +8,6 @@
 #include <set>
 
 
-//##ModelId=3E6907B400B4
-typedef std::map<int,mitk::State*> StateMap;
-//##ModelId=3E6907B400C4
-typedef std::map<int,mitk::Transition> TransitionMap;
-
-//##ModelId=3E775728018B
-typedef std::map<int,mitk::State *>::iterator StateMapIter;
-//##ModelId=3E77572801AB
-typedef std::map<int,mitk::Transition>::iterator TransMapIter;
-
-//##ModelId=3E775728019B
-typedef std::map<int,mitk::Transition>::const_iterator TransMapConstIter;
-
-
 namespace mitk {
 
 //##ModelId=3E5A3986027B
@@ -34,11 +20,24 @@ namespace mitk {
 class State
 {
   public:
-    //##ModelId=3E5B2A9203BD
-	  State(std::string name, int id);
+	//##ModelId=3E6907B400B4
+	typedef std::map<int,mitk::State*> StateMap;
+	//##ModelId=3E6907B400C4
+	typedef std::map<int,mitk::Transition> TransitionMap;
+
+	//##ModelId=3E775728018B
+	typedef std::map<int,mitk::State *>::iterator StateMapIter;
+	//##ModelId=3E77572801AB
+	typedef std::map<int,mitk::Transition>::iterator TransMapIter;
+
+	//##ModelId=3E775728019B
+	typedef std::map<int,mitk::Transition>::const_iterator TransMapConstIter;
+    
+	//##ModelId=3E5B2A9203BD
+	State(std::string name, int id);
 
     //##ModelId=3E5B2B2E0304
-	  bool AddTransition(std::string transitionName, int nextStateId, int eventId, int sideEffectId);
+	bool AddTransition(std::string transitionName, int nextStateId, int eventId, int sideEffectId);
 
     //##ModelId=3E5B2B9000AC
     //##Documentation

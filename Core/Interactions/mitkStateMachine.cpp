@@ -34,33 +34,28 @@ bool mitk::StateMachine::HandleEvent(StateEvent const* stateEvent, int groupEven
 
 //get Transition from m_Current State with equals ID
 	const Transition *tempTransition = m_CurrentState->GetTransition(stateEvent->GetId());
-	if (tempTransition == NULL)
-		return false;
+	if (tempTransition == NULL) return false;
 //get next State
-	State *tempState = tempTransition->GetNextState();
-	if (tempState == NULL)
-		return false;
+	State *tempNextState = tempTransition->GetNextState();
+	if (tempNextState == NULL) return false;
 //and SideEffectId to execute later on
 	int tempSideEffectId = tempTransition->GetSideEffectId();
 
-	if (m_UndoEnabled)	//write to UndoMechanism
+	if (( m_CurrentState->GetId() == tempNextState->GetId() ) && m_UndoEnabled)	//write to UndoMechanism if there is a real statechange and Undo is enabled
 	{
-		//UNDO StateTransitionOperation
-		StateTransitionOperation* undoSTO = new StateTransitionOperation(mitk::STATETRANSITION, 0, m_CurrentState);
-		StateTransitionOperation* redoSTO = new StateTransitionOperation(mitk::STATETRANSITION, 0, tempState);//tempStateZeiger? mögl. Fehlerquelle
-	
+		//UNDO for this statechange
+		StateTransitionOperation* doOp = new StateTransitionOperation(OpSTATECHANGE, tempNextState);
+		StateTransitionOperation* undoOp = new StateTransitionOperation(OpSTATECHANGE, m_CurrentState);
 		OperationEvent *operationEvent = new OperationEvent(((mitk::OperationActor*)(this)), 
-															undoSTO, redoSTO, 
+															doOp, undoOp,
 															groupEventId,
 															objectEventId );
-
-		
-		m_UndoController->SwitchUndoModel(LIMITEDLINEARUNDO);
 		m_UndoController->SetOperationEvent(operationEvent);
 	}
 
-	//first following StateChange, then operation(SideEffect)
-	m_CurrentState = tempState;
+	//first following StateChange(or calling ExecuteOperation(tempNextStateOp)), then operation(SideEffect)
+	m_CurrentState = tempNextState;	
+
 	//Undo is handled in ExecuteSideEffect(...)
 	bool ok = ExecuteSideEffect(tempSideEffectId, stateEvent, groupEventId, objectEventId);
 		
@@ -87,4 +82,26 @@ void mitk::StateMachine::EnableUndo(bool enable)
 int mitk::StateMachine::IncCurrGroupEventId()
 {
 	return mitk::OperationEvent::IncCurrGroupEventId();
+}
+
+void mitk::StateMachine::ExecuteOperation(Operation* operation)
+{
+	switch (operation->GetOperationType())
+	{
+	case OpNOTHING:
+		break;
+	case OpSTATECHANGE:
+		{
+			mitk::StateTransitionOperation* stateTransOp = dynamic_cast<mitk::StateTransitionOperation *>(operation);
+			if (stateTransOp == NULL)
+			{
+				std::cout<<"Error! see StateMachine.cpp"<<std::endl;
+				return;
+			}
+			m_CurrentState = stateTransOp->GetState();
+		}
+		break;
+	default:
+		NULL;
+	}
 }

@@ -4,6 +4,7 @@
 #include "ImageSource.h"
 #include "BaseData.h"
 #include "Mapper.h"
+#include "StateMachine.h"
 
 #ifdef MBI_NO_STD_NAMESPACE
 	#define MBI_STD
@@ -53,12 +54,19 @@ public:
     //## a vtkTransform
     //## @sa m_VtkTransform
 	vtkTransform* GetVtkTransform() const;
+	//##Documentation
+	//## @brief Get the Interactor 
+    StateMachine::Pointer GetInteractor() const;
 
     //##ModelId=3E33F4E4025B
     //##Documentation
     //## @brief Set the data object (instance of BaseData, e.g., an Image)
     //## managed by this DataTreeNode
     virtual void SetData(mitk::BaseData* baseData);
+	//##Documentation
+	//## @brief Set the Interactor
+	virtual void SetInteractor(mitk::StateMachine* interactor);
+
     //##ModelId=3E33F5D7032D
     mitk::DataTreeNode& operator=(const DataTreeNode& right);
 
@@ -219,6 +227,10 @@ protected:
     //##Documentation
     //## @brief Map associating each BaseRenderer with its own PropertyList
     mutable std::map<const mitk::BaseRenderer*,mitk::PropertyList::Pointer> m_MapOfPropertyLists;
+
+	//##Documentation
+	//## @brief StateMachine, that handles the Interaction
+    mitk::StateMachine::Pointer m_Interactor;
 };
 
 

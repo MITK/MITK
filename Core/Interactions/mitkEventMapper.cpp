@@ -21,7 +21,7 @@ const std::string mitk::EventMapper::KEY = "KEY";
 
 //for Linker ->no undefined reference
 mitk::StateMachine *mitk::EventMapper::m_GlobalStateMachine;
-EventDescriptionVec mitk::EventMapper::m_EventDescriptions;
+mitk::EventMapper::EventDescriptionVec mitk::EventMapper::m_EventDescriptions;
 mitk::StateEvent mitk::EventMapper::m_StateEvent;
 std::string mitk::EventMapper::m_StyleName;
 

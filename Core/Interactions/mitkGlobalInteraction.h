@@ -11,12 +11,6 @@
 
 
 namespace mitk {
-//##ModelId=3EF099E8014F
-typedef std::vector<StateMachine*> StateMachineList;
-//##ModelId=3EF099E8015F
-typedef std::vector<StateMachine*>::iterator StateMachineListIter;
-//class Group;
-
 //##ModelId=3E5B33000230
 //##Documentation
 //## @brief handles all global Events ("not specified on one object"-Events).
@@ -33,15 +27,15 @@ typedef std::vector<StateMachine*>::iterator StateMachineListIter;
 class GlobalInteraction : public StateMachine
 {
 	public:
+	//##ModelId=3EF099E8014F
+	typedef std::vector<StateMachine*> StateMachineList;
+	//##ModelId=3EF099E8015F
+	typedef std::vector<StateMachine*>::iterator StateMachineListIter;
+
 	//##ModelId=3EAD420E0088
 	GlobalInteraction(std::string type);
 
-    //##ModelId=3E7F497F01AE
-    virtual bool ExecuteSideEffect(int sideEffectId, mitk::StateEvent const* stateEvent, int groupEventId, int objectEventId);
-
-    //##ModelId=3EDCAECA0194
-	virtual void ExecuteOperation(mitk::Operation* operation);
-
+    
     //##ModelId=3EF099E90065
 	//##Documentation
 	//## @brief add a Statemachine to the set of StateMachines that are asked for handling an event
@@ -56,8 +50,13 @@ class GlobalInteraction : public StateMachine
 	//## returns true in case of success
 	bool RemoveStateMachine(StateMachine* stateMachine);
 
+	protected:
+
+	//##ModelId=3E7F497F01AE
+    virtual bool ExecuteSideEffect(int sideEffectId, mitk::StateEvent const* stateEvent, int groupEventId, int objectEventId);
 
 	private:
+
     //##ModelId=3EF099E80364
 	//##Documentation
 	//## After m_Roi the next quickimplementation! Thought is a list of StateMachines to be asked.
@@ -68,15 +67,10 @@ class GlobalInteraction : public StateMachine
 	StateMachineList m_LocalStateMachines;//für späteres freischalten und im austausch für m_Roi!
 
     //##ModelId=3EF099E80373
-    Focus* m_Focus;
+//    Focus* m_Focus;
 
     //##ModelId=3EDDD763029D
     //Group* m_Group;
-
-    //##ModelId=3EAD502B01EC
-//   DataTree* m_DataTree;
-
-
 
 
 };

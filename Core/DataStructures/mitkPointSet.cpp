@@ -95,11 +95,9 @@ const mitk::PointSet::PointType mitk::PointSet::GetPoint(int position)
 	}
   PointType out;
   out.Fill(0);
-  PointType *pout;
-  pout = &out;
-  m_PointList->GetPoint(position, pout);//findet punkt nicht! ERROR!
+  m_PointList->GetPoint(position, &out);
   return out;
-  }
+}
 
 const mitk::ITKPoint3D mitk::PointSet::GetItkPoint(int position)
 {
@@ -108,11 +106,9 @@ const mitk::ITKPoint3D mitk::PointSet::GetItkPoint(int position)
     return NULL;
 	}
 	mitk::ITKPoint3D itkout;
-  PointType  out;
+  PointType out;
   out.Fill(0);
-  PointType *pout;
-  pout = &out;
-  m_PointList->GetPoint(position, pout);//findet punkt nicht! ERROR!
+  m_PointList->GetPoint(position, &out);
   itkout[0] = out[0];
   itkout[1] = out[1];
   itkout[2] = out[2];
@@ -162,14 +158,15 @@ void mitk::PointSet::ExecuteOperation(Operation* operation)
 		break;
 	case OpADD://adds the point to the end
 		{
-      PointsContainer::Pointer itkPoints = m_PointList->GetPoints();
+      unsigned long idoffset = m_PointList->GetNumberOfPoints();
 
       mitk::ITKPoint3D a0 = pointOp->GetPoint();
       PointType a1;
       a1[0] = a0[0];
       a1[1] = a0[1];
       a1[2] = a0[2];
-      itkPoints->push_back(a1);
+
+      m_PointList->SetPoint(idoffset, a1);
 
       m_SelectList.push_back(false);
 		}
@@ -193,7 +190,7 @@ void mitk::PointSet::ExecuteOperation(Operation* operation)
 		}
 		break;
 	case OpMOVE://moves the point given by index
-		{
+		{//check if working!
       unsigned int index = pointOp->GetIndex();
       PointsContainer::Pointer itkPoints = m_PointList->GetPoints();
 			if (index < m_PointList->GetNumberOfPoints() )//checking, cause .at is not supported by older compilers
@@ -212,9 +209,22 @@ void mitk::PointSet::ExecuteOperation(Operation* operation)
 		break;
 	case OpREMOVE://removes the point at position pointOperation.index
 		{
-			if ((unsigned)pointOp->GetIndex() < m_PointList->GetNumberOfPoints() )//checking, cause .at is not supported by older compilers
+      unsigned int index = (unsigned)pointOp->GetIndex();
+			if (index < m_PointList->GetNumberOfPoints() )//checking, cause .at is not supported by older compilers
 			{
-        m_PointList->GetPoints()->DeleteIndex(pointOp->GetIndex());
+        //PointSet doesn't delete the Index! So use the std::vector behind it!
+        //pc->DeleteIndex(index);//doesn't work by ITK!!!
+
+#ifdef INTERDEBUG
+        std::cout<<"Numbers in List before remove:"<<m_PointList->GetNumberOfPoints();
+#endif
+        PointsContainer::Pointer pc = m_PointList->GetPoints();
+        PointsContainer::iterator posIt = &((*pc)[index]);
+        pc->erase(posIt);
+
+#ifdef INTERDEBUG
+        std::cout<<"Numbers in List after remove:"<<m_PointList->GetNumberOfPoints()<<std::endl;
+#endif
 
         BoolListIter selPosition = m_SelectList.begin();
         selPosition+=pointOp->GetIndex();
@@ -224,7 +234,7 @@ void mitk::PointSet::ExecuteOperation(Operation* operation)
 		break;
 	case OpSELECTPOINT://select the given point
 		{
-			m_SelectList[pointOp->GetIndex()] = true;			
+			m_SelectList[pointOp->GetIndex()] = true;
 		}
 		break;
 	case OpDESELECTPOINT://unselect the given point

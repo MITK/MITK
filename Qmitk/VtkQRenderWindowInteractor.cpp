@@ -193,7 +193,6 @@ void VtkQRenderWindowInteractor::Resize(int w, int h)
     if(InteractorStyle==NULL) return;
     if(InteractorStyle->IsA("vtkInteractorStyle"))
     {
-        vtkInteractorStyle* vtkinteractorstyle=(vtkInteractorStyle*)InteractorStyle;
         SetEventSize(w, h);
         SetEventPosition(0, Size[1] - 0 - 1);
         if (this->GetEnabled())
@@ -201,6 +200,7 @@ void VtkQRenderWindowInteractor::Resize(int w, int h)
 #if ((VTK_MAJOR_VERSION>4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=2)))
             InvokeEvent(vtkCommand::ConfigureEvent,NULL);
 #else
+            vtkInteractorStyle* vtkinteractorstyle=(vtkInteractorStyle*)InteractorStyle;
             vtkinteractorstyle->OnConfigure(w,h);
 #endif
         }

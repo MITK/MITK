@@ -172,7 +172,7 @@ template<class TPixel, unsigned int VImageDimension>
   
   
   unsigned long noBytes = input->GetDimension(0);
-  for (int i=1; i<VImageDimension; ++i)
+  for (unsigned int i=1; i<VImageDimension; ++i)
   {
     noBytes = noBytes * input->GetDimension(i);
   }
@@ -226,7 +226,7 @@ template<class TPixel, unsigned int VImageDimension>
   double origin[ VImageDimension ];
   double spacing[ VImageDimension ];
   
-  for (int i=0; i < VImageDimension; ++i)
+  for (unsigned int i=0; i < VImageDimension; ++i)
   {
     size[i]    = input->GetDimension(i);
     spacing[i] = input->GetSlicedGeometry()->GetSpacing()[i];

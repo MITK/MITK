@@ -13,9 +13,9 @@ namespace mitk
 {
 
 template <typename TPixel>
-BoundingObjectCutter<TPixel>::BoundingObjectCutter()
-  : m_UseInsideValue(false), m_OutsideValue(0), m_InsideValue(1), m_BoundingObject(NULL), 
-  m_OutsidePixelCount(0), m_InsidePixelCount(0)
+BoundingObjectCutter<TPixel>::BoundingObjectCutter() : 
+m_BoundingObject(NULL), m_InsideValue(1), m_OutsideValue(0), 
+m_UseInsideValue(false), m_OutsidePixelCount(0), m_InsidePixelCount(0)
 {
 }
 
@@ -137,7 +137,9 @@ void BoundingObjectCutter<TPixel>::GenerateData()
   ItkRegionType regionOfInterest;
   typename ItkImageType::IndexType start;
 //  itkImage->TransformPhysicalPointToIndex(globalMinPoint, start);
-  start[0] = globalMinPoint[0]; start[1] = globalMinPoint[1]; start[2] = globalMinPoint[2];
+  start[0] = static_cast<typename ItkImageType::IndexType::IndexValueType>(floor(globalMinPoint[0])); 
+  start[1] = static_cast<typename ItkImageType::IndexType::IndexValueType>(floor(globalMinPoint[1])); 
+  start[2] = static_cast<typename ItkImageType::IndexType::IndexValueType>(floor(globalMinPoint[2]));
   regionOfInterest.SetIndex(start);
   typename ItkImageType::SizeType size;  
   size[0] = static_cast<typename ItkImageType::SizeType::SizeValueType>((globalMaxPoint[0] - globalMinPoint[0])/ itkImage->GetSpacing()[0]); // number of pixels along X axis
@@ -173,7 +175,6 @@ void BoundingObjectCutter<TPixel>::GenerateData()
   ItkImageIteratorType inputIt(itkImage, regionOfInterest);
   ItkImageIteratorType outputIt(itkOutputImage, outputRegion);
   /* Cut the boundingbox out of the image by iterating through all pixels and checking if they are IsInside() */
-  bool inside = false;
   m_OutsidePixelCount = 0;
   m_InsidePixelCount = 0;
   if (GetUseInsideValue()) // use a fixed value for each inside pixel (create a binary mask of the bounding object)

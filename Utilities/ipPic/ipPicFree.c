@@ -6,7 +6,10 @@
  *   frees all space used by a picDescriptor
  *
  * $Log$
- * Revision 1.3  1998/09/16 18:32:45  andre
+ * Revision 1.4  1998/09/16 18:37:34  andre
+ * added ipPicFreeTag
+ *
+ * Revision 1.3  1998/09/16  18:32:45  andre
  * *** empty log message ***
  *
  * Revision 1.2  1997/09/15  13:21:12  andre
@@ -49,13 +52,13 @@ void ipPicFree( ipPicDescriptor *pic )
 }
 
 void
-ipTagFree( ipPicTSV_t *tsv )
+ipPicFreeTag( ipPicTSV_t *tsv )
 {
   if( tsv )
     {  
       if( tsv->value );
-        ipFree( tsv->value );
+        free( tsv->value );
 
-      ipFree( tsv );
+      free( tsv );
     }  
 }

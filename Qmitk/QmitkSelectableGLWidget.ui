@@ -1,4 +1,4 @@
-<!DOCTYPE UI><UI version="3.1" stdsetdef="1">
+<!DOCTYPE UI><UI version="3.2" stdsetdef="1">
 <class>QmitkSelectableGLWidget</class>
 <widget class="QWidget">
     <property name="name">
@@ -9,7 +9,7 @@
             <x>0</x>
             <y>0</y>
             <width>498</width>
-            <height>582</height>
+            <height>585</height>
         </rect>
     </property>
     <property name="caption">
@@ -69,7 +69,7 @@
     </hbox>
 </widget>
 <includes>
-    <include location="global" impldecl="in declaration">mitkQmitkGLWidget.h</include>
+    <include location="global" impldecl="in declaration">QmitkRenderWindow.h</include>
     <include location="global" impldecl="in declaration">mitkOpenGLRenderer.h</include>
     <include location="local" impldecl="in implementation">QmitkSelectableGLWidget.ui.h</include>
 </includes>

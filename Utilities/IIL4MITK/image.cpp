@@ -143,7 +143,9 @@ iilImage::display (iilWidget* widget)
     GLdouble planeX [] = {-1, 0, 0, regionWidth ()};
     GLdouble planeY [] = {0, -1, 0, regionHeight ()};
 
-    if (!visible () || !widget->isVisible (this) || (constraint () && (widget != constraint ()))) {
+    if (!visible () 
+      //|| !widget->isVisible (this) //MITK commented out
+      || (constraint () && (widget != constraint ()))) {
 	return;
     }
 
@@ -193,7 +195,7 @@ void iilImage::drawTextures (iilWidget* widget)
 	        iilWidget* w;
 		unsigned int available, total;
 	
-		w = (widget->isSharing () ? widget->sharedWidget () : widget);
+		w = (widget->IsSharing () ? widget->SharedWidget () : widget);
     std::map<void*,Textures*>::iterator tex_it = _textures.find (w);
     if(tex_it!=_textures.end())
       textures = tex_it->second;
@@ -213,7 +215,7 @@ void iilImage::drawTextures (iilWidget* widget)
 			textures->push_back(new _iilTexture (w));
 iii=textures->size ();
 		}
-		widget->makeCurrent ();
+		widget->MakeCurrent ();
 	}	
 
 	/* Render the textures */

@@ -3,8 +3,6 @@
 
 #include <GL/gl.h>
 
-class iilWidget;
-
 /*!
 \brief The items are objects that can be displayed by 
 the widget. When the widget demands an update of the display, 

@@ -7,8 +7,6 @@
 #include <vector>
 #include <map>
 
-class iilWidget;
-
 /*!
 \todo Manage the texture in a common way for all instances.
 \todo Implement scaling of images here.

@@ -247,7 +247,7 @@ void mitk::OpenGLRenderer::Render()
      if(m_VtkMapperPresent) {
       //    m_MitkVtkRenderWindow->MitkRender();
      } else
-      m_RenderWindow->swapBuffers();
+      m_RenderWindow->SwapBuffers();
 
     return;
   }
@@ -323,7 +323,7 @@ void mitk::OpenGLRenderer::Render()
     m_MitkVtkRenderWindow->MitkRender();
   }
   else
-    m_RenderWindow->swapBuffers();
+    m_RenderWindow->SwapBuffers();
  }
 
 /*!

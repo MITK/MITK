@@ -6,7 +6,7 @@ _iilTexture::_iilTexture (iilWidget* aParent)
 {	
 	assert (parent);
 
-	parent->makeCurrent ();
+	parent->MakeCurrent ();
 	glGenTextures (1, &_name);
 	glBindTexture (GL_TEXTURE_2D, _name);
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
@@ -22,7 +22,7 @@ will not be deleted.
 */
 _iilTexture::~_iilTexture () {
 	if(parent!=NULL)
-  	parent->makeCurrent ();
+  	parent->MakeCurrent ();
 	glDeleteTextures (1, &_name);
 
 	// Are the textures deleted automatically?

@@ -21,7 +21,7 @@ void QmitkSelectableGLWidget::init()
         composedName+=name();
     else
         composedName+="QmitkGLWidget";
-    QWidget *mitkWidget = new mitk::QmitkGLWidget(renderer, container, composedName);
+    QWidget *mitkWidget = new mitk::QmitkRenderWindow(renderer, container, composedName);
     hlayout->addWidget(mitkWidget);
 }
 

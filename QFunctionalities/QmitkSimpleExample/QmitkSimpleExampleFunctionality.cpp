@@ -270,7 +270,7 @@ void QmitkSimpleExampleFunctionality::stereoSelectionChanged( int id )
     break;
   }
   multiWidget->mitkWidget4->GetRenderer()->SetMapperID(2);
-  multiWidget->mitkWidget4->GetRenderer()->GetRenderWindow()->Update();
+  multiWidget->mitkWidget4->GetRenderer()->GetRenderWindow()->Repaint();
 }
 
 void QmitkSimpleExampleFunctionality::initWidgets()
@@ -398,7 +398,7 @@ void QmitkSimpleExampleFunctionality::ExecuteOperation(mitk::Operation* operatio
             case mitk::OpMOVE :
                 {
                     renderer->GetDisplayGeometry()->MoveBy(dcOperation->GetLastToCurrentDisplayVector()*(-1.0));
-                    renderer->GetRenderWindow()->Update();
+                    renderer->GetRenderWindow()->Repaint();
                     ok = true;
                 }
                 break;
@@ -408,7 +408,7 @@ void QmitkSimpleExampleFunctionality::ExecuteOperation(mitk::Operation* operatio
                     distance = (distance > 0 ? 1 : (distance < 0 ? -1 : 0));
                     float factor= 1.0 + distance * 0.05;
                     renderer->GetDisplayGeometry()->Zoom(factor, dcOperation->GetStartDisplayCoordinate());
-                    renderer->GetRenderWindow()->Update();
+                    renderer->GetRenderWindow()->Repaint();
                     ok = true;
                 }
                 break;

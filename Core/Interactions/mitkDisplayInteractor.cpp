@@ -38,7 +38,7 @@ void mitk::DisplayInteractor::ExecuteOperation(mitk::Operation * operation)
     case OpMOVE :
       {
         renderer->GetDisplayGeometry()->MoveBy(dcOperation->GetLastToCurrentDisplayVector()*(-1.0));
-        renderer->GetRenderWindow()->Update();
+        renderer->GetRenderWindow()->Repaint();
         ok = true;
       }
       break;
@@ -51,7 +51,7 @@ void mitk::DisplayInteractor::ExecuteOperation(mitk::Operation * operation)
         renderer->GetDisplayGeometry()->Zoom(factor, 
           Vector2f(renderer->GetDisplayGeometry()->GetDisplayWidth()/2,
                     renderer->GetDisplayGeometry()->GetDisplayHeight()/2));
-        renderer->GetRenderWindow()->Update();
+        renderer->GetRenderWindow()->Repaint();
         ok = true;
       }
       break;

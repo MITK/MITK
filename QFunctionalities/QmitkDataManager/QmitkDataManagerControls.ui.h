@@ -46,8 +46,8 @@ void QmitkDataManagerControls::UpdateRendererCombo() {
  m_RenderWindowCombo->clear(); 
   const mitk::RenderWindow::RenderWindowSet rws = mitk::RenderWindow::GetInstances();
   for (mitk::RenderWindow::RenderWindowSet::const_iterator iter = rws.begin();iter != rws.end();iter++) {
-    if ((*iter)->name()) {
-      m_RenderWindowCombo->insertItem(QString((*iter)->name()),0);
+    if ((*iter)->GetName()) {
+      m_RenderWindowCombo->insertItem(QString((*iter)->GetName()),0);
 //        if ((*iter) == focusedRenderWindow) {
 //          m_RenderWindowCombo->setCurrentItem(0);
 //        }
@@ -55,7 +55,7 @@ void QmitkDataManagerControls::UpdateRendererCombo() {
  
   }
   if (focusedRenderWindow) {
-    m_RenderWindowCombo->setCurrentText(focusedRenderWindow->name()); 
+    m_RenderWindowCombo->setCurrentText(focusedRenderWindow->GetName()); 
     // m_RenderWindowCombo->activated(focusedRenderWindow->name());
   } else {
     m_RenderWindowCombo->setCurrentText("no focused window");

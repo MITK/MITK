@@ -11,10 +11,10 @@
 
 void QmitkStdMultiWidget::updateMitkWidgets()
 {
-  mitkWidget1->GetRenderer()->GetRenderWindow()->updateGL(); 
-  mitkWidget2->GetRenderer()->GetRenderWindow()->updateGL(); 
-  mitkWidget3->GetRenderer()->GetRenderWindow()->updateGL(); 
-  mitkWidget4->GetRenderer()->GetRenderWindow()->updateGL();
+  mitkWidget1->GetRenderer()->GetRenderWindow()->Repaint(); 
+  mitkWidget2->GetRenderer()->GetRenderWindow()->Repaint(); 
+  mitkWidget3->GetRenderer()->GetRenderWindow()->Repaint(); 
+  mitkWidget4->GetRenderer()->GetRenderWindow()->Repaint();
 }
 
 void QmitkStdMultiWidget::init()

@@ -24,7 +24,7 @@ ipPicDescriptor* Pic2vtk::convert( vtkImageData* vtkImage ) {
 		pic->dim = 3;		
 	} else if( dim[1] > 1 ) {
 		pic->dim = 2;
-	} else if ( dim[1] > 1 ) {
+	} else if ( dim[0] > 1 ) {
 		pic->dim = 1;
 	} else {
 	  cerr << "Can't determine dimensions of vtkImageData" << endl;

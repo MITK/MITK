@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #ifndef LIGHTBOXIMAGEREADER_H_HEADER_INCLUDED_C1F48A22
 #define LIGHTBOXIMAGEREADER_H_HEADER_INCLUDED_C1F48A22
-#define NO_pVersion
+
 #include "mitkImageSource.h"
 #include "mitkCommon.h"
 #include <chili/qclightbox.h>
@@ -36,12 +36,22 @@ public:
     /** Method for creation through the object factory. */
     itkNewMacro(Self);
 
-    mitk::Vector3D GetSpacingFromLB();
-
     void SetLightBox(QcLightbox* lightbox);
     QcLightbox* GetLightBox() const;
 
 protected:
+    typedef struct _localImageInfo
+    {
+      int pos;
+      int imageNumber;
+      mitk::Vector3D origin;
+      mitk::Vector3D* direction;
+    } LocalImageInfo;
+    typedef std::vector<LocalImageInfo> LocalImageInfoArray;
+
+    static bool ImageOriginLesser ( const LocalImageInfo& elem1, const LocalImageInfo& elem2 );
+    static bool ImageNumberLesser ( const LocalImageInfo& elem1, const LocalImageInfo& elem2 );
+
     virtual void GenerateData();
 
     virtual void GenerateOutputInformation();
@@ -53,9 +63,13 @@ protected:
     /** Time when Header was last read. */
     itk::TimeStamp m_ReadHeaderTime;
     //double ConvertTime(ipPicDescriptor*  pic);
-    int GetRealPosition(int position, std::list<int> liste);
-    std::list<int> SortImage();
+    int GetRealPosition(int position, LocalImageInfoArray& liste);
+    void SortImage(LocalImageInfoArray& imageNumbers);
+    mitk::Vector3D GetSpacingFromLB(LocalImageInfoArray& imageNumbers);
     QcLightbox* m_LightBox;
+
+    LocalImageInfoArray m_ImageNumbers;
+
 };
 
 } // namespace mitk
@@ -66,5 +80,6 @@ typedef struct imageInfo
   //float imagetime;
   mitk::Point3D startPosition;
 }imageInfo;
+
 
 #endif /* LIGHTBOXIMAGEREADER_H_HEADER_INCLUDED_C1F48A22 */

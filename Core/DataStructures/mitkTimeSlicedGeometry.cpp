@@ -56,6 +56,11 @@ bool mitk::TimeSlicedGeometry::SetGeometry3D(mitk::Geometry3D* geometry3D, int t
   if(IsValidTime(t))
   {
     m_Geometry3Ds[t]=geometry3D;
+    if((t==0) && (geometry3D!=NULL))
+    {
+      m_TransformMMToUnits = geometry3D->GetTransformUnitsToMM();
+      m_TransformMMToUnits.invert(m_TransformUnitsToMM);
+    }
     return true;
   }
   return false;
@@ -101,6 +106,7 @@ const mitk::BoundingBox* mitk::TimeSlicedGeometry::GetBoundingBox() const
     geometry3d = GetGeometry3D(t);
     assert(geometry3d!=NULL);
     nextBoundingBox = geometry3d->GetBoundingBox();
+    assert(nextBoundingBox.IsNotNull());
     const mitk::BoundingBox::PointsContainer * nextPoints = nextBoundingBox->GetPoints();
     if(nextPoints!=NULL)
     {

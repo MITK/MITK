@@ -1,4 +1,4 @@
-<!DOCTYPE UI><UI version="3.2" stdsetdef="1">
+<!DOCTYPE UI><UI version="3.3" stdsetdef="1">
 <class>QmitkMainTemplate</class>
 <widget class="QMainWindow">
     <property name="name">
@@ -8,8 +8,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>752</width>
-            <height>938</height>
+            <width>786</width>
+            <height>891</height>
         </rect>
     </property>
     <property name="minimumSize">
@@ -389,6 +389,9 @@
         <property name="text">
             <string>Open Image Sequence...</string>
         </property>
+        <property name="menuText">
+            <string>Open Image Sequence...</string>
+        </property>
         <property name="toolTip">
             <string>Open Image Sequence</string>
         </property>
@@ -398,6 +401,9 @@
             <cstring>layoutGroup</cstring>
         </property>
         <property name="text">
+            <string>ActionGroup</string>
+        </property>
+        <property name="menuText">
             <string>ActionGroup</string>
         </property>
         <property name="toolTip">
@@ -416,6 +422,9 @@
             <property name="text">
                 <string>standard layout</string>
             </property>
+            <property name="menuText">
+                <string>standard layout</string>
+            </property>
         </action>
         <action>
             <property name="name">
@@ -425,6 +434,9 @@
                 <bool>true</bool>
             </property>
             <property name="text">
+                <string>2D images up</string>
+            </property>
+            <property name="menuText">
                 <string>2D images up</string>
             </property>
         </action>
@@ -438,6 +450,9 @@
             <property name="text">
                 <string>2D images left</string>
             </property>
+            <property name="menuText">
+                <string>2D images left</string>
+            </property>
         </action>
         <action>
             <property name="name">
@@ -447,6 +462,9 @@
                 <bool>true</bool>
             </property>
             <property name="text">
+                <string>Big 3D</string>
+            </property>
+            <property name="menuText">
                 <string>Big 3D</string>
             </property>
         </action>
@@ -460,6 +478,9 @@
             <property name="text">
                 <string>Transversal plane</string>
             </property>
+            <property name="menuText">
+                <string>Transversal plane</string>
+            </property>
         </action>
         <action>
             <property name="name">
@@ -469,6 +490,9 @@
                 <bool>true</bool>
             </property>
             <property name="text">
+                <string>Sagittal plane</string>
+            </property>
+            <property name="menuText">
                 <string>Sagittal plane</string>
             </property>
         </action>
@@ -481,6 +505,31 @@
             </property>
             <property name="text">
                 <string>Coronal plane</string>
+            </property>
+            <property name="menuText">
+                <string>Coronal plane</string>
+            </property>
+        </action>
+        <action>
+            <property name="name">
+                <cstring>ColumnWidget3n4</cstring>
+            </property>
+            <property name="toggleAction">
+                <bool>true</bool>
+            </property>
+            <property name="text">
+                <string>ColumnWidget3n4</string>
+            </property>
+        </action>
+        <action>
+            <property name="name">
+                <cstring>RowWidget3n4</cstring>
+            </property>
+            <property name="toggleAction">
+                <bool>true</bool>
+            </property>
+            <property name="text">
+                <string>RowWidget3n4</string>
             </property>
         </action>
     </actiongroup>
@@ -497,12 +546,18 @@
         <property name="text">
             <string>Fullscreen</string>
         </property>
+        <property name="menuText">
+            <string>Fullscreen</string>
+        </property>
     </action>
     <action>
         <property name="name">
             <cstring>viewHideAction</cstring>
         </property>
         <property name="text">
+            <string>WidgetPlanes</string>
+        </property>
+        <property name="menuText">
             <string>WidgetPlanes</string>
         </property>
     </action>
@@ -513,35 +568,38 @@
         <property name="text">
             <string>new item</string>
         </property>
+        <property name="menuText">
+            <string>new item</string>
+        </property>
     </action>
 </actions>
 <images>
     <image name="image0">
-        <data format="XPM.GZ" length="706">789cad91cf0ac2300cc6ef7d8ab0dc8a38375106e223281e05f190760e3d6c82ce8388ef6effac5be72a22f825d07cfd91a4d098c376b3021eb36b4df549823cd205787e2bcbfb6ebf7cb0284d41e51c9268c4a23148589fab83ae51d53831d2566a9b4db3c4dadc5891cdac256d0b256b85b34561c606f50f824ae67c27f6167586a7e127822d71c33d6009922081adbcb7a1202f7ac407f4530ff6d5f520cabc8b868440bb6700dc9e21687a02c09210684800b81e5fdf7ffbb9602f2ef09adc</data>
+        <data format="PNG" length="233">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b000000b049444154789cb594310e43210c436df4879e897b75fa53d5bbf94c1d2ad185afa6802891829708102f9623a024ec50da42dd093ebc1772cec5ae25b13d974417f8ba346a2489b629a38667a1921892711b0f5033fe979b170a0004504a0180722d41ae716706eaf0be5080b513bb7d4ff3648c3beb5c69e478adce35ccd89bf548c38c2df4f9006e07f07aafd5fbf913452cd43c905868e7380a6ac0b1501b6e28d4388e85768ebd9afd1561ff71ab0fa524b6cd47368ca10000000049454e44ae426082</data>
     </image>
     <image name="image1">
-        <data format="XPM.GZ" length="751">789c8d925f0b823010c0dff729867b93c8341423fa08458f41f4b0ddd47ab0a0ec21a2efdefe38bcc9046f0ef6e3f8dded70494c4fc73d8d13f2ea7877030a57fea4b17cb7ede77cd97d499465547d1b9a460b122d29d0c3e35ee9335367b632a151682cd7656a911b14656e1134420e19e41aab1e0b8b8d41290a69505a5459a9b1d62873c16d76190c936181e8335ce88a95db4c82cb08ce008502ec38a30689aa59a7699ca3d8eb5337ae8fe2893ebe530db79bede079b023f0fc1c3be3859cd1420ef3cb85fa8cef3638e379e638d3f3784ee077f7ef20fc427e5bf207f059b31a</data>
+        <data format="PNG" length="326">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b0000010d49444154789cb595bd8ac3301084c741c5967e1e0bf256a98ee3082155de2ae0edf22e2aaed842705738ab4491f5179c6decc168f46918db0333e3136300609aa6bf2d4d9979302a2e67403cf0fd03ccd7196408e265d9daa3a8ed6471e31bc40becde0200766a2c1e20f3d855bc2c37be53df27589159cca32705d251463872204300104875b2c44a0247a0df312173e4227d3a2e7126c6afc44aa29ba94656c7eb03632e63250b27c8661cafcf12e7c9d6f5ebfa6ac6ad6d68266e256dcef8744cab531b7db99e89931eabf9b3eeb92651bc63b2762d121fbeba9288e2488cd78e539af93a877bbbb7f55644952b4d6f8f5b89bb7bdc4a5cebf1dbc4b56fc5a0ffbcad7e4fcc3c44c65bcf3f79fbd584615d36810000000049454e44ae426082</data>
     </image>
     <image name="image2">
-        <data format="XPM.GZ" length="3262">789c7dd55b532a471007f0773f0565bf59a93eecc22e4ba5f2a08077b979379587d9cb887a105014f154be7b7aba7b46734e0c3805bffa77f70ee3167cdbaa5d0d4f6a5bdf369e97667957d48a8979aa6d952fd3e9facfbffef8b1b119c735fa8b1a492ddefc6d6373b4ac15b5feecb172804702d4f9c12ed899b5f5ccd954ce51bd9e45925bb17bb2f782b91e3376e60d7d75a6f9d83be67e6c39c7756fa88be9d9665fab9bea88dd0ef98d5a731c793722de7fa9ceb4bee12d39e4626b358f9d1b91ef8744edeb9bea42e717e2465df356b0ccabd47e3f182cf9bdd85aed6fb3dba13f53fbfad4bb29f3727526390ebd3537cecdc81b7be2665d9daa751e9eb20dd9f0f586ea22e19b07bbce894992847303ea3295bc212e2ac961d739356994b2d1bb14c38973ab9126ad06fb4a5d8a71109c737e27b656e76db3f3904fc5ad488c47ea447de09dc9f51ec4d66a7ee89c357c8ec7ea32937c9f9d7b43e9dd6eb2c7e22cd1fabeb7e6676adf7fe12d39f279b49b34afe0fc5c1cfa4f8339c78eda5f7f152cfd03715bfb712f5872fe3ced22d45f7a1b9977240ef5236fc9f15dedfb0fbd356f07cb7e9be2c2683d9faf69fa79d00b96fa44edf7d30d96fc4c6c7cff76b0e4b1b88cc5c0e765c27e60c73b97fdbe8943ff4a6db47ee6adf50b75a5f9da5b72e0f3c9693f5affacf6f94170c9f9ad388fb57e1d2cf94c9d6a3fef372f43ff5c4cb918d4466dd4be7ee25c247955246c2b2e62f5933a15c38b988e4f72fe7e2b4aca655ea936ea1d7525069e57d2bc52fa0b75a58e82f9f7097371194b0e8b60c96fd4a9185ed955e8af8b43fd95dad7cfbdab9473ed2f8dd65f7b6bfea8d6f960c4d6aadd8f2b54699877aed67ef81e2cf35fd495d66b7f15ab2f83a55efb2b3fff2258aecff75745bbd3fa7bb1cff141edaf3f556b3d4cc4d6aaf9f7caa695b172bd3bb18dc5c0f7abb5d658cb06b5158f961f4f04349863c1abc40a2df916273effa5dee01ddee3037ea7754fefa7b41effa7ded24c37d7cf976b545fd6cf7042d7706bceaf337a5d7c359f66ddca3c9d3be1f7f051f153fdc75cbf9ea873f665bda1f39133f1b3ddbafdb2befcd76cbfbe9eff4ce7f2804b7c09eb95d60adf70fd733dcd79c76d3a8f57dcf9b41ea9ab835dece1aebb8eafa77deee13e1ee0211e7d5ac778827d1ce0104738c6533c937a9e7d8e17788957788d37bcea18618c0d6c628229b6e899e150be8fb00d08bf3e0ce450408e399450e1182cb6e4fb1b6effa31a600277700f0ff4ee3b4ca9fe51ea61067358c0132cdc6e608e4b78c64b58d29ac30bbc72b6c28ceac7f27b0b6fb08677d8861d5a1de8c20e9ed14ac81de8e11eac6017f6c2fc7d38c03555cd28ed5055977b0ea14b9fab0747708c7d3871f5d097df6b9ae36a0e79b9ca1ebe4b25ad1e9d7f1f76dd7e60a8f3dd2e3aa12abcd21ad16e5730c601cdefe342e653ff184ee18cd6983e591fcee1825e3bbc2ee9fd29edbf0f03f9ffd2d15fc1359dd70dd469451043039a90400a2dc8a04daf09ddb883cff70f2e0c18f7c8a145bf84ee495fa7d4df87bea9e8fffbaef7dbdfbf6ffc0397b0fd2b</data>
+        <data format="PNG" length="890">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b0000034149444154789c8d95c16bdc4614c67f3263f20654904c0abba117432f36cdc12697945e1ae8210bbd24a7daf490e4d87fc139f6cfc8b1ed254d0f852d1492e35268b00309d9430b5a70b0040dcc4005f30202f53092b2b615e8807868a4f7e97bef7df329592c168cad5087160393ab1368000334a08d0e511b25d4813ccd492449d6f3cd286af7e4e68d9b68ad6022901881062495e1be7a5b51aecab1f4f1254658be5a0e4c2595738cd72b1011def1eeff01bbda914b8ea20882570f0a0808825387c5e2d431cda62472ae13e3c057b8d2d2804857ba91d80679cf384ff3b85773a9bf1f0456556c6af1de83742577ccfb8889d9a10958ec258c8d516022ab2ccb10d38119013af65d25c335b24681b3348b4ad0282921aa003a9975fbaafac1298d6e976f4ab63fdd663a99c6e435159c538311cae72567eeac958f72b6aeda6414b8d5b65d164b8a17050858b1511d698ef3e763dfe3eab462f1c782f29f929deb3bedecf68cad6c2b49fa93d7366d7bf27249a81c5e15e1f2c086c18990931344a9aa92c59f0bfc5b8fab1dfb9fed7270ef2032ee99def96a06fd41a83d1821348aed6303a1811373ccbc79c2ade616d3973b1c2f1784954380e3e7c7b83a60daa66d9745c9c1d707d88fd765938f0ea5a0e07b1e525070c2098fe531b3d55d7ef48f28df3814a55c1598f2b4e4c1b77761737cba175746c68c2f79863063c6eef55d7299e2eb92473ffd80f79e6c9261d8148abf4b42a35007482dd60083e18034821aa0564885efea23ee9882693de5b529a00e4c3fd906ed240998ea7445612c8e8004f028a2828a22dadb83a0e211cd503c420628859678a287bc7e758c765509b02108011063a31a36a31e2268ffaa824a0441f028aaa0783284a08a35efe7a328464551173a2981ff37beecd724865e64dc4b2fc36b0544cf900e78ffc6e76c0c65f76574cc4405d52e5e6883760d8aa002046c9aa3c06432e1fefd83c8d8adaaf8909c200eeb731c0556729c5658c0498545507ab0f811878f797581081c3d3ce2dae45a923cfdfd693bff75cecfbfcdd13a90a796d01095d179b11a90e14f92753e41e71d120f532a3cb877c8fede7e02301ce9b3eaac7df2cb9cf2af621840544f3fc0e876004141d5c53dafec7db1c7e13787eceeec0e26f41f85e7e377c3d6686d0000000049454e44ae426082</data>
     </image>
     <image name="image3">
-        <data format="XPM.GZ" length="691">789cd3d7528808f055d0d2e72a2e492cc94c5648ce482c52d04a29cdcdad8c8eb5ade6523232520022530543251d2e253d856405bffcbc54103b11c8563600020b63105719ce4d027193415c0b630b43886c12989b64610a91d5c30a064846391104931032ca10f144651884cb8099202198ce24b81ea01444254c0aa1271159026c065c0fb204f17af0d8039742721b0a4846f60f0a80ea1d74f1832c536bcd0500f66b8305</data>
+        <data format="PNG" length="245">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b000000bc49444154789ced94b10ec22010867f8c03cf0493f1999c8c71ead4476a8813f74c6c382870a50525d8c1a4ff42d2de7d7c395a0411618b1c36a1ee609e634bb152d6030e80045fc741429fb4e0b5227c154a594f347f9980c6e7b0b595f73363b780e78644e7c2c6af3afbb03e98b319cb08cfa1445a94a000dea61297ab8bcf183899e5d012709ed0bf00d767f639a1af629c8fe5e7c66df006e36fe1e14cc621198b9edbcd4cc6dfeeeb67d2f54b97a040a7712dff77bbede098270d896ad1bd2229be0000000049454e44ae426082</data>
     </image>
     <image name="image4">
-        <data format="XPM.GZ" length="691">789cd3d7528808f055d0d2e72a2e492cc94c5648ce482c52d04a29cdcdad8c8eb5ade6523232520022530543251d2e253d856405bffcbc54103b09c8563600020b63103711ce4d027195415c0b630b43886c32989b64610a91d5c30ae82da39c980482983249893008114e82c928c35443f581144064908c014981a521323043f4e00663d1039522494f52228a1eb8dbf4108e47f827194718a0fa9fb8701b40995a6b2e00275b8d1c</data>
+        <data format="PNG" length="244">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b000000bb49444154789ced943d0ec3200c851f55879cc94c55cfd4a9aaaaaacad423458cf599b2d10105cc4f286d948db75802f4f9191b1433630f1d76a176b0d4315d3093b1b7fb0060061047e6b36a052b391544c6a6b05264d6c50444c62ec9bd633305e89a33a2b705661fe5b960cac9dff1527ead5c66addcbe73ee6069a5093894fb5d395c5e57068e33fe028fe306c740add11b1cd7a727013f1f7143fe8306c7ab73fc1a07e853795e5b143d69d990cbb5bd9125a9fe1f7770a60f4eb6680127c512000000000049454e44ae426082</data>
     </image>
     <image name="image5">
-        <data format="XPM.GZ" length="676">789cadd0bd0ac2301007f03d4f71f4b620a95607417c04c5511087bb28e8500b5a0711dfdd7e98f46aa238989492eb2fffe623d5b05e2d40a7ea525279b4600f7406bdbbe6f96db39ddf559265503d131825039518b0b02c4efb7a8cd518874dab4b72e5745c97ec4b6e82d12604c5fb4f825141199162be088a9ff5a4fadec1af22567913428a0b9321a68850d30d05c2ad79f242c6c98b9cb0e9847be226d3a74cbb5a906973c1dec44962b7d393c74c3d01fe6d7fd1</data>
+        <data format="PNG" length="245">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b000000bc49444154789ccd94b10ec3200c444dd521df64c67c7746ee9bb2b943449b94034cd2aabd2592891fe713720020dfd0ad75a8aa36527783afe87fc09e185c600602102e813d8053e0acecda1b838848f0bce33dd03bc56f5f45763992b933e3c5f6df8f80559389bcdcaa26f35cd0d9158b01f1303e100330871ebc0a564d06ccd54c7b700a664e47e105b8e7b4d444abc4f15a457087fc7f02e60ed8f916199fee5e968e0ede9b81f874dd8a8cee8aad711291b5d9dc926b099dd1038b8f65b02f7dbe550000000049454e44ae426082</data>
     </image>
     <image name="image6">
-        <data format="XPM.GZ" length="736">789c9d92cb0ac2301045f7f98ad0ec8a58dbba88889fa0b814c4c564d2a08b2a685d88f8ef76f290da4605ef043a87cb215092a57cb35ef2346397069a0372dcc399a7fa5ad7b7ed6e71674951f0f6489e2723968c39f2d5e958d12eda5d4c6c0831a02c09d50b15a1269ce6251a4358114a25670e8d47ed10088d8dbd349aef8df0893460d3ab5c4306b4f3c981b7aaeb28743374d07d117b8e00e55cd4d873203895ad620e18aa628e4dccb15131c7ed11c7efbf1c9fa113fed4d009cd5f0e76e6db3b78ccd91390c8ac22</data>
+        <data format="PNG" length="286">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b000000e549444154789cb595310e83300c45bf5107ce1475a9d82af5365527b6b2b55762f599b2b94364408d0d34345fb22261ebf9cb3840cc8c1a6aaa50011000592b60662a068bd86c222a869fbe212a6d26222022f9153e813dd7a5f0691496e3f4ec05200268cd93b9339bed98f11322bd931f00c08437731165911ab6665e7539f70861cc9c4d6011c922299a79d5f566c3ddad50d8d2719e03ee0fa5f40861101dcb8ead88ab799db32a8451983b3ae4d87aa9446ffcc5b1575fecd8d2b2be9ae346dd78e1edb15d8bd9f1d6fdd7fd2c9eb1af8333de7250c571ba04f6d7cd3e01aaf533fd006acba9a2c958679a0000000049454e44ae426082</data>
     </image>
     <image name="image7">
-        <data format="XPM.GZ" length="767">789c7d92cd8ac2301446f77d8ad0bb2bc3682b1d0a838fa0b81c185c24374de2c211fc5988f8eee6de185b639cefb690d32f075ad249257e560b514d8ac3511e3728d0c9bda8f469bb3dffaee797a26c1ae1af7a2aeaf2a3283f058ae5eeafa735f8354c398436623723340f548448d8cdba3a6c568caa6b43db13628b0db6849a51e3176a4249687c82eb221ac3af94cda8014adaf0439052c25073f328c6157f2e2854be01be791d1b02dddf872936a810740cd3d8199238cf33769e27758c8d933ad685586753c7b1e18ca32aef50f5c6f155d6e10d39c7bd753839872738f7f38157279eef60d0fcf3875cbf8b1bf23fc9c6</data>
+        <data format="PNG" length="339">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b0000011a49444154789cb5954d6e83301085bf412c7c1f76def64a61d5445515ba72af55ef721f2f90a60b0875fc1348429f841eb667de3c8f6510ef3dff81f6dea2b556d339efbd6c1196abe392088046b352912c156bb68a96c65794f2055000f7e508638f691dfd7bbf08c52ee371293e762e80a641177f218c01d39a2a77b6cbc463e1065816c3d82fee4c6bee722def8a760afeab0c3d9dedcacd4c90e665c271e5787b8f708a26adfc2ca71040cf9f75f1d38703026056f8747378598f732701d563b5cf2203aac7ecf2643dce7be76681efcca9ea611e338b0feafd9b6c763c251e2a9ec3f2168befe63815dfc571a9e8cb8e4b072b32ecd1e3125e745ce2690701e60fbdd69fb33e0a702a6bff3c6b7f74dbcdbbe555e167f10bb7df841bc085536e0000000049454e44ae426082</data>
     </image>
     <image name="image8">
-        <data format="XPM.GZ" length="334">789cd3d7528808f055d0d2e72a2e492cc94c5648ce482c52d04a29cdcdad8c8eb5ade65232345330345630523054d2e15252564856f0cbcf4b05b1f5806c6503300073d1008962ca7030f062e4f9a3d69a0b009af43aaa</data>
+        <data format="PNG" length="106">89504e470d0a1a0a0000000d49484452000000100000000d0806000000a0bbee240000003149444154789c63646060f8cf400160a24433550c6041e61c3b768c91184d565656706f0fbc17460d6060606418f2291100e23a0619d3e2d9940000000049454e44ae426082</data>
     </image>
 </images>
 <connections>
@@ -695,6 +753,18 @@
         <receiver>QmitkMainTemplate</receiver>
         <slot>m_ShowPlanesCheckBox_clicked()</slot>
     </connection>
+    <connection>
+        <sender>ColumnWidget3n4</sender>
+        <signal>activated()</signal>
+        <receiver>QmitkMainTemplate</receiver>
+        <slot>changeToColumnWidget3n4Layout()</slot>
+    </connection>
+    <connection>
+        <sender>RowWidget3n4</sender>
+        <signal>activated()</signal>
+        <receiver>QmitkMainTemplate</receiver>
+        <slot>changeToRowWidget3n4Layout()</slot>
+    </connection>
 </connections>
 <includes>
     <include location="global" impldecl="in declaration">mitkDataTree.h</include>
@@ -756,6 +826,8 @@
     <slot>changeToWidget3Layout()</slot>
     <slot>FullScreenMode( bool fullscreen )</slot>
     <slot>m_ShowPlanesCheckBox_clicked()</slot>
+    <slot>changeToColumnWidget3n4Layout()</slot>
+    <slot>changeToRowWidget3n4Layout()</slot>
 </slots>
 <functions>
     <function>fileOpen( const char * fileName )</function>

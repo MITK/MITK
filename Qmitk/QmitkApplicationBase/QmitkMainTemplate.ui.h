@@ -576,3 +576,14 @@ QmitkFctMediator* QmitkMainTemplate::getFctMediator()
 {
     return qfm;
 }
+
+void QmitkMainTemplate::changeToColumnWidget3n4Layout()
+{
+    mitkMultiWidget->changeLayoutToColumnWidget3And4();
+}
+
+
+void QmitkMainTemplate::changeToRowWidget3n4Layout()
+{
+    mitkMultiWidget->changeLayoutToRowWidget3And4();
+}

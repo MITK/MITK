@@ -6,8 +6,11 @@
 2D-widget as in (1), it won't work, although all messages come through and Render is called. Seems to be 
 a OpenGL-context problem. It will work, if in (3) another 2D widget is used
 
-@bug switching to QmitkRegistration sometimes takes a long time, probably because of a resize of an 
-invisible OpenGL widget.
+@bug switching from QmitkRegistration to another functionality sometimes takes a long time, probably because of a resize of an invisible OpenGL widget.
 
+@bug after the removal of all previously defined points in the mapped view (coronary mapping fucntionality) 
+the application crashes.
+
+@bug functionalities influence each other because they all work on the same data, i.e. when changing colors of the 2D planes in one functionality it will be the same color in the other functionalities and so on. Also all data sets added to the tree are visible in all functionlities
  
 */

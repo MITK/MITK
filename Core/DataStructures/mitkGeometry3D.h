@@ -97,7 +97,19 @@ public:
   //##@brief executes affine operations (translate, rotate, scale)
   void ExecuteOperation(Operation* operation);
 
-  mitk::ScalarType* GetScale();
+  //mitk::ScalarType* GetScale();
+  
+  itkSetVectorMacro(Origin, ScalarType, 3);
+  itkSetVectorMacro(Position, ScalarType, 3);
+  itkSetVectorMacro(Orientation, ScalarType, 3);
+  itkSetVectorMacro(Scale, ScalarType, 3);
+  itkSetVectorMacro(Center, ScalarType, 3);  
+
+  itkGetVectorMacro(Origin, const ScalarType, 3);
+  itkGetVectorMacro(Position, const ScalarType, 3);
+  itkGetVectorMacro(Orientation, const ScalarType, 3);
+  itkGetVectorMacro(Scale, const ScalarType, 3);
+  itkGetVectorMacro(Center, const ScalarType, 3);  
 protected:
   Geometry3D();
 

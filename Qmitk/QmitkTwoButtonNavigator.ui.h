@@ -34,7 +34,7 @@ void QmitkTwoButtonNavigator::Refetch()
     m_MinValue = 0;
     m_MaxValue = m_Stepper->GetSteps()-1;
     m_SliceNumber = m_Stepper->GetPos();
-       
+    m_SliceNumberLabel->setText( QString("%1").arg(m_SliceNumber) );       
     m_InRefetch=false;
   }
 }

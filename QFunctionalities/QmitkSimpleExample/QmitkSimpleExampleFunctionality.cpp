@@ -133,7 +133,7 @@ void QmitkSimpleExampleFunctionality::activated()
 
   if(m_NavigatorsInitialized)
   {
-    multiWidget->InitializeStandardViews(NULL);
+    multiWidget->ReInitializeStandardViews();
   }
 }
 

@@ -17,7 +17,7 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 #include "mitkInteractionDebugger.h"
-#include <itkmacro.h>
+#include <itkMacro.h>
 
 const char* mitk::InteractionDebugger::m_CurrentSender = "";
 bool mitk::InteractionDebugger::m_Active = false;

@@ -546,7 +546,7 @@ void mitk::Geometry3D::SetBaseGeometry(mitk::Geometry3D* base)
 
 mitk::Geometry3D::Pointer mitk::Geometry3D::Clone()
 {
-  Geometry3D::Pointer newGeometry = new Geometry3D( *this);
+  mitk::Geometry3D::Pointer newGeometry = new Geometry3D( *this);
   newGeometry->GetTransform()->SetMatrix(m_Transform->GetMatrix());
   //newGeometry->GetRelativeTransform()->SetMatrix(m_RelativeTransform->GetMatrix());
   return newGeometry;

@@ -186,7 +186,7 @@ public:
   
   vtkTransform* GetTransform();  
   void SetBaseGeometry(mitk::Geometry3D* base);  
-  Geometry3D::Pointer Clone();
+  mitk::Geometry3D::Pointer Clone();
 protected:
   //##ModelId=3E3453C703AF
   virtual void Initialize(unsigned int dimension, const unsigned int* dimensions);

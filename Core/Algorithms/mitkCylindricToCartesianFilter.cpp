@@ -377,12 +377,19 @@ void mitk::CylindricToCartesianFilter::GenerateData()
 	pic_transformed->n[2] = output->GetDimension(2);
 	pic_transformed->data=malloc(_ipPicSize(pic_transformed));
 
-	unsigned int t, n=0;
-	for(n=0;n<1;++n)//output->GetNumberOfChannels();++n)
+	int n, nmax;
+	int t, tmax;
+
+	t=output->GetRequestedRegion().GetIndex(3);
+	n=output->GetRequestedRegion().GetIndex(4);
+
+	tmax=t+output->GetRequestedRegion().GetSize(3);
+	nmax=n+output->GetRequestedRegion().GetSize(4);
+	for(;n<nmax;++n)//output->GetNumberOfChannels();++n)
 	{
 		timeSelector->SetChannelNr(n);
 
-		for(t=0;t<output->GetDimension(3);++t)
+		for(t=0;t<tmax;++t)
 		{
 			timeSelector->SetTimeNr(t);
 
@@ -406,6 +413,7 @@ void mitk::CylindricToCartesianFilter::GenerateData()
 			output->SetPicVolume(pic_transformed, t, n);
 		}
 	}
+	//ipPicPut("outzzzzzzzz.pic",pic_transformed);	
 	ipPicFree(pic_transformed);
 }
 

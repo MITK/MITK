@@ -348,7 +348,7 @@ void mitk::CylindricToCartesianFilter::GenerateOutputInformation()
   if (pointProp.IsNotNull() )
   {
     itk::Point<int, 3> tp = pointProp->GetValue();
-    tp[2] = (int)(tmpDimensions[2]-tp[1] * scale);
+    tp[2] = (int)(tmpDimensions[2]-tp[1] * scale-1);
     tp[0] = tmpDimensions[0]/2;
     tp[1] = tmpDimensions[0]/2;
     mitk::Point3iProperty::Pointer pointProp = new mitk::Point3iProperty(tp);
@@ -407,10 +407,10 @@ void mitk::CylindricToCartesianFilter::GenerateData()
     a=b=0;
     mitk::FloatProperty::Pointer prop;
 
-    prop = dynamic_cast<mitk::FloatProperty*>(input->GetProperty("SECTOR LIMITING LINE OFFSET").GetPointer());
+    prop = dynamic_cast<mitk::FloatProperty*>(input->GetProperty("SECTOR LIMITING LINE SLOPE").GetPointer());
     if (prop.IsNotNull() )
       a = prop->GetValue();
-    prop = dynamic_cast<mitk::FloatProperty*>(input->GetProperty("SECTOR LIMITING LINE SLOPE").GetPointer());
+    prop = dynamic_cast<mitk::FloatProperty*>(input->GetProperty("SECTOR LIMITING LINE OFFSET").GetPointer());
     if (prop.IsNotNull() )
       b = prop->GetValue();
 

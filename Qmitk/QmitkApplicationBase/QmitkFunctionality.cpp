@@ -55,7 +55,7 @@ void QmitkFunctionality::setAvailability(bool available)
 
 void QmitkFunctionality::setDataTree(mitk::DataTreeIteratorBase* it)
 {
-  if(m_DataTreeIterator!=NULL)
+  if(m_DataTreeIterator.IsNotNull()! )
   {
     m_DataTreeIterator->GetTree()->RemoveObserver(m_ObserverTag);
   }

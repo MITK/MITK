@@ -98,13 +98,33 @@ void mitk::MeshMapper2D::Paint(mitk::BaseRenderer * renderer)
           vert.y=8;
           glColor3f(selectedColor[0],selectedColor[1],selectedColor[2]);//red
 
-          //a diamond around the point
-          glBegin (GL_LINE_LOOP);
-            tmp=pt2d-horz;      glVertex2fv(&tmp.x);
-            tmp=pt2d+vert;      glVertex2fv(&tmp.x);
-            tmp=pt2d+horz;			glVertex2fv(&tmp.x);
-            tmp=pt2d-vert;      glVertex2fv(&tmp.x);
-          glEnd ();
+          switch (dataIt->Value().pointSpec)
+	        {
+          case PTSTART:
+            {
+              //a quad
+              glBegin (GL_LINE_LOOP);
+                tmp=pt2d-horz+vert;      glVertex2fv(&tmp.x);
+                tmp=pt2d+horz+vert;      glVertex2fv(&tmp.x);
+                tmp=pt2d+horz-vert;      glVertex2fv(&tmp.x);
+                tmp=pt2d-horz-vert;      glVertex2fv(&tmp.x);
+              glEnd ();
+            }
+            break;
+          case PTUNDEFINED:
+            {
+              //a diamond around the point
+              glBegin (GL_LINE_LOOP);
+                tmp=pt2d-horz;      glVertex2fv(&tmp.x);
+                tmp=pt2d+vert;      glVertex2fv(&tmp.x);
+                tmp=pt2d+horz;			glVertex2fv(&tmp.x);
+                tmp=pt2d-vert;      glVertex2fv(&tmp.x);
+              glEnd ();
+            }
+            break;
+          default:
+            NULL;
+          }//switch
 
           //the actual point
           glBegin (GL_POINTS);
@@ -114,14 +134,30 @@ void mitk::MeshMapper2D::Paint(mitk::BaseRenderer * renderer)
         else //if not selected
         {
           glColor3f(unselectedColor[0],unselectedColor[1],unselectedColor[2]);
-					//drawing crosses
-          glBegin (GL_LINES);
-              tmp=pt2d-horz;      glVertex2fv(&tmp.x);
-              tmp=pt2d+horz;      glVertex2fv(&tmp.x);
-              tmp=pt2d-vert;      glVertex2fv(&tmp.x);
-              tmp=pt2d+vert;      glVertex2fv(&tmp.x);
-          glEnd ();
-        }
+          switch (dataIt->Value().pointSpec)
+	        {
+          case PTSTART:
+            {
+              //a quad
+              glBegin (GL_LINE_LOOP);
+                tmp=pt2d-horz+vert;      glVertex2fv(&tmp.x);
+                tmp=pt2d+horz+vert;      glVertex2fv(&tmp.x);
+                tmp=pt2d+horz-vert;      glVertex2fv(&tmp.x);
+                tmp=pt2d-horz-vert;      glVertex2fv(&tmp.x);
+              glEnd ();
+            }
+          case PTUNDEFINED:
+            {
+              //drawing crosses
+              glBegin (GL_LINES);
+                  tmp=pt2d-horz;      glVertex2fv(&tmp.x);
+                  tmp=pt2d+horz;      glVertex2fv(&tmp.x);
+                  tmp=pt2d-vert;      glVertex2fv(&tmp.x);
+                  tmp=pt2d+vert;      glVertex2fv(&tmp.x);
+              glEnd ();
+            }
+          }//switch
+        }//else
       }
       ++it;
       ++dataIt;
@@ -306,6 +342,11 @@ void mitk::MeshMapper2D::Paint(mitk::BaseRenderer * renderer)
           }
         }
       }//if numOfPointsInCell>1
+      delete firstOfCell;
+      delete lastPoint;
+      lastPoint = NULL;
+      firstOfCell = NULL;
+      lastPointId = 0;
       ++cellIt;
       ++cellDataIt;
     }

@@ -128,7 +128,7 @@ public:
     void UnitsToMM(const mitk::Point3D &pt_units, mitk::Point3D &pt_mm, float t = 0) const;
 
     //##ModelId=3DCBC65C017C
-    const float *GetSpacing() const;
+    const float* GetSpacing() const;
 
     //##ModelId=3E144966003D
     const RegionType& GetLargestPossibleRegion() const 

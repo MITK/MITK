@@ -152,163 +152,163 @@ void mitk::ImageMapper2D::GenerateData(mitk::BaseRenderer *renderer)
 
   renderinfo.Squeeze();
 
-  if(input!=NULL)
+  if(input == NULL)
+    return;
+
+  const TimeSlicedGeometry* inputtimegeometry = dynamic_cast<const TimeSlicedGeometry*>(input->GetUpdatedGeometry());
+  if(( inputtimegeometry == NULL ) || ( inputtimegeometry->GetTimeSteps() == 0 ) )
+    return;
+
+  iil4mitkPicImage* image;
+  image = new iil4mitkPicImage(512);
+  renderinfo.Set_iil4mitkImage(image);
+
+  ApplyProperties(renderer);
+
+  const Geometry2D* worldgeometry = renderer->GetCurrentWorldGeometry2D();
+
+  assert(worldgeometry!=NULL);
+
+  int timestep=0;
+  ScalarType time = worldgeometry->GetTimeBoundsInMS()[0];
+  if(time>-ScalarTypeNumericTraits::max())
+    timestep = inputtimegeometry->MSToTimeStep(time);
+
+  if(inputtimegeometry->IsValidTime(timestep)==false)
+    return;
+
+  vtkImageData* inputData = input->GetVtkImageData(timestep);
+  if(inputData==NULL)
+    return;
+
+  float spacing[3];
+  inputData->GetSpacing(spacing);
+
+  //how many pixels we really want to sample: width x height pixels
+  mitk::ScalarType width, height;
+  //how big the area is in physical coordinates: widthInMM x heightInMM pixels
+  mitk::ScalarType widthInMM, heightInMM;
+
+  //where we want to sample
+  Point3D origin;
+  Vector3D right, bottom, normal;
+
+  if(dynamic_cast<const PlaneGeometry *>(worldgeometry)!=NULL)
   {
-    iil4mitkPicImage* image;
-    image = new iil4mitkPicImage(512);
-    renderinfo.Set_iil4mitkImage(image);
+    //let's use the values of worldgeometry->GetExtent(0) and worldgeometry->GetExtent(1) for that purpose
+    //maybe it is useful to add here a more sophisticated rule that depends on the actual size of the current display, so not to
+    //sample 1000x1000 pixels for a display of 10x10 pixels
+    width =worldgeometry->GetExtent(0); widthInMM = worldgeometry->GetExtentInMM(0);
+    height=worldgeometry->GetExtent(1); heightInMM= worldgeometry->GetExtentInMM(1);
 
-    ApplyProperties(renderer);
-    const TimeSlicedGeometry* inputtimegeometry = dynamic_cast<const TimeSlicedGeometry*>(input->GetUpdatedGeometry());
+    const PlaneGeometry *planeview=dynamic_cast<const PlaneGeometry *>(worldgeometry);  
+    origin = planeview->GetOrigin();
+    right  = planeview->GetAxisVector(0); right.Normalize();
+    bottom = planeview->GetAxisVector(1); bottom.Normalize();
+    normal = planeview->GetNormal();      normal.Normalize();
 
-    assert(inputtimegeometry!=NULL);
-
-    const Geometry2D* worldgeometry = renderer->GetCurrentWorldGeometry2D();
-
-    assert(worldgeometry!=NULL);
-
-    int timestep=0;
-    ScalarType time = worldgeometry->GetTimeBoundsInMS()[0];
-    if(time>-ScalarTypeNumericTraits::max())
-      timestep = inputtimegeometry->MSToTimeStep(time);
-
-    if(inputtimegeometry->IsValidTime(timestep)==false)
-      return;
-
-    vtkImageData* inputData = input->GetVtkImageData(timestep);
-    if(inputData==NULL)
-      return;
-
-    float spacing[3];
-    inputData->GetSpacing(spacing);
-
-    //how many pixels we really want to sample: width x height pixels
-    mitk::ScalarType width, height;
-    //how big the area is in physical coordinates: widthInMM x heightInMM pixels
-    mitk::ScalarType widthInMM, heightInMM;
-
-    //where we want to sample
-    Point3D origin;
-    Vector3D right, bottom, normal;
-
-    if(dynamic_cast<const PlaneGeometry *>(worldgeometry)!=NULL)
+    vtkTransform * vtktransform = GetDataTreeNode()->GetVtkTransform();
+          
+    vtkLinearTransform * inversetransform = vtktransform->GetLinearInverse();
+    m_Reslicer->SetResliceTransform(inversetransform); 
+    inputData->SetSpacing(1,1,1); //spacing already included in transform!
+  }
+  else
+  if(dynamic_cast<const AbstractTransformGeometry *>(worldgeometry)!=NULL)
+  {
+    const mitk::AbstractTransformGeometry* abstractGeometry = dynamic_cast<const AbstractTransformGeometry *>(worldgeometry);
+    if(abstractGeometry!=NULL)
     {
       //let's use the values of worldgeometry->GetExtent(0) and worldgeometry->GetExtent(1) for that purpose
       //maybe it is useful to add here a more sophisticated rule that depends on the actual size of the current display, so not to
       //sample 1000x1000 pixels for a display of 10x10 pixels
-      width =worldgeometry->GetExtent(0); widthInMM = worldgeometry->GetExtentInMM(0);
-      height=worldgeometry->GetExtent(1); heightInMM= worldgeometry->GetExtentInMM(1);
+      width =worldgeometry->GetParametricExtent(0); widthInMM = abstractGeometry->GetPlane()->GetExtentInMM(0);
+      height=worldgeometry->GetParametricExtent(1); heightInMM= abstractGeometry->GetPlane()->GetExtentInMM(1);
 
-      const PlaneGeometry *planeview=dynamic_cast<const PlaneGeometry *>(worldgeometry);  
-      origin = planeview->GetOrigin();
-      right  = planeview->GetAxisVector(0); right.Normalize();
-      bottom = planeview->GetAxisVector(1); bottom.Normalize();
-      normal = planeview->GetNormal();      normal.Normalize();
-
-      vtkTransform * vtktransform = GetDataTreeNode()->GetVtkTransform();
-           
-      vtkLinearTransform * inversetransform = vtktransform->GetLinearInverse();
-      m_Reslicer->SetResliceTransform(inversetransform); 
-      inputData->SetSpacing(1,1,1); //spacing already included in transform!
+      origin = abstractGeometry->GetPlane()->GetOrigin();
+      right  = abstractGeometry->GetPlane()->GetAxisVector(0); right.Normalize();
+      bottom = abstractGeometry->GetPlane()->GetAxisVector(1); bottom.Normalize();
+      normal = abstractGeometry->GetPlane()->GetNormal();      normal.Normalize();
     }
     else
-    if(dynamic_cast<const AbstractTransformGeometry *>(worldgeometry)!=NULL)
-    {
-      const mitk::AbstractTransformGeometry* abstractGeometry = dynamic_cast<const AbstractTransformGeometry *>(worldgeometry);
-      if(abstractGeometry!=NULL)
-      {
-        //let's use the values of worldgeometry->GetExtent(0) and worldgeometry->GetExtent(1) for that purpose
-        //maybe it is useful to add here a more sophisticated rule that depends on the actual size of the current display, so not to
-        //sample 1000x1000 pixels for a display of 10x10 pixels
-        width =worldgeometry->GetParametricExtent(0); widthInMM = abstractGeometry->GetPlane()->GetExtentInMM(0);
-        height=worldgeometry->GetParametricExtent(1); heightInMM= abstractGeometry->GetPlane()->GetExtentInMM(1);
+        return;
+    m_Reslicer->SetResliceTransform(abstractGeometry->GetVtkAbstractTransform());
+  }
+  else
+    return;
 
-        origin = abstractGeometry->GetPlane()->GetOrigin();
-        right  = abstractGeometry->GetPlane()->GetAxisVector(0); right.Normalize();
-        bottom = abstractGeometry->GetPlane()->GetAxisVector(1); bottom.Normalize();
-        normal = abstractGeometry->GetPlane()->GetNormal();      normal.Normalize();
-      }
-      else
-          return;
-      m_Reslicer->SetResliceTransform(abstractGeometry->GetVtkAbstractTransform());
-    }
-    else
-      return;
+  assert(normal.GetSquaredNorm()>0.1);
 
-    assert(normal.GetSquaredNorm()>0.1);
+  if((width<=1) && (height<=1))
+    return;
 
-    if((width<=1) && (height<=1))
-      return;
+  vtkMatrix4x4* geometry = vtkMatrix4x4::New();
+  geometry->Identity();
 
-    vtkMatrix4x4* geometry = vtkMatrix4x4::New();
-    geometry->Identity();
+  m_Reslicer->SetInput(inputData);
+  m_Reslicer->SetOutputDimensionality(2);
+  m_Reslicer->SetOutputOrigin(0,0,0);
 
-    m_Reslicer->SetInput(inputData);
-    m_Reslicer->SetOutputDimensionality(2);
-    m_Reslicer->SetOutputOrigin(0,0,0);
+  m_Reslicer->SetBackgroundLevel(-1024);
 
-    m_Reslicer->SetBackgroundLevel(-1024);
+  renderinfo.m_PixelsPerMM[0]= width/widthInMM;
+  renderinfo.m_PixelsPerMM[1]= height/heightInMM;
 
-    renderinfo.m_PixelsPerMM[0]= width/widthInMM;
-    renderinfo.m_PixelsPerMM[1]= height/heightInMM;
+  m_Reslicer->SetOutputSpacing(1.0/renderinfo.m_PixelsPerMM[0], 1.0/renderinfo.m_PixelsPerMM[1], 1.0);
+  m_Reslicer->SetOutputExtent(0, (int)width-1, 0, (int)height-1, 0, 1);
 
-    m_Reslicer->SetOutputSpacing(1.0/renderinfo.m_PixelsPerMM[0], 1.0/renderinfo.m_PixelsPerMM[1], 1.0);
-    m_Reslicer->SetOutputExtent(0, (int)width-1, 0, (int)height-1, 0, 1);
+  //calulate the originarray and the orientations for the reslice-filter
+  double originarray[3];
+  itk2vtk(origin, originarray);
 
-    //calulate the originarray and the orientations for the reslice-filter
-    double originarray[3];
-    itk2vtk(origin, originarray);
+  m_Reslicer->SetResliceAxes(geometry);
+  m_Reslicer->SetResliceAxesOrigin(originarray);
+  //        m_Reslicer->SetInterpolationModeToLinear();
+  double cosines[9];
 
-    m_Reslicer->SetResliceAxes(geometry);
-    m_Reslicer->SetResliceAxesOrigin(originarray);
-    //        m_Reslicer->SetInterpolationModeToLinear();
-    double cosines[9];
+  // direction of the X-axis of the sampled result
+  vnl2vtk(right.Get_vnl_vector(), cosines);
 
-    // direction of the X-axis of the sampled result
-    vnl2vtk(right.Get_vnl_vector(), cosines);
+  // direction of the Y-axis of the sampled result
+  vnl2vtk(bottom.Get_vnl_vector(), cosines+3);
 
-    // direction of the Y-axis of the sampled result
-    vnl2vtk(bottom.Get_vnl_vector(), cosines+3);
+  // normal of the plane
+  vnl2vtk(normal.Get_vnl_vector(), cosines+6);
 
-    // normal of the plane
-    vnl2vtk(normal.Get_vnl_vector(), cosines+6);
+  m_Reslicer->SetResliceAxesDirectionCosines(cosines);
 
-    m_Reslicer->SetResliceAxesDirectionCosines(cosines);
+  //do the reslicing
+  m_Reslicer->Update();
 
-    //do the reslicing
-    m_Reslicer->Update();
+  vtkImageData* vtkoutput = m_Reslicer->GetOutput();
 
-    vtkImageData* vtkoutput = m_Reslicer->GetOutput();
+  assert(vtkoutput);
 
-    assert(vtkoutput);
-
-    //	std::cout << vtkoutput <<std::endl;
-    ipPicDescriptor* pic = Pic2vtk::convert(vtkoutput);
+  //	std::cout << vtkoutput <<std::endl;
+  ipPicDescriptor* pic = Pic2vtk::convert(vtkoutput);
 //    ipPicPut("G:/home/boettger/tmp/mapperoutput.pic",pic);
-    assert(pic);
-    if(pic->dim==1)
-    {
-      pic->dim=2;
-      pic->n[1]=1;
-    }
-    assert(pic->dim == 2);
+  assert(pic);
+  if(pic->dim==1)
+  {
+    pic->dim=2;
+    pic->n[1]=1;
+  }
+  assert(pic->dim == 2);
 
-    if(renderinfo.m_Pic!=NULL)
-      ipPicFree(renderinfo.m_Pic);
-    renderinfo.m_Pic = pic;
+  if(renderinfo.m_Pic!=NULL)
+    ipPicFree(renderinfo.m_Pic);
+  renderinfo.m_Pic = pic;
 
-    //std::cout << "Pic dimensions:" << pic->dim << std::endl;
+  //std::cout << "Pic dimensions:" << pic->dim << std::endl;
 
 //   image->setImage(pic, iil4mitkImage::INTENSITY_ALPHA);
-	  image->setImage(pic, m_iil4mitkMode);
-    image->setInterpolation( false );
-    image->setRegion(0,0,pic->n[0],pic->n[1]);
+	image->setImage(pic, m_iil4mitkMode);
+  image->setInterpolation( false );
+  image->setRegion(0,0,pic->n[0],pic->n[1]);
 
-    renderinfo.m_LastUpdateTime.Modified();
+  renderinfo.m_LastUpdateTime.Modified();
 
-    inputData->SetSpacing(spacing);
-  }
-  return;
+  inputData->SetSpacing(spacing);
 }
 
 void mitk::ImageMapper2D::GenerateAllData()

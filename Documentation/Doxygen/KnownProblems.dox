@@ -16,6 +16,8 @@
 
 @bug 7:functionalities: the activated method is called twice - side effect when adding a state machine to GlobalInteraction in activated and removing it in deactivated one statemachine will remain. By the way, the same state machine pointer can be added more than once shouldn't this be impossible??? -->quickimplement, so has to be replaced
 
+@bug 8:mapped view in coronary mapping is a 2D view. Thus it is possible to interact like the usual views. The bug causes the interaction to operate strange! Selection of points in buggy!
+
 @todo 1: derive Mapper from BaseProcess or ProcessObject instead of ImageSource
 @todo 2: remove Geometry2DData; derive Geometry3D from BaseData; derive a class StackedGeometry from Geometry3D, which contains Geometry2D's; derive Geometry2D from Geometry3D.
 @todo 3: derive DataTreeNode from DataObject instead of BaseData, since otherwise we have duplicated Geometry information.

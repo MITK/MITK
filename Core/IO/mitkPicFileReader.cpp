@@ -137,7 +137,7 @@ void mitk::PicFileReader::GenerateData()
             ipPicFree(slice);
         }
 
-        output->SetPicVolume(pic);
+        output->SetPicChannel(pic);
     }
     else
     {

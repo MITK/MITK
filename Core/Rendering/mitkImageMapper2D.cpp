@@ -166,7 +166,6 @@ void mitk::ImageMapper2D::GenerateData(mitk::BaseRenderer *renderer)
     if(input.IsNotNull())
     {
         vtkImageData* inputData = input->GetVtkImageData();
-
         const PlaneView* planeview=NULL;
 
         const Geometry2D* worldgeometry = renderer->GetWorldGeometry();
@@ -199,11 +198,13 @@ void mitk::ImageMapper2D::GenerateData(mitk::BaseRenderer *renderer)
 
         m_Reslicer->SetBackgroundLevel(-1024);
 
-
-        renderinfo.m_PixelsPerMM.set(planeview->getLengthOfOrientation1()/worldgeometry->GetWidthInUnits(), planeview->getLengthOfOrientation2()/worldgeometry->GetHeightInUnits());
+        int width, height;
+        width=worldgeometry->GetWidthInUnits();
+        height=worldgeometry->GetHeightInUnits();
+        renderinfo.m_PixelsPerMM.set(planeview->getLengthOfOrientation1()/width, planeview->getLengthOfOrientation2()/height);
 
         m_Reslicer->SetOutputSpacing(renderinfo.m_PixelsPerMM.x, renderinfo.m_PixelsPerMM.y, 1.0);
-        m_Reslicer->SetOutputExtent(0.0, worldgeometry->GetWidthInUnits()-1, 0.0, worldgeometry->GetHeightInUnits()-1, 0.0, 1.0);
+        m_Reslicer->SetOutputExtent(0.0, width-1, 0.0, height-1, 0.0, 1.0);
 
         double origin[3];
         origin[0]=planeview->point.x;

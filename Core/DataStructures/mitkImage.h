@@ -50,40 +50,85 @@ class Image : public SlicedData
     const mitk::PixelType& GetType(int n = 0) const;
 
     //##ModelId=3DCBC5AA0112
+    //## @brief Get dimension of the image
+    //##
     unsigned int GetDimension() const;
 
     //##ModelId=3DCBC6040068
+    //## @brief Get the size of dimension @a i (e.g., i=0 results in the number of pixels in x-direction).
+    //##
+    //## @sa GetDimensions()
     unsigned int GetDimension(int i) const;
 
     //##ModelId=3E0B494802D6
+    //## @brief Get the data vector of the complete image, i.e., of all channels linked together.
+    //##
+    //## If you only want to access a slice, volume at a specific time or single channel
+    //## use one of the SubImageSelector classes.
     virtual void* GetData();
 
     //##ModelId=3DCBEF2902C6
-    virtual vtkImageData* GetVtkImageData();
+    //##Documentation
+    //## @brief Get a volume at a specific time @a t of channel @a n as a vtkImageData.
+    virtual vtkImageData* GetVtkImageData(int t = 0, int n = 0);
 
     //##ModelId=3DCBE2B802E4
+    //##Documentation
+    //## @brief Get the complete image, i.e., all channels linked together, as a @a ipPicDescriptor.
+    //##
+    //## If you only want to access a slice, volume at a specific time or single channel
+    //## use one of the SubImageSelector classes.
     virtual ipPicDescriptor* GetPic();
 
 	//##ModelId=3E1012990305
+    //##Documentation
+    //## @brief Check whether slice @a s at time @a t in channel @a n is set
     virtual bool IsSliceSet(int s = 0, int t = 0, int n = 0) const;
 
     //##ModelId=3E10139001BF
+    //##Documentation
+    //## @brief Check whether volume at time @a t in channel @a n is set
     virtual bool IsVolumeSet(int t = 0, int n = 0) const;
 
     //##ModelId=3E1550E700E2
+    //##Documentation
+    //## @brief Check whether the channel @a n is set
     virtual bool IsChannelSet(int n = 0) const;
   
     //##ModelId=3E10148003D7
+    //##Documentation
+    //## @brief Set @a data as slice @a s at time @a t in channel @a n. It is in
+    //## the responsibility of the caller to ensure that the data vector @a data 
+    //## is really a slice (at least is not smaller than a slice), since there is 
+    //## no chance to check this.
+    //## 
+    //## @sa SetPicSlice
     virtual bool SetSlice(void *data, int s = 0, int t = 0, int n = 0);
 
     //##ModelId=3E1014A00211
+    //##Documentation
+    //## @brief Set @a data as volume at time @a t in channel @a n. It is in
+    //## the responsibility of the caller to ensure that the data vector @a data 
+    //## is really a volume (at least is not smaller than a volume), since there is 
+    //## no chance to check this.
+    //## 
+    //## @sa SetPicVolume
     virtual bool SetVolume(void *data, int t = 0, int n = 0);
+
+    //##Documentation
+    //## @brief Set @a data in channel @a n. It is in
+    //## the responsibility of the caller to ensure that the data vector @a data 
+    //## is really a channel (at least is not smaller than a channel), since there is 
+    //## no chance to check this.
+    //## 
+    //## @sa SetPicChannel
+    virtual bool SetChannel(void *data, int n = 0);
 
     //##ModelId=3E1027F8023D
     //##Documentation
-    //## set @a pic as slice @a s at time @a t in channel @a n. The
-    //## corresponding @ Geomety2D is updated according to the information
-    //## provided in the tags of @a pic.
+    //## @brief Set @a pic as slice @a s at time @a t in channel @a n. 
+    //## @todo The corresponding @a Geomety3D and depending @a Geometry2D entries 
+    //## are updated according to the information provided in the tags of @a pic.
     //## @return @a false : dimensions and/or data-type of @a pic does not
     //## comply with image 
     //## @a true success
@@ -92,13 +137,23 @@ class Image : public SlicedData
 
     //##ModelId=3E102818024D
     //##Documentation
-    //## set @a pic as volume at time @a t in channel @a n. The corresponding
-    //## @a Geomety3D and depending @a Geometry2D entries are updated according
-    //## to the information provided in the tags of @a pic.
+    //## @brief Set @a pic as volume at time @a t in channel @a n.
+    //## @todo The corresponding @a Geomety3D and depending @a Geometry2D entries 
+    //## are updated according to the information provided in the tags of @a pic.
     //## @return @a false : dimensions and/or data-type of @a pic does not
     //## comply with image 
     //## @a true success
     virtual bool SetPicVolume(ipPicDescriptor *pic, int t = 0, int n = 0);
+
+    //##Documentation
+    //## @brief Set @a pic in channel @a n. 
+    //## @todo The corresponding @a Geomety3D and depending @a Geometry2D entries 
+    //## are updated according to the information provided in the tags of @a pic.
+    //## @return @a false : dimensions and/or data-type of @a pic does not
+    //## comply with image 
+    //## @a true success
+    virtual bool SetPicChannel(ipPicDescriptor *pic, int n = 0);
+
     //##ModelId=3E102AE9004B
     //##Documentation
     //## initialize new (or re-initialize) image
@@ -148,17 +203,31 @@ class Image : public SlicedData
 	};
   
 	//##ModelId=3E155CF000F6
+    //##Documentation
+    //## @brief Check whether slice @a s at time @a t in channel @a n is valid, i.e., 
+    //## is (or can be) inside of the image
     virtual bool IsValidSlice(int s = 0, int t = 0, int n = 0) const;
 
-
     //##ModelId=3E155D2501A7
+    //##Documentation
+    //## @brief Check whether volume at time @a t in channel @a n is valid, i.e., 
+    //## is (or can be) inside of the image
     virtual bool IsValidVolume(int t = 0, int n = 0) const;
+
     //##ModelId=3E157C53030B
+    //##Documentation
+    //## @brief Check whether the channel @a n is valid, i.e., 
+    //## is (or can be) inside of the image
     virtual bool IsValidChannel(int n = 0) const;
 
     //##ModelId=3E19EA110396
+    //##Documentation
+    //## @brief Check whether the image has been initialize, i.e., at least the header has to be set
 	virtual bool IsInitialized() const;
     //##ModelId=3E1A11530384
+    //## @brief Get the sizes of all dimensions as an integer-array.
+    //##
+    //## @sa GetDimension(int i);
     unsigned int* GetDimensions() const;
 
     //##ModelId=3ED91D060027
@@ -193,23 +262,24 @@ class Image : public SlicedData
     //##ModelId=3E155C940248
     int GetSliceIndex(int s = 0, int t = 0, int n = 0) const;
 
-
     //##ModelId=3E155C76012D
     int GetVolumeIndex(int t = 0, int n = 0) const;
+
     //##ModelId=3E155E7A0374
     void ComputeOffsetTable();
+
     //##ModelId=3E1569310328
     virtual mitk::ImageDataItem::Pointer AllocateSliceData(int s = 0, int t = 0, int n = 0);
-
 
     //##ModelId=3E15694500EC
     virtual mitk::ImageDataItem::Pointer AllocateVolumeData(int t = 0, int n = 0);
 
     //##ModelId=3E1569500322
-    //##ModelId=3E1569500322
     virtual mitk::ImageDataItem::Pointer AllocateChannelData(int n = 0);
+
     //##ModelId=3E15F6C60103
     Image();
+
     //##ModelId=3E15F6CA014F
     ~Image();
 

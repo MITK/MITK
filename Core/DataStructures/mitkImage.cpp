@@ -35,7 +35,7 @@ void* mitk::Image::GetData()
 }
 
 //##ModelId=3DCBEF2902C6
-vtkImageData* mitk::Image::GetVtkImageData()
+vtkImageData* mitk::Image::GetVtkImageData(int t, int n)
 {
 	if(m_Initialized==false)
 	{
@@ -43,12 +43,12 @@ vtkImageData* mitk::Image::GetVtkImageData()
 			return NULL;
 		GetSource()->UpdateOutputInformation();
 	}
-	m_CompleteData=GetChannelData();
-	if(m_CompleteData.IsNull()) 
+    mitk::ImageDataItem::Pointer volume=GetVolumeData(t, n);
+	if(volume.IsNull()) 
 		return NULL;
 	float* spacing = const_cast<float*>(GetGeometry()->GetSpacing());
-	m_CompleteData->GetVtkImageData()->SetSpacing(spacing);
-	return m_CompleteData->GetVtkImageData();
+	volume->GetVtkImageData()->SetSpacing(spacing);
+	return volume->GetVtkImageData();
 }
 
 //##ModelId=3DCBE2B802E4
@@ -395,13 +395,38 @@ bool mitk::Image::SetVolume(void *data, int t, int n)
 	return true;
 }
 
+bool mitk::Image::SetChannel(void *data, int n)
+{
+	if(IsValidChannel(n)==false) return false;
+	ImageDataItemPointer ch;
+	if(IsChannelSet(n))
+	{
+		ch=GetChannelData(n);
+		memcpy(ch->GetData(), ch, m_OffsetTable[4]*m_PixelType.GetBpe()/8);
+        ch->Modified();
+		ch->SetComplete(true);
+		//we have changed the data: call Modified()! 
+		Modified();
+	}
+	else
+	{
+		ch=AllocateChannelData(n);
+		if(ch.IsNull()) return false;
+		memcpy(ch->GetData(), data, m_OffsetTable[4]*m_PixelType.GetBpe()/8);
+		ch->SetComplete(true);
+		//we just added a missing Channel, which is not regarded as modification.
+		//Therefore, we do not call Modified()!
+	}
+	return true;
+}
+
 //##ModelId=3E1027F8023D
 bool mitk::Image::SetPicSlice(ipPicDescriptor *pic, int s, int t, int n)
 {
 	if(pic==NULL) return false;
 	if(pic->dim!=2) return false;
 	if((pic->n[0]!=m_Dimensions[0]) || (pic->n[1]!=m_Dimensions[1])) return false;
-	return SetSlice(pic->data,s,t,n); //FIXME: add geometry!
+	return SetSlice(pic->data,s,t,n); //@todo: add geometry!
 }
 
 //##ModelId=3E102818024D
@@ -411,7 +436,20 @@ bool mitk::Image::SetPicVolume(ipPicDescriptor *pic, int t, int n)
     if((pic->dim==2) && ((m_Dimension==2) || ((m_Dimension>2) && (m_Dimensions[2]==1)))) return SetPicSlice(pic, 0, t, n);
 	if(pic->dim!=3) return false;
 	if((pic->n[0]!=m_Dimensions[0]) || (pic->n[1]!=m_Dimensions[1]) || (pic->n[2]!=m_Dimensions[2])) return false;
-	return SetVolume(pic->data,t,n); //FIXME: check dim; add geometry!
+	return SetVolume(pic->data,t,n); //@todo: add geometry!
+}
+
+bool mitk::Image::SetPicChannel(ipPicDescriptor *pic, int n)
+{
+	if(pic==NULL) return false;
+    if(pic->dim<=3) return SetPicVolume(pic, 0, n);
+	if(pic->dim!=m_Dimension) return false;
+    int i;
+    for(i=0;i<m_Dimension; ++i)
+    {
+	    if(pic->n[i]!=m_Dimensions[i]) return false;
+    }
+	return SetChannel(pic->data,n); //@todo: add geometry!
 }
 
 //##ModelId=3E102AE9004B

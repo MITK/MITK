@@ -43,7 +43,7 @@ void (*VtkQRenderWindowInteractor::ClassExitMethodArgDelete)(void *) = (void (*)
 //// Construct object so that light follows camera motion.
 //##ModelId=3E6D600F0164
 //##ModelId=3E6D600F0177
-VtkQRenderWindowInteractor::VtkQRenderWindowInteractor() : m_MitkRenderer(NULL)
+VtkQRenderWindowInteractor::VtkQRenderWindowInteractor() 
 {
     //static int timerId           = 1;
     //this->WindowId           = 0;

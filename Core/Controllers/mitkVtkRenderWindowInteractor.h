@@ -17,6 +17,7 @@ class VtkRenderWindowInteractor : public ::vtkRenderWindowInteractor
 {
   mitk::BaseRenderer::Pointer m_MitkRenderer;
 public:
+  VtkRenderWindowInteractor() : m_MitkRenderer(NULL){};
   itkTypeMacro(VtkRenderWindowInteractor,::vtkRenderWindowInteractor);
 
   itkSetObjectMacro(MitkRenderer, mitk::BaseRenderer);

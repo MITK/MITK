@@ -28,9 +28,6 @@ public:
 
   itkTypeMacro(VtkQRenderWindowInteractor,vtkRenderWindowInteractor);
 
-  itkSetObjectMacro(MitkRenderer, mitk::BaseRenderer);
-  itkGetObjectMacro(MitkRenderer, mitk::BaseRenderer);
-
   //##ModelId=3E6D600F00F5
   //##Documentation
   //## Initialize the event handler
@@ -121,9 +118,6 @@ protected:
   //WNDPROC OldProc;
     //##ModelId=3E6D600F00B8
   int     InstallMessageProc;
-
-    //##ModelId=3E6D600F00B9
-  mitk::BaseRenderer::Pointer m_MitkRenderer;
 
     //##ModelId=3E6D600F00C2
   int     MouseInWindow;

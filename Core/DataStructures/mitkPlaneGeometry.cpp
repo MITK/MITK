@@ -152,9 +152,9 @@ void mitk::PlaneGeometry::InitializeStandardPlane(mitk::ScalarType width, mitk::
       }
       else
       {
-        FillVector3D(origin,   0,  height, zPosition+1);
-        FillVector3D(rightDV,  1,  0,      0          );
-        FillVector3D(bottomDV, 0,  -1,     0          );
+        FillVector3D(origin,   0,  height, zPosition);
+        FillVector3D(rightDV,  1,  0,      0        );
+        FillVector3D(bottomDV, 0,  -1,     0        );
       }
       normalDirection = 2;
       break;
@@ -167,9 +167,9 @@ void mitk::PlaneGeometry::InitializeStandardPlane(mitk::ScalarType width, mitk::
       }
       else
       {
-        FillVector3D(origin,   0, zPosition+1,  height);
-        FillVector3D(rightDV,  1, 0,            0     );
-        FillVector3D(bottomDV, 0, 0,           -1     );
+        FillVector3D(origin,   0, zPosition,  height);
+        FillVector3D(rightDV,  1, 0,          0     );
+        FillVector3D(bottomDV, 0, 0,         -1     );
       }
       normalDirection = 1;
       break;
@@ -182,9 +182,9 @@ void mitk::PlaneGeometry::InitializeStandardPlane(mitk::ScalarType width, mitk::
       }
       else
       {
-        FillVector3D(origin,   zPosition+1, 0,  height);
-        FillVector3D(rightDV,  0,           1,  0     );
-        FillVector3D(bottomDV, 0,           0, -1     );
+        FillVector3D(origin,   zPosition, 0,  height);
+        FillVector3D(rightDV,  0,         1,  0     );
+        FillVector3D(bottomDV, 0,         0, -1     );
       }
       normalDirection = 0;
       break;

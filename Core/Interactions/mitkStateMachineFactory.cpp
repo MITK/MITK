@@ -74,7 +74,7 @@ bool mitk::StateMachineFactory::LoadBehavior(std::string fileName)
      mitk::StatusBar::DisplayErrorText( "No appropriate statemachine found! Check string in constructor of interactor!" );
    }
   
-   delete stateMachineFactory;
+   stateMachineFactory->Delete();
    return true;
 }
 

@@ -510,7 +510,7 @@ bool mitk::EventMapper::LoadBehavior(std::string fileName)
      #endif
    }
 
-   delete eventMapper;
+   eventMapper->Delete();
    return true;
 }
 

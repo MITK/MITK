@@ -30,29 +30,29 @@ public:
   typedef mitk::ScalarType PixelType;
   typedef itk::DefaultDynamicMeshTraits<bool, 3, 3, mitk::ScalarType> MeshTraits;
   typedef itk::Mesh<PixelType, Dimension, MeshTraits> MeshType;  
-  typedef MeshType PointSetType;
+  typedef MeshType DataType;
 
-  typedef PointSetType::PointType PointType;
-  typedef PointSetType::PointsContainer PointsContainer;
-  typedef PointSetType::PointsContainerIterator PointsIterator;
-  typedef PointSetType::PointDataContainer PointDataContainer;
-  typedef PointSetType::PointDataContainerIterator PointDataIterator;
+  typedef DataType::PointType PointType;
+  typedef DataType::PointsContainer PointsContainer;
+  typedef DataType::PointsContainerIterator PointsIterator;
+  typedef DataType::PointDataContainer PointDataContainer;
+  typedef DataType::PointDataContainerIterator PointDataIterator;
   
 
   //##ModelId=3F0177E901BF
   //##Documentation
   //## @brief executes the given Operation
-	void ExecuteOperation(Operation* operation);
+	virtual void ExecuteOperation(Operation* operation);
 
   //##ModelId=3F0177E901C1
   //##Documentation
 	//## @brief returns the current size of the point-list
-	int GetSize();
+	virtual int GetSize();
 
   //##ModelId=3F0177E901CC
   //##Documentation
 	//## @brief returns the point-list with points and selected Information
-  const PointSetType::Pointer GetPointSet() const;
+  const DataType::Pointer GetPointSet() const;
 
   //##ModelId=3F0177E901CE
   //##Documentation
@@ -69,17 +69,17 @@ public:
 
   //##Documentation
 	//## @brief returns true if a point exists at this position
-  bool IndexExists(int position);
+  virtual bool IndexExists(int position);
 
   //##ModelId=3F0177E901DC
 	//##Documentation
 	//## @brief to get the state selected/unselected of the point on the position
-	bool GetSelectInfo(int position);
+	virtual bool GetSelectInfo(int position);
 
   //##ModelId=3F05B07B0147
   //##Documentation
 	//## @brief returns the number of selected points
-	const int GetNumberOfSelected();
+	virtual const int GetNumberOfSelected();
 
   //##ModelId=3F0177E901DE
 	//##Documentation
@@ -108,12 +108,10 @@ protected:
   //##ModelId=3F0177E901BE
 	virtual ~PointSet();
 
-private:
-
   //##ModelId=3F0177E90190
 	//##Documentation
-	//## @brief List of Points
-	PointSetType::Pointer m_PointSet;
+	//## @brief Data from ITK; List of Points; the object, the operations are ment for
+	DataType::Pointer m_ItkData;
 };
 
 } // namespace mitk

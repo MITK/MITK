@@ -20,6 +20,7 @@ See MITKCopyright.txt or http://www.mitk.org/ for details.
 #define MITKBOUNDINGOBJECTCUTTER_TXX
 
 #include "mitkStatusBar.h"
+#include "mitkImageToItkMultiplexer.h"
 
 //##Documentation
 //## @brief For internal within mitkBoundingObjectCutter.cpp and mitkBoundingObjectCutAndCast.txx only

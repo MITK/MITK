@@ -37,7 +37,7 @@ See MITKCopyright.txt or http://www.mitk.org/ for details.
 
 mitk::SurfaceToImageFilter::SurfaceToImageFilter()
 {
-
+  m_MakeOutputBinaryOn = false;
 }
 
 mitk::SurfaceToImageFilter::~SurfaceToImageFilter()
@@ -67,10 +67,7 @@ void mitk::SurfaceToImageFilter::GenerateData()
   transform->SetMatrix(GetImage()->GetGeometry()->GetVtkTransform()->GetMatrix());
   transform->Inverse();
   transform->PostMultiply();
-  //mitk::Vector3D spacing=GetImage()->GetSlicedGeometry()->GetSpacing();
-  //spacing*=0.5;
-  //transform->Translate(spacing[0],spacing[1],spacing[2]);
-  transform->Translate(0.5,0.5,0.5);
+  transform->Translate(0.5,0.5,0.5); /// warum????
   move->SetTransform(transform);
 
   polydata=move->GetOutput();
@@ -109,24 +106,35 @@ void mitk::SurfaceToImageFilter::GenerateData()
   stencil->SetInput( maths->GetOutput() );
   stencil->Update();
 
-  vtkImageThreshold * threshold = vtkImageThreshold::New();
-  threshold->SetInput( stencil->GetOutput() );
-  threshold->ThresholdByUpper(1);
-  threshold->ReplaceInOn();
-  threshold->ReplaceOutOn();
-  threshold->SetInValue(1);
-  threshold->SetOutValue(0);
-  threshold->Update();
+  if (m_MakeOutputBinaryOn)
+  {
+    vtkImageThreshold * threshold = vtkImageThreshold::New();
+    threshold->SetInput( stencil->GetOutput() );
+    threshold->ThresholdByUpper(1);
+    threshold->ReplaceInOn();
+    threshold->ReplaceOutOn();
+    threshold->SetInValue(1);
+    threshold->SetOutValue(0);
+    threshold->Update();
 
-  vtkImageCast * castFilter = vtkImageCast::New();
-  castFilter->SetOutputScalarTypeToUnsignedChar();
-  castFilter->SetInput(threshold->GetOutput() );
-  castFilter->Update();
+    vtkImageCast * castFilter = vtkImageCast::New();
+    castFilter->SetOutputScalarTypeToUnsignedChar();
+    castFilter->SetInput(threshold->GetOutput() );
+    castFilter->Update();
+
+    mitk::Image::Pointer output = this->GetOutput();
+    output->Initialize( castFilter->GetOutput() );
+    output->SetGeometry( static_cast<mitk::Geometry3D*>(GetImage()->GetGeometry()->Clone().GetPointer()) );
+    output->SetVolume( castFilter->GetOutput()->GetScalarPointer() );
+  }
+  else
+  {
+    mitk::Image::Pointer output = this->GetOutput();
+    output->Initialize( stencil->GetOutput() );
+    output->SetGeometry( static_cast<mitk::Geometry3D*>(GetImage()->GetGeometry()->Clone().GetPointer()) );
+    output->SetVolume( stencil->GetOutput()->GetScalarPointer() );
+  }
   
-  mitk::Image::Pointer output = this->GetOutput();
-  output->Initialize( castFilter->GetOutput() );
-  output->SetGeometry( static_cast<mitk::Geometry3D*>(GetImage()->GetGeometry()->Clone().GetPointer()) );
-  output->SetVolume( castFilter->GetOutput()->GetScalarPointer() );
 
 }
 

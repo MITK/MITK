@@ -35,8 +35,10 @@ namespace mitk {
  *
  * @brief Converts surface data to pixel data, one needs a surface and an image
  *
- * The resulting image as the same size as the input image with all voxels inside the 
- * surface set to one and all outside voxel set to zero.
+ * The resulting image has the same size as the input image. The image is cut using a vtkStencil
+ * User can decide if he wants to keep the original values or create a binary image 
+ * by setting MakeBinaryOutputOn (default is false). If set to true all voxels inside the 
+ * surface are set to one and all outside voxel are set to zero.
  * 
  * @ingroup SurfaceFilters
  * @ingroup Process
@@ -46,6 +48,10 @@ class SurfaceToImageFilter : public ImageSource
 public:
   mitkClassMacro(SurfaceToImageFilter, ImageSource);
   itkNewMacro(Self);
+
+  itkSetMacro(MakeOutputBinaryOn, bool);
+  itkGetMacro(MakeOutputBinaryOn, bool);
+
 
   virtual void GenerateOutputInformation();
 
@@ -65,6 +71,8 @@ protected:
 
   //##ModelId=3EF4A4A70363
   virtual ~SurfaceToImageFilter();
+
+  bool m_MakeOutputBinaryOn;
 
 };
 

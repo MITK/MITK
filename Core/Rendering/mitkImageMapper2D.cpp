@@ -32,7 +32,7 @@ mitk::ImageMapper2D::ImageMapper2D() : m_SliceSelector(NULL)
 //##ModelId=3E32DCF60043
 mitk::ImageMapper2D::~ImageMapper2D()
 {
-  //FIXME: durch die folgende Zeile sollte doch wohl der desctructor von RendererInfo aufgerufen werden. Das passiert aber nie. Deshalb wird bei der Programm-Beendung auch das iilImage und damit die textur nicht rechtzeitig freigegeben und das Programm crashed.
+  //@FIXME: durch die folgende Zeile sollte doch wohl der desctructor von RendererInfo aufgerufen werden. Das passiert aber nie. Deshalb wird bei der Programm-Beendung auch das iilImage und damit die textur nicht rechtzeitig freigegeben und das Programm crashed.
   m_RendererInfo.clear(); 
 }
 

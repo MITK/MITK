@@ -382,7 +382,7 @@ void mitk::OpenGLRenderer::Resize(int w, int h)
   BaseRenderer::Resize(w, h);
 
   Update();
-  //    m_MitkVtkRenderWindow->SetSize(w,h); //FIXME?
+  //    m_MitkVtkRenderWindow->SetSize(w,h); //@FIXME?
 }
 
 /*!

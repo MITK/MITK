@@ -101,7 +101,7 @@ public:
     //##ModelId=3E6423D30003
     ~RendererInfo()
     {
-      //         delete m_iilImage; //FIXME: diese Zeile wird nie erreicht, s. Kommentar im desctuctor von ImageMapper2D
+      //         delete m_iilImage; //@FIXME: diese Zeile wird nie erreicht, s. Kommentar im desctuctor von ImageMapper2D
     }
   };
 

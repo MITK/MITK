@@ -35,7 +35,7 @@ bool mitk::LimitedLinearUndo::Undo(bool fine)
 			this->SwapOperations(operationEvent);
 			operationEvent->GetDestination()->ExecuteOperation(operationEvent->GetOperation());
 			
-			m_RedoList.push_back(operationEvent);//set in redo //!!!TODO:store the param fine
+			m_RedoList.push_back(operationEvent);//set in redo //!!!@todo:store the param fine
 			m_UndoList.pop_back();//delete last operation from undo-list
             if (m_UndoList.empty())
             {

@@ -468,7 +468,7 @@ bool mitk::EventMapper::LoadBehavior(std::string fileName)
 //## @brief converts the given const String declared in the xml-file
 //## to the defined const int
 inline int convertConstString2ConstInt(std::string input)
-{//todo:Implement
+{//@todo:Implement
 //    int i;
 //    for ( i=0; i<
 //    return mitkEventConstArray.find(input).id();

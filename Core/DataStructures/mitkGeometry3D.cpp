@@ -455,7 +455,7 @@ void mitk::Geometry3D::SetSpacing(ipPicDescriptor* pic)
     }
   }
 #endif
-  // FIXME:
+  // @FIXME:
   // nur fuer Testdatensatz
   // spacing = Vector3D(1/3.0,1/4.0,1/5.0);
   SetSpacing(spacing);

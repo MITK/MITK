@@ -161,7 +161,7 @@ void mitk::Geometry2DDataVtkMapper3D::Update(mitk::BaseRenderer* renderer)
     if(GetDataTreeNode()->GetIntProperty("yresolution", res, renderer))
       surfaceCreator->SetYResolution(res);
 
-    surfaceCreator->Update(); //FIXME ohne das crash
+    surfaceCreator->Update(); //@FIXME ohne das crash
     m_VtkPolyDataMapper->SetInput(surfaceCreator->GetOutput()->GetVtkPolyData());
 
     if(m_DataTreeIterator)

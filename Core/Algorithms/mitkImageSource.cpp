@@ -80,12 +80,12 @@ void mitk::ImageSource::GraftNthOutput(unsigned int idx, OutputImageType* graft)
     if (output && graft)
       {
       // grab a handle to the bulk data of the specified data object
-//      output->SetPixelContainer( graft->GetPixelContainer() ); FIXME!!!!
+//      output->SetPixelContainer( graft->GetPixelContainer() ); @FIXME!!!!
       
       // copy the region ivars of the specified data object
       output->SetRequestedRegion( graft );//graft->GetRequestedRegion() );
-//      output->SetLargestPossibleRegion( graft->GetLargestPossibleRegion() ); FIXME!!!!
-//      output->SetBufferedRegion( graft->GetBufferedRegion() ); FIXME!!!!
+//      output->SetLargestPossibleRegion( graft->GetLargestPossibleRegion() ); @FIXME!!!!
+//      output->SetBufferedRegion( graft->GetBufferedRegion() ); @FIXME!!!!
       
       // copy the meta-information
       output->CopyInformation( graft );
@@ -162,8 +162,8 @@ void mitk::ImageSource::AllocateOutputs()
   for (unsigned int i=0; i < this->GetNumberOfOutputs(); i++)
     {
     outputPtr = this->GetOutput(i);
-//    outputPtr->SetBufferedRegion(outputPtr->GetRequestedRegion()); FIXME???
-//    outputPtr->Allocate(); FIXME???
+//    outputPtr->SetBufferedRegion(outputPtr->GetRequestedRegion()); @FIXME???
+//    outputPtr->Allocate(); @FIXME???
     }
 }
 

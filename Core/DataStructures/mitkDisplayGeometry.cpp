@@ -304,7 +304,7 @@ void mitk::DisplayGeometry::Fit()
     width=m_SizeInDisplayUnits.x;
     height=m_SizeInDisplayUnits.y;
 
-// FIXME: "silly assignment" (IDEA)
+// @FIXME: "silly assignment" (IDEA)
 	w = width;
 	h = height;
 

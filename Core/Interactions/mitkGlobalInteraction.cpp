@@ -184,7 +184,7 @@ bool mitk::GlobalInteraction::ExecuteSideEffect(int sideEffectId, mitk::StateEve
 	}
 
 /*
-ToDo:
+@todo:
 List of all StateMachines/Interactables that are beneath 
 the focused BaseRenderer (Focus-StateMachine).
 register at DataTree, that if anything changes, the list can be refreshed.

@@ -70,7 +70,7 @@ void mitk::LightBoxImageReader::GenerateOutputInformation()
     printf("\n copy tags \n");
     ipFuncCopyTags(header, pic);
 
-    //FIXME: was ist, wenn die Bilder nicht alle gleich gross sind?
+    //@FIXME: was ist, wenn die Bilder nicht alle gleich gross sind?
     if(numberOfImages>1)
     {  
         printf("\n numberofimages %d > 1\n",numberOfImages);

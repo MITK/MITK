@@ -84,7 +84,7 @@ void mitk::PicFileReader::GenerateOutputInformation()
             return;
         }
 
-        //FIXME: was ist, wenn die Bilder nicht alle gleich gross sind?
+        //@FIXME: was ist, wenn die Bilder nicht alle gleich gross sind?
         if(numberOfImages>1)
         {  
             printf("\n numberofimages %d > 1\n",numberOfImages);

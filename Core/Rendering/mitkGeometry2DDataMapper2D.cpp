@@ -38,7 +38,7 @@ void mitk::Geometry2DDataMapper2D::Paint(mitk::BaseRenderer * renderer)
 {
   if(IsVisible(renderer)==false) return;
   
-  //	FIXME: Logik fuer update
+  //	@FIXME: Logik fuer update
   bool updateNeccesary=true;
   
   if (updateNeccesary) {
@@ -114,7 +114,7 @@ void mitk::Geometry2DDataMapper2D::Paint(mitk::BaseRenderer * renderer)
       if(GetDataTreeNode()->GetIntProperty("yresolution", res, renderer))
         surfaceCreator->SetYResolution(res);
 
-      surfaceCreator->Update(); //FIXME ohne das crash
+      surfaceCreator->Update(); //@FIXME ohne das crash
       
       if(m_SurfaceMapper.IsNull())
         m_SurfaceMapper=mitk::SurfaceDataMapper2D::New();

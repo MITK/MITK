@@ -12,7 +12,7 @@
 //##ModelId=3D6A0E8C02CC
 mitk::Mapper* mitk::DataTreeNode::GetMapper(MapperSlotId id) const
 {
-    // TODO
+    // @todo
     
     if (mappers[id].IsNull()) {
         

@@ -13,7 +13,7 @@
 #include <vtkRenderWindow.h>
 #include <vtkTransform.h>
 
-#include "PlaneGeometry.h"upde
+#include "PlaneGeometry.h"
 
 //##ModelId=3E33ECF301AD
 mitk::OpenGLRenderer::OpenGLRenderer() : m_VtkMapperPresent(NULL)

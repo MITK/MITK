@@ -115,7 +115,7 @@ ipPicDescriptor *ipFuncShp ( ipPicDescriptor *pic_old,
        return ( ipFuncERROR );
     }
 
-  if ( mask_nr < 0 || mask_nr > 2 ) 
+  if ( /* mask_nr < 0 || */ mask_nr > 2 ) 
     {
        _ipFuncSetErrno ( ipFuncDATA_ERROR );
        return ( ipFuncERROR );
@@ -168,3 +168,4 @@ ipPicDescriptor *ipFuncShp ( ipPicDescriptor *pic_old,
   return pic_new;
 }
 #endif
+

@@ -98,7 +98,7 @@ ipFloat8_t ipFuncMean ( ipPicDescriptor *pic );
 ipFloat8_t ipFuncMean ( ipPicDescriptor *pic )
 {
 
-  ipFloat8_t mean;            
+  ipFloat8_t mean = 0.0;            
 
   /* check data                                               */ 
 

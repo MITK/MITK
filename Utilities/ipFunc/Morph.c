@@ -255,6 +255,8 @@ ipPicDescriptor *_ipFuncMorph ( ipPicDescriptor *pic_old,
          return ( ipFuncERROR );
       }
 
+  pic_new = NULL;
+
   /* initialisation of vectors                                             */  
                                                                             
   size [0] = 1;                                                             

@@ -108,3 +108,4 @@ ipFloat8_t ipFuncSDevROI ( ipPicDescriptor *pic_old,
 } 
 
 #endif
+

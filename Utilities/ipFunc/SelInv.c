@@ -117,9 +117,7 @@ ipPicDescriptor *ipFuncSelInv ( ipPicDescriptor *pic_old,
                                 ipPicDescriptor *pic_return ) 
 {
   ipFloat8_t       min_gv, max_gv;  /* max and min posiible greyvalues      */
-  ipFloat8_t       min, max;        /* extreme greyvalues                   */
   ipPicDescriptor  *pic_new;        /* pointer to transformed image         */
-  ipUInt4_t        i;               /* loop index                           */
 
 
   /* calculate max. and min. possible greyvalues                            */
@@ -164,3 +162,4 @@ ipPicDescriptor *ipFuncSelInv ( ipPicDescriptor *pic_old,
   return ( pic_new );
 }
 #endif
+

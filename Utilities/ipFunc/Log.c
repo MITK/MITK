@@ -216,3 +216,4 @@ ipPicDescriptor *ipFuncLog ( ipPicDescriptor *pic_old )
    return ( pic_new );
 }
 #endif
+

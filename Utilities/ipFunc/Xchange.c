@@ -57,6 +57,9 @@
  * @author Ulrike Guennel @date 07.7.1995 
  *
  * $Log$
+ * Revision 1.3  2003/08/21 08:44:44  tobiask
+ * Removed warnings.
+ *
  * Revision 1.2  2000/05/24 15:29:43  tobiask
  * Changed the installation paths of the package.
  *
@@ -116,3 +119,4 @@ void ipFuncXchange( ipPicDescriptor **pic1,
   return;
 }
 #endif
+

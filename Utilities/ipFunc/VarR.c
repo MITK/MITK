@@ -91,3 +91,4 @@ ipFloat8_t  ipFuncVarR   ( ipPicDescriptor *pic_old,
    return ( var );
 }
 #endif
+

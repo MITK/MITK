@@ -80,7 +80,6 @@ ipPicDescriptor *ipFuncWindow ( ipPicDescriptor *pic_old,
 
 #define WIND( type, pic, beg, end, size )                                          \
 {                                                                                  \
-  ipUInt4_t      i;                /* loop index                                */ \
   ipUInt4_t      offset;           /* offset of pixels in pic_new               */ \
   ipUInt4_t      ind[_ipPicNDIM];  /* loop index vector                         */ \
   ipUInt4_t      off[_ipPicNDIM];  /* used to calculate offset of image pixels  */ \
@@ -208,3 +207,4 @@ ipPicDescriptor *ipFuncWindow ( ipPicDescriptor *pic_old,
 }
 
 #endif
+

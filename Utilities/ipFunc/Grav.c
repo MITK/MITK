@@ -127,11 +127,10 @@ ipFloat8_t *ipFuncGrav ( ipPicDescriptor *pic_old );
 ipFloat8_t *ipFuncGrav ( ipPicDescriptor *pic_old )            
 {
 
-  ipPicDescriptor *pic_new;               /* inverted picture           */
   ipUInt4_t       index_vect[_ipPicNDIM]; /* loopindex-vector           */
   ipInt4_t        n[_ipPicNDIM];          /* number of pixels in each   */
                                           /* dimension                  */
-  ipUInt4_t       i, j;                   /* loop index                 */
+  ipUInt4_t       i;                      /* loop index                 */
   ipFloat8_t      *gravity;
 
   /* check data                                                         */

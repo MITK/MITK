@@ -135,3 +135,4 @@ ipFloat8_t ipFuncMedI ( ipPicDescriptor *pic_old )
   return ( median );
 }
 #endif
+

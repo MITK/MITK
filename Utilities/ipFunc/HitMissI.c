@@ -115,7 +115,6 @@
   ipUInt4_t     end_m;                   /* loop index                      */ \
   ipUInt4_t     beg_m1;                  /*                                 */ \
   ipUInt4_t     beg_m2;                  /*                                 */ \
-  ipUInt4_t     offset;                  /* offset                          */ \
   ipUInt4_t     size[_ipPicNDIM];        /*                                 */ \
   ipInt4_t      ind[_ipPicNDIM];         /* loop index vector               */ \
   ipUInt4_t     off[_ipPicNDIM];         /* offset vector                   */ \
@@ -227,7 +226,7 @@
    ipInt4_t        end[_ipPicNDIM];  /*                                       */
    ipFuncMasc_t    *m1, *m2;         /* compressed masks                      */
    ipUInt4_t       dim;              /* dimension of mask                     */
-   ipUInt4_t       i, j;             /* loop variable                         */
+   ipUInt4_t       j;                /* loop variable                         */
 
    /* check image data and mask data                                          */
 

@@ -82,8 +82,6 @@ ipFloat8_t ipFuncVarC  ( ipPicDescriptor *pic_old,
 
 #define VAR( type, pic, beg, end, size, center, radius )                           \
 {                                                                                  \
-  ipUInt4_t      i;                /* loop index                                */ \
-  ipUInt4_t      offset;           /* offset of pixels in pic_new               */ \
   ipUInt4_t      ind[_ipPicNDIM];  /* loop index vector                         */ \
   ipUInt4_t      off[_ipPicNDIM];  /* used to calculate offset of image pixels  */ \
   ipUInt4_t      dist[_ipPicNDIM]; /* used to calculate offset of image pixels  */ \
@@ -149,7 +147,7 @@ ipFloat8_t ipFuncVarC  ( ipPicDescriptor *pic_old,
                           ipUInt4_t       radius )
 {
   ipInt4_t       help;
-  ipInt4_t       i;                    /* loop index                              */
+  ipUInt4_t      i;                    /* loop index                              */
   ipFloat8_t     mean;
   ipFloat8_t     mean2;
   ipFloat8_t     var;   
@@ -181,7 +179,7 @@ ipFloat8_t ipFuncVarC  ( ipPicDescriptor *pic_old,
       else begin[i] = help;
 
       help = center[i] + radius;
-      if ( help > pic_old->n[i] )
+      if ( (ipUInt4_t) help > pic_old->n[i] )
         {
            _ipFuncSetErrno ( ipFuncDATA_ERROR );
            return ( ipFuncERROR );

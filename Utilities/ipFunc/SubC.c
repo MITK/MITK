@@ -86,7 +86,6 @@ ipPicDescriptor *ipFuncSubC ( ipPicDescriptor *pic_old,
 #define SUBC2( type_n, pic_new, pic_1, type_1, value )                   \
 {                                                                        \
   ipUInt4_t  i, no_elem;                                                 \
-  type_1     help;                                                       \
                                                                          \
   no_elem = _ipPicElements ( pic_1 );                                    \
   for ( i = 0; i < no_elem; i++ )                                        \
@@ -128,7 +127,6 @@ ipPicDescriptor *ipFuncSubC ( ipPicDescriptor *pic_old,
 {
 
   ipPicDescriptor *pic_new;         /* pointer to new image             */
-  ipUInt4_t       i;                /* loop index                       */
   ipFloat8_t      max_gv;           /* max. possible greyvalue          */
   ipFloat8_t      min_gv;           /* min. possible greyvalue          */
   ipFloat8_t      min1, max1;       /* extreme greyvalues of 1. image   */ 

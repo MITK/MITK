@@ -100,7 +100,6 @@ ipPicDescriptor *ipFuncNorm ( ipPicDescriptor *pic_old,
 {
 
   ipPicDescriptor *pic_new;  /* inverted picture                        */
-  ipUInt4_t       i, j;      /* loopindex                               */
   ipFloat8_t      max, min;  /* extreme greyvalues in the image         */
   ipFloat8_t      max_gv;    /* max. possible greyvalue                 */
   ipFloat8_t      min_gv;    /* min. possible greyvalue                 */

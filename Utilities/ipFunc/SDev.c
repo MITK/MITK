@@ -84,3 +84,4 @@ ipFloat8_t ipFuncSDev ( ipPicDescriptor *pic )
   return( s_der );
 }
 #endif
+

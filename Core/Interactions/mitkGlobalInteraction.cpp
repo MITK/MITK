@@ -208,7 +208,10 @@ and the Focus changes.
 //##ModelId=3EF099E90065
 void mitk::GlobalInteraction::AddStateMachine(mitk::StateMachine* stateMachine)
 {
-	m_LocalStateMachines.push_back(stateMachine);
+  if ( std::find(m_LocalStateMachines.begin(), m_LocalStateMachines.end(),stateMachine) == m_LocalStateMachines.end() )
+  {
+	  m_LocalStateMachines.push_back(stateMachine);
+  }
 }
 
 //##ModelId=3EF099E900D2

@@ -24,6 +24,7 @@
 #include <vtkLinearTransform.h>
 #include <vtkActor.h>
 #include <vtkPolyDataMapper.h>
+#include <vtkScalarsToColors.h>
 
 #include <itkProcessObject.h>
 
@@ -37,7 +38,6 @@ const mitk::BaseData *mitk::PolyDataGLMapper2D::GetInput( void )
     return dynamic_cast<const mitk::BaseData * > ( GetData() );
 }
 
-
 void mitk::PolyDataGLMapper2D::Paint( mitk::BaseRenderer * renderer )
 {
     if ( IsVisible( renderer ) == false )
@@ -47,12 +47,6 @@ void mitk::PolyDataGLMapper2D::Paint( mitk::BaseRenderer * renderer )
     mitk::BaseData::Pointer input = const_cast<mitk::BaseData*>( this->GetInput() );
 
     assert( input );
-
-    bool useCellData;
-    if ( dynamic_cast<mitk::BoolProperty *>( this->GetDataTreeNode() ->GetProperty( "useCellDataForColouring" ).GetPointer() ) == NULL )
-        useCellData = false;
-    else
-        useCellData = dynamic_cast<mitk::BoolProperty *>( this->GetDataTreeNode() ->GetProperty( "useCellDataForColouring" ).GetPointer() ) ->GetBool();
 
     input->Update();
 
@@ -126,7 +120,7 @@ void mitk::PolyDataGLMapper2D::Paint( mitk::BaseRenderer * renderer )
         //apply color and opacity read from the PropertyList
         ApplyProperties( renderer );
 
-        // travers the cut contour
+        // traverse the cut contour
         vtkPolyData * contour = m_Cutter->GetOutput();
 
         vtkPoints *vpoints = contour->GetPoints();
@@ -143,31 +137,28 @@ void mitk::PolyDataGLMapper2D::Paint( mitk::BaseRenderer * renderer )
         Point2D p2d, last, first;
 
         vpolys->InitTraversal();
+        vtkScalarsToColors* lut = GetVtkLUT();
+        assert ( lut != NULL );
+
         for ( i = 0;i < numberOfCells;++i )
         {
             int *cell, cellSize;
 
             vpolys->GetNextCell( cellSize, cell );
-            vpoints->GetPoint( cell[ 0 ], vp );
 
-            //take transformation via vtktransform into account
-            vtktransform->TransformPoint( vp, vp );
+            if ( m_ColorByCellData )
+            {  // color each cell according to cell data
+                float * color = lut->GetColor( vcellscalars->GetComponent( i, 0 ) );
+                glColor3f( color[ 0 ], color[ 1 ], color[ 2 ] );
+            }
+            else if ( m_ColorByPointData )
+            {
+                float* color = lut->GetColor( vscalars->GetComponent( i, 0 ) );
+                glColor3f( color[ 0 ], color[ 1 ], color[ 2 ] );
+            }
 
-            vtk2vec( vp, p );
-
-            //convert 3D point (in mm) to 2D point on slice (also in mm)
-            worldGeometry->Map( p, p2d );
-
-            //convert point (until now mm and in worldcoordinates) to display coordinates (units )
-            displayGeometry->MMToDisplay( p2d, p2d );
-            //   p2d.y=toGL-p2d.y;
-            first = last = p2d;
-
-
-
-            //      glColor3f(1.0f,1.0f,0.0f);
-            int j;
-            for ( j = 1;j < cellSize;++j )
+            glBegin ( GL_LINE_LOOP );
+            for ( int j = 0;j < cellSize;++j )
             {
                 vpoints->GetPoint( cell[ j ], vp );
                 //take transformation via vtktransform into account
@@ -182,33 +173,21 @@ void mitk::PolyDataGLMapper2D::Paint( mitk::BaseRenderer * renderer )
                 displayGeometry->MMToDisplay( p2d, p2d );
 
                 //convert display coordinates ( (0,0) is top-left ) in GL coordinates ( (0,0) is bottom-left )
-                //    p2d.y=toGL-p2d.y;
+                //p2d.y=toGL-p2d.y;
 
-
-                if ( useCellData )
-                {  // color each cell according to cell data
-                    float * color;
-                    float v = vcellscalars->GetComponent( i, 0 );
-                    color = m_LUT->GetColor( vcellscalars->GetComponent( i, 0 ) );
-                    glColor3f( color[ 0 ], color[ 1 ], color[ 2 ] );
-                }
-
-                //draw the line
-                glBegin ( GL_LINE_LOOP );
-
-                glVertex2f( last.x, last.y );
+                //add the current vertex to the line
                 glVertex2f( p2d.x, p2d.y );
-                glVertex2f( last.x, last.y );
-                glEnd ();
-
-                last = p2d;
             }
+            glEnd ();
         }
     }
 }
 
 
-vtkPolyData* mitk::PolyDataGLMapper2D::GetVtkPolyData( void )
+
+
+
+vtkPolyDataMapper* mitk::PolyDataGLMapper2D::GetVtkPolyDataMapper()
 {
     mitk::DataTreeNode::Pointer node = this->GetDataTreeNode();
     if ( node.IsNull() )
@@ -218,66 +197,71 @@ vtkPolyData* mitk::PolyDataGLMapper2D::GetVtkPolyData( void )
     if ( mitkMapper.IsNull() )
         return NULL;
 
-    ((itk::ProcessObject*)mitkMapper.GetPointer())->Update();
+    ( ( itk::ProcessObject* ) mitkMapper.GetPointer() ) ->Update();
 
     vtkActor* actor = dynamic_cast<vtkActor*>( mitkMapper->GetProp() );
 
     if ( actor == NULL )
         return NULL;
 
-    vtkPolyDataMapper* mapper = dynamic_cast<vtkPolyDataMapper*>( actor->GetMapper() );
-    if ( mapper == NULL )
-        return NULL;
+    return dynamic_cast<vtkPolyDataMapper*>( actor->GetMapper() );
+}
 
-    return mapper->GetInput();
+
+
+vtkPolyData* mitk::PolyDataGLMapper2D::GetVtkPolyData( )
+{
+    vtkPolyDataMapper * polyDataMapper = GetVtkPolyDataMapper();
+    if ( polyDataMapper == NULL )
+        return NULL;
+    else
+        return polyDataMapper->GetInput();
+}
+
+
+
+vtkScalarsToColors* mitk::PolyDataGLMapper2D::GetVtkLUT( )
+{
+    vtkPolyDataMapper * polyDataMapper = GetVtkPolyDataMapper();
+    if ( polyDataMapper == NULL )
+        return NULL;
+    else
+        return polyDataMapper->GetLookupTable();
 }
 
 
 bool mitk::PolyDataGLMapper2D::IsConvertibleToVtkPolyData()
 {
-    mitk::DataTreeNode::Pointer node = this->GetDataTreeNode();
-    if ( node.IsNull() )
-        return false;
-
-    mitk::BaseVtkMapper3D::Pointer mitkMapper = dynamic_cast< mitk::BaseVtkMapper3D* > ( node->GetMapper( 2 ) );
-    if ( mitkMapper.IsNull() )
-        return false;
-    
-    ((itk::ProcessObject*)mitkMapper.GetPointer())->Update();
-
-    vtkActor* actor = dynamic_cast<vtkActor*>( mitkMapper->GetProp() );
-
-    if ( actor == NULL )
-        return false;
-
-    vtkPolyDataMapper* mapper = dynamic_cast<vtkPolyDataMapper*>( actor->GetMapper() );
-    if ( mapper == NULL )
-        return false;
-
-    return true;
+    return ( GetVtkPolyDataMapper() != NULL );
 }
+
 
 
 void mitk::PolyDataGLMapper2D::Update()
 {}
 
+
+
 mitk::PolyDataGLMapper2D::PolyDataGLMapper2D()
 {
-  m_Plane  = vtkPlane::New();
-  m_Cutter = vtkCutter::New();
+    m_Plane = vtkPlane::New();
+    m_Cutter = vtkCutter::New();
 
-  m_Cutter->SetCutFunction(m_Plane);
-  m_Cutter->GenerateValues(1,0,1);
+    m_Cutter->SetCutFunction( m_Plane );
+    m_Cutter->GenerateValues( 1, 0, 1 );
 
-  m_LUT = vtkLookupTable::New();
-  m_LUT->SetTableRange(0,255);
-  m_LUT->SetNumberOfColors(255);
-  m_LUT->SetRampToLinear ();
-  m_LUT->Build();
+    m_ColorByCellData = false;
+    m_ColorByPointData = false;
+
+    //m_LUT = vtkLookupTable::New();
+    //m_LUT->SetTableRange( 0, 255 );
+    //m_LUT->SetNumberOfColors( 255 );
+    //m_LUT->SetRampToLinear ();
+    //m_LUT->Build();
 }
-    
+
+
+
 mitk::PolyDataGLMapper2D::~PolyDataGLMapper2D()
-{
-    
-}
+{}
 

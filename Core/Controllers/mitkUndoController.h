@@ -87,6 +87,18 @@ class UndoController
 
     //##ModelId=3E9C45D502EB
 	bool RemoveUndoModel(UndoType undoType);
+    
+	//##Documentation
+    //## @brief returns the ObjectEventId of the 
+	//## top Element in the OperationHistory of the selected 
+	//## UndoModel
+    int GetLastObjectEventIdInList();
+
+	//##Documentation
+    //## @brief returns the GroupEventId of the 
+	//## top Element in the OperationHistory of the selected 
+	//## UndoModel
+    int GetLastGroupEventIdInList();
 
   private:
     //##ModelId=3EAEBEBD02DC

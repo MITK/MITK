@@ -65,6 +65,16 @@ public:
 	//## @brief true if RedoList is empty
 	virtual bool RedoListEmpty();
 
+	//##Documentation
+    //## @brief returns the ObjectEventId of the 
+	//## top Element in the OperationHistory
+    virtual int GetLastObjectEventIdInList();
+
+	//##Documentation
+    //## @brief returns the GroupEventId of the 
+	//## top Element in the OperationHistory
+    virtual int GetLastGroupEventIdInList();
+
 protected:
     //##ModelId=3E5F5DF80360
     UndoContainer m_UndoList;

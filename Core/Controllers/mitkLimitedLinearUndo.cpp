@@ -117,18 +117,28 @@ bool mitk::LimitedLinearUndo::Redo(bool fine)
 //##ModelId=3F04519601A4
 void mitk::LimitedLinearUndo::Clear()
 {
-	m_UndoList.clear();
-	m_RedoList.clear();
+  m_UndoList.clear();
+  m_RedoList.clear();
 }
 
 //##ModelId=3F04519601B5
 void mitk::LimitedLinearUndo::ClearRedoList()
 {
-	m_RedoList.clear();
+  m_RedoList.clear();
 }
 
 //##ModelId=3F04519601D3
 bool mitk::LimitedLinearUndo::RedoListEmpty()
 {
-	return m_RedoList.empty();
+  return m_RedoList.empty();
+}
+
+int mitk::LimitedLinearUndo::GetLastObjectEventIdInList()
+{
+  return m_UndoList.back()->GetObjectEventId();
+}
+
+int mitk::LimitedLinearUndo::GetLastGroupEventIdInList()
+{
+  return m_UndoList.back()->GetGroupEventId();
 }

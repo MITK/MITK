@@ -44,6 +44,17 @@ class UndoModel
 	//## @brief true if RedoList is empty
 	virtual bool RedoListEmpty() = 0;
 
+	//##Documentation
+    //## @brief returns the ObjectEventId of the 
+	//## top Element in the OperationHistory of the selected 
+	//## UndoModel
+    virtual int GetLastObjectEventIdInList() = 0;
+
+	//##Documentation
+    //## @brief returns the GroupEventId of the 
+	//## top Element in the OperationHistory of the selected 
+	//## UndoModel
+    virtual int GetLastGroupEventIdInList() = 0;
 
 protected:
     //##ModelId=3F01770A018E

@@ -175,3 +175,13 @@ bool mitk::UndoController::RemoveUndoModel(UndoType undoType)
 	return true;
 }
 
+int mitk::UndoController::GetLastObjectEventIdInList()
+{
+  return m_CurUndoModel->GetLastObjectEventIdInList();
+}
+
+int mitk::UndoController::GetLastGroupEventIdInList()
+{
+  return m_CurUndoModel->GetLastGroupEventIdInList();
+}
+

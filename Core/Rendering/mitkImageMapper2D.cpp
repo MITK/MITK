@@ -76,16 +76,16 @@ void mitk::ImageMapper2D::Paint(mitk::BaseRenderer * renderer)
 
   const mitk::DisplayGeometry* displayGeometry = renderer->GetDisplayGeometry();
 
-  Vector2D oldtopLeft=displayGeometry->GetOriginInUnits();
-  Vector2D oldbottomRight=displayGeometry->GetOriginInUnits()+displayGeometry->GetSizeInUnits();
+  Vector2D oldtopLeft=displayGeometry->GetOriginInMM();
+  Vector2D oldbottomRight=displayGeometry->GetOriginInMM()+displayGeometry->GetSizeInMM();
 
   Vector2D topLeft;
   Vector2D bottomRight;
-  topLeft=displayGeometry->GetOriginInDisplayUnits();
-  bottomRight=topLeft+displayGeometry->GetSizeInDisplayUnits();
+  topLeft=displayGeometry->GetOriginInMM();
+  bottomRight=topLeft+displayGeometry->GetSizeInMM();
 
-  displayGeometry->DisplayToMM(topLeft, topLeft); topLeft[0]*=renderinfo.m_PixelsPerMM[0];  topLeft[1]*=renderinfo.m_PixelsPerMM[1];
-  displayGeometry->DisplayToMM(bottomRight, bottomRight); bottomRight[0]*=renderinfo.m_PixelsPerMM[0];  bottomRight[1]*=renderinfo.m_PixelsPerMM[1];
+  topLeft[0]*=renderinfo.m_PixelsPerMM[0];  topLeft[1]*=renderinfo.m_PixelsPerMM[1];
+  bottomRight[0]*=renderinfo.m_PixelsPerMM[0];  bottomRight[1]*=renderinfo.m_PixelsPerMM[1];
 
   //test - small differences noticed for unisotropic datasets.
   if((Vector2D(oldtopLeft-topLeft).GetSquaredNorm()>0.1) || (Vector2D(oldbottomRight-bottomRight).GetSquaredNorm()>0.1))

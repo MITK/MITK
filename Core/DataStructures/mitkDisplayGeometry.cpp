@@ -24,8 +24,8 @@ void mitk::DisplayGeometry::Zoom(mitk::ScalarType factor, const mitk::Point2D& c
 {
   assert(factor > 0);
 
-  SetScaleFactor(m_ScaleFactorUnitsPerDisplayUnit/factor);
-  SetOriginInUnits(m_OriginInUnits-centerInDisplayUnits.GetVectorFromOrigin()*(1-factor)*m_ScaleFactorUnitsPerDisplayUnit);
+  SetScaleFactor(m_ScaleFactorMMPerDisplayUnit/factor);
+  SetOriginInMM(m_OriginInMM-centerInDisplayUnits.GetVectorFromOrigin()*(1-factor)*m_ScaleFactorMMPerDisplayUnit);
 
   Modified();
 }
@@ -33,7 +33,7 @@ void mitk::DisplayGeometry::Zoom(mitk::ScalarType factor, const mitk::Point2D& c
 //##ModelId=3E3AEE700380
 void mitk::DisplayGeometry::MoveBy(const mitk::Vector2D& shiftInDisplayUnits)
 {
-  SetOriginInUnits(m_OriginInUnits+shiftInDisplayUnits*m_ScaleFactorUnitsPerDisplayUnit);
+  SetOriginInMM(m_OriginInMM+shiftInDisplayUnits*m_ScaleFactorMMPerDisplayUnit);
 
   Modified();
 }
@@ -44,32 +44,6 @@ void mitk::DisplayGeometry::SetWorldGeometry(const mitk::Geometry2D* aWorldGeome
   m_WorldGeometry = aWorldGeometry;
 
   Modified();
-}
-
-//##ModelId=3E3AEB8F0286
-void mitk::DisplayGeometry::DisplayToUnits(const mitk::Point2D &pt_display, mitk::Point2D &pt_units) const
-{
-  pt_units[0]=m_ScaleFactorUnitsPerDisplayUnit*pt_display[0]+m_OriginInUnits[0];
-  pt_units[1]=m_ScaleFactorUnitsPerDisplayUnit*pt_display[1]+m_OriginInUnits[1];
-}
-
-//##ModelId=3E3AEBEF039C
-void mitk::DisplayGeometry::UnitsToDisplay(const mitk::Point2D &pt_units, mitk::Point2D &pt_display) const
-{
-  pt_display[0]=(pt_units[0]-m_OriginInUnits[0])*(1.0/m_ScaleFactorUnitsPerDisplayUnit);
-  pt_display[1]=(pt_units[1]-m_OriginInUnits[1])*(1.0/m_ScaleFactorUnitsPerDisplayUnit);
-}
-
-//##ModelId=3E3B02710239
-void mitk::DisplayGeometry::DisplayToUnits(const mitk::Vector2D &vec_display, mitk::Vector2D &vec_units) const
-{
-  vec_units=vec_display*m_ScaleFactorUnitsPerDisplayUnit;
-}
-
-//##ModelId=3E3B02760128
-void mitk::DisplayGeometry::UnitsToDisplay(const mitk::Vector2D &vec_units, mitk::Vector2D &vec_display) const
-{
-  vec_display=vec_units*(1.0/m_ScaleFactorUnitsPerDisplayUnit);
 }
 
 bool mitk::DisplayGeometry::Project(const mitk::Point3D &pt3d_mm, mitk::Point3D &projectedPt3d_mm) const
@@ -129,37 +103,27 @@ void mitk::DisplayGeometry::MMToUnits(const mitk::Vector2D &vec_mm, mitk::Vector
 //##ModelId=3E48D5B40210
 void mitk::DisplayGeometry::DisplayToMM(const mitk::Point2D &pt_display, mitk::Point2D &pt_mm) const
 {
-  DisplayToUnits(pt_display, pt_mm);
-
-  if(m_WorldGeometry.IsNull()) return;
-  m_WorldGeometry->UnitsToMM(pt_mm, pt_mm);
+  pt_mm[0]=m_ScaleFactorMMPerDisplayUnit*pt_display[0]+m_OriginInMM[0];
+  pt_mm[1]=m_ScaleFactorMMPerDisplayUnit*pt_display[1]+m_OriginInMM[1];
 }
 
 //##ModelId=3E48D5D7027E
 void mitk::DisplayGeometry::MMToDisplay(const mitk::Point2D &pt_mm, mitk::Point2D &pt_display) const
 {
-  if(m_WorldGeometry.IsNull()) return;
-  m_WorldGeometry->MMToUnits(pt_mm, pt_display);
-
-  UnitsToDisplay(pt_display, pt_display);
+  pt_display[0]=(pt_mm[0]-m_OriginInMM[0])*(1.0/m_ScaleFactorMMPerDisplayUnit);
+  pt_display[1]=(pt_mm[1]-m_OriginInMM[1])*(1.0/m_ScaleFactorMMPerDisplayUnit);
 }
 
 //##ModelId=3E48E2AE03A7
 void mitk::DisplayGeometry::DisplayToMM(const mitk::Vector2D &vec_display, mitk::Vector2D &vec_mm) const
 {
-  DisplayToUnits(vec_display, vec_mm);
-
-  if(m_WorldGeometry.IsNull()) return;
-  m_WorldGeometry->UnitsToMM(vec_mm, vec_mm);
+  vec_mm=vec_display*m_ScaleFactorMMPerDisplayUnit;
 }
 
 //##ModelId=3E48E2B40374
 void mitk::DisplayGeometry::MMToDisplay(const mitk::Vector2D &vec_mm, mitk::Vector2D &vec_display) const
 {
-  if(m_WorldGeometry.IsNull()) return;
-  m_WorldGeometry->MMToUnits(vec_mm, vec_display);
-
-  UnitsToDisplay(vec_display, vec_display);
+  vec_display=vec_mm*(1.0/m_ScaleFactorMMPerDisplayUnit);
 }
 
 //##ModelId=3EF4364802A9
@@ -188,69 +152,32 @@ void mitk::DisplayGeometry::DisplayToULDisplay(const mitk::Vector2D &vec_display
   ULDisplayToDisplay(vec_display, vec_ULdisplay);
 }
 
-//##ModelId=3EF436450223
-void mitk::DisplayGeometry::ULDisplayToUnits(const mitk::Point2D &pt_ULdisplay, mitk::Point2D &pt_units) const
-{
-  pt_units[0]=pt_ULdisplay[0];
-  pt_units[1]=GetDisplayHeight()-pt_ULdisplay[1];
-  DisplayToUnits(pt_units, pt_units);
-}
-
-//##ModelId=3EF43645039F
-void mitk::DisplayGeometry::UnitsToULDisplay(const mitk::Point2D &pt_units, mitk::Point2D &pt_ULdisplay) const
-{
-  UnitsToDisplay(pt_units, pt_ULdisplay);
-  pt_ULdisplay[1]=GetDisplayHeight()-pt_ULdisplay[1];
-}
-
-//##ModelId=3EF436460120
-void mitk::DisplayGeometry::ULDisplayToUnits(const mitk::Vector2D &vec_ULdisplay, mitk::Vector2D &vec_units) const
-{
-  vec_units[0]= m_ScaleFactorUnitsPerDisplayUnit*vec_ULdisplay[0];
-  vec_units[1]=-m_ScaleFactorUnitsPerDisplayUnit*vec_ULdisplay[1];
-}
-
-//##ModelId=3EF436460292
-void mitk::DisplayGeometry::UnitsToULDisplay(const mitk::Vector2D &vec_units, mitk::Vector2D &vec_ULdisplay) const
-{
-  vec_ULdisplay[0]= vec_units[0]*(1.0/m_ScaleFactorUnitsPerDisplayUnit);
-  vec_ULdisplay[1]=-vec_units[1]*(1.0/m_ScaleFactorUnitsPerDisplayUnit);
-}
-
 //##ModelId=3EF436470027
 void mitk::DisplayGeometry::ULDisplayToMM(const mitk::Point2D &pt_ULdisplay, mitk::Point2D &pt_mm) const
 {
-  ULDisplayToUnits(pt_ULdisplay, pt_mm);
-
-  if(m_WorldGeometry.IsNull()) return;
-  m_WorldGeometry->UnitsToMM(pt_mm, pt_mm);
+  ULDisplayToDisplay(pt_ULdisplay, pt_mm);
+  DisplayToMM(pt_mm, pt_mm);
 }
 
 //##ModelId=3EF4364701AE
 void mitk::DisplayGeometry::MMToULDisplay(const mitk::Point2D &pt_mm, mitk::Point2D &pt_ULdisplay) const
 {
-  if(m_WorldGeometry.IsNull()) return;
-  m_WorldGeometry->MMToUnits(pt_mm, pt_ULdisplay);
-
-  UnitsToULDisplay(pt_ULdisplay, pt_ULdisplay);
+  MMToDisplay(pt_mm, pt_ULdisplay);
+  DisplayToULDisplay(pt_ULdisplay, pt_ULdisplay);
 }
 
 //##ModelId=3EF436470348
 void mitk::DisplayGeometry::ULDisplayToMM(const mitk::Vector2D &vec_ULdisplay, mitk::Vector2D &vec_mm) const
 {
-  ULDisplayToUnits(vec_ULdisplay, vec_mm);
-
-  if(m_WorldGeometry.IsNull()) return;
-  m_WorldGeometry->UnitsToMM(vec_mm, vec_mm);
+  ULDisplayToDisplay(vec_ULdisplay, vec_mm);
+  DisplayToMM(vec_mm, vec_mm);
 }
 
 //##ModelId=3EF436480105
 void mitk::DisplayGeometry::MMToULDisplay(const mitk::Vector2D &vec_mm, mitk::Vector2D &vec_ULdisplay) const
 {
-  if(m_WorldGeometry.IsNull()) return;
-  m_WorldGeometry->MMToUnits(vec_mm, vec_ULdisplay);
-
-  UnitsToULDisplay(vec_ULdisplay, vec_ULdisplay);
+  MMToDisplay(vec_mm, vec_ULdisplay);
+  DisplayToULDisplay(vec_ULdisplay, vec_ULdisplay);
 }
 
 //##ModelId=3E3AEB620231
@@ -264,11 +191,11 @@ const mitk::TimeBounds& mitk::DisplayGeometry::GetTimeBoundsInMS() const
 
 //##ModelId=3E3AE91A035E
 mitk::DisplayGeometry::DisplayGeometry() : 
-  m_ScaleFactorUnitsPerDisplayUnit(1.0),
+  m_ScaleFactorMMPerDisplayUnit(1.0),
   m_WorldGeometry(NULL)
 {
   m_SizeInDisplayUnits.Fill(10);
-  m_OriginInUnits.Fill(0);
+  m_OriginInMM.Fill(0);
 }
 
 //##ModelId=3E3AE91A037C
@@ -279,8 +206,8 @@ mitk::DisplayGeometry::~DisplayGeometry()
 //##ModelId=3E3C36920345
 void mitk::DisplayGeometry::SetSizeInDisplayUnits(unsigned int width, unsigned int height, bool keepDisplayedRegion)
 {
-  Vector2D centerInUnits;
-  centerInUnits =  m_SizeInUnits*0.5;
+  Vector2D centerInMM;
+  centerInMM =  m_SizeInMM*0.5;
 
   m_SizeInDisplayUnits[0]=width;
   m_SizeInDisplayUnits[1]=height;
@@ -290,19 +217,19 @@ void mitk::DisplayGeometry::SetSizeInDisplayUnits(unsigned int width, unsigned i
   if(m_SizeInDisplayUnits[1] <= 0)
     m_SizeInDisplayUnits[1] = 1;
 
-  DisplayToUnits(m_SizeInDisplayUnits, m_SizeInUnits);
+  DisplayToMM(m_SizeInDisplayUnits, m_SizeInMM);
 
   if(keepDisplayedRegion)
   {
-    Vector2D newCenterInUnits;
-    newCenterInUnits = m_SizeInUnits*0.5;
+    Vector2D newCenterInMM;
+    newCenterInMM = m_SizeInMM*0.5;
 
     Vector2D shift;
-    shift=centerInUnits-newCenterInUnits;
-    UnitsToDisplay(shift, shift);
+    shift=centerInMM-newCenterInMM;
+    MMToDisplay(shift, shift);
 
-    m_ScaleFactorUnitsPerDisplayUnit *= sqrt(centerInUnits.GetSquaredNorm()/newCenterInUnits.GetSquaredNorm());
-    assert(m_ScaleFactorUnitsPerDisplayUnit<ScalarTypeNumericTraits::infinity());
+    m_ScaleFactorMMPerDisplayUnit *= sqrt(centerInMM.GetSquaredNorm()/newCenterInMM.GetSquaredNorm());
+    assert(m_ScaleFactorMMPerDisplayUnit<ScalarTypeNumericTraits::infinity());
 
     MoveBy(shift);
   }
@@ -311,10 +238,10 @@ void mitk::DisplayGeometry::SetSizeInDisplayUnits(unsigned int width, unsigned i
 }
 
 //##ModelId=3E3C36CD02D2
-void mitk::DisplayGeometry::SetOriginInUnits(const mitk::Vector2D& origin_units)
+void mitk::DisplayGeometry::SetOriginInMM(const mitk::Vector2D& origin_mm)
 {
-  m_OriginInUnits=origin_units;
-  UnitsToDisplay(m_OriginInUnits, m_OriginInDisplayUnits);
+  m_OriginInMM = origin_mm;
+  MMToDisplay(m_OriginInMM, m_OriginInDisplayUnits);
 
   Modified();
 }
@@ -335,81 +262,43 @@ void mitk::DisplayGeometry::Fit()
   w = width;
   h = height;
 
-  const ScalarType& widthInUnits(m_WorldGeometry->GetExtent(0));
-  const ScalarType& heightInUnits(m_WorldGeometry->GetExtent(1));
-  mitk::ScalarType aspRatio=((mitk::ScalarType)widthInUnits)/heightInUnits;
+  const ScalarType& widthInMM(m_WorldGeometry->GetExtentInMM(0));
+  const ScalarType& heightInMM(m_WorldGeometry->GetExtentInMM(1));
+  mitk::ScalarType aspRatio=((mitk::ScalarType)widthInMM)/heightInMM;
 
-  x = (mitk::ScalarType)w/widthInUnits;
-  y = (mitk::ScalarType)h/heightInUnits;
+  x = (mitk::ScalarType)w/widthInMM;
+  y = (mitk::ScalarType)h/heightInMM;
   if (x > y)
     w = (int) (aspRatio*h);
   else
     h = (int) (w/aspRatio);
 
   if(w>0)
-    SetScaleFactor(widthInUnits/w);
+    SetScaleFactor(widthInMM/w);
 
   mitk::Vector2D origin_display;
   origin_display[0]=-(width-w)/2.0;
   origin_display[1]=-(height-h)/2.0;
-  SetOriginInUnits(origin_display*m_ScaleFactorUnitsPerDisplayUnit);
+  SetOriginInMM(origin_display*m_ScaleFactorMMPerDisplayUnit);
 
   Modified();
 }
 
-//##ModelId=3E3C516B0045
-mitk::Vector2D mitk::DisplayGeometry::GetOriginInUnits() const
-{
-  return m_OriginInUnits;
-}
-
-//##ModelId=3E3C51890107
-mitk::Vector2D mitk::DisplayGeometry::GetOriginInDisplayUnits() const
-{
-  return m_OriginInDisplayUnits;
-}
-
-//##ModelId=3E3C666E0299
-unsigned int mitk::DisplayGeometry::GetDisplayWidth() const
-{
-  assert(m_SizeInDisplayUnits[0] >= 0);  
-  return (unsigned int)m_SizeInDisplayUnits[0];
-}
-
-//##ModelId=3E3C668B0363
-unsigned int mitk::DisplayGeometry::GetDisplayHeight() const
-{
-  assert(m_SizeInDisplayUnits[1] >= 0);  
-  return (unsigned int)m_SizeInDisplayUnits[1];
-}
-
-//##ModelId=3E3D86CB0039
-mitk::Vector2D mitk::DisplayGeometry::GetSizeInDisplayUnits() const
-{
-  return m_SizeInDisplayUnits;
-}
-
-//##ModelId=3E3D86E9015E
-mitk::Vector2D mitk::DisplayGeometry::GetSizeInUnits() const
-{
-  return m_SizeInUnits;
-}
-
 //##ModelId=3E3D883B0132
-void mitk::DisplayGeometry::SetScaleFactor(mitk::ScalarType unitsPerDisplayUnit)
+void mitk::DisplayGeometry::SetScaleFactor(mitk::ScalarType mmPerDisplayUnit)
 {
-  if(unitsPerDisplayUnit<0.0001) unitsPerDisplayUnit=0.0001;
+  if(mmPerDisplayUnit<0.0001) mmPerDisplayUnit=0.0001;
 
-  m_ScaleFactorUnitsPerDisplayUnit = unitsPerDisplayUnit;
-  assert(m_ScaleFactorUnitsPerDisplayUnit<ScalarTypeNumericTraits::infinity());
+  m_ScaleFactorMMPerDisplayUnit = mmPerDisplayUnit;
+  assert(m_ScaleFactorMMPerDisplayUnit<ScalarTypeNumericTraits::infinity());
 
-  DisplayToUnits(m_SizeInDisplayUnits, m_SizeInUnits);
+  DisplayToMM(m_SizeInDisplayUnits, m_SizeInMM);
 }
 
 //##ModelId=3E3ED45900A1
-mitk::ScalarType mitk::DisplayGeometry::GetScaleFactorUnitsPerDisplayUnit() const
+mitk::ScalarType mitk::DisplayGeometry::GetScaleFactorMMPerDisplayUnit() const
 {
-  return m_ScaleFactorUnitsPerDisplayUnit;
+  return m_ScaleFactorMMPerDisplayUnit;
 }
 
 //##ModelId=3E66CC5A0118

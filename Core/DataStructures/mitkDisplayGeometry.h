@@ -74,16 +74,6 @@ public:
   //##ModelId=3E3C38660226
   virtual void Fit();
 
-  //##ModelId=3E3AEB8F0286
-  virtual void DisplayToUnits(const mitk::Point2D &pt_display, mitk::Point2D &pt_units) const;
-  //##ModelId=3E3AEBEF039C
-  virtual void UnitsToDisplay(const mitk::Point2D &pt_units, mitk::Point2D &pt_display) const;
-
-  //##ModelId=3EF436450223
-  virtual void ULDisplayToUnits(const mitk::Point2D &pt_ULdisplay, mitk::Point2D &pt_units) const;
-  //##ModelId=3EF43645039F
-  virtual void UnitsToULDisplay(const mitk::Point2D &pt_units, mitk::Point2D &pt_ULdisplay) const;
-
   //##ModelId=3E3C36920345
   //##Documentation
   //## @brief Set the size of the display in display units.
@@ -101,11 +91,19 @@ public:
   //## @todo debug!
   virtual void SetSizeInDisplayUnits(unsigned int width, unsigned int height, bool keepDisplayedRegion=true);
   //##ModelId=3E3C36CD02D2
-  virtual void SetOriginInUnits(const mitk::Vector2D& origin_units);
+  virtual void SetOriginInMM(const mitk::Vector2D& origin_mm);
+
   //##ModelId=3E3C516B0045
-  mitk::Vector2D GetOriginInUnits() const;
+  mitk::Vector2D GetOriginInMM() const
+  {
+    return m_OriginInMM;
+  }
+
   //##ModelId=3E3C51890107
-  mitk::Vector2D GetOriginInDisplayUnits() const;
+  mitk::Vector2D GetOriginInDisplayUnits() const
+  {
+    return m_OriginInDisplayUnits;
+  }
 
   virtual bool Project(const mitk::Point3D &pt3d_mm, mitk::Point3D &projectedPt3d_mm) const;
   virtual bool Project(const mitk::Point3D & atPt3d_mm, const mitk::Vector3D &vec3d_mm, mitk::Vector3D &projectedVec3d_mm) const;
@@ -122,34 +120,41 @@ public:
   //##ModelId=3E3AEB620231
   virtual const TimeBounds& GetTimeBoundsInMS() const;
 
-  //##ModelId=3E3B02710239
-  virtual void DisplayToUnits(const mitk::Vector2D &vec_display, mitk::Vector2D &vec_units) const;
-  //##ModelId=3E3B02760128
-  virtual void UnitsToDisplay(const mitk::Vector2D &vec_units, mitk::Vector2D &vec_display) const;
-
-  //##ModelId=3EF436460120
-  virtual void ULDisplayToUnits(const mitk::Vector2D &vec_ULdisplay, mitk::Vector2D &vec_units) const;
-  //##ModelId=3EF436460292
-  virtual void UnitsToULDisplay(const mitk::Vector2D &vec_units, mitk::Vector2D &vec_ULdisplay) const;
-
   //##ModelId=3E3B994B02A6
   virtual void MMToUnits(const mitk::Vector2D &vec_mm, mitk::Vector2D &vec_units) const;
   //##ModelId=3E3B994802B6
   virtual void UnitsToMM(const mitk::Vector2D &vec_units, mitk::Vector2D &vec_mm) const;
 
   //##ModelId=3E3C666E0299
-  unsigned int GetDisplayWidth() const;
+  unsigned int GetDisplayWidth() const
+  {
+    assert(m_SizeInDisplayUnits[0] >= 0);  
+    return (unsigned int)m_SizeInDisplayUnits[0];
+  }
+
   //##ModelId=3E3C668B0363
-  unsigned int GetDisplayHeight() const;
+  unsigned int GetDisplayHeight() const
+  {
+    assert(m_SizeInDisplayUnits[1] >= 0);  
+    return (unsigned int)m_SizeInDisplayUnits[1];
+  }
 
   //##ModelId=3E3D86CB0039
-  mitk::Vector2D GetSizeInDisplayUnits() const;
+  mitk::Vector2D GetSizeInDisplayUnits() const
+  {
+    return m_SizeInDisplayUnits;
+  }
+
   //##ModelId=3E3D86E9015E
-  mitk::Vector2D GetSizeInUnits() const;
+  mitk::Vector2D GetSizeInMM() const
+  {
+    return m_SizeInMM;
+  }
+
   //##ModelId=3E3D883B0132
-  virtual void SetScaleFactor(mitk::ScalarType unitsPerDisplayUnit);
+  virtual void SetScaleFactor(mitk::ScalarType mmPerDisplayUnit);
   //##ModelId=3E3ED45900A1
-  mitk::ScalarType GetScaleFactorUnitsPerDisplayUnit() const;
+  mitk::ScalarType GetScaleFactorMMPerDisplayUnit() const;
 
   //##ModelId=3E48D5B40210
   virtual void DisplayToMM(const mitk::Point2D &pt_display, mitk::Point2D &pt_mm) const;
@@ -197,13 +202,13 @@ protected:
   virtual ~DisplayGeometry();
 
   //##ModelId=3E3AE9350140
-  mitk::Vector2D m_OriginInUnits;
+  mitk::Vector2D m_OriginInMM;
   //##ModelId=3E3C521C01EE
   mitk::Vector2D m_OriginInDisplayUnits;
   //##ModelId=3E3AE94D00AE
-  mitk::ScalarType m_ScaleFactorUnitsPerDisplayUnit;
+  mitk::ScalarType m_ScaleFactorMMPerDisplayUnit;
   //##ModelId=3E3D88E70252
-  mitk::Vector2D m_SizeInUnits;
+  mitk::Vector2D m_SizeInMM;
   //##ModelId=3E3AE97701A9
   mitk::Vector2D m_SizeInDisplayUnits;
   //##ModelId=3E3AEA9001D5

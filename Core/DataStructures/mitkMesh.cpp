@@ -512,7 +512,7 @@ void mitk::Mesh::ExecuteOperation(Operation* operation)
       CellType * cell = cellAutoPointer.GetPointer();
       CellAutoPointer newCellAutoPointer;
       newCellAutoPointer.TakeOwnership( new PolygonType );
-      CellType * newCell = newCellAutoPointer.GetPointer();
+      //CellType * newCell = newCellAutoPointer.GetPointer(); \todo remove line
       PolygonType * newPolygon = static_cast<PolygonType *>( cell );
       
       PointIdIterator it = cell->PointIdsBegin();

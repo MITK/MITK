@@ -19,3 +19,4 @@ See MITKCopyright.txt or http://www.mitk.org/ for details.
 
 const mitk::ScalarType mitk::eps = vnl_math::float_eps;
 const mitk::ScalarType mitk::epsSquared = vnl_math::float_sqrteps;
+

@@ -82,3 +82,8 @@ void mitk::VtkInteractorCameraController::SetRenderWindow(vtkRenderWindow* aren)
 {
     m_VtkInteractor->SetRenderWindow(aren);
 }
+
+vtkRenderWindowInteractor* mitk::VtkInteractorCameraController::GetVtkInteractor()
+{
+    return m_VtkInteractor;
+}

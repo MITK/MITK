@@ -23,6 +23,10 @@ public:
 
     itkNewMacro(Self);
 
+    //##Documentation
+    //## @brief Returns the vtkRenderWindowInteractor used internally by this CameraController
+    vtkRenderWindowInteractor* GetVtkInteractor();
+
     //##ModelId=3E6D600F006B
     virtual void Resize(int w, int h);
     //##ModelId=3E6D600F0075

@@ -1,0 +1,9 @@
+===================================================================
+File: MITKCopyright.txt	Status: Locally Added
+
+   Working revision:	New file!
+   Repository revision:	No revision control file
+   Sticky Tag:		(none)
+   Sticky Date:		(none)
+   Sticky Options:	(none)
+

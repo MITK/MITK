@@ -655,7 +655,7 @@ void mitk::Mesh::ExecuteOperation(Operation* operation)
         CellDataType cellData;
         m_ItkData->GetCellData(cellId, &cellData);
         SelectedLinesType *selectedLines = &(cellData.selectedLines);
-        SelectedLinesIter position = std::find(selectedLines->begin(), selectedLines->end(), lineOp->GetId());
+        SelectedLinesIter position = std::find(selectedLines->begin(), selectedLines->end(), (unsigned int) lineOp->GetId());
 			  if (position == selectedLines->end())//if not alsready selected
         {
           cellData.selectedLines.push_back(lineOp->GetId());
@@ -679,7 +679,7 @@ void mitk::Mesh::ExecuteOperation(Operation* operation)
         CellDataType cellData;
         m_ItkData->GetCellData(cellId, &cellData);
         SelectedLinesType *selectedLines = &(cellData.selectedLines);
-        SelectedLinesIter position = std::find(selectedLines->begin(), selectedLines->end(), lineOp->GetId());
+        SelectedLinesIter position = std::find(selectedLines->begin(), selectedLines->end(), (unsigned int) lineOp->GetId());
 			  if (position != selectedLines->end())//if found
         {
           selectedLines->erase(position);

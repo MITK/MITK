@@ -178,9 +178,9 @@ class Image : public SlicedData
     //## Geometry3D /@a Geometry2D  are set according to the tags in @a pic.
     //## @param tDim override time dimension in @a itkimage (if >0 and <)
     //## @param sDim override z-space dimension in @a itkimage (if >0 and <)
-	template <typename itkImageType> void InitializeByItk(itkImageType* itkimage, int channels = 1, int tDim = -1, int sDim=-1)
-	{
-		if(itkimage.IsNull()) return;
+    template <typename itkImageType> void InitializeByItk(itkImageType* itkimage, int channels = 1, int tDim = -1, int sDim=-1)
+	 {
+		if(itkimage==NULL) return;
 
 		m_Dimension=itkimage->GetImageDimension();
 		unsigned int i, *tmpDimensions=new unsigned int[m_Dimension>4?m_Dimension:4];
@@ -201,6 +201,14 @@ class Image : public SlicedData
 			m_Dimension, 
 			tmpDimensions,
 			channels);
+
+      const double *spacinglist = itkimage->GetSpacing();
+      Vector3D spacing(spacinglist[0],1.0,1.0);
+      if(m_Dimension>=2)
+         spacing.y=spacinglist[1];
+      if(m_Dimension>=3)
+         spacing.z=spacinglist[2];
+      m_Geometry3D->SetSpacing(spacing);
 
 		delete tmpDimensions;
 	};

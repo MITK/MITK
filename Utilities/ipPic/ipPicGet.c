@@ -6,7 +6,10 @@
  *   reads a PicFile from disk
  *
  * $Log$
- * Revision 1.5  1998/09/04 17:45:54  andre
+ * Revision 1.6  1999/11/27 19:29:43  andre
+ * *** empty log message ***
+ *
+ * Revision 1.5  1998/09/04  17:45:54  andre
  * *** empty log message ***
  *
  * Revision 1.4  1998/05/06  14:13:15  andre
@@ -36,6 +39,19 @@
 #endif
 
 #include "ipPic.h"
+
+ipFile_t
+_ipPicOpenPicFileIn( char *path )
+{
+  ipFile_t infile;
+  if( path == NULL )
+    infile = stdin;
+  else if( strcmp(path, "stdin") == 0 )
+    infile = stdin;
+  else
+    infile = ipFOpen( path, "rb" );
+  return( infile );
+}
 
 ipPicDescriptor *ipPicGet( char *infile_name, ipPicDescriptor *pic )
 {

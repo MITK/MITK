@@ -22,6 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 // std
 #include <string>
+#include <vector>
 
 #include <ipPic.h>
 
@@ -79,6 +80,7 @@ public:
   static const char* GetExternalFileExtensions() { return EXTERNAL_FILE_EXTENSIONS; };
   static const char* GetSaveFileExtensions() { return SAVE_FILE_EXTENSIONS; };
 
+  typedef std::vector<mitk::DataTreeNode*> DataTreeNodeVector;
   /** \brief compute min and max 
   */
   template < typename TImageType >
@@ -805,8 +807,50 @@ static void SaveImage(mitk::Image* image)
         }
         return NULL;
     }
+    
+    template <typename BaseDataType>
+    static DataTreeNodeVector GetNodesForDataType(mitk::DataTreeIteratorClone it) {
+      DataTreeNodeVector result;
 
+        if ( it.GetPointer() != NULL )
+        {
+       
+        mitk::DataTreeIteratorClone iteratorClone = it->Clone();
+        while ( !iteratorClone->IsAtEnd() )
+        {
+            mitk::DataTreeNode::Pointer node = iteratorClone->Get();
+            if ( dynamic_cast<BaseDataType*>( node->GetData() ) )
+            {
+              result.push_back(node);
+	    }
+	    ++iteratorClone;
+        }
+        }
+	return result;
+         
+    }
+    
+    static DataTreeNodeVector FilterNodes(mitk::DataTreeIteratorClone it, bool (* FilterFunction)(mitk::DataTreeNode*)) {
+      
+      DataTreeNodeVector result;
 
+        if ( it.GetPointer() != NULL )
+        {
+       
+        mitk::DataTreeIteratorClone iteratorClone = it;
+        while ( !iteratorClone->IsAtEnd() )
+        {
+            mitk::DataTreeNode::Pointer node = iteratorClone->Get();
+            if ( FilterFunction( node ) )
+            {
+	      result.push_back(node);
+	    }
+	    ++iteratorClone;
+        }
+        }
+	return result;
+         
+    }
 
 };
 #endif // _CommonFunctionality__h_

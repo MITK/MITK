@@ -166,6 +166,8 @@ private:
   unsigned long m_LastUpdateVtkActorsTime;
 
   vtkWorldPointPicker *m_WorldPointPicker;
+
+  mitk::Mapper::Pointer m_CurrentWorldGeometry2DMapper;
 };
 
 } // namespace mitk

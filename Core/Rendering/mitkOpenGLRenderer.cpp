@@ -27,6 +27,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkVtkRenderWindow.h"
 #include "mitkVtkStencilRenderWindow.h"
 #include "mitkRenderWindow.h"
+#include "mitkGeometry2DDataVtkMapper3D.h"
 
 #include <vtkRenderer.h>
 #include <vtkRendererCollection.h>
@@ -61,6 +62,10 @@ mitk::OpenGLRenderer::OpenGLRenderer() : m_VtkMapperPresent(false),
 #else
   m_DataChangedCommand->SetCallbackFunction(this, &mitk::OpenGLRenderer::DataChangedEvent);
 #endif
+
+  mitk::Geometry2DDataVtkMapper3D::Pointer geometryMapper = mitk::Geometry2DDataVtkMapper3D::New();
+  m_CurrentWorldGeometry2DMapper = geometryMapper;
+  m_CurrentWorldGeometry2DNode->SetMapper(2, geometryMapper);
 }
 
 //##ModelId=3E3D28AB0018
@@ -72,6 +77,7 @@ void mitk::OpenGLRenderer::SetData(const mitk::DataTreeIteratorBase* iterator)
     bool geometry_is_set=false;
 
     BaseRenderer::SetData(iterator);
+    static_cast<mitk::Geometry2DDataVtkMapper3D*>(m_CurrentWorldGeometry2DMapper.GetPointer())->SetDataIteratorForTexture(m_DataTreeIterator.GetPointer());
 
     if (iterator != NULL)
     {

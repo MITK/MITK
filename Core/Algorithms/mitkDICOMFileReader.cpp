@@ -3,7 +3,7 @@
 
 extern "C"
 {
-#include "ipDicom.h"
+#include "ipDicom/ipDicom.h"
 }
 
 void mitk::DICOMFileReader::GenerateOutputInformation()

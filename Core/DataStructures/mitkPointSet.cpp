@@ -198,6 +198,7 @@ void mitk::PointSet::ExecuteOperation(Operation* operation)
     }
     break;
 	default:
+    itkWarningMacro("mitkPointSet could not understrand the operation. Please check!");
 		break;
 	}
 	//to tell the mappers, that the data is modifierd and has to be updated

@@ -1,7 +1,7 @@
 #include "GlobalInteraction.h"
 #include "mitkInteractionConst.h"
 #include "Event.h"
-#include "QmitkStatusBar.h"
+#include "mitkStatusBar.h"
 //#include "Focus.h"
 
 
@@ -38,7 +38,7 @@ bool mitk::GlobalInteraction::ExecuteSideEffect(int sideEffectId, mitk::StateEve
     ok = m_Focus->HandleEvent(stateEvent,...);//give it to Focus which calculates accordingly to it's Statemachine the worldcoordinates
 	//for debugging
 	if (!ok)
-	  (QmitkStatusBar::GetInstance())->DisplayText("Error! Sender: PositionEvent;   Message: HandleEvent returned false", 10000);
+	  (StatusBar::GetInstance())->DisplayText("Error! Sender: PositionEvent;   Message: HandleEvent returned false", 10000);
   }
   */
      

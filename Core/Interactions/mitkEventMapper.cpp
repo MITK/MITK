@@ -12,7 +12,7 @@
 #include "PositionEvent.h"
 #include "EventMapper.h"
 #include <itkOutputWindow.h>
-#include "QmitkStatusBar.h"
+#include "mitkStatusBar.h"
 //#include <string>
 //#include <map>
 //#include "FocusManager.h"
@@ -485,7 +485,7 @@ inline const int mitk::EventMapper::convertConstString2ConstInt(std::string inpu
       return (tempIt)->second;
   }
   
-  (QmitkStatusBar::GetInstance())->DisplayText("Warning! from EventMapper.cpp: Couldn't find matching Event Int from Event String in XML-File");
+  (StatusBar::GetInstance())->DisplayText("Warning! from EventMapper.cpp: Couldn't find matching Event Int from Event String in XML-File");
   return -1;//for didn't find anything
 }
 
@@ -517,7 +517,7 @@ bool mitk::EventMapper::startElement( const QString&, const QString&, const QStr
         
         if (!ok) 
         {
-            (QmitkStatusBar::GetInstance())->DisplayText("error reading Event::Button, ButtonState or Key!");
+            (StatusBar::GetInstance())->DisplayText("error reading Event::Button, ButtonState or Key!");
         }
         m_EventDescriptions.push_back(eventDescr);
 	}

@@ -1,5 +1,5 @@
 #include "StateMachineFactory.h"
-#include "QmitkStatusBar.h"
+#include "mitkStatusBar.h"
 
 
 //##Documentation
@@ -96,7 +96,7 @@ bool mitk::StateMachineFactory::parse(mitk::State::StateMap *states, mitk::State
 	//nextStatesSet is empty, so deadlock!
 	if ( nextStatesSet.empty() )
 	{
-      (QmitkStatusBar::GetInstance())->DisplayText("Warnung: Ein inkonsistenter Zustand (oder ein Endzustand) wird erzeugt!");    
+      (StatusBar::GetInstance())->DisplayText("Warnung: Ein inkonsistenter Zustand (oder ein Endzustand) wird erzeugt!");    
 	  return true;//Jedoch erlaubt!!!z.B. als Endzustand
 	}
 	bool ok;
@@ -133,7 +133,7 @@ bool mitk::StateMachineFactory::ConnectStates(mitk::State::StateMap *states)
 	  else //ether !ok or sizeA!=sizeB
 	  {
 	    delete history;
-        (QmitkStatusBar::GetInstance())->DisplayText("Warnung: Ein unereichbarer Zustand wird aufgebaut. Ueberprüfen sie die Zustands- Konfigurations- Datei");    
+        (StatusBar::GetInstance())->DisplayText("Warnung: Ein unereichbarer Zustand wird aufgebaut. Ueberprüfen sie die Zustands- Konfigurations- Datei");    
 		//return false;//better go on and build/ connect the states than quit
       }
 	}
@@ -144,7 +144,7 @@ bool mitk::StateMachineFactory::ConnectStates(mitk::State::StateMap *states)
 		bool tempbool = ( ( tempState->second )->ConnectTransitions( states ) );
         if ( tempbool = false )
 		{
-       		(QmitkStatusBar::GetInstance())->DisplayText("Warnung: Das Verbinden der Zustände war NICHT erfolgreich!");    
+       		(StatusBar::GetInstance())->DisplayText("Warnung: Das Verbinden der Zustände war NICHT erfolgreich!");    
             return false;//abort!
 		}
 	}

@@ -4,7 +4,7 @@
 #include "OperationEvent.h"
 #include "UndoController.h"
 #include "mitkInteractionConst.h"
-#include "QmitkStatusBar.h"
+#include "mitkStatusBar.h"
 
 //##ModelId=3E5B2DB301FD
 //##Documentation
@@ -67,7 +67,7 @@ bool mitk::StateMachine::HandleEvent(StateEvent const* stateEvent, int objectEve
   else if (!ok && !m_UndoEnabled && 
     m_UndoController->GetLastObjectEventIdInList()==objectEventId)
   {
-    (QmitkStatusBar::GetInstance())->DisplayText("Error! Sender: StateMachine; Message: Operation could not be done!", 10000);
+    (StatusBar::GetInstance())->DisplayText("Error! Sender: StateMachine; Message: Operation could not be done!", 10000);
   }
   return ok;
 }
@@ -95,7 +95,7 @@ void mitk::StateMachine::ExecuteOperation(Operation* operation)
 			mitk::StateTransitionOperation* stateTransOp = dynamic_cast<mitk::StateTransitionOperation *>(operation);
 			if (stateTransOp == NULL)
 			{
-				(QmitkStatusBar::GetInstance())->DisplayText("Error! see StateMachine.cpp", 10000);
+				(StatusBar::GetInstance())->DisplayText("Error! see StateMachine.cpp", 10000);
 				return;
 			}
 			m_CurrentState = stateTransOp->GetState();

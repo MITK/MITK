@@ -3,6 +3,7 @@
 #include "mitkSlicedGeometry3D.h"
 #include "mitkPlaneGeometry.h"
 #include "mitkProperties.h"
+#include "mitkFloatProperty.h"
 
 #include <ipPicTypeMultiplex.h>
 
@@ -367,13 +368,6 @@ void mitk::CylindricToCartesianFilter::GenerateData()
   mitk::ImageTimeSelector::Pointer timeSelector=mitk::ImageTimeSelector::New();
   timeSelector->SetInput(input);
 
-  if(zt==NULL)
-  {
-    buildTransformShortCuts(input->GetDimension(0),input->GetDimension(1), input->GetDimension(2), output->GetDimension(0), rt_pic, phit_pic, fr_pic, fphi_pic, zt, fz);
-    buildConeCutOffShortCut(input->GetDimension(0),input->GetDimension(1), rt_pic, fr_pic, a, b, coneCutOff_pic);
-    //		ipPicPut("C:\\temp\\rt_90.pic",rt_pic);
-  }
-
   ipPicDescriptor* pic_transformed;
   pic_transformed = ipPicNew();
   pic_transformed->dim=3;
@@ -393,6 +387,29 @@ void mitk::CylindricToCartesianFilter::GenerateData()
   tmax=tstart+output->GetRequestedRegion().GetSize(3);
   nmax=nstart+output->GetRequestedRegion().GetSize(4);
 
+  if(zt==NULL)
+  {
+    timeSelector->SetChannelNr(nstart);
+    timeSelector->SetTimeNr(tstart);
+
+    buildTransformShortCuts(input->GetDimension(0),input->GetDimension(1), input->GetDimension(2), output->GetDimension(0), rt_pic, phit_pic, fr_pic, fphi_pic, zt, fz);
+
+    // query the line limiting the sector
+    a=b=0;
+    mitk::FloatProperty::Pointer prop;
+
+    prop = dynamic_cast<mitk::FloatProperty*>(input->GetProperty("SECTOR LIMITING LINE OFFSET").GetPointer());
+    if (prop.IsNotNull() )
+      a = prop->GetValue();
+    prop = dynamic_cast<mitk::FloatProperty*>(input->GetProperty("SECTOR LIMITING LINE SLOPE").GetPointer());
+    if (prop.IsNotNull() )
+      b = prop->GetValue();
+
+    buildConeCutOffShortCut(input->GetDimension(0),input->GetDimension(1), rt_pic, fr_pic, a, b, coneCutOff_pic);
+    //		ipPicPut("C:\\temp\\rt_90.pic",rt_pic);
+    ipPicPut("C:\\temp\\coneCutOff.pic", coneCutOff_pic);
+  }
+
   int n,t;
   for(n=nstart;n<nmax;++n)//output->GetNumberOfChannels();++n)
   {
@@ -406,16 +423,6 @@ void mitk::CylindricToCartesianFilter::GenerateData()
 
       _ipPicFreeTags(pic_transformed->info->tags_head);
       pic_transformed->info->tags_head = _ipPicCloneTags(timeSelector->GetOutput()->GetPic()->info->tags_head);
-
-      // query the line limiting the sector
-      a=b=0;
-      ipPicTSV_t *Tag;
-      Tag = ipPicQueryTag(timeSelector->GetOutput()->GetPic(), "SECTOR LIMITING LINE");
-      if (Tag != NULL)
-      {
-        ipFloat4_t *line = ((ipFloat4_t *) Tag->value);
-        a=line[0]; b=line[1];
-      }
 
       ipPicTypeMultiplex9(_transform, timeSelector->GetOutput()->GetPic(), pic_transformed, m_OutsideValue, (float*)fr_pic->data, (float*)fphi_pic->data, fz, (short *)rt_pic->data, (unsigned int *)phit_pic->data, zt, coneCutOff_pic);
       //	ipPicPut("1trf.pic",pic_transformed);	

@@ -4,12 +4,15 @@
 #include "mitkCommon.h"
 #include "Geometry2D.h"
 #include <itkImageRegion.h>
+#include <itkBoundingBox.h>
 
 namespace mitk {
 
 #if _MSC_VER < 1300
 #define GImageDimension 4
 #endif
+
+typedef itk::BoundingBox<> BoundingBox;
 
 //##ModelId=3DCBF389032B
 //##Documentation
@@ -113,7 +116,7 @@ public:
     mitk::Geometry2D::ConstPointer GetGeometry2D(int s, int t) const;
 
     //##ModelId=3DCBF5D40253
-    void GetBoundingBox() const;
+    mitk::BoundingBox::ConstPointer GetBoundingBox(int t = 0) const;
 
     //##ModelId=3DCBF5E9037F
     double GetTime(int t) const;

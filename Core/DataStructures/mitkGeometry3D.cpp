@@ -27,7 +27,7 @@ mitk::Geometry2D::ConstPointer mitk::Geometry3D::GetGeometry2D(int s, int t) con
 
     if(IsValidSlice(s, t))
     {
-        int pos=s*m_Dimensions[2]+t*m_Dimensions[3];
+        int pos=s+t*m_Dimensions[2];
 	    geometry2d = m_Geometry2Ds[pos];
         //if (a) we don't have a Geometry2D stored for the requested slice, 
         //(b) m_EvenlySpaced is activated and (c) the first slice (s=0,t=0) 
@@ -35,13 +35,14 @@ mitk::Geometry2D::ConstPointer mitk::Geometry3D::GetGeometry2D(int s, int t) con
         //as the plane of the first slice shifted by m_Spacing*s.
         if((m_EvenlySpaced) && (geometry2d==NULL))
         {
+            Vector3D zStep(0,0,m_Spacing.z);
             const PlaneGeometry* firstslice=dynamic_cast<const PlaneGeometry*> (m_Geometry2Ds[0].GetPointer());
-            if(geometry2d!=NULL)
+            if(firstslice!=NULL)
             {
                 mitk::PlaneView view=firstslice->GetPlaneView();
                 mitk::PlaneGeometry::Pointer requestedslice;
                 requestedslice = mitk::PlaneGeometry::New();
-                view.point+=m_Spacing*s;
+                view.point+=zStep*s;
                 requestedslice->SetPlaneView(view);
                 geometry2d = requestedslice;
                 m_Geometry2Ds[pos] = geometry2d;
@@ -52,9 +53,53 @@ mitk::Geometry2D::ConstPointer mitk::Geometry3D::GetGeometry2D(int s, int t) con
 }
 
 //##ModelId=3DCBF5D40253
-void mitk::Geometry3D::GetBoundingBox() const
+mitk::BoundingBox::ConstPointer mitk::Geometry3D::GetBoundingBox(int t) const
 {
-	itkExceptionMacro("BoundingBox not yet supported."); 	
+    mitk::BoundingBox::Pointer m_BoundingBox=mitk::BoundingBox::New();
+
+    mitk::BoundingBox::PointsContainer::Pointer pointscontainer=mitk::BoundingBox::PointsContainer::New();
+    float nullpoint[]={0,0,0};
+    mitk::BoundingBox::PointType p(nullpoint);
+
+    assert(m_EvenlySpaced);
+
+    int s, slices;
+    mitk::BoundingBox::PointIdentifier pointid=0;
+    
+    slices=( GetDataDimension()<=2 ? 1 : GetDimensions()[2] );
+
+    for(s=0;s<slices;++s)
+    {
+        const PlaneGeometry* planegeometry =
+            dynamic_cast<const PlaneGeometry *>(GetGeometry2D(s,t).GetPointer());
+        assert(planegeometry!=NULL);
+
+        const PlaneView& planeview=planegeometry->GetPlaneView();
+        Point3D pt;
+
+        //add the four edge points of the plane geometry to the bounding box calculator.
+        pt=planeview.point;
+        p[0]=pt.x; p[1]=pt.y; p[2]=pt.z;
+        pointscontainer->InsertElement(pointid++, p);
+        
+        pt=planeview.point+planeview.getOrientation1();
+        p[0]=pt.x; p[1]=pt.y; p[2]=pt.z;
+        pointscontainer->InsertElement(pointid++, p);
+        
+        pt+=planeview.getOrientation2();
+        p[0]=pt.x; p[1]=pt.y; p[2]=pt.z;
+        pointscontainer->InsertElement(pointid++, p);
+        
+        pt=planeview.point+planeview.getOrientation2();
+        p[0]=pt.x; p[1]=pt.y; p[2]=pt.z;
+        pointscontainer->InsertElement(pointid++, p);
+    }
+   
+    m_BoundingBox->SetPoints(pointscontainer);
+
+    m_BoundingBox->ComputeBoundingBox();
+
+    return m_BoundingBox;
 }
 
 //##ModelId=3DCBF5E9037F

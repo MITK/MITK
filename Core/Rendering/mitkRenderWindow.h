@@ -46,6 +46,11 @@ public:
     return m_MitkVtkRenderWindow;
   }
 
+  //##Documentation
+  //## @brief Set the VtkRenderWindow
+  void SetVtkRenderWindow(VtkRenderWindow* renWin);
+
+
   //##ModelId=3EF1627602DF
   //##Documentation
   //## @brief Makes the renderwindow the current widget for rendering.

@@ -87,3 +87,13 @@ void mitk::RenderWindow::SetWindowId(void * id)
 {
   m_MitkVtkRenderWindow->SetWindowId( id );
 }
+
+void mitk::RenderWindow::SetVtkRenderWindow(VtkRenderWindow* renWin)
+{
+  if (renWin != NULL)
+  {
+    m_MitkVtkRenderWindow = renWin;
+    InitRenderer();
+  }
+}
+

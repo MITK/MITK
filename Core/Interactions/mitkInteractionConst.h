@@ -1,5 +1,8 @@
 #ifndef MITKINTERACTCONST_H
 #define MITKINTERACTCONST_H
+
+namespace mitk{
+
 /*
 //UndoMechanism:
 //constants for UndoMechanism;
@@ -70,92 +73,92 @@
 #define SeDELETEPOINT 120
 
 
-	//Type
-#define None 0				// invalid event
-#define Timer 1				// timer event
-#define MouseButtonPress 2			// mouse button pressed
-#define MouseButtonRelease 3			// mouse button released
-#define MouseButtonDblClick 4		// mouse button double click
-#define MouseMove 5				// mouse move
-#define KeyPress 6				// key pressed
-#define KeyRelease 7				// key released
-#define FocusIn 8				// keyboard focus received
-#define FocusOut 9				// keyboard focus lost
-#define Enter 10				// mouse enters widget
-#define Leave 11				// mouse leaves widget
-#define Paint 12				// paint widget
-#define Move 13				// move widget
-#define Resize 14				// resize widget
-#define Create 15				// after object creation
-#define Destroy 16				// during object destruction
-#define Show 17				// widget is shown
-#define Hide 18				// widget is hidden
-#define Close 19				// request to close widget
-#define Quit 20				// request to quit application
-#define Reparent 21				// widget has been reparented
-#define ShowMinimized 22		       	// widget is shown minimized
-#define ShowNormal 23	       		// widget is shown normal
-#define WindowActivate 24	       		// window was activated
-#define WindowDeactivate 25	       		// window was deactivated
-#define ShowToParent 26	       		// widget is shown to parent
-#define HideToParent 27	       		// widget is hidden to parent
-#define ShowMaximized 28		       	// widget is shown maximized
-#define ShowFullScreen 29			// widget is shown full-screen
-#define Accel 30				// accelerator event
-#define Wheel 31				// wheel event
-#define AccelAvailable 32			// accelerator available event
-#define CaptionChange 33			// caption changed
-#define IconChange 34			// icon changed
-#define ParentFontChange 35			// parent font changed
-#define ApplicationFontChange 36		// application font changed
-#define ParentPaletteChange 37		// parent palette changed
-#define ApplicationPaletteChange 38		// application palette changed
-#define PaletteChange 39			// widget palette changed
-#define Clipboard 40				// internal clipboard event
-#define Speech 42				// reserved for speech input
-#define SockAct 50				// socket activation
-#define AccelOverride 51			// accelerator override event
-#define DeferredDelete 52			// deferred delete event
-#define DragEnter 60				// drag moves into widget
-#define DragMove 61				// drag moves in widget
-#define DragLeave 62				// drag leaves or is cancelled
-#define Drop 63				// actual drop
-#define DragResponse 64			// drag accepted/rejected
-#define ChildInserted 70			// new child widget
-#define ChildRemoved 71			// deleted child widget
-#define LayoutHint 72			// child min/max size changed
-#define ShowWindowRequest 73			// widget's window should be mapped
-#define ActivateControl 80			// ActiveX activation
-#define DeactivateControl 81			// ActiveX deactivation
-#define ContextMenu 82			// context popup menu
-#define IMStart 83				// input method composition start
-#define IMCompose 84				// input method composition
-#define IMEnd 85				// input method composition end
-#define Accessibility 86			// accessibility information is requested
-#define TabletMove 87			// Wacom tablet event
-#define LocaleChange 88			// the system locale changed
-#define LanguageChange 89			// the application language changed
-#define LayoutDirectionChange 90		// the layout direction changed
-#define Style 91				// internal style event
-#define TabletPress 92			// tablet press
-#define TabletRelease 93			// tablet release
-#define User 1000				// first user event id
-#define MaxUser 65535
+//Type
+#define Type_None 0				// invalid event
+#define Type_Timer 1				// timer event
+#define Type_MouseButtonPress 2			// mouse button pressed
+#define Type_MouseButtonRelease 3			// mouse button released
+#define Type_MouseButtonDblClick 4		// mouse button double click
+#define Type_MouseMove 5				// mouse move
+#define Type_KeyPress 6				// key pressed
+#define Type_KeyRelease 7				// key released
+#define Type_FocusIn 8				// keyboard focus received
+#define Type_FocusOut 9				// keyboard focus lost
+#define Type_Enter 10				// mouse enters widget
+#define Type_Leave 11				// mouse leaves widget
+#define Type_Paint 12				// paint widget
+#define Type_Move 13				// move widget
+#define Type_Resize 14				// resize widget
+#define Type_Create 15				// after object creation
+#define Type_Destroy 16				// during object destruction
+#define Type_Show 17				// widget is shown
+#define Type_Hide 18				// widget is hidden
+#define Type_Close 19				// request to close widget
+#define Type_Quit 20				// request to quit application
+#define Type_Reparent 21				// widget has been reparented
+#define Type_ShowMinimized 22		       	// widget is shown minimized
+#define Type_ShowNormal 23	       		// widget is shown normal
+#define Type_WindowActivate 24	       		// window was activated
+#define Type_WindowDeactivate 25	       		// window was deactivated
+#define Type_ShowToParent 26	       		// widget is shown to parent
+#define Type_HideToParent 27	       		// widget is hidden to parent
+#define Type_ShowMaximized 28		       	// widget is shown maximized
+#define Type_ShowFullScreen 29			// widget is shown full-screen
+#define Type_Accel 30				// accelerator event
+#define Type_Wheel 31				// wheel event
+#define Type_AccelAvailable 32			// accelerator available event
+#define Type_CaptionChange 33			// caption changed
+#define Type_IconChange 34			// icon changed
+#define Type_ParentFontChange 35			// parent font changed
+#define Type_ApplicationFontChange 36		// application font changed
+#define Type_ParentPaletteChange 37		// parent palette changed
+#define Type_ApplicationPaletteChange 38		// application palette changed
+#define Type_PaletteChange 39			// widget palette changed
+#define Type_Clipboard 40				// internal clipboard event
+#define Type_Speech 42				// reserved for speech input
+#define Type_SockAct 50				// socket activation
+#define Type_AccelOverride 51			// accelerator override event
+#define Type_DeferredDelete 52			// deferred delete event
+#define Type_DragEnter 60				// drag moves into widget
+#define Type_DragMove 61				// drag moves in widget
+#define Type_DragLeave 62				// drag leaves or is cancelled
+#define Type_Drop 63				// actual drop
+#define Type_DragResponse 64			// drag accepted/rejected
+#define Type_ChildInserted 70			// new child widget
+#define Type_ChildRemoved 71			// deleted child widget
+#define Type_LayoutHint 72			// child min/max size changed
+#define Type_ShowWindowRequest 73			// widget's window should be mapped
+#define Type_ActivateControl 80			// ActiveX activation
+#define Type_DeactivateControl 81			// ActiveX deactivation
+#define Type_ContextMenu 82			// context popup menu
+#define Type_IMStart 83				// input method composition start
+#define Type_IMCompose 84				// input method composition
+#define Type_IMEnd 85				// input method composition end
+#define Type_Accessibility 86			// accessibility information is requested
+#define Type_TabletMove 87			// Wacom tablet event
+#define Type_LocaleChange 88			// the system locale changed
+#define Type_LanguageChange 89			// the application language changed
+#define Type_LayoutDirectionChange 90		// the layout direction changed
+#define Type_Style 91				// internal style event
+#define Type_TabletPress 92			// tablet press
+#define Type_TabletRelease 93			// tablet release
+#define Type_User 1000				// first user event id
+#define Type_MaxUser 65535
 
-	//##ButtonState
-	// mouse/keyboard state values
-	//QT combinations: left MouseButton + ControlButton: 0x201
-#define NoButton        0x0000
-#define LeftButton      0x0001
-#define RightButton     0x0002
-#define MidButton       0x0004
-#define MouseButtonMask 0x0007
-#define ShiftButton     0x0100
-#define ControlButton   0x0200
-#define AltButton       0x0400
-#define MetaButton		0x0800
-#define KeyButtonMask   0x0f00
-#define Keypad          0x4000
+//##ButtonState
+// mouse/keyboard state values
+//QT combinations: left MouseButton + ControlButton: 0x201
+#define BS_NoButton        0x0000
+#define BS_LeftButton      0x0001
+#define BS_RightButton     0x0002
+#define BS_MidButton       0x0004
+#define BS_MouseButtonMask 0x0007
+#define BS_ShiftButton     0x0100
+#define BS_ControlButton   0x0200
+#define BS_AltButton       0x0400
+#define BS_MetaButton		0x0800
+#define BS_KeyButtonMask   0x0f00
+#define BS_Keypad          0x4000
 
 	//##Key
 #define Key_Escape 0x1000            // misc keys
@@ -408,5 +411,5 @@
 
 
 
-
+}//namespace mitk
 #endif //ifndef MITKINTERACTCONST_H

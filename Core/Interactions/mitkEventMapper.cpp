@@ -42,96 +42,96 @@ std::string mitk::EventMapper::m_StyleName;
 
 //array with string to key for mapping string from xml-file to int
 StringIntArrayStruct mitkEventConstArray[] = {
-	{"None",					0},		// invalid event
-	{"Timer",					1},		// timer event
-	{"MouseButtonPress" ,		2},		// mouse button pressed
-	{"MouseButtonRelease" ,		3},		// mouse button released
-	{"MouseButtonDblClick" ,	4},		// mouse button double click
-	{"MouseMove" ,				5},		// mouse move
-	{"KeyPress" ,				6},		// key pressed
-	{"KeyRelease" ,				7},		// key released
-	{"FocusIn" ,				8},		// keyboard focus received
-	{"FocusOut" ,				9},		// keyboard focus lost
-	{"Enter" ,					10},	// mouse enters widget
-	{"Leave" ,					11},	// mouse leaves widget
-	{"Paint" ,					12},	// paint widget
-	{"Move" ,					13},	// move widget
-	{"Resize" ,					14},	// resize widget
-	{"Create" ,					15},	// after object creation
-	{"Destroy" ,				16},	// during object destruction
-	{"Show" ,					17},	// widget is shown
-	{"Hide" ,					18},	// widget is hidden
-	{"Close" ,					19},	// request to close widget
-	{"Quit" ,					20},	// request to quit application
-	{"Reparent" ,				21},	// widget has been reparented
-	{"ShowMinimized" ,			22},	// widget is shown minimized
-	{"ShowNormal" ,				23},	// widget is shown normal
-	{"WindowActivate" ,			24},	// window was activated
-	{"WindowDeactivate" ,		25},	// window was deactivated
-	{"ShowToParent" ,			26},	// widget is shown to parent
-	{"HideToParent" ,			27},	// widget is hidden to parent
-	{"ShowMaximized" ,			28},	// widget is shown maximized
-	{"ShowFullScreen" ,			29},	// widget is shown full-screen
-	{"Accel" ,					30},	// accelerator event
-	{"Wheel" ,					31},	// wheel event
-	{"AccelAvailable" ,			32},	// accelerator available event
-	{"CaptionChange" ,			33},	// caption changed
-	{"IconChange" ,				34},	// icon changed
-	{"ParentFontChange" ,		35},	// parent font changed
-	{"ApplicationFontChange" ,	36},// application font changed
-	{"ParentPaletteChange" ,	37},	// parent palette changed
-	{"ApplicationPaletteChange" , 38},// application palette changed
-	{"PaletteChange" ,			39},	// widget palette changed
-	{"Clipboard" ,				40},	// internal clipboard event
-	{"Speech" ,					42},	// reserved for speech input
-	{"SockAct" ,				50},	// socket activation
-	{"AccelOverride" ,			51},	// accelerator override event
-	{"DeferredDelete" ,			52},	// deferred delete event
-	{"DragEnter" ,				60},	// drag moves into widget
-	{"DragMove" ,				61},	// drag moves in widget
-	{"DragLeave" ,				62},	// drag leaves or is cancelled
-	{"Drop" ,					63},	// actual drop
-	{"DragResponse" ,			64},	// drag accepted/rejected
-	{"ChildInserted" ,			70},	// new child widget
-	{"ChildRemoved" ,			71},	// deleted child widget
-	{"LayoutHint" ,				72},	// child min/max size changed
-	{"ShowWindowRequest" ,		73},	// widget's window should be mapped
-	{"ActivateControl" ,		80},	// ActiveX activation
-	{"DeactivateControl" ,		81},	// ActiveX deactivation
-	{"ContextMenu" ,			82},	// context popup menu
-	{"IMStart" ,				83},	// input method composition start
-	{"IMCompose" ,				84},	// input method composition
-	{"IMEnd" ,					85},	// input method composition end
-	{"Accessibility" ,			86},	// accessibility information is requested
-	{"TabletMove" ,				87},	// Wacom tablet event
-	{"LocaleChange" ,			88},	// the system locale changed
-	{"LanguageChange" ,			89},	// the application language changed
-	{"LayoutDirectionChange" ,	90},	// the layout direction changed
-	{"Style" ,					91},	// internal style event
-	{"TabletPress" ,			92},	// tablet press
-	{"TabletRelease" ,			93},	// tablet release
-	{"User" ,					1000},	// first user event id
-	{"MaxUser" ,				65535},	// last user event id
+	{"Type_None",					0},		// invalid event
+	{"Type_Timer",					1},		// timer event
+	{"Type_MouseButtonPress" ,		2},		// mouse button pressed
+	{"Type_MouseButtonRelease" ,	3},		// mouse button released
+	{"Type_MouseButtonDblClick" ,	4},		// mouse button double click
+	{"Type_MouseMove" ,				5},		// mouse move
+	{"Type_KeyPress" ,				6},		// key pressed
+	{"Type_KeyRelease" ,			7},		// key released
+	{"Type_FocusIn" ,				8},		// keyboard focus received
+	{"Type_FocusOut" ,				9},		// keyboard focus lost
+	{"Type_Enter" ,					10},	// mouse enters widget
+	{"Type_Leave" ,					11},	// mouse leaves widget
+	{"Type_Paint" ,					12},	// paint widget
+	{"Type_Move" ,					13},	// move widget
+	{"Type_Resize" ,				14},	// resize widget
+	{"Type_Create" ,				15},	// after object creation
+	{"Type_Destroy" ,				16},	// during object destruction
+	{"Type_Show" ,					17},	// widget is shown
+	{"Type_Hide" ,					18},	// widget is hidden
+	{"Type_Close" ,					19},	// request to close widget
+	{"Type_Quit" ,					20},	// request to quit application
+	{"Type_Reparent" ,				21},	// widget has been reparented
+	{"Type_ShowMinimized" ,			22},	// widget is shown minimized
+	{"Type_ShowNormal" ,			23},	// widget is shown normal
+	{"Type_WindowActivate" ,		24},	// window was activated
+	{"Type_WindowDeactivate" ,		25},	// window was deactivated
+	{"Type_ShowToParent" ,			26},	// widget is shown to parent
+	{"Type_HideToParent" ,			27},	// widget is hidden to parent
+	{"Type_ShowMaximized" ,			28},	// widget is shown maximized
+	{"Type_ShowFullScreen" ,		29},	// widget is shown full-screen
+	{"Type_Accel" ,					30},	// accelerator event
+	{"Type_Wheel" ,					31},	// wheel event
+	{"Type_AccelAvailable" ,		32},	// accelerator available event
+	{"Type_CaptionChange" ,			33},	// caption changed
+	{"Type_IconChange" ,			34},	// icon changed
+	{"Type_ParentFontChange" ,		35},	// parent font changed
+	{"Type_ApplicationFontChange" ,	36},// application font changed
+	{"Type_ParentPaletteChange" ,	37},	// parent palette changed
+	{"Type_ApplicationPaletteChange" , 38},// application palette changed
+	{"Type_PaletteChange" ,			39},	// widget palette changed
+	{"Type_Clipboard" ,				40},	// internal clipboard event
+	{"Type_Speech" ,				42},	// reserved for speech input
+	{"Type_SockAct" ,				50},	// socket activation
+	{"Type_AccelOverride" ,			51},	// accelerator override event
+	{"Type_DeferredDelete" ,		52},	// deferred delete event
+	{"Type_DragEnter" ,				60},	// drag moves into widget
+	{"Type_DragMove" ,				61},	// drag moves in widget
+	{"Type_DragLeave" ,				62},	// drag leaves or is cancelled
+	{"Type_Drop" ,					63},	// actual drop
+	{"Type_DragResponse" ,			64},	// drag accepted/rejected
+	{"Type_ChildInserted" ,			70},	// new child widget
+	{"Type_ChildRemoved" ,			71},	// deleted child widget
+	{"Type_LayoutHint" ,			72},	// child min/max size changed
+	{"Type_ShowWindowRequest" ,		73},	// widget's window should be mapped
+	{"Type_ActivateControl" ,		80},	// ActiveX activation
+	{"Type_DeactivateControl" ,		81},	// ActiveX deactivation
+	{"Type_ContextMenu" ,			82},	// context popup menu
+	{"Type_IMStart" ,				83},	// input method composition start
+	{"Type_IMCompose" ,				84},	// input method composition
+	{"Type_IMEnd" ,					85},	// input method composition end
+	{"Type_Accessibility" ,			86},	// accessibility information is requested
+	{"Type_TabletMove" ,			87},	// Wacom tablet event
+	{"Type_LocaleChange" ,			88},	// the system locale changed
+	{"Type_LanguageChange" ,		89},	// the application language changed
+	{"Type_LayoutDirectionChange" ,	90},	// the layout direction changed
+	{"Type_Style" ,					91},	// internal style event
+	{"Type_TabletPress" ,			92},	// tablet press
+	{"Type_TabletRelease" ,			93},	// tablet release
+	{"Type_User" ,					1000},	// first user event id
+	{"Type_MaxUser" ,				65535},	// last user event id
 
 //ButtonState
-    {"NoButton" , 0x0000},
-    {"LeftButton" , 0x0001},
-    {"RightButton" , 0x0002},
-    {"MidButton" , 0x0004},
-    {"MouseButtonMask" , 0x0007},
-    {"ShiftButton" , 0x0008},
-    {"ControlButton" , 0x0010},
-    {"AltButton" , 0x0020},
-    {"KeyButtonMask" , 0x0038},
-    {"Keypad" , 0x4000},
+    {"BS_NoButton" , 0x0000},
+    {"BS_LeftButton" , 0x0001},
+    {"BS_RightButton" , 0x0002},
+    {"BS_MidButton" , 0x0004},
+    {"BS_MouseButtonMask" , 0x0007},
+    {"BS_ShiftButton" , 0x0008},
+    {"BS_ControlButton" , 0x0010},
+    {"BS_AltButton" , 0x0020},
+    {"BS_KeyButtonMask" , 0x0038},
+    {"BS_Keypad" , 0x4000},
 
 //Modifier
-    {"SHIFT" , 0x00200000},
-    {"CTRL" , 0x00400000},
-    {"ALT" , 0x00800000},
-    {"MODIFIER_MASK" , 0x00e00000},
-    {"UNICODE_ACCEL" , 0x10000000},
-    {"ASCII_ACCEL" , 0x10000000},
+    {"Mod_SHIFT" , 0x00200000},
+    {"Mod_CTRL" , 0x00400000},
+    {"Mod_ALT" , 0x00800000},
+    {"Mod_MODIFIER_MASK" , 0x00e00000},
+    {"Mod_UNICODE_ACCEL" , 0x10000000},
+    {"Mod_ASCII_ACCEL" , 0x10000000},
 
 //Key
     {"Key_Escape", 0x1000},

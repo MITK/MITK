@@ -6,9 +6,22 @@ mitk::StateMachine::StateMachine(std::string type)
 {}
 
 //##ModelId=3E5B2DE30378
-bool mitk::StateMachine::SetEvent(StateEvent const* stateEvent)
+bool mitk::StateMachine::HandleEvent(StateEvent const* stateEvent)
 {
-	return true;
+	const Transition *tempTransition = m_CurrentState->GetTransition(stateEvent->GetId());
+	
+	State *tempState = tempTransition->GetNextState();
+	if (tempState == NULL)
+		return false;
+	
+	int tempSideEffectId = tempTransition->GetSideEffectId();
+
+	//remember UNDO!!!!!
+	/*new Operation for StateChange and Operation*/
+	m_CurrentState = tempState;
+
+	//remember UNDO!!!!!
+	return Operation(tempSideEffectId);
 }
 
 //##ModelId=3E5B2E660087
@@ -18,7 +31,7 @@ std::string mitk::StateMachine::GetName() const
 }
 
 //##ModelId=3E5B2E170228
-bool mitk::StateMachine::Operation(int sideEffectId)
+bool mitk::StateMachine::ExecuteSideEffect(int sideEffectId)
 {
 	return true;
 }

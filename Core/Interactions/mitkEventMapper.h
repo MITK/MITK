@@ -25,7 +25,7 @@ class EventMapper : public QXmlDefaultHandler
     static SetStateMachine(StateMachine* stateMachine);
 
     //##ModelId=3E5B34CF0041
-    static bool SetEvent(Event* event);
+    static bool MapEvent(Event* event);
 
     //##ModelId=3E5B35140072
 	static bool LoadBehavior(std::string fileName);

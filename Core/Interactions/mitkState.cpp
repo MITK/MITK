@@ -54,7 +54,10 @@ std::set<int> mitk::State::GetAllNextStates() const
 }
 
 //##ModelId=3E64B4360017
-bool mitk::State::LocateTransition(int eventId) const
+//##Documentation
+//## to check, if this Event has a Transition. 
+//## for menu Behavior e.g.
+bool mitk::State::IsValidEvent(int eventId) const
 {
 	if( m_Transitions.find(eventId) != m_Transitions.end() )
         return true;

@@ -26,7 +26,7 @@ mitk::EventMapper::SetStateMachine(StateMachine* stateMachine)
 }
 
 //##ModelId=3E5B34CF0041
-bool mitk::EventMapper::SetEvent(Event* event)
+bool mitk::EventMapper::MapEvent(Event* event)
 {
 	if (m_StateMachine == NULL) 
 		return false;
@@ -40,7 +40,7 @@ bool mitk::EventMapper::SetEvent(Event* event)
 		return false;
 
 	m_StateEvent.Set( (m_EventDescriptions.at(i)).GetId(), event );
-	m_StateMachine->SetEvent(&m_StateEvent);
+	m_StateMachine->HandleEvent(&m_StateEvent);
 	return true;
 }
 

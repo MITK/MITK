@@ -23,6 +23,11 @@ const std::string mitk::StateMachineFactory::NEXT_STATE_ID = "NEXT_STATE_ID";
 const std::string mitk::StateMachineFactory::EVENT_ID = "EVENT_ID";
 //##ModelId=3E775729017C
 const std::string mitk::StateMachineFactory::SIDE_EFFECT_ID = "SIDE_EFFECT_ID";
+//##ModelId=3E7F18FF0131
+const std::string mitk::StateMachineFactory::TRUE = "TRUE";
+//##ModelId=3E7F18FF01FD
+const std::string mitk::StateMachineFactory::FALSE = "FALSE";
+
 
 
 //##ModelId=3E68B2C600BD

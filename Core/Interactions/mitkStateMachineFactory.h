@@ -88,6 +88,10 @@ namespace mitk {
 	  static const std::string EVENT_ID;
     //##ModelId=3E775729017C
 	  static const std::string SIDE_EFFECT_ID;
+    //##ModelId=3E7F18FF0131
+	  static const std::string TRUE;
+    //##ModelId=3E7F18FF01FD
+	  static const std::string FALSE;
 	
 
 

@@ -52,9 +52,9 @@ class State
 
     //##ModelId=3E64B4360017
     //##Documentation
-    //## locates an eventId in the hashmap and returns true if located, else
-    //## false
-    bool LocateTransition(int eventId) const;
+	//## to check, if this Event has a Transition. 
+	//## for menu Behavior e.g.
+    bool IsValidEvent(int eventId) const;
 
     //##ModelId=3E68C573013F
 	//##Documentation

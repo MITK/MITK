@@ -174,9 +174,13 @@ mitk::ImageDataItem::Pointer mitk::Image::GetVolumeData(int t, int n)
         sl=m_Slices[posSl];
         if(sl->GetParent()!=vol)
         {
+          // copy data of slices in volume
+          int offset = s*size;
+          memcpy(static_cast<char*>(vol->GetData())+offset, sl->GetData(), size);
+
+          // replace old slice with reference to volume
           sl=new ImageDataItem(*vol, 2, s*size);
           sl->SetComplete(true);
-          memcpy(static_cast<char*>(vol->GetData())+sl->GetOffset(), sl->GetData(), size);
           m_Slices[posSl]=sl;
         }
       }
@@ -254,7 +258,8 @@ mitk::ImageDataItem::Pointer mitk::Image::GetChannelData(int n)
           memcpy(static_cast<char*>(ch->GetData())+offset, vol->GetData(), size);
 
           // replace old volume with reference to channel
-          vol=new ImageDataItem(*vol, 3, offset);
+          vol=new ImageDataItem(*ch, 3, offset);
+          vol->SetComplete(true);
           m_Volumes[posVol]=vol;
         }
       }
@@ -509,8 +514,6 @@ void mitk::Image::Initialize(const mitk::PixelType& type, unsigned int dimension
 
   ComputeOffsetTable();
 
-  SetRequestedRegionToLargestPossibleRegion();
-
   m_Initialized = true;
 }
 
@@ -630,7 +633,7 @@ void mitk::Image::Initialize(ipPicDescriptor* pic, int channels, int tDim, int s
   SlicedGeometry3D::Pointer slicedGeometry = SlicedGeometry3D::New();
   slicedGeometry->Initialize(m_Dimensions[2]);
   slicedGeometry->SetSpacing(pic);
-  slicedGeometry->SetGeometry2D(pic);
+  slicedGeometry->SetGeometry2D(pic, 0);
   slicedGeometry->SetEvenlySpaced();
   timeSliceGeometry->SetGeometry3D(slicedGeometry, 0);
   timeSliceGeometry->SetEvenlyTimed();
@@ -648,8 +651,6 @@ void mitk::Image::Initialize(ipPicDescriptor* pic, int channels, int tDim, int s
   m_Slices.assign(GetNumberOfChannels()*m_Dimensions[3]*m_Dimensions[2], dnull);
 
   ComputeOffsetTable();
-
-  SetRequestedRegionToLargestPossibleRegion();
 
   // initialize level-window
   m_LevelWindow.SetAuto( pic );

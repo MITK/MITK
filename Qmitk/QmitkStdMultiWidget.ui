@@ -8,8 +8,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>536</width>
-            <height>726</height>
+            <width>596</width>
+            <height>920</height>
         </rect>
     </property>
     <property name="caption">
@@ -180,6 +180,7 @@
     <slot returnType="bool">InitializeStandardViews( mitk::DataTreeIteratorBase * it )</slot>
     <slot returnType="bool">InitializeStandardViews( mitk::Geometry3D * geometry )</slot>
     <slot>wheelEvent( QWheelEvent * e )</slot>
+    <slot>ReInitializeStandardViews()</slot>
 </slots>
 <functions>
     <function access="private" specifier="non virtual">init()</function>

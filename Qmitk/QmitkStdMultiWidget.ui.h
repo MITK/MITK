@@ -540,3 +540,24 @@ mitk::DisplayVectorInteractor* QmitkStdMultiWidget::GetMoveAndZoomInteractor()
     return m_MoveAndZoomInteractor;
 }
 
+
+
+void QmitkStdMultiWidget::ReInitializeStandardViews()
+{
+  mitk::SliceNavigationController* sliceNavigatorTransversal = mitkWidget1->GetSliceNavigationController();
+  mitk::SliceNavigationController* sliceNavigatorSagittal    = mitkWidget2->GetSliceNavigationController();
+  mitk::SliceNavigationController* sliceNavigatorFrontal     = mitkWidget3->GetSliceNavigationController();
+
+  sliceNavigatorTransversal->SetViewDirection(mitk::SliceNavigationController::Transversal);
+  sliceNavigatorSagittal->SetViewDirection(mitk::SliceNavigationController::Sagittal);
+  sliceNavigatorFrontal->SetViewDirection(mitk::SliceNavigationController::Frontal);
+  
+  multiplexUpdateController->SetBlockUpdate(true);
+    sliceNavigatorTransversal->Update();
+    sliceNavigatorSagittal->Update();
+    sliceNavigatorFrontal->Update();
+    timeNavigationController->Update();
+    multiplexUpdateController->SetBlockUpdate(false);
+    multiplexUpdateController->UpdateRequest();
+
+}

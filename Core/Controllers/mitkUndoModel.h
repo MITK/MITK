@@ -8,18 +8,22 @@ namespace mitk {
 //##ModelId=3E5F564C03D4
 class UndoModel
 {
+protected:
+    //##ModelId=3E9B07B601A9
+    void Execute(OperationEvent* operationEvent);
+
   public:
     //##ModelId=3E95950F02B1
-    UndoModel();
+    //UndoModel();
 
     //##ModelId=3E5F5C6C00DF
-    virtual bool SetOperationEvent(OperationEvent* operationEvent);
+    virtual bool SetOperationEvent(OperationEvent* operationEvent) = 0;
 
     //##ModelId=3E5F5C6C00F3
-    virtual bool Undo();
+    virtual bool Undo() = 0;
 
     //##ModelId=3E5F5C6C00FE
-    virtual bool Redo();
+    virtual bool Redo() = 0;
 
 };
 }// namespace mitk

@@ -43,9 +43,6 @@ namespace mitk {
 	//##loads the xml file filename and generates the necessary instances
 	  static bool LoadBehavior(std::string fileName);
 
-	  //bool startDocument(){return TRUE;}
-	  //bool endDocument() {return true;}
-
     //##ModelId=3E6773790098
 	  bool startElement( const QString&, const QString&, const QString& qName, const QXmlAttributes& atts );
 
@@ -95,10 +92,6 @@ namespace mitk {
 	  static const std::string ISTRUE;
     //##ModelId=3E7F18FF01FD
 	  static const std::string ISFALSE;
-	
-
-
-	  
 };
 
 } // namespace mitk

@@ -43,10 +43,10 @@ class EventMapper : public QXmlDefaultHandler
 
     //##ModelId=3E5B343701F1
     static StateMachine *m_StateMachine;
-  
+
 	//##ModelId=3E956E3A036B
     static StateEvent m_StateEvent;
-    
+
 	//##ModelId=3E7B1EB800CC
     static std::string m_StyleName;
 
@@ -64,11 +64,7 @@ class EventMapper : public QXmlDefaultHandler
     static const std::string BUTTONSTATE;
     //##ModelId=3E785B1B01A9
 	static const std::string KEY;
-    //##ModelId=3E785B1B01F7
-	//static const std::string ISTRUE;
-    //##ModelId=3E785B1B0245
-	//static const std::string ISFALSE;
-    
+
 
 };
 

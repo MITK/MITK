@@ -2,10 +2,11 @@
 #define OPERATION_H_HEADER_INCLUDED_C16E7D9E
 
 #include "mitkCommon.h"
-//##ModelId=3E91C0B70183
-enum OperationType {
-	ROI,
-	VIEW};
+//##ModelId=3E9B07B10043
+typedef int OperationType ;
+	
+static const int ROI = 10;
+static const int VIEW = 20;
 
 namespace mitk {
 //##ModelId=3E5F682C0289

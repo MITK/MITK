@@ -15,6 +15,6 @@ OperationType mitk::Operation::GetOperationType()
 //##ModelId=3E7F4D7D01AE
 void mitk::Operation::Execute()
 {
-	//executes the Operation!
+	//virtual method; implement the operation here!
 }
 

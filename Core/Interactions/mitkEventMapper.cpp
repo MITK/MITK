@@ -1,6 +1,6 @@
 #include "EventMapper.h"
 #include <string>
-//XML Event	  
+//XML Event
 //##ModelId=3E788FC000E5
 const std::string mitk::EventMapper::STYLE = "STYLE";
 //##ModelId=3E788FC0025C
@@ -15,16 +15,13 @@ const std::string mitk::EventMapper::BUTTON = "BUTTON";
 const std::string mitk::EventMapper::BUTTONSTATE = "BUTTONSTATE";
 //##ModelId=3E77572902C4
 const std::string mitk::EventMapper::KEY = "KEY";
-//##ModelId=3E7757290341
-//const std::string mitk::EventMapper::ISTRUE = "TRUE";
-//##ModelId=3E77572903AE
-//const std::string mitk::EventMapper::ISFALSE = "FALSE";
 
+//for Linker ->no undefined reference
 mitk::StateMachine *mitk::EventMapper::m_StateMachine;
-EventDescriptionVec mitk::EventMapper::m_EventDescriptions;//for Linker ->no undefined reference
-//##ModelId=3E956E3A036B
+EventDescriptionVec mitk::EventMapper::m_EventDescriptions;
 mitk::StateEvent mitk::EventMapper::m_StateEvent;
 std::string mitk::EventMapper::m_StyleName;
+
 
 //##ModelId=3E5B349600CB
 void mitk::EventMapper::SetStateMachine(StateMachine *stateMachine)
@@ -36,12 +33,12 @@ void mitk::EventMapper::SetStateMachine(StateMachine *stateMachine)
 //##ModelId=3E5B34CF0041
 bool mitk::EventMapper::MapEvent(Event* event)
 {
-	if (m_StateMachine == NULL) 
+	if (m_StateMachine == NULL)
 		return false;
-	
+
 	int i;
 	for (i = 0;
-		(i < ((int)(m_EventDescriptions.size()))) || 
+		(i < ((int)(m_EventDescriptions.size()))) ||
 		!(m_EventDescriptions[i] == *event);//insecure[] but .at(i) is not supported before std.vers 3.0
 		i++){}
 	if (!(m_EventDescriptions[i] == *event))//insecure
@@ -68,7 +65,7 @@ bool mitk::EventMapper::LoadBehavior(std::string fileName)
    mitk::EventMapper* eventMapper = new EventMapper();
    reader.setContentHandler( eventMapper );
    reader.parse( source );
-  
+
    delete eventMapper;
    return true;
 }
@@ -85,11 +82,11 @@ bool mitk::EventMapper::startElement( const QString&, const QString&, const QStr
 	else if ( qName == "event")
 	{
 		//neuen Eintrag in der m_EventDescriptions
-		EventDescription tempEventDescr( atts.value( NAME.c_str() ).latin1(), 
-										 atts.value( ID.c_str() ).toInt(), 
+		EventDescription tempEventDescr( atts.value( NAME.c_str() ).latin1(),
+										 atts.value( ID.c_str() ).toInt(),
 										 atts.value( TYPE.c_str() ).toInt(),
-										 atts.value( BUTTON.c_str() ).toInt(), 
-										 atts.value( BUTTONSTATE.c_str() ).toInt(), 
+										 atts.value( BUTTON.c_str() ).toInt(),
+										 atts.value( BUTTONSTATE.c_str() ).toInt(),
 										 atts.value( KEY.c_str() ).toInt() );
 		m_EventDescriptions.push_back(tempEventDescr);
 	}

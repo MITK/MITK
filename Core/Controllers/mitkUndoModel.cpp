@@ -1,24 +1,14 @@
 #include "UndoModel.h"
 
 //##ModelId=3E95950F02B1
-mitk::UndoModel::UndoModel()
-{
-}
+//mitk::UndoModel::UndoModel(){}
 
-//##ModelId=3E5F5C6C00DF
-bool mitk::UndoModel::SetOperationEvent(OperationEvent* operationEvent)
+/**
+ * sends the Operation to the destination and swaps the operations
+ */
+//##ModelId=3E9B07B601A9
+void mitk::UndoModel::Execute( OperationEvent* operationEvent ) 
 {
-	return true;
-}
-
-//##ModelId=3E5F5C6C00F3
-bool mitk::UndoModel::Undo()
-{
-	return true;
-}
-
-//##ModelId=3E5F5C6C00FE
-bool mitk::UndoModel::Redo()
-{
-	return true;
+	operationEvent->swapOperations();
+	operationEvent->GetDestination()->SetOperation( operationEvent->GetOperation() );
 }

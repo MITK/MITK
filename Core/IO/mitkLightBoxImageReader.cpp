@@ -490,7 +490,7 @@ itkDebugMacro(<<"DIRECTION: "<<direction);
 
 int mitk::LightBoxImageReader::GetRealPosition(int position, LocalImageInfoArray& list)
 {
-  return liste[position].pos;
+  return list[position].pos;
 }
 
 

@@ -73,6 +73,8 @@ void mitk::ImageSource::GraftOutput(OutputImageType *graft)
 //##ModelId=3E1886F10313
 void mitk::ImageSource::GraftNthOutput(unsigned int idx, OutputImageType* graft)
 {
+  itkWarningMacro(<< "GraftNthOutput(): This method is not yet implemented for mitk. Implement it before using!!" );
+  assert(false);
   if (idx < this->GetNumberOfOutputs())
     {
     OutputImageType * output = this->GetOutput(idx);

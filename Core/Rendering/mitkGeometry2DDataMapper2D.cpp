@@ -40,7 +40,7 @@ void mitk::Geometry2DDataMapper2D::Paint(mitk::BaseRenderer * renderer)
         PlaneGeometry::ConstPointer input_planeGeometry = dynamic_cast<const PlaneGeometry *>(input->GetGeometry2D());
         PlaneGeometry::ConstPointer worldPlaneGeometry = dynamic_cast<const PlaneGeometry*>(renderer->GetWorldGeometry());
 
-        if((input_planeGeometry!=NULL) && (worldPlaneGeometry!=NULL))
+        if((input_planeGeometry.IsNotNull()) && (worldPlaneGeometry.IsNotNull()))
         {
             mitk::DisplayGeometry::Pointer displayGeometry = renderer->GetDisplayGeometry();
             assert(displayGeometry);
@@ -73,10 +73,10 @@ void mitk::Geometry2DDataMapper2D::Paint(mitk::BaseRenderer * renderer)
                 if(node!=NULL)
                 {
                     mitk::ColorProperty::Pointer colorprop = dynamic_cast<mitk::ColorProperty*>(node->GetPropertyList()->GetProperty("color").GetPointer());
-                    if(colorprop!=NULL)
+                    if(colorprop.IsNotNull())
                         memcpy(rgba, colorprop->GetColor().GetDataPointer(), 3*sizeof(float));
                     mitk::FloatProperty::Pointer opacityprop = dynamic_cast<mitk::FloatProperty*>(node->GetPropertyList()->GetProperty("opacity").GetPointer());
-                    if(opacityprop!=NULL)
+                    if(opacityprop.IsNotNull())
                         rgba[3]=opacityprop->GetValue();
                 }
                 glColor4fv(rgba);

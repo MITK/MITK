@@ -63,7 +63,7 @@ mitk::BoundingBox::Pointer mitk::DataTree::ComputeBoundingBox(mitk::DataTreeIter
     while (_it->hasNext()) {
 			_it->next();
 			mitk::DataTreeNode::Pointer node = _it->get();
-			if (node->GetData() != NULL && node->GetData()->GetGeometry() != NULL	) {
+			if (node->GetData() != NULL && node->GetData()->GetGeometry().IsNotNull()) {
 				mitk::BoundingBox::ConstPointer nextBoundingBox = node->GetData()->GetGeometry()->GetBoundingBox();
 				const mitk::BoundingBox::PointsContainer * nextPoints = nextBoundingBox->GetPoints();
 				mitk::BoundingBox::PointsContainer::ConstIterator pointsIt = nextPoints->Begin();

@@ -41,7 +41,7 @@ public:
 	{
 //		m_MitkImage = image;
 
-		if(image==NULL)
+		if(image.IsNull())
 			itkExceptionMacro( << "image is null" );
 
 		if(image->GetDimension()!=VImageDimension)

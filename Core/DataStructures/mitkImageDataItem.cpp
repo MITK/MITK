@@ -30,7 +30,7 @@ mitk::ImageDataItem::~ImageDataItem()
 		m_PicDescriptor->data=NULL;
 		ipPicFree(m_PicDescriptor);
 	}
-	if(m_Parent==NULL)
+	if(m_Parent.IsNull())
 	{
 		if(m_Data!=NULL)
 			delete m_Data;

@@ -19,7 +19,7 @@ lightbox_t mitk::LightBoxImageReader::GetLightBox()
 void mitk::LightBoxImageReader::GenerateOutputInformation()
 {
     printf("\nGenerateOutputInformation\n");
-    if(m_LightBox==NULL)
+    if(m_LightBox.IsNull())
     {
         itk::ImageFileReaderException e(__FILE__, __LINE__);
         itk::OStringStream msg;
@@ -44,7 +44,7 @@ void mitk::LightBoxImageReader::GenerateOutputInformation()
     {
         if (m_LightBox->image_list[position].type == DB_OBJECT_IMAGE) 
         {
-            if(pic==NULL) // only build header
+            if(pic.IsNull()) // only build header
                 pic = pFetchImage (m_LightBox, position);
             ++numberOfImages;
             //            tagImageType = ipPicQueryTag (pic, tagIMAGE_TYPE);
@@ -88,7 +88,7 @@ void mitk::LightBoxImageReader::GenerateOutputInformation()
 void mitk::LightBoxImageReader::GenerateData()
 {
     printf("\n GenerateData \n");
-    if(m_LightBox==NULL)
+    if(m_LightBox.IsNull())
     {
         itk::ImageFileReaderException e(__FILE__, __LINE__);
         itk::OStringStream msg;

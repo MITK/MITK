@@ -95,7 +95,7 @@ mitk::PixelType::PixelType(ipPicDescriptor* pic)
 	else
 	{
 		m_TypeId=NULL;
-//		itkExceptionMacro("pic==NULL has no pixel type.");
+//		itkExceptionMacro("pic.IsNull() has no pixel type.");
 	}
 }
 

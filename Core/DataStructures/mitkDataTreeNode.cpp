@@ -7,7 +7,7 @@ mitk::Mapper* mitk::DataTreeNode::GetMapper(MapperSlotId id) const
 {
 // TODO
 
-   if (mappers[id] == NULL) {
+   if (mappers[id].IsNull()) {
 
      mappers[id] = MapperFactory::CreateMapper(const_cast<DataTreeNode*>(this),id);
 

@@ -99,11 +99,11 @@ void mitk::Geometry2DDataVtkMapper3D::Update()
 {
     mitk::Geometry2DData::Pointer input  = const_cast<mitk::Geometry2DData*>(this->GetInput());
 
-    if(input!=NULL)
+    if(input.IsNotNull())
     {
         mitk::PlaneGeometry::ConstPointer planeGeometry = dynamic_cast<const PlaneGeometry *>(input->GetGeometry2D());
 
-        if(planeGeometry!=NULL)
+        if(planeGeometry.IsNotNull())
         {
             const PlaneView &plane=planeGeometry->GetPlaneView();
             Vector3D right, bottom;
@@ -128,14 +128,14 @@ void mitk::Geometry2DDataVtkMapper3D::Update()
                     if(imagemapper)
                     {
 						mitk::SmartPointerProperty::Pointer rendererProp = dynamic_cast<mitk::SmartPointerProperty*>(GetDataTreeNode()->GetPropertyList()->GetProperty("renderer").GetPointer());
-						if(rendererProp!=NULL)
+						if(rendererProp.IsNotNull())
 						{
 							mitk::BaseRenderer::Pointer renderer = dynamic_cast<mitk::BaseRenderer*>(rendererProp->GetSmartPointer().GetPointer());
-							if(renderer!=NULL)
+							if(renderer.IsNotNull())
 							{
 								// check for level window prop and use it for display if it exists
 								mitk::LevelWindowProperty::Pointer levWinProp = dynamic_cast<mitk::LevelWindowProperty*>(it->get()->GetPropertyList()->GetProperty("levelwindow").GetPointer());
-								if(levWinProp!=NULL)
+								if(levWinProp.IsNotNull())
 								{
 									m_VtkLookupTable->SetTableRange(levWinProp->GetLevelWindow().GetMin(),levWinProp->GetLevelWindow().GetMax());
 								}
@@ -163,10 +163,10 @@ void mitk::Geometry2DDataVtkMapper3D::Update()
         if(node!=NULL)
         {
             mitk::ColorProperty::Pointer colorprop = dynamic_cast<mitk::ColorProperty*>(node->GetPropertyList()->GetProperty("color").GetPointer());
-            if(colorprop!=NULL)
+            if(colorprop.IsNotNull())
                 memcpy(rgba, colorprop->GetColor().GetDataPointer(), 3*sizeof(float));
             mitk::FloatProperty::Pointer opacityprop = dynamic_cast<mitk::FloatProperty*>(node->GetPropertyList()->GetProperty("opacity").GetPointer());
-            if(opacityprop!=NULL)
+            if(opacityprop.IsNotNull())
                 rgba[3]=opacityprop->GetValue();
         }
         m_Actor->GetProperty()->SetColor(rgba);

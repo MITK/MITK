@@ -34,10 +34,10 @@ mitk::Geometry2D::ConstPointer mitk::Geometry3D::GetGeometry2D(int s, int t) con
         //(b) m_EvenlySpaced is activated and (c) the first slice (s=0,t=0) 
         //is a PlaneGeometry instance, then we calculate geometry of the requested
         //as the plane of the first slice shifted by m_Spacing*s.
-        if((m_EvenlySpaced) && (geometry2d==NULL))
+        if((m_EvenlySpaced) && (geometry2d.IsNull()))
         {
             const PlaneGeometry* firstslice=dynamic_cast<const PlaneGeometry*> (m_Geometry2Ds[0].GetPointer());
-            if(firstslice!=NULL)
+            if(firstslice != NULL)
             {
                 mitk::PlaneView view=firstslice->GetPlaneView();
                 
@@ -62,7 +62,7 @@ mitk::Geometry2D::ConstPointer mitk::Geometry3D::GetGeometry2D(int s, int t) con
 //##ModelId=3DCBF5D40253
 mitk::BoundingBox::ConstPointer mitk::Geometry3D::GetBoundingBox(int t) const
 {
-	if(m_BoundingBoxes[t]!=NULL)
+	if(m_BoundingBoxes[t].IsNotNull())
 		return m_BoundingBoxes[t];
 
     mitk::BoundingBox::Pointer boundingBox=mitk::BoundingBox::New();
@@ -82,7 +82,7 @@ mitk::BoundingBox::ConstPointer mitk::Geometry3D::GetBoundingBox(int t) const
     {
         const PlaneGeometry* planegeometry =
             dynamic_cast<const PlaneGeometry *>(GetGeometry2D(s,t).GetPointer());
-        assert(planegeometry!=NULL);
+        assert(planegeometry != NULL);
 
         const PlaneView& planeview=planegeometry->GetPlaneView();
         Point3D pt;

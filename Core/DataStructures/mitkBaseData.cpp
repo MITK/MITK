@@ -84,7 +84,7 @@ void mitk::BaseData::UnRegister() const
     if(GetReferenceCount()>1)
     {
         Superclass::UnRegister();
-        if((m_Unregistering==false) && (m_SmartSourcePointer!=NULL))
+        if((m_Unregistering==false) && (m_SmartSourcePointer.IsNotNull()))
         {
             m_Unregistering=true;
             if(m_SmartSourcePointer->GetExternalReferenceCount()==0)

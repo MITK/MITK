@@ -39,7 +39,7 @@ bool mitk::Geometry2DData::RequestedRegionIsOutsideOfTheBufferedRegion()
 {
  	if(VerifyRequestedRegion()==false) return true;
 
-    if(m_Geometry2D==NULL) return true;
+    if(m_Geometry2D.IsNull()) return true;
 
 	return false;
 }
@@ -47,7 +47,7 @@ bool mitk::Geometry2DData::RequestedRegionIsOutsideOfTheBufferedRegion()
 //##ModelId=3E66CC5A02F0
 bool mitk::Geometry2DData::VerifyRequestedRegion()
 {
-    if(m_Geometry2D==NULL) return false;
+    if(m_Geometry2D.IsNull()) return false;
 
     return true;
 }

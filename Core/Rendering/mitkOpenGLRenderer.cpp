@@ -40,10 +40,10 @@ void mitk::OpenGLRenderer::SetData(mitk::DataTreeIterator* iterator)
 			{
 				it->next();
 				BaseData::Pointer data=it->get()->GetData();
-				if(data!=NULL)
+				if(data.IsNotNull())
 				{
 					Image::Pointer image = dynamic_cast<Image*>(data.GetPointer());
-					if(image!=NULL)
+					if(image.IsNotNull())
 					{
 						SetWorldGeometry(image->GetGeometry2D(0, 0));
 						break;
@@ -87,11 +87,11 @@ void mitk::OpenGLRenderer::UpdateVtkActors()
 		{
 			it->next();
 			mitk::Mapper::Pointer mapper = it->get()->GetMapper(m_MapperID);
-			if(mapper!=NULL)
+			if(mapper.IsNotNull())
 			{
 				BaseVtkMapper2D* anVtkMapper2D;
 				anVtkMapper2D=dynamic_cast<BaseVtkMapper2D*>(mapper.GetPointer());
-				if(anVtkMapper2D!=NULL)
+				if(anVtkMapper2D != NULL)
 				{
 					anVtkMapper2D->Update();
 					m_VtkRenderer->AddProp(anVtkMapper2D->GetProp());
@@ -100,7 +100,7 @@ void mitk::OpenGLRenderer::UpdateVtkActors()
 				{
 					BaseVtkMapper3D* anVtkMapper3D;
 					anVtkMapper3D=dynamic_cast<BaseVtkMapper3D*>(mapper.GetPointer());
-					if(anVtkMapper3D!=NULL)
+					if(anVtkMapper2D != NULL)
 					{
 						anVtkMapper3D->Update();
 						m_VtkRenderer->AddProp(anVtkMapper3D->GetProp());
@@ -125,7 +125,7 @@ void mitk::OpenGLRenderer::UpdateVtkActors()
 //##ModelId=3E330D260255
 void mitk::OpenGLRenderer::Update()
 {
-    if(m_DataTreeIterator==NULL) return;
+    if(m_DataTreeIterator == NULL) return;
     mitk::DataTreeIterator* it=m_DataTreeIterator->clone();
     while(it->hasNext())
     {
@@ -134,10 +134,10 @@ void mitk::OpenGLRenderer::Update()
         unsigned int dummy[] = {10,10,10};
         //Geometry3D geometry(3,dummy);
         mitk::Mapper::Pointer mapper = it->get()->GetMapper(m_MapperID);
-        if(mapper!=NULL)
+        if(mapper.IsNotNull())
         {
             Mapper2D* mapper2d=dynamic_cast<Mapper2D*>(mapper.GetPointer());
-            if(mapper2d!=NULL)
+            if(mapper2d != NULL)
             {
                 ImageMapper2D* imagemapper2d=dynamic_cast<ImageMapper2D*>(mapper.GetPointer());
                 mapper2d->Update();
@@ -157,7 +157,7 @@ void mitk::OpenGLRenderer::Update()
 void mitk::OpenGLRenderer::Render()
 {
 	//if we do not have any data, we do nothing else but clearing our window
-    if(GetData()==NULL)
+    if(GetData() == NULL)
 	{
 		glClear(GL_COLOR_BUFFER_BIT);
 		return;
@@ -220,7 +220,7 @@ void mitk::OpenGLRenderer::Render()
 		
 		mitk::DataTreeNode::Pointer node = it->get();
 		mitk::Mapper::Pointer mapper = node->GetMapper(m_MapperID);
-		if(mapper!=NULL)
+		if(mapper.IsNotNull())
 		{
 			GLMapper2D* mapper2d=dynamic_cast<GLMapper2D*>(mapper.GetPointer());
 			if(mapper2d!=NULL) {

@@ -120,7 +120,7 @@ class Image : public SlicedData
     //## @param sDim override z-space dimension in @a itkimage (if >0 and <)
 	template <typename itkImageType> void InitializeByItk(itkImageType* itkimage, int channels = 1, int tDim = -1, int sDim=-1)
 	{
-		if(itkimage==NULL) return;
+		if(itkimage.IsNull()) return;
 
 		m_Dimension=itkimage->GetImageDimension();
 		unsigned int i, *tmpDimensions=new unsigned int[m_Dimension>4?m_Dimension:4];

@@ -87,7 +87,7 @@ bool mitk::SlicedData::RequestedRegionIsOutsideOfTheBufferedRegion()
 //##ModelId=3E14105B00F7
 bool mitk::SlicedData::VerifyRequestedRegion()
 {
-    if(m_Geometry3D==NULL) return false;
+    if(m_Geometry3D.IsNull()) return false;
 
 	unsigned int i;
 

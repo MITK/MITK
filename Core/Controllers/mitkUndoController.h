@@ -18,7 +18,7 @@ typedef std::map<UndoType, UndoModel*> UndoModelMap;
 //##ModelId=3E9C45D50092
 typedef std::map<UndoType, UndoModel*>::iterator UndoModelMapIter;
 
-static const mitk::UndoType DEFAULTUNDOMODEL;
+static const mitk::UndoType DEFAULTUNDOMODEL = 111;
 
 //##ModelId=3E5F53AA026C
 class UndoController

@@ -164,6 +164,9 @@ mitk::TimeSlicedGeometry::~TimeSlicedGeometry()
 
 const mitk::BoundingBox* mitk::TimeSlicedGeometry::GetBoundingBox() const
 {
+  if(m_TimeSteps==0)
+    return Superclass::GetBoundingBox();
+
   mitk::BoundingBox::Pointer boundingBox=mitk::BoundingBox::New();
  
   mitk::BoundingBox::PointsContainer::Pointer pointscontainer=mitk::BoundingBox::PointsContainer::New();

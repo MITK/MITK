@@ -1,7 +1,7 @@
 #ifndef _MITK_DISPLAY_INTERACTOR_CPP_
 #define _MITK_DISPLAY_INTERACTOR_CPP_
 
-#include "mitkDisplayInterActor.h"
+#include "mitkDisplayInteractor.h"
 
 #include <OperationActor.h>
 #include <EventMapper.h>

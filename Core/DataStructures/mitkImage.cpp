@@ -458,7 +458,7 @@ void mitk::Image::Initialize(const mitk::PixelType& type, unsigned int dimension
 }
 
 //##ModelId=3E102D2601DF
-void mitk::Image::Initialize(ipPicDescriptor* pic, int channels, int sDim, int tDim)
+void mitk::Image::Initialize(ipPicDescriptor* pic, int channels, int tDim, int sDim)
 {
 	if(pic==NULL) return;
 

@@ -92,7 +92,7 @@ int mitk::PointSet::SearchPoint(Point3D point, float distance )
 //##ModelId=3F0177E901CE
 //##Documentation
 //##@brief check if index exists. If it doesn't exist, then return 0,0,0
-const mitk::PointSet::PointType mitk::PointSet::GetPoint(int position)
+mitk::PointSet::PointType mitk::PointSet::GetPoint(int position) const
 {
   PointType out;
   out.Fill(0);

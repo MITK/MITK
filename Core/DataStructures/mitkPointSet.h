@@ -110,7 +110,7 @@ public:
   //## @brief Get the point on the given position
   //##
   //## check if index exists. If it doesn't exist, then return 0,0,0
-  const PointType GetPoint(int position);
+  PointType GetPoint(int position) const;
 
   //##Documentation
   //## @brief searches a selected point and returns the id of that point. if no point is found, then -1 is returned

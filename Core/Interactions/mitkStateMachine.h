@@ -20,8 +20,7 @@ namespace mitk {
 //## realizes the methods, that every statemachine has to have.
 //## Undo can be enabled and disabled through EnableUndo
 //## Developers must derive its statemachines and implement ExecuteSideEffect
-//## and ExecuteOperation
-	class StateMachine : public itk::Object, public mitk::OperationActor
+class StateMachine : public itk::Object, public mitk::OperationActor
 {
   public:
   mitkClassMacro(StateMachine,itk::Object);
@@ -66,10 +65,10 @@ namespace mitk {
 
   //##ModelId=3E5B2E170228
   //##Documentation
-  //## each statechange has a sideeffect, which can be assigned by it's number
-  //## if you are developing a new statemachine, you put all your operations here!
-  //## dependant on the SideEffectNumber / build of the StateMachine-Definition
-  //## First Undo, then SideEffectOperation
+  //## @brief Method called in HandleEvent after Statechange.
+  //##
+  //## Each statechange has actions, which can be assigned by it's number.
+  //## If you are developing a new statemachine, declare all your operations here and send them to Undo-Controller and to the Data.
   virtual bool ExecuteSideEffect(int sideEffectId, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId)= 0;
 
   //##Documentation
@@ -78,13 +77,13 @@ namespace mitk {
 
   //##ModelId=3EDCAECB00B9
   //##Documentation
-  //## @biref if true, then UndoFunctionality is enabled
+  //## @brief if true, then UndoFunctionality is enabled
   //## default on true;
   bool m_UndoEnabled;
 
   //Documentation
   //##ModelId=3EF099EA03C0
-  //## @brief friend protected function of OperationEvent, that way all StateMachines can increment!
+  //## @brief friend protected function of OperationEvent, that way all StateMachines can increment GroupEventId!
   int IncCurrGroupEventId();
 
   //##ModelId=3EDCAECB0128
@@ -95,10 +94,10 @@ namespace mitk {
  private:
   //##ModelId=3EAEEDC603D9
   //##Documentation
-  //## from OperationActor; a stateMachine has to be an OperationActor
-  //## due to the UndoMechanism. Else no destination for Undo/Redo of StateMachines
-  //## can be set.
-  //## is set private here and in superclass it is set public, so UndoController
+  //## @brief A statemachine is also an OperationActor due to the UndoMechanism. 
+  //## 
+  //## The statechange is done in ExecuteOperation, so that the statechange can be undone by UndoMechanism.
+  //## Is set private here and in superclass it is set public, so UndoController
   //## can reach ist, but it can't be overwritten by a subclass
   void ExecuteOperation(Operation* operation);
 

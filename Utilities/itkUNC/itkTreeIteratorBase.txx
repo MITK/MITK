@@ -479,7 +479,7 @@ TreeIteratorBase<TTreeType>::Remove()
     {
     TreeNodeType* parent = m_Position->GetParent();
     //keep node alive just a bit longer
-    TreeNodeType::Pointer position = m_Position;
+    typename TreeNodeType::Pointer position = m_Position;
     parent->Remove( m_Position );
     //restore parent, which was set to NULL in the previous line
     m_Position->SetParent(parent);

@@ -39,9 +39,9 @@ controls(NULL), multiWidget(mitkStdMultiWidget), opacityprop(NULL)
     mitk::GlobalInteraction* globalInteraction = dynamic_cast<mitk::GlobalInteraction*>(mitk::EventMapper::GetGlobalStateMachine());
     if(globalInteraction!=NULL)
     {
-	    globalInteraction->AddStateMachine(new mitk::CoordinateSupplier("navigation", this));
-	    globalInteraction->AddStateMachine(new mitk::DisplayVectorInteractor("move", this));
-	    globalInteraction->AddStateMachine(new mitk::DisplayVectorInteractor("zoom", this));
+	    globalInteraction->AddStateMachine(new mitk::CoordinateSupplier("navigation", this));//sends PointOperations
+	    globalInteraction->AddStateMachine(new mitk::DisplayVectorInteractor("move", this));//sends DisplayCoordinateOperation
+	    globalInteraction->AddStateMachine(new mitk::DisplayVectorInteractor("zoom", this));//sends DisplayCoordinateOperation
     }
 }
 
@@ -206,93 +206,110 @@ void QmitkSimpleExampleFunctionality::initWidgets()
 
 void QmitkSimpleExampleFunctionality::ExecuteOperation(mitk::Operation* operation)
 {
-    if(operation->GetOperationType() == OpADD) //navigate
+    bool ok;//as return type
+
+    mitk::PointOperation* pointoperation=dynamic_cast<mitk::PointOperation*>(operation);
+    if(pointoperation!=NULL)
     {
-        mitk::PointOperation* pointoperation=dynamic_cast<mitk::PointOperation*>(operation);
-        if(pointoperation==NULL) return;
-
-        mitk::ITKPoint3D point;
-        mitk::Point3D seed; 
-
-        point = pointoperation->GetPoint();
-        mitk::itk2vm(point, seed);
-
-        const mitk::Geometry2D* g2d; 
-        const mitk::PlaneGeometry* pg;
-        mitk::PlaneView pv;
-        mitk::PlaneGeometry::Pointer plane;
-
-        int v;
-        v=(int)seed.x;
-        if(controls->getSliderYZ()->value()!=v)
+    /****NAVIGATION inside the volume****/
+        switch (operation->GetOperationType())
         {
-            g2d = multiWidget->mitkWidget2->GetRenderer()->GetWorldGeometry();
-            pg = dynamic_cast<const mitk::PlaneGeometry*>(g2d);
-            pv = pg->GetPlaneView();
-            pv.point.x = v;
-            plane = mitk::PlaneGeometry::New();  
-            plane->SetPlaneView(pv);
-            multiWidget->mitkWidget2->GetRenderer()->SetWorldGeometry(plane);
-            controls->getSliderYZ()->blockSignals(true);
-            controls->getSliderYZ()->setValue(v);
-            controls->getSliderYZ()->blockSignals(false);
-        }
+            case OpMOVE:
+                {
+                    mitk::ITKPoint3D point;
+                    mitk::Point3D seed; 
 
-        v=(int)seed.y;
-        if(controls->getSliderXZ()->value()!=v)
-        {
-            g2d = multiWidget->mitkWidget3->GetRenderer()->GetWorldGeometry();
-            pg = dynamic_cast<const mitk::PlaneGeometry*>(g2d);
-            pv = pg->GetPlaneView();
-            pv.point.y = v;
-            plane  = mitk::PlaneGeometry::New();  
-            plane->SetPlaneView(pv);
-            multiWidget->mitkWidget3->GetRenderer()->SetWorldGeometry(plane);
-            controls->getSliderXZ()->blockSignals(true);
-            controls->getSliderXZ()->setValue(v);
-            controls->getSliderXZ()->blockSignals(false);
-        }
+                    point = pointoperation->GetPoint();
+                    mitk::itk2vm(point, seed);
 
-        v=(int)seed.z;
-        if(controls->getSliderXY()->value()!=v)
-        {
-            g2d = multiWidget->mitkWidget1->GetRenderer()->GetWorldGeometry();
-            pg = dynamic_cast<const mitk::PlaneGeometry*>(g2d);
-            pv = pg->GetPlaneView();
-            pv.point.z = v;
-            plane = mitk::PlaneGeometry::New();  
-            plane->SetPlaneView(pv);
-            multiWidget->mitkWidget1->GetRenderer()->SetWorldGeometry(plane);
-            controls->getSliderXY()->blockSignals(true);
-            controls->getSliderXY()->setValue(v);
-            controls->getSliderXY()->blockSignals(false);
+                    const mitk::Geometry2D* g2d; 
+                    const mitk::PlaneGeometry* pg;
+                    mitk::PlaneView pv;
+                    mitk::PlaneGeometry::Pointer plane;
+            
+                    int v;
+                    v=(int)seed.x;
+                    if(controls->getSliderYZ()->value()!=v)
+                    {
+                        g2d = multiWidget->mitkWidget2->GetRenderer()->GetWorldGeometry();
+                        pg = dynamic_cast<const mitk::PlaneGeometry*>(g2d);
+                        pv = pg->GetPlaneView();
+                        pv.point.x = v; 
+                        plane = mitk::PlaneGeometry::New();  
+                        plane->SetPlaneView(pv);
+                        multiWidget->mitkWidget2->GetRenderer()->SetWorldGeometry(plane);
+                        controls->getSliderYZ()->blockSignals(true);
+                        controls->getSliderYZ()->setValue(v);
+                        controls->getSliderYZ()->blockSignals(false);
+                    }
+
+                    v=(int)seed.y;
+                    if(controls->getSliderXZ()->value()!=v)
+                    {
+                        g2d = multiWidget->mitkWidget3->GetRenderer()->GetWorldGeometry();
+                        pg = dynamic_cast<const mitk::PlaneGeometry*>(g2d);
+                        pv = pg->GetPlaneView();
+                        pv.point.y = v;
+                        plane  = mitk::PlaneGeometry::New();  
+                        plane->SetPlaneView(pv);
+                        multiWidget->mitkWidget3->GetRenderer()->SetWorldGeometry(plane);
+                        controls->getSliderXZ()->blockSignals(true);
+                        controls->getSliderXZ()->setValue(v);
+                        controls->getSliderXZ()->blockSignals(false);
+                    }
+
+                    v=(int)seed.z;
+                    if(controls->getSliderXY()->value()!=v)
+                    {
+                        g2d = multiWidget->mitkWidget1->GetRenderer()->GetWorldGeometry();
+                        pg = dynamic_cast<const mitk::PlaneGeometry*>(g2d);
+                        pv = pg->GetPlaneView();
+                        pv.point.z = v;
+                        plane = mitk::PlaneGeometry::New();  
+                        plane->SetPlaneView(pv);
+                        multiWidget->mitkWidget1->GetRenderer()->SetWorldGeometry(plane);
+                        controls->getSliderXY()->blockSignals(true);
+                        controls->getSliderXY()->setValue(v);
+                        controls->getSliderXY()->blockSignals(false);
+                    }
+                    multiWidget->updateMitkWidgets();
+                    ok = true;
+                }
+                break;
+            case OpNOTHING:
+                break;
+            default:
+                ;
         }
-        multiWidget->updateMitkWidgets();
     }
-    else
+    mitk::DisplayCoordinateOperation* dcOperation=dynamic_cast<mitk::DisplayCoordinateOperation*>(operation);
+    if( dcOperation != NULL )
     {
-        mitk::DisplayCoordinateOperation* dcOperation=dynamic_cast<mitk::DisplayCoordinateOperation*>(operation);
-        if(dcOperation==NULL) return;
-
+    /****ZOOM & MOVE of the whole volume****/
         mitk::BaseRenderer* renderer = dcOperation->GetRenderer();
-        if(renderer==NULL)
+        if( renderer == NULL )
             return;
-
-        if(operation->GetOperationType() == OpMOVE) //move
+        switch (operation->GetOperationType())
         {
-            renderer->GetDisplayGeometry()->MoveBy(dcOperation->GetLastToCurrentDisplayVector()*(-1.0));
-            renderer->GetRenderWindow()->Update();
+            case OpMOVE :
+                {
+                    renderer->GetDisplayGeometry()->MoveBy(dcOperation->GetLastToCurrentDisplayVector()*(-1.0));
+                    renderer->GetRenderWindow()->Update();
+                    ok = true;
+                }
+                break;
+            case OpZOOM :
+                {
+                    float distance = dcOperation->GetLastToCurrentDisplayVector().y;
+                    distance = (distance > 0 ? 1 : (distance < 0 ? -1 : 0));
+                    float factor= 1.0 + distance * 0.05;
+                    renderer->GetDisplayGeometry()->Zoom(factor, dcOperation->GetStartDisplayCoordinate());
+                    renderer->GetRenderWindow()->Update();
+                    ok = true;
+                }
+                break;
+            default:
+                ;
         }
-        else
-        if(operation->GetOperationType() == OpZOOM) //zoom
-        {
-            float distance = dcOperation->GetLastToCurrentDisplayVector().y;
-            distance = (distance > 0 ? 1 : (distance < 0 ? -1 : 0));
-            float factor= 1.0 + distance * 0.05;
-            renderer->GetDisplayGeometry()->Zoom(factor, dcOperation->GetStartDisplayCoordinate());
-            renderer->GetRenderWindow()->Update();
-        }
-        else
-            return;
     }
 }

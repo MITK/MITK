@@ -66,6 +66,10 @@ namespace mitk
 
       itkGetMacro(Selected, bool);
 
+      itkSetMacro(Width, float);
+
+      itkGetMacro(Width, float);
+
 
       /**
        * clean up the contour data
@@ -169,6 +173,8 @@ namespace mitk
       bool m_Closed;
 
       bool m_Selected;
+
+			float m_Width;
     };
 
   } // namespace mitk

@@ -25,7 +25,8 @@ m_CurrentWindow ( NULL ),
 m_BoundingBox (BoundingBoxType::New()),
 m_Vertices ( BoundingBoxType::PointsContainer::New() ),
 m_Closed ( true ),
-m_Selected ( false ) 
+m_Selected ( false ),
+m_Width (3.0)
 {
   m_Geometry3D->Initialize();
 }

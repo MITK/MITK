@@ -72,7 +72,7 @@ void mitk::ContourSetMapper2D::Paint(mitk::BaseRenderer * renderer)
       mitk::Point3D p, projected_p;
       float vtkp[3];
 
-      glLineWidth(3.0);
+      glLineWidth( nextContour->GetWidth() );
 
       if (nextContour->GetClosed())
       {
@@ -84,14 +84,14 @@ void mitk::ContourSetMapper2D::Paint(mitk::BaseRenderer * renderer)
       }
 
       
-      float rgba[4]={1.0f,1.0f,1.0f,1.0f};
-      if ( nextContour->GetSelected() )
-      {
-        rgba[0] = 1.0;
-        rgba[1] = 0.0;
-        rgba[2] = 0.0;
-      }
-      glColor4fv(rgba);
+      //float rgba[4]={1.0f,1.0f,1.0f,1.0f};
+      //if ( nextContour->GetSelected() )
+      //{
+      //  rgba[0] = 1.0;
+      //  rgba[1] = 0.0;
+      //  rgba[2] = 0.0;
+      //}
+      //glColor4fv(rgba);
 
       mitk::Contour::PointsContainerPointer points = nextContour->GetPoints();
       mitk::Contour::PointsContainerIterator pointsIt = points->Begin();

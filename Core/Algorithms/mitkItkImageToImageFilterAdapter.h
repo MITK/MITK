@@ -42,7 +42,6 @@ protected:
 	ItkImageToImageFilterAdapter();
 	virtual ~ItkImageToImageFilterAdapter();
 
-  //ImageToImageFilterType::Pointer m_ItkImageToImageFilter;
   ImageToImageFilterType::Pointer m_FirstFilter;  // Start of Filter Pipeline
   ImageToImageFilterType::Pointer m_LastFilter;   // End of Filter Pipeline
 };

@@ -15,7 +15,7 @@ class GenericProperty : public BaseProperty
 {
   public:
    
-    mitkClassMacro(GenericProperty, BaseProperty);
+    mitkClassMacro(GenericProperty<T>, BaseProperty);
 //    itkNewMacro(Self);
 
     //##ModelId=3EF99E2C0290

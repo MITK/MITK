@@ -449,7 +449,7 @@ void mitk::DataTreeNodeFactory::ReadFileTypeHPSONOS()
         // if "levelwindow" is used if "levelwindow" is not available
         // else "levelwindow" is used
         // "levelwindow" is not affected by the slider
-        node->GetPropertyList() ->SetProperty( "levelwindow", levWinProp );
+        node->GetPropertyList() ->SetProperty( "levelWindow", levWinProp );
 
         node->SetProperty( "LookupTable", LookupTableProp );
         node->SetVisibility( false, NULL );
@@ -477,7 +477,7 @@ void mitk::DataTreeNodeFactory::ReadFileTypeHPSONOS()
         // if "levelwindow" is used if "levelwindow" is not available
         // else "levelwindow" is used
         // "levelwindow" is not affected by the slider
-        node->GetPropertyList() ->SetProperty( "levelwindow", levWinProp );
+        node->GetPropertyList() ->SetProperty( "levelWindow", levWinProp );
 
         node->SetProperty( "LookupTable", LookupTableProp );
         node->Update();

@@ -22,10 +22,15 @@ namespace mitk {
 
 //##ModelId=3E5A39550068
 //##Documentation
-//## a xml file including the states and the transitions is read.
-//## according to the structur all States are generated.
-//## Then all transitions are generated and the pointers are set
-//## (Transition::setNextState(State* tState))
+//## @brief builds up all specifiyed statemachines and hold them for later
+//## access
+//## @ingroup Interaction
+//## According to the XML-File every different statemachine is build up. A new
+//## Instance of a new StateMachine grabs a StartState of one certain
+//## statemachine. Two instances of one kind of statemachine share that
+//## statemachine. 
+//## During Build-Process each statemachine is paresed for well formed  Style.
+//## No changes are to ber done after the Build-Process.
 	class StateMachineFactory : public QXmlDefaultHandler
 {
   public:

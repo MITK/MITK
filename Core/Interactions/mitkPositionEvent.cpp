@@ -12,13 +12,13 @@ mitk::Vector3D mitk::PositionEvent::GetDisplayPosition() const
 	return m_DisplayPosition;
 }
 
-//##ModelId=3ECA2D3E0376
+//##ModelId=3EDC8EEC00F8
 mitk::Vector3D mitk::PositionEvent::GetWorldPosition() const
 {
 	return m_WorldPosition;
 }
 
-//##ModelId=3ECA2D3E03C6
+//##ModelId=3EDC8EEC0136
 void mitk::PositionEvent::SetWorldPosition(mitk::Vector3D& worldPosition)
 {
 	m_WorldPosition = worldPosition;

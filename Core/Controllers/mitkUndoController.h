@@ -9,7 +9,7 @@
 
 namespace mitk {
 
-//##ModelId=3ECA2D3D01C6
+//##ModelId=3EDCAEC901C3
 typedef int UndoType;
 
 //##ModelId=3E9C45D5007E
@@ -58,7 +58,7 @@ class UndoController
 	//##Documentation
     //## current selected UndoModel
 	static UndoModel *m_CurUndoModel;
-    //##ModelId=3ECA2D3F0166
+    //##ModelId=3EDCAECC0176
 	//##Documentation
     //## current selected Type of m_CurUndoModel
 	static UndoType m_CurUndoType;

@@ -25,6 +25,12 @@ typedef std::map<int,mitk::Transition>::const_iterator TransMapConstIter;
 namespace mitk {
 
 //##ModelId=3E5A3986027B
+//##Documentation
+//## @brief represents one state with all its necessary information
+//## @ingroup Interaction
+//## Name and ID are stored. Also methods for building up, connecting and
+//## parsing for well formed statemachines are present.
+//## This class holds a map of transitions to next States. 
 class State
 {
   public:

@@ -14,6 +14,13 @@
 namespace mitk {
 
 //##ModelId=3E5A397B01D5
+//##Documentation
+//## @brief superior statemachine
+//## @ingroup Interaction 
+//## realizes the methods, that every statemachine has to have.
+//## Undo can be enabled and disabled through EnableUndo
+//## Developers must derive its statemachines and implement ExecuteSideEffect
+//## and ExecuteOperation
 	class StateMachine : public itk::Object, public mitk::OperationActor
 {
   public:
@@ -42,7 +49,7 @@ namespace mitk {
 	//## can be set.
 	virtual void ExecuteOperation(Operation* operation) = 0;
 
-    //##ModelId=3EDB6C220015
+    //##ModelId=3EDCAECB0175
 	//##Documentation
     //## if set to true, then UndoFunctionality is enabled
 	//## if false, then Undo is disabled
@@ -63,14 +70,14 @@ namespace mitk {
     //##ModelId=3E5B2D8F02B9
     State* m_CurrentState;
 
-    //##ModelId=3EDB6C210370
+    //##ModelId=3EDCAECB00B9
 	//##Documentation
 	//## if true, then UndoFunctionality is enabled
 	//## default on true;
 	bool m_UndoEnabled;
 
   protected:
-    //##ModelId=3EDB6C2103CF
+    //##ModelId=3EDCAECB0128
 	//##Documentation
 	//## holds an UndoController, that can be accessed from all StateMachines
 	UndoController* m_UndoController;

@@ -178,6 +178,7 @@ bool mitk::GlobalInteraction::ExecuteSideEffect(int sideEffectId, mitk::StateEve
 	return ok;
 }
 
+//##ModelId=3EDCAECA0194
 void mitk::GlobalInteraction::ExecuteOperation(mitk::Operation* operation)
 {
 }

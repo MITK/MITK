@@ -6,7 +6,7 @@
 //##ModelId=3EAEBEBD02DC
 mitk::UndoModel* mitk::UndoController::m_CurUndoModel;
 mitk::UndoModelMap mitk::UndoController::m_UndoModelList;
-//##ModelId=3ECA2D3F0166
+//##ModelId=3EDCAECC0176
 mitk::UndoType mitk::UndoController::m_CurUndoType;
 
 static const mitk::UndoType DEFAULTUNDOMODEL = LIMITEDLINEARUNDO;

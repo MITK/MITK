@@ -10,6 +10,13 @@
 namespace mitk {
 
 //##ModelId=3E5B79B5012A
+//##Documentation
+//## @brief Event, that also stores coordinates
+//## @ingroup Interaction
+//## 
+//## Stores DisplayPosition from Mouse.
+//## Later on the WorldPosition according to a BaseRender can be calculated and
+//## set.
 class PositionEvent : public Event
 {
   public:
@@ -19,17 +26,17 @@ class PositionEvent : public Event
 	//##ModelId=3E5B79DE0133
     Vector3D GetDisplayPosition() const;
 	
-    //##ModelId=3ECA2D3E0376
+    //##ModelId=3EDC8EEC00F8
 	Vector3D GetWorldPosition() const;
 
-    //##ModelId=3ECA2D3E03C6
+    //##ModelId=3EDC8EEC0136
 	void SetWorldPosition(Vector3D& worldPosition);
     
   private:
     //##ModelId=3E5B79D00395
     Vector3D m_DisplayPosition;
 	
-    //##ModelId=3ECA2D3E02D6
+    //##ModelId=3EDC8EEC008A
 	Vector3D m_WorldPosition;
 };
 

@@ -14,6 +14,12 @@ namespace mitk {
 //class Group;
 
 //##ModelId=3E5B33000230
+//##Documentation
+//## @brief handles all global Events ("not specified on one object"-Events).
+//## @ingroup Interaction
+//## 
+//## superior statemachine, that handles the events and asks all other ROI's
+//## through the information of RoiFactory to process the event.
 class GlobalInteraction : public StateMachine
 {
 	public:
@@ -23,7 +29,7 @@ class GlobalInteraction : public StateMachine
     //##ModelId=3E7F497F01AE
     virtual bool ExecuteSideEffect(int sideEffectId, mitk::StateEvent const* stateEvent);
 
-    //##ModelId=3EDB725E0146
+    //##ModelId=3EDCAECA0194
 	virtual void ExecuteOperation(mitk::Operation* operation);
 
 	private:

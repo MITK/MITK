@@ -380,7 +380,7 @@ void mitk::EventMapper::SetGlobalStateMachine(StateMachine *stateMachine)
 	m_GlobalStateMachine = stateMachine;
 }
 
-//##ModelId=3EDAFB81012E
+//##ModelId=3EDCA746026F
 mitk::StateMachine* mitk::EventMapper::GetGlobalStateMachine()
 {
 	return m_GlobalStateMachine;

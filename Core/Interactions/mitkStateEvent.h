@@ -7,6 +7,12 @@
 namespace mitk {
 
 //##ModelId=3E5B7929027D
+//##Documentation
+//## @brief Event for statechange
+//## @ingroup Interaction
+//## Represents an event, with which a statechange of a statemachine shall be
+//## done. ID stores the nextStateId, Event all necessary information like
+//## MousePosition (case of PositionEvent).
 class StateEvent
 {
   public:

@@ -75,7 +75,7 @@ bool mitk::StateMachine::HandleEvent(StateEvent const* stateEvent)
 
 	return ok;
 }
-//##ModelId=3EDB6C220015
+//##ModelId=3EDCAECB0175
 void mitk::StateMachine::EnableUndo(bool enable)
 {
 	m_UndoEnabled = enable;

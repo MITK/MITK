@@ -16,18 +16,26 @@ typedef std::vector<mitk::EventDescription> EventDescriptionVec;
 //##ModelId=3EAEC3AE01DF
 typedef std::vector<mitk::EventDescription>::iterator EventDescriptionVecIter;
 
-//##ModelId=3ECA2D3D0035
+//##ModelId=3EDCAEC900E8
 struct StringIntArrayStruct
 {//for mapping string from xml-file to int
-    //##ModelId=3ECA2D3D01F9
+    //##ModelId=3EDCAEC901E3
 	const char * text;
-    //##ModelId=3ECA2D3D0202
+    //##ModelId=3EDCAEC901E4
 	int id;
 };
 
 namespace mitk {
 
 //##ModelId=3E5A390401F2
+//##Documentation
+//## @brief Maps an Event to its description 
+//## @ingroup Interaction
+//## 
+//## the incoming event is maped to additional description that is declared in
+//## an xml-file.
+//## That way an event can be mapped to an EventID, that can be processed in a
+//## statemachine 
 class EventMapper : public QXmlDefaultHandler
 {
   public:
@@ -37,7 +45,7 @@ class EventMapper : public QXmlDefaultHandler
 	//## then copy the old statemachine with GetStateMachine()
     static void SetGlobalStateMachine(StateMachine* stateMachine);
 
-    //##ModelId=3EDAFB81012E
+    //##ModelId=3EDCA746026F
 	static StateMachine* GetGlobalStateMachine();
 
     //##ModelId=3E5B34CF0041

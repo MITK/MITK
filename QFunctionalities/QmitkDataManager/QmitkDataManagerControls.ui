@@ -62,7 +62,7 @@
             </property>
         </item>
             <property name="name">
-                <cstring>m_dataTreeView</cstring>
+                <cstring>m_DataTreeView</cstring>
             </property>
             <property name="minimumSize">
                 <size>
@@ -102,13 +102,23 @@
             <verstretch>0</verstretch>
         </sizepolicy>
         <pixmap>image0</pixmap>
+        <slot access="public" specifier="">slot()</slot>
+        <slot access="public" specifier="">SelectionChanged(QListViewItem* NewItem)</slot>
     </customwidget>
 </customwidgets>
 <images>
     <image name="image0">
-        <data format="XPM.GZ" length="2949">789c959559532a491085dffd1584f9664ce4a5179aeeb8310f82e006082aa277621e7a4171015c40d489f9ef37bbea6485834ccc1d8aa5bfc89359276bd16f3b95cb7eb7b2f36deb65912e6ef34a3e499f2b3bc5723a7dffe3cfdfffdadaf6fd8abc3d2faaf8dbbf6d6d3355f24a6f3e1b1b483f43f609068bcf91a50055cdcb70c7716c78020e110f1d9b38597dec78171c23ff149c7b269fc6257bd572186e8035ff4e19f14b706ce7a74c19f113708efc6765c45f0cc7aae72158e30bcbbefae98175feb792fdaa3277c15aaf6e38f1b5deb9e500eb4923c7763d8e95a1bf716ce367e0106cea055e1083179643ad67f283248883c4d47b05e7d05f951c7aa1f281e1b49620ff42d9c6c9f8abf98e87e002ebfba08c7a7dcb9187f88532fa23c736fea8ecdb7801ae21ff40d9c6f9da705a2b6aa989df5a8ee09fa6cad88f8163eb2f50c67c4db0f6f3a40cbf667f23bf0eff5c53869f06b886fa4d65c47b60ccc7e6bc47523fb2fef72c3bfd11b8803f735fea415cf3cd7ef22e58fdaf1cdbb859bf7a564fea99897f58563dff2839ce12d4e743cba9f6f7e6d8f6b352c67cfbca8167e21f60f44fac0cfd5219fabce4244cbc2434f199e554fb7b51b6e797dfc129fced39b6f35d2b63bebe637bfecfc063f4d3b69cf9605f19f39bfe92dcc5abcaa89f3bb6fa57e5d0f6178323f86d39b6f512b0f6e339b6f11365ccf7eed8f663ce471a6611f6ef12acf92365e4a78e6dfe043c867f737fd33c1b47e67f060d2ce7e897237084fc1658ebdf83c7d09bfb97855a8f6796731f7caf5c0f0cdf29c7e6bcf23338b2f79be7cac87f02a7f0dbb65c607d69ae0c3fe6ef435664e3d49c377eb4ecf20f2d17f03f589483e9bfc760a17a4e39e39c0b1e6f18d77cc3139b61f5f294f12ddff13d3ff094673c97f128a3fc7de2677ee1052fffa1cf45fdca2b7ee377fee05d6e7053bef7b8c56d19fb7cb0a62fa4f68a0f4571c4c7dc91e852bebbdce313c969717f4d3f1627a57a20aa0e9ff2199ff3d03c5ff0882f37e8a7e2e4c854bee21f5c658f7d0e3814ae71b4413f13df75a3ae72cc89048952d17628a39c8a2ffab9f4d7a1b1d42ed5d77423735dd1c4d4d8a5db0dfa062f45552dd565cf7427ba7b7a10e580a65ff48fb2824be9d2e395a9bde421cd684e8ff214d0d3067de9e7997d51882f7a91d916b4a457f95d6dd0cf798fdea46e40efe2fb436acb9e4ade2e357844cd0dfa16ed893ee4264da8456ddaa74c54133aa0c38dfa361dd1b1d9d7633a96d57ca58e9cb309bdc97a76d7f4d772aadab2ef2359f1a1390d32a821b57b7442fd2ffb752367b0d47b34a05c3a0fa48f53f17d28fdf7e98cced7f41339b107dca7a17c0abaa5293d99d1a42e5dd0882ed7f4a41efe75d09afe9786bb8fff53ffcbf7fdefef5b3f01502377eb</data>
+        <data format="XPM.GZ" length="2910">789cb595db522a571086ef7d0acabeb352bd9903c34ca57201088a0a02a21b4de5624e829c541814d895774f4fafeea91da452c9455ceaf055ffddfdf75a6bf4db5969d4eb94cebe9dacb3307b894bf1245c95ce92cd62b1fbfd8fdf7e9c9cda7689be2dcb29d9a7bf9c9cf6b3525ceabe2ed31c70450065fe626e17ec33a7c2aec4ad82390e46ef17bc15f625ff5638b6381fa29cad72be9877c29a3f5696f8bdb06ffa032a4bfc463896fc576589bf31fbaac781b0c6df0ddbeae75a58fb6f72b6cbca7825acf55ce6c0d67a7dc38eec270c0b36fb71a92cfaa46013ef09bbc25ccfb11c5ff8ddb0abf538df091cdf09b8de5a3816fd43ceaee52a3799c34a20f977ca260eecaf62173c104e647f5f94a55ec7b06749fc4e59f6c72fd8c417cab6993f14ae487e53d9c431660e2b4925e4f8b3614ffcc35459fa750b36fecacad26f2facf32c95e53cf87c3dbbaafe6d65f1b313ae48fdbdb2c4af85a51ff27df7a8be67fcd70c17fa0be144fcf1fb5275fc8acde7895b61f59f156ce2bc7fd5a81a54238e7f1a563d7ecfd98f02a98f2dc3a1ceb729d8cc93294bbf7365c7e2f8a7b0ce5f5516fd4a59f49073e00656e0727c6638d4f9de94cdfdc50fe150fcd50a36e7152b4bbf4ec1e6fef78453f1d7301cd9c24fcad29fe70be2223e5296fa50b0d1af955d335f45d813bff5824d3d4f58e7792cd8c46f94a5df47c1661ebe1fa11b79727ef7c29a3f54967850b0c94f8553f1cfef6f1847a9c7ff0ca06b389679d111f624bf2eacfe26c2a9e8f9fd8b5cad8733c3b12d3c51ae3acc63659fef2bbe0a7be6fdc6b9b2e42f8543f1db309cc8fec25c59fcf0df872889d290ef1b2e0c17f92dc389f8ef67ff7efdac47c010a3232bc604d3433d3ee31827f882539ce19cd68256fe5ce22bbee13bae7ed653ed31ae31c30d7ee0276e71877bfa5dc33a36689d63f3401f52ed0c5ba4b8c04b6ce38a561baff01a6f28a78e9d037d444e727597546dbcc51ef671c09fef7088f747f4537272c1951ff03b8ef0119fb08c16b18dce11fd8c7cbbac1e61053daca28f0169db8000107ed1cf69be3644549bd4104342bd1e20e51a5b783ea2dfe18a54a35c9dcf0c63d24de085f45d987ed12f68075734e523665c7b850398c11c16f4a90ccb23fadccf2b3e91827cc11b757b8715ace9991dd1cfb1061baa5b860ff2fd49b5e94c296f0b3b1cc2fe88be0e35d25bb88714ead0807340f29242135a47f50db8804b3ed74b7afab08636a6a4dfd07e5e1de863ba550d3af721edf8806f032dd851ed6bb881ce97f34ae80ee6fa47e802d0e4659ae3967cb768fe0ef4a07fa04fe9c636b10303fa09e119a6b0e4b5872bb88321dcff5d4f19ab7f5e5fdfaffffa3efe2ffa3f7f3df90bdf8dabe4</data>
     </image>
 </images>
+<connections>
+    <connection>
+        <sender>m_DataTreeView</sender>
+        <signal>selectionChanged(QListViewItem*)</signal>
+        <receiver>m_NodePropertiesView</receiver>
+        <slot>SelectionChanged(QListViewItem*)</slot>
+    </connection>
+</connections>
 <includes>
     <include location="global" impldecl="in implementation">mitkStringProperty.h</include>
     <include location="global" impldecl="in implementation">qlistview.h</include>
@@ -119,9 +129,9 @@
 <variables>
     <variable>QHBoxLayout * treeLayout;</variable>
     <variable>mitk::DataTreeIterator * m_DataTreeIterator;</variable>
-    <variable>DataTreeView * dataTreeView;</variable>
 </variables>
 <functions>
+    <function access="private" specifier="non virtual">init()</function>
     <function>SetDataTreeIterator( mitk::DataTreeIterator * it )</function>
 </functions>
 <layoutdefaults spacing="0" margin="0"/>

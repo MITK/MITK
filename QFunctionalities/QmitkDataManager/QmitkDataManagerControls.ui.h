@@ -6,30 +6,27 @@
 ** init() function in place of a constructor, and a destroy() function in
 ** place of a destructor.
 *****************************************************************************/
+void QmitkDataManagerControls::init() { 
+while (m_DataTreeView->columns() > 0 ) {
+	m_DataTreeView->removeColumn(0);
+    }
+    m_DataTreeView->addColumn( "Name" );
+    m_DataTreeView->addColumn( "NodeType" );
+    m_DataTreeView->setRootIsDecorated(true);
+}
 
 void QmitkDataManagerControls::SetDataTreeIterator(mitk::DataTreeIterator * it)
 {
-  m_DataTreeIterator = it->clone();
-  mitk::DataTreeIterator* tempIt = m_DataTreeIterator->clone();
-  
-  QHBoxLayout * hl = (QHBoxLayout *)this->layout(); 
-
-  if (hl->findWidget(dataTreeView) == -1) {
-    dataTreeView = new DataTreeView(this);
-    dataTreeView->addColumn( "Class/Node" );
-    dataTreeView->addColumn( "Name" );
-    dataTreeView->addColumn( "Value" );
-    dataTreeView->setRootIsDecorated(true);
-    hl->addWidget( dataTreeView );
-  }
-  else {
-    dataTreeView->removeItem(dataTreeView->firstChild());
-  }
+    while (m_DataTreeView->firstChild()) {
+	    delete m_DataTreeView->firstChild();
+     }
+    m_DataTreeIterator = it->clone();
+    mitk::DataTreeIterator* tempIt = m_DataTreeIterator->clone();
 
   if (tempIt->hasNext()) 
   {
     tempIt->next();
-    DataTreeNodeItem * rootItem = new DataTreeNodeItem(dataTreeView, "Loaded Data", "root", tempIt->clone());
+    DataTreeViewItem * rootItem = new DataTreeViewItem(m_DataTreeView, "Loaded Data", "root", tempIt->clone());
   }
   delete tempIt;
 }

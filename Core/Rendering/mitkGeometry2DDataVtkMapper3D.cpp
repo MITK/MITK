@@ -184,11 +184,11 @@ void mitk::Geometry2DDataVtkMapper3D::Update(mitk::BaseRenderer* renderer)
             {
 
               // check for LookupTable
-              mitk::LookupTableProperty::Pointer lut;
-              lut = dynamic_cast<mitk::LookupTableProperty*>(node->GetPropertyList()->GetProperty("LookupTable").GetPointer());
-              if (lut.IsNotNull() )
+              mitk::LookupTableProperty::Pointer LookupTableProb;
+              LookupTableProb = dynamic_cast<mitk::LookupTableProperty*>(node->GetPropertyList()->GetProperty("LookupTable").GetPointer());
+              if (LookupTableProb.IsNotNull() )
               {
-                m_VtkLookupTable = lut->GetLookupTable().GetVtkLookupTable();
+                m_VtkLookupTable = LookupTableProb->GetLookupTable().GetVtkLookupTable();
                 m_VtkTexture->SetLookupTable(m_VtkLookupTable);
                 //						    m_VtkTexture->Modified();
               } else {

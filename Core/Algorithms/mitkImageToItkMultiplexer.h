@@ -1,7 +1,7 @@
-template <typename PixelType, unsigned int Dimension> void _calculateItkPipelineFunction(mitk::Image* result, mitk::Image* mitksource, itk::ImageSource< mitk::ImageToItk<PixelType, Dimension> >* itkpipelinefunction)
+/*template <typename PixelType, unsigned int Dimension> void _calculateItkPipelineFunction(mitk::Image* result, mitk::Image* mitksource, itk::ImageSource< mitk::ImageToItk<PixelType, Dimension> >* itkpipelinefunction)
 {
   typedef mitk::ImageToItk<PixelType, Dimension> ImageToItkType;
-  typedef itk::Image<type, dimension> ImageType;                                  \
+  typedef itk::Image<type, dimension> ImageType;
     typedef itk::ImageSource< ImageType > ImageFilterType;
   
   ImageToItkType::Pointer myImageToItkFilter = ImageToItkType::New();
@@ -15,7 +15,7 @@ template <typename PixelType, unsigned int Dimension> void _calculateItkPipeline
     result->Initialize(itkpipeline->GetOutput());
     result->SetVolume(itkpipeline->GetOutput()->GetBufferPointer());
 }
-
+*/
 #define _calculateItkPipelineFunction(result, mitksource, itkpipelinefunction, type, dimension)    \
   if ( typeId == typeid(type) )                                                                  \
 {                                                                                              \

@@ -10,7 +10,7 @@
 #include "mitkGeometry2DDataVtkMapper3D.h"
 #include "QmitkSelectableGLWidget.h"
 #include "QLevelWindowWidget.h"
-
+#include "MyvtkAblationMesh.h"
 #include <vtkSTLReader.h>
 #include <vtkSTLWriter.h>
 #include <vtkPolyDataReader.h>
@@ -291,8 +291,16 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
 		cyl2cart->Update();
 		node->SetData(cyl2cart->GetOutput());
 		it->add(node); 
-		node->SetColor(0.0,0.9, 0.2, mitkMultiWidget->mitkWidget1->GetRenderer());
-		node->SetColor(0.0,0.1, 0.9, mitkMultiWidget->mitkWidget3->GetRenderer());
+		//node->SetColor(0.0,0.9, 0.2, mitkMultiWidget->mitkWidget1->GetRenderer());
+		//node->SetColor(0.0,0.1, 0.9, mitkMultiWidget->mitkWidget3->GetRenderer());
+		node->Update();
+		mitk::SurfaceData::Pointer surfaceData = mitk::SurfaceData::New();
+		MyvtkAblationMesh  myMesh ;//= MyvtkAblationMesh::New();
+		myMesh.SetData();
+		surfaceData->SetVtkPolyData(myMesh.GetPolyData());
+        node=mitk::DataTreeNode::New();
+		node->SetData(surfaceData);
+		it->add(node);
 		node->Update();
 		
 		mitk::LevelWindow levelWindow;

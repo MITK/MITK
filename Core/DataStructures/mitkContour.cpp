@@ -1,12 +1,8 @@
 #include "mitkContour.h"
 
-#include <mitkPointOperation.h>
-#include <mitkOperationActor.h>
-
-//#include <qapplication.h>//@todo because of quickimplementation UpdateAllWidgets
-//#include <qwidgetlist.h>//@todo because of quickimplementation UpdateAllWidgets
-
-#include <mitkInteractionConst.h>
+//#include <mitkPointOperation.h>
+//#include <mitkOperationActor.h>
+//#include <mitkInteractionConst.h>
 
 mitk::Contour::Contour() :
 m_ContourPath (PathType::New()),
@@ -31,32 +27,32 @@ void mitk::Contour::AddVertex(mitk::ITKPoint3D newPoint)
   m_ContourPath->AddVertex(idx);
 }
 
-void mitk::Contour::ExecuteOperation(Operation* op)
-{
-  mitk::PointOperation * pointOp = dynamic_cast<mitk::PointOperation*>( op );
-  if ( pointOp != NULL )
-  {
-    switch (op->GetOperationType())
-    {
-    case mitk::OpADD:
-      {
-      m_ContourPath = PathType::New();
-      m_ContourPath->Initialize();    
-      }
-
-    case mitk::OpMOVE:
-      {
-        //std::cout << "add vertex to contour" << std::endl;
-        AddVertex(pointOp->GetPoint());
-        UpdateOutputInformation();
-        if (m_CurrentWindow != NULL) {
-          m_CurrentWindow->Update();
-        }
-      }
-    }
-  }
-}
-
+//void mitk::Contour::ExecuteOperation(Operation* op)
+//{
+//  mitk::PointOperation * pointOp = dynamic_cast<mitk::PointOperation*>( op );
+//  if ( pointOp != NULL )
+//  {
+//    switch (op->GetOperationType())
+//    {
+//    case mitk::OpADD:
+//      {
+//      m_ContourPath = PathType::New();
+//      m_ContourPath->Initialize();    
+//      }
+//
+//    case mitk::OpMOVE:
+//      {
+//        //std::cout << "add vertex to contour" << std::endl;
+//        AddVertex(pointOp->GetPoint());
+//        UpdateOutputInformation();
+//        if (m_CurrentWindow != NULL) {
+//          m_CurrentWindow->Update();
+//        }
+//      }
+//    }
+//  }
+//}
+//
 void mitk::Contour::UpdateOutputInformation()
 {
   float mitkBounds[6];
@@ -128,16 +124,6 @@ mitk::Contour::Initialize()
   m_Geometry3D->Initialize();
   }
 
-void
-mitk::Contour::Continue(mitk::ITKPoint3D newPoint)
-  {
-  //std::cout << "add vertex to contour" << std::endl;
-  AddVertex(newPoint);
-  UpdateOutputInformation();
-  if (m_CurrentWindow != NULL) {
-    m_CurrentWindow->Update();
-    }
-  }
 
 unsigned int 
 mitk::Contour::GetNumberOfPoints()

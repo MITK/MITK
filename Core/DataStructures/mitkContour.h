@@ -7,67 +7,127 @@
 
 #include <itkPolyLineParametricPath.h>
 
-namespace mitk {
+namespace mitk 
+  {
 
-class Contour : public BaseData
-{
-public:
-  mitkClassMacro(Contour, BaseData);
+  /**
+   * This class holds stores vertices for drawing a contour 
+   *
+   */
+  class Contour : public BaseData
+    {
+    public:
+      mitkClassMacro(Contour, BaseData);
 
-  itkNewMacro(Self);
+      itkNewMacro(Self);
 
-  typedef itk::PolyLineParametricPath<3>                        PathType;
-  typedef PathType::Pointer                                     PathPointer;
-  typedef PathType::ContinuousIndexType                         ContinuousIndexType;
-  typedef PathType::InputType                                   InputType;
-  typedef PathType::OutputType                                  OutputType;
-  typedef PathType::OffsetType                                  OffsetType;
-  typedef itk::BoundingBox<unsigned long, 3, ScalarType>        BoundingBoxType;
-  typedef BoundingBoxType::PointsContainer                      PointsContainer;
-  typedef BoundingBoxType::PointsContainer::Pointer             PointsContainerPointer;
+      typedef itk::PolyLineParametricPath<3>                        PathType;
+      typedef PathType::Pointer                                     PathPointer;
+      typedef PathType::ContinuousIndexType                         ContinuousIndexType;
+      typedef PathType::InputType                                   InputType;
+      typedef PathType::OutputType                                  OutputType;
+      typedef PathType::OffsetType                                  OffsetType;
+      typedef itk::BoundingBox<unsigned long, 3, ScalarType>        BoundingBoxType;
+      typedef BoundingBoxType::PointsContainer                      PointsContainer;
+      typedef BoundingBoxType::PointsContainer::Pointer             PointsContainerPointer;
 
- 	void ExecuteOperation(Operation* operation);
+      //void ExecuteOperation(Operation* operation);
 
-  void AddVertex(mitk::ITKPoint3D newPoint);
+      /**
+       * clean up the contour data
+       */
+      void Initialize();
 
-  void Initialize();
+      /** 
+       * add a new vertex to the contour
+       */
+      void AddVertex(mitk::ITKPoint3D newPoint);
 
-  void Continue(mitk::ITKPoint3D newPoint);
+      /**
+       * return an itk parametric path of the contour 
+       */
+      PathType::Pointer GetContourPath();
 
-  PathType::Pointer GetContourPath();
+      /**
+       * set the current render window. This is helpful if one 
+       * wants to draw the contour in one special window only.
+       */
+      void SetCurrentWindow(mitk::RenderWindow* rw);
+ 
+      /**
+       * returns the points to the current render window
+       */
+      mitk::RenderWindow* GetCurrentWindow();
 
-  void SetCurrentWindow(mitk::RenderWindow* rw);
-  mitk::RenderWindow* GetCurrentWindow();
+      /**
+       * returns the number of points stored in the contour
+       */
+      unsigned int GetNumberOfPoints();
 
-  unsigned int GetNumberOfPoints();
+      /**
+       * returns the container of the contour points
+       */
+      PointsContainerPointer GetPoints();
 
-  PointsContainerPointer GetPoints();
-  void SetPoints(PointsContainerPointer points);
+      /**
+       * set the contour points container.
+       */
+      void SetPoints(PointsContainerPointer points);
 
-	//virtual methods, that need to be implemented
-	virtual void UpdateOutputInformation();
-	virtual void SetRequestedRegionToLargestPossibleRegion();
-	virtual bool RequestedRegionIsOutsideOfTheBufferedRegion();
-	virtual bool VerifyRequestedRegion();
-	virtual void SetRequestedRegion(itk::DataObject *data);
+      /**
+       * intherited from parent
+       */
+      virtual void UpdateOutputInformation();
 
-protected:
-	Contour();
+      /**
+       * intherited from parent
+       */
+      virtual void SetRequestedRegionToLargestPossibleRegion();
 
-	virtual ~Contour();
+      /**
+       * intherited from parent
+       */
+      virtual bool RequestedRegionIsOutsideOfTheBufferedRegion();
 
-private:
+      /**
+       * intherited from parent
+       */
+      virtual bool VerifyRequestedRegion();
 
-  PathType::Pointer m_ContourPath;
+      /**
+       * intherited from parent
+       */
+      virtual void SetRequestedRegion(itk::DataObject *data);
 
-  mitk::RenderWindow* m_CurrentWindow;
+    protected:
+      Contour();
+      virtual ~Contour();
 
-  BoundingBoxType::Pointer m_BoundingBox;
-  BoundingBoxType::PointsContainer::Pointer m_Vertices;
+    private:
 
-};
+      /**
+       * parametric path of a contour;
+       */
+      PathType::Pointer m_ContourPath;
 
-} // namespace mitk
+      /**
+       * the current render window
+       */ 
+      mitk::RenderWindow* m_CurrentWindow;
+
+      /**
+       * the bounding box of the contour
+       */
+      BoundingBoxType::Pointer m_BoundingBox;
+
+      /**
+       * container for all contour points
+       */
+      BoundingBoxType::PointsContainer::Pointer m_Vertices;
+
+    };
+
+  } // namespace mitk
 
 
 

@@ -13,6 +13,7 @@
 #include <vtkLightKit.h>
 #include <vtkRenderWindow.h>
 #include <vtkTransform.h>
+#include <vtkCamera.h>
 
 #include "PlaneGeometry.h"
 #include "mitkProperties.h"
@@ -111,11 +112,19 @@ void mitk::OpenGLRenderer::UpdateVtkActors()
   //    m_MitkVtkRenderWindow->RemoveRenderer(m_VtkRenderer);
   //    m_VtkRenderer->Delete();
 
+  bool newRenderer = false;
   if(m_VtkRenderer==NULL)
   {
     m_VtkRenderer = vtkRenderer::New();
     m_VtkRenderer->SetLayer(0);
     m_MitkVtkRenderWindow->AddRenderer( this->m_VtkRenderer );
+    newRenderer = true;
+
+    //strange: when using a simple light, the backface of the planes are not shown (regardless of SetNumberOfLayers)
+    //m_Light = vtkLight::New();
+    //m_VtkRenderer->AddLight( m_Light );
+    m_LightKit = vtkLightKit::New();
+    m_LightKit->AddLightsToRenderer(m_VtkRenderer);
   }
 
    m_VtkRenderer->RemoveAllProps();
@@ -162,6 +171,9 @@ void mitk::OpenGLRenderer::UpdateVtkActors()
     delete it;
   }
 
+  if(newRenderer)
+    m_VtkRenderer->GetActiveCamera()->Elevation(-90);
+  
   //    catch( ::itk::ExceptionObject ee)
   //    {
   //        printf("%s\n",ee.what());
@@ -340,16 +352,7 @@ void mitk::OpenGLRenderer::InitRenderer(mitk::RenderWindow* renderwindow)
   */
   //m_MitkVtkRenderWindow->SetNumberOfLayers(2);
 
-  m_VtkRenderer = vtkRenderer::New();
-  m_MitkVtkRenderWindow->AddRenderer( m_VtkRenderer );
-
-  //strange: when using a simple light, the backface of the planes are not shown (regardless of SetNumberOfLayers)
-  //m_Light = vtkLight::New();
-  //m_VtkRenderer->AddLight( m_Light );
-  m_LightKit = vtkLightKit::New();
-  m_LightKit->AddLightsToRenderer(m_VtkRenderer);
-
-  if(m_CameraController)
+  if(m_CameraController.IsNotNull())
     ((VtkInteractorCameraController*)m_CameraController.GetPointer())->SetRenderWindow(m_MitkVtkRenderWindow);
 
   //we should disable vtk doublebuffering, but then it doesn't work

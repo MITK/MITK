@@ -20,7 +20,7 @@ public:
 
     typedef mitk::STLVectorContainer<T> OutputType;
 
-    typedef OutputType::Pointer OutputTypePointer;
+    typedef typename OutputType::Pointer OutputTypePointer;
 
     typedef itk::DataObject::Pointer DataObjectPointer;
 
@@ -79,6 +79,8 @@ typedef STLVectorContainerSource<short int> ShortIntVectorContainerSource;
 typedef STLVectorContainerSource<short unsigned int> ShortUnsignedIntVectorContainerSource;
 typedef STLVectorContainerSource<float> FloatVectorContainerSource;
 typedef STLVectorContainerSource<double> DoubleVectorContainerSource;
+
+} // end of namespace mitk
 
 #include "mitkSTLVectorContainerSource.txx"
 

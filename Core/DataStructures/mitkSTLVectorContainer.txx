@@ -6,13 +6,13 @@
 template<typename T>
 unsigned int mitk::STLVectorContainer<T>::GetSize()
 {
-    return m_Component.get_size();    
+    return Get().size();    
 }
 
 template<typename T>
 void mitk::STLVectorContainer<T>::Clear()
 {
-    return m_Component.clear();    
+    return Get().clear();    
     this->Modified();
 }
 
@@ -22,7 +22,7 @@ void mitk::STLVectorContainer<T>::Clear()
 template<typename T>
 void mitk::STLVectorContainer<T>::Resize( unsigned int size )
 {
-    m_Component.resize( size );    
+    Get().resize( size );    
     this->Modified();
 }
 
@@ -33,8 +33,8 @@ void mitk::STLVectorContainer<T>::Resize( unsigned int size )
 template<typename T>
 void mitk::STLVectorContainer<T>::SetElement( const unsigned int& index, const mitk::STLVectorContainer<T>::ValueType& element )
 {
-    assert( index < m_Component.size() );
-    m_Component[index] = element;
+    assert( index < Get().size() );
+    Get()[index] = element;
     this->Modified();
 }
 
@@ -43,10 +43,10 @@ void mitk::STLVectorContainer<T>::SetElement( const unsigned int& index, const m
  * If the index is out of range, an assertion is raised!
  */
 template<typename T>
-mitk::STLVectorContainer<T>::ValueType& mitk::STLVectorContainer<T>::GetElement( const unsigned int& index )
+typename mitk::STLVectorContainer<T>::ValueType& mitk::STLVectorContainer<T>::GetElement( const unsigned int& index )
 {
-    assert( index < m_Component.size() );
-    return m_Component[index];
+    assert( index < Get().size() );
+    return Get()[index];
     
 }
         

@@ -10,15 +10,17 @@
 namespace mitk
 {
     
-typedef itk::SimpleDataObjectDecorator<std::vector>
     
 template <typename T>
 class STLVectorContainer : public itk::SimpleDataObjectDecorator< std::vector<T> > 
 {
 public:
 
-    mitkClassMacro( STLVectorContainer, itk::SimpleDataObjectDecorator );
-
+    typedef STLVectorContainer<T> Self; 
+    typedef itk::SimpleDataObjectDecorator< std::vector<T> > Superclass; 
+    typedef itk::SmartPointer<Self> Pointer; 
+    typedef itk::SmartPointer<const Self>  ConstPointer; 
+    itkTypeMacro(STLVectorContainer,itk::SimpleDataObjectDecorator)
     itkNewMacro( Self );
     
     typedef T ValueType;
@@ -65,8 +67,8 @@ typedef STLVectorContainer<float> FloatVectorContainer;
 typedef STLVectorContainer<double> DoubleVectorContainer;
 
 
-}
+} //end of namespace mitk
 
-#include "mitkSTLVector.txx"
+#include "mitkSTLVectorContainer.txx"
 
 #endif

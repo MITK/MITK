@@ -142,7 +142,7 @@ void QmitkSimpleExampleFunctionality::selectSliceWidgetYZ(int x)
 
 void QmitkSimpleExampleFunctionality::selectSliceWidgetFP( int p )
 {
-	if(opacityprop!=NULL) {
+  if( opacityprop.IsNotNull() ) {
 		opacityprop->SetValue(p/100.0);
 		multiWidget->updateMitkWidgets();
 	}
@@ -157,10 +157,10 @@ void QmitkSimpleExampleFunctionality::initWidgets()
 		printf("\nrequesting boundingbox\n");   
 		mitk::DataTreeNode::Pointer node = it->get();
 		mitk::BaseData::Pointer data=node->GetData();
-		if((data!=NULL) && (dynamic_cast<mitk::Geometry2DData*>(node->GetData()) == NULL ))
+    if((data.IsNotNull()) && (dynamic_cast<mitk::Geometry2DData*>(node->GetData()) == NULL ))
 		{
 			// get 
-			if (data->GetUpdatedGeometry() != NULL	) 
+			if ((data->GetUpdatedGeometry()).IsNotNull() ) 
 			{
 				mitk::BoundingBox::ConstPointer bb = data->GetGeometry()->GetBoundingBox();
 				printf("boundsArrayType\n");
@@ -189,7 +189,7 @@ void QmitkSimpleExampleFunctionality::initWidgets()
 			}
 			
 			// init pic opacity props
-			if (opacityprop == NULL) {
+      if ( opacityprop.IsNull() ) {
 				opacityprop = new mitk::FloatProperty(1.0f);
 			}
 			if (count == 1) {

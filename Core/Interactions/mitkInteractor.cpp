@@ -7,6 +7,8 @@
 #include <vtkRenderer.h>
 #include <mitkOpenGLRenderer.h>
 #include "mitkInteractionConst.h"
+#include <vtkTransform.h>
+#include <itkVector.h>
 
 
 
@@ -84,23 +86,26 @@ float mitk::Interactor::CalculateJurisdiction(StateEvent const* stateEvent) cons
     else//3D information from a 2D window.
     {
       mitk::Point3D const point = posEvent->GetWorldPosition();
-      itk::BoundingBox<mitk::ScalarType,3>::PointType itkPoint;
-      vm2itk(point, itkPoint);
+      mitk::BoundingBox::PointType itkPoint;
+      float p[3];
+      p[0] = point.x;p[1] = point.y;p[2] = point.z;
+      //transforming the Worldposition to local coordinatesystem
+      m_DataTreeNode->GetData()->GetGeometry()->GetVtkTransform()->GetInverse()->TransformPoint(p, p);
+      
+      itkPoint[0] = p[0];itkPoint[1] = p[1];itkPoint[2] = p[2];
 
       //check if the given position lies inside the data-object
-
       if (bBox->IsInside(itkPoint))
       {
         //how near inside the center?
         mitk::BoundingBox::PointType center = bBox->GetCenter();
         //distance between center and point 
-        returnvalue = itkPoint.SquaredEuclideanDistanceTo(center);
-        //now in rage of 0.5 to 1 compared to size of boundingbox
-
-//#################
-//TODO: map between 0.5 and 1
-//#################
-
+        returnvalue = 1 - itkPoint.SquaredEuclideanDistanceTo(center);
+        //now in rage of 0.5 to 1 compared to size of boundingbox;
+        returnvalue = returnvalue/( (bBox->GetMaximum() - bBox->GetMinimum()).GetNorm() / 2);
+        
+        //map between 0.5 and 1
+        returnvalue = 0.5 + (returnvalue / 2);
       }
       else
       {

@@ -22,6 +22,7 @@ class UndoModel
     virtual bool Redo() = 0;
 
 protected:
+    //##ModelId=3F01770A018E
 	//##Documentation
 	//## @brief friend method from OperationEvent.
 	//## changes the two Operations from undo to redo and redo to undo and also sets a swapped flag

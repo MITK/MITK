@@ -33,12 +33,18 @@ class DisplayCoordinateOperation : public Operation
     //##ModelId=3EF1D5CF0235
     mitk::BaseRenderer* GetRenderer();
 
+    //##ModelId=3F0177090269
     mitkGetMacro(StartDisplayCoordinate, mitk::Point2D);
+    //##ModelId=3F0177090288
     mitkGetMacro(LastDisplayCoordinate, mitk::Point2D);
+    //##ModelId=3F01770902A7
     mitkGetMacro(CurrentDisplayCoordinate, mitk::Point2D);
 
+    //##ModelId=3F01770902D6
     mitk::Vector2D GetLastToCurrentDisplayVector();
+    //##ModelId=3F01770902D7
     mitk::Vector2D GetStartToCurrentDisplayVector();
+    //##ModelId=3F01770902E6
     mitk::Vector2D GetStartToLastDisplayVector();
 
 
@@ -48,7 +54,9 @@ class DisplayCoordinateOperation : public Operation
 
     //##ModelId=3EF1CD2D03A0
     const mitk::Point2D m_StartDisplayCoordinate;
+    //##ModelId=3F01770901DC
     const mitk::Point2D m_LastDisplayCoordinate;
+    //##ModelId=3F01770901FB
     const mitk::Point2D m_CurrentDisplayCoordinate;
 };
 

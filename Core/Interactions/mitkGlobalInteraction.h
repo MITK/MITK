@@ -27,9 +27,9 @@ namespace mitk {
 class GlobalInteraction : public StateMachine
 {
 	public:
-	//##ModelId=3EF099E8014F
+	//##ModelId=3F0177080324
 	typedef std::vector<StateMachine*> StateMachineList;
-	//##ModelId=3EF099E8015F
+	//##ModelId=3F0177080334
 	typedef std::vector<StateMachine*>::iterator StateMachineListIter;
 
 	//##ModelId=3EAD420E0088
@@ -57,7 +57,7 @@ class GlobalInteraction : public StateMachine
 
 	private:
 
-    //##ModelId=3EF099E80364
+    //##ModelId=3F0185C80306
 	//##Documentation
 	//## After m_Roi the next quickimplementation! Thought is a list of StateMachines to be asked.
 	//## take the information from BaseRenderer and parse through the tree and save all interactables

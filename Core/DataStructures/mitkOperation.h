@@ -33,6 +33,7 @@ class Operation
     //## 
     Operation(OperationType operationType);
 
+    //##ModelId=3F01770A0007
     virtual ~Operation();
 
     //##ModelId=3E7831B600CA

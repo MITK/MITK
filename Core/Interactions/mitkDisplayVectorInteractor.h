@@ -32,7 +32,9 @@ class DisplayVectorInteractor : public StateMachine
 
     //##ModelId=3EF1D2A00341
     mitk::Point2D m_StartDisplayCoordinate;
+    //##ModelId=3F0177090324
     mitk::Point2D m_LastDisplayCoordinate;
+    //##ModelId=3F0177090343
     mitk::Point2D m_CurrentDisplayCoordinate;
 
     //##ModelId=3EF231670106

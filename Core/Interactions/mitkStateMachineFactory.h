@@ -23,13 +23,13 @@ namespace mitk {
 	class StateMachineFactory : public QXmlDefaultHandler
 {
   public:
-	//##ModelId=3E775728016C
+	//##ModelId=3F0177090046
 	typedef std::map<std::string,mitk::State*> StartStateMap;
-	//##ModelId=3E775728017C
+	//##ModelId=3F0177090056
 	typedef std::map<std::string,mitk::State *>::iterator StartStateMapIter;
-	//##ModelId=3E775728014D
+	//##ModelId=3F0177090075
 	typedef std::set<int> HistorySet;
-	//##ModelId=3E775728015C
+	//##ModelId=3F0177090094
 	typedef std::set<int>::iterator HistorySetIter;
 
     //##ModelId=3E68B2C600BD

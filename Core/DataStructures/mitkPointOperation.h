@@ -8,6 +8,7 @@
 
 namespace mitk {
 
+//##ModelId=3F0189F0016F
 //##Documentation
 //## @brief Operation, that handles all aktions on one Point.
 //##
@@ -21,19 +22,25 @@ namespace mitk {
 class PointOperation : public mitk::Operation
 {
   public:
+    //##ModelId=3F0189F003A2
 	//##Documentation
 
     PointOperation(OperationType operationType, 
 					ITKPoint3D point, int index);
     
+    //##ModelId=3F0189F003B2
     virtual ~PointOperation();
 	
+    //##ModelId=3F0189F003B4
 	ITKPoint3D GetPoint();
 	
+    //##ModelId=3F0189F003B5
 	int GetIndex();
 
   private:
+    //##ModelId=3F0189F00393
 	ITKPoint3D m_Point;
+    //##ModelId=3F0189F003A1
 	int m_Index;
 };
 }//namespace mitk

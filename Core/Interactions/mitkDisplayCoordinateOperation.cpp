@@ -29,17 +29,19 @@ mitk::BaseRenderer* mitk::DisplayCoordinateOperation::GetRenderer()
     return m_Renderer;
 }
 
-//##ModelId=3EF1D5DB0337
+//##ModelId=3F01770902D6
 mitk::Vector2D mitk::DisplayCoordinateOperation::GetLastToCurrentDisplayVector()
 {
     return m_CurrentDisplayCoordinate-m_LastDisplayCoordinate;
 }
 
+//##ModelId=3F01770902D7
 mitk::Vector2D mitk::DisplayCoordinateOperation::GetStartToCurrentDisplayVector()
 {
     return m_CurrentDisplayCoordinate-m_StartDisplayCoordinate;
 }
 
+//##ModelId=3F01770902E6
 mitk::Vector2D mitk::DisplayCoordinateOperation::GetStartToLastDisplayVector()
 {
     return m_LastDisplayCoordinate-m_StartDisplayCoordinate;

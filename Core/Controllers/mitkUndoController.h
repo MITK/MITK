@@ -12,12 +12,13 @@ namespace mitk {
 class UndoController
 {
   public:
-	//##ModelId=3EDCAEC901C3
+	//##ModelId=3F01770900C3
 	typedef int UndoType;
-	//##ModelId=3E9C45D5007E
+	//##ModelId=3F01770900D2
 	typedef std::map<UndoType, UndoModel*> UndoModelMap;
-	//##ModelId=3E9C45D50092
+	//##ModelId=3F01770900E2
 	typedef std::map<UndoType, UndoModel*>::iterator UndoModelMapIter;
+    //##ModelId=3F01770A0170
 	//##Documentation
     //## @brief Default UndoModel to use.
     static const UndoType DEFAULTUNDOMODEL;
@@ -67,11 +68,11 @@ class UndoController
 	//##Documentation
     //## current selected UndoModel
 	static UndoModel *m_CurUndoModel;
-    //##ModelId=3EDCAECC0176
+    //##ModelId=3F0185C90085
 	//##Documentation
     //## current selected Type of m_CurUndoModel
 	static UndoType m_CurUndoType;
-    //##ModelId=3E9C45D5026A
+    //##ModelId=3F0185C900A5
 	//##Documentation
     //## different UndoModels to select and activate
 	static UndoModelMap m_UndoModelList;

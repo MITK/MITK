@@ -10,14 +10,14 @@
 #include "mitkInteractionConst.h"
 
 
-//##ModelId=3EDDD8F2001B
+//##ModelId=3F0189F0025B
 mitk::CoordinateSupplier::CoordinateSupplier(std::string type, mitk::OperationActor* operationActor)
 : mitk::StateMachine(type), m_Destination(operationActor)
 {
 	m_Point.Fill(0.0);
 }
 
-//##ModelId=3EDDD8F20105
+//##ModelId=3F0189F00269
 bool mitk::CoordinateSupplier::ExecuteSideEffect(int sideEffectId, mitk::StateEvent const* stateEvent, int groupEventId, int objectEventId)
 {
     bool ok = false;

@@ -20,17 +20,17 @@ namespace mitk {
 class State
 {
   public:
-	//##ModelId=3E6907B400B4
+	//##ModelId=3F0177080382
 	typedef std::map<int,mitk::State*> StateMap;
-	//##ModelId=3E6907B400C4
+	//##ModelId=3F0177080393
 	typedef std::map<int,mitk::Transition> TransitionMap;
 
-	//##ModelId=3E775728018B
+	//##ModelId=3F01770803B1
 	typedef std::map<int,mitk::State *>::iterator StateMapIter;
-	//##ModelId=3E77572801AB
+	//##ModelId=3F01770803C0
 	typedef std::map<int,mitk::Transition>::iterator TransMapIter;
 
-	//##ModelId=3E775728019B
+	//##ModelId=3F01770803D0
 	typedef std::map<int,mitk::Transition>::const_iterator TransMapConstIter;
     
 	//##ModelId=3E5B2A9203BD

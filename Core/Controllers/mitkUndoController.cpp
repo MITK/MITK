@@ -5,10 +5,12 @@
 //static member-variables init.
 //##ModelId=3EAEBEBD02DC
 mitk::UndoModel* mitk::UndoController::m_CurUndoModel;
+//##ModelId=3F0185C900A5
 mitk::UndoController::UndoModelMap mitk::UndoController::m_UndoModelList;
-//##ModelId=3EDCAECC0176
+//##ModelId=3F0185C90085
 mitk::UndoController::UndoType mitk::UndoController::m_CurUndoType;
 
+//##ModelId=3F01770A0170
 const mitk::UndoController::UndoType mitk::UndoController::DEFAULTUNDOMODEL = LIMITEDLINEARUNDO;
 
 

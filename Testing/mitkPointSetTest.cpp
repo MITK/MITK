@@ -29,7 +29,7 @@ int mitkPointSetTest(int argc, char* argv[])
 
   //create an operation and add a point.
   int position = 0;
-  mitk::ITKPoint3D itkPoint;
+  mitk::Point3D itkPoint;
   itkPoint.Fill(1);
   mitk::PointOperation* doOp = new mitk::PointOperation(mitk::OpINSERT, itkPoint, position);
 	pointSet->ExecuteOperation(doOp);
@@ -42,7 +42,7 @@ int mitkPointSetTest(int argc, char* argv[])
     return EXIT_FAILURE;
   }
   
-  mitk::ITKPoint3D tempPoint;
+  mitk::Point3D tempPoint;
   tempPoint.Fill(0);
   tempPoint = pointSet->GetItkPoint(position);
   if (tempPoint != itkPoint)

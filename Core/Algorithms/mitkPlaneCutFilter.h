@@ -3,6 +3,8 @@
 
 #include "mitkCommon.h"
 #include "mitkImageToImageFilter.h"
+#include "mitkPlaneGeometry.h"
+#include "itkVectorContainer.h"
 
 namespace mitk {
 
@@ -16,35 +18,37 @@ namespace mitk {
 class PlaneCutFilter : public ImageToImageFilter
 {
 public:
-    mitkClassMacro(PlaneCutFilter, ImageToImageFilter);
+  mitkClassMacro(PlaneCutFilter, ImageToImageFilter);
 
-    /** Method for creation through the object factory. */
-    itkNewMacro(Self);
+  /** Method for creation through the object factory. */
+  itkNewMacro(Self);
 
-	typedef enum {Fill, FillInverse} CreationMode;
+  typedef enum {Fill, FillInverse} CreationMode;
 
-    //##Documentation
-    //## @brief Set background grey level
-	itkSetMacro(BackgroundLevel, float);
-	itkGetMacro(BackgroundLevel, float);
+  typedef itk::VectorContainer<unsigned int, PlaneGeometry::ConstPointer> PlanesContainerType;
 
-	itkSetMacro(CreationMode, CreationMode);
-	itkGetMacro(CreationMode, CreationMode);
+  //##Documentation
+  //## @brief Set background grey level
+  itkSetMacro(BackgroundLevel, float);
+  itkGetMacro(BackgroundLevel, float);
 
-	itkSetMacro(Planes, PlaneView*);
-	itkGetMacro(Planes, const PlaneView*);
+  itkSetMacro(CreationMode, CreationMode);
+  itkGetMacro(CreationMode, CreationMode);
+
+  itkSetObjectMacro(Planes, PlanesContainerType);
+  itkGetObjectMacro(Planes, PlanesContainerType);
 protected:
-    virtual void GenerateData();
+  virtual void GenerateData();
 
-    PlaneCutFilter();
+  PlaneCutFilter();
 
-    ~PlaneCutFilter();
+  ~PlaneCutFilter();
 
-	float m_BackgroundLevel;
+  float m_BackgroundLevel;
 
-	const PlaneView *m_Planes;
+  PlanesContainerType::Pointer m_Planes;
 
-	CreationMode m_CreationMode;
+  CreationMode m_CreationMode;
 };
 
 } // namespace mitk

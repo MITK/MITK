@@ -180,7 +180,7 @@ void mitk::Mesh::ExecuteOperation(Operation* operation)
 
       //create two operations out of the one operation and call superclass
 
-      ITKPoint3D pointA, pointB;
+      Point3D pointA, pointB;
       m_ItkData->GetPoint(lineOp->GetPIdA(), &pointA);
       m_ItkData->GetPoint(lineOp->GetPIdB(), &pointB);
 

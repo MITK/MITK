@@ -18,7 +18,6 @@
 #include <mitkOpenGLRenderer.h>
 #include <mitkVtkRenderWindow.h>
 #include <vtkRenderWindow.h>
-#include <mitkVesselGraphInteractor.h>
 
 // for zoom/pan
 #include <mitkDisplayCoordinateOperation.h>
@@ -132,20 +131,19 @@ void QmitkSimpleExampleFunctionality::initNavigators()
     // float boundingbox[6]={-2*bounds[1],2*bounds[1],-2*bounds[3],2*bounds[3],-2*bounds[5],2*bounds[5]};
     mitk::Geometry3D::Pointer geometry = mitk::Geometry3D::New();
     geometry->Initialize();
-    geometry->SetBoundingBox(boundingbox);
+    geometry->SetBounds(boundingbox->GetBounds());
 
     //lets see if we have data with a limited live-span ...
     mitk::TimeBounds timebounds = mitk::DataTree::ComputeTimeBoundsInMS(m_DataTreeIterator, NULL, "includeInBoundingBox");
     if(timebounds[1]<mitk::ScalarTypeNumericTraits::max())
     {
-      mitk::TimeSlicedGeometry::Pointer timegeometry = mitk::TimeSlicedGeometry::New();
       mitk::ScalarType duration = timebounds[1]-timebounds[0];
-      timegeometry->Initialize(duration);
-      timegeometry->SetTimeBoundsInMS(timebounds); //@bug really required?
-      timegeometry->SetEvenlyTimed();
-      timebounds[1] = timebounds[0]+1.0f;
 
-      timegeometry->SetGeometry3D(geometry, 0);
+      mitk::TimeSlicedGeometry::Pointer timegeometry = mitk::TimeSlicedGeometry::New();
+      timegeometry->InitializeEvenlyTimed(geometry, duration);
+      timegeometry->SetTimeBoundsInMS(timebounds); //@bug really required? FIXME
+
+      timebounds[1] = timebounds[0]+1.0f;
       geometry->SetTimeBoundsInMS(timebounds);
 
       geometry=timegeometry;
@@ -222,30 +220,30 @@ void QmitkSimpleExampleFunctionality::ExecuteOperation(mitk::Operation* operatio
   if( dcOperation != NULL )
   {
   /****ZOOM & MOVE of the whole volume****/
-    mitk::BaseRenderer* renderer = dcOperation->GetRenderer();
-    if( renderer == NULL )
-      return;
-    switch (operation->GetOperationType())
-    {
-      case mitk::OpMOVE :
+      mitk::BaseRenderer* renderer = dcOperation->GetRenderer();
+      if( renderer == NULL )
+          return;
+      switch (operation->GetOperationType())
       {
-        renderer->GetDisplayGeometry()->MoveBy(dcOperation->GetLastToCurrentDisplayVector()*(-1.0));
-        renderer->GetRenderWindow()->Repaint();
-        ok = true;
+          case mitk::OpMOVE :
+              {
+                  renderer->GetDisplayGeometry()->MoveBy(dcOperation->GetLastToCurrentDisplayVector()*(-1.0));
+                  renderer->GetRenderWindow()->Repaint();
+                  ok = true;
+              }
+              break;
+          case mitk::OpZOOM :
+              {
+                  float distance = dcOperation->GetLastToCurrentDisplayVector()[1];
+                  distance = (distance > 0 ? 1 : (distance < 0 ? -1 : 0));
+                  float factor= 1.0 + distance * 0.05;
+                  renderer->GetDisplayGeometry()->Zoom(factor, dcOperation->GetStartDisplayCoordinate());
+                  renderer->GetRenderWindow()->Repaint();
+                  ok = true;
+              }
+              break;
+          default:
+              ;
       }
-      break;
-      case mitk::OpZOOM :
-      {
-        float distance = dcOperation->GetLastToCurrentDisplayVector().y;
-        distance = (distance > 0 ? 1 : (distance < 0 ? -1 : 0));
-        float factor= 1.0 + distance * 0.05;
-        renderer->GetDisplayGeometry()->Zoom(factor, dcOperation->GetStartDisplayCoordinate());
-        renderer->GetRenderWindow()->Repaint();
-        ok = true;
-      }
-      break;
-      default:
-      ;
-    }
   }
 }

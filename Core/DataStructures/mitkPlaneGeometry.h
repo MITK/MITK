@@ -3,7 +3,8 @@
 
 #include "mitkCommon.h"
 #include "mitkGeometry2D.h"
-#include "SpaceGeometry.h"
+#include "mitkLine.h"
+#include <vnl/vnl_cross.h>
 
 class vtkTransform;
 
@@ -19,42 +20,14 @@ class PlaneGeometry : public Geometry2D
 public:
   mitkClassMacro(PlaneGeometry,Geometry2D);
 
-  //    itkGetConstReferenceMacro(PlaneView, PlaneView);
-  //##ModelId=3E395E3E0077
-  //##Documentation
-  //## @brief Get the planeview, i.e., the instance of a class with methods
-  //## for plane rectangles in 3D space
-  virtual const mitk::PlaneView& GetPlaneView() const;
-  //##ModelId=3E396ABE0385
-  //##Documentation
-  //## @brief Set the planeview, i.e., the instance of a class with methods
-  //## for plane rectangles in 3D space
-  virtual void SetPlaneView(const mitk::PlaneView& aPlaneView);
-
-  //##ModelId=3ED91D060363
-  virtual void TransformGeometry(const vtkTransform * transform);
-
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  //##Documentation
-  //## @brief Get the thickness of the plane
-  itkGetConstMacro(Thickness, mitk::ScalarType);
-  //##Documentation
-  //## @brief Set the thickness of the plane
-  virtual void SetThickness(mitk::ScalarType thickness);
-  //##Documentation
-  //## @brief Set the thickness of the plane by a spacing vector as m_PlaneView.normal.dot(spacing)
-  virtual void SetThicknessBySpacing(const float* spacing);
-  //##Documentation
-  //## @brief Set the thickness of the plane by a spacing vector as m_PlaneView.normal.dot(spacing)
-  virtual void SetThicknessBySpacing(const Vector3D* spacing);
+  enum PlaneOrientation {Transversal, Sagittal, Frontal};
 
-  //##ModelId=3E3B9C6E02B5
-  virtual bool Map(const mitk::Point3D &pt3d_mm, mitk::Point2D &pt2d_mm) const;
+  virtual void SetUnitsToMMAffineTransform(mitk::AffineTransform3D* transform);
 
-  //##ModelId=3E3B9C7101BF
-  virtual void Map(const mitk::Point2D &pt2d_mm, mitk::Point3D &pt3d_mm) const;
+  virtual void SetBounds(const BoundingBox::BoundsArrayType& bounds);
 
   //##ModelId=3E3B9C730262
   virtual void UnitsToMM(const mitk::Point2D &pt_units, mitk::Point2D &pt_mm) const;
@@ -66,28 +39,193 @@ public:
   //##ModelId=3E3B9C8E0152
   virtual void MMToUnits(const mitk::Vector2D &vec_mm, mitk::Vector2D &vec_units) const;
 
-  //##ModelId=3EF492640343
-  virtual bool Map(const mitk::Point3D & atPt3d_mm, const mitk::Vector3D &vec3d_mm, mitk::Vector2D &vec2d_mm) const;
-  //##ModelId=3EF49267006C
-  virtual void Map(const mitk::Point2D & atPt2d_mm, const mitk::Vector2D &vec2d_mm, mitk::Vector3D &vec3d_mm) const;
-
   virtual void Modified() const;
 
   virtual void Initialize();
 
-  virtual Geometry3D::Pointer Clone() const;
+  //##Documentation
+  //## @brief Initialize a plane with orientation @a planeorientation (default: transversal) with respect to 
+  //## @a geometryframe (default: identity) and unit spacing (bounds set accordingly).
+  //##
+  virtual void InitializeStandardPlane(const mitk::Geometry3D* geometry3D, PlaneOrientation planeorientation = PlaneOrientation::Transversal, mitk::ScalarType zPosition = 0, bool frontside=true);
+
+  //##Documentation
+  //## @brief Initialize a plane with orientation @a planeorientation (default: transversal) with respect to 
+  //## @a transform (default: identity) given width and height in units.
+  //##
+  virtual void InitializeStandardPlane(mitk::ScalarType width, mitk::ScalarType height, const mitk::AffineTransform3D* transform=NULL, PlaneOrientation planeorientation = PlaneOrientation::Transversal, mitk::ScalarType zPosition = 0, bool frontside=true);
+
+  //##Documentation
+  //## @brief Initialize plane with orientation @a planeorientation (default: transversal) 
+  //## given width, height and spacing.
+  //##
+  virtual void InitializeStandardPlane(mitk::ScalarType width, mitk::ScalarType height, const Vector3D & spacing, PlaneOrientation planeorientation = PlaneOrientation::Transversal, mitk::ScalarType zPosition = 0, bool frontside=true);
+
+  //##Documentation
+  //## @brief Initialize plane by right-/down-vector (itk) and spacing (default: 1.0 mm in all directions).
+  //##
+  //## The length of the right-/-down-vector is used as width/height in units, respectively. Then, 
+  //## the vectors are normalized and multiplied by the respective spacing before they are set in the matrix.
+  virtual void InitializeStandardPlane(const Vector3D& rightVector, const Vector3D& downVector, const Vector3D * spacing = NULL);
+
+  //##Documentation
+  //## @brief Initialize plane by right-/down-vector (vnl) and spacing (default: 1.0 mm in all directions).
+  //##
+  //## The length of the right-/-down-vector is used as width/height in units, respectively. Then, 
+  //## the vectors are normalized and multiplied by the respective spacing before they are set in the matrix.
+  virtual void InitializeStandardPlane(const VnlVector& rightVector, const VnlVector& downVector, const Vector3D * spacing = NULL);
+
+  AffineGeometryFrame3D::Pointer Clone() const;
+
+  //##Documentation
+  //## @brief Initialize plane by right-/down-vector.
+  //##
+  //## @warning The vectors are set into the matrix as they are, @em without normalization! band multiplied by the respective spacing before they are set in the matrix.
+  void SetMatrixByVectors(const VnlVector& rightVector, const VnlVector& downVector, mitk::ScalarType thickness=1.0)
+  {
+    VnlVector normal = vnl_cross_3d(rightVector, downVector);
+    normal.normalize();
+    normal *= thickness;
+
+    mitk::AffineTransform3D::Pointer transform = mitk::AffineTransform3D::New();
+    mitk::Matrix3D matrix;
+    matrix.GetVnlMatrix().set_column(0, rightVector);
+    matrix.GetVnlMatrix().set_column(1, downVector);
+    matrix.GetVnlMatrix().set_column(2, normal);
+    transform->SetMatrix(matrix);
+    transform->SetOffset(const_cast<Point3D&>(m_Origin).Get_vnl_vector().data_block());
+    SetUnitsToMMAffineTransform(transform);
+  }
+
+  void SetOrigin(const Point3D& origin)
+  {
+    if(origin!=GetOrigin())
+    {
+      m_UnitsToMMAffineTransform->SetOffset(const_cast<Point3D&>(origin).Get_vnl_vector().data_block());
+      m_Origin = origin;
+      Modified();
+    }
+  }
+
+  const Point3D& GetOrigin() const
+  {
+    return m_Origin;
+  }
+
+  VnlVector GetOriginVnl() const
+  {
+    return const_cast<Self*>(this)->m_Origin.Get_vnl_vector();
+  }
+
+  Vector3D GetNormal() const
+  {
+    return GetAxisVector(2);
+  }
+
+  VnlVector GetNormalVnl() const
+  {
+    return GetAxisVector(2).Get_vnl_vector();
+  }
+
+  //##Documentation
+  //## @brief Distance of the point from the plane
+  ScalarType Distance(const Point3D& point ) const 
+  {
+		return fabs(SignedDistance(point));
+	}
+
+  //##Documentation
+  //## @brief Signed distance of the point from the plane
+  //##
+  //## > 0 : point is in the direction of the direction vector.
+  inline ScalarType SignedDistance(const Point3D& point ) const 
+  {
+    ScalarType len = GetNormalVnl().two_norm();
+
+		if( len == 0 )
+			return 0;
+
+		return (point-GetOrigin())*GetNormal() / len;
+	}
+  //##Documentation
+  //## @brief Calculate the intersecting line of two planes
+  //##
+  //## @return @a true planes are intersecting
+  //## @return @a false planes do not intersect
+  bool CrossLine( const PlaneGeometry* plane, ITKLine3D& crossline ) const
+  {
+    VnlVector direction;
+
+    Vector3D normal, planenormal;
+    normal = GetNormal();
+    planenormal = plane->GetNormal();
+
+    direction = vnl_cross_3d(normal.Get_vnl_vector(), planenormal.Get_vnl_vector());
+
+    if ( direction.squared_magnitude() < eps )
+      return false; 
+
+    Vector3D itkdirection;
+    itkdirection.Set_vnl_vector(direction);
+    crossline.SetDirection(itkdirection);
+
+    double N1sq = normal.GetSquaredNorm();
+    double N2sq = planenormal.GetSquaredNorm();
+    double N1dN2 = normal*planenormal;
+
+    double determinant = N1sq * N2sq - N1dN2*N1dN2;
+
+    double d1=dot_product(normal.Get_vnl_vector(),GetOriginVnl());
+    double d2=dot_product(planenormal.Get_vnl_vector(),plane->GetOriginVnl());
+
+    double c1 = ( d1*N2sq - d2*N1dN2 ) / determinant;
+    double c2 = ( d2*N1sq - d1*N1dN2) / determinant ;
+
+    Vector3D vpoint;
+    vpoint = normal*((ScalarType)c1)+planenormal*((ScalarType)c2);
+    crossline.GetPoint().Get_vnl_vector()=vpoint.Get_vnl_vector();
+
+    return true;
+  }
+
+  //##Documentation
+  //## @brief Calculate two points where another plane intersects the border of this plane
+  //##
+  //## @return number of intersection points (0..2). First interection point (if existing) 
+  //## is returned in @a lineFrom, second in @a lineTo.
+  int IntersectWithPlane2D(const PlaneGeometry* plane, Point2D& lineFrom, Point2D& lineTo ) const 
+  {
+    VnlVector ptest;
+    ptest = vnl_cross_3d(GetNormalVnl(), plane->GetNormalVnl());
+    if(ptest.squared_magnitude()<vnl_math::float_sqrteps)
+      return 0;
+
+    ITKLine3D crossline;
+    if (CrossLine( plane, crossline ) == false)
+      return 0;
+
+    Point2D  point2; 
+    Vector2D direction2; 
+
+    Map(crossline.GetPoint(), point2);
+    Map(crossline.GetPoint(), crossline.GetDirection(), direction2);
+
+    return 
+      mitk::ITKLine3D::RectangleLineIntersection( 
+        0, 0, GetExtent(0), GetExtent(1), 
+        point2, direction2, lineFrom, lineTo );
+  }
+  static void EnsurePerpendicularNormal(mitk::AffineTransform3D* transform);
+
 protected:
   //##ModelId=3E395F22035A
   PlaneGeometry();
   //##ModelId=3E395F220382
   virtual ~PlaneGeometry();
 
-  virtual void ComputeBoundingBox();
+  virtual void InitializeGeometry(Self * newGeometry) const;
 
-  //##ModelId=3E3A3F03034E
-  //##Documentation
-  //## @brief instance of class with methods for plane rectangles in 3D space
-  mitk::PlaneView m_PlaneView;
+  Point3D m_Origin;
 
   //##ModelId=3E3BE12C012B
   //##Documentation
@@ -103,10 +241,6 @@ protected:
   //## Is calculated in SetPlaneView from the value of m_HeightInUnits and
   //## the PlaneView
   mutable mitk::ScalarType m_ScaleFactorMMPerUnitY;
-
-  //##Documentation
-  //## @brief Thickness of the plane
-  mitk::ScalarType m_Thickness;
 };
 
 } // namespace mitk

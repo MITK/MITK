@@ -2,11 +2,10 @@
 #define GEOMETRY3D_H_HEADER_INCLUDED_C1EBD0AD
 
 #include "mitkCommon.h"
-#include "mitkOperationActor.h"
 #include "mitkVector.h"
-#include <itkImageRegion.h>
+#include <itkAffineGeometryFrame.h>
+#include "mitkOperationActor.h"
 #include <itkBoundingBox.h>
-
 
 class vtkTransform;
 class Operation;
@@ -24,12 +23,14 @@ typedef itk::BoundingBox<unsigned long, 3, mitk::ScalarType>   BoundingBox;
 //## @brief Standard typedef for time-bounds
 typedef itk::FixedArray<mitk::ScalarType,2> TimeBounds;
 
+typedef itk::AffineGeometryFrame<mitk::ScalarType, 3> AffineGeometryFrame3D;
+
 //##ModelId=3DCBF389032B
 //##Documentation
 //## @brief Describes the geometry of a data object
 //## @ingroup Geometry
 //## Describes the geometry of a data object. At least, it can
-//## return the bounding box of the data object. An important sub-class is
+//## return the bounding box of the data object. An important etpaub-class is
 //## SlicedGeometry3D, which descibes data objects consisting of
 //## slices, e.g., objects of type Image.
 //## Conversions between world coordinates (in mm) and unit coordinates 
@@ -43,22 +44,123 @@ typedef itk::FixedArray<mitk::ScalarType,2> TimeBounds;
 //## itk::DataObject::UpdateOutputInformation().
 //## 
 //## Rule: everything is in mm (ms) if not stated otherwise.
-class Geometry3D : public itk::Object, public OperationActor
+class Geometry3D : public AffineGeometryFrame3D, public OperationActor
 {
 public:
-  mitkClassMacro(Geometry3D, itk::Object);
+  mitkClassMacro(Geometry3D, AffineGeometryFrame3D);
 
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  //##ModelId=3DCBF5D40253
-  itkGetConstObjectMacro(BoundingBox, BoundingBox);
-  itkSetConstObjectMacro(BoundingBox, BoundingBox);
+  virtual void SetFloatBounds(const float bounds[6]);
 
-  virtual void SetTimeBoundsInMS(const mitk::TimeBounds& timebounds);
+  //##Documentation
+  //## @brief Get the parametric bounding-box
+  //## 
+  itkGetConstObjectMacro(ParametricBoundingBox, BoundingBox);
+#if ITK_VERSION_MINOR <= 6
+  const BoundingBox::BoundsArrayType GetParametricBounds() const
+#else
+  const BoundingBox::BoundsArrayType& GetParametricBounds() const
+#endif 
+  {
+    assert(m_ParametricBoundingBox.IsNotNull());
+    return m_ParametricBoundingBox->GetBounds();
+  }
 
-  //##ModelId=3DCBF5E9037F
-  virtual const TimeBounds& GetTimeBoundsInMS() const;
+  virtual void SetParametricBounds(const BoundingBox::BoundsArrayType& bounds);
+  virtual void SetFloatParametricBounds(const float bounds[6]);
+ 
+  mitk::ScalarType GetParametricExtent(int direction) const
+  {
+    assert(direction>=0 && direction<3);
+    assert(m_ParametricBoundingBox.IsNotNull());
+
+    AffineBoundingBoxType::BoundsArrayType bounds = m_ParametricBoundingBox->GetBounds();
+    return bounds[direction*2+1]-bounds[direction*2];
+  }
+
+  virtual void SetUnitsToMMAffineTransform(mitk::AffineTransform3D* transform);
+
+  itkGetConstReferenceMacro(TimeBoundsInMS, TimeBounds);
+  virtual void SetTimeBoundsInMS(const TimeBounds& timebounds);
+
+  Point3D GetCornerPoint(unsigned char id) const
+  {
+    assert(m_BoundingBox.IsNotNull());
+    BoundingBox::BoundsArrayType bounds = m_BoundingBox->GetBounds();
+
+    Point3D cornerpoint;
+    switch(id)
+    {
+      case 0: FillVector3D(cornerpoint, bounds[0],bounds[2],bounds[4]); break;
+      case 1: FillVector3D(cornerpoint, bounds[0],bounds[2],bounds[5]); break;
+      case 2: FillVector3D(cornerpoint, bounds[0],bounds[3],bounds[4]); break;
+      case 3: FillVector3D(cornerpoint, bounds[0],bounds[3],bounds[5]); break;
+      case 4: FillVector3D(cornerpoint, bounds[1],bounds[2],bounds[4]); break;
+      case 5: FillVector3D(cornerpoint, bounds[1],bounds[2],bounds[5]); break;
+      case 6: FillVector3D(cornerpoint, bounds[1],bounds[3],bounds[4]); break;
+      case 7: FillVector3D(cornerpoint, bounds[1],bounds[3],bounds[5]); break;
+      default: assert(id < 8);
+    }
+
+    return m_UnitsToMMAffineTransform->TransformPoint(cornerpoint);
+  }
+
+  Point3D GetCornerPoint(bool xFront=true, bool yFront=true, bool zFront=true) const
+  {
+    assert(m_BoundingBox.IsNotNull());
+    BoundingBox::BoundsArrayType bounds = m_BoundingBox->GetBounds();
+
+    Point3D cornerpoint;
+    cornerpoint[0] = (xFront ? bounds[0] : bounds[1]);
+    cornerpoint[1] = (yFront ? bounds[2] : bounds[3]);
+    cornerpoint[2] = (zFront ? bounds[4] : bounds[5]);
+
+    return m_UnitsToMMAffineTransform->TransformPoint(cornerpoint);
+  }
+
+  Vector3D GetAxisVector(int direction) const
+  {
+    Vector3D frontToBack;
+    frontToBack.Set_vnl_vector(m_UnitsToMMAffineTransform->GetMatrix().GetVnlMatrix().get_column(direction));
+    frontToBack *= GetExtent(direction);
+    return frontToBack;
+  }
+
+  //##Documentation
+  //## @brief Get the extent of the bounding-box in the specified @a direction in mm
+  //##
+  ScalarType GetExtentInMM(int direction) const
+  {
+    return m_UnitsToMMAffineTransform->GetMatrix().GetVnlMatrix().get_column(direction).magnitude()*GetExtent(direction); //
+  }
+
+  //##Documentation
+  //## @brief Set the extent of the bounding-box in the specified @a direction in mm
+  //##
+  //## @note This changes the matrix in the transform, @a not the bounds, which are given in units!
+  void SetExtentInMM(int direction, ScalarType extentInMM)
+  {
+    ScalarType len = GetExtentInMM(direction);
+    if(fabs(len - extentInMM)>=mitk::epsSquared)
+    {
+      AffineTransform3D::MatrixType::InternalMatrixType vnlmatrix;
+      vnlmatrix = m_UnitsToMMAffineTransform->GetMatrix().GetVnlMatrix();
+      if(len>extentInMM)
+        vnlmatrix.set_column(direction, vnlmatrix.get_column(direction)/len*extentInMM);
+      else
+        vnlmatrix.set_column(direction, vnlmatrix.get_column(direction)*extentInMM/len);
+      Matrix3D matrix;
+      matrix = vnlmatrix;
+      m_UnitsToMMAffineTransform->SetMatrix(matrix);
+      Modified();
+    }
+  }
+
+  vtkTransform* GetVtkTransform();
+
+  itkGetConstObjectMacro(ParametricTransform, mitk::Transform3D);
 
   //##ModelId=3DDE65D1028A
   void MMToUnits(const mitk::Point3D &pt_mm, mitk::Point3D &pt_units) const;
@@ -68,50 +170,56 @@ public:
 
   //##ModelId=3E3B986602CF
   void MMToUnits(const mitk::Vector3D &vec_mm, mitk::Vector3D &vec_units) const;
+
   //##ModelId=3E3B987503A3
   void UnitsToMM(const mitk::Vector3D &vec_units, mitk::Vector3D &vec_mm) const;
 
-  //##ModelId=3ED91D050305
-  virtual void SetBoundingBox(const float bounds[6]);
-  
-  vtkTransform* GetVtkTransform();
-
-  itkGetConstMacro(TransformUnitsToMM, const mitk::Matrix4D &);
-  
   //##ModelId=3E3453C703AF
   virtual void Initialize();
 
   //##Documentation
-  //## @brief duplicates the geometry
-  virtual Pointer Clone() const;
+  //## @brief clones the geometry
+  //##
+  //## Overwrite in all sub-classes.
+  //## Normally looks like:
+  //## \code
+  //##  Self::Pointer newGeometry = Self::New();
+  //##  newGeometry->Initialize();
+  //##  InitializeGeometry(newGeometry);
+  //##  return newGeometry.GetPointer();
+  //## \endcode
+  //## \sa InitializeGeometry
+  virtual AffineGeometryFrame3D::Pointer Clone() const;
 
   //##Documentation
   //##@brief executes affine operations (translate, rotate, scale)
   void ExecuteOperation(Operation* operation); 
 
-  const ITKVector3D GetXAxis();
-  const ITKVector3D GetYAxis();
-  const ITKVector3D GetZAxis();
-
+  const Vector3D GetXAxis();
+  const Vector3D GetYAxis();
+  const Vector3D GetZAxis();
 protected:
   Geometry3D();
 
   //##ModelId=3E3456C50067
   virtual ~Geometry3D();
 
-  //##ModelId=3ED91D050269
-  mutable mitk::BoundingBox::ConstPointer m_BoundingBox;
+  //##Documentation
+  //## @brief used in clone to initialize the newly created geometry
+  //##
+  //## Has to be overwritten in sub-classes, if they add members.
+  //## Do the following:
+  //## \li call Superclass::InitializeGeometry(newGeometry)
+  //## \li transfer all additional members of Self compared to Superclass
+  virtual void InitializeGeometry(Self * newGeometry) const;
+
+  mutable mitk::BoundingBox::Pointer m_ParametricBoundingBox;
 
   mutable mitk::TimeBounds m_TimeBoundsInMS;
 
-  //##ModelId=3E3BE8BF02BA
-  mitk::Matrix4D m_TransformUnitsToMM;
-  //##ModelId=3E3BEC5D0257
-  mitk::Matrix4D m_TransformMMToUnits;
-  //##ModelId=3E3BE8BF02EC
-  mitk::Matrix4D m_TransformOfOrigin;
-
-  vtkTransform* m_Transform;
+  vtkTransform* m_VtkUnitsToMMAffineTransform;
+  
+  mitk::Transform3D::Pointer m_ParametricTransform;
 };
 
 } // namespace mitk

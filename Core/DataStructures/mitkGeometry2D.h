@@ -20,7 +20,8 @@ namespace mitk {
 //## the 3D point onto the 2D manifold and then calculating the 2D-coordinates
 //## (in mm). These 2D-mm-coordinates can be further converted into 
 //## 2D-unit-coordinates (e.g., pixels), giving a parameter representation of the 
-//## object with parameter values inside a rectangle (e.g., [0,0]..[width, height]).
+//## object with parameter values inside a rectangle (e.g., [0,0]..[width, height]),
+//## which is the bounding box (bounding range in z-direction always [0]..[1]).
 //##
 //## A Geometry2D describes the 2D representation within a 3D object and is 
 //## therefore itself a Geometry3D (derived from Geometry3D). For example,
@@ -49,20 +50,6 @@ public:
 
   /** Method for creation through the object factory. */
   //itkNewMacro(Self);
-
-  /** @brief get the width of the described area in units, e.g., for an image: the
-  * number of pixels in x-direction*/
-  itkGetConstMacro(WidthInUnits, unsigned int);
-  /** @brief set the width of the described area in units, e.g., for an image: the
-  * number of pixels in x-direction*/
-  itkSetMacro(WidthInUnits, unsigned int);
-
-  /** @brief get the height of the described area in units, e.g., for an image: the
-  * number of pixels in y-direction*/
-  itkGetConstMacro(HeightInUnits, unsigned int);
-  /** @brief set the height of the described area in units, e.g., for an image: the
-  * number of pixels in y-direction*/
-  itkSetMacro(HeightInUnits, unsigned int);
 
   //##ModelId=3DDE65E00122
   //##Documentation
@@ -121,10 +108,12 @@ public:
 
   //##ModelId=3E3C3A92033E
   //##Documentation
-  //## @brief Set the width and height of the geometry in units (stored in
-  //## the members m_WidthInUnits, m_HeightInUnits). For an image, this is
-  //## the number of pixels in x-/y-direction.
-  virtual void SetSizeInUnits(unsigned int width, unsigned int height);
+  //## @brief Set the width and height of this 2D-geometry in units by calling SetBounds.
+  //## This does @a not change the extent in mm!
+  //##
+  //## For an image, this is the number of pixels in x-/y-direction.
+  //## @note In contrast to calling SetBounds directly, this does @a not change the extent in mm!
+  virtual void SetSizeInUnits(mitk::ScalarType width, mitk::ScalarType height);
 
   //##ModelId=3EF48EA10320
   //##Documentation
@@ -133,7 +122,6 @@ public:
   //## 
   //## @return true projection was possible
   virtual bool Project(const mitk::Point3D &pt3d_mm, mitk::Point3D &projectedPt3d_mm) const;
-
 
   //##ModelId=3EF48F170280
   //##Documentation
@@ -170,22 +158,12 @@ public:
   //## @return true projection was possible
   virtual bool Project(const mitk::Point3D & atPt3d_mm, const mitk::Vector3D &vec3d_mm, mitk::Vector3D &projectedVec3d_mm) const;
 
+  virtual AffineGeometryFrame3D::Pointer Clone() const;
 protected:
   //##ModelId=3E395E0802E6
   Geometry2D();
   //##ModelId=3E395E080318
   virtual ~Geometry2D();
-
-  //##ModelId=3E3C429101C5
-  //##Documentation
-  //## @brief width of the described area in units, e.g., for an image: the
-  //## number of pixels in x-direction.
-  unsigned int m_WidthInUnits;
-  //##ModelId=3E3C4291020B
-  //##Documentation
-  //## @brief width of the described area in units, e.g., for an image: the
-  //## number of pixels in y-direction.
-  unsigned int m_HeightInUnits;
 };
 
 } // namespace mitk

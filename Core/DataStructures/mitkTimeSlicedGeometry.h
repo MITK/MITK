@@ -43,16 +43,24 @@ public:
   virtual int MSToTimeStep(mitk::ScalarType time_in_ms) const;
 
   virtual mitk::ScalarType TimeStepToMS(int timestep) const;
-
+protected:
   virtual void Initialize(unsigned int timeSteps);
+public:
+  //##Documentation
+  //## @brief Completely initialize this instance as evenly-timed with @timeSteps geometries 
+  //## identical to the provided Geometry3D except of the time bounds.
+  //##
+  virtual void InitializeEvenlyTimed(mitk::Geometry3D* geometry3D, unsigned int timeSteps);
 
   //##Documentation
   //## @brief duplicates the geometry
-  virtual Geometry3D::Pointer Clone() const;
+  virtual AffineGeometryFrame3D::Pointer Clone() const;
 protected:
   TimeSlicedGeometry();
 
   virtual ~TimeSlicedGeometry();
+
+  void InitializeGeometry(Self * newGeometry) const;
 
   mutable std::vector<Geometry3D::Pointer> m_Geometry3Ds;
 

@@ -3,7 +3,8 @@
 
 #include "mitkCommon.h"
 #include "mitkGeometry2D.h"
-#include "SpaceGeometry.h"
+#include "mitkPlaneGeometry.h"
+#include "itkVtkAbstractTransform.h"
 
 class vtkTransform;
 class vtkAbstractTransform;
@@ -19,7 +20,7 @@ namespace mitk {
 //## of 3D space into 3D space. In contrast, AbstractTransformGeometry
 //## (since it is a subclass of Geometry2D) describes a 2D manifold in
 //## 3D space. The 2D manifold is defined as the manifold that results
-//## from transforming a rectangle (given in m_PlaneView) by the
+//## from transforming a rectangle (given in m_Plane) by the
 //## vtkAbstractTransform (given in m_VtkAbstractTransform). 
 //## @todo GetMTime is overwritten to include the timestamp of the
 //## VtkAbstractTransform int the MTime. The implementation of this is
@@ -48,13 +49,13 @@ public:
   //## @brief Get the rectangular area that is used for transformation by 
   //## m_VtkAbstractTransform and therewith defines the 2D manifold described by 
   //## AbstractTransformGeometry
-  virtual const mitk::PlaneView& GetPlaneView() const;
+  itkGetConstObjectMacro(Plane, PlaneGeometry);
   //##ModelId=3EF4A2660243
   //##Documentation
   //## @brief Set the rectangular area that is used for transformation by 
   //## m_VtkAbstractTransform and therewith defines the 2D manifold described by 
   //## AbstractTransformGeometry
-  virtual void SetPlaneView(const mitk::PlaneView& aPlaneView);
+  virtual void SetPlane(const mitk::PlaneGeometry* aPlane);
   
   //##ModelId=3EF4A2660256
   virtual bool Map(const mitk::Point3D &pt3d_mm, mitk::Point2D &pt2d_mm) const;
@@ -82,48 +83,23 @@ public:
   
   virtual unsigned long GetMTime() const;
 
-  virtual void Modified() const;
-
-  virtual Geometry3D::Pointer Clone() const;
+  virtual AffineGeometryFrame3D::Pointer Clone() const;
 protected:
   //##ModelId=3EF4A266029C
   AbstractTransformGeometry();
   //##ModelId=3EF4A266029D
   virtual ~AbstractTransformGeometry();
   
-  //##ModelId=3EF4A26601A2
-  //##Documentation
-  //## @brief Instance of the vtkAbstractTransform
-  vtkAbstractTransform* m_VtkAbstractTransform;
-  
-  //##ModelId=3EF4A2660219
-  //##Documentation
-  //## @brief Instance of the vtkAbstractTransform
-  vtkAbstractTransform* m_InverseVtkAbstractTransform;
-  
+  void InitializeGeometry(Self * newGeometry) const;
+
   //##ModelId=3EF4A266021A
   //##Documentation
   //## @brief The rectangular area that is used for transformation by 
   //## m_VtkAbstractTransform and therewith defines the 2D manifold described by 
   //## AbstractTransformGeometry.
-  mitk::PlaneView m_PlaneView;
-  
-  //##ModelId=3EF4A2660223
-  //##Documentation
-  //## @brief factor to convert x-coordinates from mm to units and vice versa
-  //## 
-  //## Is calculated in SetPlaneView from the value of m_WidthInUnits and the
-  //## PlaneView
-  mutable float m_ScaleFactorMMPerUnitX;
-  //##ModelId=3EF4A266022D
-  //##Documentation
-  //## @brief factor to convert y-coordinates from mm to units and vice versa
-  //## 
-  //## Is calculated in SetPlaneView from the value of m_HeightInUnits and
-  //## the PlaneView
-  mutable float m_ScaleFactorMMPerUnitY;
+  mitk::PlaneGeometry::Pointer m_Plane;
 
-  mutable unsigned long m_LastVtkAbstractTransformTimeStamp;
+  itk::VtkAbstractTransform<ScalarType>::Pointer m_ItkVtkAbstractTransform;
 };
 
 } // namespace mitk

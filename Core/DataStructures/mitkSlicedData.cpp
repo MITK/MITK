@@ -189,7 +189,7 @@ void mitk::SlicedData::CopyInformation(const itk::DataObject *data)
 
   if (slicedData)
   {
-    m_Geometry3D = slicedData->GetGeometry()->Clone();//new SlicedGeometry3D(*slicedData->GetGeometry().GetPointer());
+    m_Geometry3D = dynamic_cast<Geometry3D*>(slicedData->GetSlicedGeometry()->Clone().GetPointer());//new SlicedGeometry3D(*slicedData->GetGeometry().GetPointer());
   }
   else
   {
@@ -236,15 +236,13 @@ void mitk::SlicedData::SetGeometry(Geometry3D* aGeometry3D)
         Geometry2D* geometry2d = dynamic_cast<Geometry2D*>(aGeometry3D);
         assert(geometry2d!=NULL);
         slicedGeometry = SlicedGeometry3D::New();
-        slicedGeometry->Initialize(1);
-        slicedGeometry->SetGeometry2D(geometry2d, 0);
+        slicedGeometry->InitializeEvenlySpaced(geometry2d, 1);
       }
       assert(slicedGeometry.IsNotNull());
 
       TimeSlicedGeometry::Pointer timeSlicedGeometry = TimeSlicedGeometry::New();
       m_Geometry3D = m_TimeSlicedGeometry = timeSlicedGeometry;   
-      m_TimeSlicedGeometry->Initialize(1);
-      m_TimeSlicedGeometry->SetGeometry3D(slicedGeometry, 0);
+      m_TimeSlicedGeometry->InitializeEvenlyTimed(slicedGeometry, 1);
     }
     Superclass::SetGeometry(m_TimeSlicedGeometry);
   }

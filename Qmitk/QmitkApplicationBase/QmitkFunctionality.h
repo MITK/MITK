@@ -109,14 +109,6 @@ public:
 	mitk::DataTreeIterator * getDataTree();
 
 
-  /*!
-	 \brief initialize the widgets
-	 */
-  void initWidget(mitk::DataTreeIterator* it,
-				   QmitkSelectableGLWidget* widget,
-				   const Vector3f& origin,
-				   const Vector3f& right,
-				   const Vector3f& bottom);
 signals:
 	void signal_dummy();
 	void availabilityChanged(QmitkFunctionality*);

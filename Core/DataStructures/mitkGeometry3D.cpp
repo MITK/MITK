@@ -1,5 +1,4 @@
 #include "mitkGeometry3D.h"
-#include "mitkPlaneGeometry.h"
 #include "mitkOperation.h"
 #include "mitkRotationOperation.h"
 #include "mitkPointOperation.h"
@@ -7,124 +6,125 @@
 #include "mitkStatusBar.h"
 #include <float.h>
 
-#include <vecmath.h>
 #include <vtkTransform.h>
 #include <vtkMatrix4x4.h>
 
-//void printmatrix(vtkMatrix4x4* m)
-//{
-//  std::cout << "matrix: " << m->Element[0][0] << ",\t" << m->Element[0][1] << ",\t" << m->Element[0][2] << ",\t" << m->Element[0][3] << std::endl;
-//  std::cout << "        " << m->Element[1][0] << ",\t" << m->Element[1][1] << ",\t" << m->Element[1][2] << ",\t" << m->Element[0][3] << std::endl;
-//  std::cout << "        " << m->Element[2][0] << ",\t" << m->Element[2][1] << ",\t" << m->Element[2][2] << ",\t" << m->Element[0][3] << std::endl;
-//  std::cout << "        " << m->Element[3][0] << ",\t" << m->Element[3][1] << ",\t" << m->Element[3][2] << ",\t" << m->Element[3][3] << std::endl;
-//}
-
-//##ModelId=3ED91D050305
-void mitk::Geometry3D::SetBoundingBox(const float bounds[6])
-{
-  mitk::BoundingBox::Pointer boundingBox=mitk::BoundingBox::New();
-  
-  mitk::BoundingBox::PointsContainer::Pointer pointscontainer=mitk::BoundingBox::PointsContainer::New();
-  mitk::ScalarType nullpoint[]={0,0,0};
-  mitk::BoundingBox::PointType p(nullpoint);
-  
-  mitk::BoundingBox::PointIdentifier pointid=0;
-  
-  //add the upper-left-front and lower-right-back edge points of the plane geometry to the bounding box calculator.
-  p[0]=bounds[0]; p[1]=bounds[2]; p[2]=bounds[4];
-  pointscontainer->InsertElement(pointid++, p);
- 
-  p[0]=bounds[1]; p[1]=bounds[3]; p[2]=bounds[5];
-  pointscontainer->InsertElement(pointid++, p);
-
-  boundingBox->SetPoints(pointscontainer);
-  
-  boundingBox->ComputeBoundingBox();
-  
-  SetBoundingBox(boundingBox);
-}
-
-//##ModelId=3DCBF5E9037F
-const mitk::TimeBounds& mitk::Geometry3D::GetTimeBoundsInMS() const
-{
-  return m_TimeBoundsInMS;
-}
-
-void mitk::Geometry3D::SetTimeBoundsInMS(const mitk::TimeBounds& timebounds)
-{
-  m_TimeBoundsInMS = timebounds;
-}
-
-//##ModelId=3DE763C500C4
-/*!
-\todo use parameter t or removed it!!!
-\deprecated New method returns a vtkTransform
-*/
-
-//##ModelId=3DDE65D1028A
-void mitk::Geometry3D::MMToUnits(const mitk::Point3D &pt_mm, mitk::Point3D &pt_units) const
-{
-  m_TransformMMToUnits.transform(pt_mm, &pt_units);
-}
-
-//##ModelId=3DDE65DC0151
-void mitk::Geometry3D::UnitsToMM(const mitk::Point3D &pt_units, mitk::Point3D &pt_mm) const
-{
-  m_TransformUnitsToMM.transform(pt_units, &pt_mm);
-}
-
-//##ModelId=3E3B986602CF
-void mitk::Geometry3D::MMToUnits(const mitk::Vector3D &vec_mm, mitk::Vector3D &vec_units) const
-{
-  m_TransformMMToUnits.transform(vec_mm, &vec_units);
-}
-
-//##ModelId=3E3B987503A3
-void mitk::Geometry3D::UnitsToMM(const mitk::Vector3D &vec_units, mitk::Vector3D &vec_mm) const
-{
-  m_TransformUnitsToMM.transform(vec_units, &vec_mm);
-}
-
-//##ModelId=3E3453C703AF
-void mitk::Geometry3D::Initialize()
-{
-  //initialize m_TransformOfOrigin and m_Spacing (and m_TransformUnitsToMM/m_TransformMMToUnits).
-  m_TransformOfOrigin.setIdentity();
-}
-
 // Standard Constructor for the new makro. sets the geometry to 3 dimensions
-mitk::Geometry3D::Geometry3D() : m_BoundingBox(NULL)
+mitk::Geometry3D::Geometry3D() : m_ParametricBoundingBox(NULL), m_VtkUnitsToMMAffineTransform(NULL)
 {
-  m_TimeBoundsInMS[0]=-ScalarTypeNumericTraits::max(); m_TimeBoundsInMS[1]=ScalarTypeNumericTraits::max();
-
-  m_TransformMMToUnits.setIdentity();
-  m_TransformUnitsToMM.setIdentity();
-    
-  m_Transform = vtkTransform::New();  
+  Initialize();
 }
 
 //##ModelId=3E3456C50067
 mitk::Geometry3D::~Geometry3D()
 {
+
+}
+
+//##ModelId=3E3453C703AF
+void mitk::Geometry3D::Initialize()
+{
+  float b[6] = {0,1,0,1,0,1};
+  SetFloatBounds(b);
+
+  Superclass::Initialize();
+
+  m_VtkUnitsToMMAffineTransform = vtkTransform::New();  
+  m_VtkUnitsToMMAffineTransform->Identity();
+
+  m_ParametricTransform = m_UnitsToMMAffineTransform;
+
+  m_TimeBoundsInMS[0]=-ScalarTypeNumericTraits::max(); m_TimeBoundsInMS[1]=ScalarTypeNumericTraits::max();
+}
+
+void mitk::Geometry3D::SetTimeBoundsInMS(const TimeBounds& timebounds)
+{
+  if(m_TimeBoundsInMS != timebounds)
+  {
+    m_TimeBoundsInMS = timebounds;
+    Modified();
+  }
+}
+  
+void mitk::Geometry3D::SetFloatBounds(const float bounds[6])
+{
+  mitk::BoundingBox::BoundsArrayType b;
+  b=bounds;
+  SetBoundsArray(b, m_BoundingBox);
+}
+
+void mitk::Geometry3D::SetFloatParametricBounds(const float bounds[6])
+{
+  mitk::BoundingBox::BoundsArrayType b;
+  b=bounds;
+  SetBoundsArray(b, m_ParametricBoundingBox);
+}
+
+void mitk::Geometry3D::SetParametricBounds(const BoundingBox::BoundsArrayType& bounds)
+{
+  SetBoundsArray(bounds, m_ParametricBoundingBox);
+}
+
+void mitk::Geometry3D::MMToUnits(const mitk::Point3D &pt_mm, mitk::Point3D &pt_units) const
+{
+  pt_units = m_UnitsToMMAffineTransform->BackTransform(pt_mm);
+}
+
+//##ModelId=3DDE65DC0151
+void mitk::Geometry3D::UnitsToMM(const mitk::Point3D &pt_units, mitk::Point3D &pt_mm) const
+{
+  pt_mm = m_ParametricTransform->TransformPoint(pt_units);
+}
+
+//##ModelId=3E3B986602CF
+void mitk::Geometry3D::MMToUnits(const mitk::Vector3D &vec_mm, mitk::Vector3D &vec_units) const
+{
+  vec_units = m_UnitsToMMAffineTransform->BackTransform(vec_mm);
+}
+
+//##ModelId=3E3B987503A3
+void mitk::Geometry3D::UnitsToMM(const mitk::Vector3D &vec_units, mitk::Vector3D &vec_mm) const
+{
+  vec_mm = m_ParametricTransform->TransformVector(vec_units);
+}
+
+void mitk::Geometry3D::SetUnitsToMMAffineTransform(mitk::AffineTransform3D* transform)
+{
+  if(m_UnitsToMMAffineTransform.GetPointer() != transform)
+  {
+    Superclass::SetUnitsToMMAffineTransform(transform);
+    m_ParametricTransform = m_UnitsToMMAffineTransform;
+    //m_VtkUnitsToMMAffineTransform = @FIXME connect vtk and itk transforms!!!
+    Modified();
+  }
 }
 
 /*
   \todo set User Matrix/transform also - clone it also?
 */
-mitk::Geometry3D::Pointer mitk::Geometry3D::Clone() const
+mitk::AffineGeometryFrame3D::Pointer mitk::Geometry3D::Clone() const
 {
-  mitk::Geometry3D::Pointer newGeometry = Geometry3D::New();
+  Self::Pointer newGeometry = Self::New();
   newGeometry->Initialize();
+  InitializeGeometry(newGeometry);
+  return newGeometry.GetPointer();
+}
 
-  newGeometry->SetBoundingBox(m_BoundingBox);
+void mitk::Geometry3D::InitializeGeometry(Geometry3D * newGeometry) const
+{
+  Superclass::InitializeGeometry(newGeometry);
+
   newGeometry->SetTimeBoundsInMS(m_TimeBoundsInMS);  
-  newGeometry->GetVtkTransform()->SetMatrix(m_Transform->GetMatrix());
-  return newGeometry;  
+
+  newGeometry->GetVtkTransform()->SetMatrix(m_VtkUnitsToMMAffineTransform->GetMatrix());
+
+  if(m_ParametricBoundingBox.IsNotNull())
+    newGeometry->SetParametricBounds(m_ParametricBoundingBox->GetBounds());
 }
 
 vtkTransform* mitk::Geometry3D::GetVtkTransform()
 {
-  return m_Transform;
+  return m_VtkUnitsToMMAffineTransform;
 }
 
 void mitk::Geometry3D::ExecuteOperation(Operation* operation)
@@ -138,15 +138,15 @@ void mitk::Geometry3D::ExecuteOperation(Operation* operation)
     mitk::PointOperation *pointOp = dynamic_cast<mitk::PointOperation *>(operation);
 	  if (pointOp == NULL)
 	  {
-		  mitk::StatusBar::DisplayText("Recieved wrong type of operation!See mitkAffineInteractor.cpp", 10000);
+		  mitk::StatusBar::DisplayText("received wrong type of operation!See mitkAffineInteractor.cpp", 10000);
 		  return;
 	  } 
-    mitk::ITKPoint3D newPos = pointOp->GetPoint();
+    mitk::Point3D newPos = pointOp->GetPoint();
     ScalarType data[3];
-    m_Transform->GetPosition(data);
-    m_Transform->PostMultiply();
-    m_Transform->Translate(newPos[0], newPos[1], newPos[2]);    
-    m_Transform->PreMultiply();
+    m_VtkUnitsToMMAffineTransform->GetPosition(data);
+    m_VtkUnitsToMMAffineTransform->PostMultiply();
+    m_VtkUnitsToMMAffineTransform->Translate(newPos[0], newPos[1], newPos[2]);    
+    m_VtkUnitsToMMAffineTransform->PreMultiply();
     break;
   }
 	case OpSCALE:
@@ -154,28 +154,28 @@ void mitk::Geometry3D::ExecuteOperation(Operation* operation)
     mitk::PointOperation *pointOp = dynamic_cast<mitk::PointOperation *>(operation);
 	  if (pointOp == NULL)
 	  {
-		  mitk::StatusBar::DisplayText("Recieved wrong type of operation!See mitkAffineInteractor.cpp", 10000);
+		  mitk::StatusBar::DisplayText("received wrong type of operation!See mitkAffineInteractor.cpp", 10000);
 		  return;
 	  } 
-    mitk::ITKPoint3D newScale = pointOp->GetPoint();
+    mitk::Point3D newScale = pointOp->GetPoint();
     ScalarType data[3];
     /* calculate new scale: newscale = oldscale * (oldscale + scaletoadd)/oldscale */
     data[0] = 1 + (newScale[0] / GetXAxis().GetNorm());
     data[1] = 1 + (newScale[1] / GetYAxis().GetNorm());
     data[2] = 1 + (newScale[2] / GetZAxis().GetNorm());  
 
-    mitk::ITKPoint3D center = const_cast<mitk::BoundingBox*>(m_BoundingBox.GetPointer())->GetCenter();
+    mitk::Point3D center = const_cast<mitk::BoundingBox*>(m_BoundingBox.GetPointer())->GetCenter();
     ScalarType pos[3];
-    m_Transform->GetPosition(pos);
-    m_Transform->PostMultiply();
-    m_Transform->Translate(-pos[0], -pos[1], -pos[2]);
-    m_Transform->Translate(-center[0], -center[1], -center[2]);   
-    m_Transform->PreMultiply();
-    m_Transform->Scale(data[0], data[1], data[2]);
-    m_Transform->PostMultiply();
-    m_Transform->Translate(+center[0], +center[1], +center[2]);   
-    m_Transform->Translate(pos[0], pos[1], pos[2]);
-    m_Transform->PreMultiply();
+    m_VtkUnitsToMMAffineTransform->GetPosition(pos);
+    m_VtkUnitsToMMAffineTransform->PostMultiply();
+    m_VtkUnitsToMMAffineTransform->Translate(-pos[0], -pos[1], -pos[2]);
+    m_VtkUnitsToMMAffineTransform->Translate(-center[0], -center[1], -center[2]);   
+    m_VtkUnitsToMMAffineTransform->PreMultiply();
+    m_VtkUnitsToMMAffineTransform->Scale(data[0], data[1], data[2]);
+    m_VtkUnitsToMMAffineTransform->PostMultiply();
+    m_VtkUnitsToMMAffineTransform->Translate(+center[0], +center[1], +center[2]);   
+    m_VtkUnitsToMMAffineTransform->Translate(pos[0], pos[1], pos[2]);
+    m_VtkUnitsToMMAffineTransform->PreMultiply();
     break;
   }
   case OpROTATE:
@@ -183,19 +183,19 @@ void mitk::Geometry3D::ExecuteOperation(Operation* operation)
     mitk::RotationOperation *rotateOp = dynamic_cast<mitk::RotationOperation *>(operation);
     if (rotateOp == NULL)
     {
-	    mitk::StatusBar::DisplayText("Recieved wrong type of operation!See mitkAffineInteractor.cpp", 10000);
+	    mitk::StatusBar::DisplayText("received wrong type of operation!See mitkAffineInteractor.cpp", 10000);
 	    return;
     }
-    ITKVector3D rotationVector = rotateOp->GetVectorOfRotation();
-    ITKPoint3D center = rotateOp->GetCenterOfRotation();
+    Vector3D rotationVector = rotateOp->GetVectorOfRotation();
+    Point3D center = rotateOp->GetCenterOfRotation();
     ScalarType angle = rotateOp->GetAngleOfRotation();
     angle = (angle < -360) ? -360 : angle;
     angle = (angle >  360) ?  360 : angle;
-    m_Transform->PostMultiply();
-    m_Transform->Translate(-center[0], -center[1], -center[2]);
-    m_Transform->RotateWXYZ(angle, rotationVector[0], rotationVector[1], rotationVector[2]);
-    m_Transform->Translate(center[0], center[1], center[2]);
-    m_Transform->PreMultiply();
+    m_VtkUnitsToMMAffineTransform->PostMultiply();
+    m_VtkUnitsToMMAffineTransform->Translate(-center[0], -center[1], -center[2]);
+    m_VtkUnitsToMMAffineTransform->RotateWXYZ(angle, rotationVector[0], rotationVector[1], rotationVector[2]);
+    m_VtkUnitsToMMAffineTransform->Translate(center[0], center[1], center[2]);
+    m_VtkUnitsToMMAffineTransform->PreMultiply();
     break;  
   }
   default:
@@ -203,29 +203,29 @@ void mitk::Geometry3D::ExecuteOperation(Operation* operation)
 	}
 }
 
-const mitk::ITKVector3D mitk::Geometry3D::GetXAxis()
+const mitk::Vector3D mitk::Geometry3D::GetXAxis()
 {
   vtkMatrix4x4* m = GetVtkTransform()->GetMatrix();
-  mitk::ITKVector3D v;
+  mitk::Vector3D v;
   v[0] = m->Element[0][0];
   v[1] = m->Element[1][0];
   v[2] = m->Element[2][0];
   return v;
 }
 
-const mitk::ITKVector3D mitk::Geometry3D::GetYAxis()
+const mitk::Vector3D mitk::Geometry3D::GetYAxis()
 {
   vtkMatrix4x4* m = GetVtkTransform()->GetMatrix();
-  mitk::ITKVector3D v;
+  mitk::Vector3D v;
   v[0] = m->Element[0][1];
   v[1] = m->Element[1][1];
   v[2] = m->Element[2][1];
   return v;
 }
-const mitk::ITKVector3D mitk::Geometry3D::GetZAxis()
+const mitk::Vector3D mitk::Geometry3D::GetZAxis()
 {
   vtkMatrix4x4* m = GetVtkTransform()->GetMatrix();
-  mitk::ITKVector3D v;
+  mitk::Vector3D v;
   v[0] = m->Element[0][2];
   v[1] = m->Element[1][2];
   v[2] = m->Element[2][2];

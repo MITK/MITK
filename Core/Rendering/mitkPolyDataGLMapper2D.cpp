@@ -6,7 +6,7 @@
 #include "mitkSurfaceData.h"
 #include "mitkColorProperty.h"
 #include "mitkProperties.h"
-#include "mitkAbstractTransformGeometry.h"
+#include "mitkVtkAbstractTransformGeometry.h"
 #include "mitkBaseVtkMapper3D.h"
 
 #include <vtkPolyData.h>
@@ -62,37 +62,36 @@ void mitk::PolyDataGLMapper2D::Paint( mitk::BaseRenderer * renderer )
 
     if ( vtkpolydata != NULL )
     {
-        Vector3D point;
+        Point3D point;
         Vector3D normal;
 
-        if ( worldPlaneGeometry.IsNotNull() )
+        if(worldPlaneGeometry.IsNotNull())
         {
-            // set up vtkPlane according to worldGeometry
-            point = worldPlaneGeometry->GetPlaneView().point;
-            normal = worldPlaneGeometry->GetPlaneView().normal;
-            normal.normalize();
-            m_Plane->SetTransform( NULL );
+          // set up vtkPlane according to worldGeometry
+          point=worldPlaneGeometry->GetOrigin();
+          normal=worldPlaneGeometry->GetNormal(); normal.Normalize();
+          m_Plane->SetTransform(NULL);
         }
         else
         {
-            //@FIXME: does not work correctly. Does m_Plane->SetTransform really transforms a "plane plane" into a "curved plane"?
-            return ;
-            AbstractTransformGeometry::ConstPointer worldAbstractGeometry = dynamic_cast<const AbstractTransformGeometry*>( renderer->GetCurrentWorldGeometry2D() );
-            if ( worldAbstractGeometry.IsNotNull() )
-            {
-                // set up vtkPlane according to worldGeometry
-                point = worldAbstractGeometry->GetPlaneView().point;
-                normal = worldAbstractGeometry->GetPlaneView().normal;
-                normal.normalize();
-                m_Plane->SetTransform( worldAbstractGeometry->GetVtkAbstractTransform() ->GetInverse() );
-            }
-            else
-                return ;
+          //@FIXME: does not work correctly. Does m_Plane->SetTransform really transforms a "plane plane" into a "curved plane"?
+          return;
+          VtkAbstractTransformGeometry::ConstPointer worldAbstractGeometry = dynamic_cast<const VtkAbstractTransformGeometry*>(renderer->GetCurrentWorldGeometry2D());
+          if(worldAbstractGeometry.IsNotNull())
+          {
+            // set up vtkPlane according to worldGeometry
+            point=const_cast<mitk::BoundingBox*>(worldAbstractGeometry->GetParametricBoundingBox())->GetMinimum();
+            FillVector3D(normal, 0, 0, 1);
+            m_Plane->SetTransform(worldAbstractGeometry->GetVtkAbstractTransform()->GetInverse());
+          }
+          else
+            return;
         }
 
+
         float vp[ 3 ], vnormal[ 3 ];
-        vec2vtk( point, vp );
-        vec2vtk( normal, vnormal );
+        vnl2vtk(point.Get_vnl_vector(), vp);
+        vnl2vtk(normal.Get_vnl_vector(), vnormal);
 
         //normally, we would need to transform the surface and cut the transformed surface with the cutter.
         //This might be quite slow. Thus, the idea is, to perform an inverse transform of the plane instead.
@@ -115,7 +114,7 @@ void mitk::PolyDataGLMapper2D::Paint( mitk::BaseRenderer * renderer )
         // fetch geometry
         mitk::DisplayGeometry::Pointer displayGeometry = renderer->GetDisplayGeometry();
         assert( displayGeometry );
-        //  float toGL=displayGeometry->GetSizeInDisplayUnits().y;
+        //  float toGL=displayGeometry->GetSizeInDisplayUnits()[1];
 
         //apply color and opacity read from the PropertyList
         ApplyProperties( renderer );
@@ -164,7 +163,7 @@ void mitk::PolyDataGLMapper2D::Paint( mitk::BaseRenderer * renderer )
                 //take transformation via vtktransform into account
                 vtktransform->TransformPoint( vp, vp );
 
-                vtk2vec( vp, p );
+                vtk2itk( vp, p );
 
                 //convert 3D point (in mm) to 2D point on slice (also in mm)
                 worldGeometry->Map( p, p2d );
@@ -173,10 +172,10 @@ void mitk::PolyDataGLMapper2D::Paint( mitk::BaseRenderer * renderer )
                 displayGeometry->MMToDisplay( p2d, p2d );
 
                 //convert display coordinates ( (0,0) is top-left ) in GL coordinates ( (0,0) is bottom-left )
-                //p2d.y=toGL-p2d.y;
+                //p2d[1]=toGL-p2d[1];
 
                 //add the current vertex to the line
-                glVertex2f( p2d.x, p2d.y );
+                glVertex2f( p2d[0], p2d[1] );
             }
             glEnd ();
         }

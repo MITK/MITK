@@ -3,8 +3,6 @@
 
 #include "mitkCommon.h"
 #include "mitkImageToImageFilter.h"
-#include <vecmath.h>
-
 
 #define M_PI       3.14159265358979323846
 //#endif
@@ -53,7 +51,7 @@ private:
 
   float m_Distance;
   int m_NoStrainInterval;
-  Point3<int> m_Origin;  
+  itk::Point<int, 3> m_Origin;  
     
 };
 

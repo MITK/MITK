@@ -45,7 +45,7 @@ private:
 
   //##Documentation
   //## @brief to calculate a direction vector from last point and actual point
-  ITKPoint3D m_LastPoint;
+  Point3D m_LastPoint;
 
 };
 }

@@ -10,7 +10,7 @@ namespace mitk {
 class AffineTransformationOperation : public PointOperation
 {
 public:
-  AffineTransformationOperation(OperationType operationType, ITKPoint3D point, ScalarType angle, int index);
+  AffineTransformationOperation(OperationType operationType, Point3D point, ScalarType angle, int index);
   virtual ~AffineTransformationOperation(void);
   ScalarType GetAngle();
 protected:

@@ -6,12 +6,7 @@
 #include "mitkProperties.h"
 #include <vtkTransform.h>
 
-
-#ifdef WIN32
-	#include <glut.h>
-#else
-	#include <GL/glut.h>
-#endif
+#include <GL/glut.h>
 	
 mitk::LineMapper2D::LineMapper2D()
 : mitk::PointSetMapper2D()
@@ -64,33 +59,25 @@ void mitk::LineMapper2D::Paint(mitk::BaseRenderer * renderer)
     {
       mitk::Point3D p, q, projected_p, projected_q;
       float vtkp[3];
-      p.x= it->Value()[0];
-      p.y= it->Value()[1];
-      p.z= it->Value()[2];
+      itk2vtk(it->Value(), vtkp);
+      transform->TransformPoint(vtkp, vtkp);
+      vtk2itk(vtkp,p);
       
       //next point n+1
       it++;
-      q.x= it->Value()[0];
-      q.y= it->Value()[1];
-      q.z= it->Value()[2];
+      itk2vtk(it->Value(), vtkp);
+      transform->TransformPoint(vtkp, vtkp);
+      vtk2itk(vtkp,q);
       it--;
-
-      vec2vtk(p, vtkp);
-      transform->TransformPoint(vtkp, vtkp);
-      vtk2vec(vtkp,p);
-
-      vec2vtk(q, vtkp);
-      transform->TransformPoint(vtkp, vtkp);
-      vtk2vec(vtkp,q);
-
 
       displayGeometry->Project(p, projected_p);
       displayGeometry->Project(q, projected_q);
 
-      if((Vector3D(p-projected_p).length()<2.0) &&
-        (Vector3D(q-projected_q).length()<2.0))
+      Vector3D diffp=p-projected_p, diffq=q-projected_q;
+      if((diffp.GetSquaredNorm()<4.0) &&
+         (diffq.GetSquaredNorm()<4.0))
       {
-        Point2D p2d, q2d, tmp, horz(5,0), vert(0,5);
+        Point2D p2d, q2d, tmp;
         
         displayGeometry->Map(projected_p, p2d);
         displayGeometry->MMToDisplay(p2d, p2d);
@@ -111,8 +98,8 @@ void mitk::LineMapper2D::Paint(mitk::BaseRenderer * renderer)
 
 
         //  glBegin (GL_LINES);
-        //    glVertex2f(p2d.x, p2d.y);
-        //    glVertex2f(q2d.x, q2d.y);
+        //    glVertex2f(p2d[0], p2d[1]);
+        //    glVertex2f(q2d[0], q2d[1]);
         //  glEnd ();
 
         //  glColor3f(currCol[0],currCol[1],currCol[2]);//the color before changing to select!
@@ -121,8 +108,8 @@ void mitk::LineMapper2D::Paint(mitk::BaseRenderer * renderer)
         //else
         //{
 					glBegin (GL_LINES);
-            glVertex2f(p2d.x, p2d.y);
-            glVertex2f(q2d.x, q2d.y);
+            glVertex2f(p2d[0], p2d[1]);
+            glVertex2f(q2d[0], q2d[1]);
           glEnd ();
         //}
       }

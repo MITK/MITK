@@ -51,7 +51,7 @@ namespace mitk
       /** 
        * add a new vertex to the contour
        */
-      void AddVertex(mitk::ITKPoint3D newPoint);
+      void AddVertex(mitk::Point3D newPoint);
 
       /**
        * return an itk parametric path of the contour 

@@ -15,7 +15,7 @@ public:
   itkNewMacro(Self);
   
   virtual mitk::ScalarType GetVolume();
-  virtual bool IsInside(ITKPoint3D p);
+  virtual bool IsInside(Point3D p);
     
 protected:
   Cylinder();

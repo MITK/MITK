@@ -7,7 +7,6 @@
 ** place of a destructor.
 *****************************************************************************/
 
-#include "mitkProperties.h"
 #include <mitkProperties.h>
 #include <mitkStringProperty.h>
 #include <mitkGeometry2DDataVtkMapper3D.h>
@@ -297,7 +296,7 @@ void QmitkStdMultiWidget::initWidget(mitk::DataTreeIterator* it,
                                    const mitk::Vector3D& right,
                                    const mitk::Vector3D& bottom)
 {
-
+/*
   mitk::PlaneGeometry::Pointer plane = mitk::PlaneGeometry::New();
 
   //ohne den Pointer-Umweg meckert gcc
@@ -308,10 +307,12 @@ void QmitkStdMultiWidget::initWidget(mitk::DataTreeIterator* it,
   widget->GetRenderer()->SetWorldGeometry(plane);
 
   widget->update();
+*/
 }
 
 void QmitkStdMultiWidget::initWidgets( mitk::DataTreeIterator * it )
 {
+/*
   const mitk::BoundingBox::BoundsArrayType bounds = mitk::DataTree::ComputeBoundingBox(it)->GetBounds();
   printf("\nboundingbox\n");
 
@@ -341,6 +342,7 @@ void QmitkStdMultiWidget::initWidgets( mitk::DataTreeIterator * it )
   mitkWidget4->GetRenderer()->SetData(it);
   
   fit();
+*/
 }
 
 void QmitkStdMultiWidget::addPlaneSubTree(mitk::DataTreeIterator * it)

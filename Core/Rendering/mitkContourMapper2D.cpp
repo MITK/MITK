@@ -5,13 +5,7 @@
 #include "mitkProperties.h"
 #include <vtkTransform.h>
 
-
-#ifdef WIN32
-#include <glut.h>
-#else
 #include <GL/glut.h>
-#endif
-
 
 mitk::ContourMapper2D::ContourMapper2D()
 {
@@ -75,21 +69,19 @@ void mitk::ContourMapper2D::Paint(mitk::BaseRenderer * renderer)
       //      point = input->GetContourPath()->Evaluate(idx);
       point = pointsIt.Value();
 
-      p.x= point[0];
-      p.y= point[1];
-      p.z= point[2];
-      vec2vtk(p, vtkp);
+      itk2vtk(point, vtkp);
       transform->TransformPoint(vtkp, vtkp);
-      vtk2vec(vtkp,p);
+      vtk2itk(vtkp,p);
 
       displayGeometry->Project(p, projected_p);
-      if(Vector3D(p-projected_p).length()< 1) 
-        {
+      Vector3D diff=p-projected_p;
+      if(diff.GetSquaredNorm()<1.0)
+      {
         Point2D pt2d, tmp;
         displayGeometry->Map(projected_p, pt2d);
         displayGeometry->MMToDisplay(pt2d, pt2d);
-        glVertex2fv(&pt2d.x);
-        }
+        glVertex2f(pt2d[0], pt2d[1]);
+      }
 
       pointsIt++;
       //      idx += 1;

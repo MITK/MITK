@@ -46,10 +46,10 @@ void mitk::ParRecFileReader::GenerateOutputInformation()
     float sliceThickness=0.0;
     float sliceGap=0.0;
     float sliceSpacing=0.0;
-    mitk::Vector3D thickness(1.0,1.0,1.0);
-    mitk::Vector3D gap(0.0,0.0,0.0);
+    mitk::Vector3D thickness; thickness.Fill(1.0);
+    mitk::Vector3D gap; gap.Fill(0.0);
     mitk::Vector3D spacing;
-
+    
     FILE *f;
     f=fopen(m_FileName.c_str(), "r");
     if(f!=NULL)
@@ -98,7 +98,7 @@ void mitk::ParRecFileReader::GenerateOutputInformation()
         if(strstr(s,"FOV (ap,fh,rl) [mm]"))
         {
           p=s+strcspn(s,"0123456789");
-          sscanf(p,"%f %f %f", &thickness.x, &thickness.y, &thickness.z);
+          sscanf(p,"%f %f %f", &thickness[0], &thickness[1], &thickness[2]);
         }
         else
         if(strstr(s,"Slice thickness [mm]"))
@@ -117,15 +117,15 @@ void mitk::ParRecFileReader::GenerateOutputInformation()
 
 //C:\home\ivo\data\coronaries\ucsf-wholeheart-2.par
       sliceSpacing = sliceThickness+sliceGap;
-      if(fabs(thickness.x/dimensions[2]-sliceSpacing)<0.0001)
-        thickness.x=thickness.y;
+      if(fabs(thickness[0]/dimensions[2]-sliceSpacing)<0.0001)
+        thickness[0]=thickness[1];
       else
-      if(fabs(thickness.y/dimensions[2]-sliceSpacing)<0.0001)
-        thickness.y=thickness.x;
-      thickness.z=sliceSpacing;
+      if(fabs(thickness[1]/dimensions[2]-sliceSpacing)<0.0001)
+        thickness[1]=thickness[0];
+      thickness[2]=sliceSpacing;
 
-      thickness.x/=dimensions[0];
-      thickness.y/=dimensions[1];
+      thickness[0]/=dimensions[0];
+      thickness[1]/=dimensions[1];
       spacing=thickness+gap;
 
       if((dimension>0) && (dimensions[0]>0) && (dimensions[1]>0))
@@ -146,7 +146,7 @@ void mitk::ParRecFileReader::GenerateOutputInformation()
     output->Initialize(type, dimension, dimensions);
     output->GetSlicedGeometry()->SetSpacing(spacing);
 
-    output->GetSlicedGeometry()->SetGeometry2D(mitk::Image::BuildStandardPlaneGeometry2D(output->GetSlicedGeometry(), dimensions).GetPointer(), 0);
+    //output->GetSlicedGeometry()->SetGeometry2D(mitk::Image::BuildStandardPlaneGeometry2D(output->GetSlicedGeometry(), dimensions).GetPointer(), 0);
     output->GetSlicedGeometry()->SetEvenlySpaced();
   }
   

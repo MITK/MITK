@@ -28,7 +28,7 @@ class BaseRenderer;
 //##Documentation
 //## @brief OpenGL-texture-based mapper to display slices of an image
 //## @ingroup Mapper
-//## Currently implemented for mapping on PlaneGeometry and AbstractTransformGeometry.
+//## Currently implemented for mapping on PlaneGeometry and VtkAbstractTransformGeometry.
 //## This results in a flipped version when used for texture mapping. Furthermore,
 //## not the complete rectangular area described by the Geometry2D from the renderer
 //## is resampled, @em if the Geometry2D is larger than the image dimension in the requested
@@ -94,9 +94,9 @@ public:
     //## @brief number of pixels per mm in x- and y-direction of the resampled image m_Pic
     Vector2D m_PixelsPerMM;
     //##ModelId=3E6423D30002
-    RendererInfo() : m_LastUpdateTime(0), m_iilImage(NULL), m_Pic(NULL), m_RendererId(-1), m_PixelsPerMM(0,0)
+    RendererInfo() : m_LastUpdateTime(0), m_iilImage(NULL), m_Pic(NULL), m_RendererId(-1)
     {
-
+      m_PixelsPerMM.Fill(0);
     };
     //##ModelId=3E6423D30003
     ~RendererInfo()

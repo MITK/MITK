@@ -23,17 +23,8 @@ void mitk::ImageTimeSelector::GenerateOutputInformation()
 	output->Initialize(input->GetPixelType(), dim, input->GetDimensions());
 
   // initialize geometry
-  output->SetGeometry(input->GetSlicedGeometry(m_TimeNr)->Clone());
-
-//  std::cout << "in timeSelector" << std::endl;
-//  const float *spacing = input->GetSlicedGeometry()->GetSpacing();
-//	std::cout << "   in: xres=" << spacing[0] << " yres=" << spacing[1] << " zres=" << spacing[2] << std::endl;
-  
-  output->SetPropertyList(input->GetPropertyList()->Clone());
-
-//  spacing = input->GetSlicedGeometry()->GetSpacing();
-//	std::cout << "   out: xres=" << spacing[0] << " yres=" << spacing[1] << " zres=" << spacing[2] << std::endl;
-  
+  output->SetGeometry(dynamic_cast<Geometry3D*>(input->GetSlicedGeometry(m_TimeNr)->Clone().GetPointer()));
+  output->SetPropertyList(input->GetPropertyList()->Clone());  
 }
 
 //##ModelId=3E3BD0CE0194

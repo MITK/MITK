@@ -71,13 +71,13 @@ void BoundingObjectCutter<TPixel>::GenerateData()
   mitk::ScalarType min[3];
   min[0] = minPoint[0];   min[1] = minPoint[1];   min[2] = minPoint[2];
   m_BoundingObject->GetGeometry()->GetVtkTransform()->TransformPoint(min, min);
-  mitk::ITKPoint3D globalMinPoint;
-  mitk::ITKPoint3D globalMaxPoint;
+  mitk::Point3D globalMinPoint;
+  mitk::Point3D globalMaxPoint;
   globalMinPoint[0] = min[0];   globalMinPoint[1] = min[1];   globalMinPoint[2] = min[2];  
   globalMaxPoint[0] = min[0];   globalMaxPoint[1] = min[1];   globalMaxPoint[2] = min[2];
   /* create all 8 points of the bounding box */
   mitk::BoundingBox::PointsContainerPointer points = mitk::BoundingBox::PointsContainer::New();
-  mitk::ITKPoint3D p;
+  mitk::Point3D p;
   p = boundingBox->GetMinimum();
   points->InsertElement(0, p);
   p[0] = -p[0];

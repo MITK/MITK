@@ -36,7 +36,7 @@ mitk::PointSet::DataType* mitk::PointSet::GetPointSet() const
 //##ModelId=3F0177E901DE
 //##Documentation
 //##@brief searches a point in the list with a given precision
-int mitk::PointSet::SearchPoint(ITKPoint3D point, float distance )
+int mitk::PointSet::SearchPoint(Point3D point, float distance )
 {
 //in is the given point to search
 //out is the point which is checked to be the searched point
@@ -87,9 +87,9 @@ const mitk::PointSet::PointType mitk::PointSet::GetPoint(int position)
     return out;
 }
 
-const mitk::ITKPoint3D mitk::PointSet::GetItkPoint(int position)
+const mitk::Point3D mitk::PointSet::GetItkPoint(int position)
 {
-	mitk::ITKPoint3D itkout;
+	mitk::Point3D itkout;
   PointType out;
   out.Fill(0);
   
@@ -207,7 +207,7 @@ void mitk::PointSet::UpdateOutputInformation()
   BoundingBox::BoundsArrayType itkBounds = bb->GetBounds();
   float mitkBounds[6];
 
-  //for assignment see Geometry3d::SetBoundingBox(const float bounds)
+  //for assignment see Geometry3d::SetBounds(const float bounds)
   mitkBounds[0] = itkBounds[0];
   mitkBounds[1] = itkBounds[1];
   mitkBounds[2] = itkBounds[2];
@@ -216,7 +216,7 @@ void mitk::PointSet::UpdateOutputInformation()
   mitkBounds[5] = itkBounds[5];
 //@TODO check if order is correct 012345 or 024135; Bounds/BoundingBox and so on.
 
-  m_Geometry3D->SetBoundingBox(mitkBounds);
+  m_Geometry3D->SetBounds(mitkBounds);
 }
 
 //##ModelId=3F0177E901FB

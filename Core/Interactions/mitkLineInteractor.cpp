@@ -62,7 +62,7 @@ bool mitk::LineInteractor::ExecuteAction(Action* action, mitk::StateEvent const*
       return false;
 
     //start of the Movement is stored to calculate the undoKoordinate in FinishMovement
-    mitk::vm2itk(posEvent->GetWorldPosition(), m_LastPoint);
+    m_LastPoint = posEvent->GetWorldPosition();
     ok = true;
     break;
   }
@@ -73,8 +73,8 @@ bool mitk::LineInteractor::ExecuteAction(Action* action, mitk::StateEvent const*
     if (posEvent == NULL)
       return false;
 
-    mitk::ITKPoint3D newPoint;
-    mitk::vm2itk(posEvent->GetWorldPosition(), newPoint);
+    mitk::Point3D newPoint;
+    newPoint = posEvent->GetWorldPosition();
 
     PointOperation* doOp = new mitk::PointOperation(OpMOVELINE, newPoint, m_Id);
     //execute the Operation
@@ -91,8 +91,8 @@ bool mitk::LineInteractor::ExecuteAction(Action* action, mitk::StateEvent const*
 
     //finish the movement:
     // set undo-information and move it to the last position.
-    mitk::ITKPoint3D newPoint;
-    mitk::vm2itk(posEvent->GetWorldPosition(), newPoint);
+    mitk::Point3D newPoint;
+    newPoint = posEvent->GetWorldPosition();
     PointOperation* doOp = new mitk::PointOperation(OpMOVELINE, newPoint, m_Id);
     if ( m_UndoEnabled )
     {
@@ -113,7 +113,7 @@ bool mitk::LineInteractor::ExecuteAction(Action* action, mitk::StateEvent const*
   break;
   case AcSELECT:
   {
-    mitk::ITKPoint3D newPoint;
+    mitk::Point3D newPoint;
     newPoint.Fill(0);
     LineOperation* doOp = new mitk::LineOperation(OpSELECTLINE, m_Id, m_PIdA, m_PIdB);
     if ( m_UndoEnabled )
@@ -131,7 +131,7 @@ bool mitk::LineInteractor::ExecuteAction(Action* action, mitk::StateEvent const*
   break;
   case AcDESELECT:
   {
-    mitk::ITKPoint3D newPoint;
+    mitk::Point3D newPoint;
     newPoint.Fill(0);
     LineOperation* doOp = new mitk::LineOperation(OpDESELECTLINE, m_Id, m_PIdA, m_PIdB);
     if ( m_UndoEnabled )

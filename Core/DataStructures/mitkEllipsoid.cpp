@@ -18,7 +18,7 @@ mitk::Ellipsoid::~Ellipsoid()
 {
 }
 
-bool mitk::Ellipsoid::IsInside(ITKPoint3D worldPoint)
+bool mitk::Ellipsoid::IsInside(Point3D worldPoint)
 {
   // transform point from world to object coordinates
   ScalarType p[4];
@@ -27,7 +27,7 @@ bool mitk::Ellipsoid::IsInside(ITKPoint3D worldPoint)
   p[2] = worldPoint[2];
   p[3] = 1;
   m_Geometry3D->GetVtkTransform()->GetInverse()->TransformPoint(p, p);
-	mitk::ITKPoint3D itkPoint;
+	mitk::Point3D itkPoint;
 
   // reapply scaling
   p[0] = p[0] * m_Geometry3D->GetXAxis().GetNorm();

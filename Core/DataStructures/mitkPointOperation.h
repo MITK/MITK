@@ -27,13 +27,13 @@ class PointOperation : public mitk::Operation
 	//## operationType is the type of that operation (see mitkOperation.h; e.g. move or add; Information for StateMachine::ExecuteOperation());
 	//## point is the information of the point to add or is the information to change a point into; index is e.g. the position in a
 	//## list which describes the element to change
-  PointOperation(OperationType operationType,	ITKPoint3D point, int index = -1, bool selected = true, PointSpecificationType type = PTUNDEFINED);
+  PointOperation(OperationType operationType,	Point3D point, int index = -1, bool selected = true, PointSpecificationType type = PTUNDEFINED);
   
   //##ModelId=3F0189F003B2
   virtual ~PointOperation();
 
   //##ModelId=3F0189F003B4
-	ITKPoint3D GetPoint();
+	Point3D GetPoint();
 
   //##ModelId=3F0189F003B5
 	int GetIndex();
@@ -44,7 +44,7 @@ class PointOperation : public mitk::Operation
 
   private:
   //##ModelId=3F0189F00393
-	ITKPoint3D m_Point;
+	Point3D m_Point;
 
   //##ModelId=3F0189F003A1
   //##Documentation

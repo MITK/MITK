@@ -4,21 +4,19 @@
 #include "mitkBaseRenderer.h"
 #include <stdlib.h>
 #ifdef WIN32
-#include <vtkWin32OpenGLRenderWindow.h>
+  #include <vtkWin32OpenGLRenderWindow.h>
 #else
-#include <vtkXOpenGLRenderWindow.h>
+  #include <vtkXOpenGLRenderWindow.h>
 #endif
-
 
 namespace mitk
 {
 
 #ifdef WIN32
-#define PARENTCLASS vtkWin32OpenGLRenderWindow
+  #define PARENTCLASS vtkWin32OpenGLRenderWindow
 #else
-#define PARENTCLASS vtkXOpenGLRenderWindow
+  #define PARENTCLASS vtkXOpenGLRenderWindow
 #endif
-
 
 class VtkRenderWindow : public PARENTCLASS
 #undef PARENTCLASS
@@ -41,7 +39,7 @@ public:
 
 protected:
   VtkRenderWindow();
-  ~VtkRenderWindow();
+  virtual ~VtkRenderWindow();
 
   BaseRenderer::Pointer m_MitkRenderer;
 

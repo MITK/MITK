@@ -1,25 +1,24 @@
 #ifndef MITKVECTOR_H_HEADER_INCLUDED_C1EBD0AD
 #define MITKVECTOR_H_HEADER_INCLUDED_C1EBD0AD
 
-#include "SpaceGeometry.h"
 #include <itkPoint.h>
+#include <itkAffineTransform.h>
 #include <float.h>
-
-
 
 namespace mitk {
 typedef float ScalarType;
-typedef View<ScalarType>   PlaneView;
-typedef Plane<ScalarType> Plane3D;
-typedef Line<ScalarType> Line3D;
-typedef Vector3<ScalarType> Vector3D;
-typedef Point3<ScalarType>  Point3D;
-typedef Vector2<ScalarType> Vector2D;
-typedef Point2<ScalarType>  Point2D;
-typedef Vector4<ScalarType>  Vector4D;
-typedef Matrix4<ScalarType> Matrix4D;
-typedef itk::Point<ScalarType,3> ITKPoint3D;
-typedef itk::Vector<ScalarType,3> ITKVector3D;
+
+typedef itk::Matrix<ScalarType, 3, 3> Matrix3D;
+typedef vnl_matrix_fixed<ScalarType, 3, 3> VnlMatrix3D;
+typedef itk::Transform<ScalarType, 3, 3> Transform3D;
+typedef itk::AffineTransform<ScalarType, 3> AffineTransform3D;
+typedef vnl_vector<ScalarType> VnlVector;
+typedef vnl_vector_ref<ScalarType> VnlVectorRef;
+
+typedef itk::Point<ScalarType,2> Point2D;
+typedef itk::Point<ScalarType,3> Point3D;
+typedef itk::Vector<ScalarType,2> Vector2D;
+typedef itk::Vector<ScalarType,3> Vector3D;
 
 //##Documentation
 //##@brief enumeration of the type a point can be
@@ -34,17 +33,19 @@ typedef enum PointSpecificationType
 
 typedef class itk::NumericTraits<mitk::ScalarType> ScalarTypeNumericTraits;
 extern const ScalarType eps;
+extern const ScalarType epsSquared;
 
 template <class Tout>
-inline void FillITKVector3D(Tout& out, ScalarType x, ScalarType y, ScalarType z)
+  inline void FillVector3D(Tout& out, ScalarType x, ScalarType y, ScalarType z)
 {
   out[0] = x;
   out[1] = y;
   out[2] = z;
 }
 
+
 template <class Tin, class Tout>
-inline void itk2vtk(const Tin& in, Tout& out)
+  inline void itk2vtk(const Tin& in, Tout& out)
 {
   out[0]=in[0];
   out[1]=in[1];
@@ -52,7 +53,7 @@ inline void itk2vtk(const Tin& in, Tout& out)
 }
 
 template <class Tin, class Tout>
-inline void vtk2itk(const Tin& in, Tout& out)
+  inline void vtk2itk(const Tin& in, Tout& out)
 {
   out[0]=in[0];
   out[1]=in[1];
@@ -60,7 +61,7 @@ inline void vtk2itk(const Tin& in, Tout& out)
 }
 
 template <class Tin, class Tout>
-inline void vnl2vtk(const vnl_vector<Tin>& in, Tout *out)
+  inline void vnl2vtk(const vnl_vector<Tin>& in, Tout *out)
 {
   int i;
   for(i=0; i<in.size();++i)
@@ -68,7 +69,7 @@ inline void vnl2vtk(const vnl_vector<Tin>& in, Tout *out)
 }
 
 template <class Tin>
-inline void vtk2vnl(const Tin *in, vnl_vector<Tin>& out)
+  inline void vtk2vnl(const Tin *in, vnl_vector<Tin>& out)
 {
   int i;
   for(i=0; i<out.size();++i)
@@ -76,42 +77,100 @@ inline void vtk2vnl(const Tin *in, vnl_vector<Tin>& out)
 }
 
 template <class Tin>
-inline void vtk2vnlref(const Tin *in, vnl_vector_ref<Tin>& out)
+  inline void vtk2vnlref(const Tin *in, vnl_vector_ref<Tin>& out)
 {
   int i;
   for(i=0; i<out.size();++i)
     out[i]=in[i];
 }
 
-//itk vs. vecmath conversion
-template <class T>
-inline void vm2itk(const Point3<T>& p, ITKPoint3D& a)
+template <class Tin, class Tout, unsigned int n>
+  inline void vnl2vtk(const vnl_vector_fixed<Tin, n>& in, Tout *out)
 {
-	a[0]=p.x;
-	a[1]=p.y;
-	a[2]=p.z;
-}
- 
-template <class T>
-inline void itk2vm(const ITKPoint3D& a, Point3<T> & p)
-{
-	p.set(a[0], a[1], a[2]);
+  int i;
+  for(i=0; i<in.size();++i)
+    out[i]=in[i];
 }
 
-template <class T>
-inline void vm2itk(const Vector3<T>& p, ITKVector3D& a)
+template <class Tin, unsigned int n>
+  inline void vtk2vnl(const Tin *in, vnl_vector_fixed<Tin, n>& out)
 {
-	a[0]=p.x;
-	a[1]=p.y;
-	a[2]=p.z;
-}
- 
-template <class T>
-inline void itk2vm(const ITKVector3D& a, Vector3<T> & p)
-{
-	p.set(a[0], a[1], a[2]);
+  int i;
+  for(i=0; i<out.size();++i)
+    out[i]=in[i];
 }
 
+template <class T, unsigned int NVectorDimension>
+  itk::Vector<T, NVectorDimension> operator+(const itk::Vector<T, NVectorDimension> &vector, const itk::Point<T, NVectorDimension> &point)
+{
+  itk::Vector<T, NVectorDimension> sub;
+  for( unsigned int i=0; i<NVectorDimension; i++) 
+  {
+    sub[i] = vector[i]+point[i];
+  }
+  return sub;
+}
+
+template <class T, unsigned int NVectorDimension>
+  inline itk::Vector<T, NVectorDimension>& operator+=(itk::Vector<T, NVectorDimension> &vector, const itk::Point<T, NVectorDimension> &point)
+{
+  for( unsigned int i=0; i<NVectorDimension; i++) 
+  {
+    vector[i] += point[i];
+  }
+  return vector;
+}
+
+template <class T, unsigned int NVectorDimension>
+  itk::Vector<T, NVectorDimension> operator-(const itk::Vector<T, NVectorDimension> &vector, const itk::Point<T, NVectorDimension> &point)
+{
+  itk::Vector<T, NVectorDimension> sub;
+  for( unsigned int i=0; i<NVectorDimension; i++) 
+  {
+    sub[i] = vector[i]-point[i];
+  }
+  return sub;
+}
+
+template <class T, unsigned int NVectorDimension>
+  inline itk::Vector<T, NVectorDimension>& operator-=(itk::Vector<T, NVectorDimension> &vector, const itk::Point<T, NVectorDimension> &point)
+{
+  for( unsigned int i=0; i<NVectorDimension; i++) 
+  {
+    vector[i] -= point[i];
+  }
+  return vector;
+}
+
+template <typename TCoordRep, unsigned int NPointDimension>
+  inline bool Equal(const itk::Vector<TCoordRep, NPointDimension>& vector1, const itk::Vector<TCoordRep, NPointDimension>& vector2) 
+{
+  itk::Vector<TCoordRep, NPointDimension>::VectorType diff = vector1-vector2;
+  return diff.GetSquaredNorm() < mitk::epsSquared; 
+}
+
+template <typename TCoordRep, unsigned int NPointDimension>
+  inline bool Equal(const itk::Point<TCoordRep, NPointDimension>& vector1, const itk::Point<TCoordRep, NPointDimension>& vector2) 
+{
+  itk::Point<TCoordRep, NPointDimension>::VectorType diff = vector1-vector2;
+  return diff.GetSquaredNorm() < mitk::epsSquared; 
+}
+
+inline bool Equal(const mitk::VnlVector& vector1, const mitk::VnlVector& vector2) 
+{
+  mitk::VnlVector diff = vector1-vector2;
+  return diff.squared_magnitude() < mitk::epsSquared; 
+}
+
+inline bool Equal(double scalar1, double scalar2) 
+{
+  return fabs(scalar1-scalar2) < mitk::eps;
+}
+
+inline bool Equal(float scalar1, float scalar2) 
+{
+  return fabs(scalar1-scalar2) < mitk::eps;
+}
 
 } // namespace mitk
 

@@ -6,7 +6,7 @@ mitk::Geometry2DData::Geometry2DData()
 {
   m_SlicedGeometry = SlicedGeometry3D::New();
   SetGeometry(m_SlicedGeometry);
-  m_SlicedGeometry->Initialize(1);
+//  m_SlicedGeometry->Initialize(1);
 }
 
 //##ModelId=3E639CD30233

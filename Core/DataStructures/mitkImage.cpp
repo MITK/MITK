@@ -3,6 +3,7 @@
 #include "mitkSlicedGeometry3D.h"
 #include "mitkPlaneGeometry.h"
 #include <vtkImageData.h>
+#include "mitkPicHelper.h"
 
 //##ModelId=3DCBC2B50345
 const mitk::PixelType& mitk::Image::GetPixelType(int n) const
@@ -49,8 +50,7 @@ vtkImageData* mitk::Image::GetVtkImageData(int t, int n)
   mitk::ImageDataItem::Pointer volume=GetVolumeData(t, n);
   if(volume.IsNull() || volume->GetVtkImageData() == NULL)
     return NULL;
-  float* spacing = const_cast<float*>(GetUpdatedSlicedGeometry(t)->GetSpacing());
-  volume->GetVtkImageData()->SetSpacing(spacing);
+  volume->GetVtkImageData()->SetSpacing(const_cast<float*>(GetUpdatedSlicedGeometry(t)->GetFloatSpacing()));
   return volume->GetVtkImageData();
 }
 
@@ -122,7 +122,9 @@ mitk::ImageDataItem::Pointer mitk::Image::GetSliceData(int s, int t, int n)
   }
   else
   {
-    return AllocateSliceData(s,t,n);
+    mitk::ImageDataItem::Pointer item = AllocateSliceData(s,t,n);
+    item->SetComplete(true);
+    return item;
   }
 }
 
@@ -211,7 +213,9 @@ mitk::ImageDataItem::Pointer mitk::Image::GetVolumeData(int t, int n)
     }
     else
     {
-      return AllocateVolumeData(t,n);
+      mitk::ImageDataItem::Pointer item = AllocateVolumeData(t,n);
+      item->SetComplete(true);
+      return item;
     }
 }
 
@@ -292,7 +296,9 @@ mitk::ImageDataItem::Pointer mitk::Image::GetChannelData(int n)
   }
   else
   {
-    return AllocateChannelData(n);
+    mitk::ImageDataItem::Pointer item = AllocateChannelData(n);
+    item->SetComplete(true);
+    return item;
   }
 }
 
@@ -488,18 +494,16 @@ void mitk::Image::Initialize(const mitk::PixelType& type, unsigned int dimension
 
   m_PixelType=type;
 
-  TimeSlicedGeometry::Pointer timeSliceGeometry;
-  timeSliceGeometry = TimeSlicedGeometry::New();
-  timeSliceGeometry->Initialize(m_Dimensions[3]);
-  
+  PlaneGeometry::Pointer planegeometry = PlaneGeometry::New();
+  planegeometry->InitializeStandardPlane(m_Dimensions[0], m_Dimensions[1]);
+
   SlicedGeometry3D::Pointer slicedGeometry = SlicedGeometry3D::New();
-  slicedGeometry->Initialize(m_Dimensions[2]);
-  slicedGeometry->SetGeometry2D(BuildStandardPlaneGeometry2D(slicedGeometry, m_Dimensions).GetPointer(), 0);
-  slicedGeometry->SetEvenlySpaced();
-  
-  timeSliceGeometry->SetGeometry3D(slicedGeometry, 0);
-  timeSliceGeometry->SetEvenlyTimed();
-  SetGeometry(timeSliceGeometry);  
+  slicedGeometry->InitializeEvenlySpaced(planegeometry, m_Dimensions[2]);
+
+  TimeSlicedGeometry::Pointer timeSliceGeometry = TimeSlicedGeometry::New();
+  timeSliceGeometry->InitializeEvenlyTimed(slicedGeometry, m_Dimensions[3]);
+
+  SetGeometry(timeSliceGeometry);
 
   ImageDataItemPointer dnull=NULL;
 
@@ -580,17 +584,15 @@ void mitk::Image::Initialize(vtkImageData* vtkimagedata, int channels, int tDim,
     channels);
 
   const float *spacinglist = vtkimagedata->GetSpacing();
-  Vector3D spacing(spacinglist[0],1.0,1.0);
+  Vector3D spacing;
+  FillVector3D(spacing, spacinglist[0], 1.0, 1.0);
   if(m_Dimension>=2)
-    spacing.y=spacinglist[1];
+    spacing[1]=spacinglist[1];
   if(m_Dimension>=3)
-    spacing.z=spacinglist[2];
+    spacing[2]=spacinglist[2];
 
   SlicedGeometry3D* slicedGeometry = GetSlicedGeometry(0);
   slicedGeometry->SetSpacing(spacing);
-  slicedGeometry->SetGeometry2D(BuildStandardPlaneGeometry2D(slicedGeometry, m_Dimensions).GetPointer(), 0);
-  slicedGeometry->SetEvenlySpaced();
-  m_TimeSlicedGeometry->SetEvenlyTimed();
 
   delete [] tmpDimensions;
 }
@@ -627,16 +629,12 @@ void mitk::Image::Initialize(ipPicDescriptor* pic, int channels, int tDim, int s
   m_LargestPossibleRegion.SetSize(i, channels);
 
   m_PixelType=PixelType(pic);
-  TimeSlicedGeometry::Pointer timeSliceGeometry;
-  timeSliceGeometry = TimeSlicedGeometry::New();
-  timeSliceGeometry->Initialize(m_Dimensions[3]);
-  SlicedGeometry3D::Pointer slicedGeometry = SlicedGeometry3D::New();
-  slicedGeometry->Initialize(m_Dimensions[2]);
-  slicedGeometry->SetSpacing(pic);
-  slicedGeometry->SetGeometry2D(pic, 0);
-  slicedGeometry->SetEvenlySpaced();
-  timeSliceGeometry->SetGeometry3D(slicedGeometry, 0);
-  timeSliceGeometry->SetEvenlyTimed();
+  SlicedGeometry3D::Pointer slicedGeometry = SlicedGeometry3D::New(); 
+  PicHelper::InitializeEvenlySpaced(pic, m_Dimensions[2], slicedGeometry);
+
+  TimeSlicedGeometry::Pointer timeSliceGeometry = TimeSlicedGeometry::New();
+  timeSliceGeometry->InitializeEvenlyTimed(slicedGeometry, m_Dimensions[3]);
+
   SetGeometry(timeSliceGeometry);  
 
   ImageDataItemPointer dnull=NULL;
@@ -831,19 +829,18 @@ float mitk::Image::GetScalarValueMax() const
   return -1.0f;
 }
 
-mitk::Geometry2D::Pointer mitk::Image::BuildStandardPlaneGeometry2D(mitk::SlicedGeometry3D* slicedgeometry3D, unsigned int *dimensions)
-{
-  mitk::Point3D origin, right, bottom;
-  origin.set(0,0,0);             slicedgeometry3D->UnitsToMM(origin, origin);
-  right.set(dimensions[0],0,0);  slicedgeometry3D->UnitsToMM(right, right);
-  bottom.set(0,dimensions[1],0); slicedgeometry3D->UnitsToMM(bottom, bottom);
-
-  PlaneView view_std(origin, right, bottom);
-
-  mitk::PlaneGeometry::Pointer planegeometry=mitk::PlaneGeometry::New();
-  planegeometry->SetPlaneView(view_std);
-  planegeometry->SetThicknessBySpacing(slicedgeometry3D->GetSpacing());
-  planegeometry->SetSizeInUnits(dimensions[0], dimensions[1]);
-
-  return planegeometry.GetPointer();
-}
+//mitk::Geometry2D::Pointer mitk::Image::BuildStandardPlaneGeometry2D(mitk::SlicedGeometry3D* slicedgeometry3D, unsigned int *dimensions)
+//{
+//  mitk::Point3D origin;
+//  mitk::Vector3D right, bottom;
+//  FillVector3D(origin,0,0,0);             slicedgeometry3D->UnitsToMM(origin, origin);
+//  FillVector3D(right,dimensions[0],0,0);  slicedgeometry3D->UnitsToMM(right, right);
+//  FillVector3D(bottom,0,dimensions[1],0); slicedgeometry3D->UnitsToMM(bottom, bottom);
+//
+//  mitk::PlaneGeometry::Pointer planegeometry=mitk::PlaneGeometry::New();
+//  planegeometry->SetOrigin(origin);
+//  planegeometry->SetByRightAndDownVector(right.Get_vnl_vector(), bottom.Get_vnl_vector(), slicedgeometry3D->GetSpacing()[2]);
+//  planegeometry->SetSizeInUnits(dimensions[0], dimensions[1]);
+//
+//  return planegeometry.GetPointer();
+//}

@@ -68,64 +68,41 @@ void mitk::SliceNavigationController::Update()
 
     if(m_InputWorldGeometry.IsNotNull())
     {
-      // compute bounding box with respect to first images geometry
-      //mitk::BoundingBox::ConstPointer boundingBox = aGeometry3D->GetBoundingBox();
-      //const_cast<mitk::BoundingBox*>(boundingBox.GetPointer())->ComputeBoundingBox();
-      //const mitk::BoundingBox::BoundsArrayType bounds = boundingBox->GetBounds();
-      const mitk::BoundingBox::BoundsArrayType bounds = m_InputWorldGeometry->GetBoundingBox()->GetBounds();
-
-      Vector3D dimensionVec;
-      Vector3D  origin, right, bottom;
-      if ( (m_ViewDirection == Transversal) || (m_ViewDirection == Original))
-      {  
-        origin = Vector3f(bounds[0],bounds[3],bounds[5]);
-        right = Vector3f(bounds[1],bounds[3],bounds[5]);
-        bottom = Vector3f(bounds[0],bounds[2],bounds[5]);
-        dimensionVec.set(0,0,bounds[4]-bounds[5]);
-      }
-      else if (m_ViewDirection == Frontal)
-      {  
-        origin = Vector3f(bounds[0],bounds[2],bounds[4]);
-        right = Vector3f(bounds[1],bounds[2],bounds[4]);
-        bottom = Vector3f(bounds[0],bounds[2],bounds[5]);
-        dimensionVec.set(0,bounds[3]-bounds[2],0);
-      }
-      // init sagittal view
-      else 
-      {  
-        origin = Vector3f(bounds[0],bounds[2],bounds[4]);
-        right = Vector3f(bounds[0],bounds[3],bounds[4]);
-        bottom = Vector3f(bounds[0],bounds[2],bounds[5]);
-        dimensionVec.set(bounds[1]-bounds[0],0,0);
-      }
-
-      m_InputWorldGeometry->MMToUnits(dimensionVec, dimensionVec);
-
-      m_Slice->SetSteps((int)dimensionVec.length()+1.0);
-      m_Slice->SetPos(0);
-
       // initialize the viewplane
       mitk::PlaneGeometry::Pointer planegeometry = mitk::PlaneGeometry::New();
 
-      //@FIXME: ohne den Pointer-Umweg meckert gcc  
-      mitk::PlaneView* view = new mitk::PlaneView(origin,right,bottom);
-      planegeometry->SetPlaneView(*view);
+      switch(m_ViewDirection)
+      {
+        case Original:
+          assert(false);
+          break;
+        case Transversal:
+          planegeometry->InitializeStandardPlane(m_InputWorldGeometry, PlaneGeometry::Transversal, m_InputWorldGeometry->GetExtentInMM(2), false);
+          m_Slice->SetSteps((int)m_InputWorldGeometry->GetExtentInMM(2)+1.0);
+          break;
+        case Frontal:
+          planegeometry->InitializeStandardPlane(m_InputWorldGeometry, PlaneGeometry::Frontal);
+          m_Slice->SetSteps((int)m_InputWorldGeometry->GetExtentInMM(1)+1.0);
+          break;
+        case Sagittal:
+          planegeometry->InitializeStandardPlane(m_InputWorldGeometry, PlaneGeometry::Sagittal);
+          m_Slice->SetSteps((int)m_InputWorldGeometry->GetExtentInMM(0)+1.0);
+          break;
+        default:
+          itkExceptionMacro("unknown ViewDirection");
+      }
+
+      m_Slice->SetPos(0);
 
       mitk::SlicedGeometry3D::Pointer slicedWorldGeometry=mitk::SlicedGeometry3D::New();
-      slicedWorldGeometry->Initialize(m_Slice->GetSteps());
-
-      slicedWorldGeometry->SetGeometry2D(planegeometry, 0);
-      slicedWorldGeometry->SetDirectionVector(dimensionVec);
-      Vector3D spacing(1.0,1.0,1.0); 
-      slicedWorldGeometry->SetSpacing(spacing);
-      slicedWorldGeometry->SetEvenlySpaced();
+      slicedWorldGeometry->InitializeEvenlySpaced(planegeometry, 1, m_Slice->GetSteps(), (m_ViewDirection==Frontal?true:false));
 
       // initialize TimeSlicedGeometry
       m_CreatedWorldGeometry = TimeSlicedGeometry::New();
       const TimeSlicedGeometry* worldTimeSlicedGeometry = dynamic_cast<const TimeSlicedGeometry*>(m_InputWorldGeometry.GetPointer());
       if(worldTimeSlicedGeometry==NULL)
       {
-        m_CreatedWorldGeometry->Initialize(1);
+        m_CreatedWorldGeometry->InitializeEvenlyTimed(slicedWorldGeometry, 1);
         m_Time->SetSteps(0);
         m_Time->SetPos(0);
       }
@@ -136,12 +113,10 @@ void mitk::SliceNavigationController::Update()
         m_Time->SetPos(0);
         m_BlockUpdate = false;
 
-        m_CreatedWorldGeometry->Initialize(worldTimeSlicedGeometry->GetTimeSteps());
-        //@todo implement for non-evenly-timed geometry!
-        m_CreatedWorldGeometry->SetEvenlyTimed();
         slicedWorldGeometry->SetTimeBoundsInMS(worldTimeSlicedGeometry->GetGeometry3D(0)->GetTimeBoundsInMS());
+        //@todo implement for non-evenly-timed geometry!
+        m_CreatedWorldGeometry->InitializeEvenlyTimed(slicedWorldGeometry, worldTimeSlicedGeometry->GetTimeSteps());
       }
-      m_CreatedWorldGeometry->SetGeometry3D(slicedWorldGeometry, 0);
     }
   }
 
@@ -235,7 +210,7 @@ bool mitk::SliceNavigationController::ExecuteAction( Action* action, mitk::State
        // }
         case AcINITMOVEMENT:
        // {//move the point to the coordinate //not used, cause same to MovePoint... check xml-file
-       //   mitk::ITKPoint3D movePoint;
+       //   mitk::Point3D movePoint;
        //   vm2itk(posEvent->GetWorldPosition(), movePoint);
 
        //   PointOperation* doOp = new mitk::PointOperation(OpMOVE, movePoint, 0);
@@ -246,7 +221,7 @@ bool mitk::SliceNavigationController::ExecuteAction( Action* action, mitk::State
        // }
         case AcMOVEPOINT:
         {
-       //   mitk::ITKPoint3D movePoint;
+       //   mitk::Point3D movePoint;
        //   vm2itk(posEvent->GetWorldPosition(), movePoint);
 
        //   PointOperation* doOp = new mitk::PointOperation(OpMOVE, movePoint, 0);
@@ -284,9 +259,9 @@ bool mitk::SliceNavigationController::ExecuteAction( Action* action, mitk::State
               {
                 slicedWorldGeometry->GetGeometry2D(s)->Project(point, projected_point);
                 Vector3D dist = projected_point-point;
-                if(dist.lengthSquared() < best_distance)
+                if(dist.GetSquaredNorm() < best_distance)
                 {
-                  best_distance = dist.lengthSquared();
+                  best_distance = dist.GetSquaredNorm();
                   best_slice    = s;
                 }
               }
@@ -302,7 +277,7 @@ bool mitk::SliceNavigationController::ExecuteAction( Action* action, mitk::State
        // /*finishes a Movement from the coordinate supplier: 
        //   gets the lastpoint from the undolist and writes an undo-operation so 
        //   that the movement of the coordinatesupplier is undoable.*/
-       //   mitk::ITKPoint3D movePoint, oldMovePoint;
+       //   mitk::Point3D movePoint, oldMovePoint;
        //   oldMovePoint.Fill(0);
        //   vm2itk(posEvent->GetWorldPosition(), movePoint);
        //   PointOperation* doOp = new mitk::PointOperation(OpMOVE, movePoint, 0);

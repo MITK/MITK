@@ -1,7 +1,7 @@
 #include "mitkPointOperation.h"
 
 //##ModelId=3F0189F003A2
-mitk::PointOperation::PointOperation(OperationType operationType, ITKPoint3D point, int index, bool selected, PointSpecificationType type)
+mitk::PointOperation::PointOperation(OperationType operationType, Point3D point, int index, bool selected, PointSpecificationType type)
 : mitk::Operation(operationType), m_Point(point), m_Index(index), m_Selected(selected), m_Type(type)
 {}
 
@@ -11,7 +11,7 @@ mitk::PointOperation::~PointOperation()
 }
 
 //##ModelId=3F0189F003B4
-mitk::ITKPoint3D mitk::PointOperation::GetPoint()
+mitk::Point3D mitk::PointOperation::GetPoint()
 {
 	return m_Point;
 }

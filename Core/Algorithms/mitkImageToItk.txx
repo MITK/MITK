@@ -232,11 +232,10 @@ template<class TPixel, unsigned int VImageDimension>
     spacing[i] = input->GetSlicedGeometry()->GetSpacing()[i];
   }
   
-  mitk::Point3D mitkorigin(0,0,0);
+  mitk::Point3D mitkorigin;
+  mitkorigin.Fill(0.0);
   input->GetGeometry()->UnitsToMM(mitkorigin, mitkorigin);
-  origin[0] = mitkorigin.x;    // X coordinate
-  origin[1] = mitkorigin.y;    // Y coordinate
-  origin[2] = mitkorigin.z;    // Z coordinate
+  itk2vtk(mitkorigin, origin);
   
   IndexType start;
   start.Fill( 0 );

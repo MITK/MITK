@@ -36,9 +36,9 @@ protected:
   virtual bool ExecuteAction(Action* action, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId);
 
   bool CheckSelected(const mitk::Point3D& worldPoint);
-  bool ConvertDisplayEventToWorldPosition(mitk::DisplayPositionEvent const* displayEvent, mitk::ITKPoint3D& worldPoint);
+  bool ConvertDisplayEventToWorldPosition(mitk::DisplayPositionEvent const* displayEvent, mitk::Point3D& worldPoint);
 
-  mitk::ITKPoint3D m_LastMousePosition;
+  mitk::Point3D m_LastMousePosition;
 };
 
 } // namespace mitk

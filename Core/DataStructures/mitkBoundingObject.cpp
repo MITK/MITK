@@ -33,7 +33,7 @@ void mitk::BoundingObject::SetRequestedRegion(itk::DataObject *data)
 
 void mitk::BoundingObject::UpdateOutputInformation()
 {  
-  float bounds[6]={0,1,0,1,0,1};  //{xmin,x_max, ymin,y_max,zmin,z_max}
+  ScalarType bounds[6]={0,1,0,1,0,1};  //{xmin,x_max, ymin,y_max,zmin,z_max}
   
   // calculate vector from origin (in the center of the cuboid) to each corner
   mitk::ScalarType p[3];
@@ -56,7 +56,7 @@ void mitk::BoundingObject::UpdateOutputInformation()
   bounds[4] = - p[2];
   bounds[5] = + p[2];
  
-  m_Geometry3D->SetBoundingBox(bounds);
+  m_Geometry3D->SetBounds(bounds);
 }
 mitk::ScalarType mitk::BoundingObject::GetVolume()
 {

@@ -1,4 +1,5 @@
 #include "mitkVtkInteractorCameraController.h"
+#include "mitkRenderWindow.h"
 #include "mitkVtkRenderWindowInteractor.h"
 #include "mitkInteractionConst.h"
 #include <vtkInteractorStyleSwitch.h>
@@ -40,8 +41,8 @@ void mitk::VtkInteractorCameraController::MousePressEvent(mitk::MouseEvent *me)
     int ctrl  = me->GetButtonState() & BS_ControlButton;
     int shift = me->GetButtonState() & BS_ShiftButton;
 #if ((VTK_MAJOR_VERSION>4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=2)))
-    int xp = (int)me->GetDisplayPosition().x;
-    int yp = (int)me->GetDisplayPosition().y;
+    int xp = (int)me->GetDisplayPosition()[0];
+    int yp = (int)me->GetDisplayPosition()[1];
     m_VtkInteractor->SetEventInformationFlipY(xp, yp, ctrl, shift);
     
     switch (me->GetButton()) {
@@ -93,8 +94,8 @@ void mitk::VtkInteractorCameraController::MouseReleaseEvent(mitk::MouseEvent *me
     int ctrl  = me->GetButtonState() & BS_ControlButton;
     int shift = me->GetButtonState() & BS_ShiftButton;
 #if ((VTK_MAJOR_VERSION>4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=2)))
-    int xp = (int)me->GetDisplayPosition().x;
-    int yp = (int)me->GetDisplayPosition().y;
+    int xp = (int)me->GetDisplayPosition()[0];
+    int yp = (int)me->GetDisplayPosition()[1];
     m_VtkInteractor->SetEventInformationFlipY(xp, yp, ctrl, shift);
     
     switch (me->GetButton()) {
@@ -147,8 +148,8 @@ void mitk::VtkInteractorCameraController::MouseMoveEvent(mitk::MouseEvent *me)
     int ctrl  = me->GetButtonState() & BS_ControlButton;
     int shift = me->GetButtonState() & BS_ShiftButton;
 #if ((VTK_MAJOR_VERSION>4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=2)))
-    int xp = (int)me->GetDisplayPosition().x;
-    int yp = (int)me->GetDisplayPosition().y;
+    int xp = (int)me->GetDisplayPosition()[0];
+    int yp = (int)me->GetDisplayPosition()[1];
     m_VtkInteractor->SetEventInformationFlipY(xp, yp, ctrl, shift);
     m_VtkInteractor->InvokeEvent(vtkCommand::MouseMoveEvent, NULL);
 #else
@@ -204,12 +205,15 @@ bool mitk::VtkInteractorCameraController::SetRenderer(mitk::BaseRenderer* render
 {
   VtkRenderWindowInteractor* windowInteractor = 
     dynamic_cast<VtkRenderWindowInteractor*>(m_VtkInteractor);
-  if (windowInteractor == NULL) {
-    std::cout << "renderwindow is not a mitk::VtkRenderWindow" << std::endl;
-  } else {
+  if (windowInteractor == NULL)
+  {
+    itkWarningMacro(<< "renderwindow is not an mitk::VtkRenderWindow");
+  } 
+  else 
+  {
     windowInteractor->SetMitkRenderer(renderer);
   }
-    m_VtkInteractor->Initialize();
+  m_VtkInteractor->Initialize();
   return true;
 }
 

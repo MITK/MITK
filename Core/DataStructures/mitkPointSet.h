@@ -65,7 +65,7 @@ public:
 	//## @brief Get the point on the given position in itkPoint3D
   //##
   //## check if index exists. If it doesn't exist, then return 0,0,0
-  const mitk::ITKPoint3D GetItkPoint(int position);
+  const mitk::Point3D GetItkPoint(int position);
 
   //##Documentation
 	//## @brief returns true if a point exists at this position
@@ -87,7 +87,7 @@ public:
 	//##
 	//## returns -1 if no point is found
 	//## or the position in the list of the first match
-	int SearchPoint(ITKPoint3D point, float distance);
+	int SearchPoint(Point3D point, float distance);
 
 	//virtual methods, that need to be implemented
   //##ModelId=3F0177E901EE

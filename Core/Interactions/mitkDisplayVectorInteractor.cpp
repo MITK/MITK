@@ -136,12 +136,12 @@ bool mitk::DisplayVectorInteractor::ExecuteAction(Action* action, mitk::StateEve
 
 //##ModelId=3EF2229F00F0
 mitk::DisplayVectorInteractor::DisplayVectorInteractor(const char * type, mitk::OperationActor* destination)
-: mitk::StateMachine(type), m_Destination(destination),
-m_Sender(NULL),
-m_StartDisplayCoordinate(0,0),
-m_LastDisplayCoordinate(0,0),
-m_CurrentDisplayCoordinate(0,0)
+  : mitk::StateMachine(type), m_Destination(destination), m_Sender(NULL)
 {
+  m_StartDisplayCoordinate.Fill(0);
+  m_LastDisplayCoordinate.Fill(0);
+  m_CurrentDisplayCoordinate.Fill(0);
+
   if(m_Destination==NULL)
     m_Destination=this;
 }

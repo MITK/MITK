@@ -48,8 +48,8 @@ bool mitk::PointInteractor::ExecuteAction(Action* action, mitk::StateEvent const
       return false;
 
 		//converting from Point3D to itk::Point
-		mitk::ITKPoint3D itkPoint;
-		mitk::vm2itk(posEvent->GetWorldPosition(), itkPoint);
+		mitk::Point3D itkPoint;
+		itkPoint = posEvent->GetWorldPosition();
 
     //dexlare the operation and let the data execute it
     PointOperation* doOp = new mitk::PointOperation(OpINSERT, itkPoint, m_Id);
@@ -75,7 +75,7 @@ bool mitk::PointInteractor::ExecuteAction(Action* action, mitk::StateEvent const
       return false;
 
     //start of the Movement is stored to calculate the undoKoordinate in FinishMovement
-    mitk::vm2itk(posEvent->GetWorldPosition(), m_LastPoint);
+    m_LastPoint = posEvent->GetWorldPosition();
     
     //initialize a value to calculate the movement through all MouseMoveEvents from MouseClick to MouseRelease
     ok = true;
@@ -88,8 +88,8 @@ bool mitk::PointInteractor::ExecuteAction(Action* action, mitk::StateEvent const
 		if (posEvent == NULL)
       return false;
 
-    mitk::ITKPoint3D newPoint;
-		mitk::vm2itk(posEvent->GetWorldPosition(), newPoint);
+    mitk::Point3D newPoint;
+		newPoint = posEvent->GetWorldPosition();
 
     PointOperation* doOp = new mitk::PointOperation(OpMOVE, newPoint, m_Id);
     //execute the Operation
@@ -107,8 +107,8 @@ bool mitk::PointInteractor::ExecuteAction(Action* action, mitk::StateEvent const
 
     //finish the movement:
     // set undo-information and move it to the last position.
-    mitk::ITKPoint3D newPoint;
-		mitk::vm2itk(posEvent->GetWorldPosition(), newPoint);
+    mitk::Point3D newPoint;
+		newPoint = posEvent->GetWorldPosition();
 
     PointOperation* doOp = new mitk::PointOperation(OpMOVE, newPoint, m_Id);
 	  if ( m_UndoEnabled )

@@ -69,11 +69,11 @@ class PointSetInteractor : public Interactor
     //##ModelId=3F0AF6CF00C2
     //##Documentation
     //## @brief to calculate a direction vector from last point and actual point
-    ITKPoint3D m_LastPoint;
+    Point3D m_LastPoint;
 
     //##Documentation
     //## @brief summ-vector for Movement
-    ITKVector3D m_SumVec;
+    Vector3D m_SumVec;
 
     //##Documentation
     //## @brief to store the value of precision to pick a point

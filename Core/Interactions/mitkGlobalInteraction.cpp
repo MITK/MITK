@@ -21,12 +21,12 @@ mitk::GlobalInteraction::GlobalInteraction(const char * type)
 inline mitk::StateEvent* GenerateEmptyStateEvent(int eventId)
 {
   mitk::Event *noEvent = new mitk::Event(NULL,
-    mitk::Type_User,
-    mitk::BS_NoButton,
-    mitk::BS_NoButton,
-    mitk::Key_none);
+        mitk::Type_User,
+        mitk::BS_NoButton,
+		    mitk::BS_NoButton,
+        mitk::Key_none);
   mitk::StateEvent *stateEvent = new mitk::StateEvent(eventId, noEvent);
-  return stateEvent;
+	return stateEvent;
 }
 
 
@@ -91,7 +91,7 @@ void mitk::GlobalInteraction::InformListeners(mitk::StateEvent const* stateEvent
   for (StateMachineListIter it = m_ListenerList.begin(); it != m_ListenerList.end(); it++)
   {
     if((*it)!=NULL)
-      (*it)->HandleEvent(stateEvent, objectEventId, groupEventId);
+	    (*it)->HandleEvent(stateEvent, objectEventId, groupEventId);
   }
 
 }
@@ -107,8 +107,8 @@ bool mitk::GlobalInteraction::AskSelected(mitk::StateEvent const* stateEvent, in
     if((*it)!=NULL && !m_SelectedList.empty())
     {
       //Interactor are in Mode SELECTED or SUBSELECTED
-      oneOk = (*it)->HandleEvent(stateEvent, objectEventId, groupEventId);
-
+	    oneOk = (*it)->HandleEvent(stateEvent, objectEventId, groupEventId);
+      
       //if one HandleEvent did succeed, then set returnvalue on true;
       if (oneOk)
         ok = true;
@@ -163,7 +163,7 @@ void mitk::GlobalInteraction::AskCurrentInteractor(mitk::StateEvent const* state
 
     //if after handling an event Interactor is in mode SELECTED or SUBSELECTED
     if ( ((*m_CurrentInteractorIter).second->GetMode() == mitk::Interactor::SMSELECTED ) || 
-      ((*m_CurrentInteractorIter).second->GetMode() == mitk::Interactor::SMSUBSELECTED) )
+          ((*m_CurrentInteractorIter).second->GetMode() == mitk::Interactor::SMSUBSELECTED) )
     {
       m_SelectedList.clear();
       m_SelectedList.push_back((*m_CurrentInteractorIter).second);
@@ -219,11 +219,9 @@ bool mitk::GlobalInteraction::GetWorldCoordinate(const mitk::DisplayPositionEven
 
   vtkWorldPointPicker *worldPicker = vtkWorldPointPicker::New();
   //picker->SetTolerance (0.0001);
-  worldPicker->Pick(displayPoint.x, displayPoint.y, 0, glRenderer->GetVtkRenderer());
+  worldPicker->Pick(displayPoint[0], displayPoint[1], 0, glRenderer->GetVtkRenderer());
   mitk::Point3D worldPoint;
-  worldPoint.x = worldPicker->GetPickPosition()[0];
-  worldPoint.y = worldPicker->GetPickPosition()[1];
-  worldPoint.z = worldPicker->GetPickPosition()[2];
+  vtk2itk(worldPicker->GetPickPosition(), worldPoint);
   positionEvent->SetWorldPosition(worldPoint);
   return true;
 }
@@ -243,9 +241,7 @@ bool mitk::GlobalInteraction::ExecuteAction(Action* action, mitk::StateEvent con
       if (displayEvent!=NULL)
       {
         mitk::Point3D worldPoint;
-        worldPoint.x = 0;
-        worldPoint.y = 0;
-        worldPoint.z = 0;
+        worldPoint.Fill(0);
 
         PositionEvent* positionEvent = new PositionEvent(displayEvent->GetSender(), displayEvent->GetType(), displayEvent->GetButton(),
           displayEvent->GetButtonState(), displayEvent->GetKey(), displayEvent->GetDisplayPosition(), worldPoint);
@@ -259,43 +255,43 @@ bool mitk::GlobalInteraction::ExecuteAction(Action* action, mitk::StateEvent con
     }
 
 
-    ok = false;
-    switch (action->GetActionId())
+  ok = false;
+  switch (action->GetActionId())
+  {
+  case AcDONOTHING:
+    ok = true;
+	break;
+  case AcINFORMLISTENERS:
+    InformListeners(stateEvent, objectEventId, groupEventId);
+    ok = true;
+    break;
+  case AcASKINTERACTORS:
+    if (! AskSelected(stateEvent, objectEventId, groupEventId))//no selected
     {
-      case AcDONOTHING:
-        ok = true;
-        break;
-      case AcINFORMLISTENERS:
-        InformListeners(stateEvent, objectEventId, groupEventId);
-        ok = true;
-        break;
-      case AcASKINTERACTORS:
-        if (! AskSelected(stateEvent, objectEventId, groupEventId))//no selected
-        {
-          //if m_JurisdictionMap is empty, then fill it.
-          if (m_JurisdictionMap.empty())
-            FillJurisdictionMap(stateEvent, objectEventId, groupEventId, 0);
+      //if m_JurisdictionMap is empty, then fill it.
+      if (m_JurisdictionMap.empty())
+        FillJurisdictionMap(stateEvent, objectEventId, groupEventId, 0);
+      
+      //no jurisdiction value above 0 could be found, so take all to convert to old scheme
+      if (m_JurisdictionMap.empty())
+        FillJurisdictionMap(stateEvent, objectEventId, groupEventId, -1);
 
-          //no jurisdiction value above 0 could be found, so take all to convert to old scheme
-          if (m_JurisdictionMap.empty())
-            FillJurisdictionMap(stateEvent, objectEventId, groupEventId, -1);
-
-          //ask the next Interactor to handle that event
-          AskCurrentInteractor(stateEvent, objectEventId, groupEventId);
-
-          //after asking for jurisdiction and sending the events to the interactors,
-          //interactors should change the mode. We can now clear the jurisdictionmap.
-          m_JurisdictionMap.clear();
-        }
-        else
-        {
-          //checking if the selected one is still in Mode Subselected or selected
-          //...//todo
-        }
-        ok = true;
-        break;
-      default:
-        ok = true;
+      //ask the next Interactor to handle that event
+      AskCurrentInteractor(stateEvent, objectEventId, groupEventId);
+      
+      //after asking for jurisdiction and sending the events to the interactors,
+      //interactors should change the mode. We can now clear the jurisdictionmap.
+      m_JurisdictionMap.clear();
     }
-    return ok;
+    else
+    {
+      //checking if the selected one is still in Mode Subselected or selected
+      //...//todo
+    }
+    ok = true;
+    break;
+  default:
+	  ok = true;
+  }
+  return ok;
 }

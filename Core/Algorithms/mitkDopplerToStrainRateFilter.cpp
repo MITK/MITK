@@ -31,8 +31,8 @@ void mitk::DopplerToStrainRateFilter::GenerateOutputInformation()
 
   output->GetSlicedGeometry()->SetSpacing(input->GetSlicedGeometry()->GetSpacing());
 
-  output->GetSlicedGeometry()->SetGeometry2D(mitk::Image::BuildStandardPlaneGeometry2D(output->GetSlicedGeometry(), tmpDimensions).GetPointer(), 0);
-  output->GetSlicedGeometry()->SetEvenlySpaced();
+  //output->GetSlicedGeometry()->SetGeometry2D(mitk::Image::BuildStandardPlaneGeometry2D(output->GetSlicedGeometry(), tmpDimensions).GetPointer(), 0);
+  //output->GetSlicedGeometry()->SetEvenlySpaced();
   //set the timebounds - after SetGeometry2D, so that the already created PlaneGeometry will also receive this timebounds.
   output->GetSlicedGeometry()->SetTimeBoundsInMS(input->GetSlicedGeometry()->GetTimeBoundsInMS());
 
@@ -58,11 +58,11 @@ void mitk::DopplerToStrainRateFilter::GenerateData()
   }
 
   std::cout << "compute Strain Rate Image .... " << std::endl;
-  std::cout << "  origin.x=" << m_Origin.x << " origin.y=" << m_Origin.y << " origin.z=" << m_Origin.z << std::endl;
+  std::cout << "  origin[0]=" << m_Origin[0] << " origin[1]=" << m_Origin[1] << " origin[2]=" << m_Origin[2] << std::endl;
   std::cout << "  distance=" << m_Distance << std::endl;
   std::cout << "  NoStrainIntervall=" << m_NoStrainInterval << std::endl;
 
-  const float *spacing = input->GetSlicedGeometry()->GetSpacing();
+  const Vector3D & spacing = input->GetSlicedGeometry()->GetSpacing();
   //	std::cout << "   in: xres=" << spacing[0] << " yres=" << spacing[1] << " zres=" << spacing[2] << std::endl;
 
 
@@ -157,11 +157,11 @@ void mitk::DopplerToStrainRateFilter::GenerateData()
 
         for (y=1; y<yDim; y++) {
 
-          if (y<m_Origin.y) continue;  // cannot compute StrainRate above Transducer-Position
+          if (y<m_Origin[1]) continue;  // cannot compute StrainRate above Transducer-Position
 
           for (x=0; x<xDim; x++) {
 
-            if ((m_Origin.x - x)==0) {  // winkelhalbierende
+            if ((m_Origin[0] - x)==0) {  // winkelhalbierende
 
               int yDistanceInUnits = (int)( m_Distance/spacing[1]);
               int yTmp = ( (y-yDistanceInUnits)<0 )  ? 0 : (y-yDistanceInUnits);
@@ -172,7 +172,7 @@ void mitk::DopplerToStrainRateFilter::GenerateData()
 
               // compute angle to transducer position
               // m_Origin is given in units, not in mm
-              alpha = atan( (float) (m_Origin.x - x)  / (float) (m_Origin.y - y) );
+              alpha = atan( (float) (m_Origin[0] - x)  / (float) (m_Origin[1] - y) );
 
               // m_Distance is given in mm
               dx = -sin(alpha) * m_Distance;
@@ -322,9 +322,9 @@ mitk::DopplerToStrainRateFilter::DopplerToStrainRateFilter()
 : m_Distance(10), m_NoStrainInterval(2)
 {
 
-  m_Origin.x = 0;
-  m_Origin.y = 0;
-  m_Origin.z = 0;
+  m_Origin[0] = 0;
+  m_Origin[1] = 0;
+  m_Origin[2] = 0;
 
 }
 

@@ -37,8 +37,8 @@ void mitk::AngleCorrectByPointFilter::GenerateOutputInformation()
 
   output->GetSlicedGeometry()->SetSpacing(input->GetSlicedGeometry()->GetSpacing());
 
-  output->GetSlicedGeometry()->SetGeometry2D(mitk::Image::BuildStandardPlaneGeometry2D(output->GetSlicedGeometry(), tmpDimensions).GetPointer(), 0);
-  output->GetSlicedGeometry()->SetEvenlySpaced();
+  //output->GetSlicedGeometry()->SetGeometry2D(mitk::Image::BuildStandardPlaneGeometry2D(output->GetSlicedGeometry(), tmpDimensions).GetPointer(), 0);
+  //output->GetSlicedGeometry()->SetEvenlySpaced();
   //set the timebounds - after SetGeometry2D, so that the already created PlaneGeometry will also receive this timebounds.
   //@fixme!!! will not work for not evenly timed data!
   output->GetSlicedGeometry()->SetTimeBoundsInMS(input->GetSlicedGeometry()->GetTimeBoundsInMS());
@@ -66,8 +66,10 @@ void mitk::AngleCorrectByPointFilter::GenerateData()
     pointProp = dynamic_cast<mitk::Point3iProperty*>(input->GetProperty("ORIGIN").GetPointer());
     if (pointProp.IsNotNull() )
     {
-      Point3<int> tp = pointProp->GetValue();
-      vm2itk(tp, m_TransducerPosition);
+      const itk::Point<int, 3> & p = pointProp->GetValue();
+      m_TransducerPosition[0] = p[0];
+      m_TransducerPosition[1] = p[1];
+      m_TransducerPosition[2] = p[2];
     }
   }
 
@@ -75,7 +77,7 @@ void mitk::AngleCorrectByPointFilter::GenerateData()
   itkDebugMacro( << "  Center[0]=" << m_Center[0] << " Center[1]=" << m_Center[1] << " Center[2]=" << m_Center[2] );
   itkDebugMacro( << "  TransducerPosition[0]=" << m_TransducerPosition[0] << " TransducerPosition[1]=" << m_TransducerPosition[1] << " TransducerPosition[2]=" << m_TransducerPosition[2] );
 
-  const float *spacing = input->GetSlicedGeometry()->GetSpacing();
+  const Vector3D & spacing = input->GetSlicedGeometry()->GetSpacing();
   //	std::cout << "   in: xres=" << spacing[0] << " yres=" << spacing[1] << " zres=" << spacing[2] << std::endl;
   
   if((spacing[0]!=spacing[1]) || (spacing[0]!=spacing[2]))
@@ -83,14 +85,14 @@ void mitk::AngleCorrectByPointFilter::GenerateData()
     itkExceptionMacro("filter does not work for uninsotropic data: spacing: ("<< spacing[0] << "," << spacing[1] << "," << spacing[2] << ")");
   }
 
-  ITKVector3D p;
-  ITKVector3D tx_direction;
-  ITKVector3D tx_position = m_TransducerPosition.GetVectorFromOrigin();
-  ITKVector3D center = m_Center.GetVectorFromOrigin();
-  ITKVector3D assumed_direction;
+  Vector3D p;
+  Vector3D tx_direction;
+  Vector3D tx_position = m_TransducerPosition.GetVectorFromOrigin();
+  Vector3D center = m_Center.GetVectorFromOrigin();
+  Vector3D assumed_direction;
   ScalarType &x(p[0]),&y(p[1]),&z(p[2]);
-  ITKVector3D down;
-  FillITKVector3D(down,0.0,0.0,-1.0);
+  Vector3D down;
+  FillVector3D(down,0.0,0.0,-1.0);
 
   int xDim = input->GetDimension(0);
   int yDim = input->GetDimension(1);

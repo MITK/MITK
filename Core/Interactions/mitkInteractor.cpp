@@ -87,7 +87,7 @@ float mitk::Interactor::CalculateJurisdiction(StateEvent const* stateEvent) cons
   float returnvalue = 0.0;
   //if it is a key event that can be handled in the current state, then return 0.5
   mitk::DisplayPositionEvent const  *disPosEvent = dynamic_cast <const mitk::DisplayPositionEvent *> (stateEvent->GetEvent());
-
+	
   //Key event handling:
   if (disPosEvent == NULL)
   {
@@ -102,7 +102,7 @@ float mitk::Interactor::CalculateJurisdiction(StateEvent const* stateEvent) cons
     }
 
   }
-
+  
   //Mouse event handling:
   else//if we have 2d or 3d position
   {
@@ -117,7 +117,7 @@ float mitk::Interactor::CalculateJurisdiction(StateEvent const* stateEvent) cons
       return 0;
 
     mitk::PositionEvent const  *posEvent = dynamic_cast <const mitk::PositionEvent *> (stateEvent->GetEvent());
-    if (posEvent == NULL) //2D information from a 3D window
+	  if (posEvent == NULL) //2D information from a 3D window
     {
       //get camera and calculate the distance between the center of this boundingbox and the camera
       mitk::OpenGLRenderer* oglRenderer = dynamic_cast<mitk::OpenGLRenderer*>(stateEvent->GetEvent()->GetSender());
@@ -127,29 +127,26 @@ float mitk::Interactor::CalculateJurisdiction(StateEvent const* stateEvent) cons
       vtkCamera* camera = oglRenderer->GetVtkRenderer()->GetActiveCamera();
       if (camera == NULL)
       {
+        assert(disPosEvent->GetSender()!=NULL);
         return 0;
       }
       float normal[3];
       camera->GetViewPlaneNormal(normal);
       
       mitk::BoundingBox::PointType center,n;
-      n[0] = normal[0];
-      n[1] = normal[1];
-      n[2] = normal[2];
+      vtk2itk(n, normal);
       returnvalue = center.SquaredEuclideanDistanceTo( n );
       //map between 0.5 and 1
-
     }
     else//3D information from a 2D window.
     {
       mitk::Point3D const point = posEvent->GetWorldPosition();
       mitk::BoundingBox::PointType itkPoint;
       float p[3];
-      p[0] = point.x;p[1] = point.y;p[2] = point.z;
+      itk2vtk(point, p);
       //transforming the Worldposition to local coordinatesystem
       m_DataTreeNode->GetData()->GetGeometry()->GetVtkTransform()->GetInverse()->TransformPoint(p, p);
-
-      itkPoint[0] = p[0];itkPoint[1] = p[1];itkPoint[2] = p[2];
+      vtk2itk(p, itkPoint);
 
       //check if the given position lies inside the data-object
       if (bBox->IsInside(itkPoint))
@@ -160,7 +157,7 @@ float mitk::Interactor::CalculateJurisdiction(StateEvent const* stateEvent) cons
         returnvalue = 1 - itkPoint.SquaredEuclideanDistanceTo(center);
         //now in rage of 0.5 to 1 compared to size of boundingbox;
         returnvalue = returnvalue/( (bBox->GetMaximum() - bBox->GetMinimum()).GetNorm() / 2);
-
+        
         //map between 0.5 and 1
         returnvalue = 0.5 + (returnvalue / 2);
       }

@@ -41,13 +41,14 @@ void mitk::DisplayInteractor::ExecuteOperation(mitk::Operation * operation)
       break;
     case OpZOOM :
       {
-        float distance = dcOperation->GetLastToCurrentDisplayVector().y;
+        float distance = dcOperation->GetLastToCurrentDisplayVector()[1];
         distance = (distance > 0 ? 1 : (distance < 0 ? -1 : 0));
         float factor= 1.0 + distance * 0.05;
         //renderer->GetDisplayGeometry()->Zoom(factor, dcOperation->GetStartDisplayCoordinate());
-        renderer->GetDisplayGeometry()->Zoom(factor, 
-          Vector2f(renderer->GetDisplayGeometry()->GetDisplayWidth()/2,
-                    renderer->GetDisplayGeometry()->GetDisplayHeight()/2));
+        Point2D center;
+        center[0] = renderer->GetDisplayGeometry()->GetDisplayWidth()/2;
+        center[1] = renderer->GetDisplayGeometry()->GetDisplayHeight()/2;
+        renderer->GetDisplayGeometry()->Zoom(factor, center);
         renderer->GetRenderWindow()->Repaint();
         ok = true;
       }

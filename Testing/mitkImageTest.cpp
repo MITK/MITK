@@ -6,9 +6,61 @@ int mitkImageTest(int argc, char* argv[])
 	//Create Image out of nowhere
 	mitk::Image::Pointer imgMem;
 	mitk::PixelType pt(typeid(int));
+	unsigned int dim[]={100,100,20};
+
+  std::cout << "Testing creation of Image: ";
 	imgMem=mitk::Image::New();
-	  unsigned int dim[]={10,10,10};
-	  imgMem->Initialize(mitk::PixelType(typeid(int)), 3, dim);
+  if(imgMem.IsNull())
+  {
+    std::cout<<"[FAILED]"<<std::endl;
+    return EXIT_FAILURE;
+  }
+  std::cout<<"[PASSED]"<<std::endl;
+
+  std::cout << "Testing Initialize(const mitk::PixelType& type, unsigned int dimension, unsigned int *dimensions): ";
+	imgMem->Initialize(mitk::PixelType(typeid(int)), 3, dim);
+  std::cout<<"[PASSED]"<<std::endl;
+
+  std::cout << "Testing IsInitialized(): ";
+  if(imgMem->IsInitialized()==false)
+  {
+    std::cout<<"[FAILED]"<<std::endl;
+    return EXIT_FAILURE;
+  }
+  std::cout<<"[PASSED]"<<std::endl;
+
+  std::cout << "Testing GetData(): ";
+  int *p = (int*)imgMem->GetData();
+  if(p==NULL)
+  {
+    std::cout<<"[FAILED]"<<std::endl;
+    return EXIT_FAILURE;
+  }
+  std::cout<<"[PASSED]"<<std::endl;
+
+  std::cout << "Filling image: ";
+  int i;
+  int size = dim[0]*dim[1]*dim[2];
+  for(i=0; i<size; ++i, ++p)
+    *p=i;
+  std::cout<<"[PASSED]"<<std::endl;
+
+  std::cout << "Getting it again and compare with filled values: ";
+  int *p2 = (int*)imgMem->GetData();
+  if(p2==NULL)
+  {
+    std::cout<<"[FAILED]"<<std::endl;
+    return EXIT_FAILURE;
+  }
+  for(i=0; i<size; ++i, ++p2)
+  {
+    if(*p2!=i)
+    {
+      std::cout<<"[FAILED]"<<std::endl;
+      return EXIT_FAILURE;
+    }
+  }
+  std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "Testing IsInitialized(): ";
   if(imgMem->IsInitialized()==false)
@@ -21,6 +73,12 @@ int mitkImageTest(int argc, char* argv[])
   std::cout << "Testing GetSliceData(): ";
   
   
+
+  //int *data = new int[size];
+  //std::cout << "Testing SetVolume(): ";
+  //imgMem->SetVolume(data);
+  //std::cout<<"[PASSED]"<<std::endl;
+
 
   std::cout<<"[TEST DONE]"<<std::endl;
   return EXIT_SUCCESS;

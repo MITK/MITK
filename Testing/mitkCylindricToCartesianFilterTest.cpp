@@ -13,6 +13,7 @@ int mitkCylindricToCartesianFilterTest(int argc, char* argv[])
   //Use CylindricToCartesianFilter
 	mitk::CylindricToCartesianFilter::Pointer cyl2cart = mitk::CylindricToCartesianFilter::New();
     cyl2cart->SetInput(reader->GetOutput());
+    cyl2cart->SetTargetXSize( 64 );
 
   //Take a slice
 	mitk::ImageSliceSelector::Pointer slice = mitk::ImageSliceSelector::New();

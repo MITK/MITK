@@ -17,11 +17,11 @@ public:
 
 	itkNewMacro(Self);
   
-  itkSetMacro(Center, ITKPoint3D);
-	itkGetConstReferenceMacro(Center, ITKPoint3D);
+  itkSetMacro(Center, Point3D);
+	itkGetConstReferenceMacro(Center, Point3D);
 
-  itkSetMacro(TransducerPosition, ITKPoint3D);
-	itkGetConstReferenceMacro(TransducerPosition, ITKPoint3D);
+  itkSetMacro(TransducerPosition, Point3D);
+	itkGetConstReferenceMacro(TransducerPosition, Point3D);
 
   itkSetMacro(PreferTransducerPositionFromProperty, bool);
 	itkGetMacro(PreferTransducerPositionFromProperty, bool);
@@ -43,8 +43,8 @@ protected:
 
 	virtual void GenerateInputRequestedRegion();
 
-  ITKPoint3D m_TransducerPosition;
-  ITKPoint3D m_Center;
+  Point3D m_TransducerPosition;
+  Point3D m_Center;
 
   bool m_PreferTransducerPositionFromProperty;
 };

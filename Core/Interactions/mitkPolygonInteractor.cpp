@@ -29,7 +29,7 @@ int mitk::PolygonInteractor::GetId()
 //##if no line is selected, then the next line to the given point is selected
 //##if more than one line is selected, then all are deselected and the one next to the given point is selected.
 //## Returns true if success, false if an error occured
-bool mitk::PolygonInteractor::SelectOneLine(ITKPoint3D itkPoint)
+bool mitk::PolygonInteractor::SelectOneLine(Point3D itkPoint)
 {
  // mitk::Mesh* data = dynamic_cast<mitk::Mesh*>(m_DataTreeNode->GetData());
 	//if (data == NULL)
@@ -81,8 +81,8 @@ bool mitk::PolygonInteractor::ExecuteAction(Action* action, mitk::StateEvent con
       m_PointList->insert(PointListType::value_type(m_PointIdCount, pointInteractor));
 
       //Now add the point to the data
-		  mitk::ITKPoint3D itkPoint;
-		  mitk::vm2itk(posEvent->GetWorldPosition(), itkPoint);
+		  mitk::Point3D itkPoint;
+		  itkPoint = posEvent->GetWorldPosition();
       mitk::PointOperation* doOp = new mitk::PointOperation(OpINSERT, itkPoint, m_PointIdCount);
 		  if (m_UndoEnabled)
 		  {
@@ -104,8 +104,8 @@ bool mitk::PolygonInteractor::ExecuteAction(Action* action, mitk::StateEvent con
         return false;
       //only one line may be selected. get the line and rebuild the cell with the ID of the new 
       //point inserted between the two points of the selected line
-      mitk::ITKPoint3D itkPoint;
-		  mitk::vm2itk(posEvent->GetWorldPosition(), itkPoint);
+      mitk::Point3D itkPoint;
+		  itkPoint = posEvent->GetWorldPosition();
 
       SelectOneLine(itkPoint);
       //now one line is selected
@@ -155,7 +155,7 @@ bool mitk::PolygonInteractor::ExecuteAction(Action* action, mitk::StateEvent con
 
 //  case AcREMOVE:
 //  {
-//    mitk::ITKPoint3D newPoint;
+//    mitk::Point3D newPoint;
 //    newPoint.Fill(0);
 ////critical, cause the inverse operation of removecell is not necesarily insertline. We don't know how the cell looked like when deleted.
 //    PointOperation* doOp = new mitk::PointOperation(OpREMOVECELL, newPoint, m_Id);
@@ -175,7 +175,7 @@ bool mitk::PolygonInteractor::ExecuteAction(Action* action, mitk::StateEvent con
 //  case AcREMOVEALL://remove Line and the two points
 //  {
 //    //removing the line
-//    mitk::ITKPoint3D newPoint;
+//    mitk::Point3D newPoint;
 //    newPoint.Fill(0);
 //    PointOperation* doOp = new mitk::PointOperation(OpREMOVECELL, newPoint, m_Id);
 //    if ( m_UndoEnabled )

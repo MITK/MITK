@@ -76,7 +76,7 @@ private:
 
   //##Documentation
   //## to make possible the undo of a movement of a line
-  ITKPoint3D m_LastPoint;
+  Point3D m_LastPoint;
 
 };
 }

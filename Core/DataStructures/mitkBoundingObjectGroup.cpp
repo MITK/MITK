@@ -34,7 +34,7 @@ void mitk::BoundingObjectGroup::SetRequestedRegion(itk::DataObject *data)
 
 void mitk::BoundingObjectGroup::UpdateOutputInformation()
 {  
-  float bounds[6]={0,1,0,1,0,1};  // {xmin,x_max, ymin,y_max,zmin,z_max};
+  ScalarType bounds[6]={0,1,0,1,0,1};  // {xmin,x_max, ymin,y_max,zmin,z_max};
   
   // calculate global bounding box
   mitk::BoundingObjectGroup::BoundingObjectContainer::ConstIterator boundingObjectsIterator = m_BoundingObjects->Begin();
@@ -68,7 +68,7 @@ void mitk::BoundingObjectGroup::UpdateOutputInformation()
 
     /* create all 8 points of the bounding box */
     mitk::BoundingBox::PointsContainerPointer points = mitk::BoundingBox::PointsContainer::New();
-    mitk::ITKPoint3D p;
+    mitk::Point3D p;
     p = boundingBox->GetMinimum();
     points->InsertElement(0, p);
     p[0] = -p[0];
@@ -120,7 +120,7 @@ void mitk::BoundingObjectGroup::UpdateOutputInformation()
   bounds[3] = globalMaxPoint[1] - centerPoint[1]; // y Max
   bounds[4] = globalMinPoint[2] - centerPoint[2]; // z Min
   bounds[5] = globalMaxPoint[2] - centerPoint[2]; // z Max
-  m_Geometry3D->SetBoundingBox(bounds);
+  m_Geometry3D->SetBounds(bounds);
 
   /* the objects position is the center of all sub bounding objects */
   m_Geometry3D->GetVtkTransform()->Identity();
@@ -134,7 +134,7 @@ void mitk::BoundingObjectGroup::AddBoundingObject(mitk::BoundingObject::Pointer 
   UpdateOutputInformation();
 }
 
-bool mitk::BoundingObjectGroup::IsInside(mitk::ITKPoint3D p)
+bool mitk::BoundingObjectGroup::IsInside(mitk::Point3D p)
 {
   mitk::BoundingObjectGroup::BoundingObjectContainer::ConstIterator boundingObjectsIterator = m_BoundingObjects->Begin();
   const mitk::BoundingObjectGroup::BoundingObjectContainer::ConstIterator boundingObjectsIteratorEnd = m_BoundingObjects->End();

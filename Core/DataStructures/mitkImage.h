@@ -216,17 +216,15 @@ public:
 #else
     const double *spacinglist = itkimage->GetSpacing();  
 #endif 
-    Vector3D spacing(spacinglist[0],1.0,1.0);
+    Vector3D spacing;
+    FillVector3D(spacing, spacinglist[0], 1.0, 1.0);
     if(m_Dimension>=2)
-      spacing.y=spacinglist[1];
+      spacing[1]=spacinglist[1];
     if(m_Dimension>=3)
-      spacing.z=spacinglist[2];
+      spacing[2]=spacinglist[2];
 
     SlicedGeometry3D* slicedGeometry = GetSlicedGeometry(0);
     slicedGeometry->SetSpacing(spacing);
-    slicedGeometry->SetGeometry2D(BuildStandardPlaneGeometry2D(slicedGeometry, m_Dimensions).GetPointer(), 0);
-    slicedGeometry->SetEvenlySpaced();
-    m_TimeSlicedGeometry->SetEvenlyTimed();
 
     delete [] tmpDimensions;
   };
@@ -288,9 +286,6 @@ public:
   //## @warning for internal use only
   virtual mitk::ImageDataItem::Pointer GetChannelData(int n = 0);
   
-  //##Documentation
-  //## @brief Build a PlaneGeometry using the resolution/spacing information in \a geometry3D and the (first two) dimensions in \a dimensions
-  static Geometry2D::Pointer BuildStandardPlaneGeometry2D(mitk::SlicedGeometry3D* geometry3D, unsigned int *dimensions);
 protected:
   //##ModelId=3E155C940248
   int GetSliceIndex(int s = 0, int t = 0, int n = 0) const;

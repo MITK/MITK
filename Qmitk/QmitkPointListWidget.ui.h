@@ -6,8 +6,6 @@
 ** init() function in place of a constructor, and a destroy() function in
 ** place of a destructor.
 *****************************************************************************/
-//#include <itkCommand.h>
-//#include <mitkPointSetInteractor.h>
 
 mitk::PointSetInteractor::Pointer QmitkPointListWidget::m_CurrentInteraction;
 void QmitkPointListWidget::init()
@@ -33,7 +31,8 @@ void QmitkPointListWidget::PointSelect( int ItemIndex )
   for (it = m_PointSet->GetPointSet()->GetPoints()->Begin(); i<ItemIndex; it++) i++; ///the iterator will be set to the position needed 
   m_PointSet->GetPointSet()->GetPoints()->GetElementIfIndexExists(it->Index(), &ppt);
   mitk::Point2D p2d;
-  mitk::Point3D p3d((ppt)[0],(ppt)[1],(ppt)[2]);
+  mitk::Point3D p3d;
+  mitk::FillVector3D(p3d, (ppt)[0],(ppt)[1],(ppt)[2]);
   mitk::PositionEvent event(NULL, 0, 0, 0, mitk::Key_unknown, p2d, p3d);
   mitk::StateEvent *stateEvent = new mitk::StateEvent(mitk::EIDLEFTMOUSEBTN , &event);    
   mitk::GlobalInteraction* globalInteraction = dynamic_cast<mitk::GlobalInteraction*>(mitk::EventMapper::GetGlobalStateMachine());
@@ -85,7 +84,7 @@ void QmitkPointListWidget::SwitchInteraction( mitk::PointSetInteractor::Pointer 
     {
       //new layer property
       mitk::IntProperty::Pointer layer = new mitk::IntProperty(1);
-      mitk::ColorProperty::Pointer color = new mitk::ColorProperty(c.x,c.y,c.z);
+      mitk::ColorProperty::Pointer color = new mitk::ColorProperty(c[0],c[1],c[2]);
 
       mitk::BoolProperty::Pointer contour = new mitk::BoolProperty(false);
       mitk::BoolProperty::Pointer close = new mitk::BoolProperty(true);

@@ -38,7 +38,7 @@ protected:
 private:
   //##ModelId=3F0189F0024A
   OperationActor* m_Destination;
-  ITKPoint3D m_OldPoint;
+  Point3D m_OldPoint;
 
 };
 

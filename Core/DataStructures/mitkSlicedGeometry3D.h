@@ -3,7 +3,6 @@
 
 #include "mitkGeometry3D.h"
 #include "mitkGeometry2D.h"
-#include <ipPic/ipPic.h>
 
 class vtkTransform;
 
@@ -68,22 +67,6 @@ public:
   //##Documentation
   //## @brief Set Geometry2D of slice @a s.
   virtual bool SetGeometry2D(mitk::Geometry2D* geometry2D, int s);
-  //##ModelId=3E155839024F
-  //##Documentation
-  //## @brief Set this SlicedGeometry3D according to the tags in @a pic. 
-  //## 
-  //## Currently, pic still does not have IGS information. Until it finally
-  //## has them, the following is done:
-  //## A slice parallel to the XY-plane is created with the size according 
-  //## to the information in the tag REAL PIXEL SIZES, including the 
-  //## z-position of the slice (sum of all z-sizes for slices < s).
-  //## If @a s is -1, all slices are initialized. 
-  //## If the tag REAL PIXEL SIZES does not exist, the spacing is used.
-  //## @return @a false: geometry not changed, either because of inconsistent
-  //## data (e.g., dimensions do not match the dimensions of a slice) or
-  //## read-only geometry.
-  //## @return @a true: geometry successfully updated.
-  virtual bool SetGeometry2D(ipPicDescriptor* pic, int s = -1);
 
   virtual void SetTimeBoundsInMS(const mitk::TimeBounds& timebounds);
 
@@ -99,9 +82,13 @@ public:
   virtual bool IsValidSlice(int s = 0) const;
 
   //##Documentation
-  //## @brief Get the spacing as a float[3] array. Only valid if the SlicedGeometry3D is
-  //## evenly-spaced (m_EvenlySpaced==true).
-  const float* mitk::SlicedGeometry3D::GetSpacing() const;
+  //## @brief Get the spacing (size of a pixel).
+  //##
+  itkGetConstReferenceMacro(Spacing, mitk::Vector3D);
+
+  //##Documentation
+  //## @brief Get the spacing as a float[3] array.
+  const float* mitk::SlicedGeometry3D::GetFloatSpacing() const;
 
   //##ModelId=3E3BE8CF010E
   //##Documentation
@@ -132,26 +119,40 @@ public:
   virtual void SetDirectionVector(const mitk::Vector3D& directionVector);
   itkGetConstMacro(DirectionVector, const mitk::Vector3D&);
 
-  //##ModelId=3E3C2C37031B
-  //##Documentation
-  //## @brief Set the spacing according to the tags in @ pic.
-  virtual void SetSpacing(ipPicDescriptor* pic);
+  virtual AffineGeometryFrame3D::Pointer Clone() const;
 
-  virtual Geometry3D::Pointer Clone() const;
-
+protected:
   //##ModelId=3E3453C703AF
   //##Documentation
-  //## @brief Tell this instance how many 2D-geometries it shall manage.
+  //## @brief Tell this instance how many Geometry2Ds it shall manage. Bounding box and the 
+  //## Geometry2Ds must be set additionally by calling the respective methods!
+  //##
+  //## @warning Bounding box and the 2D-geometries must be set additionally: use SetBounds() 
+  //## SetGeometry().
   virtual void Initialize(unsigned int slices);
+public:
+  //##Documentation
+  //## @brief Completely initialize this instance as evenly-spaced with slices parallel to the provided
+  //## Geometry2D that is used as the first slice and for spacing calculation.
+  //##
+  //## Initializes the bounding box according to the width/height of the Geometry2D and @a slices.
+  //## The spacing is calculated from the Geometry2D.
+  virtual void InitializeEvenlySpaced(mitk::Geometry2D* geometry2D, unsigned int slices, bool flipped=false);
 
+  //##Documentation
+  //## @brief Completely initialize this instance as evenly-spaced with slices parallel to the provided
+  //## Geometry2D that is used as the first slice and for spacing calculation (except z-spacing).
+  //##
+  //## Initializes the bounding box according to the width/height of the Geometry2D and @a slices.
+  //## The x-/y-spacing is calculated from the Geometry2D.
+  virtual void InitializeEvenlySpaced(mitk::Geometry2D* geometry2D, mitk::ScalarType zSpacing, unsigned int slices, bool flipped=false);
 protected:
   SlicedGeometry3D();
 
   //##ModelId=3E3456C50067
   virtual ~SlicedGeometry3D();
 
-  //## set spacing from a pic tag
-  void SetSpacing( const ipPicTSV_t* tsv );
+  void InitializeGeometry(Self * newGeometry) const;
 
   //##ModelId=3E3968CC000E
   //##Documentation
@@ -183,6 +184,9 @@ protected:
   //##Documentation
   //## Number of slices this SliceGeometry3D is descibing.
   unsigned int m_Slices;
+
+private:
+  float m_FloatSpacing[3];
 };
 
 } // namespace mitk

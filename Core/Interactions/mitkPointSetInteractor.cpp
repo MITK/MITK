@@ -49,7 +49,7 @@ void mitk::PointSetInteractor::UnselectAll(int objectEventId, int groupEventId)
     itkPointSet->GetPointData(position, &selected);
     if ( selected )//then declare an operation which unselects this point; UndoOperation as well!
 		{
-			mitk::ITKPoint3D noPoint;
+			mitk::Point3D noPoint;
 			noPoint.Fill(0);
 
       mitk::PointOperation* doOp = new mitk::PointOperation(OpDESELECTPOINT, noPoint, position);
@@ -74,7 +74,7 @@ void mitk::PointSetInteractor::SelectPoint(int position, int objectEventId, int 
   if (pointSet->GetSize()<=0)//if List is empty, then no select of a point can be done!
     return;
 
-  mitk::ITKPoint3D noPoint;//dummyPoint... not needed anyway
+  mitk::Point3D noPoint;//dummyPoint... not needed anyway
   noPoint.Fill(0);
   mitk::PointOperation* doOp = new mitk::PointOperation(OpSELECTPOINT, noPoint, position);
 	if (m_UndoEnabled)
@@ -140,8 +140,8 @@ bool mitk::PointSetInteractor::ExecuteAction(Action* action, mitk::StateEvent co
       return false;
 
 		//converting from Point3D to itk::Point
-		mitk::ITKPoint3D itkPoint;
-		mitk::vm2itk(posEvent->GetWorldPosition(), itkPoint);
+		mitk::Point3D itkPoint;
+		itkPoint = posEvent->GetWorldPosition();
 
     //undo-supported deselect of all points in the DataList; if List is empty, then nothing will be unselected
 		this->UnselectAll(objectEventId, groupEventId);
@@ -201,7 +201,7 @@ bool mitk::PointSetInteractor::ExecuteAction(Action* action, mitk::StateEvent co
       return false;
 
     //start of the Movement is stored to calculate the undoKoordinate in FinishMovement
-    mitk::vm2itk(posEvent->GetWorldPosition(), m_LastPoint );
+    m_LastPoint = posEvent->GetWorldPosition();
     
     //initialize a value to calculate the movement through all MouseMoveEvents from MouseClick to MouseRelease
     m_SumVec.Fill(0);
@@ -215,14 +215,14 @@ bool mitk::PointSetInteractor::ExecuteAction(Action* action, mitk::StateEvent co
 		if (posEvent == NULL)
       return false;
 
-    mitk::ITKPoint3D newPoint, resultPoint;
-		mitk::vm2itk(posEvent->GetWorldPosition(), newPoint);
+    mitk::Point3D newPoint, resultPoint;
+		newPoint = posEvent->GetWorldPosition();
 		//search the elements in the list, that are selected
     //then calculate the vector, because only with the vector we can move several elements in the same direction
     //newPoint - lastPoint = vector
     //then move all selected and set the lastPoint = newPoint.
     //then add all vectors to a summeryVector (to be able to calculate the startpoint for undoOperation)
-    mitk::ITKVector3D dirVector = newPoint - m_LastPoint;
+    mitk::Vector3D dirVector = newPoint - m_LastPoint;
 
     //summ up all Movement for Undo in FinishMovement
     m_SumVec = m_SumVec + dirVector;
@@ -236,7 +236,7 @@ bool mitk::PointSetInteractor::ExecuteAction(Action* action, mitk::StateEvent co
       if ( pointSet->GetSelectInfo(position) )//if selected
       {
         PointSet::PointType pt = pointSet->GetPoint(position);
-        mitk::ITKPoint3D sumVec;
+        mitk::Point3D sumVec;
         sumVec[0] = pt[0];
         sumVec[1] = pt[1];
         sumVec[2] = pt[2];
@@ -260,8 +260,8 @@ bool mitk::PointSetInteractor::ExecuteAction(Action* action, mitk::StateEvent co
 		if (posEvent != NULL)
 		{
 			//converting from Point3D to itk::Point
-			mitk::ITKPoint3D itkPoint;
-			mitk::vm2itk(posEvent->GetWorldPosition(), itkPoint);
+			mitk::Point3D itkPoint;
+			itkPoint = posEvent->GetWorldPosition();
 
 			//search the point in the list
 			int position = pointSet->SearchPoint(itkPoint, 0);
@@ -323,7 +323,7 @@ bool mitk::PointSetInteractor::ExecuteAction(Action* action, mitk::StateEvent co
         {
           //get the coordinates of that point to be undoable
           PointSet::PointType selectedPoint = it->Value();
-          mitk::ITKPoint3D itkPoint;
+          mitk::Point3D itkPoint;
           itkPoint[0] = selectedPoint[0];
           itkPoint[1] = selectedPoint[1];
           itkPoint[2] = selectedPoint[2];
@@ -394,8 +394,8 @@ bool mitk::PointSetInteractor::ExecuteAction(Action* action, mitk::StateEvent co
 	//		if (posEvent == NULL) return false;
 
 	//		//converting from Point3D to itk::Point
-	//		mitk::ITKPoint3D itkPoint;
-	//		mitk::vm2itk(posEvent->GetWorldPosition(), itkPoint);
+	//		mitk::Point3D itkPoint;
+	//		itkPoint = posEvent->GetWorldPosition();
 
 	//		int position = pointSet->GetSize()-1;//not needed for the doOp, but for UndoOp
 	//		PointOperation* doOp = new mitk::PointOperation(OpDELETE, itkPoint, position);
@@ -423,21 +423,15 @@ bool mitk::PointSetInteractor::ExecuteAction(Action* action, mitk::StateEvent co
 
 			  //converting from Point3D to itk::Point
         mitk::Point3D worldPoint = posEvent->GetWorldPosition();
-			  mitk::ITKPoint3D itkPoint;
-			  mitk::vm2itk(worldPoint, itkPoint);
 
-
-			  int position = pointSet->SearchPoint(itkPoint, m_Precision);
+			  int position = pointSet->SearchPoint(worldPoint, m_Precision);
 			  if (position>=0)//found a point near enough to the given point
 			  {
           PointSet::PointType pt = pointSet->GetPoint(position);//get that point, the one meant by the user!
-				  itkPoint[0] = pt[0];//convert it to itkPoint
-          itkPoint[1] = pt[1];
-          itkPoint[2] = pt[2];
-				  mitk::Point2D displPoint(itkPoint[0], itkPoint[1]);
-          mitk::itk2vm(itkPoint,worldPoint);//convert it to Point3D and use the not needed var worldPoint
+				  mitk::Point2D displPoint;
+          displPoint[0] = worldPoint[0]; displPoint[1] = worldPoint[1];
           //new Event with information YES and with the correct point
-  			  mitk::PositionEvent const* newPosEvent = new mitk::PositionEvent(posEvent->GetSender(), Type_None, BS_NoButton, BS_NoButton, Key_none, displPoint, worldPoint);
+  			  mitk::PositionEvent const* newPosEvent = new mitk::PositionEvent(posEvent->GetSender(), Type_None, BS_NoButton, BS_NoButton, Key_none, displPoint, pt);
           mitk::StateEvent* newStateEvent = new mitk::StateEvent(StYES, newPosEvent);
           //call HandleEvent to leave the guard-state
           this->HandleEvent( newStateEvent, objectEventId, groupEventId );
@@ -477,9 +471,7 @@ bool mitk::PointSetInteractor::ExecuteAction(Action* action, mitk::StateEvent co
             return false;
           mitk::Point3D worldPoint = posEvent->GetWorldPosition();
           //converting from Point3D to itk::Point
-			    mitk::ITKPoint3D itkWorldPoint;
-			    mitk::vm2itk(worldPoint, itkWorldPoint);
-          position = pointSet->SearchPoint(itkWorldPoint, m_Precision);
+          position = pointSet->SearchPoint(worldPoint, m_Precision);
 
 			    if (position>=0)
 			    {
@@ -494,7 +486,7 @@ bool mitk::PointSetInteractor::ExecuteAction(Action* action, mitk::StateEvent co
 				      ok = true;
 
               //saving the spot for calculating the direction vector in moving
-					    mitk::vm2itk(posEvent->GetWorldPosition(), m_LastPoint);//??????? ingmar: Umstellung zu Old und Lastpoint; "hier so noch richtig?"
+					    m_LastPoint = posEvent->GetWorldPosition();//??????? ingmar: Umstellung zu Old und Lastpoint; "hier so noch richtig?"
             }
             else //not selected then call event StNO
             {
@@ -560,8 +552,8 @@ bool mitk::PointSetInteractor::ExecuteAction(Action* action, mitk::StateEvent co
 			if (posEvent == NULL) return false;
 
 			//converting from Point3D to itk::Point
-			mitk::ITKPoint3D itkPoint;
-			mitk::vm2itk(posEvent->GetWorldPosition(), itkPoint);
+			mitk::Point3D itkPoint;
+			itkPoint = posEvent->GetWorldPosition();
 
 			//search the point in the list
 			int position = pointSet->SearchPoint(itkPoint, 0);
@@ -597,8 +589,8 @@ bool mitk::PointSetInteractor::ExecuteAction(Action* action, mitk::StateEvent co
         return false;
 
 			//converting from Point3D to itk::Point
-			mitk::ITKPoint3D itkPoint;
-			mitk::vm2itk(posEvent->GetWorldPosition(), itkPoint);
+			mitk::Point3D itkPoint;
+			itkPoint = posEvent->GetWorldPosition();
 
 			//search the point in the list
 			int position = pointSet->SearchPoint(itkPoint, 0);
@@ -651,7 +643,7 @@ bool mitk::PointSetInteractor::ExecuteAction(Action* action, mitk::StateEvent co
         if ( pointSet->GetSelectInfo(position) )//if selected
         {
           PointSet::PointType pt = pointSet->GetPoint(position);
-          ITKPoint3D itkPoint;
+          Point3D itkPoint;
           itkPoint[0] = pt[0];
           itkPoint[1] = pt[1];
           itkPoint[2] = pt[2];
@@ -660,7 +652,7 @@ bool mitk::PointSetInteractor::ExecuteAction(Action* action, mitk::StateEvent co
           {
             //set the undo-operation, so the final position is undo-able
             //calculate the old Position from the already moved position - m_SumVec
-            mitk::ITKPoint3D undoPoint = ( itkPoint - m_SumVec );
+            mitk::Point3D undoPoint = ( itkPoint - m_SumVec );
             PointOperation* undoOp = new mitk::PointOperation(OpMOVE, undoPoint, position);
 				    OperationEvent *operationEvent = new OperationEvent(pointSet,
 													    doOp, undoOp,
@@ -698,7 +690,7 @@ bool mitk::PointSetInteractor::ExecuteAction(Action* action, mitk::StateEvent co
 
 void mitk::PointSetInteractor::Clear()
 {
-	mitk::ITKPoint3D itkPoint;
+	mitk::Point3D itkPoint;
   itkPoint.Fill(0);
 
 	mitk::PointSet* pointSet = dynamic_cast<mitk::PointSet*>(m_DataTreeNode->GetData());

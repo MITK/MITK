@@ -1,0 +1,213 @@
+#include "itkVtkAbstractTransform.h"
+#include <vtkTransform.h>
+#include <vtkAbstractTransform.h>
+#include <mitkVector.h>
+
+namespace itk {
+
+template <class TScalarType>
+itk::VtkAbstractTransform<TScalarType>::VtkAbstractTransform() : 
+  m_VtkAbstractTransform(NULL), m_InverseVtkAbstractTransform(NULL), 
+  m_LastVtkAbstractTransformTimeStamp(0)
+{
+
+}
+
+template <class TScalarType>
+itk::VtkAbstractTransform<TScalarType>::~VtkAbstractTransform()
+{
+}
+
+template <class TScalarType>
+vtkAbstractTransform* itk::VtkAbstractTransform<TScalarType>::GetVtkAbstractTransform() const
+{
+  return m_VtkAbstractTransform;
+}
+
+template <class TScalarType>
+vtkAbstractTransform* itk::VtkAbstractTransform<TScalarType>::GetInverseVtkAbstractTransform() const
+{
+  return m_InverseVtkAbstractTransform;
+}
+
+template <class TScalarType>
+void itk::VtkAbstractTransform<TScalarType>::SetVtkAbstractTransform(vtkAbstractTransform* aVtkAbstractTransform)
+{
+  if(m_VtkAbstractTransform==aVtkAbstractTransform)
+    return;
+
+  if(m_VtkAbstractTransform!=NULL)
+    m_VtkAbstractTransform->UnRegister(NULL);
+
+  if(m_InverseVtkAbstractTransform!=NULL)
+    m_InverseVtkAbstractTransform->UnRegister(NULL);
+
+  m_VtkAbstractTransform=aVtkAbstractTransform;
+  if(m_VtkAbstractTransform!=NULL)
+  {
+    m_VtkAbstractTransform->Register(NULL);
+    m_InverseVtkAbstractTransform=m_VtkAbstractTransform->GetInverse();
+    m_InverseVtkAbstractTransform->Register(NULL);
+  }
+
+  m_LastVtkAbstractTransformTimeStamp = m_VtkAbstractTransform->GetMTime();
+
+  Modified();
+}
+
+// Transform a point
+template<class TScalarType>
+typename itk::VtkAbstractTransform<TScalarType>::OutputPointType
+itk::VtkAbstractTransform<TScalarType>::
+TransformPoint(const InputPointType &point) const 
+{
+  assert(m_VtkAbstractTransform!=NULL);
+
+  OutputPointType outputpoint;
+  vnl_vector<TScalarType> vnl_vec;
+  float vtkpt[3];
+  mitk::itk2vtk(point, vtkpt);
+  m_VtkAbstractTransform->TransformPoint(vtkpt, vtkpt);
+  mitk::vtk2itk(vtkpt, outputpoint);
+  return outputpoint;
+}
+
+
+// Transform a vector
+template<class TScalarType>
+typename itk::VtkAbstractTransform<TScalarType>::OutputVectorType
+itk::VtkAbstractTransform<TScalarType>::
+TransformVector(const InputVectorType &vect) const 
+{
+  assert(m_VtkAbstractTransform!=NULL);
+
+  OutputVectorType outputvector;
+  vnl_vector<TScalarType> vnl_vec;
+  float vtkpt[3]={0,0,0};
+  float vtkvec[3];
+  mitk::vnl2vtk(vect.Get_vnl_vector(), vtkvec);
+  m_VtkAbstractTransform->TransformVectorAtPoint(vtkpt, vtkvec, vtkvec);
+  mitk::vtk2vnl(vtkvec, outputvector.Get_vnl_vector());
+  return outputvector;
+}
+
+
+// Transform a vnl_vector_fixed
+template<class TScalarType>
+typename itk::VtkAbstractTransform<TScalarType>::OutputVnlVectorType
+itk::VtkAbstractTransform<TScalarType>::
+TransformVector(const InputVnlVectorType &vect) const 
+{
+  assert(m_VtkAbstractTransform!=NULL);
+
+  OutputVnlVectorType outputvector;
+  float vtkpt[3]={0,0,0};
+  float vtkvec[3];
+  mitk::vnl2vtk(vect, vtkvec);
+  m_VtkAbstractTransform->TransformVectorAtPoint(vtkpt, vtkvec, vtkvec);
+  mitk::vtk2vnl(vtkvec, outputvector);
+  return outputvector;
+}
+
+// Transform a CovariantVector
+template<class TScalarType>
+typename itk::VtkAbstractTransform<TScalarType>::OutputCovariantVectorType
+itk::VtkAbstractTransform<TScalarType>::
+TransformCovariantVector(const InputCovariantVectorType &vec) const 
+{
+  itkExceptionMacro( << "implement before using!" );
+  OutputCovariantVectorType  result;    // Converted vector
+
+//  for (unsigned int i = 0; i < NDimensions; i++) 
+//    {
+//    result[i] = NumericTraits<ScalarType>::Zero;
+//    for (unsigned int j = 0; j < NDimensions; j++) 
+//      {
+//      result[i] += m_Inverse[j][i]*vec[j]; // Inverse transposed
+//      }
+//    }
+  return result;
+}
+
+// Back transform a point
+template<class TScalarType>
+typename VtkAbstractTransform<TScalarType>::InputPointType
+itk::VtkAbstractTransform<TScalarType>::
+BackTransform(const OutputPointType &point) const 
+{
+  assert(m_VtkAbstractTransform!=NULL);
+
+  OutputPointType outputpoint;
+  float vtkpt[3];
+  mitk::itk2vtk(point, vtkpt);
+  m_InverseVtkAbstractTransform->TransformPoint(vtkpt, vtkpt);
+  mitk::vtk2itk(vtkpt, outputpoint);
+  return outputpoint;
+}
+
+// Back transform a vector
+template<class TScalarType>
+typename VtkAbstractTransform<TScalarType>::InputVectorType
+itk::VtkAbstractTransform<TScalarType>::
+BackTransform(const OutputVectorType &vect ) const 
+{
+  assert(m_VtkAbstractTransform!=NULL);
+
+  OutputVectorType outputvector;
+  float vtkpt[3]={0,0,0};
+  float vtkvec[3];
+  mitk::itk2vtk(vect, vtkvec);
+  m_InverseVtkAbstractTransform->TransformVectorAtPoint(vtkpt, vtkvec, vtkvec);
+  mitk::vtk2itk(vtkvec, outputvector);
+  return outputvector;
+}
+
+// Back transform a vnl_vector
+template<class TScalarType>
+typename VtkAbstractTransform<TScalarType>::InputVnlVectorType
+itk::VtkAbstractTransform<TScalarType>::
+BackTransform(const OutputVnlVectorType &vect ) const 
+{
+  assert(m_InverseVtkAbstractTransform!=NULL);
+
+  OutputVnlVectorType outputvector;
+  float vtkpt[3]={0,0,0};
+  float vtkvec[3];
+  mitk::itk2vtk(vect, vtkvec);
+  m_InverseVtkAbstractTransform->TransformVectorAtPoint(vtkpt, vtkvec, vtkvec);
+  mitk::vtk2vnl(vtkvec, outputvector);
+  return outputvector;
+}
+
+// Back Transform a CovariantVector
+template<class TScalarType>
+typename VtkAbstractTransform<TScalarType>::InputCovariantVectorType
+itk::VtkAbstractTransform<TScalarType>::
+BackTransform(const OutputCovariantVectorType &vec) const 
+{
+  itkExceptionMacro( << "implement before using!" );
+//  for (unsigned int i = 0; i < NDimensions; i++) 
+//    {
+//    result[i] = NumericTraits<ScalarType>::Zero;
+//    for (unsigned int j = 0; j < NDimensions; j++) 
+//      {
+//      result[i] += m_Matrix[j][i]*vec[j]; // Direct matrix transposed
+//      }
+//    }
+  return vec;
+}
+
+template<class TScalarType>
+unsigned long 
+itk::VtkAbstractTransform<TScalarType>::GetMTime() const
+{
+  if(m_LastVtkAbstractTransformTimeStamp<m_VtkAbstractTransform->GetMTime())
+  {
+    m_LastVtkAbstractTransformTimeStamp=m_VtkAbstractTransform->GetMTime();
+    Modified();
+  }
+
+  return Superclass::GetMTime();
+}
+
+} // namespace itk

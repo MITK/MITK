@@ -17,61 +17,64 @@ class vtkLight;
 class vtkLightKit;
 
 namespace mitk {
-
-class VtkRenderWindow;
-
 //##ModelId=3C6E9AD90215
 //##Documentation
 //## @brief OpenGL-based implementation of BaseRenderer
 //## @ingroup Renderer
 class OpenGLRenderer : public BaseRenderer
 {
-  public:
-    /** Standard class typedefs. */
-    //##ModelId=3E691CC70250
-    mitkClassMacro(OpenGLRenderer,BaseRenderer);
+public:
+  /** Standard class typedefs. */
+  //##ModelId=3E691CC70250
+  mitkClassMacro(OpenGLRenderer,BaseRenderer);
 
-    /** Method for creation through the object factory. */
-    itkNewMacro(Self);
-    
-    //##ModelId=3E3D28AB0018
-    void SetData(mitk::DataTreeIterator* iterator);
+  /** Method for creation through the object factory. */
+  itkNewMacro(Self);
 
-    //##ModelId=3E330D260255
-    virtual void Update();
+  //##ModelId=3E3D28AB0018
+  void SetData(mitk::DataTreeIterator* iterator);
 
-    //##ModelId=3E330D2903CC
-    //##Documentation
-    //## @brief Do the rendering. 
-    //## If necessary, Update() and UpdateVtkActors() is called first.
-    virtual void Render();
+  virtual void Update(mitk::DataTreeNode* datatreenode);
 
-    //##ModelId=3E3314B0005C
-    virtual void SetWindowId(void *id);
+  //##ModelId=3E330D260255
+  virtual void Update();
 
-    //##ModelId=3EF59AD20235
-    virtual void SetMapperID(const MapperSlotId mapperId);
+  //##ModelId=3E330D2903CC
+  //##Documentation
+  //## @brief Do the rendering. 
+  //## If necessary, Update() and UpdateVtkActors() is called first.
+  virtual void Render();
 
-    //##ModelId=3EF162760271
-    virtual void MakeCurrent();
+  //##ModelId=3EF59AD20235
+  virtual void SetMapperID(const MapperSlotId mapperId);
 
-    //##ModelId=3E3799420227
-    virtual void InitSize(int w, int h);
+  //##ModelId=3EF162760271
+  virtual void MakeCurrent();
 
-    
+  //##ModelId=3E3799420227
+  virtual void InitSize(int w, int h);
 
-    //##ModelId=3ED91D060305
-    //##Documentation
-    //## @brief Update the vtk-based-mappers by adding the produced actors to the m_VtkRenderer.
-    //## 
-    //## @warning Always call Update() before, which checks, whether there are vtk-based-mappers.
-	virtual void UpdateIncludingVtkActors();
+  //##ModelId=3ED91D060305
+  //##Documentation
+  //## @brief Update the vtk-based-mappers by adding the produced actors to the m_VtkRenderer.
+  //## 
+  //## @warning Always call Update() before, which checks, whether there are vtk-based-mappers.
+  virtual void UpdateIncludingVtkActors();
 
-    VtkRenderWindow*  GetVtkRenderWindow(){ return  m_MitkVtkRenderWindow;}
-    
-    //##Documentation
-    //## @brief returns the vtk-renderer associated with the OpenGL renderer.
-    vtkRenderer * GetVtkRenderer(){return m_VtkRenderer;};
+  inline VtkRenderWindow* GetVtkRenderWindow()
+  { 
+    if(m_RenderWindow!=NULL)
+      return m_RenderWindow->GetVtkRenderWindow();
+    else
+      return NULL;
+  }
+
+  //##Documentation
+  //## @brief returns the vtk-renderer associated with the OpenGL renderer.
+  inline vtkRenderer * GetVtkRenderer()
+  {
+    return m_VtkRenderer;
+  };
 
   //##Documentation
   //## @brief Updates the contents of all renderwindows
@@ -92,53 +95,50 @@ class OpenGLRenderer : public BaseRenderer
     }
   }
 protected:
-    //##ModelId=3E33145B005A
-    virtual void Paint();
+  //##ModelId=3E33145B005A
+  virtual void Paint();
 
-    //##ModelId=3E33145B0096
-    virtual void Initialize();
+  //##ModelId=3E33145B0096
+  virtual void Initialize();
 
-    //##ModelId=3E33145B00D2
-    virtual void Resize(int w, int h);
+  //##ModelId=3E33145B00D2
+  virtual void Resize(int w, int h);
 
-    //##ModelId=3E33145B0226
-    virtual void InitRenderer(mitk::RenderWindow* renderwindow);
+  //##ModelId=3E33145B0226
+  virtual void InitRenderer(mitk::RenderWindow* renderwindow);
 
-    //##ModelId=3E33ECF301AD
-    OpenGLRenderer();
+  //##ModelId=3E33ECF301AD
+  OpenGLRenderer();
 
-    //##ModelId=3E33ECF301B7
-    virtual ~OpenGLRenderer();
+  //##ModelId=3E33ECF301B7
+  virtual ~OpenGLRenderer();
 
-    virtual void DataChangedEvent(const itk::Object *caller, const itk::EventObject &event);
+  virtual void DataChangedEvent(const itk::Object *caller, const itk::EventObject &event);
 
-    itk::MemberCommand<mitk::OpenGLRenderer>::Pointer m_DataChangedCommand;
+  itk::MemberCommand<mitk::OpenGLRenderer>::Pointer m_DataChangedCommand;
 
-  private:
-    //##ModelId=3E33145A0315
-    bool m_InitNeeded;
+private:
+  //##ModelId=3E33145A0315
+  bool m_InitNeeded;
 
-    //##ModelId=3E33145A0347
-    bool m_ResizeNeeded;
+  //##ModelId=3E33145A0347
+  bool m_ResizeNeeded;
 
-    //##ModelId=3EF1627601DB
-    bool m_VtkMapperPresent;
+  //##ModelId=3EF1627601DB
+  bool m_VtkMapperPresent;
 
-    //##ModelId=3E33145A0383
-    vtkRenderer* m_VtkRenderer;
+  //##ModelId=3E33145A0383
+  vtkRenderer* m_VtkRenderer;
 
-    //##ModelId=3E33145A03BF
-    VtkRenderWindow* m_MitkVtkRenderWindow;
+  //##ModelId=3E33145B001E
+  vtkLight* m_Light;
 
-    //##ModelId=3E33145B001E
-    vtkLight* m_Light;
+  //##ModelId=3ED91D0602E6
+  vtkLightKit* m_LightKit;
 
-    //##ModelId=3ED91D0602E6
-    vtkLightKit* m_LightKit;
-
-    //##Documentation
-    //## @brief Timestamp of last call of UpdateVtkActors().
-    unsigned long m_LastUpdateVtkActorsTime;
+  //##Documentation
+  //## @brief Timestamp of last call of UpdateVtkActors().
+  unsigned long m_LastUpdateVtkActorsTime;
 };
 
 } // namespace mitk

@@ -7,12 +7,7 @@
 #include <vtkTransform.h>
 #include "mitkStringProperty.h"
 
-
-#ifdef WIN32
-	#include <glut.h>
-#else
-	#include <GL/glut.h>
-#endif
+#include <GL/glut.h>
 	
 //##ModelId=3F0189F00378
 mitk::PointSetMapper2D::PointSetMapper2D()
@@ -73,24 +68,25 @@ void mitk::PointSetMapper2D::Paint(mitk::BaseRenderer * renderer)
       {
           mitk::Point3D p, projected_p;
           float vtkp[3];
-          p.x= it->Value()[0];
-          p.y= it->Value()[1];
-          p.z= it->Value()[2];
-          vec2vtk(p, vtkp);
+
+          itk2vtk(it->Value(), vtkp);
           transform->TransformPoint(vtkp, vtkp);
-          vtk2vec(vtkp,p);
+          vtk2itk(vtkp,p);
 
           displayGeometry->Project(p, projected_p);
-          if(Vector3D(p-projected_p).length()<2.0)
+          Vector3D diff=p-projected_p;
+          if(diff.GetSquaredNorm()<4.0)
           {
               Point2D pt2d, tmp;
               displayGeometry->Map(projected_p, pt2d);
               displayGeometry->MMToDisplay(pt2d, pt2d);
 
-              Point2D horz(5,0),vert(0,5);
+              Vector2D horz,vert;
+              horz[0]=8; horz[1]=0;
+              vert[0]=0; vert[1]=8;
                               
 							// now paint text if available
-              glRasterPos2f ( pt2d.x + 5, pt2d.y + 5);
+              glRasterPos2f ( pt2d[0] + 5, pt2d[1] + 5);
 							if (dynamic_cast<mitk::StringProperty *>(this->GetDataTreeNode()->GetProperty("label").GetPointer()) == NULL)
 							{}
 							else {
@@ -116,21 +112,19 @@ void mitk::PointSetMapper2D::Paint(mitk::BaseRenderer * renderer)
                 float currCol[4];
                 glGetFloatv(GL_CURRENT_COLOR,currCol);
 
-                horz.x=8;
-                vert.y=8;
                 glColor3f(colorSel[0],colorSel[1],colorSel[2]);//red
 
                 //a diamond around the point
                 glBegin (GL_LINE_LOOP);
-                    tmp=pt2d-horz;      glVertex2fv(&tmp.x);
-                    tmp=pt2d+vert;      glVertex2fv(&tmp.x);
-                    tmp=pt2d+horz;			glVertex2fv(&tmp.x);
-                    tmp=pt2d-vert;      glVertex2fv(&tmp.x);
+                    tmp=pt2d-horz;      glVertex2fv(&tmp[0]);
+                    tmp=pt2d+vert;      glVertex2fv(&tmp[0]);
+                    tmp=pt2d+horz;			glVertex2fv(&tmp[0]);
+                    tmp=pt2d-vert;      glVertex2fv(&tmp[0]);
                 glEnd ();
 
                 //the actual point
                 glBegin (GL_POINTS);
-                  tmp=pt2d;             glVertex2fv(&tmp.x);
+                  tmp=pt2d;             glVertex2fv(&tmp[0]);
                 glEnd ();
                 
                 
@@ -140,10 +134,10 @@ void mitk::PointSetMapper2D::Paint(mitk::BaseRenderer * renderer)
               else
               {
 								glBegin (GL_LINES);
-                    tmp=pt2d-horz;      glVertex2fv(&tmp.x);
-                    tmp=pt2d+horz;      glVertex2fv(&tmp.x);
-                    tmp=pt2d-vert;      glVertex2fv(&tmp.x);
-                    tmp=pt2d+vert;      glVertex2fv(&tmp.x);
+                    tmp=pt2d-horz;      glVertex2fv(&tmp[0]);
+                    tmp=pt2d+horz;      glVertex2fv(&tmp[0]);
+                    tmp=pt2d-vert;      glVertex2fv(&tmp[0]);
+                    tmp=pt2d+vert;      glVertex2fv(&tmp[0]);
                 glEnd ();
               }
           }

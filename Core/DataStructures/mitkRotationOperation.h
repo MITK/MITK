@@ -10,16 +10,16 @@ namespace mitk {
 class RotationOperation : public Operation
 {
 public:
-  RotationOperation(OperationType operationType, ITKPoint3D pointOfRotation, ITKVector3D vectorOfRotation, ScalarType angleOfRotation);
+  RotationOperation(OperationType operationType, Point3D pointOfRotation, Vector3D vectorOfRotation, ScalarType angleOfRotation);
   virtual ~RotationOperation(void);
   virtual ScalarType GetAngleOfRotation();
-  virtual const ITKPoint3D GetCenterOfRotation();
-  virtual const ITKVector3D GetVectorOfRotation();
+  virtual const Point3D GetCenterOfRotation();
+  virtual const Vector3D GetVectorOfRotation();
 
 protected:
   ScalarType m_AngleOfRotation;
-  ITKPoint3D m_PointOfRotation;
-  ITKVector3D m_VectorOfRotation;
+  Point3D m_PointOfRotation;
+  Vector3D m_VectorOfRotation;
 };
 
 } // namespace mitk

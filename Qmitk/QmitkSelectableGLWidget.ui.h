@@ -8,7 +8,7 @@
 *****************************************************************************/
 
 void QmitkSelectableGLWidget::init()
-{	
+{
     QHBoxLayout *hlayout;
     hlayout=new QHBoxLayout(container);
     

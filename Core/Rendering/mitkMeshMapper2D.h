@@ -14,7 +14,7 @@ class BaseRenderer;
 //##Documentation
 //## @brief OpenGL-based mapper to display a mesh in a 2D window
 //## @ingroup Mapper
-//## @todo implement for AbstractTransformGeometry.
+//## @todo implement for VtkAbstractTransformGeometry.
 class MeshMapper2D : public GLMapper2D
 {
 public:

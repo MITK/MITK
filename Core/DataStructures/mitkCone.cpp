@@ -22,7 +22,7 @@ mitk::Cone::~Cone()
 {
 }
 
-bool mitk::Cone::IsInside(ITKPoint3D worldPoint)
+bool mitk::Cone::IsInside(Point3D worldPoint)
 {
   // transform point from world to object coordinates
   ScalarType p[4];

@@ -56,29 +56,19 @@ mitk::BoundingBox::Pointer mitk::DataTree::ComputeBoundingBox(mitk::DataTreeIter
   mitk::BoundingBox::Pointer m_BoundingBox=mitk::BoundingBox::New();
   mitk::BoundingBox::PointsContainer::Pointer pointscontainer=mitk::BoundingBox::PointsContainer::New();
 
-  mitk::ScalarType nullpoint[]={0,0,0};
-  mitk::BoundingBox::PointType p(nullpoint);
-
   mitk::BoundingBox::PointIdentifier pointid=0;
 
   while (_it->hasNext())
   {
     _it->next();
     mitk::DataTreeNode::Pointer node = _it->get();
+    assert(node.IsNotNull());
     if (node->GetData() != NULL && node->GetData()->GetUpdatedGeometry() != NULL && node->IsOn(boolPropertyKey, renderer) && node->IsOn(boolPropertyKey2, renderer)) 
     {
-      mitk::BoundingBox::ConstPointer nextBoundingBox = node->GetData()->GetGeometry()->GetBoundingBox();
-      const mitk::BoundingBox::PointsContainer * nextPoints = nextBoundingBox->GetPoints();
-      if(nextPoints!=NULL)
-      {
-        mitk::BoundingBox::PointsContainer::ConstIterator pointsIt = nextPoints->Begin();
-
-        while (pointsIt != nextPoints->End() )
-        {
-          pointscontainer->InsertElement( pointid++, pointsIt->Value());
-          ++pointsIt;
-        }
-      }
+      const Geometry3D* geometry = node->GetData()->GetUpdatedGeometry();
+      unsigned char i;
+      for(i=0; i<8; ++i)
+        pointscontainer->InsertElement( pointid++, geometry->GetCornerPoint(i));
     }
   }
 

@@ -31,8 +31,7 @@ bool mitk::CoordinateSupplier::ExecuteAction(Action* action, mitk::StateEvent co
       {
         case AcNEWPOINT:
         {
-			    mitk::Point3D newPoint = posEvent->GetWorldPosition();
-          vm2itk(newPoint, m_OldPoint);
+          m_OldPoint = posEvent->GetWorldPosition();
 
 			    PointOperation* doOp = new mitk::PointOperation(OpADD, m_OldPoint, 0);
 			    //Undo
@@ -50,8 +49,7 @@ bool mitk::CoordinateSupplier::ExecuteAction(Action* action, mitk::StateEvent co
         }
         case AcINITMOVEMENT:
         {//move the point to the coordinate //not used, cause same to MovePoint... check xml-file
-          mitk::ITKPoint3D movePoint;
-          vm2itk(posEvent->GetWorldPosition(), movePoint);
+          mitk::Point3D movePoint = posEvent->GetWorldPosition();
 
           PointOperation* doOp = new mitk::PointOperation(OpMOVE, movePoint, 0);
           //execute the Operation
@@ -61,8 +59,7 @@ bool mitk::CoordinateSupplier::ExecuteAction(Action* action, mitk::StateEvent co
         }
         case AcMOVEPOINT:
         {
-          mitk::ITKPoint3D movePoint;
-          vm2itk(posEvent->GetWorldPosition(), movePoint);
+          mitk::Point3D movePoint = posEvent->GetWorldPosition();
 
           PointOperation* doOp = new mitk::PointOperation(OpMOVE, movePoint, 0);
           //execute the Operation
@@ -74,9 +71,9 @@ bool mitk::CoordinateSupplier::ExecuteAction(Action* action, mitk::StateEvent co
         {/*finishes a Movement from the coordinate supplier: 
           gets the lastpoint from the undolist and writes an undo-operation so 
           that the movement of the coordinatesupplier is undoable.*/
-          mitk::ITKPoint3D movePoint, oldMovePoint;
-          oldMovePoint.Fill(0);
-          vm2itk(posEvent->GetWorldPosition(), movePoint);
+          mitk::Point3D movePoint = posEvent->GetWorldPosition();
+          mitk::Point3D oldMovePoint; oldMovePoint.Fill(0);
+
           PointOperation* doOp = new mitk::PointOperation(OpMOVE, movePoint, 0);
           if (m_UndoEnabled )
           {

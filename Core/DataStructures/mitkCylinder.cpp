@@ -21,7 +21,7 @@ mitk::Cylinder::~Cylinder()
 
 }
 
-bool mitk::Cylinder::IsInside(ITKPoint3D worldPoint)
+bool mitk::Cylinder::IsInside(Point3D worldPoint)
 {
   // transform point from world to object coordinates
   ScalarType p[4];
@@ -30,7 +30,7 @@ bool mitk::Cylinder::IsInside(ITKPoint3D worldPoint)
   p[2] = worldPoint[2];
   p[3] = 1;
   m_Geometry3D->GetVtkTransform()->GetInverse()->TransformPoint(p, p);
-	mitk::ITKPoint3D itkPoint;
+	mitk::Point3D itkPoint;
 
   mitk::ScalarType v =  pow(p[0], 2) + pow(p[2], 2);
   bool retval = (v <= 1) && (p[1] >= -1) && (p[1] <= 1);

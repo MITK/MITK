@@ -63,11 +63,6 @@ public:
   //## @brief Do the rendering. 
   virtual void Render() = 0;
 
-  //##ModelId=3E3314720003
-  //##Documentation
-  //## @brief Set the window id of the window to draw into.
-  virtual void SetWindowId(void *id);
-
   //##ModelId=3EF1627503C4
   //##Documentation
   //## @brief Makes the widget, this renderer is drawing into, the current widget for 

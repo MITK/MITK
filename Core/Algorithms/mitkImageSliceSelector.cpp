@@ -11,7 +11,7 @@ void mitk::ImageSliceSelector::GenerateOutputInformation()
 	output->Initialize(input->GetPixelType(), 2, input->GetDimensions());
 
   // initialize geometry
-  output->SetGeometry(input->GetSlicedGeometry(m_TimeNr)->GetGeometry2D(m_SliceNr)->Clone());
+  output->SetGeometry(dynamic_cast<Geometry3D*>(input->GetSlicedGeometry(m_TimeNr)->GetGeometry2D(m_SliceNr)->Clone().GetPointer()));
   output->SetPropertyList(input->GetPropertyList()->Clone());
 }
 

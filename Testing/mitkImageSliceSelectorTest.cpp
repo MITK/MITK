@@ -39,7 +39,9 @@ int mitkImageSliceSelectorTest(int argc, char* argv[])
   int i, size = _ipPicSize(picslice);
   char * p1 = (char*)slice->GetPic()->data;
   char * p2 = (char*)picslice->data;
-
+  //picslice->info->write_protect=ipFalse;
+  //ipPicPut("C:\\1aaaaIPPIC.pic", picslice);
+  //ipPicPut("C:\\1aaaaSEL.pic", slice->GetPic());
   for(i=0; i<size; ++i, ++p1, ++p2)
   {
     if((*p1) != (*p2))
@@ -58,7 +60,7 @@ int mitkImageSliceSelectorTest(int argc, char* argv[])
 	  mitk::CylindricToCartesianFilter::Pointer cyl2cart = mitk::CylindricToCartesianFilter::New();
       cyl2cart->SetInput(reader->GetOutput());
       //the output size of this filter is smaller than the of the input!!
-      cyl2cart->SetTargetXSize( 128 );
+      cyl2cart->SetTargetXSize( 64 );
 
     //Use the same slice-selector again, this time to take a slice of the filtered image
       //which is smaller than the one of the old input!!

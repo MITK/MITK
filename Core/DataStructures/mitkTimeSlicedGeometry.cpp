@@ -17,7 +17,7 @@ mitk::Geometry3D* mitk::TimeSlicedGeometry::GetGeometry3D(int t) const
       assert(firstgeometry != NULL);
 
       mitk::Geometry3D::Pointer requestedgeometry;
-      requestedgeometry = firstgeometry->Clone();
+      requestedgeometry = dynamic_cast<Geometry3D*>(firstgeometry->Clone().GetPointer());
 
       TimeBounds timebounds = requestedgeometry->GetTimeBoundsInMS();
       if(timebounds[1]<ScalarTypeNumericTraits::max())
@@ -60,11 +60,6 @@ bool mitk::TimeSlicedGeometry::SetGeometry3D(mitk::Geometry3D* geometry3D, int t
   if(IsValidTime(t))
   {
     m_Geometry3Ds[t]=geometry3D;
-    if((t==0) && (geometry3D!=NULL))
-    {
-      m_TransformUnitsToMM = geometry3D->GetTransformUnitsToMM();
-      m_TransformMMToUnits.invert(m_TransformUnitsToMM);
-    }
     return true;
   }
   return false;
@@ -97,6 +92,8 @@ mitk::ScalarType mitk::TimeSlicedGeometry::TimeStepToMS(int timestep) const
 
 void mitk::TimeSlicedGeometry::Initialize(unsigned int timeSteps)
 {
+  Superclass::Initialize();
+
   m_TimeSteps = timeSteps;
   
   m_Geometry3Ds.clear();  
@@ -105,6 +102,22 @@ void mitk::TimeSlicedGeometry::Initialize(unsigned int timeSteps)
  
   m_Geometry3Ds.reserve(m_TimeSteps);
   m_Geometry3Ds.assign(m_TimeSteps, gnull);
+}
+
+void mitk::TimeSlicedGeometry::InitializeEvenlyTimed(mitk::Geometry3D* geometry3D, unsigned int timeSteps)
+{
+  assert(geometry3D!=NULL);
+
+  Initialize(timeSteps);
+
+  AffineTransform3D::Pointer transform = AffineTransform3D::New();
+  transform->SetMatrix(geometry3D->GetUnitsToMMAffineTransform()->GetMatrix());
+  transform->SetOffset(geometry3D->GetUnitsToMMAffineTransform()->GetOffset());
+  SetUnitsToMMAffineTransform(transform);
+
+  SetBounds(geometry3D->GetBounds());
+  SetGeometry3D(geometry3D, 0);
+  SetEvenlyTimed();
 }
 
 mitk::TimeSlicedGeometry::TimeSlicedGeometry() : m_TimeSteps(0), m_EvenlyTimed(false)
@@ -169,13 +182,20 @@ bool mitk::TimeSlicedGeometry::IsValidTime(int t) const
   return (t>=0) && (t< (int)m_TimeSteps);
 }
 
-mitk::Geometry3D::Pointer mitk::TimeSlicedGeometry::Clone() const
+mitk::AffineGeometryFrame3D::Pointer mitk::TimeSlicedGeometry::Clone() const
 {
-  mitk::TimeSlicedGeometry::Pointer newGeometry = TimeSlicedGeometry::New();
+  Self::Pointer newGeometry = Self::New();
   newGeometry->Initialize(m_TimeSteps);
-  newGeometry->GetVtkTransform()->SetMatrix(m_Transform->GetMatrix());
-  //newGeometry->GetRelativeTransform()->SetMatrix(m_RelativeTransform->GetMatrix());
+  InitializeGeometry(newGeometry);
+  return newGeometry.GetPointer();
+}
+
+void mitk::TimeSlicedGeometry::InitializeGeometry(Self * newGeometry) const
+{
+  Superclass::InitializeGeometry(newGeometry);
+
   newGeometry->SetEvenlyTimed(m_EvenlyTimed);
+
   unsigned int t;
   for(t=0; t<m_TimeSteps; ++t)
   {
@@ -185,8 +205,7 @@ mitk::Geometry3D::Pointer mitk::TimeSlicedGeometry::Clone() const
     }
     else
     {
-      newGeometry->SetGeometry3D(m_Geometry3Ds[t]->Clone(), t);
+      newGeometry->SetGeometry3D(dynamic_cast<Geometry3D*>(m_Geometry3Ds[t]->Clone().GetPointer()), t);
     }
   }
-  return newGeometry.GetPointer();
 }

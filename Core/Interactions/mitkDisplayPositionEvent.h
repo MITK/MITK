@@ -2,7 +2,6 @@
 #define DISPLAYPOSITIONEVENT_H_HEADER_INCLUDED_C184F366
 
 #include "mitkCommon.h"
-#include <vecmath.h>
 #include "mitkEvent.h"
 #include "mitkVector.h"
 
@@ -27,7 +26,7 @@ class DisplayPositionEvent : public Event
     DisplayPositionEvent(mitk::BaseRenderer* sender, int type, int button, int buttonState, int key, const mitk::Point2D& displPosition);
 
     const Point2D& GetDisplayPosition() const;
-    void SetDisplayPosition(const mitk::Point2D& displPosition) { m_DisplayPosition = displPosition; }    
+    void SetDisplayPosition(const mitk::Point2D& displPosition) { m_DisplayPosition = displPosition; }
   private:
     Point2D m_DisplayPosition;
 };

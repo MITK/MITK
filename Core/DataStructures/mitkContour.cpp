@@ -13,7 +13,7 @@ m_Closed ( true )
 mitk::Contour::~Contour()
 {}
 
-void mitk::Contour::AddVertex(mitk::ITKPoint3D newPoint)
+void mitk::Contour::AddVertex(mitk::Point3D newPoint)
 {
   BoundingBoxType::PointType p;
   p.CastFrom(newPoint);
@@ -46,7 +46,7 @@ void mitk::Contour::UpdateOutputInformation()
     mitkBounds[4] = tmp[4];
     mitkBounds[5] = tmp[5];
   }
-  m_Geometry3D->SetBoundingBox(mitkBounds);
+  m_Geometry3D->SetBounds(mitkBounds);
 }
 
 void mitk::Contour::SetRequestedRegionToLargestPossibleRegion()

@@ -16,7 +16,7 @@ int mitkContourTest(int argc, char* argv[])
   } 
 
   std::cout << "Testing mitk::Contour::AddVertex(): ";
-  mitk::ITKPoint3D p;
+  mitk::Point3D p;
   p.Fill(0);
   contour->AddVertex(p);
   p.Fill(1);

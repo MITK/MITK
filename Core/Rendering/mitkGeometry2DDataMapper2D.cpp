@@ -12,6 +12,8 @@
 #include "mitkGeometry2DDataToSurfaceDataFilter.h"
 #include "mitkSurfaceDataMapper2D.h"
 
+#include "GL/glu.h"
+
 //##ModelId=3E639E100243
 mitk::Geometry2DDataMapper2D::Geometry2DDataMapper2D() : m_SurfaceMapper(NULL)
 {
@@ -59,16 +61,11 @@ void mitk::Geometry2DDataMapper2D::Paint(mitk::BaseRenderer * renderer)
       mitk::DisplayGeometry::Pointer displayGeometry = renderer->GetDisplayGeometry();
       assert(displayGeometry);
       
-      //we want to take the transform of the datatreenode into account. Thus, copy
-      //the geometry and transform it with the transform of the datatreenode.
-      PlaneGeometry::Pointer planeGeometry = PlaneGeometry::New();
-      planeGeometry->SetPlaneView(input_planeGeometry->GetPlaneView());
-      planeGeometry->TransformGeometry(GetDataTreeNode()->GetVtkTransform());
-      
       //calculate intersection of the plane data with the border of the world geometry rectangle
-      Point2D lineFrom;
+      //float aaaa[2]={10,11};
+      Point2D lineFrom;// =(float[2]){10,11}; 
       Point2D lineTo;
-      bool intersecting = worldPlaneGeometry->GetPlaneView().intersectPlane2D( planeGeometry->GetPlaneView(), lineFrom, lineTo );
+      bool intersecting = worldPlaneGeometry->IntersectWithPlane2D( input_planeGeometry, lineFrom, lineTo );
       
       if(intersecting)
       {
@@ -78,17 +75,17 @@ void mitk::Geometry2DDataMapper2D::Paint(mitk::BaseRenderer * renderer)
         
         //convert display coordinates ( (0,0) is top-left ) in GL coordinates ( (0,0) is bottom-left )
         //                float toGL=//displayGeometry->GetDisplayHeight(); displayGeometry->GetCurrentWorldGeometry2D()->GetHeightInUnits();
-        //                lineFrom.y=toGL-lineFrom.y;
-        //                lineTo.y=toGL-lineTo.y;
+        //                lineFrom[1]=toGL-lineFrom[1];
+        //                lineTo[1]=toGL-lineTo[1];
         
         //apply color and opacity read from the PropertyList
         ApplyProperties(renderer);
-        
+
         //draw
         glBegin (GL_LINE_LOOP);
-        glVertex2fv(&lineFrom.x);
-        glVertex2fv(&lineTo.x);
-        glVertex2fv(&lineFrom.x);
+        glVertex2f(lineFrom[0],lineFrom[1]);
+        glVertex2f(lineTo[0],lineTo[1]);
+        glVertex2f(lineFrom[0],lineFrom[1]);
         glEnd ();
       }
     }
@@ -110,10 +107,18 @@ void mitk::Geometry2DDataMapper2D::Paint(mitk::BaseRenderer * renderer)
       surfaceCreator->SetInput(input);
       
       int res;
+      bool usegeometryparametricbounds=true;
       if(GetDataTreeNode()->GetIntProperty("xresolution", res, renderer))
+      {
         surfaceCreator->SetXResolution(res);
+        usegeometryparametricbounds=false;        
+      }
       if(GetDataTreeNode()->GetIntProperty("yresolution", res, renderer))
+      {
         surfaceCreator->SetYResolution(res);
+        usegeometryparametricbounds=false;        
+      }
+      surfaceCreator->SetUseGeometryParametricBounds(usegeometryparametricbounds);
 
       surfaceCreator->Update(); //@FIXME ohne das crash
       

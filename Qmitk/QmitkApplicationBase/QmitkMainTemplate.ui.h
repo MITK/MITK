@@ -528,9 +528,10 @@ void QmitkMainTemplate::changeToWidget3Layout()
 
 void QmitkMainTemplate::FullScreenMode(bool fullscreen)
 {
-    if (fullscreen) showFullScreen();
-    else showNormal();
-    
+  if (fullscreen)
+    showFullScreen();
+  else
+    showNormal();
 }
 
 void QmitkMainTemplate::setXMLFallBackPath( const char * anXmlFallBackPath )

@@ -6,6 +6,9 @@
 #include "mitkBaseRenderer.h"
 
 namespace mitk {
+
+  class VtkRenderWindow;
+
 //##ModelId=3E3ECC1201B2
 //##Documentation
 //## @brief Abstract window/widget class used for rendering
@@ -16,10 +19,13 @@ public:
   typedef std::set<RenderWindow*> RenderWindowSet;
 
   //##ModelId=3E3ECC13036D
-  RenderWindow(const char *name, mitk::BaseRenderer* renderer = NULL)  : m_Name(name), m_Renderer(renderer)
+  RenderWindow(const char *name, mitk::BaseRenderer* renderer = NULL);
+  virtual ~RenderWindow();
+
+  inline VtkRenderWindow* GetVtkRenderWindow()
   {
-    instances.insert(this);
-  };
+    return m_MitkVtkRenderWindow;
+  }
 
   //##ModelId=3EF1627602DF
   //##Documentation
@@ -27,7 +33,7 @@ public:
   //##
   //## Needed for example for OpenGL, i.e. makes the widget's rendering 
   //## context the current OpenGL rendering context.
-  virtual void MakeCurrent() = 0;
+  virtual void MakeCurrent();
 
   //##Documentation
   //## @brief  Swaps the screen contents with an off-screen buffer. 
@@ -35,7 +41,7 @@ public:
   //## This only works if the widget's format specifies double buffer mode.
   //## Normally, there is no need to explicitly call this function because it is done automatically 
   //## after each widget repaint, i.e. each time after paintGL() has been executed. 
-  virtual void SwapBuffers () = 0;
+  virtual void SwapBuffers ();
 
   //##Documentation
   //## @brief Returns @a true if display list sharing with another window
@@ -43,7 +49,7 @@ public:
   //## 
   //## For example, a OpenGL system may fail to provide display list sharing 
   //## if the two windows use different formats.
-  virtual bool IsSharing () const = 0;
+  virtual bool IsSharing () const;
 
   //##ModelId=3EF59AD202D5
   //##Documentation
@@ -51,13 +57,13 @@ public:
   //##
   //## Repainting may be scheduled as a paint event for processing o optimize for 
   //## more speed and less flicker than a call to Repaint() does.
-  virtual void Update() = 0;
+  virtual void Update();
 
   //##Documentation
   //## @brief Immediately repaints the contents of the renderwindow
   //##
   //## Renderwindow will be updated before repainting. 
-  virtual void Repaint() = 0;
+  virtual void Repaint();
 
   //##Documentation
   //## @brief Updates the contents of all renderwindows
@@ -70,13 +76,14 @@ public:
     return instances;
   } 
 
-  const char * GetName()
+  const char * GetName() const
   {
     return m_Name.c_str();
   }
 
   //## @brief return the first RenderWindow created with the given name 
-  static const RenderWindow* GetByName(const std::string& name) {
+  static const RenderWindow* GetByName(const std::string& name)
+  {
     for (RenderWindowSet::const_iterator iter = instances.begin();iter != instances.end();iter++) {
       if (name == (*iter)->m_Name) {
         return *iter;
@@ -84,10 +91,6 @@ public:
     }
     return NULL;
   }   
-  virtual ~RenderWindow() 
-  {
-    instances.erase(this);
-  }
 
   //##Documentation
   //## TEMPORARY FOR IIL COMPATIBILITY - DO NOT USE!!!
@@ -97,11 +100,24 @@ public:
   virtual bool isVisible (const float, const float,
     const float, const float) {return true;}
 
-  virtual void InitRenderer() = 0;
+  virtual void InitRenderer();
 
-  virtual BaseRenderer::Pointer GetRenderer() const {return m_Renderer;} 
+  //##Documentation
+  //## @brief Set the window id of the window to draw into.
+  virtual void SetWindowId(void *id);
+
+  //##Documentation
+  //## @brief Set the size of the window
+  void SetSize(int w, int h);
+    
+  inline BaseRenderer* GetRenderer() const 
+  {
+    return m_Renderer.GetPointer();
+  } 
 
 protected:
+  VtkRenderWindow* m_MitkVtkRenderWindow;
+
   static RenderWindowSet instances;
   std::string m_Name;
   

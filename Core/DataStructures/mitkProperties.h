@@ -2,7 +2,7 @@
 #define MITKPROPERTIES_H_HEADER_INCLUDED
 
 #include "mitkGenericProperty.h"
-#include "vecmath.h"
+#include "mitkVector.h"
 #include <string>
 
 namespace mitk {
@@ -19,17 +19,13 @@ namespace mitk {
    typedef GenericProperty<double> DoubleProperty;
    template class GenericProperty<double>;
 
-   typedef GenericProperty<Point3d> Point3dProperty;
-   template class GenericProperty<Point3d>;
+   typedef GenericProperty<Point3D> Point3dProperty;
+   template class GenericProperty<Point3D>;
 
-   typedef GenericProperty<Point3<int> > Point3iProperty;
-   template class GenericProperty<Point3<int> >;
+   typedef GenericProperty<itk::Point<int, 3> > Point3iProperty;
+   template class GenericProperty<itk::Point<int, 3> >;
    
             
 } // namespace mitk  
-
-// itkSetMacro needs this: 
-int operator!=(const Point3<int>& left, const Point3<int>& right);
-int operator!=(const Point3d& left, const Point3d& right);
 
 #endif /* MITKPROPERTIES_H_HEADER_INCLUDED */

@@ -314,14 +314,16 @@ void mitk::CylindricToCartesianFilter::GenerateOutputInformation()
     input->GetNumberOfChannels());
 
   // initialize the spacing of the output
-  const float *spacinglist = input->GetSlicedGeometry()->GetSpacing();
-  Vector3D spacing(spacinglist[0],spacinglist[0],1.0);
+  Vector3D spacing = input->GetSlicedGeometry()->GetSpacing();
   if(input->GetDimension()>=2)
-    spacing.z=spacinglist[1];
+    spacing[2]=spacing[1];
+  else
+    spacing[2] = 1.0;
+  spacing[1] = spacing[0];
   spacing *= 1.0/scale;
   output->GetSlicedGeometry()->SetSpacing(spacing);
 
-  output->GetSlicedGeometry()->SetGeometry2D(mitk::Image::BuildStandardPlaneGeometry2D(output->GetSlicedGeometry(), tmpDimensions).GetPointer(), 0);
+  //output->GetSlicedGeometry()->SetGeometry2D(mitk::Image::BuildStandardPlaneGeometry2D(output->GetSlicedGeometry(), tmpDimensions).GetPointer(), 0);
   //set the timebounds - after SetGeometry2D, so that the already created PlaneGeometry will also receive this timebounds.
   //@fixme!!! will not work for not evenly timed data!
   output->GetSlicedGeometry()->SetTimeBoundsInMS(input->GetSlicedGeometry()->GetTimeBoundsInMS());
@@ -335,10 +337,10 @@ void mitk::CylindricToCartesianFilter::GenerateOutputInformation()
   pointProp = dynamic_cast<mitk::Point3iProperty*>(input->GetProperty("ORIGIN").GetPointer());
   if (pointProp.IsNotNull() )
   {
-    Point3<int> tp = pointProp->GetValue();
-    tp.z = tmpDimensions[2]-tp.y * scale;
-    tp.x = tmpDimensions[0]/2;
-    tp.y = tmpDimensions[0]/2;
+    itk::Point<int, 3> tp = pointProp->GetValue();
+    tp[2] = tmpDimensions[2]-tp[1] * scale;
+    tp[0] = tmpDimensions[0]/2;
+    tp[1] = tmpDimensions[0]/2;
     mitk::Point3iProperty::Pointer pointProp = new mitk::Point3iProperty(tp);
     output->SetProperty("ORIGIN", pointProp);
   }

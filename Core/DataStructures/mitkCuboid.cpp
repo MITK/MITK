@@ -21,7 +21,7 @@ mitk::Cuboid::~Cuboid()
 
 }
 
-bool mitk::Cuboid::IsInside(ITKPoint3D worldPoint)
+bool mitk::Cuboid::IsInside(Point3D worldPoint)
 {
   // transform point from world to object coordinates
   ScalarType p[4];
@@ -30,7 +30,7 @@ bool mitk::Cuboid::IsInside(ITKPoint3D worldPoint)
   p[2] = worldPoint[2];
   p[3] = 1;
   m_Geometry3D->GetVtkTransform()->GetInverse()->TransformPoint(p, p);
-	mitk::ITKPoint3D itkPoint;
+	mitk::Point3D itkPoint;
 
   bool retval =(p[0] >= -1) && (p[0] <= 1) 
             && (p[1] >= -1) && (p[1] <= 1) 

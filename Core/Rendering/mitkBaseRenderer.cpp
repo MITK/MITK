@@ -66,11 +66,6 @@ void mitk::BaseRenderer::SetData(mitk::DataTreeIterator* iterator)
   }
 }
 
-//##ModelId=3E3314720003
-void mitk::BaseRenderer::SetWindowId(void *id)
-{
-}
-
 //##ModelId=3E330C4D0395
 const MapperSlotId mitk::BaseRenderer::defaultMapper = 1;
 
@@ -253,7 +248,7 @@ void mitk::BaseRenderer::MousePressEvent(mitk::MouseEvent *me)
   }
   if(m_MapperID==1)
   {
-    Point2D p(me->GetDisplayPosition().x, me->GetDisplayPosition().y);
+    Point2D p(me->GetDisplayPosition());
     Point2D p_mm;
     Point3D position;
     GetDisplayGeometry()->ULDisplayToDisplay(p,p);
@@ -264,16 +259,16 @@ void mitk::BaseRenderer::MousePressEvent(mitk::MouseEvent *me)
   }
   else if(m_MapperID==2)
   {
-
     //fix for strange offset in 3D coordinates!
     if (me->GetType() == Type_MouseButtonPress)
     {
-      Point2D ptest(me->GetDisplayPosition().x, me->GetDisplayPosition().y);
-      ptest.y -= 24.5;
+      Point2D ptest(me->GetDisplayPosition());
+      ptest[1] -= 24.5;
       me->SetDisplayPosition(ptest);
     }
 
-    Point2D p(me->GetDisplayPosition().x, me->GetDisplayPosition().y);
+    Point2D p(me->GetDisplayPosition());
+
     GetDisplayGeometry()->ULDisplayToDisplay(p,p);
 //    std::cout << "press event!" << std::endl;
     me->SetDisplayPosition(p);
@@ -292,7 +287,7 @@ void mitk::BaseRenderer::MouseReleaseEvent(mitk::MouseEvent *me)
 
   if(m_MapperID==1)
   {
-    Point2D p(me->GetDisplayPosition().x, me->GetDisplayPosition().y);
+    Point2D p(me->GetDisplayPosition());
     Point2D p_mm;
     Point3D position;
     GetDisplayGeometry()->ULDisplayToDisplay(p,p);
@@ -303,7 +298,7 @@ void mitk::BaseRenderer::MouseReleaseEvent(mitk::MouseEvent *me)
   }
   else if(m_MapperID==2)
   {
-    Point2D p(me->GetDisplayPosition().x, me->GetDisplayPosition().y);
+    Point2D p(me->GetDisplayPosition());
     GetDisplayGeometry()->ULDisplayToDisplay(p,p);
     me->SetDisplayPosition(p);
     mitk::EventMapper::MapEvent(me);
@@ -320,7 +315,7 @@ void mitk::BaseRenderer::MouseMoveEvent(mitk::MouseEvent *me)
   }
   if(m_MapperID==1)
   {
-    Point2D p(me->GetDisplayPosition().x, me->GetDisplayPosition().y);
+    Point2D p(me->GetDisplayPosition());
     Point2D p_mm;
     Point3D position;
     GetDisplayGeometry()->ULDisplayToDisplay(p,p);
@@ -331,7 +326,7 @@ void mitk::BaseRenderer::MouseMoveEvent(mitk::MouseEvent *me)
   }
   else if(m_MapperID==2)
   {
-    Point2D p(me->GetDisplayPosition().x, me->GetDisplayPosition().y);
+    Point2D p(me->GetDisplayPosition());
     GetDisplayGeometry()->ULDisplayToDisplay(p,p);
     me->SetDisplayPosition(p);
     mitk::EventMapper::MapEvent(me);

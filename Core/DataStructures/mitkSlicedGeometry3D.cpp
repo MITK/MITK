@@ -390,7 +390,7 @@ void mitk::SlicedGeometry3D::SetSpacing(ipPicDescriptor* pic)
   {
     SetSpacing( tsv );    
     m_EvenlySpaced = true;
-    itkWarningMacro(<< "using the tag PIXEL SIZE: " << m_Spacing << " this may not the correct thickness of the slice");
+    itkDebugMacro(<< "using the tag PIXEL SIZE: " << m_Spacing << " this may not the correct thickness of the slice");
   }
 #ifdef MBI_INTERNAL
   else if( tsv = ipPicQueryTag( pic, "SOURCE HEADER" ) )

@@ -2,7 +2,8 @@
 #include <vtkTransform.h>
 
 //##ModelId=3E395F22035A
-mitk::PlaneGeometry::PlaneGeometry() : Geometry2D(10.0, 10.0), m_ScaleFactorMMPerUnitX(1.0), m_ScaleFactorMMPerUnitY(1.0)
+mitk::PlaneGeometry::PlaneGeometry() : Geometry2D(10.0, 10.0), m_ScaleFactorMMPerUnitX(1.0), 
+   m_ScaleFactorMMPerUnitY(1.0)
 {
 }
 

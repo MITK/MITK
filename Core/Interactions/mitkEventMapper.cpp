@@ -12,8 +12,10 @@
 #include "mitkPositionEvent.h"
 #include "mitkEventMapper.h"
 #include <itkOutputWindow.h>
+#include <itkMacro.h>
 #include "mitkStatusBar.h"
 #include "mitkInteractionConst.h"
+
 //#include <string>
 //#include <map>
 //#include "FocusManager.h"
@@ -502,7 +504,9 @@ bool mitk::EventMapper::LoadBehavior(std::string fileName)
    if ( eventMapper->Parse() )    
    {
      #ifdef INTERDEBUG
-     itkWarningMakro( << "mitk::EventMapper::LoadBehavior xml file cannot parse!" );
+     //itkWarningMacro("mitk::EventMapper::LoadBehavior xml file cannot parse!" );
+     //static function LoadBehavior has no this pointer!
+     std::cout<<"mitk::EventMapper::LoadBehavior xml file cannot parse!"<<std::endl;
      #endif
    }
 

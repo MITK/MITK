@@ -36,17 +36,13 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itksys/SystemTools.hxx>
 
 #include <qfiledialog.h>
+#include <qmessagebox.h>
 
 #include "ipPic.h"
 #include "ipFunc.h"
 
-#ifdef CHILIPLUGIN
-#include "QcMITKSamplePlugin.h"
+#include "mitkChiliPlugin.h"
 #include "mitkLightBoxResultImageWriter.h"
-#include <chili/plugin.h>
-#include <chili/qclightbox.h>
-#include <qmessagebox.h>
-#endif
 
 void QmitkDataManagerControls::init() { 
   m_DataTreeIterator = NULL;
@@ -65,9 +61,8 @@ void QmitkDataManagerControls::init() {
 
     fm->AddObserver(fe,fcc);
   }
-#ifndef CHILIPLUGIN
-  m_SaveToLightBox->hide();
-#endif
+  if(mitk::ChiliPlugin::IsPlugin()==false)
+    m_SaveToLightBox->hide();
 }
 
 void QmitkDataManagerControls::destroy() 
@@ -193,7 +188,15 @@ void QmitkDataManagerControls::SaveButton_clicked()
 
 void QmitkDataManagerControls::SaveLightBox_clicked()
 {
-#ifdef CHILIPLUGIN
+  if(mitk::ChiliPlugin::IsPlugin()==false)
+  {
+    QMessageBox::critical( this, "Save Selected to LightBox",
+      "Saving to LightBox not possible:\n"
+      "This is not a plugin!! ... or the plugin is not correctly initialized!", 
+      QMessageBox::Cancel|QMessageBox::Default|QMessageBox::Escape,QMessageBox::NoButton );
+    return;
+  }
+
   QmitkDataTreeViewItem *selected = dynamic_cast<QmitkDataTreeViewItem*>(m_DataTreeView->selectedItem());
   if (selected != NULL)
   {
@@ -221,22 +224,13 @@ void QmitkDataManagerControls::SaveLightBox_clicked()
                 "Unable to find parent image that came from Chili.", QMessageBox::Cancel|QMessageBox::Default|QMessageBox::Escape,QMessageBox::NoButton );
               return;
             }
-            QcPlugin* plugin = QcMITKSamplePlugin::GetPluginInstance();
-            if(plugin==NULL)
-            {
-              QMessageBox::critical( this, "Save Selected to LightBox",
-                "Saving to LightBox not possible:\n"
-                "This is not a plugin!!", QMessageBox::Cancel|QMessageBox::Default|QMessageBox::Escape,QMessageBox::NoButton );
-              return;
-            }
-            lbwriter->SetLightBox(plugin->lightboxManager()->getActiveLightbox());
+            lbwriter->SetLightBoxToCurrentLightBox();
             lbwriter->Write();
           }
         }
       }
     }
   }
-#endif
 }
 
 
@@ -254,6 +248,5 @@ void QmitkDataManagerControls::m_ReInitButton_clicked()
       emit InitializeStandardViews( basedata );
       mitk::RenderWindow::UpdateAllInstances();
     }
-
   } 
 }

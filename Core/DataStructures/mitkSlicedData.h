@@ -202,6 +202,16 @@ public:
   //## @todo Appropriate setting of the update extent is missing.
   const SlicedGeometry3D* GetUpdatedSlicedGeometry(unsigned int t=0);
 
+  mitk::TimeSlicedGeometry* GetTimeSlicedGeometry()
+  {
+    return m_TimeSlicedGeometry;
+  }
+
+  const mitk::TimeSlicedGeometry* GetTimeSlicedGeometry() const
+  {
+    return m_TimeSlicedGeometry;
+  }
+
   //##Documentation
   //## @brief Set the Geometry3D of the data, which will be referenced (not copied!). It
   //## has to be a sub-class of SlicedGeometry3D.

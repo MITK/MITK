@@ -1,5 +1,8 @@
 TEMPLATE = lib
 TARGET = ipPic
+CONFIG += warn_on debug
+
+OBJECTS_DIR = obj
 
 SOURCES = \
       ipPicInfo.c ipPicType.c                           \
@@ -17,5 +20,5 @@ SOURCES = \
 
 HEADERS = ipPic.h ipTypes.h ipPicOldP.h ipPicAnnotation.h 
 
-INCLUDEPATH = ..
+INCLUDEPATH = .. .
 

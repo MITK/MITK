@@ -325,10 +325,10 @@ void QmitkMainTemplate::initialize()
   } else {
     xmlFileName = xmlFallBackPath;
   }
-  xmlFileName += "/PointStateMachine.xml";
+  xmlFileName += "/StateMachine.xml";
 
   if(QFile::exists(xmlFileName.c_str())==false)
-    xmlFileName = "PointStateMachine.xml";
+    xmlFileName = "StateMachine.xml";
 
   std::cout << "Loading behavior file: " << xmlFileName << std::endl;
   //create undo-controller

@@ -1,16 +1,15 @@
 #include "mitkVtkInteractorCameraController.h"
 #include "mitkVtkQRenderWindowInteractor.h"
-
+#include <vtkInteractorStyleSwitch.h>
 //#include <vtkInteractorStyleTrackball.h>
 
 //##ModelId=3E6D600F009A
 mitk::VtkInteractorCameraController::VtkInteractorCameraController() : m_VtkInteractor(NULL)
 {
     m_VtkInteractor = mitk::VtkQRenderWindowInteractor::New();
-    //vtkInteractorStyleTrackball* iswitch = vtkInteractorStyleTrackball::New();
-    //iswitch->SetCurrentStyleToTrackballCamera();
-    //m_VtkInteractor->SetInteractorStyle(iswitch);
-    //iswitch->Delete();
+    vtkInteractorStyleSwitch* interactorswitch = dynamic_cast<vtkInteractorStyleSwitch*>(m_VtkInteractor->GetInteractorStyle());
+    if(interactorswitch!=NULL)
+      interactorswitch->SetCurrentStyleToTrackballCamera();
 }
 
 //##ModelId=3E6D600F009B

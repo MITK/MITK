@@ -52,27 +52,17 @@ public:
   itkSetObjectMacro(MitkRenderer, BaseRenderer);
   itkGetObjectMacro(MitkRenderer, BaseRenderer);
 
-  itkSetMacro(FinishRendering, bool);
-
-
   virtual void Render();
 
   //##Documentation
   //##@brief call the render process from vtk
   virtual void MitkRender(){vtkRenderWindow::Render();};
 
-  //##Documentation
-  //##@brief derived from vtkRenderWindow to only swap buffer if we are about to finish the rendering
-  virtual void CopyResultFrame();
-
 protected:
   VtkRenderWindow();
   virtual ~VtkRenderWindow();
 
   itk::WeakPointer<BaseRenderer> m_MitkRenderer;
-
-  //flag to sign if the renderprocess is about to finish and the buffers shall be swapped
-  bool m_FinishRendering;
 
 private:
   VtkRenderWindow(const VtkRenderWindow&);  // Not implemented.

@@ -25,6 +25,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkLevelWindow.h"
 #include "mitkVtkInteractorCameraController.h"
 #include "mitkVtkRenderWindow.h"
+#include "mitkVtkStencilRenderWindow.h"
 #include "mitkRenderWindow.h"
 
 #include <vtkRenderer.h>
@@ -342,7 +343,10 @@ void mitk::OpenGLRenderer::Render()
       //rendering VTK-Mappers if present
       if(m_VtkMapperPresent) 
       {
-        m_RenderWindow->GetVtkRenderWindow()->SetFinishRendering(false);
+        mitk::VtkStencilRenderWindow *stencilRenderWindow = dynamic_cast<mitk::VtkStencilRenderWindow *>(m_RenderWindow->GetVtkRenderWindow());
+        if (stencilRenderWindow)
+          stencilRenderWindow->SetFinishRendering(false);
+
         //start vtk render process with the updated scenegraph       
         m_RenderWindow->GetVtkRenderWindow()->MitkRender();
       }
@@ -382,16 +386,13 @@ void mitk::OpenGLRenderer::Render()
         layers.pop();
       }
 
-      ////if we didn't have vtk mappers, then swap now
-      //if(!m_VtkMapperPresent) 
-      //{
-      //  m_RenderWindow->SwapBuffers();
-      //}
-
       //swap buffers
       if (m_VtkMapperPresent)
       {
-        m_RenderWindow->GetVtkRenderWindow()->SetFinishRendering(true);//set an internal flag to only swap buffers when ready with rendering
+        mitk::VtkStencilRenderWindow *stencilRenderWindow = dynamic_cast<mitk::VtkStencilRenderWindow *>(m_RenderWindow->GetVtkRenderWindow());
+        if (stencilRenderWindow)
+          stencilRenderWindow->SetFinishRendering(true);//set an internal flag to only swap buffers when ready with rendering
+        
         m_RenderWindow->GetVtkRenderWindow()->CopyResultFrame();
       }
       else

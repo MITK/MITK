@@ -41,9 +41,18 @@ public:
   // overwrites the superclass method to also clear stencil buffer
   virtual void Render();
 
+  //##Documentation
+  //##@brief derived from vtkRenderWindow to only swap buffer if we are about to finish the rendering
+  virtual void CopyResultFrame();
+
+  itkSetMacro(FinishRendering, bool);
+
 protected:
   VtkStencilRenderWindow();
   virtual ~VtkStencilRenderWindow(){};
+  
+  //flag to sign if the renderprocess is about to finish and the buffers shall be swapped
+  bool m_FinishRendering;
 };
 
 }

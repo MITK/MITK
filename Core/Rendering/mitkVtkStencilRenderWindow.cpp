@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 mitk::VtkStencilRenderWindow::VtkStencilRenderWindow()
-: mitk::VtkRenderWindow()
+: mitk::VtkRenderWindow(), m_FinishRendering(true)
 {
 }
 
@@ -48,5 +48,27 @@ void mitk::VtkStencilRenderWindow::Render()
   }
   else
     itkExceptionMacro("MitkRenderer not set.");
+}
+
+
+//derived to only call swap buffer if we are about to finish the render process
+//done to be able to use stencil buffer. First render vtk Objects, then the mitk Objects and then swap buffers.
+void mitk::VtkStencilRenderWindow::CopyResultFrame()
+{
+  //if we are not about to finish rendering, then we don't swap buffers!
+  //due to this, stereo doesn't work anymore!?!
+  if (!m_FinishRendering)
+    return;
+
+  if (this->ResultFrame)
+    {
+    int *size;
+
+    // get the size
+    size = this->GetSize();
+    this->SetPixelData(0,0,size[0]-1,size[1]-1,this->ResultFrame,!this->DoubleBuffer);
+    }
+
+  this->Frame();
 }
 

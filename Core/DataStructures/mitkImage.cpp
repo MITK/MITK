@@ -486,8 +486,12 @@ void mitk::Image::Initialize(const mitk::PixelType& type, unsigned int dimension
   TimeSlicedGeometry::Pointer timeSliceGeometry;
   timeSliceGeometry = TimeSlicedGeometry::New();
   timeSliceGeometry->Initialize(m_Dimensions[3]);
+  
   SlicedGeometry3D::Pointer slicedGeometry = SlicedGeometry3D::New();
   slicedGeometry->Initialize(m_Dimensions[2]);
+  slicedGeometry->SetGeometry2D(BuildStandardPlaneGeometry2D(slicedGeometry, m_Dimensions).GetPointer(), 0);
+  slicedGeometry->SetEvenlySpaced();
+  
   timeSliceGeometry->SetGeometry3D(slicedGeometry, 0);
   timeSliceGeometry->SetEvenlyTimed();
   SetGeometry(timeSliceGeometry);  

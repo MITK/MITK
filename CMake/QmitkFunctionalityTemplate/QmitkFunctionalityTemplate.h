@@ -15,8 +15,8 @@ PURPOSE.  See the above copyright notices for more information.
 // QmitkFunctionalityTemplate.h: interface for the QmitkFunctionalityTemplate class.
 //
 //////////////////////////////////////////////////////////////////////
-#if !defined(QMITK_FUNCTIONALITY_TEMPLATE_H__INCLUDED)
-#define QMITK_FUNCTIONALITY_TEMPLATE_H__INCLUDED
+#if !defined(QMITK_FUNCTIONALITYTEMPLATE_H__INCLUDED)
+#define QMITK_FUNCTIONALITYTEMPLATE_H__INCLUDED
 #include "QmitkFunctionality.h"
 #include <mitkOperationActor.h>
 #include <mitkProperties.h>
@@ -71,4 +71,4 @@ protected:
   */
   QmitkFunctionalityTemplateControls * controls;
 };
-#endif // !defined(QMITK_FUNCTIONALITY_TEMPLATE_H__INCLUDED)
+#endif // !defined(QMITK_FUNCTIONALITYTEMPLATE_H__INCLUDED)

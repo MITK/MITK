@@ -2,7 +2,7 @@ INCLUDE_DIRECTORIES(../../Framework/QmitkApplicationBase ../../Functionalities/Q
 
 
 
-# Functionality Template
+# FunctionalityTemplate
 
 
 

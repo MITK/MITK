@@ -6,6 +6,7 @@
 #include "ImageMapper2D.h"
 
 #include "vtkActor.h"
+#include "vtkProperty.h"
 #include "vtkTexture.h"
 #include "vtkPlaneSource.h"
 #include "vtkPolyDataMapper.h"

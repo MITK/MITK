@@ -397,6 +397,9 @@ void mitk::DataTreeNodeFactory::ReadFileTypeHPSONOS()
 
     reader->SetFileName( m_FileName.c_str() );
 
+		std::string m_dir = m_FileName.substr(m_FileName.length()-17,6);
+
+
     mitk::ImageChannelSelector::Pointer channelSelector = mitk::ImageChannelSelector::New();
     mitk::ImageChannelSelector::Pointer DopplerChannelSelector = mitk::ImageChannelSelector::New();
 
@@ -432,6 +435,7 @@ void mitk::DataTreeNodeFactory::ReadFileTypeHPSONOS()
     channelSelector->SetChannelNr( 0 );
 
     mitk::ImageSliceSelector::Pointer sliceSelector = mitk::ImageSliceSelector::New();
+
     //
     // insert original (in cylindrical coordinates) Backscatter information
     //
@@ -442,7 +446,7 @@ void mitk::DataTreeNodeFactory::ReadFileTypeHPSONOS()
     mitk::StringProperty::Pointer ultrasoundProp = new mitk::StringProperty( "OriginalBackscatter" );
     node->SetProperty( "ultrasound", ultrasoundProp );
 
-    mitk::StringProperty::Pointer nameProp = new mitk::StringProperty( "OriginalBackscatter" );
+    mitk::StringProperty::Pointer nameProp = new mitk::StringProperty( m_dir+"(OBS)" );
     node->SetProperty( "name", nameProp );
     node->SetProperty( "layer", new mitk::IntProperty( -11 ) );
     mitk::LevelWindow levelwindow;
@@ -462,8 +466,7 @@ void mitk::DataTreeNodeFactory::ReadFileTypeHPSONOS()
     node->SetData( cyl2cart->GetOutput() );
     ultrasoundProp = new mitk::StringProperty( "TransformedBackscatter" );
     node->SetProperty( "ultrasound", ultrasoundProp );
-
-    nameProp = new mitk::StringProperty( "TransformedBackscatter" );
+    nameProp = new mitk::StringProperty( m_dir+"(TBS)" );
     node->SetProperty( "name", nameProp );
     node->SetProperty( "layer", new mitk::IntProperty( -10 ) );
 
@@ -503,7 +506,7 @@ void mitk::DataTreeNodeFactory::ReadFileTypeHPSONOS()
         node->SetData( DopplerChannelSelector->GetOutput() );
         ultrasoundProp = new mitk::StringProperty( "OriginalDoppler" );
         node->SetProperty( "ultrasound", ultrasoundProp );
-        nameProp = new mitk::StringProperty( "OriginalDoppler" );
+        nameProp = new mitk::StringProperty( m_dir+"(OD)" );
         node->SetProperty( "name", nameProp );
         node->SetProperty( "layer", new mitk::IntProperty( -6 ) );
 
@@ -535,7 +538,7 @@ void mitk::DataTreeNodeFactory::ReadFileTypeHPSONOS()
         node->SetData( cyl2cartDoppler->GetOutput() );
         ultrasoundProp = new mitk::StringProperty( "TransformedDoppler" );
         node->SetProperty( "ultrasound", ultrasoundProp );
-        nameProp = new mitk::StringProperty( "TransformedDoppler" );
+        nameProp = new mitk::StringProperty( m_dir+"(TD)" );
         node->SetProperty( "name", nameProp );
         node->SetProperty( "layer", new mitk::IntProperty( -5 ) );
 

@@ -36,10 +36,9 @@
 				<action ID="12010">
 				<stringParam Name="Beschreibung" Value="Das ist ein Text" />
 				</action>
+   			</transition>
 
-			</transition>
-
-	                <transition NAME="nextState" NEXT_STATE_ID="10020" EVENT_ID="11111"> <!--EIDEDIT-->
+        <transition NAME="nextState" NEXT_STATE_ID="10020" EVENT_ID="11111"> <!--EIDEDIT-->
 				<action ID="12010"></action>
 			</transition>
 

@@ -9,6 +9,7 @@
 
 #include "QmitkSelectableGLWidget.h"
 #include "QLevelWindowWidget.h"
+
 #include <vtkSTLReader.h>
 #include <vtkSTLWriter.h>
 #include <vtkPolyDataReader.h>
@@ -88,7 +89,7 @@ void QmitkMainTemplate::fileOpen()
 void QmitkMainTemplate::fileOpen( const char * fileName )
 {
   mitk::DataTreeNodeFactory::Pointer factory = mitk::DataTreeNodeFactory::New();
-  
+
   try
   {
     factory->SetFileName( fileName );

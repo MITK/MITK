@@ -31,7 +31,7 @@ class Transition
     bool IsEvent(int eventId) const;
 
     //##ModelId=3E6370080067
-    setNextState(State* state);
+    void setNextState(State* state);
 
   private:
     //##ModelId=3E5A39C102B2

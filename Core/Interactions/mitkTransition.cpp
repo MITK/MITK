@@ -43,7 +43,7 @@ bool mitk::Transition::IsEvent(int eventId) const
 }
 
 //##ModelId=3E6370080067
-mitk::Transition::setNextState(State* state)
+void mitk::Transition::setNextState(State* state)
 {
 	m_NextState = state;
 }

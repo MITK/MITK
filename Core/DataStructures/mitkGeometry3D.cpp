@@ -141,6 +141,7 @@ mitk::Geometry3D::Pointer mitk::Geometry3D::Clone() const
   newGeometry->Initialize();
 
   newGeometry->SetBoundingBox(m_BoundingBox);
+  newGeometry->SetTimeBoundsInMS(m_TimeBoundsInMS);  
   newGeometry->GetTransform()->SetMatrix(m_Transform->GetMatrix());
   //newGeometry->GetRelativeTransform()->SetMatrix(m_RelativeTransform->GetMatrix());
   //newGeometry->SetPosition(GetPosition());

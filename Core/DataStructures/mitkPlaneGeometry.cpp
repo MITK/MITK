@@ -151,6 +151,7 @@ mitk::Geometry3D::Pointer mitk::PlaneGeometry::Clone() const
 {
   mitk::PlaneGeometry::Pointer newGeometry = PlaneGeometry::New();
   newGeometry->Initialize();
+  newGeometry->SetBoundingBox(m_BoundingBox);
   newGeometry->SetTimeBoundsInMS(m_TimeBoundsInMS);  
   newGeometry->GetTransform()->SetMatrix(m_Transform->GetMatrix());
   //newGeometry->GetRelativeTransform()->SetMatrix(m_RelativeTransform->GetMatrix());

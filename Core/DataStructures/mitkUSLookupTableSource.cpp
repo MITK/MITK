@@ -2,6 +2,8 @@
 #include <ipPic/ipPic.h>
 #include <vtkLookupTable.h>
 #include <fstream>
+
+
 extern "C"
 {
 #include "uscfunctions/usc.h"
@@ -11,31 +13,32 @@ extern "C"
 mitk::USLookupTableSource::~USLookupTableSource()
 {}
 
-mitk::USLookupTableSource::USLookupTableSource()
+
+mitk::USLookupTableSource::USLookupTableSource() : mitk::LookupTableSource()
 {
+
+		std::cout << "creating USLookupTableSource ... " << std::endl;
     m_Mode = DefaultLUT;
     m_LookupTable = NULL;
 
+  	this->Modified();    
+		std::cout << "creating USLookupTableSource OK! " << std::endl;
 }
 
 
-/**
- *
- */
-mitk::USLookupTableSource::OutputTypePointer mitk::USLookupTableSource::GetOutput()
+void mitk::USLookupTableSource::GenerateData()
+{
+    std::cout << "USLookupTableSource::generate data!" << std::endl;
+    OutputType::Pointer output = this->GetOutput();
+    output->SetVtkLookupTable( this->BuildVtkLookupTable( ) );
+}
+
+vtkLookupTable* mitk::USLookupTableSource::BuildDSRDopplerLookupTable()
 {
 
-    std::cout << "mitk:US:LookupTableSource::GetOutput() ... " << std::endl;
+	   std::cout << "  creating HP LookupTable ... " << std::endl;
 
-    // if (m_LookupTable !+= NULL) delete m_LookupTable;
-
-    m_LookupTable = mitk::LookupTable::New();
-
-    if ( m_Mode == HP )
-    {
-        std::cout << "  creating HP LookupTable ... " << std::endl;
-
-        ipPicDescriptor *HPMap;
+     ipPicDescriptor *HPMap;
 
         char MapFilename[ 20 ] = "a.map";
         int failed ;
@@ -64,11 +67,13 @@ mitk::USLookupTableSource::OutputTypePointer mitk::USLookupTableSource::GetOutpu
                 vtkLookupTable->SetTableValue ( i, rgba );
             }
 
-            m_LookupTable->SetVtkLookupTable( vtkLookupTable );
+            return ( vtkLookupTable );
 
-        }
-        else
-        { // no HP lut -> create custom LUT
+        }  // do we have a HP LUT ?
+
+
+        else	// no HP lut -> create custom LUT
+        { 		
             std::cout << "  no a.map available! creating custom Doppler LookUpTable ... " << std::endl;
 
             vtkLookupTable *vtkLookupTable = vtkLookupTable::New();
@@ -181,14 +186,15 @@ mitk::USLookupTableSource::OutputTypePointer mitk::USLookupTableSource::GetOutpu
             //    cout << "i=" <<  i << " r=" << rgba[0] << " g=" << rgba[1]<< " b=" << rgba[2] << endl;
             //   }
 
-            m_LookupTable->SetVtkLookupTable( vtkLookupTable );
+            return( vtkLookupTable );
 
-        }
+        }	// no HP lut -> create custom LUT
+}
 
-    }
-    else if ( m_Mode == Strain )
-    {
-        std::cout << "  creating Strain  LookupTable ... " << std::endl;
+
+vtkLookupTable* mitk::USLookupTableSource::BuildStrainRateLookupTable()
+{
+        std::cout << "  creating StrainRate  LookupTable ... " << std::endl;
         vtkLookupTable *vtkLookupTable = vtkLookupTable::New();
 
         int size = 256;
@@ -301,25 +307,42 @@ mitk::USLookupTableSource::OutputTypePointer mitk::USLookupTableSource::GetOutpu
         //    cout << "i=" <<  i << " r=" << rgba[0] << " g=" << rgba[1]<< " b=" << rgba[2] << endl;
         //   }
 
-        m_LookupTable->SetVtkLookupTable( vtkLookupTable );
-
-
-    }
-    else
-    {
-        std::cout << "  creating default LookupTable... " << std::endl;
-        vtkLookupTable *vtkLookupTable = vtkLookupTable::New();
-        int size = 256;
-        vtkLookupTable->SetNumberOfColors( size );
-        vtkLookupTable->Build();
-        m_LookupTable->SetVtkLookupTable( vtkLookupTable );
-    }
-
-
-
-    std::cout << "mitk::USLookupTableSource::GetOutput() ... " << std::endl;
-    return m_LookupTable;
+        return( vtkLookupTable );
 
 }
+
+vtkLookupTable* mitk::USLookupTableSource::BuildDefaultLookupTable(){
+
+	std::cout << "  creating default LookupTable... " << std::endl;
+  vtkLookupTable *vtkLookupTable = vtkLookupTable::New();
+  int size = 256;
+  vtkLookupTable->SetNumberOfColors( size );
+  vtkLookupTable->Build();
+  return( vtkLookupTable );
+
+}
+
+
+vtkLookupTable* mitk::USLookupTableSource::BuildVtkLookupTable()
+{
+
+		std::cout << "mitk::USLookupTableSource::BuildVtkLookupTable() ... " << std::endl;
+		
+    if ( m_Mode == DSRDoppler )
+    {
+				return BuildDSRDopplerLookupTable();
+ 		}
+    else if ( m_Mode == StrainRate )
+    {
+			return BuildStrainRateLookupTable();
+		}
+    else
+    {
+			return BuildDefaultLookupTable();
+    }
+
+
+}
+
 
 

@@ -301,7 +301,7 @@ bool mitk::PointSetInteractor::ExecuteAction( Action* action, mitk::StateEvent c
       it = points->Begin();
       end = points->End();
       //debug
-      int size = points->Size();
+      // int size = points->Size(); /* * \todo remove line */
       //debug
       int position = 0;
       while (it != end)

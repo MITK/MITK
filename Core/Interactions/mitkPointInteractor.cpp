@@ -122,7 +122,7 @@ float mitk::PointInteractor::CalculateJurisdiction(StateEvent const* stateEvent)
     //TODO 
     //get the point and calculate the jurisdiction out of it.
     mitk::PointSet::PointType point;
-    bool ok = pointSet->GetPointSet()->GetPoint(index, &point);
+    // bool ok = pointSet->GetPointSet()->GetPoint(index, &point); /* \todo remove line*/
     returnValue = point.EuclideanDistanceTo(worldPoint);
 
     //between 1 and 0.     1 if directly hit

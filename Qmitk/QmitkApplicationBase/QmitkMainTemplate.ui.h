@@ -4,7 +4,7 @@ Program:   Medical Imaging & Interaction Toolkit
 Module:    $RCSfile$
 Language:  C++
 Date:      $Date$
-Version:   $Revision$
+Version:   $Revision$ 
 
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
@@ -586,4 +586,13 @@ void QmitkMainTemplate::changeToColumnWidget3n4Layout()
 void QmitkMainTemplate::changeToRowWidget3n4Layout()
 {
     mitkMultiWidget->changeLayoutToRowWidget3And4();
+}
+
+
+void QmitkMainTemplate::hideToolbar(bool on)
+{
+  if(on)
+    ToolBar->hide();
+  else
+    ToolBar->show();
 }

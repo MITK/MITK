@@ -8,14 +8,14 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>786</width>
-            <height>891</height>
+            <width>352</width>
+            <height>495</height>
         </rect>
     </property>
     <property name="minimumSize">
         <size>
             <width>222</width>
-            <height>303</height>
+            <height>332</height>
         </size>
     </property>
     <property name="caption">
@@ -85,6 +85,9 @@
         <action name="helpIndexAction"/>
         <separator/>
         <action name="helpAboutAction"/>
+    </item>
+    <item text="Options" name="Options">
+        <action name="HideToolbarAction"/>
     </item>
 </menubar>
 <toolbars>
@@ -572,6 +575,20 @@
             <string>new item</string>
         </property>
     </action>
+    <action>
+        <property name="name">
+            <cstring>HideToolbarAction</cstring>
+        </property>
+        <property name="toggleAction">
+            <bool>true</bool>
+        </property>
+        <property name="text">
+            <string>Hide Toolbar</string>
+        </property>
+        <property name="menuText">
+            <string>Hide Toolbar</string>
+        </property>
+    </action>
 </actions>
 <images>
     <image name="image0">
@@ -765,6 +782,12 @@
         <receiver>QmitkMainTemplate</receiver>
         <slot>changeToRowWidget3n4Layout()</slot>
     </connection>
+    <connection>
+        <sender>HideToolbarAction</sender>
+        <signal>toggled(bool)</signal>
+        <receiver>QmitkMainTemplate</receiver>
+        <slot>hideToolbar(bool)</slot>
+    </connection>
 </connections>
 <includes>
     <include location="global" impldecl="in declaration">mitkDataTree.h</include>
@@ -828,6 +851,7 @@
     <slot>m_ShowPlanesCheckBox_clicked()</slot>
     <slot>changeToColumnWidget3n4Layout()</slot>
     <slot>changeToRowWidget3n4Layout()</slot>
+    <slot>hideToolbar( bool on )</slot>
 </slots>
 <functions>
     <function>fileOpen( const char * fileName )</function>

@@ -210,7 +210,7 @@ void mitk::ImageMapper2D::GenerateData(mitk::BaseRenderer *renderer)
     width =worldgeometry->GetExtent(0); widthInMM = worldgeometry->GetExtentInMM(0);
     height=worldgeometry->GetExtent(1); heightInMM= worldgeometry->GetExtentInMM(1);
 
-    const PlaneGeometry *planeview=dynamic_cast<const PlaneGeometry *>(worldgeometry);  
+    const PlaneGeometry *planeview=static_cast<const PlaneGeometry *>(worldgeometry);  
     origin = planeview->GetOrigin();
     right  = planeview->GetAxisVector(0); right.Normalize();
     bottom = planeview->GetAxisVector(1); bottom.Normalize();

@@ -4,33 +4,29 @@
 #include <FL/Fl.h>
 void FLmitkRenderWindow::InitRenderer()
 { 
-   // m_InitNeeded = true;
-   // m_ResizeNeeded = true;
-        
-        if(m_Renderer.IsNull())
-	      m_Renderer = mitk::OpenGLRenderer::New();
-	  
-	  m_Renderer->InitRenderer(this);
-	    
-//	    this->setAutoBufferSwap( false );
-} 
+  if(m_Renderer.IsNull())
+    m_Renderer = mitk::OpenGLRenderer::New();
+
+  mitk::RenderWindow::InitRenderer();
+}
+
 void FLmitkRenderWindow::draw() {
   if(m_InitNeeded)
- {
-    m_Renderer->SetWindowId( (void *)fl_xid( this ) );
+  {
+    SetWindowId( (void *)fl_xid( this ) );
     m_InitNeeded = false;
- }
+  }
   if(m_ResizeNeeded)
-    {
-      m_ResizeNeeded=false;
-      m_Renderer->InitSize(w(),h());
-    }
-   if(visible())
-    {
-      make_current(); 
-      m_Renderer->Paint();
-    }
-   }
+  {
+    m_ResizeNeeded=false;
+    m_Renderer->InitSize(w(),h());
+  }
+  if(visible())
+  {
+    make_current(); 
+    m_Renderer->Paint();
+  }
+}
 
 
 void FLmitkRenderWindow::resize(int x, int y, int w, int h) {

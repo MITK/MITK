@@ -38,39 +38,39 @@ class Surface;
 //## for mitk::SurfaceSource.
 class SurfaceSource : public BaseProcess
 {
-  public:
-    mitkClassMacro(SurfaceSource, BaseProcess);
+public:
+  mitkClassMacro(SurfaceSource, BaseProcess);
 
-    itkNewMacro(Self);  
+  itkNewMacro(Self);  
 
-    //##ModelId=3EF56D670290
-    typedef itk::DataObject::Pointer DataObjectPointer;
+  //##ModelId=3EF56D670290
+  typedef itk::DataObject::Pointer DataObjectPointer;
 
-    //##ModelId=3EF56B0703A4
-    virtual DataObjectPointer MakeOutput(unsigned int idx);
+  //##ModelId=3EF56B0703A4
+  virtual DataObjectPointer MakeOutput(unsigned int idx);
 
 
-    //##ModelId=3EF56B1101F0
-    void SetOutput(mitk::Surface* output);
+  //##ModelId=3EF56B1101F0
+  void SetOutput(mitk::Surface* output);
 
-    //##ModelId=3EF56B16028D
-    mitk::Surface* GetOutput();
+  //##ModelId=3EF56B16028D
+  mitk::Surface* GetOutput();
 
-    //##ModelId=3EF56B1A0257
-    mitk::Surface* GetOutput(unsigned int idx);
+  //##ModelId=3EF56B1A0257
+  mitk::Surface* GetOutput(unsigned int idx);
 
-    //##ModelId=3EF56B1303D3
-    virtual void GraftOutput(mitk::Surface* graft);
+  //##ModelId=3EF56B1303D3
+  virtual void GraftOutput(mitk::Surface* graft);
 
-    //##ModelId=3EF56C440197
-    virtual void GraftNthOutput(unsigned int idx, mitk::Surface *graft);
+  //##ModelId=3EF56C440197
+  virtual void GraftNthOutput(unsigned int idx, mitk::Surface *graft);
 
 protected:
-    //##ModelId=3EF4A4A3001E
-    SurfaceSource();
+  //##ModelId=3EF4A4A3001E
+  SurfaceSource();
 
-    //##ModelId=3EF4A4A3003C
-    virtual ~SurfaceSource();
+  //##ModelId=3EF4A4A3003C
+  virtual ~SurfaceSource();
 };
 
 } // namespace mitk

@@ -61,13 +61,13 @@ bool mitk::StateMachine::HandleEvent(StateEvent const* stateEvent, int objectEve
 
 //Doku: if the operation didn't work, then we have already changed the state. 
 //Check, if we have already done a statechange, if yes, then recall all of thet ObjectEventId
-  if (!ok && m_UndoEnabled && 
-    m_UndoController->GetLastObjectEventIdInList()==OperationEvent::GetCurrObjectEventId())//oder objectEventId
+  if ((!ok) && m_UndoEnabled && 
+    m_UndoController->GetLastObjectEventIdInList()==objectEventId)//oder objectEventId
   {
     ok = m_UndoController->Undo(true);//fine undo!
   }
   else if (!ok && !m_UndoEnabled && 
-    m_UndoController->GetLastObjectEventIdInList()==OperationEvent::GetCurrObjectEventId())
+    m_UndoController->GetLastObjectEventIdInList()==objectEventId)
   {
     std::cout<<"Error! Sender: StateMachine; Message: Operation could not be done!"<<std::endl;
   }

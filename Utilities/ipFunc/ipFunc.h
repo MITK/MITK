@@ -124,9 +124,11 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include <sys/time.h>
 #ifndef WIN32
+#include <sys/time.h>
 #include <sys/resource.h>
+#else
+#include <sys/timeb.h>
 #endif
 #include <ipPic.h>
 #include <ipTypes.h>

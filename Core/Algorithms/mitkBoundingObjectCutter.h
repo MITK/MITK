@@ -2,99 +2,63 @@
 #define BOUNDINGOBJECTCUTTER_H_HEADER_INCLUDED_C10B22CD
 
 #include "mitkCommon.h"
-
 #include "mitkBoundingObject.h"
-//#include "mitkEllipsoid.h"
-
 #include <mitkImageToImageFilter.h>
-
 #include "itkImage.h"
-#include <itkImageFileWriter.h>
-
-#include "itkImageToImageFilter.h"
-
-#include <itkRegionOfInterestImageFilter.h>
 #include "itkImageRegionIteratorWithIndex.h"
-#include "itkConfidenceConnectedImageFilter.h"
-#include <itkMultiplyImageFilter.h>
-
 
 namespace mitk {
 
 //##Documentation
-//## @brief Cuts an Bounding Objectout of an mitk Image
+//## @brief Cuts an Boundingobject out of an mitk Image
 //## @ingroup Process
 //## 
 //## Input Parameters are a mitk::BoundingObject and optionally an mitk::Image
-//## if no mitk::Image is provided, the resulting image will have INSIDEVALUE as pixelvalue on inside voxels, 
+//## if no mitk::Image is provided, the resulting image will have m_InsideValue as pixelvalue on inside pixel, 
 //## otherwise it will have the pixelvalue of the input image.
-//## Voxels on the outside of the BoundingObject will have a pixelvalue of OUTSIDEVALUE
-/**
-  *  \todo What Image resolution/spacing should be used, if no input image is given?
-  */
-class BoundingObjectCutter : public ImageToImageFilter
+//## Pixel on the outside of the BoundingObject will have a pixelvalue of m_OutsideValue
+//## \todo What Image resolution/spacing should be used, if no input image is given?
+template <typename TPixel> class BoundingObjectCutter : public ImageToImageFilter
 {
 public:
-  typedef short PixelType;
-  typedef itk::Image<PixelType, 3> ItkImageType;
-  typedef itk::RegionOfInterestImageFilter<ItkImageType, ItkImageType> ItkRegionOfInterestFilterType;
-  typedef ItkRegionOfInterestFilterType::InputImageRegionType ItkRegionType;
-  typedef itk::ImageRegionIteratorWithIndex< ItkImageType > ItkImageIteratorType;
-  typedef itk::ImageFileWriter<ItkImageType> ItkImageWriter;
-
-  typedef itk::ImageToImageFilter<ItkImageType, ItkImageType> ImageToImageFilterType;
-
-  typedef itk::ConfidenceConnectedImageFilter<ItkImageType, ItkImageType> ConnectedFilterType;
-  typedef  itk::MultiplyImageFilter< ItkImageType, ItkImageType, ItkImageType > MultiplyImageFilterType;
-
   mitkClassMacro(BoundingObjectCutter, ImageToImageFilter);
   itkNewMacro(Self);
 
-  virtual void GenerateOutputInformation();
+  typedef TPixel PixelType;
+  typedef itk::Image<PixelType, 3> ItkImageType;
+  typedef ItkImageType::RegionType ItkRegionType;
+  typedef itk::ImageRegionIteratorWithIndex< ItkImageType > ItkImageIteratorType;
 
+  virtual void GenerateOutputInformation();
   virtual void GenerateData();
 
   itkSetObjectMacro(BoundingObject, mitk::BoundingObject);
   itkGetObjectMacro(BoundingObject, mitk::BoundingObject);
-
-
-  itkSetMacro(InsideValue,  mitk::BoundingObjectCutter::PixelType);
-  itkGetMacro(InsideValue,  mitk::BoundingObjectCutter::PixelType);
-  itkSetMacro(OutsideValue, mitk::BoundingObjectCutter::PixelType);
-  itkGetMacro(OutsideValue, mitk::BoundingObjectCutter::PixelType);
+  itkSetMacro(InsideValue,  PixelType);
+  itkGetMacro(InsideValue,  PixelType);
+  itkSetMacro(OutsideValue, PixelType);
+  itkGetMacro(OutsideValue, PixelType);
   itkSetMacro(UseInsideValue, bool);
   itkGetMacro(UseInsideValue, bool);
   itkBooleanMacro(UseInsideValue);
-
-  itkSetMacro(UseRegionGrower, bool);
-  itkGetMacro(UseRegionGrower, bool);
-  itkBooleanMacro(UseRegionGrower);
-  
-  itkSetObjectMacro(SegmentationFilter, ImageToImageFilterType);
-  itkGetObjectMacro(SegmentationFilter, ImageToImageFilterType);
-
   itkGetMacro(InsidePixelCount, unsigned int);
   itkGetMacro(OutsidePixelCount, unsigned int);
-
-  itkGetMacro(ResampleFactor, mitk::ScalarType);
-  itkSetMacro(ResampleFactor, mitk::ScalarType);
 
 protected:
   BoundingObjectCutter();
   virtual ~BoundingObjectCutter();
 
-  mitk::BoundingObject::Pointer m_BoundingObject;
-  PixelType m_InsideValue;
-  PixelType m_OutsideValue;
-  bool m_UseInsideValue;
-  bool m_UseRegionGrower;
+  mitk::BoundingObject::Pointer m_BoundingObject; // BoundingObject that will be cut
+  PixelType m_InsideValue;                        // Value for inside pixels, if UseInsideValue is true
+  PixelType m_OutsideValue;                       // Value for outside pixels
+  bool m_UseInsideValue;                          // if true, pixels that are inside m_BoundingObject 
+                                                  // will get m_InsideValue in the cutting process 
+                                                  // (else they keep their original value)
   unsigned int m_OutsidePixelCount;
   unsigned int m_InsidePixelCount;
-  mitk::ScalarType m_ResampleFactor;
-
-  ImageToImageFilterType::Pointer m_SegmentationFilter;
 };
-
 } // namespace mitk
+
+#include "mitkBoundingObjectCutter.txx"  // because it is a template
 
 #endif /* BOUNDINGOBJECTCUTTER_H_HEADER_INCLUDED_C10B22CD */

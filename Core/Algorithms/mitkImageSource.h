@@ -11,8 +11,6 @@ namespace mitk {
 //##Documentation
 //## @brief Superclass of all classes generating Images (instances of class
 //## Image) as output. 
-//## Superclass of all classes generating Images (instances of class Image) as
-//## output. 
 //## @ingroup Process
 //## In itk and vtk the generated result of a ProcessObject is only guaranteed
 //## to be up-to-date, when Update() of the ProcessObject or the generated

@@ -77,14 +77,14 @@ mitk::EventMapper::EventMapper()
 {
 
 //map with string to key for mapping string from xml-file to int
-	m_EventConstMap["Type_None"] = 0;		// invalid event //@TODO:replace with mitk::Type_None
-	m_EventConstMap["Type_Timer"] = 1;		// timer event
-	m_EventConstMap["Type_MouseButtonPress"] = 2;		// mouse button pressed
-	m_EventConstMap["Type_MouseButtonRelease"] = 3;		// mouse button released
-	m_EventConstMap["Type_MouseButtonDblClick"] =	4;		// mouse button double click
-	m_EventConstMap["Type_MouseMove"] = 5;		// mouse move
-	m_EventConstMap["Type_KeyPress"] = 6;		// key pressed
-	m_EventConstMap["Type_KeyRelease"] = 7;		// key released
+  m_EventConstMap["Type_None"] = mitk::Type_None;		// invalid event 
+  m_EventConstMap["Type_Timer"] = mitk::Type_Timer;		// timer event
+  m_EventConstMap["Type_MouseButtonPress"] = mitk::Type_MouseButtonPress;		// mouse button pressed
+  m_EventConstMap["Type_MouseButtonRelease"] = mitk::Type_MouseButtonRelease;		// mouse button released
+  m_EventConstMap["Type_MouseButtonDblClick"] =	mitk::Type_MouseButtonDblClick;		// mouse button double click
+  m_EventConstMap["Type_MouseMove"] = mitk::Type_MouseMove;		// mouse move
+  m_EventConstMap["Type_KeyPress"] = mitk::Type_KeyPress;		// key pressed
+  m_EventConstMap["Type_KeyRelease"] = mitk::Type_KeyRelease;		// key released
 	m_EventConstMap["Type_FocusIn"] = 				8;		// keyboard focus received
 	m_EventConstMap["Type_FocusOut"] = 				9;		// keyboard focus lost
 	m_EventConstMap["Type_Enter"] = 					10;	// mouse enters widget
@@ -149,16 +149,16 @@ mitk::EventMapper::EventMapper()
 	m_EventConstMap["Type_MaxUser"] = 				65535;	// last user event id
 
 //ButtonState
-    m_EventConstMap["BS_NoButton"] =  0x0000;
-    m_EventConstMap["BS_LeftButton"] =  0x0001;
-    m_EventConstMap["BS_RightButton"] =  0x0002;
-    m_EventConstMap["BS_MidButton"] =  0x0004;
-    m_EventConstMap["BS_MouseButtonMask"] =  0x0007;
-    m_EventConstMap["BS_ShiftButton"] =  0x0008;
-    m_EventConstMap["BS_ControlButton"] =  0x0010;
-    m_EventConstMap["BS_AltButton"] =  0x0020;
-    m_EventConstMap["BS_KeyButtonMask"] =  0x0038;
-    m_EventConstMap["BS_Keypad"] =  0x4000;
+  m_EventConstMap["BS_NoButton"] =  mitk::BS_NoButton;//0x0000
+    m_EventConstMap["BS_LeftButton"] =  mitk::BS_LeftButton;//0x0001
+    m_EventConstMap["BS_RightButton"] =  mitk::BS_RightButton;//0x0002
+    m_EventConstMap["BS_MidButton"] =  mitk::BS_MidButton;//0x0004
+    m_EventConstMap["BS_MouseButtonMask"] =  mitk::BS_MouseButtonMask;//0x0007
+    m_EventConstMap["BS_ShiftButton"] =  mitk::BS_ShiftButton;//0x0008
+    m_EventConstMap["BS_ControlButton"] =  mitk::BS_ControlButton;//0x0010
+    m_EventConstMap["BS_AltButton"] =  mitk::BS_AltButton;//0x0020
+    m_EventConstMap["BS_KeyButtonMask"] =  mitk::BS_KeyButtonMask;//0x0038
+    m_EventConstMap["BS_Keypad"] =  mitk::BS_Keypad;//0x4000
 
 //Modifier
     m_EventConstMap["Mod_SHIFT"] =  0x00200000;

@@ -20,6 +20,7 @@ class VtkRenderWindow;
 //##ModelId=3C6E9AD90215
 //##Documentation
 //## @brief OpenGL-based implementation of BaseRenderer
+//## @ingroup Renderer
 class OpenGLRenderer : public BaseRenderer
 {
   public:

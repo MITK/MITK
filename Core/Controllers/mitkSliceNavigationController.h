@@ -9,7 +9,9 @@ namespace mitk {
 
 //##ModelId=3DD523E00048
 //##Documentation
-//## @brief controls the selection of the slice the associated BaseRenderer will display
+//## @brief controls the selection of the slice the associated BaseRenderer
+//## will display
+//## @ingroup NavigationControl
 //## Subclass of BaseController. Controls the selection of the slice the
 //## associated BaseRenderer will display.
 class SliceNavigationController : public BaseController

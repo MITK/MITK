@@ -10,13 +10,14 @@ namespace mitk {
 //##ModelId=3E86AABB0082
 //##Documentation
 //## @brief Standard RGB color typedef (float)
-//## 
+//## @ingroup Property
 //## Standard RGB color typedef to get rid of template argument (float).
 typedef itk::RGBPixel< float > Color;
 
 //##ModelId=3E86A20C00FD
 //##Documentation
 //## @brief RGB color property
+//## @ingroup DataTree
 class ColorProperty : public BaseProperty
 {
 protected:

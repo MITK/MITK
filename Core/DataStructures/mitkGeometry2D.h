@@ -12,6 +12,7 @@ namespace mitk {
 //##ModelId=3DDE4DEC0291
 //##Documentation
 //## @brief Describes the geometry of a two-dimensional object
+//## @ingroup Geometry
 //## Describes the geometry of a two-dimensional object. Most often, this will
 //## be a plane, which is represented by the sub-class PlaneGeometry. But
 //## curved surfaces are also possible. Can transform between world coordinates

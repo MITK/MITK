@@ -9,6 +9,7 @@ namespace mitk {
 //##ModelId=3E186F28009B
 //##Documentation
 //## @brief Base class of readers that read from files
+//## @ingroup Process
 class FileReader : public Reader
 {
   protected:

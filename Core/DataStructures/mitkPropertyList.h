@@ -12,6 +12,7 @@ namespace mitk {
 //##ModelId=3E031F200392
 //##Documentation
 //## @brief List of properties (instances of subclasses of BaseProperty)
+//## @ingroup DataTree
 //## List of properties (instances of subclasses of BaseProperty). The
 //## properties are stored in a map, thus each property is associated with a
 //## key of type string. 

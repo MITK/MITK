@@ -10,6 +10,7 @@ namespace mitk {
 //##ModelId=3E3ECC1201B2
 //##Documentation
 //## @brief Abstract window/widget class used for rendering
+//## @ingroup Renderer
 class RenderWindow : public RenderWindowBase
 {
 public:

@@ -17,6 +17,7 @@ class SubImageSelector;
 //##ModelId=3DCBC1E300FE
 //##Documentation
 //## @brief Image class for storing images
+//## @ingroup Data
 //## Image class for storing images. Can be asked for header information, the
 //## data vector, ipPicDescriptors or vtkImageData objects. If not the complete
 //## data is required, the appropriate SubImageSelector class should be used

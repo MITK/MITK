@@ -24,6 +24,7 @@ namespace mitk {
 //##ModelId=3E031E2C0143
 //##Documentation
 //## @brief Class for nodes of the DataTree
+//## @ingroup DataTree
 //## Contains the data (instance of BaseData), a list of mappers, which can
 //## draw the data, a transform (vtkTransform) and a list of properties
 //## (PropertyList).

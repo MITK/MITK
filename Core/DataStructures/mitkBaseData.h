@@ -15,6 +15,7 @@ class BaseProcess;
 //##ModelId=3D6A0D7D00EC
 //##Documentation
 //## @brief Base of all data objects
+//## @ingroup Data
 //## Base of all data objects, e.g., images, contours, surfaces etc. Inherits
 //## from itk::DataObject and thus can be included in a pipeline.
 class BaseData : public itk::DataObject

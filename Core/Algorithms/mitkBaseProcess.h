@@ -11,8 +11,8 @@ class BaseData;
 //##ModelId=3DCBF9BC011A
 //##Documentation
 //## @brief Superclass of all classes generating some kind of mitk::BaseData.
-//## Superclass of all classes generating some kind of mitk::BaseData. 
-//## 
+//## Superclass of all classes generating some kind of mitk::BaseData.
+//## @ingroup Process
 //## In itk and vtk the generated result of a ProcessObject is only guaranteed
 //## to be up-to-date, when Update() of the ProcessObject or the generated
 //## DataObject is called immediately before access of the data stored in the

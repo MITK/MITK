@@ -16,28 +16,19 @@ typedef DataTreeBase::TreeChangeListener DataTreeBaseTreeChangeListener;
 //##ModelId=3E394E99028E
 //##Documentation
 //## @brief typedef to an iterator on the data tree
+//## @ingroup DataTree
 typedef	::TreeIterator<DataTreeNode::Pointer> DataTreeIterator;
 
 
 //##ModelId=3E38F35101A0
 //##Documentation
 //## @brief Main run-time data management class defining a data tree
+//## @ingroup DataTree
 class DataTree : public itk::Object, public DataTreeBase, public DataTreeBaseTreeChangeListener
 {
 
-	public:
-
-
-
-	/** Standard class typedefs. */
-    //##ModelId=3E38FFC80202
-	typedef DataTree                 Self;
-    //##ModelId=3E38FFC80220
-	typedef itk::Object              Superclass;
-    //##ModelId=3E38FFC8023E
-	typedef itk::SmartPointer<Self>  Pointer;
-    //##ModelId=3E38FFC80266
-	typedef itk::SmartPointer<const Self>  ConstPointer;
+public:
+	mitkClassMacro(DataTree, itk::Object);    
 
 	/** Method for creation through the object factory. */
 	itkNewMacro(Self);

@@ -13,6 +13,7 @@ namespace mitk {
 //##ModelId=3DDE570F010A
 //##Documentation
 //## @brief Describes a two-dimensional, plane and rectangular surface
+//## @ingroup Geometry
 class PlaneGeometry : public Geometry2D
 {
 public:

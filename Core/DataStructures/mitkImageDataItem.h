@@ -11,6 +11,7 @@ namespace mitk {
 //##ModelId=3D7B424502D7
 //##Documentation
 //## @brief Internal class for managing references on sub-images
+//## @ingroup Data
 class ImageDataItem : public itk::LightObject
 {
   public:

@@ -10,7 +10,8 @@ namespace mitk {
 //##ModelId=3E32C60F00E6
 //##Documentation
 //## @brief Base class of all vtk-based 2D-Mappers
-//## Base class of all vtk-based 2D-Mappers. Those must implement the abstract
+//## @ingroup Mapper
+//## Those must implement the abstract
 //## method vtkProp* GetProp().
 class BaseVtkMapper2D : public Mapper2D
 {

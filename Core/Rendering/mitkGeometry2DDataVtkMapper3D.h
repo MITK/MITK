@@ -20,7 +20,7 @@ namespace mitk {
 //##ModelId=3E691E09014F
 //##Documentation
 //## @brief Vtk-based mapper to display a Geometry2D in a 3D window
-//## Vtk-based mapper to display a Geometry2D in a 3D window.
+//## @ingroup Mapper
 class Geometry2DDataVtkMapper3D : public BaseVtkMapper3D
 {
   public:

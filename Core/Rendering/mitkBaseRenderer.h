@@ -13,7 +13,9 @@ namespace mitk {
 //##ModelId=3C6E9AA90306
 //##Documentation
 //## @brief Organizes the rendering process
-//## Organizes the rendering process. A Renderer contains a reference to a (sub-) data 
+//## @ingroup Renderer
+//## Organizes the rendering process. A Renderer contains a reference to a
+//## (sub-) data 
 //## tree and asks the mappers of the data objects to render 
 //## the data into the renderwindow it is associated to.
 class BaseRenderer : public itk::Object

@@ -11,6 +11,7 @@ namespace mitk {
 //## @brief Class to store level/window values
 //## class implements level window data structure
 //## current min and max value are stored in m_Min and m_Max.
+//## @ingroup DataTree
 //## The maximum and minimum of valid value range is stored in
 //## m_RangeMin and m_RangeMax
 class LevelWindow

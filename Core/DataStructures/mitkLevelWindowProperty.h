@@ -8,6 +8,9 @@
 namespace mitk {
 
 //##ModelId=3ED953070392
+//##Documentation
+//## @brief Property for level/window data
+//## @ingroup DataTree
 class LevelWindowProperty : public BaseProperty
 {
 

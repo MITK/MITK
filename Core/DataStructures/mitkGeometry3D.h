@@ -23,10 +23,11 @@ typedef itk::BoundingBox<> BoundingBox;
 //##ModelId=3DCBF389032B
 //##Documentation
 //## @brief Describes the geometry of a data object
+//## @ingroup Geometry
 //## Describes the geometry of a data object, e.g., an Image. At least, it can
 //## return the bounding box of the data object. If the data object consists of
 //## slices, a Geometry2D can be requested for each slice and conversions
-//## between world coordinates (in mm) and units coordinates (e.g., pixels in
+//## between world coordinates (in mm) and unit coordinates (e.g., pixels in
 //## the case of an Image) can be performed.
 //## 
 //## Geometry3D and the associated Geometry2Ds (if applicable) have to be
@@ -156,10 +157,10 @@ public:
     //##Documentation
     //## set according to tags in @a pic. @a pic can be 2D, 3D or 4D.  For 3D,
     //## the parameter @a s is ignored, for 4D @a s and @a t are ignored.
-    //## @return false geometry not changed, either because of inconsistent
+    //## @return @a false: geometry not changed, either because of inconsistent
     //## data (e.g., dimensions do not match the dimensions of a slice) or
     //## read-only geometry.
-    //## @return true geometry successfully updated.
+    //## @return @a true: geometry successfully updated.
     virtual bool SetGeometry2D(ipPicDescriptor* pic, int s = 0, int t = 0);
 
     //##ModelId=3E3B986602CF

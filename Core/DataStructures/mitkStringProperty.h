@@ -10,6 +10,7 @@ namespace mitk {
 //##ModelId=3E3FDF05028B
 //##Documentation
 //## @brief Property for strings
+//## @ingroup DataTree
 class StringProperty : public BaseProperty
 {
 protected:

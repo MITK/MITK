@@ -10,6 +10,7 @@ namespace mitk {
 //##ModelId=3E3AE8F401DD
 //##Documentation
 //## @brief Describes the geometry on the Display (inside a widget)
+//## @ingroup Geometry
 //## Describes the geometry on the Display (inside a widget). Can convert
 //## between Display units and data units (as stored in Geometry2D). Can depend
 //## on a Geometry2D describing the data. If so, it can directly convert from

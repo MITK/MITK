@@ -14,6 +14,7 @@ class VtkQRenderWindowInteractor;
 //##ModelId=3E6D600E017F
 //##Documentation
 //## @brief vtk-based camera controller
+//## @ingroup NavigationControl
 class VtkInteractorCameraController : public CameraController
 {
 public:

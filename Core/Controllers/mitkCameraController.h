@@ -9,6 +9,7 @@ namespace mitk {
 //##ModelId=3DF8BCFD014C
 //##Documentation
 //## @brief controls the camera used by the associated BaseRenderer
+//## @ingroup NavigationControl
 //## Subclass of BaseController. Controls the camera used by the associated
 //## BaseRenderer.
 class CameraController : public BaseController

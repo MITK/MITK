@@ -1,6 +1,6 @@
 INCLUDES = -I../ipPic
 
-EXTRA_DIST = libipFunc.dsp ipFunc.dsp
+EXTRA_DIST = libipFunc.dsp ipFunc.dsp ipFunc.dox
 
 bin_PROGRAMS = ipFunc
 lib_LIBRARIES = libipFunc.a
@@ -13,7 +13,8 @@ noinst_HEADERS =		\
       ipLocal.h                	\
       ipMorphological.h        	\
       ipPointOperators.h       	\
-      ipStatistical.h            
+      ipStatistical.h            \
+      ipAdministrative.h
 
 ipFunc_LDADD = ./libipFunc.a
 

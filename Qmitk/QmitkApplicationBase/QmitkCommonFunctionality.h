@@ -447,11 +447,11 @@ static mitk::DataTreeNode::Pointer OpenVolumeOrSliceStack()
 }
 
 template < typename TImageType >
-static void SaveImage(mitk::Image* image)
+static QString SaveImage(mitk::Image* image)
 {
   QString fileName = QFileDialog::getSaveFileName(QString("NewImage.pic"),GetSaveFileExtensions());
   if (fileName == NULL ) 
-    return;
+    return NULL;
 
   try 
   {
@@ -535,8 +535,9 @@ static void SaveImage(mitk::Image* image)
   {
     std::cout << "Exception object caught!" <<std::endl;
     std::cout << err << std::endl;
-    return;
+    return NULL;
   }
+  return fileName;
 }
 
     static void SaveSurface(mitk::Surface* surface, std::string name = 0)

@@ -49,7 +49,6 @@ void mitk::BoundingObjectGroup::UpdateOutputInformation()
   mitk::BoundingBox::PointType minPoint;
   mitk::BoundingBox::PointType globalMinPoint;  
   mitk::BoundingBox::PointType globalMaxPoint;
-  float* posPoint;
 
   /* Initialize globalMin/MaxPoints */
   boundingObjectsIterator.Value()->UpdateOutputInformation();

@@ -6,7 +6,7 @@
 //##ModelId=3E3FE04202B9
 mitk::BaseData::BaseData() : m_SmartSourcePointer(NULL), m_SourceOutputIndexDuplicate(0), m_Unregistering(false), m_ExternalReferenceCount(-1), m_CalculatingExternalReferenceCount(false)
 {
-
+  m_Geometry3D = Geometry3D::New();
 }
 
 //##ModelId=3E3FE042031D

@@ -78,76 +78,110 @@ void mitk::SliceNavigationController::SetInputWorldGeometry(const mitk::Geometry
 
 void mitk::SliceNavigationController::Update()
 {
+  if(m_InputWorldGeometry.IsNull())
+    return;
   if(m_BlockUpdate)
     return;
   m_BlockUpdate = true;
-  if(m_LastUpdateTime<GetMTime())
+  if(m_LastUpdateTime < m_InputWorldGeometry->GetMTime())
+  {
+    Modified();
+  }
+  if(m_LastUpdateTime < GetMTime())
   {
     m_LastUpdateTime = GetMTime();
 
-    if(m_InputWorldGeometry.IsNotNull())
+    // initialize the viewplane
+    mitk::PlaneGeometry::Pointer planegeometry = mitk::PlaneGeometry::New();
+
+    ScalarType viewSpacing = 1;
+
+    mitk::SlicedGeometry3D::Pointer slicedWorldGeometry = NULL;
+    m_CreatedWorldGeometry = NULL;
+    const TimeSlicedGeometry* worldTimeSlicedGeometry = dynamic_cast<const TimeSlicedGeometry*>(m_InputWorldGeometry.GetPointer());
+    switch(m_ViewDirection)
     {
-      // initialize the viewplane
-      mitk::PlaneGeometry::Pointer planegeometry = mitk::PlaneGeometry::New();
+      case Original:
+        if(worldTimeSlicedGeometry != NULL)
+        {
+          m_CreatedWorldGeometry =
+            static_cast<mitk::TimeSlicedGeometry*>(m_InputWorldGeometry->Clone().GetPointer());
+          worldTimeSlicedGeometry = m_CreatedWorldGeometry.GetPointer();
+          slicedWorldGeometry = dynamic_cast<mitk::SlicedGeometry3D*>(m_CreatedWorldGeometry->GetGeometry3D(0));
+          if(slicedWorldGeometry.IsNotNull())
+          {
+            break;
+          }
+        }
+        else
+        {
+          const mitk::SlicedGeometry3D* worldSlicedGeometry = dynamic_cast<const mitk::SlicedGeometry3D*>(m_InputWorldGeometry.GetPointer());
+          if(worldSlicedGeometry != NULL)
+          {
+            slicedWorldGeometry = static_cast<mitk::SlicedGeometry3D*>(m_InputWorldGeometry->Clone().GetPointer());
+            break;
+          }
+        }
+        //else: use Transversal: no "break" here!!
+      case Transversal:
+        planegeometry->InitializeStandardPlane(            
+          m_InputWorldGeometry,
+          PlaneGeometry::Transversal, 
+          m_InputWorldGeometry->GetExtent(2)-1, false);
+        m_Slice->SetSteps((int)m_InputWorldGeometry->GetExtent(2));
+        viewSpacing=m_InputWorldGeometry->GetExtentInMM(2)/m_InputWorldGeometry->GetExtent(2);
+        break;
+      case Frontal:
+        planegeometry->InitializeStandardPlane(
+          m_InputWorldGeometry,
+          PlaneGeometry::Frontal);
+        m_Slice->SetSteps((int)(m_InputWorldGeometry->GetExtent(1)));
+        viewSpacing=m_InputWorldGeometry->GetExtentInMM(1)/m_InputWorldGeometry->GetExtent(1);
+        break;
+      case Sagittal:
+        planegeometry->InitializeStandardPlane(
+          m_InputWorldGeometry,
+          PlaneGeometry::Sagittal);
+        m_Slice->SetSteps((int)(m_InputWorldGeometry->GetExtent(0)));
+        viewSpacing=m_InputWorldGeometry->GetExtentInMM(0)/m_InputWorldGeometry->GetExtent(0);
+        break;
+      default:
+        itkExceptionMacro("unknown ViewDirection");
+    }
 
-      ScalarType viewSpacing = 1;
+    m_Slice->SetPos(0);
 
-      switch(m_ViewDirection)
-      {
-        case Original:
-          assert(false);
-          break;
-        case Transversal:
-          planegeometry->InitializeStandardPlane(            
-            m_InputWorldGeometry,
-            PlaneGeometry::Transversal, 
-            m_InputWorldGeometry->GetExtent(2)-1, false);
-          m_Slice->SetSteps((int)m_InputWorldGeometry->GetExtent(2));
-          viewSpacing=m_InputWorldGeometry->GetExtentInMM(2)/m_InputWorldGeometry->GetExtent(2);
-          break;
-        case Frontal:
-          planegeometry->InitializeStandardPlane(
-            m_InputWorldGeometry,
-            PlaneGeometry::Frontal);
-          m_Slice->SetSteps((int)(m_InputWorldGeometry->GetExtent(1)));
-          viewSpacing=m_InputWorldGeometry->GetExtentInMM(1)/m_InputWorldGeometry->GetExtent(1);
-          break;
-        case Sagittal:
-          planegeometry->InitializeStandardPlane(
-            m_InputWorldGeometry,
-            PlaneGeometry::Sagittal);
-          m_Slice->SetSteps((int)(m_InputWorldGeometry->GetExtent(0)));
-          viewSpacing=m_InputWorldGeometry->GetExtentInMM(0)/m_InputWorldGeometry->GetExtent(0);
-          break;
-        default:
-          itkExceptionMacro("unknown ViewDirection");
-      }
-
-      m_Slice->SetPos(0);
-
-      mitk::SlicedGeometry3D::Pointer slicedWorldGeometry=mitk::SlicedGeometry3D::New();
+    if(slicedWorldGeometry.IsNull())
+    {
+      slicedWorldGeometry=mitk::SlicedGeometry3D::New();
       slicedWorldGeometry->InitializeEvenlySpaced(planegeometry, viewSpacing, m_Slice->GetSteps(), (m_ViewDirection==Frontal?true:false));
+    }
+    else
+    {
+      m_Slice->SetSteps((int)slicedWorldGeometry->GetSlices());
+    }
 
+    if(m_CreatedWorldGeometry.IsNull())
+    {
       // initialize TimeSlicedGeometry
       m_CreatedWorldGeometry = TimeSlicedGeometry::New();
-      const TimeSlicedGeometry* worldTimeSlicedGeometry = dynamic_cast<const TimeSlicedGeometry*>(m_InputWorldGeometry.GetPointer());
-      if(worldTimeSlicedGeometry==NULL)
-      {
-        m_CreatedWorldGeometry->InitializeEvenlyTimed(slicedWorldGeometry, 1);
-        m_Time->SetSteps(0);
-        m_Time->SetPos(0);
-      }
-      else
-      {
-        m_BlockUpdate = true;
-        m_Time->SetSteps(worldTimeSlicedGeometry->GetTimeSteps());
-        m_Time->SetPos(0);
-        m_BlockUpdate = false;
+    }
+    if(worldTimeSlicedGeometry==NULL)
+    {
+      m_CreatedWorldGeometry->InitializeEvenlyTimed(slicedWorldGeometry, 1);
+      m_Time->SetSteps(0);
+      m_Time->SetPos(0);
+    }
+    else
+    {
+      m_BlockUpdate = true;
+      m_Time->SetSteps(worldTimeSlicedGeometry->GetTimeSteps());
+      m_Time->SetPos(0);
+      m_BlockUpdate = false;
 
-        slicedWorldGeometry->SetTimeBoundsInMS(worldTimeSlicedGeometry->GetGeometry3D(0)->GetTimeBoundsInMS());
-        //@todo implement for non-evenly-timed geometry!
-        m_CreatedWorldGeometry->InitializeEvenlyTimed(slicedWorldGeometry, worldTimeSlicedGeometry->GetTimeSteps());
-      }
+      slicedWorldGeometry->SetTimeBoundsInMS(worldTimeSlicedGeometry->GetGeometry3D(0)->GetTimeBoundsInMS());
+      //@todo implement for non-evenly-timed geometry!
+      m_CreatedWorldGeometry->InitializeEvenlyTimed(slicedWorldGeometry, worldTimeSlicedGeometry->GetTimeSteps());
     }
   }
 

@@ -4,6 +4,7 @@
 #include "mitkCommon.h"
 #include "mitkOperationEvent.h"
 
+
 namespace mitk {
 //##ModelId=3E5F564C03D4
 //##Documentation
@@ -14,7 +15,9 @@ class UndoModel
 {
   public:
   //##ModelId=3E95950F02B1
-  //UndoModel();
+  UndoModel();
+
+  ~UndoModel();
 
   //##ModelId=3E5F5C6C00DF
   virtual bool SetOperationEvent(OperationEvent* operationEvent) = 0;

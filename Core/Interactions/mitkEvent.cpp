@@ -50,7 +50,10 @@ int mitk::Event::GetKey() const
 //##ModelId=3E77630102A1
 bool mitk::Event::operator==(const Event& event) const
 {
-	if ( (m_Type == event.GetType())
+    const mitk::Event *input = dynamic_cast<const mitk::Event*>(&event);
+    if(input==NULL) return false;
+
+    if ( (m_Type == event.GetType())
 		&& (m_Button == event.GetButton())
 		&& (m_ButtonState == event.GetButtonState())
 		&& (m_Key == event.GetKey()) )

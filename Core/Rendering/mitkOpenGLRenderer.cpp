@@ -419,6 +419,7 @@ void mitk::OpenGLRenderer::SetWindowId(void * id)
 void mitk::OpenGLRenderer::InitSize(int w, int h)
 {
   m_MitkVtkRenderWindow->SetSize(w,h);
+  GetDisplayGeometry()->SetSizeInDisplayUnits(w, h);
   GetDisplayGeometry()->Fit();
   Modified();
   Update();

@@ -3,7 +3,6 @@
 
 #include "mitkCommon.h"
 #include "SlicedData.h"
-#include "DICOM.h"
 #include "ImageDataItem.h"
 #include "PixelType.h"
 #include "BaseData.h"

@@ -59,6 +59,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkSTLWriter.h>
 #include <vtkPolyDataWriter.h>
 
+#include "mitkLevelWindow.h"
+
 #define EXTERNAL_FILE_EXTENSIONS "All known formats(*.dcm *.DCM *.pic *.pic.gz *.png *.jog *.tiff);;DICOM files(*.dcm *.DCM);;DKFZ Pic (*.seq *.pic *.pic.gz *.seq.gz);;Sets of 2D slices (*.pic *.pic.gz *.png *.dcm);;stl files (*.stl)"
 #define INTERNAL_FILE_EXTENSIONS "all (*.seq *.pic *.pic.gz *.seq.gz *.pvtk *.stl *.vtk *.ves *.uvg *.par *.dcm *.mhd hpsonos.db HPSONOS.DB *.png *.tiff *.jpg);;DKFZ Pic (*.seq *.pic *.pic.gz *.seq.gz);;surface files (*.stl *.vtk);;stl files (*.stl);;vtk surface files (*.vtk);;vtk image files (*.pvtk);;vessel files (*.ves *.uvg);;par/rec files (*.par);;DSR files (hpsonos.db HPSONOS.DB);;DICOM files (*.dcm)"
 #define SAVE_FILE_EXTENSIONS "all (*.pic *.mhd *.png *.tiff *.jpg)"
@@ -92,6 +94,32 @@ public:
     max = (float) minmax->GetMaximum();
 
 
+  }
+
+  template < typename TImageType >
+  static void AutoLevelWindow( mitk::DataTreeNode::Pointer node )
+  {
+    mitk::Image::Pointer image = dynamic_cast<mitk::Image*> (node->GetData() );
+    if ( image.IsNotNull() )
+    {
+      typename TImageType::Pointer itkImage= TImageType::New();
+      mitk::CastToItkImage( image, itkImage);
+      float extrema[2];
+      extrema[0] = 0;
+      extrema[1] = 4096;
+      MinMax<TImageType>(itkImage,extrema[0],extrema[1]);
+
+      mitk::LevelWindowProperty::Pointer levWinProp = dynamic_cast<mitk::LevelWindowProperty*>(node->GetPropertyList()->GetProperty("levelwindow").GetPointer());
+      if( levWinProp.IsNull() )
+      {
+        levWinProp = new mitk::LevelWindowProperty();
+      }
+      mitk::LevelWindow levWin = levWinProp->GetLevelWindow();
+      levWin.SetRangeMin(extrema[0]);
+      levWin.SetRangeMax(extrema[1]);
+      levWinProp->SetLevelWindow(levWin);
+
+    }
   }
 
 
@@ -143,6 +171,7 @@ public:
     }
     return node;
   }
+
 
 
   /** 
@@ -325,6 +354,9 @@ static mitk::DataTreeNode::Pointer OpenVolumeOrSliceStack()
       }
       return newNode;
     }
+  }
+  {
+    return NULL;
   }
 }
 

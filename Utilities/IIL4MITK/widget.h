@@ -3,6 +3,7 @@
 
 #include "mitkRenderWindow.h"
 #include <assert.h>
+#include <qptrlist.h> 
 
 typedef mitk::RenderWindow iilWidget;
 

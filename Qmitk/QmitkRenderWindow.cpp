@@ -23,7 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qcursor.h>
 #include "mitkDisplayPositionEvent.h"
 //##ModelId=3E1EB4410304
-mitk::QmitkRenderWindow::QmitkRenderWindow(mitk::BaseRenderer* renderer, QGLFormat glf, QWidget *parent, const char *name) 
+QmitkRenderWindow::QmitkRenderWindow(mitk::BaseRenderer* renderer, QGLFormat glf, QWidget *parent, const char *name) 
   : QGLWidget(glf, parent, name), mitk::RenderWindow(name, renderer), m_InitNeeded(false), m_ResizeNeeded(false), m_InResize(false)
 {
   InitRenderer();
@@ -31,7 +31,7 @@ mitk::QmitkRenderWindow::QmitkRenderWindow(mitk::BaseRenderer* renderer, QGLForm
   setMouseTracking(true);
 }
 
-mitk::QmitkRenderWindow::QmitkRenderWindow(QGLFormat glf, QWidget *parent, const char *name) 
+QmitkRenderWindow::QmitkRenderWindow(QGLFormat glf, QWidget *parent, const char *name) 
   : QGLWidget(glf, parent, name), mitk::RenderWindow(name, NULL), m_InitNeeded(false), m_ResizeNeeded(false), m_InResize(false)
 {
   InitRenderer();
@@ -40,7 +40,7 @@ mitk::QmitkRenderWindow::QmitkRenderWindow(QGLFormat glf, QWidget *parent, const
 }
 
 //##ModelId=3E1EB4410318
-mitk::QmitkRenderWindow::QmitkRenderWindow(mitk::BaseRenderer* renderer, QWidget *parent, const char *name)
+QmitkRenderWindow::QmitkRenderWindow(mitk::BaseRenderer* renderer, QWidget *parent, const char *name)
 : QGLWidget(parent, name), mitk::RenderWindow(name, renderer), m_InitNeeded(false), m_ResizeNeeded(false), m_InResize(false)
 {
   InitRenderer();
@@ -48,7 +48,7 @@ mitk::QmitkRenderWindow::QmitkRenderWindow(mitk::BaseRenderer* renderer, QWidget
   setMouseTracking(true);
 }
 
-mitk::QmitkRenderWindow::QmitkRenderWindow(QWidget *parent, const char *name)
+QmitkRenderWindow::QmitkRenderWindow(QWidget *parent, const char *name)
 : QGLWidget(parent, name), mitk::RenderWindow(name, NULL), m_InitNeeded(false), m_ResizeNeeded(false), m_InResize(false)
 {
   InitRenderer();
@@ -57,12 +57,12 @@ mitk::QmitkRenderWindow::QmitkRenderWindow(QWidget *parent, const char *name)
 }
 
 //##ModelId=3E1EB441032C
-mitk::QmitkRenderWindow::~QmitkRenderWindow()
+QmitkRenderWindow::~QmitkRenderWindow()
 {
 
 }
 
-void mitk::QmitkRenderWindow::InitRenderer()
+void QmitkRenderWindow::InitRenderer()
 {
   m_InitNeeded = true;
   m_ResizeNeeded = true;
@@ -76,7 +76,7 @@ void mitk::QmitkRenderWindow::InitRenderer()
 \brief Initialize the OpenGL Window
 */
 //##ModelId=3E33145903C8
-void mitk::QmitkRenderWindow::initializeGL() 
+void QmitkRenderWindow::initializeGL() 
 {
   if(m_Renderer.IsNotNull())
     m_Renderer->Initialize();
@@ -86,7 +86,7 @@ void mitk::QmitkRenderWindow::initializeGL()
 \brief Resize the OpenGL Window
 */
 //##ModelId=3E33145A001C
-void mitk::QmitkRenderWindow::resizeGL( int w, int h ) 
+void QmitkRenderWindow::resizeGL( int w, int h ) 
 {
   if(m_InResize) //@FIXME CRITICAL probably related to VtkSizeBug
     return;
@@ -104,7 +104,7 @@ void mitk::QmitkRenderWindow::resizeGL( int w, int h )
 \brief Render the scene
 */
 //##ModelId=3E3314590396
-void mitk::QmitkRenderWindow::paintGL( )
+void QmitkRenderWindow::paintGL( )
 {
   // Get the native window ID and pass it
   // to the m_Renderer
@@ -123,7 +123,7 @@ void mitk::QmitkRenderWindow::paintGL( )
   }
 }
 
-void mitk::QmitkRenderWindow::showEvent ( QShowEvent * )
+void QmitkRenderWindow::showEvent ( QShowEvent * )
 {
   // when the widget becomes visible the first time, we need to tell vtk the window size
   if(m_ResizeNeeded)
@@ -136,23 +136,23 @@ void mitk::QmitkRenderWindow::showEvent ( QShowEvent * )
 
 
 //##ModelId=3E3D1D4A00A5
-void mitk::QmitkRenderWindow::MakeCurrent()
+void QmitkRenderWindow::MakeCurrent()
 {
   makeCurrent();
 }
 
-void mitk::QmitkRenderWindow::SwapBuffers() 
+void QmitkRenderWindow::SwapBuffers() 
 {
   swapBuffers();
 };
 
-bool mitk::QmitkRenderWindow::IsSharing () const
+bool QmitkRenderWindow::IsSharing () const
 {
   return isSharing();
 }
 
 //##ModelId=3E6D5DD40306
-void mitk::QmitkRenderWindow::mousePressEvent(QMouseEvent *me) 
+void QmitkRenderWindow::mousePressEvent(QMouseEvent *me) 
 {
   QGLWidget::mousePressEvent(me);
   if (m_Renderer.IsNotNull())
@@ -164,7 +164,7 @@ void mitk::QmitkRenderWindow::mousePressEvent(QMouseEvent *me)
 }
 
 //##ModelId=3E6D5DD4032E
-void mitk::QmitkRenderWindow::mouseReleaseEvent(QMouseEvent *me) 
+void QmitkRenderWindow::mouseReleaseEvent(QMouseEvent *me) 
 {
   QGLWidget::mouseReleaseEvent(me);
   if (m_Renderer.IsNotNull()) 
@@ -176,7 +176,7 @@ void mitk::QmitkRenderWindow::mouseReleaseEvent(QMouseEvent *me)
 }
 
 //##ModelId=3E6D5DD40356
-void mitk::QmitkRenderWindow::mouseMoveEvent(QMouseEvent *me) 
+void QmitkRenderWindow::mouseMoveEvent(QMouseEvent *me) 
 {
   QGLWidget::mouseMoveEvent(me);
   if (m_Renderer.IsNotNull()) {
@@ -186,7 +186,7 @@ void mitk::QmitkRenderWindow::mouseMoveEvent(QMouseEvent *me)
   }
 }
 
-void mitk::QmitkRenderWindow::wheelEvent(QWheelEvent *we)
+void QmitkRenderWindow::wheelEvent(QWheelEvent *we)
 {
   we->ignore();
   /*  QGLWidget::wheelEvent(we);
@@ -195,7 +195,7 @@ void mitk::QmitkRenderWindow::wheelEvent(QWheelEvent *we)
 }
 
 //##ModelId=3E6D5DD40388
-void mitk::QmitkRenderWindow::keyPressEvent(QKeyEvent *ke) 
+void QmitkRenderWindow::keyPressEvent(QKeyEvent *ke) 
 {
   if (m_Renderer.IsNotNull())
   {
@@ -209,13 +209,13 @@ void mitk::QmitkRenderWindow::keyPressEvent(QKeyEvent *ke)
 
 //##ModelId=3EF59AD202B7
 //check for update
-void mitk::QmitkRenderWindow::Update()
+void QmitkRenderWindow::Update()
 {
   update();
 };
 
 //force an update
-void mitk::QmitkRenderWindow::Repaint()
+void QmitkRenderWindow::Repaint()
 {
   //hide();//strongest update! but flickering widgets in zoom!
   //show();
@@ -223,25 +223,25 @@ void mitk::QmitkRenderWindow::Repaint()
   repaint();
 };
 
-QSize mitk::QmitkRenderWindow::minimumSizeHint () const
+QSize QmitkRenderWindow::minimumSizeHint () const
 {
   return QSize(100, 100);
 }
 
-QSizePolicy mitk::QmitkRenderWindow::sizePolicy() const
+QSizePolicy QmitkRenderWindow::sizePolicy() const
 {
   return QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding, 0, 0);
 }
 
-QSize mitk::QmitkRenderWindow::sizeHint () const 
+QSize QmitkRenderWindow::sizeHint () const 
 {
   return QSize(100, 100);
 }
 
 //##ModelId=3E6D5DD403B0
-void mitk::QmitkRenderWindow::focusInEvent(QFocusEvent*)  {};
+void QmitkRenderWindow::focusInEvent(QFocusEvent*)  {};
 //##ModelId=3E6D5DD403E2
-void mitk::QmitkRenderWindow::focusOutEvent(QFocusEvent*) {}; 
+void QmitkRenderWindow::focusOutEvent(QFocusEvent*) {}; 
 
 //We have to put this in a file containing a class that is directly used
 //somewhere. Otherwise, e.g. when put in VtkRenderWindowInteractor.cpp, 

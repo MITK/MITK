@@ -155,7 +155,7 @@ void Step6::SetupWidgets()
   QHBox* viewParent = new QHBox(m_TopLevelWidget);
   // Part VIa: 3D view
   // create a renderwindow
-  mitk::QmitkRenderWindow* renderWindow = new mitk::QmitkRenderWindow(viewParent);
+  QmitkRenderWindow* renderWindow = new QmitkRenderWindow(viewParent);
   // tell the renderwindow which (part of) the tree to render
   renderWindow->GetRenderer()->SetData(&it);
   // use it as a 3D view

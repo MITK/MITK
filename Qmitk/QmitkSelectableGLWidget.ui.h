@@ -41,7 +41,7 @@ void QmitkSelectableGLWidget::init()
         composedName+=name();
     else
         composedName+="QmitkGLWidget";
-    mitkWidget = new mitk::QmitkRenderWindow(renderer,QGLFormat( QGL::StencilBuffer ), this, composedName);
+    mitkWidget = new QmitkRenderWindow(renderer,QGLFormat( QGL::StencilBuffer ), this, composedName);
     
     //initialize SliceNavigationController
     sliceNavigationController = new mitk::SliceNavigationController("navigation");

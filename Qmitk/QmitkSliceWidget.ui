@@ -221,7 +221,7 @@
     <variable access="private">bool popUpEnabled;</variable>
     <variable>mitk::SliceNavigationController::Pointer m_SliceNavigator;</variable>
     <variable access="private">mitk::DataTree::Pointer m_DataTree;</variable>
-    <variable>mitk::QmitkRenderWindow* m_RenderWindow;</variable>
+    <variable>QmitkRenderWindow* m_RenderWindow;</variable>
 </variables>
 <signals>
     <signal>sliderChanged(int)</signal>
@@ -250,7 +250,7 @@
     <function returnType="QmitkSliderNavigator *">GetNavigatorWidget()</function>
     <function returnType="mitk::SliceNavigationController::Pointer">GetSliceController()</function>
     <function specifier="non virtual" returnType="bool">IsLevelWindowEnabled()</function>
-    <function returnType="mitk::QmitkRenderWindow *">GetRenderWindow()</function>
+    <function returnType="QmitkRenderWindow *">GetRenderWindow()</function>
 </functions>
 <layoutdefaults spacing="6" margin="11"/>
 <includehints>

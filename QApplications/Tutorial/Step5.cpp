@@ -104,7 +104,7 @@ int main(int argc, char* argv[])
   QHBox toplevelWidget;
   // Part VIa: 3D view
   // create a renderwindow
-  mitk::QmitkRenderWindow renderWindow(&toplevelWidget);
+  QmitkRenderWindow renderWindow(&toplevelWidget);
   // tell the renderwindow which (part of) the tree to render
   renderWindow.GetRenderer()->SetData(&it);
   // use it as a 3D view

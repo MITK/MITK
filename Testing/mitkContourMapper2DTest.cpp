@@ -66,7 +66,7 @@ int mitkContourMapper2DTest(int argc, char* argv[])
   
   mitk::OpenGLRenderer::Pointer renderer = mitk::OpenGLRenderer::New();
   
-  //  mitk::QmitkRenderWindow *rw = new mitk::QmitkRenderWindow(renderer, NULL, NULL);  
+  //  QmitkRenderWindow *rw = new QmitkRenderWindow(renderer, NULL, NULL);  
 
   
   std::cout<<"Testing mitk::BaseRenderer::SetData()"<<std::endl;

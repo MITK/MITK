@@ -53,7 +53,7 @@ int main(int argc, char* argv[])
 
   //Part IV: Create window and pass the tree to it
   // create a renderwindow
-  mitk::QmitkRenderWindow renderWindow;
+  QmitkRenderWindow renderWindow;
   // tell the renderwindow which (part of) the tree to render
   renderWindow.GetRenderer()->SetData(&it);
 

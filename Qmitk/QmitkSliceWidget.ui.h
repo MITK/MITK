@@ -39,7 +39,7 @@ void QmitkSliceWidget::init()
     composedName+=name();
   else
     composedName+="QmitkGLWidget";
-  m_RenderWindow = new mitk::QmitkRenderWindow(m_Renderer, container, composedName);
+  m_RenderWindow = new QmitkRenderWindow(m_Renderer, container, composedName);
   hlayout->addWidget(m_RenderWindow);
 
   m_SliceNavigator = new mitk::SliceNavigationController("navigation");
@@ -331,7 +331,7 @@ bool QmitkSliceWidget::IsLevelWindowEnabled()
 }
 
 
-mitk::QmitkRenderWindow* QmitkSliceWidget::GetRenderWindow()
+QmitkRenderWindow* QmitkSliceWidget::GetRenderWindow()
 {
     return m_RenderWindow;
 }

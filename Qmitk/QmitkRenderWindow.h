@@ -25,7 +25,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkBaseRenderer.h"
 #include "mitkRenderWindow.h"
 
-namespace mitk {
 
 //##ModelId=3DD521FB01A9
 //##Documentation
@@ -105,9 +104,5 @@ public:
   //##ModelId=3E6D5DD403E2
   virtual void focusOutEvent(QFocusEvent*); 
 };
-
-} // namespace mitk
-
-
 
 #endif /* QMITKRENDERWINDOW_H_HEADER_INCLUDED_C1C40D66 */

@@ -59,11 +59,16 @@ public:
 
   virtual void SetInput(const mitk::Image *input);
   virtual void SetInput(unsigned int index, const mitk::Image * image);
-	//void SetMitkImage(mitk::Image::Pointer image, int n = 0);
 
-  itkGetMacro(Channel, int);
-  itkSetMacro(Channel, int);
-	
+  virtual void UpdateOutputInformation();
+
+  itkGetMacro( Channel, int );
+  itkSetMacro( Channel, int );
+
+  itkSetMacro( CopyMemFlag, bool );
+  itkGetMacro( CopyMemFlag, bool );
+  itkBooleanMacro( CopyMemFlag );
+
 protected:
 	ImageToItk();
 	
@@ -76,12 +81,6 @@ protected:
 
   virtual void GenerateOutputInformation();
   
-  void SetCopyMemFlagOn();
-
-  void SetCopyMemFlagOff();
-
-  void SetCopyMemFlag(bool flag);
-
 private:
 	bool m_CopyMemFlag;
   int m_Channel;

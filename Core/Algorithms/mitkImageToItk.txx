@@ -16,25 +16,6 @@ See MITKCopyright.txt or http://www.mitk.org/ for details.
 
 =========================================================================*/
 
-/*=========================================================================
-
-Program:   Insight Segmentation & Registration Toolkit
-Module:    $RCSfile$
-Language:  C++
-Date:      $Date$
-Version:   $Revision$
-
-Copyright (c) 2002 Insight Consortium. All rights reserved.
-See ITKCopyright.txt or http://www.itk.org/HTML/Copyright.htm for details.
-
-Portions of this code are covered under the VTK copyright.
-See VTKCopyright.txt or http://www.kitware.com/VTKCopyright.htm for details.
-
-This software is distributed WITHOUT ANY WARRANTY; without even 
-the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR 
-PURPOSE.  See the above copyright notices for more information.
-      
-=========================================================================*/
 #ifndef IMAGETOITK_TXX_INCLUDED_C1C2FCD2
 #define IMAGETOITK_TXX_INCLUDED_C1C2FCD2
 
@@ -118,64 +99,6 @@ const mitk::Image *ImageToItk<TPixel, VImageDimension>::GetInput(unsigned int id
 		(this->ProcessObject::GetInput(idx));
 }
 
-
-/** set the @a mitk::Image that shall be accessed from itk via this itk-wrapper-class.
-* @param n channel number to be accessed
-*
-template<class TPixel, unsigned int VImageDimension>
-  void ImageToItk<TPixel, VImageDimension>
-  ::SetMitkImage(mitk::Image::Pointer image, int n)
-{
-  
-  std::cout << "ImageToItk::SetMitkImage() ... " << std::endl;
-  
-  if(image == NULL)
-    itkExceptionMacro( << "image is null" );
-  if(image->GetDimension()!=VImageDimension)
-    itkExceptionMacro( << "image has dimension " << image->GetDimension() << " instead of " << VImageDimension );
-  
-  
-  if(typeid(TPixel) != *image->GetPixelType().GetTypeId())
-    itkExceptionMacro( << "image has wrong pixel type " );
-  
-  itkDebugMacro("ImageToItk::SetImageToItk ...");
-  
-  std::cout << "Hallo..  " << std::endl;    
-  m_MitkImage = image;
-  
-  m_Channel = n;
-  
-  
-  this->Modified();
-  
-  
-  itkDebugMacro( << "ImageToItk::SetMitkImage OK!" );
-  std::cout << "ImageToItk::SetMitkImage() OK! " << std::endl;
-  
-}*/
-
-template<class TPixel, unsigned int VImageDimension>
-  void ImageToItk<TPixel, VImageDimension>
-  ::SetCopyMemFlagOn()
-{
-  m_CopyMemFlag = true;
-}
-
-template<class TPixel, unsigned int VImageDimension>
-  void ImageToItk<TPixel, VImageDimension>
-  ::SetCopyMemFlagOff()
-{
-  m_CopyMemFlag = false;
-}
-
-template<class TPixel, unsigned int VImageDimension>
-  void ImageToItk<TPixel, VImageDimension>
-  ::SetCopyMemFlag(bool flag)
-{
-  m_CopyMemFlag = flag;
-}
-
-
 template<class TPixel, unsigned int VImageDimension>
   void ImageToItk<TPixel, VImageDimension>
   ::GenerateData()
@@ -229,6 +152,28 @@ template<class TPixel, unsigned int VImageDimension>
   std::cout << "ImageToItk<TPixel, VImageDimension>::GenerateData() OK! " << std::endl;
   
   
+}
+
+template<class TPixel, unsigned int VImageDimension>
+  void ImageToItk<TPixel, VImageDimension>
+  ::UpdateOutputInformation()
+{
+  mitk::Image::ConstPointer input = this->GetInput();
+  if(input.IsNotNull() && input->GetSource()->Updating())
+  {
+    typename OutputImageType::Pointer output = this->GetOutput();
+    unsigned long t1 = input->GetUpdateMTime()+1;
+    if (t1 > m_OutputInformationMTime.GetMTime())
+    {
+      output->SetPipelineMTime(t1);
+
+      this->GenerateOutputInformation();
+
+      m_OutputInformationMTime.Modified();
+    }
+    return;
+  }
+  Superclass::UpdateOutputInformation();
 }
 
 template<class TPixel, unsigned int VImageDimension>

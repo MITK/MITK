@@ -21,9 +21,9 @@ void mitk::ParRecFileReader::GenerateOutputInformation()
   if( m_FileName != "")
   {
     int extPos=m_FileName.find_last_of(".");
-    if(extPos>=std::npos)
+    if(extPos>=-1)
     {
-      const char *ext=m_FileName.str()+extPos+1;
+      const char *ext=m_FileName.c_str()+extPos+1;
       if(stricmp(ext,"par")==0)
         m_RecFileName = m_FileName.substr(0,extPos);
       else
@@ -51,27 +51,30 @@ void mitk::ParRecFileReader::GenerateOutputInformation()
       {
         char s[300], *p;
         fgets(s,200,f);
-        if(strstr(s,"Max. number of cardiac phases")
+        if(strstr(s,"Max. number of cardiac phases"))
         {
-          p=strchr(s,':');
+          p=strchr(s,':')+1;
           dimensions[3]=atoi(p);
           if(dimensions[3]>1)
             dimension=4;
         }
         else
-        if(strstr(s,"Max. number of slices/locations")
+        if(strstr(s,"Max. number of slices/locations"))
         {
-          p=strchr(s,':');
+          p=strchr(s,':')+1;
           dimensions[2]=atoi(p);
-          if(dimensions[2]>1)
-            dimension=3;
-          else
-            dimension=2;
+          if(dimension==0)
+          {
+            if(dimensions[2]>1)
+              dimension=3;
+            else
+              dimension=2;
+          }
         }
         else
-        if(strstr(s,"Image pixel size")
+        if(strstr(s,"Image pixel size"))
         {
-          p=strchr(s,':');
+          p=strchr(s,':')+1;
           int bpe=atoi(p);
           if(bpe==8)
             type=typeid(ipUInt1_t);
@@ -79,27 +82,37 @@ void mitk::ParRecFileReader::GenerateOutputInformation()
             type=typeid(ipUInt2_t);
         }
         else
-        if(strstr(s,"Recon resolution")
+        if(strstr(s,"Recon resolution"))
         {
-          p=strcspn(s,"0123456789");
-          sscanf(p,"%u %u", dimension[0], dimension[1]);
+          p=s+strcspn(s,"0123456789");
+          sscanf(p,"%u %u", dimensions, dimensions+1);
         }
         else
-        if(strstr(s,"Slice thickness [mm]")
+        if(strstr(s,"FOV (ap,fh,rl) [mm]"))
         {
-          p=strcspn(s,"0123456789");
-          sscanf(p,"%f %f %f", thickness.x, thickness.y, thickness.z);
+          p=s+strcspn(s,"0123456789");
+          sscanf(p,"%f %f %f", &thickness.z, &thickness.x, &thickness.y);
         }
-        else
-        if(strstr(s,"Slice gap [mm]")
-        {
-          p=strcspn(s,"0123456789");
-          sscanf(p,"%f %f %f", gap.x, gap.y, gap.z);
-        }
+        //else
+        //if(strstr(s,"Slice thickness [mm]"))
+        //{
+        //  p=s+strcspn(s,"0123456789");
+        //  sscanf(p,"%f", &thickness.z);
+        //}
+        //else
+        //if(strstr(s,"Slice gap [mm]"))
+        //{
+        //  p=s+strcspn(s,"0123456789");
+        //  sscanf(p,"%f", &gap.z);
+        //}
       }
       fclose(f);
 
+      thickness.x/=dimensions[0];
+      thickness.y/=dimensions[1];
+      thickness.z/=dimensions[2];
       spacing=thickness+gap;
+
       if((dimension>0) && (dimensions[0]>0) && (dimensions[1]>0))
         headerRead = true;
     }
@@ -117,6 +130,8 @@ void mitk::ParRecFileReader::GenerateOutputInformation()
     
     output->Initialize(type, dimension, dimensions);
     output->GetGeometry()->SetSpacing(spacing);
+    output->GetGeometry()->SetGeometry2D((ipPicDescriptor*)1, 0, 0);
+    output->GetGeometry()->SetEvenlySpaced();
   }
   
   m_ReadHeaderTime.Modified();
@@ -135,31 +150,51 @@ void mitk::ParRecFileReader::GenerateData()
   
   if( m_RecFileName != "")
   {
-    char * c=const_cast<char *>(m_RecFileName.c_str());
-    ipPicDescriptor* pic=ipPicGet(const_cast<char *>(m_FileName.c_str()), NULL);
-    
-    //left to right handed conversion
-    if(pic->dim==3)
+    FILE *f = fopen(m_RecFileName.c_str(), "r");
+    if(f==NULL)
     {
-      ipPicDescriptor* slice=ipPicCopyHeader(pic, NULL);
-      slice->dim=2;
-      int size=_ipPicSize(slice);
-      slice->data=malloc(size);
-      unsigned char *p_first=(unsigned char *)pic->data;
-      unsigned char *p_last=(unsigned char *)pic->data;
-      p_last+=size*(pic->n[2]-1);
-      
-      int i, smid=pic->n[2]/2;
-      for(i=0; i<smid;++i,p_last-=size, p_first+=size)
-      {
-        memcpy(slice->data, p_last, size);
-        memcpy(p_last, p_first, size);
-        memcpy(p_first, slice->data, size);
-      }
-      ipPicFree(slice);
+      throw itk::ImageFileReaderException(__FILE__, __LINE__, "Could not open rec-file.");
     }
+
+    int z, zmax;
+    int t, tmax;
     
-    output->SetPicChannel(pic);
+    z=output->GetRequestedRegion().GetIndex(2);
+    t=output->GetRequestedRegion().GetIndex(3);
+    
+    zmax=z+output->GetRequestedRegion().GetSize(2);
+    tmax=t+output->GetRequestedRegion().GetSize(3);
+    
+    int sliceSize=output->GetDimension(0)*output->GetDimension(1)*output->GetPixelType().GetBpe()/8;
+    void *data = malloc(sliceSize);
+
+    bool ignore4Dtopogram=false;
+    if(output->GetDimension(3)>1)
+    {
+      int volumeSize=sliceSize*output->GetDimension(2);
+      ignore4Dtopogram=true;
+
+      for(;t<tmax;++t)
+        for(;z<zmax;++z)
+        {
+			    if(ignore4Dtopogram)
+            fseek(f,volumeSize*z+(sliceSize+1)*t,SEEK_SET);				  
+          else
+            fseek(f,volumeSize*z+sliceSize*t,SEEK_SET);				  
+      	  fread(data, sliceSize, 1, f);
+          output->SetSlice(data,z,t,0);
+        }
+    }
+    else
+    {
+      for(;z<zmax;++z)
+      {
+        fseek(f,sliceSize*z,SEEK_SET);				  
+      	fread(data, sliceSize, 1, f);
+        output->SetSlice(data,z,0,0);
+      }
+    }
+    free(data);
   }
 }
 
@@ -168,6 +203,6 @@ mitk::ParRecFileReader::ParRecFileReader()
 {
 }
 
-mitk::ParRecFileReader::~PicFileReader()
+mitk::ParRecFileReader::~ParRecFileReader()
 {
 }

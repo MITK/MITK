@@ -1,5 +1,5 @@
 #include "mitkDopplerToStrainRateFilter.h"
-#include "ImageTimeSelector.h"
+#include "mitkImageTimeSelector.h"
 
 #include <iostream.h>
 #include <string>
@@ -265,7 +265,7 @@ void mitk::DopplerToStrainRateFilter::GenerateData()
 		}
 	}
 	//ipPicPut("outzzzzzzzz.pic",pic_transformed);	
-	ipPicFree(picDoppler);
+//	ipPicFree(picDoppler);
 
 
   std::cout << "Strain Rate Image computed.... " << std::endl;

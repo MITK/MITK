@@ -2,7 +2,7 @@
 #define MITKDOPPLERTOSTRAINRATEFILTER_H_HEADER_INCLUDED_C1F48A22
 
 #include "mitkCommon.h"
-#include "ImageToImageFilter.h"
+#include "mitkImageToImageFilter.h"
 #include <vecmath.h>
 
 

@@ -30,7 +30,7 @@ void QmitkSliderNavigator::Refetch()
 void QmitkSliderNavigator::SetStepper( mitk::Stepper * stepper)
 {
     m_Stepper = stepper;
-    m_InRefetch = ( m_Stepper.IsNull() ); // this avoids trying to use m_Stepper until it is set to something != NULL (additionally to the avoiding recursions during refetching)
+    m_InRefetch = (stepper==NULL); // this avoids trying to use m_Stepper until it is set to something != NULL (additionally to the avoiding recursions during refetching)
 }
 
 

@@ -76,7 +76,7 @@ pkginclude_HEADERS = ipFunc.h
 noinst_HEADERS =        gradient.h               	      ipArithmeticAndLogical.h 	      ipFuncP.h                	      ipGeometrical.h          	      ipLocal.h                	      ipMorphological.h        	      ipPointOperators.h       	      ipStatistical.h                  ipAdministrative.h
 
 
-ipFunc_LDADD = ./libipFunc.a
+ipFunc_LDADD = ./libipFunc.a ../ipPic/libipPic.a
 
 ipFunc_SOURCES =  	ipFunc.c
 
@@ -110,7 +110,7 @@ AR = ar
 PROGRAMS =  $(bin_PROGRAMS)
 
 ipFunc_OBJECTS =  ipFunc.o
-ipFunc_DEPENDENCIES =  ./libipFunc.a
+ipFunc_DEPENDENCIES =  ./libipFunc.a ../ipPic/libipPic.a
 ipFunc_LDFLAGS = 
 CFLAGS = @CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)

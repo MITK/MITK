@@ -16,7 +16,7 @@ noinst_HEADERS =		\
       ipStatistical.h            \
       ipAdministrative.h
 
-ipFunc_LDADD = ./libipFunc.a
+ipFunc_LDADD = ./libipFunc.a ../ipPic/libipPic.a
 
 ipFunc_SOURCES = \
 	ipFunc.c

@@ -1,4 +1,5 @@
 #include "mitkLineOperation.h"
+
 mitk::LineOperation::LineOperation(OperationType operationType, int cellId, int pIdA, int pIdB)
 : mitk::Operation(operationType), m_CellId(cellId), m_PIdA(pIdA), m_PIdB(pIdB)
 {}

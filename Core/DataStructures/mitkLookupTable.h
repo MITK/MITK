@@ -3,66 +3,98 @@
 
 #include "mitkCommon.h"
 #include "vtkLookupTable.h"
-//#include "itk.h"
+#include <itkDataObject.h>
+#include <itkObjectFactory.h>
 
-namespace mitk {
-
-//## 
-//##Documentation
-//## @brief 
-//## @ingroup Data
-//## 
-//## 
-//## 
-class LookupTable //: public itk::Object //: public BaseData
+namespace mitk
 {
-protected:
+
+//##
+//##Documentation
+//## @brief
+//## @ingroup Data
+//##
+//##
+//##
+class LookupTable : public itk::DataObject 
+{
 public:
-//	 	mitkClassMacro(LookupTable, itk::Object);
-//	 	mitkClassMacro(LookupTable, LookupTable);
-	  
-	  /** @brief Some convenient typedefs. */
+    /** 
+     *@brief Some convenient typedefs. 
+     */
     typedef unsigned char RawLookupTableType;
 
-		vtkLookupTable* GetVtkLookupTable() const;
+    mitkClassMacro( LookupTable, itk::DataObject );
 
-		RawLookupTableType * GetRawLookupTable() const;
+    itkNewMacro( Self );
 
-		
-		void SetVtkLookupTable(vtkLookupTable* vtkLookupTable){m_LookupTable = vtkLookupTable;};
+    /**
+     * @returns the associated vtkLookupTable
+     */
+    virtual vtkLookupTable* GetVtkLookupTable() const;
 
-		void ChangeOpacityForAll(float opacity);
-		
-    LookupTable();
+    virtual RawLookupTableType * GetRawLookupTable() const;
 
-    virtual ~LookupTable();
+    virtual void SetVtkLookupTable( vtkLookupTable* lut );
 
+    virtual void ChangeOpacityForAll( float opacity );
 
     /*!
     * \brief equality operator implementation
     */
-    virtual bool operator==(const mitk::LookupTable& LookupTable) const;
+    virtual bool operator==( const mitk::LookupTable& LookupTable ) const;
 
     /*!
     * \brief non equality operator implementation
-    */
+    */ 
     //##ModelId=3EA969CD007C
-    virtual bool operator!=(const LookupTable& LookupTable) const;
+    virtual bool operator!=( const LookupTable& LookupTable ) const;
 
     /*!
     * \brief implementation necessary because operator made
-    *	private in itk::Object
+    * private in itk::Object
     */
-    virtual LookupTable& operator=(const LookupTable& LookupTable);
+    virtual LookupTable& operator=( const LookupTable& LookupTable );
 
-        
-						
+    /**
+     * Updates the output information of the current object by calling 
+     * updateOutputInformation of the data objects source object.
+     */
+    virtual void UpdateOutputInformation( );
+
+    /**
+     * Sets the requested Region to the largest possible region.
+     * This method is not implemented, since this is the default
+     * behaviour of the itk pipeline and we do not support the
+     * requested-region mechanism for lookup-tables
+     */
+    virtual void SetRequestedRegionToLargestPossibleRegion( );
+
+    /**
+     * Checks, if the requested region lies outside of the buffered region by
+     * calling verifyRequestedRegion(). 
+     */
+    virtual bool RequestedRegionIsOutsideOfTheBufferedRegion( );
+
+    /**
+     * Checks if the requested region is completely contained in
+     * the buffered region. Since we always want to process the lookup
+     * table as a whole, this method always returns true
+     */
+    virtual bool VerifyRequestedRegion( );
+
+    /**
+     * This method has no effect for lookup tables, since we do
+     * not support the region-mechanism
+     */
+    virtual void SetRequestedRegion( DataObject *data );
+
 protected:
 
-
     vtkLookupTable* m_LookupTable;
-//    vtkLookupTable* m_LookupTableforRawMode;
-    
+    LookupTable();
+    virtual ~LookupTable();
+
 private:
 
 };

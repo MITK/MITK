@@ -151,9 +151,9 @@ void mitk::PolyDataGLMapper2D::Paint( mitk::BaseRenderer * renderer )
                 float * color = lut->GetColor( vcellscalars->GetComponent( i, 0 ) );
                 glColor3f( color[ 0 ], color[ 1 ], color[ 2 ] );
             }
-            else if ( m_ColorByPointData )
+            if ( m_ColorByPointData )
             {
-                float* color = lut->GetColor( vscalars->GetComponent( i, 0 ) );
+                float* color = lut->GetColor( vscalars->GetComponent( cell[0], 0 ) );
                 glColor3f( color[ 0 ], color[ 1 ], color[ 2 ] );
             }
 

@@ -105,7 +105,7 @@ void mitk::BaseRenderer::Resize(int w, int h)
   m_Size[0] = w;
   m_Size[1] = h;
 
-  //if(m_CameraController) //see bug #32
+  //if(m_CameraController) //see bug #32 (vtkSizeBug)
   //  m_CameraController->Resize(w, h); 
 
   GetDisplayGeometry()->SetSizeInDisplayUnits(w, h);

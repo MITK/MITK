@@ -8,8 +8,10 @@
 namespace mitk {
 //##ModelId=3E782FC201BB
 //##Documentation
-//## operation, that changes the stateMachine and sets a state according to a
+//## @brief operation, that changes the stateMachine and sets a state according to a
 //## transition to an other state.
+//##
+//## @ingroup Undo
 class StateTransitionOperation : public mitk::Operation
 {
   public:

@@ -1,12 +1,15 @@
-#ifndef MITKROTATIONOPERATION_H_HEADER_INCLUDED_C188C29F
-#define MITKROTATIONOPERATION_H_HEADER_INCLUDED_C188C29F
+#ifndef MITKROTATIONOPERATION_H_HEADER_INCLUDED
+#define MITKROTATIONOPERATION_H_HEADER_INCLUDED
 
 #include "mitkOperation.h"
 #include "mitkVector.h"
 
 namespace mitk {
 
-
+//##Documentation
+//## @brief Operation, that holds everything necessary for an rotation operation 
+//##
+//## @ingroup Undo
 class RotationOperation : public Operation
 {
 public:
@@ -24,4 +27,4 @@ protected:
 
 } // namespace mitk
 
-#endif /* MITKROTATIONOPERATION_H_HEADER_INCLUDED_C188C29F */
+#endif /* MITKROTATIONOPERATION_H_HEADER_INCLUDED */

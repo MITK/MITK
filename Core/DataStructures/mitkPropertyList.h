@@ -23,7 +23,7 @@ public:
 
     /** Method for creation through the object factory. */
     itkNewMacro(Self);
-
+    typedef std::map<std::string,BaseProperty::Pointer> PropertyMap;
 public:
     //##ModelId=3D6A0E9E0029
     //##Documentation
@@ -49,6 +49,7 @@ public:
     //## @brief Remove a property from the list/map.
     bool DeleteProperty(const char* propertyKey);
 
+    const PropertyMap* GetMap() const { return &m_Properties; }
 protected:
     //##ModelId=3E38FEFE0125
     PropertyList();
@@ -60,7 +61,7 @@ protected:
     //##ModelId=3D6A0F0B00BC
     //##Documentation
     //## @brief Map of properties.
-    std::map<std::string,BaseProperty::Pointer> m_Properties;
+    PropertyMap m_Properties;
 };
 
 } // namespace mitk

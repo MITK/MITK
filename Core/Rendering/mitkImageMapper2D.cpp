@@ -222,8 +222,8 @@ void mitk::ImageMapper2D::GenerateData(mitk::BaseRenderer *renderer)
       //let's use the values of worldgeometry->GetExtent(0) and worldgeometry->GetExtent(1) for that purpose
       //maybe it is useful to add here a more sophisticated rule that depends on the actual size of the current display, so not to
       //sample 1000x1000 pixels for a display of 10x10 pixels
-      width =worldgeometry->GetParametricExtent(0); widthInMM = abstractGeometry->GetPlane()->GetExtentInMM(0);
-      height=worldgeometry->GetParametricExtent(1); heightInMM= abstractGeometry->GetPlane()->GetExtentInMM(1);
+      width =worldgeometry->GetParametricExtent(0); widthInMM = abstractGeometry->GetParametricExtentInMM(0); //GetPlane()->
+      height=worldgeometry->GetParametricExtent(1); heightInMM= abstractGeometry->GetParametricExtentInMM(1); //GetPlane()->
 
       origin = abstractGeometry->GetPlane()->GetOrigin();
       right  = abstractGeometry->GetPlane()->GetAxisVector(0); right.Normalize();

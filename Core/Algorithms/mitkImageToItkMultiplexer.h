@@ -28,7 +28,7 @@ template <typename PixelType, unsigned int Dimension> void _calculateItkPipeline
             itkpipelinefunction(myItkImage.GetPointer()).GetPointer();                             \
 			itkpipeline->Update();                                                                 \
                                                                                                    \
-		result->Initialize(itkpipeline->GetOutput());                                              \
+		result->InitializeByItk(itkpipeline->GetOutput());                                              \
 		result->SetVolume(itkpipeline->GetOutput()->GetBufferPointer());                           \
 	}                                                              
 //		_calculateItkPipelineFunction(result, mitkimage, itkpipeline<type, dimension>::New());     

@@ -132,7 +132,7 @@ class Image : public SlicedData
     //## Geometry3D /@a Geometry2D  are set according to the tags in @a pic.
     //## @param tDim override time dimension in @a itkimage (if >0 and <)
     //## @param sDim override z-space dimension in @a itkimage (if >0 and <)
-	template <typename itkImageType> void Initialize(itkImageType* itkimage, int channels = 1, int tDim = -1, int sDim=-1)
+	template <typename itkImageType> void InitializeByItk(itkImageType* itkimage, int channels = 1, int tDim = -1, int sDim=-1)
 	{
 		if(itkimage==NULL) return;
 

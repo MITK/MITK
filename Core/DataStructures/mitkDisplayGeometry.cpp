@@ -252,8 +252,11 @@ mitk::DisplayGeometry::~DisplayGeometry()
 }
 
 //##ModelId=3E3C36920345
-void mitk::DisplayGeometry::SetSizeInDisplayUnits(unsigned int width, unsigned int height)
+void mitk::DisplayGeometry::SetSizeInDisplayUnits(unsigned int width, unsigned int height, bool keepDisplayedRegion)
 {
+    Vector2D centerInUnits;
+    centerInUnits =  m_SizeInUnits*0.5;
+
     m_SizeInDisplayUnits.set(width, height);
 
     if(m_SizeInDisplayUnits.x <= 0)
@@ -262,6 +265,20 @@ void mitk::DisplayGeometry::SetSizeInDisplayUnits(unsigned int width, unsigned i
         m_SizeInDisplayUnits.y = 1;
 
     DisplayToUnits(m_SizeInDisplayUnits, m_SizeInUnits);
+
+    if(keepDisplayedRegion)
+    {
+      Vector2D newCenterInUnits;
+      newCenterInUnits = m_SizeInUnits*0.5;
+
+      Vector2D shift;
+      shift=centerInUnits-newCenterInUnits;
+      UnitsToDisplay(shift, shift);
+
+      m_ScaleFactorUnitsPerDisplayUnit *= sqrt(centerInUnits.lengthSquared()/newCenterInUnits.lengthSquared());
+
+      MoveBy(shift);
+    }
 
     Modified();
 }

@@ -65,7 +65,21 @@ public:
     virtual void UnitsToULDisplay(const mitk::Point2D &pt_units, mitk::Point2D &pt_ULdisplay) const;
 
     //##ModelId=3E3C36920345
-    virtual void SetSizeInDisplayUnits(unsigned int width, unsigned int height);
+    //##Documentation
+    //## @brief Set the size of the display in display units.
+    //## 
+    //## This method must be called every time the display is resized (normally, the GUI-toolkit 
+    //## informs about resizing).
+    //## @param keepDisplayedRegion: if @a true (the default), the displayed contents is zoomed/shrinked
+    //## so that the displayed region is (approximately) the same as before: The point at the center will 
+    //## be kept at the center and the length of the diagonal of the displayed region @em in @em units
+    //## will also be kept.
+    //## When the aspect ration changes, the displayed region includes the old displayed region, but
+    //## cannot be exaclty the same.
+    //## @warning the described behaviour is implemented, but does not work yet. Sorry, didn't have the time to debug it yet.
+    //## Therefore, the old behaviour is used in BaseRenderer::Resize (calling Fit).
+    //## @todo debug!
+    virtual void SetSizeInDisplayUnits(unsigned int width, unsigned int height, bool keepDisplayedRegion=true);
     //##ModelId=3E3C36CD02D2
     virtual void SetOriginInUnits(const mitk::Vector2D& origin_units);
     //##ModelId=3E3C516B0045
@@ -154,7 +168,6 @@ public:
     //##ModelId=3EF4935A01B6
     virtual bool Map(const mitk::Point3D & atPt3d_mm, const mitk::Vector3D &vec3d_mm, mitk::Vector2D &vec2d_mm) const;
 
-
     //##ModelId=3EF4935C03B8
     virtual void Map(const mitk::Point2D & atPt2d_mm, const mitk::Vector2D &vec2d_mm, mitk::Vector3D &vec3d_mm) const;
 
@@ -179,7 +192,5 @@ protected:
 };
 
 } // namespace mitk
-
-
 
 #endif /* DISPLAYGEOMETRY_H_HEADER_INCLUDED_C1B77F88 */

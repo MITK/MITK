@@ -26,7 +26,7 @@ mitk::OpenGLRenderer::OpenGLRenderer() : m_VtkMapperPresent(false)
   m_CameraController=NULL;
   m_CameraController = VtkInteractorCameraController::New();
   m_CameraController->AddRenderer(this);
-  
+
   m_DataChangedCommand = itk::MemberCommand<mitk::OpenGLRenderer>::New();
   m_DataChangedCommand->SetCallbackFunction(this, DataChangedEvent);
 }
@@ -36,9 +36,9 @@ void mitk::OpenGLRenderer::SetData(mitk::DataTreeIterator* iterator)
 {
   if(iterator!=GetData())
   {
-    
+
     bool geometry_is_set=false;
-    
+
     if(m_DataTreeIterator!=NULL)
     {
       //remove old connections
@@ -50,11 +50,11 @@ void mitk::OpenGLRenderer::SetData(mitk::DataTreeIterator* iterator)
       }
       delete it;
     }
-    
+
     BaseRenderer::SetData(iterator);
-    
-    if (iterator != NULL) {
-      
+
+    if (iterator != NULL)
+    {
       //initialize world geometry: use first slice of first node containing an image
       mitk::DataTreeIterator* it=m_DataTreeIterator->clone();
       while(it->hasNext())
@@ -72,17 +72,17 @@ void mitk::OpenGLRenderer::SetData(mitk::DataTreeIterator* iterator)
               geometry_is_set=true;                            
             }
           }
-          //add connections
-          data->AddObserver(itk::EndEvent(), m_DataChangedCommand);
+          //@todo add connections
+          //data->AddObserver(itk::EndEvent(), m_DataChangedCommand);
         }
       }
       delete it;
     }
-    
+
     //update the vtk-based mappers
     Update(); //this is only called to check, whether we have vtk-based mappers!
     UpdateVtkActors();
-    
+
     Modified();
   }
 }
@@ -91,31 +91,31 @@ void mitk::OpenGLRenderer::SetData(mitk::DataTreeIterator* iterator)
 void mitk::OpenGLRenderer::UpdateVtkActors()
 {
   VtkInteractorCameraController* vicc=dynamic_cast<VtkInteractorCameraController*>(m_CameraController.GetPointer());
-  
+
   if (m_VtkMapperPresent == false)
   {
     if(vicc!=NULL)
       vicc->GetVtkInteractor()->Disable();
     return;
   }
-  
+
   if(vicc!=NULL)
     vicc->GetVtkInteractor()->Enable();
-  
+
   //    m_LightKit->RemoveLightsFromRenderer(this->m_VtkRenderer);
-  
+
   //    m_MitkVtkRenderWindow->RemoveRenderer(m_VtkRenderer);
   //    m_VtkRenderer->Delete();
-  
+
   if(m_VtkRenderer==NULL)
   {
     m_VtkRenderer = vtkRenderer::New();
     m_VtkRenderer->SetLayer(0);
     m_MitkVtkRenderWindow->AddRenderer( this->m_VtkRenderer );
   }
-  
+
   m_VtkRenderer->RemoveAllProps();
-  
+
   //strange: when using a simple light, the backface of the planes are not shown (regardless of SetNumberOfLayers)
   //m_Light->Delete();
   //m_Light = vtkLight::New();
@@ -125,7 +125,7 @@ void mitk::OpenGLRenderer::UpdateVtkActors()
     m_LightKit = vtkLightKit::New();
     m_LightKit->AddLightsToRenderer(m_VtkRenderer);
   }
-  
+
   //    try
   if (m_DataTreeIterator != NULL) 
   {
@@ -157,7 +157,7 @@ void mitk::OpenGLRenderer::UpdateVtkActors()
     }
     delete it;
   }
-  
+
   //    catch( ::itk::ExceptionObject ee)
   //    {
   //        printf("%s\n",ee.what());
@@ -173,9 +173,9 @@ void mitk::OpenGLRenderer::UpdateVtkActors()
 void mitk::OpenGLRenderer::Update()
 {
   if(m_DataTreeIterator == NULL) return;
-  
+
   m_VtkMapperPresent=false;
-  
+
   mitk::DataTreeIterator* it=m_DataTreeIterator->clone();
   while(it->hasNext())
   {
@@ -210,7 +210,7 @@ void mitk::OpenGLRenderer::Update()
       }
     }
   }
-  
+
   delete it;
   Modified();
   m_LastUpdateTime=GetMTime();
@@ -225,7 +225,7 @@ void mitk::OpenGLRenderer::Render()
     glClear(GL_COLOR_BUFFER_BIT);
     return;
   }
-  
+
   //has someone transformed our worldgeometry-node? if so, incorporate this transform into
   //the worldgeometry itself and reset the transform of the node to identity
   /*	if(m_WorldGeometryTransformTime<m_WorldGeometryNode->GetVtkTransform()->GetMTime())
@@ -259,29 +259,29 @@ void mitk::OpenGLRenderer::Render()
       { //@todo in 3D mode wird sonst nix geupdated, da z.Z. weder camera noch Änderung des Baums beachtet wird!!!
         Update();
       }
-      
+
       glClear(GL_COLOR_BUFFER_BIT);
-      
+
       PlaneGeometry* myPlaneGeom =
         dynamic_cast<PlaneGeometry *>((mitk::Geometry2D*)(GetWorldGeometry()));
-      
+
       glViewport (0, 0, m_Size[0], m_Size[1]);
       glMatrixMode( GL_PROJECTION );
       glLoadIdentity();
       gluOrtho2D( 0.0, m_Size[0], 0.0, m_Size[1] );
       glMatrixMode( GL_MODELVIEW );
-      
+
       mitk::DataTreeIterator* it=m_DataTreeIterator->clone();
       mitk::DataTree::Pointer tree = dynamic_cast <mitk::DataTree *> (it->getTree());
       //	std::cout << "Render:: tree: " <<  *tree << std::endl;
-      
+
       typedef std::pair<int, GLMapper2D*> LayerMapperPair;
       std::priority_queue<LayerMapperPair> layers;
       int mapperNo = 0;
       while(it->hasNext())
       {        
         it->next();
-        
+
         mitk::DataTreeNode::Pointer node = it->get();
         mitk::Mapper::Pointer mapper = node->GetMapper(m_MapperID);
         if(mapper.IsNotNull())
@@ -299,7 +299,7 @@ void mitk::OpenGLRenderer::Render()
           }
         }
       }
-      
+
       delete it;
       while (!layers.empty()) {
         layers.top().second->Paint(this);
@@ -313,34 +313,34 @@ void mitk::OpenGLRenderer::Render()
 /*!
 \brief Initialize the OpenGLRenderer
 
-  This method is called from the two Constructors
+This method is called from the two Constructors
 */
 void mitk::OpenGLRenderer::InitRenderer(mitk::RenderWindow* renderwindow) 
 {
   BaseRenderer::InitRenderer(renderwindow);
-  
+
   m_InitNeeded = true;
   m_ResizeNeeded = true;
-  
+
   m_MitkVtkRenderWindow = mitk::VtkRenderWindow::New();
   m_MitkVtkRenderWindow->SetMitkRenderer(this);
   /**@todo SetNumberOfLayers commented out, because otherwise the backface of the planes are not shown (only, when a light is added).
   * But we need SetNumberOfLayers(2) later, when we want to prevent vtk to clear the widget before it renders (i.e., when we render something in the scene before vtk).
   */
   //m_MitkVtkRenderWindow->SetNumberOfLayers(2);
-  
+
   m_VtkRenderer = vtkRenderer::New();
   m_MitkVtkRenderWindow->AddRenderer( m_VtkRenderer );
-  
+
   //strange: when using a simple light, the backface of the planes are not shown (regardless of SetNumberOfLayers)
   //m_Light = vtkLight::New();
   //m_VtkRenderer->AddLight( m_Light );
   m_LightKit = vtkLightKit::New();
   m_LightKit->AddLightsToRenderer(m_VtkRenderer);
-  
+
   if(m_CameraController)
     ((VtkInteractorCameraController*)m_CameraController.GetPointer())->SetRenderWindow(m_MitkVtkRenderWindow);
-  
+
   //we should disable vtk doublebuffering, but then it doesn't work
   //m_MitkVtkRenderWindow->SwapBuffersOff();
 }
@@ -369,17 +369,14 @@ void mitk::OpenGLRenderer::Initialize( ) {
 //##ModelId=3E33145B00D2
 void mitk::OpenGLRenderer::Resize(int w, int h) 
 {
-  BaseRenderer::Resize(w, h);
-  
   glViewport (0, 0, w, h);
   glMatrixMode( GL_PROJECTION );
   glLoadIdentity();
   gluOrtho2D( 0.0, w, 0.0, h );
   glMatrixMode( GL_MODELVIEW );
-  
-  GetDisplayGeometry()->SetSizeInDisplayUnits(w, h);
-  GetDisplayGeometry()->Fit();
-  
+
+  BaseRenderer::Resize(w, h);
+
   Update();
   //    m_MitkVtkRenderWindow->SetSize(w,h); //FIXME?
 }

@@ -109,19 +109,10 @@ void QmitkSimpleExampleFunctionality::selectSliceWidgetYZ(int x)
 
 void QmitkSimpleExampleFunctionality::selectSliceWidgetFP( int p )
 {
-    if(opacityprop!=NULL)
-        opacityprop->SetValue(p/100.0);
-    multiWidget->updateMitkWidgets();
-    return;
-    const mitk::Geometry2D* g2d = multiWidget->mitkWidget4->GetRenderer()->GetWorldGeometry();
-    const mitk::PlaneGeometry* pg = dynamic_cast<const mitk::PlaneGeometry*>(g2d);
-    mitk::PlaneView pv = pg->GetPlaneView();
-    pv.point = pv.normal*p;
-    mitk::PlaneGeometry::Pointer plane = mitk::PlaneGeometry::New();
-    plane->SetPlaneView(pv);
-    multiWidget->mitkWidget4->GetRenderer()->SetWorldGeometry(plane);
-    multiWidget->updateMitkWidgets();
-    //std::cout << "Slider:" << p << std::endl;
+	if(opacityprop!=NULL) {
+		opacityprop->SetValue(p/100.0);
+		multiWidget->updateMitkWidgets();
+	}
 }
 
 void QmitkSimpleExampleFunctionality::initWidgets()
@@ -168,16 +159,18 @@ void QmitkSimpleExampleFunctionality::initWidgets()
 			node->GetPropertyList()->SetProperty("color", colorprop);
 			
 			// init pic opacity props
-			mitk::FloatProperty::Pointer opacityprop;
-			
+			if (opacityprop == NULL) {
+				opacityprop = new mitk::FloatProperty(1.0f);
+			}
+
 			if (count == 1) {
-				opacityprop	= new mitk::FloatProperty(1.0f);
+				node->GetPropertyList()->SetProperty("opacity", new mitk::FloatProperty(1.0f) );
 			}
 			else {
-				opacityprop =	 new mitk::FloatProperty(0.5f);
+				opacityprop->SetValue(0.5f);
+				node->GetPropertyList()->SetProperty("opacity", opacityprop);
 			}
-			node->GetPropertyList()->SetProperty("opacity", opacityprop);
-
+			
 		}
 	}
 	delete it;

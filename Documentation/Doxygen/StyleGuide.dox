@@ -58,6 +58,12 @@ Another example:
 typename std::vector<TreeChangeListener*>::iterator pos = treeChangeListenerList.begin();
 @endcode
 @a iterator is an inner class of @a vector.
-\li Never include mitkInteractionConst.h in a header. Always include it @a last in an implementation file. If you get strange errors (e.g., syntax error before '15'), this might be the solution. 
-\li Often QmitkFunctionality::activated()/deactivated() is the right place to connect/disconnnect event-handlers (e.g., GlobalStateMachine::AddStateMachine() in activated() and GlobalStateMachine::RemoveStateMachine() in deactivated()).
+\li Never include mitkInteractionConst.h in a header. Always include it @a last in an implementation file. 
+If you get strange errors (e.g., syntax error before '15'), this might be the solution. 
+\li Often QmitkFunctionality::activated()/deactivated() is the right place to connect/disconnnect event-handlers 
+(e.g., GlobalStateMachine::AddStateMachine() in activated() and GlobalStateMachine::RemoveStateMachine()
+ in deactivated()).
+\li The four widgets of the QmitkStdMultiWidget should be initialized in QmitkFunctionality::activated(),
+ but does @em not need to be restored in QmitkFunctionality::deactivated(): It is the responsiblity of the 
+ subsequently activated functionality to initialize them according to its needs.
 */

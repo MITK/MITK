@@ -105,6 +105,9 @@ void mitk::BaseRenderer::Resize(int w, int h)
   m_Size[0] = w;
   m_Size[1] = h;
 
+  if(m_CameraController) 	 
+    m_CameraController->Resize(w, h);
+
   GetDisplayGeometry()->SetSizeInDisplayUnits(w, h);
   //@FIXME: die nächste Zeile ist nur da, weil der Anpassungsvorgang in SetSizeInDisplayUnits leider noch nicht richtig funktioniert.
   GetDisplayGeometry()->Fit();

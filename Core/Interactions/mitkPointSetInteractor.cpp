@@ -108,6 +108,23 @@ bool mitk::PointSetInteractor::ExecuteAction(Action* action, mitk::StateEvent co
   case AcDONOTHING:
     ok = true;
 	  break;
+  case AcCHECKOPERATION:
+    //to check if the given Event is a PositionEvent. Other Events (DisplayEvent without WorldPosition) can't be yet used to add points due to a missing axsis.
+    {
+	    mitk::PositionEvent const  *posEvent = dynamic_cast <const mitk::PositionEvent *> (stateEvent->GetEvent());
+		  if (posEvent != NULL) 
+      {
+        mitk::StateEvent* newStateEvent = new mitk::StateEvent(StYES, stateEvent->GetEvent());
+        this->HandleEvent( newStateEvent, objectEventId, groupEventId );
+      }
+      else 
+      {
+        mitk::StateEvent* newStateEvent = new mitk::StateEvent(StNO, stateEvent->GetEvent());
+        this->HandleEvent( newStateEvent, objectEventId, groupEventId );
+      }
+    }
+    ok = true;
+    break;
 	case AcADDPOINT:
 		/*
 		declare two operations: one for the selected state: deselect the last one selected and select the new one
@@ -116,6 +133,10 @@ bool mitk::PointSetInteractor::ExecuteAction(Action* action, mitk::StateEvent co
 	{
 	  mitk::PositionEvent const  *posEvent = dynamic_cast <const mitk::PositionEvent *> (stateEvent->GetEvent());
 		if (posEvent == NULL) 
+      //check if it is a DisplayEvent thrown in a 3D window.
+      //Then the z-information is missing.
+      //returning false might end in the state full, but the last point couldn't be added, so the set wouldn't be full.
+      //so a extra Action that checks the operationtype has been added.
       return false;
 
 		//converting from Point3D to itk::Point

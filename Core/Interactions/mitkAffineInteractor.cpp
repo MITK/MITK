@@ -51,21 +51,6 @@ bool mitk::AffineInteractor::ExecuteAction(Action* action, mitk::StateEvent cons
   /* Each case must watch the type of the event! */
   switch (action->GetActionId())
   {
-  case AcINITAFFINEINTERACTIONS:
-    {
-      ok = true;
-      break;
-    }
-  case AcFINISHAFFINEINTERACTIONS:
-    {
-      ok = true;
-      break;
-    }
-  case AcNEWPOINT:
-    {
-      //ok = true;
-      break;
-    }
   case AcCHECKELEMENT:
     {
       mitk::Point3D worldPoint;
@@ -299,11 +284,18 @@ bool mitk::AffineInteractor::ExecuteAction(Action* action, mitk::StateEvent cons
       }
       /* execute the Operation */
       geometry->ExecuteOperation(doOp);
+      /* Update Volume Property with new value */
+      mitk::BoundingObject* b = dynamic_cast<mitk::BoundingObject*>(m_DataTreeNode->GetData());
+      if (b != NULL)
+      {
+        m_DataTreeNode->GetPropertyList()->SetProperty("volume", new FloatProperty(b->GetVolume()));
+        //std::cout << "Volume of Boundingobject is " << b->GetVolume()/1000.0 << " ml" << std::endl;
+      }
       ok = true;
       break;
     }
   default:
-    ok = true;
+    ok = Superclass::ExecuteAction(action, stateEvent);//, objectEventId, groupEventId);
   }
   mitk::RenderWindow::UpdateAllInstances();
   return ok;
@@ -375,6 +367,12 @@ bool mitk::AffineInteractor::ConvertDisplayEventToWorldPosition(mitk::DisplayPos
     worldPoint[1] = position[1] / position[3];
     worldPoint[2] = position[2] / position[3];
     position[3] = 1.0;
+  }
+  else
+  {
+    worldPoint[0] = position[0];
+    worldPoint[1] = position[1];
+    worldPoint[2] = position[2];
   }
   return true;
 }

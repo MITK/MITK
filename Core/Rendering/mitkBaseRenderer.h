@@ -1,11 +1,11 @@
 #ifndef BASERENDERER_H_HEADER_INCLUDED_C1CCA0F4
 #define BASERENDERER_H_HEADER_INCLUDED_C1CCA0F4
 
-#include "DataTree.h"
-#include "Geometry2D.h"
-#include "DisplayGeometry.h"
+#include "mitkDataTree.h"
+#include "mitkGeometry2D.h"
+#include "mitkDisplayGeometry.h"
 #include "mitkGeometry2DData.h"
-#include "CameraController.h"
+#include "mitkCameraController.h"
 #include "mitkEventTypedefs.h"
 
 namespace mitk {

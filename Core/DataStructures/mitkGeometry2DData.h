@@ -2,8 +2,8 @@
 #define MITKGEOMETRY2DDATA_H_HEADER_INCLUDED_C19C01E2
 
 #include "mitkCommon.h"
-#include "BaseData.h"
-#include "Geometry2D.h"
+#include "mitkBaseData.h"
+#include "mitkGeometry2D.h"
 
 namespace mitk {
 

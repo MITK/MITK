@@ -1,6 +1,6 @@
-#include "GlobalInteraction.h"
+#include "mitkGlobalInteraction.h"
 #include "mitkInteractionConst.h"
-#include "Event.h"
+#include "mitkEvent.h"
 #include "mitkStatusBar.h"
 
 

@@ -1,4 +1,4 @@
-#include "SlicedData.h"
+#include "mitkSlicedData.h"
 
 //##ModelId=3E141028018A
 void mitk::SlicedData::UpdateOutputInformation()

@@ -1,5 +1,5 @@
-#include "Geometry3D.h"
-#include "PlaneGeometry.h"
+#include "mitkGeometry3D.h"
+#include "mitkPlaneGeometry.h"
 #include <vecmath.h>
 #include <vtkTransform.h> 
 

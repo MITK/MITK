@@ -3,9 +3,9 @@
 
 #include <itkDataObject.h>
 #include "mitkCommon.h"
-#include "Geometry3D.h"
-#include "Geometry2D.h"
-#include "OperationActor.h"
+#include "mitkGeometry3D.h"
+#include "mitkGeometry2D.h"
+#include "mitkOperationActor.h"
 
 namespace mitk {
 

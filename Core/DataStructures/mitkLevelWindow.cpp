@@ -1,4 +1,4 @@
-#include "LevelWindow.h"
+#include "mitkLevelWindow.h"
 #include <ipFunc/ipFunc.h>
 #include <algorithm>
 

@@ -2,8 +2,8 @@
 #define MITKLEVELWINDOWPROPERTY_H_HEADER_INCLUDED_C10EEAA8
 
 #include "mitkCommon.h"
-#include "BaseProperty.h"
-#include "LevelWindow.h"
+#include "mitkBaseProperty.h"
+#include "mitkLevelWindow.h"
 
 namespace mitk {
 

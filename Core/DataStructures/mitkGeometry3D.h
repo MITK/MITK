@@ -2,7 +2,7 @@
 #define GEOMETRY3D_H_HEADER_INCLUDED_C1EBD0AD
 
 #include "mitkCommon.h"
-#include "Geometry2D.h"
+#include "mitkGeometry2D.h"
 #include <itkImageRegion.h>
 #include <itkBoundingBox.h>
 #include <ipPic/ipPic.h>

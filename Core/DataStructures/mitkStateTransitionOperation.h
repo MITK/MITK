@@ -2,8 +2,8 @@
 #define STATETRANSITIONOPERATION_H_HEADER_INCLUDED_C1695462
 
 #include "mitkCommon.h"
-#include "Operation.h"
-#include "State.h"
+#include "mitkOperation.h"
+#include "mitkState.h"
 
 namespace mitk {
 //##ModelId=3E782FC201BB

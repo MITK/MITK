@@ -1,4 +1,4 @@
-#include "Event.h"
+#include "mitkEvent.h"
 
 //##ModelId=3E5B3007000F
 mitk::Event::Event(mitk::BaseRenderer* sender, int type, int button, int buttonState, int key)

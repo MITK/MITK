@@ -5,7 +5,7 @@
 #include <sstream>
 
 #include "mitkCommon.h"
-#include "BaseProperty.h"
+#include "mitkBaseProperty.h"
 
 namespace mitk {
 

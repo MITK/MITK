@@ -1,4 +1,4 @@
-#include "PixelType.h"
+#include "mitkPixelType.h"
 #include <itkRGBPixel.h>
 #include <itkRGBAPixel.h>
 

@@ -1,8 +1,8 @@
 #include "mitkGeometry2DDataMapper2D.h"
 
-#include "BaseRenderer.h"
+#include "mitkBaseRenderer.h"
 
-#include "PlaneGeometry.h"
+#include "mitkPlaneGeometry.h"
 
 #include "mitkColorProperty.h"
 #include "mitkFloatProperty.h"

@@ -2,7 +2,7 @@
 #define MITKCOORDINATESUPPLIER_H
 
 #include "mitkCommon.h"
-#include "StateMachine.h"
+#include "mitkStateMachine.h"
 #include "mitkVector.h"
 
 namespace mitk {

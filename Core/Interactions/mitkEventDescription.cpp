@@ -1,4 +1,4 @@
-#include "EventDescription.h"
+#include "mitkEventDescription.h"
 
 //##ModelId=3E5B30A30095
 mitk::EventDescription::EventDescription(int type, int button, int buttonState, int key, std::string name, int id)

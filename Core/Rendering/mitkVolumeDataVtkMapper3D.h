@@ -2,8 +2,8 @@
 #define MITKVOLUMEDATAVTKMAPPER3D_H_HEADER_INCLUDED
 
 #include "mitkCommon.h"
-#include "BaseVtkMapper3D.h"
-#include "BaseRenderer.h"
+#include "mitkBaseVtkMapper3D.h"
+#include "mitkBaseRenderer.h"
 #include "mitkImage.h"
 
 class vtkVolumeRayCastMapper;

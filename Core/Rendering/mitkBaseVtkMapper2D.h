@@ -2,9 +2,9 @@
 #define BASEVTKMAPPER2D_H_HEADER_INCLUDED_C1C517D5
 
 #include "mitkCommon.h"
-#include "Mapper2D.h"
+#include "mitkMapper2D.h"
 #include <vtkProp.h>
-#include "BaseRenderer.h"
+#include "mitkBaseRenderer.h"
 
 namespace mitk {
 

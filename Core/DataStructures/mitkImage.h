@@ -2,12 +2,12 @@
 #define MITKIMAGE_H_HEADER_INCLUDED_C1C2FCD2
 
 #include "mitkCommon.h"
-#include "SlicedData.h"
-#include "ImageDataItem.h"
-#include "PixelType.h"
-#include "BaseData.h"
-#include "LevelWindow.h"
-#include "PlaneGeometry.h"
+#include "mitkSlicedData.h"
+#include "mitkImageDataItem.h"
+#include "mitkPixelType.h"
+#include "mitkBaseData.h"
+#include "mitkLevelWindow.h"
+#include "mitkPlaneGeometry.h"
 //#include "mitkImageToItk.h"
 
 namespace mitk {

@@ -2,8 +2,8 @@
 #define DISPLAYGEOMETRY_H_HEADER_INCLUDED_C1B77F88
 
 #include "mitkCommon.h"
-#include "Geometry2D.h"
-#include "ImageSliceSelector.h"
+#include "mitkGeometry2D.h"
+#include "mitkImageSliceSelector.h"
 
 namespace mitk {
 

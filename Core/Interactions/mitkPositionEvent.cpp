@@ -1,4 +1,4 @@
-#include "PositionEvent.h"
+#include "mitkPositionEvent.h"
 #include "mitkVector.h"
 
 //##ModelId=3E5B7CF900F0

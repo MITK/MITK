@@ -1,4 +1,4 @@
-#include "BaseProperty.h"
+#include "mitkBaseProperty.h"
 
 //##ModelId=3E38FF0902A7
 mitk::BaseProperty::BaseProperty()

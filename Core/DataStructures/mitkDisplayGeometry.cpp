@@ -1,4 +1,4 @@
-#include "DisplayGeometry.h"
+#include "mitkDisplayGeometry.h"
 
 //##ModelId=3E3AE9FD00C5
 void mitk::DisplayGeometry::Zoom(float factor, const mitk::Vector2D& centerInDisplayUnits)

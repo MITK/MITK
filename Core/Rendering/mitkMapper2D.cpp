@@ -1,4 +1,4 @@
-#include "Mapper2D.h"
+#include "mitkMapper2D.h"
 
 //##ModelId=3E3C46810341
 mitk::Mapper2D::Mapper2D()

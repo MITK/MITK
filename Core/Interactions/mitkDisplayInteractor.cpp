@@ -3,15 +3,15 @@
 
 #include "mitkDisplayInteractor.h"
 
-#include <OperationActor.h>
-#include <EventMapper.h>
-#include <GlobalInteraction.h>
+#include <mitkOperationActor.h>
+#include <mitkEventMapper.h>
+#include <mitkGlobalInteraction.h>
 #include <mitkCoordinateSupplier.h>
 #include <mitkDisplayCoordinateOperation.h>
 #include <mitkDisplayVectorInteractor.h>
 
 
-#include <BaseRenderer.h>
+#include <mitkBaseRenderer.h>
 #include <mitkRenderWindow.h>
 
 #include <mitkInteractionConst.h>

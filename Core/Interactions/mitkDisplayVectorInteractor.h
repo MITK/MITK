@@ -2,8 +2,8 @@
 #define MITKDISPLAYVECTORINTERACTOR_H_HEADER_INCLUDED_C10DC4EB
 
 #include "mitkCommon.h"
-#include "BaseRenderer.h"
-#include "StateMachine.h"
+#include "mitkBaseRenderer.h"
+#include "mitkStateMachine.h"
 
 namespace mitk {
 

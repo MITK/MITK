@@ -1,4 +1,4 @@
-#include "Geometry2D.h"
+#include "mitkGeometry2D.h"
 
 //##ModelId=3DDE65E00122
 /*!

@@ -3,8 +3,8 @@
 
 #include "mitkFocusManager.h"
 #include "mitkCommon.h"
-#include "StateMachine.h"
-#include "Roi.h"
+#include "mitkStateMachine.h"
+#include "mitkRoi.h"
 #include <string>
 #include <vector>
 

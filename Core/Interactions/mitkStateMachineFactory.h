@@ -2,7 +2,7 @@
 #define STATEMACHINEFACTORY_H_HEADER_INCLUDED_C19AEDDD
 
 #include "mitkCommon.h"
-#include "State.h"
+#include "mitkState.h"
 #include <qxml.h>
 #include <iostream>
 

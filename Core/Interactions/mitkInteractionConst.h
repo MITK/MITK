@@ -22,7 +22,7 @@ typedef enum EUndoModels{LIMITEDLINEARUNDO=10, TREEUNDO=20};
 
 /*
 //EventMechanism:
-//If you change anything here, then change in EventMapper.cpp (Array of constants) as well.
+//If you change anything here, then change in mitkEventMapper.cpp (Array of constants) as well.
 */
 
 //##Constants for Events thrown by the code (e.g.Yes-I-found-a-point-at-that-position)

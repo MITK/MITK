@@ -3,11 +3,11 @@
 
 #include "mitkCommon.h"
 #include <itkObject.h>
-#include "OperationActor.h"
-#include "State.h"
-#include "StateEvent.h"
-#include "UndoModel.h"
-#include "UndoController.h"
+#include "mitkOperationActor.h"
+#include "mitkState.h"
+#include "mitkStateEvent.h"
+#include "mitkUndoModel.h"
+#include "mitkUndoController.h"
 #include <string>
 
 

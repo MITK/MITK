@@ -1,9 +1,9 @@
 #include "mitkOpenGLRenderer.h"
-#include "Mapper.h"
+#include "mitkMapper.h"
 #include "mitkImageMapper2D.h"
-#include "BaseVtkMapper2D.h"
-#include "BaseVtkMapper3D.h"
-#include "LevelWindow.h"
+#include "mitkBaseVtkMapper2D.h"
+#include "mitkBaseVtkMapper3D.h"
+#include "mitkLevelWindow.h"
 #include "mitkVtkInteractorCameraController.h"
 #include "mitkVtkRenderWindow.h"
 #include "mitkRenderWindow.h"
@@ -15,7 +15,7 @@
 #include <vtkTransform.h>
 #include <vtkCamera.h>
 
-#include "PlaneGeometry.h"
+#include "mitkPlaneGeometry.h"
 #include "mitkProperties.h"
 #include <queue>
 #include <utility>

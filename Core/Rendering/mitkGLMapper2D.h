@@ -2,8 +2,8 @@
 #define MITKGLMAPPER2D_H_HEADER_INCLUDED_C197C872
 
 #include "mitkCommon.h"
-#include "Mapper2D.h"
-#include "BaseRenderer.h"
+#include "mitkMapper2D.h"
+#include "mitkBaseRenderer.h"
 
 namespace mitk {
 

@@ -2,7 +2,7 @@
 #define MITKPOINTOPERATION
 
 #include "mitkCommon.h"
-#include "Operation.h"
+#include "mitkOperation.h"
 #include "mitkVector.h"
 
 
@@ -23,7 +23,7 @@ class PointOperation : public mitk::Operation
 	//##@brief Operation, that handles all aktions on one Point.
 	//##
 	//## @params
-	//## operationType is the type of that operation (see Operation.h; e.g. move or add; Information for StateMachine::ExecuteOperation());
+	//## operationType is the type of that operation (see mitkOperation.h; e.g. move or add; Information for StateMachine::ExecuteOperation());
 	//## point is the information of the point to add or is the information to change a point into; index is e.g. the position in a
 	//## list which describes the element to change
     PointOperation(OperationType operationType,

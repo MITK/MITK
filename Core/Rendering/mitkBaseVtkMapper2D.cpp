@@ -1,4 +1,4 @@
-#include "BaseVtkMapper2D.h"
+#include "mitkBaseVtkMapper2D.h"
 
 //##ModelId=3E3AE0060159
 mitk::BaseVtkMapper2D::BaseVtkMapper2D()

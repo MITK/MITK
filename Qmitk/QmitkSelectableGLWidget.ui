@@ -69,7 +69,7 @@
     </hbox>
 </widget>
 <includes>
-    <include location="global" impldecl="in declaration">QmitkGLWidget.h</include>
+    <include location="global" impldecl="in declaration">mitkQmitkGLWidget.h</include>
     <include location="global" impldecl="in declaration">mitkOpenGLRenderer.h</include>
     <include location="local" impldecl="in implementation">QmitkSelectableGLWidget.ui.h</include>
 </includes>

@@ -3,7 +3,7 @@
 
 #include "mitkCommon.h"
 #include <itkObjectFactory.h>
-#include "BaseProperty.h"
+#include "mitkBaseProperty.h"
 #include <string>
 #include <map> 
 

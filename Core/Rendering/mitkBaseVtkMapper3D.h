@@ -2,9 +2,9 @@
 #define BASEVTKMAPPER3D_H_HEADER_INCLUDED_C1CD0F0A
 
 #include "mitkCommon.h"
-#include "Mapper.h"
-#include "Mapper3D.h"
-#include "BaseRenderer.h"
+#include "mitkMapper.h"
+#include "mitkMapper3D.h"
+#include "mitkBaseRenderer.h"
 
 class vtkProp;
 class vtkProp3D;

@@ -28,24 +28,24 @@
 #include <mitkLevelWindowProperty.h>
 #include <mitkVesselTreeFileReader.h>
 #include <mitkVesselGraphFileReader.h>
-#include <LevelWindow.h>
-#include <DataTree.h>
+#include <mitkLevelWindow.h>
+#include <mitkDataTree.h>
 #include <mitkFloatProperty.h>
 #include <qregexp.h>
 #include <string>
 
 #include <mitkStringProperty.h>
 #include <qstring.h>
-#include "ImageTimeSelector.h"
-#include "ImageChannelSelector.h"
+#include "mitkImageTimeSelector.h"
+#include "mitkImageChannelSelector.h"
 //#include <mitkImageToItk.h>
 //#include <itkThresholdImageFilter.h>
 
-#include <StateMachineFactory.h>
-#include <UndoController.h>
-#include <StateMachine.h>
-#include <EventMapper.h>
-#include <GlobalInteraction.h>
+#include <mitkStateMachineFactory.h>
+#include <mitkUndoController.h>
+#include <mitkStateMachine.h>
+#include <mitkEventMapper.h>
+#include <mitkGlobalInteraction.h>
 
 #include <mitkUSLookupTableSource.h>
 

@@ -2,7 +2,7 @@
 #pragma warning( disable : 4290 )
 #endif
 
-#include "ImageDataItem.h"
+#include "mitkImageDataItem.h"
 #include <vtkImageData.h>
 #include <vtkPointData.h>
 

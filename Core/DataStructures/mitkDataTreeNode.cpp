@@ -1,5 +1,5 @@
-#include "DataTreeNode.h"
-#include "MapperFactory.h"
+#include "mitkDataTreeNode.h"
+#include "mitkMapperFactory.h"
 #include <vtkTransform.h>
 
 #include "mitkProperties.h"
@@ -8,7 +8,7 @@
 #include "mitkBoolProperty.h"
 #include "mitkColorProperty.h"
 #include "mitkLevelWindowProperty.h"
-#include "Geometry3D.h"
+#include "mitkGeometry3D.h"
 
 //##ModelId=3D6A0E8C02CC
 mitk::Mapper* mitk::DataTreeNode::GetMapper(MapperSlotId id) const

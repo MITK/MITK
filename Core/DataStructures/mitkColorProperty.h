@@ -2,7 +2,7 @@
 #define MITKCOLORPROPERTY_H_HEADER_INCLUDED_C17953D1
 
 #include "mitkCommon.h"
-#include "BaseProperty.h"
+#include "mitkBaseProperty.h"
 #include <itkRGBPixel.h>
 
 namespace mitk {

@@ -2,10 +2,10 @@
 #define MITKPointSetMAPPER2D_H_HEADER_INCLUDED
 
 #include "mitkCommon.h"
-#include "Mapper2D.h"
+#include "mitkMapper2D.h"
 #include "mitkPointSet.h"
 #include "mitkGLMapper2D.h"
-#include "DataTree.h"
+#include "mitkDataTree.h"
 
 namespace mitk {
 

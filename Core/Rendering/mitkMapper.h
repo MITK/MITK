@@ -2,8 +2,8 @@
 #define MAPPER_H_HEADER_INCLUDED_C1E6EA08
 
 #include "mitkCommon.h"
-#include "ImageSource.h"
-#include "LevelWindow.h"
+#include "mitkImageSource.h"
+#include "mitkLevelWindow.h"
 
 namespace mitk {
 

@@ -2,7 +2,7 @@
 #define EVENTDESCRIPTION_H_HEADER_INCLUDED_C188FC4D
 
 #include "mitkCommon.h"
-#include "Event.h"
+#include "mitkEvent.h"
 #include <string>
 
 namespace mitk {

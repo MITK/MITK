@@ -218,15 +218,15 @@
     </connection>
 </connections>
 <includes>
-    <include location="global" impldecl="in declaration">DataTree.h</include>
+    <include location="global" impldecl="in declaration">mitkDataTree.h</include>
     <include location="local" impldecl="in declaration">DataTreeView.h</include>
     <include location="global" impldecl="in declaration">map</include>
-    <include location="local" impldecl="in declaration">BaseProperty.h</include>
+    <include location="local" impldecl="in declaration">mitkBaseProperty.h</include>
     <include location="global" impldecl="in declaration">string</include>
     <include location="global" impldecl="in implementation">mitkStringProperty.h</include>
     <include location="global" impldecl="in implementation">qlistview.h</include>
     <include location="global" impldecl="in implementation">qdropsite.h</include>
-    <include location="local" impldecl="in implementation">GlobalInteraction.h</include>
+    <include location="local" impldecl="in implementation">mitkGlobalInteraction.h</include>
     <include location="local" impldecl="in implementation">QmitkDataManagerControls.ui.h</include>
 </includes>
 <variables>

@@ -1,4 +1,4 @@
-#include "PlaneGeometry.h"
+#include "mitkPlaneGeometry.h"
 #include <vtkTransform.h>
 
 //##ModelId=3E395F22035A

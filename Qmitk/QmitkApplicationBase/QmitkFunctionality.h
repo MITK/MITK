@@ -17,7 +17,7 @@
 
 class QActionGroup;
 
-#include "DataTree.h"
+#include "mitkDataTree.h"
 #include "QmitkSelectableGLWidget.h"
 #include "vecmath.h"
 

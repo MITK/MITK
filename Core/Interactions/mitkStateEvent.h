@@ -2,7 +2,7 @@
 #define STATEEVENT_H_HEADER_INCLUDED_C188E5BF
 
 #include "mitkCommon.h"
-#include "Event.h"
+#include "mitkEvent.h"
 
 namespace mitk {
 

@@ -1,5 +1,5 @@
-#include "BaseData.h"
-#include "BaseProcess.h"
+#include "mitkBaseData.h"
+#include "mitkBaseProcess.h"
 
 #define MITK_WEAKPOINTER_PROBLEM_WORKAROUND_ENABLED
 

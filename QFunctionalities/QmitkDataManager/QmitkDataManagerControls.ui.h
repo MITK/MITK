@@ -8,7 +8,7 @@
 *****************************************************************************/
 #include <utility>
 #include "mitkBoolProperty.h"
-#include "EventMapper.h"
+#include "mitkEventMapper.h"
 #include "mitkFocusManager.h"
 void QmitkDataManagerControls::init() { 
   while (m_DataTreeView->columns() > 0 ) {

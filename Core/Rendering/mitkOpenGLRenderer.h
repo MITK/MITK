@@ -2,9 +2,9 @@
 #define MITKOPENGLRENDERER_H_HEADER_INCLUDED_C1C29F6D
 
 #include "mitkCommon.h"
-#include "BaseRenderer.h"
-#include "DataTree.h"
-#include "ImageSliceSelector.h"
+#include "mitkBaseRenderer.h"
+#include "mitkDataTree.h"
+#include "mitkImageSliceSelector.h"
 
 #include "picimage.h"
 

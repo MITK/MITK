@@ -643,15 +643,15 @@
     </connection>
 </connections>
 <includes>
-    <include location="global" impldecl="in declaration">DataTree.h</include>
-    <include location="global" impldecl="in declaration">UndoController.h</include>
+    <include location="global" impldecl="in declaration">mitkDataTree.h</include>
+    <include location="global" impldecl="in declaration">mitkUndoController.h</include>
     <include location="global" impldecl="in implementation">QmitkStdMultiWidget.h</include>
     <include location="global" impldecl="in implementation">QmitkFctMediator.h</include>
     <include location="global" impldecl="in implementation">QmitkControlsRightFctLayoutTemplate.h</include>
     <include location="global" impldecl="in implementation">qfiledialog.h</include>
-    <include location="global" impldecl="in implementation">DataTreeNode.h</include>
-    <include location="global" impldecl="in implementation">PlaneGeometry.h</include>
-    <include location="global" impldecl="in implementation">PicFileReader.h</include>
+    <include location="global" impldecl="in implementation">mitkDataTreeNode.h</include>
+    <include location="global" impldecl="in implementation">mitkPlaneGeometry.h</include>
+    <include location="global" impldecl="in implementation">mitkPicFileReader.h</include>
     <include location="global" impldecl="in implementation">ipPic/ipPic.h</include>
     <include location="global" impldecl="in implementation">qstring.h</include>
     <include location="global" impldecl="in implementation">qapplication.h</include>

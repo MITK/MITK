@@ -1,11 +1,11 @@
 #ifndef EVENTMAPPER_H_HEADER_INCLUDED_C187864A
 #define EVENTMAPPER_H_HEADER_INCLUDED_C187864A
 
-#include "Event.h"
+#include "mitkEvent.h"
 #include "mitkCommon.h"
-#include "EventDescription.h"
-#include "StateEvent.h"
-#include "StateMachine.h"
+#include "mitkEventDescription.h"
+#include "mitkStateEvent.h"
+#include "mitkStateMachine.h"
 #include <qxml.h>
 #include <vector>
 #include <string>

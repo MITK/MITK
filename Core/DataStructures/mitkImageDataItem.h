@@ -2,7 +2,7 @@
 #define IMAGEDATAITEM_H_HEADER_INCLUDED_C1F4DAB4
 
 #include "mitkCommon.h"
-#include "PixelType.h"
+#include "mitkPixelType.h"
 
 class vtkImageData;
 

@@ -1,4 +1,4 @@
-#include "DataTree.h"
+#include "mitkDataTree.h"
 
 //##ModelId=3E38F46A0190
 mitk::DataTree::DataTree() : 

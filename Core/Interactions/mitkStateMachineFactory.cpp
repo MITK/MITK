@@ -1,4 +1,4 @@
-#include "StateMachineFactory.h"
+#include "mitkStateMachineFactory.h"
 #include "mitkStatusBar.h"
 
 

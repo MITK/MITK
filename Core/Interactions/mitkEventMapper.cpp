@@ -9,8 +9,8 @@
 *
 */
 
-#include "PositionEvent.h"
-#include "EventMapper.h"
+#include "mitkPositionEvent.h"
+#include "mitkEventMapper.h"
 #include <itkOutputWindow.h>
 #include "mitkStatusBar.h"
 #include "mitkInteractionConst.h"
@@ -502,7 +502,7 @@ inline const int mitk::EventMapper::convertConstString2ConstInt(std::string inpu
       return (tempIt)->second;
   }
   
-  (StatusBar::GetInstance())->DisplayText("Warning! from EventMapper.cpp: Couldn't find matching Event Int from Event String in XML-File");
+  (StatusBar::GetInstance())->DisplayText("Warning! from mitkEventMapper.cpp: Couldn't find matching Event Int from Event String in XML-File");
   return -1;//for didn't find anything
 }
 

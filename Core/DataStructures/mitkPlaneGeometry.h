@@ -2,7 +2,7 @@
 #define PLANEGEOMETRY_H_HEADER_INCLUDED_C1C68A2C
 
 #include "mitkCommon.h"
-#include "Geometry2D.h"
+#include "mitkGeometry2D.h"
 #include "SpaceGeometry.h"
 
 class vtkTransform;

@@ -1,7 +1,7 @@
 #include "mitkPointSet.h"
 
-#include <Operation.h>
-#include <OperationActor.h>
+#include <mitkOperation.h>
+#include <mitkOperationActor.h>
 
 #include <qapplication.h>//@todo because of quickimplementation UpdateAllWidgets
 #include <qwidgetlist.h>//@todo because of quickimplementation UpdateAllWidgets

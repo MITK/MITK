@@ -1,7 +1,7 @@
 #ifndef MITKVTKRENDERWINDOW_H_HEADER_INCLUDED_C1C53722
 #define MITKVTKRENDERWINDOW_H_HEADER_INCLUDED_C1C53722
 
-#include "BaseRenderer.h"
+#include "mitkBaseRenderer.h"
 #include <stdlib.h>
 #ifdef WIN32
 #include <vtkWin32OpenGLRenderWindow.h>

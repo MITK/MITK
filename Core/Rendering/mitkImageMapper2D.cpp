@@ -3,9 +3,9 @@
 #include "widget.h"
 #include "picimage.h"
 #include "pic2vtk.h"
-#include "PlaneGeometry.h"
-#include "BaseRenderer.h"
-#include "DataTreeNode.h"
+#include "mitkPlaneGeometry.h"
+#include "mitkBaseRenderer.h"
+#include "mitkDataTreeNode.h"
 
 #include "mitkLookupTableProperty.h"
 #include "mitkBoolProperty.h"

@@ -2,9 +2,9 @@
 #define MITKDISPLAYCOORDINATEOPERATION_H_HEADER_INCLUDED_C10E33D0
 
 #include "mitkCommon.h"
-#include "BaseRenderer.h"
+#include "mitkBaseRenderer.h"
 #include "mitkVector.h"
-#include "Operation.h"
+#include "mitkOperation.h"
 
 #define mitkGetMacro(name,type) \
   virtual type Get##name () \

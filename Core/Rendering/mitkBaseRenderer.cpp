@@ -1,8 +1,8 @@
-#include "BaseRenderer.h"
-#include "PlaneGeometry.h"
-#include "EventMapper.h"
-#include "PositionEvent.h"
-#include "GlobalInteraction.h"
+#include "mitkBaseRenderer.h"
+#include "mitkPlaneGeometry.h"
+#include "mitkEventMapper.h"
+#include "mitkPositionEvent.h"
+#include "mitkGlobalInteraction.h"
 #include "mitkDisplayPositionEvent.h"
 #include "mitkSmartPointerProperty.h"
 #include "mitkStatusBar.h"
@@ -142,7 +142,7 @@ void mitk::BaseRenderer::MousePressEvent(mitk::MouseEvent *me)
   {
     bool success = globalInteraction->SetFocus(this);
     if (! success) 
-      (StatusBar::GetInstance())->DisplayText("Warning! from BaseRenderer.cpp: Couldn't focus this BaseRenderer!");
+      (StatusBar::GetInstance())->DisplayText("Warning! from mitkBaseRenderer.cpp: Couldn't focus this BaseRenderer!");
   }
 
   if (m_CameraController)

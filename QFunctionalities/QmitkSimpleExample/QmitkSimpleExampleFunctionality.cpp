@@ -9,18 +9,18 @@
 
 #include "slicer.xpm"
 
-#include "PlaneGeometry.h"
+#include "mitkPlaneGeometry.h"
 #include <mitkSurfaceData.h>
 #include <mitkColorProperty.h>
 #include <mitkLookupTable.h>
 
-#include <EventMapper.h>
-#include <GlobalInteraction.h>
+#include <mitkEventMapper.h>
+#include <mitkGlobalInteraction.h>
 #include <mitkCoordinateSupplier.h>
 #include <mitkPointOperation.h>
 #include <mitkDisplayCoordinateOperation.h>
 #include <mitkDisplayVectorInteractor.h>
-#include <BaseRenderer.h>
+#include <mitkBaseRenderer.h>
 #include <mitkInteractionConst.h>
 
 #include <algorithm>

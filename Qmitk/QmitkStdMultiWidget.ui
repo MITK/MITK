@@ -134,7 +134,7 @@
 <includes>
     <include location="global" impldecl="in implementation">qframe.h</include>
     <include location="global" impldecl="in implementation">qcolor.h</include>
-    <include location="global" impldecl="in implementation">DataTreeNode.h</include>
+    <include location="global" impldecl="in implementation">mitkDataTreeNode.h</include>
     <include location="local" impldecl="in implementation">QmitkStdMultiWidget.ui.h</include>
 </includes>
 <slots>

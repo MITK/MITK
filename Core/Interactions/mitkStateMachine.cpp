@@ -1,8 +1,8 @@
-#include "StateMachine.h"
-#include "StateMachineFactory.h"
-#include "StateTransitionOperation.h"
-#include "OperationEvent.h"
-#include "UndoController.h"
+#include "mitkStateMachine.h"
+#include "mitkStateMachineFactory.h"
+#include "mitkStateTransitionOperation.h"
+#include "mitkOperationEvent.h"
+#include "mitkUndoController.h"
 #include "mitkInteractionConst.h"
 #include "mitkStatusBar.h"
 
@@ -95,7 +95,7 @@ void mitk::StateMachine::ExecuteOperation(Operation* operation)
 			mitk::StateTransitionOperation* stateTransOp = dynamic_cast<mitk::StateTransitionOperation *>(operation);
 			if (stateTransOp == NULL)
 			{
-				(StatusBar::GetInstance())->DisplayText("Error! see StateMachine.cpp", 10000);
+				(StatusBar::GetInstance())->DisplayText("Error! see mitkStateMachine.cpp", 10000);
 				return;
 			}
 			m_CurrentState = stateTransOp->GetState();

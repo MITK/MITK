@@ -2,7 +2,7 @@
 #define STATE_H_HEADER_INCLUDED_C19A8A5D
 
 #include "mitkCommon.h"
-#include "Transition.h"
+#include "mitkTransition.h"
 #include <string>
 #include <map>
 #include <set>

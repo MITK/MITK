@@ -1,10 +1,10 @@
 #ifndef DATATREENODE_H_HEADER_INCLUDED_C1E14338
 #define DATATREENODE_H_HEADER_INCLUDED_C1E14338
 
-#include "ImageSource.h"
-#include "BaseData.h"
-#include "Mapper.h"
-#include "StateMachine.h"
+#include "mitkImageSource.h"
+#include "mitkBaseData.h"
+#include "mitkMapper.h"
+#include "mitkStateMachine.h"
 
 #ifdef MBI_NO_STD_NAMESPACE
 	#define MBI_STD
@@ -16,10 +16,10 @@
 	#include <fstream>
 #endif
 
-#include "PropertyList.h"
+#include "mitkPropertyList.h"
 
 #include <map>
-#include "LevelWindow.h"
+#include "mitkLevelWindow.h"
 #include "mitkColorProperty.h"
 
 class vtkTransform;

@@ -2,10 +2,10 @@
 #define DATATREE_H_HEADER_INCLUDED_C1C7797C
 
 #include "mitkCommon.h"
-#include "DataTreeNode.h"
+#include "mitkDataTreeNode.h"
 
 //#include "DataTreeIterator.h"
-#include "Geometry3D.h"
+#include "mitkGeometry3D.h"
 #include <Tree/LinkedTree.h>
 
 namespace mitk {

@@ -1,4 +1,4 @@
-#include "Operation.h"
+#include "mitkOperation.h"
 
 //##ModelId=3E7830E70054
 mitk::Operation::Operation(mitk::OperationType operationType)

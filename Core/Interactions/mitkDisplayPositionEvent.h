@@ -3,7 +3,7 @@
 
 #include "mitkCommon.h"
 #include <vecmath.h>
-#include "Event.h"
+#include "mitkEvent.h"
 #include "mitkVector.h"
 
 

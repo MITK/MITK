@@ -1,8 +1,8 @@
 #ifndef _MITK_DISPLAY_INTERACTOR_H_
 #define _MITK_DISPLAY_INTERACTOR_H_
 
-#include "OperationActor.h"
-#include "BaseRenderer.h"
+#include "mitkOperationActor.h"
+#include "mitkBaseRenderer.h"
 
 namespace mitk {
 

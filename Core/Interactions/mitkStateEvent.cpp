@@ -1,4 +1,4 @@
-#include "StateEvent.h"
+#include "mitkStateEvent.h"
 
 //##ModelId=3F02F8960177
 mitk::StateEvent::StateEvent(int id, Event const* event)

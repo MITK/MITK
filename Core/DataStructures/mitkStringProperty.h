@@ -2,7 +2,7 @@
 #define MITKSTRINGPROPERTY_H_HEADER_INCLUDED_C1C02491
 
 #include "mitkCommon.h"
-#include "BaseProperty.h"
+#include "mitkBaseProperty.h"
 #include <string>
 
 namespace mitk {

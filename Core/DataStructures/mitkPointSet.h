@@ -2,7 +2,7 @@
 #define MITKPointSet_H_HEADER_INCLUDED
 
 #include "mitkCommon.h"
-#include <BaseData.h>
+#include <mitkBaseData.h>
 #include <itkPoint.h>
 #include <itkPointSet.h>
 #include "itkCovariantVector.h"

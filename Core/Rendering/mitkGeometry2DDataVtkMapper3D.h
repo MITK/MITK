@@ -2,11 +2,11 @@
 #define MITKGEOMETRY2DDATAVTKMAPPER3D_H_HEADER_INCLUDED_C196C71F
 
 #include "mitkCommon.h"
-#include "BaseVtkMapper3D.h"
+#include "mitkBaseVtkMapper3D.h"
 #include "mitkGeometry2DData.h"
-#include "DataTree.h"
-#include "ImageSliceSelector.h"
-#include "BaseRenderer.h"
+#include "mitkDataTree.h"
+#include "mitkImageSliceSelector.h"
+#include "mitkBaseRenderer.h"
 
 class vtkActor;
 class vtkTexture;

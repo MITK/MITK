@@ -2,7 +2,7 @@
 #define SLICEDDATA_H_HEADER_INCLUDED_C1EBD53D
 
 #include "mitkCommon.h"
-#include "BaseData.h"
+#include "mitkBaseData.h"
 #include "itkProcessObject.h"
 #include "itkIndex.h"
 #include "itkOffset.h"

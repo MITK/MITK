@@ -2,8 +2,8 @@
 #define MAPPER3D_H_HEADER_INCLUDED_C1C517B9
 
 #include "mitkCommon.h"
-#include "Mapper.h"
-#include "ImageChannelSelector.h"
+#include "mitkMapper.h"
+#include "mitkImageChannelSelector.h"
 
 namespace mitk {
 

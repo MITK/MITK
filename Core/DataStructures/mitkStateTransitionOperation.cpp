@@ -1,4 +1,4 @@
-#include "StateTransitionOperation.h"
+#include "mitkStateTransitionOperation.h"
 
 //##ModelId=3E78311303E7
 mitk::StateTransitionOperation::StateTransitionOperation(OperationType operationType, State* state)

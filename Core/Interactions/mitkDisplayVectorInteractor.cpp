@@ -1,5 +1,5 @@
 #include "mitkDisplayVectorInteractor.h"
-#include "Operation.h"
+#include "mitkOperation.h"
 #include "mitkDisplayCoordinateOperation.h"
 #include "mitkDisplayPositionEvent.h"
 #include "mitkInteractionConst.h"

@@ -2,7 +2,7 @@
 #define MITKLookupTablePROPERTY_H_HEADER_INCLUDED_C10EEAA8
 
 #include "mitkCommon.h"
-#include "BaseProperty.h"
+#include "mitkBaseProperty.h"
 #include "mitkLookupTable.h"
 
 namespace mitk {

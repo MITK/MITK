@@ -1,5 +1,5 @@
 #include "mitkPointSetVtkMapper3D.h"
-#include "DataTreeNode.h"
+#include "mitkDataTreeNode.h"
 #include "mitkBoolProperty.h"
 #include "mitkFloatProperty.h"
 #include "mitkStringProperty.h"

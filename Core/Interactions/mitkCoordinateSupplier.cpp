@@ -1,10 +1,10 @@
 #include "mitkDisplayCoordinateOperation.h"
 //has to be on top, otherwise compiler error!
 #include "mitkCoordinateSupplier.h"
-#include "Operation.h"
-#include "OperationActor.h"
+#include "mitkOperation.h"
+#include "mitkOperationActor.h"
 #include "mitkPointOperation.h"
-#include "PositionEvent.h"
+#include "mitkPositionEvent.h"
 //and not here!
 #include <string>
 #include "mitkInteractionConst.h"

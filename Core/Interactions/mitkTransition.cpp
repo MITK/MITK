@@ -1,4 +1,4 @@
-#include "Transition.h"
+#include "mitkTransition.h"
 
 //##ModelId=3E5A3A77006F
 mitk::Transition::Transition(std::string name, int nextStateId, int eventId, int sideEffectId)

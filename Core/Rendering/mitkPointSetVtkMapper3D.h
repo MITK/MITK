@@ -2,9 +2,9 @@
 #define MITKPointSetVtkMAPPER3D_H_HEADER_INCLUDED_C1907273
 
 #include "mitkCommon.h"
-#include "BaseVtkMapper3D.h"
+#include "mitkBaseVtkMapper3D.h"
 #include "mitkPointSet.h"
-#include "BaseRenderer.h"
+#include "mitkBaseRenderer.h"
 
 #include <vtkSphereSource.h>
 #include <vtkAppendPolyData.h>

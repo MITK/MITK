@@ -1,5 +1,5 @@
-#include "Mapper.h"
-#include "DataTreeNode.h"
+#include "mitkMapper.h"
+#include "mitkDataTreeNode.h"
 
 //##ModelId=3E3C320001E4
 //void mitk::Mapper::SetDisplaySizeInDisplayUnits(unsigned int widthInDisplayUnits, unsigned int heightInDisplayUnits)

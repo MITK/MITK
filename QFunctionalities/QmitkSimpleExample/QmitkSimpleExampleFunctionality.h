@@ -11,7 +11,7 @@
 
 #include "QmitkFunctionality.h"
 
-#include <OperationActor.h>
+#include <mitkOperationActor.h>
 
 #include <mitkFloatProperty.h>
 #include <mitkLookupTableProperty.h>

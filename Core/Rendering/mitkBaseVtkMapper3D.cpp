@@ -1,5 +1,5 @@
-#include "BaseVtkMapper3D.h"
-#include "DataTreeNode.h"
+#include "mitkBaseVtkMapper3D.h"
+#include "mitkDataTreeNode.h"
 #include <vtkProp3D.h>
 #include <vtkActor.h>
 #include <vtkProperty.h>

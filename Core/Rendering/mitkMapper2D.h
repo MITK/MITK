@@ -2,11 +2,11 @@
 #define MAPPER2D_H_HEADER_INCLUDED_C1C5453B
 
 #include "mitkCommon.h"
-#include "Mapper.h"
-#include "Geometry3D.h"
-#include "DisplayGeometry.h"
-#include "BaseRenderer.h"
-#include "ImageChannelSelector.h"
+#include "mitkMapper.h"
+#include "mitkGeometry3D.h"
+#include "mitkDisplayGeometry.h"
+#include "mitkBaseRenderer.h"
+#include "mitkImageChannelSelector.h"
 
 namespace mitk {
 

@@ -1,8 +1,8 @@
 #include "mitkGeometry2DDataVtkMapper3D.h"
 
-#include "PlaneGeometry.h"
+#include "mitkPlaneGeometry.h"
 
-#include "DataTree.h"
+#include "mitkDataTree.h"
 #include "mitkImageMapper2D.h"
 
 #include "mitkSurfaceData.h"

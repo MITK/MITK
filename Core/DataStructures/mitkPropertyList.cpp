@@ -1,4 +1,4 @@
-#include "PropertyList.h"
+#include "mitkPropertyList.h"
 
 //##ModelId=3D6A0E9E0029
 mitk::BaseProperty::Pointer mitk::PropertyList::GetProperty(const char *propertyKey) const

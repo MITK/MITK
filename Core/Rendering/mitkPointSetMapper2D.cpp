@@ -41,115 +41,117 @@ void mitk::PointSetMapper2D::Paint(mitk::BaseRenderer * renderer)
 {
   if(IsVisible(renderer)==false) return;
 
-    //	@FIXME: Logik fuer update
-    bool updateNeccesary=true;
+  //	@FIXME: Logik fuer update
+  bool updateNeccesary=true;
 
-    if (updateNeccesary) {
-        // ok, das ist aus GenerateData kopiert
+  if (updateNeccesary) {
+      // ok, das ist aus GenerateData kopiert
 
-        mitk::PointSet::Pointer input  = const_cast<mitk::PointSet*>(this->GetInput());
+      mitk::PointSet::Pointer input  = const_cast<mitk::PointSet*>(this->GetInput());
 
-        mitk::DisplayGeometry::Pointer displayGeometry = renderer->GetDisplayGeometry();
+      mitk::DisplayGeometry::Pointer displayGeometry = renderer->GetDisplayGeometry();
 
-        assert(displayGeometry.IsNotNull());
+      assert(displayGeometry.IsNotNull());
 
-        //apply color and opacity read from the PropertyList
-        ApplyProperties(renderer);
+      //apply color and opacity read from the PropertyList
+      ApplyProperties(renderer);
 
-        vtkTransform* transform = GetDataTreeNode()->GetVtkTransform();
+      vtkTransform* transform = GetDataTreeNode()->GetVtkTransform();
 
-        //List of the Points
-        PointSet::PointSetType::PointsContainerConstIterator it, end;
-        it=input->GetPointList()->GetPoints()->Begin();
-        end=input->GetPointList()->GetPoints()->End();
+      //List of the Points
+      PointSet::PointSetType::PointsContainerConstIterator it, end;
+      it=input->GetPointList()->GetPoints()->Begin();
+      end=input->GetPointList()->GetPoints()->End();
 
-        //bool list for the selection of the points
-        PointSet::PointSetType::PointDataContainerIterator selIt, selEnd;
-        selIt=input->GetPointList()->GetPointData()->Begin();
-        selEnd=input->GetPointList()->GetPointData()->End();
-        
-        int j=0;
-        while(it!=end)
-        {
-            mitk::Point3D p, projected_p;
-            float vtkp[3];
-            p.x= it->Value()[0];
-            p.y= it->Value()[1];
-            p.z= it->Value()[2];
-            vec2vtk(p, vtkp);
-            transform->TransformPoint(vtkp, vtkp);
-            vtk2vec(vtkp,p);
+      //bool list for the selection of the points
+      PointSet::PointSetType::PointDataContainerIterator selIt, selEnd;
+      selIt=input->GetPointList()->GetPointData()->Begin();
+      selEnd=input->GetPointList()->GetPointData()->End();
+      
+      int j=0;
+      while(it!=end)
+      {
+          mitk::Point3D p, projected_p;
+          float vtkp[3];
+          p.x= it->Value()[0];
+          p.y= it->Value()[1];
+          p.z= it->Value()[2];
+          vec2vtk(p, vtkp);
+          transform->TransformPoint(vtkp, vtkp);
+          vtk2vec(vtkp,p);
 
-            displayGeometry->Project(p, projected_p);
-            if(Vector3D(p-projected_p).length()<2.0)
-            {
-                Point2D pt2d, tmp;
-                displayGeometry->Map(projected_p, pt2d);
-                displayGeometry->MMToDisplay(pt2d, pt2d);
+          displayGeometry->Project(p, projected_p);
+          if(Vector3D(p-projected_p).length()<2.0)
+          {
+              Point2D pt2d, tmp;
+              displayGeometry->Map(projected_p, pt2d);
+              displayGeometry->MMToDisplay(pt2d, pt2d);
 
-                Point2D horz(5,0),vert(0,5);
-                                
-								// now paint text if available
-                glRasterPos2f ( pt2d.x + 5, pt2d.y + 5);
-								if (dynamic_cast<mitk::StringProperty *>(this->GetDataTreeNode()->GetProperty("label").GetPointer()) == NULL)
-								{}
-								else {
+              Point2D horz(5,0),vert(0,5);
+                              
+							// now paint text if available
+              glRasterPos2f ( pt2d.x + 5, pt2d.y + 5);
+							if (dynamic_cast<mitk::StringProperty *>(this->GetDataTreeNode()->GetProperty("label").GetPointer()) == NULL)
+							{}
+							else {
 
-										const char * pointLabel =dynamic_cast<mitk::StringProperty *>(this->GetDataTreeNode()->GetProperty("label").GetPointer())->GetString();
-										char buffer[20];
-						 	      std::string l = pointLabel;
-										if (input->GetSize()>1)
-										{
-												sprintf(buffer,"%d",j+1);
-												l.append(buffer);
-										}
-		
-    		            for (unsigned int i = 0; i < l.size(); i++)
-		    		            glutBitmapCharacter (GLUT_BITMAP_HELVETICA_10, l[i]);
-		        		}
+									const char * pointLabel =dynamic_cast<mitk::StringProperty *>(this->GetDataTreeNode()->GetProperty("label").GetPointer())->GetString();
+									char buffer[20];
+						 	    std::string l = pointLabel;
+									if (input->GetSize()>1)
+									{
+											sprintf(buffer,"%d",j+1);
+											l.append(buffer);
+									}
+	
+    		          for (unsigned int i = 0; i < l.size(); i++)
+		    		          glutBitmapCharacter (GLUT_BITMAP_HELVETICA_10, l[i]);
+		        	}
 
-                if (selIt->Value())//selected
-                {
-                  float colorSel[]={1.0,0.0,0.6}; //for selected!
+              if (selIt->Value())//selected
+              {
+                float colorSel[]={1.0,0.0,0.6}; //for selected!
 
-                  //current color for changing to a diferent color if selected
-                  float currCol[4];
-                  glGetFloatv(GL_CURRENT_COLOR,currCol);
+                //current color for changing to a diferent color if selected
+                float currCol[4];
+                glGetFloatv(GL_CURRENT_COLOR,currCol);
 
-                  horz.x=10;
-                  vert.y=10;
-                  glColor3f(colorSel[0],colorSel[1],colorSel[2]);//red
+                horz.x=8;
+                vert.y=8;
+                glColor3f(colorSel[0],colorSel[1],colorSel[2]);//red
 
-                  glBegin (GL_LINE_LOOP);
-                      tmp=pt2d-horz;      glVertex2fv(&tmp.x);
-                      tmp=pt2d+vert;      glVertex2fv(&tmp.x);
-                      tmp=pt2d+horz;			glVertex2fv(&tmp.x);
-                      tmp=pt2d-vert;      glVertex2fv(&tmp.x);
-                  glEnd ();
+                //a diamond around the point
+                glBegin (GL_LINE_LOOP);
+                    tmp=pt2d-horz;      glVertex2fv(&tmp.x);
+                    tmp=pt2d+vert;      glVertex2fv(&tmp.x);
+                    tmp=pt2d+horz;			glVertex2fv(&tmp.x);
+                    tmp=pt2d-vert;      glVertex2fv(&tmp.x);
+                glEnd ();
 
-                  glBegin (GL_POINTS);
-                    tmp=pt2d;             glVertex2fv(&tmp.x);
-                  glEnd ();
-                  
-                  
-                  glColor3f(currCol[0],currCol[1],currCol[2]);//the color before changing to select!
+                //the actual point
+                glBegin (GL_POINTS);
+                  tmp=pt2d;             glVertex2fv(&tmp.x);
+                glEnd ();
+                
+                
+                glColor3f(currCol[0],currCol[1],currCol[2]);//the color before changing to select!
 
-                }
-                else
-                {
-								  glBegin (GL_LINES);
-                      tmp=pt2d-horz;      glVertex2fv(&tmp.x);
-                      tmp=pt2d+horz;      glVertex2fv(&tmp.x);
-                      tmp=pt2d-vert;      glVertex2fv(&tmp.x);
-                      tmp=pt2d+vert;      glVertex2fv(&tmp.x);
-                  glEnd ();
-                }
-            }
-            ++it;
-            ++selIt;
- 						j++;
-        }
-    }
+              }
+              else
+              {
+								glBegin (GL_LINES);
+                    tmp=pt2d-horz;      glVertex2fv(&tmp.x);
+                    tmp=pt2d+horz;      glVertex2fv(&tmp.x);
+                    tmp=pt2d-vert;      glVertex2fv(&tmp.x);
+                    tmp=pt2d+vert;      glVertex2fv(&tmp.x);
+                glEnd ();
+              }
+          }
+          ++it;
+          ++selIt;
+ 					j++;
+      }
+  }
 }
 
 //##ModelId=3F0189F00376

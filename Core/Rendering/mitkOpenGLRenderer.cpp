@@ -307,7 +307,7 @@ void mitk::OpenGLRenderer::Render()
 
   //has the data tree been changed?
   if(dynamic_cast<mitk::DataTree*>(GetData()->GetTree()) == NULL ) return;
-  if(m_LastUpdateVtkActorsTime < dynamic_cast<mitk::DataTree*>(GetData()->GetTree())->GetMTime() )
+  if(m_LastUpdateVtkActorsTime < static_cast<mitk::DataTree*>(GetData()->GetTree())->GetMTime() )
   {
     //yes: update vtk-actors
     UpdateIncludingVtkActors();

@@ -84,7 +84,7 @@ bool mitk::PicHelper::SetSpacing(ipPicDescriptor* pic, SlicedGeometry3D* slicedg
   Vector3D spacing(slicedgeometry->GetSpacing());
 
   ipPicTSV_t *tsv;
-  if ( tsv = ipPicQueryTag( pic, "REAL PIXEL SIZES" ) )
+  if ( (tsv = ipPicQueryTag( pic, "REAL PIXEL SIZES" )) != NULL)
   {    
     int count = tsv->n[1];
     float* value = (float*) tsv->value;
@@ -123,6 +123,14 @@ void mitk::PicHelper::InitializeEvenlySpaced(ipPicDescriptor* pic, unsigned int 
   mitk::PlaneGeometry::Pointer planegeometry=mitk::PlaneGeometry::New();
   planegeometry->InitializeStandardPlane(pic->n[0], pic->n[1], spacing);
   slicedgeometry->InitializeEvenlySpaced(planegeometry, spacing[2], slices);
+
+  if(pic->dim>=4)
+  {
+    TimeBounds timebounds;
+    timebounds[0] = 0.0;
+    timebounds[1] = 1.0;
+    slicedgeometry->SetTimeBoundsInMS(timebounds);
+  }
 }
 
 bool mitk::PicHelper::SetGeometry2D(ipPicDescriptor* pic, int s, SlicedGeometry3D* slicedgeometry)
@@ -133,7 +141,7 @@ bool mitk::PicHelper::SetGeometry2D(ipPicDescriptor* pic, int s, SlicedGeometry3
     mitk::Point3D origin;
     mitk::Vector3D rightDV, bottomDV;
     ipPicTSV_t *tsv;
-    if ( tsv = ipPicQueryTag( pic, "REAL PIXEL SIZES" ) )
+    if ( (tsv = ipPicQueryTag( pic, "REAL PIXEL SIZES" )) != NULL)
     {    
       int count = tsv->n[1];
       float* value = (float*) tsv->value;

@@ -1,7 +1,3 @@
-#if _MSC_VER<=1300
-#pragma warning( disable : 4290 )
-#endif
-
 #include "mitkImageDataItem.h"
 #include <vtkImageData.h>
 #include <vtkPointData.h>
@@ -20,8 +16,8 @@
 
 //##ModelId=3E0B7882024B
 mitk::ImageDataItem::ImageDataItem(const ImageDataItem& aParent, unsigned int dimension, int offset) : 
-  m_Parent(&aParent), m_Data(NULL), m_VtkImageData(NULL), m_PicDescriptor(NULL), m_IsComplete(false),
-  m_Offset(offset)
+  m_Data(NULL), m_PicDescriptor(NULL), m_VtkImageData(NULL), m_Offset(offset), m_IsComplete(false),
+  m_Parent(&aParent)
 {
   mitk::PixelType type(aParent.GetPicDescriptor());
   m_PicDescriptor=ipPicNew();
@@ -52,7 +48,8 @@ mitk::ImageDataItem::~ImageDataItem()
 
 //##ModelId=3E159C240213
 mitk::ImageDataItem::ImageDataItem(const mitk::PixelType& type, unsigned int dimension, unsigned int *dimensions) : 
-m_Parent(NULL), m_Data(NULL), m_VtkImageData(NULL), m_PicDescriptor(NULL), m_IsComplete(false), m_Offset(0)
+  m_Data(NULL), m_PicDescriptor(NULL), m_VtkImageData(NULL), m_Offset(0), m_IsComplete(false),
+  m_Parent(NULL)
 {
   //const std::type_info & typeId=*type.GetTypeId();
   m_PicDescriptor=ipPicNew();

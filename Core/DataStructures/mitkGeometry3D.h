@@ -98,7 +98,7 @@ class Geometry3D : public itk::LightObject
     Geometry3D(unsigned int dimension, const unsigned int* dimensions);
 
     //##ModelId=3E15578402BD
-    virtual bool SetGeometry2D(mitk::Geometry2D geometry2D, int s, int t = 0);
+    virtual bool SetGeometry2D(mitk::Geometry2D* geometry2D, int s, int t = 0);
   
     //##ModelId=3E155839024F
     //##Documentation

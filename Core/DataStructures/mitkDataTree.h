@@ -8,6 +8,7 @@
 #include <Tree/LinkedTree.h>
 
 namespace mitk {
+//##ModelId=3E3959140012
 typedef ::LinkedTree<DataTreeNode::Pointer> DataTreeBase;
 
 //##ModelId=3E38F35101A0
@@ -41,6 +42,7 @@ class DataTree : public itk::Object, public DataTreeBase
 
 };
 
+//##ModelId=3E394E99028E
 typedef	::TreeIterator<DataTreeNode::Pointer> DataTreeIterator;
 
 } // namespace mitk

@@ -42,3 +42,14 @@ double mitk::Geometry2D::GetTime()
 	return -1;
 }
 
+//##ModelId=3E395E0802E6
+mitk::Geometry2D::Geometry2D()
+{
+}
+
+
+//##ModelId=3E395E080318
+mitk::Geometry2D::~Geometry2D()
+{
+}
+

@@ -45,6 +45,7 @@ public:
     //##ModelId=3E33F5D7032D
     mitk::DataTreeNode& operator=(const DataTreeNode& right);
 
+    //##ModelId=3E34248B02E0
     mitk::DataTreeNode& operator=(BaseData* right);
 
 protected:

@@ -49,6 +49,13 @@ public:
 	//##ModelId=3E02DFAF02AD
 	virtual double GetTime();
 
+
+  protected:
+    //##ModelId=3E395E080318
+    virtual ~Geometry2D();
+    //##ModelId=3E395E0802E6
+    Geometry2D();
+
 };
 
 } // namespace mitk

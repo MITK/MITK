@@ -59,10 +59,10 @@ class LevelWindow : public itk::Object
     //##ModelId=3E345B580260
     LevelWindow();
 
-    //##ModelId=3E0B122C0393
     //##ModelId=3E345B58029C
     virtual ~LevelWindow();
 
+    //##ModelId=3E0B122C0393
     float m_Min;
 
     //##ModelId=3E0B123D0167

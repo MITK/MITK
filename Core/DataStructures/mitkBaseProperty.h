@@ -10,9 +10,13 @@ class BaseProperty : public itk::LightObject
 {
 public:
     /** Standard class typedefs. */
+    //##ModelId=3E394E9901A5
     typedef BaseProperty             Self;
+    //##ModelId=3E394E9901E1
     typedef itk::LightObject         Superclass;
+    //##ModelId=3E394E990209
     typedef itk::SmartPointer<Self>  Pointer;
+    //##ModelId=3E394E990231
     typedef itk::SmartPointer<const Self>  ConstPointer;
 
     /** Method for creation through the object factory. */

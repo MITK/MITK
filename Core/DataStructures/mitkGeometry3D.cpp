@@ -59,7 +59,7 @@ const double *mitk::Geometry3D::GetSpacing() const
 }
 
 //##ModelId=3E15578402BD
-bool mitk::Geometry3D::SetGeometry2D(mitk::Geometry2D geometry2D, int s, int t)
+bool mitk::Geometry3D::SetGeometry2D(mitk::Geometry2D* geometry2D, int s, int t)
 {
 	itkExceptionMacro("SetGeometry2D not yet supported."); 	
 	return false;

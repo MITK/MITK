@@ -1,8 +1,8 @@
-INCLUDEPATH	+= ../../Framework/QmitkApplicationBase ../../AppModules/QmitkSimpleExample
+INCLUDEPATH	+= ../../Framework/QmitkApplicationBase ../../Functionalities/QmitkSimpleExample
 
 # an example of a functionality
-HEADERS	+= ../../AppModules/QmitkSimpleExample/QmitkSimpleExampleFunctionality.h 
+HEADERS	+= ../../Functionalities/QmitkSimpleExample/QmitkSimpleExampleFunctionality.h 
 		
-SOURCES	+= ../../AppModules/QmitkSimpleExample/QmitkSimpleExampleFunctionality.cpp 
+SOURCES	+= ../../Functionalities/QmitkSimpleExample/QmitkSimpleExampleFunctionality.cpp 
 
-FORMS += ../../AppModules/QmitkSimpleExample/QmitkSimpleExampleControls.ui
+FORMS += ../../Functionalities/QmitkSimpleExample/QmitkSimpleExampleControls.ui

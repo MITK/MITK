@@ -63,7 +63,6 @@ bool mitk::PointInteractor::ExecuteSideEffect(int sideEffectId, mitk::StateEvent
 			m_UndoController->SetOperationEvent(operationEvent);
 		}
 		m_DataTreeNode->GetData()->ExecuteOperation(doOp);
-
 		ok = true;
     break;
 	}
@@ -95,7 +94,6 @@ bool mitk::PointInteractor::ExecuteSideEffect(int sideEffectId, mitk::StateEvent
     //execute the Operation
     //here no undo is stored, because the movement-steps aren't interesting. only the start and the end is interisting to store for undo.
 		m_DataTreeNode->GetData()->ExecuteOperation(doOp);
-
     ok = true;
     break;
 	}
@@ -116,8 +114,8 @@ bool mitk::PointInteractor::ExecuteSideEffect(int sideEffectId, mitk::StateEvent
     {
       PointOperation* undoOp = new mitk::PointOperation(OpMOVE, m_LastPoint, m_Id);
       OperationEvent *operationEvent = new OperationEvent(m_DataTreeNode->GetData(),
-							doOp, undoOp,
-							objectEventId, groupEventId);
+                                            							doOp, undoOp,
+							                                            objectEventId, groupEventId);
       m_UndoController->SetOperationEvent(operationEvent);
     }
 		//execute the Operation
@@ -125,7 +123,6 @@ bool mitk::PointInteractor::ExecuteSideEffect(int sideEffectId, mitk::StateEvent
 
   //  //increase the GroupEventId, so that the raw-Undo goes to here
 		//this->IncCurrGroupEventId();
-
 	ok = true;
 	}
 	break;
@@ -146,7 +143,6 @@ bool mitk::PointInteractor::ExecuteSideEffect(int sideEffectId, mitk::StateEvent
    	ok = true;
   }
 	break;
-
   case SeSELECT:
 	{
     PointOperation* doOp = new mitk::PointOperation(OpSELECTPOINT, ((PointSet*)(m_DataTreeNode->GetData()))->GetItkPoint(m_Id), m_Id);
@@ -159,10 +155,9 @@ bool mitk::PointInteractor::ExecuteSideEffect(int sideEffectId, mitk::StateEvent
 			m_UndoController->SetOperationEvent(operationEvent);
 		}
 		m_DataTreeNode->GetData()->ExecuteOperation(doOp);
-		ok = true;
+    ok = true;
 	}
 	break;
-
   case SeDESELECT:
 	{
     PointOperation* doOp = new mitk::PointOperation(OpDESELECTPOINT, ((PointSet*)(m_DataTreeNode->GetData()))->GetItkPoint(m_Id), m_Id);
@@ -178,7 +173,14 @@ bool mitk::PointInteractor::ExecuteSideEffect(int sideEffectId, mitk::StateEvent
 		ok = true;
 	}
 	break;
-
+  case SeMODESELECT:
+    m_Mode = SMMode::SELECTED;
+    ok = true;
+    break;
+  case SeMODEDESELECT:
+    m_Mode = SMMode::DESELECTED;
+    ok = true;
+    break;
 	default:
     (StatusBar::GetInstance())->DisplayText("Message from mitkPointInteractor: I do not understand the SideEffect!", 10000);
     return false;

@@ -3,8 +3,11 @@
 #include <mitkInteractionConst.h>
 #include <mitkPositionEvent.h>
 #include <mitkOperationEvent.h>
+#include <mitkStateEvent.h>
 #include <mitkPointOperation.h>
 #include <mitkDataTreeNode.h>
+#include <mitkMesh.h>
+
 
 mitk::PolygonInteractor::PolygonInteractor(const char * type, DataTreeNode* dataTreeNode)
 : Interactor(type, dataTreeNode), m_PointIdCount(0), m_LineIdCount(0)
@@ -20,10 +23,26 @@ int mitk::PolygonInteractor::GetId()
   return m_Id;
 }
 
+//##Documentation
+//##@brief makes sure, that one line is selected.
+//##if no line is selected, then the next line to the given point is selected
+//##if more than one line is selected, then all are deselected and the one next to the given point is selected
+void mitk::PolygonInteractor::SelectOneLine(ITKPoint3D itkPoint)
+{
+  //@Todo:Implement!!!  with respect to undo!
+
+}
+
 
 bool mitk::PolygonInteractor::ExecuteSideEffect(int sideEffectId, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId)
 {
   bool ok = false;//for return type bool
+  
+  //checking corresponding Data; has to be a Mesh or a subclass
+	mitk::Mesh* data = dynamic_cast<mitk::Mesh*>(m_DataTreeNode->GetData());
+	if (data == NULL)
+		return false;
+
   
   switch (sideEffectId)
 	{
@@ -38,6 +57,7 @@ bool mitk::PolygonInteractor::ExecuteSideEffect(int sideEffectId, mitk::StateEve
         return false;
 
       //inserting the new interactor into the list
+      //referencecounting has to be made. but so far I can see is it ok. 
       mitk::PointInteractor::Pointer pointInteractor = new mitk::PointInteractor("pointinteractor", m_DataTreeNode, m_PointIdCount);
       m_PointList->insert(PointListType::value_type(m_PointIdCount, pointInteractor));
 
@@ -48,17 +68,73 @@ bool mitk::PolygonInteractor::ExecuteSideEffect(int sideEffectId, mitk::StateEve
 		  if (m_UndoEnabled)
 		  {
         mitk::PointOperation* undoOp = new mitk::PointOperation(OpREMOVE, itkPoint, m_PointIdCount);
-			  OperationEvent *operationEvent = new OperationEvent(m_DataTreeNode->GetData(),
+			  OperationEvent *operationEvent = new OperationEvent(data,
 				  													doOp, undoOp,
 					  												objectEventId, groupEventId);
 			  m_UndoController->SetOperationEvent(operationEvent);
 		  }
-		  m_DataTreeNode->GetData()->ExecuteOperation(doOp);
-	  
-      ++m_PointIdCount;
+		  data->ExecuteOperation(doOp);
+	    ++m_PointIdCount;
     }
     ok = true;
 	  break;
+  case SeINSERTLINE:
+    {
+      mitk::PositionEvent const  *posEvent = dynamic_cast <const mitk::PositionEvent *> (stateEvent->GetEvent());
+		  if (posEvent == NULL) 
+        return false;
+      //only one line can be selected. get the line and rebuild the cell with the ID of the new 
+      //point inserted between the two points of the selected line
+      mitk::ITKPoint3D itkPoint;
+		  mitk::vm2itk(posEvent->GetWorldPosition(), itkPoint);
+
+      SelectOneLine(itkPoint);
+      //now one line is selected
+      
+      //create a new LineInteractor. thenconnect one old LineInteractor to the new point, 
+      //the new lineInteractor to the same new point and to the other old point.
+
+
+      
+
+    }
+    ok = true;
+    break;
+  case SeCHECKGREATERZERO:
+    {
+      //check if the number of points is greater to zero.
+      if (data->GetSize()>0)
+      {
+        mitk::StateEvent* newStateEvent = new mitk::StateEvent(StYES, stateEvent->GetEvent());
+        this->HandleEvent( newStateEvent, objectEventId, groupEventId );
+		    ok = true;
+      }
+      else 
+      {
+        mitk::StateEvent* newStateEvent = new mitk::StateEvent(StNO, stateEvent->GetEvent());
+        this->HandleEvent(newStateEvent, objectEventId, groupEventId );
+		    ok = true;
+      }
+    }
+    break;
+    case SeCHECKGREATERTWO:
+    {
+      //check if the number of points is greater to two.
+      if (data->GetSize()>2)
+      {
+        mitk::StateEvent* newStateEvent = new mitk::StateEvent(StYES, stateEvent->GetEvent());
+        this->HandleEvent( newStateEvent, objectEventId, groupEventId );
+		    ok = true;
+      }
+      else 
+      {
+        mitk::StateEvent* newStateEvent = new mitk::StateEvent(StNO, stateEvent->GetEvent());
+        this->HandleEvent(newStateEvent, objectEventId, groupEventId );
+		    ok = true;
+      }
+    }
+    break;
+
 
 //  case SeREMOVE:
 //  {
@@ -129,7 +205,14 @@ bool mitk::PolygonInteractor::ExecuteSideEffect(int sideEffectId, mitk::StateEve
 //    ok = true;
 //  }
 //  break;
-
+  case SeMODESELECT:
+    m_Mode = SMMode::SELECTED;
+    ok = true;
+    break;
+  case SeMODEDESELECT:
+    m_Mode = SMMode::DESELECTED;
+    ok = true;
+    break;
   default:
     (StatusBar::GetInstance())->DisplayText("Message from mitkPolygonInteractor: I do not understand the SideEffect!", 10000);
     return false;

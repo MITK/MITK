@@ -5,6 +5,7 @@
 #include <mitkInteractor.h>
 #include "mitkLineInteractor.h"
 #include "mitkPointInteractor.h"
+#include <mitkVector.h>
 #include <map>
 
 namespace mitk
@@ -44,6 +45,13 @@ protected:
   virtual bool ExecuteSideEffect(int sideEffectId, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId);
 
 private:
+
+  //##Documentation
+  //##@brief makes sure, that one line is selected.
+  //##if no line is selected, then the next line to the given point is selected
+  //##if more than one line is selected, then all are deselected and the one next to the given point is selected
+  void SelectOneLine(ITKPoint3D itkPoint);
+
   //##Documentation
   //## @brief lower Line Interactors 
   LineListType *m_LineList;

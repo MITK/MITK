@@ -62,7 +62,6 @@ bool mitk::LineInteractor::ExecuteSideEffect(int sideEffectId, mitk::StateEvent 
 
     //start of the Movement is stored to calculate the undoKoordinate in FinishMovement
     mitk::vm2itk(posEvent->GetWorldPosition(), m_LastPoint);
-    //initialize a value to calculate the movement through all MouseMoveEvents from MouseClick to MouseRelease
     ok = true;
     break;
   }
@@ -147,8 +146,16 @@ bool mitk::LineInteractor::ExecuteSideEffect(int sideEffectId, mitk::StateEvent 
     ok = true;
   }
   break;
-
+  case SeMODESELECT:
+    m_Mode = SMMode::SELECTED;
+    ok = true;
+    break;
+  case SeMODEDESELECT:
+    m_Mode = SMMode::DESELECTED;
+    ok = true;
+    break;
   default:
+    m_Mode = SMMode::DESELECTED;
     (StatusBar::GetInstance())->DisplayText("Message from mitkLineInteractor: I do not understand the SideEffect!", 10000);
     return false;
     //a false here causes the statemachine to undo its last statechange.

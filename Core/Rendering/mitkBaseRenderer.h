@@ -12,8 +12,10 @@ namespace mitk {
 
 //##ModelId=3C6E9AA90306
 //##Documentation
-//## Organizes the rendering process. Contains the DataTree and asks for the
-//## Mappers of DataTreeNodes. 
+//## @brief Organizes the rendering process
+//## Organizes the rendering process. A Renderer contains a reference to a (sub-) data 
+//## tree and asks the mappers of the data objects to render 
+//## the data into the renderwindow it is associated to.
 class BaseRenderer : public itk::Object
 {
   public:
@@ -73,11 +75,17 @@ class BaseRenderer : public itk::Object
     //##ModelId=3E66CC590379
     virtual void SetWorldGeometry(const mitk::Geometry2D* geometry2d);
 
-    itkGetObjectMacro(DisplayGeometry2DData, mitk::Geometry2DData);
-    itkGetObjectMacro(WorldGeometry2DData, mitk::Geometry2DData);
+    itkGetObjectMacro(DisplayGeometryData, mitk::Geometry2DData);
+    itkGetObjectMacro(WorldGeometryData, mitk::Geometry2DData);
+
+    itkGetObjectMacro(DisplayGeometryNode, mitk::DataTreeNode);
+    itkGetObjectMacro(WorldGeometryNode, mitk::DataTreeNode);
 
     itkGetMacro(MapperID, MapperSlotId);
     itkSetMacro(MapperID, MapperSlotId);
+
+    itkGetMacro(Focused, bool);
+    itkSetMacro(Focused, bool);
 
     itkGetMacro(Size, int*);
 
@@ -116,16 +124,49 @@ protected:
     //##ModelId=3E6D5DD302E6
     int m_Size[2];
 
+    //##ModelId=3ED91D0400D3
+	bool m_Focused;
+
 private:
     //##ModelId=3E3D2EEB0087
+	//##Documentation
+	//## ConstPointer to the displaygeometry. The displaygeometry describes the
+	//## geometry of the visible area in the window controlled by the renderer 
+	//## in case we are doing 2D-rendering. 
+	//## It is const, since we are not allowed to change it.
     DisplayGeometry::Pointer m_DisplayGeometry;
     //##ModelId=3E66B9FA022D
+	//##Documentation
+	//## ConstPointer to the worldgeometry. The worldgeometry describes the
+	//## maximal area to be rendered in case we are doing 2D-rendering. 
+	//## It is const, since we are not allowed to change it (it may be taken
+	//## directly from the geometry of an image-slice and thus it would be 
+	//## very strange when suddenly the image-slice changes its geometry).
     Geometry2D::ConstPointer m_WorldGeometry;
 
+protected:
     //##ModelId=3E66BDF000F4
-    Geometry2DData::Pointer m_DisplayGeometry2DData;
+	//##Documentation
+	//## Data object containing the m_DisplayGeometry defined above. 
+    Geometry2DData::Pointer m_DisplayGeometryData;
     //##ModelId=3E66CC5901C1
-    Geometry2DData::Pointer m_WorldGeometry2DData;
+	//##Documentation
+	//## Data object containing the m_WorldGeometry defined above. 
+    Geometry2DData::Pointer m_WorldGeometryData;
+
+    //##ModelId=3ED91D04020B
+	//##Documentation
+	//## DataTreeNode objects containing the m_DisplayGeometryData defined above. 
+	DataTreeNode::Pointer m_DisplayGeometryNode;
+    //##ModelId=3ED91D040288
+	//##Documentation
+	//## DataTreeNode objects containing the m_WorldGeometryData defined above. 
+	DataTreeNode::Pointer m_WorldGeometryNode;
+
+    //##ModelId=3ED91D040305
+    unsigned long m_DisplayGeometryTransformTime;
+    //##ModelId=3ED91D040382
+    unsigned long m_WorldGeometryTransformTime;
 };
 
 } // namespace mitk

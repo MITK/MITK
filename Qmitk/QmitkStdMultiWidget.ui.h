@@ -102,6 +102,9 @@ void QmitkStdMultiWidget::init()
   mitkWidget3->GetSliceNavigationController()->ConnectRepaintRequest(multiplexUpdateController.GetPointer());
   mitkWidget4->GetSliceNavigationController()->ConnectRepaintRequest(multiplexUpdateController.GetPointer());
   timeNavigationController->ConnectRepaintRequest(multiplexUpdateController.GetPointer());
+  
+  // instantiate display interactor
+  m_MoveAndZoomInteractor = new mitk::DisplayVectorInteractor("moveNzoom", new mitk::DisplayInteractor() );
 }
 
 void QmitkStdMultiWidget::changeLayoutTo2DImagesUp()
@@ -511,12 +514,12 @@ bool QmitkStdMultiWidget::InitializeStandardViews(mitk::DataTreeIteratorBase * i
 
       if(const_cast<mitk::BoundingBox*>(geometry->GetBoundingBox())->GetDiagonalLength2()>=mitk::eps)
       {
-        boundingBoxInitialized=true;	
+        boundingBoxInitialized=true;
         multiplexUpdateController->SetBlockUpdate(true);
         sliceNavigatorTransversal->SetInputWorldGeometry(geometry.GetPointer()); sliceNavigatorTransversal->Update();
         sliceNavigatorSagittal->SetInputWorldGeometry(geometry.GetPointer());    sliceNavigatorSagittal->Update();
         sliceNavigatorFrontal->SetInputWorldGeometry(geometry.GetPointer());     sliceNavigatorFrontal->Update();
-        timeNavigationController->SetInputWorldGeometry(geometry.GetPointer());        timeNavigationController->Update();
+        timeNavigationController->SetInputWorldGeometry(geometry.GetPointer());  timeNavigationController->Update();
         multiplexUpdateController->SetBlockUpdate(false);
         multiplexUpdateController->UpdateRequest();
         fit();
@@ -526,8 +529,79 @@ bool QmitkStdMultiWidget::InitializeStandardViews(mitk::DataTreeIteratorBase * i
   return boundingBoxInitialized;
 }
 
+
+//bool QmitkStdMultiWidget::InitializeStandardViews(mitk::SlicedGeometry* geometry)
+//{
+//  bool boundingBoxInitialized = false;
+//
+//  mitk::SliceNavigationController* sliceNavigatorTransversal = mitkWidget1->GetSliceNavigationController();
+//  mitk::SliceNavigationController* sliceNavigatorSagittal       = mitkWidget2->GetSliceNavigationController();
+//  mitk::SliceNavigationController* sliceNavigatorFrontal        = mitkWidget3->GetSliceNavigationController();
+//
+//  sliceNavigatorTransversal->SetViewDirection(mitk::SliceNavigationController::Transversal);
+//  sliceNavigatorSagittal->SetViewDirection(mitk::SliceNavigationController::Sagittal);
+//  sliceNavigatorFrontal->SetViewDirection(mitk::SliceNavigationController::Frontal);
+//
+//  if(geometry==NULL)
+//  {
+//    multiplexUpdateController->SetBlockUpdate(true);
+//    sliceNavigatorTransversal->Update();
+//    sliceNavigatorSagittal->Update();
+//    sliceNavigatorFrontal->Update();
+//    timeNavigationController->Update();
+//    multiplexUpdateController->SetBlockUpdate(false);
+//    multiplexUpdateController->UpdateRequest();
+//  }
+//  else
+//  {
+//    const mitk::BoundingBox* boundingbox = geometry->GetBoundingBox();
+//    if(boundingbox->GetPoints()->Size()>0)
+//    { 
+//      mitk::Geometry3D::Pointer geometry = mitk::Geometry3D::New();
+//      geometry->Initialize();
+//      geometry->SetBounds(boundingbox->GetBounds());
+//
+//      //lets see if we have data with a limited live-span ...
+//      mitk::TimeBounds timebounds = mitk::DataTree::ComputeTimeBoundsInMS(it, NULL, "includeInBoundingBox");
+//      if(timebounds[1]<mitk::ScalarTypeNumericTraits::max())
+//      {
+//        mitk::ScalarType duration = timebounds[1]-timebounds[0];
+//
+//        mitk::TimeSlicedGeometry::Pointer timegeometry = mitk::TimeSlicedGeometry::New();
+//        timegeometry->InitializeEvenlyTimed(geometry, (unsigned int) duration);
+//        timegeometry->SetTimeBoundsInMS(timebounds); //@bug really required? FIXME
+//
+//        timebounds[1] = timebounds[0]+1.0f;
+//        geometry->SetTimeBoundsInMS(timebounds);
+//
+//        geometry=timegeometry;
+//      }
+//
+//      if(const_cast<mitk::BoundingBox*>(geometry->GetBoundingBox())->GetDiagonalLength2()>=mitk::eps)
+//      {
+//        boundingBoxInitialized=true;	
+//        multiplexUpdateController->SetBlockUpdate(true);
+//        sliceNavigatorTransversal->SetInputWorldGeometry(geometry.GetPointer()); sliceNavigatorTransversal->Update();
+//        sliceNavigatorSagittal->SetInputWorldGeometry(geometry.GetPointer());    sliceNavigatorSagittal->Update();
+//        sliceNavigatorFrontal->SetInputWorldGeometry(geometry.GetPointer());     sliceNavigatorFrontal->Update();
+//        timeNavigationController->SetInputWorldGeometry(geometry.GetPointer());  timeNavigationController->Update();
+//        multiplexUpdateController->SetBlockUpdate(false);
+//        multiplexUpdateController->UpdateRequest();
+//        fit();
+//      }
+//    }
+//  }
+//  return boundingBoxInitialized;
+//}
+
 void QmitkStdMultiWidget::wheelEvent( QWheelEvent * e )
 {
     std::cout << "QmitkMultiWidget: grabbed mouse wheel event" << std::endl;
     emit WheelMoved( e );
+}
+
+
+mitk::DisplayVectorInteractor* QmitkStdMultiWidget::GetMoveAndZoomInteractor()
+{
+    return m_MoveAndZoomInteractor;
 }

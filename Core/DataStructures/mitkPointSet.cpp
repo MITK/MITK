@@ -169,6 +169,7 @@ void mitk::PointSet::ExecuteOperation(Operation* operation)
 
       PointDataType pointData = {pointOp->GetIndex(), pointOp->GetSelected(), pointOp->GetPointType()};
       m_ItkData->GetPointData()->InsertElement(position, pointData);
+      this->Modified();
 		}
 		break;
 	case OpMOVE://moves the point given by index
@@ -178,6 +179,7 @@ void mitk::PointSet::ExecuteOperation(Operation* operation)
 			PointType pt;
       pt.CastFrom(pointOp->GetPoint());
       m_ItkData->SetPoint(pointOp->GetIndex(), pt);
+      this->Modified();
 		}
 		break;
 	case OpREMOVE://removes the point at given by position 
@@ -186,6 +188,7 @@ void mitk::PointSet::ExecuteOperation(Operation* operation)
 
       m_ItkData->GetPoints()->DeleteIndex((unsigned)pointOp->GetIndex());
       m_ItkData->GetPointData()->DeleteIndex((unsigned)pointOp->GetIndex());
+      this->Modified();
 		}
 		break;
   case OpSELECTPOINT://select the given point
@@ -196,6 +199,7 @@ void mitk::PointSet::ExecuteOperation(Operation* operation)
       m_ItkData->GetPointData(pointOp->GetIndex(), &pointData);
       pointData.selected = true;
       m_ItkData->SetPointData(pointOp->GetIndex(), pointData);
+      this->Modified();
 		}
 		break;
 	case OpDESELECTPOINT://unselect the given point
@@ -206,6 +210,7 @@ void mitk::PointSet::ExecuteOperation(Operation* operation)
       m_ItkData->GetPointData(pointOp->GetIndex(), &pointData);
       pointData.selected = false;
       m_ItkData->SetPointData(pointOp->GetIndex(), pointData);
+      this->Modified();
 		}
 		break;
   case OpSETPOINTTYPE:
@@ -215,14 +220,17 @@ void mitk::PointSet::ExecuteOperation(Operation* operation)
       m_ItkData->GetPointData(pointOp->GetIndex(), &pointData);
       pointData.pointSpec = pointOp->GetPointType();
       m_ItkData->SetPointData(pointOp->GetIndex(), pointData);
+      this->Modified();
     }
     break;
 	default:
     itkWarningMacro("mitkPointSet could not understrand the operation. Please check!");
 		break;
 	}
-	//to tell the mappers, that the data is modifierd and has to be updated
-	this->Modified();
+  
+  //to tell the mappers, that the data is modifierd and has to be updated	
+  //only call modified if anything is done, so call in cases
+	//this->Modified();
 
   ((const itk::Object*)this)->InvokeEvent(itk::EndEvent());
 

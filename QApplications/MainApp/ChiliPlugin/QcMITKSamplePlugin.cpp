@@ -17,8 +17,6 @@
 
 #include "ipFunc.h"
 
-#include <crtdbg.h>
-
 
 QcPlugin* QcMITKSamplePlugin::s_PluginInstance = NULL;
 

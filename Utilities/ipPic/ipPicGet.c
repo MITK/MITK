@@ -52,6 +52,9 @@
  *   reads a PicFile from disk
  *
  * $Log$
+ * Revision 1.16  2004/01/16 22:11:59  andre
+ * big endian bug fix
+ *
  * Revision 1.15  2002/11/13 17:53:00  ivo
  * new ipPic added.
  *
@@ -237,7 +240,7 @@ _ipPicReadTags( _ipPicTagsElement_t *head, ipUInt4_t bytes_to_read, FILE *stream
 
       tsv = malloc( sizeof(ipPicTSV_t) );
 
-      ipPicFRead( &tag_name, sizeof(ipPicTag_t), 1, stream );
+      ipPicFRead( &tag_name, 1, sizeof(ipPicTag_t), stream );
       strncpy( tsv->tag, tag_name, _ipPicTAGLEN );
       tsv->tag[_ipPicTAGLEN] = '\0';
 

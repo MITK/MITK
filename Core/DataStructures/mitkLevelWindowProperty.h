@@ -57,6 +57,8 @@ public:
 
     //##ModelId=3ED953090135
     void SetLevelWindow(const mitk::LevelWindow &levWin);
+
+    virtual std::string GetValueAsString() const;
 };
 
 } // namespace mitk

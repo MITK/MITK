@@ -61,3 +61,10 @@ void mitk::LevelWindowProperty::SetLevelWindow(const mitk::LevelWindow &levWin)
         Modified();
     }
 }
+
+std::string mitk::LevelWindowProperty::GetValueAsString() const
+{
+  std::stringstream myStr;
+  myStr << "L:" << m_LevWin.GetLevel() << " W:" << m_LevWin.GetWindow();
+  return myStr.str(); 
+}

@@ -9,6 +9,10 @@
 #include "mitkInteractionConst.h"
 #include "mitkAction.h"
 #include <itkCommand.h>
+#include <mitkGlobalInteraction.h>
+#include <mitkEventMapper.h>
+#include <mitkFocusManager.h>
+#include <mitkOpenGLRenderer.h>
 
 //##ModelId=3E189B1D008D
 mitk::SliceNavigationController::SliceNavigationController(const char * type) 
@@ -280,31 +284,36 @@ bool mitk::SliceNavigationController::ExecuteAction( Action* action, mitk::State
        //   //execute the Operation
 	  		  //m_Destination->ExecuteOperation(doOp);
 
-
-          mitk::Point3D point, projected_point; 
-          point = posEvent->GetWorldPosition();
-          
-          //@todo add time to PositionEvent and use here!!
-          SlicedGeometry3D* slicedWorldGeometry=dynamic_cast<SlicedGeometry3D*>(m_CreatedWorldGeometry->GetGeometry3D(0));
-          if(slicedWorldGeometry!=NULL)
-          {
-            int best_slice = -1;
-            double best_distance = itk::NumericTraits<double>::max();
-
-            int s, slices;
-            slices = slicedWorldGeometry->GetSlices();
-            for(s=0; s < slices; ++s)
+          //checkif this event comes from a 2D -Widget. only then a change of slices is wanted
+          mitk::BaseRenderer* baseRenderer = posEvent->GetSender();
+          if (baseRenderer!=NULL)
+           if (baseRenderer->GetMapperID() == 1)
+           {
+            mitk::Point3D point, projected_point; 
+            point = posEvent->GetWorldPosition();
+            
+            //@todo add time to PositionEvent and use here!!
+            SlicedGeometry3D* slicedWorldGeometry=dynamic_cast<SlicedGeometry3D*>(m_CreatedWorldGeometry->GetGeometry3D(0));
+            if(slicedWorldGeometry!=NULL)
             {
-              slicedWorldGeometry->GetGeometry2D(s)->Project(point, projected_point);
-              Vector3D dist = projected_point-point;
-              if(dist.lengthSquared() < best_distance)
+              int best_slice = -1;
+              double best_distance = itk::NumericTraits<double>::max();
+
+              int s, slices;
+              slices = slicedWorldGeometry->GetSlices();
+              for(s=0; s < slices; ++s)
               {
-                best_distance = dist.lengthSquared();
-                best_slice    = s;
+                slicedWorldGeometry->GetGeometry2D(s)->Project(point, projected_point);
+                Vector3D dist = projected_point-point;
+                if(dist.lengthSquared() < best_distance)
+                {
+                  best_distance = dist.lengthSquared();
+                  best_slice    = s;
+                }
               }
+              if(best_slice >= 0)
+                GetSlice()->SetPos(best_slice);
             }
-            if(best_slice >= 0)
-              GetSlice()->SetPos(best_slice);
           }
           ok = true;
           break;

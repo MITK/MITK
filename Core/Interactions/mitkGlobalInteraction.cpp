@@ -199,12 +199,14 @@ mitk::FocusManager* mitk::GlobalInteraction::GetFocusManager()
 bool mitk::GlobalInteraction::GetWorldCoordinate(const mitk::DisplayPositionEvent *displayPositionEvent, mitk::PositionEvent* positionEvent)
 {
   /* pick a Prop3D and assume its position as event 3D coordinates */
+  //also possible to take the Sender of the event!
   const mitk::Point2D displayPoint = displayPositionEvent->GetDisplayPosition();
   const FocusManager::FocusElement* fe = this->GetFocus();
   FocusManager::FocusElement* fe2 =  const_cast <FocusManager::FocusElement*>(fe);
   mitk::OpenGLRenderer* glRenderer = dynamic_cast<mitk::OpenGLRenderer*>(fe2);
   if (glRenderer == NULL)
     return false;
+
   vtkWorldPointPicker *worldPicker = vtkWorldPointPicker::New();
   //picker->SetTolerance (0.0001);
   worldPicker->Pick(displayPoint.x, displayPoint.y, 0, glRenderer->GetVtkRenderer());

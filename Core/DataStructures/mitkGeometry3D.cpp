@@ -102,7 +102,6 @@ void mitk::Geometry3D::Initialize()
 // Standard Constructor for the new makro. sets the geometry to 3 dimensions
 mitk::Geometry3D::Geometry3D() : m_BoundingBox(NULL)
 {
-
   m_TimeBoundsInMS[0]=-ScalarTypeNumericTraits::max(); m_TimeBoundsInMS[1]=ScalarTypeNumericTraits::max();
 
   m_TransformMMToUnits.setIdentity();

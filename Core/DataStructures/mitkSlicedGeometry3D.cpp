@@ -174,17 +174,15 @@ bool mitk::SlicedGeometry3D::IsValidSlice(int s) const
 }
 
 //##ModelId=3E3BE8CF010E
-/**
- * @warning the values of passe the spacing parameter are not checked for correctness! 
- *  When passing wrong values application can hang and/or crash --> 
- * @todo Implement tests!
- */
 void mitk::SlicedGeometry3D::SetSpacing(mitk::Vector3D aSpacing)
 {
   bool hasEvenlySpacedPlaneGeometry=false;
   mitk::Point3D origin, rightDV, bottomDV;
   unsigned int width, height;
   mitk::ScalarType thickness;
+
+  assert(aSpacing.x>0 && aSpacing.y>0 && aSpacing.z>0);
+
   //in case of evenly-spaced data: re-initialize instances of Geometry2D, since the spacing influences them
   if((m_EvenlySpaced) && (m_Geometry2Ds.size()>0))
   {

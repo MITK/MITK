@@ -1,4 +1,4 @@
-<!DOCTYPE UI><UI version="3.2" stdsetdef="1">
+<!DOCTYPE UI><UI version="3.3" stdsetdef="1">
 <class>QmitkDataManagerControls</class>
 <widget class="QWidget">
     <property name="name">
@@ -8,7 +8,7 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>553</width>
+            <width>366</width>
             <height>823</height>
         </rect>
     </property>
@@ -57,31 +57,68 @@
                 <property name="name">
                     <cstring>unnamed</cstring>
                 </property>
-                <property name="spacing">
-                    <number>10</number>
-                </property>
                 <widget class="QPushButton">
                     <property name="name">
                         <cstring>m_SaveButton</cstring>
                     </property>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>1</hsizetype>
+                            <vsizetype>0</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
                     <property name="text">
-                        <string>Save Selected</string>
+                        <string>Save</string>
                     </property>
                 </widget>
                 <widget class="QPushButton">
                     <property name="name">
                         <cstring>m_SaveToLightBox</cstring>
                     </property>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>1</hsizetype>
+                            <vsizetype>0</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
                     <property name="text">
-                        <string>Save Selected to LightBox</string>
+                        <string>Save to LightBox</string>
                     </property>
                 </widget>
                 <widget class="QPushButton">
                     <property name="name">
                         <cstring>m_RemoveButton</cstring>
                     </property>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>1</hsizetype>
+                            <vsizetype>0</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
                     <property name="text">
                         <string>Remove</string>
+                    </property>
+                </widget>
+                <widget class="QPushButton">
+                    <property name="name">
+                        <cstring>m_ReInitButton</cstring>
+                    </property>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>1</hsizetype>
+                            <vsizetype>0</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
+                    <property name="text">
+                        <string>Reinit</string>
                     </property>
                 </widget>
             </hbox>
@@ -217,7 +254,7 @@
 </customwidgets>
 <images>
     <image name="image0">
-        <data format="XPM.GZ" length="2910">789cb595db522a571086ef7d0acabeb352bd9903c34ca57201088a0a02a21b4de5624e829c541814d895774f4fafeea91da452c9455ceaf055ffddfdf75a6bf4db5969d4eb94cebe9dacb3307b894bf1245c95ce92cd62b1fbfd8fdf7e9c9cda7689be2dcb29d9a7bf9c9cf6b3525ceabe2ed31c70450065fe626e17ec33a7c2aec4ad82390e46ef17bc15f625ff5638b6381fa29cad72be9877c29a3f5696f8bdb06ffa032a4bfc463896fc576589bf31fbaac781b0c6df0ddbeae75a58fb6f72b6cbca7825acf55ce6c0d67a7dc38eec270c0b36fb71a92cfaa46013ef09bbc25ccfb11c5ff8ddb0abf538df091cdf09b8de5a3816fd43ceaee52a3799c34a20f977ca260eecaf62173c104e647f5f94a55ec7b06749fc4e59f6c72fd8c417cab6993f14ae487e53d9c431660e2b4925e4f8b3614ffcc35459fa750b36fecacad26f2facf32c95e53cf87c3dbbaafe6d65f1b313ae48fdbdb2c4af85a51ff27df7a8be67fcd70c17fa0be144fcf1fb5275fc8acde7895b61f59f156ce2bc7fd5a81a54238e7f1a563d7ecfd98f02a98f2dc3a1ceb729d8cc93294bbf7365c7e2f8a7b0ce5f5516fd4a59f49073e00656e0727c6638d4f9de94cdfdc50fe150fcd50a36e7152b4bbf4ec1e6fef78453f1d7301cd9c24fcad29fe70be2223e5296fa50b0d1af955d335f45d813bff5824d3d4f58e7792cd8c46f94a5df47c1661ebe1fa11b79727ef7c29a3f54967850b0c94f8553f1cfef6f1847a9c7ff0ca06b389679d111f624bf2eacfe26c2a9e8f9fd8b5cad8733c3b12d3c51ae3acc63659fef2bbe0a7be6fdc6b9b2e42f8543f1db309cc8fec25c59fcf0df872889d290ef1b2e0c17f92dc389f8ef67ff7efdac47c010a3232bc604d3433d3ee31827f882539ce19cd68256fe5ce22bbee13bae7ed653ed31ae31c30d7ee0276e71877bfa5dc33a36689d63f3401f52ed0c5ba4b8c04b6ce38a561baff01a6f28a78e9d037d444e727597546dbcc51ef671c09fef7088f747f4537272c1951ff03b8ef0119fb08c16b18dce11fd8c7cbbac1e61053daca28f0169db8000107ed1cf69be3644549bd4104342bd1e20e51a5b783ea2dfe18a54a35c9dcf0c63d24de085f45d987ed12f68075734e523665c7b850398c11c16f4a90ccb23fadccf2b3e91827cc11b757b8715ace9991dd1cfb1061baa5b860ff2fd49b5e94c296f0b3b1cc2fe88be0e35d25bb88714ead0807340f29242135a47f50db8804b3ed74b7afab08636a6a4dfd07e5e1de863ba550d3af721edf8806f032dd851ed6bb881ce97f34ae80ee6fa47e802d0e4659ae3967cb768fe0ef4a07fa04fe9c636b10303fa09e119a6b0e4b5872bb88321dcff5d4f19ab7f5e5fdfaffffa3efe2ffa3f7f3df90bdf8dabe4</data>
+        <data format="PNG" length="806">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b000002ed49444154789ccd953168dc5618c77f2e1a3e81034f70851378d0818778bc42174186f37834c3153a249dd24097d2251d3315d274c81c3a183cda43211902ce60c8950eba21e16c48890a2ed50d0712d8a03704f44104d7e1c967df9d0d2db4d0b7083d7deff7fdf57f7f3dad2549c27f31bce589f1ebf12c2f72caf7e5df02586bc94e32466f4624bf266b57822bfd7316752b2214ad1539af68aafce65ad59756d730c9407784388e6749e2e073f0f8f57816752b0a7b40596680e2fb4af54128a64279a68010b4a0d351641db4692037200ce1e82a2bf22227421ba8c5f785776f0dc31796f4d802da540ad14d617b60887b40ede645162d9a83cbf7255aeb1c9a0c61efa7c22d5a173a370de2413e5526bf2bbb3f161413c3dd7b72a9e91560a7057c1fdebd9506aaf43e6bd31f08c1c78028aa21c9cb8abd9d8283fd82763ba2ff4500d805f047cb6daa0fc2f0b99d43bffc5a08420b62294f8557cf4bfa039fafbe6d03c2b37d8b3d5b96b87ceb413115d2df2cc618fa0301cf82076a0dbb4f94f4d8529ec2fd0701a343579ba6cea6eb1543b3fb4a1835afdf409f3e769b685ac227b70431155b5db763f9441b23af01bb9cba0211e769991b9e3e56d263d750043a1bbe7bee9dc364c58a15c541cb156653453560f40b4ea911da6d4331b53c7a98931e05e4272e0d61e42f6396bebcda853fda14267f28c9cb8afe1d9ff2d410df12c20d9f470fa198587ef8264355312da1dbadc8a78b915b512cebd01f1800f6760a92c38afb0f02ba3d88ba25df7ddfc1b40dd65ab456b6076dc2cd15c1ab8790d610f7a0981a9eed17ec3e29181d0a5b5b0202f9498e9ee97ce57868c96e8788b7f8a1ccc1d65e045c513ebf279876c4c1cf2e0de9f14573d312fa83886468b1aaa882b58b56ccc1d949c624036e5cc0fb0321ee85a4a9219fb8f970c3a7fb6945b809dbb74327d22b498fae018fde8cd01d210c9ba8d5cc8f4c398fa1077961c95fb8d6e209d6427aa4e4c5a2a56b97ff20711ccf963dff27e3fc2c5e01ff9b63256eff7bf05f44dc4fc7dd2e8f010000000049454e44ae426082</data>
     </image>
 </images>
 <connections>
@@ -257,18 +294,25 @@
         <receiver>QmitkDataManagerControls</receiver>
         <slot>SaveLightBox_clicked()</slot>
     </connection>
+    <connection>
+        <sender>m_ReInitButton</sender>
+        <signal>clicked()</signal>
+        <receiver>QmitkDataManagerControls</receiver>
+        <slot>m_ReInitButton_clicked()</slot>
+    </connection>
 </connections>
 <includes>
-    <include location="global" impldecl="in declaration">mitkDataTree.h</include>
-    <include location="local" impldecl="in declaration">QmitkDataTreeViewItem.h</include>
-    <include location="global" impldecl="in declaration">map</include>
-    <include location="local" impldecl="in declaration">mitkBaseProperty.h</include>
-    <include location="global" impldecl="in declaration">string</include>
     <include location="global" impldecl="in implementation">mitkStringProperty.h</include>
     <include location="global" impldecl="in implementation">qlistview.h</include>
     <include location="global" impldecl="in implementation">qdropsite.h</include>
     <include location="local" impldecl="in implementation">mitkGlobalInteraction.h</include>
     <include location="local" impldecl="in implementation">QmitkCommonFunctionality.h</include>
+    <include location="global" impldecl="in declaration">mitkDataTree.h</include>
+    <include location="local" impldecl="in declaration">QmitkDataTreeViewItem.h</include>
+    <include location="global" impldecl="in declaration">map</include>
+    <include location="local" impldecl="in declaration">mitkBaseProperty.h</include>
+    <include location="global" impldecl="in declaration">string</include>
+    <include location="local" impldecl="in declaration">mitkBaseData.h</include>
     <include location="local" impldecl="in implementation">QmitkDataManagerControls.ui.h</include>
 </includes>
 <variables>
@@ -276,11 +320,15 @@
     <variable>QHBoxLayout * treeLayout;</variable>
     <variable>mitk::DataTreeIteratorClone m_DataTreeIterator;</variable>
 </variables>
+<signals>
+    <signal>InitializeStandardViews(mitk::BaseData::Pointer)</signal>
+</signals>
 <slots>
     <slot>SetDataTreeIterator( mitk::DataTreeIteratorBase * it )</slot>
     <slot>RemoveButtonClicked()</slot>
     <slot>SaveButton_clicked()</slot>
     <slot>SaveLightBox_clicked()</slot>
+    <slot>m_ReInitButton_clicked()</slot>
 </slots>
 <functions>
     <function access="private" specifier="non virtual">init()</function>

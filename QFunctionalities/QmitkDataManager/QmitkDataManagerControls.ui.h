@@ -51,7 +51,7 @@ PURPOSE.  See the above copyright notices for more information.
 void QmitkDataManagerControls::init() { 
   m_DataTreeIterator = NULL;
   while (m_DataTreeView->columns() > 0 ) {
-	m_DataTreeView->removeColumn(0);
+ m_DataTreeView->removeColumn(0);
   }
   m_DataTreeView->addColumn( "Name" );
   m_DataTreeView->addColumn( "NodeType" );
@@ -116,7 +116,7 @@ void QmitkDataManagerControls::SetDataTreeIterator(mitk::DataTreeIteratorBase* i
   m_RendererPropertiesView->SetDataTreeNode(NULL);
 
     while (m_DataTreeView->firstChild()) {
-	    delete m_DataTreeView->firstChild();
+     delete m_DataTreeView->firstChild();
      }
     m_DataTreeIterator = it;
     mitk::DataTreeIteratorClone tempIt = m_DataTreeIterator;
@@ -237,4 +237,23 @@ void QmitkDataManagerControls::SaveLightBox_clicked()
     }
   }
 #endif
+}
+
+
+void QmitkDataManagerControls::m_ReInitButton_clicked()
+{
+  QmitkDataTreeViewItem *selected = dynamic_cast<QmitkDataTreeViewItem*>(m_DataTreeView->selectedItem());
+  if (selected != NULL) 
+  {
+    mitk::DataTreeIteratorClone selectedIterator = selected->GetDataTreeIterator();
+    assert(selectedIterator != NULL);
+    mitk::DataTreeNode* node = selectedIterator->Get();
+    if (node != NULL )
+    {
+      mitk::BaseData::Pointer basedata = node->GetData();
+      emit InitializeStandardViews( basedata );
+      mitk::RenderWindow::UpdateAllInstances();
+    }
+
+  } 
 }

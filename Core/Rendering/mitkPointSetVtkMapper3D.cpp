@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkPointSetVtkMapper3D.h"
 #include "mitkDataTreeNode.h"
 #include "mitkProperties.h"
-#include "mitkColorProperty.h"
+//#include "mitkColorProperty.h"
 #include "mitkOpenGLRenderer.h"
 
 
@@ -34,7 +34,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkProperty.h>
 #include <vtkPolyDataMapper.h>
 #include <stdlib.h>
-#include "mitkStringProperty.h"
+#include <mitkStringProperty.h>
 
 //##ModelId=3E70F60301D5
 const mitk::PointSet* mitk::PointSetVtkMapper3D::GetInput()
@@ -196,83 +196,87 @@ void mitk::PointSetVtkMapper3D::Update(mitk::BaseRenderer* renderer)
   // check for color prop and use it for rendering if it exists
   GetColor(rgba, renderer);
 
+  int pointSize = 2;
+  mitk::IntProperty::Pointer pointSizeProp = dynamic_cast<mitk::IntProperty *>(this->GetDataTreeNode()->GetProperty("pointsize").GetPointer());
+  if (pointSizeProp != NULL)
+    pointSize = pointSizeProp->GetValue();
+            
+  for (j=0, i=pointList->GetPoints()->Begin(); i!=pointList->GetPoints()->End() ; i++,j++)
+  {
+    vtkSphereSource *sphere = vtkSphereSource::New();
 
-for (j=0, i=pointList->GetPoints()->Begin(); i!=pointList->GetPoints()->End() ; i++,j++)
-	{
-	    vtkSphereSource *sphere = vtkSphereSource::New();
+    sphere->SetRadius(pointSize);
+    sphere->SetCenter(i.Value()[0],i.Value()[1],i.Value()[2]);
 
-			sphere->SetRadius(2);
-      sphere->SetCenter(i.Value()[0],i.Value()[1],i.Value()[2]);
+    m_vtkPointList->AddInput(sphere->GetOutput());
 
-			m_vtkPointList->AddInput(sphere->GetOutput());
+    if (dynamic_cast<mitk::StringProperty *>(this->GetDataTreeNode()->GetProperty("label").GetPointer()) == NULL)
+    {}
+    else {
 
-			if (dynamic_cast<mitk::StringProperty *>(this->GetDataTreeNode()->GetProperty("label").GetPointer()) == NULL)
-			{}
-			else {
+      const char * pointLabel =dynamic_cast<mitk::StringProperty *>(this->GetDataTreeNode()->GetProperty("label").GetPointer())->GetValue();
+      char buffer[20];
+      std::string l = pointLabel;
+      if (input->GetSize()>1)
+      {
+        sprintf(buffer,"%d",j+1);
+        l.append(buffer);
+      }
 
-				const char * pointLabel =dynamic_cast<mitk::StringProperty *>(this->GetDataTreeNode()->GetProperty("label").GetPointer())->GetValue();
-				char buffer[20];
- 	      std::string l = pointLabel;
-				if (input->GetSize()>1)
-				{
-					sprintf(buffer,"%d",j+1);
-					l.append(buffer);
-				}
+      ////// Define the text for the label
+      vtkVectorText *label = vtkVectorText::New();
+      label->SetText(l.c_str());
 
-				////// Define the text for the label
-					vtkVectorText *label = vtkVectorText::New();
-				  label->SetText(l.c_str());
+      //				// Define the text for the label
+      //				vtkTextSource *label = vtkTextSource::New();
+      //			  label->SetText(l.c_str());
+      //				label->BackingOff();
+      //				label->SetForegroundColor(rgba[0],rgba[1],rgba[2]);
 
-//				// Define the text for the label
-//				vtkTextSource *label = vtkTextSource::New();
-//			  label->SetText(l.c_str());
-//				label->BackingOff();
-//				label->SetForegroundColor(rgba[0],rgba[1],rgba[2]);
+      //# Set up a transform to move the label to a new position.
+      vtkTransform *aLabelTransform =vtkTransform::New();
+      aLabelTransform->Identity();
+      aLabelTransform->Translate(i.Value()[0]+2,i.Value()[1]+2,i.Value()[2]);
+      aLabelTransform->Scale(5.7,5.7,5.7);
 
-				//# Set up a transform to move the label to a new position.
-				vtkTransform *aLabelTransform =vtkTransform::New();
-				aLabelTransform->Identity();
-			  aLabelTransform->Translate(i.Value()[0]+2,i.Value()[1]+2,i.Value()[2]);
-			  aLabelTransform->Scale(5.7,5.7,5.7);
+      //# Move the label to a new position.
+      vtkTransformPolyDataFilter *labelTransform = vtkTransformPolyDataFilter::New();
+      labelTransform->SetTransform(aLabelTransform);
+      labelTransform->SetInput(label->GetOutput());
 
-				//# Move the label to a new position.
-				vtkTransformPolyDataFilter *labelTransform = vtkTransformPolyDataFilter::New();
-			  labelTransform->SetTransform(aLabelTransform);
-			  labelTransform->SetInput(label->GetOutput());
+      //	      m_TextActor = vtkFollower::New();
+      //		    m_TextVtkPolyDataMapper = vtkPolyDataMapper::New();
+      //
+      ////	    	m_TextVtkPolyDataMapper->SetInput(labelTransform->GetOutput());
+      //	    	m_TextVtkPolyDataMapper->SetInput(label->GetOutput());
+      //		    m_TextActor->SetMapper(m_TextVtkPolyDataMapper);
+      //				m_TextActor->SetPosition((*i)[0]+2,(*i)[1]+2,(*i)[2]);
+      //				m_TextActor->SetScale(10,10,10);
+      //
+      ////				m_vtkTextList->AddInput(labelTransform->GetOutput());
+      //		    m_TextActor->GetProperty()->SetColor(rgba);
+      //				m_TextActor->SetCamera(  dynamic_cast<mitk::OpenGLRenderer *>(renderer)->GetVtkRenderer()->GetActiveCamera());
+      //		    m_Actor->AddPart(m_TextActor);
 
-//	      m_TextActor = vtkFollower::New();
-//		    m_TextVtkPolyDataMapper = vtkPolyDataMapper::New();
-//
-////	    	m_TextVtkPolyDataMapper->SetInput(labelTransform->GetOutput());
-//	    	m_TextVtkPolyDataMapper->SetInput(label->GetOutput());
-//		    m_TextActor->SetMapper(m_TextVtkPolyDataMapper);
-//				m_TextActor->SetPosition((*i)[0]+2,(*i)[1]+2,(*i)[2]);
-//				m_TextActor->SetScale(10,10,10);
-//
-////				m_vtkTextList->AddInput(labelTransform->GetOutput());
-//		    m_TextActor->GetProperty()->SetColor(rgba);
-//				m_TextActor->SetCamera(  dynamic_cast<mitk::OpenGLRenderer *>(renderer)->GetVtkRenderer()->GetActiveCamera());
-//		    m_Actor->AddPart(m_TextActor);
-
-					m_vtkPointList->AddInput(labelTransform->GetOutput());
-			}
+      m_vtkPointList->AddInput(labelTransform->GetOutput());
+    }
 
 
-		}
+  }
 
-//		m_TextActor->SetCamera(  dynamic_cast<mitk::OpenGLRenderer *>(renderer)->GetVtkRenderer()->GetActiveCamera());
+  //		m_TextActor->SetCamera(  dynamic_cast<mitk::OpenGLRenderer *>(renderer)->GetVtkRenderer()->GetActiveCamera());
 
-//    m_PointVtkPolyDataMapper->SetInput(m_vtkPointList->GetOutput());
+  //    m_PointVtkPolyDataMapper->SetInput(m_vtkPointList->GetOutput());
 
-    m_VtkPolyDataMapper->SetInput(m_vtkPointList->GetOutput());
-    m_Actor->GetProperty()->SetColor(rgba);
-//    m_PointActor->GetProperty()->SetColor(rgba);
-//    m_TextActor->GetProperty()->SetColor(rgba);
+  m_VtkPolyDataMapper->SetInput(m_vtkPointList->GetOutput());
+  m_Actor->GetProperty()->SetColor(rgba);
+  //    m_PointActor->GetProperty()->SetColor(rgba);
+  //    m_TextActor->GetProperty()->SetColor(rgba);
 
-//    m_Actor->AddPart(m_PointActor);
-//    m_Actor->AddPart(m_TextActor);			
+  //    m_Actor->AddPart(m_PointActor);
+  //    m_Actor->AddPart(m_TextActor);			
 
-    StandardUpdate();
+  StandardUpdate();
 }
 
 

@@ -19,8 +19,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkMeshVtkMapper3D.h"
 #include "mitkDataTreeNode.h"
-#include "mitkStringProperty.h"
-#include "mitkColorProperty.h"
+#include "mitkProperties.h"
+//#include "mitkStringProperty.h"
+//#include "mitkColorProperty.h"
 #include "mitkOpenGLRenderer.h"
 #include "mitkMeshUtil.h"
 
@@ -124,11 +125,16 @@ void mitk::MeshVtkMapper3D::Update(mitk::BaseRenderer* renderer)
   // check for color prop and use it for rendering if it exists
   GetColor(rgba, renderer);
 
+  int pointSize = 2;
+  mitk::IntProperty::Pointer pointSizeProp = dynamic_cast<mitk::IntProperty *>(this->GetDataTreeNode()->GetProperty("pointsize").GetPointer());
+  if (pointSizeProp != NULL)
+    pointSize = pointSizeProp->GetValue();
+
   for (j=0, i=mesh->GetPoints()->Begin(); i!=mesh->GetPoints()->End() ; i++,j++)
 	{
 	  vtkSphereSource *sphere = vtkSphereSource::New();
 
-		sphere->SetRadius(2);
+		sphere->SetRadius(pointSize);
     sphere->SetCenter(i.Value()[0],i.Value()[1],i.Value()[2]);
 
 		m_Spheres->AddInput(sphere->GetOutput());

@@ -524,3 +524,9 @@ bool QmitkStdMultiWidget::InitializeStandardViews(mitk::DataTreeIteratorBase * i
   }
   return boundingBoxInitialized;
 }
+
+void QmitkStdMultiWidget::wheelEvent( QWheelEvent * e )
+{
+    std::cout << "QmitkMultiWidget: grabbed mouse wheel event" << std::endl;
+    emit WheelMoved( e );
+}

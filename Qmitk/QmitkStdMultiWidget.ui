@@ -8,8 +8,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>720</width>
-            <height>921</height>
+            <width>536</width>
+            <height>720</height>
         </rect>
     </property>
     <property name="caption">
@@ -153,6 +153,9 @@
     <variable>mitk::MultiplexUpdateController::Pointer multiplexUpdateController;</variable>
     <variable>mitk::SliceNavigationController::Pointer timeNavigationController;</variable>
 </variables>
+<signals>
+    <signal>WheelMoved( QWheelEvent* )</signal>
+</signals>
 <slots>
     <slot>updateMitkWidgets()</slot>
     <slot>changeLayoutTo2DImagesUp()</slot>
@@ -168,6 +171,7 @@
     <slot>initWidgets( mitk::DataTreeIteratorBase * it )</slot>
     <slot>addPlaneSubTree( mitk::DataTreeIteratorBase * it )</slot>
     <slot>texturizePlaneSubTree( mitk::DataTreeIteratorBase * it )</slot>
+    <slot>wheelEvent( QWheelEvent * e )</slot>
     <slot returnType="bool">InitializeStandardViews( mitk::DataTreeIteratorBase * it )</slot>
 </slots>
 <functions>

@@ -22,7 +22,7 @@ const std::string mitk::EventMapper::KEY = "KEY";
 
 
 //##ModelId=3E5B349600CB
-mitk::EventMapper::SetStateMachine(StateMachine* stateMachine)
+void mitk::EventMapper::SetStateMachine(StateMachine* stateMachine)
 {
 	m_StateMachine = stateMachine;
 }

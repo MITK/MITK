@@ -23,7 +23,7 @@ class EventMapper : public QXmlDefaultHandler
 {
   public:
     //##ModelId=3E5B349600CB
-    static SetStateMachine(StateMachine* stateMachine);
+    static void SetStateMachine(StateMachine* stateMachine);
 
     //##ModelId=3E5B34CF0041
     static bool MapEvent(Event* event);

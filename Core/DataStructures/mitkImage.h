@@ -26,6 +26,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkPixelType.h"
 #include "mitkBaseData.h"
 #include "mitkLevelWindow.h"
+#include "mitkPlaneGeometry.h"
 
 namespace mitk {
 
@@ -231,18 +232,29 @@ namespace mitk {
         tmpDimensions,
         channels);
 #if ITK_VERSION_MINOR > 5
-      typename itkImageType::SpacingType spacinglist = itkimage->GetSpacing();  
+      typename const itkImageType::SpacingType& itkspacing = itkimage->GetSpacing();  
 #else
-      const double *spacinglist = itkimage->GetSpacing();  
+      const double *itkspacing = itkimage->GetSpacing();  
 #endif 
       Vector3D spacing;
-      FillVector3D(spacing, spacinglist[0], 1.0, 1.0);
+      FillVector3D(spacing, itkspacing[0], 1.0, 1.0);
       if(m_Dimension>=2)
-        spacing[1]=spacinglist[1];
+        spacing[1]=itkspacing[1];
       if(m_Dimension>=3)
-        spacing[2]=spacinglist[2];
+        spacing[2]=itkspacing[2];
 
+      Point3D origin;
+      typename const itkImageType::PointType& itkorigin = itkimage->GetOrigin();  
+      FillVector3D(origin, itkorigin[0], 0.0, 0.0);
+      if(m_Dimension>=2)
+        origin[1]=itkorigin[1];
+      if(m_Dimension>=3)
+        origin[2]=itkorigin[2];
+
+      PlaneGeometry* planeGeometry = static_cast<PlaneGeometry*>(GetSlicedGeometry(0)->GetGeometry2D(0));
+      planeGeometry->SetOrigin(origin);
       SlicedGeometry3D* slicedGeometry = GetSlicedGeometry(0);
+      slicedGeometry->InitializeEvenlySpaced(planeGeometry, m_Dimensions[2]);
       slicedGeometry->SetSpacing(spacing);
       m_TimeSlicedGeometry->InitializeEvenlyTimed(slicedGeometry, m_Dimensions[3]);
       delete [] tmpDimensions;

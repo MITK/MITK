@@ -180,3 +180,8 @@ mitk::AffineGeometryFrame3D::Pointer mitk::Geometry2D::Clone() const
   return newGeometry.GetPointer();
 }
 
+void mitk::Geometry2D::InitializeGeometry(Self * newGeometry) const
+{
+  Superclass::InitializeGeometry(newGeometry);
+}
+

@@ -183,6 +183,9 @@ protected:
   Geometry2D();
   //##ModelId=3E395E080318
   virtual ~Geometry2D();
+
+	virtual void InitializeGeometry(Self * newGeometry) const;
+	
 };
 
 } // namespace mitk

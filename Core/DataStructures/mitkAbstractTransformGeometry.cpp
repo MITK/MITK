@@ -59,7 +59,15 @@ void mitk::AbstractTransformGeometry::SetPlane(const mitk::PlaneGeometry* aPlane
   {
     m_Plane = dynamic_cast<mitk::PlaneGeometry*>(aPlane->Clone().GetPointer());
 
-    SetParametricBounds(m_Plane->GetBoundingBox()->GetBounds());
+		BoundingBox::BoundsArrayType b =m_Plane->GetBoundingBox()->GetBounds();
+
+		//std::cout << " BOUNDS: " << b << std::endl;
+		//std::cout << " EXTEND: " <<m_Plane->GetExtent(0) << std::endl;
+		//std::cout << " EXTEND: " <<m_Plane->GetExtent(1) << std::endl;
+
+    //SetParametricBounds(m_Plane->GetBoundingBox()->GetBounds());
+		SetParametricBounds(b);
+
 
     //@warning affine-transforms and bounding-box should be set by specific sub-classes!
     SetBounds(m_Plane->GetBoundingBox()->GetBounds());
@@ -75,6 +83,7 @@ void mitk::AbstractTransformGeometry::SetPlane(const mitk::PlaneGeometry* aPlane
 
 void mitk::AbstractTransformGeometry::SetParametricBounds(const BoundingBox::BoundsArrayType& bounds)
 {
+	//std::cout << " BOUNDS: " << bounds << std::endl;
   Superclass::SetParametricBounds(bounds);
 
   //@warning affine-transforms and bounding-box should be set by specific sub-classes!

@@ -736,80 +736,81 @@ void mitk::DataTreeNodeFactory::ReadFileSeriesTypePIC()
 
 void mitk::DataTreeNodeFactory::ReadFileSeriesTypeDCM()
 {
-    std::cout << "loading image series with prefix " << m_FilePrefix << " and pattern " << m_FilePattern << " as DICOM..." << std::endl;
+  std::cout << "loading image series with prefix " << m_FilePrefix << " and pattern " << m_FilePattern << " as DICOM..." << std::endl;
 
-    typedef itk::Image<int, 3> ImageType;
-    typedef itk::ImageSeriesReader< ImageType > ReaderType;
-    typedef std::vector<std::string> StringContainer;
-    typedef itk::DICOMImageIO2 IOType;
-    typedef itk::DICOMSeriesFileNames NameGeneratorType;
+  typedef itk::Image<int, 3> ImageType;
+  typedef itk::ImageSeriesReader< ImageType > ReaderType;
+  typedef std::vector<std::string> StringContainer;
+  typedef itk::DICOMImageIO2 IOType;
+  typedef itk::DICOMSeriesFileNames NameGeneratorType;
 
-    std::string dir = this->GetDirectory();
-    std::cout << "dir: " << dir << std::endl;
+  std::string dir = this->GetDirectory();
+  std::cout << "dir: " << dir << std::endl;
 
-    IOType::Pointer dicomIO = IOType::New();
+  IOType::Pointer dicomIO = IOType::New();
 
-    // Get the DICOM filenames from the directory
-    NameGeneratorType::Pointer nameGenerator = NameGeneratorType::New();
-    nameGenerator->SetDirectory( dir.c_str() );
+  // Get the DICOM filenames from the directory
+  NameGeneratorType::Pointer nameGenerator = NameGeneratorType::New();
+  nameGenerator->SetDirectory( m_FilePrefix.c_str() );
 
-    const StringContainer & seriesUID = nameGenerator->GetSeriesUIDs();
+  const StringContainer & seriesUID = nameGenerator->GetSeriesUIDs();
 
-    StringContainer::const_iterator seriesItr = seriesUID.begin();
-    StringContainer::const_iterator seriesEnd = seriesUID.end();
+  StringContainer::const_iterator seriesItr = seriesUID.begin();
+  StringContainer::const_iterator seriesEnd = seriesUID.end();
 
-    std::cout << "The directory " << dir << "contains the following DICOM Series: " << std::endl;
-    while ( seriesItr != seriesEnd )
+  std::cout << "The directory " << dir << "contains the following DICOM Series: " << std::endl;
+  while ( seriesItr != seriesEnd )
+  {
+    std::cout << *seriesItr << std::endl;
+    seriesItr++;
+  }
+
+  this->ResizeOutputs( seriesUID.size() );
+
+  for ( unsigned int i = 0 ; i < seriesUID.size() ; ++i )
+  {
+    std::cout << "Reading series " << seriesUID[ i ] << std::endl;
+    StringContainer fileNames = nameGenerator->GetFileNames( seriesUID[ i ] );
+    ReaderType::Pointer reader = ReaderType::New();
+    reader->SetFileNames( fileNames );
+    reader->SetImageIO( dicomIO );
+    try
     {
-        std::cout << *seriesItr << std::endl;
-        seriesItr++;
+      reader->Update();
+
+      //Initialize mitk image from itk
+      mitk::Image::Pointer image = mitk::Image::New();
+      image->InitializeByItk( reader->GetOutput() );
+      image->SetVolume( reader->GetOutput()->GetBufferPointer() );
+
+      //add the mitk image to the node
+      mitk::DataTreeNode::Pointer node = this->GetOutput( i );
+      node->SetData( image );
+
+
+      // disable volume rendering by default
+      node->SetProperty( "volumerendering", new mitk::BoolProperty( false ) );
+
+      // add level-window property
+      mitk::LevelWindowProperty::Pointer levWinProp = new mitk::LevelWindowProperty();
+      mitk::LevelWindow levelwindow;
+      levelwindow.SetAuto( image->GetPic() );
+      levWinProp->SetLevelWindow( levelwindow );
+      node->GetPropertyList()->SetProperty( "levelwindow", levWinProp );
+
+
+      // set filename without path as string property
+      std::string filename = std::string( this->GetBaseFilePrefix() );
+      mitk::StringProperty::Pointer nameProp = new mitk::StringProperty( seriesUID[ i ] );
+      node->SetProperty( "name", nameProp );
+
     }
-
-    this->ResizeOutputs( seriesUID.size() );
-
-    for ( unsigned int i = 0 ; i < seriesUID.size() ; ++i )
+    catch ( const std::exception & e )
     {
-        std::cout << "Reading series " << seriesUID[ i ] << std::endl;
-        StringContainer fileNames = nameGenerator->GetFileNames( seriesUID[ i ] );
-        ReaderType::Pointer reader = ReaderType::New();
-        reader->SetFileNames( fileNames );
-        reader->SetImageIO( dicomIO );
-        try
-        {
-            reader->Update();
-
-            //Initialize mitk image from itk
-            mitk::Image::Pointer image = mitk::Image::New();
-            image->InitializeByItk( reader->GetOutput() );
-            image->SetVolume( reader->GetOutput()->GetBufferPointer() );
-
-            //add the mitk image to the node
-            mitk::DataTreeNode::Pointer node = this->GetOutput( i );
-            node->SetData( image );
-
-            // disable volume rendering by default
-            node->SetProperty( "volumerendering", new mitk::BoolProperty( false ) );
-
-            // add level-window property
-            mitk::LevelWindowProperty::Pointer levWinProp = new mitk::LevelWindowProperty();
-            mitk::LevelWindow levelwindow;
-            levelwindow.SetAuto( image->GetPic() );
-            levWinProp->SetLevelWindow( levelwindow );
-            node->GetPropertyList()->SetProperty( "levelwindow", levWinProp );
-
-
-            // set filename without path as string property
-            std::string filename = this->GetBaseFilePrefix() + "dcm";
-            mitk::StringProperty::Pointer nameProp = new mitk::StringProperty( filename );
-            node->SetProperty( "name", nameProp );
-
-        }
-        catch ( const std::exception & e )
-        {
-            itkWarningMacro( << e.what() );
-            return ;
-        }
+      itkWarningMacro( << e.what() );
+      return ;
     }
+  }
 }
 
 
@@ -948,6 +949,9 @@ void mitk::DataTreeNodeFactory::ReadFileSeriesTypeITKImageSeriesReader()
             //add the mitk image to the node
             mitk::DataTreeNode::Pointer node = this->GetOutput( i );
             node->SetData( image );
+
+            mitk::StringProperty::Pointer nameProp = new mitk::StringProperty( prefix );
+            node->SetProperty( "name", nameProp );
 
             // disable volume rendering by default
             node->SetProperty( "volumerendering", new mitk::BoolProperty( false ) );

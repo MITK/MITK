@@ -24,13 +24,14 @@ See MITKCopyright.txt or http://www.mitk.org/ for details.
 #include <vtkImageStencil.h>
 #include <vtkImageData.h>
 #include <vtkPolyData.h>
-#include <vtkTransformPolyDataFilter.h>
 #include <vtkTriangleFilter.h>
 #include <vtkDataSetTriangleFilter.h>
 #include <vtkImageThreshold.h>
 #include <vtkImageMathematics.h>
 #include <vtkPolyDataNormals.h>
 
+#include <vtkTransformPolyDataFilter.h>
+#include <vtkTransform.h>
 
 mitk::SurfaceToImageFilter::SurfaceToImageFilter()
 {
@@ -55,9 +56,20 @@ void mitk::SurfaceToImageFilter::GenerateOutputInformation()
 
 void mitk::SurfaceToImageFilter::GenerateData()
 {
+  vtkPolyData * polydata = ( (mitk::Surface*)GetInput() )->GetVtkPolyData();
+
+  vtkTransformPolyDataFilter * move=vtkTransformPolyDataFilter::New();
+  move->SetInput(polydata);
+  vtkTransform *transform=vtkTransform::New();
+  mitk::Vector3D spacing=GetImage()->GetSlicedGeometry()->GetSpacing();
+  spacing*=0.5;
+  transform->Translate(spacing[0],spacing[1],spacing[2]);
+  move->SetTransform(transform);
+
+  polydata=move->GetOutput();
  
   vtkPolyDataNormals * normalsFilter = vtkPolyDataNormals::New();
-  normalsFilter->SetInput( ( (mitk::Surface*)GetInput() )->GetVtkPolyData() );
+  normalsFilter->SetInput( polydata );
   normalsFilter->SetFeatureAngle(50);
   normalsFilter->SetConsistency(1);
   normalsFilter->SetSplitting(1);

@@ -19,6 +19,7 @@ namespace mitk {
 
 //##ModelId=3E691E09014F
 //##Documentation
+//## @brief Vtk-based mapper to display a Geometry2D in a 3D window
 //## Vtk-based mapper to display a Geometry2D in a 3D window.
 class Geometry2DDataVtkMapper3D : public BaseVtkMapper3D
 {
@@ -27,9 +28,6 @@ class Geometry2DDataVtkMapper3D : public BaseVtkMapper3D
     mitkClassMacro(Geometry2DDataVtkMapper3D, BaseVtkMapper3D);
 
     itkNewMacro(Geometry2DDataVtkMapper3D);
-
-    //##ModelId=3E691E090376
-    virtual vtkProp* GetProp();
 
     //##ModelId=3E691E090380
     virtual const mitk::Geometry2DData *GetInput();

@@ -14,14 +14,11 @@
 //#include "vtkImageMapToWindowLevelColors";
 #include "mitkColorProperty.h"
 #include "mitkFloatProperty.h"
+#include "mitkLevelWindowProperty.h"
+#include "mitkSmartPointerProperty.h"
+#include <vtkActor.h>
 
 #include "pic2vtk.h"
-
-//##ModelId=3E691E090376
-vtkProp* mitk::Geometry2DDataVtkMapper3D::GetProp()
-{
-    return m_Actor;
-}
 
 //##ModelId=3E691E09038E
 mitk::Geometry2DDataVtkMapper3D::Geometry2DDataVtkMapper3D() : m_DataTreeIterator(NULL)
@@ -34,6 +31,9 @@ mitk::Geometry2DDataVtkMapper3D::Geometry2DDataVtkMapper3D() : m_DataTreeIterato
 
     m_Actor = vtkActor::New();
         m_Actor->SetMapper(m_VtkPolyDataMapper);
+
+	m_Prop3D = m_Actor;
+		m_Prop3D->Register(NULL);
 
     m_VtkLookupTable = vtkLookupTable::New();
         m_VtkLookupTable->SetTableRange (-1024, 4096);
@@ -117,35 +117,54 @@ void mitk::Geometry2DDataVtkMapper3D::Update()
             m_VtkPlaneSource->SetPoint1(right.x, right.y, right.z);
             m_VtkPlaneSource->SetPoint2(bottom.x, bottom.y, bottom.z);
 
-//            if(m_DataTreeIterator)
-//            {
-//                mitk::DataTreeIterator* it=m_DataTreeIterator->clone();
-//                while(it->hasNext())
-//                {
-//                    it->next();
-//                    mitk::Mapper::Pointer mapper = it->get()->GetMapper(1);
-//                    mitk::ImageMapper2D* imagemapper = dynamic_cast<ImageMapper2D*>(mapper.GetPointer());
-//
-//                    if(imagemapper)
-//                    {
-//                        mitk::Image::Pointer image4texture = dynamic_cast<Image*>(imagemapper->GetOutput(0));
-//                        if(image4texture)
-//                        {
-//                            m_SliceSelector->SetInput(image4texture);
-////m_SliceSelector->SetChannel(1);
-////                            ipPicDescriptor *p=Pic2vtk::convert(m_SliceSelector->GetOutput()->GetVtkImageData());
-//                            //if((p!=NULL) && (plane.normal.z==1))
-//                            //    ipPicPut("C:\\aaa.pic", p);
-////                            m_VtkTexture->SetInput(Pic2vtk::convert(p));
-//                            m_VtkTexture->SetInput(m_SliceSelector->GetOutput()->GetVtkImageData());
-//
-//                            m_Actor->SetTexture(m_VtkTexture);
-//
-//                            break;
-//                        }
-//                    }
-//                }
-//            }
+            if(m_DataTreeIterator)
+            {
+                mitk::DataTreeIterator* it=m_DataTreeIterator->clone();
+                while(it->hasNext())
+                {
+                    it->next();
+                    mitk::Mapper::Pointer mapper = it->get()->GetMapper(1);
+                    mitk::ImageMapper2D* imagemapper = dynamic_cast<ImageMapper2D*>(mapper.GetPointer());
+
+                    if(imagemapper)
+                    {
+						mitk::SmartPointerProperty::Pointer rendererProp = dynamic_cast<mitk::SmartPointerProperty*>(GetDataTreeNode()->GetPropertyList()->GetProperty("renderer").GetPointer());
+						if(rendererProp!=NULL)
+						{
+							mitk::BaseRenderer::Pointer renderer = dynamic_cast<mitk::BaseRenderer*>(rendererProp->GetSmartPointer().GetPointer());
+							if(renderer!=NULL)
+							{
+								// check for level window prop and use it for display if it exists
+								mitk::LevelWindowProperty::Pointer levWinProp = dynamic_cast<mitk::LevelWindowProperty*>(it->get()->GetPropertyList()->GetProperty("levelwindow").GetPointer());
+								if(levWinProp!=NULL)
+								{
+									m_VtkLookupTable->SetTableRange(levWinProp->GetLevelWindow().GetMin(),levWinProp->GetLevelWindow().GetMax());
+								}
+
+								imagemapper->GenerateAllData();
+								mitk::Image::Pointer image4texture = dynamic_cast<Image*>(imagemapper->GetOutput(0));
+								if(image4texture)
+								{
+									m_SliceSelector->SetInput(image4texture);
+		m_SliceSelector->SetChannelNr(1);
+		//                            ipPicDescriptor *p=Pic2vtk::convert(m_SliceSelector->GetOutput()->GetVtkImageData());
+		//                            if((p!=NULL) && (plane.normal.z==1))
+		//                                ipPicPut("C:\\aaa.pic", p);
+									const ImageMapper2D::RendererInfo* ri=imagemapper->GetRendererInfo(renderer);
+									if(ri!=NULL)
+									{
+										ipPicDescriptor *p=ri->m_Pic;
+										m_VtkTexture->SetInput(Pic2vtk::convert(p));                            
+										m_Actor->SetTexture(m_VtkTexture);
+									}
+
+									break;
+								}
+							}
+						}
+                    }
+                }
+            }
         }
         //query and set color
         const mitk::DataTreeNode* node=GetDataTreeNode();

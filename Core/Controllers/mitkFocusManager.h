@@ -49,11 +49,13 @@ namespace mitk {
   //## has to be an itk-Objekct in order to use itk-Smartpointer!
 	typedef mitk::BaseRenderer FocusElement;
 
+	typedef itk::WeakPointer<FocusElement> FocusElementWeakPointer;
+
 	//##ModelId=3F01770802C7
-  typedef std::vector<FocusElement::Pointer> FocusElementList;
+  typedef std::vector<FocusElementWeakPointer> FocusElementList;
 	
   //##ModelId=3F01770802D7
-  typedef std::vector<FocusElement::Pointer>::iterator FocusListIterator;
+  typedef std::vector<FocusElementWeakPointer>::iterator FocusListIterator;
 	
   //##Documentation
   //## Destructor
@@ -63,7 +65,7 @@ namespace mitk {
   //##Documentation
   //## Adds the widget into the set of managed Widgets after the focused
   //## widget and sets the focus to the added one
-  bool AddElement(FocusElement::Pointer element);
+  bool AddElement(FocusElement* element);
 
   //##ModelId=3EDCAF790230
 	//##Documentation
@@ -72,18 +74,18 @@ namespace mitk {
 	//## afterwards the focused widget is the one behind the deleted
 	//## or if the deleted was the last, then the one before the deleted
 	//## that way you can delete sequentialy from the back on or from front to back
-  bool RemoveElement(FocusElement::Pointer element);
+  bool RemoveElement(FocusElement* element);
 
   //##ModelId=3EDCAF7902BD
   //##Documentation
   //## returns the focused Widget
-  FocusElement::ConstPointer GetFocused() const;
+  const FocusElement* GetFocused() const;
 
   //##ModelId=3EDCAF7902FB
   //##Documentation
   //## searches the given Widget in List;
   //## if found, sets the focus to this widget and returns true
-  bool SetFocused(FocusElement::Pointer element);
+  bool SetFocused(FocusElement* element);
 
   //##ModelId=3EDCAF790378
   //##Documentation
@@ -98,12 +100,12 @@ namespace mitk {
   //##ModelId=3EDCAF7903D6
   //##Documentation
   //## returns the first widget in list
-  FocusElement::ConstPointer GetFirst() const;
+  const FocusElement* GetFirst() const;
 
   //##ModelId=3EDCAF7A002D
   //##Documentation
   //## returns the last widget in list
-  FocusElement::ConstPointer GetLast() const;
+  const FocusElement* GetLast() const;
 
 	//##ModelId=3EDCAF7A007B
   //##Documentation
@@ -141,7 +143,7 @@ private:
   //##ModelId=3F0185C802D7
 	//##Documentation
   //## holds the focused Widget
-	FocusElement::Pointer m_FocElement;
+  itk::WeakPointer<FocusElement> m_FocElement;
 
   //##ModelId=3EDCAF790155
 	//##Documentation

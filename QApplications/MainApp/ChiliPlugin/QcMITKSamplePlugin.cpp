@@ -169,6 +169,7 @@ void QcMITKSamplePlugin::selectSerie (QcLightbox* lightbox)
 
 void QcMITKSamplePlugin::CreateNewSampleApp()
 {
+  delete ap;
   ap = new SampleApp(task,"sample",0);
   toolbar->SetWidget(ap);
 }

@@ -296,6 +296,10 @@ namespace mitk {
     //## @sa GetDimension(int i);
     unsigned int* GetDimensions() const;
 
+    //##Documentation
+    //## @brief reset image to non-initialized state, release memory
+    virtual void Clear();
+
     //##ModelId=3ED91D060027
     //##Documentation
     //## @todo LevelWindow extraction/calculation not yet implemented. 
@@ -377,4 +381,3 @@ namespace mitk {
 } // namespace mitk
 
 #endif /* MITKIMAGE_H_HEADER_INCLUDED_C1C2FCD2 */
-

@@ -43,6 +43,8 @@ mitk::Geometry2DDataToSurfaceFilter::Geometry2DDataToSurfaceFilter()
 //##ModelId=3EF4A4A70363
 mitk::Geometry2DDataToSurfaceFilter::~Geometry2DDataToSurfaceFilter()
 {
+  m_VtkPlaneSource->Delete();
+  m_VtkTransformPlaneFilter->Delete();
 }
 
 //##ModelId=3EF56DCD021E

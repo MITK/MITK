@@ -40,6 +40,8 @@ mitk::VtkInteractorCameraController::VtkInteractorCameraController(const char * 
 //##ModelId=3E6D600F009B
 mitk::VtkInteractorCameraController::~VtkInteractorCameraController()
 {
+  m_VtkInteractor->SetRenderWindow(NULL);
+  m_VtkInteractor->Delete();
 }
 
 //##ModelId=3E6D600F006B

@@ -129,8 +129,8 @@ TreeNode<TValueType>
   pos = std::find(m_Children.begin(), m_Children.end(), n );
   if ( pos != m_Children.end() ) 
     {
-    m_Children.erase(pos);
     n->SetParent(NULL);
+    m_Children.erase(pos);
     return true;
     }
   return false;

@@ -36,7 +36,7 @@ class VtkRenderWindowInteractor : public ::vtkRenderWindowInteractor
 {
 
 protected:
-  mitk::BaseRenderer::Pointer m_MitkRenderer;
+  itk::WeakPointer<BaseRenderer> m_MitkRenderer;
 
 public:
   VtkRenderWindowInteractor() : m_MitkRenderer(NULL){};

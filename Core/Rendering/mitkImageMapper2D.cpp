@@ -54,8 +54,7 @@ mitk::ImageMapper2D::ImageMapper2D() : m_SliceSelector(NULL)
 //##ModelId=3E32DCF60043
 mitk::ImageMapper2D::~ImageMapper2D()
 {
-  //@FIXME: durch die folgende Zeile sollte doch wohl der desctructor von RendererInfo aufgerufen werden. Das passiert aber nie. Deshalb wird bei der Programm-Beendung auch das iil4mitkImage und damit die textur nicht rechtzeitig freigegeben und das Programm crashed.
-  m_RendererInfo.clear();
+  Clear();
 }
 
 void mitk::ImageMapper2D::Paint(mitk::BaseRenderer * renderer)
@@ -67,10 +66,10 @@ void mitk::ImageMapper2D::Paint(mitk::BaseRenderer * renderer)
 
   if(IsVisible(renderer)==false) return;
 
-  RendererInfo& renderinfo=m_RendererInfo[renderer];
-  iil4mitkPicImage*& image = renderinfo.m_iil4mitkImage;
-
   Update(renderer);
+
+  RendererInfo& renderinfo = AccessRendererInfo(renderer);
+  iil4mitkPicImage* image = renderinfo.Get_iil4mitkImage();
 
   if(image==NULL)
     return;
@@ -138,36 +137,19 @@ const mitk::ImageMapper2D::InputImageType *mitk::ImageMapper2D::GetInput(void)
 //##ModelId=3E6E83B00343
 int mitk::ImageMapper2D::GetAssociatedChannelNr(mitk::BaseRenderer *renderer)
 {
-  RendererInfo& renderinfo=m_RendererInfo[renderer];
-  if(renderinfo.m_RendererId < 0)
-    renderinfo.m_RendererId = ImageMapper2D::numRenderer++;
+  RendererInfo& renderinfo=AccessRendererInfo(renderer);
 
-  return renderinfo.m_RendererId;
+  return renderinfo.GetRendererId();
 }
 
 //##ModelId=3ED932B00140
 void mitk::ImageMapper2D::GenerateData(mitk::BaseRenderer *renderer)
 {
-  RendererInfo& renderinfo=m_RendererInfo[renderer];
-
-  iil4mitkPicImage*& image = renderinfo.m_iil4mitkImage;
+  RendererInfo& renderinfo=AccessRendererInfo(renderer);
 
   mitk::Image* input  = const_cast<mitk::ImageMapper2D::InputImageType *>(this->GetInput());
 
-  if(image!= NULL)
-  {
-    delete image;
-    image = NULL;
-  }
-
-  if(renderinfo.m_Pic)
-  {
-    ipPicFree(renderinfo.m_Pic);
-    renderinfo.m_Pic = NULL;
-  }
-
-  if(renderinfo.m_RendererId < 0)
-    renderinfo.m_RendererId = ImageMapper2D::numRenderer++;
+  renderinfo.Squeeze();
 
   if(input!=NULL)
   {
@@ -304,19 +286,21 @@ void mitk::ImageMapper2D::GenerateData(mitk::BaseRenderer *renderer)
     }
     assert(pic->dim == 2);
 
+    if(renderinfo.m_Pic!=NULL)
+      ipPicFree(renderinfo.m_Pic);
     renderinfo.m_Pic = pic;
 
     //std::cout << "Pic dimensions:" << pic->dim << std::endl;
 
+    iil4mitkPicImage* image;
     image = new iil4mitkPicImage(512);
+    renderinfo.Set_iil4mitkImage(image);
 
     ApplyProperties(renderer);
 //   image->setImage(pic, iil4mitkImage::INTENSITY_ALPHA);
 	  image->setImage(pic, m_iil4mitkMode);
     image->setInterpolation(true);
     image->setRegion(0,0,pic->n[0],pic->n[1]);
-
-
 
     renderinfo.m_LastUpdateTime.Modified();
 
@@ -327,15 +311,26 @@ void mitk::ImageMapper2D::GenerateData(mitk::BaseRenderer *renderer)
 
 void mitk::ImageMapper2D::GenerateAllData()
 {
-  std::map<mitk::BaseRenderer*,RendererInfo>::iterator it=m_RendererInfo.begin();
-  for(;it!=m_RendererInfo.end();++it)
+  RenderInfoMap::iterator it=m_RendererInfo.begin(), end=m_RendererInfo.end();
+  for(;it!=end;++it)
     Update(it->first);
+}
+
+void mitk::ImageMapper2D::Clear()
+{
+  RenderInfoMap::iterator it=m_RendererInfo.begin(), end=m_RendererInfo.end();
+  for(;it!=end;++it)
+  {
+    it->second.Squeeze();
+  }
+  //@FIXME: durch die folgende Zeile sollte doch wohl der desctructor von RendererInfo aufgerufen werden. Das passiert aber nie. Deshalb wird bei der Programm-Beendung auch das iil4mitkImage und damit die textur nicht rechtzeitig freigegeben und das Programm crashed.
+  m_RendererInfo.clear();
 }
 
 void mitk::ImageMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
 {
-  RendererInfo& renderinfo=m_RendererInfo[renderer];
-  iil4mitkPicImage*& image = renderinfo.m_iil4mitkImage;
+  RendererInfo& renderinfo=AccessRendererInfo(renderer);
+  iil4mitkPicImage* image = renderinfo.Get_iil4mitkImage();
 
   assert(image != NULL);
 
@@ -391,13 +386,13 @@ void mitk::ImageMapper2D::Update(mitk::BaseRenderer* renderer)
   if(input == NULL)
     return;
 
-  RendererInfo& renderinfo=m_RendererInfo[renderer];
-  const DataTreeNode* node=GetDataTreeNode();
-  iil4mitkPicImage*& image = renderinfo.m_iil4mitkImage;
+  const DataTreeNode* node = GetDataTreeNode();
+
+  RendererInfo& renderinfo = AccessRendererInfo(renderer);
+  iil4mitkPicImage* image = renderinfo.Get_iil4mitkImage();
 
   if(
       (image == NULL) ||
-      (renderinfo.m_RendererId < 0) ||
       (renderinfo.m_LastUpdateTime < node->GetMTime()) ||
       (renderinfo.m_LastUpdateTime < renderer->GetCurrentWorldGeometry2DUpdateTime()) ||
       (renderinfo.m_LastUpdateTime < renderer->GetDisplayGeometryUpdateTime())
@@ -420,5 +415,34 @@ void mitk::ImageMapper2D::Update(mitk::BaseRenderer* renderer)
     // since we have checked that nothing important has changed, we can set m_LastUpdateTime
     // to the current time
     renderinfo.m_LastUpdateTime.Modified();
+  }
+}
+
+void mitk::ImageMapper2D::RendererInfo::RendererDeleted()
+{
+  //delete texture due to its dependency on the renderer
+  delete m_iil4mitkImage;
+  m_iil4mitkImage = NULL;
+  //renderer will be deleted, so the command is no longer necessary
+  m_DeleteRendererCommand = NULL;
+  m_Renderer = NULL;
+}
+
+void mitk::ImageMapper2D::RendererInfo::Set_iil4mitkImage(iil4mitkPicImage* iil4mitkImage)
+{
+  assert(iil4mitkImage!=NULL);
+
+  delete m_iil4mitkImage;
+  m_iil4mitkImage = iil4mitkImage;
+}
+
+void mitk::ImageMapper2D::RendererInfo::Squeeze()
+{
+  delete m_iil4mitkImage;
+  m_iil4mitkImage = NULL;
+  if(m_Pic!=NULL)
+  {
+    ipPicFree(m_Pic);
+    m_Pic = NULL;
   }
 }

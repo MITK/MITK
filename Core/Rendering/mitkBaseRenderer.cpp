@@ -23,7 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkPositionEvent.h"
 #include "mitkGlobalInteraction.h"
 #include "mitkDisplayPositionEvent.h"
-#include "mitkSmartPointerProperty.h"
+#include "mitkWeakPointerProperty.h"
 #include "mitkSlicedGeometry3D.h"
 #include "mitkSliceNavigationController.h"
 #include "mitkStatusBar.h"
@@ -45,7 +45,7 @@ mitk::BaseRenderer::BaseRenderer() :
     globalInteraction->AddFocusElement(this);
   }
 
-  SmartPointerProperty::Pointer rendererProp = new SmartPointerProperty((itk::Object*)this);
+  WeakPointerProperty::Pointer rendererProp = new WeakPointerProperty((itk::Object*)this);
 
   m_CurrentWorldGeometry2D = mitk::PlaneGeometry::New();
 
@@ -70,7 +70,7 @@ mitk::BaseRenderer::BaseRenderer() :
 //##ModelId=3E3D2F12008C
 mitk::BaseRenderer::~BaseRenderer()
 {
-
+  m_DataTreeIterator = NULL;
 }
 
 //##ModelId=3D6A1791038B

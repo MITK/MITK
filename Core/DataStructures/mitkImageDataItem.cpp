@@ -48,6 +48,10 @@ mitk::ImageDataItem::ImageDataItem(const ImageDataItem& aParent, unsigned int di
   memcpy(m_PicDescriptor->n, aParent.GetPicDescriptor()->n, sizeof(unsigned int)*(dimension<=8?dimension:8));
   m_PicDescriptor->data=m_Data=static_cast<unsigned char*>(aParent.GetData())+offset;
   ipFuncCopyTags(m_PicDescriptor, aParent.GetPicDescriptor());
+
+  m_ReferenceCountLock.Lock();
+  m_ReferenceCount = 0;
+  m_ReferenceCountLock.Unlock();
 }
 
 //##ModelId=3E0B78820287
@@ -81,6 +85,9 @@ mitk::ImageDataItem::ImageDataItem(const mitk::PixelType& type, unsigned int dim
   memcpy(m_PicDescriptor->n, dimensions, sizeof(unsigned int)*(dimension<=8?dimension:8));
   m_PicDescriptor->data=m_Data=new unsigned char[_ipPicSize(m_PicDescriptor)];
   
+  m_ReferenceCountLock.Lock();
+  m_ReferenceCount = 0;
+  m_ReferenceCountLock.Unlock();
 }
 
 //##ModelId=3E33F08A03B8

@@ -32,7 +32,10 @@ QmitkFunctionality::QmitkFunctionality(QObject *parent, const char *name, mitk::
 
 QmitkFunctionality::~QmitkFunctionality()
 {
-
+  if(m_DataTreeIterator.IsNotNull() )
+  {
+    m_DataTreeIterator->GetTree()->RemoveObserver(m_ObserverTag);
+  }
 }
 
 QString QmitkFunctionality::getFunctionalityName()

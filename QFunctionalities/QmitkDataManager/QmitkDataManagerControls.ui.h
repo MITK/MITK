@@ -56,7 +56,6 @@ void QmitkDataManagerControls::init() {
   m_DataTreeView->addColumn( "Name" );
   m_DataTreeView->addColumn( "NodeType" );
   m_DataTreeView->addColumn( "RefCount");
-  m_RemoveButton->setEnabled(false);
   mitk::GlobalInteraction* globalInteraction = dynamic_cast<mitk::GlobalInteraction*> (mitk::EventMapper::GetGlobalStateMachine());
   if (globalInteraction) {
     mitk::FocusManager* fm = globalInteraction->GetFocusManager();
@@ -113,6 +112,9 @@ void QmitkDataManagerControls::SetDataTreeIterator(mitk::DataTreeIteratorBase* i
 {
     if (it == NULL) return;
 
+  m_GlobalNodePropertiesView->SetDataTreeNode(NULL);
+  m_RendererPropertiesView->SetDataTreeNode(NULL);
+
     while (m_DataTreeView->firstChild()) {
 	    delete m_DataTreeView->firstChild();
      }
@@ -132,10 +134,11 @@ void QmitkDataManagerControls::RemoveButtonClicked()
   QmitkDataTreeViewItem *selected = dynamic_cast<QmitkDataTreeViewItem*>(m_DataTreeView->selectedItem());
   if (selected == NULL) {
   } else {
-    mitk::DataTreeIteratorBase* selectedIterator = selected->GetDataTreeIterator();
+    mitk::DataTreeIteratorClone selectedIterator = selected->GetDataTreeIterator();
     assert(selectedIterator != NULL);
-    selectedIterator->Remove();
     delete selected;
+    selectedIterator->Remove();
+    mitk::RenderWindow::UpdateAllInstances();
   } 
 }
 

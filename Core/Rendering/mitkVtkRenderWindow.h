@@ -60,7 +60,7 @@ protected:
   VtkRenderWindow();
   virtual ~VtkRenderWindow();
 
-  BaseRenderer::Pointer m_MitkRenderer;
+  itk::WeakPointer<BaseRenderer> m_MitkRenderer;
 
 private:
   VtkRenderWindow(const VtkRenderWindow&);  // Not implemented.

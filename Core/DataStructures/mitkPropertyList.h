@@ -69,7 +69,9 @@ public:
 
     const PropertyMap* GetMap() const { return &m_Properties; }
 
-		Pointer Clone()    ;
+		virtual Pointer Clone();
+
+    virtual void Clear();
 protected:
     //##ModelId=3E38FEFE0125
     PropertyList();

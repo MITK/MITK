@@ -326,7 +326,6 @@ void QmitkMainTemplate::init()
 
   //create the data tree
   tree=mitk::DataTree::New();
-  tree->Register(); //@FIXME: da DataTreeIteratorClone keinen Smartpointer auf DataTree hält, wird tree sonst gelöscht.
 }
 
 /*!
@@ -556,4 +555,10 @@ void QmitkMainTemplate::setXMLFallBackPath( const char * anXmlFallBackPath )
 void QmitkMainTemplate::m_ShowPlanesCheckBox_clicked()
 {
     emit ShowWidgetPlanesToggled( m_ShowPlanesCheckBox->isOn() );
+}
+
+
+void QmitkMainTemplate::destroy()
+{
+  delete qfm;
 }

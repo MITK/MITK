@@ -477,15 +477,19 @@ TreeIteratorBase<TTreeType>::Remove()
   
   if ( m_Position->HasParent() )
     {
-    m_Tree->InvokeEvent( TreeRemoveEvent<TTreeType>(*this) );
     TreeNodeType* parent = m_Position->GetParent();
+    //keep node alive just a bit longer
+    TreeNodeType::Pointer position = m_Position;
     parent->Remove( m_Position );
+    //restore parent, which was set to NULL in the previous line
+    m_Position->SetParent(parent);
+    m_Tree->InvokeEvent( TreeRemoveEvent<TTreeType>(*this) );
     m_Tree->Modified();
     } 
   else if (m_Root == m_Position)
     {
-    m_Tree->InvokeEvent( TreeRemoveEvent<TTreeType>(*this) );
     m_Root = NULL;
+    m_Tree->InvokeEvent( TreeRemoveEvent<TTreeType>(*this) );
     m_Tree->Modified();
     }
 

@@ -41,6 +41,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkLevelWindowProperty.h"
 #include "mitkSmartPointerProperty.h"
+#include "mitkWeakPointerProperty.h"
 #include <vtkActor.h>
 #include <vtkImageData.h>
 
@@ -52,7 +53,6 @@ mitk::Geometry2DDataVtkMapper3D::Geometry2DDataVtkMapper3D() : m_DataTreeIterato
   m_VtkPlaneSource = vtkPlaneSource::New();
 
   m_VtkPolyDataMapper = vtkPolyDataMapper::New();
-  //        m_VtkPolyDataMapper->SetInput(m_VtkPlaneSource->GetOutput());
   m_VtkPolyDataMapper->ImmediateModeRenderingOn();
 
   m_Actor = vtkActor::New();
@@ -70,31 +70,10 @@ mitk::Geometry2DDataVtkMapper3D::Geometry2DDataVtkMapper3D() : m_DataTreeIterato
 
   m_VtkLookupTableDefault = m_VtkLookupTable;
 
-
   m_VtkTexture = vtkTexture::New();
   m_VtkTexture->InterpolateOn();
   m_VtkTexture->SetLookupTable(m_VtkLookupTable);
   m_VtkTexture->MapColorScalarsThroughLookupTableOn();
-
-  //    m_Actor->SetTexture(axialTexture);
-
-  //  axialTexture->SetInput(axialSection->GetOutput());
-  //  axialTexture->InterpolateOn();
-  //  axialTexture->SetLookupTable (lut);
-  //  axialTexture->MapColorScalarsThroughLookupTableOn();
-  //m_VtkPlaneSource = vtkPlaneSource::New();
-  //  m_VtkPlaneSource->SetXResolution(1);
-  //  m_VtkPlaneSource->SetYResolution(1);
-  //  m_VtkPlaneSource->SetOrigin(0.0, 0.0, slice);
-  //  m_VtkPlaneSource->SetPoint1(xDim, 0.0, slice);
-  //  m_VtkPlaneSource->SetPoint2(0.0, yDim, slice);
-  //m_VtkPolyDataMapper = vtkPolyDataMapper::New();
-  //  m_VtkPolyDataMapper->SetInput(m_VtkPlaneSource->GetOutput());
-  //  m_VtkPolyDataMapper->ImmediateModeRenderingOn();
-  //axial = vtkActor::New();
-  //  axial->SetMapper(m_VtkPolyDataMapper);
-  //  axial->SetTexture(axialTexture);
-
 }
 
 //##ModelId=3E691E090394
@@ -163,6 +142,7 @@ void mitk::Geometry2DDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
     surfaceCreator->Update(); //@FIXME ohne das crash
     m_VtkPolyDataMapper->SetInput(surfaceCreator->GetOutput()->GetVtkPolyData());
 
+    bool texture=false;
     if(m_DataTreeIterator.IsNotNull())
     {
       mitk::DataTreeIteratorClone it=m_DataTreeIterator.GetPointer();
@@ -174,10 +154,10 @@ void mitk::Geometry2DDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
 
         if((node->IsVisible(renderer)) && (imagemapper))
         {
-          mitk::SmartPointerProperty::Pointer rendererProp = dynamic_cast<mitk::SmartPointerProperty*>(GetDataTreeNode()->GetPropertyList()->GetProperty("renderer").GetPointer());
+          mitk::WeakPointerProperty::Pointer rendererProp = dynamic_cast<mitk::WeakPointerProperty*>(GetDataTreeNode()->GetPropertyList()->GetProperty("renderer").GetPointer());
           if(rendererProp.IsNotNull())
           {
-            mitk::BaseRenderer::Pointer renderer = dynamic_cast<mitk::BaseRenderer*>(rendererProp->GetSmartPointer().GetPointer());
+            mitk::BaseRenderer::Pointer renderer = dynamic_cast<mitk::BaseRenderer*>(rendererProp->GetWeakPointer().GetPointer());
             if(renderer.IsNotNull())
             {
 
@@ -214,6 +194,7 @@ void mitk::Geometry2DDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
                 m_Actor->SetTexture(m_VtkTexture);
                 m_LastTextureUpdateTime=ri->m_LastUpdateTime;
               }
+              texture = true;
               break;
             }
           }
@@ -221,9 +202,12 @@ void mitk::Geometry2DDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
         ++it;
       }
     }
+    if(texture==false)
+    {
+      m_Actor->SetTexture(NULL);
+    }
 
     //apply properties read from the PropertyList
     ApplyProperties(m_Actor, renderer);
   }
 }
-

@@ -33,6 +33,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkImageChannelSelector.h"
 #include "mitkBaseRenderer.h"
 
+#include <itkCommand.h>
+#include <itkEventObject.h>
+
+
 class iil4mitkPicImage;
 class Vtk2itk;
 class vtkImageReslice;
@@ -90,36 +94,84 @@ public:
   //##Documentation
   //## @brief internal storage class for data needed for rendering into a renderer
   class RendererInfo {
+    //##ModelId=3E6E83AB0346
+    //##Documentation
+    //## @brief internal id of the renderer the data is stored for
+    int m_RendererId;
+
+    itk::SimpleMemberCommand<RendererInfo>::Pointer m_DeleteRendererCommand;
+    //##ModelId=3E6423D203E1
+    //##Documentation
+    //## @brief stored iil4mitkPicImage containing the texture to display
+    iil4mitkPicImage* m_iil4mitkImage;
+    mitk::BaseRenderer* m_Renderer;
+    unsigned long m_ObserverId;
+
+    void RendererDeleted();
   public:
     //##ModelId=3E6423D203E0
     //##Documentation
     //## @brief timestamp of last update of stored data
     itk::TimeStamp m_LastUpdateTime;
-    //##ModelId=3E6423D203E1
-    //##Documentation
-    //## @brief stored iil4mitkPicImage containing the texture to display
-    iil4mitkPicImage* m_iil4mitkImage; 
     //##ModelId=3E6E83AB02CD
     //##Documentation
     //## @brief stored data as a ipPicDescriptor
     ipPicDescriptor *m_Pic;
-    //##ModelId=3E6E83AB0346
-    //##Documentation
-    //## @brief internal id of the renderer the data is stored for
-    int m_RendererId;
     //##Documentation
     //## @brief number of pixels per mm in x- and y-direction of the resampled image m_Pic
     Vector2D m_PixelsPerMM;
     //##ModelId=3E6423D30002
-    RendererInfo() :  m_iil4mitkImage(NULL), m_Pic(NULL), m_RendererId(-1)
+    RendererInfo() :  m_iil4mitkImage(NULL), m_Renderer(NULL), m_ObserverId(0), m_Pic(NULL), m_RendererId(-1)
     {
       m_PixelsPerMM.Fill(0);
     };
     //##ModelId=3E6423D30003
     ~RendererInfo()
     {
+      Squeeze();
+      if(m_Renderer != NULL)
+      {
+        m_Renderer->RemoveObserver(m_ObserverId);
+        m_Renderer = NULL;
+      }
       //         delete m_iil4mitkImage; //@FIXME: diese Zeile wird nie erreicht, s. Kommentar im desctuctor von ImageMapper2D
     }
+
+    inline bool IsInitialized() const
+    {
+      return m_RendererId >= 0;
+    }
+    void Initialize(int rendererId, mitk::BaseRenderer* renderer)
+    {
+      assert(rendererId>=0);
+      assert(m_RendererId<0);
+
+      m_RendererId = rendererId;
+      m_Renderer = renderer;
+
+      m_DeleteRendererCommand = itk::SimpleMemberCommand<RendererInfo>::New();
+  #ifdef WIN32
+      m_DeleteRendererCommand->SetCallbackFunction(this, RendererDeleted);
+  #else
+      m_DeleteRendererCommand->SetCallbackFunction(this, &RendererInfo::RendererDeleted);
+  #endif
+
+      m_ObserverId = renderer->AddObserver(itk::DeleteEvent(), m_DeleteRendererCommand);
+    }
+
+    void Set_iil4mitkImage(iil4mitkPicImage* iil4mitkImage);
+
+    inline iil4mitkPicImage* Get_iil4mitkImage() const
+    {
+      return m_iil4mitkImage;
+    }
+
+    inline int GetRendererId() const
+    {
+      return m_RendererId;
+    }
+
+    void Squeeze();
   };
 
   //##ModelId=3E6E83B00343
@@ -133,8 +185,12 @@ public:
   //## @brief Get the RendererInfo for @a renderer
   const RendererInfo * GetRendererInfo(mitk::BaseRenderer* renderer)
   {
-    return &m_RendererInfo[renderer];
+    return &AccessRendererInfo(renderer);
   }
+
+  //##Documentation
+  //## @brief Release memory allocated for buffering
+  virtual void Clear();
 
 protected:
   //##ModelId=3E3BD98600F4
@@ -145,6 +201,16 @@ protected:
 
   virtual void GenerateData(mitk::BaseRenderer *renderer);
   
+  //##Documentation
+  //## @brief Get the RendererInfo for @a renderer
+  inline RendererInfo & AccessRendererInfo(mitk::BaseRenderer* renderer)
+  {
+    RendererInfo& renderinfo=m_RendererInfo[renderer];
+    if(renderinfo.IsInitialized()==false)
+      renderinfo.Initialize(ImageMapper2D::numRenderer++, renderer);
+    return renderinfo;
+  }
+
   //##ModelId=3E6E83AB0347
   //##Documentation
   //## @brief Number of renderers data is stored for
@@ -153,6 +219,8 @@ protected:
   static int numRenderer;
 
 protected:
+  typedef std::map<mitk::BaseRenderer*,RendererInfo> RenderInfoMap;
+
   //##ModelId=3EDD039F02EC
   //##Documentation
   //## @brief ImageSliceSelector for display of original slices (currently not used)
@@ -167,7 +235,7 @@ protected:
   //##Documentation
   //## @brief Map of instances of RendererInfo
   //## @sa RendererInfo
-  std::map<mitk::BaseRenderer*,RendererInfo> m_RendererInfo;
+  RenderInfoMap m_RendererInfo;
 
 private:
 	int m_iil4mitkMode;

@@ -55,10 +55,10 @@ QmitkFctMediator::QmitkFctMediator(QObject *parent, const char *name) : QObject(
 
 QmitkFctMediator::~QmitkFctMediator()
 {
-/*	QmitkFunctionality *functionality;
+	QmitkFunctionality *functionality;
 	for ( functionality=qfl.first(); functionality != 0; functionality=qfl.next() )
 		delete functionality;
-	qfl.clear();*/
+	qfl.clear();
 }
 
 void QmitkFctMediator::initialize(QWidget *aLayoutTemplate)

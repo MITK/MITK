@@ -383,8 +383,23 @@ void mitk::OpenGLRenderer::InitRenderer(mitk::RenderWindow* renderwindow)
 \brief Destructs the OpenGLRenderer.
 */
 //##ModelId=3E33ECF301B7
-mitk::OpenGLRenderer::~OpenGLRenderer() {
-  m_VtkRenderer->Delete();
+mitk::OpenGLRenderer::~OpenGLRenderer()
+{
+  if(m_VtkRenderer!=NULL)
+  {
+    m_RenderWindow->GetVtkRenderWindow()->RemoveRenderer(m_VtkRenderer);
+    m_RenderWindow->GetVtkRenderWindow()->SetInteractor(NULL);
+    m_CameraController = NULL;
+    //VtkInteractorCameraController* vicc=dynamic_cast<VtkInteractorCameraController*>(m_CameraController.GetPointer());
+    //if(vicc!=NULL)
+    //{
+    //  vicc->SetRenderWindow(NULL);
+    //  vicc->GetVtkInteractor()->Disable();
+    //}
+    m_VtkRenderer->Delete();
+  }
+  else
+    m_CameraController = NULL;
 }
 
 /*!

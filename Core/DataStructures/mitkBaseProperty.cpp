@@ -22,6 +22,9 @@ PURPOSE.  See the above copyright notices for more information.
 //##ModelId=3E38FF0902A7
 mitk::BaseProperty::BaseProperty() : m_Enabled(true)
 {
+  m_ReferenceCountLock.Lock();
+  m_ReferenceCount = 0;
+  m_ReferenceCountLock.Unlock();
 }
 
 

@@ -34,7 +34,8 @@ mitk::RenderWindow::RenderWindow(const char *name, mitk::BaseRenderer* renderer)
 mitk::RenderWindow::~RenderWindow()
 {
   instances.erase(this);
-  m_MitkVtkRenderWindow->Delete();
+  m_Renderer = NULL;
+  m_MitkVtkRenderWindow->Delete(); //xxx
 }
 
 void mitk::RenderWindow::MakeCurrent() 

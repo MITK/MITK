@@ -22,7 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 //##ModelId=3D6A0E9E0029
 mitk::BaseProperty::Pointer mitk::PropertyList::GetProperty(const char *propertyKey) const
 {
-    std::map<std::string,BaseProperty::Pointer>::const_iterator it;
+    PropertyMap::const_iterator it;
     
     it=m_Properties.find( propertyKey );
 
@@ -35,7 +35,7 @@ mitk::BaseProperty::Pointer mitk::PropertyList::GetProperty(const char *property
 //##ModelId=3D78B966005F
 void mitk::PropertyList::SetProperty(const char* propertyKey, BaseProperty* property)
 {
-    std::map<std::string,BaseProperty::Pointer>::iterator it;
+    PropertyMap::iterator it;
     
     it=m_Properties.find( propertyKey );
     //is a property with key @a propertyKey contained in the list?
@@ -48,11 +48,12 @@ void mitk::PropertyList::SetProperty(const char* propertyKey, BaseProperty* prop
             return;
 	}
         //no? erase the old entry.
+        it->second=NULL;
         m_Properties.erase(it);
     }
 
     //no? add/replace it.
-	//std::pair<std::map<std::string,BaseProperty::Pointer>::iterator, bool> o=
+	//std::pair<PropertyMap::iterator, bool> o=
         m_Properties.insert ( std::pair<std::string,BaseProperty::Pointer>( propertyKey, property ) );
    Modified();
 }
@@ -66,12 +67,13 @@ mitk::PropertyList::PropertyList()
 //##ModelId=3E38FEFE0157
 mitk::PropertyList::~PropertyList()
 {
+  Clear();
 }
 
 unsigned long mitk::PropertyList::GetMTime() const
 {
-    std::map<std::string,BaseProperty::Pointer>::const_iterator it=m_Properties.begin();
-	for(;it!=m_Properties.end();++it)
+    PropertyMap::const_iterator it = m_Properties.begin(), end = m_Properties.end();
+	for(;it!=end;++it)
 	{
 		if(Superclass::GetMTime()<it->second->GetMTime())
 		{
@@ -84,8 +86,17 @@ unsigned long mitk::PropertyList::GetMTime() const
 //##ModelId=3EF1B0160286
 bool mitk::PropertyList::DeleteProperty(const char* propertyKey)
 {
+  PropertyMap::iterator it;  
+  it=m_Properties.find( propertyKey );
+
+  if(it!=m_Properties.end())
+  {
+    it->second=NULL;
+    m_Properties.erase(it);
     Modified();
-    return m_Properties.erase(propertyKey)>0;
+    return true;
+  }
+  return false;
 }
 
 mitk::PropertyList::Pointer mitk::PropertyList::Clone()
@@ -96,4 +107,15 @@ mitk::PropertyList::Pointer mitk::PropertyList::Clone()
   newPropertyList->m_Properties = m_Properties;
 
   return newPropertyList.GetPointer();
+}
+
+void mitk::PropertyList::Clear()
+{
+  PropertyMap::iterator it = m_Properties.begin(), end = m_Properties.end();
+  while(it!=end)
+  {
+    it->second = NULL;
+    ++it;
+  }
+  m_Properties.clear();
 }

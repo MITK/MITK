@@ -529,9 +529,10 @@ bool mitk::Image::SetPicChannel(ipPicDescriptor *pic, int n)
 //##ModelId=3E102AE9004B
 void mitk::Image::Initialize(const mitk::PixelType& type, unsigned int dimension, unsigned int *dimensions, unsigned int channels)
 {
+  Clear();
+
   m_Dimension=dimension;
-  if(m_Dimensions!=NULL)
-    delete [] m_Dimensions;
+
   m_Dimensions=new unsigned int[m_Dimension>4?m_Dimension:4];
   memcpy(m_Dimensions, dimensions, sizeof(unsigned int)*m_Dimension);
   if(m_Dimension<4)
@@ -661,9 +662,10 @@ void mitk::Image::Initialize(ipPicDescriptor* pic, int channels, int tDim, int s
 {
   if(pic==NULL) return;
 
+  Clear();
+
   m_Dimension=pic->dim;
-  if(m_Dimensions!=NULL)
-    delete m_Dimensions;
+
   m_Dimensions=new unsigned int[m_Dimension>4?m_Dimension:4];
   memcpy(m_Dimensions, pic->n, sizeof(unsigned int)*m_Dimension);
   if(m_Dimension<4)
@@ -874,7 +876,7 @@ m_CompleteData(NULL), m_PixelType(NULL), m_Initialized(false)
 //##ModelId=3E15F6CA014F
 mitk::Image::~Image()
 {
-
+  Clear();
 }
 
 //##ModelId=3E1A11530384
@@ -901,18 +903,27 @@ float mitk::Image::GetScalarValueMax() const
   return -1.0f;
 }
 
-//mitk::Geometry2D::Pointer mitk::Image::BuildStandardPlaneGeometry2D(mitk::SlicedGeometry3D* slicedgeometry3D, unsigned int *dimensions)
-//{
-//  mitk::Point3D origin;
-//  mitk::Vector3D right, bottom;
-//  FillVector3D(origin,0,0,0);             slicedgeometry3D->UnitsToMM(origin, origin);
-//  FillVector3D(right,dimensions[0],0,0);  slicedgeometry3D->UnitsToMM(right, right);
-//  FillVector3D(bottom,0,dimensions[1],0); slicedgeometry3D->UnitsToMM(bottom, bottom);
-//
-//  mitk::PlaneGeometry::Pointer planegeometry=mitk::PlaneGeometry::New();
-//  planegeometry->SetOrigin(origin);
-//  planegeometry->SetByRightAndDownVector(right.Get_vnl_vector(), bottom.Get_vnl_vector(), slicedgeometry3D->GetSpacing()[2]);
-//  planegeometry->SetSizeInUnits(dimensions[0], dimensions[1]);
-//
-//  return planegeometry.GetPointer();
-//}
+void mitk::Image::Clear()
+{
+  if(m_Initialized)
+  {
+    m_Initialized = false;
+
+    if(m_Dimensions!=NULL)
+      delete [] m_Dimensions;
+
+    ImageDataItemPointerArray::iterator it, end;
+    for( it=m_Slices.begin(), end=m_Slices.end(); it!=end; ++it )
+    {
+      (*it)=NULL;
+    }
+    for( it=m_Volumes.begin(), end=m_Volumes.end(); it!=end; ++it )
+    {
+      (*it)=NULL;
+    }
+    for( it=m_Channels.begin(), end=m_Channels.end(); it!=end; ++it )
+    {
+      (*it)=NULL;
+    }
+  }
+}

@@ -9,7 +9,7 @@
             <x>0</x>
             <y>0</y>
             <width>752</width>
-            <height>935</height>
+            <height>938</height>
         </rect>
     </property>
     <property name="minimumSize">
@@ -766,6 +766,7 @@
     <function>parseCommandLine()</function>
     <function returnType="mitk::DataTree::Pointer">GetTree()</function>
     <function>setXMLFallBackPath( const char * anXmlFallBackPath )</function>
+    <function access="private">destroy()</function>
 </functions>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

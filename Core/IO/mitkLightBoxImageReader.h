@@ -1,6 +1,6 @@
 #ifndef LIGHTBOXIMAGEREADER_H_HEADER_INCLUDED_C1F48A22
 #define LIGHTBOXIMAGEREADER_H_HEADER_INCLUDED_C1F48A22
-
+#define NO_pVersion
 #include "mitkImageSource.h"
 #include "mitkCommon.h"
 #include "../../Applications/MITKSamplePlugIn/include/plugin.h"

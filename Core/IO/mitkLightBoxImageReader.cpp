@@ -130,12 +130,12 @@ void mitk::LightBoxImageReader::GenerateData()
     }
     printf("\n fertig \n");
 }
-
-mitk::LightBoxImageReader::GetSpacingFromLB()
+/*
+Vector3<float> mitk::LightBoxImageReader::GetSpacingFromLB()
 {
 
-Vector3<float>  OrganicerPluginFrame::getSpacingFromLB( )
-{
+// OrganicerPluginFrame::getSpacingFromLB( )
+//{
 
    Vector3<float> spacing(1.0, 1.0, 1.0);
 
@@ -169,7 +169,7 @@ Vector3<float>  OrganicerPluginFrame::getSpacingFromLB( )
    cout<<" spacing x: "<<spacing.x<<" y: "<<spacing.y<<" z: "<<spacing.z<<endl; 
    return spacing;
 }
-
+*/
 
 
 

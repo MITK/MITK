@@ -28,6 +28,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 mitk::PointSetInteractor::Pointer QmitkPointListWidget::m_CurrentInteraction;
 mitk::PolygonInteractor::Pointer QmitkPointListWidget::m_CurrentPolygonInteraction;
+unsigned long QmitkPointListWidget::m_CurrentObserverID;
 
 void QmitkPointListWidget::init()
 {
@@ -37,14 +38,15 @@ void QmitkPointListWidget::init()
   m_DataChangedCommand->SetCallbackFunction(this, QmitkPointListWidget::ItemsOfListUpdate);
 #else
   m_DataChangedCommand->SetCallbackFunction(this, &QmitkPointListWidget::ItemsOfListUpdate);
-#endif    
+#endif
+  m_CurrentObserverID = 0;
 }
 
 
 
 void QmitkPointListWidget::PointSelect( int ItemIndex )
 {  
-  assert(m_PointSet.IsNotNull());    
+  assert(m_PointSet.IsNotNull());
   //assert(m_PointSet->IndexExists(ItemIndex));
   mitk::PointSet::PointType ppt;
   mitk::PointSet::PointsContainer::Iterator it, end;  
@@ -72,25 +74,24 @@ void QmitkPointListWidget::ItemsOfListUpdate()
 {
   if (m_DatatreeNode.IsNull())return;
   InteractivePointList->clear();
-  m_PointSet = (mitk::PointSet*)(m_DatatreeNode->GetData());	
+  m_PointSet = (mitk::PointSet*)(m_DatatreeNode->GetData());
   int size =m_PointSet->GetSize();
   if (size!=0)
   {
     const mitk::PointSet::DataType::Pointer Pointlist= m_PointSet->GetPointSet();
     ////
     mitk::PointSet::PointsContainer::Iterator it, end;
-    end = m_PointSet->GetPointSet()->GetPoints()->End();   
+    end = m_PointSet->GetPointSet()->GetPoints()->End();
     unsigned int i=0;
     mitk::PointSet::PointType ppt;
-    for (it = m_PointSet->GetPointSet()->GetPoints()->Begin(); it!=end; it++,i++) 
+    for (it = m_PointSet->GetPointSet()->GetPoints()->Begin(); it!=end; it++,i++)
     {
-      m_PointSet->GetPointSet()->GetPoints()->GetElementIfIndexExists(it->Index(), &ppt);    
+      m_PointSet->GetPointSet()->GetPoints()->GetElementIfIndexExists(it->Index(), &ppt);
       std::stringstream  aStrStream;
       aStrStream<<prefix<<i+1<<"  ("<< (ppt)[0]<<",  "<<(ppt)[1]<<",  "<<(ppt)[2]<<")";
       const std::string s = aStrStream.str();
-      const char * Item =s.c_str();				
-      this->InteractivePointList->insertItem(Item);              
-
+      const char * Item =s.c_str();
+      this->InteractivePointList->insertItem(Item);
     }
   }
 }
@@ -101,6 +102,7 @@ void QmitkPointListWidget::SwitchInteraction( mitk::PointSetInteractor::Pointer 
   mitk::GlobalInteraction* globalInteraction = dynamic_cast<mitk::GlobalInteraction*>(mitk::EventMapper::GetGlobalStateMachine());
   if(globalInteraction!=NULL)
   {
+    mitk::PointSet::Pointer pointset;
     if ((*sop).IsNull())
     {
       //new layer property
@@ -111,21 +113,24 @@ void QmitkPointListWidget::SwitchInteraction( mitk::PointSetInteractor::Pointer 
       mitk::BoolProperty::Pointer close = new mitk::BoolProperty(true);
 
 
+      //if necessary create a TreeNode, to connect the data to...
+      mitk::DataTreeNode::Pointer dataTreeNode;
+      if((*node).IsNull())
+        dataTreeNode = mitk::DataTreeNode::New();
+      else
+        dataTreeNode = *node;
 
-      //create a DataElement that holds the points
-      mitk::PointSet::Pointer pointset = mitk::PointSet::New();
+      //if necessary create a DataElement that holds the points
+      if(dynamic_cast<mitk::PointSet*>(dataTreeNode->GetData()) == NULL)
+        pointset = mitk::PointSet::New();
+      else
+        pointset = dynamic_cast<mitk::PointSet*>(dataTreeNode->GetData());
 
-      //connect data to refresh method
-      pointset->AddObserver(itk::EndEvent(), m_DataChangedCommand);
-
-      //then crate a TreeNode, to connect the data to...
-      mitk::DataTreeNode::Pointer dataTreeNode = mitk::DataTreeNode::New();
       //declaring a new Interactor
       if (numberOfPoints!=UNLIMITED)//limited number of points
         *sop = new mitk::PointSetInteractor("pointsetinteractor", dataTreeNode, numberOfPoints);
       else   //unlimited number of points
         *sop = new mitk::PointSetInteractor("pointsetinteractor", dataTreeNode);
-
 
       //datatreenode: and give set the data, layer and Interactor
       dataTreeNode->SetData(pointset);
@@ -134,14 +139,14 @@ void QmitkPointListWidget::SwitchInteraction( mitk::PointSetInteractor::Pointer 
       dataTreeNode->SetProperty("contour",contour);
       dataTreeNode->SetProperty("close",close);
 
-			mitk::StringProperty::Pointer label = new mitk::StringProperty(l);
+      mitk::StringProperty::Pointer label = new mitk::StringProperty(l);
 
-			//const char *c="";
-			//if ( !strcmp(l.c_str(),c) )
-		//	{
+      //const char *c="";
+      //if ( !strcmp(l.c_str(),c) )
+      //	{
 
-      	dataTreeNode->SetProperty("label",label);
-		//	}
+      dataTreeNode->SetProperty("label",label);
+      //	}
 
       dataTreeNode->SetInteractor(*sop);
       dataTreeNode->SetProperty("name", label); /// name is identical with label????
@@ -155,7 +160,15 @@ void QmitkPointListWidget::SwitchInteraction( mitk::PointSetInteractor::Pointer 
     {
       //remove last Interactor
       globalInteraction->RemoveInteractor(m_CurrentInteraction);
+      pointset = dynamic_cast<mitk::PointSet*>(m_DatatreeNode->GetData());
+      assert(pointset.IsNotNull());
+      pointset->RemoveObserver(m_CurrentObserverID);
     }
+
+    //connect data to refresh method
+    pointset = dynamic_cast<mitk::PointSet*>((*node)->GetData());
+    assert(pointset.IsNotNull());
+    m_CurrentObserverID = pointset->AddObserver(itk::EndEvent(), m_DataChangedCommand);
 
     //new Interactor
     m_CurrentInteraction = *sop;
@@ -176,7 +189,7 @@ void QmitkPointListWidget::SwitchInteraction( mitk::PolygonInteractor::Pointer *
     if ((*sop).IsNull())
     {
       //new layer property
-			std::cout << "creating polygon interactor ..." << std::endl;
+      std::cout << "creating polygon interactor ..." << std::endl;
 
       mitk::IntProperty::Pointer layer = new mitk::IntProperty(1);
       mitk::ColorProperty::Pointer color = new mitk::ColorProperty(c[0],c[1],c[2]);
@@ -184,7 +197,7 @@ void QmitkPointListWidget::SwitchInteraction( mitk::PolygonInteractor::Pointer *
       //mitk::BoolProperty::Pointer contour = new mitk::BoolProperty(false);
       //mitk::BoolProperty::Pointer close = new mitk::BoolProperty(true);
       mitk::StringProperty::Pointer label = new mitk::StringProperty(l);
-			mitk::StringProperty::Pointer name = new mitk::StringProperty(l);
+      mitk::StringProperty::Pointer name = new mitk::StringProperty(l);
       //create a DataElement that holds the points
       mitk::Mesh::Pointer meshpointset = mitk::Mesh::New();
 

@@ -36,7 +36,7 @@ bool testGetAxisVectorVariants(mitk::Geometry3D* geometry)
       case 2: frontToBack = geometry->GetCornerPoint(false, false, false)-geometry->GetCornerPoint(false , false, true);  break; //7-2
     }
     std::cout << "Testing GetAxisVector(int) vs GetAxisVector(bool, bool, bool): ";
-    if(mitk::Equal(geometry->GetAxisVector(direction), frontToBack) == false)
+    if(mitk::Equal((double)geometry->GetAxisVector(direction), (double)frontToBack) == false)
     {
       std::cout<<"[FAILED]"<<std::endl;
       return false;
@@ -51,7 +51,7 @@ bool testGetAxisVectorExtent(mitk::Geometry3D* geometry)
   int direction;
   for(direction=0; direction<3; ++direction)
   {
-    if(mitk::Equal(geometry->GetAxisVector(direction).GetNorm(), geometry->GetExtentInMM(direction)) == false)
+    if(mitk::Equal((double)geometry->GetAxisVector(direction).GetNorm(), (double)geometry->GetExtentInMM(direction)) == false)
     {
       std::cout<<"[FAILED]"<<std::endl;
       return false;

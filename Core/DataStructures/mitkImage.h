@@ -177,10 +177,17 @@ public:
   //## @warning Initialize() by pic assumes a plane, evenly spaced geometry starting at (0,0,0).
   virtual void Initialize(ipPicDescriptor* pic, int channels = 1, int tDim = -1, int sDim = -1);
   
+  //##Documentation
+  //## initialize new (or re-initialize) image by @a vtkimagedata, a vtk-image. Only the header is 
+  //## used, not the data vector! Use SetVolume(vtkimage->GetScalarPointer()) to set the data vector.
+  //## @param tDim override time dimension in @a vtkimagedata (if >0 and <)
+  //## @param sDim override z-space dimension in @a vtkimagedata (if >0 and <)
+  virtual void Initialize(vtkImageData* vtkimagedata, int channels = 1, int tDim = -1, int sDim = -1);
+
   //##ModelId=3E102D2601DF
   //##Documentation
-  //## initialize new (or re-initialize) image by @a itkimage, an templated itk-image. Dimensions and @a
-  //## Geometry3D /@a Geometry2D  are set according to the tags in @a pic.
+  //## initialize new (or re-initialize) image by @a itkimage, a templated itk-image. Only the header is 
+  //## used, not the data vector! Use SetVolume(itkimage->GetBufferPointer()) to set the data vector.
   //## @param tDim override time dimension in @a itkimage (if >0 and <)
   //## @param sDim override z-space dimension in @a itkimage (if >0 and <)
   template <typename itkImageType> void InitializeByItk(itkImageType* itkimage, int channels = 1, int tDim = -1, int sDim=-1)

@@ -58,15 +58,11 @@ int mitkPropertyListTest(int argc, char* argv[])
   std::cout << "Testing MTime correctness when changing property value: ";
   boolProp = new mitk::BoolProperty(true);
   propList->SetProperty("test",boolProp); 
-  std::cout << "prop->MTIme() before: >" << boolProp->GetMTime() << "< ";
-  std::cout << (tBefore = propList->GetMTime());
+  tBefore = propList->GetMTime();
   boolProp->SetValue(true);
-  std::cout << "prop->MTIme() after: >" << boolProp->GetMTime() << "< ";
-  std::cout << (tAfter = propList->GetMTime());
+  tAfter = propList->GetMTime();
   boolProp->SetValue(false);
-  std::cout << "prop->MTIme() afterAll: >" << boolProp->GetMTime() << "< ";
   unsigned long tAfterAll = propList->GetMTime();
-  
   
   if (tBefore != tAfter || tAfterAll <= tAfter) {
     std::cout<<"[FAILED]"<<std::endl;

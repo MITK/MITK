@@ -205,3 +205,9 @@ void mitk::QmitkRenderWindow::Repaint()
 void mitk::QmitkRenderWindow::focusInEvent(QFocusEvent*)  {};
 //##ModelId=3E6D5DD403E2
 void mitk::QmitkRenderWindow::focusOutEvent(QFocusEvent*) {}; 
+
+//We have to put this in a file containing a class that is directly used
+//somewhere. Otherwise, e.g. when put in VtkRenderWindowInteractor.cpp, 
+//it is removed by the linker. 
+#include "VtkQRenderWindowInteractor.h"
+VtkQRenderWindowInteractorFactory vtkQRenderWindowInteractorFactory;

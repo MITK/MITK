@@ -57,7 +57,7 @@ int mitkActionTest(int argc, char* argv[])
 
   float floatproperty = 0.0;
   floatproperty = dynamic_cast<mitk::FloatProperty *>(action->GetProperty("floatproperty"))->GetValue();
-  if (floatproperty != 10.05)
+  if (floatproperty != 10.05f)
   {
     std::cout<<"[FAILED]"<<std::endl;
     return EXIT_FAILURE;

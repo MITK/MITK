@@ -43,7 +43,7 @@ int mitkStateTest(int argc, char* argv[])
   mitk::Transition* secondTransition = new mitk::Transition("secondTransition", count, count+1);
 
   //add transitions
-  if (	state->AddTransition( firstTransition ) || state->AddTransition( secondTransition ))
+  if (	!state->AddTransition( firstTransition ) || !state->AddTransition( secondTransition ))
   {
     std::cout<<"[FAILED]"<<std::endl;
     return EXIT_FAILURE;
@@ -76,11 +76,6 @@ int mitkStateTest(int argc, char* argv[])
     std::cout<<"[FAILED]"<<std::endl;
     return EXIT_FAILURE;
   }
-
-
-
-
-
 
   //well done!!! Passed!
   std::cout<<"[PASSED]"<<std::endl;

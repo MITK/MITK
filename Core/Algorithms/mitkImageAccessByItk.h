@@ -44,6 +44,14 @@ PURPOSE.  See the above copyright notices for more information.
       _accessByItk(mitkImage, itkImageTypeFunction, char, dimension) else              \
       _accessByItk(mitkImage, itkImageTypeFunction, unsigned char,  dimension)         \
 
+#define _accessMainTypesByItk(mitkImage, itkImageTypeFunction, dimension)              \
+      _accessByItk(mitkImage, itkImageTypeFunction, double, dimension) else            \
+      _accessByItk(mitkImage, itkImageTypeFunction, float, dimension) else             \
+      _accessByItk(mitkImage, itkImageTypeFunction, short, dimension) else             \
+      _accessByItk(mitkImage, itkImageTypeFunction, unsigned short, dimension) else    \
+      _accessByItk(mitkImage, itkImageTypeFunction, char, dimension) else              \
+      _accessByItk(mitkImage, itkImageTypeFunction, unsigned char,  dimension)         \
+
 //##Documentation
 //## @brief Access an mitk-image by an itk-image
 //## @ingroup Process
@@ -74,21 +82,13 @@ PURPOSE.  See the above copyright notices for more information.
 #define AccessByItk(mitkImage, itkImageTypeFunction)                                   \
 {                                                                                      \
   const std::type_info& typeId=*mitkImage->GetPixelType().GetTypeId();                 \
-  switch (mitkImage->GetDimension())                                                   \
+  assert(mitkImage->GetDimension()>=2 && mitkImage->GetDimension()<=4);                \
+  if(mitkImage->GetDimension()==2)                                                     \
   {                                                                                    \
-    case 2:                                                                            \
-      _accessAllTypesByItk(mitkImage, itkImageTypeFunction, 2)                         \
-      break;                                                                           \
-    case 3:                                                                            \
-      _accessAllTypesByItk(mitkImage, itkImageTypeFunction, 3)                         \
-      break;                                                                           \
-    case 4:                                                                            \
-      _accessAllTypesByItk(mitkImage, itkImageTypeFunction, 4)                         \
-      break;                                                                           \
-    default:                                                                           \
-      assert(mitkImage->GetDimension()>=2 && mitkImage->GetDimension()<=4);            \
-      break;                                                                           \
+    _accessMainTypesByItk(mitkImage, itkImageTypeFunction, 2);                         \
+    return;                                                                            \
   }                                                                                    \
+  _accessMainTypesByItk(mitkImage, itkImageTypeFunction, 3)                            \
 }
 
 //##Documentation
@@ -109,13 +109,13 @@ PURPOSE.  See the above copyright notices for more information.
 //----------------------- version with 1 additional paramater ------------------
 #define _accessByItk_1(mitkImage, itkImageTypeFunction, pixeltype, dimension, param1)            \
   if ( typeId == typeid(pixeltype) )                                                             \
-{                                                                                                \
+  {                                                                                              \
     typedef mitk::ImageToItk<pixeltype, dimension> ImageToItkType;                               \
     ImageToItkType::Pointer imagetoitk = ImageToItkType::New();                                  \
     imagetoitk->SetInput(mitkImage);                                                             \
     imagetoitk->Update();                                                                        \
     itkImageTypeFunction<pixeltype, dimension>(imagetoitk->GetOutput(), param1);                 \
-}
+  }
 
 #define _accessAllTypesByItk_1(mitkImage, itkImageTypeFunction, dimension, param1)               \
       _accessByItk_1(mitkImage, itkImageTypeFunction, double, dimension, param1) else            \
@@ -124,6 +124,14 @@ PURPOSE.  See the above copyright notices for more information.
       _accessByItk_1(mitkImage, itkImageTypeFunction, unsigned long, dimension, param1) else     \
       _accessByItk_1(mitkImage, itkImageTypeFunction, int, dimension, param1) else               \
       _accessByItk_1(mitkImage, itkImageTypeFunction, unsigned int, dimension, param1) else      \
+      _accessByItk_1(mitkImage, itkImageTypeFunction, short, dimension, param1) else             \
+      _accessByItk_1(mitkImage, itkImageTypeFunction, unsigned short, dimension, param1) else    \
+      _accessByItk_1(mitkImage, itkImageTypeFunction, char, dimension, param1) else              \
+      _accessByItk_1(mitkImage, itkImageTypeFunction, unsigned char,  dimension, param1)         \
+
+#define _accessMainTypesByItk_1(mitkImage, itkImageTypeFunction, dimension, param1)               \
+      _accessByItk_1(mitkImage, itkImageTypeFunction, double, dimension, param1) else            \
+      _accessByItk_1(mitkImage, itkImageTypeFunction, float, dimension, param1) else             \
       _accessByItk_1(mitkImage, itkImageTypeFunction, short, dimension, param1) else             \
       _accessByItk_1(mitkImage, itkImageTypeFunction, unsigned short, dimension, param1) else    \
       _accessByItk_1(mitkImage, itkImageTypeFunction, char, dimension, param1) else              \
@@ -144,21 +152,13 @@ PURPOSE.  See the above copyright notices for more information.
 #define AccessByItk_1(mitkImage, itkImageTypeFunction, param1)                                   \
 {                                                                                                \
   const std::type_info& typeId=*mitkImage->GetPixelType().GetTypeId();                           \
-  switch (mitkImage->GetDimension())                                                             \
+  assert(mitkImage->GetDimension()>=2 && mitkImage->GetDimension()<=4);                          \
+  if(mitkImage->GetDimension()==2)                                                               \
   {                                                                                              \
-    case 2:                                                                                      \
-      _accessAllTypesByItk_1(mitkImage, itkImageTypeFunction, 2, param1)                         \
-      break;                                                                                     \
-    case 3:                                                                                      \
-      _accessAllTypesByItk_1(mitkImage, itkImageTypeFunction, 3, param1)                         \
-      break;                                                                                     \
-    case 4:                                                                                      \
-      _accessAllTypesByItk_1(mitkImage, itkImageTypeFunction, 4, param1)                         \
-      break;                                                                                     \
-    default:                                                                                     \
-      assert(mitkImage->GetDimension()>=2 && mitkImage->GetDimension()<=4);                      \
-      break;                                                                                     \
+    _accessMainTypesByItk_1(mitkImage, itkImageTypeFunction, 2, param1);                         \
+    return;                                                                                      \
   }                                                                                              \
+  _accessMainTypesByItk_1(mitkImage, itkImageTypeFunction, 3, param1)                            \
 }
 
 //##Documentation
@@ -203,6 +203,14 @@ PURPOSE.  See the above copyright notices for more information.
       _accessByItk_2(mitkImage, itkImageTypeFunction, char, dimension, param1, param2) else              \
       _accessByItk_2(mitkImage, itkImageTypeFunction, unsigned char,  dimension, param1, param2)         \
 
+#define _accessMainTypesByItk_2(mitkImage, itkImageTypeFunction, dimension, param1, param2)              \
+      _accessByItk_2(mitkImage, itkImageTypeFunction, double, dimension, param1, param2) else            \
+      _accessByItk_2(mitkImage, itkImageTypeFunction, float, dimension, param1, param2) else             \
+      _accessByItk_2(mitkImage, itkImageTypeFunction, short, dimension, param1, param2) else             \
+      _accessByItk_2(mitkImage, itkImageTypeFunction, unsigned short, dimension, param1, param2) else    \
+      _accessByItk_2(mitkImage, itkImageTypeFunction, char, dimension, param1, param2) else              \
+      _accessByItk_2(mitkImage, itkImageTypeFunction, unsigned char,  dimension, param1, param2)         \
+
 //##Documentation
 //## @brief Access an mitk-image by an itk-image and pass two 
 //## additional parameters to the access-function
@@ -218,20 +226,13 @@ PURPOSE.  See the above copyright notices for more information.
 #define AccessByItk_2(mitkImage, itkImageTypeFunction, param1, param2)                           \
 {                                                                                                \
   const std::type_info& typeId=*mitkImage->GetPixelType().GetTypeId();                           \
-  switch (mitkImage->GetDimension())                                                             \
+  assert(mitkImage->GetDimension()>=2 && mitkImage->GetDimension()<=4);                          \
+  if(mitkImage->GetDimension()==2)                                                               \
   {                                                                                              \
-    case 2:                                                                                      \
-      _accessAllTypesByItk_2(mitkImage, itkImageTypeFunction, 2, param1, param2)                 \
-      break;                                                                                     \
-    case 3:                                                                                      \
-      _accessAllTypesByItk_2(mitkImage, itkImageTypeFunction, 3, param1, param2)                 \
-      break;                                                                                     \
-    case 4:                                                                                      \
-      _accessAllTypesByItk_2(mitkImage, itkImageTypeFunction, 4, param1, param2)                 \
-      break;                                                                                     \
-    default:                                                                                     \
-      assert(mitkImage->GetDimension()>=2 && mitkImage->GetDimension()<=4);                      \
-      break;                                                                                     \
+    _accessMainTypesByItk_2(mitkImage, itkImageTypeFunction, 2, param1, param2);                 \
+    return;                                                                                      \
+  }                                                                                              \
+  _accessMainTypesByItk_2(mitkImage, itkImageTypeFunction, 3, param1, param2)                    \
   }                                                                                              \
 }
 

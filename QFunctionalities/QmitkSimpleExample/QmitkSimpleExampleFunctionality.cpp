@@ -93,7 +93,7 @@ void QmitkSimpleExampleFunctionality::selectSliceWidgetXZ(int y)
     const mitk::Geometry2D* g2d = multiWidget->mitkWidget3->GetRenderer()->GetWorldGeometry();
     const mitk::PlaneGeometry* pg = dynamic_cast<const mitk::PlaneGeometry*>(g2d);
     mitk::PlaneView pv = pg->GetPlaneView();
-    pv.point.y = y;
+    pv.point.x=y; //y = y;
     mitk::PlaneGeometry::Pointer plane = mitk::PlaneGeometry::New();  
     plane->SetPlaneView(pv);
     multiWidget->mitkWidget3->GetRenderer()->SetWorldGeometry(plane);
@@ -130,10 +130,13 @@ void QmitkSimpleExampleFunctionality::initWidgets()
 		it->next();
 		printf("\nrequesting boundingbox\n");   
 		mitk::DataTreeNode::Pointer node = it->get();
-		if (node->GetData() != NULL ) {
+		mitk::BaseData::Pointer data=node->GetData();
+		if((data!=NULL) && (dynamic_cast<mitk::Geometry2DData*>(node->GetData()) == NULL ))
+		{
 			// get 
-				if (node->GetData()->GetGeometry() != NULL	) {
-				mitk::BoundingBox::ConstPointer bb = node->GetData()->GetGeometry()->GetBoundingBox();
+			if (data->GetGeometry() != NULL	) 
+			{
+				mitk::BoundingBox::ConstPointer bb = data->GetGeometry()->GetBoundingBox();
 				printf("boundsArrayType\n");
 				const mitk::BoundingBox::BoundsArrayType bounds = bb->GetBounds();
 				printf("\nboundingbox\n");   

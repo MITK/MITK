@@ -148,9 +148,9 @@ bool mitk::PicHelper::SetGeometry2D(ipPicDescriptor* pic, int s, SlicedGeometry3
       mitk::Vector3D pixelSize;
       ScalarType zPosition = 0.0f;
 
-      if(s != -1)
+      if(s >= 0)
       {
-        if(count < s)
+        if(count < (unsigned int) s)
           return false;
         count = s;
       }

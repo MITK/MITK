@@ -32,7 +32,6 @@
 ipPicDescriptor *ipPicClone( ipPicDescriptor *pic )
 {
   ipPicDescriptor *clone;
-  ipUInt4_t size;
 
   clone = ipPicCopyHeader( pic,
                            NULL );
@@ -43,10 +42,19 @@ ipPicDescriptor *ipPicClone( ipPicDescriptor *pic )
 
   clone->info->write_protect = pic->info->write_protect;
 
-  size = _ipPicSize( pic );
+  if( !pic->data )
+    {
+      clone->data = NULL;
+    }
+  else
+    {
+      ipUInt4_t size;
 
-  clone->data = malloc( size );
-  memcpy( clone->data, pic->data, size );
+      size = _ipPicSize( pic );
+
+      clone->data = malloc( size );
+      memcpy( clone->data, pic->data, size );
+    }
 
   return( clone );
 }

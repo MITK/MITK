@@ -98,7 +98,7 @@ int main( int argc, char *argv[] )
 
   ipPicAddSubTag( tsv3, tsv2 );
 
-  ipPicDelSubTag( tsv, "ANNOTATION" );
+  ipPicDelSubTag( tsv, "TYPE" );
 
   ipPicPut( argv[2],
             pic );

@@ -50,9 +50,13 @@ ipPicDelSubTag( ipPicTSV_t *parent, char *t )
 
   which = _ipPicFindTag( parent->value, tag );
 
-  if( which )
-    parent->n[0]--;
+  if( !which )
+    return( NULL );
 
+  if( which->tsv->type == ipPicTSV )
+    return( NULL );
+
+  parent->n[0]--;
   return( _ipPicRemoveTag( (_ipPicTagsElement_t **)&(parent->value), which, tag ) );
 }
 

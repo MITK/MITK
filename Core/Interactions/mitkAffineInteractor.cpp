@@ -9,11 +9,10 @@
 
 #include <math.h>
 
-
 mitk::AffineInteractor::AffineInteractor(std::string type, DataTreeNode* dataTreeNode)
 	 : Interactor(type, dataTreeNode)
 {
-  m_ScaleFactor = 1.0;
+  //m_ScaleFactor = 1.0;
 }
 
 bool mitk::AffineInteractor::ExecuteSideEffect(int sideEffectId, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId)
@@ -44,7 +43,7 @@ bool mitk::AffineInteractor::ExecuteSideEffect(int sideEffectId, mitk::StateEven
     AffineTransformationOperation* doOp = new mitk::AffineTransformationOperation(OpMOVE, newPosition, 0.0, 0); // Index is not used here
 		if (m_UndoEnabled)	//write to UndoMechanism
 		{
-      double pos[3];
+      mitk::ScalarType pos[3];
       geometry->GetTransform()->GetPosition(pos);
       mitk::ITKPoint3D oldPosition;
       oldPosition[0] = pos[0];
@@ -72,7 +71,6 @@ bool mitk::AffineInteractor::ExecuteSideEffect(int sideEffectId, mitk::StateEven
 		mitk::vm2itk(posEvent->GetWorldPosition(), newPosition);
     // save mouse down position
     m_lastRotatePosition = newPosition.GetVectorFromOrigin();
-    mitk::ScalarType lastOrientation[3];
     ok = true;
     break;
   }
@@ -92,10 +90,14 @@ bool mitk::AffineInteractor::ExecuteSideEffect(int sideEffectId, mitk::StateEven
 
     newPosition -= dataPosition;  // calculate vector from center of the data object to the mouse position
     
-    mitk::ITKVector3D startPosition = m_lastRotatePosition - dataPosition;  // calculate vector from center of the data object to the last mouse position
+    mitk::ITKVector3D startPosition = m_lastRotatePosition - dataPosition;  // calculate vector from center of the data object to the last mouse position              
 
-    mitk::ITKVector3D rotationaxis =  newPosition * startPosition;  // calculate rotation axis
-    double angle = acos( (newPosition * startPosition )/(startPosition.GetNorm() * newPosition.GetNorm())) * (180/(4 * atan(1))); // calculate rotation angle (in degree)
+    mitk::ITKVector3D rotationaxis;   // calculate rotation axis (by calculating the cross produkt of the vectors)
+    rotationaxis[0] =  startPosition[1] * newPosition[2] - startPosition[2] * newPosition[1];
+    rotationaxis[1] =  startPosition[2] * newPosition[0] - startPosition[0] * newPosition[2];
+    rotationaxis[2] =  startPosition[0] * newPosition[1] - startPosition[1] * newPosition[0];
+    
+    mitk::ScalarType angle = atan2(rotationaxis.GetNorm(), newPosition * startPosition) * (180/(4 * atan(1)));    
     
     m_lastRotatePosition = dummy.GetVectorFromOrigin(); // save actual mouse position as last mouse position
 
@@ -104,11 +106,11 @@ bool mitk::AffineInteractor::ExecuteSideEffect(int sideEffectId, mitk::StateEven
     dummy[2] = rotationaxis[2];
     
     // create operation with angle and axis
-    AffineTransformationOperation* doOp = new mitk::AffineTransformationOperation(OpROTATE, dummy, -angle, 0); // Index is not used here
-		if (m_UndoEnabled)	//write to UndoMechanism
-		{     
-      
-      AffineTransformationOperation* undoOp = new mitk::AffineTransformationOperation(OpROTATE, dummy, angle, 0); // Index is not used here
+    AffineTransformationOperation* doOp = new mitk::AffineTransformationOperation(OpROTATE, dummy, angle, 0); // Index is not used here
+		
+    if (m_UndoEnabled)	//write to UndoMechanism
+		{           
+      AffineTransformationOperation* undoOp = new mitk::AffineTransformationOperation(OpROTATE, dummy, -angle, 0); // Index is not used here
 			OperationEvent *operationEvent = new OperationEvent(geometry,
 																	doOp, undoOp,
 																	objectEventId, groupEventId);
@@ -155,9 +157,10 @@ bool mitk::AffineInteractor::ExecuteSideEffect(int sideEffectId, mitk::StateEven
     newScale[2] = (newScale[2] < 1) ? 1 : newScale[2];
 
     AffineTransformationOperation* doOp = new mitk::AffineTransformationOperation(OpSCALE, newScale, 0.0, 0); // Index is not used here
+
 		if (m_UndoEnabled)	//write to UndoMechanism
 		{     
-      ScalarType oldScale[3];
+      mitk::ScalarType oldScale[3];
       geometry->GetTransform()->GetScale(oldScale);
       mitk::ITKPoint3D oldScaleData = oldScale;
       

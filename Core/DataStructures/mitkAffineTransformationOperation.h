@@ -2,7 +2,7 @@
 #define MITKAFFINETRANSFORMATIONOPERATION_H_HEADER_INCLUDED_C188C29F
 
 #include "mitkPointOperation.h"
-
+#include "mitkVector.h"
 
 namespace mitk {
 
@@ -10,11 +10,11 @@ namespace mitk {
 class AffineTransformationOperation : public PointOperation
 {
 public:
-  AffineTransformationOperation(OperationType operationType, ITKPoint3D point, double angle, int index);
+  AffineTransformationOperation(OperationType operationType, ITKPoint3D point, ScalarType angle, int index);
   virtual ~AffineTransformationOperation(void);
-  double GetAngle();
+  ScalarType GetAngle();
 protected:
-  double m_Angle;
+  ScalarType m_Angle;
 };
 
 } // namespace mitk

@@ -37,7 +37,7 @@ protected:
   mitk::ITKPoint3D m_lastScalePosition;
   mitk::ITKPoint3D m_lastScaleData;
   mitk::ITKVector3D m_lastRotatePosition;
-  float m_ScaleFactor;
+  //mitk::ScalarType m_ScaleFactor;
 };
 
 } // namespace mitk

@@ -7,30 +7,37 @@
 namespace mitk {
 
 //##ModelId=3EF99DB6009C
-template <class T>
+template <typename T>
 class GenericProperty : public BaseProperty
 {
   public:
+   
     mitkClassMacro(GenericProperty, BaseProperty);
-    itkNewMacro(Self);
+//    itkNewMacro(Self);
+
     //##ModelId=3EF99E2C0290
-    GenericProperty();
-
+    GenericProperty() {};
+    GenericProperty(T x) : m_Value(x) {};	
     //##ModelId=3EF99E2C02AE
-    virtual ~GenericProperty();
+    virtual ~GenericProperty() {}; 
     //##ModelId=3EF99E3A0196
-    virtual bool operator==(const BaseProperty& property) const;
-
-
+    virtual bool operator==(const BaseProperty& property) const {
+        const Self *other = dynamic_cast<const Self*>(&property);
+        if(other==NULL) return false;
+        return other->m_Value==m_Value;
+    }
+    virtual T GetValue() {
+	return m_Value;
+    }
+    virtual void SetValue(T x) {
+	m_Value = x;
+    }	
   protected:
     //##ModelId=3EF99E45001F
-    float m_Value;
-
+    T m_Value;
 
 };
 
 } // namespace mitk
-
-
 
 #endif /* MITKGENERICPROPERTY_H_HEADER_INCLUDED_C1061CEE */

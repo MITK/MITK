@@ -62,8 +62,15 @@ public:
   itkGetMacro(OutsideValue, mitk::BoundingObjectCutter::PixelType);
   itkSetMacro(UseInsideValue, bool);
   itkGetMacro(UseInsideValue, bool);
-
   itkBooleanMacro(UseInsideValue);
+
+  itkSetMacro(UseRegionGrower, bool);
+  itkGetMacro(UseRegionGrower, bool);
+  itkBooleanMacro(UseRegionGrower);
+
+  itkSetClampMacro(ConfidenceFactor, float, 0.0, 10.0);
+  itkGetMacro(ConfidenceFactor, float);
+  
   
   //ItkImageType::Pointer m_ItkImage;
 protected:
@@ -74,6 +81,8 @@ protected:
   PixelType m_InsideValue;
   PixelType m_OutsideValue;
   bool m_UseInsideValue;
+  bool m_UseRegionGrower;
+  float m_ConfidenceFactor;
 
 };
 

@@ -11,7 +11,8 @@
 
 
 mitk::BoundingObjectCutter::BoundingObjectCutter()
-: m_UseInsideValue(false), m_OutsideValue(0), m_InsideValue(1), m_BoundingObject(NULL)
+: m_UseInsideValue(false), m_OutsideValue(0), m_InsideValue(1), m_BoundingObject(NULL), 
+  m_ConfidenceFactor(1.92), m_UseRegionGrower(true)
 {  
 }
 
@@ -94,46 +95,51 @@ void mitk::BoundingObjectCutter::GenerateData()
         it.Value() = m_OutsideValue;
     }
 
-    std::cout << " cutting done, now starting region grower.\n";
-    // now start a regiongrowing filter
-    ConnectedFilterType::Pointer confidenceConnected = ConnectedFilterType::New();
-    confidenceConnected->SetInput( itkImageCut );
-    confidenceConnected->SetMultiplier( 1.88 );
-    confidenceConnected->SetNumberOfIterations( 5 );
-    confidenceConnected->SetReplaceValue( 10000 );
-    
-    // Set seedpoint to center of image
-    ItkImageType::IndexType index; 
-    index[0] = static_cast<ItkImageType::IndexType::IndexValueType>(size[0] / 2.0);
-    index[1] = static_cast<ItkImageType::IndexType::IndexValueType>(size[1] / 2.0);
-    index[2] = static_cast<ItkImageType::IndexType::IndexValueType>(size[2] / 2.0);
-    confidenceConnected->SetSeed( index );
-    
-    confidenceConnected->SetInitialNeighborhoodRadius( 2 );
-  
-    //MultiplyImageFilterType::Pointer multiplyFilter = MultiplyImageFilterType::New();
-    //multiplyFilter->SetInput1(confidenceConnected->GetOutput());
-    //multiplyFilter->SetInput2(itkImageCut);
-
-    try
-    {
-      //multiplyFilter->Update();
-      confidenceConnected->Update();
-    }
-    catch( itk::ExceptionObject & excep )
-    {
-      std::cerr << "Exception while updating RegiongrowingFilter!" << std::endl;
-      std::cerr << excep << std::endl;
-    }
-
-    // convert the itk image back to an mitk image and set it as outout for this filter
     mitk::Image::Pointer outputImage = this->GetOutput();
 
-    //outputImage->InitializeByItk(multiplyFilter->GetOutput());
-    //outputImage->SetVolume(multiplyFilter->GetOutput()->GetBufferPointer());
+    if (m_UseRegionGrower)
+    {
+      std::cout << " cutting done, now starting region grower.\n";
+      // now start a regiongrowing filter
+      ConnectedFilterType::Pointer confidenceConnected = ConnectedFilterType::New();
+      confidenceConnected->SetInput( itkImageCut );
+      //confidenceConnected->SetMultiplier( 1.88 );
+      confidenceConnected->SetMultiplier( m_ConfidenceFactor );
+      confidenceConnected->SetNumberOfIterations( 5 );
+      confidenceConnected->SetReplaceValue( 10000 );
+      
+      // Set seedpoint to center of image
+      ItkImageType::IndexType index; 
+      index[0] = static_cast<ItkImageType::IndexType::IndexValueType>(size[0] / 2.0);
+      index[1] = static_cast<ItkImageType::IndexType::IndexValueType>(size[1] / 2.0);
+      index[2] = static_cast<ItkImageType::IndexType::IndexValueType>(size[2] / 2.0);
+      confidenceConnected->SetSeed( index );
+      
+      confidenceConnected->SetInitialNeighborhoodRadius( 2 );
+    
+      //MultiplyImageFilterType::Pointer multiplyFilter = MultiplyImageFilterType::New();
+      //multiplyFilter->SetInput1(confidenceConnected->GetOutput());
+      //multiplyFilter->SetInput2(itkImageCut);
 
-    outputImage->InitializeByItk(confidenceConnected->GetOutput());
-    outputImage->SetVolume(confidenceConnected->GetOutput()->GetBufferPointer());
-
+      try
+      {
+        //multiplyFilter->Update();
+        confidenceConnected->Update();
+      }
+      catch( itk::ExceptionObject & excep )
+      {
+        std::cerr << "Exception while updating RegiongrowingFilter!" << std::endl;
+        std::cerr << excep << std::endl;
+      }
+      // convert the itk image back to an mitk image and set it as output for this filter
+      outputImage->InitializeByItk(confidenceConnected->GetOutput());
+      outputImage->SetVolume(confidenceConnected->GetOutput()->GetBufferPointer());
+    }
+    else
+    {
+      // convert the itk image back to an mitk image and set it as output for this filter
+      outputImage->InitializeByItk(itkImageCut.GetPointer());
+      outputImage->SetVolume(itkImageCut->GetBufferPointer());
+    }
     //this->GraftOutput(outputImage);
 }

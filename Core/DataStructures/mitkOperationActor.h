@@ -13,7 +13,7 @@ class OperationActor
 {
 public:
     //##ModelId=3E5F62530359
-    virtual void SetOperation(Operation* operation) = 0;
+    virtual void ExecuteOperation(Operation* operation) = 0;
 
 };
 }

@@ -61,7 +61,7 @@ bool mitk::StateMachineFactory::LoadBehavior(std::string fileName)
    QXmlInputSource source( &xmlFile );
    QXmlSimpleReader reader;
    mitk::StateMachineFactory* stateMachineFactory = new StateMachineFactory();
-   reader.setContentHandler( stateMachineFactory );
+   reader.setContentHandler( stateMachineFactory );//this???
    reader.parse( source );
   
    delete stateMachineFactory;
@@ -75,26 +75,39 @@ bool mitk::StateMachineFactory::LoadBehavior(std::string fileName)
 //## size at the end, then the StateMachine is correct
 bool mitk::StateMachineFactory::parse(StateMap *states, StateMapIter thisState, HistorySet *history)
 {
-
+	history->insert((thisState->second)->GetId());//log our path  //or thisState->first
 	std::set<int> nextStatesSet = (thisState->second)->GetAllNextStates();
-	
+
+//for debugging
+//	int thisStateId = (thisState->second)->GetId();
+//	int firstNextState = *nextStatesSet.begin();
+
+
+	//remove loops in nextStatesSet; 
+	//nether do we have to go there, nor will it clear a deadlock
+	std::set<int>::iterator position = nextStatesSet.find((thisState->second)->GetId());
+	if (position != nextStatesSet.end())
+	{
+		nextStatesSet.erase(position);
+	}
+
+	//nextStatesSet is empty, so deadlock!
+	if ( nextStatesSet.empty() )
+	{
+		std::cout<<"Warnung: Ein inkonsistenter Zustand (oder ein Endzustand) wird erzeugt!"<<endl;	
+		return true;//Jedoch erlaubt!!!z.B. als Endzustand
+	}
+	bool ok;
 	//go through all Transitions of thisState and look if we have allready been in this state
 	for (std::set<int>::iterator i = nextStatesSet.begin(); i != nextStatesSet.end();  i++)
 	{
 		if ( history->find(*i) == history->end() )//wenn wir noch nicht in dieser NextState waren
 		{
-			history->insert(*i);//log our path
 			StateMapIter nextState = states->find(*i);//search the iterator for our nextState
-			return parse( states, nextState, history);//recusive path into the next state
+			ok = parse( states, nextState, history);//recusive path into the next state
 		}
-		else if ( nextStatesSet.size()<= 1 )//wenn gleiche State oder wenn kein nextState vorhanden, dann Deadlock
-		{
-			std::cout<<"Warnung: Ein inkonsistenter Zustand wird erzeugt!"<<endl;
-			return true;//erlaubt!!!
-		}
-
 	}
-	return true;
+	return ok;
 }
 
 //##ModelId=3E5B428F010B
@@ -102,6 +115,7 @@ bool mitk::StateMachineFactory::parse(StateMap *states, StateMapIter thisState, 
 //## sets the pointers in Transition (setNextState(..)) according to the extracted xml-file content
 bool mitk::StateMachineFactory::ConnectStates(StateMap *states)
 {
+
 	//parse all the given states an check for deadlock or not connected states
 	HistorySet *history = new HistorySet;
 
@@ -116,9 +130,9 @@ bool mitk::StateMachineFactory::ConnectStates(StateMap *states)
 	else //ether !ok or sizeA!=sizeB
 	{
 		delete history;
-		return false;
+		std::cout<<"Warnung: Ein unereichbarer Zustand wird aufgebaut. Ueberprüfen sie die Zustands- Konfigurations- Datei'statemachineFactory.cpp"<<endl;	
+		//return false;//better go on and build connect the states than quit
 	}
-
 
 	//connect all the states
 	for (StateMapIter tempState = states->begin(); tempState != states->end();  tempState++)
@@ -139,14 +153,14 @@ bool mitk::StateMachineFactory::startElement( const QString&, const QString&, co
 	qName.ascii(); //for debuging
 	
 	//abfangen atts.value(#) fehler!
-
+/*
 	if( qName == "mitkInteraktionStates" )								//e.g.<mitkInteraktionStates STYLE="Powerpoint">
 	{
 		NULL;//new statemachine pattern
 		//evtl. unterschied in STYLES PowerPoint oder PhotoShop usw...
 	}
 
-	else if ( qName == "stateMachine" ) 									//e.g. <stateMachine NAME="global">
+	else*/ if ( qName == "stateMachine" ) 									//e.g. <stateMachine NAME="global">
 	{
 		m_AktStateMachineName = atts.value( NAME.c_str() ).latin1() ;
 	}
@@ -165,7 +179,7 @@ bool mitk::StateMachineFactory::startElement( const QString&, const QString&, co
 
 	else if ( qName == "transition" )										//e.g. <transition NAME="neues Element" NEXT_STATE_ID="2" EVENT="1" SIDE_EFFECT="0" />
 	{
-		int a = atts.value( NEXT_STATE_ID.c_str() ).toInt();
+//		int a = atts.value( NEXT_STATE_ID.c_str() ).toInt(); //for debugging
 
 		m_AktState->AddTransition( 
 					atts.value(NAME.c_str()).latin1(), 
@@ -173,8 +187,8 @@ bool mitk::StateMachineFactory::startElement( const QString&, const QString&, co
 					atts.value(EVENT_ID.c_str()).toInt(),
 					atts.value(SIDE_EFFECT_ID.c_str()).toInt() );
 	}
-	else
-		NULL;
+	/*else
+		NULL;*/
 	
     return true;
 }
@@ -183,14 +197,12 @@ bool mitk::StateMachineFactory::startElement( const QString&, const QString&, co
 bool mitk::StateMachineFactory::endElement( const QString&, const QString&, const QString & qName )
 {
 	//abfangen atts.value(#) fehler!
-
+    bool ok = true;
+	qName.ascii();
     if (qName == "stateMachine")
 	{
-			bool ok = ConnectStates(&m_AllStates);
+			ok = ConnectStates(&m_AllStates);
 			m_AllStates.clear();
-			if (!ok)
-				return false;
 	}
-
-	return true;
+	return ok;
 }

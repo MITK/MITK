@@ -1,5 +1,8 @@
 #include "EventMapper.h"
+#include "PositionEvent.h"
 #include <string>
+#include "FocusManager.h"
+
 //XML Event
 //##ModelId=3E788FC000E5
 const std::string mitk::EventMapper::STYLE = "STYLE";
@@ -17,10 +20,11 @@ const std::string mitk::EventMapper::BUTTONSTATE = "BUTTONSTATE";
 const std::string mitk::EventMapper::KEY = "KEY";
 
 //for Linker ->no undefined reference
-mitk::StateMachine *mitk::EventMapper::m_StateMachine;
+mitk::StateMachine *mitk::EventMapper::m_GlobalStateMachine;
 EventDescriptionVec mitk::EventMapper::m_EventDescriptions;
 mitk::StateEvent mitk::EventMapper::m_StateEvent;
 std::string mitk::EventMapper::m_StyleName;
+
 
 //array with string to key for mapping string from xml-file to int
 StringIntArrayStruct mitkConstType[] = {
@@ -369,11 +373,17 @@ StringIntArrayStruct mitkConstArray[] = {
 
 //##ModelId=3E5B349600CB
 //##Documentation
-//##
-void mitk::EventMapper::SetStateMachine(StateMachine *stateMachine)
+//## set the global StateMachine. If temporaryly changed, 
+//## then copy the old statemachine with GetStateMachine()
+void mitk::EventMapper::SetGlobalStateMachine(StateMachine *stateMachine)
 {
-//was mit alter Statemachine-Zeiger?
-	mitk::EventMapper::m_StateMachine = stateMachine;
+	m_GlobalStateMachine = stateMachine;
+}
+
+//##ModelId=3EDAFB81012E
+mitk::StateMachine* mitk::EventMapper::GetGlobalStateMachine()
+{
+	return m_GlobalStateMachine;
 }
 
 //##ModelId=3E5B34CF0041
@@ -382,21 +392,19 @@ void mitk::EventMapper::SetStateMachine(StateMachine *stateMachine)
 //## and if included 
 bool mitk::EventMapper::MapEvent(Event* event)
 {
-	if (m_StateMachine == NULL)
+	if (m_GlobalStateMachine == NULL)
 		return false;
 
-	int i;
+	unsigned int i;
 	for (i = 0;
-		(i < ((int)(m_EventDescriptions.size()))) ||
+		(i < m_EventDescriptions.size()) &&
 		!(m_EventDescriptions[i] == *event);//insecure[] but .at(i) is not supported before std.vers 3.0
 		i++){}
-	if (!(m_EventDescriptions[i] == *event))//insecure
-		//searched entry not found
+	if (!(m_EventDescriptions[i] == *event))//searched entry not found
 		return false;
-
+	//generate StateEvent and send to StateMachine, which does everything further!
 	m_StateEvent.Set( (m_EventDescriptions[i]).GetId(), event );
-	m_StateMachine->HandleEvent(&m_StateEvent);
-	return true;
+	return m_GlobalStateMachine->HandleEvent(&m_StateEvent);
 }
 
 //##ModelId=3E5B35140072
@@ -429,7 +437,7 @@ bool mitk::EventMapper::LoadBehavior(std::string fileName)
 bool mitk::EventMapper::startElement( const QString&, const QString&, const QString& qName, const QXmlAttributes& atts )
 {
 
-	qName.ascii(); //for debuging
+	//qName.ascii(); //for debuging
 	if( qName == "events")
 	{
 		m_StyleName = atts.value( STYLE.c_str() ).latin1();
@@ -437,12 +445,14 @@ bool mitk::EventMapper::startElement( const QString&, const QString&, const QStr
 	else if ( qName == "event")
 	{
 		//neuen Eintrag in der m_EventDescriptions
-		EventDescription tempEventDescr( atts.value( NAME.c_str() ).latin1(),
-										 atts.value( ID.c_str() ).toInt(),
-										 atts.value( TYPE.c_str() ).toInt(),
-										 atts.value( BUTTON.c_str() ).toInt(),
-										 atts.value( BUTTONSTATE.c_str() ).toInt(),
-										 atts.value( KEY.c_str() ).toInt() );
+		bool ok;
+		EventDescription tempEventDescr( atts.value( TYPE.c_str() ).toInt(),
+										 (( atts.value((QString)(BUTTON.c_str())) ).remove(0,2) ).toInt( &ok, 16 ),
+										 (( atts.value((QString)(BUTTONSTATE.c_str())) ).remove(0,2) ).toInt( &ok, 16 ),
+										 (( atts.value((QString)(KEY.c_str())) ).remove(0,2) ).toInt( &ok, 16 ),
+										 atts.value( NAME.c_str() ).latin1(),
+										 atts.value( ID.c_str() ).toInt());
+		if (!ok) std::cout<<"error reading Event::Button, ButtonState or Key!"<<std::endl;
 		m_EventDescriptions.push_back(tempEventDescr);
 	}
 	return true;
@@ -453,3 +463,611 @@ std::string mitk::EventMapper::GetStyleName()
 {
 	return m_StyleName;
 }
+
+/*
+16.05.2003 QT-FAQ:http://lists.trolltech.com/qt-interest/2001-03/thread00611-0.html
+Trolltech Home |  Qt-interest Home | Recent Threads | All Threads | Author | Date 	
+All threads index page 5
+Qt-interest Archive, March 2001
+How to receive event's name?
+Pages: Prev | 1 | 2 | Next
+Message 1 in thread
+
+    * Subject: How to receive event's name?
+    * From: "Denis Yu. Konovalchik" <D.Konovalchik@xxxxxxxxxxxxxx>
+    * Date: Tue, 20 Mar 2001 12:18:50 +0500
+    * Organization: Compass Plus
+    * Reply-to: =?koi8-r?B?5MXOydMg68/Oz9fBzNjeycs=?= <D.Konovalchik@xxxxxxxxxxxxxx>
+    * To: qt-interest@xxxxxxxxxxxxx
+
+Dobry den' ;-)
+
+Not too long ago I've decided to make a special debug window for my
+application to catch and translate specific Qt events, and met the
+problem.
+Is there a way to obtain the Qt event's name by its type() value (for example,
+ 9 => "FocusOut", 16=> "Destroy") without the big case operator with
+ the manual translation of each event type?
+
+-- 
+ [ signature omitted ] 
+
+Message 2 in thread
+
+    * Subject: Re: How to receive event's name?
+    * From: "Roy Dennington" <roy@xxxxxxxxxxxx>
+    * Date: Tue, 20 Mar 2001 08:23:29 -0600
+    * Cc: <D.Konovalchik@xxxxxxxxxxxxxx>
+    * To: "Qt-Interest" <qt-interest@xxxxxxxxxxxxx>
+
+Denis,
+
+> Is there a way to obtain the Qt event's name by its type() value (for
+example,
+>  9 => "FocusOut", 16=> "Destroy") without the big case operator with
+>  the manual translation of each event type?
+
+Here is a more elegant solution (untested and incomplete). You will have
+to load event_array into event_string during initialization.
+
+struct EventArray
+{
+  int type;
+  char* string;
+};
+
+EventArray event_array[] =
+{
+  { QEvent::None, "None" },
+  { QEvent::Timer, "Timer" },
+  { QEvent::MouseButtonPress, "MouseButtonPress" },
+  { QEvent::MouseButtonRelease, "MouseButtonRelease" },
+  { QEvent::MouseButtonDblClick, "MouseButtonDblClick" },
+  { QEvent::MouseMove, "MouseMove" },
+  { QEvent::KeyPress, "KeyPress" },
+  { QEvent::KeyRelease, "KeyRelease" },
+  { QEvent::FocusIn, "FocusIn" },
+  { QEvent::FocusOut, "FocusOut" },
+  { QEvent::Enter, "Enter" },
+  { QEvent::Leave, "Leave" },
+  { QEvent::Paint, "Paint" },
+  { QEvent::Move, "Move" },
+  { QEvent::Resize, "Resize" },
+  { QEvent::Create, "Create" },
+  { QEvent::Destroy, "Destroy" },
+  { QEvent::Show, "Show" },
+  { QEvent::Hide, "Hide" },
+  { QEvent::Close, "Close" },
+  { QEvent::Quit, "Quit" },
+  { QEvent::Reparent, "Reparent" },
+  { QEvent::ShowMinimized, "ShowMinimized" },
+  { QEvent::ShowNormal, "ShowNormal" },
+  { QEvent::WindowActivate, "WindowActivate" },
+  { QEvent::WindowDeactivate, "WindowDeactivate" },
+  { QEvent::ShowToParent, "ShowToParent" },
+  { QEvent::HideToParent, "HideToParent" },
+  { QEvent::ShowMaximized, "ShowMaximized" },
+  { QEvent::Accel, "Accel" },
+  { QEvent::Wheel, "Wheel" },
+  { QEvent::AccelAvailable, "AccelAvailable" },
+  { QEvent::CaptionChange, "CaptionChange" },
+  { QEvent::IconChange, "IconChange" },
+  { QEvent::ParentFontChange, "ParentFontChange" },
+  { QEvent::ApplicationFontChange, "ApplicationFontChange" },
+  { QEvent::ParentPaletteChange, "ParentPaletteChange" },
+  { QEvent::ApplicationPaletteChange, "ApplicationPaletteChange" },
+  { QEvent::Clipboard, "Clipboard" },
+  { QEvent::Speech, "Speech" },
+  { QEvent::SockAct, "SockAct" },
+  { QEvent::AccelOverride, "AccelOverride" },
+  { QEvent::DragEnter, "DragEnter" },
+  { QEvent::DragMove, "DragMove" },
+  { QEvent::DragLeave, "DragLeave" },
+  { QEvent::Drop, "Drop" },
+  { QEvent::DragResponse, "DragResponse" },
+  { QEvent::ChildInserted, "ChildInserted" },
+  { QEvent::ChildRemoved, "ChildRemoved" },
+  { QEvent::LayoutHint, "LayoutHint" },
+  { QEvent::ShowWindowRequest, "ShowWindowRequest" },
+  { QEvent::ActivateControl, "ActivateControl" },
+  { QEvent::DeactivateControl, "DeactivateControl" },
+  { QEvent::User, "User" },
+  { 0, 0 }
+};
+
+QIntDict<char> event_string(59);
+
+int n = -1;
+while ( event_array[++n].string )
+  event_string.insert( event_array[n].type, event_array[n].string );
+
+To use:
+  char* str = event_string[event];  // very efficient!
+
+Enjoy,
+Roy Dennington
+roy@semichem.com
+
+
+
+Message 3 in thread
+
+    * Subject: Re: How to receive event's name?
+    * From: Johann Gunnar Oskarsson <johanngo@xxxxxxxxxxx>
+    * Date: Tue, 20 Mar 2001 15:49:01 +0000
+    * Cc: <D.Konovalchik@xxxxxxxxxxxxxx>, "Roy Dennington" <roy@xxxxxxxxxxxx>
+    * Organization: Firmanet
+    * To: "Qt-Interest" <qt-interest@xxxxxxxxxxxxx>
+
+Hi,
+
+On Tuesday 20 March 2001 14:23, Roy Dennington wrote:
+> Denis,
+>
+> > Is there a way to obtain the Qt event's name by its type() value (for
+>
+> example,
+>
+> >  9 => "FocusOut", 16=> "Destroy") without the big case operator with
+> >  the manual translation of each event type?
+>
+> Here is a more elegant solution (untested and incomplete). You will have
+> to load event_array into event_string during initialization.
+
+This is, IMO, a lot better and safer:
+
+// Declaration:
+std::map< int, std::string > event_map;
+
+// Run time initialization (has to be in a function or constructor):
+
+event_map[QEvent::None] = "None";
+event_map[QEvent::Timer] = "Timer";
+event_map[QEvent::MouseButtonPress] = "MouseButtonPress";
+event_map[QEvent::MouseButtonRelease] = "MouseButtonRelease";
+event_map[QEvent::MouseButtonDblClick] = "MouseButtonDblClick";
+event_map[QEvent::MouseMove] = "MouseMove";
+event_map[QEvent::KeyPress] = "KeyPress";
+event_map[QEvent::KeyRelease] = "KeyRelease";
+event_map[QEvent::FocusIn] = "FocusIn";
+event_map[QEvent::FocusOut] = "FocusOut";
+event_map[QEvent::Enter] = "Enter";
+event_map[QEvent::Leave] = "Leave";
+event_map[QEvent::Paint] = "Paint";
+event_map[QEvent::Move] = "Move";
+event_map[QEvent::Resize] = "Resize";
+event_map[QEvent::Create] = "Create";
+event_map[QEvent::Destroy] = "Destroy";
+event_map[QEvent::Show] = "Show";
+event_map[QEvent::Hide] = "Hide";
+event_map[QEvent::Close] = "Close";
+event_map[QEvent::Quit] = "Quit";
+event_map[QEvent::Reparent] = "Reparent";
+event_map[QEvent::ShowMinimized] = "ShowMinimized";
+event_map[QEvent::ShowNormal] = "ShowNormal";
+event_map[QEvent::WindowActivate] = "WindowActivate";
+event_map[QEvent::WindowDeactivate] = "WindowDeactivate";
+event_map[QEvent::ShowToParent] = "ShowToParent";
+event_map[QEvent::HideToParent] = "HideToParent";
+event_map[QEvent::ShowMaximized] = "ShowMaximized";
+event_map[QEvent::Accel] = "Accel";
+event_map[QEvent::Wheel] = "Wheel";
+event_map[QEvent::AccelAvailable] = "AccelAvailable";
+event_map[QEvent::CaptionChange] = "CaptionChange";
+event_map[QEvent::IconChange] = "IconChange";
+event_map[QEvent::ParentFontChange] = "ParentFontChange";
+event_map[QEvent::ApplicationFontChange] = "ApplicationFontChange";
+event_map[QEvent::ParentPaletteChange] = "ParentPaletteChange";
+event_map[QEvent::ApplicationPaletteChange] = "ApplicationPaletteChange";
+event_map[QEvent::Clipboard] = "Clipboard";
+event_map[QEvent::Speech] = "Speech";
+event_map[QEvent::SockAct] = "SockAct";
+event_map[QEvent::AccelOverride] = "AccelOverride";
+event_map[QEvent::DragEnter] = "DragEnter";
+event_map[QEvent::DragMove] = "DragMove";
+event_map[QEvent::DragLeave] = "DragLeave";
+event_map[QEvent::Drop] = "Drop";
+event_map[QEvent::DragResponse] = "DragResponse";
+event_map[QEvent::ChildInserted] = "ChildInserted";
+event_map[QEvent::ChildRemoved] = "ChildRemoved";
+event_map[QEvent::LayoutHint] = "LayoutHint";
+event_map[QEvent::ShowWindowRequest] = "ShowWindowRequest";
+event_map[QEvent::ActivateControl] = "ActivateControl";
+event_map[QEvent::DeactivateControl] = "DeactivateControl";
+event_map[QEvent::User] = "User";
+event_map[0] = 0;
+
+
+//Usage
+std::string = event_map[QEvent::User];  // very efficient
+
+Johann
+
+// Roy Dennington's solution:
+>
+> struct EventArray
+> {
+>   int type;
+>   char* string;
+> };
+>
+> EventArray event_array[] =
+> {
+>   { QEvent::None, "None" },
+>   { QEvent::Timer, "Timer" },
+
+[snip]
+You get the idea
+
+>   { QEvent::ActivateControl, "ActivateControl" },
+>   { QEvent::DeactivateControl, "DeactivateControl" },
+>   { QEvent::User, "User" },
+>   { 0, 0 }
+> };
+>
+> QIntDict<char> event_string(59);
+>
+> int n = -1;
+> while ( event_array[++n].string )
+>   event_string.insert( event_array[n].type, event_array[n].string );
+>
+> To use:
+>   char* str = event_string[event];  // very efficient!
+>
+> Enjoy,
+> Roy Dennington
+> roy@semichem.com
+>
+
+Message 4 in thread
+
+    * Subject: Re: How to receive event's name?
+    * From: Rik Hemsley <rik@xxxxxxx>
+    * Date: Tue, 20 Mar 2001 18:15:13 +0000
+    * Mail-followup-to: Qt-Interest <qt-interest@trolltech.com>
+    * To: Qt-Interest <qt-interest@xxxxxxxxxxxxx>
+
+#if Johann Gunnar Oskarsson
+
+> This is, IMO, a lot better and safer:
+> 
+> // Declaration:
+> std::map< int, std::string > event_map;
+
+And using QMap saves you linking STL :)
+
+Rik
+
+
+Message 5 in thread
+
+    * Subject: Re: How to receive event's name?
+    * From: Guillaume Laurent <glaurent@xxxxxxxxxxxxxxxxxx>
+    * Date: Tue, 20 Mar 2001 23:12:11 +0100
+    * To: qt-interest@xxxxxxxxxxxxx
+
+On Tuesday 20 March 2001 19:15, Rik Hemsley wrote:
+
+> And using QMap saves you linking STL :)
+
+The STL is not a library you link with :-).
+
+In any case, I doubt the difference between QMap and std::map (or hash_map 
+since it provided most of the time) is really significant (probably depends 
+on which implementation of the STL you're using, though).
+
+-- 
+ [ signature omitted ] 
+
+Message 6 in thread
+
+    * Subject: QListView::clear() not working
+    * From: "Neil Barman" <neil@xxxxxxx>
+    * Date: Tue, 20 Mar 2001 18:54:00 -0600
+    * To: <qt-interest@xxxxxxxxxxxxx>
+
+Hi,
+
+"clear" is not working for QListView. I will appreciate if you please let me
+know what I am doing wrong.
+
+
+QListView *lvSched;
+
+
+{
+
+   lvSched->clear();
+
+
+add stuff using QListViewItem ..
+   QListViewItem *lvi = new QListViewItem (lvSched, "something",...)
+
+
+}
+
+The program is not clearing the ListView when I come to the "clear" again.
+It is adding on top of the previous one.
+
+
+Any help will be appreciated.
+
+Regards
+Nil
+
+
+Message 7 in thread
+
+    * Subject: Re: QListView::clear() not working
+    * From: wim delvaux <wim.delvaux@xxxxxxxxx>
+    * Date: Wed, 21 Mar 2001 02:35:45 +0100
+    * Cc: qt-interest@xxxxxxxxxxxxx
+    * Organization: Adaptive Planet
+    * Sender: u19809@xxxxxxxxxxx
+    * To: neil@xxxxxxx
+
+
+<<< text/html: EXCLUDED >>>
+Message 8 in thread
+
+    * Subject: Re: QListView::clear() not working
+    * From: "Neil Barman" <neil@xxxxxxx>
+    * Date: Wed, 21 Mar 2001 10:07:04 -0600
+    * Cc: <qt-interest@xxxxxxxxxxxxx>
+    * To: <wim.delvaux@xxxxxxxxx>, <neil@xxxxxxx>
+
+
+<<< text/html: EXCLUDED >>>
+Message 9 in thread
+
+    * Subject: Re: How to receive event's name?
+    * From: Rik Hemsley <rik@xxxxxxx>
+    * Date: Wed, 21 Mar 2001 01:49:54 +0000
+    * Mail-followup-to: qt-interest@trolltech.com
+    * To: qt-interest@xxxxxxxxxxxxx
+
+#if Guillaume Laurent
+> On Tuesday 20 March 2001 19:15, Rik Hemsley wrote:
+> 
+> > And using QMap saves you linking STL :)
+> 
+> The STL is not a library you link with :-).
+
+Well, what I mean is that it saves you having to use STL at all, which
+is a good thing because STL isn't as standard as it's cracked up to be.
+I prefer to use Qt classes everywhere in my Qt apps, because then
+they're guaranteed to be portable to all the places Qt works.
+
+Rik
+
+
+Message 10 in thread
+
+    * Subject: Re: How to receive event's name?
+    * From: Guillaume Laurent <glaurent@xxxxxxxxxxxxxxxxxx>
+    * Date: Wed, 21 Mar 2001 13:16:00 +0100
+    * To: qt-interest@xxxxxxxxxxxxx
+
+On Wednesday 21 March 2001 02:49, Rik Hemsley wrote:
+
+> Well, what I mean is that it saves you having to use STL at all, which
+> is a good thing because STL isn't as standard as it's cracked up to be.
+
+It is now. Every newly released C++ compiler supports it AFAIK. Though I 
+think even gcc 2.7 supports map<> adequately.
+
+> I prefer to use Qt classes everywhere in my Qt apps, because then
+> they're guaranteed to be portable to all the places Qt works.
+
+Agreed. This is the recurring debate on whether one should support broken 
+compilers or not. There is no definitive answer on that.
+
+-- 
+ [ signature omitted ] 
+
+Message 11 in thread
+
+    * Subject: Re: How to receive event's name?
+    * From: "Roy Dennington" <roy@xxxxxxxxxxxx>
+    * Date: Wed, 21 Mar 2001 09:13:03 -0600
+    * To: "Qt-Interest" <qt-interest@xxxxxxxxxxxxx>
+
+All,
+
+> On Wednesday 21 March 2001 02:49, Rik Hemsley wrote:
+>
+> > Well, what I mean is that it saves you having to use STL at all, which
+> > is a good thing because STL isn't as standard as it's cracked up to be.
+>
+> It is now. Every newly released C++ compiler supports it AFAIK. Though I
+> think even gcc 2.7 supports map<> adequately.
+
+Yes, but your mileage for STL varies from one compiler to the next. Recall,
+even STL evolved from "draft" to "final". Compilers are catching up, but
+it is risky to say STL is standard and stable everywhere. STL comes with
+alot of baggage:    STL=>Exception Handling => std namespace.
+
+I can tell you that a recent SGI compiler does not adequately handle
+std namespace. Nor does it like "#include <iostream>". It seems to
+support STL somewhere in between draft and final.
+
+The HP compiler (aCC) is also somewhat behind.
+
+These are major platforms that my company cannot ignore.
+
+> Agreed. This is the recurring debate on whether one should support broken
+> compilers or not. There is no definitive answer on that.
+
+We have begun to include small pieces of STL code to "test the water".
+But we cannot afford to exclude a platform simply because the compilers
+are behind the standard. Once you adopt STL, you cannot easily UNDO.
+
+I look forward to using STL eventually.
+
+Regards,
+Roy Dennington
+roy@semichem.com
+
+
+
+Message 12 in thread
+
+    * Subject: Re: How to receive event's name?
+    * From: Matthias Stiller <stiller@xxxxxxxx>
+    * Date: Wed, 21 Mar 2001 16:19:05 +0100 (MET)
+    * Reply-to: stiller@xxxxxxxx
+    * To: roy@xxxxxxxxxxxx, "Qt-Interest" <qt-interest@xxxxxxxxxxxxx>
+
+On Mar 21,  9:13am, Roy Dennington wrote:
+> Subject: Re: How to receive event's name?
+> All,
+>
+> > On Wednesday 21 March 2001 02:49, Rik Hemsley wrote:
+> >
+> > > Well, what I mean is that it saves you having to use STL at all, which
+> > > is a good thing because STL isn't as standard as it's cracked up to be.
+> >
+> > It is now. Every newly released C++ compiler supports it AFAIK. Though I
+> > think even gcc 2.7 supports map<> adequately.
+>
+> Yes, but your mileage for STL varies from one compiler to the next. Recall,
+> even STL evolved from "draft" to "final". Compilers are catching up, but
+> it is risky to say STL is standard and stable everywhere. STL comes with
+> alot of baggage:    STL=>Exception Handling => std namespace.
+>
+> I can tell you that a recent SGI compiler does not adequately handle
+> std namespace. Nor does it like "#include <iostream>". It seems to
+> support STL somewhere in between draft and final.
+>
+> The HP compiler (aCC) is also somewhat behind.
+
+Hello,
+
+just a short question. Why do you stick to the STL delivered together with your
+compiler ? The STL are just header files, so you could download a new version
+from oss.sgi.com anytime.
+
+The problem with #include <iostream> can be resolved if you just use the
+following compiler switch -LANG:std
+
+Regards
+
+Matthias
+--
+ [ signature omitted ] 
+
+Message 13 in thread
+
+    * Subject: Re: How to receive event's name?
+    * From: "Philippe A. Bouchard" <jh82vyof@xxxxxxxxxxxxxxx>
+    * Date: Wed, 21 Mar 2001 07:47:41 -0500
+    * Organization: Corel Linux
+    * To: <qt-interest@xxxxxxxx>
+
+Rik Hemsley wrote:
+
+> #if Guillaume Laurent
+> > On Tuesday 20 March 2001 19:15, Rik Hemsley wrote:
+> >
+> > > And using QMap saves you linking STL :)
+> >
+> > The STL is not a library you link with :-).
+>
+> Well, what I mean is that it saves you having to use STL at all, which
+> is a good thing because STL isn't as standard as it's cracked up to be.
+> I prefer to use Qt classes everywhere in my Qt apps, because then
+> they're guaranteed to be portable to all the places Qt works.
+>
+> Rik
+>
+> --
+> List archive and information: http://qt-interest.trolltech.com
+
+It's true, but STL is so much powerfull. You have complex algorithms
+already implemented, the abstraction is so much beautifull that once you
+get in touch with it you don't want to let it go. One thing I find sad
+from QT is that QT streams are not compatible at all with standard C++
+streams (if there is a compiler out there that is not supporting C++
+streams, my bets on this compiler would be lower than ever).
+
+If QT was to strenghten their abstraction layer, they would have a lot
+more chances of becoming a standard for UNIX platforms than GTK.
+
+--
+ [ signature omitted ] 
+
+Message 14 in thread
+
+    * Subject: Re: How to receive event's name?
+    * From: Lucio Ismael Flores <ismael@xxxxxx>
+    * Date: Wed, 21 Mar 2001 10:03:17 -0800
+    * Cc: qt-interest@xxxxxxxxxxxxx
+    * Organization: Digital Domain
+    * Reply-to: ismael@xxxxxx
+    * Sender: ismael@xxxxxx
+    * To: rik@xxxxxxx
+
+Rik Hemsley wrote:
+
+> #if Guillaume Laurent
+> > On Tuesday 20 March 2001 19:15, Rik Hemsley wrote:
+> >
+> > > And using QMap saves you linking STL :)
+> >
+> > The STL is not a library you link with :-).
+>
+> Well, what I mean is that it saves you having to use STL at all, which
+> is a good thing because STL isn't as standard as it's cracked up to be.
+> I prefer to use Qt classes everywhere in my Qt apps, because then
+> they're guaranteed to be portable to all the places Qt works.
+>
+
+Hmmm... STL IS a C++ standard. What isn't standard is the signal/slot
+
+mechanism, which is Troll-Tech's own extension to C++.
+
+--
+ [ signature omitted ] 
+
+Message 15 in thread
+
+    * Subject: Re: How to receive event's name?
+    * From: "Aigars Grins" <aigars.grins@xxxxxxxxxx>
+    * Date: Wed, 21 Mar 2001 18:53:29 -0000
+    * Organization: Defcom
+    * To: <qt-interest@xxxxxxxxxxxxx>
+
+> > I prefer to use Qt classes everywhere in my Qt apps, because then
+> > they're guaranteed to be portable to all the places Qt works.
+>
+> Hmmm... STL IS a C++ standard. What isn't standard is the signal/slot
+> mechanism, which is Troll-Tech's own extension to C++.
+
+I like the STL and it _is_ part of the 'standard'. The problem is that
+_very_ few compilers are _100_% compatible to the standard. Most cover
+something like 90-98%. The problem is of course getting smaller and smaller
+over time. Nowadays the STL works ok for most compilers/platforms (but not
+everything everywhere).
+
+Using Troll specific containers etc. gives you a guarantee that they work
+everywhere where Qt works. That is a Good Thing.
+
+Having a way of giving members functions as callbacks is almost always very
+appreciated in most GUI libs. This isn't supported by the language in any
+specific way (not in a simple and efficient way) and since things like
+libsigc isn't that well developed for xplatform functionality (at least yet)
+most libs/IDEs will have to come up with something of their own. Trolls way
+is signals/slots.
+
+All this is obvious and old news. But it brings me back again to the wish
+that Troll could separate their non-GUI code from the rest. I've been told
+(by Jasmin) why they wont. But still. It would be great. (Even better would
+be somthing like a good xplatform ATL).
+
+--
+ [ signature omitted ] 
+
+Pages: Prev | 1 | 2 | Next
+
+
+*/

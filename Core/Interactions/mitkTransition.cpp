@@ -2,8 +2,9 @@
 
 //##ModelId=3E5A3A77006F
 mitk::Transition::Transition(std::string name, int nextStateId, int eventId, int sideEffectId)
-: m_Name(name), m_NextStateId(nextStateId), m_NextState(NULL), m_EventId(eventId), m_SideEffectId(sideEffectId)
+: m_Name(name), m_NextStateId(nextStateId), m_EventId(eventId), m_SideEffectId(sideEffectId)
 {
+	 m_NextState = NULL;
 }
 
 //##ModelId=3E5A3BAE03B5

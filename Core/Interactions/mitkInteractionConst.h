@@ -1,6 +1,6 @@
 #ifndef MITKINTERACTCONST_H
 #define MITKINTERACTCONST_H
-//##Constants for EventMapping... In StateMachines do: case EventMapper::KeyPress
+//##Constants for EventMapping...
 //##SideEffectId
 #define DONOTHING 0
 #define INITNEWOBJECT 5

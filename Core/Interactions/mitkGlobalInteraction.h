@@ -3,16 +3,15 @@
 
 #include "mitkCommon.h"
 #include "StateMachine.h"
+#include "Focus.h"
 //#include "DataTree.h"
 #include <string>
 #include <vector>
 
-//#include "DataTree.h"
-
 
 namespace mitk {
-class FocusHandler;
-class Group;
+
+//class Group;
 
 //##ModelId=3E5B33000230
 class GlobalInteraction : public StateMachine
@@ -22,17 +21,20 @@ class GlobalInteraction : public StateMachine
 	GlobalInteraction(std::string type);
 
     //##ModelId=3E7F497F01AE
-    virtual bool ExecuteSideEffect(int sideEffectId, Event const* event);
+    virtual bool ExecuteSideEffect(int sideEffectId, mitk::StateEvent const* stateEvent);
 
-	private:    
+    //##ModelId=3EDB725E0146
+	virtual void ExecuteOperation(mitk::Operation* operation);
+
+	private:
 	//##ModelId=3EAD4EF903A5
 //	std::vector<Roi*> m_SelectedElements;//ERROR!!!
 
     //##ModelId=3EAD4F3A03C6
-    FocusHandler* m_FocusHandler;
+    Focus* m_Focus;
 
     //##ModelId=3EAD4F51010C
-    Group* m_Group;
+    //Group* m_Group;
 
     //##ModelId=3EAD502B01EC
  //   DataTree* m_DataTree;

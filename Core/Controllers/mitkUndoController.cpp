@@ -1,13 +1,15 @@
 #include "UndoController.h"
 #include "LimitedLinearUndo.h"
+#include "mitkInteractionConst.h"
 
 //static member-variables init.
 //##ModelId=3EAEBEBD02DC
 mitk::UndoModel* mitk::UndoController::m_CurUndoModel;
 mitk::UndoModelMap mitk::UndoController::m_UndoModelList;
+//##ModelId=3ECA2D3F0166
 mitk::UndoType mitk::UndoController::m_CurUndoType;
 
-static const mitk::UndoType DEFAULTUNDOMODEL = mitk::LIMITEDLINEARUNDO;
+static const mitk::UndoType DEFAULTUNDOMODEL = LIMITEDLINEARUNDO;
 
 //##ModelId=3EA585FD0261
 mitk::UndoController::UndoController()
@@ -19,7 +21,7 @@ mitk::UndoController::UndoController(UndoType undoType)
 	{
 		switch (undoType)
 		{
-			case LIMITEDLINEARUNDO:
+		case LIMITEDLINEARUNDO:
 				m_CurUndoModel = new mitk::LimitedLinearUndo;
 				m_CurUndoType = undoType;
 				m_UndoModelList.insert(UndoModelMap::value_type(undoType, m_CurUndoModel));

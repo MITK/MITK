@@ -16,11 +16,13 @@ namespace mitk {
 
 typedef int OperationType ;
 
-static const int ROI = 10;
+static const int ROI = 100;
 
-static const int VIEW = 20;
+static const int POINT = 101;
 
-static const int STATETRANSITION = 30;
+static const int FOCUS = 200;
+
+static const int STATETRANSITION = 300;
 
 
 

@@ -22,8 +22,8 @@
 		</state>
 		<state NAME="next object search" ID="4">
 			<transition NAME="No New and only one selected" NEXT_STATE_ID="3" EVENT_ID="206" SIDE_EFFECT_ID="0" />
-			<transition NAME="No New but &gt;1 selected" NEXT_STATE_ID="6" EVENT_ID="207" SIDE_EFFECT_ID="0" />
-			<transition NAME="same-&gt;Check" NEXT_STATE_ID="5" EVENT_ID="205" SIDE_EFFECT_ID="31" />
+			<transition NAME="No New but more than 1 selected" NEXT_STATE_ID="6" EVENT_ID="207" SIDE_EFFECT_ID="0" />
+			<transition NAME="same-Check" NEXT_STATE_ID="5" EVENT_ID="205" SIDE_EFFECT_ID="31" />
 			<transition NAME="New Object Picked" NEXT_STATE_ID="6" EVENT_ID="200" SIDE_EFFECT_ID="61" />
 		</state>
 		<state NAME="last check" ID="5">
@@ -55,40 +55,57 @@
 			<transition NAME="old point" NEXT_STATE_ID="1" EVENT_ID="201" SIDE_EFFECT_ID="40" />
 		</state>
 	</stateMachine>
+	<stateMachine NAME="focus">
+			<state NAME="neutral" ID="1" START_STATE="TRUE">
+				<transition NAME="changefocus" NEXT_STATE_ID="1" EVENT_ID="1" SIDE_EFFECT_ID="1000" />
+			</state>
+	</stateMachine>
+	<!-- -->
+	<!-- -->
+	<!-- EventDescriptions -->
 	<events STYLE="Powerpoint">
 		<!-- left MouseButton -->
 		<event NAME="left MouseBN" ID="1" TYPE="2" BUTTON="0x0001" BUTTONSTATE="0x0000" KEY="0xffff" />
 		<!-- <event NAME="DrawObject"   ID="2" TYPE="MouseButtonPress" BUTTON="LeftButton" BUTTONSTATE="NoButton" KEY="Key_unknown" />  -->
 		<!-- Shift + left MouseButton -->
-		<event NAME="left MouseBN + Shift" ID="3" TYPE="2" BUTTON="0x0000" BUTTONSTATE="0x0008" KEY="0xffff" />
+		<event NAME="left MouseBN + Shift" ID="3" TYPE="2" BUTTON="0x0001" BUTTONSTATE="0x0100" KEY="0xffff" />
 		<!-- <event NAME="Snapping_Adding"  ID="3" TYPE="MouseButtonPress" BUTTON="LeftButton" BUTTONSTATE="ShiftButton" KEY="Key_unknown" />-->
 		<!-- Strg + N -->
-		<event NAME="Strg + N" ID="10" TYPE="6" BUTTON="0x0000" BUTTONSTATE="0x0010" KEY="0x4e" />
+		<event NAME="Strg + N" ID="10" TYPE="6" BUTTON="0x0000" BUTTONSTATE="0x0200" KEY="0x4e" />
 		<!-- <event NAME="NewObject" ID="1" TYPE="KeyPress" BUTTON="NoButton" BUTTONSTATE="ControlButton" KEY="Key_N" /> -->
 		<!-- Strg + E -->
-		<event NAME="Strg + E" ID="11" TYPE="6" BUTTON="0x0000" BUTTONSTATE="0x0010" KEY="0x45" />
+		<event NAME="Strg + E" ID="11" TYPE="6" BUTTON="0x0000" BUTTONSTATE="0x0200" KEY="0x45" />
 		<!-- <event NAME="Strg + E"  ID="4" TYPE="KeyPress" BUTTON="NoButton" BUTTONSTATE="ControlButton" KEY="Key_E" />-->
-		<!-- eigens ausgelöste Events-->
-		<event NAME="new" ID="200" TYPE="0" BUTTON="0x0000" BUTTONSTATE="0x0000" KEY="0xffff" />
-		<!--7<event NAME="IsNewPoint"  ID="200" TYPE="None" BUTTON="NoButton" BUTTONSTATE="NoButton" KEY="Key_none" />-->
-		<event NAME="old" ID="201" TYPE="0" BUTTON="0x0000" BUTTONSTATE="0x0000" KEY="0xffff" />
-		<!--<event NAME="IsOldPoint"  ID="201" TYPE="None" BUTTON="NoButton" BUTTONSTATE="NoButton" KEY="Key_none" />-->
-		<event NAME="finished" ID="202" TYPE="0" BUTTON="0x0000" BUTTONSTATE="0x0000" KEY="0xffff" />
-		<!--<event NAME="ready"  ID="202" TYPE="None" BUTTON="NoButton" BUTTONSTATE="NoButton" KEY="Key_none" />-->
-		<event NAME="no" ID="203" TYPE="0" BUTTON="0x0000" BUTTONSTATE="0x0000" KEY="0xffff" />
-		<!--<event NAME="no"  ID="203" TYPE="None" BUTTON="NoButton" BUTTONSTATE="NoButton" KEY="Key_none" />-->
-		<event NAME="yes" ID="204" TYPE="0" BUTTON="0x0000" BUTTONSTATE="0x0000" KEY="0xffff" />
-		<!--<event NAME="yes"  ID="204" TYPE="None" BUTTON="NoButton" BUTTONSTATE="NoButton" KEY="Key_none" />-->
-		<event NAME="same" ID="205" TYPE="0" BUTTON="0x0000" BUTTONSTATE="0x0000" KEY="0xffff" />
-		<!--<event NAME="same"  ID="205" TYPE="None" BUTTON="NoButton" BUTTONSTATE="NoButton" KEY="Key_none" />-->
-		<event NAME="no and last Object" ID="206" TYPE="0" BUTTON="0x0000" BUTTONSTATE="0x0000" KEY="0xffff" />
-		<!--<event NAME="no&LastObject"  ID="206" TYPE="None" BUTTON="NoButton" BUTTONSTATE="NoButton" KEY="Key_none" />-->
-		<event NAME="no and not last Object" ID="207" TYPE="0" BUTTON="0x0000" BUTTONSTATE="0x0000" KEY="0xffff" />
-		<!--<event NAME="no&notLastObject"  ID="207" TYPE="None" BUTTON="NoButton" BUTTONSTATE="NoButton" KEY="Key_none" />-->
-		<event NAME="last" ID="208" TYPE="0" BUTTON="0x0000" BUTTONSTATE="0x0000" KEY="0xffff" />
-		<!--<event NAME="last"  ID="208" TYPE="None" BUTTON="NoButton" BUTTONSTATE="NoButton" KEY="Key_none" />-->
-		<event NAME="not last" ID="209" TYPE="0" BUTTON="0x0000" BUTTONSTATE="0x0000" KEY="0xffff" />
-		<!--<event NAME="not last"  ID="209" TYPE="None" BUTTON="NoButton" BUTTONSTATE="NoButton" KEY="Key_none" />-->
+		<!-- -->
+		<!-- eigens ausgeloeste Events/ intern -->
+		<!-- fuer State-Transition-Handling-->
+		<event NAME="new" ID="200" TYPE="1000" BUTTON="0x0000" BUTTONSTATE="0x0000" KEY="0xffff" />
+		<!--7<event NAME="IsNewPoint"  ID="200" TYPE="User" BUTTON="NoButton" BUTTONSTATE="NoButton" KEY="Key_none" />-->
+		<event NAME="old" ID="201" TYPE="1000" BUTTON="0x0000" BUTTONSTATE="0x0000" KEY="0xffff" />
+		<!--<event NAME="IsOldPoint"  ID="201" TYPE="User" BUTTON="NoButton" BUTTONSTATE="NoButton" KEY="Key_none" />-->
+		<event NAME="finished" ID="202" TYPE="1000" BUTTON="0x0000" BUTTONSTATE="0x0000" KEY="0xffff" />
+		<!--<event NAME="ready"  ID="202" TYPE="User" BUTTON="NoButton" BUTTONSTATE="NoButton" KEY="Key_none" />-->
+		<event NAME="no" ID="203" TYPE="1000" BUTTON="0x0000" BUTTONSTATE="0x0000" KEY="0xffff" />
+		<!--<event NAME="no"  ID="203" TYPE="User" BUTTON="NoButton" BUTTONSTATE="NoButton" KEY="Key_none" />-->
+		<event NAME="yes" ID="204" TYPE="1000" BUTTON="0x0000" BUTTONSTATE="0x0000" KEY="0xffff" />
+		<!--<event NAME="yes"  ID="204" TYPE="User" BUTTON="NoButton" BUTTONSTATE="NoButton" KEY="Key_none" />-->
+		<event NAME="same" ID="205" TYPE="1000" BUTTON="0x0000" BUTTONSTATE="0x0000" KEY="0xffff" />
+		<!--<event NAME="same"  ID="205" TYPE="User" BUTTON="NoButton" BUTTONSTATE="NoButton" KEY="Key_none" />-->
+		<event NAME="no and last object" ID="206" TYPE="1000" BUTTON="0x0000" BUTTONSTATE="0x0000" KEY="0xffff" />
+		<!--<event NAME="no&LastObject"  ID="206" TYPE="User" BUTTON="NoButton" BUTTONSTATE="NoButton" KEY="Key_none" />-->
+		<event NAME="no and not last object" ID="207" TYPE="1000" BUTTON="0x0000" BUTTONSTATE="0x0000" KEY="0xffff" />
+		<!--<event NAME="no&notLastObject"  ID="207" TYPE="User" BUTTON="NoButton" BUTTONSTATE="NoButton" KEY="Key_none" />-->
+		<event NAME="last" ID="208" TYPE="1000" BUTTON="0x0000" BUTTONSTATE="0x0000" KEY="0xffff" />
+		<!--<event NAME="last"  ID="208" TYPE="User" BUTTON="NoButton" BUTTONSTATE="NoButton" KEY="Key_none" />-->
+		<event NAME="not last" ID="209" TYPE="1000" BUTTON="0x0000" BUTTONSTATE="0x0000" KEY="0xffff" />
+		<!--<event NAME="not last"  ID="209" TYPE="User" BUTTON="NoButton" BUTTONSTATE="NoButton" KEY="Key_none" />-->
+		<!-- Sonstiges -->
+		<event NAME="PositionEvent"  ID="500" TYPE="2" BUTTON="0x0001" BUTTONSTATE="0x0000" KEY="0xffff" />
+		<!-- MouseButtonPress -->
+		<event NAME="PositionEvent"  ID="505" TYPE="3" BUTTON="0x0001" BUTTONSTATE="0x0000" KEY="0xffff" />
+		<!-- MouseButtonRelease -->
+		<!-- DoubleClick <event NAME="PositionEvent"  ID="500" TYPE="4" BUTTON="" BUTTONSTATE="" KEY="" />-->
+		<!-- MouseMove <event NAME="PositionEvent"  ID="500" TYPE="5" BUTTON="" BUTTONSTATE="" KEY="" />-->
 	</events>
 </mitkInteraktionStates>
 <!-- DOKUMENTATION -->

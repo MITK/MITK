@@ -1,18 +1,21 @@
 #include "GlobalInteraction.h"
 #include "mitkInteractionConst.h"
 #include "Event.h"
+#include "Focus.h"
 
 
 //##ModelId=3EAD420E0088
 mitk::GlobalInteraction::GlobalInteraction(std::string type)
 : StateMachine(type)
-{}
+{
+	m_Focus = new mitk::Focus("focus");
+}
 
-inline mitk::StateEvent* GenerateEmptyEvent(int eventId)
+inline mitk::StateEvent* GenerateEmptyStateEvent(int eventId)
 {
 	mitk::Event *noEvent = new mitk::Event(User,
 									NoButton,
-									NoButton, 
+									NoButton,
 									Key_none);
 	mitk::StateEvent *stateEvent = new mitk::StateEvent();
 	stateEvent->Set( eventId, noEvent );
@@ -20,20 +23,24 @@ inline mitk::StateEvent* GenerateEmptyEvent(int eventId)
 }
 
 //##ModelId=3E7F497F01AE
-bool mitk::GlobalInteraction::ExecuteSideEffect(int sideEffectId, mitk::Event const* event)
+bool mitk::GlobalInteraction::ExecuteSideEffect(int sideEffectId, mitk::StateEvent const* stateEvent)
 {
-	//if the Event is a PositionEvent, then get the worldCoordinates:
-	//get the focused BaseRenderer and compute the coordinates
-	if (event->GetType()== MouseButtonPress)
+	bool ok = false;
+	//if the Event is a PositionEvent, then get the worldCoordinates through Focus
+	if ( (stateEvent->GetEvent() )->GetType()== MouseButtonPress)
 	{
-		//get BaseRenderer from Focus and ask about Worldcoordinates
+		ok = m_Focus->HandleEvent(stateEvent);//give it to Focus which calculates accordingly to it's Statemachine the worldcoordinates
+
+		//for debugging
+		if (!ok)
+			std::cout<<"Error! Sender: PositionEvent;   Message: HandleEvent returned false"<<std::endl;
 	}
 
 	//actually it is very unclean to write numbers in code (EventId's), but here:
-	//The xml-File has to be written, with all the EventNames and EventID's, 
-	//a StateMachine with sideeffects have to be written, so the developer has 
+	//The xml-File has to be written, with all the EventNames and EventID's,
+	//a StateMachine with sideeffects have to be written, so the developer has
 	//to make sure, that everything is conclusive... to be changed in constants!
-	bool ok = false;
+	ok = false;
 	switch (sideEffectId)
 	{
 	case DONOTHING:
@@ -48,9 +55,9 @@ bool mitk::GlobalInteraction::ExecuteSideEffect(int sideEffectId, mitk::Event co
 		{
 			//StateMachine change into Object
 			//when ready, then generate ID 202
-			//202 for finished Object 
-			mitk::StateEvent* stateEvent = GenerateEmptyEvent(202);
-			ok = HandleEvent(stateEvent);
+			//202 for finished Object
+			mitk::StateEvent* nextStateEvent = GenerateEmptyStateEvent(202);
+			ok = HandleEvent(nextStateEvent);
 		}
 		break;
 	case INITEDITOBJECT:
@@ -59,8 +66,8 @@ bool mitk::GlobalInteraction::ExecuteSideEffect(int sideEffectId, mitk::Event co
 			//202 for finished editing object
 			//inbetween the edit has to be done to the Object. Next StateMachine!!!
 			//this event generation can be done in the next StateMachine!
-			mitk::StateEvent* stateEvent = GenerateEmptyEvent(202);
-			ok = HandleEvent(stateEvent);
+			mitk::StateEvent* nextStateEvent = GenerateEmptyStateEvent(202);
+			ok = HandleEvent(nextStateEvent);
 		}
 		break;
 	case INITEDITGROUP:
@@ -69,8 +76,8 @@ bool mitk::GlobalInteraction::ExecuteSideEffect(int sideEffectId, mitk::Event co
 			//202 for finished editing group
 			//inbetween the edit has to be done to the Group. Next StateMachine!!!
 			//this event generation can be done in the next StateMachine!
-			mitk::StateEvent* stateEvent = GenerateEmptyEvent(202);
-			ok = HandleEvent(stateEvent);
+			mitk::StateEvent* nextStateEvent = GenerateEmptyStateEvent(202);
+			ok = HandleEvent(nextStateEvent);
 		}
 		break;
 	case ADDPOINT:
@@ -90,15 +97,15 @@ bool mitk::GlobalInteraction::ExecuteSideEffect(int sideEffectId, mitk::Event co
 		{
 			//208 for neutral
 			//209 for group selected
-			mitk::StateEvent* stateEvent = GenerateEmptyEvent(208);
-			ok = HandleEvent(stateEvent);
+			mitk::StateEvent* nextStateEvent = GenerateEmptyStateEvent(208);
+			ok = HandleEvent(nextStateEvent);
 		}
 		break;
 	case FINISHOBJECT:
 		std::cout<<"FinishObject"<<std::endl;
 		{
-			mitk::StateEvent* stateEvent = GenerateEmptyEvent(202);
-			ok = HandleEvent(stateEvent);
+			mitk::StateEvent* nextStateEvent = GenerateEmptyStateEvent(202);
+			ok = HandleEvent(nextStateEvent);
 		}
 		break;
 	case FINISHGROUP:
@@ -112,8 +119,8 @@ bool mitk::GlobalInteraction::ExecuteSideEffect(int sideEffectId, mitk::Event co
 			//203 for nothing picked
 			//204 for object picked
 			//205 for same object picked
-			mitk::StateEvent* stateEvent = GenerateEmptyEvent(204);//object picked
-			ok = HandleEvent(stateEvent);
+			mitk::StateEvent* nextStateEvent = GenerateEmptyStateEvent(204);//object picked
+			ok = HandleEvent(nextStateEvent);
 		}
 		break;
 	case SEARCHGROUP:
@@ -121,8 +128,8 @@ bool mitk::GlobalInteraction::ExecuteSideEffect(int sideEffectId, mitk::Event co
 		{
 			//203 for neutral; no group found
 			//204 for edit group; group found
-			mitk::StateEvent* stateEvent = GenerateEmptyEvent(203);
-			ok = HandleEvent(stateEvent);
+			mitk::StateEvent* nextStateEvent = GenerateEmptyStateEvent(203);
+			ok = HandleEvent(nextStateEvent);
 		}
 		break;
 	case SEARCHANOTHEROBJECT:
@@ -132,8 +139,8 @@ bool mitk::GlobalInteraction::ExecuteSideEffect(int sideEffectId, mitk::Event co
 			//205 for same-Check
 			//206 for no new and only one selected
 			//207 for No New but more than 1 selected
-			mitk::StateEvent* stateEvent = GenerateEmptyEvent(206);
-			ok = HandleEvent(stateEvent);
+			mitk::StateEvent* nextStateEvent = GenerateEmptyStateEvent(206);
+			ok = HandleEvent(nextStateEvent);
 		}
 		break;
 	case SELECTPICKEDOBJECT:
@@ -169,4 +176,9 @@ bool mitk::GlobalInteraction::ExecuteSideEffect(int sideEffectId, mitk::Event co
 		ok = true;
 	}
 	return ok;
+}
+
+void mitk::GlobalInteraction::ExecuteOperation(mitk::Operation* operation)
+{
+	NULL;
 }

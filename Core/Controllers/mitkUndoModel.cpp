@@ -1,4 +1,5 @@
 #include "UndoModel.h"
+#include "OperationActor.h"
 
 //##ModelId=3E95950F02B1
 //mitk::UndoModel::UndoModel(){}
@@ -10,5 +11,5 @@
 void mitk::UndoModel::Execute( OperationEvent* operationEvent ) 
 {
 	operationEvent->swapOperations();
-	operationEvent->GetDestination()->SetOperation( operationEvent->GetOperation() );
+	( operationEvent->GetDestination() )->ExecuteOperation( operationEvent->GetOperation() );
 }

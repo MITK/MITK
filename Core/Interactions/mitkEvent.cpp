@@ -2,8 +2,13 @@
 
 //##ModelId=3E5B3007000F
 mitk::Event::Event(int type, int button, int buttonState, int key)
-: m_Type(type), m_Button(button), m_ButtonState(buttonState), m_Key(key)  
-{}
+//: m_Type(type), m_Button(button), m_ButtonState(buttonState), m_Key(key)  
+{
+m_Type = type;
+m_Button = button;
+m_ButtonState = buttonState;
+m_Key = key;
+}
 
 //##ModelId=3E5B304700A7
 int mitk::Event::GetType() const
@@ -31,12 +36,13 @@ int mitk::Event::GetKey() const
 }
 
 //##ModelId=3E77630102A1
-bool mitk::Event::operator==(const Event& event)
+bool mitk::Event::operator==(const Event& event) const
 {
 	if ( (m_Type == event.GetType())
 		&& (m_Button == event.GetButton())
 		&& (m_ButtonState == event.GetButtonState())
 		&& (m_Key == event.GetKey()) )
 		return true;
-	else return false;
+	else 
+		return false;
 }

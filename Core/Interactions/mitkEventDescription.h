@@ -12,7 +12,7 @@ class EventDescription : public Event
 {
   public:
     //##ModelId=3E5B30A30095
-	EventDescription(std::string name, int id, int type, int button, int buttonState, int key);
+	EventDescription(int type, int button, int buttonState,int key, std::string name, int id);
 
     //##ModelId=3E5B3103030A
 	std::string GetName() const;

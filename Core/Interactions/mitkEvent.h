@@ -11,7 +11,6 @@ class Event
   public:
     //##ModelId=3E5B3007000F
     //##Documentation
-
     //## @params:
     //## type: type of Event: Mouse or Key Event? (from QEvent->type)
     //## button: mouse-button
@@ -29,7 +28,7 @@ class Event
     int GetKey() const;
 
     //##ModelId=3E77630102A1
-    bool operator==(const Event& event);
+    bool operator==(const Event& event) const;
 
     //##ModelId=3E8AE2F20360
     int GetButtonState() const;
@@ -41,10 +40,11 @@ class Event
     //##ModelId=3E5B2FA60290
     int m_Button;
 
-    //##ModelId=3E5B2FB10282
-    int m_Key;
     //##ModelId=3E8AE2CD02A4
 	int m_ButtonState;
+
+	//##ModelId=3E5B2FB10282
+    int m_Key;
 
 };
 

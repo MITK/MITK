@@ -17,11 +17,12 @@ bool mitk::StateMachine::HandleEvent(StateEvent const* stateEvent)
 	int tempSideEffectId = tempTransition->GetSideEffectId();
 
 	//remember UNDO!!!!!
-	/*new Operation for StateChange and Operation*/
+	/*first StateChange, then operation*/
 	m_CurrentState = tempState;
 
 	//remember UNDO!!!!!
-	return Operation(tempSideEffectId);
+	bool ok = ExecuteSideEffect(tempSideEffectId);
+	return ok;
 }
 
 //##ModelId=3E5B2E660087

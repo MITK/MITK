@@ -108,8 +108,8 @@ void mitk::Geometry3D::SetUnitsToMMAffineTransform(mitk::AffineTransform3D* tran
   if(m_UnitsToMMAffineTransform.GetPointer() != transform)
   {
     Superclass::SetUnitsToMMAffineTransform(transform);
-    m_ParametricTransform = m_UnitsToMMAffineTransform;
-    //m_VtkUnitsToMMAffineTransform = @FIXME connect vtk and itk transforms!!!
+    m_ParametricTransform = m_UnitsToMMAffineTransform;    
+    TransferItkToVtkTransform();
     Modified();
   }
 }

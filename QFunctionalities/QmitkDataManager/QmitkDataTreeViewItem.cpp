@@ -2,7 +2,8 @@
 #include "QmitkDataTreeViewItem.h"
 #include "mitkPropertyList.h"
 #include "mitkStringProperty.h"
-
+#include "enabled.xpm"
+#include "disabled.xpm"
 QmitkDataTreeViewItem::QmitkDataTreeViewItem( QListView *parent, const QString &s1 , const QString &s2 , mitk::DataTreeIterator * nodeIt )
     : QListViewItem( parent, s1, s2 ),m_DataTreeIterator(nodeIt)
 {
@@ -63,8 +64,8 @@ mitk::DataTreeNode::ConstPointer QmitkDataTreeViewItem::GetDataTreeNode() const 
 }
 
 void QmitkNodeViewBaseItem::updateEnabledAppearance() {
-      QPixmap *qpm = new QPixmap(10,10);
-      qpm->fill(Qt::red); 
+      static const QPixmap enabledPix((const char **)enabled_xpm);
+      static const QPixmap disabledPix((const char **)disabled_xpm);
       // ok, we are instanceof QListViewItem, but the cast
       // is ugly:
       QListViewItem* listViewItem = NULL;
@@ -73,10 +74,10 @@ void QmitkNodeViewBaseItem::updateEnabledAppearance() {
 	  (listViewItem = dynamic_cast<NodeViewCheckboxItem*>(this))) {
 	if (isPropEnabled()) {
 	  std::cout << "nodeViewItem Enabled" << std::endl;
-	  listViewItem->setPixmap(1,0);
+	  listViewItem->setPixmap(0,enabledPix);
 	} else {
 	  std::cout << "nodeViewItem Disabled" << std::endl;
-	  listViewItem->setPixmap(1,*qpm);
+	  listViewItem->setPixmap(0,disabledPix);
 
 	}
 

@@ -1,6 +1,8 @@
 #include "mitkMovieGenerator.h"
 #include <GL/gl.h>
-
+#ifndef GL_BGR
+	#define GL_BGR GL_BGR_EXT
+#endif
 
 bool mitk::MovieGenerator::WriteMovie()
 {
@@ -14,7 +16,7 @@ bool mitk::MovieGenerator::WriteMovie()
     GLbyte *data = new GLbyte[imgSize];
     for (int i=0; i<m_stepper->GetSteps(); i++) {
       if (m_renderer) m_renderer->MakeCurrent();
-      glReadPixels( 0, 0, m_width, m_height, GL_BGR_EXT, GL_UNSIGNED_BYTE, (void*)data );
+      glReadPixels( 0, 0, m_width, m_height, GL_BGR, GL_UNSIGNED_BYTE, (void*)data );
       AddFrame( data );
       m_stepper->Next();
     }

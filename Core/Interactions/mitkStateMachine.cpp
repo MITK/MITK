@@ -123,7 +123,7 @@ void mitk::StateMachine::ExecuteOperation(Operation* operation)
 			}
 #ifdef INTERDEBUG
 //Debug StateChanges through cout output! Thus very slow!
-std::cout<<this->GetType()<<": Undo: Changing from StateId "<<m_CurrentState->GetId()<<" to StateId "<<stateTransOp->GetState()->GetId<<std::endl;
+std::cout<<this->GetType()<<": Undo: Changing from StateId "<<m_CurrentState->GetId()<<" to StateId "<<stateTransOp->GetState()->GetId()<<std::endl;
 std::cout<<this->GetType()<<": Undo: Changing from State "<<m_CurrentState->GetName()<<" to State "<<stateTransOp->GetState()->GetName()<<std::endl;
 #endif
 			m_CurrentState = stateTransOp->GetState();

@@ -17,6 +17,10 @@ int mitkImageTest(int argc, char* argv[])
     return EXIT_FAILURE;
   }
   std::cout<<"[PASSED]"<<std::endl;
+  
+  std::cout << "Testing GetSliceData(): ";
+  
+  
 
   std::cout<<"[TEST DONE]"<<std::endl;
   return EXIT_SUCCESS;

@@ -358,6 +358,12 @@ void mitk::Geometry3D::SetSpacing(mitk::Vector3D aSpacing)
     Modified();
 }
 
+void mitk::Geometry3D::SetSpacing(const float aSpacing[3])
+{
+    mitk::Vector3D tmp(aSpacing[0], aSpacing[1], aSpacing[2]);
+    SetSpacing(tmp);
+}
+
 //##ModelId=3E3C13F802A6
 void mitk::Geometry3D::SetEvenlySpaced(bool on)
 {

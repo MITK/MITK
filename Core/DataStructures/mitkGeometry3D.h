@@ -168,6 +168,7 @@ public:
     virtual bool IsValidTime(int t = 0) const;
     //##ModelId=3E3BE8CF010E
     virtual void SetSpacing(mitk::Vector3D aSpacing);
+    virtual void SetSpacing(const float aSpacing[3]);
     //##ModelId=3E3C13F802A6
     virtual void SetEvenlySpaced(bool on = true);
     //##ModelId=3E3C2C37031B

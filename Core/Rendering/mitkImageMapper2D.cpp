@@ -95,7 +95,7 @@ void mitk::ImageMapper2D::Paint(mitk::BaseRenderer * renderer)
 
   glMatrixMode (GL_PROJECTION);
   glLoadIdentity ();
-  gluOrtho2D(topLeft[0], bottomRight[0], topLeft[1], bottomRight[1] );
+  gluOrtho2D(topLeft[0]-0.5, bottomRight[0]-0.5, topLeft[1]-0.5/*+1*/, bottomRight[1]-0.5);
   glMatrixMode( GL_MODELVIEW );
 
   GLdouble eqn0[4] = {0.0, 1.0, 0.0, 0.0};
@@ -211,6 +211,14 @@ void mitk::ImageMapper2D::GenerateData(mitk::BaseRenderer *renderer)
     right  = planeview->GetAxisVector(0); right.Normalize();
     bottom = planeview->GetAxisVector(1); bottom.Normalize();
     normal = planeview->GetNormal();      normal.Normalize();
+    //VnlVector v = inputtimegeometry->GetMatrixColumn(2);
+    //origin[0]-=v[0]*0.5; origin[1]-=v[1]*0.5; origin[2]-=v[2]*0.5;
+    Vector3D v; v.Fill(0.5); v.Fill(0.0005);
+    v = inputtimegeometry->GetIndexToWorldTransform()->TransformVector(v);
+    origin -= v;
+    //Vector3D inplane;
+    //inplane = v-normal*(v*normal);
+    //origin -= inplane;
 
     vtkTransform * vtktransform = GetDataTreeNode()->GetVtkTransform();
           
@@ -291,7 +299,7 @@ void mitk::ImageMapper2D::GenerateData(mitk::BaseRenderer *renderer)
 
   //	std::cout << vtkoutput <<std::endl;
   ipPicDescriptor* pic = Pic2vtk::convert(vtkoutput);
-//    ipPicPut("G:/home/boettger/tmp/mapperoutput.pic",pic);
+    ipPicPut("c:/a.pic",pic);
   assert(pic);
   if(pic->dim==1)
   {
@@ -349,22 +357,16 @@ void mitk::ImageMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
 
 
   // check for interpolation properties
-  mitk::BoolProperty::Pointer vtkInterpolation = dynamic_cast<mitk::BoolProperty*>(this->GetDataTreeNode()->GetProperty("vtkInterpolation",renderer).GetPointer());
-  mitk::BoolProperty::Pointer iilInterpolation = dynamic_cast<mitk::BoolProperty*>(this->GetDataTreeNode()->GetProperty("iilInterpolation",renderer).GetPointer());
+  bool vtkInterpolation=false;
+  GetDataTreeNode()->GetBoolProperty("vtkInterpolation", vtkInterpolation, renderer);
+  bool iilInterpolation=false;
+  GetDataTreeNode()->GetBoolProperty("iilInterpolation", iilInterpolation, renderer);
 
-  renderinfo.m_IilInterpolation = iilInterpolation.IsNotNull() && iilInterpolation->GetValue();
-  if (vtkInterpolation.IsNotNull() && vtkInterpolation->GetValue()) {
+  renderinfo.m_IilInterpolation = iilInterpolation;
+  if (vtkInterpolation) 
     m_Reslicer->SetInterpolationModeToLinear();
-  } else {
+  else 
     m_Reslicer->SetInterpolationModeToNearestNeighbor();
-
-  }
- 
-  
-
-  mitk::LevelWindow levelWindow;
-  // check for level window prop and use it for display if it exists
-  GetLevelWindow(levelWindow, renderer);
 
 
   mitk::LookupTableProperty::Pointer LookupTableProp;
@@ -374,33 +376,25 @@ void mitk::ImageMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
 		m_iil4mitkMode = iil4mitkImage::INTENSITY_ALPHA;
 	  image->setColor(rgba[0], rgba[1], rgba[2], rgba[3]);
 	}
-	else {
+	else 
+  {
 		m_iil4mitkMode = iil4mitkImage::COLOR_ALPHA;
-		image->setColors(LookupTableProp->GetLookupTable().GetRawLookupTable());
-		
+		image->setColors(LookupTableProp->GetLookupTable().GetRawLookupTable());	
 	}
 
-  mitk::BoolProperty::Pointer binary;
-  binary = dynamic_cast<mitk::BoolProperty*>(this->GetDataTreeNode()->GetProperty("binary").GetPointer());
+  mitk::LevelWindow levelWindow;
 
-  mitk::LevelWindowProperty::Pointer overwriteLevelWindow;
-  overwriteLevelWindow = dynamic_cast<mitk::LevelWindowProperty*>(this->GetDataTreeNode()->GetProperty("levelWindow").GetPointer());
+  bool binary=false;
+  GetDataTreeNode()->GetBoolProperty("binary", binary, renderer);
 
-  if (binary.IsNotNull() )
-  {
+  if (binary)
     image->setExtrema(0, 1);
-  }
-  else if (overwriteLevelWindow.IsNotNull() )
+  else 
   {
-    image->setExtrema(overwriteLevelWindow->GetLevelWindow().GetMin(), overwriteLevelWindow->GetLevelWindow().GetMax());
+    if(!GetLevelWindow(levelWindow,renderer,"levelWindow"))
+      GetLevelWindow(levelWindow,renderer);
+    image->setExtrema(levelWindow.GetMin(), levelWindow.GetMax()); 
   }
-  else
-  {
-  // set the properties
-    image->setExtrema(levelWindow.GetMin(), levelWindow.GetMax());
-  }
-//  image->setColor(rgba[0], rgba[1], rgba[2], rgba[3]);
-  
 }
 
 void mitk::ImageMapper2D::Update(mitk::BaseRenderer* renderer)

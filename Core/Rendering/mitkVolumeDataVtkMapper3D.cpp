@@ -245,7 +245,15 @@ mitk::TransferFunctionProperty::Pointer tranferFunctionProp = dynamic_cast<mitk:
   {
     mitk::LevelWindow levelWindow;
     int lw_min,lw_max;
-    if (GetLevelWindow(levelWindow,renderer) || GetLevelWindow(levelWindow,renderer,"levelWindow"))
+
+    bool binary=false;
+    GetDataTreeNode()->GetBoolProperty("binary", binary, renderer);
+    if(binary)
+    {
+      lw_min=0; lw_max=2;
+    }
+    else
+    if(GetLevelWindow(levelWindow,renderer,"levelWindow") || GetLevelWindow(levelWindow,renderer))
     {
       lw_min = (int)levelWindow.GetMin();
       lw_max = (int)levelWindow.GetMax();

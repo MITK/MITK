@@ -79,7 +79,7 @@ bool mitk::Mesh::SearchLine(Point3D point, float distance , unsigned long &lineI
         {
           Line<CoordinateType> *line = new Line<CoordinateType>();
           line->SetPoints(pointA, pointB);
-          double thisDistance = line->distance(point);
+          double thisDistance = line->Distance(point);
           if (thisDistance < distance)
           {
             cellId = cellIt->Index();
@@ -109,7 +109,7 @@ bool mitk::Mesh::SearchLine(Point3D point, float distance , unsigned long &lineI
           {
             Line<CoordinateType> *line = new Line<CoordinateType>();
             line->SetPoints(pointA, pointB);
-            double thisDistance = line->distance(point);
+            double thisDistance = line->Distance(point);
             if (thisDistance < distance)
             {
               cellId = cellIt->Index();

@@ -169,7 +169,7 @@ float mitk::LineInteractor::CalculateJurisdiction(StateEvent const* stateEvent) 
     Line<PointSet::CoordinateType> *line = new Line<PointSet::CoordinateType>();
     line->SetPoints(pointA, pointB);
     
-    double pointDistance = line->distance(worldPoint);
+    double pointDistance = line->Distance(worldPoint);
     
     //because we searched for a line in the distance, we now can set it according to distance between 0 and 1
     returnValue = 1 - ( pointDistance / distance );

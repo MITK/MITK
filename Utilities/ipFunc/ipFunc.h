@@ -195,6 +195,9 @@ typedef struct
    } ipFuncBox_t;
 
 
+/* macros */
+#define IPFUNCMAX( x, y ) ( ( (x) > (y) ) ? (x) : (y) )
+#define IPFUNCMIN( x, y ) ( ( (x) < (y) ) ? (x) : (y) )  
 
 /* function prototypes */
 
@@ -211,6 +214,9 @@ ipPicDescriptor *ipFuncConvert( ipPicDescriptor *pic_old,
                                 ipUInt4_t       bpe );
 
 void             ipFuncCopyTags(ipPicDescriptor *pic_new, ipPicDescriptor *pic_old);
+
+int ipFuncSetTag( ipPicDescriptor *pic, char *name, int type, int size, 
+                  int el_size, void *data );
 
 ipPicDescriptor *ipFuncInv    ( ipPicDescriptor *pic_old,
                                 ipPicDescriptor *pic_return );

@@ -60,6 +60,17 @@
  *
  * UPDATES
  * $Log$
+ * Revision 1.3  2000/07/24 13:06:26  ivo
+ * June 26, 2000
+ * iw - function ipFuncSetTag added.
+ *
+ * July 8, 2000
+ * iw - Visual C++ 6.0 SP3 compiler crashes at "static char *what..." lines.
+ * Workaround: "lint" defined in project files for all configurations.
+ *
+ * July 11, 2000
+ * iw - ipFunc.exe Scale crashed, if last parameter was missing. Corrected.
+ *
  * Revision 1.2  2000/05/24 15:29:44  tobiask
  * Changed the installation paths of the package.
  *
@@ -79,7 +90,7 @@
  * COPYRIGHT (c) 1995 by DKFZ (Dept. MBI) HEIDELBERG, FRG
  */
 #ifndef lint
-  static char *what = { "@(#)????????\t\tDKFZ (Dept. MBI)\t"__DATE__ };
+ä  static char *what = { "@(#)????????\t\tDKFZ (Dept. MBI)\t"__DATE__ };
 #endif
 
 /* include files                                                                  */
@@ -91,10 +102,8 @@
 
 #define BORDER( type, pic, size, value )                                           \
 {                                                                                  \
-  ipUInt4_t      i, j, k;          /* loop index                                */ \
-  ipUInt4_t      offset;           /* offset of pixels in pic_new               */ \
+  ipUInt4_t      i;                /* loop index                                */ \
   ipUInt4_t      anf[_ipPicNDIM];  /*                                           */ \
-  ipUInt4_t      end[_ipPicNDIM];  /*                                           */ \
   ipUInt4_t      ind[_ipPicNDIM];  /* loop index vector                         */ \
   ipUInt4_t      off[_ipPicNDIM];  /* used to calculate offset of image pixels  */ \
                                                                                    \
@@ -196,9 +205,8 @@ ipPicDescriptor *_ipFuncBorderX ( ipPicDescriptor *pic_old,
                                   ipFloat8_t      value )
 {
   ipPicDescriptor *pic_new;            /* pointer to transformed image            */
-  ipInt4_t       i;                    /* loop index                              */
+  ipUInt4_t       i;                   /* loop index                              */
   ipUInt4_t      end[_ipPicNDIM];      /* end of image                            */
-  ipUInt4_t      beg[_ipPicNDIM];      /* end of image                            */
   ipUInt4_t      size[_ipPicNDIM];     /*                                         */
   ipFloat8_t     max_gv, min_gv;
 

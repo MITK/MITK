@@ -526,7 +526,7 @@ void main (int argc, char **argv)
 	{
 		if ( ( (unsigned int) argc == 2 ) || 
 			( ( (unsigned int) argc == 3 ) && ( strcasecmp (argv[2], "-h") == 0 ) ) ||
-			( (unsigned int) argc < 6 ) )  
+			( (unsigned int) argc < 8 ) )  
 		{
 			printf("Usage: ipFunc Scale infile outfile sc_fact1 ... sc_factn kind   \n");
 			printf("  sc_factx must contain a positive float number \n" );

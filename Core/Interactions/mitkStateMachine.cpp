@@ -18,6 +18,9 @@ mitk::StateMachine::StateMachine(const char * type) : m_CurrentState(NULL)
     m_Type = type;
 	  m_CurrentState = mitk::StateMachineFactory::GetStartState(type);
   }
+  else
+    (StatusBar::GetInstance())->DisplayText("Error! Sender: StateMachine; Message: Type of StateMachine is NULL!", 10000);
+  
   m_UndoController = new UndoController(LIMITEDLINEARUNDO);//switch to LLU or add LLU
 	m_UndoEnabled = true;
 }
@@ -26,6 +29,13 @@ mitk::StateMachine::StateMachine(const char * type) : m_CurrentState(NULL)
 std::string mitk::StateMachine::GetType() const
 {
 	return m_Type;
+}
+
+const mitk::State* mitk::StateMachine::GetCurrentState() const
+{
+  if (m_CurrentState)
+    return m_CurrentState;
+  return NULL;
 }
 
 //##ModelId=3E5B2DE30378

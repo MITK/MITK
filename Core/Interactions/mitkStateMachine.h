@@ -72,9 +72,13 @@ namespace mitk {
   //## First Undo, then SideEffectOperation
   virtual bool ExecuteSideEffect(int sideEffectId, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId)= 0;
 
+  //##Documentation
+  //## @brief returns the current state
+  const State* GetCurrentState() const;
+
   //##ModelId=3EDCAECB00B9
   //##Documentation
-  //## if true, then UndoFunctionality is enabled
+  //## @biref if true, then UndoFunctionality is enabled
   //## default on true;
   bool m_UndoEnabled;
 
@@ -85,7 +89,7 @@ namespace mitk {
 
   //##ModelId=3EDCAECB0128
   //##Documentation
-  //## holds an UndoController, that can be accessed from all StateMachines. For ExecutreSideEffect
+  //## @brief holds an UndoController, that can be accessed from all StateMachines. For ExecutreSideEffect
   UndoController* m_UndoController;
 
  private:
@@ -102,7 +106,10 @@ namespace mitk {
   std::string m_Type;
 
   //##ModelId=3E5B2D8F02B9
+  //##Documentation
+  //## @brief holds the current state the machine is in
   State* m_CurrentState;
+
  };
 
  } // namespace mitk

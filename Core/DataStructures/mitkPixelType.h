@@ -3,7 +3,7 @@
 
 
 #include "mitkCommon.h"
-#include <ipPic.h>
+#include <ipPic/ipPic.h>
 
 namespace mitk {
 

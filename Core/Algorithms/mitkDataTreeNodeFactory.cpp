@@ -227,6 +227,7 @@ void mitk::DataTreeNodeFactory::ReadFileTypeSTL()
         // set filename without path as string property
         mitk::StringProperty::Pointer nameProp = new mitk::StringProperty( this->GetBaseFileName() );
         node->SetProperty( "name", nameProp );
+        node->SetProperty( "wireframe", new mitk::BoolProperty(false));
     }
 
     stlReader->Delete();
@@ -255,6 +256,7 @@ void mitk::DataTreeNodeFactory::ReadFileTypeVTK()
         // set filename without path as string property
         mitk::StringProperty::Pointer nameProp = new mitk::StringProperty( this->GetBaseFileName() );
         node->SetProperty( "name", nameProp );
+        node->SetProperty( "wireframe", new mitk::BoolProperty(false));
     }
 
     reader->Delete();

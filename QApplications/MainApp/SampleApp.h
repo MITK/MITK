@@ -34,6 +34,8 @@ public:
 	 */
 	virtual void initializeFunctionality();
 
+  virtual void initializeQfm();
+
 protected:
 
 		/*! 
@@ -63,6 +65,8 @@ protected:
 		 level set segmentation tool
 		 */
 		QmitkLevelSets * m_LevelSetTool;
+
+    bool m_ControlsLeft;
 
 
 };

@@ -120,8 +120,10 @@ public:
     //##Documentation
     //## @brief number of pixels per mm in x- and y-direction of the resampled image m_Pic
     Vector2D m_PixelsPerMM;
+   
+    bool m_IilInterpolation;
     //##ModelId=3E6423D30002
-    RendererInfo() :  m_iil4mitkImage(NULL), m_Renderer(NULL), m_ObserverId(0), m_Pic(NULL), m_RendererId(-1)
+    RendererInfo() :  m_iil4mitkImage(NULL), m_Renderer(NULL), m_ObserverId(0), m_Pic(NULL), m_RendererId(-1), m_IilInterpolation(true)
     {
       m_PixelsPerMM.Fill(0);
     };

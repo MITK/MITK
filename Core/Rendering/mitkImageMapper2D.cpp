@@ -112,6 +112,7 @@ void mitk::ImageMapper2D::Paint(mitk::BaseRenderer * renderer)
   glClipPlane (GL_CLIP_PLANE3, eqn3);
   glEnable (GL_CLIP_PLANE3);
 
+  image->setInterpolation(renderinfo.m_IilInterpolation);
   image->display(renderer->GetRenderWindow());
 
   glDisable (GL_CLIP_PLANE0);
@@ -298,8 +299,7 @@ void mitk::ImageMapper2D::GenerateData(mitk::BaseRenderer *renderer)
 
     ApplyProperties(renderer);
 //   image->setImage(pic, iil4mitkImage::INTENSITY_ALPHA);
-	  image->setImage(pic, m_iil4mitkMode);
-    image->setInterpolation(true);
+    image->setImage(pic, m_iil4mitkMode);
     image->setRegion(0,0,pic->n[0],pic->n[1]);
 
     renderinfo.m_LastUpdateTime.Modified();
@@ -340,6 +340,21 @@ void mitk::ImageMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
   // check for opacity prop and use it for rendering if it exists
   GetOpacity(rgba[3], renderer);
 
+
+  // check for interpolation properties
+  mitk::BoolProperty::Pointer vtkInterpolation = dynamic_cast<mitk::BoolProperty*>(this->GetDataTreeNode()->GetProperty("vtkInterpolation",renderer).GetPointer());
+  mitk::BoolProperty::Pointer iilInterpolation = dynamic_cast<mitk::BoolProperty*>(this->GetDataTreeNode()->GetProperty("iilInterpolation",renderer).GetPointer());
+
+  renderinfo.m_IilInterpolation = iilInterpolation.IsNotNull() && iilInterpolation->GetValue();
+  if (vtkInterpolation.IsNotNull() && vtkInterpolation->GetValue()) {
+    m_Reslicer->SetInterpolationModeToLinear();
+  } else {
+    m_Reslicer->SetInterpolationModeToNearestNeighbor();
+
+  }
+ 
+  
+
   mitk::LevelWindow levelWindow;
   // check for level window prop and use it for display if it exists
   GetLevelWindow(levelWindow, renderer);
@@ -378,6 +393,7 @@ void mitk::ImageMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
     image->setExtrema(levelWindow.GetMin(), levelWindow.GetMax());
   }
 //  image->setColor(rgba[0], rgba[1], rgba[2], rgba[3]);
+  
 }
 
 void mitk::ImageMapper2D::Update(mitk::BaseRenderer* renderer)

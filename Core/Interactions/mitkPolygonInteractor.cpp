@@ -33,7 +33,7 @@ bool mitk::PolygonInteractor::SelectOneLine(ITKPoint3D itkPoint)
  // mitk::Mesh* data = dynamic_cast<mitk::Mesh*>(m_DataTreeNode->GetData());
 	//if (data == NULL)
  // {
- //   (StatusBar::GetInstance())->DisplayText("Error! Sender: PolygonInteractor; Message: Wrong type of Data!", 10000);
+ //   mitk::StatusBar::DisplayText("Error! Sender: PolygonInteractor; Message: Wrong type of Data!", 10000);
  //   return false;
  // }
  // 
@@ -230,7 +230,7 @@ bool mitk::PolygonInteractor::ExecuteSideEffect(int sideEffectId, mitk::StateEve
     ok = true;
     break;
   default:
-    (StatusBar::GetInstance())->DisplayText("Message from mitkPolygonInteractor: I do not understand the SideEffect!", 10000);
+    mitk::StatusBar::DisplayText("Message from mitkPolygonInteractor: I do not understand the SideEffect!", 10000);
     return false;
     //a false here causes the statemachine to undo its last statechange.
     //otherwise it will end up in a different state, but without done SideEffect.

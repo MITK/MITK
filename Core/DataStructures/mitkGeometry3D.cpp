@@ -146,7 +146,7 @@ void mitk::Geometry3D::ExecuteOperation(Operation* operation)
   mitk::AffineTransformationOperation *affineOp = dynamic_cast<mitk::AffineTransformationOperation *>(operation);
 	if (affineOp == NULL)
 	{
-		(StatusBar::GetInstance())->DisplayText("Recieved wrong type of operation!See mitkAffineInteractor.cpp", 10000);
+		mitk::StatusBar::DisplayText("Recieved wrong type of operation!See mitkAffineInteractor.cpp", 10000);
 		return;
 	} 
   switch (operation->GetOperationType())

@@ -19,7 +19,7 @@ mitk::StateMachine::StateMachine(const char * type) : m_CurrentState(NULL)
 	  m_CurrentState = mitk::StateMachineFactory::GetStartState(type);
   }
   else
-    (StatusBar::GetInstance())->DisplayText("Error! Sender: StateMachine; Message: Type of StateMachine is NULL!", 10000);
+    mitk::StatusBar::DisplayText("Error! Sender: StateMachine; Message: Type of StateMachine is NULL!", 10000);
   
   m_UndoController = new UndoController(LIMITEDLINEARUNDO);//switch to LLU or add LLU
 	m_UndoEnabled = true;
@@ -89,7 +89,7 @@ std::cout<<this->GetType()<<": going back! now in StateId "<<m_CurrentState->Get
   else if (!ok && !m_UndoEnabled &&
     m_UndoController->GetLastObjectEventIdInList()==objectEventId)
   {
-    (StatusBar::GetInstance())->DisplayText("Error! Sender: StateMachine; Message: Operation could not be done!", 10000);
+    mitk::StatusBar::DisplayText("Error! Sender: StateMachine; Message: Operation could not be done!", 10000);
   }
   return ok;
 }
@@ -117,7 +117,7 @@ void mitk::StateMachine::ExecuteOperation(Operation* operation)
 			mitk::StateTransitionOperation* stateTransOp = dynamic_cast<mitk::StateTransitionOperation *>(operation);
 			if (stateTransOp == NULL)
 			{
-				(StatusBar::GetInstance())->DisplayText("Error! see mitkStateMachine.cpp", 10000);
+				mitk::StatusBar::DisplayText("Error! see mitkStateMachine.cpp", 10000);
 				return;
 			}
 #ifdef INTERDEBUG

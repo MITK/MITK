@@ -483,7 +483,7 @@ bool mitk::PointSetInteractor::ExecuteSideEffect(int sideEffectId, mitk::StateEv
           }
           else //the position wasn't set properly. @todo if necessary: search the given point in list and set var position
           {
-          (StatusBar::GetInstance())->DisplayText("Message from mitkPointSetInteractor: Error in SideEffects! Check Config XML-file", 10000);
+          mitk::StatusBar::DisplayText("Message from mitkPointSetInteractor: Error in SideEffects! Check Config XML-file", 10000);
             ok = false;
           }
         }
@@ -663,7 +663,7 @@ bool mitk::PointSetInteractor::ExecuteSideEffect(int sideEffectId, mitk::StateEv
 			this->Clear();
 		}
 	default:
-    (StatusBar::GetInstance())->DisplayText("Message from mitkPointSetInteractor: I do not understand the SideEffect!", 10000);
+    mitk::StatusBar::DisplayText("Message from mitkPointSetInteractor: I do not understand the SideEffect!", 10000);
 	  ok = false;
     //a false here causes the statemachine to undo its last statechange.
     //otherwise it will end up in a different state, but without done SideEffect.

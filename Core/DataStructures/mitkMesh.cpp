@@ -55,7 +55,7 @@ void mitk::Mesh::ExecuteOperation(Operation* operation)
     	mitk::PointOperation *lineOp = dynamic_cast<mitk::PointOperation *>(operation);
     	if (lineOp == NULL)//if no PointOperation, then display error and return 
       {
-        (StatusBar::GetInstance())->DisplayText("Message from mitkMesh: Recieved wrong type of operation!See mitkMeshInteractor.cpp", 10000);
+        mitk::StatusBar::DisplayText("Message from mitkMesh: Recieved wrong type of operation!See mitkMeshInteractor.cpp", 10000);
         return;
       }
       Superclass::ExecuteOperation(operation);
@@ -174,7 +174,7 @@ void mitk::Mesh::ExecuteOperation(Operation* operation)
       mitk::LineVecOperation *lineVecOp = dynamic_cast<mitk::LineVecOperation *>(operation);
       if (lineVecOp == NULL)
       {
-        (StatusBar::GetInstance())->DisplayText("Message from mitkMesh: Recieved wrong type of operation!See mitkMeshInteractor.cpp", 10000);
+        mitk::StatusBar::DisplayText("Message from mitkMesh: Recieved wrong type of operation!See mitkMeshInteractor.cpp", 10000);
           return;
       }
 

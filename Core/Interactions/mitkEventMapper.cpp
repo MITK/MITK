@@ -511,7 +511,7 @@ inline const int mitk::EventMapper::convertConstString2ConstInt(std::string inpu
       return (tempIt)->second;
   }
 
-  (StatusBar::GetInstance())->DisplayText("Warning! from mitkEventMapper.cpp: Couldn't find matching Event Int from Event String in XML-File");
+  mitk::StatusBar::DisplayText("Warning! from mitkEventMapper.cpp: Couldn't find matching Event Int from Event String in XML-File");
   return -1;//for didn't find anything
 }
 
@@ -543,7 +543,7 @@ bool mitk::EventMapper::startElement( const QString&, const QString&, const QStr
 
         if (!ok)
         {
-            (StatusBar::GetInstance())->DisplayText("error reading Event::Button, ButtonState or Key!");
+            mitk::StatusBar::DisplayText("error reading Event::Button, ButtonState or Key!");
         }
         m_EventDescriptions.push_back(eventDescr);
 	}

@@ -96,7 +96,7 @@ bool mitk::StateMachineFactory::parse(mitk::State::StateMap *states, mitk::State
 	//nextStatesSet is empty, so deadlock!
 	if ( nextStatesSet.empty() )
 	{
-      (StatusBar::GetInstance())->DisplayText("Warnung: Ein inkonsistenter Zustand (oder ein Endzustand) wird erzeugt!");    
+    StatusBar::DisplayText("Warnung: Ein inkonsistenter Zustand (oder ein Endzustand) wird erzeugt!");    
 	  return true;//Jedoch erlaubt!!!z.B. als Endzustand
 	}
 	bool ok;
@@ -133,7 +133,7 @@ bool mitk::StateMachineFactory::ConnectStates(mitk::State::StateMap *states)
 	  else //ether !ok or sizeA!=sizeB
 	  {
 	    delete history;
-        (StatusBar::GetInstance())->DisplayText("Warnung: Ein unereichbarer Zustand wird aufgebaut. Ueberprüfen sie die Zustands- Konfigurations- Datei");    
+        mitk::StatusBar::DisplayText("Warnung: Ein unereichbarer Zustand wird aufgebaut. Ueberprüfen sie die Zustands- Konfigurations- Datei");    
 		//return false;//better go on and build/ connect the states than quit
       }
 	}
@@ -144,7 +144,7 @@ bool mitk::StateMachineFactory::ConnectStates(mitk::State::StateMap *states)
 		bool tempbool = ( ( tempState->second )->ConnectTransitions( states ) );
         if ( tempbool = false )
 		{
-       		(StatusBar::GetInstance())->DisplayText("Warnung: Das Verbinden der Zustände war NICHT erfolgreich!");    
+       		mitk::StatusBar::DisplayText("Warnung: Das Verbinden der Zustände war NICHT erfolgreich!");    
             return false;//abort!
 		}
 	}

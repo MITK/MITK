@@ -117,7 +117,7 @@ void mitk::Geometry2DDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
 
   mitk::Geometry2DData::Pointer input  = const_cast<mitk::Geometry2DData*>(this->GetInput());
 
-  if(input.IsNotNull())
+  if(input.IsNotNull() && (input->GetGeometry2D() != NULL))
   {
     mitk::Geometry2DDataToSurfaceFilter::Pointer surfaceCreator;
     mitk::SmartPointerProperty::Pointer surfacecreatorprop;

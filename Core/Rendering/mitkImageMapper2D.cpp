@@ -95,7 +95,8 @@ void mitk::ImageMapper2D::Paint(mitk::BaseRenderer * renderer)
 
   glMatrixMode (GL_PROJECTION);
   glLoadIdentity ();
-  gluOrtho2D(topLeft[0]-0.5, bottomRight[0]-0.5, topLeft[1]-0.5/*+1*/, bottomRight[1]-0.5);
+//  gluOrtho2D(topLeft[0]-0.5, bottomRight[0]-0.5, topLeft[1]-0.5/*+1*/, bottomRight[1]-0.5);
+  gluOrtho2D(topLeft[0], bottomRight[0], topLeft[1]/*+1*/, bottomRight[1]);
   glMatrixMode( GL_MODELVIEW );
 
   GLdouble eqn0[4] = {0.0, 1.0, 0.0, 0.0};
@@ -213,9 +214,9 @@ void mitk::ImageMapper2D::GenerateData(mitk::BaseRenderer *renderer)
     normal = planeview->GetNormal();      normal.Normalize();
     //VnlVector v = inputtimegeometry->GetMatrixColumn(2);
     //origin[0]-=v[0]*0.5; origin[1]-=v[1]*0.5; origin[2]-=v[2]*0.5;
-    Vector3D v; v.Fill(0.5); v.Fill(0.0005);
-    v = inputtimegeometry->GetIndexToWorldTransform()->TransformVector(v);
-    origin -= v;
+    ////Vector3D v; v.Fill(0.5); v.Fill(0.0005);
+    ////v = inputtimegeometry->GetIndexToWorldTransform()->TransformVector(v);
+    ////origin -= v;
     //Vector3D inplane;
     //inplane = v-normal*(v*normal);
     //origin -= inplane;

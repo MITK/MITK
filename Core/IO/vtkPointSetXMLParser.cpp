@@ -16,7 +16,7 @@ void mitk::vtkPointSetXMLParser::StartElement ( const char *name, const char **a
     //
     if ( currentElement == mitk::PointSetWriter::XML_POINT_SET )
     {
-        m_CurrentPointSet = mitk::PointSet::New();
+        m_CurrentPointSet = PointSetType::New();
     }
     //
     // when a new point begins, initialize it to zero.

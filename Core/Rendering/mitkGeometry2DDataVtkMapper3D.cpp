@@ -48,8 +48,6 @@ mitk::Geometry2DDataVtkMapper3D::Geometry2DDataVtkMapper3D() : m_DataTreeIterato
         m_VtkTexture->SetLookupTable(m_VtkLookupTable);
         m_VtkTexture->MapColorScalarsThroughLookupTableOn();
 
-    m_SliceSelector = mitk::ImageSliceSelector::New();
-
     //    m_Actor->SetTexture(axialTexture);
 
     //  axialTexture->SetInput(axialSection->GetOutput());

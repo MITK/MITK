@@ -10,7 +10,7 @@
 #include <vtkLight.h>
 
 //##ModelId=3E33ECF301AD
-mitk::OpenGLRenderer::OpenGLRenderer()
+mitk::OpenGLRenderer::OpenGLRenderer() : m_IilImage(0)
 {
 
 }
@@ -106,6 +106,8 @@ void mitk::OpenGLRenderer::Update()
             Mapper2D* mapper2d=dynamic_cast<Mapper2D*>(mapper.GetPointer());
             if(mapper2d!=NULL)
             {
+								ImageMapper2D* imagemapper2d=dynamic_cast<ImageMapper2D*>(mapper.GetPointer());
+								imagemapper2d->m_IilImage = &m_IilImage;
                 mapper2d->SetDisplayGeometry(m_DisplayGeometry);
                 mapper2d->Update();
             }
@@ -121,9 +123,10 @@ void mitk::OpenGLRenderer::Update()
 //##ModelId=3E330D2903CC
 void mitk::OpenGLRenderer::Render()
 {
-    if(m_LastUpdateTime<GetMTime())
-        Update();
-
+// TODO: 
+    if (m_LastUpdateTime<GetMTime() || GetDisplayGeometry()->GetMTime()<GetMTime()) {
+         Update();
+    }
     glClear(GL_COLOR_BUFFER_BIT);
 
     if(m_DataTreeIterator==NULL) return;
@@ -134,8 +137,10 @@ void mitk::OpenGLRenderer::Render()
         if(mapper!=NULL)
         {
             ImageMapper2D* imagemapper2d=dynamic_cast<ImageMapper2D*>(mapper.GetPointer());
-            if(imagemapper2d!=NULL)
-                imagemapper2d->Paint(m_RenderWindow);
+            if(imagemapper2d!=NULL) {
+									imagemapper2d->m_IilImage = &m_IilImage;
+                	imagemapper2d->Paint(m_RenderWindow);
+                 }
         }
     }
 
@@ -220,7 +225,7 @@ void mitk::OpenGLRenderer::SetWindowId(void * id)
 void mitk::OpenGLRenderer::InitSize(int w, int h)
 {
     m_VtkRenderWindow->SetSize(w,h);
-    m_DisplayGeometry->Fit();
+     m_DisplayGeometry->Fit();
     Modified();
     Update();
 }

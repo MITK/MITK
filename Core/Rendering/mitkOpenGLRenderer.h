@@ -6,6 +6,8 @@
 #include "DataTree.h"
 #include "ImageSliceSelector.h"
 
+#include "picimage.h"
+
 class vtkRenderer;
 class vtkRenderWindow;
 class vtkLight;
@@ -32,6 +34,8 @@ class OpenGLRenderer : public BaseRenderer
     /** Run-time type information (and related methods). */
     itkTypeMacro(BaseRenderer,OpenGLRenderer);
 
+
+    
     //##ModelId=3E3D28AB0018
     void SetData(mitk::DataTreeIterator* iterator);
 
@@ -81,6 +85,8 @@ class OpenGLRenderer : public BaseRenderer
 
     //##ModelId=3E33145B001E
     vtkLight* m_Light;
+  public: //FIXME
+		iilPicImage* m_IilImage;
 };
 
 } // namespace mitk

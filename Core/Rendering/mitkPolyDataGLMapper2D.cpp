@@ -97,8 +97,12 @@ void mitk::PolyDataGLMapper2D::Paint( mitk::BaseRenderer * renderer )
             return;
         }
 
-
+#if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
+        double vp[ 3 ], vnormal[ 3 ];
+#else
         float vp[ 3 ], vnormal[ 3 ];
+#endif
+
         vnl2vtk(point.Get_vnl_vector(), vp);
         vnl2vtk(normal.Get_vnl_vector(), vnormal);
 
@@ -156,13 +160,21 @@ void mitk::PolyDataGLMapper2D::Paint( mitk::BaseRenderer * renderer )
 
             if ( m_ColorByCellData )
             {  // color each cell according to cell data
-                float * color = lut->GetColor( vcellscalars->GetComponent( i, 0 ) );
+#if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
+              double * color = lut->GetColor( vcellscalars->GetComponent( i, 0 ) );
+#else
+              float * color = lut->GetColor( vcellscalars->GetComponent( i, 0 ) );
+#endif
                 glColor3f( color[ 0 ], color[ 1 ], color[ 2 ] );
             }
             if ( m_ColorByPointData )
             {
-                float* color = lut->GetColor( vscalars->GetComponent( cell[0], 0 ) );
-                glColor3f( color[ 0 ], color[ 1 ], color[ 2 ] );
+#if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
+              double* color = lut->GetColor( vscalars->GetComponent( cell[0], 0 ) );
+#else
+              float* color = lut->GetColor( vscalars->GetComponent( cell[0], 0 ) );
+#endif
+              glColor3f( color[ 0 ], color[ 1 ], color[ 2 ] );
             }
 
             glBegin ( GL_LINE_LOOP );

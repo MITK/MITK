@@ -22,6 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkBoundingObject.h"
 #include <mitkContour.h>
+#include <vtkConfigure.h>
 #include <mitkPlaneGeometry.h>
 
 class vtkLinearExtrusionFilter;
@@ -90,13 +91,24 @@ protected:
   bool m_AutomaticVectorGeneration;
 
   vtkPolygon* m_Polygon;
+
+#if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
+  double m_ProjectedContourBounds[6];
+#else
   float m_ProjectedContourBounds[6];
+#endif
+
   mitk::PlaneGeometry::Pointer m_ProjectionPlane;
   //##Documentation
   //## @brief For fast projection on plane
   float m_Right[3];
   float m_Down[3];
+
+#if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
+    double m_Normal[3];
+#else
   float m_Normal[3];
+#endif
   float m_Origin[3];
 
   vtkLinearExtrusionFilter* m_ExtrusionFilter;

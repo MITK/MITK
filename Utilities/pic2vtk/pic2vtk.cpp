@@ -1275,7 +1275,12 @@ vtkImageData* Pic2vtk::loadVtkImage( char* fileName ) {
 	std::cout << "e1 = " << extent[0] << " e2 = " << extent[1] << " e3 = " << extent[2] << std::endl;
 	std::cout << "e4 = " << extent[3] << " e5 = " << extent[4] << " e6 = " << extent[5] << std::endl;
 	
-	float s[3];
+  #if ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4))
+	double s[3];
+  #else
+  float s[3];
+  #endif
+  
 	((vtkImageData *)points)->GetSpacing (s);
 	std::cout << "s1 = " << s[0] << " s2 = " << s[1] << " s3 = " << s[2] << std::endl;
 

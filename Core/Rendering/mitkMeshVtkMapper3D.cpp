@@ -102,9 +102,13 @@ void mitk::MeshVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
 
 	int j;
 
+#if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
+  double rgba[4]={1.0f,1.0f,1.0f,1.0f};
+#else
   float rgba[4]={1.0f,1.0f,1.0f,1.0f};
+#endif
   // check for color prop and use it for rendering if it exists
-  GetColor(rgba, renderer);
+  GetColor((float*)rgba, renderer);
 
   if(mesh->GetNumberOfPoints()>0)
   {

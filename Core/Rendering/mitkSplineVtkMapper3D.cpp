@@ -125,8 +125,14 @@ mitk::SplineVtkMapper3D::GenerateData()
         profileMapper->SetInput( profileData );
 
         m_SplinesActor->SetMapper( profileMapper );
+
+
+#if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
+        double rgba[ 4 ] = {1.0f, 0.0f, 0.0f, 1.0f};
+#else
         float rgba[ 4 ] = {1.0f, 0.0f, 0.0f, 1.0f};
-        this->GetDataTreeNode()->GetColor( rgba, NULL );
+#endif
+        this->GetDataTreeNode()->GetColor( (float*)rgba, NULL );
         m_SplinesActor->GetProperty()->SetColor( rgba );
 
         float lineWidth;

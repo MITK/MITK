@@ -181,7 +181,12 @@ void mitk::ImageMapper2D::GenerateData(mitk::BaseRenderer *renderer)
   if(inputData==NULL)
     return;
 
+#if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
+  double spacing[3];
+#else
   float spacing[3];
+#endif
+  
   inputData->GetSpacing(spacing);
 
   //how many pixels we really want to sample: width x height pixels

@@ -158,7 +158,12 @@ void mitk::SurfaceMapper2D::Paint(mitk::BaseRenderer * renderer)
         return;
     }
 
+#if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
+    double vp[3], vnormal[3];
+#else
     float vp[3], vnormal[3];
+#endif
+
     vnl2vtk(point.Get_vnl_vector(), vp);
     vnl2vtk(normal.Get_vnl_vector(), vnormal);
 
@@ -205,7 +210,11 @@ void mitk::SurfaceMapper2D::PaintCells(vtkPolyData* contour, const mitk::Geometr
   for(i=0;i<numberOfCells;++i)
   {
     int *cell, cellSize;
+#if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
+    double vp[3];
+#else
     float vp[3];
+#endif
 
     vpolys->GetNextCell(cellSize, cell);
 
@@ -239,7 +248,12 @@ void mitk::SurfaceMapper2D::PaintCells(vtkPolyData* contour, const mitk::Geometr
 
       if (lut != NULL) 
       {  // color each cell according to cell data
+
+#if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
+        double *color;
+#else
         float *color;
+#endif
 
         if (vcellscalars != NULL )
         {

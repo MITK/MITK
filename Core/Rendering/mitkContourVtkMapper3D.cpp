@@ -129,7 +129,11 @@ void mitk::ContourVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
 		  m_TubeFilter->SetRadius(1);
       m_TubeFilter->Update();
       m_VtkPolyDataMapper->SetInput(m_TubeFilter->GetOutput());
+#if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
+      double rgba[4]={0.0f,1.0f,0.0f,0.6f};
+#else
       float rgba[4]={0.0f,1.0f,0.0f,0.6f};
+#endif
       m_Actor->GetProperty()->SetColor(rgba);
       m_Actor->SetMapper(m_VtkPolyDataMapper);
     }

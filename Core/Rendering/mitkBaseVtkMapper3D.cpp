@@ -55,8 +55,15 @@ void mitk::BaseVtkMapper3D::ApplyProperties(vtkActor* actor, mitk::BaseRenderer*
     // check for opacity prop and use it for rendering if it exists
     GetOpacity(rgba[3], renderer);
 
+#if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
+    double drgba[4]={rgba[0],rgba[1],rgba[2],rgba[3]};
+    actor->GetProperty()->SetColor(drgba);
+    actor->GetProperty()->SetOpacity(drgba[3]);
+#else
     actor->GetProperty()->SetColor(rgba);
     actor->GetProperty()->SetOpacity(rgba[3]);
+#endif
+
 }
 
 

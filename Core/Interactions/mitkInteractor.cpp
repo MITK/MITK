@@ -145,7 +145,11 @@ float mitk::Interactor::CalculateJurisdiction(StateEvent const* stateEvent) cons
       assert(disPosEvent->GetSender()!=NULL);
       return 0;
     }
+#if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
+    double normal[3];
+#else
     float normal[3];
+#endif
     camera->GetViewPlaneNormal(normal);
 
     mitk::BoundingBox::PointType center,n;

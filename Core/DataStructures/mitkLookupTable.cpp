@@ -50,7 +50,13 @@ void mitk::LookupTable::ChangeOpacityForAll( float opacity )
 
     int noValues = m_LookupTable->GetNumberOfTableValues ();
 
+
+#if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
+    double rgba[ 4 ];
+#else
     float rgba[ 4 ];
+#endif
+
     for ( int i = 0;i < noValues;i++ )
     {
         m_LookupTable->GetTableValue ( i, rgba );
@@ -70,7 +76,11 @@ void mitk::LookupTable::ChangeOpacity(int index, float opacity )
 			return;
 		}
 		
+#if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
+    double rgba[ 4 ];
+#else
     float rgba[ 4 ];
+#endif
     m_LookupTable->GetTableValue ( index, rgba );
     rgba[ 3 ] = opacity;
     m_LookupTable->SetTableValue ( index, rgba );
@@ -182,10 +192,18 @@ void mitk::LookupTable::CreateColorTransferFunction(vtkColorTransferFunction*& c
   mitk::LookupTable::RawLookupTableType *rgba = GetRawLookupTable();
   int i, num_of_values=m_LookupTable->GetNumberOfTableValues();
 
+
+#if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
+  double *cols;
+  double *colsHead;
+  colsHead=cols=(double *)malloc(sizeof(double*)*num_of_values*3);
+#else
   float *cols;
   float *colsHead;
-
   colsHead=cols=(float *)malloc(sizeof(float *)*num_of_values*3);
+#endif
+
+
 
   for(i=0;i<num_of_values;++i)
   {
@@ -207,10 +225,17 @@ void mitk::LookupTable::CreateOpacityTransferFunction(vtkPiecewiseFunction*& opa
   mitk::LookupTable::RawLookupTableType *rgba = GetRawLookupTable();
   int i, num_of_values=m_LookupTable->GetNumberOfTableValues();
 
+
+#if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
+  double *alphas;
+  double *alphasHead;
+  alphasHead=alphas=(double*)malloc(sizeof(double*)*num_of_values);
+#else
   float *alphas;
   float *alphasHead;
-
   alphasHead=alphas=(float *)malloc(sizeof(float *)*num_of_values);
+#endif
+
 
   rgba+=3;
   for(i=0;i<num_of_values;++i)

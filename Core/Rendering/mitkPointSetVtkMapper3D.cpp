@@ -177,9 +177,18 @@ void mitk::PointSetVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
 		m_vtkPointList->AddInput(m_tubefilter->GetOutput());
 	}
 
-  float rgba[4]={1.0f,1.0f,1.0f,1.0f};
+  float tmprgba[4]={1.0f,1.0f,1.0f,1.0f};
   // check for color prop and use it for rendering of PTUNDEFINED points if it exists
-  GetColor(rgba, renderer);
+  GetColor(tmprgba, renderer);
+
+#if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
+  double rgba[4]={1.0f,1.0f,1.0f,1.0f};
+#else
+  float rgba[4]={1.0f,1.0f,1.0f,1.0f};
+#endif
+  
+  for (int i=0;i<4;i++)
+    rgba[i] = tmprgba[i];
 
   int pointSize = 2;
   mitk::IntProperty::Pointer pointSizeProp = dynamic_cast<mitk::IntProperty *>(this->GetDataTreeNode()->GetProperty("pointsize").GetPointer());

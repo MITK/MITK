@@ -59,7 +59,11 @@ int mitkSurfaceTest(int argc, char* argv[])
   } 
 
   {
+#if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
+    double bounds[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+#else
     float bounds[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+#endif
     polys->ComputeBounds();
     polys->GetBounds( bounds );
 
@@ -110,7 +114,12 @@ int mitkSurfaceTest(int argc, char* argv[])
   //mitk::TimeSlicedGeometry* timeSlicedGeometry = surface->GetTimeSlicedGeometry();
   //timeSlicedGeometry->InitializeEvenlyTimed(geometry, 5);
 
+#if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
+  double bounds[5][6];
+#else
   float bounds[5][6];
+#endif
+
   for (int i=0;i<5;i++) {
     vtkSphereSource* sphereSource = vtkSphereSource::New();
     sphereSource->SetCenter(0,0,0);

@@ -75,7 +75,14 @@ vtkImageData* mitk::Image::GetVtkImageData(int t, int n)
   mitk::ImageDataItem::Pointer volume=GetVolumeData(t, n);
   if(volume.IsNull() || volume->GetVtkImageData() == NULL)
     return NULL;
+
+#if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
+  float *fspacing = const_cast<float *>(GetUpdatedSlicedGeometry(t)->GetFloatSpacing());
+  double dspacing[3] = {fspacing[0],fspacing[1],fspacing[2]};
+  volume->GetVtkImageData()->SetSpacing( dspacing );
+#else
   volume->GetVtkImageData()->SetSpacing(const_cast<float*>(GetUpdatedSlicedGeometry(t)->GetFloatSpacing()));
+#endif
   return volume->GetVtkImageData();
 }
 
@@ -695,7 +702,11 @@ void mitk::Image::Initialize(vtkImageData* vtkimagedata, int channels, int tDim,
     tmpDimensions,
     channels);
 
+#if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
+  const double *spacinglist = vtkimagedata->GetSpacing();
+#else
   const float *spacinglist = vtkimagedata->GetSpacing();
+#endif
   Vector3D spacing;
   FillVector3D(spacing, spacinglist[0], 1.0, 1.0);
   if(m_Dimension>=2)

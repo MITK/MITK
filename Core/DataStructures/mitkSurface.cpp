@@ -141,7 +141,11 @@ void mitk::Surface::CalculateBoundingBox()
   for ( unsigned int i = 0 ; i < m_PolyDataSeries.size() ; ++i )
   {
     vtkPolyData* polyData = m_PolyDataSeries[ i ];
+#if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
+    double bounds[ ] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+#else
     float bounds[ ] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+#endif
     if ( polyData != NULL )
     {
       polyData->Update();
@@ -150,7 +154,15 @@ void mitk::Surface::CalculateBoundingBox()
     }
     mitk::Geometry3D::Pointer g3d = timeGeometry->GetGeometry3D( i );
     assert( g3d.IsNotNull() );
+#if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
+    float fbounds[ ] =  {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+    for (int i=0;i<6;i++)
+      fbounds[i] = bounds[i];
+      g3d->SetFloatBounds( fbounds );
+#else
     g3d->SetFloatBounds( bounds );
+#endif
+
   }
   mitk::BoundingBox::Pointer bb = const_cast<mitk::BoundingBox*>( timeGeometry->GetBoundingBox() );
   //std::cout << "min"<< bb->GetMinimum() << std::endl;

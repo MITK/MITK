@@ -91,6 +91,7 @@ void mitk::OpenGLRenderer::SetData(mitk::DataTreeIterator* iterator)
 //##ModelId=3E330D260255
 void mitk::OpenGLRenderer::Update()
 {
+    if(m_DataTreeIterator==NULL) return;
     mitk::DataTreeIterator* it=m_DataTreeIterator->clone();
     while(it->hasNext())
     {
@@ -118,6 +119,8 @@ void mitk::OpenGLRenderer::Update()
 void mitk::OpenGLRenderer::Render()
 {
     glClear(GL_COLOR_BUFFER_BIT);
+
+    if(m_DataTreeIterator==NULL) return;
     mitk::DataTreeIterator* it=m_DataTreeIterator->clone();
     while(it->hasNext())
     {

@@ -42,7 +42,7 @@ void mitk::BaseRenderer::InitSize(int w, int h)
 }
 
 //##ModelId=3E3D2F120050
-mitk::BaseRenderer::BaseRenderer()
+mitk::BaseRenderer::BaseRenderer() : m_DataTreeIterator(NULL), m_RenderWindow(NULL)
 {
     m_ScreenGeometry = mitk::ScreenGeometry::New();
 }

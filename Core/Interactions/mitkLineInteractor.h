@@ -21,12 +21,13 @@ See MITKCopyright.txt or http://www.mitk.org/ for details.
 
 #include "mitkCommon.h"
 #include <mitkHierarchicalInteractor.h>
-#include "mitkPointInteractor.h"
+#include "mitkPointSnapInteractor.h"
 #include <mitkVector.h>
 
 namespace mitk
 {
 class DataTreeNode;
+class StateEvent;
 
 //##Documentation
 //## @brief Interaction with a line between two Points.
@@ -77,7 +78,7 @@ private:
 
   //##Documentation
   //## @brief lower Point Interactor 
-  PointInteractor::Pointer m_PointInteractor;
+  PointSnapInteractor::Pointer m_PointInteractor;
 
 };
 }

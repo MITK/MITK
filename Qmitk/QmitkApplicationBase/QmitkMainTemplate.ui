@@ -114,7 +114,7 @@
             <cstring>fileOpenAction</cstring>
         </property>
         <property name="iconSet">
-            <iconset></iconset>
+            <iconset>fileopen</iconset>
         </property>
         <property name="text">
             <string>Open</string>

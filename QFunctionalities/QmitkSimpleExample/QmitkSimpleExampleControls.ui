@@ -8,7 +8,7 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>124</width>
+            <width>126</width>
             <height>505</height>
         </rect>
     </property>
@@ -19,13 +19,6 @@
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
         </sizepolicy>
-    </property>
-    <property name="paletteBackgroundColor">
-        <color>
-            <red>212</red>
-            <green>208</green>
-            <blue>200</blue>
-        </color>
     </property>
     <property name="font">
         <font>

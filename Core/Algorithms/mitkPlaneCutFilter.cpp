@@ -3,7 +3,7 @@
 #include "mitkVector.h"
 
 template <class T>
-void _planesSet(ipPicDescriptor *dest, const mitk::PlaneView *planes, T outside_value, T * dummy=0)
+void _planesSet(ipPicDescriptor *dest, const mitk::Geometry3D* srcgeometry, const mitk::PlaneView *planes, T outside_value, T * dummy=0)
 {
 	T *d=(T*)dest->data;
 
@@ -12,13 +12,15 @@ void _planesSet(ipPicDescriptor *dest, const mitk::PlaneView *planes, T outside_
 //    Plane3dList::iterator end = planes->end();
 
 	int x_max(dest->n[0]),y_max(dest->n[1]), z_max(dest->n[2]), xy3_size(dest->n[0]*dest->n[1]);
-    mitk::Vector3D p;
+  mitk::Point3D p;
+  mitk::Point3D pt_mm;
 	for(p.z=0;p.z<z_max;++p.z)
 		for(p.y=0;p.y<y_max;++p.y)
 			for(p.x=0;p.x<x_max;++p.x,++d)
 //				for(pl=planes->begin();pl!=end;++pl)
 				{
-					if((*pl)->signedDistance(p)<0)
+          srcgeometry->UnitsToMM(p, pt_mm);
+					if((*pl)->signedDistance(pt_mm)<0)
 						*d=outside_value;
 				}
 }
@@ -31,10 +33,11 @@ void mitk::PlaneCutFilter::GenerateData()
 	ipPicDescriptor *pic_result;
 
     pic_result=ipPicClone(const_cast<mitk::Image*>(input.GetPointer())->GetPic());
+    pic_result->dim=3;
 
 	if(m_Planes!=NULL)
     {
-		ipPicTypeMultiplex2(_planesSet, pic_result, m_Planes, m_BackgroundLevel);
+		ipPicTypeMultiplex3(_planesSet, pic_result, input->GetGeometry(), m_Planes, m_BackgroundLevel);
     }
 
     output->Initialize(pic_result);

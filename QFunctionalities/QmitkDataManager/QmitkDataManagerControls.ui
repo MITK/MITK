@@ -219,7 +219,7 @@
 </connections>
 <includes>
     <include location="global" impldecl="in declaration">mitkDataTree.h</include>
-    <include location="local" impldecl="in declaration">DataTreeView.h</include>
+    <include location="local" impldecl="in declaration">QmitkDataTreeViewItem.h</include>
     <include location="global" impldecl="in declaration">map</include>
     <include location="local" impldecl="in declaration">mitkBaseProperty.h</include>
     <include location="global" impldecl="in declaration">string</include>

@@ -87,6 +87,7 @@ typedef enum ESideEffects
   SeREMOVEPOINT = 100,
   SeINSERTPOINT = 110,
   SeDELETEPOINT = 120,
+  SeCLEAR = 130, //clear all elements from a list
   SeTERMINATE_INTERACTION = 666
 };
 

@@ -21,7 +21,6 @@ So a separation of the definition of a sequence in interaction and its implement
 To be able to do that, we implemented the concept of statemachines with several classes: States, Transitions and Actions define the interaction pattern. The Statemachine itself adds the handling of events, that are send to it.
 
 \image html statemachine.jpg
-\image latex statemachine.eps "statemachine" 
 
 \b Example: A deterministic Mealy-statemachine has always one current state (here state 1). If an event 1 is sent to the statemachine, it searches in its current state for a transition that waits for event 1 (here transition 1). The statemachine finds transition 1, changes the current state to state2, cause the transition points to it and executes actions 1 and 2. Now state 2 is the current state. The statemachine recieves an event 2 and searches for an according transition. Transition 2 waits for event 2, and since the transition leads to state 2 the current state is not changed. Action 3 and 4 are executed. Now Event 3 gets send to the statemachine but the statemachine can't find an according transition in state 2. Only transition 2 , that waits for event 2 and transition 4, that waits for event 4 are defined in that state. So the statemachine ignores the event and doesn't change the state or execute an action. Now the statemachine recieves an event 4 and finds transition 3. So now the current state changes from state 2 to state 1 and actions 5 and 1 are executed.
 
@@ -32,7 +31,6 @@ Several actions can be defined in one transition. The execution of an action is 
 Guard States are a special kind of states. The action, that is executed after the state is set as current state, sends a new event to the statemachine, which leads out of the guard state. So the statemachine will only stay in a guard state for a short time. This kind of state is used to check different conditions, e.g. is an Object is picked of a set of points will be full after the addition of one point.
 
 \image html statemachine_guard.jpg
-\image latex statemachine_guard.eps "statemachine" 
 
 \b Example: Event 1 is send to the statemachine. This leads the current state from state 1 into state check. The action 1 is executed. This action checks a condition and puts the result into a new event, that is send an handled by the same (this) statemachine. E.g. is the the object, the statemachine handles the interaction, picked with the recieved mouse-koordinate? The event, that is generated, will be Yes or No. In case of event No, the statemachine sets the current state back to state 1 and executes action 2. In case of event Yes, the statemachine changes the state from state check into state 2 and executes action 3, which e.g. can select the object taken care of.
 

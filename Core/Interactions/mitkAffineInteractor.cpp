@@ -43,27 +43,33 @@ bool mitk::AffineInteractor::ExecuteAction(int actionId, mitk::StateEvent const*
   case AcCHECKELEMENT:
   {
     mitk::PositionEvent const  *posEvent = dynamic_cast <const mitk::PositionEvent *> (stateEvent->GetEvent());
-		if (posEvent == NULL)
-      return false;
-
-    mitk::Point3D worldPoint = posEvent->GetWorldPosition();
-
     mitk::StateEvent* newStateEvent = NULL;
-    mitk::BoolProperty::Pointer prop;
-    if (this->CheckSelected(worldPoint))
+    
+    if (posEvent != NULL) //for 2D Interaction
     {
-      newStateEvent = new mitk::StateEvent(StYES, posEvent);
-      prop = new mitk::BoolProperty(true);
+      mitk::Point3D worldPoint = posEvent->GetWorldPosition();
+
+      mitk::BoolProperty::Pointer prop;
+
+      if (this->CheckSelected(worldPoint))
+      {
+        newStateEvent = new mitk::StateEvent(StYES, posEvent);
+        prop = new mitk::BoolProperty(true);
+      }
+      else
+      {
+        newStateEvent = new mitk::StateEvent(StNO, posEvent);
+        prop = new mitk::BoolProperty(false);
+      }
+
+      // write new state (selected/not selected) to the property
+      m_DataTreeNode->GetPropertyList()->SetProperty("selected", prop);
     }
-    else
+    else // DisplayEvent from 3D Window or else Event
     {
       newStateEvent = new mitk::StateEvent(StNO, posEvent);
-      prop = new mitk::BoolProperty(false);
+      //no change on selected state because of no interaction in 3D right now
     }
-    // write new state (selected/not selected) to the property
-    m_DataTreeNode->GetPropertyList()->SetProperty("selected", prop);
-
-    //call HandleEvent to leave the guard-state
     this->HandleEvent( newStateEvent, objectEventId, groupEventId );
 		ok = true;
     break;

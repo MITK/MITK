@@ -181,8 +181,11 @@ void mitk::OpenGLRenderer::UpdateIncludingVtkActors()
 
   if(newRenderer)
   {
+    int w=vtkObject::GetGlobalWarningDisplay();
+    vtkObject::GlobalWarningDisplayOff();
     m_VtkRenderer->ResetCamera();
     m_VtkRenderer->GetActiveCamera()->Elevation(-90);
+    vtkObject::SetGlobalWarningDisplay(w);
   }
   //    catch( ::itk::ExceptionObject ee)
   //    {
@@ -432,7 +435,12 @@ void mitk::OpenGLRenderer::InitSize(int w, int h)
   Modified();
   Update();
   if(m_VtkRenderer!=NULL)
+  {
+    int w=vtkObject::GetGlobalWarningDisplay();
+    vtkObject::GlobalWarningDisplayOff();
     m_VtkRenderer->ResetCamera();
+    vtkObject::SetGlobalWarningDisplay(w);
+  }
 }
 
 //##ModelId=3EF59AD20235

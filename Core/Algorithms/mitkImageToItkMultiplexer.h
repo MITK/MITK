@@ -189,6 +189,12 @@ namespace mitk
     mitkoutputimage->InitializeByItk(itkimage.GetPointer());
     mitkoutputimage->SetVolume(itkimage->GetBufferPointer());
   }
+
+  template <typename ItkOutputImageType> void CastToMitkImage(ItkOutputImageType* itkimage, itk::SmartPointer<mitk::Image>& mitkoutputimage)
+  {
+    mitkoutputimage->InitializeByItk(itkimage);
+    mitkoutputimage->SetVolume(itkimage->GetBufferPointer());
+  }
 }
 
 #endif // of MITKIMAGETOITKMULTIPLEXER_H_HEADER_INCLUDED

@@ -13,7 +13,7 @@ const int PRECISION = 5;
 
 //##ModelId=3F017B3200F5
 mitk::PointSetInteractor::PointSetInteractor(std::string type, DataTreeNode* dataTreeNode, int n)
-	:AffineInteractor(type, dataTreeNode), m_N(n), m_Precision(PRECISION)
+	:Interactor(type, dataTreeNode), m_N(n), m_Precision(PRECISION)
 {
   m_LastPoint.Fill(0);
   m_SumVec.Fill(0);

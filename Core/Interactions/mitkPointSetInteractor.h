@@ -2,7 +2,8 @@
 #define MITKPOINTSETINTERACTOR_H_HEADER_INCLUDED_C11202FF
 
 #include "mitkCommon.h"
-#include <mitkAffineInteractor.h>
+#include "mitkVector.h"
+#include <mitkInteractor.h>
 
 namespace mitk
 {
@@ -12,11 +13,11 @@ class DataTreeNode;
 //## @brief Interaction with a set of points.
 //## @ingroup Interaction
 //## Points can be added, removed and moved.
-class PointSetInteractor : public AffineInteractor
+class PointSetInteractor : public Interactor
 {
   public:
     //##ModelId=3F017B3200F2
-    mitkClassMacro(PointSetInteractor, AffineInteractor);
+    mitkClassMacro(PointSetInteractor, Interactor);
 
     //##ModelId=3F017B3200F5
     //##Documentation

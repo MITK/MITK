@@ -18,6 +18,7 @@ itk::DataObject::Pointer mitk::BaseDataSource::MakeOutput ( unsigned int idx )
 {
     //this doesn't work, since we can not instantiate a base data
     //return OutputType::New().getPointer();
+    return NULL;
 }
 
 

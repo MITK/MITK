@@ -1,4 +1,3 @@
-#include <qapplication.h>
 #include "mitkLevelWindow.h"
 #include "mitkVolumeDataVtkMapper3D.h"
 #include "mitkDataTreeNode.h"

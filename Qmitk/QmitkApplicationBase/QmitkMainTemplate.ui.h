@@ -168,17 +168,6 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
 
       mitkMultiWidget->levelWindowWidget->setLevelWindow(levelWindow);
 
-
-
-      // example usage of a lookup table
-      /*
-  		mitk::LookupTableSource::Pointer LookupTableSource = new mitk::LookupTableSource();
-      //LookupTableSource->SetUseHPDopplerLookupTable();
-      //LookupTableSource->SetUseStrainLookupTable();
-  		mitk::LookupTableSource::OutputTypePointer LookupTable = LookupTableSource->GetOutput();
-      mitk::LookupTableProperty::Pointer LookupTableProp = new mitk::LookupTableProperty(*LookupTable);
-    	node->SetProperty("LookupTable", LookupTableProp );
-      */
       initWidgets(it);
     }
   }
@@ -319,69 +308,147 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
     std::cout << "loading " << fileName << " as DSR ... " << std::endl;
 
     reader->SetFileName(fileName);
+    
     mitk::ImageTimeSelector::Pointer timeSelector=mitk::ImageTimeSelector::New();
+    mitk::ImageTimeSelector::Pointer DopplerTimeSelector=mitk::ImageTimeSelector::New();
+
+
+    mitk::CylindricToCartesianFilter::Pointer cyl2cart = mitk::CylindricToCartesianFilter::New();;
+    mitk::CylindricToCartesianFilter::Pointer cyl2cartDoppler = mitk::CylindricToCartesianFilter::New();
+
+		cyl2cart->SetTargetXSize(128);
+		cyl2cartDoppler->SetTargetXSize(128); 
+		//
+    // insert just timeslice nr.0
+    // @TODO: insert complete 4D data
+    reader->Update();
+
+		bool haveDoppler = false;
+    if (reader->GetOutput()->IsValidChannel(0))
+    {
+				std::cout << "    have channel data 0 (backscatter) ... " << std::endl;
+		}
+
+    if (reader->GetOutput()->IsValidChannel(1))
+    {
+				std::cout << "    have channel data 1 (doppler) ... " << std::endl;
+				haveDoppler = true;
+		}
+
+				
     timeSelector->SetInput(reader->GetOutput());
     timeSelector->SetTimeNr(0);
 
-    mitk::CylindricToCartesianFilter::Pointer cyl2cart;
-    mitk::CylindricToCartesianFilter::Pointer cyl2cartDoppler;
+   
+    DopplerTimeSelector->SetInput(reader->GetOutput());
+    DopplerTimeSelector->SetTimeNr(0);
 
-    cyl2cart = mitk::CylindricToCartesianFilter::New();
-    cyl2cartDoppler = mitk::CylindricToCartesianFilter::New();
 
     mitk::DataTreeIterator* it=tree->inorderIterator();
 
-    // Backscatter information
+
+    //
+    // switch to Backscatter information
+    //    
     timeSelector->SetChannelNr(0);
     timeSelector->Update();
+    ipPicPut("timeselect.pic",timeSelector->GetOutput()->GetPic());    
+        
+    //
+    // insert original (in cylinric coordinates) Backscatter information
+    //
+    node = mitk::DataTreeNode::New();
+    node->SetData(timeSelector->GetOutput());
+    mitk::StringProperty::Pointer ultrasoundProp = new mitk::StringProperty("OriginalBackscatter");    
+    node->SetProperty("ultrasound",ultrasoundProp);
+    mitk::StringProperty::Pointer nameProp = new mitk::StringProperty("OriginalBackscatter");
+    node->SetProperty("fileName",nameProp);
+    node->SetProperty("layer", new mitk::IntProperty(-11) );
+    mitk::LevelWindow levelWindow;
+    levelWindow.SetAuto( timeSelector->GetOutput()->GetPic() );
+    node->SetLevelWindow(levelWindow, NULL);
+    node->SetVisibility(false,NULL);
+    node->Update();
+    it->add(node);    
 
+    //
+    // insert transformed (in cartesian coordinates) Backscatter information
+    //
     cyl2cart->SetInput(timeSelector->GetOutput());
     node=mitk::DataTreeNode::New();
     node->SetData(cyl2cart->GetOutput());
-    it->add(node);
-
-    //set properties for Backscatter
-    node->SetProperty("Backscatter",new mitk::BoolProperty(true));
+    ultrasoundProp = new mitk::StringProperty("TransformedBackscatter");
+    node->SetProperty("ultrasound",ultrasoundProp);
+    nameProp = new mitk::StringProperty("TransformedBackscatter");
+    node->SetProperty("fileName",nameProp);
     node->SetProperty("layer", new mitk::IntProperty(-10) );
-    mitk::LevelWindow levelWindow;
+//    mitk::LevelWindow levelWindow;
     cyl2cart->Update();
     levelWindow.SetAuto( cyl2cart->GetOutput()->GetPic() );
     node->SetLevelWindow(levelWindow, NULL);
-
-
     node->Update();
+    it->add(node);    
 
-    // Doppler information
-    timeSelector->SetChannelNr(1);
-    timeSelector->Update();
+    if (haveDoppler)
+    {
+				
+	    //
+  	  // switch to Doppler information
+	    //
+  	  DopplerTimeSelector->SetChannelNr(1);
+	    DopplerTimeSelector->Update();
 
-    // add cartesian data to tree
-    cyl2cartDoppler->SetInput(timeSelector->GetOutput());
-
-    node=mitk::DataTreeNode::New();
-    node->SetData(cyl2cartDoppler->GetOutput());
-    it->add(node);
-
-    //set properties for Doppler
-    node->SetProperty("Doppler",new mitk::BoolProperty(true));
-    node->SetProperty("layer", new mitk::IntProperty(-5) );
-
-    cyl2cartDoppler->Update();
-    levelWindow.SetAuto( cyl2cartDoppler->GetOutput()->GetPic() );
-    node->SetLevelWindow(levelWindow, NULL);
-
-    // TODO: HP map must be provided by DSRFilereader, since it
-    // may be dependend on data ( baseline shift)
-    mitk::USLookupTableSource::Pointer LookupTableSource = mitk::USLookupTableSource::New();
-    // LookupTableSource->SetUseHPLookupTable();
-    mitk::LookupTableSource::OutputTypePointer LookupTable = LookupTableSource->GetOutput();
-    mitk::LookupTableProperty::Pointer LookupTableProp = new mitk::LookupTableProperty(*LookupTable);
-
-    node->SetProperty("LookupTable", LookupTableProp );
+	    //
+  	  // create a Doppler lookup table
+    	// TODO: HP map must be provided by DSRFilereader, since it
+	    // may be dependend on data ( baseline shift)
+  	  //
+	    mitk::USLookupTableSource::Pointer LookupTableSource = mitk::USLookupTableSource::New();
+  	  LookupTableSource->SetUseDSRDopplerLookupTable();
+	    LookupTableSource->Update();
+  	  mitk::LookupTableSource::OutputTypePointer LookupTable = LookupTableSource->GetOutput();
+	    mitk::LookupTableProperty::Pointer LookupTableProp = new mitk::LookupTableProperty(*LookupTable);
 
 
-    node->Update();
+			//
+	    // insert original (in cylindric coordinates) Doppler information
+  	  //
+	    node=mitk::DataTreeNode::New();
+	 	  node->SetData(DopplerTimeSelector->GetOutput());
+	    ultrasoundProp = new mitk::StringProperty("OriginalDoppler");
+  	  node->SetProperty("ultrasound",ultrasoundProp);
+	    nameProp = new mitk::StringProperty("OriginalDoppler");
+	    node->SetProperty("fileName",nameProp);
+	    node->SetProperty("layer", new mitk::IntProperty(-6) );
+//    levelWindow.SetAuto( timeSelector->GetOutput()->GetPic() );
+//    node->SetLevelWindow(levelWindow, NULL);
+//    node->SetProperty("LookupTable", LookupTableProp );
+	    node->SetProperty("LookupTable", LookupTableProp );
+  	  node->SetVisibility(false,NULL);
+	    node->Update();
+  	  it->add(node);
 
+			//
+  	  // insert transformed (in cartesian coordinates) Doppler information
+    	//
+	    cyl2cartDoppler->SetInput(DopplerTimeSelector->GetOutput());
+  	  node=mitk::DataTreeNode::New();
+	    node->SetData(cyl2cartDoppler->GetOutput());
+  	  ultrasoundProp = new mitk::StringProperty("TransformedDoppler");
+	    node->SetProperty("ultrasound",ultrasoundProp);
+	    nameProp = new mitk::StringProperty("TransformedDoppler");
+  	  node->SetProperty("fileName",nameProp);
+	    node->SetProperty("layer", new mitk::IntProperty(-5) );
+  	  cyl2cartDoppler->Update();
+//    levelWindow.SetAuto( cyl2cartDoppler->GetOutput()->GetPic() );
+//    node->SetLevelWindow(levelWindow, NULL);
+    	node->SetProperty("LookupTable", LookupTableProp );
+	    node->Update();
+  	  it->add(node);
+		}
+
+		
+   
     mitkMultiWidget->levelWindowWidget->setLevelWindow(levelWindow);
 
     initWidgets(it);
@@ -515,7 +582,7 @@ void QmitkMainTemplate::fileSaveAs()
         }
       }
       mitk::SurfaceData::Pointer surface = dynamic_cast<mitk::SurfaceData*>(node->GetData());
-      if( image.IsNotNull() )
+      if( surface.IsNotNull() )
       {
         QString fileName = QFileDialog::getSaveFileName(NULL,"stl (*.stl);;vtk (*.vtk)");
         if ( !fileName.isNull() )

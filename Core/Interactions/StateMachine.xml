@@ -293,10 +293,10 @@
 			</transition>
 		</state>
 		<state NAME="checkedN" ID="3">
-			<transition NAME="n smaller N" NEXT_STATE_ID="40" EVENT_ID="220">
+			<transition NAME="n smaller N" NEXT_STATE_ID="40" EVENT_ID="1010">
 				<action ID="37" />
 			</transition>
-			<transition NAME="n greater equals N" NEXT_STATE_ID="41" EVENT_ID="221">
+			<transition NAME="n greater equals N" NEXT_STATE_ID="41" EVENT_ID="1011">
 				<action ID="37" />
 			</transition>
 		</state>

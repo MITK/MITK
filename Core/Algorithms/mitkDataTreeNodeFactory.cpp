@@ -230,6 +230,7 @@ void mitk::DataTreeNodeFactory::ReadFileTypeSTL()
 
         // set filename without path as string property
         mitk::StringProperty::Pointer nameProp = new mitk::StringProperty( this->GetBaseFileName() );
+        node->SetProperty( "lineWidth", new mitk::IntProperty(2) );
         node->SetProperty( "name", nameProp );
         node->SetProperty( "wireframe", new mitk::BoolProperty(false));
     }

@@ -20,8 +20,6 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef LIGHTBOXRESULTIMAGEWRITER_H_HEADER_INCLUDED_C1F48A22
 #define LIGHTBOXRESULTIMAGEWRITER_H_HEADER_INCLUDED_C1F48A22
 
-#define NO_pVersion
-
 #include "mitkBaseProcess.h"
 #include "mitkCommon.h"
 #include "mitkDataTree.h"

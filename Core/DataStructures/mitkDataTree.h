@@ -14,7 +14,7 @@ namespace mitk
 {
 
 //##ModelId=3EA93EC901B8
-typedef itk::TreeContainer<typename mitk::DataTreeNode::Pointer> DataTreeBase;
+typedef itk::TreeContainer<mitk::DataTreeNode::Pointer> DataTreeBase;
 
 //##Documentation
 //## @brief typedef to a base-iterator on the data tree

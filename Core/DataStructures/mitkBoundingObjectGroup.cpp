@@ -35,7 +35,7 @@ mitk::BoundingObjectGroup::~BoundingObjectGroup()
 bool mitk::BoundingObjectGroup::VerifyRequestedRegion()
 {
   assert(m_Geometry3D.IsNotNull());
-  return Superclass::VerifyRequestedRegion();
+  return true; //Superclass::VerifyRequestedRegion();
 }
 
 void mitk::BoundingObjectGroup::UpdateOutputInformation()
@@ -133,25 +133,21 @@ void mitk::BoundingObjectGroup::UpdateOutputInformation()
   if(geometry3d.IsNull())
   {
     assert(timesteps==0);
-    timeGeometry->SetBounds(bounds);
-
-    /* the objects position is the center of all sub bounding objects */
-    timeGeometry->GetVtkTransform()->Identity();
-    timeGeometry->GetVtkTransform()->Translate(centerPoint[0], centerPoint[1], centerPoint[2]);
-    timeGeometry->TransferVtkToITKTransform();
+    geometry3d = mitk::Geometry3D::New();
+    timesteps = 1;
   }
   else
   {
     assert(timesteps>0);
-    geometry3d->SetBounds(bounds);
-
-    /* the objects position is the center of all sub bounding objects */
-    geometry3d->GetVtkTransform()->Identity();
-    geometry3d->GetVtkTransform()->Translate(centerPoint[0], centerPoint[1], centerPoint[2]);
-    geometry3d->TransferVtkToITKTransform();
-
-    timeGeometry->InitializeEvenlyTimed(geometry3d, timesteps);
   }
+
+  /* the objects position is the center of all sub bounding objects */
+  geometry3d->SetBounds(bounds);
+  geometry3d->GetVtkTransform()->Identity();
+  geometry3d->GetVtkTransform()->Translate(centerPoint[0], centerPoint[1], centerPoint[2]);
+  geometry3d->TransferVtkToITKTransform();
+
+  timeGeometry->InitializeEvenlyTimed(geometry3d, timesteps);
 }
 
 void mitk::BoundingObjectGroup::AddBoundingObject(mitk::BoundingObject::Pointer boundingObject)

@@ -161,6 +161,7 @@ void QmitkDataManagerControls::SaveButton_clicked()
             //{
             //  ipPicPut((char *)fileName.ascii(), picImage);
             //}
+            return;
           }
           mitk::PointSet::Pointer pointset = dynamic_cast<mitk::PointSet*>(data.GetPointer());
           if(pointset.IsNotNull())
@@ -175,6 +176,11 @@ void QmitkDataManagerControls::SaveButton_clicked()
               writer->SetFileName( fileName.ascii() );
               writer->Update();
             }
+          }
+          mitk::Surface::Pointer surface = dynamic_cast<mitk::Surface*>(data.GetPointer());
+          if(surface.IsNotNull())
+          {
+            CommonFunctionality::SaveSurface(surface, "SurfaceModel.stl");
           }
         }
       }

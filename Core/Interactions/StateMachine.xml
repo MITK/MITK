@@ -226,6 +226,10 @@
       <transition NAME="exit" NEXT_STATE_ID="1" EVENT_ID="537">
         <action ID="42" />
       </transition>
+    <transition NAME="remove" NEXT_STATE_ID="1" EVENT_ID="12">
+			<action ID="100" /> <!--AcREMOVEPOINT-->
+     </transition>
+
       
     </state>
     <state NAME="picked guard" ID="2">

@@ -61,8 +61,6 @@ void mitk::BoundingObjectCutter::GenerateData()
     outputImage = NULL; 
     return; // return and do nothing in case of failure
   }
-  //std::cout << "itk Spacing:  " << itkImage->GetSpacing()[0] << ", " << itkImage->GetSpacing()[1] << ", " << itkImage->GetSpacing()[2] << ".\n";
-  //std::cout << "mitk Spacing: " << inputImageMitk->GetSlicedGeometry()->GetSpacing()[0] << ", " << inputImageMitk->GetSlicedGeometry()->GetSpacing()[1] << ", " << inputImageMitk->GetSlicedGeometry()->GetSpacing()[2] << ".\n";
 
   // calculate region of interest
   m_BoundingObject->UpdateOutputInformation();
@@ -118,17 +116,33 @@ void mitk::BoundingObjectCutter::GenerateData()
     pointsIterator++;
   }
 
+  mitk::BoundingBox::Pointer inputImageBoundingBox = const_cast<mitk::BoundingBox*>(inputImageMitk->GetGeometry()->GetBoundingBox());
+  mitk::BoundingBox::PointType imageMinPoint = inputImageBoundingBox->GetMinimum();
+  mitk::BoundingBox::PointType imageMaxPoint = inputImageBoundingBox->GetMaximum();
+
+  /* crop global bounding box to the source image bounding box */
+  globalMinPoint[0] = (globalMinPoint[0] < imageMinPoint[0]) ? imageMinPoint[0] : globalMinPoint[0];
+  globalMinPoint[1] = (globalMinPoint[1] < imageMinPoint[1]) ? imageMinPoint[1] : globalMinPoint[1];
+  globalMinPoint[2] = (globalMinPoint[2] < imageMinPoint[2]) ? imageMinPoint[2] : globalMinPoint[2];
+  globalMaxPoint[0] = (globalMaxPoint[0] > imageMaxPoint[0]) ? imageMaxPoint[0] : globalMaxPoint[0];
+  globalMaxPoint[1] = (globalMaxPoint[1] > imageMaxPoint[1]) ? imageMaxPoint[1] : globalMaxPoint[1];
+  globalMaxPoint[2] = (globalMaxPoint[2] > imageMaxPoint[2]) ? imageMaxPoint[2] : globalMaxPoint[2];
+
   /* calculate regíon of interest in pixel values */
   ItkImageType::IndexType start;
   itkImage->TransformPhysicalPointToIndex(globalMinPoint, start);
-  
+
   ItkImageType::SizeType size;  
   size[0] = static_cast<ItkImageType::SizeType::SizeValueType>((globalMaxPoint[0] - globalMinPoint[0])/ itkImage->GetSpacing()[0]); // number of pixels along X axis
   size[1] = static_cast<ItkImageType::SizeType::SizeValueType>((globalMaxPoint[1] - globalMinPoint[1])/ itkImage->GetSpacing()[1]); // number of pixels along Y axis
   size[2] = static_cast<ItkImageType::SizeType::SizeValueType>((globalMaxPoint[2] - globalMinPoint[2])/ itkImage->GetSpacing()[2]); // number of pixels along Z axis
+
   ItkRegionType regionOfInterest;
   regionOfInterest.SetSize(size);
   regionOfInterest.SetIndex(start);
+
+  /* fit region into source image */
+  regionOfInterest.Crop(itkImage->GetLargestPossibleRegion());  
 
   ItkRegionOfInterestFilterType::Pointer regionOfInterestFilter = ItkRegionOfInterestFilterType::New();
   regionOfInterestFilter->SetRegionOfInterest(regionOfInterest);
@@ -148,13 +162,9 @@ void mitk::BoundingObjectCutter::GenerateData()
   }
 
   ItkImageIteratorType imageIterator(itkImageCut, itkImageCut->GetRequestedRegion());
-//  mitk::ITKPoint3D p;
   bool inside = false;
   m_OutsidePixelCount = 0;
   m_InsidePixelCount = 0;
-  //m_UseInsideValue = true;  // just for testing
-  //m_InsideValue = 30000;  // just for testing
-  //m_OutsideValue = -30000;  // just for testing
   if (GetUseInsideValue()) // use a fixed value for each inside pixel(create a binary mask of the bounding object)
     for (imageIterator.GoToBegin(); !imageIterator.IsAtEnd(); ++imageIterator)
     {          
@@ -185,7 +195,10 @@ void mitk::BoundingObjectCutter::GenerateData()
         m_OutsidePixelCount++;
       }
     }
-    // convert the itk image back to an mitk image and set it as output for this filter
-    outputImage->InitializeByItk(itkImageCut.GetPointer());
-    outputImage->SetVolume(itkImageCut->GetBufferPointer());
+  /* convert the itk image back to an mitk image and set it as output for this filter */
+  outputImage->InitializeByItk(itkImageCut.GetPointer());
+  outputImage->SetVolume(itkImageCut->GetBufferPointer());
+
+  /* Position the output Image to match the corresponding region of the input image */
+  mitkImageTransform->Translate(globalMinPoint[0], globalMinPoint[1], globalMinPoint[2]);
 }

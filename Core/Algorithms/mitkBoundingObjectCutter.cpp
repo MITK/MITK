@@ -11,7 +11,7 @@
 
 mitk::BoundingObjectCutter::BoundingObjectCutter()
 : m_UseInsideValue(false), m_OutsideValue(0), m_InsideValue(1), m_BoundingObject(NULL), 
-  m_UseRegionGrower(true), m_SegmentationFilter(NULL), m_OutsideVoxelCount(0), m_InsideVoxelCount(0),
+  m_UseRegionGrower(true), m_SegmentationFilter(NULL), m_OutsidePixelCount(0), m_InsidePixelCount(0),
   m_ResampleFactor(1.0)
 {  
 }
@@ -61,6 +61,8 @@ void mitk::BoundingObjectCutter::GenerateData()
     outputImage = NULL; 
     return; // return and do nothing in case of failure
   }
+  std::cout << "itk Spacing:  " << itkImage->GetSpacing()[0] << ", " << itkImage->GetSpacing()[1] << ", " << itkImage->GetSpacing()[2] << ".\n";
+  std::cout << "mitk Spacing: " << inputImageMitk->GetSlicedGeometry()->GetSpacing()[0] << ", " << inputImageMitk->GetSlicedGeometry()->GetSpacing()[1] << ", " << inputImageMitk->GetSlicedGeometry()->GetSpacing()[2] << ".\n";
 
   // calculate region of interest
   m_BoundingObject->UpdateOutputInformation();
@@ -68,14 +70,18 @@ void mitk::BoundingObjectCutter::GenerateData()
   const mitk::BoundingBox::PointType minPoint = boundingBox->GetMinimum();
   const mitk::BoundingBox::PointType maxPoint = boundingBox->GetMaximum();
   float* posPoint = m_BoundingObject->GetGeometry()->GetVtkTransform()->GetPosition();
+  mitk::ITKPoint3D position;
+  position[0] = posPoint[0] + minPoint[0] + 0.5;  // + 0.5 because TransformPhys... just truncates the result and does not round correctly
+  position[1] = posPoint[1] + minPoint[1] + 0.5;
+  position[2] = posPoint[2] + minPoint[2] + 0.5;
+  
   ItkImageType::IndexType start;
-  start[0] = static_cast<ItkImageType::IndexType::IndexValueType>(posPoint[0] + minPoint[0] + 0.5); // first index on X
-  start[1] = static_cast<ItkImageType::IndexType::IndexValueType>(posPoint[1] + minPoint[1] + 0.5); // first index on Y
-  start[2] = static_cast<ItkImageType::IndexType::IndexValueType>(posPoint[2] + minPoint[2] + 0.5); // first index on Z
+  itkImage->TransformPhysicalPointToIndex(position, start);
+  
   ItkImageType::SizeType size;
-  size[0] = static_cast<ItkImageType::SizeType::SizeValueType>(maxPoint[0] - minPoint[0]); // size along X
-  size[1] = static_cast<ItkImageType::SizeType::SizeValueType>(maxPoint[1] - minPoint[1]); // size along Y
-  size[2] = static_cast<ItkImageType::SizeType::SizeValueType>(maxPoint[2] - minPoint[2]); // size along Z
+  size[0] = static_cast<ItkImageType::SizeType::SizeValueType>((maxPoint[0] - minPoint[0])/ itkImage->GetSpacing()[0]); // number of pixels along X axis
+  size[1] = static_cast<ItkImageType::SizeType::SizeValueType>((maxPoint[1] - minPoint[1])/ itkImage->GetSpacing()[1]); // number of pixels along Y axis
+  size[2] = static_cast<ItkImageType::SizeType::SizeValueType>((maxPoint[2] - minPoint[2])/ itkImage->GetSpacing()[2]); // number of pixels along Z axis
   ItkRegionType regionOfInterest;
   regionOfInterest.SetSize(size);
   regionOfInterest.SetIndex(start);
@@ -100,8 +106,8 @@ void mitk::BoundingObjectCutter::GenerateData()
   ItkImageIteratorType imageIterator(itkImageCut, itkImageCut->GetRequestedRegion());
   mitk::ITKPoint3D p;
   bool inside = false;
-  m_OutsideVoxelCount = 0;
-  m_InsideVoxelCount = 0;
+  m_OutsidePixelCount = 0;
+  m_InsidePixelCount = 0;
   if (GetUseInsideValue()) // use a fixed value for each inside pixel(create a binary mask of the bounding object)
     for (imageIterator.GoToBegin(); !imageIterator.IsAtEnd(); ++imageIterator)
     {          
@@ -109,12 +115,12 @@ void mitk::BoundingObjectCutter::GenerateData()
       if(m_BoundingObject->IsInside(p))
       {
         imageIterator.Value() = m_InsideValue;
-        m_InsideVoxelCount++;
+        m_InsidePixelCount++;
       }
       else
       {
         imageIterator.Value() = m_OutsideValue;
-        m_OutsideVoxelCount++;
+        m_OutsidePixelCount++;
       }
     }
   else // no fixed value for inside, but the pixel value of the original image (normal cutting)
@@ -124,35 +130,15 @@ void mitk::BoundingObjectCutter::GenerateData()
       itkImageCut->TransformIndexToPhysicalPoint(imageIterator.GetIndex(), p);
       if(m_BoundingObject->IsInside(p))
       {
-        m_InsideVoxelCount++;
+        m_InsidePixelCount++;
       }
       else
       {
         imageIterator.Value() = m_OutsideValue;
-        m_OutsideVoxelCount++;
+        m_OutsidePixelCount++;
       }
     }
-
-  //if (m_UseRegionGrower && m_SegmentationFilter.IsNotNull())
-  //{
-  //  m_SegmentationFilter->SetInput( itkImageCut );
-  //  try
-  //  {
-  //    m_SegmentationFilter->Update();
-  //  }
-  //  catch( itk::ExceptionObject & excep )
-  //  {
-  //    std::cerr << "Exception while updating RegiongrowingFilter" << std::endl;
-  //    std::cerr << excep << std::endl;
-  //  }
-  //  // convert the itk image back to an mitk image and set it as output for this filter
-  //  outputImage->InitializeByItk(m_SegmentationFilter->GetOutput());
-  //  outputImage->SetVolume(m_SegmentationFilter->GetOutput()->GetBufferPointer());
-  //}
-  //else
-  //{
     // convert the itk image back to an mitk image and set it as output for this filter
     outputImage->InitializeByItk(itkImageCut.GetPointer());
     outputImage->SetVolume(itkImageCut->GetBufferPointer());
-  //}
 }

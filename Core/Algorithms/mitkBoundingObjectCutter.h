@@ -73,8 +73,8 @@ public:
   itkSetObjectMacro(SegmentationFilter, ImageToImageFilterType);
   itkGetObjectMacro(SegmentationFilter, ImageToImageFilterType);
 
-  itkGetMacro(InsideVoxelCount, unsigned int);
-  itkGetMacro(OutsideVoxelCount, unsigned int);
+  itkGetMacro(InsidePixelCount, unsigned int);
+  itkGetMacro(OutsidePixelCount, unsigned int);
 
   itkGetMacro(ResampleFactor, mitk::ScalarType);
   itkSetMacro(ResampleFactor, mitk::ScalarType);
@@ -88,8 +88,8 @@ protected:
   PixelType m_OutsideValue;
   bool m_UseInsideValue;
   bool m_UseRegionGrower;
-  unsigned int m_OutsideVoxelCount;
-  unsigned int m_InsideVoxelCount;
+  unsigned int m_OutsidePixelCount;
+  unsigned int m_InsidePixelCount;
   mitk::ScalarType m_ResampleFactor;
 
   ImageToImageFilterType::Pointer m_SegmentationFilter;

@@ -139,7 +139,7 @@
             <cstring>fileOpenAction</cstring>
         </property>
         <property name="iconSet">
-            <iconset>fileopen</iconset>
+            <iconset>image0</iconset>
         </property>
         <property name="text">
             <string>Open</string>
@@ -156,7 +156,7 @@
             <cstring>fileSaveAction</cstring>
         </property>
         <property name="iconSet">
-            <iconset>filesave</iconset>
+            <iconset>image1</iconset>
         </property>
         <property name="text">
             <string>Save</string>
@@ -187,7 +187,7 @@
             <cstring>filePrintAction</cstring>
         </property>
         <property name="iconSet">
-            <iconset>print</iconset>
+            <iconset>image2</iconset>
         </property>
         <property name="text">
             <string>Print</string>
@@ -218,7 +218,7 @@
             <cstring>editUndoAction</cstring>
         </property>
         <property name="iconSet">
-            <iconset>undo</iconset>
+            <iconset>image3</iconset>
         </property>
         <property name="text">
             <string>Undo</string>
@@ -235,7 +235,7 @@
             <cstring>editRedoAction</cstring>
         </property>
         <property name="iconSet">
-            <iconset>redo</iconset>
+            <iconset>image4</iconset>
         </property>
         <property name="text">
             <string>Redo</string>
@@ -252,7 +252,7 @@
             <cstring>editCutAction</cstring>
         </property>
         <property name="iconSet">
-            <iconset>editcut</iconset>
+            <iconset>image5</iconset>
         </property>
         <property name="text">
             <string>Cut</string>
@@ -269,7 +269,7 @@
             <cstring>editCopyAction</cstring>
         </property>
         <property name="iconSet">
-            <iconset>editcopy</iconset>
+            <iconset>image6</iconset>
         </property>
         <property name="text">
             <string>Copy</string>
@@ -286,7 +286,7 @@
             <cstring>editPasteAction</cstring>
         </property>
         <property name="iconSet">
-            <iconset>editpaste</iconset>
+            <iconset>image7</iconset>
         </property>
         <property name="text">
             <string>Paste</string>
@@ -369,6 +369,32 @@
         </property>
     </action>
 </actions>
+<images>
+    <image name="image0">
+        <data format="XPM.GZ" length="730">789c9592cf0a824010c6effb1483de24348d60217a84a263101d9c59973a58507688e8dddb3fba6eba517d23fa7d8cbf9d11cc12d86e569064ecda94cd91800ee5051271abebfb6ebf7cb0a828405d1cf268c2a21208d6e753a57decf9d4f3a87c3c35d2b1d291cf786ea33411f9dc46d2512ad928ba28a539360e9559240dd5ef0c2a99e790417d47542f7c98a3c0f01c7da465b41bccb20c9220814ede6e28c82bf4be07fd06fdc5e0bb7a06b1927db59d50c3cd1936dc9c11d1ed36265a2640b44c80708cafefffc173c15e5aa2c5a7</data>
+    </image>
+    <image name="image1">
+        <data format="XPM.GZ" length="776">789c8d91cd0a82401080ef3ec5a237094b4311a247283a06d1c1995d750f15941d227af7f64771565670c785f958bef9c175cccea7038bd7c1abab3a890cdbeac962febedd3e97ebfe1b8459c6d497a62c0d5741583164c7c75de83c227942725079b4314723d7586ecbd4221a8432b72834628e19e61a9b1e0b8bd22087821bac2daa57aeb1d5c873a8ec6b12f9c24c0d9e9318075475518b66b8500be81d8e20c851409dc16845adab398e9483a3d8e9d3caa18fe2993eaed38cd32d76e83ed4e1747fa4ce34883309e2805bced7673adbe84cf759e2ccefe33891e7675b27f145f8db057f776ce80c</data>
+    </image>
+    <image name="image2">
+        <data format="XPM.GZ" length="3288">789c75d6d952db581006e07b9ec245df51531d4bb664b9a6e682c5981d1bcc3a351747cb319b012f2c2635ef3ead5e4e4832c4e9b2bffabb5b274285f36dad7139386cac7d5b992fdce2b66814376ed6582b5f2693e5dffffcf57d65358e1bf4376a751af1ea1f2bab78d7281a474f8f15033e61b8f80478264093ffb02b76e67d33abedc6b5a366338b24bf11d72ff66e30f703b2b3e0813a13e3c81cf33c766bc74d33c4627a75d94d755bdd6277431ea935c753732be2f37b75a6fd89597228c5de6bdeaedd8a6c1e3a6aeb4fd585eeafc4ada6e6dd60d93756db795cb0e40f62ef350776d7e61daaad3f33b7a5bf546792e38959f3a2763b32635fdc6eaa33b5eec333b6233bbede89ba48e4b1daae9db824493877b9ba4c254fc4452539ecd44e5d1aa56c34976238aedd69a549a7c5be5697621c06e79cdf8bbdd77d9bec3ce44fe24e24c64375a2de376772bd89d87bcd0f6a672dcbf1485d6692efb173337873b7cd1e89b344fb0766cdcfd5367f69961cf97e74dbb4afe0fc421ce6cf8239c79edaaebf0c96f9a1b8abf3b81b2c39ff7bba45e8bf323bd977280efda766c971436df307669d8760396f2a2e9cf6f3fd756ddb07fd60e9efa86ddf76b0e4e76267f39bc192b7c5652c06be5f2e9c07b6ccb9fc7b3ec4617ea976da3f356bff5c5d69be6e961cf8fee4741eed7f515bbe1f5c727e23ce63ed5f0f967caa4e759ecf9b97617e26a65cecd44e9dabadffb67691e45591b0c7e222562fd4a918dec474fb24e7e7bf2829977d95daa9b7d49518785f49fb4a992fd595ba152cdf5c85b88c258779b0e4913a15c33bbb0af3b138f45fabad7f66ae52ce75be74dadf346bfeacd6fd20e7abbc57bfd6aed2b0ef42adf3f0182cfbdfd495f6eb7c15abaf82a55fe72bdb7f192cd7e7e7aba2d369ff83d8729ca8edfa4f6aed873bb1f76a7e7e7c5a392fd7bb17fb580cfcfc78ef9df7ec5cedc5c30582153accb1c092ab428f63f20dde5acefbefe893558ef7f880137ca47aa0cf4f54cf786bf96ffbc7b4b3de6bfbe51afecbfd53da9573cdf87d4aeff32ff77b3aab0fd718535ffdd9fdb8fecffb3fedb55ad0e4f4c7f57fd99fd32eb927b67bccd7fc6a7ff5d36eabaff7bfd07d99e02bbe857aa75ae207aeffba9ff66ce026dd8f77dcfa54cf34d5c36dece34e7d1ddb4fe7dcc53ddcc7033cfc5447788c031ce2099ee208cff05cf6f3ee0bbcc42bbcc626465c31b6b08d09a6d8c10cbbd805c413f97d04000ef2df5e059450013d4be0618c23b841f9ffcf07dcfe4f770e77700f0f30a14f8ff044fdcfd20f5398c11c1630af4f03337c8517bc8257aa19bcc13b674b40ea1fc9f72d7cc03a6cc0266c51f5601bb6f09caa43ee411f77a97b0776c3fe3dd8c775ea9a52daa3ae6d9e39a002e8c3211ce1008eeb7e18c8f735eda97b0eb8eace3e6e4827559feeff80f6d379e044f7d7a7e885aef04e754aa75dc20887b47f8073d94ff323388373aa112c49177049ef3dae2bfa7c46fb0730949f2f3ab88626ddaf0862aa16b42181143a9041d75148ef1de7eaee4fcfcfdce5f40d58b8927a2a7ed1af079a1fc0c08de9e7bba1cfe7bf7faefc0789d5f917</data>
+    </image>
+    <image name="image3">
+        <data format="XPM.GZ" length="715">789cd3d7528808f055d0d2e72a2e492cc94c5648ce482c52d04a29cdcdad8c8eb5ade6523232520022730543251d2ea544856405bffcbc54105b1989ad87c4069aa1a06c000416c6206e129c9b04e2a682b816c6168610d9143037c9c21422aba78c0d826dd6c30669aa2729190453107a9220ea92936010ae273909aa1ea63305ae07a80aa21202814ae07a4010611f880dd783a483043d78ec81eb42721b0a4c45f60f0a84ea1d74f183aca7d69a0b002e53a3c4</data>
+    </image>
+    <image name="image4">
+        <data format="XPM.GZ" length="715">789cd3d7528808f055d0d2e72a2e492cc94c5648ce482c52d04a29cdcdad8c8eb5ade6523232520022730543251d2ea544856405bffcbc54105b1989ad87c44e01b2950d80c0c218c44d86739340dc2410d7c2d8c210229b0ae62659984264f594b141b0cd7ad8206df42425a78020a69e94641884e84881e94982a986ea4b4986e9017261e683a44018aa07a40606218662d103b593243d503762b80dee7c64ffa4e2080354ffd32eaca9a4a7d69a0b00e039a381</data>
+    </image>
+    <image name="image5">
+        <data format="XPM.GZ" length="700">789c95d0cd0ac2300c00e07b9f22b4b721994e10417c04c5a3201e9654d0c31ce83c88f8eef6671d75ad079735241d1f695716b0df6da028c5bdabbb0b039feb1b14fad134cfc371fd12b2aac0bc0b98c9899035306cdbebc9d62aaa31aac9d46aea1edb72689773dbeaa12507552edc287441513611198af25f86b2864c26cc1845fd4a0c1279971af389b2f7b19386938d4c34656498386f34239b951a76819c18adcca6153c32dc2b0c2a18ad30185f0f867bc7bf8c9f9618ef92b34537c9fc83af90ef95f80026b49d8a</data>
+    </image>
+    <image name="image6">
+        <data format="XPM.GZ" length="761">789c9d92cb0ac2301045f7fd8ad0ee8ad8978b8af8098a4b415c349349eba20a5a1722febb992495d2a40ade09f41ec2a1212489d97eb7617112dcbaaa3b0183a6bab258dcdbf67138ae9f4198e74cad2c6559380bc28a01db5ece483d1af4f9a073d5a35487107b2c0b42f1414e28091759015212d684252f97061b8bc220104a1dfdd3c837fa9873dfe8c3d9b80e071db5e5384006a89972d49a70049a711d345fc491c3411817258e1ce89d5ae284030d593e47c7e7e8089f63bac7b1fd9763e33afd4db94e7fbb7f3938986fefe0b50adec56fd48b</data>
+    </image>
+    <image name="image7">
+        <data format="XPM.GZ" length="791">789c7592c18ac2301086ef7d8ad0de8ae85aa914c447d8c5a3201e3a93c426a00bbbee6111dfddcca4b131b6f327305f271fb4a48b52ec779fa25c64bfd7f66a5060d7fe8852fe9dcfff87e3f696e55525dc5aba95cfb2bc1528bebe2f8afa22eae7510fae2f3eb8084dc06645d83d11081561b36a96feb06484a6f6d31321d658614da81925ae511222a176e55d1b506b7ea5622cfc11730e50f5bd8b77f82120a26f06e73908a3e0004825dd047873df3b0cfad48729384a2ad0a1986267a8c4794decbc26753a13923ac6fa32d6a48e65c3766e38e5d068c271a351870f8c3976d2e11a7338dee9ef07de9d70f3834189fe8324f97d933d00ec89eacd</data>
+    </image>
+</images>
 <connections>
     <connection>
         <sender>fileNewAction</sender>
@@ -528,6 +554,5 @@
     <function>parseCommandLine()</function>
     <function returnType="mitk::DataTree::Pointer">GetTree()</function>
 </functions>
-<pixmapinproject/>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

@@ -31,6 +31,9 @@
     <property name="mouseTracking">
         <bool>false</bool>
     </property>
+    <property name="acceptDrops">
+        <bool>false</bool>
+    </property>
     <vbox>
         <property name="name">
             <cstring>unnamed</cstring>
@@ -70,6 +73,12 @@
                     <height>0</height>
                 </size>
             </property>
+            <property name="acceptDrops">
+                <bool>false</bool>
+            </property>
+            <property name="rootIsDecorated">
+                <bool>true</bool>
+            </property>
         </widget>
         <widget class="QmitkNodePropertiesView">
             <property name="name">
@@ -82,6 +91,9 @@
                     <horstretch>0</horstretch>
                     <verstretch>0</verstretch>
                 </sizepolicy>
+            </property>
+            <property name="acceptDrops">
+                <bool>false</bool>
             </property>
         </widget>
     </vbox>
@@ -120,10 +132,11 @@
     </connection>
 </connections>
 <includes>
-    <include location="global" impldecl="in implementation">mitkStringProperty.h</include>
-    <include location="global" impldecl="in implementation">qlistview.h</include>
     <include location="global" impldecl="in declaration">DataTree.h</include>
     <include location="local" impldecl="in declaration">DataTreeView.h</include>
+    <include location="global" impldecl="in implementation">mitkStringProperty.h</include>
+    <include location="global" impldecl="in implementation">qlistview.h</include>
+    <include location="global" impldecl="in implementation">qdropsite.h</include>
     <include location="local" impldecl="in implementation">QmitkDataManagerControls.ui.h</include>
 </includes>
 <variables>

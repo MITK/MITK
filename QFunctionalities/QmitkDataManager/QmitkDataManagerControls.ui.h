@@ -12,7 +12,6 @@ while (m_DataTreeView->columns() > 0 ) {
     }
     m_DataTreeView->addColumn( "Name" );
     m_DataTreeView->addColumn( "NodeType" );
-    m_DataTreeView->setRootIsDecorated(true);
 }
 
 void QmitkDataManagerControls::SetDataTreeIterator(mitk::DataTreeIterator * it)
@@ -30,3 +29,7 @@ void QmitkDataManagerControls::SetDataTreeIterator(mitk::DataTreeIterator * it)
   }
   delete tempIt;
 }
+
+
+
+

@@ -86,8 +86,8 @@ void QmitkSimpleExampleFunctionality::createConnections()
 QAction * QmitkSimpleExampleFunctionality::createAction(QActionGroup *parent)
 {
     QAction* action;
-    action = new QAction( tr( "Left" ), QPixmap::fromMimeSource( "slicer.xpm" ), tr( "&Left" ), CTRL + Key_L, parent, "simple example" );
-    //    action = new QAction( tr( "Left" ), QPixmap::fromMimeSource( "textleft.xpm" ), tr( "&Left" ), CTRL + Key_L, parent, "simple example" );
+    action = new QAction( tr( "Left" ), QPixmap((const char**)slicer_xpm), tr( "&Left" ), CTRL + Key_L, parent, "simple example" );
+    //    action = new QAction( tr( "Left" ), QPixmap(textleft_xpm), tr( "&Left" ), CTRL + Key_L, parent, "simple example" );
     return action;
 }
 void QmitkSimpleExampleFunctionality::activated()

@@ -185,11 +185,11 @@
 			</transition>
 		</state>
 		<state NAME="checkedN" ID="3">
-			<transition NAME="n smaler N" NEXT_STATE_ID="2" EVENT_ID="220">
-				<action ID="10" />
+			<transition NAME="n smaller N" NEXT_STATE_ID="40" EVENT_ID="220">
+				<action ID="37" />
 			</transition>
-			<transition NAME="n greater equals N" NEXT_STATE_ID="4" EVENT_ID="221">
-				<action ID="10" />
+			<transition NAME="n greater equals N" NEXT_STATE_ID="41" EVENT_ID="221">
+				<action ID="37" />
 			</transition>
 		</state>
 		<state NAME="set full" ID="4">
@@ -265,6 +265,22 @@
 			</transition>
 			<transition NAME="StYes" NEXT_STATE_ID="1" EVENT_ID="204">
 				<action ID="100" />
+			</transition>
+		</state>
+		<state NAME="checkedPositionEventSmallerN" ID="40">
+			<transition NAME="PositionEvent" NEXT_STATE_ID="2" EVENT_ID="204">
+				<action ID="10" />
+			</transition>
+			<transition NAME="others" NEXT_STATE_ID="2" EVENT_ID="203">
+				<action ID="0" />
+			</transition>
+		</state>
+		<state NAME="checkedPositionEventGreaterN" ID="41">
+			<transition NAME="PositionEvent" NEXT_STATE_ID="4" EVENT_ID="204">
+				<action ID="10" />
+			</transition>
+			<transition NAME="others" NEXT_STATE_ID="2" EVENT_ID="203">
+				<action ID="0" />
 			</transition>
 		</state>
 	</stateMachine>

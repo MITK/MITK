@@ -116,8 +116,8 @@ bool mitk::GlobalInteraction::AskSelected(mitk::StateEvent const* stateEvent, in
       //if mode changed, then erase from selectedList
       if ((*it)->GetMode()==Interactor::SMDESELECTED)
       {
-        m_SelectedList.erase(it);
-        it = m_SelectedList.begin();//TODO fix!!!
+        it = m_SelectedList.erase(it);
+        //it = m_SelectedList.begin();//TODO fix!!!
       }
       else
       {
@@ -230,6 +230,8 @@ bool mitk::GlobalInteraction::GetWorldCoordinate(const mitk::DisplayPositionEven
 bool mitk::GlobalInteraction::ExecuteAction(Action* action, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId)
 {
   bool ok = false;
+  
+ 
   //check if we already have a PositionEvent with 3D worldcoordinates.
   //if we have a DiplayPositionEvent, we check if the Event is thrown by a mouseclick.
   //If so, compute the worldcoodinates through this->GetWorldPosition()

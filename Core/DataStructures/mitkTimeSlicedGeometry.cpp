@@ -121,7 +121,11 @@ void mitk::TimeSlicedGeometry::InitializeEvenlyTimed(mitk::Geometry3D* geometry3
   SetBounds(geometry3D->GetBounds());
   SetGeometry3D(geometry3D, 0);
   SetEvenlyTimed();
-  GetTimeBoundsInMS(); //@todo see GetTimeBoundsInMS
+  //
+  // commented out because this results in a
+  // segmentation fault under linux!
+  //
+  //GetTimeBoundsInMS(); //@todo see GetTimeBoundsInMS
 
   geometry3D->UnRegister();
 }

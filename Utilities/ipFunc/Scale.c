@@ -58,8 +58,6 @@
  *  
  * @return pointer to the scaled image
  *
- * @bug ipFuncScaleBl produces strange results in 3D.
- *
  * AUTHOR AND DATE
  */
  

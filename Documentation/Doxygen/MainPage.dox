@@ -10,7 +10,7 @@ Welcome to the Medical Imaging Interaction Toolkit (MITK).
 Currently under active development, MITK aims at supporting the 
 development of leading-edge medical imaging software 
 with a high degree of interaction. It combines vtk, itk and the 
-pic-based-libraries of the <a href="http://mbi.dkfz-heidelberg.de/>
+pic-based-libraries of the <a href="http://mbi.dkfz-heidelberg.de">
 Div. Medical and Biological Informatics </a> of the <a href="http://www.dkfz.de">DKFZ</a> 
 and adds those features that are most important for developing 
 interactive medical imaging software covered neither by vtk nor itk, i.e:

@@ -2,7 +2,7 @@
   \defgroup DataManagement Data Management Classes
 
   This category includes the data classes themselves as well as management classes to organize the
-  data during run-time in a tree structure (data tree).
+  data during run-time in a tree structure (data tree, mitk::DataTree).
 */
 
 /**
@@ -17,8 +17,8 @@
   \defgroup Data Data Classes
   \ingroup DataManagement
 
-  This subcategory includes the data classes, e.g., for images (Image), surfaces (SurfaceData), 
-  vessel-trees (VesselTreeData), etc. 
+  This subcategory includes the data classes, e.g., for images (mitk::Image), 
+  surfaces (mitk::SurfaceData), vessel-trees (mitk::VesselTreeData), etc. 
   Data access classes are only included, if there is no equivalent in itk (see 
   \ref AlgorithmAndAdaptorClasses "Algorithm and Adaptor Classes" below).
 */
@@ -70,9 +70,9 @@
  \defgroup NavigationControl Navigation Control Classes
  \ingroup Visualization
 
- The classes in this category tell the render (subclass of BaseRenderer) which 
- slice (subclass SliceNavigationController) or from which direction (subclass
- CameraController) it has to render. Contains two Stepper for stepping
+ The classes in this category tell the render (subclass of mitk::BaseRenderer) which 
+ slice (subclass mitk::SliceNavigationController) or from which direction (subclass
+ mitk::CameraController) it has to render. Contains two Stepper for stepping
  through the slices or through different camera views (e.g., for the
  creation of a movie around the data), respectively, and through time, if
  there is 3D+t data.
@@ -95,7 +95,7 @@
   \defgroup Interaction Interaction Classes
   \ingroup InteractionUndo
 
-  This subcategory includes interaction classes (subclasses of StateMachine) that change
+  This subcategory includes interaction classes (subclasses of mitk::StateMachine) that change
   the data according to the input of the user. For undo-support, the change is done by
   sending an OperationEvent to the respective data object, which changes itself accordingly.
    

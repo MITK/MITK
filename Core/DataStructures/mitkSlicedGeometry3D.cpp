@@ -299,8 +299,8 @@ void mitk::SlicedGeometry3D::SetSpacing(ipPicDescriptor* pic)
     SetSpacing( tsv );
 
     origin.set( 0, 0, m_Spacing.z / 2.0f );         
-    right.set( pic->n[0] * m_Spacing.x, 0, 0 );  
-    bottom.set( 0, pic->n[1] * m_Spacing.y, 0 ); 
+    right.set( pic->n[0] * m_Spacing.x, 0, m_Spacing.z / 2.0f );  
+    bottom.set( 0, pic->n[1] * m_Spacing.y, m_Spacing.z / 2.0f ); 
 
     PlaneView planeView( origin, right, bottom );
     mitk::PlaneGeometry::Pointer planegeometry=mitk::PlaneGeometry::New();
@@ -327,8 +327,8 @@ void mitk::SlicedGeometry3D::SetSpacing(ipPicDescriptor* pic)
 
       mitk::Point3D origin, right, bottom;
       origin.set( 0, 0, zPosition );         
-      right.set( pic->n[0] * pixelSize.x, 0, 0 );  
-      bottom.set( 0, pic->n[1] * pixelSize.y, 0 ); 
+      right.set( pic->n[0] * pixelSize.x, 0, zPosition );  
+      bottom.set( 0, pic->n[1] * pixelSize.y, zPosition ); 
 
       PlaneView planeView( origin, right, bottom );
       mitk::PlaneGeometry::Pointer planegeometry=mitk::PlaneGeometry::New();
@@ -347,8 +347,8 @@ void mitk::SlicedGeometry3D::SetSpacing(ipPicDescriptor* pic)
     SetSpacing( tsv );    
 
     origin.set( 0, 0, m_Spacing.z / 2.0f );         
-    right.set( pic->n[0] * m_Spacing.x, 0, 0 );  
-    bottom.set( 0, pic->n[1] * m_Spacing.y, 0 ); 
+    right.set( pic->n[0] * m_Spacing.x, 0, m_Spacing.z / 2.0f );  
+    bottom.set( 0, pic->n[1] * m_Spacing.y, m_Spacing.z / 2.0f ); 
 
     PlaneView planeView( origin, right, bottom );
     mitk::PlaneGeometry::Pointer planegeometry=mitk::PlaneGeometry::New();

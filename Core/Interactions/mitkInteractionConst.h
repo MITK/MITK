@@ -121,7 +121,9 @@ typedef enum EOperations
   OpSCALE = 1100,
   OpROTATE = 1200,
   OpSETPOINTTYPE = 1210,
-  OpMODECHANGE = 1500
+  OpMODECHANGE = 1500,
+  OpSENDCOORDINATES = 1600
+
 };
 
 //##Constants for EventMapping...
@@ -208,6 +210,7 @@ typedef enum EActions
   AcCHECKGREATERONE = 1500,
   AcCHECKBOUNDINGBOX = 1510,
   AcFORCESUBINTERACTORS = 1550,
+  AcSENDCOORDINATES = 1600,
   AcTRANSMITEVENT = 2000  //to transmit an event to a lower Interactor/Statemachine
 };
 

@@ -1,0 +1,99 @@
+/*=========================================================================
+
+Program:   Medical Imaging & Interaction Toolkit
+Module:    $RCSfile$
+Language:  C++
+Date:      $Date$
+Version:   $Revision$
+
+Copyright (c) German Cancer Research Center, Division of Medical and
+Biological Informatics. All rights reserved.
+See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
+
+This software is distributed WITHOUT ANY WARRANTY; without even
+the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE.  See the above copyright notices for more information.
+
+=========================================================================*/
+
+
+/****************************************************************************
+** ui.h extension file, included from the uic-generated form implementation.
+**
+** If you wish to add, delete or rename functions or slots use
+** Qt Designer which will update this file, preserving your code. Create an
+** init() function in place of a constructor, and a destroy() function in
+** place of a destructor.
+*****************************************************************************/
+void QmitkPrimitiveMovieNavigator::Refetch()
+{
+  if(!m_InRefetch)
+  {
+    m_InRefetch=true;
+    m_SliceNumberLabel->setText( QString("%1").arg(m_Stepper->GetPos()) );       
+    m_InRefetch=false;
+  }
+}
+
+
+void QmitkPrimitiveMovieNavigator::SetStepper( mitk::Stepper * stepper)
+{
+  m_Stepper = stepper;
+  m_InRefetch = (stepper==NULL); // this avoids trying to use m_Stepper until it is set to something != NULL (additionally to the avoiding recursions during refetching)
+}
+
+void QmitkPrimitiveMovieNavigator::init()
+{
+  m_InRefetch = true; // this avoids trying to use m_Stepper until it is set to something != NULL (additionally to the avoiding recursions during refetching)
+  m_Timer = new QTimer(this);
+  m_TimerIntervalInMS = 250;
+  connect(m_Timer, SIGNAL(timeout()), SLOT(next()) );
+}
+
+void QmitkPrimitiveMovieNavigator::goButton_clicked()
+{
+  if(!m_InRefetch) 
+  {
+    if(m_Timer->isActive()==false)
+    {
+      m_Timer->start(m_TimerIntervalInMS);
+    }
+  }
+}
+
+
+void QmitkPrimitiveMovieNavigator::stopButton_clicked()
+{
+  m_Timer->stop();
+}
+
+
+void QmitkPrimitiveMovieNavigator::next()
+{
+  if(!m_InRefetch) 
+  {
+    m_Stepper->Next();
+    if(m_Stepper->GetPos()==m_Stepper->GetSteps()-1)
+      m_Stepper->First();
+    m_SliceNumberLabel->setText( QString("%1").arg(m_Stepper->GetPos()) );
+  }
+}
+
+
+int QmitkPrimitiveMovieNavigator::getTimerInterval()
+{
+  return m_TimerIntervalInMS;
+}
+
+
+void QmitkPrimitiveMovieNavigator::setTimerInterval( int timerIntervalInMS )
+{
+  if(timerIntervalInMS!=m_TimerIntervalInMS)
+  {
+    m_TimerIntervalInMS = timerIntervalInMS;
+    if(m_Timer->isActive())
+    {
+      m_Timer->changeInterval(m_TimerIntervalInMS);
+    }
+  }
+}

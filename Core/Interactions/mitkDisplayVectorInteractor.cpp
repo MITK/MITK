@@ -31,7 +31,7 @@ void mitk::DisplayVectorInteractor::ExecuteOperation(Operation* operation)
 }
 
 //##ModelId=3EF2224401CB
-bool mitk::DisplayVectorInteractor::ExecuteSideEffect(int sideEffectId, mitk::StateEvent const* stateEvent, int groupEventId, int objectEventId)
+bool mitk::DisplayVectorInteractor::ExecuteSideEffect(int sideEffectId, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId)
 {
     bool ok=false;
 
@@ -48,8 +48,7 @@ bool mitk::DisplayVectorInteractor::ExecuteSideEffect(int sideEffectId, mitk::St
                 
 
                 OperationEvent *operationEvent = new OperationEvent(this, doOp, undoOp,
-																    groupEventId, 
-																    objectEventId);
+																    objectEventId, groupEventId);
                 m_UndoController->SetOperationEvent(operationEvent);
             }
 
@@ -72,8 +71,7 @@ bool mitk::DisplayVectorInteractor::ExecuteSideEffect(int sideEffectId, mitk::St
 
 
                 OperationEvent *operationEvent = new OperationEvent(m_Destination, doOp, undoOp,
-																    groupEventId, 
-																    objectEventId);
+																    objectEventId, groupEventId);
                 m_UndoController->SetOperationEvent(operationEvent);
             }
 

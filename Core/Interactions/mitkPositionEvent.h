@@ -21,6 +21,13 @@ class PositionEvent : public Event
 {
   public:
     //##ModelId=3E5B7CF900F0
+    //##Documentation
+    //## @brief Constructor with all necessary arguments.
+    //##
+    //## @params sender: the widget, that caused that event, so that it can be asked for worldCoordinates. changed later to a focus
+    //##        type, button, buttonState, key: information from the Event
+    //##        displPosition: the 2D Position e.g. from the mouse
+    //##        worldPosition:
     PositionEvent(mitk::BaseRenderer* sender, int type, int button, int buttonState, int key, const mitk::Point2D& displPosition, const mitk::Point3D& worldPosition);
 
 	//##ModelId=3E5B79DE0133

@@ -53,7 +53,7 @@ class GlobalInteraction : public StateMachine
 	protected:
 
 	//##ModelId=3E7F497F01AE
-    virtual bool ExecuteSideEffect(int sideEffectId, mitk::StateEvent const* stateEvent, int groupEventId, int objectEventId);
+    virtual bool ExecuteSideEffect(int sideEffectId, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId);
 
 	private:
 

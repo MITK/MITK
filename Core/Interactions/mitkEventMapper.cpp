@@ -1,3 +1,14 @@
+/**
+*   EventMapping:
+*       This class mapps the Events, usually given by the OS or here by QT, to a MITK internal EventId.
+*       It loads all information from the xml-file (possible, understandable Events with the mitkEventID).
+*       If an event appears, the method MapEvent is called with the event params.
+*       This Method looks up the event params, and tries to find an mitkEventId to it.
+*       If yes, then sends the event and the found ID to the globalStateMachine, which handles all 
+*       further operations of that event.
+*
+*/
+
 #include "PositionEvent.h"
 #include "EventMapper.h"
 #include <string>
@@ -19,10 +30,13 @@ const std::string mitk::EventMapper::BUTTONSTATE = "BUTTONSTATE";
 //##ModelId=3E77572902C4
 const std::string mitk::EventMapper::KEY = "KEY";
 
-//for Linker ->no undefined reference
+
 mitk::StateMachine *mitk::EventMapper::m_GlobalStateMachine;
+
 mitk::EventMapper::EventDescriptionVec mitk::EventMapper::m_EventDescriptions;
+
 mitk::StateEvent mitk::EventMapper::m_StateEvent;
+
 std::string mitk::EventMapper::m_StyleName;
 
 
@@ -368,8 +382,15 @@ StringIntArrayStruct mitkConstArray[] = {
 	   {"Key_none", 0xffff}
 };
 
+//##ModelId=3F02F896006D
+mitk::EventMapper::EventMapper()
+{
+}
 
-
+//##ModelId=3F02F896008C
+mitk::EventMapper::~EventMapper()
+{
+}
 
 //##ModelId=3E5B349600CB
 //##Documentation
@@ -395,14 +416,15 @@ bool mitk::EventMapper::MapEvent(Event* event)
 	if (m_GlobalStateMachine == NULL)
 		return false;
 
-	unsigned int i;
-	for (i = 0;
+	//search the event in the list of event descriptions, if found, then take the number and produce a stateevent
+    unsigned int i;
+    for (i = 0;
 		(i < m_EventDescriptions.size()) &&
 		!(m_EventDescriptions[i] == *event);//insecure[] but .at(i) is not supported before std.vers 3.0
 		i++){}
 	if (!(m_EventDescriptions[i] == *event))//searched entry not found
 		return false;
-	//generate StateEvent and send to StateMachine, which does everything further!
+	//set the Menger_Var m_StateEvent and send to StateMachine, which does everything further!
 	m_StateEvent.Set( (m_EventDescriptions[i]).GetId(), event );
 	/*
 	Group and Object EventId:
@@ -414,7 +436,7 @@ bool mitk::EventMapper::MapEvent(Event* event)
 	The StateMachines::ExecuteSideEffect have the power to descide weather a new GroupID has to be calculated 
 	(by example after the editing of a new object)
 	*/
-	return m_GlobalStateMachine->HandleEvent(&m_StateEvent, mitk::OperationEvent::GetCurrGroupEventId(), mitk::OperationEvent::IncCurrObjectEventId());
+	return m_GlobalStateMachine->HandleEvent(&m_StateEvent, mitk::OperationEvent::IncCurrObjectEventId(), mitk::OperationEvent::GetCurrGroupEventId());
 }
 
 //##ModelId=3E5B35140072
@@ -442,7 +464,8 @@ bool mitk::EventMapper::LoadBehavior(std::string fileName)
 
 //##ModelId=3E788FC00308
 //##Documentation
-//## reads a Tag from an XML-file
+//## @brief reads a Tag from an XML-file
+//##
 //## adds Events to m_EventDescription
 bool mitk::EventMapper::startElement( const QString&, const QString&, const QString& qName, const QXmlAttributes& atts )
 {
@@ -693,81 +716,6 @@ std::string = event_map[QEvent::User];  // very efficient
 
 Johann
 
-// Roy Dennington's solution:
->
-> struct EventArray
-> {
->   int type;
->   char* string;
-> };
->
-> EventArray event_array[] =
-> {
->   { QEvent::None, "None" },
->   { QEvent::Timer, "Timer" },
-
-[snip]
-You get the idea
-
->   { QEvent::ActivateControl, "ActivateControl" },
->   { QEvent::DeactivateControl, "DeactivateControl" },
->   { QEvent::User, "User" },
->   { 0, 0 }
-> };
->
-> QIntDict<char> event_string(59);
->
-> int n = -1;
-> while ( event_array[++n].string )
->   event_string.insert( event_array[n].type, event_array[n].string );
->
-> To use:
->   char* str = event_string[event];  // very efficient!
->
-> Enjoy,
-> Roy Dennington
-> roy@semichem.com
->
-
-Message 4 in thread
-
-    * Subject: Re: How to receive event's name?
-    * From: Rik Hemsley <rik@xxxxxxx>
-    * Date: Tue, 20 Mar 2001 18:15:13 +0000
-    * Mail-followup-to: Qt-Interest <qt-interest@trolltech.com>
-    * To: Qt-Interest <qt-interest@xxxxxxxxxxxxx>
-
-#if Johann Gunnar Oskarsson
-
-> This is, IMO, a lot better and safer:
-> 
-> // Declaration:
-> std::map< int, std::string > event_map;
-
-And using QMap saves you linking STL :)
-
-Rik
-
-
-Message 5 in thread
-
-    * Subject: Re: How to receive event's name?
-    * From: Guillaume Laurent <glaurent@xxxxxxxxxxxxxxxxxx>
-    * Date: Tue, 20 Mar 2001 23:12:11 +0100
-    * To: qt-interest@xxxxxxxxxxxxx
-
-On Tuesday 20 March 2001 19:15, Rik Hemsley wrote:
-
-> And using QMap saves you linking STL :)
-
-The STL is not a library you link with :-).
-
-In any case, I doubt the difference between QMap and std::map (or hash_map 
-since it provided most of the time) is really significant (probably depends 
-on which implementation of the STL you're using, though).
-
--- 
- [ signature omitted ] 
 
 Message 6 in thread
 
@@ -804,280 +752,4 @@ Any help will be appreciated.
 
 Regards
 Nil
-
-
-Message 7 in thread
-
-    * Subject: Re: QListView::clear() not working
-    * From: wim delvaux <wim.delvaux@xxxxxxxxx>
-    * Date: Wed, 21 Mar 2001 02:35:45 +0100
-    * Cc: qt-interest@xxxxxxxxxxxxx
-    * Organization: Adaptive Planet
-    * Sender: u19809@xxxxxxxxxxx
-    * To: neil@xxxxxxx
-
-
-<<< text/html: EXCLUDED >>>
-Message 8 in thread
-
-    * Subject: Re: QListView::clear() not working
-    * From: "Neil Barman" <neil@xxxxxxx>
-    * Date: Wed, 21 Mar 2001 10:07:04 -0600
-    * Cc: <qt-interest@xxxxxxxxxxxxx>
-    * To: <wim.delvaux@xxxxxxxxx>, <neil@xxxxxxx>
-
-
-<<< text/html: EXCLUDED >>>
-Message 9 in thread
-
-    * Subject: Re: How to receive event's name?
-    * From: Rik Hemsley <rik@xxxxxxx>
-    * Date: Wed, 21 Mar 2001 01:49:54 +0000
-    * Mail-followup-to: qt-interest@trolltech.com
-    * To: qt-interest@xxxxxxxxxxxxx
-
-#if Guillaume Laurent
-> On Tuesday 20 March 2001 19:15, Rik Hemsley wrote:
-> 
-> > And using QMap saves you linking STL :)
-> 
-> The STL is not a library you link with :-).
-
-Well, what I mean is that it saves you having to use STL at all, which
-is a good thing because STL isn't as standard as it's cracked up to be.
-I prefer to use Qt classes everywhere in my Qt apps, because then
-they're guaranteed to be portable to all the places Qt works.
-
-Rik
-
-
-Message 10 in thread
-
-    * Subject: Re: How to receive event's name?
-    * From: Guillaume Laurent <glaurent@xxxxxxxxxxxxxxxxxx>
-    * Date: Wed, 21 Mar 2001 13:16:00 +0100
-    * To: qt-interest@xxxxxxxxxxxxx
-
-On Wednesday 21 March 2001 02:49, Rik Hemsley wrote:
-
-> Well, what I mean is that it saves you having to use STL at all, which
-> is a good thing because STL isn't as standard as it's cracked up to be.
-
-It is now. Every newly released C++ compiler supports it AFAIK. Though I 
-think even gcc 2.7 supports map<> adequately.
-
-> I prefer to use Qt classes everywhere in my Qt apps, because then
-> they're guaranteed to be portable to all the places Qt works.
-
-Agreed. This is the recurring debate on whether one should support broken 
-compilers or not. There is no definitive answer on that.
-
--- 
- [ signature omitted ] 
-
-Message 11 in thread
-
-    * Subject: Re: How to receive event's name?
-    * From: "Roy Dennington" <roy@xxxxxxxxxxxx>
-    * Date: Wed, 21 Mar 2001 09:13:03 -0600
-    * To: "Qt-Interest" <qt-interest@xxxxxxxxxxxxx>
-
-All,
-
-> On Wednesday 21 March 2001 02:49, Rik Hemsley wrote:
->
-> > Well, what I mean is that it saves you having to use STL at all, which
-> > is a good thing because STL isn't as standard as it's cracked up to be.
->
-> It is now. Every newly released C++ compiler supports it AFAIK. Though I
-> think even gcc 2.7 supports map<> adequately.
-
-Yes, but your mileage for STL varies from one compiler to the next. Recall,
-even STL evolved from "draft" to "final". Compilers are catching up, but
-it is risky to say STL is standard and stable everywhere. STL comes with
-alot of baggage:    STL=>Exception Handling => std namespace.
-
-I can tell you that a recent SGI compiler does not adequately handle
-std namespace. Nor does it like "#include <iostream>". It seems to
-support STL somewhere in between draft and final.
-
-The HP compiler (aCC) is also somewhat behind.
-
-These are major platforms that my company cannot ignore.
-
-> Agreed. This is the recurring debate on whether one should support broken
-> compilers or not. There is no definitive answer on that.
-
-We have begun to include small pieces of STL code to "test the water".
-But we cannot afford to exclude a platform simply because the compilers
-are behind the standard. Once you adopt STL, you cannot easily UNDO.
-
-I look forward to using STL eventually.
-
-Regards,
-Roy Dennington
-roy@semichem.com
-
-
-
-Message 12 in thread
-
-    * Subject: Re: How to receive event's name?
-    * From: Matthias Stiller <stiller@xxxxxxxx>
-    * Date: Wed, 21 Mar 2001 16:19:05 +0100 (MET)
-    * Reply-to: stiller@xxxxxxxx
-    * To: roy@xxxxxxxxxxxx, "Qt-Interest" <qt-interest@xxxxxxxxxxxxx>
-
-On Mar 21,  9:13am, Roy Dennington wrote:
-> Subject: Re: How to receive event's name?
-> All,
->
-> > On Wednesday 21 March 2001 02:49, Rik Hemsley wrote:
-> >
-> > > Well, what I mean is that it saves you having to use STL at all, which
-> > > is a good thing because STL isn't as standard as it's cracked up to be.
-> >
-> > It is now. Every newly released C++ compiler supports it AFAIK. Though I
-> > think even gcc 2.7 supports map<> adequately.
->
-> Yes, but your mileage for STL varies from one compiler to the next. Recall,
-> even STL evolved from "draft" to "final". Compilers are catching up, but
-> it is risky to say STL is standard and stable everywhere. STL comes with
-> alot of baggage:    STL=>Exception Handling => std namespace.
->
-> I can tell you that a recent SGI compiler does not adequately handle
-> std namespace. Nor does it like "#include <iostream>". It seems to
-> support STL somewhere in between draft and final.
->
-> The HP compiler (aCC) is also somewhat behind.
-
-Hello,
-
-just a short question. Why do you stick to the STL delivered together with your
-compiler ? The STL are just header files, so you could download a new version
-from oss.sgi.com anytime.
-
-The problem with #include <iostream> can be resolved if you just use the
-following compiler switch -LANG:std
-
-Regards
-
-Matthias
---
- [ signature omitted ] 
-
-Message 13 in thread
-
-    * Subject: Re: How to receive event's name?
-    * From: "Philippe A. Bouchard" <jh82vyof@xxxxxxxxxxxxxxx>
-    * Date: Wed, 21 Mar 2001 07:47:41 -0500
-    * Organization: Corel Linux
-    * To: <qt-interest@xxxxxxxx>
-
-Rik Hemsley wrote:
-
-> #if Guillaume Laurent
-> > On Tuesday 20 March 2001 19:15, Rik Hemsley wrote:
-> >
-> > > And using QMap saves you linking STL :)
-> >
-> > The STL is not a library you link with :-).
->
-> Well, what I mean is that it saves you having to use STL at all, which
-> is a good thing because STL isn't as standard as it's cracked up to be.
-> I prefer to use Qt classes everywhere in my Qt apps, because then
-> they're guaranteed to be portable to all the places Qt works.
->
-> Rik
->
-> --
-> List archive and information: http://qt-interest.trolltech.com
-
-It's true, but STL is so much powerfull. You have complex algorithms
-already implemented, the abstraction is so much beautifull that once you
-get in touch with it you don't want to let it go. One thing I find sad
-from QT is that QT streams are not compatible at all with standard C++
-streams (if there is a compiler out there that is not supporting C++
-streams, my bets on this compiler would be lower than ever).
-
-If QT was to strenghten their abstraction layer, they would have a lot
-more chances of becoming a standard for UNIX platforms than GTK.
-
---
- [ signature omitted ] 
-
-Message 14 in thread
-
-    * Subject: Re: How to receive event's name?
-    * From: Lucio Ismael Flores <ismael@xxxxxx>
-    * Date: Wed, 21 Mar 2001 10:03:17 -0800
-    * Cc: qt-interest@xxxxxxxxxxxxx
-    * Organization: Digital Domain
-    * Reply-to: ismael@xxxxxx
-    * Sender: ismael@xxxxxx
-    * To: rik@xxxxxxx
-
-Rik Hemsley wrote:
-
-> #if Guillaume Laurent
-> > On Tuesday 20 March 2001 19:15, Rik Hemsley wrote:
-> >
-> > > And using QMap saves you linking STL :)
-> >
-> > The STL is not a library you link with :-).
->
-> Well, what I mean is that it saves you having to use STL at all, which
-> is a good thing because STL isn't as standard as it's cracked up to be.
-> I prefer to use Qt classes everywhere in my Qt apps, because then
-> they're guaranteed to be portable to all the places Qt works.
->
-
-Hmmm... STL IS a C++ standard. What isn't standard is the signal/slot
-
-mechanism, which is Troll-Tech's own extension to C++.
-
---
- [ signature omitted ] 
-
-Message 15 in thread
-
-    * Subject: Re: How to receive event's name?
-    * From: "Aigars Grins" <aigars.grins@xxxxxxxxxx>
-    * Date: Wed, 21 Mar 2001 18:53:29 -0000
-    * Organization: Defcom
-    * To: <qt-interest@xxxxxxxxxxxxx>
-
-> > I prefer to use Qt classes everywhere in my Qt apps, because then
-> > they're guaranteed to be portable to all the places Qt works.
->
-> Hmmm... STL IS a C++ standard. What isn't standard is the signal/slot
-> mechanism, which is Troll-Tech's own extension to C++.
-
-I like the STL and it _is_ part of the 'standard'. The problem is that
-_very_ few compilers are _100_% compatible to the standard. Most cover
-something like 90-98%. The problem is of course getting smaller and smaller
-over time. Nowadays the STL works ok for most compilers/platforms (but not
-everything everywhere).
-
-Using Troll specific containers etc. gives you a guarantee that they work
-everywhere where Qt works. That is a Good Thing.
-
-Having a way of giving members functions as callbacks is almost always very
-appreciated in most GUI libs. This isn't supported by the language in any
-specific way (not in a simple and efficient way) and since things like
-libsigc isn't that well developed for xplatform functionality (at least yet)
-most libs/IDEs will have to come up with something of their own. Trolls way
-is signals/slots.
-
-All this is obvious and old news. But it brings me back again to the wish
-that Troll could separate their non-GUI code from the rest. I've been told
-(by Jasmin) why they wont. But still. It would be great. (Even better would
-be somthing like a good xplatform ATL).
-
---
- [ signature omitted ] 
-
-Pages: Prev | 1 | 2 | Next
-
-
 */

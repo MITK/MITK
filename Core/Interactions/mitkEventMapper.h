@@ -26,13 +26,25 @@ namespace mitk {
 //## @brief Maps an Event to its description 
 //## @ingroup Interaction
 //## 
-//## the incoming event is maped to additional description that is declared in
-//## an xml-file.
-//## That way an event can be mapped to an EventID, that can be processed in a
-//## statemachine 
+//## EventMapping:
+//## This class mapps the Events, usually given by the OS or here by QT, to a MITK internal EventId.
+//## It loads all information from the xml-file (possible, understandable Events with the mitkEventID).
+//## If an event appears, the method MapEvent is called with the event params.
+//## This Method looks up the event params, and tries to find an mitkEventId to it.
+//## If yes, then sends the event and the found ID to the globalStateMachine, which handles all 
+//## further operations of that event.
+//## For Undo-Mechanism a statechanging StateMachine::HandleEvent is connected to an ObjectEventID and an GroupEventId.
+//## That way a fine an raw Undo is possible (fine for ObjectID by ObjectID, raw for GroupID for GroupID)
+//## Here the ObjectEventID gets increased, 
+//## not the GroupEventId(must get increased by a StateMachine, that has the information when a new Group of operation starts)
 class EventMapper : public QXmlDefaultHandler
 {
   public:
+    //##ModelId=3F02F896006D
+    EventMapper();
+    //##ModelId=3F02F896008C
+    ~EventMapper();
+
 	//##ModelId=3F0177080269
 	typedef std::vector<mitk::EventDescription> EventDescriptionVec;
 	//##ModelId=3F0177080288
@@ -71,6 +83,9 @@ class EventMapper : public QXmlDefaultHandler
 
   private:
     //##ModelId=3E5B33F303CA
+    //##Documentation
+    //## @brief stores the information for the connection between QT-Events and the internal EventId.
+    //## gets this information from xml-File
 	static EventDescriptionVec m_EventDescriptions;
 
     //##ModelId=3E5B343701F1

@@ -19,13 +19,14 @@ inline mitk::StateEvent* GenerateEmptyStateEvent(int eventId)
 									NoButton,
 									NoButton,
 									Key_none);
-	mitk::StateEvent *stateEvent = new mitk::StateEvent();
-	stateEvent->Set( eventId, noEvent );
+    mitk::StateEvent *stateEvent = new mitk::StateEvent(eventId, noEvent);
+    //mitk::StateEvent *stateEvent = new mitk::StateEvent();
+	//stateEvent->Set( eventId, noEvent );
 	return stateEvent;
 }
 
 //##ModelId=3E7F497F01AE
-bool mitk::GlobalInteraction::ExecuteSideEffect(int sideEffectId, mitk::StateEvent const* stateEvent, int groupEventId, int objectEventId)
+bool mitk::GlobalInteraction::ExecuteSideEffect(int sideEffectId, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId)
 {
 	bool ok = false;
 	//if the Event is a PositionEvent, then get the worldCoordinates through Focus
@@ -62,7 +63,7 @@ bool mitk::GlobalInteraction::ExecuteSideEffect(int sideEffectId, mitk::StateEve
 			//when ready, then generate ID 202
 			//202 for finished Object
 			mitk::StateEvent* nextStateEvent = GenerateEmptyStateEvent(202);
-			ok = HandleEvent(nextStateEvent, groupEventId, objectEventId);
+			ok = HandleEvent(nextStateEvent, objectEventId, groupEventId);
 		}
 		break;
 	case SeINITEDITOBJECT:
@@ -72,7 +73,7 @@ bool mitk::GlobalInteraction::ExecuteSideEffect(int sideEffectId, mitk::StateEve
 			//inbetween the edit has to be done to the Object. Next StateMachine!!!
 			//this event generation can be done in the next StateMachine!
 			mitk::StateEvent* nextStateEvent = GenerateEmptyStateEvent(202);
-			ok = HandleEvent(nextStateEvent, groupEventId, objectEventId);
+			ok = HandleEvent(nextStateEvent, objectEventId, groupEventId);
 		}
 		break;
 	case SeINITEDITGROUP:
@@ -82,7 +83,7 @@ bool mitk::GlobalInteraction::ExecuteSideEffect(int sideEffectId, mitk::StateEve
 			//inbetween the edit has to be done to the Group. Next StateMachine!!!
 			//this event generation can be done in the next StateMachine!
 			mitk::StateEvent* nextStateEvent = GenerateEmptyStateEvent(202);
-			ok = HandleEvent(nextStateEvent, groupEventId, objectEventId);
+			ok = HandleEvent(nextStateEvent, objectEventId, groupEventId);
 		}
 		break;
 	case SeADDPOINT:
@@ -103,14 +104,14 @@ bool mitk::GlobalInteraction::ExecuteSideEffect(int sideEffectId, mitk::StateEve
 			//208 for neutral
 			//209 for group selected
 			mitk::StateEvent* nextStateEvent = GenerateEmptyStateEvent(208);
-			ok = HandleEvent(nextStateEvent, groupEventId, objectEventId);
+			ok = HandleEvent(nextStateEvent, objectEventId, groupEventId);
 		}
 		break;
 	case SeFINISHOBJECT:
 		std::cout<<"FinishObject"<<std::endl;
 		{
 			mitk::StateEvent* nextStateEvent = GenerateEmptyStateEvent(202);
-			ok = HandleEvent(nextStateEvent, IncCurrGroupEventId(), objectEventId);
+			ok = HandleEvent(nextStateEvent, objectEventId, IncCurrGroupEventId());
 		}
 		break;
 	case SeFINISHGROUP:
@@ -126,7 +127,7 @@ bool mitk::GlobalInteraction::ExecuteSideEffect(int sideEffectId, mitk::StateEve
 			//204 for object picked
 			//205 for same object picked
 			mitk::StateEvent* nextStateEvent = GenerateEmptyStateEvent(204);//object picked
-			ok = HandleEvent(nextStateEvent, groupEventId, objectEventId);
+			ok = HandleEvent(nextStateEvent, objectEventId, groupEventId);
 		}
 		break;
 	case SeSEARCHGROUP:
@@ -135,7 +136,7 @@ bool mitk::GlobalInteraction::ExecuteSideEffect(int sideEffectId, mitk::StateEve
 			//203 for neutral; no group found
 			//204 for edit group; group found
 			mitk::StateEvent* nextStateEvent = GenerateEmptyStateEvent(203);
-			ok = HandleEvent(nextStateEvent, groupEventId, objectEventId);
+			ok = HandleEvent(nextStateEvent, objectEventId, groupEventId);
 		}
 		break;
 	case SeSEARCHANOTHEROBJECT:
@@ -146,7 +147,7 @@ bool mitk::GlobalInteraction::ExecuteSideEffect(int sideEffectId, mitk::StateEve
 			//206 for no new and only one selected
 			//207 for No New but more than 1 selected
 			mitk::StateEvent* nextStateEvent = GenerateEmptyStateEvent(206);
-			ok = HandleEvent(nextStateEvent, groupEventId, objectEventId);
+			ok = HandleEvent(nextStateEvent, objectEventId, groupEventId);
 		}
 		break;
 	case SeSELECTPICKEDOBJECT:
@@ -195,7 +196,7 @@ and the Focus changes.
 	for (StateMachineListIter it = m_LocalStateMachines.begin(); it != m_LocalStateMachines.end(); it++)
 	{
         if((*it)!=NULL)
-            ok = (*it)->HandleEvent(stateEvent, groupEventId, objectEventId);
+            ok = (*it)->HandleEvent(stateEvent, objectEventId, groupEventId);
 	}
 
 	return true;

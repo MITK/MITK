@@ -6,6 +6,10 @@
 
 namespace mitk {
 //##ModelId=3E5F564C03D4
+//##Documentation
+//## @brief superclass for all UndoModels
+//## @ingroup Undo
+//## all necessary operations, that all UndoModels share.
 class UndoModel
 {
   public:
@@ -16,10 +20,30 @@ class UndoModel
     virtual bool SetOperationEvent(OperationEvent* operationEvent) = 0;
 
     //##ModelId=3E5F5C6C00F3
+	virtual bool Undo() = 0;
+    //##ModelId=3F045197000E
     virtual bool Undo(bool fine) = 0;
 
     //##ModelId=3E5F5C6C00FE
     virtual bool Redo() = 0;
+    //##ModelId=3F045197002D
+	virtual bool Redo(bool fine) = 0;
+
+    //##ModelId=3F045197004D
+	//##Documentation
+	//## @brief clears undo and Redolist
+	virtual void Clear() = 0;
+
+    //##ModelId=3F045197005D
+	//##Documentation
+	//## @brief clears the RedoList
+	virtual void ClearRedoList() = 0;
+
+    //##ModelId=3F045197006D
+	//##Documentation
+	//## @brief true if RedoList is empty
+	virtual bool RedoListEmpty() = 0;
+
 
 protected:
     //##ModelId=3F01770A018E

@@ -27,7 +27,7 @@ std::string mitk::StateMachine::GetType() const
 }
 
 //##ModelId=3E5B2DE30378
-bool mitk::StateMachine::HandleEvent(StateEvent const* stateEvent, int groupEventId, int objectEventId)
+bool mitk::StateMachine::HandleEvent(StateEvent const* stateEvent, int objectEventId, int groupEventId)
 {
 	if (m_CurrentState == NULL)
 		return false;//m_CurrentState needs to be set first!
@@ -41,15 +41,14 @@ bool mitk::StateMachine::HandleEvent(StateEvent const* stateEvent, int groupEven
 //and SideEffectId to execute later on
 	int tempSideEffectId = tempTransition->GetSideEffectId();
 
-	if (( m_CurrentState->GetId() == tempNextState->GetId() ) && m_UndoEnabled)	//write to UndoMechanism if there is a real statechange and Undo is enabled
+	if ( ( m_CurrentState->GetId() != tempNextState->GetId() ) && ( m_UndoEnabled ) )	//write to UndoMechanism if there is a real statechange and Undo is enabled
 	{
 		//UNDO for this statechange
 		StateTransitionOperation* doOp = new StateTransitionOperation(OpSTATECHANGE, tempNextState);
 		StateTransitionOperation* undoOp = new StateTransitionOperation(OpSTATECHANGE, m_CurrentState);
 		OperationEvent *operationEvent = new OperationEvent(((mitk::OperationActor*)(this)), 
 															doOp, undoOp,
-															groupEventId,
-															objectEventId );
+															objectEventId ,groupEventId);
 		m_UndoController->SetOperationEvent(operationEvent);
 	}
 
@@ -57,7 +56,7 @@ bool mitk::StateMachine::HandleEvent(StateEvent const* stateEvent, int groupEven
 	m_CurrentState = tempNextState;	
 
 	//Undo is handled in ExecuteSideEffect(...)
-	bool ok = ExecuteSideEffect(tempSideEffectId, stateEvent, groupEventId, objectEventId);
+	bool ok = ExecuteSideEffect(tempSideEffectId, stateEvent, objectEventId, groupEventId);
 		
 	//Doku: if the operation doesn't work, then we have already changed the state. 
 	//Ether go further without the success of the operation or undo the statechange.

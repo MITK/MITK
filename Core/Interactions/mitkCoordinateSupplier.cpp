@@ -18,7 +18,7 @@ mitk::CoordinateSupplier::CoordinateSupplier(std::string type, mitk::OperationAc
 }
 
 //##ModelId=3F0189F00269
-bool mitk::CoordinateSupplier::ExecuteSideEffect(int sideEffectId, mitk::StateEvent const* stateEvent, int groupEventId, int objectEventId)
+bool mitk::CoordinateSupplier::ExecuteSideEffect(int sideEffectId, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId)
 {
     bool ok = false;
     if (m_Destination == NULL)
@@ -40,8 +40,7 @@ bool mitk::CoordinateSupplier::ExecuteSideEffect(int sideEffectId, mitk::StateEv
             {
 				PointOperation* undoOp = new PointOperation(OpDELETE, m_Point, 0);
                 OperationEvent *operationEvent = new OperationEvent(m_Destination, doOp, undoOp,
-																	groupEventId, 
-																	objectEventId);
+																	objectEventId, groupEventId);
                 m_UndoController->SetOperationEvent(operationEvent);
             }
             //execute the Operation
@@ -49,6 +48,27 @@ bool mitk::CoordinateSupplier::ExecuteSideEffect(int sideEffectId, mitk::StateEv
             ok = true;
             break;
         }
+        case SeMOVEPOINT:
+        {
+            mitk::ITKPoint3D movePoint;
+            vm2itk(posEvent->GetWorldPosition(), movePoint);
+
+            PointOperation* doOp = new mitk::PointOperation(OpMOVE, movePoint, 0);
+			//Undo
+            if (m_UndoEnabled)
+            {
+				PointOperation* undoOp = new PointOperation(OpMOVE, m_Point, 0);
+                OperationEvent *operationEvent = new OperationEvent(m_Destination, doOp, undoOp,
+																	objectEventId, groupEventId);
+                m_UndoController->SetOperationEvent(operationEvent);
+            }
+            m_Point = movePoint;//set the new point for storage
+            //execute the Operation
+			m_Destination->ExecuteOperation(doOp);
+            ok = true;
+            break;
+        }
+ 
         default:
             ok = false;
            break;

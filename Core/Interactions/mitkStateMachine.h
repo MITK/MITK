@@ -45,7 +45,7 @@ namespace mitk {
 	//## EventMapper gives each event a new objectEventId
 	//## and a StateMachine::ExecuteSideEffect can descide weather it gets a 
 	//## new GroupEventId or not, depending on its state (e.g. finishedNewObject then new GroupEventId)
-    bool HandleEvent(StateEvent const* stateEvent, int groupEventId, int objectEventId);
+    bool HandleEvent(StateEvent const* stateEvent, int objectEventId, int groupEventId);
 
     //##ModelId=3EDCAECB0175
 	//##Documentation
@@ -64,7 +64,7 @@ namespace mitk {
     //## if you are developing a new statemachine, you put all your operations here!
     //## dependant on the SideEffectNumber / build of the StateMachine-Definition
 	//## First Undo, then SideEffectOperation
-    virtual bool ExecuteSideEffect(int sideEffectId, mitk::StateEvent const* stateEvent, int groupEventId, int objectEventId)= 0;
+    virtual bool ExecuteSideEffect(int sideEffectId, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId)= 0;
 
 	//##ModelId=3EDCAECB00B9
 	//##Documentation

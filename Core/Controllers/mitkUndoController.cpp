@@ -44,6 +44,12 @@ bool mitk::UndoController::SetOperationEvent(OperationEvent* operationEvent)
 }
 
 //##ModelId=3E5F55C80207
+bool mitk::UndoController::Undo()
+{
+	return this->Undo(true);
+}
+
+//##ModelId=3F045196036A
 bool mitk::UndoController::Undo(bool fine)
 {
 	return m_CurUndoModel->Undo(fine);
@@ -52,7 +58,31 @@ bool mitk::UndoController::Undo(bool fine)
 //##ModelId=3E5F55E6003E
 bool mitk::UndoController::Redo()
 {
-	return m_CurUndoModel->Redo();
+	return this->Redo(true);
+}
+
+//##ModelId=3F0451960398
+bool mitk::UndoController::Redo(bool fine)
+{
+	return m_CurUndoModel->Redo(fine);
+}
+
+//##ModelId=3F04519603B8
+void mitk::UndoController::Clear()
+{
+	m_CurUndoModel->Clear();
+}
+
+//##ModelId=3F04519603C7
+void mitk::UndoController::ClearRedoList()
+{
+	m_CurUndoModel->ClearRedoList();
+}
+
+//##ModelId=3F04519603D7
+bool mitk::UndoController::RedoListEmpty()
+{
+	return m_CurUndoModel->RedoListEmpty();
 }
 
 //##ModelId=3E5F56EB017A

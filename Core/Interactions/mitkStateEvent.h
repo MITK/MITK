@@ -18,8 +18,21 @@ class StateEvent
   public:
     //##ModelId=3E5B7B9E0137
     StateEvent();
+    //##ModelId=3F02F8960177
+    //##Documentation
+    //## @brief Constructor
+    //## @params id: mitk internal EventID
+    //##        event: the information about the appeared event
+    StateEvent(int id, Event const* event);
+
+    //##ModelId=3F02F89601A5
+    ~StateEvent();
   
     //##ModelId=3E5B7A7603DA
+    //##Documentation
+    //## @brief to reset the params afterwards 
+    //##
+    //## (used in EventMapper for global variable m_StateEvent)
     void Set(int id, Event const* event);
 
     //##ModelId=3E5B7AEC0394

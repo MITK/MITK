@@ -35,6 +35,11 @@ class UndoController
     //##ModelId=3E5F55C80207
 	//##Documentation
 	//## @brief calls the UndoMechanism to undo the last change
+	bool Undo();
+	
+	//##ModelId=3F045196036A
+	//##Documentation
+	//## @brief calls the UndoMechanism to undo the last change
 	//##
 	//## the UndoMechanism has the possibility to undo the last changes in two different ways:
 	//## first it can Undo a group of operations done at last (e.g. build up a new object; Undo leads to deleting that object);
@@ -49,10 +54,30 @@ class UndoController
 	//## @brief calls the RedoMechanism to redo the operations undone
 	//##
 	//## read the Documentation of Undo!
-	//## Redo has no param like fine, because that param has to be stored in the Redo-List for to 
-	//## redo the same that has been undone!
     bool Redo();
 
+    //##ModelId=3F0451960398
+	//##Documentation
+	//## @brief calls the RedoMechanism to redo the operations undone
+	//##
+	//## read the Documentation of Undo!
+	//## only with the possibility to fine redo, like fine undo
+	bool Redo(bool fine);
+
+    //##ModelId=3F04519603B8
+	//##Documentation
+	//## @brief Clears the Undo and the RedoList
+	void Clear();
+
+    //##ModelId=3F04519603C7
+	//##Documentation
+	//## @brief Clears the RedoList
+	void ClearRedoList();
+	
+    //##ModelId=3F04519603D7
+	//##Documentation
+	//## @brief returns true, if the RedoList is empty
+	bool RedoListEmpty();
 
     //##ModelId=3E5F56EB017A
     bool SwitchUndoModel(UndoType undoType);

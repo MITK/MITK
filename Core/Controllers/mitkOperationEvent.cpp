@@ -13,24 +13,26 @@ mitk::Operation* mitk::OperationEvent::GetOperation()
 
 //##ModelId=3E957AE700E6
 mitk::OperationEvent::OperationEvent(OperationActor* destination, 
-									 Operation* operation, 
-									 Operation* undoOperation,
-									 int objectEventId,
-									 int groupEventId)
-									 : m_Destination(destination), 
-									 m_Operation(operation),
-									 m_UndoOperation(undoOperation),
-									 m_GroupEventId(groupEventId),
-									 m_ObjectEventId(objectEventId),
-									 m_Swaped(false)
-{}
+									 Operation* operation, Operation* undoOperation,
+									 int objectEventId, int groupEventId)
+: m_Destination(destination), m_Operation(operation), m_UndoOperation(undoOperation),
+  m_ObjectEventId(objectEventId), m_GroupEventId(groupEventId), m_Swaped(false)
+{
+}
 
+//##ModelId=3F0451960212
+mitk::OperationEvent::~OperationEvent()
+{
+}
 
 //##ModelId=3E957C1102E3
 //##Documentation
 //##  swaps the Undo and Redo- operation and changes m_Swaped
 void mitk::OperationEvent::SwapOperations()
 {
+    if (m_Operation == NULL) 
+        return;
+
 	Operation *tempOperation = m_Operation;
 	m_Operation = m_UndoOperation;
 	m_UndoOperation = tempOperation;

@@ -24,7 +24,7 @@ class DisplayVectorInteractor : public StateMachine
 
   protected:
     //##ModelId=3EF2224401CB
-    virtual bool ExecuteSideEffect(int sideEffectId, mitk::StateEvent const* stateEvent, int groupEventId, int objectEventId);
+    virtual bool ExecuteSideEffect(int sideEffectId, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId);
 
   private:
     //##ModelId=3EF1D2A002DD

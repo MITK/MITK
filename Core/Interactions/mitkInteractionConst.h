@@ -13,13 +13,16 @@
 //If you change anything here, then change in EventMapper.cpp (Array of constants) as well.
 */
 //##Constants for States and Transitions
-//## in the XML-File and in the code
-#define stNO 0
-#define stYES 1
+//## in the >XML-File< AND in the >code<
+#define StNO   203
+#define StYES  204
+#define StSMALERNMINUS1 220
+#define StLARGERNMINUS1 221
 
 //##Constants for Operations
 //## Typedef int OperationType
 
+#define OpNOTHING 0
 #define OpTEST 1
 #define OpADD  100 //add at the end
 #define OpINSERT  200 //insert at position
@@ -31,7 +34,7 @@
 #define OpDESELECTPOINT 800
 #define OpNAVIGATE 900
 #define OpZOOM 1000
-#define OpNOTHING 9999
+
 
 
 //##Constants for EventMapping...
@@ -44,6 +47,7 @@
 #define SeSNAPPING_ADDING 20
 #define SeCHECKPOINT 30
 #define SeCHECKIFLAST 31
+#define SeCHECKNUMBEROFPOINTS 32
 #define SeFINISHOBJECT 40
 #define SeFINISHGROUP 41
 #define SeSEARCHOBJECT 50

@@ -31,6 +31,7 @@ class vtkVolumeTextureMapper2D;
 class vtkVolume;
 class vtkObject;
 class vtkImageCast;
+class vtkImageChangeInformation;
 
 namespace mitk {
 
@@ -55,7 +56,6 @@ public:
   virtual void Update(mitk::BaseRenderer* renderer);
 
   virtual void Update();
-  virtual void SetInput(const mitk::DataTreeNode * data);
 
   virtual void ApplyProperties(vtkActor* actor, mitk::BaseRenderer* renderer);
   static void AbortCallback(vtkObject *caller, unsigned long eid, void *clientdata, void *calldata);
@@ -72,6 +72,7 @@ protected:
   vtkActor* m_Actor;
   vtkVolume* m_Volume; 
   vtkImageCast* m_ImageCast;
+  vtkImageChangeInformation* m_UnitSpacingImageFilter; 
   vtkVolumeProperty* m_VolumeProperty;
   //vtkVolumeRayCastMapper* m_VtkVolumeMapper;
 	vtkVolumeTextureMapper2D* m_VtkVolumeMapper;

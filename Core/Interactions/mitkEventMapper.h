@@ -66,8 +66,14 @@ class EventMapper : public vtkXMLParser
   //##ModelId=3E5B34CF0041
 	//##Documentation
 	//## searches the Event in m_EventDescription
-	//## and if included
+	//## and if included transmitts the event to globalInteraction
   static bool MapEvent(Event* event);
+
+  //##Documentation
+	//## maps the Event in m_EventDescription with the ID
+	//## and if found returns the Id,
+  //## if not found it returns -1
+  static StateEvent* RefreshStateEvent(StateEvent* stateEvent);
 
   //##ModelId=3E5B35140072
 	//##Documentation

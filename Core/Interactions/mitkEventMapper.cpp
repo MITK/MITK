@@ -16,10 +16,6 @@
 #include "mitkStatusBar.h"
 #include "mitkInteractionConst.h"
 
-//#include <string>
-//#include <map>
-//#include "FocusManager.h"
-
 //XML Event
 //##ModelId=3E788FC000E5
 const std::string mitk::EventMapper::STYLE = "STYLE";
@@ -428,9 +424,6 @@ mitk::StateMachine* mitk::EventMapper::GetGlobalStateMachine()
 //## and if included
 bool mitk::EventMapper::MapEvent(Event* event)
 {
-//debug
-//std::cout<<"Event:"<<event->GetType()<<" "<<event->GetButton()<<" "<<event->GetButtonState()<<" "<<event->GetKey();
-
 	if (m_GlobalStateMachine == NULL)
 		return false;
 
@@ -529,8 +522,6 @@ inline const int mitk::EventMapper::convertConstString2ConstInt(std::string inpu
   return -1;//for didn't find anything
 }
 
-//##
-//##
 void  mitk::EventMapper::StartElement (const char *elementName, const char **atts) 
 {
 
@@ -558,7 +549,7 @@ std::string mitk::EventMapper::GetStyleName()
 	return m_StyleName;
 }
 
-//##
+
 std::string mitk::EventMapper::ReadXMLStringAttribut( std::string name, const char** atts )
 {
   if(atts)
@@ -580,7 +571,7 @@ std::string mitk::EventMapper::ReadXMLStringAttribut( std::string name, const ch
     return std::string();
 }
 
-//##
+
 int mitk::EventMapper::ReadXMLIntegerAttribut( std::string name, const char** atts )
 {
   std::string s = ReadXMLStringAttribut( name, atts );
@@ -597,10 +588,28 @@ int mitk::EventMapper::ReadXMLIntegerAttribut( std::string name, const char** at
 
 void mitk::EventMapper::SetStateEvent(mitk::Event* event)
 {
-  const Event* oldEvent = m_StateEvent.GetEvent();
+//  const Event* oldEvent = m_StateEvent.GetEvent();
   m_StateEvent.Set( m_StateEvent.GetId(), event );
 
   //delete the old event and set the new one
   //caution!!causes in a crash! FixMe/ToDo
   //delete oldEvent;
+}
+
+mitk::StateEvent* mitk::EventMapper::RefreshStateEvent(mitk::StateEvent* stateEvent)
+{
+	//search the event in the list of event descriptions, if found, then change it and return the pointer
+  EventDescriptionVecIter iter;
+	for (iter = m_EventDescriptions.begin(); iter!=m_EventDescriptions.end(); iter++)
+	{
+    if (*iter == *(stateEvent->GetEvent()))
+			break;
+	}
+
+	if (iter != m_EventDescriptions.end())//found
+  {
+    stateEvent->Set((*iter).GetId(), stateEvent->GetEvent());
+  }
+
+  return stateEvent;
 }

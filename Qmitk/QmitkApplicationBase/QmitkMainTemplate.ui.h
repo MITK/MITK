@@ -189,8 +189,12 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
 			//       ipPicFree(header);
 			delete it;
 
+            reader->Update();
 			mitk::LevelWindowProperty::Pointer levWinProp = new mitk::LevelWindowProperty();
-			levWinProp->SetLevelWindow(reader->GetOutput()->GetLevelWindow());
+            
+            mitk::LevelWindow levelWindow;
+            levelWindow.SetAuto( reader->GetOutput()->GetPic() );
+			levWinProp->SetLevelWindow(levelWindow);
 			node->GetPropertyList()->SetProperty("levelwindow",levWinProp);
 		}
 	}

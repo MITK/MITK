@@ -74,6 +74,8 @@ vtkLookupTable* mitk::USLookupTableSource::BuildDSRDopplerLookupTable()
             vtkLookupTable *vtkLookupTable = vtkLookupTable::New();
             ipUInt1_t *data = ( ( ipUInt1_t * ) HPMap->data );
 
+            vtkLookupTable->SetTableRange(0,255);
+
             int LookupTablesize = 256;
             float rgba[ 4 ];
             vtkLookupTable->SetNumberOfColors( LookupTablesize );
@@ -96,6 +98,7 @@ vtkLookupTable* mitk::USLookupTableSource::BuildDSRDopplerLookupTable()
             std::cout << "  no a.map available! creating custom Doppler LookUpTable ... " << std::endl;
 
             vtkLookupTable *vtkLookupTable = vtkLookupTable::New();
+            vtkLookupTable->SetTableRange(0,255);
             // size is the no of different colors in the lut
             int size = 256;
             int lutSize = 256;
@@ -215,6 +218,8 @@ vtkLookupTable* mitk::USLookupTableSource::BuildStrainRateLookupTable()
 {
         std::cout << "  creating StrainRate  LookupTable ... " << std::endl;
         vtkLookupTable *vtkLookupTable = vtkLookupTable::New();
+
+        vtkLookupTable->SetTableRange(0,255);
 
         int lutSize = 256;
 				vtkLookupTable->SetNumberOfTableValues(lutSize);
@@ -369,6 +374,7 @@ vtkLookupTable* mitk::USLookupTableSource::BuildDefaultLookupTable(){
 	std::cout << "  creating default LookupTable... " << std::endl;
   vtkLookupTable *vtkLookupTable = vtkLookupTable::New();
   int size = 256;
+  vtkLookupTable->SetTableRange(0,255);
   vtkLookupTable->SetNumberOfColors( size );
   vtkLookupTable->Build();
   return( vtkLookupTable );

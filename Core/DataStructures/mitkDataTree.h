@@ -41,7 +41,7 @@ class DataTree : public itk::Object, public DataTreeBase, public DataTreeBase::T
     //##ModelId=3E38F46A01AE
     virtual ~DataTree();
 
-	void treeChanged( TreeIterator<T>& changedTreePosition );	
+	void treeChanged( TreeIterator<DataTreeNode::Pointer>& changedTreePosition );	
 
 };
 

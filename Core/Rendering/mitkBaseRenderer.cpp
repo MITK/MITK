@@ -105,9 +105,6 @@ void mitk::BaseRenderer::Resize(int w, int h)
   m_Size[0] = w;
   m_Size[1] = h;
 
-  if(m_CameraController)
-    m_CameraController->Resize(w-8, h-34); //@FIXME CRITICAL workaround for VtkSizeBug
-
   GetDisplayGeometry()->SetSizeInDisplayUnits(w, h);
   //@FIXME: die nächste Zeile ist nur da, weil der Anpassungsvorgang in SetSizeInDisplayUnits leider noch nicht richtig funktioniert.
   GetDisplayGeometry()->Fit();
@@ -288,14 +285,6 @@ void mitk::BaseRenderer::MousePressEvent(mitk::MouseEvent *me)
   }
   else if(m_MapperID==2)
   {
-    //fix for strange offset in 3D coordinates! //@FIXME CRITICAL probably related to VtkSizeBug
-    if (me->GetType() == Type_MouseButtonPress)
-    {
-      Point2D ptest(me->GetDisplayPosition());
-      ptest[1] -= 24.5;
-      me->SetDisplayPosition(ptest);
-    }
-
     Point2D p(me->GetDisplayPosition());
 
     GetDisplayGeometry()->ULDisplayToDisplay(p,p);

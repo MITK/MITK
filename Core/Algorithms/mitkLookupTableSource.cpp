@@ -5,21 +5,22 @@ mitk::LookupTableSource::LookupTableSource()
     // Create the output.
 
     std::cout << "mitk::LookupTableSource::LookupTableSource()... " << std::endl;
-//    OutputType::Pointer output = static_cast<OutputType*> ( this->MakeOutput( 0 ).GetPointer() );
-//    Superclass::SetNumberOfRequiredOutputs( 1 );
-//    Superclass::SetNthOutput( 0, output.GetPointer() );
+    //    OutputType::Pointer output = static_cast<OutputType*> ( this->MakeOutput( 0 ).GetPointer() );
+    //    Superclass::SetNumberOfRequiredOutputs( 1 );
+    //    Superclass::SetNthOutput( 0, output.GetPointer() );
 
 
     // Create the output. We use static_cast<> here because we know the default
-  	// output must be of type TOutputImage
-  	OutputType::Pointer output = static_cast<OutputType*>(this->MakeOutput(0).GetPointer());
+    // output must be of type TOutputImage
+    OutputType::Pointer output = static_cast<OutputType*>( this->MakeOutput( 0 ).GetPointer() );
 
-   	if (output.GetPointer()==NULL) std::cout << "something went wrong..." << std::endl;
-    
-  	this->ProcessObject::SetNumberOfRequiredOutputs(1);
-  	this->ProcessObject::SetNthOutput(0, output.GetPointer());
+    if ( output.GetPointer() == NULL )
+        std::cout << "something went wrong..." << std::endl;
 
-  
+    this->ProcessObject::SetNumberOfRequiredOutputs( 1 );
+    this->ProcessObject::SetNthOutput( 0, output.GetPointer() );
+
+
     std::cout << "mitk::LookupTableSource::LookupTableSource() OK! " << std::endl;
 }
 
@@ -33,7 +34,7 @@ mitk::LookupTableSource::~LookupTableSource()
 mitk::LookupTableSource::DataObjectPointer
 mitk::LookupTableSource::MakeOutput ( unsigned int )
 {
-		std::cout << "mitk::LookupTableSource::MakeOutput()... " << std::endl;
+    std::cout << "mitk::LookupTableSource::MakeOutput()... " << std::endl;
     return OutputType::New().GetPointer();
 }
 
@@ -60,7 +61,8 @@ mitk::LookupTableSource::GetOutput()
 
     std::cout << "returning lookuptable output ... " << std::endl;
 
-    if (static_cast<OutputType*> ( this->ProcessObject::GetOutput( 0 )) == NULL) std::cout << "oooops..." << std::endl;
+    if ( static_cast<OutputType*> ( this->ProcessObject::GetOutput( 0 ) ) == NULL )
+        std::cout << "oooops..." << std::endl;
     return static_cast<OutputType*> ( this->ProcessObject::GetOutput( 0 ) );
 }
 

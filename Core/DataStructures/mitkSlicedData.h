@@ -127,9 +127,9 @@ public:
     //##ModelId=3E34513B016D
     virtual void CopyInformation(const itk::DataObject *data);
 
-
+    //##Documentation
+    //## @brief Get the number of channels
 	itkGetConstMacro(ChannelNumber, unsigned int); 
-
 protected:
     //##ModelId=3E19EA3300BA
     SlicedData();

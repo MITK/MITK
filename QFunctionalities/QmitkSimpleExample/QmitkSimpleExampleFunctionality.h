@@ -83,6 +83,7 @@ public:
     //## The slices of widgets 1,2,3 are moved so that the seed point is on them.
     virtual void ExecuteOperation(mitk::Operation* operation);
 
+    virtual void activated();
 protected slots:
 
 	/*!

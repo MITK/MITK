@@ -7,7 +7,7 @@
 mitk::VtkInteractorCameraController::VtkInteractorCameraController() : m_VtkInteractor(NULL) 
 {
     m_VtkInteractor = mitk::VtkQRenderWindowInteractor::New();
-    m_VtkInteractor->SetInteractorStyle(vtkInteractorStyleTrackballCamera::New());
+//    m_VtkInteractor->SetInteractorStyle(vtkInteractorStyleTrackballCamera::New());
 }
 
 //##ModelId=3E6D600F009B

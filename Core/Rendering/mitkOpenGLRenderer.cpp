@@ -139,6 +139,12 @@ void mitk::OpenGLRenderer::Render()
 
         if(m_DataTreeIterator==NULL) return;
 
+        glViewport (0, 0, m_Size[0], m_Size[1]);
+        glMatrixMode( GL_PROJECTION );
+        glLoadIdentity();
+        gluOrtho2D( 0.0, m_Size[0], 0.0, m_Size[1] );
+        glMatrixMode( GL_MODELVIEW );
+
         bool m_VtkMapperPresent=false;
 
         mitk::DataTreeIterator* it=m_DataTreeIterator->clone();

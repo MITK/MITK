@@ -34,7 +34,6 @@ controls(NULL), multiWidget(mitkStdMultiWidget)
     {
 	    globalInteraction->AddStateMachine(new mitk::DisplayVectorInteractor("move", this));//sends DisplayCoordinateOperation
 	    globalInteraction->AddStateMachine(new mitk::DisplayVectorInteractor("zoom", this));//sends DisplayCoordinateOperation
-        globalInteraction->AddStateMachine(new mitk::DisplayVectorInteractor("picking", new mitk::VesselGraphInteractor( it ) ) ); //allows picking of vessels
     }
 
     m_DataTreeIterator->getTree()->addTreeChangeListener(this);

@@ -161,7 +161,7 @@ bool mitk::PicHelper::SetGeometry2D(ipPicDescriptor* pic, int s, SlicedGeometry3
         count = slicedgeometry->GetSlices();
       }
 
-      int slice;
+      unsigned int slice;
       for (slice=0; slice < count; ++slice ) 
       {
         pixelSize[0] = (ScalarType) *value++;

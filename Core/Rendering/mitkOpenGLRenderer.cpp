@@ -532,7 +532,9 @@ void mitk::OpenGLRenderer::InitSize(int w, int h)
 void mitk::OpenGLRenderer::SetMapperID(const MapperSlotId mapperId)
 {
   Superclass::SetMapperID(mapperId);
-  UpdateIncludingVtkActors();
+  //ensure that UpdateIncludingVtkActors() is called at next 
+  //call of Render():
+  m_LastUpdateVtkActorsTime = 0; 
 }
 
 //##ModelId=3EF162760271

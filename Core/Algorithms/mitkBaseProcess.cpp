@@ -20,6 +20,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkBaseProcess.h"
 #include "mitkBaseData.h"
 
+#include "itkSmartPointerForwardReference.txx"
+// Manual instantiation is necessary to prevent link errors
+template class itk::SmartPointerForwardReference<mitk::BaseProcess>;
+
 #define MITK_WEAKPOINTER_PROBLEM_WORKAROUND_ENABLED
 
 //##ModelId=3E8600DD0036

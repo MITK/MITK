@@ -44,6 +44,17 @@ class BaseProcess : public itk::ProcessObject
 public:
     mitkClassMacro(BaseProcess, itk::ProcessObject);
 
+    //##Documentation
+    //## @brief Access itk::ProcessObject::m_Updating
+    //##
+    //## m_Updating indicates when the pipeline is executing.
+    //## It prevents infinite recursion when pipelines have loops.
+    //## \sa itk::ProcessObject::m_Updating
+    bool Updating() const
+    {
+      return m_Updating;
+    }
+
     //##ModelId=3E8600DC03E2
     //##Documentation
     //## @brief Helps to deal with the weak-pointer-problem.
@@ -77,6 +88,7 @@ protected:
     //## private and non-virtual: the important stuff is done in 
     //## mitk::BaseData::connectSource.
     virtual void AddOutput(itk::DataObject *output);
+
 private:
     //##ModelId=3E8600DC0356
     //##Documentation

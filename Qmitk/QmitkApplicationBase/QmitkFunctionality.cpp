@@ -7,7 +7,7 @@
 QmitkFunctionality::QmitkFunctionality(QObject *parent, const char *name, mitk::DataTreeIterator * dataIt) : QObject(parent, name)
 {
 	available=false;
-	dataTree = dataIt;
+	m_DataTreeIterator = dataIt;
 }
 
 QmitkFunctionality::~QmitkFunctionality()
@@ -39,10 +39,10 @@ void QmitkFunctionality::setAvailability(bool available)
 
 void QmitkFunctionality::setDataTree(mitk::DataTreeIterator * it) 
 {
-	dataTree = it;
+	m_DataTreeIterator = it;
 }
 
 mitk::DataTreeIterator * QmitkFunctionality::getDataTree()
 {
-	return dataTree;
+	return m_DataTreeIterator;
 }

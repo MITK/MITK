@@ -15,11 +15,12 @@
 
 #include <EventMapper.h>
 #include <GlobalInteraction.h>
-#include <SeedRoi.h>
-#include <SeedOperation.h>
+#include <mitkCoordinateSupplier.h>
+#include <mitkPointOperation.h>
 #include <mitkDisplayCoordinateOperation.h>
 #include <mitkDisplayVectorInteractor.h>
 #include <BaseRenderer.h>
+#include <mitkInteractionConst.h>
 
 #include <algorithm>
 
@@ -38,7 +39,7 @@ controls(NULL), multiWidget(mitkStdMultiWidget), opacityprop(NULL)
     mitk::GlobalInteraction* globalInteraction = dynamic_cast<mitk::GlobalInteraction*>(mitk::EventMapper::GetGlobalStateMachine());
     if(globalInteraction!=NULL)
     {
-	    globalInteraction->AddStateMachine(new mitk::SeedRoi("navigation", this));
+	    globalInteraction->AddStateMachine(new mitk::CoordinateSupplier("navigation", this));
 	    globalInteraction->AddStateMachine(new mitk::DisplayVectorInteractor("move", this));
 	    globalInteraction->AddStateMachine(new mitk::DisplayVectorInteractor("zoom", this));
     }
@@ -150,7 +151,7 @@ void QmitkSimpleExampleFunctionality::selectSliceWidgetFP( int p )
 void QmitkSimpleExampleFunctionality::initWidgets()
 {
 	int count = 0;
-	mitk::DataTreeIterator* it=dataTree->clone();
+	mitk::DataTreeIterator* it=m_DataTreeIterator->clone();
 	while (it->hasNext()) {
 		it->next();
 		printf("\nrequesting boundingbox\n");   
@@ -205,14 +206,16 @@ void QmitkSimpleExampleFunctionality::initWidgets()
 
 void QmitkSimpleExampleFunctionality::ExecuteOperation(mitk::Operation* operation)
 {
-    int execId=operation->GetExecutionId();
-
-    if(execId<1100) //navigate
+    if(operation->GetOperationType() == OpADD) //navigate
     {
-        mitk::SeedOperation* seedoperation=dynamic_cast<mitk::SeedOperation*>(operation);
-        if(seedoperation==NULL) return;
+        mitk::PointOperation* pointoperation=dynamic_cast<mitk::PointOperation*>(operation);
+        if(pointoperation==NULL) return;
 
-        mitk::Point3D seed = seedoperation->GetSeed();
+        mitk::ITKPoint3D point;
+        mitk::Point3D seed; 
+
+        point = pointoperation->GetPoint();
+        mitk::itk2vm(point, seed);
 
         const mitk::Geometry2D* g2d; 
         const mitk::PlaneGeometry* pg;
@@ -275,17 +278,17 @@ void QmitkSimpleExampleFunctionality::ExecuteOperation(mitk::Operation* operatio
         if(renderer==NULL)
             return;
 
-        if(execId<1200) //move
+        if(operation->GetOperationType() == OpMOVE) //move
         {
             renderer->GetDisplayGeometry()->MoveBy(dcOperation->GetLastToCurrentDisplayVector()*(-1.0));
             renderer->GetRenderWindow()->Update();
         }
         else
-        if(execId<1300) //zoom
+        if(operation->GetOperationType() == OpZOOM) //zoom
         {
             float distance = dcOperation->GetLastToCurrentDisplayVector().y;
             distance = (distance > 0 ? 1 : (distance < 0 ? -1 : 0));
-            float factor= 1.0 + distance * 0.05;;
+            float factor= 1.0 + distance * 0.05;
             renderer->GetDisplayGeometry()->Zoom(factor, dcOperation->GetStartDisplayCoordinate());
             renderer->GetRenderWindow()->Update();
         }

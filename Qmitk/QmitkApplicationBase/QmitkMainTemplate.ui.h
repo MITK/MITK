@@ -38,7 +38,6 @@
 #include <StateMachine.h>
 #include <EventMapper.h>
 #include <GlobalInteraction.h>
-#include <SeedRoi.h>
 #include <mitkInteractionConst.h>
 
 
@@ -383,7 +382,7 @@ void QmitkMainTemplate::fileExit()
 
 void QmitkMainTemplate::editUndo()
 {
-    undoController->Undo(true);
+    undoController->Undo(true);//true is for fine undo
 }
 
 void QmitkMainTemplate::editRedo()
@@ -453,6 +452,10 @@ void QmitkMainTemplate::init()
 	        mitk::GlobalInteraction* globalInteraction = new mitk::GlobalInteraction("global");
         	mitk::EventMapper::SetGlobalStateMachine(globalInteraction);
         }
+    }
+    else
+    {
+        std::cout<<"Couldn't find XML-configure-file! Check your branch!"<<std::endl;
     }
 
     //this seems to be a bug of Qt3.1.1's designer: The object name of ToolBar is not initialized.

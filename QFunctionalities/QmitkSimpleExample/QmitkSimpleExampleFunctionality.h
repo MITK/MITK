@@ -79,7 +79,7 @@ public:
     //## \brief Implementation of OperationActor-method. Used for scrolling
     //## through the slices by clicking into the images.
     //## 
-    //## mitk::Operation is expected to be an mitk::SeedOperation. 
+    //## mitk::Operation is expected to be an mitk::PointOperation. 
     //## The slices of widgets 1,2,3 are moved so that the seed point is on them.
     virtual void ExecuteOperation(mitk::Operation* operation);
 

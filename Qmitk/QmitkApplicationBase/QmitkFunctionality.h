@@ -101,7 +101,7 @@ protected:
 	/*!
 			a reference to a data tree iterator object
 	 */
-	mitk::DataTreeIterator*	dataTree;
+	mitk::DataTreeIterator*	m_DataTreeIterator;
 
 
 };

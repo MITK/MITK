@@ -103,7 +103,7 @@ bool mitk::GlobalInteraction::AskSelected(mitk::StateEvent const* stateEvent, in
 
   for (InteractorListIter it = m_SelectedList.begin(); it != m_SelectedList.end(); it++)
   {
-    if((*it)!=NULL)
+    if((*it)!=NULL && m_SelectedList.empty())
     {
       //Interactor are in Mode SELECTED or SUBSELECTED
       oneOk = (*it)->HandleEvent(stateEvent, objectEventId, groupEventId);
@@ -114,7 +114,9 @@ bool mitk::GlobalInteraction::AskSelected(mitk::StateEvent const* stateEvent, in
 
       //if mode changed, then erase from selectedList
       if ((*it)->GetMode()==Interactor::SMDESELECTED)
+      {
         m_SelectedList.erase(it);
+      }
     }
   }
   return ok;

@@ -23,13 +23,14 @@ mitk::ContourMapper2D::~ContourMapper2D()
 
 
 void mitk::ContourMapper2D::Paint(mitk::BaseRenderer * renderer)
-{
+  {
   if(IsVisible(renderer)==false) return;
 
   ////	@FIXME: Logik fuer update
   bool updateNeccesary=true;
 
-  if (updateNeccesary) {
+  if (updateNeccesary) 
+    {
     mitk::Contour::Pointer input =  const_cast<mitk::Contour*>(this->GetInput());
 
     // ok, das ist aus GenerateData kopiert
@@ -43,19 +44,36 @@ void mitk::ContourMapper2D::Paint(mitk::BaseRenderer * renderer)
 
 
     Contour::InputType idx = input->GetContourPath()->StartOfInput();
-    Contour::OutputType point;
+    //    Contour::OutputType point;
+    Contour::BoundingBoxType::PointType point;
 
     mitk::Point3D p, projected_p;
     float vtkp[3];
 
-    glBegin (GL_LINE_LOOP);
+    if (input->GetClosed())
+      {
+      glBegin (GL_LINE_LOOP);
+      }
+    else 
+      {
+      glBegin (GL_LINE_STRIP);
+      }
 
-    
-    Contour::InputType end = input->GetContourPath()->EndOfInput();
-    if (end > 50000) end = 0;
-    while ( idx != end )
-    {
-      point = input->GetContourPath()->Evaluate(idx);
+
+    //Contour::InputType end = input->GetContourPath()->EndOfInput();
+    //if (end > 50000) end = 0;
+
+    mitk::Contour::PointsContainerPointer points = input->GetPoints();
+    mitk::Contour::PointsContainerIterator pointsIt = points->Begin();
+
+
+
+    while ( pointsIt != points->End() )
+      {
+      //while ( idx != end )
+      //{
+      //      point = input->GetContourPath()->Evaluate(idx);
+      point = pointsIt.Value();
 
       p.x= point[0];
       p.y= point[1];
@@ -65,19 +83,22 @@ void mitk::ContourMapper2D::Paint(mitk::BaseRenderer * renderer)
       vtk2vec(vtkp,p);
 
       displayGeometry->Project(p, projected_p);
-      if(Vector3D(p-projected_p).length()< 1) {
+      if(Vector3D(p-projected_p).length()< 1) 
+        {
         Point2D pt2d, tmp;
         displayGeometry->Map(projected_p, pt2d);
         displayGeometry->MMToDisplay(pt2d, pt2d);
         glVertex2fv(&pt2d.x);
+        }
+
+      pointsIt++;
+      //      idx += 1;
       }
 
-      idx += 1;
-    }
     glEnd ();
-  
+
+    }
   }
-}
 
 const mitk::Contour* mitk::ContourMapper2D::GetInput(void)
 {

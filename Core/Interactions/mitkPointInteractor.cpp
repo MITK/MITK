@@ -137,10 +137,9 @@ float mitk::PointInteractor::CalculateJurisdiction(StateEvent const* stateEvent)
   if (index>-1)
     //how far away is the line from the point?
   {
-    //TODO 
     //get the point and calculate the jurisdiction out of it.
     mitk::PointSet::PointType point;
-    // bool ok = pointSet->GetPointSet()->GetPoint(index, &point); /* \todo remove line*/
+    pointSet->GetPointSet()->GetPoint(index, &point); 
     returnValue = point.EuclideanDistanceTo(worldPoint);
 
     //between 1 and 0.     1 if directly hit

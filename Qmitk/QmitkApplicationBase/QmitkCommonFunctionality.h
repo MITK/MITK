@@ -441,7 +441,7 @@ static mitk::DataTreeNode::Pointer FileOpen()
         }
     }
 
-    static mitk::Image* GetFirstImageInDataTree(mitk::DataTree::Pointer dataTree)
+    static mitk::DataTreeIteratorBase* GetIteratorToFirstImageInDataTree(mitk::DataTree::Pointer dataTree)
     {
       mitk::DataTreePreOrderIterator dataTreeIterator( dataTree );
 
@@ -463,13 +463,21 @@ static mitk::DataTreeNode::Pointer FileOpen()
           // enquiry whether img is NULL
           if ( img.IsNotNull() )
           {
-            return img;
+            return it->Clone();
           }
         }
         ++it;
       }
       std::cout << "No node containing an mitk::Image found, returning NULL..." << std::endl;
       return NULL;
+    }
+
+    static mitk::Image* GetFirstImageInDataTree(mitk::DataTree::Pointer dataTree)
+    {
+      mitk::DataTreeIteratorClone it = GetIteratorToFirstImageInDataTree(dataTree);
+      if(it.IsNull())
+        return NULL;
+      return static_cast<mitk::Image*>(it->Get()->GetData());
     }
 
 

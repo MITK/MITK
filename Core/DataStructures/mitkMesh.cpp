@@ -4,6 +4,7 @@
 #include <mitkOperationActor.h>
 
 #include <mitkLineOperation.h>
+#include <mitkLineVecOperation.h>
 #include <mitkPointOperation.h>
 #include "mitkVector.h"
 
@@ -38,9 +39,12 @@ const mitk::Mesh::DataType::Pointer mitk::Mesh::GetMesh() const
 //## OpINSERTLINE (inserts a new line to the cell. if the cell already contains a line, 
 //## then the celltype will be set to Triangle(which actually adds two lines cause the object is closed),
 //## OpMOVELINE (moves the points of the given cellId),
-//## OpREMOVELINE (removes the line between the two given points of the cellId),
+//## OpREMOVECELL (removes all lines of the given cell),
 //## OpSELECTLINE (select the given line),
 //## OpDESELECTLINE (deselects it)
+//## 
+//## Removing a line has to be done by an Interactor, which knows 
+//## if the resultcell shall be closed or not.
 void mitk::Mesh::ExecuteOperation(Operation* operation)
 //adding only the operations, that aren't implemented by the pointset.
 //if already implemented, then call superclass funktion (in default)
@@ -54,7 +58,6 @@ void mitk::Mesh::ExecuteOperation(Operation* operation)
         (StatusBar::GetInstance())->DisplayText("Message from mitkMesh: Recieved wrong type of operation!See mitkMeshInteractor.cpp", 10000);
         return;
       }
-
       Superclass::ExecuteOperation(operation);
 	}
 
@@ -168,13 +171,26 @@ void mitk::Mesh::ExecuteOperation(Operation* operation)
 		break;
 	case OpMOVELINE://(moves the points of the given cellId)
 		{
+      mitk::LineVecOperation *lineVecOp = dynamic_cast<mitk::LineVecOperation *>(operation);
+      if (lineVecOp == NULL)
+      {
+        (StatusBar::GetInstance())->DisplayText("Message from mitkMesh: Recieved wrong type of operation!See mitkMeshInteractor.cpp", 10000);
+          return;
+      }
+
       //create two operations out of the one operation and call superclass
 
       ITKPoint3D pointA, pointB;
       m_ItkData->GetPoint(lineOp->GetPIdA(), &pointA);
       m_ItkData->GetPoint(lineOp->GetPIdB(), &pointB);
-      //pointA += lineOp->GetVector();
-      //pointB += lineOp->GetVector();
+
+      pointA[0] += lineVecOp->GetVector()[0];
+      pointA[1] += lineVecOp->GetVector()[1];
+      pointA[2] += lineVecOp->GetVector()[2];
+      pointB[0] += lineVecOp->GetVector()[0];
+      pointB[1] += lineVecOp->GetVector()[1];
+      pointB[2] += lineVecOp->GetVector()[2];
+
       mitk::PointOperation* operationA = new mitk::PointOperation(OpMOVE, pointA, lineOp->GetPIdA());
       mitk::PointOperation* operationB = new mitk::PointOperation(OpMOVE, pointB, lineOp->GetPIdB());
 
@@ -182,17 +198,23 @@ void mitk::Mesh::ExecuteOperation(Operation* operation)
       Superclass::ExecuteOperation(operationB);
 		}
 		break;
-	case OpREMOVELINE://(removes the line between the two given points of the cellId)
+	case OpREMOVECELL:
 		{
+      //int cellId = lineOp->GetCellId();
+      //DataType::CellAutoPointer cell;
+      //bool ok = m_ItkData->GetCell(lineOp->GetCellId(), cell);
+      //m_ItkData->SetCell(lineOp->GetCellId(),NULL)
+      
 		}
 		break;
 	case OpSELECTLINE://(select the given line)
 		{
+      m_ItkData->SetCellData(lineOp->GetCellId(), true);
 		}
 		break;
 	case OpDESELECTLINE://(deselect the given line)
 		{
-
+      m_ItkData->SetCellData(lineOp->GetCellId(), false);
 		}
 		break;
 	default:

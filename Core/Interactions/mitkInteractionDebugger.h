@@ -52,3 +52,4 @@ private:
 }//namespace mitk
 
 #endif /* MITKINTERACTIONDEBUGGER_H */
+

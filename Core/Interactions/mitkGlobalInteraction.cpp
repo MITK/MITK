@@ -1,8 +1,12 @@
 #include "mitkGlobalInteraction.h"
 #include "mitkInteractionConst.h"
+#include "mitkEventMapper.h"
 #include "mitkEvent.h"
 #include "mitkStatusBar.h"
 #include "mitkAction.h"
+#include <mitkPositionEvent.h>
+#include <vtkWorldPointPicker.h>
+#include <mitkOpenGLRenderer.h>
 
 
 //##ModelId=3EAD420E0088
@@ -192,13 +196,58 @@ mitk::FocusManager* mitk::GlobalInteraction::GetFocusManager()
   return m_FocusManager;
 }
 
-
+bool mitk::GlobalInteraction::GetWorldCoordinate(const mitk::DisplayPositionEvent *displayPositionEvent, mitk::PositionEvent* positionEvent)
+{
+  /* pick a Prop3D and assume its position as event 3D coordinates */
+  const mitk::Point2D displayPoint = displayPositionEvent->GetDisplayPosition();
+  const FocusManager::FocusElement* fe = this->GetFocus();
+  FocusManager::FocusElement* fe2 =  const_cast <FocusManager::FocusElement*>(fe);
+  mitk::OpenGLRenderer* glRenderer = dynamic_cast<mitk::OpenGLRenderer*>(fe2);
+  if (glRenderer == NULL)
+    return false;
+  vtkWorldPointPicker *worldPicker = vtkWorldPointPicker::New();
+  //picker->SetTolerance (0.0001);
+  worldPicker->Pick(displayPoint.x, displayPoint.y, 0, glRenderer->GetVtkRenderer());
+  mitk::Point3D worldPoint;
+  worldPoint.x = worldPicker->GetPickPosition()[0];
+  worldPoint.y = worldPicker->GetPickPosition()[1];
+  worldPoint.z = worldPicker->GetPickPosition()[2];
+  positionEvent->SetWorldPosition(worldPoint);
+  return true;
+}
 
 //##ModelId=3E7F497F01AE
 bool mitk::GlobalInteraction::ExecuteAction(Action* action, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId)
 {
   bool ok = false;
+  //check if we already have a PositionEvent with 3D worldcoordinates.
+  //if we have a DiplayPositionEvent, we check if the Event is thrown by a mouseclick.
+  //If so, compute the worldcoodinates through this->GetWorldPosition()
+  mitk::PositionEvent const  *posEvent = dynamic_cast <const mitk::PositionEvent *> (stateEvent->GetEvent());
+  if (posEvent == NULL)
+    if (stateEvent->GetEvent()->GetType() == Type_MouseButtonPress)
+    {
+      mitk::DisplayPositionEvent const  *displayEvent = dynamic_cast <const mitk::DisplayPositionEvent *> (stateEvent->GetEvent());
+      if (displayEvent!=NULL)
+      {
+        mitk::Point3D worldPoint;
+        worldPoint.x = 0;
+        worldPoint.y = 0;
+        worldPoint.z = 0;
 
+        PositionEvent* positionEvent = new PositionEvent(displayEvent->GetSender(), displayEvent->GetType(), displayEvent->GetButton(),
+          displayEvent->GetButtonState(), displayEvent->GetKey(), displayEvent->GetDisplayPosition(), worldPoint);
+        ok = GetWorldCoordinate(displayEvent, positionEvent);
+        if (ok)
+        {
+          int id = stateEvent->GetId();
+          mitk::EventMapper::SetStateEvent(positionEvent);
+        }
+      }
+    }
+
+
+  ok = false;
   switch (action->GetActionId())
   {
   case AcDONOTHING:
@@ -214,7 +263,6 @@ bool mitk::GlobalInteraction::ExecuteAction(Action* action, mitk::StateEvent con
       //if m_JurisdictionMap is empty, then fill it.
       if (m_JurisdictionMap.empty())
         FillJurisdictionMap(stateEvent, objectEventId, groupEventId, 0);
-      
       
       //no jurisdiction value above 0 could be found, so take all to convert to old scheme
       if (m_JurisdictionMap.empty())

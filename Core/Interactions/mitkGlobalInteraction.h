@@ -8,8 +8,11 @@
 #include <string>
 #include <vector>
 
-
 namespace mitk {
+
+  class PositionEvent;
+
+
 //##ModelId=3E5B33000230
 //##Documentation
 //## @brief handles all global Events
@@ -115,6 +118,10 @@ class GlobalInteraction : public StateMachine
 
   //##ModelId=3E7F497F01AE
   virtual bool ExecuteAction(Action* action, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId);
+
+  //##Documentation
+  //##@brief calculating the worldcoorinate and returning it in an event
+  virtual bool GetWorldCoordinate(const DisplayPositionEvent *diplayPositionEvent, PositionEvent* positionEvent);
 
   private:
 

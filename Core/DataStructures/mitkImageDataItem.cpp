@@ -4,6 +4,7 @@
 
 #include "ImageDataItem.h"
 #include <vtkImageData.h>
+#include <vtkPointData.h>
 
 //##ModelId=3E0B7882024B
 mitk::ImageDataItem::ImageDataItem(const ImageDataItem& aParent, unsigned int dimension, int offset) : 

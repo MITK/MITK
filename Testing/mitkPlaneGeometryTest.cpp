@@ -449,7 +449,7 @@ int mitkPlaneGeometryTest(int argc, char* argv[])
   std::cout << "Testing backside initialization: InitializeStandardPlane(clonedplanegeometry, planeorientation = Transversal, zPosition = 0, frontside=false): " <<std::endl;
   planegeometry->InitializeStandardPlane(clonedplanegeometry, mitk::PlaneGeometry::Transversal, 0, false);
   mitk::Point3D backsideorigin;
-  backsideorigin=origin+clonedplanegeometry->GetAxisVector(1)+clonedplanegeometry->GetAxisVector(2)/clonedplanegeometry->GetExtent(2);
+  backsideorigin=origin+clonedplanegeometry->GetAxisVector(1);
 
   std::cout << "Testing origin of backsidedly, transversally initialized version: ";
   if(mitk::Equal(planegeometry->GetOrigin(), backsideorigin)==false)

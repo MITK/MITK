@@ -18,5 +18,6 @@ mitk::BaseProperty::Pointer mitk::PropertyManager::CreateDefaultProperty(std::st
   } else {
     std::cout << "Warning: non-existing default property requested: " 
       << name << std::endl; 
-  }  
+  }
+  return NULL;
 };

@@ -42,7 +42,7 @@ QcMITKSamplePlugin::QcMITKSamplePlugin( QWidget *parent )
 QString 
 QcMITKSamplePlugin::name() 
 { 
-  return QString( "SampleApp" ); 
+  return QString( "ERIS" ); 
 }
 
 const char ** 
@@ -121,7 +121,20 @@ void QcMITKSamplePlugin::selectSerie (QcLightbox* lightbox)
   node->GetPropertyList()->SetProperty( "levelwindow", levWinProp );
   node->SetProperty( "volumerendering", new mitk::BoolProperty( false ) );
   node->SetProperty("LoadedFromChili", new mitk::BoolProperty( true ) );
-  node->SetProperty("name", new mitk::StringProperty( "1" ) );
+
+  ipPicTSV_t* uid= ipPicQueryTag(reader->GetOutput()->GetPic(),"IMAGE INSTANCE UID");
+  ipPicTSV_t* description= ipPicQueryTag(reader->GetOutput()->GetPic(),"SERIES DESCRIPTION");
+  ipPicTSV_t* patientName= ipPicQueryTag(reader->GetOutput()->GetPic(),"PATIENT NAME");
+
+  if (uid)
+    node->SetProperty("name", new mitk::StringProperty( (char*)uid->value ));
+  else if (description)
+    node->SetProperty("name", new mitk::StringProperty( (char*)description->value ));
+  
+  else if (patientName)
+    node->SetProperty("name", new mitk::StringProperty( (char*)patientName->value ));
+  else 
+    node->SetProperty("name", new mitk::StringProperty( lightbox->name() ));
 
 ///////itkGenericOutputMacro(<<"before thresh: ");
 //  ipPicDescriptor *cur, *tmp;

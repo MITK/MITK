@@ -97,7 +97,7 @@ bool mitk::AffineInteractor::ExecuteSideEffect(int sideEffectId, mitk::StateEven
     rotationaxis[1] =  startPosition[2] * newPosition[0] - startPosition[0] * newPosition[2];
     rotationaxis[2] =  startPosition[0] * newPosition[1] - startPosition[1] * newPosition[0];
     
-    mitk::ScalarType angle = atan2(rotationaxis.GetNorm(), newPosition * startPosition) * (180/(4 * atan(1)));    
+    mitk::ScalarType angle = atan2(rotationaxis.GetNorm(), newPosition * startPosition) * (180/vnl_math::pi);
     
     m_lastRotatePosition = dummy.GetVectorFromOrigin(); // save actual mouse position as last mouse position
 

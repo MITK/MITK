@@ -6,7 +6,6 @@
 
 #include "mitkOpenGLRenderer.h"
 #include "mitkRenderWindow.h"
-#include "QmitkRenderWindow.h"
 #include "qwidget.h"
 
 #include <fstream>

@@ -688,6 +688,7 @@ void mitk::DataTreeNodeFactory::ReadFileTypeITKImageIOFactory()
 #endif 
     image->SetVolume( buffer );
     image->GetSlicedGeometry()->SetSpacing( spacing );
+    image->GetTimeSlicedGeometry()->InitializeEvenlyTimed(image->GetSlicedGeometry(), image->GetDimension(3));
     free( buffer );
     buffer = NULL;
 

@@ -11,6 +11,8 @@
 #include <itkBoundingBox.h>
 #include <itkFixedArray.h>
 
+#include "mitkBoundingObject.h"
+
 #include <math.h>
 
 typedef itk::FixedArray< mitk::ScalarType, 3*2 > BoundsArrayType;
@@ -51,27 +53,40 @@ bool mitk::AffineInteractor::ExecuteSideEffect(int sideEffectId, mitk::StateEven
 		//converting from Point3D to itk::Point
     mitk::Point3D worldPoint = posEvent->GetWorldPosition();
 
-    BoundingBox* box = const_cast <BoundingBox*> (m_DataTreeNode->GetData()->GetGeometry()->GetBoundingBox());
-    BoundsArrayType bounds = box->GetBounds();
+    // check if mouseclick has hit the object
+    mitk::ITKPoint3D itkPoint;
+    bool inside = false;
+    mitk::BoundingObject::Pointer boundingObject = dynamic_cast<mitk::BoundingObject*>(m_DataTreeNode->GetData());
+    if(boundingObject.IsNotNull())  // if it is a bounding object, use its inside function for exact hit calculation
+    {
+      itkPoint[0] = worldPoint.x;
+      itkPoint[1] = worldPoint.y;
+      itkPoint[2] = worldPoint.z;      
+      inside = boundingObject->IsInside(itkPoint); // check if point is inside the object
+    }
+    else    // use the data objects bounding box to determine if hit
+    {
+      m_DataTreeNode->GetData()->UpdateOutputInformation(); // update bounding box @TODO: Is this neccessary?
+      BoundingBox* box = const_cast <BoundingBox*> (m_DataTreeNode->GetData()->GetGeometry()->GetBoundingBox());
+      BoundsArrayType bounds = box->GetBounds();
 
-    ScalarType p[4];
-    p[0] = worldPoint.x;
-    p[1] = worldPoint.y;
-    p[2] = worldPoint.z;
-    p[3] = 1;
-    geometry->GetVtkTransform()->GetInverse()->TransformPoint(p, p);
-		mitk::ITKPoint3D itkPoint;
-    itkPoint[0] = p[0]/p[3];
-    itkPoint[1] = p[1]/p[3];
-    itkPoint[2] = p[2]/p[3];
+      ScalarType p[4];
+      p[0] = worldPoint.x;
+      p[1] = worldPoint.y;
+      p[2] = worldPoint.z;
+      p[3] = 1;
+      geometry->GetVtkTransform()->GetInverse()->TransformPoint(p, p);		  
+      itkPoint[0] = p[0]/p[3];
+      itkPoint[1] = p[1]/p[3];
+      itkPoint[2] = p[2]/p[3];
 
-    itkPoint[0] *= geometry->GetXAxis().GetNorm();
-    itkPoint[1] *= geometry->GetYAxis().GetNorm();
-    itkPoint[2] *= geometry->GetZAxis().GetNorm();    
-    
-    
-    // check if point is inside the datas bounding box
-    if (box->IsInside(itkPoint))
+      itkPoint[0] *= geometry->GetXAxis().GetNorm();
+      itkPoint[1] *= geometry->GetYAxis().GetNorm();
+      itkPoint[2] *= geometry->GetZAxis().GetNorm();    
+
+      inside = box->IsInside(itkPoint); // check if point is inside the datas bounding box
+    }    
+    if (inside)
     {
       newStateEvent = new mitk::StateEvent(StYES, posEvent);  
       selected = true;

@@ -52,8 +52,8 @@ protected:
 
   virtual void GenerateData();
 
-  template < typename TPixel, unsigned int VImageDimension > 
-    void CutImageFixedOutputType( itk::Image<typename TPixel, VImageDimension>* inputItkImage, typename TPixel* dummy = NULL )
+  template < TPixel, unsigned int VImageDimension > 
+    void CutImageFixedOutputType( itk::Image< TPixel, VImageDimension>* inputItkImage, TPixel* dummy = NULL )
   {
     CutImageWithOutputTypeSelect<TPixel, VImageDimension, PixelType>(inputItkImage, dummy);
   }
@@ -65,3 +65,4 @@ protected:
 #endif
 
 #endif /* BOUNDINGOBJECTCUTANDCAST_H_HEADER_INCLUDED_C10B22CD */
+

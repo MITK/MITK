@@ -150,7 +150,7 @@ void BoundingObjectCutter::GenerateOutputInformation()
 }
 
 template < typename TPixel, unsigned int VImageDimension > 
-void BoundingObjectCutter::CutImage< TPixel, VImageDimension >( itk::Image<typename TPixel, VImageDimension>* inputItkImage, typename TPixel* dummy )
+void BoundingObjectCutter::CutImage< TPixel, VImageDimension >( itk::Image< TPixel, VImageDimension >* inputItkImage, TPixel* dummy )
 {
   CutImageWithOutputTypeSelect<TPixel, VImageDimension, TPixel>(inputItkImage, dummy);
 }
@@ -172,3 +172,4 @@ void BoundingObjectCutter::GenerateData()
 
 } // of namespace mitk
 #endif // of MITKBOUNDINGOBJECTCUTTER_CPP
+

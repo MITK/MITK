@@ -127,7 +127,7 @@ public:
 
   virtual AffineGeometryFrame3D::Pointer Clone() const;
 
-protected:
+public:
   //##ModelId=3E3453C703AF
   //##Documentation
   //## @brief Tell this instance how many Geometry2Ds it shall manage. Bounding box and the 
@@ -136,7 +136,7 @@ protected:
   //## @warning Bounding box and the 2D-geometries must be set additionally: use SetBounds() 
   //## SetGeometry().
   virtual void Initialize(unsigned int slices);
-public:
+
   //##Documentation
   //## @brief Completely initialize this instance as evenly-spaced with slices parallel to the provided
   //## Geometry2D that is used as the first slice and for spacing calculation.

@@ -14,8 +14,8 @@
 #include <mitkColorProperty.h>
 #include <mitkFloatProperty.h>
 
-//int count=0;
-//mitk::FloatProperty::Pointer opacityprop=NULL;
+int count=0;
+mitk::FloatProperty::Pointer opacityprop=NULL;
 
 void QmitkMainTemplate::fileNew()
 {

@@ -16,7 +16,6 @@ const std::string mitk::StateMachineFactory::BUTTON_NUMBER = "BUTTON_NUMBER";
 const std::string mitk::StateMachineFactory::KEY = "KEY";
 	  
 
-const std::string NEXT_STATE_ID;
 //##ModelId=3E68B2C600BD
 mitk::StateMachineFactory::StateMachineFactory()
 : m_AktState(NULL), 	m_AktStateMachineName("")
@@ -49,9 +48,11 @@ bool mitk::StateMachineFactory::LoadBehavior(std::string fileName)
 
    QXmlInputSource source( &xmlFile );
    QXmlSimpleReader reader;
-   reader.setContentHandler( this );
+   mitk::StateMachineFactory* stateMachineFactory = new StateMachineFactory();
+   reader.setContentHandler( stateMachineFactory );
    reader.parse( source );
   
+   delete stateMachineFactory;
    return true;
 }
 
@@ -71,12 +72,17 @@ bool mitk::StateMachineFactory::ConnectStates(StateMap *states)
 
 
 //##ModelId=3E6773790098
-bool mitk::StateMachineFactory::StartElement (const QString&, const QString&, const QString & qName, const QXmlAttributes & atts )
+bool mitk::StateMachineFactory::startElement( const QString& namespaceURI, const QString& localName, const QString& qName, const QXmlAttributes& atts )
 {
+
+	qName.ascii();
 	//abfangen atts.value(#) fehler!
 	
-	if(qName == "mitkInteraktionStates")								//e.g.<mitkInteraktionStates STYLE="Powerpoint">
-            NULL;		//new statemachine pattern
+	if( qName == "mitkInteraktionStates" )								//e.g.<mitkInteraktionStates STYLE="Powerpoint">
+	{
+		int a = 99;
+		//new statemachine pattern
+	}
 
 	else if (qName == "stateMaschine") 									//e.g. <stateMaschine NAME="global">
 	{
@@ -90,17 +96,20 @@ bool mitk::StateMachineFactory::StartElement (const QString&, const QString&, co
 		//insert into m_AllStates, which stores all States that aren't connected yet!
 		
 //atts.qName == "START_STATE"
-		if ((atts.length() >2) && (atts.value(START_STATE.c_str()) == "true"))				//START_STATE     ###evtl. Fehlerquelle &&
+		if ( atts.value(START_STATE.c_str()) == "TRUE" )				//START_STATE     ###evtl. Fehlerquelle &&
 			//if it is a startstate, then set a pointer into m_StartStates
 			m_StartStates.insert(StartStateMap::value_type(m_AktStateMachineName, m_AktState));
 	}/*Destructor implementieren, der dann auch den gesamten Speicherplatz wieder frei gibt!!!*/
 
 	else if (qName == "transition")										//e.g. <transition NAME="neues Element" NEXT_STATE_ID="2" EVENT="1" SIDE_EFFECT="0" />
+	{
+		int a = atts.value(NEXT_STATE_ID.c_str()).toInt();
+
 		m_AktState->AddTransition(atts.value(NAME.c_str()).latin1(), 
 					atts.value(NEXT_STATE_ID.c_str()).toInt(),
 					atts.value(EVENT_ID.c_str()).toInt(),
 					atts.value(SIDE_EFFECT_ID.c_str()).toInt());
-
+	}
 	else if (qName == "events")											//new events pattern, e.g. <events STYLE="PowerPoint">
 		//TODO: Events Loading!
 	{}
@@ -116,7 +125,7 @@ bool mitk::StateMachineFactory::StartElement (const QString&, const QString&, co
 }
 
 //##ModelId=3E6907B40180
-bool mitk::StateMachineFactory::EndElement( const QString&, const QString&, const QString & qName )
+bool mitk::StateMachineFactory::endElement( const QString&, const QString&, const QString & qName )
 {
 	//abfangen atts.value(#) fehler!
 
@@ -129,4 +138,6 @@ bool mitk::StateMachineFactory::EndElement( const QString&, const QString&, cons
 	}
 	else
         NULL;
+
+	return true;
 }

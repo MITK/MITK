@@ -27,7 +27,7 @@ namespace mitk {
 {
   public:
     //##ModelId=3E68B2C600BD
-	  StateMachineFactorty();
+	  StateMachineFactory();
 
     //##ModelId=3E5B4144024F
 	//##Documentation
@@ -37,14 +37,23 @@ namespace mitk {
     //##ModelId=3E5B41730261
 	//##Documentation
 	//##loads the xml file filename and generates the necessary instances
-	  bool LoadBehavior(std::string fileName);
+	  static bool LoadBehavior(std::string fileName);
 
+	  bool startDocument(){
+	  
+		  return TRUE;
+	  }
+
+	  bool endDocument() {
+	  
+		  return true;
+	  }
 
     //##ModelId=3E6773790098
-	  bool StartElement (const QString&, const QString&, const QString & qName, const QXmlAttributes & atts );
+	  bool startElement( const QString& namespaceURI, const QString& localName, const QString& qName, const QXmlAttributes& atts );
 
     //##ModelId=3E6907B40180
-	  bool EndElement( const QString&, const QString&, const QString & qName );
+	  bool endElement( const QString&, const QString&, const QString & qName );
 		  
 
   private:

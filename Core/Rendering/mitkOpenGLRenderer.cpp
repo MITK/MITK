@@ -107,8 +107,8 @@ void mitk::OpenGLRenderer::Update()
             if(mapper2d!=NULL)
             {
 								ImageMapper2D* imagemapper2d=dynamic_cast<ImageMapper2D*>(mapper.GetPointer());
-								imagemapper2d->m_IilImage = &m_IilImage;
-                mapper2d->SetDisplayGeometry(m_DisplayGeometry);
+								//								imagemapper2d->m_IilImage = &m_IilImage;
+								//								mapper2d->SetDisplayGeometry(m_DisplayGeometry);
 								mapper2d->Update();
             }
             else
@@ -136,19 +136,18 @@ void mitk::OpenGLRenderer::Render()
     mitk::DataTreeIterator* it=m_DataTreeIterator->clone();
     while(it->hasNext())
     {
-        mitk::Mapper::Pointer mapper = it->next()->GetMapper(defaultMapper);
-        if(mapper!=NULL)
+      mitk::Mapper::Pointer mapper = it->next()->GetMapper(defaultMapper);
+      if(mapper!=NULL)
         {
-            ImageMapper2D* imagemapper2d=dynamic_cast<ImageMapper2D*>(mapper.GetPointer());
-            if(imagemapper2d!=NULL) {
-									imagemapper2d->m_IilImage = &m_IilImage;
-                	imagemapper2d->Paint(this);
-                 }
+	  ImageMapper2D* imagemapper2d=dynamic_cast<ImageMapper2D*>(mapper.GetPointer());
+	  if(imagemapper2d!=NULL) {
+	    imagemapper2d->Paint(this);
+	  }
         }
     }
-
+    
     delete it;
-//    m_VtkRenderWindow->Render();
+    //    m_VtkRenderWindow->Render();
 }
 
 /*!

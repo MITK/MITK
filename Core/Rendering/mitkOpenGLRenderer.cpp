@@ -127,7 +127,7 @@ void mitk::OpenGLRenderer::Render()
     if (m_LastUpdateTime<GetMTime() ||
     	m_LastUpdateTime<GetDisplayGeometry()->GetMTime() ||
      m_LastUpdateTime<GetDisplayGeometry()->GetWorldGeometry()->GetMTime() ) {
-				cout << "OpenGLRenderer calling its update..." << endl;
+				std::cout << "OpenGLRenderer calling its update..." << std::endl;
          Update();
     }
     glClear(GL_COLOR_BUFFER_BIT);

@@ -18,7 +18,7 @@ mitk::OpenGLRenderer::OpenGLRenderer() : m_IilImage(0)
 //##ModelId=3E3D28AB0018
 void mitk::OpenGLRenderer::SetData(mitk::DataTreeIterator* iterator)
 {
-    mitk::BaseRenderer::SetData(iterator);
+    BaseRenderer::SetData(iterator);
 
     m_VtkRenderWindow->RemoveRenderer(m_VtkRenderer);
     m_VtkRenderer->Delete();

@@ -116,7 +116,7 @@ public:
     //## Set the requested region from this data object to match the requested
     //## region of the data object passed in as a parameter.  This method is
     //## implemented in the concrete subclasses of DataObject.
-	virtual void SetRequestedRegion(DataObject *data);
+	virtual void SetRequestedRegion(itk::DataObject *data);
 
     //##ModelId=3E144ED20089
     //##Documentation
@@ -134,7 +134,7 @@ public:
     //##ModelId=3E1550BD0272
     virtual bool IsChannelSet(int n = 0) const = 0;
     //##ModelId=3E34513B016D
-    virtual void CopyInformation(const DataObject *data);
+    virtual void CopyInformation(const itk::DataObject *data);
 
 
 	itkGetConstMacro(ChannelNumber, unsigned int); 

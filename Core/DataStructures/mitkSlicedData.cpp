@@ -128,7 +128,7 @@ bool mitk::SlicedData::VerifyRequestedRegion()
 }
 
 //##ModelId=3E1410760114
-void mitk::SlicedData::SetRequestedRegion(DataObject *data)
+void mitk::SlicedData::SetRequestedRegion(itk::DataObject *data)
 {
 	m_UseLargestPossibleRegion=false;
 
@@ -159,7 +159,7 @@ mitk::SlicedData::~SlicedData()
 }
 
 //##ModelId=3E34513B016D
-void mitk::SlicedData::CopyInformation(const DataObject *data)
+void mitk::SlicedData::CopyInformation(const itk::DataObject *data)
 {
 	const mitk::SlicedData *slicedData;
 

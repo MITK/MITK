@@ -108,8 +108,6 @@ void mitk::Mapper::Update(mitk::BaseRenderer* renderer)
     dataMTime = data->GetMTime();
   }
 
-  data->Update();
-
   if(
       (m_LastUpdateTime < GetMTime()) ||
       (m_LastUpdateTime < node->GetDataReferenceChangedTime()) ||

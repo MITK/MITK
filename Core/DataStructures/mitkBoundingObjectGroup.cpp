@@ -32,23 +32,10 @@ mitk::BoundingObjectGroup::~BoundingObjectGroup()
 {
 } 
 
-void mitk::BoundingObjectGroup::SetRequestedRegionToLargestPossibleRegion()
-{
-}
-
-bool mitk::BoundingObjectGroup::RequestedRegionIsOutsideOfTheBufferedRegion()
-{
-  return ! VerifyRequestedRegion();
-}
-
 bool mitk::BoundingObjectGroup::VerifyRequestedRegion()
 {
   assert(m_Geometry3D.IsNotNull());
-  return true;
-}
-
-void mitk::BoundingObjectGroup::SetRequestedRegion(itk::DataObject *data)
-{
+  return Superclass::VerifyRequestedRegion();
 }
 
 void mitk::BoundingObjectGroup::UpdateOutputInformation()

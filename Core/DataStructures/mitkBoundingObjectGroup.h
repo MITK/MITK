@@ -45,10 +45,7 @@ public:
   itkNewMacro(Self);
 
   virtual void UpdateOutputInformation();
-  void SetRequestedRegionToLargestPossibleRegion();
-  bool RequestedRegionIsOutsideOfTheBufferedRegion();
   virtual bool VerifyRequestedRegion();
-  void SetRequestedRegion(itk::DataObject *data);
   virtual bool IsInside(const mitk::Point3D& p) const;
 
   itkSetObjectMacro(BoundingObjects, mitk::BoundingObjectGroup::BoundingObjectContainer);

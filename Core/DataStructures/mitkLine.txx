@@ -59,8 +59,6 @@ void mitk::Line::SetRequestedRegionToLargestPossibleRegion()
 //##ModelId=3E66CC5A02D2
 bool mitk::Line::RequestedRegionIsOutsideOfTheBufferedRegion()
 {
-  if(VerifyRequestedRegion()==false) return true;
-
   if(m_Geometry2D.IsNull()) return true;
 
   return false;

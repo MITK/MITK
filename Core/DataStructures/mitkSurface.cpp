@@ -168,9 +168,6 @@ void mitk::Surface::SetRequestedRegionToLargestPossibleRegion()
 
 bool mitk::Surface::RequestedRegionIsOutsideOfTheBufferedRegion()
 {
-  if ( VerifyRequestedRegion() == false )
-    return true;
-
   int end = m_RequestedRegion.GetIndex(3)+m_RequestedRegion.GetSize(3);
   for( int t=m_RequestedRegion.GetIndex(3); t<end; ++t )
     if(m_PolyDataSeries[t]==NULL)
@@ -182,10 +179,11 @@ bool mitk::Surface::RequestedRegionIsOutsideOfTheBufferedRegion()
 //##ModelId=3E70F66100B8
 bool mitk::Surface::VerifyRequestedRegion()
 {
-  if ( m_PolyDataSeries.size() == 0 )
-    return false;
+  if( (m_RequestedRegion.GetIndex(3)>=0) && 
+      (m_RequestedRegion.GetIndex(3)+m_RequestedRegion.GetSize(3)<=m_PolyDataSeries.size()) )
+    return true;
 
-  return true;
+  return false;
 }
 
 //##ModelId=3E70F66100BA

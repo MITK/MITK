@@ -154,10 +154,7 @@ void mitk::LookupTable::SetRequestedRegionToLargestPossibleRegion( )
 
 bool mitk::LookupTable::RequestedRegionIsOutsideOfTheBufferedRegion( )
 {
-    if ( VerifyRequestedRegion( ) == false )
-        return true;
-    else
-        return false;
+    return false;
 }
 
 

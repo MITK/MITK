@@ -66,8 +66,6 @@ void mitk::SlicedData::SetRequestedRegionToLargestPossibleRegion()
 //##ModelId=3E14104300AC
 bool mitk::SlicedData::RequestedRegionIsOutsideOfTheBufferedRegion()
 {
-  if(VerifyRequestedRegion()==false) return true;
-
   // Is the requested region within the currently buffered data?
   // SlicedData and subclasses store entire volumes or slices. The
   // methods IsVolumeSet() and IsSliceSet are provided to check, 

@@ -89,7 +89,7 @@ void mitk::DopplerToStrainRateFilter::GenerateData()
 
   ipPicDescriptor *picDoppler;
 
-  int x,y,z,time;							// loop-counter
+  int x,y,z;//,time;				// loop-counter
   int strainRate;						// the computed Strain Rate
   int v1,v2;								// velocity and Point p1 and p2
 

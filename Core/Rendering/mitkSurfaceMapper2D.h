@@ -32,6 +32,8 @@ class vtkLookupTable;
 namespace mitk {
 
 class BaseRenderer;
+class Geometry2D;
+class DisplayGeometry;
 
 //##ModelId=3EF17FBD0315
 //##Documentation
@@ -64,6 +66,8 @@ public:
   //## @return NULL is returned if no Surface is set to be used instead of DataTreeNode::GetData().
   //## @sa SetSurface
   itkGetConstObjectMacro(Surface, Surface);
+
+  static void PaintCells(vtkPolyData* contour, const Geometry2D* worldGeometry, const DisplayGeometry* displayGeometry, vtkLookupTable *lut = NULL);
 protected:
   //##ModelId=3EF180540006
   SurfaceMapper2D();

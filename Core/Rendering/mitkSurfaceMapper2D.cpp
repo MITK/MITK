@@ -54,8 +54,6 @@ mitk::SurfaceMapper2D::SurfaceMapper2D()
   m_LUT->SetNumberOfColors(255);
   m_LUT->SetRampToLinear ();
   m_LUT->Build();
-
-
 }
 
 //##ModelId=3EF180540019
@@ -114,9 +112,6 @@ void mitk::SurfaceMapper2D::Paint(mitk::BaseRenderer * renderer)
   vtkPolyData * vtkpolydata = input->GetVtkPolyData( timestep );
   assert(vtkpolydata);
 
-  vtkTransform * vtktransform = GetDataTreeNode()->GetVtkTransform();
-  vtkLinearTransform * inversetransform = vtktransform->GetLinearInverse();
-
   PlaneGeometry::ConstPointer worldPlaneGeometry = dynamic_cast<const PlaneGeometry*>(worldGeometry.GetPointer());
 
   if(vtkpolydata!=NULL)
@@ -133,15 +128,24 @@ void mitk::SurfaceMapper2D::Paint(mitk::BaseRenderer * renderer)
     }
     else
     {
-      //@FIXME: does not work correctly. Does m_Plane->SetTransform really transforms a "plane plane" into a "curved plane"?
-      return;
       AbstractTransformGeometry::ConstPointer worldAbstractGeometry = dynamic_cast<const AbstractTransformGeometry*>(renderer->GetCurrentWorldGeometry2D());
       if(worldAbstractGeometry.IsNotNull())
       {
-        // set up vtkPlane according to worldGeometry
-        point=const_cast<mitk::BoundingBox*>(worldAbstractGeometry->GetParametricBoundingBox())->GetMinimum();
-        FillVector3D(normal, 0, 0, 1);
-        m_Plane->SetTransform(worldAbstractGeometry->GetVtkAbstractTransform()->GetInverse());
+        AbstractTransformGeometry::ConstPointer surfaceAbstractGeometry = dynamic_cast<const AbstractTransformGeometry*>(input->GetTimeSlicedGeometry()->GetGeometry3D(0));
+        if(surfaceAbstractGeometry!=NULL) //@todo substitude by operator== after implementation, see bug id 28
+        {
+          PaintCells(vtkpolydata, worldGeometry, renderer->GetDisplayGeometry(), (useCellData ? m_LUT : NULL));
+          return;
+        }
+        else
+        {
+          //@FIXME: does not work correctly. Does m_Plane->SetTransform really transforms a "plane plane" into a "curved plane"?
+          return;
+          // set up vtkPlane according to worldGeometry
+          point=const_cast<mitk::BoundingBox*>(worldAbstractGeometry->GetParametricBoundingBox())->GetMinimum();
+          FillVector3D(normal, 0, 0, 1);
+          m_Plane->SetTransform(worldAbstractGeometry->GetVtkAbstractTransform()->GetInverse());
+        }
       }
       else
         return;
@@ -155,6 +159,8 @@ void mitk::SurfaceMapper2D::Paint(mitk::BaseRenderer * renderer)
     //This might be quite slow. Thus, the idea is, to perform an inverse transform of the plane instead.
     //@todo It probably does not work for scaling operations yet:scaling operations have to be 
     //dealed with after the cut is performed by scaling the contour.
+    vtkTransform * vtktransform = GetDataTreeNode()->GetVtkTransform();
+    vtkLinearTransform * inversetransform = vtktransform->GetLinearInverse();
     inversetransform->TransformPoint(vp, vp);
     inversetransform->TransformNormalAtPoint(vp, vnormal, vnormal);
 
@@ -169,40 +175,48 @@ void mitk::SurfaceMapper2D::Paint(mitk::BaseRenderer * renderer)
     // calculate the cut
     m_Cutter->Update();
 
-    // fetch geometry
-    mitk::DisplayGeometry::Pointer displayGeometry = renderer->GetDisplayGeometry();
-    assert(displayGeometry);
-    //		float toGL=displayGeometry->GetSizeInDisplayUnits()[1];
-
     //apply color and opacity read from the PropertyList
     ApplyProperties(renderer);
 
     // travers the cut contour
-    vtkPolyData * contour=m_Cutter->GetOutput();
+    PaintCells(m_Cutter->GetOutput(), worldGeometry, renderer->GetDisplayGeometry(), (useCellData ? m_LUT : NULL));
+  }
+}
 
-    vtkPoints *vpoints=contour->GetPoints();
-    vtkCellArray *vpolys=contour->GetLines();
-    //vtkPointData *vpointdata=contour->GetPointData(); /* \todo remove line! */
+void mitk::SurfaceMapper2D::PaintCells(vtkPolyData* contour, const mitk::Geometry2D* worldGeometry, const mitk::DisplayGeometry* displayGeometry, vtkLookupTable *lut)
+{
+  vtkPoints    *vpoints = contour->GetPoints();
+  vtkCellArray *vpolys  = contour->GetLines();
 
-    vtkCellData *vcelldata=contour->GetCellData();
-    vtkDataArray* vcellscalars=vcelldata->GetScalars();
+  vtkCellData * vcelldata    = contour->GetCellData();
+  vtkDataArray* vcellscalars = vcelldata->GetScalars();
 
+  int i,numberOfCells=vpolys->GetNumberOfCells();
 
-    int i,numberOfCells=vpolys->GetNumberOfCells();
+  Point3D p; Point2D p2d, last, first;
 
-    Point3D p; Point2D p2d, last, first;
+  vpolys->InitTraversal();
+  for(i=0;i<numberOfCells;++i)
+  {
+    int *cell, cellSize;
+    float vp[3];
 
-    vpolys->InitTraversal();
-    for(i=0;i<numberOfCells;++i)
+    vpolys->GetNextCell(cellSize, cell);
+
+    vpoints->GetPoint(cell[0], vp);
+    vtk2itk(vp, p);
+
+    //convert 3D point (in mm) to 2D point on slice (also in mm)
+    worldGeometry->Map(p, p2d);
+
+    //convert point (until now mm and in worldcoordinates) to display coordinates (units )
+    displayGeometry->MMToDisplay(p2d, p2d);
+    first=last=p2d;
+
+    int j;
+    for(j=1;j<cellSize;++j)
     {
-      int *cell, cellSize;
-
-      vpolys->GetNextCell(cellSize, cell);
-      vpoints->GetPoint(cell[0], vp);
-
-      //take transformation via vtktransform into account
-      vtktransform->TransformPoint(vp, vp);
-
+      vpoints->GetPoint(cell[j], vp);
       vtk2itk(vp, p);
 
       //convert 3D point (in mm) to 2D point on slice (also in mm)
@@ -210,53 +224,28 @@ void mitk::SurfaceMapper2D::Paint(mitk::BaseRenderer * renderer)
 
       //convert point (until now mm and in worldcoordinates) to display coordinates (units )
       displayGeometry->MMToDisplay(p2d, p2d);
-      //			p2d[1]=toGL-p2d[1];
-      first=last=p2d;
 
-      // 	   	glColor3f(1.0f,1.0f,0.0f);     
-      int j;
-      for(j=1;j<cellSize;++j)
-      {
-        vpoints->GetPoint(cell[j], vp);
-        //take transformation via vtktransform into account
-        vtktransform->TransformPoint(vp, vp);
+      if (lut != NULL) 
+      {  // color each cell according to cell data
+        float *color;
 
-        vtk2itk(vp, p);
-
-        //convert 3D point (in mm) to 2D point on slice (also in mm)
-        worldGeometry->Map(p, p2d);
-
-        //convert point (until now mm and in worldcoordinates) to display coordinates (units )
-        displayGeometry->MMToDisplay(p2d, p2d);
-
-        //convert display coordinates ( (0,0) is top-left ) in GL coordinates ( (0,0) is bottom-left )
-        //				p2d[1]=toGL-p2d[1];
-
-
-        if (useCellData) {  // color each cell according to cell data
-          float *color;
-
-          if (vcellscalars != NULL )
-          {
-            vcellscalars->GetComponent(i,0);
-            color = m_LUT->GetColor( vcellscalars->GetComponent(i,0) );
-            glColor3f(color[0],color[1],color[2]);
-          }
-          else 
-          {
-          }
+        if (vcellscalars != NULL )
+        {
+          vcellscalars->GetComponent(i,0);
+          color = lut->GetColor( vcellscalars->GetComponent(i,0) );
+          glColor3f(color[0],color[1],color[2]);
         }
-
-        //draw the line
-        glBegin (GL_LINE_LOOP);        
-
-        glVertex2f(last[0], last[1]);
-        glVertex2f(p2d[0], p2d[1]);
-        glVertex2f(last[0], last[1]);
-        glEnd ();
-
-        last=p2d;
       }
+
+      //draw the line
+      glBegin (GL_LINE_LOOP);
+
+      glVertex2f(last[0], last[1]);
+      glVertex2f(p2d[0], p2d[1]);
+      glVertex2f(last[0], last[1]);
+      glEnd ();
+
+      last=p2d;
     }
   }
 }

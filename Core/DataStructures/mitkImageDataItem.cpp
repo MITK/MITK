@@ -115,6 +115,7 @@ void mitk::ImageDataItem::ConstructVtkImageData() const
     m_VtkImageData->GetPointData()->GetScalars()->SetVoidArray(m_PicDescriptor->data, _ipPicElements(m_PicDescriptor), 1);
 }
 
+//##ModelId=3E6FB94200BD
 void mitk::ImageDataItem::Modified() const
 {
     if(m_VtkImageData)

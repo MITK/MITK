@@ -34,7 +34,7 @@ namespace mitk {
 //## @ingroup Undo
 //##
 //## Stores everything for Adding, Moving and Deleting a Point.
-class PointOperation : public mitk::Operation
+class PointOperation : public Operation
 {
   public:
   //##ModelId=3F0189F003A2

@@ -12,9 +12,12 @@
 #include "QmitkFunctionality.h"
 #include "QmitkStdMultiWidget.h"
 #include "QmitkSimpleExampleControls.h"
+
 #include <mitkSurfaceData.h>
 #include <mitkColorProperty.h>
 #include <mitkFloatProperty.h>
+
+#include <OperationActor.h>
 
 #include <qlist.h>
 
@@ -26,7 +29,7 @@ and createAction(..) from QmitkFunctionality. A QmitkFctMediator object gets pas
 functionality and positions the widgets in the application window controlled by a 
 layout template.
 */
-class QmitkSimpleExampleFunctionality : public QmitkFunctionality
+class QmitkSimpleExampleFunctionality : public QmitkFunctionality, public mitk::OperationActor
 {
     Q_OBJECT
 public:
@@ -75,6 +78,13 @@ public:
 	 */
 	void initWidgets();
 
+    //##Documentation
+    //## \brief Implementation of OperationActor-method. Used for scrolling
+    //## through the slices by clicking into the images.
+    //## 
+    //## mitk::Operation is expected to be an mitk::SeedOperation. 
+    //## The slices of widgets 1,2,3 are moved so that the seed point is on them.
+    virtual void ExecuteOperation(mitk::Operation* operation);
 
 protected slots:
 
@@ -114,18 +124,31 @@ protected:
 	*/
 	QmitkSimpleExampleControls * controls;
   
+
 	/*!
+
 	* ???
+
 	*/
+
 //	int count;
+
   
+
 	/*!
+
 	* property for opacity for showing image overlays.
+
 	* This property can be adjusted over a slider in 
+
 	* the control widget.
+
 	* 
+
 	*/
+
 	mitk::FloatProperty::Pointer opacityprop;
+
 
 		
 };

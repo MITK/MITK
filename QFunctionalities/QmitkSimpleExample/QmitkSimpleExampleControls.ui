@@ -299,5 +299,11 @@
     <slot>sliderYZ_valueChanged( int val )</slot>
     <slot>sliderXZ_valueChanged( int val )</slot>
 </slots>
+<functions>
+    <function returnType="QSlider *">getSliderXY()</function>
+    <function returnType="QSlider *">getSliderXZ()</function>
+    <function returnType="QSlider *">getSliderYZ()</function>
+    <function returnType="QSlider *">getSliderFP()</function>
+</functions>
 <layoutdefaults spacing="0" margin="0"/>
 </UI>

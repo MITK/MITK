@@ -9,6 +9,11 @@
 #include <mitkFloatProperty.h>
 #include <algorithm>
 
+#include <EventMapper.h>
+#include <GlobalInteraction.h>
+#include <SeedRoi.h>
+#include <SeedOperation.h>
+
 #if (defined(_MSC_VER) && (_MSC_VER <= 1200))
   #include <xutility>
 #else
@@ -20,6 +25,13 @@ QmitkSimpleExampleFunctionality::QmitkSimpleExampleFunctionality(QObject *parent
 controls(NULL), multiWidget(mitkStdMultiWidget), opacityprop(NULL)
 {
     setAvailability(true);
+
+    mitk::GlobalInteraction* globalInteraction = dynamic_cast<mitk::GlobalInteraction*>(mitk::EventMapper::GetGlobalStateMachine());
+    if(globalInteraction!=NULL)
+    {
+	    mitk::SeedRoi* seedRoi = new mitk::SeedRoi("seedroi", this);
+	    globalInteraction->SetRoi(seedRoi);
+    }
 }
 
 QmitkSimpleExampleFunctionality::~QmitkSimpleExampleFunctionality()
@@ -176,4 +188,65 @@ void QmitkSimpleExampleFunctionality::initWidgets()
 		}
 	}
 	delete it;
+}
+
+void QmitkSimpleExampleFunctionality::ExecuteOperation(mitk::Operation* operation)
+{
+    mitk::SeedOperation* seedoperation=dynamic_cast<mitk::SeedOperation*>(operation);
+    if(operation==NULL) return;
+
+    mitk::Point3D seed = seedoperation->GetSeed();
+
+    const mitk::Geometry2D* g2d; 
+    const mitk::PlaneGeometry* pg;
+    mitk::PlaneView pv;
+    mitk::PlaneGeometry::Pointer plane;
+
+    int v;
+    v=(int)seed.x;
+    if(controls->getSliderYZ()->value()!=v)
+    {
+        g2d = multiWidget->mitkWidget2->GetRenderer()->GetWorldGeometry();
+        pg = dynamic_cast<const mitk::PlaneGeometry*>(g2d);
+        pv = pg->GetPlaneView();
+        pv.point.x = v;
+        plane = mitk::PlaneGeometry::New();  
+        plane->SetPlaneView(pv);
+        multiWidget->mitkWidget2->GetRenderer()->SetWorldGeometry(plane);
+        controls->getSliderYZ()->blockSignals(true);
+        controls->getSliderYZ()->setValue(v);
+        controls->getSliderYZ()->blockSignals(false);
+    }
+
+    v=(int)seed.y;
+    if(controls->getSliderXZ()->value()!=v)
+    {
+        g2d = multiWidget->mitkWidget3->GetRenderer()->GetWorldGeometry();
+        pg = dynamic_cast<const mitk::PlaneGeometry*>(g2d);
+        pv = pg->GetPlaneView();
+        pv.point.y = v;
+        plane  = mitk::PlaneGeometry::New();  
+        plane->SetPlaneView(pv);
+        multiWidget->mitkWidget3->GetRenderer()->SetWorldGeometry(plane);
+        controls->getSliderXZ()->blockSignals(true);
+        controls->getSliderXZ()->setValue(v);
+        controls->getSliderXZ()->blockSignals(false);
+    }
+
+    v=(int)seed.z;
+    if(controls->getSliderXY()->value()!=v)
+    {
+        g2d = multiWidget->mitkWidget1->GetRenderer()->GetWorldGeometry();
+        pg = dynamic_cast<const mitk::PlaneGeometry*>(g2d);
+        pv = pg->GetPlaneView();
+        pv.point.z = v;
+        plane = mitk::PlaneGeometry::New();  
+        plane->SetPlaneView(pv);
+        multiWidget->mitkWidget1->GetRenderer()->SetWorldGeometry(plane);
+        controls->getSliderXY()->blockSignals(true);
+        controls->getSliderXY()->setValue(v);
+        controls->getSliderXY()->blockSignals(false);
+    }
+
+    multiWidget->updateMitkWidgets();
 }

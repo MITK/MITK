@@ -20,7 +20,7 @@
  */
 
 #ifndef lint
-  static char *what = { "@(#)ipPicGetMem\tDKFZ (Dept. MBI)\t"__DATE__"\t$Revision$" };
+  static char *what = { "@(#)ipPicGetMem\t\tDKFZ (Dept. MBI)\t"__DATE__"\t$Revision$" };
 #endif
 
 #include "ipPic.h"

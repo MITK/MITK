@@ -1,8 +1,9 @@
 
-CC = gcc -Wall -pedantic -ansi -Wno-comment
 CC = cc -mips2
+CC = gcc -Wall -pedantic -ansi -Wno-comment
 
 DEBUG = -O2
+DEBUG = -g
 COPTIONS = #-DDMALLOC_FUNC_CHECK
 INCPATHS = -I. -I.. -I/usr/local/include
 LIBPATHS = -L. -L/usr/local/lib
@@ -21,6 +22,7 @@ all = ipPicInfo.o ipPicType.o                           \
       ipPicOldGet.o ipPicOldGetH.o ipPicOldGetS.o       \
       ipPicGet.o ipPicGetH.o ipPicGetS.o                \
       ipPicPut.o ipPicPutS.o                            \
+      ipPicGetMem.o ipPicPutMem.o                       \
       ipPicCopyS.o ipPicCopyH.o                         \
       ipPicNew.o ipPicClear.o ipPicFree.o ipPicClone.o  \
       ipEndian.o ipFRead.o ipFWrite.o                   \
@@ -33,6 +35,7 @@ DISTFILES = Makefile                                                     \
             ipPicOldGet.c ipPicOldGetH.c ipPicOldGetS.c                  \
             ipPicGet.c ipPicGetH.c ipPicGetS.c                           \
             ipPicPut.c ipPicPutS.c                                       \
+            ipPicGetMem.c ipPicPutMem.c                                  \
             ipPicCopyS.c ipPicCopyH.c                                    \
             ipPicNew.c ipPicClear.c ipPicFree.c ipPicClone.c             \
             ipPicAddT.c ipPicQueryT.c ipPicDelT.c ipPicGetT.c            \

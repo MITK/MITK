@@ -2,7 +2,6 @@
 #include <ipFunc/ipFunc.h>
 #include "widget.h"
 #include "texture.h"
-#include "switch.h"
 #include "image.h"
 
 static unsigned int
@@ -17,10 +16,10 @@ power2 (const unsigned int x) {
 
 const unsigned int iilImage::_bytes [] = {1, 2, 3, 4};
 
-iilImage::iilImage (QObject* parent, const char* name)
-        : iilItem (parent, name), _width (0), _height (0), _rx (0), _ry (0), _rw (0), _rh (0), _model (INTENSITY), _interpolation (false), _pixels (NULL), _internal (GL_LUMINANCE)
+iilImage::iilImage ()
+        : _width (0), _height (0), _rx (0), _ry (0), _rw (0), _rh (0), _model (INTENSITY), _interpolation (false), _pixels (NULL), _internal (GL_LUMINANCE)
 {
-    _textures.setAutoDelete (true);
+
 }
 
 iilImage::~iilImage ()
@@ -97,6 +96,14 @@ iilImage::clear ()
     _model = INTENSITY;
     _pixels = NULL;
     _internal = GL_LUMINANCE;
+
+    std::map<void*,Textures*>::iterator i;
+    for (i=_textures.begin(); i!=_textures.end(); ++i) {
+      for (unsigned int j = 0; j < (*i).second->size (); j++) {
+        delete (*(*i).second)[j];
+      }	
+      delete i->second;
+    }
     _textures.clear ();
 }
 
@@ -187,17 +194,24 @@ void iilImage::drawTextures (iilWidget* widget)
 		unsigned int available, total;
 	
 		w = (widget->isSharing () ? widget->sharedWidget () : widget);
-        	textures = _textures.find (w);
+    std::map<void*,Textures*>::iterator tex_it = _textures.find (w);
+    if(tex_it!=_textures.end())
+      textures = tex_it->second;
+    else
+      textures = NULL;
+
 		if (!textures) {
 			textures = new Textures ();
-			textures->setAutoDelete (true);
-			_textures.insert (w, textures);
+      typedef std::pair <void*, std::vector<_iilTexture*>* > TexturePair;
+			_textures.insert (TexturePair(w, textures));
 		}
-		available = textures->count (); 
+		available = textures->size (); 
 		total = n * m;
-		textures->resize (total);
+//		textures->resize (total);
+    int iii;
 		for (unsigned int i = available; i < total; i++) {
-			textures->insert (i, new _iilTexture (w));
+			textures->push_back(new _iilTexture (w));
+iii=textures->size ();
 		}
 		widget->makeCurrent ();
 	}	
@@ -251,15 +265,22 @@ void iilImage::drawTextures (iilWidget* widget)
 void 
 iilImage::remove (iilWidget* widget)
 {
-   _textures.remove (widget);
+  std::map<void*,Textures*>::iterator i =
+   _textures.find (widget);
+  for (unsigned int j = 0; j < (*i).second->size (); j++) {
+		delete (*(*i).second)[j];
+	}	
+  delete i->second;
+  _textures.erase(i);
 }
 
 void
 iilImage::invalidateTextures ()
 {
-    for (QPtrDictIterator<Textures> i (_textures); i.current (); ++i) {
-        for (unsigned int j = 0; j < (*i).count (); j++) {
-		(*i)[j]->invalidate ();
+  std::map<void*,Textures*>::iterator i;
+  for (i=_textures.begin(); i!=_textures.end(); ++i) {
+        for (unsigned int j = 0; j < (*i).second->size (); j++) {
+		(*(*i).second)[j]->invalidate ();
 	}	
     }
 }
@@ -349,19 +370,8 @@ iilImage::find (const iilItem* item)
 
     if (!item) return (iilImage *) NULL;
 
-    if (item->isA ("iilGroup")) {
-        QPtrListIterator<iilItem> i (((iilGroup *) item)->members ());
-        do {
-            result = iilImage::find (i ());
-        } while (i.current () && !result);
-    }
-
-    if (item->isA ("iilSwitch")) {
-        result = iilImage::find (((iilSwitch *) item)->current ());
-    }
-
-    if (item->inherits ("iilImage")) {
-        result = (iilImage *) item;
+    if ( dynamic_cast<const iilImage*>(item)!=NULL ) {
+        result = const_cast<iilImage*>(dynamic_cast<const iilImage*>(item));
     }
     return (iilImage *) result;
 }

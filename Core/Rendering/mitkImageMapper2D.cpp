@@ -273,7 +273,7 @@ void mitk::ImageMapper2D::GenerateData(mitk::BaseRenderer *renderer)
 
     //std::cout << "Pic dimensions:" << pic->dim << std::endl;
 
-    image = new iilPicImage(NULL, "ll", 512);
+    image = new iilPicImage(512);
 
     ApplyProperties(renderer);
 //   image->setImage(pic, iilImage::INTENSITY_ALPHA);

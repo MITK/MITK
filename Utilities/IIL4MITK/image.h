@@ -1,11 +1,11 @@
 #ifndef _IMAGE_H_
 #define _IMAGE_H_
 
-#include <qptrdict.h>
-#include <qptrvector.h>
 #include <ipPic/ipPic.h>
 #include "texture.h"
 #include "item.h"
+#include <vector>
+#include <map>
 
 class iilWidget;
 
@@ -15,14 +15,12 @@ class iilWidget;
 */
 class iilImage : public iilItem {
 
-    Q_OBJECT
-
 public:
 
     /*!
     \brief The constructor.
     */
-    iilImage (QObject* parent = 0, const char* name = 0);
+    iilImage ();
 
     /*!
     \brief The destructor.
@@ -190,8 +188,8 @@ private:
     /*!
     \brief The list of allocated textures. 
     */
-    typedef QPtrVector<_iilTexture> Textures;
-    QPtrDict<Textures> _textures;
+    typedef std::vector<_iilTexture*> Textures;
+    std::map<void*,Textures*> _textures;
 
 };
 

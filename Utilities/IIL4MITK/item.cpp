@@ -1,8 +1,8 @@
 #include "widget.h"
 #include "item.h"
 
-iilItem::iilItem (QObject* parent, const char* name)
-        : QObject (parent, name), _x (0.0), _y (0.0), _red (1.0), _green (1.0), _blue (1.0), _alpha (1.0), _lineWidth (0.0), _constraint (0), _visible (true), _pickable (false), _scalable (true)
+iilItem::iilItem ()
+        : _x (0.0), _y (0.0), _red (1.0), _green (1.0), _blue (1.0), _alpha (1.0), _lineWidth (0.0), _constraint (0), _visible (true), _pickable (false), _scalable (true)
 {
 }
 

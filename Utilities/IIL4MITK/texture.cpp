@@ -1,8 +1,8 @@
 #include <assert.h>
 #include "texture.h"
 
-_iilTexture::_iilTexture (iilWidget* parent, const char* name ) 
-	: QObject (parent, name), _width (0), _height (0), _model (0), _internal (0), _valid (false), _interpolation (false), _red (1.0), _green (1.0), _blue (1.0), _alpha (1.0)
+_iilTexture::_iilTexture (iilWidget* aParent) 
+	: parent(aParent), _width (0), _height (0), _model (0), _internal (0), _valid (false), _interpolation (false), _red (1.0), _green (1.0), _blue (1.0), _alpha (1.0)
 {	
 	assert (parent);
 
@@ -21,8 +21,8 @@ Pay attention that the context which the widget share with another widget
 will not be deleted.
 */
 _iilTexture::~_iilTexture () {
-	if((QGLWidget *)parent()!=NULL)
-  	((QGLWidget *) parent ())->makeCurrent ();
+	if(parent!=NULL)
+  	parent->makeCurrent ();
 	glDeleteTextures (1, &_name);
 
 	// Are the textures deleted automatically?

@@ -10,7 +10,7 @@ the rendering of images.
 
 \todo Remove the makeCurrent calls
 */
-class _iilTexture : public QObject {
+class _iilTexture {
 
 public:
 
@@ -18,7 +18,7 @@ public:
 	\brief The constructor.
 	\note Make sure that the desired OpenGL context is selected.
 	*/
-	_iilTexture (iilWidget* parent, const char* name = 0); 
+	_iilTexture (iilWidget* parent); 
 	
 	/*! 
 	\brief The destructor.
@@ -133,6 +133,7 @@ private:
 	*/
 	float _red, _green, _blue, _alpha;
 
+  iilWidget* parent;
 };	
 
 #endif

@@ -10,13 +10,11 @@ to map the intensity range to the physical one of the display.
 */
 class iilPicImage : public iilImage {
 
-    Q_OBJECT
-
 public:
     /*!
     \brief The constructor.
     */
-    iilPicImage (QObject* parent = 0, const char* name = 0, const unsigned int size = 128);
+    iilPicImage (const unsigned int size = 128);
 
     /*!
     \brief The destructor.

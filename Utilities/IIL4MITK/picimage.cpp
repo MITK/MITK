@@ -1,11 +1,9 @@
 #include <assert.h>
-#include "group.h"
-#include "switch.h"
 #include "texture.h"
 #include "picimage.h"
 
-iilPicImage::iilPicImage (QObject* parent, const char* name, const unsigned int size)
-        : iilImage (parent, name), _pic (NULL), _min (0.0), _max (0.0), _colors (NULL), _binary (false), _mask (false), _outline(false)
+iilPicImage::iilPicImage (const unsigned int size)
+        : _pic (NULL), _min (0.0), _max (0.0), _colors (NULL), _binary (false), _mask (false), _outline(false)
 {
 }
 
@@ -153,19 +151,8 @@ iilPicImage::find (const iilItem* item)
 
     if (!item) return NULL;
 
-    if (item->isA ("iilGroup")) {
-        QPtrListIterator<iilItem> i (((iilGroup *) item)->members ());
-        do {
-            result = iilPicImage::find (i ());
-        } while (i.current () && !result);
-    }
-
-    if (item->isA ("iilSwitch")) {
-        result = iilPicImage::find (((iilSwitch *) item)->current ());
-    }
-
-    if (item->inherits ("iilPicImage")) {
-        result = (iilPicImage *) item;
+    if ( dynamic_cast<const iilPicImage*>(item)!=NULL ) {
+        result = const_cast<iilPicImage*>(dynamic_cast<const iilPicImage*>(item));
     }
     return result;
 }

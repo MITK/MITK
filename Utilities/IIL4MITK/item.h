@@ -1,11 +1,7 @@
 #ifndef _ITEM_H_
 #define _ITEM_H_
 
-#if defined(WIN32)
-#include <qt_windows.h>
-#endif
 #include <GL/gl.h>
-#include <qobject.h>
 
 class iilWidget;
 
@@ -20,9 +16,7 @@ whether it has been picked by the user.
 \todo Add a parameter iilWidget to the picking method. Done.
 */
 
-class iilItem : public QObject {
-
-    Q_OBJECT
+class iilItem {
 
 public:
 
@@ -31,7 +25,7 @@ public:
     @param parent the parent item
     @param name the object name
     */
-    iilItem (QObject* parent = 0, const char* name = 0);
+    iilItem();
 
     /*!
     \brief Displays the item.

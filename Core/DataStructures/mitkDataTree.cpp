@@ -15,6 +15,7 @@ mitk::DataTree::~DataTree()
 /**
  *
  */
+//##ModelId=3E3FE0430148
 TreeIterator<mitk::DataTreeNode::Pointer>* mitk::DataTree::GetNext( const char* propertyKey, const mitk::BaseProperty* property,  TreeIterator<mitk::DataTreeNode::Pointer>* startPosition ){
 
 	if ( startPosition == NULL )

@@ -10,6 +10,7 @@ class BaseProperty : public itk::Object
 {
 public:
 
+    //##ModelId=3E3FF04D0369
 	mitkClassMacro(BaseProperty,itk::Object);
 
 protected:
@@ -19,6 +20,7 @@ protected:
     //##ModelId=3E38FF0902CF
     virtual ~BaseProperty();
 
+    //##ModelId=3E3FE04203D1
 	virtual bool operator==(const BaseProperty& property ) const = 0;
 };
 

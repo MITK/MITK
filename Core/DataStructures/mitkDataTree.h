@@ -31,6 +31,7 @@ class DataTree : public itk::Object, public DataTreeBase
 	/** Run-time type information (and related methods). */
 	itkTypeMacro(DataTree,itk::Object);
 
+    //##ModelId=3E3FE0430148
 	TreeIterator<mitk::DataTreeNode::Pointer>* GetNext( const char* propertyName, const mitk::BaseProperty* property,  TreeIterator<mitk::DataTreeNode::Pointer>* startPosition = NULL );
 
  protected:

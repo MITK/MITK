@@ -62,7 +62,7 @@ class BaseRenderer : public itk::Object
     //##ModelId=3E3799250397
     virtual void InitSize(int w, int h);
 
-    itkGetConstObjectMacro(DisplayGeometry, mitk::DisplayGeometry);
+    itkGetObjectMacro(DisplayGeometry, mitk::DisplayGeometry);
     itkSetObjectMacro(DisplayGeometry, mitk::DisplayGeometry);
 
   protected:
@@ -84,6 +84,8 @@ class BaseRenderer : public itk::Object
 
     //##ModelId=3E3D1FCA0272
     RenderWindow *m_RenderWindow;
+
+    unsigned long m_LastUpdateTime;
 };
 
 } // namespace mitk

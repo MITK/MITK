@@ -86,6 +86,8 @@ void mitk::OpenGLRenderer::SetData(mitk::DataTreeIterator* iterator)
 //            printf("test\n");
 //    }
     delete it;
+
+    Modified();
 }
 
 //##ModelId=3E330D260255
@@ -114,10 +116,14 @@ void mitk::OpenGLRenderer::Update()
     }
 
     delete it;
+    m_LastUpdateTime=GetMTime();
 }
 //##ModelId=3E330D2903CC
 void mitk::OpenGLRenderer::Render()
 {
+    if(m_LastUpdateTime<GetMTime())
+        Update();
+
     glClear(GL_COLOR_BUFFER_BIT);
 
     if(m_DataTreeIterator==NULL) return;

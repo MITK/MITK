@@ -10,7 +10,7 @@ namespace mitk {
 class RenderWindow : public QGLWidget
 {
 public:
-    //##ModelId=3E3ECC1201B2
+    //##ModelId=3E3ECC130358
     RenderWindow(QGLFormat glf, QWidget *parent = 0, const char *name = 0) : QGLWidget(glf, parent, name) {};
 
     //##ModelId=3E3ECC13036D

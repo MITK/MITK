@@ -36,12 +36,17 @@ class BaseData : public itk::DataObject
     //## setting of the update extent is missing.
     virtual mitk::Geometry2D::ConstPointer GetGeometry2D(int s, int t);
 
+    //##ModelId=3E3FE0420273
 	mitk::PropertyList::Pointer GetPropertyList();
 
   protected:
+    //##ModelId=3E3FE04202B9
 	BaseData();
+    //##ModelId=3E3FE042031D
 	~BaseData();
+    //##ModelId=3E15551A03CE
     Geometry3DPointer m_Geometry3D;
+    //##ModelId=3E3FE0420242
 	PropertyList::Pointer m_PropertyList;
 };
 

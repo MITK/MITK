@@ -15,10 +15,12 @@ class StringProperty : public BaseProperty
     std::string m_String;
 
 public:
+    //##ModelId=3E3FF04F005F
 	StringProperty( const char* string );
 	itkGetStringMacro(String)
 	itkSetStringMacro(String)
 
+    //##ModelId=3E3FF04F00E1
 	virtual bool operator==(const BaseProperty& property ) const;
 };
 

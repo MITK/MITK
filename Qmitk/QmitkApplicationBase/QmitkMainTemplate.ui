@@ -453,7 +453,6 @@
     <include location="global" impldecl="in implementation">QmitkStdMultiWidget.h</include>
     <include location="global" impldecl="in implementation">QmitkFctMediator.h</include>
     <include location="global" impldecl="in implementation">QmitkControlsRightFctLayoutTemplate.h</include>
-    <include location="global" impldecl="in implementation">QmitkSimpleExampleFunctionality.h</include>
     <include location="global" impldecl="in implementation">qfiledialog.h</include>
     <include location="global" impldecl="in implementation">DataTreeNode.h</include>
     <include location="global" impldecl="in implementation">PlaneGeometry.h</include>

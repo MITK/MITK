@@ -1,0 +1,16 @@
+/**
+
+\mainpage  Medical Imaging Interaction Toolkit
+
+\image html mitkLogo.jpg
+
+\section intro Introduction
+
+Welcome to the Medical Imaging Interaction Toolkit (MITK). 
+Currently under active development, MITK aims at supporting the 
+development of leading-edge medical imaging software 
+with a high degree of interaction.
+
+*/
+
+

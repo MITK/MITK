@@ -38,6 +38,7 @@ class PositionEvent : public Event
 
     //##ModelId=3EDC8EEC0136
 	void SetWorldPosition(const Point3D& worldPosition);
+
     
   private:
     //##ModelId=3E5B79D00395

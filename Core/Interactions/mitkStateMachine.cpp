@@ -30,8 +30,8 @@ std::string mitk::StateMachine::GetType() const
 bool mitk::StateMachine::HandleEvent(StateEvent const* stateEvent, int objectEventId, int groupEventId)
 {
 
-////debug
-//std::cout<<"EventID:"<<stateEvent->GetId()<<std::endl;
+//debug
+//std::cout<<"EventID:"<<stateEvent->GetId();
 
 	if (m_CurrentState == NULL)
 		return false;//m_CurrentState needs to be set first!
@@ -56,9 +56,17 @@ bool mitk::StateMachine::HandleEvent(StateEvent const* stateEvent, int objectEve
 		m_UndoController->SetOperationEvent(operationEvent);
 	}
 
+//debug
+if (m_CurrentState->GetId()>1)//all other SM stay in 1, only SetOfPointsInteractor doesn't
+{
+std::cout<<"SMName: "<<m_Type<<" coming from StateID:"<<m_CurrentState->GetId()<<" "<<std::endl;
+std::cout<<"goint to StateID:"<<tempNextState->GetId()<<" "<<std::endl;
+std::cout<<std::endl;
+}
+
+
 	//first following StateChange(or calling ExecuteOperation(tempNextStateOp)), then operation(SideEffect)
 	m_CurrentState = tempNextState;	
-
 	//Undo is handled in ExecuteSideEffect(...)
 	bool ok = ExecuteSideEffect(tempSideEffectId, stateEvent, objectEventId, groupEventId);
 		
@@ -72,7 +80,6 @@ bool mitk::StateMachine::HandleEvent(StateEvent const* stateEvent, int objectEve
 	{
 		std::cout<<"Error! Sender: StateMachine; Message: Operation could not be done!"<<std::endl;
 	}
-
 	return ok;
 }
 //##ModelId=3EDCAECB0175

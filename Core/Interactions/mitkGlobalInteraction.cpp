@@ -94,11 +94,11 @@ bool mitk::GlobalInteraction::ExecuteSideEffect(int sideEffectId, mitk::StateEve
 		std::cout<<"SnappingAdding"<<std::endl;
 		ok = true;
 		break;
-	case SeCHECKPOINT:
+	case SeCHECKELEMENT:
 		std::cout<<"CheckPoint"<<std::endl;
 		ok = true;
 		break;
-	case SeCHECKIFLAST:
+	case SeCHECKEQUALS1:
 		std::cout<<"CheckIfLast"<<std::endl;
 		{
 			//208 for neutral
@@ -200,7 +200,7 @@ and the Focus changes.
             ok = (*it)->HandleEvent(stateEvent, objectEventId, groupEventId);
 	}
 
-	return true;
+	return true;//return ok;
 }
 
 

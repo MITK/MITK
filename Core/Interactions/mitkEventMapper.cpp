@@ -413,6 +413,9 @@ mitk::StateMachine* mitk::EventMapper::GetGlobalStateMachine()
 //## and if included 
 bool mitk::EventMapper::MapEvent(Event* event)
 {
+//debug
+//std::cout<<"Event:"<<event->GetType()<<" "<<event->GetButton()<<" "<<event->GetButtonState()<<" "<<event->GetKey();
+
 	if (m_GlobalStateMachine == NULL)
 		return false;
 

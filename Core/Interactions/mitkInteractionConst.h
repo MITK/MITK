@@ -45,10 +45,11 @@
 #define SeINITEDITGROUP 7
 #define SeADDPOINT 10
 #define SeSNAPPING_ADDING 20
-#define SeCHECKPOINT 30
-#define SeCHECKIFLAST 31
-#define SeCHECKNMINUS1 32
-#define SeCHECKEQUALS1 33
+#define SeCHECKELEMENT 30		//check if there is a element close enough (picking)
+//#define SeCHECKIFLAST 31   //== 34
+#define SeCHECKNMINUS1 32  //check if the number of elements is equal to N-1
+#define SeCHECKEQUALS1 33  //check if the number of elements in the data is equal to 1
+#define SeCHECKSELECTED 34 //check if the given element is selected or not
 #define SeFINISHOBJECT 40
 #define SeFINISHGROUP 41
 #define SeSEARCHOBJECT 50
@@ -63,6 +64,7 @@
 #define SeDESELECTALL 72
 #define SeNEWPOINT 80
 #define SeMOVEPOINT 90
+#define SeMOVESELECTED 91
 #define SeREMOVEPOINT 100
 #define SeINSERTPOINT 110
 #define SeDELETEPOINT 120
@@ -142,6 +144,7 @@
 
 	//##ButtonState
 	// mouse/keyboard state values
+	//QT combinations: left MouseButton + ControlButton: 0x201
 #define NoButton        0x0000
 #define LeftButton      0x0001
 #define RightButton     0x0002

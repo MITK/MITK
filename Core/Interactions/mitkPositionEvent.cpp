@@ -23,6 +23,3 @@ void mitk::PositionEvent::SetWorldPosition(const mitk::Point3D& worldPosition)
 {
 	m_WorldPosition = worldPosition;
 }
-
-
-

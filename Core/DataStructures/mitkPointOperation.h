@@ -46,3 +46,4 @@ class PointOperation : public mitk::Operation
 };
 }//namespace mitk
 #endif /* MITKPOINTOPERATION*/
+

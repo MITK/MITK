@@ -77,3 +77,6 @@ class GlobalInteraction : public StateMachine
 } // namespace mitk
 
 #endif /* GLOBALINTERACTION_H_HEADER_INCLUDED_C152938A */
+
+
+

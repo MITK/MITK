@@ -164,7 +164,7 @@ void mitk::SlicedData::SetRequestedRegion(SlicedData::RegionType *region)
 
 
 //##ModelId=3E19EA3300BA
-mitk::SlicedData::SlicedData() : m_TimeSlicedGeometry(NULL), m_UseLargestPossibleRegion(false)
+mitk::SlicedData::SlicedData() : m_UseLargestPossibleRegion(false), m_TimeSlicedGeometry(NULL)
 {
   unsigned int i;
   for(i=0;i<4;++i)

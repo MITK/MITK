@@ -90,7 +90,6 @@ mitk::DataTreeIteratorClone mitk::DataTree::GetIteratorToNode(mitk::DataTreeBase
 mitk::BoundingBox::Pointer mitk::DataTree::ComputeBoundingBox(mitk::DataTreeIteratorBase* it, const char* boolPropertyKey, mitk::BaseRenderer* renderer, const char* boolPropertyKey2)
 {
   mitk::DataTreeIteratorClone _it=it;
-  mitk::BoundingBox::Pointer m_BoundingBox=mitk::BoundingBox::New();
   mitk::BoundingBox::PointsContainer::Pointer pointscontainer=mitk::BoundingBox::PointsContainer::New();
 
   mitk::BoundingBox::PointIdentifier pointid=0;

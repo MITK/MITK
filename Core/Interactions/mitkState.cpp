@@ -23,8 +23,16 @@ const mitk::Transition* mitk::State::GetTransition(int eventId) const
 	TransitionMap::const_iterator tempTrans = m_Transitions.find(eventId);
 	if( tempTrans != m_Transitions.end() )
         return &(*tempTrans).second;
-	else
-		return NULL;
+	else //can a Transition with ID 0 be found?
+    {
+        tempTrans = m_Transitions.find(0);
+        if ( tempTrans != m_Transitions.end() )//found transition 0 (= transmitt all events to other local StateMachines)
+        {
+            return &(*tempTrans).second;
+        }
+        else
+            return NULL;
+    }
 }
 
 //##ModelId=3E5B2C0503D5

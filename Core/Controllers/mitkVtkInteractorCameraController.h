@@ -9,8 +9,6 @@ class vtkRenderWindow;
 
 namespace mitk {
 
-class VtkQRenderWindowInteractor;
-
 //##ModelId=3E6D600E017F
 //##Documentation
 //## @brief vtk-based camera controller
@@ -56,7 +54,7 @@ protected:
   virtual bool ExecuteSideEffect(int sideEffectId, mitk::StateEvent const* stateEvent, int objectEventId, int groupEventId);
 
   //##ModelId=3E6D600F0060
-  VtkQRenderWindowInteractor* m_VtkInteractor;
+  vtkRenderWindowInteractor* m_VtkInteractor;
 };
 
 } // namespace mitk

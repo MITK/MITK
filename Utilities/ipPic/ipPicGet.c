@@ -6,7 +6,10 @@
  *   reads a PicFile from disk
  *
  * $Log$
- * Revision 1.8  1999/11/28 16:29:43  andre
+ * Revision 1.9  1999/11/28 18:22:42  andre
+ * *** empty log message ***
+ *
+ * Revision 1.8  1999/11/28  16:29:43  andre
  * *** empty log message ***
  *
  * Revision 1.7  1999/11/27  20:03:48  andre
@@ -136,7 +139,7 @@ ipPicDescriptor *ipPicGet( char *infile_name, ipPicDescriptor *pic )
   pic->data = malloc( _ipPicSize(pic) );
 #endif
 
-  pic->info->pixel_start_in_file = ftell( infile );
+  pic->info->pixel_start_in_file = ipPicFTell( infile );
   if( pic->type == ipPicNonUniform )
     fread( pic->data, pic->bpe / 8, _ipPicElements(pic), infile );
   else

@@ -118,64 +118,64 @@ ipPicDescriptor *_ipFuncScBL( ipPicDescriptor *pic_old,
        for ( ind_o[7] = 0; ind_o[7] < n[7]; ind_o[7]++ )                 \
        {                                                                 \
          help1[7]    = ( ipFloat8_t ) ind_o[7] * scale[7];               \
-         weights[7]  = help1 [7] - ( ipFloat8_t )                        \
-                       (( ipUInt4_t ) help1[7] );                        \
+         weights[7]  = 1. - (help1 [7] - ( ipFloat8_t )                  \
+                       (( ipUInt4_t ) help1[7] ));                       \
          weights[15] = 1. - weights[7];                                  \
          help2[7]    = ( ipUInt4_t ) help1[7] * size[7];                 \
      case 7:                                                             \
          for ( ind_o[6] = 0; ind_o[6] < n[6]; ind_o[6]++ )               \
          {                                                               \
            help1[6]    = ( ipFloat8_t ) ind_o[6] * scale[6];             \
-           weights[6]  = help1 [6] - ( ipFloat8_t )                      \
-                         (( ipUInt4_t ) help1[7] );                      \
+           weights[6]  = 1. - (help1 [6] - ( ipFloat8_t )                \
+                         (( ipUInt4_t ) help1[6] ));                     \
            weights[14] = 1. - weights[6];                                \
            help2[6]    = ( ipUInt4_t ) help1[6] * size[6];               \
      case 6:                                                             \
            for ( ind_o[5] = 0; ind_o[5] < n[5]; ind_o[5]++ )             \
            {                                                             \
              help1[5]    = ( ipFloat8_t ) ind_o[5] * scale[5];           \
-             weights[5]  = help1 [5] - ( ipFloat8_t )                    \
-                           (( ipUInt4_t ) help1[5] );                    \
+             weights[5]  = 1. - (help1 [5] - ( ipFloat8_t )              \
+                           (( ipUInt4_t ) help1[5] ));                   \
              weights[13] = 1. - weights[5];                              \
              help2[5]    = ( ipUInt4_t ) help1[5] * size[5];             \
      case 5:                                                             \
              for ( ind_o[4] = 0; ind_o[4] < n[4]; ind_o[4]++ )           \
              {                                                           \
                help1[4]    = ( ipFloat8_t ) ind_o[4] * scale[4];         \
-               weights[4]  = help1 [4] - ( ipFloat8_t )                  \
-                             (( ipUInt4_t ) help1[4] );                  \
+               weights[4]  = 1. - (help1 [4] - ( ipFloat8_t )            \
+                             (( ipUInt4_t ) help1[4] ));                 \
                weights[12] = 1. - weights[4];                            \
                help2[4]    = ( ipUInt4_t ) help1[4] * size[4];           \
      case 4:                                                             \
                for ( ind_o[3] = 0; ind_o[3] < n[3]; ind_o[3]++ )         \
                {                                                         \
                  help1[3]    = ( ipFloat8_t ) ind_o[3] * scale[3];       \
-                 weights[3]  = help1 [3] - ( ipFloat8_t )                \
-                               (( ipUInt4_t ) help1[3] );                \
+                 weights[3]  = 1. - (help1 [3] - ( ipFloat8_t )          \
+                               (( ipUInt4_t ) help1[3] ));               \
                  weights[11] = 1. - weights[3];                          \
                  help2[3]    = ( ipUInt4_t ) help1[3] * size[3];         \
      case 3:                                                             \
                  for ( ind_o[2] = 0; ind_o[2] < n[2]; ind_o[2]++ )       \
                  {                                                       \
                    help1[2]    = ( ipFloat8_t ) ind_o[2] * scale[2];     \
-                   weights[2]  = help1 [2] - ( ipFloat8_t )              \
-                                 (( ipUInt4_t ) help1[2] );              \
+                   weights[2]  = 1. - (help1 [2] - ( ipFloat8_t )        \
+                                 (( ipUInt4_t ) help1[2] ));             \
                    weights[10] = 1. - weights[2];                        \
                    help2[2]    = ( ipUInt4_t ) help1[2] * size[2];       \
      case 2:                                                             \
                    for ( ind_o[1] = 0; ind_o[1] < n[1]; ind_o[1]++ )     \
                    {                                                     \
                      help1[1]    = ( ipFloat8_t ) ind_o[1] * scale[1];   \
-                     weights[1]  = help1 [1] - ( ipFloat8_t )            \
-                                   (( ipUInt4_t ) help1[1] );            \
+                     weights[1]  = 1. - (help1 [1] - ( ipFloat8_t )      \
+                                   (( ipUInt4_t ) help1[1] ));           \
                      weights[9] = 1. - weights[1];                       \
                      help2[1]    = ( ipUInt4_t ) help1[1] * size[1];     \
      case 1:                                                             \
                      for ( ind_o[0] = 0; ind_o[0] < n[0]; ind_o[0]++ )   \
                      {                                                   \
                        help1[0]    = ( ipFloat8_t ) ind_o[0] * scale[0]; \
-                       weights[0]  = help1 [0] - ( ipFloat8_t )          \
-                                     (( ipUInt4_t ) help1[0] );          \
+                       weights[0]  = 1. - (help1 [0] - ( ipFloat8_t )    \
+                                     (( ipUInt4_t ) help1[0] ));         \
                        weights[8] = 1. - weights[0];                     \
                        help2[0]    = ( ipUInt4_t ) help1[0] * size[0];   \
                                                                          \

@@ -781,6 +781,7 @@ void QmitkMainTemplate::initialize()
     mitk::DataTreeNode::Pointer node=mitk::DataTreeNode::New();
     it->add(node);
     it->next();
+    it->next();
     planesSubTree=dynamic_cast<mitk::DataTreeBase*>(it->getSubTree());
 
     float white[3] = {1.0f,1.0f,1.0f};
@@ -789,16 +790,19 @@ void QmitkMainTemplate::initialize()
     planeNode=mitkMultiWidget->mitkWidget1->GetRenderer()->GetCurrentWorldGeometry2DNode();
     planeNode->SetColor(white, mitkMultiWidget->mitkWidget4->GetRenderer());
     planeNode->SetProperty("fileName", new mitk::StringProperty("widget1Plane"));
+    planeNode->SetProperty("includeInBoundingBox", new mitk::BoolProperty(false));
     it->add(planeNode);
     // ... of widget 2
     planeNode=mitkMultiWidget->mitkWidget2->GetRenderer()->GetCurrentWorldGeometry2DNode();
     planeNode->SetColor(white, mitkMultiWidget->mitkWidget4->GetRenderer());
     planeNode->SetProperty("fileName", new mitk::StringProperty("widget2Plane"));
+    planeNode->SetProperty("includeInBoundingBox", new mitk::BoolProperty(false));
     it->add(planeNode);
     // ... of widget 3
     planeNode=mitkMultiWidget->mitkWidget3->GetRenderer()->GetCurrentWorldGeometry2DNode();
     planeNode->SetColor(white, mitkMultiWidget->mitkWidget4->GetRenderer());
     planeNode->SetProperty("fileName", new mitk::StringProperty("widget3Plane"));
+    planeNode->SetProperty("includeInBoundingBox", new mitk::BoolProperty(false));
     it->add(planeNode);
 
     connect(mitkMultiWidget->levelWindowWidget,SIGNAL(levelWindow(mitk::LevelWindow*)),this,SLOT(changeLevelWindow(mitk::LevelWindow*)) );

@@ -211,8 +211,11 @@ public:
       m_Dimension, 
       tmpDimensions,
       channels);
-
-    const double *spacinglist = itkimage->GetSpacing();
+#if ITK_VERSION_MINOR == 6
+    typename itkImageType::SpacingType spacinglist = itkimage->GetSpacing();  
+#else
+    const double *spacinglist = itkimage->GetSpacing();  
+#endif 
     Vector3D spacing(spacinglist[0],1.0,1.0);
     if(m_Dimension>=2)
       spacing.y=spacinglist[1];

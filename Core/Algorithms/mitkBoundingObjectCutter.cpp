@@ -63,14 +63,15 @@ const std::type_info& BoundingObjectCutter::GetOutputPixelType()
 
 void BoundingObjectCutter::GenerateInputRequestedRegion()
 {
-  if((m_BoundingObject.IsNull()) || (m_BoundingObject->GetTimeSlicedGeometry()->GetTimeSteps() == 0))
+  mitk::Image* output = this->GetOutput();
+  if((output->IsInitialized()==false) || (m_BoundingObject.IsNull()) || (m_BoundingObject->GetTimeSlicedGeometry()->GetTimeSteps() == 0))
     return;
   // we have already calculated the spatial part of the 
   // input-requested-region in m_InputRequestedRegion in 
   // GenerateOutputInformation (which is called before 
   // GenerateInputRequestedRegion).
-  GenerateTimeInInputRegion(this->GetOutput(), const_cast< mitk::Image * > ( this->GetInput() ));
-  GenerateTimeInInputRegion(this->GetOutput(), m_BoundingObject.GetPointer());
+  GenerateTimeInInputRegion(output, const_cast< mitk::Image * > ( this->GetInput() ));
+  GenerateTimeInInputRegion(output, m_BoundingObject.GetPointer());
 }
 
 void BoundingObjectCutter::GenerateOutputInformation()
@@ -178,7 +179,7 @@ void BoundingObjectCutter::GenerateData()
   if(input.IsNull())
     return;  
 
-  if((m_BoundingObject.IsNull()) || (m_BoundingObject->GetTimeSlicedGeometry()->GetTimeSteps() == 0))
+  if((output->IsInitialized()==false) || (m_BoundingObject.IsNull()) || (m_BoundingObject->GetTimeSlicedGeometry()->GetTimeSteps() == 0))
     return;
 
   m_InputTimeSelector->SetInput(input);

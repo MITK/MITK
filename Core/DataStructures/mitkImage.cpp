@@ -418,7 +418,7 @@ void mitk::Image::Initialize(const mitk::PixelType& type, unsigned int dimension
 {
 	m_Dimension=dimension;
 	if(m_Dimensions!=NULL)
-		delete m_Dimensions;
+		delete [] m_Dimensions;
 	m_Dimensions=new unsigned int[m_Dimension>4?m_Dimension:4];
 	memcpy(m_Dimensions, dimensions, sizeof(unsigned int)*m_Dimension);
 	if(m_Dimension<4)
@@ -542,7 +542,7 @@ bool mitk::Image::IsInitialized() const
 void mitk::Image::ComputeOffsetTable()
 {
 	if(m_OffsetTable!=NULL)
-		delete m_OffsetTable;
+		delete [] m_OffsetTable;
 
 	m_OffsetTable=new unsigned int[m_Dimension>4 ? m_Dimension+1 : 4+1];
 	

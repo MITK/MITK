@@ -452,7 +452,7 @@ static mitk::DataTreeNode::Pointer FileOpen()
           {
             mitk::SurfaceVtkWriter<vtkSTLWriter>::Pointer writer=mitk::SurfaceVtkWriter<vtkSTLWriter>::New();
             writer->SetInput( surface );
-            writer->SetFileName(fileName.ascii());
+            writer->SetFileName(fileName.latin1());
             writer->GetVtkWriter()->SetFileTypeToBinary();
             writer->Write();
           }
@@ -461,7 +461,7 @@ static mitk::DataTreeNode::Pointer FileOpen()
             if (fileName.endsWith(".vtk")==false) fileName += ".vtk";
             mitk::SurfaceVtkWriter<vtkPolyDataWriter>::Pointer writer=mitk::SurfaceVtkWriter<vtkPolyDataWriter>::New();
             writer->SetInput( surface );
-            writer->SetFileName(fileName.ascii());
+            writer->SetFileName(fileName.latin1());
             writer->Write();
           }
         }

@@ -450,9 +450,7 @@ static void SaveImage(mitk::Image* image)
 {
   QString fileName = QFileDialog::getSaveFileName(QString("NewImage.pic"),GetSaveFileExtensions());
   if (fileName == NULL ) 
-  {
-    fileName = QString("NewImage.mhd");
-  }
+    return;
 
   try 
   {

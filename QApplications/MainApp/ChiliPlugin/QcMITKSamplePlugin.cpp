@@ -5,7 +5,7 @@
 #include <qstring.h>
 #include <mitkDataTree.h>
 #include <QmitkStdMultiWidget.h>
-//#include <mitkLightBoxImageReader.h>
+#include <mitkLightBoxImageReader.h>
 #include "SampleApp.h"
 #include "QcMITKSamplePlugin.h"
 
@@ -23,6 +23,7 @@ QcMITKSamplePlugin::QcMITKSamplePlugin( QWidget *parent )
   layout->addWidget(ap,0,0,0);
 
   itkGenericOutputMacro(<<"hallo");
+
 
   //funktioniert nicht:
   //QcLightbox* lightbox;
@@ -71,23 +72,25 @@ void QcMITKSamplePlugin::selectSerie (QcLightbox* lightbox)
 {
   itkGenericOutputMacro(<<"selectSerie");
 
-  ipPicDescriptor* pic;
-    
+  
   if(lightbox->getFrames()==0)
     return;
-
+  
   mitk::Image::Pointer image = mitk::Image::New();
   
   //Variante 1
-  pic=lightbox->fetchVolume();
+  //ipPicDescriptor* pic;
+  //pic=lightbox->fetchVolume();
 
-  image->Initialize(pic);
-  image->SetPicVolume(pic);
+  //image->Initialize(pic);
+  //image->SetPicVolume(pic);
+
   //Variante 2
-//  mitk::LightBoxImageReader::Pointer reader=mitk::LightBoxImageReader::New();
-  //reader->SetLightBox(lightbox);
-  //image=reader->GetOutput();
-
+  mitk::LightBoxImageReader::Pointer reader=mitk::LightBoxImageReader::New();
+  reader->SetLightBox(lightbox);
+  
+  image=reader->GetOutput();
+  image->Update();
   mitk::DataTree::Pointer tree = ap->GetTree();
   
   mitk::DataTreeIterator* it = tree->inorderIterator();
@@ -103,7 +106,7 @@ void QcMITKSamplePlugin::selectSerie (QcLightbox* lightbox)
   ap->getMultiWidget()->texturizePlaneSubTree( tree->inorderIterator());
   ap->getMultiWidget()->updateMitkWidgets();
   ap->getMultiWidget()->fit();
-
+  
 
 }
 

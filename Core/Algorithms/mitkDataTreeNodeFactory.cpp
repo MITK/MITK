@@ -31,6 +31,7 @@
 // MITK-related includes
 #include "mitkSurfaceData.h"
 #include "mitkPicFileReader.h"
+#include "mitkPicVolumeTimeSeriesReader.h"
 #include "mitkStringProperty.h"
 #include "mitkProperties.h"
 #include "mitkBoolProperty.h"
@@ -660,8 +661,8 @@ void mitk::DataTreeNodeFactory::ReadFileSeriesTypePIC()
 {
     std::cout << "loading image series with prefix " << m_FilePrefix << " and pattern " << m_FilePattern << " as pic..." << std::endl;
 
-    mitk::PicFileReader::Pointer reader;
-    reader = mitk::PicFileReader::New();
+    mitk::PicVolumeTimeSeriesReader::Pointer reader;
+    reader = mitk::PicVolumeTimeSeriesReader::New();
     reader->SetFilePrefix( m_FilePrefix.c_str() );
     reader->SetFilePattern( m_FilePattern.c_str() );
     reader->UpdateLargestPossibleRegion();
@@ -828,7 +829,13 @@ void mitk::DataTreeNodeFactory::ReadFileSeriesTypeITKImageSeriesReader()
     SortedStringContainer sortedFiles;
     for ( StringContainer::iterator it = matchedFiles.begin() ; it != matchedFiles.end() ; ++it )
     {
+        //
+        //remove the last extension, until we have a digit at the end, or no extension is left!
+        //
         std::string baseFilename = itksys::SystemTools::GetFilenameWithoutLastExtension( *it );
+        while ( ( baseFilename[baseFilename.length()-1] < '0' || baseFilename[baseFilename.length()-1] > '9') && itksys::SystemTools::GetFilenameLastExtension(baseFilename) != "") 
+             baseFilename = itksys::SystemTools::GetFilenameWithoutLastExtension( baseFilename );
+         
         std::string number;
         for ( unsigned int i = baseFilename.length() - 1; i >= 0; --i )
         {
@@ -871,7 +878,7 @@ void mitk::DataTreeNodeFactory::ReadFileSeriesTypeITKImageSeriesReader()
     for ( SortedStringContainer::iterator it = sortedFiles.begin() ; it != sortedFiles.end() ; ++it )
     {
         filesToLoad.push_back( it->second );
-        std::cout << it->second << std::endl;
+        itkDebugMacro( << it->second );
     }
 
 

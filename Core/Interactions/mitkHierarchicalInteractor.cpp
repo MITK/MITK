@@ -78,6 +78,26 @@ bool mitk::HierarchicalInteractor::TransmitEvent( StateEvent const* stateEvent )
   return ok;
 }
 
+float mitk::HierarchicalInteractor::CalculateJurisdiction(StateEvent const* stateEvent) const
+//go through all lower statemachines and this statemachine and return the highest value
+{
+  float returnJurisdiction = Superclass::CalculateJurisdiction( stateEvent );
+
+  InteractorListConstIter i = m_AllInteractors.begin();
+  InteractorListConstIter end = m_AllInteractors.end();
+
+  while ( i != end )
+  {
+    float currentJurisdiction = (*i)->CalculateJurisdiction( stateEvent );
+    if (returnJurisdiction < currentJurisdiction)
+      returnJurisdiction = currentJurisdiction;
+    i++;
+  }
+
+  return returnJurisdiction;
+}
+
+
 bool mitk::HierarchicalInteractor::ExecuteAction( Action* action, mitk::StateEvent const* stateEvent ) 
 {
   switch (action->GetActionId())
@@ -107,7 +127,7 @@ bool mitk::HierarchicalInteractor::ExecuteAction( Action* action, mitk::StateEve
         m_SelectedInteractors.clear();
         InteractorListIter i = m_AllInteractors.begin();
         InteractorListIter bestInteractor = m_AllInteractors.end();
-        const InteractorListIter end = m_AllInteractors.end();
+        InteractorListConstIter end = m_AllInteractors.end();
         float jurisdiction = 0.0f;
 
         while ( i != end )

@@ -17,6 +17,7 @@ public:
 
   typedef std::vector<Interactor::Pointer> InteractorList;
   typedef std::vector<Interactor::Pointer>::iterator InteractorListIter;
+  typedef std::vector<Interactor::Pointer>::const_iterator InteractorListConstIter;
 
   mitkClassMacro(HierarchicalInteractor,Interactor);
 
@@ -43,6 +44,11 @@ public:
   //##Documentation
   //## @brief Adds an Interactor to the list of administrated Interactors
   bool AddInteractor(Interactor::Pointer interactor);
+
+  //##Documentation
+  //## @brief derived from mitk::Interactor; merges all jurisdictions of lower interactors
+  virtual float CalculateJurisdiction(StateEvent const* stateEvent) const;
+
 
 protected:
   //##Documentation

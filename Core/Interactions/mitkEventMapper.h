@@ -12,7 +12,8 @@
 
 //##ModelId=3E788FC0001A
 typedef std::vector<mitk::EventDescription> EventDescriptionVec;
-//##ModelId=3E788FC0002A
+
+//##ModelId=3EAEC3AE01DF
 typedef std::vector<mitk::EventDescription>::iterator EventDescriptionVecIter;
 
 namespace mitk {

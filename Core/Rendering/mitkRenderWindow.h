@@ -1,26 +1,27 @@
 #ifndef MITKRENDERWINDOW_H_HEADER_INCLUDED_C1EBD0AD
 #define MITKRENDERWINDOW_H_HEADER_INCLUDED_C1EBD0AD
 
-#include <qgl.h> 
+#include <qgl.h>
 #include <widget.h>
 
-class iilItem; 
+class iilItem;
 
 namespace mitk {
 
 class RenderWindow : public RenderWindowBase
 {
 public:
-    //##ModelId=3E3ECC130358
+
+    //##ModelId=3E3ECC1201B2
     RenderWindow(QGLFormat glf, QWidget *parent = 0, const char *name = 0) : RenderWindowBase(glf, parent, name)
     {
-    
+
     };
 
     //##ModelId=3E3ECC13036D
     RenderWindow(QWidget *parent = 0, const char *name = 0) : RenderWindowBase(parent, name)
     {
-    
+
     };
 
     //iil compatibility

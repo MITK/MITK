@@ -7,17 +7,18 @@
 namespace mitk {
 
 /*!
- * class implements level window data structure 
+ * class implements level window data structure
  * current min and max value are stored in m_Min and m_Max.
- * The maximum and minimum of valid value range is stored in 
+ * The maximum and minimum of valid value range is stored in
  * m_RangeMin and m_RangeMax
- */ 
+ */
 class LevelWindow : public itk::Object
 {
   public:
 
 		/** Standard class typedefs. */
-    //##ModelId=3E33EEF40183
+
+    //##ModelId=3E0B12240067
 	typedef LevelWindow              Self;
     //##ModelId=3E33EEF401AB
     typedef itk::Object              Superclass;
@@ -33,7 +34,7 @@ class LevelWindow : public itk::Object
     itkTypeMacro(itk::Object,LevelWindow);
 
 		/*!
-		*	\brief method returns the level value, i.e. the center of  
+		*	\brief method returns the level value, i.e. the center of
 		*				current grey value interval
 		*/
     //##ModelId=3E0B12640203
@@ -70,7 +71,7 @@ class LevelWindow : public itk::Object
     void SetWindow(float window);
 
     /*!
-		 * 
+		 *
 		 */
     //##ModelId=3E0B132303A3
     void SetLevelWindow(float level, float window);
@@ -117,13 +118,13 @@ class LevelWindow : public itk::Object
     //##ModelId=3EA969CD006B
     float GetRangeMax() const;
 
-		/**! 
+		/**!
 		* \brief method returns the size of the grey value range
 		*/
     //##ModelId=3EA969CD0072
-		float GetRange() const; 
+		float GetRange() const;
 
-	
+
     /*!
      * \brief equality operator implementation
 		 */
@@ -137,13 +138,13 @@ class LevelWindow : public itk::Object
 		virtual bool operator!=(const LevelWindow& levWin) const;
 
 		/*!
-     * \brief implementation necessary because operator made 
+     * \brief implementation necessary because operator made
 		 *	private in itk::Object
 		 */
     //##ModelId=3EA969CD007F
 		virtual LevelWindow& operator=(const LevelWindow& levWin);
 
-	
+
 	protected:
 
     /*!
@@ -174,11 +175,11 @@ class LevelWindow : public itk::Object
 		 * confidence tests
 		 */
     //##ModelId=3EA969CD0087
-		inline void testValues() {	
+		inline void testValues() {
 			if ( m_Min < m_RangeMin )
 				m_Min = m_RangeMin;
 
-			if ( m_Max > m_RangeMax ) 
+			if ( m_Max > m_RangeMax )
 				m_Max = m_RangeMax;
 
 			if ( m_Min > m_Max )

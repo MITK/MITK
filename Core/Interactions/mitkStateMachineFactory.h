@@ -3,7 +3,6 @@
 
 #include "mitkCommon.h"
 #include "State.h"
-//#include "mitkInteractionConst.h"
 #include <qxml.h>
 #include <iostream>
 

@@ -49,4 +49,9 @@ bool mitk::StateMachine::HandleEvent(StateEvent const* stateEvent)
 	return ok;
 }
 
+//##ModelId=3EAEEDC603D9
+void mitk::StateMachine::SetOperation(Operation* operation)
+{
+//what to do?
+}
 

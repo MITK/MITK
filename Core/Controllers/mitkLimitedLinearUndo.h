@@ -10,6 +10,7 @@ namespace mitk {
 //##ModelId=3E5F5D3F0075
 class LimitedLinearUndo : public UndoModel
 {
+public:
     //##ModelId=3E5F5D8C00B2
     virtual bool SetOperationEvent(OperationEvent* operationEvent);
 
@@ -29,6 +30,7 @@ class LimitedLinearUndo : public UndoModel
     //##  and sets it to Undo-Stack
     virtual bool Redo();
 
+protected:
     //##ModelId=3E5F5DF80360
     std::vector<OperationEvent*> m_UndoList;
 

@@ -30,6 +30,13 @@ namespace mitk {
 	//## statechange with Undo functionality
     bool HandleEvent(StateEvent const* stateEvent);
 
+    //##ModelId=3EAEEDC603D9
+	//##Documentation
+    //## from OperationActor; a stateMachine has to be an OperationActor 
+	//## due to the UndoMechanism. Else no destination for Undo/Redo of StateMachines
+	//## can be set.
+	virtual void SetOperation(Operation* operation);
+
   protected:
     //##ModelId=3E5B2E170228
     virtual bool ExecuteSideEffect(int sideEffectId)= 0;

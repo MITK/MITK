@@ -9,6 +9,7 @@
 
 namespace mitk {
 
+//##ModelId=3E93EE1D001F
 	enum UndoType
 	{
 		//NULL = 0,
@@ -16,8 +17,10 @@ namespace mitk {
 		TREEUNDO = 2
 	};
 
+//##ModelId=3E9C45D5007E
 typedef std::map<UndoType, UndoModel*> UndoModelMap;
 
+//##ModelId=3E9C45D50092
 typedef std::map<UndoType, UndoModel*>::iterator UndoModelMapIter;
 
 
@@ -56,7 +59,7 @@ class UndoController
 	bool RemoveUndoModel(UndoType undoType);
 
   private:
-    //##ModelId=3EA93FC40068
+    //##ModelId=3EAEBEBD02DC
 	//##Documentation
     //## current selected UndoModel
 	static UndoModel *m_CurUndoModel;

@@ -8,8 +8,8 @@
 
 namespace mitk {
 /* changes effect:
-/	TriangleROI.cpp
-/	ROI.cpp
+/	TriangleRoi.cpp
+/	Roi.cpp
 */
 enum SideEffectId {
 	DONOTHING = 0,

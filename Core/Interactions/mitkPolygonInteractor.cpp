@@ -129,8 +129,8 @@ bool mitk::PolygonInteractor::ExecuteAction(Action* action, mitk::StateEvent con
       mitk::Point3D worldPoint = posEvent->GetWorldPosition();
 
       //searching for a point
-      unsigned long lineId = -1;
-      unsigned long cellId = -1;
+      unsigned long lineId = 0;
+      unsigned long cellId = 0;
       int PRECISION = 1;
       mitk::IntProperty *precision = dynamic_cast<IntProperty*>(action->GetProperty("PRECISION"));
       if (precision != NULL)
@@ -194,7 +194,7 @@ bool mitk::PolygonInteractor::ExecuteAction(Action* action, mitk::StateEvent con
       bool hit = true;
       //var's for EvaluatePosition
       mitk::Point3D point = posEvent->GetWorldPosition();
-      unsigned long cellId = -1;
+      unsigned long cellId = 0;
       
       //check wheather the mesh is hit.
       if (mesh->EvaluatePosition(point, cellId))

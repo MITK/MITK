@@ -37,10 +37,15 @@ namespace mitk {
 
     //##ModelId=3E5B2DE30378
 	//##Documentation
-    //## gets StateEvent from EventMapper and handles it
-	//## according to stateEvent->GetId()
-	//## statechange with Undo functionality
-    bool HandleEvent(StateEvent const* stateEvent);
+    //## @brief handles an Event accordingly to its current State
+	//##
+	//## statechange with Undo functionality;
+	//## groupEventId and objectEventId are use to combine Operations so that
+	//## they can be undone together or seperately.
+	//## EventMapper gives each event a new objectEventId
+	//## and a StateMachine::ExecuteSideEffect can descide weather it gets a 
+	//## new GroupEventId or not, depending on its state (e.g. finishedNewObject then new GroupEventId)
+    bool HandleEvent(StateEvent const* stateEvent, int groupEventId, int objectEventId);
 
     //##ModelId=3EAEEDC603D9
 	//##Documentation
@@ -62,13 +67,18 @@ namespace mitk {
     //## if you are developing a new statemachine, you put all your operations here!
     //## dependant on the SideEffectNumber / build of the StateMachine-Definition
 	//## First Undo, then SideEffectOperation
-    virtual bool ExecuteSideEffect(int sideEffectId, mitk::StateEvent const* stateEvent)= 0;
+    virtual bool ExecuteSideEffect(int sideEffectId, mitk::StateEvent const* stateEvent, int groupEventId, int objectEventId)= 0;
 
 	//##ModelId=3EDCAECB00B9
 	//##Documentation
 	//## if true, then UndoFunctionality is enabled
 	//## default on true;
 	bool m_UndoEnabled;
+	
+	//Documentation
+    //##ModelId=3EF099EA03C0
+	//## @brief friend protected function of OperationEvent, that way all StateMachines can increment!
+	int IncCurrGroupEventId();
 
   private:
 	//##ModelId=3E5B2D66027E

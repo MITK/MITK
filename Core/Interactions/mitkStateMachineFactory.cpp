@@ -115,32 +115,35 @@ bool mitk::StateMachineFactory::parse(StateMap *states, StateMapIter thisState, 
 //## sets the pointers in Transition (setNextState(..)) according to the extracted xml-file content
 bool mitk::StateMachineFactory::ConnectStates(StateMap *states)
 {
-
-	//parse all the given states an check for deadlock or not connected states
-	HistorySet *history = new HistorySet;
-
-	StateMapIter firstState = states->begin(); 
-	//parse through all the given states, log the parsed elements in history
-	bool ok = parse( states, firstState, history);
-
-	if ( (states->size() == history->size()) && ok )
+	if (states->size() > 1)//only one state; don't have to be parsed for deadlocks!
 	{
-		delete history;
-	}
-	else //ether !ok or sizeA!=sizeB
-	{
-		delete history;
-		std::cout<<"Warnung: Ein unereichbarer Zustand wird aufgebaut. Ueberprüfen sie die Zustands- Konfigurations- Datei'statemachineFactory.cpp"<<endl;	
-		//return false;//better go on and build/ connect the states than quit
-	}
+		//parse all the given states an check for deadlock or not connected states
+		HistorySet *history = new HistorySet;
+		StateMapIter firstState = states->begin(); 
+		//parse through all the given states, log the parsed elements in history
+		bool ok = parse( states, firstState, history);
 
+		if ( (states->size() == history->size()) && ok )
+		{
+			delete history;
+		}
+		else //ether !ok or sizeA!=sizeB
+		{
+			delete history;
+			std::cout<<"Warnung: Ein unereichbarer Zustand wird aufgebaut. Ueberprüfen sie die Zustands- Konfigurations- Datei"<<endl;	
+			//return false;//better go on and build/ connect the states than quit
+		}
+	}
 	//connect all the states
 	for (StateMapIter tempState = states->begin(); tempState != states->end();  tempState++)
 	{
 		//searched through the States and Connects all Transitions
 		bool tempbool = ( ( tempState->second )->ConnectTransitions( states ) );
         if ( tempbool = false )
+		{
             return false;//abort!
+			std::cout<<"Warnung: Das Verbinden der Zustände war NICHT erfolgreich!"<<endl;
+		}
 	}
 	return true;
 }

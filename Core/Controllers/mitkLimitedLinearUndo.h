@@ -16,14 +16,21 @@ public:
 
     //##ModelId=3E5F5D8C00C6
     //##Documentation
+	//## @brief Undoes the last changes
+	//##
     //##  reads the top element of the Undo-Stack,  
     //##  executes the operation,
     //##  swaps the OperationEvent-Undo with the Operation
     //##  and sets it to Redo-Stack
-    virtual bool Undo();
+	//##
+	//## @params fine: if set to true, then all operations with the same ObjectId are undone
+	//## if set to false, then all operations with the same GroupEventId are undone (see UndoController.h)
+    virtual bool Undo(bool fine);
 
     //##ModelId=3E5F5D8C00DA
     //##Documentation
+	//## @brief Undoes the last changes
+	//##
     //## reads the top element of the Redo-Stack, 
     //##  executes the operation,
     //##  swaps the OperationEvent-Operation with the Undo-Operation

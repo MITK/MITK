@@ -27,7 +27,7 @@ std::string mitk::StateMachine::GetType() const
 }
 
 //##ModelId=3E5B2DE30378
-bool mitk::StateMachine::HandleEvent(StateEvent const* stateEvent)
+bool mitk::StateMachine::HandleEvent(StateEvent const* stateEvent, int groupEventId, int objectEventId)
 {
 	if (m_CurrentState == NULL)
 		return false;//m_CurrentState needs to be set first!
@@ -49,9 +49,10 @@ bool mitk::StateMachine::HandleEvent(StateEvent const* stateEvent)
 		StateTransitionOperation* undoSTO = new StateTransitionOperation(mitk::STATETRANSITION, 0, m_CurrentState);
 		StateTransitionOperation* redoSTO = new StateTransitionOperation(mitk::STATETRANSITION, 0, tempState);//tempStateZeiger? mögl. Fehlerquelle
 	
-		OperationEvent *operationEvent = new OperationEvent(((mitk::OperationActor*)(this)), undoSTO, redoSTO, 
-																OperationEvent::GenerateObjectEventId(), 
-																OperationEvent::GenerateGroupEventId());
+		OperationEvent *operationEvent = new OperationEvent(((mitk::OperationActor*)(this)), 
+															undoSTO, redoSTO, 
+															groupEventId,
+															objectEventId );
 
 		
 		m_UndoController->SwitchUndoModel(LIMITEDLINEARUNDO);
@@ -60,13 +61,14 @@ bool mitk::StateMachine::HandleEvent(StateEvent const* stateEvent)
 
 	//first following StateChange, then operation(SideEffect)
 	m_CurrentState = tempState;
-	bool ok = ExecuteSideEffect(tempSideEffectId, stateEvent);//Undo in ExecuteSideEffect(...)
-	
+	//Undo is handled in ExecuteSideEffect(...)
+	bool ok = ExecuteSideEffect(tempSideEffectId, stateEvent, groupEventId, objectEventId);
+		
 	//Doku: if the operation doesn't work, then we have already changed the state. 
 	//Ether go further without the success of the operation or undo the statechange.
 	if (!ok && m_UndoEnabled)
 	{
-		ok = m_UndoController->Undo();
+		ok = m_UndoController->Undo(true);//fine undo!
 	}
 	else if (!ok && !m_UndoEnabled)
 	{
@@ -81,3 +83,8 @@ void mitk::StateMachine::EnableUndo(bool enable)
 	m_UndoEnabled = enable;
 }
 
+//##ModelId=3EF099EA03C0
+int mitk::StateMachine::IncCurrGroupEventId()
+{
+	return mitk::OperationEvent::IncCurrGroupEventId();
+}

@@ -1,9 +1,9 @@
 #include "OperationEvent.h"
 
 //##ModelId=3E9B07B40374
-int mitk::OperationEvent::m_NextObjectEventId = 0;
+int mitk::OperationEvent::m_CurrObjectEventId = 0;
 //##ModelId=3E9B07B5002B
-int mitk::OperationEvent::m_NextGroupEventId = 0;
+int mitk::OperationEvent::m_CurrGroupEventId = 0;
 
 //##ModelId=3E5F610D00BB
 mitk::Operation* mitk::OperationEvent::GetOperation()
@@ -20,15 +20,15 @@ mitk::OperationEvent::OperationEvent(OperationActor* destination,
 									 : m_Destination(destination), 
 									 m_Operation(operation),
 									 m_UndoOperation(undoOperation),
-									 m_ObjectEventId(objectEventId),
 									 m_GroupEventId(groupEventId),
+									 m_ObjectEventId(objectEventId),
 									 m_Swaped(false)
 {}
 
-/**
- *swaps the Undo and Redo- operation and changes m_Swaped
- */
+
 //##ModelId=3E957C1102E3
+//##Documentation
+//##  swaps the Undo and Redo- operation and changes m_Swaped
 void mitk::OperationEvent::swapOperations()
 {
 	Operation *tempOperation = m_Operation;
@@ -40,16 +40,28 @@ void mitk::OperationEvent::swapOperations()
 		m_Swaped = true;
 }
 
-//##ModelId=3E9B07B501A7
-int mitk::OperationEvent::GenerateObjectEventId()
+//##ModelId=3E9B07B50220
+int mitk::OperationEvent::GetCurrGroupEventId()
 {
-	return m_NextObjectEventId++;
+	return m_CurrGroupEventId;
 }
 
-//##ModelId=3E9B07B50220
-int mitk::OperationEvent::GenerateGroupEventId()
+//##ModelId=3E9B07B501A7
+int mitk::OperationEvent::GetCurrObjectEventId()
 {
-	return m_NextGroupEventId++;
+	return m_CurrObjectEventId;
+}
+
+//##ModelId=3EF099E90269
+int mitk::OperationEvent::IncCurrGroupEventId()
+{
+	return m_CurrGroupEventId++;
+}
+
+//##ModelId=3EF099E90289
+int mitk::OperationEvent::IncCurrObjectEventId()
+{
+	return m_CurrObjectEventId++;
 }
 
 //##ModelId=3E9B07B502AC
@@ -58,3 +70,14 @@ mitk::OperationActor* mitk::OperationEvent::GetDestination()
 	return m_Destination;
 }
 
+//##ModelId=3EF099E90249
+int mitk::OperationEvent::GetGroupEventId()
+{
+	return m_GroupEventId;
+}
+
+//##ModelId=3EF099E90259
+int mitk::OperationEvent::GetObjectEventId()
+{
+	return m_ObjectEventId;
+}

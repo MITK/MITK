@@ -34,9 +34,24 @@ class UndoController
     bool SetOperationEvent(OperationEvent* operationEvent);
 
     //##ModelId=3E5F55C80207
-    bool Undo();
+	//##Documentation
+	//## @brief calls the UndoMechanism to undo the last change
+	//##
+	//## the UndoMechanism has the possibility to undo the last changes in two different ways:
+	//## first it can Undo a group of operations done at last (e.g. build up a new object; Undo leads to deleting that object);
+	//## or it can Undo a set of operations, that belong together(statechange with SideEffect),
+	//## that way it is possible recall the last set point after you have finished to build up a new object
+	//## @params fine: if set to true, then undo all operations with the same objectEventId
+	//## if set to false, then undo all operations with the same GroupEventId
+    bool Undo(bool fine);
 
     //##ModelId=3E5F55E6003E
+	//##Documentation
+	//## @brief calls the RedoMechanism to redo the operations undone
+	//##
+	//## read the Documentation of Undo!
+	//## Redo has no param like fine, because that param has to be stored in the Redo-List for to 
+	//## redo the same that has been undone!
     bool Redo();
 
 

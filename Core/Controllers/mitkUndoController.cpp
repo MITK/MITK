@@ -41,9 +41,9 @@ bool mitk::UndoController::SetOperationEvent(OperationEvent* operationEvent)
 }
 
 //##ModelId=3E5F55C80207
-bool mitk::UndoController::Undo()
+bool mitk::UndoController::Undo(bool fine)
 {
-	return m_CurUndoModel->Undo();
+	return m_CurUndoModel->Undo(fine);
 }
 
 //##ModelId=3E5F55E6003E

@@ -404,7 +404,17 @@ bool mitk::EventMapper::MapEvent(Event* event)
 		return false;
 	//generate StateEvent and send to StateMachine, which does everything further!
 	m_StateEvent.Set( (m_EventDescriptions[i]).GetId(), event );
-	return m_GlobalStateMachine->HandleEvent(&m_StateEvent);
+	/*
+	Group and Object EventId:
+	then EventMapper has the power to descide which operations hang together;
+	each event causes n (n e N) operations (e.g. StateChanges, data-operations...).
+	Undo must recall all these coherent operations, so all of the same objectId.
+	But Undo has also the power to recall more operationsets, for example a set for building up a new object, 
+	so that a newly build up object is deleted after a Undo and not only the latest set point.
+	The StateMachines::ExecuteSideEffect have the power to descide weather a new GroupID has to be calculated 
+	(by example after the editing of a new object)
+	*/
+	return m_GlobalStateMachine->HandleEvent(&m_StateEvent, mitk::OperationEvent::GetCurrGroupEventId(), mitk::OperationEvent::IncCurrObjectEventId());
 }
 
 //##ModelId=3E5B35140072
@@ -445,7 +455,7 @@ bool mitk::EventMapper::startElement( const QString&, const QString&, const QStr
 	else if ( qName == "event")
 	{
 		//neuen Eintrag in der m_EventDescriptions
-		bool ok;
+		bool ok = false;//for error at converting 16 to 10 system
 		EventDescription tempEventDescr( atts.value( TYPE.c_str() ).toInt(),
 										 (( atts.value((QString)(BUTTON.c_str())) ).remove(0,2) ).toInt( &ok, 16 ),
 										 (( atts.value((QString)(BUTTONSTATE.c_str())) ).remove(0,2) ).toInt( &ok, 16 ),

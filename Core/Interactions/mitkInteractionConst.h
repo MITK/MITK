@@ -22,6 +22,7 @@
 #define ADDSELECTEDTOGROUP 64
 #define DESELECTOBJECT 70 //deselect picked from group
 #define DESELECTALL 72
+#define NEWPOINT 80
 
 	//Type
 #define None 0				// invalid event

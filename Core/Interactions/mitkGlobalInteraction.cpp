@@ -6,7 +6,7 @@
 
 //##ModelId=3EAD420E0088
 mitk::GlobalInteraction::GlobalInteraction(std::string type)
-: StateMachine(type), m_Roi(NULL)
+: StateMachine(type)
 {
 	//Quickimplementation ... Ivo: No Need of focus, cause glWidget sends the Event now.
 	//m_Focus = new mitk::Focus("focus");
@@ -24,14 +24,14 @@ inline mitk::StateEvent* GenerateEmptyStateEvent(int eventId)
 }
 
 //##ModelId=3E7F497F01AE
-bool mitk::GlobalInteraction::ExecuteSideEffect(int sideEffectId, mitk::StateEvent const* stateEvent)
+bool mitk::GlobalInteraction::ExecuteSideEffect(int sideEffectId, mitk::StateEvent const* stateEvent, int groupEventId, int objectEventId)
 {
 	bool ok = false;
 	//if the Event is a PositionEvent, then get the worldCoordinates through Focus
 	/*Quickimplementation... no need of focus, since the qglwidget send the event
 	if ( (stateEvent->GetEvent() )->GetType()== MouseButtonPress)
 	{
-		ok = m_Focus->HandleEvent(stateEvent);//give it to Focus which calculates accordingly to it's Statemachine the worldcoordinates
+		ok = m_Focus->HandleEvent(stateEvent,...);//give it to Focus which calculates accordingly to it's Statemachine the worldcoordinates
 
 		//for debugging
 		if (!ok)
@@ -61,7 +61,7 @@ bool mitk::GlobalInteraction::ExecuteSideEffect(int sideEffectId, mitk::StateEve
 			//when ready, then generate ID 202
 			//202 for finished Object
 			mitk::StateEvent* nextStateEvent = GenerateEmptyStateEvent(202);
-			ok = HandleEvent(nextStateEvent);
+			ok = HandleEvent(nextStateEvent, groupEventId, objectEventId);
 		}
 		break;
 	case INITEDITOBJECT:
@@ -71,7 +71,7 @@ bool mitk::GlobalInteraction::ExecuteSideEffect(int sideEffectId, mitk::StateEve
 			//inbetween the edit has to be done to the Object. Next StateMachine!!!
 			//this event generation can be done in the next StateMachine!
 			mitk::StateEvent* nextStateEvent = GenerateEmptyStateEvent(202);
-			ok = HandleEvent(nextStateEvent);
+			ok = HandleEvent(nextStateEvent, groupEventId, objectEventId);
 		}
 		break;
 	case INITEDITGROUP:
@@ -81,7 +81,7 @@ bool mitk::GlobalInteraction::ExecuteSideEffect(int sideEffectId, mitk::StateEve
 			//inbetween the edit has to be done to the Group. Next StateMachine!!!
 			//this event generation can be done in the next StateMachine!
 			mitk::StateEvent* nextStateEvent = GenerateEmptyStateEvent(202);
-			ok = HandleEvent(nextStateEvent);
+			ok = HandleEvent(nextStateEvent, groupEventId, objectEventId);
 		}
 		break;
 	case ADDPOINT:
@@ -102,18 +102,19 @@ bool mitk::GlobalInteraction::ExecuteSideEffect(int sideEffectId, mitk::StateEve
 			//208 for neutral
 			//209 for group selected
 			mitk::StateEvent* nextStateEvent = GenerateEmptyStateEvent(208);
-			ok = HandleEvent(nextStateEvent);
+			ok = HandleEvent(nextStateEvent, groupEventId, objectEventId);
 		}
 		break;
 	case FINISHOBJECT:
 		std::cout<<"FinishObject"<<std::endl;
 		{
 			mitk::StateEvent* nextStateEvent = GenerateEmptyStateEvent(202);
-			ok = HandleEvent(nextStateEvent);
+			ok = HandleEvent(nextStateEvent, IncCurrGroupEventId(), objectEventId);
 		}
 		break;
 	case FINISHGROUP:
 		std::cout<<"FinishGroup"<<std::endl;
+		//don't forget to increase GroiupEventId
 		ok = true;
 		break;
 	case SEARCHOBJECT:
@@ -124,7 +125,7 @@ bool mitk::GlobalInteraction::ExecuteSideEffect(int sideEffectId, mitk::StateEve
 			//204 for object picked
 			//205 for same object picked
 			mitk::StateEvent* nextStateEvent = GenerateEmptyStateEvent(204);//object picked
-			ok = HandleEvent(nextStateEvent);
+			ok = HandleEvent(nextStateEvent, groupEventId, objectEventId);
 		}
 		break;
 	case SEARCHGROUP:
@@ -133,7 +134,7 @@ bool mitk::GlobalInteraction::ExecuteSideEffect(int sideEffectId, mitk::StateEve
 			//203 for neutral; no group found
 			//204 for edit group; group found
 			mitk::StateEvent* nextStateEvent = GenerateEmptyStateEvent(203);
-			ok = HandleEvent(nextStateEvent);
+			ok = HandleEvent(nextStateEvent, groupEventId, objectEventId);
 		}
 		break;
 	case SEARCHANOTHEROBJECT:
@@ -144,7 +145,7 @@ bool mitk::GlobalInteraction::ExecuteSideEffect(int sideEffectId, mitk::StateEve
 			//206 for no new and only one selected
 			//207 for No New but more than 1 selected
 			mitk::StateEvent* nextStateEvent = GenerateEmptyStateEvent(206);
-			ok = HandleEvent(nextStateEvent);
+			ok = HandleEvent(nextStateEvent, groupEventId, objectEventId);
 		}
 		break;
 	case SELECTPICKEDOBJECT:
@@ -181,7 +182,6 @@ bool mitk::GlobalInteraction::ExecuteSideEffect(int sideEffectId, mitk::StateEve
 	}
 
 /*
-now ask all the other StateMachines!
 ToDo:
 List of all StateMachines/Interactables that are beneath 
 the focused BaseRenderer (Focus-StateMachine).
@@ -189,13 +189,14 @@ register at DataTree, that if anything changes, the list can be refreshed.
 If a new object is generated here, the new object flows into the m_SelectedElements
 and the Focus changes.
 */
+	//Quickimplementation; is to be changed with List from DataTree
+	//send the event to all in List
+	for (StateMachineListIter it = m_LocalStateMachines.begin(); it != m_LocalStateMachines.end(); it++)
+	{
+        ok = (*it)->HandleEvent(stateEvent, groupEventId, objectEventId);
+	}
 
-//Quickimplementation
-	//ask if the statemachine of that roi can do anything with that event.
-    if(m_Roi!=NULL)
-	    ok = m_Roi->HandleEvent(stateEvent);
-
-	return ok;
+	return true;
 }
 
 //##ModelId=3EDCAECA0194
@@ -205,8 +206,27 @@ void mitk::GlobalInteraction::ExecuteOperation(mitk::Operation* operation)
 	operation->Execute();
 }
 
+/*
 //##ModelId=3EDDD76302BB
 void mitk::GlobalInteraction::SetRoi(Roi* roi)
 {
 	m_Roi = roi;
+}
+*/
+
+//##ModelId=3EF099E90065
+void mitk::GlobalInteraction::AddStateMachine(mitk::StateMachine* stateMachine)
+{
+	m_LocalStateMachines.push_back(stateMachine);
+}
+
+//##ModelId=3EF099E900D2
+bool mitk::GlobalInteraction::RemoveStateMachine(mitk::StateMachine* stateMachine)
+{
+	// Try find  
+	StateMachineListIter position = std::find(m_LocalStateMachines.begin(), m_LocalStateMachines.end(),stateMachine);
+	if (position == m_LocalStateMachines.end())
+		return false;
+	position = m_LocalStateMachines.erase(position);
+	return true;
 }

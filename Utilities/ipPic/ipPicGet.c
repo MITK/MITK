@@ -52,6 +52,9 @@
  *   reads a PicFile from disk
  *
  * $Log$
+ * Revision 1.13  2002/02/27 09:02:56  andre
+ * zlib changes
+ *
  * Revision 1.12  2002/02/27 08:54:43  andre
  * zlib changes
  *
@@ -108,6 +111,7 @@ ipPicFile_t
 _ipPicOpenPicFileIn( char *path )
 {
   ipPicFile_t infile;
+
   if( path == NULL )
     infile = stdin;
   else if( strcmp(path, "stdin") == 0 )
@@ -130,7 +134,7 @@ _ipPicOpenPicFileIn( char *path )
 ipPicDescriptor *
 ipPicGet( char *infile_name, ipPicDescriptor *pic )
 {
-  FILE *infile;
+  ipPicFile_t infile;
 
   ipPicTag_t tag_name;
   ipUInt4_t len;

@@ -52,6 +52,9 @@
  *   reads a slice from a PicFile
  *
  * $Log$
+ * Revision 1.6  2002/02/27 09:02:56  andre
+ * zlib changes
+ *
  * Revision 1.5  2002/02/27 08:54:43  andre
  * zlib changes
  *
@@ -85,7 +88,7 @@
 
 ipPicDescriptor *ipPicGetSlice( char *infile_name, ipPicDescriptor *pic, ipUInt4_t slice )
 {
-  FILE *infile;
+  ipPicFile_t infile;
 
   ipPicTag_t tag_name;
   ipUInt4_t len;

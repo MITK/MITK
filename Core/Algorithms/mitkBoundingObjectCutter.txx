@@ -114,7 +114,7 @@ void BoundingObjectCutter<TPixel>::GenerateData() {
   start[2] = min[2];
   regionOfInterest.SetIndex(start);
   typename ItkImageType::SizeType size;  
-  ItkImageType::SizeType inputSize = inputItkImage->GetLargestPossibleRegion().GetSize();
+  typename ItkImageType::SizeType inputSize = inputItkImage->GetLargestPossibleRegion().GetSize();
   if ( inputSize[0] < max[0] )
     size[0] = inputSize[0] - min[0];
   else 
@@ -137,14 +137,14 @@ void BoundingObjectCutter<TPixel>::GenerateData() {
   //CastToItkImage(outputImage, outputItkImage);
 
 
-  ItkImageType::Pointer outputItkImage = ItkImageType::New();
+  typename ItkImageType::Pointer outputItkImage = ItkImageType::New();
   ItkRegionType outputRegion;
   outputRegion.SetSize(size);
-  ItkImageType::IndexType origin;
+  typename ItkImageType::IndexType origin;
   origin.Fill(0);
   outputRegion.SetIndex(origin);
   outputItkImage->SetRegions(outputRegion);
-  ItkImageType::SpacingType itkSpacing;
+  typename ItkImageType::SpacingType itkSpacing;
   itkSpacing[0] = spacing[0];
   itkSpacing[1] = spacing[1];
   itkSpacing[2] = spacing[2];
@@ -158,8 +158,8 @@ void BoundingObjectCutter<TPixel>::GenerateData() {
   m_OutsidePixelCount = 0;
   m_InsidePixelCount = 0;
   mitk::Point3D p;
-  ItkImageType::IndexType indexIn;
-  ItkImageType::IndexType indexOut;
+  typename ItkImageType::IndexType indexIn;
+  typename ItkImageType::IndexType indexOut;
 
 
 

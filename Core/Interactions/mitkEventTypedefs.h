@@ -27,8 +27,8 @@ typedef DisplayPositionEvent MouseEvent;
 class KeyEvent : public BaseEvent 
 {
   int m_Ascii;
-  int m_Key;
   std::string m_Text;
+  int m_Key;
 public:
   KeyEvent(int type, int key, int ascii, int state, const std::string & text = "", bool autorep = false, unsigned short count = 1, int x=0, int y=0, int globalX=0, int globalY=0 )
     : BaseEvent(type,state,x,y,globalX,globalY) ,m_Ascii(ascii),m_Text(text),m_Key(key)

@@ -94,6 +94,7 @@ main (int argc, char **argv)
 	ipFloat8_t      gv;                   /* new greyvalue                */
 	ipFloat8_t      s_der;                /* standard derivation          */
 	ipFloat8_t      *sc;                  /* standard derivation          */
+	int             *perm;                /* permutation vector for transpose */
 	ipFloat8_t      *grav;                /* center of gravity            */
 	ipFloat8_t      *inertia, *ev;
 	ipUInt4_t       *hist;                /* greylevel histogram          */
@@ -110,7 +111,7 @@ main (int argc, char **argv)
 		printf("Usage: ipFunc operation infile outfile parameterlist\n");
         printf(" Arithmetic:   AddC, AddI, DivC, DivI, MultC, MultI, SubC, SubI\n");
         printf(" Logic:        And, Not, Or\n");
-        printf(" Geometric:    Refl, Rotate, Scale, Window, WindowR\n");
+        printf(" Geometric:    Refl, Rotate, Scale, Transpose, Window, WindowR\n");
         printf(" Point:        Equal, Exp, Inv, LevWin, LN, Log, Norm, NormY\n");
         printf("               Pot, Select, SelInv, SelMM, Sqrt, Thresh, ZeroCr\n");
         printf(" Locale:       Canny, Conv, GaussF, Grad, Laplace, Mean\n");
@@ -545,6 +546,25 @@ main (int argc, char **argv)
 		pic_new = ipFuncScale ( pic_old, sc, keep );
 		pic_ret = NULL;
 		free(sc);
+	}
+    else if ( strcasecmp ( operation, "Transpose" ) == 0 )
+	{
+		if ( ( (unsigned int) argc == 2 ) || 
+			( ( (unsigned int) argc == 3 ) && ( strcasecmp (argv[2], "-h") == 0 ) ) ||
+			( (unsigned int) argc != pic_old->dim + 4 ) )  
+		{
+			printf("Usage: ipFunc Transpose infile outfile perm_1 ... perm_n  \n");
+			printf("  perm_1 ... perm_n must be a permutation vector, e.g., 4 2 1 3 \n" );
+			exit(1);
+		}
+		perm  = malloc ( _ipPicNDIM * sizeof ( ipFloat8_t ) );
+		for ( i = 0; i < pic_old->dim; i++ )
+		{
+			sscanf  ( argv[4+i], "%d", &perm[i] );
+		}
+		pic_new = ipFuncTranspose ( pic_old, NULL, perm );
+		pic_ret = NULL;
+		free(perm);
 	}
     else if ( strcasecmp ( operation, "Roberts" ) == 0 )
 	{

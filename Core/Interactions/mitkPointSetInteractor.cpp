@@ -150,7 +150,6 @@ bool mitk::PointSetInteractor::ExecuteAction( Action* action, mitk::StateEvent c
       //so a extra Action that checks the operationtype has been added.
       return false;
 
-		//converting from Point3D to itk::Point
 		mitk::Point3D itkPoint;
 		itkPoint = posEvent->GetWorldPosition();
 
@@ -266,7 +265,6 @@ bool mitk::PointSetInteractor::ExecuteAction( Action* action, mitk::StateEvent c
 	  mitk::PositionEvent const  *posEvent = dynamic_cast <const mitk::PositionEvent *> (stateEvent->GetEvent());
 		if (posEvent != NULL)
 		{
-			//converting from Point3D to itk::Point
 			mitk::Point3D itkPoint;
 			itkPoint = posEvent->GetWorldPosition();
 
@@ -393,7 +391,6 @@ bool mitk::PointSetInteractor::ExecuteAction( Action* action, mitk::StateEvent c
 	//		mitk::PositionEvent const  *posEvent = dynamic_cast <const mitk::PositionEvent *> (stateEvent->GetEvent());
 	//		if (posEvent == NULL) return false;
 
-	//		//converting from Point3D to itk::Point
 	//		mitk::Point3D itkPoint;
 	//		itkPoint = posEvent->GetWorldPosition();
 
@@ -418,8 +415,6 @@ bool mitk::PointSetInteractor::ExecuteAction( Action* action, mitk::StateEvent c
       mitk::PositionEvent const  *posEvent = dynamic_cast <const mitk::PositionEvent *> (stateEvent->GetEvent());
 			if (posEvent != NULL)
       {
-
-			  //converting from Point3D to itk::Point
         mitk::Point3D worldPoint = posEvent->GetWorldPosition();
 
 			  int position = pointSet->SearchPoint(worldPoint, m_Precision);
@@ -468,7 +463,7 @@ bool mitk::PointSetInteractor::ExecuteAction( Action* action, mitk::StateEvent c
 			    if (posEvent == NULL)
             return false;
           mitk::Point3D worldPoint = posEvent->GetWorldPosition();
-          //converting from Point3D to itk::Point
+
           position = pointSet->SearchPoint(worldPoint, m_Precision);
 
 			    if (position>=0)
@@ -549,7 +544,6 @@ bool mitk::PointSetInteractor::ExecuteAction( Action* action, mitk::StateEvent c
       mitk::PositionEvent const  *posEvent = dynamic_cast <const mitk::PositionEvent *> (stateEvent->GetEvent());
 			if (posEvent == NULL) return false;
 
-			//converting from Point3D to itk::Point
 			mitk::Point3D itkPoint;
 			itkPoint = posEvent->GetWorldPosition();
 
@@ -584,7 +578,6 @@ bool mitk::PointSetInteractor::ExecuteAction( Action* action, mitk::StateEvent c
 			if (posEvent == NULL) 
         return false;
 
-			//converting from Point3D to itk::Point
 			mitk::Point3D itkPoint;
 			itkPoint = posEvent->GetWorldPosition();
 

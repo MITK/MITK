@@ -31,8 +31,14 @@ void mitk::SlicedData::UpdateOutputInformation()
 void mitk::SlicedData::SetRequestedRegionToLargestPossibleRegion()
 {
   m_UseLargestPossibleRegion = true;
-  m_RequestedRegion.SetIndex((SlicedData::RegionType::IndexType &)GetGeometry()->GetLargestPossibleRegion().GetIndex());
-  m_RequestedRegion.SetSize((SlicedData::RegionType::SizeType &)GetGeometry()->GetLargestPossibleRegion().GetSize());
+  int i;
+  const Geometry3D::RegionType::IndexType & index = GetGeometry()->GetLargestPossibleRegion().GetIndex();
+  const Geometry3D::RegionType::SizeType & size = GetGeometry()->GetLargestPossibleRegion().GetSize();
+  for(i=0;i<4;++i)
+  {
+    m_RequestedRegion.SetIndex(i, index[i]);
+    m_RequestedRegion.SetSize(i, size[i]);
+  }
   m_RequestedRegion.SetIndex(4, 0);
   m_RequestedRegion.SetSize(4, m_NumberOfChannels);
 }

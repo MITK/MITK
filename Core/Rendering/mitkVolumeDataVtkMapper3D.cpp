@@ -32,9 +32,6 @@ return static_cast<const mitk::Image*> ( GetData() );
 void mitk::VolumeDataVtkMapper3D::GenerateData()
 {
 
-
-
-
 }
 
 
@@ -46,18 +43,15 @@ void mitk::VolumeDataVtkMapper3D::GenerateOutputInformation()
 mitk::VolumeDataVtkMapper3D::VolumeDataVtkMapper3D()
 {
   m_VtkVolumeMapper = vtkVolumeRayCastMapper::New();
-vtkVolumeRayCastCompositeFunction* compositeFunction = vtkVolumeRayCastCompositeFunction::New();
+  vtkVolumeRayCastCompositeFunction* compositeFunction = vtkVolumeRayCastCompositeFunction::New();
   m_VtkVolumeMapper->SetVolumeRayCastFunction(compositeFunction);
   vtkFiniteDifferenceGradientEstimator* gradientEstimator = 
 	vtkFiniteDifferenceGradientEstimator::New();
   m_VtkVolumeMapper->SetGradientEstimator(gradientEstimator);
   gradientEstimator->Delete();
-//  m_Prop3D
   m_Volume = vtkVolume::New();
-//  m_VtkVolumeMapper->SetInput(img->GetVtkImageData()); 
   m_Volume->SetMapper( m_VtkVolumeMapper );
- //  m_Volume->SetProperty(volumeProperty); 
- m_Prop3D = m_Volume;
+  m_Prop3D = m_Volume;
   m_Prop3D->Register(NULL); 
 
 }
@@ -97,65 +91,58 @@ void mitk::VolumeDataVtkMapper3D::Update(mitk::BaseRenderer* renderer)
   if (m_Prop3D) {
     m_Prop3D->VisibilityOn();
   }
-  // FIXME
-  mitk::Image* img = const_cast<mitk::Image*>(GetInput());
-// dynamic_cast<mitk::Image*>(GetData());
+  const mitk::Image* img = (GetInput());
   if (img == NULL) {
-    std::cout << "Image == NULL" << std::endl;
+    itkWarningMacro("Image == NULL")
   } else {   
-  vtkVolumeProperty* volumeProperty = vtkVolumeProperty::New();
-  vtkPiecewiseFunction *opacityTransferFunction, *gradientTransferFunction;
-  vtkColorTransferFunction* colorTransferFunction;
+    vtkVolumeProperty* volumeProperty = vtkVolumeProperty::New();
+    vtkPiecewiseFunction *opacityTransferFunction, *gradientTransferFunction;
+    vtkColorTransferFunction* colorTransferFunction;
 
-  opacityTransferFunction  = vtkPiecewiseFunction::New();
-  colorTransferFunction    = vtkColorTransferFunction::New();
-  mitk::LevelWindow levelWindow;
-  int lw_min,lw_max;
-  if (GetLevelWindow(levelWindow,renderer)) {
-    std::cout << "level window found" << std::endl;
-    lw_min = (int)levelWindow.GetMin();
-    lw_max = (int)levelWindow.GetMax();
-  } else {
-    lw_min = 0;
-    lw_max = 255;
-  }
+    opacityTransferFunction  = vtkPiecewiseFunction::New();
+    colorTransferFunction    = vtkColorTransferFunction::New();
+    mitk::LevelWindow levelWindow;
+    int lw_min,lw_max;
+    if (GetLevelWindow(levelWindow,renderer)) {
+      lw_min = (int)levelWindow.GetMin();
+      lw_max = (int)levelWindow.GetMax();
+    } else {
+      lw_min = 0;
+      lw_max = 255;
+    }
 
-  opacityTransferFunction->AddPoint( lw_min, 0.0 );
-  opacityTransferFunction->AddPoint( lw_max, 0.9 );
-//  opacityTransferFunction->AddPoint( max+offset, 0.9 );
-  opacityTransferFunction->ClampingOff();
-  
-  colorTransferFunction->AddRGBPoint( lw_min, 1.0, 1.0, 1.0 );
-  colorTransferFunction->AddRGBPoint( lw_max, 1.0, 1.0, 1.0 );
-//  colorTransferFunction->AddRGBPoint( max+offset, 1.0, 1.0, 1.0 );
-  colorTransferFunction->ClampingOff();
- 
-  volumeProperty->SetColor( colorTransferFunction );
-  volumeProperty->SetScalarOpacity( opacityTransferFunction ); 
-  volumeProperty->ShadeOn();
-  volumeProperty->SetDiffuse(0.7);
-  volumeProperty->SetAmbient(0.01);
+    opacityTransferFunction->AddPoint( lw_min, 0.0 );
+    opacityTransferFunction->AddPoint( lw_max, 0.9 );
+    opacityTransferFunction->ClampingOff();
+    
+    colorTransferFunction->AddRGBPoint( lw_min, 1.0, 1.0, 1.0 );
+    colorTransferFunction->AddRGBPoint( lw_max, 1.0, 1.0, 1.0 );
+    colorTransferFunction->ClampingOff();
+   
+    volumeProperty->SetColor( colorTransferFunction );
+    volumeProperty->SetScalarOpacity( opacityTransferFunction ); 
+    volumeProperty->ShadeOn();
+    volumeProperty->SetDiffuse(0.7);
+    volumeProperty->SetAmbient(0.01);
 
-  m_Volume = vtkVolume::New();
-  m_VtkVolumeMapper->SetInput(img->GetVtkImageData()); 
-  m_Volume->SetMapper( m_VtkVolumeMapper );
-  m_Volume->SetProperty(volumeProperty); 
-  
-  m_Prop3D = m_Volume;
-  mitk::OpenGLRenderer* openGlRenderer = dynamic_cast<mitk::OpenGLRenderer*>(renderer);
-  assert(openGlRenderer);
-  vtkCallbackCommand* cbc = vtkCallbackCommand::New(); 
-  cbc->SetCallback(mitk::VolumeDataVtkMapper3D::AbortCallback); 
-  vtkRenderWindow* vtkRendWin;
-  vtkRendWin = (vtkRenderWindow*)openGlRenderer->GetVtkRenderWindow();
-  vtkRendWin->AddObserver(vtkCommand::AbortCheckEvent,cbc); 
-  // mitk::VolumeData::Pointer input  = const_cast<mitk::VolumeData*>(this->GetInput());
+    m_Volume = vtkVolume::New();
+    // FIXME: const_cast; maybe GetVtkImageData can be made const by using volatile
+    m_VtkVolumeMapper->SetInput(const_cast<mitk::Image*>(img)->GetVtkImageData()); 
+    m_Volume->SetMapper( m_VtkVolumeMapper );
+    m_Volume->SetProperty(volumeProperty); 
+    
+    m_Prop3D = m_Volume;
 
-  // m_VtkPolyDataMapper->SetInput(input->GetVtkPolyData());
+    // now add an AbortCheckEvent callback for cancelling the rendering 
+    mitk::OpenGLRenderer* openGlRenderer = dynamic_cast<mitk::OpenGLRenderer*>(renderer);
+    assert(openGlRenderer);
+    vtkCallbackCommand* cbc = vtkCallbackCommand::New(); 
+    cbc->SetCallback(mitk::VolumeDataVtkMapper3D::AbortCallback); 
+    vtkRenderWindow* vtkRendWin;
+    vtkRendWin = (vtkRenderWindow*)openGlRenderer->GetVtkRenderWindow();
+    vtkRendWin->AddObserver(vtkCommand::AbortCheckEvent,cbc); 
 
-  //apply properties read from the PropertyList
-
-  StandardUpdate();
+    StandardUpdate();
   }
 }
 
@@ -168,5 +155,3 @@ void mitk::VolumeDataVtkMapper3D::ApplyProperties(vtkActor* actor, mitk::BaseRen
 {
 
 }
-
-

@@ -14,75 +14,75 @@ namespace mitk {
 //## @ingroup Data
 class ImageDataItem : public itk::LightObject
 {
-  public:
-	mitkClassMacro(ImageDataItem, itk::LightObject);
-
-    //##ModelId=3E0B7882024B
-	ImageDataItem(const ImageDataItem& aParent, unsigned int dimension, int offset = 0);
-
-    //##ModelId=3E0B78820287
-	~ImageDataItem();
-    //##ModelId=3E159C240213
-    ImageDataItem(const mitk::PixelType& type, unsigned int dimension, unsigned int *dimensions);
-    //##ModelId=3E19F8F00098
-    void* GetData() const
-    {
-        return m_Data;
-    }
-    //##ModelId=3E19F8F00188
-    bool IsComplete() const
-    {
-        return m_IsComplete;
-    }
-    //##ModelId=3E1A02A10244
-    void SetComplete(bool complete)
-    {
-        m_IsComplete = complete;
-    }
-    //##ModelId=3E19F8F0025A
-    int GetOffset() const
-    {
-        return m_Offset;
-    }
-    //##ModelId=3E19F8F0032C
-    ImageDataItem::ConstPointer GetParent() const
-    {
-        return m_Parent;
-    }
-    //##ModelId=3E19F8F1002B
-    ipPicDescriptor* GetPicDescriptor() const
-    {
-        return m_PicDescriptor;
-    }
-    //##ModelId=3E19F8F10111
-    vtkImageData* GetVtkImageData() const
-    {
-        if(m_VtkImageData==NULL)
-            ConstructVtkImageData();
-        return m_VtkImageData;
-    }
-    //##ModelId=3E33F08A03B8
-    virtual void ConstructVtkImageData() const;
-
-    //##ModelId=3E70F51001F2
-    virtual void Modified() const;
-
-  protected:
-    //##ModelId=3D7B42E90201
-    void* m_Data;
-    //##ModelId=3E0B487201C0
-    ipPicDescriptor* m_PicDescriptor;
-    //##ModelId=3E0B488C0380
-    mutable vtkImageData* m_VtkImageData;
-    //##ModelId=3E0B89080207
-	int m_Offset;
-    //##ModelId=3E156DC500D4
-	bool m_IsComplete;
-
-  private:
-    //##ModelId=3D7B425E0337
-    ImageDataItem::ConstPointer m_Parent;
-
+public:
+  mitkClassMacro(ImageDataItem, itk::LightObject);
+  
+  //##ModelId=3E0B7882024B
+  ImageDataItem(const ImageDataItem& aParent, unsigned int dimension, int offset = 0);
+  
+  //##ModelId=3E0B78820287
+  ~ImageDataItem();
+  //##ModelId=3E159C240213
+  ImageDataItem(const mitk::PixelType& type, unsigned int dimension, unsigned int *dimensions);
+  //##ModelId=3E19F8F00098
+  void* GetData() const
+  {
+    return m_Data;
+  }
+  //##ModelId=3E19F8F00188
+  bool IsComplete() const
+  {
+    return m_IsComplete;
+  }
+  //##ModelId=3E1A02A10244
+  void SetComplete(bool complete)
+  {
+    m_IsComplete = complete;
+  }
+  //##ModelId=3E19F8F0025A
+  int GetOffset() const
+  {
+    return m_Offset;
+  }
+  //##ModelId=3E19F8F0032C
+  ImageDataItem::ConstPointer GetParent() const
+  {
+    return m_Parent;
+  }
+  //##ModelId=3E19F8F1002B
+  ipPicDescriptor* GetPicDescriptor() const
+  {
+    return m_PicDescriptor;
+  }
+  //##ModelId=3E19F8F10111
+  vtkImageData* GetVtkImageData() const
+  {
+    if(m_VtkImageData==NULL)
+      ConstructVtkImageData();
+    return m_VtkImageData;
+  }
+  //##ModelId=3E33F08A03B8
+  virtual void ConstructVtkImageData() const;
+  
+  //##ModelId=3E70F51001F2
+  virtual void Modified() const;
+  
+protected:
+  //##ModelId=3D7B42E90201
+  void* m_Data;
+  //##ModelId=3E0B487201C0
+  ipPicDescriptor* m_PicDescriptor;
+  //##ModelId=3E0B488C0380
+  mutable vtkImageData* m_VtkImageData;
+  //##ModelId=3E0B89080207
+  int m_Offset;
+  //##ModelId=3E156DC500D4
+  bool m_IsComplete;
+  
+private:
+  //##ModelId=3D7B425E0337
+  ImageDataItem::ConstPointer m_Parent;
+  
 };
 
 } // namespace mitk

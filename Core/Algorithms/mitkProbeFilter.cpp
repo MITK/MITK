@@ -64,7 +64,6 @@ void mitk::ProbeFilter::SetSource(const mitk::Image *source)
 
 void mitk::ProbeFilter::GenerateOutputInformation()
 {
-  unsigned int idx = 0;
   mitk::Surface::ConstPointer input  = this->GetInput();	
   mitk::Image::ConstPointer source = this->GetSource();	
   mitk::Surface::Pointer output = this->GetOutput();

@@ -114,7 +114,7 @@
             <cstring>fileOpenAction</cstring>
         </property>
         <property name="iconSet">
-            <iconset>fileopen</iconset>
+            <iconset></iconset>
         </property>
         <property name="text">
             <string>Open</string>
@@ -470,6 +470,7 @@
     <slot>helpIndex()</slot>
     <slot>helpContents()</slot>
     <slot>helpAbout()</slot>
+    <slot>initWidgets( mitk::DataTreeNode::Pointer node )</slot>
 </slots>
 <functions>
     <function access="protected">fileOpen( const char * fileName )</function>
@@ -478,6 +479,7 @@
     <function>initialize()</function>
     <function>initializeFunctionality()</function>
     <function>initializeQfm()</function>
+    <function returnType="mitk::DataTree *">getDataTree()</function>
 </functions>
 <pixmapinproject/>
 <layoutdefaults spacing="6" margin="11"/>

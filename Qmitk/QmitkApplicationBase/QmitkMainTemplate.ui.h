@@ -78,15 +78,6 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
 
             reader->SetFileName(fileName);
 
-            mitk::BoundingBox::ConstPointer bb = reader->GetOutput()->GetGeometry()->GetBoundingBox();
-            const mitk::BoundingBox::BoundsArrayType bounds = bb->GetBounds();
-
-            //sliderYZ->setMinValue(bounds[0]);
-            //sliderYZ->setMaxValue(bounds[1]);
-            //sliderXZ->setMinValue(bounds[2]);
-            //sliderXZ->setMaxValue(bounds[3]);
-            //sliderXY->setMinValue(bounds[4]);
-            //sliderXY->setMaxValue(bounds[5]);
 
             mitk::DataTreeIterator* it=tree->inorderIterator();
 
@@ -94,27 +85,8 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
             node->SetData(reader->GetOutput());
             it->add(node); 
 
-            //// XY
-            initWidget(it,
-                mitkMultiWidget->mitkWidget1,
-                Vector3f(bounds[0],bounds[2],bounds[4]),
-                Vector3f(bounds[1],bounds[2],bounds[4]),
-                Vector3f(bounds[0],bounds[3],bounds[4])
-                );
-
-            // YZ
-            initWidget(it,mitkMultiWidget->mitkWidget2,
-                Vector3f(bounds[0],bounds[2],bounds[4]),
-                Vector3f(bounds[0],bounds[3],bounds[4]),
-                Vector3f(bounds[0],bounds[2],bounds[5])
-                );
-            // XZ
-            initWidget(it,
-                mitkMultiWidget->mitkWidget3,
-                Vector3f(bounds[0],bounds[2],bounds[4]),
-                Vector3f(bounds[1],bounds[2],bounds[4]),
-                Vector3f(bounds[0],bounds[2],bounds[5])
-                );
+	initWidgets(node);
+	    
             //mitk::DataTreeNode::Pointer node2=mitk::DataTreeNode::New();
             //node2->SetData(mitkMultiWidget->mitkWidget3->GetRenderer()->GetWorldGeometry2DData());
             //it->add(node2);
@@ -371,4 +343,51 @@ void QmitkMainTemplate::initializeQfm()
 
 		mitkMultiWidget = new QmitkStdMultiWidget(qfm->getDefaultMain(), "QmitkMainTemplate::QmitkStdMultiWidget");
 
+}
+
+
+mitk::DataTree* QmitkMainTemplate::getDataTree()
+{
+    return tree;
+}
+
+
+void QmitkMainTemplate::initWidgets( mitk::DataTreeNode::Pointer node )
+{
+           mitk::DataTreeIterator* it=tree->inorderIterator();
+	   
+	printf("\nrequesting boundingbox\n");   
+            mitk::BoundingBox::ConstPointer bb = node->GetData()->GetGeometry()->GetBoundingBox();
+	  printf("boundsArrayType\n");
+            const mitk::BoundingBox::BoundsArrayType bounds = bb->GetBounds();
+	printf("\nboundingbox\n");   
+
+            //sliderYZ->setMinValue(bounds[0]);
+            //sliderYZ->setMaxValue(bounds[1]);
+            //sliderXZ->setMinValue(bounds[2]);
+            //sliderXZ->setMaxValue(bounds[3]);
+            //sliderXY->setMinValue(bounds[4]);
+            //sliderXY->setMaxValue(bounds[5]);
+            //// XY
+            initWidget(it,
+                mitkMultiWidget->mitkWidget1,
+                Vector3f(bounds[0],bounds[2],bounds[4]),
+                Vector3f(bounds[1],bounds[2],bounds[4]),
+                Vector3f(bounds[0],bounds[3],bounds[4])
+                );
+	printf("\nw1 init\n");   
+
+            // YZ
+            initWidget(it,mitkMultiWidget->mitkWidget2,
+                Vector3f(bounds[0],bounds[2],bounds[4]),
+                Vector3f(bounds[0],bounds[3],bounds[4]),
+                Vector3f(bounds[0],bounds[2],bounds[5])
+                );
+            // XZ
+            initWidget(it,
+                mitkMultiWidget->mitkWidget3,
+                Vector3f(bounds[0],bounds[2],bounds[4]),
+                Vector3f(bounds[1],bounds[2],bounds[4]),
+                Vector3f(bounds[0],bounds[2],bounds[5])
+                );
 }

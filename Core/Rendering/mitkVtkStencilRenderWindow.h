@@ -1,0 +1,52 @@
+/*=========================================================================
+
+Program:   Medical Imaging & Interaction Toolkit
+Module:    $RCSfile$
+Language:  C++
+Date:      $Date$
+Version:   $Revision$
+
+Copyright (c) German Cancer Research Center, Division of Medical and
+Biological Informatics. All rights reserved.
+See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
+
+This software is distributed WITHOUT ANY WARRANTY; without even
+the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE.  See the above copyright notices for more information.
+
+=========================================================================*/
+
+
+#ifndef MITKVTKSTENCILRENDERWINDOW_H_HEADER_INCLUDED
+#define MITKVTKSTENCILRENDERWINDOW_H_HEADER_INCLUDED
+
+#include "mitkVtkRenderWindow.h"
+
+namespace mitk
+{
+//##Documentation
+//##@brief 
+//##@ingroup Rendering  
+//##These RenderWindows are configured for the use with the 
+//##  OpenGL stencil buffer. Thus VTK has to be initialized according to the operating system,
+//##  developers have to derive this class and care about the initialisation of the OpenGL stencil buffer.
+//##  By default stencil buffer is not supported by vtk nor by qt.
+class VtkStencilRenderWindow : public VtkRenderWindow
+{
+public:
+  vtkTypeMacro(VtkStencilRenderWindow,VtkRenderWindow);
+  itkTypeMacro(VtkStencilRenderWindow,VtkRenderWindow);
+
+  // Description:
+  // overwrites the superclass method to also clear stencil buffer
+  virtual void Render();
+
+protected:
+  VtkStencilRenderWindow();
+  virtual ~VtkStencilRenderWindow(){};
+};
+
+}
+
+#endif /* MITKVTKSTENCILRENDERWINDOW_H_HEADER_INCLUDED */
+

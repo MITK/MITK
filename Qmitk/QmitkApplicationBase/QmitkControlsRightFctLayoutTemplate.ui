@@ -81,6 +81,7 @@
 </widget>
 <includes>
     <include location="global" impldecl="in implementation">qvaluelist.h</include>
+    <include location="local" impldecl="in implementation">QmitkControlsRightFctLayoutTemplate.ui.h</include>
 </includes>
 <functions>
     <function access="private" specifier="non virtual">init()</function>

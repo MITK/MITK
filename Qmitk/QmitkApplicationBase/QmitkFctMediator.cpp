@@ -47,6 +47,8 @@ void QmitkFctMediator::initialize(QWidget *aLayoutTemplate)
         hlayout->setAutoAdd(true);
         m_MainStack = new QWidgetStack(w, "QmitkFctMediator::mainStack");
 
+        m_MainStack->setSizePolicy( QSizePolicy( QSizePolicy::Minimum, QSizePolicy::Minimum, 1, 0, m_MainStack->sizePolicy().hasHeightForWidth()) );
+
         m_DefaultMain = new QWidget(m_MainStack,"QmitkFctMediator::m_DefaultMain");
         m_MainStack->addWidget(m_DefaultMain);
 
@@ -58,6 +60,7 @@ void QmitkFctMediator::initialize(QWidget *aLayoutTemplate)
 		QHBoxLayout* hlayout=new QHBoxLayout(w);
         hlayout->setAutoAdd(true);
         m_ControlStack = new QWidgetStack(w, "QmitkFctMediator::controlStack");
+        m_ControlStack->setSizePolicy( QSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum, 0, 1, m_ControlStack->sizePolicy().hasHeightForWidth()) );
     }
 
     if((w=static_cast<QWidget*>(aLayoutTemplate->child("ButtonMenuParent", "QButtonGroup")))!=NULL)

@@ -30,10 +30,12 @@ typedef enum EUndoModels{LIMITEDLINEARUNDO=10, TREEUNDO=20};
 //## in the >XML-File< AND in the >code<
 typedef enum EConditions
 {
+  StSELECT = 1003,
+  StDESELECT = 1004,
   StNO = 203,
   StYES = 204,
-  StSMALLERNMINUS1 = 220,
-  StLARGERNMINUS1 = 221,
+  StSMALLERNMINUS1 = 1010,
+  StLARGERNMINUS1 = 1011
 };
 
 //Constants for EventIds
@@ -77,34 +79,49 @@ typedef enum EEventIds
 };
 
 //##Constants for Operations
+//## xomments are always examples of the usage
 typedef enum EOperations
 {
   OpNOTHING = 0,
   OpTEST = 1,
+  OpNEWCELL = 10, //add a new cell
   OpADD = 100, //add a point
-	OpADDLINE = 1001, //add a line
+  OpADDLINE = 1001, //add a line
   OpINSERT = 200, //insert a point at position
   OpINSERTLINE = 201, //insert a line at position
+  OpINSERTPOINT = 202,
+  OpCLOSECELL = 250, //close a cell (to a polygon)
+  OpOPENCELL = 251, //close a cell (to a polygon)
   OpMOVE = 300, //move a point
   OpMOVELINE = 301, //move a line
   OpREMOVE = 400, //remove a point at position
   OpREMOVELINE = 401, //remove a line at position
   OpREMOVECELL = 402, //remove a cell
+  OpREMOVEPOINT = 403,
   OpDELETE = 500, //delete
-  OpUNDELETE = 501, //undo the delete
+  OpDELETELINE = 501, //delete the last line in a cell
+  OpUNDELETE = 502,
+  OpDELETECELL = 505,
   OpSTATECHANGE = 600, //change a state
   OpTERMINATE = 666, //change a state
   OpSELECTPOINT = 700,
   OpSELECTLINE = 701,
+  OpSELECTCELL = 702,
   OpDESELECTPOINT = 800,
   OpDESELECTLINE = 801,
+  OpDESELECTCELL = 802,
   OpNAVIGATE = 900,
   OpZOOM = 1000,
   OpSCALE = 1100,
-  OpROTATE = 1200
+  OpROTATE = 1200,
+  OpSETPOINTTYPE = 1210,
+  OpMODECHANGE = 1500
 };
 
 //##Constants for EventMapping...
+//##connects the statemachine.xml-File with the implemented conditions.
+//##within one statemachine the choice of the actionconstants is freely
+//##
 //## ActionId
 typedef enum EActions
 {
@@ -118,8 +135,11 @@ typedef enum EActions
   AcADD = 11,
   AcADDLINE = 12,
   AcADDANDFINISH = 13,
-  AcSNAPPING_ADDING = 20,
+  AcCHECKPOINT = 21,
+  AcCHECKLINE = 22,
+  AcCHECKCELL = 23,
   AcCHECKELEMENT = 30,		//check if there is a element close enough (picking)
+  AcCHECKOBJECT = 31,		//check if an object is hit
   AcCHECKNMINUS1 = 32,  //check if the number of elements is equal to N-1
   AcCHECKEQUALS1 = 33,  //check if the number of elements in the data is equal to 1
   AcCHECKSELECTED = 34, //check if the given element is selected or not
@@ -136,14 +156,20 @@ typedef enum EActions
   AcSEARCHGROUP = 51,
   AcSEARCHANOTHEROBJECT = 52, //one object is selected and another object is to be added to selection
   AcSELECTPICKEDOBJECT = 60, // select the picked object and deselect others
-  AcSELECTANOTHEROBJECT = 61, //adds the picked object to the selection
+  AcSELECTANOTHEROBJECT = 61,
   AcSELECTGROUP = 62,
   AcSELECTALL = 63,
   AcADDSELECTEDTOGROUP = 64,
   AcSELECT = 65,
+  AcSELECTPOINT = 66,
+  AcSELECTLINE = 68,
+  AcSELECTCELL = 67,
   AcDESELECTOBJECT = 70, //deselect picked from group
   AcDESELECTALL = 72,
   AcDESELECT = 75,
+  AcDESELECTPOINT = 76,
+  AcDESELECTLINE = 78,
+  AcDESELECTCELL = 77,
   AcNEWPOINT = 80,
   AcMOVEPOINT = 90,
   AcMOVESELECTED = 91,
@@ -165,12 +191,14 @@ typedef enum EActions
   AcROTATE = 1005,
   AcINITAFFINEINTERACTIONS = 1006,
   AcFINISHAFFINEINTERACTIONS = 1007,
+  AcSETSTARTPOINT = 1050,
   AcMODEDESELECT = 1100,  // set interactor in not selected mode
   AcMODESELECT = 1101,  // set interactor in selected mode
   AcMODESUBSELECT = 1102,  // set interacor in sub selected mode
-  // AcEVENTTRANSMIT = 1103, // transmit an 
   AcINFORMLISTENERS = 1200, //GlobalInteraction
-  AcASKINTERACTORS = 1201  //GlobalInteraction  
+  AcASKINTERACTORS = 1201,  //GlobalInteraction
+  AcTRANSMITEVENT = 2000,  //to transmit an event to a lower Interactor/Statemachine
+  AcCHECKGREATERONE = 1500
 };
 
 //Type of an Event;

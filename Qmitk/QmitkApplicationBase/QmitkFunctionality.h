@@ -23,7 +23,12 @@ class QActionGroup;
  \brief class providing a standard interface for MITK application functionality
 
  A functionality contains the application main widget, a controls widget and the 
- application logic
+ application logic. The functionality has to set up the main widget according to 
+ its needs when it is activated, especially if it uses a shared main wiget. 
+ It does @em not need to reverse the settings when it is deactivated, since it cannot
+ know if the subsequently activated functionality will use that settings or some other
+ setting. Furthermore, most functionalities will connect interaction objects in activated()
+ and disconnect them in deactivated().
  */
 class QmitkFunctionality : public QObject
 {

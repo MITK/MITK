@@ -18,5 +18,9 @@ the application crashes.
 @bug 1) in coronary mapping: events of the fourth (mapped view)window are processed and change the view in the other three slices. One can even define new points in the mapped view with strange coordinates 2) after loading more data sets the defined mapping points (originally painted yellow) are painted white. 3) level window does not affect mapped view window
 
 
-@ bug functionalities: the activated method is called twice - side effect when adding a state machine to GlobalInteraction in activated and removing it in deactivated one statemachine will remain. By the way, the same state machine pointer can be added more than once shouldn't this be impossible??? 
+@bug functionalities: the activated method is called twice - side effect when adding a state machine to GlobalInteraction in activated and removing it in deactivated one statemachine will remain. By the way, the same state machine pointer can be added more than once shouldn't this be impossible??? 
+
+@todo derive Mapper from BaseProcess or ProcessObject instead of ImageSource
+@todo remove Geometry2DData; derive Geometry3D from BaseData; derive a class StackedGeometry from Geometry3D, which contains Geometry2D's; derive Geometry2D from Geometry3D.
+@todo derive DataTreeNode from DataObject instead of BaseData, since otherwise we have duplicated Geometry information.
 */

@@ -74,6 +74,7 @@ bool mitk::CoordinateSupplier::ExecuteAction(Action* action, mitk::StateEvent co
           mitk::Point3D oldMovePoint; oldMovePoint.Fill(0);
 
           PointOperation* doOp = new mitk::PointOperation(OpMOVE, movePoint, 0);
+          PointOperation* finishOp = new mitk::PointOperation(OpTERMINATE, movePoint, 0);
           if (m_UndoEnabled )
           {
             //get the last Position from the UndoList
@@ -92,6 +93,7 @@ bool mitk::CoordinateSupplier::ExecuteAction(Action* action, mitk::StateEvent co
           }
           //execute the Operation
 	  		  m_Destination->ExecuteOperation(doOp);
+          m_Destination->ExecuteOperation(finishOp);
           ok = true;
           break;
         }

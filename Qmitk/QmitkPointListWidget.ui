@@ -8,8 +8,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>232</width>
-            <height>470</height>
+            <width>349</width>
+            <height>431</height>
         </rect>
     </property>
     <property name="caption">
@@ -63,6 +63,8 @@
     <include location="local" impldecl="in declaration">mitkStringProperty.h</include>
     <include location="global" impldecl="in declaration">sstream</include>
     <include location="global" impldecl="in declaration">string</include>
+    <include location="local" impldecl="in declaration">mitkPolygonInteractor.h</include>
+    <include location="local" impldecl="in declaration">mitkMesh.h</include>
     <include location="local" impldecl="in implementation">QmitkPointListWidget.ui.h</include>
 </includes>
 <variables>
@@ -72,10 +74,12 @@
     <variable>static mitk::PointSetInteractor::Pointer m_CurrentInteraction;</variable>
     <variable>mitk::DataTreeNode::Pointer m_DatatreeNode;</variable>
     <variable access="public">static const int UNLIMITED=999;</variable>
+    <variable>static mitk::PolygonInteractor::Pointer m_CurrentPolygonInteraction;</variable>
 </variables>
 <slots>
     <slot>PointSelect( int ItemIndex )</slot>
     <slot access="protected">ItemsOfListUpdate()</slot>
+    <slot>SwitchInteraction( mitk::PolygonInteractor::Pointer * sop, mitk::DataTreeNode::Pointer * node, int numberOfPoints, mitk::Point3D c, std::string l )</slot>
 </slots>
 <functions>
     <function access="private" specifier="non virtual">init()</function>

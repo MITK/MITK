@@ -27,6 +27,8 @@ PURPOSE.  See the above copyright notices for more information.
 *****************************************************************************/
 
 mitk::PointSetInteractor::Pointer QmitkPointListWidget::m_CurrentInteraction;
+mitk::PolygonInteractor::Pointer QmitkPointListWidget::m_CurrentPolygonInteraction;
+
 void QmitkPointListWidget::init()
 {
   std::cout << "1" << std::endl;
@@ -107,20 +109,21 @@ void QmitkPointListWidget::SwitchInteraction( mitk::PointSetInteractor::Pointer 
 
       mitk::BoolProperty::Pointer contour = new mitk::BoolProperty(false);
       mitk::BoolProperty::Pointer close = new mitk::BoolProperty(true);
-      mitk::StringProperty::Pointer label = new mitk::StringProperty(l);
-      
+
+
+
       //create a DataElement that holds the points
       mitk::PointSet::Pointer pointset = mitk::PointSet::New();
-      
+
       //connect data to refresh method
       pointset->AddObserver(itk::EndEvent(), m_DataChangedCommand);
 
       //then crate a TreeNode, to connect the data to...
       mitk::DataTreeNode::Pointer dataTreeNode = mitk::DataTreeNode::New();
       //declaring a new Interactor
-      if (numberOfPoints!=UNLIMITED)//limited number of points			
+      if (numberOfPoints!=UNLIMITED)//limited number of points
         *sop = new mitk::PointSetInteractor("pointsetinteractor", dataTreeNode, numberOfPoints);
-      else   //unlimited number of points      
+      else   //unlimited number of points
         *sop = new mitk::PointSetInteractor("pointsetinteractor", dataTreeNode);
 
 
@@ -130,7 +133,16 @@ void QmitkPointListWidget::SwitchInteraction( mitk::PointSetInteractor::Pointer 
       dataTreeNode->SetProperty("color",color);
       dataTreeNode->SetProperty("contour",contour);
       dataTreeNode->SetProperty("close",close);
-      dataTreeNode->SetProperty("label",label);
+
+			mitk::StringProperty::Pointer label = new mitk::StringProperty(l);
+
+			//const char *c="";
+			//if ( !strcmp(l.c_str(),c) )
+		//	{
+
+      	dataTreeNode->SetProperty("label",label);
+		//	}
+
       dataTreeNode->SetInteractor(*sop);
       dataTreeNode->SetProperty("name", label); /// name is identical with label????
       *node = dataTreeNode;
@@ -151,6 +163,66 @@ void QmitkPointListWidget::SwitchInteraction( mitk::PointSetInteractor::Pointer 
     m_DatatreeNode= *node;
     //tell the global Interactor, that there is another one to ask if it can handle the event
     globalInteraction->AddInteractor(m_CurrentInteraction);
+    ItemsOfListUpdate();
+  }
+}
+
+
+void QmitkPointListWidget::SwitchInteraction( mitk::PolygonInteractor::Pointer *sop, mitk::DataTreeNode::Pointer * node, int numberOfPoints, mitk::Point3D c, std::string l )
+{
+  mitk::GlobalInteraction* globalInteraction = dynamic_cast<mitk::GlobalInteraction*>(mitk::EventMapper::GetGlobalStateMachine());
+  if(globalInteraction!=NULL)
+  {
+    if ((*sop).IsNull())
+    {
+      //new layer property
+			std::cout << "creating polygon interactor ..." << std::endl;
+
+      mitk::IntProperty::Pointer layer = new mitk::IntProperty(1);
+      mitk::ColorProperty::Pointer color = new mitk::ColorProperty(c[0],c[1],c[2]);
+
+      //mitk::BoolProperty::Pointer contour = new mitk::BoolProperty(false);
+      //mitk::BoolProperty::Pointer close = new mitk::BoolProperty(true);
+      mitk::StringProperty::Pointer label = new mitk::StringProperty(l);
+			mitk::StringProperty::Pointer name = new mitk::StringProperty(l);
+      //create a DataElement that holds the points
+      mitk::Mesh::Pointer meshpointset = mitk::Mesh::New();
+
+      //connect data to refresh method
+      meshpointset->AddObserver(itk::EndEvent(), m_DataChangedCommand);
+
+      //then crate a TreeNode, to connect the data to...
+      mitk::DataTreeNode::Pointer dataTreeNode = mitk::DataTreeNode::New();
+      *sop = new mitk::PolygonInteractor("polygoninteractor", dataTreeNode);
+
+
+      //datatreenode: and give set the data, layer and Interactor
+      dataTreeNode->SetData(meshpointset);
+      dataTreeNode->SetProperty("layer",layer);
+      dataTreeNode->SetProperty("color",color);
+      //dataTreeNode->SetProperty("contour",contour);
+      //dataTreeNode->SetProperty("close",close);
+      dataTreeNode->SetProperty("label",label);
+      dataTreeNode->SetInteractor(*sop);
+      dataTreeNode->SetProperty("name", name); /// name is identical with label????
+      *node = dataTreeNode;
+
+      ////then add it to the existing DataTree
+      //m_DataTreeIterator->add(dataTreeNode);
+    }
+
+    if (m_CurrentPolygonInteraction.IsNotNull())
+    {
+      //remove last Interactor
+      globalInteraction->RemoveInteractor(m_CurrentPolygonInteraction);
+    }
+
+    //new Interactor
+    m_CurrentPolygonInteraction = *sop;
+    prefix= l;
+    m_DatatreeNode= *node;
+    //tell the global Interactor, that there is another one to ask if it can handle the event
+    globalInteraction->AddInteractor(m_CurrentPolygonInteraction);
     ItemsOfListUpdate();
   }
 }

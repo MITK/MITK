@@ -15,12 +15,20 @@
 #include "ipPic.h"
 
 
-void ipPicAddTag( ipPicDescriptor *pic, ipPicTSV_t *tsv )
+void
+ipPicAddTag( ipPicDescriptor *pic, ipPicTSV_t *tsv )
 {
   pic->info->tags_head = _ipPicInsertTag( pic->info->tags_head, tsv );
 }
 
-_ipPicTagsElement_t *_ipPicInsertTag( _ipPicTagsElement_t *head, ipPicTSV_t *tsv )
+void
+ipPicAddSubTag( ipPicTSV_t *parent, ipPicTSV_t *tsv )
+{
+  parent->value = _ipPicInsertTag( parent->value, tsv );
+}
+
+_ipPicTagsElement_t *
+_ipPicInsertTag( _ipPicTagsElement_t *head, ipPicTSV_t *tsv )
 {
   int i;
   _ipPicTagsElement_t *new;

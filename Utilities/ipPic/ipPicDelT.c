@@ -16,7 +16,8 @@
 
 static _ipPicTagsElement_t *_ipPicRemoveTag( _ipPicTagsElement_t *head, char *tag );
 
-void ipPicDelTag( ipPicDescriptor *pic, char *t )
+void
+ipPicDelTag( ipPicDescriptor *pic, char *t )
 {
   int i;
   char tag[_ipPicTAGLEN];
@@ -28,7 +29,8 @@ void ipPicDelTag( ipPicDescriptor *pic, char *t )
   pic->info->tags_head = _ipPicRemoveTag( pic->info->tags_head, tag );
 }
 
-_ipPicTagsElement_t *_ipPicRemoveTag( _ipPicTagsElement_t *head, char *tag )
+_ipPicTagsElement_t *
+_ipPicRemoveTag( _ipPicTagsElement_t *head, char *tag )
 {
   _ipPicTagsElement_t *which;
 

@@ -10,6 +10,7 @@
 #include "mitkProperties.h"
 #include "mitkEventMapper.h"
 #include "mitkFocusManager.h"
+#include "mitkPointSetWriter.h"
 
 #include <qfiledialog.h>
 #include "ipPic.h"
@@ -103,8 +104,8 @@ void QmitkDataManagerControls::SaveButton_clicked()
   if (selected != NULL) {
     std::string m_SelectedItemsName = std::string(selected->text(0).ascii());
   
-
-    mitk::DataTreeIterator* selectedIterator = ((mitk::DataTree *) m_DataTreeIterator->getTree())->GetNext("name", new mitk::StringProperty( m_SelectedItemsName  ));
+    mitk::DataTreeIterator* selectedIterator = selected->GetDataTreeIterator();
+//    mitk::DataTreeIterator* selectedIterator = ((mitk::DataTree *) m_DataTreeIterator->getTree())->GetNext("name", new mitk::StringProperty( m_SelectedItemsName  ));
     if (selectedIterator != NULL)
     {
       mitk::DataTreeNode* node = selectedIterator->get();
@@ -115,17 +116,32 @@ void QmitkDataManagerControls::SaveButton_clicked()
         if (data.IsNotNull())
         {
           mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(data.GetPointer());
-          ipPicDescriptor * picImage = image->GetPic();
-
-          picImage = ipFuncRefl(picImage,3);
-
-          QString fileName = QFileDialog::getSaveFileName(QString(m_SelectedItemsName),"DKFZ Pic (*.seq *.pic *.pic.gz *.seq.gz *.dcm)");
-          if (fileName == NULL ) 
+          if(image!=NULL)
           {
-            fileName = QString(m_SelectedItemsName.c_str());
-          }
+            ipPicDescriptor * picImage = image->GetPic();
 
-          ipPicPut((char *)fileName.ascii(), picImage);
+            picImage = ipFuncRefl(picImage,3);
+
+            QString fileName = QFileDialog::getSaveFileName(QString(m_SelectedItemsName),"DKFZ Pic (*.seq *.pic *.pic.gz *.seq.gz *.dcm)");
+            if (fileName == NULL ) 
+            {
+              fileName = QString(m_SelectedItemsName.c_str());
+            }
+
+            ipPicPut((char *)fileName.ascii(), picImage);
+          }
+          mitk::PointSet::Pointer pointset = dynamic_cast<mitk::PointSet*>(data.GetPointer());
+          if(pointset!=NULL)
+          {
+            QString fileName = QFileDialog::getSaveFileName(QString(m_SelectedItemsName),"DKFZ PointSetFile (.mps)");
+            if (fileName != NULL ) 
+            {
+              mitk::PointSetWriter::Pointer writer = mitk::PointSetWriter::New();
+              writer->SetInput( pointset );
+              writer->SetFileName( fileName.latin1() );
+              writer->Update();
+            }
+          }
         }
       }
     } else {

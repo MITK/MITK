@@ -264,9 +264,18 @@ void mitk::BaseRenderer::MousePressEvent(mitk::MouseEvent *me)
   }
   else if(m_MapperID==2)
   {
+
+    //fix for strange offset in 3D coordinates!
+    if (me->GetType() == Type_MouseButtonPress)
+    {
+      Point2D ptest(me->GetDisplayPosition().x, me->GetDisplayPosition().y);
+      ptest.y -= 24.5;
+      me->SetDisplayPosition(ptest);
+    }
+
     Point2D p(me->GetDisplayPosition().x, me->GetDisplayPosition().y);
     GetDisplayGeometry()->ULDisplayToDisplay(p,p);
-    std::cout << "press event!" << std::endl;
+//    std::cout << "press event!" << std::endl;
     me->SetDisplayPosition(p);
     mitk::EventMapper::MapEvent(me);
   }

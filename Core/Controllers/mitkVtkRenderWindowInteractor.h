@@ -24,14 +24,14 @@ PURPOSE.  See the above copyright notices for more information.
 #include "vtkRenderWindowInteractor.h"
 #include "mitkBaseRenderer.h"
 
+namespace mitk {
+
 //##ModelId=3E6D600E0193
 //##Documentation
 //## @brief mitk::VtkRenderWindowInteractor is an agent class between mitk and a GUI 
 //## dependant RenderWindowInteractor like VtkQRenderWindowInteractor for QT
 //## (Bridge-pattern)
 //## @ingroup NavigationControl
-namespace mitk {
-
 class VtkRenderWindowInteractor : public ::vtkRenderWindowInteractor
 {
 

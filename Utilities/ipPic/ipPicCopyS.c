@@ -6,8 +6,11 @@
  *   copys a slice from a pic into a new pic
  *
  * $Log$
- * Revision 1.1  1997/09/06 19:09:58  andre
- * Initial revision
+ * Revision 1.2  1997/09/15 13:21:11  andre
+ * switched to new what string format
+ *
+ * Revision 1.1.1.1  1997/09/06  19:09:58  andre
+ * initial import
  *
  * Revision 0.0  1993/06/07  19:19:19  andre
  * Initial revision, NO error checking
@@ -17,7 +20,7 @@
  *  COPYRIGHT (c) 1993 by DKFZ (Dept. MBI) Heidelberg, FRG
  */
 #ifndef lint
-  static char *what = { "@(#)ipPicCopySlice\t\tDKFZ (Dept. MBI)\t$Date$" };
+  static char *what = { "@(#)ipPicCopySlice\t\tDKFZ (Dept. MBI)\t"__DATE__"\t$Revision$" };
 #endif
 
 #include "ipPic.h"

@@ -23,7 +23,7 @@
  * COPYRIGHT (c) 1995 by DKFZ (Dept. MBI) HEIDELBERG, FRG
  */
 #ifndef lint
-  static char *what = { "@(#)ipError\t\t\tDKFZ (Dept. MBI)\t"__DATE__ };
+  static char *what = { "@(#)ipError\t\t\tDKFZ (Dept. MBI)\t"__DATE__"\t$Revision$" };
 #endif
 
 #include <stdio.h>

@@ -6,8 +6,11 @@
  *   prints information about a picfile
  *
  * $Log$
- * Revision 1.1  1997/09/06 19:10:00  andre
- * Initial revision
+ * Revision 1.2  1997/09/15 13:21:22  andre
+ * switched to new what string format
+ *
+ * Revision 1.1.1.1  1997/09/06  19:10:00  andre
+ * initial import
  *
  * Revision 0.1  1993/04/02  16:18:39  andre
  * now works on PC, SUN and DECstation
@@ -20,7 +23,7 @@
  *  COPYRIGHT (c) 1993 by DKFZ (Dept. MBI) Heidelberg, FRG
  */
 #ifndef lint
-  static char *what = { "@(#)picinfo \t\tDKFZ (Dept. MBI)\t$Date$" };
+  static char *what = { "@(#)picinfo \t\tDKFZ (Dept. MBI)\t"__DATE__"\t$Revision$" };
 #endif
 
 /*

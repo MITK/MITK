@@ -6,8 +6,11 @@
  *   reads a oldstyle PicFile from disk
  *
  * $Log$
- * Revision 1.1  1997/09/06 19:09:59  andre
- * Initial revision
+ * Revision 1.2  1997/09/15 13:21:17  andre
+ * switched to new what string format
+ *
+ * Revision 1.1.1.1  1997/09/06  19:09:59  andre
+ * initial import
  *
  * Revision 0.2  1993/04/26  17:40:09  andre
  * 8 bit images from old pic format are now unsigned
@@ -23,7 +26,7 @@
  *  COPYRIGHT (c) 1993 by DKFZ (Dept. MBI) Heidelberg, FRG
  */
 #ifndef lint
-  static char *what = { "@(#)_ipPicOldGet\t\tDKFZ (Dept. MBI)\t$Date$" };
+  static char *what = { "@(#)_ipPicOldGet\t\tDKFZ (Dept. MBI)\t"__DATE__"\t$Revision$" };
 #endif
 
 #include "ipPic.h"

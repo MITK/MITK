@@ -25,7 +25,7 @@
  * COPYRIGHT (c) 1994 by DKFZ (Dept. MBI) HEIDELBERG, FRG
  */
 #ifndef lint
-  static char *what = { "@(#)_ipPicInfo\t\tDKFZ (Dept. MBI)\t"__DATE__ };
+  static char *what = { "@(#)_ipPicInfo\t\tDKFZ (Dept. MBI)\t"__DATE__"\t$Revision$" };
 #endif
 
 #include "ipPic.h"

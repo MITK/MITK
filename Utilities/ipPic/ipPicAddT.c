@@ -9,7 +9,7 @@
  *  COPYRIGHT (c) 1994 by DKFZ (Dept. MBI) Heidelberg, FRG
  */
 #ifndef lint
-  static char *what = { "@(#)ipPicAddTag\t\tDKFZ (Dept. MBI)\t"__DATE__ };
+  static char *what = { "@(#)ipPicAddTag\t\tDKFZ (Dept. MBI)\t"__DATE__"\t$Revision$" };
 #endif
 
 #include "ipPic.h"

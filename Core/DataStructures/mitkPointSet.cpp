@@ -203,7 +203,9 @@ void mitk::PointSet::ExecuteOperation(Operation* operation)
 		break;
 	case OpDELETE://deletes the last point in list
 		{
-      m_PointList->GetPoints()->pop_back();
+      //m_PointList->GetPoints()->pop_back();
+      PointsContainer::Pointer position = m_PointList->GetPoints();
+      position->DeleteIndex(position->size()-1);
 			m_SelectList.pop_back();			
 		}
 		break;
@@ -212,19 +214,8 @@ void mitk::PointSet::ExecuteOperation(Operation* operation)
       unsigned int index = (unsigned)pointOp->GetIndex();
 			if (index < m_PointList->GetNumberOfPoints() )//checking, cause .at is not supported by older compilers
 			{
-        //PointSet doesn't delete the Index! So use the std::vector behind it!
-        //pc->DeleteIndex(index);//doesn't work by ITK!!!
-
-#ifdef INTERDEBUG
-        std::cout<<"Numbers in List before remove:"<<m_PointList->GetNumberOfPoints();
-#endif
-        PointsContainer::Pointer pc = m_PointList->GetPoints();
-        itk::Point<mitk::ScalarType, 3>* position = &((*pc)[index]);
-        pc->erase(position);
-
-#ifdef INTERDEBUG
-        std::cout<<"Numbers in List after remove:"<<m_PointList->GetNumberOfPoints()<<std::endl;
-#endif
+        PointsContainer::Pointer position  = m_PointList->GetPoints();
+        position->DeleteIndex(index);
 
         BoolListIter selPosition = m_SelectList.begin();
         selPosition+=pointOp->GetIndex();
@@ -255,8 +246,13 @@ void mitk::PointSet::ExecuteOperation(Operation* operation)
 
 //##ModelId=3F0177E901EE
 void mitk::PointSet::UpdateOutputInformation()
-{
-  m_Geometry3D->SetBoundingBox(m_PointList->GetBoundingBox());
+{    //What shall be done here? Ingmar
+  /*
+  PointSetType::BoundingBoxType const *bb = m_PointList->GetBoundingBox();
+  mitk::BoundingBox * mitkbb; 
+  mitkbb = bb;
+  m_Geometry3D->SetBoundingBox((const)(mitkbb));
+  */
 }
 
 //##ModelId=3F0177E901FB

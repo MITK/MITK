@@ -5,9 +5,9 @@
 #include <mitkBaseData.h>
 #include <itkPoint.h>
 #include <itkPointSet.h>
-#include "itkCovariantVector.h"
+#include <itkCovariantVector.h>
 #include <vector>
-
+#include <itkDefaultDynamicMeshTraits.h>
 
 namespace mitk {
 
@@ -19,7 +19,7 @@ public:
 
   itkNewMacro(Self);
 
-  typedef	itk::DefaultStaticMeshTraits<unsigned short, 3, 3, mitk::ScalarType> MeshTraits;//mitk::Scalartype as PointRepresentation
+  typedef	itk::DefaultDynamicMeshTraits<unsigned short, 3, 3, mitk::ScalarType> MeshTraits;//mitk::Scalartype as PointRepresentation
   typedef itk::PointSet<bool,3,MeshTraits> PointSetType;//bool as extrainfo for selected (later on)
   typedef PointSetType::PointType PointType;
   typedef PointSetType::PointsContainer PointsContainer;

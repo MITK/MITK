@@ -1,5 +1,4 @@
 #include "mitkImageMapper2D.h"
-//#include "mitkRenderWindow.h"
 #include "widget.h"
 #include "picimage.h"
 #include "pic2vtk.h"
@@ -20,6 +19,7 @@
 #include <vtkTransform.h>
 #include <vtkMatrix4x4.h>
 #include <vtkLookupTable.h>
+#include <vtkImageData.h>
 
 #include "GL/glu.h"
 
@@ -195,6 +195,9 @@ void mitk::ImageMapper2D::GenerateData(mitk::BaseRenderer *renderer)
       return;
 
     vtkImageData* inputData = input->GetVtkImageData(timestep);
+    float spacing[3];
+    inputData->GetSpacing(spacing);
+    inputData->SetSpacing(1,1,1);
 
     //how many pixels we really want to sample: width x height pixels
     mitk::ScalarType width, height;
@@ -220,8 +223,9 @@ void mitk::ImageMapper2D::GenerateData(mitk::BaseRenderer *renderer)
       normal = planeview->GetNormal();      normal.Normalize();
 
       vtkTransform * vtktransform = GetDataTreeNode()->GetVtkTransform();
+           
       vtkLinearTransform * inversetransform = vtktransform->GetLinearInverse();
-      m_Reslicer->SetResliceTransform(inversetransform);
+      m_Reslicer->SetResliceTransform(inversetransform); 
     }
     else
     if(dynamic_cast<const VtkAbstractTransformGeometry *>(worldgeometry)!=NULL)
@@ -324,6 +328,8 @@ void mitk::ImageMapper2D::GenerateData(mitk::BaseRenderer *renderer)
     //	output->SetPicSlice(pic,0,0,renderinfo.m_RendererId);
     output->Modified();
     renderinfo.m_LastUpdateTime=output->GetMTime();
+
+    inputData->SetSpacing(spacing);
   }
   return;
 }

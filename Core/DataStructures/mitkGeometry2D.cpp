@@ -21,13 +21,37 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkTransform.h>
 
 //##ModelId=3E395E0802E6
-mitk::Geometry2D::Geometry2D()
+mitk::Geometry2D::Geometry2D() : 
+  m_ScaleFactorMMPerUnitX(1.0), 
+  m_ScaleFactorMMPerUnitY(1.0)
 {
 }
 
 //##ModelId=3E395E080318
 mitk::Geometry2D::~Geometry2D()
 {
+}
+
+void mitk::Geometry2D::SetIndexToWorldTransform(mitk::AffineTransform3D* transform)
+{
+  Superclass::SetIndexToWorldTransform(transform);
+  
+  m_ScaleFactorMMPerUnitX=GetExtentInMM(0)/GetExtent(0);
+  m_ScaleFactorMMPerUnitY=GetExtentInMM(1)/GetExtent(1);  
+
+  assert(m_ScaleFactorMMPerUnitX<ScalarTypeNumericTraits::infinity());
+  assert(m_ScaleFactorMMPerUnitY<ScalarTypeNumericTraits::infinity());
+}
+
+void mitk::Geometry2D::SetExtentInMM(int direction, ScalarType extentInMM)
+{
+  Superclass::SetExtentInMM(direction, extentInMM);
+
+  m_ScaleFactorMMPerUnitX=GetExtentInMM(0)/GetExtent(0);
+  m_ScaleFactorMMPerUnitY=GetExtentInMM(1)/GetExtent(1);  
+
+  assert(m_ScaleFactorMMPerUnitX<ScalarTypeNumericTraits::infinity());
+  assert(m_ScaleFactorMMPerUnitY<ScalarTypeNumericTraits::infinity());
 }
 
 //##ModelId=3DDE65E00122
@@ -37,9 +61,9 @@ bool mitk::Geometry2D::Map(const mitk::Point3D &pt3d_mm, mitk::Point2D &pt2d_mm)
   BoundingBox::BoundsArrayType bounds = m_BoundingBox->GetBounds();
 
   Point3D pt3d_units;
-  pt3d_units = GetIndexToWorldTransform()->BackTransformPoint(pt3d_mm);
-  pt2d_mm[0]=pt3d_units[0]*m_IndexToWorldTransform->GetMatrix().GetVnlMatrix().get_column(0).magnitude();
-  pt2d_mm[1]=pt3d_units[1]*m_IndexToWorldTransform->GetMatrix().GetVnlMatrix().get_column(1).magnitude();
+  BackTransform(pt3d_mm, pt3d_units);
+  pt2d_mm[0]=pt3d_units[0]*m_ScaleFactorMMPerUnitX;
+  pt2d_mm[1]=pt3d_units[1]*m_ScaleFactorMMPerUnitY;
   pt3d_units[2]=0;
   return const_cast<BoundingBox*>(m_BoundingBox.GetPointer())->IsInside(pt3d_units);
 }
@@ -51,10 +75,10 @@ void mitk::Geometry2D::Map(const mitk::Point2D &pt2d_mm, mitk::Point3D &pt3d_mm)
   BoundingBox::BoundsArrayType bounds = m_BoundingBox->GetBounds();
 
   Point3D pt3d_units;
-  pt3d_units[0]=pt2d_mm[0]/m_IndexToWorldTransform->GetMatrix().GetVnlMatrix().get_column(0).magnitude();
-  pt3d_units[1]=pt2d_mm[1]/m_IndexToWorldTransform->GetMatrix().GetVnlMatrix().get_column(1).magnitude();
+  pt3d_units[0]=pt2d_mm[0]/m_ScaleFactorMMPerUnitX;
+  pt3d_units[1]=pt2d_mm[1]/m_ScaleFactorMMPerUnitY;
   pt3d_units[2]=0;
-  pt3d_mm = GetIndexToWorldTransform()->TransformPoint(pt3d_units);
+  pt3d_mm = GetParametricTransform()->TransformPoint(pt3d_units);
 }
 
 //##ModelId=3DE7895602F7
@@ -75,12 +99,12 @@ void mitk::Geometry2D::MMToUnits(const mitk::Point2D &pt_mm, mitk::Point2D &pt_u
   itkExceptionMacro(<< "No BackTransform in itk::Transform ==> no general MMToUnits(const mitk::Point2D &pt_mm, mitk::Point2D &pt_units) possible. Has to be implemented in sub-class.");
   assert(m_BoundingBox.IsNotNull());
   BoundingBox::BoundsArrayType bounds = m_BoundingBox->GetBounds();
-  pt_units[0]=pt_mm[0]/m_IndexToWorldTransform->GetMatrix().GetVnlMatrix().get_column(0).magnitude();
-  pt_units[1]=pt_mm[1]/m_IndexToWorldTransform->GetMatrix().GetVnlMatrix().get_column(1).magnitude();
+  pt_units[0]=pt_mm[0]/m_ScaleFactorMMPerUnitX;
+  pt_units[1]=pt_mm[1]/m_ScaleFactorMMPerUnitY;
 }
 
 //##ModelId=3E3B98C5019F
-void mitk::Geometry2D::UnitsToMM(const mitk::Vector2D &vec_units, mitk::Vector2D &vec_mm) const
+void mitk::Geometry2D::UnitsToMM(const mitk::Point2D &atPt2d_units, const mitk::Vector2D &vec_units, mitk::Vector2D &vec_mm) const
 {
   assert(m_BoundingBox.IsNotNull());
   BoundingBox::BoundsArrayType bounds = m_BoundingBox->GetBounds();
@@ -92,13 +116,13 @@ void mitk::Geometry2D::UnitsToMM(const mitk::Vector2D &vec_units, mitk::Vector2D
 }
 
 //##ModelId=3E3B98C9019B
-void mitk::Geometry2D::MMToUnits(const mitk::Vector2D &vec_mm, mitk::Vector2D &vec_units) const
+void mitk::Geometry2D::MMToUnits(const mitk::Point2D &atPt2d_mm, const mitk::Vector2D &vec_mm, mitk::Vector2D &vec_units) const
 {
   itkExceptionMacro(<< "No BackTransform in itk::Transform ==> no general MMToUnits(const mitk::Vector2D &vec_mm, mitk::Vector2D &vec_units) possible. Has to be implemented in sub-class.");
   assert(m_BoundingBox.IsNotNull());
   BoundingBox::BoundsArrayType bounds = m_BoundingBox->GetBounds();
-  vec_units[0]=vec_mm[0]/m_IndexToWorldTransform->GetMatrix().GetVnlMatrix().get_column(0).magnitude();
-  vec_units[1]=vec_mm[1]/m_IndexToWorldTransform->GetMatrix().GetVnlMatrix().get_column(1).magnitude();
+  vec_units[0]=vec_mm[0]/m_ScaleFactorMMPerUnitX;
+  vec_units[1]=vec_mm[1]/m_ScaleFactorMMPerUnitY;
 }
 
 void mitk::Geometry2D::SetSizeInUnits(mitk::ScalarType width, mitk::ScalarType height)
@@ -132,9 +156,9 @@ bool mitk::Geometry2D::Project(const mitk::Point3D &pt3d_mm, mitk::Point3D &proj
   assert(m_BoundingBox.IsNotNull());
 
   Point3D pt3d_units;
-  pt3d_units = GetIndexToWorldTransform()->BackTransformPoint(pt3d_mm);
+  BackTransform(pt3d_mm, pt3d_units);
   pt3d_units[2] = 0;
-  projectedPt3d_mm = GetIndexToWorldTransform()->TransformPoint(pt3d_units);
+  projectedPt3d_mm = GetParametricTransform()->TransformPoint(pt3d_units);
   return const_cast<BoundingBox*>(m_BoundingBox.GetPointer())->IsInside(pt3d_units);
 }
 
@@ -163,12 +187,12 @@ bool mitk::Geometry2D::Project(const mitk::Point3D & atPt3d_mm, const mitk::Vect
   assert(m_BoundingBox.IsNotNull());
 
   Vector3D vec3d_units;
-  vec3d_units = GetIndexToWorldTransform()->BackTransform(vec3d_mm);
+  BackTransform(atPt3d_mm, vec3d_mm, vec3d_units);
   vec3d_units[2] = 0;
-  projectedVec3d_mm = GetIndexToWorldTransform()->TransformVector(vec3d_units);
+  projectedVec3d_mm = GetParametricTransform()->TransformVector(vec3d_units);
 
   Point3D pt3d_units;
-  pt3d_units = GetIndexToWorldTransform()->BackTransformPoint(atPt3d_mm);
+  BackTransform(atPt3d_mm, pt3d_units);
   return const_cast<BoundingBox*>(m_BoundingBox.GetPointer())->IsInside(pt3d_units);
 }
 
@@ -184,4 +208,3 @@ void mitk::Geometry2D::InitializeGeometry(Self * newGeometry) const
 {
   Superclass::InitializeGeometry(newGeometry);
 }
-

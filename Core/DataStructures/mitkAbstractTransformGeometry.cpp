@@ -189,14 +189,14 @@ void mitk::AbstractTransformGeometry::MMToUnits(const mitk::Point2D &pt_mm, mitk
   m_Plane->MMToUnits(pt_mm, pt_units);
 }
 
-void mitk::AbstractTransformGeometry::UnitsToMM(const mitk::Vector2D &vec_units, mitk::Vector2D &vec_mm) const
+void mitk::AbstractTransformGeometry::UnitsToMM(const mitk::Point2D &atPt2d_units, const mitk::Vector2D &vec_units, mitk::Vector2D &vec_mm) const
 {
-  m_Plane->UnitsToMM(vec_units, vec_mm);
+  m_Plane->UnitsToMM(atPt2d_units, vec_units, vec_mm);
 }
 
-void mitk::AbstractTransformGeometry::MMToUnits(const mitk::Vector2D &vec_mm, mitk::Vector2D &vec_units) const
+void mitk::AbstractTransformGeometry::MMToUnits(const mitk::Point2D &atPt2d_mm, const mitk::Vector2D &vec_mm, mitk::Vector2D &vec_units) const
 {
-  m_Plane->MMToUnits(vec_mm, vec_units);
+  m_Plane->MMToUnits(atPt2d_mm, vec_mm, vec_units);
 }
 
 

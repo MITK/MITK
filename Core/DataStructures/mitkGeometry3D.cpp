@@ -97,6 +97,7 @@ void mitk::Geometry3D::TransferVtkToITKTransform()
   offset[2] = vtkmatrix->GetElement( 2, 3 );
   m_IndexToWorldTransform->SetOffset( offset );
   m_IndexToWorldTransform->Modified();
+  m_ParametricTransform = m_IndexToWorldTransform;
 }
 
 
@@ -130,7 +131,7 @@ void mitk::Geometry3D::SetParametricBounds(const BoundingBox::BoundsArrayType& b
 
 void mitk::Geometry3D::MMToUnits(const mitk::Point3D &pt_mm, mitk::Point3D &pt_units) const
 {
-  pt_units = m_IndexToWorldTransform->BackTransform(pt_mm);
+  BackTransform(pt_mm, pt_units);
 }
 
 //##ModelId=3DDE65DC0151
@@ -140,13 +141,13 @@ void mitk::Geometry3D::UnitsToMM(const mitk::Point3D &pt_units, mitk::Point3D &p
 }
 
 //##ModelId=3E3B986602CF
-void mitk::Geometry3D::MMToUnits(const mitk::Vector3D &vec_mm, mitk::Vector3D &vec_units) const
+void mitk::Geometry3D::MMToUnits(const mitk::Point3D &atPt3d_mm, const mitk::Vector3D &vec_mm, mitk::Vector3D &vec_units) const
 {
-  vec_units = m_IndexToWorldTransform->BackTransform(vec_mm);
+  BackTransform(atPt3d_mm, vec_mm, vec_units);
 }
 
 //##ModelId=3E3B987503A3
-void mitk::Geometry3D::UnitsToMM(const mitk::Vector3D &vec_units, mitk::Vector3D &vec_mm) const
+void mitk::Geometry3D::UnitsToMM(const mitk::Point3D &atPt3d_units, const mitk::Vector3D &vec_units, mitk::Vector3D &vec_mm) const
 {
   vec_mm = m_ParametricTransform->TransformVector(vec_units);
 }
@@ -162,9 +163,6 @@ void mitk::Geometry3D::SetIndexToWorldTransform(mitk::AffineTransform3D* transfo
   }
 }
 
-/*
-  \todo set User Matrix/transform also - clone it also?
-*/
 mitk::AffineGeometryFrame3D::Pointer mitk::Geometry3D::Clone() const
 {
   Self::Pointer newGeometry = Self::New();
@@ -189,9 +187,22 @@ void mitk::Geometry3D::InitializeGeometry(Geometry3D * newGeometry) const
   newGeometry->SetFrameOfReferenceID(GetFrameOfReferenceID());
 }
 
-vtkTransform* mitk::Geometry3D::GetVtkTransform()
+void mitk::Geometry3D::SetExtentInMM(int direction, ScalarType extentInMM)
 {
-  return m_VtkIndexToWorldTransform;
+  ScalarType len = GetExtentInMM(direction);
+  if(fabs(len - extentInMM)>=mitk::eps)
+  {
+    AffineTransform3D::MatrixType::InternalMatrixType vnlmatrix;
+    vnlmatrix = m_IndexToWorldTransform->GetMatrix().GetVnlMatrix();
+    if(len>extentInMM)
+      vnlmatrix.set_column(direction, vnlmatrix.get_column(direction)/len*extentInMM);
+    else
+      vnlmatrix.set_column(direction, vnlmatrix.get_column(direction)*extentInMM/len);
+    Matrix3D matrix;
+    matrix = vnlmatrix;
+    m_IndexToWorldTransform->SetMatrix(matrix);
+    Modified();
+  }
 }
 
 mitk::BoundingBox::Pointer mitk::Geometry3D::CalculateBoundingBoxRelativeToTransform(const mitk::AffineTransform3D* transform)
@@ -288,6 +299,33 @@ void mitk::Geometry3D::ExecuteOperation(Operation* operation)
   default:
     break;
 	}
+}
+
+void mitk::Geometry3D::BackTransform(const mitk::Point3D &in, mitk::Point3D& out) const
+{
+  ScalarType temp[3];
+  unsigned int i, j;
+  const TransformType::OffsetType& offset = m_IndexToWorldTransform->GetOffset();
+
+  for (j = 0; j < 3; j++) 
+  {
+    temp[j] = in[j] - offset[j];
+  }
+
+  const TransformType::MatrixType& inverse = m_IndexToWorldTransform->GetInverse();
+  for (i = 0; i < 3; i++) 
+  {
+    out[i] = 0.0;
+    for (j = 0; j < 3; j++) 
+    {
+      out[i] += inverse[i][j]*temp[j];
+    }
+  }
+}
+
+void mitk::Geometry3D::BackTransform(const mitk::Point3D &at, const mitk::Vector3D &in, mitk::Vector3D& out) const
+{
+  out = m_IndexToWorldTransform->GetInverse() * in;
 }
 
 const mitk::Vector3D mitk::Geometry3D::GetXAxis()

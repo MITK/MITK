@@ -206,25 +206,12 @@ public:
   //## @brief Set the extent of the bounding-box in the specified @a direction in mm
   //##
   //## @note This changes the matrix in the transform, @a not the bounds, which are given in units!
-  void SetExtentInMM(int direction, ScalarType extentInMM)
-  {
-    ScalarType len = GetExtentInMM(direction);
-    if(fabs(len - extentInMM)>=mitk::eps)
-    {
-      AffineTransform3D::MatrixType::InternalMatrixType vnlmatrix;
-      vnlmatrix = m_IndexToWorldTransform->GetMatrix().GetVnlMatrix();
-      if(len>extentInMM)
-        vnlmatrix.set_column(direction, vnlmatrix.get_column(direction)/len*extentInMM);
-      else
-        vnlmatrix.set_column(direction, vnlmatrix.get_column(direction)*extentInMM/len);
-      Matrix3D matrix;
-      matrix = vnlmatrix;
-      m_IndexToWorldTransform->SetMatrix(matrix);
-      Modified();
-    }
-  }
+  virtual void SetExtentInMM(int direction, ScalarType extentInMM);
 
-  vtkTransform* GetVtkTransform();
+  vtkTransform* GetVtkTransform() const
+  {
+    return m_VtkIndexToWorldTransform;
+  }
 
   itkGetConstObjectMacro(ParametricTransform, mitk::Transform3D);
 
@@ -235,10 +222,10 @@ public:
   void UnitsToMM(const mitk::Point3D &pt_units, mitk::Point3D &pt_mm) const;
 
   //##ModelId=3E3B986602CF
-  void MMToUnits(const mitk::Vector3D &vec_mm, mitk::Vector3D &vec_units) const;
+  void MMToUnits(const mitk::Point3D &atPt3d_mm, const mitk::Vector3D &vec_mm, mitk::Vector3D &vec_units) const;
 
   //##ModelId=3E3B987503A3
-  void UnitsToMM(const mitk::Vector3D &vec_units, mitk::Vector3D &vec_mm) const;
+  void UnitsToMM(const mitk::Point3D &atPt3d_units, const mitk::Vector3D &vec_units, mitk::Vector3D &vec_mm) const;
 
   //##ModelId=3E3453C703AF
   virtual void Initialize();
@@ -291,6 +278,9 @@ protected:
   //## \li call Superclass::InitializeGeometry(newGeometry)
   //## \li transfer all additional members of Self compared to Superclass
   virtual void InitializeGeometry(Self * newGeometry) const;
+
+  virtual void BackTransform(const mitk::Point3D &in, mitk::Point3D& out) const;
+  virtual void BackTransform(const mitk::Point3D &at, const mitk::Vector3D &in, mitk::Vector3D& out) const;
 
   mutable mitk::BoundingBox::Pointer m_ParametricBoundingBox;
 

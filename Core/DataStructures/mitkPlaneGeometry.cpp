@@ -22,9 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vnl/vnl_cross.h>
 
 //##ModelId=3E395F22035A
-mitk::PlaneGeometry::PlaneGeometry() : 
-  m_ScaleFactorMMPerUnitX(1.0), 
-  m_ScaleFactorMMPerUnitY(1.0)
+mitk::PlaneGeometry::PlaneGeometry()
 {
   Initialize();
 }
@@ -33,6 +31,11 @@ mitk::PlaneGeometry::PlaneGeometry() :
 //##ModelId=3E395F220382
 mitk::PlaneGeometry::~PlaneGeometry()
 {
+}
+
+void mitk::PlaneGeometry::Initialize()
+{
+  Superclass::Initialize();
 }
 
 void mitk::PlaneGeometry::EnsurePerpendicularNormal(mitk::AffineTransform3D* transform)
@@ -54,7 +57,14 @@ void mitk::PlaneGeometry::SetIndexToWorldTransform(mitk::AffineTransform3D* tran
 
   Superclass::SetIndexToWorldTransform(transform);
 
-  vtk2itk(transform->GetOffset(), m_Origin);
+  vtk2itk(m_IndexToWorldTransform->GetOffset(), m_Origin);
+}
+
+void mitk::PlaneGeometry::TransferVtkToITKTransform()
+{
+  Superclass::TransferVtkToITKTransform();
+
+  vtk2itk(m_IndexToWorldTransform->GetOffset(), m_Origin);
 }
 
 void mitk::PlaneGeometry::SetBounds(const BoundingBox::BoundsArrayType& bounds)
@@ -84,34 +94,17 @@ void mitk::PlaneGeometry::MMToUnits(const mitk::Point2D &pt_mm, mitk::Point2D &p
 }
 
 //##ModelId=3E3B9C8C0145
-void mitk::PlaneGeometry::UnitsToMM(const mitk::Vector2D &vec_units, mitk::Vector2D &vec_mm) const
+void mitk::PlaneGeometry::UnitsToMM(const mitk::Point2D &atPt2d_units, const mitk::Vector2D &vec_units, mitk::Vector2D &vec_mm) const
 {
   vec_mm[0]=m_ScaleFactorMMPerUnitX*vec_units[0];
   vec_mm[1]=m_ScaleFactorMMPerUnitY*vec_units[1];
 }
 
 //##ModelId=3E3B9C8E0152
-void mitk::PlaneGeometry::MMToUnits(const mitk::Vector2D &vec_mm, mitk::Vector2D &vec_units) const
+void mitk::PlaneGeometry::MMToUnits(const mitk::Point2D &atPt2d_mm, const mitk::Vector2D &vec_mm, mitk::Vector2D &vec_units) const
 {
   vec_units[0]=vec_mm[0]*(1.0/m_ScaleFactorMMPerUnitX);
   vec_units[1]=vec_mm[1]*(1.0/m_ScaleFactorMMPerUnitY);
-}
-
-void mitk::PlaneGeometry::Modified() const
-{
-  m_ScaleFactorMMPerUnitX=GetExtentInMM(0)/GetExtent(0);
-  m_ScaleFactorMMPerUnitY=GetExtentInMM(1)/GetExtent(1);  
-
-  assert(m_ScaleFactorMMPerUnitX<ScalarTypeNumericTraits::infinity());
-  assert(m_ScaleFactorMMPerUnitY<ScalarTypeNumericTraits::infinity());
-
-  Superclass::Modified();
-}
-
-void mitk::PlaneGeometry::Initialize()
-{
-  Superclass::Initialize();
-  vtk2itk(m_IndexToWorldTransform->GetOffset(), m_Origin);
 }
 
 void mitk::PlaneGeometry::InitializeStandardPlane(mitk::ScalarType width, mitk::ScalarType height, const Vector3D & spacing, mitk::PlaneGeometry::PlaneOrientation planeorientation, mitk::ScalarType zPosition, bool frontside)
@@ -127,7 +120,7 @@ void mitk::PlaneGeometry::InitializeStandardPlane(mitk::ScalarType width, mitk::
   vnlmatrix(2,2) = spacing[2];
   transform->SetIdentity();
   transform->SetMatrix(matrix);
-
+  
   InitializeStandardPlane(width, height, transform.GetPointer(), planeorientation, zPosition, frontside);
 }
 
@@ -151,9 +144,9 @@ void mitk::PlaneGeometry::InitializeStandardPlane(mitk::ScalarType width, mitk::
       }
       else
       {
-        FillVector3D(origin,   0,  height, zPosition);
-        FillVector3D(rightDV,  1,  0,      0        );
-        FillVector3D(bottomDV, 0,  -1,     0        );
+        FillVector3D(origin,   0,  height, zPosition/*+1*/);
+        FillVector3D(rightDV,  1,  0,      0          );
+        FillVector3D(bottomDV, 0,  -1,     0          );
       }
       normalDirection = 2;
       break;
@@ -166,9 +159,9 @@ void mitk::PlaneGeometry::InitializeStandardPlane(mitk::ScalarType width, mitk::
       }
       else
       {
-        FillVector3D(origin,   0, zPosition,  height);
-        FillVector3D(rightDV,  1, 0,          0     );
-        FillVector3D(bottomDV, 0, 0,         -1     );
+        FillVector3D(origin,   0, zPosition/*+1*/,  height);
+        FillVector3D(rightDV,  1, 0,            0     );
+        FillVector3D(bottomDV, 0, 0,           -1     );
       }
       normalDirection = 1;
       break;
@@ -181,9 +174,9 @@ void mitk::PlaneGeometry::InitializeStandardPlane(mitk::ScalarType width, mitk::
       }
       else
       {
-        FillVector3D(origin,   zPosition, 0,  height);
-        FillVector3D(rightDV,  0,         1,  0     );
-        FillVector3D(bottomDV, 0,         0, -1     );
+        FillVector3D(origin,   zPosition/*+1*/,  0,  height);
+        FillVector3D(rightDV,  0,        1,  0         );
+        FillVector3D(bottomDV, 0,        0, -1         );
       }
       normalDirection = 0;
       break;
@@ -211,7 +204,6 @@ void mitk::PlaneGeometry::InitializeStandardPlane(mitk::ScalarType width, mitk::
 void mitk::PlaneGeometry::InitializeStandardPlane(const mitk::Geometry3D* geometry3D, PlaneOrientation planeorientation, mitk::ScalarType zPosition, bool frontside)
 {
   mitk::ScalarType width, height;
-  mitk::ScalarType widthInMM, heightInMM;
 
   const BoundingBox::BoundsArrayType& boundsarray = geometry3D->GetBoundingBox()->GetBounds();
   mitk::Vector3D  originVector; 
@@ -219,16 +211,16 @@ void mitk::PlaneGeometry::InitializeStandardPlane(const mitk::Geometry3D* geomet
   switch(planeorientation)
   {
     case Transversal:
-      width  = geometry3D->GetExtent(0); widthInMM  = geometry3D->GetExtentInMM(0);
-      height = geometry3D->GetExtent(1); heightInMM = geometry3D->GetExtentInMM(1);
+      width  = geometry3D->GetExtent(0);
+      height = geometry3D->GetExtent(1);
       break;
     case Frontal:
-      width  = geometry3D->GetExtent(0); widthInMM  = geometry3D->GetExtentInMM(0);
-      height = geometry3D->GetExtent(2); heightInMM = geometry3D->GetExtentInMM(2);
+      width  = geometry3D->GetExtent(0);
+      height = geometry3D->GetExtent(2);
       break;
     case Sagittal:
-      width  = geometry3D->GetExtent(1); widthInMM  = geometry3D->GetExtentInMM(1);
-      height = geometry3D->GetExtent(2); heightInMM = geometry3D->GetExtentInMM(2);
+      width  = geometry3D->GetExtent(1);
+      height = geometry3D->GetExtent(2);
       break;
     default:
       itkExceptionMacro("unknown PlaneOrientation");

@@ -216,8 +216,8 @@ void mitk::SlicedGeometry3D::SetSpacing(mitk::Vector3D aSpacing)
     if(constplanegeometry != NULL)
     {
       MMToUnits(constplanegeometry->GetOrigin(), origin);
-      MMToUnits(constplanegeometry->GetAxisVector(0), rightDV);
-      MMToUnits(constplanegeometry->GetAxisVector(1), bottomDV);
+      MMToUnits(constplanegeometry->GetOrigin(), constplanegeometry->GetAxisVector(0), rightDV);
+      MMToUnits(constplanegeometry->GetOrigin(), constplanegeometry->GetAxisVector(1), bottomDV);
       oldwidthInMM = constplanegeometry->GetExtentInMM(0);
       oldheightInMM = constplanegeometry->GetExtentInMM(0);
       bounds = constplanegeometry->GetBounds();
@@ -253,8 +253,8 @@ void mitk::SlicedGeometry3D::SetSpacing(mitk::Vector3D aSpacing)
     //create planegeometry according to new spacing
 
     UnitsToMM(origin, origin);
-    UnitsToMM(rightDV, rightDV);
-    UnitsToMM(bottomDV, bottomDV);
+    UnitsToMM(origin, rightDV, rightDV);
+    UnitsToMM(origin, bottomDV, bottomDV);
 
     mitk::PlaneGeometry::Pointer planegeometry=mitk::PlaneGeometry::New();
     planegeometry->InitializeStandardPlane(rightDV.Get_vnl_vector(), bottomDV.Get_vnl_vector(), &m_Spacing);

@@ -67,9 +67,6 @@ public:
   mitkClassMacro(Geometry2D, mitk::Geometry3D);
   itkNewMacro(Self);
 
-  /** Method for creation through the object factory. */
-  //itkNewMacro(Self);
-
   //##ModelId=3DDE65E00122
   //##Documentation
   //## @brief Project a 3D point given in mm (@a pt3d_mm) onto the 2D
@@ -114,7 +111,7 @@ public:
   //## does not have the parameter, @em where the vector that is to be
   //## transformed is located. This method here should also need this
   //## information for general transforms.
-  virtual void UnitsToMM(const mitk::Vector2D &vec_units, mitk::Vector2D &vec_mm) const;
+  virtual void UnitsToMM(const mitk::Point2D &atPt2d_units, const mitk::Vector2D &vec_units, mitk::Vector2D &vec_mm) const;
   //##ModelId=3E3B98C9019B
   //##Documentation
   //## @brief Convert a 2D vector given in mm into a 2D point vector in mm
@@ -123,7 +120,7 @@ public:
   //## does not have the parameter, @em where the vector that is to be
   //## transformed is located. This method here should also need this
   //## information for general transforms.
-  virtual void MMToUnits(const mitk::Vector2D &vec_mm, mitk::Vector2D &vec_units) const;
+  virtual void MMToUnits(const mitk::Point2D &atPt2d_mm, const mitk::Vector2D &vec_mm, mitk::Vector2D &vec_units) const;
 
   //##ModelId=3E3C3A92033E
   //##Documentation
@@ -156,7 +153,6 @@ public:
   //## &projectedVec3d_mm) 
   virtual bool Map(const mitk::Point3D & atPt3d_mm, const mitk::Vector3D &vec3d_mm, mitk::Vector2D &vec2d_mm) const;
 
-
   //##ModelId=3EF48F2E00D4
   //##Documentation
   //## @brief Converts a 2D vector given in mm (@a vec2d_mm) relative to the
@@ -168,7 +164,6 @@ public:
   //## UnitsToMM.
   virtual void Map(const mitk::Point2D & atPt2d_mm, const mitk::Vector2D &vec2d_mm, mitk::Vector3D &vec3d_mm) const;
 
-
   //##ModelId=3EF48F8F01B0
   //##Documentation
   //## @brief Project a 3D vector given in mm (@a vec3d_mm) onto the 2D
@@ -176,6 +171,10 @@ public:
   //## 
   //## @return true projection was possible
   virtual bool Project(const mitk::Point3D & atPt3d_mm, const mitk::Vector3D &vec3d_mm, mitk::Vector3D &projectedVec3d_mm) const;
+
+  virtual void SetIndexToWorldTransform(mitk::AffineTransform3D* transform);
+
+  virtual void SetExtentInMM(int direction, ScalarType extentInMM);
 
   virtual AffineGeometryFrame3D::Pointer Clone() const;
 protected:
@@ -185,7 +184,15 @@ protected:
   virtual ~Geometry2D();
 
 	virtual void InitializeGeometry(Self * newGeometry) const;
-	
+
+  //##Documentation
+  //## @brief factor to convert x-coordinates from mm to units and vice versa
+  //## 
+  mutable mitk::ScalarType m_ScaleFactorMMPerUnitX;
+  //##Documentation
+  //## @brief factor to convert y-coordinates from mm to units and vice versa
+  //## 
+  mutable mitk::ScalarType m_ScaleFactorMMPerUnitY;
 };
 
 } // namespace mitk

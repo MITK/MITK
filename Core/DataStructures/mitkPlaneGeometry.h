@@ -32,7 +32,7 @@ namespace mitk {
 
 //##ModelId=3DDE570F010A
 //##Documentation
-//## @brief Describes a two-dimensional, plane and rectangular surface
+//## @brief Describes a two-dimensional, rectangular plane
 //## @ingroup Geometry
 class PlaneGeometry : public Geometry2D
 {
@@ -44,21 +44,44 @@ public:
 
   enum PlaneOrientation {Transversal, Sagittal, Frontal};
 
-  virtual void SetIndexToWorldTransform(mitk::AffineTransform3D* transform);
-
-  virtual void SetBounds(const BoundingBox::BoundsArrayType& bounds);
-
   //##ModelId=3E3B9C730262
   virtual void UnitsToMM(const mitk::Point2D &pt_units, mitk::Point2D &pt_mm) const;
   //##ModelId=3E3B9C760112
   virtual void MMToUnits(const mitk::Point2D &pt_mm, mitk::Point2D &pt_units) const;
 
   //##ModelId=3E3B9C8C0145
-  virtual void UnitsToMM(const mitk::Vector2D &vec_units, mitk::Vector2D &vec_mm) const;
+  virtual void UnitsToMM(const mitk::Point2D &atPt2d_units, const mitk::Vector2D &vec_units, mitk::Vector2D &vec_mm) const;
   //##ModelId=3E3B9C8E0152
-  virtual void MMToUnits(const mitk::Vector2D &vec_mm, mitk::Vector2D &vec_units) const;
+  virtual void MMToUnits(const mitk::Point2D &atPt2d_mm, const mitk::Vector2D &vec_mm, mitk::Vector2D &vec_units) const;
 
-  virtual void Modified() const;
+  //##Documentation
+  //## @brief Set the origin, i.e. the upper-left corner of the plane
+  //##
+  void SetOrigin(const Point3D& origin)
+  {
+    if(origin!=GetOrigin())
+    {
+      m_Origin = origin;
+      m_IndexToWorldTransform->SetOffset(m_Origin.GetVectorFromOrigin());
+      Modified();
+    }
+  }
+
+  //##Documentation
+  //## @brief Get the origin, i.e. the upper-left corner of the plane
+  const Point3D& GetOrigin() const
+  {
+    return m_Origin;
+  }
+
+  //##Documentation
+  //## @brief Get the origin as VnlVector
+  //##
+  //## \sa GetOrigin
+  VnlVector GetOriginVnl() const
+  {
+    return const_cast<Self*>(this)->m_Origin.Get_vnl_vector();
+  }
 
   virtual void Initialize();
 
@@ -108,12 +131,10 @@ public:
   //## 
   virtual void InitializePlane(const Point3D& origin, const Vector3D& normal);
 
-  AffineGeometryFrame3D::Pointer Clone() const;
-
   //##Documentation
   //## @brief Initialize plane by right-/down-vector.
   //##
-  //## @warning The vectors are set into the matrix as they are, @em without normalization! band multiplied by the respective spacing before they are set in the matrix.
+  //## @warning The vectors are set into the matrix as they are, @em without normalization!
   void SetMatrixByVectors(const VnlVector& rightVector, const VnlVector& downVector, mitk::ScalarType thickness=1.0)
   {
     VnlVector normal = vnl_cross_3d(rightVector, downVector);
@@ -126,8 +147,8 @@ public:
     matrix.GetVnlMatrix().set_column(1, downVector);
     matrix.GetVnlMatrix().set_column(2, normal);
     transform->SetMatrix(matrix);
-    transform->SetOffset(const_cast<Point3D&>(m_Origin).Get_vnl_vector().data_block());
     SetIndexToWorldTransform(transform);
+    SetOrigin(m_Origin);
   }
 
   //##Documentation
@@ -135,38 +156,6 @@ public:
   //## transform-martix is perpendicular to the first two columns
   //##
   static void EnsurePerpendicularNormal(mitk::AffineTransform3D* transform);
-
-  //##Documentation
-  //## @brief Set origin of the plane (upper-left corner)
-  //##
-  //## The origin is equal to the offset of the m_IndexToWorldTransform
-  void SetOrigin(const Point3D& origin)
-  {
-    if(origin!=GetOrigin())
-    {
-      m_IndexToWorldTransform->SetOffset(const_cast<Point3D&>(origin).Get_vnl_vector().data_block());
-      m_Origin = origin;
-      Modified();
-    }
-  }
-
-  //##Documentation
-  //## @brief Origin of the plane (upper-left corner)
-  //##
-  //## The origin is equal to the offset of the m_IndexToWorldTransform
-  const Point3D& GetOrigin() const
-  {
-    return m_Origin;
-  }
-
-  //##Documentation
-  //## @brief Origin of the plane as VnlVector (upper-left corner)
-  //##
-  //## The origin is equal to the offset of the m_IndexToWorldTransform
-  VnlVector GetOriginVnl() const
-  {
-    return const_cast<Self*>(this)->m_Origin.Get_vnl_vector();
-  }
 
   //##Documentation
   //## @brief Normal of the plane
@@ -431,6 +420,14 @@ public:
     return !IsOnPlane( plane );
   }
 
+  virtual void SetIndexToWorldTransform(mitk::AffineTransform3D* transform);
+
+  virtual void TransferVtkToITKTransform();
+
+  virtual void SetBounds(const BoundingBox::BoundsArrayType& bounds);
+
+  AffineGeometryFrame3D::Pointer Clone() const;
+
 protected:
   //##ModelId=3E395F22035A
   PlaneGeometry();
@@ -440,25 +437,9 @@ protected:
   virtual void InitializeGeometry(Self * newGeometry) const;
 
   //##Documentation
-  //## @brief Upper-left corner of the plane
-  //## 
-  //## The origin is equal to the offset of the m_IndexToWorldTransform
+  //## @brief Origin, i.e. upper-left corner of the plane
+  //##
   Point3D m_Origin;
-
-  //##ModelId=3E3BE12C012B
-  //##Documentation
-  //## @brief factor to convert x-coordinates from mm to units and vice versa
-  //## 
-  //## Is calculated in SetPlaneView from the value of m_WidthInUnits and the
-  //## PlaneView
-  mutable mitk::ScalarType m_ScaleFactorMMPerUnitX;
-  //##ModelId=3E3BE12C0167
-  //##Documentation
-  //## @brief factor to convert y-coordinates from mm to units and vice versa
-  //## 
-  //## Is calculated in SetPlaneView from the value of m_HeightInUnits and
-  //## the PlaneView
-  mutable mitk::ScalarType m_ScaleFactorMMPerUnitY;
 };
 
 } // namespace mitk

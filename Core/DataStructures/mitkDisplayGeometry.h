@@ -121,9 +121,9 @@ public:
   virtual const TimeBounds& GetTimeBoundsInMS() const;
 
   //##ModelId=3E3B994B02A6
-  virtual void MMToUnits(const mitk::Vector2D &vec_mm, mitk::Vector2D &vec_units) const;
+  virtual void MMToUnits(const mitk::Point2D &atPt2d_mm, const mitk::Vector2D &vec_mm, mitk::Vector2D &vec_units) const;
   //##ModelId=3E3B994802B6
-  virtual void UnitsToMM(const mitk::Vector2D &vec_units, mitk::Vector2D &vec_mm) const;
+  virtual void UnitsToMM(const mitk::Point2D &atPt2d_units, const mitk::Vector2D &vec_units, mitk::Vector2D &vec_mm) const;
 
   //##ModelId=3E3C666E0299
   unsigned int GetDisplayWidth() const

@@ -9,7 +9,7 @@
             <x>0</x>
             <y>0</y>
             <width>752</width>
-            <height>929</height>
+            <height>932</height>
         </rect>
     </property>
     <property name="caption">
@@ -80,6 +80,8 @@
         <separator/>
         <action name="helpAboutAction"/>
     </item>
+    <item text="new menu" name="unnamed">
+    </item>
 </menubar>
 <toolbars>
     <toolbar dock="2">
@@ -119,17 +121,9 @@
                 <string>if activated, the Undo or Redo operates step by step and not in defined Groups</string>
             </property>
         </widget>
-        <separator/>
+        <action name="Fullscreen"/>
         <separator/>
         <action name="layoutGroup"/>
-    </toolbar>
-    <toolbar dock="2">
-        <property name="name">
-            <cstring>Toolbar</cstring>
-        </property>
-        <property name="label">
-            <string>Toolbar</string>
-        </property>
     </toolbar>
 </toolbars>
 <actions>
@@ -475,6 +469,20 @@
             </property>
         </action>
     </actiongroup>
+    <action>
+        <property name="name">
+            <cstring>Fullscreen</cstring>
+        </property>
+        <property name="toggleAction">
+            <bool>true</bool>
+        </property>
+        <property name="iconSet">
+            <iconset>image8</iconset>
+        </property>
+        <property name="text">
+            <string>Fullscreen</string>
+        </property>
+    </action>
 </actions>
 <images>
     <image name="image0">
@@ -500,6 +508,9 @@
     </image>
     <image name="image7">
         <data format="XPM.GZ" length="767">789c7d92cd8ac2301446f77d8ad0bb2bc3682b1d0a838fa0b81c185c24374de2c211fc5988f8eee6de185b639cefb690d32f075ad249257e560b514d8ac3511e3728d0c9bda8f469bb3dffaee797a26c1ae1af7a2aeaf2a3283f058ae5eeafa735f8354c398436623723340f548448d8cdba3a6c568caa6b43db13628b0db6849a51e3176a4249687c82eb221ac3af94cda8014adaf0439052c25073f328c6157f2e2854be01be791d1b02dddf872936a810740cd3d8199238cf33769e27758c8d933ad685586753c7b1e18ca32aef50f5c6f155d6e10d39c7bd753839872738f7f38157279eef60d0fcf3875cbf8b1bf23fc9c6</data>
+    </image>
+    <image name="image8">
+        <data format="XPM.GZ" length="334">789cd3d7528808f055d0d2e72a2e492cc94c5648ce482c52d04a29cdcdad8c8eb5ade65232345330345630523054d2e15252564856f0cbcf4b05b1f5806c6503300073d1008962ca7030f062e4f9a3d69a0b009af43aaa</data>
     </image>
 </images>
 <connections>
@@ -641,6 +652,12 @@
         <receiver>QmitkMainTemplate</receiver>
         <slot>changeToWidget3Layout()</slot>
     </connection>
+    <connection>
+        <sender>Fullscreen</sender>
+        <signal>toggled(bool)</signal>
+        <receiver>QmitkMainTemplate</receiver>
+        <slot>FullScreenMode(bool)</slot>
+    </connection>
 </connections>
 <includes>
     <include location="global" impldecl="in declaration">mitkDataTree.h</include>
@@ -696,6 +713,7 @@
     <slot>changeToWidget1Layout()</slot>
     <slot>changeToWidget2Layout()</slot>
     <slot>changeToWidget3Layout()</slot>
+    <slot>FullScreenMode( bool fullscreen )</slot>
 </slots>
 <functions>
     <function access="protected">fileOpen( const char * fileName )</function>
@@ -706,7 +724,7 @@
     <function returnType="QmitkStdMultiWidget *">getMultiWidget()</function>
     <function>parseCommandLine()</function>
     <function returnType="mitk::DataTree::Pointer">GetTree()</function>
-    <function>setXMLFallBackPath(const char * anXmlFallBackPath)</function>
+    <function>setXMLFallBackPath( const char * anXmlFallBackPath )</function>
 </functions>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

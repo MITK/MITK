@@ -526,6 +526,13 @@ void QmitkMainTemplate::changeToWidget3Layout()
   mitkMultiWidget->changeLayoutToWidget3();
 }
 
+void QmitkMainTemplate::FullScreenMode(bool fullscreen)
+{
+    if (fullscreen) showFullScreen();
+    else showNormal();
+    
+}
+
 void QmitkMainTemplate::setXMLFallBackPath( const char * anXmlFallBackPath )
 {
   xmlFallBackPath = anXmlFallBackPath;

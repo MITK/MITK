@@ -79,7 +79,7 @@ public:
   //## @warning Always call Update() before, which checks, whether there are vtk-based-mappers.
   virtual void UpdateIncludingVtkActors();
 
-  inline VtkRenderWindow* GetVtkRenderWindow()
+  inline VtkRenderWindow* GetVtkRenderWindow() const
   { 
     if(m_RenderWindow!=NULL)
       return m_RenderWindow->GetVtkRenderWindow();
@@ -89,7 +89,7 @@ public:
 
   //##Documentation
   //## @brief returns the vtk-renderer associated with the OpenGL renderer.
-  inline vtkRenderer * GetVtkRenderer()
+  inline vtkRenderer * GetVtkRenderer() const
   {
     return m_VtkRenderer;
   };

@@ -8,6 +8,8 @@
 *****************************************************************************/
 #include <utility>
 #include "mitkBoolProperty.h"
+#include "EventMapper.h"
+#include "mitkFocusManager.h"
 void QmitkDataManagerControls::init() { 
   while (m_DataTreeView->columns() > 0 ) {
 	m_DataTreeView->removeColumn(0);
@@ -16,20 +18,49 @@ void QmitkDataManagerControls::init() {
   m_DataTreeView->addColumn( "NodeType" );
   m_DataTreeView->addColumn( "RefCount");
   m_RemoveButton->setEnabled(false);
+  mitk::GlobalInteraction* globalInteraction = dynamic_cast<mitk::GlobalInteraction*> (mitk::EventMapper::GetGlobalStateMachine());
+  if (globalInteraction) {
+    mitk::FocusManager* fm = globalInteraction->GetFocusManager();
+    QmitkFocusChangeCommand::Pointer fcc = QmitkFocusChangeCommand::New();
+    fcc->SetQmitkDataManagerControls(this); 
+    mitk::FocusEvent fe; 
 
-  
+    fm->AddObserver(fe,fcc);
+  }
 }
-
 
 // init the combobox with all   
 void QmitkDataManagerControls::UpdateRendererCombo() {
-  m_RenderWindowCombo->clear(); 
+  mitk::RenderWindow* focusedRenderWindow = NULL;  
+
+  mitk::GlobalInteraction* globalInteraction = 
+    dynamic_cast<mitk::GlobalInteraction*> (mitk::EventMapper::GetGlobalStateMachine());
+  if (globalInteraction) {
+    mitk::FocusManager* fm = globalInteraction->GetFocusManager();
+    mitk::BaseRenderer::ConstPointer br = fm->GetFocused();
+    if (br.IsNotNull()) {
+      focusedRenderWindow = br->GetRenderWindow();
+    }
+  }
+
+ m_RenderWindowCombo->clear(); 
   const mitk::RenderWindow::RenderWindowSet rws = mitk::RenderWindow::GetInstances();
   for (mitk::RenderWindow::RenderWindowSet::const_iterator iter = rws.begin();iter != rws.end();iter++) {
-	if ((*iter)->name()) {
-          m_RenderWindowCombo->insertItem(QString((*iter)->name()));
-        }
+    if ((*iter)->name()) {
+      m_RenderWindowCombo->insertItem(QString((*iter)->name()),0);
+//        if ((*iter) == focusedRenderWindow) {
+//          m_RenderWindowCombo->setCurrentItem(0);
+//        }
     }
+ 
+  }
+  if (focusedRenderWindow) {
+    m_RenderWindowCombo->setCurrentText(focusedRenderWindow->name()); 
+    // m_RenderWindowCombo->activated(focusedRenderWindow->name());
+  } else {
+    m_RenderWindowCombo->setCurrentText("no focused window");
+  }
+  m_RendererPropertiesView->SetRenderWindow(m_RenderWindowCombo->currentText()); 
 }
 void QmitkDataManagerControls::SetDataTreeIterator(mitk::DataTreeIterator * it)
 {
@@ -56,7 +87,7 @@ void QmitkDataManagerControls::RemoveButtonClicked()
   } else {
     mitk::DataTreeIterator* selectedIterator = selected->GetDataTreeIterator();
     assert(selectedIterator != NULL);
-selectedIterator->remove();
+    selectedIterator->remove();
     delete selected;
 
   } 

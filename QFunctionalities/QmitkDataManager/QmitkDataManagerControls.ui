@@ -8,7 +8,7 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>493</width>
+            <width>553</width>
             <height>783</height>
         </rect>
     </property>
@@ -239,7 +239,7 @@
 </slots>
 <functions>
     <function access="private" specifier="non virtual">init()</function>
-    <function access="protected">UpdateRendererCombo()</function>
+    <function>UpdateRendererCombo()</function>
     <function>SetDataTreeIterator( mitk::DataTreeIterator * it )</function>
 </functions>
 <layoutdefaults spacing="0" margin="0"/>

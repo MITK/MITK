@@ -23,6 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkCommon.h"
 #include "itkObject.h"
 #include "mitkLevelWindow.h"
+#include "itkWeakPointer.h"
 
 namespace mitk {
 

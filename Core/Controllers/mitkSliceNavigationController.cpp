@@ -98,9 +98,8 @@ void mitk::SliceNavigationController::Update()
           assert(false);
           break;
         case Transversal:
-          planegeometry->InitializeStandardPlane(
-            m_InputWorldGeometry->GetExtent(0), m_InputWorldGeometry->GetExtent(1), 
-            m_InputWorldGeometry->GetIndexToWorldTransform(), 
+          planegeometry->InitializeStandardPlane(            
+            m_InputWorldGeometry,
             PlaneGeometry::Transversal, 
             m_InputWorldGeometry->GetExtent(2)-1, false);
           m_Slice->SetSteps((int)m_InputWorldGeometry->GetExtent(2));
@@ -108,18 +107,16 @@ void mitk::SliceNavigationController::Update()
           break;
         case Frontal:
           planegeometry->InitializeStandardPlane(
-            m_InputWorldGeometry->GetExtent(0), m_InputWorldGeometry->GetExtent(2), 
-            m_InputWorldGeometry->GetIndexToWorldTransform(), 
+            m_InputWorldGeometry,
             PlaneGeometry::Frontal);
-          m_Slice->SetSteps((int)(m_InputWorldGeometry->GetExtent(1)+1.0));
+          m_Slice->SetSteps((int)(m_InputWorldGeometry->GetExtent(1)));
           viewSpacing=m_InputWorldGeometry->GetExtentInMM(1)/m_InputWorldGeometry->GetExtent(1);
           break;
         case Sagittal:
           planegeometry->InitializeStandardPlane(
-            m_InputWorldGeometry->GetExtent(1), m_InputWorldGeometry->GetExtent(2), 
-            m_InputWorldGeometry->GetIndexToWorldTransform(), 
+            m_InputWorldGeometry,
             PlaneGeometry::Sagittal);
-          m_Slice->SetSteps((int)(m_InputWorldGeometry->GetExtent(0)+1.0));
+          m_Slice->SetSteps((int)(m_InputWorldGeometry->GetExtent(0)));
           viewSpacing=m_InputWorldGeometry->GetExtentInMM(0)/m_InputWorldGeometry->GetExtent(0);
           break;
         default:

@@ -408,9 +408,30 @@ static mitk::DataTreeNode::Pointer FileOpen()
         {
           ipPicDescriptor * picImage = image->GetPic();
           picImage = ipFuncRefl(picImage,3);
+          //set tag "REAL PIXEL SIZE"
+          mitk::SlicedGeometry3D* slicedGeometry = image->GetSlicedGeometry();
+          if (slicedGeometry != NULL)
+          {
+            const mitk::Vector3D & spacing = slicedGeometry->GetSpacing();
+            ipPicTSV_t *pixelSizeTag;
+            pixelSizeTag = ipPicQueryTag( picImage, "REAL PIXEL SIZE" );
+            if (!pixelSizeTag)
+            {
+              pixelSizeTag = (ipPicTSV_t *) malloc( sizeof(ipPicTSV_t) );
+              pixelSizeTag->type = ipPicFloat;
+              pixelSizeTag->bpe = 32;
+              strcpy(pixelSizeTag->tag, "REAL PIXEL SIZE");
+              pixelSizeTag->dim = 1;
+              pixelSizeTag->n[0] = 3;            
+              pixelSizeTag->value = malloc( sizeof(float) * 3 );                
+              ipPicAddTag (picImage, pixelSizeTag);            
+            }
+            ((float*)pixelSizeTag->value)[0] = spacing[0];
+            ((float*)pixelSizeTag->value)[1] = spacing[1];
+            ((float*)pixelSizeTag->value)[2] = spacing[2];       
+          }
           ipPicPut((char*)(fileName.ascii()), picImage);
         }
-
       }
       catch ( itk::ExceptionObject &err)
       {

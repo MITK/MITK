@@ -53,6 +53,9 @@
  *   and swaps to the other endianess
  *
  * $Log$
+ * Revision 1.13  2003/03/06 10:53:08  andre
+ * *** empty log message ***
+ *
  * Revision 1.12  2002/11/13 17:52:59  ivo
  * new ipPic added.
  *
@@ -156,7 +159,7 @@ ipPicRemoveFile( char *path )
 
   status = remove( path );
 
-  if( !status )
+  if( status != 0 )
     {
       char buff[1024];
 

@@ -22,7 +22,8 @@ To be able to do that, we implemented the concept of statemachines with several 
 
 \image html statemachine.jpg
 
-\b Example: A deterministic Mealy-statemachine has always one current state (here state 1). If an event 1 is sent to the statemachine, it searches in its current state for a transition that waits for event 1 (here transition 1). The statemachine finds transition 1, changes the current state to state2, cause the transition points to it and executes actions 1 and 2. Now state 2 is the current state. The statemachine recieves an event 2 and searches for an according transition. Transition 2 waits for event 2, and since the transition leads to state 2 the current state is not changed. Action 3 and 4 are executed. Now Event 3 gets send to the statemachine but the statemachine can't find an according transition in state 2. Only transition 2 , that waits for event 2 and transition 4, that waits for event 4 are defined in that state. So the statemachine ignores the event and doesn't change the state or execute an action. Now the statemachine recieves an event 4 and finds transition 3. So now the current state changes from state 2 to state 1 and actions 5 and 1 are executed.
+\subsubsection ExampleA Example A: 
+A deterministic Mealy-statemachine has always one current state (here state 1). If an event 1 is sent to the statemachine, it searches in its current state for a transition that waits for event 1 (here transition 1). The statemachine finds transition 1, changes the current state to state2, cause the transition points to it and executes actions 1 and 2. Now state 2 is the current state. The statemachine recieves an event 2 and searches for an according transition. Transition 2 waits for event 2, and since the transition leads to state 2 the current state is not changed. Action 3 and 4 are executed. Now Event 3 gets send to the statemachine but the statemachine can't find an according transition in state 2. Only transition 2 , that waits for event 2 and transition 4, that waits for event 4 are defined in that state. So the statemachine ignores the event and doesn't change the state or execute an action. Now the statemachine recieves an event 4 and finds transition 3. So now the current state changes from state 2 to state 1 and actions 5 and 1 are executed.
 
 Several actions can be defined in one transition. The execution of an action is the active part of the statemachine. Here is where the statemachine can make changes in data, e.g. add a Point into a list.
 
@@ -32,7 +33,38 @@ Guard States are a special kind of states. The action, that is executed after th
 
 \image html statemachine_guard.jpg
 
-\b Example: Event 1 is send to the statemachine. This leads the current state from state 1 into state check. The action 1 is executed. This action checks a condition and puts the result into a new event, that is send an handled by the same (this) statemachine. E.g. is the the object, the statemachine handles the interaction, picked with the recieved mouse-koordinate? The event, that is generated, will be Yes or No. In case of event No, the statemachine sets the current state back to state 1 and executes action 2. In case of event Yes, the statemachine changes the state from state check into state 2 and executes action 3, which e.g. can select the object taken care of.
+\subsubsection ExampleB Example B: 
+Event 1 is send to the statemachine. This leads the current state from state 1 into state check. The action 1 is executed. This action checks a condition and puts the result into a new event, that is send an handled by the same (this) statemachine. E.g. is the the object, the statemachine handles the interaction, picked with the recieved mouse-koordinate? The event, that is generated, will be Yes or No. In case of event No, the statemachine sets the current state back to state 1 and executes action 2. In case of event Yes, the statemachine changes the state from state check into state 2 and executes action 3, which e.g. can select the object taken care of.
 
+\subsection XMLDefinitionStatemachine Definition of a Statemachine
+Due to the separation of the definition of an interaction sequence and its implementation, the definition has to be archived somewhere, where the application can reach it during startup and build up all the objects (states, transitions and actions) that represent the sequence of a special interaction. In MITK, these informations are defined in an XML-file (usually in Interaction/mitkBaseInteraction/StateMachine.xml).
+The structure is the following (from \ref ExampleA) :
 
+@code
+  <stateMachine NAME="statemachine1">					<!-- defining a new statemachine with its name -->
+    <state NAME="State1" ID="1" START_STATE="TRUE">			<!-- new state tag;this state is the startstate of the statemachine and has ID=1 -->
+      <transition NAME="transition1" NEXT_STATE_ID="2" EVENT_ID="1">	<!-- transition, that waits for event with the ID=1 and leads to state 2 -->
+        <action ID="1" />						<!-- action ID = 1 shall be executed --> 
+        <action ID="2" />						<!-- action ID = 2 shall be executed --> 
+      </transition>							<!-- end of transition -->
+    </state>								<!-- end of state ID = 0 -->
+    <state NAME="state2" ID="2">						
+      <transition NAME="transition2" NEXT_STATE_ID="2" EVENT_ID="2">
+        <action ID="3" />
+        <action ID="4" />
+      </transition>
+      <transition NAME="transition3" NEXT_STATE_ID="1" EVENT_ID="4" >
+        <action ID="5" />
+        <action ID="1" />
+      </transition>
+    </state>
+  </stateMachine>
+@endcode
+
+The identification numbers (ID) inside a statemachine has to be unique. Each statemachine has to have one state, that is defined as the start-state of that statemachine. This means, initialy, the current state of the statemachine is the start-state. 
+
+During startup the structure of all statemachines are ckecked for not having states, that have no transitions leading out of it (dead states), or states, that have no transitions leading into it (magic states) [Bin99 p. 183]. If an error is found, an error-message will be displayed and the statemachine will be loaded.
+
+\subsection references References
+[Bin99] Robert V. Binder. Testing Object-Oriented Systems: Models, Patterns, and Tools. Addison-Wesley, 1999
  */

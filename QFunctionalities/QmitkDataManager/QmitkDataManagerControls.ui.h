@@ -20,8 +20,9 @@ void QmitkDataManagerControls::SetDataTreeIterator(mitk::DataTreeIterator * it)
 
   if (hl->findWidget(dataTreeView) == -1) {
     dataTreeView = new DataTreeView(this);
+    dataTreeView->addColumn( "Class/Node" );
     dataTreeView->addColumn( "Name" );
-    dataTreeView->addColumn( "Properties" );
+    dataTreeView->addColumn( "Value" );
     dataTreeView->setRootIsDecorated(true);
     hl->addWidget( dataTreeView );
   }

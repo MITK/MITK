@@ -27,6 +27,8 @@ See MITKCopyright.txt or http://www.mitk.org/ for details.
 #include <mitkInteractionConst.h>
 #include <mitkLine.h>
 
+#include "mitkRenderWindow.h"//*\todo remove later, when update ok!
+
 
 mitk::Mesh::Mesh()
 {
@@ -396,7 +398,6 @@ void mitk::Mesh::ExecuteOperation(Operation* operation)
     }
     break;
 	case OpADDLINE: 
-    //deselects all lines and 
     //inserts the ID of the selected point into the indexes of lines in the selected cell
     //afterwars the added line is selected
 		{
@@ -433,24 +434,22 @@ void mitk::Mesh::ExecuteOperation(Operation* operation)
         if( cell->GetType() == CellType::POLYGON_CELL )
         {
           PolygonType * polygon = static_cast<PolygonType *>( cell );
+          //add the pointId to the Cell. filling the empty cell with 
+          //one id doesn't mean to add a line, it means, that the 
+          //initilal PointId is set. The next addition of a pointId adds a line
+          polygon->AddPointId(pId);
 
-          //deselect all other lines
+          //select the line, if we really added a line, so now have more than 1 pointID in the cell
           CellDataType cellData;
           ok = m_ItkData->GetCellData(cellId, &cellData);
           if (ok)
           {
-            //set the new line selected
-            //if we are to add pId = 0, then we don't select it, cause adding pId 0 to the 
-            //index of a cell only 'initiates' the line-drawing.
             //A line between point 0 and 1 has the Id 0. A line between 1 and 2 has a Id = 1.
-            //So we add pId to the cell and for selection add pId - 1.
-            if (pId > 0)
-              cellData.selectedLines.push_back(pId-1);
+            //So we add getnumberofpoints-2.
+            if (polygon->GetNumberOfPoints()>1)
+              cellData.selectedLines.push_back(polygon->GetNumberOfPoints()-2);
           }
           m_ItkData->SetCellData(cellId, cellData);
-
-          //even if it is the pointId = 0, then we have our start.
-          polygon->AddPointId(pId);
           m_ItkData->SetCell(cellId, cellAutoPointer);
         }
       }
@@ -492,12 +491,12 @@ void mitk::Mesh::ExecuteOperation(Operation* operation)
         {
           PolygonType * polygon = static_cast<PolygonType *>( cell );
           CellAutoPointer oldCell;
-  //        polygon->MakeCopy(oldCell);
-  //due to bug in itk::PolygonCell::MakeCopy
-  PolygonType * newPolygonCell = new PolygonType;
-  oldCell.TakeOwnership( newPolygonCell );
-  unsigned long numberOfPoints = polygon->GetNumberOfPoints();
-  newPolygonCell->SetPointIds(0, numberOfPoints, polygon->GetPointIds());
+          //polygon->MakeCopy(oldCell);
+          //due to bug in itk::PolygonCell::MakeCopy
+          PolygonType * newPolygonCell = new PolygonType;
+          oldCell.TakeOwnership( newPolygonCell );
+          unsigned long numberOfPoints = polygon->GetNumberOfPoints();
+          newPolygonCell->SetPointIds(0, numberOfPoints, polygon->GetPointIds());
 
 //          unsigned long numberOfPoints = oldCell->GetNumberOfPoints();
           PointIdConstIterator oldIter;
@@ -789,6 +788,8 @@ void mitk::Mesh::ExecuteOperation(Operation* operation)
 
   ((const itk::Object*)this)->InvokeEvent(itk::EndEvent());
 
+  mitk::RenderWindow::UpdateAllInstances(); //*todo has to be done here, cause of update-pipeline not working yet
+
 }
 
 mitk::Mesh::DataType::BoundingBoxPointer mitk::Mesh::GetBoundingBoxFromCell(unsigned long cellId)
@@ -815,4 +816,3 @@ mitk::Mesh::DataType::BoundingBoxPointer mitk::Mesh::GetBoundingBoxFromCell(unsi
   }
   return bBoxPointer;
 }
-

@@ -56,7 +56,7 @@ void main( int argc, char *argv[] )
 { 
 	int i;
 	
-	unsigned int n_infiles;
+	int n_infiles;
 	char **infile_names;
 
 	unsigned int n;
@@ -177,6 +177,9 @@ void main( int argc, char *argv[] )
 	else
 	{
 		n_infiles=argc-2-aoffset;
+		if(n_infiles<=0)
+			exit( -3 );
+
 		infile_names=malloc(n_infiles*sizeof(char*));
 		for(i=0;i<n_infiles;++i)
 			infile_names[i]=argv[aoffset+i+2];

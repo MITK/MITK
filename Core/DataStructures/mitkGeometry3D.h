@@ -177,6 +177,8 @@ public:
   //##ModelId=3E3453C703AF
   virtual void Initialize();
 
+  void TransferItkToVtkTransform();
+
   //##Documentation
   //## @brief clones the geometry
   //##

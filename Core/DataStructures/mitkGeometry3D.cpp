@@ -29,12 +29,27 @@ void mitk::Geometry3D::Initialize()
 
   Superclass::Initialize();
 
-  m_VtkUnitsToMMAffineTransform = vtkTransform::New();  
-  m_VtkUnitsToMMAffineTransform->Identity();
-
+  TransferItkToVtkTransform();
+ 
   m_ParametricTransform = m_UnitsToMMAffineTransform;
 
   m_TimeBoundsInMS[0]=-ScalarTypeNumericTraits::max(); m_TimeBoundsInMS[1]=ScalarTypeNumericTraits::max();
+}
+
+void mitk::Geometry3D::TransferItkToVtkTransform()
+{
+ // copy m_UnitsToMMAffineTransform into m_VtkUnitsToMMAffineTransform 
+  m_VtkUnitsToMMAffineTransform = vtkTransform::New();
+  vtkMatrix4x4 * vtkmatrix = vtkMatrix4x4::New();
+  vtkmatrix->Identity();
+  int i,j;
+  for(i=0;i<3;++i)
+    for(j=0;j<3;++j)
+      vtkmatrix->SetElement(i, j, m_UnitsToMMAffineTransform->GetMatrix().GetVnlMatrix().get(i, j));
+  for(i=0;i<3;++i)
+    vtkmatrix->SetElement(i, 3, m_UnitsToMMAffineTransform->GetOffset()[i]);
+  m_VtkUnitsToMMAffineTransform->SetMatrix(vtkmatrix);
+  vtkmatrix->Delete();
 }
 
 void mitk::Geometry3D::SetTimeBoundsInMS(const TimeBounds& timebounds)

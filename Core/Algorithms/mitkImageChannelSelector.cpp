@@ -11,3 +11,13 @@ mitk::ImageChannelSelector::~ImageChannelSelector()
 {
 }
 
+//##ModelId=3E3BD0C70343
+void mitk::ImageChannelSelector::GenerateOutputInformation()
+{
+}
+
+//##ModelId=3E3BD0C903DC
+void mitk::ImageChannelSelector::GenerateData()
+{
+}
+

@@ -8,6 +8,9 @@
 namespace mitk {
 
 //##ModelId=3DCBFE35015D
+//##Documentation
+//## Provides access to a slice of the input image. If the input is generated
+//## by a ProcessObject, only the required data is requested.
 class ImageSliceSelector : public SubImageSelector
 {
   public:
@@ -35,18 +38,16 @@ class ImageSliceSelector : public SubImageSelector
 	itkGetConstMacro(ChannelNr,int);
 	itkSetMacro(ChannelNr,int);
 
-    //##ModelId=3E1B196A0188
-    ImageSliceSelector();
-
-    //##ModelId=3E1B196A01C4
-    virtual ~ImageSliceSelector();
-
 protected:
     //##ModelId=3E1A0A2E027F
     virtual void GenerateOutputInformation();
 
     //##ModelId=3E1A0A320090
     virtual void GenerateData();
+    //##ModelId=3E1B196A0188
+    ImageSliceSelector();
+    //##ModelId=3E1B196A01C4
+    virtual ~ImageSliceSelector();
 
     //##ModelId=3E1A0B390283
     int m_SliceNr;

@@ -1,6 +1,13 @@
 #include "Geometry3D.h"
 #include "PlaneGeometry.h"
 
+#ifdef MITK_DICOM_ENABLED
+extern "C"
+{
+#include "ipDicom.h"
+}
+#endif
+
 //##ModelId=3DCBF3AD0110
 const unsigned int *mitk::Geometry3D::GetDimensions() const
 {
@@ -14,10 +21,34 @@ unsigned int mitk::Geometry3D::GetDataDimension() const
 }
 
 //##ModelId=3DCBF50C0377
-mitk::Geometry2D::Pointer mitk::Geometry3D::GetGeometry2D(int s, int t) const
+mitk::Geometry2D::ConstPointer mitk::Geometry3D::GetGeometry2D(int s, int t) const
 {
-	itkExceptionMacro("GetGeometry2D not yet supported."); 	
-	return NULL;
+    mitk::Geometry2D::ConstPointer geometry2d = NULL;
+
+    if(IsValidSlice(s, t))
+    {
+        int pos=s*m_Dimensions[2]+t*m_Dimensions[3];
+	    geometry2d = m_Geometry2Ds[pos];
+        //if (a) we don't have a Geometry2D stored for the requested slice, 
+        //(b) m_EvenlySpaced is activated and (c) the first slice (s=0,t=0) 
+        //is a PlaneGeometry instance, then we calculate geometry of the requested
+        //as the plane of the first slice shifted by m_Spacing*s.
+        if((m_EvenlySpaced) && (geometry2d==NULL))
+        {
+            const PlaneGeometry* firstslice=dynamic_cast<const PlaneGeometry*> (m_Geometry2Ds[0].GetPointer());
+            if(geometry2d!=NULL)
+            {
+                mitk::PlaneView view=firstslice->GetPlaneView();
+                mitk::PlaneGeometry::Pointer requestedslice;
+                requestedslice = mitk::PlaneGeometry::New();
+                view.point+=m_Spacing*s;
+                requestedslice->SetPlaneView(view);
+                geometry2d = requestedslice;
+                m_Geometry2Ds[pos] = geometry2d;
+            }
+        }
+    }
+    return geometry2d;
 }
 
 //##ModelId=3DCBF5D40253
@@ -41,88 +72,120 @@ mitk::Geometry3D::TransformPointer mitk::Geometry3D::GetTransfrom() const
 }
 
 //##ModelId=3DDE65D1028A
-void mitk::Geometry3D::PointMMToUnits(const Point3f &pt_mm, Point3f &pt_units, float t) const
+void mitk::Geometry3D::MMToUnits(const mitk::Point3D &pt_mm, mitk::Point3D &pt_units, float t) const
 {
-    pt_units.set(pt_mm.x/m_Resolution.x, pt_mm.y/m_Resolution.y, pt_mm.z/m_Resolution.z);
+    m_TransformMMToUnits.transform(pt_mm, &pt_units);
 }
 
 //##ModelId=3DDE65DC0151
-void mitk::Geometry3D::PointUnitsToMM(const Point3f &pt_units, Point3f &pt_mm, float t) const
+void mitk::Geometry3D::UnitsToMM(const mitk::Point3D &pt_units, mitk::Point3D &pt_mm, float t) const
 {
-    pt_mm.set(pt_units.x*m_Resolution.x, pt_units.y*m_Resolution.y, pt_units.z*m_Resolution.z);
+    m_TransformUnitsToMM.transform(pt_units, &pt_mm);
+}
+
+//##ModelId=3E3B986602CF
+void mitk::Geometry3D::MMToUnits(const mitk::Vector3D &vec_mm, mitk::Vector3D &vec_units, float t) const
+{
+    m_TransformMMToUnits.transform(vec_mm, &vec_units);
+}
+
+//##ModelId=3E3B987503A3
+void mitk::Geometry3D::UnitsToMM(const mitk::Vector3D &vec_units, mitk::Vector3D &vec_mm, float t) const
+{
+    m_TransformUnitsToMM.transform(vec_units, &vec_mm);
 }
 
 //##ModelId=3DCBC65C017C
-const double *mitk::Geometry3D::GetSpacing() const
+const float *mitk::Geometry3D::GetSpacing() const
 {
-	itkExceptionMacro("Spacing not yet supported."); 	
-	return NULL;
+	return &m_Spacing.x;
 }
 
 //##ModelId=3E15578402BD
-bool mitk::Geometry3D::SetGeometry2D(mitk::Geometry2D* geometry2D, int s, int t)
+bool mitk::Geometry3D::SetGeometry2D(const mitk::Geometry2D* geometry2D, int s, int t)
 {
-	itkExceptionMacro("SetGeometry2D not yet supported."); 	
+    if(IsValidSlice(s,t))
+    {
+        m_Geometry2Ds[s*m_Dimensions[2]+t*m_Dimensions[3]]=geometry2D;
+        return true;
+    }
 	return false;
 }
 
 //##ModelId=3E155839024F
 bool mitk::Geometry3D::SetGeometry2D(ipPicDescriptor* pic, int s, int t)
 {
-	itkExceptionMacro("SetGeometry2D not yet supported."); 	
-	return false;
+    if((pic!=NULL) && (IsValidSlice(s,t)))
+    {
+        itkWarningMacro("SetGeometry2D by pic assumes a plane geometry starting at (0,0,0)."); 
+
+        //construct standard view
+        mitk::Point3D origin, right, bottom; bool rightHanded=true;
+	    mitk::Vector2D viewport(0,0);
+        origin.set(0,0,s);               UnitsToMM(origin, origin);
+        right.set(m_Dimensions[0],0,0);  UnitsToMM(right, right);
+        bottom.set(0,m_Dimensions[1],0); UnitsToMM(bottom, bottom);
+
+        PlaneView view_std(origin, right, bottom, viewport, viewport, rightHanded);
+
+        mitk::PlaneGeometry::Pointer planegeometry=mitk::PlaneGeometry::New();
+        planegeometry->SetPlaneView(view_std);
+        planegeometry->SetSizeInUnits(m_Dimensions[0], m_Dimensions[1]);
+        SetGeometry2D(planegeometry, s, t);
+        return true;
+    }
+    return false;
 }
 
 //##ModelId=3E3453C703AF
 void mitk::Geometry3D::Initialize(unsigned int dimension, const unsigned int* dimensions)
 {
-    m_Dimension=dimension;
+	m_Dimension=dimension;
+	if(m_Dimensions!=NULL)
+		delete m_Dimensions;
+	m_Dimensions=new unsigned int[m_Dimension>4?m_Dimension:4];
+	memcpy(m_Dimensions, dimensions, sizeof(unsigned int)*m_Dimension);
+	if(m_Dimension<4)
+	{
+		unsigned int i, *p;
+		for(i=0,p=m_Dimensions+m_Dimension;i<4-m_Dimension;++i, ++p)
+			*p=1;
+	}
 
-    if(m_Dimensions!=NULL)
-        delete m_Dimensions;
-
-    m_Dimensions = new unsigned int [m_Dimension];
-    memcpy(m_Dimensions,dimensions,m_Dimension*sizeof(*m_Dimensions));
-
-	unsigned int i, max;
-
-	max=m_Dimension<=4?m_Dimension:4;
-
-	for(i=0;i<max;++i)
+	unsigned int i;
+	for(i=0;i<4;++i)
 	{
 		m_LargestPossibleRegion.SetIndex(i, 0);
 		m_LargestPossibleRegion.SetSize (i, m_Dimensions[i]);
 	}
-	for(;i<4;++i)
-	{
-		m_LargestPossibleRegion.SetIndex(i, 0);
-		m_LargestPossibleRegion.SetSize (i, 1);
-	}
 
     m_Geometry2Ds.clear();
 
-    Geometry2D::Pointer gnull=NULL;
-    int num=m_LargestPossibleRegion.GetSize(2)*m_LargestPossibleRegion.GetSize(3);
+    Geometry2D::ConstPointer gnull=NULL;
+    int num=m_Dimensions[2]*m_Dimensions[3];
 
     m_Geometry2Ds.reserve(num);
     m_Geometry2Ds.assign(num, gnull);
-    
-    m_Resolution.set(1.0, 1.0, 1.0);
+
+    //initialize m_TransformOfOrigin and m_Spacing (and m_TransformUnitsToMM/m_TransformMMToUnits).
+    m_TransformOfOrigin.setIdentity();
+    SetSpacing(Vector3D(1.0,1.0,1.0));
 
     //construct standard view
-    Point3f o1, o2; bool rightHanded=true;
-	Vector2f viewport(0,0);
-	o1.set(m_LargestPossibleRegion.GetSize(0),0,0); PointUnitsToMM(o1, o1);
-    o2.set(0,m_LargestPossibleRegion.GetSize(1),0); PointUnitsToMM(o2, o2);
-    PlaneView view_std(Point3f(0,0,0), o1, o2, viewport, viewport, rightHanded);
+    mitk::Point3D right, bottom; bool rightHanded=true;
+	mitk::Vector2D viewport(0,0);
+    right.set(m_Dimensions[0],0,0); UnitsToMM(right, right);
+    bottom.set(0,m_Dimensions[1],0); UnitsToMM(bottom, bottom);
+    PlaneView view_std(mitk::Point3D(0,0,0), right, bottom, viewport, viewport, rightHanded);
 
     mitk::PlaneGeometry::Pointer planegeometry=mitk::PlaneGeometry::New();
     m_Geometry2Ds[0]=planegeometry;
     planegeometry->SetPlaneView(view_std);
+    planegeometry->SetSizeInUnits(m_Dimensions[0], m_Dimensions[1]);
 }
 
 //##ModelId=3E15572E0269
-mitk::Geometry3D::Geometry3D(unsigned int dimension, const unsigned int* dimensions) : m_Dimension(0), m_Dimensions(NULL)
+mitk::Geometry3D::Geometry3D(unsigned int dimension, const unsigned int* dimensions) : m_Dimension(0), m_Dimensions(NULL), m_EvenlySpaced(true)
 {
     Initialize(dimension, dimensions);
 }
@@ -146,3 +209,95 @@ mitk::Geometry3D::~Geometry3D()
         delete m_Dimensions;
 }
 
+//##ModelId=3E3BE1F10106
+bool mitk::Geometry3D::IsValidSlice(int s, int t) const
+{
+	return ((s>=0) && (s<m_Dimensions[2]) && (t>=0) && (t<m_Dimensions[3]));
+}
+
+//##ModelId=3E3BE1F8000C
+bool mitk::Geometry3D::IsValidTime(int t) const
+{
+	return IsValidSlice(0, t);
+}
+
+//##ModelId=3E3BE8CF010E
+void mitk::Geometry3D::SetSpacing(mitk::Vector3D aSpacing)
+{
+    m_Spacing = aSpacing;
+
+    m_TransformUnitsToMM=m_TransformOfOrigin;
+
+    mitk::Vector4D col;
+    m_TransformUnitsToMM.getColumn(0, &col); col*=aSpacing.x; m_TransformUnitsToMM.setColumn(0, col);
+    m_TransformUnitsToMM.getColumn(1, &col); col*=aSpacing.x; m_TransformUnitsToMM.setColumn(1, col);
+    m_TransformUnitsToMM.getColumn(2, &col); col*=aSpacing.x; m_TransformUnitsToMM.setColumn(2, col);
+
+    m_TransformMMToUnits.invert(m_TransformUnitsToMM);
+
+    Modified();
+}
+
+//##ModelId=3E3C13F802A6
+void mitk::Geometry3D::SetEvenlySpaced(bool on)
+{
+    m_EvenlySpaced=on;
+    Modified();
+}
+
+//##ModelId=3E3C2C37031B
+void mitk::Geometry3D::SetSpacing(ipPicDescriptor* pic)
+{
+    Vector3D spacing(m_Spacing);
+
+    ipPicTSV_t *tsv;
+
+    tsv = ipPicQueryTag( pic, "PIXEL SIZE" );
+	if(tsv)
+	{
+		if((tsv->dim*tsv->n[0]>=3) && (tsv->type==ipPicFloat))
+		{
+			if(tsv->bpe==32)
+				spacing.set(((ipFloat4_t*)tsv->value)[0], ((ipFloat4_t*)tsv->value)[1],((ipFloat4_t*)tsv->value)[2]);
+			else
+			if(tsv->bpe==64)
+				spacing.set(((ipFloat8_t*)tsv->value)[0], ((ipFloat8_t*)tsv->value)[1],((ipFloat8_t*)tsv->value)[2]);
+		}
+	}
+#ifdef MITK_DICOM_ENABLED
+	else
+	{		
+		tsv = ipPicQueryTag( pic, "SOURCE HEADER" );
+		if( tsv )
+		{
+			ipFloat8_t spacing = 0;
+			ipFloat8_t thickness = 1;
+			ipFloat8_t fx = 1;
+			ipFloat8_t fy = 1;
+			
+			if( dicomFindElement( (unsigned char *) tsv->value, 0x0018, 0x0088, &data, &len ) )
+			{
+				sscanf( (char *) data, "%lf", &spacing );
+				itkDebugMacro( "spacing:   %5.2f mm\n" << spacing );
+			}
+			if( dicomFindElement( (unsigned char *) tsv->value, 0x0018, 0x0050, &data, &len ) )
+			{
+				sscanf( (char *) data, "%lf", &thickness );
+				itkDebugMacro( "thickness: %5.2f mm\n" << thickness );
+				
+				if( thickness == 0 )
+					thickness = 1;
+			}
+			if( dicomFindElement( (unsigned char *) tsv->value, 0x0028, 0x0030, &data, &len )
+				&& len>0 && ((char *)data)[0] )
+			{
+				sscanf( (char *) data, "%lf\\%lf", &fy, &fx );    // row / column value 
+				itkDebugMacro( "fx, fy:    %5.2f/%5.2f mm\n" << fx << fy );
+			}
+
+            spacing.set(fx, fy,( spacing > 0 ? spacing : thickness));
+		}
+	}
+#endif
+    SetSpacing(spacing);
+}

@@ -4,7 +4,6 @@
 #include "mitkCommon.h"
 #include "Geometry2D.h"
 #include <itkImageRegion.h>
-#include "SpaceGeometry.h"
 
 namespace mitk {
 
@@ -13,17 +12,39 @@ namespace mitk {
 #endif
 
 //##ModelId=3DCBF389032B
-class Geometry3D : public itk::LightObject
+//##Documentation
+//## Describes the geometry of a data object, e.g., an Image. At least, it can
+//## return the bounding box of the data object. If the data object consists of
+//## slices, a Geometry2D can be requested for each slice and conversions
+//## between world coordinates (in mm) and units coordinates (e.g., pixels in
+//## the case of an Image) can be performed.
+//## 
+//## Geometry3D and the associated Geometry2Ds (if applicable) have to be
+//## initialized in the method GenerateOutputInformation() of BaseProcess (or
+//## CopyInformation/ UpdateOutputInformation of BaseData, if possible, e.g.,
+//## by analyzing pic tags in Image) subclasses. See also
+//## itk::ProcessObject::GenerateOutputInformation(),
+//## itk::DataObject::CopyInformation() and
+//## itk::DataObject::UpdateOutputInformation().
+//## 
+//## @warning The Geometry2Ds are not necessarily up-to-date and not even
+//## initialized. As described in the previous paragraph, one of the
+//## Generate-/Copy-/UpdateOutputInformation methods have to initialize it.
+//## mitk::BaseData::GetGeometry2D() makes sure, that the Geometry2D is
+//## up-to-date before returning it (by setting the update extent appropriately
+//## and calling UpdateOutputInformation).
+//## 
+//## Rule: everything is in mm (ms) if not stated otherwise.
+class Geometry3D : public itk::Object
 {
 public:
     /** Standard class typedefs. */
     //##ModelId=3E1018B502F0
     typedef Geometry3D         Self;
     //##ModelId=3E1018B5032C
-    typedef itk::LightObject   Superclass;
+    typedef itk::Object        Superclass;
     //##ModelId=3E1018B50368
     typedef itk::SmartPointer<Self> Pointer;
-
     //##ModelId=3E1018B5039A
     typedef itk::SmartPointer<const Self> ConstPointer;
 
@@ -31,7 +52,7 @@ public:
     //	itkNewMacro(Self);
 
     /** Run-time type information (and related methods). */
-    itkTypeMacro(Geometry3D, itk::LightObject);
+    itkTypeMacro(Geometry3D, itk::Object);
 
 #if !(_MSC_VER < 1300)
     //##ModelId=3E1552A603AC
@@ -70,7 +91,26 @@ public:
     unsigned int GetDataDimension() const;
 
     //##ModelId=3DCBF50C0377
-    mitk::Geometry2D::Pointer GetGeometry2D(int s, int t) const;
+    //##Documentation
+    //## Return the Geometry2D of the slice (@a s, @a t).
+    //## If (a) we don't have a Geometry2D stored for the requested slice, 
+    //## (b) m_EvenlySpaced is activated and (c) the first slice (s=0,t=0) 
+    //## is a PlaneGeometry instance, then we calculate geometry of the
+    //## requested
+    //## as the plane of the first slice shifted by m_Spacing*s.
+    //## 
+    //## @warning The Geometry2Ds are not necessarily up-to-date and not even
+    //## initialized. Geometry2Ds (if applicable) have to be initialized in the
+    //## method GenerateOutputInformation() of BaseProcess (or CopyInformation/
+    //## UpdateOutputInformation of BaseData, if possible, e.g., by analyzing
+    //## pic tags in Image) subclasses. See also
+    //## itk::ProcessObject::GenerateOutputInformation(),
+    //## itk::DataObject::CopyInformation() and
+    //## itk::DataObject::UpdateOutputInformation().
+    //## mitk::BaseData::GetGeometry2D() makes sure, that the Geometry2D is
+    //## up-to-date before returning it (by setting the update extent
+    //## appropriately and calling UpdateOutputInformation).
+    mitk::Geometry2D::ConstPointer GetGeometry2D(int s, int t) const;
 
     //##ModelId=3DCBF5D40253
     void GetBoundingBox() const;
@@ -82,13 +122,13 @@ public:
     virtual TransformPointer GetTransfrom() const;
 
     //##ModelId=3DDE65D1028A
-    void PointMMToUnits(const Point3f &pt_mm, Point3f &pt_units, float t = 0) const;
+    void MMToUnits(const mitk::Point3D &pt_mm, mitk::Point3D &pt_units, float t = 0) const;
 
     //##ModelId=3DDE65DC0151
-    void PointUnitsToMM(const Point3f &pt_units, Point3f &pt_mm, float t = 0) const;
+    void UnitsToMM(const mitk::Point3D &pt_units, mitk::Point3D &pt_mm, float t = 0) const;
 
     //##ModelId=3DCBC65C017C
-    const double *GetSpacing() const;
+    const float *GetSpacing() const;
 
     //##ModelId=3E144966003D
     const RegionType& GetLargestPossibleRegion() const 
@@ -97,10 +137,11 @@ public:
     }
     //##ModelId=3E15572E0269
     Geometry3D(unsigned int dimension, const unsigned int* dimensions);
+    //##ModelId=3E3452F10253
+    Geometry3D(const mitk::Geometry3D& right);
 
     //##ModelId=3E15578402BD
-    virtual bool SetGeometry2D(mitk::Geometry2D* geometry2D, int s, int t = 0);
-
+    virtual bool SetGeometry2D(const mitk::Geometry2D* geometry2D, int s, int t = 0);
     //##ModelId=3E155839024F
     //##Documentation
     //## set according to tags in @a pic. @a pic can be 2D, 3D or 4D.  For 3D,
@@ -110,18 +151,32 @@ public:
     //## read-only geometry.
     //## @return true geometry successfully updated.
     virtual bool SetGeometry2D(ipPicDescriptor* pic, int s = 0, int t = 0);
-    //##ModelId=3E3452F10253
-    Geometry3D(const mitk::Geometry3D& right);
 
-    //##ModelId=3E3452F10393
-    //    mitk::Geometry3D& operator=(const mitk::Geometry3D& right);
-    //##ModelId=3E3456C50067
-    virtual ~Geometry3D();
+    //##ModelId=3E3B986602CF
+    void MMToUnits(const mitk::Vector3D &vec_mm, mitk::Vector3D &vec_units, float t = 0) const;
+    //##ModelId=3E3B987503A3
+    void UnitsToMM(const mitk::Vector3D &vec_units, mitk::Vector3D &vec_mm, float t = 0) const;
 
+    //##ModelId=3E3BE1F10106
+    virtual bool IsValidSlice(int s = 0, int t = 0) const;
+    //##ModelId=3E3BE1F8000C
+    virtual bool IsValidTime(int t = 0) const;
+    //##ModelId=3E3BE8CF010E
+    virtual void SetSpacing(mitk::Vector3D aSpacing);
+    //##ModelId=3E3C13F802A6
+    virtual void SetEvenlySpaced(bool on = true);
+    //##ModelId=3E3C2C37031B
+    //##Documentation
+    //## Set the spacing according to the tags in @ pic.
+    virtual void SetSpacing(ipPicDescriptor* pic);
 
 protected:
     //##ModelId=3E3453C703AF
     virtual void Initialize(unsigned int dimension, const unsigned int* dimensions);
+    //##ModelId=3E3452F10393
+    //    mitk::Geometry3D& operator=(const mitk::Geometry3D& right);
+    //##ModelId=3E3456C50067
+    virtual ~Geometry3D();
 
     //##ModelId=3E14493100B0
     RegionType m_LargestPossibleRegion;
@@ -132,10 +187,18 @@ protected:
     unsigned int *m_Dimensions;
 
     //##ModelId=3E3968CC000E
-    std::vector<Geometry2D::Pointer> m_Geometry2Ds;
-    //##ModelId=3E396B86022E
-    Vector3f m_Resolution;
+    mutable std::vector<Geometry2D::ConstPointer> m_Geometry2Ds;
+    //##ModelId=3E3BE8BF0288
+    mitk::Vector3D m_Spacing;
 
+    //##ModelId=3E3BE8BF02BA
+    mitk::Matrix4D m_TransformUnitsToMM;
+    //##ModelId=3E3BEC5D0257
+    mitk::Matrix4D m_TransformMMToUnits;
+    //##ModelId=3E3BE8BF02EC
+    mitk::Matrix4D m_TransformOfOrigin;
+    //##ModelId=3E3C13B70180
+    bool m_EvenlySpaced;
 };
 
 } // namespace mitk

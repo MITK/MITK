@@ -18,6 +18,9 @@
 namespace mitk {
 
 //##ModelId=3E031E2C0143
+//##Documentation
+//## Contains the data (instance of BaseData) and a list of mappers, which can
+//## draw the data.
 class DataTreeNode : public ImageSource
 {
 public:

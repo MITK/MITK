@@ -4,11 +4,12 @@
 #include "mitkCommon.h"
 #include "Mapper.h"
 #include <vtkProp.h>
+#include "Mapper3D.h"
 
 namespace mitk {
 
 //##ModelId=3E32C62B00BE
-class BaseVtkMapper3D : public Mapper
+class BaseVtkMapper3D : public Mapper3D
 {
 public:
     /** Standard class typedefs. */
@@ -57,7 +58,7 @@ protected:
     //##ModelId=3E33ECF20317
     LevelWindow::Pointer m_LevelWindow;
 
-    //##ModelId=3E33ECF20328
+    //##ModelId=3E3AE0DC023D
     int m_SliceNr;
 
     //##ModelId=3E33ECF203A1

@@ -12,11 +12,6 @@ namespace mitk {
 class Mapper : public ImageSource
 {
 public:
-	//##ModelId=3E32E456028D
-	virtual void SetInput(const mitk::BaseData* data) = 0;
-
-
-
 	/** Standard class typedefs. */
 	//##ModelId=3E32C49C031E
 	typedef Mapper              Self;
@@ -33,7 +28,21 @@ public:
 	/** Run-time type information (and related methods). */
 	itkTypeMacro(ImageSource,BaseProcess);
 
-public:
+	//##ModelId=3E32E456028D
+	virtual void SetInput(const mitk::BaseData* data) = 0;
+ //   //##ModelId=3E3C320001E4
+ //   virtual void SetScreenSizeInScreenUnits(unsigned int widthInScreenUnits, unsigned int heightInScreenUnits);
+
+  protected:
+    //##ModelId=3E3C337E0162
+    Mapper();
+
+    //##ModelId=3E3C337E019E
+    //##ModelId=3E3C337E019E
+    virtual ~Mapper();
+
+    ////##ModelId=3E3C322800FC
+    //Vector2D m_ScreenSizeInScreenUnits;
 };
 
 

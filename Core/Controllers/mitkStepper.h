@@ -6,6 +6,10 @@
 namespace mitk {
 
 //##ModelId=3DF8BF9A005D
+//##Documentation
+//## A helper class to step through a list. Does not contain the list, just the
+//## position in the list (between 0 and GetSteps()). Provides methods like
+//## First (go to the first element), Next (go to the next one), etc.
 class Stepper
 {
   public:
@@ -31,10 +35,10 @@ class Stepper
     void SetStepSize(unsigned int stepSize);
 
     //##ModelId=3DF8B91502F8
-    void FirstSlice();
+    void First();
 
     //##ModelId=3DF8B92703A4
-    void NextSlice();
+    void Next();
 
     //##ModelId=3DF8F6B40153
     void SetSteps(unsigned int steps);

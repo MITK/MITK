@@ -3,11 +3,22 @@
 
 #include "mitkCommon.h"
 #include "BaseProcess.h"
-#include "Image.h"
+#include "mitkImage.h"
 
 namespace mitk {
 
 //##ModelId=3E1878F90199
+//##Documentation
+//## Superclass of all classes generating Images as output. 
+//## 
+//## In itk and vtk the generated result of a ProcessObject is only guaranteed
+//## to be up-to-date, when Update() of the ProcessObject or the generated
+//## DataObject is called immediately before access of the data stored in the
+//## DataObject. This is also true for subclasses of mitk::BaseProcess and thus
+//## for mitk::ImageSource. But there are also three access methods provided
+//## that guarantee an up-to-date result (by first calling Update and then
+//## returning the result of GetOutput()): GetData(), GetPic() and
+//## GetVtkImageData().
 class ImageSource : public BaseProcess
 {
 public:
@@ -113,7 +124,15 @@ public:
    * an implementation of MakeOutput(). */
     //##ModelId=3E1886F103DB
   virtual DataObjectPointer MakeOutput(unsigned int idx);
-  
+    //##ModelId=3E3BCBD4000C
+    virtual void* GetData();
+
+    //##ModelId=3E3BCBD0024B
+    virtual ipPicDescriptor* GetPic();
+
+    //##ModelId=3E3BCBD502FD
+    virtual vtkImageData* GetVtkImageData();
+
 protected:
     //##ModelId=3E1886F20075
   ImageSource();
@@ -232,9 +251,7 @@ protected:
   };
   
 private:
-    //##ModelId=3E1886F30103
-  ImageSource(const Self&); //purposely not implemented
-    //##ModelId=3E1886F30185
+    //##ModelId=3E3BCCCD030D
   void operator=(const Self&); //purposely not implemented
 };
 

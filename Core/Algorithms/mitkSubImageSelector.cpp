@@ -5,30 +5,6 @@ void mitk::SubImageSelector::SetPosNr(int p)
 {
 }
 
-//##ModelId=3E0B4E070066
-itk::DataObject* mitk::SubImageSelector::GetDataObject()
-{
-	return NULL;
-}
-
-//##ModelId=3E0B4E0B0080
-void* mitk::SubImageSelector::GetData()
-{
-	return GetOutput()->GetData();
-}
-
-//##ModelId=3E0B4E0E0048
-vtkImageData* mitk::SubImageSelector::GetVtkImageData()
-{
-	return GetOutput()->GetVtkImageData();
-}
-
-//##ModelId=3E0B4E1403D6
-ipPicDescriptor* mitk::SubImageSelector::GetPic()
-{
-	return GetOutput()->GetPic();
-}
-
 //##ModelId=3E1A0FC903A5
 mitk::ImageDataItem::Pointer mitk::SubImageSelector::GetSliceData(int s, int t, int n)
 {

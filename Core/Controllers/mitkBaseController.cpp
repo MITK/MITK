@@ -42,3 +42,14 @@ bool mitk::BaseController::AddNavigator(mitk::Navigator* navigator)
 	return false;
 }
 
+//##ModelId=3E3AE32B0048
+mitk::BaseController::BaseController()
+{
+}
+
+
+//##ModelId=3E3AE32B0070
+mitk::BaseController::~BaseController()
+{
+}
+

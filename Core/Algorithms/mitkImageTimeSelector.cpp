@@ -11,3 +11,13 @@ mitk::ImageTimeSelector::~ImageTimeSelector()
 {
 }
 
+//##ModelId=3E3BD0CC0232
+void mitk::ImageTimeSelector::GenerateOutputInformation()
+{
+}
+
+//##ModelId=3E3BD0CE0194
+void mitk::ImageTimeSelector::GenerateData()
+{
+}
+

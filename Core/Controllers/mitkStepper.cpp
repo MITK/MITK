@@ -46,13 +46,13 @@ void mitk::Stepper::SetStepSize(unsigned int stepSize)
 }
 
 //##ModelId=3DF8B91502F8
-void mitk::Stepper::FirstSlice()
+void mitk::Stepper::First()
 {
 	m_Pos = 0;
 }
 
 //##ModelId=3DF8B92703A4
-void mitk::Stepper::NextSlice()
+void mitk::Stepper::Next()
 {
 	if(m_Pos<m_Steps)
 		++m_Pos;

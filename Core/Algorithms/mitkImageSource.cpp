@@ -1,15 +1,13 @@
 #include "ImageSource.h"
 
-//##ModelId=3E1886F20075
-//##ModelId=3E1886F30103
 mitk::ImageSource::ImageSource()
 {
   // Create the output. We use static_cast<> here because we know the default
-  // output must be of type OutputImageType
+  // output must be of type TOutputImage
   OutputImageType::Pointer output
     = static_cast<OutputImageType*>(this->MakeOutput(0).GetPointer()); 
-  this->BaseProcess::SetNumberOfRequiredOutputs(1);
-  this->BaseProcess::SetNthOutput(0, output.GetPointer());
+  this->ProcessObject::SetNumberOfRequiredOutputs(1);
+  this->ProcessObject::SetNthOutput(0, output.GetPointer());
 }
 
 /**
@@ -241,5 +239,26 @@ ITK_THREAD_RETURN_TYPE mitk::ImageSource::ThreaderCallback( void *arg )
   //   }
   
   return ITK_THREAD_RETURN_VALUE;
+}
+
+//##ModelId=3E3BCBD4000C
+void* mitk::ImageSource::GetData()
+{
+    Update();
+    return GetOutput()->GetData();
+}
+
+//##ModelId=3E3BCBD0024B
+ipPicDescriptor* mitk::ImageSource::GetPic()
+{
+    Update();
+    return GetOutput()->GetPic();
+}
+
+//##ModelId=3E3BCBD502FD
+vtkImageData* mitk::ImageSource::GetVtkImageData()
+{
+    Update();
+    return GetOutput()->GetVtkImageData();
 }
 

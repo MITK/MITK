@@ -3,6 +3,7 @@
 
 #include "mitkCommon.h"
 #include "Event.h"
+#include "vecmath.h"
 
 
 namespace mitk {

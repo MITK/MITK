@@ -61,6 +61,7 @@ typedef enum ESideEffects
   SeINITNEWOBJECT = 5,
   SeINITEDITOBJECT = 6,
   SeINITEDITGROUP = 7,
+  SeINITMOVEMENT = 8,
   SeADDPOINT = 10,
   SeSNAPPING_ADDING = 20,
   SeCHECKELEMENT = 30,		//check if there is a element close enough (picking)
@@ -69,6 +70,7 @@ typedef enum ESideEffects
   SeCHECKSELECTED = 34, //check if the given element is selected or not
   SeFINISHOBJECT = 40,
   SeFINISHGROUP = 41,
+  SeFINISHMOVEMENT = 42,
   SeSEARCHOBJECT = 50,
   SeSEARCHGROUP = 51,
   SeSEARCHANOTHEROBJECT = 52, //one object is selected and another object is to be added to selection

@@ -13,6 +13,7 @@
 #include "EventMapper.h"
 #include <itkOutputWindow.h>
 #include "mitkStatusBar.h"
+#include "mitkInteractionConst.h"
 //#include <string>
 //#include <map>
 //#include "FocusManager.h"
@@ -388,8 +389,8 @@ mitk::EventMapper::EventMapper()
     m_EventConstMap["Key_yacute"] = 0x0fd;
     m_EventConstMap["Key_thorn"] = 0x0fe;
     m_EventConstMap["Key_ydiaeresis"] = 0x0ff;
-	m_EventConstMap["Key_unknown"] = 0xffff;
-	m_EventConstMap["Key_none"] = 0xffff;
+  	m_EventConstMap["Key_unknown"] = 0xffff;
+	  m_EventConstMap["Key_none"] = 0xffff;
 
 }
 
@@ -447,8 +448,24 @@ bool mitk::EventMapper::MapEvent(Event* event)
 	so that a newly build up object is deleted after a Undo and not only the latest set point.
 	The StateMachines::ExecuteSideEffect have the power to descide weather a new GroupID has to be calculated
 	(by example after the editing of a new object)
+
+  A user interaction with the mouse is started by a mousePressEvent, continues with a MouseMove and finishes with a MouseReleaseEvent
 	*/
-	return m_GlobalStateMachine->HandleEvent(&m_StateEvent, mitk::OperationEvent::IncCurrObjectEventId(), mitk::OperationEvent::GetCurrGroupEventId());
+  bool ok;
+  switch (event->GetType())
+  {
+    case mitk::Type_MouseMove:
+      ok = m_GlobalStateMachine->HandleEvent(&m_StateEvent, mitk::OperationEvent::GetCurrObjectEventId(), mitk::OperationEvent::GetCurrGroupEventId());
+      break;
+    case mitk::Type_MouseButtonRelease:
+      ok = m_GlobalStateMachine->HandleEvent(&m_StateEvent, mitk::OperationEvent::GetCurrObjectEventId(), mitk::OperationEvent::GetCurrGroupEventId());
+      break;
+    default:
+      ok = m_GlobalStateMachine->HandleEvent(&m_StateEvent, mitk::OperationEvent::IncCurrObjectEventId(), mitk::OperationEvent::GetCurrGroupEventId());
+
+  }
+
+  return ok;
 }
 
 //##ModelId=3E5B35140072

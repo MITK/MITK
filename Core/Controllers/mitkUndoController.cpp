@@ -185,3 +185,12 @@ int mitk::UndoController::GetLastGroupEventIdInList()
   return m_CurUndoModel->GetLastGroupEventIdInList();
 }
 
+
+mitk::OperationEvent* mitk::UndoController::GetLastOfType(OperationActor* destination, OperationType opType)
+{
+  return m_CurUndoModel->GetLastOfType(destination, opType);
+}
+
+
+
+

@@ -35,12 +35,12 @@ bool mitk::LimitedLinearUndo::Undo(bool fine)
 			this->SwapOperations(operationEvent);
 			operationEvent->GetDestination()->ExecuteOperation(operationEvent->GetOperation());
 			
-			m_RedoList.push_back(operationEvent);//set in redo //!!!@todo:store the param fine
+			m_RedoList.push_back(operationEvent);//set in redo 
 			m_UndoList.pop_back();//delete last operation from undo-list
-            if (m_UndoList.empty())
-            {
-                break;
-            }
+      if (m_UndoList.empty())
+      {
+        break;
+      }
 		} while ((m_UndoList.back())->GetObjectEventId() == undoObjectEventId);
 	}
 	else //fine==false so undo all GroupEventId
@@ -142,3 +142,15 @@ int mitk::LimitedLinearUndo::GetLastGroupEventIdInList()
 {
   return m_UndoList.back()->GetGroupEventId();
 }
+
+mitk::OperationEvent* mitk::LimitedLinearUndo::GetLastOfType(OperationActor* destination, OperationType opType)
+{
+  UndoContainerRevIter iter;
+  for (iter = m_UndoList.rbegin(); iter != m_UndoList.rend(); ++iter){
+    if ( ( (*iter)->GetOperation()->GetOperationType() == opType ) && 
+         ((*iter)->GetDestination() == destination) )
+      return (*iter);
+  }
+  return NULL;
+}
+

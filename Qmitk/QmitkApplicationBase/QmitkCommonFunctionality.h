@@ -102,13 +102,14 @@ public:
       node=mitk::DataTreeNode::New();
       mitk::StringProperty::Pointer nameProp = new mitk::StringProperty(str.c_str());
       node->SetProperty("name",nameProp);
+      node->SetData(image);
       it->Add(node);
-    }
+  }
     else
     {
       node = subTree->Get();
+      node->SetData(image);
     }
-    node->SetData(image);
 
     mitk::LevelWindowProperty::Pointer levWinProp = new mitk::LevelWindowProperty();
     mitk::LevelWindow levelWindow;
@@ -707,8 +708,6 @@ static mitk::DataTreeNode::Pointer FileOpen()
         }
         return NULL;
     }
-
-
 
 
 

@@ -7,7 +7,10 @@
  *   between different machine representations
  *
  * $Log$
- * Revision 1.4  1999/11/27 19:15:08  andre
+ * Revision 1.5  1999/11/27 23:59:45  andre
+ * *** empty log message ***
+ *
+ * Revision 1.4  1999/11/27  19:15:08  andre
  * *** empty log message ***
  *
  * Revision 1.3  1998/11/11  11:11:26  andre
@@ -50,6 +53,16 @@ _ipEndian_t _ipEndian( void )
       fprintf( stderr, "%s:_ipEndian: WARNING: unknown endian !!!\n", __FILE__ );
       return( _ipEndianUnknown );
     }
+}
+
+void _ipCp( void *source, void *destination, unsigned long int len )
+{    
+  if( !source )
+    return; 
+  if( !destination )
+    return; 
+
+  memcpy( destination, source, len );
 }
 
 void _ipCvtEndian( void *data, unsigned long int len, unsigned char bytes )

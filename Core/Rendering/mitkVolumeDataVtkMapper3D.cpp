@@ -16,9 +16,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-
-#include "mitkLevelWindow.h"
 #include "mitkVolumeDataVtkMapper3D.h"
+#include "mitkLevelWindow.h"
 #include "mitkDataTreeNode.h"
 #include "mitkProperties.h"
 #include "mitkColorProperty.h"
@@ -36,9 +35,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkCallbackCommand.h>
 #include <vtkImageCast.h>
 #include <vtkImageWriter.h>
-#include <vtkImageData.h>
-
-
 #include <vtkVolumeTextureMapper2D.h> 
 
 
@@ -85,6 +81,10 @@ mitk::VolumeDataVtkMapper3D::VolumeDataVtkMapper3D()
  
   m_VolumeProperty = vtkVolumeProperty::New();
   m_Volume->SetProperty(m_VolumeProperty); 
+
+  m_ImageCast = vtkImageCast::New(); 
+  m_ImageCast->SetOutputScalarTypeToUnsignedShort();
+  m_ImageCast->ClampOverflowOn();
 }
 
 
@@ -115,17 +115,8 @@ void mitk::VolumeDataVtkMapper3D::SetInput(const mitk::DataTreeNode * data) {
   if (img == NULL) {
     itkWarningMacro("Image == NULL")
   } else {   
-   // FIXME: const_cast; maybe GetVtkImageData can be made const by using volatile
-    vtkImageCast* imageCast = vtkImageCast::New(); 
-    imageCast->SetOutputScalarTypeToUnsignedShort();
-    imageCast->SetInput(const_cast<mitk::Image*>(img)->GetVtkImageData()); 
-    imageCast->ClampOverflowOn();
-    imageCast->Update();
-    vtkImageData* castResult = vtkImageData::New();
-    castResult->DeepCopy(imageCast->GetOutput());
-    
-    m_VtkVolumeMapper->SetInput(castResult);
-    m_Volume->SetMapper( m_VtkVolumeMapper );
+   // FIXME: const_cast; maybe GetVtkImageData can be made const by using volatile    
+    m_ImageCast->SetInput( const_cast<mitk::Image*>(img)->GetVtkImageData() ); 
   }
 }
 
@@ -149,6 +140,11 @@ void mitk::VolumeDataVtkMapper3D::Update(mitk::BaseRenderer* renderer)
   if (m_Prop3D) {
     m_Prop3D->VisibilityOn();
   }
+
+  m_ImageCast->Update();    
+  m_VtkVolumeMapper->SetInput( m_ImageCast->GetOutput() );
+  m_Volume->SetMapper( m_VtkVolumeMapper );
+
   vtkPiecewiseFunction *opacityTransferFunction;
   vtkColorTransferFunction* colorTransferFunction;
 

@@ -27,11 +27,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkVolumeProperty.h>
 
 class vtkVolumeRayCastMapper;
-
 class vtkVolumeTextureMapper2D;
-
 class vtkVolume;
 class vtkObject;
+class vtkImageCast;
 
 namespace mitk {
 
@@ -47,12 +46,9 @@ public:
 
   itkNewMacro(Self);
 
-
   virtual const mitk::Image* GetInput();
 
-
   virtual void GenerateData();
-
 
   //##Documentation
   //## @brief Called by BaseRenderer when an update is required
@@ -75,9 +71,9 @@ protected:
 
   vtkActor* m_Actor;
   vtkVolume* m_Volume; 
-
-   vtkVolumeProperty* m_VolumeProperty;
-   //vtkVolumeRayCastMapper* m_VtkVolumeMapper;
+  vtkImageCast* m_ImageCast;
+  vtkVolumeProperty* m_VolumeProperty;
+  //vtkVolumeRayCastMapper* m_VtkVolumeMapper;
 	vtkVolumeTextureMapper2D* m_VtkVolumeMapper;
 
 };

@@ -110,7 +110,8 @@ void mitk::SurfaceMapper2D::Paint(mitk::BaseRenderer * renderer)
     return;
 
   vtkPolyData * vtkpolydata = input->GetVtkPolyData( timestep );
-  assert(vtkpolydata);
+  if(vtkpolydata==NULL)
+    return;
 
   PlaneGeometry::ConstPointer worldPlaneGeometry = dynamic_cast<const PlaneGeometry*>(worldGeometry.GetPointer());
 

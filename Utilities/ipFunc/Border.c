@@ -84,8 +84,7 @@ ipPicDescriptor *ipFuncBorder ( ipPicDescriptor *pic_old,
 
 #define BORDER( type, pic, size )                                                  \
 {                                                                                  \
-  ipUInt4_t      i, j, k;          /* loop index                                */ \
-  ipUInt4_t      offset;           /* offset of pixels in pic_new               */ \
+  ipUInt4_t      i;                /* loop index                                */ \
   ipUInt4_t      anf[_ipPicNDIM];  /*                                           */ \
   ipUInt4_t      end[_ipPicNDIM];  /*                                           */ \
   ipUInt4_t      ind[_ipPicNDIM];  /* loop index vector                         */ \
@@ -189,9 +188,7 @@ ipPicDescriptor *ipFuncBorder ( ipPicDescriptor *pic_old,
                                 ipPicDescriptor *pic_rtn )
 {
   ipPicDescriptor *pic_new;            /* pointer to transformed image            */
-  ipInt4_t       i;                    /* loop index                              */
-  ipUInt4_t      end[_ipPicNDIM];      /* end of image                            */
-  ipUInt4_t      beg[_ipPicNDIM];      /* end of image                            */
+  ipUInt4_t       i;                   /* loop index                              */
   ipUInt4_t      size[_ipPicNDIM];     /*                                         */
 
   /* check whEther data are correct                                               */

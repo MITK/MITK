@@ -46,7 +46,8 @@ typedef enum PointSpecificationType
   PTUNDEFINED = 0,
   PTSTART,
   PTCORNER,
-  PTEDGE
+  PTEDGE, 
+  PTEND
 };
 
 

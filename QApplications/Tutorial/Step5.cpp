@@ -84,7 +84,7 @@ int main(int argc, char* argv[])
   }
 
   //Part V: For allowing to interactively add points ...
-  // create node and set PointSet as data
+  // create PointSet and a node for it
   mitk::PointSet::Pointer pointSet = mitk::PointSet::New();
   mitk::DataTreeNode::Pointer pointSetNode = mitk::DataTreeNode::New();
   pointSetNode->SetData(pointSet);

@@ -157,6 +157,7 @@ void mitk::AngleCorrectByPointFilter::GenerateData()
             if(tx_direction*down>vnl_math::pi_over_4)
             {
               assumed_direction = center-p;
+              assumed_direction.Normalize();
               ScalarType cos_factor = -tx_direction*assumed_direction;
 
               if(fabs(cos_factor)>eps)

@@ -17,7 +17,7 @@ class LevelWindow
 public:
     LevelWindow();
     LevelWindow(const mitk::LevelWindow& levWin);
-    ~LevelWindow();
+    virtual ~LevelWindow();
 
 //    mitkClassMacro(LevelWindow, itk::Object);
 

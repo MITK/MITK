@@ -39,7 +39,7 @@ mitk::StateMachine::StateMachine(const char * type) : m_CurrentState(NULL)
     m_Type = type;
 	  m_CurrentState = mitk::StateMachineFactory::GetStartState(type);
     if (m_CurrentState == NULL)
-      itkWarningMacro("Error from "<<this->GetNameOfClass()<<"; Message: did not recieve a pointer for start-state");
+      itkWarningMacro("Error: no start-state defined in state-machine definition "<<type<<".");
   }
   //else
   //  itkWarningMacro("Error from "<<this->GetNameOfClass()<<"; Message: Type of StateMachine is NULL!");

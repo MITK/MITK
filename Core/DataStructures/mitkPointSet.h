@@ -88,6 +88,7 @@ public:
   typedef DataType::PointType PointType;
   typedef DataType::PointsContainer PointsContainer;
   typedef DataType::PointsContainerIterator PointsIterator;
+  typedef DataType::PointsContainer::ConstIterator PointsConstIterator;
   typedef DataType::PointDataContainer PointDataContainer;
   typedef DataType::PointDataContainerIterator PointDataIterator;
 

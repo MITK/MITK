@@ -1,17 +1,17 @@
 #ifndef LIGHTBOXIMAGEREADER_H_HEADER_INCLUDED_C1F48A22
 #define LIGHTBOXIMAGEREADER_H_HEADER_INCLUDED_C1F48A22
 
+#include "ImageSource.h"
 #include "mitkCommon.h"
-#include "Reader.h"
 #include "../../Applications/MITKSamplePlugIn/include/plugin.h"
 
 namespace mitk {
 
-class LightBoxImageReader : public Reader
+class LightBoxImageReader : public ImageSource 
 {
 public:
     /** Standard class typedefs. */
-    mitkClassMacro(LightBoxImageReader, Reader);
+    mitkClassMacro(LightBoxImageReader, ImageSource);
 
     /** Method for creation through the object factory. */
     itkNewMacro(Self);

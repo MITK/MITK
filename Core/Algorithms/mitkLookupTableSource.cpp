@@ -94,9 +94,10 @@ mitk::LookupTableSource::OutputTypePointer mitk::LookupTableSource::GetOutput()
 
 
 			int factor = 1;
+      int i;
 
 			// dunkelrot
-			for(int i=1; i<=sizeQuartal1; i++)
+			for(i=1; i<=sizeQuartal1; i++)
 			{
 				int index = i-1;
     	  rgba[0] = factor * (0.5 + i/(2*sizeQuartal1));      // rot
@@ -107,7 +108,7 @@ mitk::LookupTableSource::OutputTypePointer mitk::LookupTableSource::GetOutput()
 			}
 
 			// hellrot bis gelb
-			for (int i=1 ; i<=sizeQuartal2 ; i++)
+			for (i=1 ; i<=sizeQuartal2 ; i++)
 			{
 		   	int index = (i-1) + sizeQuartal1;
       	rgba[0] = factor * 1;
@@ -119,7 +120,7 @@ mitk::LookupTableSource::OutputTypePointer mitk::LookupTableSource::GetOutput()
 
 
 				//gruen
-			for(int i=1 ; i<=sizeZeroStrain ; i++)
+			for(i=1 ; i<=sizeZeroStrain ; i++)
 			{
       		int index = (i-1) + (sizeQuartal1+sizeQuartal2);
       		rgba[0] = factor * 0; //1 - i/sizeZeroStrain;
@@ -131,7 +132,7 @@ mitk::LookupTableSource::OutputTypePointer mitk::LookupTableSource::GetOutput()
 
 
 			// hellblau
-			for (int i=1 ; i<=sizeQuartal3; i++)
+			for (i=1 ; i<=sizeQuartal3; i++)
 			{
       		int index = (i-1) + ( sizeQuartal1 + sizeQuartal2 + sizeZeroStrain );
       		rgba[0]= factor * 0;
@@ -142,7 +143,7 @@ mitk::LookupTableSource::OutputTypePointer mitk::LookupTableSource::GetOutput()
 			}
 
 			// blau
-			for(int i=1 ; i<=sizeQuartal4 ; i++)
+			for(i=1 ; i<=sizeQuartal4 ; i++)
 			{
 		      int index = (i-1) + (sizeQuartal1+sizeQuartal2+sizeQuartal3 + sizeZeroStrain);
     		  rgba[0] = factor * 0;

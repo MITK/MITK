@@ -20,3 +20,4 @@ protected:
 } // namespace mitk
 
 #endif /* MITKAFFINETRANSFORMATIONOPERATION_H_HEADER_INCLUDED_C188C29F */
+

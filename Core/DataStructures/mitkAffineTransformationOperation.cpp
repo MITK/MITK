@@ -13,3 +13,4 @@ double mitk::AffineTransformationOperation::GetAngle()
 {
   return m_Angle;
 }
+

@@ -60,6 +60,9 @@
  *
  * UPDATES
  * $Log$
+ * Revision 1.4  2000/08/02 20:09:05  tobiask
+ * Made some corrections in _BorderX.c
+ *
  * Revision 1.3  2000/07/24 13:06:26  ivo
  * June 26, 2000
  * iw - function ipFuncSetTag added.
@@ -90,7 +93,7 @@
  * COPYRIGHT (c) 1995 by DKFZ (Dept. MBI) HEIDELBERG, FRG
  */
 #ifndef lint
-ä  static char *what = { "@(#)????????\t\tDKFZ (Dept. MBI)\t"__DATE__ };
+  static char *what = { "@(#)????????\t\tDKFZ (Dept. MBI)\t"__DATE__ };
 #endif
 
 /* include files                                                                  */

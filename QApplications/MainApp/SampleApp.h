@@ -1,7 +1,9 @@
-#include <QmitkSimpleExample/QmitkSimpleExampleFunctionality.h>
+//#include <QmitkSimpleExample/QmitkSimpleExampleFunctionality.h>
 #include "QmitkMainTemplate.h"
 
 class QmitkDataManager;
+class QmitkRegistration;
+class QmitkSimpleExampleFunctionality;
 
 /*!
 	\brief This application demonstrates how to code a new MITK application 
@@ -41,4 +43,10 @@ protected:
 
 		QmitkSimpleExampleFunctionality * simpleFunc;
 		QmitkDataManager * m_DataManager;
+
+		/*!
+		 AppModule for image fusion
+		 */
+		QmitkRegistration * registrationFunc;
+
 };

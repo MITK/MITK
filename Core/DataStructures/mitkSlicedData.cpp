@@ -47,7 +47,7 @@ bool mitk::SlicedData::RequestedRegionIsOutsideOfTheBufferedRegion()
 
 	const SizeType& requestedRegionSize = m_RequestedRegion.GetSize();
 	const Geometry3D::SizeType& largestPossibleRegionSize
-		= GetGeometry().GetLargestPossibleRegion().GetSize();
+		= GetGeometry()->GetLargestPossibleRegion().GetSize();
 
 	// are whole channels requested?
 	int c, cEnd;
@@ -96,11 +96,11 @@ bool mitk::SlicedData::VerifyRequestedRegion()
 	// rather than the buffered region; see DataObject::VerifyRequestedRegion.
 	const IndexType &requestedRegionIndex = m_RequestedRegion.GetIndex();
 	const Geometry3D::IndexType &largestPossibleRegionIndex
-		= GetGeometry().GetLargestPossibleRegion().GetIndex();
+		= GetGeometry()->GetLargestPossibleRegion().GetIndex();
 
 	const SizeType& requestedRegionSize = m_RequestedRegion.GetSize();
 	const Geometry3D::SizeType& largestPossibleRegionSize
-		= GetGeometry().GetLargestPossibleRegion().GetSize();
+		= GetGeometry()->GetLargestPossibleRegion().GetSize();
 
 #if _MSC_VER < 1300
 	for (i=0; i< GImageDimension; ++i)
@@ -168,7 +168,7 @@ void mitk::SlicedData::CopyInformation(const itk::DataObject *data)
 
 	if (slicedData)
 	{
-        m_Geometry3D = new Geometry3D(slicedData->GetGeometry());
+        m_Geometry3D = new Geometry3D(*slicedData->GetGeometry().GetPointer());
     }
 	else
 	{

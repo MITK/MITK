@@ -40,3 +40,9 @@ bool mitk::Ellipsoid::IsInside(ITKPoint3D worldPoint)
            + pow(p[2], 2)/pow(m_Geometry3D->GetZAxis().GetNorm(), 2)
           <= 1);
 }
+
+mitk::ScalarType mitk::Ellipsoid::GetVolume()
+{
+  return   m_Geometry3D->GetXAxis().GetNorm() * m_Geometry3D->GetYAxis().GetNorm() 
+         * m_Geometry3D->GetZAxis().GetNorm() * vnl_math::pi * 4.0/3.0;
+}

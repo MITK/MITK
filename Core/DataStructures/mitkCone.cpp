@@ -35,3 +35,9 @@ bool mitk::Cone::IsInside(ITKPoint3D worldPoint)
   p[1] += 1;  // translate point, so that it fits to the formula below, which describes a cone that has its cone vertex at the origin                                            
   return (sqrt(p[0] * p[0] + p[2] * p[2]) <= p[1] * 0.5) && (p[1] <= 2);  // formula to calculate if a given point is inside a cone that has its cone vertex at the origin, is aligned on the second axis, has a radius of one an a height of two
 }
+
+mitk::ScalarType mitk::Cone::GetVolume()
+{
+  return   m_Geometry3D->GetXAxis().GetNorm() * m_Geometry3D->GetZAxis().GetNorm() 
+         * 2 * m_Geometry3D->GetZAxis().GetNorm() * vnl_math::pi / 3.0;
+}

@@ -34,7 +34,11 @@ bool mitk::Cylinder::IsInside(ITKPoint3D worldPoint)
 
   mitk::ScalarType v =  pow(p[0], 2) + pow(p[2], 2);
   bool retval = (v <= 1) && (p[1] >= -1) && (p[1] <= 1);
-  
-  return retval;
-  
+  return retval; 
+}
+
+mitk::ScalarType mitk::Cylinder::GetVolume()
+{
+  return   m_Geometry3D->GetXAxis().GetNorm() * m_Geometry3D->GetZAxis().GetNorm() 
+         * 2 * m_Geometry3D->GetYAxis().GetNorm() * vnl_math::pi;
 }

@@ -14,6 +14,7 @@ public:
   mitkClassMacro(Cone, BoundingObject);  
   itkNewMacro(Self);
   
+  virtual mitk::ScalarType GetVolume();
   virtual bool IsInside(ITKPoint3D p);
   //virtual void UpdateOutputInformation();
 protected:

@@ -3,6 +3,8 @@
 #include "mitkVector.h"
 #include "vtkCubeSource.h"
 
+#include <vtkSTLReader.h>
+
 mitk::Cuboid::Cuboid()
 {
   m_Geometry3D->Initialize();
@@ -33,7 +35,11 @@ bool mitk::Cuboid::IsInside(ITKPoint3D worldPoint)
   bool retval =(p[0] >= -1) && (p[0] <= 1) 
             && (p[1] >= -1) && (p[1] <= 1) 
             && (p[2] >= -1) && (p[2] <= 1);
-  
   return retval;
-  
+}
+
+mitk::ScalarType mitk::Cuboid::GetVolume()
+{
+  return   2 * m_Geometry3D->GetXAxis().GetNorm() * 2 * m_Geometry3D->GetYAxis().GetNorm() 
+         * 2 * m_Geometry3D->GetZAxis().GetNorm();
 }

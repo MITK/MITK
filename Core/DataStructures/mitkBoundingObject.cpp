@@ -58,3 +58,7 @@ void mitk::BoundingObject::UpdateOutputInformation()
  
   m_Geometry3D->SetBoundingBox(bounds);
 }
+mitk::ScalarType mitk::BoundingObject::GetVolume()
+{
+  return 0.0;
+}

@@ -23,6 +23,7 @@ public:
 
   virtual bool IsInside(mitk::ITKPoint3D p)=0;
 
+  virtual mitk::ScalarType GetVolume();
   itkGetMacro(Positive, bool);
   itkSetMacro(Positive, bool);
   itkBooleanMacro(Positive);

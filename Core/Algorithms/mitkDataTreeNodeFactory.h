@@ -5,6 +5,7 @@
 #include "mitkFileReader.h"
 
 #include <string>
+#include <itkImageIOBase.h>
 
 namespace mitk
 {
@@ -109,9 +110,11 @@ protected:
     
     virtual void ReadFileTypePVTK();
     
-    virtual void ReadFileTypeDCM();
+    virtual void ReadFileTypeITKImageIOFactory();
     
 #ifdef MBI_INTERNAL
+
+    virtual void ReadFileTypeDCM();
     
     virtual void ReadFileTypeVES();
     

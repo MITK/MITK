@@ -26,7 +26,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkImageRegion.h>
 
 mitk::ProbeFilter::ProbeFilter()
-//  : m_UseGeometryParametricBounds(true), m_XResolution(10), m_YResolution(10)
 {
 
 }
@@ -55,7 +54,6 @@ void mitk::ProbeFilter::SetInput(const mitk::Surface *input)
   this->ProcessObject::SetNthInput( 0, const_cast< mitk::Surface * >( input ) );
 }
 
-/// input volume of ultrasound doppler data
 void mitk::ProbeFilter::SetSource(const mitk::Image *source)
 {
   this->ProcessObject::SetNthInput( 1, const_cast< mitk::Image * >( source ) );	
@@ -74,7 +72,21 @@ void mitk::ProbeFilter::GenerateOutputInformation()
   if(input->GetGeometry()==NULL) return;  
   if(source->GetGeometry()==NULL) return; 
 
-  output->SetGeometry( static_cast<Geometry3D*>(input->GetGeometry()->Clone().GetPointer()) );
+  if( (input->GetTimeSlicedGeometry()->GetTimeSteps()==1) && (source->GetTimeSlicedGeometry()->GetTimeSteps()>1) )
+  {
+    Geometry3D::Pointer geometry3D = Geometry3D::New();
+    geometry3D->Initialize();
+    geometry3D->SetBounds(source->GetTimeSlicedGeometry()->GetBounds());
+    geometry3D->SetTimeBoundsInMS(source->GetTimeSlicedGeometry()->GetGeometry3D(0)->GetTimeBoundsInMS());
+
+    TimeSlicedGeometry::Pointer outputTimeSlicedGeometry = TimeSlicedGeometry::New();//static_cast<TimeSlicedGeometry*>(source->GetTimeSlicedGeometry()->Clone().GetPointer());
+    outputTimeSlicedGeometry->InitializeEvenlyTimed(geometry3D, source->GetTimeSlicedGeometry()->GetTimeSteps());
+
+    output->Initialize(outputTimeSlicedGeometry->GetTimeSteps());
+    output->SetGeometry( outputTimeSlicedGeometry );
+  }
+  else
+    output->SetGeometry( static_cast<Geometry3D*>(input->GetGeometry()->Clone().GetPointer()) );
 
   itkDebugMacro(<<"GenerateOutputInformation()");
 }
@@ -94,15 +106,32 @@ void mitk::ProbeFilter::GenerateData()
   }
 
   mitk::Surface::RegionType outputRegion = output->GetRequestedRegion();
+  const mitk::TimeSlicedGeometry *outputTimeGeometry = output->GetTimeSlicedGeometry();
+  const mitk::TimeSlicedGeometry *inputTimeGeometry = input->GetTimeSlicedGeometry();
+  const mitk::TimeSlicedGeometry *sourceTimeGeometry = source->GetTimeSlicedGeometry();
+  ScalarType timeInMS;
+  int timestep=0;
 
-  //	for( int t=outputRegion[0]; t<outputRegion[1]; ++t )
-  for( int t=outputRegion.GetIndex(3); t<(outputRegion.GetIndex(3)+outputRegion.GetSize(3)); ++t )
+  int tstart, tmax;
+
+  tstart=outputRegion.GetIndex(3);
+  tmax=tstart+outputRegion.GetSize(3);
+
+  int t;
+  for(t=tstart;t<tmax;++t)
   {
+    timeInMS = outputTimeGeometry->TimeStepToMS( t );
+
     vtkProbeFilter* probe = vtkProbeFilter::New();
-    probe->SetInput( input->GetVtkPolyData(t) );
-    probe->SetSource( source->GetVtkImageData(t) );
+
+    timestep = inputTimeGeometry->MSToTimeStep( timeInMS );
+    probe->SetInput( input->GetVtkPolyData(timestep) );
+
+    timestep = sourceTimeGeometry->MSToTimeStep( timeInMS );
+    probe->SetSource( source->GetVtkImageData(timestep) );
 
     output->SetVtkPolyData( probe->GetPolyDataOutput(), t );  
+
     probe->Update();
     probe->Delete();
   }
@@ -112,26 +141,75 @@ void mitk::ProbeFilter::GenerateInputRequestedRegion()
 {
   Superclass::GenerateInputRequestedRegion();
 
-  mitk::Surface::Pointer output = this->GetOutput();
-  //mitk::Surface::RegionType outputRegion = const_cast<mitk::Surface::RegionType& >(output->GetTimeSlicedGeometry()->GetRequestedRegion());
-  mitk::Surface::RegionType outputRegion = output->GetRequestedRegion();
-  mitk::Geometry3D *outputRegionGeometry = const_cast< mitk::TimeSlicedGeometry * >(output->GetTimeSlicedGeometry());
-
-  //create and set input requested region for the input surface
-  mitk::Surface::RegionType inputSurfaceRegion = outputRegion;
   mitk::Surface *input  = const_cast< mitk::Surface * >( this->GetInput() );	
-
-  input->SetRequestedRegion( &inputSurfaceRegion  );
-  //input->SetGeometry( outputRegionGeometry );
-
-  //create and set input requested region for the source image
-  Image::RegionType slicedDataRegion;
   mitk::Image *source = const_cast< mitk::Image * >( this->GetSource() );
 
-  slicedDataRegion = source->GetLargestPossibleRegion();
-  slicedDataRegion.SetIndex( 3, outputRegion.GetIndex(3) );
-  slicedDataRegion.SetSize( 3, outputRegion.GetSize(3) );   
+  if(input==NULL) return;
+  if(source==NULL) return;
 
-  source->SetRequestedRegion( &slicedDataRegion );
+  mitk::Surface::Pointer output = this->GetOutput();
+  mitk::Surface::RegionType outputRegion = output->GetRequestedRegion();
+  const mitk::TimeSlicedGeometry *outputTimeGeometry = output->GetTimeSlicedGeometry();
+
+  mitk::Surface::RegionType inputSurfaceRegion = outputRegion;
+  Image::RegionType sourceImageRegion = source->GetLargestPossibleRegion();
+
+  if(outputRegion.GetSize(3)<1)
+  {
+    mitk::Surface::RegionType::SizeType surfacesize;
+    surfacesize.Fill(0);
+    inputSurfaceRegion.SetSize(surfacesize);
+    input->SetRequestedRegion( &inputSurfaceRegion  );
+    mitk::Image::RegionType::SizeType imagesize;
+    imagesize.Fill(0);
+    sourceImageRegion.SetSize(imagesize);
+    source->SetRequestedRegion( &sourceImageRegion );
+    return;
+  }
+
+  //create and set input requested region for the input surface
+  const mitk::TimeSlicedGeometry *inputTimeGeometry = input->GetTimeSlicedGeometry();
+
+  ScalarType timeInMS;
+  int timestep=0;
+
+  // convert the start-index-time of output in start-index-time of input via millisecond-time
+  timeInMS = outputTimeGeometry->TimeStepToMS(outputRegion.GetIndex(3));
+  timestep = inputTimeGeometry->MSToTimeStep( timeInMS );
+  if( ( timeInMS > -ScalarTypeNumericTraits::max() ) && ( inputTimeGeometry->IsValidTime( timestep ) ) )
+    inputSurfaceRegion.SetIndex( 3, timestep );
+  else
+    inputSurfaceRegion.SetIndex( 3, 0 );
+  // convert the end-index-time of output in end-index-time of input via millisecond-time
+  timeInMS = outputTimeGeometry->TimeStepToMS(outputRegion.GetIndex(3)+outputRegion.GetSize(3)-1);
+  timestep = inputTimeGeometry->MSToTimeStep( timeInMS );
+  if( ( timeInMS > -ScalarTypeNumericTraits::max() ) && ( outputTimeGeometry->IsValidTime( timestep ) ) )
+    inputSurfaceRegion.SetSize( 3, timestep - inputSurfaceRegion.GetIndex(3) + 1 );
+  else
+    inputSurfaceRegion.SetSize( 3, 1 );
+
+  input->SetRequestedRegion( &inputSurfaceRegion  );
+
+  //create and set input requested region for the source image
+  const mitk::TimeSlicedGeometry *sourceTimeGeometry = source->GetTimeSlicedGeometry();
+
+  // convert the start-index-time of output in start-index-time of source via millisecond-time
+  timeInMS = outputTimeGeometry->TimeStepToMS(outputRegion.GetIndex(3));
+  timestep = sourceTimeGeometry->MSToTimeStep( timeInMS );
+  if( ( timeInMS > -ScalarTypeNumericTraits::max() ) && ( sourceTimeGeometry->IsValidTime( timestep ) ) )
+    sourceImageRegion.SetIndex( 3, timestep );
+  else
+    sourceImageRegion.SetIndex( 3, 0 );
+  // convert the end-index-time of output in end-index-time of source via millisecond-time
+  timeInMS = outputTimeGeometry->TimeStepToMS(outputRegion.GetIndex(3)+outputRegion.GetSize(3)-1);
+  timestep = sourceTimeGeometry->MSToTimeStep( timeInMS );
+  if( ( timeInMS > -ScalarTypeNumericTraits::max() ) && ( outputTimeGeometry->IsValidTime( timestep ) ) )
+    sourceImageRegion.SetSize( 3, timestep - sourceImageRegion.GetIndex(3) + 1 );
+  else
+    sourceImageRegion.SetSize( 3, 1 );
+
+  sourceImageRegion.SetIndex( 4, 0 );
+  sourceImageRegion.SetSize( 4, 1 );
+
+  source->SetRequestedRegion( &sourceImageRegion );
 }
-

@@ -6,7 +6,7 @@
 #include "mitkStatusBar.h"
 
 #include <vecmath.h>
-#include <vtkTransform.h> 
+#include <vtkTransform.h>
 
 #ifdef MBI_INTERNAL
 extern "C"
@@ -39,23 +39,23 @@ void mitk::Geometry3D::SetBoundingBox(const float bounds[6],  int t)
   if(IsValidTime(t))
   {
     mitk::BoundingBox::Pointer boundingBox=mitk::BoundingBox::New();
-    
+
     mitk::BoundingBox::PointsContainer::Pointer pointscontainer=mitk::BoundingBox::PointsContainer::New();
     mitk::ScalarType nullpoint[]={0,0,0};
     mitk::BoundingBox::PointType p(nullpoint);
-    
+
     mitk::BoundingBox::PointIdentifier pointid=0;
-    
+
     p[0]=bounds[0]; p[1]=bounds[2]; p[2]=bounds[4];
     pointscontainer->InsertElement(pointid++, p);
-    
-    p[0]=bounds[1]; p[2]=bounds[3]; p[2]=bounds[5];
+
+    p[0]=bounds[1]; p[1]=bounds[3]; p[2]=bounds[5];
     pointscontainer->InsertElement(pointid++, p);
-    
+
     boundingBox->SetPoints(pointscontainer);
-    
+
     boundingBox->ComputeBoundingBox();
-    
+
     m_BoundingBoxes[t]=boundingBox;
   }
   else
@@ -68,7 +68,7 @@ void mitk::Geometry3D::SetBoundingBox(const float bounds[6],  int t)
 */
 double mitk::Geometry3D::GetTime(int t) const
 {
-  itkExceptionMacro("GetTime not yet supported."); 	
+  itkExceptionMacro("GetTime not yet supported.");
   return 0;
 }
 
@@ -80,7 +80,7 @@ double mitk::Geometry3D::GetTime(int t) const
 
 //##ModelId=3DDE65D1028A
 /*!
-\todo use parameter t or removed it!!! 
+\todo use parameter t or removed it!!!
 */
 void mitk::Geometry3D::MMToUnits(const mitk::Point3D &pt_mm, mitk::Point3D &pt_units, float t) const
 {
@@ -118,16 +118,16 @@ void mitk::Geometry3D::UnitsToMM(const mitk::Vector3D &vec_units, mitk::Vector3D
 void mitk::Geometry3D::Initialize(unsigned int timeSteps)
 {
   m_TimeSteps = timeSteps;
-  
+
   //initialize m_TransformOfOrigin and m_Spacing (and m_TransformUnitsToMM/m_TransformMMToUnits).
   m_TransformOfOrigin.setIdentity();
-  
+
   //initialize bounding box array
   int num=m_TimeSteps;
   BoundingBox::ConstPointer bnull=NULL;
   m_BoundingBoxes.reserve(m_TimeSteps);
   m_BoundingBoxes.assign(num, bnull);
-  
+
 }
 
 // Standard Constructor for the new makro. sets the geometry to 3 dimensions
@@ -136,7 +136,7 @@ mitk::Geometry3D::Geometry3D() : m_TimeSteps(0)
   m_TransformMMToUnits.setIdentity();
   m_TransformUnitsToMM.setIdentity();
   //New
-  m_Transform = vtkTransform::New();  
+  m_Transform = vtkTransform::New();
   m_BaseGeometry = NULL; // there is no base geometry, this one is independend (until SetBaseGeometry() is called)
 }
 
@@ -195,19 +195,19 @@ void mitk::Geometry3D::ExecuteOperation(Operation* operation)
 	case OpMOVE:
   {
     //Save actual scale, position and orientation
-    double orientation[3];     
+    double orientation[3];
     GetTransform()->GetOrientation(orientation);
-    double scale[3];     
+    double scale[3];
     GetTransform()->GetScale(scale);
-    double position[3];     
+    double position[3];
     GetTransform()->GetPosition(position);
 
     mitk::ITKPoint3D newPos = affineOp->GetPoint();
 
     //GetTransform()->Translate((newPos[0] - position[0]) / scale[0], (newPos[1] - position[1]) / scale[1], (newPos[2] - position[2]) / scale[0]);  // set new position
-    GetTransform()->Identity();               // reset transformation       
+    GetTransform()->Identity();               // reset transformation
     GetTransform()->PreMultiply();
-    GetTransform()->Translate(newPos[0], newPos[1], newPos[2]);  // set new position       
+    GetTransform()->Translate(newPos[0], newPos[1], newPos[2]);  // set new position
     GetTransform()->RotateZ(orientation[2]);
     GetTransform()->RotateX(orientation[0]);  // restore orientation
     GetTransform()->RotateY(orientation[1]);
@@ -220,18 +220,18 @@ void mitk::Geometry3D::ExecuteOperation(Operation* operation)
     //GetTransform()->GetOrientation(orientation);
     //std::cout << "Geometry: new Orientation: <" << orientation[0] << ", " << orientation[1] << ", " << orientation[2] << ">\n";
     break;
-  }		
+  }
 	case OpSCALE:
   {
     //Save actual scale, position and orientation
-    double scale[3];     
+    double scale[3];
     GetTransform()->GetScale(scale);
-    double position[3];     
+    double position[3];
     GetTransform()->GetPosition(position);
-    double orientation[3];     
+    double orientation[3];
     GetTransform()->GetOrientation(orientation);
 
-    mitk::ITKPoint3D newScale = affineOp->GetPoint();    
+    mitk::ITKPoint3D newScale = affineOp->GetPoint();
 
     //GetTransform()->Scale(newScale[0] / scale[0], newScale[1] / scale[1], newScale[2] / scale[2]); // set new scale factors
 
@@ -242,7 +242,7 @@ void mitk::Geometry3D::ExecuteOperation(Operation* operation)
     GetTransform()->RotateX(orientation[0]);  // restore orientation
     GetTransform()->RotateY(orientation[1]);
     GetTransform()->Scale(newScale[0], newScale[1], newScale[2]);             // new scale factors
-    
+
     //GetTransform()->GetScale(scale);
     //std::cout << "Geometry: new Scale: <" << scale[0] << ", " << scale[1] << ", " << scale[2] << ">\n";
     break;
@@ -250,11 +250,11 @@ void mitk::Geometry3D::ExecuteOperation(Operation* operation)
   case OpROTATE:
   {
     //Save actual scale, position and orientation
-    double scale[3];     
+    double scale[3];
     GetTransform()->GetScale(scale);
-    double position[3];     
+    double position[3];
     GetTransform()->GetPosition(position);
-    double orientation[3];     
+    double orientation[3];
     GetTransform()->GetOrientation(orientation);
 
     mitk::ITKPoint3D newRotation = affineOp->GetPoint();
@@ -265,16 +265,16 @@ void mitk::Geometry3D::ExecuteOperation(Operation* operation)
     GetTransform()->RotateWXYZ(affineOp->GetAngle(), newRotation[0], newRotation[1], newRotation[2]);
     GetTransform()->RotateZ(orientation[2]);
     GetTransform()->RotateX(orientation[0]);  // restore orientation
-    GetTransform()->RotateY(orientation[1]);    
+    GetTransform()->RotateY(orientation[1]);
     GetTransform()->Scale(scale);             // restore scale factors
-        
+
     GetTransform()->GetPosition(position);
     std::cout << "Geometry: new Position: <" << position[0] << ", " << position[1] << ", " << position[2] << ">\n";
     GetTransform()->GetScale(scale);
     std::cout << "Geometry: new Scale: <" << scale[0] << ", " << scale[1] << ", " << scale[2] << ">\n";
     GetTransform()->GetOrientation(orientation);
     std::cout << "Geometry: new Orientation: <" << orientation[0] << ", " << orientation[1] << ", " << orientation[2] << ">\n";
-    break;  
+    break;
   }
   default:
     NULL;

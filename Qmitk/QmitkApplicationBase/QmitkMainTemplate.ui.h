@@ -130,15 +130,15 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
         if(node != NULL)
         {
 
-						mitk::LevelWindowProperty::Pointer levWinProp = new mitk::LevelWindowProperty();
-						levWinProp->GetLevelWindow().SetRangeMin(-1024);
-						levWinProp->GetLevelWindow().SetRangeMax(4096);
-						levWinProp->GetLevelWindow().SetMin(-1024);
-						levWinProp->GetLevelWindow().SetMax(4096);
+			mitk::LevelWindowProperty::Pointer levWinProp = new mitk::LevelWindowProperty();
+			levWinProp->GetLevelWindow().SetRangeMin(-1024);
+			levWinProp->GetLevelWindow().SetRangeMax(4096);
+			levWinProp->GetLevelWindow().SetMin(-1024);
+			levWinProp->GetLevelWindow().SetMax(4096);
 
-						node->GetPropertyList()->SetProperty("levelwindow",levWinProp);
+			node->GetPropertyList()->SetProperty("levelwindow",levWinProp);
 
-						connect(mitkMultiWidget->levelWindowWidget,SIGNAL(levelWindow(mitk::LevelWindow*)),this,SLOT(changeLevelWindow(mitk::LevelWindow*)) );
+			connect(mitkMultiWidget->levelWindowWidget,SIGNAL(levelWindow(mitk::LevelWindow*)),this,SLOT(changeLevelWindow(mitk::LevelWindow*)) );
 
         }
 }

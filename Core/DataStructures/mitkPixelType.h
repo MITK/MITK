@@ -14,6 +14,8 @@ namespace mitk {
 class PixelType
 {
 public:
+  itkTypeMacro(PixelType, None);
+
   //##ModelId=3E1400C40198
   PixelType(const std::type_info& aTypeId);
 

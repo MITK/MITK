@@ -1,6 +1,6 @@
 
-CC = cc -mips2
 CC = gcc -Wall -pedantic -ansi -Wno-comment
+CC = cc -mips2
 
 DEBUG = -O2
 DEBUG = -g
@@ -61,6 +61,9 @@ install	:libipPic.a picinfo
 	cp libipPic.a /usr/local/lib
 	cp picinfo /usr/local/bin
 	( cd /usr/local ; rdist )
+
+clean:
+	-rm *.o *.a core picinfo test
 
 
 #distname: version.c

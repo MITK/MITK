@@ -7,8 +7,6 @@
 #include "mitkInteractionConst.h"
 #include <itkMacro.h>
 
-#define INTERDEBUG
-
 //##ModelId=3E5B2DB301FD
 //##Documentation
 //## Constructor

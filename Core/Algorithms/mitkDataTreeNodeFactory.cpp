@@ -687,9 +687,11 @@ void mitk::DataTreeNodeFactory::ReadFileTypeITKImageIOFactory()
     imageIO->Read( buffer );
     mitk::Image::Pointer image = mitk::Image::New();
 #if ITK_VERSION_MINOR > 6
-    mitk::PixelType pixelType( imageIO->GetComponentTypeInfo() );
+    mitk::PixelType pixelType( imageIO->GetComponentTypeInfo(), imageIO->GetNumberOfComponents() );
     image->Initialize( pixelType, ndim, dimensions );
 #else
+    if ( imageIO->GetNumberOfComponents() > 1)
+        itkWarningMacro(<<"For older itk versions, only scalar images are supported!");
     mitk::PixelType pixelType( imageIO->GetPixelType() );
     image->Initialize( pixelType, ndim, dimensions );
 #endif 
@@ -698,7 +700,7 @@ void mitk::DataTreeNodeFactory::ReadFileTypeITKImageIOFactory()
     image->GetTimeSlicedGeometry()->InitializeEvenlyTimed(image->GetSlicedGeometry(), image->GetDimension(3));
     free( buffer );
     buffer = NULL;
-
+    std::cout << "number of image components: "<< image->GetPixelType().GetNumberOfComponents() << std::endl;
     mitk::DataTreeNode::Pointer node = this->GetOutput();
     node->SetData( image );
 

@@ -128,7 +128,7 @@ float mitk::LineInteractor::CalculateJurisdiction(StateEvent const* stateEvent) 
     mitk::Mesh::PointIdConstIterator pointIdIt = cellAutoPointer.GetPointer()->PointIdsBegin();
     mitk::Mesh::PointIdConstIterator pointIdEnd = cellAutoPointer.GetPointer()->PointIdsEnd();
     //get to the desired index of pointIndexes according to lineId
-    int counter = 0;
+    unsigned int counter = 0;
     while (pointIdIt != pointIdEnd)
     {
       if (counter == lineId)
@@ -184,7 +184,7 @@ bool mitk::LineInteractor::ExecuteAction(Action* action, mitk::StateEvent const*
 
   //for reading on the points, Id's etc
   mitk::Mesh::DataType *itkpointSet = mesh->GetMesh();
-  mitk::Mesh::PointsContainer *points = itkpointSet->GetPoints();
+  //mitk::Mesh::PointsContainer *points = itkpointSet->GetPoints();
   
   switch (action->GetActionId())
 	{

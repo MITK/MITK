@@ -59,8 +59,9 @@ class QmitkNodeViewBaseItem {
     } 
     void updateEnabledAppearance();    
     virtual ~QmitkNodeViewBaseItem() {}
+    mitk::BaseProperty::Pointer GetProperty() { return m_Property;}
+    mitk::PropertyList::Pointer GetPropertyList() { return m_PropertyList;}
   protected:
-    bool  m_PropEnabled ;
     mitk::PropertyList::Pointer m_PropertyList;
     mitk::BaseProperty::Pointer m_Property;
 };

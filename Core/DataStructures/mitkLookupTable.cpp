@@ -20,6 +20,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkLookupTable.h"
 #include "itkProcessObject.h"
 
+#include <vtkColorTransferFunction.h>
+#include <vtkPiecewiseFunction.h>
+
+
 mitk::LookupTable::LookupTable()
 {
     m_LookupTable = vtkLookupTable::New();
@@ -173,4 +177,51 @@ void mitk::LookupTable::SetRequestedRegion( itk::DataObject *data )
     //to be set to LargestPossibleRegion
 }
 
+void mitk::LookupTable::CreateColorTransferFunction(vtkColorTransferFunction*& colorFunction)
+{
+  if(colorFunction==NULL)
+    colorFunction = vtkColorTransferFunction::New();
+  
+  mitk::LookupTable::RawLookupTableType *rgba = GetRawLookupTable();
+  int i, num_of_values=m_LookupTable->GetNumberOfTableValues();
 
+  float *cols;
+  float *colsHead;
+
+  colsHead=cols=(float *)malloc(sizeof(float *)*num_of_values*3);
+
+  for(i=0;i<num_of_values;++i)
+  {
+    *cols=*rgba/255.0; ++cols; ++rgba;
+    *cols=*rgba/255.0; ++cols; ++rgba;
+    *cols=*rgba/255.0; ++cols; ++rgba;
+    ++rgba;
+  }
+  colorFunction->BuildFunctionFromTable(m_LookupTable->GetTableRange()[0], m_LookupTable->GetTableRange()[1], num_of_values-1, colsHead);
+
+  free(colsHead);
+}
+
+void mitk::LookupTable::CreateOpacityTransferFunction(vtkPiecewiseFunction*& opacityFunction)
+{
+  if(opacityFunction==NULL)
+    opacityFunction = vtkPiecewiseFunction::New();
+
+  mitk::LookupTable::RawLookupTableType *rgba = GetRawLookupTable();
+  int i, num_of_values=m_LookupTable->GetNumberOfTableValues();
+
+  float *alphas;
+  float *alphasHead;
+
+  alphasHead=alphas=(float *)malloc(sizeof(float *)*num_of_values);
+
+  rgba+=3;
+  for(i=0;i<num_of_values;++i)
+  {
+    *alphas=*rgba/255.0; ++alphas; rgba+=4;
+  }
+
+  opacityFunction->BuildFunctionFromTable(m_LookupTable->GetTableRange()[0], m_LookupTable->GetTableRange()[1], num_of_values-1, alphasHead);
+
+  free(alphasHead);
+}

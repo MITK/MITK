@@ -25,6 +25,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkDataObject.h>
 #include <itkObjectFactory.h>
 
+class vtkColorTransferFunction;
+class vtkPiecewiseFunction;
+
 namespace mitk
 {
 
@@ -114,7 +117,8 @@ public:
     LookupTable();
     virtual ~LookupTable();
 
-    
+    void CreateColorTransferFunction(vtkColorTransferFunction*& colorFunction);
+    void CreateOpacityTransferFunction(vtkPiecewiseFunction*& opacityFunction);
 protected:
 
     vtkLookupTable* m_LookupTable;

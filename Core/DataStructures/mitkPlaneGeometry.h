@@ -47,19 +47,19 @@ public:
   //## @brief Initialize a plane with orientation @a planeorientation (default: transversal) with respect to 
   //## @a geometryframe (default: identity) and unit spacing (bounds set accordingly).
   //##
-  virtual void InitializeStandardPlane(const mitk::Geometry3D* geometry3D, PlaneOrientation planeorientation = PlaneOrientation::Transversal, mitk::ScalarType zPosition = 0, bool frontside=true);
+  virtual void InitializeStandardPlane(const mitk::Geometry3D* geometry3D, PlaneOrientation planeorientation = Transversal, mitk::ScalarType zPosition = 0, bool frontside=true);
 
   //##Documentation
   //## @brief Initialize a plane with orientation @a planeorientation (default: transversal) with respect to 
   //## @a transform (default: identity) given width and height in units.
   //##
-  virtual void InitializeStandardPlane(mitk::ScalarType width, mitk::ScalarType height, const mitk::AffineTransform3D* transform=NULL, PlaneOrientation planeorientation = PlaneOrientation::Transversal, mitk::ScalarType zPosition = 0, bool frontside=true);
+  virtual void InitializeStandardPlane(mitk::ScalarType width, mitk::ScalarType height, const mitk::AffineTransform3D* transform=NULL, PlaneOrientation planeorientation = Transversal, mitk::ScalarType zPosition = 0, bool frontside=true);
 
   //##Documentation
   //## @brief Initialize plane with orientation @a planeorientation (default: transversal) 
   //## given width, height and spacing.
   //##
-  virtual void InitializeStandardPlane(mitk::ScalarType width, mitk::ScalarType height, const Vector3D & spacing, PlaneOrientation planeorientation = PlaneOrientation::Transversal, mitk::ScalarType zPosition = 0, bool frontside=true);
+  virtual void InitializeStandardPlane(mitk::ScalarType width, mitk::ScalarType height, const Vector3D & spacing, PlaneOrientation planeorientation = Transversal, mitk::ScalarType zPosition = 0, bool frontside=true);
 
   //##Documentation
   //## @brief Initialize plane by right-/down-vector (itk) and spacing (default: 1.0 mm in all directions).
@@ -245,3 +245,6 @@ protected:
 
 } // namespace mitk
 #endif /* PLANEGEOMETRY_H_HEADER_INCLUDED_C1C68A2C */
+
+
+

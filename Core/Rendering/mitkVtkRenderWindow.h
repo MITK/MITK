@@ -14,10 +14,14 @@ namespace mitk
 {
 
 #ifdef WIN32
-class VtkRenderWindow : public vtkWin32OpenGLRenderWindow
+#define PARENTCLASS vtkWin32OpenGLRenderWindow
 #else
-class VtkRenderWindow : public vtkXOpenGLRenderWindow
+#define PARENTCLASS vtkXOpenGLRenderWindow
 #endif
+
+
+class VtkRenderWindow : public PARENTCLASS
+#undef PARENTCLASS
 {
 public:
   // Description:

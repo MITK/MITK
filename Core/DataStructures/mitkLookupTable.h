@@ -39,6 +39,9 @@ public:
 
     virtual void ChangeOpacityForAll( float opacity );
 
+    virtual void ChangeOpacity(int index, float opacity );
+
+    
     /*!
     * \brief equality operator implementation
     */
@@ -89,11 +92,13 @@ public:
      */
     virtual void SetRequestedRegion( DataObject *data );
 
+    LookupTable();
+    virtual ~LookupTable();
+
+    
 protected:
 
     vtkLookupTable* m_LookupTable;
-    LookupTable();
-    virtual ~LookupTable();
 
 private:
 

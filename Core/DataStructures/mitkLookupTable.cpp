@@ -18,6 +18,7 @@ void mitk::LookupTable::SetVtkLookupTable( vtkLookupTable* lut )
         m_LookupTable = lut;
         this->Modified();
     }
+
 }
 
 
@@ -36,6 +37,23 @@ void mitk::LookupTable::ChangeOpacityForAll( float opacity )
     this->Modified();  // need to call modiefied, since LookupTableProperty seems to be unchanged so no widget-updat is executed
 }
 
+void mitk::LookupTable::ChangeOpacity(int index, float opacity )
+{
+
+    int noValues = m_LookupTable->GetNumberOfTableValues ();
+		if (index>noValues)
+		{
+			std::cout << "could not change opacity. index exceed size of lut ... " << std::endl;
+			return;
+		}
+		
+    float rgba[ 4 ];
+    m_LookupTable->GetTableValue ( index, rgba );
+    rgba[ 3 ] = opacity;
+    m_LookupTable->SetTableValue ( index, rgba );
+
+    this->Modified();  // need to call modiefied, since LookupTableProperty seems to be unchanged so no widget-updat is executed
+}
 
 
 vtkLookupTable* mitk::LookupTable::GetVtkLookupTable() const
@@ -45,17 +63,17 @@ vtkLookupTable* mitk::LookupTable::GetVtkLookupTable() const
 
 mitk::LookupTable::RawLookupTableType * mitk::LookupTable::GetRawLookupTable() const
 {
+
+		if (m_LookupTable==NULL) std::cout << "uuups..." << std::endl;
     return m_LookupTable->GetPointer( 0 );
 };
-
 
 /*!
  * \brief equality operator inplementation
  */
 bool mitk::LookupTable::operator==( const mitk::LookupTable& LookupTable ) const
 {
-
-    if ( m_LookupTable == ( LookupTable.GetVtkLookupTable() ) )
+    if ( m_LookupTable == LookupTable.GetVtkLookupTable() )
     {
         return true;
     }

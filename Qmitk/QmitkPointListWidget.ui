@@ -1,0 +1,85 @@
+<!DOCTYPE UI><UI version="3.2" stdsetdef="1">
+<class>QmitkPointListWidget</class>
+<widget class="QWidget">
+    <property name="name">
+        <cstring>QmitkPointListWidget</cstring>
+    </property>
+    <property name="geometry">
+        <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>232</width>
+            <height>467</height>
+        </rect>
+    </property>
+    <property name="caption">
+        <string>Form1</string>
+    </property>
+    <vbox>
+        <property name="name">
+            <cstring>unnamed</cstring>
+        </property>
+        <widget class="QListBox">
+            <property name="name">
+                <cstring>InteractivePointList</cstring>
+            </property>
+            <property name="sizePolicy">
+                <sizepolicy>
+                    <hsizetype>1</hsizetype>
+                    <vsizetype>7</vsizetype>
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                </sizepolicy>
+            </property>
+            <property name="frameShape">
+                <enum>StyledPanel</enum>
+            </property>
+            <property name="frameShadow">
+                <enum>Sunken</enum>
+            </property>
+        </widget>
+    </vbox>
+</widget>
+<connections>
+    <connection>
+        <sender>InteractivePointList</sender>
+        <signal>selected(int)</signal>
+        <receiver>QmitkPointListWidget</receiver>
+        <slot>PointSelect(int)</slot>
+    </connection>
+</connections>
+<includes>
+    <include location="local" impldecl="in declaration">mitkPointSet.h</include>
+    <include location="local" impldecl="in declaration">mitkStateEvent.h</include>
+    <include location="local" impldecl="in declaration">mitkGlobalInteraction.h</include>
+    <include location="local" impldecl="in declaration">mitkEventMapper.h</include>
+    <include location="local" impldecl="in declaration">mitkProperties.h</include>
+    <include location="local" impldecl="in declaration">mitkInteractionConst.h</include>
+    <include location="local" impldecl="in declaration">mitkPositionEvent.h</include>
+    <include location="local" impldecl="in declaration">mitkVector.h</include>
+    <include location="local" impldecl="in declaration">mitkPointSetInteractor.h</include>
+    <include location="local" impldecl="in declaration">itkCommand.h</include>
+    <include location="local" impldecl="in declaration">mitkBoolProperty.h</include>
+    <include location="local" impldecl="in declaration">mitkStringProperty.h</include>
+    <include location="global" impldecl="in declaration">sstream</include>
+    <include location="global" impldecl="in declaration">string</include>
+    <include location="local" impldecl="in implementation">QmitkPointListWidget.ui.h</include>
+</includes>
+<variables>
+    <variable>std::string prefix;</variable>
+    <variable>mitk::PointSet::Pointer m_PointSet;</variable>
+    <variable>itk::SimpleMemberCommand&lt;QmitkPointListWidget&gt;::Pointer m_DataChangedCommand;</variable>
+    <variable>static mitk::PointSetInteractor::Pointer m_CurrentInteraction;</variable>
+    <variable>mitk::DataTreeNode::Pointer m_DatatreeNode;</variable>
+    <variable access="public">static const int UNLIMITED=999;</variable>
+</variables>
+<slots>
+    <slot>PointSelect( int ItemIndex )</slot>
+    <slot access="protected">ItemsOfListUpdate()</slot>
+</slots>
+<functions>
+    <function access="private" specifier="non virtual">init()</function>
+    <function>SwitchInteraction( mitk::PointSetInteractor::Pointer * sop, mitk::DataTreeNode::Pointer * node, int numberOfPoints, mitk::Point3D c, std::string l )</function>
+</functions>
+<layoutdefaults spacing="6" margin="11"/>
+</UI>

@@ -19,9 +19,11 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkImage.h"
 
+#include "mitkBaseProcess.h"
 #include "mitkSlicedGeometry3D.h"
 #include "mitkPlaneGeometry.h"
 #include "mitkPicHelper.h"
+
 #include "ipFunc.h"
 
 #include <vtkImageData.h>
@@ -53,7 +55,8 @@ void* mitk::Image::GetData()
   {
     if(GetSource()==NULL)
       return NULL;
-    GetSource()->UpdateOutputInformation();
+    if(GetSource()->Updating()==false)
+      GetSource()->UpdateOutputInformation();
   }
   m_CompleteData=GetChannelData();
   return m_CompleteData->GetData();
@@ -66,7 +69,8 @@ vtkImageData* mitk::Image::GetVtkImageData(int t, int n)
   {
     if(GetSource()==NULL)
       return NULL;
-    GetSource()->UpdateOutputInformation();
+    if(GetSource()->Updating()==false)
+      GetSource()->UpdateOutputInformation();
   }
   mitk::ImageDataItem::Pointer volume=GetVolumeData(t, n);
   if(volume.IsNull() || volume->GetVtkImageData() == NULL)
@@ -82,7 +86,8 @@ ipPicDescriptor* mitk::Image::GetPic()
   {
     if(GetSource()==NULL)
       return NULL;
-    GetSource()->UpdateOutputInformation();
+    if(GetSource()->Updating()==false)
+      GetSource()->UpdateOutputInformation();
   }
   m_CompleteData=GetChannelData();
   if(m_CompleteData.IsNull()) 
@@ -120,7 +125,7 @@ mitk::ImageDataItem::Pointer mitk::Image::GetSliceData(int s, int t, int n)
   }
 
   // slice is unavailable. Can we calculate it?
-  if(GetSource()!=NULL)
+  if((GetSource()!=NULL) && (GetSource()->Updating()==false))
   {
     // ... wir müssen rechnen!!! ....
     m_RequestedRegion.SetIndex(0, 0);
@@ -136,7 +141,7 @@ mitk::ImageDataItem::Pointer mitk::Image::GetSliceData(int s, int t, int n)
     m_RequestedRegionInitialized=true;
     GetSource()->Update();
     if(IsSliceSet(s,t,n))
-      //yes: now we can call ourselves without the risk of a endless loop (see if above)
+      //yes: now we can call ourselves without the risk of a endless loop (see "if" above)
       return GetSliceData(s,t,n);
     else
       return NULL;
@@ -175,74 +180,76 @@ mitk::ImageDataItem::Pointer mitk::Image::GetVolumeData(int t, int n)
   bool complete=true;
   unsigned int s;
   for(s=0;s<m_Dimensions[2];++s)
+  {
     if(m_Slices[GetSliceIndex(s,t,n)].IsNull())
     {
       complete=false;
       break;
     }
-    if(complete)
+  }
+  if(complete)
+  {
+    vol=m_Volumes[pos];
+    // ok, let's combine the slices!
+    if(vol.IsNull())
+      vol=new ImageDataItem(m_PixelType, 3, m_Dimensions);
+    vol->SetComplete(true);
+    int size=m_OffsetTable[2]*m_PixelType.GetBpe()/8;
+    for(s=0;s<m_Dimensions[2];++s)
     {
-      vol=m_Volumes[pos];
-      // ok, let's combine the slices!
-      if(vol.IsNull())
-        vol=new ImageDataItem(m_PixelType, 3, m_Dimensions);
-      vol->SetComplete(true);
-      int size=m_OffsetTable[2]*m_PixelType.GetBpe()/8;
-      for(s=0;s<m_Dimensions[2];++s)
+      int posSl;
+      ImageDataItemPointer sl;
+      posSl=GetSliceIndex(s,t,n);
+
+      sl=m_Slices[posSl];
+      if(sl->GetParent()!=vol)
       {
-        int posSl;
-        ImageDataItemPointer sl;
-        posSl=GetSliceIndex(s,t,n);
+        // copy data of slices in volume
+        int offset = s*size;
+        memcpy(static_cast<char*>(vol->GetData())+offset, sl->GetData(), size);
 
-        sl=m_Slices[posSl];
-        if(sl->GetParent()!=vol)
-        {
-          // copy data of slices in volume
-          int offset = s*size;
-          memcpy(static_cast<char*>(vol->GetData())+offset, sl->GetData(), size);
+        ipPicDescriptor * pic = sl->GetPicDescriptor();
 
-          ipPicDescriptor * pic = sl->GetPicDescriptor();
-
-          // replace old slice with reference to volume
-          sl=new ImageDataItem(*vol, 2, s*size);
-          sl->SetComplete(true);
-          ipFuncCopyTags(sl->GetPicDescriptor(), pic);
-          m_Slices[posSl]=sl;
-        }
+        // replace old slice with reference to volume
+        sl=new ImageDataItem(*vol, 2, s*size);
+        sl->SetComplete(true);
+        ipFuncCopyTags(sl->GetPicDescriptor(), pic);
+        m_Slices[posSl]=sl;
       }
-      if(vol->GetPicDescriptor()->info->tags_head==NULL)
-        ipFuncCopyTags(vol->GetPicDescriptor(), m_Slices[GetSliceIndex(0,t,n)]->GetPicDescriptor());
-      return m_Volumes[pos]=vol;
     }
+    if(vol->GetPicDescriptor()->info->tags_head==NULL)
+      ipFuncCopyTags(vol->GetPicDescriptor(), m_Slices[GetSliceIndex(0,t,n)]->GetPicDescriptor());
+    return m_Volumes[pos]=vol;
+  }
 
-    // volume is unavailable. Can we calculate it?
-    if(GetSource()!=NULL)
-    {
-      // ... wir müssen rechnen!!! ....
-      m_RequestedRegion.SetIndex(0, 0);
-      m_RequestedRegion.SetIndex(1, 0);
-      m_RequestedRegion.SetIndex(2, 0);
-      m_RequestedRegion.SetIndex(3, t);
-      m_RequestedRegion.SetIndex(4, n);
-      m_RequestedRegion.SetSize(0, m_Dimensions[0]);
-      m_RequestedRegion.SetSize(1, m_Dimensions[1]);
-      m_RequestedRegion.SetSize(2, m_Dimensions[2]);
-      m_RequestedRegion.SetSize(3, 1);
-      m_RequestedRegion.SetSize(4, 1);
-      m_RequestedRegionInitialized=true;
-      GetSource()->Update();
-      if(IsVolumeSet(t,n))
-        //yes: now we can call ourselves without the risk of a endless loop (see if above)
-        return GetVolumeData(t,n);
-      else
-        return NULL;
-    }
+  // volume is unavailable. Can we calculate it?
+  if((GetSource()!=NULL) && (GetSource()->Updating()==false))
+  {
+    // ... wir müssen rechnen!!! ....
+    m_RequestedRegion.SetIndex(0, 0);
+    m_RequestedRegion.SetIndex(1, 0);
+    m_RequestedRegion.SetIndex(2, 0);
+    m_RequestedRegion.SetIndex(3, t);
+    m_RequestedRegion.SetIndex(4, n);
+    m_RequestedRegion.SetSize(0, m_Dimensions[0]);
+    m_RequestedRegion.SetSize(1, m_Dimensions[1]);
+    m_RequestedRegion.SetSize(2, m_Dimensions[2]);
+    m_RequestedRegion.SetSize(3, 1);
+    m_RequestedRegion.SetSize(4, 1);
+    m_RequestedRegionInitialized=true;
+    GetSource()->Update();
+    if(IsVolumeSet(t,n))
+      //yes: now we can call ourselves without the risk of a endless loop (see "if" above)
+      return GetVolumeData(t,n);
     else
-    {
-      mitk::ImageDataItem::Pointer item = AllocateVolumeData(t,n);
-      item->SetComplete(true);
-      return item;
-    }
+      return NULL;
+  }
+  else
+  {
+    mitk::ImageDataItem::Pointer item = AllocateVolumeData(t,n);
+    item->SetComplete(true);
+    return item;
+  }
 }
 
 //##ModelId=3E0B4A9100BC
@@ -304,7 +311,7 @@ mitk::ImageDataItem::Pointer mitk::Image::GetChannelData(int n)
   }
 
   // channel is unavailable. Can we calculate it?
-  if(GetSource()!=NULL)
+  if((GetSource()!=NULL) && (GetSource()->Updating()==false))
   {
     // ... wir müssen rechnen!!! ....
     m_RequestedRegion.SetIndex(0, 0);
@@ -321,7 +328,7 @@ mitk::ImageDataItem::Pointer mitk::Image::GetChannelData(int n)
     GetSource()->Update();
     // did it work?
     if(IsChannelSet(n))
-      //yes: now we can call ourselves without the risk of a endless loop (see if above)
+      //yes: now we can call ourselves without the risk of a endless loop (see "if" above)
       return GetChannelData(n);
     else
       return NULL;
@@ -394,7 +401,7 @@ bool mitk::Image::IsChannelSet(int n) const
 }
 
 //##ModelId=3E10148003D7
-bool mitk::Image::SetSlice(void *data, int s, int t, int n)
+bool mitk::Image::SetSlice(const void *data, int s, int t, int n)
 {
   if(IsValidSlice(s,t,n)==false) return false;
   ImageDataItemPointer sl;
@@ -418,7 +425,7 @@ bool mitk::Image::SetSlice(void *data, int s, int t, int n)
 }
 
 //##ModelId=3E1014A00211
-bool mitk::Image::SetVolume(void *data, int t, int n)
+bool mitk::Image::SetVolume(const void *data, int t, int n)
 {
   if(IsValidVolume(t,n)==false) return false;
   ImageDataItemPointer vol;
@@ -443,7 +450,7 @@ bool mitk::Image::SetVolume(void *data, int t, int n)
   return true;
 }
 
-bool mitk::Image::SetChannel(void *data, int n)
+bool mitk::Image::SetChannel(const void *data, int n)
 {
   if(IsValidChannel(n)==false) return false;
   ImageDataItemPointer ch;
@@ -469,7 +476,7 @@ bool mitk::Image::SetChannel(void *data, int n)
 }
 
 //##ModelId=3E1027F8023D
-bool mitk::Image::SetPicSlice(ipPicDescriptor *pic, int s, int t, int n)
+bool mitk::Image::SetPicSlice(const ipPicDescriptor *pic, int s, int t, int n)
 {
   if(pic==NULL) return false;
   if(pic->dim!=2) return false;
@@ -478,7 +485,7 @@ bool mitk::Image::SetPicSlice(ipPicDescriptor *pic, int s, int t, int n)
   {
     ImageDataItemPointer sl;
     sl=GetSliceData(s,t,n);
-    ipFuncCopyTags(sl->GetPicDescriptor(), pic);
+    ipFuncCopyTags(sl->GetPicDescriptor(), const_cast<ipPicDescriptor *>(pic));
     return true;
   }
   else
@@ -486,7 +493,7 @@ bool mitk::Image::SetPicSlice(ipPicDescriptor *pic, int s, int t, int n)
 }
 
 //##ModelId=3E102818024D
-bool mitk::Image::SetPicVolume(ipPicDescriptor *pic, int t, int n)
+bool mitk::Image::SetPicVolume(const ipPicDescriptor *pic, int t, int n)
 {
   if(pic==NULL) return false;
   if((pic->dim==2) && ((m_Dimension==2) || ((m_Dimension>2) && (m_Dimensions[2]==1)))) return SetPicSlice(pic, 0, t, n);
@@ -496,14 +503,14 @@ bool mitk::Image::SetPicVolume(ipPicDescriptor *pic, int t, int n)
   {
     ImageDataItemPointer vol;
     vol=GetVolumeData(t,n);
-    ipFuncCopyTags(vol->GetPicDescriptor(), pic);
+    ipFuncCopyTags(vol->GetPicDescriptor(), const_cast<ipPicDescriptor *>(pic));
     return true;
   }
   else
     return false;
 }
 
-bool mitk::Image::SetPicChannel(ipPicDescriptor *pic, int n)
+bool mitk::Image::SetPicChannel(const ipPicDescriptor *pic, int n)
 {
   if(pic==NULL) return false;
   if(pic->dim<=3) return SetPicVolume(pic, 0, n);
@@ -620,12 +627,12 @@ void mitk::Image::Initialize(const mitk::PixelType& type, const mitk::Geometry3D
   /*
   if ( shiftOriginToZero ) 
   {
-    mitk::Point3D origin; origin.Fill(0);    
-    slicedGeometry->SetOrigin( origin );
+  mitk::Point3D origin; origin.Fill(0);    
+  slicedGeometry->SetOrigin( origin );
   } 
   else
   {
-    slicedGeometry->SetOrigin( geometry.GetOrigin() );
+  slicedGeometry->SetOrigin( geometry.GetOrigin() );
   }
   */
 
@@ -710,7 +717,7 @@ void mitk::Image::Initialize(vtkImageData* vtkimagedata, int channels, int tDim,
 }
 
 //##ModelId=3E102D2601DF
-void mitk::Image::Initialize(ipPicDescriptor* pic, int channels, int tDim, int sDim)
+void mitk::Image::Initialize(const ipPicDescriptor* pic, int channels, int tDim, int sDim)
 {
   if(pic==NULL) return;
 

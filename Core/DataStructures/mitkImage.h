@@ -129,7 +129,7 @@ namespace mitk {
     //## no chance to check this.
     //## 
     //## @sa SetPicSlice
-    virtual bool SetSlice(void *data, int s = 0, int t = 0, int n = 0);
+    virtual bool SetSlice(const void *data, int s = 0, int t = 0, int n = 0);
 
     //##ModelId=3E1014A00211
     //##Documentation
@@ -139,7 +139,7 @@ namespace mitk {
     //## no chance to check this.
     //## 
     //## @sa SetPicVolume
-    virtual bool SetVolume(void *data, int t = 0, int n = 0);
+    virtual bool SetVolume(const void *data, int t = 0, int n = 0);
 
     //##Documentation
     //## @brief Set @a data in channel @a n. It is in
@@ -148,7 +148,7 @@ namespace mitk {
     //## no chance to check this.
     //## 
     //## @sa SetPicChannel
-    virtual bool SetChannel(void *data, int n = 0);
+    virtual bool SetChannel(const void *data, int n = 0);
 
     //##ModelId=3E1027F8023D
     //##Documentation
@@ -158,7 +158,7 @@ namespace mitk {
     //## @return @a false : dimensions and/or data-type of @a pic does not
     //## comply with image 
     //## @a true success
-    virtual bool SetPicSlice(ipPicDescriptor *pic, int s = 0, int t = 0, int n = 0);
+    virtual bool SetPicSlice(const ipPicDescriptor *pic, int s = 0, int t = 0, int n = 0);
 
 
     //##ModelId=3E102818024D
@@ -169,7 +169,7 @@ namespace mitk {
     //## @return @a false : dimensions and/or data-type of @a pic does not
     //## comply with image 
     //## @a true success
-    virtual bool SetPicVolume(ipPicDescriptor *pic, int t = 0, int n = 0);
+    virtual bool SetPicVolume(const ipPicDescriptor *pic, int t = 0, int n = 0);
 
     //##Documentation
     //## @brief Set @a pic in channel @a n. 
@@ -178,7 +178,7 @@ namespace mitk {
     //## @return @a false : dimensions and/or data-type of @a pic does not
     //## comply with image 
     //## @a true success
-    virtual bool SetPicChannel(ipPicDescriptor *pic, int n = 0);
+    virtual bool SetPicChannel(const ipPicDescriptor *pic, int n = 0);
 
     //##ModelId=3E102AE9004B
     //##Documentation
@@ -199,7 +199,7 @@ namespace mitk {
     //## @param tDim override time dimension (@a n[3]) in @a pic (if >0 and <)
     //## @param sDim override z-space dimension (@a n[2]) in @a pic (if >0 and <)
     //## @warning Initialize() by pic assumes a plane, evenly spaced geometry starting at (0,0,0).
-    virtual void Initialize(ipPicDescriptor* pic, int channels = 1, int tDim = -1, int sDim = -1);
+    virtual void Initialize(const ipPicDescriptor* pic, int channels = 1, int tDim = -1, int sDim = -1);
 
     //##Documentation
     //## initialize new (or re-initialize) image by @a vtkimagedata, a vtk-image. Only the header is 
@@ -214,7 +214,7 @@ namespace mitk {
     //## used, not the data vector! Use SetVolume(itkimage->GetBufferPointer()) to set the data vector.
     //## @param tDim override time dimension in @a itkimage (if >0 and <)
     //## @param sDim override z-space dimension in @a itkimage (if >0 and <)
-    template <typename itkImageType> void InitializeByItk(itkImageType* itkimage, int channels = 1, int tDim = -1, int sDim=-1)
+    template <typename itkImageType> void InitializeByItk(const itkImageType* itkimage, int channels = 1, int tDim = -1, int sDim=-1)
     {
       if(itkimage==NULL) return;
 

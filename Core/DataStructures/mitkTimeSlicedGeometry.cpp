@@ -72,6 +72,8 @@ const mitk::TimeBounds& mitk::TimeSlicedGeometry::GetTimeBoundsInMS() const
 
   m_TimeBoundsInMS = timebounds;
 
+  assert(timebounds[0]<=timebounds[1]);
+
   return m_TimeBoundsInMS;
 }
 
@@ -92,7 +94,7 @@ int mitk::TimeSlicedGeometry::MSToTimeStep(mitk::ScalarType time_in_ms) const
     if(time_in_ms < m_TimeBoundsInMS[0])
       return -1;
     if(time_in_ms >= m_TimeBoundsInMS[1])
-      return m_TimeSteps;
+      return m_TimeSteps-1;
     if(m_TimeBoundsInMS[0]==m_TimeBoundsInMS[1])
       return 0;
     if((m_TimeBoundsInMS[0]>-ScalarTypeNumericTraits::max()) && (m_TimeBoundsInMS[1]<ScalarTypeNumericTraits::max()))
@@ -144,7 +146,7 @@ void mitk::TimeSlicedGeometry::InitializeEvenlyTimed(mitk::Geometry3D* geometry3
   // commented out because this results in a
   // segmentation fault under linux!
   //
-  //GetTimeBoundsInMS(); //@todo see GetTimeBoundsInMS
+  GetTimeBoundsInMS(); //@todo see GetTimeBoundsInMS
 
   geometry3D->UnRegister();
 }

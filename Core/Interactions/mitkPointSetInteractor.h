@@ -58,6 +58,13 @@ class PointSetInteractor : public Interactor
 	  //## @brief Sets the amount of precision
     void SetPrecision( unsigned int precision );
 
+    //##Documentation
+    //## @brief calculates how good the data, this statemachine handles, is hit by the event.
+    //## 
+    //## overwritten, cause we don't look at the boundingbox, we look at each point
+    virtual float CalculateJurisdiction(StateEvent const* stateEvent) const;
+
+
   protected:
     //##ModelId=3F017B320105
     virtual bool ExecuteAction( Action* action, mitk::StateEvent const* stateEvent );

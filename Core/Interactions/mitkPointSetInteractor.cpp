@@ -48,6 +48,46 @@ void mitk::PointSetInteractor::SetPrecision(unsigned int precision)
   m_Precision = precision;
 }
 
+//##Documentation
+//## overwritten cause this class can handle it better!
+float mitk::PointSetInteractor::CalculateJurisdiction(StateEvent const* stateEvent) const
+{
+  float returnvalue = 0.0;
+  //if it is a key event that can be handled in the current state, then return 0.5
+  mitk::DisplayPositionEvent const  *disPosEvent = dynamic_cast <const mitk::DisplayPositionEvent *> (stateEvent->GetEvent());
+	
+  //Key event handling:
+  if (disPosEvent == NULL)
+  {
+    //check, if the current state has a transition waiting for that key event.
+    if (this->GetCurrentState()->GetTransition(stateEvent->GetId())!=NULL)
+    {
+      return 0.5;
+    }
+    else
+    {
+      return 0;
+    }
+  }
+  
+  //on MouseMove do nothing!
+  if (stateEvent->GetEvent()->GetType() == mitk::Type_MouseMove)
+  {
+    return 0;
+  }
+
+  //if we don't have a Point in our PointSet, then return with 0.5
+  mitk::PointSet* pointSet = dynamic_cast<mitk::PointSet*>(m_DataTreeNode->GetData());
+	if (pointSet != NULL)
+  {
+    mitk::PointSet::DataType *itkPointSet = pointSet->GetPointSet();  
+    if (pointSet->GetSize()<1)
+      returnvalue = 0.5;
+  }
+
+  return returnvalue;
+}
+
 
 //##ModelId=3F017B320121
 void mitk::PointSetInteractor::UnselectAll()
@@ -664,8 +704,9 @@ bool mitk::PointSetInteractor::ExecuteAction( Action* action, mitk::StateEvent c
 			this->Clear();
 		}
 	default:
-    mitk::StatusBar::DisplayText("Message from mitkPointSetInteractor: I do not understand the Action!", 10000);
-	  ok = false;
+    return Superclass::ExecuteAction( action, stateEvent );
+    //mitk::StatusBar::DisplayText("Message from mitkPointSetInteractor: I do not understand the Action!", 10000);
+	  //ok = false;
     //a false here causes the statemachine to undo its last statechange.
     //otherwise it will end up in a different state, but without done Action.
     //if a transition really has no Action, than call donothing

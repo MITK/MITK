@@ -2,6 +2,7 @@
 #include "PlaneGeometry.h"
 #include "EventMapper.h"
 #include "PositionEvent.h"
+#include "mitkDisplayPositionEvent.h"
 #include "mitkSmartPointerProperty.h"
 #include <vtkTransform.h>
 
@@ -137,6 +138,13 @@ void mitk::BaseRenderer::MousePressEvent(mitk::MouseEvent *me)
     mitk::PositionEvent event(this, me->type(), me->button(), me->state(), Qt::Key_unknown, p, position);
     mitk::EventMapper::MapEvent(&event);
   }
+  else if(m_MapperID==2)
+  {
+    Point2D p(me->x(), me->y());
+    GetDisplayGeometry()->ULDisplayToDisplay(p,p);
+    mitk::DisplayPositionEvent event(this, me->type(), me->button(), me->state(), Qt::Key_unknown, p);
+    mitk::EventMapper::MapEvent(&event);
+  }
 }
 
 //##ModelId=3E6D5DD30372
@@ -156,6 +164,13 @@ void mitk::BaseRenderer::MouseReleaseEvent(mitk::MouseEvent *me)
     mitk::PositionEvent event(this, me->type(), me->button(), me->state(), Qt::Key_unknown, p, position);
     mitk::EventMapper::MapEvent(&event);
   }
+  else if(m_MapperID==2)
+  {
+    Point2D p(me->x(), me->y());
+    GetDisplayGeometry()->ULDisplayToDisplay(p,p);
+    mitk::DisplayPositionEvent event(this, me->type(), me->button(), me->state(), Qt::Key_unknown, p);
+    mitk::EventMapper::MapEvent(&event);
+  }
 }
 
 //##ModelId=3E6D5DD303C2
@@ -172,6 +187,13 @@ void mitk::BaseRenderer::MouseMoveEvent(mitk::MouseEvent *me)
     GetDisplayGeometry()->DisplayToMM(p, p_mm);
     GetDisplayGeometry()->Map(p_mm, position);
     mitk::PositionEvent event(this, me->type(), me->button(), me->state(), Qt::Key_unknown, p, position);
+    mitk::EventMapper::MapEvent(&event);
+  }
+  else if(m_MapperID==2)
+  {
+    Point2D p(me->x(), me->y());
+    GetDisplayGeometry()->ULDisplayToDisplay(p,p);
+    mitk::DisplayPositionEvent event(this, me->type(), me->button(), me->state(), Qt::Key_unknown, p);
     mitk::EventMapper::MapEvent(&event);
   }
 }

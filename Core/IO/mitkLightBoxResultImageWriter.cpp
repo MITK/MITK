@@ -21,8 +21,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <chili/plugin.h>
 #include <chili/qclightbox.h>
-#include <isg.h>
-#include <ipDicom.h>
+#include <chili/isg.h>
+#include <ipDicom/ipDicom.h>
 
 #include <mitkImage.h>
 #include <mitkImageSliceSelector.h>

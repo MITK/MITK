@@ -21,9 +21,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include <ipFunc.h>
 #include <itkImageFileReader.h>
 #include "mitkPlaneGeometry.h"
-#include <isg.h>
+#include <chili/isg.h>
 #include <vtkTransform.h>
-#include <ipDicom.h>
+#include <ipDicom/ipDicom.h>
 #include <list>
 
 

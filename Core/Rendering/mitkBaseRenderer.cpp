@@ -173,3 +173,7 @@ void mitk::BaseRenderer::KeyPressEvent(mitk::KeyEvent *ke)
   mitk::Event event(ke->type(), Qt::NoButton, Qt::NoButton, ke->key());
   mitk::EventMapper::MapEvent(&event);
 }
+
+void mitk::BaseRenderer::MakeCurrent()
+{
+}

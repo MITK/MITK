@@ -46,6 +46,8 @@ class OpenGLRenderer : public BaseRenderer
     //##ModelId=3E3314B0005C
     virtual void SetWindowId(void *id);
 
+    virtual void MakeCurrent();
+
     //##ModelId=3E3799420227
     virtual void InitSize(int w, int h);
 

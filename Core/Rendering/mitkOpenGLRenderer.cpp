@@ -19,8 +19,8 @@
 mitk::OpenGLRenderer::OpenGLRenderer() : m_VtkMapperPresent(NULL)
 {
     m_CameraController=NULL;
-    m_CameraController = VtkInteractorCameraController::New();
-    m_CameraController->AddRenderer(this);
+//    m_CameraController = VtkInteractorCameraController::New();
+//    m_CameraController->AddRenderer(this);
 }
 
 //##ModelId=3E3D28AB0018
@@ -236,6 +236,8 @@ void mitk::OpenGLRenderer::Render()
 		
 		mitk::DataTreeNode::Pointer node = it->get();
 		mitk::Mapper::Pointer mapper = node->GetMapper(m_MapperID);
+if(dynamic_cast<mitk::Image*>(node->GetData())==NULL)
+{
 		if(mapper.IsNotNull())
 		{
 			GLMapper2D* mapper2d=dynamic_cast<GLMapper2D*>(mapper.GetPointer());
@@ -243,6 +245,7 @@ void mitk::OpenGLRenderer::Render()
 				mapper2d->Paint(this);
 			}
 		}
+}
 	}
 	
 	delete it;
@@ -353,3 +356,10 @@ void mitk::OpenGLRenderer::InitSize(int w, int h)
     Update();
 }
 
+void mitk::OpenGLRenderer::MakeCurrent()
+{
+    if(m_RenderWindow!=NULL)
+    {
+        m_RenderWindow->MakeCurrent();
+    }
+}

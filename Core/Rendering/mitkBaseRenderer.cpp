@@ -61,6 +61,7 @@ mitk::BaseRenderer::BaseRenderer() : m_DataTreeIterator(NULL), m_RenderWindow(NU
     m_WorldGeometry2DData->SetGeometry2D(m_WorldGeometry);
 
     m_DisplayGeometry = mitk::DisplayGeometry::New();
+	m_DisplayGeometry->SetWorldGeometry(m_WorldGeometry);
     m_DisplayGeometry2DData = mitk::Geometry2DData::New();
     m_DisplayGeometry2DData->SetGeometry2D(m_DisplayGeometry);
 }

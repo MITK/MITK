@@ -186,10 +186,10 @@ void mitk::CylindricToCartesianFilter::buildTransformShortCuts(int orig_xsize, i
     {
       int xq=x-xy0, yq=y-xy0;
 
-      r=sqrt(xq*xq+yq*yq);
+      r=sqrt( (double) (xq*xq+yq*yq));
 
       //			float rtest=-(xy0-sqrt(xy0*xy0-yq*yq))-0.5;
-      rt=(ipInt2_t)(-(xy0-sqrt(xy0*xy0-yq*yq))-0.5);/*in rt steht der Index des Endes der zu überspringenden Punkte=>anfangen bei -rt+1!*/
+      rt=(ipInt2_t)(-(xy0-sqrt((double) (xy0*xy0-yq*yq)))-0.5);/*in rt steht der Index des Endes der zu überspringenden Punkte=>anfangen bei -rt+1!*/
       //			if((x>=-rt) && (x<new_xsize+rt))
       {
         if(y!=xy0)

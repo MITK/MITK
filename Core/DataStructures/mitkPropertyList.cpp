@@ -18,6 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include "mitkPropertyList.h"
+#include <mitkXMLWriter.h>
 
 //##ModelId=3D6A0E9E0029
 mitk::BaseProperty::Pointer mitk::PropertyList::GetProperty(const char *propertyKey) const
@@ -118,4 +119,26 @@ void mitk::PropertyList::Clear()
     ++it;
   }
   m_Properties.clear();
+}
+
+bool mitk::PropertyList::WriteXML( mitk::XMLWriter& xmlWriter ) 
+{
+	const mitk::PropertyList::PropertyMap* map = GetMap();
+	mitk::PropertyList::PropertyMap::const_iterator i = map->begin();
+	const mitk::PropertyList::PropertyMap::const_iterator end = map->end();
+	
+	xmlWriter.BeginNode("propertyList");
+	xmlWriter.WriteProperty( "className", typeid( *this ).name() );
+
+	while ( i != end ) {
+		xmlWriter.BeginNode( "property" );		
+		xmlWriter.WriteProperty( "className", typeid( *(*i).second.GetPointer() ).name() );
+		xmlWriter.WriteProperty((*i).first.c_str(), (*i).second->GetValueAsString().c_str());
+		xmlWriter.EndNode();
+		*i++;
+	}
+
+	xmlWriter.EndNode();
+
+	return true;
 }

@@ -28,6 +28,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk {
 
+	class XMLWriter;
+
 //##ModelId=3E031F200392
 //##Documentation
 //## @brief List of properties (instances of subclasses of BaseProperty)
@@ -72,6 +74,8 @@ public:
 		virtual Pointer Clone();
 
     virtual void Clear();
+
+	virtual bool WriteXML( XMLWriter& xmlWriter );
 protected:
     //##ModelId=3E38FEFE0125
     PropertyList();

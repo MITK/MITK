@@ -29,14 +29,8 @@ public:
   typedef itk::PointSet<bool,3,MeshTraits> PointSetType;
   typedef PointSetType::PointType PointType;
   typedef PointSetType::PointsContainer PointsContainer;
-
-
-  //##ModelId=3F0177E803D1
-	typedef std::vector<bool> BoolList;
-  //##ModelId=3F0177E803E0
-	typedef std::vector<bool>::iterator BoolListIter;
-  //##ModelId=3F054CE201E3
-	typedef std::vector<bool>::const_iterator BoolListConstIter;
+  typedef PointSetType::PointDataContainer::Iterator PointDataIterator;
+  typedef PointSetType::PointDataContainer PointDataContainer;
 
   //##ModelId=3F0177E901BF
 	void ExecuteOperation(Operation* operation);
@@ -48,13 +42,8 @@ public:
 
   //##ModelId=3F0177E901CC
 	//##Documentation
-	//## @brief returns the point-list
+	//## @brief returns the point-list with points and selected Information
   const PointSetType::Pointer GetPointList() const;
-
-  //##ModelId=3F054CE203B8
-	//##Documentation
-	//## @brief returns the list of selection
-	const BoolList& GetSelectList() const;
 
   //##ModelId=3F0177E901CE
   //##Documentation
@@ -107,12 +96,7 @@ private:
   //##ModelId=3F0177E90190
 	//##Documentation
 	//## @brief List of Points
-	PointSetType::Pointer m_PointList;
-
-  //##ModelId=3F0177E9019F
-	//##Documentation
-	//## @brief List that stores the seöect/unselect state of the Points
-	BoolList m_SelectList;
+	PointSetType::Pointer m_PointSet;
 };
 
 } // namespace mitk

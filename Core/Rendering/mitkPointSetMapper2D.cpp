@@ -60,14 +60,14 @@ void mitk::PointSetMapper2D::Paint(mitk::BaseRenderer * renderer)
         vtkTransform* transform = GetDataTreeNode()->GetVtkTransform();
 
         //List of the Points
-        PointSet::PointSetType::PointsContainer::ConstIterator it, end;
-        //bool list for the selection of the points
-        PointSet::BoolListConstIter selIt, selEnd;
-
+        PointSet::PointSetType::PointsContainerConstIterator it, end;
         it=input->GetPointList()->GetPoints()->Begin();
-        selIt=input->GetSelectList().begin();
         end=input->GetPointList()->GetPoints()->End();
-        selEnd=input->GetSelectList().end();
+
+        //bool list for the selection of the points
+        PointSet::PointSetType::PointDataContainerIterator selIt, selEnd;
+        selIt=input->GetPointList()->GetPointData()->Begin();
+        selEnd=input->GetPointList()->GetPointData()->End();
 
         int j=0;
         while(it!=end)
@@ -90,7 +90,7 @@ void mitk::PointSetMapper2D::Paint(mitk::BaseRenderer * renderer)
 
                 Point2D horz(5,0),vert(0,5);
                                 
-                if (*selIt)//selected
+                if (selIt->Value())//selected
                 {
                     horz.x=10;
                     vert.y=10;

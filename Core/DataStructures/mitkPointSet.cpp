@@ -26,8 +26,9 @@ inline void UpdateAllWidgets()//@todo global quickimplementation. is to be chang
 //##ModelId=3F0177E901BD
 mitk::PointSet::PointSet()
 {
-  //init new itk::PointSet
-  m_PointList = PointSetType::New();
+  m_PointSet = PointSetType::New();
+  PointDataContainer::Pointer pointData = PointDataContainer::New();
+  m_PointSet->SetPointData(pointData);
   m_Geometry3D->Initialize(1);
 }
 
@@ -38,18 +39,13 @@ mitk::PointSet::~PointSet()
 //##ModelId=3F0177E901C1
 int mitk::PointSet::GetSize()
 {
-  return m_PointList->GetNumberOfPoints();
+  return m_PointSet->GetNumberOfPoints();
 }
 
 //##ModelId=3F0177E901CC
 const mitk::PointSet::PointSetType::Pointer mitk::PointSet::GetPointList() const
 {
-  return m_PointList;
-}
-//##ModelId=3F054CE203B8
-const mitk::PointSet::BoolList& mitk::PointSet::GetSelectList() const
-{
-	return m_SelectList;
+  return m_PointSet;
 }
 
 //##ModelId=3F0177E901DE
@@ -71,9 +67,9 @@ int mitk::PointSet::SearchPoint(ITKPoint3D point, float distance )
 
   //searching the first point in the List, that is +- distance far away from the given point
   unsigned int i;
- 	for (i=0; i < m_PointList->GetNumberOfPoints(); i++)
+ 	for (i=0; i < m_PointSet->GetNumberOfPoints(); i++)
 	{
-    m_PointList->GetPoint(i, pout);//changes out
+    m_PointSet->GetPoint(i, pout);//changes out
     if (in == out)//if totaly equal
       return i;
 
@@ -89,26 +85,26 @@ int mitk::PointSet::SearchPoint(ITKPoint3D point, float distance )
 //##ModelId=3F0177E901CE
 const mitk::PointSet::PointType mitk::PointSet::GetPoint(int position)
 {
-	if ((int)m_PointList->GetNumberOfPoints()< position)
+	if ((int)m_PointSet->GetNumberOfPoints()< position)
 	{
     return NULL;
 	}
   PointType out;
   out.Fill(0);
-  m_PointList->GetPoint(position, &out);
+  m_PointSet->GetPoint(position, &out);
   return out;
 }
 
 const mitk::ITKPoint3D mitk::PointSet::GetItkPoint(int position)
 {
-  if ((int)m_PointList->GetNumberOfPoints()< position)
+  if ((int)m_PointSet->GetNumberOfPoints()< position)
 	{
     return NULL;
 	}
 	mitk::ITKPoint3D itkout;
   PointType out;
   out.Fill(0);
-  m_PointList->GetPoint(position, &out);
+  m_PointSet->GetPoint(position, &out);
   itkout[0] = out[0];
   itkout[1] = out[1];
   itkout[2] = out[2];
@@ -118,9 +114,11 @@ const mitk::ITKPoint3D mitk::PointSet::GetItkPoint(int position)
 //##ModelId=3F0177E901DC
 bool mitk::PointSet::GetSelectInfo(int position)
 {
-  if ( (int)m_SelectList.size() > position )
+  if ( m_PointSet->GetNumberOfPoints() > position )
 	{
-        return m_SelectList[position];
+    bool selected = false;
+    m_PointSet->GetPointData(position, &selected);
+    return selected;
 	}
 	else
 		return false;
@@ -130,10 +128,9 @@ bool mitk::PointSet::GetSelectInfo(int position)
 const int mitk::PointSet::GetNumberOfSelected()
 {
     int numberOfSelected = 0;
-    BoolListConstIter it;
-    for (it = m_SelectList.begin(); it != m_SelectList.end(); it++)
+    for (PointDataIterator it = m_PointSet->GetPointData()->Begin(); it != m_PointSet->GetPointData()->End(); it++)
     {
-        if (*it == true)
+        if (it->Value() == true)
             numberOfSelected++;
     }
     return numberOfSelected;
@@ -156,81 +153,70 @@ void mitk::PointSet::ExecuteOperation(Operation* operation)
 	{
 	case OpNOTHING:
 		break;
-	case OpADD://adds the point to the end
+	case OpADD://!!!!!#### shall not be used! Use Insert instead to know the position for undo-operation ####!!!!!
 		{
-      unsigned long idoffset = m_PointList->GetNumberOfPoints();
-
+      unsigned long idoffset = m_PointSet->GetNumberOfPoints();
       mitk::ITKPoint3D a0 = pointOp->GetPoint();
       PointType a1;
       a1[0] = a0[0];
       a1[1] = a0[1];
       a1[2] = a0[2];
-
-      m_PointList->SetPoint(idoffset, a1);
-
-      m_SelectList.push_back(false);
+      m_PointSet->SetPoint(idoffset, a1);
+      m_PointSet->SetPointData(idoffset, false);
 		}
 		break;
-	case OpINSERT://inserts the point at the given position pointOperation.index
+	case OpINSERT://inserts the point at the given position 
 		{
-      PointsContainer::Pointer itkPoints = m_PointList->GetPoints();
+      int position = pointOp->GetIndex();
 
-			if (m_PointList->GetNumberOfPoints() >= ((unsigned)(pointOp->GetIndex())))
+      if (m_PointSet->GetNumberOfPoints() >= ((unsigned)(position)))
 			{
         PointType pt;
         pt.CastFrom(pointOp->GetPoint());
 
-        itkPoints->InsertElement(pointOp->GetIndex(), pt);
-        m_PointList->SetPoints( itkPoints );
-
-        BoolListIter selPosition = m_SelectList.begin();
-        selPosition+=pointOp->GetIndex();
-				selPosition = m_SelectList.insert(selPosition, false);
+        m_PointSet->GetPoints()->InsertElement(position, pt);
+        m_PointSet->GetPointData()->InsertElement(position, false);
 			}
 		}
 		break;
 	case OpMOVE://moves the point given by index
 		{//check if working!
       unsigned int index = pointOp->GetIndex();
-      PointsContainer::Pointer itkPoints = m_PointList->GetPoints();
-			if (index < m_PointList->GetNumberOfPoints() )//checking, cause .at is not supported by older compilers
+      PointsContainer::Pointer itkPoints = m_PointSet->GetPoints();
+			if (index < m_PointSet->GetNumberOfPoints() )//checking, cause .at is not supported by older compilers
 			{
         PointType pt;
         pt.CastFrom(pointOp->GetPoint());
-        m_PointList->SetPoint(index, pt);
+        m_PointSet->SetPoint(index, pt);
 			}
 		}
 		break;
-	case OpDELETE://deletes the last point in list
+	case OpDELETE://!!!!####shall not be used anymore! Use remove(index) instead to know the position for undo-operation####!!!!
 		{
-      //m_PointList->GetPoints()->pop_back();
-      PointsContainer::Pointer position = m_PointList->GetPoints();
-      position->DeleteIndex(position->size()-1);
-			m_SelectList.pop_back();
+   //   PointsContainer::Pointer position = m_PointSet->GetPoints();
+   //   position->DeleteIndex(position->size()-1);
+			//m_SelectList.pop_back();
+
+      m_PointSet->GetPoints()->DeleteIndex(m_PointSet->GetNumberOfPoints()-1);
 		}
 		break;
-	case OpREMOVE://removes the point at position pointOperation.index
+	case OpREMOVE://removes the point at given by position 
 		{
       unsigned int index = (unsigned)pointOp->GetIndex();
-			if (index < m_PointList->GetNumberOfPoints() )
+			if (index < m_PointSet->GetNumberOfPoints() )
 			{
-        PointsContainer::Pointer position  = m_PointList->GetPoints();
-        position->DeleteIndex(index);
-
-        BoolListIter selPosition = m_SelectList.begin();
-        selPosition+=pointOp->GetIndex();
-        selPosition = m_SelectList.erase(selPosition);
+        m_PointSet->GetPoints()->DeleteIndex(index);
 			}
 		}
 		break;
 	case OpSELECTPOINT://select the given point
 		{
-			m_SelectList[pointOp->GetIndex()] = true;
+      m_PointSet->SetPointData(pointOp->GetIndex(), true);
 		}
 		break;
 	case OpDESELECTPOINT://unselect the given point
 		{
-			m_SelectList[pointOp->GetIndex()] = false;
+		  m_PointSet->SetPointData(pointOp->GetIndex(), false);
 		}
 		break;
 	default:
@@ -247,7 +233,7 @@ void mitk::PointSet::ExecuteOperation(Operation* operation)
 //##ModelId=3F0177E901EE
 void mitk::PointSet::UpdateOutputInformation()
 {
-  const PointSetType::BoundingBoxType *bb = m_PointList->GetBoundingBox();
+  const PointSetType::BoundingBoxType *bb = m_PointSet->GetBoundingBox();
   BoundingBox::BoundsArrayType itkBounds = bb->GetBounds();
   float mitkBounds[6];
 
@@ -258,7 +244,7 @@ void mitk::PointSet::UpdateOutputInformation()
   mitkBounds[3] = itkBounds[3];
   mitkBounds[4] = itkBounds[4];
   mitkBounds[5] = itkBounds[5];
-//@TODO check if order is correct 012345 or 024135
+//@TODO check if order is correct 012345 or 024135; Bounds/BoundingBox and so on.
 
   m_Geometry3D->SetBoundingBox(mitkBounds);
 }

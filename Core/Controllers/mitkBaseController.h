@@ -40,12 +40,6 @@ public:
   //## @brief Get the Stepper through the time
   mitk::Stepper* GetTime();
 
-  //##ModelId=3DD528500222
-  //##Documentation
-  //## @brief Add a Renderer to control by this BaseController
-  //## @deprecated will be substituted by itk-observer-mechanism soon
-  virtual bool AddRenderer(mitk::BaseRenderer* renderer);
-
 protected:
   //##ModelId=3E3AE32B0048
   BaseController();
@@ -60,9 +54,6 @@ protected:
   //## @brief Stepper through the slices
   Stepper::Pointer m_Slice;
   
-  itk::Object::Pointer m_RendererReference;
-  BaseRenderer* m_Renderer;
-
   unsigned long m_LastUpdateTime;
 };
 

@@ -6,6 +6,7 @@
 #include "mitkDisplayPositionEvent.h"
 #include "mitkSmartPointerProperty.h"
 #include "mitkSlicedGeometry3D.h"
+#include "mitkSliceNavigationController.h"
 #include "mitkStatusBar.h"
 #include <vtkTransform.h>
 
@@ -196,6 +197,30 @@ void mitk::BaseRenderer::SetCurrentWorldGeometry2D(mitk::Geometry2D* geometry2d)
     m_DisplayGeometry->SetWorldGeometry(m_CurrentWorldGeometry2D);
     m_CurrentWorldGeometry2DUpdateTime.Modified();
     Modified();
+  }
+}
+
+void mitk::BaseRenderer::SetGeometrySlice(const itk::EventObject & geometrySliceEvent)
+{
+  const SliceNavigationController::GeometrySliceEvent* sliceEvent =
+    dynamic_cast<const SliceNavigationController::GeometrySliceEvent *>(&geometrySliceEvent);
+
+  if(sliceEvent!=NULL)
+  {
+    SetWorldGeometry(sliceEvent->GetTimeSlicedGeometry());
+    SetSlice(sliceEvent->GetPos());
+  }
+}
+
+void mitk::BaseRenderer::SetGeometryTime(const itk::EventObject & geometryTimeEvent)
+{
+  const SliceNavigationController::GeometryTimeEvent * timeEvent =
+    dynamic_cast<const SliceNavigationController::GeometryTimeEvent *>(&geometryTimeEvent);
+
+  if(timeEvent!=NULL)
+  {
+    SetWorldGeometry(timeEvent->GetTimeSlicedGeometry());
+    SetTimeStep(timeEvent->GetPos());
   }
 }
 

@@ -15,7 +15,7 @@ namespace mitk {
    public: \
      typedef classname Self; \
      typedef super Superclass; \
-     classname(const TimeSlicedGeometry* aTimeSlicedGeometry, unsigned int aPos) : Superclass(aTimeSlicedGeometry, aPos) {} \
+     classname(TimeSlicedGeometry* aTimeSlicedGeometry, unsigned int aPos) : Superclass(aTimeSlicedGeometry, aPos) {} \
      virtual ~classname() {} \
      virtual const char * GetEventName() const { return #classname; } \
      virtual bool CheckEvent(const ::itk::EventObject* e) const \
@@ -34,6 +34,36 @@ namespace mitk {
 //## @ingroup NavigationControl
 //## Subclass of BaseController. Controls the selection of the slice the
 //## associated BaseRenderer will display.
+//## Example:
+//## \code
+//## //Initialization
+//##   sliceCtrl = mitk::SliceNavigationController::New();
+//##   //tell the navigator the geometry to be sliced (with geometry a Geometry3D::ConstPointer)
+//##   sliceCtrl->SetInputWorldGeometry(geometry.GetPointer());
+//##   //tell the navigator in which direction it shall slice the data
+//##   sliceCtrl->SetViewDirection(mitk::SliceNavigationController::Transversal);
+//## //Connect one or more BaseRenderer to this navigator, i.e.: events sent 
+//##   //by the navigator when stepping through the slices (e.g. by 
+//##   //sliceCtrl->GetSlice()->Next()) will be received by the BaseRenderer 
+//##   //(in this example only slice-changes, see also ConnectGeometryTimeEvent 
+//##   //and ConnectGeometryEvents.)
+//##   sliceCtrl->ConnectGeometrySliceEvent(renderer.GetPointer());
+//## //create a world geometry and send the information to the connected renderer(s)
+//##   sliceCtrl->Update();
+//## \endcode
+//## You can connect visible navigators to a SliceNavigationController, e.g., a
+//## QmitkSliderNavigator (for Qt):
+//## \code
+//##   //create the visible navigator (a slider with a spin-box)
+//##   QmitkSliderNavigator* navigator = new QmitkSliderNavigator(parent, "slidernavigator");
+//##   //connect the navigator to the slice-stepper of the SliceNavigationController.
+//##   //For initialization (position, mininal and maximal values) the values of the 
+//##   //SliceNavigationController are used. Thus, accessing methods of a navigator
+//##   //is normally not necessary, since everything can be set via the (Qt-independent)
+//##   //SliceNavigationController. The QmitkStepperAdapter converts the Qt-signals
+//##   //to Qt-independent itk-events.
+//##   new QmitkStepperAdapter(navigator, sliceCtrl->GetSlice(), "navigatoradaptor");
+//## \endcode
 //## @todo implement for non-evenly-timed geometry!
 class SliceNavigationController : public BaseController
 {
@@ -43,13 +73,13 @@ public:
 
   enum ViewDirection{Transversal, Sagittal, Frontal, Original};
 
-  itkSetObjectMacro(WorldGeometry, mitk::Geometry3D);
-  itkGetConstObjectMacro(WorldGeometry, mitk::Geometry3D);
+  itkSetObjectMacro(InputWorldGeometry, const mitk::Geometry3D);
+  itkGetConstObjectMacro(InputWorldGeometry, mitk::Geometry3D);
+
+  itkGetConstObjectMacro(CreatedWorldGeometry, mitk::Geometry3D);
 
   itkSetMacro(ViewDirection, ViewDirection);
   itkGetMacro(ViewDirection, ViewDirection);
-
-  virtual bool AddRenderer(mitk::BaseRenderer* renderer);
 
   virtual void Update();
 
@@ -58,7 +88,7 @@ public:
   public: 
     typedef TimeSlicedGeometryEvent Self; 
     typedef itk::AnyEvent Superclass; 
-    TimeSlicedGeometryEvent(const TimeSlicedGeometry* aTimeSlicedGeometry, unsigned int aPos) : 
+    TimeSlicedGeometryEvent(TimeSlicedGeometry* aTimeSlicedGeometry, unsigned int aPos) : 
       m_TimeSlicedGeometry(aTimeSlicedGeometry), m_Pos(aPos) {} 
     virtual ~TimeSlicedGeometryEvent() {} 
     virtual const char * GetEventName() const { return "TimeSlicedGeometryEvent"; } 
@@ -66,10 +96,10 @@ public:
     { return dynamic_cast<const Self*>(e); } 
     virtual ::itk::EventObject* MakeObject() const 
     { return new Self(m_TimeSlicedGeometry, m_Pos); } 
-    const TimeSlicedGeometry* GetTimeSlicedGeometry() const { return m_TimeSlicedGeometry; }
+    TimeSlicedGeometry* GetTimeSlicedGeometry() const { return m_TimeSlicedGeometry; }
     unsigned int GetPos() const { return m_Pos; }
   private: 
-    TimeSlicedGeometry::ConstPointer m_TimeSlicedGeometry;
+    TimeSlicedGeometry::Pointer m_TimeSlicedGeometry;
     unsigned int m_Pos;
     TimeSlicedGeometryEvent(const Self&); 
     void operator=(const Self&); 
@@ -82,9 +112,9 @@ public:
     typedef typename itk::ReceptorMemberCommand<T>::Pointer ReceptorMemberCommandPointer;
     ReceptorMemberCommandPointer eventReceptorCommand = itk::ReceptorMemberCommand<T>::New();
   #ifdef WIN32
-    eventReceptorCommand->SetCallbackFunction(receiver, T::SetGeometryTime);
+    eventReceptorCommand->SetCallbackFunction(receiver, T::SetGeometrySlice);
   #else
-    eventReceptorCommand->SetCallbackFunction(receiver, &T::SetGeometryTime);
+    eventReceptorCommand->SetCallbackFunction(receiver, &T::SetGeometrySlice);
   #endif
     AddObserver(GeometrySliceEvent(NULL,0), eventReceptorCommand);
   }
@@ -107,9 +137,9 @@ public:
     ConnectGeometryTimeEvent(receiver);
   }
 
-  virtual void SetGeometryTime(const itk::EventObject & geometryTimeEvent);
+  virtual void SetGeometrySlice(const itk::EventObject & geometrySliceEvent);
 
-  virtual void SetGeometrySlice(const itk::EventObject & geometryTimeEvent);
+  virtual void SetGeometryTime(const itk::EventObject & geometryTimeEvent);
 
 protected:
   //##ModelId=3E189B1D008D
@@ -122,9 +152,9 @@ protected:
 
   virtual void TimeStepperChanged();
 
-  mitk::Geometry3D::ConstPointer m_WorldGeometry;
+  mitk::Geometry3D::ConstPointer m_InputWorldGeometry;
 
-  mitk::TimeSlicedGeometry::Pointer m_TimeSlicedWorldGeometry;
+  mitk::TimeSlicedGeometry::Pointer m_CreatedWorldGeometry;
 
   ViewDirection m_ViewDirection;
 

@@ -154,6 +154,16 @@ public:
   itkGetConstMacro(TimeStep, unsigned int);
 
   //##Documentation
+  //## @brief SetWorldGeometry and SetSlice is called according to the geometrySliceEvent,
+  //## which is supposed to be a SliceNavigationController::GeometrySliceEvent
+  virtual void SetGeometrySlice(const itk::EventObject & geometrySliceEvent);
+
+  //##Documentation
+  //## @brief SetWorldGeometry and SetTimeStep is called according to the geometrySliceEvent,
+  //## which is supposed to be a SliceNavigationController::GeometryTimeEvent
+  virtual void SetGeometryTime(const itk::EventObject & geometryTimeEvent);
+
+  //##Documentation
   //## @brief Get a data object containing the DisplayGeometry (for 2D rendering)
   itkGetObjectMacro(DisplayGeometryData, mitk::Geometry2DData);
   //##Documentation

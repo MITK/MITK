@@ -74,24 +74,24 @@ QWidget * QmitkSimpleExampleFunctionality::createControlWidget(QWidget *parent)
     if (controls == NULL)
     {
         controls = new QmitkSimpleExampleControls(parent);
-        //connect(slider, SIGNAL(valueChanged(int)), lcd, SLOT(display(int)));
+
         sliceNavigatorTransversal = mitk::SliceNavigationController::New();
         sliceNavigatorTransversal->SetViewDirection(mitk::SliceNavigationController::Transversal);
-        sliceNavigatorTransversal->AddRenderer(multiWidget->mitkWidget1->GetRenderer());
+        sliceNavigatorTransversal->ConnectGeometrySliceEvent(multiWidget->mitkWidget1->GetRenderer().GetPointer());
         new QmitkStepperAdapter(controls->getSliceNavigatorTransversal(), sliceNavigatorTransversal->GetSlice(), "sliceNavigatorTransversalFromSimpleExample");
 
         sliceNavigatorSagittal = mitk::SliceNavigationController::New();
         sliceNavigatorSagittal->SetViewDirection(mitk::SliceNavigationController::Sagittal);
-        sliceNavigatorSagittal->AddRenderer(multiWidget->mitkWidget2->GetRenderer());
+        sliceNavigatorSagittal->ConnectGeometrySliceEvent(multiWidget->mitkWidget2->GetRenderer().GetPointer());
         new QmitkStepperAdapter(controls->getSliceNavigatorSagittal(), sliceNavigatorSagittal->GetSlice(), "sliceNavigatorSagittalFromSimpleExample");
 
         sliceNavigatorFrontal = mitk::SliceNavigationController::New();
         sliceNavigatorFrontal->SetViewDirection(mitk::SliceNavigationController::Frontal);
-        sliceNavigatorFrontal->AddRenderer(multiWidget->mitkWidget3->GetRenderer());
+        sliceNavigatorFrontal->ConnectGeometrySliceEvent(multiWidget->mitkWidget3->GetRenderer().GetPointer());
         new QmitkStepperAdapter(controls->getSliceNavigatorFrontal(), sliceNavigatorFrontal->GetSlice(), "sliceNavigatorFrontalFromSimpleExample");
 
         sliceNavigatorTime = mitk::SliceNavigationController::New();
-        sliceNavigatorTime->AddRenderer(multiWidget->mitkWidget1->GetRenderer());
+        sliceNavigatorTime->ConnectGeometryTimeEvent(multiWidget->mitkWidget1->GetRenderer().GetPointer());
         new QmitkStepperAdapter(controls->getSliceNavigatorTime(), sliceNavigatorTime->GetTime(), "sliceNavigatorTimeFromSimpleExample");
     }
     return controls;
@@ -130,9 +130,9 @@ void QmitkSimpleExampleFunctionality::initNavigators()
     mitk::Geometry3D::Pointer geometry = mitk::Geometry3D::New();
     geometry->Initialize();
     geometry->SetBoundingBox(boundingbox);
-    sliceNavigatorTransversal->SetWorldGeometry(geometry.GetPointer()); sliceNavigatorTransversal->Update();
-    sliceNavigatorFrontal->SetWorldGeometry(geometry.GetPointer());     sliceNavigatorFrontal->Update();
-    sliceNavigatorSagittal->SetWorldGeometry(geometry.GetPointer());    sliceNavigatorSagittal->Update();
+    sliceNavigatorTransversal->SetInputWorldGeometry(geometry.GetPointer()); sliceNavigatorTransversal->Update();
+    sliceNavigatorFrontal->SetInputWorldGeometry(geometry.GetPointer());     sliceNavigatorFrontal->Update();
+    sliceNavigatorSagittal->SetInputWorldGeometry(geometry.GetPointer());    sliceNavigatorSagittal->Update();
   }
 
  multiWidget->mitkWidget1->GetRenderer()->GetCurrentWorldGeometry2DNode()->SetVisibility(v1, NULL);

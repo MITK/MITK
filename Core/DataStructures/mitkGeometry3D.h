@@ -82,17 +82,6 @@ public:
   virtual void Initialize();
 
   //##Documentation
-  //## @brief set a base geometry for the geometry.
-  //## The geometrys transform is linked to the base geometrys transform  
-  void SetBaseGeometry(mitk::Geometry3D* base);  
-  
-  //##Documentation
-  //## @brief Transform the geometry with the transformation description
-  //## provided as @a transform (type vtkTransform).
-  //## @todo not yet implemented
-  virtual void SetMasterTransform(const vtkTransform * transform);
-
-  //##Documentation
   //## @brief duplicates the geometry
   virtual Pointer Clone() const;
 
@@ -100,26 +89,10 @@ public:
   //##@brief executes affine operations (translate, rotate, scale)
   void ExecuteOperation(Operation* operation); 
 
-  //itkSetVectorMacro(Position, ScalarType, 3);
-  //itkSetVectorMacro(Orientation, ScalarType, 3);
-  //itkSetVectorMacro(Scale, ScalarType, 3); 
-
-  //itkGetVectorMacro(Position, const ScalarType, 3);
-  //itkGetVectorMacro(Orientation, const ScalarType, 3);
-  //itkGetVectorMacro(Scale, const ScalarType, 3);
-
-  //virtual void SetPosition(const ScalarType data[]);
-  //virtual void SetOrientation(const ScalarType data[]);
-  //virtual void SetScale(const ScalarType data[]);
-
-  //virtual const ScalarType* GetPosition() const;
-  //virtual const ScalarType* GetOrientation() const;
-  //virtual const ScalarType* GetScale() const;
-
   const ITKVector3D GetXAxis();
   const ITKVector3D GetYAxis();
   const ITKVector3D GetZAxis();
-//  void UpdateTransform();
+
 protected:
   Geometry3D();
 
@@ -139,17 +112,6 @@ protected:
   mitk::Matrix4D m_TransformOfOrigin;
 
   vtkTransform* m_Transform;
-  
-  //ScalarType m_Position[3];
-  //ScalarType m_Orientation[3];
-  //ScalarType m_Scale[3];  
-  //ScalarType m_Angle;
-  //ITKPoint3D m_RotationVector;
-
-  //bool m_Modified;
-
-
-  Geometry3D::Pointer m_BaseGeometry;  
 };
 
 } // namespace mitk

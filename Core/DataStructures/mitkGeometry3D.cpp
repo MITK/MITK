@@ -1,7 +1,6 @@
 #include "mitkGeometry3D.h"
 #include "mitkPlaneGeometry.h"
 #include "mitkOperation.h"
-//#include "mitkAffineTransformationOperation.h"
 #include "mitkRotationOperation.h"
 #include "mitkPointOperation.h"
 #include "mitkInteractionConst.h"
@@ -100,28 +99,13 @@ mitk::Geometry3D::Geometry3D() : m_BoundingBox(NULL)
 
   m_TransformMMToUnits.setIdentity();
   m_TransformUnitsToMM.setIdentity();
-
-  m_BaseGeometry = NULL; // there is no base geometry, this one is independend (until SetBaseGeometry() is called)
-  
+    
   m_Transform = vtkTransform::New();  
-  //m_Transform->PostMultiply();  
 }
 
 //##ModelId=3E3456C50067
 mitk::Geometry3D::~Geometry3D()
 {
-
-}
-
-void mitk::Geometry3D::SetBaseGeometry(mitk::Geometry3D* base)
-{
-  m_Transform->SetInput(base->GetVtkTransform());
-  m_BaseGeometry = base;
-}
-
-void mitk::Geometry3D::SetMasterTransform(const vtkTransform * transform)
-{
-
 }
 
 /*
@@ -175,6 +159,7 @@ void mitk::Geometry3D::ExecuteOperation(Operation* operation)
 	  } 
     mitk::ITKPoint3D newScale = pointOp->GetPoint();
     ScalarType data[3];
+    /* calculate new scale: newscale = oldscale * (oldscale + scaletoadd)/oldscale */
     data[0] = 1 + (newScale[0] / GetXAxis().GetNorm());
     data[1] = 1 + (newScale[1] / GetYAxis().GetNorm());
     data[2] = 1 + (newScale[2] / GetZAxis().GetNorm());  
@@ -201,8 +186,6 @@ void mitk::Geometry3D::ExecuteOperation(Operation* operation)
     ITKVector3D rotationVector = rotateOp->GetVectorOfRotation();
     ITKPoint3D center = rotateOp->GetCenterOfRotation();
     ScalarType angle = rotateOp->GetAngleOfRotation();
-    //ScalarType pos[3];
-    //m_Transform->GetPosition(pos);
     m_Transform->PostMultiply();
     m_Transform->Translate(-center[0], -center[1], -center[2]);
     m_Transform->RotateWXYZ(angle, rotationVector[0], rotationVector[1], rotationVector[2]);
@@ -222,7 +205,6 @@ const mitk::ITKVector3D mitk::Geometry3D::GetXAxis()
   v[0] = m->Element[0][0];
   v[1] = m->Element[1][0];
   v[2] = m->Element[2][0];
-  //v.Normalize();  
   return v;
 }
 
@@ -233,7 +215,6 @@ const mitk::ITKVector3D mitk::Geometry3D::GetYAxis()
   v[0] = m->Element[0][1];
   v[1] = m->Element[1][1];
   v[2] = m->Element[2][1];
-  //v.Normalize();
   return v;
 }
 const mitk::ITKVector3D mitk::Geometry3D::GetZAxis()
@@ -243,6 +224,5 @@ const mitk::ITKVector3D mitk::Geometry3D::GetZAxis()
   v[0] = m->Element[0][2];
   v[1] = m->Element[1][2];
   v[2] = m->Element[2][2];
-  //v.Normalize();
   return v;
 }

@@ -6,8 +6,9 @@ mitk::PointSetSource::PointSetSource()
     // Create the output.
     OutputType::Pointer output = dynamic_cast<OutputType*> ( this->MakeOutput( 0 ).GetPointer() );
     assert (output.IsNotNull());
+    this->SetNumberOfRequiredInputs(0);
     this->SetNumberOfOutputs( 1 );
-    this->SetOutput(0, output.GetPointer());
+    this->SetOutput(0, output.GetPointer());  
 }
 
 

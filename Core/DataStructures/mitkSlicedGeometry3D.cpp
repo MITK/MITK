@@ -51,7 +51,7 @@ mitk::Geometry2D* mitk::SlicedGeometry3D::GetGeometry2D(int s) const
 //##ModelId=3DCBF5D40253
 const mitk::BoundingBox* mitk::SlicedGeometry3D::GetBoundingBox() const
 {
-  assert(m_BoundingBox!=NULL);
+  assert(m_BoundingBox.IsNotNull());
   return m_BoundingBox.GetPointer();
 }
 
@@ -354,7 +354,7 @@ void mitk::SlicedGeometry3D::SetTimeBoundsInMS(const mitk::TimeBounds& timebound
   int s;
   for(s=0; s<m_Slices; ++s)
   {
-    if(m_Geometry2Ds[s]!=NULL)
+    if(m_Geometry2Ds[s].IsNotNull())
     {
       m_Geometry2Ds[s]->SetTimeBoundsInMS(timebounds);
     }
@@ -390,7 +390,7 @@ void mitk::SlicedGeometry3D::InitializeGeometry(Self * newGeometry) const
     unsigned int s;
     for(s=0; s<m_Slices; ++s)
     {
-      if(m_Geometry2Ds[s]==NULL)
+      if(m_Geometry2Ds[s].IsNull())
       {
         assert(m_EvenlySpaced);
       }

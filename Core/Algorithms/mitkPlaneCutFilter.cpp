@@ -34,7 +34,7 @@ void mitk::PlaneCutFilter::GenerateData()
   pic_result=ipPicClone(const_cast<mitk::Image*>(input.GetPointer())->GetPic());
   pic_result->dim=3;
 
-  if(m_Planes!=NULL)
+  if(m_Planes.IsNotNull())
   {
     ipPicTypeMultiplex3(_planesSet, pic_result, input->GetGeometry(), m_Planes, m_BackgroundLevel);
   }

@@ -28,7 +28,7 @@ int mitkImageSliceSelectorTest(int argc, char* argv[])
     }
     mitk::DataTreeNode::Pointer node = factory->GetOutput( 0 );
     image = dynamic_cast<mitk::Image*>(node->GetData());
-    if(image==NULL)
+    if(image.IsNull())
     {
       std::cout<<"file not an image - test will not be applied [PASSED]"<<std::endl;
       std::cout<<"[TEST DONE]"<<std::endl;

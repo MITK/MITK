@@ -1204,19 +1204,7 @@ vtkImageData* Pic2vtk::convert( ipPicDescriptor* pic, unsigned long mask, int mo
 			*offset = localOffset;
 
 	} else if ( pic->type == ipPicInt && pic->bpe == 64 ) {
-
-		newPic->type = ipPicUInt;
-		newPic->data = new unsigned long[ size ];
-
-		register long* s = (long*) pic->data;
-		register unsigned long* a = (unsigned long*) newPic->data;
-		register unsigned long localOffset = 1<<63;
-
-		for ( register unsigned long i = 0; i < size ; i++ )
-			*a++ = (unsigned long) ((*s++) + localOffset);
-
-		if ( offset ) 
-			*offset = localOffset;
+    assert(false);
 	}
 
 	return newPic;

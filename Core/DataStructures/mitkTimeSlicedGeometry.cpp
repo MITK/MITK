@@ -76,7 +76,7 @@ int mitk::TimeSlicedGeometry::MSToTimeStep(mitk::ScalarType time_in_ms) const
     if(m_TimeBoundsInMS[0]==m_TimeBoundsInMS[1])
       return 0;
     if((m_TimeBoundsInMS[0]>-ScalarTypeNumericTraits::max()) && (m_TimeBoundsInMS[1]<ScalarTypeNumericTraits::max()))
-      return (int) (time_in_ms - m_TimeBoundsInMS[0])/(m_TimeBoundsInMS[1]-m_TimeBoundsInMS[0])*m_TimeSteps;
+      return (int) ((time_in_ms - m_TimeBoundsInMS[0])/(m_TimeBoundsInMS[1]-m_TimeBoundsInMS[0])*m_TimeSteps);
     return 0;
   }
   return 0;
@@ -203,7 +203,7 @@ void mitk::TimeSlicedGeometry::InitializeGeometry(Self * newGeometry) const
   unsigned int t;
   for(t=0; t<m_TimeSteps; ++t)
   {
-    if(m_Geometry3Ds[t]==NULL)
+    if(m_Geometry3Ds[t].IsNull())
     {
       assert(m_EvenlyTimed);
     }

@@ -116,7 +116,7 @@ void QmitkDataManagerControls::SaveButton_clicked()
         if (data.IsNotNull())
         {
           mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(data.GetPointer());
-          if(image!=NULL)
+          if(image.IsNotNull())
           {
             ipPicDescriptor * picImage = image->GetPic();
 
@@ -131,7 +131,7 @@ void QmitkDataManagerControls::SaveButton_clicked()
             ipPicPut((char *)fileName.ascii(), picImage);
           }
           mitk::PointSet::Pointer pointset = dynamic_cast<mitk::PointSet*>(data.GetPointer());
-          if(pointset!=NULL)
+          if(pointset.IsNotNull())
           {
             QString fileName = QFileDialog::getSaveFileName(QString(m_SelectedItemsName),"DKFZ PointSetFile (.mps)");
             if (fileName != NULL ) 

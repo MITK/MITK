@@ -176,7 +176,7 @@ void mitk::CylindricToCartesianFilter::buildTransformShortCuts(int orig_xsize, i
   xy0=(int)(((double)new_xsize)/2+0.5); 
   xy0_orig=(int)(((double)orig_xsize)/2+0.5); 
 
-  new_zsize=orig_ysize/scale;
+  new_zsize=(int)(orig_ysize/scale);
   // \bug y compared to x 
   for(y=0;y<new_xsize;++y)
   {
@@ -273,9 +273,9 @@ void mitk::CylindricToCartesianFilter::buildConeCutOffShortCut(int orig_xsize, i
   {
     register ipInt2_t cco;
     if(*rt<=ohx_size)
-      cco=a*(*rt+*fr)+b;
+      cco=(ipInt2_t)(a*(*rt+*fr)+b);
     else
-      cco=a*(orig_xsize-(*rt+*fr))+b;
+      cco=(ipInt2_t)(a*(orig_xsize-(*rt+*fr))+b);
     if(cco<0)
       cco=0;
     if(cco>=nz_size) 
@@ -303,7 +303,7 @@ void mitk::CylindricToCartesianFilter::GenerateOutputInformation()
   float scale=((float)tmpDimensions[0])/input->GetDimension(0);
 
   tmpDimensions[1] = tmpDimensions[0];
-  tmpDimensions[2] = scale*input->GetDimension(1);
+  tmpDimensions[2] = (unsigned int)(scale*input->GetDimension(1));
 
   for(i=3;i<input->GetDimension();++i)
     tmpDimensions[i]=input->GetDimension(i);
@@ -328,7 +328,7 @@ void mitk::CylindricToCartesianFilter::GenerateOutputInformation()
   if (pointProp.IsNotNull() )
   {
     itk::Point<int, 3> tp = pointProp->GetValue();
-    tp[2] = tmpDimensions[2]-tp[1] * scale;
+    tp[2] = (int)(tmpDimensions[2]-tp[1] * scale);
     tp[0] = tmpDimensions[0]/2;
     tp[1] = tmpDimensions[0]/2;
     mitk::Point3iProperty::Pointer pointProp = new mitk::Point3iProperty(tp);

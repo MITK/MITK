@@ -61,7 +61,7 @@ float mitk::PrimStripInteractor::CalculateJurisdiction(StateEvent const* stateEv
   {
 
     Mesh::DataType::BoundingBoxPointer bBox = mesh->GetBoundingBoxFromCell( cellIt->Index() );
-    if (bBox == NULL)
+    if (bBox.IsNull())
       return 0;
     
     //since we now have 3D picking in GlobalInteraction and all events send are DisplayEvents with 3D information,

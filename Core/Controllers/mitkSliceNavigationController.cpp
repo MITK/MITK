@@ -224,7 +224,7 @@ bool mitk::SliceNavigationController::ExecuteAction( Action* action, mitk::State
               {
                 mitk::Point3D pointInUnits;
                 slicedWorldGeometry->MMToUnits(point, pointInUnits);
-                best_slice = pointInUnits[2];
+                best_slice = (int)pointInUnits[2];
               }
               else
               {

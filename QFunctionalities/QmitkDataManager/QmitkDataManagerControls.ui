@@ -8,7 +8,7 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>475</width>
+            <width>493</width>
             <height>783</height>
         </rect>
     </property>
@@ -103,7 +103,54 @@
         </widget>
         <widget class="QmitkNodePropertiesView">
             <property name="name">
-                <cstring>m_NodePropertiesView</cstring>
+                <cstring>m_GlobalNodePropertiesView</cstring>
+            </property>
+            <property name="sizePolicy">
+                <sizepolicy>
+                    <hsizetype>7</hsizetype>
+                    <vsizetype>7</vsizetype>
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                </sizepolicy>
+            </property>
+            <property name="acceptDrops">
+                <bool>false</bool>
+            </property>
+        </widget>
+        <widget class="QLayoutWidget">
+            <property name="name">
+                <cstring>layout2</cstring>
+            </property>
+            <hbox>
+                <property name="name">
+                    <cstring>unnamed</cstring>
+                </property>
+                <widget class="QLabel">
+                    <property name="name">
+                        <cstring>textLabel1</cstring>
+                    </property>
+                    <property name="text">
+                        <string>RenderWindow</string>
+                    </property>
+                </widget>
+                <widget class="QComboBox">
+                    <property name="name">
+                        <cstring>m_RenderWindowCombo</cstring>
+                    </property>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>7</hsizetype>
+                            <vsizetype>0</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
+                </widget>
+            </hbox>
+        </widget>
+        <widget class="QmitkNodePropertiesView">
+            <property name="name">
+                <cstring>m_RendererPropertiesView</cstring>
             </property>
             <property name="sizePolicy">
                 <sizepolicy>
@@ -135,8 +182,8 @@
             <verstretch>0</verstretch>
         </sizepolicy>
         <pixmap>image0</pixmap>
-        <slot access="public" specifier="">slot()</slot>
         <slot access="public" specifier="">SelectionChanged(QListViewItem* NewItem)</slot>
+        <slot access="public" specifier="">SetRenderWindow(const QString &amp;name)</slot>
     </customwidget>
 </customwidgets>
 <images>
@@ -148,7 +195,7 @@
     <connection>
         <sender>m_DataTreeView</sender>
         <signal>selectionChanged(QListViewItem*)</signal>
-        <receiver>m_NodePropertiesView</receiver>
+        <receiver>m_GlobalNodePropertiesView</receiver>
         <slot>SelectionChanged(QListViewItem*)</slot>
     </connection>
     <connection>
@@ -156,6 +203,18 @@
         <signal>clicked()</signal>
         <receiver>QmitkDataManagerControls</receiver>
         <slot>RemoveButtonClicked()</slot>
+    </connection>
+    <connection>
+        <sender>m_DataTreeView</sender>
+        <signal>selectionChanged(QListViewItem*)</signal>
+        <receiver>m_RendererPropertiesView</receiver>
+        <slot>SelectionChanged(QListViewItem*)</slot>
+    </connection>
+    <connection>
+        <sender>m_RenderWindowCombo</sender>
+        <signal>activated(const QString&amp;)</signal>
+        <receiver>m_RendererPropertiesView</receiver>
+        <slot>SetRenderWindow(const QString&amp;)</slot>
     </connection>
 </connections>
 <includes>
@@ -179,9 +238,11 @@
 <functions>
     <function access="private" specifier="non virtual">init()</function>
     <function>SetDataTreeIterator( mitk::DataTreeIterator * it )</function>
+    <function access="protected">UpdateRendererCombo()</function>
 </functions>
 <layoutdefaults spacing="0" margin="0"/>
 <includehints>
+    <includehint>qmitknodepropertiesview.h</includehint>
     <includehint>qmitknodepropertiesview.h</includehint>
 </includehints>
 </UI>

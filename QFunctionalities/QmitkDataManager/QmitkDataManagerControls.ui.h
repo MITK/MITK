@@ -9,15 +9,28 @@
 #include <utility>
 #include "mitkBoolProperty.h"
 void QmitkDataManagerControls::init() { 
-while (m_DataTreeView->columns() > 0 ) {
+  while (m_DataTreeView->columns() > 0 ) {
 	m_DataTreeView->removeColumn(0);
-    }
-    m_DataTreeView->addColumn( "Name" );
-    m_DataTreeView->addColumn( "NodeType" );
-    m_DataTreeView->addColumn( "RefCount");
-    m_RemoveButton->setEnabled(false);
+  }
+  m_DataTreeView->addColumn( "Name" );
+  m_DataTreeView->addColumn( "NodeType" );
+  m_DataTreeView->addColumn( "RefCount");
+  m_RemoveButton->setEnabled(false);
+
+
 }
 
+
+// init the combobox with all   
+void QmitkDataManagerControls::UpdateRendererCombo() {
+  m_RenderWindowCombo->clear(); 
+  const mitk::RenderWindow::RenderWindowSet rws = mitk::RenderWindow::GetInstances();
+  for (mitk::RenderWindow::RenderWindowSet::const_iterator iter = rws.begin();iter != rws.end();iter++) {
+	if ((*iter)->name()) {
+          m_RenderWindowCombo->insertItem(QString((*iter)->name()));
+        }
+    }
+}
 void QmitkDataManagerControls::SetDataTreeIterator(mitk::DataTreeIterator * it)
 {
     while (m_DataTreeView->firstChild()) {
@@ -32,6 +45,7 @@ void QmitkDataManagerControls::SetDataTreeIterator(mitk::DataTreeIterator * it)
     DataTreeViewItem * rootItem = new DataTreeViewItem(m_DataTreeView, "Loaded Data", "root", tempIt->clone());
   }
   delete tempIt;
+  UpdateRendererCombo();
 }
 
 void QmitkDataManagerControls::RemoveButtonClicked()

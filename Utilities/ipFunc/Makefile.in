@@ -65,7 +65,8 @@ MAKEINFO = @MAKEINFO@
 PACKAGE = @PACKAGE@
 RANLIB = @RANLIB@
 VERSION = @VERSION@
-piano_cv_prog_doxygen_exists = @piano_cv_prog_doxygen_exists@
+htmldir = @htmldir@
+piano_cv_prog_doxygen = @piano_cv_prog_doxygen@
 
 INCLUDES = -I../ipPic
 

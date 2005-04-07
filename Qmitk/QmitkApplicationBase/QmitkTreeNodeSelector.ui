@@ -1,0 +1,79 @@
+<!DOCTYPE UI><UI version="3.3" stdsetdef="1">
+<class>QmitkTreeNodeSelector</class>
+<widget class="QWidget">
+    <property name="name">
+        <cstring>QmitkTreeNodeSelector</cstring>
+    </property>
+    <property name="geometry">
+        <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>312</width>
+            <height>45</height>
+        </rect>
+    </property>
+    <property name="sizePolicy">
+        <sizepolicy>
+            <hsizetype>3</hsizetype>
+            <vsizetype>1</vsizetype>
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+        </sizepolicy>
+    </property>
+    <property name="caption">
+        <string>Form2</string>
+    </property>
+    <hbox>
+        <property name="name">
+            <cstring>unnamed</cstring>
+        </property>
+        <widget class="QComboBox">
+            <property name="name">
+                <cstring>m_ComboBox</cstring>
+            </property>
+            <property name="sizePolicy">
+                <sizepolicy>
+                    <hsizetype>3</hsizetype>
+                    <vsizetype>1</vsizetype>
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                </sizepolicy>
+            </property>
+        </widget>
+    </hbox>
+</widget>
+<connections>
+    <connection>
+        <sender>m_ComboBox</sender>
+        <signal>activated(const QString&amp;)</signal>
+        <receiver>QmitkTreeNodeSelector</receiver>
+        <slot>TreeNodeSelected(const QString&amp;)</slot>
+    </connection>
+</connections>
+<includes>
+    <include location="local" impldecl="in implementation">QmitkCommonFunctionality.h</include>
+    <include location="local" impldecl="in declaration">mitkDataTreeNode.h</include>
+    <include location="local" impldecl="in declaration">mitkDataTree.h</include>
+    <include location="local" impldecl="in declaration">QmitkCommonFunctionality.h</include>
+    <include location="global" impldecl="in declaration">map</include>
+    <include location="local" impldecl="in implementation">QmitkTreeNodeSelector.ui.h</include>
+</includes>
+<variables>
+    <variable>mitk::DataTreeIteratorClone m_DataTreeIteratorClone;</variable>
+    <variable>bool (* m_FilterFunction)(mitk::DataTreeNode*);</variable>
+    <variable>std::map&lt;std::string,mitk::DataTreeNode*&gt; m_TreeNodes;</variable>
+</variables>
+<signals>
+    <signal>Activated(mitk::DataTreeNode *node)</signal>
+</signals>
+<slots>
+    <slot>SetDataTreeNodeIterator( mitk::DataTreeIteratorClone it )</slot>
+    <slot>UpdateContent()</slot>
+    <slot>TreeNodeSelected( const QString &amp; name )</slot>
+</slots>
+<functions>
+    <function specifier="static" returnType="bool">IsImageNode( mitk::DataTreeNode * node )</function>
+    <function access="protected">init()</function>
+</functions>
+<layoutdefaults spacing="6" margin="11"/>
+</UI>

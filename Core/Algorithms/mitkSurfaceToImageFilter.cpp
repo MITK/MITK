@@ -105,8 +105,6 @@ void mitk::SurfaceToImageFilter::GenerateData()
   mitk::Image::ConstPointer inputImage = this->GetImage();
   mitk::Image::Pointer output = this->GetOutput();
 
-
-
   if(inputImage.IsNull())
     return;  
 
@@ -200,21 +198,25 @@ void mitk::SurfaceToImageFilter::Stencil3DImage(int time)
     threshold->SetOutValue(0);
     threshold->Update();
 
-    vtkImageCast * castFilter = vtkImageCast::New();
-    castFilter->SetOutputScalarTypeToInt();
-    castFilter->SetInput(threshold->GetOutput() );
-    castFilter->Update();
-
     mitk::Image::Pointer output = this->GetOutput();
     //output->Initialize( castFilter->GetOutput() );
     //output->SetGeometry( static_cast<mitk::Geometry3D*>(GetImage()->GetGeometry()->Clone().GetPointer()) );
     output->SetVolume( stencil->GetOutput()->GetScalarPointer(), time );
+
+    threshold = NULL;
   }
   else
   {
     mitk::Image::Pointer output = this->GetOutput();
     output->SetVolume( stencil->GetOutput()->GetScalarPointer(), time );
   }
+
+  polydata = NULL;
+  normalsFilter = NULL;
+  surfaceConverter = NULL;
+  tmp = NULL;
+  castFilter = NULL;
+  stencil = NULL;
 }
 
 

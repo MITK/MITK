@@ -62,6 +62,7 @@ void mitk::DICOMFileReader::GenerateOutputInformation()
     pic = _dicomToPic( header, header_size,
       image, image_size, color, ipTrue);
 
+
     if( pic == NULL)
     {
       itk::ImageFileReaderException e(__FILE__, __LINE__);
@@ -72,8 +73,49 @@ void mitk::DICOMFileReader::GenerateOutputInformation()
       throw e;
       return;
     }
+    Vector3D spacing;
+    spacing.Fill(1.0);
+      
+    ipPicTSV_t *tsv;
+    tsv = ipPicQueryTag( pic, "SOURCE HEADER" );
+    bool ok=false;
+
+    if (tsv)
+    {
+      void *data;
+      ipUInt4_t len;
+      ipFloat8_t xSpacing = 1;
+      ipFloat8_t ySpacing = 1;
+      ipFloat8_t zSpacing = 1;
+
+      //0x0018 0x602c
+      if( dicomFindElement( (unsigned char *) tsv->value, 0x0018, 0x602c, &data, &len ) )
+      {
+        ok=true;
+        sscanf( (char *) data, "%lf", &xSpacing );
+      }
+      
+      if( dicomFindElement( (unsigned char *) tsv->value, 0x0018, 0x602e, &data, &len ) )
+      {
+        ok=true;
+        sscanf( (char *) data, "%lf", &ySpacing );
+      }
+      
+      if( dicomFindElement( (unsigned char *) tsv->value, 0x3001, 0x1003, &data, &len ) )
+      {
+        ok=true;
+        sscanf( (char *) data, "%lf", &zSpacing );
+      }
+     
+      FillVector3D(spacing, xSpacing, ySpacing, zSpacing);
+      itkGenericOutputMacro( "spacing:  " << spacing << " mm");
+      
+    }
+
 
     output->Initialize(pic);
+    if (ok)
+      output->GetSlicedGeometry()->SetSpacing( spacing );
   }
 
   m_ReadHeaderTime.Modified();

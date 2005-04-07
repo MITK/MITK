@@ -730,6 +730,14 @@ void mitk::DataTreeNodeFactory::ReadFileTypeITKImageIOFactory()
     // set filename without path as string property
     mitk::StringProperty::Pointer nameProp = new mitk::StringProperty( this->GetBaseFileName() );
     node->SetProperty( "name", nameProp );
+
+    mitk::LevelWindowProperty::Pointer levWinProp = new mitk::LevelWindowProperty();
+    mitk::LevelWindow levelwindow;
+    levelwindow.SetMinMax(4000,8000);
+    levWinProp->SetLevelWindow( levelwindow );
+    node->GetPropertyList()->SetProperty( "levelwindow", levWinProp );
+
+
     std::cout << "...finished!" << std::endl;
 }
 

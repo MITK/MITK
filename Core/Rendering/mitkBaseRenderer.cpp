@@ -113,11 +113,13 @@ void mitk::BaseRenderer::Resize(int w, int h)
   m_Size[0] = w;
   m_Size[1] = h;
 
-  //if(m_CameraController) //see bug #32 (vtkSizeBug)
-  //  m_CameraController->Resize(w, h); 
+#ifndef WIN32
+  if(m_CameraController) //see bug #32 (vtkSizeBug)
+    m_CameraController->Resize(w, h); 
+#endif
 
   GetDisplayGeometry()->SetSizeInDisplayUnits(w, h);
-  //@FIXME: die nächste Zeile ist nur da, weil der Anpassungsvorgang in SetSizeInDisplayUnits leider noch nicht richtig funktioniert.
+  //@FIXME: die nï¿½hste Zeile ist nur da, weil der Anpassungsvorgang in SetSizeInDisplayUnits leider noch nicht richtig funktioniert.
   GetDisplayGeometry()->Fit();
 }
 

@@ -19,12 +19,10 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef HISTOGRAM_GENERATOR_H_HEADER_INCLUDED
 #define HISTOGRAM_GENERATOR_H_HEADER_INCLUDED
 
-#include "itkObject.h"
-#include "itkObjectFactory.h"
-#include "itkHistogram.h"
-#include "itkImage.h"
-
-#include "mitkCommon.h"
+#include <itkObject.h>
+#include <itkObjectFactory.h>
+#include <itkHistogram.h>
+#include <itkImage.h>
 #include "mitkImage.h"
 
 namespace mitk {
@@ -48,7 +46,7 @@ public:
 	// TODO: calculate if needed in GetHistogram()
 	void ComputeHistogram();
 	float GetMaximumFrequency() const;
-	static float CalculateMaximumFrequency(HistogramType::ConstPointer histogram);
+	static float CalculateMaximumFrequency(const HistogramType* histogram);
 protected:
 	HistogramGenerator();
 
@@ -56,7 +54,7 @@ protected:
        
 	mitk::Image::ConstPointer m_Image;
 	int m_Size;
-	HistogramType::ConstPointer m_Histogram;
+	HistogramType::Pointer m_Histogram;
 };
 
 } // namespace mitk

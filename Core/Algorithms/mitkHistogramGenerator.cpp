@@ -20,14 +20,16 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkFixedCenterOfRotationAffineTransform.h>
 #endif
 
+#include "mitkHistogramGenerator.h"
+
 #include "mitkImageAccessByItk.h"
 
 #include "itkScalarImageToHistogramGenerator.h"
 
-#include "mitkHistogramGenerator.h"
 
 mitk::HistogramGenerator::HistogramGenerator() : m_Image(NULL), m_Size(256), m_Histogram(NULL)
 {
+
 }
 
 mitk::HistogramGenerator::~HistogramGenerator()
@@ -35,7 +37,7 @@ mitk::HistogramGenerator::~HistogramGenerator()
 }
 
 template < typename TPixel, unsigned int VImageDimension > 
-void InternalCompute(itk::Image< TPixel, VImageDimension >* itkImage, const mitk::HistogramGenerator* mitkHistoGenerator, mitk::HistogramGenerator::HistogramType::ConstPointer& histogram)
+void InternalCompute(itk::Image< TPixel, VImageDimension >* itkImage, const mitk::HistogramGenerator* mitkHistoGenerator, mitk::HistogramGenerator::HistogramType& histogram)
 {
   
   typedef itk::Statistics::ScalarImageToHistogramGenerator< 
@@ -50,12 +52,33 @@ void InternalCompute(itk::Image< TPixel, VImageDimension >* itkImage, const mitk
   histogramGenerator->SetMarginalScale( 10.0 );
   histogramGenerator->Compute();
   
-  histogram = (mitk::HistogramGenerator::HistogramType*)(histogramGenerator->GetOutput());
+  const HistogramGeneratorType::HistogramType* generatedHistogram = histogramGenerator->GetOutput();
+  HistogramGeneratorType::HistogramType::SizeType size = generatedHistogram->GetSize();
+  histogram.Initialize(size);
+  unsigned int i, j;
+  for ( i = 0 ; i < HistogramGeneratorType::HistogramType::MeasurementVectorSize ; i++)
+  {
+    for (j = 0; j < (size[i] - 1) ; ++j)
+    {
+      histogram.SetBinMin(0, j, generatedHistogram->GetBinMin(0, j));
+      histogram.SetBinMax(0, j, generatedHistogram->GetBinMax(0, j));
+    }
+    for (j = 0; j < (size[i] - 1) ; ++j)
+    {
+      histogram.SetFrequency(j, generatedHistogram->GetFrequency(j));
+    }
+  }
 }
 
 void mitk::HistogramGenerator::ComputeHistogram()
 {
-  AccessByItk_2(m_Image, InternalCompute, this, m_Histogram);
+  if((m_Histogram.IsNull()) || (m_Histogram->GetMTime() < m_Image->GetMTime()))
+  {
+    if(m_Histogram.IsNull())
+      m_Histogram = HistogramType::New();
+    AccessByItk_2(m_Image, InternalCompute, this, *m_Histogram);
+    m_Histogram->Modified();
+  }
 
 // debug code
   /*
@@ -81,8 +104,8 @@ float mitk::HistogramGenerator::GetMaximumFrequency() const {
   return CalculateMaximumFrequency(this->m_Histogram);
 };
 
-float mitk::HistogramGenerator::CalculateMaximumFrequency(HistogramType::ConstPointer histogram) {
-  
+float mitk::HistogramGenerator::CalculateMaximumFrequency(const HistogramType* histogram)
+{  
   HistogramType::ConstIterator itr = histogram->Begin();
   HistogramType::ConstIterator end = histogram->End();
   

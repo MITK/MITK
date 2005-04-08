@@ -296,7 +296,7 @@ void mitk::DataTreeNodeFactory::ReadFileTypePIC()
         mitk::LevelWindowProperty::Pointer levWinProp = new mitk::LevelWindowProperty();
         mitk::LevelWindow levelwindow;
 
-        levelwindow.SetAuto( reader->GetOutput()->GetPic() );
+        levelwindow.SetAuto( reader->GetOutput() );
         levWinProp->SetLevelWindow( levelwindow );
 
         node->GetPropertyList()->SetProperty( "levelwindow", levWinProp );
@@ -328,7 +328,7 @@ void mitk::DataTreeNodeFactory::ReadFileTypePAR()
     // add level-window property
     mitk::LevelWindowProperty::Pointer levWinProp = new mitk::LevelWindowProperty();
     mitk::LevelWindow levelwindow;
-    levelwindow.SetAuto( reader->GetOutput()->GetPic() );
+    levelwindow.SetAuto( reader->GetOutput() );
     levWinProp->SetLevelWindow( levelwindow );
     node->GetPropertyList()->SetProperty( "levelwindow", levWinProp );
     
@@ -362,7 +362,7 @@ void mitk::DataTreeNodeFactory::ReadFileTypePVTK()
         // add level-window property
         mitk::LevelWindowProperty::Pointer levWinProp = new mitk::LevelWindowProperty();
         mitk::LevelWindow levelwindow;
-        levelwindow.SetAuto( image->GetPic() );
+        levelwindow.SetAuto( image );
         levWinProp->SetLevelWindow( levelwindow );
         node->GetPropertyList()->SetProperty( "levelwindow", levWinProp );
         
@@ -497,7 +497,7 @@ void mitk::DataTreeNodeFactory::ReadFileTypeHPSONOS()
     node->SetProperty( "name", nameProp );
     node->SetProperty( "layer", new mitk::IntProperty( -11 ) );
     mitk::LevelWindow levelwindow;
-    levelwindow.SetAuto( sliceSelector->GetOutput()->GetPic() );
+    levelwindow.SetAuto( sliceSelector->GetOutput() );
     node->SetLevelWindow( levelwindow, NULL );
     node->SetVisibility( false, NULL );
     node->SetColor( 1.0, 1.0, 1.0, NULL );
@@ -630,7 +630,7 @@ void mitk::DataTreeNodeFactory::ReadFileTypeDCM()
 
     // add Level-Window property
     mitk::LevelWindow levelwindow;
-    levelwindow.SetAuto( reader->GetOutput()->GetPic() );
+    levelwindow.SetAuto( reader->GetOutput() );
     node->SetLevelWindow( levelwindow, NULL );
 
     
@@ -738,7 +738,7 @@ void mitk::DataTreeNodeFactory::ReadFileTypeITKImageIOFactory()
     // add level-window property
     mitk::LevelWindowProperty::Pointer levWinProp = new mitk::LevelWindowProperty();
     mitk::LevelWindow levelwindow;
-    levelwindow.SetAuto( image->GetPic() );
+    levelwindow.SetAuto( image );
     levWinProp->SetLevelWindow( levelwindow );
     node->GetPropertyList()->SetProperty( "levelwindow", levWinProp );
 
@@ -770,7 +770,7 @@ void mitk::DataTreeNodeFactory::ReadFileSeriesTypePIC()
     mitk::LevelWindowProperty::Pointer levWinProp = new mitk::LevelWindowProperty();
     mitk::LevelWindow levelwindow;
 
-    levelwindow.SetAuto( reader->GetOutput()->GetPic() );
+    levelwindow.SetAuto( reader->GetOutput() );
     levWinProp->SetLevelWindow( levelwindow );
 
     node->GetPropertyList()->SetProperty( "levelwindow", levWinProp );
@@ -838,7 +838,7 @@ void mitk::DataTreeNodeFactory::ReadFileSeriesTypeDCM()
       // add level-window property
       mitk::LevelWindowProperty::Pointer levWinProp = new mitk::LevelWindowProperty();
       mitk::LevelWindow levelwindow;
-      levelwindow.SetAuto( image->GetPic() );
+      levelwindow.SetAuto( image );
       levWinProp->SetLevelWindow( levelwindow );
       node->GetPropertyList()->SetProperty( "levelwindow", levWinProp );
 
@@ -1005,7 +1005,7 @@ void mitk::DataTreeNodeFactory::ReadFileSeriesTypeITKImageSeriesReader()
             mitk::LevelWindowProperty::Pointer levWinProp = new mitk::LevelWindowProperty();
             mitk::LevelWindow levelwindow;
 
-            levelwindow.SetAuto( image->GetPic() );
+            levelwindow.SetAuto( image );
             levWinProp->SetLevelWindow( levelwindow );
 
             node->GetPropertyList()->SetProperty( "levelwindow", levWinProp );

@@ -238,6 +238,16 @@ bool mitk::DataTreeNode::GetIntProperty(const char* propertyKey, int &intValue, 
   return true;
 }
 
+bool mitk::DataTreeNode::GetFloatProperty(const char* propertyKey, float &floatValue, mitk::BaseRenderer* renderer) const
+{
+  mitk::FloatProperty::Pointer floatprop = dynamic_cast<mitk::FloatProperty*>(GetProperty(propertyKey, renderer).GetPointer());
+  if(floatprop.IsNull())
+    return false;
+
+  floatValue = floatprop->GetValue();
+  return true;
+}
+
 bool mitk::DataTreeNode::GetStringProperty(const char* propertyKey, const char* string, mitk::BaseRenderer* renderer) const
 {
   mitk::StringProperty::Pointer stringProp = dynamic_cast<mitk::StringProperty*>(GetProperty(propertyKey, renderer).GetPointer());

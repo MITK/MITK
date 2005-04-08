@@ -1,0 +1,33 @@
+ /**
+ 
+ \page Step5Page Step 5 - Interactively add points
+ 
+ In addition to Step 4 where 3 views on the data were created we now want to interactively add points.\n
+
+ 
+
+ A node containing a PointSet as data is added to the data tree and a PointSetInteractor is associated with the node, which handles the interaction. 
+ The @em interaction @em pattern is defined in a state-machine, stored in an external XML file. Thus, we need to load a state-machine.\n
+ The interaction patterns defines the @em events, on which the interactor reacts (e.g., which mouse buttons are used to set a point), the @em transition to the next state (e.g., the initial 
+ may be "empty point set") and associated @a actions (e.g., add a point at the position where the mouse-click occured).
+ 
+ \li \ref Step5.cpp "Step5.cpp"\n 
+
+ 
+
+ \dontinclude Step5.cpp
+
+ 
+ The interaction mechanism has to be initialized. This is done by loading patterns from an XML-file:
+ 
+ \skipline if(mitk::GlobalInteraction
+ \until }
+ 
+ A PointSet and a node for it have to be created to be able to interactively add points:
+ 
+ \skipline mitk::PointSet
+ \until "pointsetinteractor"
+ 
+ \ref Step4Page "[Previous step]" \ref Step6Page "[Next step]" \ref TutorialPage "[Main tutorial page]"
+ 
+  */

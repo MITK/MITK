@@ -1,0 +1,15 @@
+ /**
+ 
+ \page Step7Page Step 7 - Convert result of region growing into a surface
+ 
+ \li \ref Step7.cpp "Step7.cpp"\n 
+ 
+ In this step the result of the previous step is converted into a surface by means of a VTK filter.
+ 
+ \dontinclude Step7.cpp
+ \skipline if(m_ResultImage
+ \until }
+ 
+ \ref Step6Page "[Previous step]" \ref Step8Page "[Next step]" \ref TutorialPage "[Main tutorial page]"
+ 
+  */

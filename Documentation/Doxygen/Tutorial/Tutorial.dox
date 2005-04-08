@@ -1,0 +1,28 @@
+/**
+
+\page TutorialPage The MITK Tutorial
+ 
+This tutorial gives an introduction to MITK.
+The source code of the examples can be found in mitk/Applications/TutorialQmitk.\n
+Two data files are used to execute the example code. They are located in mitk/Build/Testing.
+
+\li Pic3D.pic.gz \n
+This file contains an image.
+
+\li lungs.vtk \n
+This file contains a surface.
+
+\section TutorialSection Tutorial chapters
+
+\li \ref Step1Page "Displaying an image"
+\li \ref Step2Page "Load one or more data sets"
+\li \ref Step3Page "Create 3D view"
+\li \ref Step4Page "Use several views to explore data"
+\li \ref Step5Page "Interactively add points"
+\li \ref Step6Page "Use an interactive region-grower"
+\li \ref Step7Page "Convert result of region growing into a surface"
+\li \ref Step8Page "Use QmitkStdMultiWidget as widget"
+
+Enjoy MITK!
+
+*/

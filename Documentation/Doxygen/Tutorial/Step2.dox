@@ -1,0 +1,24 @@
+ /**
+
+ \page Step2Page Step 2 - Load one or more data sets
+ 
+ \image html step2_result.png 
+ 
+ \li \ref Step2.cpp "Step2.cpp"
+ 
+ \dontinclude Step2.cpp
+ 
+ This program shows how to load multiple data sets.\n 
+ A DataTreeNodeFactory is used to produce nodes containing the data.\n
+ The picture above shows the result of the program when reading both the image file and the surface file.\n
+ The code for this example equals the code of Step 1 except for part II and part III that are changed as follows:
+ \skipline Part II
+ \until exit(2)
+ \line }
+ \line }
+ 
+ 
+ 
+ \ref Step1Page "[Previous step]" \ref Step3Page "[Next step]" \ref TutorialPage "[Main tutorial page]"
+ 
+  */

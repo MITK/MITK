@@ -1,0 +1,14 @@
+ /**
+ 
+ \page Step8Page Step 8 - Use QmitkStdMultiWidget as widget
+ 
+ \li \ref Step8.cpp "Step8.cpp"\n 
+ 
+ \dontinclude Step8.cpp 
+ \skipline Part II
+ \until setCentralWidget
+ 
+ 
+ \ref Step7Page "[Previous step]" \ref TutorialPage "[Main tutorial page]"
+ 
+  */

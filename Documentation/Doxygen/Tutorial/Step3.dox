@@ -1,0 +1,43 @@
+ /**
+ 
+ \page Step3Page Step 3 - Create 3D view
+ 
+As in the previous step one or more data sets (many images, surface and other formats) may be loaded. The difference is that they are displayed in a 3D view.
+The QmitkRenderWindow is now used for displaying a 3D view, by setting the used mapper-slot to Standard3D. 
+Since volume-rendering is a (rather) slow procedure, the default is that images are not displayed in the 3D view.\n
+In Step 3a the default is kept whereas in Step 3b volume rendering is turned on.
+
+
+\li \ref Step3.cpp "Step3.cpp"\n 
+Contains the code that both creates a 3D view and turns volume rendering on.
+
+
+\section Step3aSection Step 3a - Volume rendering turned off
+  
+\image html step3a_result.png 
+  
+\dontinclude Step3.cpp
+
+Tell the renderer to create a 3D view:
+ 
+\skipline // use it as a 3D view!
+\skipline renderWindow.GetRenderer()->SetMapperID
+
+The rest of the code remains unchanged.\n
+The picture above shows the result of the program when reading both the image and the surface file.
+As volume rendering is off the image is not visible.
+ 
+\section Step3bSection Step 3b - Volume rendering turned on
+ 
+\image html step3b_result.png 
+ 
+Volume Rendering is now turned on as shown in the picture above.\n
+\dontinclude Step3.cpp 
+The property "volumerendering" has to be turned on on the node containing the image.
+ 
+\skipline Check
+\until node->SetProperty
+  
+\ref Step2Page "[Previous step]" \ref Step4Page "[Next step]" \ref TutorialPage "[Main tutorial page]"
+ 
+  */

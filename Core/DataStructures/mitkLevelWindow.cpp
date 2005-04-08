@@ -18,6 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include "mitkLevelWindow.h"
+#include "mitkImage.h"
 #include <ipFunc/ipFunc.h>
 #include <algorithm>
 
@@ -180,13 +181,26 @@ float mitk::LevelWindow::GetRange() const
 	return  (m_RangeMax > 0) ? (m_RangeMax - m_RangeMin) : (m_RangeMin - m_RangeMax);
 }
 
+void mitk::LevelWindow::SetAuto(mitk::Image* image, bool tryPicTags)
+{
+  if( image == NULL )
+    return;
+
+  if(tryPicTags)
+  {
+    if(SetAutoByPicTags(image->GetPic()))
+      return;
+  }
+  SetMinMax(image->GetScalarValue2ndMin(), image->GetScalarValue2ndMax());
+}
+
 //##ModelId=3EF1627601A9
-void mitk::LevelWindow::SetAuto(const ipPicDescriptor* aPic)
+bool mitk::LevelWindow::SetAutoByPicTags(const ipPicDescriptor* aPic)
 {
   ipPicDescriptor* pic = const_cast<ipPicDescriptor*>(aPic);
     if ( pic == NULL )
     {
-        return;        
+        return false;
     }
     ipPicTSV_t *tsv = ipPicQueryTag( pic, "LEVEL/WINDOW" );
 	if( tsv != NULL )
@@ -200,18 +214,9 @@ void mitk::LevelWindow::SetAuto(const ipPicDescriptor* aPic)
 		ipPicFORALL_2( GET_C_W, tsv, level, window );
 
 		SetLevelWindow( level, window );
+    return true;
 	}
-    else
-    {
-        if( pic->data != NULL )
-        {
-            ipFloat8_t min = 0.0;
-            ipFloat8_t max = 0.0;
-            ipFuncExtr( pic, &min, &max );
-            this->SetMin( static_cast<float>( min ) );
-            this->SetMax( static_cast<float>( max ) );
-        }
-    }
+  return false;
 }
 
 /*!

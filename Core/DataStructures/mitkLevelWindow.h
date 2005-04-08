@@ -26,6 +26,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk {
 
+class Image;
+
 //##ModelId=3E0B12240067
 //##Documentation
 //## @brief Class to store level/window values
@@ -138,10 +140,15 @@ public:
     float GetRange() const;
     
     /**!
-    * \brief sets level/window to the min/max greyvalues of the given ipPicDescriptor
+    * \brief sets level/window according to the tags in the given ipPicDescriptor
+    * \return @a true if tags where found
     */
-    //##ModelId=3EF1627601A9
-    void SetAuto(const ipPicDescriptor* pic);
+    bool SetAutoByPicTags(const ipPicDescriptor* pic);
+
+    /**!
+    * \brief sets level/window to the second min/max greyvalues of the given Image
+    */
+    void SetAuto(mitk::Image* image, bool tryPicTags = true);
 
     /*!
     * \brief equality operator implementation

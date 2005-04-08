@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITK_TRANSFER_FUNCTION_H_HEADER_INCLUDED
 #define MITK_TRANSFER_FUNCTION_H_HEADER_INCLUDED
 
+#include <mitkHistogramGenerator.h>
 #include "mitkCommon.h"
 #include <itkObject.h>
 #include <itkObjectFactory.h>
@@ -28,7 +29,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkColorTransferFunction.h>
 #include <vtkPiecewiseFunction.h>
 #include <mitkImage.h>
-#include <mitkHistogramGenerator.h>
 namespace mitk
 {
 

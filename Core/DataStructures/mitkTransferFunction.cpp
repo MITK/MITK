@@ -1,6 +1,7 @@
+#include "mitkTransferFunction.h"
+
 #include <mitkImageToItk.h>
 
-#include "mitkTransferFunction.h"
 #include <itkScalarImageToHistogramGenerator.h>
 
 #include <mitkHistogramGenerator.h>

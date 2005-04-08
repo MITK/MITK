@@ -85,9 +85,9 @@ void mitk::AutoCropImageFilter::Crop3DImage(mitk::ImageToImageFilter::InputImage
   ImageType::RegionType::SizeType regionSize;
   ImageType::RegionType::IndexType regionIndex;
 
-  regionSize[0] = m_MarginFactor * (maxima[0] - minima[0]);
-  regionSize[1] = m_MarginFactor * (maxima[1] - minima[1]);
-  regionSize[2] = m_MarginFactor * (maxima[2] - minima[2]);
+  regionSize[0] = (ImageType::RegionType::SizeType::SizeValueType)(m_MarginFactor * (maxima[0] - minima[0]));
+  regionSize[1] = (ImageType::RegionType::SizeType::SizeValueType)(m_MarginFactor * (maxima[1] - minima[1]));
+  regionSize[2] = (ImageType::RegionType::SizeType::SizeValueType)(m_MarginFactor * (maxima[2] - minima[2]));
   regionIndex = minima;
   regionIndex[0] -= (regionSize[0] - maxima[0] + minima[0])/2 ;
   regionIndex[1] -= (regionSize[1] - maxima[1] + minima[1])/2 ;

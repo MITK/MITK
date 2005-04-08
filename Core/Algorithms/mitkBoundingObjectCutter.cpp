@@ -112,9 +112,9 @@ void BoundingObjectCutter::GenerateOutputInformation()
 
   mitk::SlicedData::SizeType  size = m_InputRequestedRegion.GetSize(); //init times and channels
   mitk::BoundingBox::PointType max = boBoxRelativeToImage->GetMaximum();
-  size[0]=max[0]-index[0];
-  size[1]=max[1]-index[1];
-  size[2]=max[2]-index[2];
+  size[0]=(mitk::SlicedData::SizeType::SizeValueType)(max[0]-index[0]);
+  size[1]=(mitk::SlicedData::SizeType::SizeValueType)(max[1]-index[1]);
+  size[2]=(mitk::SlicedData::SizeType::SizeValueType)(max[2]-index[2]);
 
   mitk::SlicedData::RegionType boRegion(index, size);
   

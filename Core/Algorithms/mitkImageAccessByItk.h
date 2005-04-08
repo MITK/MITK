@@ -265,7 +265,7 @@ namespace mitk
   {
     typedef itk::Image<TPixel, VImageDimension> ItkInputImageType;
     typedef itk::CastImageFilter< ItkInputImageType, ItkOutputImageType > CastImageFilterType;
-    CastImageFilterType::Pointer castImageFilter = CastImageFilterType::New();
+    typename CastImageFilterType::Pointer castImageFilter = CastImageFilterType::New();
     castImageFilter->SetInput( itkInputImage );
     castImageFilter->Update();
     itkOutputImage = castImageFilter->GetOutput();

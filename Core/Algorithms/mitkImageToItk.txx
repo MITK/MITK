@@ -113,7 +113,7 @@ template<class TOutputImage>
     
     itkDebugMacro("do not copyMem ...");
     typedef itk::ImportImageContainer< unsigned long, PixelType >   ImportContainerType;
-    ImportContainerType::Pointer import;
+    typename ImportContainerType::Pointer import;
     
     import = ImportContainerType::New();
     import->Initialize();

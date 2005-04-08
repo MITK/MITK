@@ -37,6 +37,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkLinearTransform.h>
 #include <vtkTubeFilter.h>
 #include <vtkPolygon.h>
+#include <vtkSphereSource.h>
+
 
 
 #include <vtkProperty.h>
@@ -46,6 +48,7 @@ PURPOSE.  See the above copyright notices for more information.
 mitk::ContourVtkMapper3D::ContourVtkMapper3D()
 {
   m_VtkPolyDataMapper = vtkPolyDataMapper::New();
+  m_VtkPointList = vtkAppendPolyData::New();
   m_Actor = vtkActor::New();
   m_Actor->SetMapper(m_VtkPolyDataMapper);
 
@@ -56,21 +59,22 @@ mitk::ContourVtkMapper3D::ContourVtkMapper3D()
 mitk::ContourVtkMapper3D::~ContourVtkMapper3D()
 {
   m_VtkPolyDataMapper->Delete();
+  m_VtkPointList->Delete();
   m_Actor->Delete();
-  if(m_Contour!=NULL)
+  if ( m_Contour!=NULL )
     m_Contour->Delete();
 }
 
 void mitk::ContourVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
 {
-  if(IsVisible(renderer)==false)
+  if ( IsVisible(renderer)==false )
   {
     m_Actor->VisibilityOff();
     return;
   }
   m_Actor->VisibilityOn();
 
-  if(m_Contour!=NULL)
+  if ( m_Contour!=NULL )
     m_Contour->Delete();
 
   m_Contour = vtkPolyData::New();
@@ -79,13 +83,13 @@ void mitk::ContourVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
   mitk::Contour::Pointer input  = const_cast<mitk::Contour*>(this->GetInput());
   bool makeContour = true;
 
-  if (makeContour)
+  if ( makeContour )
   {
     vtkPoints *points = vtkPoints::New();
     vtkCellArray *lines = vtkCellArray::New();
 
     int numPts=input->GetNumberOfPoints();
-    if(numPts > 200000)
+    if ( numPts > 200000 )
       numPts = 200000;
     mitk::Contour::PathPointer path = input->GetContourPath();
     mitk::Contour::PathType::InputType cstart = path->StartOfInput();
@@ -101,24 +105,46 @@ void mitk::ContourVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
 
     float vtkpoint[3];
     unsigned int i;
-    for(i=0, ccur=cstart; i<numPts; ++i, ccur+=cstep)
+    float pointSize = 2;
+    this->GetDataTreeNode()->GetFloatProperty("spheres size", pointSize);
+
+    bool showPoints = true;
+    this->GetDataTreeNode()->GetBoolProperty("show points", showPoints);
+    if ( showPoints )
+    {
+      m_VtkPointList->Delete();
+      m_VtkPointList = vtkAppendPolyData::New();
+    }
+    for ( i=0, ccur=cstart; i<numPts; ++i, ccur+=cstep )
     {
       itk2vtk(path->Evaluate(ccur), vtkpoint);
       points->InsertPoint(ptIndex, vtkpoint);
-      if (ptIndex>0)
+      if ( ptIndex > 0 )
       {
         int cell[2] = {ptIndex-1,ptIndex};
         lines->InsertNextCell((vtkIdType)2,(vtkIdType*) cell);
       }
       lastPointIndex = ptIndex;
-      ptIndex++;
+      ++ptIndex;
+
+      if ( showPoints )
+      {
+        vtkSphereSource *sphere = vtkSphereSource::New();
+
+        sphere->SetRadius(pointSize);
+        sphere->SetCenter(vtkpoint);
+
+        m_VtkPointList->AddInput(sphere->GetOutput());
+        sphere->Update();
+        sphere->Delete();
+      }
     }
 
-    if (input->GetClosed())
+    if ( input->GetClosed() )
     {
       int cell[2] = {lastPointIndex,0};
       lines->InsertNextCell((vtkIdType)2,(vtkIdType*) cell);
-    }      
+    }
 
     m_Contour->SetPoints(points);
     points->Delete();
@@ -126,10 +152,19 @@ void mitk::ContourVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
     m_Contour->Update();
 
     m_TubeFilter->SetInput(m_Contour);
-    m_TubeFilter->SetRadius(1);
+    m_TubeFilter->SetRadius(pointSize / 2.0f);
     m_TubeFilter->SetNumberOfSides(8);
     m_TubeFilter->Update();
-    m_VtkPolyDataMapper->SetInput(m_TubeFilter->GetOutput());
+
+    if ( showPoints )
+    {
+      m_VtkPointList->AddInput(m_TubeFilter->GetOutput());
+      m_VtkPolyDataMapper->SetInput(m_VtkPointList->GetOutput());
+    }
+    else
+    {
+      m_VtkPolyDataMapper->SetInput(m_TubeFilter->GetOutput());
+    }
 #if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
     double rgba[4]={0.0f,1.0f,0.0f,0.6f};
 #else

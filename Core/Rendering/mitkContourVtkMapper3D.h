@@ -57,6 +57,7 @@ protected:
   vtkPolyDataMapper* m_VtkPolyDataMapper;
   vtkTubeFilter*     m_TubeFilter;
 
+  vtkAppendPolyData *m_VtkPointList;
   vtkPolyData *m_Contour;
   vtkActor *m_Actor;
 };

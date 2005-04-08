@@ -80,7 +80,7 @@ image->DebugOn();
   std::cout << "Adding level-window property: ";
   mitk::LevelWindowProperty::Pointer levWinProp = new mitk::LevelWindowProperty();
   mitk::LevelWindow levelwindow;
-  levelwindow.SetAuto( image->GetPic() );
+  levelwindow.SetAuto( image );
   levWinProp->SetLevelWindow( levelwindow );
   node->GetPropertyList()->SetProperty( "levelwindow", levWinProp );
   std::cout<<"[PASSED]"<<std::endl;

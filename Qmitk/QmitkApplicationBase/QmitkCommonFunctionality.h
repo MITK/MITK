@@ -290,7 +290,7 @@ namespace CommonFunctionality
 
     mitk::LevelWindowProperty::Pointer levWinProp = new mitk::LevelWindowProperty();
     mitk::LevelWindow levelWindow;
-    levelWindow.SetAuto( image->GetPic() );
+    levelWindow.SetAuto( image );
     levWinProp->SetLevelWindow(levelWindow);
     node->GetPropertyList()->SetProperty("levelwindow",levWinProp);
     return node;

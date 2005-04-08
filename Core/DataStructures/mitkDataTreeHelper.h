@@ -85,7 +85,7 @@ namespace DataTreeHelper
 
     mitk::LevelWindowProperty::Pointer levWinProp = new mitk::LevelWindowProperty();
     mitk::LevelWindow levelwindow;
-    levelwindow.SetAuto( mitkImage->GetPic() );
+    levelwindow.SetAuto( mitkImage );
     levWinProp->SetLevelWindow( levelwindow );
     node->SetProperty( "levelwindow", levWinProp );
 

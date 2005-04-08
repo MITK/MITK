@@ -52,34 +52,34 @@ namespace mitk {
 //## @ingroup Mapper
 class PointSetVtkMapper3D : public BaseVtkMapper3D
 {
-  public:
+public:
 
-    mitkClassMacro(PointSetVtkMapper3D, BaseVtkMapper3D);
+  mitkClassMacro(PointSetVtkMapper3D, BaseVtkMapper3D);
 
-    itkNewMacro(Self);
+  itkNewMacro(Self);
 
-    //##ModelId=3E70F60301D5
-    virtual const mitk::PointSet* GetInput();
+  //##ModelId=3E70F60301D5
+  virtual const mitk::PointSet* GetInput();
 
-  protected:
-    //##ModelId=3E70F60301F4
-    PointSetVtkMapper3D();
+protected:
+  //##ModelId=3E70F60301F4
+  PointSetVtkMapper3D();
 
-    //##ModelId=3E70F60301F5
-    virtual ~PointSetVtkMapper3D();
+  //##ModelId=3E70F60301F5
+  virtual ~PointSetVtkMapper3D();
 
-    virtual void GenerateData(mitk::BaseRenderer* renderer);
+  virtual void GenerateData(mitk::BaseRenderer* renderer);
 
-     vtkActor *m_Actor;
-    vtkPolyDataMapper* m_PointVtkPolyDataMapper;
-    vtkPolyDataMapper* m_TextVtkPolyDataMapper;
-    vtkPolyDataMapper* m_VtkPolyDataMapper;    
+  vtkActor *m_Actor;
+  vtkPolyDataMapper* m_PointVtkPolyDataMapper;
+  vtkPolyDataMapper* m_TextVtkPolyDataMapper;
+  vtkPolyDataMapper* m_VtkPolyDataMapper;
 
 
-		vtkAppendPolyData *m_vtkPointList;
-		vtkAppendPolyData *m_vtkTextList;
-		vtkPolyData *m_contour;
-	   vtkTubeFilter * m_tubefilter;
+  vtkAppendPolyData *m_vtkPointList;
+  vtkAppendPolyData *m_vtkTextList;
+  vtkPolyData *m_contour;
+  vtkTubeFilter * m_tubefilter;
 };
 
 } // namespace mitk

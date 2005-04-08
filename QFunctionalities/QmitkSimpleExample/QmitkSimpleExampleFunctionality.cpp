@@ -68,13 +68,6 @@ QWidget * QmitkSimpleExampleFunctionality::createMainWidget(QWidget *parent)
     {
         result = NULL;
     }
-
-    mitk::GlobalInteraction* globalInteraction = dynamic_cast<mitk::GlobalInteraction*>(mitk::EventMapper::GetGlobalStateMachine());
-    if(globalInteraction!=NULL)
-    {
-      globalInteraction->AddListener(multiWidget->GetMoveAndZoomInteractor() );//sends DisplayCoordinateOperation
-    }
-
     return result;
 }
 
@@ -88,12 +81,6 @@ QWidget * QmitkSimpleExampleFunctionality::createControlWidget(QWidget *parent)
         new QmitkStepperAdapter(controls->getSliceNavigatorFrontal(), multiWidget->mitkWidget3->GetSliceNavigationController()->GetSlice(), "sliceNavigatorFrontalFromSimpleExample");
         new QmitkStepperAdapter(controls->getSliceNavigatorTime(), multiWidget->GetTimeNavigationController()->GetTime(), "sliceNavigatorTimeFromSimpleExample");
         new QmitkStepperAdapter(controls->getMovieNavigatorTime(), multiWidget->GetTimeNavigationController()->GetTime(), "movieNavigatorTimeFromSimpleExample");
-
-        mitk::GlobalInteraction* globalInteraction = dynamic_cast<mitk::GlobalInteraction*>(mitk::EventMapper::GetGlobalStateMachine());
-        if(globalInteraction!=NULL)
-        {
-          globalInteraction->AddListener(multiWidget->GetMultiplexUpdateController());
-        }
     }
     return controls;
 }
@@ -121,8 +108,6 @@ void QmitkSimpleExampleFunctionality::initNavigators()
 
 void QmitkSimpleExampleFunctionality::treeChanged()
 {
-  if(m_NavigatorsInitialized==false)
-    initNavigators();
 }
 
 void QmitkSimpleExampleFunctionality::activated()

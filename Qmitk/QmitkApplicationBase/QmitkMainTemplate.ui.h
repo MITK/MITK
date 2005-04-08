@@ -111,6 +111,7 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
 {
   mitk::DataTreeNodeFactory::Pointer factory = mitk::DataTreeNodeFactory::New();
 
+  mitk::DataTreePreOrderIterator it(tree);
   try
   {
     factory->SetFileName( fileName );
@@ -118,7 +119,6 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
 
     for (unsigned int i = 0 ; i < factory->GetNumberOfOutputs( ); ++i)
     {
-        mitk::DataTreePreOrderIterator it(tree);
         mitk::DataTreeNode::Pointer node = factory->GetOutput( i );
         if ( node.IsNotNull( ) )
         {
@@ -133,6 +133,10 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
     }
     if (factory->GetOutput()->GetData() != NULL) //assure that we have at least one valid output
     {
+      if(m_StandardViewsInitialized == false)
+      {
+        m_StandardViewsInitialized = mitkMultiWidget->InitializeStandardViews(&it);
+      }
       mitkMultiWidget->Repaint();
       mitkMultiWidget->Fit();
     }
@@ -149,6 +153,8 @@ void QmitkMainTemplate::fileOpenImageSequence()
 
   if ( !fileName.isNull() )
   {
+    mitk::DataTreePreOrderIterator it(tree);
+
     int fnstart = fileName.findRev( QRegExp("[/\\\\]"), fileName.length() );
     if(fnstart<0) fnstart=0;
     int start = fileName.find( QRegExp("[0-9]"), fnstart );
@@ -175,7 +181,6 @@ void QmitkMainTemplate::fileOpenImageSequence()
 
     for (unsigned int i = 0 ; i < factory->GetNumberOfOutputs( ); ++i)
     {
-      mitk::DataTreePreOrderIterator it(tree);
       mitk::DataTreeNode::Pointer node = factory->GetOutput( i );
       if ( node.IsNotNull( ) )
       {
@@ -189,6 +194,10 @@ void QmitkMainTemplate::fileOpenImageSequence()
     }
     if (factory->GetOutput()->GetData() != NULL) //assure that we have at least one valid output
     {
+      if(m_StandardViewsInitialized == false)
+      {
+        m_StandardViewsInitialized = mitkMultiWidget->InitializeStandardViews(&it);
+      }
       mitkMultiWidget->Repaint();
       mitkMultiWidget->Fit();
     }
@@ -314,6 +323,7 @@ void QmitkMainTemplate::init()
 {
   m_Instance = this;  
   mitkMultiWidget=NULL;
+  m_StandardViewsInitialized = false;
 
   //creating a QmitkStatusBar for Output on the QStatusBar and connecting it with the MainStatusBar
   QmitkStatusBar *statusBar = new QmitkStatusBar(this->statusBar());
@@ -402,6 +412,14 @@ void QmitkMainTemplate::initialize()
     mitkMultiWidget->EnableStandardLevelWindow();
   }
   initializeFunctionality();
+
+
+  mitk::GlobalInteraction* globalInteraction = dynamic_cast<mitk::GlobalInteraction*>(mitk::EventMapper::GetGlobalStateMachine());
+  if(globalInteraction!=NULL)
+  {
+    globalInteraction->AddListener(mitkMultiWidget->GetMoveAndZoomInteractor() );
+    globalInteraction->AddListener(mitkMultiWidget->GetMultiplexUpdateController());
+  }
 }
 
 

@@ -818,6 +818,7 @@
     <variable>QmitkFctMediator* qfm;</variable>
     <variable>QmitkStdMultiWidget* mitkMultiWidget;</variable>
     <variable>mitk::DataTree::Pointer tree;</variable>
+    <variable>bool m_StandardViewsInitialized;</variable>
 </variables>
 <signals>
     <signal>ShowWidgetPlanesToggled(bool)</signal>

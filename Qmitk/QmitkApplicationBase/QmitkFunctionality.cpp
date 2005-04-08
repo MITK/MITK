@@ -25,7 +25,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 QmitkFunctionality::QmitkFunctionality(QObject *parent, const char *name, mitk::DataTreeIteratorBase* dataIt) : 
-  QObject(parent, name), m_Available(false), m_Activated(false), m_DataTreeIterator(NULL), m_TreeChangedWhileInActive(false), m_ObserverTag(0)
+QObject(parent, name), m_Available(false), m_Activated(false), m_DataTreeIterator(NULL), m_TreeChangedWhileInActive(false), m_ObserverTag(0)
 {
   setDataTree(dataIt);
 }
@@ -40,7 +40,7 @@ QmitkFunctionality::~QmitkFunctionality()
 
 QString QmitkFunctionality::getFunctionalityName()
 {
-	return name();
+  return name();
 }
 
 void QmitkFunctionality::activated()
@@ -60,7 +60,7 @@ void QmitkFunctionality::deactivated()
 
 bool QmitkFunctionality::isActivated()
 {
-	return m_Activated;
+  return m_Activated;
 }
 
 bool QmitkFunctionality::isAvailable()
@@ -70,9 +70,9 @@ bool QmitkFunctionality::isAvailable()
 
 void QmitkFunctionality::setAvailability(bool available)
 {
-	this->m_Available=available;
-	emit availabilityChanged(this);
-	emit availabilityChanged();
+  this->m_Available=available;
+  emit availabilityChanged(this);
+  emit availabilityChanged();
 }
 
 void QmitkFunctionality::setDataTree(mitk::DataTreeIteratorBase* it)
@@ -81,7 +81,7 @@ void QmitkFunctionality::setDataTree(mitk::DataTreeIteratorBase* it)
   {
     m_DataTreeIterator->GetTree()->RemoveObserver(m_ObserverTag);
   }
-	m_DataTreeIterator = it;
+  m_DataTreeIterator = it;
   if(m_DataTreeIterator.IsNotNull())
   {
     itk::ReceptorMemberCommand<QmitkFunctionality>::Pointer command = itk::ReceptorMemberCommand<QmitkFunctionality>::New();
@@ -92,7 +92,7 @@ void QmitkFunctionality::setDataTree(mitk::DataTreeIteratorBase* it)
 
 mitk::DataTreeIteratorBase* QmitkFunctionality::getDataTree()
 {
-	return m_DataTreeIterator.GetPointer();
+  return m_DataTreeIterator.GetPointer();
 }
 
 void QmitkFunctionality::treeChanged(const itk::EventObject & treeChangedEvent)

@@ -53,6 +53,7 @@ void QmitkDataManagerControls::init() {
   m_DataTreeView->addColumn( "Name" );
   m_DataTreeView->addColumn( "NodeType" );
   m_DataTreeView->addColumn( "RefCount");
+  m_DataTreeView->setSortColumn(20);
   mitk::GlobalInteraction* globalInteraction = dynamic_cast<mitk::GlobalInteraction*> (mitk::EventMapper::GetGlobalStateMachine());
   if (globalInteraction) {
     mitk::FocusManager* fm = globalInteraction->GetFocusManager();

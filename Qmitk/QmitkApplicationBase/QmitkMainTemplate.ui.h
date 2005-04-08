@@ -61,16 +61,15 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkStateMachine.h>
 #include <mitkEventMapper.h>
 #include <mitkGlobalInteraction.h>
-#include <mitkDataTreeNodeFactory.h>
 #include <mitkUSLookupTableSource.h>
 
 #ifdef MBI_INTERNAL
-#include <mitkVesselTreeFileReader.h>
-#include <mitkVesselGraphFileReader.h>
-#include <mitkDICOMFileReader.h>
-#include <mitkDSRFileReader.h>
-#include <mitkCylindricToCartesianFilter.h>
-#include <itksys/SystemTools.hxx>
+  #include <mitkVesselTreeFileReader.h>
+  #include <mitkVesselGraphFileReader.h>
+  #include <mitkDICOMFileReader.h>
+  #include <mitkDSRFileReader.h>
+  #include <mitkCylindricToCartesianFilter.h>
+  #include <itksys/SystemTools.hxx>
 #else
   #include "itkImage.h"
   #include "itkImageFileReader.h"
@@ -116,30 +115,7 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
   {
     factory->SetFileName( fileName );
     factory->Update();
-
-    for (unsigned int i = 0 ; i < factory->GetNumberOfOutputs( ); ++i)
-    {
-        mitk::DataTreeNode::Pointer node = factory->GetOutput( i );
-        if ( node.IsNotNull( ) )
-        {
-            it.Add( node );
-            mitk::LevelWindowProperty::Pointer lw = dynamic_cast<mitk::LevelWindowProperty*>(node->GetProperty("levelwindow").GetPointer( ) );
-            if ( lw.IsNotNull( ) )
-            {
-                mitkMultiWidget->levelWindowWidget->setLevelWindow( lw->GetLevelWindow() );
-            }
-  //          it->removeChild(it->childPosition(node));
-        }
-    }
-    if (factory->GetOutput()->GetData() != NULL) //assure that we have at least one valid output
-    {
-      if(m_StandardViewsInitialized == false)
-      {
-        m_StandardViewsInitialized = mitkMultiWidget->InitializeStandardViews(&it);
-      }
-      mitkMultiWidget->Repaint();
-      mitkMultiWidget->Fit();
-    }
+    fileOpenGetFactoryOutput(*factory.GetPointer());
   }
   catch ( itk::ExceptionObject & ex )
   {
@@ -156,9 +132,9 @@ void QmitkMainTemplate::fileOpenImageSequence()
     mitk::DataTreePreOrderIterator it(tree);
 
     int fnstart = fileName.findRev( QRegExp("[/\\\\]"), fileName.length() );
-    if(fnstart<0) fnstart=0;
+    if ( fnstart<0 ) fnstart=0;
     int start = fileName.find( QRegExp("[0-9]"), fnstart );
-    if(start<0)
+    if ( start<0 )
     {
       fileOpen(fileName.ascii());
       return;
@@ -174,35 +150,56 @@ void QmitkMainTemplate::fileOpenImageSequence()
 
 
     mitk::DataTreeNodeFactory::Pointer factory = mitk::DataTreeNodeFactory::New();
-  
+
     factory->SetFilePattern( pattern );
     factory->SetFilePrefix( prefix );
     factory->Update();
 
-    for (unsigned int i = 0 ; i < factory->GetNumberOfOutputs( ); ++i)
-    {
-      mitk::DataTreeNode::Pointer node = factory->GetOutput( i );
-      if ( node.IsNotNull( ) )
-      {
-        it.Add( node );
-        mitk::LevelWindowProperty::Pointer lw = dynamic_cast<mitk::LevelWindowProperty*>(node->GetProperty("levelwindow").GetPointer( ) );
-        if ( lw.IsNotNull( ) )
-        {
-          mitkMultiWidget->levelWindowWidget->setLevelWindow( lw->GetLevelWindow() );
-        }
-      }
-    }
-    if (factory->GetOutput()->GetData() != NULL) //assure that we have at least one valid output
-    {
-      if(m_StandardViewsInitialized == false)
-      {
-        m_StandardViewsInitialized = mitkMultiWidget->InitializeStandardViews(&it);
-      }
-      mitkMultiWidget->Repaint();
-      mitkMultiWidget->Fit();
-    }
+    fileOpenGetFactoryOutput(*factory.GetPointer());
   }
 }
+
+void QmitkMainTemplate::fileOpenGetFactoryOutput( mitk::DataTreeNodeFactory & factory)
+{
+  mitk::DataTreePreOrderIterator it(tree);
+  mitk::Image* image = 0;
+  mitk::Image* firstImage = 0;
+
+  for ( unsigned int i = 0 ; i < factory.GetNumberOfOutputs( ); ++i )
+  {
+    mitk::DataTreeNode::Pointer node = factory.GetOutput( i );
+    if ( node.IsNotNull( ) )
+    {
+      image = dynamic_cast<mitk::Image*>(node->GetData());
+      if ( image != NULL && firstImage == NULL )
+      {
+        firstImage = image;
+      }
+      it.Add( node );
+      mitk::LevelWindowProperty::Pointer lw = dynamic_cast<mitk::LevelWindowProperty*>(node->GetProperty("levelwindow").GetPointer( ) );
+      if ( lw.IsNotNull( ) )
+      {
+        mitkMultiWidget->levelWindowWidget->setLevelWindow( lw->GetLevelWindow() );
+      }
+    }
+  }
+  if ( factory.GetOutput()->GetData() != NULL ) //assure that we have at least one valid output
+  {
+    if ( m_StandardViewsInitialized == false )
+    {
+      m_StandardViewsInitialized = mitkMultiWidget->InitializeStandardViews(&it);
+
+      if ( firstImage->GetDimension() == 2 )
+      {
+        // layoutGroup->selected(Widget1); // why does this not compile -Ingmar?
+        Widget1->activate();
+      }
+    }
+    mitkMultiWidget->Repaint();
+    mitkMultiWidget->Fit();
+  }
+} // fileOpenGetFactoryOutput()
+
 
 void QmitkMainTemplate::fileSave()
 {
@@ -212,18 +209,18 @@ void QmitkMainTemplate::fileSave()
 void QmitkMainTemplate::fileSaveAs()
 {
   mitk::DataTreePreOrderIterator it(tree);
-  while(!it.IsAtEnd())
+  while ( !it.IsAtEnd() )
   {
     mitk::DataTreeNode::Pointer node=it.Get();
-    if(node->GetData()!=NULL)
+    if ( node->GetData()!=NULL )
     {
       mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
-      if( image.IsNotNull() )
+      if ( image.IsNotNull() )
       {
         QString fileName = QFileDialog::getSaveFileName(NULL,"pvtk (*.pvtk)");
         if ( !fileName.isNull() )
         {
-          if(fileName.endsWith(".pvtk")==false) fileName+=".pvtk";
+          if ( fileName.endsWith(".pvtk")==false ) fileName+=".pvtk";
           vtkStructuredPointsWriter *writer=vtkStructuredPointsWriter::New();
           writer->SetInput(image->GetVtkImageData());
           writer->SetFileName(fileName.ascii());
@@ -233,12 +230,12 @@ void QmitkMainTemplate::fileSaveAs()
         }
       }
       mitk::Surface::Pointer surface = dynamic_cast<mitk::Surface*>(node->GetData());
-      if( surface.IsNotNull() )
+      if ( surface.IsNotNull() )
       {
         QString fileName = QFileDialog::getSaveFileName(NULL,"stl (*.stl);;vtk (*.vtk)");
         if ( !fileName.isNull() )
         {
-          if(fileName.endsWith(".vtk"))
+          if ( fileName.endsWith(".vtk") )
           {
             vtkPolyDataWriter *writer=vtkPolyDataWriter ::New();
             writer->SetInput(surface->GetVtkPolyData());
@@ -248,7 +245,7 @@ void QmitkMainTemplate::fileSaveAs()
           }
           else
           {
-            if(fileName.endsWith(".stl")==false) fileName+=".stl";
+            if ( fileName.endsWith(".stl")==false ) fileName+=".stl";
             vtkSTLWriter *writer=vtkSTLWriter ::New();
             writer->SetInput(surface->GetVtkPolyData());
             writer->SetFileName(fileName.ascii());
@@ -321,7 +318,7 @@ void QmitkMainTemplate::helpAbout()
 
 void QmitkMainTemplate::init()
 {
-  m_Instance = this;  
+  m_Instance = this;
   mitkMultiWidget=NULL;
   m_StandardViewsInitialized = false;
 
@@ -351,14 +348,17 @@ void QmitkMainTemplate::initialize()
   char* mitkConf = getenv("MITKCONF");
   std::string xmlFileName;
 
-  if (mitkConf != NULL) {
+  if ( mitkConf != NULL )
+  {
     xmlFileName = mitkConf;
-  } else {
+  }
+  else
+  {
     xmlFileName = xmlFallBackPath;
   }
   xmlFileName += "/StateMachine.xml";
 
-  if(QFile::exists(xmlFileName.c_str())==false)
+  if ( QFile::exists(xmlFileName.c_str())==false )
     xmlFileName = "StateMachine.xml";
 
   std::cout << "Loading behavior file: " << xmlFileName << std::endl;
@@ -370,14 +370,14 @@ void QmitkMainTemplate::initialize()
   bool smLoadOK = stateMachineFactory->LoadBehavior(xmlFileName);
 
   //could the behavior file be found?
-  if(smLoadOK)
+  if ( smLoadOK )
   {
     //create eventmapper-factory:
     mitk::EventMapper* eventMapper = new mitk::EventMapper();
     //Load all possible Events from List
     bool eventLoadOK = eventMapper->LoadBehavior(xmlFileName);
     //could the behavior file be found?
-    if(eventLoadOK)
+    if ( eventLoadOK )
     {
       //set up the global StateMachine and register it to EventMapper
       mitk::GlobalInteraction* globalInteraction = new mitk::GlobalInteraction("global");
@@ -393,17 +393,17 @@ void QmitkMainTemplate::initialize()
   initializeQfm();
   QWidget* defaultMain = qfm->getDefaultMain();
 
-  if(defaultMain!=NULL)
+  if ( defaultMain!=NULL )
   {
     QBoxLayout *layoutdraw=dynamic_cast<QBoxLayout *>(defaultMain->layout());
-    if(layoutdraw==NULL)
+    if ( layoutdraw==NULL )
       layoutdraw = new QHBoxLayout(defaultMain);
 
     mitkMultiWidget = new QmitkStdMultiWidget(defaultMain, "QmitkMainTemplate::QmitkStdMultiWidget");
     layoutdraw->addWidget(mitkMultiWidget);
 
     // add the diplayed planes of the multiwidget to a node to which the subtree @a planesSubTree points ...
-    
+
     mitk::DataTreePreOrderIterator it(tree);
 
     mitkMultiWidget->SetData(&it);
@@ -474,7 +474,7 @@ void QmitkMainTemplate::parseCommandLine()
   //command line arguments set?
   //The following is a simple method to assess command line arguments.
   int i;
-  for(i=1;i<qApp->argc();++i)
+  for ( i=1;i<qApp->argc();++i )
   {
     //    const char *param=qApp->argv()[i];
     //    if(param[0]=='-')
@@ -530,7 +530,7 @@ void QmitkMainTemplate::changeToWidget3Layout()
 
 void QmitkMainTemplate::FullScreenMode(bool fullscreen)
 {
-  if (fullscreen)
+  if ( fullscreen )
     showFullScreen();
   else
     showNormal();
@@ -544,7 +544,7 @@ void QmitkMainTemplate::setXMLFallBackPath( const char * anXmlFallBackPath )
 
 void QmitkMainTemplate::m_ShowPlanesCheckBox_clicked()
 {
-    emit ShowWidgetPlanesToggled( m_ShowPlanesCheckBox->isOn() );
+  emit ShowWidgetPlanesToggled( m_ShowPlanesCheckBox->isOn() );
 }
 
 
@@ -555,31 +555,37 @@ void QmitkMainTemplate::destroy()
 
 QmitkMainTemplate* QmitkMainTemplate::getInstance()
 {
-    return m_Instance;
+  return m_Instance;
 }
 
 
 QmitkFctMediator* QmitkMainTemplate::getFctMediator()
 {
-    return qfm;
+  return qfm;
 }
 
 void QmitkMainTemplate::changeToColumnWidget3n4Layout()
 {
-    mitkMultiWidget->changeLayoutToColumnWidget3And4();
+  mitkMultiWidget->changeLayoutToColumnWidget3And4();
 }
 
 
 void QmitkMainTemplate::changeToRowWidget3n4Layout()
 {
-    mitkMultiWidget->changeLayoutToRowWidget3And4();
+  mitkMultiWidget->changeLayoutToRowWidget3And4();
 }
 
 
 void QmitkMainTemplate::hideToolbar(bool on)
 {
-  if(on)
+  if ( on )
     ToolBar->hide();
   else
     ToolBar->show();
+}
+
+
+void QmitkMainTemplate::newFunction()
+{
+
 }

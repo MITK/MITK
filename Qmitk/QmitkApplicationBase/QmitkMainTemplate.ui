@@ -790,8 +790,6 @@
     </connection>
 </connections>
 <includes>
-    <include location="global" impldecl="in declaration">mitkDataTree.h</include>
-    <include location="global" impldecl="in declaration">mitkUndoController.h</include>
     <include location="global" impldecl="in implementation">QmitkStdMultiWidget.h</include>
     <include location="global" impldecl="in implementation">QmitkFctMediator.h</include>
     <include location="global" impldecl="in implementation">QmitkControlsRightFctLayoutTemplate.h</include>
@@ -802,6 +800,9 @@
     <include location="global" impldecl="in implementation">ipPic/ipPic.h</include>
     <include location="global" impldecl="in implementation">qstring.h</include>
     <include location="global" impldecl="in implementation">qapplication.h</include>
+    <include location="global" impldecl="in declaration">mitkDataTree.h</include>
+    <include location="global" impldecl="in declaration">mitkUndoController.h</include>
+    <include location="global" impldecl="in declaration">mitkDataTreeNodeFactory.h</include>
     <include location="local" impldecl="in implementation">QmitkMainTemplate.ui.h</include>
 </includes>
 <forwards>
@@ -855,6 +856,7 @@
 </slots>
 <functions>
     <function>fileOpen( const char * fileName )</function>
+    <function access="protected">fileOpenGetFactoryOutput( mitk::DataTreeNodeFactory &amp; factory )</function>
     <function access="private" specifier="non virtual">init()</function>
     <function>initialize()</function>
     <function>initializeFunctionality()</function>
@@ -866,6 +868,7 @@
     <function access="private">destroy()</function>
     <function specifier="static" returnType="QmitkMainTemplate *">getInstance()</function>
     <function specifier="non virtual" returnType="QmitkFctMediator *">getFctMediator()</function>
+    <function access="protected">newFunction()</function>
 </functions>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

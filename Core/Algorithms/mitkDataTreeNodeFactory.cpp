@@ -709,6 +709,8 @@ void mitk::DataTreeNodeFactory::ReadFileTypeITKImageIOFactory()
     void* buffer = malloc( imageIO->GetImageSizeInBytes() );
     imageIO->Read( buffer );
     mitk::Image::Pointer image = mitk::Image::New();
+    if((ndim==3) && (dimensions[2]==1))
+      ndim = 2;
 #if ITK_VERSION_MAJOR == 2 || ( ITK_VERSION_MAJOR == 1 && ITK_VERSION_MINOR > 6 )
     mitk::PixelType pixelType( imageIO->GetComponentTypeInfo(), imageIO->GetNumberOfComponents() );
     image->Initialize( pixelType, ndim, dimensions );
@@ -731,12 +733,14 @@ void mitk::DataTreeNodeFactory::ReadFileTypeITKImageIOFactory()
     mitk::StringProperty::Pointer nameProp = new mitk::StringProperty( this->GetBaseFileName() );
     node->SetProperty( "name", nameProp );
 
+    SetDefaultImageProperties(node);
+
+    // add level-window property
     mitk::LevelWindowProperty::Pointer levWinProp = new mitk::LevelWindowProperty();
     mitk::LevelWindow levelwindow;
-    levelwindow.SetMinMax(4000,8000);
+    levelwindow.SetAuto( image->GetPic() );
     levWinProp->SetLevelWindow( levelwindow );
     node->GetPropertyList()->SetProperty( "levelwindow", levWinProp );
-
 
     std::cout << "...finished!" << std::endl;
 }

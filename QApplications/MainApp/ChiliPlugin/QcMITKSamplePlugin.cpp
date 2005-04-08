@@ -16,6 +16,8 @@
 #include "ToolBar.h"
 #include <mitkChiliPlugin.h>
 
+#include <qmessagebox.h>
+
 #include "ipFunc.h"
 
 
@@ -25,7 +27,7 @@ QcMITKSamplePlugin::QcMITKSamplePlugin( QWidget *parent )
   : QcPlugin( parent )
 {
   task = new QcTask( xpm(), parent, name() );
-  
+
   ap = new SampleApp(task,"sample",0);
   toolbar =new ToolBar(task,this);
   toolbar->SetWidget(ap);
@@ -45,7 +47,7 @@ QcMITKSamplePlugin::QcMITKSamplePlugin( QWidget *parent )
 QString 
 QcMITKSamplePlugin::name() 
 { 
-  return QString( "ERIS" ); 
+  return QString( "MITK PlugIn" );
 }
 
 const char ** 
@@ -119,7 +121,7 @@ void QcMITKSamplePlugin::selectSerie (QcLightbox* lightbox)
 
   mitk::LevelWindowProperty::Pointer levWinProp = new mitk::LevelWindowProperty();
   mitk::LevelWindow levelwindow;
-  levelwindow.SetAuto( reader->GetOutput()->GetPic() );
+  levelwindow.SetAuto( reader->GetOutput() );
   levWinProp->SetLevelWindow( levelwindow );
   node->GetPropertyList()->SetProperty( "levelwindow", levWinProp );
   node->SetProperty( "volumerendering", new mitk::BoolProperty( false ) );

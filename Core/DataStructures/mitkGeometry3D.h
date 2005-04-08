@@ -252,7 +252,7 @@ public:
       index.Fill(0);
       dim=3;
     }
-    for(i=0;i<3;++i)
+    for(i=0;i<dim;++i)
       index[i]=(typename IndexType::IndexValueType)pt_units[i];
   }
 

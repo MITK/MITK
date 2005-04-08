@@ -16,7 +16,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-
 #ifndef MITK_CONTOUR_VTK_MAPPER_3D_H
 #define MITK_CONTOUR_VTK_MAPPER_3D_H
 
@@ -39,35 +38,27 @@ namespace mitk {
 //## @ingroup Mapper
 class ContourVtkMapper3D : public BaseVtkMapper3D
 {
-  public:
+public:
+  mitkClassMacro(ContourVtkMapper3D, BaseVtkMapper3D);
 
-    mitkClassMacro(ContourVtkMapper3D, BaseVtkMapper3D);
+  itkNewMacro(Self);
 
-    itkNewMacro(Self);
+  virtual const mitk::Contour* GetInput();
 
+  virtual vtkProp* GetProp();
 
+protected:
+  ContourVtkMapper3D();
+  virtual ~ContourVtkMapper3D();
 
-    virtual const mitk::Contour* GetInput();
+  virtual void GenerateData(mitk::BaseRenderer* renderer);
 
+  vtkPolyDataMapper* m_PointVtkPolyDataMapper;
+  vtkPolyDataMapper* m_VtkPolyDataMapper;
+  vtkTubeFilter*     m_TubeFilter;
 
-    virtual vtkProp* GetProp();
-
-
-  protected:
-   
-    ContourVtkMapper3D();
-   
-    virtual ~ContourVtkMapper3D();
-
-    virtual void GenerateData(mitk::BaseRenderer* renderer);
-
-    vtkPolyDataMapper* m_PointVtkPolyDataMapper;
-    vtkPolyDataMapper* m_VtkPolyDataMapper;
-    vtkTubeFilter*     m_TubeFilter;
-
-		vtkPolyData *m_Contour;
-    vtkActor *m_Actor;
-  
+  vtkPolyData *m_Contour;
+  vtkActor *m_Actor;
 };
 
 } // namespace mitk

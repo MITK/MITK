@@ -51,6 +51,8 @@ PURPOSE.  See the above copyright notices for more information.
       _accessByItk(mitkImage, itkImageTypeFunction, float, dimension) else             \
       _accessByItk(mitkImage, itkImageTypeFunction, short, dimension) else             \
       _accessByItk(mitkImage, itkImageTypeFunction, unsigned short, dimension) else    \
+      _accessByItk(mitkImage, itkImageTypeFunction, int, dimension) else               \
+      _accessByItk(mitkImage, itkImageTypeFunction, unsigned int, dimension) else      \
       _accessByItk(mitkImage, itkImageTypeFunction, char, dimension) else              \
       _accessByItk(mitkImage, itkImageTypeFunction, unsigned char,  dimension)         \
 
@@ -152,11 +154,13 @@ PURPOSE.  See the above copyright notices for more information.
       _accessByItk_1(mitkImage, itkImageTypeFunction, char, dimension, param1) else              \
       _accessByItk_1(mitkImage, itkImageTypeFunction, unsigned char,  dimension, param1)         \
 
-#define _accessMainTypesByItk_1(mitkImage, itkImageTypeFunction, dimension, param1)               \
+#define _accessMainTypesByItk_1(mitkImage, itkImageTypeFunction, dimension, param1)              \
       _accessByItk_1(mitkImage, itkImageTypeFunction, double, dimension, param1) else            \
       _accessByItk_1(mitkImage, itkImageTypeFunction, float, dimension, param1) else             \
       _accessByItk_1(mitkImage, itkImageTypeFunction, short, dimension, param1) else             \
       _accessByItk_1(mitkImage, itkImageTypeFunction, unsigned short, dimension, param1) else    \
+      _accessByItk_1(mitkImage, itkImageTypeFunction, int, dimension, param1) else               \
+      _accessByItk_1(mitkImage, itkImageTypeFunction, unsigned int, dimension, param1) else      \
       _accessByItk_1(mitkImage, itkImageTypeFunction, char, dimension, param1) else              \
       _accessByItk_1(mitkImage, itkImageTypeFunction, unsigned char,  dimension, param1)         \
 
@@ -251,6 +255,8 @@ PURPOSE.  See the above copyright notices for more information.
       _accessByItk_2(mitkImage, itkImageTypeFunction, float, dimension, param1, param2) else             \
       _accessByItk_2(mitkImage, itkImageTypeFunction, short, dimension, param1, param2) else             \
       _accessByItk_2(mitkImage, itkImageTypeFunction, unsigned short, dimension, param1, param2) else    \
+      _accessByItk_2(mitkImage, itkImageTypeFunction, int, dimension, param1, param2) else               \
+      _accessByItk_2(mitkImage, itkImageTypeFunction, unsigned int, dimension, param1, param2) else      \
       _accessByItk_2(mitkImage, itkImageTypeFunction, char, dimension, param1, param2) else              \
       _accessByItk_2(mitkImage, itkImageTypeFunction, unsigned char,  dimension, param1, param2)         \
 

@@ -39,6 +39,7 @@ int mitkPointSetTest(int argc, char* argv[])
     std::cout<<"[FAILED]"<<std::endl;
     return EXIT_FAILURE;
   }
+  std::cout<<"[PASSED]"<<std::endl;
 
   //fresh PointSet has to be empty!
   std::cout << "check if the PointSet is empty";
@@ -47,8 +48,11 @@ int mitkPointSetTest(int argc, char* argv[])
     std::cout<<"[FAILED]"<<std::endl;
     return EXIT_FAILURE;
   }
+  std::cout<<"[PASSED]"<<std::endl;
 
   //create an operation and add a point.
+  std::cout << "create an operation and add a point";
+
   int position = 0;
   mitk::Point3D point;
   point.Fill(1);
@@ -56,7 +60,6 @@ int mitkPointSetTest(int argc, char* argv[])
 	pointSet->ExecuteOperation(doOp);
 
   //now check new condition!
-  std::cout << "create an operation and add a point";
   if ( (pointSet->GetSize()!=1) ||
       (!pointSet->IndexExists(position)))
   {
@@ -72,7 +75,30 @@ int mitkPointSetTest(int argc, char* argv[])
     std::cout<<"[FAILED]"<<std::endl;
     return EXIT_FAILURE;
   }
+  std::cout<<"[PASSED]"<<std::endl;
 
+
+  //add a point directly
+  std::cout << "add a point directly";
+  mitk::FillVector3D(point, 1.0, 2.0, 3.0);
+  ++position;
+	pointSet->GetPointSet()->GetPoints()->InsertElement(position, point);
+
+  //now check new condition!
+  if ( (pointSet->GetSize()!=2) ||
+      (!pointSet->IndexExists(position)))
+  {
+    std::cout<<"[FAILED]"<<std::endl;
+    return EXIT_FAILURE;
+  }
+  
+  tempPoint.Fill(0);
+  tempPoint = pointSet->GetPoint(position);
+  if (tempPoint != point)
+  {
+    std::cout<<"[FAILED]"<<std::endl;
+    return EXIT_FAILURE;
+  }
 
   //well done!!! Passed!
   std::cout<<"[PASSED]"<<std::endl;

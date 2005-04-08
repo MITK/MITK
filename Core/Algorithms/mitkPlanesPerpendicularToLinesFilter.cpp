@@ -48,7 +48,7 @@ void mitk::PlanesPerpendicularToLinesFilter::CreatePlane(const mitk::Point3D& cu
 {
   int j;
   for(j=0;j<3;++j)
-    normal[j] = curr[j]-last[j];
+    normal[j] = last[j]-curr[j]; //@todo globally define normal direction of display xxx
   normal.normalize();
 
   down = vnl_cross_3d(normal, targetRight);

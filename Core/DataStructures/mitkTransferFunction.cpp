@@ -44,6 +44,6 @@ void mitk::TransferFunction::InitializeByMitkImage( const mitk::Image * image )
   histGen->SetSize(100);
   histGen->ComputeHistogram();
   m_Histogram = histGen->GetHistogram();
-  m_Min = GetHistogram()->GetBinMin(0,0);
-  m_Max = GetHistogram()->GetBinMin(0, GetHistogram()->Size()-1);
+  m_Min = (int)GetHistogram()->GetBinMin(0,0);
+  m_Max = (int)GetHistogram()->GetBinMin(0, GetHistogram()->Size()-1);
 }

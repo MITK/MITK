@@ -462,7 +462,7 @@ static QString SaveImage(mitk::Image* image)
     {
       if (fileName.contains(".mhd") != 0)
       {
-        itk::ImageFileWriter<TImageType>::Pointer writer = itk::ImageFileWriter<TImageType>::New();
+        typename itk::ImageFileWriter<TImageType>::Pointer writer = itk::ImageFileWriter<TImageType>::New();
         writer->SetInput( itkImage );
         writer->SetFileName( fileName.ascii() );
         writer->Update();
@@ -471,7 +471,7 @@ static QString SaveImage(mitk::Image* image)
       {
         typedef itk::Image<unsigned char,3> OutputImage3DType;
         typedef itk::Image<unsigned char,2> OutputImage2DType;
-        itk::RescaleIntensityImageFilter<TImageType, OutputImage3DType>::Pointer rescaler = itk::RescaleIntensityImageFilter<TImageType, OutputImage3DType>::New();
+        typename itk::RescaleIntensityImageFilter<TImageType, OutputImage3DType>::Pointer rescaler = itk::RescaleIntensityImageFilter<TImageType, OutputImage3DType>::New();
         rescaler->SetInput(itkImage);
         rescaler->SetOutputMinimum(0);
         rescaler->SetOutputMaximum(255);
@@ -491,7 +491,7 @@ static QString SaveImage(mitk::Image* image)
       {
         typedef typename TImageType::PixelType PixelType;
         typedef itk::Image<PixelType,2> OutputImage2DType;
-        itk::ImageSeriesWriter<TImageType, OutputImage2DType>::Pointer writer = itk::ImageSeriesWriter<TImageType, OutputImage2DType >::New();
+        typename itk::ImageSeriesWriter<TImageType, OutputImage2DType>::Pointer writer = itk::ImageSeriesWriter<TImageType, OutputImage2DType >::New();
         writer->SetInput( itkImage );
         int pos = fileName.findRev(".",fileName.length()-1);
         fileName.insert(pos,".%d");

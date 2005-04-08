@@ -30,20 +30,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 #ifndef __itkHistogram_h
 #include <itkHistogram.h>
-//
-//namespace itk{
-//  namespace Statistics{
-//
-//    template< class TFrequencyValue>
-//    class ITK_EXPORT DenseFrequencyContainer ;
-//
-//    template < class TMeasurement = float, unsigned int VMeasurementVectorSize = 1,
-//      class TFrequencyContainer = DenseFrequencyContainer< float > > 
-//      class ITK_EXPORT Histogram;
-//
-//    class Histogram<double>;
-//  }
-//}
 #endif 
 
 namespace mitk {

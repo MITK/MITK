@@ -16,6 +16,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
+#include "mitkHistogramGenerator.h"
 
 #include "mitkImage.h"
 
@@ -776,7 +777,7 @@ void mitk::Image::Initialize(const ipPicDescriptor* pic, int channels, int tDim,
   ComputeOffsetTable();
 
   // initialize level-window
-  m_LevelWindow.SetAuto( pic );
+  m_LevelWindow.SetAutoByPicTags( pic );
 
   m_Initialized = true;
 }
@@ -931,10 +932,13 @@ mitk::ImageDataItem::Pointer mitk::Image::AllocateChannelData(int n)
 
 //##ModelId=3E15F6C60103
 mitk::Image::Image() : 
-m_Dimension(0), m_Dimensions(NULL), m_OffsetTable(NULL),
-m_CompleteData(NULL), m_PixelType(NULL), m_Initialized(false)
+  m_Dimension(0), m_Dimensions(NULL), m_OffsetTable(NULL),
+  m_CompleteData(NULL), m_PixelType(NULL), m_Initialized(false),
+  m_ScalarMin(0), m_ScalarMax(0), m_Scalar2ndMin(0),m_Scalar2ndMax(0)
 {
-
+  mitk::HistogramGenerator::Pointer generator = mitk::HistogramGenerator::New();
+  m_HistogramGeneratorObject = generator;
+  generator->SetImage(this);
 }
 
 //##ModelId=3E15F6CA014F
@@ -953,18 +957,6 @@ unsigned int* mitk::Image::GetDimensions() const
 const mitk::LevelWindow& mitk::Image::GetLevelWindow() const
 {
   return m_LevelWindow;
-}
-
-//##ModelId=3ED91D060085
-float mitk::Image::GetScalarValueMin() const
-{
-  return -1.0f;
-}
-
-//##ModelId=3ED91D0600E2
-float mitk::Image::GetScalarValueMax() const
-{
-  return -1.0f;
 }
 
 void mitk::Image::Clear()
@@ -996,4 +988,62 @@ void mitk::Image::SetGeometry(Geometry3D* aGeometry3D)
 {
   Superclass::SetGeometry(aGeometry3D);
   m_Geometry3D->ImageGeometryOn();
+}
+
+const mitk::Image::HistogramType& mitk::Image::GetScalarHistogram() const
+{
+  mitk::HistogramGenerator* generator = static_cast<mitk::HistogramGenerator*>(m_HistogramGeneratorObject.GetPointer());
+  generator->ComputeHistogram();
+  const mitk::Image::HistogramType & histogram = *static_cast<const mitk::Image::HistogramType*>(generator->GetHistogram());
+
+  mitk::Image::HistogramType::ConstIterator it, histend;
+  histend = histogram.End();
+
+  bool first=true;
+  for(it=histogram.Begin();it!=histend;++it)
+  {
+    if(it.GetFrequency() > 0)
+    {
+      m_Scalar2ndMin = m_ScalarMin;
+      m_ScalarMin = it.GetMeasurementVector()[0];
+      if(first)
+        first = false;
+      else
+        break;
+    }
+  }
+  m_Scalar2ndMax = m_ScalarMax = m_ScalarMin;
+  for(;it!=histend;++it)
+  {
+    if(it.GetFrequency() > 0)
+    {
+      m_Scalar2ndMax = m_ScalarMax;
+      m_ScalarMax = it.GetMeasurementVector()[0];
+    }
+  }
+  return *static_cast<const mitk::Image::HistogramType*>(generator->GetHistogram());
+}
+
+mitk::ScalarType mitk::Image::GetScalarValueMin() const
+{
+  GetScalarHistogram();
+  return m_ScalarMin;
+}
+
+mitk::ScalarType mitk::Image::GetScalarValueMax() const
+{
+  GetScalarHistogram();
+  return m_ScalarMax;
+}
+
+mitk::ScalarType mitk::Image::GetScalarValue2ndMin() const
+{
+  GetScalarHistogram();
+  return m_Scalar2ndMin;
+}
+
+mitk::ScalarType mitk::Image::GetScalarValue2ndMax() const
+{
+  GetScalarHistogram();
+  return m_Scalar2ndMax;
 }

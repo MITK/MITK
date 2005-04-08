@@ -121,10 +121,10 @@ void QmitkStdMultiWidget::changeLayoutTo2DImagesUp()
   TwoDLayout ->addWidget( mitkWidget2 );
   TwoDLayout ->addWidget( mitkWidget3 );
 
-  if (mitkWidget1->isHidden()) mitkWidget1->show();
-  if (mitkWidget2->isHidden()) mitkWidget2->show();
-  if (mitkWidget3->isHidden()) mitkWidget3->show();
-  if (mitkWidget4->isHidden()) mitkWidget4->show();
+  if ( mitkWidget1->isHidden() ) mitkWidget1->show();
+  if ( mitkWidget2->isHidden() ) mitkWidget2->show();
+  if ( mitkWidget3->isHidden() ) mitkWidget3->show();
+  if ( mitkWidget4->isHidden() ) mitkWidget4->show();
 
   layout3->addLayout( TwoDLayout , 0, 0 );
   layout3->addWidget( mitkWidget4, 1, 0 );
@@ -154,10 +154,10 @@ void QmitkStdMultiWidget::changeLayoutTo2DImagesLeft()
   TwoDLayout ->addWidget( mitkWidget2 );
   TwoDLayout ->addWidget( mitkWidget3 );
 
-  if (mitkWidget1->isHidden()) mitkWidget1->show();
-  if (mitkWidget2->isHidden()) mitkWidget2->show();
-  if (mitkWidget3->isHidden()) mitkWidget3->show();
-  if (mitkWidget4->isHidden()) mitkWidget4->show();
+  if ( mitkWidget1->isHidden() ) mitkWidget1->show();
+  if ( mitkWidget2->isHidden() ) mitkWidget2->show();
+  if ( mitkWidget3->isHidden() ) mitkWidget3->show();
+  if ( mitkWidget4->isHidden() ) mitkWidget4->show();
 
   layout3->addLayout( TwoDLayout , 0, 0 );
   layout3->addWidget( mitkWidget4, 0,1 );
@@ -180,17 +180,17 @@ void QmitkStdMultiWidget::changeLayoutToDefault()
 
   mitkWidget1->setMaximumSize(2000,2000);
   mitkWidget2->setMaximumSize(2000,2000);
-  mitkWidget3->setMaximumSize(2000,2000);    
+  mitkWidget3->setMaximumSize(2000,2000);
 
   layout3->addWidget( mitkWidget1,0,0 );
   layout3->addWidget( mitkWidget2,0,1 );
   layout3->addWidget( mitkWidget3,1,0 );
   layout3->addWidget( mitkWidget4,1,1 );
 
-  if (mitkWidget1->isHidden()) mitkWidget1->show();
-  if (mitkWidget2->isHidden()) mitkWidget2->show();
-  if (mitkWidget3->isHidden()) mitkWidget3->show();
-  if (mitkWidget4->isHidden()) mitkWidget4->show();
+  if ( mitkWidget1->isHidden() ) mitkWidget1->show();
+  if ( mitkWidget2->isHidden() ) mitkWidget2->show();
+  if ( mitkWidget3->isHidden() ) mitkWidget3->show();
+  if ( mitkWidget4->isHidden() ) mitkWidget4->show();
 
   layout4->addLayout( layout3 );
   layout4->addWidget( levelWindowWidget );
@@ -208,8 +208,8 @@ void QmitkStdMultiWidget::changeLayoutToBig3D()
   QHBoxLayout *layout4 = new QHBoxLayout( 0, 0, 6, "layout4");
   mitkWidget1->hide();
   mitkWidget2->hide();
-  mitkWidget3->hide();	
-  if (mitkWidget4->isHidden()) mitkWidget4->show();
+  mitkWidget3->hide();
+  if ( mitkWidget4->isHidden() ) mitkWidget4->show();
 
   layout4->addWidget( mitkWidget4 );
   layout4->addWidget( levelWindowWidget );
@@ -229,13 +229,15 @@ void QmitkStdMultiWidget::changeLayoutToWidget1()
 
   mitkWidget2->hide();
   mitkWidget3->hide();
-  mitkWidget4->hide();	
-  if (mitkWidget1->isHidden()) mitkWidget1->show();
+  mitkWidget4->hide();
+  if ( mitkWidget1->isHidden() ) mitkWidget1->show();
 
   layout4->addWidget( mitkWidget1 );
   layout4->addWidget( levelWindowWidget );
   QmitkStdMultiWidgetLayout->addLayout( layout4 );
 }
+
+
 void QmitkStdMultiWidget::changeLayoutToWidget2()
 {
   delete QmitkStdMultiWidgetLayout ;
@@ -244,12 +246,12 @@ void QmitkStdMultiWidget::changeLayoutToWidget2()
   QmitkStdMultiWidgetLayout = new QHBoxLayout( this, 0, 0, "QmitkStdMultiWidgetLayout");
   QHBoxLayout *layout4 = new QHBoxLayout( 0, 0, 6, "layout4");
 
-  mitkWidget2->setMaximumSize(2000,2000);    
+  mitkWidget2->setMaximumSize(2000,2000);
 
   mitkWidget1->hide();
   mitkWidget3->hide();
-  mitkWidget4->hide();	
-  if (mitkWidget2->isHidden()) mitkWidget2->show();
+  mitkWidget4->hide();
+  if ( mitkWidget2->isHidden() ) mitkWidget2->show();
 
   layout4->addWidget( mitkWidget2 );
   layout4->addWidget( levelWindowWidget );
@@ -269,8 +271,8 @@ void QmitkStdMultiWidget::changeLayoutToWidget3()
 
   mitkWidget1->hide();
   mitkWidget2->hide();
-  mitkWidget4->hide();	
-  if (mitkWidget3->isHidden()) mitkWidget3->show();
+  mitkWidget4->hide();
+  if ( mitkWidget3->isHidden() ) mitkWidget3->show();
 
   layout4->addWidget( mitkWidget3 );
   layout4->addWidget( levelWindowWidget );
@@ -297,10 +299,10 @@ void QmitkStdMultiWidget::changeLayoutTo2x2Dand3DWidget()
   layout2->addWidget( mitkWidget4 );
   layout2->addWidget( levelWindowWidget );
 
-  if (mitkWidget1->isHidden()) mitkWidget1->show();
-  if (mitkWidget2->isHidden()) mitkWidget2->show();
-  if (!mitkWidget3->isHidden()) mitkWidget3->hide();
-  if (mitkWidget4->isHidden()) mitkWidget4->show();
+  if ( mitkWidget1->isHidden() ) mitkWidget1->show();
+  if ( mitkWidget2->isHidden() ) mitkWidget2->show();
+  if ( !mitkWidget3->isHidden() ) mitkWidget3->hide();
+  if ( mitkWidget4->isHidden() ) mitkWidget4->show();
 
   QmitkStdMultiWidgetLayout->addLayout( layout2 );
 }
@@ -315,8 +317,8 @@ void QmitkStdMultiWidget::changeLayoutToRowWidget3And4()
 
   mitkWidget1->hide();
   mitkWidget2->hide();
-  if (mitkWidget3->isHidden()) mitkWidget3->show();
-  if (mitkWidget4->isHidden()) mitkWidget4->show();
+  if ( mitkWidget3->isHidden() ) mitkWidget3->show();
+  if ( mitkWidget4->isHidden() ) mitkWidget4->show();
 
   mitkWidget3->setMaximumSize(2000,2000);
   mitkWidget4->setMaximumSize(2000,2000);
@@ -339,8 +341,8 @@ void QmitkStdMultiWidget::changeLayoutToColumnWidget3And4()//doesn't work yet
 
   mitkWidget1->hide();
   mitkWidget2->hide();
-  if (mitkWidget3->isHidden()) mitkWidget3->show();
-  if (mitkWidget4->isHidden()) mitkWidget4->show();
+  if ( mitkWidget3->isHidden() ) mitkWidget3->show();
+  if ( mitkWidget4->isHidden() ) mitkWidget4->show();
 
   mitkWidget3->setMaximumSize(2000,2000);
   mitkWidget4->setMaximumSize(2000,2000);
@@ -372,13 +374,13 @@ void QmitkStdMultiWidget::Fit()
   int w=vtkObject::GetGlobalWarningDisplay();
   vtkObject::GlobalWarningDisplayOff();
   vtkrenderer = ((mitk::OpenGLRenderer*)(mitkWidget1->GetRenderer()))->GetVtkRenderer();
-  if(vtkrenderer!=NULL) vtkrenderer->ResetCamera();
+  if ( vtkrenderer!=NULL ) vtkrenderer->ResetCamera();
   vtkrenderer = ((mitk::OpenGLRenderer*)(mitkWidget2->GetRenderer()))->GetVtkRenderer();
-  if(vtkrenderer!=NULL) vtkrenderer->ResetCamera();
+  if ( vtkrenderer!=NULL ) vtkrenderer->ResetCamera();
   vtkrenderer = ((mitk::OpenGLRenderer*)(mitkWidget3->GetRenderer()))->GetVtkRenderer();
-  if(vtkrenderer!=NULL) vtkrenderer->ResetCamera();
+  if ( vtkrenderer!=NULL ) vtkrenderer->ResetCamera();
   vtkrenderer = ((mitk::OpenGLRenderer*)(mitkWidget4->GetRenderer()))->GetVtkRenderer();
-  if(vtkrenderer!=NULL) vtkrenderer->ResetCamera();
+  if ( vtkrenderer!=NULL ) vtkrenderer->ResetCamera();
   vtkObject::SetGlobalWarningDisplay(w);
 }
 
@@ -452,7 +454,7 @@ bool QmitkStdMultiWidget::InitializeStandardViews(mitk::DataTreeIteratorBase * i
   sliceNavigatorSagittal->SetViewDirection(mitk::SliceNavigationController::Sagittal);
   sliceNavigatorFrontal->SetViewDirection(mitk::SliceNavigationController::Frontal);
 
-  if(it==NULL)
+  if ( it==NULL )
   {
     multiplexUpdateController->SetBlockUpdate(true);
     sliceNavigatorTransversal->Update();
@@ -465,15 +467,15 @@ bool QmitkStdMultiWidget::InitializeStandardViews(mitk::DataTreeIteratorBase * i
   else
   {
     const mitk::BoundingBox::Pointer boundingbox = mitk::DataTree::ComputeVisibleBoundingBox(it, NULL, "includeInBoundingBox");
-    if(boundingbox->GetPoints()->Size()>0)
-    { 
+    if ( boundingbox->GetPoints()->Size()>0 )
+    {
       mitk::Geometry3D::Pointer geometry = mitk::Geometry3D::New();
       geometry->Initialize();
       geometry->SetBounds(boundingbox->GetBounds());
 
       //lets see if we have data with a limited live-span ...
       mitk::TimeBounds timebounds = mitk::DataTree::ComputeTimeBoundsInMS(it, NULL, "includeInBoundingBox");
-      if(timebounds[1]<mitk::ScalarTypeNumericTraits::max())
+      if ( timebounds[1]<mitk::ScalarTypeNumericTraits::max() )
       {
         mitk::ScalarType duration = timebounds[1]-timebounds[0];
 
@@ -488,7 +490,7 @@ bool QmitkStdMultiWidget::InitializeStandardViews(mitk::DataTreeIteratorBase * i
       }
 
       double diagonalLength  = const_cast<mitk::BoundingBox*>(geometry->GetBoundingBox())->GetDiagonalLength2();
-      if((diagonalLength > mitk::eps) && (diagonalLength < mitk::large))
+      if ( (diagonalLength > mitk::eps) && (diagonalLength < mitk::large) )
       {
         boundingBoxInitialized=true;
         multiplexUpdateController->SetBlockUpdate(true);
@@ -518,7 +520,7 @@ bool QmitkStdMultiWidget::InitializeStandardViews( mitk::Geometry3D * geometry )
   sliceNavigatorSagittal->SetViewDirection(mitk::SliceNavigationController::Sagittal);
   sliceNavigatorFrontal->SetViewDirection(mitk::SliceNavigationController::Frontal);
 
-  if((geometry==NULL) || (const_cast<mitk::BoundingBox*>(geometry->GetBoundingBox())->GetDiagonalLength2()<mitk::eps))
+  if ( (geometry==NULL) || (const_cast<mitk::BoundingBox*>(geometry->GetBoundingBox())->GetDiagonalLength2()<mitk::eps) )
   {
     multiplexUpdateController->SetBlockUpdate(true);
     sliceNavigatorTransversal->Update();
@@ -540,16 +542,16 @@ bool QmitkStdMultiWidget::InitializeStandardViews( mitk::Geometry3D * geometry )
     multiplexUpdateController->SetBlockUpdate(false);
     multiplexUpdateController->UpdateRequest();
     Fit();
-    boundingBoxInitialized=true; 
+    boundingBoxInitialized=true;
   }
   return boundingBoxInitialized;
 }
 
 void QmitkStdMultiWidget::Repaint()
 {
-  mitkWidget1->GetRenderer()->GetRenderWindow()->Repaint(); 
-  mitkWidget2->GetRenderer()->GetRenderWindow()->Repaint(); 
-  mitkWidget3->GetRenderer()->GetRenderWindow()->Repaint(); 
+  mitkWidget1->GetRenderer()->GetRenderWindow()->Repaint();
+  mitkWidget2->GetRenderer()->GetRenderWindow()->Repaint();
+  mitkWidget3->GetRenderer()->GetRenderWindow()->Repaint();
   mitkWidget4->GetRenderer()->GetRenderWindow()->Repaint();
 }
 
@@ -606,21 +608,37 @@ QmitkRenderWindow* QmitkStdMultiWidget::GetRenderWindow4() const
 void QmitkStdMultiWidget::changeLevelWindow(mitk::LevelWindow* lw)
 {
   mitk::DataTreeIteratorClone it = mitkWidget1->GetRenderer()->GetData();
-  while(!it->IsAtEnd())
+  int maxLayer = itk::NumericTraits<int>::min();
+  mitk::LevelWindowProperty::Pointer topLevWinProp = NULL;
+  while ( !it->IsAtEnd() )
   {
-    mitk::LevelWindowProperty::Pointer levWinProp = dynamic_cast<mitk::LevelWindowProperty*>(it->Get()->GetPropertyList()->GetProperty("levelwindow").GetPointer());
-    if( levWinProp.IsNotNull() )
+    if ( it->Get()->IsVisible(NULL) )
     {
-      mitk::LevelWindow levWin = levWinProp->GetLevelWindow();
-
-      levWin.SetMin(lw->GetMin());
-      levWin.SetMax(lw->GetMax());
-      levWin.SetRangeMin(lw->GetRangeMin());
-      levWin.SetRangeMax(lw->GetRangeMax());
-
-      levWinProp->SetLevelWindow(levWin);
+      int layer = 0;
+      it->Get()->GetIntProperty("layer", layer);
+      if ( layer > maxLayer )
+      {
+        mitk::LevelWindowProperty::Pointer levWinProp = dynamic_cast<mitk::LevelWindowProperty*>(it->Get()->GetProperty("levelwindow").GetPointer());
+        if (levWinProp.IsNotNull())
+        {
+          topLevWinProp = levWinProp;
+          maxLayer = layer;
+        }
+      }
     }
     ++it;
   }
-  Repaint();
-}
+  if ( topLevWinProp.IsNotNull() )
+  {
+    mitk::LevelWindow levWin = topLevWinProp->GetLevelWindow();
+
+    levWin.SetMin(lw->GetMin());
+    levWin.SetMax(lw->GetMax());
+    levWin.SetRangeMin(lw->GetRangeMin());
+    levWin.SetRangeMax(lw->GetRangeMax());
+
+    topLevWinProp->SetLevelWindow(levWin);
+    Repaint();
+  }
+} // changeLevelWindow()
+

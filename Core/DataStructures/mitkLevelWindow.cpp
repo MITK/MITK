@@ -22,163 +22,114 @@ PURPOSE.  See the above copyright notices for more information.
 #include <ipFunc/ipFunc.h>
 #include <algorithm>
 
-//##ModelId=3ED91D060288
-mitk::LevelWindow::LevelWindow(float level, float window) : m_Min(level-window/2.0), m_Max(level+window/2.0), m_RangeMin(-1024), m_RangeMax(4096)
+mitk::LevelWindow::LevelWindow(mitk::ScalarType level, mitk::ScalarType window) : m_Min(level-window/2.0), m_Max(level+window/2.0), m_RangeMin(-1024), m_RangeMax(4096)
 {
 
 }
 
-//##ModelId=3ED91D060298
 mitk::LevelWindow::LevelWindow(const mitk::LevelWindow& levWin)
 {
-    *this=levWin;
+  *this=levWin;
 }
 
-//##ModelId=3ED91D06029A
 mitk::LevelWindow::~LevelWindow()
 {
 }
 
-//##ModelId=3E0B12640203
-float mitk::LevelWindow::GetLevel() const
+mitk::ScalarType mitk::LevelWindow::GetLevel() const
 {
-	return (m_Max-m_Min)/2.0 + m_Min;
+  return (m_Max-m_Min)/2.0 + m_Min;
 }
 
-//##ModelId=3E0B12960165
-float mitk::LevelWindow::GetWindow() const
+mitk::ScalarType mitk::LevelWindow::GetWindow() const
 {
-	return (m_Max-m_Min);
+  return (m_Max-m_Min);
 }
 
-//##ModelId=3E0B130203B9
-float mitk::LevelWindow::GetMin() const
+mitk::ScalarType mitk::LevelWindow::GetMin() const
 {
-	return m_Min;
+  return m_Min;
 }
 
-//##ModelId=3E0B130A0049
-float mitk::LevelWindow::GetMax() const
+mitk::ScalarType mitk::LevelWindow::GetMax() const
 {
-	return m_Max;
+  return m_Max;
 }
 
-//##ModelId=3E0B130E037A
-void mitk::LevelWindow::SetLevel(float level)
+void mitk::LevelWindow::SetLevel(mitk::ScalarType level)
 {
-	float halfWindow = (m_Max - m_Min) / 2;
-	m_Min = level - halfWindow;
-	m_Max = level + halfWindow;
-	//double window = GetWindow();
+  mitk::ScalarType halfWindow = (m_Max - m_Min) / 2;
+  m_Min = level - halfWindow;
+  m_Max = level + halfWindow;
 
-	//m_Min = level - window / 2.0;
-	//m_Max = level + window / 2.0;
-
-	testValues();
-	//if( m_Min < m_RangeMin )
- //   {
-	//	m_Min = m_RangeMin;
-	//	m_Max = m_Min + window;
- //   }
-	//if( m_Max > m_RangeMax )
- //   {
-	//	m_Max = m_RangeMax;
-	//	m_Min = m_Max - window;
- //   }
+  testValues();
 }
 
-//##ModelId=3E0B131C0168
-void mitk::LevelWindow::SetWindow(float window)
+void mitk::LevelWindow::SetWindow(mitk::ScalarType window)
 {
-	float level = m_Min + (m_Max - m_Min) / 2;	
-	float halfWindow = window / 2;
+  mitk::ScalarType level = m_Min + (m_Max - m_Min) / 2;
+  mitk::ScalarType halfWindow = window / 2;
 
-	m_Min = level - halfWindow;
-	m_Max = level + halfWindow;
-	testValues();
+  m_Min = level - halfWindow;
+  m_Max = level + halfWindow;
 
-	//double level = GetLevel();
-
-	//m_Min = level - window / 2.0;
-	//m_Max = level + window / 2.0;
-
-	//testValues();
-
+  testValues();
 }
 
-//##ModelId=3E0B132303A3
-void mitk::LevelWindow::SetLevelWindow(float level, float window)
+void mitk::LevelWindow::SetLevelWindow(mitk::ScalarType level, mitk::ScalarType window)
 {
-	m_Min = level - window / 2.0;
-	m_Max = level + window / 2.0;
+  m_Min = level - window / 2.0;
+  m_Max = level + window / 2.0;
 
-	testValues();
-	//if( m_Min < m_RangeMin )
- //   {
-	//	m_Min = m_RangeMin;
-	//	m_Max = m_Min + window;
- //   }
-	//if( m_Max > m_RangeMax )
- //   {
-	//	m_Max = m_RangeMax;
-	//	m_Min = m_Max - window;
- //   }
+  testValues();
 }
 
-//##ModelId=3E0B13320187
-void mitk::LevelWindow::SetMin(float min)
+void mitk::LevelWindow::SetMin(mitk::ScalarType min)
 {
-	m_Min = min;
-	testValues(); 
+  m_Min = min;
+  testValues(); 
 }
 
-//##ModelId=3E0B1339006F
-void mitk::LevelWindow::SetMax(float max)
+void mitk::LevelWindow::SetMax(mitk::ScalarType max)
 {
-	m_Max = max	;
-	testValues();
+  m_Max = max;
+  testValues();
 }
 
-//##ModelId=3E0B133D0292
-void mitk::LevelWindow::SetMinMax(float min, float max)
+void mitk::LevelWindow::SetMinMax(mitk::ScalarType min, mitk::ScalarType max)
 {
-	if(min>max)
-		std::swap(min,max);
+  if(min>max)
+    std::swap(min,max);
 
-	SetMin(min);
-	SetMax(max);
+  SetMin(min);
+  SetMax(max);
 }
 
-//##ModelId=3EA969CD005D
-void mitk::LevelWindow::SetRangeMin(float min)
+void mitk::LevelWindow::SetRangeMin(mitk::ScalarType min)
 {
-	m_RangeMin = min;
-	testValues();
+  m_RangeMin = min;
+  testValues();
 }
 
-//##ModelId=3EA969CD0067
-void mitk::LevelWindow::SetRangeMax(float max)
+void mitk::LevelWindow::SetRangeMax(mitk::ScalarType max)
 {
-		m_RangeMax = max;
-		testValues();
+  m_RangeMax = max;
+  testValues();
 }
 
-//##ModelId=3EA969CD0069
-float mitk::LevelWindow::GetRangeMin() const
+mitk::ScalarType mitk::LevelWindow::GetRangeMin() const
 {
-	return m_RangeMin;
+  return m_RangeMin;
 }
 
-//##ModelId=3EA969CD006B
-float mitk::LevelWindow::GetRangeMax() const
+mitk::ScalarType mitk::LevelWindow::GetRangeMax() const
 {
-	return m_RangeMax;
+  return m_RangeMax;
 }
 
-//##ModelId=3EA969CD0072
-float mitk::LevelWindow::GetRange() const
+mitk::ScalarType mitk::LevelWindow::GetRange() const
 {
-	return  (m_RangeMax > 0) ? (m_RangeMax - m_RangeMin) : (m_RangeMin - m_RangeMax);
+  return  (m_RangeMax > 0) ? (m_RangeMax - m_RangeMin) : (m_RangeMin - m_RangeMax);
 }
 
 void mitk::LevelWindow::SetAuto(mitk::Image* image, bool tryPicTags)
@@ -194,80 +145,66 @@ void mitk::LevelWindow::SetAuto(mitk::Image* image, bool tryPicTags)
   SetMinMax(image->GetScalarValue2ndMin(), image->GetScalarValue2ndMax());
 }
 
-//##ModelId=3EF1627601A9
 bool mitk::LevelWindow::SetAutoByPicTags(const ipPicDescriptor* aPic)
 {
   ipPicDescriptor* pic = const_cast<ipPicDescriptor*>(aPic);
-    if ( pic == NULL )
-    {
-        return false;
-    }
-    ipPicTSV_t *tsv = ipPicQueryTag( pic, "LEVEL/WINDOW" );
-	if( tsv != NULL )
-	{
-		double level;
-		double window;
-        #define GET_C_W( type, tsv, C, W )			\
-		level = ((type *)tsv->value)[0];    \
-		window = ((type *)tsv->value)[1];
-		
-		ipPicFORALL_2( GET_C_W, tsv, level, window );
+  if ( pic == NULL )
+  {
+    return false;
+  }
+  ipPicTSV_t *tsv = ipPicQueryTag( pic, "LEVEL/WINDOW" );
+  if( tsv != NULL )
+  {
+    double level;
+    double window;
+    #define GET_C_W( type, tsv, C, W )    \
+      level = ((type *)tsv->value)[0];    \
+      window = ((type *)tsv->value)[1];
 
-		SetLevelWindow( level, window );
+    ipPicFORALL_2( GET_C_W, tsv, level, window );
+
+    SetLevelWindow( level, window );
     return true;
-	}
+  }
   return false;
 }
 
-/*!
- * \brief equality operator inplementation
- */
-//##ModelId=3EA969CD0074
 bool mitk::LevelWindow::operator==(const mitk::LevelWindow& levWin) const
 {
-		if ( m_RangeMin == levWin.GetRangeMin() && 
-			 m_RangeMax == levWin.GetRangeMax() && 
-			 m_Min == levWin.GetMin() && m_Max == levWin.GetMax()) {
-         
-				 return true;
-			 }
-		else {
-			return false;	
-		}
+  if ( m_RangeMin == levWin.GetRangeMin() && 
+    m_RangeMax == levWin.GetRangeMax() && 
+    m_Min == levWin.GetMin() && m_Max == levWin.GetMax()) {
+
+      return true;
+    }
+  else {
+    return false;
+  }
 }
 
-/*!
- * \brief equality operator inplementation
- */
-//##ModelId=3EA969CD007C
 bool mitk::LevelWindow::operator!=(const mitk::LevelWindow& levWin) const
 {
-		if ( m_RangeMin == levWin.GetRangeMin() && 
-			 m_RangeMax == levWin.GetRangeMax() && 
-			 m_Min == levWin.GetMin() && m_Max == levWin.GetMax()) {
-         
-				 return false;
-			 }
-		else {
-			return true;	
-		}
+  if ( m_RangeMin == levWin.GetRangeMin() && 
+    m_RangeMax == levWin.GetRangeMax() && 
+    m_Min == levWin.GetMin() && m_Max == levWin.GetMax()) {
+
+      return false;
+    }
+  else {
+    return true;
+  }
 }
 
-/*!
- * \brief non equality operator inplementation
- */
-//##ModelId=3EA969CD007F
 mitk::LevelWindow& mitk::LevelWindow::operator=(const mitk::LevelWindow& levWin)
 {
-	if (this == &levWin) {
-		return *this;
-	}
-	else {
-		m_RangeMin = levWin.GetRangeMin();
-		m_RangeMax = levWin.GetRangeMax();
-		m_Min= levWin.GetMin();
-		m_Max= levWin.GetMax();
-		return *this;
-	}
+  if (this == &levWin) {
+    return *this;
+  }
+  else {
+    m_RangeMin = levWin.GetRangeMin();
+    m_RangeMax = levWin.GetRangeMax();
+    m_Min= levWin.GetMin();
+    m_Max= levWin.GetMax();
+    return *this;
+  }
 }
-

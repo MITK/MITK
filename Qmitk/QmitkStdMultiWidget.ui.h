@@ -616,7 +616,7 @@ void QmitkStdMultiWidget::changeLevelWindow(mitk::LevelWindow* lw)
     {
       int layer = 0;
       it->Get()->GetIntProperty("layer", layer);
-      if ( layer > maxLayer )
+      if ( layer >= maxLayer )
       {
         mitk::LevelWindowProperty::Pointer levWinProp = dynamic_cast<mitk::LevelWindowProperty*>(it->Get()->GetProperty("levelwindow").GetPointer());
         if (levWinProp.IsNotNull())

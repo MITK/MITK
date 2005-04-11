@@ -23,7 +23,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <chili/plugin.h>
 #include <chili/qclightbox.h>
 #include <chili/isg.h>
-#include <ipDicom/ipDicom.h>
 #endif
 
 #include <mitkImage.h>

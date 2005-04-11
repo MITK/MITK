@@ -71,7 +71,7 @@ int mitkImageTimeSelectorTest(int argc, char* argv[])
   mitk::ImageTimeSelector::Pointer timeSelector = mitk::ImageTimeSelector::New();
   timeSelector->SetInput(image);
 	timeSelector->SetTimeNr( 0 );
-  timeSelector->Update();
+  timeSelector->UpdateLargestPossibleRegion();
   mitk::Image::Pointer result = timeSelector->GetOutput();
 
   std::cout << "Testing IsInitialized(): ";

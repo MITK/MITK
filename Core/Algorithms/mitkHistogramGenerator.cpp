@@ -52,8 +52,8 @@ void InternalCompute(itk::Image< TPixel, VImageDimension >* itkImage, const mitk
   histogramGenerator->SetMarginalScale( 10.0 );
   histogramGenerator->Compute();
   
-  const HistogramGeneratorType::HistogramType* generatedHistogram = histogramGenerator->GetOutput();
-  HistogramGeneratorType::HistogramType::SizeType size = generatedHistogram->GetSize();
+  const typename HistogramGeneratorType::HistogramType* generatedHistogram = histogramGenerator->GetOutput();
+  typename HistogramGeneratorType::HistogramType::SizeType size = generatedHistogram->GetSize();
   histogram.Initialize(size);
   unsigned int i, j;
   for ( i = 0 ; i < HistogramGeneratorType::HistogramType::MeasurementVectorSize ; i++)

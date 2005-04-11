@@ -395,6 +395,10 @@ protected:
   //##ModelId=3E15F6CA014F
   ~Image();
 
+  //##Documentation
+  //## @warning Has to be called by every Initialize method!
+  virtual void Initialize();
+
   //##ModelId=3E0B7B3C0245
   mutable ImageDataItemPointerArray m_Channels;
   //##ModelId=3E0B7B3C0263
@@ -420,6 +424,7 @@ protected:
   mitk::LevelWindow m_LevelWindow;
 
   mutable itk::Object::Pointer m_HistogramGeneratorObject;
+  mutable itk::Object::Pointer m_SliceSelectorForHistogramObject;
 
   mutable ScalarType m_ScalarMin;
   mutable ScalarType m_ScalarMax;

@@ -25,9 +25,27 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkPlaneGeometry.h"
 #include "mitkPicHelper.h"
 
+#include "mitkImageSliceSelector.h"
+
 #include "ipFunc/ipFunc.h"
 
 #include <vtkImageData.h>
+
+mitk::Image::Image() : 
+  m_Dimension(0), m_Dimensions(NULL), m_OffsetTable(NULL),
+  m_CompleteData(NULL), m_PixelType(NULL), m_Initialized(false),
+  m_ScalarMin(0), m_ScalarMax(0), m_Scalar2ndMin(0), m_Scalar2ndMax(0), m_SliceSelectorForHistogramObject(NULL)
+{
+  mitk::HistogramGenerator::Pointer generator = mitk::HistogramGenerator::New();
+  m_HistogramGeneratorObject = generator;
+  generator->SetImage(this);
+}
+
+//##ModelId=3E15F6CA014F
+mitk::Image::~Image()
+{
+  Clear();
+}
 
 //##ModelId=3DCBC2B50345
 const mitk::PixelType& mitk::Image::GetPixelType(int n) const
@@ -541,6 +559,29 @@ bool mitk::Image::SetPicChannel(const ipPicDescriptor *pic, int n)
     return false;
 }
 
+void mitk::Image::Initialize()
+{
+  mitk::HistogramGenerator* generator = static_cast<mitk::HistogramGenerator*>(m_HistogramGeneratorObject.GetPointer());
+#ifdef DEBUG
+  if((GetDimension() > 2) && ((GetDimension(2) > 5)))
+  {
+    if(m_SliceSelectorForHistogramObject.IsNull())
+      m_SliceSelectorForHistogramObject = mitk::ImageSliceSelector::New();
+
+    mitk::ImageSliceSelector* sliceSelector;
+    sliceSelector = static_cast<mitk::ImageSliceSelector*>(m_SliceSelectorForHistogramObject.GetPointer());
+    sliceSelector->SetInput(this);
+    sliceSelector->SetSliceNr(GetDimension(2)/2);
+    generator->SetImage(sliceSelector->GetOutput());
+  }
+  else
+#endif
+  {
+    generator->SetImage(this);
+    m_SliceSelectorForHistogramObject = NULL;
+  }
+}
+
 //##ModelId=3E102AE9004B
 void mitk::Image::Initialize(const mitk::PixelType& type, unsigned int dimension, unsigned int *dimensions, unsigned int channels)
 {
@@ -599,6 +640,8 @@ void mitk::Image::Initialize(const mitk::PixelType& type, unsigned int dimension
   m_Slices.assign(GetNumberOfChannels()*m_Dimensions[3]*m_Dimensions[2], dnull);
 
   ComputeOffsetTable();
+
+  Initialize();
 
   m_Initialized = true;
 }
@@ -779,6 +822,8 @@ void mitk::Image::Initialize(const ipPicDescriptor* pic, int channels, int tDim,
   // initialize level-window
   m_LevelWindow.SetAutoByPicTags( pic );
 
+  Initialize();
+
   m_Initialized = true;
 }
 
@@ -928,23 +973,6 @@ mitk::ImageDataItem::Pointer mitk::Image::AllocateChannelData(int n)
   ImageDataItemPointer ch=new ImageDataItem(m_PixelType, m_Dimension, m_Dimensions);
   m_Channels[n]=ch;
   return ch;
-}
-
-//##ModelId=3E15F6C60103
-mitk::Image::Image() : 
-  m_Dimension(0), m_Dimensions(NULL), m_OffsetTable(NULL),
-  m_CompleteData(NULL), m_PixelType(NULL), m_Initialized(false),
-  m_ScalarMin(0), m_ScalarMax(0), m_Scalar2ndMin(0),m_Scalar2ndMax(0)
-{
-  mitk::HistogramGenerator::Pointer generator = mitk::HistogramGenerator::New();
-  m_HistogramGeneratorObject = generator;
-  generator->SetImage(this);
-}
-
-//##ModelId=3E15F6CA014F
-mitk::Image::~Image()
-{
-  Clear();
 }
 
 //##ModelId=3E1A11530384

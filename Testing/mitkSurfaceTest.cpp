@@ -19,7 +19,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkSurface.h"
 #include "mitkCommon.h"
-//#include "mitkBoundingBox.h"
+#include "mitkVector.h"
+#include "mitkTimeSlicedGeometry.h"
 
 #include "vtkPolyData.h"
 #include "vtkSphereSource.h"
@@ -161,6 +162,26 @@ int mitkSurfaceTest(int argc, char* argv[])
     std::cout<<"[PASSED]"<<std::endl;
   }
   
+  std::cout << "Testing correctness of geometry for surface->GetUpdatedGeometry(): ";
+  const mitk::TimeSlicedGeometry* inputTimeGeometry = dynamic_cast< const mitk::TimeSlicedGeometry* >( surface->GetUpdatedGeometry() );
+
+  int time = 3;
+  int timestep=0;
+  timestep = inputTimeGeometry->MSToTimeStep( time );
+
+  std::cout << "time: "<< time << std::endl;
+  std::cout << "timestep: "<<timestep << std::endl;
+
+  if (time != timestep)
+  {
+    std::cout<<"[FAILED]"<<std::endl;
+    return EXIT_FAILURE;
+  }
+  else 
+  {
+    std::cout<<"[PASSED]"<<std::endl;
+  }
+
   //std::cout << "Testing mitk::Surface::*TESTED_METHOD_DESCRIPTION: ";
   //// METHOD_TEST_CODE
   //if (surface.IsNull()) {

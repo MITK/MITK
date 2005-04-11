@@ -151,7 +151,7 @@ void BoundingObjectCutter::GenerateOutputInformation()
   mitk::SlicedGeometry3D* slicedGeometry = output->GetSlicedGeometry();
   const mitk::SlicedData::IndexType& start = m_InputRequestedRegion.GetIndex();
   mitk::Vector3D vector; vtk2itk(start, vector);
-  slicedGeometry->TransferVtkToItkTransform();
+  slicedGeometry->Translate(vector);
 
   mitk::TimeSlicedGeometry* timeSlicedGeometry = output->GetTimeSlicedGeometry();
   timeSlicedGeometry->InitializeEvenlyTimed(slicedGeometry, output->GetDimension(3));

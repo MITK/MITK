@@ -51,7 +51,6 @@ bool QmitkTreeNodeSelector::IsImageNode( mitk::DataTreeNode * node )
     return node && node->GetData() && dynamic_cast<mitk::Image*>(node->GetData());
 }
 
-
 void QmitkTreeNodeSelector::init()
 {
    m_FilterFunction = QmitkTreeNodeSelector::IsImageNode;
@@ -62,3 +61,4 @@ void QmitkTreeNodeSelector::TreeNodeSelected( const QString &name )
 {
    emit Activated(m_TreeNodes[name.ascii()]);
 }
+

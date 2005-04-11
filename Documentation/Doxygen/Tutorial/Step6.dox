@@ -3,8 +3,10 @@
  \page Step6Page Step 6 - Use an interactive region-grower
  
  In this step the program is enhanced by the possibility to start a region-grower at interactively added points.
- We will see how MITK images can be accessed as ITK images.\n\n
+ We will see how MITK images can be accessed as ITK images.\n
+ In this step we only load the image file as the surface will be the result of the region growing .
  
+ \image html step6_result.png 
  
  The source is now split among several files:
  
@@ -12,7 +14,6 @@
  \li \ref Step6.h "Step6.h"\n 
  \li \ref Step6main.cpp "Step6main.cpp"
  
-
  The class Step6 inherits from QMainWindow and provides methods for setting up the widgets and for performing a region-growing.\n\n
  
  \dontinclude Step6.cpp
@@ -48,7 +49,7 @@ Then call the access method:
 AccessByItk(mitkImage, MyAccessMethod, ...)
 \endcode
 
-In this step our access method is called RegionGrowing:
+In this step our access method is called RegionGrowing():
 \skipline template
 \until }
 \until }

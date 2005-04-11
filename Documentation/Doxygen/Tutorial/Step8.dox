@@ -2,6 +2,12 @@
  
  \page Step8Page Step 8 - Use QmitkStdMultiWidget as widget
  
+ In this step a QmitkStdMultiWidget is used. It offers four views on the data.
+ From top left to bottom the views are initialized as transversal, sagittal and coronar. The bottom right view is initialized as 3D view.
+ 
+ \image html step8_result.png 
+ 
+
  \li \ref Step8.cpp "Step8.cpp"\n 
  
  \dontinclude Step8.cpp 

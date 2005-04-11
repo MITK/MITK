@@ -62,6 +62,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkEventMapper.h>
 #include <mitkGlobalInteraction.h>
 #include <mitkUSLookupTableSource.h>
+#include <mitkConfig.h>
 
 #ifdef MBI_INTERNAL
   #include <mitkVesselTreeFileReader.h>

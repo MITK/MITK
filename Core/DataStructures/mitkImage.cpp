@@ -562,8 +562,8 @@ bool mitk::Image::SetPicChannel(const ipPicDescriptor *pic, int n)
 void mitk::Image::Initialize()
 {
   mitk::HistogramGenerator* generator = static_cast<mitk::HistogramGenerator*>(m_HistogramGeneratorObject.GetPointer());
-#ifdef DEBUG
-  if((GetDimension() > 2) && ((GetDimension(2) > 5)))
+//#if DEBUG || _DEBUG
+  if((GetDimension() > 2))// && ((GetDimension(2) > 5)))
   {
     if(m_SliceSelectorForHistogramObject.IsNull())
       m_SliceSelectorForHistogramObject = mitk::ImageSliceSelector::New();
@@ -575,7 +575,7 @@ void mitk::Image::Initialize()
     generator->SetImage(sliceSelector->GetOutput());
   }
   else
-#endif
+//#endif
   {
     generator->SetImage(this);
     m_SliceSelectorForHistogramObject = NULL;

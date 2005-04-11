@@ -189,12 +189,13 @@ void QmitkMainTemplate::fileOpenGetFactoryOutput( mitk::DataTreeNodeFactory & fa
     {
       m_StandardViewsInitialized = mitkMultiWidget->InitializeStandardViews(&it);
 
-      if ( firstImage->GetDimension() == 2 )
-      {
-        // layoutGroup->selected(Widget1); // why does this not compile -Ingmar?
-        // Widget1->activate();
-        mitkMultiWidget->changeLayoutToWidget1();
-      }
+      if (firstImage!=NULL)
+        if ( firstImage->GetDimension() == 2 )
+        {
+          // layoutGroup->selected(Widget1); // why does this not compile -Ingmar?
+          // Widget1->activate();
+          mitkMultiWidget->changeLayoutToWidget1();
+        }
     }
     mitkMultiWidget->Repaint();
     mitkMultiWidget->Fit();

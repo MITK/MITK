@@ -76,12 +76,18 @@ void mitk::HistogramGenerator::ComputeHistogram()
   {
     if(m_Histogram.IsNull())
       m_Histogram = HistogramType::New();
+    const_cast<mitk::Image*>(m_Image.GetPointer())->SetRequestedRegionToLargestPossibleRegion(); //@todo without this, Image::GetScalarMin does not work for dim==3 (including sliceselector!)
+    const_cast<mitk::Image*>(m_Image.GetPointer())->Update();
     AccessByItk_2(m_Image, InternalCompute, this, *m_Histogram);
     m_Histogram->Modified();
   }
 
 // debug code
   /*
+    std::cout << "Histogram modfied 1" << m_Histogram->GetMTime() << std::endl;
+    m_Histogram->Modified();
+    std::cout << "Histogram modfied 2" << m_Histogram->GetMTime() << std::endl;
+    std::cout << "Image modfied" << m_Image->GetMTime() << std::endl;
   const unsigned int histogramSize = m_Histogram->Size();
 
   std::cout << "Histogram size " << histogramSize << std::endl;

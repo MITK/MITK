@@ -53,7 +53,7 @@ void mitk::PlaneLandmarkProjector::ProjectLandmarks(
   mitk::Point3D point;
   mitk::Point3D projectedPoint;
 
-  int size=targetLandmarks->Size();
+  unsigned int size=targetLandmarks->Size();
   m_ProjectedLandmarks->Reserve(size);
   for(id=0, pointiterator=start;id<size;++id, ++pointiterator)
   { 

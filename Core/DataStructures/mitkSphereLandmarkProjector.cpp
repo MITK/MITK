@@ -69,7 +69,7 @@ void mitk::SphereLandmarkProjector::ComputeCompleteAbstractTransform()
 void mitk::SphereLandmarkProjector::ProjectLandmarks(
   const mitk::PointSet::DataType::PointsContainer* targetLandmarks)
 {
-  int size=targetLandmarks->Size();
+  unsigned int size=targetLandmarks->Size();
   mitk::PointSet::DataType::PointsContainer::ConstIterator pointiterator, start = targetLandmarks->Begin();
   mitk::PointSet::DataType::PointsContainer::ElementIdentifier id;
 

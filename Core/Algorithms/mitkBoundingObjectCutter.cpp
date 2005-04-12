@@ -150,8 +150,11 @@ void BoundingObjectCutter::GenerateOutputInformation()
   // Position the output Image to match the corresponding region of the input image
   mitk::SlicedGeometry3D* slicedGeometry = output->GetSlicedGeometry();
   const mitk::SlicedData::IndexType& start = m_InputRequestedRegion.GetIndex();
-  mitk::Vector3D vector; vtk2itk(start, vector);
-  slicedGeometry->Translate(vector);
+  mitk::Point3D origin; vtk2itk(start, origin);
+  slicedGeometry->IndexToWorld(origin, origin);
+  slicedGeometry->GetIndexToWorldTransform()->SetOffset(origin.GetVectorFromOrigin());
+  slicedGeometry->TransferItkToVtkTransform();
+  slicedGeometry->Modified();
 
   mitk::TimeSlicedGeometry* timeSlicedGeometry = output->GetTimeSlicedGeometry();
   timeSlicedGeometry->InitializeEvenlyTimed(slicedGeometry, output->GetDimension(3));

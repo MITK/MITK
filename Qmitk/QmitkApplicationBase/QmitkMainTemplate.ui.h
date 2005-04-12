@@ -84,6 +84,109 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkInteractionConst.h>
 #include <QmitkStatusBar.h>
 
+
+#include <ipPicTypeMultiplex.h>
+#include <mitkDataTreeHelper.h>
+#include <mitkPointOperation.h>
+#include <mitkCoordinateSupplier.h>
+#include <mitkStatusBar.h>
+
+template <class T>
+static void __buildstring( ipPicDescriptor *pic, mitk::Point3D p, QString &s, T dummy=0)
+{
+   QString value;
+   if(pic->bpe!=24)
+   {
+       value.setNum(((T*) pic->data)[ (int)p[0] + (int)p[1]*pic->n[0] + (int)p[2]*pic->n[0]*pic->n[1] ]);
+   }
+   else
+   {
+       value.setNum(((T*) pic->data)[(int)p[0]*3 + 0 + (int)p[1]*pic->n[0]*3 + (int)p[2]*pic->n[0]*pic->n[1]*3 ]);
+       value.setNum(((T*) pic->data)[(int)p[0]*3 + 1 + (int)p[1]*pic->n[0]*3 + (int)p[2]*pic->n[0]*pic->n[1]*3 ]);
+       value.setNum(((T*) pic->data)[(int)p[0]*3 + 2 + (int)p[1]*pic->n[0]*3 + (int)p[2]*pic->n[0]*pic->n[1]*3 ]);
+   }
+   s+=value;
+}
+class posOutputType : public mitk::OperationActor
+{
+  mitk::DataTreeIteratorClone m_DataTreeIterator;
+public:
+
+  posOutputType(mitk::DataTreeIteratorBase* iterator)
+  {
+    m_DataTreeIterator = iterator;
+  }
+  ~posOutputType(){}
+
+  virtual void ExecuteOperation(mitk::Operation* operation)
+  {
+    mitk::PointOperation* pointoperation = dynamic_cast<mitk::PointOperation*>(operation);
+
+    if ( pointoperation != NULL )
+    {    
+      switch ( operation->GetOperationType() )
+      {
+      case mitk::OpMOVE:
+        {
+          int maxLayer = itk::NumericTraits<int>::min();
+          mitk::Image* image = NULL;
+          mitk::DataTreeIteratorClone it = m_DataTreeIterator;
+          while ( !it->IsAtEnd() )
+          {
+            if ( (it->Get()!= NULL) && (it->Get()->GetData() != NULL) && it->Get()->IsVisible(NULL) )
+            {
+              int layer = 0;
+              it->Get()->GetIntProperty("layer", layer);
+              if ( layer >= maxLayer )
+              {
+
+                if(strcmp(it->Get()->GetData()->GetNameOfClass(),"Image")==0)
+                {
+                  image = static_cast<mitk::Image*>(it->Get()->GetData());
+                  maxLayer = layer;
+                }
+              }
+            }
+            ++it;
+          }
+
+          QString s;
+          mitk::Point3D p = pointoperation->GetPoint();
+          s.sprintf("(%.2f,%.2f,%.2f) [mm]", p[0], p[1], p[2]);
+
+          if ( image )
+          {
+            image->GetGeometry()->WorldToIndex(pointoperation->GetPoint(), p);
+
+            QString pixel;
+            pixel.sprintf(" (%.2f,%.2f,%.2f) [pixel] ", p[0], p[1], p[2]);
+            s+=pixel;
+
+            ipPicDescriptor* pic = image->GetPic(); 
+
+            if ( const_cast<mitk::BoundingBox*>(image->GetGeometry()->GetBoundingBox())->IsInside(p) )
+            {
+              if(pic->bpe!=24)
+              {
+                ipPicTypeMultiplex2(__buildstring, pic, p, s);
+              }
+              else
+                __buildstring(pic, p, s, (unsigned char) 1);
+              mitk::StatusBar::DisplayText(s.ascii(), 10000);
+            }   
+          }
+          break;
+        }     
+      case mitk::OpNOTHING:
+        break;
+      default:
+        ;
+      }
+    }
+  }
+};
+
+
 QmitkMainTemplate* QmitkMainTemplate::m_Instance = NULL;
 
 void QmitkMainTemplate::fileNew()
@@ -345,6 +448,7 @@ subclasses.
 */
 void QmitkMainTemplate::initialize()
 {
+   mitk::DataTreePreOrderIterator it(tree);
   //initialize interaction sub-system: undo-controller, statemachine-factory and global-interaction
 
   // test for environment variable MITKCONF
@@ -385,6 +489,10 @@ void QmitkMainTemplate::initialize()
       //set up the global StateMachine and register it to EventMapper
       mitk::GlobalInteraction* globalInteraction = new mitk::GlobalInteraction("global");
       mitk::EventMapper::SetGlobalStateMachine(globalInteraction);
+
+      posOutputType* posOutput = new posOutputType(&it);
+
+      globalInteraction->AddListener(new mitk::CoordinateSupplier("navigation", posOutput)); //sends PointOperations
     }
   }
   else
@@ -406,8 +514,6 @@ void QmitkMainTemplate::initialize()
     layoutdraw->addWidget(mitkMultiWidget);
 
     // add the diplayed planes of the multiwidget to a node to which the subtree @a planesSubTree points ...
-
-    mitk::DataTreePreOrderIterator it(tree);
 
     mitkMultiWidget->SetData(&it);
 
@@ -586,7 +692,6 @@ void QmitkMainTemplate::hideToolbar(bool on)
   else
     ToolBar->show();
 }
-
 
 void QmitkMainTemplate::newFunction()
 {

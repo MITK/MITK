@@ -1028,6 +1028,7 @@ const mitk::Image::HistogramType& mitk::Image::GetScalarHistogram() const
   histend = histogram.End();
 
   bool first=true;
+  m_Scalar2ndMin = 0;
   for(it=histogram.Begin();it!=histend;++it)
   {
     if(it.GetFrequency() > 0)
@@ -1040,7 +1041,7 @@ const mitk::Image::HistogramType& mitk::Image::GetScalarHistogram() const
         break;
     }
   }
-  m_Scalar2ndMax = m_ScalarMax = m_ScalarMin;
+  m_Scalar2ndMax = m_ScalarMax = m_Scalar2ndMin+1;
   for(;it!=histend;++it)
   {
     if(it.GetFrequency() > 0)

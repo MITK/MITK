@@ -109,40 +109,41 @@ void QcMITKSamplePlugin::selectSerie (QcLightbox* lightbox)
   
   image=reader->GetOutput();
   image->Update();
-  mitk::DataTree::Pointer tree = ap->GetTree();
-  
-  mitk::DataTreePreOrderIterator it(tree);
 
-  mitk::DataTreeNode::Pointer node = mitk::DataTreeNode::New();
+  if ( image.IsNotNull() )
+  {
+    mitk::DataTree::Pointer tree = ap->GetTree();
+    mitk::DataTreePreOrderIterator it(tree);
+    mitk::DataTreeNode::Pointer node = mitk::DataTreeNode::New();
+    node->SetData(image);
+    it.Add(node);
+    mitk::LevelWindowProperty::Pointer levWinProp = new mitk::LevelWindowProperty();
+    mitk::LevelWindow levelwindow;
+    levelwindow.SetAuto( reader->GetOutput() );
+    levWinProp->SetLevelWindow( levelwindow );
+    node->GetPropertyList()->SetProperty( "levelwindow", levWinProp );
+    node->SetProperty( "volumerendering", new mitk::BoolProperty( false ) );
+    node->SetProperty("LoadedFromChili", new mitk::BoolProperty( true ) );
 
-  node->SetData(image);
+    ipPicTSV_t* uid= ipPicQueryTag(reader->GetOutput()->GetPic(),"IMAGE INSTANCE UID");
+    ipPicTSV_t* description= ipPicQueryTag(reader->GetOutput()->GetPic(),"SERIES DESCRIPTION");
+    ipPicTSV_t* patientName= ipPicQueryTag(reader->GetOutput()->GetPic(),"PATIENT NAME");
 
-  it.Add(node);
+    if (description)
+      node->SetProperty("name", new mitk::StringProperty( (char*)uid->value ));
+    else if (uid)
+      node->SetProperty("name", new mitk::StringProperty( (char*)description->value ));
 
-  mitk::LevelWindowProperty::Pointer levWinProp = new mitk::LevelWindowProperty();
-  mitk::LevelWindow levelwindow;
-  levelwindow.SetAuto( reader->GetOutput() );
-  levWinProp->SetLevelWindow( levelwindow );
-  node->GetPropertyList()->SetProperty( "levelwindow", levWinProp );
-  node->SetProperty( "volumerendering", new mitk::BoolProperty( false ) );
-  node->SetProperty("LoadedFromChili", new mitk::BoolProperty( true ) );
+    else if (patientName)
+      node->SetProperty("name", new mitk::StringProperty( (char*)patientName->value ));
+    else 
+      node->SetProperty("name", new mitk::StringProperty( lightbox->name() ));
 
-  ipPicTSV_t* uid= ipPicQueryTag(reader->GetOutput()->GetPic(),"IMAGE INSTANCE UID");
-  ipPicTSV_t* description= ipPicQueryTag(reader->GetOutput()->GetPic(),"SERIES DESCRIPTION");
-  ipPicTSV_t* patientName= ipPicQueryTag(reader->GetOutput()->GetPic(),"PATIENT NAME");
+    ap->getMultiWidget()->Repaint();
+    ap->getMultiWidget()->Fit();
 
-  if (uid)
-    node->SetProperty("name", new mitk::StringProperty( (char*)uid->value ));
-  else if (description)
-    node->SetProperty("name", new mitk::StringProperty( (char*)description->value ));
-  
-  else if (patientName)
-    node->SetProperty("name", new mitk::StringProperty( (char*)patientName->value ));
-  else 
-    node->SetProperty("name", new mitk::StringProperty( lightbox->name() ));
+  }
 
-  ap->getMultiWidget()->Repaint();
-  ap->getMultiWidget()->Fit();
 }
 
 

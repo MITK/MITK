@@ -1021,27 +1021,36 @@ void mitk::Image::SetGeometry(Geometry3D* aGeometry3D)
 const mitk::Image::HistogramType& mitk::Image::GetScalarHistogram() const
 {
   mitk::HistogramGenerator* generator = static_cast<mitk::HistogramGenerator*>(m_HistogramGeneratorObject.GetPointer());
+mitk::ImageSliceSelector* sliceSelector;
+sliceSelector = static_cast<mitk::ImageSliceSelector*>(m_SliceSelectorForHistogramObject.GetPointer());//\fixme XXX in histogram: PipelineMTime nach update??
+sliceSelector->UpdateLargestPossibleRegion();
   generator->ComputeHistogram();
   const mitk::Image::HistogramType & histogram = *static_cast<const mitk::Image::HistogramType*>(generator->GetHistogram());
 
   mitk::Image::HistogramType::ConstIterator it, histend;
   histend = histogram.End();
-
+//XXX does not work for very irregular histograms (-32000, 0...500) -> normal Loop!
   bool first=true;
-  m_Scalar2ndMin = 0;
+  m_ScalarMin = m_Scalar2ndMin = 0;
+  m_ScalarMax = m_Scalar2ndMax = 0;
   for(it=histogram.Begin();it!=histend;++it)
   {
     if(it.GetFrequency() > 0)
     {
-      m_ScalarMin = m_Scalar2ndMin;
-      m_Scalar2ndMin = it.GetMeasurementVector()[0];
       if(first)
+      {
+        m_ScalarMin = it.GetMeasurementVector()[0];
+        m_Scalar2ndMin = m_ScalarMin;
         first = false;
+      }
       else
+      {
+        m_Scalar2ndMin = it.GetMeasurementVector()[0];
         break;
+      }
     }
   }
-  m_Scalar2ndMax = m_ScalarMax = m_Scalar2ndMin+1;
+  m_Scalar2ndMax = m_ScalarMax = m_Scalar2ndMin;
   for(;it!=histend;++it)
   {
     if(it.GetFrequency() > 0)

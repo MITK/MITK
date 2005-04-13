@@ -182,6 +182,34 @@ int mitkSurfaceTest(int argc, char* argv[])
     std::cout<<"[PASSED]"<<std::endl;
   }
 
+  std::cout << "Explicitly changing the data of timestep 3 and checking for timebounds ccorrectness of surface's geometry again.";
+  
+  sphereSource = vtkSphereSource::New();
+  sphereSource->SetCenter(0,0,0);
+  sphereSource->SetRadius( 100.0 );
+  sphereSource->SetThetaResolution(10);
+  sphereSource->SetPhiResolution(10);
+  sphereSource->Update();
+  surface->SetVtkPolyData( sphereSource->GetOutput(), 3 );
+  
+  inputTimeGeometry = dynamic_cast< const mitk::TimeSlicedGeometry* >( surface->GetUpdatedGeometry() );
+  time = 3;
+  timestep=0;
+  timestep = inputTimeGeometry->MSToTimeStep( time );
+
+  std::cout << "time: "<< time << std::endl;
+  std::cout << "timestep: "<<timestep << std::endl;
+
+  if (time != timestep)
+  {
+    std::cout<<"[FAILED]"<<std::endl;
+    return EXIT_FAILURE;
+  }
+  else 
+  {
+    std::cout<<"[PASSED]"<<std::endl;
+  }
+
   //std::cout << "Testing mitk::Surface::*TESTED_METHOD_DESCRIPTION: ";
   //// METHOD_TEST_CODE
   //if (surface.IsNull()) {

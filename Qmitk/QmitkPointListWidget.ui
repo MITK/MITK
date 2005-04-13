@@ -65,6 +65,7 @@
     <include location="global" impldecl="in declaration">string</include>
     <include location="local" impldecl="in declaration">mitkPolygonInteractor.h</include>
     <include location="local" impldecl="in declaration">mitkMesh.h</include>
+    <include location="local" impldecl="in implementation">QmitkPointListWidget.ui.h</include>
 </includes>
 <variables>
     <variable>mitk::PolygonInteractor::Pointer m_CurrentPolygonInteraction;</variable>
@@ -79,6 +80,7 @@
 <slots>
     <slot>PointSelect( int ItemIndex )</slot>
     <slot>ItemsOfListUpdate()</slot>
+    <slot>RemoveInteraction()</slot>
     <slot>SwitchInteraction( mitk::PolygonInteractor::Pointer * sop, mitk::DataTreeNode::Pointer * node, int numberOfPoints, mitk::Point3D c, std::string l )</slot>
 </slots>
 <functions>

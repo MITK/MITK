@@ -98,6 +98,22 @@ void QmitkPointListWidget::ItemsOfListUpdate()
   }
 }
 
+void QmitkPointListWidget::RemoveInteraction()
+{
+    mitk::GlobalInteraction* globalInteraction = dynamic_cast<mitk::GlobalInteraction*>(mitk::EventMapper::GetGlobalStateMachine());
+ 
+	mitk::PointSet::Pointer pointset;
+
+    if (m_CurrentInteraction.IsNotNull())
+    {
+      //remove last Interactor
+      globalInteraction->RemoveInteractor(m_CurrentInteraction);
+      pointset = dynamic_cast<mitk::PointSet*>(m_DatatreeNode->GetData());
+      assert(pointset.IsNotNull());
+      pointset->RemoveObserver(m_CurrentObserverID);
+    }
+  
+}
 
 void QmitkPointListWidget::SwitchInteraction( mitk::PointSetInteractor::Pointer *sop, mitk::DataTreeNode::Pointer * node, int numberOfPoints, mitk::Point3D c, std::string l )
 {
@@ -145,10 +161,10 @@ void QmitkPointListWidget::SwitchInteraction( mitk::PointSetInteractor::Pointer 
 
       //const char *c="";
       //if ( !strcmp(l.c_str(),c) )
-      //	{
+      // {
 
       dataTreeNode->SetProperty("label",label);
-      //	}
+      // }
 
       dataTreeNode->SetInteractor(*sop);
       dataTreeNode->SetProperty("name", label); /// name is identical with label????
@@ -181,7 +197,6 @@ void QmitkPointListWidget::SwitchInteraction( mitk::PointSetInteractor::Pointer 
     ItemsOfListUpdate();
   }
 }
-
 
 void QmitkPointListWidget::SwitchInteraction( mitk::PolygonInteractor::Pointer *sop, mitk::DataTreeNode::Pointer * node, int numberOfPoints, mitk::Point3D c, std::string l )
 {

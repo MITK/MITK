@@ -1032,7 +1032,7 @@ const mitk::Image::HistogramType& mitk::Image::GetScalarHistogram() const
   {
     if(it.GetFrequency() > 0)
     {
-      m_Scalar2ndMin = m_ScalarMin;
+      m_ScalarMin = m_Scalar2ndMin;
       m_ScalarMin = it.GetMeasurementVector()[0];
       if(first)
         first = false;

@@ -1,0 +1,68 @@
+<!DOCTYPE UI><UI version="3.3" stdsetdef="1">
+<class>QmitkPropertyListView</class>
+<widget class="QWidget">
+    <property name="name">
+        <cstring>QmitkPropertyListView</cstring>
+    </property>
+    <property name="geometry">
+        <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>406</width>
+            <height>487</height>
+        </rect>
+    </property>
+    <property name="caption">
+        <string>Form1</string>
+    </property>
+    <vbox>
+        <property name="name">
+            <cstring>unnamed</cstring>
+        </property>
+        <widget class="QPushButton">
+            <property name="name">
+                <cstring>m_Button</cstring>
+            </property>
+            <property name="text">
+                <string>Save</string>
+            </property>
+        </widget>
+        <widget class="QGroupBox">
+            <property name="name">
+                <cstring>m_Group</cstring>
+            </property>
+            <property name="title">
+                <string>Properties</string>
+            </property>
+        </widget>
+        <widget class="QFrame">
+            <property name="name">
+                <cstring>m_Frame</cstring>
+            </property>
+            <property name="frameShape">
+                <enum>StyledPanel</enum>
+            </property>
+            <property name="frameShadow">
+                <enum>Raised</enum>
+            </property>
+        </widget>
+    </vbox>
+</widget>
+<includes>
+    <include location="local" impldecl="in declaration">mitkPropertyList.h</include>
+    <include location="local" impldecl="in declaration">qgrid.h</include>
+    <include location="local" impldecl="in declaration">QmitkPropertyListViewItem.h</include>
+</includes>
+<variables>
+    <variable>std::vector&lt;QmitkPropertyListViewItem*&gt; m_Items;</variable>
+    <variable>mitk::PropertyList* m_PropertyList;</variable>
+    <variable>QGridLayout* m_GridLayout;</variable>
+</variables>
+<slots>
+    <slot>SetPropertyList( mitk::PropertyList * propertyList )</slot>
+</slots>
+<functions>
+    <function access="private" specifier="non virtual">init()</function>
+</functions>
+<layoutdefaults spacing="6" margin="11"/>
+</UI>

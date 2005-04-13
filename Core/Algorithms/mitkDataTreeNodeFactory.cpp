@@ -160,6 +160,11 @@ void mitk::DataTreeNodeFactory::GenerateData()
       this->ReadFileSeriesTypeSTL();
     }
   }
+  unsigned int nOut = this->GetNumberOfOutputs();
+  for ( unsigned int i = 0; i < nOut; ++i )
+  {
+    this->GetOutput(i)->SetVisibility(true);
+  }
 }
 
 

@@ -71,6 +71,7 @@ void mitk::Geometry3D::Initialize()
   else
     m_IndexToWorldTransform->SetIdentity();
   CopySpacingFromTransform(m_IndexToWorldTransform, m_Spacing, m_FloatSpacing);
+  vtk2itk(m_IndexToWorldTransform->GetOffset(), m_Origin);
 
   m_VtkMatrix->Identity();
  
@@ -109,6 +110,7 @@ void mitk::Geometry3D::TransferVtkToItkTransform()
   m_IndexToWorldTransform->Modified();
   m_ParametricTransform = m_IndexToWorldTransform;
   CopySpacingFromTransform(m_IndexToWorldTransform, m_Spacing, m_FloatSpacing);
+  vtk2itk(m_IndexToWorldTransform->GetOffset(), m_Origin);
 }
 
 void mitk::Geometry3D::SetIndexToWorldTransformByVtkMatrix(vtkMatrix4x4* vtkmatrix)
@@ -180,6 +182,7 @@ void mitk::Geometry3D::SetIndexToWorldTransform(mitk::AffineTransform3D* transfo
     Superclass::SetIndexToWorldTransform(transform);
     m_ParametricTransform = m_IndexToWorldTransform;
     CopySpacingFromTransform(m_IndexToWorldTransform, m_Spacing, m_FloatSpacing);
+    vtk2itk(m_IndexToWorldTransform->GetOffset(), m_Origin);
     TransferItkToVtkTransform();
     Modified();
   }
@@ -201,7 +204,6 @@ void mitk::Geometry3D::InitializeGeometry(Geometry3D * newGeometry) const
 
   //newGeometry->GetVtkTransform()->SetMatrix(m_VtkIndexToWorldTransform->GetMatrix()); IW
 	//newGeometry->TransferVtkToItkTransform(); //MH
-
 
   if(m_ParametricBoundingBox.IsNotNull())
     newGeometry->SetParametricBounds(m_ParametricBoundingBox->GetBounds());
@@ -413,11 +415,41 @@ void mitk::Geometry3D::SetSpacing(const mitk::Vector3D& aSpacing)
   }
 }
 
+void mitk::Geometry3D::SetOrigin(const Point3D & origin)
+{
+  if(origin!=GetOrigin())
+  {
+    m_Origin = origin;
+    m_IndexToWorldTransform->SetOffset(m_Origin.GetVectorFromOrigin());
+    Modified();
+    TransferItkToVtkTransform();
+  }
+}
+
 void mitk::Geometry3D::Translate(const Vector3D & vector)
 {
-  m_IndexToWorldTransform->SetOffset(m_IndexToWorldTransform->GetOffset()+vector);
-  TransferItkToVtkTransform();
+  if((vector[0] != 0) && (vector[1] != 0) && (vector[2] != 0))
+  {
+    m_IndexToWorldTransform->SetOffset(m_IndexToWorldTransform->GetOffset()+vector);
+    TransferItkToVtkTransform();
+    Modified();
+  }
+}
+
+void mitk::Geometry3D::SetIdentity()
+{
+  m_IndexToWorldTransform->SetIdentity();
+  m_Origin.Fill(0);
   Modified();
+  TransferItkToVtkTransform();
+}
+
+void mitk::Geometry3D::Compose( const mitk::AffineGeometryFrame3D::TransformType * other,bool pre )
+{
+  m_IndexToWorldTransform->Compose(other, pre);
+  vtk2itk(m_IndexToWorldTransform->GetOffset(), m_Origin);
+  Modified();
+  TransferItkToVtkTransform();
 }
 
 const mitk::Vector3D mitk::Geometry3D::GetXAxis()

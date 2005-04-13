@@ -52,36 +52,6 @@ public:
   //##ModelId=3E3B9C8E0152
   virtual void WorldToIndex(const mitk::Point2D &atPt2d_mm, const mitk::Vector2D &vec_mm, mitk::Vector2D &vec_units) const;
 
-  //##Documentation
-  //## @brief Set the origin, i.e. the upper-left corner of the plane
-  //##
-  void SetOrigin(const Point3D& origin)
-  {
-    if(origin!=GetOrigin())
-    {
-      m_Origin = origin;
-      m_IndexToWorldTransform->SetOffset(m_Origin.GetVectorFromOrigin());
-      Modified();
-      TransferItkToVtkTransform();
-    }
-  }
-
-  //##Documentation
-  //## @brief Get the origin, i.e. the upper-left corner of the plane
-  const Point3D& GetOrigin() const
-  {
-    return m_Origin;
-  }
-
-  //##Documentation
-  //## @brief Get the origin as VnlVector
-  //##
-  //## \sa GetOrigin
-  VnlVector GetOriginVnl() const
-  {
-    return const_cast<Self*>(this)->m_Origin.Get_vnl_vector();
-  }
-
   virtual void Initialize();
 
   //##Documentation
@@ -146,8 +116,8 @@ public:
     matrix.GetVnlMatrix().set_column(1, downVector);
     matrix.GetVnlMatrix().set_column(2, normal);
     transform->SetMatrix(matrix);
+    transform->SetOffset(m_IndexToWorldTransform->GetOffset());
     SetIndexToWorldTransform(transform);
-    SetOrigin(m_Origin);
   }
 
   //##Documentation
@@ -424,8 +394,6 @@ public:
 
   virtual void SetIndexToWorldTransform(mitk::AffineTransform3D* transform);
 
-  virtual void TransferVtkToItkTransform();
-
   virtual void SetBounds(const BoundingBox::BoundsArrayType& bounds);
 
   AffineGeometryFrame3D::Pointer Clone() const;
@@ -437,11 +405,6 @@ protected:
   virtual ~PlaneGeometry();
 
   virtual void InitializeGeometry(Self * newGeometry) const;
-
-  //##Documentation
-  //## @brief Origin, i.e. upper-left corner of the plane
-  //##
-  Point3D m_Origin;
 };
 
 } // namespace mitk

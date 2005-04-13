@@ -224,7 +224,49 @@ public:
     return (vtkLinearTransform*)m_VtkIndexToWorldTransform;
   }
 
+  //##Documentation
+  //## @brief Set the origin, i.e. the upper-left corner of the plane
+  //##
+  virtual void SetOrigin(const Point3D& origin);
+
+  //##Documentation
+  //## @brief Translate the origin by a vector
+  //##
   virtual void Translate(const Vector3D & vector);
+
+  //##Documentation
+  //## @brief Set the transform to identity
+  //##
+  virtual void SetIdentity();
+
+  //##Documentation
+  //## @brief Compose new IndexToWorldTransform with a given transform.
+  //##
+  //## This method composes m_IndexToWorldTransform with another transform, 
+  //## modifying self to be the composition of self and other. 
+  //## If the argument pre is true, then other is precomposed with self; 
+  //## that is, the resulting transformation consists of first applying 
+  //## other to the source, followed by self. If pre is false or omitted, 
+  //## then other is post-composed with self; that is the resulting 
+  //## transformation consists of first applying self to the source, 
+  //## followed by other.
+  virtual void Compose( const AffineGeometryFrame3D::TransformType * other,bool pre = 0);
+
+  //##Documentation
+  //## @brief Get the origin, i.e. the upper-left corner of the plane
+  const Point3D& GetOrigin() const
+  {
+    return m_Origin;
+  }
+
+  //##Documentation
+  //## @brief Get the origin as VnlVector
+  //##
+  //## \sa GetOrigin
+  VnlVector GetOriginVnl() const
+  {
+    return const_cast<Self*>(this)->m_Origin.Get_vnl_vector();
+  }
 
   itkGetConstObjectMacro(ParametricTransform, mitk::Transform3D);
 
@@ -287,7 +329,7 @@ public:
 
   void TransferItkToVtkTransform();
 
-  virtual void TransferVtkToItkTransform();
+  void TransferVtkToItkTransform();
 
   virtual void SetIndexToWorldTransformByVtkMatrix(vtkMatrix4x4* vtkmatrix);
 
@@ -365,6 +407,11 @@ protected:
 private:
   float m_FloatSpacing[3];
   vtkMatrixToLinearTransform* m_VtkIndexToWorldTransform;
+
+  //##Documentation
+  //## @brief Origin, i.e. upper-left corner of the plane
+  //##
+  Point3D m_Origin;
 };
 
 } // namespace mitk

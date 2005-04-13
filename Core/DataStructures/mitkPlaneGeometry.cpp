@@ -35,7 +35,6 @@ mitk::PlaneGeometry::~PlaneGeometry()
 void mitk::PlaneGeometry::Initialize()
 {
   Superclass::Initialize();
-  vtk2itk(m_IndexToWorldTransform->GetOffset(), m_Origin);
 }
 
 void mitk::PlaneGeometry::EnsurePerpendicularNormal(mitk::AffineTransform3D* transform)
@@ -56,15 +55,6 @@ void mitk::PlaneGeometry::SetIndexToWorldTransform(mitk::AffineTransform3D* tran
   EnsurePerpendicularNormal(transform);
 
   Superclass::SetIndexToWorldTransform(transform);
-
-  vtk2itk(m_IndexToWorldTransform->GetOffset(), m_Origin);
-}
-
-void mitk::PlaneGeometry::TransferVtkToItkTransform()
-{
-  Superclass::TransferVtkToItkTransform();
-
-  vtk2itk(m_IndexToWorldTransform->GetOffset(), m_Origin);
 }
 
 void mitk::PlaneGeometry::SetBounds(const BoundingBox::BoundsArrayType& bounds)
@@ -267,10 +257,10 @@ void mitk::PlaneGeometry::InitializeStandardPlane(const VnlVector& rightVector, 
   matrix.GetVnlMatrix().set_column(1, downDV);
   matrix.GetVnlMatrix().set_column(2, normal);
   transform->SetMatrix(matrix);
+  transform->SetOffset(m_IndexToWorldTransform->GetOffset());
   ScalarType bounds[6]={0, width, 0, height, 0, 1};
   SetBounds(bounds);
   SetIndexToWorldTransform(transform);
-  SetOrigin(m_Origin);
 }
 
 void mitk::PlaneGeometry::InitializePlane(const mitk::Point3D& origin, const mitk::Vector3D& normal)
@@ -305,6 +295,4 @@ mitk::AffineGeometryFrame3D::Pointer mitk::PlaneGeometry::Clone() const
 void mitk::PlaneGeometry::InitializeGeometry(Self * newGeometry) const
 {
   Superclass::InitializeGeometry(newGeometry);
-
-  newGeometry->SetOrigin(m_Origin);
 }

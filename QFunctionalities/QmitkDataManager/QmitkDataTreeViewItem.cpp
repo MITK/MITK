@@ -84,7 +84,7 @@ QmitkDataTreeViewItem::QmitkDataTreeViewItem( QmitkDataTreeViewItem * parent, mi
   setOpen(true);
 }
 
-mitk::DataTreeNode::ConstPointer QmitkDataTreeViewItem::GetDataTreeNode() const {
+mitk::DataTreeNode::Pointer QmitkDataTreeViewItem::GetDataTreeNode() const {
   return m_TreeNode;
 }
 

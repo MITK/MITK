@@ -39,11 +39,11 @@ class QmitkDataTreeViewItem : public QListViewItem
     QmitkDataTreeViewItem( QmitkDataTreeViewItem * parent, mitk::DataTreeIteratorBase * nodeIt );
     virtual ~QmitkDataTreeViewItem() {}
 
-    mitk::DataTreeNode::ConstPointer GetDataTreeNode() const;
+    mitk::DataTreeNode::Pointer GetDataTreeNode() const;
     mitk::DataTreeIteratorBase* GetDataTreeIterator() {return m_DataTreeIterator.GetPointer();}
 
 	protected:
-    mitk::DataTreeNode::ConstPointer m_TreeNode;
+    mitk::DataTreeNode::Pointer m_TreeNode;
     mitk::DataTreeIteratorClone m_DataTreeIterator;
 };
 

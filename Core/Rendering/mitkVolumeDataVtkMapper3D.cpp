@@ -232,8 +232,7 @@ mitk::TransferFunctionProperty::Pointer tranferFunctionProp = dynamic_cast<mitk:
   if (transferFunctionProp.IsNotNull() && transferFunctionProp->GetValue()->GetValid())   {
 
     opacityTransferFunction = transferFunctionProp->GetValue()->GetScalarOpacityFunction();
-    colorTransferFunction = transferFunctionProp->GetValue()->GetColorTransferFunction(); 
-    std::cout << "Updated transfer functions in mapper" << std::endl;
+    colorTransferFunction = transferFunctionProp->GetValue()->GetColorTransferFunction();
   } else if (lookupTableProp.IsNotNull() )
 {
     lookupTableProp->GetLookupTable().CreateColorTransferFunction(colorTransferFunction);

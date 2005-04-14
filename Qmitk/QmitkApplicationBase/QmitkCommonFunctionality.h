@@ -20,7 +20,9 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef _CommonFunctionality__h_
 #define _CommonFunctionality__h_
 
+#include "mitkConfig.h"
 #include <mitkImageAccessByItk.h>
+
 
 // std
 #include <string>

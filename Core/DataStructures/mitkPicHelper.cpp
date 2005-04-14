@@ -16,7 +16,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-
+#include "mitkConfig.h"
 #include "mitkPicHelper.h"
 #include "mitkSlicedGeometry3D.h"
 #include "mitkPlaneGeometry.h"

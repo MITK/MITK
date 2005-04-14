@@ -30,8 +30,8 @@ void QmitkTransferFunctionWidget::SetDataTreeNode( mitk::DataTreeNode* node)
 
 void QmitkTransferFunctionWidget::PropertyChange( QListViewItem * PropertyItem )
 {
-  std::cout << "Property Selection in TransferFunctionWidget Changed" << std::endl;
-  if (NodeViewPropertyItem* nvpi = dynamic_cast<NodeViewPropertyItem*>(PropertyItem))
+    return;
+  /* if (NodeViewPropertyItem* nvpi = dynamic_cast<NodeViewPropertyItem*>(PropertyItem))
   {
     mitk::TransferFunctionProperty* tfp = dynamic_cast<mitk::TransferFunctionProperty*>(nvpi->GetProperty().GetPointer());
     if (tfp)
@@ -44,7 +44,7 @@ void QmitkTransferFunctionWidget::PropertyChange( QListViewItem * PropertyItem )
         UpdateMinMaxLabels();
       }
     }
-  }
+  } */
 }
 
 void QmitkTransferFunctionWidget::UpdateMinMaxLabels()

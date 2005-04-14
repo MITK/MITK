@@ -64,7 +64,7 @@
                         </sizepolicy>
                     </property>
                     <property name="text">
-                        <string>Save</string>
+                        <string>S&amp;ave</string>
                     </property>
                 </widget>
                 <widget class="QPushButton">
@@ -80,7 +80,7 @@
                         </sizepolicy>
                     </property>
                     <property name="text">
-                        <string>Save to LightBox</string>
+                        <string>Save to Li&amp;ghtBox</string>
                     </property>
                 </widget>
                 <widget class="QPushButton">
@@ -112,7 +112,7 @@
                         </sizepolicy>
                     </property>
                     <property name="text">
-                        <string>Reinit</string>
+                        <string>Rei&amp;nit</string>
                     </property>
                 </widget>
             </hbox>
@@ -335,6 +335,12 @@
         <receiver>m_TransferFunctionWidget</receiver>
         <slot>PropertyChange(QListViewItem*)</slot>
     </connection>
+    <connection>
+        <sender>m_DataTreeView</sender>
+        <signal>selectionChanged(QListViewItem*)</signal>
+        <receiver>QmitkDataManagerControls</receiver>
+        <slot>TreeSelectionChanged(QListViewItem*)</slot>
+    </connection>
 </connections>
 <includes>
     <include location="global" impldecl="in implementation">mitkStringProperty.h</include>
@@ -364,6 +370,7 @@
     <slot>SaveButton_clicked()</slot>
     <slot>SaveLightBox_clicked()</slot>
     <slot>m_ReInitButton_clicked()</slot>
+    <slot access="protected">TreeSelectionChanged( QListViewItem * item )</slot>
 </slots>
 <functions>
     <function access="private" specifier="non virtual">init()</function>

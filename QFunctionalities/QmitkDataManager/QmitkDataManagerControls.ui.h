@@ -252,3 +252,12 @@ void QmitkDataManagerControls::m_ReInitButton_clicked()
     }
   } 
 }
+
+
+void QmitkDataManagerControls::TreeSelectionChanged( QListViewItem * item )
+{
+ QmitkDataTreeViewItem* dtvi = dynamic_cast<QmitkDataTreeViewItem*>(item);
+  assert(dtvi != NULL);
+  assert(dtvi->GetDataTreeNode().IsNotNull());
+  m_TransferFunctionWidget->SetDataTreeNode(dtvi->GetDataTreeNode());
+}

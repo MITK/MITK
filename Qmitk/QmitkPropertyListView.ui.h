@@ -24,6 +24,7 @@ void QmitkPropertyListView::init()
 {
   std::cout << "init()" << std::endl;
   m_Group->setColumns(3);
+  m_PropertyList = NULL;
 }
 void QmitkPropertyListView::SetPropertyList( mitk::PropertyList *propertyList )
 {

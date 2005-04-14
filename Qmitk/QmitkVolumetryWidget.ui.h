@@ -132,6 +132,7 @@ void QmitkVolumetryWidget::UpdateSlider()
         m_ThresholdSlider->setMinValue(gMin);
         m_ThresholdSlider->setMaxValue(gMax);
         m_ThresholdSlider->setEnabled(true);
+        m_ThresholdLabel->setNum(m_ThresholdSlider->value());
       }
     }
     else if (image->GetDimension() == 3)
@@ -142,6 +143,7 @@ void QmitkVolumetryWidget::UpdateSlider()
       m_ThresholdSlider->setMinValue(min);
       m_ThresholdSlider->setMaxValue(max);
       m_ThresholdSlider->setEnabled(true);
+      m_ThresholdLabel->setNum(m_ThresholdSlider->value());
     }
     else
     {

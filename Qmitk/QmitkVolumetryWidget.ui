@@ -88,7 +88,7 @@
                 </widget>
                 <widget class="QLabel">
                     <property name="name">
-                        <cstring>textLabel4</cstring>
+                        <cstring>m_ThresholdLabel</cstring>
                     </property>
                     <property name="text">
                         <string>1000</string>
@@ -195,7 +195,7 @@
     <connection>
         <sender>m_ThresholdSlider</sender>
         <signal>valueChanged(int)</signal>
-        <receiver>textLabel4</receiver>
+        <receiver>m_ThresholdLabel</receiver>
         <slot>setNum(int)</slot>
     </connection>
     <connection>

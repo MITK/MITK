@@ -19,3 +19,8 @@ int main(int argc, char* argv[])
 
   return qtapplication.exec();
 }
+
+/**
+\example Step7main.cpp
+*/
+

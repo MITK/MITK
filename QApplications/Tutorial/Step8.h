@@ -15,3 +15,7 @@ protected:
 protected slots:
 };
 #endif // STEP8_H
+
+/**
+\example Step8.h
+*/

@@ -12,13 +12,13 @@
 //##Documentation
 //## @brief Use several views to explore data
 //##
-//## As in Step2 and Step3, load one or more data sets (many image, 
+//## As in Step2 and Step3, load one or more data sets (many image,
 //## surface and other formats), but create 3 views on the data.
 //## The QmitkRenderWindow is used for displaying a 3D view as in Step3,
 //## but without volume-rendering.
-//## Furthermore, we create two 2D views for slicing through the data. 
-//## We use the class QmitkSliceWidget, which is based on the class 
-//## QmitkRenderWindow, but additionally provides sliders 
+//## Furthermore, we create two 2D views for slicing through the data.
+//## We use the class QmitkSliceWidget, which is based on the class
+//## QmitkRenderWindow, but additionally provides sliders
 //## to slice through the data. We create two instances of
 //## QmitkSliceWidget, one for transversal and one for sagittal slicing.
 //## The two slices are also shown at their correct position in 3D as
@@ -80,7 +80,7 @@ int main(int argc, char* argv[])
   // *******************************************************
 
   // Part IVb: 2D view for slicing transversally
-  // create QmitkSliceWidget, which is based on the class 
+  // create QmitkSliceWidget, which is based on the class
   // QmitkRenderWindow, but additionally provides sliders
   QmitkSliceWidget view2(&toplevelWidget);
   // tell the QmitkSliceWidget which (part of) the tree to render.
@@ -91,7 +91,7 @@ int main(int argc, char* argv[])
   it.Add(view2.GetRenderer()->GetCurrentWorldGeometry2DNode());
 
   // Part IVc: 2D view for slicing sagitally
-  // create QmitkSliceWidget, which is based on the class 
+  // create QmitkSliceWidget, which is based on the class
   // QmitkRenderWindow, but additionally provides sliders
   QmitkSliceWidget view3(&toplevelWidget);
   // tell the QmitkSliceWidget which (part of) the tree to render
@@ -128,3 +128,7 @@ int main(int argc, char* argv[])
 
   return qtapplication.exec();
 }
+
+/**
+\example Step4.cpp
+*/

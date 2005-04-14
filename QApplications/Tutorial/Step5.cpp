@@ -16,17 +16,17 @@
 //##Documentation
 //## @brief Interactively add points
 //##
-//## As in Step4, load one or more data sets (many image, 
+//## As in Step4, load one or more data sets (many image,
 //## surface and other formats) and create 3 views on the data.
-//## Additionally, we want to interactively add points. A node containing 
+//## Additionally, we want to interactively add points. A node containing
 //## a PointSet as data is added to the data tree and a PointSetInteractor
 //## is associated with the node, which handles the interaction. The
-//## @em interaction @em pattern is defined in a state-machine, stored in an 
-//## external XML file. Thus, we need to load a state-machine 
-//## The interaction patterns defines the @em events, 
-//## on which the interactor reacts (e.g., which mouse buttons are used to 
-//## set a point), the @em transition to the next state (e.g., the initial 
-//## may be "empty point set") and associated @a actions (e.g., add a point 
+//## @em interaction @em pattern is defined in a state-machine, stored in an
+//## external XML file. Thus, we need to load a state-machine
+//## The interaction patterns defines the @em events,
+//## on which the interactor reacts (e.g., which mouse buttons are used to
+//## set a point), the @em transition to the next state (e.g., the initial
+//## may be "empty point set") and associated @a actions (e.g., add a point
 //## at the position where the mouse-click occured).
 int main(int argc, char* argv[])
 {
@@ -111,7 +111,7 @@ int main(int argc, char* argv[])
   renderWindow.GetRenderer()->SetMapperID(mitk::BaseRenderer::Standard3D);
 
   // Part VIb: 2D view for slicing transversally
-  // create QmitkSliceWidget, which is based on the class 
+  // create QmitkSliceWidget, which is based on the class
   // QmitkRenderWindow, but additionally provides sliders
   QmitkSliceWidget view2(&toplevelWidget);
   // tell the QmitkSliceWidget which (part of) the tree to render.
@@ -122,7 +122,7 @@ int main(int argc, char* argv[])
   it.Add(view2.GetRenderer()->GetCurrentWorldGeometry2DNode());
 
   // Part VIc: 2D view for slicing sagitally
-  // create QmitkSliceWidget, which is based on the class 
+  // create QmitkSliceWidget, which is based on the class
   // QmitkRenderWindow, but additionally provides sliders
   QmitkSliceWidget view3(&toplevelWidget);
   // tell the QmitkSliceWidget which (part of) the tree to render
@@ -155,3 +155,7 @@ int main(int argc, char* argv[])
 
   return qtapplication.exec();
 }
+
+/**
+\example Step5.cpp
+*/

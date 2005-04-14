@@ -27,7 +27,7 @@ Step6::Step6( int argc, char* argv[], QWidget *parent, const char *name )
   // create the tree: this is now a member
   m_Tree=mitk::DataTree::New();
 
-  // load data as in the previous steps; a reference to the first loaded 
+  // load data as in the previous steps; a reference to the first loaded
   // image is kept in the member m_FirstImage and used as input for the
   // region growing
   Load(argc, argv);
@@ -45,7 +45,7 @@ void Step6::Initialize()
   connect(startButton, SIGNAL(clicked()), this, SLOT(StartRegionGrowing()));
   if(m_FirstImage.IsNull()) startButton->setEnabled(false);
 
-  // as in Step5, create PointSet (now as a member m_Seeds) and 
+  // as in Step5, create PointSet (now as a member m_Seeds) and
   // associate a interactor to it
   mitk::DataTreePreOrderIterator it(m_Tree);
   m_Seeds = mitk::PointSet::New();
@@ -57,7 +57,7 @@ void Step6::Initialize()
     new mitk::PointSetInteractor("pointsetinteractor", pointSetNode));
 }
 
-template < typename TPixel, unsigned int VImageDimension > 
+template < typename TPixel, unsigned int VImageDimension >
 void Step6::RegionGrowing( itk::Image<typename TPixel, VImageDimension>* itkImage, mitk::Geometry3D* geometry)
 {
   typedef itk::Image<typename TPixel, VImageDimension> ImageType;
@@ -93,7 +93,7 @@ void Step6::RegionGrowing( itk::Image<typename TPixel, VImageDimension>* itkImag
 void Step6::StartRegionGrowing()
 {
   AccessByItk_1(m_FirstImage, RegionGrowing, m_FirstImage->GetGeometry());
-  
+
   mitk::RenderWindow::UpdateAllInstances();
 }
 
@@ -164,7 +164,7 @@ void Step6::SetupWidgets()
   renderWindow->GetRenderer()->SetMapperID(mitk::BaseRenderer::Standard3D);
 
   // Part IIb: 2D view for slicing transversally
-  // create QmitkSliceWidget, which is based on the class 
+  // create QmitkSliceWidget, which is based on the class
   // QmitkRenderWindow, but additionally provides sliders
   QmitkSliceWidget *view2=new QmitkSliceWidget(viewParent);
   // tell the QmitkSliceWidget which (part of) the tree to render.
@@ -175,7 +175,7 @@ void Step6::SetupWidgets()
   it.Add(view2->GetRenderer()->GetCurrentWorldGeometry2DNode());
 
   // Part IIc: 2D view for slicing sagitally
-  // create QmitkSliceWidget, which is based on the class 
+  // create QmitkSliceWidget, which is based on the class
   // QmitkRenderWindow, but additionally provides sliders
   QmitkSliceWidget *view3=new QmitkSliceWidget(viewParent);
   // tell the QmitkSliceWidget which (part of) the tree to render
@@ -205,3 +205,7 @@ void Step6::SetupWidgets()
 
   setCentralWidget(m_TopLevelWidget);
 }
+
+/**
+\example Step6.cpp
+*/

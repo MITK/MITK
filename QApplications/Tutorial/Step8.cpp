@@ -31,14 +31,14 @@ void Step8::SetupWidgets()
   m_TopLevelWidget = new QVBox(this);
   // create viewParent widget with horizontal layout
   QHBox* viewParent = new QHBox(m_TopLevelWidget);
-  
+
   // Part IIa: create and initialize QmitkStdMultiWidget
   QmitkStdMultiWidget* multiWidget = new QmitkStdMultiWidget(viewParent);
   // create an iterator on the tree
   mitk::DataTreePreOrderIterator it(m_Tree);
   // tell the multiWidget which (part of) the tree to render
   multiWidget->SetData(&it);
-  // initialize views as transversal, sagittal, coronar (from 
+  // initialize views as transversal, sagittal, coronar (from
   // top-left to bottom)
   multiWidget->InitializeStandardViews(&it);
   // initialize bottom-right view as 3D view
@@ -46,12 +46,12 @@ void Step8::SetupWidgets()
   // enable standard handler for levelwindow-slider
   multiWidget->EnableStandardLevelWindow();
 
-  // add the displayed views to the tree to see their positions 
+  // add the displayed views to the tree to see their positions
   // in 2D and 3D
   multiWidget->AddDisplayPlaneSubTree(&it);
 
-  //Part III: Setup standard interaction with the mouse  
-  // moving the cut-planes to click-point 
+  //Part III: Setup standard interaction with the mouse
+  // moving the cut-planes to click-point
   mitk::GlobalInteraction::GetGlobalInteraction()->AddListener(
     multiWidget->GetMultiplexUpdateController() );
   // zooming and panning
@@ -60,3 +60,7 @@ void Step8::SetupWidgets()
 
   setCentralWidget(m_TopLevelWidget);
 }
+
+/**
+\example Step8.cpp
+*/

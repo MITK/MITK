@@ -10,7 +10,7 @@
 //##Documentation
 //## @brief Change the type of display to 3D
 //##
-//## As in Step2, load one or more data sets (many image, surface 
+//## As in Step2, load one or more data sets (many image, surface
 //## and other formats), but display it in a 3D view.
 //## The QmitkRenderWindow is now used for displaying a 3D view, by
 //## setting the used mapper-slot to Standard3D.
@@ -94,3 +94,7 @@ int main(int argc, char* argv[])
 
   return qtapplication.exec();
 }
+
+/**
+\example Step3.cpp
+*/

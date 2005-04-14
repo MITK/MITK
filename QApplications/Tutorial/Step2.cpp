@@ -6,7 +6,7 @@
 #include <qapplication.h>
 
 //##Documentation
-//## @brief Load one or more data sets (many image, surface 
+//## @brief Load one or more data sets (many image, surface
 //## and other formats) and display it in a 2D view
 //##
 //## Only very slightly different to Step1: Use DataTreeNodeFactory
@@ -63,3 +63,7 @@ int main(int argc, char* argv[])
 
   return qtapplication.exec();
 }
+
+/**
+\example Step2.cpp
+*/

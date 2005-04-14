@@ -15,3 +15,7 @@ protected slots:
   virtual void StartRegionGrowing();
 };
 #endif // STEP7_H
+
+/**
+\example Step7.h
+*/

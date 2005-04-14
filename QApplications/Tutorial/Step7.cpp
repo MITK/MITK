@@ -11,12 +11,13 @@
 #include <vtkSTLWriter.h>
 
 //##Documentation
-//## @brief Convert result of region-grower into a surface 
+//## @brief Convert result of region-grower into a surface
 //## by means of a VTK filter
 Step7::Step7( int argc, char* argv[], QWidget *parent, const char *name )
   : Step6( argc, argv, parent, name )
 {
 }
+
 
 void Step7::StartRegionGrowing()
 {
@@ -25,7 +26,7 @@ void Step7::StartRegionGrowing()
   if(m_ResultImage.IsNotNull())
   {
     m_ResultNode->SetProperty("volumerendering", new mitk::BoolProperty(false));
-    
+
     vtkMarchingCubes* surfaceCreator = vtkMarchingCubes::New();
     surfaceCreator->SetInput(m_ResultImage->GetVtkImageData());
     surfaceCreator->SetValue(0, 1);
@@ -47,3 +48,7 @@ void Step7::StartRegionGrowing()
     mitk::RenderWindow::UpdateAllInstances();
   }
 }
+
+/**
+\example Step7.cpp
+*/

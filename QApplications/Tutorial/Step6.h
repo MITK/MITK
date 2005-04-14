@@ -1,7 +1,7 @@
 #ifndef STEP6_H
 #define STEP6_H
 
-#include <qmainwindow.h> 
+#include <qmainwindow.h>
 #include <mitkDataTree.h>
 #include <mitkImage.h>
 #include <mitkPointSet.h>
@@ -21,7 +21,7 @@ protected:
   void Load(int argc, char* argv[]);
   virtual void SetupWidgets();
 
-  template < typename TPixel, unsigned int VImageDimension > 
+  template < typename TPixel, unsigned int VImageDimension >
   void RegionGrowing( itk::Image<typename TPixel, VImageDimension>* itkImage, mitk::Geometry3D* geometry);
 
   mitk::DataTree::Pointer m_Tree;
@@ -35,3 +35,8 @@ protected slots:
   virtual void StartRegionGrowing();
 };
 #endif // STEP6_H
+
+/**
+\example Step6.h
+*/
+

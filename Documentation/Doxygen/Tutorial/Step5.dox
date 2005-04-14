@@ -1,6 +1,6 @@
  /**
  
- \page Step5Page Step 5 - Interactively add points
+ \page Step5Page MITK Tutorial - Step 5: Interactively add points
  
  In addition to Step 4 where 3 views on the data were created we now want to interactively add points.\n
 
@@ -13,6 +13,7 @@
  In order to add a point the shift key has to be pressed simultaneously to marking the point with the mouse.
  
  \li \ref Step5.cpp "Step5.cpp"\n 
+ Contains the code for this step.
  
  \image html step5_result.png 
 

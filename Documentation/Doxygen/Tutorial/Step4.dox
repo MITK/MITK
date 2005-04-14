@@ -1,6 +1,6 @@
 /**
  
-\page Step4Page Step 4 - Use several views to explore data
+\page Step4Page MITK Tutorial - Step 4: Use several views to explore data
   
 As in Step 2 and Step 3 one or more data sets may be loaded.\n
 Now 3 views on the data are created.
@@ -8,13 +8,15 @@ The QmitkRenderWindow is used for displaying a 3D view as in Step 3, but without
 Furthermore two 2D views for slicing through the data are created. 
 The class QmitkSliceWidget is used, which is based on the class QmitkRenderWindow, but additionally provides sliders 
 to slice through the data. We create two instances of
-QmitkSliceWidget, one for transversal and one for sagittal slicing.
-The two slices are also shown at their correct position in 3D as well as intersection-line, each in the other 2D view.
+QmitkSliceWidget, one for transversal and one for sagittal slicing. Step 4b enhances the program in that the two slices are also shown at their correct position in 3D as well as intersection-line, each in the other 2D view.
 
 \li \ref Step4.cpp "Step4.cpp"\n 
+Contains the code of step 4a - c.
  
+\section Step4aSection Step 4a - Create transversal and sagittal view
+
 \image html step4a_result.png 
-  
+
 \dontinclude Step4.cpp
 
 Create a Qt horizontal box for the layout:

@@ -1,10 +1,16 @@
  /**
  
- \page Step7Page Step 7 - Convert result of region growing into a surface
- 
- \li \ref Step7.cpp "Step7.cpp"\n 
+ \page Step7Page MITK Tutorial - Step 7: Convert result of region growing into a surface
  
  In this step the result of the previous step is converted into a surface by means of a VTK filter.
+ 
+
+ \li \ref Step7.cpp "Step7.cpp"\n 
+ \li \ref Step7.h "Step7.h"\n 
+ \li \ref Step7main.cpp "Step7main.cpp"\n 
+ 
+ Step7 inherits from Step6. It enhances the method StartRegionGrowing() by processing the result image. 
+ 
  
  \dontinclude Step7.cpp
  \skipline if(m_ResultImage

@@ -24,7 +24,7 @@
                 <cstring>m_Button</cstring>
             </property>
             <property name="text">
-                <string>Save</string>
+                <string>S&amp;ave</string>
             </property>
         </widget>
         <widget class="QGroupBox">
@@ -52,17 +52,20 @@
     <include location="local" impldecl="in declaration">mitkPropertyList.h</include>
     <include location="local" impldecl="in declaration">qgrid.h</include>
     <include location="local" impldecl="in declaration">QmitkPropertyListViewItem.h</include>
+    <include location="global" impldecl="in declaration">map</include>
 </includes>
 <variables>
-    <variable>std::vector&lt;QmitkPropertyListViewItem*&gt; m_Items;</variable>
-    <variable>mitk::PropertyList* m_PropertyList;</variable>
+    <variable>unsigned long m_ObserverTag;</variable>
     <variable>QGridLayout* m_GridLayout;</variable>
+    <variable>mitk::PropertyList* m_PropertyList;</variable>
+    <variable>std::map&lt;std::string,QmitkPropertyListViewItem*&gt; m_Items;</variable>
 </variables>
 <slots>
     <slot>SetPropertyList( mitk::PropertyList * propertyList )</slot>
 </slots>
 <functions>
     <function access="private" specifier="non virtual">init()</function>
+    <function>PropertyListModified()</function>
 </functions>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

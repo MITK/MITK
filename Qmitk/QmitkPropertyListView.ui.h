@@ -18,48 +18,70 @@
 #include <vector>
 
 #include "QmitkPropertyListViewItem.h"
+#include "itkCommand.h"
 
-void QmitkPropertyListView::init() {
+void QmitkPropertyListView::init()
+{
   std::cout << "init()" << std::endl;
-  m_Group->setColumns(2);
+  m_Group->setColumns(3);
 }
 void QmitkPropertyListView::SetPropertyList( mitk::PropertyList *propertyList )
 {
-  if (propertyList != m_PropertyList) {
+  if (propertyList != m_PropertyList)
+  {
+    if (m_PropertyList)
+    {
+      m_PropertyList->RemoveObserver(m_ObserverTag);
+    }
     m_PropertyList = propertyList;
-    int row = 0; 
+    itk::SimpleMemberCommand<QmitkPropertyListView>::Pointer propertyListModifiedCommand =
+      itk::SimpleMemberCommand<QmitkPropertyListView>::New();
+    propertyListModifiedCommand->SetCallbackFunction(this, &QmitkPropertyListView::PropertyListModified);
+    m_ObserverTag = m_PropertyList->AddObserver(itk::ModifiedEvent(), propertyListModifiedCommand);
+    int row = 0;
     const mitk::PropertyList::PropertyMap* propertyMap = propertyList->GetMap();
 
     // clear the group
-    //
-    std::cout << "before clear count:" << m_Group->children()->count() << std::endl;  
-    for (std::vector<QmitkPropertyListViewItem*>::iterator it = m_Items.begin() ; it != m_Items.end() ; it++) {
-      delete (*it)->m_Label;
-      delete (*it)->m_Control;
-    } 
-    std::cout << "after clear count:" << m_Group->children()->count() << std::endl;  
+    for (std::map<std::string,QmitkPropertyListViewItem*>::iterator it = m_Items.begin() ; it != m_Items.end() ; it++)
+    {
+      delete it->second->m_EnabledButton;
+      delete it->second->m_Label;
+      delete it->second->m_Control;
+    }
     m_Items.clear();
-   std::cout << "after cevtor clear count:" << m_Group->children()->count() << std::endl;  
-    for (mitk::PropertyList::PropertyMap::const_iterator iter = propertyMap->begin(); iter!=propertyMap->end(); iter++) {
+    for (mitk::PropertyList::PropertyMap::const_iterator iter = propertyMap->begin(); iter!=propertyMap->end(); iter++)
+    {
       QmitkPropertyListViewItem* item = QmitkPropertyListViewItem::CreateInstance(propertyList,iter->first,m_Group);
- /*     item.m_Label->reparent(m_Group);
-      item.m_Label->show();
-      item.m_Control->reparent(m_Group);
-      item.m_Control->show();
- */
-     /*
-      mitk::BaseProperty* bpp = iter->second.GetPointer();
-      QString propClassName(iter->second->GetNameOfClass());
-      QString propName(iter->first.c_str());
-      QString propValue(bpp->GetValueAsString().c_str());
-      std::cout << "adding prop: " << propName << std::endl;
-      QLabel* label = new QLabel(propName,m_Group);
-      label->show();
-      QLabel* control = new QLabel(propValue,m_Group);
-      control->show();
-      */
-      m_Items.push_back(item);
-   }
- }
+      m_Items.insert(std::make_pair(item->m_Name,item));
+    }
+  }
 }
-
+void QmitkPropertyListView::PropertyListModified()
+{
+  std::cout << "PropertyListModified()" << std::endl;
+  const mitk::PropertyList::PropertyMap* propertyMap = m_PropertyList->GetMap();
+  for (std::map<std::string,QmitkPropertyListViewItem*>::iterator it = m_Items.begin() ; it != m_Items.end() ; it++)
+  {
+    // update existing properties and check for removed ones
+    if (propertyMap->find(it->first) != propertyMap->end())
+    {
+      it->second->UpdateView();
+    }
+    else
+    {
+      delete it->second->m_EnabledButton;
+      delete it->second->m_Label;
+      delete it->second->m_Control;
+      m_Items.erase(it);
+    }
+    // now add new ones if they exist
+    for (mitk::PropertyList::PropertyMap::const_iterator iter = propertyMap->begin(); iter!=propertyMap->end(); iter++)
+    {
+      if (m_Items.find(iter->first) == m_Items.end())
+      {
+        QmitkPropertyListViewItem* item = QmitkPropertyListViewItem::CreateInstance(m_PropertyList,iter->first,m_Group);
+        m_Items.insert(std::make_pair(item->m_Name,item));
+      }
+    }
+  }
+}

@@ -22,6 +22,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qwidget.h>
 #include <qobject.h>
 #include <string>
+#include "enabled.xpm"
+#include "disabled.xpm"
+
+class QPushButton;
 
 namespace mitk {
   class PropertyList;
@@ -34,9 +38,12 @@ class QmitkPropertyListViewItem : public QObject {
       m_Name(name), m_PropertyList(propertyList), m_Label(label), m_Control(control) {}
     std::string m_Name;
     mitk::PropertyList* m_PropertyList;
+    QPushButton* m_EnabledButton;
     QLabel* m_Label;
     QWidget* m_Control;
     static QmitkPropertyListViewItem* CreateInstance(mitk::PropertyList *propList, const std::string name, QWidget* parent);
+    void UpdateView();
+    void QmitkPropertyListViewItem::UpdateEnabledView();
     // ~QmitkPropertyListViewItem()
   public slots:
     void CheckBoxControlActivated(int state);
@@ -44,7 +51,8 @@ class QmitkPropertyListViewItem : public QObject {
     void ColorControlActivated();
   protected:
     QmitkPropertyListViewItem() {}
-
+  protected slots:
+    void EnabledButtonClicked();
 };
 #endif
 

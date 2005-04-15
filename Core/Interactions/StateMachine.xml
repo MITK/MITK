@@ -1289,6 +1289,9 @@
       <transition NAME="goToCheckPicking" NEXT_STATE_ID="2" EVENT_ID="5">
          <action ID="31"/>  <!-- AcCHECKOBJECT  -->
       </transition>   
+      <transition NAME="default" NEXT_STATE_ID="1" EVENT_ID="90" >
+         <action ID="3007"/>  <!-- AcDEFAULT -->
+      </transition>
     </state>
     <state NAME="CheckPicking" ID="2">
       <transition NAME="noPicked" NEXT_STATE_ID="4" EVENT_ID="1003" > 
@@ -1305,15 +1308,51 @@
       <transition NAME="delete" NEXT_STATE_ID="1" EVENT_ID="12" >
         <action ID="104"/>  <!-- AcREMOVESELECTEDSUBOBJECT -->
       </transition>
-      <transition NAME="deselectAll" NEXT_STATE_ID="1" EVENT_ID="13" >
+      <transition NAME="deselectAll" NEXT_STATE_ID="1" EVENT_ID="14" >
         <action ID="72"/>  <!-- AcDESELECTALL -->
+      </transition>
+      <transition NAME="searchPeriphery" NEXT_STATE_ID="11" EVENT_ID="15" >
+        <action ID="3000"/>  <!-- AcPERIPHERYSEARCH -->
+      </transition>
+      <transition NAME="searchToRoot" NEXT_STATE_ID="11" EVENT_ID="16" >
+        <action ID="3001"/>  <!-- AcROOTSEARCH -->
+      </transition>
+      <transition NAME="searchToThickstVessel" NEXT_STATE_ID="11" EVENT_ID="17" >
+        <action ID="3002"/>  <!-- AcTHICKSTVESSELSEARCH -->
+      </transition>
+      
+      <!--now follow the attibutations for different vessel types-->
+      <transition NAME="attributation" NEXT_STATE_ID="1" EVENT_ID="20" >
+        <action ID="3005">  <!-- AcATTRIBUTATION -->
+	   <intParameter NAME="attribute_id" VALUE="0" />
+        </action>
+      </transition>
+      <transition NAME="attributation" NEXT_STATE_ID="1" EVENT_ID="21" >
+        <action ID="3005">  <!-- AcATTRIBUTATION -->
+      	  <intParameter NAME="attribute_id" VALUE="1" />
+        </action>
+      </transition>
+      <transition NAME="attributation" NEXT_STATE_ID="1" EVENT_ID="30" >
+        <action ID="3005">  <!-- AcATTRIBUTATION -->
+          <intParameter NAME="attribute_id" VALUE="2" />
+        </action>
+      </transition>
+      <transition NAME="attributation" NEXT_STATE_ID="1" EVENT_ID="31" >
+        <action ID="3005">  <!-- AcATTRIBUTATION -->
+      	  <intParameter NAME="attribute_id" VALUE="3" />
+         </action>
+      </transition>
+      <transition NAME="attributation" NEXT_STATE_ID="1" EVENT_ID="40" >
+        <action ID="3005">  <!-- AcATTRIBUTATION -->
+      	  <intParameter NAME="attribute_id" VALUE="4" />
+        </action>
       </transition>
     </state>
     <state NAME="OnePointPicked" ID="4">
       <transition NAME="goToCheckPicking" NEXT_STATE_ID="6" EVENT_ID="5">
         <action ID="31"/>  <!-- AcCHECKOBJECT  -->
       </transition>
-      <transition NAME="deselectAll" NEXT_STATE_ID="1" EVENT_ID="13" >
+      <transition NAME="deselectAll" NEXT_STATE_ID="1" EVENT_ID="14" >
         <action ID="72"/>  <!-- AcDESELECTALL -->
       </transition>
     </state>
@@ -1334,79 +1373,151 @@
       </transition>
     </state>
     <state NAME="OneVesselOnePointPicked" ID="7" >
-      <transition NAME="ENew" NEXT_STATE_ID="3" EVENT_ID="1000">
+      <transition NAME="ENew" NEXT_STATE_ID="1" EVENT_ID="13">
         <action ID="72"/>   <!-- AcDESELECTALL -->
         <action ID="81"/>   <!-- AcNEWSUBOBJECT -->
-        <action ID="65"/>  <!-- AcSELECT  -->
+        <!--action ID="65"/>   AcSELECT  -->
       </transition>
       <!--transition NAME="goToCheckPicking" NEXT_STATE_ID="5" EVENT_ID="5" /-->
-      <transition NAME="deselectAll" NEXT_STATE_ID="1" EVENT_ID="13" >
+      <transition NAME="deselectAll" NEXT_STATE_ID="1" EVENT_ID="14" >
         <action ID="72"/>  <!-- AcDESELECTALL -->
+      </transition>
+      
+      <!--now follow the attibutations for different vessel types-->
+      <transition NAME="attributation" NEXT_STATE_ID="1" EVENT_ID="20" >
+        <action ID="3005">  <!-- AcATTRIBUTATION -->
+	   <intParameter NAME="attribute_id" VALUE="0" />
+        </action>
+      </transition>
+      <transition NAME="attributation" NEXT_STATE_ID="1" EVENT_ID="21" >
+        <action ID="3005">  <!-- AcATTRIBUTATION -->
+      	  <intParameter NAME="attribute_id" VALUE="1" />
+        </action>
+      </transition>
+      <transition NAME="attributation" NEXT_STATE_ID="1" EVENT_ID="30" >
+        <action ID="3005">  <!-- AcATTRIBUTATION -->
+          <intParameter NAME="attribute_id" VALUE="2" />
+        </action>
+      </transition>
+      <transition NAME="attributation" NEXT_STATE_ID="1" EVENT_ID="31" >
+        <action ID="3005">  <!-- AcATTRIBUTATION -->
+      	  <intParameter NAME="attribute_id" VALUE="3" />
+         </action>
+      </transition>
+      <transition NAME="attributation" NEXT_STATE_ID="1" EVENT_ID="40" >
+        <action ID="3005">  <!-- AcATTRIBUTATION -->
+      	  <intParameter NAME="attribute_id" VALUE="4" />
+        </action>
       </transition>
     </state>
     <state NAME="TwoVesselsPicked" ID="8" >
-      <transition NAME="ENew" NEXT_STATE_ID="3" EVENT_ID="1000">
+      <transition NAME="ENew" NEXT_STATE_ID="1" EVENT_ID="13">
         <action ID="72"/>   <!-- AcDESELECTALL -->
         <action ID="81"/>  <!-- AcNEWSUBOBJECT -->
-        <action ID="65"/>  <!-- AcSELECT  -->
+        <!--action ID="65"/>   AcSELECT  -->
       </transition>
-      <transition NAME="goToCheckPicking" NEXT_STATE_ID="5" EVENT_ID="5" />
-      <transition NAME="deselectAll" NEXT_STATE_ID="1" EVENT_ID="13" >
+      <transition NAME="goToCheckPicking" NEXT_STATE_ID="10" EVENT_ID="5" >
+        <action ID="31"/>  <!-- AcCHECKOBJECT  -->
+      </transition> 
+      <transition NAME="searchShortestPathBetween2Edges" NEXT_STATE_ID="11" EVENT_ID="18" >
+        <action ID="3003"/>  <!-- AcSHORTESTPATHSEARCH -->
+      </transition>
+      <transition NAME="deselectAll" NEXT_STATE_ID="1" EVENT_ID="14" >
         <action ID="72"/>  <!-- AcDESELECTALL -->
+      </transition>
+      
+      <!--now follow the attibutations for different vessel types-->
+      <transition NAME="attributation" NEXT_STATE_ID="1" EVENT_ID="20" >
+       <action ID="3005">  <!-- AcATTRIBUTATION -->
+         <intParameter NAME="attribute_id" VALUE="0" />
+       </action>
+      </transition>
+      <transition NAME="attributation" NEXT_STATE_ID="1" EVENT_ID="21" >
+       <action ID="3005">  <!-- AcATTRIBUTATION -->
+	 <intParameter NAME="attribute_id" VALUE="1" />
+       </action>
+      </transition>
+      <transition NAME="attributation" NEXT_STATE_ID="1" EVENT_ID="30" >
+       <action ID="3005">  <!-- AcATTRIBUTATION -->
+	<intParameter NAME="attribute_id" VALUE="2" />
+       </action>
+      </transition>
+      <transition NAME="attributation" NEXT_STATE_ID="1" EVENT_ID="31" >
+       <action ID="3005">  <!-- AcATTRIBUTATION -->
+	<intParameter NAME="attribute_id" VALUE="3" />
+       </action>
+      </transition>
+      <transition NAME="attributation" NEXT_STATE_ID="1" EVENT_ID="40" >
+       <action ID="3005">  <!-- AcATTRIBUTATION -->
+	 <intParameter NAME="attribute_id" VALUE="4" />
+       </action>
       </transition>
     </state>
     <state NAME="TwoPointsPicked" ID="9" >
-      <transition NAME="ENew" NEXT_STATE_ID="3" EVENT_ID="1000">
+      <transition NAME="ENew" NEXT_STATE_ID="1" EVENT_ID="13">
         <action ID="81"/>  <!-- AcNEWSUBOBJECT -->
-        <action ID="65"/>  <!-- AcSELECT  -->
+        <!--action ID="65"/>   AcSELECT  -->
       </transition>
-      <transition NAME="deselectAll" NEXT_STATE_ID="1" EVENT_ID="13" >
+      <transition NAME="deselectAll" NEXT_STATE_ID="1" EVENT_ID="14" >
         <action ID="72"/>  <!-- AcDESELECTALL -->
       </transition>
     </state>
-    <!--
     <state NAME="CheckPicking" ID="10">
-      <transition NAME="noPicked" NEXT_STATE_ID="8" EVENT_ID="1003" />
-       <transition NAME="yesPicked" NEXT_STATE_ID="11" EVENT_ID="1004" />
-    </state>
-    <state NAME="MoreVesselsPicked" ID="11" >
-    </state>
-    -->
+      <transition NAME="noPicked" NEXT_STATE_ID="12" EVENT_ID="1003" > 
+        <action ID="36"/>    <!--AcCHECKGREATERTWO-->
+      </transition>
+      <transition NAME="yesPicked" NEXT_STATE_ID="11" EVENT_ID="1004">
+        <action ID="69"/>  <!-- AcSELECTSUBOBJECT  -->
+      </transition>
+     </state>
+     <state NAME="MoreVesselsPicked" ID="11" >
+      <transition NAME="deleteAllPicked" NEXT_STATE_ID="1" EVENT_ID="12">
+        <action ID="72"/>   <!-- AcDESELECTALL -->
+      </transition>
+      <transition NAME="goToCheckPicking" NEXT_STATE_ID="10" EVENT_ID="5" >
+        <action ID="31"/>  <!-- AcCHECKOBJECT  -->
+      </transition> 
+      <transition NAME="deselectAll" NEXT_STATE_ID="1" EVENT_ID="14" >
+        <action ID="72"/>  <!-- AcDESELECTALL -->
+      </transition>
+      <transition NAME="singleSignal" NEXT_STATE_ID="3" EVENT_ID="19" >
+        <action ID="3004"/>  <!-- AcSINGLE -->
+      </transition>
+      
+      <!--now follow the attibutations for different vessel types-->
+      <transition NAME="attributation" NEXT_STATE_ID="1" EVENT_ID="20" >
+       <action ID="3005">  <!-- AcATTRIBUTATION -->
+         <intParameter NAME="attribute_id" VALUE="0" />
+       </action>
+      </transition>
+      <transition NAME="attributation" NEXT_STATE_ID="1" EVENT_ID="21" >
+       <action ID="3005">  <!-- AcATTRIBUTATION -->
+	 <intParameter NAME="attribute_id" VALUE="1" />
+       </action>
+      </transition>
+      <transition NAME="attributation" NEXT_STATE_ID="1" EVENT_ID="30" >
+       <action ID="3005">  <!-- AcATTRIBUTATION -->
+	<intParameter NAME="attribute_id" VALUE="2" />
+       </action>
+      </transition>
+      <transition NAME="attributation" NEXT_STATE_ID="1" EVENT_ID="31" >
+       <action ID="3005">  <!-- AcATTRIBUTATION -->
+	 <intParameter NAME="attribute_id" VALUE="3" />
+        </action>
+      </transition>
+      <transition NAME="attributation" NEXT_STATE_ID="1" EVENT_ID="40" >
+       <action ID="3005">  <!-- AcATTRIBUTATION -->
+	 <intParameter NAME="attribute_id" VALUE="4" />
+       </action>
+      </transition>
+      </state>
+      <state NAME="CheckNumberPickedVesselsSmaller2" ID="12">
+      <transition NAME="yes" NEXT_STATE_ID="8" EVENT_ID="1003" /> 
+      <transition NAME="no" NEXT_STATE_ID="11" EVENT_ID="1004">
+        <action ID="69"/>  <!-- AcSELECTSUBOBJECT  -->
+      </transition>
+     </state>
   </stateMachine> 
-  <!-- 
-  <stateMachine NAME="VesselGraphInteractor2">
-    <state NAME="Start" ID="1" START_STATE="TRUE">
-      <transition NAME="GoToCheckPidking" NEXT_STATE_ID="2" EVENT_ID="5">
-         <action ID="31" />
-      </transition>   
-    </state>
-     
-    <state NAME="CheckPicking" ID="2">
-      <transition NAME="no" NEXT_STATE_ID="1" EVENT_ID="1003">
-        <action ID="0" />
-      </transition>
-      <transition NAME="yes" NEXT_STATE_ID="3" EVENT_ID="1004">
-        <action ID="69" />
-      </transition>
-      <transition NAME="empty" NEXT_STATE_ID="3" EVENT_ID="1030" />
-    </state>
-    <state NAME="SelectedVessel" ID="3">
-      <transition NAME="ENew" NEXT_STATE_ID="4" />
-      <transition NAME="GoToCheckPicking" NEXT_STATE_ID="2" />
-      <transition NAME="EDelete" NEXT_STATE_ID="1" >
-        <action ID="104" />
-      </transition>
-    </state>
-    <state NAME="SelectedAndNew" ID="4">
-      <transition NAME="ENew" NEXT_STATE_ID="3" EVENT_ID="1000"/>
-      <transition NAME="GoToSelectedVessel" NEXT_STATE_ID="3" >
-        <action ID="72" />
-        <action ID="81"/>
-        <action ID="69"/>
-      </transition>
-    </state>
-  </stateMachine> 
-  -->
   <!-- -->
   <!-- -->
   <!-- EventDescriptions -->
@@ -1426,9 +1537,32 @@
     <!-- Delete -->
     <event NAME="Delete" ID="12" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_Delete" />
     <!-- Esc -->
-    <event NAME="Escape" ID="13" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_Escape" />
+    <event NAME="Escape" ID="14" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_Escape" />
     <!-- N-->
     <event NAME="N" ID="13" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_N" />
+    <!-- P-->
+    <event NAME="P" ID="15" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_P" />
+    <!-- R-->
+    <event NAME="R" ID="16" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_R" />
+    <!-- T-->
+    <event NAME="T" ID="17" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_T" />
+    <!-- S-->
+    <event NAME="S" ID="18" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_S" />
+    <!-- E -->
+    <event NAME="E" ID="19" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_E" />
+    <!-- Strg + Alt + A -->
+    <event NAME="Strg+Alt+A" ID="20" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0600" KEY="Key_A" />
+    <!-- Strg + Alt + B -->
+    <event NAME="Strg+Alt+B" ID="21" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0600" KEY="Key_B" />
+    <!-- Strg + Alt + H -->
+    <event NAME="Strg+Alt+H" ID="30" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0600" KEY="Key_H" />
+    <!-- Strg + Alt + I -->
+    <event NAME="Strg+Alt+I" ID="31" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0600" KEY="Key_I" />
+    <!-- Strg + Alt + S -->
+    <event NAME="Strg+Alt+S" ID="40" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0600" KEY="Key_S" />
+    <!-- Alt -->
+    <event NAME="Alt" ID="90" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0400" KEY="Key_Alt" />
+
     <!-- leftMouseButtonRelease -->
     <event NAME="leftMouseRelease" ID="505" TYPE="Type_MouseButtonRelease" BUTTON="BS_LeftButton" BUTTONSTATE="0x0001" KEY="Key_none" />
     <!-- MiddleMouseButtonRelease -->

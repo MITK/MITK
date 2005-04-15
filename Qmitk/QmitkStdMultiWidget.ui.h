@@ -618,11 +618,16 @@ void QmitkStdMultiWidget::changeLevelWindow(mitk::LevelWindow* lw)
       it->Get()->GetIntProperty("layer", layer);
       if ( layer >= maxLayer )
       {
-        mitk::LevelWindowProperty::Pointer levWinProp = dynamic_cast<mitk::LevelWindowProperty*>(it->Get()->GetProperty("levelwindow").GetPointer());
-        if (levWinProp.IsNotNull())
+        bool binary = false;
+        it->Get()->GetBoolProperty("binary", binary);
+        if( binary == false)
         {
-          topLevWinProp = levWinProp;
-          maxLayer = layer;
+          mitk::LevelWindowProperty::Pointer levWinProp = dynamic_cast<mitk::LevelWindowProperty*>(it->Get()->GetProperty("levelwindow").GetPointer());
+          if (levWinProp.IsNotNull())
+          {
+            topLevWinProp = levWinProp;
+            maxLayer = layer;
+          }
         }
       }
     }

@@ -35,12 +35,12 @@ QmitkPropertyListViewItem* QmitkPropertyListViewItem::CreateInstance(mitk::Prope
   newItem->m_EnabledButton = new QPushButton(parent);
   newItem->UpdateEnabledView();
   connect(
-(QObject*)(newItem->m_EnabledButton),
-SIGNAL(clicked()),
-(QObject*)(newItem),
-SLOT(EnabledButtonClicked())
-);
-   newItem->m_Label = new QLabel(name.c_str(),parent);
+    (QObject*)(newItem->m_EnabledButton),
+    SIGNAL(clicked()),
+    (QObject*)(newItem),
+    SLOT(EnabledButtonClicked())
+  );
+  newItem->m_Label = new QLabel(name.c_str(),parent);
   if (mitk::BoolProperty* boolProp = dynamic_cast<mitk::BoolProperty*>(baseProp))
   {
     newItem->m_Control = new QCheckBox(parent);
@@ -132,7 +132,8 @@ void QmitkPropertyListViewItem::UpdateEnabledView()
     m_EnabledButton->setPixmap(disabledPix);
   }
 }
-void QmitkPropertyListViewItem::EnabledButtonClicked() {
+void QmitkPropertyListViewItem::EnabledButtonClicked()
+{
   mitk::BaseProperty* baseProp = m_PropertyList->GetProperty(m_Name.c_str());
   baseProp->SetEnabled(! baseProp->GetEnabled());
   UpdateEnabledView();

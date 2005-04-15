@@ -19,31 +19,12 @@
         <property name="name">
             <cstring>unnamed</cstring>
         </property>
-        <widget class="QPushButton">
-            <property name="name">
-                <cstring>m_Button</cstring>
-            </property>
-            <property name="text">
-                <string>S&amp;ave</string>
-            </property>
-        </widget>
         <widget class="QGroupBox">
             <property name="name">
                 <cstring>m_Group</cstring>
             </property>
             <property name="title">
                 <string>Properties</string>
-            </property>
-        </widget>
-        <widget class="QFrame">
-            <property name="name">
-                <cstring>m_Frame</cstring>
-            </property>
-            <property name="frameShape">
-                <enum>StyledPanel</enum>
-            </property>
-            <property name="frameShadow">
-                <enum>Raised</enum>
             </property>
         </widget>
     </vbox>

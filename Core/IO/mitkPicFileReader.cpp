@@ -167,6 +167,7 @@ void mitk::PicFileReader::GenerateData()
         ipPicDescriptor* pic=ipPicGet(const_cast<char *>(m_FileName.c_str()), NULL);
         ConvertHandedness(pic);
         output->SetPicChannel(pic);
+        ipPicFree(pic);
 
         //slice-wise reading
         //currently much too slow.
@@ -216,7 +217,9 @@ void mitk::PicFileReader::GenerateData()
             {
                 itkDebugMacro("Image '" << fullName << "' could not be added to Image."); 
             }
-        }
+       }
+       if(pic!=NULL)
+         ipPicFree(pic);
     }
 }
 

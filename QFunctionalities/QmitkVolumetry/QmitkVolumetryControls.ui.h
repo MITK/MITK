@@ -10,6 +10,7 @@
 ** destructor.
 *****************************************************************************/
 
+#include "QmitkTreeNodeSelector.h"
 
 void QmitkVolumetryControls::SetDataTreeIterator( mitk::DataTreeIteratorBase * it )
 {

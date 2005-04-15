@@ -53,25 +53,28 @@ void QmitkPropertyListView::SetPropertyList( mitk::PropertyList *propertyList )
       m_PropertyList->RemoveObserver(m_ObserverTag);
     }
     m_PropertyList = propertyList;
-    itk::SimpleMemberCommand<QmitkPropertyListView>::Pointer propertyListModifiedCommand =
-      itk::SimpleMemberCommand<QmitkPropertyListView>::New();
-    propertyListModifiedCommand->SetCallbackFunction(this, &QmitkPropertyListView::PropertyListModified);
-    m_ObserverTag = m_PropertyList->AddObserver(itk::ModifiedEvent(), propertyListModifiedCommand);
-    int row = 0;
-    const mitk::PropertyList::PropertyMap* propertyMap = propertyList->GetMap();
+    if (m_PropertyList)
+    {
+      itk::SimpleMemberCommand<QmitkPropertyListView>::Pointer propertyListModifiedCommand =
+        itk::SimpleMemberCommand<QmitkPropertyListView>::New();
+      propertyListModifiedCommand->SetCallbackFunction(this, &QmitkPropertyListView::PropertyListModified);
+      m_ObserverTag = m_PropertyList->AddObserver(itk::ModifiedEvent(), propertyListModifiedCommand);
+      int row = 0;
+      const mitk::PropertyList::PropertyMap* propertyMap = propertyList->GetMap();
 
-    // clear the group
-    for (std::map<std::string,QmitkPropertyListViewItem*>::iterator it = m_Items.begin() ; it != m_Items.end() ; it++)
-    {
-      delete it->second->m_EnabledButton;
-      delete it->second->m_Label;
-      delete it->second->m_Control;
-    }
-    m_Items.clear();
-    for (mitk::PropertyList::PropertyMap::const_iterator iter = propertyMap->begin(); iter!=propertyMap->end(); iter++)
-    {
-      QmitkPropertyListViewItem* item = QmitkPropertyListViewItem::CreateInstance(propertyList,iter->first,m_Group);
-      m_Items.insert(std::make_pair(item->m_Name,item));
+      // clear the group
+      for (std::map<std::string,QmitkPropertyListViewItem*>::iterator it = m_Items.begin() ; it != m_Items.end() ; it++)
+      {
+        delete it->second->m_EnabledButton;
+        delete it->second->m_Label;
+        delete it->second->m_Control;
+      }
+      m_Items.clear();
+      for (mitk::PropertyList::PropertyMap::const_iterator iter = propertyMap->begin(); iter!=propertyMap->end(); iter++)
+      {
+        QmitkPropertyListViewItem* item = QmitkPropertyListViewItem::CreateInstance(propertyList,iter->first,m_Group);
+        m_Items.insert(std::make_pair(item->m_Name,item));
+      }
     }
   }
 }

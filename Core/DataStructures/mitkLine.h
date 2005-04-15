@@ -82,7 +82,7 @@ public:
     point2 = m_Point + m_Direction;
 
     m_Point = point1;
-    direction = point2 - point1;
+    m_Direction = point2 - point1;
   }
 
   //##Documentation
@@ -219,7 +219,7 @@ public:
     itk::Vector<TCoordRep,NPointDimension> diff;
     diff = point - this->m_Point;
 
-    if( diff*direction < 0 ) 
+    if( diff*m_Direction < 0 ) 
       return false;
 
     if( diff.GetSquaredNorm() <= m_Direction.GetSquaredNorm() ) 

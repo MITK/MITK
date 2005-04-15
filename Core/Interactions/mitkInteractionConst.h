@@ -57,7 +57,7 @@ typedef enum EEventIds
   EIDSTRGANDN = 10,
   EIDSTRGANDE = 11,
   EIDDELETE = 12,
-  EIDESCAPE = 13,
+  EIDESCAPE = 14,
   EIDLEFTMOUSERELEASE = 505,
   EIDMIDDLEMOUSERELEASE = 506,
   EIDRIGHTMOUSERELEASE = 507,
@@ -118,20 +118,25 @@ typedef enum EOperations
   OpSELECTLINE = 701,
   OpSELECTCELL = 702,
   OpSELECTSUBOBJECT = 703, //for VesselGraphInteractor2
-  OpSELECTNEWSUBOBJECT = 704, //for VesselGraphInteractor2
+  //OpSELECTNEWSUBOBJECT = 704, //for VesselGraphInteractor2
   OpDESELECTPOINT = 800,
   OpDESELECTLINE = 801,
   OpDESELECTCELL = 802,
-  OpDESELECTSUBOBJECT = 803,
+  OpDESELECTSUBOBJECT = 803,  //for VesselGraphInteractor2
   OpDESELECTALL = 804,     //for VesselGraphInteractor2
-  OpNAVIGATE = 900,       //for VesselGraphInteractor2
+  OpNAVIGATE = 900,       
   OpZOOM = 1000,
   OpSCALE = 1100,
   OpROTATE = 1200,
   OpSETPOINTTYPE = 1210,
   OpMODECHANGE = 1500,
-  OpSENDCOORDINATES = 1600
-
+  OpSENDCOORDINATES = 1600,
+  OpPERIPHERYSEARCH = 2000,  //used in VesselGraphInteractor2
+  OpROOTSEARCH = 2001,        //used in VesselGraphInteractor2
+  OpTHICKSTVESSELSEARCH = 2002,       //used in VesselGraphInteractor2
+  OpSHORTESTPATHSEARCH = 2003,       //used in VesselGraphInteractor2
+  OpATTRIBUTATION = 2004,       //used in VesselGraphInteractor2
+  OpDEFAULT = 2006                  //used in VesselGraphInteractor2
 };
 
 //##Constants for EventMapping...
@@ -222,7 +227,14 @@ typedef enum EActions
   AcCHECKBOUNDINGBOX = 1510,
   AcFORCESUBINTERACTORS = 1550,
   AcSENDCOORDINATES = 1600,
-  AcTRANSMITEVENT = 2000  //to transmit an event to a lower Interactor/Statemachine
+  AcTRANSMITEVENT = 2000,  //to transmit an event to a lower Interactor/Statemachine
+  AcPERIPHERYSEARCH = 3000,  //used in VesselGraphInteractor2
+  AcROOTSEARCH = 3001,       //used in VesselGraphInteractor2
+  AcTHICKSTVESSELSEARCH = 3002,       //used in VesselGraphInteractor2
+  AcSHORTESTPATHSEARCH = 3003,       //used in VesselGraphInteractor2
+  AcSINGLE = 3004,                    //used in VesselGraphInteractor2
+  AcATTRIBUTATION = 3005,              //used in VesselGraphInteractor2
+  AcDEFAULT = 3007                  //used in VesselGraphInteractor2
 };
 
 

@@ -201,7 +201,7 @@ void mitk::SurfaceToImageFilter::Stencil3DImage(int time)
     mitk::Image::Pointer output = this->GetOutput();
     //output->Initialize( castFilter->GetOutput() );
     //output->SetGeometry( static_cast<mitk::Geometry3D*>(GetImage()->GetGeometry()->Clone().GetPointer()) );
-    output->SetVolume( stencil->GetOutput()->GetScalarPointer(), time );
+    output->SetVolume( threshold->GetOutput()->GetScalarPointer(), time );
 
     threshold = NULL;
   }

@@ -49,6 +49,7 @@ class QmitkPropertyListViewItem : public QObject {
     void CheckBoxControlActivated(int state);
     void StringControlActivated(const QString &text);
     void ColorControlActivated();
+    void FloatControlActivated(const QString &text);
   protected:
     QmitkPropertyListViewItem() {}
   protected slots:

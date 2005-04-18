@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkPropertyList.h"
 #include "mitkProperties.h"
 #include "mitkColorProperty.h"
+#include "mitkPropertyManager.h"
 
 #include <qcheckbox.h>
 #include <qlineedit.h>
@@ -27,13 +28,15 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qpushbutton.h>
 #include <qpixmap.h>
 #include <qcolordialog.h>
+#include <qvalidator.h>
 
 QmitkPropertyListViewItem* QmitkPropertyListViewItem::CreateInstance(mitk::PropertyList *propList, const std::string name, QWidget* parent)
 {
   QmitkPropertyListViewItem* newItem = new QmitkPropertyListViewItem(name,propList,NULL,NULL);
   mitk::PropertyList::PropertyMap::const_iterator it = newItem->m_PropertyList->GetMap()->find(newItem->m_Name.c_str());
   mitk::BaseProperty* baseProp = NULL;
-  if (it != newItem->m_PropertyList->GetMap()->end()) {
+  if (it != newItem->m_PropertyList->GetMap()->end())
+  {
     baseProp = it->second.first;
   }
   newItem->m_EnabledButton = new QPushButton(parent);
@@ -67,6 +70,16 @@ QmitkPropertyListViewItem* QmitkPropertyListViewItem::CreateInstance(mitk::Prope
     newItem->m_Control->setPaletteBackgroundColor(qcol);
     connect((QObject*)(newItem->m_Control),SIGNAL(clicked()),(QObject*)(newItem),SLOT(ColorControlActivated()));
   }
+  else if (mitk::FloatProperty* floatProp = dynamic_cast<mitk::FloatProperty*>(baseProp))
+  {
+
+    std::pair<float,float> minMax = mitk::PropertyManager::GetInstance()->GetDefaultLimits(newItem->m_Name);
+    QString text;
+    text.setNum(floatProp->GetValue());
+    newItem->m_Control = new QLineEdit(text,parent);
+    ((QLineEdit*)(newItem->m_Control))->setValidator(new QDoubleValidator(minMax.first,minMax.second,3,newItem->m_Control));
+    connect((QObject*)(newItem->m_Control),SIGNAL(textChanged(const QString &)),(QObject*)(newItem),SLOT(FloatControlActivated(const QString &)));
+  }
   else
   {
     newItem->m_Control = new QLabel(QString(baseProp->GetValueAsString().c_str()),parent);
@@ -86,6 +99,18 @@ void QmitkPropertyListViewItem::StringControlActivated(const QString &text)
 {
   std::cout << "setting string property to:" << text.ascii() << std::endl;
   m_PropertyList->SetProperty(m_Name.c_str(), new mitk::StringProperty(text.ascii()));
+}
+void QmitkPropertyListViewItem::FloatControlActivated(const QString &text)
+{
+  if (((QLineEdit*)m_Control)->hasAcceptableInput())
+  {
+    float value = text.toFloat();
+    mitk::FloatProperty* floatProp = dynamic_cast<mitk::FloatProperty*>(m_PropertyList->GetProperty(m_Name.c_str()).GetPointer());
+    if (value != floatProp->GetValue())
+    {
+      m_PropertyList->SetProperty(m_Name.c_str(), new mitk::FloatProperty(value));
+    }
+  }
 }
 void QmitkPropertyListViewItem::ColorControlActivated()
 {
@@ -115,6 +140,13 @@ void QmitkPropertyListViewItem::UpdateView()
   {
     ((QLineEdit*)(m_Control))->setText(QString(stringProp->GetValue()));
   }
+  else if (mitk::FloatProperty* floatProp = dynamic_cast<mitk::FloatProperty*>(baseProp))
+  {
+    QString text;
+    text.setNum(floatProp->GetValue());
+    ((QLineEdit*)(m_Control))->setText(text);
+  }
+
   else if (mitk::ColorProperty* colorProp = dynamic_cast<mitk::ColorProperty*>(baseProp))
   {
     mitk::Color col = colorProp->GetColor();
@@ -130,10 +162,12 @@ void QmitkPropertyListViewItem::UpdateEnabledView()
   if (m_PropertyList->IsEnabled(m_Name.c_str())) /* baseProp->GetEnabled()) */
   {
     m_EnabledButton->setPixmap(enabledPix);
+    if (m_Control) {m_Control->setEnabled(true);}
   }
   else
   {
     m_EnabledButton->setPixmap(disabledPix);
+    if (m_Control) {m_Control->setEnabled(false);}
   }
 }
 void QmitkPropertyListViewItem::EnabledButtonClicked()

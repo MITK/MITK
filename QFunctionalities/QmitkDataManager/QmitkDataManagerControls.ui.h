@@ -31,8 +31,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkProperties.h"
 #include "mitkEventMapper.h"
 #include "mitkFocusManager.h"
-#include "mitkPointSetWriter.h"
-//#include "mitkVesselGraphFileWriter.h"
 #include "itkImage.h"
 
 #include <itksys/SystemTools.hxx>
@@ -171,55 +169,7 @@ void QmitkDataManagerControls::SaveButton_clicked()
 
         if (data.IsNotNull())
         {
-          mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(data.GetPointer());
-          if(image.IsNotNull())
-          {
-            typedef itk::Image<int,3> ImageType;
-            CommonFunctionality::SaveImage< ImageType >(image);
-          }
-          mitk::PointSet::Pointer pointset = dynamic_cast<mitk::PointSet*>(data.GetPointer());
-          if(pointset.IsNotNull())
-          {
-            selectedItemsName = itksys::SystemTools::GetFilenameWithoutExtension(selectedItemsName);
-            selectedItemsName += ".mps";
-            QString fileName = QFileDialog::getSaveFileName(QString(selectedItemsName.c_str()),"MITK Point-Sets (*.mps)");
-            if (fileName != NULL )
-            {
-              mitk::PointSetWriter::Pointer writer = mitk::PointSetWriter::New();
-              writer->SetInput( pointset );
-              writer->SetFileName( fileName.ascii() );
-              writer->Update();
-            }
-          }
-          mitk::Surface::Pointer surface = dynamic_cast<mitk::Surface*>(data.GetPointer());
-          if(surface.IsNotNull())
-          {
-            CommonFunctionality::SaveSurface(surface, "SurfaceModel.stl");
-          }
-          //mitk::UndirectedVesselGraphData::Pointer uvg = dynamic_cast<mitk::UndirectedVesselGraphData*>(data.GetPointer());
-          //if (uvg.IsNotNull())
-          //{
-          //  QString fileName = QFileDialog::getSaveFileName(QString("VesselGraph.uvg"),"MITK VesselGraph (*.uvg)");
-          //  if (fileName != NULL ) 
-          //  {
-          //    mitk::VesselGraphFileWriter<Undirected>::Pointer writer = mitk::VesselGraphFileWriter<Undirected>::New();
-          //    writer->SetInput( uvg );
-          //    writer->SetFileName( fileName.ascii() );
-          //    writer->Update();
-          //  }
-          //}
-          //mitk::DirectedVesselGraphData::Pointer dvg = dynamic_cast<mitk::DirectedVesselGraphData*>(data.GetPointer());
-          //if (dvg.IsNotNull())
-          //{
-          //  QString fileName = QFileDialog::getSaveFileName(QString("VesselGraph.dvg"),"MITK VesselGraph (*.dvg)");
-          //  if (fileName != NULL ) 
-          //  {
-          //    mitk::VesselGraphFileWriter<Directed>::Pointer writer = mitk::VesselGraphFileWriter<Directed>::New();
-          //    writer->SetInput( dvg );
-          //    writer->SetFileName( fileName.ascii() );
-          //    writer->Update();
-          //  }
-          //}
+          CommonFunctionality::SaveBaseData( data.GetPointer(), selectedItemsName );
         }
       }
     }

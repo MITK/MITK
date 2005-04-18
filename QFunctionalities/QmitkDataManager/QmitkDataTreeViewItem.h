@@ -48,55 +48,7 @@ class QmitkDataTreeViewItem : public QListViewItem
 };
 
 
-class QmitkNodeViewBaseItem {
-  public:
-    QmitkNodeViewBaseItem(mitk::PropertyList::Pointer propList, mitk::BaseProperty::Pointer property) : m_PropertyList(propList),m_Property(property) {};
-    bool isPropEnabled() {
-      return m_Property->GetEnabled();
-    }  
-    void setPropEnabled(bool enable) {
-      m_Property->SetEnabled(enable);
-    } 
-    void updateEnabledAppearance();    
-    virtual ~QmitkNodeViewBaseItem() {}
-    mitk::BaseProperty::Pointer GetProperty() { return m_Property;}
-    mitk::PropertyList::Pointer GetPropertyList() { return m_PropertyList;}
-  protected:
-    mitk::PropertyList::Pointer m_PropertyList;
-    mitk::BaseProperty::Pointer m_Property;
-};
 
-
-class NodeViewCheckboxItem : public QCheckListItem, public QmitkNodeViewBaseItem {
-  public:
-    NodeViewCheckboxItem(QListView* parent,QString name,bool value, bool isDefault, mitk::PropertyList::Pointer propList,mitk::BaseProperty::Pointer property) : 
-      QCheckListItem(parent,name,QCheckListItem::CheckBox) , QmitkNodeViewBaseItem(propList,property)
-      {
-        setOn(value);
-      }
-
-    virtual ~NodeViewCheckboxItem() {}
-  protected:
-    virtual void stateChange ( bool state) {
-   mitk::BoolProperty* boolProp = dynamic_cast<mitk::BoolProperty*>(m_Property.GetPointer());
-//      if (m_PropertyList->SetProperty((const char *)text(),new mitk::BoolProperty(state))) {
-   if (boolProp != NULL && boolProp->GetValue() != state) {
-         
-        boolProp->SetValue(state);
-	mitk::RenderWindow::UpdateAllInstances();
-      };
-
-       QCheckListItem::stateChange(state);
-      listView()->repaintContents();      
-    };
-};
-
-class NodeViewPropertyItem : public QListViewItem, public QmitkNodeViewBaseItem {
-  public:
-    NodeViewPropertyItem(QListView* parent,QString propClassName, QString name,QString value, bool isDefault, mitk::PropertyList::Pointer propList,mitk::BaseProperty::Pointer property) : 
-      QListViewItem(parent,propClassName, name, value) , QmitkNodeViewBaseItem(propList,property){ };
-    virtual ~NodeViewPropertyItem() {}
-};
 class QmitkDataManagerControls;	
 class QmitkFocusChangeCommand : public itk::Command {
   protected:

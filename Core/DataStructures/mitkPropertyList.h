@@ -44,7 +44,8 @@ public:
 
     /** Method for creation through the object factory. */
     itkNewMacro(Self);
-    typedef std::map<std::string,BaseProperty::Pointer> PropertyMap;
+    typedef std::map< std::string,std::pair<BaseProperty::Pointer,bool> > PropertyMap;
+    typedef std::pair< std::string,std::pair<BaseProperty::Pointer,bool> > PropertyMapElementType;
 public:
     //##ModelId=3D6A0E9E0029
     //##Documentation
@@ -75,7 +76,9 @@ public:
 
     virtual void Clear();
 
-	virtual bool WriteXML( XMLWriter& xmlWriter );
+    virtual bool WriteXML( XMLWriter& xmlWriter );
+    virtual bool IsEnabled(const char *propertyKey);
+    virtual void SetEnabled(const char *propertyKey,bool enabled);
 protected:
     //##ModelId=3E38FEFE0125
     PropertyList();

@@ -31,7 +31,11 @@ PURPOSE.  See the above copyright notices for more information.
 QmitkPropertyListViewItem* QmitkPropertyListViewItem::CreateInstance(mitk::PropertyList *propList, const std::string name, QWidget* parent)
 {
   QmitkPropertyListViewItem* newItem = new QmitkPropertyListViewItem(name,propList,NULL,NULL);
-  mitk::BaseProperty* baseProp = newItem->m_PropertyList->GetProperty(newItem->m_Name.c_str());
+  mitk::PropertyList::PropertyMap::const_iterator it = newItem->m_PropertyList->GetMap()->find(newItem->m_Name.c_str());
+  mitk::BaseProperty* baseProp = NULL;
+  if (it != newItem->m_PropertyList->GetMap()->end()) {
+    baseProp = it->second.first;
+  }
   newItem->m_EnabledButton = new QPushButton(parent);
   newItem->UpdateEnabledView();
   connect(
@@ -123,7 +127,7 @@ void QmitkPropertyListViewItem::UpdateEnabledView()
   static const QPixmap enabledPix((const char **)enabled_xpm);
   static const QPixmap disabledPix((const char **)disabled_xpm);
   mitk::BaseProperty* baseProp = m_PropertyList->GetProperty(m_Name.c_str());
-  if (baseProp->GetEnabled())
+  if (m_PropertyList->IsEnabled(m_Name.c_str())) /* baseProp->GetEnabled()) */
   {
     m_EnabledButton->setPixmap(enabledPix);
   }
@@ -135,6 +139,7 @@ void QmitkPropertyListViewItem::UpdateEnabledView()
 void QmitkPropertyListViewItem::EnabledButtonClicked()
 {
   mitk::BaseProperty* baseProp = m_PropertyList->GetProperty(m_Name.c_str());
-  baseProp->SetEnabled(! baseProp->GetEnabled());
+  //baseProp->SetEnabled(! baseProp->GetEnabled());
+  m_PropertyList->SetEnabled(m_Name.c_str(), ! m_PropertyList->IsEnabled(m_Name.c_str()));
   UpdateEnabledView();
 }

@@ -88,22 +88,3 @@ mitk::DataTreeNode::Pointer QmitkDataTreeViewItem::GetDataTreeNode() const {
   return m_TreeNode;
 }
 
-void QmitkNodeViewBaseItem::updateEnabledAppearance() {
-  static const QPixmap enabledPix((const char **)enabled_xpm);
-  static const QPixmap disabledPix((const char **)disabled_xpm);
-  // ok, we are instanceof QListViewItem, but the cast
-  // is ugly:
-  QListViewItem* listViewItem = NULL;
-  listViewItem = dynamic_cast<NodeViewPropertyItem*>(this);
-  if ((listViewItem = dynamic_cast<NodeViewPropertyItem*>(this)) ||
-    (listViewItem = dynamic_cast<NodeViewCheckboxItem*>(this))) {
-      if (isPropEnabled()) {
-        listViewItem->setPixmap(0,enabledPix);
-      } else {
-        listViewItem->setPixmap(0,disabledPix);
-
-      }
-
-
-    }
-}

@@ -207,13 +207,13 @@ mitk::BaseProperty::Pointer mitk::DataTreeNode::GetProperty(const char *property
   //and is it enabled
   mitk::BaseProperty::Pointer property;
   property=it->second->GetProperty(propertyKey);
-  if(property.IsNotNull() && property->GetEnabled())
+  if(property.IsNotNull())
     //yes? return it
     return property;
 
   //no? use the renderer-independent one!
   property=m_PropertyList->GetProperty(propertyKey);
-  if(property.IsNotNull() && property->GetEnabled())
+  if(property.IsNotNull())
     return property;
   return NULL;
 }

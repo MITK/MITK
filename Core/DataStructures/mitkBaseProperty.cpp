@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkBaseProperty.h"
 
 //##ModelId=3E38FF0902A7
-mitk::BaseProperty::BaseProperty() : m_Enabled(true)
+mitk::BaseProperty::BaseProperty() 
 {
   m_ReferenceCountLock.Lock();
   m_ReferenceCount = 0;

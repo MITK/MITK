@@ -26,9 +26,8 @@ mitk::BaseProperty::Pointer mitk::PropertyList::GetProperty(const char *property
     PropertyMap::const_iterator it;
     
     it=m_Properties.find( propertyKey );
-
-    if(it!=m_Properties.end())
-	    return it->second;
+    if(it!=m_Properties.end() &&  it->second.second )
+	    return it->second.first;
     else 
         return NULL;
 }
@@ -44,19 +43,22 @@ void mitk::PropertyList::SetProperty(const char* propertyKey, BaseProperty* prop
         //yes?
     {
         //is the property contained in the list identical to the new one?
-        if( it->second == property) {
+        if( it->second.first == property) {
             // yes? do nothing and return.
             return;
 	}
         //no? erase the old entry.
-        it->second=NULL;
+        it->second.first=NULL;
         m_Properties.erase(it);
     }
 
     //no? add/replace it.
 	//std::pair<PropertyMap::iterator, bool> o=
-        m_Properties.insert ( std::pair<std::string,BaseProperty::Pointer>( propertyKey, property ) );
-   Modified();
+       PropertyMapElementType newProp;
+       newProp.first = propertyKey;
+       newProp.second = std::pair<BaseProperty::Pointer,bool>(property,true);
+       m_Properties.insert ( newProp );
+       Modified();
 }
 
 //##ModelId=3E38FEFE0125
@@ -76,7 +78,7 @@ unsigned long mitk::PropertyList::GetMTime() const
     PropertyMap::const_iterator it = m_Properties.begin(), end = m_Properties.end();
 	for(;it!=end;++it)
 	{
-		if(Superclass::GetMTime()<it->second->GetMTime())
+		if(Superclass::GetMTime()<it->second.first->GetMTime())
 		{
 			Modified();
 			break;
@@ -92,7 +94,7 @@ bool mitk::PropertyList::DeleteProperty(const char* propertyKey)
 
   if(it!=m_Properties.end())
   {
-    it->second=NULL;
+    it->second.first=NULL;
     m_Properties.erase(it);
     Modified();
     return true;
@@ -115,7 +117,7 @@ void mitk::PropertyList::Clear()
   PropertyMap::iterator it = m_Properties.begin(), end = m_Properties.end();
   while(it!=end)
   {
-    it->second = NULL;
+    it->second.first = NULL;
     ++it;
   }
   m_Properties.clear();
@@ -132,8 +134,8 @@ bool mitk::PropertyList::WriteXML( mitk::XMLWriter& xmlWriter )
 
 	while ( i != end ) {
 		xmlWriter.BeginNode( "property" );		
-		xmlWriter.WriteProperty( "className", typeid( *(*i).second.GetPointer() ).name() );
-		xmlWriter.WriteProperty((*i).first.c_str(), (*i).second->GetValueAsString().c_str());
+		xmlWriter.WriteProperty( "className", typeid( *(*i).second.first.GetPointer() ).name() );
+		xmlWriter.WriteProperty((*i).first.c_str(), (*i).second.first->GetValueAsString().c_str());
 		xmlWriter.EndNode();
 		*i++;
 	}
@@ -141,4 +143,19 @@ bool mitk::PropertyList::WriteXML( mitk::XMLWriter& xmlWriter )
 	xmlWriter.EndNode();
 
 	return true;
+}
+bool mitk::PropertyList::IsEnabled(const char *propertyKey) {
+  PropertyMap::iterator it = m_Properties.find( propertyKey );
+  if (it != m_Properties.end() && it->second.second) {
+   return true;
+  } else {
+    return false;
+  }
+}
+void mitk::PropertyList::SetEnabled(const char *propertyKey,bool enabled) {
+  PropertyMap::iterator it = m_Properties.find( propertyKey );
+  if (it != m_Properties.end() && it->second.second != enabled) {
+    it->second.second = enabled;
+    this->Modified();
+  }
 }

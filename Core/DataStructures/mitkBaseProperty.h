@@ -49,15 +49,12 @@ public:
   //## is used by PropertyList to check whether a property has been changed.
   virtual bool operator==(const BaseProperty& property) const = 0;
   virtual std::string GetValueAsString() const;
-  itkSetMacro(Enabled,bool);
-  itkGetConstMacro(Enabled,bool);
 protected:
   //##ModelId=3E38FF0902A7
     BaseProperty();
 
     //##ModelId=3E38FF0902CF
     virtual ~BaseProperty();
-    bool m_Enabled;
 };
 
 } // namespace mitk

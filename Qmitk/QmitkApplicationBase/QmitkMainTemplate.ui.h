@@ -112,7 +112,7 @@ class posOutputType : public mitk::OperationActor
 {
   mitk::DataTreeIteratorClone m_DataTreeIterator;
 public:
-    typedef mitk::Operation Operation;
+  
   posOutputType(mitk::DataTreeIteratorBase* iterator)
   {
     m_DataTreeIterator = iterator;
@@ -122,6 +122,7 @@ public:
   {
   }
 
+  typedef mitk::Operation Operation;
   void ExecuteOperation(Operation* operation) //writing mitk::Operation causes QT-Designer to create a Slot calles Operation*operation) and thus causes errors. Thats why we here have a typedef. //TODO: FIX it!
   {
     mitk::PointOperation* pointoperation = dynamic_cast<mitk::PointOperation*>(operation);

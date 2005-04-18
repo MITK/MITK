@@ -708,7 +708,7 @@ bool mitk::PointSetInteractor::ExecuteAction( Action* action, mitk::StateEvent c
 	}
   
   //XXX bug 27
-  m_DataTreeNode->Modified();//modified is also called in mitkPointSet!
+  //m_DataTreeNode->Modified();//modified is also called in mitkPointSet!
   return ok;
 }
 

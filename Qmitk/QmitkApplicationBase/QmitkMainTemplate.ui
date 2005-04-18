@@ -88,6 +88,7 @@
     </item>
     <item text="Options" name="Options">
         <action name="HideToolbarAction"/>
+        <action name="optionsFine_Undo_enabledAction"/>
     </item>
 </menubar>
 <toolbars>
@@ -102,32 +103,6 @@
         <separator/>
         <action name="editUndoAction"/>
         <action name="editRedoAction"/>
-        <widget class="QPushButton">
-            <property name="name">
-                <cstring>PBShift</cstring>
-            </property>
-            <property name="maximumSize">
-                <size>
-                    <width>30</width>
-                    <height>30</height>
-                </size>
-            </property>
-            <property name="text">
-                <string>fine</string>
-            </property>
-            <property name="toggleButton">
-                <bool>true</bool>
-            </property>
-            <property name="on">
-                <bool>true</bool>
-            </property>
-            <property name="toolTip" stdset="0">
-                <string>fine Undo/Redo</string>
-            </property>
-            <property name="whatsThis" stdset="0">
-                <string>if activated, the Undo or Redo operates step by step and not in defined Groups</string>
-            </property>
-        </widget>
         <action name="Fullscreen"/>
         <separator/>
         <widget class="QCheckBox">
@@ -589,6 +564,26 @@
             <string>Hide Toolbar</string>
         </property>
     </action>
+    <action>
+        <property name="name">
+            <cstring>optionsFine_Undo_enabledAction</cstring>
+        </property>
+        <property name="toggleAction">
+            <bool>true</bool>
+        </property>
+        <property name="on">
+            <bool>true</bool>
+        </property>
+        <property name="text">
+            <string>Fine Undo enabled</string>
+        </property>
+        <property name="menuText">
+            <string>Fine Undo enabled</string>
+        </property>
+        <property name="toolTip">
+            <string>To undo one action or a group of actions.</string>
+        </property>
+    </action>
 </actions>
 <images>
     <image name="image0">
@@ -788,6 +783,12 @@
         <receiver>QmitkMainTemplate</receiver>
         <slot>hideToolbar(bool)</slot>
     </connection>
+    <connection>
+        <sender>optionsFine_Undo_enabledAction</sender>
+        <signal>toggled(bool)</signal>
+        <receiver>QmitkMainTemplate</receiver>
+        <slot>enableFineUndo(bool)</slot>
+    </connection>
 </connections>
 <includes>
     <include location="global" impldecl="in implementation">QmitkStdMultiWidget.h</include>
@@ -820,6 +821,7 @@
     <variable>QmitkStdMultiWidget* mitkMultiWidget;</variable>
     <variable>mitk::DataTree::Pointer tree;</variable>
     <variable>bool m_StandardViewsInitialized;</variable>
+    <variable access="private">bool m_FineUndoEnabled;</variable>
 </variables>
 <signals>
     <signal>ShowWidgetPlanesToggled(bool)</signal>
@@ -853,6 +855,7 @@
     <slot>changeToColumnWidget3n4Layout()</slot>
     <slot>changeToRowWidget3n4Layout()</slot>
     <slot>hideToolbar( bool on )</slot>
+    <slot>enableFineUndo( bool enabled )</slot>
 </slots>
 <functions>
     <function>fileOpen( const char * fileName )</function>
@@ -868,7 +871,6 @@
     <function access="private">destroy()</function>
     <function specifier="static" returnType="QmitkMainTemplate *">getInstance()</function>
     <function specifier="non virtual" returnType="QmitkFctMediator *">getFctMediator()</function>
-    <function access="protected">newFunction()</function>
 </functions>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

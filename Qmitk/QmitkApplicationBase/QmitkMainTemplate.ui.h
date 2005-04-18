@@ -60,6 +60,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkUndoController.h>
 #include <mitkStateMachine.h>
 #include <mitkEventMapper.h>
+#include <mitkOperation.h>
 #include <mitkGlobalInteraction.h>
 #include <mitkUSLookupTableSource.h>
 #include <mitkConfig.h>
@@ -111,14 +112,17 @@ class posOutputType : public mitk::OperationActor
 {
   mitk::DataTreeIteratorClone m_DataTreeIterator;
 public:
-
+    typedef mitk::Operation Operation;
   posOutputType(mitk::DataTreeIteratorBase* iterator)
   {
     m_DataTreeIterator = iterator;
   }
-  ~posOutputType(){}
+  
+  ~posOutputType()
+  {
+  }
 
-  virtual void ExecuteOperation(mitk::Operation* operation)
+  void ExecuteOperation(Operation* operation) //writing mitk::Operation causes QT-Designer to create a Slot calles Operation*operation) and thus causes errors. Thats why we here have a typedef. //TODO: FIX it!
   {
     mitk::PointOperation* pointoperation = dynamic_cast<mitk::PointOperation*>(operation);
 
@@ -378,12 +382,12 @@ void QmitkMainTemplate::fileExit()
 
 void QmitkMainTemplate::editUndo()
 {
-  undoController->Undo(PBShift->isOn());
+  undoController->Undo(m_FineUndoEnabled);
 }
 
 void QmitkMainTemplate::editRedo()
 {
-  undoController->Redo(PBShift->isOn());
+  undoController->Redo(m_FineUndoEnabled);
 }
 
 void QmitkMainTemplate::editCut()
@@ -427,6 +431,7 @@ void QmitkMainTemplate::init()
   m_Instance = this;
   mitkMultiWidget=NULL;
   m_StandardViewsInitialized = false;
+  m_FineUndoEnabled = true;
 
   //creating a QmitkStatusBar for Output on the QStatusBar and connecting it with the MainStatusBar
   QmitkStatusBar *statusBar = new QmitkStatusBar(this->statusBar());
@@ -693,7 +698,8 @@ void QmitkMainTemplate::hideToolbar(bool on)
     ToolBar->show();
 }
 
-void QmitkMainTemplate::newFunction()
-{
 
+void QmitkMainTemplate::enableFineUndo( bool enabled )
+{
+  m_FineUndoEnabled = enabled;
 }

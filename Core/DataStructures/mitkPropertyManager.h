@@ -21,19 +21,25 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITKPROPERTYMANAGER_H_HEADER_INCLUDED
 #include "mitkPropertyList.h"
 #include <set>
+#include <map>
+
 namespace mitk {
   class PropertyManager {
 
     public:
-      typedef std::set<std::string> PropertyNameSet; 
+      typedef std::set<std::string> PropertyNameSet;
+            
 //      typedef PropertyNameSetterator PropertyNameIterator;
-      static const PropertyNameSet& GetDefaultPropertyNames();
-      static BaseProperty::Pointer CreateDefaultProperty(std::string name);
-
+      const PropertyNameSet& GetDefaultPropertyNames();
+      BaseProperty::Pointer CreateDefaultProperty(std::string name);
+      static PropertyManager* GetInstance();
+      std::pair<float,float> GetDefaultLimits(const std::string &name);
     protected:
       PropertyManager();
       PropertyNameSet m_DefaultPropertyNameSet;
       static void InitDefaultPropertyNames();
+      typedef std::map< std::string, std::pair<float,float> > PropertyLimitsMap;
+      PropertyLimitsMap m_PropertyLimits;
   }      ;
 }  
 

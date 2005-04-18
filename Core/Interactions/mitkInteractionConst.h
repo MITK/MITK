@@ -136,7 +136,9 @@ typedef enum EOperations
   OpTHICKSTVESSELSEARCH = 2002,       //used in VesselGraphInteractor2
   OpSHORTESTPATHSEARCH = 2003,       //used in VesselGraphInteractor2
   OpATTRIBUTATION = 2004,       //used in VesselGraphInteractor2
-  OpDEFAULT = 2006                  //used in VesselGraphInteractor2
+  OpSETBARRIER = 2005,              //used in VesselGraphInteractor2
+  OpDEFAULT = 2006,                  //used in VesselGraphInteractor2
+  OpDELETEBARRIER = 2007              //used in VesselGraphInteractor2
 };
 
 //##Constants for EventMapping...
@@ -234,7 +236,9 @@ typedef enum EActions
   AcSHORTESTPATHSEARCH = 3003,       //used in VesselGraphInteractor2
   AcSINGLE = 3004,                    //used in VesselGraphInteractor2
   AcATTRIBUTATION = 3005,              //used in VesselGraphInteractor2
-  AcDEFAULT = 3007                  //used in VesselGraphInteractor2
+  AcSETBARRIER = 3006,              //used in VesselGraphInteractor2
+  AcDEFAULT = 3007,                  //used in VesselGraphInteractor2
+  AcDELETEBARRIER = 3008              //used in VesselGraphInteractor2
 };
 
 

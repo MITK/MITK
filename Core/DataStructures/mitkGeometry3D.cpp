@@ -209,6 +209,7 @@ void mitk::Geometry3D::InitializeGeometry(Geometry3D * newGeometry) const
     newGeometry->SetParametricBounds(m_ParametricBoundingBox->GetBounds());
 
   newGeometry->SetFrameOfReferenceID(GetFrameOfReferenceID());
+  newGeometry->m_ImageGeometry = m_ImageGeometry;
 }
 
 void mitk::Geometry3D::SetExtentInMM(int direction, ScalarType extentInMM)

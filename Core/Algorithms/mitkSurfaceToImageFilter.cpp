@@ -112,12 +112,7 @@ void mitk::SurfaceToImageFilter::GenerateData()
     return;
 
   mitk::Image::RegionType outputRegion = output->GetRequestedRegion();
-  //const mitk::TimeSlicedGeometry *outputTimeGeometry = output->GetTimeSlicedGeometry();
-  //const mitk::TimeSlicedGeometry *inputTimeGeometry = input->GetTimeSlicedGeometry();
-  //const mitk::TimeSlicedGeometry *boundingObjectTimeGeometry = m_BoundingObject->GetTimeSlicedGeometry();
-  //ScalarType timeInMS;
 
-  int timestep=0;
   int tstart=outputRegion.GetIndex(3);
   int tmax=tstart+outputRegion.GetSize(3);
 
@@ -140,7 +135,7 @@ void mitk::SurfaceToImageFilter::Stencil3DImage(int time)
   const mitk::TimeSlicedGeometry *surfaceTimeGeometry = GetInput()->GetTimeSlicedGeometry();
   const mitk::TimeSlicedGeometry *imageTimeGeometry = GetImage()->GetTimeSlicedGeometry();
   
-  int surfaceTimeStep = surfaceTimeGeometry->TimeStepToMS( imageTimeGeometry->TimeStepToMS(time) );
+  int surfaceTimeStep = surfaceTimeGeometry->TimeStepToMS( (int) (imageTimeGeometry->TimeStepToMS(time) ) );
   
   vtkPolyData * polydata = ( (mitk::Surface*)GetInput() )->GetVtkPolyData( surfaceTimeStep );
   vtkTransformPolyDataFilter * move=vtkTransformPolyDataFilter::New();

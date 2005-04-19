@@ -52,11 +52,11 @@ public:
   //##Documentation
   //## @brief Get ring radius
   //##
-  itkGetMacro(RingRadius, unsigned int);
+  itkGetMacro(RingRadius, float);
   //##Documentation
   //## @brief Set ring radius
   //##
-  itkSetMacro(RingRadius, unsigned int);
+  itkSetMacro(RingRadius, float);
 
   //##Documentation
   //## @brief Get ring resolution of created Surface
@@ -90,7 +90,7 @@ protected:
   //##Documentation
   //## @brief Ring radius
   //##
-  unsigned int m_RingRadius;
+  float m_RingRadius;
 
   //##Documentation
   //## @brief Ring resolution of created Surface

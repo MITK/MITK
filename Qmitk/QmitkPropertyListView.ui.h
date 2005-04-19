@@ -36,7 +36,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qpushbutton.h>
 
 #include "QmitkPropertyListViewItem.h"
+#include "mitkPropertyManager.h"
 #include "itkCommand.h"
+#include <map>
 
 void QmitkPropertyListView::init()
 {
@@ -55,6 +57,21 @@ void QmitkPropertyListView::SetPropertyList( mitk::PropertyList *propertyList )
     m_PropertyList = propertyList;
     if (m_PropertyList)
     {
+      // workaround requested by ivo:
+      // add default properties
+      for (mitk::PropertyManager::PropertyNameSet::const_iterator iter = mitk::PropertyManager::GetInstance()->GetDefaultPropertyNames().begin(); iter!=mitk::PropertyManager::GetInstance()->GetDefaultPropertyNames().end();iter++)
+      {
+      if (m_PropertyList->GetMap()->count(iter->c_str()) == 0)
+        {
+          mitk::BaseProperty::Pointer newProp = mitk::PropertyManager::GetInstance()->CreateDefaultProperty(iter->c_str());
+          if (newProp.IsNotNull())
+          {
+            m_PropertyList->SetProperty(iter->c_str(),newProp);
+            m_PropertyList->SetEnabled(iter->c_str(),false);
+
+          }
+        }
+      }
       itk::SimpleMemberCommand<QmitkPropertyListView>::Pointer propertyListModifiedCommand =
         itk::SimpleMemberCommand<QmitkPropertyListView>::New();
       propertyListModifiedCommand->SetCallbackFunction(this, &QmitkPropertyListView::PropertyListModified);

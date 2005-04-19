@@ -94,7 +94,7 @@ bool mitk::ConnectPointsInteractor::ExecuteAction( Action* action, mitk::StateEv
     return false;
 
   //for reading on the points, Id's etc
-  mitk::PointSet::DataType *itkpointSet = mesh->GetPointSet();
+  //mitk::PointSet::DataType *itkpointSet = mesh->GetPointSet();
   //mitk::PointSet::PointsContainer *points = itkpointSet->GetPoints();//Warning Fix: not used!
 
   /*Each case must watch the type of the event!*/
@@ -125,7 +125,7 @@ bool mitk::ConnectPointsInteractor::ExecuteAction( Action* action, mitk::StateEv
           {
             Mesh::PointIdIterator last = cellAutoPointer->PointIdsEnd();
             --last;
-            deleteLine = ((unsigned)(mesh->SearchFirstCell(position)) == m_CurrentCellId) && (*last == position);
+            deleteLine = (((unsigned)(mesh->SearchFirstCell(position))) == m_CurrentCellId) && (*last == position);
           }
         }
         if(deleteLine)

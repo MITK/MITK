@@ -127,21 +127,21 @@ void mitk::SliceNavigationController::Update()
         planegeometry->InitializeStandardPlane(            
           m_InputWorldGeometry,
           PlaneGeometry::Transversal, 
-          m_InputWorldGeometry->GetExtent(2)-1, false);
+          m_InputWorldGeometry->GetExtent(2)-1+0.5, false);
         m_Slice->SetSteps((int)m_InputWorldGeometry->GetExtent(2));
         viewSpacing=m_InputWorldGeometry->GetExtentInMM(2)/m_InputWorldGeometry->GetExtent(2);
         break;
       case Frontal:
         planegeometry->InitializeStandardPlane(
           m_InputWorldGeometry,
-          PlaneGeometry::Frontal);
+          PlaneGeometry::Frontal, +0.5);
         m_Slice->SetSteps((int)(m_InputWorldGeometry->GetExtent(1)));
         viewSpacing=m_InputWorldGeometry->GetExtentInMM(1)/m_InputWorldGeometry->GetExtent(1);
         break;
       case Sagittal:
         planegeometry->InitializeStandardPlane(
           m_InputWorldGeometry,
-          PlaneGeometry::Sagittal);
+          PlaneGeometry::Sagittal, +0.5);
         m_Slice->SetSteps((int)(m_InputWorldGeometry->GetExtent(0)));
         viewSpacing=m_InputWorldGeometry->GetExtentInMM(0)/m_InputWorldGeometry->GetExtent(0);
         break;
@@ -284,7 +284,7 @@ bool mitk::SliceNavigationController::ExecuteAction( Action* action, mitk::State
               {
                 mitk::Point3D pointInUnits;
                 slicedWorldGeometry->WorldToIndex(point, pointInUnits);
-                best_slice = (int)pointInUnits[2];
+                best_slice = (int)(pointInUnits[2]+0.5);
               }
               else
               {
@@ -293,9 +293,10 @@ bool mitk::SliceNavigationController::ExecuteAction( Action* action, mitk::State
                 {
                   slicedWorldGeometry->GetGeometry2D(s)->Project(point, projected_point);
                   Vector3D dist = projected_point-point;
-                  if(dist.GetSquaredNorm() < best_distance)
+                  ScalarType curDist = dist.GetSquaredNorm();
+                  if(curDist < best_distance)
                   {
-                    best_distance = dist.GetSquaredNorm();
+                    best_distance = curDist;
                     best_slice    = s;
                   }
                 }

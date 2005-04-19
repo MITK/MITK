@@ -202,6 +202,7 @@ void mitk::ImageMapper2D::GenerateData(mitk::BaseRenderer *renderer)
   Point3D origin;
   Vector3D right, bottom, normal;
 
+  ScalarType MMperPixel[2];
   if(dynamic_cast<const PlaneGeometry *>(worldgeometry)!=NULL)
   {
     //let's use the values of worldgeometry->GetExtent(0) and worldgeometry->GetExtent(1) for that purpose
@@ -215,6 +216,13 @@ void mitk::ImageMapper2D::GenerateData(mitk::BaseRenderer *renderer)
     right  = planeview->GetAxisVector(0); right.Normalize();
     bottom = planeview->GetAxisVector(1); bottom.Normalize();
     normal = planeview->GetNormal();      normal.Normalize();
+
+    MMperPixel[0] = widthInMM/width;
+    MMperPixel[1] = heightInMM/height;
+    origin += right*(MMperPixel[0]*0.5);
+    origin += bottom*(MMperPixel[1]*0.5);
+    widthInMM -= MMperPixel[0];
+    heightInMM-= MMperPixel[1];
     //VnlVector v = inputtimegeometry->GetMatrixColumn(2);
     //origin[0]-=v[0]*0.5; origin[1]-=v[1]*0.5; origin[2]-=v[2]*0.5;
     ////Vector3D v; v.Fill(0.5); v.Fill(0.0005);
@@ -241,6 +249,8 @@ void mitk::ImageMapper2D::GenerateData(mitk::BaseRenderer *renderer)
       //sample 1000x1000 pixels for a display of 10x10 pixels
       width =worldgeometry->GetParametricExtent(0); widthInMM = abstractGeometry->GetParametricExtentInMM(0); //GetPlane()->
       height=worldgeometry->GetParametricExtent(1); heightInMM= abstractGeometry->GetParametricExtentInMM(1); //GetPlane()->
+      MMperPixel[0] = widthInMM/width;
+      MMperPixel[1] = heightInMM/height;
 
       origin = abstractGeometry->GetPlane()->GetOrigin();
       right  = abstractGeometry->GetPlane()->GetAxisVector(0); right.Normalize();
@@ -268,10 +278,10 @@ void mitk::ImageMapper2D::GenerateData(mitk::BaseRenderer *renderer)
 
   m_Reslicer->SetBackgroundLevel(-1024);
 
-  renderinfo.m_PixelsPerMM[0]= width/widthInMM;
-  renderinfo.m_PixelsPerMM[1]= height/heightInMM;
+  renderinfo.m_PixelsPerMM[0]= 1.0/MMperPixel[0];//width/widthInMM;
+  renderinfo.m_PixelsPerMM[1]= 1.0/MMperPixel[1];
 
-  m_Reslicer->SetOutputSpacing(1.0/renderinfo.m_PixelsPerMM[0], 1.0/renderinfo.m_PixelsPerMM[1], 1.0);
+  m_Reslicer->SetOutputSpacing(MMperPixel[0], MMperPixel[1], 1.0);
   m_Reslicer->SetOutputExtent(0, (int)width-1, 0, (int)height-1, 0, 1);
 
   //calulate the originarray and the orientations for the reslice-filter
@@ -315,9 +325,6 @@ void mitk::ImageMapper2D::GenerateData(mitk::BaseRenderer *renderer)
     ipPicFree(renderinfo.m_Pic);
   renderinfo.m_Pic = pic;
 
-  //std::cout << "Pic dimensions:" << pic->dim << std::endl;
-
-//   image->setImage(pic, iil4mitkImage::INTENSITY_ALPHA);
 	image->setImage(pic, m_iil4mitkMode);
   image->setInterpolation( false );
   image->setRegion(0,0,pic->n[0],pic->n[1]);

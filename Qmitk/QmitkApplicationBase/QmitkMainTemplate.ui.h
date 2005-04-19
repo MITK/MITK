@@ -93,18 +93,19 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkStatusBar.h>
 
 template <class T>
-static void __buildstring( ipPicDescriptor *pic, mitk::Point3D p, QString &s, T dummy=0)
+static void __buildstring( ipPicDescriptor *pic, itk::Point<int, 3> p, QString &s, T dummy=0)
 {
    QString value;
+
    if(pic->bpe!=24)
    {
-       value.setNum(((T*) pic->data)[ (int)p[0] + (int)p[1]*pic->n[0] + (int)p[2]*pic->n[0]*pic->n[1] ]);
+       value.setNum(((T*) pic->data)[ p[0] + p[1]*pic->n[0] + p[2]*pic->n[0]*pic->n[1] ]);
    }
    else
    {
-       value.setNum(((T*) pic->data)[(int)p[0]*3 + 0 + (int)p[1]*pic->n[0]*3 + (int)p[2]*pic->n[0]*pic->n[1]*3 ]);
-       value.setNum(((T*) pic->data)[(int)p[0]*3 + 1 + (int)p[1]*pic->n[0]*3 + (int)p[2]*pic->n[0]*pic->n[1]*3 ]);
-       value.setNum(((T*) pic->data)[(int)p[0]*3 + 2 + (int)p[1]*pic->n[0]*3 + (int)p[2]*pic->n[0]*pic->n[1]*3 ]);
+       value.setNum(((T*) pic->data)[p[0]*3 + 0 + p[1]*pic->n[0]*3 + p[2]*pic->n[0]*pic->n[1]*3 ]);
+       value.setNum(((T*) pic->data)[p[0]*3 + 1 + p[1]*pic->n[0]*3 + p[2]*pic->n[0]*pic->n[1]*3 ]);
+       value.setNum(((T*) pic->data)[p[0]*3 + 2 + p[1]*pic->n[0]*3 + p[2]*pic->n[0]*pic->n[1]*3 ]);
    }
    s+=value;
 }
@@ -171,15 +172,17 @@ public:
 
             if ( const_cast<mitk::BoundingBox*>(image->GetGeometry()->GetBoundingBox())->IsInside(p) )
             {
+              itk::Point<int, 3> pi;
+              mitk::FillVector3D(pi, p[0]+0.5, p[1]+0.5, p[2]+0.5);
               if(pic->bpe!=24)
               {
-                ipPicTypeMultiplex2(__buildstring, pic, p, s);
+                ipPicTypeMultiplex2(__buildstring, pic, pi, s);
               }
               else
-                __buildstring(pic, p, s, (unsigned char) 1);
-              mitk::StatusBar::DisplayText(s.ascii(), 10000);
+                __buildstring(pic, pi, s, (unsigned char) 1);
             }   
           }
+          mitk::StatusBar::DisplayText(s.ascii(), 10000);
           break;
         }     
       case mitk::OpNOTHING:
@@ -223,8 +226,13 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
   try
   {
     factory->SetFileName( fileName );
+
+    QApplication::setOverrideCursor( QCursor(Qt::WaitCursor) );
+
     factory->Update();
     fileOpenGetFactoryOutput(*factory.GetPointer());
+
+    QApplication::restoreOverrideCursor();
   }
   catch ( itk::ExceptionObject & ex )
   {
@@ -262,9 +270,13 @@ void QmitkMainTemplate::fileOpenImageSequence()
 
     factory->SetFilePattern( pattern );
     factory->SetFilePrefix( prefix );
-    factory->Update();
 
+    QApplication::setOverrideCursor( QCursor(Qt::WaitCursor) );
+
+    factory->Update();
     fileOpenGetFactoryOutput(*factory.GetPointer());
+
+    QApplication::restoreOverrideCursor();
   }
 }
 

@@ -99,18 +99,24 @@ void QmitkPropertyListViewItem::StringControlActivated(const QString &text)
 {
   std::cout << "setting string property to:" << text.ascii() << std::endl;
   m_PropertyList->SetProperty(m_Name.c_str(), new mitk::StringProperty(text.ascii()));
+  mitk::RenderWindow::UpdateAllInstances();
 }
 void QmitkPropertyListViewItem::FloatControlActivated(const QString &text)
 {
   if (((QLineEdit*)m_Control)->hasAcceptableInput())
   {
+    m_Control->setPaletteForegroundColor(Qt::black);
     float value = text.toFloat();
     mitk::FloatProperty* floatProp = dynamic_cast<mitk::FloatProperty*>(m_PropertyList->GetProperty(m_Name.c_str()).GetPointer());
     if (value != floatProp->GetValue())
     {
       m_PropertyList->SetProperty(m_Name.c_str(), new mitk::FloatProperty(value));
     }
+  } else
+  {
+    m_Control->setPaletteForegroundColor(Qt::red);
   }
+  mitk::RenderWindow::UpdateAllInstances(); 
 }
 void QmitkPropertyListViewItem::ColorControlActivated()
 {
@@ -176,4 +182,5 @@ void QmitkPropertyListViewItem::EnabledButtonClicked()
   //baseProp->SetEnabled(! baseProp->GetEnabled());
   m_PropertyList->SetEnabled(m_Name.c_str(), ! m_PropertyList->IsEnabled(m_Name.c_str()));
   UpdateEnabledView();
+  mitk::RenderWindow::UpdateAllInstances();
 }

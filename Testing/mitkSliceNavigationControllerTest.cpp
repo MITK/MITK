@@ -150,7 +150,7 @@ int testGeometry(const mitk::Geometry3D * geometry,
 
   std::cout << "Testing result of CreatedWorldGeometry(): ";
   mitk::Point3D transversalcornerpoint0;
-  transversalcornerpoint0 = cornerpoint0+bottom+normal*(numSlices-1); //really -1?
+  transversalcornerpoint0 = cornerpoint0+bottom+normal*(numSlices-1+0.5); //really -1?
   result = compareGeometry(*sliceCtrl->GetCreatedWorldGeometry(), width, height, numSlices, widthInMM, heightInMM, thicknessInMM*numSlices, transversalcornerpoint0, right, bottom*(-1.0), normal*(-1.0));
   if(result!=EXIT_SUCCESS)
   {
@@ -170,7 +170,9 @@ int testGeometry(const mitk::Geometry3D * geometry,
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "Testing result of CreatedWorldGeometry(): ";
-  result = compareGeometry(*sliceCtrl->GetCreatedWorldGeometry(), width, numSlices, height, widthInMM, thicknessInMM*numSlices, heightInMM, cornerpoint0, right, normal, bottom);
+  mitk::Point3D frontalcornerpoint0;
+  frontalcornerpoint0 = cornerpoint0+geometry->GetAxisVector(1)*(+0.5/geometry->GetExtent(1));
+  result = compareGeometry(*sliceCtrl->GetCreatedWorldGeometry(), width, numSlices, height, widthInMM, thicknessInMM*numSlices, heightInMM, frontalcornerpoint0, right, normal, bottom);
   if(result!=EXIT_SUCCESS)
   {
     std::cout<<"[FAILED]"<<std::endl;
@@ -189,7 +191,9 @@ int testGeometry(const mitk::Geometry3D * geometry,
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "Testing result of CreatedWorldGeometry(): ";
-  result = compareGeometry(*sliceCtrl->GetCreatedWorldGeometry(), height, numSlices, width, heightInMM, thicknessInMM*numSlices, widthInMM, cornerpoint0, bottom, normal, right);
+  mitk::Point3D sagittalcornerpoint0;
+  sagittalcornerpoint0 = cornerpoint0+geometry->GetAxisVector(0)*(+0.5/geometry->GetExtent(0));
+  result = compareGeometry(*sliceCtrl->GetCreatedWorldGeometry(), height, numSlices, width, heightInMM, thicknessInMM*numSlices, widthInMM, sagittalcornerpoint0, bottom, normal, right);
   if(result!=EXIT_SUCCESS)
   {
     std::cout<<"[FAILED]"<<std::endl;

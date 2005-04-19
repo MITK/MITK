@@ -196,6 +196,9 @@ void mitk::Geometry2DDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
                 m_VtkTexture->SetInput(vtkimage); vtkimage->Delete(); vtkimage=NULL;
                 m_Actor->SetTexture(m_VtkTexture);
                 m_LastTextureUpdateTime=ri->m_LastUpdateTime;
+                bool textureInterpolation=true;
+                node->GetBoolProperty("texture interpolation", textureInterpolation, renderer);
+                m_VtkTexture->SetInterpolate(textureInterpolation ? 1 : 0);
               }
               texture = true;
               break;

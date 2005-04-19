@@ -1023,7 +1023,8 @@ const mitk::Image::HistogramType& mitk::Image::GetScalarHistogram() const
   mitk::HistogramGenerator* generator = static_cast<mitk::HistogramGenerator*>(m_HistogramGeneratorObject.GetPointer());
 mitk::ImageSliceSelector* sliceSelector;
 sliceSelector = static_cast<mitk::ImageSliceSelector*>(m_SliceSelectorForHistogramObject.GetPointer());//\fixme XXX in histogram: PipelineMTime nach update??
-sliceSelector->UpdateLargestPossibleRegion();
+if(sliceSelector!=NULL)
+ sliceSelector->UpdateLargestPossibleRegion();
   generator->ComputeHistogram();
   const mitk::Image::HistogramType & histogram = *static_cast<const mitk::Image::HistogramType*>(generator->GetHistogram());
 

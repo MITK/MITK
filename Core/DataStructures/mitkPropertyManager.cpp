@@ -25,7 +25,7 @@ mitk::PropertyManager::PropertyManager()
 {
   std::cout << "ctor  PropertyManager" << std::endl;
   m_DefaultPropertyNameSet.insert(std::string("visible"));
-  m_PropertyLimits.insert(make_pair("opacity",std::make_pair(0.0f,1.0f)));
+  m_PropertyLimits.insert(std::make_pair("opacity",std::make_pair(0.0f,1.0f)));
 }
 mitk::PropertyManager* mitk::PropertyManager::GetInstance()
 {

@@ -21,7 +21,7 @@
         </property>
         <widget class="QGroupBox">
             <property name="name">
-                <cstring>m_Group</cstring>
+                <cstring>m_MainGroup</cstring>
             </property>
             <property name="title">
                 <string>Properties</string>
@@ -40,6 +40,7 @@
     <variable>QGridLayout* m_GridLayout;</variable>
     <variable>mitk::PropertyList* m_PropertyList;</variable>
     <variable>std::map&lt;std::string,QmitkPropertyListViewItem*&gt; m_Items;</variable>
+    <variable>QGroupBox* m_Group;</variable>
 </variables>
 <slots>
     <slot>SetPropertyList( mitk::PropertyList * propertyList )</slot>

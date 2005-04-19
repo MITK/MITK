@@ -70,7 +70,6 @@ void mitk::ContourSetVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
   m_Actor->VisibilityOn();
   
   mitk::ContourSet::Pointer input  = const_cast<mitk::ContourSet*>(this->GetInput());
-  bool makeContour = true;
 
   if ( renderer->GetDisplayGeometryUpdateTime() > this->GetInput()->GetMTime() )
   {
@@ -83,7 +82,7 @@ void mitk::ContourSetVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
     mitk::ContourSet::ContourVectorType contourVec = input->GetContours();
     mitk::ContourSet::ContourIterator contourIt = contourVec.begin();
     
-    unsigned int cellId = 0, firstPointIndex= 0, lastPointIndex=0;
+    vtkIdType firstPointIndex= 0, lastPointIndex=0;
 
     vtkIdType ptIndex = 0;
     while ( contourIt != contourVec.end() )
@@ -106,7 +105,6 @@ void mitk::ContourSetVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
         {        
           Contour::BoundingBoxType::PointType point;
           point = pointsIt.Value();
-          int cell[2] = {ptIndex-1,ptIndex};
           points->InsertPoint(ptIndex, point[0],point[1],point[2]);
           if (ptIndex > firstPointIndex)
           {

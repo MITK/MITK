@@ -206,11 +206,11 @@ void QmitkTransferFunctionCanvas::PaintHistogram(QPainter &p) {
   float scaleFactor = (float)(m_TransferFunction->GetHistogram()->GetSize()[0]) / width();
   float maxFreqLog = vcl_log(mitk::HistogramGenerator::CalculateMaximumFrequency(m_TransferFunction->GetHistogram()));
   for (unsigned int x = 0; x<width(); x++) {
-    int tfIndex = x * scaleFactor;
+    int tfIndex = static_cast<int> ( x * scaleFactor );
     float freq = m_TransferFunction->GetHistogram()->GetFrequency(tfIndex);
     
     if (freq>0) {
-      int y = (1 - vcl_log(freq) / maxFreqLog) * height();
+      int y = static_cast<int>( ( 1 - vcl_log(freq) / maxFreqLog ) * height() );
       p.drawLine(x,height(),x,y);
     }
   }

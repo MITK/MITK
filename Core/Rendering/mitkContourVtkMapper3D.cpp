@@ -104,7 +104,7 @@ void mitk::ContourVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
     mitk::Contour::PointsContainerIterator pointsIt = contourPoints->Begin();
 
     float vtkpoint[3];
-    unsigned int i;
+    int i;
     float pointSize = 2;
     this->GetDataTreeNode()->GetFloatProperty("spheres size", pointSize);
 

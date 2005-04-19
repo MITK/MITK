@@ -138,7 +138,7 @@ public:
           mitk::DataTreeIteratorClone it = m_DataTreeIterator;
           while ( !it->IsAtEnd() )
           {
-            if ( (it->Get()!= NULL) && (it->Get()->GetData() != NULL) && it->Get()->IsVisible(NULL) )
+            if ( (it->Get().GetPointer() != NULL) && (it->Get()->GetData() != NULL) && it->Get()->IsVisible(NULL) )
             {
               int layer = 0;
               it->Get()->GetIntProperty("layer", layer);

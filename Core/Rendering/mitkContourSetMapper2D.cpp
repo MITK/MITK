@@ -53,10 +53,6 @@ void mitk::ContourSetMapper2D::Paint(mitk::BaseRenderer * renderer)
     //apply color and opacity read from the PropertyList
     ApplyProperties(renderer);
 
-    vtkLinearTransform* transform = GetDataTreeNode()->GetVtkTransform();
-
-
-
     mitk::ContourSet::Pointer input =  const_cast<mitk::ContourSet*>(this->GetInput());
     mitk::ContourSet::ContourVectorType contourVec = input->GetContours();
     mitk::ContourSet::ContourIterator contourIt = contourVec.begin();

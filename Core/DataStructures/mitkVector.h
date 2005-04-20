@@ -23,6 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkPoint.h>
 #include <itkFixedCenterOfRotationAffineTransform.h>
 #include <float.h>
+#include <itkIndex.h>
 
 namespace mitk {
 typedef float ScalarType;
@@ -65,20 +66,81 @@ template <class Tout>
 }
 
 
+template <class T>
+class VectorTraits {
+  public:
+    typedef T ValueType;
+};
+template <>
+class VectorTraits<Vector3D> {
+  public:
+    typedef Vector3D::ValueType ValueType;
+};
+template <>
+
+class VectorTraits<Point3D> {
+  public:
+    typedef Point3D::ValueType ValueType;
+};
+
+class VectorTraits<double[4]> {
+  public:
+    typedef double ValueType;
+};
+class VectorTraits< itk::Index<5> > {
+  public:
+    typedef itk::Index<5>::IndexValueType ValueType;
+};
+class VectorTraits< itk::Index<3> > {
+  public:
+    typedef itk::Index<3>::IndexValueType ValueType;
+};
+
+class VectorTraits< long int [3]> {
+  public:
+    typedef long int ValueType;
+};
+class VectorTraits< float [3]> {
+  public:
+    typedef float ValueType;
+};
+class VectorTraits< double [3]> {
+  public:
+    typedef float ValueType;
+};
+
+class VectorTraits< vnl_vector_fixed<ScalarType, 3> > {
+  public:
+    typedef ScalarType ValueType;
+};
+
+class VectorTraits< long unsigned int[3]> {
+  public:
+    typedef long unsigned int ValueType;
+};
+class VectorTraits< unsigned int *> {
+  public:
+    typedef unsigned int ValueType;
+};
+class VectorTraits< ScalarType[4] > {
+  public:
+    typedef ScalarType ValueType;
+};
+
 template <class Tin, class Tout>
   inline void itk2vtk(const Tin& in, Tout& out)
 {
-  out[0]=in[0];
-  out[1]=in[1];
-  out[2]=in[2];
+  out[0]=(typename VectorTraits<Tout>::ValueType)(in[0]);
+  out[1]=(typename VectorTraits<Tout>::ValueType)(in[1]);
+  out[2]=(typename VectorTraits<Tout>::ValueType)(in[2]);
 }
 
 template <class Tin, class Tout>
   inline void vtk2itk(const Tin& in, Tout& out)
 {
-  out[0]=in[0];
-  out[1]=in[1];
-  out[2]=in[2];
+  out[0]=(typename VectorTraits<Tout>::ValueType)(in[0]);
+  out[1]=(typename VectorTraits<Tout>::ValueType)(in[1]);
+  out[2]=(typename VectorTraits<Tout>::ValueType)(in[2]);
 }
 
 template <class Tin, class Tout>

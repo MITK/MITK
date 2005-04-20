@@ -23,7 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vnl/vnl_quaternion.txx>
 
 mitk::PlanesPerpendicularToLinesFilter::PlanesPerpendicularToLinesFilter()
-  : m_Plane(NULL), m_CreatedGeometries(NULL), m_UseAllPoints(false), normal(3), targetRight(3)
+  : m_Plane(NULL), m_UseAllPoints(false), m_CreatedGeometries(NULL), normal(3), targetRight(3)
 {
   m_CreatedGeometries = mitk::SlicedGeometry3D::New();
 }

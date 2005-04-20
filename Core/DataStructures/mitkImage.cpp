@@ -33,8 +33,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 mitk::Image::Image() : 
   m_Dimension(0), m_Dimensions(NULL), m_OffsetTable(NULL),
-  m_CompleteData(NULL), m_PixelType(NULL), m_Initialized(false),
-  m_ScalarMin(0), m_ScalarMax(0), m_Scalar2ndMin(0), m_Scalar2ndMax(0), m_SliceSelectorForHistogramObject(NULL)
+  m_CompleteData(NULL), m_PixelType(NULL), m_Initialized(false) , m_SliceSelectorForHistogramObject(NULL),
+  m_ScalarMin(0), m_ScalarMax(0), m_Scalar2ndMin(0), m_Scalar2ndMax(0)
 {
   mitk::HistogramGenerator::Pointer generator = mitk::HistogramGenerator::New();
   m_HistogramGeneratorObject = generator;

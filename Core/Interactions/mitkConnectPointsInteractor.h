@@ -82,7 +82,7 @@ private:
 
   //##Documentation
   //## @brief stores the current CellId this Statemachine works in
-  unsigned int m_CurrentCellId;
+  int m_CurrentCellId;
 
   //##ModelId=3F0AF6CF00C2
   //##Documentation

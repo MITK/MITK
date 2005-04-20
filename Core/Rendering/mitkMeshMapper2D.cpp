@@ -417,18 +417,18 @@ void mitk::MeshMapper2D::Paint(mitk::BaseRenderer * renderer)
           {
             glBegin (GL_LINES);
               displayGeometry->Map(*it, pt2d); displayGeometry->MMToDisplay(pt2d, pt2d); 
-              itk2vtk(pt2d, p); glVertex2fv(p); 
+              p[0] = pt2d[0]; p[1] = pt2d[1]; glVertex2fv(p); 
               ++it;
               displayGeometry->Map(*it, pt2d); displayGeometry->MMToDisplay(pt2d, pt2d);
-              itk2vtk(pt2d, p); glVertex2fv(p); 
+              p[0] = pt2d[0]; p[1] = pt2d[1]; glVertex2fv(p); 
             glEnd ();
           }
           if(it!=intersectionPoints.end())
           {
             glBegin (GL_LINES);
               displayGeometry->Map(*it, pt2d); displayGeometry->MMToDisplay(pt2d, pt2d); 
-              itk2vtk(pt2d, p); glVertex2fv(p); 
-              itk2vtk(pt2d, p); glVertex2fv(p); 
+              p[0] = pt2d[0]; p[1] = pt2d[1]; glVertex2fv(p); 
+              p[0] = pt2d[0]; p[1] = pt2d[1]; glVertex2fv(p); 
             glEnd ();
           }
         }//fill off-plane polygon part 2

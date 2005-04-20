@@ -54,7 +54,9 @@ static void CopySpacingFromTransform(mitk::AffineTransform3D* transform, mitk::V
   spacing[0]=vnlmatrix.get_column(0).magnitude();
   spacing[1]=vnlmatrix.get_column(1).magnitude();
   spacing[2]=vnlmatrix.get_column(2).magnitude();
-  mitk::itk2vtk(spacing, floatSpacing);
+  floatSpacing[0]=spacing[0];
+  floatSpacing[1]=spacing[1];
+  floatSpacing[2]=spacing[2];
 }
 
 //##ModelId=3E3453C703AF

@@ -24,26 +24,26 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk {
 
-class BaseRenderer;
+  class BaseRenderer;
 
-//##ModelId=3E5A39350211
-//##Documentation
-//## @brief represents an Event with all its information
-//## @ingroup Interaction
-//##
-//## Class, that stores mouse as well as key-events. Type stores the type of
-//## event, that has been activated (KeyPress, MouseMove...), Button and Key
-//## represent the cause of this event and ButtonState holds the Modifiers,
-//## that might have been pressed during the appearance of this event.
-//## Ether Button (Mouse) or Key (Keyboard) is set. if both are set
-//## accidentally then the button is accepted.
-class Event
-{
+  //##ModelId=3E5A39350211
+  //##Documentation
+  //## @brief represents an Event with all its information
+  //## @ingroup Interaction
+  //##
+  //## Class, that stores mouse as well as key-events. Type stores the type of
+  //## event, that has been activated (KeyPress, MouseMove...), Button and Key
+  //## represent the cause of this event and ButtonState holds the Modifiers,
+  //## that might have been pressed during the appearance of this event.
+  //## Ether Button (Mouse) or Key (Keyboard) is set. if both are set
+  //## accidentally then the button is accepted.
+  class Event
+  {
   public:
     //##ModelId=3E5B3007000F
     //##Documentation
     //## @params:
-	//## sender: needed for DisplayCoordinateOperation in DisplayVectorInteractor....???? if not needed, then set on NULL
+    //## sender: needed for DisplayCoordinateOperation in DisplayVectorInteractor....???? if not needed, then set on NULL
     //## type: type of Event: Mouse or Key Event? (look in mitkInteractionConst.h)
     //## button: mouse-button
     //## buttonState: which other key hast been pressed? (Mouse/Keyboard modifier-keys)
@@ -82,12 +82,11 @@ class Event
     int m_Button;
 
     //##ModelId=3E8AE2CD02A4
-	int m_ButtonState;
+    int m_ButtonState;
 
-	//##ModelId=3E5B2FB10282
+    //##ModelId=3E5B2FB10282
     int m_Key;
-
-};
+  };
 
 } // namespace mitk
 

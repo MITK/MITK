@@ -21,7 +21,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 //##ModelId=3E5B3007000F
 mitk::Event::Event(mitk::BaseRenderer* sender, int type, int button, int buttonState, int key)
-//: m_Type(type), m_Button(button), m_ButtonState(buttonState), m_Key(key)  
 {
     m_Sender = sender;
     m_Type = type;

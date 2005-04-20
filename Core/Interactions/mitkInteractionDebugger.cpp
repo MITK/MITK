@@ -52,7 +52,7 @@ void mitk::InteractionDebugger::Set(const char* sender, const char* text)
     }
     else
       itkmsg<<text<<"\n";
-    
+
     itk::OutputWindowDisplayDebugText(itkmsg.str().c_str());
   }
 }

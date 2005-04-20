@@ -109,7 +109,7 @@ bool mitk::HierarchicalInteractor::TransmitEvent( StateEvent const* stateEvent )
   {
     //safety!
     /*if ((*i) == NULL)
-      break;*/
+    break;*/
 
     ok = (*i)->HandleEvent( stateEvent ) || ok;
 
@@ -158,122 +158,122 @@ bool mitk::HierarchicalInteractor::ExecuteAction( Action* action, mitk::StateEve
 {
   switch (action->GetActionId())
   {
-    case AcMODEDESELECT:
-      {
-        //declare operations for modechange:
-        this->CreateModeOperation( SMDESELECTED );
-        m_SelectedInteractors.clear();
-        return true;
-      }
-    case AcMODESELECT:
-      { 
-        //declare operations for modechange:
-        this->CreateModeOperation( SMSELECTED );
-        m_SelectedInteractors.clear();
-        return true;
-      }
-    case AcMODESUBSELECT:
-      {
-        //declare operations for modechange:
-        this->CreateModeOperation( SMSUBSELECTED );
-        return true;
-      }
-    case AcCHECKONESUBINTERACTOR:
-      {
-        m_SelectedInteractors.clear();
-        InteractorListIter i = m_AllInteractors.begin();
-        InteractorListIter bestInteractor = m_AllInteractors.end();
-        InteractorListConstIter end = m_AllInteractors.end();
-        float jurisdiction = 0.0f;
+  case AcMODEDESELECT:
+    {
+      //declare operations for modechange:
+      this->CreateModeOperation( SMDESELECTED );
+      m_SelectedInteractors.clear();
+      return true;
+    }
+  case AcMODESELECT:
+    { 
+      //declare operations for modechange:
+      this->CreateModeOperation( SMSELECTED );
+      m_SelectedInteractors.clear();
+      return true;
+    }
+  case AcMODESUBSELECT:
+    {
+      //declare operations for modechange:
+      this->CreateModeOperation( SMSUBSELECTED );
+      return true;
+    }
+  case AcCHECKONESUBINTERACTOR:
+    {
+      m_SelectedInteractors.clear();
+      InteractorListIter i = m_AllInteractors.begin();
+      InteractorListIter bestInteractor = m_AllInteractors.end();
+      InteractorListConstIter end = m_AllInteractors.end();
+      float jurisdiction = 0.0f;
 
-        while ( i != end )
+      while ( i != end )
+      {
+        float currentJurisdiction = (*i)->CalculateJurisdiction( stateEvent );
+
+        if ( jurisdiction < currentJurisdiction )          
         {
-          float currentJurisdiction = (*i)->CalculateJurisdiction( stateEvent );
-    
-          if ( jurisdiction < currentJurisdiction )          
-          {
-            jurisdiction = currentJurisdiction;
-            bestInteractor = i;
-          }
-
-          i++;
+          jurisdiction = currentJurisdiction;
+          bestInteractor = i;
         }
-        
-        FloatProperty* thresholdProperty = dynamic_cast<FloatProperty*>(action->GetProperty("threshold"));
-        float threshold;
 
-        if ( thresholdProperty )
-          threshold = thresholdProperty->GetValue();
-        else 
-          threshold = 0.5;         
-
-        if ( jurisdiction >= threshold && bestInteractor != m_AllInteractors.end())  
-        {          
-          m_SelectedInteractors.push_back( *bestInteractor );
-          mitk::StateEvent* newStateEvent = new mitk::StateEvent(EIDYES, stateEvent->GetEvent());
-          this->HandleEvent( newStateEvent );
-        }
-        else 
-        {
-          mitk::StateEvent* newStateEvent = new mitk::StateEvent(EIDNO, stateEvent->GetEvent());
-          this->HandleEvent( newStateEvent );        
-        }      
-          
-        return true;
+        i++;
       }
-    case AcCHECKSUBINTERACTORS:
+
+      FloatProperty* thresholdProperty = dynamic_cast<FloatProperty*>(action->GetProperty("threshold"));
+      float threshold;
+
+      if ( thresholdProperty )
+        threshold = thresholdProperty->GetValue();
+      else 
+        threshold = 0.5;         
+
+      if ( jurisdiction >= threshold && bestInteractor != m_AllInteractors.end())  
+      {          
+        m_SelectedInteractors.push_back( *bestInteractor );
+        mitk::StateEvent* newStateEvent = new mitk::StateEvent(EIDYES, stateEvent->GetEvent());
+        this->HandleEvent( newStateEvent );
+      }
+      else 
       {
-        FloatProperty* thresholdProperty = dynamic_cast<FloatProperty*>(action->GetProperty("threshold"));
-        float threshold;
+        mitk::StateEvent* newStateEvent = new mitk::StateEvent(EIDNO, stateEvent->GetEvent());
+        this->HandleEvent( newStateEvent );        
+      }      
 
-        if ( thresholdProperty )
-          threshold = thresholdProperty->GetValue();
-        else 
-          threshold = 0.5;         
+      return true;
+    }
+  case AcCHECKSUBINTERACTORS:
+    {
+      FloatProperty* thresholdProperty = dynamic_cast<FloatProperty*>(action->GetProperty("threshold"));
+      float threshold;
 
-        m_SelectedInteractors.clear();
-        InteractorListIter i = m_AllInteractors.begin();
-        InteractorListIter bestInteractor = m_AllInteractors.end();
-        const InteractorListIter end = m_AllInteractors.end();
+      if ( thresholdProperty )
+        threshold = thresholdProperty->GetValue();
+      else 
+        threshold = 0.5;         
 
-        while ( i != end )
-        {
-          float jurisdiction = CalculateJurisdiction( stateEvent );
-    
-          if ( jurisdiction > threshold )          
-            m_SelectedInteractors.push_back( *i );
+      m_SelectedInteractors.clear();
+      InteractorListIter i = m_AllInteractors.begin();
+      InteractorListIter bestInteractor = m_AllInteractors.end();
+      const InteractorListIter end = m_AllInteractors.end();
 
-          i++;
-        }
-        
-        if ( !m_SelectedInteractors.empty() )
-        {          
-          mitk::StateEvent* newStateEvent = new mitk::StateEvent(EIDYES, stateEvent->GetEvent());
-          this->HandleEvent( newStateEvent );
-        }
-        else 
-        {
-          mitk::StateEvent* newStateEvent = new mitk::StateEvent(EIDNO, stateEvent->GetEvent());
-          this->HandleEvent( newStateEvent );
-        }      
-          
-        return true;
-      }
-    case AcFORCESUBINTERACTORS:
+      while ( i != end )
       {
-        m_SelectedInteractors = m_AllInteractors;
-        return true;
+        float jurisdiction = CalculateJurisdiction( stateEvent );
+
+        if ( jurisdiction > threshold )          
+          m_SelectedInteractors.push_back( *i );
+
+        i++;
       }
-    case AcTRANSMITEVENT:
+
+      if ( !m_SelectedInteractors.empty() )
+      {          
+        mitk::StateEvent* newStateEvent = new mitk::StateEvent(EIDYES, stateEvent->GetEvent());
+        this->HandleEvent( newStateEvent );
+      }
+      else 
       {
-        if ( IsSubSelected() ) 
-        {
-          TransmitEvent( mitk::EventMapper::RefreshStateEvent(const_cast<StateEvent*>(stateEvent)) );
-        }
-        return true;
+        mitk::StateEvent* newStateEvent = new mitk::StateEvent(EIDNO, stateEvent->GetEvent());
+        this->HandleEvent( newStateEvent );
+      }      
+
+      return true;
+    }
+  case AcFORCESUBINTERACTORS:
+    {
+      m_SelectedInteractors = m_AllInteractors;
+      return true;
+    }
+  case AcTRANSMITEVENT:
+    {
+      if ( IsSubSelected() ) 
+      {
+        TransmitEvent( mitk::EventMapper::RefreshStateEvent(const_cast<StateEvent*>(stateEvent)) );
       }
-    default:
-      return Superclass::ExecuteAction( action, stateEvent );
+      return true;
+    }
+  default:
+    return Superclass::ExecuteAction( action, stateEvent );
   }   
 }
 

@@ -24,30 +24,30 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk{
 
-/**
-* @brief prints out information for debugging purpose
-* @ingroup Interaction
-* prints out recieved text in a sorted way
-*/
-  class InteractionDebugger : public itk::Object
-{
-public:
   /**
-  * set a text for output
-  * @params sender: 
+  * @brief prints out information for debugging purpose
+  * @ingroup Interaction
+  * prints out recieved text in a sorted way
   */
-  static void Set(const char* sender, const char* text);
-  static void Activate();
-  static void Deactivate();
+  class InteractionDebugger : public itk::Object
+  {
+  public:
+    /**
+    * set a text for output
+    * @params sender: 
+    */
+    static void Set(const char* sender, const char* text);
+    static void Activate();
+    static void Deactivate();
 
-protected:
-   InteractionDebugger();
-  ~InteractionDebugger();
+  protected:
+    InteractionDebugger();
+    ~InteractionDebugger();
 
-private:
-  static const char* m_CurrentSender;
-  static bool m_Active;
-};
+  private:
+    static const char* m_CurrentSender;
+    static bool m_Active;
+  };
 
 }//namespace mitk
 

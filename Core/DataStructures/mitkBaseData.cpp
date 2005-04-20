@@ -185,3 +185,4 @@ mitk::BaseData* mitk::BaseData::CreateObject( const char* className )
 {
 	return dynamic_cast<mitk::BaseData*>( itk::ObjectFactoryBase::CreateInstance( className ).GetPointer() );
 }
+

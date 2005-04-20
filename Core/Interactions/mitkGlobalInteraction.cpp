@@ -21,8 +21,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkInteractionConst.h"
 #include "mitkEventMapper.h"
 #include "mitkEvent.h"
-#include <mitkStatusBar.h>
+#include "mitkInteractor.h"
 #include "mitkAction.h"
+#include <mitkStatusBar.h>
 #include <mitkPositionEvent.h>
 #include <vtkWorldPointPicker.h>
 #include <mitkOpenGLRenderer.h>
@@ -43,12 +44,12 @@ mitk::GlobalInteraction::GlobalInteraction(const char * type)
 inline mitk::StateEvent* GenerateEmptyStateEvent(int eventId)
 {
   mitk::Event *noEvent = new mitk::Event(NULL,
-        mitk::Type_User,
-        mitk::BS_NoButton,
-		    mitk::BS_NoButton,
-        mitk::Key_none);
+    mitk::Type_User,
+    mitk::BS_NoButton,
+    mitk::BS_NoButton,
+    mitk::Key_none);
   mitk::StateEvent *stateEvent = new mitk::StateEvent(eventId, noEvent);
-	return stateEvent;
+  return stateEvent;
 }
 
 
@@ -128,7 +129,7 @@ void mitk::GlobalInteraction::InformListeners(mitk::StateEvent const* stateEvent
   for (StateMachineListIter it = m_ListenerList.begin(); it != m_ListenerList.end(); it++)
   {
     if((*it)!=NULL)
-	    (*it)->HandleEvent(stateEvent);
+      (*it)->HandleEvent(stateEvent);
   }
 
 }
@@ -138,14 +139,14 @@ bool mitk::GlobalInteraction::AskSelected(mitk::StateEvent const* stateEvent)
   bool ok, oneOk;
   ok = false;
   InteractorListIter it = m_SelectedList.begin();
-  
+
   while ( it != m_SelectedList.end())
   {
     if((*it)!=NULL && !m_SelectedList.empty())
     {
       //Interactor are in Mode SELECTED or SUBSELECTED
-	    oneOk = (*it)->HandleEvent(stateEvent);
-      
+      oneOk = (*it)->HandleEvent(stateEvent);
+
       //if one HandleEvent did succeed, then set returnvalue on true;
       if (oneOk)
         ok = true;
@@ -201,11 +202,11 @@ void mitk::GlobalInteraction::AskCurrentInteractor(mitk::StateEvent const* state
     //if after handling an event Interactor is in mode SELECTED or SUBSELECTED
     //then make sure, that this sub-/ selected interactor gets the next event
     if ( ((*m_CurrentInteractorIter).second->GetMode() == mitk::Interactor::SMSELECTED ) || 
-          ((*m_CurrentInteractorIter).second->GetMode() == mitk::Interactor::SMSUBSELECTED) )
+      ((*m_CurrentInteractorIter).second->GetMode() == mitk::Interactor::SMSUBSELECTED) )
     {
       m_SelectedList.clear();
       m_SelectedList.push_back((*m_CurrentInteractorIter).second);
-      
+
       //clear the map cause we have found an selected interactor so we can directly take that interactor the next time
       m_JurisdictionMap.clear();
       m_CurrentInteractorIter = m_JurisdictionMap.end();
@@ -216,7 +217,7 @@ void mitk::GlobalInteraction::AskCurrentInteractor(mitk::StateEvent const* state
         m_CurrentInteractorIter++;
       //if at end, then loop to the begining
       /*if (m_CurrentInteractorIter == m_JurisdictionMap.end())
-        m_CurrentInteractorIter= m_JurisdictionMap.begin();*/
+      m_CurrentInteractorIter= m_JurisdictionMap.begin();*/
     }
   }
 }
@@ -256,7 +257,7 @@ bool mitk::GlobalInteraction::ExecuteAction(Action* action, mitk::StateEvent con
   {
   case AcDONOTHING:
     ok = true;
-	break;
+    break;
   case AcINFORMLISTENERS:
     InformListeners(stateEvent);
     ok = true;
@@ -267,14 +268,14 @@ bool mitk::GlobalInteraction::ExecuteAction(Action* action, mitk::StateEvent con
       //if m_JurisdictionMap is empty, then fill it.
       if (m_JurisdictionMap.empty())
         FillJurisdictionMap(stateEvent, 0);
-      
+
       //no jurisdiction value above 0 could be found, so take all to convert to old scheme
       if (m_JurisdictionMap.empty())
         FillJurisdictionMap(stateEvent, -1);
 
       //ask the next Interactor to handle that event
       AskCurrentInteractor(stateEvent);
-      
+
       //after asking for jurisdiction and sending the events to the interactors,
       //interactors should change the mode. We can now clear the jurisdictionmap.
       m_JurisdictionMap.clear();
@@ -287,7 +288,7 @@ bool mitk::GlobalInteraction::ExecuteAction(Action* action, mitk::StateEvent con
     ok = true;
     break;
   default:
-	  ok = true;
+    ok = true;
   }
   return ok;
 }

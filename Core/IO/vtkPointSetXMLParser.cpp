@@ -26,6 +26,10 @@ void mitk::vtkPointSetXMLParser::StartElement ( const char *name, const char **a
         m_CurrentPoint[ 0 ] = 0.0f;
         m_CurrentPoint[ 1 ] = 0.0f;
         m_CurrentPoint[ 2 ] = 0.0f;
+        m_CurId.clear();
+        m_CurXString.clear();
+        m_CurYString.clear();
+        m_CurZString.clear();
     }
     
     //
@@ -69,6 +73,11 @@ void mitk::vtkPointSetXMLParser::EndElement ( const char *name )
     //
     else if ( currentElement == mitk::PointSetWriter::XML_POINT )
     {
+        m_CurrentPointId = ParsePointIdentifier( m_CurId );
+        m_CurrentPoint[ 0 ] = ParseScalarType( m_CurXString );
+        m_CurrentPoint[ 1 ] = ParseScalarType( m_CurYString );
+        m_CurrentPoint[ 2 ] = ParseScalarType( m_CurZString );
+
         mitk::PointOperation popInsert( mitk::OpINSERT, m_CurrentPoint, m_CurrentPointId );
         mitk::PointOperation popDeactivate( mitk::OpDESELECTPOINT, m_CurrentPoint, m_CurrentPointId );
         assert( m_CurrentPointSet.IsNotNull() );
@@ -85,37 +94,35 @@ void mitk::vtkPointSetXMLParser::CharacterDataHandler ( const char *inData, int 
     std::string currentElement = m_ParseStack.top();
     if ( currentElement == mitk::PointSetWriter::XML_ID )
     {
-        m_CurrentPointId = ParsePointIdentifier( inData, inLength );
+        m_CurId.append( inData, inLength );        
     }
     else if ( currentElement == mitk::PointSetWriter::XML_X )
-    {
-        m_CurrentPoint[ 0 ] = ParseScalarType( inData, inLength );
+    { 
+        m_CurXString.append(inData, inLength);
     }
     else if ( currentElement == mitk::PointSetWriter::XML_Y )
     {
-        m_CurrentPoint[ 1 ] = ParseScalarType( inData, inLength );
+        m_CurYString.append(inData, inLength);
     }
     else if ( currentElement == mitk::PointSetWriter::XML_Z )
     {
-        m_CurrentPoint[ 2 ] = ParseScalarType( inData, inLength );
+        m_CurZString.append(inData, inLength);
     }
 }
 
 
 
 
-mitk::ScalarType mitk::vtkPointSetXMLParser::ParseScalarType( const char *inData, int inLength )
+mitk::ScalarType mitk::vtkPointSetXMLParser::ParseScalarType( const std::string &data )
 {
-    std::string data( inData, inLength );
     return ( mitk::ScalarType ) atof( data.c_str() );
 }
 
 
 
 
-mitk::vtkPointSetXMLParser::PointIdentifier mitk::vtkPointSetXMLParser::ParsePointIdentifier( const char *inData, int inLength )
+mitk::vtkPointSetXMLParser::PointIdentifier mitk::vtkPointSetXMLParser::ParsePointIdentifier( const std::string &data )
 {
-    std::string data( inData, inLength );
     return ( mitk::vtkPointSetXMLParser::PointIdentifier ) atol( data.c_str() );
 }
 

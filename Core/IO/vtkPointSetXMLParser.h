@@ -54,14 +54,14 @@ public:
      * @param inData a char array containing the parsed string data
      * @param inLength the length of the parsed data string.
      */
-    virtual mitk::ScalarType ParseScalarType(const char *inData, int inLength);
+    virtual mitk::ScalarType ParseScalarType(const std::string &data);
     
     /**
      * Converts the given data to an PointIdentifier
      * @param inData a char array containing the parsed string data
      * @param inLength the length of the parsed data string.
      */
-    virtual PointIdentifier ParsePointIdentifier(const char *inData, int inLength);
+    virtual PointIdentifier ParsePointIdentifier(const std::string &data);
     
     /**
      * @returns the list of point sets which have been read from file.
@@ -94,6 +94,11 @@ protected:
      * by the parser.
      */
     PointType m_CurrentPoint;
+
+    std::string m_CurId;
+    std::string m_CurXString;
+    std::string m_CurYString;
+    std::string m_CurZString;
     
     /** 
      * The current point id which is processed

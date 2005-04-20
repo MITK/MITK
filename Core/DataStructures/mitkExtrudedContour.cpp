@@ -177,7 +177,6 @@ void mitk::ExtrudedContour::BuildSurface()
 
   // set extrusion contour
   vtkPolyData *polyData = vtkPolyData::New();
-  vtkPoints *loopPoints = vtkPoints::New();
   vtkCellArray *polys   = vtkCellArray::New();
 
   polys->InsertNextCell(m_Polygon->GetPointIds());

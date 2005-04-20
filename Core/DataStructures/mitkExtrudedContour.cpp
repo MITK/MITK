@@ -233,7 +233,7 @@ void mitk::ExtrudedContour::BuildGeometry()
   Vector3D nullvector; nullvector.Fill(0.0);
   float xProj[3];
   unsigned int i;
-  int numPts = 20; //m_Contour->GetNumberOfPoints();
+  unsigned int numPts = 20; //m_Contour->GetNumberOfPoints();
   mitk::Contour::PathPointer path = m_Contour->GetContourPath();
   mitk::Contour::PathType::InputType cstart = path->StartOfInput();
   mitk::Contour::PathType::InputType cend   = path->EndOfInput();

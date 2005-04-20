@@ -649,9 +649,9 @@ void mitk::Image::Initialize(const mitk::PixelType& type, unsigned int dimension
 void mitk::Image::Initialize(const mitk::PixelType& type, const mitk::Geometry3D& geometry, bool shiftOriginToZero ) 
 {
   unsigned int dimensions[3];
-  dimensions[0] = geometry.GetExtent(0);
-  dimensions[1] = geometry.GetExtent(1);
-  dimensions[2] = geometry.GetExtent(2);
+  dimensions[0] = (unsigned int)geometry.GetExtent(0);
+  dimensions[1] = (unsigned int)geometry.GetExtent(1);
+  dimensions[2] = (unsigned int)geometry.GetExtent(2);
 
   unsigned int dimension = 2;
   if ( dimensions[2] > 1 )

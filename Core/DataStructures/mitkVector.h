@@ -57,15 +57,6 @@ extern const ScalarType eps;
 extern const ScalarType sqrteps;
 extern const double large;
 
-template <class Tout>
-  inline void FillVector3D(Tout& out, ScalarType x, ScalarType y, ScalarType z)
-{
-  out[0] = x;
-  out[1] = y;
-  out[2] = z;
-}
-
-
 template <class T>
 class VectorTraits {
   public:
@@ -76,6 +67,12 @@ class VectorTraits<Vector3D> {
   public:
     typedef Vector3D::ValueType ValueType;
 };
+template <>
+class VectorTraits<VnlVector> {
+  public:
+    typedef ScalarType ValueType;
+};
+
 template <>
 
 class VectorTraits<Point3D> {
@@ -142,6 +139,15 @@ template <class Tin, class Tout>
   out[1]=(typename VectorTraits<Tout>::ValueType)(in[1]);
   out[2]=(typename VectorTraits<Tout>::ValueType)(in[2]);
 }
+template <class Tout>
+  inline void FillVector3D(Tout& out, ScalarType x, ScalarType y, ScalarType z)
+{
+  out[0] = (typename VectorTraits<Tout>::ValueType)x;
+  out[1] = (typename VectorTraits<Tout>::ValueType)y;
+  out[2] = (typename VectorTraits<Tout>::ValueType)z;
+}
+
+
 
 template <class Tin, class Tout>
   inline void vnl2vtk(const vnl_vector<Tin>& in, Tout *out)

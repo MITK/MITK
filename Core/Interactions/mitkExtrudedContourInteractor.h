@@ -9,46 +9,46 @@
 
 namespace mitk {
 
-//##Documentation
-//## @brief Interactor for the creation of an mitk::Contour
-//## @ingroup Interaction
-class ExtrudedContourInteractor : public mitk::Interactor
-{
-public:
-  mitkClassMacro(ExtrudedContourInteractor, Interactor);
+  //##Documentation
+  //## @brief Interactor for the creation of an mitk::Contour
+  //## @ingroup Interaction
+  class ExtrudedContourInteractor : public mitk::Interactor
+  {
+  public:
+    mitkClassMacro(ExtrudedContourInteractor, Interactor);
 
-  ExtrudedContourInteractor(const char * type, DataTreeNode* dataTreeNode);
-  virtual ~ExtrudedContourInteractor();
+    ExtrudedContourInteractor(const char * type, DataTreeNode* dataTreeNode);
+    virtual ~ExtrudedContourInteractor();
 
-  itkGetObjectMacro(Contour, mitk::Contour);
-  itkGetObjectMacro(ContourNode, mitk::DataTreeNode);
+    itkGetObjectMacro(Contour, mitk::Contour);
+    itkGetObjectMacro(ContourNode, mitk::DataTreeNode);
 
-protected:
-  virtual bool ExecuteAction(Action* action, mitk::StateEvent const* stateEvent);
+  protected:
+    virtual bool ExecuteAction(Action* action, mitk::StateEvent const* stateEvent);
 
-  /**
-  * entry method for any interaction. Method is called if user 
-  * presses the left mouse button down.
-  */
-  virtual void Press (mitk::Point3D& op);
+    /**
+    * entry method for any interaction. Method is called if user 
+    * presses the left mouse button down.
+    */
+    virtual void Press (mitk::Point3D& op);
 
-  /**
-  * this method is finally called after user release the left mouse button
-  */
-  virtual void Release (mitk::Point3D& op);
+    /**
+    * this method is finally called after user release the left mouse button
+    */
+    virtual void Release (mitk::Point3D& op);
 
-  /**
-  * method is called when the user moves the mouse with left mouse button down
-  */
-  virtual void Move (mitk::Point3D& op);
+    /**
+    * method is called when the user moves the mouse with left mouse button down
+    */
+    virtual void Move (mitk::Point3D& op);
 
-protected:
-  bool m_Positive;
-  bool m_Started;
+  protected:
+    bool m_Positive;
+    bool m_Started;
 
-  mitk::Contour::Pointer m_Contour;
-  mitk::DataTreeNode::Pointer m_ContourNode;
-};
+    mitk::Contour::Pointer m_Contour;
+    mitk::DataTreeNode::Pointer m_ContourNode;
+  };
 
 }
 #endif //__ExtrudedContourInteractor_H

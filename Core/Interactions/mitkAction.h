@@ -25,24 +25,24 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 namespace mitk {
-//##Documentation
-//## @brief represents an action, that is executed after a certain event (in statemachine-mechanism)
-//##
-//## @ingroup Interaction
-class Action 
-{
-  int m_ActionId;
-  PropertyList::Pointer m_PropertiesList;
+  //##Documentation
+  //## @brief represents an action, that is executed after a certain event (in statemachine-mechanism)
+  //##
+  //## @ingroup Interaction
+  class Action 
+  {
+    int m_ActionId;
+    PropertyList::Pointer m_PropertiesList;
 
-public:
-  Action( int actionId );
-  ~Action();
-  
-  void AddProperty(const char* propertyKey, BaseProperty* property);
+  public:
+    Action( int actionId );
+    ~Action();
 
-  int GetActionId() const;
-  mitk::BaseProperty* GetProperty( const char *propertyKey ) const;
-};
+    void AddProperty(const char* propertyKey, BaseProperty* property);
+
+    int GetActionId() const;
+    mitk::BaseProperty* GetProperty( const char *propertyKey ) const;
+  };
 
 } // namespace mitk
 

@@ -18,9 +18,10 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include "mitkStateMachineFactory.h"
-#include "mitkStatusBar.h"
+#include "mitkAction.h"
+#include "mitkTransition.h"
+#include <mitkStatusBar.h>
 #include <vtkXMLDataElement.h>
-#include <mitkAction.h>
 #include <mitkProperties.h>
 #include <mitkStringProperty.h>
 #include <mitkConfig.h>

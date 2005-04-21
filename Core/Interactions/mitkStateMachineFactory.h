@@ -24,32 +24,33 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkState.h"
 #include <vtkXMLParser.h> 
 #include <iostream>
+#include <set>
 
 
 namespace mitk {
+  class Action;
 
-//##ModelId=3E5A39550068
-//##Documentation
-//## @brief builds up all specifiyed statemachines and hold them for later
-//## access
-//## @ingroup Interaction
-//## According to the XML-File every different statemachine is build up. A new
-//## Instance of a new StateMachine grabs a StartState of one certain
-//## statemachine. Two instances of one kind of statemachine share that
-//## statemachine. 
-//## During Build-Process each statemachine is paresed for well formed  Style.
-//## No changes are to ber done after the Build-Process.
-	class StateMachineFactory : public vtkXMLParser
-{
+  //##ModelId=3E5A39550068
+  //##Documentation
+  //## @brief builds up all specifiyed statemachines and hold them for later
+  //## access
+  //## @ingroup Interaction
+  //## According to the XML-File every different statemachine is build up. A new
+  //## Instance of a new StateMachine grabs a StartState of one certain
+  //## statemachine. Two instances of one kind of statemachine share that
+  //## statemachine. 
+  //## During buildprocess at runtime each statemachine is parsed for well formed style.
+  class StateMachineFactory : public vtkXMLParser
+  {
   public:
-	//##ModelId=3F0177090046
-	typedef std::map<std::string,mitk::State*> StartStateMap;
-	//##ModelId=3F0177090056
-	typedef std::map<std::string,mitk::State *>::iterator StartStateMapIter;
-	//##ModelId=3F0177090075
-	typedef std::set<int> HistorySet;
-	//##ModelId=3F0177090094
-	typedef std::set<int>::iterator HistorySetIter;
+    //##ModelId=3F0177090046
+    typedef std::map<std::string,mitk::State*> StartStateMap;
+    //##ModelId=3F0177090056
+    typedef std::map<std::string,mitk::State *>::iterator StartStateMapIter;
+    //##ModelId=3F0177090075
+    typedef std::set<int> HistorySet;
+    //##ModelId=3F0177090094
+    typedef std::set<int>::iterator HistorySetIter;
 
     //##ModelId=3E68B2C600BD
     //##Documentation
@@ -103,19 +104,19 @@ namespace mitk {
     static bool ConnectStates(mitk::State::StateMap *states);
 
     //##ModelId=3E77572A010E
-	//##Documentation
-	//## recusive method, that parses this brand of 
-	//## the stateMachine and returns if correct
-	  static bool parse(mitk::State::StateMap *states, mitk::State::StateMapIter thisState, HistorySet *history);
+    //##Documentation
+    //## recusive method, that parses this brand of 
+    //## the stateMachine and returns if correct
+    static bool parse(mitk::State::StateMap *states, mitk::State::StateMapIter thisState, HistorySet *history);
 
-	//##ModelId=3E5B423003DF
-	  static StartStateMap m_StartStates;
+    //##ModelId=3E5B423003DF
+    static StartStateMap m_StartStates;
 
     //##ModelId=3E68C269032E
-	  mitk::State::StateMap m_AllStatesOfOneStateMachine;
+    mitk::State::StateMap m_AllStatesOfOneStateMachine;
 
     //##ModelId=3E6773290108
-	  State* m_AktState;
+    State* m_AktState;
 
     Transition* m_AktTransition;
 
@@ -124,29 +125,29 @@ namespace mitk {
     static std::vector<mitk::State *> m_AllStates;
     static std::vector<mitk::Transition *> m_AllTransitions;
     static std::vector<mitk::Action *> m_AllActions;
-    
+
 
     //##ModelId=3E68B2C60040
-	  std::string m_AktStateMachineName;
+    std::string m_AktStateMachineName;
 
     //##ModelId=3E7757280322
-	  static const std::string STYLE;
+    static const std::string STYLE;
     //##ModelId=3E775728037F
-	  static const std::string NAME;
+    static const std::string NAME;
     //##ModelId=3E77572803DD
-	  static const std::string ID;	  
+    static const std::string ID;	  
     //##ModelId=3E7757290053
-	  static const std::string START_STATE;
+    static const std::string START_STATE;
     //##ModelId=3E77572900B1
-	  static const std::string NEXT_STATE_ID;
+    static const std::string NEXT_STATE_ID;
     //##ModelId=3E775729010E
-	  static const std::string EVENT_ID;
+    static const std::string EVENT_ID;
     //##ModelId=3E775729017C
-	  static const std::string SIDE_EFFECT_ID;
+    static const std::string SIDE_EFFECT_ID;
     //##ModelId=3E7F18FF0131
-	  static const std::string ISTRUE;
+    static const std::string ISTRUE;
     //##ModelId=3E7F18FF01FD
-	  static const std::string ISFALSE;
+    static const std::string ISFALSE;
 
     static const std::string STATE_MACHIN;
 
@@ -170,7 +171,7 @@ namespace mitk {
 
     static const std::string VALUE;
 
-};
+  };
 
 } // namespace mitk
 

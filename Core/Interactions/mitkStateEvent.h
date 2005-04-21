@@ -21,21 +21,21 @@ PURPOSE.  See the above copyright notices for more information.
 #define STATEEVENT_H_HEADER_INCLUDED_C188E5BF
 
 #include "mitkCommon.h"
-#include "mitkEvent.h"
 
 namespace mitk {
 
-//##ModelId=3E5B7929027D
-//##Documentation
-//## @brief Class holding an mitk-event and the mitk-event-number for a statechange
-//## @ingroup Interaction
-//## Holds an event, with which a statechange of a statemachine shall be
-//## done. iD represents the mitk-event-number, event all further necessary information like
-//## the MousePosition or a key.
-//## Not derived from event to hold only one object stateevent, pass it to the statemachines, 
-//## set the next event and reuse this object
-class StateEvent
-{
+  class Event;
+  //##ModelId=3E5B7929027D
+  //##Documentation
+  //## @brief Class holding an mitk-event and the mitk-event-number for a statechange
+  //## @ingroup Interaction
+  //## Holds an event, with which a statechange of a statemachine shall be
+  //## done. iD represents the mitk-event-number, event all further necessary information like
+  //## the MousePosition or a key.
+  //## Not derived from event to hold only one object stateevent, pass it to the statemachines, 
+  //## set the next event and reuse this object
+  class StateEvent
+  {
   public:
     //##ModelId=3E5B7B9E0137
     StateEvent();
@@ -48,7 +48,7 @@ class StateEvent
 
     //##ModelId=3F02F89601A5
     ~StateEvent();
-  
+
     //##ModelId=3E5B7A7603DA
     //##Documentation
     //## @brief to set the params and reuse an object
@@ -58,16 +58,16 @@ class StateEvent
     int GetId() const;
 
     //##ModelId=3E5B7B030383
-	  mitk::Event const* GetEvent() const;
-    
+    mitk::Event const* GetEvent() const;
+
   private:
     //##ModelId=3E5B7944016D
     int m_Id;
 
     //##ModelId=3E5B7A19010F
-	  mitk::Event const* m_Event;
+    mitk::Event const* m_Event;
 
-};
+  };
 
 } // namespace mitk
 

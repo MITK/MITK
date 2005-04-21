@@ -26,16 +26,16 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk {
 
-    class Operation;
-    class OperationActor;
+  class Operation;
+  class OperationActor;
 
-//##ModelId=3EF221E9001C
-//##Documentation
-//## @brief Interactor for displaying different slices in orthogonal views.
-//## @ingroup Interaction
-//## This includes the interaction of Zooming and Panning.
-class DisplayVectorInteractor : public StateMachine
-{
+  //##ModelId=3EF221E9001C
+  //##Documentation
+  //## @brief Interactor for displaying different slices in orthogonal views.
+  //## @ingroup Interaction
+  //## This includes the interaction of Zooming and Panning.
+  class DisplayVectorInteractor : public StateMachine
+  {
   public:
     mitkClassMacro(DisplayVectorInteractor, StateMachine);
 
@@ -64,7 +64,7 @@ class DisplayVectorInteractor : public StateMachine
 
     //##ModelId=3EF231670106
     OperationActor* m_Destination;
-};
+  };
 
 } // namespace mitk
 

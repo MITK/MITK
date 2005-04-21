@@ -26,40 +26,40 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk {
 
-class Operation;
-class OperationActor;
+  class Operation;
+  class OperationActor;
 
-//##ModelId=3F0189F00094
-//##Documentation
-//## @brief Interactor
-//## @ingroup Interaction
-//## sends a Point, that can be processed in its own OperationActor
-class CoordinateSupplier : public StateMachine
-{
-public:
+  //##ModelId=3F0189F00094
+  //##Documentation
+  //## @brief Interactor
+  //## @ingroup Interaction
+  //## sends a Point, that can be processed in its own OperationActor
+  class CoordinateSupplier : public StateMachine
+  {
+  public:
     //##ModelId=3F0189F0024E
     mitkClassMacro(CoordinateSupplier, StateMachine);
 
     //##ModelId=3F0189F0025B
-	//##Documentation
+    //##Documentation
     //## @brief Constructor with needed arguments
     //## @params: type: string, that describes the StateMachine-Scheme to take from all SM (see XML-File)
     //##    operationActor: the Data, operations (+ points) are send to
-	CoordinateSupplier(const char * type, OperationActor* operationActor);
+    CoordinateSupplier(const char * type, OperationActor* operationActor);
 
-protected:
+  protected:
     //##ModelId=3F0189F00269
-	//##Documentation
-	//## @brief 
-	//##
-	virtual bool ExecuteAction(Action* action, mitk::StateEvent const* stateEvent);
+    //##Documentation
+    //## @brief 
+    //##
+    virtual bool ExecuteAction(Action* action, mitk::StateEvent const* stateEvent);
 
-private:
-  //##ModelId=3F0189F0024A
-  OperationActor* m_Destination;
-  Point3D m_OldPoint;
+  private:
+    //##ModelId=3F0189F0024A
+    OperationActor* m_Destination;
+    Point3D m_OldPoint;
 
-};
+  };
 
 } // namespace mitk
 

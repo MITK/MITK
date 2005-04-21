@@ -27,26 +27,26 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk {
 
-//##ModelId=3E5B79B5012A
-//##Documentation
-//## @brief Event that stores coordinates
-//## @ingroup Interaction
-//## 
-//## Stores display position of the mouse and 3D world position in mm.
-class PositionEvent : public DisplayPositionEvent
-{
-public:
-  //##ModelId=3E5B7CF900F0
+  //##ModelId=3E5B79B5012A
   //##Documentation
-  //## @brief Constructor with all necessary arguments.
-  //##
-  //## @params sender: the widget, that caused that event, so that it can be asked for worldCoordinates. changed later to a focus
-  //##        type, button, buttonState, key: information from the Event
-  //##        displPosition: the 2D Position e.g. from the mouse
-  //##        worldPosition: the 3D position e.g. from a picking 
-  //##        
-  PositionEvent(BaseRenderer* sender, int type, int button, int buttonState, int key, const Point2D& displPosition, const Point3D& worldPosition);
-};
+  //## @brief Event that stores coordinates
+  //## @ingroup Interaction
+  //## 
+  //## Stores display position of the mouse and 3D world position in mm.
+  class PositionEvent : public DisplayPositionEvent
+  {
+  public:
+    //##ModelId=3E5B7CF900F0
+    //##Documentation
+    //## @brief Constructor with all necessary arguments.
+    //##
+    //## @params sender: the widget, that caused that event, so that it can be asked for worldCoordinates. changed later to a focus
+    //##        type, button, buttonState, key: information from the Event
+    //##        displPosition: the 2D Position e.g. from the mouse
+    //##        worldPosition: the 3D position e.g. from a picking 
+    //##        
+    PositionEvent(BaseRenderer* sender, int type, int button, int buttonState, int key, const Point2D& displPosition, const Point3D& worldPosition);
+  };
 
 } // namespace mitk
 

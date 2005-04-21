@@ -21,14 +21,13 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITKLINEMAPPER2D_H_HEADER_INCLUDED
 
 #include "mitkCommon.h"
-#include "mitkMapper2D.h"
-#include "mitkPointSet.h"
 #include "mitkPointSetMapper2D.h"
-#include "mitkDataTree.h"
+//#include "mitkDataTree.h"
 
 namespace mitk {
 
 class BaseRenderer;
+class PointSet;
 
 //##Documentation
 //## @brief OpenGL-based mapper to display Lines
@@ -43,7 +42,7 @@ public:
 
   //##Documentation
   //## @brief Get the PointDataList to map
-  const mitk::PointSet * GetInput(void);
+  const PointSet * GetInput(void);
 
   virtual void Paint(mitk::BaseRenderer * renderer);
 

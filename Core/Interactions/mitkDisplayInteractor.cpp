@@ -25,8 +25,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkCoordinateSupplier.h>
 #include <mitkDisplayCoordinateOperation.h>
 #include <mitkDisplayVectorInteractor.h>
-
-
 #include <mitkBaseRenderer.h>
 #include <mitkRenderWindow.h>
 

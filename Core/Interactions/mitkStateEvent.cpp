@@ -18,6 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include "mitkStateEvent.h"
+#include "mitkEvent.h"
 
 //##ModelId=3F02F8960177
 mitk::StateEvent::StateEvent(int id, Event const* event)
@@ -38,18 +39,18 @@ mitk::StateEvent::~StateEvent()
 //##ModelId=3E5B7A7603DA
 void mitk::StateEvent::Set(int id, Event const* event)
 {
-	m_Id = id;
-	m_Event = event;
+  m_Id = id;
+  m_Event = event;
 }
 
 //##ModelId=3E5B7AEC0394
 int mitk::StateEvent::GetId() const
 {
-	return m_Id;
+  return m_Id;
 }
 
 //##ModelId=3E5B7B030383
 mitk::Event const* mitk::StateEvent::GetEvent() const
 {
-	return m_Event;
+  return m_Event;
 }

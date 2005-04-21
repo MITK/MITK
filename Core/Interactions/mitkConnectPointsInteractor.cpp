@@ -113,7 +113,7 @@ bool mitk::ConnectPointsInteractor::ExecuteAction( Action* action, mitk::StateEv
       worldPoint = posEvent->GetWorldPosition();
 
       int position = mesh->SearchPoint(worldPoint, m_Precision);
-      if (position>=0)//found a point near enough to the given point
+      if (position >= 0)//found a point near enough to the given point
       {
         // if the point is the last in current cell, remove it (this has to be moved in a separate action)
         bool deleteLine=false;
@@ -125,7 +125,8 @@ bool mitk::ConnectPointsInteractor::ExecuteAction( Action* action, mitk::StateEv
           {
             Mesh::PointIdIterator last = cellAutoPointer->PointIdsEnd();
             --last;
-            deleteLine = (mesh->SearchFirstCell(position) == m_CurrentCellId) && (*last == position);
+            int foundCell = mesh->SearchFirstCell( (unsigned long) position ); 
+            deleteLine = ( ((unsigned int)(foundCell)) == m_CurrentCellId ) && ( *last == position );
           }
         }
         if(deleteLine)
@@ -144,7 +145,7 @@ bool mitk::ConnectPointsInteractor::ExecuteAction( Action* action, mitk::StateEv
         {          
           // add new cell if necessary
           if(mesh->GetNewCellId() == 0) //allow single line only
-//allow multiple lines:          if((mesh->SearchFirstCell(position) >= 0) || ((m_CurrentCellId == 0) && (mesh->GetNewCellId() == 0)))
+            //allow multiple lines:          if((mesh->SearchFirstCell(position) >= 0) || ((m_CurrentCellId == 0) && (mesh->GetNewCellId() == 0)))
           {
             //get the next cellId and set m_CurrentCellId
             m_CurrentCellId = mesh->GetNewCellId();

@@ -20,11 +20,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkStateMachine.h"
 #include "mitkStateMachineFactory.h"
 #include "mitkStateTransitionOperation.h"
-#include "mitkOperationEvent.h"
-#include "mitkUndoController.h"
 #include "mitkInteractionConst.h"
-#include <itkMacro.h>
 #include "mitkInteractor.h"
+#include "mitkTransition.h"
+#include <itkMacro.h>
 
 
 //##ModelId=3E5B2DB301FD

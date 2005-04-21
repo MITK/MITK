@@ -26,76 +26,76 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk
 {
-class DataTreeNode;
-//##Documentation
-//## @brief Interaction for mitk::Mesh: Connect existing points to lines
-//## @ingroup Interaction
-class ConnectPointsInteractor : public Interactor
-{
-public:
-  mitkClassMacro(ConnectPointsInteractor, Interactor);
-
+  class DataTreeNode;
   //##Documentation
-  //##@brief Constructor with Param n for limited Set of Points
-  //##
-  //## if no n is set, then the number of points is unlimited*
-  ConnectPointsInteractor(const char * type, DataTreeNode* dataTreeNode, int n = -1);
+  //## @brief Interaction for mitk::Mesh: Connect existing points to lines
+  //## @ingroup Interaction
+  class ConnectPointsInteractor : public Interactor
+  {
+  public:
+    mitkClassMacro(ConnectPointsInteractor, Interactor);
 
-  virtual ~ConnectPointsInteractor();
+    //##Documentation
+    //##@brief Constructor with Param n for limited Set of Points
+    //##
+    //## if no n is set, then the number of points is unlimited*
+    ConnectPointsInteractor(const char * type, DataTreeNode* dataTreeNode, int n = -1);
 
-  //##Documentation
-  //## @brief Sets the amount of precision
-  void SetPrecision( unsigned int precision );
+    virtual ~ConnectPointsInteractor();
 
-  //##Documentation
-  //## @brief calculates how good the data, this statemachine handles, is hit by the event.
-  //## 
-  //## overwritten, cause we don't look at the boundingbox, we look at each point
-  virtual float CalculateJurisdiction(StateEvent const* stateEvent) const;
+    //##Documentation
+    //## @brief Sets the amount of precision
+    void SetPrecision( unsigned int precision );
+
+    //##Documentation
+    //## @brief calculates how good the data, this statemachine handles, is hit by the event.
+    //## 
+    //## overwritten, cause we don't look at the boundingbox, we look at each point
+    virtual float CalculateJurisdiction(StateEvent const* stateEvent) const;
 
 
-protected:
-  virtual bool ExecuteAction( Action* action, mitk::StateEvent const* stateEvent );
+  protected:
+    virtual bool ExecuteAction( Action* action, mitk::StateEvent const* stateEvent );
 
-  //##ModelId=3F017B320121
-  //##Documentation
-  //## @brief deselects the Points in the PointSet.
-  //## supports Undo if enabled
-  //## @params needed for declaring operations
-  void UnselectAll();
+    //##ModelId=3F017B320121
+    //##Documentation
+    //## @brief deselects the Points in the PointSet.
+    //## supports Undo if enabled
+    //## @params needed for declaring operations
+    void UnselectAll();
 
-  //##ModelId=3F05C0700185
-  //##Documentation
-  //## @brief Selects the point.
-  //## supports Undo if enabled.
-  //## @params needed for declaring operations
-  void SelectPoint( int position );
+    //##ModelId=3F05C0700185
+    //##Documentation
+    //## @brief Selects the point.
+    //## supports Undo if enabled.
+    //## @params needed for declaring operations
+    void SelectPoint( int position );
 
-private:
+  private:
 
-  //##ModelId=3F017B3200E3
-  //##Documentation
-  //## @brief the number of possible points in this object
-  //##
-  //## if -1, then no limit set
-  int m_N;
+    //##ModelId=3F017B3200E3
+    //##Documentation
+    //## @brief the number of possible points in this object
+    //##
+    //## if -1, then no limit set
+    int m_N;
 
-  //##Documentation
-  //## @brief stores the current CellId this Statemachine works in
-  int m_CurrentCellId;
+    //##Documentation
+    //## @brief stores the current CellId this Statemachine works in
+    unsigned int m_CurrentCellId;
 
-  //##ModelId=3F0AF6CF00C2
-  //##Documentation
-  //## @brief to calculate a direction vector from last point and actual point
-  Point3D m_LastPoint;
+    //##ModelId=3F0AF6CF00C2
+    //##Documentation
+    //## @brief to calculate a direction vector from last point and actual point
+    Point3D m_LastPoint;
 
-  //##Documentation
-  //## @brief summ-vector for Movement
-  Vector3D m_SumVec;
+    //##Documentation
+    //## @brief summ-vector for Movement
+    Vector3D m_SumVec;
 
-  //##Documentation
-  //## @brief to store the value of precision to pick a point
-  unsigned int m_Precision;
-};
+    //##Documentation
+    //## @brief to store the value of precision to pick a point
+    unsigned int m_Precision;
+  };
 }
 #endif /* MITKCONNECTPOINTSINTERACTOR_H_HEADER_INCLUDED_C11202FF */

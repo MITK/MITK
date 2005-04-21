@@ -26,14 +26,14 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk
 {
-class DataTreeNode;
-//##ModelId=3F017AFD00C3
-//##Documentation
-//## @brief Interaction with a set of points.
-//## @ingroup Interaction
-//## Points can be added, removed and moved.
-class PointSetInteractor : public Interactor
-{
+  class DataTreeNode;
+  //##ModelId=3F017AFD00C3
+  //##Documentation
+  //## @brief Interaction with a set of points.
+  //## @ingroup Interaction
+  //## Points can be added, removed and moved.
+  class PointSetInteractor : public Interactor
+  {
   public:
     //##ModelId=3F017B3200F2
     mitkClassMacro(PointSetInteractor, Interactor);
@@ -46,16 +46,16 @@ class PointSetInteractor : public Interactor
     PointSetInteractor(const char * type, DataTreeNode* dataTreeNode, int n = -1);
 
     //##ModelId=3F017B320103
-  	virtual ~PointSetInteractor();
+    virtual ~PointSetInteractor();
 
-	  //##Documentation
-	  //## @brief clears all the elements in the list with undo-functionality
-	  //##
-	  //## moved due to use in functionalities
-	  void Clear();
+    //##Documentation
+    //## @brief clears all the elements in the list with undo-functionality
+    //##
+    //## moved due to use in functionalities
+    void Clear();
 
- 	  //##Documentation
-	  //## @brief Sets the amount of precision
+    //##Documentation
+    //## @brief Sets the amount of precision
     void SetPrecision( unsigned int precision );
 
     //##Documentation
@@ -86,11 +86,11 @@ class PointSetInteractor : public Interactor
   private:
 
     //##ModelId=3F017B3200E3
-	  //##Documentation
-	  //## @brief the number of possible points in this object
+    //##Documentation
+    //## @brief the number of possible points in this object
     //##
     //## if -1, then no limit set
-	  int m_N;
+    int m_N;
 
     //##ModelId=3F0AF6CF00C2
     //##Documentation
@@ -104,6 +104,6 @@ class PointSetInteractor : public Interactor
     //##Documentation
     //## @brief to store the value of precision to pick a point
     unsigned int m_Precision;
-};
+  };
 }
 #endif /* MITKPOINTSETINTERACTOR_H_HEADER_INCLUDED_C11202FF */

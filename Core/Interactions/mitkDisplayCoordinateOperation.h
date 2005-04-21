@@ -28,27 +28,27 @@ PURPOSE.  See the above copyright notices for more information.
 #define mitkGetMacro(name,type) \
   virtual type Get##name () \
   { \
-    return this->m_##name; \
+  return this->m_##name; \
   }
 
 
 namespace mitk {
 
-//##ModelId=3EF1CC2B03BD
-//##Documentation
-//## @brief Operation with informations necessary for operations of DisplayVectorInteractor
-//## @ingroup Undo
-class DisplayCoordinateOperation : public Operation
-{
+  //##ModelId=3EF1CC2B03BD
+  //##Documentation
+  //## @brief Operation with informations necessary for operations of DisplayVectorInteractor
+  //## @ingroup Undo
+  class DisplayCoordinateOperation : public Operation
+  {
   public:
     //##ModelId=3EF1D349027C
     DisplayCoordinateOperation(mitk::OperationType operationType, 
-        mitk::BaseRenderer* renderer,
-        const mitk::Point2D& startDisplayCoordinate, 
-        const mitk::Point2D& lastDisplayCoordinate, 
-        const mitk::Point2D& currentDisplayCoordinate
-    );
-  
+      mitk::BaseRenderer* renderer,
+      const mitk::Point2D& startDisplayCoordinate, 
+      const mitk::Point2D& lastDisplayCoordinate, 
+      const mitk::Point2D& currentDisplayCoordinate
+      );
+
     //##ModelId=3EF1CCBB03B0
     virtual ~DisplayCoordinateOperation();
 
@@ -72,7 +72,7 @@ class DisplayCoordinateOperation : public Operation
 
   private:
     //##ModelId=3EF1D2A00053
-      mitk::BaseRenderer::Pointer m_Renderer;
+    mitk::BaseRenderer::Pointer m_Renderer;
 
     //##ModelId=3EF1CD2D03A0
     const mitk::Point2D m_StartDisplayCoordinate;
@@ -80,7 +80,7 @@ class DisplayCoordinateOperation : public Operation
     const mitk::Point2D m_LastDisplayCoordinate;
     //##ModelId=3F01770901FB
     const mitk::Point2D m_CurrentDisplayCoordinate;
-};
+  };
 
 }
 

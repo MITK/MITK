@@ -27,60 +27,60 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk
 {
-class DataTreeNode;
-class StateEvent;
-
-//##Documentation
-//## @brief Interaction with a line between two Points.
-//## @ingroup Interaction
-//##
-//## Interact with a line drawn between two declared points. 
-//## The line can be selected, which selects its edges (the two points), so that the line can be moved.
-class LineInteractor : public HierarchicalInteractor
-{
-public:
-  mitkClassMacro(LineInteractor, HierarchicalInteractor);
-    
-  //##Documentation
-  //##@brief Constructor 
-  LineInteractor(const char * type, DataTreeNode* dataTreeNode);
+  class DataTreeNode;
+  class StateEvent;
 
   //##Documentation
-  //##@brief Destructor 
-  virtual ~LineInteractor();
-
-  //##Documentation
-  //## @brief derived from mitk::HierarchicalInteractor; calculates Jurisdiction according to lines
+  //## @brief Interaction with a line between two Points.
+  //## @ingroup Interaction
   //##
-  //## standard mathod can not be used, since it doesn't differ in cells or lines. It would calculate a boundingBox according to points.
-  virtual float CalculateJurisdiction(StateEvent const* stateEvent) const;
+  //## Interact with a line drawn between two declared points. 
+  //## The line can be selected, which selects its edges (the two points), so that the line can be moved.
+  class LineInteractor : public HierarchicalInteractor
+  {
+  public:
+    mitkClassMacro(LineInteractor, HierarchicalInteractor);
 
-protected:
-  //##Documentation
-  //## @brief unselect all Lines that exist in the mesh
-  virtual void DeselectAllLines();
+    //##Documentation
+    //##@brief Constructor 
+    LineInteractor(const char * type, DataTreeNode* dataTreeNode);
 
-  //##Documentation
-  //## @brief Executes Actions
-  virtual bool ExecuteAction(Action* action, mitk::StateEvent const* stateEvent);
+    //##Documentation
+    //##@brief Destructor 
+    virtual ~LineInteractor();
 
-private:
-  //##Documentation
-  //## to make possible the undo of a movement of a line
-  Point3D m_LastPoint, m_TempPoint;
+    //##Documentation
+    //## @brief derived from mitk::HierarchicalInteractor; calculates Jurisdiction according to lines
+    //##
+    //## standard mathod can not be used, since it doesn't differ in cells or lines. It would calculate a boundingBox according to points.
+    virtual float CalculateJurisdiction(StateEvent const* stateEvent) const;
 
-  //##Documentation
-  //## to remember a lineId
-  unsigned long m_CurrentLineId;
-  
-  //##Documentation
-  //## to remember a cellId
-  unsigned long m_CurrentCellId;
+  protected:
+    //##Documentation
+    //## @brief unselect all Lines that exist in the mesh
+    virtual void DeselectAllLines();
 
-  //##Documentation
-  //## @brief lower Point Interactor 
-  PointSnapInteractor::Pointer m_PointInteractor;
+    //##Documentation
+    //## @brief Executes Actions
+    virtual bool ExecuteAction(Action* action, mitk::StateEvent const* stateEvent);
 
-};
+  private:
+    //##Documentation
+    //## to make possible the undo of a movement of a line
+    Point3D m_LastPoint, m_TempPoint;
+
+    //##Documentation
+    //## to remember a lineId
+    unsigned long m_CurrentLineId;
+
+    //##Documentation
+    //## to remember a cellId
+    unsigned long m_CurrentCellId;
+
+    //##Documentation
+    //## @brief lower Point Interactor 
+    PointSnapInteractor::Pointer m_PointInteractor;
+
+  };
 }
 #endif /* MITKLINEINTERACTOR_H_HEADER_INCLUDED */

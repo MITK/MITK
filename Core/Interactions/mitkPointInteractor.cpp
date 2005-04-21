@@ -21,13 +21,16 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkPointOperation.h>
 #include <mitkPositionEvent.h>
 #include <mitkOperationEvent.h>
-#include "mitkStatusBar.h"
+//#include "mitkStatusBar.h"
 #include <mitkDataTreeNode.h>
 #include <mitkPointSet.h>
 #include <mitkInteractionConst.h>
 #include <mitkAction.h>
 #include <mitkProperties.h>
 #include <vtkLinearTransform.h>
+#include <mitkUndoController.h>
+#include <mitkStateEvent.h>
+#include <mitkState.h>
 
 
 mitk::PointInteractor::PointInteractor(const char * type, DataTreeNode* dataTreeNode)

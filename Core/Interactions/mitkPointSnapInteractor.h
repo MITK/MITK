@@ -26,52 +26,52 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk
 {
-//class DataTreeNode;
-
-//##Documentation
-//## @brief adds Snap to Point Interaction to PointInteractor if hierarchicaly ordered
-//## @ingroup Interaction
-//## This class adds snapping to a point to the existing interaction. Hierarchicaly set 
-//## above the Pointinteractor, it checks if an already existing point lies near enough 
-//## to the MousePosition, when a Point is to be added.
-//## If so, then it only activates the point, so that the LineInteractor (hierarchicaly 
-//## above this PointSnapInteractor) can add a line to that Point.
-class PointSnapInteractor : public HierarchicalInteractor
-{
-public:
-  mitkClassMacro(PointSnapInteractor, HierarchicalInteractor);
+  //class DataTreeNode;
 
   //##Documentation
-  //##@brief Constructor 
-  PointSnapInteractor(const char * type, DataTreeNode* dataTreeNode);
+  //## @brief adds Snap to Point Interaction to PointInteractor if hierarchicaly ordered
+  //## @ingroup Interaction
+  //## This class adds snapping to a point to the existing interaction. Hierarchicaly set 
+  //## above the Pointinteractor, it checks if an already existing point lies near enough 
+  //## to the MousePosition, when a Point is to be added.
+  //## If so, then it only activates the point, so that the LineInteractor (hierarchicaly 
+  //## above this PointSnapInteractor) can add a line to that Point.
+  class PointSnapInteractor : public HierarchicalInteractor
+  {
+  public:
+    mitkClassMacro(PointSnapInteractor, HierarchicalInteractor);
 
-  //##Documentation
-  //##@brief Destructor 
-  virtual ~PointSnapInteractor();
+    //##Documentation
+    //##@brief Constructor 
+    PointSnapInteractor(const char * type, DataTreeNode* dataTreeNode);
 
-  //##Documentation
-  //## @brief uses CalculateJurisdiction from PointInteractor
-  virtual float CalculateJurisdiction(StateEvent const* stateEvent) const;
-  //{return this->CalculateLowerJurisdiction(stateEvent);};
+    //##Documentation
+    //##@brief Destructor 
+    virtual ~PointSnapInteractor();
 
-protected:
-  //##Documentation
-  //## @brief select the point on the given position
-  virtual void SelectPoint(int position);
+    //##Documentation
+    //## @brief uses CalculateJurisdiction from PointInteractor
+    virtual float CalculateJurisdiction(StateEvent const* stateEvent) const;
+    //{return this->CalculateLowerJurisdiction(stateEvent);};
 
-  //##Documentation
-  //## @brief unselect all points that exist in mesh
-  virtual void DeselectAllPoints();
+  protected:
+    //##Documentation
+    //## @brief select the point on the given position
+    virtual void SelectPoint(int position);
 
-  //##Documentation
-  //## @brief Executes Actions
-  virtual bool ExecuteAction(Action* action, mitk::StateEvent const* stateEvent);
+    //##Documentation
+    //## @brief unselect all points that exist in mesh
+    virtual void DeselectAllPoints();
 
-private:
-  PointInteractor::Pointer m_PointInteractor;
+    //##Documentation
+    //## @brief Executes Actions
+    virtual bool ExecuteAction(Action* action, mitk::StateEvent const* stateEvent);
 
-  unsigned int m_Position;
-};
+  private:
+    PointInteractor::Pointer m_PointInteractor;
+
+    unsigned int m_Position;
+  };
 }//namespace mitk
 #endif /* MITKPOINTSNAPINTERACTOR_H_HEADER_INCLUDED */
 

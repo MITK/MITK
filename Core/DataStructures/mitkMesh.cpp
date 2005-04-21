@@ -508,7 +508,7 @@ void mitk::Mesh::ExecuteOperation(Operation* operation)
           {
             for(it = oldPolygon->PointIdsBegin(); it != oldend; ++it)
             {
-              if((*it) != pId)
+              if((*it) != (MeshType::PointIdentifier)pId)
               {
                 newPolygonCell->AddPointId(*it);
               }

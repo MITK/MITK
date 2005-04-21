@@ -128,7 +128,7 @@ void mitk::InterpolateLinesFilter::BuildPointAndVectorList(mitk::Mesh::CellType&
       pt = input->GetPoint(*ptIt);
       m_SpX->AddPoint(i, pt[0]); m_SpY->AddPoint(i, pt[1]); m_SpZ->AddPoint(i, pt[2]);
     }
-    bool first = true;
+    //bool first = true;
     Point3D lastPt, firstPt;
     Vector3D vec;
     float t, step=1.0f/m_SplineResolution;

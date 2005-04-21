@@ -104,7 +104,7 @@ void mitk::PolygonToRingFilter::GenerateData()
 void mitk::PolygonToRingFilter::DrawCyl(vtkPoints *vPoints, vtkCellArray *polys, 
                                         VectorListType &sl, VectorListType &sc, int idmax, Point3D & last_p, Point3D & cur_p)
 {
-  int i;
+  unsigned int i;
   //jetzt haben wir alles: sl0 wird mit sc->at(idmax) verbunden usw.
   VectorListType::iterator slit=sl.begin(), scit=sc.begin(), scend=sc.end();
   scit+=idmax;
@@ -170,7 +170,7 @@ void mitk::PolygonToRingFilter::BuildVtkTube(vtkPoints *vPoints, vtkCellArray *p
 
   //Stern am ersten Punkt aufbauen
   m = vnl_quaternion<mitk::ScalarType>(axis.Get_vnl_vector(),2*vnl_math::pi/(double)m_RingResolution).rotation_matrix_transpose();
-  int i;
+  unsigned int i;
   for(i=0;i<m_RingResolution;++i)
   {
     sfirst.push_back(s);
@@ -242,14 +242,14 @@ void mitk::PolygonToRingFilter::BuildPointAndVectorList(mitk::Mesh::CellType& ce
 
   ptEnd = cell.PointIdsEnd();
 
-  int i, size=cell.GetNumberOfPoints();
+  unsigned int i, size=cell.GetNumberOfPoints();
 
   //for(ptIt = cell.PointIdsBegin(); ptIt !=ptEnd; ++ptIt)
   //{
   //  unsigned int numOfPointsInCell = cell.GetNumberOfPoints();
   //}
 
-  int closed_loop_pre_load=m_SplineResolution;
+  unsigned int closed_loop_pre_load=m_SplineResolution;
   //bei geschlossener Kontur: vor dem ersten Punkt die zwei letzten einfügen für glatten Übergang
   ptIt = ptEnd; ptIt-=closed_loop_pre_load+1;
   for(i=0;i<closed_loop_pre_load;++i, ++ptIt)
@@ -268,7 +268,7 @@ void mitk::PolygonToRingFilter::BuildPointAndVectorList(mitk::Mesh::CellType& ce
     m_SpZ->AddPoint(i, pvtk[2]);
   }
   //bei geschlossener Kontur: nach dem letzten Punkt die zwei ersten einfügen für glatten Übergang
-  int j;
+  unsigned int j;
   for(j=0,ptIt = cell.PointIdsBegin();j<closed_loop_pre_load;++j,++i, ++ptIt)
   {
     itk2vtk(input->GetPoint(*ptIt), pvtk);

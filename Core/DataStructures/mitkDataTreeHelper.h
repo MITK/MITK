@@ -38,7 +38,7 @@ namespace DataTreeHelper
 {
   //##Documentation
   //## @brief Search a data tree for (the first) iterator to a given node
-  static DataTreeIteratorClone FindIteratorToNode(mitk::DataTreeBase* tree, const DataTreeNode* node, const DataTreeIteratorBase* startPosition = NULL );
+  DataTreeIteratorClone FindIteratorToNode(mitk::DataTreeBase* tree, const DataTreeNode* node, const DataTreeIteratorBase* startPosition = NULL );
 
   //##Documentation
   //## @brief Add itk-image to data tree

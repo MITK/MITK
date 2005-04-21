@@ -22,66 +22,85 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkCommon.h"
 #include "mitkBaseVtkMapper3D.h"
-#include "mitkPointSet.h"
 #include "mitkBaseRenderer.h"
 
-#include <vtkSphereSource.h>
-#include <vtkAppendPolyData.h>
-#include <vtkPolyData.h>
-#include <vtkPoints.h>
-#include <vtkPointData.h>
-#include <vtkCellArray.h>
-#include <vtkFloatArray.h>
-#include <vtkTubeFilter.h>
-#include <vtkVectorText.h>
-#include <vtkTextSource.h>
-#include <vtkTransform.h>
-#include <vtkTransformPolyDataFilter.h>
-
-
 class vtkActor;
-class vtkAssembly;
-class vtkFollower;
+class vtkPropAssembly;
+class vtkAppendPolyData;
+class vtkPolyData;
+class vtkTubeFilter;
 class vtkPolyDataMapper;
 
 namespace mitk {
 
-//##ModelId=3E70F60202EA
-//##Documentation
-//## @brief Vtk-based mapper for PointList
-//## @ingroup Mapper
-class PointSetVtkMapper3D : public BaseVtkMapper3D
-{
-public:
+  class PointSet;
+  //##ModelId=3E70F60202EA
+  //##Documentation
+  //## @brief Vtk-based mapper for PointSet
+  //## @ingroup Mapper
+  //##
+  //## Due to the need of different colors for selected 
+  //## and unselected points and the facts, that we also have a contour and labels for the points,
+  //## the vtk structure is build up the following way: 
+  //## We have two AppendPolyData, one selected, and one unselected and one for a contour between the points.
+  //## Each one is connected to an own PolyDaraMapper and an Actor.
+  //## The different color for the unselected and selected state and for the contour is read from properties.
+  //## "unselectedcolor", "selectedcolor" and "contourcolor" are the strings, that are looked for.
+  //## Pointlabels are added besides the selected or the deselected points.
+  //## Then the three Actors are combined inside a vtkPropAssembly and this object is returned in GetProp()
+  //## and so hooked up into the rendering pipeline.
+  //## Other properties looked for are:
+  //## "contour" = if set to on, lines between the points are shown
+  //## "close" = if set to on, the open strip is closed (first point connected with last point)
+  //## "pointsize" = size of the points mapped
+  //## "label" = text of the Points to show besides points
+  //## "contoursize" = size of the contour drawn between the points // if not set, the pointsize is taken!
+  class PointSetVtkMapper3D : public BaseVtkMapper3D
+  {
+  public:
+    mitkClassMacro(PointSetVtkMapper3D, BaseVtkMapper3D);
 
-  mitkClassMacro(PointSetVtkMapper3D, BaseVtkMapper3D);
+    itkNewMacro(Self);
 
-  itkNewMacro(Self);
+    //##ModelId=3E70F60301D5
+    virtual const mitk::PointSet* GetInput();
 
-  //##ModelId=3E70F60301D5
-  virtual const mitk::PointSet* GetInput();
+    //overwritten from BaseVtkMapper3D to be able to return a m_PointsAssembly which is much faster than a vtkAssembly
+    virtual vtkProp* GetProp();
 
-protected:
-  //##ModelId=3E70F60301F4
-  PointSetVtkMapper3D();
+  protected:
+    //##ModelId=3E70F60301F4
+    PointSetVtkMapper3D();
 
-  //##ModelId=3E70F60301F5
-  virtual ~PointSetVtkMapper3D();
+    //##ModelId=3E70F60301F5
+    virtual ~PointSetVtkMapper3D();
 
-  virtual void GenerateData(mitk::BaseRenderer* renderer);
+    virtual void GenerateData();
+    virtual void GenerateData(mitk::BaseRenderer* renderer);
 
-  vtkActor *m_Actor;
-  vtkPolyDataMapper* m_PointVtkPolyDataMapper;
-  vtkPolyDataMapper* m_TextVtkPolyDataMapper;
-  vtkPolyDataMapper* m_VtkPolyDataMapper;
+    vtkAppendPolyData *m_vtkSelectedPointList;
+    vtkAppendPolyData *m_vtkUnselectedPointList;
+    vtkAppendPolyData *m_vtkContourPolyData;
 
+    vtkPolyDataMapper *m_VtkSelectedPolyDataMapper;
+    vtkPolyDataMapper *m_VtkUnselectedPolyDataMapper;
+    vtkPolyDataMapper *m_vtkContourPolyDataMapper;
 
-  vtkAppendPolyData *m_vtkPointList;
-  vtkAppendPolyData *m_vtkTextList;
-  vtkPolyData *m_contour;
-  vtkTubeFilter * m_tubefilter;
-};
+    vtkActor *m_SelectedActor;
+    vtkActor *m_UnselectedActor;
+    vtkActor *m_ContourActor;
 
+    vtkPropAssembly *m_PointsAssembly;
+
+    //help for contour between points
+    vtkAppendPolyData *m_vtkTextList;
+    vtkPolyData *m_contour;
+    vtkTubeFilter *m_tubefilter;
+
+    //variables to be able to log, how many inputs have been added to PolyDatas
+    unsigned int m_NumberOfSelectedAdded;
+    unsigned int m_NumberOfUnselectedAdded;
+  };
 } // namespace mitk
 
 #endif /* MITKPointSetVtkMAPPER3D_H_HEADER_INCLUDED_C1907273 */

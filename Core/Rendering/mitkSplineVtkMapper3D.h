@@ -27,7 +27,13 @@ class vtkAssembly;
 
 namespace mitk
 {
-
+  //##Documentation
+  //## @brief Vtk-based mapper for Spline between points from PointSet
+  //## @ingroup Mapper
+  //##
+  //## properties looked for:
+  //## "linewidth" = with of the spline
+  //## "dontdrawpoints" = don't draw points between spline (default = false)
 class SplineVtkMapper3D : public PointSetVtkMapper3D
 {
 public:
@@ -38,16 +44,11 @@ public:
 
     virtual vtkProp* GetProp();
 
-    
     bool SplinesAreAvailable();
     
     vtkPolyData* GetSplinesPolyData();
     
-    vtkPolyData* GetPointsPolyData();
-    
     vtkActor* GetSplinesActor();
-    
-    vtkActor* GetPointsActor();
     
     
 protected:
@@ -62,12 +63,11 @@ protected:
     
     vtkActor* m_SplinesActor;
     
-    vtkAssembly* m_Assembly;
+    vtkPropAssembly* m_SplineAssembly;
     
     bool m_SplinesAvailable;
     
     bool m_SplinesAddedToAssembly;
-    
 };
 
 

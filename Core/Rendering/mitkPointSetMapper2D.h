@@ -21,14 +21,12 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITKPointSetMAPPER2D_H_HEADER_INCLUDED
 
 #include "mitkCommon.h"
-#include "mitkMapper2D.h"
-#include "mitkPointSet.h"
 #include "mitkGLMapper2D.h"
-#include "mitkDataTree.h"
 
 namespace mitk {
 
 class BaseRenderer;
+class PointSet;
 
 //##ModelId=3F0189F0014F
 //##Documentation

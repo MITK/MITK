@@ -43,7 +43,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkImageCast.h>
 #include <mitkDataTree.h>
 #include <mitkPicFileReader.h>
-#include <mitkVesselGraphData.h>
+#ifdef MBI_INTERNAL
+  #include <mitkVesselGraphData.h>
+#endif
 #include "mitkPointSetWriter.h"
 #include "itkImage.h"
 

@@ -155,8 +155,8 @@ bool mitk::LevelWindow::SetAutoByPicTags(const ipPicDescriptor* aPic)
   ipPicTSV_t *tsv = ipPicQueryTag( pic, "LEVEL/WINDOW" );
   if( tsv != NULL )
   {
-    double level;
-    double window;
+    double level = 0;
+    double window = 0;
     #define GET_C_W( type, tsv, C, W )    \
       level = ((type *)tsv->value)[0];    \
       window = ((type *)tsv->value)[1];

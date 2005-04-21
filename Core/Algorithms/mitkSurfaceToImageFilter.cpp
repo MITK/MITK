@@ -135,7 +135,7 @@ void mitk::SurfaceToImageFilter::Stencil3DImage(int time)
   const mitk::TimeSlicedGeometry *surfaceTimeGeometry = GetInput()->GetTimeSlicedGeometry();
   const mitk::TimeSlicedGeometry *imageTimeGeometry = GetImage()->GetTimeSlicedGeometry();
   
-  int surfaceTimeStep = surfaceTimeGeometry->TimeStepToMS( (int) (imageTimeGeometry->TimeStepToMS(time) ) );
+  int surfaceTimeStep = (int) surfaceTimeGeometry->TimeStepToMS( (int) (imageTimeGeometry->TimeStepToMS(time) ) );
   
   vtkPolyData * polydata = ( (mitk::Surface*)GetInput() )->GetVtkPolyData( surfaceTimeStep );
   vtkTransformPolyDataFilter * move=vtkTransformPolyDataFilter::New();

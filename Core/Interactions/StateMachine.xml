@@ -1360,8 +1360,9 @@
       <transition NAME="noPicked" NEXT_STATE_ID="7" EVENT_ID="1003" >
         <action ID="66" /> <!-- AcSELECTPOINT  -->
       </transition>
-      <transition NAME="yesPicked" NEXT_STATE_ID="8" EVENT_ID="1004" >
+      <transition NAME="yesPicked" NEXT_STATE_ID="13" EVENT_ID="1004" >
         <action ID="69"/>    <!-- AcSELECTSUBOBJECT  -->
+        <action ID="3010" />   <!-- AcCHECKBARRIERSTATUS -->  
       </transition>
     </state>
     <state NAME="CheckPicking" ID="6">
@@ -1382,6 +1383,7 @@
       <transition NAME="deselectAll" NEXT_STATE_ID="1" EVENT_ID="14" >
         <action ID="72"/>  <!-- AcDESELECTALL -->
       </transition>
+      
       
       <!--now follow the attibutations for different vessel types-->
       <transition NAME="attributation" NEXT_STATE_ID="1" EVENT_ID="20" >
@@ -1414,7 +1416,6 @@
       <transition NAME="ENew" NEXT_STATE_ID="1" EVENT_ID="13">
         <action ID="72"/>   <!-- AcDESELECTALL -->
         <action ID="81"/>  <!-- AcNEWSUBOBJECT -->
-        <!--action ID="65"/>   AcSELECT  -->
       </transition>
       <transition NAME="goToCheckPicking" NEXT_STATE_ID="10" EVENT_ID="5" >
         <action ID="31"/>  <!-- AcCHECKOBJECT  -->
@@ -1483,12 +1484,6 @@
       <transition NAME="singleSignal" NEXT_STATE_ID="3" EVENT_ID="19" >
         <action ID="3004"/>  <!-- AcSINGLE -->
       </transition>
-      <transition NAME="setBarrier" NEXT_STATE_ID="11" EVENT_ID="91" >
-        <action ID="3006"/>  <!-- AcSETBARRIER -->
-      </transition>
-      <transition NAME="deleteBarrier" NEXT_STATE_ID="11" EVENT_ID="92" >
-        <action ID="3008"/>  <!-- AcDELETEBARRIER -->
-      </transition>
       
       <!--now follow the attibutations for different vessel types-->
       <transition NAME="attributation" NEXT_STATE_ID="1" EVENT_ID="20" >
@@ -1518,10 +1513,14 @@
       </transition>
       </state>
       <state NAME="CheckNumberPickedVesselsSmaller2" ID="12">
-      <transition NAME="yes" NEXT_STATE_ID="8" EVENT_ID="1003" /> 
-      <transition NAME="no" NEXT_STATE_ID="11" EVENT_ID="1004">
+      <transition NAME="yes" NEXT_STATE_ID="8" EVENT_ID="1004" /> 
+      <transition NAME="no" NEXT_STATE_ID="11" EVENT_ID="1003">
         <action ID="69"/>  <!-- AcSELECTSUBOBJECT  -->
       </transition>
+     </state>
+     <state NAME="CheckBarrierStatus" ID="13">
+      <transition NAME="yes" NEXT_STATE_ID="3" EVENT_ID="1004" /> 
+      <transition NAME="no" NEXT_STATE_ID="8" EVENT_ID="1003" />
      </state>
   </stateMachine> 
   <!-- -->
@@ -1568,10 +1567,6 @@
     <event NAME="Strg+Alt+S" ID="40" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0600" KEY="Key_S" />
     <!-- Alt -->
     <event NAME="Alt" ID="90" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0400" KEY="Key_Alt" />
-    <!-- B-->
-    <event NAME="B" ID="91" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_B" />
-    <!-- Strg + Alt + Z -->
-    <event NAME="Strg+Alt+Z" ID="92" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0600" KEY="Key_Z" />
     
     <!-- leftMouseButtonRelease -->
     <event NAME="leftMouseRelease" ID="505" TYPE="Type_MouseButtonRelease" BUTTON="BS_LeftButton" BUTTONSTATE="0x0001" KEY="Key_none" />

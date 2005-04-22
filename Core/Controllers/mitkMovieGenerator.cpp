@@ -17,11 +17,10 @@ mitk::MovieGenerator::Pointer mitk::MovieGenerator::New()
     #ifdef WIN32
       MovieGeneratorWin32::Pointer wp = MovieGeneratorWin32::New();
       return wp;
-      //rawPtr = (MovieGenerator*)MovieGeneratorWin32::New();
     #endif
   }
   smartPtr = rawPtr;
-  rawPtr->UnRegister();
+  if(rawPtr != NULL) rawPtr->UnRegister();
   return smartPtr;
 }
 

@@ -34,7 +34,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkMovieGenerator.h>
 
 
-#include "qpushbutton.h"
+#include <qpushbutton.h>
+#include <qfiledialog.h>
 
 // for stereo setting
 #include <mitkOpenGLRenderer.h>
@@ -117,7 +118,8 @@ void QmitkSimpleExampleFunctionality::generateMovie()
   if (movieGenerator.IsNotNull()) {
     movieGenerator->SetStepper( stepper );
     movieGenerator->SetRenderer( multiWidget->mitkWidget1->GetRenderer() );
-    movieGenerator->SetFileName( "test.avi" );
+    QString movieFileName = QFileDialog::getSaveFileName( QString::null, "Movie (*.avi)", 0, "movie file dialog", "Choose a file name" );
+    movieGenerator->SetFileName( movieFileName.ascii() );
     movieGenerator->WriteMovie();
   }
 }

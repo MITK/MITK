@@ -110,7 +110,7 @@ void mitk::PolygonToRingFilter::DrawCyl(vtkPoints *vPoints, vtkCellArray *polys,
   scit+=idmax;
   Point3D a,b;
   Point3D a_first,b_first;
-  int a_firstID, b_firstID;
+  int a_firstID = 0, b_firstID = 0;
 
   int front[4];
   for(i=0;i<m_RingResolution;++i)

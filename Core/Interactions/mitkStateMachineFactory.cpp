@@ -209,7 +209,7 @@ bool mitk::StateMachineFactory::parse(mitk::State::StateMap *states, mitk::State
     StatusBar::DisplayText("Warnung: Ein inkonsistenter Zustand (oder ein Endzustand) wird erzeugt!");    
 	  return true;//Jedoch erlaubt!!!z.B. als Endzustand
 	}
-	bool ok;
+	bool ok = false;
 	//go through all Transitions of thisState and look if we have allready been in this state
 	for (std::set<int>::iterator i = nextStatesSet.begin(); i != nextStatesSet.end();  i++)
 	{

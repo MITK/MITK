@@ -53,10 +53,10 @@ const mitk::PointSet* mitk::PointSetVtkMapper3D::GetInput()
 
 //##ModelId=3E70F60301F4
 mitk::PointSetVtkMapper3D::PointSetVtkMapper3D() 
-: m_NumberOfSelectedAdded(0), m_NumberOfUnselectedAdded(0), 
+: m_vtkSelectedPointList(NULL), m_vtkUnselectedPointList(NULL), m_vtkContourPolyData(NULL),
 m_VtkSelectedPolyDataMapper(NULL), m_VtkUnselectedPolyDataMapper(NULL),m_vtkContourPolyDataMapper(NULL),
-m_vtkSelectedPointList(NULL), m_vtkUnselectedPointList(NULL), m_vtkContourPolyData(NULL),
-m_vtkTextList(NULL), m_contour(NULL), m_tubefilter(NULL)
+m_vtkTextList(NULL), m_contour(NULL), m_tubefilter(NULL),
+m_NumberOfSelectedAdded(0), m_NumberOfUnselectedAdded(0)
 {
   //propassembly
   m_PointsAssembly = vtkPropAssembly::New();

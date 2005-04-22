@@ -34,7 +34,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 mitk::SplineVtkMapper3D::SplineVtkMapper3D()
-: m_SplinesAddedToAssembly(false), m_SplinesAvailable (false)
+: m_SplinesAvailable (false), m_SplinesAddedToAssembly(false) 
 {
   m_SplinesActor = vtkActor::New();
   m_SplineAssembly = vtkPropAssembly::New();

@@ -50,7 +50,7 @@ mitk::SplineVtkMapper3D::~SplineVtkMapper3D()
 vtkProp*
 mitk::SplineVtkMapper3D::GetProp()
 {
-  if (GetDataTreeNode == NULL)
+  if (GetDataTreeNode() == NULL)
     return NULL; 
 
   //to assign User Transforms in superclass

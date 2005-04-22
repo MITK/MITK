@@ -21,7 +21,9 @@ void mitk::MovieGeneratorWin32::InitBitmapHeader()
   GLint viewport[4];					// Where The Viewport Values Will Be Stored
   glGetIntegerv( GL_VIEWPORT, viewport );			// Retrieves The Viewport Values (X, Y, Width, Height)
   m_width = viewport[2];
+  m_width -= m_width % 4;
   m_height = viewport[3];
+  m_height -= m_height % 4;
 
   BITMAPINFOHEADER bih;
 	bih.biSize = sizeof( BITMAPINFOHEADER );

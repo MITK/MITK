@@ -166,7 +166,7 @@ void mitk::SplineVtkMapper3D::GenerateData( mitk::BaseRenderer* renderer )
 {
   bool doNotDrawPoints;
   if (dynamic_cast<mitk::BoolProperty *>(this->GetDataTreeNode()->GetProperty("dontdrawpoints").GetPointer()) == NULL)
-    doNotDrawPoints = false;
+    doNotDrawPoints = true;
   else
     doNotDrawPoints = dynamic_cast<mitk::BoolProperty *>(this->GetDataTreeNode()->GetProperty("dontdrawpoints").GetPointer())->GetValue();
   

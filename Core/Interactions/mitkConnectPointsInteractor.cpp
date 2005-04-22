@@ -126,7 +126,8 @@ bool mitk::ConnectPointsInteractor::ExecuteAction( Action* action, mitk::StateEv
             Mesh::PointIdIterator last = cellAutoPointer->PointIdsEnd();
             --last;
             int foundCell = mesh->SearchFirstCell( (unsigned long) position ); 
-            deleteLine = ( ((unsigned int)(foundCell)) == m_CurrentCellId ) && ( *last == position );
+            if (foundCell != -1)//not found
+              deleteLine = ((unsigned int)foundCell == m_CurrentCellId) && (*last == (unsigned int)position);
           }
         }
         if(deleteLine)

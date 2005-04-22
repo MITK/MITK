@@ -24,6 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkFixedCenterOfRotationAffineTransform.h>
 #include <float.h>
 #include <itkIndex.h>
+#include <itkVector.h>
 
 namespace mitk {
 typedef float ScalarType;
@@ -123,6 +124,18 @@ class VectorTraits< ScalarType[4] > {
   public:
     typedef ScalarType ValueType;
 };
+
+class VectorTraits< itk::Vector<int,3> > {
+  public:
+    typedef int ValueType;
+};
+
+class VectorTraits< itk::Point<int,3> > {
+  public:
+    typedef int ValueType;
+};
+
+
 
 template <class Tin, class Tout>
   inline void itk2vtk(const Tin& in, Tout& out)

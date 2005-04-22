@@ -91,6 +91,9 @@ protected slots:
   void treeChanged();
 
   void initNavigators();
+
+  void generateMovie();
+
 protected:
 
   /*!

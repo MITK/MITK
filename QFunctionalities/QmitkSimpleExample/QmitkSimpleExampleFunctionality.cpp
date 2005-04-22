@@ -31,6 +31,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkSelectableGLWidget.h"
 #include "QmitkStdMultiWidget.h"
 #include <QmitkStepperAdapter.h>
+#include <mitkMovieGenerator.h>
+
+
 #include "qpushbutton.h"
 
 // for stereo setting
@@ -91,6 +94,7 @@ void QmitkSimpleExampleFunctionality::createConnections()
   {
     connect(controls->getStereoSelect(), SIGNAL(activated(int)), this, SLOT(stereoSelectionChanged(int)) );
     connect(controls->getReInitializeNavigatorsButton(), SIGNAL(clicked()), this, SLOT(initNavigators()) );
+    connect(controls->getGenerateMovieButton(), SIGNAL(clicked()), this, SLOT(generateMovie()) );
   }
 }
 
@@ -104,6 +108,18 @@ QAction * QmitkSimpleExampleFunctionality::createAction(QActionGroup *parent)
 void QmitkSimpleExampleFunctionality::initNavigators()
 {
   m_NavigatorsInitialized = multiWidget->InitializeStandardViews(m_DataTreeIterator.GetPointer());
+}
+
+void QmitkSimpleExampleFunctionality::generateMovie()
+{
+  mitk::Stepper::Pointer stepper = multiWidget->mitkWidget1->GetSliceNavigationController()->GetSlice();
+  mitk::MovieGenerator::Pointer movieGenerator = mitk::MovieGenerator::New();
+  if (movieGenerator.IsNotNull()) {
+    movieGenerator->SetStepper( stepper );
+    movieGenerator->SetRenderer( multiWidget->mitkWidget1->GetRenderer() );
+    movieGenerator->SetFileName( "test.avi" );
+    movieGenerator->WriteMovie();
+  }
 }
 
 void QmitkSimpleExampleFunctionality::treeChanged()

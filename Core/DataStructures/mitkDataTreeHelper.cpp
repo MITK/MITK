@@ -18,7 +18,10 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkDataTreeHelper.h"
 
-mitk::DataTreeIteratorClone mitk::DataTreeHelper::FindIteratorToNode(mitk::DataTreeBase* tree, const mitk::DataTreeNode* node, const mitk::DataTreeIteratorBase* startPosition )
+mitk::DataTreeIteratorClone mitk::DataTreeHelper::FindIteratorToNode(
+    mitk::DataTreeBase* tree, 
+    const mitk::DataTreeNode* node, 
+    const mitk::DataTreeIteratorBase* startPosition )
 {
   DataTreeIteratorClone pos;
 

@@ -67,7 +67,7 @@ public:
   virtual bool GoToParent( );
 
   /** Set the current value of the node */
-  ValueType& Set( ValueType element);
+  bool Set( ValueType element);
 
   /** Return true if the current node has a child */
   virtual bool HasChild(int number = 0) const;

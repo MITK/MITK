@@ -70,12 +70,16 @@ TreeIteratorBase<TTreeType>::Get() const
 
 /** Set the current value of the node */
 template <class TTreeType>
-typename TreeIteratorBase<TTreeType>::ValueType& 
+bool
 TreeIteratorBase<TTreeType>::Set(ValueType element) 
 {
-  ValueType oldValue = m_Position->Get();
-  m_Position->Set(element);
-  return oldValue;
+  if ( m_Position )
+  {
+    m_Position->Set(element);
+    return true;
+   }
+    
+   return false;
 }
 
 /** Add a value to the node. This create a new child node */

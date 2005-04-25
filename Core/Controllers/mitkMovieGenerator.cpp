@@ -15,7 +15,7 @@ mitk::MovieGenerator::Pointer mitk::MovieGenerator::New()
   MovieGenerator *rawPtr = ::itk::ObjectFactory<MovieGenerator>::Create();
   if(rawPtr == NULL) {
     #ifdef WIN32
-      MovieGeneratorWin32::Pointer wp = MovieGeneratorWin32::New();
+      mitk::MovieGenerator::Pointer wp = static_cast<mitk::MovieGenerator*>(MovieGeneratorWin32::New());
       return wp;
     #endif
   }

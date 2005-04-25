@@ -129,8 +129,8 @@ void QmitkVolumetryWidget::UpdateSlider()
         CommonFunctionality::MinMax<ItkInt3DImage>(itkImage,min,max);
         if (min<gMin) { gMin = min; }
         if (max>gMax) { gMax = max; }
-        m_ThresholdSlider->setMinValue(gMin);
-        m_ThresholdSlider->setMaxValue(gMax);
+        m_ThresholdSlider->setMinValue((int)gMin);
+        m_ThresholdSlider->setMaxValue((int)gMax);
         m_ThresholdSlider->setEnabled(true);
         m_ThresholdLabel->setNum(m_ThresholdSlider->value());
       }
@@ -140,8 +140,8 @@ void QmitkVolumetryWidget::UpdateSlider()
       mitk::CastToItkImage(image,itkImage);
       float min,max;
       CommonFunctionality::MinMax<ItkInt3DImage>(itkImage,min,max);
-      m_ThresholdSlider->setMinValue(min);
-      m_ThresholdSlider->setMaxValue(max);
+      m_ThresholdSlider->setMinValue((int)min);
+      m_ThresholdSlider->setMaxValue((int)max);
       m_ThresholdSlider->setEnabled(true);
       m_ThresholdLabel->setNum(m_ThresholdSlider->value());
     }

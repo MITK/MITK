@@ -90,10 +90,9 @@ TreeIteratorBase<TTreeType>::Add(ValueType element)
   if ( m_Position == NULL && m_Root == NULL ) 
     {
     bool returnValue = false;
-    if ( m_Tree )
-      {
-      returnValue = const_cast<TTreeType*>(m_Tree)->SetRoot( element );
-      }
+    
+    if ( m_Tree )      
+      returnValue = const_cast<TTreeType*>(m_Tree)->SetRoot( element );      
 
       m_Root = dynamic_cast<const TreeNodeType*>(const_cast<TTreeType*>(m_Tree)->GetRoot());
       m_Position =  const_cast<TreeNodeType*>(m_Root);
@@ -101,10 +100,8 @@ TreeIteratorBase<TTreeType>::Add(ValueType element)
       m_Tree->InvokeEvent( TreeAddEvent<TTreeType>(*this) );
       return returnValue;
     } 
-  else if ( m_Position == NULL )
-    {
-    return false;
-    }
+  else if ( m_Position == NULL )    
+    return false;    
 
   typename TreeNodeType::Pointer node = TreeNodeType::New();
   node->Set(element);

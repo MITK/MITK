@@ -14,6 +14,15 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.Border;
 
+
+/**
+ * The tool autmaticaly creates a FilterFactoryItem from a template file 
+ * and inserts lines in several files, where the FilterFactoryItems ar listed.
+ * This class creates a new window with input fields for text, like directory paths
+ * and then starts start.class.
+ * 
+ */
+
 public class FilterFactoryItemGenerator
 extends JFrame
 implements ActionListener
@@ -149,30 +158,36 @@ implements ActionListener
 		}
 		
 		if (cmd.equals(startButton)) {
-			// Prüfe, ob Functionality schon existiert
+			// look for mitkFilterTemplateFFI.h
 			File mitkDir = new File(textf2.getText());
 			File algDir = new File(mitkDir, "Algorithms");
 			File FFIDir = new File(algDir, "mitkFilterFactoryItem");
-			File newFFI = new File(FFIDir, "mitk" + textf1.getText() + "FFI.h");
-			if (newFFI.exists()) {
-				labelOut.setText("Datei \"" + "mitk" + textf1.getText() 
-						+ "FFI.h" + "\" existiert bereits!");	
+			File templ = new File(FFIDir, "mitkFilterTemplateFFI.h");
+			if (!templ.exists()) {
+				labelOut.setText("mitkFilterTemplateFFI.h nicht gefunden!");
 			} else {
-				labelOut.setText("Programm gestartet...");			
-				start prog = new start(textf1.getText(),
-										textf2.getText(),
-										textf2a.getText(),
-										textf3.getText(),
-										textf3a.getText(),
-										textf4.getText(),
-										textf4a.getText());
-				try {
-					prog.run();
-					labelOut.setText("Programm ausgeführt.");
-				} catch (IOException e) {
-					System.out.println("Fehler beim Ausführen des Programms!");
-				} 
-			} 	
+				// check, if FilterFactoryItem already exits
+				File newFFI = new File(FFIDir, "mitk" + textf1.getText() + "FFI.h");
+				if (newFFI.exists()) {
+					labelOut.setText("Datei \"" + "mitk" + textf1.getText() 
+							+ "FFI.h" + "\" existiert bereits!");	
+				} else {
+					labelOut.setText("Programm gestartet...");			
+					start prog = new start(textf1.getText(),
+											textf2.getText(),
+											textf2a.getText(),
+											textf3.getText(),
+											textf3a.getText(),
+											textf4.getText(),
+											textf4a.getText());
+					try {
+						prog.run();
+						labelOut.setText("Programm ausgeführt.");
+					} catch (IOException e) {
+						System.out.println("Fehler beim Ausführen des Programms!");
+					} 
+				} 	
+			}
 		}	else if (cmd.equals(exitButton)) {
 			setVisible(false);
 			dispose(); 

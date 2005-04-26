@@ -7,6 +7,11 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 
+
+/**
+ * This Class first opens and reads the template file at the sprecified path.
+ * It them replaces all names by the title entered in the window.
+ */
 public class CopyTemplate {
 
 	String Title, mitkPath;

@@ -1,5 +1,11 @@
 import java.io.IOException;
 
+
+/**
+ * this class first opens CopyTemplate.class 
+ * to write a new FilterFactoryFilterItem from a template file
+ * and then opens UpdateFiles.class to insert lines to the files specified there.
+ */
 public class start {
 	
 	String Title, mitkPath, xmlPath, inputClass, inputDim, outputClass, outputDim;

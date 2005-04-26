@@ -6,6 +6,14 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 
+/**
+ * This class opens the files
+ * mitkFilterFactoryItem.cpp
+ * mitkFilterFactoryItem.cmake
+ * Alle.xml
+ * and inserts lines there, that add the new FilterFactoryItem to the list.
+ */
+
 public class UpdateFiles {
 	
 	String Title, mitkPath, xmlPath, inputClass, inputDim, outputClass, outputDim;
@@ -54,12 +62,12 @@ public class UpdateFiles {
 			}
 			StringBuffer fileContent = sWriter.getBuffer();
 			
-			c = fileContent.indexOf("// 1 please");
+			c = fileContent.indexOf("// Automatic FilterFactoryItemGenerator inserts line \"#define MITK_...\" here, please keep comment");
 			newFileContent = fileContent.insert(c, 
 				"#define MITK_" + Title.toUpperCase() + "_INCLUDE"				
 				+ System.getProperty("line.separator"));
 			
-			c = newFileContent.indexOf("// 2 please");
+			c = newFileContent.indexOf("// Automatic FilterFactoryItemGenerator inserts lines \"#ifdef MITK_...\" here, please keep comment");
 			newFileContent = newFileContent.insert(c, 
 				"#ifdef MITK_" + Title.toUpperCase() + "_INCLUDE"
 				+ System.getProperty("line.separator")
@@ -123,7 +131,7 @@ public class UpdateFiles {
 			}
 			StringBuffer fileContent = sWriter.getBuffer();
 			
-			c = fileContent.indexOf("# please");
+			c = fileContent.indexOf("# Automatic FilterFactoryItemGenerator inserts line \"#SET ( APPMOD_H ${APPMOD_H} ...\" here, please keep comment");
 			newFileContent = fileContent.insert(c, 
 				"SET ( APPMOD_H ${APPMOD_H} ../../Algorithms/mitkFilterFactoryItem/mitk" 
 				+ Title + "FFI.h )"
@@ -187,7 +195,7 @@ public class UpdateFiles {
 				+ outputClass + "Output\" CAPTION=\"XXX\" DESCRIPTION=\"XXX\">" 
 				+ System.getProperty("line.separator")
 				+ "\t" + "\t"
-				+ "<inputInteger ID=\"0\" CAPTION=\"XXX\" MIN=\"0\" MAX=\"0\" VALUE=\"0\" DESCRIPTION=\"XXX\" ENABLED=\"TRUE\" VISIBLE=\"TRUE\" />	 <!-- muss ersetzt werden -->"
+				+ "<inputInteger ID=\"0\" CAPTION=\"XXX\" MIN=\"0\" MAX=\"0\" VALUE=\"0\" DESCRIPTION=\"XXX\" ENABLED=\"TRUE\" VISIBLE=\"TRUE\" />	 <!-- please replace values -->"
 				+ System.getProperty("line.separator")
 				+ "\t"
 				+ "</filterDescriptor>"

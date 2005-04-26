@@ -35,7 +35,7 @@ bool mitk::MovieGenerator::WriteMovie()
 		int imgSize = 3 * m_width * m_height;    
 		printf( "Video size = %i x %i\n", m_width, m_height );    
 		GLbyte *data = new GLbyte[imgSize];    
-		for (int i=0; i<m_stepper->GetSteps(); i++) {      
+		for (unsigned int i=0; i<m_stepper->GetSteps(); i++) {      
 			if (m_renderer) m_renderer->MakeCurrent();      
 			glReadPixels( 0, 0, m_width, m_height, GL_BGR, GL_UNSIGNED_BYTE, (void*)data );      
 			AddFrame( data );      

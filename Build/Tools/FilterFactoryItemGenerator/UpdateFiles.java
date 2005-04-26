@@ -177,8 +177,8 @@ public class UpdateFiles {
 			}
 			StringBuffer fileContent = sWriter.getBuffer();
 			
-			c = fileContent.indexOf("<newFilterDescription />");
-			newFileContent = fileContent.insert(c+24,
+			c = fileContent.indexOf("<!-- <newFilterDescription /> -->");
+			newFileContent = fileContent.insert(c+35,
 				System.getProperty("line.separator")
 				+ System.getProperty("line.separator")
 				+ "\t"
@@ -187,7 +187,7 @@ public class UpdateFiles {
 				+ outputClass + "Output\" CAPTION=\"XXX\" DESCRIPTION=\"XXX\">" 
 				+ System.getProperty("line.separator")
 				+ "\t" + "\t"
-				+ "<inputInteger ID=\"0\" CAPTION=\"XXX\" MIN=\"0\" MAX=\"0\" VALUE=\"0\" DESCRIPTION=\"XXX\" ENABLED=\"TRUE\" VISIBLE=\"TRUE\" />	 <! muss ersetzt werden -->"
+				+ "<inputInteger ID=\"0\" CAPTION=\"XXX\" MIN=\"0\" MAX=\"0\" VALUE=\"0\" DESCRIPTION=\"XXX\" ENABLED=\"TRUE\" VISIBLE=\"TRUE\" />	 <!-- muss ersetzt werden -->"
 				+ System.getProperty("line.separator")
 				+ "\t"
 				+ "</filterDescriptor>"

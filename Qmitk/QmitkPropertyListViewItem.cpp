@@ -169,11 +169,13 @@ void QmitkPropertyListViewItem::UpdateEnabledView()
   {
     m_EnabledButton->setPixmap(enabledPix);
     if (m_Control) {m_Control->setEnabled(true);}
+    if (m_Label) {m_Label->setEnabled(true);}
   }
   else
   {
     m_EnabledButton->setPixmap(disabledPix);
     if (m_Control) {m_Control->setEnabled(false);}
+    if (m_Label) {m_Label->setEnabled(false);}
   }
 }
 void QmitkPropertyListViewItem::EnabledButtonClicked()

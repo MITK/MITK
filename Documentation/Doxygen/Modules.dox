@@ -107,7 +107,7 @@
   This includes complex interactions that have multiple states (e.g., moving a handle of an 
   active contour vs changing its local elasicity) and a concept to realize an undo/redo-mechanism.
      
-  \todo A detailed description of the rationale for these classes can be found in
+  A detailed description of the rationale for these classes can be found in
   \ref InteractionPage.
 */
 
@@ -121,7 +121,7 @@
   For undo-support, the change is done by sending an OperationEvent to the respective 
   data object, which changes itself accordingly.
    
-  \todo A detailed description of the rationale for these classes can be found in
+  A detailed description of the rationale for these classes can be found in
   \ref InteractionPage.
 */
 
@@ -134,7 +134,7 @@
   For undo-support, the change is done by sending an OperationEvent to the respective data object, 
   which changes itself accordingly.
   
-  \todo A detailed description of the rationale for these classes can be found in
+  A detailed description of the rationale for these classes can be found in
   \ref InteractionPage.
 */
  
@@ -142,7 +142,7 @@
 /**
   \defgroup Application Application-level Classes
 
-  \todo This category includes classes on the application-level, e.g., pre-defined widgets. 
+  This category includes classes on the application-level, e.g., pre-defined widgets. 
   
   It also includes the concept to organize an application in so-called "functionalities" (subclasses of 
   QmitkFunctionality). Each functionality can have its own workspace area (or share one workspace 
@@ -150,6 +150,5 @@
   QmitkFctMediator, which organizes the switching between the functionalities. This is a 
   "toolbox-in-the-large", e.g., for combining and switching between one functionality for 
   segmentation and another for registration.
-  \todo A "toolbox-in-the-small" for switching between different interactions (as, e.g., different
-  segmentation methods) should be included from the iil4mitk.
+  
 */

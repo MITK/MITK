@@ -1289,9 +1289,7 @@
       <transition NAME="goToCheckPicking" NEXT_STATE_ID="2" EVENT_ID="5">
          <action ID="31"/>  <!-- AcCHECKOBJECT  -->
       </transition>   
-      <transition NAME="default" NEXT_STATE_ID="1" EVENT_ID="90" >
-         <action ID="3007"/>  <!-- AcDEFAULT -->
-      </transition>
+      
     </state>
     <state NAME="CheckPicking" ID="2">
       <transition NAME="noPicked" NEXT_STATE_ID="4" EVENT_ID="1003" > 
@@ -1322,30 +1320,33 @@
       </transition>
       
       <!--now follow the attibutations for different vessel types-->
-      <transition NAME="attributation" NEXT_STATE_ID="1" EVENT_ID="20" >
+      <transition NAME="attributation" NEXT_STATE_ID="3" EVENT_ID="20" >
         <action ID="3005">  <!-- AcATTRIBUTATION -->
 	   <intParameter NAME="attribute_id" VALUE="0" />
         </action>
       </transition>
-      <transition NAME="attributation" NEXT_STATE_ID="1" EVENT_ID="21" >
+      <transition NAME="attributation" NEXT_STATE_ID="3" EVENT_ID="21" >
         <action ID="3005">  <!-- AcATTRIBUTATION -->
       	  <intParameter NAME="attribute_id" VALUE="1" />
         </action>
       </transition>
-      <transition NAME="attributation" NEXT_STATE_ID="1" EVENT_ID="30" >
+      <transition NAME="attributation" NEXT_STATE_ID="3" EVENT_ID="30" >
         <action ID="3005">  <!-- AcATTRIBUTATION -->
           <intParameter NAME="attribute_id" VALUE="2" />
         </action>
       </transition>
-      <transition NAME="attributation" NEXT_STATE_ID="1" EVENT_ID="31" >
+      <transition NAME="attributation" NEXT_STATE_ID="3" EVENT_ID="31" >
         <action ID="3005">  <!-- AcATTRIBUTATION -->
       	  <intParameter NAME="attribute_id" VALUE="3" />
          </action>
       </transition>
-      <transition NAME="attributation" NEXT_STATE_ID="1" EVENT_ID="40" >
+      <transition NAME="attributation" NEXT_STATE_ID="3" EVENT_ID="40" >
         <action ID="3005">  <!-- AcATTRIBUTATION -->
       	  <intParameter NAME="attribute_id" VALUE="4" />
         </action>
+      </transition>
+      <transition NAME="default" NEXT_STATE_ID="1" EVENT_ID="90" >
+         <action ID="3007"/>  <!-- AcDEFAULT -->
       </transition>
     </state>
     <state NAME="OnePointPicked" ID="4">
@@ -1375,47 +1376,51 @@
     </state>
     <state NAME="OneVesselOnePointPicked" ID="7" >
       <transition NAME="ENew" NEXT_STATE_ID="1" EVENT_ID="13">
-        <action ID="72"/>   <!-- AcDESELECTALL -->
         <action ID="81"/>   <!-- AcNEWSUBOBJECT -->
-        <!--action ID="65"/>   AcSELECT  -->
+        <action ID="72"/>   <!-- AcDESELECTALL -->
       </transition>
       <!--transition NAME="goToCheckPicking" NEXT_STATE_ID="5" EVENT_ID="5" /-->
       <transition NAME="deselectAll" NEXT_STATE_ID="1" EVENT_ID="14" >
         <action ID="72"/>  <!-- AcDESELECTALL -->
       </transition>
-      
+      <transition NAME="delete" NEXT_STATE_ID="1" EVENT_ID="12" >
+        <action ID="104"/>  <!-- AcREMOVESELECTEDSUBOBJECT -->
+      </transition>
       
       <!--now follow the attibutations for different vessel types-->
-      <transition NAME="attributation" NEXT_STATE_ID="1" EVENT_ID="20" >
+      <transition NAME="attributation" NEXT_STATE_ID="7" EVENT_ID="20" >
         <action ID="3005">  <!-- AcATTRIBUTATION -->
 	   <intParameter NAME="attribute_id" VALUE="0" />
         </action>
       </transition>
-      <transition NAME="attributation" NEXT_STATE_ID="1" EVENT_ID="21" >
+      <transition NAME="attributation" NEXT_STATE_ID="7" EVENT_ID="21" >
         <action ID="3005">  <!-- AcATTRIBUTATION -->
       	  <intParameter NAME="attribute_id" VALUE="1" />
         </action>
       </transition>
-      <transition NAME="attributation" NEXT_STATE_ID="1" EVENT_ID="30" >
+      <transition NAME="attributation" NEXT_STATE_ID="7" EVENT_ID="30" >
         <action ID="3005">  <!-- AcATTRIBUTATION -->
           <intParameter NAME="attribute_id" VALUE="2" />
         </action>
       </transition>
-      <transition NAME="attributation" NEXT_STATE_ID="1" EVENT_ID="31" >
+      <transition NAME="attributation" NEXT_STATE_ID="7" EVENT_ID="31" >
         <action ID="3005">  <!-- AcATTRIBUTATION -->
       	  <intParameter NAME="attribute_id" VALUE="3" />
          </action>
       </transition>
-      <transition NAME="attributation" NEXT_STATE_ID="1" EVENT_ID="40" >
+      <transition NAME="attributation" NEXT_STATE_ID="7" EVENT_ID="40" >
         <action ID="3005">  <!-- AcATTRIBUTATION -->
       	  <intParameter NAME="attribute_id" VALUE="4" />
         </action>
       </transition>
+      <transition NAME="default" NEXT_STATE_ID="1" EVENT_ID="90" >
+         <action ID="3007"/>  <!-- AcDEFAULT -->
+      </transition>      
     </state>
     <state NAME="TwoVesselsPicked" ID="8" >
       <transition NAME="ENew" NEXT_STATE_ID="1" EVENT_ID="13">
-        <action ID="72"/>   <!-- AcDESELECTALL -->
         <action ID="81"/>  <!-- AcNEWSUBOBJECT -->
+        <action ID="72"/>   <!-- AcDESELECTALL -->
       </transition>
       <transition NAME="goToCheckPicking" NEXT_STATE_ID="10" EVENT_ID="5" >
         <action ID="31"/>  <!-- AcCHECKOBJECT  -->
@@ -1426,38 +1431,43 @@
       <transition NAME="deselectAll" NEXT_STATE_ID="1" EVENT_ID="14" >
         <action ID="72"/>  <!-- AcDESELECTALL -->
       </transition>
+      <transition NAME="delete" NEXT_STATE_ID="1" EVENT_ID="12" >
+        <action ID="104"/>  <!-- AcREMOVESELECTEDSUBOBJECT -->
+      </transition>      
       
       <!--now follow the attibutations for different vessel types-->
-      <transition NAME="attributation" NEXT_STATE_ID="1" EVENT_ID="20" >
+      <transition NAME="attributation" NEXT_STATE_ID="8" EVENT_ID="20" >
        <action ID="3005">  <!-- AcATTRIBUTATION -->
          <intParameter NAME="attribute_id" VALUE="0" />
        </action>
       </transition>
-      <transition NAME="attributation" NEXT_STATE_ID="1" EVENT_ID="21" >
+      <transition NAME="attributation" NEXT_STATE_ID="8" EVENT_ID="21" >
        <action ID="3005">  <!-- AcATTRIBUTATION -->
 	 <intParameter NAME="attribute_id" VALUE="1" />
        </action>
       </transition>
-      <transition NAME="attributation" NEXT_STATE_ID="1" EVENT_ID="30" >
+      <transition NAME="attributation" NEXT_STATE_ID="8" EVENT_ID="30" >
        <action ID="3005">  <!-- AcATTRIBUTATION -->
 	<intParameter NAME="attribute_id" VALUE="2" />
        </action>
       </transition>
-      <transition NAME="attributation" NEXT_STATE_ID="1" EVENT_ID="31" >
+      <transition NAME="attributation" NEXT_STATE_ID="8" EVENT_ID="31" >
        <action ID="3005">  <!-- AcATTRIBUTATION -->
 	<intParameter NAME="attribute_id" VALUE="3" />
        </action>
       </transition>
-      <transition NAME="attributation" NEXT_STATE_ID="1" EVENT_ID="40" >
+      <transition NAME="attributation" NEXT_STATE_ID="8" EVENT_ID="40" >
        <action ID="3005">  <!-- AcATTRIBUTATION -->
 	 <intParameter NAME="attribute_id" VALUE="4" />
        </action>
       </transition>
+      <transition NAME="default" NEXT_STATE_ID="1" EVENT_ID="90" >
+         <action ID="3007"/>  <!-- AcDEFAULT -->
+      </transition>      
     </state>
     <state NAME="TwoPointsPicked" ID="9" >
       <transition NAME="ENew" NEXT_STATE_ID="1" EVENT_ID="13">
         <action ID="81"/>  <!-- AcNEWSUBOBJECT -->
-        <!--action ID="65"/>   AcSELECT  -->
       </transition>
       <transition NAME="deselectAll" NEXT_STATE_ID="1" EVENT_ID="14" >
         <action ID="72"/>  <!-- AcDESELECTALL -->
@@ -1467,13 +1477,14 @@
       <transition NAME="noPicked" NEXT_STATE_ID="12" EVENT_ID="1003" > 
         <action ID="36"/>    <!--AcCHECKGREATERTWO-->
       </transition>
-      <transition NAME="yesPicked" NEXT_STATE_ID="11" EVENT_ID="1004">
+      <transition NAME="yesPicked" NEXT_STATE_ID="14" EVENT_ID="1004">
         <action ID="69"/>  <!-- AcSELECTSUBOBJECT  -->
+        <action ID="3010" />   <!-- AcCHECKBARRIERSTATUS -->
       </transition>
      </state>
      <state NAME="MoreVesselsPicked" ID="11" >
-      <transition NAME="deleteAllPicked" NEXT_STATE_ID="1" EVENT_ID="12">
-        <action ID="72"/>   <!-- AcDESELECTALL -->
+      <transition NAME="delete" NEXT_STATE_ID="1" EVENT_ID="12">
+        <action ID="104"/>   <!-- AcDESELECTALL -->
       </transition>
       <transition NAME="goToCheckPicking" NEXT_STATE_ID="10" EVENT_ID="5" >
         <action ID="31"/>  <!-- AcCHECKOBJECT  -->
@@ -1486,31 +1497,34 @@
       </transition>
       
       <!--now follow the attibutations for different vessel types-->
-      <transition NAME="attributation" NEXT_STATE_ID="1" EVENT_ID="20" >
+      <transition NAME="attributation" NEXT_STATE_ID="11" EVENT_ID="20" >
        <action ID="3005">  <!-- AcATTRIBUTATION -->
          <intParameter NAME="attribute_id" VALUE="0" />
        </action>
       </transition>
-      <transition NAME="attributation" NEXT_STATE_ID="1" EVENT_ID="21" >
+      <transition NAME="attributation" NEXT_STATE_ID="11" EVENT_ID="21" >
        <action ID="3005">  <!-- AcATTRIBUTATION -->
 	 <intParameter NAME="attribute_id" VALUE="1" />
        </action>
       </transition>
-      <transition NAME="attributation" NEXT_STATE_ID="1" EVENT_ID="30" >
+      <transition NAME="attributation" NEXT_STATE_ID="11" EVENT_ID="30" >
        <action ID="3005">  <!-- AcATTRIBUTATION -->
 	<intParameter NAME="attribute_id" VALUE="2" />
        </action>
       </transition>
-      <transition NAME="attributation" NEXT_STATE_ID="1" EVENT_ID="31" >
+      <transition NAME="attributation" NEXT_STATE_ID="11" EVENT_ID="31" >
        <action ID="3005">  <!-- AcATTRIBUTATION -->
 	 <intParameter NAME="attribute_id" VALUE="3" />
         </action>
       </transition>
-      <transition NAME="attributation" NEXT_STATE_ID="1" EVENT_ID="40" >
+      <transition NAME="attributation" NEXT_STATE_ID="11" EVENT_ID="40" >
        <action ID="3005">  <!-- AcATTRIBUTATION -->
 	 <intParameter NAME="attribute_id" VALUE="4" />
        </action>
       </transition>
+      <transition NAME="default" NEXT_STATE_ID="1" EVENT_ID="90" >
+         <action ID="3007"/>  <!-- AcDEFAULT -->
+      </transition>      
       </state>
       <state NAME="CheckNumberPickedVesselsSmaller2" ID="12">
       <transition NAME="yes" NEXT_STATE_ID="8" EVENT_ID="1004" /> 
@@ -1522,6 +1536,10 @@
       <transition NAME="yes" NEXT_STATE_ID="3" EVENT_ID="1004" /> 
       <transition NAME="no" NEXT_STATE_ID="8" EVENT_ID="1003" />
      </state>
+     <state NAME="CheckBarrierStatus" ID="14">
+      <transition NAME="yes" NEXT_STATE_ID="8" EVENT_ID="1004" /> 
+      <transition NAME="no" NEXT_STATE_ID="11" EVENT_ID="1003" />
+     </state>     
   </stateMachine> 
   <!-- -->
   <!-- -->

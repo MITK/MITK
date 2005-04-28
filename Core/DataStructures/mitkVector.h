@@ -58,79 +58,74 @@ extern const ScalarType eps;
 extern const ScalarType sqrteps;
 extern const double large;
 
-template <class T>
-class VectorTraits {
+template <class T> class VectorTraits {
   public:
     typedef T ValueType;
 };
-template <>
-class VectorTraits<Vector3D> {
+template <> class VectorTraits<Vector3D> {
   public:
     typedef Vector3D::ValueType ValueType;
 };
-template <>
-class VectorTraits<VnlVector> {
+template <> class VectorTraits<VnlVector> {
   public:
     typedef ScalarType ValueType;
 };
 
-template <>
-
-class VectorTraits<Point3D> {
+template <> class VectorTraits<Point3D> {
   public:
     typedef Point3D::ValueType ValueType;
 };
 
-class VectorTraits<double[4]> {
+template<> class VectorTraits<double[4]> {
   public:
     typedef double ValueType;
 };
-class VectorTraits< itk::Index<5> > {
+template<> class VectorTraits< itk::Index<5> > {
   public:
     typedef itk::Index<5>::IndexValueType ValueType;
 };
-class VectorTraits< itk::Index<3> > {
+template<> class VectorTraits< itk::Index<3> > {
   public:
     typedef itk::Index<3>::IndexValueType ValueType;
 };
 
-class VectorTraits< long int [3]> {
+template<> class VectorTraits< long int [3]> {
   public:
     typedef long int ValueType;
 };
-class VectorTraits< float [3]> {
+template<> class VectorTraits< float [3]> {
   public:
     typedef float ValueType;
 };
-class VectorTraits< double [3]> {
+template<> class VectorTraits< double [3]> {
   public:
     typedef float ValueType;
 };
 
-class VectorTraits< vnl_vector_fixed<ScalarType, 3> > {
+template<> class VectorTraits< vnl_vector_fixed<ScalarType, 3> > {
   public:
     typedef ScalarType ValueType;
 };
 
-class VectorTraits< long unsigned int[3]> {
+template<> class VectorTraits< long unsigned int[3]> {
   public:
     typedef long unsigned int ValueType;
 };
-class VectorTraits< unsigned int *> {
+template<> class VectorTraits< unsigned int *> {
   public:
     typedef unsigned int ValueType;
 };
-class VectorTraits< ScalarType[4] > {
+template<> class VectorTraits< ScalarType[4] > {
   public:
     typedef ScalarType ValueType;
 };
 
-class VectorTraits< itk::Vector<int,3> > {
+template<> class VectorTraits< itk::Vector<int,3> > {
   public:
     typedef int ValueType;
 };
 
-class VectorTraits< itk::Point<int,3> > {
+template<> class VectorTraits< itk::Point<int,3> > {
   public:
     typedef int ValueType;
 };

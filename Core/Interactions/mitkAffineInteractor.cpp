@@ -226,7 +226,7 @@ bool mitk::AffineInteractor::ExecuteAction(Action* action, mitk::StateEvent cons
       rotationaxis[2] =  startPosition[0] * newPosition[1] - startPosition[1] * newPosition[0];
 
       /* calculate rotation angle in degrees */
-      mitk::ScalarType angle = atan2(rotationaxis.GetNorm(), newPosition * startPosition) * (180/vnl_math::pi);
+      mitk::ScalarType angle = atan2((mitk::ScalarType)rotationaxis.GetNorm(), (mitk::ScalarType) (newPosition * startPosition)) * (180/vnl_math::pi);
       m_LastMousePosition = p; // save current mouse position as last mouse position
 
       /* create operation with center of rotation, angle and axis and send it to the geometry and Undo controller */

@@ -66,8 +66,8 @@ switch (sideEffectId)
   {
   case mitk::SeMOVESELECTED:
 @endcode
-Prefixes for the constants are to be used like corresponding others. See file @a Framework\SceneInteraction\mitkInteractionConst.h for further details.
-\li Often QmitkFunctionality::activated() and QmitkFunctionality::deactivated() is the right place to connect/disconnnect event-handlers 
+Prefixes for the constants are to be used like corresponding others. See file @a Interactions\\mitkBaseInteraction\\mitkInteractionConst.h for further details.
+\li Often QmitkFunctionality::activated() and QmitkFunctionality::deactivated() is the right place to connect and disconnnect event-handlers 
 (e.g., mitk::GlobalStateMachine::AddStateMachine() in activated() and mitk::GlobalStateMachine::RemoveStateMachine()
  in deactivated()).
 \li The four widgets of the QmitkStdMultiWidget should be initialized in QmitkFunctionality::activated(),

@@ -40,11 +40,10 @@ namespace mitk {
     //##Documentation
     //## @brief Constructor with all necessary arguments.
     //##
-    //## @params sender: the widget, that caused that event, so that it can be asked for worldCoordinates. changed later to a focus
-    //##        type, button, buttonState, key: information from the Event
-    //##        displPosition: the 2D Position e.g. from the mouse
-    //##        worldPosition: the 3D position e.g. from a picking 
-    //##        
+    //## @param sender: the widget, that caused that event, so that it can be asked for worldCoordinates. changed later to a focus
+    //## @param type, button, buttonState, key: information from the Event
+    //## @param displPosition: the 2D Position e.g. from the mouse
+    //## @param worldPosition: the 3D position e.g. from a picking 
     PositionEvent(BaseRenderer* sender, int type, int button, int buttonState, int key, const Point2D& displPosition, const Point3D& worldPosition);
   };
 

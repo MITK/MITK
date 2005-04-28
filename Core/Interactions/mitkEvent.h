@@ -42,12 +42,11 @@ namespace mitk {
   public:
     //##ModelId=3E5B3007000F
     //##Documentation
-    //## @params:
-    //## sender: needed for DisplayCoordinateOperation in DisplayVectorInteractor....???? if not needed, then set on NULL
-    //## type: type of Event: Mouse or Key Event? (look in mitkInteractionConst.h)
-    //## button: mouse-button
-    //## buttonState: which other key hast been pressed? (Mouse/Keyboard modifier-keys)
-    //## key: pressed key
+    //## @params sender: needed for DisplayCoordinateOperation in DisplayVectorInteractor....???? if not needed, then set on NULL
+    //## @params type: type of Event: Mouse or Key Event? (look in mitkInteractionConst.h)
+    //## @params button: mouse-button
+    //## @params buttonState: which other key hast been pressed? (Mouse/Keyboard modifier-keys)
+    //## @params key: pressed key
     Event(mitk::BaseRenderer* sender, int type, int button, int buttonState, int key);
 
     //##ModelId=3EF099E8023A

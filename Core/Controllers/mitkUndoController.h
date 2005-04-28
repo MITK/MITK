@@ -64,7 +64,7 @@ class UndoController
   //## first it can Undo a group of operations done at last (e.g. build up a new object; Undo leads to deleting that object);
   //## or it can Undo a set of operations, that belong together(statechange with Action),
   //## that way it is possible recall the last set point after you have finished to build up a new object
-  //## @params fine: if set to true, then undo all operations with the same objectEventId
+  //## @param fine: if set to true, then undo all operations with the same objectEventId
   //## if set to false, then undo all operations with the same GroupEventId
   bool Undo(bool fine);
 

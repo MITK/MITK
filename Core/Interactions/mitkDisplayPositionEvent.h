@@ -40,9 +40,9 @@ class DisplayPositionEvent : public Event
     //##Documentation
     //## @brief Constructor with all necessary arguments.
     //##
-    //## @params sender: the renderer that caused that event
-    //##        type, button, buttonState, key: information from the Event
-    //##        displPosition: the 2D Position of the mouse
+    //## @param sender is the renderer that caused that event
+    //## @param type, button, buttonState, key: information from the Event
+    //## @param displPosition is the 2D Position of the mouse
     DisplayPositionEvent(BaseRenderer* sender, int type, int button, int buttonState, int key, const Point2D& displPosition);
 
     const Point2D& GetDisplayPosition() const

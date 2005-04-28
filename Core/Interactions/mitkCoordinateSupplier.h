@@ -43,15 +43,15 @@ namespace mitk {
     //##ModelId=3F0189F0025B
     //##Documentation
     //## @brief Constructor with needed arguments
-    //## @params: type: string, that describes the StateMachine-Scheme to take from all SM (see XML-File)
-    //##    operationActor: the Data, operations (+ points) are send to
+    //## @param type: string, that describes the StateMachine-Scheme to take from all SM (see XML-File)
+    //## @param operationActor: the Data, operations (+ points) are send to
     CoordinateSupplier(const char * type, OperationActor* operationActor);
 
   protected:
     //##ModelId=3F0189F00269
     //##Documentation
-    //## @brief 
-    //##
+    //## @brief executes the actions that are sent to this statemachine
+    //## derived from StateMachine 
     virtual bool ExecuteAction(Action* action, mitk::StateEvent const* stateEvent);
 
   private:

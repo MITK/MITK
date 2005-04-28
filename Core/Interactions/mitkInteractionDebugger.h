@@ -34,7 +34,7 @@ namespace mitk{
   public:
     /**
     * set a text for output
-    * @params sender: 
+    * @param sender: who has sent this text
     */
     static void Set(const char* sender, const char* text);
     static void Activate();

@@ -41,9 +41,8 @@ public:
   //##Documentation
   //## @brief Constructor
   //##
-  //## @params dataTreeNode is the node, this Interactor is connected to
-  //## type is the type of StateMachine like declared in the XML-Configure-File
-  //##
+  //## @param dataTreeNode is the node, this Interactor is connected to
+  //## @param type is the type of StateMachine like declared in the XML-Configure-File
   AffineInteractor(const char * type, DataTreeNode* dataTreeNode);
 
   //##Documentation

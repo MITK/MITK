@@ -69,8 +69,8 @@ namespace mitk {
     //##Documentation
     //## @brief Constructor
     //##
-    //## @params dataTreeNode is the node, this Interactor is connected to
-    //## type is the type of StateMachine like declared in the XML-Configure-File
+    //## @param dataTreeNode is the node, this Interactor is connected to
+    //## @params type is the type of StateMachine like declared in the XML-Configure-File
     //##
     //## Interactor connects itself to the DataTreeNode-Interactor-pointer through call of SetInteractor(this)
     Interactor(const char * type, DataTreeNode* dataTreeNode);

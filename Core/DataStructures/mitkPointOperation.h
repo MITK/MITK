@@ -42,10 +42,9 @@ class PointOperation : public Operation
 	//##Documentation
 	//##@brief Operation, that handles all aktions on one Point.
 	//##
-	//## @params
-	//## operationType is the type of that operation (see mitkOperation.h; e.g. move or add; Information for StateMachine::ExecuteOperation());
-	//## point is the information of the point to add or is the information to change a point into; index is e.g. the position in a
-	//## list which describes the element to change
+	//## @param operationType is the type of that operation (see mitkOperation.h; e.g. move or add; Information for StateMachine::ExecuteOperation());
+  //## @param point is the information of the point to add or is the information to change a point into
+  //## @param index is e.g. the position in a list which describes the element to change
   PointOperation(OperationType operationType,	Point3D point, int index = -1, bool selected = true, PointSpecificationType type = PTUNDEFINED);
   
   //##ModelId=3F0189F003B2

@@ -42,8 +42,8 @@ namespace mitk {
     //##ModelId=3F02F8960177
     //##Documentation
     //## @brief Constructor
-    //## @params id: mitk internal EventID
-    //##        event: the information about the appeared event
+    //## @param id: mitk internal EventID
+    //## @param event: the information about the appeared event
     StateEvent(int id, Event const* event = NULL );
 
     //##ModelId=3F02F89601A5

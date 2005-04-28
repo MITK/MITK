@@ -59,7 +59,7 @@ public:
   //##ModelId=3F0451960156
   //##Documentation
   //## @brief same like Undo() but with the possibility to fine or raw undo(Group or ObjectEventId)
-  //## @params fine: if set to true, then all operations with the same ObjectId are undone
+  //## @param fine: if set to true, then all operations with the same ObjectId are undone
   //## if set to false, then all operations with the same GroupEventId are undone (see mitkUndoController.h)
   virtual bool Undo(bool fine);
 

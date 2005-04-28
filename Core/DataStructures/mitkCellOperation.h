@@ -37,7 +37,7 @@ class CellOperation : public Operation
 	//##Documentation
 	//##@brief constructor
 	//##
-	//## @params
+	//## @param
 	//## operationType is the type of that operation (see mitkOperation.h; e.g. move or add; Information for StateMachine::ExecuteOperation());
 	//## cellId: Id of the cell and a vector if needed
     CellOperation(OperationType operationType, int cellId, Vector3D vector);

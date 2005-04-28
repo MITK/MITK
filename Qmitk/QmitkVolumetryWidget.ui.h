@@ -124,7 +124,7 @@ void QmitkVolumetryWidget::UpdateSlider()
       {
         timeSelector->SetTimeNr(timeStep);
         timeSelector->Update();
-        mitk::CastToItkImage(image,itkImage);
+        mitk::CastToItkImage(timeSelector->GetOutput(),itkImage);
         float min,max;
         CommonFunctionality::MinMax<ItkInt3DImage>(itkImage,min,max);
         if (min<gMin) { gMin = min; }

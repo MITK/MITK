@@ -22,7 +22,7 @@ protected:
   virtual void SetupWidgets();
 
   template < typename TPixel, unsigned int VImageDimension >
-  void RegionGrowing( itk::Image<typename TPixel, VImageDimension>* itkImage, mitk::Geometry3D* geometry);
+    friend void RegionGrowing( itk::Image<typename TPixel, VImageDimension>* itkImage, Step6* step6);
 
   mitk::DataTree::Pointer m_Tree;
   mitk::Image::Pointer m_FirstImage;

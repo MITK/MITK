@@ -57,42 +57,9 @@ void Step6::Initialize()
     new mitk::PointSetInteractor("pointsetinteractor", pointSetNode));
 }
 
-template < typename TPixel, unsigned int VImageDimension >
-void Step6::RegionGrowing( itk::Image<typename TPixel, VImageDimension>* itkImage, mitk::Geometry3D* geometry)
-{
-  typedef itk::Image<typename TPixel, VImageDimension> ImageType;
-
-  // create itk::ConfidenceConnectedImageFilter and set itkImage as input
-  typedef itk::ConfidenceConnectedImageFilter<ImageType, ImageType> ConfidenceConnectedFilterType;
-  typedef ConfidenceConnectedFilterType::IndexType IndexType;
-  ConfidenceConnectedFilterType::Pointer regGrowFilter = ConfidenceConnectedFilterType::New();
-  regGrowFilter->SetInput(itkImage);
-
-  // convert the points in the PointSet m_Seeds (in world-coordinates) to
-  // "index" values, i.e. points in pixel coordinates, and add these as seeds
-  // to the ConfidenceConnectedImageFilter
-  mitk::PointSet::PointsConstIterator pit, pend = m_Seeds->GetPointSet()->GetPoints()->End();
-  IndexType seedIndex;
-  for(pit=m_Seeds->GetPointSet()->GetPoints()->Begin();pit!=pend;++pit)
-  {
-    geometry->WorldToIndex(pit.Value(), seedIndex);
-    regGrowFilter->AddSeed( seedIndex );
-  }
-
-  // add output of ConfidenceConnectedImageFilter to tree
-  mitk::DataTreePreOrderIterator it(m_Tree);
-  m_ResultNode = mitk::DataTreeHelper::AddItkImageToDataTree(regGrowFilter->GetOutput(), &it, "segmentation");
-  m_ResultImage = static_cast<mitk::Image*>(m_ResultNode->GetData());
-  // set some additional properties
-  m_ResultNode->SetProperty("binary", new mitk::BoolProperty(true));
-  m_ResultNode->SetProperty("color", new mitk::ColorProperty(1.0,0.0,0.0));
-  m_ResultNode->SetProperty("volumerendering", new mitk::BoolProperty(true));
-  m_ResultNode->SetProperty("layer", new mitk::IntProperty(1));
-}
-
 void Step6::StartRegionGrowing()
 {
-  AccessByItk_1(m_FirstImage, RegionGrowing, m_FirstImage->GetGeometry());
+  AccessByItk_1(m_FirstImage, RegionGrowing, this);
 
   mitk::RenderWindow::UpdateAllInstances();
 }

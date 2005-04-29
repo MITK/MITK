@@ -11,6 +11,7 @@
 #include <mitkLightBoxImageReader.h>
 #include "SampleApp.h"
 #include "QcMITKSamplePlugin.h"
+#include "mitkDataTreeNodeFactory.h"
 #include "mitkProperties.h"
 #include "mitkLevelWindowProperty.h"
 #include "mitkStringProperty.h"
@@ -124,8 +125,8 @@ void QcMITKSamplePlugin::selectSerie (QcLightbox* lightbox)
     levelwindow.SetAuto( reader->GetOutput() );
     levWinProp->SetLevelWindow( levelwindow );
     node->GetPropertyList()->SetProperty( "levelwindow", levWinProp );
-    node->SetProperty( "volumerendering", new mitk::BoolProperty( false ) );
     node->SetProperty("LoadedFromChili", new mitk::BoolProperty( true ) );
+    mitk::DataTreeNodeFactory::SetDefaultImageProperties(node);
 
     ipPicTSV_t* uid= ipPicQueryTag(reader->GetOutput()->GetPic(),"IMAGE INSTANCE UID");
     ipPicTSV_t* description= ipPicQueryTag(reader->GetOutput()->GetPic(),"SERIES DESCRIPTION");

@@ -86,6 +86,8 @@ void mitk::PlanesPerpendicularToLinesFilter::GenerateData()
     targetRight   = m_Plane->GetMatrixColumn(0);
     targetSpacing = m_Plane->GetSpacing();
     bounds = m_Plane->GetBoundingBox()->GetBounds();
+    halfWidthInMM  = m_Plane->GetExtentInMM(0)*0.5;
+    halfHeightInMM = m_Plane->GetExtentInMM(1)*0.5;
   }
   else
   {

@@ -1,6 +1,7 @@
 #include <chili/task.h>
 #include <chili/plugin.xpm>
 #include <chili/qclightbox.h>
+#include <chili/qclightboxmanager.h>
 #include <qlayout.h>
 #include <qpushbutton.h>
 #include <qptrlist.h>
@@ -18,7 +19,8 @@
 
 #include <qmessagebox.h>
 
-#include "ipFunc.h"
+#include <ipPic.h>
+#include <ipFunc.h>
 
 
 QcPlugin* QcMITKSamplePlugin::s_PluginInstance = NULL;

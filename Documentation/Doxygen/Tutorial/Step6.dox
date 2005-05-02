@@ -1,39 +1,38 @@
- /**
- 
- \page Step6Page MITK Tutorial - Step 6: Use an interactive region-grower
- 
- In this step the program is enhanced by the possibility to start a region-grower at interactively added points.
- We will see how MITK images can be accessed as ITK images.\n
- We now simply load the image file since the surface will be the result of the region growing.
- 
- \image html step6_result.png 
- 
- The source is now split among several files:
- 
- \li \ref Step6.cpp "Step6.cpp"\n 
- \li \ref Step6.h "Step6.h"\n 
- \li \ref Step6main.cpp "Step6main.cpp"
- 
- The class Step6 inherits from QMainWindow and provides methods for setting up the widgets and for performing a region-growing.\n
- As in ITK and VTK class member names start with m_ followed by the proper member name starting with a capital letter (e.g. m_Tree).
+/**
 
- Function names start with capital letters. To learn more about style conventions in MITK read \ref StylesAndNotesPage "The MITK Style Guide".\n
- Step6main.cpp contains main.\n
- 
- \dontinclude Step6.cpp
- 
- The widgets are initialized as in the previous steps but with an additional QVBox for a button to start the segmentation:
+\page Step6Page MITK Tutorial - Step 6: Use an interactive region-grower
 
- \skipline m_TopLevelWidget = new QVBox(this);
- 
+In this step the program is enhanced by the possibility to start a region-grower at interactively added points.
+We will see how MITK images can be accessed as ITK images.\n
+We now simply load the image file since the surface will be the result of the region-growing.
 
- Then a button is created to start the segmentation and its clicked() signal is connected to the method StartRegionGrowing():
+\image html step6_result.png 
 
- \dontinclude Step6.cpp
+The source is now split among several files:
 
- \skipline QPushButton
- \skipline connect
- 
+\li \ref Step6.cpp "Step6.cpp"\n 
+\li \ref Step6.h "Step6.h"\n 
+\li \ref Step6RegionGrowing.cpp "Step6RegionGrowing.cpp"
+\li \ref Step6main.cpp "Step6main.cpp"
+
+The class Step6 inherits from QMainWindow and provides methods for setting up the widgets. Step6RegionGrowing.cpp contains a method for performing the region-growing. Step6main.cpp contains main.\n
+As in ITK and VTK class member names start with m_ followed by the proper member name starting with a capital letter (e.g. m_Tree).
+Function names start with capital letters. To learn more about style conventions in MITK read \ref StylesAndNotesPage "The MITK Style Guide".\n\n
+
+\dontinclude Step6.cpp
+
+The widgets are initialized as in the previous steps but with an additional QVBox for a button to start the segmentation:
+
+\skipline m_TopLevelWidget = new QVBox(this);
+
+
+Then a button is created to start the segmentation and its clicked() signal is connected to the method StartRegionGrowing():
+
+\dontinclude Step6.cpp
+
+\skipline QPushButton
+\skipline connect
+
 \section AccessMTIKImagesAsITKImagesSection Access MITK images as ITK images
 
 ITK images are templated whereas mitk::Images are not.\n
@@ -53,13 +52,21 @@ Then call the access method:
 AccessByItk(mitkImage, MyAccessMethod, ...)
 \endcode
 
+\dontinclude Step6RegionGrowing.cpp
+
 In this step our access method is called RegionGrowing():
 \skipline template
 \until }
 \until }
 
+Additionally the access function has to be instantiated for all datatypes and dimensions as some compilers have memory problems without this explicit instantiation.
+
+\skipline InstantiateAccessFunction_1
+
+\dontinclude Step6.cpp
+
 The method StartRegionGrowing() finally calls our access method RegionGrowing():
-\skipline StartRegionGrowing
+\skipline Step6::StartRegionGrowing
 \until }
 
 \section ConvertingITKMITKSection Converting ITK images to MITK images and vice versa
@@ -85,8 +92,8 @@ Again: not a conversion, just accessing
 \li \code vtkPolyData* mitk::Surface::GetVtkPolyData(int time = 0) \endcode
 
 \li \code mitk::Surface::SetVtkPolyData(vtkPolyData*, int time = 0) \endcode
- 
 
- \ref Step5Page "[Previous step]" \ref Step7Page "[Next step]" \ref TutorialPage "[Main tutorial page]"
- 
-  */
+
+\ref Step5Page "[Previous step]" \ref Step7Page "[Next step]" \ref TutorialPage "[Main tutorial page]"
+
+*/

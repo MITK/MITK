@@ -210,22 +210,36 @@
         <receiver>QmitkVolumetryWidget</receiver>
         <slot>CalculateTimeSeries()</slot>
     </connection>
+    <connection>
+        <sender>m_ThresholdSlider</sender>
+        <signal>valueChanged(int)</signal>
+        <receiver>QmitkVolumetryWidget</receiver>
+        <slot>m_ThresholdSlider_valueChanged(int)</slot>
+    </connection>
 </connections>
 <includes>
     <include location="local" impldecl="in declaration">mitkDataTreeNode.h</include>
+    <include location="local" impldecl="in declaration">mitkDataTree.h</include>
     <include location="global" impldecl="in implementation">string</include>
     <include location="local" impldecl="in implementation">mitkImage.h</include>
     <include location="local" impldecl="in implementation">mitkVolumeCalculator.h</include>
     <include location="local" impldecl="in implementation">QmitkVolumetryWidget.ui.h</include>
 </includes>
 <variables>
+  <variable>mitk::DataTreeIteratorClone m_DataTreeIteratorClone;</variable>
     <variable>const mitk::DataTreeNode* m_Node;</variable>
+    <variable>mitk::DataTreeNode::Pointer m_OverlayNode;</variable>
 </variables>
 <slots>
+    <slot>SetDataTreeNodeIterator( mitk::DataTreeIteratorClone it )</slot>
     <slot>SetDataTreeNode( mitk::DataTreeNode * node )</slot>
     <slot access="protected">CalculateVolume()</slot>
     <slot>CalculateTimeSeries()</slot>
     <slot>UpdateSlider()</slot>
+    <slot>m_ThresholdSlider_valueChanged( int )</slot>
 </slots>
+<functions>
+    <function access="protected">CreateOverlayChild()</function>
+</functions>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

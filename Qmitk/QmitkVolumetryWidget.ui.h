@@ -31,10 +31,22 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkCommonFunctionality.h"
 #include "itkImage.h"
 #include <limits>
+#include "mitkDataTreeNode.h"
+
+void QmitkVolumetryWidget::SetDataTreeNodeIterator( mitk::DataTreeIteratorClone it )
+{
+  m_DataTreeIteratorClone = it;
+}
 
 void QmitkVolumetryWidget::SetDataTreeNode(mitk::DataTreeNode* node)
 {
   m_Node = node;
+  if (m_OverlayNode)
+  {
+    // remove it from the tree
+    m_OverlayNode = NULL;
+  }
+  CreateOverlayChild();
   std::string name;
   if (node->GetName(name))
   {
@@ -150,5 +162,37 @@ void QmitkVolumetryWidget::UpdateSlider()
       m_ThresholdSlider->setEnabled(false);
     }
 
+  }
+}
+
+
+void QmitkVolumetryWidget::m_ThresholdSlider_valueChanged( int value)
+{
+  if (m_OverlayNode) {m_OverlayNode->SetLevelWindow(mitk::LevelWindow(value,1)); mitk::RenderWindow::UpdateAllInstances();}
+}
+
+void QmitkVolumetryWidget::CreateOverlayChild()
+{
+  if (m_Node)
+  {
+    m_OverlayNode = mitk::DataTreeNode::New();
+    mitk::StringProperty::Pointer nameProp = new mitk::StringProperty("volume threshold overlay image" );
+    m_OverlayNode->SetProperty( "name", nameProp );
+    m_OverlayNode->SetData(m_Node->GetData());
+    m_OverlayNode->SetColor(1.0,0.0,0.0);
+    m_OverlayNode->SetOpacity(.7);
+    m_OverlayNode->SetLevelWindow(mitk::LevelWindow(m_ThresholdSlider->value(),1));
+  
+    // hack!!!
+    mitk::DataTreeIteratorClone iteratorClone = m_DataTreeIteratorClone;
+    while ( !iteratorClone->IsAtEnd() )
+    {
+      mitk::DataTreeNode::Pointer node = iteratorClone->Get();
+      if (  node == m_Node )
+      {
+        iteratorClone->Add(m_OverlayNode);
+      }
+      ++iteratorClone;
+    }
   }
 }

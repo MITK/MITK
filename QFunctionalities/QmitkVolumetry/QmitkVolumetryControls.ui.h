@@ -15,5 +15,6 @@
 void QmitkVolumetryControls::SetDataTreeIterator( mitk::DataTreeIteratorBase * it )
 {
    m_DataTreeIterator = it;
-   m_TreeNodeSelector->SetDataTreeNodeIterator(it);   
+   m_TreeNodeSelector->SetDataTreeNodeIterator(it);
+   m_VolumetryWidget->SetDataTreeNodeIterator(it);
 }

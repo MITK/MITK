@@ -39,15 +39,18 @@ namespace mitk {
 
 //##ModelId=3F0177E803A1
 //##Documentation
-//##@brief DataStructure which stores a set/list of Points 
+//##@brief DataStructure which stores a set of points. Superclass of mitk::Mesh.
 //## @ingroup Data
 //##
-//## Each Entry (Point) in the the PointSet has a additional value (bool) to store
-//## the selected/unselected state of the entry(Point).
-//## Then each point has a type, like Startpoint or edge...
-//## The class uses an itkMesh internaly. It can behave like a PointSet or due to the itkMesh like a PointList.
+//## This class supports 3D point definition.
+//## An entry is divided into the pointcoordinates and pointdata.
+//## The pointdata includes information about the pointId, the selection state of the point and an information about the type of the point.
+//## For further information about different types of a point see mitk::PointSpecificationType in mitkVector.h;
 //## Inserting a point is accompanied by an event, containing an index. The new point is set into ths list 
 //## at the indexed position. At the same time an internal ID is set in data of the point.
+//##
+//## The class uses an itkMesh internaly, because mitk::Mesh is derived from mitk::PointSet and needs the itk::Mesh structure which is also derived from itk::PointSet.
+//## Thus several typedefs, that seem to be in wrong place, are declared here (for example SelectedLinesType).
 class PointSet : public BaseData
 {
 public:

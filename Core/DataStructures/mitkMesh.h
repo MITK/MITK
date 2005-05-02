@@ -33,7 +33,7 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk {
   
 //##Documentation
-//##@brief DataStructure which stores a list of Points with data and cells
+//##@brief DataStructure which stores a set of points (incl. pointdata) where each point can be associated to an element of a cell.
 //## @ingroup Data
 //##
 //## A mesh contains several cells that can be of different celltypes (Line, Triangle, Polygone...).

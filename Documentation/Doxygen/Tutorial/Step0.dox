@@ -1,0 +1,12 @@
+/**
+
+\page Step0Page MITK Tutorial - Step 0: Getting started
+
+After having checked out MITK's current cvs repository use CMake to generate a Makefile under UNIX and a Visual Studio workspace under windows respectively.
+The source and the binary directory have to be specicfied. The picture below shows the CMake interface under windows. To compile the tutorial the variable BUILD_TUTORIALQMITK has to be set to ON. 
+
+\image html configureCMake.PNG
+
+\ref Step1Page "[Next step]" \ref TutorialPage "[Main tutorial page]"
+
+*/

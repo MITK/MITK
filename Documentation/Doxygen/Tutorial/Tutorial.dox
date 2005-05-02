@@ -14,6 +14,7 @@ This file contains a surface.
 
 \section TutorialSection Tutorial chapters
 
+\li \ref Step0Page "Step 0: Getting started"
 \li \ref Step1Page "Step 1: Displaying an image"
 \li \ref Step2Page "Step 2: Load one or more data sets"
 \li \ref Step3Page "Step 3: Create 3D view"

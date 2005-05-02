@@ -310,6 +310,27 @@ public:
     return m_Valid;
   }
 
+  bool IsInside(const mitk::Point3D& p) const
+  {
+    mitk::Point3D index;
+    WorldToIndex(p, index);
+    return IsIndexInside(index);
+  }
+
+  bool IsIndexInside(const mitk::Point3D& index) const
+  {
+    bool inside = m_BoundingBox->IsInside(index);
+    if((m_ImageGeometry == false) && (inside))
+    {
+      const BoundingBox::BoundsArrayType& bounds = m_BoundingBox->GetBounds();
+      if((index[0] == bounds[1]) ||
+         (index[1] == bounds[3]) ||
+         (index[2] == bounds[5]))
+        inside = false;
+    }
+    return inside;
+  }
+
   //##Documentation
   //## @brief Get the spacing (size of a pixel).
   //##

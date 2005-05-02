@@ -320,7 +320,7 @@ public:
   bool IsIndexInside(const mitk::Point3D& index) const
   {
     bool inside = m_BoundingBox->IsInside(index);
-    if((m_ImageGeometry == false) && (inside))
+    if((m_ImageGeometry) && (inside))
     {
       const BoundingBox::BoundsArrayType& bounds = m_BoundingBox->GetBounds();
       if((index[0] == bounds[1]) ||

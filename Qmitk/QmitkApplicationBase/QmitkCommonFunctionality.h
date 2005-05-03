@@ -86,6 +86,7 @@ namespace CommonFunctionality
   static const char* GetExternalFileExtensions() { return EXTERNAL_FILE_EXTENSIONS; };
   static const char* GetSaveFileExtensions() { return SAVE_FILE_EXTENSIONS; };
 
+  typedef std::vector<mitk::DataTreeIteratorClone> DataTreeIteratorVector;
   typedef std::vector<mitk::DataTreeNode*> DataTreeNodeVector;
   /** \brief compute min and max 
   */
@@ -845,9 +846,9 @@ void SaveBaseData( mitk::BaseData* data, std::string name = "" );
          
     }
     
-    static DataTreeNodeVector FilterNodes(mitk::DataTreeIteratorClone it, bool (* FilterFunction)(mitk::DataTreeNode*)) {
+    static DataTreeIteratorVector FilterNodes(mitk::DataTreeIteratorClone it, bool (* FilterFunction)(mitk::DataTreeNode*)) {
       
-      DataTreeNodeVector result;
+      DataTreeIteratorVector result;
 
         if ( it.GetPointer() != NULL )
         {
@@ -858,7 +859,7 @@ void SaveBaseData( mitk::BaseData* data, std::string name = "" );
             mitk::DataTreeNode::Pointer node = iteratorClone->Get();
             if ( FilterFunction( node ) )
             {
-	      result.push_back(node);
+	      result.push_back(iteratorClone);
 	    }
 	    ++iteratorClone;
         }

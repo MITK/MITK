@@ -61,10 +61,11 @@
 <variables>
     <variable access="public">mitk::DataTreeIteratorClone m_DataTreeIteratorClone;</variable>
     <variable access="public">bool (* m_FilterFunction)(mitk::DataTreeNode*);</variable>
-    <variable>std::map&lt;std::string,mitk::DataTreeNode*&gt; m_TreeNodes;</variable>
+    <variable>std::map&lt;std::string,mitk::DataTreeIteratorClone&gt; m_TreeNodes;</variable>
 </variables>
 <signals>
-    <signal>Activated(mitk::DataTreeNode *node)</signal>
+    <signal>Activated(mitk::DataTreeIteratorClone node)</signal>
+    <signal>Activated(mitk::DataTreeNode* node)</signal>
 </signals>
 <slots>
     <slot>SetDataTreeNodeIterator( mitk::DataTreeIteratorClone it )</slot>

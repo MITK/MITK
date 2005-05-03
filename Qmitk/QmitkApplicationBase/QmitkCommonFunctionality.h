@@ -454,11 +454,14 @@ static mitk::DataTreeNode::Pointer OpenVolumeOrSliceStack()
 }
 
 template < typename TImageType >
-static QString SaveImage(mitk::Image* image)
+static QString SaveImage(mitk::Image* image, QString fileName = 0)
 {
-  QString fileName = QFileDialog::getSaveFileName(QString("NewImage.pic"),GetSaveFileExtensions());
-  if (fileName == NULL ) 
-    return NULL;
+  if (!fileName)
+  {
+    fileName = QFileDialog::getSaveFileName(QString("NewImage.pic"),GetSaveFileExtensions());
+    if (fileName == NULL ) 
+      return NULL;
+  }
 
   try 
   {

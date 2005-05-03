@@ -115,11 +115,13 @@ static void __buildstring( ipPicDescriptor *pic, itk::Point<int, 3> p, QString &
 class posOutputType : public mitk::OperationActor
 {
   mitk::DataTreeIteratorClone m_DataTreeIterator;
+  mitk::ImageTimeSelector::Pointer m_TimeSelector;
 public:
   
   posOutputType(mitk::DataTreeIteratorBase* iterator)
   {
     m_DataTreeIterator = iterator;
+    m_TimeSelector = mitk::ImageTimeSelector::New();
   }
   
   ~posOutputType()
@@ -161,22 +163,50 @@ public:
 
           QString s;
           mitk::Point3D p = pointoperation->GetPoint();
+          mitk::ScalarType time = pointoperation->GetTimeInMS();
+
           s.sprintf("(%.2f,%.2f,%.2f) [mm]", p[0], p[1], p[2]);
+          if(time>mitk::ScalarTypeNumericTraits::min())
+          {
+            QString tmp;
+            tmp.sprintf(" %.2f [ms]", time);
+            s+=tmp;
+          }
+
 
           if ( image )
           {
+            m_TimeSelector->SetInput(image);
+
+            const mitk::TimeSlicedGeometry* inputTimeGeometry = dynamic_cast< const mitk::TimeSlicedGeometry* >( image->GetUpdatedGeometry() );
+
+            int timestep=0;
+            if(time>mitk::ScalarTypeNumericTraits::min())
+              timestep = inputTimeGeometry->MSToTimeStep( time );
+            if( inputTimeGeometry->IsValidTime( timestep ) == false )
+              return;
+
+            m_TimeSelector->SetTimeNr(timestep);
+            m_TimeSelector->UpdateLargestPossibleRegion();            
+
+            image = m_TimeSelector->GetOutput();
+
             image->GetGeometry()->WorldToIndex(pointoperation->GetPoint(), p);
 
             QString pixel;
-            pixel.sprintf(" (%.2f,%.2f,%.2f) [pixel] ", p[0], p[1], p[2]);
+            if(time>mitk::ScalarTypeNumericTraits::min())
+              pixel.sprintf(" (%.2f,%.2f,%.2f,%u) [pixel] ", p[0], p[1], p[2],timestep);
+            else
+              pixel.sprintf(" (%.2f,%.2f,%.2f) [pixel] ", p[0], p[1], p[2]);
             s+=pixel;
 
             ipPicDescriptor* pic = image->GetPic(); 
 
-            if ( const_cast<mitk::BoundingBox*>(image->GetGeometry()->GetBoundingBox())->IsInside(p) )
+            mitk::FillVector3D(p, (int)(p[0]+0.5), (int)(p[1]+0.5), (int)(p[2]+0.5));
+            if ( image->GetGeometry()->IsIndexInside(p) )
             {
               itk::Point<int, 3> pi;
-              mitk::FillVector3D(pi, p[0]+0.5, p[1]+0.5, p[2]+0.5);
+              mitk::itk2vtk(p, pi);
               if(pic->bpe!=24)
               {
                 ipPicTypeMultiplex2(__buildstring, pic, pi, s);

@@ -46,7 +46,15 @@ class PointOperation : public Operation
   //## @param point is the information of the point to add or is the information to change a point into
   //## @param index is e.g. the position in a list which describes the element to change
   PointOperation(OperationType operationType,	Point3D point, int index = -1, bool selected = true, PointSpecificationType type = PTUNDEFINED);
-  
+ 
+	//##Documentation
+	//##@brief Operation, that handles all aktions on one Point.
+	//##
+	//## @param operationType is the type of that operation (see mitkOperation.h; e.g. move or add; Information for StateMachine::ExecuteOperation());
+  //## @param point is the information of the point to add or is the information to change a point into
+  //## @param index is e.g. the position in a list which describes the element to change
+  PointOperation(OperationType operationType,	ScalarType timeInMS, Point3D point, int index = -1, bool selected = true, PointSpecificationType type = PTUNDEFINED);
+
   //##ModelId=3F0189F003B2
   virtual ~PointOperation();
 
@@ -59,6 +67,8 @@ class PointOperation : public Operation
   bool GetSelected();
 
   PointSpecificationType GetPointType();
+
+  ScalarType GetTimeInMS() const;
 
   private:
   //##ModelId=3F0189F00393
@@ -75,6 +85,8 @@ class PointOperation : public Operation
   //##Documentation
   //##@brief to describe the type of the point. See enum PointSpecification for different types
   PointSpecificationType m_Type;
+
+  ScalarType m_TimeInMS;
 };
 }//namespace mitk
 #endif /* MITKPOINTOPERATION_H*/

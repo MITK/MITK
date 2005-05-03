@@ -16,16 +16,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#include "mitkConfig.h"
 #include "mitkSlicedGeometry3D.h"
 #include "mitkPlaneGeometry.h"
-
-#ifdef MBI_INTERNAL
-extern "C"
-{
-#include "ipDicom/ipDicom.h"
-}
-#endif
 
 //##ModelId=3DCBF50C0377
 mitk::Geometry2D* mitk::SlicedGeometry3D::GetGeometry2D(int s) const

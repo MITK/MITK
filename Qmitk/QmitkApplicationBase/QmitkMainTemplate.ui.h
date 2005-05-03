@@ -96,7 +96,7 @@ template <class T>
 static void __buildstring( ipPicDescriptor *pic, itk::Point<int, 3> p, QString &s, T dummy=0)
 {
    QString value;
-
+   if ( p[0] < pic->n[0] && p[1] < pic->n[1] && p[2] < pic->n[2] ) { 
    if(pic->bpe!=24)
    {
        value.setNum(((T*) pic->data)[ p[0] + p[1]*pic->n[0] + p[2]*pic->n[0]*pic->n[1] ]);
@@ -108,6 +108,9 @@ static void __buildstring( ipPicDescriptor *pic, itk::Point<int, 3> p, QString &
        value.setNum(((T*) pic->data)[p[0]*3 + 2 + p[1]*pic->n[0]*3 + p[2]*pic->n[0]*pic->n[1]*3 ]);
    }
    s+=value;
+} else {
+  s+= "point out of data";
+} 
 }
 class posOutputType : public mitk::OperationActor
 {

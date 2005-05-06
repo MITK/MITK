@@ -290,6 +290,8 @@ public:
     slicedGeometry->SetSpacing(spacing);
     m_TimeSlicedGeometry->InitializeEvenlyTimed(slicedGeometry, m_Dimensions[3]);
     delete [] tmpDimensions;
+
+    this->Initialize();
   };
 
   /**

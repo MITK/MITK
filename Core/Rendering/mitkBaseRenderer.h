@@ -374,6 +374,8 @@ private:
   //## @brief timestamp of last call of SetDisplayGeometry
   itk::TimeStamp m_DisplayGeometryUpdateTime;
 protected:
+  virtual void PrintSelf(std::ostream& os, itk::Indent indent) const;
+
   //##Documentation
   //## Data object containing the m_WorldGeometry defined above. 
   Geometry2DData::Pointer m_WorldGeometryData;

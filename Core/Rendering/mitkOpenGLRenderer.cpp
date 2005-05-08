@@ -572,3 +572,12 @@ void mitk::OpenGLRenderer::PickWorldPoint(const mitk::Point2D& displayPoint, mit
   else
     Superclass::PickWorldPoint(displayPoint, worldPoint);
 }
+
+void mitk::OpenGLRenderer::PrintSelf(std::ostream& os, itk::Indent indent) const
+{
+  Superclass::PrintSelf(os,indent);
+  os << indent << " VtkMapperPresent: " << m_VtkMapperPresent << std::endl;  
+  os << indent << " VtkRenderer: " << m_VtkRenderer << std::endl;
+  os << indent << " LastUpdateVtkActorsTime: " << m_LastUpdateVtkActorsTime << std::endl;
+}
+

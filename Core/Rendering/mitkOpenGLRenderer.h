@@ -140,6 +140,8 @@ protected:
 
   virtual void DataChangedEvent(const itk::Object *caller, const itk::EventObject &event);
 
+  virtual void PrintSelf(std::ostream& os, itk::Indent indent) const;
+
   itk::MemberCommand<mitk::OpenGLRenderer>::Pointer m_DataChangedCommand;
 
 private:

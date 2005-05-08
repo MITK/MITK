@@ -397,3 +397,34 @@ void mitk::BaseRenderer::KeyPressEvent(mitk::KeyEvent *ke)
 void mitk::BaseRenderer::MakeCurrent()
 {
 }
+
+void mitk::BaseRenderer::PrintSelf(std::ostream& os, itk::Indent indent) const
+{
+  os << indent << " MapperID: " << m_MapperID << std::endl;
+  os << indent << " Slice: " << m_Slice << std::endl;
+  os << indent << " TimeStep: " << m_TimeStep << std::endl;
+
+  os << indent << " WorldGeometry: ";
+  if(m_WorldGeometry.IsNull())
+    os << "NULL" << std::endl;
+  else
+    m_WorldGeometry->Print(os, indent);
+
+  os << indent << " CurrentWorldGeometry2D: ";
+  if(m_CurrentWorldGeometry2D.IsNull())
+    os << "NULL" << std::endl;
+  else
+    m_CurrentWorldGeometry2D->Print(os, indent);
+
+  os << indent << " CurrentWorldGeometry2DUpdateTime: " << m_CurrentWorldGeometry2DUpdateTime << std::endl;
+  os << indent << " CurrentWorldGeometry2DTransformTime: " << m_CurrentWorldGeometry2DTransformTime << std::endl;
+
+  os << indent << " DisplayGeometry: ";
+  if(m_DisplayGeometry.IsNull())
+    os << "NULL" << std::endl;
+  else
+    m_DisplayGeometry->Print(os, indent);
+
+  os << indent << " DisplayGeometryTransformTime: " << m_DisplayGeometryTransformTime << std::endl;
+  Superclass::PrintSelf(os,indent);
+}

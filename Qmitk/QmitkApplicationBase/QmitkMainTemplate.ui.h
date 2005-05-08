@@ -749,3 +749,10 @@ void QmitkMainTemplate::enableFineUndo( bool enabled )
 {
   m_FineUndoEnabled = enabled;
 }
+
+#include "QmitkSystemInfo.h"
+void QmitkMainTemplate::optionsSystem_InformationAction_activated()
+{
+  QmitkSystemInfo* systemInfo = new QmitkSystemInfo(this, "QmitkSystemInfo");
+  systemInfo->show();
+}

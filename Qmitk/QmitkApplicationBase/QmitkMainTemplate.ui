@@ -8,7 +8,7 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>352</width>
+            <width>674</width>
             <height>495</height>
         </rect>
     </property>
@@ -80,15 +80,16 @@
         <separator/>
         <action name="editFindAction"/>
     </item>
+    <item text="&amp;Options" name="Options">
+        <action name="HideToolbarAction"/>
+        <action name="optionsFine_Undo_enabledAction"/>
+        <action name="optionsSystem_InformationAction"/>
+    </item>
     <item text="&amp;Help" name="helpMenu">
         <action name="helpContentsAction"/>
         <action name="helpIndexAction"/>
         <separator/>
         <action name="helpAboutAction"/>
-    </item>
-    <item text="Options" name="Options">
-        <action name="HideToolbarAction"/>
-        <action name="optionsFine_Undo_enabledAction"/>
     </item>
 </menubar>
 <toolbars>
@@ -561,7 +562,7 @@
             <string>Hide Toolbar</string>
         </property>
         <property name="menuText">
-            <string>Hide Toolbar</string>
+            <string>&amp;Hide Toolbar</string>
         </property>
     </action>
     <action>
@@ -578,10 +579,24 @@
             <string>Fine Undo enabled</string>
         </property>
         <property name="menuText">
-            <string>Fine Undo enabled</string>
+            <string>&amp;Fine Undo enabled</string>
         </property>
         <property name="toolTip">
             <string>To undo one action or a group of actions.</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>optionsSystem_InformationAction</cstring>
+        </property>
+        <property name="text">
+            <string>MITK System Information</string>
+        </property>
+        <property name="menuText">
+            <string>&amp;MITK System Information</string>
+        </property>
+        <property name="accel">
+            <string>Ctrl+I</string>
         </property>
     </action>
 </actions>
@@ -789,6 +804,12 @@
         <receiver>QmitkMainTemplate</receiver>
         <slot>enableFineUndo(bool)</slot>
     </connection>
+    <connection>
+        <sender>optionsSystem_InformationAction</sender>
+        <signal>activated()</signal>
+        <receiver>QmitkMainTemplate</receiver>
+        <slot>optionsSystem_InformationAction_activated()</slot>
+    </connection>
 </connections>
 <includes>
     <include location="global" impldecl="in implementation">QmitkStdMultiWidget.h</include>
@@ -856,6 +877,7 @@
     <slot>changeToRowWidget3n4Layout()</slot>
     <slot>hideToolbar( bool on )</slot>
     <slot>enableFineUndo( bool enabled )</slot>
+    <slot>optionsSystem_InformationAction_activated()</slot>
 </slots>
 <functions>
     <function>fileOpen( const char * fileName )</function>

@@ -55,7 +55,7 @@ void QmitkDataManagerControls::init()
   m_DataTreeView->addColumn( "NodeType" );
   m_DataTreeView->addColumn( "RefCount");
   m_DataTreeView->setSortColumn(20);
-  mitk::GlobalInteraction* globalInteraction = dynamic_cast<mitk::GlobalInteraction*> (mitk::EventMapper::GetGlobalStateMachine());
+  mitk::GlobalInteraction* globalInteraction =  mitk::GlobalInteraction::GetGlobalInteraction();
   if (globalInteraction)
   {
     mitk::FocusManager* fm = globalInteraction->GetFocusManager();
@@ -78,8 +78,7 @@ void QmitkDataManagerControls::UpdateRendererCombo()
 {
   mitk::RenderWindow* focusedRenderWindow = NULL;
 
-  mitk::GlobalInteraction* globalInteraction =
-    dynamic_cast<mitk::GlobalInteraction*> (mitk::EventMapper::GetGlobalStateMachine());
+  mitk::GlobalInteraction* globalInteraction =  mitk::GlobalInteraction::GetGlobalInteraction();
   if (globalInteraction)
   {
     mitk::FocusManager* fm = globalInteraction->GetFocusManager();
@@ -96,7 +95,7 @@ void QmitkDataManagerControls::UpdateRendererCombo()
   {
     if ((*iter)->GetName())
     {
-      m_RenderWindowCombo->insertItem(QString((*iter)->GetName()),0);
+      m_RenderWindowCombo->insertItem(QString((*iter)->GetName()));
       //        if ((*iter) == focusedRenderWindow) {
       //          m_RenderWindowCombo->setCurrentItem(0);
       //        }
@@ -253,22 +252,28 @@ void QmitkDataManagerControls::TreeSelectionChanged( QListViewItem * item )
   assert(dtvi != NULL);
   assert(dtvi->GetDataTreeNode().IsNotNull());
   m_TransferFunctionWidget->SetDataTreeNode(dtvi->GetDataTreeNode());  m_NodePropertiesView->SetPropertyList(dtvi->GetDataTreeNode()->GetPropertyList());
+  RenderWindowSelected(m_RenderWindowCombo->currentItem() );
+}
 
-  mitk::RenderWindow* focusedRenderWindow = NULL;
-
-  mitk::GlobalInteraction* globalInteraction =
-    dynamic_cast<mitk::GlobalInteraction*> (mitk::EventMapper::GetGlobalStateMachine());
-  if (globalInteraction)
+void QmitkDataManagerControls::RenderWindowSelected( int id )
+{
+  QmitkDataTreeViewItem *selected = dynamic_cast<QmitkDataTreeViewItem*>(m_DataTreeView->selectedItem());
+  if (selected != NULL)
   {
-    mitk::FocusManager* fm = globalInteraction->GetFocusManager();
-    mitk::BaseRenderer::ConstPointer br = fm->GetFocused();
-    if (br.IsNotNull())
+    mitk::DataTreeNode* node = selected->GetDataTreeIterator()->Get();
+    int selectedItem = id;
+    int itemNumber = -1;
+    const mitk::RenderWindow::RenderWindowSet rws = mitk::RenderWindow::GetInstances();
+    mitk::RenderWindow::RenderWindowSet::const_iterator iter;
+    for (iter = rws.begin();iter != rws.end();++iter)
     {
-      focusedRenderWindow = br->GetRenderWindow();
+      ++itemNumber;
+      if(itemNumber==selectedItem)
+        break;
     }
-  }
-  if (focusedRenderWindow)
-  {
-    m_RendererPropertiesView->SetPropertyList(dtvi->GetDataTreeNode()->GetPropertyList(focusedRenderWindow->GetRenderer()));
+    if(itemNumber==selectedItem)
+    {
+      m_RendererPropertiesView->SetPropertyList(node->GetPropertyList((*iter)->GetRenderer()));
+    }
   }
 }

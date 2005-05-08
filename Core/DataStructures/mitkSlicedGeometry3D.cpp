@@ -339,3 +339,18 @@ void mitk::SlicedGeometry3D::InitializeGeometry(Self * newGeometry) const
     }
   }
 }
+
+void mitk::SlicedGeometry3D::PrintSelf(std::ostream& os, itk::Indent indent) const
+{
+  Superclass::PrintSelf(os,indent);
+  os << indent << " EvenlySpaced: " << m_EvenlySpaced << std::endl;
+  if(m_EvenlySpaced)
+    os << indent << " DirectionVector: " << m_DirectionVector << std::endl;
+  os << indent << " Slices: " << m_Slices << std::endl;
+
+  os << indent << " GetGeometry2D(0): ";
+  if(GetGeometry2D(0)==NULL)
+    os << "NULL" << std::endl;
+  else
+    GetGeometry2D(0)->Print(os, indent);
+}

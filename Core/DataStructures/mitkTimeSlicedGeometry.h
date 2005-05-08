@@ -100,6 +100,8 @@ protected:
 
   void InitializeGeometry(Self * newGeometry) const;
 
+  virtual void PrintSelf(std::ostream& os, itk::Indent indent) const;
+
   mutable std::vector<Geometry3D::Pointer> m_Geometry3Ds;
 
   unsigned int m_TimeSteps;

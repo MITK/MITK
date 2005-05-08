@@ -208,3 +208,10 @@ void mitk::Geometry2D::InitializeGeometry(Self * newGeometry) const
 {
   Superclass::InitializeGeometry(newGeometry);
 }
+
+void mitk::Geometry2D::PrintSelf(std::ostream& os, itk::Indent indent) const
+{
+  Superclass::PrintSelf(os,indent);
+  os << indent << " ScaleFactorMMPerUnitX: " << m_ScaleFactorMMPerUnitX << std::endl;
+  os << indent << " ScaleFactorMMPerUnitY: " << m_ScaleFactorMMPerUnitY << std::endl;
+}

@@ -160,7 +160,9 @@ protected:
   //##ModelId=3E3456C50067
   virtual ~SlicedGeometry3D();
 
-  void InitializeGeometry(Self * newGeometry) const;
+  virtual void InitializeGeometry(Self * newGeometry) const;
+
+  void PrintSelf(std::ostream& os, itk::Indent indent) const;
 
   //##ModelId=3E3968CC000E
   //##Documentation

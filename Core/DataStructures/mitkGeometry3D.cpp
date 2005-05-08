@@ -82,6 +82,8 @@ void mitk::Geometry3D::Initialize()
   m_TimeBoundsInMS[0]=-ScalarTypeNumericTraits::max(); m_TimeBoundsInMS[1]=ScalarTypeNumericTraits::max();
 
   m_FrameOfReferenceID = 0;
+
+  m_ImageGeometry = false;
 }
 
 void mitk::Geometry3D::TransferItkToVtkTransform()
@@ -482,4 +484,26 @@ const mitk::Vector3D mitk::Geometry3D::GetZAxis()
   v[1] = m->Element[1][2];
   v[2] = m->Element[2][2];
   return v;
+}
+
+void mitk::Geometry3D::PrintSelf(std::ostream& os, itk::Indent indent) const
+{
+  os << indent << " IndexToWorldTransform: ";
+  if(m_IndexToWorldTransform.IsNull())
+    os << "NULL" << std::endl;
+  else
+    m_IndexToWorldTransform->Print(os, indent);
+  
+  os << indent << " BoundingBox: ";
+  if(m_BoundingBox.IsNull())
+    os << "NULL" << std::endl;
+  else
+    m_BoundingBox->Print(os, indent);
+
+  os << indent << " Origin: " << m_Origin << std::endl;
+  os << indent << " ImageGeometry: " << m_ImageGeometry << std::endl;
+  os << indent << " Spacing: " << m_Spacing << std::endl;
+  os << indent << " TimeBoundsInMS: " << m_TimeBoundsInMS << std::endl;
+
+  Superclass::PrintSelf(os,indent);
 }

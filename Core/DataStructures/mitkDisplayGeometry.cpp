@@ -329,3 +329,24 @@ bool mitk::DisplayGeometry::IsValid() const
 {
   return m_Valid && m_WorldGeometry.IsNotNull() && m_WorldGeometry->IsValid();
 }
+
+mitk::AffineGeometryFrame3D::Pointer mitk::DisplayGeometry::Clone() const
+{
+  itkExceptionMacro(<<"calling mitk::DisplayGeometry::Clone does not make much sense.");
+}
+
+void mitk::DisplayGeometry::PrintSelf(std::ostream& os, itk::Indent indent) const
+{
+  if(m_WorldGeometry.IsNull())
+    os << indent << " WorldGeometry: " << "NULL" << std::endl;
+  else
+  {
+    m_WorldGeometry->Print(os, indent);
+    os << indent << " OriginInMM: " << m_OriginInMM << std::endl;
+    os << indent << " OriginInDisplayUnits: " << m_OriginInDisplayUnits << std::endl;
+    os << indent << " SizeInMM: " << m_SizeInMM << std::endl;
+    os << indent << " SizeInDisplayUnits: " << m_SizeInDisplayUnits << std::endl;
+    os << indent << " ScaleFactorMMPerDisplayUni: " << m_ScaleFactorMMPerDisplayUnit << std::endl;
+  }
+  Superclass::PrintSelf(os,indent);
+}

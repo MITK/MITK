@@ -198,6 +198,10 @@ void mitk::PlaneGeometry::InitializeStandardPlane(const mitk::Geometry3D* geomet
   const BoundingBox::BoundsArrayType& boundsarray = geometry3D->GetBoundingBox()->GetBounds();
   mitk::Vector3D  originVector; 
   FillVector3D(originVector,  boundsarray[0], boundsarray[2], boundsarray[4]);
+  if(geometry3D->GetImageGeometry())
+  {
+    FillVector3D(originVector, originVector[0]-0.5, originVector[1]-0.5, originVector[2]-0.5);
+  }
   switch(planeorientation)
   {
     case Transversal:
@@ -295,4 +299,10 @@ mitk::AffineGeometryFrame3D::Pointer mitk::PlaneGeometry::Clone() const
 void mitk::PlaneGeometry::InitializeGeometry(Self * newGeometry) const
 {
   Superclass::InitializeGeometry(newGeometry);
+}
+
+void mitk::PlaneGeometry::PrintSelf(std::ostream& os, itk::Indent indent) const
+{
+  Superclass::PrintSelf(os,indent);
+  os << indent << " Normal: " << GetNormal() << std::endl;
 }

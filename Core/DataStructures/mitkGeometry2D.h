@@ -183,6 +183,8 @@ protected:
 
 	virtual void InitializeGeometry(Self * newGeometry) const;
 
+  virtual void PrintSelf(std::ostream& os, itk::Indent indent) const;
+
   //##Documentation
   //## @brief factor to convert x-coordinates from mm to units and vice versa
   //## 

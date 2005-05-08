@@ -196,11 +196,17 @@ public:
   virtual void Map(const mitk::Point2D & atPt2d_mm, const mitk::Vector2D &vec2d_mm, mitk::Vector3D &vec3d_mm) const;
 
   virtual bool IsValid() const;
+
+  //##Documentation
+  //## @brief duplicates the geometry, NOT useful for this sub-class
+  virtual AffineGeometryFrame3D::Pointer Clone() const;
 protected:
   //##ModelId=3E3AE91A035E
   DisplayGeometry();
   //##ModelId=3E3AE91A037C
   virtual ~DisplayGeometry();
+
+  virtual void PrintSelf(std::ostream& os, itk::Indent indent) const;
 
   //##ModelId=3E3AE9350140
   mitk::Vector2D m_OriginInMM;

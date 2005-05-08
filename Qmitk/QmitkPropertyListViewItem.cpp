@@ -52,7 +52,7 @@ QmitkPropertyListViewItem* QmitkPropertyListViewItem::CreateInstance(mitk::Prope
   {
     newItem->m_Control = new QCheckBox(parent);
     ((QCheckBox*)(newItem->m_Control))->setChecked(boolProp->GetValue());
-    connect((QObject*)(newItem->m_Control),SIGNAL(stateChanged(int)),(QObject*)(newItem),SLOT(CheckBoxControlActivated(int)));
+    connect((QObject*)(newItem->m_Control),SIGNAL(toggled(bool)),(QObject*)(newItem),SLOT(CheckBoxControlActivated(bool)));
   }
   else if (mitk::StringProperty* stringProp = dynamic_cast<mitk::StringProperty*>(baseProp))
   {
@@ -89,9 +89,9 @@ QmitkPropertyListViewItem* QmitkPropertyListViewItem::CreateInstance(mitk::Prope
   newItem->m_Control->show();
   return newItem;
 }
-void QmitkPropertyListViewItem::CheckBoxControlActivated(int state)
+void QmitkPropertyListViewItem::CheckBoxControlActivated(bool on)
 {
-  m_PropertyList->SetProperty(m_Name.c_str(), new mitk::BoolProperty(state));
+  m_PropertyList->SetProperty(m_Name.c_str(), new mitk::BoolProperty(on));
   mitk::RenderWindow::UpdateAllInstances();
 }
 
@@ -137,6 +137,7 @@ void QmitkPropertyListViewItem::ColorControlActivated()
 }
 void QmitkPropertyListViewItem::UpdateView()
 {
+  m_Control->blockSignals(true);
   mitk::BaseProperty* baseProp = m_PropertyList->GetProperty(m_Name.c_str());
   if (mitk::BoolProperty* boolProp = dynamic_cast<mitk::BoolProperty*>(baseProp))
   {
@@ -159,6 +160,7 @@ void QmitkPropertyListViewItem::UpdateView()
     QColor qcol((int)(col.GetRed() * 255), (int)(col.GetGreen() * 255),(int)( col.GetBlue() * 255));
     ((QPushButton*)(m_Control))->setPaletteBackgroundColor(qcol);
   }
+  m_Control->blockSignals(false);
 }
 void QmitkPropertyListViewItem::UpdateEnabledView()
 {

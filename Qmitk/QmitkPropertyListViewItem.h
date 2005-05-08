@@ -46,7 +46,7 @@ class QmitkPropertyListViewItem : public QObject {
     void QmitkPropertyListViewItem::UpdateEnabledView();
     // ~QmitkPropertyListViewItem()
   public slots:
-    void CheckBoxControlActivated(int state);
+    void CheckBoxControlActivated(bool on);
     void StringControlActivated(const QString &text);
     void ColorControlActivated();
     void FloatControlActivated(const QString &text);

@@ -1,7 +1,6 @@
-#include "mitkImageCast.h"
-
 #include "mitkAutoCropImageFilter.h"
 
+#include "mitkImageCast.h"
 #include "mitkImageTimeSelector.h"
 #include "itkLinearInterpolateImageFunction.h"
 #include <itkBinaryMedianImageFilter.h>

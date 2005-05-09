@@ -12,7 +12,7 @@
  \li \ref Step8.h "Step8.h"\n 
  \li \ref Step8main.cpp "Step8main.cpp"\n 
  
- Step8 inherits from Step6. The method SetupWidgets() is changed: A QmitkStdMultiWidget is used instead of one QmitkRenderWindow and two QmitkSliceWidget s.
+ Step8 inherits from Step6. The method SetupWidgets() is changed: A QmitkStdMultiWidget is used instead of one QmitkRenderWindow and two instances of QmitkSliceWidget.
  
  \dontinclude Step8.cpp 
  \skipline Part II

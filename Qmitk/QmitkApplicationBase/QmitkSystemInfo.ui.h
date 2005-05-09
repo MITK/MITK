@@ -22,7 +22,7 @@
 void QmitkSystemInfo::init()
 {
   m_UpdateRendererListCommand = itk::SimpleMemberCommand<QmitkSystemInfo>::New();
-  m_UpdateRendererListCommand->SetCallbackFunction(this, UpdateRendererList);
+  m_UpdateRendererListCommand->SetCallbackFunction(this, &QmitkSystemInfo::UpdateRendererList);
 
   mitk::GlobalInteraction* globalInteraction =  mitk::GlobalInteraction::GetGlobalInteraction();
   if (globalInteraction)

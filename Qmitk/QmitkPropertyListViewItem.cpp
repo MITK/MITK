@@ -40,7 +40,6 @@ QmitkPropertyListViewItem* QmitkPropertyListViewItem::CreateInstance(mitk::Prope
     baseProp = it->second.first;
   }
   newItem->m_EnabledButton = new QPushButton(parent);
-  newItem->UpdateEnabledView();
   connect(
     (QObject*)(newItem->m_EnabledButton),
     SIGNAL(clicked()),
@@ -87,6 +86,7 @@ QmitkPropertyListViewItem* QmitkPropertyListViewItem::CreateInstance(mitk::Prope
   newItem->m_EnabledButton->show();
   newItem->m_Label->show();
   newItem->m_Control->show();
+  newItem->UpdateEnabledView();
   return newItem;
 }
 void QmitkPropertyListViewItem::CheckBoxControlActivated(bool on)

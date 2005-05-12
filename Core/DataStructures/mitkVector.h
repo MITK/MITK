@@ -270,7 +270,7 @@ inline bool Equal(double scalar1, double scalar2)
 #if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
  typedef double VTK_FLOAT_TYPE;
 #else
- #define float VTK_FLOAT_TYPE;
+ typedef float VTK_FLOAT_TYPE;
 #endif
 
 #define mitkSetConstReferenceMacro(name,type) \

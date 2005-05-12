@@ -4,7 +4,9 @@
 #include "mitkCommon.h"
 #include "mitkImageToImageFilter.h"
 #include "mitkSubImageSelector.h"
-#include "itkImageRegion.h"
+#include "mitkImageTimeSelector.h"
+#include <itkImageRegion.h>
+#include <itkCropImageFilter.h>
 
 namespace mitk {
 
@@ -31,9 +33,15 @@ public:
 	itkGetConstMacro(MarginFactor,float);
 	itkSetMacro(MarginFactor,float);
 
+  virtual const std::type_info& GetOutputPixelType();
+
 protected:
 
-  void Crop3DImage(mitk::ImageToImageFilter::InputImageConstPointer img);
+  void ComputeNewImageBounds();
+
+  template < typename TPixel, unsigned int VImageDimension> 
+    void Crop3DImage( itk::Image< TPixel, VImageDimension >* inputItkImage, mitk::AutoCropImageFilter* cropper, int timeStep=0);
+
 
 protected:
 	//##ModelId=3E1B1975031E
@@ -56,6 +64,23 @@ protected:
   RegionType m_CroppingRegion;
 
   float m_MarginFactor;
+
+  typedef itk::Image<float,3>    ImageType;
+  typedef ImageType::Pointer      ImagePointer;
+  typedef itk::CropImageFilter<ImageType,ImageType> CropFilterType;
+
+  ImageType::RegionType::SizeType m_RegionSize;
+  ImageType::RegionType::IndexType m_RegionIndex;
+
+  CropFilterType::SizeType m_LowerBounds;
+  CropFilterType::SizeType m_UpperBounds;
+
+  mitk::ImageTimeSelector::Pointer m_InputTimeSelector;
+  mitk::ImageTimeSelector::Pointer m_OutputTimeSelector;
+
+  mitk::SlicedData::RegionType m_InputRequestedRegion;
+  itk::TimeStamp m_TimeOfHeaderInitialization;
+
 };
 
 } // namespace mitk

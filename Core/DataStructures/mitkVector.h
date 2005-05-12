@@ -25,6 +25,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <float.h>
 #include <itkIndex.h>
 #include <itkVector.h>
+#include <vtkConfigure.h>
 
 namespace mitk {
 typedef float ScalarType;
@@ -265,6 +266,12 @@ inline bool Equal(double scalar1, double scalar2)
 }
 
 } // namespace mitk
+
+#if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
+ typedef double VTK_FLOAT_TYPE;
+#else
+ #define float VTK_FLOAT_TYPE;
+#endif
 
 #define mitkSetConstReferenceMacro(name,type) \
   virtual void Set##name (const type & _arg) \

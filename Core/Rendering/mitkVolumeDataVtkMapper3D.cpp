@@ -189,12 +189,14 @@ void mitk::VolumeDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
   //trying to avoid update-problem, when size of input changed. Does not really help much.
   if(m_ImageCast->GetOutput()!=NULL)
   {
-    int * inputWE=inputData->GetWholeExtent();
+    int inputWE[6]; 
+    inputData->GetWholeExtent(inputWE);
     int * outputWE=m_UnitSpacingImageFilter->GetOutput()->GetExtent();
     if(m_ImageCast->GetOutput()!=NULL && memcmp(inputWE, outputWE,sizeof(int)*6) != 0)
     {
 //      m_ImageCast->GetOutput()->SetUpdateExtentToWholeExtent();
 //      m_UnitSpacingImageFilter->GetOutput()->SetUpdateExtentToWholeExtent();
+      m_UnitSpacingImageFilter->GetOutput()->SetUpdateExtent(inputWE);
       m_UnitSpacingImageFilter->UpdateWholeExtent();
     }
   }

@@ -69,7 +69,7 @@ void QmitkPropertyListView::SetPropertyList( mitk::PropertyList *propertyList )
     {
       // workaround requested by ivo:
       // add default properties
-      for (mitk::PropertyManager::PropertyNameSet::const_iterator iter = mitk::PropertyManager::GetInstance()->GetDefaultPropertyNames().begin(); iter!=mitk::PropertyManager::GetInstance()->GetDefaultPropertyNames().end();iter++)
+      for (mitk::PropertyManager::PropertyNameSet::const_iterator iter = mitk::PropertyManager::GetInstance()->GetDefaultPropertyNames().begin(); iter!=mitk::PropertyManager::GetInstance()->GetDefaultPropertyNames().end();++iter)
       {
       if (m_PropertyList->GetMap()->count(iter->c_str()) == 0)
         {
@@ -97,9 +97,9 @@ void QmitkPropertyListView::SetPropertyList( mitk::PropertyList *propertyList )
         delete it->second->m_Control;
       }
       m_Items.clear();
-      for (mitk::PropertyList::PropertyMap::const_iterator iter = propertyMap->begin(); iter!=propertyMap->end(); iter++)
+      for (mitk::PropertyList::PropertyMap::const_iterator mapiter = propertyMap->begin(); mapiter!=propertyMap->end(); ++mapiter)
       {
-        QmitkPropertyListViewItem* item = QmitkPropertyListViewItem::CreateInstance(propertyList,iter->first,m_Group);
+        QmitkPropertyListViewItem* item = QmitkPropertyListViewItem::CreateInstance(propertyList,mapiter->first,m_Group);
         m_Items.insert(std::make_pair(item->m_Name,item));
       }
     }

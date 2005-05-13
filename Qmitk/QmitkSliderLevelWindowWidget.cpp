@@ -145,7 +145,7 @@ void QmitkSliderLevelWindowWidget::mouseMoveEvent( QMouseEvent* mouseEvent ) {
 
       if (diff == 0) return;
 
-      if (lw.GetWindow() < 40.0 ) diff = diff /(std::abs(diff)/2.0) ;
+      if (lw.GetWindow() < 40.0 ) diff = diff /(vnl_math_abs(diff)/2.0) ;
       else if (lw.GetWindow() < 100.0 ) diff /= 5.0;
 
       float value = lw.GetWindow() - ( diff );

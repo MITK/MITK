@@ -12,6 +12,7 @@
  This program shows how to load multiple data sets.\n 
  A DataTreeNodeFactory is used to produce nodes containing the data.\n
  The picture above shows the result of the program when reading both the image file and the surface file.\n
+ In order to obtain the result the program has to be executed using the image file mitk/Build/Testing/Pic3D.pic.gz and the surface file mitk/Build/Testing/lungs.vtk.\n
  The code for this example equals the code of Step 1 except for part II and part III that are changed as follows:
  \skipline Part II
  \until exit(2)

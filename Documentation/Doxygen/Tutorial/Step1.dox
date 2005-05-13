@@ -5,7 +5,7 @@
 \image html step1_result.png 
 
 The first program shows how to display an image in a 2D view. The picture above is a snapshot of the program.\n
-In order to obtain the result the program has to be executed using the image file (Pic3D.pic.gz).\n
+In order to obtain the result the program has to be executed using the image file mitk/Build/Testing/Pic3D.pic.gz.\n
 The code is subdivided in Part I - V. First of all a DataTree has to be created. Then data has to be read from a file which afterwards has to be put into the tree. Part IV creates a window and passes the tree to it. The last part deals with some Qt-specific initialization.
 
 \include Step1.cpp

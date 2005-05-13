@@ -35,6 +35,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vector>
 #include <qpushbutton.h>
 #include <qscrollview.h>
+#include <qsizepolicy.h>
 
 #include "QmitkPropertyListViewItem.h"
 #include "mitkPropertyManager.h"
@@ -45,11 +46,13 @@ void QmitkPropertyListView::init()
 {
   std::cout << "init()" << std::endl;
   m_MainGroup->setColumns(1);
+  // m_MainGroup->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
   QScrollView* qsv = new QScrollView(m_MainGroup);
   m_Group = new QGroupBox(qsv->viewport());
   qsv->addChild(m_Group);
   qsv->show();
   m_Group->setColumns(3);
+  // m_Group->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
   m_Group->show();
   m_PropertyList = NULL;
 }

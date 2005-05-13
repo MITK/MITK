@@ -37,53 +37,35 @@ mitk::HistogramGenerator::~HistogramGenerator()
 }
 
 template < typename TPixel, unsigned int VImageDimension > 
-void InternalCompute(itk::Image< TPixel, VImageDimension >* itkImage, const mitk::HistogramGenerator* mitkHistoGenerator, mitk::HistogramGenerator::HistogramType& histogram)
+void InternalCompute(itk::Image< TPixel, VImageDimension >* itkImage, const mitk::HistogramGenerator* mitkHistoGenerator, mitk::HistogramGenerator::HistogramType::ConstPointer& histogram)
 {
   
   typedef itk::Statistics::ScalarImageToHistogramGenerator< 
-                                              itk::Image< TPixel, VImageDimension >
-                                                          >   HistogramGeneratorType;
+                                              itk::Image< TPixel, VImageDimension >,
+                                              double            >   HistogramGeneratorType;
 
   typename HistogramGeneratorType::Pointer histogramGenerator = HistogramGeneratorType::New();
 
   histogramGenerator->SetInput( itkImage );
 
   histogramGenerator->SetNumberOfBins( mitkHistoGenerator->GetSize() );
-  histogramGenerator->SetMarginalScale( 10.0 );
+//  histogramGenerator->SetMarginalScale( 10.0 );
   histogramGenerator->Compute();
   
-  const typename HistogramGeneratorType::HistogramType* generatedHistogram = histogramGenerator->GetOutput();
-  typename HistogramGeneratorType::HistogramType::SizeType size = generatedHistogram->GetSize();
-  histogram.Initialize(size);
-  unsigned int i, j;
-  for ( i = 0 ; i < HistogramGeneratorType::HistogramType::MeasurementVectorSize ; i++)
-  {
-    for (j = 0; j < (size[i] - 1) ; ++j)
-    {
-      histogram.SetBinMin(0, j, generatedHistogram->GetBinMin(0, j));
-      histogram.SetBinMax(0, j, generatedHistogram->GetBinMax(0, j));
-    }
-    for (j = 0; j < (size[i] - 1) ; ++j)
-    {
-      histogram.SetFrequency(j, generatedHistogram->GetFrequency(j));
-    }
-  }
+  histogram = histogramGenerator->GetOutput();
 }
 
 void mitk::HistogramGenerator::ComputeHistogram()
 {
   if((m_Histogram.IsNull()) || (m_Histogram->GetMTime() < m_Image->GetMTime()))
   {
-    if(m_Histogram.IsNull())
-      m_Histogram = HistogramType::New();
     const_cast<mitk::Image*>(m_Image.GetPointer())->SetRequestedRegionToLargestPossibleRegion(); //@todo without this, Image::GetScalarMin does not work for dim==3 (including sliceselector!)
     const_cast<mitk::Image*>(m_Image.GetPointer())->Update();
     mitk::ImageTimeSelector::Pointer timeSelector=mitk::ImageTimeSelector::New();
     timeSelector->SetInput(m_Image);
     timeSelector->SetTimeNr( 0 );
     timeSelector->UpdateLargestPossibleRegion();
-    AccessByItk_2( timeSelector->GetOutput() , InternalCompute, this, *m_Histogram);
-    m_Histogram->Modified();
+    AccessByItk_2( timeSelector->GetOutput() , InternalCompute, this, m_Histogram);
   }
 
 // debug code

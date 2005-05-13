@@ -54,7 +54,7 @@ protected:
        
 	mitk::Image::ConstPointer m_Image;
 	int m_Size;
-	HistogramType::Pointer m_Histogram;
+	HistogramType::ConstPointer m_Histogram;
 };
 
 } // namespace mitk

@@ -142,8 +142,13 @@ void QcMITKSamplePlugin::selectSerie (QcLightbox* lightbox)
     else 
       node->SetProperty("name", new mitk::StringProperty( lightbox->name() ));
 
-    ap->getMultiWidget()->Repaint();
-    ap->getMultiWidget()->Fit();
+    if(ap->GetStandardViewsInitialized()==false)
+    {
+      ap->SetStandardViewsInitialized(ap->GetMultiWidget()->InitializeStandardViews(&it));
+    }
+
+    ap->GetMultiWidget()->Repaint();
+    ap->GetMultiWidget()->Fit();
 
   }
 

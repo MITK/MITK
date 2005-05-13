@@ -59,14 +59,6 @@ int mitkImageTimeSelectorTest(int argc, char* argv[])
     return EXIT_FAILURE;
   }
 
-  if( image->IsVolumeSet(0) == false)
-  {
-    std::cout<<"[FAILED]"<<std::endl;
-    return EXIT_FAILURE;
-  }
-  std::cout<<"[PASSED]"<<std::endl;
-
-
   //Take a time step
   mitk::ImageTimeSelector::Pointer timeSelector = mitk::ImageTimeSelector::New();
   timeSelector->SetInput(image);

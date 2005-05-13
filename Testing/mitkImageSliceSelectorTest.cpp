@@ -120,19 +120,28 @@ int mitkImageSliceSelectorTest(int argc, char* argv[])
       //which is smaller than the one of the old input!!
 	  slice->SetInput(cyl2cart->GetOutput());
       slice->SetSliceNr(1);
-
-      //The requested region is still the old one,
-      //therefore the following should result in an exception! 
 	    slice->Update();
 
-    std::cout<<"Part 1 [FAILED]"<<std::endl;
-    return EXIT_FAILURE;
+    //Check that the requested region is now the one of the smaller image
+    if(cyl2cart->GetOutput()->GetLargestPossibleRegion().GetSize()[0]!=64)
+    {
+      std::cout<<"Part 1 [FAILED]"<<std::endl;
+      return EXIT_FAILURE;
+    }
+    std::cout<<"Part 1 [PASSED] ";
+
+    //Check that the size of the output is now the one of the smaller image
+    if((cyl2cart->GetOutput()->GetDimensions()[0]!=64) || (cyl2cart->GetOutput()->GetDimensions()[1]!=64))
+    {
+      std::cout<<"Part 2 [FAILED]"<<std::endl;
+      return EXIT_FAILURE;
+    }
+    std::cout<<"Part 2 [PASSED] ";
   }
   catch ( itk::ExceptionObject )
   {
-    std::cout<<"Part 1 [PASSED] ";
-    //after such an exception, we need to call ResetPipeline.
-    slice->ResetPipeline();
+    std::cout<<"Part 1 [FAILED]"<<std::endl;
+    return EXIT_FAILURE;
   }
 
   try
@@ -141,10 +150,10 @@ int mitkImageSliceSelectorTest(int argc, char* argv[])
   }
   catch ( itk::ExceptionObject )
   {
-    std::cout<<"Part 2 [FAILED]"<<std::endl;
+    std::cout<<"Part 3 [FAILED]"<<std::endl;
     return EXIT_FAILURE;
   }
-  std::cout<<"Part 2 [PASSED]"<<std::endl;
+  std::cout<<"Part 3 [PASSED]"<<std::endl;
 
   std::cout << "Testing IsInitialized(): ";
   if(slice->GetOutput()->IsInitialized()==false)

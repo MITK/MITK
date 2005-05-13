@@ -24,7 +24,6 @@ void mitk::TransferFunction::UpdateVtkFunctions() {
       m_ScalarOpacityFunction->RemoveAllPoints();
       m_ColorTransferFunction->RemoveAllPoints();
     }  
- //   std::cout << "Fill TF: ";
     for (unsigned int x = 0; x < values.size() ; x++) {
       float fx = m_Min + x * (float)(m_Max - m_Min)/values.size(); 
   //    std::cout << fx << "/" << values[x].m_Opacity << " ";
@@ -32,9 +31,8 @@ void mitk::TransferFunction::UpdateVtkFunctions() {
       m_ColorTransferFunction->AddRGBPoint(fx, values[x].m_Red / 255.0, values[x].m_Green / 255.0, values[x].m_Blue / 255.0); 
     }
  //   std::cout << std::endl;
-   if (m_Elements.size() > 1) {
+   if (m_Elements.size() >= 1) {
      m_Valid = true;
-     std::cout << "TF is now valid" << std::endl;
    } 
 };
 

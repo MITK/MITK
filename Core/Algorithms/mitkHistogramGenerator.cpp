@@ -21,7 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 #endif
 
 #include "mitkHistogramGenerator.h"
-
+#include "mitkImageTimeSelector.h"
 #include "mitkImageAccessByItk.h"
 
 #include "itkScalarImageToHistogramGenerator.h"
@@ -78,7 +78,11 @@ void mitk::HistogramGenerator::ComputeHistogram()
       m_Histogram = HistogramType::New();
     const_cast<mitk::Image*>(m_Image.GetPointer())->SetRequestedRegionToLargestPossibleRegion(); //@todo without this, Image::GetScalarMin does not work for dim==3 (including sliceselector!)
     const_cast<mitk::Image*>(m_Image.GetPointer())->Update();
-    AccessByItk_2(m_Image, InternalCompute, this, *m_Histogram);
+    mitk::ImageTimeSelector::Pointer timeSelector=mitk::ImageTimeSelector::New();
+    timeSelector->SetInput(m_Image);
+    timeSelector->SetTimeNr( 0 );
+    timeSelector->UpdateLargestPossibleRegion();
+    AccessByItk_2( timeSelector->GetOutput() , InternalCompute, this, *m_Histogram);
     m_Histogram->Modified();
   }
 

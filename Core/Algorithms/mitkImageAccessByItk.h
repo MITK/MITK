@@ -103,7 +103,7 @@ template void itkImgFunc(itk::Image<unsigned char, dimension>*, param1Type, para
     ImageToItkType::Pointer imagetoitk = ImageToItkType::New();                        \
     imagetoitk->SetInput(mitkImage);                                                   \
     imagetoitk->Update();                                                              \
-    itkImageTypeFunction<pixeltype, dimension>(imagetoitk->GetOutput());               \
+    itkImageTypeFunction(imagetoitk->GetOutput());               \
 }                                                              
 
 #define _accessAllTypesByItk(mitkImage, itkImageTypeFunction, dimension)               \
@@ -212,7 +212,7 @@ template void itkImgFunc(itk::Image<unsigned char, dimension>*, param1Type, para
     ImageToItkType::Pointer imagetoitk = ImageToItkType::New();                                  \
     imagetoitk->SetInput(mitkImage);                                                             \
     imagetoitk->Update();                                                                        \
-    itkImageTypeFunction<pixeltype, dimension>(imagetoitk->GetOutput(), param1);                 \
+    itkImageTypeFunction(imagetoitk->GetOutput(), param1);                 \
   }
 
 #define _accessAllTypesByItk_1(mitkImage, itkImageTypeFunction, dimension, param1)               \
@@ -304,7 +304,7 @@ template void itkImgFunc(itk::Image<unsigned char, dimension>*, param1Type, para
     ImageToItkType::Pointer imagetoitk = ImageToItkType::New();                                  \
     imagetoitk->SetInput(mitkImage);                                                             \
     imagetoitk->Update();                                                                        \
-    itkImageTypeFunction<pixeltype, dimension>(imagetoitk->GetOutput(), param1, param2);         \
+    itkImageTypeFunction(imagetoitk->GetOutput(), param1, param2);         \
 }
 
 #define _accessAllTypesByItk_2(mitkImage, itkImageTypeFunction, dimension, param1, param2)               \

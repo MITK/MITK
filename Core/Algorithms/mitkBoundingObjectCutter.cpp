@@ -18,6 +18,8 @@ See MITKCopyright.txt or http://www.mitk.org/ for details.
 
 #if(_MSC_VER==1200)
 #include <itkFixedCenterOfRotationAffineTransform.h>
+#include <itkIndex.h>
+#include <itkConceptChecking.h>
 #endif
 #include "mitkBoundingObjectCutter.h"
 #include "mitkBoundingObjectCutter.txx"

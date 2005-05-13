@@ -40,7 +40,7 @@ protected:
   void ComputeNewImageBounds();
 
   template < typename TPixel, unsigned int VImageDimension> 
-    void Crop3DImage( itk::Image< TPixel, VImageDimension >* inputItkImage);
+    friend void _Crop3DImage( itk::Image< TPixel, VImageDimension >* inputItkImage, mitk::AutoCropImageFilter* autoCropFilter);
 
 
 protected:

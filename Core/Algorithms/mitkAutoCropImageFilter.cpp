@@ -13,8 +13,11 @@
 #include "mitkStatusBar.h"
 
 
+namespace mitk
+{
+
 template < typename TPixel, unsigned int VImageDimension>
-    void mitk::AutoCropImageFilter::Crop3DImage( itk::Image< TPixel, VImageDimension >* inputItkImage)
+  void _Crop3DImage( itk::Image< TPixel, VImageDimension >* inputItkImage, mitk::AutoCropImageFilter* autoCropFilter)
 {
   typedef itk::Image< TPixel, VImageDimension > InternalImageType;
   typedef typename InternalImageType::Pointer            InternalImagePointer;
@@ -25,8 +28,8 @@ template < typename TPixel, unsigned int VImageDimension>
   InternalImagePointer outputItk = InternalImageType::New();
 
   FilterPointer cropFilter = FilterType::New();
-  cropFilter->SetLowerBoundaryCropSize( m_LowerBounds );
-  cropFilter->SetUpperBoundaryCropSize( m_UpperBounds );
+  cropFilter->SetLowerBoundaryCropSize( autoCropFilter->m_LowerBounds );
+  cropFilter->SetUpperBoundaryCropSize( autoCropFilter->m_UpperBounds );
   cropFilter->SetInput( inputItkImage );
   cropFilter->Update();
   outputItk = cropFilter->GetOutput();
@@ -65,7 +68,7 @@ template < typename TPixel, unsigned int VImageDimension>
 
   // PART 2: get access to the MITK output image via an ITK image
   typename mitk::ImageToItk<InternalImageType>::Pointer outputimagetoitk = mitk::ImageToItk<InternalImageType>::New();
-  mitk::Image::Pointer timeImage = m_OutputTimeSelector->GetOutput();
+  mitk::Image::Pointer timeImage = autoCropFilter->m_OutputTimeSelector->GetOutput();
   outputimagetoitk->SetInput(timeImage);
   outputimagetoitk->Update();
   typename InternalImageType::Pointer outputItkImage = outputimagetoitk->GetOutput();
@@ -95,7 +98,7 @@ template < typename TPixel, unsigned int VImageDimension>
 ////  this->GraftNthOutput(0,output);  
 //  this->SetNthOutput(0,output);  
 }
-
+}
 
 
 mitk::AutoCropImageFilter::AutoCropImageFilter() : m_BackgroundValue(0), m_MarginFactor(1.0)
@@ -228,7 +231,7 @@ void mitk::AutoCropImageFilter::GenerateData()
 
     timestep = inputTimeGeometry->MSToTimeStep( timeInMS );
 
-    AccessFixedDimensionByItk( m_InputTimeSelector->GetOutput(), Crop3DImage, 3);
+    AccessFixedDimensionByItk_1( m_InputTimeSelector->GetOutput(), _Crop3DImage, 3, this);
   }
 
   //float origin[3];

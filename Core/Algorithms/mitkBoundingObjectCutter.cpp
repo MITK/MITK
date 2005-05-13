@@ -143,12 +143,16 @@ void BoundingObjectCutter::GenerateOutputInformation()
   output->Initialize(mitk::PixelType(GetOutputPixelType()), dimension, dimensions);
   delete [] dimensions;
 
-  // set the spacing
-  mitk::Vector3D spacing = input->GetSlicedGeometry()->GetSpacing();
-  output->SetSpacing(spacing);
+  // now we have everything to initialize the transform of the output
+  mitk::SlicedGeometry3D* slicedGeometry = output->GetSlicedGeometry();
+
+  // set the transform: use the transform of the input; 
+  // the origin will be replaced afterwards
+  AffineTransform3D::Pointer indexToWorldTransform = AffineTransform3D::New();
+  indexToWorldTransform->SetParameters(input->GetSlicedGeometry()->GetIndexToWorldTransform()->GetParameters());
+  slicedGeometry->SetIndexToWorldTransform(indexToWorldTransform);
   
   // Position the output Image to match the corresponding region of the input image
-  mitk::SlicedGeometry3D* slicedGeometry = output->GetSlicedGeometry();
   const mitk::SlicedData::IndexType& start = m_InputRequestedRegion.GetIndex();
   mitk::Point3D origin; vtk2itk(start, origin);
   inputImageGeometry->IndexToWorld(origin, origin);

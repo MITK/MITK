@@ -6,7 +6,7 @@
 /*! @file
 *	DKFZ - Heidelberg
 *
-*	Module Name: QSliderLevelWindowWidget
+*	Module Name: QmitkSliderLevelWindowWidget
 * 
 *	Module Klasse: 	ADT --- nee, GUI Komponente
 *
@@ -42,7 +42,7 @@
 #include <mitkLevelWindow.h>
 #include <qstring.h>
 
-class QSliderLevelWindowWidget : public QWidget {
+class QmitkSliderLevelWindowWidget : public QWidget {
 
   Q_OBJECT
 
@@ -69,12 +69,12 @@ protected:
 
 public:
 
-  QSliderLevelWindowWidget( QWidget * parent=0, const char * name=0, WFlags f = false );
+  QmitkSliderLevelWindowWidget( QWidget * parent=0, const char * name=0, WFlags f = false );
   QBrush brush;
 
   /*!
   *	data structure which stores the values manipulated
-  *	by a QSliderLevelWindowWidget
+  *	by a QmitkSliderLevelWindowWidget
   */
   mitk::LevelWindow lw;
 

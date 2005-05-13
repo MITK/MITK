@@ -53,7 +53,7 @@
                 <property name="spacing">
                     <number>0</number>
                 </property>
-                <widget class="QSliderLevelWindowWidget">
+                <widget class="QmitkSliderLevelWindowWidget">
                     <property name="name">
                         <cstring>SliderLevelWindowWidget</cstring>
                     </property>
@@ -161,8 +161,8 @@
 </widget>
 <customwidgets>
     <customwidget>
-        <class>QSliderLevelWindowWidget</class>
-        <header location="global">QSliderLevelWindowWidget.h</header>
+        <class>QmitkSliderLevelWindowWidget</class>
+        <header location="global">QmitkSliderLevelWindowWidget.h</header>
         <sizehint>
             <width>-1</width>
             <height>-1</height>
@@ -203,7 +203,7 @@
 </connections>
 <includes>
     <include location="local" impldecl="in declaration">mitkLevelWindow.h</include>
-    <include location="local" impldecl="in implementation">QSliderLevelWindowWidget.h</include>
+    <include location="local" impldecl="in implementation">QmitkSliderLevelWindowWidget.h</include>
     <include location="local" impldecl="in implementation">QmitkLevelWindowWidget.ui.h</include>
 </includes>
 <variables>

@@ -1,8 +1,8 @@
 <!DOCTYPE CW><CW>
 <customwidgets>
     <customwidget>
-        <class>QSliderLevelWindowWidget</class>
-        <header location="global">QSliderLevelWindowWidget.h</header>
+        <class>QmitkSliderLevelWindowWidget</class>
+        <header location="global">QmitkSliderLevelWindowWidget.h</header>
         <sizehint>
             <width>-1</width>
             <height>-1</height>

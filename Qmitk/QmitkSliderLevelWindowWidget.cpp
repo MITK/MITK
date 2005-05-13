@@ -1,12 +1,12 @@
 // SliderLevelWindowWidget.cpp
 
-#include "QSliderLevelWindowWidget.h"
+#include "QmitkSliderLevelWindowWidget.h"
 
 
 /**
 * Konstruktor
 */
-QSliderLevelWindowWidget::QSliderLevelWindowWidget( QWidget * parent, const char * name, WFlags f )
+QmitkSliderLevelWindowWidget::QmitkSliderLevelWindowWidget( QWidget * parent, const char * name, WFlags f )
 : QWidget( parent, name, f ), brush( QBrush::SolidPattern ),mouseDown(false), lw()
 {
   // Dense2Pattern
@@ -28,7 +28,7 @@ QSliderLevelWindowWidget::QSliderLevelWindowWidget( QWidget * parent, const char
 /**
 *
 */
-void QSliderLevelWindowWidget::newPaintEvent()
+void QmitkSliderLevelWindowWidget::newPaintEvent()
 {
   QPainter painter(this);
 
@@ -61,17 +61,17 @@ void QSliderLevelWindowWidget::newPaintEvent()
   // painter.drawRect ( rect );
 }
 
-QString QSliderLevelWindowWidget::GetWindow()
+QString QmitkSliderLevelWindowWidget::GetWindow()
 {
   return window;
 }
 
-QString QSliderLevelWindowWidget::GetLevel()
+QString QmitkSliderLevelWindowWidget::GetLevel()
 {
   return level;
 }
 
-void QSliderLevelWindowWidget::paintEvent( QPaintEvent* e ) 
+void QmitkSliderLevelWindowWidget::paintEvent( QPaintEvent* e ) 
 {
   newPaintEvent();
 
@@ -114,7 +114,7 @@ void QSliderLevelWindowWidget::paintEvent( QPaintEvent* e )
 /**
 *
 */
-void QSliderLevelWindowWidget::mouseMoveEvent( QMouseEvent* mouseEvent ) {
+void QmitkSliderLevelWindowWidget::mouseMoveEvent( QMouseEvent* mouseEvent ) {
 
   if ( mouseDown ) {
 
@@ -165,7 +165,7 @@ void QSliderLevelWindowWidget::mouseMoveEvent( QMouseEvent* mouseEvent ) {
 /**
 *
 */
-void QSliderLevelWindowWidget::mousePressEvent( QMouseEvent* mouseEvent ) {
+void QmitkSliderLevelWindowWidget::mousePressEvent( QMouseEvent* mouseEvent ) {
   mouseDown = true;
   startPos = mouseEvent->pos();
 
@@ -180,7 +180,7 @@ void QSliderLevelWindowWidget::mousePressEvent( QMouseEvent* mouseEvent ) {
 /**
 *
 */
-void QSliderLevelWindowWidget::resizeEvent ( QResizeEvent * event ) {
+void QmitkSliderLevelWindowWidget::resizeEvent ( QResizeEvent * event ) {
   moveHeight = event->size().height() - 25;
   update();
 }
@@ -188,7 +188,7 @@ void QSliderLevelWindowWidget::resizeEvent ( QResizeEvent * event ) {
 /**
 *
 */
-void QSliderLevelWindowWidget::mouseReleaseEvent( QMouseEvent* mouseEvent ) 
+void QmitkSliderLevelWindowWidget::mouseReleaseEvent( QMouseEvent* mouseEvent ) 
 {
   mouseDown = false;
 }
@@ -197,21 +197,21 @@ void QSliderLevelWindowWidget::mouseReleaseEvent( QMouseEvent* mouseEvent )
 /**
 *
 */
-void QSliderLevelWindowWidget::setLevelWindow( const mitk::LevelWindow& lw ) {
+void QmitkSliderLevelWindowWidget::setLevelWindow( const mitk::LevelWindow& lw ) {
   this->lw = lw;
 }
 
 /**
 *
 */
-mitk::LevelWindow& QSliderLevelWindowWidget::getLevelWindow() {
+mitk::LevelWindow& QmitkSliderLevelWindowWidget::getLevelWindow() {
   return lw;
 }
 
 /**
 *
 */
-void QSliderLevelWindowWidget::update( ipPicDescriptor* pic ) {
+void QmitkSliderLevelWindowWidget::update( ipPicDescriptor* pic ) {
 
   double min, max;
   ipFuncExtr( pic, &min, &max );
@@ -225,7 +225,7 @@ void QSliderLevelWindowWidget::update( ipPicDescriptor* pic ) {
 /**
 *
 */
-void QSliderLevelWindowWidget::update() {
+void QmitkSliderLevelWindowWidget::update() {
 
   float mr = lw.GetRange();
 
@@ -255,7 +255,7 @@ void QSliderLevelWindowWidget::update() {
 
 }
 
-void QSliderLevelWindowWidget::updateFromLineEdit(int lineEditLevel, int lineEditWindow) 
+void QmitkSliderLevelWindowWidget::updateFromLineEdit(int lineEditLevel, int lineEditWindow) 
 {
 
   float mr = lw.GetRange();

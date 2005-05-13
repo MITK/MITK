@@ -10,7 +10,7 @@
 ** destructor.
 *****************************************************************************/
 
-#include "QSliderLevelWindowWidget.h"
+#include "QmitkSliderLevelWindowWidget.h"
 #include <qmetaobject.h>
 #include <qapplication.h>
 

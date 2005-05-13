@@ -40,11 +40,11 @@ class QmitkFctMediator;
 
 A functionality contains the application main widget, a controls widget and the 
 application logic. The functionality has to set up the main widget according to 
-its needs when it is activated, especially if it uses a shared main wiget. 
-It does @em not need to reverse the settings when it is deactivated, since it cannot
-know if the subsequently activated functionality will use that settings or some other
-setting. Furthermore, most functionalities will connect interaction objects in activated()
-and disconnect them in deactivated().
+its needs when it is Activated, especially if it uses a shared main wiget. 
+It does @em not need to reverse the settings when it is Deactivated, since it cannot
+know if the subsequently Activated functionality will use that settings or some other
+setting. Furthermore, most functionalities will connect interaction objects in Activated()
+and disconnect them in Deactivated().
 */
 class QmitkFunctionality : public QObject
 {
@@ -68,75 +68,75 @@ public:
   /*!
   \brief method for creating the widget containing the functionalities controls, like sliders, buttons etc.
   */
-  virtual QWidget * createControlWidget(QWidget *parent) = 0;
+  virtual QWidget * CreateControlWidget(QWidget *parent) = 0;
 
   /*!
   \brief method for creating the functionality's main widget
   */
-  virtual QWidget * createMainWidget(QWidget * parent) = 0;
+  virtual QWidget * CreateMainWidget(QWidget * parent) = 0;
 
   /*!
   \brief method for creating the connections of main and control widget
   */
-  virtual void createConnections() {};
+  virtual void CreateConnections() {};
 
   /*!
   \brief method for creating a QAction object, i.e., toolbar button and menu entry
   */
-  virtual QAction * createAction(QActionGroup * parent) { return NULL; };
+  virtual QAction * CreateAction(QActionGroup * parent) { return NULL; };
 
   /*!
   \brief method for defining the name of the functionality
   */
-  virtual QString getFunctionalityName();
+  virtual QString GetFunctionalityName();
 
   /*!
   \brief called when a functionality becomes active/visible. Often, event-handlers are connected (e.g., 
-  GlobalStateMachine::AddInteractor() or AddListener()) in activated() and the connection is removed in deactivated()
+  GlobalStateMachine::AddInteractor() or AddListener()) in Activated() and the connection is removed in Deactivated()
   (e.g., GlobalStateMachine::RemoveInteractor() or RemoveListener()).
   */
-  virtual void activated();
+  virtual void Activated();
 
   /*!
-  \brief called when a functionality is deactivated, i.e., is no longer active/visible. Often, event-handlers are connected (e.g., 
-  GlobalStateMachine::AddInteractor() or AddListener()) in activated() and the connection is removed in deactivated()
+  \brief called when a functionality is Deactivated, i.e., is no longer active/visible. Often, event-handlers are connected (e.g., 
+  GlobalStateMachine::AddInteractor() or AddListener()) in Activated() and the connection is removed in Deactivated()
   (e.g., GlobalStateMachine::RemoveInteractor() or RemoveListener()).
   */
-  virtual void deactivated();
+  virtual void Deactivated();
 
 
   //##Documentation
   //## @brief Is the functionality currently active?
   //## 
-  //## @warning Will only work if in sub-classes the superclass-methods are called in activated() and deactivated()!
-  virtual bool isActivated();
+  //## @warning Will only work if in sub-classes the superclass-methods are called in Activated() and Deactivated()!
+  virtual bool IsActivated();
 
-  virtual bool isAvailable();
+  virtual bool IsAvailable();
 
   /*!
   \brief setter method for data tree attribute
   @param it the reference to a data tree ieterator object
   */
-  void setDataTree(mitk::DataTreeIteratorBase* it);
+  void SetDataTree(mitk::DataTreeIteratorBase* it);
 
   /*!
   \brief getter for dataTree attribute. It returns the 
   reference to a data tree iterator object
   */
-  mitk::DataTreeIteratorBase* getDataTree();
+  mitk::DataTreeIteratorBase* GetDataTree();
 
-  virtual void treeChanged(const itk::EventObject & treeChangedEvent);
+  virtual void TreeChanged(const itk::EventObject & treeChangedEvent);
 
-  virtual void treeChanged();
+  virtual void TreeChanged();
 
 signals:
-  void signal_dummy();
-  void availabilityChanged(QmitkFunctionality*);
-  void availabilityChanged();
+  void Signal_dummy();
+  void AvailabilityChanged(QmitkFunctionality*);
+  void AvailabilityChanged();
 
 
 protected:
-  virtual void setAvailability(bool available);
+  virtual void SetAvailability(bool available);
   /*!
   a reference to a data tree iterator object
   */

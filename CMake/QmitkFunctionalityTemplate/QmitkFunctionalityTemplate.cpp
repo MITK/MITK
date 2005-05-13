@@ -43,19 +43,19 @@ PURPOSE.  See the above copyright notices for more information.
 QmitkFunctionalityTemplate::QmitkFunctionalityTemplate(QObject *parent, const char *name, QmitkStdMultiWidget *mitkStdMultiWidget, mitk::DataTreeIteratorBase* it) 
 : QmitkFunctionality(parent, name, it) ,controls(NULL), multiWidget(mitkStdMultiWidget)
 {
-  setAvailability(true);
+  SetAvailability(true);
 }
 
 QmitkFunctionalityTemplate::~QmitkFunctionalityTemplate()
 {
 }
 
-QWidget * QmitkFunctionalityTemplate::createMainWidget(QWidget *parent)
+QWidget * QmitkFunctionalityTemplate::CreateMainWidget(QWidget *parent)
 {  
   return NULL;
 }
 
-QWidget * QmitkFunctionalityTemplate::createControlWidget(QWidget *parent)
+QWidget * QmitkFunctionalityTemplate::CreateControlWidget(QWidget *parent)
 {  
   if (controls == NULL)  
   {    
@@ -64,7 +64,7 @@ QWidget * QmitkFunctionalityTemplate::createControlWidget(QWidget *parent)
   return controls;
 }
 
-void QmitkFunctionalityTemplate::createConnections()
+void QmitkFunctionalityTemplate::CreateConnections()
 {  
   if ( controls )   
   {    
@@ -72,18 +72,18 @@ void QmitkFunctionalityTemplate::createConnections()
   }
 }
 
-QAction * QmitkFunctionalityTemplate::createAction(QActionGroup *parent)
+QAction * QmitkFunctionalityTemplate::CreateAction(QActionGroup *parent)
 {  
   QAction* action;  
   action = new QAction( tr( "ToolTip" ), QPixmap((const char**)icon_xpm), tr( "MenueEintrag" ), CTRL + Key_G, parent, "FunctionalityTemplate" );
   return action;
 }
 
-void QmitkFunctionalityTemplate::treeChanged()
+void QmitkFunctionalityTemplate::TreeChanged()
 {
 }
 
-void QmitkFunctionalityTemplate::activated()
+void QmitkFunctionalityTemplate::Activated()
 {  
-  QmitkFunctionality::activated();
+  QmitkFunctionality::Activated();
 }

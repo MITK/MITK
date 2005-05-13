@@ -136,7 +136,7 @@ bool QmitkFctMediator::addFunctionality(QmitkFunctionality * functionality)
 
   qfl.append(functionality);
 
-  connect(functionality, SIGNAL(availabilityChanged()), this, SLOT(checkAvailability()));
+  connect(functionality, SIGNAL(AvailabilityChanged()), this, SLOT(checkAvailability()));
 
   QPushButton* funcButton=NULL; 
   if(m_ButtonMenu!=NULL)
@@ -151,11 +151,11 @@ bool QmitkFctMediator::addFunctionality(QmitkFunctionality * functionality)
 
     char number[20]; sprintf(number,"%d",m_NumOfFuncs);
 
-    funcButton = new QPushButton(functionality->getFunctionalityName(), m_ButtonMenu, number);
+    funcButton = new QPushButton(functionality->GetFunctionalityName(), m_ButtonMenu, number);
     funcButton->setToggleButton(true);
     menuLayout->addItem(new QWidgetItem(funcButton));
 
-    if((qfl.count()>1) && (functionality->isAvailable()==false))
+    if((qfl.count()>1) && (functionality->IsAvailable()==false))
       funcButton->setEnabled(false);
   }
 
@@ -163,7 +163,7 @@ bool QmitkFctMediator::addFunctionality(QmitkFunctionality * functionality)
   if(m_FunctionalityActionGroup!=NULL)
   {
 
-    action = functionality->createAction(m_FunctionalityActionGroup);
+    action = functionality->CreateAction(m_FunctionalityActionGroup);
     if(action!=NULL)
     {
       action->setToggleAction( true );
@@ -175,7 +175,7 @@ bool QmitkFctMediator::addFunctionality(QmitkFunctionality * functionality)
 
   if(m_MainStack!=NULL)
   {
-    QWidget * mainWidget = functionality->createMainWidget(m_MainStack);
+    QWidget * mainWidget = functionality->CreateMainWidget(m_MainStack);
     if((mainWidget!=NULL) && (mainWidget->parent()!=m_DefaultMain))
     {
       mainWidget->setSizePolicy(ignored);
@@ -186,7 +186,7 @@ bool QmitkFctMediator::addFunctionality(QmitkFunctionality * functionality)
   }
   if(m_ControlStack!=NULL)
   {
-    QWidget * controlWidget = functionality->createControlWidget(m_ControlStack);
+    QWidget * controlWidget = functionality->CreateControlWidget(m_ControlStack);
     if(controlWidget!=NULL)
     {
       controlWidget->setSizePolicy(ignored);
@@ -208,7 +208,7 @@ bool QmitkFctMediator::addFunctionality(QmitkFunctionality * functionality)
       m_MainStack->raiseWidget(0+1);
   }
 
-  functionality->createConnections();
+  functionality->CreateConnections();
 
   ++m_NumOfFuncs;
 
@@ -244,10 +244,10 @@ void QmitkFctMediator::selecting(int id)
 {
   if(id!=m_CurrentFunctionality)
   {    
-    qfl.at(m_CurrentFunctionality)->deactivated();
+    qfl.at(m_CurrentFunctionality)->Deactivated();
     if(qfl.at(m_CurrentFunctionality)->m_Activated)
     {
-      itkGenericOutputMacro(<<"Method deactivated() of functionality '"<<qfl.at(m_CurrentFunctionality)->getFunctionalityName().latin1()<< "' did not call QmitkFunctionality::deactivated().");
+      itkGenericOutputMacro(<<"Method Deactivated() of functionality '"<<qfl.at(m_CurrentFunctionality)->GetFunctionalityName().latin1()<< "' did not call QmitkFunctionality::Deactivated().");
       qfl.at(m_CurrentFunctionality)->m_Activated = false;
     }
   }
@@ -257,10 +257,10 @@ void QmitkFctMediator::functionalitySelected(int id)
 {
   if(id==0) return;
   m_CurrentFunctionality=id-1; //kommt von m_MainStack und der hat einen Eintrag mehr (wg. m_DefaultMain)
-  qfl.at(m_CurrentFunctionality)->activated();
+  qfl.at(m_CurrentFunctionality)->Activated();
   if(qfl.at(m_CurrentFunctionality)->m_Activated==false)
   {
-    itkGenericOutputMacro(<<"Method activated() of functionality '"<<qfl.at(m_CurrentFunctionality)->getFunctionalityName().latin1()<< "' did not call QmitkFunctionality::activated(). treeChanged() will not work!!");
+    itkGenericOutputMacro(<<"Method Activated() of functionality '"<<qfl.at(m_CurrentFunctionality)->GetFunctionalityName().latin1()<< "' did not call QmitkFunctionality::Activated(). TreeChanged() will not work!!");
     qfl.at(m_CurrentFunctionality)->m_Activated = true;
   }
 }
@@ -269,7 +269,7 @@ QmitkFunctionality* QmitkFctMediator::getFunctionalityByName(const char *name)
 {
   QmitkFunctionality *functionality;
   for ( functionality=qfl.first(); functionality != 0; functionality=qfl.next() )
-    if(strcmp(functionality->getFunctionalityName().ascii(),name)==0)
+    if(strcmp(functionality->GetFunctionalityName().ascii(),name)==0)
       return functionality;
   return NULL;
 }
@@ -281,7 +281,7 @@ int QmitkFctMediator::getFunctionalityIdByName( const char * name ) {
 
   for ( functionality = qfl.first(); functionality != NULL; functionality = qfl.next(), id++ ) 
   {
-    if(strcmp(functionality->getFunctionalityName().ascii(),name)==0)
+    if(strcmp(functionality->GetFunctionalityName().ascii(),name)==0)
       return id;
   }
 
@@ -363,7 +363,7 @@ void QmitkFctMediator::checkAvailability()
   int id;
   if(m_ButtonMenu!=NULL)
     for ( functionality=qfl.first(), id=0; functionality != 0; functionality=qfl.next(),++id )
-      ((QButtonGroup*)m_ButtonMenu)->find(id)->setEnabled(functionality->isAvailable());
+      ((QButtonGroup*)m_ButtonMenu)->find(id)->setEnabled(functionality->IsAvailable());
 }
 
 void QmitkFctMediator::hideControls(bool hide)

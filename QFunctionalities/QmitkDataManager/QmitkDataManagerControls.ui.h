@@ -105,7 +105,7 @@ void QmitkDataManagerControls::UpdateRendererCombo()
   if (focusedRenderWindow)
   {
     m_RenderWindowCombo->setCurrentText(focusedRenderWindow->GetName());
-    // m_RenderWindowCombo->activated(focusedRenderWindow->name());
+    // m_RenderWindowCombo->Activated(focusedRenderWindow->name());
   }
   else
   {

@@ -33,6 +33,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <limits>
 #include "mitkDataTreeNode.h"
 #include "mitkRenderWindow.h"
+#include "mitkDataTreeHelper.h"
 
 void QmitkVolumetryWidget::SetDataTreeNodeIterator( mitk::DataTreeIteratorClone it )
 {
@@ -44,7 +45,9 @@ void QmitkVolumetryWidget::SetDataTreeNode(mitk::DataTreeNode* node)
   m_Node = node;
   if (m_OverlayNode)
   {
-    // remove it from the tree
+   // remove it from the tree
+   mitk::DataTreeIteratorClone overlayIt = mitk::DataTreeHelper::FindIteratorToNode(m_DataTreeIteratorClone->GetTree(),m_OverlayNode);
+   if (overlayIt.IsNotNull()) { overlayIt->Remove(); } 
     m_OverlayNode = NULL;
   }
   CreateOverlayChild();
@@ -122,48 +125,12 @@ void QmitkVolumetryWidget::UpdateSlider()
 
   if (m_Node && dynamic_cast<mitk::Image*>(m_Node->GetData()))
   {
-    typedef itk::Image<int,3> ItkInt3DImage;
-    ItkInt3DImage::Pointer itkImage = ItkInt3DImage::New();
     mitk::Image* image = dynamic_cast<mitk::Image*>(m_Node->GetData());
-
-    if (image->GetDimension() == 4)
-    {
-
-      mitk::ImageTimeSelector::Pointer timeSelector = mitk::ImageTimeSelector::New();
-      timeSelector->SetInput(image);
-      float gMin = std::numeric_limits<float>::max();
-      float gMax = std::numeric_limits<float>::min();
-      for (unsigned int timeStep = 0; timeStep<image->GetDimension(3); timeStep++)
-      {
-        timeSelector->SetTimeNr(timeStep);
-        timeSelector->Update();
-        mitk::CastToItkImage(timeSelector->GetOutput(),itkImage);
-        float min,max;
-        CommonFunctionality::MinMax<ItkInt3DImage>(itkImage,min,max);
-        if (min<gMin) { gMin = min; }
-        if (max>gMax) { gMax = max; }
-        m_ThresholdSlider->setMinValue((int)gMin);
-        m_ThresholdSlider->setMaxValue((int)gMax);
+        m_ThresholdSlider->setMinValue((int)image->GetScalarValueMin());
+        m_ThresholdSlider->setMaxValue((int)image->GetScalarValueMax());
         m_ThresholdSlider->setEnabled(true);
         m_ThresholdLabel->setNum(m_ThresholdSlider->value());
-      }
-    }
-    else if (image->GetDimension() == 3)
-    {
-      mitk::CastToItkImage(image,itkImage);
-      float min,max;
-      CommonFunctionality::MinMax<ItkInt3DImage>(itkImage,min,max);
-      m_ThresholdSlider->setMinValue((int)min);
-      m_ThresholdSlider->setMaxValue((int)max);
-      m_ThresholdSlider->setEnabled(true);
-      m_ThresholdLabel->setNum(m_ThresholdSlider->value());
-    }
-    else
-    {
-      m_ThresholdSlider->setEnabled(false);
-    }
-
-  }
+}
 }
 
 

@@ -50,27 +50,27 @@ class QmitkFunctionalityTemplate : public QmitkFunctionality
   /*!  
   \brief method for creating the widget containing the application   controls, like sliders, buttons etc.  
   */  
-  virtual QWidget * createControlWidget(QWidget *parent);
+  virtual QWidget * CreateControlWidget(QWidget *parent);
 
   /*!  
   \brief method for creating the applications main widget  
   */  
-  virtual QWidget * createMainWidget(QWidget * parent);
+  virtual QWidget * CreateMainWidget(QWidget * parent);
 
   /*!  
   \brief method for creating the connections of main and control widget  
   */  
-  virtual void createConnections();
+  virtual void CreateConnections();
 
   /*!  
   \brief method for creating an QAction object, i.e. button & menu entry  @param parent the parent QWidget  
   */  
-  virtual QAction * createAction(QActionGroup *parent);
+  virtual QAction * CreateAction(QActionGroup *parent);
 
-  virtual void activated();
+  virtual void Activated();
 
 protected slots:  
-  void treeChanged();
+  void TreeChanged();
 
 protected:  
   /*!  

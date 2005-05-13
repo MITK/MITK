@@ -44,14 +44,14 @@ PURPOSE.  See the above copyright notices for more information.
 QmitkVolumetry::QmitkVolumetry(QObject *parent, const char *name, QmitkStdMultiWidget *mitkStdMultiWidget, mitk::DataTreeIteratorBase* it) 
 : QmitkFunctionality(parent, name, it) ,m_Controls(NULL), m_MultiWidget(mitkStdMultiWidget)
 {
-  setAvailability(true);
+  SetAvailability(true);
 }
 
 QmitkVolumetry::~QmitkVolumetry()
 {
 }
 
-QWidget * QmitkVolumetry::createMainWidget(QWidget *parent)
+QWidget * QmitkVolumetry::CreateMainWidget(QWidget *parent)
 {  
   if (m_MultiWidget == NULL) 
   {
@@ -63,17 +63,17 @@ QWidget * QmitkVolumetry::createMainWidget(QWidget *parent)
   }
 }
 
-QWidget * QmitkVolumetry::createControlWidget(QWidget *parent)
+QWidget * QmitkVolumetry::CreateControlWidget(QWidget *parent)
 {  
   if (m_Controls == NULL)  
   {    
     m_Controls = new QmitkVolumetryControls(parent);          
-    m_Controls->SetDataTreeIterator(getDataTree());
+    m_Controls->SetDataTreeIterator(GetDataTree());
   }  
   return m_Controls;
 }
 
-void QmitkVolumetry::createConnections()
+void QmitkVolumetry::CreateConnections()
 {  
   if ( m_Controls )   
   {    
@@ -81,21 +81,21 @@ void QmitkVolumetry::createConnections()
   }
 }
 
-QAction * QmitkVolumetry::createAction(QActionGroup *parent)
+QAction * QmitkVolumetry::CreateAction(QActionGroup *parent)
 {  
   QAction* action;  
   action = new QAction( tr( "Volumetry" ), QPixmap((const char**)volumetry_xpm), tr( "Volumetry" ), CTRL + Key_G, parent, "Volumetry" );
   return action;
 }
 
-void QmitkVolumetry::treeChanged()
+void QmitkVolumetry::TreeChanged()
 {
   m_Controls->m_TreeNodeSelector->UpdateContent();
 }
 
-void QmitkVolumetry::activated()
+void QmitkVolumetry::Activated()
 {  
-  QmitkFunctionality::activated();
+  QmitkFunctionality::Activated();
 }
 void QmitkVolumetry::InitializeStandardViews(mitk::BaseData::Pointer data)
 {

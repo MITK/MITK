@@ -27,7 +27,7 @@ PURPOSE.  See the above copyright notices for more information.
 QmitkFunctionality::QmitkFunctionality(QObject *parent, const char *name, mitk::DataTreeIteratorBase* dataIt) : 
 QObject(parent, name), m_Available(false), m_Activated(false), m_DataTreeIterator(NULL), m_TreeChangedWhileInActive(false), m_ObserverTag(0)
 {
-  setDataTree(dataIt);
+  SetDataTree(dataIt);
 }
 
 QmitkFunctionality::~QmitkFunctionality()
@@ -38,44 +38,44 @@ QmitkFunctionality::~QmitkFunctionality()
   }
 }
 
-QString QmitkFunctionality::getFunctionalityName()
+QString QmitkFunctionality::GetFunctionalityName()
 {
   return name();
 }
 
-void QmitkFunctionality::activated()
+void QmitkFunctionality::Activated()
 {
   m_Activated = true;
   if(m_TreeChangedWhileInActive)
   {
-    treeChanged();
+    TreeChanged();
     m_TreeChangedWhileInActive = false;
   }
 }
 
-void QmitkFunctionality::deactivated()
+void QmitkFunctionality::Deactivated()
 {
   m_Activated = false;
 }
 
-bool QmitkFunctionality::isActivated()
+bool QmitkFunctionality::IsActivated()
 {
   return m_Activated;
 }
 
-bool QmitkFunctionality::isAvailable()
+bool QmitkFunctionality::IsAvailable()
 {
   return m_Available;
 }
 
-void QmitkFunctionality::setAvailability(bool available)
+void QmitkFunctionality::SetAvailability(bool available)
 {
   this->m_Available=available;
-  emit availabilityChanged(this);
-  emit availabilityChanged();
+  emit AvailabilityChanged(this);
+  emit AvailabilityChanged();
 }
 
-void QmitkFunctionality::setDataTree(mitk::DataTreeIteratorBase* it)
+void QmitkFunctionality::SetDataTree(mitk::DataTreeIteratorBase* it)
 {
   if(m_DataTreeIterator.IsNotNull() )
   {
@@ -85,27 +85,27 @@ void QmitkFunctionality::setDataTree(mitk::DataTreeIteratorBase* it)
   if(m_DataTreeIterator.IsNotNull())
   {
     itk::ReceptorMemberCommand<QmitkFunctionality>::Pointer command = itk::ReceptorMemberCommand<QmitkFunctionality>::New();
-    command->SetCallbackFunction(this, &QmitkFunctionality::treeChanged);
+    command->SetCallbackFunction(this, &QmitkFunctionality::TreeChanged);
     m_ObserverTag = m_DataTreeIterator->GetTree()->AddObserver(itk::TreeChangeEvent<mitk::DataTreeBase>(), command);
   }
 }
 
-mitk::DataTreeIteratorBase* QmitkFunctionality::getDataTree()
+mitk::DataTreeIteratorBase* QmitkFunctionality::GetDataTree()
 {
   return m_DataTreeIterator.GetPointer();
 }
 
-void QmitkFunctionality::treeChanged(const itk::EventObject & treeChangedEvent)
+void QmitkFunctionality::TreeChanged(const itk::EventObject & treeChangedEvent)
 {
-  if(isActivated())
+  if(IsActivated())
   {
     m_TreeChangedWhileInActive = false;
-    treeChanged();
+    TreeChanged();
   }
   else
     m_TreeChangedWhileInActive = true;
 }
 
-void QmitkFunctionality::treeChanged()
+void QmitkFunctionality::TreeChanged()
 {
 }

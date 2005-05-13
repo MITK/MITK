@@ -51,7 +51,7 @@ PURPOSE.  See the above copyright notices for more information.
 QmitkSimpleExampleFunctionality::QmitkSimpleExampleFunctionality(QObject *parent, const char *name, QmitkStdMultiWidget *mitkStdMultiWidget, mitk::DataTreeIteratorBase* it) : QmitkFunctionality(parent, name, it) ,
 controls(NULL), multiWidget(mitkStdMultiWidget), m_NavigatorsInitialized(false)
 {
-    setAvailability(true);
+    SetAvailability(true);
 }
 
 QmitkSimpleExampleFunctionality::~QmitkSimpleExampleFunctionality()
@@ -59,7 +59,7 @@ QmitkSimpleExampleFunctionality::~QmitkSimpleExampleFunctionality()
 //  delete moveNzoom;
 }
 
-QWidget * QmitkSimpleExampleFunctionality::createMainWidget(QWidget *parent)
+QWidget * QmitkSimpleExampleFunctionality::CreateMainWidget(QWidget *parent)
 {
     QWidget *result = NULL;
 
@@ -75,7 +75,7 @@ QWidget * QmitkSimpleExampleFunctionality::createMainWidget(QWidget *parent)
     return result;
 }
 
-QWidget * QmitkSimpleExampleFunctionality::createControlWidget(QWidget *parent)
+QWidget * QmitkSimpleExampleFunctionality::CreateControlWidget(QWidget *parent)
 {
     if (controls == NULL)
     {
@@ -89,17 +89,17 @@ QWidget * QmitkSimpleExampleFunctionality::createControlWidget(QWidget *parent)
     return controls;
 }
 
-void QmitkSimpleExampleFunctionality::createConnections()
+void QmitkSimpleExampleFunctionality::CreateConnections()
 {
   if ( controls ) 
   {
-    connect(controls->getStereoSelect(), SIGNAL(activated(int)), this, SLOT(stereoSelectionChanged(int)) );
+    connect(controls->getStereoSelect(), SIGNAL(Activated(int)), this, SLOT(stereoSelectionChanged(int)) );
     connect(controls->getReInitializeNavigatorsButton(), SIGNAL(clicked()), this, SLOT(initNavigators()) );
     connect(controls->getGenerateMovieButton(), SIGNAL(clicked()), this, SLOT(generateMovie()) );
   }
 }
 
-QAction * QmitkSimpleExampleFunctionality::createAction(QActionGroup *parent)
+QAction * QmitkSimpleExampleFunctionality::CreateAction(QActionGroup *parent)
 {
     QAction* action;
     action = new QAction( tr( "Simple Example" ), QPixmap((const char**)slicer_xpm), tr( "&Simple Example" ), CTRL + Key_L, parent, "simple example" );
@@ -124,13 +124,13 @@ void QmitkSimpleExampleFunctionality::generateMovie()
   }
 }
 
-void QmitkSimpleExampleFunctionality::treeChanged()
+void QmitkSimpleExampleFunctionality::TreeChanged()
 {
 }
 
-void QmitkSimpleExampleFunctionality::activated()
+void QmitkSimpleExampleFunctionality::Activated()
 {
-  QmitkFunctionality::activated();
+  QmitkFunctionality::Activated();
   assert( multiWidget != NULL );
   // init widget 4 as a 3D widget
   multiWidget->mitkWidget4->GetRenderer()->SetMapperID(2);

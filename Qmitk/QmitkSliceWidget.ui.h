@@ -42,7 +42,7 @@ void QmitkSliceWidget::init()
   m_RenderWindow = new QmitkRenderWindow(m_Renderer, container, composedName);
   hlayout->addWidget(m_RenderWindow);
 
-  m_SliceNavigator = new mitk::SliceNavigationController("navigation");
+  m_SliceNavigator = new mitk::SliceNavigationController(NULL);
   m_SliceNavigator->SetViewDirection(mitk::SliceNavigationController::Transversal);
   m_SliceNavigator->ConnectGeometrySliceEvent(m_Renderer.GetPointer());
   m_SliceNavigator->ConnectRepaint(m_RenderWindow);

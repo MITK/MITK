@@ -27,7 +27,7 @@ PURPOSE.  See the above copyright notices for more information.
 *****************************************************************************/
 
 #include "QmitkSelectableGLWidget.h"
-#include "QLevelWindowWidget.h"
+#include "QmitkLevelWindowWidget.h"
 
 #include <vtkSTLReader.h>
 #include <vtkSTLWriter.h>

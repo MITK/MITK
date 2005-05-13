@@ -72,7 +72,7 @@
                         </widget>
                     </grid>
                 </widget>
-                <widget class="QLevelWindowWidget">
+                <widget class="QmitkLevelWindowWidget">
                     <property name="name">
                         <cstring>levelWindowWidget</cstring>
                     </property>
@@ -119,8 +119,8 @@
         <pixmap>image0</pixmap>
     </customwidget>
     <customwidget>
-        <class>QLevelWindowWidget</class>
-        <header location="global">QLevelWindowWidget.h</header>
+        <class>QmitkLevelWindowWidget</class>
+        <header location="global">QmitkLevelWindowWidget.h</header>
         <sizehint>
             <width>-1</width>
             <height>-1</height>

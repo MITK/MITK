@@ -94,7 +94,7 @@
                         <property name="spacing">
                             <number>0</number>
                         </property>
-                        <widget class="QLevelWindowWidget" row="0" column="0">
+                        <widget class="QmitkLevelWindowWidget" row="0" column="0">
                             <property name="name">
                                 <cstring>levelWindow</cstring>
                             </property>
@@ -152,8 +152,8 @@
 </widget>
 <customwidgets>
     <customwidget>
-        <class>QLevelWindowWidget</class>
-        <header location="global">QLevelWindowWidget.h</header>
+        <class>QmitkLevelWindowWidget</class>
+        <header location="global">QmitkLevelWindowWidget.h</header>
         <sizehint>
             <width>-1</width>
             <height>-1</height>

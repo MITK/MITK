@@ -33,8 +33,8 @@
         </pixmap>
     </customwidget>
     <customwidget>
-        <class>QLevelWindowWidget</class>
-        <header location="global">../../Functionalities/QLevelWindowWidget/QLevelWindowWidget.h</header>
+        <class>QmitkLevelWindowWidget</class>
+        <header location="global">../../AppModules/QmitkLevelWindowWidget/QmitkLevelWindowWidget.h</header>
         <sizehint>
             <width>-1</width>
             <height>-1</height>

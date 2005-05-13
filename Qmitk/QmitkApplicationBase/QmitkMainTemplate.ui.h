@@ -497,7 +497,7 @@ void QmitkMainTemplate::init()
 The method is should be called at the end of the initialize-method of its
 subclasses.
 */
-void QmitkMainTemplate::initialize()
+void QmitkMainTemplate::Initialize()
 {
    mitk::DataTreePreOrderIterator it(tree);
   //initialize interaction sub-system: undo-controller, statemachine-factory and global-interaction
@@ -552,7 +552,7 @@ void QmitkMainTemplate::initialize()
   }
 
   //initialize functionality management
-  initializeQfm();
+  InitializeQfm();
   QWidget* defaultMain = qfm->getDefaultMain();
 
   if ( defaultMain!=NULL )
@@ -571,7 +571,7 @@ void QmitkMainTemplate::initialize()
     mitkMultiWidget->AddDisplayPlaneSubTree(&it);
     mitkMultiWidget->EnableStandardLevelWindow();
   }
-  initializeFunctionality();
+  InitializeFunctionality();
 
 
   mitk::GlobalInteraction* globalInteraction = dynamic_cast<mitk::GlobalInteraction*>(mitk::EventMapper::GetGlobalStateMachine());
@@ -586,7 +586,7 @@ void QmitkMainTemplate::initialize()
 /*!
 
 */
-void QmitkMainTemplate::initializeFunctionality()
+void QmitkMainTemplate::InitializeFunctionality()
 {
 
 }
@@ -597,7 +597,7 @@ void QmitkMainTemplate::initializeFunctionality()
 When subclassing this template class the developer can overwrite the method
 to provide different layout templates
 */
-void QmitkMainTemplate::initializeQfm()
+void QmitkMainTemplate::InitializeQfm()
 {
   QHBoxLayout *hlayout;
   hlayout=new QHBoxLayout(MainWidget);
@@ -624,7 +624,7 @@ void QmitkMainTemplate::initializeQfm()
 
 
 
-QmitkStdMultiWidget* QmitkMainTemplate::getMultiWidget()
+QmitkStdMultiWidget* QmitkMainTemplate::GetMultiWidget()
 {
   return mitkMultiWidget;
 }
@@ -713,13 +713,13 @@ void QmitkMainTemplate::destroy()
   delete qfm;
 }
 
-QmitkMainTemplate* QmitkMainTemplate::getInstance()
+QmitkMainTemplate* QmitkMainTemplate::GetInstance()
 {
   return m_Instance;
 }
 
 
-QmitkFctMediator* QmitkMainTemplate::getFctMediator()
+QmitkFctMediator* QmitkMainTemplate::GetFctMediator()
 {
   return qfm;
 }
@@ -755,4 +755,16 @@ void QmitkMainTemplate::optionsSystem_InformationAction_activated()
 {
   QmitkSystemInfo* systemInfo = new QmitkSystemInfo(this, "QmitkSystemInfo");
   systemInfo->show();
+}
+
+
+bool QmitkMainTemplate::GetStandardViewsInitialized()
+{
+    return m_StandardViewsInitialized;
+}
+
+
+void QmitkMainTemplate::SetStandardViewsInitialized( bool areInitialized )
+{
+    m_StandardViewsInitialized = areInitialized;
 }

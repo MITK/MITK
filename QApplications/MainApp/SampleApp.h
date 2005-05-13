@@ -44,9 +44,9 @@ public:
   In this method the user adds the application specific functionalities
   to the application template
   */
-  virtual void initializeFunctionality();
+  virtual void InitializeFunctionality();
 
-  virtual void initializeQfm();
+  virtual void InitializeQfm();
 
 public slots:
 

@@ -883,16 +883,18 @@
     <function>fileOpen( const char * fileName )</function>
     <function access="protected">fileOpenGetFactoryOutput( mitk::DataTreeNodeFactory &amp; factory )</function>
     <function access="private" specifier="non virtual">init()</function>
-    <function>initialize()</function>
-    <function>initializeFunctionality()</function>
-    <function>initializeQfm()</function>
-    <function returnType="QmitkStdMultiWidget *">getMultiWidget()</function>
+    <function>Initialize()</function>
+    <function>InitializeFunctionality()</function>
+    <function>InitializeQfm()</function>
+    <function returnType="QmitkStdMultiWidget *">GetMultiWidget()</function>
     <function>parseCommandLine()</function>
     <function returnType="mitk::DataTree::Pointer">GetTree()</function>
     <function>setXMLFallBackPath( const char * anXmlFallBackPath )</function>
     <function access="private">destroy()</function>
-    <function specifier="static" returnType="QmitkMainTemplate *">getInstance()</function>
-    <function specifier="non virtual" returnType="QmitkFctMediator *">getFctMediator()</function>
+    <function specifier="static" returnType="QmitkMainTemplate *">GetInstance()</function>
+    <function specifier="non virtual" returnType="QmitkFctMediator *">GetFctMediator()</function>
+    <function returnType="bool">GetStandardViewsInitialized()</function>
+    <function>SetStandardViewsInitialized( bool areInitialized )</function>
 </functions>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

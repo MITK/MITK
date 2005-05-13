@@ -4,7 +4,7 @@
 
 In this step the program is enhanced by the possibility to start a region-grower at interactively added points.
 We will see how MITK images can be accessed as ITK images.\n
-We now simply load the image file since the surface will be the result of the region-growing.
+We now load the image file only (mitk/Build/Testing/Pic3D.pic.gz) since the surface will be the result of the region-growing.
 
 \image html step6_result.png 
 

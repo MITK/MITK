@@ -17,13 +17,14 @@ template < typename TPixel, unsigned int VImageDimension>
     void mitk::AutoCropImageFilter::Crop3DImage( itk::Image< TPixel, VImageDimension >* inputItkImage, mitk::AutoCropImageFilter* cropper, int timeStep)
 {
   typedef itk::Image< TPixel, VImageDimension > InternalImageType;
-  typedef InternalImageType::Pointer            InternalImagePointer;
+  typedef typename InternalImageType::Pointer            InternalImagePointer;
 
   typedef itk::CropImageFilter<InternalImageType,InternalImageType> FilterType;
+  typedef typename itk::CropImageFilter<InternalImageType,InternalImageType>::Pointer FilterPointer;
 
   InternalImagePointer outputItk = InternalImageType::New();
 
-  FilterType::Pointer cropFilter = FilterType::New();
+  FilterPointer cropFilter = FilterType::New();
   cropFilter->SetLowerBoundaryCropSize( m_LowerBounds );
   cropFilter->SetUpperBoundaryCropSize( m_UpperBounds );
   cropFilter->SetInput( inputItkImage );
@@ -79,7 +80,6 @@ template < typename TPixel, unsigned int VImageDimension>
   // Cut the boundingbox out of the image by iterating through 
   // all pixels and checking if they are inside using IsInside()
   mitk::Point3D p;
-  mitk::Geometry3D* inputGeometry = this->GetInput()->GetGeometry();
 
   for ( inputIt.GoToBegin(), outputIt.GoToBegin(); !inputIt.IsAtEnd(); ++inputIt, ++outputIt)
   {

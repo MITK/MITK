@@ -31,11 +31,6 @@ void Step7::StartRegionGrowing()
     surfaceCreator->SetInput(m_ResultImage->GetVtkImageData());
     surfaceCreator->SetValue(0, 1);
 
-//    vtkSTLWriter* writer = vtkSTLWriter::New();
-//    writer->SetInput(surfaceCreator->GetOutput());
-//    writer->SetFileName("C:\\lungsOfOrig_volume.stl");
-//writer->Write();
-
     mitk::Surface::Pointer surface = mitk::Surface::New();
     surface->SetVtkPolyData(surfaceCreator->GetOutput());
 

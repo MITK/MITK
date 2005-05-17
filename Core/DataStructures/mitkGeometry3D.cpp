@@ -89,29 +89,13 @@ void mitk::Geometry3D::Initialize()
 void mitk::Geometry3D::TransferItkToVtkTransform()
 {
  // copy m_IndexToWorldTransform into m_VtkIndexToWorldTransform 
-  int i,j;
-  for(i=0;i<3;++i)
-    for(j=0;j<3;++j)
-      m_VtkMatrix->SetElement(i, j, m_IndexToWorldTransform->GetMatrix().GetVnlMatrix().get(i, j));
-  for(i=0;i<3;++i)
-    m_VtkMatrix->SetElement(i, 3, m_IndexToWorldTransform->GetOffset()[i]);
+  TransferItkTransformToVtkMatrix(m_IndexToWorldTransform, m_VtkMatrix);
   m_VtkIndexToWorldTransform->Modified();
 }
 
 void mitk::Geometry3D::TransferVtkToItkTransform()
 {
-  itk::Matrix<mitk::ScalarType,3,3>::InternalMatrixType& vlnMatrix = const_cast<itk::Matrix<mitk::ScalarType,3,3>::InternalMatrixType&>(m_IndexToWorldTransform->GetMatrix().GetVnlMatrix());  
-
-  for ( int i=0; i < 3; ++i)
-    for( int j=0; j < 3; ++j )
-      vlnMatrix.put( i, j, m_VtkMatrix->GetElement( i, j ) );      
-
-  itk::AffineTransform<mitk::ScalarType>::OffsetType offset;
-  offset[0] = m_VtkMatrix->GetElement( 0, 3 );
-  offset[1] = m_VtkMatrix->GetElement( 1, 3 );
-  offset[2] = m_VtkMatrix->GetElement( 2, 3 );
-  m_IndexToWorldTransform->SetOffset( offset );
-  m_IndexToWorldTransform->Modified();
+  TransferVtkMatrixToItkTransform(m_VtkMatrix, m_IndexToWorldTransform);
   m_ParametricTransform = m_IndexToWorldTransform;
   CopySpacingFromTransform(m_IndexToWorldTransform, m_Spacing, m_FloatSpacing);
   vtk2itk(m_IndexToWorldTransform->GetOffset(), m_Origin);
@@ -449,12 +433,19 @@ void mitk::Geometry3D::SetIdentity()
   TransferItkToVtkTransform();
 }
 
-void mitk::Geometry3D::Compose( const mitk::AffineGeometryFrame3D::TransformType * other,bool pre )
+void mitk::Geometry3D::Compose( const mitk::AffineGeometryFrame3D::TransformType * other, bool pre )
 {
   m_IndexToWorldTransform->Compose(other, pre);
   vtk2itk(m_IndexToWorldTransform->GetOffset(), m_Origin);
   Modified();
   TransferItkToVtkTransform();
+}
+
+void mitk::Geometry3D::Compose( const vtkMatrix4x4 * vtkmatrix, bool pre )
+{
+  mitk::AffineGeometryFrame3D::TransformType::Pointer itkTransform = mitk::AffineGeometryFrame3D::TransformType::New();
+  TransferVtkMatrixToItkTransform(vtkmatrix, itkTransform);
+  Compose(itkTransform, pre);
 }
 
 const mitk::Vector3D mitk::Geometry3D::GetXAxis()

@@ -250,7 +250,13 @@ public:
   //## then other is post-composed with self; that is the resulting 
   //## transformation consists of first applying self to the source, 
   //## followed by other.
-  virtual void Compose( const AffineGeometryFrame3D::TransformType * other,bool pre = 0);
+  virtual void Compose( const AffineGeometryFrame3D::TransformType * other, bool pre = 0 );
+
+  //##Documentation
+  //## @brief Compose new IndexToWorldTransform with a given vtkMatrix4x4.
+  //##
+  //## Converts the vtkMatrix4x4 into a itk-transform and calls the previous method.
+  virtual void Compose( const vtkMatrix4x4 * vtkmatrix, bool pre = 0 );
 
   //##Documentation
   //## @brief Get the origin, i.e. the upper-left corner of the plane

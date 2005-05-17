@@ -91,7 +91,7 @@ void QmitkFctMediator::Initialize(QWidget *aLayoutTemplate)
     m_DefaultMain = new QWidget(m_MainStack,"QmitkFctMediator::m_DefaultMain");
     m_MainStack->addWidget(m_DefaultMain, 0);
 
-    connect( m_MainStack, SIGNAL(aboutToShow(int)), this, SLOT(functionalitySelected(int)) );
+    connect( m_MainStack, SIGNAL(aboutToShow(int)), this, SLOT(FunctionalitySelected(int)) );
   }
 
   if((w=static_cast<QWidget*>(aLayoutTemplate->child("ControlParent", "QWidget")))!=NULL)

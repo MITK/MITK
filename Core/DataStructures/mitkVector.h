@@ -27,6 +27,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkVector.h>
 #include <vtkConfigure.h>
 
+class vtkMatrix4x4;
+
 namespace mitk {
 typedef float ScalarType;
 
@@ -264,6 +266,10 @@ inline bool Equal(double scalar1, double scalar2)
 {
   return fabs(scalar1-scalar2) < mitk::eps;
 }
+
+void TransferVtkMatrixToItkTransform(const vtkMatrix4x4* vtkmatrix, mitk::AffineTransform3D* itkTransform);
+
+void TransferItkTransformToVtkMatrix(const mitk::AffineTransform3D* itkTransform, vtkMatrix4x4* vtkmatrix);
 
 } // namespace mitk
 

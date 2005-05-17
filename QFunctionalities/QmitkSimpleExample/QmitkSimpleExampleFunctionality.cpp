@@ -93,7 +93,7 @@ void QmitkSimpleExampleFunctionality::CreateConnections()
 {
   if ( controls ) 
   {
-    connect(controls->getStereoSelect(), SIGNAL(Activated(int)), this, SLOT(stereoSelectionChanged(int)) );
+    connect(controls->getStereoSelect(), SIGNAL(activated(int)), this, SLOT(stereoSelectionChanged(int)) );
     connect(controls->getReInitializeNavigatorsButton(), SIGNAL(clicked()), this, SLOT(initNavigators()) );
     connect(controls->getGenerateMovieButton(), SIGNAL(clicked()), this, SLOT(generateMovie()) );
   }

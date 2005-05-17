@@ -312,7 +312,7 @@
     </connection>
     <connection>
         <sender>m_RenderWindowCombo</sender>
-        <signal>Activated(int)</signal>
+        <signal>activated(int)</signal>
         <receiver>QmitkDataManagerControls</receiver>
         <slot>RenderWindowSelected(int)</slot>
     </connection>

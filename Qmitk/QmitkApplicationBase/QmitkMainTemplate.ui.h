@@ -553,7 +553,7 @@ void QmitkMainTemplate::Initialize()
 
   //initialize functionality management
   InitializeQfm();
-  QWidget* defaultMain = qfm->getDefaultMain();
+  QWidget* defaultMain = qfm->GetDefaultMain();
 
   if ( defaultMain!=NULL )
   {
@@ -612,7 +612,7 @@ void QmitkMainTemplate::InitializeQfm()
   hlayout->addWidget(layoutTemplate);
 
   //let the QmitkFctMediator know about the layout. This includes the toolbar and the layoutTemplate.
-  qfm->initialize(this);
+  qfm->Initialize(this);
 }
 
 // @FIXME: probably obsolete

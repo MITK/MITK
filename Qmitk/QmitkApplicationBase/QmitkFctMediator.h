@@ -54,32 +54,32 @@ protected:
   QPtrList<QAction> qal;
 
 protected slots:
-  void slot_dummy_protected() {};
-  virtual void selecting(int id);
-  virtual void functionalitySelected(int id);
-  virtual void raiseFunctionality(QAction* action);
+  void Slot_dummy_protected() {};
+  virtual void Selecting(int id);
+  virtual void FunctionalitySelected(int id);
+  virtual void RaiseFunctionality(QAction* action);
 public slots:
-  void slot_dummy() {};
+  void Slot_dummy() {};
 
-  virtual void hideControls(bool hide);
-  virtual void hideMenu(bool hide);
+  virtual void HideControls(bool hide);
+  virtual void HideMenu(bool hide);
 
-  virtual void checkAvailability();
+  virtual void CheckAvailability();
 
-  virtual void raiseFunctionality(int id);
-  virtual void raiseFunctionality(QmitkFunctionality* aFunctionality);
+  virtual void RaiseFunctionality(int id);
+  virtual void RaiseFunctionality(QmitkFunctionality* aFunctionality);
 public:
-  virtual void initialize(QWidget *aLayoutTemplate);
+  virtual void Initialize(QWidget *aLayoutTemplate);
 
-  virtual bool addFunctionality(QmitkFunctionality * functionality);
+  virtual bool AddFunctionality(QmitkFunctionality * functionality);
 
-  virtual QmitkFunctionality* getFunctionalityByName(const char * name);
-  virtual int getFunctionalityIdByName( const char * name );
-  virtual QWidget * getMainParent();
-  virtual QWidget * getControlParent();
-  virtual QButtonGroup * getButtonMenu();
-  virtual QWidget * getToolBar();
-  virtual QWidget * getDefaultMain();
+  virtual QmitkFunctionality* GetFunctionalityByName(const char * name);
+  virtual int GetFunctionalityIdByName( const char * name );
+  virtual QWidget * GetMainParent();
+  virtual QWidget * GetControlParent();
+  virtual QButtonGroup * GetButtonMenu();
+  virtual QWidget * GetToolBar();
+  virtual QWidget * GetDefaultMain();
 
   QmitkFctMediator(QObject *parent=0, const char *name=0);
   virtual ~QmitkFctMediator();

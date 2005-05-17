@@ -51,10 +51,8 @@
     </connection>
 </connections>
 <includes>
-    <include location="local" impldecl="in implementation">QmitkCommonFunctionality.h</include>
     <include location="local" impldecl="in declaration">mitkDataTreeNode.h</include>
     <include location="local" impldecl="in declaration">mitkDataTree.h</include>
-    <include location="local" impldecl="in declaration">QmitkCommonFunctionality.h</include>
     <include location="global" impldecl="in declaration">map</include>
     <include location="local" impldecl="in implementation">QmitkTreeNodeSelector.ui.h</include>
 </includes>
@@ -75,7 +73,8 @@
 <functions>
     <function specifier="static" returnType="bool">IsImageNode( mitk::DataTreeNode * node )</function>
     <function access="protected">init()</function>
-    <function returnType="mitk::DataTreeNode *">GetSelectedNode()</function>
+    <function returnType="mitk::DataTreeNode *">GetSelectedNode() const</function>
+    <function returnType="const mitk::DataTreeIteratorClone *">GetSelectedIterator() const</function>
 </functions>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

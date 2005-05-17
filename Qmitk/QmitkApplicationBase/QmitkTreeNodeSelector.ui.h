@@ -14,6 +14,8 @@
   \class QmitkTreeNodeSelector. A simple ComboXBox for selecting an image node
 */
 #include "mitkDataTreeNode.h"
+#include "QmitkCommonFunctionality.h"
+
 void QmitkTreeNodeSelector::SetDataTreeNodeIterator( mitk::DataTreeIteratorClone it )
 {
   m_DataTreeIteratorClone = it;
@@ -43,7 +45,7 @@ void QmitkTreeNodeSelector::UpdateContent()
     }
   }
   QString newText = m_ComboBox->currentText();
-  if (currentText != newText)
+  if ( (currentText != newText) && (newText.isNull() == false) )
   {
     TreeNodeSelected(newText);
   }
@@ -67,11 +69,11 @@ void QmitkTreeNodeSelector::TreeNodeSelected( const QString &name )
   emit Activated(m_TreeNodes[name.ascii()]->Get());
 }
 
-mitk::DataTreeNode * QmitkTreeNodeSelector::GetSelectedNode()
+mitk::DataTreeNode * QmitkTreeNodeSelector::GetSelectedNode() const
 {
   if (m_ComboBox && !m_ComboBox->currentText().isEmpty())
   {
-    return m_TreeNodes[m_ComboBox->currentText().ascii()]->Get();
+    return m_TreeNodes.find(m_ComboBox->currentText().ascii())->second->Get();
   }
   else
   {
@@ -79,3 +81,14 @@ mitk::DataTreeNode * QmitkTreeNodeSelector::GetSelectedNode()
   }
 }
 
+const mitk::DataTreeIteratorClone * QmitkTreeNodeSelector::GetSelectedIterator() const
+{
+  if (m_ComboBox && !m_ComboBox->currentText().isEmpty())
+  {
+    return &( m_TreeNodes.find(m_ComboBox->currentText().ascii())->second);
+  }
+  else
+  {
+    return NULL;
+  }
+}

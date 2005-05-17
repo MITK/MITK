@@ -465,11 +465,11 @@ static QString SaveImage(mitk::Image* image, QString fileName = 0)
 
   try 
   {
-    typename TImageType::Pointer itkImage = TImageType::New();
-    mitk::CastToItkImage( image, itkImage );
-
     if ( fileName.contains(".pic") == 0 )
     {
+      typename TImageType::Pointer itkImage = TImageType::New();
+      mitk::CastToItkImage( image, itkImage );
+
       if (fileName.contains(".mhd") != 0)
       {
         typename itk::ImageFileWriter<TImageType>::Pointer writer = itk::ImageFileWriter<TImageType>::New();
@@ -513,8 +513,6 @@ static QString SaveImage(mitk::Image* image, QString fileName = 0)
     else
     {
       ipPicDescriptor * picImage = image->GetPic();
-      picImage = ipPicClone(picImage);
-      mitk::PicFileReader::ConvertHandedness(picImage);
       //set tag "REAL PIXEL SIZE"
       mitk::SlicedGeometry3D* slicedGeometry = image->GetSlicedGeometry();
       if (slicedGeometry != NULL)
@@ -537,14 +535,14 @@ static QString SaveImage(mitk::Image* image, QString fileName = 0)
         ((float*)pixelSizeTag->value)[1] = spacing[1];
         ((float*)pixelSizeTag->value)[2] = spacing[2];       
       }
+      mitk::PicFileReader::ConvertHandedness(picImage);
       ipPicPut((char*)(fileName.ascii()), picImage);
-      ipPicFree(picImage);
+      mitk::PicFileReader::ConvertHandedness(picImage);
     }
   }
   catch ( itk::ExceptionObject &err)
   {
-    std::cout << "Exception object caught!" <<std::endl;
-    std::cout << err << std::endl;
+    itkGenericOutputMacro(<< "Exception object caught! " << err);
     return NULL;
   }
   return fileName;

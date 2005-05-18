@@ -74,10 +74,17 @@ PURPOSE.  See the above copyright notices for more information.
 
 #ifdef MBI_INTERNAL
 #ifndef QMITKCOMMONFUNCTIONALITYIMPLEMENTATION
+//#include <boost/graph/graph_traits.hpp>
+//#include <boost/graph/graph_selectors.hpp>
+namespace boost {
+struct directedS;
+struct undirectedS;
+}
 namespace mitk
 {
-  class DirectedVesselGraphData;
-  class UndirectedVesselGraphData;
+  template <typename DirectedCategory> class VesselGraphData;
+  typedef VesselGraphData< boost::undirectedS  > UndirectedVesselGraphData;
+  typedef VesselGraphData< boost::directedS > DirectedVesselGraphData;
 }
 #endif
 #endif

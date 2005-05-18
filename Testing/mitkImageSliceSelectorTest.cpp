@@ -138,9 +138,10 @@ int mitkImageSliceSelectorTest(int argc, char* argv[])
     }
     std::cout<<"Part 2 [PASSED] ";
   }
-  catch ( itk::ExceptionObject )
+  catch ( itk::ExceptionObject &err)
   {
-    std::cout<<"Part 1 [FAILED]"<<std::endl;
+    std::cout<<"Part 1 [PASSED] - exception ... seems to be not ITK 2.0.0 ..."<<std::endl;
+    std::cout<<err<<std::endl;
     return EXIT_FAILURE;
   }
 

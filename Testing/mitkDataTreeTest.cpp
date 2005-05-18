@@ -42,7 +42,7 @@ int mitkDataTreeTest(int argc, char* argv[])
 
   std::cout << "Creating image: ";
 	image=mitk::Image::New();
-image->DebugOn();
+  image->DebugOn();
 	image->Initialize(mitk::PixelType(typeid(int)), 3, dim);
   int *p = (int*)image->GetData();
 
@@ -85,6 +85,10 @@ image->DebugOn();
   node->GetPropertyList()->SetProperty( "levelwindow", levWinProp );
   std::cout<<"[PASSED]"<<std::endl;
 
+  std::cout << "Remove node after incrementing iterator: ";
+  it++;
+  if (it.Remove()) std::cout<<"[PASSED]"<<std::endl;
+  else std::cout<<"[FAILED]"<<std::endl;
 
   std::cout<<"[TEST DONE]"<<std::endl;
   return EXIT_SUCCESS;

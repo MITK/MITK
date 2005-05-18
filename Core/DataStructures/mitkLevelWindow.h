@@ -127,7 +127,7 @@ public:
   /**!
   * \brief sets level/window to the second min/max greyvalues of the given Image
   */
-  void SetAuto(mitk::Image* image, bool tryPicTags = true);
+  void SetAuto(mitk::Image* image, bool tryPicTags = true, bool guessByCentralSlice = true);
 
   /*!
   * \brief equality operator implementation

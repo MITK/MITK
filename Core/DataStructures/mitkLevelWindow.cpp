@@ -18,7 +18,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include "mitkLevelWindow.h"
-#include "mitkImage.h"
+#include "mitkImageSliceSelector.h"
+
 #include <ipFunc/ipFunc.h>
 #include <algorithm>
 
@@ -132,7 +133,7 @@ mitk::ScalarType mitk::LevelWindow::GetRange() const
   return  (m_RangeMax > 0) ? (m_RangeMax - m_RangeMin) : (m_RangeMin - m_RangeMax);
 }
 
-void mitk::LevelWindow::SetAuto(mitk::Image* image, bool tryPicTags)
+void mitk::LevelWindow::SetAuto(mitk::Image* image, bool tryPicTags, bool guessByCentralSlice)
 {
   if( image == NULL )
     return;
@@ -141,6 +142,17 @@ void mitk::LevelWindow::SetAuto(mitk::Image* image, bool tryPicTags)
   {
     if(SetAutoByPicTags(image->GetPic()))
       return;
+  }
+  if(guessByCentralSlice)
+  {
+    mitk::ImageSliceSelector::Pointer sliceSelector = mitk::ImageSliceSelector::New();
+      sliceSelector->SetInput(image);
+      sliceSelector->SetSliceNr(image->GetDimension(2)/2);
+      sliceSelector->SetTimeNr(image->GetDimension(4)/2);
+      sliceSelector->SetChannelNr(image->GetDimension(5)/2);
+      sliceSelector->Update();
+
+    image = sliceSelector->GetOutput();
   }
   SetMinMax(image->GetScalarValue2ndMin(), image->GetScalarValue2ndMax());
 }

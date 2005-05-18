@@ -336,12 +336,9 @@ public:
 
   virtual void SetGeometry(Geometry3D* aGeometry3D);
 
-  //##ModelId=3ED91D060027
-  //##Documentation
-  //## @todo LevelWindow extraction/calculation not yet implemented. 
-  virtual const mitk::LevelWindow& GetLevelWindow() const;
-
   virtual const HistogramType& GetScalarHistogram() const;
+
+  virtual const void ComputeExtrema() const;
 
   //##Documentation
   //## \brief Get the minimum for scalar images
@@ -371,6 +368,9 @@ public:
   //##Documentation
   //## @warning for internal use only
   virtual mitk::ImageDataItem::Pointer GetChannelData(int n = 0);
+
+  template < typename ItkImageType >
+    friend void _ComputeExtremaInItkImage(ItkImageType* itkImage, mitk::Image * mitkImage);
 
 protected:
   //##ModelId=3E155C940248
@@ -422,16 +422,13 @@ protected:
   //##ModelId=3E19EA110292
   bool m_Initialized;
 
-  //##ModelId=3ED91D0503C2
-  mitk::LevelWindow m_LevelWindow;
-
   mutable itk::Object::Pointer m_HistogramGeneratorObject;
-  mutable itk::Object::Pointer m_SliceSelectorForHistogramObject;
 
   mutable ScalarType m_ScalarMin;
   mutable ScalarType m_ScalarMax;
   mutable ScalarType m_Scalar2ndMin;
   mutable ScalarType m_Scalar2ndMax;
+
 };
 
 template <typename ItkOutputImageType> 

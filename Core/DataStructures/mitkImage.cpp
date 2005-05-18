@@ -25,15 +25,13 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkPlaneGeometry.h"
 #include "mitkPicHelper.h"
 
-#include "mitkImageSliceSelector.h"
-
 #include "ipFunc/ipFunc.h"
 
 #include <vtkImageData.h>
 
 mitk::Image::Image() : 
   m_Dimension(0), m_Dimensions(NULL), m_OffsetTable(NULL),
-  m_CompleteData(NULL), m_PixelType(NULL), m_Initialized(false) , m_SliceSelectorForHistogramObject(NULL),
+  m_CompleteData(NULL), m_PixelType(NULL), m_Initialized(false),
   m_ScalarMin(0), m_ScalarMax(0), m_Scalar2ndMin(0), m_Scalar2ndMax(0)
 {
   mitk::HistogramGenerator::Pointer generator = mitk::HistogramGenerator::New();
@@ -562,24 +560,7 @@ bool mitk::Image::SetPicChannel(const ipPicDescriptor *pic, int n)
 void mitk::Image::Initialize()
 {
   mitk::HistogramGenerator* generator = static_cast<mitk::HistogramGenerator*>(m_HistogramGeneratorObject.GetPointer());
-//#if DEBUG || _DEBUG
-  if((GetDimension() > 2))// && ((GetDimension(2) > 5)))
-  {
-    if(m_SliceSelectorForHistogramObject.IsNull())
-      m_SliceSelectorForHistogramObject = mitk::ImageSliceSelector::New();
-
-    mitk::ImageSliceSelector* sliceSelector;
-    sliceSelector = static_cast<mitk::ImageSliceSelector*>(m_SliceSelectorForHistogramObject.GetPointer());
-    sliceSelector->SetInput(this);
-    sliceSelector->SetSliceNr(GetDimension(2)/2);
-    generator->SetImage(sliceSelector->GetOutput());
-  }
-  else
-//#endif
-  {
-    generator->SetImage(this);
-    m_SliceSelectorForHistogramObject = NULL;
-  }
+  generator->SetImage(this);
 }
 
 //##ModelId=3E102AE9004B
@@ -819,9 +800,6 @@ void mitk::Image::Initialize(const ipPicDescriptor* pic, int channels, int tDim,
 
   ComputeOffsetTable();
 
-  // initialize level-window
-  m_LevelWindow.SetAutoByPicTags( pic );
-
   Initialize();
 
   m_Initialized = true;
@@ -981,12 +959,6 @@ unsigned int* mitk::Image::GetDimensions() const
   return m_Dimensions;
 }
 
-//##ModelId=3ED91D060027
-const mitk::LevelWindow& mitk::Image::GetLevelWindow() const
-{
-  return m_LevelWindow;
-}
-
 void mitk::Image::Clear()
 {
   if(m_Initialized)
@@ -1021,68 +993,68 @@ void mitk::Image::SetGeometry(Geometry3D* aGeometry3D)
 const mitk::Image::HistogramType& mitk::Image::GetScalarHistogram() const
 {
   mitk::HistogramGenerator* generator = static_cast<mitk::HistogramGenerator*>(m_HistogramGeneratorObject.GetPointer());
-mitk::ImageSliceSelector* sliceSelector;
-sliceSelector = static_cast<mitk::ImageSliceSelector*>(m_SliceSelectorForHistogramObject.GetPointer());//\fixme XXX in histogram: PipelineMTime nach update??
-if(sliceSelector!=NULL)
- sliceSelector->UpdateLargestPossibleRegion();
   generator->ComputeHistogram();
-  const mitk::Image::HistogramType & histogram = *static_cast<const mitk::Image::HistogramType*>(generator->GetHistogram());
-
-  mitk::Image::HistogramType::ConstIterator it, histend;
-  histend = histogram.End();
-//XXX does not work for very irregular histograms (-32000, 0...500) -> normal Loop!
-  bool first=true;
-  m_ScalarMin = m_Scalar2ndMin = 0;
-  m_ScalarMax = m_Scalar2ndMax = 0;
-  for(it=histogram.Begin();it!=histend;++it)
-  {
-    if(it.GetFrequency() > 0)
-    {
-      if(first)
-      {
-        m_ScalarMin = it.GetMeasurementVector()[0];
-        m_Scalar2ndMin = m_ScalarMin;
-        first = false;
-      }
-      else
-      {
-        m_Scalar2ndMin = it.GetMeasurementVector()[0];
-        break;
-      }
-    }
-  }
-  m_Scalar2ndMax = m_ScalarMax = m_Scalar2ndMin;
-  for(;it!=histend;++it)
-  {
-    if(it.GetFrequency() > 0)
-    {
-      m_Scalar2ndMax = m_ScalarMax;
-      m_ScalarMax = it.GetMeasurementVector()[0];
-    }
-  }
   return *static_cast<const mitk::Image::HistogramType*>(generator->GetHistogram());
+}
+
+#include "mitkImageAccessByItk.h"
+
+template < typename ItkImageType >
+void mitk::_ComputeExtremaInItkImage(ItkImageType* itkImage, mitk::Image* mitkImage)
+{
+	itk::ImageRegionConstIterator<ItkImageType> it(itkImage, itkImage->GetRequestedRegion());
+  //typedef itk::Image<TPixel, VImageDimension> ItkImageType;
+  typedef typename ItkImageType::PixelType TPixel;
+	TPixel value;
+  mitkImage->m_Scalar2ndMin=
+    mitkImage->m_ScalarMin = itk::NumericTraits<TPixel>::max();
+  mitkImage->m_Scalar2ndMax=
+    mitkImage->m_ScalarMax = itk::NumericTraits<TPixel>::min();
+	while( !it.IsAtEnd() )
+  {
+    value = it.Get();  
+    if ( (value > mitkImage->m_ScalarMin) && (value < mitkImage->m_Scalar2ndMin) ) 
+      mitkImage->m_Scalar2ndMin = value;	
+  	else if ( (value < mitkImage->m_ScalarMax) && (value > mitkImage->m_Scalar2ndMax) ) 
+      mitkImage->m_Scalar2ndMax = value;	
+  	else if (value > mitkImage->m_ScalarMax) 
+      mitkImage->m_ScalarMax = value;
+    else if (value < mitkImage->m_ScalarMin) 
+      mitkImage->m_ScalarMin = value;
+    ++it;
+  }
+}
+
+InstantiateAccessFunction_1(mitk::_ComputeExtremaInItkImage, mitk::Image*);
+
+const void mitk::Image::ComputeExtrema() const
+{
+  if(GetSource() != NULL)
+    GetSource()->UpdateLargestPossibleRegion();
+  mitk::Image* image = const_cast<mitk::Image*>(this);
+  AccessByItk_1( this, _ComputeExtremaInItkImage, image);
 }
 
 mitk::ScalarType mitk::Image::GetScalarValueMin() const
 {
-  GetScalarHistogram();
+  ComputeExtrema();
   return m_ScalarMin;
 }
 
 mitk::ScalarType mitk::Image::GetScalarValueMax() const
 {
-  GetScalarHistogram();
+  ComputeExtrema();
   return m_ScalarMax;
 }
 
 mitk::ScalarType mitk::Image::GetScalarValue2ndMin() const
 {
-  GetScalarHistogram();
+  ComputeExtrema();
   return m_Scalar2ndMin;
 }
 
 mitk::ScalarType mitk::Image::GetScalarValue2ndMax() const
 {
-  GetScalarHistogram();
+  ComputeExtrema();
   return m_Scalar2ndMax;
 }

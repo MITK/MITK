@@ -1,7 +1,10 @@
-#include "QmitkCommonFunctionality.h"
+#include "mitkConfig.h"
 #ifdef MBI_INTERNAL
+  #include "mitkVesselGraphData.h"
   #include "mitkVesselGraphFileWriter.h"
 #endif
+#define QMITKCOMMONFUNCTIONALITYIMPLEMENTATION
+#include "QmitkCommonFunctionality.h"
 
 #ifdef MBI_INTERNAL
   /**

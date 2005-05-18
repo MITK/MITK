@@ -77,7 +77,7 @@ void QmitkVolumetry::CreateConnections()
 {  
   if ( m_Controls )   
   {    
-    connect(m_Controls, SIGNAL( InitializeStandardViews(mitk::BaseData::Pointer) ), this, SLOT( InitializeStandardViews(mitk::BaseData::Pointer) ));
+    // connect(m_Controls, SIGNAL( InitializeStandardViews(mitk::BaseData::Pointer) ), this, SLOT( InitializeStandardViews(mitk::BaseData::Pointer) ));
   }
 }
 

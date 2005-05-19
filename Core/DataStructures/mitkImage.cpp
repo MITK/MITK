@@ -1000,7 +1000,7 @@ const mitk::Image::HistogramType& mitk::Image::GetScalarHistogram() const
 #include "mitkImageAccessByItk.h"
 
 template < typename ItkImageType >
-void mitk::_ComputeExtremaInItkImage(ItkImageType* itkImage, mitk::Image* mitkImage)
+void _ComputeExtremaInItkImage(ItkImageType* itkImage, mitk::Image* mitkImage)
 {
 	itk::ImageRegionConstIterator<ItkImageType> it(itkImage, itkImage->GetRequestedRegion());
   //typedef itk::Image<TPixel, VImageDimension> ItkImageType;
@@ -1025,7 +1025,7 @@ void mitk::_ComputeExtremaInItkImage(ItkImageType* itkImage, mitk::Image* mitkIm
   }
 }
 
-InstantiateAccessFunction_1(mitk::_ComputeExtremaInItkImage, mitk::Image*);
+InstantiateAccessFunction_1(_ComputeExtremaInItkImage, mitk::Image*);
 
 const void mitk::Image::ComputeExtrema() const
 {

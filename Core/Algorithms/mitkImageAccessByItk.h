@@ -64,36 +64,36 @@ PURPOSE.  See the above copyright notices for more information.
 #define InstantiateAccessFunction_2(itkImgFunc, param1Type, param2Type)                \
   InstantiateAccessFunctionForFixedDimension_2(itkImgFunc, 2, param1Type, param2Type)  \
   InstantiateAccessFunctionForFixedDimension_2(itkImgFunc, 3, param1Type, param2Type)         
-
+#define TEMPLATE_INSTANTIATION_PREFIX
 #define InstantiateAccessFunctionForFixedDimension(itkImgFunc, dimension)  \
-template void itkImgFunc(itk::Image<double, dimension>*);                  \
-template void itkImgFunc(itk::Image<float, dimension>*);                   \
-template void itkImgFunc(itk::Image<int, dimension>*);                     \
-template void itkImgFunc(itk::Image<unsigned int, dimension>*);            \
-template void itkImgFunc(itk::Image<short, dimension>*);                   \
-template void itkImgFunc(itk::Image<unsigned short, dimension>*);          \
-template void itkImgFunc(itk::Image<char, dimension>*);                    \
-template void itkImgFunc(itk::Image<unsigned char, dimension>*);           
+TEMPLATE_INSTANTIATION_PREFIX void itkImgFunc(itk::Image<double, dimension>*);                  \
+TEMPLATE_INSTANTIATION_PREFIX void itkImgFunc(itk::Image<float, dimension>*);                   \
+TEMPLATE_INSTANTIATION_PREFIX void itkImgFunc(itk::Image<int, dimension>*);                     \
+TEMPLATE_INSTANTIATION_PREFIX void itkImgFunc(itk::Image<unsigned int, dimension>*);            \
+TEMPLATE_INSTANTIATION_PREFIX void itkImgFunc(itk::Image<short, dimension>*);                   \
+TEMPLATE_INSTANTIATION_PREFIX void itkImgFunc(itk::Image<unsigned short, dimension>*);          \
+TEMPLATE_INSTANTIATION_PREFIX void itkImgFunc(itk::Image<char, dimension>*);                    \
+TEMPLATE_INSTANTIATION_PREFIX void itkImgFunc(itk::Image<unsigned char, dimension>*);           
 
 #define InstantiateAccessFunctionForFixedDimension_1(itkImgFunc, dimension, param1Type)\
-template void itkImgFunc(itk::Image<double, dimension>*, param1Type);                  \
-template void itkImgFunc(itk::Image<float, dimension>*, param1Type);                   \
-template void itkImgFunc(itk::Image<int, dimension>*, param1Type);                     \
-template void itkImgFunc(itk::Image<unsigned int, dimension>*, param1Type);            \
-template void itkImgFunc(itk::Image<short, dimension>*, param1Type);                   \
-template void itkImgFunc(itk::Image<unsigned short, dimension>*, param1Type);          \
-template void itkImgFunc(itk::Image<char, dimension>*, param1Type);                    \
-template void itkImgFunc(itk::Image<unsigned char, dimension>*, param1Type);           
+TEMPLATE_INSTANTIATION_PREFIX void itkImgFunc(itk::Image<double, dimension>*, param1Type);                  \
+TEMPLATE_INSTANTIATION_PREFIX void itkImgFunc(itk::Image<float, dimension>*, param1Type);                   \
+TEMPLATE_INSTANTIATION_PREFIX void itkImgFunc(itk::Image<int, dimension>*, param1Type);                     \
+TEMPLATE_INSTANTIATION_PREFIX void itkImgFunc(itk::Image<unsigned int, dimension>*, param1Type);            \
+TEMPLATE_INSTANTIATION_PREFIX void itkImgFunc(itk::Image<short, dimension>*, param1Type);                   \
+TEMPLATE_INSTANTIATION_PREFIX void itkImgFunc(itk::Image<unsigned short, dimension>*, param1Type);          \
+TEMPLATE_INSTANTIATION_PREFIX void itkImgFunc(itk::Image<char, dimension>*, param1Type);                    \
+TEMPLATE_INSTANTIATION_PREFIX void itkImgFunc(itk::Image<unsigned char, dimension>*, param1Type);           
 
 #define InstantiateAccessFunctionForFixedDimension_2(itkImgFunc, dimension, param1Type, param2Type)\
-template void itkImgFunc(itk::Image<double, dimension>*, param1Type, param2Type);                  \
-template void itkImgFunc(itk::Image<float, dimension>*, param1Type, param2Type);                   \
-template void itkImgFunc(itk::Image<int, dimension>*, param1Type, param2Type);                     \
-template void itkImgFunc(itk::Image<unsigned int, dimension>*, param1Type, param2Type);            \
-template void itkImgFunc(itk::Image<short, dimension>*, param1Type, param2Type);                   \
-template void itkImgFunc(itk::Image<unsigned short, dimension>*, param1Type, param2Type);          \
-template void itkImgFunc(itk::Image<char, dimension>*, param1Type, param2Type);                    \
-template void itkImgFunc(itk::Image<unsigned char, dimension>*, param1Type, param2Type);           
+TEMPLATE_INSTANTIATION_PREFIX void itkImgFunc(itk::Image<double, dimension>*, param1Type, param2Type);                  \
+TEMPLATE_INSTANTIATION_PREFIX void itkImgFunc(itk::Image<float, dimension>*, param1Type, param2Type);                   \
+TEMPLATE_INSTANTIATION_PREFIX void itkImgFunc(itk::Image<int, dimension>*, param1Type, param2Type);                     \
+TEMPLATE_INSTANTIATION_PREFIX void itkImgFunc(itk::Image<unsigned int, dimension>*, param1Type, param2Type);            \
+TEMPLATE_INSTANTIATION_PREFIX void itkImgFunc(itk::Image<short, dimension>*, param1Type, param2Type);                   \
+TEMPLATE_INSTANTIATION_PREFIX void itkImgFunc(itk::Image<unsigned short, dimension>*, param1Type, param2Type);          \
+TEMPLATE_INSTANTIATION_PREFIX void itkImgFunc(itk::Image<char, dimension>*, param1Type, param2Type);                    \
+TEMPLATE_INSTANTIATION_PREFIX void itkImgFunc(itk::Image<unsigned char, dimension>*, param1Type, param2Type);           
 
 #define _accessByItk(mitkImage, itkImageTypeFunction, pixeltype, dimension)            \
   if ( typeId == typeid(pixeltype) )                                                   \

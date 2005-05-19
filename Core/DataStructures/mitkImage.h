@@ -336,25 +336,23 @@ public:
 
   virtual void SetGeometry(Geometry3D* aGeometry3D);
 
-  virtual const HistogramType& GetScalarHistogram() const;
-
-  virtual const void ComputeExtrema() const;
+  virtual const HistogramType* GetScalarHistogram(int t=0) const;
 
   //##Documentation
   //## \brief Get the minimum for scalar images
-  virtual ScalarType GetScalarValueMin() const;
+  virtual ScalarType GetScalarValueMin(int t=0) const;
 
   //##Documentation
   //## \brief Get the maximum for scalar images
-  virtual ScalarType GetScalarValueMax() const;
+  virtual ScalarType GetScalarValueMax(int t=0) const;
 
   //##Documentation
   //## \brief Get the second smallest value for scalar images
-  virtual ScalarType GetScalarValue2ndMin() const;
+  virtual ScalarType GetScalarValue2ndMin(int t=0) const;
 
   //##Documentation
   //## \brief Get the second largest value for scalar images
-  virtual ScalarType GetScalarValue2ndMax() const;
+  virtual ScalarType GetScalarValue2ndMax(int t=0) const;
 
   //##ModelId=3E0B4A6A01EC
   //##Documentation
@@ -381,6 +379,8 @@ protected:
 
   //##ModelId=3E155E7A0374
   void ComputeOffsetTable();
+
+  virtual const void ComputeExtrema(int t=0) const;
 
   //##ModelId=3E1569310328
   virtual mitk::ImageDataItem::Pointer AllocateSliceData(int s = 0, int t = 0, int n = 0);
@@ -424,6 +424,7 @@ protected:
 
   mutable itk::Object::Pointer m_HistogramGeneratorObject;
 
+  mutable itk::Object::Pointer m_TimeSelectorForExtremaObject;
   mutable ScalarType m_ScalarMin;
   mutable ScalarType m_ScalarMax;
   mutable ScalarType m_Scalar2ndMin;

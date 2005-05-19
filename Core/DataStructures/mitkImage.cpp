@@ -24,6 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkSlicedGeometry3D.h"
 #include "mitkPlaneGeometry.h"
 #include "mitkPicHelper.h"
+#include "mitkImageTimeSelector.h"
 
 #include "ipFunc/ipFunc.h"
 
@@ -32,6 +33,7 @@ PURPOSE.  See the above copyright notices for more information.
 mitk::Image::Image() : 
   m_Dimension(0), m_Dimensions(NULL), m_OffsetTable(NULL),
   m_CompleteData(NULL), m_PixelType(NULL), m_Initialized(false),
+  m_TimeSelectorForExtremaObject(NULL),
   m_ScalarMin(0), m_ScalarMax(0), m_Scalar2ndMin(0), m_Scalar2ndMax(0)
 {
   mitk::HistogramGenerator::Pointer generator = mitk::HistogramGenerator::New();
@@ -561,6 +563,13 @@ void mitk::Image::Initialize()
 {
   mitk::HistogramGenerator* generator = static_cast<mitk::HistogramGenerator*>(m_HistogramGeneratorObject.GetPointer());
   generator->SetImage(this);
+
+  if(m_TimeSelectorForExtremaObject.IsNull())
+    m_TimeSelectorForExtremaObject = mitk::ImageTimeSelector::New();
+
+  mitk::ImageTimeSelector* timeSelector;
+  timeSelector = static_cast<mitk::ImageTimeSelector*>(m_TimeSelectorForExtremaObject.GetPointer());
+  timeSelector->SetInput(this);
 }
 
 //##ModelId=3E102AE9004B
@@ -990,17 +999,26 @@ void mitk::Image::SetGeometry(Geometry3D* aGeometry3D)
   m_Geometry3D->ImageGeometryOn();
 }
 
-const mitk::Image::HistogramType& mitk::Image::GetScalarHistogram() const
+const mitk::Image::HistogramType* mitk::Image::GetScalarHistogram(int t) const
 {
-  mitk::HistogramGenerator* generator = static_cast<mitk::HistogramGenerator*>(m_HistogramGeneratorObject.GetPointer());
-  generator->ComputeHistogram();
-  return *static_cast<const mitk::Image::HistogramType*>(generator->GetHistogram());
+  mitk::ImageTimeSelector* timeSelector;
+  timeSelector = static_cast<mitk::ImageTimeSelector*>(m_TimeSelectorForExtremaObject.GetPointer());
+  if(timeSelector!=NULL)
+  {
+    timeSelector->SetTimeNr(t);
+    timeSelector->UpdateLargestPossibleRegion();
+
+    mitk::HistogramGenerator* generator = static_cast<mitk::HistogramGenerator*>(m_HistogramGeneratorObject.GetPointer());
+    generator->ComputeHistogram();
+    return static_cast<const mitk::Image::HistogramType*>(generator->GetHistogram());
+  }
+  return NULL;
 }
 
 #include "mitkImageAccessByItk.h"
 
 template < typename ItkImageType >
-void _ComputeExtremaInItkImage(ItkImageType* itkImage, mitk::Image* mitkImage)
+void mitk::_ComputeExtremaInItkImage(ItkImageType* itkImage, mitk::Image* mitkImage)
 {
 	itk::ImageRegionConstIterator<ItkImageType> it(itkImage, itkImage->GetRequestedRegion());
   //typedef itk::Image<TPixel, VImageDimension> ItkImageType;
@@ -1025,36 +1043,39 @@ void _ComputeExtremaInItkImage(ItkImageType* itkImage, mitk::Image* mitkImage)
   }
 }
 
-InstantiateAccessFunction_1(_ComputeExtremaInItkImage, mitk::Image*);
-
-const void mitk::Image::ComputeExtrema() const
+const void mitk::Image::ComputeExtrema(int t) const
 {
-  if(GetSource() != NULL)
-    GetSource()->UpdateLargestPossibleRegion();
-  mitk::Image* image = const_cast<mitk::Image*>(this);
-  AccessByItk_1( this, _ComputeExtremaInItkImage, image);
+  mitk::ImageTimeSelector* timeSelector;
+  timeSelector = static_cast<mitk::ImageTimeSelector*>(m_TimeSelectorForExtremaObject.GetPointer());
+  if(timeSelector!=NULL)
+  {
+    timeSelector->SetTimeNr(t);
+    timeSelector->UpdateLargestPossibleRegion();
+    mitk::Image* image = timeSelector->GetOutput();
+    AccessByItk_1( image, _ComputeExtremaInItkImage, image );
+  }
 }
 
-mitk::ScalarType mitk::Image::GetScalarValueMin() const
+mitk::ScalarType mitk::Image::GetScalarValueMin(int t) const
 {
-  ComputeExtrema();
+  ComputeExtrema(t);
   return m_ScalarMin;
 }
 
-mitk::ScalarType mitk::Image::GetScalarValueMax() const
+mitk::ScalarType mitk::Image::GetScalarValueMax(int t) const
 {
-  ComputeExtrema();
+  ComputeExtrema(t);
   return m_ScalarMax;
 }
 
-mitk::ScalarType mitk::Image::GetScalarValue2ndMin() const
+mitk::ScalarType mitk::Image::GetScalarValue2ndMin(int t) const
 {
-  ComputeExtrema();
+  ComputeExtrema(t);
   return m_Scalar2ndMin;
 }
 
-mitk::ScalarType mitk::Image::GetScalarValue2ndMax() const
+mitk::ScalarType mitk::Image::GetScalarValue2ndMax(int t) const
 {
-  ComputeExtrema();
+  ComputeExtrema(t);
   return m_Scalar2ndMax;
 }

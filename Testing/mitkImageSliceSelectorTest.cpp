@@ -111,38 +111,44 @@ int mitkImageSliceSelectorTest(int argc, char* argv[])
   {
     std::cout << "Testing another, smaller (!!) input with the same slice-selector(): ";
     //Use CylindricToCartesianFilter
-	  mitk::CylindricToCartesianFilter::Pointer cyl2cart = mitk::CylindricToCartesianFilter::New();
+    mitk::CylindricToCartesianFilter::Pointer cyl2cart = mitk::CylindricToCartesianFilter::New();
       cyl2cart->SetInput(image);
       //the output size of this filter is smaller than the of the input!!
       cyl2cart->SetTargetXSize( 64 );
 
     //Use the same slice-selector again, this time to take a slice of the filtered image
       //which is smaller than the one of the old input!!
-	  slice->SetInput(cyl2cart->GetOutput());
+    slice->SetInput(cyl2cart->GetOutput());
       slice->SetSliceNr(1);
-	    slice->Update();
 
-    //Check that the requested region is now the one of the smaller image
+      //The requested region is still the old one, 	 
+      //therefore the following results in most ITK versions
+      //in an exception!
+      slice->Update();
+
+    //If no exception occured, check that the requested region is now 
+    //the one of the smaller image
     if(cyl2cart->GetOutput()->GetLargestPossibleRegion().GetSize()[0]!=64)
     {
       std::cout<<"Part 1 [FAILED]"<<std::endl;
       return EXIT_FAILURE;
     }
-    std::cout<<"Part 1 [PASSED] ";
+    std::cout<<"Part 1 (without exception) [PASSED] ";
 
     //Check that the size of the output is now the one of the smaller image
     if((cyl2cart->GetOutput()->GetDimensions()[0]!=64) || (cyl2cart->GetOutput()->GetDimensions()[1]!=64))
     {
-      std::cout<<"Part 2 [FAILED]"<<std::endl;
+      std::cout<<"Part 1b [FAILED]"<<std::endl;
       return EXIT_FAILURE;
     }
-    std::cout<<"Part 2 [PASSED] ";
+    std::cout<<"Part 1b [PASSED] ";
   }
   catch ( itk::ExceptionObject &err)
   {
-    std::cout<<"Part 1 [PASSED] - exception ... seems to be not ITK 2.0.0 ..."<<std::endl;
+    std::cout<<"Part 1(with expected exception) ... seems to be not ITK 2.0.0 [PASSED]"<<std::endl;
     std::cout<<err<<std::endl;
-    return EXIT_FAILURE;
+    //after such an exception, we need to call ResetPipeline.
+    slice->ResetPipeline();
   }
 
   try
@@ -151,10 +157,10 @@ int mitkImageSliceSelectorTest(int argc, char* argv[])
   }
   catch ( itk::ExceptionObject )
   {
-    std::cout<<"Part 3 [FAILED]"<<std::endl;
+    std::cout<<"Part 2 [FAILED]"<<std::endl;
     return EXIT_FAILURE;
   }
-  std::cout<<"Part 3 [PASSED]"<<std::endl;
+  std::cout<<"Part 2 [PASSED]"<<std::endl;
 
   std::cout << "Testing IsInitialized(): ";
   if(slice->GetOutput()->IsInitialized()==false)

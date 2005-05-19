@@ -1052,7 +1052,8 @@ const void mitk::Image::ComputeExtrema(int t) const
     timeSelector->SetTimeNr(t);
     timeSelector->UpdateLargestPossibleRegion();
     mitk::Image* image = timeSelector->GetOutput();
-    AccessByItk_1( image, _ComputeExtremaInItkImage, image );
+    mitk::Image* thisImage = const_cast<Image*>(this);
+    AccessByItk_1( image, _ComputeExtremaInItkImage, thisImage );
   }
 }
 

@@ -86,7 +86,7 @@ int mitkDataTreeTest(int argc, char* argv[])
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "Remove node after incrementing iterator: ";
-  it++;
+  ++it;
   if (it.Remove()) std::cout<<"[PASSED]"<<std::endl;
   else std::cout<<"[FAILED]"<<std::endl;
 

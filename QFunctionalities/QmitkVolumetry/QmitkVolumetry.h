@@ -67,6 +67,8 @@ class QmitkVolumetry : public QmitkFunctionality
   virtual QAction * CreateAction(QActionGroup *parent);
 
   virtual void Activated();
+  virtual void Deactivated();
+
 public slots:
   void InitializeStandardViews(mitk::BaseData::Pointer data);
 protected slots:  

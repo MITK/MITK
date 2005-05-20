@@ -18,6 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "QmitkVolumetry.h"
 #include "QmitkVolumetryControls.h"
+#include "QmitkVolumetryWidget.h"
 #include <qaction.h>
 #include "icon.xpm"
 #include <mitkEventMapper.h>
@@ -96,7 +97,21 @@ void QmitkVolumetry::TreeChanged()
 void QmitkVolumetry::Activated()
 {  
   QmitkFunctionality::Activated();
+
+  mitk::DataTreeNode* overlayNode = m_Controls->m_VolumetryWidget->GetOverlayNode();
+  if(overlayNode)
+    overlayNode->SetVisibility(true);
 }
+
+void QmitkVolumetry::Deactivated()
+{  
+  mitk::DataTreeNode* overlayNode = m_Controls->m_VolumetryWidget->GetOverlayNode();
+  if(overlayNode)
+    overlayNode->SetVisibility(false);
+
+  QmitkFunctionality::Deactivated();
+}
+
 void QmitkVolumetry::InitializeStandardViews(mitk::BaseData::Pointer data)
 {
   m_MultiWidget->InitializeStandardViews( data->GetGeometry() );

@@ -115,6 +115,8 @@ void QcMITKSamplePlugin::selectSerie (QcLightbox* lightbox)
 
   if ( image.IsNotNull() )
   {
+    unsigned long initTime = ap->GetMultiWidget()->GetRenderWindow1()->GetRenderer()->GetMTime();
+
     mitk::DataTree::Pointer tree = ap->GetTree();
     mitk::DataTreePreOrderIterator it(tree);
     mitk::DataTreeNode::Pointer node = mitk::DataTreeNode::New();
@@ -142,7 +144,7 @@ void QcMITKSamplePlugin::selectSerie (QcLightbox* lightbox)
     else 
       node->SetProperty("name", new mitk::StringProperty( lightbox->name() ));
 
-    if(ap->GetStandardViewsInitialized()==false)
+    if((ap->GetMultiWidget()->GetRenderWindow1()->GetRenderer()->GetMTime()==initTime) && (ap->GetStandardViewsInitialized()==false))
     {
       ap->SetStandardViewsInitialized(ap->GetMultiWidget()->InitializeStandardViews(&it));
     }

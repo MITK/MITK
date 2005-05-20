@@ -738,15 +738,16 @@ void mitk::DataTreeNodeFactory::ReadFileTypeITKImageIOFactory()
   mitk::StringProperty::Pointer nameProp = new mitk::StringProperty( this->GetBaseFileName() );
   node->SetProperty( "name", nameProp );
 
-  SetDefaultImageProperties(node);
-
   // add level-window property
-  mitk::LevelWindowProperty::Pointer levWinProp = new mitk::LevelWindowProperty();
-  mitk::LevelWindow levelwindow;
-  levelwindow.SetAuto( image );
-  levWinProp->SetLevelWindow( levelwindow );
-  node->GetPropertyList()->SetProperty( "levelwindow", levWinProp );
-
+  if ( image->GetPixelType().GetNumberOfComponents() == 1 )
+  {
+    SetDefaultImageProperties( node );
+    mitk::LevelWindowProperty::Pointer levWinProp = new mitk::LevelWindowProperty();
+    mitk::LevelWindow levelwindow;
+    levelwindow.SetAuto( image );
+    levWinProp->SetLevelWindow( levelwindow );
+    node->GetPropertyList()->SetProperty( "levelwindow", levWinProp );
+  }
   std::cout << "...finished!" << std::endl;
 }
 
@@ -1003,18 +1004,16 @@ void mitk::DataTreeNodeFactory::ReadFileSeriesTypeITKImageSeriesReader()
       mitk::StringProperty::Pointer nameProp = new mitk::StringProperty( prefix );
       node->SetProperty( "name", nameProp );
 
-
-      SetDefaultImageProperties(node);
-
-      // add level-window property
-      mitk::LevelWindowProperty::Pointer levWinProp = new mitk::LevelWindowProperty();
-      mitk::LevelWindow levelwindow;
-
-      levelwindow.SetAuto( image );
-      levWinProp->SetLevelWindow( levelwindow );
-
-      node->GetPropertyList()->SetProperty( "levelwindow", levWinProp );
-
+      if ( image->GetPixelType().GetNumberOfComponents() == 1 )
+      {
+        SetDefaultImageProperties(node);
+        // add level-window property
+        mitk::LevelWindowProperty::Pointer levWinProp = new mitk::LevelWindowProperty();
+        mitk::LevelWindow levelwindow;
+        levelwindow.SetAuto( image );
+        levWinProp->SetLevelWindow( levelwindow );
+        node->GetPropertyList()->SetProperty( "levelwindow", levWinProp );
+      }
     }
   }
   catch ( const std::exception & e )

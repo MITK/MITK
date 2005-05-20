@@ -118,7 +118,7 @@ void QmitkVolumetryWidget::CalculateTimeSeries()
         vs << timeStep++ << "\t" << *it << std::endl;
       }
       m_TextEdit->setText(vs.str().c_str());
-      m_TextEdit->setTabStopWidth(2);
+      m_TextEdit->setTabStopWidth(20);
     }
   }
 }

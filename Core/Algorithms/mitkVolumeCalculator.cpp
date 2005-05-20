@@ -60,6 +60,7 @@ void mitk::VolumeCalculator::ComputeVolume()
       m_Volumes[timeStep] = m_Volume;
     }
   } else if (m_Image->GetDimension() == 3) {
+    const_cast<mitk::Image*>(m_Image.GetPointer())->Update();
     AccessFixedDimensionByItk_1(m_Image,InternalCompute,3,this);
   } else {
     m_Volume = 0;

@@ -62,6 +62,7 @@ void QmitkVolumetryWidget::SetDataTreeNode(mitk::DataTreeNode* node)
   if (m_Node)
   {
     mitk::Image* image = dynamic_cast<mitk::Image*>(m_Node->GetData());
+    image->Update();
     if (image)
     {
       if (image->GetDimension() == 4)
@@ -94,6 +95,30 @@ void QmitkVolumetryWidget::CalculateVolume()
       std::stringstream vs;
       vs << volCalc->GetVolume() << " ml";
       m_Result->setText(vs.str().c_str() );
+    }
+  }
+}
+
+void QmitkVolumetryWidget::CalculateTimeSeries()
+{
+  if (m_Node)
+  {
+    mitk::Image* image = dynamic_cast<mitk::Image*>(m_Node->GetData());
+    if (image)
+    {
+      mitk::VolumeCalculator::Pointer volCalc = mitk::VolumeCalculator::New();
+      volCalc->SetImage(image);
+      volCalc->SetThreshold(m_ThresholdSlider->value());
+      volCalc->ComputeVolume();
+      std::vector<float> volumes = volCalc->GetVolumes();
+      std::stringstream vs;
+      int timeStep = 0;
+      for (std::vector<float>::iterator it = volumes.begin(); it != volumes.end(); it++)
+      {
+        vs << timeStep++ << "\t" << *it << std::endl;
+      }
+      m_TextEdit->setText(vs.str().c_str());
+      m_TextEdit->setTabStopWidth(2);
     }
   }
 }

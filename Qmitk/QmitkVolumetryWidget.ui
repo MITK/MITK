@@ -216,6 +216,12 @@
         <receiver>QmitkVolumetryWidget</receiver>
         <slot>m_ThresholdSlider_valueChanged(int)</slot>
     </connection>
+    <connection>
+        <sender>m_TimeSeriesButton</sender>
+        <signal>clicked()</signal>
+        <receiver>QmitkVolumetryWidget</receiver>
+        <slot>CalculateTimeSeries()</slot>
+    </connection>
 </connections>
 <includes>
     <include location="local" impldecl="in declaration">mitkDataTreeNode.h</include>
@@ -234,6 +240,7 @@
     <slot>SetDataTreeNodeIterator( mitk::DataTreeIteratorClone it )</slot>
     <slot>SetDataTreeNode( mitk::DataTreeNode * node )</slot>
     <slot access="protected">CalculateVolume()</slot>
+    <slot access="protected">CalculateTimeSeries()</slot>
     <slot>UpdateSlider()</slot>
     <slot>m_ThresholdSlider_valueChanged( int value )</slot>
 </slots>

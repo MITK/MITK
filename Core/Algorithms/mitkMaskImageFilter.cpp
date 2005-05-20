@@ -22,6 +22,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkTimeHelper.h"
 #include "mitkProperties.h"
 
+#include "itkImageRegionConstIterator.h"
+#include "itkImageRegionIteratorWithIndex.h"
+
 mitk::MaskImageFilter::MaskImageFilter() : m_Mask(NULL)
 {
   this->SetNumberOfInputs(2);

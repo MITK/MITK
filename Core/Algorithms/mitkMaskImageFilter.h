@@ -24,6 +24,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkImageToImageFilter.h"
 #include "mitkImageTimeSelector.h"
 
+namespace itk {
+template <class TPixel, unsigned int VImageDimension> class ITK_EXPORT Image;
+}
+
 namespace mitk {
 
 //##Documentation
@@ -50,8 +54,8 @@ protected:
 
   virtual void GenerateData();
 
-  template < typename ItkInputImageType >
-    friend void _InternalComputeMask(ItkInputImageType* itkImage, mitk::MaskImageFilter* volumeCalculator);
+  template < typename TPixel, unsigned int VImageDimension >
+    friend void _InternalComputeMask(itk::Image<TPixel, VImageDimension>* itkImage, mitk::MaskImageFilter* volumeCalculator);
 
   mitk::Image::Pointer m_Mask;
   mitk::ImageTimeSelector::Pointer m_InputTimeSelector;

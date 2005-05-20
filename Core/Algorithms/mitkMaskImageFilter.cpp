@@ -95,13 +95,13 @@ void mitk::MaskImageFilter::GenerateOutputInformation()
   m_TimeOfHeaderInitialization.Modified();
 }
 
-template < typename ItkInputImageType >
-void mitk::_InternalComputeMask(ItkInputImageType* inputItkImage, mitk::MaskImageFilter* MaskImageFilter)
+template < typename TPixel, unsigned int VImageDimension >
+void mitk::_InternalComputeMask(itk::Image<TPixel, VImageDimension>* inputItkImage, mitk::MaskImageFilter* MaskImageFilter)
 {
-  typedef typename ItkInputImageType::PixelType TPixel;
+  typedef itk::Image<TPixel, VImageDimension> ItkInputImageType;
 
-  typedef itk::Image<unsigned char, ::itk::GetImageDimension<ItkInputImageType>::ImageDimension> ItkMaskImageType;
-  typedef itk::Image<TPixel, ::itk::GetImageDimension<ItkInputImageType>::ImageDimension> ItkOutputImageType;
+  typedef itk::Image<unsigned char, VImageDimension> ItkMaskImageType;
+  typedef itk::Image<TPixel, VImageDimension> ItkOutputImageType;
 
   typedef itk::ImageRegionConstIterator< ItkInputImageType > ItkInputImageIteratorType;
   typedef itk::ImageRegionConstIterator< ItkMaskImageType > ItkMaskImageIteratorType;

@@ -127,6 +127,12 @@
                     <verstretch>0</verstretch>
                 </sizepolicy>
             </property>
+            <property name="frameShape">
+                <enum>LineEditPanel</enum>
+            </property>
+            <property name="frameShadow">
+                <enum>Sunken</enum>
+            </property>
         </widget>
         <widget class="QPushButton" row="3" column="0">
             <property name="name">
@@ -205,12 +211,6 @@
         <slot>CalculateVolume()</slot>
     </connection>
     <connection>
-        <sender>m_TimeSeriesButton</sender>
-        <signal>clicked()</signal>
-        <receiver>QmitkVolumetryWidget</receiver>
-        <slot>CalculateTimeSeries()</slot>
-    </connection>
-    <connection>
         <sender>m_ThresholdSlider</sender>
         <signal>valueChanged(int)</signal>
         <receiver>QmitkVolumetryWidget</receiver>
@@ -226,20 +226,22 @@
     <include location="local" impldecl="in implementation">QmitkVolumetryWidget.ui.h</include>
 </includes>
 <variables>
-  <variable>mitk::DataTreeIteratorClone m_DataTreeIteratorClone;</variable>
-    <variable>const mitk::DataTreeNode* m_Node;</variable>
+    <variable>mitk::DataTreeIteratorClone m_DataTreeIteratorClone;</variable>
+    <variable>mitk::DataTreeNode::Pointer m_Node;</variable>
     <variable>mitk::DataTreeNode::Pointer m_OverlayNode;</variable>
 </variables>
 <slots>
     <slot>SetDataTreeNodeIterator( mitk::DataTreeIteratorClone it )</slot>
     <slot>SetDataTreeNode( mitk::DataTreeNode * node )</slot>
     <slot access="protected">CalculateVolume()</slot>
-    <slot>CalculateTimeSeries()</slot>
     <slot>UpdateSlider()</slot>
-    <slot>m_ThresholdSlider_valueChanged( int )</slot>
+    <slot>m_ThresholdSlider_valueChanged( int value )</slot>
 </slots>
 <functions>
+    <function returnType="mitk::DataTreeNode *">GetImageNode()</function>
     <function access="protected">CreateOverlayChild()</function>
+    <function returnType="mitk::DataTreeNode *">GetOverlayNode()</function>
+    <function returnType="mitk::Image *">GetImage()</function>
 </functions>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

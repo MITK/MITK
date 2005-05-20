@@ -73,6 +73,7 @@ void QmitkVolumetryWidget::SetDataTreeNode(mitk::DataTreeNode* node)
         m_CalcButton->setEnabled(true);
       }
       UpdateSlider();
+      mitk::RenderWindow::UpdateAllInstances();
     }
   }
 }
@@ -97,40 +98,22 @@ void QmitkVolumetryWidget::CalculateVolume()
   }
 }
 
-void QmitkVolumetryWidget::CalculateTimeSeries()
+mitk::DataTreeNode* QmitkVolumetryWidget::GetImageNode()
 {
-  if (m_Node)
-  {
-    mitk::Image* image = dynamic_cast<mitk::Image*>(m_Node->GetData());
-    if (image)
-    {
-      mitk::VolumeCalculator::Pointer volCalc = mitk::VolumeCalculator::New();
-      volCalc->SetImage(image);
-      volCalc->SetThreshold(m_ThresholdSlider->value());
-      volCalc->ComputeVolume();
-      std::vector<float> volumes = volCalc->GetVolumes();
-      std::stringstream vs;
-      int timeStep = 0;
-      for (std::vector<float>::iterator it = volumes.begin(); it != volumes.end(); it++)
-      {
-        vs << timeStep++ << "," << *it << std::endl;
-      }
-      m_TextEdit->setText(vs.str().c_str());
-    }
-  }
+  return m_Node;
 }
 
 void QmitkVolumetryWidget::UpdateSlider()
 {
-
   if (m_Node && dynamic_cast<mitk::Image*>(m_Node->GetData()))
   {
     mitk::Image* image = dynamic_cast<mitk::Image*>(m_Node->GetData());
-        m_ThresholdSlider->setMinValue((int)image->GetScalarValueMin());
-        m_ThresholdSlider->setMaxValue((int)image->GetScalarValueMax());
-        m_ThresholdSlider->setEnabled(true);
-        m_ThresholdLabel->setNum(m_ThresholdSlider->value());
-}
+    image->Update();
+    m_ThresholdSlider->setMinValue((int)image->GetScalarValue2ndMin());
+    m_ThresholdSlider->setMaxValue((int)image->GetScalarValueMax());
+    m_ThresholdSlider->setEnabled(true);
+    m_ThresholdLabel->setNum(m_ThresholdSlider->value());
+  }
 }
 
 
@@ -147,7 +130,7 @@ void QmitkVolumetryWidget::CreateOverlayChild()
     mitk::StringProperty::Pointer nameProp = new mitk::StringProperty("volume threshold overlay image" );
     m_OverlayNode->SetProperty( "name", nameProp );
     m_OverlayNode->SetData(m_Node->GetData());
-    m_OverlayNode->SetColor(1.0,0.0,0.0);
+    m_OverlayNode->SetColor(0.0,1.0,0.0);
     m_OverlayNode->SetOpacity(.7);
     m_OverlayNode->SetLevelWindow(mitk::LevelWindow(m_ThresholdSlider->value(),1));
   
@@ -163,4 +146,18 @@ void QmitkVolumetryWidget::CreateOverlayChild()
       ++iteratorClone;
     }
   }
+}
+
+
+mitk::DataTreeNode* QmitkVolumetryWidget::GetOverlayNode()
+{
+    return m_OverlayNode;
+}
+
+
+
+
+mitk::Image* QmitkVolumetryWidget::GetImage()
+{
+    return dynamic_cast<mitk::Image*>(m_Node->GetData());
 }

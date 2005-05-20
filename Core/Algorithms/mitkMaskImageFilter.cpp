@@ -22,6 +22,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkTimeHelper.h"
 #include "mitkProperties.h"
 
+#include "mitkImageToItk.h"
+
 #include "itkImageRegionConstIterator.h"
 #include "itkImageRegionIteratorWithIndex.h"
 

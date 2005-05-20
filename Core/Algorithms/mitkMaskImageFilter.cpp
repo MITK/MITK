@@ -123,7 +123,7 @@ void mitk::_InternalComputeMask(itk::Image<TPixel, VImageDimension>* inputItkIma
   typename ItkOutputImageType::Pointer outputItkImage = outputimagetoitk->GetOutput();
 
   // create the iterators
-  ItkInputImageType::RegionType inputRegionOfInterest = inputItkImage->GetLargestPossibleRegion();
+  typename ItkInputImageType::RegionType inputRegionOfInterest = inputItkImage->GetLargestPossibleRegion();
   ItkInputImageIteratorType  inputIt( inputItkImage, inputRegionOfInterest );
   ItkMaskImageIteratorType  maskIt ( maskItkImage, inputRegionOfInterest );
   ItkOutputImageIteratorType outputIt( outputItkImage, inputRegionOfInterest );
@@ -148,7 +148,7 @@ void mitk::_InternalComputeMask(itk::Image<TPixel, VImageDimension>* inputItkIma
 void mitk::MaskImageFilter::GenerateData()
 {
   mitk::Image::ConstPointer input = this->GetInput();
-  mitk::Image::ConstPointer mask  = m_Mask;
+  mitk::Image::Pointer mask  = m_Mask;
   mitk::Image::Pointer output = this->GetOutput();
 
   if((output->IsInitialized()==false) || (mask.IsNull()) || (mask->GetTimeSlicedGeometry()->GetTimeSteps() == 0))

@@ -57,7 +57,7 @@ public:
 
   const mitk::Image *GetSourceImage(void);
   virtual void SetSourceImage(const mitk::Image *source); 
-  bool SetSourceByTreeSearch(mitk::DataTreeIteratorBase* iterator);
+  virtual bool SetSourceByTreeSearch(mitk::DataTreeIteratorBase* iterator);
 
   //##Description 
   //## @brief Set the lightbox to write into
@@ -69,7 +69,7 @@ public:
   //## The current lightbox at the time of the method
   //## call is set as lightbox to write into.
   //## \sa SetLightBox
-  void SetLightBoxToCurrentLightBox();
+  virtual void SetLightBoxToCurrentLightBox();
 
   //##Description 
   //## @brief Get the lightbox to write into
@@ -89,7 +89,7 @@ public:
   //##Documentation
   //## @brief Set the level-window, which will be written in the
   //## lightbox
-  void SetLevelWindow(const LevelWindow& levelwindow)
+  virtual void SetLevelWindow(const LevelWindow& levelwindow)
   {
     if(m_LevelWindow!=levelwindow)
     {
@@ -105,7 +105,7 @@ protected:
 
   LightBoxResultImageWriter();
 
-  ~LightBoxResultImageWriter();
+  virtual ~LightBoxResultImageWriter();
 
   QcLightbox* m_LightBox;
 

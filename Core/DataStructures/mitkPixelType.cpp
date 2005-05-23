@@ -18,13 +18,14 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include "mitkPixelType.h"
+#include <itkVector.h>
 #include <itkRGBPixel.h>
 #include <itkRGBAPixel.h>
 
 //##ModelId=3E1412720060
 mitk::PixelType::PixelType( const mitk::PixelType& aPixelType )
 {
-   Initialize( aPixelType.GetType(), aPixelType.GetBpe() );
+  Initialize( *aPixelType.GetTypeId(), aPixelType.GetNumberOfComponents() );
 }
 
 //##ModelId=3E15F73502BB
@@ -47,7 +48,7 @@ mitk::PixelType::PixelType( ipPicType_t type, int bpe, int numberOfComponents ) 
 }
 
 //##ModelId=3E1400060113
-mitk::PixelType::PixelType( const ipPicDescriptor* pic )
+mitk::PixelType::PixelType( const ipPicDescriptor* pic ) : m_NumberOfComponents( 1 )
 {
    if ( pic != NULL )
       Initialize( pic->type, pic->bpe );
@@ -111,6 +112,34 @@ void mitk::PixelType::Initialize( const std::type_info& aTypeId, int numberOfCom
    {
       m_Type = ipPicUInt;
       m_Bpe = sizeof(unsigned char) * 8 * m_NumberOfComponents;
+   }
+   else if ( *m_TypeId == typeid( itk::Vector<double,3> ) )
+   {
+      m_TypeId = & typeid( double );
+      m_NumberOfComponents *= 3;
+      m_Type = ipPicFloat;
+      m_Bpe = sizeof(double) * 8 * m_NumberOfComponents;
+   }
+   else if ( *m_TypeId == typeid( itk::Vector<float,3> ) )
+   {
+      m_TypeId = & typeid( float );
+      m_NumberOfComponents *= 3;
+      m_Type = ipPicFloat;
+      m_Bpe = sizeof(float) * 8 * m_NumberOfComponents;
+   }
+   else if ( *m_TypeId == typeid( itk::Vector<double,2> ) )
+   {
+      m_TypeId = & typeid( double );
+      m_NumberOfComponents *= 2;
+      m_Type = ipPicFloat;
+      m_Bpe = sizeof(double) * 8 * m_NumberOfComponents;
+   }
+   else if ( *m_TypeId == typeid( itk::Vector<float,2> ) )
+   {
+      m_TypeId = & typeid( float );
+      m_NumberOfComponents *= 2;
+      m_Type = ipPicFloat;
+      m_Bpe = sizeof(float) * 8 * m_NumberOfComponents;
    }
    else if ( *m_TypeId == typeid( itk::RGBPixel<unsigned char> ) )
    {

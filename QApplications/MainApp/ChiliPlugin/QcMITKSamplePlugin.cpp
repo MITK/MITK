@@ -27,13 +27,11 @@
 QcPlugin* QcMITKSamplePlugin::s_PluginInstance = NULL;
 
 QcMITKSamplePlugin::QcMITKSamplePlugin( QWidget *parent )
-  : QcPlugin( parent )
+  : QcPlugin( parent ), ap(NULL)
 {
   task = new QcTask( xpm(), parent, name() );
 
-  ap = new SampleApp(task,"sample",0);
   toolbar =new ToolBar(task,this);
-  toolbar->SetWidget(ap);
 
   QButtonGroup* tb;
   tb=toolbar->GetToolBar();
@@ -159,7 +157,8 @@ void QcMITKSamplePlugin::selectSerie (QcLightbox* lightbox)
 
 void QcMITKSamplePlugin::CreateNewSampleApp()
 {
-  delete ap;
+  if(ap!=NULL)
+    delete ap;
   ap = new SampleApp(task,"sample",0);
   toolbar->SetWidget(ap);
 }

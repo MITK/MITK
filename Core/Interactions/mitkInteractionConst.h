@@ -117,13 +117,13 @@ typedef enum EOperations
   OpSELECTPOINT = 700,
   OpSELECTLINE = 701,
   OpSELECTCELL = 702,
-  OpSELECTSUBOBJECT = 703, //for VesselGraphInteractor2
-  //OpSELECTNEWSUBOBJECT = 704, //for VesselGraphInteractor2
+  OpSELECTSUBOBJECT = 703, //for VesselGraphInteractor
+  //OpSELECTNEWSUBOBJECT = 704, //for VesselGraphInteractor
   OpDESELECTPOINT = 800,
   OpDESELECTLINE = 801,
   OpDESELECTCELL = 802,
-  OpDESELECTSUBOBJECT = 803,  //for VesselGraphInteractor2
-  OpDESELECTALL = 804,     //for VesselGraphInteractor2
+  OpDESELECTSUBOBJECT = 803,  //for VesselGraphInteractor
+  OpDESELECTALL = 804,     //for VesselGraphInteractor
   OpNAVIGATE = 900,       
   OpZOOM = 1000,
   OpSCALE = 1100,
@@ -131,12 +131,12 @@ typedef enum EOperations
   OpSETPOINTTYPE = 1210,
   OpMODECHANGE = 1500,
   OpSENDCOORDINATES = 1600,
-  OpPERIPHERYSEARCH = 2000,  //used in VesselGraphInteractor2
-  OpROOTSEARCH = 2001,        //used in VesselGraphInteractor2
-  OpTHICKSTVESSELSEARCH = 2002,       //used in VesselGraphInteractor2
-  OpSHORTESTPATHSEARCH = 2003,       //used in VesselGraphInteractor2
-  OpATTRIBUTATION = 2004,       //used in VesselGraphInteractor2
-  OpDEFAULT = 2006,                  //used in VesselGraphInteractor2
+  OpPERIPHERYSEARCH = 2000,  //used in VesselGraphInteractor
+  OpROOTSEARCH = 2001,        //used in VesselGraphInteractor
+  OpTHICKSTVESSELSEARCH = 2002,       //used in VesselGraphInteractor
+  OpSHORTESTPATHSEARCH = 2003,       //used in VesselGraphInteractor
+  OpATTRIBUTATION = 2004,       //used in VesselGraphInteractor
+  OpDEFAULT = 2006,                  //used in VesselGraphInteractor
 };
 
 //##Constants for EventMapping...
@@ -185,7 +185,7 @@ typedef enum EActions
   AcSELECTPOINT = 66,
   AcSELECTLINE = 68,
   AcSELECTCELL = 67,
-  AcSELECTSUBOBJECT = 69,    //used in VesselGraphInteractor2
+  AcSELECTSUBOBJECT = 69,    //used in VesselGraphInteractor
   AcDESELECTOBJECT = 70, //deselect picked from group
   AcDESELECTALL = 72,
   AcDESELECT = 75,
@@ -201,7 +201,7 @@ typedef enum EActions
   AcREMOVE = 101,
   AcREMOVELINE = 102,
   AcREMOVEALL = 103,
-  AcREMOVESELECTEDSUBOBJECT = 104,             //used in VesselGraphInteractor2
+  AcREMOVESELECTEDSUBOBJECT = 104,             //used in VesselGraphInteractor
   AcINSERTPOINT = 110,
   AcINSERTLINE = 111,
   AcDELETEPOINT = 120,
@@ -228,13 +228,13 @@ typedef enum EActions
   AcFORCESUBINTERACTORS = 1550,
   AcSENDCOORDINATES = 1600,
   AcTRANSMITEVENT = 2000,  //to transmit an event to a lower Interactor/Statemachine
-  AcPERIPHERYSEARCH = 3000,  //used in VesselGraphInteractor2
-  AcROOTSEARCH = 3001,       //used in VesselGraphInteractor2
-  AcTHICKSTVESSELSEARCH = 3002,       //used in VesselGraphInteractor2
-  AcSHORTESTPATHSEARCH = 3003,       //used in VesselGraphInteractor2
-  AcSINGLE = 3004,                    //used in VesselGraphInteractor2
-  AcATTRIBUTATION = 3005,              //used in VesselGraphInteractor2
-  AcDEFAULT = 3007,                  //used in VesselGraphInteractor2
+  AcPERIPHERYSEARCH = 3000,  //used in VesselGraphInteractor
+  AcROOTSEARCH = 3001,       //used in VesselGraphInteractor
+  AcTHICKSTVESSELSEARCH = 3002,       //used in VesselGraphInteractor
+  AcSHORTESTPATHSEARCH = 3003,       //used in VesselGraphInteractor
+  AcSINGLE = 3004,                    //used in VesselGraphInteractor
+  AcATTRIBUTATION = 3005,              //used in VesselGraphInteractor
+  AcDEFAULT = 3007,                  //used in VesselGraphInteractor
   AcCHECKBARRIERSTATUS = 3010
 };
 

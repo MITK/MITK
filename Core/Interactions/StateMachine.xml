@@ -1284,12 +1284,11 @@
      </transition>
     </state>
   </stateMachine>
-  <stateMachine NAME="VesselGraphInteractor2">
+  <stateMachine NAME="VesselGraphInteractor">
     <state NAME="Start" ID="1" START_STATE="TRUE">
       <transition NAME="goToCheckPicking" NEXT_STATE_ID="2" EVENT_ID="5">
          <action ID="31"/>  <!-- AcCHECKOBJECT  -->
       </transition>   
-      
     </state>
     <state NAME="CheckPicking" ID="2">
       <transition NAME="noPicked" NEXT_STATE_ID="4" EVENT_ID="1003" > 
@@ -1379,7 +1378,6 @@
         <action ID="81"/>   <!-- AcNEWSUBOBJECT -->
         <action ID="72"/>   <!-- AcDESELECTALL -->
       </transition>
-      <!--transition NAME="goToCheckPicking" NEXT_STATE_ID="5" EVENT_ID="5" /-->
       <transition NAME="deselectAll" NEXT_STATE_ID="1" EVENT_ID="14" >
         <action ID="72"/>  <!-- AcDESELECTALL -->
       </transition>

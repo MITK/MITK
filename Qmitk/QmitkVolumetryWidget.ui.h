@@ -35,6 +35,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkRenderWindow.h"
 #include "mitkDataTreeHelper.h"
 
+#include <qdir.h>
+#include <qfiledialog.h>
+#include <qmessagebox.h>
+
 void QmitkVolumetryWidget::SetDataTreeNodeIterator( mitk::DataTreeIteratorClone it )
 {
   m_DataTreeIteratorClone = it;
@@ -45,9 +49,9 @@ void QmitkVolumetryWidget::SetDataTreeNode(mitk::DataTreeNode* node)
   m_Node = node;
   if (m_OverlayNode)
   {
-   // remove it from the tree
-   mitk::DataTreeIteratorClone overlayIt = mitk::DataTreeHelper::FindIteratorToNode(m_DataTreeIteratorClone->GetTree(),m_OverlayNode);
-   if (overlayIt.IsNotNull()) { overlayIt->Remove(); } 
+    // remove it from the tree
+    mitk::DataTreeIteratorClone overlayIt = mitk::DataTreeHelper::FindIteratorToNode(m_DataTreeIteratorClone->GetTree(),m_OverlayNode);
+    if (overlayIt.IsNotNull()) { overlayIt->Remove(); }
     m_OverlayNode = NULL;
   }
   CreateOverlayChild();
@@ -58,6 +62,8 @@ void QmitkVolumetryWidget::SetDataTreeNode(mitk::DataTreeNode* node)
   }
   m_CalcButton->setEnabled(false);
   m_TimeSeriesButton->setEnabled(false);
+  m_SaveCsvButton->setEnabled(false);
+  m_TextEdit->clear();
 
   if (m_Node)
   {
@@ -119,6 +125,7 @@ void QmitkVolumetryWidget::CalculateTimeSeries()
       }
       m_TextEdit->setText(vs.str().c_str());
       m_TextEdit->setTabStopWidth(20);
+      m_SaveCsvButton->setEnabled(true);
     }
   }
 }
@@ -156,9 +163,9 @@ void QmitkVolumetryWidget::CreateOverlayChild()
     m_OverlayNode->SetProperty( "name", nameProp );
     m_OverlayNode->SetData(m_Node->GetData());
     m_OverlayNode->SetColor(0.0,1.0,0.0);
-    m_OverlayNode->SetOpacity(.7);
+    m_OverlayNode->SetOpacity(.25);
     m_OverlayNode->SetLevelWindow(mitk::LevelWindow(m_ThresholdSlider->value(),1));
-  
+
     // hack!!!
     mitk::DataTreeIteratorClone iteratorClone = m_DataTreeIteratorClone;
     while ( !iteratorClone->IsAtEnd() )
@@ -176,7 +183,7 @@ void QmitkVolumetryWidget::CreateOverlayChild()
 
 mitk::DataTreeNode* QmitkVolumetryWidget::GetOverlayNode()
 {
-    return m_OverlayNode;
+  return m_OverlayNode;
 }
 
 
@@ -184,5 +191,31 @@ mitk::DataTreeNode* QmitkVolumetryWidget::GetOverlayNode()
 
 mitk::Image* QmitkVolumetryWidget::GetImage()
 {
-    return dynamic_cast<mitk::Image*>(m_Node->GetData());
+  return dynamic_cast<mitk::Image*>(m_Node->GetData());
+}
+void QmitkVolumetryWidget::SaveCsvButtonClicked()
+{
+  static QString lastSavePath = QDir::home().absPath();
+  QString s = QFileDialog::getSaveFileName(
+                lastSavePath,
+                "CSV Files (*.csv)",
+                NULL,
+                "Save file dialog"
+                "Choose a filename to save under" );
+  if (! s.isEmpty())
+  {
+    lastSavePath = s;
+    QFile saveFile(s);
+    if ( saveFile.open( IO_WriteOnly ) )
+    {
+      QTextStream stream( &saveFile );
+      stream << m_TextEdit->text().replace('\t',';');
+      saveFile.close();
+    }
+    else
+    {
+      // QMessageBox::critical(NULL,"Save Error!",QString("Saving of CSV failed! Couldn't open output file \"") + saveFile + QString("\""),QMessageBox:Ok,QMessageBox::NoButton);
+      QMessageBox::critical(NULL,"Save Error!","Saving of CSV failed! Couldn't open output file \"" + saveFile.name() +"\"",QMessageBox::Ok,QMessageBox::NoButton);
+    }
+  }
 }

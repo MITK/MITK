@@ -8,7 +8,7 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>462</width>
+            <width>351</width>
             <height>464</height>
         </rect>
     </property>
@@ -112,7 +112,7 @@
                 </sizepolicy>
             </property>
             <property name="text">
-                <string>Calc!</string>
+                <string>C&amp;alc!</string>
             </property>
         </widget>
         <widget class="QLineEdit" row="2" column="1">
@@ -153,7 +153,7 @@
                 <string>Time series</string>
             </property>
         </widget>
-        <spacer row="5" column="1">
+        <spacer row="6" column="1">
             <property name="name">
                 <cstring>spacer1</cstring>
             </property>
@@ -170,7 +170,7 @@
                 </size>
             </property>
         </spacer>
-        <widget class="QTextEdit" row="3" column="1" rowspan="2" colspan="1">
+        <widget class="QTextEdit" row="3" column="1" rowspan="3" colspan="1">
             <property name="name">
                 <cstring>m_TextEdit</cstring>
             </property>
@@ -191,10 +191,29 @@
             <property name="sizeHint">
                 <size>
                     <width>20</width>
-                    <height>131</height>
+                    <height>60</height>
                 </size>
             </property>
         </spacer>
+        <widget class="QPushButton" row="5" column="0">
+            <property name="name">
+                <cstring>m_SaveCsvButton</cstring>
+            </property>
+            <property name="enabled">
+                <bool>false</bool>
+            </property>
+            <property name="sizePolicy">
+                <sizepolicy>
+                    <hsizetype>3</hsizetype>
+                    <vsizetype>5</vsizetype>
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                </sizepolicy>
+            </property>
+            <property name="text">
+                <string>Save CSV</string>
+            </property>
+        </widget>
     </grid>
 </widget>
 <connections>
@@ -222,6 +241,12 @@
         <receiver>QmitkVolumetryWidget</receiver>
         <slot>CalculateTimeSeries()</slot>
     </connection>
+    <connection>
+        <sender>m_SaveCsvButton</sender>
+        <signal>clicked()</signal>
+        <receiver>QmitkVolumetryWidget</receiver>
+        <slot>SaveCsvButtonClicked()</slot>
+    </connection>
 </connections>
 <includes>
     <include location="local" impldecl="in declaration">mitkDataTreeNode.h</include>
@@ -229,7 +254,6 @@
     <include location="global" impldecl="in implementation">string</include>
     <include location="local" impldecl="in implementation">mitkImage.h</include>
     <include location="local" impldecl="in implementation">mitkVolumeCalculator.h</include>
-    <include location="local" impldecl="in implementation">QmitkVolumetryWidget.ui.h</include>
 </includes>
 <variables>
     <variable>mitk::DataTreeIteratorClone m_DataTreeIteratorClone;</variable>
@@ -243,6 +267,7 @@
     <slot access="protected">CalculateTimeSeries()</slot>
     <slot>UpdateSlider()</slot>
     <slot>m_ThresholdSlider_valueChanged( int value )</slot>
+    <slot>SaveCsvButtonClicked()</slot>
 </slots>
 <functions>
     <function returnType="mitk::DataTreeNode *">GetImageNode()</function>

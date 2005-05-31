@@ -110,49 +110,10 @@ public:
   itkGetConstReferenceMacro(TimeBoundsInMS, TimeBounds);
   virtual void SetTimeBoundsInMS(const TimeBounds& timebounds);
 
-  Point3D GetCornerPoint(int id) const
-  {
-    assert(id >= 0);
-    assert(m_BoundingBox.IsNotNull());
+  Point3D GetCornerPoint(int id) const;
 
-    BoundingBox::BoundsArrayType bounds = m_BoundingBox->GetBounds();
+  Point3D GetCornerPoint(bool xFront=true, bool yFront=true, bool zFront=true) const;
 
-    Point3D cornerpoint;
-    switch(id)
-    {
-      case 0: FillVector3D(cornerpoint, bounds[0],bounds[2],bounds[4]); break;
-      case 1: FillVector3D(cornerpoint, bounds[0],bounds[2],bounds[5]); break;
-      case 2: FillVector3D(cornerpoint, bounds[0],bounds[3],bounds[4]); break;
-      case 3: FillVector3D(cornerpoint, bounds[0],bounds[3],bounds[5]); break;
-      case 4: FillVector3D(cornerpoint, bounds[1],bounds[2],bounds[4]); break;
-      case 5: FillVector3D(cornerpoint, bounds[1],bounds[2],bounds[5]); break;
-      case 6: FillVector3D(cornerpoint, bounds[1],bounds[3],bounds[4]); break;
-      case 7: FillVector3D(cornerpoint, bounds[1],bounds[3],bounds[5]); break;
-      default: assert(id < 8);
-    }
-    if(m_ImageGeometry)
-    {
-      FillVector3D(cornerpoint, cornerpoint[0]-0.5, cornerpoint[1]-0.5, cornerpoint[2]-0.5);
-    }
-    return m_IndexToWorldTransform->TransformPoint(cornerpoint);
-  }
-
-  Point3D GetCornerPoint(bool xFront=true, bool yFront=true, bool zFront=true) const
-  {
-    assert(m_BoundingBox.IsNotNull());
-    BoundingBox::BoundsArrayType bounds = m_BoundingBox->GetBounds();
-
-    Point3D cornerpoint;
-    cornerpoint[0] = (xFront ? bounds[0] : bounds[1]);
-    cornerpoint[1] = (yFront ? bounds[2] : bounds[3]);
-    cornerpoint[2] = (zFront ? bounds[4] : bounds[5]);
-    if(m_ImageGeometry)
-    {
-      FillVector3D(cornerpoint, cornerpoint[0]-0.5, cornerpoint[1]-0.5, cornerpoint[2]-0.5);
-    }
-
-    return m_IndexToWorldTransform->TransformPoint(cornerpoint);
-  }
 
   //##Documentation
   //## @brief Get vector along bounding-box in the specified @a direction in mm

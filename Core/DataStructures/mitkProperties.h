@@ -27,23 +27,16 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk {
 
    typedef GenericProperty<bool> BoolProperty;
-   template class GenericProperty<bool>;
 
    typedef GenericProperty<int> IntProperty;
-   template class GenericProperty<int>;
 
    typedef GenericProperty<float> FloatProperty;
-   template class GenericProperty<float>;
 
    typedef GenericProperty<double> DoubleProperty;
-   template class GenericProperty<double>;
 
    typedef GenericProperty<Point3D> Point3dProperty;
-   template class GenericProperty<Point3D>;
 
    typedef GenericProperty<itk::Point<int, 3> > Point3iProperty;
-   template class GenericProperty<itk::Point<int, 3> >;
-
 } // namespace mitk  
 
 #endif /* MITKPROPERTIES_H_HEADER_INCLUDED */

@@ -19,3 +19,10 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkProperties.h"
 
+template class mitk::GenericProperty<bool>;
+template class mitk::GenericProperty<int>;
+template class mitk::GenericProperty<float>;
+template class mitk::GenericProperty<double>;
+template class mitk::GenericProperty<mitk::Point3D>;
+template class mitk::GenericProperty<itk::Point<int, 3> >;
+               

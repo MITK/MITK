@@ -81,7 +81,11 @@ QmitkPropertyListViewItem* QmitkPropertyListViewItem::CreateInstance(mitk::Prope
   }
   else
   {
-    newItem->m_Control = new QLabel(QString(baseProp->GetValueAsString().c_str()),parent);
+    if (baseProp) {
+      newItem->m_Control = new QLabel(QString(baseProp->GetValueAsString().c_str()),parent);
+    } else {
+      newItem->m_Control = new QLabel("n/a",parent);
+    }
   }
   newItem->m_EnabledButton->show();
   newItem->m_Label->show();

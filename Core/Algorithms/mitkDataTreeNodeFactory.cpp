@@ -232,12 +232,9 @@ void mitk::DataTreeNodeFactory::ReadFileTypeSTL()
     surface->SetVtkPolyData( stlReader->GetOutput() );
     mitk::DataTreeNode::Pointer node = this->GetOutput();
     node->SetData( surface );
-
+    SetDefaultSurfaceProperties( node );
     // set filename without path as string property
     mitk::StringProperty::Pointer nameProp = new mitk::StringProperty( this->GetBaseFileName() );
-    node->SetProperty( "lineWidth", new mitk::IntProperty(2) );
-    node->SetProperty( "name", nameProp );
-    node->SetProperty( "wireframe", new mitk::BoolProperty(false));
   }
 
   stlReader->Delete();
@@ -915,7 +912,7 @@ void mitk::DataTreeNodeFactory::ReadFileSeriesTypeITKImageSeriesReader()
   }
   if ( matchedFiles.size() == 0 )
   {
-    itkWarningMacro( << "Sorry, none of the files matched the prefix!" )
+    itkWarningMacro( << "Sorry, none of the files matched the prefix!" );
       return ;
   }
 
@@ -966,7 +963,7 @@ void mitk::DataTreeNodeFactory::ReadFileSeriesTypeITKImageSeriesReader()
   }
   if ( sortedFiles.size() == 0 )
   {
-    itkWarningMacro( << "Sorry, no numbered files found, I can't load anything..." )
+    itkWarningMacro( << "Sorry, no numbered files found, I can't load anything..." );
       return ;
   }
 
@@ -1066,9 +1063,19 @@ void mitk::DataTreeNodeFactory::ReadFileSeriesTypeSTL()
   std::cout << "...finished!" << std::endl;
 }
 
-void mitk::DataTreeNodeFactory::SetDefaultImageProperties(mitk::DataTreeNode::Pointer &node) {
+void mitk::DataTreeNodeFactory::SetDefaultImageProperties(mitk::DataTreeNode::Pointer &node) 
+{
   node->SetProperty( "volumerendering", new mitk::BoolProperty( false ) );
   node->SetProperty( "iilInterpolation", new mitk::BoolProperty( false ) );
   node->SetProperty( "vtkInterpolation", new mitk::BoolProperty( false ) );
   node->SetProperty( "texture interpolation", new mitk::BoolProperty( true ) );
 }; 
+
+void mitk::DataTreeNodeFactory::SetDefaultSurfaceProperties(mitk::DataTreeNode::Pointer &node)
+{
+    node->SetProperty( "lineWidth", new mitk::IntProperty(2) );
+    node->SetProperty( "name", nameProp );
+    node->SetProperty( "wireframe", new mitk::BoolProperty(false));
+    node->SetProperty( "color", new mitk::ColorProperty(1.0f, 1.0f, 1.0f));
+    node->SetProperty( "opacity", new mitk::FloatProperty(1.0f));
+}

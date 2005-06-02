@@ -235,6 +235,7 @@ void mitk::DataTreeNodeFactory::ReadFileTypeSTL()
     SetDefaultSurfaceProperties( node );
     // set filename without path as string property
     mitk::StringProperty::Pointer nameProp = new mitk::StringProperty( this->GetBaseFileName() );
+    node->SetProperty( "name", nameProp );
   }
 
   stlReader->Delete();
@@ -263,7 +264,7 @@ void mitk::DataTreeNodeFactory::ReadFileTypeVTK()
     // set filename without path as string property
     mitk::StringProperty::Pointer nameProp = new mitk::StringProperty( this->GetBaseFileName() );
     node->SetProperty( "name", nameProp );
-    node->SetProperty( "wireframe", new mitk::BoolProperty(false));
+    SetDefaultSurfaceProperties( node );
   }
 
   reader->Delete();
@@ -1056,7 +1057,7 @@ void mitk::DataTreeNodeFactory::ReadFileSeriesTypeSTL()
 
   mitk::DataTreeNode::Pointer node = this->GetOutput();
   node->SetData( surface );
-
+  SetDefaultSurfaceProperties( node );
   // set filename without path as string property
   mitk::StringProperty::Pointer nameProp = new mitk::StringProperty( this->GetBaseFilePrefix() + ".stl" );
   node->SetProperty( "name", nameProp );
@@ -1074,7 +1075,6 @@ void mitk::DataTreeNodeFactory::SetDefaultImageProperties(mitk::DataTreeNode::Po
 void mitk::DataTreeNodeFactory::SetDefaultSurfaceProperties(mitk::DataTreeNode::Pointer &node)
 {
     node->SetProperty( "lineWidth", new mitk::IntProperty(2) );
-    node->SetProperty( "name", nameProp );
     node->SetProperty( "wireframe", new mitk::BoolProperty(false));
     node->SetProperty( "color", new mitk::ColorProperty(1.0f, 1.0f, 1.0f));
     node->SetProperty( "opacity", new mitk::FloatProperty(1.0f));

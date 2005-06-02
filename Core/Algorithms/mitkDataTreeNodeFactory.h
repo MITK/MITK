@@ -82,7 +82,16 @@ public:
   */
   itkGetStringMacro( FilePattern );
 
+  /**
+   * Sets default properties common to all image types
+   */
   static void SetDefaultImageProperties(DataTreeNode::Pointer &node);
+  
+  /**
+   * Sets default properites common to all data types representing a surface
+   */
+  static void SetDefaultSurfaceProperties(DataTreeNode::Pointer &node);
+  
 protected:
 
   /**

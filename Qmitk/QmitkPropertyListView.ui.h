@@ -38,24 +38,20 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qsizepolicy.h>
 
 #include "QmitkPropertyListViewItem.h"
+#include "QmitkCommonFunctionality.h"
 #include "mitkPropertyManager.h"
 #include "itkCommand.h"
 #include <map>
 
 void QmitkPropertyListView::init()
 {
-  std::cout << "init()" << std::endl;
   m_MainGroup->setColumns(1);
   // m_MainGroup->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
-  QScrollView* qsv = new QScrollView(m_MainGroup);
-  m_Group = new QGroupBox(qsv->viewport());
-  qsv->addChild(m_Group);
-  qsv->show();
-  m_Group->setColumns(3);
-  // m_Group->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
-  m_Group->show();
+  m_ScrollView = new QScrollView(m_MainGroup);
+  m_Group = NULL;
   m_PropertyList = NULL;
 }
+
 void QmitkPropertyListView::SetPropertyList( mitk::PropertyList *propertyList )
 {
   if (propertyList != m_PropertyList)
@@ -89,17 +85,36 @@ void QmitkPropertyListView::SetPropertyList( mitk::PropertyList *propertyList )
       int row = 0;
       const mitk::PropertyList::PropertyMap* propertyMap = propertyList->GetMap();
 
-      // clear the group
+// from c'tor
+  // m_Group->destroy();
+  delete m_Group;
+  m_Items.clear();
+  m_Group = new QGroupBox(m_ScrollView->viewport());
+  m_ScrollView->addChild(m_Group);
+  m_ScrollView->show();
+  m_Group->setColumns(3);
+  // m_Group->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
+  m_Group->show();
+
+ /*     // clear the group
       for (std::map<std::string,QmitkPropertyListViewItem*>::iterator it = m_Items.begin() ; it != m_Items.end() ; it++)
       {
         delete it->second->m_EnabledButton;
         delete it->second->m_Label;
         delete it->second->m_Control;
-      }
-      m_Items.clear();
+      } */
+      
       for (mitk::PropertyList::PropertyMap::const_iterator mapiter = propertyMap->begin(); mapiter!=propertyMap->end(); ++mapiter)
       {
-        QmitkPropertyListViewItem* item = QmitkPropertyListViewItem::CreateInstance(propertyList,mapiter->first,m_Group);
+        // QmitkPropertyListViewItem* item = QmitkPropertyListViewItem::CreateInstance(propertyList,mapiter->first,m_Group);
+        QmitkPropertyListViewItem* item = QmitkPropertyListViewItem::CreateInstance(propertyList,mapiter->first,NULL);
+        item->m_EnabledButton->reparent(m_Group,QPoint(),true);
+        item->m_Label->reparent(m_Group,QPoint(),true);
+        item->m_Control->reparent(m_Group,QPoint(),true);
+     //  item->m_EnabledButton->show();
+     //   item->m_Label->show();
+     //   item->m_Control->show();
+
         m_Items.insert(std::make_pair(item->m_Name,item));
       }
     }
@@ -135,3 +150,32 @@ void QmitkPropertyListView::PropertyListModified()
   }
 }
 
+void QmitkPropertyListView::SetMultiMode( std::vector<std::string> propertyNames, CommonFunctionality::DataTreeIteratorVector nodes )
+{
+//   m_Group->destroy();
+   delete m_Group;
+  m_Items.clear();
+  m_Group = new QGroupBox(m_ScrollView->viewport());
+  m_ScrollView->addChild(m_Group);
+  m_ScrollView->show();
+  m_Group->setColumns(propertyNames.size());
+  m_Group->show();
+  
+  for (CommonFunctionality::DataTreeIteratorVector::iterator node = nodes.begin() ; node != nodes.end() ; node++ ) {
+    for (std::vector<std::string>::iterator propNameIt = propertyNames.begin(); propNameIt != propertyNames.end(); propNameIt++) {   
+       //QmitkPropertyListViewItem* item = QmitkPropertyListViewItem::CreateInstance(m_PropertyList,iter->first,m_Group);
+    // add the control thing
+      std::string nodeName;
+      (*node)->Get()->GetName(nodeName); 
+      std::cout << nodeName << " / " << *propNameIt << std::endl;
+      QmitkPropertyListViewItem* item = QmitkPropertyListViewItem::CreateInstance((*node)->Get()->GetPropertyList(),*propNameIt,NULL);
+      item->m_Control->reparent(m_Group,QPoint(),true);
+      item->m_Label->hide();
+      item->m_EnabledButton->hide();
+    // add the control thing
+    
+    }
+  } 
+    
+    
+}

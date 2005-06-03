@@ -340,7 +340,7 @@ void QmitkDataManagerControls::RendererChange()
     {
       if  (m_RenderWindowCombo->isEnabled())
       {
-        const mitk::RenderWindow* renWin =  mitk::RenderWindow::GetByName(m_RenderWindowCombo->currentText());
+        const mitk::RenderWindow* renWin =  mitk::RenderWindow::GetByName(m_RenderWindowCombo->currentText().ascii());
         if (renWin)
         {
           m_NodePropertiesView->SetPropertyList(selectedNode->GetPropertyList(renWin->GetRenderer()));
@@ -370,7 +370,7 @@ void QmitkDataManagerControls::RendererChangeMulti()
       ++it;
     }
     mitk::BaseRenderer* renderer = NULL;
-    const mitk::RenderWindow* renWin =  mitk::RenderWindow::GetByName(m_RenderWindowComboMulti->currentText());
+    const mitk::RenderWindow* renWin =  mitk::RenderWindow::GetByName(m_RenderWindowComboMulti->currentText().ascii());
     if (renWin)
     {
       renderer = renWin->GetRenderer();

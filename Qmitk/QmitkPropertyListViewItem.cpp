@@ -30,7 +30,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qcolordialog.h>
 #include <qvalidator.h>
 
-QmitkPropertyListViewItem* QmitkPropertyListViewItem::CreateInstance(mitk::PropertyList *propList, const std::string name, QWidget* parent)
+QmitkPropertyListViewItem* QmitkPropertyListViewItem::CreateInstance(mitk::PropertyList *propList, const std::string name, QWidget* parent, bool createOnlyControl)
 {
   QmitkPropertyListViewItem* newItem = new QmitkPropertyListViewItem(name,propList,NULL,NULL);
   mitk::PropertyList::PropertyMap::const_iterator it = newItem->m_PropertyList->GetMap()->find(newItem->m_Name.c_str());
@@ -39,7 +39,8 @@ QmitkPropertyListViewItem* QmitkPropertyListViewItem::CreateInstance(mitk::Prope
   {
     baseProp = it->second.first;
   }
-  newItem->m_EnabledButton = new QPushButton(parent);
+  if (!createOnlyControl) {
+newItem->m_EnabledButton = new QPushButton(parent);
   connect(
     (QObject*)(newItem->m_EnabledButton),
     SIGNAL(clicked()),
@@ -47,6 +48,7 @@ QmitkPropertyListViewItem* QmitkPropertyListViewItem::CreateInstance(mitk::Prope
     SLOT(EnabledButtonClicked())
   );
   newItem->m_Label = new QLabel(name.c_str(),parent);
+}
   if (mitk::BoolProperty* boolProp = dynamic_cast<mitk::BoolProperty*>(baseProp))
   {
     newItem->m_Control = new QCheckBox(parent);
@@ -87,10 +89,9 @@ QmitkPropertyListViewItem* QmitkPropertyListViewItem::CreateInstance(mitk::Prope
       newItem->m_Control = new QLabel("n/a",parent);
     }
   }
-  newItem->m_EnabledButton->show();
-  newItem->m_Label->show();
+  if (newItem->m_EnabledButton) { newItem->m_EnabledButton->show();  newItem->UpdateEnabledView(); }
+  if (newItem->m_Label) newItem->m_Label->show();
   newItem->m_Control->show();
-  newItem->UpdateEnabledView();
   return newItem;
 }
 void QmitkPropertyListViewItem::CheckBoxControlActivated(bool on)

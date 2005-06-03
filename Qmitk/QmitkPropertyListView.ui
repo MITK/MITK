@@ -39,6 +39,7 @@
 </includes>
 <forwards>
     <forward>class QScrollView;</forward>
+    <forward>class mitk::BaseRenderer</forward>
 </forwards>
 <variables>
     <variable>unsigned long m_ObserverTag;</variable>
@@ -54,7 +55,7 @@
 <functions>
     <function access="private" specifier="non virtual">init()</function>
     <function>PropertyListModified()</function>
-    <function>SetMultiMode( std::vector&lt;std::string&gt; propertyNames, CommonFunctionality::DataTreeIteratorVector nodes )</function>
+    <function>SetMultiMode( std::vector&lt;std::string&gt; propertyNames, CommonFunctionality::DataTreeIteratorVector nodes, mitk::BaseRenderer* renderer = NULL )</function>
 </functions>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

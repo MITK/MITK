@@ -35,13 +35,13 @@ class QmitkPropertyListViewItem : public QObject {
   Q_OBJECT
   public:
     QmitkPropertyListViewItem(std::string name, mitk::PropertyList* propertyList, QLabel* label, QWidget* control) :
-      m_Name(name), m_PropertyList(propertyList), m_Label(label), m_Control(control) {}
+      m_Name(name), m_PropertyList(propertyList), m_Label(label), m_Control(control),m_EnabledButton(NULL)  {}
     std::string m_Name;
     mitk::PropertyList* m_PropertyList;
     QPushButton* m_EnabledButton;
     QLabel* m_Label;
     QWidget* m_Control;
-    static QmitkPropertyListViewItem* CreateInstance(mitk::PropertyList *propList, const std::string name, QWidget* parent);
+    static QmitkPropertyListViewItem* CreateInstance(mitk::PropertyList *propList, const std::string name, QWidget* parent, bool createOnlyControl);
     void UpdateView();
     void QmitkPropertyListViewItem::UpdateEnabledView();
     // ~QmitkPropertyListViewItem()

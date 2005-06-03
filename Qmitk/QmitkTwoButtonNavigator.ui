@@ -175,12 +175,6 @@
                                             <height>15</height>
                                         </size>
                                     </property>
-                                    <property name="font">
-                                        <font>
-                                            <family>Arial</family>
-                                            <pointsize>10</pointsize>
-                                        </font>
-                                    </property>
                                     <property name="frameShadow">
                                         <enum>Sunken</enum>
                                     </property>

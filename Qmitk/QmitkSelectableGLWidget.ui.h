@@ -36,7 +36,7 @@ void QmitkSelectableGLWidget::init()
     renderer=mitk::OpenGLRenderer::New();
     
     // create widget
-    QString composedName("QmitkSelectableGLWidget::");
+    QString composedName("QSGLWt::");
     if(name()!=NULL)
         composedName+=name();
     else

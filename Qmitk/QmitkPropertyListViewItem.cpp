@@ -39,16 +39,17 @@ QmitkPropertyListViewItem* QmitkPropertyListViewItem::CreateInstance(mitk::Prope
   {
     baseProp = it->second.first;
   }
-  if (!createOnlyControl) {
-newItem->m_EnabledButton = new QPushButton(parent);
-  connect(
-    (QObject*)(newItem->m_EnabledButton),
-    SIGNAL(clicked()),
-    (QObject*)(newItem),
-    SLOT(EnabledButtonClicked())
-  );
-  newItem->m_Label = new QLabel(name.c_str(),parent);
-}
+  if (!createOnlyControl)
+  {
+    newItem->m_EnabledButton = new QPushButton(parent);
+    connect(
+      (QObject*)(newItem->m_EnabledButton),
+      SIGNAL(clicked()),
+      (QObject*)(newItem),
+      SLOT(EnabledButtonClicked())
+    );
+    newItem->m_Label = new QLabel(name.c_str(),parent);
+  }
   if (mitk::BoolProperty* boolProp = dynamic_cast<mitk::BoolProperty*>(baseProp))
   {
     newItem->m_Control = new QCheckBox(parent);
@@ -74,18 +75,46 @@ newItem->m_EnabledButton = new QPushButton(parent);
   else if (mitk::FloatProperty* floatProp = dynamic_cast<mitk::FloatProperty*>(baseProp))
   {
 
-    std::pair<float,float> minMax = mitk::PropertyManager::GetInstance()->GetDefaultLimits(newItem->m_Name);
+    std::pair<float,float> minMax;
     QString text;
     text.setNum(floatProp->GetValue());
     newItem->m_Control = new QLineEdit(text,parent);
-    ((QLineEdit*)(newItem->m_Control))->setValidator(new QDoubleValidator(minMax.first,minMax.second,3,newItem->m_Control));
+    if (mitk::PropertyManager::GetInstance()->GetDefaultLimits(newItem->m_Name,minMax))
+    {
+      ((QLineEdit*)(newItem->m_Control))->setValidator(new QDoubleValidator(minMax.first,minMax.second,3,newItem->m_Control));
+    }
+    else
+    {
+      ((QLineEdit*)(newItem->m_Control))->setValidator(new QIntValidator(std::numeric_limits<float>::min(),std::numeric_limits<float>::max(),newItem->m_Control));
+
+    }
     connect((QObject*)(newItem->m_Control),SIGNAL(textChanged(const QString &)),(QObject*)(newItem),SLOT(FloatControlActivated(const QString &)));
+  }
+  else if (mitk::IntProperty* intProp = dynamic_cast<mitk::IntProperty*>(baseProp))
+  {
+    QString text;
+    text.setNum(intProp->GetValue());
+    newItem->m_Control = new QLineEdit(text,parent);
+    std::pair<float,float> minMax;
+    if (mitk::PropertyManager::GetInstance()->GetDefaultLimits(newItem->m_Name,minMax))
+    {
+      ((QLineEdit*)(newItem->m_Control))->setValidator(new QIntValidator((int)minMax.first,(int)minMax.second,newItem->m_Control));
+    }
+    else
+    {
+      ((QLineEdit*)(newItem->m_Control))->
+      setValidator(new QIntValidator(std::numeric_limits<int>::min(),std::numeric_limits<int>::max(),newItem->m_Control));
+    }
+    connect((QObject*)(newItem->m_Control),SIGNAL(textChanged(const QString &)),(QObject*)(newItem),SLOT(IntControlActivated(const QString &)));
   }
   else
   {
-    if (baseProp) {
+    if (baseProp)
+    {
       newItem->m_Control = new QLabel(QString(baseProp->GetValueAsString().c_str()),parent);
-    } else {
+    }
+    else
+    {
       newItem->m_Control = new QLabel("n/a",parent);
     }
   }
@@ -117,11 +146,30 @@ void QmitkPropertyListViewItem::FloatControlActivated(const QString &text)
     {
       m_PropertyList->SetProperty(m_Name.c_str(), new mitk::FloatProperty(value));
     }
-  } else
+  }
+  else
   {
     m_Control->setPaletteForegroundColor(Qt::red);
   }
-  mitk::RenderWindow::UpdateAllInstances(); 
+  mitk::RenderWindow::UpdateAllInstances();
+}
+void QmitkPropertyListViewItem::IntControlActivated(const QString &text)
+{
+  if (((QLineEdit*)m_Control)->hasAcceptableInput())
+  {
+    m_Control->setPaletteForegroundColor(Qt::black);
+    float value = text.toInt();
+    mitk::IntProperty* intProp = dynamic_cast<mitk::IntProperty*>(m_PropertyList->GetProperty(m_Name.c_str()).GetPointer());
+    if (value != intProp->GetValue())
+    {
+      m_PropertyList->SetProperty(m_Name.c_str(), new mitk::IntProperty(value));
+    }
+  }
+  else
+  {
+    m_Control->setPaletteForegroundColor(Qt::red);
+  }
+  mitk::RenderWindow::UpdateAllInstances();
 }
 void QmitkPropertyListViewItem::ColorControlActivated()
 {

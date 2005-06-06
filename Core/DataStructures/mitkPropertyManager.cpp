@@ -50,16 +50,16 @@ mitk::BaseProperty::Pointer mitk::PropertyManager::CreateDefaultProperty(std::st
   }
   return newProperty;
 }
-
-std::pair<float,float> mitk::PropertyManager::GetDefaultLimits(const std::string &name)
+bool mitk::PropertyManager::GetDefaultLimits(const std::string &name,std::pair<float,float> &minMax)
 {
   PropertyLimitsMap::iterator it = m_PropertyLimits.find(name.c_str());
   if (it != m_PropertyLimits.end())
   {
-    return it->second;
+    minMax = it->second;
+    return true;
   }
   else
   {
-    return std::make_pair(0.0f,1.0f);
+    return false;
   }
 }

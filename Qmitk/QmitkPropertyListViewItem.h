@@ -50,6 +50,7 @@ class QmitkPropertyListViewItem : public QObject {
     void StringControlActivated(const QString &text);
     void ColorControlActivated();
     void FloatControlActivated(const QString &text);
+    void IntControlActivated(const QString &text);
   protected:
     QmitkPropertyListViewItem() {}
   protected slots:

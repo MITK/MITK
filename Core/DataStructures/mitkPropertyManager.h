@@ -33,7 +33,7 @@ namespace mitk {
       const PropertyNameSet& GetDefaultPropertyNames();
       BaseProperty::Pointer CreateDefaultProperty(std::string name);
       static PropertyManager* GetInstance();
-      std::pair<float,float> GetDefaultLimits(const std::string &name);
+      bool GetDefaultLimits(const std::string &name,std::pair<float,float> &minMax);
     protected:
       PropertyManager();
       PropertyNameSet m_DefaultPropertyNameSet;

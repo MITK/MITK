@@ -1,19 +1,19 @@
 /*=========================================================================
-
+ 
 Program:   Medical Imaging & Interaction Toolkit
 Module:    $RCSfile$
 Language:  C++
 Date:      $Date$
 Version:   $Revision$ 
-
+ 
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
-
+ 
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
-
+ 
 =========================================================================*/
 
 
@@ -95,38 +95,40 @@ PURPOSE.  See the above copyright notices for more information.
 template <class T>
 static void __buildstring( ipPicDescriptor *pic, itk::Point<int, 3> p, QString &s, T dummy=0)
 {
-   QString value;
-   if ( p[0] < pic->n[0] && p[1] < pic->n[1] && p[2] < pic->n[2] ) { 
-   if(pic->bpe!=24)
-   {
-       value.setNum(((T*) pic->data)[ p[0] + p[1]*pic->n[0] + p[2]*pic->n[0]*pic->n[1] ]);
-   }
-   else
-   {
-       value.setNum(((T*) pic->data)[p[0]*3 + 0 + p[1]*pic->n[0]*3 + p[2]*pic->n[0]*pic->n[1]*3 ]);
-       value.setNum(((T*) pic->data)[p[0]*3 + 1 + p[1]*pic->n[0]*3 + p[2]*pic->n[0]*pic->n[1]*3 ]);
-       value.setNum(((T*) pic->data)[p[0]*3 + 2 + p[1]*pic->n[0]*3 + p[2]*pic->n[0]*pic->n[1]*3 ]);
-   }
-   s+=value;
-} else {
-  s+= "point out of data";
-} 
+  QString value;
+  if ( p[0] < pic->n[0] && p[1] < pic->n[1] && p[2] < pic->n[2] )
+  {
+    if(pic->bpe!=24)
+    {
+      value.setNum(((T*) pic->data)[ p[0] + p[1]*pic->n[0] + p[2]*pic->n[0]*pic->n[1] ]);
+    }
+    else
+    {
+      value.setNum(((T*) pic->data)[p[0]*3 + 0 + p[1]*pic->n[0]*3 + p[2]*pic->n[0]*pic->n[1]*3 ]);
+      value.setNum(((T*) pic->data)[p[0]*3 + 1 + p[1]*pic->n[0]*3 + p[2]*pic->n[0]*pic->n[1]*3 ]);
+      value.setNum(((T*) pic->data)[p[0]*3 + 2 + p[1]*pic->n[0]*3 + p[2]*pic->n[0]*pic->n[1]*3 ]);
+    }
+    s+=value;
+  }
+  else
+  {
+    s+= "point out of data";
+  }
 }
 class posOutputType : public mitk::OperationActor
 {
   mitk::DataTreeIteratorClone m_DataTreeIterator;
   mitk::ImageTimeSelector::Pointer m_TimeSelector;
 public:
-  
+
   posOutputType(mitk::DataTreeIteratorBase* iterator)
   {
     m_DataTreeIterator = iterator;
     m_TimeSelector = mitk::ImageTimeSelector::New();
   }
-  
+
   ~posOutputType()
-  {
-  }
+  {}
 
   typedef mitk::Operation Operation;
   void ExecuteOperation(Operation* operation) //writing mitk::Operation causes QT-Designer to create a Slot calles Operation*operation) and thus causes errors. Thats why we here have a typedef. //TODO: FIX it!
@@ -134,7 +136,7 @@ public:
     mitk::PointOperation* pointoperation = dynamic_cast<mitk::PointOperation*>(operation);
 
     if ( pointoperation != NULL )
-    {    
+    {
       switch ( operation->GetOperationType() )
       {
       case mitk::OpMOVE:
@@ -187,7 +189,7 @@ public:
               return;
 
             m_TimeSelector->SetTimeNr(timestep);
-            m_TimeSelector->UpdateLargestPossibleRegion();            
+            m_TimeSelector->UpdateLargestPossibleRegion();
 
             image = m_TimeSelector->GetOutput();
 
@@ -200,7 +202,7 @@ public:
               pixel.sprintf(" (%.2f,%.2f,%.2f) [pixel] ", p[0], p[1], p[2]);
             s+=pixel;
 
-            ipPicDescriptor* pic = image->GetPic(); 
+            ipPicDescriptor* pic = image->GetPic();
 
             mitk::FillVector3D(p, (int)(p[0]+0.5), (int)(p[1]+0.5), (int)(p[2]+0.5));
             if ( image->GetGeometry()->IsIndexInside(p) )
@@ -213,11 +215,11 @@ public:
               }
               else
                 __buildstring(pic, pi, s, (unsigned char) 1);
-            }   
+            }
           }
           mitk::StatusBar::DisplayText(s.ascii(), 10000);
           break;
-        }     
+        }
       case mitk::OpNOTHING:
         break;
       default:
@@ -231,23 +233,20 @@ public:
 QmitkMainTemplate* QmitkMainTemplate::m_Instance = NULL;
 
 void QmitkMainTemplate::fileNew()
-{
-
-}
+{}
 
 void QmitkMainTemplate::fileOpen()
 {
 #ifdef MBI_INTERNAL
-//  QString fileName = QFileDialog::getOpenFileName(NULL,"all (*.seq *.pic *.pic.gz *.seq.gz *.pvtk *.stl *.vtk *.ves *.uvg *.par *.dcm *.mhd *.png *.tif *.jpg hpsonos.db HPSONOS.DB);;DKFZ Pic (*.seq *.pic *.pic.gz *.seq.gz);;surface files (*.stl *.vtk);;stl files (*.stl);;vtk surface files (*.vtk);;vtk image files (*.pvtk);;vessel files (*.ves *.uvg);;par/rec files (*.par);;DSR files (hpsonos.db HPSONOS.DB);;DICOM files (*.dcm)");
-  QString fileName = QFileDialog::getOpenFileName(NULL,CommonFunctionality::GetInternalFileExtensions());
+  //  QString fileName = QFileDialog::getOpenFileName(NULL,"all (*.seq *.pic *.pic.gz *.seq.gz *.pvtk *.stl *.vtk *.ves *.uvg *.par *.dcm *.mhd *.png *.tif *.jpg hpsonos.db HPSONOS.DB);;DKFZ Pic (*.seq *.pic *.pic.gz *.seq.gz);;surface files (*.stl *.vtk);;stl files (*.stl);;vtk surface files (*.vtk);;vtk image files (*.pvtk);;vessel files (*.ves *.uvg);;par/rec files (*.par);;DSR files (hpsonos.db HPSONOS.DB);;DICOM files (*.dcm)");
+  QStringList fileNames = QFileDialog::getOpenFileNames(CommonFunctionality::GetInternalFileExtensions(), NULL);
 #else
-//  QString fileName = QFileDialog::getOpenFileName(NULL,"all (*.seq *.pic *.pic.gz *.seq.gz *.pvtk *.stl *.vtk *.par  *.png *.tif *.jpg);;DKFZ Pic (*.seq *.pic *.pic.gz *.seq.gz);;surface files (*.stl *.vtk);;stl files (*.stl);;vtk surface files (*.vtk);;vtk image files (*.pvtk);;par/rec files (*.par);;DICOM files (*.dcm)");
-  QString fileName = QFileDialog::getOpenFileName( NULL,CommonFunctionality::GetExternalFileExtensions() );
+  //  QString fileName = QFileDialog::getOpenFileName(NULL,"all (*.seq *.pic *.pic.gz *.seq.gz *.pvtk *.stl *.vtk *.par  *.png *.tif *.jpg);;DKFZ Pic (*.seq *.pic *.pic.gz *.seq.gz);;surface files (*.stl *.vtk);;stl files (*.stl);;vtk surface files (*.vtk);;vtk image files (*.pvtk);;par/rec files (*.par);;DICOM files (*.dcm)");
+  QStringList fileNames = QFileDialog::getOpenFileNames( CommonFunctionality::GetExternalFileExtensions(), NULL );
 #endif
-
-  if ( !fileName.isNull() )
+  for ( QStringList::Iterator it = fileNames.begin(); it != fileNames.end(); ++it )
   {
-    fileOpen(fileName.ascii());
+    fileOpen((*it).ascii());
   }
 }
 
@@ -358,9 +357,7 @@ void QmitkMainTemplate::fileOpenGetFactoryOutput( mitk::DataTreeNodeFactory & fa
 
 
 void QmitkMainTemplate::fileSave()
-{
-
-}
+{}
 
 void QmitkMainTemplate::fileSaveAs()
 {
@@ -417,9 +414,7 @@ void QmitkMainTemplate::fileSaveAs()
 }
 
 void QmitkMainTemplate::filePrint()
-{
-
-}
+{}
 
 void QmitkMainTemplate::fileExit()
 {
@@ -437,39 +432,25 @@ void QmitkMainTemplate::editRedo()
 }
 
 void QmitkMainTemplate::editCut()
-{
-
-}
+{}
 
 void QmitkMainTemplate::editCopy()
-{
-
-}
+{}
 
 void QmitkMainTemplate::editPaste()
-{
-
-}
+{}
 
 void QmitkMainTemplate::editFind()
-{
-
-}
+{}
 
 void QmitkMainTemplate::helpIndex()
-{
-
-}
+{}
 
 void QmitkMainTemplate::helpContents()
-{
-
-}
+{}
 
 void QmitkMainTemplate::helpAbout()
-{
-
-}
+{}
 
 
 void QmitkMainTemplate::init()
@@ -493,13 +474,13 @@ void QmitkMainTemplate::init()
 
 /*!
 \brief basic initialization of main widgets
-
+ 
 The method is should be called at the end of the initialize-method of its
 subclasses.
 */
 void QmitkMainTemplate::Initialize()
 {
-   mitk::DataTreePreOrderIterator it(tree);
+  mitk::DataTreePreOrderIterator it(tree);
   //initialize interaction sub-system: undo-controller, statemachine-factory and global-interaction
 
   // test for environment variable MITKCONF
@@ -584,16 +565,14 @@ void QmitkMainTemplate::Initialize()
 
 
 /*!
-
+ 
 */
 void QmitkMainTemplate::InitializeFunctionality()
-{
-
-}
+{}
 
 /*!
 \brief this method initializes the Qmitk functionality mediator
-
+ 
 When subclassing this template class the developer can overwrite the method
 to provide different layout templates
 */
@@ -651,7 +630,8 @@ void QmitkMainTemplate::parseCommandLine()
   }
 }
 
-mitk::DataTree::Pointer QmitkMainTemplate::GetTree() {
+mitk::DataTree::Pointer QmitkMainTemplate::GetTree()
+{
   return tree;
 }
 
@@ -760,11 +740,11 @@ void QmitkMainTemplate::optionsSystem_InformationAction_activated()
 
 bool QmitkMainTemplate::GetStandardViewsInitialized()
 {
-    return m_StandardViewsInitialized;
+  return m_StandardViewsInitialized;
 }
 
 
 void QmitkMainTemplate::SetStandardViewsInitialized( bool areInitialized )
 {
-    m_StandardViewsInitialized = areInitialized;
+  m_StandardViewsInitialized = areInitialized;
 }

@@ -289,6 +289,8 @@ void QmitkDataManagerControls::InitMultiMode(mitk::BaseRenderer* renderer)
   propNames.push_back("name");
   propNames.push_back("visible");
   propNames.push_back("color");
+  propNames.push_back("opacity");
+
 
   CommonFunctionality::DataTreeIteratorVector treeNodes;
   mitk::DataTreeIteratorClone it = m_DataTreeIterator;

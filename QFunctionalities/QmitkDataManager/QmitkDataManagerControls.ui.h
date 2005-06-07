@@ -314,7 +314,7 @@ void QmitkDataManagerControls::m_RenderWindowCB_toggled( bool isOn )
 void QmitkDataManagerControls::m_RenderWindowCBMulti_toggled( bool isOn )
 {
   m_RenderWindowComboMulti->setEnabled(isOn);
-RendererChangeMulti();
+  RendererChangeMulti();
 }
 
 
@@ -357,26 +357,26 @@ void QmitkDataManagerControls::RendererChange()
 }
 void QmitkDataManagerControls::RendererChangeMulti()
 {
+  std::vector<std::string> propNames;
+  propNames.push_back("name");
+  propNames.push_back("visible");
+  propNames.push_back("color");
+
+  CommonFunctionality::DataTreeIteratorVector treeNodes;
+  mitk::DataTreeIteratorClone it = m_DataTreeIterator;
+  while (!it->IsAtEnd())
+  {
+    treeNodes.push_back(it);
+    ++it;
+  }
+  mitk::BaseRenderer* renderer = NULL;
   if  (m_RenderWindowComboMulti->isEnabled())
   {
-    std::vector<std::string> propNames;
-    propNames.push_back("name");
-    propNames.push_back("visible");
-    propNames.push_back("color");
-
-    CommonFunctionality::DataTreeIteratorVector treeNodes;
-    mitk::DataTreeIteratorClone it = m_DataTreeIterator;
-    while (!it->IsAtEnd())
-    {
-      treeNodes.push_back(it);
-      ++it;
-    }
-    mitk::BaseRenderer* renderer = NULL;
     const mitk::RenderWindow* renWin =  mitk::RenderWindow::GetByName(m_RenderWindowComboMulti->currentText().ascii());
     if (renWin)
     {
       renderer = renWin->GetRenderer();
     }
-    m_MultiNodePropertiesView->SetMultiMode(propNames, treeNodes, renderer);
   }
+  m_MultiNodePropertiesView->SetMultiMode(propNames, treeNodes, renderer);
 }

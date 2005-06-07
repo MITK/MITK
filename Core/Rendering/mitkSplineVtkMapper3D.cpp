@@ -121,13 +121,19 @@ mitk::SplineVtkMapper3D::GenerateData()
 
     m_SplinesActor->SetMapper( profileMapper );
 
-
+//vtk changed the type of rgba during releases. Due to that, the following convert is done
 #if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
-    double rgba[ 4 ] = {1.0f, 0.0f, 0.0f, 1.0f};
+    double rgba[ 4 ] = {1.0f, 1.0f, 1.0f, 1.0f};//white
 #else
-    float rgba[ 4 ] = {1.0f, 0.0f, 0.0f, 1.0f};
+    float rgba[ 4 ] = {1.0f, 1.0f, 1.0f, 1.0f};//white
 #endif
-    this->GetDataTreeNode()->GetColor( (float*)rgba, NULL );
+
+    //getting the color from DataTreeNode
+    float temprgba[4];
+    this->GetDataTreeNode()->GetColor( &temprgba[0], NULL );
+    //convert to rgba, what ever type it has!
+    rgba[0] = temprgba[0];    rgba[1] = temprgba[1];    rgba[2] = temprgba[2];    rgba[3] = temprgba[3];
+    //finaly set the color inside the actor
     m_SplinesActor->GetProperty()->SetColor( rgba );
 
     float lineWidth;

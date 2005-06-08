@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkPropertyManager.h"
 #include "mitkProperties.h"
-
+#include <limits>
 
 mitk::PropertyManager::PropertyManager()
 {
@@ -60,6 +60,7 @@ bool mitk::PropertyManager::GetDefaultLimits(const std::string &name,std::pair<f
   }
   else
   {
+    minMax = std::make_pair(std::numeric_limits<float>::min(),std::numeric_limits<float>::max());
     return false;
   }
 }

@@ -1384,6 +1384,9 @@
       <transition NAME="delete" NEXT_STATE_ID="1" EVENT_ID="12" >
         <action ID="104"/>  <!-- AcREMOVESELECTEDSUBOBJECT -->
       </transition>
+      <transition NAME="setVesselElement" NEXT_STATE_ID="7" EVENT_ID="91" >
+        <action ID="3008"/>  <!-- AcSETVESSELELEMENT-->
+      </transition>
       
       <!--now follow the attibutations for different vessel types-->
       <transition NAME="attributation" NEXT_STATE_ID="7" EVENT_ID="20" >
@@ -1432,6 +1435,9 @@
       <transition NAME="delete" NEXT_STATE_ID="1" EVENT_ID="12" >
         <action ID="104"/>  <!-- AcREMOVESELECTEDSUBOBJECT -->
       </transition>      
+      <transition NAME="setVesselElement" NEXT_STATE_ID="8" EVENT_ID="91" >
+        <action ID="3008"/>  <!-- AcSETVESSELELEMENT-->
+      </transition>
       
       <!--now follow the attibutations for different vessel types-->
       <transition NAME="attributation" NEXT_STATE_ID="8" EVENT_ID="20" >
@@ -1469,6 +1475,9 @@
       </transition>
       <transition NAME="deselectAll" NEXT_STATE_ID="1" EVENT_ID="14" >
         <action ID="72"/>  <!-- AcDESELECTALL -->
+      </transition>
+      <transition NAME="setVesselElement" NEXT_STATE_ID="9" EVENT_ID="91" >
+        <action ID="3008"/>  <!-- AcSETVESSELELEMENT-->
       </transition>
     </state>
     <state NAME="CheckPicking" ID="10">
@@ -1583,6 +1592,8 @@
     <event NAME="Strg+Alt+S" ID="40" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0600" KEY="Key_S" />
     <!-- Alt -->
     <event NAME="Alt" ID="90" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0400" KEY="Key_Alt" />
+    <!-- Strg + B -->
+    <event NAME="Strg+B" ID="91" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0200" KEY="Key_B" />  
     
     <!-- leftMouseButtonRelease -->
     <event NAME="leftMouseRelease" ID="505" TYPE="Type_MouseButtonRelease" BUTTON="BS_LeftButton" BUTTONSTATE="0x0001" KEY="Key_none" />

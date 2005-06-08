@@ -235,7 +235,8 @@ typedef enum EActions
   AcSINGLE = 3004,                    //used in VesselGraphInteractor
   AcATTRIBUTATION = 3005,              //used in VesselGraphInteractor
   AcDEFAULT = 3007,                  //used in VesselGraphInteractor
-  AcCHECKBARRIERSTATUS = 3010
+  AcSETVESSELELEMENT = 3008,         //used in VesselGraphInteractor
+  AcCHECKBARRIERSTATUS = 3010        //used in VesselGraphInteractor
 };
 
 

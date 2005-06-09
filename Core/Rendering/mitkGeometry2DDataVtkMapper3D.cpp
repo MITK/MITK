@@ -189,18 +189,23 @@ void mitk::Geometry2DDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
               //a RendererInfo will be created for renderer (if it does not exist yet).
               const ImageMapper2D::RendererInfo* ri=imagemapper->GetRendererInfo(renderer);
               imagemapper->GenerateAllData();
+              texture = true;
               if((ri!=NULL) && (m_LastTextureUpdateTime<ri->m_LastUpdateTime))
               {
                 ipPicDescriptor *p=ri->m_Pic;
-                vtkImageData* vtkimage=Pic2vtk::convert(p);
-                m_VtkTexture->SetInput(vtkimage); vtkimage->Delete(); vtkimage=NULL;
-                m_Actor->SetTexture(m_VtkTexture);
-                m_LastTextureUpdateTime=ri->m_LastUpdateTime;
-                bool textureInterpolation=true;
-                node->GetBoolProperty("texture interpolation", textureInterpolation, renderer);
-                m_VtkTexture->SetInterpolate(textureInterpolation ? 1 : 0);
+                if((p->dim==2) && (p->n[0]>2) && (p->n[1]>2))
+                {
+                  vtkImageData* vtkimage=Pic2vtk::convert(p);
+                  m_VtkTexture->SetInput(vtkimage);
+                  vtkimage->Delete(); vtkimage=NULL;
+                  m_Actor->SetTexture(m_VtkTexture);
+                  m_LastTextureUpdateTime=ri->m_LastUpdateTime;
+                  bool textureInterpolation=true;
+                  m_VtkTexture->SetInterpolate(textureInterpolation ? 1 : 0);
+                }
+                else
+                  texture = false;
               }
-              texture = true;
               break;
             }
           }

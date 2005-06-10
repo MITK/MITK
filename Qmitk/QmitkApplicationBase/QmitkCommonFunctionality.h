@@ -40,25 +40,22 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkDataTreeNode.h>
 #include <mitkSurface.h>
 #include <mitkDataTreeNodeFactory.h>
-#include <mitkImageCast.h>
+// #include <mitkImageCast.h>
 #include <mitkDataTree.h>
 #include <mitkPicFileReader.h>
-#include "mitkPointSetWriter.h"
 #include "itkImage.h"
 
-#include <qfiledialog.h>
 #include "ipPic/ipPic.h"
 #include "ipFunc/ipFunc.h"
 
 #include <qstring.h>
 #include <qfiledialog.h>
-#include <qregexp.h>
 
 #include <itkRescaleIntensityImageFilter.h>
-#include "itkImageSeriesReader.h"
+// #include "itkImageSeriesReader.h"
 #include "itkImageSeriesWriter.h"
 #include "itkImageFileWriter.h"
-#include "itkNumericSeriesFileNames.h"
+// #include "itkNumericSeriesFileNames.h"
 
 #include <itksys/SystemTools.hxx>
 
@@ -417,26 +414,8 @@ namespace CommonFunctionality
     return NULL;
   }
 
-  static mitk::DataTreeIteratorBase* GetIteratorToFirstImageInDataTree(mitk::DataTree::Pointer dataTree)
-  {
-    mitk::DataTreePreOrderIterator dataTreeIterator( dataTree );
-
-    if ( dataTree.IsNull() )
-    {
-      std::cout << "iterator to data tree is NULL. I cannot work without datatree !!"  << std::endl;
-      return NULL;
-    }
-
-    return GetIteratorToFirstImage(&dataTreeIterator);
-  }
-
-  static mitk::Image* GetFirstImageInDataTree(mitk::DataTree::Pointer dataTree)
-  {
-    mitk::DataTreeIteratorClone it = GetIteratorToFirstImageInDataTree(dataTree);
-    if(it.IsNull())
-      return NULL;
-    return static_cast<mitk::Image*>(it->Get()->GetData());
-  }
+  mitk::DataTreeIteratorBase* GetIteratorToFirstImageInDataTree(mitk::DataTree::Pointer dataTree);
+  mitk::Image* GetFirstImageInDataTree(mitk::DataTree::Pointer dataTree);
 
   /**
    * Searches for the first node in the data tree, which holds a given type. 
@@ -571,19 +550,7 @@ namespace CommonFunctionality
    * @param property the value of the property we want to search for in the data tree
    * @returns the first node in the data tree which matches propertyKey and property, or NULL otherwise.
    */
-  static mitk::DataTreeNode* GetFirstNodeByProperty( mitk::DataTreeIteratorClone it, std::string propertyKey, mitk::BaseProperty* property )
-  {
-    mitk::DataTreeIteratorClone pos = dynamic_cast<mitk::DataTree*>( it->GetTree() )->GetNext( propertyKey.c_str(), property, it.GetPointer() );
-    if ( ! pos->IsAtEnd() )
-    {
-      return pos->Get();
-    }
-    else
-    {
-      return NULL;
-    }
-
-  }
+  mitk::DataTreeNode* GetFirstNodeByProperty( mitk::DataTreeIteratorClone it, std::string propertyKey, mitk::BaseProperty* property );
 
   /**
    * Searches for the first data object in the data tree, whose node matches a given 
@@ -595,19 +562,7 @@ namespace CommonFunctionality
    * @param property the value of the property we want to search for in the data tree
    * @returns the first data object in the data tree whose node matches propertyKey and property, or NULL otherwise.
    */
-  static mitk::BaseData* GetFirstDataByProperty( mitk::DataTreeIteratorClone it, std::string propertyKey, mitk::BaseProperty* property )
-  {
-    mitk::DataTreeNode* node = GetFirstNodeByProperty( it, propertyKey, property );
-    if ( node == NULL )
-    {
-      return NULL;
-    }
-    else
-    {
-      return node->GetData();
-    }
-  }
-
+  mitk::BaseData* GetFirstDataByProperty( mitk::DataTreeIteratorClone it, std::string propertyKey, mitk::BaseProperty* property );
   /**
    * Searches for the node in the data tree which holds a given mitk::BaseData 
    * @param it an iterator pointing to the position in the data tree, where
@@ -615,26 +570,7 @@ namespace CommonFunctionality
    * @param data the data object, for which the node in the tree should be searched.
    * @returns the node holding data, or NULL otherwise.
    */
-  static mitk::DataTreeNode* GetNodeForData( mitk::DataTreeIteratorClone it, mitk::BaseData* data )
-  {
-    if ( it.GetPointer() == NULL )
-    {
-      return NULL;
-    }
-
-    mitk::DataTreeIteratorClone iteratorClone = it;
-    while ( !iteratorClone->IsAtEnd() )
-    {
-      mitk::DataTreeNode::Pointer node = iteratorClone->Get();
-      if ( node.IsNotNull() )
-      {
-        if ( node->GetData() == data )
-          return node.GetPointer();
-      }
-      ++iteratorClone;
-    }
-    return NULL;
-  }
+  mitk::DataTreeNode* GetNodeForData( mitk::DataTreeIteratorClone it, mitk::BaseData* data );
 
   template <typename BaseDataType>
   static DataTreeNodeVector GetNodesForDataType(mitk::DataTreeIteratorClone it)
@@ -659,28 +595,6 @@ namespace CommonFunctionality
 
   }
 
-  static DataTreeIteratorVector FilterNodes(mitk::DataTreeIteratorClone it, bool (* FilterFunction)(mitk::DataTreeNode*))
-  {
-
-    DataTreeIteratorVector result;
-
-    if ( it.GetPointer() != NULL )
-    {
-
-      mitk::DataTreeIteratorClone iteratorClone = it;
-      while ( !iteratorClone->IsAtEnd() )
-      {
-        mitk::DataTreeNode::Pointer node = iteratorClone->Get();
-        if ( FilterFunction( node ) )
-        {
-          result.push_back(iteratorClone);
-        }
-        ++iteratorClone;
-      }
-    }
-    return result;
-
-  }
-
+  DataTreeIteratorVector FilterNodes(mitk::DataTreeIteratorClone it, bool (* FilterFunction)(mitk::DataTreeNode*));
 };
 #endif // _CommonFunctionality__h_

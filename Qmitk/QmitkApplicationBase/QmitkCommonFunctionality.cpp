@@ -1,3 +1,5 @@
+#include <qregexp.h>
+#include "mitkPointSetWriter.h"
 #include "mitkConfig.h"
 #ifdef MBI_INTERNAL
 #include "mitkVesselGraphData.h"
@@ -326,4 +328,116 @@ mitk::DataTreeNode::Pointer CommonFunctionality::OpenVolumeOrSliceStack()
   {
     return NULL;
   }
+}
+static mitk::DataTreeIteratorBase* GetIteratorToFirstImage(mitk::DataTreeIteratorBase* dataTreeIterator)
+{
+  mitk::DataTreeIteratorClone it = dataTreeIterator;
+  while ( !it->IsAtEnd() )
+  {
+    mitk::DataTreeNode::Pointer node = it->Get();
+    if ( node->GetData() != NULL )
+    {
+      // access the original image
+      mitk::Image::Pointer img = dynamic_cast<mitk::Image*>( node->GetData() );
+
+      // enquiry whether img is NULL
+      if ( img.IsNotNull() )
+      {
+        return it->Clone();
+      }
+    }
+    ++it;
+  }
+  std::cout << "No node containing an mitk::Image found, returning NULL..." << std::endl;
+  return NULL;
+}
+
+mitk::DataTreeIteratorBase* CommonFunctionality::GetIteratorToFirstImageInDataTree(mitk::DataTree::Pointer dataTree)
+{
+  mitk::DataTreePreOrderIterator dataTreeIterator( dataTree );
+
+  if ( dataTree.IsNull() )
+  {
+    std::cout << "iterator to data tree is NULL. I cannot work without datatree !!"  << std::endl;
+    return NULL;
+  }
+
+  return GetIteratorToFirstImage(&dataTreeIterator);
+}
+
+mitk::Image* CommonFunctionality::GetFirstImageInDataTree(mitk::DataTree::Pointer dataTree)
+{
+  mitk::DataTreeIteratorClone it = GetIteratorToFirstImageInDataTree(dataTree);
+  if(it.IsNull())
+    return NULL;
+  return static_cast<mitk::Image*>(it->Get()->GetData());
+}
+mitk::DataTreeNode* CommonFunctionality::GetFirstNodeByProperty( mitk::DataTreeIteratorClone it, std::string propertyKey, mitk::BaseProperty* property )
+{
+  mitk::DataTreeIteratorClone pos = dynamic_cast<mitk::DataTree*>( it->GetTree() )->GetNext( propertyKey.c_str(), property, it.GetPointer() );
+  if ( ! pos->IsAtEnd() )
+  {
+    return pos->Get();
+  }
+  else
+  {
+    return NULL;
+  }
+
+}
+mitk::BaseData* CommonFunctionality::GetFirstDataByProperty( mitk::DataTreeIteratorClone it, std::string propertyKey, mitk::BaseProperty* property )
+{
+  mitk::DataTreeNode* node = GetFirstNodeByProperty( it, propertyKey, property );
+  if ( node == NULL )
+  {
+    return NULL;
+  }
+  else
+  {
+    return node->GetData();
+  }
+}
+
+mitk::DataTreeNode* CommonFunctionality::GetNodeForData( mitk::DataTreeIteratorClone it, mitk::BaseData* data )
+{
+  if ( it.GetPointer() == NULL )
+  {
+    return NULL;
+  }
+
+  mitk::DataTreeIteratorClone iteratorClone = it;
+  while ( !iteratorClone->IsAtEnd() )
+  {
+    mitk::DataTreeNode::Pointer node = iteratorClone->Get();
+    if ( node.IsNotNull() )
+    {
+      if ( node->GetData() == data )
+        return node.GetPointer();
+    }
+    ++iteratorClone;
+  }
+  return NULL;
+}
+
+CommonFunctionality::DataTreeIteratorVector CommonFunctionality::FilterNodes(mitk::DataTreeIteratorClone it, bool (* FilterFunction)(mitk::DataTreeNode*))
+{
+
+  DataTreeIteratorVector result;
+
+  if ( it.GetPointer() != NULL )
+  {
+
+    mitk::DataTreeIteratorClone iteratorClone = it;
+    while ( !iteratorClone->IsAtEnd() )
+    {
+      mitk::DataTreeNode::Pointer node = iteratorClone->Get();
+      if ( FilterFunction( node ) )
+      {
+        result.push_back(iteratorClone);
+      }
+      ++iteratorClone;
+    }
+  }
+  return result;
+
 }

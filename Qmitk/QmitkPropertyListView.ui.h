@@ -166,7 +166,6 @@ void QmitkPropertyListView::SetMultiMode( std::vector<std::string> propertyNames
       // add the control thing
       std::string nodeName;
       (*node)->Get()->GetName(nodeName);
-      std::cout << nodeName << " / " << *propNameIt << std::endl;
       QmitkPropertyListViewItem* item;
       if (*propNameIt == "name")
       {

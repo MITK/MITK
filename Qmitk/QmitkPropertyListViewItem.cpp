@@ -31,6 +31,14 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qvalidator.h>
 #include <qhbox.h>
 #include <qslider.h>
+QmitkPropertyListViewItem::QmitkPropertyListViewItem(std::string name, mitk::PropertyList* propertyList, QWidget* parent, bool createOnlyControl) : m_Name(name), m_PropertyList(propertyList), m_Control(NULL), m_Label(NULL) {
+  if (!createOnlyControl) {
+    CreateEnabledButton(parent);
+    m_Label = new QLabel(name.c_str(),parent);
+    m_Label->show();
+  }  
+};
+
 void QmitkPropertyListViewItem::CreateEnabledButton(QWidget* parent)
 {
   m_EnabledButton = new QPushButton(parent);
@@ -55,20 +63,20 @@ QmitkPropertyListViewItem* QmitkPropertyListViewItem::CreateInstance(mitk::Prope
   }
   if (mitk::BoolProperty* boolProp = dynamic_cast<mitk::BoolProperty*>(baseProp))
   {
-    newItem = new QmitkPropertyListViewItem(name,propList,NULL,NULL);
+    newItem = new QmitkPropertyListViewItem(name,propList,parent,createOnlyControl);
     newItem->m_Control = new QCheckBox(parent);
     ((QCheckBox*)(newItem->m_Control))->setChecked(boolProp->GetValue());
     connect((QObject*)(newItem->m_Control),SIGNAL(toggled(bool)),(QObject*)(newItem),SLOT(CheckBoxControlActivated(bool)));
   }
   else if (mitk::StringProperty* stringProp = dynamic_cast<mitk::StringProperty*>(baseProp))
   {
-    newItem = new QmitkPropertyListViewItem(name,propList,NULL,NULL);
+    newItem = new QmitkPropertyListViewItem(name,propList,parent,createOnlyControl);
     newItem->m_Control = new QLineEdit(QString(stringProp->GetValue()),parent);
     connect((QObject*)(newItem->m_Control),SIGNAL(textChanged(const QString &)),(QObject*)(newItem),SLOT(StringControlActivated(const QString &)));
   }
   else if (mitk::ColorProperty* colorProp = dynamic_cast<mitk::ColorProperty*>(baseProp))
   {
-    newItem = new QmitkPropertyListViewItem(name,propList,NULL,NULL);
+    newItem = new QmitkPropertyListViewItem(name,propList,parent,createOnlyControl);
     newItem->m_Control = new QPushButton(parent);
     QPixmap pm(20,20);
     mitk::Color col = colorProp->GetColor();
@@ -88,7 +96,7 @@ QmitkPropertyListViewItem* QmitkPropertyListViewItem::CreateInstance(mitk::Prope
     {
       // condition to use slider instead of lineedit
 
-      QmitkPropertyListViewFloatSlider* sliderItem = new QmitkPropertyListViewFloatSlider(name,propList,NULL,NULL);
+      QmitkPropertyListViewFloatSlider* sliderItem = new QmitkPropertyListViewFloatSlider(name,propList,parent,createOnlyControl);
       sliderItem->m_Control =  new QHBox(parent);
       sliderItem->m_Slider = new QSlider(Qt::Horizontal,sliderItem->m_Control);
       sliderItem->m_ValueLabel = new QLabel(text,sliderItem->m_Control);
@@ -100,7 +108,7 @@ QmitkPropertyListViewItem* QmitkPropertyListViewItem::CreateInstance(mitk::Prope
     }
     else
     {
-      newItem = new QmitkPropertyListViewItem(name,propList,NULL,NULL);
+      newItem = new QmitkPropertyListViewItem(name,propList,parent,createOnlyControl);
       newItem->m_Control = new QLineEdit(text,parent);
       ((QLineEdit*)(newItem->m_Control))->setValidator(new QDoubleValidator(minMax.first,minMax.second,3,newItem->m_Control));
       connect((QObject*)(newItem->m_Control),SIGNAL(textChanged(const QString &)),(QObject*)(newItem),SLOT(FloatControlActivated(const QString &)));
@@ -108,7 +116,7 @@ QmitkPropertyListViewItem* QmitkPropertyListViewItem::CreateInstance(mitk::Prope
   }
   else if (mitk::IntProperty* intProp = dynamic_cast<mitk::IntProperty*>(baseProp))
   {
-    newItem = new QmitkPropertyListViewItem(name,propList,NULL,NULL);
+    newItem = new QmitkPropertyListViewItem(name,propList,parent,createOnlyControl);
     QString text;
     text.setNum(intProp->GetValue());
     newItem->m_Control = new QLineEdit(text,parent);
@@ -126,7 +134,7 @@ QmitkPropertyListViewItem* QmitkPropertyListViewItem::CreateInstance(mitk::Prope
   }
   else
   {
-    newItem = new QmitkPropertyListViewItem(name,propList,NULL,NULL);
+    newItem = new QmitkPropertyListViewItem(name,propList,parent,createOnlyControl);
     if (baseProp)
     {
       newItem->m_Control = new QLabel(QString(baseProp->GetValueAsString().c_str()),parent);
@@ -136,13 +144,7 @@ QmitkPropertyListViewItem* QmitkPropertyListViewItem::CreateInstance(mitk::Prope
       newItem->m_Control = new QLabel("n/a",parent);
     }
   }
-  if (!createOnlyControl)
-  {
-    newItem->CreateEnabledButton(parent);
-    newItem->m_Label = new QLabel(name.c_str(),parent);
-    if (newItem->m_Label) newItem->m_Label->show();
-  }
-  // newItem->m_Control->show();
+  newItem->m_Control->show();
   return newItem;
 }
 void QmitkPropertyListViewItem::CheckBoxControlActivated(bool on)

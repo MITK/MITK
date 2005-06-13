@@ -106,11 +106,7 @@ void QmitkPropertyListView::SetPropertyList( mitk::PropertyList *propertyList )
 
       for (mitk::PropertyList::PropertyMap::const_iterator mapiter = propertyMap->begin(); mapiter!=propertyMap->end(); ++mapiter)
       {
-        // QmitkPropertyListViewItem* item = QmitkPropertyListViewItem::CreateInstance(propertyList,mapiter->first,m_Group,false);
-        QmitkPropertyListViewItem* item = QmitkPropertyListViewItem::CreateInstance(propertyList,mapiter->first,NULL,false);
-        item->m_Control->reparent(m_Group,QPoint(),true);
-        item->m_Label->reparent(m_Group,QPoint(),true);
-        item->m_EnabledButton->reparent(m_Group,QPoint(),true);
+        QmitkPropertyListViewItem* item = QmitkPropertyListViewItem::CreateInstance(propertyList,mapiter->first,m_Group,false);
 
         m_Items.insert(std::make_pair(item->m_Name,item));
       }
@@ -140,8 +136,7 @@ void QmitkPropertyListView::PropertyListModified()
     {
       if (m_Items.find(iter->first) == m_Items.end())
       {
-        QmitkPropertyListViewItem* item = QmitkPropertyListViewItem::CreateInstance(m_PropertyList,iter->first,NULL,true);
-        item->m_Control->reparent(m_Group,QPoint(),true);
+        QmitkPropertyListViewItem* item = QmitkPropertyListViewItem::CreateInstance(m_PropertyList,iter->first,m_Group,true);
         m_Items.insert(std::make_pair(item->m_Name,item));
       }
     }
@@ -162,20 +157,18 @@ void QmitkPropertyListView::SetMultiMode( std::vector<std::string> propertyNames
   {
     for (std::vector<std::string>::iterator propNameIt = propertyNames.begin(); propNameIt != propertyNames.end(); propNameIt++)
     {
-      //QmitkPropertyListViewItem* item = QmitkPropertyListViewItem::CreateInstance(m_PropertyList,iter->first,m_Group);
       // add the control thing
       std::string nodeName;
       (*node)->Get()->GetName(nodeName);
       QmitkPropertyListViewItem* item;
       if (*propNameIt == "name")
       {
-       item = QmitkPropertyListViewItem::CreateInstance((*node)->Get()->GetPropertyList(),*propNameIt,NULL,true);
+       item = QmitkPropertyListViewItem::CreateInstance((*node)->Get()->GetPropertyList(),*propNameIt,m_Group,true);
       }
       else
       {
-       item = QmitkPropertyListViewItem::CreateInstance((*node)->Get()->GetPropertyList(renderer),*propNameIt,NULL,true);
+       item = QmitkPropertyListViewItem::CreateInstance((*node)->Get()->GetPropertyList(renderer),*propNameIt,m_Group,true);
       }
-      item->m_Control->reparent(m_Group,QPoint(),true);
     }
   }
 }

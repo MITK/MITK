@@ -39,8 +39,7 @@ class QmitkPropertyListViewItem : public QObject
 {
   Q_OBJECT
 public:
-  QmitkPropertyListViewItem(std::string name, mitk::PropertyList* propertyList, QLabel* label, QWidget* control) :
-  m_Name(name), m_PropertyList(propertyList), m_Label(label), m_Control(control),m_EnabledButton(NULL)  {}
+  QmitkPropertyListViewItem(std::string name, mitk::PropertyList* propertyList, QWidget* parent, bool createOnlyControl) ;
   std::string m_Name;
   mitk::PropertyList* m_PropertyList;
   QPushButton* m_EnabledButton;
@@ -67,8 +66,8 @@ class QmitkPropertyListViewFloatSlider : public QmitkPropertyListViewItem
 {
   Q_OBJECT
 public:
-  QmitkPropertyListViewFloatSlider(std::string name, mitk::PropertyList* propertyList, QLabel* label, QWidget* control) :
-  QmitkPropertyListViewItem(name,propertyList,label,control),m_Slider(NULL), m_ValueLabel(NULL)  {}
+    QmitkPropertyListViewFloatSlider(std::string name, mitk::PropertyList* propertyList, QWidget* parent,bool createOnlyControl) :
+  QmitkPropertyListViewItem(name,propertyList,parent,createOnlyControl),m_Slider(NULL), m_ValueLabel(NULL)  {}
   void UpdateView();
   QSlider* m_Slider;
   QLabel* m_ValueLabel;

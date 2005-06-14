@@ -181,6 +181,13 @@ void mitk::ImageMapper2D::GenerateData(mitk::BaseRenderer *renderer)
   if(inputtimegeometry->IsValidTime(timestep)==false)
     return;
 
+  Image::RegionType requestedRegion = input->GetLargestPossibleRegion();
+  requestedRegion.SetIndex(3, timestep);
+  requestedRegion.SetSize(3, 1);
+  requestedRegion.SetSize(4, 1);
+  input->SetRequestedRegion(&requestedRegion);
+  input->Update();
+
   vtkImageData* inputData = input->GetVtkImageData(timestep);
   if(inputData==NULL)
     return;
@@ -420,14 +427,19 @@ void mitk::ImageMapper2D::Update(mitk::BaseRenderer* renderer)
   if(input == NULL)
     return;
 
+  if(IsVisible(renderer)==false) 
+    return;
+
   const DataTreeNode* node = GetDataTreeNode();
 
   RendererInfo& renderinfo = AccessRendererInfo(renderer);
   iil4mitkPicImage* image = renderinfo.Get_iil4mitkImage();
 
+  input->UpdateOutputInformation();
   if(
       (image == NULL) ||
       (renderinfo.m_LastUpdateTime < node->GetMTime()) ||
+      (renderinfo.m_LastUpdateTime < input->GetPipelineMTime()) ||
       (renderinfo.m_LastUpdateTime < renderer->GetCurrentWorldGeometry2DUpdateTime()) ||
       (renderinfo.m_LastUpdateTime < renderer->GetDisplayGeometryUpdateTime())
     )

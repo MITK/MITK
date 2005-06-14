@@ -58,7 +58,8 @@ void QmitkPropertyListView::SetPropertyList( mitk::PropertyList *propertyList )
   {
     if (m_PropertyList)
     {
-      m_PropertyList->RemoveObserver(m_ObserverTag);
+      m_PropertyList->RemoveObserver(m_ObserverTags[m_PropertyList]);
+      m_ObserverTags.erase(m_PropertyList);
     }
     m_PropertyList = propertyList;
     if (m_PropertyList)
@@ -81,7 +82,7 @@ void QmitkPropertyListView::SetPropertyList( mitk::PropertyList *propertyList )
       itk::SimpleMemberCommand<QmitkPropertyListView>::Pointer propertyListModifiedCommand =
         itk::SimpleMemberCommand<QmitkPropertyListView>::New();
       propertyListModifiedCommand->SetCallbackFunction(this, &QmitkPropertyListView::PropertyListModified);
-      m_ObserverTag = m_PropertyList->AddObserver(itk::ModifiedEvent(), propertyListModifiedCommand);
+      m_ObserverTags[m_PropertyList] = m_PropertyList->AddObserver(itk::ModifiedEvent(), propertyListModifiedCommand);
       int row = 0;
       const mitk::PropertyList::PropertyMap* propertyMap = propertyList->GetMap();
 
@@ -116,37 +117,55 @@ void QmitkPropertyListView::SetPropertyList( mitk::PropertyList *propertyList )
 void QmitkPropertyListView::PropertyListModified()
 {
   std::cout << "PropertyListModified()" << std::endl;
-  const mitk::PropertyList::PropertyMap* propertyMap = m_PropertyList->GetMap();
-  for (std::map<std::string,QmitkPropertyListViewItem*>::iterator it = m_Items.begin() ; it != m_Items.end() ; it++)
+  if (m_PropertyList)
   {
-    // update existing properties and check for removed ones
-    if (propertyMap->find(it->first) != propertyMap->end())
+    // single mode
+    const mitk::PropertyList::PropertyMap* propertyMap = m_PropertyList->GetMap();
+    for (std::map<std::string,QmitkPropertyListViewItem*>::iterator it = m_Items.begin() ; it != m_Items.end() ; it++)
+    {
+      // update existing properties and check for removed ones
+      if (propertyMap->find(it->first) != propertyMap->end())
+      {
+        it->second->UpdateView();
+      }
+      else
+      {
+        delete it->second->m_EnabledButton;
+        delete it->second->m_Label;
+        delete it->second->m_Control;
+        m_Items.erase(it);
+      }
+      // now add new ones if they exist
+      for (mitk::PropertyList::PropertyMap::const_iterator iter = propertyMap->begin(); iter!=propertyMap->end(); iter++)
+      {
+        if (m_Items.find(iter->first) == m_Items.end())
+        {
+          QmitkPropertyListViewItem* item = QmitkPropertyListViewItem::CreateInstance(m_PropertyList,iter->first,m_Group,true);
+          m_Items.insert(std::make_pair(item->m_Name,item));
+        }
+      }
+    }
+  }
+  else
+  {
+    // multi mode
+    for (std::map<std::string,QmitkPropertyListViewItem*>::iterator it = m_Items.begin() ; it != m_Items.end() ; it++)
     {
       it->second->UpdateView();
-    }
-    else
-    {
-      delete it->second->m_EnabledButton;
-      delete it->second->m_Label;
-      delete it->second->m_Control;
-      m_Items.erase(it);
-    }
-    // now add new ones if they exist
-    for (mitk::PropertyList::PropertyMap::const_iterator iter = propertyMap->begin(); iter!=propertyMap->end(); iter++)
-    {
-      if (m_Items.find(iter->first) == m_Items.end())
-      {
-        QmitkPropertyListViewItem* item = QmitkPropertyListViewItem::CreateInstance(m_PropertyList,iter->first,m_Group,true);
-        m_Items.insert(std::make_pair(item->m_Name,item));
-      }
     }
   }
 }
 
 void QmitkPropertyListView::SetMultiMode( std::vector<std::string> propertyNames, CommonFunctionality::DataTreeIteratorVector nodes, mitk::BaseRenderer * renderer )
 {
+  // remove all observers
+  for (std::map<mitk::PropertyList*,unsigned long>::iterator mapIt = m_ObserverTags.begin(); mapIt != m_ObserverTags.end(); mapIt++)
+  {
+    (*mapIt).first->RemoveObserver((*mapIt).second);
+  }
   delete m_Group;
   m_Items.clear();
+  m_PropertyList = NULL;
   m_Group = new QGroupBox(m_ScrollView->viewport());
   m_ScrollView->addChild(m_Group);
   m_ScrollView->show();
@@ -163,12 +182,22 @@ void QmitkPropertyListView::SetMultiMode( std::vector<std::string> propertyNames
       QmitkPropertyListViewItem* item;
       if (*propNameIt == "name")
       {
-       item = QmitkPropertyListViewItem::CreateInstance((*node)->Get()->GetPropertyList(),*propNameIt,m_Group,true);
+        item = QmitkPropertyListViewItem::CreateInstance((*node)->Get()->GetPropertyList(),*propNameIt,m_Group,true);
       }
       else
       {
-       item = QmitkPropertyListViewItem::CreateInstance((*node)->Get()->GetPropertyList(renderer),*propNameIt,m_Group,true);
+        mitk::PropertyList* propList = (*node)->Get()->GetPropertyList(renderer);
+        item = QmitkPropertyListViewItem::CreateInstance(propList,*propNameIt,m_Group,true);
+        if (m_ObserverTags.count(propList) == 0)
+        {
+          // add observer
+          itk::SimpleMemberCommand<QmitkPropertyListView>::Pointer propertyListModifiedCommand =
+            itk::SimpleMemberCommand<QmitkPropertyListView>::New();
+          propertyListModifiedCommand->SetCallbackFunction(this, &QmitkPropertyListView::PropertyListModified);
+          m_ObserverTags[propList] = propList->AddObserver(itk::ModifiedEvent(), propertyListModifiedCommand);
+        }
       }
+      m_Items.insert(std::make_pair(*propNameIt,item));
     }
   }
 }

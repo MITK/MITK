@@ -42,10 +42,10 @@
     <forward>class mitk::BaseRenderer</forward>
 </forwards>
 <variables>
-    <variable>unsigned long m_ObserverTag;</variable>
+    <variable>std::map&lt;mitk::PropertyList*,unsigned long&gt; m_ObserverTags;</variable>
     <variable>QGridLayout* m_GridLayout;</variable>
     <variable>mitk::PropertyList* m_PropertyList;</variable>
-    <variable>std::map&lt;std::string,QmitkPropertyListViewItem*&gt; m_Items;</variable>
+    <variable>std::multimap&lt;std::string,QmitkPropertyListViewItem*&gt; m_Items;</variable>
     <variable>QGroupBox* m_Group;</variable>
     <variable>QScrollView* m_ScrollView;</variable>
 </variables>

@@ -31,12 +31,14 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qvalidator.h>
 #include <qhbox.h>
 #include <qslider.h>
-QmitkPropertyListViewItem::QmitkPropertyListViewItem(std::string name, mitk::PropertyList* propertyList, QWidget* parent, bool createOnlyControl) : m_Name(name), m_PropertyList(propertyList), m_Control(NULL), m_Label(NULL) {
-  if (!createOnlyControl) {
+QmitkPropertyListViewItem::QmitkPropertyListViewItem(std::string name, mitk::PropertyList* propertyList, QWidget* parent, bool createOnlyControl) : m_Name(name), m_PropertyList(propertyList), m_Control(NULL), m_Label(NULL)
+{
+  if (!createOnlyControl)
+  {
     CreateEnabledButton(parent);
     m_Label = new QLabel(name.c_str(),parent);
     m_Label->show();
-  }  
+  }
 };
 
 void QmitkPropertyListViewItem::CreateEnabledButton(QWidget* parent)
@@ -207,7 +209,7 @@ void QmitkPropertyListViewItem::ColorControlActivated()
     col.SetGreen(result.green() / 255.0);
     col.SetBlue(result.blue() / 255.0);
     colorProp->SetColor(col);
-    m_PropertyList->SetProperty(m_Name.c_str(), colorProp);
+    m_PropertyList->InvokeEvent(itk::ModifiedEvent());
     m_Control->setPaletteBackgroundColor(result);
     mitk::RenderWindow::UpdateAllInstances();
   }

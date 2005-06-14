@@ -121,7 +121,7 @@ void QmitkPropertyListView::PropertyListModified()
   {
     // single mode
     const mitk::PropertyList::PropertyMap* propertyMap = m_PropertyList->GetMap();
-    for (std::map<std::string,QmitkPropertyListViewItem*>::iterator it = m_Items.begin() ; it != m_Items.end() ; it++)
+    for (std::multimap<std::string,QmitkPropertyListViewItem*>::iterator it = m_Items.begin() ; it != m_Items.end() ; it++)
     {
       // update existing properties and check for removed ones
       if (propertyMap->find(it->first) != propertyMap->end())
@@ -149,7 +149,7 @@ void QmitkPropertyListView::PropertyListModified()
   else
   {
     // multi mode
-    for (std::map<std::string,QmitkPropertyListViewItem*>::iterator it = m_Items.begin() ; it != m_Items.end() ; it++)
+    for (std::multimap<std::string,QmitkPropertyListViewItem*>::iterator it = m_Items.begin() ; it != m_Items.end() ; it++)
     {
       it->second->UpdateView();
     }

@@ -47,9 +47,18 @@ bool mitk::CoordinateSupplier::ExecuteAction(Action* action, mitk::StateEvent co
     
     if(posEvent!=NULL)
     {
-      const Geometry2D* worldGeometry = stateEvent->GetEvent()->GetSender()->GetCurrentWorldGeometry2D();
-      assert( worldGeometry != NULL );
-      ScalarType timeInMS = worldGeometry->GetTimeBoundsInMS()[ 0 ];
+      ScalarType timeInMS = 0;
+      if(stateEvent->GetEvent()->GetSender()!=NULL)
+      {
+        const Geometry2D* worldGeometry = stateEvent->GetEvent()->GetSender()->GetCurrentWorldGeometry2D();
+        assert( worldGeometry != NULL );
+        timeInMS = worldGeometry->GetTimeBoundsInMS()[ 0 ];
+      }
+      else
+      {
+        itkWarningMacro(<<"StateEvent::GetSender()==NULL - setting timeInMS to 0");
+      }
+
       switch (action->GetActionId())
       {
         case AcNEWPOINT:

@@ -60,6 +60,7 @@ void QmitkPropertyListView::SetPropertyList( mitk::PropertyList *propertyList )
     {
       m_PropertyList->RemoveObserver(m_ObserverTags[m_PropertyList]);
       m_ObserverTags.erase(m_PropertyList);
+
     }
     m_PropertyList = propertyList;
     if (m_PropertyList)
@@ -83,6 +84,11 @@ void QmitkPropertyListView::SetPropertyList( mitk::PropertyList *propertyList )
         itk::SimpleMemberCommand<QmitkPropertyListView>::New();
       propertyListModifiedCommand->SetCallbackFunction(this, &QmitkPropertyListView::PropertyListModified);
       m_ObserverTags[m_PropertyList] = m_PropertyList->AddObserver(itk::ModifiedEvent(), propertyListModifiedCommand);
+
+      itk::MemberCommand<QmitkPropertyListView>::Pointer propertyListDeletedCommand =
+        itk::MemberCommand<QmitkPropertyListView>::New();
+      propertyListDeletedCommand->SetCallbackFunction(this, &QmitkPropertyListView::PropertyListDeleted);
+      m_PropertyList->AddObserver(itk::DeleteEvent(), propertyListDeletedCommand);
       int row = 0;
       const mitk::PropertyList::PropertyMap* propertyMap = propertyList->GetMap();
 
@@ -113,10 +119,10 @@ void QmitkPropertyListView::SetPropertyList( mitk::PropertyList *propertyList )
       }
     }
   }
+  m_MultiMode = false;
 }
 void QmitkPropertyListView::PropertyListModified()
 {
-  std::cout << "PropertyListModified()" << std::endl;
   if (m_PropertyList)
   {
     // single mode
@@ -195,9 +201,35 @@ void QmitkPropertyListView::SetMultiMode( std::vector<std::string> propertyNames
             itk::SimpleMemberCommand<QmitkPropertyListView>::New();
           propertyListModifiedCommand->SetCallbackFunction(this, &QmitkPropertyListView::PropertyListModified);
           m_ObserverTags[propList] = propList->AddObserver(itk::ModifiedEvent(), propertyListModifiedCommand);
+
+          itk::MemberCommand<QmitkPropertyListView>::Pointer propertyListDeletedCommand =
+            itk::MemberCommand<QmitkPropertyListView>::New();
+          propertyListDeletedCommand->SetCallbackFunction(this, &QmitkPropertyListView::PropertyListDeleted);
+          propList->AddObserver(itk::DeleteEvent(), propertyListDeletedCommand);
+
         }
       }
       m_Items.insert(std::make_pair(*propNameIt,item));
+    }
+  }
+  m_MultiMode = true;
+}
+void QmitkPropertyListView::PropertyListDeleted(const itk::Object *caller, const itk::EventObject &event)
+{
+  const mitk::PropertyList* propList = dynamic_cast<const mitk::PropertyList*>(caller);
+  if (propList)
+  {
+    m_ObserverTags.erase(const_cast<mitk::PropertyList*>(propList));
+    if (m_MultiMode == false)
+    {
+      delete m_Group;
+      m_Group = NULL;
+      m_Items.clear();
+      m_PropertyList = NULL;
+    }
+    else
+    {
+      PropertyListModified();
     }
   }
 }

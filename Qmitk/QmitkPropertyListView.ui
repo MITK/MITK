@@ -42,12 +42,13 @@
     <forward>class mitk::BaseRenderer</forward>
 </forwards>
 <variables>
-    <variable>std::map&lt;mitk::PropertyList*,unsigned long&gt; m_ObserverTags;</variable>
-    <variable>QGridLayout* m_GridLayout;</variable>
-    <variable>mitk::PropertyList* m_PropertyList;</variable>
-    <variable>std::multimap&lt;std::string,QmitkPropertyListViewItem*&gt; m_Items;</variable>
-    <variable>QGroupBox* m_Group;</variable>
+    <variable>bool m_MultiMode;</variable>
     <variable>QScrollView* m_ScrollView;</variable>
+    <variable>QGroupBox* m_Group;</variable>
+    <variable>std::multimap&lt;std::string,QmitkPropertyListViewItem*&gt; m_Items;</variable>
+    <variable>mitk::PropertyList* m_PropertyList;</variable>
+    <variable>QGridLayout* m_GridLayout;</variable>
+    <variable>std::map&lt;mitk::PropertyList*,unsigned long&gt; m_ObserverTags;</variable>
 </variables>
 <slots>
     <slot>SetPropertyList( mitk::PropertyList * propertyList )</slot>
@@ -56,6 +57,7 @@
     <function access="private" specifier="non virtual">init()</function>
     <function>PropertyListModified()</function>
     <function>SetMultiMode( std::vector&lt;std::string&gt; propertyNames, CommonFunctionality::DataTreeIteratorVector nodes, mitk::BaseRenderer* renderer = NULL )</function>
+    <function>PropertyListDeleted(const itk::Object *caller, const itk::EventObject &amp;event)</function>
 </functions>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

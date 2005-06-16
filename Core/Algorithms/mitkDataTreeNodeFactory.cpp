@@ -726,6 +726,7 @@ void mitk::DataTreeNodeFactory::ReadFileTypeITKImageIOFactory()
   image->SetVolume( buffer );
   image->GetSlicedGeometry()->SetSpacing( spacing );
   image->GetTimeSlicedGeometry()->InitializeEvenlyTimed(image->GetSlicedGeometry(), image->GetDimension(3));
+  image->GetGeometry()->ImageGeometryOn();
   free( buffer );
   buffer = NULL;
   std::cout << "number of image components: "<< image->GetPixelType().GetNumberOfComponents() << std::endl;

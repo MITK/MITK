@@ -164,6 +164,7 @@ void QmitkVolumetryWidget::CreateOverlayChild()
     m_OverlayNode->SetData(m_Node->GetData());
     m_OverlayNode->SetColor(0.0,1.0,0.0);
     m_OverlayNode->SetOpacity(.25);
+    m_OverlayNode->SetProperty("layer",new mitk::IntProperty(2));
     m_OverlayNode->SetLevelWindow(mitk::LevelWindow(m_ThresholdSlider->value(),1));
 
     // hack!!!

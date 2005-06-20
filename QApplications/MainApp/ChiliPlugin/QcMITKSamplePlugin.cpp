@@ -22,6 +22,7 @@
 
 #include <ipPic.h>
 #include <ipFunc.h>
+#include <ipDicom/ipDicom.h>
 
 
 QcPlugin* QcMITKSamplePlugin::s_PluginInstance = NULL;
@@ -128,9 +129,11 @@ void QcMITKSamplePlugin::selectSerie (QcLightbox* lightbox)
     node->SetProperty("LoadedFromChili", new mitk::BoolProperty( true ) );
     mitk::DataTreeNodeFactory::SetDefaultImageProperties(node);
 
-    ipPicTSV_t* uid= ipPicQueryTag(reader->GetOutput()->GetPic(),"IMAGE INSTANCE UID");
-    ipPicTSV_t* description= ipPicQueryTag(reader->GetOutput()->GetPic(),"SERIES DESCRIPTION");
-    ipPicTSV_t* patientName= ipPicQueryTag(reader->GetOutput()->GetPic(),"PATIENT NAME");
+    ipPicDescriptor *pic = reader->GetOutput()->GetPic();
+
+    ipPicTSV_t* uid= ipPicQueryTag(pic, "IMAGE INSTANCE UID");
+    ipPicTSV_t* description= ipPicQueryTag(pic, "SERIES DESCRIPTION");
+    ipPicTSV_t* patientName= ipPicQueryTag(pic, "PATIENT NAME");
 
     if (description)
       node->SetProperty("name", new mitk::StringProperty( (char*)uid->value ));
@@ -141,6 +144,20 @@ void QcMITKSamplePlugin::selectSerie (QcLightbox* lightbox)
       node->SetProperty("name", new mitk::StringProperty( (char*)patientName->value ));
     else 
       node->SetProperty("name", new mitk::StringProperty( lightbox->name() ));
+
+
+    ipPicTSV_t* tsv = ipPicQueryTag(pic, "SOURCE HEADER");
+    void* data;
+    ipUInt4_t len;
+    if (tsv)
+    {
+      dicomFindElement((unsigned char*) tsv->value, 0x0018, 0x1030, &data, &len);
+      node->SetProperty("protocol", new mitk::StringProperty( (char *) data ));
+    }
+        //dicomFindElement((unsigned char*) tsv->value, 0x0020, 0x0013, &data, &len);
+        //sscanf( (char *) data, "%d", &imageNumber );
+        //info.imageNumber=imageNumber;
+
 
     if((ap->GetMultiWidget()->GetRenderWindow1()->GetRenderer()->GetMTime()==initTime) && (ap->GetStandardViewsInitialized()==false))
     {

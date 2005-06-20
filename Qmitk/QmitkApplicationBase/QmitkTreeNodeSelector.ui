@@ -8,17 +8,9 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>312</width>
-            <height>45</height>
+            <width>203</width>
+            <height>31</height>
         </rect>
-    </property>
-    <property name="sizePolicy">
-        <sizepolicy>
-            <hsizetype>3</hsizetype>
-            <vsizetype>1</vsizetype>
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-        </sizepolicy>
     </property>
     <property name="caption">
         <string>Form2</string>
@@ -27,17 +19,15 @@
         <property name="name">
             <cstring>unnamed</cstring>
         </property>
+        <property name="margin">
+            <number>0</number>
+        </property>
+        <property name="spacing">
+            <number>0</number>
+        </property>
         <widget class="QComboBox">
             <property name="name">
                 <cstring>m_ComboBox</cstring>
-            </property>
-            <property name="sizePolicy">
-                <sizepolicy>
-                    <hsizetype>3</hsizetype>
-                    <vsizetype>1</vsizetype>
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                </sizepolicy>
             </property>
         </widget>
     </hbox>

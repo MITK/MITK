@@ -52,6 +52,9 @@
  *   writes a PicFile to disk
  *
  * $Log$
+ * Revision 1.16  2005/06/21 11:22:48  ivo
+ * CHG: encrypted only a warning instead of an error on write
+ *
  * Revision 1.15  2003/02/18 12:28:23  andre
  * write compressed pic files
  *
@@ -120,8 +123,7 @@ ipPicPut( char *outfile_name, ipPicDescriptor *pic )
 
   if( ipPicEncryptionType(pic) != ' ' )
     {
-      fprintf( stderr, "ipPicPut: sorry, can't write (was encrypted !!!)\n" );
-      return( -1 );
+      fprintf( stderr, "ipPicPut: warning: was encrypted !!!\n" );
     }
 
   if( outfile_name == NULL )

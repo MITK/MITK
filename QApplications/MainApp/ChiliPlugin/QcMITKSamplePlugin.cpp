@@ -151,8 +151,23 @@ void QcMITKSamplePlugin::selectSerie (QcLightbox* lightbox)
     ipUInt4_t len;
     if (tsv)
     {
+      //0x0018, 0x1030 : Protocol Name - ist bei Morphologie/Phase gleich
+      //0x0008, 0x103e : Series Description - ist der in der unter "Beschreibung" stehende name (_bh/_bh_P)
+      // aber: wahrscheinlich unsicher, da vom Benutzer eingegeben
+      //eventuell brauchbar: 0x0018, 0x0024 : Sequence Name
       dicomFindElement((unsigned char*) tsv->value, 0x0018, 0x1030, &data, &len);
-      node->SetProperty("protocol", new mitk::StringProperty( (char *) data ));
+      char * tmp = new char[len+1];
+      strncpy(tmp, (char*)data, len);
+      tmp[len]=0;
+      node->SetProperty("protocol", new mitk::StringProperty( tmp ));
+      delete [] tmp;
+
+      dicomFindElement((unsigned char*) tsv->value, 0x0008, 0x103e, &data, &len);
+      tmp = new char[len+1];
+      strncpy(tmp, (char*)data, len);
+      tmp[len]=0;
+      node->SetProperty("series description", new mitk::StringProperty( tmp ));
+      delete [] tmp;
     }
         //dicomFindElement((unsigned char*) tsv->value, 0x0020, 0x0013, &data, &len);
         //sscanf( (char *) data, "%d", &imageNumber );

@@ -240,7 +240,7 @@
 </slots>
 <functions>
     <function access="private" specifier="non virtual">init()</function>
-    <function returnType="mitk::OpenGLRenderer::Pointer">GetRenderer()</function>
+    <function returnType="mitk::OpenGLRenderer*">GetRenderer()</function>
     <function returnType="QFrame *">GetSelectionFrame()</function>
     <function>UpdateGL()</function>
     <function>mousePressEvent( QMouseEvent * e )</function>

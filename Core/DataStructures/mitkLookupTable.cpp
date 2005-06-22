@@ -240,7 +240,7 @@ void mitk::LookupTable::CreateOpacityTransferFunction(vtkPiecewiseFunction*& opa
   rgba+=3;
   for(i=0;i<num_of_values;++i)
   {
-    *alphas=*rgba/255.0; ++alphas; rgba+=4;
+    *alphas=*rgba * 1024.0; ++alphas; rgba+=4;
   }
 
   opacityFunction->BuildFunctionFromTable(m_LookupTable->GetTableRange()[0], m_LookupTable->GetTableRange()[1], num_of_values-1, alphasHead);

@@ -21,8 +21,6 @@ PURPOSE.  See the above copyright notices for more information.
 #define _CommonFunctionality__h_
 
 #include "mitkConfig.h"
-#include <mitkImageAccessByItk.h>
-
 
 // std
 #include <string>
@@ -38,36 +36,30 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkLevelWindowProperty.h>
 #include <mitkStringProperty.h>
 #include <mitkDataTreeNode.h>
-#include <mitkSurface.h>
 #include <mitkDataTreeNodeFactory.h>
 // #include <mitkImageCast.h>
 #include <mitkDataTree.h>
 #include <mitkPicFileReader.h>
 #include "itkImage.h"
 
-#include "ipPic/ipPic.h"
-#include "ipFunc/ipFunc.h"
-
 #include <qstring.h>
 #include <qfiledialog.h>
 
-#include <itkRescaleIntensityImageFilter.h>
-// #include "itkImageSeriesReader.h"
-#include "itkImageSeriesWriter.h"
-#include "itkImageFileWriter.h"
-// #include "itkNumericSeriesFileNames.h"
-
 #include <itksys/SystemTools.hxx>
-
-#include "mitkSurfaceVtkWriter.h"
-#include <vtkSTLWriter.h>
-#include <vtkPolyDataWriter.h>
 
 #include "mitkLevelWindow.h"
 
 #define EXTERNAL_FILE_EXTENSIONS "All known formats(*.dcm *.DCM *.pic *.pic.gz *.png *.jog *.tiff);;DICOM files(*.dcm *.DCM);;DKFZ Pic (*.seq *.pic *.pic.gz *.seq.gz);;Sets of 2D slices (*.pic *.pic.gz *.png *.dcm);;stl files (*.stl)"
 #define INTERNAL_FILE_EXTENSIONS "all (*.seq *.pic *.pic.gz *.seq.gz *.pvtk *.stl *.vtk *.ves *.uvg *.dvg *.par *.dcm *.mhd hpsonos.db HPSONOS.DB *.png *.tiff *.jpg);;DKFZ Pic (*.seq *.pic *.pic.gz *.seq.gz);;surface files (*.stl *.vtk);;stl files (*.stl);;vtk surface files (*.vtk);;vtk image files (*.pvtk);;vessel files (*.ves *.uvg *.dvg);;par/rec files (*.par);;DSR files (hpsonos.db HPSONOS.DB);;DICOM files (*.dcm)"
 #define SAVE_FILE_EXTENSIONS "all (*.pic *.mhd *.png *.tiff *.jpg)"
+
+namespace mitk
+{
+  class Surface;
+  class Image;
+}
+
+class vtkPolyData;
 
 #ifdef MBI_INTERNAL
 #ifndef QMITKCOMMONFUNCTIONALITYIMPLEMENTATION
@@ -256,138 +248,21 @@ namespace CommonFunctionality
 
   void SetWidgetPlanesEnabled(mitk::DataTree* dataTree, bool enable);
   mitk::DataTreeNode::Pointer FileOpen( const char * fileName );
-  mitk::DataTreeNode::Pointer FileOpenImageSequence(QString fileName);
+  mitk::DataTreeNode::Pointer FileOpenImageSequence(const char* fileName);
   mitk::DataTreeNode::Pointer FileOpenImageSequence();
   mitk::DataTreeNode::Pointer FileOpen();
   mitk::DataTreeNode::Pointer OpenVolumeOrSliceStack();
 
-  template < typename TImageType >
-  static QString SaveImage(mitk::Image* image, QString fileName = 0)
-  {
-    if (!fileName)
-    {
-      fileName = QFileDialog::getSaveFileName(QString("NewImage.pic"),GetSaveFileExtensions());
-      if (fileName == NULL )
-        return NULL;
-    }
+  std::string SaveImage(mitk::Image* image, const char* fileName = NULL);
 
-    try
-    {
-      if ( fileName.contains(".pic") == 0 )
-      {
-        typename TImageType::Pointer itkImage = TImageType::New();
-        mitk::CastToItkImage( image, itkImage );
+  std::string SaveSurface(mitk::Surface* surface, const char* fileName = NULL);
 
-        if (fileName.contains(".mhd") != 0)
-        {
-          typename itk::ImageFileWriter<TImageType>::Pointer writer = itk::ImageFileWriter<TImageType>::New();
-          writer->SetInput( itkImage );
-          writer->SetFileName( fileName.ascii() );
-          writer->Update();
-        }
-        else if (fileName.contains(".png") != 0 || fileName.contains(".tif") != 0 || fileName.contains(".jpg") != 0)
-        {
-          typedef itk::Image<unsigned char,3> OutputImage3DType;
-          typedef itk::Image<unsigned char,2> OutputImage2DType;
-          typename itk::RescaleIntensityImageFilter<TImageType, OutputImage3DType>::Pointer rescaler = itk::RescaleIntensityImageFilter<TImageType, OutputImage3DType>::New();
-          rescaler->SetInput(itkImage);
-          rescaler->SetOutputMinimum(0);
-          rescaler->SetOutputMaximum(255);
-          itk::ImageSeriesWriter<OutputImage3DType, OutputImage2DType>::Pointer writer = itk::ImageSeriesWriter<OutputImage3DType, OutputImage2DType >::New();
-          writer->SetInput( rescaler->GetOutput() );
-
-          int numberOfSlices = itkImage->GetLargestPossibleRegion().GetSize()[2];
-          writer->SetStartIndex(numberOfSlices);
-          writer->SetIncrementIndex(-1);
-
-          int pos = fileName.findRev(".",fileName.length()-1);
-          fileName.insert(pos,".%d");
-          writer->SetSeriesFormat( fileName.ascii() );
-          writer->Update();
-        }
-        else
-        {
-          typedef typename TImageType::PixelType PixelType;
-          typedef itk::Image<PixelType,2> OutputImage2DType;
-          typename itk::ImageSeriesWriter<TImageType, OutputImage2DType>::Pointer writer = itk::ImageSeriesWriter<TImageType, OutputImage2DType >::New();
-          writer->SetInput( itkImage );
-          int pos = fileName.findRev(".",fileName.length()-1);
-          fileName.insert(pos,".%d");
-          writer->SetSeriesFormat( fileName.ascii() );
-          writer->Update();
-        }
-
-      }
-      else
-      {
-        ipPicDescriptor * picImage = image->GetPic();
-        //set tag "REAL PIXEL SIZE"
-        mitk::SlicedGeometry3D* slicedGeometry = image->GetSlicedGeometry();
-        if (slicedGeometry != NULL)
-        {
-          const mitk::Vector3D & spacing = slicedGeometry->GetSpacing();
-          ipPicTSV_t *pixelSizeTag;
-          pixelSizeTag = ipPicQueryTag( picImage, "REAL PIXEL SIZE" );
-          if (!pixelSizeTag)
-          {
-            pixelSizeTag = (ipPicTSV_t *) malloc( sizeof(ipPicTSV_t) );
-            pixelSizeTag->type = ipPicFloat;
-            pixelSizeTag->bpe = 32;
-            strcpy(pixelSizeTag->tag, "REAL PIXEL SIZE");
-            pixelSizeTag->dim = 1;
-            pixelSizeTag->n[0] = 3;
-            pixelSizeTag->value = malloc( sizeof(float) * 3 );
-            ipPicAddTag (picImage, pixelSizeTag);
-          }
-          ((float*)pixelSizeTag->value)[0] = spacing[0];
-          ((float*)pixelSizeTag->value)[1] = spacing[1];
-          ((float*)pixelSizeTag->value)[2] = spacing[2];
-        }
-        mitk::PicFileReader::ConvertHandedness(picImage);
-        ipPicPut((char*)(fileName.ascii()), picImage);
-        mitk::PicFileReader::ConvertHandedness(picImage);
-      }
-    }
-    catch ( itk::ExceptionObject &err)
-    {
-      itkGenericOutputMacro(<< "Exception object caught! " << err);
-      return NULL;
-    }
-    return fileName;
-  }
-
-  static void SaveSurface(mitk::Surface* surface, std::string name = 0)
-  {
-    std::string selectedItemsName = itksys::SystemTools::GetFilenameWithoutExtension(name);
-    selectedItemsName += ".stl";
-    QString fileName = QFileDialog::getSaveFileName(QString(selectedItemsName.c_str()),"Surface Data(*.stl *.vtk)");
-    if (fileName != NULL )
-    {
-      if(fileName.endsWith(".stl")==true)
-      {
-        mitk::SurfaceVtkWriter<vtkSTLWriter>::Pointer writer=mitk::SurfaceVtkWriter<vtkSTLWriter>::New();
-        writer->SetInput( surface );
-        writer->SetFileName(fileName.latin1());
-        writer->GetVtkWriter()->SetFileTypeToBinary();
-        writer->Write();
-      }
-      else
-      {
-        if (fileName.endsWith(".vtk")==false)
-          fileName += ".vtk";
-        mitk::SurfaceVtkWriter<vtkPolyDataWriter>::Pointer writer=mitk::SurfaceVtkWriter<vtkPolyDataWriter>::New();
-        writer->SetInput( surface );
-        writer->SetFileName(fileName.latin1());
-        writer->Write();
-      }
-    }
-  }
 #ifdef MBI_INTERNAL
-  void SaveDirectedVesselGraph( mitk::DirectedVesselGraphData* graph, std::string name = "" );
-  void SaveUndirectedVesselGraph( mitk::UndirectedVesselGraphData* graph, std::string name = "" );
+  void SaveDirectedVesselGraph( mitk::DirectedVesselGraphData* graph, const char* fileName = NULL );
+  void SaveUndirectedVesselGraph( mitk::UndirectedVesselGraphData* graph, const char* fileName = NULL );
 #endif
 
-  void SaveBaseData( mitk::BaseData* data, std::string name = "" );
+  void SaveBaseData( mitk::BaseData* data, const char* name = NULL );
 
 
 

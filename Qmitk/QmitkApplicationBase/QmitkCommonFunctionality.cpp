@@ -1,4 +1,5 @@
 #include <qregexp.h>
+#include <string>
 #include "mitkPointSetWriter.h"
 #include "mitkConfig.h"
 #ifdef MBI_INTERNAL
@@ -7,25 +8,30 @@
 #endif
 #define QMITKCOMMONFUNCTIONALITYIMPLEMENTATION
 #include "QmitkCommonFunctionality.h"
+#include "mitkImageAccessByItk.h"
+#include <mitkSurface.h>
 
 #ifdef MBI_INTERNAL
 /**
  * Saves the given directed vessel graph to a file. If no name is provided, the
  * user is prompted for a file name.
  */
-void CommonFunctionality::SaveDirectedVesselGraph( mitk::DirectedVesselGraphData* graph, std::string name )
+void CommonFunctionality::SaveDirectedVesselGraph( mitk::DirectedVesselGraphData* graph, const char* aFileName )
 {
   if(graph == NULL)
   {
     std::cout << "Warning in file " << __FILE__<< " line " << __LINE__ <<": vessel graph is NULL!" << std::endl;
     return;
   }
-  QString fileName = name.c_str();
-  if (fileName == "")
+  QString fileName;
+  if (aFileName == NULL)
   {
     fileName = QFileDialog::getSaveFileName(QString("VesselGraph.dvg"),"MITK VesselGraph (*.dvg)");
   }
-  if (fileName != NULL )
+  else
+    fileName = aFileName;
+
+  if (fileName.isEmpty() == false )
   {
     mitk::VesselGraphFileWriter<Directed>::Pointer writer = mitk::VesselGraphFileWriter<Directed>::New();
     writer->SetInput( graph );
@@ -38,19 +44,21 @@ void CommonFunctionality::SaveDirectedVesselGraph( mitk::DirectedVesselGraphData
  * Saves the given undirected vessel graph to a file. If no name is provided, the
  * user is prompted for a file name.
  */
-void CommonFunctionality::SaveUndirectedVesselGraph( mitk::UndirectedVesselGraphData* graph, std::string name)
+void CommonFunctionality::SaveUndirectedVesselGraph( mitk::UndirectedVesselGraphData* graph, const char* aFileName)
 {
   if(graph == NULL)
   {
     std::cout << "Warning in file " << __FILE__<< " line " << __LINE__ <<": vessel graph is NULL!" << std::endl;
     return;
   }
-  QString fileName = name.c_str();
-  if (fileName == "")
+  QString fileName;
+  if (aFileName == NULL)
   {
     fileName = QFileDialog::getSaveFileName(QString("VesselGraph.uvg"),"MITK VesselGraph (*.uvg)");
   }
-  if (fileName != NULL )
+  else
+    fileName = aFileName;
+  if (fileName.isEmpty() == false )
   {
     mitk::VesselGraphFileWriter<Undirected>::Pointer writer = mitk::VesselGraphFileWriter<Undirected>::New();
     writer->SetInput( graph );
@@ -67,28 +75,32 @@ void CommonFunctionality::SaveUndirectedVesselGraph( mitk::UndirectedVesselGraph
  * until the save-problem is solved by means of a Save-Factory or any
  * other "nice" mechanism
  */
-void CommonFunctionality::SaveBaseData( mitk::BaseData* data, std::string name )
+void CommonFunctionality::SaveBaseData( mitk::BaseData* data, const char * aFileName )
 {
   if (data != NULL)
   {
     mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(data);
     if(image.IsNotNull())
     {
-      typedef itk::Image<int,3> ImageType;
-      CommonFunctionality::SaveImage< ImageType >(image);
+      CommonFunctionality::SaveImage(image);
     }
 
     mitk::PointSet::Pointer pointset = dynamic_cast<mitk::PointSet*>(data);
     if(pointset.IsNotNull())
     {
-      name = itksys::SystemTools::GetFilenameWithoutExtension(name);
-      name += ".mps";
-      QString fileName = QFileDialog::getSaveFileName(QString(name.c_str()),"MITK Point-Sets (*.mps)");
-      if (fileName != NULL )
+      std::string fileName;
+      if(aFileName == NULL)
+        fileName = "PointSet";
+      else
+        fileName = aFileName;
+      fileName = itksys::SystemTools::GetFilenameWithoutExtension(fileName);
+      fileName += ".mps";
+      QString qfileName = QFileDialog::getSaveFileName(QString(fileName.c_str()),"MITK Point-Sets (*.mps)");
+      if (fileName.empty() == false )
       {
         mitk::PointSetWriter::Pointer writer = mitk::PointSetWriter::New();
         writer->SetInput( pointset );
-        writer->SetFileName( fileName.ascii() );
+        writer->SetFileName( qfileName.ascii() );
         writer->Update();
       }
     }
@@ -96,25 +108,25 @@ void CommonFunctionality::SaveBaseData( mitk::BaseData* data, std::string name )
     mitk::Surface::Pointer surface = dynamic_cast<mitk::Surface*>(data);
     if(surface.IsNotNull())
     {
-      CommonFunctionality::SaveSurface(surface, "SurfaceModel.stl");
+      CommonFunctionality::SaveSurface(surface, aFileName);
     }
 
 #ifdef MBI_INTERNAL
     mitk::UndirectedVesselGraphData::Pointer uvg = dynamic_cast<mitk::UndirectedVesselGraphData*>(data);
     if (uvg.IsNotNull())
     {
-      CommonFunctionality::SaveUndirectedVesselGraph(uvg.GetPointer());
+      CommonFunctionality::SaveUndirectedVesselGraph(uvg.GetPointer(), aFileName);
     }
 
     mitk::DirectedVesselGraphData::Pointer dvg = dynamic_cast<mitk::DirectedVesselGraphData*>(data);
     if (dvg.IsNotNull())
     {
-      CommonFunctionality::SaveDirectedVesselGraph(dvg.GetPointer());
+      CommonFunctionality::SaveDirectedVesselGraph(dvg.GetPointer(), aFileName);
     }
 #endif
-
   }
 }
+
 mitk::DataTreeNode::Pointer CommonFunctionality::AddVtkMeshToDataTree(vtkPolyData* polys, mitk::DataTreeIteratorBase* iterator, std::string str)
 {
   mitk::DataTreeIteratorClone it=iterator;
@@ -229,10 +241,13 @@ mitk::DataTreeNode::Pointer CommonFunctionality::FileOpen( const char * fileName
 }
 
 
-mitk::DataTreeNode::Pointer CommonFunctionality::FileOpenImageSequence(QString fileName)
+mitk::DataTreeNode::Pointer CommonFunctionality::FileOpenImageSequence(const char* aFileName)
 {
+  if(aFileName==NULL) return NULL;
+
   mitk::DataTreeNodeFactory::Pointer factory = mitk::DataTreeNodeFactory::New();
 
+  QString fileName = aFileName;
   if (!fileName.contains("dcm") && !fileName.contains("DCM"))
   {
     int fnstart = fileName.findRev( QRegExp("[/\\\\]"), fileName.length() );
@@ -258,8 +273,8 @@ mitk::DataTreeNode::Pointer CommonFunctionality::FileOpenImageSequence(QString f
   else
   {
     //    factory->SetFileName( fileName );
-    factory->SetFilePattern( fileName );
-    factory->SetFilePrefix( fileName );
+    factory->SetFilePattern( fileName.ascii() );
+    factory->SetFilePrefix( fileName.ascii() );
   }
   factory->Update();
   return factory->GetOutput( 0 );
@@ -441,3 +456,105 @@ CommonFunctionality::DataTreeIteratorVector CommonFunctionality::FilterNodes(mit
   return result;
 
 }
+
+#include "mitkSurfaceVtkWriter.h"
+#include <vtkSTLWriter.h>
+#include <vtkPolyDataWriter.h>
+
+std::string CommonFunctionality::SaveSurface(mitk::Surface* surface, const char* aFileName)
+{
+  std::string fileName;
+  if(aFileName == NULL)
+    fileName = "Surface";
+  else
+    fileName = aFileName;
+
+  std::string selectedItemsName = itksys::SystemTools::GetFilenameWithoutExtension(fileName);
+  selectedItemsName += ".stl";
+  QString qfileName = QFileDialog::getSaveFileName(QString(selectedItemsName.c_str()),"Surface Data(*.stl *.vtk)");
+  if (qfileName != NULL )
+  {
+    if(qfileName.endsWith(".stl")==true)
+    {
+      mitk::SurfaceVtkWriter<vtkSTLWriter>::Pointer writer=mitk::SurfaceVtkWriter<vtkSTLWriter>::New();
+      writer->SetInput( surface );
+      writer->SetFileName(qfileName.latin1());
+      writer->GetVtkWriter()->SetFileTypeToBinary();
+      writer->Write();
+    }
+    else
+    {
+      if (qfileName.endsWith(".vtk")==false)
+        qfileName += ".vtk";
+      mitk::SurfaceVtkWriter<vtkPolyDataWriter>::Pointer writer=mitk::SurfaceVtkWriter<vtkPolyDataWriter>::New();
+      writer->SetInput( surface );
+      writer->SetFileName(qfileName.latin1());
+      writer->Write();
+    }
+  }
+  fileName = qfileName.ascii();
+  return fileName;
+}
+
+#include "mitkItkImageWrite.h"
+
+std::string CommonFunctionality::SaveImage(mitk::Image* image, const char* aFileName)
+{
+  std::string fileName;
+  if(aFileName == NULL)
+  {
+    QString qfileName = QFileDialog::getSaveFileName(QString("NewImage.pic"),GetSaveFileExtensions());
+    if (qfileName == NULL )
+      return "";
+    fileName = qfileName.ascii();
+  }
+
+  fileName = aFileName;
+  try
+  {
+    if ( fileName.find(".pic") == std::string::npos )
+    {
+      AccessByItk_1( image, _mitkItkImageWrite, fileName );
+    }
+    else
+    {
+      ipPicDescriptor * picImage = image->GetPic();
+      //set tag "REAL PIXEL SIZE"
+      mitk::SlicedGeometry3D* slicedGeometry = image->GetSlicedGeometry();
+      if (slicedGeometry != NULL)
+      {
+        const mitk::Vector3D & spacing = slicedGeometry->GetSpacing();
+        ipPicTSV_t *pixelSizeTag;
+        pixelSizeTag = ipPicQueryTag( picImage, "REAL PIXEL SIZE" );
+        if (!pixelSizeTag)
+        {
+          pixelSizeTag = (ipPicTSV_t *) malloc( sizeof(ipPicTSV_t) );
+          pixelSizeTag->type = ipPicFloat;
+          pixelSizeTag->bpe = 32;
+          strcpy(pixelSizeTag->tag, "REAL PIXEL SIZE");
+          pixelSizeTag->dim = 1;
+          pixelSizeTag->n[0] = 3;
+          pixelSizeTag->value = malloc( sizeof(float) * 3 );
+          ipPicAddTag (picImage, pixelSizeTag);
+        }
+        ((float*)pixelSizeTag->value)[0] = spacing[0];
+        ((float*)pixelSizeTag->value)[1] = spacing[1];
+        ((float*)pixelSizeTag->value)[2] = spacing[2];
+      }
+      mitk::PicFileReader::ConvertHandedness(picImage);
+      ipPicPut((char*)(fileName.c_str()), picImage);
+      mitk::PicFileReader::ConvertHandedness(picImage);
+    }
+  }
+  catch ( itk::ExceptionObject &err)
+  {
+    itkGenericOutputMacro( << "Exception during write: " << err );
+    return "";
+  }
+  catch ( ... )
+  {
+    itkGenericOutputMacro( << "Unknown type of exception during write" );
+  }
+  return fileName;
+}
+

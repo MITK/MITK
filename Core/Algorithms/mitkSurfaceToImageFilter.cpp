@@ -51,12 +51,8 @@ void mitk::SurfaceToImageFilter::GenerateInputRequestedRegion()
   mitk::Image* output = this->GetOutput();
   if((output->IsInitialized()==false) )
     return;
-  // we have already calculated the spatial part of the 
-  // input-requested-region in m_InputRequestedRegion in 
-  // GenerateOutputInformation (which is called before 
-  // GenerateInputRequestedRegion).
+
   GenerateTimeInInputRegion(output, const_cast< mitk::Image * > ( this->GetImage() ));
-//  GenerateTimeInInputRegion(output, this->GetImage()->GetLargestPossibleRegion() );
 }
 
 void mitk::SurfaceToImageFilter::GenerateOutputInformation()
@@ -96,8 +92,6 @@ void mitk::SurfaceToImageFilter::GenerateOutputInformation()
   mitk::TimeSlicedGeometry* timeSlicedGeometry = output->GetTimeSlicedGeometry();
   timeSlicedGeometry->InitializeEvenlyTimed(slicedGeometry, output->GetDimension(3));
   timeSlicedGeometry->CopyTimes(inputImage->GetTimeSlicedGeometry());
-
-  //  m_TimeOfHeaderInitialization.Modified();
 }
 
 void mitk::SurfaceToImageFilter::GenerateData()
@@ -206,12 +200,12 @@ void mitk::SurfaceToImageFilter::Stencil3DImage(int time)
     output->SetVolume( stencil->GetOutput()->GetScalarPointer(), time );
   }
 
-  polydata = NULL;
-  normalsFilter = NULL;
-  surfaceConverter = NULL;
-  tmp = NULL;
-  castFilter = NULL;
-  stencil = NULL;
+  polydata->Delete();
+  normalsFilter->Delete();
+  surfaceConverter->Delete();
+  tmp->Delete();
+  castFilter->Delete();
+  stencil->Delete();
 }
 
 

@@ -1,0 +1,76 @@
+/*=========================================================================
+
+Program:   Medical Imaging & Interaction Toolkit
+Module:    $RCSfile$
+Language:  C++
+Date:      $Date$
+Version:   $Revision$
+
+Copyright (c) German Cancer Research Center, Division of Medical and
+Biological Informatics. All rights reserved.
+See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
+
+This software is distributed WITHOUT ANY WARRANTY; without even
+the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE.  See the above copyright notices for more information.
+
+=========================================================================*/
+
+#include "mitkImageAccessByItk.h"
+
+#include "itkImageSeriesWriter.h"
+#include "itkImageFileWriter.h"
+#include <itkRescaleIntensityImageFilter.h>
+
+template < typename TPixel, unsigned int VImageDimension > 
+void _mitkItkImageWrite(itk::Image< TPixel, VImageDimension >* itkImage, std::string& fileName)
+{
+  typedef itk::Image< TPixel, VImageDimension > TImageType;
+
+  if (fileName.find(".mhd") != std::string::npos)
+  {
+    typename itk::ImageFileWriter<TImageType>::Pointer writer = itk::ImageFileWriter<TImageType>::New();
+    writer->SetInput( itkImage );
+    writer->SetFileName( fileName.c_str() );
+    writer->Update();
+  }
+  else if (fileName.find(".png") != std::string::npos || fileName.find(".tif") != std::string::npos || fileName.find(".jpg") != std::string::npos)
+  {
+    typedef itk::Image<unsigned char,3> OutputImage3DType;
+    typedef itk::Image<unsigned char,2> OutputImage2DType;
+    typename itk::RescaleIntensityImageFilter<TImageType, OutputImage3DType>::Pointer rescaler = itk::RescaleIntensityImageFilter<TImageType, OutputImage3DType>::New();
+    rescaler->SetInput(itkImage);
+    rescaler->SetOutputMinimum(0);
+    rescaler->SetOutputMaximum(255);
+    itk::ImageSeriesWriter<OutputImage3DType, OutputImage2DType>::Pointer writer = itk::ImageSeriesWriter<OutputImage3DType, OutputImage2DType >::New();
+    writer->SetInput( rescaler->GetOutput() );
+
+    int numberOfSlices = itkImage->GetLargestPossibleRegion().GetSize()[2];
+    writer->SetStartIndex(numberOfSlices);
+    writer->SetIncrementIndex(-1);
+
+    std::string::size_type pos = fileName.find_last_of(".",fileName.length()-1);
+    if(pos==std::string::npos)
+      fileName.append(".%d.png");
+    else
+      fileName.insert(pos,".%d");
+    writer->SetSeriesFormat( fileName.c_str() );
+    writer->Update();
+  }
+  else
+  {
+    typedef typename TImageType::PixelType PixelType;
+    typedef itk::Image<PixelType,2> OutputImage2DType;
+    typename itk::ImageSeriesWriter<TImageType, OutputImage2DType>::Pointer writer = itk::ImageSeriesWriter<TImageType, OutputImage2DType >::New();
+    writer->SetInput( itkImage );
+    std::string::size_type pos = fileName.find_last_of(".",fileName.length()-1);
+    if(pos==std::string::npos)
+      fileName.append(".%d.png");
+    else
+      fileName.insert(pos,".%d");
+    writer->SetSeriesFormat( fileName.c_str() );
+    writer->Update();
+  }
+}
+
+InstantiateAccessFunction_1(_mitkItkImageWrite, std::string&);

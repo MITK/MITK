@@ -1,7 +1,7 @@
 #include <chili/task.h>
 #include <chili/plugin.xpm>
 #include <chili/qclightbox.h>
-#include <chili/qclightboxmanager.h>
+//#include <chili/qclightboxmanager.h>
 #include <qlayout.h>
 #include <qpushbutton.h>
 #include <qptrlist.h>

@@ -1082,4 +1082,5 @@ void mitk::DataTreeNodeFactory::SetDefaultSurfaceProperties(mitk::DataTreeNode::
     node->SetProperty( "wireframe", new mitk::BoolProperty(false));
     node->SetProperty( "color", new mitk::ColorProperty(1.0f, 1.0f, 1.0f));
     node->SetProperty( "opacity", new mitk::FloatProperty(1.0f));
+    node->SetProperty("layer",new mitk::IntProperty(1));
 }

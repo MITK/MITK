@@ -46,7 +46,7 @@ void QmitkPrimitiveMovieNavigator::init()
 {
   m_InRefetch = true; // this avoids trying to use m_Stepper until it is set to something != NULL (additionally to the avoiding recursions during refetching)
   m_Timer = new QTimer(this);
-  m_TimerIntervalInMS = 250;
+  m_TimerIntervalInMS = 120;
   connect(m_Timer, SIGNAL(timeout()), SLOT(next()) );
 }
 
@@ -97,3 +97,5 @@ void QmitkPrimitiveMovieNavigator::setTimerInterval( int timerIntervalInMS )
     }
   }
 }
+
+

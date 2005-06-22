@@ -1,4 +1,4 @@
-<!DOCTYPE UI><UI version="3.2" stdsetdef="1">
+<!DOCTYPE UI><UI version="3.3" stdsetdef="1">
 <class>QmitkPrimitiveMovieNavigator</class>
 <widget class="QWidget">
     <property name="name">
@@ -8,8 +8,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>227</width>
-            <height>76</height>
+            <width>154</width>
+            <height>50</height>
         </rect>
     </property>
     <property name="sizePolicy">
@@ -43,7 +43,7 @@
             <property name="frameShadow">
                 <enum>Raised</enum>
             </property>
-            <hbox>
+            <grid>
                 <property name="name">
                     <cstring>unnamed</cstring>
                 </property>
@@ -53,96 +53,119 @@
                 <property name="spacing">
                     <number>0</number>
                 </property>
-                <widget class="QLayoutWidget">
+                <widget class="QPushButton" row="0" column="0">
                     <property name="name">
-                        <cstring>layout9</cstring>
+                        <cstring>goButton</cstring>
                     </property>
-                    <hbox>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>0</hsizetype>
+                            <vsizetype>0</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
+                    <property name="maximumSize">
+                        <size>
+                            <width>35</width>
+                            <height>32767</height>
+                        </size>
+                    </property>
+                    <property name="text">
+                        <string></string>
+                    </property>
+                    <property name="pixmap">
+                        <pixmap>image0</pixmap>
+                    </property>
+                </widget>
+                <widget class="QPushButton" row="0" column="1">
+                    <property name="name">
+                        <cstring>stopButton</cstring>
+                    </property>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>0</hsizetype>
+                            <vsizetype>0</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
+                    <property name="maximumSize">
+                        <size>
+                            <width>35</width>
+                            <height>32767</height>
+                        </size>
+                    </property>
+                    <property name="text">
+                        <string></string>
+                    </property>
+                    <property name="pixmap">
+                        <pixmap>image1</pixmap>
+                    </property>
+                </widget>
+                <widget class="QFrame" row="0" column="2">
+                    <property name="name">
+                        <cstring>frame5</cstring>
+                    </property>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>1</hsizetype>
+                            <vsizetype>1</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
+                    <property name="minimumSize">
+                        <size>
+                            <width>55</width>
+                            <height>25</height>
+                        </size>
+                    </property>
+                    <property name="maximumSize">
+                        <size>
+                            <width>55</width>
+                            <height>25</height>
+                        </size>
+                    </property>
+                    <property name="frameShape">
+                        <enum>WinPanel</enum>
+                    </property>
+                    <property name="frameShadow">
+                        <enum>Sunken</enum>
+                    </property>
+                    <vbox>
                         <property name="name">
                             <cstring>unnamed</cstring>
                         </property>
                         <property name="margin">
-                            <number>0</number>
+                            <number>1</number>
                         </property>
                         <property name="spacing">
                             <number>2</number>
                         </property>
-                        <widget class="QPushButton">
+                        <widget class="QLabel">
                             <property name="name">
-                                <cstring>goButton</cstring>
+                                <cstring>m_SliceNumberLabel</cstring>
                             </property>
                             <property name="sizePolicy">
                                 <sizepolicy>
                                     <hsizetype>0</hsizetype>
                                     <vsizetype>0</vsizetype>
-                                    <horstretch>0</horstretch>
-                                    <verstretch>0</verstretch>
-                                </sizepolicy>
-                            </property>
-                            <property name="maximumSize">
-                                <size>
-                                    <width>35</width>
-                                    <height>32767</height>
-                                </size>
-                            </property>
-                            <property name="text">
-                                <string></string>
-                            </property>
-                            <property name="pixmap">
-                                <pixmap>image0</pixmap>
-                            </property>
-                        </widget>
-                        <widget class="QPushButton">
-                            <property name="name">
-                                <cstring>stopButton</cstring>
-                            </property>
-                            <property name="sizePolicy">
-                                <sizepolicy>
-                                    <hsizetype>0</hsizetype>
-                                    <vsizetype>0</vsizetype>
-                                    <horstretch>0</horstretch>
-                                    <verstretch>0</verstretch>
-                                </sizepolicy>
-                            </property>
-                            <property name="maximumSize">
-                                <size>
-                                    <width>35</width>
-                                    <height>32767</height>
-                                </size>
-                            </property>
-                            <property name="text">
-                                <string></string>
-                            </property>
-                            <property name="pixmap">
-                                <pixmap>image1</pixmap>
-                            </property>
-                        </widget>
-                        <widget class="QFrame">
-                            <property name="name">
-                                <cstring>frame5</cstring>
-                            </property>
-                            <property name="sizePolicy">
-                                <sizepolicy>
-                                    <hsizetype>1</hsizetype>
-                                    <vsizetype>1</vsizetype>
                                     <horstretch>0</horstretch>
                                     <verstretch>0</verstretch>
                                 </sizepolicy>
                             </property>
                             <property name="minimumSize">
                                 <size>
-                                    <width>55</width>
-                                    <height>25</height>
+                                    <width>40</width>
+                                    <height>15</height>
                                 </size>
                             </property>
                             <property name="maximumSize">
                                 <size>
-                                    <width>55</width>
-                                    <height>25</height>
+                                    <width>40</width>
+                                    <height>15</height>
                                 </size>
-                            </property>
-                            <property name="frameShape">
-                                <enum>WinPanel</enum>
                             </property>
                             <property name="frameShadow">
                                 <enum>Sunken</enum>
@@ -193,18 +216,29 @@
                                 </widget>
                             </vbox>
                         </widget>
-                    </hbox>
+                    </vbox>
                 </widget>
-            </hbox>
+                <widget class="QDial" row="0" column="3">
+                    <property name="name">
+                        <cstring>m_DelayDial</cstring>
+                    </property>
+                    <property name="maxValue">
+                        <number>250</number>
+                    </property>
+                    <property name="value">
+                        <number>100</number>
+                    </property>
+                </widget>
+            </grid>
         </widget>
     </vbox>
 </widget>
 <images>
     <image name="image0">
-        <data format="XPM.GZ" length="312">789cd3d7528808f055d0d2e72a2e492cc94c5648ce482c52d04a29cdcdad8c8eb5ade65232345630345130523054d2e15252564856f0cbcf4b05b1f5806c6503300073f59411002280240413800b2104a042c80260215401a010ba801e4101fc86e27718bad3913c576bcd05005ac6366b</data>
+        <data format="PNG" length="139">89504e470d0a1a0a0000000d494844520000000d0000000e0806000000f47f96d20000005249444154789c9dd23b0ec0300883e19faaf73f96af954c48a9f2326562e05b8c03680092027322518e8327e4e02d3ae12b5a611b8db88c009e2af88524c55b39cefd8a56916fd1e9b913726af409c22d6d07ed0922fb627bf4590000000049454e44ae426082</data>
     </image>
     <image name="image1">
-        <data format="XPM.GZ" length="394">789cd3d7528808f055d0d2e72a2e492cc94c5648ce482c52d04a29cdcdad8c8eb5ade6523234530022230543251d2e253d856405bffcbc54105b19c856360003b0141a008b29a380513198187a58d55a7301006a793f51</data>
+        <data format="PNG" length="106">89504e470d0a1a0a0000000d49484452000000100000001008060000001ff3ff610000003149444154789c633c76ec1803258085818181c1cacaea3f399a8f1d3bc6c84491f50c0c0ca3068c1a306a000430529a9d01e85708c591681bf30000000049454e44ae426082</data>
     </image>
 </images>
 <connections>
@@ -219,6 +253,12 @@
         <signal>clicked()</signal>
         <receiver>QmitkPrimitiveMovieNavigator</receiver>
         <slot>stopButton_clicked()</slot>
+    </connection>
+    <connection>
+        <sender>m_DelayDial</sender>
+        <signal>valueChanged(int)</signal>
+        <receiver>QmitkPrimitiveMovieNavigator</receiver>
+        <slot>setTimerInterval(int)</slot>
     </connection>
 </connections>
 <includes>
@@ -241,11 +281,11 @@
     <slot>goButton_clicked()</slot>
     <slot>stopButton_clicked()</slot>
     <slot>next()</slot>
+    <slot>setTimerInterval( int timerIntervalInMS )</slot>
 </slots>
 <functions>
     <function access="private" specifier="non virtual">init()</function>
     <function returnType="int">getTimerInterval()</function>
-    <function>setTimerInterval( int timerIntervalInMS )</function>
 </functions>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

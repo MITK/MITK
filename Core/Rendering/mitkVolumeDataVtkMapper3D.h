@@ -73,7 +73,7 @@ protected:
 	// vtkVolumeMapper* m_VtkVolumeMapper;
 	// vtkVolumeTextureMapper2D* m_VtkVolumeMapper;
   vtkVolumeTextureMapper2D* m_LowResMapper;
-  vtkVolumeTextureMapper2D* m_MedResMapper;
+  vtkVolumeRayCastMapper* m_MedResMapper;
   vtkVolumeRayCastMapper* m_HiResMapper;
   vtkLODProp3D* m_VolumeLOD;
   vtkImageResample* m_Resampler; 

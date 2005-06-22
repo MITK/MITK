@@ -35,6 +35,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkVolumeRayCastCompositeFunction.h>
 #include <vtkFiniteDifferenceGradientEstimator.h>
 #include <vtkRenderWindow.h>
+#include <vtkRenderWindowInteractor.h>
 #include <vtkCallbackCommand.h>
 #include <vtkImageShiftScale.h>
 #include <vtkImageChangeInformation.h>
@@ -43,9 +44,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkImageData.h>
 #include <vtkLODProp3D.h>
 #include <vtkImageResample.h>
-#include <vtkRenderWindow.h>
 #include <mitkVtkRenderWindow.h>
 
+#include <itkMultiThreader.h>
 
 const mitk::Image* mitk::VolumeDataVtkMapper3D::GetInput()
 {
@@ -54,19 +55,28 @@ const mitk::Image* mitk::VolumeDataVtkMapper3D::GetInput()
 
 mitk::VolumeDataVtkMapper3D::VolumeDataVtkMapper3D()
 {
-  
-  
-  
   //  m_VtkVolumeMapper = vtkVolumeRayCastMapper::New();
 	// m_VtkVolumeMapper = vtkVolumeTextureMapper2D::New();
 
   m_LowResMapper =  vtkVolumeTextureMapper2D::New();
-  m_MedResMapper =  vtkVolumeTextureMapper2D::New();
+  m_MedResMapper =  vtkVolumeRayCastMapper::New();
   m_HiResMapper = vtkVolumeRayCastMapper::New();
-        
+
+
+  //m_MedResMapper->AutoAdjustSampleDistancesOff();
+  //m_MedResMapper->SetImageSampleDistance(2.5);
+
+  //m_HiResMapper->AutoAdjustSampleDistancesOff();
+  //m_HiResMapper->SetImageSampleDistance(0.5);
+  m_HiResMapper->SetMaximumImageSampleDistance(10.0);
+  m_HiResMapper->SetMinimumImageSampleDistance(1.0);
+  m_HiResMapper->IntermixIntersectingGeometryOn();
+  m_HiResMapper->SetNumberOfThreads( itk::MultiThreader::GetGlobalDefaultNumberOfThreads() );
+
   vtkVolumeRayCastCompositeFunction* compositeFunction = vtkVolumeRayCastCompositeFunction::New();
+  m_MedResMapper->SetVolumeRayCastFunction(compositeFunction);
   m_HiResMapper->SetVolumeRayCastFunction(compositeFunction);
-  compositeFunction->Delete();
+//  compositeFunction->Delete();
   vtkFiniteDifferenceGradientEstimator* gradientEstimator = 
   vtkFiniteDifferenceGradientEstimator::New();
 /* if (dynamic_cast<vtkVolumeRayCastMapper*>(m_VtkVolumeMapper)){ 
@@ -82,9 +92,10 @@ mitk::VolumeDataVtkMapper3D::VolumeDataVtkMapper3D()
 
   m_VolumeProperty = vtkVolumeProperty::New();
   m_VolumeLOD = vtkLODProp3D::New();
-  m_VolumeLOD->AddLOD(m_LowResMapper,m_VolumeProperty,0.0);
-  m_VolumeLOD->AddLOD(m_MedResMapper,m_VolumeProperty,0.0);
+
   m_VolumeLOD->AddLOD(m_HiResMapper,m_VolumeProperty,0.0);
+  m_VolumeLOD->AddLOD(m_MedResMapper,m_VolumeProperty,0.0);
+  m_VolumeLOD->AddLOD(m_LowResMapper,m_VolumeProperty,0.0);
   
   m_Resampler = vtkImageResample::New();
   m_Resampler->SetAxisMagnificationFactor(0,0.5);
@@ -125,6 +136,11 @@ void mitk::VolumeDataVtkMapper3D::AbortCallback(vtkObject *caller, unsigned long
   // std::cout << "abort test called" << std::endl;
   vtkRenderWindow* renWin = dynamic_cast<vtkRenderWindow*>(caller);
   assert(renWin);
+   int foo=renWin->GetEventPending();
+   if(foo!=0) 
+   {
+     renWin->SetAbortRender(1);
+   }
   // FIXME: qApp->hasPendingEvents is always true, renWin->GetEventPending is
   // always false. So aborting the render doesn't work this way.
 
@@ -236,7 +252,7 @@ mitk::TransferFunctionProperty::Pointer tranferFunctionProp = dynamic_cast<mitk:
     opacityTransferFunction = transferFunctionProp->GetValue()->GetScalarOpacityFunction();
     colorTransferFunction = transferFunctionProp->GetValue()->GetColorTransferFunction();
   } else if (lookupTableProp.IsNotNull() )
-{
+  {
     lookupTableProp->GetLookupTable().CreateColorTransferFunction(colorTransferFunction);
     colorTransferFunction->ClampingOn();
     lookupTableProp->GetLookupTable().CreateOpacityTransferFunction(opacityTransferFunction);
@@ -300,15 +316,25 @@ mitk::TransferFunctionProperty::Pointer tranferFunctionProp = dynamic_cast<mitk:
   
   m_VolumeProperty->SetColor( colorTransferFunction );
   m_VolumeProperty->SetScalarOpacity( opacityTransferFunction ); 
-  //m_VolumeProperty->ShadeOn();
+  m_VolumeProperty->SetDiffuse(0.2);
+  m_VolumeProperty->SetAmbient(0.9);
+  m_VolumeProperty->ShadeOn();
 
-  m_VolumeProperty->SetDiffuse(0.99);
-  m_VolumeProperty->SetAmbient(0.99);
+  m_Prop3D = m_VolumeLOD;
+
   mitk::OpenGLRenderer* openGlRenderer = dynamic_cast<mitk::OpenGLRenderer*>(renderer);
   assert(openGlRenderer);
   vtkRenderWindow* vtkRendWin = dynamic_cast<vtkRenderWindow*>(openGlRenderer->GetVtkRenderWindow());
   if (vtkRendWin) {
-    vtkRendWin->SetDesiredUpdateRate(20.0);
+//    vtkRendWin->SetDesiredUpdateRate(25.0);
+    vtkRenderWindowInteractor* interactor = vtkRendWin->GetInteractor();
+    interactor->SetDesiredUpdateRate(50000.0);
+    interactor->SetStillUpdateRate(0.0001);
+
+    vtkCallbackCommand* cbc = vtkCallbackCommand::New(); 
+    cbc->SetCallback(mitk::VolumeDataVtkMapper3D::AbortCallback); 
+    vtkRendWin->AddObserver(vtkCommand::AbortCheckEvent,cbc); 
+
   } else {
     std::cout << "no vtk renderwindow" << std::endl;
   }
@@ -317,15 +343,7 @@ mitk::TransferFunctionProperty::Pointer tranferFunctionProp = dynamic_cast<mitk:
   // m_Prop3D = m_Volume;
 
   // now add an AbortCheckEvent callback for cancelling the rendering 
-/*
-  mitk::OpenGLRenderer* openGlRenderer = dynamic_cast<mitk::OpenGLRenderer*>(renderer);
-  assert(openGlRenderer);
-  vtkCallbackCommand* cbc = vtkCallbackCommand::New(); 
-  cbc->SetCallback(mitk::VolumeDataVtkMapper3D::AbortCallback); 
-  vtkRenderWindow* vtkRendWin;
-  vtkRendWin = (vtkRenderWindow*)openGlRenderer->GetVtkRenderWindow();
-  vtkRendWin->AddObserver(vtkCommand::AbortCheckEvent,cbc); 
-*/
+
 //  colorTransferFunction->Delete();
 //  opacityTransferFunction->Delete();
 }

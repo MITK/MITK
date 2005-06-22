@@ -171,7 +171,7 @@ void QmitkDataManagerControls::SaveButton_clicked()
 
         if (data.IsNotNull())
         {
-          CommonFunctionality::SaveBaseData( data.GetPointer(), selectedItemsName );
+          CommonFunctionality::SaveBaseData( data.GetPointer(), selectedItemsName.c_str() );
         }
       }
     }

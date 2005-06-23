@@ -3,7 +3,7 @@
 #include "mitkLightBoxImageReader.h"
 #include <qlayout.h>
 #include <qbuttongroup.h>
-//#include <chili/qclightboxmanager.h>
+#include <chili/qclightboxmanager.h>
 #include <qptrlist.h>
 
 

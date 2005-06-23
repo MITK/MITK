@@ -22,7 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifdef CHILIPLUGIN
 #include <chili/plugin.h>
 #include <chili/qclightbox.h>
-//#include <chili/qclightboxmanager.h>
+#include <chili/qclightboxmanager.h>
 #include <chili/isg.h>
 #endif
 

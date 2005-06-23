@@ -58,6 +58,7 @@ void CommonFunctionality::SaveUndirectedVesselGraph( mitk::UndirectedVesselGraph
   }
   else
     fileName = aFileName;
+
   if (fileName.isEmpty() == false )
   {
     mitk::VesselGraphFileWriter<Undirected>::Pointer writer = mitk::VesselGraphFileWriter<Undirected>::New();
@@ -508,8 +509,9 @@ std::string CommonFunctionality::SaveImage(mitk::Image* image, const char* aFile
       return "";
     fileName = qfileName.ascii();
   }
+  else
+    fileName = aFileName;
 
-  fileName = aFileName;
   try
   {
     if ( fileName.find(".pic") == std::string::npos )
@@ -519,10 +521,10 @@ std::string CommonFunctionality::SaveImage(mitk::Image* image, const char* aFile
     else
     {
       ipPicDescriptor * picImage = image->GetPic();
-      //set tag "REAL PIXEL SIZE"
       mitk::SlicedGeometry3D* slicedGeometry = image->GetSlicedGeometry();
       if (slicedGeometry != NULL)
       {
+        //set tag "REAL PIXEL SIZE"
         const mitk::Vector3D & spacing = slicedGeometry->GetSpacing();
         ipPicTSV_t *pixelSizeTag;
         pixelSizeTag = ipPicQueryTag( picImage, "REAL PIXEL SIZE" );
@@ -540,6 +542,42 @@ std::string CommonFunctionality::SaveImage(mitk::Image* image, const char* aFile
         ((float*)pixelSizeTag->value)[0] = spacing[0];
         ((float*)pixelSizeTag->value)[1] = spacing[1];
         ((float*)pixelSizeTag->value)[2] = spacing[2];
+        //set tag "ISG"
+        ipPicTSV_t *geometryTag;
+        geometryTag = ipPicQueryTag( picImage, "ISG" );
+        if (!geometryTag)
+        {
+          geometryTag = (ipPicTSV_t *) malloc( sizeof(ipPicTSV_t) );
+          geometryTag->type = ipPicFloat;
+          geometryTag->bpe = 32;
+          strcpy(geometryTag->tag, "ISG");
+          geometryTag->dim = 4;
+          geometryTag->n[0] = 3;
+          geometryTag->n[1] = 3;
+          geometryTag->n[2] = 3;
+          geometryTag->n[3] = 3;
+          geometryTag->value = malloc( sizeof(float) * 3 * 4 );
+          ipPicAddTag (picImage, geometryTag);
+        }
+        const mitk::AffineTransform3D::OffsetType& offset = slicedGeometry->GetIndexToWorldTransform()->GetOffset();
+        ((float*)geometryTag->value)[0] = offset[0];
+        ((float*)geometryTag->value)[1] = offset[1];
+        ((float*)geometryTag->value)[2] = offset[2];
+
+        const mitk::AffineTransform3D::MatrixType& matrix = slicedGeometry->GetIndexToWorldTransform()->GetMatrix();
+        const mitk::AffineTransform3D::MatrixType::ValueType* row0 = matrix[0];
+        const mitk::AffineTransform3D::MatrixType::ValueType* row1 = matrix[1];
+        const mitk::AffineTransform3D::MatrixType::ValueType* row2 = matrix[2];
+        ((float*)geometryTag->value)[3] = row0[0];
+        ((float*)geometryTag->value)[4] = row1[0];
+        ((float*)geometryTag->value)[5] = row2[0];
+        ((float*)geometryTag->value)[6] = row0[1];
+        ((float*)geometryTag->value)[7] = row1[1];
+        ((float*)geometryTag->value)[8] = row2[1];
+
+        ((float*)geometryTag->value)[9] = spacing[0];
+        ((float*)geometryTag->value)[10] = spacing[1];
+        ((float*)geometryTag->value)[11] = spacing[2];
       }
       mitk::PicFileReader::ConvertHandedness(picImage);
       ipPicPut((char*)(fileName.c_str()), picImage);

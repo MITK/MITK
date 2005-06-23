@@ -8,8 +8,8 @@
 #endif
 #define QMITKCOMMONFUNCTIONALITYIMPLEMENTATION
 #include "QmitkCommonFunctionality.h"
-#include "mitkImageAccessByItk.h"
-#include <mitkSurface.h>
+#include <mitkImageAccessByItk.h>
+#include <mitkPicFileReader.h>
 
 #ifdef MBI_INTERNAL
 /**

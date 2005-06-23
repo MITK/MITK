@@ -39,7 +39,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkDataTreeNodeFactory.h>
 // #include <mitkImageCast.h>
 #include <mitkDataTree.h>
-#include <mitkPicFileReader.h>
+#include <mitkSurface.h>
 #include "itkImage.h"
 
 #include <qstring.h>

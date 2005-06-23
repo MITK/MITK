@@ -313,7 +313,7 @@ void QmitkFctMediator::RaiseFunctionality(int id)
   {
     osize=oldVisibleWidget->minimumSizeHint();
     oldVisibleWidget->setSizePolicy(ignored);
-    newVisibleWidget->setSizePolicy(preferred);
+    newVisibleWidget->setSizePolicy(ignored);
   }
   m_ControlStack->raiseWidget(newVisibleWidget);
 

@@ -20,7 +20,10 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef _MITKITKIMAGEWRITE_H_HEADER_INCLUDED_C1EBD0AD
 #define _MITKITKIMAGEWRITE_H_HEADER_INCLUDED_C1EBD0AD
 
+#include <itkImage.h>
+#include <string>
+
 template < typename TPixel, unsigned int VImageDimension > 
-void _mitkItkImageWrite(itk::Image< TPixel, VImageDimension >* itkImage, std::string& fileName)
+void _mitkItkImageWrite(itk::Image< TPixel, VImageDimension >* itkImage, std::string& fileName);
 
 #endif /* _MITKITKIMAGEWRITE_H_HEADER_INCLUDED_C1EBD0AD */

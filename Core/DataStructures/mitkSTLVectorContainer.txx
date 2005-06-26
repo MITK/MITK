@@ -31,7 +31,7 @@ void mitk::STLVectorContainer<T>::Resize( unsigned int size )
  * if the index is out of range, an assertion is raised
  */
 template<typename T>
-void mitk::STLVectorContainer<T>::SetElement( const unsigned int& index, const mitk::STLVectorContainer<T>::ValueType& element )
+void mitk::STLVectorContainer<T>::SetElement( const unsigned int& index, const typename mitk::STLVectorContainer<T>::ValueType& element )
 {
     assert( index < Get().size() );
     Get()[index] = element;

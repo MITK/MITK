@@ -156,6 +156,9 @@ void mitk::PicHelper::InitializeEvenlySpaced(const ipPicDescriptor* pic, unsigne
     mitk::vtk2itk(((float*)geometryTag->value+6), downVector);
     mitk::vtk2itk(((float*)geometryTag->value+9), spacing);
 
+    rightVector.Normalize();
+    downVector.Normalize();
+
     rightVector=rightVector*pic->n[0];
     downVector=downVector*pic->n[1];
 

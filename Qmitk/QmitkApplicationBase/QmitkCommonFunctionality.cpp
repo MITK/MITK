@@ -568,12 +568,20 @@ std::string CommonFunctionality::SaveImage(mitk::Image* image, const char* aFile
         const mitk::AffineTransform3D::MatrixType::ValueType* row0 = matrix[0];
         const mitk::AffineTransform3D::MatrixType::ValueType* row1 = matrix[1];
         const mitk::AffineTransform3D::MatrixType::ValueType* row2 = matrix[2];
-        ((float*)geometryTag->value)[3] = row0[0];
-        ((float*)geometryTag->value)[4] = row1[0];
-        ((float*)geometryTag->value)[5] = row2[0];
-        ((float*)geometryTag->value)[6] = row0[1];
-        ((float*)geometryTag->value)[7] = row1[1];
-        ((float*)geometryTag->value)[8] = row2[1];
+
+        mitk::Vector3D v;
+
+        mitk::FillVector3D(v, row0[0], row1[0], row2[0]);
+        v.Normalize();
+        ((float*)geometryTag->value)[3] = v[0];
+        ((float*)geometryTag->value)[4] = v[1];
+        ((float*)geometryTag->value)[5] = v[2];
+
+        mitk::FillVector3D(v, row0[1], row1[1], row2[1]);
+        v.Normalize();
+        ((float*)geometryTag->value)[6] = v[0];
+        ((float*)geometryTag->value)[7] = v[1];
+        ((float*)geometryTag->value)[8] = v[2];
 
         ((float*)geometryTag->value)[9] = spacing[0];
         ((float*)geometryTag->value)[10] = spacing[1];

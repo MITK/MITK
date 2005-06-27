@@ -41,6 +41,7 @@ class iil4mitkPicImage;
 class Vtk2itk;
 class vtkImageReslice;
 class vtkLookupTable;
+class vtkGeneralTransform;
 
 namespace mitk {
 
@@ -238,6 +239,8 @@ protected:
   //## @brief Map of instances of RendererInfo
   //## @sa RendererInfo
   RenderInfoMap m_RendererInfo;
+
+  vtkGeneralTransform* m_ComposedResliceTransformForAbstractTransformGeometry;
 
 private:
 	int m_iil4mitkMode;

@@ -36,6 +36,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <vtkImageReslice.h>
 #include <vtkLinearTransform.h>
+#include <vtkGeneralTransform.h>
 #include <vtkMatrix4x4.h>
 #include <vtkLookupTable.h>
 #include <vtkImageData.h>
@@ -49,6 +50,7 @@ mitk::ImageMapper2D::ImageMapper2D() : m_SliceSelector(NULL)
 {
   m_SliceSelector = ImageSliceSelector::New();
   m_Reslicer = vtkImageReslice::New();
+  m_ComposedResliceTransformForAbstractTransformGeometry = vtkGeneralTransform::New();
 }
 
 //##ModelId=3E32DCF60043
@@ -263,10 +265,22 @@ void mitk::ImageMapper2D::GenerateData(mitk::BaseRenderer *renderer)
       right  = abstractGeometry->GetPlane()->GetAxisVector(0); right.Normalize();
       bottom = abstractGeometry->GetPlane()->GetAxisVector(1); bottom.Normalize();
       normal = abstractGeometry->GetPlane()->GetNormal();      normal.Normalize();
+
+      //take transform of input image into account
+      Geometry3D* geometry = inputtimegeometry->GetGeometry3D(timestep);
+
+      vtkLinearTransform * vtktransform = GetDataTreeNode()->GetVtkTransform();
+      vtkLinearTransform * inversetransform = vtktransform->GetLinearInverse();
+
+      m_ComposedResliceTransformForAbstractTransformGeometry->Identity();
+      m_ComposedResliceTransformForAbstractTransformGeometry->Concatenate(inversetransform);
+      m_ComposedResliceTransformForAbstractTransformGeometry->Concatenate(abstractGeometry->GetVtkAbstractTransform());
+
+      inputData->SetSpacing(1,1,1); //spacing already included in transform!
     }
     else
         return;
-    m_Reslicer->SetResliceTransform(abstractGeometry->GetVtkAbstractTransform());
+    m_Reslicer->SetResliceTransform(m_ComposedResliceTransformForAbstractTransformGeometry);
   }
   else
     return;

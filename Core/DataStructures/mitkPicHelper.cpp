@@ -140,13 +140,38 @@ void mitk::PicHelper::InitializeEvenlySpaced(const ipPicDescriptor* pic, unsigne
 {
   assert(pic!=NULL);
   assert(slicedgeometry!=NULL);
-  Vector3D spacing;
-  spacing.Fill(1);
-  GetSpacing(pic, spacing);
 
   mitk::PlaneGeometry::Pointer planegeometry=mitk::PlaneGeometry::New();
-  planegeometry->InitializeStandardPlane(pic->n[0], pic->n[1], spacing);
-  slicedgeometry->InitializeEvenlySpaced(planegeometry, spacing[2], slices);
+
+  ipPicTSV_t *geometryTag;
+  if ( (geometryTag = ipPicQueryTag( const_cast<ipPicDescriptor*>(pic), "ISG" )) != NULL)
+  {    
+    mitk::Point3D  origin;
+    mitk::Vector3D rightVector;
+    mitk::Vector3D downVector;
+    mitk::Vector3D spacing;
+
+    mitk::vtk2itk(((float*)geometryTag->value+0), origin);
+    mitk::vtk2itk(((float*)geometryTag->value+3), rightVector);
+    mitk::vtk2itk(((float*)geometryTag->value+6), downVector);
+    mitk::vtk2itk(((float*)geometryTag->value+9), spacing);
+
+    rightVector=rightVector*pic->n[0];
+    downVector=downVector*pic->n[1];
+
+    mitk::PlaneGeometry::Pointer planegeometry = PlaneGeometry::New();
+    planegeometry->InitializeStandardPlane(rightVector,downVector,&spacing);
+    planegeometry->SetOrigin(origin);
+    slicedgeometry->InitializeEvenlySpaced(planegeometry, slices);    
+  }
+  else
+  {
+    Vector3D spacing;
+    spacing.Fill(1);
+    GetSpacing(pic, spacing);
+    planegeometry->InitializeStandardPlane(pic->n[0], pic->n[1], spacing);
+    slicedgeometry->InitializeEvenlySpaced(planegeometry, spacing[2], slices);
+  }
 
   if(pic->dim>=4)
   {

@@ -141,8 +141,12 @@ void QmitkVolumetryWidget::UpdateSlider()
   {
     mitk::Image* image = dynamic_cast<mitk::Image*>(m_Node->GetData());
     image->Update();
-    m_ThresholdSlider->setMinValue((int)image->GetScalarValue2ndMin());
-    m_ThresholdSlider->setMaxValue((int)image->GetScalarValueMax());
+    int minVal = (int)image->GetScalarValue2ndMin();
+    int maxVal = (int)image->GetScalarValueMax();
+    if (minVal == maxVal)
+      --minVal;
+    m_ThresholdSlider->setMinValue(minVal);
+    m_ThresholdSlider->setMaxValue(maxVal);
     m_ThresholdSlider->setEnabled(true);
     m_ThresholdLabel->setNum(m_ThresholdSlider->value());
   }

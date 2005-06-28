@@ -267,8 +267,6 @@ void mitk::ImageMapper2D::GenerateData(mitk::BaseRenderer *renderer)
       normal = abstractGeometry->GetPlane()->GetNormal();      normal.Normalize();
 
       //take transform of input image into account
-      Geometry3D* geometry = inputtimegeometry->GetGeometry3D(timestep);
-
       vtkLinearTransform * vtktransform = GetDataTreeNode()->GetVtkTransform();
       vtkLinearTransform * inversetransform = vtktransform->GetLinearInverse();
 

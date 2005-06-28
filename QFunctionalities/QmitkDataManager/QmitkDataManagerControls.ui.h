@@ -299,7 +299,6 @@ void QmitkDataManagerControls::InitMultiMode(mitk::BaseRenderer* renderer)
     treeNodes.push_back(it);
     ++it;
   }
-  std::cout << "Test clicked!" << std::endl;
   m_MultiNodePropertiesView->SetMultiMode(propNames,treeNodes);
 }
 

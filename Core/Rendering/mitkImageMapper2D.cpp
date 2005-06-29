@@ -211,6 +211,9 @@ void mitk::ImageMapper2D::GenerateData(mitk::BaseRenderer *renderer)
   Point3D origin;
   Vector3D right, bottom, normal;
 
+  //take transform of input image into account
+  Geometry3D* inputGeometry = inputtimegeometry->GetGeometry3D(timestep);
+
   ScalarType MMperPixel[2];
   if(dynamic_cast<const PlaneGeometry *>(worldgeometry)!=NULL)
   {
@@ -241,7 +244,7 @@ void mitk::ImageMapper2D::GenerateData(mitk::BaseRenderer *renderer)
     //inplane = v-normal*(v*normal);
     //origin -= inplane;
 
-    vtkLinearTransform * vtktransform = GetDataTreeNode()->GetVtkTransform();
+    vtkLinearTransform * vtktransform = inputGeometry->GetVtkTransform();
           
     vtkLinearTransform * inversetransform = vtktransform->GetLinearInverse();
     m_Reslicer->SetResliceTransform(inversetransform); 
@@ -266,8 +269,7 @@ void mitk::ImageMapper2D::GenerateData(mitk::BaseRenderer *renderer)
       bottom = abstractGeometry->GetPlane()->GetAxisVector(1); bottom.Normalize();
       normal = abstractGeometry->GetPlane()->GetNormal();      normal.Normalize();
 
-      //take transform of input image into account
-      vtkLinearTransform * vtktransform = GetDataTreeNode()->GetVtkTransform();
+      vtkLinearTransform * vtktransform = inputGeometry->GetVtkTransform();
       vtkLinearTransform * inversetransform = vtktransform->GetLinearInverse();
 
       m_ComposedResliceTransformForAbstractTransformGeometry->Identity();

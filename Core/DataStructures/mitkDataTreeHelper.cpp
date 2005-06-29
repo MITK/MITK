@@ -20,15 +20,12 @@ PURPOSE.  See the above copyright notices for more information.
 
 mitk::DataTreeIteratorClone mitk::DataTreeHelper::FindIteratorToNode(
   mitk::DataTreeBase* tree,
-  const mitk::DataTreeNode* node,
-  const mitk::DataTreeIteratorBase* startPosition )
+  const mitk::DataTreeNode* node)
 {
-  DataTreeIteratorClone pos;
+  if(tree == NULL)
+    return NULL;
 
-  if(startPosition != NULL)
-    pos = *startPosition;
-  else
-    pos = DataTreePreOrderIterator(tree);
+  DataTreeIteratorClone pos = DataTreePreOrderIterator(tree);
 
   while ( !pos->IsAtEnd() )
   {
@@ -37,8 +34,24 @@ mitk::DataTreeIteratorClone mitk::DataTreeHelper::FindIteratorToNode(
     ++pos;
   }
   return pos;
-
 }
+
+mitk::DataTreeIteratorClone mitk::DataTreeHelper::FindIteratorToNode(
+  const mitk::DataTreeIteratorBase* startPosition,
+  const mitk::DataTreeNode* node
+  )
+{
+  DataTreeIteratorClone pos = *startPosition;
+
+  while ( !pos->IsAtEnd() )
+  {
+    if ( pos->Get().GetPointer() == node )
+      return pos;
+    ++pos;
+  }
+  return pos;
+}
+
 mitk::DataTreeIteratorClone mitk::DataTreeHelper::GetNamedChild(mitk::DataTreeIteratorBase* iterator, std::string name)
 {
   mitk::DataTreeChildIterator childIterator(*iterator);

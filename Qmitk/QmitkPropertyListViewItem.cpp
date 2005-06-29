@@ -157,7 +157,6 @@ void QmitkPropertyListViewItem::CheckBoxControlActivated(bool on)
 
 void QmitkPropertyListViewItem::StringControlActivated(const QString &text)
 {
-  std::cout << "setting string property to:" << text.ascii() << std::endl;
   m_PropertyList->SetProperty(m_Name.c_str(), new mitk::StringProperty(text.ascii()));
   mitk::RenderWindow::UpdateAllInstances();
 }

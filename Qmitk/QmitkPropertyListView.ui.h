@@ -229,6 +229,18 @@ void QmitkPropertyListView::PropertyListDeleted(const itk::Object *caller, const
     }
     else
     {
+      std::multimap<std::string,QmitkPropertyListViewItem*>::iterator it = m_Items.begin();
+      while(it != m_Items.end())
+      {
+        if(it->second->m_PropertyList == propList)
+        {
+          std::multimap<std::string,QmitkPropertyListViewItem*>::iterator tmp = it;
+          ++it;
+          m_Items.erase(tmp);
+        } 
+        else
+          ++it;
+      }
       PropertyListModified();
     }
   }

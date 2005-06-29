@@ -199,7 +199,6 @@ void QmitkPropertyListViewItem::IntControlActivated(const QString &text)
 }
 void QmitkPropertyListViewItem::ColorControlActivated()
 {
-  std::cout << "color control" << std::endl;
   mitk::ColorProperty* colorProp = dynamic_cast<mitk::ColorProperty*>(m_PropertyList->GetProperty(m_Name.c_str()).GetPointer());
   mitk::Color col = colorProp->GetColor();
   QColor result = QColorDialog::getColor(QColor((int)(col.GetRed() * 255), (int)(col.GetGreen() * 255), (int)(col.GetBlue() * 255)));

@@ -49,10 +49,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkLevelWindow.h"
 
-#define EXTERNAL_FILE_EXTENSIONS "All known formats(*.dcm *.DCM *.pic *.pic.gz *.png *.jog *.tiff);;DICOM files(*.dcm *.DCM);;DKFZ Pic (*.seq *.pic *.pic.gz *.seq.gz);;Sets of 2D slices (*.pic *.pic.gz *.png *.dcm);;stl files (*.stl)"
-#define INTERNAL_FILE_EXTENSIONS "all (*.seq *.pic *.pic.gz *.seq.gz *.pvtk *.stl *.vtk *.ves *.uvg *.dvg *.par *.dcm *.mhd hpsonos.db HPSONOS.DB *.png *.tiff *.jpg);;DKFZ Pic (*.seq *.pic *.pic.gz *.seq.gz);;surface files (*.stl *.vtk);;stl files (*.stl);;vtk surface files (*.vtk);;vtk image files (*.pvtk);;vessel files (*.ves *.uvg *.dvg);;par/rec files (*.par);;DSR files (hpsonos.db HPSONOS.DB);;DICOM files (*.dcm)"
-#define SAVE_FILE_EXTENSIONS "all (*.pic *.mhd *.png *.tiff *.jpg)"
-
 namespace mitk
 {
   class Surface;
@@ -86,9 +82,9 @@ namespace mitk
 namespace CommonFunctionality
 {
 
-  static const char* GetInternalFileExtensions() { return INTERNAL_FILE_EXTENSIONS; };
-  static const char* GetExternalFileExtensions() { return EXTERNAL_FILE_EXTENSIONS; };
-  static const char* GetSaveFileExtensions() { return SAVE_FILE_EXTENSIONS; };
+  static const char* GetInternalFileExtensions();
+  static const char* GetExternalFileExtensions();
+  static const char* GetSaveFileExtensions();
 
   typedef std::vector<mitk::DataTreeIteratorClone> DataTreeIteratorVector;
   typedef std::vector<mitk::DataTreeNode*> DataTreeNodeVector;

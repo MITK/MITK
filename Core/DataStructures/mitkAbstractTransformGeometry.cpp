@@ -152,6 +152,19 @@ void mitk::AbstractTransformGeometry::WorldToIndex(const mitk::Point2D &atPt2d_m
   m_Plane->WorldToIndex(atPt2d_mm, vec_mm, vec_units);
 }
 
+bool mitk::AbstractTransformGeometry::IsAbove(const mitk::Point3D& pt3d_mm) const
+{
+  assert((m_ItkVtkAbstractTransform.IsNotNull()) && (m_Plane.IsNotNull()));
+
+  Point3D pt3d_ParametricWorld;
+  pt3d_ParametricWorld = m_ItkVtkAbstractTransform->BackTransform(pt3d_mm);
+
+  Point3D pt3d_ParametricUnits;
+  ((Geometry3D*)m_Plane)->WorldToIndex(pt3d_ParametricWorld, pt3d_ParametricUnits);
+
+  return (pt3d_ParametricUnits[2] > m_ParametricBoundingBox->GetBounds()[4]);
+}
+
 void mitk::AbstractTransformGeometry::SetVtkAbstractTransform(vtkAbstractTransform* aVtkAbstractTransform)
 {
   m_ItkVtkAbstractTransform->SetVtkAbstractTransform(aVtkAbstractTransform);

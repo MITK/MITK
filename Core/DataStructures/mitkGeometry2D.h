@@ -170,6 +170,27 @@ public:
   //## @return true projection was possible
   virtual bool Project(const mitk::Point3D & atPt3d_mm, const mitk::Vector3D &vec3d_mm, mitk::Vector3D &projectedVec3d_mm) const;
 
+  //##Documentation
+  //## @brief Distance of the point from the geometry
+  //## (bounding-box @em not considered)
+  //##
+  inline ScalarType Distance(const Point3D& pt3d_mm) const
+  {
+    return fabs(SignedDistance(pt3d_mm));
+  }
+
+  //##Documentation
+  //## @brief Signed distance of the point from the geometry
+  //## (bounding-box @em not considered)
+  //##
+  virtual ScalarType SignedDistance(const Point3D& pt3d_mm) const;
+
+  //##Documentation
+  //## @brief Test if the point is above the geometry
+  //## (bounding-box @em not considered)
+  //##
+  virtual bool IsAbove(const Point3D& pt3d_mm) const;
+
   virtual void SetIndexToWorldTransform(mitk::AffineTransform3D* transform);
 
   virtual void SetExtentInMM(int direction, ScalarType extentInMM);

@@ -196,6 +196,26 @@ bool mitk::Geometry2D::Project(const mitk::Point3D & atPt3d_mm, const mitk::Vect
   return const_cast<BoundingBox*>(m_BoundingBox.GetPointer())->IsInside(pt3d_units);
 }
 
+mitk::ScalarType mitk::Geometry2D::SignedDistance(const mitk::Point3D& pt3d_mm) const
+{
+  Point3D projectedPoint;
+  Project(pt3d_mm, projectedPoint);
+  Vector3D direction = pt3d_mm-projectedPoint;
+  ScalarType distance = direction.GetNorm();
+
+  if(IsAbove(pt3d_mm) == false)
+    distance*=-1.0;
+
+  return distance;
+}
+
+bool mitk::Geometry2D::IsAbove(const mitk::Point3D& pt3d_mm) const
+{
+  Point3D pt3d_units;
+  Geometry3D::WorldToIndex(pt3d_mm, pt3d_units);
+  return (pt3d_units[2] > m_BoundingBox->GetBounds()[4]);
+}
+
 mitk::AffineGeometryFrame3D::Pointer mitk::Geometry2D::Clone() const
 {
   Self::Pointer newGeometry = Self::New();

@@ -288,6 +288,16 @@ void mitk::PlaneGeometry::InitializePlane(const mitk::Point3D& origin, const mit
   SetOrigin(origin);
 }
 
+mitk::ScalarType mitk::PlaneGeometry::SignedDistance(const mitk::Point3D& pt3d_mm) const
+{
+  return SignedDistanceFromPlane(pt3d_mm);
+}
+
+bool mitk::PlaneGeometry::IsAbove(const mitk::Point3D& pt3d_mm) const
+{
+  return SignedDistanceFromPlane(pt3d_mm)>0;
+}
+
 mitk::AffineGeometryFrame3D::Pointer mitk::PlaneGeometry::Clone() const
 {
   Self::Pointer newGeometry = Self::New();

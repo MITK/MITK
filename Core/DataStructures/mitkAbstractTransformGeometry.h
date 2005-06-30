@@ -95,6 +95,8 @@ public:
 
   virtual void WorldToIndex(const mitk::Point2D &atPt2d_mm, const mitk::Vector2D &vec_mm, mitk::Vector2D &vec_units) const;
 
+  virtual bool IsAbove(const Point3D& pt3d_mm) const;
+
   //##Documentation
   //## @brief Change the parametric bounds to @a oversampling times 
   //## the bounds of m_Plane.

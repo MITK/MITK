@@ -144,13 +144,17 @@ public:
     return m_IndexToWorldTransform->GetMatrix().GetVnlMatrix().get_column(2);
   }
 
+  virtual ScalarType SignedDistance(const Point3D& pt3d_mm) const;
+
+  virtual bool IsAbove(const Point3D& pt3d_mm) const;
+
   //##Documentation
   //## @brief Distance of the point from the plane
   //## (bounding-box @em not considered)
   //##
-  ScalarType Distance(const Point3D& point ) const 
+  ScalarType DistanceFromPlane(const Point3D& pt3d_mm) const 
   {
-    return fabs(SignedDistance(point));
+    return fabs(SignedDistance(pt3d_mm));
   }
 
   //##Documentation
@@ -158,30 +162,31 @@ public:
   //## (bounding-box @em not considered)
   //##
   //## > 0 : point is in the direction of the direction vector.
-  inline ScalarType SignedDistance(const Point3D& point ) const 
+  inline ScalarType SignedDistanceFromPlane(const Point3D& pt3d_mm) const 
   {
     ScalarType len = GetNormalVnl().two_norm();
 
     if( len == 0 )
       return 0;
 
-    return (point-GetOrigin())*GetNormal() / len;
+    return (pt3d_mm-GetOrigin())*GetNormal() / len;
   }
+
   //##Documentation
   //## @brief Distance of the plane from another plane
   //## (bounding-box @em not considered)
   //##
   //## Result is 0 if planes are not parallel.
-  ScalarType Distance(const PlaneGeometry* plane) const 
+  ScalarType DistanceFromPlane(const PlaneGeometry* plane) const 
   {
-    return fabs(SignedDistance(plane));
+    return fabs(SignedDistanceFromPlane(plane));
   }
   //##Documentation
   //## @brief Signed distance of the plane from another plane
   //## (bounding-box @em not considered)
   //##
   //## Result is 0 if planes are not parallel.
-  inline ScalarType SignedDistance(const PlaneGeometry* plane) const 
+  inline ScalarType SignedDistanceFromPlane(const PlaneGeometry* plane) const 
   {
     if(IsParallel(plane))
     {

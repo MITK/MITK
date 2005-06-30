@@ -32,6 +32,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkPolyData.h>
 #include <vtkStructuredPointsReader.h>
 #include <vtkStructuredPoints.h>
+#if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
+#include <vtkXMLImageDataReader.h>
+#endif
 
 // ITK-related includes
 #include <itksys/SystemTools.hxx>
@@ -110,6 +113,12 @@ void mitk::DataTreeNodeFactory::GenerateData()
     {
       this->ReadFileTypePVTK();
     }
+#if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
+    else if ( this->FileNameEndsWith( ".vti" ) )
+    {
+      this->ReadFileTypeVTI();
+    }
+#endif
 #ifdef MBI_INTERNAL
     else if ( this->FileNameEndsWith( ".DCM" ) || this->FileNameEndsWith( ".dcm" ) )
     {
@@ -355,6 +364,36 @@ void mitk::DataTreeNodeFactory::ReadFileTypePVTK()
     mitk::DataTreeNode::Pointer node = this->GetOutput();
     node->SetData( image );
 
+    SetDefaultImageProperties(node);
+
+    // set filename without path as string property
+    mitk::StringProperty::Pointer nameProp = new mitk::StringProperty( this->GetBaseFileName() );
+    node->SetProperty( "name", nameProp );
+
+    // add level-window property
+    mitk::LevelWindowProperty::Pointer levWinProp = new mitk::LevelWindowProperty();
+    mitk::LevelWindow levelwindow;
+    levelwindow.SetAuto( image );
+    levWinProp->SetLevelWindow( levelwindow );
+    node->GetPropertyList()->SetProperty( "levelwindow", levWinProp );
+  }
+  vtkreader->Delete();
+}
+
+#if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
+void mitk::DataTreeNodeFactory::ReadFileTypeVTI()
+{
+  vtkXMLImageDataReader * vtkreader = vtkXMLImageDataReader::New();
+  vtkreader->SetFileName( m_FileName.c_str() );
+  vtkreader->Update();
+
+  if ( vtkreader->GetOutput() != NULL )
+  {
+    mitk::Image::Pointer image = mitk::Image::New();
+    image->Initialize( vtkreader->GetOutput() );
+    image->SetVolume( vtkreader->GetOutput()->GetScalarPointer() );
+    mitk::DataTreeNode::Pointer node = this->GetOutput();
+    node->SetData( image );
 
     SetDefaultImageProperties(node);
 
@@ -368,18 +407,13 @@ void mitk::DataTreeNodeFactory::ReadFileTypePVTK()
     levelwindow.SetAuto( image );
     levWinProp->SetLevelWindow( levelwindow );
     node->GetPropertyList()->SetProperty( "levelwindow", levWinProp );
-
-
   }
-
   vtkreader->Delete();
-
 }
+#endif
+
 
 #ifdef MBI_INTERNAL
-
-
-
 void mitk::DataTreeNodeFactory::ReadFileTypeVES()
 {
   std::cout << "Loading " << m_FileName << " as ves... " << std::endl;

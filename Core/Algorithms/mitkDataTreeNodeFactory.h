@@ -162,6 +162,10 @@ protected:
 
   virtual void ReadFileTypePVTK();
 
+#if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
+  virtual void ReadFileTypeVTI();
+#endif
+
   virtual void ReadFileTypeITKImageIOFactory();
 
 #ifdef MBI_INTERNAL

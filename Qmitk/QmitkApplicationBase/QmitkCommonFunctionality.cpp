@@ -20,9 +20,9 @@
 #endif
 #define SAVE_FILE_EXTENSIONS "all (*.pic *.mhd *.png *.tiff *.jpg)"
 
-static const char* CommonFunctionality::GetInternalFileExtensions() { return INTERNAL_FILE_EXTENSIONS; };
-static const char* CommonFunctionality::GetExternalFileExtensions() { return EXTERNAL_FILE_EXTENSIONS; };
-static const char* CommonFunctionality::GetSaveFileExtensions() { return SAVE_FILE_EXTENSIONS; };
+const char* CommonFunctionality::GetInternalFileExtensions() { return INTERNAL_FILE_EXTENSIONS; };
+const char* CommonFunctionality::GetExternalFileExtensions() { return EXTERNAL_FILE_EXTENSIONS; };
+const char* CommonFunctionality::GetSaveFileExtensions() { return SAVE_FILE_EXTENSIONS; };
 
 
 #ifdef MBI_INTERNAL

@@ -158,7 +158,7 @@ void mitk::GeometryClipImageFilter::GenerateData()
 
   const Geometry2D * clippingGeometryOfCurrentTimeStep = NULL;
 
-  if(m_TimeSlicedClippingGeometry == NULL)
+  if(m_TimeSlicedClippingGeometry.IsNull())
   {
     clippingGeometryOfCurrentTimeStep = dynamic_cast<const Geometry2D*>(m_ClippingGeometry.GetPointer());
   }
@@ -194,7 +194,7 @@ void mitk::GeometryClipImageFilter::GenerateData()
     m_OutputTimeSelector->SetTimeNr(t);
     m_OutputTimeSelector->UpdateLargestPossibleRegion();
 
-    if(m_TimeSlicedClippingGeometry != NULL)
+    if(m_TimeSlicedClippingGeometry.IsNotNull())
     {
       timestep = m_TimeSlicedClippingGeometry->MSToTimeStep( timeInMS );
       if(m_TimeSlicedClippingGeometry->IsValidTime(timestep) == false)

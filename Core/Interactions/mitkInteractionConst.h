@@ -119,11 +119,13 @@ typedef enum EOperations
   OpSELECTCELL = 702,
   OpSELECTSUBOBJECT = 703, //for VesselGraphInteractor
   //OpSELECTNEWSUBOBJECT = 704, //for VesselGraphInteractor
+  OpSELECT = 705, 
   OpDESELECTPOINT = 800,
   OpDESELECTLINE = 801,
   OpDESELECTCELL = 802,
   OpDESELECTSUBOBJECT = 803,  //for VesselGraphInteractor
   OpDESELECTALL = 804,     //for VesselGraphInteractor
+  OpDESELECT = 805,    
   OpNAVIGATE = 900,       
   OpZOOM = 1000,
   OpSCALE = 1100,

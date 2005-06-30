@@ -1548,6 +1548,27 @@
       <transition NAME="no" NEXT_STATE_ID="11" EVENT_ID="1003" />
      </state>     
   </stateMachine> 
+  <!-- state machine for vessel TREE interaction -->
+  <stateMachine NAME="YetAnotherVesselTreeInteractor">
+    <state NAME="no-vessel-picked" ID="0" START_STATE="TRUE">
+      <transition NAME="checkpicked" NEXT_STATE_ID="1" EVENT_ID="5">
+        <action ID="30"/> <!--AcCHECKELEMENT-->
+      </transition>
+    </state>
+    <state NAME="check-guard" ID="1">
+      <transition NAME="check-successful" NEXT_STATE_ID="2" EVENT_ID="1004">
+        <action ID="65" /> <!--AcSELECT-->
+      </transition>
+      <transition NAME="check-not-successful" NEXT_STATE_ID="0" EVENT_ID="1003">
+        <action ID="75" /> <!--AcDESELECT-->
+      </transition>
+    </state>
+    <state NAME="vessel-picked" ID="2">
+      <transition NAME="checkpicked" NEXT_STATE_ID="1" EVENT_ID="5">
+        <action ID="30"/> <!--AcCHECKELEMENT-->
+      </transition>
+    </state>
+  </stateMachine>
   <!-- -->
   <!-- -->
   <!-- EventDescriptions -->

@@ -234,7 +234,8 @@ void mitk::PointSet::ExecuteOperation(Operation* operation)
   //only call modified if anything is done, so call in cases
 	//this->Modified();
 
-  ((const itk::Object*)this)->InvokeEvent(itk::EndEvent());
+  mitk::OperationEndEvent endevent(operation);
+  ((const itk::Object*)this)->InvokeEvent(endevent);
 
   mitk::RenderWindow::UpdateAllInstances(); //*todo has to be done here, cause of update-pipeline not working yet
 }

@@ -53,7 +53,7 @@ void QmitkTwoButtonNavigator::init()
 void QmitkTwoButtonNavigator::SpinBoxValueChanged(int value)
 {
   if(!m_InRefetch)
-    m_Stepper->SetPos(m_Stepper->ConvertPosToUnit(m_SpinBox->value()));
+    m_Stepper->SetPos((int) m_Stepper->ConvertPosToUnit(m_SpinBox->value()));
 }
 
 void QmitkTwoButtonNavigator::prevButton_clicked()

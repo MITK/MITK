@@ -235,10 +235,30 @@ void mitk::SliceNavigationController::SetGeometry(const itk::EventObject & geome
 
 void mitk::SliceNavigationController::SetGeometryTime(const itk::EventObject & geometryTimeEvent)
 {
+  const SliceNavigationController::GeometryTimeEvent * timeEvent =
+    dynamic_cast<const SliceNavigationController::GeometryTimeEvent *>(&geometryTimeEvent);
+  assert(timeEvent!=NULL);
+
+  TimeSlicedGeometry* timeSlicedGeometry = timeEvent->GetTimeSlicedGeometry();
+  assert(timeSlicedGeometry!=NULL);
+
+  if(m_CreatedWorldGeometry.IsNotNull())
+  {
+    int timeStep = (int) timeEvent->GetPos();
+    ScalarType timeInMS;
+    timeInMS = timeSlicedGeometry->TimeStepToMS(timeStep);
+    timeStep = m_CreatedWorldGeometry->MSToTimeStep(timeInMS);
+    GetTime()->SetPos(timeStep);
+  }
 }
 
 void mitk::SliceNavigationController::SetGeometrySlice(const itk::EventObject & geometrySliceEvent)
 {
+  const SliceNavigationController::GeometrySliceEvent* sliceEvent =
+    dynamic_cast<const SliceNavigationController::GeometrySliceEvent *>(&geometrySliceEvent);
+  assert(sliceEvent!=NULL);
+
+  GetSlice()->SetPos(sliceEvent->GetPos());
 }
 
 bool mitk::SliceNavigationController::ExecuteAction( Action* action, mitk::StateEvent const* stateEvent)

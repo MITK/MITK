@@ -75,13 +75,19 @@ void QmitkStdMultiWidget::init()
   layer = new mitk::IntProperty(1000);
   planeNode->SetProperty("layer",layer);
 
-  //initialize timeNavigationController
+  //initialize timeNavigationController: send time via sliceNavigationControllers
   timeNavigationController = new mitk::SliceNavigationController(NULL);
-  timeNavigationController->ConnectGeometryTimeEvent(mitkWidget1->GetRenderer(), false);
-  timeNavigationController->ConnectGeometryTimeEvent(mitkWidget2->GetRenderer(), false);
-  timeNavigationController->ConnectGeometryTimeEvent(mitkWidget3->GetRenderer(), false);
-  timeNavigationController->ConnectGeometryTimeEvent(mitkWidget4->GetRenderer(), false);
+  timeNavigationController->ConnectGeometryTimeEvent(mitkWidget1->GetSliceNavigationController(), false);
+  timeNavigationController->ConnectGeometryTimeEvent(mitkWidget2->GetSliceNavigationController(), false);
+  timeNavigationController->ConnectGeometryTimeEvent(mitkWidget3->GetSliceNavigationController(), false);
+  timeNavigationController->ConnectGeometryTimeEvent(mitkWidget4->GetSliceNavigationController(), false);
   mitkWidget1->GetSliceNavigationController()->ConnectGeometrySendEvent(mitkWidget4->GetRenderer());
+
+  //reverse connection between sliceNavigationControllers and timeNavigationController
+  mitkWidget1->GetSliceNavigationController()->ConnectGeometryTimeEvent(timeNavigationController.GetPointer(), false);
+  mitkWidget2->GetSliceNavigationController()->ConnectGeometryTimeEvent(timeNavigationController.GetPointer(), false);
+  mitkWidget3->GetSliceNavigationController()->ConnectGeometryTimeEvent(timeNavigationController.GetPointer(), false);
+  mitkWidget4->GetSliceNavigationController()->ConnectGeometryTimeEvent(timeNavigationController.GetPointer(), false);
 
   //initialize update-controller
   multiplexUpdateController = new mitk::MultiplexUpdateController("navigation");

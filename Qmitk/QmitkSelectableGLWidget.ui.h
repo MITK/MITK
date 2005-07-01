@@ -46,6 +46,7 @@ void QmitkSelectableGLWidget::init()
     //initialize SliceNavigationController
     sliceNavigationController = new mitk::SliceNavigationController("navigation");
     sliceNavigationController->ConnectGeometrySliceEvent(renderer.GetPointer());
+    sliceNavigationController->ConnectGeometryTimeEvent(renderer.GetPointer(), false);
 }
 
 
@@ -70,8 +71,11 @@ mitk::SliceNavigationController* QmitkSelectableGLWidget::GetSliceNavigationCont
 
 void QmitkSelectableGLWidget::wheelEvent( QWheelEvent * e )
 {
+  mitk::Stepper* stepper = sliceNavigationController->GetSlice();
+  if(stepper->GetSteps() <= 1)
+    stepper = sliceNavigationController->GetTime();
   if (e->orientation() * e->delta()  > 0) 
-      sliceNavigationController->GetSlice()->Next();
+    stepper->Next();
   else
-      sliceNavigationController->GetSlice()->Previous();
+    stepper->Previous();
 }

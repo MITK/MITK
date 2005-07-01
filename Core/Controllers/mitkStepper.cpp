@@ -32,9 +32,9 @@ mitk::Stepper::~Stepper()
 //##ModelId=3DF8B9410142
 void mitk::Stepper::Previous()
 {
-	if(m_Pos>0)
+  if(m_Pos>0)
   {
-		--m_Pos;
+    --m_Pos;
     Modified();
   }
 }
@@ -44,7 +44,7 @@ void mitk::Stepper::Last()
 {
   if(m_Pos != m_Steps-1)
   {
-	  m_Pos = m_Steps-1;
+    m_Pos = m_Steps-1;
     Modified();
   }
 }
@@ -54,7 +54,7 @@ void mitk::Stepper::First()
 {
   if(m_Pos != 0)
   {
-  	m_Pos = 0;
+    m_Pos = 0;
     Modified();
   }
 }
@@ -62,9 +62,9 @@ void mitk::Stepper::First()
 //##ModelId=3DF8B92703A4
 void mitk::Stepper::Next()
 {
-	if(m_Pos<m_Steps)
+  if(m_Pos<m_Steps-1)
   {
-		++m_Pos;
+    ++m_Pos;
     Modified();
   }
 }
@@ -93,4 +93,3 @@ unsigned int mitk::Stepper::ConvertUnitToPos(float unitValue)
   }
   return posValue;
 }
-

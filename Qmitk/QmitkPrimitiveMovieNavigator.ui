@@ -8,13 +8,13 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>154</width>
-            <height>50</height>
+            <width>239</width>
+            <height>30</height>
         </rect>
     </property>
     <property name="sizePolicy">
         <sizepolicy>
-            <hsizetype>1</hsizetype>
+            <hsizetype>5</hsizetype>
             <vsizetype>1</vsizetype>
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
@@ -23,7 +23,7 @@
     <property name="caption">
         <string>QmitkPrimitiveMovieNavigator</string>
     </property>
-    <vbox>
+    <hbox>
         <property name="name">
             <cstring>unnamed</cstring>
         </property>
@@ -33,42 +33,30 @@
         <property name="spacing">
             <number>0</number>
         </property>
-        <widget class="QFrame">
+        <widget class="QLayoutWidget">
             <property name="name">
-                <cstring>frame6</cstring>
+                <cstring>layout5</cstring>
             </property>
-            <property name="frameShape">
-                <enum>StyledPanel</enum>
-            </property>
-            <property name="frameShadow">
-                <enum>Raised</enum>
-            </property>
-            <grid>
+            <hbox>
                 <property name="name">
                     <cstring>unnamed</cstring>
                 </property>
-                <property name="margin">
-                    <number>0</number>
-                </property>
-                <property name="spacing">
-                    <number>0</number>
-                </property>
-                <widget class="QPushButton" row="0" column="0">
+                <widget class="QPushButton">
                     <property name="name">
-                        <cstring>goButton</cstring>
+                        <cstring>m_GoButton</cstring>
                     </property>
                     <property name="sizePolicy">
                         <sizepolicy>
-                            <hsizetype>0</hsizetype>
-                            <vsizetype>0</vsizetype>
+                            <hsizetype>3</hsizetype>
+                            <vsizetype>1</vsizetype>
                             <horstretch>0</horstretch>
                             <verstretch>0</verstretch>
                         </sizepolicy>
                     </property>
-                    <property name="maximumSize">
+                    <property name="minimumSize">
                         <size>
-                            <width>35</width>
-                            <height>32767</height>
+                            <width>50</width>
+                            <height>0</height>
                         </size>
                     </property>
                     <property name="text">
@@ -78,22 +66,22 @@
                         <pixmap>image0</pixmap>
                     </property>
                 </widget>
-                <widget class="QPushButton" row="0" column="1">
+                <widget class="QPushButton">
                     <property name="name">
-                        <cstring>stopButton</cstring>
+                        <cstring>m_StopButton</cstring>
                     </property>
                     <property name="sizePolicy">
                         <sizepolicy>
-                            <hsizetype>0</hsizetype>
-                            <vsizetype>0</vsizetype>
+                            <hsizetype>3</hsizetype>
+                            <vsizetype>1</vsizetype>
                             <horstretch>0</horstretch>
                             <verstretch>0</verstretch>
                         </sizepolicy>
                     </property>
-                    <property name="maximumSize">
+                    <property name="minimumSize">
                         <size>
-                            <width>35</width>
-                            <height>32767</height>
+                            <width>50</width>
+                            <height>0</height>
                         </size>
                     </property>
                     <property name="text">
@@ -103,9 +91,9 @@
                         <pixmap>image1</pixmap>
                     </property>
                 </widget>
-                <widget class="QFrame" row="0" column="2">
+                <widget class="QSpinBox">
                     <property name="name">
-                        <cstring>frame5</cstring>
+                        <cstring>m_SpinBox</cstring>
                     </property>
                     <property name="sizePolicy">
                         <sizepolicy>
@@ -115,123 +103,50 @@
                             <verstretch>0</verstretch>
                         </sizepolicy>
                     </property>
+                    <property name="maxValue">
+                        <number>0</number>
+                    </property>
+                </widget>
+                <widget class="QSlider">
+                    <property name="name">
+                        <cstring>m_TimerInterval</cstring>
+                    </property>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>1</hsizetype>
+                            <vsizetype>0</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
                     <property name="minimumSize">
                         <size>
-                            <width>55</width>
-                            <height>25</height>
+                            <width>60</width>
+                            <height>0</height>
                         </size>
                     </property>
-                    <property name="maximumSize">
-                        <size>
-                            <width>55</width>
-                            <height>25</height>
-                        </size>
-                    </property>
-                    <property name="frameShape">
-                        <enum>WinPanel</enum>
-                    </property>
-                    <property name="frameShadow">
-                        <enum>Sunken</enum>
-                    </property>
-                    <vbox>
-                        <property name="name">
-                            <cstring>unnamed</cstring>
-                        </property>
-                        <property name="margin">
-                            <number>1</number>
-                        </property>
-                        <property name="spacing">
-                            <number>2</number>
-                        </property>
-                        <widget class="QLabel">
-                            <property name="name">
-                                <cstring>m_SliceNumberLabel</cstring>
-                            </property>
-                            <property name="sizePolicy">
-                                <sizepolicy>
-                                    <hsizetype>0</hsizetype>
-                                    <vsizetype>0</vsizetype>
-                                    <horstretch>0</horstretch>
-                                    <verstretch>0</verstretch>
-                                </sizepolicy>
-                            </property>
-                            <property name="minimumSize">
-                                <size>
-                                    <width>40</width>
-                                    <height>15</height>
-                                </size>
-                            </property>
-                            <property name="maximumSize">
-                                <size>
-                                    <width>40</width>
-                                    <height>15</height>
-                                </size>
-                            </property>
-                            <property name="frameShadow">
-                                <enum>Sunken</enum>
-                            </property>
-                            <vbox>
-                                <property name="name">
-                                    <cstring>unnamed</cstring>
-                                </property>
-                                <property name="margin">
-                                    <number>1</number>
-                                </property>
-                                <property name="spacing">
-                                    <number>2</number>
-                                </property>
-                                <widget class="QLabel">
-                                    <property name="name">
-                                        <cstring>m_SliceNumberLabel</cstring>
-                                    </property>
-                                    <property name="sizePolicy">
-                                        <sizepolicy>
-                                            <hsizetype>0</hsizetype>
-                                            <vsizetype>0</vsizetype>
-                                            <horstretch>0</horstretch>
-                                            <verstretch>0</verstretch>
-                                        </sizepolicy>
-                                    </property>
-                                    <property name="minimumSize">
-                                        <size>
-                                            <width>40</width>
-                                            <height>15</height>
-                                        </size>
-                                    </property>
-                                    <property name="maximumSize">
-                                        <size>
-                                            <width>40</width>
-                                            <height>15</height>
-                                        </size>
-                                    </property>
-                                    <property name="frameShadow">
-                                        <enum>Sunken</enum>
-                                    </property>
-                                    <property name="text">
-                                        <string>0</string>
-                                    </property>
-                                    <property name="alignment">
-                                        <set>AlignVCenter|AlignRight</set>
-                                    </property>
-                                </widget>
-                            </vbox>
-                        </widget>
-                    </vbox>
-                </widget>
-                <widget class="QDial" row="0" column="3">
-                    <property name="name">
-                        <cstring>m_DelayDial</cstring>
+                    <property name="minValue">
+                        <number>10</number>
                     </property>
                     <property name="maxValue">
-                        <number>250</number>
+                        <number>1000</number>
                     </property>
                     <property name="value">
+                        <number>250</number>
+                    </property>
+                    <property name="orientation">
+                        <enum>Horizontal</enum>
+                    </property>
+                    <property name="tickmarks">
+                        <enum>Below</enum>
+                    </property>
+                    <property name="tickInterval">
                         <number>100</number>
                     </property>
                 </widget>
-            </grid>
+            </hbox>
         </widget>
-    </vbox>
+    </hbox>
 </widget>
 <images>
     <image name="image0">
@@ -243,19 +158,25 @@
 </images>
 <connections>
     <connection>
-        <sender>goButton</sender>
-        <signal>clicked()</signal>
+        <sender>m_SpinBox</sender>
+        <signal>valueChanged(int)</signal>
         <receiver>QmitkPrimitiveMovieNavigator</receiver>
-        <slot>goButton_clicked()</slot>
+        <slot>spinBoxValueChanged(int)</slot>
     </connection>
     <connection>
-        <sender>stopButton</sender>
+        <sender>m_StopButton</sender>
         <signal>clicked()</signal>
         <receiver>QmitkPrimitiveMovieNavigator</receiver>
         <slot>stopButton_clicked()</slot>
     </connection>
     <connection>
-        <sender>m_DelayDial</sender>
+        <sender>m_GoButton</sender>
+        <signal>clicked()</signal>
+        <receiver>QmitkPrimitiveMovieNavigator</receiver>
+        <slot>goButton_clicked()</slot>
+    </connection>
+    <connection>
+        <sender>m_TimerInterval</sender>
         <signal>valueChanged(int)</signal>
         <receiver>QmitkPrimitiveMovieNavigator</receiver>
         <slot>setTimerInterval(int)</slot>
@@ -264,7 +185,6 @@
 <includes>
     <include location="global" impldecl="in declaration">mitkStepper.h</include>
     <include location="global" impldecl="in implementation">qtimer.h</include>
-    <include location="local" impldecl="in implementation">QmitkPrimitiveMovieNavigator.ui.h</include>
 </includes>
 <forwards>
     <forward>class QTimer;</forward>
@@ -278,10 +198,11 @@
 <slots>
     <slot>Refetch()</slot>
     <slot>SetStepper( mitk::Stepper * stepper )</slot>
-    <slot>goButton_clicked()</slot>
+    <slot>spinBoxValueChanged(int value)</slot>
     <slot>stopButton_clicked()</slot>
-    <slot>next()</slot>
+    <slot>goButton_clicked()</slot>
     <slot>setTimerInterval( int timerIntervalInMS )</slot>
+    <slot access="private">next()</slot>
 </slots>
 <functions>
     <function access="private" specifier="non virtual">init()</function>

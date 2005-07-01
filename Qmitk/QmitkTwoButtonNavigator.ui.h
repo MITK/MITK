@@ -31,10 +31,9 @@ void QmitkTwoButtonNavigator::Refetch()
   {
     m_InRefetch=true;
     
-    m_MinValue = 0;
-    m_MaxValue = m_Stepper->GetSteps()-1;
-    m_SliceNumber = m_Stepper->GetPos();
-    m_SliceNumberLabel->setText( QString("%1").arg(m_SliceNumber) );       
+    m_SpinBox->setMinValue( (int) m_Stepper->ConvertPosToUnit(0) );
+    m_SpinBox->setMaxValue( (int) m_Stepper->ConvertPosToUnit(m_Stepper->GetSteps()));
+    m_SpinBox->setValue((int) m_Stepper->ConvertPosToUnit(m_Stepper->GetPos()) );
     m_InRefetch=false;
   }
 }
@@ -46,45 +45,30 @@ void QmitkTwoButtonNavigator::SetStepper( mitk::Stepper * stepper)
     m_InRefetch = (stepper==NULL); // this avoids trying to use m_Stepper until it is set to something != NULL (additionally to the avoiding recursions during refetching)
 }
 
-
-/*void QmitkTwoButtonNavigator::slider_valueChanged( int )
-{
-  if(!m_InRefetch)
-    m_Stepper->SetPos(slider->value());
-}
-*/
-
 void QmitkTwoButtonNavigator::init()
 {
   m_InRefetch = true; // this avoids trying to use m_Stepper until it is set to something != NULL (additionally to the avoiding recursions during refetching)
 }
 
-
-/*void QmitkSliderNavigator::spinBox_valueChanged( int )
+void QmitkTwoButtonNavigator::SpinBoxValueChanged(int value)
 {
   if(!m_InRefetch)
-    m_Stepper->SetPos(m_Stepper->ConvertPosToUnit(spinBox->value()));
+    m_Stepper->SetPos(m_Stepper->ConvertPosToUnit(m_SpinBox->value()));
 }
-*/
-
 
 void QmitkTwoButtonNavigator::prevButton_clicked()
-  {
+{
   if(!m_InRefetch) 
-    {
-    if (m_SliceNumber > m_MinValue) m_SliceNumber--;
-    m_Stepper->SetPos( m_SliceNumber );
-    m_SliceNumberLabel->setText( QString("%1").arg(m_SliceNumber) );
-    }
+  {
+    m_Stepper->Previous();
   }
+}
 
 
 void QmitkTwoButtonNavigator::nextButton_clicked()
-  {
+{
   if(!m_InRefetch) 
-    {
-    if (m_SliceNumber < m_MaxValue) m_SliceNumber++;
-    m_Stepper->SetPos( m_SliceNumber );
-    m_SliceNumberLabel->setText( QString("%1").arg( m_SliceNumber ) );
-    }
+  {
+    m_Stepper->Next();
   }
+}

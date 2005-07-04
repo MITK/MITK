@@ -218,11 +218,20 @@ void QmitkPropertyListViewItem::UpdateView()
   mitk::BaseProperty* baseProp = m_PropertyList->GetProperty(m_Name.c_str());
   if (mitk::BoolProperty* boolProp = dynamic_cast<mitk::BoolProperty*>(baseProp))
   {
-    ((QCheckBox*)(m_Control))->setChecked(boolProp->GetValue());
+     if (QCheckBox* cb = dynamic_cast<QCheckBox*>(m_Control)) {
+      cb ->setChecked(boolProp->GetValue());
+     } else {
+       std::cout << "warning: non-checkbox control for bool property " << m_Name << std::endl;
+     }
   }
   else if (mitk::StringProperty* stringProp = dynamic_cast<mitk::StringProperty*>(baseProp))
   {
-    ((QLineEdit*)(m_Control))->setText(QString(stringProp->GetValue()));
+    if (QLineEdit* qle = dynamic_cast<QLineEdit*>(m_Control)) {
+    qle->setText(QString(stringProp->GetValue()));
+} else {
+       std::cout << "warning: non-lineedit control for string property " << m_Name << std::endl;
+}
+
   }
   else if (mitk::FloatProperty* floatProp = dynamic_cast<mitk::FloatProperty*>(baseProp))
   {

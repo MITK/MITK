@@ -211,6 +211,7 @@ void mitk::LightBoxImageReader::GenerateOutputInformation()
     itkDebugMacro(<<"copy header");
     RealPosition=GetRealPosition(0, m_ImageNumbers);
     ipPicDescriptor *header=ipPicCopyHeader(m_LightBox->fetchHeader(RealPosition), NULL);
+        
     //@FIXME: was ist, wenn die Bilder nicht alle gleich gross sind?
     if(numberOfImages>1)
     {  
@@ -464,9 +465,18 @@ void mitk::LightBoxImageReader::SortImage(LocalImageInfoArray& imageNumbers)
       tsv=ipPicQueryTag(pic,"SOURCE HEADER");
       if (tsv)
       {
-        dicomFindElement((unsigned char*) tsv->value, 0x0020, 0x0013, &data, &len);
-        sscanf( (char *) data, "%d", &imageNumber );
-        info.imageNumber=imageNumber;
+        bool ok = dicomFindElement((unsigned char*) tsv->value, 0x0020, 0x0013, &data, &len);
+        if (ok)
+        {
+          sscanf( (char *) data, "%d", &imageNumber );
+          info.imageNumber=imageNumber;
+        }
+        else
+        {
+          info.imageNumber=position;
+          itkWarningMacro(<<"Something is wrong with the source header at lighbox-position "<<position);
+        }
+        
         //itkDebugMacro(<<"number image: "<<imageNumber);
       }
       else

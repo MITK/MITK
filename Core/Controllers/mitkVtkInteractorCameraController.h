@@ -57,8 +57,6 @@ public:
   //##ModelId=3E6D600F0088
   virtual void KeyPressEvent(mitk::KeyEvent*);
 
-  //##ModelId=3E6D600F0090
-  virtual void SetRenderWindow(vtkRenderWindow* aren);
   //##ModelId=3E6D600F0093
   //##Documentation
   //## @brief Set the BaseRenderer to be controlled by this vtk-based camera controller

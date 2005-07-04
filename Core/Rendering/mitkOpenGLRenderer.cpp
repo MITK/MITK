@@ -1,19 +1,19 @@
 /*=========================================================================
-
+ 
 Program:   Medical Imaging & Interaction Toolkit
 Module:    $RCSfile$
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
-
+ 
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
-
+ 
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
-
+ 
 =========================================================================*/
 
 
@@ -48,8 +48,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 //##ModelId=3E33ECF301AD
-mitk::OpenGLRenderer::OpenGLRenderer() : m_VtkMapperPresent(false), 
-  m_VtkRenderer(NULL), m_LastUpdateVtkActorsTime(0)
+mitk::OpenGLRenderer::OpenGLRenderer() : m_VtkMapperPresent(false),
+    m_VtkRenderer(NULL), m_LastUpdateVtkActorsTime(0)
 {
   m_CameraController=NULL;//\*todo remove line
   m_CameraController = new VtkInteractorCameraController();
@@ -97,7 +97,7 @@ void mitk::OpenGLRenderer::SetData(const mitk::DataTreeIteratorBase* iterator)
           mitk::PlaneGeometry::Pointer planegeometry = mitk::PlaneGeometry::New();
           planegeometry->InitializeStandardPlane(
             image->GetGeometry(),
-            PlaneGeometry::Transversal, 
+            PlaneGeometry::Transversal,
             image->GetGeometry()->GetExtent(2)-1, false);
           SetWorldGeometry(planegeometry);
           geometry_is_set=true;
@@ -167,7 +167,7 @@ void mitk::OpenGLRenderer::UpdateIncludingVtkActors()
   //{
   //  m_LightKit = vtkLightKit::New();
   //  m_LightKit->AddLightsToRenderer(m_VtkRenderer);
- // }
+  // }
 
   // Layer sceme to be able to sort the painting order.
   // Nodes, without a layer are painted last, cause their order has no meaning.
@@ -220,7 +220,7 @@ void mitk::OpenGLRenderer::UpdateIncludingVtkActors()
       }
     }
 
-    while (!layers.empty()) 
+    while (!layers.empty())
     {
       m_VtkRenderer->AddProp(layers.top().second);
       layers.pop();
@@ -293,7 +293,7 @@ void mitk::OpenGLRenderer::Update()
 
   while(!it->IsAtEnd())
   {
-    Update(it->Get());    
+    Update(it->Get());
     ++it;
   }
   Modified();
@@ -309,15 +309,15 @@ void mitk::OpenGLRenderer::Render()
   {
     glClear(GL_COLOR_BUFFER_BIT);
     if(((m_VtkRenderer==NULL) && (m_RenderWindow->GetVtkRenderWindow()->GetRenderers()->GetNumberOfItems()>0)) ||
-       ((m_VtkRenderer!=NULL) && (m_RenderWindow->GetVtkRenderWindow()->GetRenderers()->GetNumberOfItems()>1)) )
+        ((m_VtkRenderer!=NULL) && (m_RenderWindow->GetVtkRenderWindow()->GetRenderers()->GetNumberOfItems()>1)) )
       m_RenderWindow->GetVtkRenderWindow()->MitkRender();
     else
-    if(m_VtkMapperPresent)
-    {
-      //    m_RenderWindow->GetVtkRenderWindow()->MitkRender();
-    } 
-    else
-      m_RenderWindow->SwapBuffers();
+      if(m_VtkMapperPresent)
+      {
+        //    m_RenderWindow->GetVtkRenderWindow()->MitkRender();
+      }
+      else
+        m_RenderWindow->SwapBuffers();
 
     return;
   }
@@ -342,83 +342,83 @@ void mitk::OpenGLRenderer::Render()
         Update();
       }
 
-      glClear(GL_COLOR_BUFFER_BIT);
+  glClear(GL_COLOR_BUFFER_BIT);
 
-      //PlaneGeometry* myPlaneGeom =
-      //  dynamic_cast<PlaneGeometry *>((mitk::Geometry2D*)(GetCurrentWorldGeometry2D()));
+  //PlaneGeometry* myPlaneGeom =
+  //  dynamic_cast<PlaneGeometry *>((mitk::Geometry2D*)(GetCurrentWorldGeometry2D()));
 
-      glViewport (0, 0, m_Size[0], m_Size[1]);
-      glMatrixMode( GL_PROJECTION );
-      glLoadIdentity();
-      gluOrtho2D( 0.0, m_Size[0], 0.0, m_Size[1] );
-      glMatrixMode( GL_MODELVIEW );
+  glViewport (0, 0, m_Size[0], m_Size[1]);
+  glMatrixMode( GL_PROJECTION );
+  glLoadIdentity();
+  gluOrtho2D( 0.0, m_Size[0], 0.0, m_Size[1] );
+  glMatrixMode( GL_MODELVIEW );
 
-      //------------------
-      //rendering VTK-Mappers if present
-      if(m_VtkMapperPresent) 
+  //------------------
+  //rendering VTK-Mappers if present
+  if(m_VtkMapperPresent)
+  {
+    mitk::VtkStencilRenderWindow *stencilRenderWindow = dynamic_cast<mitk::VtkStencilRenderWindow *>(m_RenderWindow->GetVtkRenderWindow());
+    if (stencilRenderWindow)
+      stencilRenderWindow->SetFinishRendering(false);
+
+    //start vtk render process with the updated scenegraph
+    m_RenderWindow->GetVtkRenderWindow()->MitkRender();
+  }
+
+  //------------------
+  //preparing and gaining information about 2D rendering for OpenGL
+  if(GetDisplayGeometry()->IsValid())
+  {
+    mitk::DataTreeIteratorClone it = m_DataTreeIterator;
+    typedef std::pair<int, GLMapper2D*> LayerMapperPair;
+    std::priority_queue<LayerMapperPair> layers;
+    int mapperNo = 0;
+
+    for(;it->IsAtEnd()==false;++it)
+    {
+      mitk::DataTreeNode::Pointer node = it->Get();
+      if(node.IsNull())
+        continue;
+      mitk::Mapper::Pointer mapper = node->GetMapper(m_MapperID);
+      if(mapper.IsNull())
+        continue;
+      GLMapper2D* mapper2d=dynamic_cast<GLMapper2D*>(mapper.GetPointer());
+      if(mapper2d!=NULL)
       {
-        mitk::VtkStencilRenderWindow *stencilRenderWindow = dynamic_cast<mitk::VtkStencilRenderWindow *>(m_RenderWindow->GetVtkRenderWindow());
-        if (stencilRenderWindow)
-          stencilRenderWindow->SetFinishRendering(false);
-
-        //start vtk render process with the updated scenegraph       
-        m_RenderWindow->GetVtkRenderWindow()->MitkRender();
+        // mapper without a layer property are painted first
+        int layer=-1;
+        node->GetIntProperty("layer", layer, this);
+        // pushing negative layer value, since default sort for
+        // priority_queue is lessthan
+        layers.push(LayerMapperPair(- (layer<<16) - mapperNo ,mapper2d));
+        mapperNo++;
       }
+    }
 
-      //------------------
-      //preparing and gaining information about 2D rendering for OpenGL
-      if(GetDisplayGeometry()->IsValid())
-      {
-        mitk::DataTreeIteratorClone it = m_DataTreeIterator;
-        typedef std::pair<int, GLMapper2D*> LayerMapperPair;
-        std::priority_queue<LayerMapperPair> layers;
-        int mapperNo = 0;
+    //go through the generated list and let the sorted mappers paint
+    while (!layers.empty())
+    {
+      layers.top().second->Paint(this);
+      layers.pop();
+    }
+  }
 
-        for(;it->IsAtEnd()==false;++it)
-        {
-          mitk::DataTreeNode::Pointer node = it->Get();
-          if(node.IsNull())
-            continue;
-          mitk::Mapper::Pointer mapper = node->GetMapper(m_MapperID);
-          if(mapper.IsNull())
-            continue;
-          GLMapper2D* mapper2d=dynamic_cast<GLMapper2D*>(mapper.GetPointer());
-          if(mapper2d!=NULL)
-          {
-            // mapper without a layer property are painted first
-            int layer=-1;
-            node->GetIntProperty("layer", layer, this);
-            // pushing negative layer value, since default sort for
-            // priority_queue is lessthan
-            layers.push(LayerMapperPair(- (layer<<16) - mapperNo ,mapper2d));
-            mapperNo++;
-          }
-        }
+  //swap buffers
+  if (m_VtkMapperPresent)
+  {
+    mitk::VtkStencilRenderWindow *stencilRenderWindow = dynamic_cast<mitk::VtkStencilRenderWindow *>(m_RenderWindow->GetVtkRenderWindow());
+    if (stencilRenderWindow)
+      stencilRenderWindow->SetFinishRendering(true);//set an internal flag to only swap buffers when ready with rendering
 
-        //go through the generated list and let the sorted mappers paint
-        while (!layers.empty()) 
-        {
-          layers.top().second->Paint(this);
-          layers.pop();
-        }
-      }
-
-      //swap buffers
-      if (m_VtkMapperPresent)
-      {
-        mitk::VtkStencilRenderWindow *stencilRenderWindow = dynamic_cast<mitk::VtkStencilRenderWindow *>(m_RenderWindow->GetVtkRenderWindow());
-        if (stencilRenderWindow)
-          stencilRenderWindow->SetFinishRendering(true);//set an internal flag to only swap buffers when ready with rendering
-        
-        m_RenderWindow->GetVtkRenderWindow()->CopyResultFrame();
-      }
-      else
-        m_RenderWindow->SwapBuffers();
+    m_RenderWindow->GetVtkRenderWindow()->CopyResultFrame();
+  }
+  else
+    m_RenderWindow->SwapBuffers();
 }
 
 /*!
 \brief Initialize the OpenGLRenderer
-
+ 
 This method is called from the two Constructors
 */
 void mitk::OpenGLRenderer::InitRenderer(mitk::RenderWindow* renderwindow)
@@ -439,7 +439,6 @@ void mitk::OpenGLRenderer::InitRenderer(mitk::RenderWindow* renderwindow)
     VtkInteractorCameraController* vicc=dynamic_cast<VtkInteractorCameraController*>(m_CameraController.GetPointer());
     if(vicc!=NULL)
     {
-      vicc->SetRenderWindow(m_RenderWindow->GetVtkRenderWindow());
       vicc->SetRenderer(this);
       vicc->GetVtkInteractor()->Disable();
     }
@@ -479,7 +478,8 @@ mitk::OpenGLRenderer::~OpenGLRenderer()
 \brief Initialize the OpenGL Window
 */
 //##ModelId=3E33145B0096
-void mitk::OpenGLRenderer::Initialize( ) {
+void mitk::OpenGLRenderer::Initialize( )
+{
 
   glClearColor(0.0, 0.0, 0.0, 1.0);
   glColor3f(1.0, 0.0, 0.0);
@@ -500,8 +500,8 @@ void mitk::OpenGLRenderer::Resize(int w, int h)
 
   BaseRenderer::Resize(w, h);
 
-  //GetVtkRenderWindow()->SetSize(w,h); // this was originally done by VtkInteractor via 
-  //                                    // m_CameraController->Resize(...) in BaseRenderer, 
+  //GetVtkRenderWindow()->SetSize(w,h); // this was originally done by VtkInteractor via
+  //                                    // m_CameraController->Resize(...) in BaseRenderer,
   //                                    // but bug #32 forced us to put it here (vtkSizeBug)
 
   Update();
@@ -539,9 +539,9 @@ void mitk::OpenGLRenderer::InitSize(int w, int h)
 void mitk::OpenGLRenderer::SetMapperID(const MapperSlotId mapperId)
 {
   Superclass::SetMapperID(mapperId);
-  //ensure that UpdateIncludingVtkActors() is called at next 
+  //ensure that UpdateIncludingVtkActors() is called at next
   //call of Render():
-  m_LastUpdateVtkActorsTime = 0; 
+  m_LastUpdateVtkActorsTime = 0;
 }
 
 //##ModelId=3EF162760271
@@ -576,7 +576,7 @@ void mitk::OpenGLRenderer::PickWorldPoint(const mitk::Point2D& displayPoint, mit
 void mitk::OpenGLRenderer::PrintSelf(std::ostream& os, itk::Indent indent) const
 {
   Superclass::PrintSelf(os,indent);
-  os << indent << " VtkMapperPresent: " << m_VtkMapperPresent << std::endl;  
+  os << indent << " VtkMapperPresent: " << m_VtkMapperPresent << std::endl;
   os << indent << " VtkRenderer: " << m_VtkRenderer << std::endl;
   os << indent << " LastUpdateVtkActorsTime: " << m_LastUpdateVtkActorsTime << std::endl;
 }

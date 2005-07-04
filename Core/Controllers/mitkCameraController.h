@@ -20,10 +20,12 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef CAMERACONTROLLER_H_HEADER_INCLUDED_C1C53722
 #define CAMERACONTROLLER_H_HEADER_INCLUDED_C1C53722
 
+
+
 #include "mitkCommon.h"
 #include "mitkBaseController.h"
 #include "mitkEventTypedefs.h"
-
+class mitk::BaseRenderer;
 namespace mitk {
 
 //##ModelId=3DF8BCFD014C
@@ -37,6 +39,8 @@ class CameraController : public BaseController
 public:
     //##ModelId=3E6D5DD4008F
     mitkClassMacro(CameraController, BaseController);
+    itkSetMacro(Renderer,BaseRenderer*);
+    itkGetConstMacro(Renderer,const BaseRenderer*);
 
     /** Method for creation through the object factory. */
     //itkNewMacro(Self);
@@ -63,12 +67,13 @@ public:
     //##Documentation
     //## @brief Implemented in sub-classes.
     virtual void KeyPressEvent(mitk::KeyEvent*);
+
 protected:
     //CameraController();
 
     //##ModelId=3E3AE75803CF
     virtual ~CameraController();
-
+    const BaseRenderer* m_Renderer;
 };
 
 } // namespace mitk

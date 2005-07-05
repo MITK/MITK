@@ -24,6 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "itkObject.h"
 #include "mitkLevelWindow.h"
 #include "itkWeakPointer.h"
+#include "mitkXMLIO.h"
 
 namespace mitk {
 
@@ -39,7 +40,7 @@ class BaseData;
 //## Subclasses of mitk::Mapper control the creation of rendering primitives
 //## that interface to the graphics library (e.g., OpenGL, vtk). 
 //## @todo Should Mapper be a subclass of ImageSource?
-class Mapper : public itk::Object
+class Mapper : public itk::Object, public XMLIO
 {
 public:
     mitkClassMacro(Mapper, itk::Object);

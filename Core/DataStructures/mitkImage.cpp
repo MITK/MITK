@@ -29,6 +29,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "ipFunc/ipFunc.h"
 
 #include <vtkImageData.h>
+#include <mitkXMLWriter.h>
 
 mitk::Image::Image() : 
   m_Dimension(0), m_Dimensions(NULL), m_OffsetTable(NULL),
@@ -993,6 +994,29 @@ void mitk::Image::Clear()
   }
 }
 
+bool mitk::Image::WriteXML( XMLWriter& xmlWriter ) 
+{
+	xmlWriter.BeginNode("data");
+	xmlWriter.WriteProperty( "className", typeid( *this ).name() );
+
+  std::string fileName = xmlWriter.getNewFileName();
+  xmlWriter.WriteProperty( "FILENAME", fileName.c_str() );
+
+	mitk::Geometry3D* geomety = GetGeometry();
+
+	if ( geomety )
+		geomety->WriteXML( xmlWriter );
+
+	xmlWriter.EndNode(); // data
+	return true;
+}
+
+bool mitk::Image::ReadXML( XMLReader& xmlReader )
+{
+
+  return false;
+}
+
 void mitk::Image::SetGeometry(Geometry3D* aGeometry3D)
 {
   Superclass::SetGeometry(aGeometry3D);
@@ -1080,3 +1104,4 @@ mitk::ScalarType mitk::Image::GetScalarValue2ndMax(int t) const
   ComputeExtrema(t);
   return m_Scalar2ndMax;
 }
+

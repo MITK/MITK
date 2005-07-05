@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkSurface.h"
 #include "mitkBaseProcess.h"
 #include "vtkPolyData.h"
+#include "mitkXMLWriter.h"
 
 void mitk::Surface::SetVtkPolyData( vtkPolyData* polydata, unsigned int t )
 {
@@ -250,3 +251,27 @@ void mitk::Surface::Resize( unsigned int timeSteps )
   m_CalculateBoundingBox = true;
 }
 
+bool mitk::Surface::WriteXML( XMLWriter& xmlWriter )
+{
+	xmlWriter.BeginNode("data");
+	xmlWriter.WriteProperty( "className", typeid( *this ).name() );
+
+  std::string fileName = xmlWriter.getNewFileName();
+  fileName += ".stl";
+  xmlWriter.WriteProperty( "FILENAME", fileName.c_str() );
+
+	mitk::Geometry3D* geomety = GetGeometry();
+
+	if ( geomety )
+		geomety->WriteXML( xmlWriter );
+
+	xmlWriter.EndNode(); // data
+	return true;
+}
+
+
+bool mitk::Surface::ReadXML( XMLReader& xmlReader )
+{
+
+  return false;
+}

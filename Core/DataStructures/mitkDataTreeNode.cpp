@@ -26,6 +26,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkColorProperty.h"
 #include "mitkLevelWindowProperty.h"
 #include "mitkGeometry3D.h"
+#include <mitkXMLWriter.h>
 
 //##ModelId=3D6A0E8C02CC
 mitk::Mapper* mitk::DataTreeNode::GetMapper(MapperSlotId id) const
@@ -375,4 +376,54 @@ unsigned long mitk::DataTreeNode::GetMTime() const
 		  Modified();
 	}
   return Superclass::GetMTime();
+}
+
+bool mitk::DataTreeNode::WriteXML( XMLWriter& xmlWriter ) 
+{
+  xmlWriter.BeginNode("dataTreeNode");
+	xmlWriter.WriteProperty( "className", typeid( *this ).name() );
+
+  // PropertyList
+	mitk::PropertyList* propertyList = GetPropertyList();
+
+	if ( propertyList )
+		propertyList->WriteXML( xmlWriter );
+
+  // Data
+	BaseData* data = GetData();
+
+	if ( data )
+		data->WriteXML( xmlWriter );
+
+  // mapperList
+	xmlWriter.BeginNode("mapperList");
+	int mappercount = m_Mappers.size();
+
+	for ( int i=0; i<mappercount; i++ )
+	{
+		mitk::Mapper* mapper = GetMapper( i );
+
+		if ( mapper )
+		{
+			xmlWriter.BeginNode("mapperSlot");
+			xmlWriter.WriteProperty( "id", i );
+			mapper->WriteXML( xmlWriter );
+			xmlWriter.EndNode(); // mapperSlot
+		}
+	}
+  xmlWriter.EndNode(); // mapperList
+
+  // Interactor
+	Interactor::Pointer interactor = GetInteractor();
+
+	if ( interactor.IsNotNull() )
+		interactor->WriteXML( xmlWriter );
+
+  xmlWriter.EndNode(); // dataTreeNode
+	return true;		
+}
+
+bool mitk::DataTreeNode::ReadXML( XMLReader& xmlReader ) 
+{
+	return false;
 }

@@ -170,16 +170,22 @@ void mitk::BaseData::ExecuteOperation(mitk::Operation* operation)
 
 bool mitk::BaseData::WriteXML( XMLWriter& xmlWriter ) 
 {
-	xmlWriter.BeginNode("dataTreeNode");
+	xmlWriter.BeginNode("data");
 	xmlWriter.WriteProperty( "className", typeid( *this ).name() );
-	xmlWriter.EndNode();
+	mitk::Geometry3D* geomety = GetGeometry();
+
+	if ( geomety )
+		geomety->WriteXML( xmlWriter );
+
+	xmlWriter.EndNode(); // data
 	return true;
 }
 
-bool mitk::BaseData::ReadXML( XMLReader& xmlReader )
+bool mitk::BaseData::ReadXML( XMLReader& xmlWriter ) 
 {
 	return false;
 }
+
 
 mitk::BaseData* mitk::BaseData::CreateObject( const char* className ) 
 {

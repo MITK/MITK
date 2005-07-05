@@ -173,32 +173,31 @@ bool mitk::DataTree::Save( const mitk::DataTreeIteratorBase* it, const char* fil
 		return false;
 
 	mitk::XMLWriter writer( fileName );
-	writer.WriteComment( "MITK Data Tree" );
-	writer.BeginNode( "mitkDataTree" );
 
 	if ( !Save( it, writer ) )
 		writer.WriteComment( "Error" );
 
-	writer.EndNode();
 	return true;
 }
 
-bool mitk::DataTree::Save( const mitk::DataTreeIteratorBase* it, mitk::XMLWriter& xmlWriter ) 
+bool mitk::DataTree::SaveNext( const mitk::DataTreeIteratorBase* it, mitk::XMLWriter& xmlWriter ) 
 {
 	if ( it == NULL || it->IsAtEnd() )
 		return false;
 
 	mitk::DataTreeNode* node = it->Get();
+  xmlWriter.BeginNode("treeNode");
 
 	if (node) 
 	{
-		mitk::BaseData* data = node->GetData();
-		xmlWriter.BeginNode("dataTreeNode");
-		xmlWriter.WriteProperty( "className", typeid( *data ).name() );
-		mitk::PropertyList* propertyList = node->GetPropertyList();
+    node->WriteXML( xmlWriter );
 
-		if ( propertyList )
-			propertyList->WriteXML( xmlWriter );
+    /*
+		mitk::BaseData* data = node->GetData();
+
+		if ( data )
+			data->WriteXML( xmlWriter );
+    */
 
 		if ( it->HasChild() ) 
 		{
@@ -206,13 +205,22 @@ bool mitk::DataTree::Save( const mitk::DataTreeIteratorBase* it, mitk::XMLWriter
 
 			while (!children.IsAtEnd())
 			{
-				Save( &children, xmlWriter );
+				SaveNext( &children, xmlWriter );
 				++children;
 			}
 		}
 	}
 
-	xmlWriter.EndNode();
+	xmlWriter.EndNode(); // TreeNode
 
 	return true;
+}
+
+bool mitk::DataTree::Save( const mitk::DataTreeIteratorBase* it, mitk::XMLWriter& xmlWriter ) 
+{
+	xmlWriter.WriteComment( "MITK Data Tree" );
+	xmlWriter.BeginNode( "mitkDataTree" );
+	bool result = SaveNext( it, xmlWriter );
+	xmlWriter.EndNode(); // mitkDataTree
+	return result;
 }

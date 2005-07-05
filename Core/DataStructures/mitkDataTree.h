@@ -136,13 +136,15 @@ public:
 
   //## 
   static bool Save( const mitk::DataTreeIteratorBase* it, const char* fileName );
+  static bool Save( const mitk::DataTreeIteratorBase* it, mitk::XMLWriter& xmlWriter );
 protected:
   //##ModelId=3E38F46A0190
   DataTree();
 
   //##ModelId=3E38F46A01AE
   virtual ~DataTree();
-  static bool Save( const mitk::DataTreeIteratorBase* it, mitk::XMLWriter& xmlWriter );
+
+  static bool mitk::DataTree::SaveNext( const mitk::DataTreeIteratorBase* it, mitk::XMLWriter& xmlWriter );  
 };
 
 } // namespace mitk

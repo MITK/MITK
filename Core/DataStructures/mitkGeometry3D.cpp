@@ -23,6 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkPointOperation.h"
 #include "mitkInteractionConst.h"
 #include "mitkStatusBar.h"
+#include <mitkXMLWriter.h>
 #include <float.h>
 
 #include <vtkMatrixToLinearTransform.h>
@@ -476,6 +477,58 @@ const mitk::Vector3D mitk::Geometry3D::GetZAxis()
   return v;
 }
 
+const char* mitk::Geometry3D::GetTransformAsString( TransformType* transformType ) 
+{
+	static char buffer[255];
+	ostrstream out( buffer, 255 );
+
+	out << '[';
+
+	for( int i=0; i<3; ++i )
+	{
+		out << '[';
+		for( int j=0; j<3; ++j )
+			out << transformType->GetMatrix().GetVnlMatrix().get(i, j) << ' ';
+		out << ']';
+	}
+
+	out << "][";
+
+	for( int i=0; i<3; ++i )
+		out << transformType->GetOffset()[i] << ' ';
+
+	out << ']';
+
+	return buffer;
+}
+
+bool mitk::Geometry3D::WriteXML( XMLWriter& xmlWriter ) 
+{
+	xmlWriter.BeginNode("Geometry");
+	xmlWriter.WriteProperty( "className", typeid( *this ).name() );
+
+	if ( m_IndexToObjectTransform.IsNotNull() )
+		xmlWriter.WriteProperty( "IndexToObjectTransform", GetTransformAsString( m_IndexToObjectTransform.GetPointer() ) );
+
+	if ( m_ObjectToNodeTransform.IsNotNull() )
+		xmlWriter.WriteProperty( "ObjectToNodeTransform", GetTransformAsString( m_ObjectToNodeTransform.GetPointer() ) );
+
+	if ( m_IndexToNodeTransform.IsNotNull() )
+		xmlWriter.WriteProperty( "IndexToNodeTransform", GetTransformAsString( m_IndexToNodeTransform.GetPointer() ) );
+
+	if ( m_IndexToWorldTransform.IsNotNull() )
+		xmlWriter.WriteProperty( "IndexToWorldTransform", GetTransformAsString( m_IndexToWorldTransform.GetPointer() ) );	
+
+	xmlWriter.EndNode();
+	return true;		
+}
+
+bool mitk::Geometry3D::ReadXML( XMLReader& xmlReader ) 
+{
+
+	return false;
+}
+
 void mitk::Geometry3D::PrintSelf(std::ostream& os, itk::Indent indent) const
 {
   os << indent << " IndexToWorldTransform: ";
@@ -497,6 +550,7 @@ void mitk::Geometry3D::PrintSelf(std::ostream& os, itk::Indent indent) const
 
   Superclass::PrintSelf(os,indent);
 }
+
 mitk::Point3D mitk::Geometry3D::GetCornerPoint(int id) const
 {
   assert(id >= 0);
@@ -540,3 +594,4 @@ mitk::Point3D mitk::Geometry3D::GetCornerPoint(bool xFront, bool yFront, bool zF
 
   return m_IndexToWorldTransform->TransformPoint(cornerpoint);
 }
+

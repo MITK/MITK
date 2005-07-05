@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkBoundingObject.h"
 #include "mitkBaseProcess.h"
+#include "mitkXMLWriter.h"
 
 mitk::BoundingObject::BoundingObject()
   : Surface(), m_Positive(true)
@@ -50,4 +51,33 @@ void mitk::BoundingObject::UpdateOutputInformation()
 mitk::ScalarType mitk::BoundingObject::GetVolume()
 {
   return 0.0;
+}
+
+bool mitk::BoundingObject::WriteXML( XMLWriter& xmlWriter )
+{
+	xmlWriter.BeginNode("data");
+	xmlWriter.WriteProperty( "className", typeid( *this ).name() );
+
+  std::string fileName = xmlWriter.getNewFileName();
+  fileName += ".stl";
+  xmlWriter.WriteProperty( "FILENAME", fileName.c_str() );
+
+  // Positiv
+  xmlWriter.WriteProperty("Positiv", m_Positive );
+
+  // Geometrie
+	mitk::Geometry3D* geomety = GetGeometry();
+
+	if ( geomety )
+		geomety->WriteXML( xmlWriter );
+
+	xmlWriter.EndNode(); // data
+	return true;
+}
+
+
+bool mitk::BoundingObject::ReadXML( XMLReader& xmlReader )
+{
+
+  return false;
 }

@@ -42,6 +42,9 @@ public:
   itkGetMacro(Positive, bool);
   itkSetMacro(Positive, bool);
   itkBooleanMacro(Positive);
+  bool WriteXML( XMLWriter& xmlWriter );
+  bool ReadXML( XMLReader& xmlReader );
+
 protected:
   BoundingObject();
   virtual ~BoundingObject();

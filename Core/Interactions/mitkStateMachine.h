@@ -31,10 +31,12 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkStateEvent.h"
 #include "mitkUndoModel.h"
 #include "mitkUndoController.h"
+#include <string>
+#include <mitkXMLIO.h>
 #include "mitkOperationEvent.h"
 
-
 namespace mitk {
+
   //class State;
   //class Action;
   //class StateEvent;
@@ -49,6 +51,7 @@ namespace mitk {
   //## Developers must derive its statemachines and implement ExecuteAction
   class StateMachine : public itk::Object, public mitk::OperationActor
   {
+
   public:
     mitkClassMacro(StateMachine,itk::Object);
 

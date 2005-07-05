@@ -40,7 +40,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include <map>
 #include "mitkLevelWindow.h"
 #include "mitkColorProperty.h"
+#include "mitkXMLIO.h"
 #include "mitkStringProperty.h"
+
 
 class vtkLinearTransform;
 
@@ -55,7 +57,7 @@ class BaseRenderer;
 //## Contains the data (instance of BaseData), a list of mappers, which can
 //## draw the data, a transform (vtkTransform) and a list of properties
 //## (PropertyList).
-class DataTreeNode : public itk::DataObject
+class DataTreeNode : public itk::DataObject, public XMLIO
 {
 public:
 
@@ -303,6 +305,12 @@ public:
   {
     return m_DataReferenceChangedTime.GetMTime();
   }
+
+  //##
+  virtual bool WriteXML( XMLWriter& xmlWriter );
+  //##
+  virtual bool ReadXML( XMLReader& xmlReader );
+
 protected:
   //##ModelId=3E33F5D702AA
   DataTreeNode();

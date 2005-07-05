@@ -103,24 +103,29 @@ namespace mitk {
     //## @brief Executes Actions 
     virtual bool ExecuteAction(Action* action, mitk::StateEvent const* stateEvent);
 
-  protected:
-    //##Documentation
-    //## @brief adds the handling of Operations used for mode change. Unrecognized Operations are send to Superclass.
-    virtual void ExecuteOperation(Operation* operation);
+  //##
+  virtual bool WriteXML( XMLWriter& xmlWriter );
+  //##
+  virtual bool ReadXML( XMLReader& xmlReader );
 
-    //##Documentation
-    //## @brief creates a ModeOperation with the transmitted mode and sends it to this. Undo supported!
-    void CreateModeOperation(ModeType mode);
+protected:
+  //##Documentation
+  //## @brief adds the handling of Operations used for mode change. Unrecognized Operations are send to Superclass.
+  virtual void ExecuteOperation(Operation* operation);
+  
+  //##Documentation
+  //## @brief creates a ModeOperation with the transmitted mode and sends it to this. Undo supported!
+  void CreateModeOperation(ModeType mode);
 
-    //##Documentation
-    //## @brief Pointer to the data, this object handles the Interaction for
-    DataTreeNode* m_DataTreeNode;
+  //##Documentation
+  //## @brief Pointer to the data, this object handles the Interaction for
+  DataTreeNode* m_DataTreeNode;
 
-    //##Documentation
-    //## @brief Mode of Selection
-    ModeType m_Mode;
+  //##Documentation
+  //## @brief Mode of Selection
+  ModeType m_Mode;
 
-  };
+};
 
 }//namespace mitk
 #endif /* INTERACTOR_H_HEADER_INCLUDED */

@@ -31,6 +31,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkLinearTransform.h>
 #include <itkVector.h>
 #include <mitkModeOperation.h>
+#include <mitkXMLWriter.h>
 
 
 
@@ -211,4 +212,22 @@ void mitk::Interactor::ExecuteOperation(Operation* operation)
   default:
     Superclass::ExecuteOperation(operation);
   }
+}
+
+  //##
+bool mitk::Interactor::WriteXML( XMLWriter& xmlWriter )
+{
+	xmlWriter.BeginNode("interactor");
+	xmlWriter.WriteProperty( "className", typeid( *this ).name() );
+	xmlWriter.WriteProperty( "StateMachinType", GetType() );
+	xmlWriter.WriteProperty( "State", GetCurrentState()->GetName() );
+	xmlWriter.EndNode();
+	return true;
+}
+
+  //##
+bool mitk::Interactor::ReadXML( XMLReader& xmlReader )
+{
+
+	return false;
 }

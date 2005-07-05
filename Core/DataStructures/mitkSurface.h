@@ -101,6 +101,12 @@ public:
 
   virtual void Initialize(unsigned int timeSteps=1);
 
+  //## 
+  virtual bool WriteXML( XMLWriter& xmlWriter );
+
+  //##
+  virtual bool ReadXML( XMLReader& xmlReader );
+
   void CalculateBoundingBox();
 
 protected:

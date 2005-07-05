@@ -24,15 +24,13 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkGeometry3D.h"
 #include "mitkCommon.h"
 #include "mitkOperationActor.h"
-
+#include "mitkXMLIO.h"
 #include "mitkPropertyList.h"
 #include <map>
 
 namespace mitk {
 
 class BaseProcess;
-class XMLWriter;
-class XMLReader;
 
 //##ModelId=3D6A0D7D00EC
 //##Documentation
@@ -41,7 +39,7 @@ class XMLReader;
 //## Base of all data objects, e.g., images, contours, surfaces etc. Inherits
 //## from itk::DataObject and thus can be included in a pipeline.
 //## Inherits also from OperationActor and can be used as a destination for Undo
-class BaseData : public itk::DataObject, public OperationActor
+class BaseData : public itk::DataObject, public OperationActor, public XMLIO
 {
 public:
   //##ModelId=3E10262200CE
@@ -193,7 +191,7 @@ public:
   //## 
   virtual bool WriteXML( XMLWriter& xmlWriter );
 
-  //## 
+  //##
   virtual bool ReadXML( XMLReader& xmlReader );
 
   //##

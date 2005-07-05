@@ -25,6 +25,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkAffineGeometryFrame.h>
 #include "mitkOperationActor.h"
 #include <itkBoundingBox.h>
+#include <mitkXMLIO.h>
 #include <itkIndex.h>
 
 class vtkLinearTransform;
@@ -66,7 +67,7 @@ typedef itk::AffineGeometryFrame<mitk::ScalarType, 3> AffineGeometryFrame3D;
 //## itk::DataObject::UpdateOutputInformation().
 //## 
 //## Rule: everything is in mm (ms) if not stated otherwise.
-class Geometry3D : public AffineGeometryFrame3D, public OperationActor
+class Geometry3D : public AffineGeometryFrame3D, public OperationActor, public XMLIO
 {
 public:
   mitkClassMacro(Geometry3D, AffineGeometryFrame3D);
@@ -348,8 +349,15 @@ public:
   const Vector3D GetXAxis();
   const Vector3D GetYAxis();
   const Vector3D GetZAxis();
+
+  //##
+  virtual bool WriteXML( XMLWriter& xmlWriter );
+  //##
+  virtual bool ReadXML( XMLReader& xmlReader );
+
 protected:
   Geometry3D();
+  static const char* mitk::Geometry3D::GetTransformAsString( TransformType* transformType );
 
   //##ModelId=3E3456C50067
   virtual ~Geometry3D();

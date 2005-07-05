@@ -21,175 +21,118 @@ namespace mitk{
 		bool m_NodeIsClosed;
 		bool m_NewNode;
 
+    std::string m_Filename;
+    std::string m_SubFolder;
+    int m_FileCounter;
+
 	public:
 
 		/**
 		 * Construktor
 		 */
-		XMLWriter( const char* filename, int space = 3)
-			:m_Out(NULL), m_Increase(0), m_Space(space), m_NodeCount(0) , m_File(true), m_FirstNode(true), m_NodeIsClosed(true), m_NewNode(false) 
-		{		
-			m_Out = new std::ofstream( filename );			
-		}
+		XMLWriter( const char* filename, int space = 3);
 
 		/**
 		 * Construktor
 		 */
-		XMLWriter( std::ostream& out, int space = 3 )
-			:m_Out(&out), m_Increase(0), m_Space(space), m_NodeCount(0), m_File(false), m_FirstNode(true), m_NodeIsClosed(true), m_NewNode(false) 
-		{}
+		XMLWriter( std::ostream& out, int space = 3 );
 
 		/**
 		 * Destruktor
 		 */
-		~XMLWriter() 
-		{
-			if ( m_File ) {
-				std::ofstream* file = static_cast<std::ofstream*>(m_Out);
-				file->close();
-			}
-		}
+		~XMLWriter();
 
-		void BeginNode( const char* name ) 
-		{		
-			if ( m_FirstNode ) 
-			{
-				*m_Out << "<?xml version=\"1.0\" encoding=\"utf-8\" ?>\n";
-				m_FirstNode = false;
-			}
-
-			if ( !m_NodeIsClosed ) 
-			{
-				*m_Out << ">\n";
-				m_NodeIsClosed = true;
-			}
-
-			int steps = m_Space * m_Increase;
-
-			for(int i=0; i < steps; i++) 
-				*m_Out << ' '; 
-
-			*m_Out << '<' << name << ' ';
-
-			m_NodeIsClosed = false;
-			m_NewNode = true;
-			m_Stack.push( name );
-			m_Increase++;
-			m_NodeCount++;
-		}
+		/*
+		 * begin an new node
+		 */
+		void BeginNode( const char* name );
 
 		/**
-		 *
+		 * close an open node
 		 */
-		void EndNode( )
-		{			
-			m_Increase--;
-
-			if ( m_NewNode )
-				*m_Out << "/>\n";
-			else 
-			{
-				int steps = m_Space * m_Increase;
-
-				for(int i=0; i < steps; i++) 
-					*m_Out << ' '; 
-				*m_Out << "</" << m_Stack.top() << ">\n";				
-			}
-
-			m_Stack.pop();
-			m_NodeIsClosed = true;
-			m_NewNode = false;
-		}
+		void EndNode( );
 
 		/**
-		 * Write Property
+		 * Write string Property
 		 */
-		void WriteProperty( const char* key, const char* value ) const
-		{
-			*m_Out << ConvertString( key );
-			*m_Out << "=\"" << ConvertString( value ) << "\" ";
-		}
+		void WriteProperty( const char* key, const char* value ) const;
+
+		/**
+		 * Write string Property
+		 */
+		void WriteProperty( const char* key, const std::string& value ) const;
+
+		/**
+		 * Write int Property
+		 */
+		void WriteProperty( const char* key, int value ) const;
+
+		/**
+		 * Write float Property
+		 */
+		void WriteProperty( const char* key, float value ) const;
+
+		/**
+		 * Write double Property
+		 */
+		void WriteProperty( const char* key, double value ) const;
+
+		/**
+		 * Write bool Property
+		 */
+		void WriteProperty( const char* key, bool value ) const;
 
 		/**
 		 * Write comment
 		 */
-		void WriteComment( const char* text ) 
-		{
-			if ( m_FirstNode ) 
-			{
-				*m_Out <<"<?xml version=\"1.0\" encoding=\"utf-8\" ?>\n";
-				m_FirstNode = false;
-			}
-
-			int steps = m_Space * m_Increase;
-
-			for(int i=0; i < steps; i++) 
-				*m_Out << ' '; 
-
-			*m_Out << "<!-- " << ConvertString( text ) <<  " -->\n";
-		}
+		void WriteComment( const char* text );
 	
 		/**
-		* retun the current deph
-		*/
-		int GetCurrentDeph() const
-		{
-			return m_Stack.size();
-		}
+		 * retun the current deph
+		 */
+		int GetCurrentDeph() const;
 
 		/**
-		*
-		*/
-		int GetNodeCount() const
-		{
-			return m_NodeCount;
-		}
+		 * Get the current count of nodes
+		 */
+		int GetNodeCount() const;
 
 		/**
-		* Get the space
-		*/
-		int GetSpace() const
-		{
-			return m_Space;
-		}
+		 * Get the space
+		 */
+		int GetSpace() const;
 
 		/**
-		*
-		*/
-		void SetSpace( int space )
-		{
-			m_Space = space;
-		}
+		 *
+		 */
+		void SetSpace( int space );
+
+    /**
+     * get the subfolder of the xml-File. 
+     */
+    void setSubFolder( const char* subFolder );
+
+    /**
+     * get the subfolder of the xml-File. 
+     */
+    const char* getSubFolder();
+
+    /*
+     * get an new unique FileName in the subdirectory of the xml-File
+     */
+    const char* getNewFileName();
+
+    /*
+     * get an new unique FileName in the subdirectory of the xml-File
+     */
+    const char* getNewFilenameAndSubFolder();
 
 		private:
 
-		const char* ConvertString( const char* string ) const
-		{
-			static std::char_traits<char>::char_type buffer[255];
-			int length = std::char_traits<char>::length( string );
-			std::char_traits<char>::copy ( buffer, string, length + 1 );
-			const char* pos = buffer;
-			
-			while ( pos != NULL ) 
-			{
-				pos = std::char_traits<char>::find ( buffer, length , '<');
-
-				if( pos != NULL )
-					*(const_cast<char*>(pos)) = '{';
-			}
-
-			pos = buffer;
-			
-			while ( pos != NULL ) 
-			{
-				pos = std::char_traits<char>::find ( buffer, length , '>');
-
-				if( pos != NULL )
-					*(const_cast<char*>(pos)) = '}';
-			}
-
-			return buffer;
-		}
+		/**
+		 * replace char < and > through { and }
+		 */
+		const char* ConvertString( const char* string ) const;
 	};
 }
 #endif

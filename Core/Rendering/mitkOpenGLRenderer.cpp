@@ -434,7 +434,7 @@ void mitk::OpenGLRenderer::InitRenderer(mitk::RenderWindow* renderwindow)
   */
   //m_RenderWindow->GetVtkRenderWindow()->SetNumberOfLayers(2);
 
-  if(m_CameraController.IsNotNull())
+  if(m_CameraController != NULL)
   {
     VtkInteractorCameraController* vicc=dynamic_cast<VtkInteractorCameraController*>(m_CameraController.GetPointer());
     if(vicc!=NULL)

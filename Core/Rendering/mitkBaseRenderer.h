@@ -25,12 +25,14 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkTimeSlicedGeometry.h"
 #include "mitkDisplayGeometry.h"
 #include "mitkGeometry2DData.h"
-#include "mitkCameraController.h"
+#include <itkSmartPointerForwardReference.h>
 #include "mitkEventTypedefs.h"
+
 
 namespace mitk {
 
 class RenderWindow;
+class CameraController;
 
 //##ModelId=3C6E9AA90306
 //##Documentation
@@ -297,7 +299,7 @@ protected:
   //##Documentation
   //## @brief CameraController for 3D rendering
   //## @note preliminary.
-  mitk::CameraController::Pointer m_CameraController;
+  itk::SmartPointerForwardReference<mitk::CameraController> m_CameraController;
 
   //##ModelId=3E6D5DD302E6
   //##Documentation

@@ -36,6 +36,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkInteractionConst.h"
 
 #include <vtkLinearTransform.h>
+#include "mitkCameraController.h"
+#include <itkSmartPointerForwardReference.txx>
+
+template class itk::SmartPointerForwardReference<mitk::CameraController>;
 
 //##ModelId=3E3D2F120050
 mitk::BaseRenderer::BaseRenderer() : 

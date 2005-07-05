@@ -23,7 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkRescaleIntensityImageFilter.h>
 
 template < typename TPixel, unsigned int VImageDimension > 
-void _mitkItkImageWrite(itk::Image< TPixel, VImageDimension >* itkImage, std::string& fileName)
+void _mitkItkImageWrite(itk::Image< TPixel, VImageDimension >* itkImage, const std::string& fileName)
 {
   typedef itk::Image< TPixel, VImageDimension > TImageType;
 
@@ -49,12 +49,13 @@ void _mitkItkImageWrite(itk::Image< TPixel, VImageDimension >* itkImage, std::st
     writer->SetStartIndex(numberOfSlices);
     writer->SetIncrementIndex(-1);
 
+    std::string finalFileName = fileName;
     std::string::size_type pos = fileName.find_last_of(".",fileName.length()-1);
     if(pos==std::string::npos)
-      fileName.append(".%d.png");
+      finalFileName.append(".%d.png");
     else
-      fileName.insert(pos,".%d");
-    writer->SetSeriesFormat( fileName.c_str() );
+      finalFileName.insert(pos,".%d");
+    writer->SetSeriesFormat( finalFileName.c_str() );
     writer->Update();
   }
   else
@@ -63,14 +64,15 @@ void _mitkItkImageWrite(itk::Image< TPixel, VImageDimension >* itkImage, std::st
     typedef itk::Image<PixelType,2> OutputImage2DType;
     typename itk::ImageSeriesWriter<TImageType, OutputImage2DType>::Pointer writer = itk::ImageSeriesWriter<TImageType, OutputImage2DType >::New();
     writer->SetInput( itkImage );
+    std::string finalFileName = fileName;
     std::string::size_type pos = fileName.find_last_of(".",fileName.length()-1);
     if(pos==std::string::npos)
-      fileName.append(".%d.png");
+      finalFileName.append(".%d.png");
     else
-      fileName.insert(pos,".%d");
-    writer->SetSeriesFormat( fileName.c_str() );
+      finalFileName.insert(pos,".%d");
+    writer->SetSeriesFormat( finalFileName.c_str() );
     writer->Update();
   }
 }
 
-InstantiateAccessFunction_1(_mitkItkImageWrite, std::string&);
+InstantiateAccessFunction_1(_mitkItkImageWrite, const std::string&);

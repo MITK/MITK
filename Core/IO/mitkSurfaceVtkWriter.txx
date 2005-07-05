@@ -20,7 +20,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <sstream>
 
-
 template <class VTKWRITER>
 mitk::SurfaceVtkWriter<VTKWRITER>::SurfaceVtkWriter()
 {
@@ -58,13 +57,21 @@ void mitk::SurfaceVtkWriter<VTKWRITER>::GenerateData()
   {
     
     int t, timesteps;
-    const mitk::TimeBounds& timebounds = input->GetTimeSlicedGeometry()->GetTimeBoundsInMS();
 
     timesteps = input->GetTimeSlicedGeometry()->GetTimeSteps();
     for(t = 0; t < timesteps; ++t)
     {
       ::itk::OStringStream filename;
-      filename <<  m_FileName.c_str() << "_S" << std::setprecision(0) << timebounds[0] << "_E" << std::setprecision(0) << timebounds[1] << "_T" << t << m_Extension;
+      if(input->GetTimeSlicedGeometry()->IsValidTime(t))
+      {
+        const mitk::TimeBounds& timebounds = input->GetTimeSlicedGeometry()->GetGeometry3D(t)->GetTimeBoundsInMS();
+        filename <<  m_FileName.c_str() << "_S" << std::setprecision(0) << timebounds[0] << "_E" << std::setprecision(0) << timebounds[1] << "_T" << t << m_Extension;
+      }
+      else
+      {
+        itkWarningMacro(<<"Error on write: TimeSlicedGeometry invalid of surface " << filename << ".");
+        filename <<  m_FileName.c_str() << "_T" << t << m_Extension;
+      }
       m_VtkWriter->SetFileName(filename.str().c_str());
       m_VtkWriter->SetInput(input->GetVtkPolyData(t));
       m_VtkWriter->Write();
@@ -90,7 +97,7 @@ const mitk::Surface* mitk::SurfaceVtkWriter<VTKWRITER>::GetInput()
 {
   if ( this->GetNumberOfInputs() < 1 )
   {
-    return 0;
+    return NULL;
   }
   else
   {

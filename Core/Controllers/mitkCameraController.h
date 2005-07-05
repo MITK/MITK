@@ -37,6 +37,8 @@ namespace mitk {
 class CameraController : public BaseController
 {
 public:
+    enum StandardView { ANTERIOR,POSTERIOR,SINISTER,DEXTER,CRANIAL,CAUDAL };
+
     //##ModelId=3E6D5DD4008F
     mitkClassMacro(CameraController, BaseController);
     itkSetMacro(Renderer,BaseRenderer*);
@@ -68,6 +70,9 @@ public:
     //## @brief Implemented in sub-classes.
     virtual void KeyPressEvent(mitk::KeyEvent*);
 
+   virtual void SetViewToAnterior();
+   virtual void SetStandardView(StandardView view);
+  
 protected:
     //CameraController();
 

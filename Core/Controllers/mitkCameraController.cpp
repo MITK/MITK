@@ -54,6 +54,26 @@ void mitk::CameraController::SetViewToAnterior()
 {
   this->SetStandardView(ANTERIOR);
 }
+void mitk::CameraController::SetViewToPosterior()
+{
+  this->SetStandardView(POSTERIOR);
+}
+void mitk::CameraController::SetViewToSinister()
+{
+  this->SetStandardView(SINISTER);
+}
+void mitk::CameraController::SetViewToDexter()
+{
+  this->SetStandardView(DEXTER);
+}
+void mitk::CameraController::SetViewToCranial()
+{
+  this->SetStandardView(CRANIAL);
+}
+void mitk::CameraController::SetViewToCaudal()
+{
+  this->SetStandardView(CAUDAL);
+}
 
 void mitk::CameraController::SetStandardView( mitk::CameraController::StandardView view )
 {

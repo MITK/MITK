@@ -71,6 +71,11 @@ public:
     virtual void KeyPressEvent(mitk::KeyEvent*);
 
    virtual void SetViewToAnterior();
+   virtual void SetViewToPosterior();
+   virtual void SetViewToSinister();
+   virtual void SetViewToDexter();
+   virtual void SetViewToCranial();
+   virtual void SetViewToCaudal();
    virtual void SetStandardView(StandardView view);
   
 protected:

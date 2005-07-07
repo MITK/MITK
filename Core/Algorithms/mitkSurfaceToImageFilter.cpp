@@ -39,7 +39,7 @@ See MITKCopyright.txt or http://www.mitk.org/ for details.
 mitk::SurfaceToImageFilter::SurfaceToImageFilter()
 {
   m_MakeOutputBinaryOn = false;
-  m_BackgroundValue = -1;
+  m_BackgroundValue = -10000;
 }
 
 mitk::SurfaceToImageFilter::~SurfaceToImageFilter()
@@ -132,80 +132,80 @@ void mitk::SurfaceToImageFilter::Stencil3DImage(int time)
   int surfaceTimeStep = (int) surfaceTimeGeometry->TimeStepToMS( (int) (imageTimeGeometry->TimeStepToMS(time) ) );
   
   vtkPolyData * polydata = ( (mitk::Surface*)GetInput() )->GetVtkPolyData( surfaceTimeStep );
+
   vtkTransformPolyDataFilter * move=vtkTransformPolyDataFilter::New();
   move->SetInput(polydata);
+  move->ReleaseDataFlagOn();
+
   vtkTransform *transform=vtkTransform::New();
   surfaceTimeGeometry->GetGeometry3D( surfaceTimeStep )->TransferItkToVtkTransform();
   transform->SetMatrix(surfaceTimeGeometry->GetGeometry3D( surfaceTimeStep )->GetVtkTransform()->GetMatrix());
-//  transform->Inverse();
   transform->PostMultiply();
-  //  transform->Translate(0.5,0.5,0.5); /// warum????
   move->SetTransform(transform);
-  move->Update();
-  polydata=move->GetOutput();
 
   vtkPolyDataNormals * normalsFilter = vtkPolyDataNormals::New();
-  normalsFilter->SetInput( polydata );
   normalsFilter->SetFeatureAngle(50);
   normalsFilter->SetConsistency(1);
   normalsFilter->SetSplitting(1);
   normalsFilter->SetFlipNormals(0);
-  normalsFilter->Update();
+  normalsFilter->ReleaseDataFlagOn();
+
+  normalsFilter->SetInput( move->GetOutput() );
+  move->Delete();
 
   vtkPolyDataToImageStencil * surfaceConverter = vtkPolyDataToImageStencil::New();
-  surfaceConverter->SetInput( normalsFilter->GetOutput() );
+  surfaceConverter->DebugOn();
   surfaceConverter->SetTolerance( 0.0 );
-  surfaceConverter->Update();
+  surfaceConverter->ReleaseDataFlagOn();
+
+  surfaceConverter->SetInput( normalsFilter->GetOutput() );
+  normalsFilter->Delete();
 
   vtkImageData * tmp = ( (mitk::Image*)GetImage() )->GetVtkImageData( time );
-  vtkImageMathematics * maths = vtkImageMathematics::New();
-  maths->SetOperationToAddConstant();
-  maths->SetConstantC(0);
-  maths->SetConstantK(100);
-  maths->SetInput1(tmp);
-  maths->Update();
 
   vtkImageCast * castFilter = vtkImageCast::New();
+  castFilter->ReleaseDataFlagOn();
   castFilter->SetOutputScalarTypeToInt();
   castFilter->SetInput( tmp );
 
   vtkImageStencil * stencil = vtkImageStencil::New();
-  stencil->SetStencil( surfaceConverter->GetOutput() );
   stencil->SetBackgroundValue( m_BackgroundValue );
   stencil->ReverseStencilOff();
+  stencil->ReleaseDataFlagOn();
+
+  stencil->SetStencil( surfaceConverter->GetOutput() );
+  surfaceConverter->Delete();
+
   stencil->SetInput( castFilter->GetOutput() );
-  stencil->Update();
+  castFilter->Delete();
+
 
   if (m_MakeOutputBinaryOn)
   {
     vtkImageThreshold * threshold = vtkImageThreshold::New();
     threshold->SetInput( stencil->GetOutput() );
+    stencil->Delete();
     threshold->ThresholdByUpper(1);
     threshold->ReplaceInOn();
     threshold->ReplaceOutOn();
     threshold->SetInValue(1);
     threshold->SetOutValue(0);
+//    threshold->SetOutputScalarTypeToUnsignedChar();
     threshold->Update();
 
     mitk::Image::Pointer output = this->GetOutput();
-    //output->Initialize( castFilter->GetOutput() );
-    //output->SetGeometry( static_cast<mitk::Geometry3D*>(GetImage()->GetGeometry()->Clone().GetPointer()) );
     output->SetVolume( threshold->GetOutput()->GetScalarPointer(), time );
 
-    threshold = NULL;
+    threshold->Delete();
   }
   else
   {
+    stencil->Update();
     mitk::Image::Pointer output = this->GetOutput();
     output->SetVolume( stencil->GetOutput()->GetScalarPointer(), time );
+    std::cout << "stencil ref count: " << stencil->GetReferenceCount() << std::endl;
+    stencil->Delete();
   }
-
-  polydata->Delete();
-  normalsFilter->Delete();
-  surfaceConverter->Delete();
-  tmp->Delete();
-  castFilter->Delete();
-  stencil->Delete();
 }
 
 

@@ -23,3 +23,4 @@ bool XMLIO::ReadXML( XMLReader& xmlReader )
 }
 
 } // namespace mitk
+

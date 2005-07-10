@@ -168,6 +168,10 @@ void mitk::DataTreeNodeFactory::GenerateData()
     {
       this->ReadFileSeriesTypeSTL();
     }
+    else if ( this->FilePatternEndsWith( ".vtk" ) || this->FilePatternEndsWith( ".VTK" ) )
+    {
+      this->ReadFileSeriesTypeVTK();
+    }
   }
   unsigned int nOut = this->GetNumberOfOutputs();
   for ( unsigned int i = 0; i < nOut; ++i )
@@ -1097,6 +1101,49 @@ void mitk::DataTreeNodeFactory::ReadFileSeriesTypeSTL()
   node->SetProperty( "name", nameProp );
   std::cout << "...finished!" << std::endl;
 }
+
+void mitk::DataTreeNodeFactory::ReadFileSeriesTypeVTK()
+{
+  if ( !this->GenerateFileList() )
+  {
+    itkWarningMacro( << "Sorry, file list could not be determined..." );
+    return ;
+  }
+
+  mitk::Surface::Pointer surface = mitk::Surface::New();
+  std::cout << "prefix: "<< m_FilePrefix << ", pattern: " <<m_FilePattern << std::endl;
+  surface->Initialize(m_MatchedFileNames.size());
+  //surface->Resize( m_MatchedFileNames.size() );
+  for ( unsigned int i = 0 ; i < m_MatchedFileNames.size(); ++i )
+  {
+    std::string fileName = m_MatchedFileNames[i];
+    std::cout << "Loading " << fileName << " as vtk..." << std::endl;
+
+    vtkPolyDataReader *reader = vtkPolyDataReader::New();
+    reader->SetFileName( fileName.c_str() );
+    reader->Update();
+
+    if ( reader->GetOutput() != NULL )
+    {
+      surface->SetVtkPolyData( reader->GetOutput(), i );
+    }
+    else
+    {
+      itkWarningMacro(<< "stlReader returned NULL while reading " << fileName << ". Trying to continue with empty vtkPolyData...");
+      surface->SetVtkPolyData( vtkPolyData::New(), i ); 
+    }
+    reader->Delete();
+  }
+
+  mitk::DataTreeNode::Pointer node = this->GetOutput();
+  node->SetData( surface );
+  SetDefaultSurfaceProperties( node );
+  // set filename without path as string property
+  mitk::StringProperty::Pointer nameProp = new mitk::StringProperty( this->GetBaseFilePrefix() + ".vtk" );
+  node->SetProperty( "name", nameProp );
+  std::cout << "...finished!" << std::endl;
+}
+
 
 void mitk::DataTreeNodeFactory::SetDefaultImageProperties(mitk::DataTreeNode::Pointer &node) 
 {

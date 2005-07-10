@@ -186,6 +186,8 @@ protected:
 
   virtual void ReadFileSeriesTypeSTL();
 
+  virtual void ReadFileSeriesTypeVTK();
+
   virtual void ReadFileSeriesTypeDCM();
 
   virtual void ReadFileSeriesTypeITKImageSeriesReader();

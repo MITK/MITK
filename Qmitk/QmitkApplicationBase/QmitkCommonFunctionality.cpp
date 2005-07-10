@@ -529,12 +529,16 @@ std::string CommonFunctionality::SaveImage(mitk::Image* image, const char* aFile
 
   try
   {
+    std::string dir = itksys::SystemTools::GetFilenamePath( fileName );
     std::string baseFilename = itksys::SystemTools::GetFilenameWithoutLastExtension( fileName );
     std::string extension = itksys::SystemTools::GetFilenameLastExtension( fileName );
 
+    dir += "/";
+    dir += baseFilename;
+
     mitk::ImageWriter::Pointer imageWriter = mitk::ImageWriter::New();
     imageWriter->SetInput(image);
-    imageWriter->SetFileName(baseFilename.c_str());
+    imageWriter->SetFileName(dir.c_str());
     imageWriter->SetExtension(extension.c_str());
     imageWriter->Write();
   }

@@ -197,6 +197,15 @@ void QcMITKSamplePlugin::selectSerie (QcLightbox* lightbox)
         delete [] tmp;
       }
 
+      if (dicomFindElement((unsigned char*) tsv->value, 0x0008, 0x0070, &data, &len))
+      {
+        tmp = new char[len+1];
+        strncpy(tmp, (char*)data, len);
+        tmp[len]=0;
+        node->SetProperty("manufacturer", new mitk::StringProperty( tmp ));
+        delete [] tmp;
+      }
+
       if (dicomFindElement((unsigned char*) tsv->value, 0x0020, 0x000e, &data, &len))
       {
         dicomFindElement((unsigned char*) tsv->value, 0x0020, 0x000e, &data, &len);

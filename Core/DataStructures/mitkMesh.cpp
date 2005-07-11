@@ -802,7 +802,8 @@ void mitk::Mesh::ExecuteOperation(Operation* operation)
 	//to tell the mappers, that the data is modifierd and has to be updated
 	this->Modified();
 
-  ((const itk::Object*)this)->InvokeEvent(itk::EndEvent());
+  mitk::OperationEndEvent endevent(operation);
+  ((const itk::Object*)this)->InvokeEvent(endevent);
 
   mitk::RenderWindow::UpdateAllInstances(); //*todo has to be done here, cause of update-pipeline not working yet
 

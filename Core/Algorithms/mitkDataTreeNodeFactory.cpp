@@ -712,8 +712,8 @@ void mitk::DataTreeNodeFactory::ReadFileTypeITKImageIOFactory()
   unsigned int ndim = imageIO->GetNumberOfDimensions();
   if ( ndim < MINDIM || ndim > MAXDIM )
   {
-    itkWarningMacro( << "Sorry, only dimensions 2, 3 and 4 are supported. The given file has " << ndim << " dimensions!" );
-    return ;
+    itkWarningMacro( << "Sorry, only dimensions 2, 3 and 4 are supported. The given file has " << ndim << " dimensions! Reading as 4D." );
+    ndim = 4;
   }
 
   itk::ImageIORegion ioRegion( ndim );
@@ -840,7 +840,6 @@ void mitk::DataTreeNodeFactory::ReadFileSeriesTypeDCM()
   nameGenerator->SetDirectory( dir.c_str() );
 
   const StringContainer & seriesUID = nameGenerator->GetSeriesUIDs();
-
   StringContainer::const_iterator seriesItr = seriesUID.begin();
   StringContainer::const_iterator seriesEnd = seriesUID.end();
 
@@ -857,6 +856,13 @@ void mitk::DataTreeNodeFactory::ReadFileSeriesTypeDCM()
   {
     std::cout << "Reading series " << seriesUID[ i ] << std::endl;
     StringContainer fileNames = nameGenerator->GetFileNames( seriesUID[ i ] );
+    StringContainer::const_iterator fnItr = fileNames.begin();
+    StringContainer::const_iterator fnEnd = fileNames.end();
+    while ( fnItr != fnEnd )
+    {
+      std::cout << *fnItr << std::endl;
+      fnItr++;
+    }
     ReaderType::Pointer reader = ReaderType::New();
     reader->SetFileNames( fileNames );
     reader->SetImageIO( dicomIO );
@@ -895,7 +901,7 @@ void mitk::DataTreeNodeFactory::ReadFileSeriesTypeDCM()
     catch ( const std::exception & e )
     {
       itkWarningMacro( << e.what() );
-      return ;
+      reader->ResetPipeline();
     }
   }
 }

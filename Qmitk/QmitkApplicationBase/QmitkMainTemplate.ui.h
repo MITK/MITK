@@ -317,6 +317,7 @@ void QmitkMainTemplate::fileOpenGetFactoryOutput( mitk::DataTreeNodeFactory & fa
   mitk::DataTreePreOrderIterator it(tree);
   mitk::Image* image = 0;
   mitk::Image* firstImage = 0;
+  bool dataFound = false;
 
   for ( unsigned int i = 0 ; i < factory.GetNumberOfOutputs( ); ++i )
   {
@@ -329,7 +330,10 @@ void QmitkMainTemplate::fileOpenGetFactoryOutput( mitk::DataTreeNodeFactory & fa
         firstImage = image;
       }
       if ( node->GetData() != NULL )
+      {
+        dataFound = true;
         it.Add( node );
+      }
       mitk::LevelWindowProperty::Pointer lw = dynamic_cast<mitk::LevelWindowProperty*>(node->GetProperty("levelwindow").GetPointer( ) );
       if ( lw.IsNotNull( ) )
       {
@@ -337,7 +341,7 @@ void QmitkMainTemplate::fileOpenGetFactoryOutput( mitk::DataTreeNodeFactory & fa
       }
     }
   }
-  if ( factory.GetOutput()->GetData() != NULL ) //assure that we have at least one valid output
+  if ( dataFound != NULL ) //assure that we have at least one valid output
   {
     if ( m_StandardViewsInitialized == false )
     {

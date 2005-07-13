@@ -341,7 +341,7 @@ void QmitkMainTemplate::fileOpenGetFactoryOutput( mitk::DataTreeNodeFactory & fa
       }
     }
   }
-  if ( dataFound != NULL ) //assure that we have at least one valid output
+  if ( dataFound ) //assure that we have at least one valid output
   {
     if ( m_StandardViewsInitialized == false )
     {

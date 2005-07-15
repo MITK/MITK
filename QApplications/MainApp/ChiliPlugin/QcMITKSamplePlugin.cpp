@@ -233,6 +233,66 @@ void QcMITKSamplePlugin::selectSerie (QcLightbox* lightbox)
         node->SetProperty("series description", new mitk::StringProperty( tmp ));
         delete [] tmp;
       }
+
+      //Heart-Rate
+      if ( dicomFindElement((unsigned char*) tsv->value, 0x0018, 0x1088, &data, &len) )
+      {
+        tmp = new char[len+1];
+        strncpy(tmp, (char*)data, len);
+        tmp[len]=0;     
+        int heartRate = 1;
+        heartRate = atoi(tmp);
+        delete [] tmp;
+
+        node->SetProperty("heartrate", new mitk::IntProperty( heartRate ));          
+      }
+      else
+        node->SetProperty("heartrate", new mitk::IntProperty( 0));          
+
+
+      //Unterscheidung nach Firma: 0x0008 0x0070
+      if ( dicomFindElement((unsigned char*) tsv->value, 0x0008, 0x0070, &data, &len) )
+      {
+        tmp = new char[len+1];
+        strncpy(tmp, (char*)data, len);
+        tmp[len]=0;
+        std::string stext = tmp;   
+        delete [] tmp;
+
+        std::string::size_type position = stext.find ("Philips",0);
+        if(!(position== std::string::npos))
+        {
+          //Venc bei Philips war 1
+          node->SetProperty("venc", new mitk::IntProperty( 1 ));          
+        }
+
+        position = stext.find ("SIEMENS",0);
+        if(!(position== std::string::npos))
+        {
+          //Auslesen des Venc-Wertes
+          if ( dicomFindElement((unsigned char*) tsv->value, 0x0018, 0x1030, &data, &len) )
+          {
+            tmp = new char[len+1];
+            strncpy(tmp, (char*)data, len);
+            tmp[len]=0;
+
+            stext = tmp;   
+
+            char* tmp2 = new char[4];
+            tmp2[0]=tmp[6];
+            tmp2[1]=tmp[7];
+            tmp2[2]=tmp[8];
+            tmp2[3]=0;
+
+            int wert = atoi(tmp2);
+
+            //Positionen 7, 8, 9
+            node->SetProperty("venc", new mitk::IntProperty(wert));
+            delete [] tmp;
+            delete [] tmp2;
+          }   
+        }
+      }
     }
         //dicomFindElement((unsigned char*) tsv->value, 0x0020, 0x0013, &data, &len);
         //sscanf( (char *) data, "%d", &imageNumber );

@@ -83,6 +83,7 @@ typedef enum EEventIds
   EIDPOSITIONEVENT = 1012,
   EIDEDIT = 1013,
   EIDSUBDESELECT = 1020,
+  EIDSMTOSELECTED = 1030,
   //external thrown events:
   EIDCLEAR = 1100
 };

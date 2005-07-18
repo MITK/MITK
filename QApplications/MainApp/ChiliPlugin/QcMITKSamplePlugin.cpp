@@ -106,19 +106,7 @@ void QcMITKSamplePlugin::selectSerie (QcLightbox* lightbox)
   activated=true;
   if(lightbox->getFrames()==0)
     return;
-  
-  QObject * parent = this->parent();
-  QWidget * parentWidget = (QWidget *)parent;
-
-  if (parentWidget->isVisible()) {
-    itkGenericOutputMacro(<<"plugin active");
-  } else
-  {
-    itkGenericOutputMacro(<<"plugin not active");
-  }
-  
-
-  
+    
   mitk::Image::Pointer image = mitk::Image::New();
   
   mitk::LightBoxImageReader::Pointer reader=mitk::LightBoxImageReader::New();
@@ -146,36 +134,6 @@ void QcMITKSamplePlugin::selectSerie (QcLightbox* lightbox)
 
     ipPicDescriptor *pic = reader->GetOutput()->GetPic();
 
-    ipPicTSV_t* uid= ipPicQueryTag(pic, "IMAGE INSTANCE UID");
-    ipPicTSV_t* description= ipPicQueryTag(pic, "SERIES DESCRIPTION");
-    ipPicTSV_t* patientName= ipPicQueryTag(pic, "PATIENT NAME");
-
-    int laenge = patientName->n[0];
-    char* patName = new char[laenge+1];
-    strncpy(patName, (char*)(patientName->value), laenge);
-    patName[laenge] = 0;
-    //char a;
-    //while (*patName != 0) 
-    //{
-    //  a = *patName;
-    //  patName++;
-    //}
-
-    std::string test((char*)patientName->value );
-    int lenght = test.length();
-    
-   if (description)
-      node->SetProperty("name", new mitk::StringProperty( (char*)uid->value ));
-    else if (uid)
-      node->SetProperty("name", new mitk::StringProperty( (char*)description->value ));
-
-    else if (patientName)
-      //node->SetProperty("name", new mitk::StringProperty( (char*)patientName->value ));
-      //node->SetProperty("name", new mitk::StringProperty( test.c_str() ));
-      node->SetProperty("name", new mitk::StringProperty( patName ));
-    else 
-      node->SetProperty("name", new mitk::StringProperty( lightbox->name() ));
-
     bool notAlreadyInDataTree = true;
 
     ipPicTSV_t* tsv = ipPicQueryTag(pic, "SOURCE HEADER");
@@ -197,12 +155,42 @@ void QcMITKSamplePlugin::selectSerie (QcLightbox* lightbox)
         delete [] tmp;
       }
 
+      if (dicomFindElement((unsigned char*) tsv->value, 0x0020, 0x0011, &data, &len))
+      {
+        tmp = new char[len+1];
+        strncpy(tmp, (char*)data, len);
+        tmp[len]=0;
+        int number = atoi(tmp);
+        node->SetProperty("series number", new mitk::IntProperty( number ));
+        delete [] tmp;
+      }
+
       if (dicomFindElement((unsigned char*) tsv->value, 0x0008, 0x0070, &data, &len))
       {
         tmp = new char[len+1];
         strncpy(tmp, (char*)data, len);
         tmp[len]=0;
         node->SetProperty("manufacturer", new mitk::StringProperty( tmp ));
+        delete [] tmp;
+      }
+
+      //series description
+      if ( dicomFindElement((unsigned char*) tsv->value, 0x0008, 0x103e, &data, &len) )
+      {
+        tmp = new char[len+1];
+        strncpy(tmp, (char*)data, len);
+        tmp[len]=0;
+        node->SetProperty("name", new mitk::StringProperty( tmp ));
+        delete [] tmp;
+      }
+
+      //patient name
+      if ( dicomFindElement((unsigned char*) tsv->value, 0x0010, 0x0010, &data, &len) )
+      {
+        tmp = new char[len+1];
+        strncpy(tmp, (char*)data, len);
+        tmp[len]=0;
+        node->SetProperty("patient name", new mitk::StringProperty( tmp ));
         delete [] tmp;
       }
 
@@ -223,16 +211,6 @@ void QcMITKSamplePlugin::selectSerie (QcLightbox* lightbox)
 
         delete [] tmp;
       }      
-
-      
-      if ( dicomFindElement((unsigned char*) tsv->value, 0x0008, 0x103e, &data, &len) )
-      {
-        tmp = new char[len+1];
-        strncpy(tmp, (char*)data, len);
-        tmp[len]=0;
-        node->SetProperty("series description", new mitk::StringProperty( tmp ));
-        delete [] tmp;
-      }
 
       //Heart-Rate
       if ( dicomFindElement((unsigned char*) tsv->value, 0x0018, 0x1088, &data, &len) )
@@ -297,7 +275,69 @@ void QcMITKSamplePlugin::selectSerie (QcLightbox* lightbox)
         //dicomFindElement((unsigned char*) tsv->value, 0x0020, 0x0013, &data, &len);
         //sscanf( (char *) data, "%d", &imageNumber );
         //info.imageNumber=imageNumber;
-    
+
+    if (!node->GetProperty("name"))
+    {
+      ipPicTSV_t* seriesDescriptionTag = ipPicQueryTag(pic, "SERIES DESCRIPTION");
+      if (seriesDescriptionTag)
+      {
+        int length = seriesDescriptionTag->n[0];
+        char* seriesDescription = new char[length+1];
+        strncpy(seriesDescription, (char*)(seriesDescriptionTag->value), length);
+        seriesDescription[length] = 0;
+        node->SetProperty("name", new mitk::StringProperty( seriesDescription ));
+        delete [] seriesDescription;
+      }
+    }
+
+    if (!node->GetProperty("patient name"))
+    {
+      ipPicTSV_t* patientNameTag = ipPicQueryTag(pic, "PATIENT NAME");
+      if (patientNameTag)
+      {
+        int length = patientNameTag->n[0];
+        char* patientName = new char[length+1];
+        strncpy(patientName, (char*)(patientNameTag->value), length);
+        patientName[length] = 0;
+        node->SetProperty("patient name", new mitk::StringProperty( patientName ));
+        delete [] patientName;
+      }
+    }
+
+    if (!node->GetProperty("series source uid"))
+    {
+      ipPicTSV_t* seriesSourceUIDTag = ipPicQueryTag(pic, "SERIES SOURCE UID");
+      if (seriesSourceUIDTag)
+      {
+        int length = seriesSourceUIDTag->n[0];
+        char* seriesSourceUID = new char[length+1];
+        strncpy(seriesSourceUID, (char*)(seriesSourceUIDTag->value), length);
+        seriesSourceUID[length] = 0;
+        node->SetProperty("series source uid", new mitk::StringProperty( seriesSourceUID ));
+        delete [] seriesSourceUID;
+      }
+    }
+
+    if (!node->GetProperty("series uid"))
+    {
+      ipPicTSV_t* seriesUIDTag = ipPicQueryTag(pic, "SERIES INSTANCE UID");
+      if (seriesUIDTag)
+      {
+        int length = seriesUIDTag->n[0];
+        char* seriesUID = new char[length+1];
+        strncpy(seriesUID, (char*)(seriesUIDTag->value), length);
+        seriesUID[length] = 0;
+        node->SetProperty("series uid", new mitk::StringProperty( seriesUID ));
+
+        //check if tree already contains node with this series instance uid
+        mitk::DataTreeNode* existingNode = CommonFunctionality::GetFirstNodeByProperty(it,"series uid", new mitk::StringProperty( seriesUID ));
+        if ( existingNode )
+        {
+          notAlreadyInDataTree = false;
+        }
+        delete [] seriesUID;
+      }
+    }
 
     if (notAlreadyInDataTree)
     {

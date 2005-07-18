@@ -77,6 +77,10 @@ void mitk::GlobalInteraction::AddInteractor(mitk::Interactor* interactor)
   if ( std::find(m_InteractorList.begin(), m_InteractorList.end(),interactor) == m_InteractorList.end() )
   {
     m_InteractorList.push_back(interactor);
+    
+    //if Interactor already selected, then add to selected list
+    if (interactor->GetMode()==Interactor::SMSELECTED)
+      m_SelectedList.push_back(interactor);
   }
 }
 

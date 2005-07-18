@@ -78,6 +78,10 @@ public:
   itkSetStringMacro( ImageTypeName );
   itkGetStringMacro( ImageTypeName );
 
+  itkSetStringMacro( Name );
+  itkGetStringMacro( Name );
+
+
   //##Documentation
   //## @brief Get the level-window, which will be written in the
   //## lightbox
@@ -112,6 +116,9 @@ protected:
   LevelWindow m_LevelWindow;
 
   std::string m_ImageTypeName;
+
+  // the series description
+  std::string m_Name;
 };
 
 } // namespace mitk

@@ -20,28 +20,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkFunctionalityTemplateControls.h"
 #include <qaction.h>
 #include "icon.xpm"
-#include <mitkEventMapper.h>
-#include <mitkGlobalInteraction.h>
-#include <mitkBaseRenderer.h>
-#include "QmitkRenderWindow.h"
-#include "QmitkSelectableGLWidget.h"
-#include "QmitkStdMultiWidget.h"
-#include <QmitkStepperAdapter.h>
-#include "qpushbutton.h"
-
-// for stereo setting
-#include <mitkOpenGLRenderer.h>
-#include <mitkVtkRenderWindow.h>
-#include <vtkRenderWindow.h>
-
-// for zoom/pan
-#include <mitkDisplayCoordinateOperation.h>
-#include <mitkDisplayVectorInteractor.h>
-#include <mitkDisplayInteractor.h>
-#include <mitkInteractionConst.h>
 
 QmitkFunctionalityTemplate::QmitkFunctionalityTemplate(QObject *parent, const char *name, QmitkStdMultiWidget *mitkStdMultiWidget, mitk::DataTreeIteratorBase* it) 
-: QmitkFunctionality(parent, name, it) ,controls(NULL), multiWidget(mitkStdMultiWidget)
+: QmitkFunctionality(parent, name, it) ,m_Controls(NULL), m_MultiWidget(mitkStdMultiWidget)
 {
   SetAvailability(true);
 }
@@ -57,16 +38,16 @@ QWidget * QmitkFunctionalityTemplate::CreateMainWidget(QWidget *parent)
 
 QWidget * QmitkFunctionalityTemplate::CreateControlWidget(QWidget *parent)
 {  
-  if (controls == NULL)  
+  if (m_Controls == NULL)  
   {    
-    controls = new QmitkFunctionalityTemplateControls(parent);          
+    m_Controls = new QmitkFunctionalityTemplateControls(parent);          
   }  
-  return controls;
+  return m_Controls;
 }
 
 void QmitkFunctionalityTemplate::CreateConnections()
 {  
-  if ( controls )   
+  if ( m_Controls )   
   {    
     //connect( ... );  
   }

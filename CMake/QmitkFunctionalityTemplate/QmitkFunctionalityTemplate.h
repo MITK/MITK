@@ -20,14 +20,10 @@ PURPOSE.  See the above copyright notices for more information.
 #define QMITK_FUNCTIONALITYTEMPLATE_H__INCLUDED
 
 #include "QmitkFunctionality.h"
-#include <mitkOperationActor.h>
-#include <mitkProperties.h>
+
 class QmitkStdMultiWidget;
 class QmitkFunctionalityTemplateControls;
 
-namespace mitk { 
-  class DisplayInteractor; 
-}
 /*
 !\class
 \brief Functionality Template 
@@ -77,12 +73,12 @@ protected:
   * default main widget containing 4 windows showing 3   
   * orthogonal slices of the volume and a 3d render window  
   */  
-  QmitkStdMultiWidget * multiWidget;
+  QmitkStdMultiWidget * m_MultiWidget;
 
   /*!  
   * controls containing sliders for scrolling through the slices  
   */  
-  QmitkFunctionalityTemplateControls * controls;
+  QmitkFunctionalityTemplateControls * m_Controls;
 
 };
 #endif // !defined(QMITK_FUNCTIONALITYTEMPLATE_H__INCLUDED)

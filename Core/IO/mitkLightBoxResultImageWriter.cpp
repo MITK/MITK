@@ -336,6 +336,8 @@ void mitk::LightBoxResultImageWriter::GenerateData()
 
       QcPlugin::changeImageType( cur, const_cast<char*>(m_ImageTypeName.c_str()) ); 
 
+      cur->dim = 2;
+
       if( prev )
         QcPlugin::changeSeries( cur, prev );
       m_LightBox->addImage( cur );

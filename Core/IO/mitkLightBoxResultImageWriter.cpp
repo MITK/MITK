@@ -159,6 +159,61 @@ void mitk::LightBoxResultImageWriter::SetLightBoxToCurrentLightBox()
 #endif
 }
 
+bool mitk::LightBoxResultImageWriter::SetLightBoxToNewLightBox()
+{
+#ifdef CHILIPLUGIN
+  QcPlugin* plugin = mitk::ChiliPlugin::GetPluginInstance();
+  if(plugin==NULL)
+  {
+    itkExceptionMacro(<<"GetPluginInstance()==NULL: Plugin is not initialized correctly !");
+  }
+  int lightboxCount = plugin->lightboxManager()->getLightboxes().count();
+  QcLightbox * newLightbox;
+  for (int i = 0; i < lightboxCount; i++)
+  {
+    newLightbox = plugin->lightboxManager()->getLightboxes().at(i);
+    if (newLightbox->getFrames() == 0)
+    {
+      newLightbox->activate();
+      newLightbox->show();
+      SetLightBox(newLightbox);
+      return true;
+    }    
+  }
+  return false;
+  //QWidget* parentWidget = (QWidget*) plugin->parent();
+  //QcLightbox * newLightbox = new QcLightbox(parentWidget,NULL,(uint)0) ; 	
+  //SetLightBox(newLightbox);
+#endif
+  return false;
+}
+
+bool mitk::LightBoxResultImageWriter::SetLightBoxToCorrespondingLightBox()
+{
+#ifdef CHILIPLUGIN
+  QcPlugin* plugin = mitk::ChiliPlugin::GetPluginInstance();
+  if(plugin==NULL)
+  {
+    itkExceptionMacro(<<"GetPluginInstance()==NULL: Plugin is not initialized correctly !");
+  }
+  QcLightbox * activeLightbox = plugin->lightboxManager()->getActiveLightbox();
+  ipPicDescriptor * currPic =	activeLightbox->fetchVolume();
+  ipPicTSV_t* seriesDescriptionTag = ipPicQueryTag(currPic, "SERIES DESCRIPTION");
+  if (seriesDescriptionTag)
+  {
+    if (*((char*)seriesDescriptionTag->value) == *(m_Name.c_str()))
+    {
+      activeLightbox->clear();
+      SetLightBox(activeLightbox);
+      return true;
+    }
+    else return false;
+  }
+  else return false;  
+#endif
+  return false;
+}
+
 QcLightbox* mitk::LightBoxResultImageWriter::GetLightBox() const
 {
   return m_LightBox;
@@ -288,7 +343,7 @@ void mitk::LightBoxResultImageWriter::GenerateData()
       prev = cur;
     }
   }
-
+  
 #endif
 }
 

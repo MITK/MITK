@@ -72,6 +72,20 @@ public:
   virtual void SetLightBoxToCurrentLightBox();
 
   //##Description 
+  //## @brief Set the lightbox to write into to a new lightbox
+  //##
+  //## A new lightbox is set as lightbox to write into.
+  //## \sa SetLightBox
+  virtual bool SetLightBoxToNewLightBox();
+
+  //##Description 
+  //## @brief Set the lightbox to write into to the lightbox containing the image to be written
+  //##
+  //## The lightbox that contains the image to be written is set as lightbox to write into.
+  //## \sa SetLightBox
+  virtual bool SetLightBoxToCorrespondingLightBox();
+
+  //##Description 
   //## @brief Get the lightbox to write into
   QcLightbox* GetLightBox() const;
 

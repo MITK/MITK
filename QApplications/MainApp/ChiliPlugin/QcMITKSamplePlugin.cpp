@@ -12,6 +12,7 @@
 #include "SampleApp.h"
 #include "QcMITKSamplePlugin.h"
 #include "mitkDataTreeNodeFactory.h"
+#include "mitkDataTreeHelper.h"
 #include "mitkProperties.h"
 #include "mitkLevelWindowProperty.h"
 #include "mitkStringProperty.h"
@@ -339,9 +340,75 @@ void QcMITKSamplePlugin::selectSerie (QcLightbox* lightbox)
       }
     }
 
+    ipPicTSV_t* imageTypeTag = ipPicQueryTag(pic, "IMAGE TYPE");
+    if (imageTypeTag)
+    {
+      int length = imageTypeTag->n[0];
+      char* imageType = new char[length+1];
+      strncpy(imageType, (char*)(imageTypeTag->value), length);
+      imageType[length] = 0;
+      if (imageType)
+      {
+        std::string imageTypeString(imageType);
+        if (imageTypeString == "Image, Segmentation")
+          node->SetProperty("segmentation",new mitk::BoolProperty(true));
+      }
+      delete [] imageType;
+    }
+
+    //is source image already in data tree?
+    mitk::DataTreeNode* fatherNode = NULL;
+    if (node->GetProperty("series source uid"))
+    {
+      mitk::StringProperty::Pointer seriesSourceeUID = dynamic_cast<mitk::StringProperty*>(node->GetProperty("series source uid").GetPointer());    
+      fatherNode = CommonFunctionality::GetFirstNodeByProperty(it,"series uid", seriesSourceeUID);      
+    }
+
     if (notAlreadyInDataTree)
     {
-      it.Add(node);
+      if (fatherNode)
+      {
+        mitk::DataTreeIteratorClone fatherIt = mitk::DataTreeHelper::FindIteratorToNode(ap->GetTree(), fatherNode );
+        fatherIt->Add(node);
+      }
+      else 
+        it.Add(node);
+
+      //now that the node is added:
+      //are child nodes of it already in the data tree?
+      //if so the sorting of the tree has to be changed
+      mitk::StringProperty::Pointer seriesInstanceUID = dynamic_cast<mitk::StringProperty*>(node->GetProperty("series uid").GetPointer());
+      mitk::DataTreeIteratorClone fatherIt = mitk::DataTreeHelper::FindIteratorToNode(ap->GetTree(), node );
+      if (seriesInstanceUID != NULL)
+      {
+        mitk::DataTreePreOrderIterator treeIt( ap->GetTree() );
+        treeIt.GoToBegin();
+        bool iterate = true;
+        while (!treeIt.IsAtEnd())
+        {
+          mitk::DataTreeNode* curNode = treeIt.Get();
+          if (fatherIt->ChildPosition(curNode) == -1)
+          {
+            mitk::StringProperty::Pointer seriesSourceUID = dynamic_cast<mitk::StringProperty*>(curNode->GetProperty("series source uid").GetPointer());
+            if (seriesSourceUID != NULL)
+            {
+              if (*seriesSourceUID == *seriesInstanceUID)            
+              {
+                mitk::DataTreeIteratorClone itClone = treeIt.Clone();
+                itClone->GoToParent();
+                int childPos = itClone->ChildPosition(curNode);
+                ++treeIt;
+                iterate = false;
+                if (itClone->RemoveChild(childPos))
+                  fatherIt->Add(curNode);                            
+              }
+            }
+          }
+          if (iterate)
+            ++treeIt;
+          else iterate = true;
+        }
+      }    
     }
     
     if((ap->GetMultiWidget()->GetRenderWindow1()->GetRenderer()->GetMTime()==initTime) && (ap->GetStandardViewsInitialized()==false))

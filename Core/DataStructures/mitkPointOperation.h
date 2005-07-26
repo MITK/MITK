@@ -55,6 +55,8 @@ class PointOperation : public Operation
   //## @param index is e.g. the position in a list which describes the element to change
   PointOperation(OperationType operationType,	ScalarType timeInMS, Point3D point, int index = -1, bool selected = true, PointSpecificationType type = PTUNDEFINED);
 
+  PointOperation(OperationType operationType,	Point3D point, ScalarType timeInMS, int index, bool selected, PointSpecificationType type);
+
   //##ModelId=3F0189F003B2
   virtual ~PointOperation();
 

@@ -46,8 +46,11 @@ namespace mitk {
 //## An entry is divided into the pointcoordinates and pointdata.
 //## The pointdata includes information about the pointId, the selection state of the point and an information about the type of the point.
 //## For further information about different types of a point see mitk::PointSpecificationType in mitkVector.h;
-//## Inserting a point is accompanied by an event, containing an index. The new point is set into ths list 
+//## Inserting a point is accompanied by an event, containing an index. The new point is set into the list 
 //## at the indexed position. At the same time an internal ID is set in data of the point.
+//##
+//## The points of itk::PointSet stores the points in a pointContainer = MapContainer. To read the points, do it with an constIteractor of MapContainer and not with size.
+//## That way all the indexed points are iterated and the points, that are deleted by deleting the index aren't shown.
 //##
 //## The class uses an itkMesh internaly, because mitk::Mesh is derived from mitk::PointSet and needs the itk::Mesh structure which is also derived from itk::PointSet.
 //## Thus several typedefs, that seem to be in wrong place, are declared here (for example SelectedLinesType).

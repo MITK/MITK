@@ -67,6 +67,10 @@ class QmitkFunctionalityTemplate : public QmitkFunctionality
 
 protected slots:  
   void TreeChanged();
+  /*
+   * just an example slot for the example TreeNodeSelector widget
+   */
+  void ImageSelected(mitk::DataTreeIteratorClone imageIt);
 
 protected:  
   /*!  

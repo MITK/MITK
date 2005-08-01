@@ -65,7 +65,7 @@ namespace itk
     }
 
   private: 
-    TreeChangeEvent(const Self&); 
+    // TreeChangeEvent(const Self&); 
     void operator=(const Self&); 
 
   protected:
@@ -102,7 +102,7 @@ namespace itk
     /** */     
     virtual ::itk::EventObject* MakeObject() const 
     { 
-      return new Self( *m_ChangePosition ); 
+      return new Self( *this->m_ChangePosition ); 
     } 
   
   };
@@ -137,7 +137,7 @@ namespace itk
     /** */     
     virtual ::itk::EventObject* MakeObject() const 
     { 
-      return new Self( *m_ChangePosition ); 
+      return new Self( *this->m_ChangePosition ); 
     } 
   };
 

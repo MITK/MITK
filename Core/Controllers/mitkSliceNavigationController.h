@@ -42,7 +42,6 @@ namespace mitk {
      virtual ::itk::EventObject* MakeObject() const \
        { return new Self(GetTimeSlicedGeometry(), GetPos()); } \
    private: \
-     classname(const Self&); \
      void operator=(const Self&); \
  }
 
@@ -129,7 +128,7 @@ public:
   private: 
     TimeSlicedGeometry::Pointer m_TimeSlicedGeometry;
     unsigned int m_Pos;
-    TimeSlicedGeometryEvent(const Self&); 
+    // TimeSlicedGeometryEvent(const Self&); 
     void operator=(const Self&); 
   };
   mitkTimeSlicedGeometryEventMacro( GeometrySendEvent    , TimeSlicedGeometryEvent );

@@ -51,7 +51,7 @@ void itk::VtkAbstractTransform<TScalarType>::SetVtkAbstractTransform(vtkAbstract
 
   m_LastVtkAbstractTransformTimeStamp = m_VtkAbstractTransform->GetMTime();
 
-  Modified();
+  this->Modified();
 }
 
 // Transform a point
@@ -203,7 +203,7 @@ itk::VtkAbstractTransform<TScalarType>::GetMTime() const
   if((m_VtkAbstractTransform != NULL) && (m_LastVtkAbstractTransformTimeStamp < m_VtkAbstractTransform->GetMTime()))
   {
     m_LastVtkAbstractTransformTimeStamp=m_VtkAbstractTransform->GetMTime();
-    Modified();
+    this->Modified();
   }
 
   return Superclass::GetMTime();

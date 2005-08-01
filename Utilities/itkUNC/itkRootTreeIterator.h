@@ -58,10 +58,10 @@ RootTreeIterator<TTreeType>::RootTreeIterator(TTreeType* tree, const TreeNodeTyp
 {  
   if(start)
     {
-    m_Begin = const_cast<TreeNode<ValueType>*>(start);
+    this->m_Begin = const_cast<TreeNode<ValueType>*>(start);
     }
-  m_Root = tree->GetRoot();
-  m_Position = m_Begin;
+  this->m_Root = tree->GetRoot();
+  this->m_Position = this->m_Begin;
 }
 
 
@@ -91,8 +91,8 @@ template <class TTreeType>
 const typename RootTreeIterator<TTreeType>::ValueType& 
 RootTreeIterator<TTreeType>::Next() 
 {
-  m_Position = const_cast<TreeNodeType*>(FindNextNode());
-  return m_Position->Get();
+  this->m_Position = const_cast<TreeNodeType*>(FindNextNode());
+  return this->m_Position->Get();
 }
 
 /** Go to the next node */
@@ -101,8 +101,8 @@ template <class TTreeType>
 const typename RootTreeIterator<TTreeType>::TreeNodeType* 
 RootTreeIterator<TTreeType>::Next() const
 {
-  m_Position = const_cast<TreeNodeType*>(FindNextNode());
-  return m_Position;
+  this->m_Position = const_cast<TreeNodeType*>(FindNextNode());
+  return this->m_Position;
 }
 */
 
@@ -111,15 +111,15 @@ template <class TTreeType>
 const typename RootTreeIterator<TTreeType>::TreeNodeType* 
 RootTreeIterator<TTreeType>::FindNextNode() const
 {  
-  if ( m_Position == NULL )
+  if ( this->m_Position == NULL )
     {
     return NULL;
     }
-  if ( m_Position == m_Root )
+  if ( this->m_Position == this->m_Root )
     {
     return NULL;
     }
-  return m_Position->GetParent();
+  return this->m_Position->GetParent();
 }
 
 
@@ -127,7 +127,7 @@ RootTreeIterator<TTreeType>::FindNextNode() const
 template <class TTreeType>
 TreeIteratorBase<TTreeType>* RootTreeIterator<TTreeType>::Clone() 
 {
-  RootTreeIterator<TTreeType>* clone = new RootTreeIterator<TTreeType>( const_cast<TTreeType*>(m_Tree), m_Position );
+  RootTreeIterator<TTreeType>* clone = new RootTreeIterator<TTreeType>( const_cast<TTreeType*>(this->m_Tree), this->m_Position );
   *clone = *this;  
   return clone;
 }

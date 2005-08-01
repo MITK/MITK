@@ -102,7 +102,7 @@ class MeshUtil
       unsigned long num = t->GetNumberOfVertices();
       vtkIdType *pts = (vtkIdType*)t->PointIdsBegin();
       if (num==2) // useless because itk::LineCell always returns 2
-        InsertLine(pts);
+        this->InsertLine(pts);
     }
 
     /*!
@@ -113,13 +113,13 @@ class MeshUtil
       unsigned long num = t->GetNumberOfVertices();
       vtkIdType *pts = (vtkIdType*)t->PointIdsBegin();
       if (num > 3) 
-        InsertPolygon(num, pts);
+        this->InsertPolygon(num, pts);
       else
       if (num == 3) 
-        InsertTriangle(pts);
+        this->InsertTriangle(pts);
       else
       if (num==2)
-        InsertLine(pts);
+        this->InsertLine(pts);
     }
 
     /*!
@@ -130,10 +130,10 @@ class MeshUtil
       unsigned long num = t->GetNumberOfVertices();
       vtkIdType *pts = (vtkIdType*)t->PointIdsBegin();
       if (num == 3) 
-        InsertTriangle(pts);
+        this->InsertTriangle(pts);
       else
       if (num==2)
-        InsertLine(pts);
+        this->InsertLine(pts);
     }
 
     /*! 
@@ -144,13 +144,13 @@ class MeshUtil
       unsigned long num = t->GetNumberOfVertices();
       vtkIdType *pts = (vtkIdType*)t->PointIdsBegin();
       if (num == 4) 
-        InsertQuad(pts);
+        this->InsertQuad(pts);
       else
       if (num == 3) 
-        InsertTriangle(pts);
+        this->InsertTriangle(pts);
       else
       if (num==2)
-        InsertLine(pts);
+        this->InsertLine(pts);
     }
   };
 
@@ -186,7 +186,7 @@ class MeshUtil
       unsigned long num = t->GetNumberOfVertices();
       vtkIdType *pts = (vtkIdType*)t->PointIdsBegin();
       if (num==2)
-        InsertLine(pts);
+        this->InsertLine(pts);
     }
 
     /*!
@@ -197,7 +197,7 @@ class MeshUtil
       unsigned long num = t->GetNumberOfVertices();
       vtkIdType *pts = (vtkIdType*)t->PointIdsBegin();
       if (num > 3) 
-        InsertPolygon(num, pts);
+        this->InsertPolygon(num, pts);
     }
 
     /*!
@@ -208,7 +208,7 @@ class MeshUtil
       unsigned long num = t->GetNumberOfVertices();
       vtkIdType *pts = (vtkIdType*)t->PointIdsBegin();
       if (num == 3) 
-        InsertTriangle(pts);
+        this->InsertTriangle(pts);
     }
 
     /*! 
@@ -219,7 +219,7 @@ class MeshUtil
       unsigned long num = t->GetNumberOfVertices();
       vtkIdType *pts = (vtkIdType*)t->PointIdsBegin();
       if (num == 4) 
-        InsertQuad(pts);
+        this->InsertQuad(pts);
     }
   };
 
@@ -251,26 +251,26 @@ class MeshUtil
 
     void InsertLine(vtkIdType *pts)
     {
-      cellId = m_Cells->InsertNextCell(2, pts);
-      m_TypeArray[cellId] = VTK_LINE;
+      this->cellId = m_Cells->InsertNextCell(2, pts);
+      m_TypeArray[this->cellId] = VTK_LINE;
     }
 
     void InsertTriangle(vtkIdType *pts)
     {
-      cellId = m_Cells->InsertNextCell(3, pts);
-      m_TypeArray[cellId] = VTK_TRIANGLE;
+      this->cellId = m_Cells->InsertNextCell(3, pts);
+      m_TypeArray[this->cellId] = VTK_TRIANGLE;
     }
 
     void InsertPolygon(vtkIdType npts, vtkIdType *pts)
     {
-      cellId = m_Cells->InsertNextCell(npts, pts);
-      m_TypeArray[cellId] = VTK_POLYGON;
+      this->cellId = m_Cells->InsertNextCell(npts, pts);
+      m_TypeArray[this->cellId] = VTK_POLYGON;
     }
 
     void InsertQuad(vtkIdType *pts)
     {
-      cellId = m_Cells->InsertNextCell(4, pts);
-      m_TypeArray[cellId] = VTK_QUAD;
+      this->cellId = m_Cells->InsertNextCell(4, pts);
+      m_TypeArray[this->cellId] = VTK_QUAD;
     }
   };
 

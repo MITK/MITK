@@ -37,7 +37,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkStringProperty.h>
 #include <mitkDataTreeNode.h>
 #include <mitkDataTreeNodeFactory.h>
-// #include <mitkImageCast.h>
+#include <mitkImageCast.h>
 #include <mitkDataTree.h>
 #include <mitkSurface.h>
 #include "itkImage.h"
@@ -48,14 +48,13 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itksys/SystemTools.hxx>
 
 #include "mitkLevelWindow.h"
+#include "vtkPolyData.h"
 
 namespace mitk
 {
   class Surface;
   class Image;
 }
-
-class vtkPolyData;
 
 #ifdef MBI_INTERNAL
 #ifndef QMITKCOMMONFUNCTIONALITYIMPLEMENTATION

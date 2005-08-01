@@ -35,7 +35,7 @@ void mitk::ImageToItk<TOutputImage>::SetInput(const mitk::Image *input)
     itkExceptionMacro( << "image has wrong pixel type " );
   
   // Process object is not const-correct so the const_cast is required here
-  this->ProcessObject::SetNthInput(0, 
+  itk::ProcessObject::SetNthInput(0, 
     const_cast< mitk::Image * >( input ) );
 }
 
@@ -57,7 +57,7 @@ void mitk::ImageToItk<TOutputImage>::SetInput( unsigned int index, const mitk::I
     itkExceptionMacro( << "image has wrong pixel type " );
 
   // Process object is not const-correct so the const_cast is required here
-  this->ProcessObject::SetNthInput(index, 
+  itk::ProcessObject::SetNthInput(index, 
     const_cast< mitk::Image *>( input ) );
 }
 
@@ -70,14 +70,14 @@ const mitk::Image *mitk::ImageToItk<TOutputImage>::GetInput(void)
 	}
 
 	return static_cast< const mitk::Image * >
-		(this->ProcessObject::GetInput(0) );
+		(itk::ProcessObject::GetInput(0) );
 }
 
 template<class TOutputImage>
 const mitk::Image *mitk::ImageToItk<TOutputImage>::GetInput(unsigned int idx)
 {
 	return static_cast< mitk::Image * >
-		(this->ProcessObject::GetInput(idx));
+		(itk::ProcessObject::GetInput(idx));
 }
 
 template<class TOutputImage>
@@ -86,7 +86,7 @@ template<class TOutputImage>
 {
   // Allocate output
   mitk::Image::ConstPointer input = this->GetInput();
-  typename OutputImageType::Pointer output = this->GetOutput();
+  typename Superclass::OutputImageType::Pointer output = this->GetOutput();
   
   
   unsigned long noBytes = input->GetDimension(0);
@@ -133,15 +133,15 @@ template<class TOutputImage>
   mitk::Image::ConstPointer input = this->GetInput();
   if(input.IsNotNull() && (input->GetSource()!=NULL) && input->GetSource()->Updating())
   {
-    typename OutputImageType::Pointer output = this->GetOutput();
+    typename Superclass::OutputImageType::Pointer output = this->GetOutput();
     unsigned long t1 = input->GetUpdateMTime()+1;
-    if (t1 > m_OutputInformationMTime.GetMTime())
+    if (t1 > this->m_OutputInformationMTime.GetMTime())
     {
       output->SetPipelineMTime(t1);
 
       this->GenerateOutputInformation();
 
-      m_OutputInformationMTime.Modified();
+      this->m_OutputInformationMTime.Modified();
     }
     return;
   }
@@ -153,7 +153,7 @@ template<class TOutputImage>
   ::GenerateOutputInformation()
 {
   mitk::Image::ConstPointer input = this->GetInput();
-  typename OutputImageType::Pointer output = this->GetOutput();
+  typename Superclass::OutputImageType::Pointer output = this->GetOutput();
   
   SizeType  size;
   double origin[ 4 ];   // itk2vtk() expects 3 dimensions, so we can't use VImageDimension if image is 2d!

@@ -32,6 +32,9 @@ template<class T>
 class Vector3 : public Tuple3<T> {
 /*
  * $Log$
+ * Revision 1.5  2005/08/01 15:51:30  nolden
+ * COMP: gcc 3.4 issues
+ *
  * Revision 1.4  2003/11/04 14:19:17  nolden
  * gcc2 compatibility fix
  *
@@ -120,9 +123,9 @@ public:
         T d = length();
 
         // zero-div may occur.
-        x /= d;
-        y /= d;
-        z /= d;
+        this->x /= d;
+        this->y /= d;
+        this->z /= d;
     }
 
     /**
@@ -130,7 +133,7 @@ public:
       * @param  v1 the other vector
       */
     T dot(const Vector3& v1) const {
-        return x*v1.x + y*v1.y + z*v1.z;
+        return this->x*v1.x +this->y*v1.y +this->z*v1.z;
     }
 
 
@@ -139,7 +142,7 @@ public:
       * @return the squared length of this vector
       */
     T lengthSquared() const {
-        return x*x + y*y + z*z;
+        return this->x*this->x + this->y*this->y + this->z*this->z;
     }
 
     /**
@@ -181,8 +184,8 @@ public:
 		T radius = length();
 		if (radius == 0) return Vector3( 0, 0, 0 );
 
-		T polar = VmUtil<T>::acos( z / radius );
-		T azimuth = VmUtil<T>::atan2( y, x );
+		T polar = VmUtil<T>::acos( this->z / radius );
+		T azimuth = VmUtil<T>::atan2( this->y, this->x );
 		return Vector3( azimuth, polar, radius );
     }
 
@@ -196,9 +199,9 @@ public:
       */
     Vector3 sphere2cart() const {
            
-		T cartX = z * VmUtil<T>::cos( x ) * VmUtil<T>::sin( y );
-		T cartY = z * VmUtil<T>::sin( x ) * VmUtil<T>::sin( y );
-		T cartZ = z * VmUtil<T>::cos( y );
+		T cartX = this->z * VmUtil<T>::cos( this->x ) * VmUtil<T>::sin( this->y );
+		T cartY = this->z * VmUtil<T>::sin( this->x ) * VmUtil<T>::sin( this->y );
+		T cartZ = this->z * VmUtil<T>::cos( this->y );
 		return Vector3( cartX, cartY, cartZ );
     }
 

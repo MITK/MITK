@@ -288,6 +288,7 @@ void mitk::PointSet::SetRequestedRegion(itk::DataObject*)
 
 bool mitk::PointSet::WriteXMLData( XMLWriter& xmlWriter )
 {
+  BaseData::WriteXMLData( xmlWriter );
   std::string fileName = xmlWriter.GetNewFilenameAndSubFolder();
   fileName += ".mps";
   xmlWriter.WriteProperty( XMLReader::FILENAME, fileName.c_str() );
@@ -300,6 +301,8 @@ bool mitk::PointSet::WriteXMLData( XMLWriter& xmlWriter )
 
 bool mitk::PointSet::ReadXMLData( XMLReader& xmlReader )
 {
+  BaseData::ReadXMLData( xmlReader );
+
   std::string fileName;
   xmlReader.GetAttribute( XMLReader::FILENAME, fileName );
 

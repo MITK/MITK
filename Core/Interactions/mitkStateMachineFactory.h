@@ -29,6 +29,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk {
   class Action;
+  class Interactor;
 
   //##ModelId=3E5A39550068
   //##Documentation
@@ -51,6 +52,11 @@ namespace mitk {
     typedef std::set<int> HistorySet;
     //##ModelId=3F0177090094
     typedef std::set<int>::iterator HistorySetIter;
+    //##Documentation
+    //## this type holds all states of one statemachine
+    typedef std::map<int,State*> StateMachineMapType;
+    //## this type holds all states of all statemachines so that a specific state can be accessed for persistence
+    typedef std::map<std::string, StateMachineMapType* > AllStateMachineMapType;
 
     //##ModelId=3E68B2C600BD
     //##Documentation
@@ -59,7 +65,7 @@ namespace mitk {
 
     //##Documentation
     //## Destructor
-    ~StateMachineFactory(){}
+    ~StateMachineFactory();
 
     //##Documentation
     //## @brief deletes all States, Transitions and Actions that have been build up
@@ -90,6 +96,8 @@ namespace mitk {
 
     void  EndElement (const char *elementName);
 
+    friend class StateMachine;
+
   private:
 
     std::string ReadXMLStringAttribut( std::string name, const char** atts);
@@ -97,6 +105,10 @@ namespace mitk {
     double ReadXMLDoubleAttribut( std::string name, const char** atts );
     int ReadXMLIntegerAttribut( std::string name, const char** atts );
     bool ReadXMLBooleanAttribut( std::string name, const char** atts );
+
+    //##Documentation
+    //## returns NULL if no entry with string type is found
+    static mitk::State* GetState( const char * type, int StateId );
 
     //##ModelId=3E5B428F010B
     //##Documentation
@@ -125,6 +137,7 @@ namespace mitk {
     static std::vector<mitk::State *> m_AllStates;
     static std::vector<mitk::Transition *> m_AllTransitions;
     static std::vector<mitk::Action *> m_AllActions;
+    static AllStateMachineMapType m_AllStateMachineMap;
 
 
     //##ModelId=3E68B2C60040

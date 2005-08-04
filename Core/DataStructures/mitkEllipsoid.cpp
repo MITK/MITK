@@ -47,7 +47,7 @@ bool mitk::Ellipsoid::IsInside(const Point3D& worldPoint) const
   p[1] = worldPoint[1];
   p[2] = worldPoint[2];
   p[3] = 1;
-  m_Geometry3D->GetVtkTransform()->GetInverse()->TransformPoint(p, p);
+  GetGeometry()->GetVtkTransform()->GetInverse()->TransformPoint(p, p);
 	mitk::Point3D itkPoint;
   return (pow(p[0], 2) + pow(p[1], 2) + pow(p[2], 2) <= 1);
 }
@@ -55,6 +55,6 @@ bool mitk::Ellipsoid::IsInside(const Point3D& worldPoint) const
 
 mitk::ScalarType mitk::Ellipsoid::GetVolume()
 {
-  return   m_Geometry3D->GetXAxis().GetNorm() * m_Geometry3D->GetYAxis().GetNorm() 
-         * m_Geometry3D->GetZAxis().GetNorm() * vnl_math::pi * 4.0/3.0;
+  return   GetGeometry()->GetXAxis().GetNorm() * GetGeometry()->GetYAxis().GetNorm() 
+         * GetGeometry()->GetZAxis().GetNorm() * vnl_math::pi * 4.0/3.0;
 }

@@ -42,12 +42,13 @@ public:
   itkGetMacro(Positive, bool);
   itkSetMacro(Positive, bool);
   itkBooleanMacro(Positive);
-  bool WriteXML( XMLWriter& xmlWriter );
-  bool ReadXML( XMLReader& xmlReader );
+  bool ReadXMLData( XMLReader& xmlReader );
+  Geometry3D* GetGeometry() const;
 
 protected:
   BoundingObject();
   virtual ~BoundingObject();
+  bool WriteXMLData( XMLWriter& xmlWriter );
   bool m_Positive; // If true, the Boundingobject describes a positive volume, if false a negative volume
 };
 

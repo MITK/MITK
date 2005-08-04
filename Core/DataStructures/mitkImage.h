@@ -368,9 +368,9 @@ public:
   virtual mitk::ImageDataItem::Pointer GetChannelData(int n = 0);
 
   //##
-  virtual bool WriteXML( XMLWriter& xmlWriter );
+  virtual bool WriteXMLData( XMLWriter& xmlWriter );
   //##
-  virtual bool ReadXML( XMLReader& xmlReader );
+  virtual bool ReadXMLData( XMLReader& xmlReader );
 
   template < typename ItkImageType >
     friend void _ComputeExtremaInItkImage(ItkImageType* itkImage, mitk::Image * mitkImage);

@@ -3,24 +3,48 @@
 
 namespace mitk {
 
+const std::string XMLIO::XML_NODE_NAME = "nameless";
+const std::string XMLIO::CLASS_NAME = "CLASS_NAME";
+
 /**
  *
  */
 bool XMLIO::WriteXML( XMLWriter& xmlWriter ) 
 {
-	xmlWriter.BeginNode("mitkXMLIO");
-	xmlWriter.WriteProperty( "className", typeid( *this ).name() );
+  const std::string& nodeName = GetXMLNodeName();
+  std::cout << nodeName.c_str() << std::endl; // test
+	xmlWriter.BeginNode( nodeName );
+	xmlWriter.WriteProperty( CLASS_NAME, typeid( *this ).name() );
+
+  bool result = WriteXMLData( xmlWriter );
+
 	xmlWriter.EndNode();
-	return true;				
+	return result;				
 }
 
 /**
  *
  */
-bool XMLIO::ReadXML( XMLReader& xmlReader )
+bool XMLIO::WriteXMLData( XMLWriter& xmlWriter )
 {
-	return false;
+  return true;
+}
+
+/**
+ *
+ */
+bool XMLIO::ReadXMLData( XMLReader& xmlReader )
+{
+ return false;
+}
+
+
+/**
+ *
+ */
+const std::string& XMLIO::GetXMLNodeName() const
+{
+  return XML_NODE_NAME;
 }
 
 } // namespace mitk
-

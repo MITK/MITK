@@ -31,7 +31,7 @@ void QmitkSliceWidget::init()
   hlayout=new QHBoxLayout(container);
 
   // create Renderer
-  m_Renderer=mitk::OpenGLRenderer::New();
+  m_Renderer= new mitk::OpenGLRenderer("Renderer::SliceWidget");
 
   // create widget
   QString composedName("QmitkSliceWidget::");

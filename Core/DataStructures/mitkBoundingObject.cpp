@@ -24,12 +24,24 @@ PURPOSE.  See the above copyright notices for more information.
 mitk::BoundingObject::BoundingObject()
   : Surface(), m_Positive(true)
 {
-  m_Geometry3D->Initialize();
+  mitk::Geometry3D::Pointer geometry3D = mitk::Geometry3D::New();
+  (static_cast<mitk::TimeSlicedGeometry*>(m_Geometry3D.GetPointer()))->InitializeEvenlyTimed( geometry3D, 1);
+  GetGeometry()->Initialize();
 }
 
 mitk::BoundingObject::~BoundingObject() 
 {
 } 
+
+mitk::Geometry3D* mitk::BoundingObject::GetGeometry() const
+{
+  TimeSlicedGeometry* timeSlicedGeometry = dynamic_cast<mitk::TimeSlicedGeometry*>( m_Geometry3D.GetPointer() );
+
+  if ( timeSlicedGeometry )
+    return timeSlicedGeometry->GetGeometry3D( 0 );
+
+  return m_Geometry3D;
+}
 
 void mitk::BoundingObject::UpdateOutputInformation()
 {  
@@ -45,7 +57,7 @@ void mitk::BoundingObject::UpdateOutputInformation()
   bounds[3] = + 1;
   bounds[4] = - 1;
   bounds[5] = + 1; 
-  m_Geometry3D->SetBounds(bounds);
+  GetGeometry()->SetBounds(bounds);
 }
 
 mitk::ScalarType mitk::BoundingObject::GetVolume()
@@ -53,31 +65,16 @@ mitk::ScalarType mitk::BoundingObject::GetVolume()
   return 0.0;
 }
 
-bool mitk::BoundingObject::WriteXML( XMLWriter& xmlWriter )
+bool mitk::BoundingObject::WriteXMLData( XMLWriter& xmlWriter )
 {
-	xmlWriter.BeginNode("data");
-	xmlWriter.WriteProperty( "className", typeid( *this ).name() );
-
-  std::string fileName = xmlWriter.getNewFileName();
-  fileName += ".stl";
-  xmlWriter.WriteProperty( "FILENAME", fileName.c_str() );
-
-  // Positiv
-  xmlWriter.WriteProperty("Positiv", m_Positive );
-
-  // Geometrie
-	mitk::Geometry3D* geomety = GetGeometry();
-
-	if ( geomety )
-		geomety->WriteXML( xmlWriter );
-
-	xmlWriter.EndNode(); // data
+  Surface::WriteXMLData( xmlWriter );
+  xmlWriter.WriteProperty("Positiv", m_Positive );	
 	return true;
 }
 
 
-bool mitk::BoundingObject::ReadXML( XMLReader& xmlReader )
+bool mitk::BoundingObject::ReadXMLData( XMLReader& xmlReader )
 {
-
-  return false;
+  Surface::ReadXMLData( xmlReader );
+  return true;
 }

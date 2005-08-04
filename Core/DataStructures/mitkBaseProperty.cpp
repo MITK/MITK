@@ -18,6 +18,11 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include "mitkBaseProperty.h"
+#include <mitkXMLWriter.h>
+
+// XML
+std::string mitk::BaseProperty::VALUE = "VALUE";
+const std::string mitk::BaseProperty::XML_NODE_NAME = "property";
 
 //##ModelId=3E38FF0902A7
 mitk::BaseProperty::BaseProperty() 
@@ -36,4 +41,20 @@ mitk::BaseProperty::~BaseProperty()
 std::string mitk::BaseProperty::GetValueAsString() const
 {
    return "n/a"; 
+}
+
+bool mitk::BaseProperty::WriteXMLData( XMLWriter& xmlWriter )
+{
+  xmlWriter.WriteProperty( VALUE, GetValueAsString() );
+  return true;
+}
+
+bool mitk::BaseProperty::ReadXMLData( XMLReader& xmlReader )
+{
+  return false;
+}
+
+const std::string& mitk::BaseProperty::GetXMLNodeName() const
+{
+  return XML_NODE_NAME;
 }

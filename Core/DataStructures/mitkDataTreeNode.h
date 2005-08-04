@@ -63,6 +63,7 @@ public:
 
   typedef mitk::Geometry3D::Pointer Geometry3DPointer;
   typedef std::vector<Mapper::Pointer> MapperVector;
+  typedef std::map<const mitk::BaseRenderer*,mitk::PropertyList::Pointer> MapOfPropertyLists;
 
   mitkClassMacro(DataTreeNode, itk::DataObject);
 
@@ -307,9 +308,13 @@ public:
   }
 
   //##
-  virtual bool WriteXML( XMLWriter& xmlWriter );
+  virtual bool WriteXMLData( XMLWriter& xmlWriter );
   //##
-  virtual bool ReadXML( XMLReader& xmlReader );
+  virtual bool ReadXMLData( XMLReader& xmlReader );
+
+  virtual const std::string& GetXMLNodeName() const;
+
+  static const std::string XML_NODE_NAME;
 
 protected:
   //##ModelId=3E33F5D702AA
@@ -340,7 +345,7 @@ protected:
   //##ModelId=3EF16CFA010A
   //##Documentation
   //## @brief Map associating each BaseRenderer with its own PropertyList
-  mutable std::map<const mitk::BaseRenderer*,mitk::PropertyList::Pointer> m_MapOfPropertyLists;
+  mutable MapOfPropertyLists m_MapOfPropertyLists;
 
   //##Documentation
   //## @brief Interactor, that handles the Interaction

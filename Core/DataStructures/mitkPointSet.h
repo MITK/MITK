@@ -157,6 +157,10 @@ public:
   virtual bool VerifyRequestedRegion();
   //##ModelId=3F0177E9020B
   virtual void SetRequestedRegion(itk::DataObject *data);
+  //##ModelId=3F0177E9020B
+  virtual bool WriteXMLData( XMLWriter& xmlWriter );
+  //##ModelId=3F0177E9020B
+  virtual bool ReadXMLData( XMLReader& xmlReader );
 
 protected:
   //##ModelId=3F0177E901BD

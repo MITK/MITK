@@ -20,9 +20,13 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkBaseData.h"
 #include "mitkBaseProcess.h"
 #include <mitkXMLWriter.h>
+#include <mitkXMLReader.h>
 #include <itkObjectFactoryBase.h>
+#include <mitkTimeSlicedGeometry.h>
 
 #define MITK_WEAKPOINTER_PROBLEM_WORKAROUND_ENABLED
+
+const std::string mitk::BaseData::XML_NODE_NAME = "data";
 
 //##ModelId=3E3FE04202B9
 mitk::BaseData::BaseData() : m_SmartSourcePointer(NULL), m_SourceOutputIndexDuplicate(0), m_Unregistering(false), m_CalculatingExternalReferenceCount(false), m_ExternalReferenceCount(-1)
@@ -49,7 +53,7 @@ const mitk::Geometry3D* mitk::BaseData::GetUpdatedGeometry()
 }
 
 mitk::Geometry3D* mitk::BaseData::GetGeometry() const
-{
+{ 
   return m_Geometry3D.GetPointer();
 }
 
@@ -168,26 +172,27 @@ void mitk::BaseData::ExecuteOperation(mitk::Operation* operation)
 }
 
 
-bool mitk::BaseData::WriteXML( XMLWriter& xmlWriter ) 
+bool mitk::BaseData::WriteXMLData( XMLWriter& xmlWriter ) 
 {
-	xmlWriter.BeginNode("data");
-	xmlWriter.WriteProperty( "className", typeid( *this ).name() );
-	mitk::Geometry3D* geomety = GetGeometry();
+	if ( m_Geometry3D )
+    this->m_Geometry3D->WriteXML( xmlWriter );
 
-	if ( geomety )
-		geomety->WriteXML( xmlWriter );
-
-	xmlWriter.EndNode(); // data
 	return true;
 }
 
-bool mitk::BaseData::ReadXML( XMLReader& xmlWriter ) 
+bool mitk::BaseData::ReadXMLData( XMLReader& xmlReader ) 
 {
-	return false;
+  if ( xmlReader.Goto( Geometry3D::XML_NODE_NAME ) ) {
+    this->m_Geometry3D = dynamic_cast<mitk::Geometry3D*>( xmlReader.CreateObject().GetPointer() );
+    if ( this->m_Geometry3D.IsNotNull() ) this->m_Geometry3D->ReadXMLData( xmlReader );
+    xmlReader.GotoParent();
+  }
+
+	return true;
 }
 
-
-mitk::BaseData* mitk::BaseData::CreateObject( const char* className ) 
-{
-	return dynamic_cast<mitk::BaseData*>( itk::ObjectFactoryBase::CreateInstance( className ).GetPointer() );
+const std::string& mitk::BaseData::GetXMLNodeName() const
+{ 
+  return XML_NODE_NAME;
 }
+

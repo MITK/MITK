@@ -104,6 +104,9 @@ public:
 
     virtual void Update(mitk::BaseRenderer* renderer);
 
+    //##Documentation
+    virtual const std::string& GetXMLNodeName() const;
+
   protected:
     //##ModelId=3E3C337E0162
     Mapper();
@@ -123,6 +126,9 @@ public:
     //##Documentation
     //## @brief timestamp of last update of stored data
     itk::TimeStamp m_LastUpdateTime;
+
+    //##Documentation
+    static const std::string XML_NODE_NAME;
 };
 
 } // namespace mitk

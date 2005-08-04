@@ -18,12 +18,15 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include "mitkStringProperty.h"
+#include <mitkXMLWriter.h>
+#include <mitkXMLReader.h>
 
 //##ModelId=3E3FF04F005F
 mitk::StringProperty::StringProperty( const char* string ) 
-: m_Value( string ) 
+: m_Value()
 {
-
+  if ( string )
+    m_Value = string;
 }
 
 //##ModelId=3E3FF04F005F
@@ -47,3 +50,15 @@ std::string mitk::StringProperty::GetValueAsString() const
   return m_Value;
 }
 
+bool mitk::StringProperty::WriteXMLData( XMLWriter& xmlWriter )
+{
+  xmlWriter.WriteProperty( VALUE, m_Value );
+  return true;
+}
+
+bool mitk::StringProperty::ReadXMLData( XMLReader& xmlReader )
+{
+  xmlReader.GetAttribute( VALUE, m_Value );
+  std::cout << "StringProperty: " << m_Value << std::endl;
+  return false;
+}

@@ -40,7 +40,7 @@ public:
     mitkClassMacro(StringProperty, BaseProperty);
 
     //##ModelId=3E3FF04F005F
-    StringProperty( const char* string );
+    StringProperty( const char* string = NULL );
     StringProperty( std::string  s );
     
     itkGetStringMacro(Value);
@@ -49,6 +49,10 @@ public:
     //##ModelId=3E3FF04F00E1
     virtual bool operator==(const BaseProperty& property ) const;
     virtual std::string GetValueAsString() const;
+  //## 
+  virtual bool WriteXMLData( XMLWriter& xmlWriter );
+  //##
+  virtual bool ReadXMLData( XMLReader& xmlReader );
 };
 
 } // namespace mitk

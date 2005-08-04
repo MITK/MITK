@@ -30,6 +30,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <vtkImageData.h>
 #include <mitkXMLWriter.h>
+#include <mitkXMLReader.h>
+#include <mitkImageWriter.h>
+#include "mitkDataTreeNodeFactory.h"
 
 mitk::Image::Image() : 
   m_Dimension(0), m_Dimensions(NULL), m_OffsetTable(NULL),
@@ -994,12 +997,16 @@ void mitk::Image::Clear()
   }
 }
 
-bool mitk::Image::WriteXML( XMLWriter& xmlWriter ) 
+bool mitk::Image::WriteXMLData( XMLWriter& xmlWriter ) 
 {
-	xmlWriter.BeginNode("data");
-	xmlWriter.WriteProperty( "className", typeid( *this ).name() );
+  std::string fileName = xmlWriter.GetNewFilenameAndSubFolder();
+  mitk::ImageWriter::Pointer imageWriter = mitk::ImageWriter::New();
+  imageWriter->SetInput( this );
+  imageWriter->SetFileName( fileName.c_str() );
+  imageWriter->SetExtension( xmlWriter.GetImageExtension().c_str() );
+  imageWriter->Write();
 
-  std::string fileName = xmlWriter.getNewFileName();
+  fileName += xmlWriter.GetImageExtension();
   xmlWriter.WriteProperty( "FILENAME", fileName.c_str() );
 
 	mitk::Geometry3D* geomety = GetGeometry();
@@ -1007,14 +1014,41 @@ bool mitk::Image::WriteXML( XMLWriter& xmlWriter )
 	if ( geomety )
 		geomety->WriteXML( xmlWriter );
 
-	xmlWriter.EndNode(); // data
 	return true;
 }
 
-bool mitk::Image::ReadXML( XMLReader& xmlReader )
+bool mitk::Image::ReadXMLData( XMLReader& xmlReader )
 {
+  BaseData::ReadXMLData( xmlReader );
+  std::string fileName;
+  xmlReader.GetAttribute( XMLReader::FILENAME, fileName );
 
-  return false;
+  std::cout << fileName << std::endl;
+
+  mitk::DataTreeNodeFactory::Pointer factory = mitk::DataTreeNodeFactory::New();
+
+  try
+  {
+    std::cout << fileName << std::endl;
+    factory->SetFileName( fileName.c_str() );
+    factory->Update();
+    mitk::DataTreeNode::Pointer tmpNode = factory->GetOutput( 0 );
+
+    if ( tmpNode.IsNull() )
+      return false;
+
+    mitk::Image::Pointer tmpImage = dynamic_cast<mitk::Image*>(tmpNode->GetData());
+    Initialize( tmpImage.GetPointer() );
+    SetPicVolume( tmpImage->GetPic() );    
+  }
+  catch ( itk::ExceptionObject & ex )
+  {
+    itkGenericOutputMacro( << "Exception during file open: " << ex );
+    return false;
+  }
+
+  
+  return true;
 }
 
 void mitk::Image::SetGeometry(Geometry3D* aGeometry3D)

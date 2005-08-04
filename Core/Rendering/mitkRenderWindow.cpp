@@ -77,7 +77,11 @@ void mitk::RenderWindow::SetSize(int w, int h)
 void mitk::RenderWindow::InitRenderer()
 {
   if(m_Renderer.IsNull())
-    m_Renderer = mitk::OpenGLRenderer::New();
+  {
+    std::string rendererName("Renderer::");
+    rendererName += m_Name;
+    m_Renderer = new OpenGLRenderer( rendererName.c_str() );
+  }
 
   m_MitkVtkRenderWindow->SetMitkRenderer(m_Renderer);
 

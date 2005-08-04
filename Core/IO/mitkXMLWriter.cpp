@@ -2,27 +2,26 @@
 
 #include <fstream>
 #include <string>
-#include <stack>
-#include <stdio.h>
+#include <sstream>
 
 namespace mitk {
+
+std::string XMLWriter::m_ImageExtension = ".pic";
 
 /**
  * Construktor
  */
-XMLWriter::XMLWriter( const char* filename, int space )
-:m_Out(NULL), m_Increase(0), m_Space(space), m_NodeCount(0) , m_File(true), m_FirstNode(true), m_NodeIsClosed(true), m_NewNode(false), 
- m_Filename( filename ), m_SubFolder(), m_FileCounter(0)
+XMLWriter::XMLWriter( const char* filename, const char* subDirectory, int space )
+:BaseXMLWriter( filename, space ), m_SubFolder(), m_FileCounter(0), m_Filename(filename)
 {		
-	m_Out = new std::ofstream( filename );			
+  m_SubFolder = subDirectory;
 }
 
 /**
  * Construktor
  */
 XMLWriter::XMLWriter( std::ostream& out, int space )
-:m_Out(&out), m_Increase(0), m_Space(space), m_NodeCount(0), m_File(false), m_FirstNode(true), m_NodeIsClosed(true), m_NewNode(false),
- m_Filename(), m_SubFolder(), m_FileCounter(0)
+:BaseXMLWriter( out, space ), m_SubFolder(), m_FileCounter(0)
 {}
 
 /**
@@ -30,213 +29,43 @@ XMLWriter::XMLWriter( std::ostream& out, int space )
  */
 XMLWriter::~XMLWriter() 
 {
-	if ( m_File ) 
-	{
-		std::ofstream* file = static_cast<std::ofstream*>(m_Out);
-		file->close();
-		delete file;
-	}
-}
-
-/*
- *
- */
-void XMLWriter::BeginNode( const char* name ) 
-{		
-	if ( m_FirstNode ) 
-	{
-		*m_Out << "<?xml version=\"1.0\" encoding=\"utf-8\" ?>\n";
-		m_FirstNode = false;
-	}
-
-	if ( !m_NodeIsClosed ) 
-	{
-		*m_Out << ">\n";
-		m_NodeIsClosed = true;
-	}
-
-	int steps = m_Space * m_Increase;
-
-	for(int i=0; i < steps; i++) 
-		*m_Out << ' '; 
-
-	*m_Out << '<' << name << ' ';
-
-	m_NodeIsClosed = false;
-	m_NewNode = true;
-	m_Stack.push( name );
-	m_Increase++;
-	m_NodeCount++;
-}
-
-/**
- *
- */
-void XMLWriter::EndNode( )
-{			
-	m_Increase--;
-
-	if ( m_NewNode )
-		*m_Out << "/>\n";
-	else 
-	{
-		int steps = m_Space * m_Increase;
-
-		for(int i=0; i < steps; i++) 
-			*m_Out << ' '; 
-		*m_Out << "</" << m_Stack.top() << ">\n";				
-	}
-
-	m_Stack.pop();
-	m_NodeIsClosed = true;
-	m_NewNode = false;
-}
-
-/**
- * Write Property
- */
-void XMLWriter::WriteProperty( const char* key, const char* value ) const
-{
-	*m_Out << ConvertString( key );
-	*m_Out << "=\"" << ConvertString( value ) << "\" ";
-}
-
-/**
- * Write string Property
- */
-void XMLWriter::WriteProperty( const char* key, const std::string& value ) const 
-{
-	*m_Out << ConvertString( key );
-	*m_Out << "=\"" << ConvertString( value.c_str() ) << "\" ";
-}
-
-
-/**
- * Write int Property
- */
-void XMLWriter::WriteProperty( const char* key, int value ) const 
-{
-	*m_Out << ConvertString( key );
-	*m_Out << "=\"" << value << "\" ";
-}
-
-/**
- * Write float Property
- */
-void XMLWriter::WriteProperty( const char* key, float value ) const
-{
-	*m_Out << ConvertString( key );
-	*m_Out << "=\"" << value << "\" ";
-}
-
-/**
- * Write double Property
- */
-void XMLWriter::WriteProperty( const char* key, double value ) const
-{
-	*m_Out << ConvertString( key );
-	*m_Out << "=\"" << value << "\" ";
 }
 
 /**
 	* Write bool Property
 	*/
-void XMLWriter::WriteProperty( const char* key, bool value ) const
+void XMLWriter::WriteProperty( const std::string& key, const mitk::Point3D& value ) const
 {
-	*m_Out << ConvertString( key );
-
-  if ( value == true )
-	  *m_Out << "=\"" << "TRUE\" ";
-  else
-    *m_Out << "=\"" << "FALSE\" ";
+  std::stringstream stream;;
+  stream << value;
+  BaseXMLWriter::WriteProperty( key, stream.str() );
 }
 
 /**
-	* Write comment
+	* Write bool Property
 	*/
-void XMLWriter::WriteComment( const char* text ) 
+void XMLWriter::WriteProperty( const std::string& key, const mitk::Vector3D& value ) const
 {
-	if ( m_FirstNode ) 
-	{
-		*m_Out <<"<?xml version=\"1.0\" encoding=\"utf-8\" ?>\n";
-		m_FirstNode = false;
-	}
-
-	int steps = m_Space * m_Increase;
-
-	for(int i=0; i < steps; i++) 
-		*m_Out << ' '; 
-
-	*m_Out << "<!-- " << ConvertString( text ) <<  " -->\n";
-}
-	
-/**
- * retun the current deph
- */
-int XMLWriter::GetCurrentDeph() const
-{
-	return m_Stack.size();
+  std::stringstream stream;;
+  stream << value;
+  BaseXMLWriter::WriteProperty( key, stream.str() );
 }
 
 /**
- *
- */
-int XMLWriter::GetNodeCount() const
+	* Write bool Property
+	*/
+void XMLWriter::WriteProperty( const std::string& key, const itk::Point<int,3> value ) const
 {
-	return m_NodeCount;
+  std::stringstream stream;;
+  stream << value;
+  BaseXMLWriter::WriteProperty( key, stream.str() );
 }
 
-/**
- * Get the space
- */
-int XMLWriter::GetSpace() const
-{
-	return m_Space;
-}
-
-/**
- *
- */
-void XMLWriter::SetSpace( int space )
-{
-	m_Space = space;
-}
-
-/**
- * replace char < and > through { and }
- */
-const char* XMLWriter::ConvertString( const char* string ) const
-{
-	static std::char_traits<char>::char_type buffer[255];
-	int length = std::char_traits<char>::length( string );
-	std::char_traits<char>::copy ( buffer, string, length + 1 );
-	const char* pos = buffer;
-	
-	while ( pos != NULL ) 
-	{
-		pos = std::char_traits<char>::find ( buffer, length , '<');
-
-		if( pos != NULL )
-			*(const_cast<char*>(pos)) = '{';
-	}
-
-	pos = buffer;
-	
-	while ( pos != NULL ) 
-	{
-		pos = std::char_traits<char>::find ( buffer, length , '>');
-
-		if( pos != NULL )
-			*(const_cast<char*>(pos)) = '}';
-	}
-
-	return buffer;
-}
 
 /**
   * get the subfolder of the xml-File. 
   */
-void XMLWriter::setSubFolder( const char* subFolder )
+void XMLWriter::SetSubFolder( const char* subFolder )
 {
   m_SubFolder = subFolder;
 }
@@ -244,15 +73,15 @@ void XMLWriter::setSubFolder( const char* subFolder )
 /**
   * get the subfolder of the xml-File. 
   */
-const char* XMLWriter::getSubFolder()
+const char* XMLWriter::GetSubFolder()
 {
   return m_SubFolder.c_str();
 }
 
-/*
+/**
   * get an new unique FileName in the subdirectory of the xml-File
   */
-const char* XMLWriter::getNewFileName()
+const char* XMLWriter::GetNewFileName()
 {
   static std::string newFileName;
   char buffer[20];
@@ -269,10 +98,10 @@ const char* XMLWriter::getNewFileName()
   return newFileName.c_str();
 }
 
-/*
+/**
   * get an new unique FileName in the subdirectory of the xml-File
   */
-const char* XMLWriter::getNewFilenameAndSubFolder()
+const char* XMLWriter::GetNewFilenameAndSubFolder()
 {
   static std::string newFilenameAndSubFolder;
   newFilenameAndSubFolder = m_SubFolder;
@@ -284,9 +113,37 @@ const char* XMLWriter::getNewFilenameAndSubFolder()
   else
     newFilenameAndSubFolder += '/';
 
-  newFilenameAndSubFolder += getNewFileName();
+  newFilenameAndSubFolder += GetNewFileName();
   return newFilenameAndSubFolder.c_str();
 }
 
-} // namespace mitk
+/**
+ *
+ */
+void XMLWriter::SetImageExtension( const std::string& imageExtension )
+{
+  m_ImageExtension = imageExtension;
+}
 
+/**
+ *
+ */
+const std::string XMLWriter::GetImageExtension()
+{
+  return m_ImageExtension;
+}
+
+void XMLWriter::WriteProperty( const std::string& key, const char* value ) const
+{ XMLWriter::BaseXMLWriter::WriteProperty( key, value ); }
+void XMLWriter::WriteProperty( const std::string& key, const std::string& value ) const
+{ XMLWriter::BaseXMLWriter::WriteProperty( key, value ); }
+void XMLWriter::WriteProperty( const std::string& key, int value ) const
+{ XMLWriter::BaseXMLWriter::WriteProperty( key, value ); }
+void XMLWriter::WriteProperty( const std::string& key, float value ) const
+{ XMLWriter::BaseXMLWriter::WriteProperty( key, value ); }
+void XMLWriter::WriteProperty( const std::string& key, double value ) const
+{ XMLWriter::BaseXMLWriter::WriteProperty( key, value ); }
+void XMLWriter::WriteProperty( const std::string& key, bool value ) const
+{ XMLWriter::BaseXMLWriter::WriteProperty( key, value ); }
+
+} // namespace mitk

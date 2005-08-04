@@ -38,6 +38,7 @@ mitk::StateMachineFactory::StartStateMap mitk::StateMachineFactory::m_StartState
 std::vector<mitk::State *> mitk::StateMachineFactory::m_AllStates;
 std::vector<mitk::Transition *> mitk::StateMachineFactory::m_AllTransitions;
 std::vector<mitk::Action *> mitk::StateMachineFactory::m_AllActions;
+mitk::StateMachineFactory::AllStateMachineMapType mitk::StateMachineFactory::m_AllStateMachineMap;
 
 //XML StateMachine
 //##ModelId=3E7757280322
@@ -116,7 +117,13 @@ void mitk::StateMachineFactory::DeleteAllStateMachines()
     delete state;
   }
 
+  AllStateMachineMapType::iterator i = m_AllStateMachineMap.begin();
+  const AllStateMachineMapType::iterator end = m_AllStateMachineMap.end();
 
+  while ( i != end )
+    delete (*i++).second;
+
+  m_AllStateMachineMap.clear();
 }
 
 
@@ -276,6 +283,7 @@ void  mitk::StateMachineFactory::StartElement (const char *elementName, const ch
 	if ( name == STATE_MACHIN ) 					
   { 
     m_AktStateMachineName = ReadXMLStringAttribut( NAME, atts ); 
+    m_AllStateMachineMap[ m_AktStateMachineName ] = new StateMachineMapType;
   } 
   
   else if ( name == STATE )   
@@ -285,6 +293,11 @@ void  mitk::StateMachineFactory::StartElement (const char *elementName, const ch
 
 		m_AktState = new mitk::State(stateMachinName , id);
     m_AllStates.push_back(m_AktState);//to be able to delete in destructor
+
+    // store all states to be able to access a specific state (for persistence)
+    StateMachineMapType* stateMachine = m_AllStateMachineMap[ m_AktStateMachineName ];
+    (*stateMachine)[id] = m_AktState;
+
 		std::pair<mitk::State::StateMapIter,bool> ok = m_AllStatesOfOneStateMachine.insert(mitk::State::StateMap::value_type(id , m_AktState));
 
 		if ( ok.second == false ) 
@@ -446,3 +459,22 @@ bool mitk::StateMachineFactory::ReadXMLBooleanAttribut( std::string name, const 
   else
     return false;
 }
+
+mitk::State* mitk::StateMachineFactory::GetState( const char * type, int StateId )
+{
+
+  AllStateMachineMapType::iterator i = m_AllStateMachineMap.find( type );
+
+  if ( i == m_AllStateMachineMap.end() )
+    return false;
+
+  StateMachineMapType* sm = m_AllStateMachineMap[type];
+
+  if ( sm != NULL )
+    return (*sm)[StateId];  
+  else
+    return NULL;
+}
+
+mitk::StateMachineFactory::~StateMachineFactory()
+{ }

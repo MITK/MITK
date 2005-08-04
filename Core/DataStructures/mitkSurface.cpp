@@ -21,6 +21,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkBaseProcess.h"
 #include "vtkPolyData.h"
 #include "mitkXMLWriter.h"
+#include "mitkXMLReader.h"
+#include "mitkSurfaceVtkWriter.h"
+#include <vtkPolyDataWriter.h>
+#include <vtkPolyDataReader.h>
 
 void mitk::Surface::SetVtkPolyData( vtkPolyData* polydata, unsigned int t )
 {
@@ -251,27 +255,36 @@ void mitk::Surface::Resize( unsigned int timeSteps )
   m_CalculateBoundingBox = true;
 }
 
-bool mitk::Surface::WriteXML( XMLWriter& xmlWriter )
+bool mitk::Surface::WriteXMLData( XMLWriter& xmlWriter )
 {
-	xmlWriter.BeginNode("data");
-	xmlWriter.WriteProperty( "className", typeid( *this ).name() );
+  BaseData::WriteXMLData( xmlWriter );
+  std::string fileName = xmlWriter.GetNewFilenameAndSubFolder();
+  fileName += ".vtk";
+  xmlWriter.WriteProperty( XMLReader::FILENAME, fileName.c_str() );
 
-  std::string fileName = xmlWriter.getNewFileName();
-  fileName += ".stl";
-  xmlWriter.WriteProperty( "FILENAME", fileName.c_str() );
-
-	mitk::Geometry3D* geomety = GetGeometry();
-
-	if ( geomety )
-		geomety->WriteXML( xmlWriter );
-
-	xmlWriter.EndNode(); // data
+  mitk::SurfaceVtkWriter<vtkPolyDataWriter>::Pointer writer = mitk::SurfaceVtkWriter<vtkPolyDataWriter>::New();
+  writer->SetInput( this );
+  writer->SetFileName( fileName.c_str() );
+  writer->Write();
 	return true;
 }
 
 
-bool mitk::Surface::ReadXML( XMLReader& xmlReader )
+bool mitk::Surface::ReadXMLData( XMLReader& xmlReader )
 {
+  BaseData::ReadXMLData( xmlReader );
 
-  return false;
+  std::string fileName;
+  xmlReader.GetAttribute( XMLReader::FILENAME, fileName );
+
+  vtkPolyDataReader *reader = vtkPolyDataReader::New();
+  reader->SetFileName( fileName.c_str() );
+  reader->Update();
+
+  if ( reader->GetOutput() != NULL )
+    SetVtkPolyData( reader->GetOutput() );
+
+  reader->Delete();
+
+  return true;
 }

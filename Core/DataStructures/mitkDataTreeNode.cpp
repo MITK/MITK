@@ -27,6 +27,12 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkLevelWindowProperty.h"
 #include "mitkGeometry3D.h"
 #include <mitkXMLWriter.h>
+#include <mitkXMLReader.h>
+#include <mitkGlobalInteraction.h>
+#include <mitkEventMapper.h>
+#include <mitkRenderWindow.h>
+
+const std::string mitk::DataTreeNode::XML_NODE_NAME = "dataTreeNode";
 
 //##ModelId=3D6A0E8C02CC
 mitk::Mapper* mitk::DataTreeNode::GetMapper(MapperSlotId id) const
@@ -86,7 +92,13 @@ mitk::DataTreeNode::DataTreeNode() : m_Data(NULL)
 //##ModelId=3E33F5D702D3
 mitk::DataTreeNode::~DataTreeNode()
 {
+  Interactor* interactor = GetInteractor().GetPointer();
 
+  if ( interactor )
+  {
+    mitk::GlobalInteraction* globalInteraction = dynamic_cast<mitk::GlobalInteraction*>(mitk::EventMapper::GetGlobalStateMachine());
+    globalInteraction->RemoveInteractor( interactor );  
+  }
 }
 
 //##ModelId=3E33F5D7032D
@@ -361,7 +373,23 @@ void mitk::DataTreeNode::SetProperty(const char *propertyKey,
 vtkLinearTransform* mitk::DataTreeNode::GetVtkTransform() const
 {
   assert(m_Data.IsNotNull());
+
+  mitk::Geometry3D* geometry = m_Data->GetGeometry();
+
   assert(m_Data->GetGeometry()!=NULL);
+
+  mitk::TimeSlicedGeometry* timeSlicedGeometry = dynamic_cast<mitk::TimeSlicedGeometry*>( geometry );
+
+  if ( timeSlicedGeometry ) 
+  {
+    Geometry3D* geometry = timeSlicedGeometry->GetGeometry3D( 0 );
+
+    if( geometry )
+      return geometry->GetVtkTransform();
+    else
+      m_Data->GetGeometry()->GetVtkTransform();
+  }
+
   return m_Data->GetGeometry()->GetVtkTransform();
 }
 
@@ -378,16 +406,37 @@ unsigned long mitk::DataTreeNode::GetMTime() const
   return Superclass::GetMTime();
 }
 
-bool mitk::DataTreeNode::WriteXML( XMLWriter& xmlWriter ) 
+bool mitk::DataTreeNode::WriteXMLData( XMLWriter& xmlWriter ) 
 {
-  xmlWriter.BeginNode("dataTreeNode");
-	xmlWriter.WriteProperty( "className", typeid( *this ).name() );
+  // PropertyLists
+  MapOfPropertyLists::iterator i = m_MapOfPropertyLists.begin();
+  const MapOfPropertyLists::iterator end = m_MapOfPropertyLists.end();
 
-  // PropertyList
-	mitk::PropertyList* propertyList = GetPropertyList();
+  while ( i != end )
+  {
+    mitk::PropertyList* propertyList = (*i).second;
 
-	if ( propertyList )
-		propertyList->WriteXML( xmlWriter );
+    if ( propertyList != NULL && propertyList->GetMap()->size() > 0 )
+    {
+      xmlWriter.BeginNode("renderer");
+
+      if ( (*i).first != NULL )
+        xmlWriter.WriteProperty( "RENDERE_NAME", (*i).first->GetName() );
+      else
+        xmlWriter.WriteProperty( "rendererName", "" );
+
+  	  if ( propertyList )
+	  	  propertyList->WriteXML( xmlWriter );
+
+      xmlWriter.EndNode(); // Renderer
+    }
+    i++;
+  }
+
+  mitk::PropertyList* propertyList = GetPropertyList();
+
+  if ( propertyList )
+    propertyList->WriteXML( xmlWriter );
 
   // Data
 	BaseData* data = GetData();
@@ -418,12 +467,63 @@ bool mitk::DataTreeNode::WriteXML( XMLWriter& xmlWriter )
 
 	if ( interactor.IsNotNull() )
 		interactor->WriteXML( xmlWriter );
-
-  xmlWriter.EndNode(); // dataTreeNode
+  
 	return true;		
 }
 
-bool mitk::DataTreeNode::ReadXML( XMLReader& xmlReader ) 
+bool mitk::DataTreeNode::ReadXMLData( XMLReader& xmlReader ) 
 {
-	return false;
+  if ( xmlReader.Goto( BaseData::XML_NODE_NAME ) ) {
+    m_Data = dynamic_cast<mitk::BaseData*>( xmlReader.CreateObject().GetPointer() );
+    if ( m_Data.IsNotNull() ) m_Data->ReadXMLData( xmlReader );
+    xmlReader.GotoParent();
+  }
+
+  if ( xmlReader.Goto( Interactor::XML_NODE_NAME ) ) {
+    m_Interactor = dynamic_cast<mitk::Interactor*>( xmlReader.CreateObject().GetPointer() );
+    if ( m_Interactor.IsNotNull() ) 
+    {
+      m_Interactor->ReadXMLData( xmlReader );
+      m_Interactor->SetDataTreeNode( this );
+      mitk::GlobalInteraction* globalInteraction = dynamic_cast<mitk::GlobalInteraction*>(mitk::EventMapper::GetGlobalStateMachine());
+      globalInteraction->AddInteractor( m_Interactor );
+    }
+    xmlReader.GotoParent();
+    mitk::RenderWindow::UpdateAllInstances();
+  }
+
+  if ( xmlReader.Goto( PropertyList::XML_NODE_NAME ) ) {
+    m_PropertyList = dynamic_cast<mitk::PropertyList*>( xmlReader.CreateObject().GetPointer() );
+    if ( m_PropertyList.IsNotNull() ) m_PropertyList->ReadXMLData( xmlReader );
+    xmlReader.GotoParent();
+  }
+
+  if ( xmlReader.Goto( "mapperList" ) ) {
+
+    if ( xmlReader.Goto( "mapperSlot" ) ) {
+    
+      do{
+        int id = -1;
+        xmlReader.GetAttribute( "id", id );
+
+        if ( xmlReader.Goto( "mapper" ) ) {
+          Mapper::Pointer mapper = dynamic_cast<mitk::Mapper*>( xmlReader.CreateObject().GetPointer() );
+          if ( mapper.IsNotNull() ) {
+            mapper->ReadXMLData( xmlReader );
+            SetMapper( id, mapper );
+          }
+          xmlReader.GotoParent();
+        }
+      
+      }while ( xmlReader.GotoNext() );
+      xmlReader.GotoParent();
+    }
+    xmlReader.GotoParent();
+  }
+	return true;
+}
+
+const std::string& mitk::DataTreeNode::GetXMLNodeName() const
+{
+  return XML_NODE_NAME;
 }

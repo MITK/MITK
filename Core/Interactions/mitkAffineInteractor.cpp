@@ -50,6 +50,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include "vtkCamera.h"
 #include <vtkInteractorObserver.h>
 
+mitk::AffineInteractor::AffineInteractor()
+: Interactor()
+{ }
 
 mitk::AffineInteractor::AffineInteractor(const char * type, DataTreeNode* dataTreeNode)
 : Interactor(type, dataTreeNode)
@@ -60,7 +63,8 @@ bool mitk::AffineInteractor::ExecuteAction(Action* action, mitk::StateEvent cons
 {
   bool ok = false;
 
-  mitk::Geometry3D* geometry = m_DataTreeNode->GetData()->GetGeometry();
+  mitk::Geometry3D* geometry = GetGeometry();
+
   if (geometry == NULL)
     return false;
   /* Position events - 3D coordinates from a 2D window */
@@ -328,10 +332,10 @@ bool mitk::AffineInteractor::CheckSelected(const mitk::Point3D& worldPoint)
   else    // use the data objects bounding box to determine if hit
   {
     m_DataTreeNode->GetData()->UpdateOutputInformation(); // update bounding box @TODO: Is this neccessary?
-    BoundingBox* box = const_cast <BoundingBox*> (m_DataTreeNode->GetData()->GetGeometry()->GetBoundingBox());
+    BoundingBox* box = const_cast <BoundingBox*> (GetGeometry()->GetBoundingBox());
     ScalarType p[4];
     itk2vtk(worldPoint, p); p[3] = 1;
-    m_DataTreeNode->GetData()->GetGeometry()->GetVtkTransform()->GetInverse()->TransformPoint(p, p);
+    GetGeometry()->GetVtkTransform()->GetInverse()->TransformPoint(p, p);
 
     Point3D point;
     point[0] = p[0]/p[3];

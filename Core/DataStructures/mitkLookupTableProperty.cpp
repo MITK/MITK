@@ -19,6 +19,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkLookupTableProperty.h"
 
+mitk::LookupTableProperty::LookupTableProperty()
+{
+}
 
 //##ModelId=3ED953090121
 mitk::LookupTableProperty::LookupTableProperty(const mitk::LookupTable &lut)

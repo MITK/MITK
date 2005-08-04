@@ -20,6 +20,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkMapper.h"
 #include "mitkDataTreeNode.h"
 
+const std::string mitk::Mapper::XML_NODE_NAME = "mapper";
+
 //##ModelId=3E3C337E0162
 mitk::Mapper::Mapper()
 {
@@ -121,4 +123,9 @@ void mitk::Mapper::Update(mitk::BaseRenderer* renderer)
   }
 
   GenerateData(renderer);
+}
+
+const std::string& mitk::Mapper::GetXMLNodeName() const
+{
+  return XML_NODE_NAME;
 }

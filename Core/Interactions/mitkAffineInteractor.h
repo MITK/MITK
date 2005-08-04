@@ -38,6 +38,8 @@ class AffineInteractor : public Interactor
 public:
   mitkClassMacro(AffineInteractor,Interactor);
 
+  AffineInteractor();
+
   //##Documentation
   //## @brief Constructor
   //##

@@ -22,6 +22,11 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkOperationActor.h>
 #include <mitkPointOperation.h>
 #include "mitkInteractionConst.h"
+#include <mitkXMLWriter.h>
+#include <mitkXMLReader.h>
+#include <mitkPointSetWriter.h>
+#include <mitkPointSetReader.h>
+
 
 #include "mitkRenderWindow.h"//*\todo remove later, when update ok!
 
@@ -281,3 +286,33 @@ void mitk::PointSet::SetRequestedRegion(itk::DataObject*)
 {
 }
 
+bool mitk::PointSet::WriteXMLData( XMLWriter& xmlWriter )
+{
+  std::string fileName = xmlWriter.GetNewFilenameAndSubFolder();
+  fileName += ".mps";
+  xmlWriter.WriteProperty( XMLReader::FILENAME, fileName.c_str() );
+  PointSetWriter::Pointer writer = PointSetWriter::New();
+  writer->SetFileName( fileName.c_str() );
+  writer->SetInput( this );
+  writer->Update();
+  return true;
+}
+
+bool mitk::PointSet::ReadXMLData( XMLReader& xmlReader )
+{
+  std::string fileName;
+  xmlReader.GetAttribute( XMLReader::FILENAME, fileName );
+
+  if ( fileName.empty() )
+    return false;
+
+  PointSetReader::Pointer reader = PointSetReader::New();
+  reader->SetFileName( fileName.c_str() );
+  reader->Update();
+  m_ItkData = dynamic_cast<DataType*>( reader->GetOutput() );
+
+  if ( m_ItkData.IsNull() )
+    return false;
+
+  return true;
+}

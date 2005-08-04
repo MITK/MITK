@@ -351,9 +351,13 @@ public:
   const Vector3D GetZAxis();
 
   //##
-  virtual bool WriteXML( XMLWriter& xmlWriter );
+  virtual bool WriteXMLData( XMLWriter& xmlWriter );
   //##
-  virtual bool ReadXML( XMLReader& xmlReader );
+  virtual bool ReadXMLData( XMLReader& xmlReader );
+  //##
+  const std::string& GetXMLNodeName() const;
+  //##
+  static const std::string XML_NODE_NAME;
 
 protected:
   Geometry3D();
@@ -401,6 +405,11 @@ protected:
   bool m_Valid;
 
   unsigned int m_FrameOfReferenceID;
+
+  static const std::string INDEX_TO_OBJECT_TRANSFORM;
+  static const std::string OBJECT_TO_NODE_TRANSFORM;
+  static const std::string INDEX_TO_NODE_TRANSFORM;
+  static const std::string INDEX_TO_WORLD_TRANSFORM;
 
 private:
   float m_FloatSpacing[3];

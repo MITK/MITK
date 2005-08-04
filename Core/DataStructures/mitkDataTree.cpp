@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkDataTree.h"
 #include <mitkXMLWriter.h>
+#include <mitkXMLReader.h>
 
 
 //##ModelId=3E38F46A0190
@@ -167,12 +168,19 @@ mitk::TimeBounds mitk::DataTree::ComputeTimeBoundsInMS(mitk::DataTreeIteratorBas
   return timebounds;
 }
 
+bool mitk::DataTree::Load( const mitk::DataTreeIteratorBase* it, const char* filename )
+{
+  return mitk::XMLReader::Load( filename, it );
+}
+
 bool mitk::DataTree::Save( const mitk::DataTreeIteratorBase* it, const char* fileName ) 
 {
 	if ( fileName == NULL || it == NULL || it->IsAtEnd() )
 		return false;
 
-	mitk::XMLWriter writer( fileName );
+  std::string stdFileName(fileName);
+  unsigned int pos = stdFileName.find('.');
+	mitk::XMLWriter writer( fileName, stdFileName.substr( 0, pos ).c_str() );
 
 	if ( !Save( it, writer ) )
 		writer.WriteComment( "Error" );
@@ -211,6 +219,7 @@ bool mitk::DataTree::SaveNext( const mitk::DataTreeIteratorBase* it, mitk::XMLWr
 		}
 	}
 
+  xmlWriter.WriteComment( "close TreeNode" );
 	xmlWriter.EndNode(); // TreeNode
 
 	return true;
@@ -218,9 +227,10 @@ bool mitk::DataTree::SaveNext( const mitk::DataTreeIteratorBase* it, mitk::XMLWr
 
 bool mitk::DataTree::Save( const mitk::DataTreeIteratorBase* it, mitk::XMLWriter& xmlWriter ) 
 {
-	xmlWriter.WriteComment( "MITK Data Tree" );
+	// xmlWriter.WriteComment( "MITK Data Tree" );
 	xmlWriter.BeginNode( "mitkDataTree" );
 	bool result = SaveNext( it, xmlWriter );
+  // xmlWriter.WriteComment( "close mitkDataTree" );
 	xmlWriter.EndNode(); // mitkDataTree
 	return result;
 }

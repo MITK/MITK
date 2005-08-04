@@ -48,8 +48,11 @@ public:
   //##ModelId=3E691CC70250
   mitkClassMacro(OpenGLRenderer,BaseRenderer);
 
+  //##ModelId=3E33ECF301AD
+  OpenGLRenderer( const char* name );
+
   /** Method for creation through the object factory. */
-  itkNewMacro(Self);
+  // itkNewMacro(Self);
 
   //##ModelId=3E3D28AB0018
   void SetData(const mitk::DataTreeIteratorBase* iterator);
@@ -131,9 +134,6 @@ protected:
 
   //##ModelId=3E33145B0226
   virtual void InitRenderer(mitk::RenderWindow* renderwindow);
-
-  //##ModelId=3E33ECF301AD
-  OpenGLRenderer();
 
   //##ModelId=3E33ECF301B7
   virtual ~OpenGLRenderer();

@@ -189,13 +189,13 @@ public:
   itk::SmartPointerForwardReference<mitk::BaseProcess> GetSource() const;
 
   //## 
-  virtual bool WriteXML( XMLWriter& xmlWriter );
+  virtual bool WriteXMLData( XMLWriter& xmlWriter );
+
+
+  virtual bool ReadXMLData( XMLReader& xmlReader );
 
   //##
-  virtual bool ReadXML( XMLReader& xmlReader );
-
-  //##
-  static BaseData* CreateObject( const char* className );
+  static const std::string XML_NODE_NAME;
 
 protected:
   //##ModelId=3E3FE04202B9
@@ -219,6 +219,10 @@ protected:
   //## @brief for internal use only. Helps to deal with the
   //## weak-pointer-problem.
   virtual void ConnectSource(itk::ProcessObject *arg, unsigned int idx) const;
+
+  //## XML
+  virtual const std::string& GetXMLNodeName() const;
+
 private:
   //##ModelId=3E8600D90384
   //##Documentation

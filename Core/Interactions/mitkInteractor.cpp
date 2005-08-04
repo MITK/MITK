@@ -31,15 +31,31 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkLinearTransform.h>
 #include <itkVector.h>
 #include <mitkModeOperation.h>
-#include <mitkXMLWriter.h>
 
+const std::string mitk::Interactor::XML_NODE_NAME = "interactor";
 
+mitk::Interactor::Interactor( )
+: mitk::StateMachine( NULL ), m_DataTreeNode(NULL), m_Mode(SMDESELECTED)
+{
+
+}
 
 mitk::Interactor::Interactor(const char * type, DataTreeNode* dataTreeNode)
 : mitk::StateMachine(type), m_DataTreeNode(dataTreeNode), m_Mode(SMDESELECTED)
 {
   if (m_DataTreeNode != NULL)
     m_DataTreeNode->SetInteractor(this);
+}
+
+mitk::Geometry3D* mitk::Interactor::GetGeometry() const
+{
+  mitk::Geometry3D* geometry = m_DataTreeNode->GetData()->GetGeometry();
+  TimeSlicedGeometry* timeSlicedGeometry = dynamic_cast<mitk::TimeSlicedGeometry*>( geometry );
+
+  if ( timeSlicedGeometry )
+    return timeSlicedGeometry->GetGeometry3D( 0 ); 
+
+  return geometry;
 }
 
 mitk::Interactor::SMMode mitk::Interactor::GetMode() const
@@ -128,7 +144,7 @@ float mitk::Interactor::CalculateJurisdiction(StateEvent const* stateEvent) cons
   }
 
   //compute the center of the data taken care of
-  mitk::BoundingBox *bBox = const_cast<mitk::BoundingBox*>(m_DataTreeNode->GetData()->GetGeometry()->GetBoundingBox());
+  mitk::BoundingBox *bBox = const_cast<mitk::BoundingBox*>(GetGeometry()->GetBoundingBox());
   if (bBox == NULL)
     return 0;
 
@@ -164,7 +180,7 @@ float mitk::Interactor::CalculateJurisdiction(StateEvent const* stateEvent) cons
     float p[3];
     itk2vtk(worldPoint, p);
     //transforming the Worldposition to local coordinatesystem
-    m_DataTreeNode->GetData()->GetGeometry()->GetVtkTransform()->GetInverse()->TransformPoint(p, p);
+    GetGeometry()->GetVtkTransform()->GetInverse()->TransformPoint(p, p);
     vtk2itk(p, worldPoint);
 
     //distance between center and point 
@@ -215,19 +231,12 @@ void mitk::Interactor::ExecuteOperation(Operation* operation)
 }
 
   //##
-bool mitk::Interactor::WriteXML( XMLWriter& xmlWriter )
+const std::string& mitk::Interactor::GetXMLNodeName() const
 {
-	xmlWriter.BeginNode("interactor");
-	xmlWriter.WriteProperty( "className", typeid( *this ).name() );
-	xmlWriter.WriteProperty( "StateMachinType", GetType() );
-	xmlWriter.WriteProperty( "State", GetCurrentState()->GetName() );
-	xmlWriter.EndNode();
-	return true;
+  return XML_NODE_NAME;
 }
 
-  //##
-bool mitk::Interactor::ReadXML( XMLReader& xmlReader )
+void mitk::Interactor::SetDataTreeNode( DataTreeNode* dataTreeNode )
 {
-
-	return false;
+    m_DataTreeNode = dataTreeNode;
 }

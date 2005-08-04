@@ -127,6 +127,13 @@ public:
 
   virtual AffineGeometryFrame3D::Pointer Clone() const;
 
+  //##
+  virtual bool ReadXMLData( XMLReader& xmlReader );
+
+  static const std::string SLICES;
+  const static std::string DIRECTION_VECTOR;
+  const static std::string EVENLY_SPACED;
+
 public:
   //##ModelId=3E3453C703AF
   //##Documentation
@@ -159,6 +166,9 @@ protected:
 
   //##ModelId=3E3456C50067
   virtual ~SlicedGeometry3D();
+
+  //##
+  virtual bool WriteXMLData( XMLWriter& xmlWriter );
 
   virtual void InitializeGeometry(Self * newGeometry) const;
 

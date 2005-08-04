@@ -25,6 +25,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkBaseProperty.h"
 #include <string>
 #include <map> 
+#include <mitkXMLIO.h>
 
 namespace mitk {
 
@@ -37,7 +38,7 @@ namespace mitk {
 //## List of properties (instances of subclasses of BaseProperty). The
 //## properties are stored in a map, thus each property is associated with a
 //## key of type string. 
-class PropertyList : public itk::Object
+class PropertyList : public itk::Object, public XMLIO
 {
 public:
     mitkClassMacro(PropertyList, itk::Object);
@@ -76,9 +77,12 @@ public:
 
     virtual void Clear();
 
-    virtual bool WriteXML( XMLWriter& xmlWriter );
+    virtual bool WriteXMLData( XMLWriter& xmlWriter );
+    virtual bool ReadXMLData( XMLReader& xmlReader );
     virtual bool IsEnabled(const char *propertyKey);
     virtual void SetEnabled(const char *propertyKey,bool enabled);
+
+    static const std::string XML_NODE_NAME;
 protected:
     //##ModelId=3E38FEFE0125
     PropertyList();
@@ -91,6 +95,9 @@ protected:
     //##Documentation
     //## @brief Map of properties.
     PropertyMap m_Properties;
+
+    //##Documentation
+    virtual const std::string& GetXMLNodeName() const;
 };
 
 } // namespace mitk

@@ -48,8 +48,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 //##ModelId=3E33ECF301AD
-mitk::OpenGLRenderer::OpenGLRenderer() : m_VtkMapperPresent(false),
-    m_VtkRenderer(NULL), m_LastUpdateVtkActorsTime(0)
+mitk::OpenGLRenderer::OpenGLRenderer( const char* name ) 
+: BaseRenderer(name), m_VtkMapperPresent(false), m_VtkRenderer(NULL), m_LastUpdateVtkActorsTime(0)
 {
   m_CameraController=NULL;//\*todo remove line
   m_CameraController = new VtkInteractorCameraController();

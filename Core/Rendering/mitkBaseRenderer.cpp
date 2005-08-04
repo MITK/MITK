@@ -39,15 +39,19 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkCameraController.h"
 #include <itkSmartPointerForwardReference.txx>
 
+mitk::BaseRenderer::RendererSet mitk::BaseRenderer::instances;
+
 template class itk::SmartPointerForwardReference<mitk::CameraController>;
 
 //##ModelId=3E3D2F120050
-mitk::BaseRenderer::BaseRenderer() : 
+mitk::BaseRenderer::BaseRenderer( const char* name ) : 
   m_MapperID(defaultMapper), m_DataTreeIterator(NULL), m_RenderWindow(NULL), m_LastUpdateTime(0), m_CameraController(NULL), m_Focused(false), 
-  m_WorldGeometry(NULL), m_TimeSlicedWorldGeometry(NULL), m_CurrentWorldGeometry2D(NULL), m_Slice(0), m_TimeStep(0)
+  m_WorldGeometry(NULL), m_TimeSlicedWorldGeometry(NULL), m_CurrentWorldGeometry2D(NULL), m_Slice(0), m_TimeStep(0), m_Name(name)
 {
   m_Size[0] = 0;
   m_Size[1] = 0;
+
+  instances.insert( this );
 
   //adding this BaseRenderer to the List of all BaseRenderer
   mitk::GlobalInteraction *globalInteraction = dynamic_cast<mitk::GlobalInteraction *>(EventMapper::GetGlobalStateMachine());
@@ -82,6 +86,8 @@ mitk::BaseRenderer::BaseRenderer() :
 //##ModelId=3E3D2F12008C
 mitk::BaseRenderer::~BaseRenderer()
 {
+  RendererSet::iterator pos = instances.find( this );
+  instances.erase( pos );
   m_DataTreeIterator = NULL;
 }
 

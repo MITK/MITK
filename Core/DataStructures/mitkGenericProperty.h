@@ -22,9 +22,14 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <string>
 #include <sstream>
+#include <stdlib.h>
+
 
 #include "mitkCommon.h"
 #include "mitkBaseProperty.h"
+#include <mitkXMLWriter.h>
+#include <mitkXMLReader.h>
+#include <mitkTransferFunction.h>
 
 namespace mitk {
 
@@ -57,12 +62,33 @@ class GenericProperty : public BaseProperty
        myStr << GetValue() ;
        return myStr.str(); 
     }
+
+  virtual bool WriteXMLData( XMLWriter& xmlWriter );
+  
+  virtual bool ReadXMLData( XMLReader& xmlReader );
     
   protected:
     //##ModelId=3EF99E45001F
     T m_Value;
 
 };
+
+template <class T>
+bool GenericProperty<T>::WriteXMLData( XMLWriter& xmlWriter )
+{
+  xmlWriter.WriteProperty( VALUE, m_Value );  
+  return true;
+}
+
+template <class T>
+bool GenericProperty<T>::ReadXMLData( XMLReader& xmlReader )
+{
+  T value;
+  xmlReader.GetAttribute( VALUE, value );
+  m_Value = (T) value;
+  return true;
+}
+
 
 } // namespace mitk
 

@@ -196,6 +196,9 @@ public:
   virtual void SetExtentInMM(int direction, ScalarType extentInMM);
 
   virtual AffineGeometryFrame3D::Pointer Clone() const;
+
+  virtual bool ReadXMLData( XMLReader& xmlReader );
+
 protected:
   //##ModelId=3E395E0802E6
   Geometry2D();
@@ -205,6 +208,11 @@ protected:
 	virtual void InitializeGeometry(Self * newGeometry) const;
 
   virtual void PrintSelf(std::ostream& os, itk::Indent indent) const;
+
+  virtual bool WriteXMLData( XMLWriter& xmlWriter );
+
+  static std::string SCALAR_FACTOR_MM_PRT_UNIT_X;
+  static std::string SCALAR_FACTOR_MM_PRT_UNIT_Y;
 
   //##Documentation
   //## @brief factor to convert x-coordinates from mm to units and vice versa

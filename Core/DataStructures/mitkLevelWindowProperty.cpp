@@ -18,6 +18,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include "mitkLevelWindowProperty.h"
+#include <mitkXMLWriter.h>
+#include <mitkXMLReader.h>
 
 
 //##ModelId=3ED953090121
@@ -67,4 +69,21 @@ std::string mitk::LevelWindowProperty::GetValueAsString() const
   std::stringstream myStr;
   myStr << "L:" << m_LevWin.GetLevel() << " W:" << m_LevWin.GetWindow();
   return myStr.str(); 
+}
+
+
+bool mitk::LevelWindowProperty::WriteXMLData( XMLWriter& xmlWriter )
+{
+  xmlWriter.WriteProperty( "LEVEL", m_LevWin.GetLevel() );
+  xmlWriter.WriteProperty( "WINDOW", m_LevWin.GetWindow() );
+  return true;
+}
+
+bool mitk::LevelWindowProperty::ReadXMLData( XMLReader& xmlReader )
+{
+  double level, window;
+  xmlReader.GetAttribute( "LEVEL", level );
+  xmlReader.GetAttribute( "WINDOW", window );
+  m_LevWin.SetLevelWindow( level, window );
+  return true;
 }

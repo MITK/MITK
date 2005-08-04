@@ -63,6 +63,11 @@ public:
 
   virtual mitk::ScalarType TimeStepToMS(int timestep) const;
 
+  //##
+  virtual bool WriteXMLData( XMLWriter& xmlWriter );
+  //##
+  virtual bool ReadXMLData( XMLReader& xmlReader );
+
 protected:
   virtual void Initialize(unsigned int timeSteps);
 public:
@@ -107,6 +112,9 @@ protected:
   unsigned int m_TimeSteps;
 
   bool m_EvenlyTimed;
+
+  static const std::string EVENLY_TIMED;
+  static const std::string TIME_STEPS;
 };
 
 } // namespace mitk

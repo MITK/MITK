@@ -34,6 +34,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <string>
 #include <mitkXMLIO.h>
 #include "mitkOperationEvent.h"
+#include <mitkXMLIO.h>
 
 namespace mitk {
 
@@ -49,7 +50,7 @@ namespace mitk {
   //## realizes the methods, that every statemachine has to have.
   //## Undo can be enabled and disabled through EnableUndo
   //## Developers must derive its statemachines and implement ExecuteAction
-  class StateMachine : public itk::Object, public mitk::OperationActor
+  class StateMachine : public itk::Object, public mitk::OperationActor, public XMLIO
   {
 
   public:
@@ -90,6 +91,13 @@ namespace mitk {
     //## so that UndoModel can call ExecuteOperation for Undo!
     friend class UndoModel;
 
+    //##
+    virtual bool WriteXMLData( XMLWriter& xmlWriter );
+    //##
+    virtual bool ReadXMLData( XMLReader& xmlReader );
+
+    static const std::string XML_NODE_NAME;
+
   protected:
 
     //##ModelId=3E5B2E170228
@@ -129,6 +137,13 @@ namespace mitk {
     //## Is set private here and in superclass it is set public, so UndoController
     //## can reach ist, but it can't be overwritten by a subclass
     virtual void ExecuteOperation(Operation* operation);
+
+    //##Documentation
+    // XML
+    virtual const std::string& GetXMLNodeName() const;
+
+    static const std::string STATE_MACHINE_TYPE;
+    static const std::string STATE_ID;
 
   private:
 

@@ -58,6 +58,8 @@ typedef	itk::PreOrderTreeIterator<DataTreeBase> DataTreePreOrderIterator;
 //## @ingroup DataTree
 typedef	itk::ChildTreeIterator<DataTreeBase> DataTreeChildIterator;
 
+typedef	itk::TreeChangeEvent<DataTreeBase> DataTreeChangeEvent;
+
 //##ModelId=3E38F35101A0
 //##Documentation
 //## @brief Main run-time data management class defining a data tree
@@ -137,6 +139,7 @@ public:
   //## 
   static bool Save( const mitk::DataTreeIteratorBase* it, const char* fileName );
   static bool Save( const mitk::DataTreeIteratorBase* it, mitk::XMLWriter& xmlWriter );
+  static bool Load( const mitk::DataTreeIteratorBase* it, const char* filename );
 protected:
   //##ModelId=3E38F46A0190
   DataTree();

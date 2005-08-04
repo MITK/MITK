@@ -45,9 +45,13 @@ class CameraController;
 class BaseRenderer : public itk::Object
 {
 public:
+  typedef std::set<BaseRenderer*> RendererSet;
   /** Standard class typedefs. */
   //##ModelId=3E691E0901DB
   mitkClassMacro(BaseRenderer, itk::Object);
+
+  //##ModelId=3E3D2F120050
+  BaseRenderer( const char* name );
 
   //##Documentation
   //## @brief MapperSlotId defines which kind of mapper (e.g., 2D or 3D) shoud be used.
@@ -268,9 +272,28 @@ public:
   //## @note for internal use only. preliminary.
   virtual void KeyPressEvent(mitk::KeyEvent*);
 
+  //##Documentation
+  //## @brief get the name of the Renderer
+  //## @note 
+  const char * GetName() const
+  {
+    return m_Name.c_str();
+  }
+
+  //##Documentation
+  //## @brief get the Renderer by the name
+  //## @note 
+  static const BaseRenderer* GetByName( const std::string& name )
+  {
+    for (RendererSet::const_iterator iter = instances.begin();iter != instances.end();iter++) {
+      if (name == (*iter)->m_Name) {
+        return *iter;
+      }
+    }
+    return NULL;
+  } 
+
 protected:
-  //##ModelId=3E3D2F120050
-  BaseRenderer();
 
   //##ModelId=3E3D2F12008C
   virtual ~BaseRenderer();
@@ -410,6 +433,9 @@ protected:
   //##Documentation
   //## @brief test only
   unsigned long m_CurrentWorldGeometry2DTransformTime;
+
+  std::string m_Name;
+  static RendererSet instances;
 };
 
 } // namespace mitk

@@ -40,6 +40,8 @@ protected:
 public:
     mitkClassMacro(LookupTableProperty, BaseProperty);
 
+    LookupTableProperty();
+
     //##ModelId=3ED953090121
     LookupTableProperty(const mitk::LookupTable &lut);
 

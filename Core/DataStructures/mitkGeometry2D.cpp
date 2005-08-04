@@ -19,6 +19,11 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkGeometry2D.h"
 #include <vtkTransform.h>
+#include <mitkXMLWriter.h>
+#include <mitkXMLReader.h>
+
+std::string mitk::Geometry2D::SCALAR_FACTOR_MM_PRT_UNIT_X = "SCALAR_FACTOR_MM_PRT_UNIT_X";
+std::string mitk::Geometry2D::SCALAR_FACTOR_MM_PRT_UNIT_Y = "SCALAR_FACTOR_MM_PRT_UNIT_Y";
 
 //##ModelId=3E395E0802E6
 mitk::Geometry2D::Geometry2D() : 
@@ -234,4 +239,22 @@ void mitk::Geometry2D::PrintSelf(std::ostream& os, itk::Indent indent) const
   Superclass::PrintSelf(os,indent);
   os << indent << " ScaleFactorMMPerUnitX: " << m_ScaleFactorMMPerUnitX << std::endl;
   os << indent << " ScaleFactorMMPerUnitY: " << m_ScaleFactorMMPerUnitY << std::endl;
+}
+
+bool mitk::Geometry2D::WriteXMLData( XMLWriter& xmlWriter )
+{
+  mitk::Geometry3D::WriteXMLData( xmlWriter );
+  xmlWriter.WriteProperty( SCALAR_FACTOR_MM_PRT_UNIT_X, m_ScaleFactorMMPerUnitX );
+  xmlWriter.WriteProperty( SCALAR_FACTOR_MM_PRT_UNIT_Y, m_ScaleFactorMMPerUnitY );
+  return true;
+}
+
+bool mitk::Geometry2D::ReadXMLData( XMLReader& xmlReader )
+{
+  Geometry3D::ReadXMLData( xmlReader );
+  bool resul = true;
+  resul &= mitk::Geometry3D::ReadXMLData( xmlReader );
+  resul &= xmlReader.GetAttribute( SCALAR_FACTOR_MM_PRT_UNIT_X, m_ScaleFactorMMPerUnitX );
+  resul &= xmlReader.GetAttribute( SCALAR_FACTOR_MM_PRT_UNIT_Y, m_ScaleFactorMMPerUnitY );
+  return resul;
 }

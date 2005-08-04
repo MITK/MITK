@@ -32,8 +32,11 @@ void QmitkSelectableGLWidget::init()
     hlayout->setMargin(2);
     hlayout->setAutoAdd(true);
 
+    QString rendererName("Renderer::");
+    rendererName += name();
+
     // create Renderer
-    renderer=mitk::OpenGLRenderer::New();
+    renderer= new mitk::OpenGLRenderer( rendererName ); 
     
     // create widget
     QString composedName("QSGLWt::");

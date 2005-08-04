@@ -19,6 +19,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkPropertyList.h"
 #include <mitkXMLWriter.h>
+#include <mitkXMLReader.h>
+
+const std::string mitk::PropertyList::XML_NODE_NAME = "propertyList";
 
 //##ModelId=3D6A0E9E0029
 mitk::BaseProperty::Pointer mitk::PropertyList::GetProperty(const char *propertyKey) const
@@ -123,27 +126,53 @@ void mitk::PropertyList::Clear()
   m_Properties.clear();
 }
 
-bool mitk::PropertyList::WriteXML( mitk::XMLWriter& xmlWriter ) 
+bool mitk::PropertyList::WriteXMLData( mitk::XMLWriter& xmlWriter ) 
 {
 	const mitk::PropertyList::PropertyMap* map = GetMap();
 	mitk::PropertyList::PropertyMap::const_iterator i = map->begin();
-	const mitk::PropertyList::PropertyMap::const_iterator end = map->end();
-	
-	xmlWriter.BeginNode("propertyList");
-	xmlWriter.WriteProperty( "className", typeid( *this ).name() );
+	const mitk::PropertyList::PropertyMap::const_iterator end = map->end();	
 
 	while ( i != end ) {
-		xmlWriter.BeginNode( "property" );		
-		xmlWriter.WriteProperty( "className", typeid( *(*i).second.first.GetPointer() ).name() );
-		xmlWriter.WriteProperty((*i).first.c_str(), (*i).second.first->GetValueAsString().c_str());
-		xmlWriter.EndNode();
+    xmlWriter.BeginNode( (*i).second.first->GetXMLNodeName() );
+    xmlWriter.WriteProperty( XMLIO::CLASS_NAME, typeid( *(*i).second.first ).name() );
+    xmlWriter.WriteProperty( XMLReader::PROPERTY_KEY, (*i).first.c_str() );
+    (*i).second.first->WriteXMLData( xmlWriter );
 		*i++;
+    xmlWriter.EndNode();
 	}
-
-	xmlWriter.EndNode();
 
 	return true;
 }
+
+bool mitk::PropertyList::ReadXMLData( XMLReader& xmlReader )
+{
+
+  if ( xmlReader.Goto( BaseProperty::XML_NODE_NAME ) ) {
+
+    do {
+      BaseProperty::Pointer property = dynamic_cast<BaseProperty*>( xmlReader.CreateObject().GetPointer() );
+
+      if ( property.IsNotNull() ) 
+      {
+        property->ReadXMLData( xmlReader );
+        std::string name;
+        xmlReader.GetAttribute( XMLReader::PROPERTY_KEY, name );
+
+        if ( !name.empty() )
+          SetProperty( name.c_str(), property );
+      }
+    } while ( xmlReader.GotoNext() );
+    xmlReader.GotoParent();
+  }
+
+  return true;
+}
+
+const std::string& mitk::PropertyList::GetXMLNodeName() const
+{
+  return XML_NODE_NAME;
+}
+
 bool mitk::PropertyList::IsEnabled(const char *propertyKey) {
   PropertyMap::iterator it = m_Properties.find( propertyKey );
   if (it != m_Properties.end() && it->second.second) {

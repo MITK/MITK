@@ -22,6 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkCommon.h"
 #include "mitkStateMachine.h"
+#include "mitkGeometry3D.h"
 //#include <mitkOperationActor.h>
 
 #include <string>
@@ -66,6 +67,8 @@ namespace mitk {
 
     mitkClassMacro(Interactor,StateMachine);
 
+    Interactor( );
+
     //##Documentation
     //## @brief Constructor
     //##
@@ -99,23 +102,28 @@ namespace mitk {
     //## (Used by GlobalInteraction to descide which DESELECTED statemachine to send the event to.)
     virtual float CalculateJurisdiction(StateEvent const* stateEvent) const;
 
+    void SetDataTreeNode( DataTreeNode* dataTreeNode );
+
     //##Documentation
     //## @brief Executes Actions 
     virtual bool ExecuteAction(Action* action, mitk::StateEvent const* stateEvent);
 
-  //##
-  virtual bool WriteXML( XMLWriter& xmlWriter );
-  //##
-  virtual bool ReadXML( XMLReader& xmlReader );
+    static const std::string XML_NODE_NAME;
 
 protected:
   //##Documentation
   //## @brief adds the handling of Operations used for mode change. Unrecognized Operations are send to Superclass.
   virtual void ExecuteOperation(Operation* operation);
+
+  //##Documentation
+  virtual const std::string& GetXMLNodeName() const;
+
   
   //##Documentation
   //## @brief creates a ModeOperation with the transmitted mode and sends it to this. Undo supported!
   void CreateModeOperation(ModeType mode);
+
+  mitk::Geometry3D* GetGeometry() const;
 
   //##Documentation
   //## @brief Pointer to the data, this object handles the Interaction for
@@ -124,7 +132,6 @@ protected:
   //##Documentation
   //## @brief Mode of Selection
   ModeType m_Mode;
-
 };
 
 }//namespace mitk

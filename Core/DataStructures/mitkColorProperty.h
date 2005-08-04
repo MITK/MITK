@@ -43,6 +43,7 @@ protected:
   //##ModelId=3E86A3B00061
   mitk::Color m_Color;
 public:
+  ColorProperty();
   mitkClassMacro(ColorProperty, BaseProperty);
   
   ColorProperty(const float red, const float green, const float blue);
@@ -65,6 +66,11 @@ public:
   const mitk::Color & GetValue() const;
   std::string mitk::ColorProperty::GetValueAsString() const;
   void SetColor(const mitk::Color & color );
+
+  //## 
+  virtual bool WriteXMLData( XMLWriter& xmlWriter );
+  //##
+  virtual bool ReadXMLData( XMLReader& xmlReader );
 };
 
 } // namespace mitk

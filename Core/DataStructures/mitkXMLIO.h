@@ -19,6 +19,8 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef XMLIO_H_HEADER_INCLUDED
 #define XMLIO_H_HEADER_INCLUDED
 
+#include <string>
+
 namespace mitk {
 
 	class XMLWriter;
@@ -31,12 +33,33 @@ namespace mitk {
 		/**
 		 *
 		 */
-		virtual bool WriteXML( XMLWriter& xmlWriter );
+		bool WriteXML( XMLWriter& xmlWriter );
 
 		/**
 		 *
 		 */
-		virtual bool ReadXML( XMLReader& xmlReader );
+		virtual bool ReadXMLData( XMLReader& xmlReader );
+
+		/**
+		 *
+		 */
+    static const std::string CLASS_NAME;
+
+  protected:
+    /**
+     *
+     */
+    virtual bool WriteXMLData( XMLWriter& xmlWriter );
+
+    /**
+     *
+     */
+    virtual const std::string& GetXMLNodeName() const;
+
+    /**
+     *
+     */
+    static const std::string XML_NODE_NAME;
 	};
 
 }

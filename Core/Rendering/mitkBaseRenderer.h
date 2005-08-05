@@ -51,7 +51,7 @@ public:
   mitkClassMacro(BaseRenderer, itk::Object);
 
   //##ModelId=3E3D2F120050
-  BaseRenderer( const char* name );
+  BaseRenderer( const char* name = NULL );
 
   //##Documentation
   //## @brief MapperSlotId defines which kind of mapper (e.g., 2D or 3D) shoud be used.

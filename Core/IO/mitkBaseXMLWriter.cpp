@@ -232,7 +232,7 @@ const char* BaseXMLWriter::ConvertString( const char* string ) const
  */
 void BaseXMLWriter::StreamNode::Write( std::ostream& out, int steps )
 {
-  std::string& comment = m_Comment.str();
+  std::string comment = m_Comment.str();
 
   if ( comment.size() )
   {
@@ -244,12 +244,12 @@ void BaseXMLWriter::StreamNode::Write( std::ostream& out, int steps )
 
   out << '<' << m_Name;
 
-  std::string& properties = m_PropertyStream.str();
+  std::string properties = m_PropertyStream.str();
 
   if ( properties.size() )
     out << ' ' << properties;
 
-  std::string& children = m_ChildrenStream.str();
+  std::string children = m_ChildrenStream.str();
 
   if ( children.size() )
   {

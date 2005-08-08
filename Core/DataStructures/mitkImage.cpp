@@ -43,12 +43,18 @@ mitk::Image::Image() :
   mitk::HistogramGenerator::Pointer generator = mitk::HistogramGenerator::New();
   m_HistogramGeneratorObject = generator;
   generator->SetImage(this);
+  this->UnRegister();
 }
 
 //##ModelId=3E15F6CA014F
 mitk::Image::~Image()
 {
   Clear();
+  m_ReferenceCountLock.Lock();
+  m_ReferenceCount = 2;
+  m_HistogramGeneratorObject = NULL;
+  m_ReferenceCount = 0;
+  m_ReferenceCountLock.Unlock();
 }
 
 //##ModelId=3DCBC2B50345

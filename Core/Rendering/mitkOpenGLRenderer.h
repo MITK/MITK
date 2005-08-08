@@ -49,7 +49,7 @@ public:
   mitkClassMacro(OpenGLRenderer,BaseRenderer);
 
   //##ModelId=3E33ECF301AD
-  OpenGLRenderer( const char* name = NULL );
+  OpenGLRenderer( const char* name = "OpenGLRenderer" );
 
   /** Method for creation through the object factory. */
   itkNewMacro(Self);

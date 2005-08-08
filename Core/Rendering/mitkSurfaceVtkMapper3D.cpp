@@ -43,6 +43,8 @@ mitk::SurfaceVtkMapper3D::SurfaceVtkMapper3D()
   m_Actor = vtkActor::New();
   m_Actor->SetMapper(m_VtkPolyDataMapper);
 
+  m_Prop3D = m_Actor;
+
   m_GenerateNormals = false;
 }
 
@@ -59,23 +61,24 @@ mitk::SurfaceVtkMapper3D::~SurfaceVtkMapper3D()
 //##ModelId=3EF19FA803BF
 void mitk::SurfaceVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
 {
-  m_Prop3D=NULL;
+  bool visible = IsVisible(renderer);
 
-  if(IsVisible(renderer)==false)
+  if(visible==false)
   {
     m_Actor->VisibilityOff();
     return;
   }
-  m_Actor->VisibilityOn();
 
-  
   //
   // get the TimeSlicedGeometry of the input object
   //
   mitk::Surface::Pointer input  = const_cast< mitk::Surface* >( this->GetInput() );
   const TimeSlicedGeometry* inputTimeGeometry = dynamic_cast< const TimeSlicedGeometry* >( input->GetUpdatedGeometry() );
   if(( inputTimeGeometry == NULL ) || ( inputTimeGeometry->GetTimeSteps() == 0 ) )
+  {
+    m_Actor->VisibilityOff();
     return;
+  }
 
   //
   // get the world time
@@ -91,7 +94,10 @@ void mitk::SurfaceVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
   if( time > -ScalarTypeNumericTraits::max() )
     timestep = inputTimeGeometry->MSToTimeStep( time );
   if( inputTimeGeometry->IsValidTime( timestep ) == false )
+  {
+    m_Actor->VisibilityOff();
     return;
+  }
 //  std::cout << "time: "<< time << std::endl;
 //  std::cout << "timestep: "<<timestep << std::endl;
   
@@ -101,7 +107,10 @@ void mitk::SurfaceVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
 
   vtkPolyData * polydata = input->GetVtkPolyData( timestep );
   if(polydata == NULL) 
+  {
+    m_Actor->VisibilityOff();
     return;
+  }
 
   if ( m_GenerateNormals )
   {
@@ -118,7 +127,8 @@ void mitk::SurfaceVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
   //
   ApplyProperties(m_Actor, renderer);
 
-  m_Prop3D = m_Actor;
+  if(visible)
+    m_Actor->VisibilityOn();
 }
 
 void mitk::SurfaceVtkMapper3D::ApplyProperties(vtkActor* actor, mitk::BaseRenderer* renderer)

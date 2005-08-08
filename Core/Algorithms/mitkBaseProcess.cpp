@@ -75,7 +75,7 @@ void mitk::BaseProcess::UnRegister() const
     {
         m_Unregistering=true;
 
-        int realReferenceCount = GetExternalReferenceCount();
+        int realReferenceCount = GetExternalReferenceCount()-1; //-1 because some is trying to unregister us
         if(realReferenceCount<0)
             m_ExternalReferenceCount=0;
 

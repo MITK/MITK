@@ -138,7 +138,7 @@ void mitk::PointSetMapper2D::Paint(mitk::BaseRenderer * renderer)
                 vert[1]=8;
                 glColor3f(selectedColor[0],selectedColor[1],selectedColor[2]);//red
 
-                //a diamond around the point
+                //a diamond around the point with the selected color
                 glBegin (GL_LINE_LOOP);
                     tmp=pt2d-horz;      glVertex2fv(&tmp[0]);
                     tmp=pt2d+vert;      glVertex2fv(&tmp[0]);
@@ -146,7 +146,8 @@ void mitk::PointSetMapper2D::Paint(mitk::BaseRenderer * renderer)
                     tmp=pt2d-vert;      glVertex2fv(&tmp[0]);
                 glEnd ();
 
-                //the actual point
+                //the actual point in the specified color to see the usual color of the point
+                glColor3f(unselectedColor[0],unselectedColor[1],unselectedColor[2]);
                 glBegin (GL_POINTS);
                   tmp=pt2d;             glVertex2fv(&tmp[0]);
                 glEnd ();

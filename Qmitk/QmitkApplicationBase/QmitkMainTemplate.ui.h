@@ -742,7 +742,8 @@ void QmitkMainTemplate::optionsSystem_InformationAction_activated()
   systemInfo->show();
 }
 
-
+ 
+  
 bool QmitkMainTemplate::GetStandardViewsInitialized()
 {
   return m_StandardViewsInitialized;
@@ -752,4 +753,66 @@ bool QmitkMainTemplate::GetStandardViewsInitialized()
 void QmitkMainTemplate::SetStandardViewsInitialized( bool areInitialized )
 {
   m_StandardViewsInitialized = areInitialized;
+}
+
+/**
+  *
+  */
+void QmitkMainTemplate::fileOpenProjectActionActivated()
+{
+  QString fileName = QFileDialog::getOpenFileName( NULL, "*.mitk" );  
+
+  if ( fileName.length() < 5 ) 
+    return;
+
+  mitk::DataTreePreOrderIterator it(tree);
+
+  try{
+    mitk::DataTree::Load( &it, fileName.ascii() );
+  } catch ( ... )
+  { std::cout << "cant open Project: " << fileName.ascii() << std::endl; }
+
+  m_ProjectFileName = fileName;
+}
+
+/**
+  *
+  */
+void QmitkMainTemplate::fileSaveProjectActionActivated()
+{
+  QString fileName;
+
+  if ( m_ProjectFileName.length() > 5 )
+    fileName = m_ProjectFileName;
+  else 
+    fileName = QFileDialog::getSaveFileName( NULL, "*.mitk" );  
+
+  if ( fileName.length() < 4 ) 
+    return;
+
+  mitk::DataTreePreOrderIterator it(tree);
+
+  try{
+    mitk::DataTree::Save( &it, fileName.ascii() );
+  } catch (...)
+  { std::cout << "cant save project: " << fileName.ascii() << std::endl; }
+  m_ProjectFileName = fileName;
+}
+
+/**
+  *
+  */
+void QmitkMainTemplate::fileSaveProjectAsActionActivated()
+{
+ QString fileName = QFileDialog::getSaveFileName( NULL, "*.mitk" );  
+
+  if ( fileName.length() < 5 ) 
+    return;
+
+  mitk::DataTreePreOrderIterator it(tree);
+  try{
+    mitk::DataTree::Save( &it, fileName.ascii() ); 
+  } catch (...)
+  { std::cout << "cant save project: " << fileName.ascii() << std::endl; }
+  m_ProjectFileName = fileName;
 }

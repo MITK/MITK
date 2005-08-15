@@ -59,12 +59,16 @@
     <property name="name">
         <cstring>menubar</cstring>
     </property>
-    <item text="&amp;File" name="fileMenu">
+    <item text="&amp;File" name="File">
         <action name="fileNewAction"/>
         <action name="fileOpenAction"/>
         <action name="fileOpenImageSequenceAction"/>
         <action name="fileSaveAction"/>
         <action name="fileSaveAsAction"/>
+        <separator/>
+        <action name="fileOpen_ProjectAction"/>
+        <action name="fileSave_ProjectAction"/>
+        <action name="fileSave_Project_AsAction"/>
         <separator/>
         <action name="filePrintAction"/>
         <separator/>
@@ -599,6 +603,39 @@
             <string>Ctrl+I</string>
         </property>
     </action>
+    <action>
+        <property name="name">
+            <cstring>fileOpen_ProjectAction</cstring>
+        </property>
+        <property name="text">
+            <string>Open Project</string>
+        </property>
+        <property name="menuText">
+            <string>Open Project</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>fileSave_ProjectAction</cstring>
+        </property>
+        <property name="text">
+            <string>Save Project</string>
+        </property>
+        <property name="menuText">
+            <string>Save Project</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>fileSave_Project_AsAction</cstring>
+        </property>
+        <property name="text">
+            <string>Save Project As...</string>
+        </property>
+        <property name="menuText">
+            <string>Save Project As...</string>
+        </property>
+    </action>
 </actions>
 <images>
     <image name="image0">
@@ -810,6 +847,24 @@
         <receiver>QmitkMainTemplate</receiver>
         <slot>optionsSystem_InformationAction_activated()</slot>
     </connection>
+    <connection>
+        <sender>fileOpen_ProjectAction</sender>
+        <signal>activated()</signal>
+        <receiver>QmitkMainTemplate</receiver>
+        <slot>fileOpenProjectActionActivated()</slot>
+    </connection>
+    <connection>
+        <sender>fileSave_ProjectAction</sender>
+        <signal>activated()</signal>
+        <receiver>QmitkMainTemplate</receiver>
+        <slot>fileSaveProjectActionActivated()</slot>
+    </connection>
+    <connection>
+        <sender>fileSave_Project_AsAction</sender>
+        <signal>activated()</signal>
+        <receiver>QmitkMainTemplate</receiver>
+        <slot>fileSaveProjectAsActionActivated()</slot>
+    </connection>
 </connections>
 <includes>
     <include location="global" impldecl="in implementation">QmitkStdMultiWidget.h</include>
@@ -843,6 +898,7 @@
     <variable>mitk::DataTree::Pointer tree;</variable>
     <variable>bool m_StandardViewsInitialized;</variable>
     <variable access="private">bool m_FineUndoEnabled;</variable>
+    <variable>QString m_ProjectFileName;</variable>
 </variables>
 <signals>
     <signal>ShowWidgetPlanesToggled(bool)</signal>
@@ -878,6 +934,9 @@
     <slot>hideToolbar( bool on )</slot>
     <slot>enableFineUndo( bool enabled )</slot>
     <slot>optionsSystem_InformationAction_activated()</slot>
+    <slot>fileOpenProjectActionActivated()</slot>
+    <slot>fileSaveProjectActionActivated()</slot>
+    <slot>fileSaveProjectAsActionActivated()</slot>
 </slots>
 <functions>
     <function>fileOpen( const char * fileName )</function>

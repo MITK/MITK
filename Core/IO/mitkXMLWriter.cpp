@@ -12,7 +12,7 @@ std::string XMLWriter::m_ImageExtension = ".pic";
  * Construktor
  */
 XMLWriter::XMLWriter( const char* filename, const char* subDirectory, int space )
-:BaseXMLWriter( filename, space ), m_SubFolder(), m_FileCounter(0), m_Filename(filename)
+:BaseXMLWriter( filename, space ), m_SubFolder(), m_Filename(filename), m_FileCounter(0)
 {		
   m_SubFolder = subDirectory;
 }

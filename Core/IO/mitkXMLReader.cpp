@@ -35,7 +35,7 @@ namespace mitk {
    *
    */
   XMLReader::XMLReader( const mitk::DataTreeIteratorBase* it )
-    :m_Root(NULL), m_CurrentNode(NULL), vtkXMLParser(), m_CurrentPosition(const_cast<mitk::DataTreeIteratorBase*>(it)) { }
+    :vtkXMLParser(), m_Root(NULL), m_CurrentNode(NULL), m_CurrentPosition(const_cast<mitk::DataTreeIteratorBase*>(it)) { }
 
   /**
    *
@@ -164,7 +164,6 @@ namespace mitk {
     if ( !GetAttribute( name, string ) )
       return false;
 
-    const char* test = string.c_str();
     int e0 = string.find( "[" );
     int e1 = string.find( ",", e0 + 1 );
     int e2 = string.find( ",", e1 + 1 );

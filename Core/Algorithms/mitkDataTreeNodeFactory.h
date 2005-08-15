@@ -161,6 +161,8 @@ protected:
   virtual void ReadFileTypePAR();
 
   virtual void ReadFileTypePVTK();
+  
+  virtual void ReadFileTypeGDCM();
 
 #if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
   virtual void ReadFileTypeVTI();
@@ -189,6 +191,8 @@ protected:
   virtual void ReadFileSeriesTypeVTK();
 
   virtual void ReadFileSeriesTypeDCM();
+
+  virtual void ReadFileSeriesTypeGDCM();
 
   virtual void ReadFileSeriesTypeITKImageSeriesReader();
 };

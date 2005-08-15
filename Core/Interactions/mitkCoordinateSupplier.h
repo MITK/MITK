@@ -47,6 +47,8 @@ namespace mitk {
     //## @param operationActor: the Data, operations (+ points) are send to
     CoordinateSupplier(const char * type, OperationActor* operationActor);
 
+    itkGetConstReferenceMacro(CurrentPoint, Point3D);
+
   protected:
     //##ModelId=3F0189F00269
     //##Documentation
@@ -58,7 +60,7 @@ namespace mitk {
     //##ModelId=3F0189F0024A
     OperationActor* m_Destination;
     Point3D m_OldPoint;
-
+    Point3D m_CurrentPoint;
   };
 
 } // namespace mitk

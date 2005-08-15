@@ -40,8 +40,6 @@ mitk::CoordinateSupplier::CoordinateSupplier(const char * type, mitk::OperationA
 bool mitk::CoordinateSupplier::ExecuteAction(Action* action, mitk::StateEvent const* stateEvent)
 {
     bool ok = false;
-    if (m_Destination == NULL)
-        return false;
 	
     const PositionEvent* posEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
     
@@ -63,6 +61,8 @@ bool mitk::CoordinateSupplier::ExecuteAction(Action* action, mitk::StateEvent co
       {
         case AcNEWPOINT:
         {
+          if (m_Destination == NULL)
+            return false;
           m_OldPoint = posEvent->GetWorldPosition();
 
 			    PointOperation* doOp = new mitk::PointOperation(OpADD, timeInMS, m_OldPoint, 0);
@@ -79,7 +79,10 @@ bool mitk::CoordinateSupplier::ExecuteAction(Action* action, mitk::StateEvent co
           break;
         }
         case AcINITMOVEMENT:
-        {//move the point to the coordinate //not used, cause same to MovePoint... check xml-file
+        {
+          if (m_Destination == NULL)
+            return false;
+          //move the point to the coordinate //not used, cause same to MovePoint... check xml-file
           mitk::Point3D movePoint = posEvent->GetWorldPosition();
 
           PointOperation* doOp = new mitk::PointOperation(OpMOVE, timeInMS, movePoint, 0);
@@ -91,7 +94,9 @@ bool mitk::CoordinateSupplier::ExecuteAction(Action* action, mitk::StateEvent co
         case AcMOVEPOINT:
         {
           mitk::Point3D movePoint = posEvent->GetWorldPosition();
-
+          m_CurrentPoint = movePoint;
+          if (m_Destination == NULL)
+            return false;
           PointOperation* doOp = new mitk::PointOperation(OpMOVE, timeInMS, movePoint, 0);
           //execute the Operation
 			    m_Destination->ExecuteOperation(doOp);
@@ -99,7 +104,10 @@ bool mitk::CoordinateSupplier::ExecuteAction(Action* action, mitk::StateEvent co
           break;
         }
         case AcFINISHMOVEMENT:
-        {/*finishes a Movement from the coordinate supplier: 
+        {
+          if (m_Destination == NULL)
+            return false;
+          /*finishes a Movement from the coordinate supplier: 
           gets the lastpoint from the undolist and writes an undo-operation so 
           that the movement of the coordinatesupplier is undoable.*/
           mitk::Point3D movePoint = posEvent->GetWorldPosition();
@@ -137,6 +145,8 @@ bool mitk::CoordinateSupplier::ExecuteAction(Action* action, mitk::StateEvent co
     }
     else if(action->GetActionId() == AcREMOVEPOINT)
     {
+      if (m_Destination == NULL)
+        return false;
       mitk::Point3D p;
       m_Destination->ExecuteOperation( new mitk::PointOperation(OpREMOVE, p ) );
       ok = true;

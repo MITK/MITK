@@ -24,7 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 mitk::Cylinder::Cylinder()
 {
-  m_Geometry3D->Initialize();
+  GetGeometry()->Initialize();
   vtkCylinderSource* cylinder = vtkCylinderSource::New();
   cylinder->SetRadius(1.0);
   cylinder->SetHeight(2.0);
@@ -48,7 +48,7 @@ bool mitk::Cylinder::IsInside(const Point3D& worldPoint) const
   p[1] = worldPoint[1];
   p[2] = worldPoint[2];
   p[3] = 1;
-  m_Geometry3D->GetVtkTransform()->GetInverse()->TransformPoint(p, p);
+  GetGeometry()->GetVtkTransform()->GetInverse()->TransformPoint(p, p);
 	mitk::Point3D itkPoint;
 
   mitk::ScalarType v =  pow(p[0], 2) + pow(p[2], 2);
@@ -58,6 +58,6 @@ bool mitk::Cylinder::IsInside(const Point3D& worldPoint) const
 
 mitk::ScalarType mitk::Cylinder::GetVolume()
 {
-  return   m_Geometry3D->GetXAxis().GetNorm() * m_Geometry3D->GetZAxis().GetNorm() 
-         * 2 * m_Geometry3D->GetYAxis().GetNorm() * vnl_math::pi;
+  return   GetGeometry()->GetXAxis().GetNorm() * GetGeometry()->GetZAxis().GetNorm() 
+         * 2 * GetGeometry()->GetYAxis().GetNorm() * vnl_math::pi;
 }

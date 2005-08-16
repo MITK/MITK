@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkStepper.h"
 
-mitk::Stepper::Stepper() : m_Pos(0), m_Steps(0), m_StepSize(1), m_PosToUnitFactor(1), m_ZeroLine(0)
+mitk::Stepper::Stepper() : m_Pos(0), m_Steps(0), m_StepSize(1), m_PosToUnitFactor(1), m_ZeroLine(0), m_AutoRepeat(false)
 {
 
 }
@@ -35,6 +35,11 @@ void mitk::Stepper::Previous()
   if(m_Pos>0)
   {
     --m_Pos;
+    Modified();
+  }
+  else if (m_AutoRepeat)
+  {
+    m_Pos = m_Steps-1;
     Modified();
   }
 }
@@ -65,6 +70,11 @@ void mitk::Stepper::Next()
   if(m_Pos<m_Steps-1)
   {
     ++m_Pos;
+    Modified();
+  }
+  else if (m_AutoRepeat)
+  {
+    m_Pos = 0;
     Modified();
   }
 }

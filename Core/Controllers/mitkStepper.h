@@ -61,6 +61,9 @@ public:
   itkGetStringMacro(UnitName);
   itkSetStringMacro(UnitName);
 
+  itkGetMacro(AutoRepeat, bool);
+  itkSetMacro(AutoRepeat, bool);
+
   //##ModelId=3DF8B9410142
   void Previous();
 
@@ -87,6 +90,8 @@ protected:
   float m_ZeroLine;
 
   std::string m_UnitName;
+
+  bool m_AutoRepeat;
 
 private:
 

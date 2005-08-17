@@ -36,7 +36,7 @@ namespace mitk
  * for streaming, that is, that the requested region is always the largest
  * possible region.
  */
-class LookupTableSource : public BaseProcess
+class LookupTableSource : public itk::ProcessObject
 {
 public:
 

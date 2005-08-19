@@ -44,6 +44,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkChiliPlugin.h"
 #include "mitkLightBoxResultImageWriter.h"
 
+#include <QMessageBox.h>
+
 void QmitkDataManagerControls::init()
 {
   m_DataTreeIterator = NULL;
@@ -138,19 +140,37 @@ void QmitkDataManagerControls::SetDataTreeIterator(mitk::DataTreeIteratorBase* i
   UpdateRendererCombo();
 }
 
+
+
 void QmitkDataManagerControls::RemoveButtonClicked()
 {
   QmitkDataTreeViewItem *selected = dynamic_cast<QmitkDataTreeViewItem*>(m_DataTreeView->selectedItem());
-  if (selected == NULL)
-  {}
-  else
-  {
-    mitk::DataTreeIteratorClone selectedIterator = selected->GetDataTreeIterator();
-    assert(selectedIterator.IsNotNull());
-    delete selected;
-    selectedIterator->Remove();
-    mitk::RenderWindow::UpdateAllInstances();
-  }
+
+  switch(QMessageBox::information(this, "Application name here",
+    "Do you really want do delete this item?\n",
+    "&No", "&Yes", "Cancel",
+    0,      // Enter == button 0
+    2)) { // Escape == button 2
+        case 0: // "NO" clicked or Enter pressed.
+          break;
+        case 1: //"YES" clicked
+          //Remove the item
+          if (selected == NULL)
+          {}
+          else
+          {
+            mitk::DataTreeIteratorClone selectedIterator = selected->GetDataTreeIterator();
+            assert(selectedIterator.IsNotNull());
+            delete selected;
+            selectedIterator->Remove();
+            mitk::RenderWindow::UpdateAllInstances();
+          }
+
+
+          break;
+        case 2: // Cancel clicked or Escape pressed
+          break;
+    }
 }
 
 

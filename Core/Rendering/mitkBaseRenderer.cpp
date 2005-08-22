@@ -313,12 +313,11 @@ void mitk::BaseRenderer::MousePressEvent(mitk::MouseEvent *me)
     mitk::PositionEvent event(this, me->GetType(), me->GetButton(), me->GetButtonState(), mitk::Key_unknown, p, position);
     mitk::EventMapper::MapEvent(&event);
   }
-  else if(m_MapperID==2)
+  else if(m_MapperID>1)//==2 for 3D and ==5 for stencil
   {
     Point2D p(me->GetDisplayPosition());
 
     GetDisplayGeometry()->ULDisplayToDisplay(p,p);
-//    std::cout << "press event!" << std::endl;
     me->SetDisplayPosition(p);
     mitk::EventMapper::MapEvent(me);
   }

@@ -622,7 +622,7 @@ void mitk::Image::Initialize(const mitk::PixelType& type, unsigned int dimension
     TimeBounds timebounds;
     timebounds[0] = 0.0;
     timebounds[1] = 1.0;
-    slicedGeometry->SetTimeBounds(timebounds);
+    slicedGeometry->SetTimeBoundsInMS(timebounds);
   }
 
   TimeSlicedGeometry::Pointer timeSliceGeometry = TimeSlicedGeometry::New();
@@ -677,7 +677,7 @@ void mitk::Image::Initialize(const mitk::PixelType& type, const mitk::Geometry3D
     slicedGeometry->SetBounds(bounds);
     slicedGeometry->GetIndexToWorldTransform()->SetOffset(origin.Get_vnl_vector().data_block());  
   
-    GetTimeSlicedGeometry()->InitializeEvenlyTimed(slicedGeometry, m_Dimensions[3]);
+    m_TimeSlicedGeometry->InitializeEvenlyTimed(slicedGeometry, m_Dimensions[3]);
   }
 }
 
@@ -762,7 +762,7 @@ void mitk::Image::Initialize(vtkImageData* vtkimagedata, int channels, int tDim,
 
   SlicedGeometry3D* slicedGeometry = GetSlicedGeometry(0);
   slicedGeometry->SetSpacing(spacing);
-  GetTimeSlicedGeometry()->InitializeEvenlyTimed(slicedGeometry, m_Dimensions[3]);
+  m_TimeSlicedGeometry->InitializeEvenlyTimed(slicedGeometry, m_Dimensions[3]);
 
   delete [] tmpDimensions;
 }
@@ -829,14 +829,15 @@ void mitk::Image::Initialize(const ipPicDescriptor* pic, int channels, int tDim,
 void mitk::Image::SetSpacing(const float aSpacing[3])
 {
   GetSlicedGeometry(0)->SetSpacing(aSpacing);
-  GetTimeSlicedGeometry()->InitializeEvenlyTimed(GetSlicedGeometry(0), m_Dimensions[3]);
+  m_TimeSlicedGeometry->InitializeEvenlyTimed(GetSlicedGeometry(0), m_Dimensions[3]);
 }
 
 void mitk::Image::SetSpacing(mitk::Vector3D aSpacing)
 {
   GetSlicedGeometry(0)->SetSpacing(aSpacing);
-  GetTimeSlicedGeometry()->InitializeEvenlyTimed(GetSlicedGeometry(0), m_Dimensions[3]);
+  m_TimeSlicedGeometry->InitializeEvenlyTimed(GetSlicedGeometry(0), m_Dimensions[3]);
 }
+
 
 //##ModelId=3E155CF000F6
 bool mitk::Image::IsValidSlice(int s, int t, int n) const
@@ -1061,7 +1062,7 @@ bool mitk::Image::ReadXMLData( XMLReader& xmlReader )
 void mitk::Image::SetGeometry(Geometry3D* aGeometry3D)
 {
   Superclass::SetGeometry(aGeometry3D);
-  GetTimeSlicedGeometry()->ImageGeometryOn();
+  m_Geometry3D->ImageGeometryOn();
 }
 
 const mitk::Image::HistogramType* mitk::Image::GetScalarHistogram(int t) const
@@ -1145,3 +1146,4 @@ mitk::ScalarType mitk::Image::GetScalarValue2ndMax(int t) const
   ComputeExtrema(t);
   return m_Scalar2ndMax;
 }
+

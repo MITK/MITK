@@ -77,21 +77,26 @@ void mitk::BaseProcess::UnRegister() const
 
         int realReferenceCount = GetExternalReferenceCount()-1; //-1 because some is trying to unregister us
         if(realReferenceCount<0)
-            m_ExternalReferenceCount=0;
+            realReferenceCount=0;
 
         if(realReferenceCount==0)
         {
             DataObjectPointerArray outputs = const_cast<mitk::BaseProcess*>(this)->GetOutputs();
             //disconnect all outputs from us
+            //size of outputs will not change until the very last output
+            //is removed, because we remove from front to back
             unsigned int idx;
             for (idx = 0; idx < outputs.size(); ++idx)
             {
-                const_cast<mitk::BaseProcess*>(this)->RemoveOutput(outputs[idx]);
+              const_cast<mitk::BaseProcess*>(this)->RemoveOutput(outputs[idx]);
             }
             //now the referenceCount should be one!
             int testReferenceCount=GetReferenceCount();
             if(testReferenceCount!=1)
-                testReferenceCount=0;
+            {
+              itkWarningMacro(<<"Reference count of process object unexpectedly "
+                << "not 1 before final unregister but " << testReferenceCount);
+            }
         }
         m_Unregistering=false;
     }

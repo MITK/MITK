@@ -19,4 +19,8 @@ After checking the configured values and changing them if needed you can generat
 <br>
 <b>Windows:</b>
 Open the just created solution file in \c ip++ and build the desired target.
+<br>
+<br>
+The compiled files (lib and applications) are then localted in the directory <binary-mitk-dir>/Build/MITK/bin.
+
 */

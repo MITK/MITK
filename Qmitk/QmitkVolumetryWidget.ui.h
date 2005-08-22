@@ -58,7 +58,7 @@ void QmitkVolumetryWidget::SetDataTreeNode(mitk::DataTreeNode* node)
   std::string name;
   if (node->GetName(name))
   {
-    m_TreeNodeNameLabel->setText( name.c_str() );
+//    m_TreeNodeNameLabel->setText( name.c_str() );
   }
   m_CalcButton->setEnabled(false);
   m_TimeSeriesButton->setEnabled(false);
@@ -148,10 +148,22 @@ void QmitkVolumetryWidget::UpdateSlider()
     m_ThresholdSlider->setMinValue(minVal);
     m_ThresholdSlider->setMaxValue(maxVal);
     m_ThresholdSlider->setEnabled(true);
-    m_ThresholdLabel->setNum(m_ThresholdSlider->value());
+
+    int intSliderValue = (int)m_ThresholdSlider->value();
+    QString stringSliderValue;
+    stringSliderValue.setNum(intSliderValue);
+    m_ThresholdLineEdit->setText(stringSliderValue);
   }
 }
 
+
+void QmitkVolumetryWidget::UpdateSliderLabel()
+{
+   int sliderValue = atoi(m_ThresholdLineEdit->text());
+    m_ThresholdSlider->setValue(sliderValue);
+    UpdateSlider();
+  
+}
 
 void QmitkVolumetryWidget::m_ThresholdSlider_valueChanged( int value)
 {

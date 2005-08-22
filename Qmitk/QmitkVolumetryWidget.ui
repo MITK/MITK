@@ -8,14 +8,14 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>351</width>
-            <height>464</height>
+            <width>204</width>
+            <height>700</height>
         </rect>
     </property>
     <property name="sizePolicy">
         <sizepolicy>
             <hsizetype>3</hsizetype>
-            <vsizetype>1</vsizetype>
+            <vsizetype>5</vsizetype>
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
         </sizepolicy>
@@ -27,192 +27,252 @@
         <property name="name">
             <cstring>unnamed</cstring>
         </property>
-        <widget class="QLabel" row="0" column="1">
+        <widget class="QFrame" row="0" column="0">
             <property name="name">
-                <cstring>m_TreeNodeNameLabel</cstring>
+                <cstring>frame3</cstring>
             </property>
-            <property name="sizePolicy">
-                <sizepolicy>
-                    <hsizetype>5</hsizetype>
-                    <vsizetype>1</vsizetype>
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                </sizepolicy>
+            <property name="frameShape">
+                <enum>StyledPanel</enum>
             </property>
-            <property name="text">
-                <string>Please select image!</string>
+            <property name="frameShadow">
+                <enum>Raised</enum>
             </property>
-        </widget>
-        <widget class="QLabel" row="0" column="0">
-            <property name="name">
-                <cstring>textLabel1</cstring>
+            <property name="lineWidth">
+                <number>0</number>
             </property>
-            <property name="sizePolicy">
-                <sizepolicy>
-                    <hsizetype>5</hsizetype>
-                    <vsizetype>1</vsizetype>
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                </sizepolicy>
-            </property>
-            <property name="text">
-                <string>Node Name:</string>
-            </property>
-        </widget>
-        <widget class="QLabel" row="1" column="0">
-            <property name="name">
-                <cstring>textLabel3</cstring>
-            </property>
-            <property name="text">
-                <string>Thresh:</string>
-            </property>
-        </widget>
-        <widget class="QLayoutWidget" row="1" column="1">
-            <property name="name">
-                <cstring>layout1</cstring>
-            </property>
-            <hbox>
+            <vbox>
                 <property name="name">
                     <cstring>unnamed</cstring>
                 </property>
-                <widget class="QSlider">
+                <property name="margin">
+                    <number>0</number>
+                </property>
+                <property name="spacing">
+                    <number>0</number>
+                </property>
+                <widget class="QLayoutWidget">
                     <property name="name">
-                        <cstring>m_ThresholdSlider</cstring>
+                        <cstring>layout7</cstring>
                     </property>
-                    <property name="maxValue">
-                        <number>1000</number>
+                    <hbox>
+                        <property name="name">
+                            <cstring>unnamed</cstring>
+                        </property>
+                        <widget class="QLayoutWidget">
+                            <property name="name">
+                                <cstring>layout4</cstring>
+                            </property>
+                            <vbox>
+                                <property name="name">
+                                    <cstring>unnamed</cstring>
+                                </property>
+                                <widget class="QLabel">
+                                    <property name="name">
+                                        <cstring>textLabel3</cstring>
+                                    </property>
+                                    <property name="sizePolicy">
+                                        <sizepolicy>
+                                            <hsizetype>5</hsizetype>
+                                            <vsizetype>0</vsizetype>
+                                            <horstretch>0</horstretch>
+                                            <verstretch>0</verstretch>
+                                        </sizepolicy>
+                                    </property>
+                                    <property name="text">
+                                        <string>Thresh:</string>
+                                    </property>
+                                </widget>
+                                <widget class="QPushButton">
+                                    <property name="name">
+                                        <cstring>m_CalcButton</cstring>
+                                    </property>
+                                    <property name="enabled">
+                                        <bool>false</bool>
+                                    </property>
+                                    <property name="sizePolicy">
+                                        <sizepolicy>
+                                            <hsizetype>0</hsizetype>
+                                            <vsizetype>0</vsizetype>
+                                            <horstretch>0</horstretch>
+                                            <verstretch>0</verstretch>
+                                        </sizepolicy>
+                                    </property>
+                                    <property name="text">
+                                        <string>C&amp;alc!</string>
+                                    </property>
+                                    <property name="accel">
+                                        <string>Alt+A</string>
+                                    </property>
+                                </widget>
+                                <widget class="QPushButton">
+                                    <property name="name">
+                                        <cstring>m_TimeSeriesButton</cstring>
+                                    </property>
+                                    <property name="enabled">
+                                        <bool>false</bool>
+                                    </property>
+                                    <property name="sizePolicy">
+                                        <sizepolicy>
+                                            <hsizetype>1</hsizetype>
+                                            <vsizetype>0</vsizetype>
+                                            <horstretch>0</horstretch>
+                                            <verstretch>0</verstretch>
+                                        </sizepolicy>
+                                    </property>
+                                    <property name="text">
+                                        <string>Time series</string>
+                                    </property>
+                                </widget>
+                                <spacer>
+                                    <property name="name">
+                                        <cstring>spacer2</cstring>
+                                    </property>
+                                    <property name="orientation">
+                                        <enum>Vertical</enum>
+                                    </property>
+                                    <property name="sizeType">
+                                        <enum>Expanding</enum>
+                                    </property>
+                                    <property name="sizeHint">
+                                        <size>
+                                            <width>20</width>
+                                            <height>149</height>
+                                        </size>
+                                    </property>
+                                </spacer>
+                                <widget class="QPushButton">
+                                    <property name="name">
+                                        <cstring>m_SaveCsvButton</cstring>
+                                    </property>
+                                    <property name="enabled">
+                                        <bool>false</bool>
+                                    </property>
+                                    <property name="sizePolicy">
+                                        <sizepolicy>
+                                            <hsizetype>0</hsizetype>
+                                            <vsizetype>5</vsizetype>
+                                            <horstretch>0</horstretch>
+                                            <verstretch>0</verstretch>
+                                        </sizepolicy>
+                                    </property>
+                                    <property name="text">
+                                        <string>Save CSV</string>
+                                    </property>
+                                </widget>
+                            </vbox>
+                        </widget>
+                        <widget class="QLayoutWidget">
+                            <property name="name">
+                                <cstring>layout6</cstring>
+                            </property>
+                            <vbox>
+                                <property name="name">
+                                    <cstring>unnamed</cstring>
+                                </property>
+                                <widget class="QLayoutWidget">
+                                    <property name="name">
+                                        <cstring>layout3</cstring>
+                                    </property>
+                                    <hbox>
+                                        <property name="name">
+                                            <cstring>unnamed</cstring>
+                                        </property>
+                                        <widget class="QSlider">
+                                            <property name="name">
+                                                <cstring>m_ThresholdSlider</cstring>
+                                            </property>
+                                            <property name="maxValue">
+                                                <number>1000</number>
+                                            </property>
+                                            <property name="orientation">
+                                                <enum>Horizontal</enum>
+                                            </property>
+                                        </widget>
+                                        <widget class="QLineEdit">
+                                            <property name="name">
+                                                <cstring>m_ThresholdLineEdit</cstring>
+                                            </property>
+                                            <property name="sizePolicy">
+                                                <sizepolicy>
+                                                    <hsizetype>3</hsizetype>
+                                                    <vsizetype>0</vsizetype>
+                                                    <horstretch>0</horstretch>
+                                                    <verstretch>0</verstretch>
+                                                </sizepolicy>
+                                            </property>
+                                            <property name="minimumSize">
+                                                <size>
+                                                    <width>30</width>
+                                                    <height>0</height>
+                                                </size>
+                                            </property>
+                                            <property name="maximumSize">
+                                                <size>
+                                                    <width>50</width>
+                                                    <height>32767</height>
+                                                </size>
+                                            </property>
+                                            <property name="frameShape">
+                                                <enum>LineEditPanel</enum>
+                                            </property>
+                                            <property name="frameShadow">
+                                                <enum>Sunken</enum>
+                                            </property>
+                                            <property name="text">
+                                                <string>1000</string>
+                                            </property>
+                                        </widget>
+                                    </hbox>
+                                </widget>
+                                <widget class="QLineEdit">
+                                    <property name="name">
+                                        <cstring>m_Result</cstring>
+                                    </property>
+                                    <property name="sizePolicy">
+                                        <sizepolicy>
+                                            <hsizetype>7</hsizetype>
+                                            <vsizetype>1</vsizetype>
+                                            <horstretch>0</horstretch>
+                                            <verstretch>0</verstretch>
+                                        </sizepolicy>
+                                    </property>
+                                    <property name="frameShape">
+                                        <enum>LineEditPanel</enum>
+                                    </property>
+                                    <property name="frameShadow">
+                                        <enum>Sunken</enum>
+                                    </property>
+                                </widget>
+                                <widget class="QTextEdit">
+                                    <property name="name">
+                                        <cstring>m_TextEdit</cstring>
+                                    </property>
+                                    <property name="readOnly">
+                                        <bool>true</bool>
+                                    </property>
+                                </widget>
+                            </vbox>
+                        </widget>
+                    </hbox>
+                </widget>
+                <spacer>
+                    <property name="name">
+                        <cstring>spacer1</cstring>
                     </property>
                     <property name="orientation">
-                        <enum>Horizontal</enum>
+                        <enum>Vertical</enum>
                     </property>
-                </widget>
-                <widget class="QLabel">
-                    <property name="name">
-                        <cstring>m_ThresholdLabel</cstring>
+                    <property name="sizeType">
+                        <enum>Expanding</enum>
                     </property>
-                    <property name="text">
-                        <string>1000</string>
+                    <property name="sizeHint">
+                        <size>
+                            <width>20</width>
+                            <height>291</height>
+                        </size>
                     </property>
-                </widget>
-            </hbox>
-        </widget>
-        <widget class="QPushButton" row="2" column="0">
-            <property name="name">
-                <cstring>m_CalcButton</cstring>
-            </property>
-            <property name="enabled">
-                <bool>false</bool>
-            </property>
-            <property name="sizePolicy">
-                <sizepolicy>
-                    <hsizetype>1</hsizetype>
-                    <vsizetype>1</vsizetype>
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                </sizepolicy>
-            </property>
-            <property name="text">
-                <string>C&amp;alc!</string>
-            </property>
-        </widget>
-        <widget class="QLineEdit" row="2" column="1">
-            <property name="name">
-                <cstring>m_Result</cstring>
-            </property>
-            <property name="sizePolicy">
-                <sizepolicy>
-                    <hsizetype>7</hsizetype>
-                    <vsizetype>1</vsizetype>
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                </sizepolicy>
-            </property>
-            <property name="frameShape">
-                <enum>LineEditPanel</enum>
-            </property>
-            <property name="frameShadow">
-                <enum>Sunken</enum>
-            </property>
-        </widget>
-        <widget class="QPushButton" row="3" column="0">
-            <property name="name">
-                <cstring>m_TimeSeriesButton</cstring>
-            </property>
-            <property name="enabled">
-                <bool>false</bool>
-            </property>
-            <property name="sizePolicy">
-                <sizepolicy>
-                    <hsizetype>1</hsizetype>
-                    <vsizetype>1</vsizetype>
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                </sizepolicy>
-            </property>
-            <property name="text">
-                <string>Time series</string>
-            </property>
-        </widget>
-        <spacer row="6" column="1">
-            <property name="name">
-                <cstring>spacer1</cstring>
-            </property>
-            <property name="orientation">
-                <enum>Vertical</enum>
-            </property>
-            <property name="sizeType">
-                <enum>Expanding</enum>
-            </property>
-            <property name="sizeHint">
-                <size>
-                    <width>20</width>
-                    <height>130</height>
-                </size>
-            </property>
-        </spacer>
-        <widget class="QTextEdit" row="3" column="1" rowspan="3" colspan="1">
-            <property name="name">
-                <cstring>m_TextEdit</cstring>
-            </property>
-            <property name="readOnly">
-                <bool>true</bool>
-            </property>
-        </widget>
-        <spacer row="4" column="0">
-            <property name="name">
-                <cstring>spacer2</cstring>
-            </property>
-            <property name="orientation">
-                <enum>Vertical</enum>
-            </property>
-            <property name="sizeType">
-                <enum>Expanding</enum>
-            </property>
-            <property name="sizeHint">
-                <size>
-                    <width>20</width>
-                    <height>60</height>
-                </size>
-            </property>
-        </spacer>
-        <widget class="QPushButton" row="5" column="0">
-            <property name="name">
-                <cstring>m_SaveCsvButton</cstring>
-            </property>
-            <property name="enabled">
-                <bool>false</bool>
-            </property>
-            <property name="sizePolicy">
-                <sizepolicy>
-                    <hsizetype>3</hsizetype>
-                    <vsizetype>5</vsizetype>
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                </sizepolicy>
-            </property>
-            <property name="text">
-                <string>Save CSV</string>
-            </property>
+                </spacer>
+            </vbox>
         </widget>
     </grid>
 </widget>
@@ -220,8 +280,8 @@
     <connection>
         <sender>m_ThresholdSlider</sender>
         <signal>valueChanged(int)</signal>
-        <receiver>m_ThresholdLabel</receiver>
-        <slot>setNum(int)</slot>
+        <receiver>QmitkVolumetryWidget</receiver>
+        <slot>UpdateSlider()</slot>
     </connection>
     <connection>
         <sender>m_CalcButton</sender>
@@ -247,6 +307,12 @@
         <receiver>QmitkVolumetryWidget</receiver>
         <slot>SaveCsvButtonClicked()</slot>
     </connection>
+    <connection>
+        <sender>m_ThresholdLineEdit</sender>
+        <signal>returnPressed()</signal>
+        <receiver>QmitkVolumetryWidget</receiver>
+        <slot>UpdateSliderLabel()</slot>
+    </connection>
 </connections>
 <includes>
     <include location="local" impldecl="in declaration">mitkDataTreeNode.h</include>
@@ -254,6 +320,7 @@
     <include location="global" impldecl="in implementation">string</include>
     <include location="local" impldecl="in implementation">mitkImage.h</include>
     <include location="local" impldecl="in implementation">mitkVolumeCalculator.h</include>
+    <include location="local" impldecl="in implementation">QmitkVolumetryWidget.ui.h</include>
 </includes>
 <variables>
     <variable>mitk::DataTreeIteratorClone m_DataTreeIteratorClone;</variable>
@@ -266,6 +333,7 @@
     <slot access="protected">CalculateVolume()</slot>
     <slot access="protected">CalculateTimeSeries()</slot>
     <slot>UpdateSlider()</slot>
+    <slot>UpdateSliderLabel()</slot>
     <slot>m_ThresholdSlider_valueChanged( int value )</slot>
     <slot>SaveCsvButtonClicked()</slot>
 </slots>

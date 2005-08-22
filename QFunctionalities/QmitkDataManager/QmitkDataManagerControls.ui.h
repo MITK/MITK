@@ -44,7 +44,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkChiliPlugin.h"
 #include "mitkLightBoxResultImageWriter.h"
 
-#include <QMessageBox.h>
+#include <qmessagebox.h>
 
 void QmitkDataManagerControls::init()
 {

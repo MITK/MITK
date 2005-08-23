@@ -526,7 +526,7 @@ public:
   /*!
     create an vtkUnstructuredGrid object from an itkMesh
   */
-  static vtkUnstructuredGrid* MeshToUnstructuredGrid(typename MeshType::Pointer mesh)
+  static vtkUnstructuredGrid* MeshToUnstructuredGrid(typename MeshType* mesh)
   {
     /*! 
     default SingleCellArray line cell visitior definition 
@@ -650,7 +650,7 @@ public:
   /*!
     create an vtkUnstructuredGrid object from an itkMesh
   */
-  static vtkPolyData* MeshToPolyData(typename MeshType::Pointer mesh, bool onlyTriangles = false, bool useScalarAccessor = false, unsigned int pointDataType = 0, mitk::Geometry3D* geometryFrame=NULL, vtkPolyData* polydata = NULL)
+  static vtkPolyData* MeshToPolyData(typename MeshType* mesh, bool onlyTriangles = false, bool useScalarAccessor = false, unsigned int pointDataType = 0, mitk::Geometry3D* geometryFrame=NULL, vtkPolyData* polydata = NULL)
   {
     /*! 
     default Distribute line cell visitior definition 
@@ -721,7 +721,7 @@ public:
 
     // iterate over all the points in the itk mesh to find
     // the maximal index
-    int maxIndex = 0;
+    unsigned int maxIndex = 0;
     for(i = points->Begin(); i != points->End(); ++i)
     {
       if(maxIndex < i->Index())
@@ -903,7 +903,7 @@ public:
 		  return resultMesh;
   }
 
-  static typename MeshType::Pointer TranslateMesh(typename MeshType::PointType vec, typename MeshType::Pointer input)
+  static typename MeshType::Pointer TranslateMesh(typename MeshType::PointType vec, typename MeshType* input)
   {
 
     typename MeshType::Pointer output = MeshType::New();

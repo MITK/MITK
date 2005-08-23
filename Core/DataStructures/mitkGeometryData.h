@@ -21,7 +21,6 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITKGEOMETRYDATA_H_HEADER_INCLUDED_C19C01E2
 
 #include "mitkBaseData.h"
-#include "mitkGeometry2DData.h"
 
 namespace mitk {
 
@@ -31,10 +30,10 @@ namespace mitk {
 //## @ingroup Geometry
 //## 
 //## Only implements pipeline methods which are abstract in BaseData.
-class GeometryData : public Geometry2DData
+class GeometryData : public BaseData
 {
 public:
-  mitkClassMacro(GeometryData, Geometry2DData);
+  mitkClassMacro(GeometryData, BaseData);
 
   itkNewMacro(Self);
 

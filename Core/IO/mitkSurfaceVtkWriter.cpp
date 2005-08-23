@@ -17,10 +17,10 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 #include "mitkSurfaceVtkWriter.h"
+#include "mitkSurfaceVtkWriter.txx"
 
 #include <vtkSTLWriter.h>
 #include <vtkPolyDataWriter.h>
-
 
 template<>
 void mitk::SurfaceVtkWriter<vtkSTLWriter>::SetDefaultExtension()
@@ -33,3 +33,7 @@ void mitk::SurfaceVtkWriter<vtkPolyDataWriter>::SetDefaultExtension()
 {
   m_Extension = ".vtk";
 }
+
+template mitk::SurfaceVtkWriter<vtkSTLWriter>;
+
+template mitk::SurfaceVtkWriter<vtkPolyDataWriter>;

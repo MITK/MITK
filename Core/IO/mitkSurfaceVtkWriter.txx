@@ -64,7 +64,7 @@ void mitk::SurfaceVtkWriter<VTKWRITER>::GenerateData()
       ::itk::OStringStream filename;
       if(input->GetTimeSlicedGeometry()->IsValidTime(t))
       {
-        const mitk::TimeBounds& timebounds = input->GetTimeSlicedGeometry()->GetGeometry3D(t)->GetTimeBoundsInMS();
+        const mitk::TimeBounds& timebounds = input->GetTimeSlicedGeometry()->GetGeometry3D(t)->GetTimeBounds();
         filename <<  m_FileName.c_str() << "_S" << std::setprecision(0) << timebounds[0] << "_E" << std::setprecision(0) << timebounds[1] << "_T" << t << m_Extension;
       }
       else

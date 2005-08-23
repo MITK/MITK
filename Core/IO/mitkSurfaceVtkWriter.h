@@ -153,8 +153,6 @@ protected:
     VtkWriterType* m_VtkWriter;
 };
 
-#include "mitkSurfaceVtkWriter.txx"
-
 }
 
 #endif //_MITK_SURFACE_VTK_WRITER__H_

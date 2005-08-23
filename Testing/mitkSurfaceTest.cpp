@@ -162,8 +162,8 @@ int mitkSurfaceTest(int argc, char* argv[])
     std::cout<<"[PASSED]"<<std::endl;
   }
   
-  std::cout << "Testing correctness of geometry for surface->GetUpdatedGeometry(): ";
-  const mitk::TimeSlicedGeometry* inputTimeGeometry = dynamic_cast< const mitk::TimeSlicedGeometry* >( surface->GetUpdatedGeometry() );
+  std::cout << "Testing correctness of geometry for surface->GetUpdatedTimeSlicedGeometry(): ";
+  const mitk::TimeSlicedGeometry* inputTimeGeometry = surface->GetUpdatedTimeSlicedGeometry();
 
   int time = 3;
   int timestep=0;
@@ -192,7 +192,7 @@ int mitkSurfaceTest(int argc, char* argv[])
   sphereSource->Update();
   surface->SetVtkPolyData( sphereSource->GetOutput(), 3 );
   
-  inputTimeGeometry = dynamic_cast< const mitk::TimeSlicedGeometry* >( surface->GetUpdatedGeometry() );
+  inputTimeGeometry = surface->GetUpdatedTimeSlicedGeometry();
   time = 3;
   timestep=0;
   timestep = inputTimeGeometry->MSToTimeStep( time );

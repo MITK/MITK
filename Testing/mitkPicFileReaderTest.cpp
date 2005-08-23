@@ -73,7 +73,7 @@ int mitkPicFileReaderTest(int argc, char* argv[])
 
   std::cout << "Testing type of geometry (TimeSlicedGeometry expected): ";
   mitk::TimeSlicedGeometry* timegeometry;
-  timegeometry = dynamic_cast<mitk::TimeSlicedGeometry*>(reader->GetOutput()->GetGeometry());
+  timegeometry = reader->GetOutput()->GetTimeSlicedGeometry();
   if(timegeometry==NULL)
   {
     std::cout<<"[FAILED]"<<std::endl;
@@ -167,8 +167,8 @@ int mitkPicFileReaderTest(int argc, char* argv[])
   if(picheader->dim==4)
   {
     std::cout << "4D dataset: Testing that timebounds are not infinite: ";
-    if((slicedgeometry->GetTimeBoundsInMS()[0] == -mitk::ScalarTypeNumericTraits::max()) && 
-       (slicedgeometry->GetTimeBoundsInMS()[1] ==  mitk::ScalarTypeNumericTraits::max())
+    if((slicedgeometry->GetTimeBounds()[0] == -mitk::ScalarTypeNumericTraits::max()) && 
+       (slicedgeometry->GetTimeBounds()[1] ==  mitk::ScalarTypeNumericTraits::max())
       )
     {
       std::cout<<"[FAILED]"<<std::endl;

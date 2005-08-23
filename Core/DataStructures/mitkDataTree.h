@@ -118,7 +118,7 @@ public:
   //## and is set to @a false, the node is ignored for the time-bounds calculation.
   //## @param renderer see @a boolPropertyKey
   //## @param boolPropertyKey2 a second condition that is applied additionally to @a boolPropertyKey
-  static TimeBounds mitk::DataTree::ComputeTimeBoundsInMS(mitk::DataTreeIteratorBase* it, const char* boolPropertyKey, mitk::BaseRenderer* renderer, const char* boolPropertyKey2);
+  static TimeBounds mitk::DataTree::ComputeTimeBounds(mitk::DataTreeIteratorBase* it, const char* boolPropertyKey, mitk::BaseRenderer* renderer, const char* boolPropertyKey2);
 
   //##Documentation
   //## @brief Compute the time-bounds of all visible parts of the data tree structure, for general 
@@ -126,14 +126,14 @@ public:
   //##
   //## The methods returns only [-infinity, +infinity], if all data-objects have an infinite live-span. Otherwise,
   //## all data-objects with infinite live-span are ignored.
-  //## Simply calls ComputeTimeBoundsInMS(it, "visible", renderer, boolPropertyKey).
+  //## Simply calls ComputeTimeBounds(it, "visible", renderer, boolPropertyKey).
   //## @param it an iterator to a data tree structure
   //## @param boolPropertyKey if a BoolProperty with this boolPropertyKey exists for a node (for @a renderer) 
   //## and is set to @a false, the node is ignored for the time-bounds calculation.
   //## @param renderer see @a boolPropertyKey
-  static TimeBounds mitk::DataTree::ComputeTimeBoundsInMS(mitk::DataTreeIteratorBase* it, mitk::BaseRenderer* renderer, const char* boolPropertyKey)
+  static TimeBounds mitk::DataTree::ComputeTimeBounds(mitk::DataTreeIteratorBase* it, mitk::BaseRenderer* renderer, const char* boolPropertyKey)
   {
-    return ComputeTimeBoundsInMS(it, "visible", renderer, boolPropertyKey);
+    return ComputeTimeBounds(it, "visible", renderer, boolPropertyKey);
   }
 
   //## 

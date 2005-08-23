@@ -179,7 +179,7 @@ void mitk::SliceNavigationController::Update()
       m_Time->SetPos(0);
       m_BlockUpdate = false;
 
-      slicedWorldGeometry->SetTimeBoundsInMS(worldTimeSlicedGeometry->GetGeometry3D(0)->GetTimeBoundsInMS());
+      slicedWorldGeometry->SetTimeBounds(worldTimeSlicedGeometry->GetGeometry3D(0)->GetTimeBounds());
       //@todo implement for non-evenly-timed geometry!
       m_CreatedWorldGeometry->InitializeEvenlyTimed(slicedWorldGeometry, worldTimeSlicedGeometry->GetTimeSteps());
     }

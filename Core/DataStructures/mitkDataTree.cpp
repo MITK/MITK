@@ -100,19 +100,21 @@ mitk::BoundingBox::Pointer mitk::DataTree::ComputeBoundingBox(mitk::DataTreeIter
   while (!_it->IsAtEnd())
   {
     mitk::DataTreeNode::Pointer node = _it->Get();
-    assert(node.IsNotNull());
-    if (node->GetData() != NULL && node->GetData()->GetUpdatedGeometry() != NULL && node->IsOn(boolPropertyKey, renderer) && node->IsOn(boolPropertyKey2, renderer)) 
+    if((node.IsNotNull()) && (node->GetData() != NULL) && node->IsOn(boolPropertyKey, renderer) && node->IsOn(boolPropertyKey2, renderer))
     {
-      const Geometry3D* geometry = node->GetData()->GetUpdatedGeometry();
-      unsigned char i;
-      for(i=0; i<8; ++i)
+      const Geometry3D* geometry = node->GetData()->GetUpdatedTimeSlicedGeometry();
+      if (geometry != NULL ) 
       {
-        point = geometry->GetCornerPoint(i);
-        if(point[0]*point[0]+point[1]*point[1]+point[2]*point[2] < mitk::large)
-          pointscontainer->InsertElement( pointid++, point);
-        else
+        unsigned char i;
+        for(i=0; i<8; ++i)
         {
-          itkGenericOutputMacro( << "Unrealistically distant corner point encountered. Ignored. Node: " << node );
+          point = geometry->GetCornerPoint(i);
+          if(point[0]*point[0]+point[1]*point[1]+point[2]*point[2] < mitk::large)
+            pointscontainer->InsertElement( pointid++, point);
+          else
+          {
+            itkGenericOutputMacro( << "Unrealistically distant corner point encountered. Ignored. Node: " << node );
+          }
         }
       }
     }
@@ -126,9 +128,9 @@ mitk::BoundingBox::Pointer mitk::DataTree::ComputeBoundingBox(mitk::DataTreeIter
   return result;
 }
 
-mitk::TimeBounds mitk::DataTree::ComputeTimeBoundsInMS(mitk::DataTreeIteratorBase* it, const char* boolPropertyKey, mitk::BaseRenderer* renderer, const char* boolPropertyKey2)
+mitk::TimeBounds mitk::DataTree::ComputeTimeBounds(mitk::DataTreeIteratorBase* it, const char* boolPropertyKey, mitk::BaseRenderer* renderer, const char* boolPropertyKey2)
 {
-  TimeBounds timebounds;
+  TimeBounds timeBounds;
 
   mitk::DataTreeIteratorClone _it=it;
 
@@ -137,35 +139,38 @@ mitk::TimeBounds mitk::DataTree::ComputeTimeBoundsInMS(mitk::DataTreeIteratorBas
   stmin=-ScalarTypeNumericTraits::max();
   stmax= ScalarTypeNumericTraits::max();
 
-  timebounds[0]=stmax; timebounds[1]=stmin;
+  timeBounds[0]=stmax; timeBounds[1]=stmin;
 
   while (!_it->IsAtEnd())
   {
     mitk::DataTreeNode::Pointer node = _it->Get();
-    if (node->GetData() != NULL && node->GetData()->GetUpdatedGeometry() != NULL && node->IsOn(boolPropertyKey, renderer) && node->IsOn(boolPropertyKey2, renderer))
+    if((node.IsNotNull()) && (node->GetData() != NULL) && node->IsOn(boolPropertyKey, renderer) && node->IsOn(boolPropertyKey2, renderer) && node->IsOn(boolPropertyKey2, renderer))
     {
-      mitk::Geometry3D::ConstPointer geometry = node->GetData()->GetGeometry();
+      const Geometry3D* geometry = node->GetData()->GetUpdatedTimeSlicedGeometry();
+      if (geometry != NULL ) 
+      {
+        const TimeBounds & curTimeBounds = geometry->GetTimeBounds();
+        cur=curTimeBounds[0];
+        //is it after -infinity, but before everything else that we found until now?
+        if((cur > stmin) && (cur < timeBounds[0]))
+          timeBounds[0] = cur;
 
-      cur=geometry->GetTimeBoundsInMS()[0];
-      //is it after -infinity, but before everything else that we found until now?
-      if((cur>stmin) && (cur<timebounds[0]))
-        timebounds[0] = cur;
-
-      cur=geometry->GetTimeBoundsInMS()[1];
-      //is it before infinity, but after everything else that we found until now?
-      if((cur<stmax) && (cur>timebounds[1]))
-        timebounds[1] = cur;
+        cur=curTimeBounds[1];
+        //is it before infinity, but after everything else that we found until now?
+        if((cur < stmax) && (cur > timeBounds[1]))
+          timeBounds[1] = cur;
+      }
     }
     ++_it;
   }
 
-  if(!(timebounds[0]<stmax))
+  if(!(timeBounds[0]<stmax))
   {
-    timebounds[0] = stmin;
-    timebounds[1] = stmax;
+    timeBounds[0] = stmin;
+    timeBounds[1] = stmax;
   }
 
-  return timebounds;
+  return timeBounds;
 }
 
 bool mitk::DataTree::Load( const mitk::DataTreeIteratorBase* it, const char* filename )

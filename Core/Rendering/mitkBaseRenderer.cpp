@@ -46,8 +46,16 @@ template class itk::SmartPointerForwardReference<mitk::CameraController>;
 //##ModelId=3E3D2F120050
 mitk::BaseRenderer::BaseRenderer( const char* name ) : 
   m_MapperID(defaultMapper), m_DataTreeIterator(NULL), m_RenderWindow(NULL), m_LastUpdateTime(0), m_CameraController(NULL), m_Focused(false), 
-  m_WorldGeometry(NULL), m_TimeSlicedWorldGeometry(NULL), m_CurrentWorldGeometry2D(NULL), m_Slice(0), m_TimeStep(0), m_Name(name)
+  m_WorldGeometry(NULL), m_TimeSlicedWorldGeometry(NULL), m_CurrentWorldGeometry2D(NULL), m_Slice(0), m_TimeStep(0)
 {
+  if(name != NULL)
+    m_Name = name;
+  else
+  {
+    m_Name = "unnamed renderer";
+    itkWarningMacro(<< "Created unnamed renderer. Bad for serialization. Please choose a name.");
+  }
+
   m_Size[0] = 0;
   m_Size[1] = 0;
 
@@ -308,7 +316,7 @@ void mitk::BaseRenderer::MousePressEvent(mitk::MouseEvent *me)
     Point2D p_mm;
     Point3D position;
     GetDisplayGeometry()->ULDisplayToDisplay(p,p);
-    GetDisplayGeometry()->DisplayToMM(p, p_mm);
+    GetDisplayGeometry()->DisplayToWorld(p, p_mm);
     GetDisplayGeometry()->Map(p_mm, position);
     mitk::PositionEvent event(this, me->GetType(), me->GetButton(), me->GetButtonState(), mitk::Key_unknown, p, position);
     mitk::EventMapper::MapEvent(&event);
@@ -338,7 +346,7 @@ void mitk::BaseRenderer::MouseReleaseEvent(mitk::MouseEvent *me)
     Point2D p_mm;
     Point3D position;
     GetDisplayGeometry()->ULDisplayToDisplay(p,p);
-    GetDisplayGeometry()->DisplayToMM(p, p_mm);
+    GetDisplayGeometry()->DisplayToWorld(p, p_mm);
     GetDisplayGeometry()->Map(p_mm, position);
     mitk::PositionEvent event(this, me->GetType(), me->GetButton(), me->GetButtonState(), mitk::Key_unknown, p, position);
     mitk::EventMapper::MapEvent(&event);
@@ -366,7 +374,7 @@ void mitk::BaseRenderer::MouseMoveEvent(mitk::MouseEvent *me)
     Point2D p_mm;
     Point3D position;
     GetDisplayGeometry()->ULDisplayToDisplay(p,p);
-    GetDisplayGeometry()->DisplayToMM(p, p_mm);
+    GetDisplayGeometry()->DisplayToWorld(p, p_mm);
     GetDisplayGeometry()->Map(p_mm, position);
     mitk::PositionEvent event(this, me->GetType(), me->GetButton(), me->GetButtonState(), mitk::Key_unknown, p, position);
     mitk::EventMapper::MapEvent(&event);
@@ -383,7 +391,7 @@ void mitk::BaseRenderer::MouseMoveEvent(mitk::MouseEvent *me)
 void mitk::BaseRenderer::PickWorldPoint(const mitk::Point2D& displayPoint, mitk::Point3D& worldPoint) const
 {
   mitk::Point2D worldPoint2D;
-  GetDisplayGeometry()->DisplayToMM(displayPoint, worldPoint2D);
+  GetDisplayGeometry()->DisplayToWorld(displayPoint, worldPoint2D);
   GetDisplayGeometry()->Map(worldPoint2D, worldPoint);
 }
 

@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkAffineInteractor.h"
 #include "mitkInteractionConst.h"
-#include <mitkDataTreeNode.h>
+#include "mitkDataTreeNode.h"
 #include "mitkGeometry3D.h"
 #include "mitkRotationOperation.h"
 #include "mitkPointOperation.h"
@@ -63,10 +63,31 @@ bool mitk::AffineInteractor::ExecuteAction(Action* action, mitk::StateEvent cons
 {
   bool ok = false;
 
-  mitk::Geometry3D* geometry = GetGeometry();
-
-  if (geometry == NULL)
+  TimeSlicedGeometry* inputtimegeometry = GetData()->GetTimeSlicedGeometry();
+  if (inputtimegeometry == NULL)
     return false;
+
+  int timestep=0;
+  mitk::BaseRenderer* renderer = stateEvent->GetEvent()->GetSender();
+  if(renderer!=NULL)
+  {
+    const Geometry2D* worldgeometry = renderer->GetCurrentWorldGeometry2D();
+    assert(worldgeometry!=NULL);
+
+    if(worldgeometry->IsValid()==false)
+      return false;
+
+    int timestep=0;
+    ScalarType time = worldgeometry->GetTimeBounds()[0];
+    if(time>-ScalarTypeNumericTraits::max())
+      timestep = inputtimegeometry->MSToTimeStep(time);
+
+    if(inputtimegeometry->IsValidTime(timestep)==false)
+      return false;
+  }
+
+  Geometry3D* geometry = inputtimegeometry->GetGeometry3D(timestep);
+
   /* Position events - 3D coordinates from a 2D window */
   mitk::PositionEvent const  *posEvent = dynamic_cast <const mitk::PositionEvent *> (stateEvent->GetEvent());
   /* Display  events - 2D coordinates from a 3D window */
@@ -262,9 +283,9 @@ bool mitk::AffineInteractor::ExecuteAction(Action* action, mitk::StateEvent cons
       mitk::Vector3D v = p - m_LastMousePosition;    
       /* calculate scale changes */
       mitk::Point3D newScale;
-      newScale[0] = (geometry->GetXAxis() * v) / geometry->GetXAxis().GetNorm();  // Scalarprodukt of normalized Axis
-      newScale[1] = (geometry->GetYAxis() * v) / geometry->GetYAxis().GetNorm();  // and direction vector of mouse movement
-      newScale[2] = (geometry->GetZAxis() * v) / geometry->GetZAxis().GetNorm();  // is the length of the movement vectors
+      newScale[0] = (geometry->GetAxisVector(0) * v) / geometry->GetExtentInMM(0);  // Scalarprodukt of normalized Axis
+      newScale[1] = (geometry->GetAxisVector(1) * v) / geometry->GetExtentInMM(1);  // and direction vector of mouse movement
+      newScale[2] = (geometry->GetAxisVector(2) * v) / geometry->GetExtentInMM(2);  // is the length of the movement vectors
       // projection onto the axis
       /* convert movement to local object coordinate system and mirror it to the positive quadrant */
       Vector3D start;
@@ -319,6 +340,9 @@ bool mitk::AffineInteractor::ExecuteAction(Action* action, mitk::StateEvent cons
 
 bool mitk::AffineInteractor::CheckSelected(const mitk::Point3D& worldPoint)
 {
+  // \todo consider time! Replace GetTimeSlicedGeometry by GetGeometry(time of stateEvent)
+  const Geometry3D* geometry = GetData()->GetUpdatedTimeSlicedGeometry();
+
   bool selected = false;
   if (m_DataTreeNode->GetBoolProperty("selected", selected) == false)        // if property does not exist
     m_DataTreeNode->SetProperty("selected", new mitk::BoolProperty(false));  // create it
@@ -331,11 +355,10 @@ bool mitk::AffineInteractor::CheckSelected(const mitk::Point3D& worldPoint)
   }
   else    // use the data objects bounding box to determine if hit
   {
-    m_DataTreeNode->GetData()->UpdateOutputInformation(); // update bounding box @TODO: Is this neccessary?
-    BoundingBox* box = const_cast <BoundingBox*> (GetGeometry()->GetBoundingBox());
+    const BoundingBox* box = geometry->GetBoundingBox();
     ScalarType p[4];
     itk2vtk(worldPoint, p); p[3] = 1;
-    GetGeometry()->GetVtkTransform()->GetInverse()->TransformPoint(p, p);
+    geometry->GetVtkTransform()->GetInverse()->TransformPoint(p, p);
 
     Point3D point;
     point[0] = p[0]/p[3];

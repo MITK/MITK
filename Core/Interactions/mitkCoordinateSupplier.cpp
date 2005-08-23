@@ -34,6 +34,7 @@ PURPOSE.  See the above copyright notices for more information.
 mitk::CoordinateSupplier::CoordinateSupplier(const char * type, mitk::OperationActor* operationActor)
 : mitk::StateMachine(type), m_Destination(operationActor)
 {
+  m_CurrentPoint.Fill(0);
 }
 
 //##ModelId=3F0189F00269
@@ -50,7 +51,7 @@ bool mitk::CoordinateSupplier::ExecuteAction(Action* action, mitk::StateEvent co
       {
         const Geometry2D* worldGeometry = stateEvent->GetEvent()->GetSender()->GetCurrentWorldGeometry2D();
         assert( worldGeometry != NULL );
-        timeInMS = worldGeometry->GetTimeBoundsInMS()[ 0 ];
+        timeInMS = worldGeometry->GetTimeBounds()[ 0 ];
       }
       else
       {

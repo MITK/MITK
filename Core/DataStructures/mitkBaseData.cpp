@@ -114,7 +114,7 @@ void mitk::BaseData::UnRegister() const
     if((m_Unregistering==false) && (m_SmartSourcePointer.IsNotNull()))
     {
       m_Unregistering=true;
-      if((GetSource==NULL) || (m_SmartSourcePointer->GetExternalReferenceCount()==0))
+      if((this->GetSource()==NULL) || (this->m_SmartSourcePointer->GetExternalReferenceCount()==0))
         m_SmartSourcePointer=NULL; // now the reference count is zero and this object has been destroyed; thus nothing may be done after this line!!
       else
         m_Unregistering=false;

@@ -81,7 +81,7 @@ public:
   //## @brief Get the transformation applied prior to displaying the data as
   //## a vtkTransform
   //## \deprecated use GetData()->GetGeometry()->GetVtkTransform() instead
-  vtkLinearTransform* GetVtkTransform() const;
+  vtkLinearTransform* GetVtkTransform(int t=0) const;
   //##Documentation
   //## @brief Get the Interactor 
   Interactor::Pointer GetInteractor() const;

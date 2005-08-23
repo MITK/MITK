@@ -78,6 +78,8 @@ void mitk::DataTreeNode::SetData(mitk::BaseData* baseData)
 void mitk::DataTreeNode::SetInteractor(mitk::Interactor* interactor)
 {
   m_Interactor = interactor;
+  if(m_Interactor.IsNotNull())
+  m_Interactor->SetDataTreeNode(this);
 }
 
 //##ModelId=3E33F5D702AA
@@ -370,27 +372,16 @@ void mitk::DataTreeNode::SetProperty(const char *propertyKey,
 }
 
 //##ModelId=3ED91D050121
-vtkLinearTransform* mitk::DataTreeNode::GetVtkTransform() const
+vtkLinearTransform* mitk::DataTreeNode::GetVtkTransform(int t) const
 {
   assert(m_Data.IsNotNull());
 
-  mitk::Geometry3D* geometry = m_Data->GetGeometry();
+  mitk::Geometry3D* geometry = m_Data->GetGeometry(t);
 
-  assert(m_Data->GetGeometry()!=NULL);
+  if(geometry == NULL)
+    return NULL;
 
-  mitk::TimeSlicedGeometry* timeSlicedGeometry = dynamic_cast<mitk::TimeSlicedGeometry*>( geometry );
-
-  if ( timeSlicedGeometry ) 
-  {
-    Geometry3D* geometry = timeSlicedGeometry->GetGeometry3D( 0 );
-
-    if( geometry )
-      return geometry->GetVtkTransform();
-    else
-      m_Data->GetGeometry()->GetVtkTransform();
-  }
-
-  return m_Data->GetGeometry()->GetVtkTransform();
+  return geometry->GetVtkTransform();
 }
 
 unsigned long mitk::DataTreeNode::GetMTime() const
@@ -401,9 +392,12 @@ unsigned long mitk::DataTreeNode::GetMTime() const
     if((time < m_Data->GetMTime()) ||
       ((m_Data->GetSource() != NULL) && (time < m_Data->GetSource()->GetMTime()))
     )
+    {
 		  Modified();
+      return Superclass::GetMTime();
+    }
 	}
-  return Superclass::GetMTime();
+  return time;
 }
 
 bool mitk::DataTreeNode::WriteXMLData( XMLWriter& xmlWriter ) 

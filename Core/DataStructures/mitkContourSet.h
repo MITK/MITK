@@ -26,92 +26,90 @@ PURPOSE.  See the above copyright notices for more information.
 #include  <map>
 
 namespace mitk 
-  {
+{
+
+/**
+* This class holds stores vertices for drawing a contour 
+*
+*/
+class ContourSet : public BaseData
+{
+public:
+  mitkClassMacro(ContourSet, BaseData);
+
+  itkNewMacro(Self);
+
+  typedef std::map<unsigned long,Contour::Pointer>              ContourVectorType;
+  typedef ContourVectorType::iterator                           ContourIterator;
+  typedef itk::BoundingBox<unsigned long, 3, ScalarType>        BoundingBoxType;
 
   /**
-   * This class holds stores vertices for drawing a contour 
-   *
-   */
-  class ContourSet : public BaseData
-    {
-    public:
-      mitkClassMacro(ContourSet, BaseData);
+  * clean up the contour data
+  */
+  void Initialize();
 
-      itkNewMacro(Self);
+  /** 
+  * add a contour
+  */
+  void AddContour(unsigned int index, mitk::Contour::Pointer contour);
 
-      typedef std::map<unsigned long,Contour::Pointer>                                 ContourVectorType;
-      typedef ContourVectorType::iterator                           ContourIterator;
-      typedef itk::BoundingBox<unsigned long, 3, ScalarType>        BoundingBoxType;
+  /** 
+  * add a contour
+  */
+  void RemoveContour(unsigned long index);
 
-      /**
-      * clean up the contour data
-      */
-      void Initialize();
+  /**
+  * returns the number of points stored in the contour
+  */
+  unsigned int GetNumberOfContours();
 
-      /** 
-       * add a contour
-       */
-      void AddContour(unsigned int index, mitk::Contour::Pointer contour);
+  /**
+  * returns the container of the contour points
+  */
+  ContourVectorType GetContours();
 
-      /** 
-       * add a contour
-       */
-      void RemoveContour(unsigned long index);
+  /**
+  * intherited from parent
+  */
+  virtual void UpdateOutputInformation();
 
-      /**
-       * returns the number of points stored in the contour
-       */
-      unsigned int GetNumberOfContours();
+  /**
+  * intherited from parent
+  */
+  virtual void SetRequestedRegionToLargestPossibleRegion();
 
-      /**
-       * returns the container of the contour points
-       */
-      ContourVectorType GetContours();
+  /**
+  * intherited from parent
+  */
+  virtual bool RequestedRegionIsOutsideOfTheBufferedRegion();
 
-          /**
-       * intherited from parent
-       */
-      virtual void UpdateOutputInformation();
+  /**
+  * intherited from parent
+  */
+  virtual bool VerifyRequestedRegion();
 
-      /**
-       * intherited from parent
-       */
-      virtual void SetRequestedRegionToLargestPossibleRegion();
+  /**
+  * intherited from parent
+  */
+  virtual void SetRequestedRegion(itk::DataObject *data);
 
-      /**
-       * intherited from parent
-       */
-      virtual bool RequestedRegionIsOutsideOfTheBufferedRegion();
+protected:
+  ContourSet();
+  virtual ~ContourSet();
 
-      /**
-       * intherited from parent
-       */
-      virtual bool VerifyRequestedRegion();
+private:
 
-      /**
-       * intherited from parent
-       */
-      virtual void SetRequestedRegion(itk::DataObject *data);
+  /**
+  * the bounding box of the contour
+  */
+  BoundingBoxType::Pointer m_BoundingBox;
 
-    protected:
-      ContourSet();
-      virtual ~ContourSet();
+  ContourVectorType m_ContourVector;
 
-    private:
+  unsigned int m_NumberOfContours;
 
-      /**
-       * the bounding box of the contour
-       */
-      BoundingBoxType::Pointer m_BoundingBox;
+};
 
-      ContourVectorType m_ContourVector;
-
-      unsigned int m_NumberOfContours;
-
-    };
-
-  } // namespace mitk
-
-
+} // namespace mitk
 
 #endif //_MITK_CONTOUR_SET_H_

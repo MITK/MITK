@@ -20,14 +20,15 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkContourSet.h"
 
 mitk::ContourSet::ContourSet() :
-m_ContourVector( ContourVectorType() ),
-m_NumberOfContours (0)
+  m_ContourVector( ContourVectorType() ),
+  m_NumberOfContours (0)
 {
-  m_Geometry3D->Initialize();
+  GetTimeSlicedGeometry()->Initialize(1);
 }
 
 mitk::ContourSet::~ContourSet()
-{}
+{
+}
 
 void mitk::ContourSet::AddContour(unsigned int index, mitk::Contour::Pointer contour)
 {
@@ -40,30 +41,48 @@ void mitk::ContourSet::RemoveContour(unsigned long index)
   m_ContourVector.erase( index );
 }
 
-
 void mitk::ContourSet::UpdateOutputInformation()
 {
-  float mitkBounds[6];
-  if (true || m_ContourVector.size() == 0)  {
-    mitkBounds[0] = 0.0;
-    mitkBounds[1] = 0.0;
-    mitkBounds[2] = 0.0;
-    mitkBounds[3] = 0.0;
-    mitkBounds[4] = 0.0;
-    mitkBounds[5] = 0.0;
-  }
-  else
+  mitk::ContourSet::ContourVectorType contourVec = GetContours();
+  mitk::ContourSet::ContourIterator contoursIterator = contourVec.begin();
+  mitk::ContourSet::ContourIterator contoursIteratorEnd = contourVec.end();
+
+  // initialize container
+  mitk::BoundingBox::PointsContainer::Pointer pointscontainer=mitk::BoundingBox::PointsContainer::New();
+
+  mitk::BoundingBox::PointIdentifier pointid=0;
+  mitk::Point3D point;
+
+  mitk::AffineTransform3D* transform = GetTimeSlicedGeometry()->GetIndexToWorldTransform();
+
+  // calculate a bounding box that includes all contours
+  // \todo probably we should do this additionally for each time-step
+  while (contoursIterator != contoursIteratorEnd)
   {
-    //m_BoundingBox->ComputeBoundingBox();
-    //BoundingBoxType::BoundsArrayType tmp = m_BoundingBox->GetBounds();
-    //mitkBounds[0] = tmp[0];
-    //mitkBounds[1] = tmp[1];
-    //mitkBounds[2] = tmp[2];
-    //mitkBounds[3] = tmp[3];
-    //mitkBounds[4] = tmp[4];
-    //mitkBounds[5] = tmp[5];
+    const Geometry3D* geometry = (*contoursIterator).second->GetUpdatedTimeSlicedGeometry();
+    unsigned char i;
+    for(i=0; i<8; ++i)
+    {
+      point = transform->BackTransformPoint(geometry->GetCornerPoint(i));
+      if(point[0]*point[0]+point[1]*point[1]+point[2]*point[2] < mitk::large)
+        pointscontainer->InsertElement( pointid++, point);
+      else
+      {
+        itkGenericOutputMacro( << "Unrealistically distant corner point encountered. Ignored. BoundingObject: " << (*contoursIterator).second );
+      }
+    }
+    ++contoursIterator;
   }
-  m_Geometry3D->SetBounds(mitkBounds);
+
+  mitk::BoundingBox::Pointer boundingBox = mitk::BoundingBox::New();
+  boundingBox->SetPoints(pointscontainer);
+  boundingBox->ComputeBoundingBox();
+
+  Geometry3D* geometry3d = GetGeometry(0);
+  geometry3d->SetIndexToWorldTransform(transform);
+  geometry3d->SetBounds(boundingBox->GetBounds());
+
+  GetTimeSlicedGeometry()->InitializeEvenlyTimed(geometry3d, GetTimeSlicedGeometry()->GetTimeSteps());
 }
 
 void mitk::ContourSet::SetRequestedRegionToLargestPossibleRegion()
@@ -84,22 +103,19 @@ void mitk::ContourSet::SetRequestedRegion(itk::DataObject*)
 {
 }
 
-void
-mitk::ContourSet::Initialize()
+void mitk::ContourSet::Initialize()
 {
   m_ContourVector = ContourVectorType();
-  m_Geometry3D->Initialize();
+  GetTimeSlicedGeometry()->Initialize(1);
 }
 
 
-unsigned int 
-mitk::ContourSet::GetNumberOfContours()
+unsigned int mitk::ContourSet::GetNumberOfContours()
 {
   return m_ContourVector.size();
 }
 
-mitk::ContourSet::ContourVectorType
-mitk::ContourSet::GetContours()
+mitk::ContourSet::ContourVectorType mitk::ContourSet::GetContours()
 {
   return m_ContourVector;
 }

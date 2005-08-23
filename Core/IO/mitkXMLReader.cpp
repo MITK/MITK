@@ -199,7 +199,6 @@ namespace mitk {
     if ( !GetAttribute( name, string ) )
       return false;
 
-    const char* test = string.c_str();
     int e1 = string.find(",");
     int e2 = string.find(",", e1 + 1);
     int e3 = string.length();

@@ -27,11 +27,11 @@ namespace mitk {
 //##Documentation
 //## @brief group object, that contains several mitk::BoundingObjects
 //## calculates a bounding box that contains all sub-bounding boxes
-//## @ingroup Data  
+//## @ingroup Data
 class BoundingObjectGroup : public mitk::BoundingObject
 {
 public:
-  typedef itk::VectorContainer<unsigned int ,mitk::BoundingObject::Pointer> BoundingObjectContainer;
+  typedef itk::VectorContainer<unsigned int, mitk::BoundingObject::Pointer> BoundingObjectContainer;
 
   enum CSGMode
    {
@@ -40,12 +40,10 @@ public:
       Difference
    };
 
-
   mitkClassMacro(BoundingObjectGroup, mitk::BoundingObject);// itk::VectorContainer<unsigned int ,mitk::BoundingObject::Pointer>);  
   itkNewMacro(Self);
 
   virtual void UpdateOutputInformation();
-  virtual bool VerifyRequestedRegion();
   virtual bool IsInside(const mitk::Point3D& p) const;
 
   itkSetObjectMacro(BoundingObjects, mitk::BoundingObjectGroup::BoundingObjectContainer);

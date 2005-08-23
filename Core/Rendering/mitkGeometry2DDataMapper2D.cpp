@@ -84,8 +84,8 @@ void mitk::Geometry2DDataMapper2D::Paint(mitk::BaseRenderer * renderer)
       if(intersecting)
       {
         //convert intersection points (until now mm) to display coordinates (units )
-        displayGeometry->MMToDisplay(lineFrom, lineFrom);
-        displayGeometry->MMToDisplay(lineTo, lineTo);
+        displayGeometry->WorldToDisplay(lineFrom, lineFrom);
+        displayGeometry->WorldToDisplay(lineTo, lineTo);
         
         //convert display coordinates ( (0,0) is top-left ) in GL coordinates ( (0,0) is bottom-left )
         //                float toGL=//displayGeometry->GetDisplayHeight(); displayGeometry->GetCurrentWorldGeometry2D()->GetHeightInUnits();

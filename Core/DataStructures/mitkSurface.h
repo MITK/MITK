@@ -70,18 +70,6 @@ public:
   virtual void Update();
   
   virtual void Resize( unsigned int timeSteps );
-  
-  virtual void SetGeometry(Geometry3D* aGeometry3D);
-
-  mitk::TimeSlicedGeometry* GetTimeSlicedGeometry()
-  {
-    return dynamic_cast<mitk::TimeSlicedGeometry*>( m_Geometry3D.GetPointer() );
-  }
-
-  const mitk::TimeSlicedGeometry* GetTimeSlicedGeometry() const
-  {
-    return dynamic_cast<mitk::TimeSlicedGeometry*>( m_Geometry3D.GetPointer() );
-  }
 
   const RegionType& GetLargestPossibleRegion() const
   {

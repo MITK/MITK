@@ -82,7 +82,7 @@ void mitk::SurfaceMapper2D::Paint(mitk::BaseRenderer * renderer)
   //
   // get the TimeSlicedGeometry of the input object
   //
-  const TimeSlicedGeometry* inputTimeGeometry = dynamic_cast< const TimeSlicedGeometry* >( input->GetUpdatedGeometry() );
+  const TimeSlicedGeometry* inputTimeGeometry = input->GetTimeSlicedGeometry();
   if(( inputTimeGeometry == NULL ) || ( inputTimeGeometry->GetTimeSteps() == 0 ) )
     return;
 
@@ -102,7 +102,7 @@ void mitk::SurfaceMapper2D::Paint(mitk::BaseRenderer * renderer)
   //
   Geometry2D::ConstPointer worldGeometry = renderer->GetCurrentWorldGeometry2D();
   assert( worldGeometry.IsNotNull() );
-  ScalarType time = worldGeometry->GetTimeBoundsInMS()[ 0 ];
+  ScalarType time = worldGeometry->GetTimeBounds()[ 0 ];
 
   //
   // convert the world time to time steps of the input object
@@ -226,7 +226,7 @@ void mitk::SurfaceMapper2D::PaintCells(vtkPolyData* contour, const mitk::Geometr
     worldGeometry->Map(p, p2d);
 
     //convert point (until now mm and in worldcoordinates) to display coordinates (units )
-    displayGeometry->MMToDisplay(p2d, p2d);
+    displayGeometry->WorldToDisplay(p2d, p2d);
     first=last=p2d;
 
     int j;
@@ -241,7 +241,7 @@ void mitk::SurfaceMapper2D::PaintCells(vtkPolyData* contour, const mitk::Geometr
       worldGeometry->Map(p, p2d);
 
       //convert point (until now mm and in worldcoordinates) to display coordinates (units )
-      displayGeometry->MMToDisplay(p2d, p2d);
+      displayGeometry->WorldToDisplay(p2d, p2d);
 
       glLineWidth( m_LineWidth );
 

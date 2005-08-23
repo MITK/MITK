@@ -107,7 +107,7 @@ void mitk::MeshMapper2D::Paint(mitk::BaseRenderer * renderer)
       {
         Point2D pt2d, tmp;
         displayGeometry->Map(projected_p, pt2d);
-        displayGeometry->MMToDisplay(pt2d, pt2d);
+        displayGeometry->WorldToDisplay(pt2d, pt2d);
 
         Vector2D horz,vert;
         horz[0]=5; horz[1]=0;
@@ -257,7 +257,7 @@ void mitk::MeshMapper2D::Paint(mitk::BaseRenderer * renderer)
           {
             Point2D pt2d, tmp;
             displayGeometry->Map(projected_p, pt2d);
-            displayGeometry->MMToDisplay(pt2d, pt2d);
+            displayGeometry->WorldToDisplay(pt2d, pt2d);
 
             if (lastPoint == NULL)
             {
@@ -366,7 +366,7 @@ void mitk::MeshMapper2D::Paint(mitk::BaseRenderer * renderer)
               vtk2itk(vtkp,p);
               displayGeometry->Project(p, projected_p);
               displayGeometry->Map(projected_p, min2D);
-              displayGeometry->MMToDisplay(min2D, min2D);
+              displayGeometry->WorldToDisplay(min2D, min2D);
 
               itk2vtk(max, vtkp);
               transform->TransformPoint(vtkp, vtkp);
@@ -376,7 +376,7 @@ void mitk::MeshMapper2D::Paint(mitk::BaseRenderer * renderer)
               if(diff.GetSquaredNorm()<4.0)
               {
                 displayGeometry->Map(projected_p, max2D);
-                displayGeometry->MMToDisplay(max2D, max2D);
+                displayGeometry->WorldToDisplay(max2D, max2D);
 
                 //draw the BoundingBox
                 glColor3f(selectedColor[0],selectedColor[1],selectedColor[2]);//red
@@ -416,17 +416,17 @@ void mitk::MeshMapper2D::Paint(mitk::BaseRenderer * renderer)
           for ( it = intersectionPoints.begin( ); it != end; ++it )
           {
             glBegin (GL_LINES);
-              displayGeometry->Map(*it, pt2d); displayGeometry->MMToDisplay(pt2d, pt2d); 
+              displayGeometry->Map(*it, pt2d); displayGeometry->WorldToDisplay(pt2d, pt2d); 
               p[0] = pt2d[0]; p[1] = pt2d[1]; glVertex2fv(p); 
               ++it;
-              displayGeometry->Map(*it, pt2d); displayGeometry->MMToDisplay(pt2d, pt2d);
+              displayGeometry->Map(*it, pt2d); displayGeometry->WorldToDisplay(pt2d, pt2d);
               p[0] = pt2d[0]; p[1] = pt2d[1]; glVertex2fv(p); 
             glEnd ();
           }
           if(it!=intersectionPoints.end())
           {
             glBegin (GL_LINES);
-              displayGeometry->Map(*it, pt2d); displayGeometry->MMToDisplay(pt2d, pt2d); 
+              displayGeometry->Map(*it, pt2d); displayGeometry->WorldToDisplay(pt2d, pt2d); 
               p[0] = pt2d[0]; p[1] = pt2d[1]; glVertex2fv(p); 
               p[0] = pt2d[0]; p[1] = pt2d[1]; glVertex2fv(p); 
             glEnd ();

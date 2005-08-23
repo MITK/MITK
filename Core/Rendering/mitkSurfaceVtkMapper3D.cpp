@@ -73,7 +73,7 @@ void mitk::SurfaceVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
   // get the TimeSlicedGeometry of the input object
   //
   mitk::Surface::Pointer input  = const_cast< mitk::Surface* >( this->GetInput() );
-  const TimeSlicedGeometry* inputTimeGeometry = dynamic_cast< const TimeSlicedGeometry* >( input->GetUpdatedGeometry() );
+  const TimeSlicedGeometry* inputTimeGeometry = input->GetTimeSlicedGeometry();
   if(( inputTimeGeometry == NULL ) || ( inputTimeGeometry->GetTimeSteps() == 0 ) )
   {
     m_Actor->VisibilityOff();
@@ -85,7 +85,7 @@ void mitk::SurfaceVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
   //
   const Geometry2D* worldGeometry = renderer->GetCurrentWorldGeometry2D();
   assert( worldGeometry != NULL );
-  ScalarType time = worldGeometry->GetTimeBoundsInMS()[ 0 ];
+  ScalarType time = worldGeometry->GetTimeBounds()[ 0 ];
 
   //
   // convert the world time in time steps of the input object

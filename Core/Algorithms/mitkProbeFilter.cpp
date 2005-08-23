@@ -80,9 +80,9 @@ void mitk::ProbeFilter::GenerateOutputInformation()
     Geometry3D::Pointer geometry3D = Geometry3D::New();
     geometry3D->Initialize();
     geometry3D->SetBounds(source->GetTimeSlicedGeometry()->GetBounds());
-    geometry3D->SetTimeBoundsInMS(source->GetTimeSlicedGeometry()->GetGeometry3D(0)->GetTimeBoundsInMS());
+    geometry3D->SetTimeBounds(source->GetTimeSlicedGeometry()->GetGeometry3D(0)->GetTimeBounds());
 
-    TimeSlicedGeometry::Pointer outputTimeSlicedGeometry = TimeSlicedGeometry::New();//static_cast<TimeSlicedGeometry*>(source->GetTimeSlicedGeometry()->Clone().GetPointer());
+    TimeSlicedGeometry::Pointer outputTimeSlicedGeometry = TimeSlicedGeometry::New();
     outputTimeSlicedGeometry->InitializeEvenlyTimed(geometry3D, source->GetTimeSlicedGeometry()->GetTimeSteps());
 
     output->Initialize(outputTimeSlicedGeometry->GetTimeSteps());

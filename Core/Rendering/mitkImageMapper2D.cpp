@@ -158,7 +158,7 @@ void mitk::ImageMapper2D::GenerateData(mitk::BaseRenderer *renderer)
   if(input == NULL)
     return;
 
-  const TimeSlicedGeometry* inputtimegeometry = dynamic_cast<const TimeSlicedGeometry*>(input->GetUpdatedGeometry());
+  const TimeSlicedGeometry* inputtimegeometry = input->GetTimeSlicedGeometry();
   if(( inputtimegeometry == NULL ) || ( inputtimegeometry->GetTimeSteps() == 0 ) )
     return;
 
@@ -176,7 +176,7 @@ void mitk::ImageMapper2D::GenerateData(mitk::BaseRenderer *renderer)
     return;
 
   int timestep=0;
-  ScalarType time = worldgeometry->GetTimeBoundsInMS()[0];
+  ScalarType time = worldgeometry->GetTimeBounds()[0];
   if(time>-ScalarTypeNumericTraits::max())
     timestep = inputtimegeometry->MSToTimeStep(time);
 

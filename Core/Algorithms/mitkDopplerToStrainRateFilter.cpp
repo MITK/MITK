@@ -53,7 +53,7 @@ void mitk::DopplerToStrainRateFilter::GenerateOutputInformation()
   //output->GetSlicedGeometry()->SetGeometry2D(mitk::Image::BuildStandardPlaneGeometry2D(output->GetSlicedGeometry(), tmpDimensions).GetPointer(), 0);
   //output->GetSlicedGeometry()->SetEvenlySpaced();
   //set the timebounds - after SetGeometry2D, so that the already created PlaneGeometry will also receive this timebounds.
-  output->GetSlicedGeometry()->SetTimeBoundsInMS(input->GetSlicedGeometry()->GetTimeBoundsInMS());
+  output->GetSlicedGeometry()->SetTimeBounds(input->GetSlicedGeometry()->GetTimeBounds());
 
   output->SetPropertyList(input->GetPropertyList()->Clone());    
 

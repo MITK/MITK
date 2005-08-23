@@ -106,7 +106,7 @@ void mitk::PointSetMapper2D::Paint(mitk::BaseRenderer * renderer)
           {
               Point2D pt2d, tmp;
               displayGeometry->Map(projected_p, pt2d);
-              displayGeometry->MMToDisplay(pt2d, pt2d);
+              displayGeometry->WorldToDisplay(pt2d, pt2d);
 
               Vector2D horz,vert;
               horz[0]=8.0-scalardiff*2; horz[1]=0;

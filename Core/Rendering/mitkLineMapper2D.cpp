@@ -97,9 +97,9 @@ void mitk::LineMapper2D::Paint(mitk::BaseRenderer * renderer)
         Point2D p2d, q2d, tmp;
         
         displayGeometry->Map(projected_p, p2d);
-        displayGeometry->MMToDisplay(p2d, p2d);
+        displayGeometry->WorldToDisplay(p2d, p2d);
         displayGeometry->Map(projected_q, q2d);
-        displayGeometry->MMToDisplay(q2d, q2d);
+        displayGeometry->WorldToDisplay(q2d, q2d);
 
         //outlined, cause iterators behave strange and multiple points can't be selected anyway by now!
         //selItNext = selIt++;//Iterator to the next Element, cause only when the two points ar selected, then the Line is Selected

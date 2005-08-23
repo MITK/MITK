@@ -179,7 +179,7 @@ void mitk::VolumeDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
     return;
 
   // FIXME: const_cast; maybe GetVtkImageData can be made const by using volatile    
-  const TimeSlicedGeometry* inputtimegeometry = dynamic_cast<const TimeSlicedGeometry*>(input->GetUpdatedGeometry());
+  const TimeSlicedGeometry* inputtimegeometry = input->GetTimeSlicedGeometry();
   assert(inputtimegeometry!=NULL);
 
   const Geometry3D* worldgeometry = renderer->GetCurrentWorldGeometry();
@@ -187,7 +187,7 @@ void mitk::VolumeDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
   assert(worldgeometry!=NULL);
 
   int timestep=0;
-  ScalarType time = worldgeometry->GetTimeBoundsInMS()[0];
+  ScalarType time = worldgeometry->GetTimeBounds()[0];
   if(time>-ScalarTypeNumericTraits::max())
     timestep = inputtimegeometry->MSToTimeStep(time);
 

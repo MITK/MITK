@@ -288,7 +288,7 @@ public:
     SlicedGeometry3D* slicedGeometry = GetSlicedGeometry(0);
     slicedGeometry->InitializeEvenlySpaced(planeGeometry, m_Dimensions[2]);
     slicedGeometry->SetSpacing(spacing);
-    m_TimeSlicedGeometry->InitializeEvenlyTimed(slicedGeometry, m_Dimensions[3]);
+    GetTimeSlicedGeometry()->InitializeEvenlyTimed(slicedGeometry, m_Dimensions[3]);
     delete [] tmpDimensions;
 
     this->Initialize();

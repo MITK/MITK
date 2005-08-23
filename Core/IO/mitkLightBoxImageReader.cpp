@@ -304,9 +304,9 @@ void mitk::LightBoxImageReader::GenerateOutputInformation()
     if (numberOfTimePoints>1)
     {
       mitk::ScalarType timeBounds[] = {0.0, 1.0};
-      planegeometry->SetTimeBoundsInMS( timeBounds );
+      planegeometry->SetTimeBounds( timeBounds );
     }
-//    planegeometry->SetTimeBoundsInMS(timebounds);
+//    planegeometry->SetTimeBounds(timebounds);
 
     SlicedGeometry3D::Pointer slicedGeometry = SlicedGeometry3D::New();
     itkDebugMacro(<<"output->GetDimension(2): "<<output->GetDimension(2));
@@ -316,7 +316,7 @@ void mitk::LightBoxImageReader::GenerateOutputInformation()
     itkDebugMacro(<<"output->GetDimension(3): "<<output->GetDimension(3));
     timeSliceGeometry->InitializeEvenlyTimed(slicedGeometry, output->GetDimension(3));
     //Variante B: timeSliceGeometry->SetEvenlyTimed(false);
-    //unten: output->GetTimeGeometry()->GetGeometry3D(time)->SetTimeBoundsInMS(timeboundsOfTimeStepTime);
+    //unten: output->GetTimeGeometry()->GetGeometry3D(time)->SetTimeBounds(timeboundsOfTimeStepTime);
 
     timeSliceGeometry->TransferItkToVtkTransform();
 

@@ -189,7 +189,7 @@ void mitk::PolyDataGLMapper2D::Paint( mitk::BaseRenderer * renderer )
                 worldGeometry->Map( p, p2d );
 
                 //convert point (until now mm and in worldcoordinates) to display coordinates (units )
-                displayGeometry->MMToDisplay( p2d, p2d );
+                displayGeometry->WorldToDisplay( p2d, p2d );
 
                 //convert display coordinates ( (0,0) is top-left ) in GL coordinates ( (0,0) is bottom-left )
                 //p2d[1]=toGL-p2d[1];

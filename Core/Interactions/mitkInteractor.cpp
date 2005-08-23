@@ -35,27 +35,21 @@ PURPOSE.  See the above copyright notices for more information.
 const std::string mitk::Interactor::XML_NODE_NAME = "interactor";
 
 mitk::Interactor::Interactor( )
-: mitk::StateMachine( NULL ), m_DataTreeNode(NULL), m_Mode(SMDESELECTED)
+  : mitk::StateMachine( NULL ), m_DataTreeNode(NULL), m_Mode(SMDESELECTED)
 {
 
 }
 
 mitk::Interactor::Interactor(const char * type, DataTreeNode* dataTreeNode)
-: mitk::StateMachine(type), m_DataTreeNode(dataTreeNode), m_Mode(SMDESELECTED)
+  : mitk::StateMachine(type), m_DataTreeNode(dataTreeNode), m_Mode(SMDESELECTED)
 {
   if (m_DataTreeNode != NULL)
     m_DataTreeNode->SetInteractor(this);
 }
 
-mitk::Geometry3D* mitk::Interactor::GetGeometry() const
+mitk::BaseData* mitk::Interactor::GetData() const
 {
-  mitk::Geometry3D* geometry = m_DataTreeNode->GetData()->GetGeometry();
-  TimeSlicedGeometry* timeSlicedGeometry = dynamic_cast<mitk::TimeSlicedGeometry*>( geometry );
-
-  if ( timeSlicedGeometry )
-    return timeSlicedGeometry->GetGeometry3D( 0 ); 
-
-  return geometry;
+  return m_DataTreeNode->GetData();
 }
 
 mitk::Interactor::SMMode mitk::Interactor::GetMode() const
@@ -114,8 +108,7 @@ bool mitk::Interactor::ExecuteAction(Action* action, mitk::StateEvent const* sta
   return false;
 }
 
-//##Documentation
-//## change if derived class can handle it better!
+// \todo consider time! Replace GetTimeSlicedGeometry by GetGeometry(time of stateEvent)
 float mitk::Interactor::CalculateJurisdiction(StateEvent const* stateEvent) const
 {
   float returnvalue = 0.0;
@@ -144,7 +137,7 @@ float mitk::Interactor::CalculateJurisdiction(StateEvent const* stateEvent) cons
   }
 
   //compute the center of the data taken care of
-  mitk::BoundingBox *bBox = const_cast<mitk::BoundingBox*>(GetGeometry()->GetBoundingBox());
+  const mitk::BoundingBox *bBox = GetData()->GetTimeSlicedGeometry()->GetBoundingBox();
   if (bBox == NULL)
     return 0;
 
@@ -176,16 +169,13 @@ float mitk::Interactor::CalculateJurisdiction(StateEvent const* stateEvent) cons
   }
   else//3D information from a 2D window.
   {
-    mitk::Point3D worldPoint = posEvent->GetWorldPosition();
-    float p[3];
-    itk2vtk(worldPoint, p);
     //transforming the Worldposition to local coordinatesystem
-    GetGeometry()->GetVtkTransform()->GetInverse()->TransformPoint(p, p);
-    vtk2itk(p, worldPoint);
+    mitk::Point3D point;
+    GetData()->GetTimeSlicedGeometry()->WorldToIndex(posEvent->GetWorldPosition(), point);
 
     //distance between center and point 
     mitk::BoundingBox::PointType center = bBox->GetCenter();
-    returnvalue = worldPoint.EuclideanDistanceTo(center);
+    returnvalue = point.EuclideanDistanceTo(center);
 
     //now compared to size of boundingbox to get between 0 and 1;
     returnvalue = returnvalue/( (bBox->GetMaximum().EuclideanDistanceTo(bBox->GetMinimum() ) ) );
@@ -198,7 +188,7 @@ float mitk::Interactor::CalculateJurisdiction(StateEvent const* stateEvent) cons
     returnvalue = 1 - returnvalue;
 
     //check if the given position lies inside the data-object
-    if (bBox->IsInside(worldPoint))
+    if (bBox->IsInside(point))
     {
       //mapped between 0,5 and 1
       returnvalue = 0.5 + (returnvalue / 2);

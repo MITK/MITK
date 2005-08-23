@@ -110,7 +110,7 @@ void mitk::ContourMapper2D::Paint(mitk::BaseRenderer * renderer)
       {
         Point2D pt2d, tmp;
         displayGeometry->Map(projected_p, pt2d);
-        displayGeometry->MMToDisplay(pt2d, pt2d);
+        displayGeometry->WorldToDisplay(pt2d, pt2d);
         glVertex2f(pt2d[0], pt2d[1]);
       }
 

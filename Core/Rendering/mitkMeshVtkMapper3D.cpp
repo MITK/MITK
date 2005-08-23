@@ -140,7 +140,7 @@ void mitk::MeshVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
 #ifdef VCL_VC60
     itkExceptionMacro(<<"MeshVtkMapper3D currently not working for MS Visual C++ 6.0, because MeshUtils are currently not supported.");
 #else
-    m_Contour = MeshUtil<mitk::Mesh::MeshType>::MeshToPolyData(mesh.GetPointer(), false, false, m_Contour);
+    m_Contour = MeshUtil<mitk::Mesh::MeshType>::MeshToPolyData(mesh.GetPointer(), false, false, 0, NULL, m_Contour);
 #endif
 
     if(m_Contour->GetNumberOfCells()>0)

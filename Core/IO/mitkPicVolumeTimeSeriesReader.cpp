@@ -80,7 +80,7 @@ void mitk::PicVolumeTimeSeriesReader::GenerateOutputInformation()
     timearray[ 0 ] = 0;
     timearray[ 1 ] = 1; 
     TimeBounds timebounds( timearray );
-    output->GetSlicedGeometry()->SetTimeBoundsInMS( timebounds );
+    output->GetSlicedGeometry()->SetTimeBounds( timebounds );
 
     m_ReadHeaderTime.Modified();
 }

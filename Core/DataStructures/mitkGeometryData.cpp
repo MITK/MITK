@@ -31,12 +31,7 @@ mitk::GeometryData::~GeometryData()
 
 void mitk::GeometryData::UpdateOutputInformation()
 {
-  if(m_Geometry3D.IsNotNull())
-    SetPipelineMTime(m_Geometry3D->GetMTime());
-  if (this->GetSource())
-  {
-    this->GetSource()->UpdateOutputInformation();
-  }
+  Superclass::UpdateOutputInformation();
 }
 
 void mitk::GeometryData::SetRequestedRegionToLargestPossibleRegion()
@@ -46,14 +41,14 @@ void mitk::GeometryData::SetRequestedRegionToLargestPossibleRegion()
 
 bool mitk::GeometryData::RequestedRegionIsOutsideOfTheBufferedRegion()
 {
-  if(m_Geometry3D.IsNull()) return true;
+  if(GetGeometry()!=NULL) return true;
 
   return false;
 }
 
 bool mitk::GeometryData::VerifyRequestedRegion()
 {
-  if(m_Geometry3D.IsNull()) return false;
+  if(GetGeometry()==NULL) return false;
 
   return true;
 }

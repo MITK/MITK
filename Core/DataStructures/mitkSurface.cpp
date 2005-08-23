@@ -22,9 +22,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include "vtkPolyData.h"
 #include "mitkXMLWriter.h"
 #include "mitkXMLReader.h"
-#include "mitkSurfaceVtkWriter.h"
 #include <vtkPolyDataWriter.h>
 #include <vtkPolyDataReader.h>
+#include "mitkSurfaceVtkWriter.h"
 
 void mitk::Surface::SetVtkPolyData( vtkPolyData* polydata, unsigned int t )
 {
@@ -45,12 +45,12 @@ void mitk::Surface::SetVtkPolyData( vtkPolyData* polydata, unsigned int t )
 
 void mitk::Surface::Initialize(unsigned int timeSteps)
 {
-  mitk::TimeSlicedGeometry::Pointer timeGeometry = const_cast< mitk::TimeSlicedGeometry *>(this->GetTimeSlicedGeometry());
+  mitk::TimeSlicedGeometry::Pointer timeGeometry = this->GetTimeSlicedGeometry();
 
   mitk::Geometry3D::Pointer g3d = mitk::Geometry3D::New();
   g3d->Initialize();
   mitk::ScalarType timeBounds[] = {0.0, 1.0};
-  g3d->SetTimeBoundsInMS( timeBounds );
+  g3d->SetTimeBounds( timeBounds );
   //
   // The geometry is propagated automatically to the other items,
   // if EvenlyTimed is true...
@@ -60,23 +60,6 @@ void mitk::Surface::Initialize(unsigned int timeSteps)
   vtkPolyData* pdnull = NULL;
   m_PolyDataSeries.reserve(timeSteps);
   m_PolyDataSeries.assign(timeSteps, pdnull);
-}
-
-void mitk::Surface::SetGeometry(mitk::Geometry3D* aGeometry3D)
-{
-  if(aGeometry3D!=NULL)
-  {
-    TimeSlicedGeometry::Pointer timeSlicedGeometry = dynamic_cast<TimeSlicedGeometry*>(aGeometry3D);
-    if(timeSlicedGeometry.IsNull())
-    {
-      timeSlicedGeometry = TimeSlicedGeometry::New();
-      m_Geometry3D = timeSlicedGeometry;   
-      timeSlicedGeometry->InitializeEvenlyTimed(aGeometry3D, 1);
-    }
-    Superclass::SetGeometry(timeSlicedGeometry);
-  }
-  else
-    Superclass::SetGeometry(NULL);
 }
 
 vtkPolyData* mitk::Surface::GetVtkPolyData( unsigned int t )
@@ -103,7 +86,7 @@ vtkPolyData* mitk::Surface::GetVtkPolyData( unsigned int t )
 //##ModelId=3E70F66100C4
 mitk::Surface::Surface() : m_CalculateBoundingBox( false )
 {
-  m_Geometry3D = mitk::TimeSlicedGeometry::New();
+
 }
 
 //##ModelId=3E70F66100CA
@@ -125,6 +108,8 @@ void mitk::Surface::UpdateOutputInformation()
   }
   if ( ( m_CalculateBoundingBox ) && ( m_PolyDataSeries.size() > 0 ) )
     CalculateBoundingBox();
+  else
+    GetTimeSlicedGeometry()->UpdateInformation();
 }
 
 void mitk::Surface::CalculateBoundingBox()
@@ -133,7 +118,7 @@ void mitk::Surface::CalculateBoundingBox()
   // first make sure, that the associated time sliced geometry has
   // the same number of geometry 3d's as vtkPolyDatas are present
   //
-  mitk::TimeSlicedGeometry::Pointer timeGeometry = GetTimeSlicedGeometry();
+  mitk::TimeSlicedGeometry* timeGeometry = GetTimeSlicedGeometry();
   if ( timeGeometry->GetTimeSteps() != m_PolyDataSeries.size() )
   {
     itkExceptionMacro(<<"timeGeometry->GetTimeSteps() != m_PolyDataSeries.size() -- use Initialize(timeSteps) with correct number of timeSteps!");
@@ -161,9 +146,11 @@ void mitk::Surface::CalculateBoundingBox()
     assert( g3d.IsNotNull() );
     g3d->SetFloatBounds( bounds );
   }
+  timeGeometry->UpdateInformation();
+
   mitk::BoundingBox::Pointer bb = const_cast<mitk::BoundingBox*>( timeGeometry->GetBoundingBox() );
-  //std::cout << "min"<< bb->GetMinimum() << std::endl;
-  //std::cout << "max"<< bb->GetMaximum() << std::endl;
+  itkDebugMacro( << "boundingbox min: "<< bb->GetMinimum());
+  itkDebugMacro( << "boundingbox max: "<< bb->GetMaximum());
   m_CalculateBoundingBox = false;
 }
 

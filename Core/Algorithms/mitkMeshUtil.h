@@ -526,7 +526,7 @@ public:
   /*!
     create an vtkUnstructuredGrid object from an itkMesh
   */
-  static vtkUnstructuredGrid* MeshToUnstructuredGrid(typename MeshType* mesh)
+  static vtkUnstructuredGrid* MeshToUnstructuredGrid(MeshType* mesh)
   {
     /*! 
     default SingleCellArray line cell visitior definition 
@@ -650,7 +650,7 @@ public:
   /*!
     create an vtkUnstructuredGrid object from an itkMesh
   */
-  static vtkPolyData* MeshToPolyData(typename MeshType* mesh, bool onlyTriangles = false, bool useScalarAccessor = false, unsigned int pointDataType = 0, mitk::Geometry3D* geometryFrame=NULL, vtkPolyData* polydata = NULL)
+  static vtkPolyData* MeshToPolyData(MeshType* mesh, bool onlyTriangles = false, bool useScalarAccessor = false, unsigned int pointDataType = 0, mitk::Geometry3D* geometryFrame=NULL, vtkPolyData* polydata = NULL)
   {
     /*! 
     default Distribute line cell visitior definition 
@@ -903,7 +903,7 @@ public:
 		  return resultMesh;
   }
 
-  static typename MeshType::Pointer TranslateMesh(typename MeshType::PointType vec, typename MeshType* input)
+  static typename MeshType::Pointer TranslateMesh(typename MeshType::PointType vec, MeshType* input)
   {
 
     typename MeshType::Pointer output = MeshType::New();

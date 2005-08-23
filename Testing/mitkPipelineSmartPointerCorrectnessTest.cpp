@@ -57,15 +57,35 @@ protected:
   }
 };
 
-int mitkPipelineSmartPointerCorrectnessTest(int argc, char* argv[])
+class TwoOutputsFilter : public mitk::SurfaceToImageFilter
 {
-  mitk::SurfaceToImageFilter::Pointer filter;
-  std::cout << "Testing mitk::Surface::New(): ";
-  filter = mitk::SurfaceToImageFilter::New();
+public:
+  mitkClassMacro(TwoOutputsFilter, SurfaceToImageFilter);
+  itkNewMacro(Self);
+protected:
+  TwoOutputsFilter()
+  {
+    mitk::Image::Pointer output
+      = static_cast<mitk::Image*>(this->MakeOutput(0).GetPointer()); 
+    Superclass::SetNumberOfRequiredOutputs(2);
+    Superclass::SetNthOutput(1, output.GetPointer());
+  }
+
+  virtual ~TwoOutputsFilter()
+  {
+  }
+};
+
+template <class FilterType>
+runPipelineSmartPointerCorrectnessTestForFilterType()
+{
+  typename FilterType::Pointer filter;
+  std::cout << "Testing " << typeid(FilterType).name() << "::New(): ";
+  filter = FilterType::New();
   if (filter.IsNull()) 
   {
     std::cout<<"[FAILED]"<<std::endl;
-    // return EXIT_FAILURE;
+     return EXIT_FAILURE;
   }
   else {
   std::cout<<"[PASSED]"<<std::endl;
@@ -83,8 +103,12 @@ int mitkPipelineSmartPointerCorrectnessTest(int argc, char* argv[])
 
 //#ifdef MITK_WEAKPOINTER_PROBLEM_WORKAROUND_ENABLED
   //MITK_WEAKPOINTER_PROBLEM_WORKAROUND_ENABLED test
-  ReferenceCountWatcher::Pointer filterWatcher;
+  std::cout << "Initializing ReferenceCountWatcher: "<<std::endl;
+  ReferenceCountWatcher::Pointer filterWatcher, filterOutputWatcher;
   filterWatcher = new ReferenceCountWatcher(filter, "filter1");
+  filterOutputWatcher = new ReferenceCountWatcher(filter->GetOutput(), "filter1Output");
+  std::cout<<"[PASSED]"<<std::endl;
+
   std::cout << "Testing MITK_WEAKPOINTER_PROBLEM_WORKAROUND_ENABLED part1: "<<std::endl;
   try 
   {
@@ -96,7 +120,7 @@ int mitkPipelineSmartPointerCorrectnessTest(int argc, char* argv[])
     if(output->GetReferenceCount()!=2)
     {
       std::cout<<"[FAILED]"<<std::endl;
-      // return EXIT_FAILURE;
+      return EXIT_FAILURE;
     }
     else
       std::cout<<"[PASSED]"<<std::endl;
@@ -104,12 +128,14 @@ int mitkPipelineSmartPointerCorrectnessTest(int argc, char* argv[])
     if(output->GetExternalReferenceCount()!=1)
     {
       std::cout<<"[FAILED]"<<std::endl;
-      // return EXIT_FAILURE;
+      return EXIT_FAILURE;
     }
     else
       std::cout<<"[PASSED]"<<std::endl;
 
     std::cout << "Testing to set output to NULL:";
+    //output->GetSource()->DebugOn();
+    //output->DebugOn();
     output = NULL;
     std::cout<<"[PASSED]"<<std::endl;
 
@@ -117,7 +143,16 @@ int mitkPipelineSmartPointerCorrectnessTest(int argc, char* argv[])
     if(filterWatcher->GetReferenceCount()!=0)
     {
       std::cout<<"[FAILED]"<<std::endl;
-      // return EXIT_FAILURE;
+      return EXIT_FAILURE;
+    }
+    else
+      std::cout<<"[PASSED]"<<std::endl;
+
+    std::cout << "Testing reference count of filter output:";
+    if(filterOutputWatcher->GetReferenceCount()!=0)
+    {
+      std::cout<<"[FAILED]"<<std::endl;
+      return EXIT_FAILURE;
     }
     else
       std::cout<<"[PASSED]"<<std::endl;
@@ -125,12 +160,13 @@ int mitkPipelineSmartPointerCorrectnessTest(int argc, char* argv[])
   catch(...)
   {
     std::cout<<"[FAILED]"<<std::endl;
-    // return EXIT_FAILURE;
+    return EXIT_FAILURE;
   }
 
   std::cout << "Testing MITK_WEAKPOINTER_PROBLEM_WORKAROUND_ENABLED part2: "<<std::endl;
-  filter = mitk::SurfaceToImageFilter::New();
+  filter = FilterType::New();
   filterWatcher = new ReferenceCountWatcher(filter, "filter2");
+  filterOutputWatcher = new ReferenceCountWatcher(filter->GetOutput(), "filter2Output");
   try 
   {
     std::cout << "Testing to set filter to NULL, keeping NO reference to output:";
@@ -141,7 +177,16 @@ int mitkPipelineSmartPointerCorrectnessTest(int argc, char* argv[])
     if(filterWatcher->GetReferenceCount()!=0)
     {
       std::cout<<"[FAILED]"<<std::endl;
-      // return EXIT_FAILURE;
+      return EXIT_FAILURE;
+    }
+    else
+      std::cout<<"[PASSED]"<<std::endl;
+
+    std::cout << "Testing reference count of filter output:";
+    if(filterOutputWatcher->GetReferenceCount()!=0)
+    {
+      std::cout<<"[FAILED]"<<std::endl;
+      return EXIT_FAILURE;
     }
     else
       std::cout<<"[PASSED]"<<std::endl;
@@ -149,7 +194,7 @@ int mitkPipelineSmartPointerCorrectnessTest(int argc, char* argv[])
   catch(...)
   {
     std::cout<<"[FAILED]"<<std::endl;
-    // return EXIT_FAILURE;
+    return EXIT_FAILURE;
   }
 
   std::cout << "Testing MITK_WEAKPOINTER_PROBLEM_WORKAROUND_ENABLED part3: "<<std::endl;
@@ -157,8 +202,9 @@ int mitkPipelineSmartPointerCorrectnessTest(int argc, char* argv[])
   {
     mitk::Image::Pointer output;
     {
-      mitk::SurfaceToImageFilter::Pointer localFilter = mitk::SurfaceToImageFilter::New();
-      filterWatcher = new ReferenceCountWatcher(localFilter, "filter4");
+      typename FilterType::Pointer localFilter = FilterType::New();
+      filterWatcher = new ReferenceCountWatcher(localFilter, "filter3");
+      filterOutputWatcher = new ReferenceCountWatcher(localFilter->GetOutput(), "filter3Output");
       output = localFilter->GetOutput();
       std::cout << "Testing running out of scope of filter, keeping reference to output:";
     }
@@ -167,7 +213,7 @@ int mitkPipelineSmartPointerCorrectnessTest(int argc, char* argv[])
     if(output->GetReferenceCount()!=2)
     {
       std::cout<<"[FAILED]"<<std::endl;
-      // return EXIT_FAILURE;
+      return EXIT_FAILURE;
     }
     else
       std::cout<<"[PASSED]"<<std::endl;
@@ -175,7 +221,7 @@ int mitkPipelineSmartPointerCorrectnessTest(int argc, char* argv[])
     if(output->GetExternalReferenceCount()!=1)
     {
       std::cout<<"[FAILED]"<<std::endl;
-      // return EXIT_FAILURE;
+      return EXIT_FAILURE;
     }
     else
       std::cout<<"[PASSED]"<<std::endl;
@@ -188,7 +234,16 @@ int mitkPipelineSmartPointerCorrectnessTest(int argc, char* argv[])
     if(filterWatcher->GetReferenceCount()!=0)
     {
       std::cout<<"[FAILED]"<<std::endl;
-      // return EXIT_FAILURE;
+      return EXIT_FAILURE;
+    }
+    else
+      std::cout<<"[PASSED]"<<std::endl;
+
+    std::cout << "Testing reference count of filter output:";
+    if(filterOutputWatcher->GetReferenceCount()!=0)
+    {
+      std::cout<<"[FAILED]"<<std::endl;
+      return EXIT_FAILURE;
     }
     else
       std::cout<<"[PASSED]"<<std::endl;
@@ -196,15 +251,16 @@ int mitkPipelineSmartPointerCorrectnessTest(int argc, char* argv[])
   catch(...)
   {
     std::cout<<"[FAILED]"<<std::endl;
-    // return EXIT_FAILURE;
+    return EXIT_FAILURE;
   }
 
   std::cout << "Testing MITK_WEAKPOINTER_PROBLEM_WORKAROUND_ENABLED part4: "<<std::endl;
   try 
   {
     {
-      mitk::SurfaceToImageFilter::Pointer localFilter = mitk::SurfaceToImageFilter::New();
+      typename FilterType::Pointer localFilter = FilterType::New();
       filterWatcher = new ReferenceCountWatcher(localFilter, "filter4");
+      filterOutputWatcher = new ReferenceCountWatcher(localFilter->GetOutput(), "filter4Output");
       std::cout << "Testing running out of scope of filter, keeping NO reference to output:";
     }
     std::cout<<"[PASSED]"<<std::endl;
@@ -213,7 +269,16 @@ int mitkPipelineSmartPointerCorrectnessTest(int argc, char* argv[])
     if(filterWatcher->GetReferenceCount()!=0)
     {
       std::cout<<"[FAILED]"<<std::endl;
-      // return EXIT_FAILURE;
+      return EXIT_FAILURE;
+    }
+    else
+      std::cout<<"[PASSED]"<<std::endl;
+
+    std::cout << "Testing reference count of filter output:";
+    if(filterOutputWatcher->GetReferenceCount()!=0)
+    {
+      std::cout<<"[FAILED]"<<std::endl;
+      return EXIT_FAILURE;
     }
     else
       std::cout<<"[PASSED]"<<std::endl;
@@ -221,11 +286,23 @@ int mitkPipelineSmartPointerCorrectnessTest(int argc, char* argv[])
   catch(...)
   {
     std::cout<<"[FAILED]"<<std::endl;
-    // return EXIT_FAILURE;
+    return EXIT_FAILURE;
   }
+  return EXIT_SUCCESS;
 //#endif
+}
 
+int mitkPipelineSmartPointerCorrectnessTest(int argc, char* argv[])
+{
+  int result;
+  result = runPipelineSmartPointerCorrectnessTestForFilterType<mitk::SurfaceToImageFilter>();
+  if( result != EXIT_SUCCESS )
+    return result;
 
+  result = runPipelineSmartPointerCorrectnessTestForFilterType<TwoOutputsFilter>();
+  if( result != EXIT_SUCCESS )
+    return result;
+  
   std::cout<<"[TEST DONE]"<<std::endl;
   return EXIT_SUCCESS;
 }

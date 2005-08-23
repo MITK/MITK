@@ -51,7 +51,7 @@ template <typename MeshType>
 class NullScalarAccessor
 {
 public:
-  static inline VTK_FLOAT_TYPE GetScalar(typename MeshType::PointDataContainer* point, typename MeshType::PointIdentifier idx, typename MeshType* mesh = NULL, unsigned int type = 0)
+  static inline VTK_FLOAT_TYPE GetScalar(typename MeshType::PointDataContainer* point, typename MeshType::PointIdentifier idx, MeshType* mesh = NULL, unsigned int type = 0)
   {
     return (VTK_FLOAT_TYPE) 0.0;
   };
@@ -61,7 +61,7 @@ template <typename MeshType>
 class MeanCurvatureAccessor
 {
 public:
-  static inline VTK_FLOAT_TYPE GetScalar(typename MeshType::PointDataContainer* point, typename MeshType::PointIdentifier idx, typename MeshType* mesh, unsigned int type = 0)
+  static inline VTK_FLOAT_TYPE GetScalar(typename MeshType::PointDataContainer* point, typename MeshType::PointIdentifier idx, MeshType* mesh, unsigned int type = 0)
   {
     typename MeshType::PixelType dis;    
     mesh->GetPointData(idx, &dis);
@@ -73,7 +73,7 @@ template <typename MeshType>
 class SimplexMeshAccessor
 {
 public:
-  static inline VTK_FLOAT_TYPE GetScalar(typename MeshType::PointDataContainer* point, typename MeshType::PointIdentifier idx, typename MeshType* mesh, unsigned int type = 0 )
+  static inline VTK_FLOAT_TYPE GetScalar(typename MeshType::PointDataContainer* point, typename MeshType::PointIdentifier idx, MeshType* mesh, unsigned int type = 0 )
   {
     typename MeshType::GeometryMapPointer geometryData = mesh->GetGeometryData();
 

@@ -181,7 +181,7 @@ void mitk::PicHelper::InitializeEvenlySpaced(const ipPicDescriptor* pic, unsigne
     TimeBounds timebounds;
     timebounds[0] = 0.0;
     timebounds[1] = 1.0;
-    slicedgeometry->SetTimeBoundsInMS(timebounds);
+    slicedgeometry->SetTimeBounds(timebounds);
   }
 }
 

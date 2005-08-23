@@ -34,48 +34,55 @@ namespace mitk {
 class Geometry2DData : public BaseData
 {
 public:
-    mitkClassMacro(Geometry2DData, BaseData);
+  mitkClassMacro(Geometry2DData, BaseData);
 
-    itkNewMacro(Self);
+  itkNewMacro(Self);
 
-    //##ModelId=3E6423D2030E
-    //##Documentation
-    //## @brief Set the reference to the Geometry2D that is stored
-    //## by the object
-    virtual void SetGeometry2D(mitk::Geometry2D* geometry2d);
-    //##ModelId=3E6423D20318
-    //##Documentation
-    //## @brief Get the reference to the Geometry2D that is stored
-    //## by the object
-    mitk::Geometry2D * GetGeometry2D() const
-    {
-        return static_cast<mitk::Geometry2D *>(m_Geometry3D.GetPointer());
-    };
+  //##Documentation
+  //## @brief Set the reference to a Geometry2D that is stored
+  //## by the object
+  //##
+  //## @warning Accepts only instances of Geometry2D or sub-classes.
+  void SetGeometry(mitk::Geometry3D *geometry);
 
-    //##ModelId=3E66CC5A0295
-	virtual void UpdateOutputInformation();
+  //##ModelId=3E6423D2030E
+  //##Documentation
+  //## @brief Set the reference to the Geometry2D that is stored
+  //## by the object
+  virtual void SetGeometry2D(mitk::Geometry2D* geometry2d);
+  //##ModelId=3E6423D20318
+  //##Documentation
+  //## @brief Get the reference to the Geometry2D that is stored
+  //## by the object
+  mitk::Geometry2D * GetGeometry2D() const
+  {
+    return static_cast<mitk::Geometry2D *>(GetGeometry());
+  };
 
-    //##ModelId=3E66CC5A02B4
-	virtual void SetRequestedRegionToLargestPossibleRegion();
+  //##ModelId=3E66CC5A0295
+  virtual void UpdateOutputInformation();
 
-    //##ModelId=3E66CC5A02D2
-	virtual bool RequestedRegionIsOutsideOfTheBufferedRegion();
+  //##ModelId=3E66CC5A02B4
+  virtual void SetRequestedRegionToLargestPossibleRegion();
 
-    //##ModelId=3E66CC5A02F0
-	virtual bool VerifyRequestedRegion();
+  //##ModelId=3E66CC5A02D2
+  virtual bool RequestedRegionIsOutsideOfTheBufferedRegion();
 
-    //##ModelId=3E66CC5A030E
-	virtual void SetRequestedRegion(itk::DataObject *data);
+  //##ModelId=3E66CC5A02F0
+  virtual bool VerifyRequestedRegion();
 
-    //##ModelId=3E67D85E00B7
-    virtual void CopyInformation(const itk::DataObject *data);
+  //##ModelId=3E66CC5A030E
+  virtual void SetRequestedRegion(itk::DataObject *data);
+
+  //##ModelId=3E67D85E00B7
+  virtual void CopyInformation(const itk::DataObject *data);
 
 protected:
-    //##ModelId=3E639CD30201
-    Geometry2DData();
+  //##ModelId=3E639CD30201
+  Geometry2DData();
 
-    //##ModelId=3E639CD30233
-    virtual ~Geometry2DData();
+  //##ModelId=3E639CD30233
+  virtual ~Geometry2DData();
 };
 
 } // namespace mitk

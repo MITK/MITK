@@ -30,22 +30,29 @@ mitk::Geometry2DData::~Geometry2DData()
 {
 }
 
+void mitk::Geometry2DData::SetGeometry(mitk::Geometry3D *geometry)
+{
+  if(geometry==NULL)
+    SetGeometry2D(NULL);
+  else
+  {
+    Geometry2D* geometry2d = dynamic_cast<Geometry2D*>(geometry);
+    if(geometry2d==NULL)
+      itkExceptionMacro(<<"Trying to set a geometry which is not a Geometry2D into Geometry2DData.");
+    SetGeometry2D(geometry2d);
+  }
+}
+
 //##ModelId=3E6423D2030E
 void mitk::Geometry2DData::SetGeometry2D(mitk::Geometry2D *geometry2d)
 {
-  m_Geometry3D=geometry2d;
-  Modified();
+  Superclass::SetGeometry(geometry2d);
 }
 
 //##ModelId=3E66CC5A0295
 void mitk::Geometry2DData::UpdateOutputInformation()
 {
-  if(m_Geometry3D.IsNotNull())
-    SetPipelineMTime(m_Geometry3D->GetMTime());
-  if (this->GetSource())
-  {
-    this->GetSource()->UpdateOutputInformation();
-  }
+  Superclass::UpdateOutputInformation();
 }
 
 //##ModelId=3E66CC5A02B4
@@ -57,7 +64,7 @@ void mitk::Geometry2DData::SetRequestedRegionToLargestPossibleRegion()
 //##ModelId=3E66CC5A02D2
 bool mitk::Geometry2DData::RequestedRegionIsOutsideOfTheBufferedRegion()
 {
-  if(m_Geometry3D.IsNull()) return true;
+  if(GetGeometry2D()==NULL) return true;
 
   return false;
 }
@@ -65,7 +72,7 @@ bool mitk::Geometry2DData::RequestedRegionIsOutsideOfTheBufferedRegion()
 //##ModelId=3E66CC5A02F0
 bool mitk::Geometry2DData::VerifyRequestedRegion()
 {
-  if(m_Geometry3D.IsNull()) return false;
+  if(GetGeometry2D()==NULL) return false;
 
   return true;
 }

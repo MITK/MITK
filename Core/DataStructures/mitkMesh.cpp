@@ -36,8 +36,6 @@ mitk::Mesh::Mesh()
   m_ItkData = DataType::New();
   PointDataContainer::Pointer pointData = PointDataContainer::New();
   m_ItkData->SetPointData(pointData);
-
-  m_Geometry3D->Initialize();
 }
 
 mitk::Mesh::~Mesh()

@@ -201,16 +201,6 @@ public:
   //## @todo Appropriate setting of the update extent is missing.
   const SlicedGeometry3D* GetUpdatedSlicedGeometry(unsigned int t=0);
 
-  mitk::TimeSlicedGeometry* GetTimeSlicedGeometry()
-  {
-    return m_TimeSlicedGeometry;
-  }
-
-  const mitk::TimeSlicedGeometry* GetTimeSlicedGeometry() const
-  {
-    return m_TimeSlicedGeometry;
-  }
-
   //##Documentation
   //## @brief Set the Geometry3D of the data, which will be referenced (not copied!). It
   //## has to be a sub-class of SlicedGeometry3D.
@@ -233,13 +223,6 @@ protected:
   RegionType          m_BufferedRegion;
   //##ModelId=3E144ED20075
   bool                m_UseLargestPossibleRegion;
-
-  //##Documentation
-  //## Additional pointer to the contents of m_Geometry3D, 
-  //## which is of type SlicedGeometry3D (or a sub-class of it). 
-  //## Has to be initialized by sub-classes of SlicedData, when creating
-  //## the geometry!
-  TimeSlicedGeometry* m_TimeSlicedGeometry;
 };
 
 } // namespace mitk

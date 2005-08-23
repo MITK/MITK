@@ -23,13 +23,11 @@ PURPOSE.  See the above copyright notices for more information.
 //##ModelId=3E141028018A
 void mitk::SlicedData::UpdateOutputInformation()
 {
-  if (this->GetSource())
-  {
-    this->GetSource()->UpdateOutputInformation();
-  }
+  Superclass::UpdateOutputInformation();
+
+  if (this->GetSource() == false)
   // If we don't have a source, then let's make our Image
   // span our buffer
-  else
   {
     m_UseLargestPossibleRegion = true;
   }
@@ -115,7 +113,7 @@ bool mitk::SlicedData::RequestedRegionIsOutsideOfTheBufferedRegion()
 //##ModelId=3E14105B00F7
 bool mitk::SlicedData::VerifyRequestedRegion()
 {
-  if(m_Geometry3D.IsNull()) return false;
+  if(GetTimeSlicedGeometry() == NULL) return false;
 
   unsigned int i;
 
@@ -182,7 +180,7 @@ void mitk::SlicedData::SetRequestedRegion(SlicedData::RegionType *region)
 
 
 //##ModelId=3E19EA3300BA
-mitk::SlicedData::SlicedData() : m_UseLargestPossibleRegion(false), m_TimeSlicedGeometry(NULL)
+mitk::SlicedData::SlicedData() : m_UseLargestPossibleRegion(false)
 {
   unsigned int i;
   for(i=0;i<4;++i)
@@ -201,13 +199,17 @@ mitk::SlicedData::~SlicedData()
 //##ModelId=3E34513B016D
 void mitk::SlicedData::CopyInformation(const itk::DataObject *data)
 {
+  // Standard call to the superclass' method
+  Superclass::CopyInformation(data);
+
   const mitk::SlicedData *slicedData;
 
   slicedData = dynamic_cast<const mitk::SlicedData*>(data);
 
   if (slicedData)
   {
-    SetGeometry(dynamic_cast<Geometry3D*>(GetGeometry()->Clone().GetPointer()));//new SlicedGeometry3D(*slicedData->GetGeometry().GetPointer());
+    m_LargestPossibleRegion = slicedData->GetLargestPossibleRegion();
+    SetGeometry(dynamic_cast<Geometry3D*>(GetTimeSlicedGeometry()->Clone().GetPointer()));//new SlicedGeometry3D(*slicedData->GetGeometry().GetPointer());
   }
   else
   {
@@ -227,9 +229,9 @@ void mitk::SlicedData::CopyInformation(const itk::DataObject *data)
 //
 mitk::SlicedGeometry3D* mitk::SlicedData::GetSlicedGeometry(unsigned int t) const
 {
-  if(m_TimeSlicedGeometry == NULL)
+  if(GetTimeSlicedGeometry() == NULL)
     return NULL;
-  return dynamic_cast<SlicedGeometry3D*>(m_TimeSlicedGeometry->GetGeometry3D(t));
+  return dynamic_cast<SlicedGeometry3D*>(GetTimeSlicedGeometry()->GetGeometry3D(t));
 }
 
 const mitk::SlicedGeometry3D* mitk::SlicedData::GetUpdatedSlicedGeometry(unsigned int t)
@@ -245,8 +247,8 @@ void mitk::SlicedData::SetGeometry(Geometry3D* aGeometry3D)
 {
   if(aGeometry3D!=NULL)
   {
-    m_TimeSlicedGeometry = dynamic_cast<TimeSlicedGeometry*>(aGeometry3D);
-    if(m_TimeSlicedGeometry==NULL)
+    TimeSlicedGeometry::Pointer timeSlicedGeometry = dynamic_cast<TimeSlicedGeometry*>(aGeometry3D);
+    if(timeSlicedGeometry.IsNull())
     {
       SlicedGeometry3D::Pointer slicedGeometry = dynamic_cast<SlicedGeometry3D*>(aGeometry3D);
       if(slicedGeometry.IsNull())
@@ -254,6 +256,8 @@ void mitk::SlicedData::SetGeometry(Geometry3D* aGeometry3D)
         Geometry2D* geometry2d = dynamic_cast<Geometry2D*>(aGeometry3D);
         if(geometry2d!=NULL)
         {
+          if((GetSlicedGeometry()->GetGeometry2D(0)==geometry2d) && (GetSlicedGeometry()->GetSlices()==1))
+            return;
           slicedGeometry = SlicedGeometry3D::New();
           slicedGeometry->InitializeEvenlySpaced(geometry2d, 1);
         }
@@ -266,12 +270,15 @@ void mitk::SlicedData::SetGeometry(Geometry3D* aGeometry3D)
       }
       assert(slicedGeometry.IsNotNull());
 
-      TimeSlicedGeometry::Pointer timeSlicedGeometry = TimeSlicedGeometry::New();
-      m_Geometry3D = m_TimeSlicedGeometry = timeSlicedGeometry;   
-      m_TimeSlicedGeometry->InitializeEvenlyTimed(slicedGeometry, 1);
+      timeSlicedGeometry = TimeSlicedGeometry::New();
+      timeSlicedGeometry->InitializeEvenlyTimed(slicedGeometry, 1);
     }
-    Superclass::SetGeometry(m_TimeSlicedGeometry);
+    Superclass::SetGeometry(timeSlicedGeometry);
   }
   else
+  {
+    if(GetGeometry()==NULL)
+      return;
     Superclass::SetGeometry(NULL);
+  }
 }

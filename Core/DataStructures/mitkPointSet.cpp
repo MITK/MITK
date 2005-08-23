@@ -36,12 +36,13 @@ mitk::PointSet::PointSet()
   m_ItkData = DataType::New();
   PointDataContainer::Pointer pointData = PointDataContainer::New();
   m_ItkData->SetPointData(pointData);
-  m_Geometry3D->Initialize();
+  GetTimeSlicedGeometry()->Initialize(1);
 }
 
 //##ModelId=3F0177E901BE
 mitk::PointSet::~PointSet()
-{}
+{
+}
 
 //##ModelId=3F0177E901C1
 int mitk::PointSet::GetSize()
@@ -264,7 +265,7 @@ void mitk::PointSet::UpdateOutputInformation()
   mitkBounds[4] = itkBounds[4];
   mitkBounds[5] = itkBounds[5];
 
-  m_Geometry3D->SetBounds(mitkBounds);
+  GetGeometry()->SetBounds(itkBounds);
 }
 
 //##ModelId=3F0177E901FB

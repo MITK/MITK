@@ -43,14 +43,14 @@ namespace mitk {
 //## in display coordinates into a point in units of a BaseData-object @a datum
 //## (the requested point is 3D!), use
 //## @code
-//## displaygeometry->DisplayToMM(pt_display, pt2d_mm);
+//## displaygeometry->DisplayToWorld(pt_display, pt2d_mm);
 //## displaygeometry->Map(pt2d_mm, pt3d_mm);
 //## datum->GetGeometry()->WorldToIndex(pt3d_mm, pt3d_datum_units);
 //## @endcode
 //## Even, if you want to convert the 2D point @a pt_display into a 2D point in
 //## units on a certain 2D geometry @a certaingeometry, it is safer to use
 //## @code
-//## displaygeometry->DisplayToMM(pt_display, pt_mm);
+//## displaygeometry->DisplayToWorld(pt_display, pt_mm);
 //## certaingeometry->WorldToIndex(pt_mm, pt_certain_geometry_units);
 //## @endcode
 //## unless you can be sure that the underlying geometry of @a displaygeometry
@@ -118,7 +118,7 @@ public:
   virtual void WorldToIndex(const mitk::Point2D &pt_mm, mitk::Point2D &pt_units) const;
 
   //##ModelId=3E3AEB620231
-  virtual const TimeBounds& GetTimeBoundsInMS() const;
+  virtual const TimeBounds& GetTimeBounds() const;
 
   //##ModelId=3E3B994B02A6
   virtual void WorldToIndex(const mitk::Point2D &atPt2d_mm, const mitk::Vector2D &vec_mm, mitk::Vector2D &vec_units) const;
@@ -157,14 +157,14 @@ public:
   mitk::ScalarType GetScaleFactorMMPerDisplayUnit() const;
 
   //##ModelId=3E48D5B40210
-  virtual void DisplayToMM(const mitk::Point2D &pt_display, mitk::Point2D &pt_mm) const;
+  virtual void DisplayToWorld(const mitk::Point2D &pt_display, mitk::Point2D &pt_mm) const;
   //##ModelId=3E48D5D7027E
-  virtual void MMToDisplay(const mitk::Point2D &pt_mm, mitk::Point2D &pt_display) const;
+  virtual void WorldToDisplay(const mitk::Point2D &pt_mm, mitk::Point2D &pt_display) const;
 
   //##ModelId=3E48E2AE03A7
-  virtual void DisplayToMM(const mitk::Vector2D &vec_display, mitk::Vector2D &vec_mm) const;
+  virtual void DisplayToWorld(const mitk::Vector2D &vec_display, mitk::Vector2D &vec_mm) const;
   //##ModelId=3E48E2B40374
-  virtual void MMToDisplay(const mitk::Vector2D &vec_mm, mitk::Vector2D &vec_display) const;
+  virtual void WorldToDisplay(const mitk::Vector2D &vec_mm, mitk::Vector2D &vec_display) const;
 
   //##ModelId=3EF436470027
   virtual void ULDisplayToMM(const mitk::Point2D &pt_ULdisplay, mitk::Point2D &pt_mm) const;

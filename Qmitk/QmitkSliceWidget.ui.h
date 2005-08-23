@@ -167,17 +167,17 @@ void QmitkSliceWidget::InitWidget( mitk::SliceNavigationController::ViewDirectio
 //    geometry->SetSpacing(correctGeometry->GetSpacing());
 
     //lets see if we have data with a limited live-span ...
-    mitk::TimeBounds timebounds = mitk::DataTree::ComputeTimeBoundsInMS(m_DataTreeIterator.GetPointer(), NULL, "includeInBoundingBox");
+    mitk::TimeBounds timebounds = mitk::DataTree::ComputeTimeBounds(m_DataTreeIterator.GetPointer(), NULL, "includeInBoundingBox");
     if(timebounds[1]<mitk::ScalarTypeNumericTraits::max())
     {
       mitk::ScalarType duration = timebounds[1]-timebounds[0];
 
       mitk::TimeSlicedGeometry::Pointer timegeometry = mitk::TimeSlicedGeometry::New();
       timegeometry->InitializeEvenlyTimed(m_SlicedGeometry.GetPointer(), (unsigned int) duration);
-      timegeometry->SetTimeBoundsInMS(timebounds); //@bug really required? FIXME
+      timegeometry->SetTimeBounds(timebounds); //@bug really required? FIXME
 
       timebounds[1] = timebounds[0]+1.0f;
-      geometry->SetTimeBoundsInMS(timebounds);
+      geometry->SetTimeBounds(timebounds);
 
       geometry=timegeometry;
     }

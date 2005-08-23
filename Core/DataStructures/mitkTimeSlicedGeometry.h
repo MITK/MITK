@@ -25,8 +25,26 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk {
 
 //##Documentation
-//## @brief Describes XXX
+//## @brief Describes a geometry consisting of several geometries which 
+//## exist at different times.
 //##
+//## The geometry contains m_TimeSteps geometries, which can be accessed
+//## using GetGeometry3D(int t). To convert between world-time in 
+//## milliseconds and the integer timestep-number use MSToTimeStep.
+//## The hull (in space and time) of the TimeSlicedGeometry contains all
+//## contained geometries. 
+//## @warning The hull (i.e., transform, bounding-box and
+//## time-bounds) is only guaranteed to be up-to-date after calling 
+//## UpdateInformation().
+//## 
+//## TimeSlicedGeometry and the associated Geometry3Ds have to be
+//## initialized in the method GenerateOutputInformation() of BaseProcess (or
+//## CopyInformation/ UpdateOutputInformation of BaseData, if possible, e.g.,
+//## by analyzing pic tags in Image) subclasses. See also
+//## itk::ProcessObject::GenerateOutputInformation(),
+//## itk::DataObject::CopyInformation() and
+//## itk::DataObject::UpdateOutputInformation().
+//## 
 //## @ingroup Geometry
 class TimeSlicedGeometry : public Geometry3D
 {
@@ -35,16 +53,22 @@ public:
 
   itkNewMacro(Self);
 
+  //## @brief Re-calculate the hull of the contained geometries.
+  //##
+  //## The transforms, bounding-box and time-bounds of this
+  //## geometry (stored in members of the super-class Geometry3D)
+  //## are re-calculated from the contained geometries.
+  void UpdateInformation();
+
   //## @brief Get the number of time-steps
   itkGetConstMacro(TimeSteps, unsigned int);
 
-  virtual const TimeBounds& GetTimeBoundsInMS() const;
   //##Documentation
   //## @brief Set/Get whether the TimeSlicedGeometry is evenly-timed (m_EvenlyTimed)
   //## 
-  //## if (a) we don't have a Geometry3D stored for the requested time, 
+  //## If (a) we don't have a Geometry3D stored for the requested time, 
   //## (b) m_EvenlyTimed is activated and (c) the first geometry (t=0) 
-  //## is set, then we clone the geometry and set the m_TimeBoundsInMS accordingly.
+  //## is set, then we clone the geometry and set the m_TimeBounds accordingly.
   //## \sa GetGeometry3D
  	itkGetConstMacro(EvenlyTimed, bool);
   virtual void SetEvenlyTimed(bool on = true);
@@ -54,8 +78,6 @@ public:
   virtual bool SetGeometry3D(mitk::Geometry3D* geometry3D, int t);
   
   virtual mitk::Geometry3D* GetGeometry3D(int t) const;
-
-  virtual const mitk::BoundingBox* GetBoundingBox() const;
 
   virtual bool IsValidTime(int t) const;
 
@@ -68,19 +90,23 @@ public:
   //##
   virtual bool ReadXMLData( XMLReader& xmlReader );
 
-protected:
+  //## @brief Completely initialize this instance as evenly-timed with 
+  //## @timeSteps geometries of type Geometry3D, each initialized by
+  //## Geometry3D::Initialize().
   virtual void Initialize(unsigned int timeSteps);
-public:
+
   //##Documentation
   //## @brief Completely initialize this instance as evenly-timed with @timeSteps geometries 
   //## identical to the provided Geometry3D except of the time bounds.
   //##
   virtual void InitializeEvenlyTimed(mitk::Geometry3D* geometry3D, unsigned int timeSteps);
 
+  virtual void InitializeEmpty(unsigned int timeSteps);
+
   virtual void SetImageGeometry(const bool isAnImageGeometry);
 
   //##Documentation
-  //## @brief Copy the m_TimeBoundsInMS of the geometries contained
+  //## @brief Copy the m_TimeBounds of the geometries contained
   //## in @a timeslicedgeometry into the geometries contained in this
   //## TimeSlicedGeometry object.
   //##

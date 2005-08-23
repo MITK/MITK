@@ -24,15 +24,14 @@ PURPOSE.  See the above copyright notices for more information.
 
 mitk::Ellipsoid::Ellipsoid():BoundingObject()
 {
-  //m_Geometry3D->Initialize();
   vtkSphereSource* sphere = vtkSphereSource::New();
   sphere->SetRadius(1.0);
   sphere->SetThetaResolution(20);
   sphere->SetPhiResolution(20);
   sphere->Update();
   SetVtkPolyData(sphere->GetOutput());
-  std::cout << GetVtkPolyData()<< ", " << sphere->GetOutput() << std::endl;
-  //sphere->Delete();
+  itkDebugMacro( << GetVtkPolyData()<< ", " << sphere->GetOutput());
+  sphere->Delete();
 }
 
 mitk::Ellipsoid::~Ellipsoid()
@@ -55,6 +54,8 @@ bool mitk::Ellipsoid::IsInside(const Point3D& worldPoint) const
 
 mitk::ScalarType mitk::Ellipsoid::GetVolume()
 {
-  return   GetGeometry()->GetXAxis().GetNorm() * GetGeometry()->GetYAxis().GetNorm() 
-         * GetGeometry()->GetZAxis().GetNorm() * vnl_math::pi * 4.0/3.0;
+  return   GetGeometry()->GetExtentInMM(0) * 0.5
+         * GetGeometry()->GetExtentInMM(1) * 0.5
+         * GetGeometry()->GetExtentInMM(2) * 0.5
+         * vnl_math::pi * 4.0/3.0;
 }

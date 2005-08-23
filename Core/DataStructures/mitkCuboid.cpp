@@ -26,11 +26,11 @@ PURPOSE.  See the above copyright notices for more information.
 
 mitk::Cuboid::Cuboid()
 {
-  GetGeometry()->Initialize();
   vtkCubeSource* cube = vtkCubeSource::New();
   cube->SetXLength(2.0);
   cube->SetYLength(2.0);
   cube->SetZLength(2.0);
+  cube->Update();
   SetVtkPolyData(cube->GetOutput());
   cube->Delete();
 }
@@ -43,13 +43,8 @@ mitk::Cuboid::~Cuboid()
 bool mitk::Cuboid::IsInside(const Point3D& worldPoint) const
 {
   // transform point from world to object coordinates
-  ScalarType p[4];
-  p[0] = worldPoint[0];
-  p[1] = worldPoint[1];
-  p[2] = worldPoint[2];
-  p[3] = 1;
-  GetGeometry()->GetVtkTransform()->GetInverse()->TransformPoint(p, p);
-	mitk::Point3D itkPoint;
+  Point3D p;
+  GetGeometry(0)->WorldToIndex(worldPoint, p);
 
   bool retval =(p[0] >= -1) && (p[0] <= 1) 
             && (p[1] >= -1) && (p[1] <= 1) 
@@ -59,6 +54,8 @@ bool mitk::Cuboid::IsInside(const Point3D& worldPoint) const
 
 mitk::ScalarType mitk::Cuboid::GetVolume()
 {
-  return   2 * GetGeometry()->GetXAxis().GetNorm() * 2 * GetGeometry()->GetYAxis().GetNorm() 
-         * 2 * GetGeometry()->GetZAxis().GetNorm();
+  Geometry3D* geometry = GetTimeSlicedGeometry();
+  return   geometry->GetExtentInMM(0) 
+         * geometry->GetExtentInMM(1)
+         * geometry->GetExtentInMM(2);
 }

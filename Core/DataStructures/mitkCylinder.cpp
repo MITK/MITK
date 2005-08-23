@@ -24,7 +24,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 mitk::Cylinder::Cylinder()
 {
-  GetGeometry()->Initialize();
   vtkCylinderSource* cylinder = vtkCylinderSource::New();
   cylinder->SetRadius(1.0);
   cylinder->SetHeight(2.0);
@@ -43,13 +42,8 @@ mitk::Cylinder::~Cylinder()
 bool mitk::Cylinder::IsInside(const Point3D& worldPoint) const
 {
   // transform point from world to object coordinates
-  ScalarType p[4];
-  p[0] = worldPoint[0];
-  p[1] = worldPoint[1];
-  p[2] = worldPoint[2];
-  p[3] = 1;
-  GetGeometry()->GetVtkTransform()->GetInverse()->TransformPoint(p, p);
-	mitk::Point3D itkPoint;
+  Point3D p;
+  GetGeometry(0)->WorldToIndex(worldPoint, p);
 
   mitk::ScalarType v =  pow(p[0], 2) + pow(p[2], 2);
   bool retval = (v <= 1) && (p[1] >= -1) && (p[1] <= 1);
@@ -58,6 +52,9 @@ bool mitk::Cylinder::IsInside(const Point3D& worldPoint) const
 
 mitk::ScalarType mitk::Cylinder::GetVolume()
 {
-  return   GetGeometry()->GetXAxis().GetNorm() * GetGeometry()->GetZAxis().GetNorm() 
-         * 2 * GetGeometry()->GetYAxis().GetNorm() * vnl_math::pi;
+  Geometry3D* geometry = GetTimeSlicedGeometry();
+  return   geometry->GetExtentInMM(0) * 0.5
+         * geometry->GetExtentInMM(2) * 0.5
+         * vnl_math::pi
+         * geometry->GetExtentInMM(1);
 }

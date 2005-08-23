@@ -1,5 +1,5 @@
 /*=========================================================================
- 
+
 Program:   Medical Imaging & Interaction Toolkit
 Module:    $RCSfile$
 Language:  C++
@@ -9,11 +9,11 @@ Version:   $Revision$
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 
@@ -66,18 +66,18 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkConfig.h>
 
 #ifdef MBI_INTERNAL
-  #include <mitkVesselTreeFileReader.h>
-  #include <mitkVesselGraphFileReader.h>
-  #include <mitkDICOMFileReader.h>
-  #include <mitkDSRFileReader.h>
-  #include <mitkCylindricToCartesianFilter.h>
-  #include <itksys/SystemTools.hxx>
+#include <mitkVesselTreeFileReader.h>
+#include <mitkVesselGraphFileReader.h>
+#include <mitkDICOMFileReader.h>
+#include <mitkDSRFileReader.h>
+#include <mitkCylindricToCartesianFilter.h>
+#include <itksys/SystemTools.hxx>
 #else
-  #include "itkImage.h"
-  #include "itkImageFileReader.h"
-  #include "itkDICOMImageIO2.h"
-  #include "itkImageSeriesReader.h"
-  #include "itkDICOMSeriesFileNames.h"
+#include "itkImage.h"
+#include "itkImageFileReader.h"
+#include "itkDICOMImageIO2.h"
+#include "itkImageSeriesReader.h"
+#include "itkDICOMSeriesFileNames.h"
 #endif
 
 #include "QmitkCommonFunctionality.h"
@@ -180,7 +180,7 @@ public:
           {
             m_TimeSelector->SetInput(image);
 
-            const mitk::TimeSlicedGeometry* inputTimeGeometry = dynamic_cast< const mitk::TimeSlicedGeometry* >( image->GetUpdatedGeometry() );
+            const mitk::TimeSlicedGeometry* inputTimeGeometry = image->GetUpdatedTimeSlicedGeometry();
 
             int timestep=0;
             if(time>mitk::ScalarTypeNumericTraits::min())
@@ -238,10 +238,8 @@ void QmitkMainTemplate::fileNew()
 void QmitkMainTemplate::fileOpen()
 {
 #ifdef MBI_INTERNAL
-  //  QString fileName = QFileDialog::getOpenFileName(NULL,"all (*.seq *.pic *.pic.gz *.seq.gz *.pvtk *.stl *.vtk *.ves *.uvg *.par *.dcm *.mhd *.png *.tif *.jpg hpsonos.db HPSONOS.DB);;DKFZ Pic (*.seq *.pic *.pic.gz *.seq.gz);;surface files (*.stl *.vtk);;stl files (*.stl);;vtk surface files (*.vtk);;vtk image files (*.pvtk);;vessel files (*.ves *.uvg);;par/rec files (*.par);;DSR files (hpsonos.db HPSONOS.DB);;DICOM files (*.dcm)");
   QStringList fileNames = QFileDialog::getOpenFileNames(CommonFunctionality::GetInternalFileExtensions(), NULL);
 #else
-  //  QString fileName = QFileDialog::getOpenFileName(NULL,"all (*.seq *.pic *.pic.gz *.seq.gz *.pvtk *.stl *.vtk *.par  *.png *.tif *.jpg);;DKFZ Pic (*.seq *.pic *.pic.gz *.seq.gz);;surface files (*.stl *.vtk);;stl files (*.stl);;vtk surface files (*.vtk);;vtk image files (*.pvtk);;par/rec files (*.par);;DICOM files (*.dcm)");
   QStringList fileNames = QFileDialog::getOpenFileNames( CommonFunctionality::GetExternalFileExtensions(), NULL );
 #endif
   for ( QStringList::Iterator it = fileNames.begin(); it != fileNames.end(); ++it )
@@ -263,13 +261,13 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
 
     factory->Update();
     fileOpenGetFactoryOutput(*factory.GetPointer());
-
-    QApplication::restoreOverrideCursor();
   }
   catch ( itk::ExceptionObject & ex )
   {
     itkGenericOutputMacro( << "Exception during file open: " << ex );
   }
+
+  QApplication::restoreOverrideCursor();
 }
 
 void QmitkMainTemplate::fileOpenImageSequence()
@@ -300,13 +298,20 @@ void QmitkMainTemplate::fileOpenImageSequence()
 
     mitk::DataTreeNodeFactory::Pointer factory = mitk::DataTreeNodeFactory::New();
 
-    factory->SetFilePattern( pattern );
-    factory->SetFilePrefix( prefix );
+    try
+    {
+      factory->SetFilePattern( pattern );
+      factory->SetFilePrefix( prefix );
 
-    QApplication::setOverrideCursor( QCursor(Qt::WaitCursor) );
+      QApplication::setOverrideCursor( QCursor(Qt::WaitCursor) );
 
-    factory->Update();
-    fileOpenGetFactoryOutput(*factory.GetPointer());
+      factory->Update();
+      fileOpenGetFactoryOutput(*factory.GetPointer());
+    }
+    catch ( itk::ExceptionObject & ex )
+    {
+      itkGenericOutputMacro( << "Exception during file open: " << ex );
+    }
 
     QApplication::restoreOverrideCursor();
   }
@@ -358,62 +363,78 @@ void QmitkMainTemplate::fileOpenGetFactoryOutput( mitk::DataTreeNodeFactory & fa
   }
 } // fileOpenGetFactoryOutput()
 
+void QmitkMainTemplate::fileOpenProject()
+{
+  QString fileName = QFileDialog::getOpenFileName(NULL,"MITK Project File (*.mitk)");
+
+  if ( !fileName.isNull() )
+  {
+    try
+    {    
+      QApplication::setOverrideCursor( QCursor(Qt::WaitCursor) );
+
+      mitk::DataTreePreOrderIterator it(tree);
+      mitk::DataTree::Load( &it, fileName.ascii() );
+
+      m_ProjectFileName = fileName;
+    }
+    catch ( itk::ExceptionObject & ex )
+    {
+      itkGenericOutputMacro( << "Exception during file open project: " << ex );
+    }
+    QApplication::restoreOverrideCursor();
+  }
+}
+
+void QmitkMainTemplate::fileSaveProjectAs()
+{
+  QString fileName = QFileDialog::getSaveFileName(NULL,"MITK Project File (*.mitk)");
+
+  if ( !fileName.isNull() )
+  {
+   try
+    {    
+      QApplication::setOverrideCursor( QCursor(Qt::WaitCursor) );
+
+      mitk::DataTreePreOrderIterator it(tree);
+      mitk::DataTree::Save( &it, fileName.ascii() );
+
+      m_ProjectFileName = fileName;
+    }
+    catch ( itk::ExceptionObject & ex )
+    {
+      itkGenericOutputMacro( << "Exception during file open project: " << ex );
+    }
+  }
+  QApplication::restoreOverrideCursor();
+}
 
 void QmitkMainTemplate::fileSave()
-{}
-
-void QmitkMainTemplate::fileSaveAs()
 {
-  mitk::DataTreePreOrderIterator it(tree);
-  while ( !it.IsAtEnd() )
-  {
-    mitk::DataTreeNode::Pointer node=it.Get();
-    if ( node->GetData()!=NULL )
-    {
-      mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
-      if ( image.IsNotNull() )
-      {
-        QString fileName = QFileDialog::getSaveFileName(NULL,"pvtk (*.pvtk)");
-        if ( !fileName.isNull() )
-        {
-          if ( fileName.endsWith(".pvtk")==false ) fileName+=".pvtk";
-          vtkStructuredPointsWriter *writer=vtkStructuredPointsWriter::New();
-          writer->SetInput(image->GetVtkImageData());
-          writer->SetFileName(fileName.ascii());
-          writer->SetFileTypeToBinary();
-          writer->Write();
-          writer->Delete();
-        }
-      }
-      mitk::Surface::Pointer surface = dynamic_cast<mitk::Surface*>(node->GetData());
-      if ( surface.IsNotNull() )
-      {
-        QString fileName = QFileDialog::getSaveFileName(NULL,"stl (*.stl);;vtk (*.vtk)");
-        if ( !fileName.isNull() )
-        {
-          if ( fileName.endsWith(".vtk") )
-          {
-            vtkPolyDataWriter *writer=vtkPolyDataWriter ::New();
-            writer->SetInput(surface->GetVtkPolyData());
-            writer->SetFileName(fileName.ascii());
-            writer->Write();
-            writer->Delete();
-          }
-          else
-          {
-            if ( fileName.endsWith(".stl")==false ) fileName+=".stl";
-            vtkSTLWriter *writer=vtkSTLWriter ::New();
-            writer->SetInput(surface->GetVtkPolyData());
-            writer->SetFileName(fileName.ascii());
-            writer->Write();
-            writer->Delete();
-          }
-        }
-      }
-    }
-    ++it;
-  }
+  QString fileName;
 
+  if ( m_ProjectFileName.length() > 5 )
+    fileName = m_ProjectFileName;
+  else 
+    fileName = fileName = QFileDialog::getSaveFileName(NULL,"MITK Project File (*.mitk)");
+
+  if ( !fileName.isNull() )
+  {
+   try
+    {    
+      QApplication::setOverrideCursor( QCursor(Qt::WaitCursor) );
+
+      mitk::DataTreePreOrderIterator it(tree);
+      mitk::DataTree::Save( &it, fileName.ascii() );
+
+      m_ProjectFileName = fileName;
+    }
+    catch ( itk::ExceptionObject & ex )
+    {
+      itkGenericOutputMacro( << "Exception during file open project: " << ex );
+    }
+  }
+  QApplication::restoreOverrideCursor();
 }
 
 void QmitkMainTemplate::filePrint()
@@ -477,7 +498,7 @@ void QmitkMainTemplate::init()
 
 /*!
 \brief basic initialization of main widgets
- 
+
 The method is should be called at the end of the initialize-method of its
 subclasses.
 */
@@ -568,30 +589,27 @@ void QmitkMainTemplate::Initialize()
 
 
 /*!
- 
+
 */
 void QmitkMainTemplate::InitializeFunctionality()
 {}
 
 /*!
 \brief this method initializes the Qmitk functionality mediator
- 
+
 When subclassing this template class the developer can overwrite the method
 to provide different layout templates
 */
 void QmitkMainTemplate::InitializeQfm()
 {
-  QHBoxLayout *hlayout;
-  hlayout=new QHBoxLayout(MainWidget);
-
   //create an QmitkFctMediator. This is an invisible object that controls, manages and mediates functionalities
-  qfm=new QmitkFctMediator(MainWidget);
+  qfm=new QmitkFctMediator(this);
 
   //create an QmitkButtonFctLayoutTemplate. This is an simple example for an layout of the different widgets, of which
   //a functionality and the management consists: the main widget, the control widget and a menu for selecting the
   //active functionality.
-  QmitkControlsRightFctLayoutTemplate* layoutTemplate=new QmitkControlsRightFctLayoutTemplate(MainWidget, "LayoutTemplate");
-  hlayout->addWidget(layoutTemplate);
+  QmitkControlsRightFctLayoutTemplate* layoutTemplate=new QmitkControlsRightFctLayoutTemplate(this, "LayoutTemplate");
+  setCentralWidget(layoutTemplate);
 
   //let the QmitkFctMediator know about the layout. This includes the toolbar and the layoutTemplate.
   qfm->Initialize(this);
@@ -740,77 +758,12 @@ void QmitkMainTemplate::optionsSystem_InformationAction_activated()
   systemInfo->show();
 }
 
- 
-  
 bool QmitkMainTemplate::GetStandardViewsInitialized()
 {
   return m_StandardViewsInitialized;
 }
 
-
 void QmitkMainTemplate::SetStandardViewsInitialized( bool areInitialized )
 {
   m_StandardViewsInitialized = areInitialized;
-}
-
-/**
-  *
-  */
-void QmitkMainTemplate::fileOpenProjectActionActivated()
-{
-  QString fileName = QFileDialog::getOpenFileName( NULL, "*.mitk" );  
-
-  if ( fileName.length() < 5 ) 
-    return;
-
-  mitk::DataTreePreOrderIterator it(tree);
-
-  try{
-    mitk::DataTree::Load( &it, fileName.ascii() );
-  } catch ( ... )
-  { std::cout << "cant open Project: " << fileName.ascii() << std::endl; }
-
-  m_ProjectFileName = fileName;
-}
-
-/**
-  *
-  */
-void QmitkMainTemplate::fileSaveProjectActionActivated()
-{
-  QString fileName;
-
-  if ( m_ProjectFileName.length() > 5 )
-    fileName = m_ProjectFileName;
-  else 
-    fileName = QFileDialog::getSaveFileName( NULL, "*.mitk" );  
-
-  if ( fileName.length() < 4 ) 
-    return;
-
-  mitk::DataTreePreOrderIterator it(tree);
-
-  try{
-    mitk::DataTree::Save( &it, fileName.ascii() );
-  } catch (...)
-  { std::cout << "cant save project: " << fileName.ascii() << std::endl; }
-  m_ProjectFileName = fileName;
-}
-
-/**
-  *
-  */
-void QmitkMainTemplate::fileSaveProjectAsActionActivated()
-{
- QString fileName = QFileDialog::getSaveFileName( NULL, "*.mitk" );  
-
-  if ( fileName.length() < 5 ) 
-    return;
-
-  mitk::DataTreePreOrderIterator it(tree);
-  try{
-    mitk::DataTree::Save( &it, fileName.ascii() ); 
-  } catch (...)
-  { std::cout << "cant save project: " << fileName.ascii() << std::endl; }
-  m_ProjectFileName = fileName;
 }

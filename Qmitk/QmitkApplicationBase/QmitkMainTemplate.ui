@@ -8,52 +8,19 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>674</width>
-            <height>495</height>
+            <width>684</width>
+            <height>499</height>
         </rect>
     </property>
     <property name="minimumSize">
         <size>
-            <width>222</width>
-            <height>332</height>
+            <width>21</width>
+            <height>254</height>
         </size>
     </property>
     <property name="caption">
         <string>QmitkMainTemplate</string>
     </property>
-    <hbox>
-        <property name="name">
-            <cstring>unnamed</cstring>
-        </property>
-        <widget class="QFrame">
-            <property name="name">
-                <cstring>MainWidget</cstring>
-            </property>
-            <property name="sizePolicy">
-                <sizepolicy>
-                    <hsizetype>1</hsizetype>
-                    <vsizetype>1</vsizetype>
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                </sizepolicy>
-            </property>
-            <property name="minimumSize">
-                <size>
-                    <width>200</width>
-                    <height>200</height>
-                </size>
-            </property>
-            <property name="frameShape">
-                <enum>StyledPanel</enum>
-            </property>
-            <property name="frameShadow">
-                <enum>Raised</enum>
-            </property>
-            <property name="lineWidth">
-                <number>0</number>
-            </property>
-        </widget>
-    </hbox>
 </widget>
 <menubar>
     <property name="name">
@@ -63,12 +30,11 @@
         <action name="fileNewAction"/>
         <action name="fileOpenAction"/>
         <action name="fileOpenImageSequenceAction"/>
-        <action name="fileSaveAction"/>
-        <action name="fileSaveAsAction"/>
         <separator/>
-        <action name="fileOpen_ProjectAction"/>
-        <action name="fileSave_ProjectAction"/>
-        <action name="fileSave_Project_AsAction"/>
+        <action name="fileOpenProjectAction"/>
+        <action name="fileSaveProjectAction"/>
+        <action name="fileSaveProjectAsAction"/>
+        <action name="fileCloseProjectAction"/>
         <separator/>
         <action name="filePrintAction"/>
         <separator/>
@@ -161,16 +127,16 @@
     </action>
     <action>
         <property name="name">
-            <cstring>fileSaveAction</cstring>
+            <cstring>fileSaveProjectAction</cstring>
         </property>
         <property name="iconSet">
             <iconset>image1</iconset>
         </property>
         <property name="text">
-            <string>Save</string>
+            <string>Save Project</string>
         </property>
         <property name="menuText">
-            <string>&amp;Save</string>
+            <string>&amp;Save Project</string>
         </property>
         <property name="accel">
             <string>Ctrl+S</string>
@@ -178,13 +144,13 @@
     </action>
     <action>
         <property name="name">
-            <cstring>fileSaveAsAction</cstring>
+            <cstring>fileSaveProjectAsAction</cstring>
         </property>
         <property name="text">
-            <string>Save As</string>
+            <string>Save Project &amp;As...</string>
         </property>
         <property name="menuText">
-            <string>Save &amp;As...</string>
+            <string>Save Project &amp;As...</string>
         </property>
         <property name="accel">
             <string></string>
@@ -605,35 +571,41 @@
     </action>
     <action>
         <property name="name">
-            <cstring>fileOpen_ProjectAction</cstring>
+            <cstring>fileOpenProjectAction</cstring>
+        </property>
+        <property name="on">
+            <bool>false</bool>
         </property>
         <property name="text">
             <string>Open Project</string>
         </property>
         <property name="menuText">
-            <string>Open Project</string>
+            <string>Open &amp;Project</string>
+        </property>
+        <property name="toolTip">
+            <string>Open existing project file</string>
         </property>
     </action>
     <action>
         <property name="name">
-            <cstring>fileSave_ProjectAction</cstring>
+            <cstring>Action</cstring>
         </property>
         <property name="text">
-            <string>Save Project</string>
-        </property>
-        <property name="menuText">
-            <string>Save Project</string>
+            <string>Unnamed</string>
         </property>
     </action>
     <action>
         <property name="name">
-            <cstring>fileSave_Project_AsAction</cstring>
+            <cstring>fileCloseProjectAction</cstring>
         </property>
         <property name="text">
-            <string>Save Project As...</string>
+            <string>Close Project</string>
         </property>
         <property name="menuText">
-            <string>Save Project As...</string>
+            <string>&amp;Close Project</string>
+        </property>
+        <property name="toolTip">
+            <string>Close the project; clears the data tree.</string>
         </property>
     </action>
 </actions>
@@ -746,13 +718,7 @@
         <slot>filePrint()</slot>
     </connection>
     <connection>
-        <sender>fileSaveAsAction</sender>
-        <signal>activated()</signal>
-        <receiver>QmitkMainTemplate</receiver>
-        <slot>fileSaveAs()</slot>
-    </connection>
-    <connection>
-        <sender>fileSaveAction</sender>
+        <sender>fileSaveProjectAction</sender>
         <signal>activated()</signal>
         <receiver>QmitkMainTemplate</receiver>
         <slot>fileSave()</slot>
@@ -848,22 +814,10 @@
         <slot>optionsSystem_InformationAction_activated()</slot>
     </connection>
     <connection>
-        <sender>fileOpen_ProjectAction</sender>
+        <sender>fileOpenProjectAction</sender>
         <signal>activated()</signal>
         <receiver>QmitkMainTemplate</receiver>
-        <slot>fileOpenProjectActionActivated()</slot>
-    </connection>
-    <connection>
-        <sender>fileSave_ProjectAction</sender>
-        <signal>activated()</signal>
-        <receiver>QmitkMainTemplate</receiver>
-        <slot>fileSaveProjectActionActivated()</slot>
-    </connection>
-    <connection>
-        <sender>fileSave_Project_AsAction</sender>
-        <signal>activated()</signal>
-        <receiver>QmitkMainTemplate</receiver>
-        <slot>fileSaveProjectAsActionActivated()</slot>
+        <slot>fileOpenProject()</slot>
     </connection>
 </connections>
 <includes>
@@ -907,8 +861,9 @@
     <slot>fileNew()</slot>
     <slot>fileOpen()</slot>
     <slot>fileOpenImageSequence()</slot>
+    <slot>fileOpenProject()</slot>
     <slot>fileSave()</slot>
-    <slot>fileSaveAs()</slot>
+    <slot>fileSaveProjectAs()</slot>
     <slot>filePrint()</slot>
     <slot>fileExit()</slot>
     <slot>editUndo()</slot>
@@ -934,9 +889,6 @@
     <slot>hideToolbar( bool on )</slot>
     <slot>enableFineUndo( bool enabled )</slot>
     <slot>optionsSystem_InformationAction_activated()</slot>
-    <slot>fileOpenProjectActionActivated()</slot>
-    <slot>fileSaveProjectActionActivated()</slot>
-    <slot>fileSaveProjectAsActionActivated()</slot>
 </slots>
 <functions>
     <function>fileOpen( const char * fileName )</function>

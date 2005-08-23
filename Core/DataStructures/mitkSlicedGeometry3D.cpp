@@ -289,19 +289,19 @@ void mitk::SlicedGeometry3D::SetDirectionVector(const mitk::Vector3D& directionV
   }
 }
 
-void mitk::SlicedGeometry3D::SetTimeBoundsInMS(const mitk::TimeBounds& timebounds)
+void mitk::SlicedGeometry3D::SetTimeBounds(const mitk::TimeBounds& timebounds)
 {
-  Superclass::SetTimeBoundsInMS(timebounds);
+  Superclass::SetTimeBounds(timebounds);
 
   unsigned int s;
   for(s=0; s<m_Slices; ++s)
   {
     if(m_Geometry2Ds[s].IsNotNull())
     {
-      m_Geometry2Ds[s]->SetTimeBoundsInMS(timebounds);
+      m_Geometry2Ds[s]->SetTimeBounds(timebounds);
     }
   }
-  m_TimeBoundsInMS = timebounds;
+  m_TimeBounds = timebounds;
 }
 
 mitk::AffineGeometryFrame3D::Pointer mitk::SlicedGeometry3D::Clone() const

@@ -108,8 +108,8 @@ public:
 
   virtual void SetIndexToWorldTransform(mitk::AffineTransform3D* transform);
 
-  itkGetConstReferenceMacro(TimeBoundsInMS, TimeBounds);
-  virtual void SetTimeBoundsInMS(const TimeBounds& timebounds);
+  itkGetConstReferenceMacro(TimeBounds, TimeBounds);
+  virtual void SetTimeBounds(const TimeBounds& timebounds);
 
   Point3D GetCornerPoint(int id) const;
 
@@ -266,6 +266,30 @@ public:
       index[i]=(typename IndexType::IndexValueType)pt_units[i];
   }
 
+  template<class TCoordRep>
+  void WorldToItkPhysicalPoint(const mitk::Point3D &pt_mm,
+            itk::Point<TCoordRep, 3>& itkPhysicalPoint) const
+  {
+    mitk::Point3D index;
+    WorldToIndex(pt_mm, index);
+    for (unsigned int i = 0 ; i < 3 ; i++)
+    {
+      itkPhysicalPoint[i] = static_cast<TCoordRep>( this->m_Spacing[i] * index[i] + this->m_Origin[i] );
+    }
+  }
+
+  template<class TCoordRep>
+  void ItkPhysicalPointToWorld(const itk::Point<TCoordRep, 3>& itkPhysicalPoint,
+            mitk::Point3D &pt_mm) const
+  {
+    mitk::Point3D index;
+    for (unsigned int i = 0 ; i < 3 ; i++)
+    {
+      index[i] = static_cast<ScalarType>( (itkPhysicalPoint[i]- this->m_Origin[i]) / this->m_Spacing[i] );
+    }
+    IndexToWorld(index, pt_mm);
+   }
+
   //##ModelId=3E3453C703AF
   virtual void Initialize();
 
@@ -346,10 +370,6 @@ public:
   //##@brief executes affine operations (translate, rotate, scale)
   void ExecuteOperation(Operation* operation); 
 
-  const Vector3D GetXAxis();
-  const Vector3D GetYAxis();
-  const Vector3D GetZAxis();
-
   //##
   virtual bool WriteXMLData( XMLWriter& xmlWriter );
   //##
@@ -389,7 +409,7 @@ protected:
 
   mutable mitk::BoundingBox::Pointer m_ParametricBoundingBox;
 
-  mutable mitk::TimeBounds m_TimeBoundsInMS;
+  mutable mitk::TimeBounds m_TimeBounds;
 
   vtkMatrix4x4* m_VtkMatrix;
   

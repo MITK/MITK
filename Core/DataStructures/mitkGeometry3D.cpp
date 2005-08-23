@@ -86,7 +86,7 @@ void mitk::Geometry3D::Initialize()
 
   m_ParametricTransform = m_IndexToWorldTransform;
 
-  m_TimeBoundsInMS[0]=-ScalarTypeNumericTraits::max(); m_TimeBoundsInMS[1]=ScalarTypeNumericTraits::max();
+  m_TimeBounds[0]=-ScalarTypeNumericTraits::max(); m_TimeBounds[1]=ScalarTypeNumericTraits::max();
 
   m_FrameOfReferenceID = 0;
 
@@ -114,11 +114,11 @@ void mitk::Geometry3D::SetIndexToWorldTransformByVtkMatrix(vtkMatrix4x4* vtkmatr
   TransferVtkToItkTransform();
 }
 
-void mitk::Geometry3D::SetTimeBoundsInMS(const TimeBounds& timebounds)
+void mitk::Geometry3D::SetTimeBounds(const TimeBounds& timebounds)
 {
-  if(m_TimeBoundsInMS != timebounds)
+  if(m_TimeBounds != timebounds)
   {
-    m_TimeBoundsInMS = timebounds;
+    m_TimeBounds = timebounds;
     Modified();
   }
 }
@@ -195,7 +195,7 @@ void mitk::Geometry3D::InitializeGeometry(Geometry3D * newGeometry) const
 {
   Superclass::InitializeGeometry(newGeometry);
 
-  newGeometry->SetTimeBoundsInMS(m_TimeBoundsInMS);
+  newGeometry->SetTimeBounds(m_TimeBounds);
 
   //newGeometry->GetVtkTransform()->SetMatrix(m_VtkIndexToWorldTransform->GetMatrix()); IW
   //newGeometry->TransferVtkToItkTransform(); //MH
@@ -286,9 +286,9 @@ void mitk::Geometry3D::ExecuteOperation(Operation* operation)
       mitk::Point3D newScale = pointOp->GetPoint();
       ScalarType data[3];
       /* calculate new scale: newscale = oldscale * (oldscale + scaletoadd)/oldscale */
-      data[0] = 1 + (newScale[0] / GetXAxis().GetNorm());
-      data[1] = 1 + (newScale[1] / GetYAxis().GetNorm());
-      data[2] = 1 + (newScale[2] / GetZAxis().GetNorm());
+      data[0] = 1 + (newScale[0] / GetMatrixColumn(0).magnitude());
+      data[1] = 1 + (newScale[1] / GetMatrixColumn(1).magnitude());
+      data[2] = 1 + (newScale[2] / GetMatrixColumn(2).magnitude());
 
       mitk::Point3D center = const_cast<mitk::BoundingBox*>(m_BoundingBox.GetPointer())->GetCenter();
       ScalarType pos[3];
@@ -329,6 +329,7 @@ void mitk::Geometry3D::ExecuteOperation(Operation* operation)
   }
   m_VtkMatrix->DeepCopy(vtktransform->GetMatrix());
   TransferVtkToItkTransform();
+  Modified();
 }
 
 void mitk::Geometry3D::BackTransform(const mitk::Point3D &in, mitk::Point3D& out) const
@@ -455,35 +456,6 @@ void mitk::Geometry3D::Compose( const vtkMatrix4x4 * vtkmatrix, bool pre )
   Compose(itkTransform, pre);
 }
 
-const mitk::Vector3D mitk::Geometry3D::GetXAxis()
-{
-  vtkMatrix4x4* m = GetVtkTransform()->GetMatrix();
-  mitk::Vector3D v;
-  v[0] = m->Element[0][0];
-  v[1] = m->Element[1][0];
-  v[2] = m->Element[2][0];
-  return v;
-}
-
-const mitk::Vector3D mitk::Geometry3D::GetYAxis()
-{
-  vtkMatrix4x4* m = GetVtkTransform()->GetMatrix();
-  mitk::Vector3D v;
-  v[0] = m->Element[0][1];
-  v[1] = m->Element[1][1];
-  v[2] = m->Element[2][1];
-  return v;
-}
-const mitk::Vector3D mitk::Geometry3D::GetZAxis()
-{
-  vtkMatrix4x4* m = GetVtkTransform()->GetMatrix();
-  mitk::Vector3D v;
-  v[0] = m->Element[0][2];
-  v[1] = m->Element[1][2];
-  v[2] = m->Element[2][2];
-  return v;
-}
-
 const char* mitk::Geometry3D::GetTransformAsString( TransformType* transformType ) 
 {
 	static char buffer[255];  
@@ -563,7 +535,7 @@ void mitk::Geometry3D::PrintSelf(std::ostream& os, itk::Indent indent) const
   os << indent << " Origin: " << m_Origin << std::endl;
   os << indent << " ImageGeometry: " << m_ImageGeometry << std::endl;
   os << indent << " Spacing: " << m_Spacing << std::endl;
-  os << indent << " TimeBoundsInMS: " << m_TimeBoundsInMS << std::endl;
+  os << indent << " TimeBounds: " << m_TimeBounds << std::endl;
 
   Superclass::PrintSelf(os,indent);
 }

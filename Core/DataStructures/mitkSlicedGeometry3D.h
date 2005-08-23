@@ -50,6 +50,10 @@ namespace mitk {
 //## 
 //## Rule: everything is in mm (or ms for temporal information) if not 
 //## stated otherwise.
+//## 
+//## @warning The hull (i.e., transform, bounding-box and
+//## time-bounds) is only guaranteed to be up-to-date after calling 
+//## UpdateInformation().
 class SlicedGeometry3D : public mitk::Geometry3D
 {
 public:
@@ -58,26 +62,33 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
+  //## @brief Re-calculate the hull of the contained geometries.
+  //##
+  //## The transforms, bounding-box and time-bounds of this
+  //## geometry (stored in members of the super-class Geometry3D)
+  //## are re-calculated from the contained geometries.
+  void UpdateInformation();
+
   //##ModelId=3DCBF50C0377
   //##Documentation
-  //## Return the Geometry2D of the slice (@a s).
+  //## \brief Returns the Geometry2D of the slice (@a s).
+  //##
   //## If (a) m_EvenlySpaced==true, (b) we don't have a Geometry2D stored
   //## for the requested slice, and (c) the first slice (s=0) 
   //## is a PlaneGeometry instance, then we calculate the geometry of the
-  //## requested as the plane of the first slice shifted by m_Spacing.z*s
+  //## requested as the plane of the first slice shifted by m_Spacing[3]*s
   //## in the direction of m_DirectionVector.
   //##
   //## @warning The Geometry2Ds are not necessarily up-to-date and not even
-  //## initialized. Geometry2Ds (if applicable) have to be initialized in the
-  //## method GenerateOutputInformation() of BaseProcess (or CopyInformation/
+  //## initialized. 
+  //##
+  //## The Geometry2Ds have to be initialized in the method 
+  //## GenerateOutputInformation() of BaseProcess (or CopyInformation/
   //## UpdateOutputInformation of BaseData, if possible, e.g., by analyzing
   //## pic tags in Image) subclasses. See also
   //## itk::ProcessObject::GenerateOutputInformation(),
   //## itk::DataObject::CopyInformation() and
   //## itk::DataObject::UpdateOutputInformation().
-  //## mitk::BaseData::GetGeometry2D() makes sure, that the Geometry2D is
-  //## up-to-date before returning it (by setting the update extent
-  //## appropriately and calling UpdateOutputInformation).
   virtual mitk::Geometry2D* GetGeometry2D(int s) const;
 
   //##ModelId=3E15578402BD
@@ -85,7 +96,7 @@ public:
   //## @brief Set Geometry2D of slice @a s.
   virtual bool SetGeometry2D(mitk::Geometry2D* geometry2D, int s);
 
-  virtual void SetTimeBoundsInMS(const mitk::TimeBounds& timebounds);
+  virtual void SetTimeBounds(const mitk::TimeBounds& timebounds);
 
   //##ModelId=3DCBF5D40253
   virtual const mitk::BoundingBox* GetBoundingBox() const;

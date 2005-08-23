@@ -77,7 +77,7 @@ protected:
 };
 
 template <class FilterType>
-runPipelineSmartPointerCorrectnessTestForFilterType()
+int runPipelineSmartPointerCorrectnessTestForFilterType()
 {
   typename FilterType::Pointer filter;
   std::cout << "Testing " << typeid(FilterType).name() << "::New(): ";

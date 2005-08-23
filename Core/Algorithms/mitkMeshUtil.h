@@ -31,6 +31,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkTransformMeshFilter.h>
 #include <itkTranslationTransform.h>
 #include <itkMinimumMaximumImageCalculator.h>
+#include <itkAutomaticTopologyMeshSource.h>
+#include <itkMeshDeformation/itkSimplexMeshGeometry.h>
+#include <itkRegularSphereMeshSource.h>
+#include <vnl/vnl_cross.h>
 
 #include <vtkActor.h>
 #include <vtkCellArray.h>
@@ -41,13 +45,76 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkProperty.h>
 #include <vtkFloatArray.h>
 
+#include <mitkGeometry3D.h>
+
 template <typename MeshType>
 class NullScalarAccessor
 {
 public:
-  static inline float GetScalar(typename MeshType::PointDataContainer* point, typename MeshType::PointIdentifier idx)
+  static inline VTK_FLOAT_TYPE GetScalar(typename MeshType::PointDataContainer* point, typename MeshType::PointIdentifier idx, typename MeshType* mesh = NULL, unsigned int type = 0)
   {
-    return 0.0f;
+    return (VTK_FLOAT_TYPE) 0.0;
+  };
+};
+
+template <typename MeshType>
+class MeanCurvatureAccessor
+{
+public:
+  static inline VTK_FLOAT_TYPE GetScalar(typename MeshType::PointDataContainer* point, typename MeshType::PointIdentifier idx, typename MeshType* mesh, unsigned int type = 0)
+  {
+    typename MeshType::PixelType dis;    
+    mesh->GetPointData(idx, &dis);
+    return (VTK_FLOAT_TYPE) dis;
+  };
+};
+
+template <typename MeshType>
+class SimplexMeshAccessor
+{
+public:
+  static inline VTK_FLOAT_TYPE GetScalar(typename MeshType::PointDataContainer* point, typename MeshType::PointIdentifier idx, typename MeshType* mesh, unsigned int type = 0 )
+  {
+    typename MeshType::GeometryMapPointer geometryData = mesh->GetGeometryData();
+
+    typename MeshType::PixelType dis;
+    if (type == 0)
+    {
+      double val = mesh->GetMeanCurvature( idx );
+      mesh->SetPointData(idx, val);
+      return val;
+    }
+    else if (type == 1)
+    {
+      double val = geometryData->GetElement(idx)->meanTension;
+      mesh->SetPointData(idx, val);
+      return val;
+    }
+    else if (type == 2)
+    {
+      double val = geometryData->GetElement(idx)->externalForce.GetNorm();
+      mesh->SetPointData(idx, val);
+      return val;
+    }
+    else if (type == 3)
+      return geometryData->GetElement(idx)->internalForce.GetNorm();
+    else if (type == 4)
+      return geometryData->GetElement(idx)->externalForce.GetNorm() *
+      mesh->GetDistance(idx);
+    else if (type == 5)
+    {
+      typename MeshType::PixelType dis;    
+      mesh->GetPointData(idx, &dis);
+      return (VTK_FLOAT_TYPE) dis;
+    }
+    else if (type == 6)
+    {
+      return (VTK_FLOAT_TYPE) ((geometryData->GetElement(idx))->allowSplitting);
+    }
+    else
+      return (VTK_FLOAT_TYPE) 0;
+
+    return (VTK_FLOAT_TYPE) dis;
   };
 };
 
@@ -331,7 +398,7 @@ public:
   /*!
   create an itkMesh object from a vtkPolyData
   */
-  static typename MeshType::Pointer MeshFromPolyData(vtkPolyData* poly)
+  static typename MeshType::Pointer MeshFromPolyData(vtkPolyData* poly, mitk::Geometry3D* geometryFrame=NULL)
   {
     // Create a new mesh
     typename MeshType::Pointer output = MeshType::New();
@@ -353,16 +420,31 @@ public:
     // points->Reserve(numPoints);
     // // Set the point container on the mesh
     //output->SetPoints(points);
-    for(int i =0; i < numPoints; i++)
+    VTK_FLOAT_TYPE vtkpoint[3];
+    typename MeshType::PointType itkPhysicalPoint;
+    if(geometryFrame==NULL)
     {
-      float* test = vtkpoints->GetPoint(i);
-      std::cout << "next point: " << test[0]<< "," << test[1] << "," << test[2] << std::endl;
-      typename MeshType::PixelType* apoint = (typename MeshType::PixelType*) vtkpoints->GetPoint(i);
-      typename MeshType::PointType p;
-      p[0] = test[0];
-      p[1] = test[1];
-      p[2] = test[2];
-      output->SetPoint( i, p );
+      for(int i =0; i < numPoints; ++i)
+      {
+        vtkpoints->GetPoint(i, vtkpoint);
+        //std::cout << "next point: " << test[0]<< "," << test[1] << "," << test[2] << std::endl;
+        //typename MeshType::PixelType* apoint = (typename MeshType::PixelType*) vtkpoints->GetPoint(i);
+        mitk::itk2vtk(itkPhysicalPoint, vtkpoint);
+        output->SetPoint( i, itkPhysicalPoint );
+      }
+    }
+    else
+    {
+      mitk::Point3D mitkWorldPoint;
+      for(int i =0; i < numPoints; ++i)
+      {
+        vtkpoints->GetPoint(i, vtkpoint);
+        //std::cout << "next point: " << test[0]<< "," << test[1] << "," << test[2] << std::endl;
+        //typename MeshType::PixelType* apoint = (typename MeshType::PixelType*) vtkpoints->GetPoint(i);
+        mitk::vtk2itk(vtkpoint, mitkWorldPoint);
+        geometryFrame->WorldToItkPhysicalPoint(mitkWorldPoint, itkPhysicalPoint);
+        output->SetPoint( i, itkPhysicalPoint );
+      }
     }
 
     vtkCellArray* vtkcells = poly->GetPolys();
@@ -436,6 +518,7 @@ public:
     }
     //output->Print(std::cout);
     output->BuildCellLinks();
+    delete[] vtkCellTypes;
     return output;
   }
 
@@ -490,14 +573,28 @@ public:
     // Create a vtkUnstructuredGrid
     vtkUnstructuredGrid* vgrid = vtkUnstructuredGrid::New();
     // Create the vtkPoints object and set the number of points
+#if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
+    vtkPoints* vpoints = vtkPoints::New( VTK_DOUBLE );
+#else
     vtkPoints* vpoints = vtkPoints::New();
-    vpoints->SetNumberOfPoints(numPoints);
-    // iterate over all the points in the itk mesh filling in
-    // the vtkPoints object as we go
-    typename MeshType::PointsContainer::Pointer points = mesh->GetPoints();
+#endif
 
-    for(typename MeshType::PointsContainer::Iterator i = points->Begin();
-      i != points->End(); ++i)
+    typename MeshType::PointsContainer::Pointer points = mesh->GetPoints();
+    typename MeshType::PointsContainer::Iterator i;
+
+    // iterate over all the points in the itk mesh to find
+    // the maximal index
+    int maxIndex = 0;
+    for(i = points->Begin(); i != points->End(); ++i)
+    {
+      if(maxIndex < i->Index())
+        maxIndex = i->Index();
+    }
+
+    // initialize vtk-classes for points and scalars
+    vpoints->SetNumberOfPoints(maxIndex+1);
+
+    for(i = points->Begin(); i != points->End(); ++i)
     {
       // Get the point index from the point container iterator
       int idx = i->Index();
@@ -553,7 +650,7 @@ public:
   /*!
     create an vtkUnstructuredGrid object from an itkMesh
   */
-  static vtkPolyData* MeshToPolyData(typename MeshType::Pointer mesh, bool onlyTriangles = false, bool useScalarAccessor = false, vtkPolyData* polydata = NULL)
+  static vtkPolyData* MeshToPolyData(typename MeshType::Pointer mesh, bool onlyTriangles = false, bool useScalarAccessor = false, unsigned int pointDataType = 0, mitk::Geometry3D* geometryFrame=NULL, vtkPolyData* polydata = NULL)
   {
     /*! 
     default Distribute line cell visitior definition 
@@ -611,43 +708,79 @@ public:
       polydata->Initialize();
 
     // Create the vtkPoints object and set the number of points
+#if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
+    vtkPoints* vpoints = vtkPoints::New( VTK_DOUBLE );
+#else
     vtkPoints* vpoints = vtkPoints::New();
-    vpoints->SetNumberOfPoints(numPoints);
-
+#endif
     vtkFloatArray * scalars = vtkFloatArray::New();
     scalars->SetNumberOfComponents(1);
-    scalars->SetNumberOfTuples(numPoints);
+
+    typename MeshType::PointsContainer::Pointer points = mesh->GetPoints();
+    typename MeshType::PointsContainer::Iterator i;
+
+    // iterate over all the points in the itk mesh to find
+    // the maximal index
+    int maxIndex = 0;
+    for(i = points->Begin(); i != points->End(); ++i)
+    {
+      if(maxIndex < i->Index())
+        maxIndex = i->Index();
+    }
+
+    // initialize vtk-classes for points and scalars
+    vpoints->SetNumberOfPoints(maxIndex+1);
+    scalars->SetNumberOfTuples(maxIndex+1);
 
     // iterate over all the points in the itk mesh filling in
     // the vtkPoints object as we go
-    typename MeshType::PointsContainer::Pointer points = mesh->GetPoints();
 
-    int idx=0;
-    for(typename MeshType::PointsContainer::Iterator i = points->Begin();
-      i != points->End(); ++i, ++idx)
+    VTK_FLOAT_TYPE vtkpoint[3];
+    typename MeshType::PointType itkPhysicalPoint;
+    if(geometryFrame==NULL)
     {
-      // Get the point index from the point container iterator
-      // int idx = i->Index(); //using this together with vtk::Points::SetPoint (no range checking!!) is unsafe!!
-      
-      typename MeshType::PointType p;
-      p = i->Value();
-      double  pd[3];
-      pd[0]=p[0];
-      pd[1]=p[1];
-      pd[2]=p[2];
-      // Set the vtk point at the index with the the coord array from itk
-      // itk returns a const pointer, but vtk is not const correct, so
-      // we have to use a const cast to get rid of the const
-      //      vpoints->SetPoint(idx, const_cast<DATATYPE*>(i->Value().GetDataPointer()));
-      vpoints->SetPoint(idx, pd);
+      for(i = points->Begin(); i != points->End(); ++i)
+      {
+        // Get the point index from the point container iterator
+        int idx = i->Index();
 
-      if(useScalarAccessor)
-      {   
-        scalars->InsertTuple1( idx, ScalarAccessor::GetScalar( mesh->GetPointData(), i->Index() ) );
+        itkPhysicalPoint = i->Value();
+        mitk::itk2vtk(itkPhysicalPoint, vtkpoint);
+        // Set the vtk point at the index with the the coord array from itk
+        // itk returns a const pointer, but vtk is not const correct, so
+        // we have to use a const cast to get rid of the const
+        //      vpoints->SetPoint(idx, const_cast<DATATYPE*>(i->Value().GetDataPointer()));
+        vpoints->SetPoint(idx, vtkpoint);
+
+        if(useScalarAccessor)
+        {   
+          scalars->InsertTuple1( idx, ScalarAccessor::GetScalar( mesh->GetPointData(), i->Index(), mesh, pointDataType ) );
+        }
       }
     }
+    else
+    {
+      mitk::Point3D mitkWorldPoint;
+      for(i = points->Begin(); i != points->End(); ++i)
+      {
+        // Get the point index from the point container iterator
+        int idx = i->Index();
 
+        itkPhysicalPoint = i->Value();
+        geometryFrame->ItkPhysicalPointToWorld(itkPhysicalPoint, mitkWorldPoint);
+        mitk::itk2vtk(itkPhysicalPoint, vtkpoint);
+        // Set the vtk point at the index with the the coord array from itk
+        // itk returns a const pointer, but vtk is not const correct, so
+        // we have to use a const cast to get rid of the const
+        //      vpoints->SetPoint(idx, const_cast<DATATYPE*>(i->Value().GetDataPointer()));
+        vpoints->SetPoint(idx, vtkpoint);
 
+        if(useScalarAccessor)
+        {   
+          scalars->InsertTuple1( idx, ScalarAccessor::GetScalar( mesh->GetPointData(), i->Index(), mesh, pointDataType ) );
+        }
+      }
+    }
 
     // Set the points on the vtk grid
     polydata->SetPoints(vpoints);
@@ -694,7 +827,7 @@ public:
       trianglecells->Allocate(numCells);
       polygoncells->Allocate(numCells);
 
-      // 2. Create a visitors
+      // 2. Create visitors
       typename DistributeLineVisitor::Pointer lv          = DistributeLineVisitor::New();
       typename DistributePolygonVisitor::Pointer pv       = DistributePolygonVisitor::New();
       typename DistributeTriangleVisitor::Pointer tv      = DistributeTriangleVisitor::New();
@@ -734,42 +867,178 @@ public:
     return polydata;
   }
 
-  static typename MeshType::Pointer TranslateMesh(typename MeshType::PointType vec, typename MeshType::Pointer inputMesh)
+  static typename MeshType::Pointer CreateRegularSphereMesh(typename MeshType::PointType center, typename MeshType::PointType::VectorType scale, int resolution)
   {
-    typedef typename itk::TranslationTransform< typename MeshType::PixelType, 3>  TransformType;
-    typedef typename itk::TransformMeshFilter<MeshType, MeshType, TransformType > MeshFilterType;
+    typedef itk::RegularSphereMeshSource<MeshType> SphereSourceType;
+      typename SphereSourceType::Pointer mySphereSource = SphereSourceType::New();
 
-    typename TransformType::Pointer translation = TransformType::New();
-    translation->SetIdentity();
-    
-    typename TransformType::ParametersType params = translation->GetParameters();
-    unsigned int i;
-
-    for (i=0; i < 3; i++) {
-      params[i]= vec[i];
-    }
-    translation->SetParameters(params);
-
-    typename MeshFilterType::Pointer filter = MeshFilterType::New();
-    filter->SetTransform( translation );
-    filter->SetInput( inputMesh );
-    filter->Update();
-
-    typename MeshType::Pointer resultMesh = filter->GetOutput();
-    resultMesh->Register();
-    
-    return resultMesh;
+			mySphereSource->SetCenter(center);
+			mySphereSource->SetScale(scale);
+      mySphereSource->SetResolution( resolution );
+			mySphereSource->Update();
+			
+      typename MeshType::Pointer resultMesh = mySphereSource->GetOutput();
+      resultMesh->Register(); // necessary ???? 
+		  return resultMesh;
   }
 
-  template <typename TImageType>
-  static std::pair<float,float> minmax(typename TImageType::Pointer image)
+ static typename MeshType::Pointer CreateSphereMesh(typename MeshType::PointType center, typename MeshType::PointType scale, int* resolution)
   {
-    typedef typename itk::MinimumMaximumImageCalculator<TImageType> MinMaxCalcType;
-    typename MinMaxCalcType::Pointer minmax = MinMaxCalcType::New();
-    minmax->SetImage( image );
-    minmax->ComputeMinimum();
-    minmax->ComputeMaximum();
-    return std::make_pair(minmax->GetMinimum(),minmax->GetMaximum());
+    	typedef typename itk::SphereMeshSource<MeshType> SphereSource;
+
+      typename SphereSource::Pointer mySphereSource = SphereSource::New();
+
+			mySphereSource->SetCenter(center);
+			mySphereSource->SetScale(scale);
+      mySphereSource->SetResolutionX(resolution[0]);
+			mySphereSource->SetResolutionY(resolution[1]);
+			mySphereSource->SetSquareness1(1);
+			mySphereSource->SetSquareness2(1);
+			mySphereSource->Update();
+			mySphereSource->GetOutput();
+
+      typename MeshType::Pointer resultMesh = mySphereSource->GetOutput();
+      resultMesh->Register();
+
+		  return resultMesh;
+  }
+
+  static typename MeshType::Pointer TranslateMesh(typename MeshType::PointType vec, typename MeshType::Pointer input)
+  {
+
+    typename MeshType::Pointer output = MeshType::New();
+    {
+      output->SetPoints(input->GetPoints());
+      output->SetPointData(input->GetPointData());
+      output->SetCells(input->GetCells());
+      output->SetLastCellId( input->GetLastCellId() );
+      typename MeshType::GeometryMapIterator pointDataIterator = input->GetGeometryData()->Begin();
+      typename MeshType::GeometryMapIterator pointDataEnd = input->GetGeometryData()->End();
+
+      typename MeshType::PointType inputPoint,outputPoint;
+
+      while (pointDataIterator != pointDataEnd)
+      {
+        unsigned long pointId = pointDataIterator->Index();
+        itk::SimplexMeshGeometry* newGeometry = new itk::SimplexMeshGeometry();
+        itk::SimplexMeshGeometry* refGeometry = pointDataIterator->Value();
+
+        input->GetPoint(pointId, &inputPoint );
+        outputPoint[0] = inputPoint[0] + vec[0];
+        outputPoint[1] = inputPoint[1] + vec[1];
+        outputPoint[2] = inputPoint[2] + vec[2];
+        output->SetPoint( pointId, outputPoint );
+
+
+        newGeometry->pos = outputPoint;
+        newGeometry->neighborIndices = refGeometry->neighborIndices;
+        newGeometry->meanCurvature = refGeometry->meanCurvature;
+        newGeometry->neighbors = refGeometry->neighbors;
+        newGeometry->oldPos = refGeometry->oldPos;
+        newGeometry->eps = refGeometry->eps;
+        newGeometry->referenceMetrics = refGeometry->referenceMetrics;
+        newGeometry->neighborSet = refGeometry->neighborSet;
+        newGeometry->distance = refGeometry->distance;
+        newGeometry->externalForce = refGeometry->externalForce;
+        newGeometry->internalForce = refGeometry->internalForce;
+        output->SetGeometryData(pointId, newGeometry);
+        pointDataIterator++;
+      }
+    }
+//    output->SetGeometryData( inputMesh->GetGeometryData() );
+    return output;
+  }
+
+  static typename MeshType::Pointer CreateRegularSphereMesh2(typename MeshType::PointType center, typename MeshType::PointType scale, int resolution)
+  {
+	  typedef typename itk::AutomaticTopologyMeshSource<MeshType> MeshSourceType;
+	  typename MeshSourceType::Pointer mySphereSource = MeshSourceType::New();
+
+	  typename MeshType::PointType pnt0, pnt1, pnt2, pnt3, pnt4, pnt5, pnt6, pnt7, pnt8, pnt9, pnt10, pnt11;
+      double c1= 0.5 * (1.0 + sqrt(5.0));
+      double c2= 1.0;
+      double len = sqrt( c1*c1 + c2*c2 );
+      c1 /= len;  c2 /= len;
+    
+	  pnt0[0] = center[0] - c1*scale[0];    pnt0[1] = center[1];                pnt0[2] = center[2] + c2*scale[2];
+	  pnt1[0] = center[0];                  pnt1[1] = center[1] + c2*scale[1];  pnt1[2] = center[2] - c1*scale[2];
+	  pnt2[0] = center[0];                  pnt2[1] = center[1] + c2*scale[1];  pnt2[2] = center[2] + c1*scale[2];
+	  pnt3[0] = center[0] + c1*scale[0];    pnt3[1] = center[1];                pnt3[2] = center[2] - c2*scale[2];
+      pnt4[0] = center[0] - c2*scale[0];    pnt4[1] = center[1] - c1*scale[1];  pnt4[2] = center[2];
+      pnt5[0] = center[0] - c2*scale[0];    pnt5[1] = center[1] + c1*scale[1];  pnt5[2] = center[2];
+      pnt6[0] = center[0];                  pnt6[1] = center[1] - c2*scale[1];  pnt6[2] = center[2] + c1*scale[2];
+      pnt7[0] = center[0] + c2*scale[0];    pnt7[1] = center[1] + c1*scale[1];  pnt7[2] = center[2];
+      pnt8[0] = center[0];                  pnt8[1] = center[1] - c2*scale[1];  pnt8[2] = center[2] - c1*scale[2];
+      pnt9[0] = center[0] + c1*scale[0];    pnt9[1] = center[1];                pnt9[2] = center[2] + c2*scale[2];
+      pnt10[0]= center[0] + c2*scale[0];    pnt10[1]= center[1] - c1*scale[1];  pnt10[2]= center[2];
+      pnt11[0]= center[0] - c1*scale[0];    pnt11[1]= center[1];                pnt11[2]= center[2] - c2*scale[2];
+
+      addTriangle( mySphereSource, scale, pnt9, pnt2, pnt6, resolution );
+	  addTriangle( mySphereSource, scale, pnt1, pnt11, pnt5, resolution );
+	  addTriangle( mySphereSource, scale, pnt11, pnt1, pnt8, resolution );
+	  addTriangle( mySphereSource, scale, pnt0, pnt11, pnt4, resolution );
+      addTriangle( mySphereSource, scale, pnt3, pnt1, pnt7, resolution );
+	  addTriangle( mySphereSource, scale, pnt3, pnt8, pnt1, resolution );
+	  addTriangle( mySphereSource, scale, pnt9, pnt3, pnt7, resolution );
+	  addTriangle( mySphereSource, scale, pnt0, pnt6, pnt2, resolution );
+      addTriangle( mySphereSource, scale, pnt4, pnt10, pnt6, resolution );
+	  addTriangle( mySphereSource, scale, pnt1, pnt5, pnt7, resolution );
+	  addTriangle( mySphereSource, scale, pnt7, pnt5, pnt2, resolution );
+	  addTriangle( mySphereSource, scale, pnt8, pnt3, pnt10, resolution );
+      addTriangle( mySphereSource, scale, pnt4, pnt11, pnt8, resolution );
+	  addTriangle( mySphereSource, scale, pnt9, pnt7, pnt2, resolution );
+	  addTriangle( mySphereSource, scale, pnt10, pnt9, pnt6, resolution );
+	  addTriangle( mySphereSource, scale, pnt0, pnt5, pnt11, resolution );
+      addTriangle( mySphereSource, scale, pnt0, pnt2, pnt5, resolution );
+	  addTriangle( mySphereSource, scale, pnt8, pnt10, pnt4, resolution );
+	  addTriangle( mySphereSource, scale, pnt3, pnt9, pnt10, resolution );
+	  addTriangle( mySphereSource, scale, pnt6, pnt0, pnt4, resolution );
+
+	  return mySphereSource->GetOutput();
+  }
+
+ 
+
+private:
+      
+  static void addTriangle( typename itk::AutomaticTopologyMeshSource<MeshType>::Pointer meshSource, typename MeshType::PointType scale, 
+						   typename MeshType::PointType pnt0, typename MeshType::PointType pnt1, typename MeshType::PointType pnt2, int resolution )
+  {
+	  if (resolution==0) {
+		  // add triangle
+          meshSource->AddTriangle( meshSource->AddPoint( pnt0 ), 
+								   meshSource->AddPoint( pnt1 ), 
+								   meshSource->AddPoint( pnt2 ) );
+	  }
+	  else {
+          vnl_vector_fixed<double, 3> v1, v2, res, pv;
+          v1 = (pnt1-pnt0).Get_vnl_vector();  
+          v2 = (pnt2-pnt0).Get_vnl_vector();
+          res = vnl_cross_3d( v1, v2 );
+          pv = pnt0.GetVectorFromOrigin().Get_vnl_vector();
+          double d = res[0]*pv[0] + res[1]*pv[1] + res[2]*pv[2];
+
+		  // subdivision
+		  typename MeshType::PointType pnt01, pnt12, pnt20;
+		  for (int d=0; d<3; d++) {
+			  pnt01[d] = (pnt0[d] + pnt1[d]) / 2.0;
+			  pnt12[d] = (pnt1[d] + pnt2[d]) / 2.0;
+			  pnt20[d] = (pnt2[d] + pnt0[d]) / 2.0;
+		  }
+		  // map new points to sphere
+		  double lenPnt01=0;  for (int d=0; d<3; d++) lenPnt01 += pnt01[d]*pnt01[d];  lenPnt01 = sqrt( lenPnt01 );
+		  double lenPnt12=0;  for (int d=0; d<3; d++) lenPnt12 += pnt12[d]*pnt12[d];  lenPnt12 = sqrt( lenPnt12 );
+	      double lenPnt20=0;  for (int d=0; d<3; d++) lenPnt20 += pnt20[d]*pnt20[d];  lenPnt20 = sqrt( lenPnt20 );
+		  for (int d=0; d<3; d++) {
+			  pnt01[d] *= scale[d]/lenPnt01;
+			  pnt12[d] *= scale[d]/lenPnt12;
+			  pnt20[d] *= scale[d]/lenPnt20;
+		  }
+	      addTriangle( meshSource, scale, pnt0,  pnt01, pnt20, resolution-1 );
+		  addTriangle( meshSource, scale, pnt01, pnt1,  pnt12, resolution-1 );
+		  addTriangle( meshSource, scale, pnt20, pnt12, pnt2,  resolution-1 );
+		  addTriangle( meshSource, scale, pnt01, pnt12, pnt20, resolution-1 );
+	  }
   }
 
 };

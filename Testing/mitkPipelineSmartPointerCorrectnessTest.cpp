@@ -103,7 +103,7 @@ runPipelineSmartPointerCorrectnessTestForFilterType()
 
 //#ifdef MITK_WEAKPOINTER_PROBLEM_WORKAROUND_ENABLED
   //MITK_WEAKPOINTER_PROBLEM_WORKAROUND_ENABLED test
-  std::cout << "Initializing ReferenceCountWatcher: "<<std::endl;
+  std::cout << "Initializing ReferenceCountWatcher: ";
   ReferenceCountWatcher::Pointer filterWatcher, filterOutputWatcher;
   filterWatcher = new ReferenceCountWatcher(filter, "filter1");
   filterOutputWatcher = new ReferenceCountWatcher(filter->GetOutput(), "filter1Output");
@@ -298,6 +298,7 @@ int mitkPipelineSmartPointerCorrectnessTest(int argc, char* argv[])
   result = runPipelineSmartPointerCorrectnessTestForFilterType<mitk::SurfaceToImageFilter>();
   if( result != EXIT_SUCCESS )
     return result;
+  std::cout << std::endl;
 
   result = runPipelineSmartPointerCorrectnessTestForFilterType<TwoOutputsFilter>();
   if( result != EXIT_SUCCESS )

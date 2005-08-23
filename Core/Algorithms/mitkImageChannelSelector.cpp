@@ -42,7 +42,7 @@ void mitk::ImageChannelSelector::GenerateOutputInformation()
 
   // initialize geometry
   output->SetPropertyList(input->GetPropertyList()->Clone());  
-	output->SetGeometry(input->GetGeometry());
+	output->SetGeometry(dynamic_cast<Geometry3D*>(input->GetTimeSlicedGeometry()->Clone().GetPointer()));
 }
 
 //##ModelId=3E3BD0C903DC

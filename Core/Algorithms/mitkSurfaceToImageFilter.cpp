@@ -140,6 +140,7 @@ void mitk::SurfaceToImageFilter::Stencil3DImage(int time)
   vtkTransform *transform=vtkTransform::New();
   surfaceTimeGeometry->GetGeometry3D( surfaceTimeStep )->TransferItkToVtkTransform();
   transform->SetMatrix(surfaceTimeGeometry->GetGeometry3D( surfaceTimeStep )->GetVtkTransform()->GetMatrix());
+  //@todo: take geometry of image into account! (cave: spacing of image also in vtkimagedata!)
   transform->PostMultiply();
   move->SetTransform(transform);
 

@@ -22,7 +22,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkXMLWriter.h>
 #include <mitkXMLReader.h>
 #include <itkObjectFactoryBase.h>
-#include <mitkTimeSlicedGeometry.h>
 
 #define MITK_WEAKPOINTER_PROBLEM_WORKAROUND_ENABLED
 
@@ -31,9 +30,8 @@ const std::string mitk::BaseData::XML_NODE_NAME = "data";
 //##ModelId=3E3FE04202B9
 mitk::BaseData::BaseData() : m_SmartSourcePointer(NULL), m_SourceOutputIndexDuplicate(0), m_Unregistering(false), m_CalculatingExternalReferenceCount(false), m_ExternalReferenceCount(-1)
 {
-  m_Geometry3D = Geometry3D::New();
-  m_PropertyList = PropertyList::New();
-  
+  m_TimeSlicedGeometry = TimeSlicedGeometry::New();
+  m_PropertyList = PropertyList::New(); 
 }
 
 //##ModelId=3E3FE042031D
@@ -42,24 +40,62 @@ mitk::BaseData::~BaseData()
   m_SmartSourcePointer = NULL;
 }
 
-//##ModelId=3DCBE2BA0139
-const mitk::Geometry3D* mitk::BaseData::GetUpdatedGeometry()
+void mitk::BaseData::UpdateOutputInformation()
+{
+  if ( this->GetSource() )
+  {
+    this->GetSource()->UpdateOutputInformation();
+  }
+  if(m_TimeSlicedGeometry.IsNotNull())
+    m_TimeSlicedGeometry->UpdateInformation();
+}
+
+const mitk::TimeSlicedGeometry* mitk::BaseData::GetUpdatedTimeSlicedGeometry()
 {
   SetRequestedRegionToLargestPossibleRegion();
 
   UpdateOutputInformation();
 
-  return m_Geometry3D.GetPointer();
+  return GetTimeSlicedGeometry();
 }
 
-mitk::Geometry3D* mitk::BaseData::GetGeometry() const
-{ 
-  return m_Geometry3D.GetPointer();
+//##ModelId=3DCBE2BA0139
+const mitk::Geometry3D* mitk::BaseData::GetUpdatedGeometry(int t)
+{
+  SetRequestedRegionToLargestPossibleRegion();
+
+  UpdateOutputInformation();
+
+  return GetGeometry(t);
 }
 
 void mitk::BaseData::SetGeometry(Geometry3D* aGeometry3D)
 {
-  m_Geometry3D = aGeometry3D;
+  if(aGeometry3D!=NULL)
+  {
+    TimeSlicedGeometry::Pointer timeSlicedGeometry = dynamic_cast<TimeSlicedGeometry*>(aGeometry3D);
+    if(timeSlicedGeometry.IsNull())
+    {
+      if((m_TimeSlicedGeometry.IsNotNull()) && (m_TimeSlicedGeometry->GetGeometry3D(0)==aGeometry3D) && m_TimeSlicedGeometry->GetTimeSteps()==1)
+        return;
+      timeSlicedGeometry = TimeSlicedGeometry::New();
+      m_TimeSlicedGeometry = timeSlicedGeometry;   
+      timeSlicedGeometry->InitializeEvenlyTimed(aGeometry3D, 1);
+    }
+    else
+    {
+      if(aGeometry3D == m_TimeSlicedGeometry)
+        return;
+    }
+    m_TimeSlicedGeometry = timeSlicedGeometry;
+  }
+  else
+  {
+    if(m_TimeSlicedGeometry.IsNull())
+      return;
+    m_TimeSlicedGeometry = NULL;
+  }
+  Modified();
 }
 
 itk::SmartPointerForwardReference<mitk::BaseProcess> mitk::BaseData::GetSource() const
@@ -141,8 +177,6 @@ void mitk::BaseData::ConnectSource(itk::ProcessObject *arg, unsigned int idx) co
 #endif
 }
 
-
-
 mitk::PropertyList::Pointer mitk::BaseData::GetPropertyList() const
 {
 	  return m_PropertyList;
@@ -165,6 +199,24 @@ void mitk::BaseData::SetPropertyList(PropertyList *pList)
     m_PropertyList = pList;
 }
 
+unsigned long mitk::BaseData::GetMTime() const
+{
+  unsigned long time = Superclass::GetMTime();
+  if(m_TimeSlicedGeometry.IsNotNull())
+	{
+    if((time < m_TimeSlicedGeometry->GetMTime()))
+    {
+		  Modified();
+      return Superclass::GetMTime();
+    }
+    //unsigned long geometryTime = m_TimeSlicedGeometry->GetMTime();
+    //if(time < geometryTime)
+    //{
+    //  return geometryTime;
+    //}
+	}
+  return time;
+}
 
 void mitk::BaseData::ExecuteOperation(mitk::Operation* operation)
 {
@@ -174,20 +226,20 @@ void mitk::BaseData::ExecuteOperation(mitk::Operation* operation)
 
 bool mitk::BaseData::WriteXMLData( XMLWriter& xmlWriter ) 
 {
-	if ( m_Geometry3D )
-    this->m_Geometry3D->WriteXML( xmlWriter );
+	if ( m_TimeSlicedGeometry )
+    this->m_TimeSlicedGeometry->WriteXML( xmlWriter );
 
 	return true;
 }
 
 bool mitk::BaseData::ReadXMLData( XMLReader& xmlReader ) 
 {
-  if ( xmlReader.Goto( Geometry3D::XML_NODE_NAME ) ) {
-    this->m_Geometry3D = dynamic_cast<mitk::Geometry3D*>( xmlReader.CreateObject().GetPointer() );
-    if ( this->m_Geometry3D.IsNotNull() ) this->m_Geometry3D->ReadXMLData( xmlReader );
+  if ( xmlReader.Goto( Geometry3D::XML_NODE_NAME ) ) 
+  {
+    this->m_TimeSlicedGeometry = dynamic_cast<mitk::TimeSlicedGeometry*>( xmlReader.CreateObject().GetPointer() );
+    if ( this->m_TimeSlicedGeometry.IsNotNull() ) this->m_TimeSlicedGeometry->ReadXMLData( xmlReader );
     xmlReader.GotoParent();
   }
-
 	return true;
 }
 
@@ -195,4 +247,3 @@ const std::string& mitk::BaseData::GetXMLNodeName() const
 { 
   return XML_NODE_NAME;
 }
-

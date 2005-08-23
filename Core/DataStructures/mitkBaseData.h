@@ -21,7 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define BASEDATA_H_HEADER_INCLUDED_C1EBB6FA
 
 #include <itkDataObject.h>
-#include "mitkGeometry3D.h"
+#include "mitkTimeSlicedGeometry.h"
 #include "mitkCommon.h"
 #include "mitkOperationActor.h"
 #include "mitkXMLIO.h"
@@ -42,30 +42,68 @@ class BaseProcess;
 class BaseData : public itk::DataObject, public OperationActor, public XMLIO
 {
 public:
-  //##ModelId=3E10262200CE
-  typedef Geometry3D::Pointer Geometry3DPointer;
-
   mitkClassMacro(BaseData,itk::DataObject)
+
+  //##Documentation
+  //## @brief Return the TimeSlicedGeometry of the data as const pointer. 
+  //## 
+  //## \warning No update will be called. Use GetUpdatedGeometry() if you cannot
+  //## be sure that the geometry is up-to-date.
+  //## 
+  //## Normally used in GenerateOutputInformation of subclasses of BaseProcess.
+  const mitk::TimeSlicedGeometry* GetTimeSlicedGeometry() const
+  {
+    return m_TimeSlicedGeometry.GetPointer();
+  }
+
+  //##Documentation
+  //## @brief Return the TimeSlicedGeometry of the data as const pointer. 
+  //## 
+  //## \warning No update will be called. Use GetUpdatedGeometry() if you cannot
+  //## be sure that the geometry is up-to-date.
+  //## 
+  //## Normally used in GenerateOutputInformation of subclasses of BaseProcess.
+  mitk::TimeSlicedGeometry* GetTimeSlicedGeometry()
+  {
+    return m_TimeSlicedGeometry.GetPointer();
+  }
+
+  //##Documentation
+  //## @brief Return the Geometry3D of the data.
+  //## 
+  //## The method does not simply return the value of the m_TimeSlicedGeometry 
+  //## member. Before doing this, it makes sure that the TimeSlicedGeometry 
+  //## is up-to-date (by setting the update extent to largest possible and 
+  //## calling UpdateOutputInformation).
+  const mitk::TimeSlicedGeometry* GetUpdatedTimeSlicedGeometry();
 
   //##ModelId=3DCBE2BA0139
   //##Documentation
-  //## @brief Return the Geometry3D of the data. 
+  //## @brief Return the Geometry3D of the data at time \a t.
   //## 
-  //## The method does not simply return the value of the m_Geometry3D member. 
-  //## Before doing this, it makes sure that the Geometry3D is up-to-date before 
-  //## returning it (by setting the update extent appropriately and calling
+  //## The method does not simply return 
+  //## m_TimeSlicedGeometry->GetGeometry(t).
+  //## Before doing this, it makes sure that the Geometry3D is up-to-date 
+  //## (by setting the update extent appropriately and calling
   //## UpdateOutputInformation).
   //## 
-  //## @warning GetGeometry not yet completely implemented. 
   //## @todo Appropriate setting of the update extent is missing.
-  const mitk::Geometry3D* GetUpdatedGeometry();
+  const mitk::Geometry3D* GetUpdatedGeometry(int t=0);
 
   //##Documentation
-  //## @brief Return the Geometry3D of the data as non-const pointer. 
+  //## @brief Return the geometry, which is a TimeSlicedGeometry, of the data 
+  //## as non-const pointer. 
   //## 
-  //## @em No update will be called. Normally used in GenerateOutputInformation of 
-  //## subclasses of BaseProcess.
-  mitk::Geometry3D* GetGeometry() const;
+  //## \warning No update will be called. Use GetUpdatedGeometry() if you cannot
+  //## be sure that the geometry is up-to-date.
+  //##
+  //## Normally used in GenerateOutputInformation of subclasses of BaseProcess.
+  mitk::Geometry3D* GetGeometry(int t=0) const
+  {
+    if(m_TimeSlicedGeometry.IsNull())
+      return NULL;
+    return m_TimeSlicedGeometry->GetGeometry3D(t);
+  }
 
   //##ModelId=3E8600DB0188
   //##Documentation
@@ -80,16 +118,21 @@ public:
 
   //##ModelId=3EDD06DC017A
   //##Documentation 
-  //## @brief Update the information for this BaseData so that it can be used
-  //## as an output of a BaseProcess. 
+  //## @brief Update the information for this BaseData (the geometry in particular) 
+  //## so that it can be used as an output of a BaseProcess. 
   //## 
   //## This method is used in the pipeline mechanism to propagate information and 
   //## initialize the meta data associated with a BaseData. Any implementation 
   //## of this method in a derived class is assumed to call its source's
   //## BaseProcess::UpdateOutputInformation() which determines modified
   //## times, LargestPossibleRegions, and any extra meta data like spacing,
-  //## origin, etc. 
-  void UpdateOutputInformation()=0;
+  //## origin, etc. Default implementation simply call's it's source's
+  //## UpdateOutputInformation().
+  //## \note Implementations of this methods in derived classes must take care 
+  //## that the geometry is updated by calling 
+  //## GetTimeSlicedGeometry()->UpdateInformation()
+  //## \em after calling its source's BaseProcess::UpdateOutputInformation().
+  void UpdateOutputInformation();
 
   //##ModelId=3EDD06DC035E
   //##Documentation 
@@ -163,7 +206,6 @@ public:
   //## during initialization.
   virtual void SetGeometry(Geometry3D* aGeometry3D);
 
-
   //##Documentation
   //## @brief Get the PropertyList 
   //## @sa GetProperty
@@ -188,6 +230,11 @@ public:
 
   itk::SmartPointerForwardReference<mitk::BaseProcess> GetSource() const;
 
+  //##Documentation
+  //## @brief Get the modified time of the last change of the contents 
+  //## this data object or its geometry.
+  virtual unsigned long GetMTime() const;
+
   //## 
   virtual bool WriteXMLData( XMLWriter& xmlWriter );
 
@@ -202,8 +249,6 @@ protected:
   BaseData();
   //##ModelId=3E3FE042031D
   ~BaseData();
-  //##ModelId=3E15551A03CE
-  Geometry3DPointer m_Geometry3D;
 
 #if ITK_VERSION_MAJOR == 2 || ( ITK_VERSION_MAJOR == 1 && ITK_VERSION_MINOR > 6 )
   bool m_RequestedRegionInitialized;
@@ -241,6 +286,9 @@ private:
   //## @brief PropertyList, f.e. to hold pic-tags, tracking-data,..
   //##
   PropertyList::Pointer m_PropertyList;  
+
+  //##ModelId=3E15551A03CE
+  TimeSlicedGeometry::Pointer m_TimeSlicedGeometry;
 
   //##Documentation
   //## @brief Helps to deal with the weak-pointer-problem.

@@ -34,8 +34,6 @@ class BoundingObject : public mitk::Surface     //BaseData
 public:
   mitkClassMacro(BoundingObject, mitk::Surface);  
 
-  virtual void UpdateOutputInformation();// = 0;
-
   virtual bool IsInside(const mitk::Point3D& p) const=0;
 
   virtual mitk::ScalarType GetVolume();
@@ -43,13 +41,18 @@ public:
   itkSetMacro(Positive, bool);
   itkBooleanMacro(Positive);
   bool ReadXMLData( XMLReader& xmlReader );
-  Geometry3D* GetGeometry() const;
 
 protected:
   BoundingObject();
   virtual ~BoundingObject();
+
   bool WriteXMLData( XMLWriter& xmlWriter );
-  bool m_Positive; // If true, the Boundingobject describes a positive volume, if false a negative volume
+
+  //##Documentation
+  //## \brief If \a true, the Boundingobject describes a positive volume, 
+  //## if \a false a negative volume.
+  //## 
+  bool m_Positive;
 };
 
 }

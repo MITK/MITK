@@ -20,45 +20,21 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkBoundingObject.h"
 #include "mitkBaseProcess.h"
 #include "mitkXMLWriter.h"
+#include "mitkXMLReader.h"
 
 mitk::BoundingObject::BoundingObject()
   : Surface(), m_Positive(true)
 {
-  mitk::Geometry3D::Pointer geometry3D = mitk::Geometry3D::New();
-  (static_cast<mitk::TimeSlicedGeometry*>(m_Geometry3D.GetPointer()))->InitializeEvenlyTimed( geometry3D, 1);
-  GetGeometry()->Initialize();
+  GetTimeSlicedGeometry()->Initialize(1);
+
+  /* bounding box around the unscaled bounding object */ 
+  ScalarType bounds[6]={-1,1,-1,1,-1,1};  //{xmin,x_max, ymin,y_max,zmin,z_max}
+  GetGeometry()->SetBounds(bounds);
 }
 
 mitk::BoundingObject::~BoundingObject() 
 {
 } 
-
-mitk::Geometry3D* mitk::BoundingObject::GetGeometry() const
-{
-  TimeSlicedGeometry* timeSlicedGeometry = dynamic_cast<mitk::TimeSlicedGeometry*>( m_Geometry3D.GetPointer() );
-
-  if ( timeSlicedGeometry )
-    return timeSlicedGeometry->GetGeometry3D( 0 );
-
-  return m_Geometry3D;
-}
-
-void mitk::BoundingObject::UpdateOutputInformation()
-{  
-  if ( this->GetSource() )
-  {
-    this->GetSource()->UpdateOutputInformation();
-  }
-  ScalarType bounds[6]={0,1,0,1,0,1};  //{xmin,x_max, ymin,y_max,zmin,z_max}
-  /* bounding box around the unscaled bounding object */ 
-  bounds[0] = - 1;
-  bounds[1] = + 1;
-  bounds[2] = - 1;
-  bounds[3] = + 1;
-  bounds[4] = - 1;
-  bounds[5] = + 1; 
-  GetGeometry()->SetBounds(bounds);
-}
 
 mitk::ScalarType mitk::BoundingObject::GetVolume()
 {
@@ -68,7 +44,7 @@ mitk::ScalarType mitk::BoundingObject::GetVolume()
 bool mitk::BoundingObject::WriteXMLData( XMLWriter& xmlWriter )
 {
   Surface::WriteXMLData( xmlWriter );
-  xmlWriter.WriteProperty("Positiv", m_Positive );	
+  xmlWriter.WriteProperty("Positive", m_Positive );	
 	return true;
 }
 
@@ -76,5 +52,6 @@ bool mitk::BoundingObject::WriteXMLData( XMLWriter& xmlWriter )
 bool mitk::BoundingObject::ReadXMLData( XMLReader& xmlReader )
 {
   Surface::ReadXMLData( xmlReader );
+  xmlReader.GetAttribute("Positive", m_Positive );	
   return true;
 }

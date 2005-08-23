@@ -20,19 +20,20 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkContour.h"
 
 mitk::Contour::Contour() :
-m_ContourPath (PathType::New()),
-m_CurrentWindow ( NULL ),
-m_BoundingBox (BoundingBoxType::New()),
-m_Vertices ( BoundingBoxType::PointsContainer::New() ),
-m_Closed ( true ),
-m_Selected ( false ),
-m_Width (3.0)
+  m_ContourPath (PathType::New()),
+  m_CurrentWindow ( NULL ),
+  m_BoundingBox (BoundingBoxType::New()),
+  m_Vertices ( BoundingBoxType::PointsContainer::New() ),
+  m_Closed ( true ),
+  m_Selected ( false ),
+  m_Width (3.0)
 {
-  m_Geometry3D->Initialize();
+  GetTimeSlicedGeometry()->Initialize(1);
 }
 
 mitk::Contour::~Contour()
-{}
+{
+}
 
 void mitk::Contour::AddVertex(mitk::Point3D newPoint)
 {
@@ -48,6 +49,7 @@ void mitk::Contour::AddVertex(mitk::Point3D newPoint)
 
 void mitk::Contour::UpdateOutputInformation()
 {
+  // \todo probably we should do this additionally for each time-step
   float mitkBounds[6];
   if (m_Vertices->Size() == 0)  {
     mitkBounds[0] = 0.0;
@@ -68,8 +70,9 @@ void mitk::Contour::UpdateOutputInformation()
     mitkBounds[4] = tmp[4];
     mitkBounds[5] = tmp[5];
   }
-  m_Geometry3D->SetBounds(mitkBounds);
-
+  Geometry3D* geometry3d = GetGeometry(0);
+  geometry3d->SetBounds(mitkBounds);
+  GetTimeSlicedGeometry()->UpdateInformation();
 }
 
 void mitk::Contour::SetRequestedRegionToLargestPossibleRegion()
@@ -90,37 +93,31 @@ void mitk::Contour::SetRequestedRegion(itk::DataObject*)
 {
 }
 
-mitk::Contour::PathType::Pointer 
-mitk::Contour::GetContourPath() const
+mitk::Contour::PathType::Pointer mitk::Contour::GetContourPath() const
 {
   return m_ContourPath;
 }
 
-void 
-mitk::Contour::SetCurrentWindow(mitk::RenderWindow* rw)
+void mitk::Contour::SetCurrentWindow(mitk::RenderWindow* rw)
 {
   m_CurrentWindow = rw;
 }
 
-mitk::RenderWindow*
-mitk::Contour::GetCurrentWindow() const
+mitk::RenderWindow* mitk::Contour::GetCurrentWindow() const
 {
   return m_CurrentWindow;
 }
 
-void
-mitk::Contour::Initialize()
+void mitk::Contour::Initialize()
 {
   m_ContourPath = PathType::New();
   m_ContourPath->Initialize();
   m_BoundingBox = BoundingBoxType::New();
   m_Vertices = BoundingBoxType::PointsContainer::New();
-  m_Geometry3D->Initialize();
+  GetTimeSlicedGeometry()->Initialize(1);
 }
 
-
-unsigned int 
-mitk::Contour::GetNumberOfPoints() const
+unsigned int mitk::Contour::GetNumberOfPoints() const
 {
   return m_Vertices->Size();
 }
@@ -131,31 +128,10 @@ mitk::Contour::GetPoints() const
   return m_Vertices;
 }
 
-void
-mitk::Contour::SetPoints(mitk::Contour::PointsContainerPointer points)
+void mitk::Contour::SetPoints(mitk::Contour::PointsContainerPointer points)
 {
   m_Vertices = points;
   Modified();
-}
-
-bool mitk::Contour::IsInside(const mitk::Point3D& point) const
-{
-  unsigned int j = 0; 
-  unsigned int i = 0;
-  while( i<3 )
-    {
-    if( point[i] < m_Geometry3D->GetBounds()[j++] )
-      {
-      return false;
-      }
-    if( point[i] > m_Geometry3D->GetBounds()[j++] )
-      {
-      return false;
-      }
-    i++;
-    }
-  return true;
-
 }
 
 void mitk::Contour::PrintSelf( std::ostream& os, itk::Indent indent) const

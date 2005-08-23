@@ -43,7 +43,7 @@ PURPOSE.  See the above copyright notices for more information.
 mitk::ExtrudedContour::ExtrudedContour() 
   : m_Contour(NULL), m_ClippingGeometry(NULL), m_AutomaticVectorGeneration(false)
 {
-  m_Geometry3D->Initialize();
+  GetTimeSlicedGeometry()->Initialize(1);
 
   FillVector3D(m_Vector, 0.0, 0.0, 1.0);
   m_RightVector.Fill(0.0);
@@ -202,7 +202,7 @@ void mitk::ExtrudedContour::BuildSurface()
   polyData->Delete();
 
   // set extrusion scale factor
-  m_ExtrusionFilter->SetScaleFactor(m_Geometry3D->GetExtentInMM(2));
+  m_ExtrusionFilter->SetScaleFactor(GetGeometry()->GetExtentInMM(2));
   SetVtkPolyData(m_SubdivisionFilter->GetOutput());
   //if(m_ClippingGeometry.IsNull())
   //{
@@ -378,7 +378,7 @@ void mitk::ExtrudedContour::BuildGeometry()
 
   itk2vtk(origin, m_Origin);
 
-  mitk::TimeSlicedGeometry::Pointer timeGeometry = const_cast< mitk::TimeSlicedGeometry *>(this->GetTimeSlicedGeometry());
+  mitk::TimeSlicedGeometry::Pointer timeGeometry = this->GetTimeSlicedGeometry();
   mitk::Geometry3D::Pointer g3d = timeGeometry->GetGeometry3D( 0 );
   assert( g3d.IsNotNull() );
   g3d->SetBounds(bounds);

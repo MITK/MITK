@@ -77,11 +77,11 @@ void mitk::BaseProcess::UnRegister() const
 
         int realReferenceCount = GetExternalReferenceCount()-1; //-1 because some is trying to unregister us
         if(realReferenceCount<0)
-            realReferenceCount=0;
+          m_ExternalReferenceCount=realReferenceCount=0;
 
         if(realReferenceCount==0)
         {
-            DataObjectPointerArray outputs = const_cast<mitk::BaseProcess*>(this)->GetOutputs();
+            DataObjectPointerArray& outputs = const_cast<mitk::BaseProcess*>(this)->GetOutputs();
             //disconnect all outputs from us
             //size of outputs will not change until the very last output
             //is removed, because we remove from front to back

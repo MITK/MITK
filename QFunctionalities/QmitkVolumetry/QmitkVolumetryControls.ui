@@ -25,15 +25,25 @@
         <property name="name">
             <cstring>unnamed</cstring>
         </property>
-        <widget class="QmitkTreeNodeSelector">
+        <widget class="QLayoutWidget">
             <property name="name">
-                <cstring>m_TreeNodeSelector</cstring>
+                <cstring>layout1</cstring>
             </property>
-        </widget>
-        <widget class="QmitkVolumetryWidget">
-            <property name="name">
-                <cstring>m_VolumetryWidget</cstring>
-            </property>
+            <vbox>
+                <property name="name">
+                    <cstring>unnamed</cstring>
+                </property>
+                <widget class="QmitkTreeNodeSelector">
+                    <property name="name">
+                        <cstring>m_TreeNodeSelector</cstring>
+                    </property>
+                </widget>
+                <widget class="QmitkVolumetryWidget">
+                    <property name="name">
+                        <cstring>m_VolumetryWidget</cstring>
+                    </property>
+                </widget>
+            </vbox>
         </widget>
         <spacer>
             <property name="name">
@@ -72,6 +82,7 @@
         <pixmap>image0</pixmap>
         <signal>Activated(mitk::DataTreeNode* node)</signal>
         <signal>signal()</signal>
+        <signal>Activated(mitk::DataTreeIteratorClone node)</signal>
         <slot access="public" specifier="">slot()</slot>
         <slot access="public" specifier="">SetDataTreeNodeIterator(mitk::DataTreeIteratorClone)</slot>
     </customwidget>

@@ -31,6 +31,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkGeometry2DDataVtkMapper3D.h>
 #include <vtkRenderer.h>
 #include <mitkOpenGLRenderer.h>
+// for AdjustCross
+#include <mitkPositionEvent.h>
+#include <mitkInteractionConst.h>
+#include <mitkGlobalInteraction.h>
 
 void QmitkStdMultiWidget::init()
 {
@@ -105,6 +109,9 @@ void QmitkStdMultiWidget::init()
 
   // instantiate display interactor
   m_MoveAndZoomInteractor = new mitk::DisplayVectorInteractor("moveNzoom", new mitk::DisplayInteractor() );
+  
+  m_LastLeftClickPositionSupplier = new mitk::CoordinateSupplier("navigation", NULL);
+  mitk::GlobalInteraction::GetGlobalInteraction()->AddListener(m_LastLeftClickPositionSupplier);
 }
 
 void QmitkStdMultiWidget::changeLayoutTo2DImagesUp()
@@ -480,17 +487,17 @@ bool QmitkStdMultiWidget::InitializeStandardViews(mitk::DataTreeIteratorBase * i
       geometry->SetBounds(boundingbox->GetBounds());
 
       //lets see if we have data with a limited live-span ...
-      mitk::TimeBounds timebounds = mitk::DataTree::ComputeTimeBoundsInMS(it, NULL, "includeInBoundingBox");
+      mitk::TimeBounds timebounds = mitk::DataTree::ComputeTimeBounds(it, NULL, "includeInBoundingBox");
       if ( timebounds[1]<mitk::ScalarTypeNumericTraits::max() )
       {
         mitk::ScalarType duration = timebounds[1]-timebounds[0];
 
         mitk::TimeSlicedGeometry::Pointer timegeometry = mitk::TimeSlicedGeometry::New();
         timegeometry->InitializeEvenlyTimed(geometry, (unsigned int) duration);
-        timegeometry->SetTimeBoundsInMS(timebounds); //@bug really required? FIXME
+        timegeometry->SetTimeBounds(timebounds); //@bug really required? FIXME
 
         timebounds[1] = timebounds[0]+1.0f;
-        geometry->SetTimeBoundsInMS(timebounds);
+        geometry->SetTimeBounds(timebounds);
 
         geometry=timegeometry;
       }
@@ -618,7 +625,7 @@ void QmitkStdMultiWidget::changeLevelWindow(mitk::LevelWindow* lw)
   mitk::LevelWindowProperty::Pointer topLevWinProp = NULL;
   while ( !it->IsAtEnd() )
   {
-    if ( it->Get()->IsVisible(NULL) )
+    if ( (it->Get() != NULL) && (it->Get()->IsVisible(NULL)) )
     {
       int layer = 0;
       it->Get()->GetIntProperty("layer", layer);
@@ -653,3 +660,24 @@ void QmitkStdMultiWidget::changeLevelWindow(mitk::LevelWindow* lw)
   }
 } // changeLevelWindow()
 
+const mitk::Point3D & QmitkStdMultiWidget::GetCrossPosition() const
+{
+  return m_LastLeftClickPositionSupplier->GetCurrentPoint();
+}
+
+void QmitkStdMultiWidget::AdjustCross()
+{
+  mitk::Point2D p2d;
+  mitk::Point3D p3d;
+  p3d = GetCrossPosition();
+  mitk::PositionEvent event(mitkWidget1->GetRenderer(), 0, 0, 0, mitk::Key_unknown, p2d, p3d);
+  mitk::StateEvent *stateEvent = new mitk::StateEvent(mitk::EIDLEFTMOUSEBTN , &event);    
+  mitk::GlobalInteraction* globalInteraction = mitk::GlobalInteraction::GetGlobalInteraction();
+  if(globalInteraction!=NULL)
+  {
+    globalInteraction->HandleEvent( stateEvent );
+    stateEvent->Set(mitk::EIDLEFTMOUSERELEASE , &event);
+    globalInteraction->HandleEvent( stateEvent );
+  }
+  delete stateEvent;  
+}

@@ -146,23 +146,25 @@
 <includes>
     <include location="global" impldecl="in implementation">qframe.h</include>
     <include location="global" impldecl="in implementation">qcolor.h</include>
-    <include location="global" impldecl="in declaration">QmitkRenderWindow.h</include>
     <include location="global" impldecl="in implementation">mitkDataTreeNode.h</include>
     <include location="global" impldecl="in implementation">mitkDataTree.h</include>
     <include location="global" impldecl="in implementation">mitkPlaneGeometry.h</include>
+    <include location="global" impldecl="in declaration">QmitkRenderWindow.h</include>
     <include location="global" impldecl="in declaration">mitkDataTree.h</include>
     <include location="global" impldecl="in declaration">mitkMultiplexUpdateController.h</include>
     <include location="global" impldecl="in declaration">mitkSliceNavigationController.h</include>
     <include location="global" impldecl="in declaration">mitkDisplayInteractor.h</include>
     <include location="global" impldecl="in declaration">mitkDisplayVectorInteractor.h</include>
+    <include location="global" impldecl="in declaration">mitkCoordinateSupplier.h</include>
     <include location="local" impldecl="in implementation">QmitkStdMultiWidget.ui.h</include>
 </includes>
 <variables>
-    <variable>mitk::DisplayVectorInteractor* m_MoveAndZoomInteractor;</variable>
-    <variable>mitk::DataTreeIteratorClone planesIterator;</variable>
-    <variable>mitk::DataTreeBase* planesSubTree;</variable>
-    <variable>mitk::MultiplexUpdateController::Pointer multiplexUpdateController;</variable>
+    <variable>mitk::CoordinateSupplier::Pointer m_LastLeftClickPositionSupplier;</variable>
     <variable>mitk::SliceNavigationController::Pointer timeNavigationController;</variable>
+    <variable>mitk::MultiplexUpdateController::Pointer multiplexUpdateController;</variable>
+    <variable>mitk::DataTreeBase* planesSubTree;</variable>
+    <variable>mitk::DataTreeIteratorClone planesIterator;</variable>
+    <variable>mitk::DisplayVectorInteractor* m_MoveAndZoomInteractor;</variable>
 </variables>
 <signals>
     <signal>WheelMoved( QWheelEvent* )</signal>
@@ -178,27 +180,29 @@
     <slot>changeLayoutTo2x2Dand3DWidget()</slot>
     <slot>changeLayoutToRowWidget3And4()</slot>
     <slot>changeLayoutToColumnWidget3And4()</slot>
-    <slot>changeLevelWindow( mitk::LevelWindow * lw )</slot>
-    <slot>wheelEvent( QWheelEvent * e )</slot>
     <slot>SetData( mitk::DataTreeIteratorBase * it )</slot>
-    <slot returnType="bool">InitializeStandardViews( mitk::DataTreeIteratorBase * it )</slot>
-    <slot returnType="bool">InitializeStandardViews( mitk::Geometry3D * geometry )</slot>
-    <slot>EnableStandardLevelWindow()</slot>
-    <slot>DisableStandardLevelWindow()</slot>
-    <slot>Repaint()</slot>
     <slot>Fit()</slot>
     <slot>AddDisplayPlaneSubTree( mitk::DataTreeIteratorBase * it )</slot>
+    <slot>EnableStandardLevelWindow()</slot>
+    <slot>DisableStandardLevelWindow()</slot>
+    <slot returnType="bool">InitializeStandardViews( mitk::DataTreeIteratorBase * it )</slot>
+    <slot returnType="bool">InitializeStandardViews( mitk::Geometry3D * geometry )</slot>
+    <slot>Repaint()</slot>
+    <slot>wheelEvent( QWheelEvent * e )</slot>
     <slot>ReInitializeStandardViews()</slot>
+    <slot>changeLevelWindow( mitk::LevelWindow * lw )</slot>
 </slots>
 <functions>
     <function access="private" specifier="non virtual">init()</function>
     <function returnType="mitk::MultiplexUpdateController *">GetMultiplexUpdateController()</function>
     <function returnType="mitk::SliceNavigationController *">GetTimeNavigationController()</function>
     <function specifier="non virtual" returnType="mitk::DisplayVectorInteractor *">GetMoveAndZoomInteractor()</function>
-    <function returnType="QmitkRenderWindow*">GetRenderWindow1() const</function>
-    <function returnType="QmitkRenderWindow*">GetRenderWindow2() const</function>
-    <function returnType="QmitkRenderWindow*">GetRenderWindow3() const</function>
-    <function returnType="QmitkRenderWindow*">GetRenderWindow4() const</function>
+    <function returnType="QmitkRenderWindow *">GetRenderWindow1() const</function>
+    <function returnType="QmitkRenderWindow *">GetRenderWindow2() const</function>
+    <function returnType="QmitkRenderWindow *">GetRenderWindow3() const</function>
+    <function returnType="QmitkRenderWindow *">GetRenderWindow4() const</function>
+    <function returnType="const mitk::Point3D &amp;">GetCrossPosition() const</function>
+    <function>AdjustCross()</function>
 </functions>
 <layoutdefaults spacing="6" margin="11"/>
 <includehints>
@@ -206,6 +210,6 @@
     <includehint>qmitkselectableglwidget.h</includehint>
     <includehint>qmitkselectableglwidget.h</includehint>
     <includehint>qmitkselectableglwidget.h</includehint>
-    <includehint>qlevelwindowwidget.h</includehint>
+    <includehint>qmitklevelwindowwidget.h</includehint>
 </includehints>
 </UI>

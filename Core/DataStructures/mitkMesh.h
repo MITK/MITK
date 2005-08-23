@@ -70,13 +70,13 @@ public:
 
   //##Documentation
 	//## @brief returns the mesh 
-  virtual DataType::Pointer GetMesh() const;
+  virtual DataType* GetMesh() const;
 
   //##Documentation
 	//## @brief returns the mesh 
-  virtual DataType::Pointer GetMesh();
+  virtual DataType* GetMesh();
 
-  void SetMesh(DataType::Pointer);
+  void SetMesh(DataType*);
 
   //##Documentation
 	//## @brief checks if the given point is in a cell and returns that cellId.

@@ -41,17 +41,17 @@ mitk::Mesh::Mesh()
 mitk::Mesh::~Mesh()
 {}
 
-mitk::Mesh::DataType::Pointer mitk::Mesh::GetMesh() const
+mitk::Mesh::DataType* mitk::Mesh::GetMesh() const
 {
   return m_ItkData;
 }
 
-mitk::Mesh::DataType::Pointer mitk::Mesh::GetMesh()
+mitk::Mesh::DataType* mitk::Mesh::GetMesh()
 {
   return m_ItkData;
 }
 
-void mitk::Mesh::SetMesh(DataType::Pointer mesh)
+void mitk::Mesh::SetMesh(DataType* mesh)
 {
   m_ItkData = mesh;
 }

@@ -32,7 +32,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkTranslationTransform.h>
 #include <itkMinimumMaximumImageCalculator.h>
 #include <itkAutomaticTopologyMeshSource.h>
-#include <itkMeshDeformation/itkSimplexMeshGeometry.h>
 #include <itkRegularSphereMeshSource.h>
 #include <vnl/vnl_cross.h>
 

@@ -15,7 +15,7 @@ import java.io.StringWriter;
  */
 
 public class UpdateFiles {
-  
+
   String Title, mitkPath, xmlPath, inputClass, inputDim, outputClass, outputDim;
   FileReader fReader;
   BufferedWriter bWriter;
@@ -24,9 +24,9 @@ public class UpdateFiles {
   FileWriter fWriter;
   StringBuffer fileContent, newFileContent;
   int c;
-  
-  public UpdateFiles(String Title, String mitkPath, String xmlPath, 
-      String inputClass, String inputDim, String outputClass, 
+
+  public UpdateFiles(String Title, String mitkPath, String xmlPath,
+      String inputClass, String inputDim, String outputClass,
       String outputDim) {
     this.Title = Title;
     this.mitkPath = mitkPath;
@@ -41,18 +41,18 @@ public class UpdateFiles {
     File mitkDir = new File(mitkPath);
     File algDir = new File(mitkDir, "Algorithms");
     File FFIDir = new File(algDir, "mitkFilterFactoryItem");
-    
+
     // update mitkFilterFactoryItem.cpp
     File cpp = new File(FFIDir, "mitkFilterFactoryItem.cpp");
     try {
       fReader = new FileReader(cpp);
     } catch (IOException e) {
-      System.out.println("Fehler bei FileReader(" 
-                + cpp.getName() 
+      System.out.println("Fehler bei FileReader("
+                + cpp.getName()
                 + ") @ "
                 + FFIDir.getAbsolutePath()
                 + "! "
-                + e.getMessage());        
+                + e.getMessage());
     }
 
     try {
@@ -61,14 +61,14 @@ public class UpdateFiles {
         sWriter.write(((char)c));
       }
       StringBuffer fileContent = sWriter.getBuffer();
-      
+
       c = fileContent.indexOf("// Automatic FilterFactoryItemGenerator inserts line \"#define MITK_...\" here, please keep comment");
-      newFileContent = fileContent.insert(c, 
-        "#define MITK_" + Title.toUpperCase() + "_INCLUDE"        
+      newFileContent = fileContent.insert(c,
+        "#define MITK_" + Title.toUpperCase() + "_INCLUDE"
         + System.getProperty("line.separator"));
-      
+
       c = newFileContent.indexOf("// Automatic FilterFactoryItemGenerator inserts lines \"#ifdef MITK_...\" here, please keep comment");
-      newFileContent = newFileContent.insert(c, 
+      newFileContent = newFileContent.insert(c,
         "#ifdef MITK_" + Title.toUpperCase() + "_INCLUDE"
         + System.getProperty("line.separator")
         + "#include <mitk" + Title + "FFI.h>"
@@ -77,13 +77,13 @@ public class UpdateFiles {
         + inputClass + ", " + inputDim + ">, itk::Image<"
         + outputClass + ", " + outputDim + "> > "
         + Title + "FFI_" + inputClass + outputClass
-        + "(\"" + Title + "FFI_" + inputClass + "Input_" 
+        + "(\"" + Title + "FFI_" + inputClass + "Input_"
         + outputClass + "Output\");"
         + System.getProperty("line.separator")
         + "#endif"
-        + System.getProperty("line.separator")  
+        + System.getProperty("line.separator")
         + System.getProperty("line.separator"));
-          
+
     } catch (IOException e) {
       System.out.println("Fehler bei StringWriter("
           + cpp.getName()
@@ -92,7 +92,7 @@ public class UpdateFiles {
           + "! "
           + e.getMessage());
     }
-    
+
     try {
       sReader = new StringReader(newFileContent.toString());
       fWriter = new FileWriter(cpp);
@@ -110,18 +110,18 @@ public class UpdateFiles {
           + "! "
           + e.getMessage());
     }
-    
+
     // update mitkFilterFactoryItem.cmake
     File cmake = new File(FFIDir, "mitkFilterFactoryItem.cmake");
     try {
       fReader = new FileReader(cmake);
     } catch (IOException e) {
-      System.out.println("Fehler bei FileReader(" 
-                + cmake.getName() 
+      System.out.println("Fehler bei FileReader("
+                + cmake.getName()
                 + ") @ "
                 + FFIDir.getAbsolutePath()
                 + "! "
-                + e.getMessage());        
+                + e.getMessage());
     }
 
     try {
@@ -130,13 +130,13 @@ public class UpdateFiles {
         sWriter.write(((char)c));
       }
       StringBuffer fileContent = sWriter.getBuffer();
-      
+
       c = fileContent.indexOf("# Automatic FilterFactoryItemGenerator inserts line \"#SET ( APPMOD_H ${APPMOD_H} ...\" here, please keep comment");
-      newFileContent = fileContent.insert(c, 
-        "SET ( APPMOD_H ${APPMOD_H} ../../Algorithms/mitkFilterFactoryItem/mitk" 
+      newFileContent = fileContent.insert(c,
+        "SET ( APPMOD_H ${APPMOD_H} ../../Algorithms/mitkFilterFactoryItem/mitk"
         + Title + "FFI.h )"
         + System.getProperty("line.separator"));
-          
+
     } catch (IOException e) {
       System.out.println("Fehler bei StringWriter("
           + cmake.getName()
@@ -145,7 +145,7 @@ public class UpdateFiles {
           + "! "
           + e.getMessage());
     }
-    
+
     try {
       sReader = new StringReader(newFileContent.toString());
       fWriter = new FileWriter(cmake);
@@ -163,19 +163,19 @@ public class UpdateFiles {
           + "! "
           + e.getMessage());
     }
-    
+
     // update Alle.xml
     File xmlDir = new File(xmlPath);
     File xml = new File(xmlDir, "Alle.xml");
     try {
       fReader = new FileReader(xml);
     } catch (IOException e) {
-      System.out.println("Fehler bei FileReader(" 
-                + xml.getName() 
+      System.out.println("Fehler bei FileReader("
+                + xml.getName()
                 + ") @ "
                 + FFIDir.getAbsolutePath()
                 + "! "
-                + e.getMessage());        
+                + e.getMessage());
     }
 
     try {
@@ -184,23 +184,32 @@ public class UpdateFiles {
         sWriter.write(((char)c));
       }
       StringBuffer fileContent = sWriter.getBuffer();
-      
+
       c = fileContent.indexOf("<!-- <newFilterDescription /> -->");
       newFileContent = fileContent.insert(c+35,
         System.getProperty("line.separator")
         + System.getProperty("line.separator")
         + "\t"
-        + "<filterDescriptor NAME=\"" 
-        + Title + "FFI_" + inputClass + "Input_" 
-        + outputClass + "Output\" CAPTION=\"XXX\" DESCRIPTION=\"XXX\">" 
+        + "<pipe NAME=\""
+        + Title + "FFI_" + inputClass + "Input_"
+        + outputClass + "Output\" CAPTION=\"XXX\" DESCRIPTION=\"XXX\" INPUTIMAGETYPE=" + inputClass + ">"
         + System.getProperty("line.separator")
         + "\t" + "\t"
+        + "<filterDescriptor NAME=\""
+        + Title + "FFI_" + inputClass + "Input_"
+        + outputClass + "Output\" CAPTION=\"XXX\" DESCRIPTION=\"XXX\">"
+        + System.getProperty("line.separator")
+        + "\t" + "\t" + "\t"
         + "<inputInteger ID=\"0\" CAPTION=\"XXX\" MIN=\"0\" MAX=\"0\" VALUE=\"0\" DESCRIPTION=\"XXX\" ENABLED=\"TRUE\" VISIBLE=\"TRUE\" />   <!-- please replace values -->"
         + System.getProperty("line.separator")
-        + "\t"
+        + "\t" + "\t"
         + "</filterDescriptor>"
+        + System.getProperty("line.separator")
+        + "\t"
+        + "</pipe>"
         + System.getProperty("line.separator"));
-          
+
+
     } catch (IOException e) {
       System.out.println("Fehler bei StringWriter("
           + xml.getName()
@@ -209,7 +218,7 @@ public class UpdateFiles {
           + "! "
           + e.getMessage());
     }
-    
+
     try {
       sReader = new StringReader(newFileContent.toString());
       fWriter = new FileWriter(xml);

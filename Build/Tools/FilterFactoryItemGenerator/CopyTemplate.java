@@ -40,14 +40,14 @@ public void run()
     try {
       fReader = new FileReader(templ);
     } catch (IOException e) {
-      System.out.println("Fehler bei FileReader(" 
-                + templ.getName() 
+      System.out.println("Fehler bei FileReader("
+                + templ.getName()
                 + ") @ "
                 + FFIDir.getAbsolutePath()
                 + "! "
-                + e.getMessage());        
+                + e.getMessage());
     }
-    
+
     // read file and replace title
     try {
       sWriter = new StringWriter();
@@ -60,14 +60,14 @@ public void run()
       newFileContent = newFileContent.replaceAll(
           "FILTERTEMPLATE", Title.toUpperCase());
     } catch (IOException e) {
-      System.out.println("Fehler bei StringWriter(" 
+      System.out.println("Fehler bei StringWriter("
           + templ.getName()
           + ") @ "
           + FFIDir.getAbsolutePath()
           + "! "
           + e.getMessage());
     }
-    
+
     // save new file
     try {
       sReader = new StringReader(newFileContent);

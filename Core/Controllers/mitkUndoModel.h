@@ -20,11 +20,14 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef UNDOMODEL_H_HEADER_INCLUDED_C16ED098
 #define UNDOMODEL_H_HEADER_INCLUDED_C16ED098
 
-#include "mitkCommon.h"
-#include "mitkOperationEvent.h"
-
+#include "mitkOperation.h"
 
 namespace mitk {
+
+class UndoStackItem;
+class OperationEvent;
+class OperationActor;
+  
 //##ModelId=3E5F564C03D4
 //##Documentation
 //## @brief superclass for all UndoModels
@@ -39,7 +42,7 @@ class UndoModel
   virtual ~UndoModel();
 
   //##ModelId=3E5F5C6C00DF
-  virtual bool SetOperationEvent(OperationEvent* operationEvent) = 0;
+  virtual bool SetOperationEvent(UndoStackItem* stackItem) = 0;
 
   //##ModelId=3E5F5C6C00F3
   virtual bool Undo() = 0;

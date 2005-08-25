@@ -18,7 +18,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include "mitkUndoModel.h"
-
+#include "mitkCommon.h"
+#include "mitkOperationEvent.h"
 
 mitk::UndoModel::UndoModel()
 {}
@@ -29,5 +30,5 @@ mitk::UndoModel::~UndoModel()
 //##ModelId=3F01770A018E
 void mitk::UndoModel::SwapOperations(mitk::OperationEvent *operationEvent)
 {
-	operationEvent->SwapOperations();
+  operationEvent->SwapOperations();
 }

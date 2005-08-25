@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkUndoController.h"
 #include "mitkLimitedLinearUndo.h"
+#include "mitkVerboseLimitedLinearUndo.h"
 #include "mitkInteractionConst.h"
 
 //static member-variables init.
@@ -30,7 +31,8 @@ mitk::UndoController::UndoModelMap mitk::UndoController::m_UndoModelList;
 mitk::UndoController::UndoType mitk::UndoController::m_CurUndoType;
 
 //##ModelId=3F01770A0170
-const mitk::UndoController::UndoType mitk::UndoController::DEFAULTUNDOMODEL = LIMITEDLINEARUNDO;
+//const mitk::UndoController::UndoType mitk::UndoController::DEFAULTUNDOMODEL = LIMITEDLINEARUNDO;
+const mitk::UndoController::UndoType mitk::UndoController::DEFAULTUNDOMODEL = VERBOSE_LIMITEDLINEARUNDO;
 
 
 mitk::UndoController::UndoController(UndoType undoType)
@@ -44,11 +46,16 @@ mitk::UndoController::UndoController(UndoType undoType)
 			m_CurUndoType = undoType;
 			m_UndoModelList.insert(UndoModelMap::value_type(undoType, m_CurUndoModel));
 		break;
+    case VERBOSE_LIMITEDLINEARUNDO:
+      m_CurUndoModel = new mitk::VerboseLimitedLinearUndo;
+      m_CurUndoType = undoType;
+      m_UndoModelList.insert(UndoModelMap::value_type(undoType, m_CurUndoModel));
+    break;
 		//case ###
 		//insert here, in add- and RemoveUndoModel new sets of UndoModels!
 		//break;
 		default :
-			m_CurUndoModel = new LimitedLinearUndo;
+			m_CurUndoModel = new VerboseLimitedLinearUndo;
 			m_CurUndoType = undoType;
 			m_UndoModelList.insert(UndoModelMap::value_type(undoType, m_CurUndoModel));
 		}
@@ -210,6 +217,9 @@ mitk::OperationEvent* mitk::UndoController::GetLastOfType(OperationActor* destin
   return m_CurUndoModel->GetLastOfType(destination, opType);
 }
 
-
+mitk::UndoModel* mitk::UndoController::GetCurrentUndoModel()
+{
+  return m_CurUndoModel;
+}
 
 

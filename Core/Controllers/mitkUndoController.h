@@ -125,6 +125,11 @@ class UndoController
   //## corresponding to the given value; if nothing found, then returns NULL
   OperationEvent* GetLastOfType(OperationActor* destination, OperationType opType);
 
+  //##Documentation
+  //## @brief gives access to the currently used UndoModel
+  //## Introduced to access special functions of more specific UndoModels,
+  //## especially to retrieve text descriptions of the undo/redo stack
+  static UndoModel* GetCurrentUndoModel();
   
   private:
   //##ModelId=3EAEBEBD02DC

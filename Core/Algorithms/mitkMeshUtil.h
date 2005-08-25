@@ -33,6 +33,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkMinimumMaximumImageCalculator.h>
 #include <itkAutomaticTopologyMeshSource.h>
 #include <itkRegularSphereMeshSource.h>
+#include <itkSimplexMeshGeometry.h>
 #include <vnl/vnl_cross.h>
 
 #include <vtkActor.h>

@@ -31,7 +31,7 @@ mitk::ImageToSurfaceFilter::~ImageToSurfaceFilter(){};
 * or smooth th data (vtkSmoothPolyDataFilter).
 */
 
-void mitk::ImageToSurfaceFilter::CreateSurface(int time, vtkImageData *vtkimage, mitk::Surface * surface, const int threshold)
+void mitk::ImageToSurfaceFilter::CreateSurface(int time, vtkImageData *vtkimage, mitk::Surface * surface, const ScalarType threshold)
 {
   //Inkrement Referenzcounter Counter (hier: RC)
   vtkimage->Register(NULL);

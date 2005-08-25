@@ -55,7 +55,7 @@ public:
 protected:
   ImageToSurfaceFilter();
   virtual ~ImageToSurfaceFilter();
-  void CreateSurface(int time, vtkImageData *vtkimage, mitk::Surface * surface, const int threshold);
+  void CreateSurface(int time, vtkImageData *vtkimage, mitk::Surface * surface, const ScalarType threshold);
   
   bool m_SetSmooth;
   bool m_SetDecimate;

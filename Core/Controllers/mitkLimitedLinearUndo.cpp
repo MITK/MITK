@@ -19,137 +19,204 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkLimitedLinearUndo.h"
 
+mitk::LimitedLinearUndo::LimitedLinearUndo()
+{
+  // nothing to do
+}
+
 mitk::LimitedLinearUndo::~LimitedLinearUndo()
 {
-  this->Clear();
+  m_UndoList.clear(); 
+  m_RedoList.clear(); 
 }
 
 
 //##ModelId=3E5F5D8C00B2
-bool mitk::LimitedLinearUndo::SetOperationEvent(OperationEvent* operationEvent)
+bool mitk::LimitedLinearUndo::SetOperationEvent(UndoStackItem* stackItem)
 {
-	if (operationEvent == NULL)
-		return false;
+  OperationEvent* operationEvent = dynamic_cast<OperationEvent*>(stackItem); 
+  if (!operationEvent) return false;
+  
+  // clear the redolist, if a new operation is saved
+  if (!m_RedoList.empty())
+  {
+    m_RedoList.clear();
+    InvokeEvent( RedoEmptyEvent() );
+  }
 
-	//clear the redolist, if a new operation is saved
-	if ( ! (this->RedoListEmpty() ))
-		this->ClearRedoList();
-
-	m_UndoList.push_back(operationEvent);
-	
-	return true;
+  m_UndoList.push_back(operationEvent);
+  
+  InvokeEvent( UndoNotEmptyEvent() );
+  
+  return true;
 }
 
 bool mitk::LimitedLinearUndo::Undo()
 {
-	return Undo(false);
+  return Undo(false);
 }
 
 //##ModelId=3F0451960156
 bool mitk::LimitedLinearUndo::Undo(bool fine)
 {
-	if(m_UndoList.size()<1) return false;
+  if(m_UndoList.empty()) return false;
 
-	if (fine == true)//undo all ObjectEventId
-	{
-		int undoObjectEventId = (m_UndoList.back())->GetObjectEventId();
-		do
-		{
-			//get the last operation from the static undo-list
-			OperationEvent* operationEvent = m_UndoList.back();
-			this->SwapOperations(operationEvent);
-			operationEvent->GetDestination()->ExecuteOperation(operationEvent->GetOperation());
-			
-			m_RedoList.push_back(operationEvent);//set in redo 
-			m_UndoList.pop_back();//delete last operation from undo-list
-      if (m_UndoList.empty())
+  if (fine) // undo all ObjectEventId
+  {
+    int undoObjectEventId = m_UndoList.back()->GetObjectEventId();
+    do
+    {
+      // get the last operation from the static undo-list
+      OperationEvent* operationEvent = dynamic_cast<OperationEvent*>(m_UndoList.back());
+      if (operationEvent)
       {
+        SwapOperations(operationEvent);
+        operationEvent->GetDestination()->ExecuteOperation( operationEvent->GetOperation() );
+      
+        m_RedoList.push_back(operationEvent);  // set in redo 
+        InvokeEvent( RedoNotEmptyEvent() );
+        m_UndoList.pop_back();                 // delete last operation from undo-list
+      }
+      else
+      {
+        // everything except OperationEvents: just put into the other stack
+        m_RedoList.push_back(m_UndoList.back());
+        m_UndoList.pop_back();
+      }
+
+      if (m_UndoList.empty()) 
+      {
+        InvokeEvent( UndoEmptyEvent() );
         break;
       }
-		} while ((m_UndoList.back())->GetObjectEventId() == undoObjectEventId);
-	}
-	else //fine==false so undo all GroupEventId
-	{
-		int undoGroupEventId = (m_UndoList.back())->GetGroupEventId();
-		do
-		{
-			//get the last operation from the static undo-list
-			OperationEvent* operationEvent = m_UndoList.back();
-			this->SwapOperations(operationEvent);
-			operationEvent->GetDestination()->ExecuteOperation(operationEvent->GetOperation());
+    } 
+    while ( m_UndoList.back()->GetObjectEventId() == undoObjectEventId );
+  }
+  else // fine == false, so undo all GroupEventId
+  {
+    int undoGroupEventId = m_UndoList.back()->GetGroupEventId();
+    do
+    {
+      // get the last operation from the static undo-list
+      OperationEvent* operationEvent = dynamic_cast<OperationEvent*>(m_UndoList.back());
+      if (operationEvent)
+      {
+        SwapOperations(operationEvent);
+        operationEvent->GetDestination()->ExecuteOperation( operationEvent->GetOperation() );
 
-			m_RedoList.push_back(operationEvent);//set in redo//
-			m_UndoList.pop_back();//delete last operation from undo-list
-            if (m_UndoList.empty())
-            {
-                break;
-            }
-		} while ((m_UndoList.back())->GetGroupEventId() == undoGroupEventId);
-	}
+        m_RedoList.push_back(operationEvent);  // set in redo
+        InvokeEvent( RedoNotEmptyEvent() );
+        m_UndoList.pop_back();                 // delete last operation from undo-list
+      }
+      else
+      {
+        // everything except OperationEvents: just put into the other stack
+        m_RedoList.push_back(m_UndoList.back());
+        m_UndoList.pop_back();
+      }
+      
+      if (m_UndoList.empty()) 
+      {
+        InvokeEvent( UndoEmptyEvent() );
+        break;
+      }
+    } 
+    while ( m_UndoList.back()->GetGroupEventId() == undoGroupEventId );
+  }
 
-	return true;
+  return true;
 }
 
 //##ModelId=3E5F5D8C00DA
 bool mitk::LimitedLinearUndo::Redo()
 {
-	return Redo(false);
+  return Redo(false);
 }
 
 //##ModelId=3F0451960176
 bool mitk::LimitedLinearUndo::Redo(bool fine)
 {
-	if(m_RedoList.size()<1) return false;
+  if (m_RedoList.empty()) return false;
 
-	if (fine == true)//undo all ObjectEventId
-	{
-		int redoObjectEventId = (m_RedoList.back())->GetObjectEventId();
-		do
-		{
-			//get the last operation from the static undo-list
-			OperationEvent* operationEvent = m_RedoList.back();
-			this->SwapOperations(operationEvent);
-			operationEvent->GetDestination()->ExecuteOperation(operationEvent->GetOperation());
-			
-			m_UndoList.push_back(operationEvent);
-			m_RedoList.pop_back();
-            if (m_RedoList.empty())
-            {
-                break;
-            }
-		} while ((m_RedoList.back())->GetObjectEventId() == redoObjectEventId);
-	}
-	else //fine==false so undo all GroupEventId
-	{
-		int redoGroupEventId = (m_RedoList.back())->GetGroupEventId();
-		do
-		{
-			//get the last operation from the static undo-list
-			OperationEvent* operationEvent = m_RedoList.back();
-			this->SwapOperations(operationEvent);
-			operationEvent->GetDestination()->ExecuteOperation(operationEvent->GetOperation());
+  if (fine) // undo all ObjectEventId
+  {
+    int redoObjectEventId = m_RedoList.back()->GetObjectEventId();
+    do
+    {
+      // get the last operation from the static undo-list
+      OperationEvent* operationEvent = dynamic_cast<OperationEvent*>(m_RedoList.back());
+      if (operationEvent)
+      {
+        SwapOperations(operationEvent);
+        operationEvent->GetDestination()->ExecuteOperation( operationEvent->GetOperation() );
+      
+        m_UndoList.push_back(operationEvent);
+        InvokeEvent( UndoNotEmptyEvent() );
+        m_RedoList.pop_back();
+      }
+      else
+      {
+        // everything except OperationEvents: just put into the other stack
+        m_UndoList.push_back(m_RedoList.back());
+        m_RedoList.pop_back();
+      }
 
-			m_UndoList.push_back(operationEvent);//set in redo
-			m_RedoList.pop_back();
-            if (m_RedoList.empty())
-            {
-                break;
-            }
-		} while ((m_RedoList.back())->GetGroupEventId() == redoGroupEventId);
-	}
-	return true;
+      if (m_RedoList.empty()) 
+      {
+        InvokeEvent( RedoEmptyEvent() );
+        break;
+      }
+    } 
+    while ( m_RedoList.back()->GetObjectEventId() == redoObjectEventId );
+  }
+  else // fine == false so undo all GroupEventId
+  {
+    int redoGroupEventId = (m_RedoList.back())->GetGroupEventId();
+    do
+    {
+      // get the last operation from the static undo-list
+      OperationEvent* operationEvent = dynamic_cast<OperationEvent*>(m_RedoList.back());
+      if (operationEvent)
+      {
+        SwapOperations(operationEvent);
+        operationEvent->GetDestination()->ExecuteOperation( operationEvent->GetOperation() );
+
+        m_UndoList.push_back(operationEvent); // set in redo
+        InvokeEvent( UndoNotEmptyEvent() );
+        m_RedoList.pop_back();
+      }
+      else
+      {
+        // everything except OperationEvents: just put into the other stack
+        m_UndoList.push_back(m_RedoList.back());
+        m_RedoList.pop_back();
+      }
+      if (m_RedoList.empty())
+      {
+        InvokeEvent( RedoEmptyEvent() );
+        break;
+      }
+    } 
+    while ( m_RedoList.back()->GetGroupEventId() == redoGroupEventId );
+  }
+  return true;
 }
+
 //##ModelId=3F04519601A4
 void mitk::LimitedLinearUndo::Clear()
 {
-  m_UndoList.clear();//TODO delete all elements
-  m_RedoList.clear();//TODO delete all elements
+  m_UndoList.clear();
+  InvokeEvent( UndoEmptyEvent() );
+  
+  m_RedoList.clear();
+  InvokeEvent( RedoEmptyEvent() );
 }
 
 //##ModelId=3F04519601B5
 void mitk::LimitedLinearUndo::ClearRedoList()
 {
-  m_RedoList.clear();//TODO delete all elements
+  m_RedoList.clear();
+  InvokeEvent( RedoEmptyEvent() );
 }
 
 //##ModelId=3F04519601D3
@@ -170,12 +237,16 @@ int mitk::LimitedLinearUndo::GetLastGroupEventIdInList()
 
 mitk::OperationEvent* mitk::LimitedLinearUndo::GetLastOfType(OperationActor* destination, OperationType opType)
 {
-  UndoContainerRevIter iter;
-  for (iter = m_UndoList.rbegin(); iter != m_UndoList.rend(); ++iter){
-    if ( ( (*iter)->GetOperation()->GetOperationType() == opType ) && 
-         ((*iter)->GetDestination() == destination) )
-      return (*iter);
+  for ( UndoContainerRevIter iter = m_UndoList.rbegin(); iter != m_UndoList.rend(); ++iter )
+  {
+    OperationEvent* opEvent = dynamic_cast<OperationEvent*>(*iter);
+    if (!opEvent) continue;
+
+    if (   opEvent->GetOperation()->GetOperationType() == opType
+        && opEvent->GetDestination() == destination ) 
+      return opEvent;
   }
+
   return NULL;
 }
 

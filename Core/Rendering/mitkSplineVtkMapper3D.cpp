@@ -121,27 +121,7 @@ mitk::SplineVtkMapper3D::GenerateData()
 
     m_SplinesActor->SetMapper( profileMapper );
 
-//vtk changed the type of rgba during releases. Due to that, the following convert is done
-#if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
-    double rgba[ 4 ] = {1.0f, 1.0f, 1.0f, 1.0f};//white
-#else
-    float rgba[ 4 ] = {1.0f, 1.0f, 1.0f, 1.0f};//white
-#endif
-
-    //getting the color from DataTreeNode
-    float temprgba[4];
-    this->GetDataTreeNode()->GetColor( &temprgba[0], NULL );
-    //convert to rgba, what ever type it has!
-    rgba[0] = temprgba[0];    rgba[1] = temprgba[1];    rgba[2] = temprgba[2];    rgba[3] = temprgba[3];
-    //finaly set the color inside the actor
-    m_SplinesActor->GetProperty()->SetColor( rgba );
-
-    float lineWidth;
-    if (dynamic_cast<mitk::FloatProperty *>(this->GetDataTreeNode()->GetProperty("linewidth").GetPointer()) == NULL)
-      lineWidth = 1.0;
-    else
-      lineWidth = dynamic_cast<mitk::FloatProperty *>(this->GetDataTreeNode()->GetProperty("linewidth").GetPointer())->GetValue();
-    m_SplinesActor->GetProperty()->SetLineWidth(lineWidth);
+    this->ApplyProperties();
   }
   else
   {
@@ -170,25 +150,6 @@ mitk::SplineVtkMapper3D::GenerateData()
 
 void mitk::SplineVtkMapper3D::GenerateData( mitk::BaseRenderer* renderer )
 {
-  bool doNotDrawPoints;
-  if (dynamic_cast<mitk::BoolProperty *>(this->GetDataTreeNode()->GetProperty("dontdrawpoints").GetPointer()) == NULL)
-    doNotDrawPoints = true;
-  else
-    doNotDrawPoints = dynamic_cast<mitk::BoolProperty *>(this->GetDataTreeNode()->GetProperty("dontdrawpoints").GetPointer())->GetValue();
-  
-  //add or remove the PointsAssembly according to the property doNotDrawPoints
-  if (!doNotDrawPoints)
-  {
-    Superclass::GenerateData( renderer );
-    if( ! m_SplineAssembly->GetParts()->IsItemPresent(m_PointsAssembly))
-      m_SplineAssembly->AddPart( m_PointsAssembly );
-  }
-  else
-  {
-    if(m_SplineAssembly->GetParts()->IsItemPresent(m_PointsAssembly))
-      m_SplineAssembly->RemovePart(m_PointsAssembly);
-  }
-  
   if ( IsVisible( renderer ) == false )
   {
     m_SplinesActor->VisibilityOff();
@@ -202,9 +163,59 @@ void mitk::SplineVtkMapper3D::GenerateData( mitk::BaseRenderer* renderer )
     //don't care if added or not!
     m_PointsAssembly->VisibilityOn();
     m_SplineAssembly->VisibilityOn();
-    
+
+    bool doNotDrawPoints;
+    if (dynamic_cast<mitk::BoolProperty *>(this->GetDataTreeNode()->GetProperty("dontdrawpoints").GetPointer()) == NULL)
+      doNotDrawPoints = true;
+    else
+      doNotDrawPoints = dynamic_cast<mitk::BoolProperty *>(this->GetDataTreeNode()->GetProperty("dontdrawpoints").GetPointer())->GetValue();
+
+    //add or remove the PointsAssembly according to the property doNotDrawPoints
+    if (!doNotDrawPoints)
+    {
+      Superclass::GenerateData( renderer );
+      if( ! m_SplineAssembly->GetParts()->IsItemPresent(m_PointsAssembly))
+        m_SplineAssembly->AddPart( m_PointsAssembly );
+    }
+    else
+    {
+      if(m_SplineAssembly->GetParts()->IsItemPresent(m_PointsAssembly))
+        m_SplineAssembly->RemovePart(m_PointsAssembly);
+    }
+    this->ApplyProperties();
+   
   }
 }
+
+
+void mitk::SplineVtkMapper3D::ApplyProperties()
+{
+//todo: only call if needed and properties have been changed!!!
+
+
+  //vtk changed the type of rgba during releases. Due to that, the following convert is done
+#if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
+  double rgba[ 4 ] = {1.0f, 1.0f, 1.0f, 1.0f};//white
+#else
+  float rgba[ 4 ] = {1.0f, 1.0f, 1.0f, 1.0f};//white
+#endif
+
+  //getting the color from DataTreeNode
+  float temprgba[4];
+  this->GetDataTreeNode()->GetColor( &temprgba[0], NULL );
+  //convert to rgba, what ever type it has!
+  rgba[0] = temprgba[0];    rgba[1] = temprgba[1];    rgba[2] = temprgba[2];    rgba[3] = temprgba[3];
+  //finaly set the color inside the actor
+  m_SplinesActor->GetProperty()->SetColor( rgba );
+
+  float lineWidth;
+  if (dynamic_cast<mitk::FloatProperty *>(this->GetDataTreeNode()->GetProperty("linewidth").GetPointer()) == NULL)
+    lineWidth = 1.0;
+  else
+    lineWidth = dynamic_cast<mitk::FloatProperty *>(this->GetDataTreeNode()->GetProperty("linewidth").GetPointer())->GetValue();
+  m_SplinesActor->GetProperty()->SetLineWidth(lineWidth);
+}
+
 
 bool mitk::SplineVtkMapper3D::SplinesAreAvailable()
 {

@@ -60,6 +60,8 @@ protected:
     virtual void GenerateData();
 
     virtual void GenerateData(mitk::BaseRenderer * renderer);
+
+    virtual void ApplyProperties();
     
     vtkActor* m_SplinesActor;
     

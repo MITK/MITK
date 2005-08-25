@@ -20,53 +20,27 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkOperationEvent.h"
 
 //##ModelId=3E9B07B40374
-int mitk::OperationEvent::m_CurrObjectEventId = 0;
+int mitk::UndoStackItem::m_CurrObjectEventId = 0;
 //##ModelId=3E9B07B5002B
-int mitk::OperationEvent::m_CurrGroupEventId = 0;
+int mitk::UndoStackItem::m_CurrGroupEventId = 0;
 
-bool mitk::OperationEvent::m_IncrObjectEventId = false;
-bool mitk::OperationEvent::m_IncrGroupEventId = false;
+bool mitk::UndoStackItem::m_IncrObjectEventId = false;
+bool mitk::UndoStackItem::m_IncrGroupEventId = false;
 
 
-//##ModelId=3E5F610D00BB
-mitk::Operation* mitk::OperationEvent::GetOperation()
+mitk::UndoStackItem::UndoStackItem(std::string description)
+:m_Description(description)
 {
-	return m_Operation;
+  m_ObjectEventId = GetCurrObjectEventId();
+  m_GroupEventId = GetCurrGroupEventId();
 }
 
-//##ModelId=3E957AE700E6
-mitk::OperationEvent::OperationEvent(OperationActor* destination, 
-									 Operation* operation, Operation* undoOperation)
-: m_Destination(destination), m_Operation(operation), m_UndoOperation(undoOperation),
-  m_Swaped(false)
+mitk::UndoStackItem::~UndoStackItem()
 {
-  m_ObjectEventId = this->GetCurrObjectEventId();
-  m_GroupEventId = this->GetCurrGroupEventId();
+  // nothing to do
 }
 
-//##ModelId=3F0451960212
-mitk::OperationEvent::~OperationEvent()
-{
-}
-
-//##ModelId=3E957C1102E3
-//##Documentation
-//##  swaps the Undo and Redo- operation and changes m_Swaped
-void mitk::OperationEvent::SwapOperations()
-{
-    if (m_Operation == NULL) 
-        return;
-
-	Operation *tempOperation = m_Operation;
-	m_Operation = m_UndoOperation;
-	m_UndoOperation = tempOperation;
-	if (m_Swaped)
-		m_Swaped = false;
-	else 
-		m_Swaped = true;
-}
-
-void mitk::OperationEvent::ExecuteIncrement()
+void mitk::UndoStackItem::ExecuteIncrement()
 {
   if (m_IncrObjectEventId)
   {
@@ -82,44 +56,93 @@ void mitk::OperationEvent::ExecuteIncrement()
 }
 
 //##ModelId=3E9B07B501A7
-int mitk::OperationEvent::GetCurrObjectEventId()
+int mitk::UndoStackItem::GetCurrObjectEventId()
 {
-	return m_CurrObjectEventId;
+  return m_CurrObjectEventId;
 }
 
 //##ModelId=3E9B07B50220
-int mitk::OperationEvent::GetCurrGroupEventId()
+int mitk::UndoStackItem::GetCurrGroupEventId()
 {
-	return m_CurrGroupEventId;
+  return m_CurrGroupEventId;
 }
 
 //##ModelId=3EF099E90289
-void mitk::OperationEvent::IncCurrObjectEventId()
+void mitk::UndoStackItem::IncCurrObjectEventId()
 {
-	m_IncrObjectEventId = true;
+  m_IncrObjectEventId = true;
 }
 
 //##ModelId=3EF099E90269
-void mitk::OperationEvent::IncCurrGroupEventId()
+void mitk::UndoStackItem::IncCurrGroupEventId()
 {
-	m_IncrGroupEventId = true;
+  m_IncrGroupEventId = true;
+}
+
+//##ModelId=3EF099E90259
+int mitk::UndoStackItem::GetObjectEventId()
+{
+  return m_ObjectEventId;
+}
+
+//##ModelId=3EF099E90249
+int mitk::UndoStackItem::GetGroupEventId()
+{
+  return m_GroupEventId;
+}
+
+std::string mitk::UndoStackItem::GetDescription()
+{
+  return m_Description;
+}
+
+// ******************** mitk::OperationEvent ********************
+
+//##ModelId=3E5F610D00BB
+mitk::Operation* mitk::OperationEvent::GetOperation()
+{
+  return m_Operation;
+}
+
+//##ModelId=3E957AE700E6
+mitk::OperationEvent::OperationEvent(OperationActor* destination, 
+                                     Operation* operation, Operation* undoOperation,
+                                     std::string description)
+: UndoStackItem(description), 
+  m_Destination(destination),
+  m_Operation(operation), m_UndoOperation(undoOperation), 
+  m_Swaped(false)
+{
+  // nothing to do
+}
+
+//##ModelId=3F0451960212
+mitk::OperationEvent::~OperationEvent()
+{
+  // nothing to do
+}
+
+//##ModelId=3E957C1102E3
+//##Documentation
+//##  swaps the Undo and Redo- operation and changes m_Swaped
+void mitk::OperationEvent::SwapOperations()
+{
+    if (m_Operation == NULL) 
+        return;
+
+  Operation *tempOperation = m_Operation;
+  m_Operation = m_UndoOperation;
+  m_UndoOperation = tempOperation;
+  if (m_Swaped)
+    m_Swaped = false;
+  else 
+    m_Swaped = true;
 }
 
 //##ModelId=3E9B07B502AC
 mitk::OperationActor* mitk::OperationEvent::GetDestination() 
 {
-	return m_Destination;
+  return m_Destination;
 }
 
-//##ModelId=3EF099E90259
-int mitk::OperationEvent::GetObjectEventId()
-{
-	return m_ObjectEventId;
-}
-
-//##ModelId=3EF099E90249
-int mitk::OperationEvent::GetGroupEventId()
-{
-	return m_GroupEventId;
-}
 

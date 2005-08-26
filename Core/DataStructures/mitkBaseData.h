@@ -228,6 +228,19 @@ public:
 
   void SetProperty(const char *propertyKey, BaseProperty* property);
 
+  /** \brief Get the process object that generated this data object.
+   *
+   * If there is no process object, then the data object has
+   * been disconnected from the pipeline, or the data object
+   * was created manually. (Note: we cannot use the GetObjectMacro()
+   * defined in itkMacro because the mutual dependency of
+   * DataObject and ProcessObject causes compile problems. Also,
+   * a forward reference smart pointer is returned, not a smart pointer, 
+   * because of the circular dependency between the process and data object.)
+   *
+   * GetSource() returns a SmartPointerForwardReference and not a WeakPointer
+   * because it is assumed the code calling GetSource() wants to hold a
+   * long term reference to the source. */
   itk::SmartPointerForwardReference<mitk::BaseProcess> GetSource() const;
 
   //##Documentation

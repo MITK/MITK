@@ -25,11 +25,7 @@ mitk::ImageToSurfaceFilter::ImageToSurfaceFilter()
   { }
 mitk::ImageToSurfaceFilter::~ImageToSurfaceFilter(){};
 
-/** 
-* With the given threshold vtkMarchingcube creates the Surface. By default nothing
-* will be done. Optionaly its possible to reduce the number of triangles (vtkDecimat)
-* or smooth th data (vtkSmoothPolyDataFilter).
-*/
+
 
 void mitk::ImageToSurfaceFilter::CreateSurface(int time, vtkImageData *vtkimage, mitk::Surface * surface, const ScalarType threshold)
 {
@@ -102,9 +98,7 @@ void mitk::ImageToSurfaceFilter::CreateSurface(int time, vtkImageData *vtkimage,
 }
 
 
-/**
-* For each image time slice a surface will be created.
-*/
+
 void mitk::ImageToSurfaceFilter::GenerateData()
 {
   mitk::Surface *surface = this->GetOutput();
@@ -137,9 +131,7 @@ void mitk::ImageToSurfaceFilter::GenerateOutputInformation()
 }
 
 
-/** 
-* Set image input 3D or 4D
-*/
+
 void mitk::ImageToSurfaceFilter::SetInput(const mitk::Image *image)
 {
   // Process object is not const-correct so the const_cast is required here  

@@ -14,6 +14,7 @@
 #include "vtkMarchingCubes.h"
 
 
+namespace mitk {
 /**
  * @brief Converts pixel data to surface data
  *
@@ -25,28 +26,41 @@
  * @ingroup Process
  */
 
-namespace mitk {
-
 class ImageToSurfaceFilter : public SurfaceSource
 {
 public:  
   mitkClassMacro(ImageToSurfaceFilter, SurfaceSource);
   itkNewMacro(Self);
 
+  /**
+  * For each image time slice a surface will be created.
+  */
   virtual void GenerateData();
   virtual void GenerateOutputInformation();
   //virtual void GenerateInputRequestRegion();
 
+  /** 
+  * Set/Get *image input 3D or 4D
+  */
   const mitk::Image *GetInput(void);
   virtual void SetInput(const mitk::Image *image);
 
+  /**
+  * Set disired threshold for input image e.g. 1 for binary
+  */
   itkSetMacro(Threshold, ScalarType);
   itkGetConstMacro(Threshold, ScalarType);
 
+  /*
+  * Turn On/Off Surface smoothing
+  */
   itkSetMacro(SetSmooth,bool);
   itkGetConstMacro(SetSmooth,bool);
   itkBooleanMacro(SetSmooth);
 
+  /**
+  * Turn On/Off Decimate triangulars
+  */
   itkSetMacro(SetDecimate,bool);
   itkGetConstMacro(SetDecimate,bool);
   itkBooleanMacro(SetDecimate);
@@ -55,6 +69,16 @@ public:
 protected:
   ImageToSurfaceFilter();
   virtual ~ImageToSurfaceFilter();
+
+  /** 
+  * With the given threshold vtkMarchingcube creates the Surface. By default nothing
+  * will be done. Optionaly its possible to reduce the number of triangles (vtkDecimat)
+  * or smooth th data (vtkSmoothPolyDataFilter).
+  * @param time selected slice or "0" for single
+  * @param *vtkimage input image
+  * @param *surface output 
+  * @param threshold can be different from SetThreshold()
+  */
   void CreateSurface(int time, vtkImageData *vtkimage, mitk::Surface * surface, const ScalarType threshold);
   
   bool m_SetSmooth;

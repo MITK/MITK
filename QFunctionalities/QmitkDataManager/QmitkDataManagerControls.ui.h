@@ -148,13 +148,11 @@ void QmitkDataManagerControls::RemoveButtonClicked()
 
   switch(QMessageBox::information(this, "Application name here",
     "Do you really want do delete this item?\n",
-    "&No", "&Yes", "Cancel",
+    "&Yes", "&No", "Cancel",
     0,      // Enter == button 0
     2)) { // Escape == button 2
-        case 0: // "NO" clicked or Enter pressed.
-          break;
-        case 1: //"YES" clicked
-          //Remove the item
+        case 0: // "Yes" clicked or Enter pressed.
+                    //Remove the item
           if (selected == NULL)
           {}
           else
@@ -165,8 +163,8 @@ void QmitkDataManagerControls::RemoveButtonClicked()
             selectedIterator->Remove();
             mitk::RenderWindow::UpdateAllInstances();
           }
-
-
+          break;
+        case 1: //"No" clicked
           break;
         case 2: // Cancel clicked or Escape pressed
           break;

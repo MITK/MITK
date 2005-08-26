@@ -100,7 +100,7 @@ void mitk::BaseData::SetGeometry(Geometry3D* aGeometry3D)
 
 itk::SmartPointerForwardReference<mitk::BaseProcess> mitk::BaseData::GetSource() const
 {
-  return m_SmartSourcePointer.GetPointer();
+  return static_cast<mitk::BaseProcess*>(Superclass::GetSource().GetPointer());
 }
 
 //##ModelId=3E8600DB02DC

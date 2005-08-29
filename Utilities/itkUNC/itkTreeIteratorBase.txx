@@ -392,8 +392,7 @@ TreeIteratorBase<TTreeType>* TreeIteratorBase<TTreeType>::GetChild( int number )
     {
     return NULL;
     }
-//    return new WalkTreeIterator<ValueType,P>( child, m_Root, m_Tree, getType() );
-  return NULL;
+	return new PreOrderTreeIterator<TTreeType>( m_Tree, child );  
 }
 
 /** Count the number of nodes from the beginning */

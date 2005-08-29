@@ -35,7 +35,7 @@ const float selectedColor[]={1.0,0.0,0.6}; //for selected!
 
 //##ModelId=3F0189F00378
 mitk::PointSetMapper2D::PointSetMapper2D()
-{
+: m_Polygon(false) {
 }
 
 //##ModelId=3F0189F00382
@@ -49,6 +49,16 @@ const mitk::PointSet *mitk::PointSetMapper2D::GetInput(void)
     return static_cast<const mitk::PointSet * > ( GetData() );
 }
 
+void mitk::PointSetMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
+{
+  GLMapper2D::ApplyProperties( renderer );
+  
+  const mitk::DataTreeNode* node=GetDataTreeNode();
+  if( node == NULL )
+    return;
+
+  node->GetBoolProperty( "contour", m_Polygon );
+}
 
 //##ModelId=3F0189F00373
 void mitk::PointSetMapper2D::Paint(mitk::BaseRenderer * renderer)
@@ -73,7 +83,7 @@ void mitk::PointSetMapper2D::Paint(mitk::BaseRenderer * renderer)
       vtkLinearTransform* transform = GetDataTreeNode()->GetVtkTransform();
 
       //List of the Points
-      PointSet::DataType::PointsContainerConstIterator it, end;
+      PointSet::DataType::PointsContainerConstIterator it, end;      
       it=input->GetPointSet()->GetPoints()->Begin();
       end=input->GetPointSet()->GetPoints()->End();
 
@@ -81,6 +91,7 @@ void mitk::PointSetMapper2D::Paint(mitk::BaseRenderer * renderer)
       PointSet::DataType::PointDataContainerIterator selIt, selEnd;
       selIt=input->GetPointSet()->GetPointData()->Begin();
       selEnd=input->GetPointSet()->GetPointData()->End();
+      int counter = 0;
       
       //for writing text 
       int j=0;
@@ -104,7 +115,7 @@ void mitk::PointSetMapper2D::Paint(mitk::BaseRenderer * renderer)
           ScalarType scalardiff = diff.GetSquaredNorm();
           if(scalardiff<4.0)
           {
-              Point2D pt2d, tmp;
+              Point2D pt2d, tmp, lastPt2d;
               displayGeometry->Map(projected_p, pt2d);
               displayGeometry->WorldToDisplay(pt2d, pt2d);
 
@@ -163,6 +174,16 @@ void mitk::PointSetMapper2D::Paint(mitk::BaseRenderer * renderer)
                     tmp=pt2d+vert;      glVertex2fv(&tmp[0]);
                 glEnd ();
               }
+
+              if ( m_Polygon && counter > 0 )
+              {
+               glBegin (GL_LINES);
+                  glVertex2fv(&pt2d[0]);
+                  glVertex2fv(&lastPt2d[0]);
+               glEnd ();               
+              }
+            lastPt2d = pt2d;
+            counter++;
           }
           ++it;
           ++selIt;

@@ -106,7 +106,7 @@ public:
   //##ModelId=3F0177E901C1
   //##Documentation
   //## @brief returns the current size of the point-list
-  virtual int GetSize();
+  virtual int GetSize() const;
 
   //##ModelId=3F0177E901CC
   //##Documentation

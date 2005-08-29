@@ -53,12 +53,16 @@ public:
     //##ModelId=3F0189F00373
     virtual void Paint(mitk::BaseRenderer * renderer);
 
+    virtual void ApplyProperties(mitk::BaseRenderer* renderer);
+
 protected:
     //##ModelId=3F0189F00378
     PointSetMapper2D();
 
     //##ModelId=3F0189F00382
     virtual ~PointSetMapper2D();
+
+    bool m_Polygon;
 };
 
 } // namespace mitk

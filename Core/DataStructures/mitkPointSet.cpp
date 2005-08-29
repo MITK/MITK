@@ -45,7 +45,7 @@ mitk::PointSet::~PointSet()
 }
 
 //##ModelId=3F0177E901C1
-int mitk::PointSet::GetSize()
+int mitk::PointSet::GetSize() const
 {
   return m_ItkData->GetNumberOfPoints();
 }

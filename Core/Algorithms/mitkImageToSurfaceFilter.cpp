@@ -109,9 +109,7 @@ void mitk::ImageToSurfaceFilter::GenerateData()
   int tmax=tstart+outputRegion.GetSize(3); //GetSize()==1 - will aber 0 haben, wenn nicht zeitaufgelöst
 
   int t;
-  t=tstart;
-
-  for( t; t < tmax;t++)
+  for( t=tstart; t < tmax; ++t)
   {
     vtkImageData *vtkimagedata =  image->GetVtkImageData(t);
     CreateSurface(t,vtkimagedata,surface,m_Threshold);

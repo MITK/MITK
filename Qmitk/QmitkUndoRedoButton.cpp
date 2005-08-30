@@ -46,7 +46,7 @@ void QmitkUndoRedoButton::beforePopup()
 
     for ( std::list<std::string>::iterator iter = descriptions.begin(); iter != descriptions.end(); ++iter )
     {
-      insertItem( QString(*iter) ); // append each item to the list
+      insertItem( QString((*iter).c_str()) ); // append each item to the list
     }
 
   }

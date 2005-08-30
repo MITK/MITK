@@ -193,6 +193,10 @@ void mitk::GlobalInteraction::FillJurisdictionMap(mitk::StateEvent const* stateE
     m_CurrentInteractorIter = m_JurisdictionMap.end();
 }
 
+/*
+* Go through the list of interactors, that could possibly handle an event and ask if it has handled the event.
+* If an interactor has handled an event, then it gets set as an selected Interactor (m_SelectedInteractors)
+*/
 void mitk::GlobalInteraction::AskCurrentInteractor(mitk::StateEvent const* stateEvent)
 {
   if (m_JurisdictionMap.empty())
@@ -219,9 +223,7 @@ void mitk::GlobalInteraction::AskCurrentInteractor(mitk::StateEvent const* state
     {
       if (!handled) 
         m_CurrentInteractorIter++;
-      //if at end, then loop to the begining
-      /*if (m_CurrentInteractorIter == m_JurisdictionMap.end())
-      m_CurrentInteractorIter= m_JurisdictionMap.begin();*/
+      //looping to the beginning would make a change.If the first couldn't handle it once, then a second try won't make a change!
     }
   }
 }
@@ -267,15 +269,22 @@ bool mitk::GlobalInteraction::ExecuteAction(Action* action, mitk::StateEvent con
     ok = true;
     break;
   case AcASKINTERACTORS:
-    if (! AskSelected(stateEvent))//no selected
+    if (! AskSelected(stateEvent))//no interactor selected anymore
     {
       //if m_JurisdictionMap is empty, then fill it.
       if (m_JurisdictionMap.empty())
         FillJurisdictionMap(stateEvent, 0);
 
+      /*
+      * Commented out, because this is the old sceme to send events to all interactors.
+      * If  Interactors doesn't answer anymore, uncomment these two lines and send a message to ingmar.
+      */
       //no jurisdiction value above 0 could be found, so take all to convert to old scheme
+      //that way only the first statemachine, that handles the interaction can get the event.
+      /*
       if (m_JurisdictionMap.empty())
         FillJurisdictionMap(stateEvent, -1);
+      */
 
       //ask the next Interactor to handle that event
       AskCurrentInteractor(stateEvent);

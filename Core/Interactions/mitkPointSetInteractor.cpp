@@ -76,13 +76,17 @@ float mitk::PointSetInteractor::CalculateJurisdiction(StateEvent const* stateEve
     return 0;
   }
 
-  //if we don't have a Point in our PointSet, then return with 0.5
+  
   mitk::PointSet* pointSet = dynamic_cast<mitk::PointSet*>(m_DataTreeNode->GetData());
 	if (pointSet != NULL)
   {
-    //mitk::PointSet::DataType *itkPointSet = pointSet->GetPointSet();  
+    //if we don't have a Point in our PointSet, then return with 0.5
     if (pointSet->GetSize()<1)
       returnvalue = 0.5;
+
+    //if we have a point or more, then check if the have been picked
+    if (pointSet->SearchPoint(disPosEvent->GetWorldPosition(), m_Precision) >-1)
+      returnvalue = 1.0;
   }
 
   return returnvalue;
@@ -707,8 +711,6 @@ bool mitk::PointSetInteractor::ExecuteAction( Action* action, mitk::StateEvent c
     return Superclass::ExecuteAction( action, stateEvent );
 	}
   
-  //XXX bug 27
-  //m_DataTreeNode->Modified();//modified is also called in mitkPointSet!
   return ok;
 }
 

@@ -59,6 +59,7 @@ mitk::PointSet::DataType::Pointer mitk::PointSet::GetPointSet() const
 //##ModelId=3F0177E901DE
 //##Documentation
 //##@brief searches a point in the list with a given precision
+//##returns -1 if no point has been found
 int mitk::PointSet::SearchPoint(Point3D point, float distance )
 {
 //out is the point which is checked to be the searched point

@@ -147,14 +147,14 @@ void mitk::OpenGLRenderer::UpdateIncludingVtkActors()
     newRenderer = true;
 
     //strange: when using a simple light, the backface of the planes are not shown (regardless of SetNumberOfLayers)
-    m_Light = vtkLight::New();
-    m_Light->SetLightTypeToCameraLight();
-    double pos[]= {0.5,0.2,1.0};
-    m_Light->SetPosition(pos);
+    //m_Light = vtkLight::New();
+    //m_Light->SetLightTypeToCameraLight();
+    //double pos[]= {0.5,-2.0,1.0};
+    //m_Light->SetPosition(pos);
 
-    m_VtkRenderer->AddLight( m_Light );
-    //m_LightKit = vtkLightKit::New();
-    //m_LightKit->AddLightsToRenderer(m_VtkRenderer);
+    //m_VtkRenderer->AddLight( m_Light );
+    m_LightKit = vtkLightKit::New();
+    m_LightKit->AddLightsToRenderer(m_VtkRenderer);
   }
 
   m_VtkRenderer->RemoveAllProps();
@@ -338,7 +338,7 @@ void mitk::OpenGLRenderer::Render()
     }
     else
       if(m_MapperID>=2)
-      { //@todo in 3D mode wird sonst nix geupdated, da z.Z. weder camera noch Änderung des Baums beachtet wird!!!
+      { //@todo in 3D mode wird sonst nix geupdated, da z.Z. weder camera noch ï¿½derung des Baums beachtet wird!!!
         Update();
       }
 

@@ -1,7 +1,7 @@
 #include "mitkMaterialProperty.h"
 #include <vtkProperty.h>
 
-mitk::MaterialProperty::MaterialProperty( Color color, float opacity )
+mitk::MaterialProperty::MaterialProperty( Color color, vtkScalarType opacity )
 {
     m_Color = color;
     m_ColorCoefficient = 1.0f;
@@ -15,7 +15,7 @@ mitk::MaterialProperty::MaterialProperty( Color color, float opacity )
 
 
 
-mitk::MaterialProperty::MaterialProperty( float red, float green, float blue, float opacity )
+mitk::MaterialProperty::MaterialProperty( vtkScalarType red, vtkScalarType green, vtkScalarType blue, vtkScalarType opacity )
 {
     m_Color.Set( red, green, blue );
     m_ColorCoefficient = 1.0f;
@@ -29,7 +29,7 @@ mitk::MaterialProperty::MaterialProperty( float red, float green, float blue, fl
 
 
 
-mitk::MaterialProperty::MaterialProperty( float red, float green, float blue, float colorCoefficient, float specularCoefficient, float specularPower, float opacity )
+mitk::MaterialProperty::MaterialProperty( vtkScalarType red, vtkScalarType green, vtkScalarType blue, vtkScalarType colorCoefficient, vtkScalarType specularCoefficient, vtkScalarType specularPower, vtkScalarType opacity )
 {
     m_Color.Set( red, green, blue );
     m_ColorCoefficient = colorCoefficient;
@@ -42,7 +42,7 @@ mitk::MaterialProperty::MaterialProperty( float red, float green, float blue, fl
 }
 
 
-mitk::MaterialProperty::MaterialProperty( mitk::MaterialProperty::Color color, float colorCoefficient, float specularCoefficient, float specularPower, float opacity )
+mitk::MaterialProperty::MaterialProperty( mitk::MaterialProperty::Color color, vtkScalarType colorCoefficient, vtkScalarType specularCoefficient, vtkScalarType specularPower, vtkScalarType opacity )
 {
     m_Color = color;
     m_ColorCoefficient = colorCoefficient;
@@ -78,13 +78,13 @@ void mitk::MaterialProperty::SetColor( mitk::MaterialProperty::Color color )
 }
 
 
-void mitk::MaterialProperty::SetColor( float red, float green, float blue )
+void mitk::MaterialProperty::SetColor( vtkScalarType red, vtkScalarType green, vtkScalarType blue )
 {
     m_Color.Set( red, green, blue );
 }
 
 
-void mitk::MaterialProperty::SetColorCoefficient( float coefficient )
+void mitk::MaterialProperty::SetColorCoefficient( vtkScalarType coefficient )
 {
     m_ColorCoefficient = coefficient;
 }
@@ -95,24 +95,24 @@ void mitk::MaterialProperty::SetSpecularColor( mitk::MaterialProperty::Color spe
 }
 
 
-void mitk::MaterialProperty::SetSpecularColor( float red, float green, float blue )
+void mitk::MaterialProperty::SetSpecularColor( vtkScalarType red, vtkScalarType green, vtkScalarType blue )
 {
     m_SpecularColor.Set( red, green, blue );
 }
 
-void mitk::MaterialProperty::SetSpecularCoefficient( float specularCoefficient )
+void mitk::MaterialProperty::SetSpecularCoefficient( vtkScalarType specularCoefficient )
 {
     m_SpecularCoefficient = specularCoefficient;
 }
 
 
-void mitk::MaterialProperty::SetSpecularPower( float specularPower )
+void mitk::MaterialProperty::SetSpecularPower( vtkScalarType specularPower )
 {
     m_SpecularPower = specularPower;
 }
 
 
-void mitk::MaterialProperty::SetOpacity( float opacity )
+void mitk::MaterialProperty::SetOpacity( vtkScalarType opacity )
 {
     m_Opacity = opacity;
 }
@@ -136,7 +136,7 @@ mitk::MaterialProperty::Color mitk::MaterialProperty::GetColor() const
 }
 
 
-float mitk::MaterialProperty::GetColorCoefficient() const
+vtkScalarType mitk::MaterialProperty::GetColorCoefficient() const
 {
     return m_ColorCoefficient;
 }
@@ -146,19 +146,19 @@ mitk::MaterialProperty::Color mitk::MaterialProperty::GetSpecularColor() const
     return m_SpecularColor;
 }
 
-float mitk::MaterialProperty::GetSpecularCoefficient() const
+vtkScalarType mitk::MaterialProperty::GetSpecularCoefficient() const
 {
     return m_SpecularCoefficient;
 }
 
 
-float mitk::MaterialProperty::GetSpecularPower() const
+vtkScalarType mitk::MaterialProperty::GetSpecularPower() const
 {
     return m_SpecularPower;
 }
 
 
-float mitk::MaterialProperty::GetOpacity() const
+vtkScalarType mitk::MaterialProperty::GetOpacity() const
 {
     return m_Opacity;
 }

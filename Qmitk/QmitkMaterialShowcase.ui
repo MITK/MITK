@@ -68,32 +68,41 @@
     <include location="local" impldecl="in declaration">mitkDataTreeNode.h</include>
     <include location="local" impldecl="in declaration">mitkDataTree.h</include>
     <include location="local" impldecl="in declaration">mitkSurface.h</include>
+    <include location="local" impldecl="in declaration">qevent.h</include>
     <include location="local" impldecl="in implementation">QmitkMaterialShowcase.ui.h</include>
+    <include location="global" impldecl="in declaration">mitkVtkTypes.h</include>
 </includes>
 <variables>
     <variable>mitk::Surface::Pointer m_Surface;</variable>
     <variable>mitk::DataTree::Pointer m_DataTree;</variable>
     <variable>mitk::DataTreeNode::Pointer m_DataTreeNode;</variable>
     <variable>mitk::MaterialProperty* m_MaterialProperty;</variable>
+    <variable>unsigned int m_ShowcaseNumber;</variable>
 </variables>
+<signals>
+    <signal>Selected( QmitkMaterialShowcase* )</signal>
+</signals>
 <slots>
     <slot>SetMaterialProperty( mitk::MaterialProperty * property )</slot>
     <slot>SetColor( mitk::MaterialProperty::Color color )</slot>
-    <slot>SetColor( float red, float green, float blue )</slot>
-    <slot>SetColorCoefficient( float coefficient )</slot>
+    <slot>SetColor( vtkScalarType red, vtkScalarType green, vtkScalarType blue )</slot>
+    <slot>SetColorCoefficient( vtkScalarType coefficient )</slot>
     <slot>SetSpecularColor( mitk::MaterialProperty::Color color )</slot>
-    <slot>SetSpecularColor( float red, float green, float blue )</slot>
-    <slot>SetSpecularCoefficient( float specularCoefficient )</slot>
-    <slot>SetSpecularPower( float specularPower )</slot>
-    <slot>SetOpacity( float opacity )</slot>
+    <slot>SetSpecularColor( vtkScalarType red, vtkScalarType green, vtkScalarType blue )</slot>
+    <slot>SetSpecularCoefficient( vtkScalarType specularCoefficient )</slot>
+    <slot>SetSpecularPower( vtkScalarType specularPower )</slot>
+    <slot>SetOpacity( vtkScalarType opacity )</slot>
     <slot>UpdateRenderWindow()</slot>
     <slot>SetRepresentation( mitk::MaterialProperty::RepresentationType representation )</slot>
     <slot>SetInterpolation( mitk::MaterialProperty::InterpolationType interpolation )</slot>
+    <slot>SetShowcaseNumber( unsigned int number )</slot>
 </slots>
 <functions>
     <function access="private" specifier="non virtual">init()</function>
     <function access="private" specifier="non virtual">destroy()</function>
     <function returnType="mitk::MaterialProperty *">GetMaterialProperty()</function>
+    <function access="protected">mousePressEvent( QMouseEvent * e )</function>
+    <function returnType="unsigned int">GetShowcaseNumber()</function>
 </functions>
 <layoutdefaults spacing="6" margin="11"/>
 <includehints>

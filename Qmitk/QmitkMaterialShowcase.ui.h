@@ -24,6 +24,7 @@
 
 void QmitkMaterialShowcase::init()
 {
+    m_ShowcaseNumber = 0;
     m_MaterialProperty = new mitk::MaterialProperty();
     vtkSphereSource* sphereSource = vtkSphereSource::New();
     sphereSource->SetThetaResolution(25);
@@ -51,13 +52,7 @@ void QmitkMaterialShowcase::SetMaterialProperty( mitk::MaterialProperty* propert
     if (m_MaterialProperty != NULL)
         delete m_MaterialProperty;
     
-    m_MaterialProperty = new mitk::MaterialProperty( );
-    this->SetColor( property->GetColor() );
-    this->SetColorCoefficient( property->GetColorCoefficient() );
-    this->SetSpecularColor( property->GetSpecularColor() );
-    this->SetSpecularCoefficient( property->GetSpecularCoefficient() );
-    this->SetSpecularPower( property->GetSpecularPower() );
-    this->SetOpacity( property->GetOpacity() );
+    m_MaterialProperty = new mitk::MaterialProperty( *property );
     m_DataTreeNode->SetProperty( "material", m_MaterialProperty );
     this->UpdateRenderWindow();
 }
@@ -70,14 +65,14 @@ void QmitkMaterialShowcase::SetColor( mitk::MaterialProperty::Color color )
     this->UpdateRenderWindow();
 }
 
-void  QmitkMaterialShowcase::SetColor( float red, float green, float blue )
+void  QmitkMaterialShowcase::SetColor( vtkScalarType red, vtkScalarType green, vtkScalarType blue )
 {
     m_MaterialProperty->SetColor( red, green, blue );
     m_DataTreeNode->SetProperty( "material", m_MaterialProperty );
     this->UpdateRenderWindow(); 
 }
     
-void  QmitkMaterialShowcase::SetColorCoefficient( float coefficient )
+void  QmitkMaterialShowcase::SetColorCoefficient( vtkScalarType coefficient )
 {
     m_MaterialProperty->SetColorCoefficient( coefficient );
     m_DataTreeNode->SetProperty( "material", m_MaterialProperty );
@@ -91,28 +86,28 @@ void  QmitkMaterialShowcase::SetSpecularColor( mitk::MaterialProperty::Color col
     this->UpdateRenderWindow();
 }
     
-void  QmitkMaterialShowcase::SetSpecularColor( float red, float green, float blue )
+void  QmitkMaterialShowcase::SetSpecularColor( vtkScalarType red, vtkScalarType green, vtkScalarType blue )
 {
     m_MaterialProperty->SetSpecularColor( red, green, blue );
     m_DataTreeNode->SetProperty( "material", m_MaterialProperty );
     this->UpdateRenderWindow();
 }
     
-void  QmitkMaterialShowcase::SetSpecularCoefficient( float specularCoefficient )
+void  QmitkMaterialShowcase::SetSpecularCoefficient( vtkScalarType specularCoefficient )
 {
     m_MaterialProperty->SetSpecularCoefficient( specularCoefficient );
     m_DataTreeNode->SetProperty( "material", m_MaterialProperty );
     this->UpdateRenderWindow();
 }
     
-void  QmitkMaterialShowcase::SetSpecularPower( float specularPower )
+void  QmitkMaterialShowcase::SetSpecularPower( vtkScalarType specularPower )
 {
     m_MaterialProperty->SetSpecularPower( specularPower );
     m_DataTreeNode->SetProperty( "material", m_MaterialProperty );
     this->UpdateRenderWindow();
 }
     
-void  QmitkMaterialShowcase::SetOpacity( float opacity )
+void  QmitkMaterialShowcase::SetOpacity( vtkScalarType opacity )
 {
     m_MaterialProperty->SetOpacity( opacity );
     m_DataTreeNode->SetProperty( "material", m_MaterialProperty );
@@ -145,4 +140,23 @@ void QmitkMaterialShowcase::SetInterpolation( mitk::MaterialProperty::Interpolat
     m_MaterialProperty->SetInterpolation( interpolation );
     m_DataTreeNode->SetProperty( "material", m_MaterialProperty );
     this->UpdateRenderWindow();
+}
+
+
+void QmitkMaterialShowcase::mousePressEvent( QMouseEvent * e )
+{
+    QWidget::mousePressEvent( e );
+    emit Selected( this );  
+}
+
+
+void QmitkMaterialShowcase::SetShowcaseNumber( unsigned int number )
+{
+    m_ShowcaseNumber = number;
+}
+
+
+unsigned int QmitkMaterialShowcase::GetShowcaseNumber()
+{
+    return m_ShowcaseNumber;
 }

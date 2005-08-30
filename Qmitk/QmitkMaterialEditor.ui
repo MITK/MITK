@@ -311,6 +311,7 @@
     <include location="global" impldecl="in declaration">vector</include>
     <include location="local" impldecl="in declaration">QmitkMaterialShowcase.h</include>
     <include location="local" impldecl="in implementation">QmitkMaterialEditor.ui.h</include>
+    <include location="global" impldecl="in declaration">mitkVtkTypes.h</include>
 </includes>
 <variables>
     <variable>mitk::DataTree::Pointer m_DataTree;</variable>
@@ -337,6 +338,7 @@
     <slot access="protected">OnCoefficientsChanged( int value )</slot>
     <slot access="protected">OnInterpolationChanged( int item )</slot>
     <slot access="protected">OnRepresentationChanged( int item )</slot>
+    <slot access="protected">OnMaterialShowcaseSelected( QmitkMaterialShowcase * showcase )</slot>
 </slots>
 <functions>
     <function access="private" specifier="non virtual">init()</function>

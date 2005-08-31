@@ -3,7 +3,7 @@
 
 #include "mitkCommon.h"
 #include "mitkBaseProperty.h"
-#include "mitkVtkTypes.h"
+#include <mitkVtkTypes.h>
 #include <itkRGBPixel.h>
 #include <itkObject.h>
 #include <itkVectorContainer.h>
@@ -23,7 +23,7 @@ class MaterialProperty : public BaseProperty
 public:
     mitkClassMacro( MaterialProperty, BaseProperty );
 
-    typedef itk::RGBPixel<vtkScalarType> Color;
+    typedef itk::RGBPixel<VTK_FLOAT_TYPE> Color;
     
     enum InterpolationType
     {
@@ -51,7 +51,7 @@ public:
      * @param opacity the opacity of the material. 0.0 means fully transparent
      *              and 1.0 means solid.
      */
-    MaterialProperty( Color color, vtkScalarType opacity = 1.0f );
+    MaterialProperty( Color color, VTK_FLOAT_TYPE opacity = 1.0f );
 
     /**
      * Constructor. All values besides the given ones are set to defaults as 
@@ -62,7 +62,7 @@ public:
      * @param opacity the opacity of the material. 0.0 means fully transparent
      *        and 1.0 means solid.
      */
-    MaterialProperty( vtkScalarType red, vtkScalarType green, vtkScalarType blue, vtkScalarType opacity = 1.0f );
+    MaterialProperty( VTK_FLOAT_TYPE red, VTK_FLOAT_TYPE green, VTK_FLOAT_TYPE blue, VTK_FLOAT_TYPE opacity = 1.0f );
 
     /**
      * Constructor. All values besides the given ones are set to defaults as 
@@ -79,7 +79,8 @@ public:
      * @param opacity the opacity of the material. 0.0 means fully transparent
      *        and 1.0 means solid.
      */
-    MaterialProperty( vtkScalarType red, vtkScalarType green, vtkScalarType blue, vtkScalarType colorCoefficient, vtkScalarType specularCoefficient, vtkScalarType specularPower, vtkScalarType opacity );
+    MaterialProperty( VTK_FLOAT_TYPE red, VTK_FLOAT_TYPE green, VTK_FLOAT_TYPE blue, VTK_FLOAT_TYPE colorCoefficient, 
+      VTK_FLOAT_TYPE specularCoefficient, VTK_FLOAT_TYPE specularPower, VTK_FLOAT_TYPE opacity );
 
     /**
      * Constructor. All values besides the given ones are set to defaults as 
@@ -96,7 +97,7 @@ public:
      * @param opacity the opacity of the material. 0.0 means fully transparent
      *        and 1.0 means solid.
      */
-    MaterialProperty( Color color, vtkScalarType colorCoefficient, vtkScalarType specularCoefficient, vtkScalarType specularPower, vtkScalarType opacity );
+    MaterialProperty( Color color, VTK_FLOAT_TYPE colorCoefficient, VTK_FLOAT_TYPE specularCoefficient, VTK_FLOAT_TYPE specularPower, VTK_FLOAT_TYPE opacity );
 
     /**
      * Copy constructor
@@ -117,14 +118,14 @@ public:
      * @param green the green component of the materials color (range [0..1])
      * @param blue the blue component of the materials color (range [0..1])
      */
-    virtual void SetColor( vtkScalarType red, vtkScalarType green, vtkScalarType blue );
+    virtual void SetColor( VTK_FLOAT_TYPE red, VTK_FLOAT_TYPE green, VTK_FLOAT_TYPE blue );
 
     /**
      * Sets a attenuation coefficient for the color. A value of 0 results in 
      * a black object. VAlid range is [0..1]
      * @param coefficient the color attenuation coefficient
      */
-    virtual void SetColorCoefficient( vtkScalarType coefficient );
+    virtual void SetColorCoefficient( VTK_FLOAT_TYPE coefficient );
 
     /**
      * Sets the specular color
@@ -139,7 +140,7 @@ public:
      * @param green the green component of the specular color (range [0..1])
      * @param blue the blue component of the specular color (range [0..1])
      */
-    virtual void SetSpecularColor( vtkScalarType red, vtkScalarType green, vtkScalarType blue );
+    virtual void SetSpecularColor( VTK_FLOAT_TYPE red, VTK_FLOAT_TYPE green, VTK_FLOAT_TYPE blue );
 
     /**
      * Sets the specular coefficient which controls the shininess of the object
@@ -147,7 +148,7 @@ public:
      * @param specularCoefficient the new specular coefficient. Valid range
      *        is [0..1]
      */
-    virtual void SetSpecularCoefficient( vtkScalarType specularCoefficient );
+    virtual void SetSpecularCoefficient( VTK_FLOAT_TYPE specularCoefficient );
 
     /**
      * Sets the specular power which controls the shininess of the object
@@ -155,7 +156,7 @@ public:
      * @param specularCoefficient the new specular coefficient. Valid range
      *        is [0..inf]
      */
-    virtual void SetSpecularPower( vtkScalarType specularPower );
+    virtual void SetSpecularPower( VTK_FLOAT_TYPE specularPower );
 
     /**
      * Sets the opacity of the material, which controls how transparent the 
@@ -163,7 +164,7 @@ public:
      * and 1 means a solid surface.
      * @param opacity the new opacity of the material
      */
-    virtual void SetOpacity( vtkScalarType opacity );
+    virtual void SetOpacity( VTK_FLOAT_TYPE opacity );
 
     /**
      * Sets the surface interpolation method of the object rendered using the
@@ -191,7 +192,7 @@ public:
     /**
      * @returns the color coefficient of the material. Range is [0..1]
      */
-    virtual vtkScalarType GetColorCoefficient() const;
+    virtual VTK_FLOAT_TYPE GetColorCoefficient() const;
 
     /**
      * @returns the specular color of the material in rgb values, which 
@@ -202,17 +203,17 @@ public:
     /**
      * @returns the specular coefficient used for rendering. Range is [0..1]
      */
-    virtual vtkScalarType GetSpecularCoefficient() const;
+    virtual VTK_FLOAT_TYPE GetSpecularCoefficient() const;
 
     /**
      * @returns the specular power. Ranges from 0 to infinity
      */
-    virtual vtkScalarType GetSpecularPower() const;
+    virtual VTK_FLOAT_TYPE GetSpecularPower() const;
 
     /**
      * @returns the opacity of the material. Ranges from 0 to 1
      */
-    virtual vtkScalarType GetOpacity() const;
+    virtual VTK_FLOAT_TYPE GetOpacity() const;
 
     /**
      * @returns the interpolation method used for rendering.
@@ -256,13 +257,13 @@ protected:
 
     Color m_SpecularColor;
 
-    vtkScalarType m_ColorCoefficient;
+    VTK_FLOAT_TYPE m_ColorCoefficient;
 
-    vtkScalarType m_SpecularCoefficient;
+    VTK_FLOAT_TYPE m_SpecularCoefficient;
 
-    vtkScalarType m_SpecularPower;
+    VTK_FLOAT_TYPE m_SpecularPower;
 
-    vtkScalarType m_Opacity;
+    VTK_FLOAT_TYPE m_Opacity;
 
     InterpolationType m_Interpolation;
 

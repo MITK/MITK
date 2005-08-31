@@ -25,7 +25,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <float.h>
 #include <itkIndex.h>
 #include <itkVector.h>
-#include <vtkConfigure.h>
+#include <mitkVtkTypes.h>
 
 class vtkMatrix4x4;
 
@@ -272,12 +272,6 @@ void TransferVtkMatrixToItkTransform(const vtkMatrix4x4* vtkmatrix, mitk::Affine
 void TransferItkTransformToVtkMatrix(const mitk::AffineTransform3D* itkTransform, vtkMatrix4x4* vtkmatrix);
 
 } // namespace mitk
-
-#if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
- typedef double VTK_FLOAT_TYPE;
-#else
- typedef float VTK_FLOAT_TYPE;
-#endif
 
 #define mitkSetConstReferenceMacro(name,type) \
   virtual void Set##name (const type & _arg) \

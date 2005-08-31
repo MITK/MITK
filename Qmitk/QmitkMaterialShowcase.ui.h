@@ -65,14 +65,14 @@ void QmitkMaterialShowcase::SetColor( mitk::MaterialProperty::Color color )
     this->UpdateRenderWindow();
 }
 
-void  QmitkMaterialShowcase::SetColor( vtkScalarType red, vtkScalarType green, vtkScalarType blue )
+void  QmitkMaterialShowcase::SetColor( VTK_FLOAT_TYPE red, VTK_FLOAT_TYPE green, VTK_FLOAT_TYPE blue )
 {
     m_MaterialProperty->SetColor( red, green, blue );
     m_DataTreeNode->SetProperty( "material", m_MaterialProperty );
     this->UpdateRenderWindow(); 
 }
     
-void  QmitkMaterialShowcase::SetColorCoefficient( vtkScalarType coefficient )
+void  QmitkMaterialShowcase::SetColorCoefficient( VTK_FLOAT_TYPE coefficient )
 {
     m_MaterialProperty->SetColorCoefficient( coefficient );
     m_DataTreeNode->SetProperty( "material", m_MaterialProperty );
@@ -86,28 +86,28 @@ void  QmitkMaterialShowcase::SetSpecularColor( mitk::MaterialProperty::Color col
     this->UpdateRenderWindow();
 }
     
-void  QmitkMaterialShowcase::SetSpecularColor( vtkScalarType red, vtkScalarType green, vtkScalarType blue )
+void  QmitkMaterialShowcase::SetSpecularColor( VTK_FLOAT_TYPE red, VTK_FLOAT_TYPE green, VTK_FLOAT_TYPE blue )
 {
     m_MaterialProperty->SetSpecularColor( red, green, blue );
     m_DataTreeNode->SetProperty( "material", m_MaterialProperty );
     this->UpdateRenderWindow();
 }
     
-void  QmitkMaterialShowcase::SetSpecularCoefficient( vtkScalarType specularCoefficient )
+void  QmitkMaterialShowcase::SetSpecularCoefficient( VTK_FLOAT_TYPE specularCoefficient )
 {
     m_MaterialProperty->SetSpecularCoefficient( specularCoefficient );
     m_DataTreeNode->SetProperty( "material", m_MaterialProperty );
     this->UpdateRenderWindow();
 }
     
-void  QmitkMaterialShowcase::SetSpecularPower( vtkScalarType specularPower )
+void  QmitkMaterialShowcase::SetSpecularPower( VTK_FLOAT_TYPE specularPower )
 {
     m_MaterialProperty->SetSpecularPower( specularPower );
     m_DataTreeNode->SetProperty( "material", m_MaterialProperty );
     this->UpdateRenderWindow();
 }
     
-void  QmitkMaterialShowcase::SetOpacity( vtkScalarType opacity )
+void  QmitkMaterialShowcase::SetOpacity( VTK_FLOAT_TYPE opacity )
 {
     m_MaterialProperty->SetOpacity( opacity );
     m_DataTreeNode->SetProperty( "material", m_MaterialProperty );

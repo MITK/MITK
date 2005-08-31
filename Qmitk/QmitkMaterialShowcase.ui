@@ -85,13 +85,13 @@
 <slots>
     <slot>SetMaterialProperty( mitk::MaterialProperty * property )</slot>
     <slot>SetColor( mitk::MaterialProperty::Color color )</slot>
-    <slot>SetColor( vtkScalarType red, vtkScalarType green, vtkScalarType blue )</slot>
-    <slot>SetColorCoefficient( vtkScalarType coefficient )</slot>
+    <slot>SetColor( VTK_FLOAT_TYPE red, VTK_FLOAT_TYPE green, VTK_FLOAT_TYPE blue )</slot>
+    <slot>SetColorCoefficient( VTK_FLOAT_TYPE coefficient )</slot>
     <slot>SetSpecularColor( mitk::MaterialProperty::Color color )</slot>
-    <slot>SetSpecularColor( vtkScalarType red, vtkScalarType green, vtkScalarType blue )</slot>
-    <slot>SetSpecularCoefficient( vtkScalarType specularCoefficient )</slot>
-    <slot>SetSpecularPower( vtkScalarType specularPower )</slot>
-    <slot>SetOpacity( vtkScalarType opacity )</slot>
+    <slot>SetSpecularColor( VTK_FLOAT_TYPE red, VTK_FLOAT_TYPE green, VTK_FLOAT_TYPE blue )</slot>
+    <slot>SetSpecularCoefficient( VTK_FLOAT_TYPE specularCoefficient )</slot>
+    <slot>SetSpecularPower( VTK_FLOAT_TYPE specularPower )</slot>
+    <slot>SetOpacity( VTK_FLOAT_TYPE opacity )</slot>
     <slot>UpdateRenderWindow()</slot>
     <slot>SetRepresentation( mitk::MaterialProperty::RepresentationType representation )</slot>
     <slot>SetInterpolation( mitk::MaterialProperty::InterpolationType interpolation )</slot>

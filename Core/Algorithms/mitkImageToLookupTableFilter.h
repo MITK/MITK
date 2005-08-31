@@ -6,49 +6,43 @@
 
 namespace mitk
 {
-    
+
 /**
- * Creates a mitk::LookupTable from an image. This may be used to 
- * create a default coloring scheme for vector images...
- */
+* Creates a mitk::LookupTable from an image. This may be used to 
+* create a default coloring scheme for vector images...
+*/
 class ImageToLookupTableFilter : public LookupTableSource
 {
 public:
-        
-    mitkClassMacro( ImageToLookupTableFilter, LookupTableSource );    
 
-    itkNewMacro( Self );
-    
-    // typedefs for setting an image as input
-	typedef mitk::Image                    InputImageType;
-	typedef InputImageType::Pointer        InputImagePointer;
-	typedef InputImageType::ConstPointer   InputImageConstPointer;
-    
-    #if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
-      typedef double vtkScalarType;
-    #else
-      typedef float vtkScalarType;
-    #endif
-    
-	virtual void SetInput( const InputImageType *image);
-    
-	virtual void SetInput( unsigned int, const InputImageType * image);
-    
-	const InputImageType * GetInput(void);
-    
-	const InputImageType * GetInput(unsigned int idx);
-            
+  mitkClassMacro( ImageToLookupTableFilter, LookupTableSource );    
+
+  itkNewMacro( Self );
+
+  // typedefs for setting an image as input
+  typedef mitk::Image                    InputImageType;
+  typedef InputImageType::Pointer        InputImagePointer;
+  typedef InputImageType::ConstPointer   InputImageConstPointer;
+
+  virtual void SetInput( const InputImageType *image);
+
+  virtual void SetInput( unsigned int, const InputImageType * image);
+
+  const InputImageType * GetInput(void);
+
+  const InputImageType * GetInput(unsigned int idx);
+
 protected:   
-        
-    virtual void GenerateData();
 
-    ImageToLookupTableFilter();
-    
-    virtual ~ImageToLookupTableFilter();
-    
+  virtual void GenerateData();
+
+  ImageToLookupTableFilter();
+
+  virtual ~ImageToLookupTableFilter();
+
 };
 
-    
+
 } //end of namespace mitk
 
 #endif

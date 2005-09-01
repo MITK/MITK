@@ -783,6 +783,8 @@ void mitk::DataTreeNodeFactory::ReadFileTypeITKImageIOFactory()
   void* buffer = malloc( imageIO->GetImageSizeInBytes() );
   imageIO->Read( buffer );
   mitk::Image::Pointer image = mitk::Image::New();
+  if((ndim==4) && (dimensions[3]==1))
+    ndim = 3;
   if((ndim==3) && (dimensions[2]==1))
     ndim = 2;
 #if ITK_VERSION_MAJOR == 2 || ( ITK_VERSION_MAJOR == 1 && ITK_VERSION_MINOR > 6 )

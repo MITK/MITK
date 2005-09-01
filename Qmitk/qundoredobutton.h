@@ -2,10 +2,12 @@
 #define UNDOBUTTON_H_1329857WEG
 
 #include <qframe.h>
+//#include <qtoolbutton.h>
 #include <qwidgetplugin.h>
 #include "mitkCommon.h"
 
-class QPushButton;
+//class QPushButton;
+class QToolButton;
 class QFrame;
 class QHBoxLayout;
 class QListBox;
@@ -77,8 +79,8 @@ QUndoRedoButton : public QFrame
     void arrowButtonClicked();
     
   private:
-    QPushButton* m_iconbutton;
-    QPushButton* m_arrowbutton;
+    QToolButton* m_iconbutton;
+    QToolButton* m_arrowbutton;
     QHBoxLayout* m_layout;
     PopupUndoRedoListBox* m_popup;
     QString m_actionName;

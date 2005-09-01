@@ -14,7 +14,6 @@
 #include <qlayout.h>
 #include <qapplication.h>
 
-#include <iostream>
 #include <algorithm>
 
   
@@ -44,13 +43,12 @@ void PassOnMouseListBox::mouseReleaseEvent(QMouseEvent * e)
 
 
 PopupActionHistory::PopupActionHistory(QWidget* parent, const char* name)
-: QFrame (parent, name),
+: QFrame (parent, name, WStyle_StaysOnTop | WStyle_Customize | WStyle_NoBorder | WStyle_Tool | WX11BypassWM),
   m_moves(0),
   my_parent(parent)
 {
   QVBoxLayout* vbox = new QVBoxLayout(this, lineWidth());
   
-  setFrameStyle ( WinPanel | Raised );
   setLineWidth(2);
   setMouseTracking ( TRUE );
  
@@ -64,8 +62,13 @@ PopupActionHistory::PopupActionHistory(QWidget* parent, const char* name)
   m_label->show();
   vbox->addWidget(m_label);
   
-  //vbox->setResizeMode( QLayout::FreeResize);
-  
+  setMargin(0);
+  setAutoMask( FALSE );
+  setFrameStyle ( QFrame::Panel | QFrame::Raised );
+  setLineWidth( 2 );
+  polish();
+  adjustSize();
+
   hide();
 }
 
@@ -106,7 +109,10 @@ void PopupActionHistory::popup(QWidget* parent)
   // e.g. when popupParent is near the bottom of the screen
   // Problem: then the layout of label and listbox has to be changed, plus the logic in mouseMoveEvent! Items have to be ordered from bottom to top
   if (m_popupParent)
-    move ( m_popupParent->mapTo( my_parent, m_popupParent->rect().bottomLeft() ) );
+  {
+    move ( m_popupParent->mapToGlobal( m_popupParent->rect().bottomLeft() ) );
+  }
+  
   m_listbox->clearSelection();
   
   // TODO: could the following be done nicer, in a more general way?
@@ -117,6 +123,7 @@ void PopupActionHistory::popup(QWidget* parent)
         );
   
   show();
+  raise();
   grabMouse();
   m_moves = 0;
 }

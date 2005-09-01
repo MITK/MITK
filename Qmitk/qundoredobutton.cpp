@@ -5,8 +5,8 @@
 #include "redoarrow.xpm"
 
 #include <qlayout.h>
-#include <qpushbutton.h>
-#include <qframe.h>
+#include <qtoolbutton.h>
+//#include <qpushbutton.h>
 #include <qapplication.h>
 
 QUndoRedoButton::QUndoRedoButton( QWidget* parent, const char* name)
@@ -14,35 +14,41 @@ QUndoRedoButton::QUndoRedoButton( QWidget* parent, const char* name)
  m_Mode(Undo),
  m_actionName("Undo")
 {
-  setFrameStyle( QFrame::Panel | QFrame::Raised );
-  setLineWidth(2);
+  setFrameStyle( QFrame::NoFrame );
+  setLineWidth(0);
   
   // create HBoxLayout with two buttons
   m_layout = new QHBoxLayout(this);
-  m_layout->setMargin(1);
+  m_layout->setMargin(0);
  
   // the "do 1 undo/redo" button
-  m_iconbutton = new QPushButton("", this);
-  m_iconbutton->setFlat(true);
+  m_iconbutton = new QToolButton(this);
+  m_iconbutton->setAutoRaise(true);
   m_layout->addWidget(m_iconbutton);
 
-  // some separation line
-  QFrame* frame = new QFrame(this);
-  frame->setFrameStyle( QFrame::VLine | QFrame::Plain );
-  m_layout->addWidget( frame );
- 
   // the "popup undo/redo list" button
-  m_arrowbutton = new QPushButton("", this);
+  m_arrowbutton = new QToolButton(this);
   m_arrowbutton->setPixmap( QPixmap(popup_arrow_xpm) );
-  m_arrowbutton->setFlat(true);
+  m_arrowbutton->setAutoRaise(true);
   m_layout->addWidget(m_arrowbutton);
-
-  m_popup = new PopupUndoRedoListBox(parent);
+  
+  // our popup belongs to the whole screen, so it could be drawn outside the toplevel window's borders
+  int scr;
+  if ( QApplication::desktop()->isVirtualDesktop() )
+    scr = QApplication::desktop()->screenNumber( parent->mapToGlobal( pos() ) );
+  else
+    scr = QApplication::desktop()->screenNumber( parent );
+ 
+  m_popup = new PopupUndoRedoListBox(QApplication::desktop()->screen( scr ));
+  
   connect( m_popup, SIGNAL( selectedRange(int) ), this, SLOT(popupItemsSelected(int)) );
   connect( m_iconbutton, SIGNAL( clicked() ) , this, SLOT(iconButtonClicked()) );
   connect( m_arrowbutton, SIGNAL( pressed() ) , this, SLOT(arrowButtonClicked()) );
 
   setMode(Undo);
+
+  polish();
+  adjustSize();
 }
 
 QUndoRedoButton::~QUndoRedoButton()
@@ -106,12 +112,10 @@ void QUndoRedoButton::iconButtonClicked()
 
 void QUndoRedoButton::arrowButtonClicked()
 {
-  //m_popup->popup(m_arrowbutton);
-
   beforePopup();  // for derived classes to fill the popuplist
   
   qApp->processEvents();
-  
+    
   m_popup->popup(this);
 }
 

@@ -13,7 +13,6 @@ QmitkUndoRedoButton::QmitkUndoRedoButton( QWidget* parent, const char* name, mit
   m_ListenerEmpty(NULL),
   m_ListenerNotEmpty(NULL)
 {
-  // nothing to do
   setEnabled(false);
   connect( this, SIGNAL(undoRedoLast(int)), this, SLOT(doUndoRedoLast(int)) );
 }

@@ -3,6 +3,7 @@
 
 #include <qframe.h>
 #include <qwidgetplugin.h>
+#include "mitkCommon.h"
 
 class QPushButton;
 class QFrame;
@@ -13,7 +14,7 @@ class PopupUndoRedoListBox;
 
 // nice undo or redo button with popup showing the last actions
 class 
-//QT_WIDGET_PLUGIN_EXPORT 
+MITK_EXPORT
 QUndoRedoButton : public QFrame
 {
   Q_OBJECT;

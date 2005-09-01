@@ -139,11 +139,7 @@ public:
   {
     typedef typename itk::ReceptorMemberCommand<T>::Pointer ReceptorMemberCommandPointer;
     ReceptorMemberCommandPointer eventReceptorCommand = itk::ReceptorMemberCommand<T>::New();
-  #ifdef WIN32
-    eventReceptorCommand->SetCallbackFunction(receiver, T::SetGeometry);
-  #else
     eventReceptorCommand->SetCallbackFunction(receiver, &T::SetGeometry);
-  #endif
     AddObserver(GeometrySendEvent(NULL,0), eventReceptorCommand);
   }
   
@@ -151,11 +147,7 @@ public:
   {
     typedef typename itk::ReceptorMemberCommand<T>::Pointer ReceptorMemberCommandPointer;
     ReceptorMemberCommandPointer eventReceptorCommand = itk::ReceptorMemberCommand<T>::New();
-  #ifdef WIN32
-    eventReceptorCommand->SetCallbackFunction(receiver, T::SetGeometrySlice);
-  #else
     eventReceptorCommand->SetCallbackFunction(receiver, &T::SetGeometrySlice);
-  #endif
     AddObserver(GeometrySliceEvent(NULL,0), eventReceptorCommand);
     if(connectSendEvent)
       ConnectGeometrySendEvent(receiver);
@@ -165,11 +157,7 @@ public:
   {
     typedef typename itk::ReceptorMemberCommand<T>::Pointer ReceptorMemberCommandPointer;
     ReceptorMemberCommandPointer eventReceptorCommand = itk::ReceptorMemberCommand<T>::New();
-  #ifdef WIN32
-    eventReceptorCommand->SetCallbackFunction(receiver, T::SetGeometryTime);
-  #else
     eventReceptorCommand->SetCallbackFunction(receiver, &T::SetGeometryTime);
-  #endif
     AddObserver(GeometryTimeEvent(NULL,0), eventReceptorCommand);
     if(connectSendEvent)
       ConnectGeometrySendEvent(receiver);
@@ -185,11 +173,7 @@ public:
   {
     typedef typename itk::SimpleMemberCommand<T>::Pointer SimpleMemberCommandPointer;
     SimpleMemberCommandPointer eventSimpleCommand = itk::SimpleMemberCommand<T>::New();
-  #ifdef WIN32
-    eventSimpleCommand->SetCallbackFunction(receiver, T::UpdateRequest);
-  #else
     eventSimpleCommand->SetCallbackFunction(receiver, &T::UpdateRequest);
-  #endif
     AddObserver(UpdateEvent(), eventSimpleCommand);
     receiver->AddStateMachine(this);
   }
@@ -198,11 +182,7 @@ public:
   {
     typedef typename itk::SimpleMemberCommand<T>::Pointer SimpleMemberCommandPointer;
     SimpleMemberCommandPointer eventSimpleCommand = itk::SimpleMemberCommand<T>::New();
-  #ifdef WIN32
-    eventSimpleCommand->SetCallbackFunction(receiver, T::RepaintRequest);
-  #else
     eventSimpleCommand->SetCallbackFunction(receiver, &T::RepaintRequest);
-  #endif
     AddObserver(UpdateEvent(), eventSimpleCommand);
     receiver->AddStateMachine(this);
   }
@@ -211,11 +191,7 @@ public:
   {
     typedef typename itk::SimpleMemberCommand<T>::Pointer SimpleMemberCommandPointer;
     SimpleMemberCommandPointer eventSimpleCommand = itk::SimpleMemberCommand<T>::New();
-  #ifdef WIN32
-    eventSimpleCommand->SetCallbackFunction(receiver, T::Update);
-  #else
     eventSimpleCommand->SetCallbackFunction(receiver, &T::Update);
-  #endif
     AddObserver(UpdateEvent(), eventSimpleCommand);
   }
 
@@ -223,11 +199,7 @@ public:
   {
     typedef typename itk::SimpleMemberCommand<T>::Pointer SimpleMemberCommandPointer;
     SimpleMemberCommandPointer eventSimpleCommand = itk::SimpleMemberCommand<T>::New();
-  #ifdef WIN32
-    eventSimpleCommand->SetCallbackFunction(receiver, T::Repaint);
-  #else
     eventSimpleCommand->SetCallbackFunction(receiver, &T::Repaint);
-  #endif
     AddObserver(UpdateEvent(), eventSimpleCommand);
   }
 

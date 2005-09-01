@@ -31,11 +31,7 @@ const int QmitkPointListWidget::UNLIMITED = 999;
 void QmitkPointListWidget::init()
 {
   m_DataChangedCommand = itk::SimpleMemberCommand<QmitkPointListWidget>::New();
-#ifdef WIN32
-  m_DataChangedCommand->SetCallbackFunction(this, QmitkPointListWidget::ItemsOfListUpdate);
-#else
   m_DataChangedCommand->SetCallbackFunction(this, &QmitkPointListWidget::ItemsOfListUpdate);
-#endif
   m_CurrentObserverID = 0;
   m_CurrentInteraction = NULL;
   m_CurrentPolygonInteraction = NULL;

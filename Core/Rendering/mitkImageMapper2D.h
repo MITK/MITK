@@ -153,11 +153,7 @@ public:
       m_Renderer = renderer;
 
       m_DeleteRendererCommand = itk::SimpleMemberCommand<RendererInfo>::New();
-  #ifdef WIN32
-      m_DeleteRendererCommand->SetCallbackFunction(this, RendererDeleted);
-  #else
       m_DeleteRendererCommand->SetCallbackFunction(this, &RendererInfo::RendererDeleted);
-  #endif
 
       m_ObserverId = renderer->AddObserver(itk::DeleteEvent(), m_DeleteRendererCommand);
     }

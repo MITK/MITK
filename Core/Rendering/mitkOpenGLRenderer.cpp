@@ -57,11 +57,7 @@ mitk::OpenGLRenderer::OpenGLRenderer( const char* name )
   m_WorldPointPicker = vtkWorldPointPicker::New();
 
   m_DataChangedCommand = itk::MemberCommand<mitk::OpenGLRenderer>::New();
-#ifdef WIN32
-  m_DataChangedCommand->SetCallbackFunction(this, mitk::OpenGLRenderer::DataChangedEvent);
-#else
   m_DataChangedCommand->SetCallbackFunction(this, &mitk::OpenGLRenderer::DataChangedEvent);
-#endif
 
   mitk::Geometry2DDataVtkMapper3D::Pointer geometryMapper = mitk::Geometry2DDataVtkMapper3D::New();
   m_CurrentWorldGeometry2DMapper = geometryMapper;

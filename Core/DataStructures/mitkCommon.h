@@ -54,4 +54,21 @@ typedef  unsigned int MapperSlotId;
     return this->m_##name.GetPointer(); \
   } 
 
+/** provide a macro for adding MS specific __declspec(dllexport/-import)
+ *  to classes.
+ *  This is needed for the export of symbols, when you build a DLL. Then write
+ *  
+ *    class MITK_EXPORT ClassName : public SomeClass {};
+ */
+#if defined(WIN32)
+  #if defined(BUILDING_MITK_DLL)
+    #define MITK_EXPORT __declspec(dllexport)
+  #elif defined(IMPORTING_MITK_DLL)
+    #define MITK_EXPORT __declspec(dllimport)
+  #else
+    #define MITK_EXPORT
+  #endif
+#else
+  #define MITK_EXPORT
+#endif
 

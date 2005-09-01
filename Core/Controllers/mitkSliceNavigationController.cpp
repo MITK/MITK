@@ -40,13 +40,8 @@ mitk::SliceNavigationController::SliceNavigationController(const char * type)
   itk::SimpleMemberCommand<SliceNavigationController>::Pointer sliceStepperChangedCommand, timeStepperChangedCommand;
   sliceStepperChangedCommand = itk::SimpleMemberCommand<SliceNavigationController>::New();
   timeStepperChangedCommand = itk::SimpleMemberCommand<SliceNavigationController>::New();
-#ifdef WIN32
-  sliceStepperChangedCommand->SetCallbackFunction(this, SliceNavigationController::SendSlice);
-  timeStepperChangedCommand->SetCallbackFunction(this,  SliceNavigationController::SendTime);
-#else
   sliceStepperChangedCommand->SetCallbackFunction(this, &SliceNavigationController::SendSlice);
   timeStepperChangedCommand->SetCallbackFunction(this,  &SliceNavigationController::SendTime);
-#endif
 
   m_Slice->AddObserver(itk::ModifiedEvent(), sliceStepperChangedCommand);
   m_Time->AddObserver(itk::ModifiedEvent(),  timeStepperChangedCommand);

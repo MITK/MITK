@@ -226,7 +226,7 @@ void QmitkMaterialEditor::Initialize( mitk::MaterialPropertyVectorContainer::Poi
 void QmitkMaterialEditor::Initialize()
 {
     QVBoxLayout * layout = new QVBoxLayout( m_GridContainer );
-    QGrid * grid = new QGrid( static_cast<int>( sqrt( m_MaterialProperties->size() ) ), Qt::Horizontal, m_GridContainer );
+    QGrid * grid = new QGrid( static_cast<int>( sqrt( (double)m_MaterialProperties->size() ) ), Qt::Horizontal, m_GridContainer );
     layout->addWidget( grid );
     m_Showcases.resize( m_MaterialProperties->size() );
     for ( unsigned int i = 0 ; i < m_MaterialProperties->size() ; ++i )

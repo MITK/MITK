@@ -24,6 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkDataTreeNodeSource.h"
 #include "mitkFileSeriesReader.h"
 
+#include <vtkConfigure.h>
 #include <string>
 
 namespace mitk

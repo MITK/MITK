@@ -65,14 +65,14 @@ void QmitkMaterialShowcase::SetColor( mitk::MaterialProperty::Color color )
     this->UpdateRenderWindow();
 }
 
-void  QmitkMaterialShowcase::SetColor( VTK_FLOAT_TYPE red, VTK_FLOAT_TYPE green, VTK_FLOAT_TYPE blue )
+void  QmitkMaterialShowcase::SetColor( vtkFloatingPointType red, vtkFloatingPointType green, vtkFloatingPointType blue )
 {
     m_MaterialProperty->SetColor( red, green, blue );
     m_DataTreeNode->SetProperty( "material", m_MaterialProperty );
     this->UpdateRenderWindow(); 
 }
     
-void  QmitkMaterialShowcase::SetColorCoefficient( VTK_FLOAT_TYPE coefficient )
+void  QmitkMaterialShowcase::SetColorCoefficient( vtkFloatingPointType coefficient )
 {
     m_MaterialProperty->SetColorCoefficient( coefficient );
     m_DataTreeNode->SetProperty( "material", m_MaterialProperty );
@@ -86,28 +86,28 @@ void  QmitkMaterialShowcase::SetSpecularColor( mitk::MaterialProperty::Color col
     this->UpdateRenderWindow();
 }
     
-void  QmitkMaterialShowcase::SetSpecularColor( VTK_FLOAT_TYPE red, VTK_FLOAT_TYPE green, VTK_FLOAT_TYPE blue )
+void  QmitkMaterialShowcase::SetSpecularColor( vtkFloatingPointType red, vtkFloatingPointType green, vtkFloatingPointType blue )
 {
     m_MaterialProperty->SetSpecularColor( red, green, blue );
     m_DataTreeNode->SetProperty( "material", m_MaterialProperty );
     this->UpdateRenderWindow();
 }
     
-void  QmitkMaterialShowcase::SetSpecularCoefficient( VTK_FLOAT_TYPE specularCoefficient )
+void  QmitkMaterialShowcase::SetSpecularCoefficient( vtkFloatingPointType specularCoefficient )
 {
     m_MaterialProperty->SetSpecularCoefficient( specularCoefficient );
     m_DataTreeNode->SetProperty( "material", m_MaterialProperty );
     this->UpdateRenderWindow();
 }
     
-void  QmitkMaterialShowcase::SetSpecularPower( VTK_FLOAT_TYPE specularPower )
+void  QmitkMaterialShowcase::SetSpecularPower( vtkFloatingPointType specularPower )
 {
     m_MaterialProperty->SetSpecularPower( specularPower );
     m_DataTreeNode->SetProperty( "material", m_MaterialProperty );
     this->UpdateRenderWindow();
 }
     
-void  QmitkMaterialShowcase::SetOpacity( VTK_FLOAT_TYPE opacity )
+void  QmitkMaterialShowcase::SetOpacity( vtkFloatingPointType opacity )
 {
     m_MaterialProperty->SetOpacity( opacity );
     m_DataTreeNode->SetProperty( "material", m_MaterialProperty );

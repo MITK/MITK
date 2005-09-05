@@ -70,7 +70,6 @@
     <include location="local" impldecl="in declaration">mitkSurface.h</include>
     <include location="local" impldecl="in declaration">qevent.h</include>
     <include location="local" impldecl="in implementation">QmitkMaterialShowcase.ui.h</include>
-    <include location="global" impldecl="in declaration">mitkVtkTypes.h</include>
 </includes>
 <variables>
     <variable>mitk::Surface::Pointer m_Surface;</variable>
@@ -85,13 +84,13 @@
 <slots>
     <slot>SetMaterialProperty( mitk::MaterialProperty * property )</slot>
     <slot>SetColor( mitk::MaterialProperty::Color color )</slot>
-    <slot>SetColor( VTK_FLOAT_TYPE red, VTK_FLOAT_TYPE green, VTK_FLOAT_TYPE blue )</slot>
-    <slot>SetColorCoefficient( VTK_FLOAT_TYPE coefficient )</slot>
+    <slot>SetColor( vtkFloatingPointType red, vtkFloatingPointType green, vtkFloatingPointType blue )</slot>
+    <slot>SetColorCoefficient( vtkFloatingPointType coefficient )</slot>
     <slot>SetSpecularColor( mitk::MaterialProperty::Color color )</slot>
-    <slot>SetSpecularColor( VTK_FLOAT_TYPE red, VTK_FLOAT_TYPE green, VTK_FLOAT_TYPE blue )</slot>
-    <slot>SetSpecularCoefficient( VTK_FLOAT_TYPE specularCoefficient )</slot>
-    <slot>SetSpecularPower( VTK_FLOAT_TYPE specularPower )</slot>
-    <slot>SetOpacity( VTK_FLOAT_TYPE opacity )</slot>
+    <slot>SetSpecularColor( vtkFloatingPointType red, vtkFloatingPointType green, vtkFloatingPointType blue )</slot>
+    <slot>SetSpecularCoefficient( vtkFloatingPointType specularCoefficient )</slot>
+    <slot>SetSpecularPower( vtkFloatingPointType specularPower )</slot>
+    <slot>SetOpacity( vtkFloatingPointType opacity )</slot>
     <slot>UpdateRenderWindow()</slot>
     <slot>SetRepresentation( mitk::MaterialProperty::RepresentationType representation )</slot>
     <slot>SetInterpolation( mitk::MaterialProperty::InterpolationType interpolation )</slot>

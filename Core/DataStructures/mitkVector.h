@@ -25,7 +25,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <float.h>
 #include <itkIndex.h>
 #include <itkVector.h>
-#include <mitkVtkTypes.h>
 
 class vtkMatrix4x4;
 

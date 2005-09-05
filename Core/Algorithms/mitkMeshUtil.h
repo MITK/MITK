@@ -51,9 +51,9 @@ template <typename MeshType>
 class NullScalarAccessor
 {
 public:
-  static inline VTK_FLOAT_TYPE GetScalar(typename MeshType::PointDataContainer* point, typename MeshType::PointIdentifier idx, MeshType* mesh = NULL, unsigned int type = 0)
+  static inline vtkFloatingPointType GetScalar(typename MeshType::PointDataContainer* point, typename MeshType::PointIdentifier idx, MeshType* mesh = NULL, unsigned int type = 0)
   {
-    return (VTK_FLOAT_TYPE) 0.0;
+    return (vtkFloatingPointType) 0.0;
   };
 };
 
@@ -61,11 +61,11 @@ template <typename MeshType>
 class MeanCurvatureAccessor
 {
 public:
-  static inline VTK_FLOAT_TYPE GetScalar(typename MeshType::PointDataContainer* point, typename MeshType::PointIdentifier idx, MeshType* mesh, unsigned int type = 0)
+  static inline vtkFloatingPointType GetScalar(typename MeshType::PointDataContainer* point, typename MeshType::PointIdentifier idx, MeshType* mesh, unsigned int type = 0)
   {
     typename MeshType::PixelType dis;    
     mesh->GetPointData(idx, &dis);
-    return (VTK_FLOAT_TYPE) dis;
+    return (vtkFloatingPointType) dis;
   };
 };
 
@@ -73,7 +73,7 @@ template <typename MeshType>
 class SimplexMeshAccessor
 {
 public:
-  static inline VTK_FLOAT_TYPE GetScalar(typename MeshType::PointDataContainer* point, typename MeshType::PointIdentifier idx, MeshType* mesh, unsigned int type = 0 )
+  static inline vtkFloatingPointType GetScalar(typename MeshType::PointDataContainer* point, typename MeshType::PointIdentifier idx, MeshType* mesh, unsigned int type = 0 )
   {
     typename MeshType::GeometryMapPointer geometryData = mesh->GetGeometryData();
 
@@ -105,16 +105,16 @@ public:
     {
       typename MeshType::PixelType dis;    
       mesh->GetPointData(idx, &dis);
-      return (VTK_FLOAT_TYPE) dis;
+      return (vtkFloatingPointType) dis;
     }
     else if (type == 6)
     {
-      return (VTK_FLOAT_TYPE) ((geometryData->GetElement(idx))->allowSplitting);
+      return (vtkFloatingPointType) ((geometryData->GetElement(idx))->allowSplitting);
     }
     else
-      return (VTK_FLOAT_TYPE) 0;
+      return (vtkFloatingPointType) 0;
 
-    return (VTK_FLOAT_TYPE) dis;
+    return (vtkFloatingPointType) dis;
   };
 };
 
@@ -420,7 +420,7 @@ public:
     // points->Reserve(numPoints);
     // // Set the point container on the mesh
     //output->SetPoints(points);
-    VTK_FLOAT_TYPE vtkpoint[3];
+    vtkFloatingPointType vtkpoint[3];
     typename MeshType::PointType itkPhysicalPoint;
     if(geometryFrame==NULL)
     {
@@ -735,7 +735,7 @@ public:
     // iterate over all the points in the itk mesh filling in
     // the vtkPoints object as we go
 
-    VTK_FLOAT_TYPE vtkpoint[3];
+    vtkFloatingPointType vtkpoint[3];
     typename MeshType::PointType itkPhysicalPoint;
     if(geometryFrame==NULL)
     {

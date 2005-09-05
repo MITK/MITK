@@ -1,7 +1,7 @@
 #include "mitkMaterialProperty.h"
 #include <vtkProperty.h>
 
-mitk::MaterialProperty::MaterialProperty( Color color, VTK_FLOAT_TYPE opacity )
+mitk::MaterialProperty::MaterialProperty( Color color, vtkFloatingPointType opacity )
 {
     m_Color = color;
     m_ColorCoefficient = 1.0f;
@@ -15,7 +15,7 @@ mitk::MaterialProperty::MaterialProperty( Color color, VTK_FLOAT_TYPE opacity )
 
 
 
-mitk::MaterialProperty::MaterialProperty( VTK_FLOAT_TYPE red, VTK_FLOAT_TYPE green, VTK_FLOAT_TYPE blue, VTK_FLOAT_TYPE opacity )
+mitk::MaterialProperty::MaterialProperty( vtkFloatingPointType red, vtkFloatingPointType green, vtkFloatingPointType blue, vtkFloatingPointType opacity )
 {
     m_Color.Set( red, green, blue );
     m_ColorCoefficient = 1.0f;
@@ -29,9 +29,9 @@ mitk::MaterialProperty::MaterialProperty( VTK_FLOAT_TYPE red, VTK_FLOAT_TYPE gre
 
 
 
-mitk::MaterialProperty::MaterialProperty( VTK_FLOAT_TYPE red, VTK_FLOAT_TYPE green, VTK_FLOAT_TYPE blue, 
-                                          VTK_FLOAT_TYPE colorCoefficient, VTK_FLOAT_TYPE specularCoefficient, 
-                                          VTK_FLOAT_TYPE specularPower, VTK_FLOAT_TYPE opacity )
+mitk::MaterialProperty::MaterialProperty( vtkFloatingPointType red, vtkFloatingPointType green, vtkFloatingPointType blue, 
+                                          vtkFloatingPointType colorCoefficient, vtkFloatingPointType specularCoefficient, 
+                                          vtkFloatingPointType specularPower, vtkFloatingPointType opacity )
 {
     m_Color.Set( red, green, blue );
     m_ColorCoefficient = colorCoefficient;
@@ -44,7 +44,7 @@ mitk::MaterialProperty::MaterialProperty( VTK_FLOAT_TYPE red, VTK_FLOAT_TYPE gre
 }
 
 
-mitk::MaterialProperty::MaterialProperty( mitk::MaterialProperty::Color color, VTK_FLOAT_TYPE colorCoefficient, VTK_FLOAT_TYPE specularCoefficient, VTK_FLOAT_TYPE specularPower, VTK_FLOAT_TYPE opacity )
+mitk::MaterialProperty::MaterialProperty( mitk::MaterialProperty::Color color, vtkFloatingPointType colorCoefficient, vtkFloatingPointType specularCoefficient, vtkFloatingPointType specularPower, vtkFloatingPointType opacity )
 {
     m_Color = color;
     m_ColorCoefficient = colorCoefficient;
@@ -80,13 +80,13 @@ void mitk::MaterialProperty::SetColor( mitk::MaterialProperty::Color color )
 }
 
 
-void mitk::MaterialProperty::SetColor( VTK_FLOAT_TYPE red, VTK_FLOAT_TYPE green, VTK_FLOAT_TYPE blue )
+void mitk::MaterialProperty::SetColor( vtkFloatingPointType red, vtkFloatingPointType green, vtkFloatingPointType blue )
 {
     m_Color.Set( red, green, blue );
 }
 
 
-void mitk::MaterialProperty::SetColorCoefficient( VTK_FLOAT_TYPE coefficient )
+void mitk::MaterialProperty::SetColorCoefficient( vtkFloatingPointType coefficient )
 {
     m_ColorCoefficient = coefficient;
 }
@@ -97,24 +97,24 @@ void mitk::MaterialProperty::SetSpecularColor( mitk::MaterialProperty::Color spe
 }
 
 
-void mitk::MaterialProperty::SetSpecularColor( VTK_FLOAT_TYPE red, VTK_FLOAT_TYPE green, VTK_FLOAT_TYPE blue )
+void mitk::MaterialProperty::SetSpecularColor( vtkFloatingPointType red, vtkFloatingPointType green, vtkFloatingPointType blue )
 {
     m_SpecularColor.Set( red, green, blue );
 }
 
-void mitk::MaterialProperty::SetSpecularCoefficient( VTK_FLOAT_TYPE specularCoefficient )
+void mitk::MaterialProperty::SetSpecularCoefficient( vtkFloatingPointType specularCoefficient )
 {
     m_SpecularCoefficient = specularCoefficient;
 }
 
 
-void mitk::MaterialProperty::SetSpecularPower( VTK_FLOAT_TYPE specularPower )
+void mitk::MaterialProperty::SetSpecularPower( vtkFloatingPointType specularPower )
 {
     m_SpecularPower = specularPower;
 }
 
 
-void mitk::MaterialProperty::SetOpacity( VTK_FLOAT_TYPE opacity )
+void mitk::MaterialProperty::SetOpacity( vtkFloatingPointType opacity )
 {
     m_Opacity = opacity;
 }
@@ -138,7 +138,7 @@ mitk::MaterialProperty::Color mitk::MaterialProperty::GetColor() const
 }
 
 
-VTK_FLOAT_TYPE mitk::MaterialProperty::GetColorCoefficient() const
+vtkFloatingPointType mitk::MaterialProperty::GetColorCoefficient() const
 {
     return m_ColorCoefficient;
 }
@@ -148,19 +148,19 @@ mitk::MaterialProperty::Color mitk::MaterialProperty::GetSpecularColor() const
     return m_SpecularColor;
 }
 
-VTK_FLOAT_TYPE mitk::MaterialProperty::GetSpecularCoefficient() const
+vtkFloatingPointType mitk::MaterialProperty::GetSpecularCoefficient() const
 {
     return m_SpecularCoefficient;
 }
 
 
-VTK_FLOAT_TYPE mitk::MaterialProperty::GetSpecularPower() const
+vtkFloatingPointType mitk::MaterialProperty::GetSpecularPower() const
 {
     return m_SpecularPower;
 }
 
 
-VTK_FLOAT_TYPE mitk::MaterialProperty::GetOpacity() const
+vtkFloatingPointType mitk::MaterialProperty::GetOpacity() const
 {
     return m_Opacity;
 }

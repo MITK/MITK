@@ -87,7 +87,7 @@ void QmitkMaterialEditor::OnColorCoefficientChanged( int value )
     // convert value into color coefficient ni range [0..1]
     //
     /*
-    VTK_FLOAT_TYPE coefficient = ( ( VTK_FLOAT_TYPE ) ( value - m_SlColorCoefficient->minValue() ) ) / ( ( VTK_FLOAT_TYPE ) ( m_SlColorCoefficient->maxValue() - m_SlColorCoefficient->minValue() ) );
+    vtkFloatingPointType coefficient = ( ( vtkFloatingPointType ) ( value - m_SlColorCoefficient->minValue() ) ) / ( ( vtkFloatingPointType ) ( m_SlColorCoefficient->maxValue() - m_SlColorCoefficient->minValue() ) );
 
     m_MaterialProperties->GetElement( m_ActiveShowcase )->SetColorCoefficient( coefficient );
     m_Showcases[ m_ActiveShowcase ]->SetColorCoefficient( coefficient );
@@ -108,7 +108,7 @@ void QmitkMaterialEditor::OnSpecularCoefficientChanged( int value )
     // convert value into specular coefficient ni range [0..1]
     //
     /*
-    VTK_FLOAT_TYPE coefficient = ( ( VTK_FLOAT_TYPE ) ( value - m_SlSpecularCoefficient->minValue() ) ) / ( ( VTK_FLOAT_TYPE ) ( m_SlSpecularCoefficient->maxValue() - m_SlSpecularCoefficient->minValue() ) );
+    vtkFloatingPointType coefficient = ( ( vtkFloatingPointType ) ( value - m_SlSpecularCoefficient->minValue() ) ) / ( ( vtkFloatingPointType ) ( m_SlSpecularCoefficient->maxValue() - m_SlSpecularCoefficient->minValue() ) );
 
     m_MaterialProperties->GetElement( m_ActiveShowcase )->SetSpecularCoefficient( coefficient );
     m_Showcases[ m_ActiveShowcase ]->SetSpecularCoefficient( coefficient );
@@ -125,7 +125,7 @@ void QmitkMaterialEditor::OnSpecularCoefficientChanged( int value )
  */
 void QmitkMaterialEditor::OnSpecularPowerChanged( int value )
 {
-    VTK_FLOAT_TYPE power = ( VTK_FLOAT_TYPE ) value;
+    vtkFloatingPointType power = ( vtkFloatingPointType ) value;
     m_MaterialProperties->GetElement( m_ActiveShowcase )->SetSpecularPower( power );
     m_Showcases[ m_ActiveShowcase ]->SetSpecularPower( power );
 }
@@ -140,7 +140,7 @@ void QmitkMaterialEditor::OnSpecularPowerChanged( int value )
  */
 void QmitkMaterialEditor::OnOpacityChanged( int value )
 {
-    VTK_FLOAT_TYPE opacity = ( ( VTK_FLOAT_TYPE ) ( value - m_SlOpacity->minValue() ) ) / ( ( VTK_FLOAT_TYPE ) ( m_SlOpacity->maxValue() - m_SlOpacity->minValue() ) );
+    vtkFloatingPointType opacity = ( ( vtkFloatingPointType ) ( value - m_SlOpacity->minValue() ) ) / ( ( vtkFloatingPointType ) ( m_SlOpacity->maxValue() - m_SlOpacity->minValue() ) );
     m_MaterialProperties->GetElement( m_ActiveShowcase )->SetOpacity( opacity );
     m_Showcases[ m_ActiveShowcase ]->SetOpacity( opacity );
 }
@@ -293,10 +293,10 @@ void QmitkMaterialEditor::SetActiveShowcase( unsigned int number )
 mitk::MaterialProperty::Color QmitkMaterialEditor::ValueToColor( int value )
 {
     mitk::MaterialProperty::Color color;
-    VTK_FLOAT_TYPE val = value;
-    VTK_FLOAT_TYPE red = 0.0f;
-    VTK_FLOAT_TYPE green = 0.0f;
-    VTK_FLOAT_TYPE blue = 0.0f;
+    vtkFloatingPointType val = value;
+    vtkFloatingPointType red = 0.0f;
+    vtkFloatingPointType green = 0.0f;
+    vtkFloatingPointType blue = 0.0f;
     if ( val < 85.0f )
     {
         red = ( 85.0f - val ) / 85.0f;
@@ -328,7 +328,7 @@ mitk::MaterialProperty::Color QmitkMaterialEditor::ValueToColor( int value )
 int QmitkMaterialEditor::ColorToValue( mitk::MaterialProperty::Color color )
 {
     int value = 0;
-    VTK_FLOAT_TYPE* rgba = color.GetDataPointer();
+    vtkFloatingPointType* rgba = color.GetDataPointer();
     if ( rgba[ 1 ] == 0.0f && rgba[ 2 ] == 0.0f )
         value = 0;
     else if ( rgba[ 0 ] == 0.0f && rgba[ 2 ] == 0.0f )
@@ -380,7 +380,7 @@ void QmitkMaterialEditor::OnCoefficientsChanged( int value )
     //
     // convert value into color coefficient in range [0..1]
     //
-    VTK_FLOAT_TYPE coefficient = ( ( VTK_FLOAT_TYPE ) ( value - m_SlCoefficients->minValue() ) ) / ( ( VTK_FLOAT_TYPE ) ( m_SlCoefficients->maxValue() - m_SlCoefficients->minValue() ) );
+    vtkFloatingPointType coefficient = ( ( vtkFloatingPointType ) ( value - m_SlCoefficients->minValue() ) ) / ( ( vtkFloatingPointType ) ( m_SlCoefficients->maxValue() - m_SlCoefficients->minValue() ) );
 
     m_MaterialProperties->GetElement( m_ActiveShowcase )->SetColorCoefficient( coefficient );
     m_MaterialProperties->GetElement( m_ActiveShowcase )->SetSpecularCoefficient( coefficient );

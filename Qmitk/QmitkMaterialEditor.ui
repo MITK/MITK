@@ -311,7 +311,6 @@
     <include location="global" impldecl="in declaration">vector</include>
     <include location="local" impldecl="in declaration">QmitkMaterialShowcase.h</include>
     <include location="local" impldecl="in implementation">QmitkMaterialEditor.ui.h</include>
-    <include location="local" impldecl="in implementation">mitkVtkTypes.h</include>
 </includes>
 <variables>
     <variable>mitk::DataTree::Pointer m_DataTree;</variable>

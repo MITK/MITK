@@ -460,12 +460,14 @@ bool QmitkStdMultiWidget::InitializeStandardViews(mitk::DataTreeIteratorBase * i
   bool boundingBoxInitialized = false;
 
   mitk::SliceNavigationController* sliceNavigatorTransversal = mitkWidget1->GetSliceNavigationController();
-  mitk::SliceNavigationController* sliceNavigatorSagittal       = mitkWidget2->GetSliceNavigationController();
-  mitk::SliceNavigationController* sliceNavigatorFrontal        = mitkWidget3->GetSliceNavigationController();
+  mitk::SliceNavigationController* sliceNavigatorSagittal    = mitkWidget2->GetSliceNavigationController();
+  mitk::SliceNavigationController* sliceNavigatorFrontal     = mitkWidget3->GetSliceNavigationController();
+  mitk::SliceNavigationController* sliceNavigatorWidget4     = mitkWidget4->GetSliceNavigationController();
 
   sliceNavigatorTransversal->SetViewDirection(mitk::SliceNavigationController::Transversal);
   sliceNavigatorSagittal->SetViewDirection(mitk::SliceNavigationController::Sagittal);
   sliceNavigatorFrontal->SetViewDirection(mitk::SliceNavigationController::Frontal);
+  sliceNavigatorWidget4->SetViewDirection(mitk::SliceNavigationController::Original);
 
   if ( it==NULL )
   {
@@ -510,6 +512,7 @@ bool QmitkStdMultiWidget::InitializeStandardViews(mitk::DataTreeIteratorBase * i
         sliceNavigatorTransversal->SetInputWorldGeometry(geometry.GetPointer()); sliceNavigatorTransversal->Update();
         sliceNavigatorSagittal->SetInputWorldGeometry(geometry.GetPointer());    sliceNavigatorSagittal->Update();
         sliceNavigatorFrontal->SetInputWorldGeometry(geometry.GetPointer());     sliceNavigatorFrontal->Update();
+        sliceNavigatorWidget4->SetInputWorldGeometry(geometry.GetPointer());     sliceNavigatorWidget4->Update();
         timeNavigationController->SetInputWorldGeometry(geometry.GetPointer());  timeNavigationController->Update();
         multiplexUpdateController->SetBlockUpdate(false);
         multiplexUpdateController->UpdateRequest();

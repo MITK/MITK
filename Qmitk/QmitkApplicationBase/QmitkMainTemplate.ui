@@ -15,7 +15,7 @@
     <property name="minimumSize">
         <size>
             <width>21</width>
-            <height>254</height>
+            <height>226</height>
         </size>
     </property>
     <property name="caption">
@@ -336,13 +336,13 @@
             <cstring>fileOpenImageSequenceAction</cstring>
         </property>
         <property name="text">
-            <string>Open Image Sequence...</string>
+            <string>Open Sequence...</string>
         </property>
         <property name="menuText">
-            <string>Open Image Sequence...</string>
+            <string>Open Se&amp;quence...</string>
         </property>
         <property name="toolTip">
-            <string>Open Image Sequence</string>
+            <string>Open Sequence</string>
         </property>
     </action>
     <actiongroup>
@@ -862,8 +862,8 @@
     <slot>fileOpen()</slot>
     <slot>fileOpenImageSequence()</slot>
     <slot>fileOpenProject()</slot>
-    <slot>fileSave()</slot>
     <slot>fileSaveProjectAs()</slot>
+    <slot>fileSave()</slot>
     <slot>filePrint()</slot>
     <slot>fileExit()</slot>
     <slot>editUndo()</slot>

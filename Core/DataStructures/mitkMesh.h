@@ -27,7 +27,11 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkFloatArray.h>
 #include <vtkPointData.h>
 #include <vtkPolyData.h>
+#if (VTK_MAJOR_VERSION >= 5)
+#include <vtkType.h>
+#else
 #include <vtkIdType.h>
+#endif
 #include <vtkPoints.h>
 
 namespace mitk {

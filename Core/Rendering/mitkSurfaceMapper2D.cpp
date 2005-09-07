@@ -130,7 +130,7 @@ void mitk::SurfaceMapper2D::Paint(mitk::BaseRenderer * renderer)
       // set up vtkPlane according to worldGeometry
       point=worldPlaneGeometry->GetOrigin();
       normal=worldPlaneGeometry->GetNormal(); normal.Normalize();
-      m_Plane->SetTransform(NULL);
+      m_Plane->SetTransform((vtkAbstractTransform*)NULL);
     }
     else
     {

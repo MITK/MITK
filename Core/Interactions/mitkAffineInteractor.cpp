@@ -131,13 +131,13 @@ bool mitk::AffineInteractor::ExecuteAction(Action* action, mitk::StateEvent cons
       mitk::StateEvent* newStateEvent = NULL;
       if (this->CheckSelected(worldPoint))
       {
-        newStateEvent = new mitk::StateEvent(EIDYES, posEvent);
+        newStateEvent = new mitk::StateEvent(EIDYES, stateEvent->GetEvent());
         selected = new mitk::BoolProperty(true);
         color = new mitk::ColorProperty(1.0, 1.0, 0.0); // if selected, color is yellow
       }
       else
       {
-        newStateEvent = new mitk::StateEvent(EIDNO, posEvent);
+        newStateEvent = new mitk::StateEvent(EIDNO, stateEvent->GetEvent());
         selected = new mitk::BoolProperty(false);
         mitk::BoundingObject* b = dynamic_cast<mitk::BoundingObject*>(m_DataTreeNode->GetData());
         if(b != NULL)

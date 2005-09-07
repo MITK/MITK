@@ -9,7 +9,6 @@
 #include <mitkImage.h>
 #include <vtkImageData.h>
 
-#include <vtkDecimate.h>
 #include "vtkSmoothPolyDataFilter.h"
 #include "vtkMarchingCubes.h"
 

@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include "mitkImageToSurfaceFilter.h"
-
+#include <vtkDecimate.h>
 
 mitk::ImageToSurfaceFilter::ImageToSurfaceFilter()
   : m_SetSmooth(false), m_SetDecimate(false)

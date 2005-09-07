@@ -29,6 +29,11 @@ void mitk::TransferVtkMatrixToItkTransform(const vtkMatrix4x4* vtkmatrix, mitk::
   if(itkTransform==NULL)
     return;
 
+  // this ensures m_MatrixMTime.Modified(), which is therewith not equal to 
+  // m_InverseMatrixMTime, thus a new inverse will be calculated (when
+  // requested).
+  itkTransform->SetIdentity();
+
   itk::Matrix<mitk::ScalarType,3,3>::InternalMatrixType& vnlMatrix = const_cast<itk::Matrix<mitk::ScalarType,3,3>::InternalMatrixType&>(itkTransform->GetMatrix().GetVnlMatrix());  
 
   for ( int i=0; i < 3; ++i)

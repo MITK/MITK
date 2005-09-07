@@ -163,7 +163,7 @@ float mitk::Interactor::CalculateJurisdiction(StateEvent const* stateEvent) cons
     camera->GetViewPlaneNormal(normal);
 
     mitk::BoundingBox::PointType center,n;
-    vtk2itk(n, normal);
+    vtk2itk(normal, n);
     returnvalue = center.SquaredEuclideanDistanceTo( n );
     //map between 0.5 and 1
   }

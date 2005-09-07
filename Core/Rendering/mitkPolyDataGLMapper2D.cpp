@@ -78,7 +78,7 @@ void mitk::PolyDataGLMapper2D::Paint( mitk::BaseRenderer * renderer )
           // set up vtkPlane according to worldGeometry
           point=worldPlaneGeometry->GetOrigin();
           normal=worldPlaneGeometry->GetNormal(); normal.Normalize();
-          m_Plane->SetTransform(NULL);
+          m_Plane->SetTransform((vtkAbstractTransform*)NULL);
         }
         else
         {
@@ -96,11 +96,7 @@ void mitk::PolyDataGLMapper2D::Paint( mitk::BaseRenderer * renderer )
             return;
         }
 
-#if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
-        double vp[ 3 ], vnormal[ 3 ];
-#else
-        float vp[ 3 ], vnormal[ 3 ];
-#endif
+        vtkFloatingPointType vp[ 3 ], vnormal[ 3 ];
 
         vnl2vtk(point.Get_vnl_vector(), vp);
         vnl2vtk(normal.Get_vnl_vector(), vnormal);

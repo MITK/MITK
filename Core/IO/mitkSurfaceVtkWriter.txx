@@ -17,7 +17,8 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 #include "mitkSurfaceVtkWriter.h"
-
+class vtkDataObject;
+#include <vtkConfigure.h>
 #include <sstream>
 
 template <class VTKWRITER>
@@ -73,14 +74,22 @@ void mitk::SurfaceVtkWriter<VTKWRITER>::GenerateData()
         filename <<  m_FileName.c_str() << "_T" << t << m_Extension;
       }
       m_VtkWriter->SetFileName(filename.str().c_str());
+#if VTK_MAJOR_VERSION >= 5 
+      m_VtkWriter->SetInput((vtkDataObject*)input->GetVtkPolyData(t));
+#else
       m_VtkWriter->SetInput(input->GetVtkPolyData(t));
+#endif
       m_VtkWriter->Write();
     }
   }
   else
   {
     m_VtkWriter->SetFileName(m_FileName.c_str());
+#if VTK_MAJOR_VERSION >= 5 
+    m_VtkWriter->SetInput((vtkDataObject*)input->GetVtkPolyData());
+#else
     m_VtkWriter->SetInput(input->GetVtkPolyData());
+#endif
     m_VtkWriter->Write();
   }
 

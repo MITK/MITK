@@ -415,7 +415,7 @@
     <variable>mitk::DataTreeIteratorClone m_DataTreeIterator;</variable>
 </variables>
 <signals>
-    <signal>InitializeStandardViews(mitk::BaseData::Pointer)</signal>
+    <signal>InitializeStandardViews(mitk::BaseData*)</signal>
 </signals>
 <slots>
     <slot>SetDataTreeIterator( mitk::DataTreeIteratorBase * it )</slot>

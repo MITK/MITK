@@ -18,7 +18,15 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include "mitkImageToSurfaceFilter.h"
+#if VTK_MAJOR_VERSION >= 5
+#define USE_VTK_DECIMATE_PRO
+#endif
+
+#ifdef USE_VTK_DECIMATE_PRO
+#include <vtkDecimatePro.h>
+#else
 #include <vtkDecimate.h>
+#endif
 
 mitk::ImageToSurfaceFilter::ImageToSurfaceFilter()
   : m_SetSmooth(false), m_SetDecimate(false)
@@ -65,21 +73,15 @@ void mitk::ImageToSurfaceFilter::CreateSurface(int time, vtkImageData *vtkimage,
   //decimate = to reduce number of polygons
   if(m_SetDecimate)
   {
+#ifdef USE_VTK_DECIMATE_PRO
+    vtkDecimatePro *decimate = vtkDecimatePro::New();
+    decimate->SplittingOff();
+#else
     vtkDecimate *decimate = vtkDecimate::New();
-    decimate->SetInput(polydata);//RC++
-    polydata->Delete();//RC--
-      
     decimate->PreserveEdgesOn();
-    decimate->PreserveTopologyOn();
-    decimate->BoundaryVertexDeletionOff();
     decimate->GenerateErrorScalarsOn();
-    decimate->SetDegree(10); //std-value is 25!
-    
-    decimate->SetTargetReduction(0.05f);
-
     decimate->SetInitialError(0.0005);
     decimate->SetErrorIncrement(0.0005);
-    decimate->SetMaximumError(0.002);
     decimate->SetMaximumIterations(10);
 
     decimate->SetInitialFeatureAngle(15);
@@ -87,7 +89,19 @@ void mitk::ImageToSurfaceFilter::CreateSurface(int time, vtkImageData *vtkimage,
     decimate->SetMaximumFeatureAngle(30);
 
     decimate->SetAspectRatio(10);
+#endif
+    
+    decimate->PreserveTopologyOn();
+    decimate->BoundaryVertexDeletionOff();
+    decimate->SetDegree(10); //std-value is 25!
+    
+    decimate->SetInput(polydata);//RC++
+    polydata->Delete();//RC--
+    decimate->SetTargetReduction(0.05f);
+
+    
     decimate->SetReleaseDataFlag(true);
+    decimate->SetMaximumError(0.002);
 
     polydata = decimate->GetOutput();
   

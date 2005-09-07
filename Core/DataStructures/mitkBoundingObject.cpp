@@ -30,6 +30,7 @@ mitk::BoundingObject::BoundingObject()
   /* bounding box around the unscaled bounding object */ 
   ScalarType bounds[6]={-1,1,-1,1,-1,1};  //{xmin,x_max, ymin,y_max,zmin,z_max}
   GetGeometry()->SetBounds(bounds);
+  GetTimeSlicedGeometry()->UpdateInformation();
 }
 
 mitk::BoundingObject::~BoundingObject() 

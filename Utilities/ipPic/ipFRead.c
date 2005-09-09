@@ -53,6 +53,9 @@
  *   and swaps to the other endianess
  *
  * $Log$
+ * Revision 1.14  2005/09/09 09:14:45  ivo
+ * FIX: warnings on windows
+ *
  * Revision 1.13  2003/03/06 10:53:08  andre
  * *** empty log message ***
  *
@@ -102,6 +105,9 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#ifdef WIN32
+#include <io.h>
+#endif
 
 #include "ipPic.h"
 

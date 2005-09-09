@@ -85,7 +85,6 @@ ipPicDescriptor *ipFuncSqrt ( ipPicDescriptor *pic_1,
 {                                                                        \
   ipUInt4_t  i, no_elem;                                                 \
   ipFloat8_t help;                                                       \
-  ipFloat8_t max_gv, min_gv;                                             \
                                                                          \
   no_elem = _ipPicElements ( pic_1 );                                    \
   for ( i = 0; i < no_elem; i++ )                                        \
@@ -109,14 +108,8 @@ ipPicDescriptor *ipFuncSqrt ( ipPicDescriptor *pic_1,
 {
 
   ipPicDescriptor *pic_new;         /* pointer to new image             */
-  ipUInt4_t       bpe;              /* length of elements of pic_new    */
-  ipUInt4_t       error;            /*                                  */ 
   ipUInt4_t       i;                /* loop index                       */
-  ipFloat8_t      max_gv;           /* max. possible greyvalue          */
-  ipFloat8_t      min_gv;           /* min. possible greyvalue          */
   ipFloat8_t      min1, max1;       /* extreme greyvalues of 1. image   */ 
-  ipFloat8_t      smin, smax;       /* product of extreme greyvalues    */
-  ipPicType_t     type;             /* type of new image                */
 
 
   /* check image data                                                   */

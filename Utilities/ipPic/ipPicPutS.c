@@ -52,6 +52,9 @@
  *   writes a PicFile to disk
  *
  * $Log$
+ * Revision 1.12  2005/09/09 09:14:45  ivo
+ * FIX: warnings on windows
+ *
  * Revision 1.11  2003/02/18 12:28:23  andre
  * write compressed pic files
  *
@@ -98,8 +101,6 @@
 void ipPicPutSlice( char *outfile_name, ipPicDescriptor *pic, ipUInt4_t slice )
 {
   ipPicDescriptor *pic_in;
-
-  ipUInt4_t tags_len;
 
   FILE *outfile;
 

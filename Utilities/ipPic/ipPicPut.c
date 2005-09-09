@@ -52,6 +52,9 @@
  *   writes a PicFile to disk
  *
  * $Log$
+ * Revision 1.17  2005/09/09 09:14:45  ivo
+ * FIX: warnings on windows
+ *
  * Revision 1.16  2005/06/21 11:22:48  ivo
  * CHG: encrypted only a warning instead of an error on write
  *
@@ -106,6 +109,9 @@
 #endif
 
 #include "ipPic.h"
+
+extern size_t
+_ipPicFWrite( const void *ptr, size_t size, size_t nitems, ipPicFile_t stream);
 
 int
 ipPicPut( char *outfile_name, ipPicDescriptor *pic )

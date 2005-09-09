@@ -134,7 +134,7 @@ ipPicDescriptor *ipFuncWindow ( ipPicDescriptor *pic_old,
                                 ipUInt4_t       *length )
 {
   ipPicDescriptor *pic_new;            /* pointer to transformed image            */
-  ipInt4_t       i;                    /* loop index                              */
+  ipUInt4_t      i;                    /* loop index                              */
   ipUInt4_t      end[_ipPicNDIM];      /* end of image                            */
   ipUInt4_t      beg[_ipPicNDIM];      /* end of image                            */
   ipUInt4_t      size[_ipPicNDIM];     /*                                         */

@@ -57,7 +57,7 @@
 
 ipUInt4_t _ipPicElements( ipPicDescriptor *pic )
 {
-  int i;
+  unsigned int i;
   ipUInt4_t elements;
 
   if( pic->dim == 0 )

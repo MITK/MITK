@@ -88,43 +88,12 @@ bool mitk::AffineInteractor::ExecuteAction(Action* action, mitk::StateEvent cons
 
   Geometry3D* geometry = inputtimegeometry->GetGeometry3D(timestep);
 
-  /* Position events - 3D coordinates from a 2D window */
-  mitk::PositionEvent const  *posEvent = dynamic_cast <const mitk::PositionEvent *> (stateEvent->GetEvent());
-  /* Display  events - 2D coordinates from a 3D window */
-  mitk::DisplayPositionEvent const  *displayEvent = dynamic_cast <const mitk::DisplayPositionEvent *> (stateEvent->GetEvent());
-  /* Each case must watch the type of the event! */
+  mitk::DisplayPositionEvent const  *event = dynamic_cast <const mitk::DisplayPositionEvent *> (stateEvent->GetEvent());
   switch (action->GetActionId())
   {
   case AcCHECKELEMENT:
     {
-      mitk::Point3D worldPoint;
-      if (posEvent != NULL)   // Event in 2D Window with 3D coordinates
-      {
-        worldPoint = posEvent->GetWorldPosition();
-      }
-      else if (displayEvent != NULL)  // Event in 3D window with 2D coordinates
-      {  
-        /* pick a Prop3D and assume its position as event 3D coordinates */
-        const mitk::Point2D displayPoint = displayEvent->GetDisplayPosition();
-        mitk::GlobalInteraction* globalInteraction = dynamic_cast<mitk::GlobalInteraction*>(mitk::EventMapper::GetGlobalStateMachine());
-        if (globalInteraction == NULL)
-          return false;
-        const FocusManager::FocusElement* fe = globalInteraction->GetFocus();
-        FocusManager::FocusElement* fe2 =  const_cast <FocusManager::FocusElement*>(fe);
-        mitk::OpenGLRenderer* glRenderer = dynamic_cast<mitk::OpenGLRenderer*>(fe2);
-        if (glRenderer == NULL)
-          return false;
-        mitk::Point3D objectPoint;
-        vtkPicker* picker =	vtkPicker::New();
-        picker->SetTolerance (0.0001);
-        picker->Pick(displayPoint[0], displayPoint[1], 0, glRenderer->GetVtkRenderer());
-        if (picker->GetProp3D() == NULL)
-          return false;
-        vtk2itk(picker->GetPickPosition(), worldPoint);
-      }
-      else  // neither 2D nor 3D coordinates available
-        return false;
-
+      mitk::Point3D worldPoint = event->GetWorldPosition();
       /* now we have a worldpoint. check if it is inside our object and select/deselect it accordingly */
       mitk::BoolProperty::Pointer selected;
       mitk::ColorProperty::Pointer color;
@@ -157,18 +126,16 @@ bool mitk::AffineInteractor::ExecuteAction(Action* action, mitk::StateEvent cons
     }
   case AcADD:
     {
-      if (posEvent == NULL)   // @TODO: this should work with displayEvent too
-        return false;
-      mitk::Point3D worldPoint = posEvent->GetWorldPosition();
+      mitk::Point3D worldPoint = event->GetWorldPosition();
       mitk::StateEvent* newStateEvent = NULL;
       if (this->CheckSelected(worldPoint))
       {
-        newStateEvent = new mitk::StateEvent(EIDYES, posEvent);
+        newStateEvent = new mitk::StateEvent(EIDYES, event);
         m_DataTreeNode->GetPropertyList()->SetProperty("selected", new mitk::BoolProperty(true));  // TODO: Generate an Select Operation and send it to the undo controller ?
       }
       else  // if not selected, do nothing (don't deselect)
       {
-        newStateEvent = new mitk::StateEvent(EIDNO, posEvent);
+        newStateEvent = new mitk::StateEvent(EIDNO, event);
       }
       //call HandleEvent to leave the guard-state
       this->HandleEvent( newStateEvent );
@@ -179,36 +146,17 @@ bool mitk::AffineInteractor::ExecuteAction(Action* action, mitk::StateEvent cons
   case AcROTATESTART:
   case AcSCALESTART:
     {
-      if (posEvent != NULL)
-      {     
-        m_LastMousePosition = posEvent->GetWorldPosition();
-        ok = true;
-      }
-      else if (displayEvent != NULL)  // 2D coordinate in event
-      {
-        ok = ConvertDisplayEventToWorldPosition(displayEvent, m_LastMousePosition);      
-      }
-      else
-        ok = false;    
+      m_LastMousePosition = event->GetWorldPosition();
+      ok = true;
       break;
     }
   case AcTRANSLATE:
     {
       mitk::Point3D newPosition;
-      if (posEvent != NULL)   // 3D coordinate in event
-      {
-        newPosition = posEvent->GetWorldPosition();
-        newPosition -=  m_LastMousePosition.GetVectorFromOrigin();        // compute difference between actual and last mouse position
-        m_LastMousePosition = posEvent->GetWorldPosition();               // save current mouse position as last position
-      }
-      else if (displayEvent != NULL)  // 2D coordinate in event
-      {
-        mitk::Point3D p;
-        if(ConvertDisplayEventToWorldPosition(displayEvent, p) == false)
-          return false;      
-        newPosition = p - m_LastMousePosition.GetVectorFromOrigin();        // compute difference between actual and last mouse position
-        m_LastMousePosition = p;    // save current mouse position as last position
-      }
+      newPosition = event->GetWorldPosition();
+      newPosition -=  m_LastMousePosition.GetVectorFromOrigin();        // compute difference between actual and last mouse position
+      m_LastMousePosition = event->GetWorldPosition();               // save current mouse position as last position
+
       /* create operation with position difference */
       mitk::PointOperation* doOp = new mitk::PointOperation(OpMOVE, newPosition, 0); // Index is not used here
       if (m_UndoEnabled)	//write to UndoMechanism
@@ -226,16 +174,8 @@ bool mitk::AffineInteractor::ExecuteAction(Action* action, mitk::StateEvent cons
     }
   case AcROTATE:
     {
-      mitk::Point3D p;
-      if (posEvent != NULL)   // 3D coordinate in event
-      {
-        p = posEvent->GetWorldPosition();
-      }
-      else if (displayEvent != NULL)  // 2D coordinate in event
-      {
-        if(ConvertDisplayEventToWorldPosition(displayEvent, p) == false)
-          return false;
-      }
+      mitk::Point3D p = event->GetWorldPosition();
+
       mitk::Vector3D newPosition = p.GetVectorFromOrigin();
 
       mitk::Point3D dataPosition = geometry->GetCenter();
@@ -270,16 +210,8 @@ bool mitk::AffineInteractor::ExecuteAction(Action* action, mitk::StateEvent cons
     }
   case AcSCALE:
     {    
-      mitk::Point3D p;
-      if (posEvent != NULL)   // 3D coordinate in event
-      {
-         p = posEvent->GetWorldPosition();
-      }
-      else if (displayEvent != NULL)  // 2D coordinate in event
-      {
-        if(ConvertDisplayEventToWorldPosition(displayEvent, p) == false)
-          return false;
-      }
+      mitk::Point3D p = event->GetWorldPosition();
+
       mitk::Vector3D v = p - m_LastMousePosition;    
       /* calculate scale changes */
       mitk::Point3D newScale;

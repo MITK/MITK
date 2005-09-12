@@ -74,7 +74,7 @@ namespace mitk {
 
     typedef std::vector<Interactor*>::iterator InteractorListIter;
 
-    typedef std::multimap<float, Interactor*> InteractorMap;
+    typedef std::multimap<float, Interactor*, std::greater<double> > InteractorMap;
 
     typedef InteractorMap::iterator  InteractorMapIter;
 

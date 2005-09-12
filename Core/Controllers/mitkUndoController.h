@@ -49,7 +49,7 @@ class UndoController
   UndoController(UndoType undoType = DEFAULTUNDOMODEL);
 
   //##ModelId=3E5F543402C5
-  bool SetOperationEvent(OperationEvent* operationEvent);
+  bool SetOperationEvent(UndoStackItem* operationEvent);
 
   //##ModelId=3E5F55C80207
   //##Documentation

@@ -63,7 +63,7 @@ mitk::UndoController::UndoController(UndoType undoType)
 }
 
 //##ModelId=3E5F543402C5
-bool mitk::UndoController::SetOperationEvent(OperationEvent* operationEvent)
+bool mitk::UndoController::SetOperationEvent(UndoStackItem* operationEvent)
 {
   m_CurUndoModel->SetOperationEvent(operationEvent);
   return true;

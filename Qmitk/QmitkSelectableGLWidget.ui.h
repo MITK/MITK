@@ -44,7 +44,15 @@ void QmitkSelectableGLWidget::init()
         composedName+=name();
     else
         composedName+="QmitkGLWidget";
-    mitkWidget = new QmitkRenderWindow(renderer,QGLFormat( QGL::StencilBuffer ), this, composedName);
+    /*
+    * here is the place to define QT-Flags to enable and disable certain OpenGL elements, like StencilBuffer, RGBA and so on.
+    * See QGLFormat for futher informations
+    * QGL::AlphaChannel: Enable Alpha in Framebuffer
+    * QGL::Rgba enable use of rgba rather than color_index
+    * QGL::StencilBuffer for use of stencilbuffer in OpenGL
+    */
+    mitkWidget = new QmitkRenderWindow(renderer,QGLFormat( /*QGL::Rgba |*/ QGL::AlphaChannel ), this, composedName);
+    
     
     //initialize SliceNavigationController
     sliceNavigationController = new mitk::SliceNavigationController("navigation");

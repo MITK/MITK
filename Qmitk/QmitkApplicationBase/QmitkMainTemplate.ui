@@ -72,6 +72,19 @@
         </property>
         <action name="fileOpenAction"/>
         <separator/>
+        <widget class="QmitkUndoRedoButton">
+            <property name="name">
+                <cstring>undoButton</cstring>
+            </property>
+        </widget>
+        <widget class="QmitkUndoRedoButton">
+            <property name="name">
+                <cstring>redoButton</cstring>
+            </property>
+            <property name="mode">
+                <enum>Redo</enum>
+            </property>
+        </widget>
         <action name="editUndoAction"/>
         <action name="editRedoAction"/>
         <action name="Fullscreen"/>
@@ -191,11 +204,8 @@
         <property name="name">
             <cstring>editUndoAction</cstring>
         </property>
-        <property name="iconSet">
-            <iconset>image3</iconset>
-        </property>
         <property name="text">
-            <string>Undo</string>
+            <string>&amp;Undo</string>
         </property>
         <property name="menuText">
             <string>&amp;Undo</string>
@@ -203,13 +213,13 @@
         <property name="accel">
             <string>Ctrl+Z</string>
         </property>
+        <property name="visible">
+            <bool>true</bool>
+        </property>
     </action>
     <action>
         <property name="name">
             <cstring>editRedoAction</cstring>
-        </property>
-        <property name="iconSet">
-            <iconset>image4</iconset>
         </property>
         <property name="text">
             <string>Redo</string>
@@ -220,13 +230,16 @@
         <property name="accel">
             <string>Ctrl+Y</string>
         </property>
+        <property name="visible">
+            <bool>true</bool>
+        </property>
     </action>
     <action>
         <property name="name">
             <cstring>editCutAction</cstring>
         </property>
         <property name="iconSet">
-            <iconset>image5</iconset>
+            <iconset>image3</iconset>
         </property>
         <property name="text">
             <string>Cut</string>
@@ -243,7 +256,7 @@
             <cstring>editCopyAction</cstring>
         </property>
         <property name="iconSet">
-            <iconset>image6</iconset>
+            <iconset>image4</iconset>
         </property>
         <property name="text">
             <string>Copy</string>
@@ -260,7 +273,7 @@
             <cstring>editPasteAction</cstring>
         </property>
         <property name="iconSet">
-            <iconset>image7</iconset>
+            <iconset>image5</iconset>
         </property>
         <property name="text">
             <string>Paste</string>
@@ -490,7 +503,7 @@
             <bool>true</bool>
         </property>
         <property name="iconSet">
-            <iconset>image8</iconset>
+            <iconset>image6</iconset>
         </property>
         <property name="text">
             <string>Fullscreen</string>
@@ -611,31 +624,25 @@
 </actions>
 <images>
     <image name="image0">
-        <data format="PNG" length="233">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b000000b049444154789cb594310e43210c436df4879e897b75fa53d5bbf94c1d2ad185afa6802891829708102f9623a024ec50da42dd093ebc1772cec5ae25b13d974417f8ba346a2489b629a38667a1921892711b0f5033fe979b170a0004504a0180722d41ae716706eaf0be5080b513bb7d4ff3648c3beb5c69e478adce35ccd89bf548c38c2df4f9006e07f07aafd5fbf913452cd43c905868e7380a6ac0b1501b6e28d4388e85768ebd9afd1561ff71ab0fa524b6cd47368ca10000000049454e44ae426082</data>
+        <data format="PNG" length="233">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b000000b049444154388db594310e43210c436df4879e897b75fa53d5bbf94c1d2ad185afa6802891829708102f9623a024ec50da42dd093ebc1772cec5ae25b13d974417f8ba346a2489b629a38667a1921892711b0f5033fe979b170a0004504a0180722d41ae716706eaf0be5080b513bb7d4ff3648c3beb5c69e478adce35ccd89bf548c38c2df4f9006e07f07aafd5fbf913452cd43c905868e7380a6ac0b1501b6e28d4388e85768ebd9afd1561ff71ab0fa524b6cd8efff1610000000049454e44ae426082</data>
     </image>
     <image name="image1">
-        <data format="PNG" length="326">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b0000010d49444154789cb595bd8ac3301084c741c5967e1e0bf256a98ee3082155de2ae0edf22e2aaed842705738ab4491f5179c6decc168f46918db0333e3136300609aa6bf2d4d9979302a2e67403cf0fd03ccd7196408e265d9daa3a8ed6471e31bc40becde0200766a2c1e20f3d855bc2c37be53df27589159cca32705d251463872204300104875b2c44a0247a0df312173e4227d3a2e7126c6afc44aa29ba94656c7eb03632e63250b27c8661cafcf12e7c9d6f5ebfa6ac6ad6d68266e256dcef8744cab531b7db99e89931eabf9b3eeb92651bc63b2762d121fbeba9288e2488cd78e539af93a877bbbb7f55644952b4d6f8f5b89bb7bdc4a5cebf1dbc4b56fc5a0ffbcad7e4fcc3c44c65bcf3f79fbd584615d36810000000049454e44ae426082</data>
+        <data format="PNG" length="326">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b0000010d49444154388db595bd8ac3301084c741c5967e1e0bf256a98ee3082155de2ae0edf22e2aaed842705738ab4491f5179c6decc168f46918db0333e3136300609aa6bf2d4d9979302a2e67403cf0fd03ccd7196408e265d9daa3a8ed6471e31bc40becde0200766a2c1e20f3d855bc2c37be53df27589159cca32705d251463872204300104875b2c44a0247a0df312173e4227d3a2e7126c6afc44aa29ba94656c7eb03632e63250b27c8661cafcf12e7c9d6f5ebfa6ac6ad6d68266e256dcef8744cab531b7db99e89931eabf9b3eeb92651bc63b2762d121fbeba9288e2488cd78e539af93a877bbbb7f55644952b4d6f8f5b89bb7bdc4a5cebf1dbc4b56fc5a0ffbcad7e4fcc3c44c65bcf3f79fbd584b969dcb60000000049454e44ae426082</data>
     </image>
     <image name="image2">
-        <data format="PNG" length="890">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b0000034149444154789c8d95c16bdc4614c67f3263f20654904c0abba117432f36cdc12697945e1ae8210bbd24a7daf490e4d87fc139f6cfc8b1ed254d0f852d1492e35268b00309d9430b5a70b0040dcc4005f30202f53092b2b615e8807868a4f7e97bef7df329592c168cad5087160393ab1368000334a08d0e511b25d4813ccd492449d6f3cd286af7e4e68d9b68ad6022901881062495e1be7a5b51aecab1f4f1254658be5a0e4c2595738cd72b1011def1eeff01bbda914b8ea20882570f0a0808825387c5e2d431cda62472ae13e3c057b8d2d2804857ba91d80679cf384ff3b85773a9bf1f0456556c6af1de83742577ccfb8889d9a10958ec258c8d516022ab2ccb10d38119013af65d25c335b24681b3348b4ad0282921aa003a9975fbaafac1298d6e976f4ab63fdd663a99c6e435159c538311cae72567eeac958f72b6aeda6414b8d5b65d164b8a17050858b1511d698ef3e763dfe3eab462f1c782f29f929deb3bedecf68cad6c2b49fa93d7366d7bf27249a81c5e15e1f2c086c18990931344a9aa92c59f0bfc5b8fab1dfb9fed7270ef2032ee99def96a06fd41a83d1821348aed6303a1811373ccbc79c2ade616d3973b1c2f1784954380e3e7c7b83a60daa66d9745c9c1d707d88fd765938f0ea5a0e07b1e525070c2098fe531b3d55d7ef48f28df3814a55c1598f2b4e4c1b77761737cba175746c68c2f79863063c6eef55d7299e2eb92473ffd80f79e6c9261d8148abf4b42a35007482dd60083e18034821aa0564885efea23ee9882693de5b529a00e4c3fd906ed240998ea7445612c8e8004f028a2828a22dadb83a0e211cd503c420628859678a287bc7e758c765509b02108011063a31a36a31e2268ffaa824a0441f028aaa0783284a08a35efe7a328464551173a2981ff37beecd724865e64dc4b2fc36b0544cf900e78ffc6e76c0c65f76574cc4405d52e5e6883760d8aa002046c9aa3c06432e1fefd83c8d8adaaf8909c200eeb731c0556729c5658c0498545507ab0f811878f797581081c3d3ce2dae45a923cfdfd693bff75cecfbfcdd13a90a796d01095d179b11a90e14f92753e41e71d120f532a3cb877c8fede7e02301ce9b3eaac7df2cb9cf2af621840544f3fc0e876004141d5c53dafec7db1c7e13787eceeec0e26f41f85e7e377c3d6686d0000000049454e44ae426082</data>
+        <data format="PNG" length="890">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b0000034149444154388d8d95c16bdc4614c67f3263f20654904c0abba117432f36cdc12697945e1ae8210bbd24a7daf490e4d87fc139f6cfc8b1ed254d0f852d1492e35268b00309d9430b5a70b0040dcc4005f30202f53092b2b615e8807868a4f7e97bef7df329592c168cad5087160393ab1368000334a08d0e511b25d4813ccd492449d6f3cd286af7e4e68d9b68ad6022901881062495e1be7a5b51aecab1f4f1254658be5a0e4c2595738cd72b1011def1eeff01bbda914b8ea20882570f0a0808825387c5e2d431cda62472ae13e3c057b8d2d2804857ba91d80679cf384ff3b85773a9bf1f0456556c6af1de83742577ccfb8889d9a10958ec258c8d516022ab2ccb10d38119013af65d25c335b24681b3348b4ad0282921aa003a9975fbaafac1298d6e976f4ab63fdd663a99c6e435159c538311cae72567eeac958f72b6aeda6414b8d5b65d164b8a17050858b1511d698ef3e763dfe3eab462f1c782f29f929deb3bedecf68cad6c2b49fa93d7366d7bf27249a81c5e15e1f2c086c18990931344a9aa92c59f0bfc5b8fab1dfb9fed7270ef2032ee99def96a06fd41a83d1821348aed6303a1811373ccbc79c2ade616d3973b1c2f1784954380e3e7c7b83a60daa66d9745c9c1d707d88fd765938f0ea5a0e07b1e525070c2098fe531b3d55d7ef48f28df3814a55c1598f2b4e4c1b77761737cba175746c68c2f79863063c6eef55d7299e2eb92473ffd80f79e6c9261d8148abf4b42a35007482dd60083e18034821aa0564885efea23ee9882693de5b529a00e4c3fd906ed240998ea7445612c8e8004f028a2828a22dadb83a0e211cd503c420628859678a287bc7e758c765509b02108011063a31a36a31e2268ffaa824a0441f028aaa0783284a08a35efe7a328464551173a2981ff37beecd724865e64dc4b2fc36b0544cf900e78ffc6e76c0c65f76574cc4405d52e5e6883760d8aa002046c9aa3c06432e1fefd83c8d8adaaf8909c200eeb731c0556729c5658c0498545507ab0f811878f797581081c3d3ce2dae45a923cfdfd693bff75cecfbfcdd13a90a796d01095d179b11a90e14f92753e41e71d120f532a3cb877c8fede7e02301ce9b3eaac7df2cb9cf2af621840544f3fc0e876004141d5c53dafec7db1c7e13787eceeec0e26f41f85e7e3779301f5a70000000049454e44ae426082</data>
     </image>
     <image name="image3">
-        <data format="PNG" length="245">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b000000bc49444154789ced94b10ec22010867f8c03cf0493f1999c8c71ead4476a8813f74c6c382870a50525d8c1a4ff42d2de7d7c395a0411618b1c36a1ee609e634bb152d6030e80045fc741429fb4e0b5227c154a594f347f9980c6e7b0b595f73363b780e78644e7c2c6af3afbb03e98b319cb08cfa1445a94a000dea61297ab8bcf183899e5d012709ed0bf00d767f639a1af629c8fe5e7c66df006e36fe1e14cc621198b9edbcd4cc6dfeeeb67d2f54b97a040a7712dff77bbede098270d896ad1bd2229be0000000049454e44ae426082</data>
+        <data format="PNG" length="245">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b000000bc49444154388dcd94b10ec3200c444dd521df64c67c7746ee9bb2b943449b94034cd2aabd2592891fe713720020dfd0ad75a8aa36527783afe87fc09e185c600602102e813d8053e0acecda1b838848f0bce33dd03bc56f5f45763992b933e3c5f6df8f80559389bcdcaa26f35cd0d9158b01f1303e100330871ebc0a564d06ccd54c7b700a664e47e105b8e7b4d444abc4f15a457087fc7f02e60ed8f916199fee5e968e0ede9b81f874dd8a8cee8aad711291b5d9dc926b099dd1038b8f65b0daa1e9c90000000049454e44ae426082</data>
     </image>
     <image name="image4">
-        <data format="PNG" length="244">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b000000bb49444154789ced943d0ec3200c851f55879cc94c55cfd4a9aaaaaacad423458cf599b2d10105cc4f286d948db75802f4f9191b1433630f1d76a176b0d4315d3093b1b7fb0060061047e6b36a052b391544c6a6b05264d6c50444c62ec9bd633305e89a33a2b705661fe5b960cac9dff1527ead5c66addcbe73ee6069a5093894fb5d395c5e57068e33fe028fe306c740add11b1cd7a727013f1f7143fe8306c7ab73fc1a07e853795e5b143d69d990cbb5bd9125a9fe1f7770a60f4eb6680127c512000000000049454e44ae426082</data>
+        <data format="PNG" length="286">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b000000e549444154388db595310e83300c45bf5107ce1475a9d82af5365527b6b2b55762f599b2b94364408d0d34345fb22261ebf9cb3840cc8c1a6aaa50011000592b60662a068bd86c222a869fbe212a6d26222022f9153e813dd7a5f0691496e3f4ec05200268cd93b9339bed98f11322bd931f00c08437731165911ab6665e7539f70861cc9c4d6011c922299a79d5f566c3ddad50d8d2719e03ee0fa5f40861101dcb8ead88ab799db32a8451983b3ae4d87aa9446ffcc5b1575fecd8d2b2be9ae346dd78e1edb15d8bd9f1d6fdd7fd2c9eb1af8333de7250c571ba04f6d7cd3e01aaf533fd006acba9a2fff3fa0e0000000049454e44ae426082</data>
     </image>
     <image name="image5">
-        <data format="PNG" length="245">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b000000bc49444154789ccd94b10ec3200c444dd521df64c67c7746ee9bb2b943449b94034cd2aabd2592891fe713720020dfd0ad75a8aa36527783afe87fc09e185c600602102e813d8053e0acecda1b838848f0bce33dd03bc56f5f45763992b933e3c5f6df8f80559389bcdcaa26f35cd0d9158b01f1303e100330871ebc0a564d06ccd54c7b700a664e47e105b8e7b4d444abc4f15a457087fc7f02e60ed8f916199fee5e968e0ede9b81f874dd8a8cee8aad711291b5d9dc926b099dd1038b8f65b02f7dbe550000000049454e44ae426082</data>
+        <data format="PNG" length="339">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b0000011a49444154388db5954d6e83301085bf412c7c1f76def64a61d5445515ba72af55ef721f2f90a60b0875fc1348429f841eb667de3c8f6510ef3dff81f6dea2b556d339efbd6c1196abe392088046b352912c156bb68a96c65794f2055000f7e508638f691dfd7bbf08c52ee371293e762e80a641177f218c01d39a2a77b6cbc463e1065816c3d82fee4c6bee722def8a760afeab0c3d9dedcacd4c90e665c271e5787b8f708a26adfc2ca71040cf9f75f1d38703026056f8747378598f732701d563b5cf2203aac7ecf2643dce7be76681efcca9ea611e338b0feafd9b6c763c251e2a9ec3f2168befe63815dfc571a9e8cb8e4b072b32ecd1e3125e745ce2690701e60fbdd69fb33e0a702a6bff3c6b7f74dbcdbbe555e167f10bb7df841bcc58a4b30000000049454e44ae426082</data>
     </image>
     <image name="image6">
-        <data format="PNG" length="286">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b000000e549444154789cb595310e83300c45bf5107ce1475a9d82af5365527b6b2b55762f599b2b94364408d0d34345fb22261ebf9cb3840cc8c1a6aaa50011000592b60662a068bd86c222a869fbe212a6d26222022f9153e813dd7a5f0691496e3f4ec05200268cd93b9339bed98f11322bd931f00c08437731165911ab6665e7539f70861cc9c4d6011c922299a79d5f566c3ddad50d8d2719e03ee0fa5f40861101dcb8ead88ab799db32a8451983b3ae4d87aa9446ffcc5b1575fecd8d2b2be9ae346dd78e1edb15d8bd9f1d6fdd7fd2c9eb1af8333de7250c571ba04f6d7cd3e01aaf533fd006acba9a2c958679a0000000049454e44ae426082</data>
-    </image>
-    <image name="image7">
-        <data format="PNG" length="339">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b0000011a49444154789cb5954d6e83301085bf412c7c1f76def64a61d5445515ba72af55ef721f2f90a60b0875fc1348429f841eb667de3c8f6510ef3dff81f6dea2b556d339efbd6c1196abe392088046b352912c156bb68a96c65794f2055000f7e508638f691dfd7bbf08c52ee371293e762e80a641177f218c01d39a2a77b6cbc463e1065816c3d82fee4c6bee722def8a760afeab0c3d9dedcacd4c90e665c271e5787b8f708a26adfc2ca71040cf9f75f1d38703026056f8747378598f732701d563b5cf2203aac7ecf2643dce7be76681efcca9ea611e338b0feafd9b6c763c251e2a9ec3f2168befe63815dfc571a9e8cb8e4b072b32ecd1e3125e745ce2690701e60fbdd69fb33e0a702a6bff3c6b7f74dbcdbbe555e167f10bb7df841bc085536e0000000049454e44ae426082</data>
-    </image>
-    <image name="image8">
-        <data format="PNG" length="106">89504e470d0a1a0a0000000d49484452000000100000000d0806000000a0bbee240000003149444154789c63646060f8cf400160a24433550c6041e61c3b768c91184d565656706f0fbc17460d6060606418f2291100e23a0619d3e2d9940000000049454e44ae426082</data>
+        <data format="PNG" length="106">89504e470d0a1a0a0000000d49484452000000100000000d0806000000a0bbee240000003149444154289163646060f8cf400160a24433550c6041e61c3b768c91184d565656706f0fbc17460d6060606418f2291100e23a0619b9b941d30000000049454e44ae426082</data>
     </image>
 </images>
 <connections>
@@ -692,18 +699,6 @@
         <signal>activated()</signal>
         <receiver>QmitkMainTemplate</receiver>
         <slot>editCut()</slot>
-    </connection>
-    <connection>
-        <sender>editRedoAction</sender>
-        <signal>activated()</signal>
-        <receiver>QmitkMainTemplate</receiver>
-        <slot>editRedo()</slot>
-    </connection>
-    <connection>
-        <sender>editUndoAction</sender>
-        <signal>activated()</signal>
-        <receiver>QmitkMainTemplate</receiver>
-        <slot>editUndo()</slot>
     </connection>
     <connection>
         <sender>fileExitAction</sender>
@@ -819,6 +814,18 @@
         <receiver>QmitkMainTemplate</receiver>
         <slot>fileOpenProject()</slot>
     </connection>
+    <connection>
+        <sender>editUndoAction</sender>
+        <signal>activated()</signal>
+        <receiver>QmitkMainTemplate</receiver>
+        <slot>editUndo()</slot>
+    </connection>
+    <connection>
+        <sender>editRedoAction</sender>
+        <signal>activated()</signal>
+        <receiver>QmitkMainTemplate</receiver>
+        <slot>editRedo()</slot>
+    </connection>
 </connections>
 <includes>
     <include location="global" impldecl="in implementation">QmitkStdMultiWidget.h</include>
@@ -833,6 +840,7 @@
     <include location="global" impldecl="in implementation">qapplication.h</include>
     <include location="global" impldecl="in declaration">mitkDataTree.h</include>
     <include location="global" impldecl="in declaration">mitkUndoController.h</include>
+    <include location="global" impldecl="in declaration">mitkVerboseLimitedLinearUndo.h</include>
     <include location="global" impldecl="in declaration">mitkDataTreeNodeFactory.h</include>
     <include location="local" impldecl="in implementation">QmitkMainTemplate.ui.h</include>
 </includes>
@@ -866,8 +874,6 @@
     <slot>fileSave()</slot>
     <slot>filePrint()</slot>
     <slot>fileExit()</slot>
-    <slot>editUndo()</slot>
-    <slot>editRedo()</slot>
     <slot>editCut()</slot>
     <slot>editCopy()</slot>
     <slot>editPaste()</slot>
@@ -889,6 +895,8 @@
     <slot>hideToolbar( bool on )</slot>
     <slot>enableFineUndo( bool enabled )</slot>
     <slot>optionsSystem_InformationAction_activated()</slot>
+    <slot>editUndo()</slot>
+    <slot>editRedo()</slot>
 </slots>
 <functions>
     <function>fileOpen( const char * fileName )</function>

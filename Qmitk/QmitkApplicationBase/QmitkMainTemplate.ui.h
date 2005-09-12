@@ -445,16 +445,6 @@ void QmitkMainTemplate::fileExit()
   qApp->quit();
 }
 
-void QmitkMainTemplate::editUndo()
-{
-  undoController->Undo(m_FineUndoEnabled);
-}
-
-void QmitkMainTemplate::editRedo()
-{
-  undoController->Redo(m_FineUndoEnabled);
-}
-
 void QmitkMainTemplate::editCut()
 {}
 
@@ -527,6 +517,9 @@ void QmitkMainTemplate::Initialize()
   std::cout << "Loading behavior file: " << xmlFileName << std::endl;
   //create undo-controller
   undoController = new mitk::UndoController;
+
+  undoButton->setUndoModel( dynamic_cast<mitk::VerboseLimitedLinearUndo*>(mitk::UndoController::GetCurrentUndoModel()) );
+  redoButton->setUndoModel( dynamic_cast<mitk::VerboseLimitedLinearUndo*>(mitk::UndoController::GetCurrentUndoModel()) );
 
   //create statemachine-factory:
   mitk::StateMachineFactory* stateMachineFactory = new mitk::StateMachineFactory();
@@ -749,6 +742,8 @@ void QmitkMainTemplate::hideToolbar(bool on)
 void QmitkMainTemplate::enableFineUndo( bool enabled )
 {
   m_FineUndoEnabled = enabled;
+  undoButton->setFineUndo(enabled);
+  redoButton->setFineUndo(enabled);
 }
 
 #include "QmitkSystemInfo.h"
@@ -766,4 +761,18 @@ bool QmitkMainTemplate::GetStandardViewsInitialized()
 void QmitkMainTemplate::SetStandardViewsInitialized( bool areInitialized )
 {
   m_StandardViewsInitialized = areInitialized;
+}
+
+
+void QmitkMainTemplate::editUndo()
+{
+  if (undoButton->isEnabled())
+    undoButton->doUndoRedoLast(1);
+}
+
+
+void QmitkMainTemplate::editRedo()
+{
+  if (redoButton->isEnabled())
+    redoButton->doUndoRedoLast(1);
 }

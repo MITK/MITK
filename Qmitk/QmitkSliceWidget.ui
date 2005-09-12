@@ -253,8 +253,4 @@
     <function returnType="QmitkRenderWindow *">GetRenderWindow()</function>
 </functions>
 <layoutdefaults spacing="6" margin="11"/>
-<includehints>
-    <includehint>qlevelwindowwidget.h</includehint>
-    <includehint>qmitkslidernavigator.h</includehint>
-</includehints>
 </UI>

@@ -476,10 +476,8 @@ mitk::OpenGLRenderer::~OpenGLRenderer()
 //##ModelId=3E33145B0096
 void mitk::OpenGLRenderer::Initialize( )
 {
-
-  glClearColor(0.0, 0.0, 0.0, 1.0);
+  glClearColor(0.0, 0.0, 0.0, 0.0);
   glColor3f(1.0, 0.0, 0.0);
-
 }
 
 /*!

@@ -142,7 +142,7 @@ bool mitk::AffineInteractor::ExecuteAction(Action* action, mitk::StateEvent cons
         mitk::BoundingObject* b = dynamic_cast<mitk::BoundingObject*>(m_DataTreeNode->GetData());
         if(b != NULL)
         {
-          color = (b->GetPositive())? new mitk::ColorProperty(1.0, 0.0, 0.0) : new mitk::ColorProperty(0.0, 0.0, 1.0);  // if deselected, a boundingobject is colored according to its positive/negative state
+          color = (b->GetPositive())? new mitk::ColorProperty(0.0, 0.0, 1.0) : new mitk::ColorProperty(1.0, 0.0, 0.0);  // if deselected, a boundingobject is colored according to its positive/negative state
         }
         else
           color = new mitk::ColorProperty(1.0, 1.0, 1.0);   // if deselcted and no bounding object, color is white

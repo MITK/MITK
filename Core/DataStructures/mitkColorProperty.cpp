@@ -77,6 +77,11 @@ void mitk::ColorProperty::SetColor(const mitk::Color & color )
     }
 }
 
+void mitk::ColorProperty::SetColor( float red, float green, float blue )
+{
+  m_Color.Set(red, green, blue);
+}
+
 std::string mitk::ColorProperty::GetValueAsString() const {
   std::stringstream myStr;
   myStr << GetValue() ;
@@ -113,4 +118,3 @@ bool mitk::ColorProperty::ReadXMLData( XMLReader& xmlReader )
   }
   return false;
 }
-

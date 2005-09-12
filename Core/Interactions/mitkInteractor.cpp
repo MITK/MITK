@@ -31,6 +31,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkLinearTransform.h>
 #include <itkVector.h>
 #include <mitkModeOperation.h>
+#include "mitkGlobalInteraction.h"
 
 const std::string mitk::Interactor::XML_NODE_NAME = "interactor";
 
@@ -81,17 +82,22 @@ void mitk::Interactor::CreateModeOperation(ModeType mode)
 
 bool mitk::Interactor::ExecuteAction(Action* action, mitk::StateEvent const* stateEvent) 
 {
-
+  GlobalInteraction* global = GlobalInteraction::GetGlobalInteraction();
+  if (global == NULL)
+    itkWarningMacro("Message from Interactor.cpp: GlobalInteraction == NULL! Check use of Interactor!");
+  
   switch (action->GetActionId())
   {
   case AcMODEDESELECT:
     {
       this->CreateModeOperation(SMDESELECTED);
+      global->RemoveFromSelectedInteractors(this);
       return true;
     }
   case AcMODESELECT:
     {      
       this->CreateModeOperation(SMSELECTED);
+      global->AddToSelectedInteractors(this);
       return true;
     }
   case AcMODESUBSELECT:
@@ -141,63 +147,35 @@ float mitk::Interactor::CalculateJurisdiction(StateEvent const* stateEvent) cons
   if (bBox == NULL)
     return 0;
 
-  mitk::PositionEvent const  *posEvent = dynamic_cast <const mitk::PositionEvent *> (stateEvent->GetEvent());
-  if (posEvent == NULL) //2D information from a 3D window
+  mitk::DisplayPositionEvent const  *event = dynamic_cast <const mitk::DisplayPositionEvent *> (stateEvent->GetEvent());
+  //transforming the Worldposition to local coordinatesystem
+  mitk::Point3D point;
+  GetData()->GetTimeSlicedGeometry()->WorldToIndex(event->GetWorldPosition(), point);
+
+  //distance between center and point 
+  mitk::BoundingBox::PointType center = bBox->GetCenter();
+  returnvalue = point.EuclideanDistanceTo(center);
+
+  //now compared to size of boundingbox to get between 0 and 1;
+  returnvalue = returnvalue/( (bBox->GetMaximum().EuclideanDistanceTo(bBox->GetMinimum() ) ) );
+
+  //safety: if by now returnvalue is not in 0 and 1, then return 1!
+  if (returnvalue>1 ||returnvalue<0)
+    return 0;
+
+  //shall be 1 if short length to center
+  returnvalue = 1 - returnvalue;
+
+  //check if the given position lies inside the data-object
+  if (bBox->IsInside(point))
   {
-    //get camera and calculate the distance between the center of this boundingbox and the camera
-    mitk::OpenGLRenderer* oglRenderer = dynamic_cast<mitk::OpenGLRenderer*>(stateEvent->GetEvent()->GetSender());
-    if (oglRenderer == NULL)
-      return 0;
-
-    vtkCamera* camera = oglRenderer->GetVtkRenderer()->GetActiveCamera();
-    if (camera == NULL)
-    {
-      assert(disPosEvent->GetSender()!=NULL);
-      return 0;
-    }
-#if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
-    double normal[3];
-#else
-    float normal[3];
-#endif
-    camera->GetViewPlaneNormal(normal);
-
-    mitk::BoundingBox::PointType center,n;
-    vtk2itk(normal, n);
-    returnvalue = center.SquaredEuclideanDistanceTo( n );
-    //map between 0.5 and 1
+    //mapped between 0,5 and 1
+    returnvalue = 0.5 + (returnvalue / 2);
   }
-  else//3D information from a 2D window.
+  else
   {
-    //transforming the Worldposition to local coordinatesystem
-    mitk::Point3D point;
-    GetData()->GetTimeSlicedGeometry()->WorldToIndex(posEvent->GetWorldPosition(), point);
-
-    //distance between center and point 
-    mitk::BoundingBox::PointType center = bBox->GetCenter();
-    returnvalue = point.EuclideanDistanceTo(center);
-
-    //now compared to size of boundingbox to get between 0 and 1;
-    returnvalue = returnvalue/( (bBox->GetMaximum().EuclideanDistanceTo(bBox->GetMinimum() ) ) );
-
-    //safety: if by now returnvalue is not in 0 and 1, then return 1!
-    if (returnvalue>1 ||returnvalue<0)
-      return 0;
-
-    //shall be 1 if short length to center
-    returnvalue = 1 - returnvalue;
-
-    //check if the given position lies inside the data-object
-    if (bBox->IsInside(point))
-    {
-      //mapped between 0,5 and 1
-      returnvalue = 0.5 + (returnvalue / 2);
-    }
-    else
-    {
-      //set it in range between 0 and 0.5
-      returnvalue = returnvalue / 2;
-    }
+    //set it in range between 0 and 0.5
+    returnvalue = returnvalue / 2;
   }
   return returnvalue;
 }

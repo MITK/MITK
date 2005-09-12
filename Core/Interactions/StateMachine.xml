@@ -539,7 +539,7 @@
   <stateMachine NAME="pointsetinteractor">
     <state NAME="no points or loaded points" ID="1" START_STATE="TRUE">
       <transition NAME="addPoint but check n" NEXT_STATE_ID="3" EVENT_ID="3">
-        <action ID="1101" /> <!--AcMODESELECT-->
+        <action ID="1101" /> <!--AcMODE_SELECT-->
         <action ID="32" />
       </transition>
       <transition NAME="Select or move point Space" NEXT_STATE_ID="10" EVENT_ID="1">
@@ -549,7 +549,10 @@
         <action ID="33" />
       </transition>
       <transition NAME="SetThisStatemachineOnSelected" NEXT_STATE_ID="1" EVENT_ID="1030">
-      <action ID="1101" /> <!--AcMODESELECT-->
+        <action ID="1101" /> <!--AcMODE_SELECT-->
+      </transition>
+      <transition NAME="SetThisStatemachineOnDeselected" NEXT_STATE_ID="1" EVENT_ID="1031">
+        <action ID="1100" /> <!--AcMODE_DESELECT-->
       </transition>
     </state>
     <state NAME="space left" ID="2">
@@ -564,11 +567,11 @@
       </transition>
       <transition NAME="clear all" NEXT_STATE_ID="1" EVENT_ID="700"><!--Event NotYetSpecified!NotInListBelow-->
         <action ID="130" />
-        <action ID="1100" /> <!--AcMODEDESELECT-->
+        <action ID="1100" /> <!--AcMODE_DESELECT-->
       </transition>
       <transition NAME="DeselectAll" NEXT_STATE_ID="2" EVENT_ID="14"><!--Event = ESC-->
         <action ID="72" />    <!--AcDESELECTALL-->
-        <action ID="1100" />  <!--AcMODEDESELECT-->
+        <action ID="1100" />  <!--AcMODE_DESELECT-->
       </transition>
     </state>
     <state NAME="checkedN" ID="3">
@@ -1053,30 +1056,30 @@
   <!-- affine interactions standard statemachine  -->
   <stateMachine NAME="AffineInteractions ctrl-drag">
     <state NAME="start" ID="0" START_STATE="TRUE">
-      <transition NAME="leftButtonPress" NEXT_STATE_ID="12" EVENT_ID="5"> <!-- CTRL+LBM_Down ==> SeCHECKELEMENT  -->
-        <action ID="30" />
+      <transition NAME="leftButtonPress" NEXT_STATE_ID="12" EVENT_ID="5"> <!-- CTRL+LBM_Down -->
+        <action ID="30" /> <!--AcCHECKELEMENT-->
       </transition>
-      <transition NAME="leftButtonPress" NEXT_STATE_ID="12" EVENT_ID="540"> <!-- SHIFT+CTRL+LBM_Down ==> SeADD  -->
-        <action ID="11" />
+      <transition NAME="leftButtonPress" NEXT_STATE_ID="12" EVENT_ID="540"> <!-- SHIFT+CTRL+LBM_Down -->
+        <action ID="11" /> <!--AcADD-->
       </transition>
-      <transition NAME="middleButtonPress" NEXT_STATE_ID="14" EVENT_ID="6"> <!-- CTRL+MBM_Down ==> SeCHECKELEMENT  -->
-        <action ID="30" />
+      <transition NAME="middleButtonPress" NEXT_STATE_ID="14" EVENT_ID="6"> <!-- CTRL+MBM_Down -->
+        <action ID="30" /> <!--AcCHECKELEMENT-->
       </transition>
-      <transition NAME="rightButtonPress" NEXT_STATE_ID="13" EVENT_ID="7"> <!-- CTRL+RBM_Down ==> SeCHECKELEMENT  -->
-        <action ID="30" />
+      <transition NAME="rightButtonPress" NEXT_STATE_ID="13" EVENT_ID="7"> <!-- CTRL+RBM_Down -->
+        <action ID="30" /> <!--AcCHECKELEMENT-->
       </transition>
     </state>
     <state NAME="picked guard Translate" ID="12">
       <transition NAME="yes" NEXT_STATE_ID="2" EVENT_ID="1004"> <!-- EIDYES -->
-        <action ID="1101" /> <!--AcMODESELECT-->
-        <action ID="1000" />
+        <action ID="1101" /> <!--AcMODE_SELECT-->
+        <action ID="1000" /> <!--AcTRANSLATESTART-->
       </transition>
       <transition NAME="no" NEXT_STATE_ID="0" EVENT_ID="1003" /> <!-- StNO -->
     </state>
     <state NAME="picked guard Scale" ID="13">
       <transition NAME="yes" NEXT_STATE_ID="3" EVENT_ID="1004"> <!-- EIDYES -->
-        <action ID="1101" /> <!--AcMODESELECT-->
-        <action ID="1002" />
+        <action ID="1101" /> <!--AcMODE_SELECT-->
+        <action ID="1002" /> <!--AcSCALESTART-->
       </transition>
       <transition NAME="no" NEXT_STATE_ID="0" EVENT_ID="1003"> <!-- StNO -->
         <action ID="0" />
@@ -1084,7 +1087,7 @@
     </state>
     <state NAME="picked guard Rotate" ID="14">
       <transition NAME="yes" NEXT_STATE_ID="4" EVENT_ID="1004"> <!-- EIDYES -->
-        <action ID="1101" /> <!--AcMODESELECT-->
+        <action ID="1101" /> <!--AcMODE_SELECT-->
         <action ID="1004" />
       </transition>
       <transition NAME="no" NEXT_STATE_ID="0" EVENT_ID="1003"> <!-- StNO -->
@@ -1092,36 +1095,36 @@
       </transition>
     </state>
     <state NAME="translating" ID="2">
-      <transition NAME="leftButtonMove" NEXT_STATE_ID="2" EVENT_ID="534"> <!-- CTRL+LBM_Move ==> SeTRANSLATE  -->
-        <action ID="1001" />
+      <transition NAME="leftButtonMove" NEXT_STATE_ID="2" EVENT_ID="534"> <!-- CTRL+LBM_Move -->
+        <action ID="1001" /> <!--AcTRANSLATE-->
       </transition>
-      <transition NAME="leftButtonRelease" NEXT_STATE_ID="0" EVENT_ID="505"> <!-- LBM_Release ==> SeTRANSLATE  -->
-        <action ID="1100" /> <!--AcMODEDESELECT-->
+      <transition NAME="leftButtonRelease" NEXT_STATE_ID="0" EVENT_ID="505"> <!-- LBM_Release-->
+        <action ID="1100" /> <!--AcMODE_DESELECT-->
       </transition>
-      <transition NAME="leftButtonRelease" NEXT_STATE_ID="0" EVENT_ID="537"> <!-- CTRL+LBM_Release ==> SeTRANSLATE  -->
-        <action ID="1100" /> <!--AcMODEDESELECT-->
+      <transition NAME="leftButtonRelease" NEXT_STATE_ID="0" EVENT_ID="537"> <!-- CTRL+LBM_Release -->
+        <action ID="1100" /> <!--AcMODE_DESELECT-->
       </transition>
     </state>
     <state NAME="rotating" ID="4">
-      <transition NAME="middleButtonMove" NEXT_STATE_ID="4" EVENT_ID="536"> <!-- CTRL+MBM_Move ==> SeROTATE  -->
-        <action ID="1005" />
+      <transition NAME="middleButtonMove" NEXT_STATE_ID="4" EVENT_ID="536"> <!-- CTRL+MBM_Move-->
+        <action ID="1005" /> <!--AcROTATE-->
       </transition>
-      <transition NAME="middleButtonRelease" NEXT_STATE_ID="0" EVENT_ID="506"> <!-- MBM_Release ==> SeROTATE  -->
-        <action ID="1100" /> <!--AcMODEDESELECT-->
+      <transition NAME="middleButtonRelease" NEXT_STATE_ID="0" EVENT_ID="506"> <!-- MBM_Release-->
+        <action ID="1100" /> <!--AcMODE_DESELECT-->
       </transition>
-      <transition NAME="middleButtonRelease" NEXT_STATE_ID="0" EVENT_ID="539"> <!-- CTRL+MBM_Release ==> SeROTATE  -->
-        <action ID="1100" /> <!--AcMODEDESELECT-->
+      <transition NAME="middleButtonRelease" NEXT_STATE_ID="0" EVENT_ID="539"> <!-- CTRL+MBM_Release-->
+        <action ID="1100" /> <!--AcMODE_DESELECT-->
       </transition>
     </state>
     <state NAME="scaling" ID="3">
-      <transition NAME="rightButtonMove" NEXT_STATE_ID="3" EVENT_ID="535"> <!-- CTRL+RBM_Move ==> SeSCALE  -->
-        <action ID="1003" />
+      <transition NAME="rightButtonMove" NEXT_STATE_ID="3" EVENT_ID="535"> <!-- CTRL+RBM_Move -->
+        <action ID="1003" /> <!--AcROTATE -->
       </transition>
       <transition NAME="rightButtonRelease" NEXT_STATE_ID="0" EVENT_ID="507"> <!-- RBM_Release ==> SeSCALE  -->
-        <action ID="1100" /> <!--AcMODEDESELECT-->
+        <action ID="1100" /> <!--AcMODE_DESELECT-->
       </transition>
       <transition NAME="rightButtonRelease" NEXT_STATE_ID="0" EVENT_ID="538"> <!-- CTRL+RBM_Release ==> SeSCALE  -->
-        <action ID="1100" /> <!--AcMODEDESELECT-->
+        <action ID="1100" /> <!--AcMODE_DESELECT-->
       </transition>
     </state>
   </stateMachine>
@@ -1690,6 +1693,7 @@
     <event NAME="last" ID="1008" TYPE="Type_User" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_none" />
     <event NAME="not last" ID="1009" TYPE="Type_User" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_none" />
     <event NAME="SetStateMachineToSelectedMode" ID="1030" TYPE="Type_User" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_none" />
+    <event NAME="SetStateMachineToDeselectedMode" ID="1031" TYPE="Type_User" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_none" />
     <!-- for n-PointRoi-->
     <event NAME="StSMALERNMINUS1 " ID="1010" TYPE="Type_User" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_none" />
     <event NAME="StLARGERNMINUS1" ID="1011" TYPE="Type_User" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_none" />

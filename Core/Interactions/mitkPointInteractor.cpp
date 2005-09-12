@@ -169,12 +169,12 @@ float mitk::PointInteractor::CalculateJurisdiction(StateEvent const* stateEvent)
 
 bool mitk::PointInteractor::ExecuteAction( Action* action, mitk::StateEvent const* stateEvent )
 {
-	bool ok = false;//for return type bool
+  bool ok = false;//for return type bool
   
   //checking corresponding Data; has to be a PointSet or a subclass
-	mitk::PointSet* pointSet = dynamic_cast<mitk::PointSet*>(m_DataTreeNode->GetData());
-	if (pointSet == NULL)
-		return false;
+  mitk::PointSet* pointSet = dynamic_cast<mitk::PointSet*>(m_DataTreeNode->GetData());
+  if (pointSet == NULL)
+    return false;
 
   //for reading on the points, Id's etc
   mitk::PointSet::DataType *itkPointSet = pointSet->GetPointSet();
@@ -213,55 +213,57 @@ bool mitk::PointInteractor::ExecuteAction( Action* action, mitk::StateEvent cons
     if (m_UndoEnabled)
     {
       PointOperation* undoOp = new mitk::PointOperation(OpREMOVE, itkPoint, lastPosition);
-      OperationEvent *operationEvent = new OperationEvent(pointSet, doOp, undoOp);
+      OperationEvent *operationEvent = new OperationEvent(pointSet, doOp, undoOp, "Add point");
       m_UndoController->SetOperationEvent(operationEvent);
     }
     pointSet->ExecuteOperation(doOp);
     ok = true;
     break;
-	}
+  }
   case AcDESELECTALL:
     this->DeselectAllPoints();
     ok = true;
     break;
   case AcCHECKELEMENT :
-	  /*checking if the Point transmitted is close enough to one point. Then generate a new event with the point and let this statemaschine handle the event.*/
+    /*checking if the Point transmitted is close enough to one point. Then generate a new event with the point and let this statemaschine handle the event.*/
     {
       mitk::PositionEvent const  *posEvent = dynamic_cast <const mitk::PositionEvent *> (stateEvent->GetEvent());
       if (posEvent != NULL)
       {
-	      mitk::Point3D worldPoint = posEvent->GetWorldPosition();
+        mitk::Point3D worldPoint = posEvent->GetWorldPosition();
 
-	      int PRECISION = 4;
-	      mitk::IntProperty *precision = dynamic_cast<IntProperty*>(action->GetProperty("PRECISION"));
-	      if (precision != NULL)
-	      {
-	        PRECISION = precision->GetValue();
-	      }
+        int PRECISION = 4;
+        mitk::IntProperty *precision = dynamic_cast<IntProperty*>(action->GetProperty("PRECISION"));
+        if (precision != NULL)
+        {
+          PRECISION = precision->GetValue();
+        }
 
-	      int position = pointSet->SearchPoint(worldPoint, PRECISION);
-	      if (position>=0)//found a point near enough to the given point
-	      {
-	        m_LastPosition = position;//store it to be able to move the point
-	        worldPoint = pointSet->GetPoint(position);//get that point, the one meant by the user!
-	        mitk::Point2D displPoint;
-	        displPoint[0] = worldPoint[0];
-	        displPoint[1] = worldPoint[1];
+        int position = pointSet->SearchPoint(worldPoint, PRECISION);
+        if (position>=0)//found a point near enough to the given point
+        {
+          m_LastPosition = position;//store it to be able to move the point
+          worldPoint = pointSet->GetPoint(position);//get that point, the one meant by the user!
+          mitk::Point2D displPoint;
+          displPoint[0] = worldPoint[0];
+          displPoint[1] = worldPoint[1];
 
-	        //new Event with information YES and with the correct point
-	        mitk::PositionEvent const* newPosEvent = new mitk::PositionEvent(posEvent->GetSender(), posEvent->GetType(), posEvent->GetButton(), posEvent->GetButtonState(), posEvent->GetKey(), displPoint, worldPoint);
-	        mitk::StateEvent* newStateEvent = new mitk::StateEvent(EIDYES, newPosEvent);
-	        //call HandleEvent to leave the guard-state
-	        this->HandleEvent( newStateEvent );
-	        ok = true;
-	      }
-	      else
-	      {
-	        //new Event with information NO
-	        mitk::StateEvent* newStateEvent = new mitk::StateEvent(EIDNO, posEvent);
-	        this->HandleEvent( newStateEvent );
-	        ok = true;
-	      }
+          //new Event with information YES and with the correct point
+          mitk::PositionEvent const* newPosEvent = new mitk::PositionEvent(posEvent->GetSender(), posEvent->GetType(), 
+                                                                           posEvent->GetButton(), posEvent->GetButtonState(), posEvent->GetKey(), 
+                                                                           displPoint, worldPoint);
+          mitk::StateEvent* newStateEvent = new mitk::StateEvent(EIDYES, newPosEvent);
+          //call HandleEvent to leave the guard-state
+          this->HandleEvent( newStateEvent );
+          ok = true;
+        }
+        else
+        {
+          //new Event with information NO
+          mitk::StateEvent* newStateEvent = new mitk::StateEvent(EIDNO, posEvent);
+          this->HandleEvent( newStateEvent );
+          ok = true;
+        }
       }
       else //hardly used, due to 3dPicking of globalInteraction
       {
@@ -270,7 +272,7 @@ bool mitk::PointInteractor::ExecuteAction( Action* action, mitk::StateEvent cons
         {//2d Koordinates for 3D Interaction; return false to redo the last statechange
           mitk::StateEvent* newStateEvent = new mitk::StateEvent(EIDNO, posEvent);
           this->HandleEvent( newStateEvent );
-	        ok = true;
+          ok = true;
         }
       }
     }
@@ -281,7 +283,7 @@ bool mitk::PointInteractor::ExecuteAction( Action* action, mitk::StateEvent cons
       mitk::PositionEvent const  *posEvent = dynamic_cast <const mitk::PositionEvent *> (stateEvent->GetEvent());
       if (posEvent != NULL)
       {
-	      mitk::Point3D worldPoint = posEvent->GetWorldPosition();
+        mitk::Point3D worldPoint = posEvent->GetWorldPosition();
 
         int PRECISION = 4;
         mitk::IntProperty *precision = dynamic_cast<IntProperty*>(action->GetProperty("precision"));
@@ -291,40 +293,40 @@ bool mitk::PointInteractor::ExecuteAction( Action* action, mitk::StateEvent cons
         }
 
         int position = pointSet->SearchPoint(worldPoint, PRECISION);
-	      if (position <0)//no point found at the current mouseposition
-	      {
-	        //new Event with information NO
+        if (position <0)//no point found at the current mouseposition
+        {
+          //new Event with information NO
           mitk::StateEvent* newStateEvent = new mitk::StateEvent(EIDNO, posEvent);
           this->HandleEvent( newStateEvent );
-	        ok = true;
-	        break;
-  	    }
+          ok = true;
+          break;
+        }
 
         //point found at the current mouseposition, so check if this point is the same like before
-	      unsigned int upos = (unsigned int) position;//comparison signed unsigned int
-	      if (upos == m_LastPosition)//found the same point again
-	      {
+        unsigned int upos = (unsigned int) position;//comparison signed unsigned int
+        if (upos == m_LastPosition)//found the same point again
+        {
           mitk::StateEvent* newStateEvent = new mitk::StateEvent(EIDYES, posEvent);
           //call HandleEvent to leave the guard-state
           this->HandleEvent( newStateEvent );
-	        ok = true;
-	      }
-	      else
-	      {
-	        //new Event with information NO
+          ok = true;
+        }
+        else
+        {
+          //new Event with information NO
           mitk::StateEvent* newStateEvent = new mitk::StateEvent(EIDNO, posEvent);
           this->HandleEvent( newStateEvent );
-	        ok = true;
-	      }
+          ok = true;
+        }
       }
       else //hardly used, due to 3dPicking of globalInteraction
       {
         mitk::DisplayPositionEvent const  *disPosEvent = dynamic_cast <const mitk::DisplayPositionEvent *> (stateEvent->GetEvent());
-	      if (disPosEvent != NULL)
+        if (disPosEvent != NULL)
         {//2d Koordinates for 3D Interaction; return false to redo the last statechange
           mitk::StateEvent* newStateEvent = new mitk::StateEvent(EIDNO, posEvent);
           this->HandleEvent( newStateEvent );
-	        ok = true;
+          ok = true;
         }
       }    
     }
@@ -341,7 +343,7 @@ bool mitk::PointInteractor::ExecuteAction( Action* action, mitk::StateEvent cons
     ok = true;
     break;
   }
-	
+  
   case AcMOVESELECTED://moves the point
   {
     mitk::PositionEvent const  *posEvent = dynamic_cast <const mitk::PositionEvent *> (stateEvent->GetEvent());
@@ -374,7 +376,7 @@ bool mitk::PointInteractor::ExecuteAction( Action* action, mitk::StateEvent cons
     if ( m_UndoEnabled )
     {
       PointOperation* undoOp = new mitk::PointOperation(OpMOVE, m_LastPoint, m_LastPosition);
-      OperationEvent *operationEvent = new OperationEvent( m_DataTreeNode->GetData(), doOp, undoOp );
+      OperationEvent *operationEvent = new OperationEvent( m_DataTreeNode->GetData(), doOp, undoOp, "Move point");
       m_UndoController->SetOperationEvent(operationEvent);
     }
     //execute the Operation
@@ -434,7 +436,7 @@ case AcREMOVEPOINT:
     if (m_UndoEnabled)
     {
       Operation* undoOp = new mitk::Operation(OpINSERTPOINT);
-      OperationEvent *operationEvent = new OperationEvent(pointSet, doOp, undoOp);
+      OperationEvent *operationEvent = new OperationEvent(pointSet, doOp, undoOp, "Remove point");
       m_UndoController->SetOperationEvent(operationEvent);
     }
     pointSet->ExecuteOperation(doOp);
@@ -460,11 +462,11 @@ case AcREMOVEPOINT:
       PointOperation* doOp = new mitk::PointOperation(OpSELECTPOINT, worldPoint, position);
 
       //Undo
-      if (m_UndoEnabled)	//write to UndoMechanism
+      if (m_UndoEnabled)  //write to UndoMechanism
       {
-	PointOperation* undoOp = new mitk::PointOperation(OpDESELECTPOINT, worldPoint, position);
-	OperationEvent *operationEvent = new OperationEvent(pointSet, doOp, undoOp);
-	m_UndoController->SetOperationEvent(operationEvent);
+        PointOperation* undoOp = new mitk::PointOperation(OpDESELECTPOINT, worldPoint, position);
+        OperationEvent *operationEvent = new OperationEvent(pointSet, doOp, undoOp);
+        m_UndoController->SetOperationEvent(operationEvent);
       }
 
       //execute the Operation
@@ -491,11 +493,11 @@ case AcREMOVEPOINT:
       PointOperation* doOp = new mitk::PointOperation(OpDESELECTPOINT, worldPoint, position);
 
       //Undo
-      if (m_UndoEnabled)	//write to UndoMechanism
+      if (m_UndoEnabled)  //write to UndoMechanism
       {
-	PointOperation* undoOp = new mitk::PointOperation(OpSELECTPOINT, worldPoint, position);
-	OperationEvent *operationEvent = new OperationEvent(pointSet, doOp, undoOp);
-	m_UndoController->SetOperationEvent(operationEvent);
+        PointOperation* undoOp = new mitk::PointOperation(OpSELECTPOINT, worldPoint, position);
+        OperationEvent *operationEvent = new OperationEvent(pointSet, doOp, undoOp);
+        m_UndoController->SetOperationEvent(operationEvent);
       }
 
       //execute the Operation
@@ -515,15 +517,15 @@ case AcREMOVEPOINT:
         PointOperation* doOp = new mitk::PointOperation(OpSETPOINTTYPE, point, position, true, PTSTART);
 
         //Undo
-      	if (m_UndoEnabled)	//write to UndoMechanism
+        if (m_UndoEnabled)  //write to UndoMechanism
         {
-	        PointOperation* undoOp = new mitk::PointOperation(OpSETPOINTTYPE, point, position, true, PTUNDEFINED);
-	        OperationEvent *operationEvent = new OperationEvent(pointSet, doOp, undoOp);
-	        m_UndoController->SetOperationEvent(operationEvent);
-	      }
+          PointOperation* undoOp = new mitk::PointOperation(OpSETPOINTTYPE, point, position, true, PTUNDEFINED);
+          OperationEvent *operationEvent = new OperationEvent(pointSet, doOp, undoOp);
+          m_UndoController->SetOperationEvent(operationEvent);
+        }
 
-	      //execute the Operation
-	      pointSet->ExecuteOperation(doOp);
+        //execute the Operation
+        pointSet->ExecuteOperation(doOp);
         ok = true;
       }
     }

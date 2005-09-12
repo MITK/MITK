@@ -181,7 +181,6 @@ void mitk::GlobalInteraction::FillJurisdictionMap(mitk::StateEvent const* stateE
       float value = (*it)->CalculateJurisdiction(stateEvent);
       if (value > threshold)
       {
-        ///TODO: hier werden die gleichen IDs überschrieben! von map auf vector umändern!
         m_JurisdictionMap.insert(InteractorMap::value_type(value, (*it)));
       }
     }

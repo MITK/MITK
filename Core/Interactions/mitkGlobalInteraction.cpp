@@ -80,7 +80,7 @@ void mitk::GlobalInteraction::AddInteractor(mitk::Interactor* interactor)
     
     //if Interactor already selected, then add to selected list
     if (interactor->GetMode()==Interactor::SMSELECTED)
-      m_SelectedList.push_back(interactor);
+      this->AddToSelectedInteractors(interactor);
   }
 }
 
@@ -107,24 +107,21 @@ bool mitk::GlobalInteraction::RemoveInteractor(mitk::Interactor* interactor)
     return false;
   position = m_InteractorList.erase(position);
 
-  //ether in JurisdictionMap or in SelectedList
-  position = std::find(m_SelectedList.begin(), m_SelectedList.end(),interactor);
-  if (position != m_SelectedList.end())
-    position = m_SelectedList.erase(position);
-  else
+  //check if the interactor is also held in SelectedList
+  this->RemoveFromSelectedInteractors(interactor);  
+
+  //check if in JurisdictionMap
+  for (InteractorMapIter it = m_JurisdictionMap.begin(); it != m_JurisdictionMap.end(); it++)
   {
-    for (InteractorMapIter it = m_JurisdictionMap.begin(); it != m_JurisdictionMap.end(); it++)
+    if ((*it).second == interactor)
     {
-      if ((*it).second == interactor)
-      {
-        m_JurisdictionMap.erase(it);
-        if (m_CurrentInteractorIter == it)
-          m_CurrentInteractorIter == m_JurisdictionMap.end();
-        break;
-      }
+      m_JurisdictionMap.erase(it);
+      if (m_CurrentInteractorIter == it)
+        m_CurrentInteractorIter == m_JurisdictionMap.end();
+      break;
     }
   }
-
+  
   return true;
 }
 
@@ -135,44 +132,35 @@ void mitk::GlobalInteraction::InformListeners(mitk::StateEvent const* stateEvent
     if((*it)!=NULL)
       (*it)->HandleEvent(stateEvent);
   }
-
 }
 
 bool mitk::GlobalInteraction::AskSelected(mitk::StateEvent const* stateEvent)
 {
-  bool ok, oneOk;
-  ok = false;
-  InteractorListIter it = m_SelectedList.begin();
+  if (m_SelectedList.empty())
+    return false;
 
-  while ( it != m_SelectedList.end())
+  bool ok = false, oneOk = false;
+    
+  //copy of m_SelectedList to be stable if an iterator gets removed during the following steps
+  InteractorList copyOfSelectedList = m_SelectedList;
+  InteractorListIter it = copyOfSelectedList.begin();
+
+  for (; it != copyOfSelectedList.end(); it++)
   {
-    if((*it)!=NULL && !m_SelectedList.empty())
-    {
-      //Interactor are in Mode SELECTED or SUBSELECTED
-      oneOk = (*it)->HandleEvent(stateEvent);
+    oneOk = (*it)->HandleEvent(stateEvent);
 
-      //if one HandleEvent did succeed, then set returnvalue on true;
-      if (oneOk)
-        ok = true;
-
-      //if mode changed, then erase from selectedList
-      if ((*it)->GetMode()==Interactor::SMDESELECTED)
-      {
-        it = m_SelectedList.erase(it);
-      }
-      else
-      {
-        ++it;
-      }
-    }
-    else
-      ++it;
+    //if one HandleEvent did succeed, then set returnvalue on true;
+    if (oneOk)
+      ok = true;
   }
   return ok;
 }
 
+
 void mitk::GlobalInteraction::FillJurisdictionMap(mitk::StateEvent const* stateEvent, float threshold)
 {
+  m_JurisdictionMap.clear();
+
   for (InteractorListIter it = m_InteractorList.begin(); it != m_InteractorList.end(); it++)
   {
     if((*it)!=NULL)
@@ -194,37 +182,28 @@ void mitk::GlobalInteraction::FillJurisdictionMap(mitk::StateEvent const* stateE
 
 /*
 * Go through the list of interactors, that could possibly handle an event and ask if it has handled the event.
-* If an interactor has handled an event, then it gets set as an selected Interactor (m_SelectedInteractors)
+* If an interactor has handled an event, it should add itself to the list of selectedInteractors
+* Ask as long as no interactor answers, that it could be handled
 */
-void mitk::GlobalInteraction::AskCurrentInteractor(mitk::StateEvent const* stateEvent)
+bool mitk::GlobalInteraction::AskCurrentInteractor(mitk::StateEvent const* stateEvent)
 {
+  //no need to check if we don't have any interactors. nearly equal to m_CurrentInteractorIter == m_JurisdictionMap.end
   if (m_JurisdictionMap.empty())
-    return;
+    return false;
 
   bool handled = false;
   while ( m_CurrentInteractorIter != m_JurisdictionMap.end()&& !handled)
   {
     handled = (*m_CurrentInteractorIter).second->HandleEvent(stateEvent);
 
-    //if after handling an event Interactor is in mode SELECTED or SUBSELECTED
-    //then make sure, that this sub-/ selected interactor gets the next event
-    if ( ((*m_CurrentInteractorIter).second->GetMode() == mitk::Interactor::SMSELECTED ) || 
-      ((*m_CurrentInteractorIter).second->GetMode() == mitk::Interactor::SMSUBSELECTED) )
-    {
-      m_SelectedList.clear();
-      m_SelectedList.push_back((*m_CurrentInteractorIter).second);
-
-      //clear the map cause we have found an selected interactor so we can directly take that interactor the next time
-      m_JurisdictionMap.clear();
-      m_CurrentInteractorIter = m_JurisdictionMap.end();
-    }
-    else //if the event could not be handled, then go to next interactor
-    {
-      if (!handled) 
-        m_CurrentInteractorIter++;
-      //looping to the beginning would make a change.If the first couldn't handle it once, then a second try won't make a change!
-    }
+    if (!handled) 
+      m_CurrentInteractorIter++;
   }
+  
+  //loop for later usage
+  if (m_CurrentInteractorIter == m_JurisdictionMap.end())
+    m_CurrentInteractorIter = m_JurisdictionMap.begin();
+  return handled;
 }
 
 bool mitk::GlobalInteraction::AddFocusElement(mitk::FocusManager::FocusElement* element)
@@ -270,32 +249,12 @@ bool mitk::GlobalInteraction::ExecuteAction(Action* action, mitk::StateEvent con
   case AcASKINTERACTORS:
     if (! AskSelected(stateEvent))//no interactor selected anymore
     {
-      //if m_JurisdictionMap is empty, then fill it.
-      if (m_JurisdictionMap.empty())
-        FillJurisdictionMap(stateEvent, 0);
+      //fill the jurisdictionMap to ask them bit by bit.
+      //currentInteractor is set here to the beginning
+      FillJurisdictionMap(stateEvent, 0);
 
-      /*
-      * Commented out, because this is the old sceme to send events to all interactors.
-      * If  Interactors doesn't answer anymore, uncomment these two lines and send a message to ingmar.
-      */
-      //no jurisdiction value above 0 could be found, so take all to convert to old scheme
-      //that way only the first statemachine, that handles the interaction can get the event.
-      /*
-      if (m_JurisdictionMap.empty())
-        FillJurisdictionMap(stateEvent, -1);
-      */
-
-      //ask the next Interactor to handle that event
+      //ask the Interactors to handle that event
       AskCurrentInteractor(stateEvent);
-
-      //after asking for jurisdiction and sending the events to the interactors,
-      //interactors should change the mode. We can now clear the jurisdictionmap.
-      m_JurisdictionMap.clear();
-    }
-    else
-    {
-      //checking if the selected one is still in Mode Subselected or selected
-      //...//todo
     }
     ok = true;
     break;
@@ -334,3 +293,34 @@ mitk::GlobalInteraction* mitk::GlobalInteraction::GetGlobalInteraction()
 {
   return dynamic_cast<mitk::GlobalInteraction*>(mitk::EventMapper::GetGlobalStateMachine());
 }
+
+bool mitk::GlobalInteraction::AddToSelectedInteractors(mitk::Interactor* interactor)
+{
+  InteractorListIter position = std::find(m_SelectedList.begin(), m_SelectedList.end(),interactor);
+  if (position != m_SelectedList.end())
+  {
+    //already added so don't add once more!
+    return true;
+  }
+  else
+    m_SelectedList.push_back(interactor);
+  
+  return true;
+}
+
+bool mitk::GlobalInteraction::RemoveFromSelectedInteractors(mitk::Interactor* interactor)
+{
+  if (interactor == NULL)
+    return false;
+
+  InteractorListIter position = std::find(m_SelectedList.begin(), m_SelectedList.end(),interactor);
+  if (position != m_SelectedList.end())
+  {
+    position = m_SelectedList.erase(position);
+    return true;
+  }
+  else
+    return false;
+}
+
+

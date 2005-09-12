@@ -72,7 +72,7 @@ namespace mitk {
 
     typedef std::vector<Interactor*> InteractorList;
 
-    typedef std::vector<Interactor*>::iterator InteractorListIter;
+    typedef InteractorList::iterator InteractorListIter;
 
     typedef std::multimap<float, Interactor*, std::greater<double> > InteractorMap;
 
@@ -80,8 +80,6 @@ namespace mitk {
 
     //##ModelId=3EAD420E0088
     GlobalInteraction(const char * type);
-
-
 
     //##Documentation
     //## @brief add an Interactor to the list of all Interactors that are asked for handling an event
@@ -147,10 +145,25 @@ namespace mitk {
 
     static GlobalInteraction* GetGlobalInteraction();
 
+    //so that the interactors can call AddToSelectedInteractors() and RemoveFromSelectedInteractors()
+    friend class Interactor;
   protected:
 
     //##ModelId=3E7F497F01AE
     virtual bool ExecuteAction(Action* action, mitk::StateEvent const* stateEvent);
+
+    /*
+    *@brief adds the given interactor to the list of selected interactors. 
+    * This list is asked first to handle an event.
+    */
+    virtual bool AddToSelectedInteractors(Interactor* interactor);
+
+    /*
+    *@brief removes the given interactor from the list of selected interactors
+    * This list is asked first to handle an event.
+    */
+    virtual bool RemoveFromSelectedInteractors(Interactor* interactor);
+
 
   private:
 
@@ -166,7 +179,7 @@ namespace mitk {
 
     //##Documentation
     //##@brief asking next interactor of m_JurisdictionMap
-    void AskCurrentInteractor(mitk::StateEvent const* stateEvent);
+    bool AskCurrentInteractor(mitk::StateEvent const* stateEvent);
 
     //##Documentation
     //##@brief filling m_JurisdictionMap 
@@ -184,7 +197,7 @@ namespace mitk {
 
     //##Documentation
     //## @brief list of all interactors, that are in Mode SELECTED or SUBSELECTED
-    InteractorList m_SelectedList; //or id of position in vector
+    InteractorList m_SelectedList; 
 
     //##Documentation
     //## @brief map for sorting all interactors by the value returned from CalculateJurisdiction(..).
@@ -192,11 +205,10 @@ namespace mitk {
     //## With that list certain interactors can be looped through like diving through layers
     InteractorMap m_JurisdictionMap;
 
-
     //##Documentation
     //## @brief iterator on an entry in m_JurisdictionMap for stepping through interactors
     InteractorMapIter m_CurrentInteractorIter;
-
+    
     //##ModelId=3EF099E80373
     //##Documentation
     //## @brief holds a list of BaseRenderer and one focused

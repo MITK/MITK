@@ -320,8 +320,6 @@ mitk::TransferFunctionProperty::Pointer tranferFunctionProp = dynamic_cast<mitk:
   m_VolumeProperty->SetAmbient(0.9);
   m_VolumeProperty->ShadeOn();
 
-  m_Prop3D = m_VolumeLOD;
-
   mitk::OpenGLRenderer* openGlRenderer = dynamic_cast<mitk::OpenGLRenderer*>(renderer);
   assert(openGlRenderer);
   vtkRenderWindow* vtkRendWin = dynamic_cast<vtkRenderWindow*>(openGlRenderer->GetVtkRenderWindow());

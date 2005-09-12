@@ -69,21 +69,22 @@ float mitk::PointSetInteractor::CalculateJurisdiction(StateEvent const* stateEve
       return 0;
     }
   }
-  
+
   //on MouseMove do nothing!
   if (stateEvent->GetEvent()->GetType() == mitk::Type_MouseMove)
   {
     return 0;
   }
 
+  //if the event can be understood and if there is a transition waiting for that event
+  if (this->GetCurrentState()->GetTransition(stateEvent->GetId())!=NULL)
+  {
+    returnvalue = 0.5;//it can be understood
+  }
   
   mitk::PointSet* pointSet = dynamic_cast<mitk::PointSet*>(m_DataTreeNode->GetData());
   if (pointSet != NULL)
   {
-    //if we don't have a Point in our PointSet, then return with 0.5
-    if (pointSet->GetSize()<1)
-      returnvalue = 0.5;
-
     //if we have a point or more, then check if the have been picked
     if (pointSet->SearchPoint(disPosEvent->GetWorldPosition(), m_Precision) >-1)
       returnvalue = 1.0;

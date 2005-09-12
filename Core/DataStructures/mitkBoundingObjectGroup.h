@@ -54,6 +54,7 @@ public:
 
   void AddBoundingObject(mitk::BoundingObject::Pointer boundingObject);
   unsigned int GetCount() const;
+  mitk::Geometry3D *  GetGeometry (int t=0) const;
 
 protected:
   BoundingObjectGroup();

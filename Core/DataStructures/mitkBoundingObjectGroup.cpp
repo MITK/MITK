@@ -22,7 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkLinearTransform.h>
 
 mitk::BoundingObjectGroup::BoundingObjectGroup()
-:  m_Counter(0), m_CSGMode(Difference) //m_CSGMode(Union) m_CSGMode(Intersection)
+:  m_Counter(0), m_CSGMode(Intersection) //m_CSGMode(Union) m_CSGMode(Intersection)
 {
   GetTimeSlicedGeometry()->Initialize(1);
   GetGeometry(0)->SetIndexToWorldTransform(GetTimeSlicedGeometry()->GetIndexToWorldTransform());
@@ -173,4 +173,22 @@ bool mitk::BoundingObjectGroup::IsInside(const mitk::Point3D& p) const
 unsigned int mitk::BoundingObjectGroup::GetCount() const
 {
   return m_Counter;
+}
+
+mitk::Geometry3D *  mitk::BoundingObjectGroup::GetGeometry (int t) const
+{
+  if ( m_BoundingObjects == NULL )
+    return mitk::BaseData::GetGeometry();
+
+  mitk::BoundingObjectGroup::BoundingObjectContainer::ConstIterator boI = m_BoundingObjects->Begin();
+  const mitk::BoundingObjectGroup::BoundingObjectContainer::ConstIterator boIEnd = m_BoundingObjects->End();
+  mitk::Geometry3D* currentGeometry = NULL;
+
+  while ( boI != boIEnd )
+  {
+    currentGeometry = boI.Value()->GetGeometry( t );
+    boI++;
+  }
+
+  return currentGeometry;
 }

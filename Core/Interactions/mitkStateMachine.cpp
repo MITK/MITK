@@ -50,7 +50,7 @@ mitk::StateMachine::StateMachine(const char * type) : m_CurrentState(NULL)
   //  itkWarningMacro("Error from "<<this->GetNameOfClass()<<"; Message: Type of StateMachine is NULL!");
   //\*todo: check the process with BaseControllers, cause they are always instantiated with type ==NULL! So here we can't check and warn the user.
   
-  m_UndoController = new UndoController(LIMITEDLINEARUNDO);//switch to LLU or add LLU
+  m_UndoController = new UndoController(VERBOSE_LIMITEDLINEARUNDO);//switch to LLU or add LLU
 	m_UndoEnabled = true;
 }
 mitk::StateMachine::~StateMachine()

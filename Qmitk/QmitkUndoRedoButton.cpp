@@ -1,7 +1,5 @@
 #include "QmitkUndoRedoButton.h"
 // MITK header
-#include "mitkLimitedLinearUndo.h"
-#include "mitkVerboseLimitedLinearUndo.h"
 #include "mitkUndoController.h"
 // STL header
 #include <list>
@@ -11,10 +9,12 @@ QmitkUndoRedoButton::QmitkUndoRedoButton( QWidget* parent, const char* name, mit
 : QUndoRedoButton(parent, name),
   m_UndoModel(undoModel),
   m_ListenerEmpty(NULL),
-  m_ListenerNotEmpty(NULL)
+  m_ListenerNotEmpty(NULL),
+  m_FineUndo(true)
 {
   setEnabled(false);
   connect( this, SIGNAL(undoRedoLast(int)), this, SLOT(doUndoRedoLast(int)) );
+  connect( this, SIGNAL(buttonClicked()), this, SLOT(doUndoClick()) );
 }
 
 QmitkUndoRedoButton::~QmitkUndoRedoButton()
@@ -31,7 +31,6 @@ void QmitkUndoRedoButton::beforePopup()
   {
     clear(); // clear whole list
   
-    std::list<std::string> descriptions;
     switch (m_Mode)
     {
       case Undo:
@@ -43,9 +42,11 @@ void QmitkUndoRedoButton::beforePopup()
       default:;
     }
 
-    for ( std::list<std::string>::iterator iter = descriptions.begin(); iter != descriptions.end(); ++iter )
+    for ( mitk::VerboseLimitedLinearUndo::StackDescription::iterator iter = descriptions.begin(); 
+          iter != descriptions.end();
+          ++iter )
     {
-      insertItem( QString((*iter).c_str()) ); // append each item to the list
+      insertItem( QString(iter->second.c_str()) ); // append each item to the list
     }
 
   }
@@ -71,6 +72,7 @@ void QmitkUndoRedoButton::setUndoModel(mitk::VerboseLimitedLinearUndo* undoModel
   if ( m_UndoModel != undoModel)
   {
     m_UndoModel = undoModel;  // remember model
+    if (!m_UndoModel) return; // on NULL, do nothing
     
     switch (m_Mode)
     {
@@ -99,13 +101,37 @@ void QmitkUndoRedoButton::doUndoRedoLast(int soMany)
   switch (m_Mode)
   {
     case Undo:
-      for (int i = 0; i < soMany; ++i)
-        m_UndoModel->Undo(true); // all objectEventIDs
+      if (soMany <= 1) 
+        m_UndoModel->Undo();
+      else
+        m_UndoModel->Undo( descriptions.at(soMany-1).first  );
       break;
     case Redo:
-      for (int i = 0; i < soMany; ++i)
-        m_UndoModel->Redo(true); // all objectEventIDs
+      if (soMany <= 1) 
+        m_UndoModel->Redo();
+      else
+      m_UndoModel->Redo( descriptions.at(soMany-1).first  );
       break;
     default:;
   } 
+}
+
+void QmitkUndoRedoButton::doUndoClick()
+{
+  if (!m_UndoModel) return;
+  switch (m_Mode)
+  {
+    case Undo:
+      m_UndoModel->Undo();
+      break;
+    case Redo:
+      m_UndoModel->Redo();
+      break;
+    default:;
+  }
+}
+
+void QmitkUndoRedoButton::setFineUndo(bool fine)
+{
+  m_FineUndo = fine;
 }

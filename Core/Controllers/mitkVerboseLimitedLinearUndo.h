@@ -27,10 +27,8 @@ PURPOSE.  See the above copyright notices for more information.
 // STL header
 #include <vector>
 #include <list>
+#include <utility>
 #include <string>
-// ITK header
-#include <itkObject.h>
-#include<itkEventObject.h>
 
 namespace mitk {
 
@@ -42,21 +40,20 @@ namespace mitk {
 */
 class VerboseLimitedLinearUndo : public LimitedLinearUndo
 {
+  
 public:
+  
+  typedef std::pair<int,std::string> StackDescriptionItem; 
+  typedef std::vector<StackDescriptionItem> StackDescription; /// a list of pairs (int,string), representing a stack with ObjectEventIDs and descriptions
+
   virtual bool SetOperationEvent(UndoStackItem* undoStackItem);
 
   VerboseLimitedLinearUndo();
 
-  virtual bool Undo();
-  virtual bool Undo(bool fine);
-  
-  virtual bool Redo();
-  virtual bool Redo(bool fine);
-
   virtual ~VerboseLimitedLinearUndo();
 
-  virtual std::list<std::string> GetUndoDescriptions();
-  virtual std::list<std::string> GetRedoDescriptions();
+  virtual StackDescription GetUndoDescriptions();
+  virtual StackDescription GetRedoDescriptions();
 };
 
 } // namespace mitk

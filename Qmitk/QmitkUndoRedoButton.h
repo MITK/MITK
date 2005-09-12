@@ -4,9 +4,7 @@
 #include "mitkCommon.h"
 #include "qundoredobutton.h"
 #include "QmitkItkEventQtSlotAdapter.h"
-
-namespace mitk { class VerboseLimitedLinearUndo; };
-
+#include "mitkVerboseLimitedLinearUndo.h"
 
 class 
 MITK_EXPORT
@@ -26,20 +24,26 @@ QmitkUndoRedoButton : public QUndoRedoButton
 
     virtual void beforePopup(); /// fill popup list just before popup
 
+    void setFineUndo(bool);
+
   public slots:
 
     void notifyStackEmpty();
     void notifyStackNotEmpty();
 
     void doUndoRedoLast(int);
+    void doUndoClick();
   
   private:
 
     mitk::VerboseLimitedLinearUndo* m_UndoModel;
+    mitk::VerboseLimitedLinearUndo::StackDescription descriptions;
 
     // adapters for itk-Events
     QItkEventQtSlotAdapter<Self>* m_ListenerEmpty;
     QItkEventQtSlotAdapter<Self>* m_ListenerNotEmpty;
+
+    bool m_FineUndo;
 };
 
 #endif

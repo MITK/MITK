@@ -45,29 +45,9 @@ bool mitk::VerboseLimitedLinearUndo::SetOperationEvent(UndoStackItem* undoStackI
   return true;
 }
 
-bool mitk::VerboseLimitedLinearUndo::Undo()
+mitk::VerboseLimitedLinearUndo::StackDescription mitk::VerboseLimitedLinearUndo::GetUndoDescriptions()
 {
-  return Undo(true);
-}
-
-bool mitk::VerboseLimitedLinearUndo::Undo(bool fine)
-{
-  return LimitedLinearUndo::Undo(fine);
-}
-
-bool mitk::VerboseLimitedLinearUndo::Redo()
-{
-  return Redo(true);
-}
-
-bool mitk::VerboseLimitedLinearUndo::Redo(bool fine)
-{
-  return LimitedLinearUndo::Redo(fine);
-}
-
-std::list<std::string> mitk::VerboseLimitedLinearUndo::GetUndoDescriptions()
-{
-  std::list<std::string> descriptions;
+  mitk::VerboseLimitedLinearUndo::StackDescription descriptions;
   
   if(m_UndoList.empty()) return descriptions;
 
@@ -84,7 +64,7 @@ std::list<std::string> mitk::VerboseLimitedLinearUndo::GetUndoDescriptions()
       if ( currentDescription.empty() )
         currentDescription = "Some unnamed action";  // set a default description
       
-      descriptions.push_back( currentDescription );
+      descriptions.push_back( StackDescriptionItem(oeid,currentDescription) );
       
       currentDescription = "";                 // prepare for next group
       currentDescriptionCount = 0;
@@ -117,14 +97,14 @@ std::list<std::string> mitk::VerboseLimitedLinearUndo::GetUndoDescriptions()
   // add last description to list
   if ( currentDescription.empty() )
     currentDescription = "Some unnamed action";
-  descriptions.push_back( currentDescription );
+  descriptions.push_back( StackDescriptionItem( oeid, currentDescription) );
 
   return descriptions;  // list ready
 }
 
-std::list<std::string> mitk::VerboseLimitedLinearUndo::GetRedoDescriptions()
+mitk::VerboseLimitedLinearUndo::StackDescription mitk::VerboseLimitedLinearUndo::GetRedoDescriptions()
 {
-  std::list<std::string> descriptions;
+  mitk::VerboseLimitedLinearUndo::StackDescription descriptions;
   
   if(m_RedoList.empty()) return descriptions;
 
@@ -141,7 +121,7 @@ std::list<std::string> mitk::VerboseLimitedLinearUndo::GetRedoDescriptions()
       if ( currentDescription.empty() )
         currentDescription = "Some unnamed action";  // set a default description
       
-      descriptions.push_back( currentDescription );
+      descriptions.push_back( StackDescriptionItem( oeid, currentDescription) );
       
       currentDescription = "";                 // prepare for next group
       currentDescriptionCount = 0;
@@ -174,7 +154,7 @@ std::list<std::string> mitk::VerboseLimitedLinearUndo::GetRedoDescriptions()
   // add last description to list
   if ( currentDescription.empty() )
     currentDescription = "Some unnamed action";
-  descriptions.push_back( currentDescription );
+  descriptions.push_back( StackDescriptionItem( oeid, currentDescription) );
 
   return descriptions;  // list ready
 }

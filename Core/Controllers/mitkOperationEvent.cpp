@@ -29,7 +29,8 @@ bool mitk::UndoStackItem::m_IncrGroupEventId = false;
 
 
 mitk::UndoStackItem::UndoStackItem(std::string description)
-:m_Description(description)
+: m_Reversed(false),
+  m_Description(description)
 {
   m_ObjectEventId = GetCurrObjectEventId();
   m_GroupEventId = GetCurrGroupEventId();
@@ -96,6 +97,16 @@ std::string mitk::UndoStackItem::GetDescription()
   return m_Description;
 }
 
+void mitk::UndoStackItem::ReverseOperations()
+{
+  m_Reversed = !m_Reversed;
+}
+
+void mitk::UndoStackItem::ReverseAndExecute()
+{
+  ReverseOperations();
+}
+
 // ******************** mitk::OperationEvent ********************
 
 //##ModelId=3E5F610D00BB
@@ -110,8 +121,7 @@ mitk::OperationEvent::OperationEvent(OperationActor* destination,
                                      std::string description)
 : UndoStackItem(description), 
   m_Destination(destination),
-  m_Operation(operation), m_UndoOperation(undoOperation), 
-  m_Swaped(false)
+  m_Operation(operation), m_UndoOperation(undoOperation) 
 {
   // nothing to do
 }
@@ -124,19 +134,23 @@ mitk::OperationEvent::~OperationEvent()
 
 //##ModelId=3E957C1102E3
 //##Documentation
-//##  swaps the Undo and Redo- operation and changes m_Swaped
-void mitk::OperationEvent::SwapOperations()
+//##  swaps the Undo and Redo- operation and changes m_Reversed
+void mitk::OperationEvent::ReverseOperations()
 {
-    if (m_Operation == NULL) 
-        return;
+  if (m_Operation == NULL) 
+    return;
 
   Operation *tempOperation = m_Operation;
   m_Operation = m_UndoOperation;
   m_UndoOperation = tempOperation;
-  if (m_Swaped)
-    m_Swaped = false;
-  else 
-    m_Swaped = true;
+
+  UndoStackItem::ReverseOperations();
+}
+
+void mitk::OperationEvent::ReverseAndExecute()
+{
+  ReverseOperations();
+  m_Destination->ExecuteOperation( m_Operation );
 }
 
 //##ModelId=3E9B07B502AC

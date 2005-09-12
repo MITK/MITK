@@ -66,13 +66,11 @@ public:
   //##  swaps the OperationEvent-Undo with the Operation
   //##  and sets it to Redo-Stack
   virtual bool Undo();
+  virtual bool Undo(bool);
 
-  //##ModelId=3F0451960156
   //##Documentation
-  //## @brief Same like Undo() but with the possibility to fine or raw undo(Group or ObjectEventId)
-  //## @param fine: if set to true, then all operations with the same ObjectId are undone.
-  //## If set to false, then all operations with the same GroupEventId are undone (see mitkUndoController.h)
-  virtual bool Undo(bool fine);
+  //## @brief Undoes all changes until ObjectEventID oeid
+  virtual bool Undo(int oeid);
 
   //##ModelId=3E5F5D8C00DA
   //##Documentation
@@ -83,13 +81,11 @@ public:
   //## swaps the OperationEvent-Operation with the Undo-Operation
   //## and sets it to Undo-Stack
   virtual bool Redo();
+  virtual bool Redo(bool);
 
-  //##ModelId=3F0451960176
   //##Documentation
-  //## @brief Undoes the last changes
-  //##
-  //## Same as Redo(), but with the possibility to set to fine or raw
-  virtual bool Redo(bool fine);
+  //## @brief Redoes all changes until ObjectEventID oeid
+  virtual bool Redo(int oeid);
 
   //##ModelId=3F04519601A4
   //##Documentation
@@ -127,6 +123,9 @@ protected:
 
   //##ModelId=3E5F5E020332
   UndoContainer m_RedoList;
+
+private:
+  int FirstObjectEventIdOfCurrentGroup(UndoContainer& stack);
 
 };
 

@@ -24,7 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk {
 
-class UndoStackItem;
+class UndoStackItem; 
 class OperationEvent;
 class OperationActor;
   
@@ -81,22 +81,13 @@ class UndoModel
   //## UndoModel
   virtual int GetLastGroupEventIdInList() = 0;
 
-
   //##Documentation
   //## @brief returns the last specified OperationEvent in Undo-list
   //## corresponding to the given values; if nothing found, then returns NULL
   //## 
   //## needed to get the old Position of an Element for declaring an UndoOperation
   virtual OperationEvent* GetLastOfType(OperationActor* destination, OperationType opType) = 0;
-
   
-protected:
-  //##ModelId=3F01770A018E
-	//##Documentation
-	//## @brief friend method from OperationEvent.
-	//## changes the two Operations from undo to redo and redo to undo and also sets a swapped flag
-	void SwapOperations(OperationEvent *operationEvent);
-
 };
 
 }// namespace mitk

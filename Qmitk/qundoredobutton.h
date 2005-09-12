@@ -63,8 +63,8 @@ QUndoRedoButton : public QFrame
     void changeItem( const QPixmap &pixmap, const QString &text, int index );
 
   signals:
-    void undoRedoLast(int); /// Emitted, when button is pressed or a number of
-                            /// actions is selected
+    void undoRedoLast(int); /// Emitted, when a number of actions is selected
+    void buttonClicked();   /// Emitted, when the button is clicked
 
   public slots:
     void clear();

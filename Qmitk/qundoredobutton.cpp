@@ -107,7 +107,7 @@ void QUndoRedoButton::popupItemsSelected(int num)
 
 void QUndoRedoButton::iconButtonClicked()
 {
-  emit undoRedoLast(1);
+  emit buttonClicked();
 }
 
 void QUndoRedoButton::arrowButtonClicked()

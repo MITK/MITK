@@ -25,6 +25,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkOperationActor.h"
 #include "mitkUndoModel.h"
 #include <string>
+#include <list>
 
 namespace mitk {
 
@@ -88,8 +89,16 @@ class UndoStackItem
 
     friend class StateMachine; //for IncCurrGroupEventId
     friend class EventMapper;  //for IncCurrObjectEventId
+    
+    virtual void ReverseOperations();
+    virtual void ReverseAndExecute();
 
   protected:
+    //##ModelId=3E9B07B500D5
+    //##Documentation
+    //## @brief true, if operation and undooperation have been swaped/changed
+    bool m_Reversed;
+
     //##Documentation
     //## @brief Executes the incrementation of objectEventId and groupEventId if they are set to be incremented
     static void ExecuteIncrement();
@@ -103,8 +112,7 @@ class UndoStackItem
     //##Documentation
     //## @brief Sets the current GroupEventId to be incremended when ExecuteIncrement is called
     static void IncCurrGroupEventId();
-
-
+  
   private:
     //##ModelId=3E9B07B40374
     static int m_CurrObjectEventId;
@@ -121,11 +129,14 @@ class UndoStackItem
 
     //##ModelId=3E7F48C60335
     int m_GroupEventId;
-
+  
     std::string m_Description;
+    
+    UndoStackItem(UndoStackItem&);              // hide copy constructor
+    void operator=(const UndoStackItem&);       // hide operator=
 
 };
-  
+
 //##ModelId=3E5F60F301A4
 //##Documentation
 //## @brief Represents a pair of operations: undo and the according redo.
@@ -155,12 +166,13 @@ public:
 
   friend class UndoModel;
 
-protected:
   //##ModelId=3E957C1102E3
   //##Documentation
   //## @brief Swaps the two operations and sets a flag, 
   //## that it has been swapped and do is undo and undo is do
-  void SwapOperations();
+  virtual void ReverseOperations();
+  virtual void ReverseAndExecute();           /// reverses and executes both operations (used, when moved from undo to redo stack)
+protected:
 
 private:
   //##ModelId=3E5F61DB00D6
@@ -172,11 +184,10 @@ private:
   //##ModelId=3E5F6B2E0060
   Operation* m_UndoOperation;
 
-  //##ModelId=3E9B07B500D5
-  //##Documentation
-  //## @brief true, if operation and undooperation have been swaped/changed
-  bool m_Swaped;
+  OperationEvent(OperationEvent&);             // hide copy constructor
+  void operator=(const OperationEvent&);       // hide operator=
 };
+
 } //namespace mitk
 
 #endif /* OPERATIONEVENT_H_HEADER_INCLUDED_C16E83FC */

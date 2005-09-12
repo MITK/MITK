@@ -56,6 +56,8 @@ public:
   unsigned int GetCount() const;
   mitk::Geometry3D *  GetGeometry (int t=0) const;
 
+  virtual bool VerifyRequestedRegion();
+
 protected:
   BoundingObjectGroup();
   virtual ~BoundingObjectGroup();

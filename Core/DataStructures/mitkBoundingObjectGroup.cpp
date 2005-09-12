@@ -22,7 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkLinearTransform.h>
 
 mitk::BoundingObjectGroup::BoundingObjectGroup()
-:  m_Counter(0), m_CSGMode(Intersection) //m_CSGMode(Union) m_CSGMode(Intersection)
+:  m_Counter(0), m_CSGMode(Union) //m_CSGMode(Intersection)
 {
   GetTimeSlicedGeometry()->Initialize(1);
   GetGeometry(0)->SetIndexToWorldTransform(GetTimeSlicedGeometry()->GetIndexToWorldTransform());
@@ -87,21 +87,21 @@ void mitk::BoundingObjectGroup::UpdateOutputInformation()
   boundingBox->ComputeBoundingBox();
 
   /* BoundingBox is centered around the center of all sub bounding objects */
-  Point3D center = boundingBox->GetCenter();
+  //Point3D center = boundingBox->GetCenter();
 
-  Point3D minimum, maximum;
-  minimum.Fill(0); maximum.Fill(0);
-  minimum += boundingBox->GetMinimum() - center;
-  maximum += boundingBox->GetMaximum() - center;
+  //Point3D minimum, maximum;
+  //minimum.Fill(0); maximum.Fill(0);
+  //minimum += boundingBox->GetMinimum() - center;
+  //maximum += boundingBox->GetMaximum() - center;
 
-  boundingBox->SetMinimum(minimum);
-  boundingBox->SetMaximum(maximum);
+  //boundingBox->SetMinimum(minimum);
+  //boundingBox->SetMaximum(maximum);
 
   Geometry3D* geometry3d = GetGeometry(0);
   geometry3d->SetIndexToWorldTransform(transform);
   geometry3d->SetBounds(boundingBox->GetBounds());
   /* the objects position is the center of all sub bounding objects */
-  geometry3d->SetOrigin(center);
+  //geometry3d->SetOrigin(center);
 
   GetTimeSlicedGeometry()->InitializeEvenlyTimed(geometry3d, GetTimeSlicedGeometry()->GetTimeSteps());
 }
@@ -175,20 +175,25 @@ unsigned int mitk::BoundingObjectGroup::GetCount() const
   return m_Counter;
 }
 
+bool mitk::BoundingObjectGroup::VerifyRequestedRegion()
+{
+  return m_Counter > 0;
+}
+
 mitk::Geometry3D *  mitk::BoundingObjectGroup::GetGeometry (int t) const
 {
-  if ( m_BoundingObjects == NULL )
-    return mitk::BaseData::GetGeometry();
+  //if ( m_BoundingObjects == NULL )
+    return Superclass::GetGeometry(t);
 
-  mitk::BoundingObjectGroup::BoundingObjectContainer::ConstIterator boI = m_BoundingObjects->Begin();
-  const mitk::BoundingObjectGroup::BoundingObjectContainer::ConstIterator boIEnd = m_BoundingObjects->End();
-  mitk::Geometry3D* currentGeometry = NULL;
+  //mitk::BoundingObjectGroup::BoundingObjectContainer::ConstIterator boI = m_BoundingObjects->Begin();
+  //const mitk::BoundingObjectGroup::BoundingObjectContainer::ConstIterator boIEnd = m_BoundingObjects->End();
+  //mitk::Geometry3D* currentGeometry = NULL;
 
-  while ( boI != boIEnd )
-  {
-    currentGeometry = boI.Value()->GetGeometry( t );
-    boI++;
-  }
+  //while ( boI != boIEnd )
+  //{
+  //  currentGeometry = boI.Value()->GetGeometry( t );
+  //  boI++;
+  //}
 
-  return currentGeometry;
+  //return currentGeometry;
 }

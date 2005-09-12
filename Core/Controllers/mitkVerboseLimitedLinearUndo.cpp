@@ -74,10 +74,6 @@ mitk::VerboseLimitedLinearUndo::StackDescription mitk::VerboseLimitedLinearUndo:
 
     if ( !(*iter)->GetDescription().empty() )  // if there is a description
     {
-      if ( currentDescriptionCount )           // if we have already seen another description
-//        currentDescription += '\n';            // concatenate descriptions with newline
-        currentDescription += " AND ";          // this has to wait until the popup can process multiline items
-   
       if (!dynamic_cast<OperationEvent*>(*iter))
       {
         // anything but an OperationEvent overrides the collected descriptions
@@ -86,6 +82,9 @@ mitk::VerboseLimitedLinearUndo::StackDescription mitk::VerboseLimitedLinearUndo:
       }
       else if (!niceDescriptionFound) // mere descriptive items override OperationEvents' descriptions
       {
+      if ( currentDescriptionCount )            // if we have already seen another description
+        //currentDescription += '\n';             // concatenate descriptions with newline
+        currentDescription += " AND ";          // this has to wait until the popup can process multiline items
         currentDescription += (*iter)->GetDescription();
       }
       
@@ -131,9 +130,6 @@ mitk::VerboseLimitedLinearUndo::StackDescription mitk::VerboseLimitedLinearUndo:
 
     if ( !(*iter)->GetDescription().empty() )  // if there is a description
     {
-      if ( currentDescriptionCount )           // if we have already seen another description
-//        currentDescription += '\n';            // concatenate descriptions with newline
-        currentDescription += " AND ";          // this has to wait until the popup can process multiline items
    
       if (!dynamic_cast<OperationEvent*>(*iter))
       {
@@ -143,6 +139,9 @@ mitk::VerboseLimitedLinearUndo::StackDescription mitk::VerboseLimitedLinearUndo:
       }
       else if (!niceDescriptionFound) // mere descriptive items override OperationEvents' descriptions
       {
+      if ( currentDescriptionCount )            // if we have already seen another description
+        //currentDescription += '\n';             // concatenate descriptions with newline
+        currentDescription += " AND ";          // this has to wait until the popup can process multiline items
         currentDescription += (*iter)->GetDescription();
       }
       

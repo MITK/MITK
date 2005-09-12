@@ -137,7 +137,7 @@ float mitk::Interactor::CalculateJurisdiction(StateEvent const* stateEvent) cons
   }
 
   //compute the center of the data taken care of
-  const mitk::BoundingBox *bBox = GetData()->GetTimeSlicedGeometry()->GetBoundingBox();
+  const mitk::BoundingBox *bBox = GetData()->GetUpdatedTimeSlicedGeometry()->GetBoundingBox();
   if (bBox == NULL)
     return 0;
 

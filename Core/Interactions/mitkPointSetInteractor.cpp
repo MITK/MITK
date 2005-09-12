@@ -85,11 +85,11 @@ float mitk::PointSetInteractor::CalculateJurisdiction(StateEvent const* stateEve
   mitk::PointSet* pointSet = dynamic_cast<mitk::PointSet*>(m_DataTreeNode->GetData());
   if (pointSet != NULL)
   {
-    //if we have a point or more, then check if the have been picked
-    if (pointSet->SearchPoint(disPosEvent->GetWorldPosition(), m_Precision) >-1)
-      returnvalue = 1.0;
+    //if we have one point or more, then check if the have been picked
+    if (pointSet->GetSize()>0)
+      if (pointSet->SearchPoint(disPosEvent->GetWorldPosition(), m_Precision) >-1)
+        returnvalue = 1.0;
   }
-
   return returnvalue;
 }
 

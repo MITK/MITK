@@ -114,11 +114,16 @@ bool mitk::Interactor::ExecuteAction(Action* action, mitk::StateEvent const* sta
   return false;
 }
 
-// \todo consider time! Replace GetTimeSlicedGeometry by GetGeometry(time of stateEvent)
 float mitk::Interactor::CalculateJurisdiction(StateEvent const* stateEvent) const
 {
-  float returnvalue = 0.0;
-  //if it is a key event that can be handled in the current state, then return 0.5
+    //retunrValue for boundingbox
+  float returnvalueBB = 0.0, 
+    //retunrvalue for a existing transition
+    returnvalueTransition = 0.0, 
+    //returnvalue for an existing key transition
+    returnvalueKey = 0.0;
+
+  //if it is a key event that can be handled in the current state
   mitk::DisplayPositionEvent const  *disPosEvent = dynamic_cast <const mitk::DisplayPositionEvent *> (stateEvent->GetEvent());
 
   //Key event handling:
@@ -127,11 +132,7 @@ float mitk::Interactor::CalculateJurisdiction(StateEvent const* stateEvent) cons
     //check, if the current state has a transition waiting for that key event.
     if (this->GetCurrentState()->GetTransition(stateEvent->GetId())!=NULL)
     {
-      return 0.5;
-    }
-    else
-    {
-      return 0;
+      returnvalueKey = 0.5;
     }
   }
 
@@ -141,6 +142,13 @@ float mitk::Interactor::CalculateJurisdiction(StateEvent const* stateEvent) cons
   {
     return 0;
   }
+
+  //if the event can be understood and if there is a transition waiting for that event
+  if (this->GetCurrentState()->GetTransition(stateEvent->GetId())!=NULL)
+  {
+    returnvalueTransition = 0.5;//it can be understood
+  }
+  
 
   //compute the center of the data taken care of
   const mitk::BoundingBox *bBox = GetData()->GetUpdatedTimeSlicedGeometry()->GetBoundingBox();
@@ -154,30 +162,31 @@ float mitk::Interactor::CalculateJurisdiction(StateEvent const* stateEvent) cons
 
   //distance between center and point 
   mitk::BoundingBox::PointType center = bBox->GetCenter();
-  returnvalue = point.EuclideanDistanceTo(center);
+  returnvalueBB = point.EuclideanDistanceTo(center);
 
   //now compared to size of boundingbox to get between 0 and 1;
-  returnvalue = returnvalue/( (bBox->GetMaximum().EuclideanDistanceTo(bBox->GetMinimum() ) ) );
+  returnvalueBB = returnvalueBB/( (bBox->GetMaximum().EuclideanDistanceTo(bBox->GetMinimum() ) ) );
 
   //safety: if by now returnvalue is not in 0 and 1, then return 1!
-  if (returnvalue>1 ||returnvalue<0)
-    return 0;
+  if (returnvalueBB>1 ||returnvalueBB<0)
+    returnvalueBB = 0;
 
   //shall be 1 if short length to center
-  returnvalue = 1 - returnvalue;
+  returnvalueBB = 1 - returnvalueBB;
 
   //check if the given position lies inside the data-object
   if (bBox->IsInside(point))
   {
     //mapped between 0,5 and 1
-    returnvalue = 0.5 + (returnvalue / 2);
+    returnvalueBB = 0.5 + (returnvalueBB/ 2);
   }
   else
   {
     //set it in range between 0 and 0.5
-    returnvalue = returnvalue / 2;
+    returnvalueBB = returnvalueBB / 2;
   }
-  return returnvalue;
+
+  return std::max(returnvalueBB, std::max(returnvalueKey, returnvalueTransition));
 }
 
 void mitk::Interactor::ExecuteOperation(Operation* operation)

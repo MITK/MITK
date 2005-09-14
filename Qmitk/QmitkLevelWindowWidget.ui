@@ -230,6 +230,6 @@
 </functions>
 <layoutdefaults spacing="6" margin="11"/>
 <includehints>
-    <includehint>qsliderlevelwindowwidget.h</includehint>
+    
 </includehints>
 </UI>

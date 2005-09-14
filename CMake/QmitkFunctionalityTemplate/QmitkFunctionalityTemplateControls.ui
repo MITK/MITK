@@ -80,6 +80,6 @@
 </tabstops>
 <layoutdefaults spacing="6" margin="11"/>
 <includehints>
-    <includehint>qmitktreenodeselector.h</includehint>
+    
 </includehints>
 </UI>

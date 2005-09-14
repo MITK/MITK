@@ -130,7 +130,7 @@
 </slots>
 <layoutdefaults spacing="6" margin="11"/>
 <includehints>
-    <includehint>qmitktreenodeselector.h</includehint>
-    <includehint>qmitkvolumetrywidget.h</includehint>
+    
+    
 </includehints>
 </UI>

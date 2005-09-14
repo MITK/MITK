@@ -105,6 +105,6 @@
 </functions>
 <layoutdefaults spacing="6" margin="11"/>
 <includehints>
-    <includehint>qmitkselectableglwidget.h</includehint>
+    
 </includehints>
 </UI>

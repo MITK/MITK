@@ -203,10 +203,10 @@
 </functions>
 <layoutdefaults spacing="0" margin="0"/>
 <includehints>
-    <includehint>qmitkslidernavigator.h</includehint>
-    <includehint>qmitkslidernavigator.h</includehint>
-    <includehint>qmitkslidernavigator.h</includehint>
-    <includehint>qmitkslidernavigator.h</includehint>
-    <includehint>qmitkprimitivemovienavigator.h</includehint>
+    
+    
+    
+    
+    
 </includehints>
 </UI>

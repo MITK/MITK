@@ -1,0 +1,114 @@
+/*=========================================================================
+
+Program:   Medical Imaging & Interaction Toolkit
+Module:    $RCSfile$
+Language:  C++
+Date:      $Date$
+Version:   $Revision$
+
+Copyright (c) German Cancer Research Center, Division of Medical and
+Biological Informatics. All rights reserved.
+See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
+
+This software is distributed WITHOUT ANY WARRANTY; without even
+the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE.  See the above copyright notices for more information.
+
+=========================================================================*/
+
+#include <mitkSeedsInteractor.h>
+
+#include <mitkProperties.h>
+#include <mitkStringProperty.h>
+#include <mitkAction.h>
+#include <mitkDisplayPositionEvent.h>
+#include <mitkOperationEvent.h>
+#include <mitkInteractionConst.h>
+#include <mitkUndoController.h>
+#include <mitkDataTreeNode.h>
+#include <mitkStateEvent.h>
+#include <mitkState.h>
+#include <mitkDrawOperation.h>
+
+mitk::SeedsInteractor::SeedsInteractor(const char * type, mitk::DataTreeNode* dataTreeNode)
+  : mitk::Interactor(type, dataTreeNode)
+{
+  m_Radius = 4;
+}
+
+mitk::SeedsInteractor::~SeedsInteractor()
+{
+}
+
+
+bool mitk::SeedsInteractor::ExecuteAction(mitk::Action* action, mitk::StateEvent const* stateEvent)
+{
+  const mitk::DisplayPositionEvent* posEvent = dynamic_cast<const mitk::DisplayPositionEvent*>(stateEvent->GetEvent());
+  if (posEvent == NULL)
+    return false;
+  
+  event_point = posEvent->GetWorldPosition();
+
+  m_SeedsImage = dynamic_cast<mitk::SeedsImage*>(m_DataTreeNode->GetData());
+
+
+  bool ok = false;
+  switch (action->GetActionId())
+  {
+  case mitk::AcINITFOREGROUND:
+    {
+      m_DrawState = 255;
+      ok = true;
+      break;
+    }
+  case mitk::AcINITBACKGROUND:
+    {
+      m_DrawState = 254;
+      ok = true;
+      break;
+    }
+  case mitk::AcINITNEUTRAL:
+    {
+      m_DrawState = 0;
+      ok = true;
+      break;
+    }
+  case mitk::AcADD:
+    {
+			last_point = event_point;
+      mitk::DrawOperation* doOp = new mitk::DrawOperation(OpADD, event_point, last_point, m_DrawState, m_Radius);
+      if (m_UndoEnabled){	//write to UndoMechanism/ Can probably be removed!
+        mitk::DrawOperation* undoOp = new mitk::DrawOperation(OpREMOVE, event_point, last_point, m_DrawState, m_Radius);
+        mitk::OperationEvent *operationEvent = new mitk::OperationEvent(m_SeedsImage, doOp, undoOp);
+			  m_UndoController->SetOperationEvent(operationEvent);
+	    }
+		  //execute the Operation
+		  m_SeedsImage->ExecuteOperation(doOp);
+      ok = true;
+      break;
+    }
+  case mitk::AcMOVE:
+    {
+			last_point = event_point;
+      mitk::DrawOperation* doOp = new mitk::DrawOperation(OpMOVE, event_point, last_point, m_DrawState, m_Radius);
+      if (m_UndoEnabled){	//write to UndoMechanism/ Can probably be removed!
+        mitk::DrawOperation* undoOp = new mitk::DrawOperation(OpREMOVE, event_point, last_point, m_DrawState, m_Radius);
+        mitk::OperationEvent *operationEvent = new mitk::OperationEvent(m_SeedsImage, doOp, undoOp);
+			  m_UndoController->SetOperationEvent(operationEvent);
+	    }
+		  //execute the Operation
+		  m_SeedsImage->ExecuteOperation(doOp);   
+      ok = true;
+      break;
+    }
+  case mitk::AcFINISH:
+    {
+			last_point = event_point;
+      ok = true;
+      break;
+    }
+  default:
+    return Superclass::ExecuteAction( action, stateEvent );
+  }
+  return ok;
+}

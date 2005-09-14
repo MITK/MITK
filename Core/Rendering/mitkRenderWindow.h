@@ -34,6 +34,8 @@ namespace mitk {
 //## @ingroup Renderer
 class RenderWindow
 {
+  friend class RenderingManager;
+
 public:
   typedef std::set<RenderWindow*> RenderWindowSet;
 
@@ -77,25 +79,14 @@ public:
 
   //##ModelId=3EF59AD202D5
   //##Documentation
-  //## @brief Updates and repaints the contents of the renderwindow, if necessary.
-  //##
-  //## Repainting may be scheduled as a paint event for processing o optimize for 
-  //## more speed and less flicker than a call to Repaint() does.
-  virtual void Update();
+  //## Requests a repaint of this RenderWindow. The RenderingManager will
+  //## execute the repaint when appropriate, depending on its update interval.
+  virtual void RequestUpdate();
 
   //##Documentation
-  //## @brief Immediately repaints the contents of the renderwindow
-  //##
-  //## Renderwindow will be updated before repainting. 
-  virtual void Repaint();
+  //## Asks the RenderingManager to immediately repaint this RenderWindow.
+  virtual void ForceImmediateUpdate();
 
-  //##Documentation
-  //## @brief Updates the contents of all renderwindows
-  static void UpdateAllInstances() {
-    for (RenderWindowSet::iterator iter = instances.begin();iter != instances.end();iter++) {
-      (*iter)->Update();
-    }
-  }
   static const RenderWindowSet& GetInstances() {
     return instances;
   } 
@@ -140,6 +131,11 @@ public:
   } 
 
 protected:
+  //##Documentation
+  //## Abstract method for repainting the RenderWindow. This method has to be
+  //## implemented by subclasses.
+  virtual void Repaint() {};
+
   VtkRenderWindow* m_MitkVtkRenderWindow;
 
   static RenderWindowSet instances;

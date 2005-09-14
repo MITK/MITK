@@ -416,7 +416,7 @@ void QcMITKSamplePlugin::selectSerie (QcLightbox* lightbox)
       ap->SetStandardViewsInitialized(ap->GetMultiWidget()->InitializeStandardViews(&it));
     }
 
-    ap->GetMultiWidget()->Repaint();
+    ap->GetMultiWidget()->RequestUpdate();
     ap->GetMultiWidget()->Fit();
 
   }

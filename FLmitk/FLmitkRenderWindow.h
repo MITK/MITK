@@ -29,26 +29,20 @@ class FLmitkRenderWindow : public mitk::RenderWindow, public Fl_Gl_Window {
   //## if the two windows use different formats.
   virtual bool IsSharing () const { return false;}
 
-  //##ModelId=3EF59AD202D5
-  //##Documentation
-  //## @brief Updates and repaints the contents of the renderwindow, if necessary.
-  //##
-  //## Repainting may be scheduled as a paint event for processing o optimize for 
-  //## more speed and less flicker than a call to Repaint() does.
-  virtual void Update() { invalidate();  std::cout << "Update() called" << std::endl; }
-
   //##Documentation
   //## @brief Immediately repaints the contents of the renderwindow
   //##
   //## Renderwindow will be updated before repainting. 
-  virtual void Repaint() { std::cout << "Repaint() called" << std::endl; }
   virtual void paint() { std::cout << "paint() called" << std::endl; }
   virtual void InitRenderer();
   virtual void draw();
   virtual int handle(int event) { return Fl_Gl_Window::handle(event); }
   virtual ~FLmitkRenderWindow() {};
   virtual void resize(int x, int y, int w, int h);
-  protected:
+
+protected:
+  virtual void Repaint() { invalidate(); }
+
   //##ModelId=3E3314590288
   bool m_InitNeeded;
   bool m_ResizeNeeded;

@@ -16,15 +16,15 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#include <mitkSeedsImage.h>
+#include "mitkSeedsImage.h"
 
-#include <mitkOperation.h>
-#include <mitkOperationActor.h>
-#include <mitkDrawOperation.h>
-#include <mitkImageAccessByItk.h>
-#include <mitkInteractionConst.h>
+#include "mitkOperation.h"
+#include "mitkOperationActor.h"
+#include "mitkDrawOperation.h"
+#include "mitkImageAccessByItk.h"
+#include "mitkInteractionConst.h"
 
-#include <mitkRenderWindow.h>//*\todo remove later, when update ok!
+#include "mitkRenderingManager.h"
 
 void mitk::SeedsImage::ExecuteOperation(mitk::Operation* operation)
 {
@@ -64,7 +64,9 @@ void mitk::SeedsImage::ExecuteOperation(mitk::Operation* operation)
       }
 		}
     this->Modified();
-    mitk::RenderWindow::UpdateAllInstances(); //*todo has to be done here, cause of update-pipeline not working yet
+    
+    //*todo has to be done here, cause of update-pipeline not working yet
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
 }
 

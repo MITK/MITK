@@ -160,5 +160,5 @@ void QmitkSimpleExampleFunctionality::stereoSelectionChanged( int id )
     break;
   }
   multiWidget->mitkWidget4->GetRenderer()->SetMapperID(2);
-  multiWidget->mitkWidget4->GetRenderer()->GetRenderWindow()->Repaint();
+  multiWidget->mitkWidget4->GetRenderer()->GetRenderWindow()->RequestUpdate();
 }

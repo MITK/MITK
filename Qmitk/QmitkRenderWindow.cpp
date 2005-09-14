@@ -22,6 +22,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkRenderWindow.h"
 #include <qcursor.h>
 #include "mitkDisplayPositionEvent.h"
+#include "QmitkRenderingManagerFactory.h"
+
 //##ModelId=3E1EB4410304
 QmitkRenderWindow::QmitkRenderWindow(mitk::BaseRenderer* renderer, QGLFormat glf, QWidget *parent, const char *name) 
   : QGLWidget(glf, parent, name), mitk::RenderWindow(name, renderer), m_InitNeeded(false), m_ResizeNeeded(false), m_InResize(false)
@@ -207,19 +209,8 @@ void QmitkRenderWindow::keyPressEvent(QKeyEvent *ke)
   }
 }
 
-//##ModelId=3EF59AD202B7
-//check for update
-void QmitkRenderWindow::Update()
-{
-  update();
-};
-
-//force an update
 void QmitkRenderWindow::Repaint()
 {
-  //hide();//strongest update! but flickering widgets in zoom!
-  //show();
-  //updateGL();//not strong enough
   repaint();
 };
 
@@ -242,6 +233,9 @@ QSize QmitkRenderWindow::sizeHint () const
 void QmitkRenderWindow::focusInEvent(QFocusEvent*)  {};
 //##ModelId=3E6D5DD403E2
 void QmitkRenderWindow::focusOutEvent(QFocusEvent*) {}; 
+
+// Create and register RenderingManagerFactory for this platform.
+QmitkRenderingManagerFactory qmitkRenderingManagerFactory;
 
 //We have to put this in a file containing a class that is directly used
 //somewhere. Otherwise, e.g. when put in VtkRenderWindowInteractor.cpp, 

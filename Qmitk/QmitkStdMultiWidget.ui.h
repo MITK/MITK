@@ -101,11 +101,12 @@ void QmitkStdMultiWidget::init()
   multiplexUpdateController->AddRenderWindow(mitkWidget4->GetRenderer()->GetRenderWindow());
 
   //connect sliceNavigationControllers to update-controller
-  mitkWidget1->GetSliceNavigationController()->ConnectRepaintRequest(multiplexUpdateController.GetPointer());
-  mitkWidget2->GetSliceNavigationController()->ConnectRepaintRequest(multiplexUpdateController.GetPointer());
-  mitkWidget3->GetSliceNavigationController()->ConnectRepaintRequest(multiplexUpdateController.GetPointer());
-  mitkWidget4->GetSliceNavigationController()->ConnectRepaintRequest(multiplexUpdateController.GetPointer());
-  timeNavigationController->ConnectRepaintRequest(multiplexUpdateController.GetPointer());
+  mitkWidget1->GetSliceNavigationController()->ConnectUpdateRequest(multiplexUpdateController.GetPointer());
+  mitkWidget2->GetSliceNavigationController()->ConnectUpdateRequest(multiplexUpdateController.GetPointer());
+  mitkWidget3->GetSliceNavigationController()->ConnectUpdateRequest(multiplexUpdateController.GetPointer());
+  mitkWidget4->GetSliceNavigationController()->ConnectUpdateRequest(multiplexUpdateController.GetPointer());
+  
+  timeNavigationController->ConnectUpdateRequest(multiplexUpdateController.GetPointer());
 
   // instantiate display interactor
   m_MoveAndZoomInteractor = new mitk::DisplayVectorInteractor("moveNzoom", new mitk::DisplayInteractor() );
@@ -508,14 +509,30 @@ bool QmitkStdMultiWidget::InitializeStandardViews(mitk::DataTreeIteratorBase * i
       if ( (diagonalLength > mitk::eps) && (diagonalLength < mitk::large) )
       {
         boundingBoxInitialized=true;
+        
         multiplexUpdateController->SetBlockUpdate(true);
-        sliceNavigatorTransversal->SetInputWorldGeometry(geometry.GetPointer()); sliceNavigatorTransversal->Update();
-        sliceNavigatorSagittal->SetInputWorldGeometry(geometry.GetPointer());    sliceNavigatorSagittal->Update();
-        sliceNavigatorFrontal->SetInputWorldGeometry(geometry.GetPointer());     sliceNavigatorFrontal->Update();
-        sliceNavigatorWidget4->SetInputWorldGeometry(geometry.GetPointer());     sliceNavigatorWidget4->Update();
-        timeNavigationController->SetInputWorldGeometry(geometry.GetPointer());  timeNavigationController->Update();
+        
+        sliceNavigatorTransversal->SetInputWorldGeometry(geometry.GetPointer());
+        sliceNavigatorTransversal->Update();
+
+        sliceNavigatorSagittal->SetInputWorldGeometry(geometry.GetPointer());
+        sliceNavigatorSagittal->Update();
+
+        sliceNavigatorFrontal->SetInputWorldGeometry(geometry.GetPointer());
+        sliceNavigatorFrontal->Update();
+
+        sliceNavigatorWidget4->SetInputWorldGeometry(geometry.GetPointer());
+        sliceNavigatorWidget4->Update();
+
+        timeNavigationController->SetInputWorldGeometry(geometry.GetPointer());
+        timeNavigationController->Update();
+
         multiplexUpdateController->SetBlockUpdate(false);
-        multiplexUpdateController->UpdateRequest();
+
+        // Temporary solution: Use RepaintRequest instead of UpdateRequest so
+        // that Fit() resets the camera according to the new geometry.
+        //multiplexUpdateController->UpdateRequest();
+        multiplexUpdateController->RepaintRequest();
         Fit();
       }
     }
@@ -563,12 +580,20 @@ bool QmitkStdMultiWidget::InitializeStandardViews( mitk::Geometry3D * geometry )
   return boundingBoxInitialized;
 }
 
-void QmitkStdMultiWidget::Repaint()
+void QmitkStdMultiWidget::RequestUpdate()
 {
-  mitkWidget1->GetRenderer()->GetRenderWindow()->Repaint();
-  mitkWidget2->GetRenderer()->GetRenderWindow()->Repaint();
-  mitkWidget3->GetRenderer()->GetRenderWindow()->Repaint();
-  mitkWidget4->GetRenderer()->GetRenderWindow()->Repaint();
+  mitkWidget1->GetRenderer()->GetRenderWindow()->RequestUpdate();
+  mitkWidget2->GetRenderer()->GetRenderWindow()->RequestUpdate();
+  mitkWidget3->GetRenderer()->GetRenderWindow()->RequestUpdate();
+  mitkWidget4->GetRenderer()->GetRenderWindow()->RequestUpdate();
+}
+
+void QmitkStdMultiWidget::ForceImmediateUpdate()
+{
+  mitkWidget1->GetRenderer()->GetRenderWindow()->ForceImmediateUpdate();
+  mitkWidget2->GetRenderer()->GetRenderWindow()->ForceImmediateUpdate();
+  mitkWidget3->GetRenderer()->GetRenderWindow()->ForceImmediateUpdate();
+  mitkWidget4->GetRenderer()->GetRenderWindow()->ForceImmediateUpdate();
 }
 
 void QmitkStdMultiWidget::wheelEvent( QWheelEvent * e )
@@ -659,7 +684,7 @@ void QmitkStdMultiWidget::changeLevelWindow(mitk::LevelWindow* lw)
     levWin.SetRangeMax(lw->GetRangeMax());
 
     topLevWinProp->SetLevelWindow(levWin);
-    Repaint();
+    this->RequestUpdate();
   }
 } // changeLevelWindow()
 
@@ -684,3 +709,5 @@ void QmitkStdMultiWidget::AdjustCross()
   }
   delete stateEvent;  
 }
+
+

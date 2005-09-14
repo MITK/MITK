@@ -117,7 +117,7 @@ void  QmitkMaterialShowcase::SetOpacity( vtkFloatingPointType opacity )
 
 void QmitkMaterialShowcase::UpdateRenderWindow()
 {
-    m_SelectableGLWidget->GetRenderWindow()->Update();
+    m_SelectableGLWidget->GetRenderWindow()->RequestUpdate();
 }
 
 

@@ -6,9 +6,12 @@
 #include <mitkProperties.h>
 
 #include <mitkSurface.h>
+#include <mitkRenderingManager.h>
 
 #include <vtkMarchingCubes.h>
 #include <vtkSTLWriter.h>
+
+
 
 //##Documentation
 //## @brief Convert result of region-grower into a surface
@@ -40,7 +43,7 @@ void Step7::StartRegionGrowing()
     mitk::DataTreePreOrderIterator it(m_Tree);
     it.Add(surfaceNode);
 
-    mitk::RenderWindow::UpdateAllInstances();
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
 }
 

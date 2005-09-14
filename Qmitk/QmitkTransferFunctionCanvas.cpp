@@ -5,6 +5,7 @@
 #include "QmitkTransferFunctionCanvas.h"
 #include <assert.h>
 #include "mitkRenderWindow.h"
+#include "mitkRenderingManager.h"
 #include <cmath>
 
 QmitkTransferFunctionCanvas::QmitkTransferFunctionCanvas(QWidget * parent, const char * name, WFlags f) : QWidget(parent, name, f), m_GrabbedHandle(NULL), m_GrabbedElement(NULL) {
@@ -73,7 +74,7 @@ void QmitkTransferFunctionCanvas::mouseDoubleClickEvent(QMouseEvent* mouseEvent)
       elem->m_Blue = result.blue();
       this->update();
       m_TransferFunction->UpdateVtkFunctions();
-      mitk::RenderWindow::UpdateAllInstances();
+      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
   }
 }
@@ -118,7 +119,7 @@ void QmitkTransferFunctionCanvas::mousePressEvent( QMouseEvent* mouseEvent ) {
   update();
   
   m_TransferFunction->UpdateVtkFunctions();
-  mitk::RenderWindow::UpdateAllInstances();
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 
 }
 
@@ -146,7 +147,7 @@ void QmitkTransferFunctionCanvas::mouseMoveEvent( QMouseEvent* mouseEvent ) {
     m_MoveStart = std::make_pair(mouseEvent->x(),mouseEvent->y());
     update();
     m_TransferFunction->UpdateVtkFunctions();
-    mitk::RenderWindow::UpdateAllInstances();
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
 }
 /*  Alter TriElement Code

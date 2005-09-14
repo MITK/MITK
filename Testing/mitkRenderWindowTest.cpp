@@ -78,7 +78,7 @@ int mitkRenderWindowTest(int argc, char* argv[])
   // interact with data
   mitk::NativeRenderWindowInteractor::Pointer iren = mitk::NativeRenderWindowInteractor::New();
     iren->SetMitkRenderWindow(renderwindow);
-  renderwindow->Update();
+  renderwindow->RequestUpdate();
 //  iren->Start();
 
   cone->Delete();

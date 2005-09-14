@@ -34,6 +34,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkDataTreeNode.h"
 #include "mitkRenderWindow.h"
 #include "mitkDataTreeHelper.h"
+#include "mitkRenderingManager.h"
 
 #include <qdir.h>
 #include <qfiledialog.h>
@@ -80,7 +81,7 @@ void QmitkVolumetryWidget::SetDataTreeNode(mitk::DataTreeNode* node)
         m_CalcButton->setEnabled(true);
       }
       UpdateSlider();
-      mitk::RenderWindow::UpdateAllInstances();
+      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     }
   }
 }
@@ -167,7 +168,11 @@ void QmitkVolumetryWidget::UpdateSliderLabel()
 
 void QmitkVolumetryWidget::m_ThresholdSlider_valueChanged( int value)
 {
-  if (m_OverlayNode) {m_OverlayNode->SetLevelWindow(mitk::LevelWindow(value,1)); mitk::RenderWindow::UpdateAllInstances();}
+  if (m_OverlayNode)
+  {
+    m_OverlayNode->SetLevelWindow(mitk::LevelWindow(value,1));
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  }
 }
 
 void QmitkVolumetryWidget::CreateOverlayChild()

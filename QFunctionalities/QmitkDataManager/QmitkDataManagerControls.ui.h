@@ -31,6 +31,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkProperties.h"
 #include "mitkEventMapper.h"
 #include "mitkFocusManager.h"
+#include "mitkRenderingManager.h"
 #include "itkImage.h"
 
 #include <itksys/SystemTools.hxx>
@@ -161,7 +162,7 @@ void QmitkDataManagerControls::RemoveButtonClicked()
             assert(selectedIterator.IsNotNull());
             delete selected;
             selectedIterator->Remove();
-            mitk::RenderWindow::UpdateAllInstances();
+            mitk::RenderingManager::GetInstance()->RequestUpdateAll();
           }
           break;
         case 1: //"No" clicked
@@ -260,8 +261,7 @@ void QmitkDataManagerControls::m_ReInitButton_clicked()
     if (node != NULL )
     {
       mitk::BaseData::Pointer basedata = node->GetData();
-      emit InitializeStandardViews( basedata.GetPointer() );
-      mitk::RenderWindow::UpdateAllInstances();
+      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     }
   }
 }

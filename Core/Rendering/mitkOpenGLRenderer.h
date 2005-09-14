@@ -24,7 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkBaseRenderer.h"
 #include "mitkDataTree.h"
 #include "mitkImageSliceSelector.h"
-
+#include "mitkRenderingManager.h"
 
 #include "picimage.h"
 
@@ -104,24 +104,6 @@ public:
 
   virtual void PickWorldPoint(const Point2D& displayPoint, Point3D& worldPoint) const;
 
-  //##Documentation
-  //## @brief Updates the contents of all renderwindows
-  static void UpdateAllInstancesIncludingVtkActors() 
-  {
-    const RenderWindow::RenderWindowSet& instances = RenderWindow::GetInstances();
-    for (RenderWindow::RenderWindowSet::const_iterator iter = instances.begin();iter != instances.end();iter++) 
-    {
-      OpenGLRenderer * openglrenderer = dynamic_cast<OpenGLRenderer*>((BaseRenderer*)((*iter)->GetRenderer()));
-      if(openglrenderer)
-      {
-        openglrenderer->UpdateIncludingVtkActors();
-        openglrenderer->GetRenderWindow()->Repaint();
-
-      }
-      else
-        (*iter)->Update();
-    }
-  }
 protected:
   //##ModelId=3E33145B005A
   virtual void Paint();

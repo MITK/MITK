@@ -45,7 +45,7 @@ void QmitkSliceWidget::init()
   m_SliceNavigator = new mitk::SliceNavigationController(NULL);
   m_SliceNavigator->SetViewDirection(mitk::SliceNavigationController::Transversal);
   m_SliceNavigator->ConnectGeometrySliceEvent(m_Renderer.GetPointer());
-  m_SliceNavigator->ConnectRepaint(m_RenderWindow);
+  m_SliceNavigator->ConnectUpdate(m_RenderWindow);
   new QmitkStepperAdapter(m_NavigatorWidget, m_SliceNavigator->GetSlice(), "navigation");  
   
   SetLevelWindowEnabled(true);
@@ -190,7 +190,7 @@ void QmitkSliceWidget::InitWidget( mitk::SliceNavigationController::ViewDirectio
   }
 
   GetRenderer()->GetDisplayGeometry()->Fit();
-  GetRenderer()->GetRenderWindow()->Repaint();
+  GetRenderer()->GetRenderWindow()->RequestUpdate();
   GetRenderer()->Update();
   //int w=vtkObject::GetGlobalWarningDisplay();
   //vtkObject::GlobalWarningDisplayOff();  
@@ -231,14 +231,14 @@ void QmitkSliceWidget::ChangeLevelWindow(mitk::LevelWindow* lw )
     }
     ++it;
   }
-  GetRenderer()->GetRenderWindow()->Repaint();
+  GetRenderer()->GetRenderWindow()->RequestUpdate();
 }
 
 
 void QmitkSliceWidget::UpdateGL()
 {
   GetRenderer()->GetDisplayGeometry()->Fit();
-  GetRenderer()->GetRenderWindow()->Repaint();
+  GetRenderer()->GetRenderWindow()->RequestUpdate();
 }
 
 void QmitkSliceWidget::mousePressEvent( QMouseEvent * e )

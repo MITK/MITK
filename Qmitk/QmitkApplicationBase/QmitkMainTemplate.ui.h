@@ -358,7 +358,7 @@ void QmitkMainTemplate::fileOpenGetFactoryOutput( mitk::DataTreeNodeFactory & fa
           mitkMultiWidget->changeLayoutToWidget1();
         }
     }
-    mitkMultiWidget->Repaint();
+    mitkMultiWidget->RequestUpdate();
     mitkMultiWidget->Fit();
   }
 } // fileOpenGetFactoryOutput()

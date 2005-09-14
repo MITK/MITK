@@ -166,7 +166,7 @@ void mitk::OpenGLRenderer::UpdateIncludingVtkActors()
   // }
 
   // Layer sceme to be able to sort the painting order.
-  // Nodes, without a layer are painted last, cause their order has no meaning.
+  // Nodes without a layer are painted last, because their order has no meaning.
   // Nodes with a high layer are painted first (e.g. data necessary for stencil-buffer)
   if (m_DataTreeIterator.IsNotNull())
   {
@@ -554,7 +554,7 @@ void mitk::OpenGLRenderer::DataChangedEvent(const itk::Object *caller, const itk
 {
   if(m_RenderWindow!=NULL)
   {
-    m_RenderWindow->Update();
+    m_RenderWindow->RequestUpdate();
   }
 }
 

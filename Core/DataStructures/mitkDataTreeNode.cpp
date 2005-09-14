@@ -26,11 +26,12 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkColorProperty.h"
 #include "mitkLevelWindowProperty.h"
 #include "mitkGeometry3D.h"
-#include <mitkXMLWriter.h>
-#include <mitkXMLReader.h>
-#include <mitkGlobalInteraction.h>
-#include <mitkEventMapper.h>
-#include <mitkRenderWindow.h>
+#include "mitkRenderingManager.h"
+#include "mitkXMLWriter.h"
+#include "mitkXMLReader.h"
+#include "mitkGlobalInteraction.h"
+#include "mitkEventMapper.h"
+#include "mitkRenderWindow.h"
 
 const std::string mitk::DataTreeNode::XML_NODE_NAME = "dataTreeNode";
 
@@ -483,7 +484,7 @@ bool mitk::DataTreeNode::ReadXMLData( XMLReader& xmlReader )
       globalInteraction->AddInteractor( m_Interactor );
     }
     xmlReader.GotoParent();
-    mitk::RenderWindow::UpdateAllInstances();
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
 
   if ( xmlReader.Goto( PropertyList::XML_NODE_NAME ) ) {

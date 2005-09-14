@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkProperties.h"
 #include "mitkColorProperty.h"
 #include "mitkPropertyManager.h"
+#include "mitkRenderingManager.h"
 
 #include <qcheckbox.h>
 #include <qlineedit.h>
@@ -152,13 +153,13 @@ QmitkPropertyListViewItem* QmitkPropertyListViewItem::CreateInstance(mitk::Prope
 void QmitkPropertyListViewItem::CheckBoxControlActivated(bool on)
 {
   m_PropertyList->SetProperty(m_Name.c_str(), new mitk::BoolProperty(on));
-  mitk::RenderWindow::UpdateAllInstances();
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkPropertyListViewItem::StringControlActivated(const QString &text)
 {
   m_PropertyList->SetProperty(m_Name.c_str(), new mitk::StringProperty(text.ascii()));
-  mitk::RenderWindow::UpdateAllInstances();
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 void QmitkPropertyListViewItem::FloatControlActivated(const QString &text)
 {
@@ -176,7 +177,7 @@ void QmitkPropertyListViewItem::FloatControlActivated(const QString &text)
   {
     m_Control->setPaletteForegroundColor(Qt::red);
   }
-  mitk::RenderWindow::UpdateAllInstances();
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 void QmitkPropertyListViewItem::IntControlActivated(const QString &text)
 {
@@ -194,7 +195,7 @@ void QmitkPropertyListViewItem::IntControlActivated(const QString &text)
   {
     m_Control->setPaletteForegroundColor(Qt::red);
   }
-  mitk::RenderWindow::UpdateAllInstances();
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 void QmitkPropertyListViewItem::ColorControlActivated()
 {
@@ -209,7 +210,7 @@ void QmitkPropertyListViewItem::ColorControlActivated()
     colorProp->SetColor(col);
     m_PropertyList->InvokeEvent(itk::ModifiedEvent());
     m_Control->setPaletteBackgroundColor(result);
-    mitk::RenderWindow::UpdateAllInstances();
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
 }
 void QmitkPropertyListViewItem::UpdateView()
@@ -272,14 +273,14 @@ void QmitkPropertyListViewItem::EnabledButtonClicked()
   //baseProp->SetEnabled(! baseProp->GetEnabled());
   m_PropertyList->SetEnabled(m_Name.c_str(), ! m_PropertyList->IsEnabled(m_Name.c_str()));
   UpdateEnabledView();
-  mitk::RenderWindow::UpdateAllInstances();
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void  QmitkPropertyListViewFloatSlider::SliderValueChanged(int value)
 {
   m_PropertyList->SetProperty(m_Name.c_str(), new mitk::FloatProperty(value / 100.0f));
   UpdateView();
-  mitk::RenderWindow::UpdateAllInstances();
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 void QmitkPropertyListViewFloatSlider::UpdateView()
 {

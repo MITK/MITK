@@ -191,7 +191,7 @@ public:
   {
     typedef typename itk::SimpleMemberCommand<T>::Pointer SimpleMemberCommandPointer;
     SimpleMemberCommandPointer eventSimpleCommand = itk::SimpleMemberCommand<T>::New();
-    eventSimpleCommand->SetCallbackFunction(receiver, &T::Update);
+    eventSimpleCommand->SetCallbackFunction(receiver, &T::RequestUpdate);
     AddObserver(UpdateEvent(), eventSimpleCommand);
   }
 
@@ -199,7 +199,7 @@ public:
   {
     typedef typename itk::SimpleMemberCommand<T>::Pointer SimpleMemberCommandPointer;
     SimpleMemberCommandPointer eventSimpleCommand = itk::SimpleMemberCommand<T>::New();
-    eventSimpleCommand->SetCallbackFunction(receiver, &T::Repaint);
+    eventSimpleCommand->SetCallbackFunction(receiver, &T::ForceImmediateUpdate);
     AddObserver(UpdateEvent(), eventSimpleCommand);
   }
 

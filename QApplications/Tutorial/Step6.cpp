@@ -15,6 +15,8 @@
 #include <mitkImageAccessByItk.h>
 #include <mitkDataTreeHelper.h>
 
+#include <mitkRenderingManager.h>
+
 #include <qhbox.h>
 #include <qvbox.h>
 #include <qpushbutton.h>
@@ -61,7 +63,7 @@ void Step6::StartRegionGrowing()
 {
   AccessByItk_1(m_FirstImage, RegionGrowing, this);
 
-  mitk::RenderWindow::UpdateAllInstances();
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void Step6::Load(int argc, char* argv[])

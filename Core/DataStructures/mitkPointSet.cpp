@@ -18,14 +18,15 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include "mitkPointSet.h"
-#include <mitkOperation.h>
-#include <mitkOperationActor.h>
-#include <mitkPointOperation.h>
+#include "mitkOperation.h"
+#include "mitkOperationActor.h"
+#include "mitkPointOperation.h"
 #include "mitkInteractionConst.h"
-#include <mitkXMLWriter.h>
-#include <mitkXMLReader.h>
-#include <mitkPointSetWriter.h>
-#include <mitkPointSetReader.h>
+#include "mitkXMLWriter.h"
+#include "mitkXMLReader.h"
+#include "mitkPointSetWriter.h"
+#include "mitkPointSetReader.h"
+#include "mitkRenderingManager.h"
 
 
 #include "mitkRenderWindow.h"//*\todo remove later, when update ok!
@@ -244,7 +245,8 @@ void mitk::PointSet::ExecuteOperation(Operation* operation)
   mitk::OperationEndEvent endevent(operation);
   ((const itk::Object*)this)->InvokeEvent(endevent);
 
-  mitk::RenderWindow::UpdateAllInstances(); //*todo has to be done here, cause of update-pipeline not working yet
+  //*todo has to be done here, cause of update-pipeline not working yet
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 //##ModelId=3F0177E901EE

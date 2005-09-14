@@ -82,7 +82,7 @@ renderwindow->GetRenderer()->InitSize(400,400); //ohne dies leider kein Bild. Ve
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "RenderWindow::Update(): ";
-  renderwindow->Update();
+  renderwindow->RequestUpdate();
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "Testing if an mitk::ImageMapper2D was created: ";

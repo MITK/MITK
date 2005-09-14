@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkRenderWindow.h"
 #include "mitkVtkRenderWindow.h"
 #include "mitkOpenGLRenderer.h"
+#include "mitkRenderingManager.h"
 #include <assert.h>
 
 std::set<mitk::RenderWindow*> mitk::RenderWindow::instances;
@@ -32,12 +33,18 @@ mitk::RenderWindow::RenderWindow(const char *name, mitk::BaseRenderer* renderer)
   else
     m_Name = name;
   instances.insert(this);
+
+  RenderingManager::GetInstance()->AddRenderWindow( this );
+
   m_MitkVtkRenderWindow = mitk::VtkRenderWindow::New();
 }
 
 mitk::RenderWindow::~RenderWindow()
 {
   instances.erase(this);
+
+  RenderingManager::GetInstance()->RemoveRenderWindow( this );
+
   m_Renderer = NULL;
   m_MitkVtkRenderWindow->Delete(); //xxx
 }
@@ -57,16 +64,14 @@ bool mitk::RenderWindow::IsSharing () const
   return false;
 }
 
-void mitk::RenderWindow::Update()
+void mitk::RenderWindow::RequestUpdate()
 {
-  m_MitkVtkRenderWindow->MakeCurrent();
-  m_MitkVtkRenderWindow->Render();
+  mitk::RenderingManager::GetInstance()->RequestUpdate( this );
 }
 
-void mitk::RenderWindow::Repaint()
+void mitk::RenderWindow::ForceImmediateUpdate()
 {
-  m_MitkVtkRenderWindow->MakeCurrent();
-  m_MitkVtkRenderWindow->Render();
+  mitk::RenderingManager::GetInstance()->ForceImmediateUpdate( this );
 }
 
 void mitk::RenderWindow::SetSize(int w, int h)
@@ -105,4 +110,5 @@ void mitk::RenderWindow::SetVtkRenderWindow(VtkRenderWindow* renWin)
     InitRenderer();
   }
 }
+
 

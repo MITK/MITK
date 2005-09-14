@@ -25,7 +25,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkBaseRenderer.h"
 #include "mitkRenderWindow.h"
 
-
 //##ModelId=3DD521FB01A9
 //##Documentation
 //## @brief Qt implementation of mitk::RenderWindow
@@ -53,11 +52,6 @@ public:
 
   virtual bool IsSharing () const;
 
-  //##ModelId=3EF59AD202B7
-  virtual void Update();
-
-  virtual void Repaint();
-
   virtual QSize minimumSizeHint () const;
 
   virtual QSizePolicy sizePolicy() const;
@@ -65,6 +59,8 @@ public:
   virtual QSize sizeHint () const;
 
 protected:
+  virtual void Repaint();
+
   //##ModelId=3E3314590396
   virtual void paintGL();
 
@@ -103,6 +99,7 @@ public:
   virtual void focusInEvent(QFocusEvent*);
   //##ModelId=3E6D5DD403E2
   virtual void focusOutEvent(QFocusEvent*); 
+
 };
 
 #endif /* QMITKRENDERWINDOW_H_HEADER_INCLUDED_C1C40D66 */

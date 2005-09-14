@@ -140,7 +140,7 @@
 </customwidgets>
 <images>
     <image name="image0">
-        <data format="PNG" length="988">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b000003a349444154789ccd955d4c9b5518c77fe7bc2fed5b5a3e6ad752441c4358a626e82e26498d330abb309105bc305e6ed16b17e3ad31d9e59265deb345bdd2b02bb3cd0bf7a1c440a3896d700e90e29041da0242a17ddbd2aff71c2f8a899de047a289cfd53927e7f9e59fffffe439221a8df25f94f9f0412c16d3e9741adbb6ff162097cbb1b0b0403c1e67727252ec0bce151fe8be811247068a549d2242088404d30429eb6b3468adeb0d42e028c5f2cf2ef415834824a2a3d1a86800c76231dd3750626dfb16197b919ab38bdba370aa161b2983cc6619b48b470e35f1e891325e5f8d6a558310983e08868dfdad48a7d3f40e14c9d88b54750ecbe361e95e13776ee499ff7e1728eeddf4d273d4e2d4580b832f1a285d000d9647ee0fb66d9b8a53a4e614b03c1ebefd0a26c6d70189b7c5a4b73f847409d22b159613bb5cbe50606d25c06b675c68ca28a5f707d72d13b83db074cf64627c0d500c8d74303c62e00f094ccba1546c63fa668589f15fb8fe699a8e702fc3631652161ac00dfa8504a76a71fb9a0dd4187a35c4eb6f35d11e2e605a39b6372cee5c2f726ab49933e78280c9679f6c626f490c4334801b149b266c240d123f94696d6d65f8b489923b988681bdd3c64797f2cccd64d85aaff0e63b41a66e7a49cc6649ccfb311e7ab80d8aa5146c6d95519438fc84853f28304d8342d6cff8059bb9990c8143cd0cbed082b7adc4b1679aebc1af5611f280f0ea1e83502e40215d0ac372d8def0f3f10779e6676c40e1769b747637615a450c57bd5d69136934821b7702fc41017849ae5629ef3633fd6585b9990cededcd84c3eda4923b5c7c2fc5fd193fc9fb252492aec75d48a10e56ac1574f5d438dce7e1c14f45a6bea870fa0d2fd92d3fcf3def23dce5e6e2fb3552cb3b9c7f7b854ab1405bc0cd53c735e96423b851b1d6787d0eaf8cfa00b87a7983e95b25ce9e0b70e26587de67b3bc7bbe8740a89dfcce36955a8da1d100ddfd35347ff28e11826a15064f1aa456fd5c9b48f2e1a53453b7bd1c7bdac27009924b6bd8990aec85f5ddd705122321cca603c2cbe572384a81d0d4449eb1b316a1ce7e6e5c5d2771374be2ee36a000893f603134fa18df4cdad8c50a95b2229f3dc0e385850596975d183e8142a2a831342a397132cce28f15d657141a4967b78b278f6bba8f2a5e1ae9a05a06d3b4998d97f707c7e371f4158360d8c0ed916847200c852125c6ded894d2209d52a4521a3e5798a6249f83d97889cd35a7d1d5dfff209148a431817f58bfcde23f80ffcd927f7de57f06fe15435d868c1867ee490000000049454e44ae426082</data>
+        <data format="XBM.GZ" length="79">789c534e494dcbcc4b554829cdcdad8c2fcf4c29c95030e0524611cd48cd4ccf28010a1797249664262b2467241641a592324b8aa363156c15aab914146aadb90067111b1f</data>
     </image>
 </images>
 <includes>
@@ -187,7 +187,6 @@
     <slot>DisableStandardLevelWindow()</slot>
     <slot returnType="bool">InitializeStandardViews( mitk::DataTreeIteratorBase * it )</slot>
     <slot returnType="bool">InitializeStandardViews( mitk::Geometry3D * geometry )</slot>
-    <slot>Repaint()</slot>
     <slot>wheelEvent( QWheelEvent * e )</slot>
     <slot>ReInitializeStandardViews()</slot>
     <slot>changeLevelWindow( mitk::LevelWindow * lw )</slot>
@@ -196,6 +195,8 @@
     <function access="private" specifier="non virtual">init()</function>
     <function returnType="mitk::MultiplexUpdateController *">GetMultiplexUpdateController()</function>
     <function returnType="mitk::SliceNavigationController *">GetTimeNavigationController()</function>
+    <function>RequestUpdate()</function>
+    <function>ForceImmediateUpdate()</function>
     <function specifier="non virtual" returnType="mitk::DisplayVectorInteractor *">GetMoveAndZoomInteractor()</function>
     <function returnType="QmitkRenderWindow *">GetRenderWindow1() const</function>
     <function returnType="QmitkRenderWindow *">GetRenderWindow2() const</function>

@@ -26,13 +26,14 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkPositionEvent.h"
 #include "mitkDisplayPositionEvent.h"
 #include "vtkTransform.h"
-#include <mitkRenderWindow.h>
-#include <mitkProperties.h>
+#include "mitkRenderWindow.h"
+#include "mitkProperties.h"
 #include <itkBoundingBox.h>
 #include <itkFixedArray.h>
-#include <mitkAction.h>
+#include "mitkAction.h"
 
 #include "mitkBoundingObject.h"
+#include "mitkRenderingManager.h"
 
 #include <math.h>
 
@@ -41,8 +42,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkOpenGLRenderer.h"
 #include "mitkBaseRenderer.h"
 #include "mitkGlobalInteraction.h"
-#include <mitkFocusManager.h>
-#include <mitkEventMapper.h>
+#include "mitkFocusManager.h"
+#include "mitkEventMapper.h"
 #include "vtkProp3D.h"
 #include "mitkVtkInteractorCameraController.h"
 #include <vtkInteractorObserver.h>
@@ -266,7 +267,7 @@ bool mitk::AffineInteractor::ExecuteAction(Action* action, mitk::StateEvent cons
   default:
     ok = Superclass::ExecuteAction(action, stateEvent);//, objectEventId, groupEventId);
   }
-  mitk::RenderWindow::UpdateAllInstances();
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   return ok;
 }
 

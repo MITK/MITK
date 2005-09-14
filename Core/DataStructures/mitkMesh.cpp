@@ -18,15 +18,16 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include "mitkMesh.h"
-#include <mitkOperation.h>
-#include <mitkOperationActor.h>
-#include <mitkLineOperation.h>
-#include <mitkLineOperation.h>
-#include <mitkPointOperation.h>
-#include <mitkVector.h>
-#include <mitkStatusBar.h>
-#include <mitkInteractionConst.h>
-#include <mitkLine.h>
+#include "mitkOperation.h"
+#include "mitkOperationActor.h"
+#include "mitkLineOperation.h"
+#include "mitkLineOperation.h"
+#include "mitkPointOperation.h"
+#include "mitkVector.h"
+#include "mitkStatusBar.h"
+#include "mitkInteractionConst.h"
+#include "mitkLine.h"
+#include "mitkRenderingManager.h"
 
 #include "mitkRenderWindow.h"//*\todo remove later, when update ok!
 
@@ -803,7 +804,8 @@ void mitk::Mesh::ExecuteOperation(Operation* operation)
   mitk::OperationEndEvent endevent(operation);
   ((const itk::Object*)this)->InvokeEvent(endevent);
 
-  mitk::RenderWindow::UpdateAllInstances(); //*todo has to be done here, cause of update-pipeline not working yet
+  //*todo has to be done here, cause of update-pipeline not working yet
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 
 }
 

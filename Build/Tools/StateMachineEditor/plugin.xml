@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<plugin
+   id="StateMachines"
+   name="StateMachines Plug-in"
+   version="1.0.0"
+   provider-name=""
+   class="stateMachines.StateMachinesPlugin">
+
+   <runtime>
+      <library name="StateMachines.jar">
+         <export name="*"/>
+      </library>
+   </runtime>
+
+   <requires>
+      <import plugin="org.eclipse.gef"/>
+      <import plugin="org.eclipse.ui"/>
+      <import plugin="org.eclipse.core.runtime"/>
+      <import plugin="org.eclipse.core.resources"/>
+      <import plugin="org.eclipse.ui.views"/>
+      <import plugin="org.eclipse.ui.workbench"/>
+      <import plugin="org.eclipse.ui.ide"/>
+      <import plugin="org.eclipse.jface"/>
+   </requires>
+   
+   <extension point="org.eclipse.ui.editors">
+      <editor name="GEF State Machines"
+              extensions="States"
+              icon="states.gif"
+              default="true"
+              class="stateMachines.StateMachinesEditor"
+              id="GEF StateMachines Editor"
+              contributorClass="stateMachines.StateMachinesEditorActionBarContributor">
+      </editor>
+   </extension>
+   
+   <extension
+         point="org.eclipse.ui.actionSets">
+      <actionSet
+            label="Sample Action Set"
+            visible="true"
+            id="statemachines">
+         <menu
+               label="Sample &amp;Menu"
+               id="sampleMenu">
+            <separator
+                  name="sampleGroup">
+            </separator>
+         </menu>
+         <action
+               label="&amp;Sample Action"
+               icon="states.gif"
+               class="wizard.NewStateMachine"
+               tooltip="Create a new *.states file"
+               menubarPath="sampleMenu/sampleGroup"
+               toolbarPath="sampleGroup"
+               id="StateMachines">
+         </action>
+      </actionSet>
+   </extension>
+   
+   <extension
+         point="org.eclipse.ui.actionSets">
+      <actionSet
+            label="Sample Action Set2"
+            visible="true"
+            id="statemachines2">
+         <menu
+               label="Sample &amp;Menu"
+               id="sampleMenu">
+            <separator
+                  name="sampleGroup">
+            </separator>
+         </menu>
+         <action
+               label="&amp;Sample Action"
+               icon="states.gif"
+               class="wizard.CreateFromXML"
+               tooltip="Get statemachines from *.xml file"
+               menubarPath="sampleMenu/sampleGroup"
+               toolbarPath="sampleGroup"
+               id="StateMachines">
+         </action>
+      </actionSet>
+   </extension>
+</plugin>

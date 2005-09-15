@@ -11,6 +11,7 @@ import model.StateMachinesDiagram;
 
 import org.jdom.Document;
 import org.jdom.Element;
+import org.jdom.Namespace;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
@@ -38,15 +39,6 @@ public class ReadDOMTree {
 		allMachines.remove(machine);
 	}
 	
-	/*public StateMachinesDiagram create() {
-		List stateMachinesList = doc.getRootElement().getChildren("stateMachine", doc.getRootElement().getNamespace());
-        for (int i = 0; i < stateMachinesList.size(); i++) {
-        	Element ele1 = (Element) stateMachinesList.get(i);
-        	StateMachinesDiagram machine = new StateMachinesDiagram(ele1);
-        	allMachines.add(machine);
-        }
-        return machine;
-	}*/
 	public ReadDOMTree(String file) {
         String filename = file;
         try {
@@ -54,12 +46,6 @@ public class ReadDOMTree {
             SAXBuilder builder = new SAXBuilder();
             // Create the document
             doc = builder.build(new File(filename));
-            /*List stateMachinesList = doc.getRootElement().getChildren("stateMachine", doc.getRootElement().getNamespace());
-            for (int i = 0; i < stateMachinesList.size(); i++) {
-            	Element ele1 = (Element) stateMachinesList.get(i);
-            	StateMachinesDiagram machine = new StateMachinesDiagram(ele1);
-            	allMachines.add(machine);
-            }*/
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -68,7 +54,9 @@ public class ReadDOMTree {
 	public ReadDOMTree() {
 		// create new DOMTree
 		 Element root = new Element("mitkInteraktionStates");
-		 
+		 Namespace xmlns = Namespace.getNamespace(
+				  "", "http://tempuri.org/StateMachine.xsd");
+		 root.setNamespace(xmlns);
 		 root.setAttribute("STYLE", "User001");
 		 doc = new Document(root);
 	}

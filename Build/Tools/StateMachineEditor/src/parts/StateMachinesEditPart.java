@@ -274,11 +274,15 @@ class StateMachinesEditPart extends AbstractGraphicalEditPart implements
 		String prop = evt.getPropertyName();
 		if (States.SIZE_PROP.equals(prop) || States.LOCATION_PROP.equals(prop) 
 				|| States.STATE_NAME_PROP.equals(prop)) {
+			refreshSourceConnections();
+			refreshTargetConnections();
 			refreshVisuals();
 		} else if (States.SOURCE_CONNECTIONS_PROP.equals(prop)) {
 			refreshSourceConnections();
+			refreshTargetConnections();
 			refreshVisuals();
 		} else if (States.TARGET_CONNECTIONS_PROP.equals(prop)) {
+			refreshSourceConnections();
 			refreshTargetConnections();
 			refreshVisuals();
 		}

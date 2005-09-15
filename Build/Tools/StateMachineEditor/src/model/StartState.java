@@ -26,9 +26,12 @@ public class StartState extends States {
 	public String toString() {
 		return "Startstate " + getStateName() + " ID " + getStateId();
 	}
+	
+	public void setStartState() {
+		state.setAttribute("START_STATE", "TRUE");
+	}
 
 	public Element getStateElement() {
-		state.setAttribute("START_STATE", "TRUE");
 		return state;
 	}
 

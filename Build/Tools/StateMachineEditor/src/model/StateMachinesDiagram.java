@@ -28,6 +28,8 @@ public class StateMachinesDiagram extends ModelElement {
 	
 	private Element stateMachine;
 	
+	private int maxID = 0;
+	
 	public StateMachinesDiagram(Element machine) {
 		List statesList = machine.getChildren("state", machine.getNamespace());
         for (int i = 0; i < statesList.size(); i++) {
@@ -41,6 +43,11 @@ public class StateMachinesDiagram extends ModelElement {
     				state.setStateElement(ele1);
         			this.addChildAtCreation(state);
         			startState = true;
+    			}
+    			if (attr.getName().equals("ID")) {
+    				if (Integer.parseInt(attr.getValue()) > maxID) {
+    					maxID = Integer.parseInt(attr.getValue());
+    				}
     			}
     		}
         	if (!startState) {
@@ -80,6 +87,11 @@ public class StateMachinesDiagram extends ModelElement {
 			return true;
 		}
 		return false;
+	}
+	
+	public int getMaxID() {
+		maxID = maxID + 1;
+		return maxID;
 	}
 	
 	/**

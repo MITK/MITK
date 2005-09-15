@@ -50,8 +50,8 @@ protected:
   unsigned int orig_size[3];
   int m_DrawState;
   int m_Radius;
-  double delta_x, delta_y, delta_z;
-	double sphere_distance;
+  float delta_x, delta_y, delta_z;
+	float sphere_distance;
 };
 } // namespace mitk
 

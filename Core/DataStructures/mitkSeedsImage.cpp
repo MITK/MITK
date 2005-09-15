@@ -57,12 +57,26 @@ void mitk::SeedsImage::ExecuteOperation(mitk::Operation* operation)
 				last_point = point;
         break;
       }
-    case mitk::OpREMOVE:
+    case mitk::OpUNDOADD:
       {
+				point = seedsOp->GetPoint();
+				last_point = point;
+        m_DrawState = 0;
+        m_Radius = m_Radius+4;  // todo - operation is not equal with its inverse operation - possible approximation problems in the function PointInterpolation()
+ 				AccessByItk(this, AddSeedPoint);
+        break;
+      }
+    case mitk::OpUNDOMOVE:
+      {
+				point = seedsOp->GetPoint();
+        m_DrawState = 0;
+        m_Radius = m_Radius+4; // todo - operation is not equal with its inverse operation - possible approximation problems in the function PointInterpolation()
+ 				AccessByItk(this, AddSeedPoint);
+ 				AccessByItk(this, PointInterpolation);
 				last_point = point;
         break;
       }
-		}
+    }
     this->Modified();
     
     //*todo has to be done here, cause of update-pipeline not working yet
@@ -122,7 +136,7 @@ void mitk::SeedsImage::PointInterpolation(itk::Image< TPixel, VImageDimension >*
 	delta_x = abs(last_point[0] - point[0]);
 	delta_y = abs(last_point[1] - point[1]);
 	delta_z = abs(last_point[2] - point[2]);
-	double point_distance;
+	float point_distance;
 	point_distance = sqrt((delta_x * delta_x) + (delta_y * delta_y) + (delta_z * delta_z));
 	
 	int distance_step = m_Radius;

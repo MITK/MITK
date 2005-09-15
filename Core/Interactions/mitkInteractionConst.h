@@ -101,6 +101,7 @@ typedef enum EOperations
   OpTEST = 1,
   OpNEWCELL = 10, //add a new cell
   OpADD = 100, //add a point or a vessel
+  OpUNDOADD = 101,
   OpADDLINE = 1001, //add a line
   OpINSERT = 200, //insert a point at position
   OpINSERTLINE = 201, //insert a line at position
@@ -110,6 +111,7 @@ typedef enum EOperations
   OpMOVE = 300, //move a point
   OpMOVELINE = 301, //move a line
   OpMOVECELL = 302, //move a line
+  OpUNDOMOVE = 303,
   OpREMOVE = 400, //remove a point at position
   OpREMOVELINE = 401, //remove a line at position
   OpREMOVECELL = 402, //remove a cell

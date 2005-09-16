@@ -80,12 +80,13 @@ void mitk::SeedsImage::ExecuteOperation(mitk::Operation* operation)
     this->Modified();
     
     //*todo has to be done here, cause of update-pipeline not working yet
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    //mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
   }
 }
 
 
-template < typename TPixel, unsigned int VImageDimension >
+template < typename TPixel, int VImageDimension >
 void mitk::SeedsImage::AddSeedPoint(itk::Image< TPixel, VImageDimension >* itkImage)
 {	
 	itk::ImageRegionIterator<itk::Image < TPixel, VImageDimension > >
@@ -118,7 +119,7 @@ void mitk::SeedsImage::AddSeedPoint(itk::Image< TPixel, VImageDimension >* itkIm
 }
 
 
-template < typename TPixel, unsigned int VImageDimension >
+template < typename TPixel, int VImageDimension >
 void mitk::SeedsImage::PointInterpolation(itk::Image< TPixel, VImageDimension >* itkImage)
 {
 	itk::ImageRegionIterator<itk::Image < TPixel, VImageDimension > >
@@ -133,9 +134,9 @@ void mitk::SeedsImage::PointInterpolation(itk::Image< TPixel, VImageDimension >*
 	for (int i=0; i<3; i++) last_pointIndex[i] = (int)ceil(last_point[i]/spacing[i]);
 						
 	// calculation of the distance between last_point and point
-	delta_x = abs(last_point[0] - point[0]);
-	delta_y = abs(last_point[1] - point[1]);
-	delta_z = abs(last_point[2] - point[2]);
+	delta_x = fabsf(last_point[0] - point[0]);
+	delta_y = fabsf(last_point[1] - point[1]);
+	delta_z = fabsf(last_point[2] - point[2]);
 	float point_distance;
 	point_distance = sqrt((delta_x * delta_x) + (delta_y * delta_y) + (delta_z * delta_z));
 	
@@ -154,9 +155,9 @@ void mitk::SeedsImage::PointInterpolation(itk::Image< TPixel, VImageDimension >*
 			for(int z = baseIndex[2] - m_Radius; z <= baseIndex[2] + m_Radius; ++z){
 				for(int y = baseIndex[1] - m_Radius; y <= baseIndex[1] + m_Radius; ++y){
 					for(int x = baseIndex[0] - m_Radius; x <= baseIndex[0] + m_Radius; ++x){
-						delta_x = abs(x - baseIndex[0])*spacing[0];
-						delta_y = abs(y - baseIndex[1])*spacing[1];
-						delta_z = abs(z - baseIndex[2])*spacing[2];
+						delta_x = fabsf(x - baseIndex[0])*spacing[0];
+						delta_y = fabsf(y - baseIndex[1])*spacing[1];
+						delta_z = fabsf(z - baseIndex[2])*spacing[2];
 						sphere_distance = sqrt((delta_x * delta_x) + (delta_y * delta_y) + (delta_z * delta_z));
 						if (sphere_distance <= m_Radius){
 							// is the point inside the image?

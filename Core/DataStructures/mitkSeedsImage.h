@@ -36,10 +36,10 @@ public:
   virtual void ExecuteOperation(Operation* operation);
 
 protected:
-  template < typename TPixel, unsigned int VImageDimension >
+  template < typename TPixel, int VImageDimension >
   void AddSeedPoint(itk::Image< TPixel, VImageDimension >* itkImage);
 
-	template < typename TPixel, unsigned int VImageDimension >
+	template < typename TPixel, int VImageDimension >
   void PointInterpolation(itk::Image< TPixel, VImageDimension >* itkImage);
 
 
@@ -47,7 +47,7 @@ protected:
 	mitk::Point3D point;
 	mitk::Point3D last_point;
   mitk::Vector3D spacing;
-  unsigned int orig_size[3];
+  int orig_size[3];
   int m_DrawState;
   int m_Radius;
   float delta_x, delta_y, delta_z;

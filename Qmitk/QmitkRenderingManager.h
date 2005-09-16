@@ -42,10 +42,11 @@ public:
 
   ~QmitkRenderingManager();
   
-  Q_OBJECT
-
-protected slots:
+protected:
   QmitkRenderingManager();
+
+  Q_OBJECT
+protected slots:
 
   virtual void RestartTimer();
 

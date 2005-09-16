@@ -49,6 +49,7 @@ bool mitk::SeedsInteractor::ExecuteAction(mitk::Action* action, mitk::StateEvent
   
   event_point = posEvent->GetWorldPosition();
 
+  m_DataTreeNode->SetVisibility(true);
   m_SeedsImage = dynamic_cast<mitk::SeedsImage*>(m_DataTreeNode->GetData());
 
 

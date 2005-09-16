@@ -20,6 +20,22 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkRenderingManager.h"
 #include <qtimer.h>
 
+QmitkRenderingManager::Pointer QmitkRenderingManager::m_Instance;
+
+QmitkRenderingManager *
+QmitkRenderingManager
+::GetInstance()
+{
+  if ( !QmitkRenderingManager::m_Instance )
+  {
+    QmitkRenderingManager *rawPtr = new QmitkRenderingManager;
+    QmitkRenderingManager::m_Instance = rawPtr;
+    rawPtr->UnRegister();
+  }
+
+  return m_Instance;
+}
+
 QmitkRenderingManager::QmitkRenderingManager()
 {
   m_Timer = new QTimer( this );

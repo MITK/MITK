@@ -22,10 +22,16 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkRenderingManagerFactory.h"
 
-//##Documentation
-//## @brief ...
-//## @ingroup Renderer
-//## 
+/**
+ * \brief QT specific implementation of mitk::RenderingManagerFactory.
+ *
+ * This class create QmitkRenderingManager instances via
+ * #CreateRenderingManager.
+ *
+ * A static instance of QmitkRenderingManagerFactory is created in
+ * QmitkRenderWindow, forcing the usage of QmitkRenderingManager for the QT
+ * platform.
+ */
 class QmitkRenderingManagerFactory : public mitk::RenderingManagerFactory
 {
 public:

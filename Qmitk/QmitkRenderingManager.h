@@ -25,35 +25,38 @@ PURPOSE.  See the above copyright notices for more information.
 
 class QTimer;
 
-//##Documentation
-//## @brief ...
-//## @ingroup Renderer
-//## 
+/**
+ * \brief QT specific implementation of mitk::RenderinManager.
+ *
+ * This implementation uses a QTimer object to realize the RenderWindow
+ * update timing. The execution of pending updates is controlled by the
+ * timer.
+ */
 class QmitkRenderingManager : public QObject, public mitk::RenderingManager
 {
 public:
   mitkClassMacro( QmitkRenderingManager, mitk::RenderingManager );
 
-  //##Documentation
-  //## Constructor
-  QmitkRenderingManager();
+  /** Get the RenderingManager singleton instance. */
+  static QmitkRenderingManager *GetInstance();
 
-  //##Documentation
-  //## Destructor
   ~QmitkRenderingManager();
   
   Q_OBJECT
 
 protected slots:
+  QmitkRenderingManager();
+
   virtual void RestartTimer();
 
   virtual void StopTimer();
 
   virtual void QUpdateCallback();
 
-
 private:
   QTimer *m_Timer;
+
+  static QmitkRenderingManager::Pointer m_Instance;
 
 };
 

@@ -20,8 +20,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkRenderingManagerFactory.h"
 #include "mitkRenderWindow.h"
 
-mitk::RenderingManager::Pointer mitk::RenderingManager::m_Instance;
-mitk::RenderingManagerFactory *mitk::RenderingManager::m_RenderingManagerFactory;
+mitk::RenderingManager *mitk::RenderingManager::m_Instance = 0;
+mitk::RenderingManagerFactory *mitk::RenderingManager::m_RenderingManagerFactory = 0;
 
 void
 mitk::RenderingManager
@@ -30,7 +30,7 @@ mitk::RenderingManager
   m_RenderingManagerFactory = factory;
 }
 
-mitk::RenderingManager::Pointer
+mitk::RenderingManager *
 mitk::RenderingManager
 ::GetInstance()
 {
@@ -38,21 +38,11 @@ mitk::RenderingManager
   {
     if ( m_RenderingManagerFactory )
     {
-      RenderingManager *rawPointer =
-        m_RenderingManagerFactory->CreateRenderingManager();
-      m_Instance = rawPointer;
-      rawPointer->UnRegister();
+      m_Instance = m_RenderingManagerFactory->CreateRenderingManager();
     }
   }
 
   return m_Instance;
-}
-
-mitk::RenderingManager::Pointer 
-mitk::RenderingManager
-::New()
-{ 
-  return RenderingManager::GetInstance();
 }
 
 mitk::RenderingManager::RenderingManager()

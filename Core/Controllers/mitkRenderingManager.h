@@ -37,10 +37,10 @@ class RenderingManagerFactory;
  * RenderingManager is a central instance retrieving and executing
  * RenderWindow update requests. Its main purpose is to coordinate
  * distributed requests which cannot be aware of each other - lacking the
- * knowledge of whether they are necessary or not. For example, two objects
- * might determine that a specific RenderWindow needs to be updated. This
- * would result in one unnecessary update, if both executed the update on
- * their own.
+ * knowledge of whether they are really necessary or not. For example, two
+ * objects might determine that a specific RenderWindow needs to be updated.
+ * This would result in one unnecessary update, if both executed the update
+ * on their own.
  *
  * The RenderingManager addresses this by letting each such object
  * <em>request</em> an update, and waiting for other objects to possibly
@@ -63,22 +63,20 @@ class RenderingManagerFactory;
  * appropriate timer for controlling the update execution process. See method
  * documentation for a description of how this can be done.
  *
- * TODO: Individual timers for specific RenderWindows - the desired maximum
- * update frequency of a 3D window could be less then of a 2D window
+ * \todo Individual timers for specific RenderWindows - the desired maximum
+ * update frequency of a 3D window could be less then that of a 2D window
  */
 class RenderingManager : public itk::Object
 {
 public:
   mitkClassMacro( RenderingManager, itk::Object );
 
-  static Pointer New();
-
   /** Set the object factory which produces the desired platform specific
    * RenderingManager singleton instance. */
   static void SetFactory( RenderingManagerFactory *factory );
 
   /** Get the RenderingManager singleton instance. */
-  static Pointer GetInstance();
+  static RenderingManager *GetInstance();
 
   /** Adds a RenderWindow. This is required if the methods #RequestUpdateAll
    * or #ForceImmediateUpdate are to be used. */
@@ -135,7 +133,7 @@ private:
 
   RenderWindowList m_RenderWindowList;
 
-  static RenderingManager::Pointer m_Instance;
+  static RenderingManager *m_Instance;
   static RenderingManagerFactory *m_RenderingManagerFactory;
 
 };

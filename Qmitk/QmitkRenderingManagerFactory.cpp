@@ -36,7 +36,5 @@ mitk::RenderingManager *
 QmitkRenderingManagerFactory
 ::CreateRenderingManager()
 {
-  static QmitkRenderingManager instance;
-
-  return &instance;
+  return QmitkRenderingManager::GetInstance();
 }

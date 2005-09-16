@@ -26,18 +26,34 @@ namespace mitk
 class RenderingManager;
 
 /**
- * \brief Central manager for rendering requests.
+ * \brief Factory interface for facilitating the usage of a platform-specific
+ * mitk::RenderingManager instance.
+ *
+ * This class provides an interface for creating the required singleton
+ * instance of RenderingManager. Concrete platform-specific subclasses should
+ * be instantiated once during startup of the framework (e.g. as a static
+ * instance). Their constructor then merely has to call
+ * mitk::RenderingManager::SetFactory().
+ *
+ * \note Note: Instead of using an external class for the manager
+ * instantiation, the factory mechanism could be integrated into the
+ * RenderingManager (and its subclasses) itself. However, this would make
+ * the framework specific instantiation more complicated. Simply creating a
+ * static instance somewhere would not work since RenderingManager derives from
+ * itk::Object, which itself depends on the initialization of static members
+ * (which is problematic since the order of static member initializations
+ * cannot easily be controlled).
  */
 class RenderingManagerFactory
 {
 public:
   virtual ~RenderingManagerFactory() {};
 
+  /** Factory method to create platform specific instances of
+   * RenderingManager. */
   virtual RenderingManager *CreateRenderingManager() = 0;
 
 protected:
-  //##Documentation
-  //## Constructor
   RenderingManagerFactory() {};
 
 private:

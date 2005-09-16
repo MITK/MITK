@@ -261,6 +261,7 @@ void QmitkDataManagerControls::m_ReInitButton_clicked()
     if (node != NULL )
     {
       mitk::BaseData::Pointer basedata = node->GetData();
+      emit InitializeStandardViews( basedata.GetPointer() );
       mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     }
   }

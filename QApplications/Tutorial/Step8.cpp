@@ -1,8 +1,9 @@
 #include "Step8.h"
 
-#include <QmitkStdMultiWidget.h>
+#include "QmitkStdMultiWidget.h"
 
-#include <mitkGlobalInteraction.h>
+#include "mitkGlobalInteraction.h"
+#include "mitkRenderingManager.h"
 
 #include <qhbox.h>
 #include <qvbox.h>
@@ -52,8 +53,7 @@ void Step8::SetupWidgets()
 
   //Part III: Setup standard interaction with the mouse
   // moving the cut-planes to click-point
-  mitk::GlobalInteraction::GetGlobalInteraction()->AddListener(
-    multiWidget->GetMultiplexUpdateController() );
+  multiWidget->EnableNavigationControllerEventListening();
   // zooming and panning
   mitk::GlobalInteraction::GetGlobalInteraction()->AddListener(
     multiWidget->GetMoveAndZoomInteractor() );

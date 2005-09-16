@@ -45,7 +45,6 @@ void QmitkSliceWidget::init()
   m_SliceNavigator = new mitk::SliceNavigationController(NULL);
   m_SliceNavigator->SetViewDirection(mitk::SliceNavigationController::Transversal);
   m_SliceNavigator->ConnectGeometrySliceEvent(m_Renderer.GetPointer());
-  m_SliceNavigator->ConnectUpdate(m_RenderWindow);
   new QmitkStepperAdapter(m_NavigatorWidget, m_SliceNavigator->GetSlice(), "navigation");  
   
   SetLevelWindowEnabled(true);

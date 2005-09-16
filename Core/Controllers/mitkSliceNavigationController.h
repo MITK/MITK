@@ -169,40 +169,6 @@ public:
     ConnectGeometryTimeEvent(receiver);
   }
 
-  template <typename T> void ConnectUpdateRequest(T* receiver)
-  {
-    typedef typename itk::SimpleMemberCommand<T>::Pointer SimpleMemberCommandPointer;
-    SimpleMemberCommandPointer eventSimpleCommand = itk::SimpleMemberCommand<T>::New();
-    eventSimpleCommand->SetCallbackFunction(receiver, &T::UpdateRequest);
-    AddObserver(UpdateEvent(), eventSimpleCommand);
-    receiver->AddStateMachine(this);
-  }
-
-  template <typename T> void ConnectRepaintRequest(T* receiver)
-  {
-    typedef typename itk::SimpleMemberCommand<T>::Pointer SimpleMemberCommandPointer;
-    SimpleMemberCommandPointer eventSimpleCommand = itk::SimpleMemberCommand<T>::New();
-    eventSimpleCommand->SetCallbackFunction(receiver, &T::RepaintRequest);
-    AddObserver(UpdateEvent(), eventSimpleCommand);
-    receiver->AddStateMachine(this);
-  }
-
-  template <typename T> void ConnectUpdate(T* receiver)
-  {
-    typedef typename itk::SimpleMemberCommand<T>::Pointer SimpleMemberCommandPointer;
-    SimpleMemberCommandPointer eventSimpleCommand = itk::SimpleMemberCommand<T>::New();
-    eventSimpleCommand->SetCallbackFunction(receiver, &T::RequestUpdate);
-    AddObserver(UpdateEvent(), eventSimpleCommand);
-  }
-
-  template <typename T> void ConnectRepaint(T* receiver)
-  {
-    typedef typename itk::SimpleMemberCommand<T>::Pointer SimpleMemberCommandPointer;
-    SimpleMemberCommandPointer eventSimpleCommand = itk::SimpleMemberCommand<T>::New();
-    eventSimpleCommand->SetCallbackFunction(receiver, &T::ForceImmediateUpdate);
-    AddObserver(UpdateEvent(), eventSimpleCommand);
-  }
-
   virtual void SetGeometry(const itk::EventObject & geometrySliceEvent);
 
   virtual void SetGeometrySlice(const itk::EventObject & geometrySliceEvent);

@@ -151,7 +151,6 @@
     <include location="global" impldecl="in implementation">mitkPlaneGeometry.h</include>
     <include location="global" impldecl="in declaration">QmitkRenderWindow.h</include>
     <include location="global" impldecl="in declaration">mitkDataTree.h</include>
-    <include location="global" impldecl="in declaration">mitkMultiplexUpdateController.h</include>
     <include location="global" impldecl="in declaration">mitkSliceNavigationController.h</include>
     <include location="global" impldecl="in declaration">mitkDisplayInteractor.h</include>
     <include location="global" impldecl="in declaration">mitkDisplayVectorInteractor.h</include>
@@ -161,7 +160,6 @@
 <variables>
     <variable>mitk::CoordinateSupplier::Pointer m_LastLeftClickPositionSupplier;</variable>
     <variable>mitk::SliceNavigationController::Pointer timeNavigationController;</variable>
-    <variable>mitk::MultiplexUpdateController::Pointer multiplexUpdateController;</variable>
     <variable>mitk::DataTreeBase* planesSubTree;</variable>
     <variable>mitk::DataTreeIteratorClone planesIterator;</variable>
     <variable>mitk::DisplayVectorInteractor* m_MoveAndZoomInteractor;</variable>
@@ -193,7 +191,6 @@
 </slots>
 <functions>
     <function access="private" specifier="non virtual">init()</function>
-    <function returnType="mitk::MultiplexUpdateController *">GetMultiplexUpdateController()</function>
     <function returnType="mitk::SliceNavigationController *">GetTimeNavigationController()</function>
     <function>RequestUpdate()</function>
     <function>ForceImmediateUpdate()</function>
@@ -204,13 +201,15 @@
     <function returnType="QmitkRenderWindow *">GetRenderWindow4() const</function>
     <function returnType="const mitk::Point3D &amp;">GetCrossPosition() const</function>
     <function>AdjustCross()</function>
+    <function>EnableNavigationControllerEventListening()</function>
+    <function>DisableNavigationControllerEventListening()</function>
 </functions>
 <layoutdefaults spacing="6" margin="11"/>
 <includehints>
-    
-    
-    
-    
-    
+    <includehint>qmitkselectableglwidget.h</includehint>
+    <includehint>qmitkselectableglwidget.h</includehint>
+    <includehint>qmitkselectableglwidget.h</includehint>
+    <includehint>qmitkselectableglwidget.h</includehint>
+    <includehint>qmitklevelwindowwidget.h</includehint>
 </includehints>
 </UI>

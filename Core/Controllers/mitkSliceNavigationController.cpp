@@ -27,11 +27,13 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkPositionEvent.h"
 #include "mitkInteractionConst.h"
 #include "mitkAction.h"
+#include "mitkGlobalInteraction.h"
+#include "mitkEventMapper.h"
+#include "mitkFocusManager.h"
+#include "mitkOpenGLRenderer.h"
+#include "mitkRenderingManager.h"
+
 #include <itkCommand.h>
-#include <mitkGlobalInteraction.h>
-#include <mitkEventMapper.h>
-#include <mitkFocusManager.h>
-#include <mitkOpenGLRenderer.h>
 
 //##ModelId=3E189B1D008D
 mitk::SliceNavigationController::SliceNavigationController(const char * type) 
@@ -186,9 +188,9 @@ void mitk::SliceNavigationController::Update()
 
   //Send the geometry. Do this even if nothing was changed, because maybe Update() was only called to 
   //re-send the old geometry and time/slice data.
-  SendCreatedWorldGeometry();
-  SendSlice();
-  SendTime();
+  this->SendCreatedWorldGeometry();
+  this->SendSlice();
+  this->SendTime();
 }
 
 void mitk::SliceNavigationController::SendCreatedWorldGeometry()
@@ -207,7 +209,9 @@ void mitk::SliceNavigationController::SendSlice()
     if(m_CreatedWorldGeometry.IsNotNull())
     {
       InvokeEvent(GeometrySliceEvent(m_CreatedWorldGeometry, m_Slice->GetPos()));
-      InvokeEvent(UpdateEvent());
+
+      // Request rendering update for all views
+      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     }
   }
 }
@@ -219,7 +223,9 @@ void mitk::SliceNavigationController::SendTime()
     if(m_CreatedWorldGeometry.IsNotNull())
     {
       InvokeEvent(GeometryTimeEvent(m_CreatedWorldGeometry, m_Time->GetPos()));
-      InvokeEvent(UpdateEvent());
+
+      // Request rendering update for all views
+      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     }
   }
 }

@@ -152,6 +152,26 @@
 </widget>
 <customwidgets>
     <customwidget>
+        <class>QmitkSliderNavigator</class>
+        <header location="global">QmitkSliderNavigator.h</header>
+        <sizehint>
+            <width>10</width>
+            <height>0</height>
+        </sizehint>
+        <container>0</container>
+        <sizepolicy>
+            <hordata>5</hordata>
+            <verdata>5</verdata>
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+        </sizepolicy>
+        <pixmap>image0</pixmap>
+        <slot access="public" specifier="">slot()</slot>
+        <slot access="public" specifier="">SetStepper(mitk::Stepper*)</slot>
+        <slot access="public" specifier="">Refetch()</slot>
+        <property type="0">4</property>
+    </customwidget>
+    <customwidget>
         <class>QmitkLevelWindowWidget</class>
         <header location="global">QmitkLevelWindowWidget.h</header>
         <sizehint>
@@ -167,27 +187,8 @@
         </sizepolicy>
         <pixmap>image0</pixmap>
         <signal>levelWindow(mitk::LevelWindow*)</signal>
+        <signal>levelWindow( const LevelWindow&amp; )</signal>
         <slot access="public" specifier="">slot()</slot>
-    </customwidget>
-    <customwidget>
-        <class>QmitkSliderNavigator</class>
-        <header location="global">QmitkSliderNavigator.h</header>
-        <sizehint>
-            <width>150</width>
-            <height>20</height>
-        </sizehint>
-        <container>0</container>
-        <sizepolicy>
-            <hordata>5</hordata>
-            <verdata>5</verdata>
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-        </sizepolicy>
-        <pixmap>image0</pixmap>
-        <slot access="public" specifier="">slot()</slot>
-        <slot access="public" specifier="">SetStepper(mitk::Stepper*)</slot>
-        <slot access="public" specifier="">Refetch()</slot>
-        <property type="0">4</property>
     </customwidget>
 </customwidgets>
 <images>
@@ -208,7 +209,6 @@
     <include location="local" impldecl="in declaration">mitkOpenGLRenderer.h</include>
     <include location="local" impldecl="in declaration">qpopupmenu.h</include>
     <include location="local" impldecl="in declaration">mitkSliceNavigationController.h</include>
-    <include location="local" impldecl="in declaration">mitkMultiplexUpdateController.h</include>
     <include location="local" impldecl="in declaration">QmitkRenderWindow.h</include>
     <include location="local" impldecl="in implementation">QmitkSliceWidget.ui.h</include>
 </includes>
@@ -253,4 +253,8 @@
     <function returnType="QmitkRenderWindow *">GetRenderWindow()</function>
 </functions>
 <layoutdefaults spacing="6" margin="11"/>
+<includehints>
+    <includehint>qmitklevelwindowwidget.h</includehint>
+    <includehint>qmitkslidernavigator.h</includehint>
+</includehints>
 </UI>

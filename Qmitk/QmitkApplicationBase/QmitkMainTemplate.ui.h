@@ -572,12 +572,13 @@ void QmitkMainTemplate::Initialize()
   InitializeFunctionality();
 
 
-  mitk::GlobalInteraction* globalInteraction = dynamic_cast<mitk::GlobalInteraction*>(mitk::EventMapper::GetGlobalStateMachine());
-  if(globalInteraction!=NULL)
-  {
-    globalInteraction->AddListener(mitkMultiWidget->GetMoveAndZoomInteractor() );
-    globalInteraction->AddListener(mitkMultiWidget->GetMultiplexUpdateController());
-  }
+  // Add MoveAndZoomInteractor and widget NavigationControllers as
+  // GlobalInteraction listeners
+  mitk::GlobalInteraction::GetGlobalInteraction()->AddListener(
+    mitkMultiWidget->GetMoveAndZoomInteractor()
+  );
+
+  mitkMultiWidget->EnableNavigationControllerEventListening();
 }
 
 

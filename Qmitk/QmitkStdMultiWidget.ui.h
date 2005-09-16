@@ -93,21 +93,6 @@ void QmitkStdMultiWidget::init()
   mitkWidget3->GetSliceNavigationController()->ConnectGeometryTimeEvent(timeNavigationController.GetPointer(), false);
   mitkWidget4->GetSliceNavigationController()->ConnectGeometryTimeEvent(timeNavigationController.GetPointer(), false);
 
-  //initialize update-controller
-  multiplexUpdateController = new mitk::MultiplexUpdateController("navigation");
-  multiplexUpdateController->AddRenderWindow(mitkWidget1->GetRenderer()->GetRenderWindow());
-  multiplexUpdateController->AddRenderWindow(mitkWidget2->GetRenderer()->GetRenderWindow());
-  multiplexUpdateController->AddRenderWindow(mitkWidget3->GetRenderer()->GetRenderWindow());
-  multiplexUpdateController->AddRenderWindow(mitkWidget4->GetRenderer()->GetRenderWindow());
-
-  //connect sliceNavigationControllers to update-controller
-  mitkWidget1->GetSliceNavigationController()->ConnectUpdateRequest(multiplexUpdateController.GetPointer());
-  mitkWidget2->GetSliceNavigationController()->ConnectUpdateRequest(multiplexUpdateController.GetPointer());
-  mitkWidget3->GetSliceNavigationController()->ConnectUpdateRequest(multiplexUpdateController.GetPointer());
-  mitkWidget4->GetSliceNavigationController()->ConnectUpdateRequest(multiplexUpdateController.GetPointer());
-  
-  timeNavigationController->ConnectUpdateRequest(multiplexUpdateController.GetPointer());
-
   // instantiate display interactor
   m_MoveAndZoomInteractor = new mitk::DisplayVectorInteractor("moveNzoom", new mitk::DisplayInteractor() );
   
@@ -432,11 +417,6 @@ void QmitkStdMultiWidget::AddDisplayPlaneSubTree(mitk::DataTreeIteratorBase* it)
   planesIterator = dit;
 }
 
-mitk::MultiplexUpdateController* QmitkStdMultiWidget::GetMultiplexUpdateController()
-{
-  return multiplexUpdateController.GetPointer();
-}
-
 
 mitk::SliceNavigationController* QmitkStdMultiWidget::GetTimeNavigationController()
 {
@@ -472,13 +452,11 @@ bool QmitkStdMultiWidget::InitializeStandardViews(mitk::DataTreeIteratorBase * i
 
   if ( it==NULL )
   {
-    multiplexUpdateController->SetBlockUpdate(true);
     sliceNavigatorTransversal->Update();
     sliceNavigatorSagittal->Update();
     sliceNavigatorFrontal->Update();
     timeNavigationController->Update();
-    multiplexUpdateController->SetBlockUpdate(false);
-    multiplexUpdateController->UpdateRequest();
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
   else
   {
@@ -510,8 +488,6 @@ bool QmitkStdMultiWidget::InitializeStandardViews(mitk::DataTreeIteratorBase * i
       {
         boundingBoxInitialized=true;
         
-        multiplexUpdateController->SetBlockUpdate(true);
-        
         sliceNavigatorTransversal->SetInputWorldGeometry(geometry.GetPointer());
         sliceNavigatorTransversal->Update();
 
@@ -527,13 +503,11 @@ bool QmitkStdMultiWidget::InitializeStandardViews(mitk::DataTreeIteratorBase * i
         timeNavigationController->SetInputWorldGeometry(geometry.GetPointer());
         timeNavigationController->Update();
 
-        multiplexUpdateController->SetBlockUpdate(false);
-
-        // Temporary solution: Use RepaintRequest instead of UpdateRequest so
+        // Temporary solution: Use ForceImmediateUpdate instead of RequestUpdate so
         // that Fit() resets the camera according to the new geometry.
-        //multiplexUpdateController->UpdateRequest();
-        multiplexUpdateController->RepaintRequest();
-        Fit();
+        //mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+        mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
+        this->Fit();
       }
     }
   }
@@ -555,28 +529,37 @@ bool QmitkStdMultiWidget::InitializeStandardViews( mitk::Geometry3D * geometry )
 
   if ( (geometry==NULL) || (const_cast<mitk::BoundingBox*>(geometry->GetBoundingBox())->GetDiagonalLength2()<mitk::eps) )
   {
-    multiplexUpdateController->SetBlockUpdate(true);
     sliceNavigatorTransversal->Update();
     sliceNavigatorSagittal->Update();
     sliceNavigatorFrontal->Update();
     timeNavigationController->Update();
-    multiplexUpdateController->SetBlockUpdate(false);
-    multiplexUpdateController->UpdateRequest();
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
   else
   {
     mitk::Geometry3D::Pointer clonedgeometry = static_cast<mitk::Geometry3D*>(geometry->Clone().GetPointer());
 
-    multiplexUpdateController->SetBlockUpdate(true);
-    sliceNavigatorTransversal->SetInputWorldGeometry(clonedgeometry.GetPointer()); sliceNavigatorTransversal->Update();
-    sliceNavigatorSagittal->SetInputWorldGeometry(clonedgeometry.GetPointer());    sliceNavigatorSagittal->Update();
-    sliceNavigatorFrontal->SetInputWorldGeometry(clonedgeometry.GetPointer());     sliceNavigatorFrontal->Update();
-    timeNavigationController->SetInputWorldGeometry(clonedgeometry.GetPointer());  timeNavigationController->Update();
-    multiplexUpdateController->SetBlockUpdate(false);
-    multiplexUpdateController->UpdateRequest();
-    Fit();
+    sliceNavigatorTransversal->SetInputWorldGeometry(clonedgeometry.GetPointer());
+    sliceNavigatorTransversal->Update();
+
+    sliceNavigatorSagittal->SetInputWorldGeometry(clonedgeometry.GetPointer());
+    sliceNavigatorSagittal->Update();
+
+    sliceNavigatorFrontal->SetInputWorldGeometry(clonedgeometry.GetPointer());
+    sliceNavigatorFrontal->Update();
+
+    timeNavigationController->SetInputWorldGeometry(clonedgeometry.GetPointer());
+    timeNavigationController->Update();
+    
+    // Temporary solution: Use ForceImmediateUpdate instead of RequestUpdate so
+    // that Fit() resets the camera according to the new geometry.
+    //mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
+    this->Fit();
+
     boundingBoxInitialized=true;
   }
+
   return boundingBoxInitialized;
 }
 
@@ -617,13 +600,12 @@ void QmitkStdMultiWidget::ReInitializeStandardViews()
   sliceNavigatorSagittal->SetViewDirection(mitk::SliceNavigationController::Sagittal);
   sliceNavigatorFrontal->SetViewDirection(mitk::SliceNavigationController::Frontal);
 
-  multiplexUpdateController->SetBlockUpdate(true);
   sliceNavigatorTransversal->Update();
   sliceNavigatorSagittal->Update();
   sliceNavigatorFrontal->Update();
   timeNavigationController->Update();
-  multiplexUpdateController->SetBlockUpdate(false);
-  multiplexUpdateController->UpdateRequest();
+
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 QmitkRenderWindow* QmitkStdMultiWidget::GetRenderWindow1() const
@@ -711,3 +693,31 @@ void QmitkStdMultiWidget::AdjustCross()
 }
 
 
+
+
+void QmitkStdMultiWidget::EnableNavigationControllerEventListening()
+{
+  // Let NavigationControllers listen to GlobalInteraction
+  mitk::GlobalInteraction *globalInteraction = mitk::GlobalInteraction::GetGlobalInteraction();
+
+  globalInteraction->AddListener( mitkWidget1->GetSliceNavigationController() );
+  globalInteraction->AddListener( mitkWidget2->GetSliceNavigationController() );
+  globalInteraction->AddListener( mitkWidget3->GetSliceNavigationController() );
+  globalInteraction->AddListener( mitkWidget4->GetSliceNavigationController() );
+
+  globalInteraction->AddListener( timeNavigationController );
+}
+
+
+void QmitkStdMultiWidget::DisableNavigationControllerEventListening()
+{
+  // Do not let NavigationControllers listen to GlobalInteraction
+  mitk::GlobalInteraction *globalInteraction = mitk::GlobalInteraction::GetGlobalInteraction();
+
+  globalInteraction->RemoveListener( mitkWidget1->GetSliceNavigationController() );
+  globalInteraction->RemoveListener( mitkWidget2->GetSliceNavigationController() );
+  globalInteraction->RemoveListener( mitkWidget3->GetSliceNavigationController() );
+  globalInteraction->RemoveListener( mitkWidget4->GetSliceNavigationController() );
+  
+  globalInteraction->RemoveListener( timeNavigationController );
+}

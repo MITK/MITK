@@ -1,13 +1,13 @@
-#include <QmitkRenderWindow.h>
-#include <QmitkSliceWidget.h>
+#include "QmitkRenderWindow.h"
+#include "QmitkSliceWidget.h"
 
-#include <mitkDataTreeNodeFactory.h>
-#include <mitkProperties.h>
-#include <mitkMultiplexUpdateController.h>
+#include "mitkDataTreeNodeFactory.h"
+#include "mitkProperties.h"
+#include "mitkRenderingManager.h"
 
-#include <mitkGlobalInteraction.h>
-#include <mitkPointSet.h>
-#include <mitkPointSetInteractor.h>
+#include "mitkGlobalInteraction.h"
+#include "mitkPointSet.h"
+#include "mitkPointSetInteractor.h"
 
 #include <itksys/SystemTools.hxx>
 #include <qapplication.h>
@@ -132,22 +132,14 @@ int main(int argc, char* argv[])
   // slice itself in 3D: add it to the tree!
   it.Add(view3.GetRenderer()->GetCurrentWorldGeometry2DNode());
 
-  //Part VII: handle updates: To avoid unnecessary updates, we have to
-  //define, when to update. The SliceNavigationController of each
-  //2D view sends an event, when the slice was changed. Connect this
-  //an update-controller to this event, and all renderwindows to
-  //the update-controller.
-  // create update-controller
-  mitk::MultiplexUpdateController::Pointer updateController= new mitk::MultiplexUpdateController;
-  // connect SliceNavigationController of each 2D View to the update-controller
-  view2.GetSliceController()->ConnectRepaintRequest(updateController.GetPointer());
-  view3.GetSliceController()->ConnectRepaintRequest(updateController.GetPointer());
-
-  // tell the update-controller which renderwindows to update when
-  // an update/repaint is requested
-  updateController->AddRenderWindow(&renderWindow);
-  updateController->AddRenderWindow(view2.GetRenderWindow());
-  updateController->AddRenderWindow(view3.GetRenderWindow());
+  // Part VII: handle updates: To avoid unnecessary updates, we have to
+  // define when to update. The RenderingManager serves this purpose, and
+  // each RenderWindow has to be registered to it.
+  mitk::RenderingManager *renderingManager =
+    mitk::RenderingManager::GetInstance();
+  renderingManager->AddRenderWindow( &renderWindow );
+  renderingManager->AddRenderWindow( view2.GetRenderWindow() );
+  renderingManager->AddRenderWindow( view3.GetRenderWindow() );
 
   //Part VIII: Qt-specific initialization
   qtapplication.setMainWidget(&toplevelWidget);

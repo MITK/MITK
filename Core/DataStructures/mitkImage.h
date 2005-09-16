@@ -351,8 +351,22 @@ public:
   virtual ScalarType GetScalarValue2ndMin(int t=0) const;
 
   //##Documentation
+  //## \brief Get the second largest value for scalar images, but do not recompute it first
+  virtual mitk::ScalarType mitk::Image::GetScalarValue2ndMinNoRecompute() const
+  {
+      return m_Scalar2ndMin;
+  }
+
+  //##Documentation
   //## \brief Get the second largest value for scalar images
   virtual ScalarType GetScalarValue2ndMax(int t=0) const;
+
+  //##Documentation
+  //## \brief Get the second largest value for scalar images, but do not recompute it first
+  virtual mitk::ScalarType mitk::Image::GetScalarValue2ndMaxNoRecompute() const
+  {
+      return m_Scalar2ndMax;
+  }
 
   //##ModelId=3E0B4A6A01EC
   //##Documentation

@@ -4,7 +4,7 @@
 
 
 /**
-* Konstruktor
+* Constructor
 */
 QmitkSliderLevelWindowWidget::QmitkSliderLevelWindowWidget( QWidget * parent, const char * name, WFlags f )
 : QWidget( parent, name, f ), brush( QBrush::SolidPattern ),mouseDown(false), lw()
@@ -236,8 +236,8 @@ void QmitkSliderLevelWindowWidget::update() {
 
   float rectHeight = lw.GetWindow() * fact;
 
-  if ( rectHeight < 5 )
-    rectHeight = 5;
+  if ( rectHeight < 15 )
+    rectHeight = 15;
 
   if ( lw.GetMin() < 0 )
     rect.setRect( 2, (int) (moveHeight - (lw.GetMax() - lw.GetRangeMin()) * fact) , 24, (int) rectHeight );
@@ -283,5 +283,3 @@ void QmitkSliderLevelWindowWidget::updateFromLineEdit(int lineEditLevel, int lin
   // FIX: only emit the signal if the level window was changed by the user via mouse
   if (mouseDown) emit levelWindow( &lw );
 }//end of updateFromLineEdit
-
-

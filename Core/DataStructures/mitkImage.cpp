@@ -1092,20 +1092,52 @@ void mitk::_ComputeExtremaInItkImage(ItkImageType* itkImage, mitk::Image* mitkIm
   mitkImage->m_Scalar2ndMin=
     mitkImage->m_ScalarMin = itk::NumericTraits<TPixel>::max();
   mitkImage->m_Scalar2ndMax=
-    mitkImage->m_ScalarMax = itk::NumericTraits<TPixel>::min();
+    mitkImage->m_ScalarMax = itk::NumericTraits<TPixel>::NonpositiveMin();
 	while( !it.IsAtEnd() )
   {
     value = it.Get();  
-    if ( (value > mitkImage->m_ScalarMin) && (value < mitkImage->m_Scalar2ndMin) ) 
-      mitkImage->m_Scalar2ndMin = value;	
-  	else if ( (value < mitkImage->m_ScalarMax) && (value > mitkImage->m_Scalar2ndMax) ) 
-      mitkImage->m_Scalar2ndMax = value;	
-  	else if (value > mitkImage->m_ScalarMax) 
-      mitkImage->m_ScalarMax = value;
-    else if (value < mitkImage->m_ScalarMin) 
-      mitkImage->m_ScalarMin = value;
+    //  if ( (value > mitkImage->m_ScalarMin) && (value < mitkImage->m_Scalar2ndMin) )        mitkImage->m_Scalar2ndMin = value;  
+    //	else if ( (value < mitkImage->m_ScalarMax) && (value > mitkImage->m_Scalar2ndMax) )   mitkImage->m_Scalar2ndMax = value;	
+    //	else if (value > mitkImage->m_ScalarMax)                                              mitkImage->m_ScalarMax = value;
+    //  else if (value < mitkImage->m_ScalarMin)                                              mitkImage->m_ScalarMin = value;
+
+    // if numbers start with 2ndMin or 2ndMax and never have that value again, the previous above logic failed
+
+    if ( value > mitkImage->m_ScalarMax )
+    {
+        mitkImage->m_Scalar2ndMax = mitkImage->m_ScalarMax;    mitkImage->m_ScalarMax = value;
+    }
+    else if ( value == mitkImage->m_ScalarMax )
+    {
+        // do nothing
+    }
+    else if ( value > mitkImage->m_Scalar2ndMax )
+    {
+        mitkImage->m_Scalar2ndMax = value;
+    }
+
+    if ( value < mitkImage->m_ScalarMin )
+    {
+        mitkImage->m_Scalar2ndMin = mitkImage->m_ScalarMin;    mitkImage->m_ScalarMin = value;
+    }
+    else if ( value == mitkImage->m_ScalarMin )
+    {
+        // do nothing
+    }
+    else if ( value < mitkImage->m_Scalar2ndMin )
+    {
+        mitkImage->m_Scalar2ndMin = value;
+    }
+
     ++it;
   }
+
+  //// guard for wrong 2dMin/Max on single constant value images
+  if (mitkImage->m_ScalarMax == mitkImage->m_ScalarMin)
+  {
+      mitkImage->m_Scalar2ndMax = mitkImage->m_Scalar2ndMin = mitkImage->m_ScalarMax;
+  }
+  //itkGenericOutputMacro(<<"extrema "<<itk::NumericTraits<TPixel>::NonpositiveMin()<<" "<<mitkImage->m_ScalarMin<<" "<<mitkImage->m_Scalar2ndMin<<" "<<mitkImage->m_Scalar2ndMax<<" "<<mitkImage->m_ScalarMax<<" "<<itk::NumericTraits<TPixel>::max());
 }
 
 const void mitk::Image::ComputeExtrema(int t) const

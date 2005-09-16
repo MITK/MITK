@@ -143,6 +143,8 @@ void mitk::LevelWindow::SetAuto(mitk::Image* image, bool tryPicTags, bool guessB
     if(SetAutoByPicTags(image->GetPic()))
       return;
   }
+
+  mitk::Image* wholeImage = image;
   if(guessByCentralSlice)
   {
     mitk::ImageSliceSelector::Pointer sliceSelector = mitk::ImageSliceSelector::New();
@@ -154,7 +156,19 @@ void mitk::LevelWindow::SetAuto(mitk::Image* image, bool tryPicTags, bool guessB
 
     image = sliceSelector->GetOutput();
   }
-  SetMinMax(image->GetScalarValue2ndMin(), image->GetScalarValue2ndMax());
+  ScalarType minValue = image->GetScalarValue2ndMin();
+  ScalarType maxValue = image->GetScalarValue2ndMaxNoRecompute();
+  if (minValue == maxValue)
+  {
+      // guessByCentralSlice seems to have failed, lets look at all data
+      minValue = wholeImage->GetScalarValue2ndMin();
+      maxValue = wholeImage->GetScalarValue2ndMaxNoRecompute();
+  }
+  SetMinMax(minValue, maxValue);
+  SetRangeMin(minValue);
+  SetRangeMax(maxValue);
+
+  //itkGenericOutputMacro(<<"set WL to "<<minValue<<" "<<maxValue);
 }
 
 bool mitk::LevelWindow::SetAutoByPicTags(const ipPicDescriptor* aPic)

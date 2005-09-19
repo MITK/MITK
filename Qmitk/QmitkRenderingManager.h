@@ -34,6 +34,7 @@ class QTimer;
  */
 class QmitkRenderingManager : public QObject, public mitk::RenderingManager
 {
+  Q_OBJECT
 public:
   mitkClassMacro( QmitkRenderingManager, mitk::RenderingManager );
 
@@ -45,7 +46,6 @@ public:
 protected:
   QmitkRenderingManager();
 
-  Q_OBJECT
 protected slots:
 
   virtual void RestartTimer();

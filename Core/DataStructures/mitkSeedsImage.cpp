@@ -31,7 +31,7 @@ void mitk::SeedsImage::ExecuteOperation(mitk::Operation* operation)
   //mitkCheckOperationTypeMacro(SeedsOperation, operation, seedsOp);
 
   spacing = this->GetGeometry()->GetSpacing();
-  for(int i=0; i<this->GetDimension(); i++)
+  for(unsigned int i=0; i<this->GetDimension(); i++)
     orig_size[i] = this->GetDimension(i);
 
   mitk::DrawOperation * seedsOp = dynamic_cast<mitk::DrawOperation*>( operation );
@@ -91,8 +91,9 @@ void mitk::SeedsImage::AddSeedPoint(SeedsImageType* itkImage)
 {	
 	itk::ImageRegionIterator<SeedsImageType >
   iterator(itkImage, itkImage->GetRequestedRegion());
-    itk::Index<::itk::GetImageDimension<SeedsImageType>::ImageDimension> baseIndex;
-	itk::Index<::itk::GetImageDimension<SeedsImageType>::ImageDimension> setIndex;
+	const unsigned int dimension = ::itk::GetImageDimension<SeedsImageType>::ImageDimension;
+    itk::Index<dimension> baseIndex;
+	itk::Index<itk::GetImageDimension<SeedsImageType>::ImageDimension> setIndex;
 	for (int i=0; i<3; i++) baseIndex[i] = (int)ceil(point[i]/spacing[i]);
 	
 	// setting a sphere around the point
@@ -124,10 +125,10 @@ void mitk::SeedsImage::PointInterpolation(SeedsImageType* itkImage)
 {
 	itk::ImageRegionIterator<SeedsImageType >
   iterator(itkImage, itkImage->GetRequestedRegion());
-	itk::Index<::itk::GetImageDimension<SeedsImageType>::ImageDimension>pointIndex;
-	itk::Index<::itk::GetImageDimension<SeedsImageType>::ImageDimension>last_pointIndex;
-	itk::Index<::itk::GetImageDimension<SeedsImageType>::ImageDimension>baseIndex;
-	itk::Index<::itk::GetImageDimension<SeedsImageType>::ImageDimension>setIndex;
+	itk::Index<itk::GetImageDimension<SeedsImageType>::ImageDimension>pointIndex;
+	itk::Index<itk::GetImageDimension<SeedsImageType>::ImageDimension>last_pointIndex;
+	itk::Index<itk::GetImageDimension<SeedsImageType>::ImageDimension>baseIndex;
+	itk::Index<itk::GetImageDimension<SeedsImageType>::ImageDimension>setIndex;
 
 	// coordinate transformation from physical coordinates to index coordinates
 	for (int i=0; i<3; i++) pointIndex[i] = (int)ceil(point[i]/spacing[i]);

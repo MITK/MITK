@@ -36,11 +36,11 @@ public:
   virtual void ExecuteOperation(Operation* operation);
 
 protected:
-  template < typename TPixel, int VImageDimension >
-  void AddSeedPoint(itk::Image< TPixel, VImageDimension >* itkImage);
+  template < typename SeedsImageType >
+  void AddSeedPoint(SeedsImageType * itkImage);
 
-	template < typename TPixel, int VImageDimension >
-  void PointInterpolation(itk::Image< TPixel, VImageDimension >* itkImage);
+  template < typename SeedsImageType >
+  void PointInterpolation(SeedsImageType * itkImage);
 
 
 protected:

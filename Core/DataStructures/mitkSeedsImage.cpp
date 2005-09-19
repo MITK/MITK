@@ -86,13 +86,13 @@ void mitk::SeedsImage::ExecuteOperation(mitk::Operation* operation)
 }
 
 
-template < typename TPixel, int VImageDimension >
-void mitk::SeedsImage::AddSeedPoint(itk::Image< TPixel, VImageDimension >* itkImage)
+template < typename SeedsImageType >
+void mitk::SeedsImage::AddSeedPoint(SeedsImageType* itkImage)
 {	
-	itk::ImageRegionIterator<itk::Image < TPixel, VImageDimension > >
+	itk::ImageRegionIterator<SeedsImageType >
   iterator(itkImage, itkImage->GetRequestedRegion());
-	itk::Index<VImageDimension>baseIndex;
-	itk::Index<VImageDimension>setIndex;
+    itk::Index<::itk::GetImageDimension<SeedsImageType>::ImageDimension> baseIndex;
+	itk::Index<::itk::GetImageDimension<SeedsImageType>::ImageDimension> setIndex;
 	for (int i=0; i<3; i++) baseIndex[i] = (int)ceil(point[i]/spacing[i]);
 	
 	// setting a sphere around the point
@@ -119,15 +119,15 @@ void mitk::SeedsImage::AddSeedPoint(itk::Image< TPixel, VImageDimension >* itkIm
 }
 
 
-template < typename TPixel, int VImageDimension >
-void mitk::SeedsImage::PointInterpolation(itk::Image< TPixel, VImageDimension >* itkImage)
+template < typename SeedsImageType >
+void mitk::SeedsImage::PointInterpolation(SeedsImageType* itkImage)
 {
-	itk::ImageRegionIterator<itk::Image < TPixel, VImageDimension > >
+	itk::ImageRegionIterator<SeedsImageType >
   iterator(itkImage, itkImage->GetRequestedRegion());
-	itk::Index<VImageDimension>pointIndex;
-	itk::Index<VImageDimension>last_pointIndex;
-	itk::Index<VImageDimension>baseIndex;
-	itk::Index<VImageDimension>setIndex;
+	itk::Index<::itk::GetImageDimension<SeedsImageType>::ImageDimension>pointIndex;
+	itk::Index<::itk::GetImageDimension<SeedsImageType>::ImageDimension>last_pointIndex;
+	itk::Index<::itk::GetImageDimension<SeedsImageType>::ImageDimension>baseIndex;
+	itk::Index<::itk::GetImageDimension<SeedsImageType>::ImageDimension>setIndex;
 
 	// coordinate transformation from physical coordinates to index coordinates
 	for (int i=0; i<3; i++) pointIndex[i] = (int)ceil(point[i]/spacing[i]);

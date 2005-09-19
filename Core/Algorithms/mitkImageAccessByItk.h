@@ -95,6 +95,7 @@ template void itkImgFunc(itk::Image<unsigned short, dimension>*, param1Type, par
 template void itkImgFunc(itk::Image<char, dimension>*, param1Type, param2Type);                    \
 template void itkImgFunc(itk::Image<unsigned char, dimension>*, param1Type, param2Type);           
 
+#if(_MSC_VER==1200)
 #define _accessByItk(mitkImage, itkImageTypeFunction, pixeltype, dimension)            \
   if ( typeId == typeid(pixeltype) )                                                   \
 {                                                                                      \
@@ -103,8 +104,19 @@ template void itkImgFunc(itk::Image<unsigned char, dimension>*, param1Type, para
     ImageToItkType::Pointer imagetoitk = ImageToItkType::New();                        \
     imagetoitk->SetInput(mitkImage);                                                   \
     imagetoitk->Update();                                                              \
-    itkImageTypeFunction(imagetoitk->GetOutput());               \
-}                                                              
+    itkImageTypeFunction(imagetoitk->GetOutput());                                     \
+}
+#else
+#define _accessByItk(mitkImage, itkImageTypeFunction, pixeltype, dimension)            \
+  if ( typeId == typeid(pixeltype) )                                                   \
+{                                                                                      \
+    typedef itk::Image<pixeltype, dimension> ImageType;                                \
+    typedef mitk::ImageToItk<ImageType> ImageToItkType;                                \
+    ImageToItkType::Pointer imagetoitk = ImageToItkType::New();                        \
+    imagetoitk->SetInput(mitkImage);                                                   \
+    imagetoitk->Update();                                                              \
+    itkImageTypeFunction<pixeltype, dimension>(imagetoitk->GetOutput());               \
+#endif
 
 #define _accessAllTypesByItk(mitkImage, itkImageTypeFunction, dimension)               \
       _accessByItk(mitkImage, itkImageTypeFunction, double, dimension) else            \
@@ -204,6 +216,7 @@ template void itkImgFunc(itk::Image<unsigned char, dimension>*, param1Type, para
 }
 
 //----------------------- version with 1 additional paramater ------------------
+#if(_MSC_VER==1200)
 #define _accessByItk_1(mitkImage, itkImageTypeFunction, pixeltype, dimension, param1)            \
   if ( typeId == typeid(pixeltype) )                                                             \
   {                                                                                              \
@@ -212,8 +225,19 @@ template void itkImgFunc(itk::Image<unsigned char, dimension>*, param1Type, para
     ImageToItkType::Pointer imagetoitk = ImageToItkType::New();                                  \
     imagetoitk->SetInput(mitkImage);                                                             \
     imagetoitk->Update();                                                                        \
-    itkImageTypeFunction(imagetoitk->GetOutput(), param1);                 \
+    itkImageTypeFunction(imagetoitk->GetOutput(), param1);                                       \
   }
+#else
+  if ( typeId == typeid(pixeltype) )                                                             \
+  {                                                                                              \
+    typedef itk::Image<pixeltype, dimension> ImageType;                                          \
+    typedef mitk::ImageToItk<ImageType> ImageToItkType;                                          \
+    ImageToItkType::Pointer imagetoitk = ImageToItkType::New();                                  \
+    imagetoitk->SetInput(mitkImage);                                                             \
+    imagetoitk->Update();                                                                        \
+    itkImageTypeFunction<pixeltype, dimension>(imagetoitk->GetOutput(), param1);                 \
+  }
+#endif
 
 #define _accessAllTypesByItk_1(mitkImage, itkImageTypeFunction, dimension, param1)               \
       _accessByItk_1(mitkImage, itkImageTypeFunction, double, dimension, param1) else            \
@@ -296,6 +320,7 @@ template void itkImgFunc(itk::Image<unsigned char, dimension>*, param1Type, para
 }
 
 //----------------------- version with 2 additional paramaters -----------------
+#if(_MSC_VER==1200)
 #define _accessByItk_2(mitkImage, itkImageTypeFunction, pixeltype, dimension, param1, param2)    \
   if ( typeId == typeid(pixeltype) )                                                             \
 {                                                                                                \
@@ -304,9 +329,20 @@ template void itkImgFunc(itk::Image<unsigned char, dimension>*, param1Type, para
     ImageToItkType::Pointer imagetoitk = ImageToItkType::New();                                  \
     imagetoitk->SetInput(mitkImage);                                                             \
     imagetoitk->Update();                                                                        \
-    itkImageTypeFunction(imagetoitk->GetOutput(), param1, param2);         \
+    itkImageTypeFunction(imagetoitk->GetOutput(), param1, param2);                               \
 }
-
+#else
+#define _accessByItk_2(mitkImage, itkImageTypeFunction, pixeltype, dimension, param1, param2)    \
+  if ( typeId == typeid(pixeltype) )                                                             \
+{                                                                                                \
+    typedef itk::Image<pixeltype, dimension> ImageType;                                          \
+    typedef mitk::ImageToItk<ImageType> ImageToItkType;                                          \
+    ImageToItkType::Pointer imagetoitk = ImageToItkType::New();                                  \
+    imagetoitk->SetInput(mitkImage);                                                             \
+    imagetoitk->Update();                                                                        \
+    itkImageTypeFunction<pixeltype, dimension>(imagetoitk->GetOutput(), param1, param2);         \
+}
+#endif
 #define _accessAllTypesByItk_2(mitkImage, itkImageTypeFunction, dimension, param1, param2)               \
       _accessByItk_2(mitkImage, itkImageTypeFunction, double, dimension, param1, param2) else            \
       _accessByItk_2(mitkImage, itkImageTypeFunction, float, dimension, param1, param2) else             \

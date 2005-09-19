@@ -99,8 +99,7 @@ mitk::DataTreeNode::~DataTreeNode()
 
   if ( interactor )
   {
-    mitk::GlobalInteraction* globalInteraction = dynamic_cast<mitk::GlobalInteraction*>(mitk::EventMapper::GetGlobalStateMachine());
-    globalInteraction->RemoveInteractor( interactor );  
+    mitk::GlobalInteraction::GetInstance()->RemoveInteractor( interactor );  
   }
 }
 
@@ -480,8 +479,7 @@ bool mitk::DataTreeNode::ReadXMLData( XMLReader& xmlReader )
     {
       m_Interactor->ReadXMLData( xmlReader );
       m_Interactor->SetDataTreeNode( this );
-      mitk::GlobalInteraction* globalInteraction = dynamic_cast<mitk::GlobalInteraction*>(mitk::EventMapper::GetGlobalStateMachine());
-      globalInteraction->AddInteractor( m_Interactor );
+      mitk::GlobalInteraction::GetInstance()->AddInteractor( m_Interactor );
     }
     xmlReader.GotoParent();
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();

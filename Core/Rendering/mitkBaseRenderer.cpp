@@ -62,11 +62,7 @@ mitk::BaseRenderer::BaseRenderer( const char* name ) :
   instances.insert( this );
 
   //adding this BaseRenderer to the List of all BaseRenderer
-  mitk::GlobalInteraction *globalInteraction = dynamic_cast<mitk::GlobalInteraction *>(EventMapper::GetGlobalStateMachine());
-  if (globalInteraction != NULL)
-	{
-    globalInteraction->AddFocusElement(this);
-  }
+  mitk::GlobalInteraction::GetInstance()->AddFocusElement(this);
 
   WeakPointerProperty::Pointer rendererProp = new WeakPointerProperty((itk::Object*)this);
 
@@ -297,13 +293,9 @@ void mitk::BaseRenderer::SetGeometryTime(const itk::EventObject & geometryTimeEv
 void mitk::BaseRenderer::MousePressEvent(mitk::MouseEvent *me)
 {
   //set the Focus on the renderer
-  mitk::GlobalInteraction *globalInteraction = dynamic_cast<mitk::GlobalInteraction *>(EventMapper::GetGlobalStateMachine());
-  if (globalInteraction != NULL)
-  {
-    bool success = globalInteraction->SetFocus(this);
-    if (! success) 
-      mitk::StatusBar::DisplayText("Warning! from mitkBaseRenderer.cpp: Couldn't focus this BaseRenderer!");
-  }
+  bool success = mitk::GlobalInteraction::GetInstance()->SetFocus(this);
+  if (! success) 
+    mitk::StatusBar::DisplayText("Warning! from mitkBaseRenderer.cpp: Couldn't focus this BaseRenderer!");
 
   if (m_CameraController)
   {

@@ -289,9 +289,11 @@ bool mitk::GlobalInteraction::StandardInteractionSetup(const char * XMLbehaviorF
   return true;
 }
 
-mitk::GlobalInteraction* mitk::GlobalInteraction::GetGlobalInteraction()
+mitk::GlobalInteraction* mitk::GlobalInteraction::GetInstance()
 {
-  return dynamic_cast<mitk::GlobalInteraction*>(mitk::EventMapper::GetGlobalStateMachine());
+  return dynamic_cast<mitk::GlobalInteraction*>(
+    mitk::EventMapper::GetGlobalStateMachine()
+  );
 }
 
 bool mitk::GlobalInteraction::AddToSelectedInteractors(mitk::Interactor* interactor)

@@ -55,8 +55,9 @@ void Step6::Initialize()
   pointSetNode->SetData(m_Seeds);
   pointSetNode->SetProperty("layer", new mitk::IntProperty(2));
   it.Add(pointSetNode);
-  mitk::GlobalInteraction::GetGlobalInteraction()->AddInteractor(
-    new mitk::PointSetInteractor("pointsetinteractor", pointSetNode));
+  mitk::GlobalInteraction::GetInstance()->AddInteractor(
+    new mitk::PointSetInteractor("pointsetinteractor", pointSetNode)
+  );
 }
 
 void Step6::StartRegionGrowing()

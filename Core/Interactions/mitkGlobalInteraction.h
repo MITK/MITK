@@ -143,7 +143,7 @@ namespace mitk {
 
     static bool StandardInteractionSetup(const char * XMLbehaviorFile=NULL);
 
-    static GlobalInteraction* GetGlobalInteraction();
+    static GlobalInteraction* GetInstance();
 
     //so that the interactors can call AddToSelectedInteractors() and RemoveFromSelectedInteractors()
     friend class Interactor;

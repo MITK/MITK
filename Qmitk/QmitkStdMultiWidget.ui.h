@@ -97,7 +97,9 @@ void QmitkStdMultiWidget::init()
   m_MoveAndZoomInteractor = new mitk::DisplayVectorInteractor("moveNzoom", new mitk::DisplayInteractor() );
   
   m_LastLeftClickPositionSupplier = new mitk::CoordinateSupplier("navigation", NULL);
-  mitk::GlobalInteraction::GetGlobalInteraction()->AddListener(m_LastLeftClickPositionSupplier);
+  mitk::GlobalInteraction::GetInstance()->AddListener(
+    m_LastLeftClickPositionSupplier
+  );
 }
 
 void QmitkStdMultiWidget::changeLayoutTo2DImagesUp()
@@ -682,13 +684,11 @@ void QmitkStdMultiWidget::AdjustCross()
   p3d = GetCrossPosition();
   mitk::PositionEvent event(mitkWidget1->GetRenderer(), 0, 0, 0, mitk::Key_unknown, p2d, p3d);
   mitk::StateEvent *stateEvent = new mitk::StateEvent(mitk::EIDLEFTMOUSEBTN , &event);    
-  mitk::GlobalInteraction* globalInteraction = mitk::GlobalInteraction::GetGlobalInteraction();
-  if(globalInteraction!=NULL)
-  {
-    globalInteraction->HandleEvent( stateEvent );
-    stateEvent->Set(mitk::EIDLEFTMOUSERELEASE , &event);
-    globalInteraction->HandleEvent( stateEvent );
-  }
+  
+  mitk::GlobalInteraction::GetInstance()->HandleEvent( stateEvent );
+  stateEvent->Set(mitk::EIDLEFTMOUSERELEASE , &event);
+  mitk::GlobalInteraction::GetInstance()->HandleEvent( stateEvent );
+
   delete stateEvent;  
 }
 
@@ -698,7 +698,8 @@ void QmitkStdMultiWidget::AdjustCross()
 void QmitkStdMultiWidget::EnableNavigationControllerEventListening()
 {
   // Let NavigationControllers listen to GlobalInteraction
-  mitk::GlobalInteraction *globalInteraction = mitk::GlobalInteraction::GetGlobalInteraction();
+  mitk::GlobalInteraction *globalInteraction =
+    mitk::GlobalInteraction::GetInstance();
 
   globalInteraction->AddListener( mitkWidget1->GetSliceNavigationController() );
   globalInteraction->AddListener( mitkWidget2->GetSliceNavigationController() );
@@ -712,12 +713,21 @@ void QmitkStdMultiWidget::EnableNavigationControllerEventListening()
 void QmitkStdMultiWidget::DisableNavigationControllerEventListening()
 {
   // Do not let NavigationControllers listen to GlobalInteraction
-  mitk::GlobalInteraction *globalInteraction = mitk::GlobalInteraction::GetGlobalInteraction();
+  mitk::GlobalInteraction *globalInteraction =
+    mitk::GlobalInteraction::GetInstance();
 
-  globalInteraction->RemoveListener( mitkWidget1->GetSliceNavigationController() );
-  globalInteraction->RemoveListener( mitkWidget2->GetSliceNavigationController() );
-  globalInteraction->RemoveListener( mitkWidget3->GetSliceNavigationController() );
-  globalInteraction->RemoveListener( mitkWidget4->GetSliceNavigationController() );
+  globalInteraction->RemoveListener(
+    mitkWidget1->GetSliceNavigationController()
+  );
+  globalInteraction->RemoveListener(
+    mitkWidget2->GetSliceNavigationController()
+  );
+  globalInteraction->RemoveListener(
+    mitkWidget3->GetSliceNavigationController()
+  );
+  globalInteraction->RemoveListener(
+    mitkWidget4->GetSliceNavigationController()
+  );
   
   globalInteraction->RemoveListener( timeNavigationController );
 }

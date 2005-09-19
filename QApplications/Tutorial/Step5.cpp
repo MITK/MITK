@@ -92,8 +92,9 @@ int main(int argc, char* argv[])
   it.Add(pointSetNode);
   // create PointSetInteractor, associate to pointSetNode and add as
   // interactor to GlobalInteraction
-  mitk::GlobalInteraction::GetGlobalInteraction()->AddInteractor(
-    new mitk::PointSetInteractor("pointsetinteractor", pointSetNode));
+  mitk::GlobalInteraction::GetInstance()->AddInteractor(
+    new mitk::PointSetInteractor("pointsetinteractor", pointSetNode)
+  );
 
   // *******************************************************
   // ******************* END OF NEW PART *******************

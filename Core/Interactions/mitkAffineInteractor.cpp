@@ -325,10 +325,9 @@ bool mitk::AffineInteractor::ConvertDisplayEventToWorldPosition(mitk::DisplayPos
   /* Copied from vtk Sphere widget */
   double focalPoint[4], position[4];
   double z;
-  mitk::GlobalInteraction* globalInteraction = dynamic_cast<mitk::GlobalInteraction*>(mitk::EventMapper::GetGlobalStateMachine());
-  if (globalInteraction == NULL)
-    return false;
-  const FocusManager::FocusElement* fe = globalInteraction->GetFocus();
+
+  const FocusManager::FocusElement* fe =
+    mitk::GlobalInteraction::GetInstance()->GetFocus();
   FocusManager::FocusElement* fe2 =  const_cast <FocusManager::FocusElement*>(fe);
   mitk::OpenGLRenderer* glRenderer = dynamic_cast<mitk::OpenGLRenderer*>(fe2);
   if (glRenderer == NULL)

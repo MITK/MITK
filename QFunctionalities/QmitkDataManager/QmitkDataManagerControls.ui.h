@@ -58,16 +58,15 @@ void QmitkDataManagerControls::init()
   m_DataTreeView->addColumn( "NodeType" );
   m_DataTreeView->addColumn( "RefCount");
   m_DataTreeView->setSortColumn(20);
-  mitk::GlobalInteraction* globalInteraction =  mitk::GlobalInteraction::GetGlobalInteraction();
-  if (globalInteraction)
-  {
-    mitk::FocusManager* fm = globalInteraction->GetFocusManager();
-    QmitkFocusChangeCommand::Pointer fcc = QmitkFocusChangeCommand::New();
-    fcc->SetQmitkDataManagerControls(this);
-    mitk::FocusEvent fe;
 
-    fm->AddObserver(fe,fcc);
-  }
+  mitk::FocusManager* fm =
+    mitk::GlobalInteraction::GetInstance()->GetFocusManager();
+  QmitkFocusChangeCommand::Pointer fcc = QmitkFocusChangeCommand::New();
+  fcc->SetQmitkDataManagerControls(this);
+  mitk::FocusEvent fe;
+
+  fm->AddObserver(fe,fcc);
+
   if(mitk::ChiliPlugin::IsPlugin()==false)
   {
     m_SaveToLightBox->hide();
@@ -97,16 +96,15 @@ void QmitkDataManagerControls::UpdateRendererCombo()
 
   // try to select focused RenderWindow
   mitk::RenderWindow* focusedRenderWindow = NULL;
-  mitk::GlobalInteraction* globalInteraction =  mitk::GlobalInteraction::GetGlobalInteraction();
-  if (globalInteraction)
+
+  mitk::FocusManager* fm =
+    mitk::GlobalInteraction::GetInstance()->GetFocusManager();
+  mitk::BaseRenderer::ConstPointer br = fm->GetFocused();
+  if (br.IsNotNull())
   {
-    mitk::FocusManager* fm = globalInteraction->GetFocusManager();
-    mitk::BaseRenderer::ConstPointer br = fm->GetFocused();
-    if (br.IsNotNull())
-    {
-      focusedRenderWindow = br->GetRenderWindow();
-    }
+    focusedRenderWindow = br->GetRenderWindow();
   }
+
   if (focusedRenderWindow)
   {
     m_RenderWindowCombo->setCurrentText(focusedRenderWindow->GetName());

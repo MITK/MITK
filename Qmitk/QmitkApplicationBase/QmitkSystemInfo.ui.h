@@ -22,31 +22,29 @@
 void QmitkSystemInfo::init()
 {
   m_UpdateRendererListCommand = itk::SimpleMemberCommand<QmitkSystemInfo>::New();
-  m_UpdateRendererListCommand->SetCallbackFunction(this, &QmitkSystemInfo::UpdateRendererList);
+  m_UpdateRendererListCommand->SetCallbackFunction(
+    this, &QmitkSystemInfo::UpdateRendererList
+  );
 
-  mitk::GlobalInteraction* globalInteraction =  mitk::GlobalInteraction::GetGlobalInteraction();
-  if (globalInteraction)
-  {
-    mitk::FocusManager* fm = globalInteraction->GetFocusManager();
-    mitk::FocusEvent fe;
-    fm->AddObserver(fe, m_UpdateRendererListCommand);
-  }
-  UpdateRendererList();
+  mitk::FocusManager* fm =
+    mitk::GlobalInteraction::GetInstance()->GetFocusManager();
+  mitk::FocusEvent fe;
+  fm->AddObserver(fe, m_UpdateRendererListCommand);
+
+  this->UpdateRendererList();
 }
 
 void QmitkSystemInfo::UpdateRendererList()
 {
   mitk::RenderWindow* focusedRenderWindow = NULL;
 
-  mitk::GlobalInteraction* globalInteraction =  mitk::GlobalInteraction::GetGlobalInteraction();
-  if (globalInteraction)
+  mitk::FocusManager* fm =
+    mitk::GlobalInteraction::GetInstance()->GetFocusManager();
+
+  mitk::BaseRenderer::ConstPointer br = fm->GetFocused();
+  if (br.IsNotNull())
   {
-    mitk::FocusManager* fm = globalInteraction->GetFocusManager();
-    mitk::BaseRenderer::ConstPointer br = fm->GetFocused();
-    if (br.IsNotNull())
-    {
-      focusedRenderWindow = br->GetRenderWindow();
-    }
+    focusedRenderWindow = br->GetRenderWindow();
   }
 
   int selectedItem = -1;

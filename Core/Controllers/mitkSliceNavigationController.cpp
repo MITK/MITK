@@ -280,11 +280,9 @@ bool mitk::SliceNavigationController::ExecuteAction( Action* action, mitk::State
           mitk::BaseRenderer* baseRenderer = posEvent->GetSender();
           if (baseRenderer==NULL)
             {
-              mitk::GlobalInteraction *globalInteraction = dynamic_cast<mitk::GlobalInteraction *>(mitk::EventMapper::GetGlobalStateMachine());
-              if (globalInteraction!=NULL)
-              {
-                baseRenderer = const_cast<mitk::BaseRenderer *>(globalInteraction->GetFocus());
-              }
+              baseRenderer = const_cast<mitk::BaseRenderer *>(
+                mitk::GlobalInteraction::GetInstance()->GetFocus()
+              );
             }
           if (baseRenderer!=NULL)
            if (baseRenderer->GetMapperID() == 1)
@@ -360,11 +358,7 @@ bool mitk::SliceNavigationController::ExecuteAction( Action* action, mitk::State
           //mitk::BaseRenderer *baseRenderer = posEvent->GetSender();
           //if (baseRenderer==NULL)
           //  {
-          //    mitk::GlobalInteraction *globalInteraction = dynamic_cast<mitk::GlobalInteraction *>(mitk::EventMapper::GetGlobalStateMachine());
-          //    if (globalInteraction!=NULL)
-          //    {
-          //      baseRenderer = const_cast<mitk::BaseRenderer *>(globalInteraction->GetFocus());
-          //    }
+          //    baseRenderer = const_cast<mitk::BaseRenderer *>(mitk::GlobalInteraction::GetInstance()->GetFocus());
           //  }
           //  if (baseRenderer!=NULL)
           //  {

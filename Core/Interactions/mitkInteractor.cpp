@@ -82,7 +82,7 @@ void mitk::Interactor::CreateModeOperation(ModeType mode)
 
 bool mitk::Interactor::ExecuteAction(Action* action, mitk::StateEvent const* stateEvent) 
 {
-  GlobalInteraction* global = GlobalInteraction::GetGlobalInteraction();
+  GlobalInteraction* global = mitk::GlobalInteraction::GetInstance();
   if (global == NULL)
     itkWarningMacro("Message from Interactor.cpp: GlobalInteraction == NULL! Check use of Interactor!");
   

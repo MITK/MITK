@@ -574,7 +574,7 @@ void QmitkMainTemplate::Initialize()
 
   // Add MoveAndZoomInteractor and widget NavigationControllers as
   // GlobalInteraction listeners
-  mitk::GlobalInteraction::GetGlobalInteraction()->AddListener(
+  mitk::GlobalInteraction::GetInstance()->AddListener(
     mitkMultiWidget->GetMoveAndZoomInteractor()
   );
 

@@ -148,7 +148,7 @@ bool mitk::PrimStripInteractor::ExecuteAction(Action* action, mitk::StateEvent c
 		  if (m_UndoEnabled)
 		  {
 			  LineOperation* undoOp = new mitk::LineOperation(OpDELETECELL, m_CurrentCellId);
-			  OperationEvent *operationEvent = new OperationEvent(mesh, doOp, undoOp);
+			  OperationEvent *operationEvent = new OperationEvent(mesh, doOp, undoOp, "Add cell");
 			  m_UndoController->SetOperationEvent(operationEvent);
 		  }
       mesh->ExecuteOperation(doOp);
@@ -338,7 +338,7 @@ bool mitk::PrimStripInteractor::ExecuteAction(Action* action, mitk::StateEvent c
       {
         Vector3D vectorBack = m_MovementStart - newPoint;
         CellOperation* undoOp = new mitk::CellOperation(OpMOVECELL, m_CurrentCellId, vectorBack);
-        OperationEvent *operationEvent = new OperationEvent(m_DataTreeNode->GetData(), doOp, undoOp);
+        OperationEvent *operationEvent = new OperationEvent(m_DataTreeNode->GetData(), doOp, undoOp, "Move cell");
         m_UndoController->SetOperationEvent(operationEvent);
       }
 		  //execute the Operation
@@ -363,7 +363,7 @@ bool mitk::PrimStripInteractor::ExecuteAction(Action* action, mitk::StateEvent c
       	if (m_UndoEnabled)	//write to UndoMechanism
         {
 	        PointOperation* undoOp = new mitk::PointOperation(OpSETPOINTTYPE, point, position, true, PTUNDEFINED);
-	        OperationEvent *operationEvent = new OperationEvent(mesh, doOp, undoOp);
+	        OperationEvent *operationEvent = new OperationEvent(mesh, doOp, undoOp, "Set start point");
 	        m_UndoController->SetOperationEvent(operationEvent);
 	      }
 

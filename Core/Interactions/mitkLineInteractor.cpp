@@ -221,7 +221,7 @@ bool mitk::LineInteractor::ExecuteAction(Action* action, mitk::StateEvent const*
 		  if (m_UndoEnabled)
 		  {
 		  	Operation* undoOp = new mitk::Operation(OpDELETELINE);
-			  OperationEvent *operationEvent = new OperationEvent(mesh, doOp, undoOp);
+			  OperationEvent *operationEvent = new OperationEvent(mesh, doOp, undoOp, "Add line");
 			  m_UndoController->SetOperationEvent(operationEvent);
 		  }
 		  //execute the Operation
@@ -415,7 +415,7 @@ bool mitk::LineInteractor::ExecuteAction(Action* action, mitk::StateEvent const*
       if ( m_UndoEnabled )
       {
         LineOperation* undoOp = new mitk::LineOperation(OpMOVELINE, m_CurrentCellId, m_LastPoint-newPoint, idA, idB, m_CurrentLineId);
-        OperationEvent *operationEvent = new OperationEvent(m_DataTreeNode->GetData(), doOp, undoOp);
+        OperationEvent *operationEvent = new OperationEvent(m_DataTreeNode->GetData(), doOp, undoOp, "Move line");
         m_UndoController->SetOperationEvent(operationEvent);
       }
       //execute the Operation

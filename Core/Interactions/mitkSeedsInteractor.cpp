@@ -80,7 +80,7 @@ bool mitk::SeedsInteractor::ExecuteAction(mitk::Action* action, mitk::StateEvent
       mitk::DrawOperation* doOp = new mitk::DrawOperation(OpADD, event_point, last_point, m_DrawState, m_Radius);
       if (m_UndoEnabled){	//write to UndoMechanism/ Can probably be removed!
         mitk::DrawOperation* undoOp = new mitk::DrawOperation(OpUNDOADD, event_point, last_point, m_DrawState, m_Radius);
-        mitk::OperationEvent *operationEvent = new mitk::OperationEvent(m_SeedsImage, doOp, undoOp);
+        mitk::OperationEvent *operationEvent = new mitk::OperationEvent(m_SeedsImage, doOp, undoOp, "Add seed point");
 			  m_UndoController->SetOperationEvent(operationEvent);
 	    }
 		  //execute the Operation
@@ -94,7 +94,7 @@ bool mitk::SeedsInteractor::ExecuteAction(mitk::Action* action, mitk::StateEvent
       mitk::DrawOperation* doOp = new mitk::DrawOperation(OpMOVE, event_point, last_point, m_DrawState, m_Radius);
       if (m_UndoEnabled){	//write to UndoMechanism/ Can probably be removed!
         mitk::DrawOperation* undoOp = new mitk::DrawOperation(OpUNDOMOVE, event_point, last_point, m_DrawState, m_Radius);
-        mitk::OperationEvent *operationEvent = new mitk::OperationEvent(m_SeedsImage, doOp, undoOp);
+        mitk::OperationEvent *operationEvent = new mitk::OperationEvent(m_SeedsImage, doOp, undoOp, "Move seed point");
 			  m_UndoController->SetOperationEvent(operationEvent);
 	    }
 		  //execute the Operation

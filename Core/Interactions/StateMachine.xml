@@ -1147,9 +1147,11 @@
       </transition>
       <transition NAME="leftButtonRelease" NEXT_STATE_ID="0" EVENT_ID="505"> <!-- LBM_Release-->
         <action ID="1100" /> <!--AcMODE_DESELECT-->
+        <action ID="1008" /> <!--AcTRANSLATEEND-->
       </transition>
       <transition NAME="leftButtonRelease" NEXT_STATE_ID="0" EVENT_ID="537"> <!-- CTRL+LBM_Release -->
         <action ID="1100" /> <!--AcMODE_DESELECT-->
+        <action ID="1008" /> <!--AcTRANSLATEEND-->
       </transition>
     </state>
     <state NAME="rotating" ID="4">
@@ -1158,9 +1160,11 @@
       </transition>
       <transition NAME="middleButtonRelease" NEXT_STATE_ID="0" EVENT_ID="506"> <!-- MBM_Release-->
         <action ID="1100" /> <!--AcMODE_DESELECT-->
+        <action ID="1010" /> <!--AcROTATEEEND-->
       </transition>
       <transition NAME="middleButtonRelease" NEXT_STATE_ID="0" EVENT_ID="539"> <!-- CTRL+MBM_Release-->
         <action ID="1100" /> <!--AcMODE_DESELECT-->
+        <action ID="1010" /> <!--AcROTATEEEND-->
       </transition>
     </state>
     <state NAME="scaling" ID="3">
@@ -1169,9 +1173,11 @@
       </transition>
       <transition NAME="rightButtonRelease" NEXT_STATE_ID="0" EVENT_ID="507"> <!-- RBM_Release ==> SeSCALE  -->
         <action ID="1100" /> <!--AcMODE_DESELECT-->
+        <action ID="1009" /> <!--AcSCALEEND-->
       </transition>
       <transition NAME="rightButtonRelease" NEXT_STATE_ID="0" EVENT_ID="538"> <!-- CTRL+RBM_Release ==> SeSCALE  -->
         <action ID="1100" /> <!--AcMODE_DESELECT-->
+        <action ID="1009" /> <!--AcSCALEEND-->
       </transition>
     </state>
   </stateMachine>

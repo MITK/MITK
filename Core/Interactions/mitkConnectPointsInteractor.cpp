@@ -136,7 +136,7 @@ bool mitk::ConnectPointsInteractor::ExecuteAction( Action* action, mitk::StateEv
           if (m_UndoEnabled)
           {
             LineOperation* undoOp = new mitk::LineOperation(OpADDLINE, m_CurrentCellId, position);
-            OperationEvent *operationEvent = new OperationEvent(mesh, doOp, undoOp);
+            OperationEvent *operationEvent = new OperationEvent(mesh, doOp, undoOp, "Delete line");
             m_UndoController->SetOperationEvent(operationEvent);
           }
           //execute the Operation
@@ -156,7 +156,7 @@ bool mitk::ConnectPointsInteractor::ExecuteAction( Action* action, mitk::StateEv
             if (m_UndoEnabled)
             {
               LineOperation* undoOp = new mitk::LineOperation(OpDELETECELL, m_CurrentCellId);
-              OperationEvent *operationEvent = new OperationEvent(mesh, doOp, undoOp);
+              OperationEvent *operationEvent = new OperationEvent(mesh, doOp, undoOp, "Add cell");
               m_UndoController->SetOperationEvent(operationEvent);
             }
             mesh->ExecuteOperation(doOp);
@@ -168,7 +168,7 @@ bool mitk::ConnectPointsInteractor::ExecuteAction( Action* action, mitk::StateEv
             if (m_UndoEnabled)
             {
               LineOperation* undoOp = new mitk::LineOperation(OpDELETELINE, m_CurrentCellId, position);
-              OperationEvent *operationEvent = new OperationEvent(mesh, doOp, undoOp);
+              OperationEvent *operationEvent = new OperationEvent(mesh, doOp, undoOp, "Add line");
               m_UndoController->SetOperationEvent(operationEvent);
             }
             //execute the Operation

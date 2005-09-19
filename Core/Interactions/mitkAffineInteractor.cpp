@@ -51,6 +51,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "vtkCamera.h"
 #include <vtkInteractorObserver.h>
 
+#include <iostream>
+
 mitk::AffineInteractor::AffineInteractor()
 : Interactor()
 { }
@@ -173,6 +175,11 @@ bool mitk::AffineInteractor::ExecuteAction(Action* action, mitk::StateEvent cons
       ok = true;
       break;
     }
+  case AcTRANSLATEEND:
+    {
+      m_UndoController->SetOperationEvent(new UndoStackItem("Move object"));
+      break;
+    }
   case AcROTATE:
     {
       mitk::Point3D p = event->GetWorldPosition();
@@ -207,6 +214,11 @@ bool mitk::AffineInteractor::ExecuteAction(Action* action, mitk::StateEvent cons
       /* execute the Operation */
       geometry->ExecuteOperation(doOp);
       ok = true;
+      break;
+    }
+  case AcROTATEEND:
+    {
+      m_UndoController->SetOperationEvent(new UndoStackItem("Rotate object"));
       break;
     }
   case AcSCALE:
@@ -262,6 +274,11 @@ bool mitk::AffineInteractor::ExecuteAction(Action* action, mitk::StateEvent cons
         //std::cout << "Volume of Boundingobject is " << b->GetVolume()/1000.0 << " ml" << std::endl;
       }
       ok = true;
+      break;
+    }
+  case AcSCALEEND:
+    {
+      m_UndoController->SetOperationEvent(new UndoStackItem("Scale object"));
       break;
     }
   default:

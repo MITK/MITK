@@ -39,9 +39,20 @@ class CameraController;
 //## @brief Organizes the rendering process
 //## @ingroup Renderer
 //## Organizes the rendering process. A Renderer contains a reference to a
-//## (sub-) data 
-//## tree and asks the mappers of the data objects to render 
+//## (sub-) data tree and asks the mappers of the data objects to render 
 //## the data into the renderwindow it is associated to.
+//## 
+//## #Render() checks if rendering is currently allowed by calling
+//## RenderWindow::PrepareRendering(). Initialization of a rendering context
+//## can also be performed in this method.
+//## 
+//## The actual rendering code has been moved to #Repaint()
+//## Both #Repaint() and #Update() are declared protected now.
+//## 
+//## Note: Separation of the Repaint and Update processes (rendering vs
+//## creating a vtk prop tree) still needs to be worked on. The whole
+//## rendering process also should be reworked to use VTK based classes for
+//## both 2D and 3D rendering.
 class BaseRenderer : public itk::Object
 {
 public:

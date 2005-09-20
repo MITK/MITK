@@ -190,7 +190,6 @@ void QmitkSliceWidget::InitWidget( mitk::SliceNavigationController::ViewDirectio
 
   GetRenderer()->GetDisplayGeometry()->Fit();
   GetRenderer()->GetRenderWindow()->RequestUpdate();
-  GetRenderer()->Update();
   //int w=vtkObject::GetGlobalWarningDisplay();
   //vtkObject::GlobalWarningDisplayOff();  
   //vtkRenderer * vtkrenderer = ((mitk::OpenGLRenderer*)(GetRenderer()))->GetVtkRenderer();

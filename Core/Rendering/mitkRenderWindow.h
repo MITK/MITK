@@ -77,6 +77,14 @@ public:
   //## if the two windows use different formats.
   virtual bool IsSharing () const;
 
+  //##Documentation
+  //## @brief Gives subclasses the chance to initialize the render context
+  //## before executing the actual rendering.
+  //## This method is called by BaseRenderer::Render(). To block rendering
+  //## (e.g. if the render window
+  //## is currently invisible), false must be returned, true otherwise.
+  virtual bool PrepareRendering() { return true; };
+
   //##ModelId=3EF59AD202D5
   //##Documentation
   //## Requests a repaint of this RenderWindow. The RenderingManager will

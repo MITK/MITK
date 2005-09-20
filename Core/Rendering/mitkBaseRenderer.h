@@ -79,15 +79,14 @@ public:
     return m_RenderWindow;
   }
 
-  //##ModelId=3E330B930328
-  //##Documentation
-  //## @brief Call update of all mappers.
-  virtual void Update()=0;
-
   //##ModelId=3E330B9C02F9
   //##Documentation
-  //## @brief Do the rendering. 
-  virtual void Render() = 0;
+  //## @brief Initiates the rendering. The associated RenderWindow is given
+  //## the chance to initialize the rendering context, and block rendering if
+  //## required (e.g. if the render window is currently invisible).
+  //##
+  //## Note: Subclasses should implement Repaint(), not Render().
+  virtual void Render();
 
   //##ModelId=3EF1627503C4
   //##Documentation
@@ -297,6 +296,16 @@ protected:
 
   //##ModelId=3E3D2F12008C
   virtual ~BaseRenderer();
+
+  //##ModelId=3E330B9C02F9
+  //##Documentation
+  //## @brief Do the rendering. To be implemented in subclasses.
+  virtual void Repaint() = 0;
+
+  //##ModelId=3E330B930328
+  //##Documentation
+  //## @brief Call update of all mappers. To be implemented in subclasses.
+  virtual void Update() = 0;
 
   //##ModelId=3E3D381A027D
   //##Documentation

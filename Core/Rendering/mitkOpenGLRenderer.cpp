@@ -297,7 +297,7 @@ void mitk::OpenGLRenderer::Update()
 }
 
 //##ModelId=3E330D2903CC
-void mitk::OpenGLRenderer::Render()
+void mitk::OpenGLRenderer::Repaint()
 //first render vtkActors, then render mitkMappers
 {
   //if we do not have any data, we do nothing else but clearing our window
@@ -501,18 +501,6 @@ void mitk::OpenGLRenderer::Resize(int w, int h)
   Update();
 }
 
-/*!
-\brief Render the scene
-*/
-//##ModelId=3E33145B005A
-void mitk::OpenGLRenderer::Paint( )
-{
-
-  //  glFlush();
-  //  m_RenderWindow->swapBuffers();
-  Render();
-}
-
 //##ModelId=3E3799420227
 void mitk::OpenGLRenderer::InitSize(int w, int h)
 {
@@ -536,7 +524,7 @@ void mitk::OpenGLRenderer::SetMapperID(const MapperSlotId mapperId)
   {
     Superclass::SetMapperID(mapperId);
     //ensure that UpdateIncludingVtkActors() is called at next
-    //call of Render():
+    //call of Repaint():
     m_LastUpdateVtkActorsTime = 0;
   }
 }

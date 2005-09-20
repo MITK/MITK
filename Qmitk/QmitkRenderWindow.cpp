@@ -28,7 +28,7 @@ PURPOSE.  See the above copyright notices for more information.
 QmitkRenderWindow::QmitkRenderWindow(mitk::BaseRenderer* renderer, QGLFormat glf, QWidget *parent, const char *name) 
   : QGLWidget(glf, parent, name), mitk::RenderWindow(name, renderer), m_InitNeeded(false), m_ResizeNeeded(false), m_InResize(false)
 {
-  InitRenderer();
+  this->InitRenderer();
   setFocusPolicy(QWidget::StrongFocus);
   setMouseTracking(true);
 }
@@ -36,7 +36,7 @@ QmitkRenderWindow::QmitkRenderWindow(mitk::BaseRenderer* renderer, QGLFormat glf
 QmitkRenderWindow::QmitkRenderWindow(QGLFormat glf, QWidget *parent, const char *name) 
   : QGLWidget(glf, parent, name), mitk::RenderWindow(name, NULL), m_InitNeeded(false), m_ResizeNeeded(false), m_InResize(false)
 {
-  InitRenderer();
+  this->InitRenderer();
   setFocusPolicy(QWidget::StrongFocus);
   setMouseTracking(true);
 }
@@ -45,7 +45,7 @@ QmitkRenderWindow::QmitkRenderWindow(QGLFormat glf, QWidget *parent, const char 
 QmitkRenderWindow::QmitkRenderWindow(mitk::BaseRenderer* renderer, QWidget *parent, const char *name)
 : QGLWidget(parent, name), mitk::RenderWindow(name, renderer), m_InitNeeded(false), m_ResizeNeeded(false), m_InResize(false)
 {
-  InitRenderer();
+  this->InitRenderer();
   setFocusPolicy(QWidget::StrongFocus);
   setMouseTracking(true);
 }
@@ -53,7 +53,7 @@ QmitkRenderWindow::QmitkRenderWindow(mitk::BaseRenderer* renderer, QWidget *pare
 QmitkRenderWindow::QmitkRenderWindow(QWidget *parent, const char *name)
 : QGLWidget(parent, name), mitk::RenderWindow(name, NULL), m_InitNeeded(false), m_ResizeNeeded(false), m_InResize(false)
 {
-  InitRenderer();
+  this->InitRenderer();
   setFocusPolicy(QWidget::StrongFocus);
   setMouseTracking(true);
 }
@@ -72,6 +72,29 @@ void QmitkRenderWindow::InitRenderer()
   RenderWindow::InitRenderer();
 
   this->setAutoBufferSwap( false );
+}
+
+bool QmitkRenderWindow::PrepareRendering()
+{
+  // Get the native window ID and pass it
+  // to the m_Renderer
+  // before we render for the first time...
+  if ( m_InitNeeded )
+  {
+    WId nId = winId();
+    this->SetWindowId( (void*) nId );
+    m_InitNeeded = false;
+  }
+
+  // rendering when not visible might cause serious problems (program may hang)
+  if ( QGLWidget::isVisible() )
+  {
+    if ( m_Renderer.IsNotNull() )
+    {
+      return true; // allow rendering
+    }
+  }
+  return false; // block rendering
 }
 
 /*!
@@ -108,21 +131,8 @@ void QmitkRenderWindow::resizeGL( int w, int h )
 //##ModelId=3E3314590396
 void QmitkRenderWindow::paintGL( )
 {
-  // Get the native window ID and pass it
-  // to the m_Renderer
-  // before we render for the first time...
-  if(m_InitNeeded)
-  {
-    WId nId = winId();
-    SetWindowId( (void*) nId );
-    m_InitNeeded = false;
-  }
-  // rendering when not visible might cause serious problems (program may hang)
-  if(QGLWidget::isVisible())
-  {
-    if(m_Renderer.IsNotNull())
-      m_Renderer->Paint();
-  }
+  // Calls back to PrepareRendering()
+  m_Renderer->Render();
 }
 
 void QmitkRenderWindow::showEvent ( QShowEvent * )

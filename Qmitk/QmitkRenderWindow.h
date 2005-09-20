@@ -76,6 +76,8 @@ protected:
   //##ModelId=3E33145A0171
   virtual void InitRenderer();
 
+  virtual bool PrepareRendering();
+
   //##ModelId=3E3314590288
   bool m_InitNeeded;
 

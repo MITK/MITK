@@ -18,6 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include "mitkBaseRenderer.h"
+#include "mitkRenderWindow.h"
 
 #include "mitkPlaneGeometry.h"
 #include "mitkSlicedGeometry3D.h"
@@ -34,9 +35,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkStatusBar.h"
 #include "mitkInteractionConst.h"
+#include "mitkCameraController.h"
 
 #include <vtkLinearTransform.h>
-#include "mitkCameraController.h"
 #include <itkSmartPointerForwardReference.txx>
 
 mitk::BaseRenderer::RendererSet mitk::BaseRenderer::instances;
@@ -45,11 +46,15 @@ template class itk::SmartPointerForwardReference<mitk::CameraController>;
 
 //##ModelId=3E3D2F120050
 mitk::BaseRenderer::BaseRenderer( const char* name ) : 
-  m_MapperID(defaultMapper), m_DataTreeIterator(NULL), m_RenderWindow(NULL), m_LastUpdateTime(0), m_CameraController(NULL), m_Focused(false), 
-  m_WorldGeometry(NULL), m_TimeSlicedWorldGeometry(NULL), m_CurrentWorldGeometry2D(NULL), m_Slice(0), m_TimeStep(0)
+  m_MapperID(defaultMapper), m_DataTreeIterator(NULL), m_RenderWindow(NULL),
+  m_LastUpdateTime(0), m_CameraController(NULL), m_Focused(false), 
+  m_WorldGeometry(NULL), m_TimeSlicedWorldGeometry(NULL),
+  m_CurrentWorldGeometry2D(NULL), m_Slice(0), m_TimeStep(0)
 {
-  if(name != NULL)
+  if (name != NULL)
+  {
     m_Name = name;
+  }
   else
   {
     m_Name = "unnamed renderer";
@@ -400,6 +405,16 @@ void mitk::BaseRenderer::KeyPressEvent(mitk::KeyEvent *ke)
     m_CameraController->KeyPressEvent(ke);
   mitk::Event event(this, ke->type(), BS_NoButton, BS_NoButton, ke->key());
   mitk::EventMapper::MapEvent(&event);
+}
+
+void mitk::BaseRenderer::Render()
+{
+  // Initialize the render context and do the rendering, if the RenderWindow
+  // allows for it.
+  if ( m_RenderWindow && m_RenderWindow->PrepareRendering() )
+  {
+    this->Repaint();
+  }
 }
 
 //##ModelId=3EF1627503C4

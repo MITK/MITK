@@ -59,18 +59,6 @@ public:
 
   virtual void Update(mitk::DataTreeNode* datatreenode);
 
-  //##ModelId=3E330D260255
-  virtual void Update();
-
-  //##ModelId=3E330D2903CC
-  //##Documentation
-  //## @brief Do the rendering. 
-  //## If necessary, Update() and UpdateVtkActors() is called first.
-  //## The order of rendering is: First update the VTK Actors and render them, 
-  //## then prepare 2D-rendering informations with layers and render them.
-  //## Due to that order, 2D-Layers or e.g. a video can be manually put in the background
-  virtual void Render();
-
   //##ModelId=3EF59AD20235
   virtual void SetMapperID(const MapperSlotId mapperId);
 
@@ -105,8 +93,17 @@ public:
   virtual void PickWorldPoint(const Point2D& displayPoint, Point3D& worldPoint) const;
 
 protected:
-  //##ModelId=3E33145B005A
-  virtual void Paint();
+  //##ModelId=3E330D260255
+  virtual void Update();
+
+  //##ModelId=3E330D2903CC
+  //##Documentation
+  //## @brief Do the rendering. 
+  //## If necessary, Update() and UpdateVtkActors() is called first.
+  //## The order of rendering is: First update the VTK Actors and render them, 
+  //## then prepare 2D-rendering informations with layers and render them.
+  //## Due to that order, 2D-Layers or e.g. a video can be manually put in the background
+  virtual void Repaint();
 
   //##ModelId=3E33145B0096
   virtual void Initialize();

@@ -47,7 +47,9 @@ namespace mitk {
     //## @params button: mouse-button
     //## @params buttonState: which other key hast been pressed? (Mouse/Keyboard modifier-keys)
     //## @params key: pressed key
+    //Event(mitk::BaseRenderer* sender, int type, int button, int buttonState, int key);
     Event(mitk::BaseRenderer* sender, int type, int button, int buttonState, int key);
+
 
     //##ModelId=3EF099E8023A
     virtual ~Event();

@@ -26,7 +26,7 @@ PURPOSE.  See the above copyright notices for more information.
 class QTimer;
 
 /**
- * \brief QT specific implementation of mitk::RenderinManager.
+ * \brief QT specific implementation of mitk::RenderingManager.
  *
  * This implementation uses a QTimer object to realize the RenderWindow
  * update timing. The execution of pending updates is controlled by the

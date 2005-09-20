@@ -326,12 +326,13 @@ bool mitk::AffineInteractor::ConvertDisplayEventToWorldPosition(mitk::DisplayPos
   double focalPoint[4], position[4];
   double z;
 
-  const FocusManager::FocusElement* fe =
-    mitk::GlobalInteraction::GetInstance()->GetFocus();
-  FocusManager::FocusElement* fe2 =  const_cast <FocusManager::FocusElement*>(fe);
-  mitk::OpenGLRenderer* glRenderer = dynamic_cast<mitk::OpenGLRenderer*>(fe2);
-  if (glRenderer == NULL)
+  FocusManager::FocusElement* fe = mitk::GlobalInteraction::GetInstance()->GetFocus();
+  mitk::OpenGLRenderer* glRenderer = dynamic_cast<mitk::OpenGLRenderer*>( fe );
+  if ( glRenderer == NULL )
+  {
     return false;
+  }
+
   vtkRenderer *renderer = glRenderer->GetVtkRenderer();
   vtkCamera *camera = renderer->GetActiveCamera();
   if ( !camera )

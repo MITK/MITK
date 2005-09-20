@@ -216,7 +216,7 @@ bool mitk::GlobalInteraction::RemoveFocusElement(mitk::FocusManager::FocusElemen
   return m_FocusManager->RemoveElement(element);
 }
 
-const mitk::FocusManager::FocusElement* mitk::GlobalInteraction::GetFocus()
+mitk::FocusManager::FocusElement* mitk::GlobalInteraction::GetFocus()
 {
   return m_FocusManager->GetFocused();
 }

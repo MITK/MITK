@@ -358,7 +358,7 @@ bool mitk::SliceNavigationController::ExecuteAction( Action* action, mitk::State
           //mitk::BaseRenderer *baseRenderer = posEvent->GetSender();
           //if (baseRenderer==NULL)
           //  {
-          //    baseRenderer = const_cast<mitk::BaseRenderer *>(mitk::GlobalInteraction::GetInstance()->GetFocus());
+          //    baseRenderer = mitk::GlobalInteraction::GetInstance()->GetFocus();
           //  }
           //  if (baseRenderer!=NULL)
           //  {

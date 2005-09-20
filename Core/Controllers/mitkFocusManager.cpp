@@ -62,7 +62,7 @@ bool mitk::FocusManager::RemoveElement(FocusElement* element)
 }
 
 //##ModelId=3EDCAF7902BD
-const mitk::FocusManager::FocusElement* mitk::FocusManager::GetFocused() const 
+mitk::FocusManager::FocusElement* mitk::FocusManager::GetFocused() const 
 {
   return m_FocElement.GetPointer();
 }

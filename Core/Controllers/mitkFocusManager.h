@@ -79,7 +79,7 @@ namespace mitk {
   //##ModelId=3EDCAF7902BD
   //##Documentation
   //## returns the focused Widget
-  const FocusElement* GetFocused() const;
+  FocusElement* GetFocused() const;
 
   //##ModelId=3EDCAF7902FB
   //##Documentation

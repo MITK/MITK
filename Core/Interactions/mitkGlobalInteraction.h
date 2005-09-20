@@ -127,7 +127,7 @@ namespace mitk {
 
     //##Documentation
     //## @brief Returns the focused Element in FocusManager
-    const FocusManager::FocusElement* GetFocus();
+    FocusManager::FocusElement* GetFocus();
 
     //##Documentation
     //## @brief Sets the given Element to focused

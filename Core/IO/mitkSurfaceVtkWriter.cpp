@@ -34,6 +34,6 @@ void mitk::SurfaceVtkWriter<vtkPolyDataWriter>::SetDefaultExtension()
   m_Extension = ".vtk";
 }
 
-template mitk::SurfaceVtkWriter<vtkSTLWriter>;
+template class mitk::SurfaceVtkWriter<vtkSTLWriter>;
 
-template mitk::SurfaceVtkWriter<vtkPolyDataWriter>;
+template class mitk::SurfaceVtkWriter<vtkPolyDataWriter>;

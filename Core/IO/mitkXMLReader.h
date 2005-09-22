@@ -28,7 +28,6 @@ namespace mitk{
       XMLNode* m_Parent;
 
     public: 
-      typedef std::map<std::string,std::string> PropertyType;
       XMLNode( const char *elementName, const char **atts );
       const std::string& GetName(){ return m_Name; };
       const std::string& GetProperty( const std::string& key ) { return m_properties[key]; };

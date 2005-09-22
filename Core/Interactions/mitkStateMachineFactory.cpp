@@ -135,8 +135,9 @@ mitk::State* mitk::StateMachineFactory::GetStartState(const char * type)
 	StartStateMapIter tempState = m_StartStates.find(type);
 	if( tempState != m_StartStates.end() )
         return (tempState)->second;
-	else
-		return NULL;
+	else //no itkWarningMacro possible, cause no this pointer available in static method
+    std::cout<<"StatemachineFactory.cpp: No Startstate found! Please check name of statemachine-pattern. Returning NULL!"<<std::endl;
+  return NULL;
 }
 
 //##ModelId=3E5B41730261

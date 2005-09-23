@@ -45,9 +45,16 @@ void QmitkTreeNodeSelector::UpdateContent()
     }
   }
   QString newText = m_ComboBox->currentText();
-  if ( (currentText != newText) && (newText.isNull() == false) )
+  if ( (currentText != newText) )
   {
-    TreeNodeSelected(newText);
+    if ( !newText.isNull() ) 
+    {
+      TreeNodeSelected(newText);
+    }
+    else
+    {
+      emit TreeNodeChanged();
+    }
   }
 }
 
@@ -65,6 +72,7 @@ void QmitkTreeNodeSelector::init()
 
 void QmitkTreeNodeSelector::TreeNodeSelected( const QString &name )
 {
+  emit TreeNodeChanged();
   emit Activated(m_TreeNodes[name.ascii()]);
   emit Activated(m_TreeNodes[name.ascii()]->Get());
 }

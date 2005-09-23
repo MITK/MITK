@@ -54,6 +54,7 @@
 <signals>
     <signal>Activated(mitk::DataTreeIteratorClone node)</signal>
     <signal>Activated(mitk::DataTreeNode* node)</signal>
+    <signal>TreeNodeChanged()</signal>
 </signals>
 <slots>
     <slot>SetDataTreeNodeIterator( mitk::DataTreeIteratorClone it )</slot>

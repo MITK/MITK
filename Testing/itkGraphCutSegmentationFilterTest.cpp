@@ -1,14 +1,30 @@
+/*=========================================================================
+
+Program:   Medical Imaging & Interaction Toolkit
+Module:    $RCSfile$
+Language:  C++
+Date:      $Date$
+Version:   $Revision$
+
+Copyright (c) German Cancer Research Center, Division of Medical and
+Biological Informatics. All rights reserved.
+See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
+
+This software is distributed WITHOUT ANY WARRANTY; without even
+the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE.  See the above copyright notices for more information.
+
+=========================================================================*/
+
 #include <iostream>
 #include <itkImage.h>
 #include <itkIndex.h>
 #include <itkImageRegionIterator.h>
-//#include <itkSphereSpatialFunction.h>
 
-//#include <itkImageFileReader.h>
 //#include <itkImageFileWriter.h>
 
-#include "itkGraphCutSegmentationGridGraphFilter.h"
-#include "itkGraphCutSegmentationBoykovFilter.h"
+#include <../../Algorithms/itkSegmentationFilter/itkGraphCutSegmentationGridGraphFilter.h>
+#include <../../Algorithms/itkSegmentationFilter/itkGraphCutSegmentationBoykovFilter.h>
 
 
 int itkGraphCutSegmentationFilterTest(int, char* [] )
@@ -267,7 +283,21 @@ int itkGraphCutSegmentationFilterTest(int, char* [] )
 
   ImageType::Pointer resultImage;
   resultImage = graphcutFilter->GetOutput();
-
+/*
+  typedef itk::ImageFileWriter<ImageType> FileWriterType;
+  FileWriterType::Pointer FileWriter = FileWriterType::New();
+  FileWriter->SetInput( resultImage );
+  FileWriter->SetFileName("C:\\pics\\testing.mhd");
+  try
+  {
+      FileWriter->Update();
+  }
+  catch ( itk::ExceptionObject & excep )
+  {
+      std::cerr << "Exception caught !" << std::endl;
+      std::cerr << excep << std::endl;
+  }
+*/
   IteratorType testIterator(resultImage, resultImage->GetRequestedRegion());
   for (testIterator.GoToBegin(); !testIterator.IsAtEnd(); ++testIterator){
 	  if(testIterator.Get()==255)

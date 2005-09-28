@@ -150,7 +150,8 @@ void mitk::OperationEvent::ReverseOperations()
 void mitk::OperationEvent::ReverseAndExecute()
 {
   ReverseOperations();
-  m_Destination->ExecuteOperation( m_Operation );
+  if (m_Destination && m_Operation)
+    m_Destination->ExecuteOperation( m_Operation );
 }
 
 //##ModelId=3E9B07B502AC

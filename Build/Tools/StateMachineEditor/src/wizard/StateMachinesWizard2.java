@@ -1,9 +1,12 @@
 package wizard;
 
+import model.StateMachinesDiagram;
+
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.PartInitException;
 import org.eclipse.core.runtime.*;
 import org.eclipse.jface.operation.*;
 
@@ -15,36 +18,42 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.core.resources.*;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ui.*;
-import org.eclipse.ui.ide.IDE;
+import org.jdom.Element;
+
+import dom.DOMGetInstance;
+import dom.ReadDOMTree;
+
+import view.StateMachinesList;
 
 /**
- * This is a sample new wizard. Its role is to create a new file 
- * resource in the provided container. If the container resource
+ * This is a new wizard. Its role is to create new statemachines  
+ * from the *.xml file in the provided container. If the container resource
  * (a folder or a project) is selected in the workspace 
  * when the wizard is opened, it will accept it as the target
- * container. The wizard creates one file with the extension
- * "invokatron". If a sample multi-page editor (also available
- * as a template) is registered for the same extension, it will
+ * container. The wizard creates statemachines with the extension
+ * ".states". If an editor is registered for the same extension, it will
  * be able to open it.
  */
 
 public class StateMachinesWizard2 extends Wizard implements INewWizard {
-	private List filenames;
+	private String file;
 	private StateMachinesWizardPage2 page;
 	private ISelection selection;
+	private ReadDOMTree tree = null;
 
 	/**
 	 * Constructor for StateMachinesWizard2.
 	 */
+	
 	public StateMachinesWizard2() {
 		super();
 		setNeedsProgressMonitor(true);
 	}
 	
-	public StateMachinesWizard2(List StateMachine) {
+	public StateMachinesWizard2(String file2) {
 		super();
 		setNeedsProgressMonitor(true);
-		filenames = StateMachine;
+		file = file2;
 	}
 	
 	/**
@@ -62,9 +71,19 @@ public class StateMachinesWizard2 extends Wizard implements INewWizard {
 	 * using wizard as execution context.
 	 */
 	public boolean performFinish() {
+		IWorkbenchPage page1 = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage(); 
+		try {
+			page1.showView("StatemachinesList");
+		} catch (PartInitException e1) {
+			e1.printStackTrace();
+		}
+		DOMGetInstance.reset();
+		StateMachinesList.reset();
 		final String containerName = page.getContainerName();
 		IRunnableWithProgress op = new IRunnableWithProgress() {
 			public void run(IProgressMonitor monitor) throws InvocationTargetException {
+				tree = DOMGetInstance.getInstance(file);
+				List filenames = tree.getStateMachineNames();
 				for (int i = 0; i < filenames.size(); i++) {
 				try {					
 					String filename = filenames.get(i).toString() + ".states";
@@ -91,9 +110,8 @@ public class StateMachinesWizard2 extends Wizard implements INewWizard {
 	}
 	
 	/**
-	 * The worker method. It will find the container, create the
-	 * file if missing or just replace its contents, and open
-	 * the editor on the newly created file.
+	 * The worker method. It will find the container and create the
+	 * statemachines.
 	 */
 
 	private void doFinish(
@@ -109,41 +127,29 @@ public class StateMachinesWizard2 extends Wizard implements INewWizard {
 			throwCoreException("Container \"" + containerName + "\" does not exist.");
 		}
 		IContainer container = (IContainer) resource;
-		final IFile file = container.getFile(new Path(fileName));
-	  /*try {
-			InputStream stream = openContentStream();
-			if (file.exists()) {
-				file.setContents(stream, true, true, monitor);
-			} else {
-				file.create(stream, true, monitor);
-			}
-			stream.close();
-		} catch (IOException e) {
-		}*/
+		final IFile file1 = container.getFile(new Path(fileName));
+		StateMachinesList.setContainer(container);
 		monitor.worked(1);
 		monitor.setTaskName("Opening file for editing...");
 		getShell().getDisplay().asyncExec(new Runnable() {
 			public void run() {
-				IWorkbenchPage page =
-					PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-				try {
-					IDE.openEditor(page, file, true);					
-				} catch (PartInitException e) {
+				List allMachines = tree.getStateMachines();
+				for (int i = 0; i < allMachines.size(); i++) {
+					Element machine = (Element) allMachines.get(i);
+					String file2 = file1.getName().toString();
+					int length = file2.length();
+					String filename = file2.subSequence(0, length-7).toString();
+					if (filename.equals(machine.getAttributeValue("NAME"))) {
+						StateMachinesDiagram diagram = new StateMachinesDiagram(machine);
+						tree.addDiagram(diagram);
+						StateMachinesList.addToStateMachinesList(file1, filename);
+						break;
+					}
 				}
 			}
 		});
 		monitor.worked(1);
 	}
-	
-	/**
-	 * We will initialize file contents with a sample text.
-	 */
-
-	/*private InputStream openContentStream() {
-		String contents =
-			"";
-		return new ByteArrayInputStream(contents.getBytes());
-	}*/
 
 	private void throwCoreException(String message) throws CoreException {
 		IStatus status =
@@ -156,6 +162,7 @@ public class StateMachinesWizard2 extends Wizard implements INewWizard {
 	 * we can initialize from it.
 	 * @see IWorkbenchWizard#init(IWorkbench, IStructuredSelection)
 	 */
+	
 	public void init(IWorkbench workbench, IStructuredSelection selection) {
 		this.selection = selection;
 	}

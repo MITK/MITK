@@ -1,5 +1,7 @@
 package wizard;
 
+import java.util.ArrayList;
+
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.widgets.*;
 import org.eclipse.swt.layout.*;
@@ -10,11 +12,13 @@ import org.eclipse.swt.events.*;
 import org.eclipse.ui.dialogs.ContainerSelectionDialog;
 import org.eclipse.jface.viewers.*;
 
+import view.StateMachinesList;
+
 /**
- * The "New" wizard page allows setting the container for
+ * The wizard page allows setting the container for
  * the new file as well as the file name. The page
- * will only accept file name without the extension OR
- * with the extension that matches the expected one (invokatron).
+ * will only accept file name with the extension that
+ * matches the expected one and does not exist already.
  */
 
 public class StateMachinesWizardPage extends WizardPage {
@@ -23,13 +27,13 @@ public class StateMachinesWizardPage extends WizardPage {
 	private ISelection selection;
 
 	/**
-	 * Constructor for SampleNewWizardPage.
+	 * Constructor for StateMachinesWizardPage.
 	 * @param pageName
 	 */
 	public StateMachinesWizardPage(ISelection selection) {
 		super("wizardPage");
-		setTitle("Multi-page Editor File");
-		setDescription("This wizard creates a new file with *.states extension that can be opened by a multi-page editor.");
+		setTitle("Editor File");
+		setDescription("This wizard creates a new file with *.states extension that can be opened by a editor.");
 		this.selection = selection;
 	}
 
@@ -120,7 +124,7 @@ public class StateMachinesWizardPage extends WizardPage {
 	}
 	
 	/**
-	 * Ensures that both text fields are set.
+	 * Ensures that both text fields are set, extension is ".states" and statemachine does not exist already.
 	 */
 
 	private void dialogChanged() {
@@ -135,13 +139,20 @@ public class StateMachinesWizardPage extends WizardPage {
 			updateStatus("File name must be specified");
 			return;
 		}
-		int dotLoc = fileName.lastIndexOf('.');
-		if (dotLoc != -1) {
-			String ext = fileName.substring(dotLoc + 1);
-			if (ext.equalsIgnoreCase("states") == false) {
-				updateStatus("File extension must be \"states\"");
+		ArrayList allNames = (ArrayList) StateMachinesList.allNames;
+		int length = fileName.length();
+		String filename = fileName.subSequence(0, length-7).toString();
+		for (int i = 0; i < allNames.size(); i++) {
+			if (allNames.get(i).equals(filename)) {
+				updateStatus("File already exist");
 				return;
 			}
+		}
+		int dotLoc = fileName.lastIndexOf('.');
+		String ext = fileName.substring(dotLoc + 1);
+		if (ext.equalsIgnoreCase("states") == false) {
+			updateStatus("File extension must be \".states\"");
+			return;
 		}
 		updateStatus(null);
 	}

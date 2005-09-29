@@ -43,7 +43,7 @@ final class StateMachinesEditorPaletteFactory {
 	/** Preference ID used to persist the flyout palette's state. */
 	private static final String PALETTE_STATE = "StateMachinesEditorPaletteFactory.State";
 
-	/** Create the "GetDOMStates" drawer. */
+	/** Create the "States" drawer. */
 	private static PaletteContainer createStatesDrawer() {
 		PaletteDrawer componentsDrawer = new PaletteDrawer("GetDOMStates");
 

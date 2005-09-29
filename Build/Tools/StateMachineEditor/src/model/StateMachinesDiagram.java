@@ -9,6 +9,8 @@ import java.util.List;
 import org.jdom.Attribute;
 import org.jdom.Element;
 
+import stateMachines.StateMachinesEditor;
+
 import dom.ReadDOMTree;
 
 /**
@@ -29,6 +31,8 @@ public class StateMachinesDiagram extends ModelElement {
 	private Element stateMachine;
 	
 	private int maxID = 0;
+	
+	private StateMachinesEditor editor1;
 	
 	public StateMachinesDiagram(Element machine) {
 		List statesList = machine.getChildren("state", machine.getNamespace());
@@ -67,10 +71,13 @@ public class StateMachinesDiagram extends ModelElement {
 			}
 		}
 	}
-
-	public StateMachinesDiagram() {
-		
+	
+	public void setEditor(StateMachinesEditor editor) {
+		editor1 = editor;
 	}
+	/*public StateMachinesDiagram() {
+		
+	}*/
 
 	/**
 	 * Add a state to this diagram.
@@ -142,9 +149,20 @@ public class StateMachinesDiagram extends ModelElement {
 	
 	public void changeName(String name) {
 		stateMachine.setAttribute("NAME", name);
+		if (!(editor1 == null)) {
+			editor1.setPartName1(name);
+		}
 	}
 	
 	public String getStateMachineName() {
 		return stateMachine.getAttributeValue("NAME");
+	}
+
+	public StateMachinesEditor getEditor() {
+		return editor1;
+	}
+	
+	public Element getStateMachinesElement() {
+		return stateMachine;
 	}
 }

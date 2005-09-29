@@ -156,12 +156,11 @@ class StateMachinesEditPart extends AbstractGraphicalEditPart implements
 
 	/**
 	 * Return a IFigure depending on the instance of the current model element.
-	 * This allows this EditPart to be used for all subclasses of GetDOMStates.
+	 * This allows this EditPart to be used for all subclasses of States.
 	 */
 	private IFigure createFigureForModel() {
 		if (getModel() instanceof StartState) {
 			return new RoundLabel();
-			
 		} 
 		else if (getModel() instanceof NormalState) {
 			return new RoundLabel();
@@ -202,7 +201,7 @@ class StateMachinesEditPart extends AbstractGraphicalEditPart implements
 				anchor = new ChopboxAnchor(getFigure());
 			}
 			else {
-				// if GetDOMStates gets extended the conditions above must be updated
+				// if States gets extended the conditions above must be updated
 				throw new IllegalArgumentException("unexpected model");
 			}
 		}

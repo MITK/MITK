@@ -1,6 +1,6 @@
 package wizard;
 
-import java.util.List;
+import java.io.File;
 
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
@@ -12,9 +12,6 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 import org.eclipse.ui.PlatformUI;
-
-import dom.DOMGetInstance;
-import dom.ReadDOMTree;
 
 
 /**
@@ -48,11 +45,8 @@ public class CreateFromXML implements IWorkbenchWindowActionDelegate {
 		if (!(fileDialog.getFileName().equals(""))) {
 			String file = fileDialog.getFilterPath();
 			String file1 = fileDialog.getFileName();
-			String file2 = file + "\\" + file1;
-			DOMGetInstance.reset();
-			ReadDOMTree tree = DOMGetInstance.getInstance(file2);
-			List stateMachines = tree.getStateMachineNames();
-			StateMachinesWizard2 wizard= new StateMachinesWizard2(stateMachines);
+			String file2 = file + File.separator + file1;
+			StateMachinesWizard2 wizard= new StateMachinesWizard2(file2);
 			WizardDialog dialog = new WizardDialog(shell, wizard);
 			dialog.create();
 			dialog.open();

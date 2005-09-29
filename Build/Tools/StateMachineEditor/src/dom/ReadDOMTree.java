@@ -20,23 +20,41 @@ public class ReadDOMTree {
 	private List allMachines = new ArrayList();
 	private Document doc = null;
 	
+	public void addDiagram(StateMachinesDiagram diagram) {
+		allMachines.add(diagram);
+	}
+	
+	public void removeDiagram(StateMachinesDiagram diagram) {
+		allMachines.remove(diagram);
+	}
+	
+	public List getAllDiagrams() {
+		return allMachines;
+	}
+	
 	public List getStateMachines() {
 		return doc.getRootElement().getChildren("stateMachine", doc.getRootElement().getNamespace());
 	}
-	
-	public Element getRoot() {
-		return doc.getRootElement();
-	}	
 
 	public void addStateMachine(StateMachinesDiagram machine, Element stateMachine) {
 		stateMachine.setNamespace(doc.getRootElement().getNamespace());
 		doc.getRootElement().addContent(stateMachine);
-		allMachines.add(machine);
 	}
 
 	public void removeStateMachine(StateMachinesDiagram machine, Element stateMachine) {
 		doc.getRootElement().removeContent(stateMachine);
 		allMachines.remove(machine);
+	}
+	
+	public StateMachinesDiagram getStateMachinesDiagram(String machineName) {
+		StateMachinesDiagram machine = null;
+		for (int j = 0; j < allMachines.size(); j++) {
+			machine = (StateMachinesDiagram) allMachines.get(j);
+			if (machine.getStateMachineName().equals(machineName)) {
+				break;
+			}
+		}
+		return machine;
 	}
 	
 	public ReadDOMTree(String file) {

@@ -11,10 +11,8 @@ import org.eclipse.ui.dialogs.ContainerSelectionDialog;
 import org.eclipse.jface.viewers.*;
 
 /**
- * The "New" wizard page allows setting the container for
- * the new file as well as the file name. The page
- * will only accept file name without the extension OR
- * with the extension that matches the expected one (invokatron).
+ * The wizard page allows setting the container for
+ * the new file.
  */
 
 public class StateMachinesWizardPage2 extends WizardPage {
@@ -22,13 +20,13 @@ public class StateMachinesWizardPage2 extends WizardPage {
 	private ISelection selection;
 
 	/**
-	 * Constructor for SampleNewWizardPage.
+	 * Constructor for StateMachinesWizardPage2.
 	 * @param pageName
 	 */
 	public StateMachinesWizardPage2(ISelection selection) {
 		super("wizardPage");
-		setTitle("Multi-page Editor File");
-		setDescription("This wizard creates all statemachines as files with *.states extension that are in the .xml file.");
+		setTitle("Editor File");
+		setDescription("This wizard creates all statemachines with *.states extension that are in the *.xml file.");
 		this.selection = selection;
 	}
 

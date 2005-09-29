@@ -20,9 +20,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkPicHelper.h"
 #include "mitkSlicedGeometry3D.h"
 #include "mitkPlaneGeometry.h"
-#ifdef MBI_INTERNAL
+#ifdef HAVE_IPDICOM
 #include "ipDicom/ipDicom.h"
-#endif
+#endif /* HAVE_IPDICOM */
 
 bool mitk::PicHelper::GetSpacing(const ipPicDescriptor* aPic, Vector3D & spacing)
 {
@@ -50,7 +50,7 @@ bool mitk::PicHelper::GetSpacing(const ipPicDescriptor* aPic, Vector3D & spacing
         }
     }
   }
-#ifdef MBI_INTERNAL
+#ifdef HAVE_IPDICOM
   else
   {
     tsv = ipPicQueryTag( pic, "SOURCE HEADER" );
@@ -92,7 +92,7 @@ bool mitk::PicHelper::GetSpacing(const ipPicDescriptor* aPic, Vector3D & spacing
       return ok;
     }
   }
-#endif
+#endif /* HAVE_IPDICOM */
   if(spacing[0]<=0 || spacing[1]<=0 || spacing[2]<=0)
   {
     itkGenericOutputMacro(<< "illegal spacing by pic tag: " << spacing << ". Setting spacing to (1,1,1).");

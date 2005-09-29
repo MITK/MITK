@@ -67,7 +67,9 @@ PURPOSE.  See the above copyright notices for more information.
 #ifdef MBI_INTERNAL
 #include "mitkVesselGraphFileReader.h"
 #include "mitkVesselTreeFileReader.h"
+#ifdef HAVE_IPDICOM
 #include "mitkDICOMFileReader.h"
+#endif /* HAVE_IPDICOM */
 #include "mitkCylindricToCartesianFilter.h"
 #include "mitkDSRFileReader.h"
 #endif
@@ -124,10 +126,12 @@ void mitk::DataTreeNodeFactory::GenerateData()
     }
 #endif
 #ifdef MBI_INTERNAL
+#ifdef HAVE_IPDICOM
     else if ( this->FileNameEndsWith( ".DCM" ) || this->FileNameEndsWith( ".dcm" ) )
     {
       this->ReadFileTypeDCM();
     }
+#endif /* HAVE_IPDICOM */
     else if ( this->FileNameEndsWith( ".ves" ) )
     {
       this->ReadFileTypeVES();
@@ -658,6 +662,7 @@ void mitk::DataTreeNodeFactory::ReadFileTypeHPSONOS()
   std::cout << "...finished!" << std::endl;
 }
 
+#ifdef HAVE_IPDICOM
 
 void mitk::DataTreeNodeFactory::ReadFileTypeDCM()
 {
@@ -687,6 +692,7 @@ void mitk::DataTreeNodeFactory::ReadFileTypeDCM()
 }
 
 
+#endif /* HAVE_IPDICOM */
 #endif
 
 void mitk::DataTreeNodeFactory::ReadFileTypeGDCM()

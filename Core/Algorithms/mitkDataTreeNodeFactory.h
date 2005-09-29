@@ -173,8 +173,10 @@ protected:
 
 #ifdef MBI_INTERNAL
 
+#ifdef HAVE_IPDICOM
   virtual void ReadFileTypeDCM();
 
+#endif /* HAVE_IPDICOM */
   virtual void ReadFileTypeVES();
 
   virtual void ReadFileTypeUVG();

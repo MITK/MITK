@@ -719,6 +719,12 @@
         <slot>fileSave()</slot>
     </connection>
     <connection>
+        <sender>fileSaveProjectAsAction</sender>
+        <signal>activated()</signal>
+        <receiver>QmitkMainTemplate</receiver>
+        <slot>fileSaveProjectAs()</slot>
+    </connection>
+    <connection>
         <sender>fileOpenAction</sender>
         <signal>activated()</signal>
         <receiver>QmitkMainTemplate</receiver>

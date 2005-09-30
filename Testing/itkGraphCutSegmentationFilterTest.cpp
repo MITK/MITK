@@ -23,9 +23,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 //#include <itkImageFileWriter.h>
 
-#include <../../Algorithms/itkSegmentationFilter/itkGraphCutSegmentationGridGraphFilter.h>
-#include <../../Algorithms/itkSegmentationFilter/itkGraphCutSegmentationBoykovFilter.h>
-
+#include <itkGraphCutSegmentationGridGraphFilter.h>
+#include <itkGraphCutSegmentationBoykovFilter.h>
 
 int itkGraphCutSegmentationFilterTest(int, char* [] )
 //int main(int, char* [] )

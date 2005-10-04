@@ -172,10 +172,6 @@ void mitk::DataTreeNodeFactory::GenerateData()
     {
       this->ReadFileSeriesTypeGDCM();
     }
-    else if ( this->FilePatternEndsWith( ".png" ) || this->FilePatternEndsWith( ".PNG" ) )
-    {
-      this->ReadFileSeriesTypeITKImageSeriesReader();
-    }
     else if ( this->FilePatternEndsWith( ".stl" ) || this->FilePatternEndsWith( ".STL" ) )
     {
       this->ReadFileSeriesTypeSTL();
@@ -183,6 +179,10 @@ void mitk::DataTreeNodeFactory::GenerateData()
     else if ( this->FilePatternEndsWith( ".vtk" ) || this->FilePatternEndsWith( ".VTK" ) )
     {
       this->ReadFileSeriesTypeVTK();
+    }
+    else
+    {
+      this->ReadFileSeriesTypeITKImageSeriesReader();
     }
   }
   unsigned int nOut = this->GetNumberOfOutputs();

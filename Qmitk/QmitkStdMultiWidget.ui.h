@@ -28,7 +28,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkProperties.h>
 #include <mitkStringProperty.h>
 #include <mitkLevelWindowProperty.h>
-#include <mitkGeometry2DDataVtkMapper3D.h>
+#include <mitkGeometry2DDataMapper2D.h>
 #include <vtkRenderer.h>
 #include <mitkOpenGLRenderer.h>
 // for AdjustCross
@@ -397,23 +397,34 @@ void QmitkStdMultiWidget::AddDisplayPlaneSubTree(mitk::DataTreeIteratorBase* it)
 
   float white[3] = {1.0f,1.0f,1.0f};
   mitk::DataTreeNode::Pointer planeNode;
+  mitk::Geometry2DDataMapper2D::Pointer mapper;
   // ... of widget 1
   planeNode=mitkWidget1->GetRenderer()->GetCurrentWorldGeometry2DNode();
   planeNode->SetColor(white, mitkWidget4->GetRenderer());
   planeNode->SetProperty("name", new mitk::StringProperty("widget1Plane"));
   planeNode->SetProperty("includeInBoundingBox", new mitk::BoolProperty(false));
+  mapper = mitk::Geometry2DDataMapper2D::New();
+  planeNode->SetMapper(mitk::BaseRenderer::Standard2D, mapper);
   dit->Add(planeNode);
+  mitk::DataTreeChildIterator childIterator(*(dit.GetPointer()));
+  mapper->SetDataIteratorToOtherGeometry2Ds(&childIterator);
   // ... of widget 2
   planeNode=mitkWidget2->GetRenderer()->GetCurrentWorldGeometry2DNode();
   planeNode->SetColor(white, mitkWidget4->GetRenderer());
   planeNode->SetProperty("name", new mitk::StringProperty("widget2Plane"));
   planeNode->SetProperty("includeInBoundingBox", new mitk::BoolProperty(false));
+  mapper = mitk::Geometry2DDataMapper2D::New();
+  mapper->SetDataIteratorToOtherGeometry2Ds(&childIterator);
+  planeNode->SetMapper(mitk::BaseRenderer::Standard2D, mapper);
   dit->Add(planeNode);
   // ... of widget 3
   planeNode=mitkWidget3->GetRenderer()->GetCurrentWorldGeometry2DNode();
   planeNode->SetColor(white, mitkWidget4->GetRenderer());
   planeNode->SetProperty("name", new mitk::StringProperty("widget3Plane"));
   planeNode->SetProperty("includeInBoundingBox", new mitk::BoolProperty(false));
+  mapper = mitk::Geometry2DDataMapper2D::New();
+  mapper->SetDataIteratorToOtherGeometry2Ds(&childIterator);
+  planeNode->SetMapper(mitk::BaseRenderer::Standard2D, mapper);
   dit->Add(planeNode);
 
   planesIterator = dit;

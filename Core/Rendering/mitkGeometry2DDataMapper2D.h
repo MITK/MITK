@@ -52,6 +52,11 @@ public:
     //##ModelId=3E67D77A0109
     virtual void Paint(mitk::BaseRenderer * renderer);
 
+    //## @brief Leave a little gap when crossing other nodes containing 
+    //## Geometry2DData accessible by traversing the iterator
+    //##
+    //## \note works currently for PlaneGeometry only
+    virtual void SetDataIteratorToOtherGeometry2Ds(const mitk::DataTreeIteratorBase* iterator);
 protected:
     //##ModelId=3E639E100243
     Geometry2DDataMapper2D();
@@ -59,11 +64,20 @@ protected:
     //##ModelId=3E639E100257
     virtual ~Geometry2DDataMapper2D();
 
+    virtual void GenerateData();
+
     SurfaceMapper2D::Pointer m_SurfaceMapper;
+
+    //## @brief Leave a little gap when crossing other nodes containing 
+    //## Geometry2DData accessible by traversing this iterator (if set)
+    //##
+    //## \note works currently for PlaneGeometry only
+    mitk::DataTreeIteratorClone m_IteratorToOtherGeometry2Ds;
+
+    typedef std::vector<mitk::DataTreeNode::Pointer> NodesVectorType;
+    NodesVectorType m_OtherGeometry2Ds;
 };
 
 } // namespace mitk
-
-
 
 #endif /* MITKGEOMETRY2DDATAMAPPER2D_H_HEADER_INCLUDED_C19C0BFB */

@@ -49,6 +49,41 @@ const mitk::Geometry2DData *mitk::Geometry2DDataMapper2D::GetInput(void)
   return static_cast<const mitk::Geometry2DData * > ( GetData() );
 }
 
+void mitk::Geometry2DDataMapper2D::SetDataIteratorToOtherGeometry2Ds(const mitk::DataTreeIteratorBase* iterator)
+{
+  if(m_IteratorToOtherGeometry2Ds != iterator)
+  {
+    m_IteratorToOtherGeometry2Ds = iterator;
+    Modified();
+  }
+}
+
+void mitk::Geometry2DDataMapper2D::GenerateData()
+{
+  //collect all Geometry2DData's accessible by traversing m_IteratorToOtherGeometry2Ds
+  m_OtherGeometry2Ds.clear();
+  if(m_IteratorToOtherGeometry2Ds.IsNull()) return;
+
+  mitk::DataTreeIteratorClone it = m_IteratorToOtherGeometry2Ds;
+  while(!it->IsAtEnd())
+  {
+    if(it->Get().IsNotNull())
+    {
+      mitk::BaseData* data = it->Get()->GetData();
+      if(data != NULL)
+      {
+        mitk::Geometry2DData* geometry2dData = dynamic_cast<mitk::Geometry2DData*>(data);
+        if(geometry2dData!=NULL)
+        {
+          mitk::PlaneGeometry* planegeometry = dynamic_cast<mitk::PlaneGeometry*>(geometry2dData->GetGeometry2D());
+          if(planegeometry!=NULL)
+            m_OtherGeometry2Ds.push_back(it->Get());
+        }
+      }
+    }
+    ++it;
+  }
+}
 
 //##ModelId=3E67D77A0109
 void mitk::Geometry2DDataMapper2D::Paint(mitk::BaseRenderer * renderer)
@@ -74,32 +109,96 @@ void mitk::Geometry2DDataMapper2D::Paint(mitk::BaseRenderer * renderer)
     {
       mitk::DisplayGeometry::Pointer displayGeometry = renderer->GetDisplayGeometry();
       assert(displayGeometry);
-      
+
       //calculate intersection of the plane data with the border of the world geometry rectangle
-      //float aaaa[2]={10,11};
-      Point2D lineFrom;// =(float[2]){10,11}; 
-      Point2D lineTo;
+      Point2D lineFrom, lineTo;
       bool intersecting = worldPlaneGeometry->IntersectWithPlane2D( input_planeGeometry, lineFrom, lineTo ) > 0;
-      
+
       if(intersecting)
       {
-        //convert intersection points (until now mm) to display coordinates (units )
+        mitk::Line<ScalarType, 2> line, tmpLine;
+        line.SetPoints(lineFrom, lineTo);
+
         displayGeometry->WorldToDisplay(lineFrom, lineFrom);
         displayGeometry->WorldToDisplay(lineTo, lineTo);
-        
-        //convert display coordinates ( (0,0) is top-left ) in GL coordinates ( (0,0) is bottom-left )
-        //                float toGL=//displayGeometry->GetDisplayHeight(); displayGeometry->GetCurrentWorldGeometry2D()->GetHeightInUnits();
-        //                lineFrom[1]=toGL-lineFrom[1];
-        //                lineTo[1]=toGL-lineTo[1];
-        
+        Vector2D l;
+        l=lineTo-lineFrom;
+        ScalarType lengthInDisplayUnits = l.GetNorm();
+
+        std::vector<ScalarType> lineParams;
+        lineParams.reserve(m_OtherGeometry2Ds.size()+2);
+        lineParams.push_back(0);
+        lineParams.push_back(1);
+
+        Vector2D d, dOrth;
+        NodesVectorType::iterator otherPlanesIt = m_OtherGeometry2Ds.begin();
+        NodesVectorType::iterator otherPlanesEnd = m_OtherGeometry2Ds.end();
+        while(otherPlanesIt != otherPlanesEnd)
+        {
+          mitk::PlaneGeometry* otherPlane = static_cast<PlaneGeometry*>(static_cast<Geometry2DData*>((*otherPlanesIt)->GetData())->GetGeometry2D());
+          if(otherPlane != input_planeGeometry)
+          {
+            bool otherIntersecting = worldPlaneGeometry->IntersectWithPlane2D( otherPlane, lineFrom, lineTo ) > 0;
+            if(otherIntersecting)
+            {
+              tmpLine.SetPoints(lineFrom, lineTo);
+              d = tmpLine.GetDirection();
+              dOrth[0] = -d[1]; dOrth[1] = d[0];
+              ScalarType t = (tmpLine.GetPoint1()-line.GetPoint1())*(dOrth);
+              ScalarType norm = line.GetDirection()*dOrth;
+              if(fabs(norm) > mitk::eps)
+              {
+                t /= norm;
+                lineParams.push_back(t);
+              }
+            }
+          }
+
+          ++otherPlanesIt;
+        }
+
         //apply color and opacity read from the PropertyList
         ApplyProperties(renderer);
 
-        //draw
-        glBegin (GL_LINE_LOOP);
-        glVertex2f(lineFrom[0],lineFrom[1]);
-        glVertex2f(lineTo[0],lineTo[1]);
-        glVertex2f(lineFrom[0],lineFrom[1]);
+        ScalarType gapSizeInPixel = 10;
+        ScalarType gapSizeInParamUnits = 1.0/lengthInDisplayUnits*gapSizeInPixel;
+
+        std::sort(lineParams.begin(), lineParams.end());
+
+        Point2D p1, p2;
+        ScalarType p1Param, p2Param; 
+        
+        p1Param = lineParams[0];
+        p1 = line.GetPoint(p1Param);
+        displayGeometry->WorldToDisplay(p1, p1);
+
+        unsigned int i, preLastLineParam = lineParams.size()-1;
+        for(i=1; i < preLastLineParam; ++i)
+        {
+          p2Param = lineParams[i]-gapSizeInParamUnits*0.5;
+          p2 = line.GetPoint(p2Param);
+          if(p2Param > p1Param)
+          {
+            //convert intersection points (until now mm) to display coordinates (units )
+            displayGeometry->WorldToDisplay(p2, p2);
+
+            //draw
+            glBegin (GL_LINES);
+            glVertex2f(p1[0],p1[1]);
+            glVertex2f(p2[0],p2[1]);
+            glEnd ();
+          }
+          p1Param = p2Param+gapSizeInParamUnits;
+          p1 = line.GetPoint(p1Param);
+          displayGeometry->WorldToDisplay(p1, p1);
+        }
+        //draw last line segment
+        p2Param = lineParams[i];
+        p2 = line.GetPoint(p2Param);
+        displayGeometry->WorldToDisplay(p2, p2);
+        glBegin (GL_LINES);
+        glVertex2f(p1[0],p1[1]);
+        glVertex2f(p2[0],p2[1]);
         glEnd ();
       }
     }

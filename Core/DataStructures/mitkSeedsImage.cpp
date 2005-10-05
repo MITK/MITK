@@ -29,7 +29,6 @@ PURPOSE.  See the above copyright notices for more information.
 void mitk::SeedsImage::ExecuteOperation(mitk::Operation* operation)
 {
   //mitkCheckOperationTypeMacro(SeedsOperation, operation, seedsOp);
-
   spacing = this->GetGeometry()->GetSpacing();
   for(unsigned int i=0; i<this->GetDimension(); i++)
     orig_size[i] = this->GetDimension(i);
@@ -80,8 +79,8 @@ void mitk::SeedsImage::ExecuteOperation(mitk::Operation* operation)
     this->Modified();
     
     //*todo has to be done here, cause of update-pipeline not working yet
-    //mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-    mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    //mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
   }
 }
 
@@ -89,33 +88,62 @@ void mitk::SeedsImage::ExecuteOperation(mitk::Operation* operation)
 template < typename SeedsImageType >
 void mitk::SeedsImage::AddSeedPoint(SeedsImageType* itkImage)
 {	
-	itk::ImageRegionIterator<SeedsImageType >
+	itk::ImageRegionIterator<SeedsImageType>
   iterator(itkImage, itkImage->GetRequestedRegion());
-	const unsigned int dimension = ::itk::GetImageDimension<SeedsImageType>::ImageDimension;
-    itk::Index<dimension> baseIndex;
-	itk::Index<itk::GetImageDimension<SeedsImageType>::ImageDimension> setIndex;
-	for (int i=0; i<3; i++) baseIndex[i] = (int)ceil(point[i]/spacing[i]);
+  const unsigned int dimension = ::itk::GetImageDimension<SeedsImageType>::ImageDimension;
+  itk::Index<dimension> baseIndex;
+  itk::Index<dimension> setIndex;
+  
+  GetGeometry()->WorldToIndex(point, baseIndex);
+//	for (int i=0; i<3; i++) baseIndex[i] = (int)ceil(point[i]/spacing[i]);
 	
 	// setting a sphere around the point
-	for(int z = baseIndex[2] - m_Radius; z <= baseIndex[2] + m_Radius; ++z){
-		for(int y = baseIndex[1] - m_Radius; y <= baseIndex[1] + m_Radius; ++y){
-			for(int x = baseIndex[0] - m_Radius; x <= baseIndex[0] + m_Radius; ++x){
-				delta_x = abs(x - baseIndex[0])*spacing[0];
-				delta_y = abs(y - baseIndex[1])*spacing[1];
-				delta_z = abs(z - baseIndex[2])*spacing[2];
-				sphere_distance = sqrt((delta_x * delta_x) + (delta_y * delta_y) + (delta_z * delta_z));
-				if (sphere_distance <= m_Radius){
-					// check -> is the point inside the image?
-					if ((x>=0) && (x<=orig_size[0]) && (y>=0) && (y<=orig_size[1]) && (z>=0) && (z<orig_size[2])){
-						setIndex[2]=z;
-						setIndex[1]=y;
-						setIndex[0]=x;
-						iterator.SetIndex(setIndex);
-						iterator.Set(m_DrawState);
-					}
-				}
-			}
-		}
+  if(dimension==2){
+    ScalarType radius[dimension];
+    for(int i=0; i<dimension; i++)
+      radius[i] = ((ScalarType)m_Radius)/spacing[i];
+    //FillVector2D(radius, ((ScalarType)m_Radius)/spacing[0], ((ScalarType)m_Radius)/spacing[1]);
+		  for(int y = baseIndex[1] - radius[1]; y <= baseIndex[1] + radius[1]; ++y){
+			  for(int x = baseIndex[0] - radius[0]; x <= baseIndex[0] + radius[0]; ++x){
+				  delta_x = abs(x - baseIndex[0])*spacing[0];
+				  delta_y = abs(y - baseIndex[1])*spacing[1];
+				  sphere_distance = (delta_x * delta_x) + (delta_y * delta_y);
+				  if (sphere_distance <= (m_Radius*m_Radius)){
+					  // check -> is the point inside the image?
+					  if ((x>=0) && (x<=orig_size[0]) && (y>=0) && (y<=orig_size[1])){
+						  setIndex[1]=y;
+						  setIndex[0]=x;
+						  iterator.SetIndex(setIndex);
+						  iterator.Set(m_DrawState);
+					  }
+				  }
+			  }
+      }
+  }
+  else
+  {
+    Vector3D radius;
+    FillVector3D(radius, ((ScalarType)m_Radius)/spacing[0], ((ScalarType)m_Radius)/spacing[1], ((ScalarType)m_Radius)/spacing[2]);
+	  for(int z = baseIndex[2] - radius[2]; z <= baseIndex[2] + radius[2]; ++z){
+		  for(int y = baseIndex[1] - radius[1]; y <= baseIndex[1] + radius[1]; ++y){
+			  for(int x = baseIndex[0] - radius[0]; x <= baseIndex[0] + radius[0]; ++x){
+				  delta_x = abs(x - baseIndex[0])*spacing[0];
+				  delta_y = abs(y - baseIndex[1])*spacing[1];
+				  delta_z = abs(z - baseIndex[2])*spacing[2];
+				  sphere_distance = (delta_x * delta_x) + (delta_y * delta_y) + (delta_z * delta_z);
+				  if (sphere_distance <= (m_Radius*m_Radius)){
+					  // check -> is the point inside the image?
+            if ((x>=0) && (x<=orig_size[0]) && (y>=0) && (y<=orig_size[1]) && (z>=0) && (z<orig_size[2])){
+						  setIndex[2]=z;
+						  setIndex[1]=y;
+						  setIndex[0]=x;
+						  iterator.SetIndex(setIndex);
+						  iterator.Set(m_DrawState);
+					  }
+				  }
+			  }
+		  }
+    }
   }
 }
 
@@ -125,55 +153,101 @@ void mitk::SeedsImage::PointInterpolation(SeedsImageType* itkImage)
 {
 	itk::ImageRegionIterator<SeedsImageType >
   iterator(itkImage, itkImage->GetRequestedRegion());
-	itk::Index<itk::GetImageDimension<SeedsImageType>::ImageDimension>pointIndex;
-	itk::Index<itk::GetImageDimension<SeedsImageType>::ImageDimension>last_pointIndex;
-	itk::Index<itk::GetImageDimension<SeedsImageType>::ImageDimension>baseIndex;
-	itk::Index<itk::GetImageDimension<SeedsImageType>::ImageDimension>setIndex;
+	const unsigned int dimension = ::itk::GetImageDimension<SeedsImageType>::ImageDimension;
+  itk::Index<dimension> pointIndex;
+	itk::Index<dimension> last_pointIndex;
+	itk::Index<dimension> baseIndex;
+	itk::Index<dimension> setIndex;
+	float point_distance;
+  int distance_step;
+  int distance_iterator;
+  float t;
 
 	// coordinate transformation from physical coordinates to index coordinates
-	for (int i=0; i<3; i++) pointIndex[i] = (int)ceil(point[i]/spacing[i]);
-	for (int i=0; i<3; i++) last_pointIndex[i] = (int)ceil(last_point[i]/spacing[i]);
-						
-	// calculation of the distance between last_point and point
-	delta_x = fabsf(last_point[0] - point[0]);
-	delta_y = fabsf(last_point[1] - point[1]);
-	delta_z = fabsf(last_point[2] - point[2]);
-	float point_distance;
-	point_distance = sqrt((delta_x * delta_x) + (delta_y * delta_y) + (delta_z * delta_z));
-	
-	int distance_step = m_Radius;
-	int distance_iterator = distance_step;
-	float t;
+  GetGeometry()->WorldToIndex(point, pointIndex);
+  GetGeometry()->WorldToIndex(last_point, last_pointIndex);
+//	for (int i=0; i<3; i++) pointIndex[i] = (int)ceil(point[i]/spacing[i]);
+//	for (int i=0; i<3; i++) last_pointIndex[i] = (int)ceil(last_point[i]/spacing[i]);
 
-	// check - is there a gap between the points?
-	if(point_distance > distance_step){
-		// fill the gap
-		while (distance_iterator < point_distance){
-			t = distance_iterator/point_distance;
-			// interpolation between the points
-			for (int i=0; i<3; i++) baseIndex[i] = (int)(((1-t)*last_pointIndex[i]) + (t*pointIndex[i]));
-			
-			for(int z = baseIndex[2] - m_Radius; z <= baseIndex[2] + m_Radius; ++z){
-				for(int y = baseIndex[1] - m_Radius; y <= baseIndex[1] + m_Radius; ++y){
-					for(int x = baseIndex[0] - m_Radius; x <= baseIndex[0] + m_Radius; ++x){
+  delta_x = fabsf(last_point[0] - point[0]);
+	delta_y = fabsf(last_point[1] - point[1]);
+	delta_z = fabsf(last_point[2] - point[2]);						
+
+  // calculation of the distance between last_point and point
+  if(dimension==2){
+	  point_distance = (delta_x * delta_x) + (delta_y * delta_y);  	
+	  distance_step = m_Radius*m_Radius;
+	  distance_iterator = distance_step;
+
+	  // check - is there a gap between the points?
+    if(point_distance > distance_step){
+		  // fill the gap
+		  while (distance_iterator < point_distance){
+			  t = distance_iterator/point_distance;
+			  // interpolation between the points
+			  for (int i=0; i<dimension; i++) baseIndex[i] = (int)(((1-t)*last_pointIndex[i]) + (t*pointIndex[i]));
+
+        ScalarType radius[dimension];
+        for(int i=0; i<dimension; i++)
+          radius[i] = ((ScalarType)m_Radius)/spacing[i];
+		    for(int y = baseIndex[1] - radius[1]; y <= baseIndex[1] + radius[1]; ++y){
+			    for(int x = baseIndex[0] - radius[0]; x <= baseIndex[0] + radius[0]; ++x){
 						delta_x = fabsf(x - baseIndex[0])*spacing[0];
 						delta_y = fabsf(y - baseIndex[1])*spacing[1];
-						delta_z = fabsf(z - baseIndex[2])*spacing[2];
-						sphere_distance = sqrt((delta_x * delta_x) + (delta_y * delta_y) + (delta_z * delta_z));
-						if (sphere_distance <= m_Radius){
+						sphere_distance = (delta_x * delta_x) + (delta_y * delta_y);
+						if (sphere_distance <= (m_Radius*m_Radius)){
 							// is the point inside the image?
-							if ((x>=0) && (x<=orig_size[0]) && (y>=0) && (y<=orig_size[1]) && (z>=0) && (z<orig_size[2])){
-								setIndex[2]=z;
+							if ((x>=0) && (x<=orig_size[0]) && (y>=0) && (y<=orig_size[1])){
 								setIndex[1]=y;
 								setIndex[0]=x;
 								iterator.SetIndex(setIndex);
 								iterator.Set(m_DrawState);
 							}
 						}
-					}
-				}
-			}			
-		distance_iterator = distance_iterator + distance_step;
-		}
-	}
+          }
+        }			
+		  distance_iterator = distance_iterator + distance_step;
+      }
+    }
+  }
+  else{ 
+	  point_distance = (delta_x * delta_x) + (delta_y * delta_y) + (delta_z * delta_z);  	
+	  distance_step = m_Radius*m_Radius;
+	  distance_iterator = distance_step;
+
+	  // check - is there a gap between the points?
+	  if(point_distance > distance_step){
+		  // fill the gap
+		  while (distance_iterator < point_distance){
+			  t = distance_iterator/point_distance;
+			  // interpolation between the points
+			  for (int i=0; i<dimension; i++) baseIndex[i] = (int)(((1-t)*last_pointIndex[i]) + (t*pointIndex[i]));
+
+        Vector3D radius;
+        FillVector3D(radius, ((ScalarType)m_Radius)/spacing[0], ((ScalarType)m_Radius)/spacing[1], ((ScalarType)m_Radius)/spacing[2]);
+	      for(int z = baseIndex[2] - radius[2]; z <= baseIndex[2] + radius[2]; ++z){
+		      for(int y = baseIndex[1] - radius[1]; y <= baseIndex[1] + radius[1]; ++y){
+			      for(int x = baseIndex[0] - radius[0]; x <= baseIndex[0] + radius[0]; ++x){
+						  delta_x = fabsf(x - baseIndex[0])*spacing[0];
+						  delta_y = fabsf(y - baseIndex[1])*spacing[1];
+						  delta_z = fabsf(z - baseIndex[2])*spacing[2];
+						  sphere_distance = (delta_x * delta_x) + (delta_y * delta_y) + (delta_z * delta_z);
+						  if (sphere_distance <= (m_Radius*m_Radius)){
+							  // is the point inside the image?
+							  if ((x>=0) && (x<=orig_size[0]) && (y>=0) && (y<=orig_size[1]) && (z>=0) && (z<orig_size[2])){
+								  setIndex[2]=z;
+								  setIndex[1]=y;
+								  setIndex[0]=x;
+								  iterator.SetIndex(setIndex);
+								  iterator.Set(m_DrawState);
+							  }
+						  }
+					  }
+				  }
+        }			
+		  distance_iterator = distance_iterator + distance_step;
+      }
+    }
+  }
 }
+

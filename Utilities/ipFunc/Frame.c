@@ -59,6 +59,9 @@
  * @param value this greyvalue is used for the frame
  *
  * $Log$
+ * Revision 1.3  2005/10/05 16:31:55  nolden
+ * FIX: added newline to avoid warning
+ *
  * Revision 1.2  2000/05/24 15:29:42  tobiask
  * Changed the installation paths of the package.
  *

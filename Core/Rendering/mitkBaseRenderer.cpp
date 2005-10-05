@@ -95,6 +95,7 @@ mitk::BaseRenderer::BaseRenderer( const char* name ) :
 //##ModelId=3E3D2F12008C
 mitk::BaseRenderer::~BaseRenderer()
 {
+  this->InvokeEvent(mitk::BaseRenderer::RendererResetEvent());
   RendererSet::iterator pos = instances.find( this );
   instances.erase( pos );
   m_DataTreeIterator = NULL;
@@ -146,6 +147,7 @@ void mitk::BaseRenderer::Resize(int w, int h)
 void mitk::BaseRenderer::InitRenderer(mitk::RenderWindow* renderwindow)
 {
   m_RenderWindow = renderwindow;
+  this->InvokeEvent(mitk::BaseRenderer::RendererResetEvent());
 }
 
 //##ModelId=3E3799250397

@@ -45,7 +45,9 @@ mitk::RenderWindow::~RenderWindow()
 
   RenderingManager::GetInstance()->RemoveRenderWindow( this );
 
+  m_Renderer->InitRenderer(NULL);
   m_Renderer = NULL;
+
   m_MitkVtkRenderWindow->Delete(); //xxx
 }
 

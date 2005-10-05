@@ -483,8 +483,6 @@ void mitk::ImageMapper2D::RendererInfo::RendererDeleted()
   //delete texture due to its dependency on the renderer
   delete m_iil4mitkImage;
   m_iil4mitkImage = NULL;
-  //renderer will be deleted, so the command is no longer necessary
-  m_DeleteRendererCommand = NULL;
   m_Renderer = NULL;
 }
 

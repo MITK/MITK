@@ -420,11 +420,16 @@ This method is called from the two Constructors
 void mitk::OpenGLRenderer::InitRenderer(mitk::RenderWindow* renderwindow)
 {
   BaseRenderer::InitRenderer(renderwindow);
+  if(renderwindow == NULL)
+  {
+    m_InitNeeded = false;
+    m_ResizeNeeded = false;
+    return;
+  }
 
   m_InitNeeded = true;
   m_ResizeNeeded = true;
 
-  assert(renderwindow);
   /**@todo SetNumberOfLayers commented out, because otherwise the backface of the planes are not shown (only, when a light is added).
   * But we need SetNumberOfLayers(2) later, when we want to prevent vtk to clear the widget before it renders (i.e., when we render something in the scene before vtk).
   */

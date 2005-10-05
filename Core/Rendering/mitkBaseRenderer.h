@@ -56,6 +56,9 @@ class CameraController;
 class BaseRenderer : public itk::Object
 {
 public:
+
+  itkEventMacro( RendererResetEvent, itk::AnyEvent );
+
   typedef std::set<BaseRenderer*> RendererSet;
   /** Standard class typedefs. */
   //##ModelId=3E691E0901DB

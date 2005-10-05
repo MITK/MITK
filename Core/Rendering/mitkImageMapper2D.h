@@ -99,8 +99,7 @@ public:
     //##Documentation
     //## @brief internal id of the renderer the data is stored for
     int m_RendererId;
-
-    itk::SimpleMemberCommand<RendererInfo>::Pointer m_DeleteRendererCommand;
+    
     //##ModelId=3E6423D203E1
     //##Documentation
     //## @brief stored iil4mitkPicImage containing the texture to display
@@ -152,10 +151,11 @@ public:
       m_RendererId = rendererId;
       m_Renderer = renderer;
 
-      m_DeleteRendererCommand = itk::SimpleMemberCommand<RendererInfo>::New();
-      m_DeleteRendererCommand->SetCallbackFunction(this, &RendererInfo::RendererDeleted);
+      itk::SimpleMemberCommand<RendererInfo>::Pointer deleteRendererCommand;
+      deleteRendererCommand = itk::SimpleMemberCommand<RendererInfo>::New();
+      deleteRendererCommand->SetCallbackFunction(this, &RendererInfo::RendererDeleted);
 
-      m_ObserverId = renderer->AddObserver(itk::DeleteEvent(), m_DeleteRendererCommand);
+      m_ObserverId = renderer->AddObserver(mitk::BaseRenderer::RendererResetEvent(), deleteRendererCommand);
     }
 
     void Set_iil4mitkImage(iil4mitkPicImage* iil4mitkImage);

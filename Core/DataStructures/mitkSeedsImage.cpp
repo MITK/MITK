@@ -99,9 +99,9 @@ void mitk::SeedsImage::AddSeedPoint(SeedsImageType* itkImage)
 	
 	// setting a sphere around the point
   if(dimension==2){
-    ScalarType radius[dimension];
-    for(int i=0; i<dimension; i++)
-      radius[i] = ((ScalarType)m_Radius)/spacing[i];
+    int radius[dimension];
+    for(unsigned int i=0; i<dimension; i++)
+      radius[i] = int(m_Radius/spacing[i]);
     //FillVector2D(radius, ((ScalarType)m_Radius)/spacing[0], ((ScalarType)m_Radius)/spacing[1]);
 		  for(int y = baseIndex[1] - radius[1]; y <= baseIndex[1] + radius[1]; ++y){
 			  for(int x = baseIndex[0] - radius[0]; x <= baseIndex[0] + radius[0]; ++x){
@@ -123,7 +123,7 @@ void mitk::SeedsImage::AddSeedPoint(SeedsImageType* itkImage)
   else
   {
     Vector3D radius;
-    FillVector3D(radius, ((ScalarType)m_Radius)/spacing[0], ((ScalarType)m_Radius)/spacing[1], ((ScalarType)m_Radius)/spacing[2]);
+    FillVector3D(radius, m_Radius/spacing[0], m_Radius/spacing[1], m_Radius/spacing[2]);
 	  for(int z = baseIndex[2] - radius[2]; z <= baseIndex[2] + radius[2]; ++z){
 		  for(int y = baseIndex[1] - radius[1]; y <= baseIndex[1] + radius[1]; ++y){
 			  for(int x = baseIndex[0] - radius[0]; x <= baseIndex[0] + radius[0]; ++x){
@@ -185,11 +185,11 @@ void mitk::SeedsImage::PointInterpolation(SeedsImageType* itkImage)
 		  while (distance_iterator < point_distance){
 			  t = distance_iterator/point_distance;
 			  // interpolation between the points
-			  for (int i=0; i<dimension; i++) baseIndex[i] = (int)(((1-t)*last_pointIndex[i]) + (t*pointIndex[i]));
+			  for (unsigned int i=0; i<dimension; i++) baseIndex[i] = (int)(((1-t)*last_pointIndex[i]) + (t*pointIndex[i]));
 
-        ScalarType radius[dimension];
-        for(int i=0; i<dimension; i++)
-          radius[i] = ((ScalarType)m_Radius)/spacing[i];
+        int radius[dimension];
+        for(unsigned int i=0; i<dimension; i++)
+          radius[i] = int(m_Radius/spacing[i]);
 		    for(int y = baseIndex[1] - radius[1]; y <= baseIndex[1] + radius[1]; ++y){
 			    for(int x = baseIndex[0] - radius[0]; x <= baseIndex[0] + radius[0]; ++x){
 						delta_x = fabsf(x - baseIndex[0])*spacing[0];
@@ -221,10 +221,10 @@ void mitk::SeedsImage::PointInterpolation(SeedsImageType* itkImage)
 		  while (distance_iterator < point_distance){
 			  t = distance_iterator/point_distance;
 			  // interpolation between the points
-			  for (int i=0; i<dimension; i++) baseIndex[i] = (int)(((1-t)*last_pointIndex[i]) + (t*pointIndex[i]));
+			  for (unsigned int i=0; i<dimension; i++) baseIndex[i] = (int)(((1-t)*last_pointIndex[i]) + (t*pointIndex[i]));
 
         Vector3D radius;
-        FillVector3D(radius, ((ScalarType)m_Radius)/spacing[0], ((ScalarType)m_Radius)/spacing[1], ((ScalarType)m_Radius)/spacing[2]);
+        FillVector3D(radius, m_Radius/spacing[0], m_Radius/spacing[1], m_Radius/spacing[2]);
 	      for(int z = baseIndex[2] - radius[2]; z <= baseIndex[2] + radius[2]; ++z){
 		      for(int y = baseIndex[1] - radius[1]; y <= baseIndex[1] + radius[1]; ++y){
 			      for(int x = baseIndex[0] - radius[0]; x <= baseIndex[0] + radius[0]; ++x){

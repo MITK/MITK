@@ -38,10 +38,10 @@ template<class T>
 void Quat4<T>::mul(const Quat4& q1) {
     // store on stack for aliasing-safty
     set(
-        x*q1.w + w*q1.x + y*q1.z - z*q1.y,
-        y*q1.w + w*q1.y + z*q1.x - x*q1.z,
-        z*q1.w + w*q1.z + x*q1.y - y*q1.x,
-        w*q1.w - x*q1.x - y*q1.y - z*q1.z
+        this->x*q1.w + this->w*q1.x + this->y*q1.z - this->z*q1.y,
+        this->y*q1.w + this->w*q1.y + this->z*q1.x - this->x*q1.z,
+        this->z*q1.w + this->w*q1.z + this->x*q1.y - this->y*q1.x,
+        this->w*q1.w - this->x*q1.x - this->y*q1.y - this->z*q1.z
         );
 }
 
@@ -67,10 +67,10 @@ void Quat4<T>::mulInverse(const Quat4& q1) {
     n = 1/n;
     // store on stack once for aliasing-safty
     set(
-        (x*q1.w - w*q1.x - y*q1.z + z*q1.y)*n,
-        (y*q1.w - w*q1.y - z*q1.x + x*q1.z)*n,
-        (z*q1.w - w*q1.z - x*q1.y + y*q1.x)*n,
-        (w*q1.w + x*q1.x + y*q1.y + z*q1.z)*n
+        (this->x*q1.w - this->w*q1.x - this->y*q1.z + this->z*q1.y)*n,
+        (this->y*q1.w - this->w*q1.y - this->z*q1.x + this->x*q1.z)*n,
+        (this->z*q1.w - this->w*q1.z - this->x*q1.y + this->y*q1.x)*n,
+        (this->w*q1.w + this->x*q1.x + this->y*q1.y + this->z*q1.z)*n
         );
 }
 
@@ -97,16 +97,16 @@ void Quat4<T>::set(const Matrix3<T>& m1) {
 
 template<class T>
 void Quat4<T>::set(const AxisAngle4<T>& a1) {
-	x = a1.x;
-	y = a1.y;
-	z = a1.z;
-	T n = VmUtil<T>::sqrt(x*x + y*y + z*z);
+	this->x = a1.x;
+	this->y = a1.y;
+	this->z = a1.z;
+	T n = VmUtil<T>::sqrt(this->x*this->x + this->y*this->y + this->z*this->z);
 	// zero-div may occur.
 	T s = VmUtil<T>::sin(0.5*a1.angle)/n;
-	x *= s;
-	y *= s;
-	z *= s;
-	w = VmUtil<T>::cos(0.5*a1.angle);
+	this->x *= s;
+	this->y *= s;
+	this->z *= s;
+	this->w = VmUtil<T>::cos(0.5*a1.angle);
 }
 
 
@@ -122,7 +122,7 @@ void Quat4<T>::interpolate(const Quat4& q1, T alpha) {
 	T w1 = q1.w/n1;
 
 	// t is cosine (dot product)
-	T t = x*x1 + y*y1 + z*z1 + w*w1;
+	T t = this->x*x1 + this->y*y1 + this->z*z1 + this->w*w1;
 
 	// same quaternion (avoid domain error)
 	if (1.0 <= VmUtil<T>::abs(t))
@@ -141,10 +141,10 @@ void Quat4<T>::interpolate(const Quat4& q1, T alpha) {
 	t = VmUtil<T>::sin(alpha*t)/sin_t;
 
 	// set values
-	x = s*x + t*x1;
-	y = s*y + t*y1;
-	z = s*z + t*z1;
-	w = s*w + t*w1;
+	this->x = s*this->x + t*x1;
+	this->y = s*this->y + t*y1;
+	this->z = s*this->z + t*z1;
+	this->w = s*this->w + t*w1;
 }
 
 template<class T>
@@ -165,34 +165,34 @@ void Quat4<T>::setFromMat(T m00, T m01, T m02,
 	T tr = m00 + m11 + m22;
 	if (tr >= 0.0) {
 	    s = VmUtil<T>::sqrt(tr + 1.0);
-	    w = s*0.5;
+	    this->w = s*0.5;
 	    s = 0.5/s;
-	    x = (m21 - m12)*s;
-	    y = (m02 - m20)*s;
-	    z = (m10 - m01)*s;
+	    this->x = (m21 - m12)*s;
+	    this->y = (m02 - m20)*s;
+	    this->z = (m10 - m01)*s;
 	} else {
 	    T maxm = VmUtil<T>::max(m00, m11, m22);
 	    if (maxm == m00) {
             s = VmUtil<T>::sqrt(m00 - (m11 + m22) + 1.0);
-            x = s*0.5;
+            this->x = s*0.5;
             s = 0.5/s;
-            y = (m01 + m10)*s;
-            z = (m20 + m02)*s;
-            w = (m21 - m12)*s;
+            this->y = (m01 + m10)*s;
+            this->z = (m20 + m02)*s;
+            this->w = (m21 - m12)*s;
 	    } else if (maxm == m11) {
             s = VmUtil<T>::sqrt(m11 - (m22 + m00) + 1.0);
-            y = s*0.5;
+            this->y = s*0.5;
             s = 0.5/s;
-            z = (m12 + m21)*s;
-            x = (m01 + m10)*s;
-            w = (m02 - m20)*s;
+            this->z = (m12 + m21)*s;
+            this->x = (m01 + m10)*s;
+            this->w = (m02 - m20)*s;
 	    } else {
             s = VmUtil<T>::sqrt(m22 - (m00 + m11) + 1.0);
-            z = s*0.5;
+            this->z = s*0.5;
             s = 0.5/s;
-            x = (m20 + m02)*s;
-            y = (m12 + m21)*s;
-            w = (m10 - m01)*s;
+            this->x = (m20 + m02)*s;
+            this->y = (m12 + m21)*s;
+            this->w = (m10 - m01)*s;
 	    }
 	}
 }

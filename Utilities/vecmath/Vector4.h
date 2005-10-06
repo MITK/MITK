@@ -32,6 +32,9 @@ template<class T>
 class Vector4 : public Tuple4<T> {
 /*
  * $Log$
+ * Revision 1.3  2005/10/06 15:27:15  nolden
+ * FIX: gcc4 compatibility
+ *
  * Revision 1.2  2003/04/22 14:42:11  max
  * made inclusions of vecmath header files "local" (for gcc 3.3 support)
  *
@@ -104,10 +107,10 @@ public:
      * @since Java3D 1.2
      */
     void set3(const Tuple3<T>& t1) {
-        x = t1.x;
-        y = t1.y;
-        z = t1.z;
-        w = 0;
+        this->x = t1.x;
+        this->y = t1.y;
+        this->z = t1.z;
+        this->w = 0;
     }
 
 
@@ -117,7 +120,7 @@ public:
       * @return the squared length of this vector
       */
     T lengthSquared() const {
-        return x*x + y*y + z*z + w*w;
+        return this->x*this->x + this->y*this->y + this->z*this->z + this->w*this->w;
     }
 
     /**
@@ -134,7 +137,7 @@ public:
      * @return the dot product of this vector and vector v1
      */
     T dot(const Vector4& v1) const {
-        return x*v1.x + y*v1.y + z*v1.z + w*v1.w;
+        return this->x*v1.x + this->y*v1.y + this->z*v1.z + this->w*v1.w;
     }
 
     /**
@@ -153,10 +156,10 @@ public:
         T d = length();
 
         // zero-div may occur.
-        x /= d;
-        y /= d;
-        z /= d;
-        w /= d;
+        this->x /= d;
+        this->y /= d;
+        this->z /= d;
+        this->w /= d;
     }
 
     /**

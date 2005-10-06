@@ -31,6 +31,9 @@ template<class T>
 class Tuple4 {
 /*
  * $Log$
+ * Revision 1.4  2005/10/06 15:27:15  nolden
+ * FIX: gcc4 compatibility
+ *
  * Revision 1.3  2003/04/22 14:42:11  max
  * made inclusions of vecmath header files "local" (for gcc 3.3 support)
  *
@@ -567,7 +570,7 @@ VM_IOSTREAM_STD::istream& operator>>(VM_IOSTREAM_STD::istream& i, const VM_VECMA
 	i >> t1.w;
 	i >> c;
 
-    return o;
+    return i;
 }
 // Ende Änderung Marcus
 

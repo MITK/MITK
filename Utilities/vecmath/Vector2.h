@@ -32,6 +32,9 @@ template<class T>
 class Vector2 : public Tuple2<T> {
 /*
  * $Log$
+ * Revision 1.4  2005/10/06 15:27:15  nolden
+ * FIX: gcc4 compatibility
+ *
  * Revision 1.3  2003/11/04 14:19:17  nolden
  * gcc2 compatibility fix
  *
@@ -85,7 +88,7 @@ public:
       * @param  v1 the other vector
       */
     T dot(const Vector2& v1) const {
-        return x*v1.x + y*v1.y;
+        return this->x*v1.x + this->y*v1.y;
     }
 
     /**
@@ -93,7 +96,7 @@ public:
       * @return the squared length of this vector
       */
     T lengthSquared() const {
-        return x*x + y*y;
+        return this->x*this->x + this->y*this->y;
     }
 
     /**
@@ -111,8 +114,8 @@ public:
         T d = length();
 
         // zero-div may occur.
-        x /= d;
-        y /= d;
+        this->x /= d;
+        this->y /= d;
     }
 
     /**
@@ -134,7 +137,7 @@ public:
       */
     T angle(const Vector2& v1) const {
         // stabler than acos
-        return VmUtil<T>::abs(VmUtil<T>::atan2(x*v1.y - y*v1.x , dot(v1)));
+        return VmUtil<T>::abs(VmUtil<T>::atan2(this->x*v1.y - this->y*v1.x , dot(v1)));
     }
 
     // copy constructor and operator = is made by complier

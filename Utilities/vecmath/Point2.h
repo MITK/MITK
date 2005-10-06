@@ -31,6 +31,9 @@ template<class T>
 class Point2 : public Tuple2<T> {
 /*
  * $Log$
+ * Revision 1.3  2005/10/06 15:27:15  nolden
+ * FIX: gcc4 compatibility
+ *
  * Revision 1.2  2003/04/22 14:42:11  max
  * made inclusions of vecmath header files "local" (for gcc 3.3 support)
  *
@@ -84,8 +87,8 @@ public:
       * @param  p1 the other point
       */
     T distanceSquared(const Point2& p1) const {
-        T dx = x - p1.x;
-        T dy = y - p1.y;
+        T dx = this->x - p1.x;
+        T dy = this->y - p1.y;
         return dx*dx + dy*dy;
     }
 
@@ -103,7 +106,7 @@ public:
       * @param p1 the other point
       */
     T distanceL1(const Point2& p1) const {
-        return VmUtil<T>::abs(x-p1.x) + VmUtil<T>::abs(y-p1.y);
+        return VmUtil<T>::abs(this->x-p1.x) + VmUtil<T>::abs(this->y-p1.y);
     }
 
     /**
@@ -112,7 +115,7 @@ public:
       * @param p1 the other point
       */
     T distanceLinf(const Point2& p1) const {
-        return VmUtil<T>::max(VmUtil<T>::abs(x-p1.x), VmUtil<T>::abs(y-p1.y));
+        return VmUtil<T>::max(VmUtil<T>::abs(this->x-p1.x), VmUtil<T>::abs(this->y-p1.y));
     }
 
     // copy constructor and operator = is made by complier

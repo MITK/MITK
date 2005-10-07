@@ -42,6 +42,14 @@ public:
   itkBooleanMacro(Positive);
   bool ReadXMLData( XMLReader& xmlReader );
 
+
+  //##Documentation
+  //## @brief Sets the Geometry3D of the bounding object to fit the given
+  //## geometry.
+  //## 
+  //## The fit is done once, so if the given geometry changes it will 
+  //## \em not effect the bounding object.
+  virtual void FitGeometry(Geometry3D* aGeometry3D);
 protected:
   BoundingObject();
   virtual ~BoundingObject();

@@ -42,6 +42,18 @@ mitk::ScalarType mitk::BoundingObject::GetVolume()
   return 0.0;
 }
 
+void mitk::BoundingObject::FitGeometry(mitk::Geometry3D* aGeometry3D)
+{
+  GetGeometry()->SetIdentity();
+  GetGeometry()->Compose(aGeometry3D->GetIndexToWorldTransform());
+  GetGeometry()->SetOrigin(aGeometry3D->GetCenter());
+  mitk::Vector3D size;
+  for(unsigned int i=0; i < 3; ++i)
+    size[i] = aGeometry3D->GetExtentInMM(i)/2.0;
+  GetGeometry()->SetSpacing( size );
+  GetTimeSlicedGeometry()->UpdateInformation();
+}
+
 bool mitk::BoundingObject::WriteXMLData( XMLWriter& xmlWriter )
 {
   Surface::WriteXMLData( xmlWriter );

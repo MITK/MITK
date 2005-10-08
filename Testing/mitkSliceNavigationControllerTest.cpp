@@ -273,7 +273,7 @@ int mitkSliceNavigationControllerTest(int argc, char* argv[])
   vnlmatrix = planegeometry->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix();
   mitk::VnlVector axis(3);
   mitk::FillVector3D(axis, 1.0, 1.0, 1.0); axis.normalize();
-  vnl_quaternion<mitk::ScalarType> rotation(axis, 0.123);
+  vnl_quaternion<mitk::ScalarType> rotation(axis, 0.223);
   vnlmatrix = rotation.rotation_matrix_transpose()*vnlmatrix;
   mitk::Matrix3D matrix;
   matrix = vnlmatrix;

@@ -12,7 +12,7 @@ QmitkSliceWidget, one for transversal and one for sagittal slicing. Step 4b enha
 As in the previous steps, to obtain the results the program has to be executed using the image file mitk/Build/Testing/Pic3D.pic.gz and the surface file mitk/Build/Testing/lungs.vtk.
 
 \li \ref Step4.cpp "Step4.cpp"\n 
-Contains the code of step 4a - c.
+Contains the code of step 4a + b.
  
 \section Step4aSection Step 4a - Create transversal and sagittal view
 
@@ -56,15 +56,9 @@ Therefore it has to be added to the tree:
 \skipline it.Add(view3.GetRenderer()
 
 Slice positions are now displayed as can be seen in the picture.\n
-But: Slice positions are only updated when the window is resized.
-
-\section Step4cSection Step 4c - Handle updates
 
 \dontinclude Step4.cpp
 
-\skipline Part V
-\until updateController->AddRenderWindow(view3
-
 \ref Step3Page "[Previous step]" \ref Step5Page "[Next step]" \ref TutorialPage "[Main tutorial page]"
  
-  */
+*/

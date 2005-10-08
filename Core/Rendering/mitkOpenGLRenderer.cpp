@@ -183,7 +183,7 @@ void mitk::OpenGLRenderer::UpdateIncludingVtkActors()
       mitk::Mapper::Pointer mapper = node->GetMapper(m_MapperID);
       if(mapper.IsNull())
         continue;
-      // mapper without a layer property are painted last
+      // mapper without a layer property get layer number 1
       int layer=1;
       node->GetIntProperty("layer", layer, this);
 
@@ -381,11 +381,11 @@ void mitk::OpenGLRenderer::Repaint()
       GLMapper2D* mapper2d=dynamic_cast<GLMapper2D*>(mapper.GetPointer());
       if(mapper2d!=NULL)
       {
-        // mapper without a layer property are painted first
-        int layer=-1;
+        // mapper without a layer property get layer number 1
+        int layer=1;
         node->GetIntProperty("layer", layer, this);
-        // pushing negative layer value, since default sort for
-        // priority_queue is lessthan
+        // default sort for priority_queue is lessthan, thus paint 
+        // smaller layers first
         layers.push(LayerMapperPair(- (layer<<16) - mapperNo ,mapper2d));
         mapperNo++;
       }

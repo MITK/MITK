@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkStateMachineFactory.h"
 #include "mitkAction.h"
 #include "mitkTransition.h"
+#include "mitkGlobalInteraction.h"
 #include <mitkStatusBar.h>
 #include <vtkXMLDataElement.h>
 #include <mitkProperties.h>
@@ -135,8 +136,17 @@ mitk::State* mitk::StateMachineFactory::GetStartState(const char * type)
 	StartStateMapIter tempState = m_StartStates.find(type);
 	if( tempState != m_StartStates.end() )
         return (tempState)->second;
-	else //no itkWarningMacro possible, cause no this pointer available in static method
-    std::cout<<"StatemachineFactory.cpp: No Startstate found! Please check name of statemachine-pattern. Returning NULL!"<<std::endl;
+	else
+  {
+    if(m_StartStates.size() == 0)
+    {
+      mitk::GlobalInteraction::StandardInteractionSetup();
+      tempState = m_StartStates.find(type);
+      if( tempState != m_StartStates.end() )
+        return (tempState)->second;
+    }
+    itkGenericOutputMacro(<< "Start state not found for state-machine \"" << type << "\".");
+  }
   return NULL;
 }
 

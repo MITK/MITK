@@ -22,11 +22,6 @@
  \dontinclude Step5.cpp
 
  
- The interaction mechanism has to be initialized. This is done by loading patterns from an XML-file:
- 
- \skipline if(mitk::GlobalInteraction
- \until }
- 
  A PointSet and a node for it have to be created to be able to interactively add points:
  
  \skipline mitk::PointSet

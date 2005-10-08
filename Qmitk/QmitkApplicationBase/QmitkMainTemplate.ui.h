@@ -252,7 +252,7 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
 {
   mitk::DataTreeNodeFactory::Pointer factory = mitk::DataTreeNodeFactory::New();
 
-  mitk::DataTreePreOrderIterator it(tree);
+  mitk::DataTreePreOrderIterator it(m_Tree);
   try
   {
     factory->SetFileName( fileName );
@@ -276,7 +276,7 @@ void QmitkMainTemplate::fileOpenImageSequence()
 
   if ( !fileName.isNull() )
   {
-    mitk::DataTreePreOrderIterator it(tree);
+    mitk::DataTreePreOrderIterator it(m_Tree);
 
     int fnstart = fileName.findRev( QRegExp("[/\\\\]"), fileName.length() );
     if ( fnstart<0 ) fnstart=0;
@@ -319,7 +319,7 @@ void QmitkMainTemplate::fileOpenImageSequence()
 
 void QmitkMainTemplate::fileOpenGetFactoryOutput( mitk::DataTreeNodeFactory & factory)
 {
-  mitk::DataTreePreOrderIterator it(tree);
+  mitk::DataTreePreOrderIterator it(m_Tree);
   mitk::Image* image = 0;
   mitk::Image* firstImage = 0;
   bool dataFound = false;
@@ -342,7 +342,7 @@ void QmitkMainTemplate::fileOpenGetFactoryOutput( mitk::DataTreeNodeFactory & fa
       mitk::LevelWindowProperty::Pointer lw = dynamic_cast<mitk::LevelWindowProperty*>(node->GetProperty("levelwindow").GetPointer( ) );
       if ( lw.IsNotNull( ) )
       {
-        mitkMultiWidget->levelWindowWidget->setLevelWindow( lw->GetLevelWindow() );
+        m_MultiWidget->levelWindowWidget->setLevelWindow( lw->GetLevelWindow() );
       }
     }
   }
@@ -350,16 +350,16 @@ void QmitkMainTemplate::fileOpenGetFactoryOutput( mitk::DataTreeNodeFactory & fa
   {
     if ( m_StandardViewsInitialized == false )
     {
-      m_StandardViewsInitialized = mitkMultiWidget->InitializeStandardViews(&it);
+      m_StandardViewsInitialized = m_MultiWidget->InitializeStandardViews(&it);
 
       if (firstImage!=NULL)
         if ( firstImage->GetDimension() == 2 )
         {
-          mitkMultiWidget->changeLayoutToWidget1();
+          m_MultiWidget->changeLayoutToWidget1();
         }
     }
-    mitkMultiWidget->RequestUpdate();
-    mitkMultiWidget->Fit();
+    m_MultiWidget->RequestUpdate();
+    m_MultiWidget->Fit();
   }
 } // fileOpenGetFactoryOutput()
 
@@ -373,7 +373,7 @@ void QmitkMainTemplate::fileOpenProject()
     {    
       QApplication::setOverrideCursor( QCursor(Qt::WaitCursor) );
 
-      mitk::DataTreePreOrderIterator it(tree);
+      mitk::DataTreePreOrderIterator it(m_Tree);
       mitk::DataTree::Load( &it, fileName.ascii() );
 
       m_ProjectFileName = fileName;
@@ -396,7 +396,7 @@ void QmitkMainTemplate::fileSaveProjectAs()
     {    
       QApplication::setOverrideCursor( QCursor(Qt::WaitCursor) );
 
-      mitk::DataTreePreOrderIterator it(tree);
+      mitk::DataTreePreOrderIterator it(m_Tree);
       mitk::DataTree::Save( &it, fileName.ascii() );
 
       m_ProjectFileName = fileName;
@@ -424,7 +424,7 @@ void QmitkMainTemplate::fileSave()
     {    
       QApplication::setOverrideCursor( QCursor(Qt::WaitCursor) );
 
-      mitk::DataTreePreOrderIterator it(tree);
+      mitk::DataTreePreOrderIterator it(m_Tree);
       mitk::DataTree::Save( &it, fileName.ascii() );
 
       m_ProjectFileName = fileName;
@@ -470,7 +470,7 @@ void QmitkMainTemplate::helpAbout()
 void QmitkMainTemplate::init()
 {
   m_Instance = this;
-  mitkMultiWidget=NULL;
+  m_MultiWidget=NULL;
   m_StandardViewsInitialized = false;
   m_FineUndoEnabled = true;
 
@@ -482,8 +482,8 @@ void QmitkMainTemplate::init()
   //this seems to be a bug of Qt3.1.1's designer: The object name of ToolBar is not initialized.
   ToolBar->setName("ToolBar");
 
-  //create the data tree
-  tree=mitk::DataTree::New();
+  //create the data m_Tree
+  m_Tree=mitk::DataTree::New();
 }
 
 /*!
@@ -494,55 +494,24 @@ subclasses.
 */
 void QmitkMainTemplate::Initialize()
 {
-  mitk::DataTreePreOrderIterator it(tree);
+  mitk::DataTreePreOrderIterator it(m_Tree);
   //initialize interaction sub-system: undo-controller, statemachine-factory and global-interaction
 
-  // test for environment variable MITKCONF
-  char* mitkConf = getenv("MITKCONF");
-  std::string xmlFileName;
-
-  if ( mitkConf != NULL )
-  {
-    xmlFileName = mitkConf;
-  }
-  else
-  {
-    xmlFileName = xmlFallBackPath;
-  }
-  xmlFileName += "/StateMachine.xml";
-
-  if ( QFile::exists(xmlFileName.c_str())==false )
-    xmlFileName = "StateMachine.xml";
-
-  std::cout << "Loading behavior file: " << xmlFileName << std::endl;
   //create undo-controller
-  undoController = new mitk::UndoController;
+  m_UndoController = new mitk::UndoController;
 
   undoButton->setUndoModel( dynamic_cast<mitk::VerboseLimitedLinearUndo*>(mitk::UndoController::GetCurrentUndoModel()) );
   redoButton->setUndoModel( dynamic_cast<mitk::VerboseLimitedLinearUndo*>(mitk::UndoController::GetCurrentUndoModel()) );
 
-  //create statemachine-factory:
-  mitk::StateMachineFactory* stateMachineFactory = new mitk::StateMachineFactory();
-  bool smLoadOK = stateMachineFactory->LoadBehavior(xmlFileName);
+  //create global-interaction
+  bool smLoadOK = mitk::GlobalInteraction::StandardInteractionSetup();
 
   //could the behavior file be found?
   if ( smLoadOK )
   {
-    //create eventmapper-factory:
-    mitk::EventMapper* eventMapper = new mitk::EventMapper();
-    //Load all possible Events from List
-    bool eventLoadOK = eventMapper->LoadBehavior(xmlFileName);
-    //could the behavior file be found?
-    if ( eventLoadOK )
-    {
-      //set up the global StateMachine and register it to EventMapper
-      mitk::GlobalInteraction* globalInteraction = new mitk::GlobalInteraction("global");
-      mitk::EventMapper::SetGlobalStateMachine(globalInteraction);
-
       posOutputType* posOutput = new posOutputType(&it);
 
-      globalInteraction->AddListener(new mitk::CoordinateSupplier("navigation", posOutput)); //sends PointOperations
-    }
+      mitk::GlobalInteraction::GetInstance()->AddListener(new mitk::CoordinateSupplier("navigation", posOutput)); //sends PointOperations
   }
   else
   {
@@ -559,15 +528,15 @@ void QmitkMainTemplate::Initialize()
     if ( layoutdraw==NULL )
       layoutdraw = new QHBoxLayout(defaultMain);
 
-    mitkMultiWidget = new QmitkStdMultiWidget(defaultMain, "QmitkMainTemplate::QmitkStdMultiWidget");
-    layoutdraw->addWidget(mitkMultiWidget);
+    m_MultiWidget = new QmitkStdMultiWidget(defaultMain, "QmitkMainTemplate::QmitkStdMultiWidget");
+    layoutdraw->addWidget(m_MultiWidget);
 
     // add the diplayed planes of the multiwidget to a node to which the subtree @a planesSubTree points ...
 
-    mitkMultiWidget->SetData(&it);
+    m_MultiWidget->SetData(&it);
 
-    mitkMultiWidget->AddDisplayPlaneSubTree(&it);
-    mitkMultiWidget->EnableStandardLevelWindow();
+    m_MultiWidget->AddDisplayPlaneSubTree(&it);
+    m_MultiWidget->EnableStandardLevelWindow();
   }
   InitializeFunctionality();
 
@@ -575,10 +544,10 @@ void QmitkMainTemplate::Initialize()
   // Add MoveAndZoomInteractor and widget NavigationControllers as
   // GlobalInteraction listeners
   mitk::GlobalInteraction::GetInstance()->AddListener(
-    mitkMultiWidget->GetMoveAndZoomInteractor()
+    m_MultiWidget->GetMoveAndZoomInteractor()
   );
 
-  mitkMultiWidget->EnableNavigationControllerEventListening();
+  m_MultiWidget->EnableNavigationControllerEventListening();
 }
 
 
@@ -612,7 +581,7 @@ void QmitkMainTemplate::InitializeQfm()
 // @FIXME: probably obsolete
 // mitk::DataTree* QmitkMainTemplate::getDataTree()
 // {
-//     return tree;
+//     return m_Tree;
 //}
 
 
@@ -620,7 +589,7 @@ void QmitkMainTemplate::InitializeQfm()
 
 QmitkStdMultiWidget* QmitkMainTemplate::GetMultiWidget()
 {
-  return mitkMultiWidget;
+  return m_MultiWidget;
 }
 
 void QmitkMainTemplate::parseCommandLine()
@@ -647,40 +616,40 @@ void QmitkMainTemplate::parseCommandLine()
 
 mitk::DataTree::Pointer QmitkMainTemplate::GetTree()
 {
-  return tree;
+  return m_Tree;
 }
 
 void QmitkMainTemplate::changeTo2DImagesUpLayout()
 {
-  mitkMultiWidget->changeLayoutTo2DImagesUp();
+  m_MultiWidget->changeLayoutTo2DImagesUp();
 }
 void QmitkMainTemplate::changeTo2DImagesLeftLayout()
 {
-  mitkMultiWidget->changeLayoutTo2DImagesLeft();
+  m_MultiWidget->changeLayoutTo2DImagesLeft();
 }
 void QmitkMainTemplate::changeToDefaultLayout()
 {
-  mitkMultiWidget->changeLayoutToDefault();
+  m_MultiWidget->changeLayoutToDefault();
 }
 
 void QmitkMainTemplate::changeToBig3DLayout()
 {
-  mitkMultiWidget->changeLayoutToBig3D();
+  m_MultiWidget->changeLayoutToBig3D();
 }
 
 void QmitkMainTemplate::changeToWidget1Layout()
 {
-  mitkMultiWidget->changeLayoutToWidget1();
+  m_MultiWidget->changeLayoutToWidget1();
 }
 
 void QmitkMainTemplate::changeToWidget2Layout()
 {
-  mitkMultiWidget->changeLayoutToWidget2();
+  m_MultiWidget->changeLayoutToWidget2();
 }
 
 void QmitkMainTemplate::changeToWidget3Layout()
 {
-  mitkMultiWidget->changeLayoutToWidget3();
+  m_MultiWidget->changeLayoutToWidget3();
 }
 
 void QmitkMainTemplate::FullScreenMode(bool fullscreen)
@@ -691,15 +660,9 @@ void QmitkMainTemplate::FullScreenMode(bool fullscreen)
     showNormal();
 }
 
-void QmitkMainTemplate::setXMLFallBackPath( const char * anXmlFallBackPath )
+void QmitkMainTemplate::ShowPlanesCheckBox_clicked()
 {
-  xmlFallBackPath = anXmlFallBackPath;
-}
-
-
-void QmitkMainTemplate::m_ShowPlanesCheckBox_clicked()
-{
-  emit ShowWidgetPlanesToggled( m_ShowPlanesCheckBox->isOn() );
+  emit ShowWidgetPlanesToggled( ShowPlanesCheckBox->isOn() );
 }
 
 
@@ -721,13 +684,13 @@ QmitkFctMediator* QmitkMainTemplate::GetFctMediator()
 
 void QmitkMainTemplate::changeToColumnWidget3n4Layout()
 {
-  mitkMultiWidget->changeLayoutToColumnWidget3And4();
+  m_MultiWidget->changeLayoutToColumnWidget3And4();
 }
 
 
 void QmitkMainTemplate::changeToRowWidget3n4Layout()
 {
-  mitkMultiWidget->changeLayoutToRowWidget3And4();
+  m_MultiWidget->changeLayoutToRowWidget3And4();
 }
 
 

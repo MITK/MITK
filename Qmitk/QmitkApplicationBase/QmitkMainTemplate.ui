@@ -91,7 +91,7 @@
         <separator/>
         <widget class="QCheckBox">
             <property name="name">
-                <cstring>m_ShowPlanesCheckBox</cstring>
+                <cstring>ShowPlanesCheckBox</cstring>
             </property>
             <property name="text">
                 <string>Show Planes</string>
@@ -779,10 +779,10 @@
         <slot>FullScreenMode(bool)</slot>
     </connection>
     <connection>
-        <sender>m_ShowPlanesCheckBox</sender>
+        <sender>ShowPlanesCheckBox</sender>
         <signal>clicked()</signal>
         <receiver>QmitkMainTemplate</receiver>
-        <slot>m_ShowPlanesCheckBox_clicked()</slot>
+        <slot>ShowPlanesCheckBox_clicked()</slot>
     </connection>
     <connection>
         <sender>ColumnWidget3n4</sender>
@@ -860,11 +860,10 @@
 </forwards>
 <variables>
     <variable access="private">static QmitkMainTemplate* m_Instance;</variable>
-    <variable>std::string xmlFallBackPath;</variable>
-    <variable>mitk::UndoController* undoController;</variable>
+    <variable>mitk::UndoController* m_UndoController;</variable>
     <variable>QmitkFctMediator* qfm;</variable>
-    <variable>QmitkStdMultiWidget* mitkMultiWidget;</variable>
-    <variable>mitk::DataTree::Pointer tree;</variable>
+    <variable>QmitkStdMultiWidget* m_MultiWidget;</variable>
+    <variable>mitk::DataTree::Pointer m_Tree;</variable>
     <variable>bool m_StandardViewsInitialized;</variable>
     <variable access="private">bool m_FineUndoEnabled;</variable>
     <variable>QString m_ProjectFileName;</variable>
@@ -896,7 +895,7 @@
     <slot>changeToWidget2Layout()</slot>
     <slot>changeToWidget3Layout()</slot>
     <slot>FullScreenMode( bool fullscreen )</slot>
-    <slot>m_ShowPlanesCheckBox_clicked()</slot>
+    <slot>ShowPlanesCheckBox_clicked()</slot>
     <slot>changeToColumnWidget3n4Layout()</slot>
     <slot>changeToRowWidget3n4Layout()</slot>
     <slot>hideToolbar( bool on )</slot>
@@ -915,7 +914,6 @@
     <function returnType="QmitkStdMultiWidget *">GetMultiWidget()</function>
     <function>parseCommandLine()</function>
     <function returnType="mitk::DataTree::Pointer">GetTree()</function>
-    <function>setXMLFallBackPath( const char * anXmlFallBackPath )</function>
     <function access="private">destroy()</function>
     <function specifier="static" returnType="QmitkMainTemplate *">GetInstance()</function>
     <function specifier="non virtual" returnType="QmitkFctMediator *">GetFctMediator()</function>

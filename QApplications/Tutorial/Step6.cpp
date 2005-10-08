@@ -107,25 +107,15 @@ void Step6::Load(int argc, char* argv[])
 
 void Step6::SetupWidgets()
 {
-  //Part I: initialize interaction mechanism
-  // load interaction patterns from XML-file
-  if(mitk::GlobalInteraction::StandardInteractionSetup()==false)
-  {
-    fprintf( stderr, "Could initialize interaction.\n");
-    fprintf( stderr, "Maybe StateMachine.xml was not found. Copy it in \n");
-    fprintf( stderr, "directory of executable or set MITKCONF environment.\n\n");
-    exit(3);
-  }
-
   // create an iterator on the tree
   mitk::DataTreePreOrderIterator it(m_Tree);
 
-  //Part II: Create windows and pass the tree to it
+  //Part I: Create windows and pass the tree to it
   // create toplevel widget with vertical layout
   m_TopLevelWidget = new QVBox(this);
   // create viewParent widget with horizontal layout
   QHBox* viewParent = new QHBox(m_TopLevelWidget);
-  // Part IIa: 3D view
+  // Part Ia: 3D view
   // create a renderwindow
   QmitkRenderWindow* renderWindow = new QmitkRenderWindow(viewParent);
   // tell the renderwindow which (part of) the tree to render
@@ -133,7 +123,7 @@ void Step6::SetupWidgets()
   // use it as a 3D view
   renderWindow->GetRenderer()->SetMapperID(mitk::BaseRenderer::Standard3D);
 
-  // Part IIb: 2D view for slicing transversally
+  // Part Ib: 2D view for slicing transversally
   // create QmitkSliceWidget, which is based on the class
   // QmitkRenderWindow, but additionally provides sliders
   QmitkSliceWidget *view2=new QmitkSliceWidget(viewParent);
@@ -144,7 +134,7 @@ void Step6::SetupWidgets()
   // slice itself in 3D: add it to the tree!
   it.Add(view2->GetRenderer()->GetCurrentWorldGeometry2DNode());
 
-  // Part IIc: 2D view for slicing sagitally
+  // Part Ic: 2D view for slicing sagitally
   // create QmitkSliceWidget, which is based on the class
   // QmitkRenderWindow, but additionally provides sliders
   QmitkSliceWidget *view3=new QmitkSliceWidget(viewParent);
@@ -155,7 +145,7 @@ void Step6::SetupWidgets()
   // slice itself in 3D: add it to the tree!
   it.Add(view3->GetRenderer()->GetCurrentWorldGeometry2DNode());
 
-  // Part III: handle updates: To avoid unnecessary updates, we have to
+  // Part II: handle updates: To avoid unnecessary updates, we have to
   // define when to update. The RenderingManager serves this purpose, and
   // each RenderWindow has to be registered to it.
   mitk::RenderingManager *renderingManager =

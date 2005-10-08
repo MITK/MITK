@@ -17,23 +17,13 @@ Step8::Step8( int argc, char* argv[], QWidget *parent, const char *name )
 
 void Step8::SetupWidgets()
 {
-  //Part I: initialize interaction mechanism
-  // load interaction patterns from XML-file
-  if(mitk::GlobalInteraction::StandardInteractionSetup()==false)
-  {
-    fprintf( stderr, "Could initialize interaction.\n");
-    fprintf( stderr, "Maybe StateMachine.xml was not found. Copy it in \n");
-    fprintf( stderr, "directory of executable or set MITKCONF environment.\n\n");
-    exit(3);
-  }
-
-  //Part II: Create windows and pass the tree to it
+  //Part I: Create windows and pass the tree to it
   // create toplevel widget with vertical layout
   m_TopLevelWidget = new QVBox(this);
   // create viewParent widget with horizontal layout
   QHBox* viewParent = new QHBox(m_TopLevelWidget);
 
-  // Part IIa: create and initialize QmitkStdMultiWidget
+  // Part Ia: create and initialize QmitkStdMultiWidget
   QmitkStdMultiWidget* multiWidget = new QmitkStdMultiWidget(viewParent);
   // create an iterator on the tree
   mitk::DataTreePreOrderIterator it(m_Tree);
@@ -51,7 +41,7 @@ void Step8::SetupWidgets()
   // in 2D and 3D
   multiWidget->AddDisplayPlaneSubTree(&it);
 
-  //Part III: Setup standard interaction with the mouse
+  //Part II: Setup standard interaction with the mouse
   // moving the cut-planes to click-point
   multiWidget->EnableNavigationControllerEventListening();
   // zooming and panning

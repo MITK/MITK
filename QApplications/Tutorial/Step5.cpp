@@ -72,18 +72,8 @@ int main(int argc, char* argv[])
   // *******************************************************
   // ****************** START OF NEW PART ******************
   // *******************************************************
-
-  //Part IV: initialize interaction mechanism
-  // load interaction patterns from XML-file
-  if(mitk::GlobalInteraction::StandardInteractionSetup()==false)
-  {
-    fprintf( stderr, "Could initialize interaction.\n");
-    fprintf( stderr, "Maybe StateMachine.xml was not found. Copy it in \n");
-    fprintf( stderr, "of executable or set MITKCONF environment.\n\n");
-    exit(3);
-  }
-
-  //Part V: For allowing to interactively add points ...
+  
+  //Part VI: For allowing to interactively add points ...
   // create PointSet and a node for it
   mitk::PointSet::Pointer pointSet = mitk::PointSet::New();
   mitk::DataTreeNode::Pointer pointSetNode = mitk::DataTreeNode::New();
@@ -100,10 +90,10 @@ int main(int argc, char* argv[])
   // ******************* END OF NEW PART *******************
   // *******************************************************
 
-  //Part VI: Create windows and pass the tree to it
+  //Part V: Create windows and pass the tree to it
   // create toplevel widget with horizontal layout
   QHBox toplevelWidget;
-  // Part VIa: 3D view
+  // Part Va: 3D view
   // create a renderwindow
   QmitkRenderWindow renderWindow(&toplevelWidget);
   // tell the renderwindow which (part of) the tree to render
@@ -111,7 +101,7 @@ int main(int argc, char* argv[])
   // use it as a 3D view
   renderWindow.GetRenderer()->SetMapperID(mitk::BaseRenderer::Standard3D);
 
-  // Part VIb: 2D view for slicing transversally
+  // Part Vb: 2D view for slicing transversally
   // create QmitkSliceWidget, which is based on the class
   // QmitkRenderWindow, but additionally provides sliders
   QmitkSliceWidget view2(&toplevelWidget);
@@ -122,7 +112,7 @@ int main(int argc, char* argv[])
   // slice itself in 3D: add it to the tree!
   it.Add(view2.GetRenderer()->GetCurrentWorldGeometry2DNode());
 
-  // Part VIc: 2D view for slicing sagitally
+  // Part Vc: 2D view for slicing sagitally
   // create QmitkSliceWidget, which is based on the class
   // QmitkRenderWindow, but additionally provides sliders
   QmitkSliceWidget view3(&toplevelWidget);
@@ -133,7 +123,7 @@ int main(int argc, char* argv[])
   // slice itself in 3D: add it to the tree!
   it.Add(view3.GetRenderer()->GetCurrentWorldGeometry2DNode());
 
-  // Part VII: handle updates: To avoid unnecessary updates, we have to
+  // Part VI: handle updates: To avoid unnecessary updates, we have to
   // define when to update. The RenderingManager serves this purpose, and
   // each RenderWindow has to be registered to it.
   mitk::RenderingManager *renderingManager =
@@ -142,7 +132,7 @@ int main(int argc, char* argv[])
   renderingManager->AddRenderWindow( view2.GetRenderWindow() );
   renderingManager->AddRenderWindow( view3.GetRenderWindow() );
 
-  //Part VIII: Qt-specific initialization
+  //Part VII: Qt-specific initialization
   qtapplication.setMainWidget(&toplevelWidget);
   toplevelWidget.show();
 

@@ -35,7 +35,6 @@ namespace mitk {
   //##ModelId=3E5B33000230
   //##Documentation
   //## @brief handles all global Events
-  //## @ingroup Interaction
   //##
   //## superior statemachine, that spreads the events to all other Interactors
   //##
@@ -60,7 +59,8 @@ namespace mitk {
   //## In that case, all interactors are asked to calculate and return their area of jurisdiction.
   //## An iterator is held on one interactor in the map. With the iterator, the map can be looped through so 
   //## so that several geometric objects, that lie on top of each other, can be selected.
-  class GlobalInteraction : public StateMachine
+  //## @ingroup Interaction
+ class GlobalInteraction : public StateMachine
   {
   public:
     mitkClassMacro(GlobalInteraction, StateMachine);
@@ -141,14 +141,14 @@ namespace mitk {
     //## to add the observer for an event
     FocusManager* GetFocusManager();
 
-    static bool StandardInteractionSetup(const char * XMLbehaviorFile=NULL);
+    static bool StandardInteractionSetup(const char * XMLbehaviorFile = NULL, const char * globalInteractionName = NULL);
 
     static GlobalInteraction* GetInstance();
 
     //so that the interactors can call AddToSelectedInteractors() and RemoveFromSelectedInteractors()
     friend class Interactor;
-  protected:
 
+  protected:
     //##ModelId=3E7F497F01AE
     virtual bool ExecuteAction(Action* action, mitk::StateEvent const* stateEvent);
 
@@ -163,7 +163,6 @@ namespace mitk {
     * This list is asked first to handle an event.
     */
     virtual bool RemoveFromSelectedInteractors(Interactor* interactor);
-
 
   private:
 
@@ -216,6 +215,7 @@ namespace mitk {
 
     InteractionDebugger::Pointer m_InteractionDebugger;
 
+    static GlobalInteraction *s_GlobalInteraction;
   };
 } // namespace mitk
 

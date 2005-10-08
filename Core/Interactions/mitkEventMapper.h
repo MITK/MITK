@@ -44,7 +44,6 @@ namespace mitk {
   //##ModelId=3E5A390401F2
   //##Documentation
   //## @brief Maps an Event to its description 
-  //## @ingroup Interaction
   //## 
   //## EventMapping:
   //## This class mapps the Events, usually given by the OS or here by QT, to a MITK internal EventId.
@@ -57,6 +56,7 @@ namespace mitk {
   //## That way a fine an raw Undo is possible (fine for ObjectID by ObjectID, raw for GroupID for GroupID)
   //## Here the ObjectEventID gets increased, 
   //## not the GroupEventId(must get increased by a StateMachine, that has the information when a new Group of operation starts)
+  //## @ingroup Interaction
   class EventMapper : public vtkXMLParser
   {
   public:
@@ -155,7 +155,7 @@ namespace mitk {
     static EventDescriptionVec m_EventDescriptions;
 
     //##ModelId=3E5B343701F1
-    static StateMachine *m_GlobalStateMachine;
+    static StateMachine *s_GlobalStateMachine;
 
     //##ModelId=3E956E3A036B
     static StateEvent m_StateEvent;

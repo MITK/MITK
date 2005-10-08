@@ -36,6 +36,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkInteractionConst.h"
 #include "mitkStateEvent.h"
 #include "mitkStateMachine.h"
+
+#include "mitkGlobalInteraction.h"
+
 #include <mitkInteractionDebugger.h>
 #include <mitkConfig.h>
 #include <itksys/SystemTools.hxx>
@@ -60,7 +63,7 @@ const std::string mitk::EventMapper::EVENTS = "events";
 
 const std::string mitk::EventMapper::EVENT = "event";
 
-mitk::StateMachine *mitk::EventMapper::m_GlobalStateMachine;
+mitk::StateMachine *mitk::EventMapper::s_GlobalStateMachine(NULL);
 
 mitk::EventMapper::EventDescriptionVec mitk::EventMapper::m_EventDescriptions;
 
@@ -432,13 +435,24 @@ mitk::EventMapper::~EventMapper()
 //## then copy the old statemachine with GetStateMachine()
 void mitk::EventMapper::SetGlobalStateMachine(StateMachine *stateMachine)
 {
-  m_GlobalStateMachine = stateMachine;
+  itkGenericOutputMacro(<< "Use of mitk::EventMapper::SetGlobalStateMachine. "
+    << "This method may be important in the future. Has the future "
+    << "already begun?");
+  if((s_GlobalStateMachine != NULL) && (s_GlobalStateMachine != stateMachine))
+  {
+    itkGenericOutputMacro(<< "replacing an existing global state machine");
+  }
+  s_GlobalStateMachine = stateMachine;
 }
 
 //##ModelId=3EDCA746026F
 mitk::StateMachine* mitk::EventMapper::GetGlobalStateMachine()
 {
-  return m_GlobalStateMachine;
+  if(s_GlobalStateMachine == NULL)
+  {
+    return mitk::GlobalInteraction::GetInstance();
+  }
+  return s_GlobalStateMachine;
 }
 
 //##ModelId=3E5B34CF0041
@@ -447,7 +461,7 @@ mitk::StateMachine* mitk::EventMapper::GetGlobalStateMachine()
 //## and if included
 bool mitk::EventMapper::MapEvent(Event* event)
 {
-  if (m_GlobalStateMachine == NULL)
+  if (GetGlobalStateMachine() == NULL)
     return false;
 
   //search the event in the list of event descriptions, if found, then take the number and produce a stateevent
@@ -500,7 +514,7 @@ bool mitk::EventMapper::MapEvent(Event* event)
     mitk::OperationEvent::IncCurrObjectEventId();
   }
   mitk::OperationEvent::ExecuteIncrement();
-  ok = m_GlobalStateMachine->HandleEvent(&m_StateEvent);
+  ok = GetGlobalStateMachine()->HandleEvent(&m_StateEvent);
 
   return ok;
 }

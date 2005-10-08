@@ -19,7 +19,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkGlobalInteraction.h"
 #include "mitkInteractionConst.h"
-#include "mitkEventMapper.h"
 #include "mitkEvent.h"
 #include "mitkInteractor.h"
 #include "mitkAction.h"
@@ -28,7 +27,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkWorldPointPicker.h>
 #include <mitkOpenGLRenderer.h>
 
-
+mitk::GlobalInteraction *mitk::GlobalInteraction::s_GlobalInteraction(NULL);
 
 //##ModelId=3EAD420E0088
 mitk::GlobalInteraction::GlobalInteraction(const char * type)
@@ -266,7 +265,7 @@ bool mitk::GlobalInteraction::ExecuteAction(Action* action, mitk::StateEvent con
 
 #include <mitkStateMachineFactory.h>
 #include <mitkEventMapper.h>
-bool mitk::GlobalInteraction::StandardInteractionSetup(const char * XMLbehaviorFile)
+bool mitk::GlobalInteraction::StandardInteractionSetup(const char * XMLbehaviorFile, const char * globalInteractionName)
 {
   bool result;
   // load interaction patterns from XML-file
@@ -283,17 +282,21 @@ bool mitk::GlobalInteraction::StandardInteractionSetup(const char * XMLbehaviorF
     result=mitk::EventMapper::LoadBehavior(XMLbehaviorFile);
   if(result==false)
     return false;
-  // setup interaction mechanism by creating GlobalInteraction and 
-  // registering it to EventMapper
-  mitk::EventMapper::SetGlobalStateMachine(new mitk::GlobalInteraction("global"));
+  // setup interaction mechanism by creating GlobalInteraction
+  if(globalInteractionName == NULL)
+    s_GlobalInteraction = new mitk::GlobalInteraction("global");
+  else
+    s_GlobalInteraction = new mitk::GlobalInteraction(globalInteractionName);
   return true;
 }
 
 mitk::GlobalInteraction* mitk::GlobalInteraction::GetInstance()
 {
-  return dynamic_cast<mitk::GlobalInteraction*>(
-    mitk::EventMapper::GetGlobalStateMachine()
-  );
+  if(s_GlobalInteraction == NULL)
+  {
+    mitk::GlobalInteraction::StandardInteractionSetup();
+  }
+  return s_GlobalInteraction;
 }
 
 bool mitk::GlobalInteraction::AddToSelectedInteractors(mitk::Interactor* interactor)

@@ -18,6 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include "mitkSurfaceToImageFilter.h"
+#include "mitkGeometryClipImageFilter.h"
 
 #include <fstream>
 
@@ -296,6 +297,11 @@ int mitkPipelineSmartPointerCorrectnessTest(int argc, char* argv[])
 {
   int result;
   result = runPipelineSmartPointerCorrectnessTestForFilterType<mitk::SurfaceToImageFilter>();
+  if( result != EXIT_SUCCESS )
+    return result;
+  std::cout << std::endl;
+
+  result = runPipelineSmartPointerCorrectnessTestForFilterType<mitk::GeometryClipImageFilter>();
   if( result != EXIT_SUCCESS )
     return result;
   std::cout << std::endl;

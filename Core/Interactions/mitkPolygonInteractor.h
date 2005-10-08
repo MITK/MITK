@@ -30,8 +30,9 @@ namespace mitk
 
   //##Documentation
   //## @brief Interaction with a Polygon, a closed set of lines.
-  //## @ingroup Interaction
+  //##
   //## Interact with a Polygon. 
+  //## @ingroup Interaction
   class PolygonInteractor : public HierarchicalInteractor
   {
   public:

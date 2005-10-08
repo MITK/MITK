@@ -33,10 +33,8 @@ namespace mitk
 
 //##
 //##Documentation
-//## @brief
+//## @brief LookupTable containing a vtkLookupTable
 //## @ingroup Data
-//##
-//##
 //##
 class LookupTable : public itk::DataObject 
 {

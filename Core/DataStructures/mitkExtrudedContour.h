@@ -38,10 +38,10 @@ namespace mitk {
 //##Documentation
 //## @brief Data class containing a bounding-object created by
 //## extruding a Contour along a vector
-//## @ingroup Data
 //##
 //## The m_Contour is extruded in the direction m_Vector until
 //## reaching m_ClippingGeometry.
+//## @ingroup Data
 class ExtrudedContour : public BoundingObject
 {
 public:

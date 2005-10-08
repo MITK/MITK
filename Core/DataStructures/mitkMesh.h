@@ -38,7 +38,6 @@ namespace mitk {
   
 //##Documentation
 //##@brief DataStructure which stores a set of points (incl. pointdata) where each point can be associated to an element of a cell.
-//## @ingroup Data
 //##
 //## A mesh contains several cells that can be of different celltypes (Line, Triangle, Polygone...).
 //## A cell is always closed. If a linestrip is to be created, then declare several cells, each containing one line.
@@ -49,6 +48,7 @@ namespace mitk {
 //## existing PIds ind the cell:1,2,4; 
 //## inserting 2,3 so that new PIds in Cell:1,2,3,4 
 //## The cell is now of type QuadrilateralCell
+//## @ingroup Data
 class Mesh : public PointSet
 {
 public:

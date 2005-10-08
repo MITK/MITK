@@ -34,6 +34,7 @@ namespace mitk {
 //##ModelId=3E70F60202EA
 //##Documentation
 //## @brief Vtk-based mapper for Surface
+//##
 //## @ingroup Mapper
 class SurfaceVtkMapper3D : public BaseVtkMapper3D
 {

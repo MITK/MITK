@@ -41,6 +41,7 @@ namespace mitk {
 
 //##Documentation
 //## @brief Vtk-based mapper for VolumeData
+//##
 //## @ingroup Mapper
 class VolumeDataVtkMapper3D : public BaseVtkMapper3D
 {

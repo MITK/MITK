@@ -27,7 +27,7 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk {
 //##Documentation
 //## @brief Reader to read files in DICOM-format
-//## @ingroup Process
+//## @ingroup IO
 class DICOMFileReader : public ImageSource, public FileReader
 {
 public:

@@ -26,12 +26,13 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk {
 //##Documentation
 //## @brief Sending a message to the applications StatusBar
-//## @ingroup Interaction
-//## holds a GUI dependent StatusBarImplementation and sends the text further.
+//##
+//## Holds a GUI dependent StatusBarImplementation and sends the text further.
 //## nearly equal to itk::OutputWindow, 
 //## no Window, but one line of text and a delay for clear. 
 //## all mitk-classes use this class to display text on GUI-StatusBar.
 //## The mainapplication has to set the internal held StatusBarImplementation with SetInstance(..).
+//## @ingroup Interaction
 class StatusBar : public itk::Object
 {
 public:

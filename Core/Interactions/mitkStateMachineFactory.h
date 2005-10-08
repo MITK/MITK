@@ -35,12 +35,13 @@ namespace mitk {
   //##Documentation
   //## @brief builds up all specifiyed statemachines and hold them for later
   //## access
-  //## @ingroup Interaction
+  //##
   //## According to the XML-File every different statemachine is build up. A new
   //## Instance of a new StateMachine grabs a StartState of one certain
   //## statemachine. Two instances of one kind of statemachine share that
   //## statemachine. 
   //## During buildprocess at runtime each statemachine is parsed for well formed style.
+  //## @ingroup Interaction
   class StateMachineFactory : public vtkXMLParser
   {
   public:

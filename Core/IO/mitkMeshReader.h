@@ -30,7 +30,7 @@ namespace mitk
 {
 /**
  * @brief reads xml representations of mitk::Mesh from a file
- * @ingroup process
+ *
  * Reader for xml files containing one or multiple xml represenations of 
  * mitk::Mesh. If multiple mitk::PointSets are stored in one file,
  * these are assigned to multiple outputs of the filter. The number of point
@@ -39,6 +39,7 @@ namespace mitk
  * Note: loading point sets from multiple files according to a given file pattern
  * is not yet supported!
  * @warning currently no cells are read!
+ * @ingroup IO
  */
 class MeshReader: public mitk::MeshSource, public mitk::FileReader
 {

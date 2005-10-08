@@ -24,9 +24,8 @@ PURPOSE.  See the above copyright notices for more information.
 //## @file mitkInteractionConst.h
 //## @brief Constants for most interaction classes, due to the generic StateMachines.
 //##
-//## @ingroup Interaction
-//##
 //## Changes in Type, ButtonState or Key has to be don in mitkEventMapper.cpp, too.
+//## @ingroup Interaction
 
 /*Prefixes for Constants:
 E = Enumeration

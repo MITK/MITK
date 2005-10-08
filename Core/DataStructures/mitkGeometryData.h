@@ -27,9 +27,9 @@ namespace mitk {
 //##Documentation
 //## @brief Data class only having a Geometry3D but not containing 
 //## any specific data.
-//## @ingroup Geometry
 //## 
 //## Only implements pipeline methods which are abstract in BaseData.
+//## @ingroup Geometry
 class GeometryData : public BaseData
 {
 public:

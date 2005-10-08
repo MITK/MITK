@@ -32,9 +32,10 @@ namespace mitk {
   //##ModelId=3E5A399E033E
   //##Documentation
   //## @brief Connection of two states
-  //## @ingroup Interaction
+  //##
   //## A transition connects two states. 
   //## Also a Action is stored, that has to be executed after the statechange
+  //## @ingroup Interaction
   class Transition
   {
   public:

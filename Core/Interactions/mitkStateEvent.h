@@ -28,12 +28,13 @@ namespace mitk {
   //##ModelId=3E5B7929027D
   //##Documentation
   //## @brief Class holding an mitk-event and the mitk-event-number for a statechange
-  //## @ingroup Interaction
+  //##
   //## Holds an event, with which a statechange of a statemachine shall be
   //## done. iD represents the mitk-event-number, event all further necessary information like
   //## the MousePosition or a key.
   //## Not derived from event to hold only one object stateevent, pass it to the statemachines, 
   //## set the next event and reuse this object
+  //## @ingroup Interaction
   class StateEvent
   {
   public:

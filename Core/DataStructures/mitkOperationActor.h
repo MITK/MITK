@@ -40,8 +40,8 @@ class OperationEvent;
 //##ModelId=3E5F62430388
 //##Documentation
 //## @brief abstract class, that can be used  by Undo to undo an operation.
-//## @ingroup Undo
 //## 
+//## @ingroup Undo
 class OperationActor
 {
 public:

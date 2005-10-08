@@ -32,8 +32,9 @@ namespace mitk {
   //##ModelId=3F0189F00094
   //##Documentation
   //## @brief Interactor
-  //## @ingroup Interaction
+  //##
   //## sends a Point, that can be processed in its own OperationActor
+  //## @ingroup Interaction
   class CoordinateSupplier : public StateMachine
   {
   public:

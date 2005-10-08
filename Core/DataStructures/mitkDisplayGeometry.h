@@ -29,7 +29,7 @@ namespace mitk {
 //##ModelId=3E3AE8F401DD
 //##Documentation
 //## @brief Describes the geometry on the display/screen for 2D display.
-//## @ingroup Geometry
+//##
 //## The main purpose of this class is to convert between display coordinates
 //## (in display-units) and world coordinates (in mm).
 //## DisplayGeometry depends on the size of the display area (widget width and
@@ -55,6 +55,7 @@ namespace mitk {
 //## @endcode
 //## unless you can be sure that the underlying geometry of @a displaygeometry
 //## is really the @a certaingeometry.
+//## @ingroup Geometry
 class DisplayGeometry : public Geometry2D
 {
 public:

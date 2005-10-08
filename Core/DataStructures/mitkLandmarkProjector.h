@@ -33,8 +33,8 @@ namespace mitk {
 //##Documentation
 //## @brief Base-class of landmark-projectors, which project the target landmarks
 //## to create source landmarks.
-//## @ingroup Geometry
 //## 
+//## @ingroup Geometry
 class LandmarkProjector : public itk::Object
 {
 public:

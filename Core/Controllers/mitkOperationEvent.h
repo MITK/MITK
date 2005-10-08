@@ -31,7 +31,7 @@ namespace mitk {
 
 //##Documentation
 //## @brief Represents an entry of the undo or redo stack.
-//## @ingroup Undo
+//##
 //## This basic entry includes a textual description of the item and a pair of IDs. Static
 //## member functions handle creation and incrementing of these IDs. 
 //##
@@ -43,6 +43,7 @@ namespace mitk {
 //## The GroupEventID is intended for logical grouping of several related Operations.
 //## Currently this is used only by PointSetInteractor. How this is done and when to use
 //## GroupEventIDs is still undocumented.
+//## @ingroup Undo
 class UndoStackItem
 {
   public:
@@ -140,13 +141,14 @@ class UndoStackItem
 //##ModelId=3E5F60F301A4
 //##Documentation
 //## @brief Represents a pair of operations: undo and the according redo.
-//## @ingroup Undo
+//##
 //## Additionally to the base class UndoStackItem, which only provides a description of an
 //## item, OperationEvent does the actual accounting of the undo/redo stack. This class
 //## holds two Operation objects (operation and its inverse operation) and the corresponding 
 //## OperationActor. The operations may be swapped, which is done by the
 //## LimitedLinearUndo models, when an OperationEvent is moved from the undo to the redo
 //## stack or vice versa.
+//## @ingroup Undo
 class OperationEvent : public UndoStackItem
 {
 public:
@@ -166,8 +168,7 @@ public:
 
   friend class UndoModel;
 
-  //##ModelId=3E957C1102E3
-  //##Documentation
+  //##ModelId=3E957C1102E3  //##Documentation
   //## @brief Swaps the two operations and sets a flag, 
   //## that it has been swapped and do is undo and undo is do
   virtual void ReverseOperations();
@@ -191,4 +192,3 @@ private:
 } //namespace mitk
 
 #endif /* OPERATIONEVENT_H_HEADER_INCLUDED_C16E83FC */
-

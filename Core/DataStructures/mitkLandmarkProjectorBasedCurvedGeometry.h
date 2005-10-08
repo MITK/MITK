@@ -28,8 +28,8 @@ namespace mitk {
 //##Documentation
 //## @brief Superclass of AbstractTransformGeometry sub-classes defined
 //## by a set of landmarks.
-//## @ingroup Geometry
 //## 
+//## @ingroup Geometry
 class LandmarkProjectorBasedCurvedGeometry : public LandmarkBasedCurvedGeometry
 {
 public:

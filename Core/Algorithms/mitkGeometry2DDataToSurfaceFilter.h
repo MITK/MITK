@@ -33,7 +33,7 @@ class Geometry2DData;
 //##Documentation
 //## @brief Superclass of all classes having a Geometry2DData as input and
 //## generating Images as output
-//## @ingroup Process
+//##
 //## Currently implemented for PlaneGeometry and AbstractTransformGeometry.
 //## Currently, this class does not really have subclasses, but does the job
 //## for itself. It checks which kind of Geometry2D is stored in the
@@ -45,6 +45,7 @@ class Geometry2DData;
 //## instance of the required subclass and delegate the surface generation to
 //## it.
 //## @todo make extension easier
+//## @ingroup Process
 class Geometry2DDataToSurfaceFilter : public SurfaceSource
 {
   public:

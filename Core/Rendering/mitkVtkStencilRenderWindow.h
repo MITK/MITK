@@ -25,12 +25,14 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk
 {
   //##Documentation
-  //##@brief 
+  //##@brief Superclass of VtkRenderWindow classes configured for the 
+  //## use with the OpenGL stencil buffer. 
+  //##
+  //## @note VTK has to be initialized according to the operating system,
+  //## developers have to derive this class and care about the initialisation 
+  //## of the OpenGL stencil buffer.
+  //## By default stencil buffer is not supported by vtk nor by qt.
   //##@ingroup Rendering  
-  //##These RenderWindows are configured for the use with the 
-  //##  OpenGL stencil buffer. Thus VTK has to be initialized according to the operating system,
-  //##  developers have to derive this class and care about the initialisation of the OpenGL stencil buffer.
-  //##  By default stencil buffer is not supported by vtk nor by qt.
   class VtkStencilRenderWindow : public VtkRenderWindow
   {
   public:

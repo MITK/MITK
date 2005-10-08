@@ -32,7 +32,7 @@ namespace mitk
 
 /**
  * @brief VTK-based writer for mitk::Surface 
- * @ingroup Process
+ *
  * The mitk::Surface is written using the VTK-writer-type provided as the
  * template argument. If the mitk::Surface contains multiple points of
  * time, multiple files are written. The life-span (time-bounds) of each
@@ -42,7 +42,8 @@ namespace mitk
  * (S=start, E=end, T=time).
  * Writing of multiple files according to a given filename pattern is not
  * yet supported.
- */
+ * @ingroup Process
+*/
 template <class VTKWRITER>
 class SurfaceVtkWriter : public itk::ProcessObject, public mitk::FileWriter
 {

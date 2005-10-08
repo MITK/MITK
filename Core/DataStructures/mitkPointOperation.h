@@ -32,9 +32,8 @@ namespace mitk {
 //##Documentation
 //## @brief Operation, that handles all aktions on one Point.
 //##
-//## @ingroup Undo
-//##
 //## Stores everything for Adding, Moving and Deleting a Point.
+//## @ingroup Undo
 class PointOperation : public Operation
 {
   public:

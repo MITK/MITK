@@ -30,15 +30,16 @@ namespace mitk
 {
 /**
  * @brief reads xml representations of mitk::PointSets from a file
- * @ingroup process
+ *
  * Reader for xml files containing one or multiple xml represenations of 
  * mitk::PointSets. If multiple mitk::PointSets are stored in one file,
  * these are assigned to multiple outputs of the filter. The number of point
  * sets which have be read can be retrieven by a call to GetNumberOfOutputs() 
  * after the pipeline update().
- * Note: loading point sets from multiple files according to a given file pattern
+ * @note loading point sets from multiple files according to a given file pattern
  * is not yet supported!
- */
+ * @ingroup IO
+*/
 class PointSetReader: public mitk::PointSetSource, public mitk::FileReader
 {
 public:

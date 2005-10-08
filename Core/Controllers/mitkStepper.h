@@ -30,10 +30,11 @@ namespace mitk {
 //##ModelId=3DF8BF9A005D
 //##Documentation
 //## @brief Helper class to step through a list
-//## @ingroup NavigationControl
+//##
 //## A helper class to step through a list. Does not contain the list, just the
 //## position in the list (between 0 and GetSteps()). Provides methods like
 //## First (go to the first element), Next (go to the next one), etc.
+//## @ingroup NavigationControl
 class Stepper : public itk::Object
 {
 public:

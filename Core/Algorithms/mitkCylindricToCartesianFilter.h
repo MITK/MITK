@@ -28,10 +28,11 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk {
 //##Documentation
 //## @brief Filter to convert a cylindric image into a cartesian image
-//## @ingroup Process
+//##
 //## @todo position of input image is not yet used to calculate position of the output
 //## @todo tag with transducer position not yet transformed.
 //## @todo the line limiting the sector is assumed to be available as a pic tag. Is this ok?
+//## @ingroup Process
 class CylindricToCartesianFilter : public ImageToImageFilter
 {
 public:

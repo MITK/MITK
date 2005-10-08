@@ -28,7 +28,7 @@ namespace mitk {
 //##ModelId=3D7B112F00B0
 //##Documentation
 //## @brief Reader to read files in DKFZ-pic-format
-//## @ingroup Process
+//## @ingroup IO
 class PicFileReader : public ImageSource, public FileReader
 {
 public:

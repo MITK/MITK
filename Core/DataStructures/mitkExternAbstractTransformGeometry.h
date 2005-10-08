@@ -28,13 +28,13 @@ namespace mitk {
 //##Documentation
 //## @brief Identical with AbstractTransformGeometry, except that 
 //## it can be externally configured.
-//## @ingroup Geometry
 //## 
 //## In contrast to its superclass (AbstractTransformGeometry), this class 
 //## provides write access to the vtkAbstractTransform and m_Plane.
 //## @note The PlaneGeometry is cloned, @em not linked/referenced.
 //## @note The bounds of the PlaneGeometry are used as the parametric bounds.
 //## @sa AbstractTransformGeometry
+//## @ingroup Geometry
 class ExternAbstractTransformGeometry : public AbstractTransformGeometry
 {
 public:

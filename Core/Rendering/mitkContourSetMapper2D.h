@@ -32,9 +32,9 @@ class BaseRenderer;
 
 /** 
  * @brief OpenGL-based mapper to display a mitk::Contour object in a 2D render window 
+ * 
+ * 
  * @ingroup Mapper
- * 
- * 
  */
 class ContourSetMapper2D : public GLMapper2D
 {

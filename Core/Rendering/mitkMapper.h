@@ -35,11 +35,12 @@ class BaseData;
 //##ModelId=3D6A0EE70237
 //##Documentation
 //## @brief Base class of all mappers, 2D as well as 3D
-//## @ingroup Mapper
+//##
 //## Base class of all Mappers, 2D as well as 3D. 
 //## Subclasses of mitk::Mapper control the creation of rendering primitives
 //## that interface to the graphics library (e.g., OpenGL, vtk). 
 //## @todo Should Mapper be a subclass of ImageSource?
+//## @ingroup Mapper
 class Mapper : public itk::Object, public XMLIO
 {
 public:

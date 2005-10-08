@@ -26,8 +26,9 @@ namespace mitk{
 
   /**
   * @brief prints out information for debugging purpose
-  * @ingroup Interaction
+  *
   * prints out recieved text in a sorted way
+  * @ingroup Interaction
   */
   class InteractionDebugger : public itk::Object
   {

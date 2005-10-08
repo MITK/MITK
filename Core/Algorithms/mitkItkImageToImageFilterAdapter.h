@@ -30,6 +30,7 @@ namespace mitk {
 
 //##Documentation
 //## @brief adapter class, that encapsulates any itk::ImageToImageFilter
+//##
 //## This filter converts a mitk::Image to an itk::Image, executes the 
 //## itkFilter and converts the itk::Image back to a mitk::Image as output.
 //## Either call SetSingleFilter() to encapsulate one itk::ImageToImageFilter, 

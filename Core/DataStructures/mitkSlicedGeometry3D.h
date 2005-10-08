@@ -28,7 +28,7 @@ namespace mitk {
 //##ModelId=3DCBF389032B
 //##Documentation
 //## @brief Describes the geometry of a data object consisting of slices
-//## @ingroup Geometry
+//##
 //## A Geometry2D can be requested for each slice.
 //## In the case of @em evenly-spaced, @em plane geometries (m_EvenlySpaced==true), 
 //## only the 2D-geometry of the first slice has to be set (to an instance of 
@@ -54,6 +54,7 @@ namespace mitk {
 //## @warning The hull (i.e., transform, bounding-box and
 //## time-bounds) is only guaranteed to be up-to-date after calling 
 //## UpdateInformation().
+//## @ingroup Geometry
 class SlicedGeometry3D : public mitk::Geometry3D
 {
 public:

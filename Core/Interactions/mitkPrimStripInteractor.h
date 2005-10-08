@@ -30,10 +30,11 @@ namespace mitk
 
   //##Documentation
   //## @brief Interaction with a list of many primitives.
-  //## @ingroup Interaction
+  //##
   //## Interact with a list of interactables e.g. lines and stripes
   //## The whole list can be selected by selecting all the other lower interactables.
   //## the selection of the whole dataSet is only possible by seting the property of the DataTreeNode.
+  //## @ingroup Interaction
   class PrimStripInteractor: public HierarchicalInteractor
   {
   public:

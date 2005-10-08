@@ -31,6 +31,7 @@ namespace mitk {
 //##ModelId=3DDE570F010A
 //##Documentation
 //## @brief Describes a two-dimensional, rectangular plane
+//## 
 //## @ingroup Geometry
 class PlaneGeometry : public Geometry2D
 {

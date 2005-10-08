@@ -27,14 +27,15 @@ namespace mitk
 {
 
 /**
- * @brief Superclass of all classes generating base datas (instances of class
+ * @brief Superclass of all classes generating base data (instances of class
  * mitk::BaseData) as output. 
- * @ingroup Process
+ *
  * In itk and vtk the generated result of a ProcessObject is only guaranteed
  * to be up-to-date, when Update() of the ProcessObject or the generated
  * DataObject is called immediately before access of the data stored in the
  * DataObject. This is also true for subclasses of mitk::BaseProcess and thus
  * for mitk::BaseDataSource.
+ * @ingroup Process
  */
 class BaseDataSource : public BaseProcess
 {

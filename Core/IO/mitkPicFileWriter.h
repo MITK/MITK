@@ -34,7 +34,7 @@ namespace mitk
 class Image;
 /**
  * @brief Writer for mitk::Image
- * @ingroup Process
+ * @ingroup IO
  */
 class PicFileWriter : public itk::ProcessObject, public mitk::FileWriter
 {

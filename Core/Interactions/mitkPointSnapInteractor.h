@@ -30,12 +30,13 @@ namespace mitk
 
   //##Documentation
   //## @brief adds Snap to Point Interaction to PointInteractor if hierarchicaly ordered
-  //## @ingroup Interaction
+  //##
   //## This class adds snapping to a point to the existing interaction. Hierarchicaly set 
   //## above the Pointinteractor, it checks if an already existing point lies near enough 
   //## to the MousePosition, when a Point is to be added.
   //## If so, then it only activates the point, so that the LineInteractor (hierarchicaly 
   //## above this PointSnapInteractor) can add a line to that Point.
+  //## @ingroup Interaction
   class PointSnapInteractor : public HierarchicalInteractor
   {
   public:

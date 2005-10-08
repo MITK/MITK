@@ -30,7 +30,7 @@ namespace mitk {
 //##Documentation
 //## @brief Superclass of all classes generating Images (instances of class
 //## Image) as output. 
-//## @ingroup Process
+//##
 //## In itk and vtk the generated result of a ProcessObject is only guaranteed
 //## to be up-to-date, when Update() of the ProcessObject or the generated
 //## DataObject is called immediately before access of the data stored in the
@@ -39,6 +39,7 @@ namespace mitk {
 //## that guarantee an up-to-date result (by first calling Update and then
 //## returning the result of GetOutput()): GetData(), GetPic() and
 //## GetVtkImageData().
+//## @ingroup Process
 class ImageSource : public BaseProcess
 {
 public:

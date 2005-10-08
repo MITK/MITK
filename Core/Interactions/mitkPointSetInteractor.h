@@ -30,8 +30,9 @@ namespace mitk
   //##ModelId=3F017AFD00C3
   //##Documentation
   //## @brief Interaction with a set of points.
-  //## @ingroup Interaction
+  //##
   //## Points can be added, removed and moved.
+  //## @ingroup Interaction
   class PointSetInteractor : public Interactor
   {
   public:

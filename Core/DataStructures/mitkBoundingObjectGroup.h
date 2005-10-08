@@ -26,7 +26,8 @@ namespace mitk {
 
 //##Documentation
 //## @brief group object, that contains several mitk::BoundingObjects
-//## calculates a bounding box that contains all sub-bounding boxes
+//##
+//## Calculates a bounding box that contains all sub-bounding boxes.
 //## @ingroup Data
 class BoundingObjectGroup : public mitk::BoundingObject
 {

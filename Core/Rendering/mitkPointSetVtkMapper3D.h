@@ -37,7 +37,6 @@ namespace mitk {
   //##ModelId=3E70F60202EA
   //##Documentation
   //## @brief Vtk-based mapper for PointSet
-  //## @ingroup Mapper
   //##
   //## Due to the need of different colors for selected 
   //## and unselected points and the facts, that we also have a contour and labels for the points,
@@ -55,6 +54,7 @@ namespace mitk {
   //## "pointsize" = size of the points mapped
   //## "label" = text of the Points to show besides points
   //## "contoursize" = size of the contour drawn between the points // if not set, the pointsize is taken!
+  //## @ingroup Mapper
   class PointSetVtkMapper3D : public BaseVtkMapper3D
   {
   public:

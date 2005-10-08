@@ -30,7 +30,7 @@ namespace mitk {
 //##Documentation
 //## @brief Data class containing Geometry2D objects
 //## @ingroup Geometry
-//## @deprecated class will be removed and replaced simply by BaseData
+//##
 class Geometry2DData : public BaseData
 {
 public:

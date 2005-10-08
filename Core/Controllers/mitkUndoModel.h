@@ -31,8 +31,9 @@ class OperationActor;
 //##ModelId=3E5F564C03D4
 //##Documentation
 //## @brief superclass for all UndoModels
-//## @ingroup Undo
+//##
 //## all necessary operations, that all UndoModels share.
+//## @ingroup Undo
 class UndoModel
 {
   public:

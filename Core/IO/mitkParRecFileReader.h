@@ -27,7 +27,7 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk {
 //##Documentation
 //## @brief Reader to read files in Philips PAR/REC file format
-//## @ingroup Process
+//## @ingroup IO
 class ParRecFileReader : public ImageSource, public FileReader
 {
 public:

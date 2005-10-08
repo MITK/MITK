@@ -31,11 +31,12 @@ class BaseRenderer;
 //##ModelId=3E639D57030F
 //##Documentation
 //## @brief OpenGL-based mapper to display a Geometry2D in a 2D window
-//## @ingroup Mapper
+//##
 //## Currently implemented for mapping on PlaneGeometry. 
 //## The result is normally a line. An important usage of this class is to show
 //## the orientation of the slices displayed in other 2D windows.
 //## @todo implement for AbstractTransformGeometry.
+//## @ingroup Mapper
 class Geometry2DDataMapper2D : public GLMapper2D
 {
 public:

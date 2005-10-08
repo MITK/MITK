@@ -29,13 +29,13 @@ namespace mitk {
 
 //##Documentation
 //## @brief Cuts an Boundingobject out of an mitk Image
-//## @ingroup Process
 //## 
 //## Input Parameters are a mitk::BoundingObject and optionally an mitk::Image
 //## if no mitk::Image is provided, the resulting image will have m_InsideValue as pixelvalue on inside pixel, 
 //## otherwise it will have the pixelvalue of the input image.
 //## Pixel on the outside of the BoundingObject will have a pixelvalue of m_OutsideValue
 //## \todo What Image resolution/spacing should be used, if no input image is given?
+//## @ingroup Process
 template <typename TPixel> class BoundingObjectCutAndCast : public BoundingObjectCutter
 {
 public:

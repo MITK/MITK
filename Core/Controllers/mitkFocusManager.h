@@ -30,13 +30,13 @@ namespace mitk {
 //##ModelId=3EDCAF46031B
 //##Documentation
 //## @brief manages a list of BaseRenderer.
-//## @ingroup Interaction
 //## 
 //## A focuspointer can be set and read.
 //## GoToNext can be used to switch through the list.
 //## if the switch m_Loop is set to true, GetNext loops through the list; after
 //## the last it goes to the first.
 //## if it is not set, it returnes NULL if it steps behind the last Widget.
+//## @ingroup Interaction
   class FocusManager : public itk::Object
 {
   public:

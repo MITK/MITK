@@ -29,8 +29,9 @@ namespace mitk {
 //##ModelId=3E6814230160
 //##Documentation
 //## @brief Base class of all OpenGL-based 2D-Mappers
-//## @ingroup Mapper
+//##
 //## Those must implement the abstract method Paint(BaseRenderer).
+//## @ingroup Mapper
 class GLMapper2D : public Mapper2D
 {
   public:

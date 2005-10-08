@@ -9,6 +9,7 @@
 //##ModelId=3E6D600E0193
 //##Documentation
 //## @brief vtkRenderWindowInteractor implementation for Qt/mitk
+//##
 //## For using the VtkQRenderWindowInteractor it is necessary to add the VtkQRenderWindowInteractor.cpp to your project.
 //## The VtkQRenderWindowInteractorFactory will install the VtkQRenderWindowInteractor in the vtkObjectFactory automatically.
 //## (Bridge-pattern)

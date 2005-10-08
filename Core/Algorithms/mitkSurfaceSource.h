@@ -28,12 +28,13 @@ class Surface;
 //##Documentation
 //## @brief Superclass of all classes generating surfaces (instances of class
 //## Surface) as output. 
-//## @ingroup Process
+//##
 //## In itk and vtk the generated result of a ProcessObject is only guaranteed
 //## to be up-to-date, when Update() of the ProcessObject or the generated
 //## DataObject is called immediately before access of the data stored in the
 //## DataObject. This is also true for subclasses of mitk::BaseProcess and thus
 //## for mitk::SurfaceSource.
+//## @ingroup Process
 class SurfaceSource : public BaseProcess
 {
 public:

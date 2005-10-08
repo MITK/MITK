@@ -40,9 +40,9 @@ class SubImageSelector;
 //##ModelId=3DCBC1E300FE
 //##Documentation
 //## @brief Image class for storing images
-//## @ingroup Data
-//## Can be asked for header information, the
-//## data vector, ipPicDescriptors or vtkImageData objects. If not the complete
+//##
+//## Can be asked for header information, the data vector, 
+//## the ipPicDescriptor struct or vtkImageData objects. If not the complete
 //## data is required, the appropriate SubImageSelector class should be used
 //## for access.
 //## Image organizes sets of slices (s x 2D), volumes (t x 3D) and channels (n
@@ -50,6 +50,7 @@ class SubImageSelector;
 //## channel 0, velocities in channel 1. All channels must have the same Geometry! In 
 //## particular, the dimensions of all channels are the same, only the pixel-type
 //## may differ between channels
+//## @ingroup Data
 class Image : public SlicedData
 {
   friend class SubImageSelector;
@@ -451,6 +452,9 @@ protected:
 
 };
 
+//##Documentation
+//## @brief Cast an itk::Image (with a specific type) to an mitk::Image.
+//## @ingroup Adaptor
 template <typename ItkOutputImageType> 
 void CastToMitkImage(const itk::SmartPointer<ItkOutputImageType>& itkimage, itk::SmartPointer<mitk::Image>& mitkoutputimage)
 {
@@ -458,6 +462,9 @@ void CastToMitkImage(const itk::SmartPointer<ItkOutputImageType>& itkimage, itk:
   mitkoutputimage->SetVolume(itkimage->GetBufferPointer());
 }
 
+//##Documentation
+//## @brief Cast an itk::Image (with a specific type) to an mitk::Image.
+//## @ingroup Adaptor
 template <typename ItkOutputImageType> 
 void CastToMitkImage(const ItkOutputImageType* itkimage, itk::SmartPointer<mitk::Image>& mitkoutputimage)
 {

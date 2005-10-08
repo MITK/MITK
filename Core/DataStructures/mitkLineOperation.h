@@ -29,9 +29,8 @@ namespace mitk {
   //##Documentation
   //## @brief Operation, that holds everything necessary for an operation on a line.
   //##
-  //## @ingroup Undo
-  //##
   //## Stores everything for de-/ selecting, inserting , moving and removing a line.
+  //## @ingroup Undo
   class LineOperation : public mitk::CellOperation
   {
   public:

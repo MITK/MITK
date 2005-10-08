@@ -28,7 +28,7 @@ namespace mitk {
 //##ModelId=3DDE4DEC0291
 //##Documentation
 //## @brief Describes the geometry of a two-dimensional object
-//## @ingroup Geometry
+//##
 //## Describes a two-dimensional manifold, i.e., simply speaken, 
 //## an object that can be described using a 2D coordinate-system. 
 //##
@@ -59,6 +59,7 @@ namespace mitk {
 //## 
 //## Rule: everything is in mm (or ms for temporal information) if not 
 //## stated otherwise.
+//## @ingroup Geometry
 class Geometry2D : public mitk::Geometry3D
 {
 public:

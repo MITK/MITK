@@ -29,10 +29,10 @@ class DisplayPositionEvent;
 
 //##Documentation
 //## @brief Interactor for Affine transformations translate, rotate and scale
-//## @ingroup Interaction
 //##
 //## An object of this class can translate, rotate and scale the data objects
 //## by modifying its geometry.
+//## @ingroup Interaction
 class AffineInteractor : public Interactor
 {
 public:

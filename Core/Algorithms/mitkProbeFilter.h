@@ -33,8 +33,8 @@ class Image;
 
 //##Documentation
 //## @brief Adapter for vtkProbeFilter, making it a 3D+t filter
-//## @ingroup Process
 //## 
+//## @ingroup Process
 class ProbeFilter : public SurfaceSource
 {
 public:

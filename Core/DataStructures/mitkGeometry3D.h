@@ -51,7 +51,7 @@ typedef itk::AffineGeometryFrame<mitk::ScalarType, 3> AffineGeometryFrame3D;
 //##ModelId=3DCBF389032B
 //##Documentation
 //## @brief Describes the geometry of a data object
-//## @ingroup Geometry
+//##
 //## Describes the geometry of a data object. At least, it can
 //## return the bounding box of the data object. An important sub-class is
 //## SlicedGeometry3D, which descibes data objects consisting of
@@ -67,6 +67,7 @@ typedef itk::AffineGeometryFrame<mitk::ScalarType, 3> AffineGeometryFrame3D;
 //## itk::DataObject::UpdateOutputInformation().
 //## 
 //## Rule: everything is in mm (ms) if not stated otherwise.
+//## @ingroup Geometry
 class Geometry3D : public AffineGeometryFrame3D, public OperationActor, public XMLIO
 {
 public:

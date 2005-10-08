@@ -29,11 +29,11 @@ namespace mitk {
 
 //##Documentation
 //## @brief Event that stores coordinates
-//## @ingroup Interaction
 //## 
 //## Stores display position of the mouse. If requested, the correspondent 
 //## 3D world position in mm is calculated via picking (delegated to the 
 //## BaseRenderer).
+//## @ingroup Interaction
 class DisplayPositionEvent : public Event
 {
   public:

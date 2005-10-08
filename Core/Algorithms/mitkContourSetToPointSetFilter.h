@@ -32,7 +32,6 @@ namespace mitk {
  *
  * The resulting pointset consists of sample points of all the contours
  *
- * 
  * @ingroup SurfaceFilters
  * @ingroup Process
  */

@@ -29,6 +29,7 @@ namespace mitk {
 //##ModelId=3ED94AC90382
 //##Documentation
 //## @brief Property containing a smart-pointer
+//##
 //## @ingroup DataTree
 class WeakPointerProperty : public BaseProperty
 {

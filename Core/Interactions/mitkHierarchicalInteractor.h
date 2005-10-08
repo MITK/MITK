@@ -28,9 +28,9 @@ namespace mitk {
 
   //##Documentation
   //## @brief Interface for an HierarchicalInteractor.
-  //## @ingroup Interaction
   //##
   //## A hierarchicalInteractor administrates the forewarding of events to other Interactors or even HierarchicalInteractors
+  //## @ingroup Interaction
   class HierarchicalInteractor : public Interactor
   {
   public:

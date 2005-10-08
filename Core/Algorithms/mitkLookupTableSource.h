@@ -30,11 +30,12 @@ namespace mitk
 /**
  * @brief Base class for all objects which have an object of type
  * mitkLookupTable as output
- * @ingroup Process
+ *
  * Base class for all objects which have an object of type mitkLookupTable
  * as output. It is assumed, that mitkLookupTableSources do not provide support
  * for streaming, that is, that the requested region is always the largest
  * possible region.
+ * @ingroup Process
  */
 class LookupTableSource : public itk::ProcessObject
 {

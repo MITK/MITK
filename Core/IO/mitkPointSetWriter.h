@@ -29,11 +29,12 @@ namespace mitk
 
 /**
  * @brief XML-based writer for mitk::PointSets 
- * @ingroup Process
+ *
  * XML-based writer for mitk::PointSets. Multiple PointSets can be written in
  * a single XML file by simply setting multiple inputs to the filter. 
  * Writing of multiple XML files according to a given filename pattern is not
  * yet supported.
+ * @ingroup Process
  */
 class PointSetWriter : public itk::ProcessObject, public mitk::FileWriter
 {

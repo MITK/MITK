@@ -51,12 +51,13 @@ class BaseRenderer;
 //##ModelId=3D74B23E0176
 //##Documentation
 //## @brief OpenGL-texture-based mapper to display slices of an image
-//## @ingroup Mapper
+//##
 //## Currently implemented for mapping on PlaneGeometry and AbstractTransformGeometry.
 //## This results in a flipped version when used for texture mapping. Furthermore,
 //## not the complete rectangular area described by the Geometry2D from the renderer
 //## is resampled, @em if the Geometry2D is larger than the image dimension in the requested
 //## direction. This results in a stretched version when used for texture mapping.
+//## @ingroup Mapper
 class ImageMapper2D : public GLMapper2D
 {
   friend class MapperFactory;

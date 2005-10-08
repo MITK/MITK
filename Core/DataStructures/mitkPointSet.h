@@ -40,7 +40,6 @@ namespace mitk {
 //##ModelId=3F0177E803A1
 //##Documentation
 //##@brief DataStructure which stores a set of points. Superclass of mitk::Mesh.
-//## @ingroup Data
 //##
 //## This class supports 3D point definition.
 //## An entry is divided into the pointcoordinates and pointdata.
@@ -54,6 +53,7 @@ namespace mitk {
 //##
 //## The class uses an itkMesh internaly, because mitk::Mesh is derived from mitk::PointSet and needs the itk::Mesh structure which is also derived from itk::PointSet.
 //## Thus several typedefs, that seem to be in wrong place, are declared here (for example SelectedLinesType).
+//## @ingroup Data
 class PointSet : public BaseData
 {
 public:

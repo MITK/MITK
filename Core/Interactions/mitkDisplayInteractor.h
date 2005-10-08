@@ -28,10 +28,10 @@ namespace mitk {
 
   //##Documentation
   //## @brief The class handles zooming and panning events
-  //## @ingroup Interaction
   //##
-  //##  One can connect it via itk::GlobalInteraction->AddStateMachine(new mitk::DisplayVectorInteractor("move", new DisplayInterActor()));
-  //##  to the global state machine.
+  //## One can connect it via itk::GlobalInteraction->AddStateMachine(new mitk::DisplayVectorInteractor("move", new DisplayInterActor()));
+  //## to the global state machine.
+  //## @ingroup Interaction
   class DisplayInteractor : public mitk::OperationActor
   {
   public:

@@ -32,7 +32,7 @@ class BaseRenderer;
 //##ModelId=3DF8F7EA01DA
 //##Documentation
 //## @brief Baseclass for renderer slice-/camera-control
-//## @ingroup NavigationControl
+//##
 //## Tells the render (subclass of BaseRenderer) which slice (subclass
 //## SliceNavigationController) or from which direction (subclass
 //## CameraController) it has to render. Contains two Stepper for stepping
@@ -40,6 +40,7 @@ class BaseRenderer;
 //## creation of a movie around the data), respectively, and through time, if
 //## there is 3D+t data.
 //## @note not yet implemented
+//## @ingroup NavigationControl
 class BaseController : public StateMachine
 {
 public:

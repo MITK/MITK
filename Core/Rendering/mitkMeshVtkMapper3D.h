@@ -49,6 +49,7 @@ namespace mitk {
 
 //##Documentation
 //## @brief Vtk-based mapper for PointList
+//##
 //## @ingroup Mapper
 class MeshVtkMapper3D : public BaseVtkMapper3D
 {

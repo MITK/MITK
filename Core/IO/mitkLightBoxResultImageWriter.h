@@ -34,8 +34,9 @@ class Image;
 * @brief Writer for result images into a Chili lightbox. The result image
 * must be of the same size and geometry as an @em source image (set of 
 * slices), which is already in the Chili database and has to be provided 
-* to the writer.
-* @ingroup Process
+* to the writer
+*
+* @ingroup IO
 * @ingroup Chili
 */
 class LightBoxResultImageWriter : public BaseProcess

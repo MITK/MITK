@@ -46,10 +46,11 @@ namespace mitk {
   //##ModelId=3E5A397B01D5
   //##Documentation
   //## @brief superior statemachine
-  //## @ingroup Interaction
-  //## realizes the methods, that every statemachine has to have.
+  //##
+  //## Realizes the methods, that every statemachine has to have.
   //## Undo can be enabled and disabled through EnableUndo
   //## Developers must derive its statemachines and implement ExecuteAction
+  //## @ingroup Interaction
   class StateMachine : public itk::Object, public mitk::OperationActor, public XMLIO
   {
 

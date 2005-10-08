@@ -28,11 +28,12 @@ namespace mitk
 /**
  * @brief Superclass of all classes generating point sets (instances of class
  * mitk::Mesh) as output. 
- * @ingroup Process
+ *
  * In itk and vtk the generated result of a ProcessObject is only guaranteed
  * to be up-to-date, when Update() of the ProcessObject or the generated
  * DataObject is called immediately before access of the data stored in the
  * DataObject. 
+ * @ingroup Process
  */
 class MeshSource : public itk::ProcessObject
 {

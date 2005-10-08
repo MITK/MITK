@@ -30,6 +30,7 @@ typedef int OperationType ;
 //##ModelId=3E5F682C0289
 //##Documentation
 //## @brief Base class of all Operation-classes
+//##
 //## @ingroup Undo
 class Operation
 {

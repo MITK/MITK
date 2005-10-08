@@ -31,7 +31,6 @@ namespace mitk {
 
 //##Documentation
 //## @brief Describes a geometry defined by an vtkAbstractTransform and a plane
-//## @ingroup Geometry
 //## 
 //## vtkAbstractTransform is the most general transform in vtk (superclass for 
 //## all vtk geometric transformations). It defines an arbitrary 3D transformation, 
@@ -48,6 +47,7 @@ namespace mitk {
 //## abstract. For full write access from extern, use ExternAbstractTransformGeometry.
 //## @note The bounds of the PlaneGeometry are used as the parametric bounds.
 //## @sa ExternAbstractTransformGeometry
+//## @ingroup Geometry
 class AbstractTransformGeometry : public Geometry2D
 {
 public:

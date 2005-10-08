@@ -32,8 +32,9 @@ namespace mitk {
   //##ModelId=3EF221E9001C
   //##Documentation
   //## @brief Interactor for displaying different slices in orthogonal views.
-  //## @ingroup Interaction
+  //##
   //## This includes the interaction of Zooming and Panning.
+  //## @ingroup Interaction
   class DisplayVectorInteractor : public StateMachine
   {
   public:

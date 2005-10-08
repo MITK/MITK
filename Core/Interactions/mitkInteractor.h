@@ -34,7 +34,7 @@ class BaseData;
 
 //##Documentation
 //## @brief Interface for an Interactor.
-//## @ingroup Interaction
+//##
 //## The Interactor is held with a SmartPointer by a DataTreeNode 
 //## and holds its Node with a Pointer. That way Smartpointer doesn't build a circle.
 //## Different Modes: In order to work with hierarchical StateMachines and not to send Events to all StateMachines, a StateMachine can be 
@@ -51,6 +51,7 @@ class BaseData;
 //## In method ExecuteAction(..) the different actions are divided up through switch/case statements. Each block has to check
 //## the appropriate type of event to process the actions. Especially in guarding states (a state, that checks certain conditions (e.g. is picked)
 //## the according Event must be called to continue in states. No return false here!
+//## @ingroup Interaction
 class Interactor : public StateMachine
 {
 public:

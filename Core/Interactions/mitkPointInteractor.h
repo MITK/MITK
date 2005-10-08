@@ -30,10 +30,11 @@ namespace mitk
 
   //##Documentation
   //## @brief Interaction with a point
-  //## @ingroup Interaction
+  //##
   //## Interact with a point: set point, select point, move point and remove point
   //## All Set-operations are done through the method "ExecuteAction".
   //## the identificationnumber of this point is set by this points and evalued from an empty place in the DataStructure
+  //## @ingroup Interaction
   class PointInteractor : public Interactor
   {
   public:

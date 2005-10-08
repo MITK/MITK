@@ -32,10 +32,10 @@ namespace mitk
 class Image;
 /**
  * @brief Writer for mitk::Image
- * @ingroup Process
  *
  * Uses the given extension (SetExtension) to decide the format to write
  * (.mhd is default, .pic, .tif, .png, .jpg supported yet).
+ * @ingroup IO
  */
 class ImageWriter : public itk::ProcessObject, public mitk::FileWriter
 {

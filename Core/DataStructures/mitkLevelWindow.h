@@ -30,11 +30,11 @@ class Image;
 
 //##Documentation
 //## @brief Class to store level/window values
-//## class implements level window data structure
-//## current min and max value are stored in m_Min and m_Max.
-//## @ingroup DataTree
+//##
+//## Current min and max value are stored in m_Min and m_Max.
 //## The maximum and minimum of valid value range is stored in
-//## m_RangeMin and m_RangeMax
+//## m_RangeMin and m_RangeMax.
+//## @ingroup DataTree
 class LevelWindow
 {
 public:

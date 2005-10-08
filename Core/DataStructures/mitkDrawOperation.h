@@ -32,9 +32,8 @@ namespace mitk {
 //##Documentation
 //## @brief Operation, that handles all aktions on Seeds.
 //##
-//## @ingroup Undo
-//##
 //## Stores everything for Adding and Deleting Seeds.
+//## @ingroup Undo
 class DrawOperation : public Operation
 {
   public:

@@ -32,7 +32,7 @@ namespace mitk
 /**
 * @brief Factory, which creates instances of mitk::DataTreeNodes filled with
 *        data read from a given file 
-* @ingroup Process
+*
 * This class reads files, creates an appropriate mitk::BaseData and adds the
 * BaseData to a mitk::DataTreeNode. This filter may produce one or more outputs
 * (i.e. mitk::DataTreeNodes). The number of generated nodes can be retrieved by a 
@@ -43,6 +43,7 @@ namespace mitk
 * the base data, adding it to a node and filling the node with properties
 * as appropriate. Second, you have to add an additional condition to
 * GenerateData which identifies your file type.
+* @ingroup IO
 */
 class DataTreeNodeFactory : public DataTreeNodeSource, public FileSeriesReader
 {

@@ -35,13 +35,14 @@ namespace mitk {
 
 //##Documentation
 //## @brief Interpolate additional points on lines
-//## @ingroup Process
+//##
 //## If a Geometry2D is set (by SetGeometryForInterpolation), 
 //## we do an interpolation in the 2D-space of the Geometry2D: 
 //## Map two neighboring original points on 
 //## the Geometry2D, resulting in two 2D-points, interpolate 
 //## in 2D between them, and map them back via the 
 //## Geometry2D in the 3D-world. 
+//## @ingroup Process
 class InterpolateLinesFilter : public SurfaceSource
 {
 public:

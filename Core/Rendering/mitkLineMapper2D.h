@@ -31,9 +31,10 @@ class PointSet;
 
 //##Documentation
 //## @brief OpenGL-based mapper to display Lines
-//## @ingroup Mapper
+//##
 //## uses the information from the PointSet to build up the lines. 
 //## Only lines in 2D in one Slice are drawn, not between slices!
+//## @ingroup Mapper
 class LineMapper2D : public PointSetMapper2D
 {
 public:

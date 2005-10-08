@@ -27,7 +27,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 //##Documentation
 //## @brief Helper class to connect Qt-based navigators to instances of Stepper
-//## @ingroup NavigationControl
+//##
 //## The constructor has to be provided with the \a Navigator 
 //## that wants to use the \a Stepper. The \a Navigator has to define the
 //## slots \a Refetch() and \a SetStepper(mitk::Stepper *). \a SetStepper will only
@@ -36,6 +36,7 @@ PURPOSE.  See the above copyright notices for more information.
 //## ask the \a Stepper for its new values.
 //## \warning The \a Navigator has to be aware that it might have caused the changes 
 //## of the \a Stepper itself. So take care that no infinite recursion is created!
+//## @ingroup NavigationControl
 class QmitkStepperAdapter : public QObject
 {
   Q_OBJECT

@@ -49,7 +49,7 @@ namespace mitk {
 //##Documentation
 //## @brief controls the selection of the slice the associated BaseRenderer
 //## will display
-//## @ingroup NavigationControl
+//##
 //## Subclass of BaseController. Controls the selection of the slice the
 //## associated BaseRenderer will display.
 //## Example:
@@ -83,6 +83,7 @@ namespace mitk {
 //##   new QmitkStepperAdapter(navigator, sliceCtrl->GetSlice(), "navigatoradaptor");
 //## \endcode
 //## @todo implement for non-evenly-timed geometry!
+//## @ingroup NavigationControl
 class SliceNavigationController : public BaseController
 {
 public:

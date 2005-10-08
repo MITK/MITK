@@ -25,7 +25,8 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk {
 
 //##Documentation
-//## @brief superclass of the different bounding objects (cylinder, cuboid,...)
+//## @brief superclass of all bounding objects (cylinder, cuboid,...)
+//##
 //## Manages generic functions and provides an interface for IsInside()
 //## calculates a generic bounding box
 //## @ingroup Data

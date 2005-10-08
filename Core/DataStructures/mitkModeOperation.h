@@ -29,6 +29,7 @@ namespace mitk {
 
 //##Documentation
 //## @brief class that holds the information for a change of the modus of an interactor object
+//##
 //## @ingroup Undo
 class ModeOperation : public Operation
 {

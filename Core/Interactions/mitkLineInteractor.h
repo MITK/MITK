@@ -32,10 +32,10 @@ namespace mitk
 
   //##Documentation
   //## @brief Interaction with a line between two Points.
-  //## @ingroup Interaction
   //##
   //## Interact with a line drawn between two declared points. 
   //## The line can be selected, which selects its edges (the two points), so that the line can be moved.
+  //## @ingroup Interaction
   class LineInteractor : public HierarchicalInteractor
   {
   public:

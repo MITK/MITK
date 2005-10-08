@@ -32,8 +32,8 @@ namespace mitk {
 
 //##Documentation
 //## @brief Thin-plate-spline-based landmark-based curved geometry
-//## @ingroup Geometry
 //## 
+//## @ingroup Geometry
 class SphereLandmarkProjector : public LandmarkProjector
 {
 public:

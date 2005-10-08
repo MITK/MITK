@@ -31,6 +31,7 @@ namespace mitk {
 //## @brief Filter to cut an image with planes. Everything in 
 //## the direction of the normal of the planes will be set to a 
 //## specified value.
+//##
 //## @todo only one plane supported yet, add 4D support
 //## @warning first version, not yet tested.
 //## @ingroup Process

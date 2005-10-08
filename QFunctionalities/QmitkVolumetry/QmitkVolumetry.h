@@ -28,9 +28,9 @@ class QmitkVolumetryControls;
 namespace mitk { 
   class DisplayInteractor; 
 }
-/*
-!\class
-\brief Functionality Template 
+/*!
+\brief Volume calculator/voxel counter using of a simple threshold.
+\ingroup Functionalities
 */
 class QmitkVolumetry : public QmitkFunctionality
 {  

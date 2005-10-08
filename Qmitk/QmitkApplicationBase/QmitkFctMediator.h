@@ -33,6 +33,15 @@ class QButtonGroup;
 class QToolBar;
 class QActionGroup;
 
+/*
+!\class
+\brief Mediator between functionalities
+
+A QmitkFctMediator object gets passed a reference of a functionality and positions 
+the widgets in the application window controlled by a layout template.
+
+\ingroup Functionalities
+*/
 class QmitkFctMediator : public QObject
 {
   Q_OBJECT

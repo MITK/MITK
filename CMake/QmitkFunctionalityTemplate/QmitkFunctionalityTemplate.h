@@ -26,7 +26,13 @@ class QmitkFunctionalityTemplateControls;
 
 /*
 !\class
-\brief Functionality Template 
+\brief FunctionalityTemplate 
+
+One needs to reimplement the methods CreateControlWidget(..), CreateMainWidget(..) 
+and CreateAction(..) from QmitkFunctionality. 
+
+\sa QmitkFunctionality
+\ingroup Functionalities
 */
 class QmitkFunctionalityTemplate : public QmitkFunctionality
 {  

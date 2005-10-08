@@ -35,7 +35,7 @@ class QmitkStdMultiWidget;
 class QmitkSimpleExampleControls;
 namespace mitk { class DisplayInteractor; }
 
-/*!\class
+/*!
 \brief MITK example demonstrating how a new application functionality can be implemented
 
 One needs to reimplement the methods CreateControlWidget(..), CreateMainWidget(..) 

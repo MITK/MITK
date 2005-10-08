@@ -45,6 +45,7 @@ It does @em not need to reverse the settings when it is Deactivated, since it ca
 know if the subsequently Activated functionality will use that settings or some other
 setting. Furthermore, most functionalities will connect interaction objects in Activated()
 and disconnect them in Deactivated().
+\ingroup Functionalities
 */
 class QmitkFunctionality : public QObject
 {
@@ -54,9 +55,10 @@ class QmitkFunctionality : public QObject
 public:
 
   /*!
-  \brief default constructor for a Functionality object
+  \brief default constructor for a QmitkFunctionality object
   @param parent the parent widget
-  @param name the name of the functionality widget
+  @param name the name of the functionality
+  @param dataIt the name of the functionality widget
   */
   QmitkFunctionality(QObject *parent=0, const char *name=0, mitk::DataTreeIteratorBase* dataIt=NULL);
 

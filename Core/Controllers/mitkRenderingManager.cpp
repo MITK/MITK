@@ -190,3 +190,36 @@ mitk::RenderingManager
     }
   }
 }
+
+namespace mitk
+{
+class GenericRenderingManager : public mitk::RenderingManager
+{
+  virtual void RestartTimer()
+  {
+  };
+
+  virtual void StopTimer()
+  {
+  };
+};
+
+class GenericRenderingManagerFactory : public mitk::RenderingManagerFactory
+{
+public:
+  GenericRenderingManagerFactory()
+  {
+    if(mitk::RenderingManager::GetInstance() == NULL)
+      mitk::RenderingManager::SetFactory( this );
+  };
+  virtual ~GenericRenderingManagerFactory() {};
+
+  virtual mitk::RenderingManager *CreateRenderingManager()
+  {
+    return new GenericRenderingManager;
+  };
+};
+}
+
+// Create and register generic RenderingManagerFactory.
+mitk::GenericRenderingManagerFactory renderingManagerFactory;

@@ -112,5 +112,3 @@ void mitk::RenderWindow::SetVtkRenderWindow(VtkRenderWindow* renWin)
     InitRenderer();
   }
 }
-
-

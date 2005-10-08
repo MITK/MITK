@@ -31,6 +31,7 @@ class QTimer;
  * This implementation uses a QTimer object to realize the RenderWindow
  * update timing. The execution of pending updates is controlled by the
  * timer.
+ * \ingroup Renderer
  */
 class QmitkRenderingManager : public QObject, public mitk::RenderingManager
 {
@@ -57,7 +58,7 @@ protected slots:
 private:
   QTimer *m_Timer;
 
-  static QmitkRenderingManager::Pointer m_Instance;
+  static QmitkRenderingManager* m_Instance;
 
 };
 

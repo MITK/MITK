@@ -65,12 +65,11 @@ class RenderingManagerFactory;
  *
  * \todo Individual timers for specific RenderWindows - the desired maximum
  * update frequency of a 3D window could be less then that of a 2D window
+ * \ingroup Renderer
  */
-class RenderingManager : public itk::Object
+class RenderingManager
 {
 public:
-  mitkClassMacro( RenderingManager, itk::Object );
-
   /** Set the object factory which produces the desired platform specific
    * RenderingManager singleton instance. */
   static void SetFactory( RenderingManagerFactory *factory );

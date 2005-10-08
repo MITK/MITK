@@ -35,7 +35,7 @@ class RenderingManager;
  * instance). Their constructor then merely has to call
  * mitk::RenderingManager::SetFactory().
  *
- * \note Note: Instead of using an external class for the manager
+ * \note Instead of using an external class for the manager
  * instantiation, the factory mechanism could be integrated into the
  * RenderingManager (and its subclasses) itself. However, this would make
  * the framework specific instantiation more complicated. Simply creating a
@@ -43,25 +43,26 @@ class RenderingManager;
  * itk::Object, which itself depends on the initialization of static members
  * (which is problematic since the order of static member initializations
  * cannot easily be controlled).
+ * \ingroup Renderer
  */
 class RenderingManagerFactory
 {
 public:
   virtual ~RenderingManagerFactory() {};
 
-  /** Factory method to create platform specific instances of
+  /** \brief Factory method to create platform specific instances of
    * RenderingManager. */
   virtual RenderingManager *CreateRenderingManager() = 0;
 
 protected:
-  RenderingManagerFactory() {};
+  RenderingManagerFactory()
+  {
+  };
 
 private:
 
 };
 
 } // namespace mitk
-
-
 
 #endif

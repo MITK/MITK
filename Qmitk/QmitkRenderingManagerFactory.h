@@ -31,6 +31,7 @@ PURPOSE.  See the above copyright notices for more information.
  * A static instance of QmitkRenderingManagerFactory is created in
  * QmitkRenderWindow, forcing the usage of QmitkRenderingManager for the QT
  * platform.
+ * \ingroup Renderer
  */
 class QmitkRenderingManagerFactory : public mitk::RenderingManagerFactory
 {

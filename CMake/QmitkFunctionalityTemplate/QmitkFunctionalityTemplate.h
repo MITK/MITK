@@ -24,8 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 class QmitkStdMultiWidget;
 class QmitkFunctionalityTemplateControls;
 
-/*
-!\class
+/*!
 \brief FunctionalityTemplate 
 
 One needs to reimplement the methods CreateControlWidget(..), CreateMainWidget(..) 

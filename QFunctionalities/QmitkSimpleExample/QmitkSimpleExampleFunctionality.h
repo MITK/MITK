@@ -42,6 +42,7 @@ One needs to reimplement the methods CreateControlWidget(..), CreateMainWidget(.
 and CreateAction(..) from QmitkFunctionality. A QmitkFctMediator object gets passed a reference of a 
 functionality and positions the widgets in the application window controlled by a 
 layout template.
+\ingroup Functionalities
 */
 class QmitkSimpleExampleFunctionality : public QmitkFunctionality
 {

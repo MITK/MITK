@@ -52,6 +52,9 @@
  *   reads a slice from a PicFile
  *
  * $Log$
+ * Revision 1.11  2005/10/09 08:56:31  ivo
+ * FIX: warning: comparison between pointer and integer
+ *
  * Revision 1.10  2003/02/25 16:16:53  andre
  * *** empty log message ***
  *
@@ -139,7 +142,7 @@ ipPicDescriptor *ipPicGetSlice( char *infile_name, ipPicDescriptor *pic, ipUInt4
     }
 
 
-  if( pic == 3 )
+  if( ((int)pic) == 3 )
     {
       pic = NULL;
       number = 3;

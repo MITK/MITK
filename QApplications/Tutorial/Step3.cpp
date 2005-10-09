@@ -38,6 +38,9 @@ int main(int argc, char* argv[])
   unsigned int i;
   for(i=1; i<argc; ++i)
   {
+    // for testing
+    if(strcmp(argv[i], "-testing")==0) continue;
+
     // create a DataTreeNodeFactory to read a data format supported
     // by the DataTreeNodeFactory (many image formats, surface formats, etc.)
     mitk::DataTreeNodeFactory::Pointer nodeReader=mitk::DataTreeNodeFactory::New();
@@ -92,7 +95,12 @@ int main(int argc, char* argv[])
   qtapplication.setMainWidget(&renderWindow);
   renderWindow.show();
 
-  return qtapplication.exec();
+  // for testing
+  #include "QtTesting.h"
+  if(strcmp(argv[argc-1], "-testing")!=0)
+    return qtapplication.exec();
+  else
+    return QtTesting();
 }
 
 /**

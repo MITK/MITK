@@ -56,7 +56,12 @@ int main(int argc, char* argv[])
   qtapplication.setMainWidget(&renderWindow);
   renderWindow.show();
 
-  return qtapplication.exec();
+  // for testing
+  #include "QtTesting.h"
+  if(strcmp(argv[argc-1], "-testing")!=0)
+    return qtapplication.exec();
+  else
+    return QtTesting();
 }
 
 /**

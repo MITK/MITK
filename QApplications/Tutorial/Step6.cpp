@@ -79,6 +79,9 @@ void Step6::Load(int argc, char* argv[])
   unsigned int i;
   for(i=1; i<argc; ++i)
   {
+    // for testing
+    if(strcmp(argv[i], "-testing")==0) continue;
+
     // create a DataTreeNodeFactory to read a data format supported
     // by the DataTreeNodeFactory (many image formats, surface formats, etc.)
     mitk::DataTreeNodeFactory::Pointer nodeReader=mitk::DataTreeNodeFactory::New();

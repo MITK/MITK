@@ -105,7 +105,7 @@ public:
   /** Gets the currently set minimum time interval. Default is 10. */
   int GetMinimumInterval() const;
 
-  ~RenderingManager();
+  virtual ~RenderingManager();
 
   /** Executes all pending requests. This method has to be called by the
    * timer used by concrete RenderingManager implementations. */
@@ -138,7 +138,5 @@ private:
 };
 
 } // namespace mitk
-
-
 
 #endif /* MITKRenderingManager_H_HEADER_INCLUDED_C135A197 */

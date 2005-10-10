@@ -501,14 +501,18 @@ bool QmitkStdMultiWidget::InitializeStandardViews(mitk::DataTreeIteratorBase * i
       {
         boundingBoxInitialized=true;
         
+        // steppers are set so that the cross is centered in the image
         sliceNavigatorTransversal->SetInputWorldGeometry(geometry.GetPointer());
         sliceNavigatorTransversal->Update();
+        sliceNavigatorTransversal->GetSlice()->SetPos( sliceNavigatorTransversal->GetSlice()->GetSteps()/2 );
 
         sliceNavigatorSagittal->SetInputWorldGeometry(geometry.GetPointer());
         sliceNavigatorSagittal->Update();
+        sliceNavigatorSagittal->GetSlice()->SetPos( sliceNavigatorSagittal->GetSlice()->GetSteps()/2 );
 
         sliceNavigatorFrontal->SetInputWorldGeometry(geometry.GetPointer());
         sliceNavigatorFrontal->Update();
+        sliceNavigatorFrontal->GetSlice()->SetPos( sliceNavigatorFrontal->GetSlice()->GetSteps()/2 );
 
         sliceNavigatorWidget4->SetInputWorldGeometry(geometry.GetPointer());
         sliceNavigatorWidget4->Update();
@@ -552,14 +556,18 @@ bool QmitkStdMultiWidget::InitializeStandardViews( mitk::Geometry3D * geometry )
   {
     mitk::Geometry3D::Pointer clonedgeometry = static_cast<mitk::Geometry3D*>(geometry->Clone().GetPointer());
 
+    // steppers are set so that the cross is centered in the image
     sliceNavigatorTransversal->SetInputWorldGeometry(clonedgeometry.GetPointer());
     sliceNavigatorTransversal->Update();
+    sliceNavigatorTransversal->GetSlice()->SetPos( sliceNavigatorTransversal->GetSlice()->GetSteps()/2 );
 
     sliceNavigatorSagittal->SetInputWorldGeometry(clonedgeometry.GetPointer());
     sliceNavigatorSagittal->Update();
+    sliceNavigatorSagittal->GetSlice()->SetPos( sliceNavigatorSagittal->GetSlice()->GetSteps()/2 );
 
     sliceNavigatorFrontal->SetInputWorldGeometry(clonedgeometry.GetPointer());
     sliceNavigatorFrontal->Update();
+    sliceNavigatorFrontal->GetSlice()->SetPos( sliceNavigatorFrontal->GetSlice()->GetSteps()/2 );
 
     timeNavigationController->SetInputWorldGeometry(clonedgeometry.GetPointer());
     timeNavigationController->Update();

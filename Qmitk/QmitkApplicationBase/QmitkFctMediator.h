@@ -89,6 +89,10 @@ public:
   virtual QWidget * GetToolBar();
   virtual QWidget * GetDefaultMain();
 
+  virtual int GetActiveFunctionalityId() const;
+  virtual QmitkFunctionality* GetActiveFunctionality();
+  virtual QmitkFunctionality* GetFunctionalityById(int id);
+
   QmitkFctMediator(QObject *parent=0, const char *name=0);
   virtual ~QmitkFctMediator();
 

@@ -388,3 +388,18 @@ void QmitkFctMediator::HideMenu(bool hide)
   else
     m_ButtonMenu->show();
 }
+
+int QmitkFctMediator::GetActiveFunctionalityId() const
+{
+  return m_CurrentFunctionality;
+}
+
+QmitkFunctionality* QmitkFctMediator::GetActiveFunctionality()
+{
+  return qfl.at(m_CurrentFunctionality);
+}
+
+QmitkFunctionality* QmitkFctMediator::GetFunctionalityById(int id)
+{
+  return qfl.at(id);
+}

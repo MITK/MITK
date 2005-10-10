@@ -92,6 +92,11 @@ namespace mitk {
     //## mitkConfig.h) "MITKROOT/Interactions/mitkBaseInteraction/StateMachine.xml"
     static bool LoadStandardBehavior();
 
+    static const std::string& GetLastLoadedBehavior()
+    {
+      return s_LastLoadedBehavior;
+    }
+
     //##ModelId=3E6773790098
     void  StartElement (const char *elementName, const char **atts);
 
@@ -139,6 +144,7 @@ namespace mitk {
     static std::vector<mitk::Transition *> m_AllTransitions;
     static std::vector<mitk::Action *> m_AllActions;
     static AllStateMachineMapType m_AllStateMachineMap;
+    static std::string s_LastLoadedBehavior;
 
 
     //##ModelId=3E68B2C60040

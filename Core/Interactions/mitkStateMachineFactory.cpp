@@ -41,6 +41,8 @@ std::vector<mitk::Transition *> mitk::StateMachineFactory::m_AllTransitions;
 std::vector<mitk::Action *> mitk::StateMachineFactory::m_AllActions;
 mitk::StateMachineFactory::AllStateMachineMapType mitk::StateMachineFactory::m_AllStateMachineMap;
 
+std::string mitk::StateMachineFactory::s_LastLoadedBehavior;
+
 //XML StateMachine
 //##ModelId=3E7757280322
 const std::string mitk::StateMachineFactory::STYLE = "STYLE";
@@ -157,6 +159,8 @@ bool mitk::StateMachineFactory::LoadBehavior(std::string fileName)
 {
    if ( fileName.empty() )
        return false;
+
+   s_LastLoadedBehavior = fileName;
 
    mitk::StateMachineFactory* stateMachineFactory = new StateMachineFactory();
    stateMachineFactory->SetFileName( fileName.c_str() );

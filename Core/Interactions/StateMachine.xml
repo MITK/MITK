@@ -935,12 +935,12 @@
         <action ID="45" /> <!--AcINITFOREGROUND-->
         <action ID="11" /> <!--AcADD-->
       </transition>
-      <transition NAME="drawBackgroundSeed" NEXT_STATE_ID="2" EVENT_ID="5">
+      <transition NAME="drawBackgroundSeed" NEXT_STATE_ID="2" EVENT_ID="600">
         <action ID="1101" /> <!--AcMODE_SELECT-->
         <action ID="46" /> <!--AcINITBACKGROUND-->
         <action ID="11" /> <!--AcADD-->
       </transition>  
-      <transition NAME="drawNeutralSeed" NEXT_STATE_ID="3" EVENT_ID="600">
+      <transition NAME="drawNeutralSeed" NEXT_STATE_ID="3" EVENT_ID="5">
         <action ID="1101" /> <!--AcMODE_SELECT-->
         <action ID="47" /> <!--AcINITNEUTRAL-->
         <action ID="11" /> <!--AcADD-->
@@ -956,19 +956,19 @@
       </transition>
     </state>
     <state NAME="drawBackground" ID="2">
-      <transition NAME="drawBackgroundSeeds" NEXT_STATE_ID="2" EVENT_ID="534">
+      <transition NAME="drawBackgroundSeeds" NEXT_STATE_ID="2" EVENT_ID="610">
         <action ID="92" /> <!--AcMOVE-->
       </transition>
-      <transition NAME="drawSeeds" NEXT_STATE_ID="0" EVENT_ID="537">
+      <transition NAME="drawSeeds" NEXT_STATE_ID="0" EVENT_ID="620">
         <action ID="44" /> <!--AcFINISH-->
         <action ID="1100" /> <!--AcMODE_DESELECT-->
       </transition>
     </state>
     <state NAME="drawNeutral" ID="3">
-      <transition NAME="drawNeutralSeeds" NEXT_STATE_ID="3" EVENT_ID="610">
+      <transition NAME="drawNeutralSeeds" NEXT_STATE_ID="3" EVENT_ID="534">
         <action ID="92" /> <!--AcMOVE-->
       </transition>
-      <transition NAME="drawSeeds" NEXT_STATE_ID="0" EVENT_ID="620">
+      <transition NAME="drawSeeds" NEXT_STATE_ID="0" EVENT_ID="537">
         <action ID="44" /> <!--AcFINISH-->
         <action ID="1100" /> <!--AcMODE_DESELECT-->
       </transition>
@@ -1804,6 +1804,20 @@
     <event NAME="Strg+Alt+A" ID="20" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0600" KEY="Key_A" />
     <!-- Strg + Alt + B -->
     <event NAME="Strg+Alt+B" ID="21" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0600" KEY="Key_B" />
+
+    <!-- Strg + Y + leftMouseButtonPress-->
+    <event NAME="Strg + Y + MousePress" ID="22" TYPE="Type_MouseButtonPress" BUTTON="BS_LeftButton" BUTTONSTATE="0x0100" KEY="Key_Y" />
+    <!-- Strg + Y leftMouseButton and MouseMove -->
+    <event NAME="Strg + Y + MouseMove" ID="23" TYPE="Type_MouseMove" BUTTON="BS_NoButton" BUTTONSTATE="0x0101" KEY="Key_Y" />
+    <!-- Strg + Y leftMouseButtonRelease -->
+    <event NAME="Strg + Y + leftMouseRelease" ID="24" TYPE="Type_MouseButtonRelease" BUTTON="BS_LeftButton" BUTTONSTATE="0x0101" KEY="Key_Y" />
+    <!-- Strg + X leftMouseButtonPress-->
+    <event NAME="Strg + X + MousePress" ID="25" TYPE="Type_MouseButtonPress" BUTTON="BS_LeftButton" BUTTONSTATE="0x0100" KEY="Key_X" />
+    <!-- Strg + X leftMouseButton and MouseMove -->
+    <event NAME="Strg + X + MouseMove" ID="26" TYPE="Type_MouseMove" BUTTON="BS_NoButton" BUTTONSTATE="0x0101" KEY="Key_X" />
+    <!-- Strg + X leftMouseButtonRelease -->
+    <event NAME="Strg + X + leftMouseRelease" ID="27" TYPE="Type_MouseButtonRelease" BUTTON="BS_LeftButton" BUTTONSTATE="0x0101" KEY="Key_X" />
+
     <!-- Strg + Alt + H -->
     <event NAME="Strg+Alt+H" ID="30" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0600" KEY="Key_H" />
     <!-- Strg + Alt + I -->

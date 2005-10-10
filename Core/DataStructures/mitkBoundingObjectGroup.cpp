@@ -22,7 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkLinearTransform.h>
 
 mitk::BoundingObjectGroup::BoundingObjectGroup()
-:  m_Counter(0), m_CSGMode(Union) //m_CSGMode(Intersection)
+:  m_Counter(0), m_CSGMode(Difference) // m_CSGMode(Union) //m_CSGMode(Intersection)
 {
   GetTimeSlicedGeometry()->Initialize(1);
   GetGeometry(0)->SetIndexToWorldTransform(GetTimeSlicedGeometry()->GetIndexToWorldTransform());

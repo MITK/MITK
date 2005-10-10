@@ -504,7 +504,9 @@ void QmitkMainTemplate::Initialize()
   redoButton->setUndoModel( dynamic_cast<mitk::VerboseLimitedLinearUndo*>(mitk::UndoController::GetCurrentUndoModel()) );
 
   //create global-interaction
+  std::cout << "Loading behavior file: " << std::flush;
   bool smLoadOK = mitk::GlobalInteraction::StandardInteractionSetup();
+  std::cout << mitk::StateMachineFactory::GetLastLoadedBehavior() << std::endl;
 
   //could the behavior file be found?
   if ( smLoadOK )

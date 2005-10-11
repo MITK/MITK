@@ -1177,3 +1177,19 @@ mitk::ScalarType mitk::Image::GetScalarValue2ndMax(int t) const
   ComputeExtrema(t);
   return m_Scalar2ndMax;
 }
+
+void mitk::Image::PrintSelf(std::ostream& os, itk::Indent indent) const
+{
+  unsigned char i;
+  os << indent << " PixelType: " << m_PixelType.GetTypeId()->name() << std::endl;
+  os << indent << " BytesPerElement: " << m_PixelType.GetBpe() << std::endl;
+  os << indent << " NumberOfComponents: " << m_PixelType.GetNumberOfComponents() << std::endl;
+  os << indent << " BitsPerComponent: " << m_PixelType.GetBitsPerComponent() << std::endl;
+  os << indent << " Dimension: " << m_Dimension << std::endl;
+  os << indent << " Dimensions: ";
+  for(i=0; i < m_Dimension; ++i)
+    os << GetDimension(i);
+  os << std::endl;
+
+  Superclass::PrintSelf(os,indent);
+}

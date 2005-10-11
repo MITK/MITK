@@ -264,6 +264,8 @@ protected:
   //##ModelId=3E3FE042031D
   ~BaseData();
 
+  virtual void PrintSelf(std::ostream& os, itk::Indent indent) const;
+
 #if ITK_VERSION_MAJOR == 2 || ( ITK_VERSION_MAJOR == 1 && ITK_VERSION_MINOR > 6 )
   bool m_RequestedRegionInitialized;
   bool m_LastRequestedRegionWasOutsideOfTheBufferedRegion;

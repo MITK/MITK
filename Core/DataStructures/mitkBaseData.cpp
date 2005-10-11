@@ -229,6 +229,14 @@ void mitk::BaseData::ExecuteOperation(mitk::Operation* operation)
   //empty by default. override if needed!
 }
 
+void mitk::BaseData::PrintSelf(std::ostream& os, itk::Indent indent) const
+{
+  os << indent << " TimeSlicedGeometry: ";
+  if(GetTimeSlicedGeometry() == NULL)
+    os << "NULL" << std::endl;
+  else
+    GetTimeSlicedGeometry()->Print(os, indent);
+}
 
 bool mitk::BaseData::WriteXMLData( XMLWriter& xmlWriter ) 
 {

@@ -421,6 +421,8 @@ protected:
   //## @warning Has to be called by every Initialize method!
   virtual void Initialize();
 
+  virtual void PrintSelf(std::ostream& os, itk::Indent indent) const;
+
   //##ModelId=3E0B7B3C0245
   mutable ImageDataItemPointerArray m_Channels;
   //##ModelId=3E0B7B3C0263

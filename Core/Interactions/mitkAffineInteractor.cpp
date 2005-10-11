@@ -305,16 +305,7 @@ bool mitk::AffineInteractor::CheckSelected(const mitk::Point3D& worldPoint)
   }
   else    // use the data objects bounding box to determine if hit
   {
-    const BoundingBox* box = geometry->GetBoundingBox();
-    ScalarType p[4];
-    itk2vtk(worldPoint, p); p[3] = 1;
-    geometry->GetVtkTransform()->GetInverse()->TransformPoint(p, p);
-
-    Point3D point;
-    point[0] = p[0]/p[3];
-    point[1] = p[1]/p[3];
-    point[2] = p[2]/p[3];
-    selected = box->IsInside(point); // check if point is inside the datas bounding box
+    selected = geometry->IsInside(worldPoint);
   }
   return selected;
 }

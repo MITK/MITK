@@ -15,6 +15,7 @@
 */
 #include "mitkDataTreeNode.h"
 #include "QmitkCommonFunctionality.h"
+#include "qlistbox.h"
 
 void QmitkTreeNodeSelector::SetDataTreeNodeIterator( mitk::DataTreeIteratorClone it )
 {
@@ -22,28 +23,33 @@ void QmitkTreeNodeSelector::SetDataTreeNodeIterator( mitk::DataTreeIteratorClone
   UpdateContent();
 }
 
-/** TODO: make entries unique if two datatreenodes have the same name */
-
 void QmitkTreeNodeSelector::UpdateContent()
 {
   // iteriere ueber Baum und wende filter funktion an
   CommonFunctionality::DataTreeIteratorVector images = CommonFunctionality::FilterNodes(m_DataTreeIteratorClone,m_FilterFunction);
   QString currentText = m_ComboBox->currentText();
-  while (m_ComboBox->count()) { m_ComboBox->removeItem(0); }
+  m_ComboBox->clear();
   m_TreeNodes.clear();
+ 
   for (CommonFunctionality::DataTreeIteratorVector::iterator it = images.begin(); it != images.end() ; it++ )
   {
     std::string name;
     if ((*it)->Get()->GetName(name))
     {
+      /** TODO: create a better kind of uniqueness */
+      // this line adds spaces to the name, until it is unique within the list
+      while ( m_ComboBox->listBox() && m_ComboBox->listBox()->findItem( QString(name.c_str()), Qt::ExactMatch|Qt::CaseSensitive ) )
+        name += ' ';
+      
       m_ComboBox->insertItem( name.c_str() );
-      m_TreeNodes[name] =*it;
-      if (currentText.find(name.c_str()) != -1 )
+      m_TreeNodes[name] = *it;
+      if (currentText == name.c_str())
       {
         m_ComboBox->setCurrentText(currentText);
       }
     }
   }
+  
   QString newText = m_ComboBox->currentText();
   if ( (currentText != newText) )
   {
@@ -77,6 +83,7 @@ void QmitkTreeNodeSelector::TreeNodeSelected( const QString &name )
   emit Activated(m_TreeNodes[name.ascii()]->Get());
 }
 
+
 mitk::DataTreeNode * QmitkTreeNodeSelector::GetSelectedNode() const
 {
   if (m_ComboBox && !m_ComboBox->currentText().isEmpty())
@@ -89,6 +96,7 @@ mitk::DataTreeNode * QmitkTreeNodeSelector::GetSelectedNode() const
   }
 }
 
+
 const mitk::DataTreeIteratorClone * QmitkTreeNodeSelector::GetSelectedIterator() const
 {
   if (m_ComboBox && !m_ComboBox->currentText().isEmpty())
@@ -100,3 +108,33 @@ const mitk::DataTreeIteratorClone * QmitkTreeNodeSelector::GetSelectedIterator()
     return NULL;
   }
 }
+
+
+bool QmitkTreeNodeSelector::SelectNode(mitk::DataTreeNode* node)
+{
+  // TODO: this is not optimal, since the tree could possibly have changed since the last call of UpdateContent().
+  // But iterating over the class internal map will yield a wrong order of items sometimes
+  
+  // iterate over matching data tree nodes
+  //   if tree node == node, mark this item as selected, return true
+  // if node is not in tree, return false
+  CommonFunctionality::DataTreeIteratorVector images = CommonFunctionality::FilterNodes(m_DataTreeIteratorClone,m_FilterFunction);
+  CommonFunctionality::DataTreeIteratorVector::iterator it;
+  int i;
+  for (it = images.begin(), i = 0; 
+       it != images.end(); 
+       ++it, ++i )
+  {
+    if ((*it)->Get() == node)
+    {
+      m_ComboBox->setCurrentItem(i);
+      emit TreeNodeChanged();
+      emit Activated(*it);
+      emit Activated(node);
+    }
+  }
+  
+  // nothing found
+  return false;
+}
+

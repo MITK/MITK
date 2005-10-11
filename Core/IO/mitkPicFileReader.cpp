@@ -164,10 +164,8 @@ void mitk::PicFileReader::GenerateData()
 
     if( m_FileName != "")
     {
-        ipPicDescriptor* pic=ipPicGet(const_cast<char *>(m_FileName.c_str()), NULL);
+        ipPicDescriptor* pic=ipPicGet(const_cast<char *>(m_FileName.c_str()), output->GetPic());
         ConvertHandedness(pic);
-        output->SetPicChannel(pic);
-        ipPicFree(pic);
 
         //slice-wise reading
         //currently much too slow.

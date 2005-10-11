@@ -253,7 +253,7 @@ int itkGraphCutSegmentationFilterTest(int, char* [] )
 
   IteratorType2D testIterator2D(resultImage2D, resultImage2D->GetRequestedRegion());
   for (testIterator2D.GoToBegin(); !testIterator2D.IsAtEnd(); ++testIterator2D){
-	  if(testIterator2D.Get()==255)
+	  if(testIterator2D.Get()==1)
       testValue2D = testValue2D++;
   }
 
@@ -299,7 +299,7 @@ int itkGraphCutSegmentationFilterTest(int, char* [] )
 */
   IteratorType testIterator(resultImage, resultImage->GetRequestedRegion());
   for (testIterator.GoToBegin(); !testIterator.IsAtEnd(); ++testIterator){
-	  if(testIterator.Get()==255)
+	  if(testIterator.Get()==1)
       testValue = testValue++;
   }
 
@@ -332,7 +332,7 @@ int itkGraphCutSegmentationFilterTest(int, char* [] )
 
   IteratorType2D testIteratorBoykov2D(resultImage2D, resultImage2D->GetRequestedRegion());
   for (testIteratorBoykov2D.GoToBegin(); !testIteratorBoykov2D.IsAtEnd(); ++testIteratorBoykov2D){
-	  if(testIteratorBoykov2D.Get()==255)
+	  if(testIteratorBoykov2D.Get()==1)
       testValue2D = testValue2D++;
   }
 
@@ -365,7 +365,7 @@ int itkGraphCutSegmentationFilterTest(int, char* [] )
 
   IteratorType testIteratorBoykov(resultImage, resultImage->GetRequestedRegion());
   for (testIteratorBoykov.GoToBegin(); !testIteratorBoykov.IsAtEnd(); ++testIteratorBoykov){
-	  if(testIteratorBoykov.Get()==255)
+	  if(testIteratorBoykov.Get()==1)
       testValue = testValue++;
   }
 

@@ -147,7 +147,7 @@ void QmitkDataManagerControls::RemoveButtonClicked()
 
   switch(QMessageBox::information(this, "Application name here",
     "Do you really want do delete this item?\n",
-    QMessageBox::Yes, QMessageBox::No, QMessageBox::Cancel,
+     "&Yes", "&No", "Cancel",
     0,      // Enter == button 0
     2)) { // Escape == button 2
         case 0: // "Yes" clicked or Enter pressed.

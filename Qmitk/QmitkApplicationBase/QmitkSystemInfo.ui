@@ -109,6 +109,22 @@
                 <attribute name="title">
                     <string>DataInfo</string>
                 </attribute>
+                <vbox>
+                    <property name="name">
+                        <cstring>unnamed</cstring>
+                    </property>
+                    <widget class="QLabel">
+                        <property name="name">
+                            <cstring>m_DataNodeName</cstring>
+                        </property>
+                        <property name="text">
+                            <string>No data</string>
+                        </property>
+                        <property name="alignment">
+                            <set>AlignTop</set>
+                        </property>
+                    </widget>
+                </vbox>
             </widget>
         </widget>
         <widget class="QGroupBox">

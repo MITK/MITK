@@ -353,7 +353,7 @@ void QmitkMainTemplate::fileOpenGetFactoryOutput( mitk::DataTreeNodeFactory & fa
       m_StandardViewsInitialized = m_MultiWidget->InitializeStandardViews(&it);
 
       if (firstImage!=NULL)
-        if ( firstImage->GetDimension() == 2 )
+        if ( firstImage->GetDimension(2) == 1 )
         {
           m_MultiWidget->changeLayoutToWidget1();
         }

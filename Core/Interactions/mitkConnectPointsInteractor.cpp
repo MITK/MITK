@@ -20,10 +20,11 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkConnectPointsInteractor.h"
 #include <mitkLineOperation.h>
 #include <mitkPositionEvent.h>
-#include "mitkMesh.h"
+#include <mitkMesh.h>
 #include <mitkDataTreeNode.h>
 #include <mitkInteractionConst.h>
-#include "mitkAction.h"
+#include <mitkAction.h>
+#include <vtkLinearTransform.h>
 
 //how precise must the user pick the point
 //default value
@@ -49,12 +50,11 @@ void mitk::ConnectPointsInteractor::SetPrecision(unsigned int precision)
 //## overwritten cause this class can handle it better!
 float mitk::ConnectPointsInteractor::CalculateJurisdiction(StateEvent const* stateEvent) const
 {
-  float returnvalue = 0.0;
-  //if it is a key event that can be handled in the current state, then return 0.5
-  mitk::DisplayPositionEvent const  *disPosEvent = dynamic_cast <const mitk::DisplayPositionEvent *> (stateEvent->GetEvent());
-
-  //Key event handling:
-  if (disPosEvent == NULL)
+  float returnValue = 0;
+  
+  mitk::PositionEvent const  *posEvent = dynamic_cast <const mitk::PositionEvent *> (stateEvent->GetEvent());
+  //checking if a keyevent can be handled:
+  if (posEvent == NULL)
   {
     //check, if the current state has a transition waiting for that key event.
     if (this->GetCurrentState()->GetTransition(stateEvent->GetId())!=NULL)
@@ -67,21 +67,55 @@ float mitk::ConnectPointsInteractor::CalculateJurisdiction(StateEvent const* sta
     }
   }
 
-  //on MouseMove do nothing!
+  //Mouse event handling:
+  //on MouseMove do nothing! reimplement if needed differently
   if (stateEvent->GetEvent()->GetType() == mitk::Type_MouseMove)
   {
     return 0;
   }
 
-  //if we don't have a Point in our PointSet, then return with 0.5
+  //check on the right data-type
   mitk::PointSet* pointSet = dynamic_cast<mitk::PointSet*>(m_DataTreeNode->GetData());
-  if (pointSet != NULL)
-  {
-    if (pointSet->GetSize()<1)
-      returnvalue = 0.5;
-  }
+  if (pointSet == NULL)
+    return 0;
 
-  return returnvalue;
+
+  //since we now have 3D picking in GlobalInteraction and all events send are DisplayEvents with 3D information,
+  //we concentrate on 3D coordinates
+  mitk::Point3D worldPoint = posEvent->GetWorldPosition();
+  float p[3];
+  itk2vtk(worldPoint, p);
+  //transforming the Worldposition to local coordinatesystem
+  m_DataTreeNode->GetData()->GetGeometry()->GetVtkTransform()->GetInverse()->TransformPoint(p, p);
+  vtk2itk(p, worldPoint);
+
+  float distance = 5;
+  int index = pointSet->SearchPoint(worldPoint, distance);
+  if (index>-1)
+    //how far away is the line from the point?
+  {
+    //get the point and calculate the jurisdiction out of it.
+    mitk::PointSet::PointType point;
+    pointSet->GetPointSet()->GetPoint(index, &point); 
+    returnValue = point.EuclideanDistanceTo(worldPoint);
+
+    //between 1 and 0.     1 if directly hit
+    returnValue = 1 - ( returnValue / distance );
+    if (returnValue<0 || returnValue>1)
+    {
+      itkWarningMacro("Difficulties in calculating Jurisdiction. Check PointInteractor");
+      return 0;
+    }
+    
+    //and now between 0,5 and 1
+    returnValue = 0.5 + (returnValue / 2);
+
+    return returnValue;
+  }
+  else //not found
+  {
+    return 0;
+  }
 }
 
 bool mitk::ConnectPointsInteractor::ExecuteAction( Action* action, mitk::StateEvent const* stateEvent )

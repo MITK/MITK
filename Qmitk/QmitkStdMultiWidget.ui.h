@@ -532,7 +532,7 @@ bool QmitkStdMultiWidget::InitializeStandardViews(mitk::DataTreeIteratorBase * i
 }
 
 
-bool QmitkStdMultiWidget::InitializeStandardViews( mitk::Geometry3D * geometry )
+bool QmitkStdMultiWidget::InitializeStandardViews( const mitk::Geometry3D * geometry )
 {
   bool boundingBoxInitialized = false;
 

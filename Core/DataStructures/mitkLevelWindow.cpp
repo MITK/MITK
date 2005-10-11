@@ -109,12 +109,16 @@ void mitk::LevelWindow::SetMinMax(mitk::ScalarType min, mitk::ScalarType max)
 void mitk::LevelWindow::SetRangeMin(mitk::ScalarType min)
 {
   m_RangeMin = min;
+  if(m_RangeMin > m_RangeMax)
+    std::swap(m_RangeMin,m_RangeMax);
   testValues();
 }
 
 void mitk::LevelWindow::SetRangeMax(mitk::ScalarType max)
 {
   m_RangeMax = max;
+  if(m_RangeMin > m_RangeMax)
+    std::swap(m_RangeMin,m_RangeMax);
   testValues();
 }
 
@@ -130,7 +134,7 @@ mitk::ScalarType mitk::LevelWindow::GetRangeMax() const
 
 mitk::ScalarType mitk::LevelWindow::GetRange() const
 {
-  return  (m_RangeMax > 0) ? (m_RangeMax - m_RangeMin) : (m_RangeMin - m_RangeMax);
+  return  m_RangeMax - m_RangeMin;
 }
 
 void mitk::LevelWindow::SetAuto(mitk::Image* image, bool tryPicTags, bool guessByCentralSlice)
@@ -150,8 +154,8 @@ void mitk::LevelWindow::SetAuto(mitk::Image* image, bool tryPicTags, bool guessB
     mitk::ImageSliceSelector::Pointer sliceSelector = mitk::ImageSliceSelector::New();
       sliceSelector->SetInput(image);
       sliceSelector->SetSliceNr(image->GetDimension(2)/2);
-      sliceSelector->SetTimeNr(image->GetDimension(4)/2);
-      sliceSelector->SetChannelNr(image->GetDimension(5)/2);
+      sliceSelector->SetTimeNr(image->GetDimension(3)/2);
+      sliceSelector->SetChannelNr(image->GetDimension(4)/2);
       sliceSelector->Update();
 
     image = sliceSelector->GetOutput();
@@ -164,11 +168,9 @@ void mitk::LevelWindow::SetAuto(mitk::Image* image, bool tryPicTags, bool guessB
       minValue = wholeImage->GetScalarValue2ndMin();
       maxValue = wholeImage->GetScalarValue2ndMaxNoRecompute();
   }
-  SetMinMax(minValue, maxValue);
   SetRangeMin(minValue);
   SetRangeMax(maxValue);
-
-  //itkGenericOutputMacro(<<"set WL to "<<minValue<<" "<<maxValue);
+  SetMinMax(minValue, maxValue);
 }
 
 bool mitk::LevelWindow::SetAutoByPicTags(const ipPicDescriptor* aPic)

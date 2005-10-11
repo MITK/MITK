@@ -362,7 +362,7 @@
         <sender>m_ReInitButton</sender>
         <signal>clicked()</signal>
         <receiver>QmitkDataManagerControls</receiver>
-        <slot>m_ReInitButton_clicked()</slot>
+        <slot>ReInitButton_clicked()</slot>
     </connection>
     <connection>
         <sender>m_DataTreeView</sender>
@@ -374,25 +374,25 @@
         <sender>m_RenderWindowCB</sender>
         <signal>toggled(bool)</signal>
         <receiver>QmitkDataManagerControls</receiver>
-        <slot>m_RenderWindowCB_toggled(bool)</slot>
+        <slot>RenderWindowCB_toggled(bool)</slot>
     </connection>
     <connection>
         <sender>m_RenderWindowCBMulti</sender>
         <signal>toggled(bool)</signal>
         <receiver>QmitkDataManagerControls</receiver>
-        <slot>m_RenderWindowCBMulti_toggled(bool)</slot>
+        <slot>RenderWindowCBMulti_toggled(bool)</slot>
     </connection>
     <connection>
         <sender>m_RenderWindowCombo</sender>
         <signal>activated(int)</signal>
         <receiver>QmitkDataManagerControls</receiver>
-        <slot>m_RenderWindowCombo_activated(int)</slot>
+        <slot>RenderWindowCombo_activated(int)</slot>
     </connection>
     <connection>
         <sender>m_RenderWindowComboMulti</sender>
         <signal>activated(int)</signal>
         <receiver>QmitkDataManagerControls</receiver>
-        <slot>m_RenderWindowComboMulti_activated(int)</slot>
+        <slot>RenderWindowComboMulti_activated(int)</slot>
     </connection>
 </connections>
 <includes>
@@ -422,14 +422,14 @@
     <slot>RemoveButtonClicked()</slot>
     <slot>SaveButton_clicked()</slot>
     <slot>SaveLightBox_clicked()</slot>
-    <slot>m_ReInitButton_clicked()</slot>
+    <slot>ReInitButton_clicked()</slot>
     <slot access="protected">TreeSelectionChanged( QListViewItem * item )</slot>
     <slot>RenderWindowSelected( int id )</slot>
     <slot>InitMultiMode(mitk::BaseRenderer* renderer)</slot>
-    <slot>m_RenderWindowCB_toggled( bool isOn )</slot>
-    <slot>m_RenderWindowCBMulti_toggled( bool isOn )</slot>
-    <slot>m_RenderWindowCombo_activated( int )</slot>
-    <slot>m_RenderWindowComboMulti_activated( int )</slot>
+    <slot>RenderWindowCB_toggled( bool isOn )</slot>
+    <slot>RenderWindowCBMulti_toggled( bool isOn )</slot>
+    <slot>RenderWindowCombo_activated( int )</slot>
+    <slot>RenderWindowComboMulti_activated( int )</slot>
 </slots>
 <functions>
     <function access="private" specifier="non virtual">init()</function>

@@ -238,7 +238,7 @@ void QmitkDataManagerControls::SaveLightBox_clicked()
   }
 }
 
-void QmitkDataManagerControls::m_ReInitButton_clicked()
+void QmitkDataManagerControls::ReInitButton_clicked()
 {
   QmitkDataTreeViewItem *selected = dynamic_cast<QmitkDataTreeViewItem*>(m_DataTreeView->selectedItem());
   if (selected != NULL)
@@ -308,26 +308,26 @@ void QmitkDataManagerControls::InitMultiMode(mitk::BaseRenderer* renderer)
   m_MultiNodePropertiesView->SetMultiMode(propNames,treeNodes);
 }
 
-void QmitkDataManagerControls::m_RenderWindowCB_toggled( bool isOn )
+void QmitkDataManagerControls::RenderWindowCB_toggled( bool isOn )
 {
   m_RenderWindowCombo->setEnabled(isOn);
   RendererChange();
 }
 
-void QmitkDataManagerControls::m_RenderWindowCBMulti_toggled( bool isOn )
+void QmitkDataManagerControls::RenderWindowCBMulti_toggled( bool isOn )
 {
   m_RenderWindowComboMulti->setEnabled(isOn);
   RendererChangeMulti();
 }
 
-void QmitkDataManagerControls::m_RenderWindowCombo_activated( int )
+void QmitkDataManagerControls::RenderWindowCombo_activated( int )
 {
   //
   std::cout << "Combo activated" << std::endl;
   RendererChange();
 }
 
-void QmitkDataManagerControls::m_RenderWindowComboMulti_activated( int )
+void QmitkDataManagerControls::RenderWindowComboMulti_activated( int )
 {
   //
   std::cout << "MultiCombo activated" << std::endl;

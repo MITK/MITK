@@ -32,12 +32,12 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkEventMapper.h"
 #include "mitkFocusManager.h"
 #include "mitkRenderingManager.h"
+#include "mitkAffineInteractor.h"
+#include <QmitkSystemInfo.h>
+
 #include "itkImage.h"
 
 #include <itksys/SystemTools.hxx>
-
-#include <qfiledialog.h>
-#include <qmessagebox.h>
 
 #include "ipPic/ipPic.h"
 #include "ipFunc/ipFunc.h"
@@ -45,33 +45,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkChiliPlugin.h"
 #include "mitkLightBoxResultImageWriter.h"
 
+#include <qfiledialog.h>
 #include <qmessagebox.h>
-
-void QmitkDataManagerControls::init()
-{
-  m_DataTreeIterator = NULL;
-  while (m_DataTreeView->columns() > 0 )
-  {
-    m_DataTreeView->removeColumn(0);
-  }
-  m_DataTreeView->addColumn( "Name" );
-  m_DataTreeView->addColumn( "NodeType" );
-  m_DataTreeView->addColumn( "RefCount");
-  m_DataTreeView->setSortColumn(20);
-
-  mitk::FocusManager* fm =
-    mitk::GlobalInteraction::GetInstance()->GetFocusManager();
-  QmitkFocusChangeCommand::Pointer fcc = QmitkFocusChangeCommand::New();
-  fcc->SetQmitkDataManagerControls(this);
-  mitk::FocusEvent fe;
-
-  fm->AddObserver(fe,fcc);
-
-  if(mitk::ChiliPlugin::IsPlugin()==false)
-  {
-    m_SaveToLightBox->hide();
-  }
-}
+#include <qtextedit.h>
+#include <qapplication.h>
 
 void QmitkDataManagerControls::destroy()
 {
@@ -249,7 +226,7 @@ void QmitkDataManagerControls::ReInitButton_clicked()
     if (node != NULL )
     {
       mitk::BaseData::Pointer basedata = node->GetData();
-      emit InitializeStandardViews( basedata.GetPointer() );
+      emit InitializeStandardViews( basedata->GetTimeSlicedGeometry() );
       mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     }
   }
@@ -263,6 +240,7 @@ void QmitkDataManagerControls::TreeSelectionChanged( QListViewItem * item )
   m_TransferFunctionWidget->SetDataTreeNode(dtvi->GetDataTreeNode());
   m_NodePropertiesView->SetPropertyList(dtvi->GetDataTreeNode()->GetPropertyList());
   RendererChange();
+  AffineInteraction_clicked();
 }
 
 void QmitkDataManagerControls::RenderWindowSelected( int id )
@@ -382,4 +360,143 @@ propNames.push_back("opacity");
     }
   }
   m_MultiNodePropertiesView->SetMultiMode(propNames, treeNodes, renderer);
+}
+
+
+void QmitkDataManagerControls::LoadButton_clicked()
+{
+  mitk::DataTreeIteratorClone selectedIterator = NULL;
+
+  QmitkDataTreeViewItem *selected = dynamic_cast<QmitkDataTreeViewItem*>(m_DataTreeView->selectedItem());
+  if (selected != NULL)
+  {
+    selectedIterator = selected->GetDataTreeIterator();
+  }
+  else
+  {
+    selectedIterator = m_DataTreeIterator;
+  }
+
+#ifdef MBI_INTERNAL
+  QStringList fileNames = QFileDialog::getOpenFileNames(CommonFunctionality::GetInternalFileExtensions(), NULL);
+#else
+  QStringList fileNames = QFileDialog::getOpenFileNames(CommonFunctionality::GetExternalFileExtensions(), NULL);
+#endif
+  for ( QStringList::Iterator it = fileNames.begin(); it != fileNames.end(); ++it )
+  {
+    FileOpen((*it).ascii(), selectedIterator.GetPointer());
+  }
+}
+
+
+void QmitkDataManagerControls::AffineInteraction_clicked()
+{
+  QmitkDataTreeViewItem *selected = dynamic_cast<QmitkDataTreeViewItem*>(m_DataTreeView->selectedItem());
+  if (selected != NULL)
+  {
+    TurnInteractionOff();
+    if(m_AffineInteraction->isOn())
+    {
+      if(selected->GetDataTreeNode()->GetData()!=NULL)
+      {
+        m_AffineInteractionNode = selected->GetDataTreeNode();
+        m_PreviousInteractor = m_AffineInteractionNode->GetInteractor();     
+        m_AffineInteractor = new mitk::AffineInteractor("AffineInteractions ctrl-drag", m_AffineInteractionNode);
+        m_AffineInteractionNode->SetInteractor(m_AffineInteractor);
+
+        mitk::GlobalInteraction::GetInstance()->AddInteractor(m_AffineInteractor);
+      }
+    }
+  }
+}
+
+
+void QmitkDataManagerControls::Info_clicked()
+{
+  QmitkDataTreeViewItem *selected = dynamic_cast<QmitkDataTreeViewItem*>(m_DataTreeView->selectedItem());
+  if( (selected != NULL) && (selected->GetDataTreeNode()->GetData() != NULL) )
+  {
+    QmitkSystemInfo *info = new QmitkSystemInfo(this, "QmitkSystemInfo::DataInfo");
+    info->m_TabWidget->setCurrentPage(1);
+    info->m_DataNodeName->setText(selected->text(0));
+    ::itk::OStringStream itkOutput;
+    if(selected->GetDataTreeNode()->GetInteractor()!=NULL)
+      selected->GetDataTreeNode()->GetInteractor()->Print(itkOutput);
+    selected->GetDataTreeNode()->GetData()->Print(itkOutput);
+    info->m_teOutputPane->append("--------------------DataInfo--------------------");
+    info->m_teOutputPane->append(selected->text(0));
+    info->m_teOutputPane->append(itkOutput.str().c_str());
+    info->m_teOutputPane->append(selected->text(0));
+    info->m_teOutputPane->append("----------------End of DataInfo-----------------");
+    info->show();
+  }
+}
+
+void QmitkDataManagerControls::FileOpen( const char * fileName, mitk::DataTreeIteratorBase* parentIterator )
+{
+  mitk::DataTreeNodeFactory::Pointer factory = mitk::DataTreeNodeFactory::New();
+
+  try
+  {
+    factory->SetFileName( fileName );
+
+    QApplication::setOverrideCursor( QCursor(Qt::WaitCursor) );
+
+    factory->Update();
+
+    for ( unsigned int i = 0 ; i < factory->GetNumberOfOutputs( ); ++i )
+    {
+      mitk::DataTreeNode::Pointer node = factory->GetOutput( i );
+      if ( ( node.IsNotNull() ) && ( node->GetData() != NULL ) )
+      {
+        parentIterator->Add( node );
+      }
+    }
+  }
+  catch ( itk::ExceptionObject & ex )
+  {
+    itkGenericOutputMacro( << "Exception during file open: " << ex );
+  }
+
+  QApplication::restoreOverrideCursor();
+}
+
+
+void QmitkDataManagerControls::TurnInteractionOff()
+{
+  if(m_AffineInteractionNode.IsNotNull())
+  {
+    // did we add an interactor before? If yes, remove it.
+    if(m_AffineInteractor.IsNotNull())
+      mitk::GlobalInteraction::GetInstance()->RemoveInteractor(m_AffineInteractor);
+    // does the m_AffineInteractionNode still contain the interactor we set on it?
+    if(m_AffineInteractionNode->GetInteractor() == m_AffineInteractor)
+    {
+      // set the previous one
+      m_AffineInteractionNode->SetInteractor(m_PreviousInteractor);
+      // activate it, if any
+      if(m_PreviousInteractor.IsNotNull())
+        mitk::GlobalInteraction::GetInstance()->AddInteractor(m_PreviousInteractor);
+    }
+    m_AffineInteractionNode = NULL;
+    m_PreviousInteractor = NULL;
+    m_AffineInteractor = NULL;
+  }
+}
+
+
+void QmitkDataManagerControls::GlobalReInit_clicked()
+{
+  if(m_DataTreeIterator.IsNotNull())
+  {
+    emit InitializeStandardViews( m_DataTreeIterator.GetPointer() );
+  }
+}
+
+
+void QmitkDataManagerControls::init()
+{
+#ifndef MBI_INTERNAL
+    m_AffineInteraction->hide();
+#endif
 }

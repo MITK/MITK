@@ -8,8 +8,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>505</width>
-            <height>722</height>
+            <width>387</width>
+            <height>999</height>
         </rect>
     </property>
     <property name="sizePolicy">
@@ -60,12 +60,37 @@
                     </property>
                     <widget class="QLayoutWidget">
                         <property name="name">
-                            <cstring>layout3</cstring>
+                            <cstring>layout20</cstring>
                         </property>
                         <hbox>
                             <property name="name">
                                 <cstring>unnamed</cstring>
                             </property>
+                            <widget class="QPushButton">
+                                <property name="name">
+                                    <cstring>m_LoadButton</cstring>
+                                </property>
+                                <property name="sizePolicy">
+                                    <sizepolicy>
+                                        <hsizetype>1</hsizetype>
+                                        <vsizetype>0</vsizetype>
+                                        <horstretch>0</horstretch>
+                                        <verstretch>0</verstretch>
+                                    </sizepolicy>
+                                </property>
+                                <property name="text">
+                                    <string>L&amp;oad</string>
+                                </property>
+                                <property name="accel">
+                                    <string>Alt+O</string>
+                                </property>
+                                <property name="toolTip" stdset="0">
+                                    <string>Load data as child of the selected node.</string>
+                                </property>
+                                <property name="whatsThis" stdset="0">
+                                    <string>Load data as child of the selected node.</string>
+                                </property>
+                            </widget>
                             <widget class="QPushButton">
                                 <property name="name">
                                     <cstring>m_SaveButton</cstring>
@@ -79,7 +104,16 @@
                                     </sizepolicy>
                                 </property>
                                 <property name="text">
-                                    <string>S&amp;ave</string>
+                                    <string>&amp;Save</string>
+                                </property>
+                                <property name="accel">
+                                    <string>Alt+S</string>
+                                </property>
+                                <property name="toolTip" stdset="0">
+                                    <string>Save selected node.</string>
+                                </property>
+                                <property name="whatsThis" stdset="0">
+                                    <string>Save selected node.</string>
                                 </property>
                             </widget>
                             <widget class="QPushButton">
@@ -95,7 +129,16 @@
                                     </sizepolicy>
                                 </property>
                                 <property name="text">
-                                    <string>Save to Li&amp;ghtBox</string>
+                                    <string>Save to Light&amp;Box</string>
+                                </property>
+                                <property name="accel">
+                                    <string>Alt+B</string>
+                                </property>
+                                <property name="toolTip" stdset="0">
+                                    <string>Save selected node to Chili lightbox.</string>
+                                </property>
+                                <property name="whatsThis" stdset="0">
+                                    <string>Save selected node to Chili lightbox.</string>
                                 </property>
                             </widget>
                             <widget class="QPushButton">
@@ -113,21 +156,14 @@
                                 <property name="text">
                                     <string>Remove</string>
                                 </property>
-                            </widget>
-                            <widget class="QPushButton">
-                                <property name="name">
-                                    <cstring>m_ReInitButton</cstring>
+                                <property name="accel">
+                                    <string></string>
                                 </property>
-                                <property name="sizePolicy">
-                                    <sizepolicy>
-                                        <hsizetype>1</hsizetype>
-                                        <vsizetype>0</vsizetype>
-                                        <horstretch>0</horstretch>
-                                        <verstretch>0</verstretch>
-                                    </sizepolicy>
+                                <property name="toolTip" stdset="0">
+                                    <string>Remove selected node.</string>
                                 </property>
-                                <property name="text">
-                                    <string>Rei&amp;nit</string>
+                                <property name="whatsThis" stdset="0">
+                                    <string>Remove selected node.</string>
                                 </property>
                             </widget>
                         </hbox>
@@ -175,6 +211,119 @@
                         <property name="rootIsDecorated">
                             <bool>true</bool>
                         </property>
+                    </widget>
+                    <widget class="QLayoutWidget">
+                        <property name="name">
+                            <cstring>layout9</cstring>
+                        </property>
+                        <hbox>
+                            <property name="name">
+                                <cstring>unnamed</cstring>
+                            </property>
+                            <widget class="QPushButton">
+                                <property name="name">
+                                    <cstring>m_GlobalReInit</cstring>
+                                </property>
+                                <property name="sizePolicy">
+                                    <sizepolicy>
+                                        <hsizetype>1</hsizetype>
+                                        <vsizetype>0</vsizetype>
+                                        <horstretch>0</horstretch>
+                                        <verstretch>0</verstretch>
+                                    </sizepolicy>
+                                </property>
+                                <property name="text">
+                                    <string>&amp;Global Reinit</string>
+                                </property>
+                                <property name="accel">
+                                    <string>Alt+G</string>
+                                </property>
+                                <property name="toolTip" stdset="0">
+                                    <string>Re-inititialize standard views according to whole tree.</string>
+                                </property>
+                                <property name="whatsThis" stdset="0">
+                                    <string>Re-inititialize standard views according to whole tree.</string>
+                                </property>
+                            </widget>
+                            <widget class="QPushButton">
+                                <property name="name">
+                                    <cstring>m_ReInitButton</cstring>
+                                </property>
+                                <property name="sizePolicy">
+                                    <sizepolicy>
+                                        <hsizetype>1</hsizetype>
+                                        <vsizetype>0</vsizetype>
+                                        <horstretch>0</horstretch>
+                                        <verstretch>0</verstretch>
+                                    </sizepolicy>
+                                </property>
+                                <property name="text">
+                                    <string>Rei&amp;nit</string>
+                                </property>
+                                <property name="accel">
+                                    <string>Alt+N</string>
+                                </property>
+                                <property name="toolTip" stdset="0">
+                                    <string>Re-inititialize standard views according to geometry of selected node.</string>
+                                </property>
+                                <property name="whatsThis" stdset="0">
+                                    <string>Re-inititialize standard views according to geometry of selected node.</string>
+                                </property>
+                            </widget>
+                            <widget class="QPushButton">
+                                <property name="name">
+                                    <cstring>m_AffineInteraction</cstring>
+                                </property>
+                                <property name="sizePolicy">
+                                    <sizepolicy>
+                                        <hsizetype>1</hsizetype>
+                                        <vsizetype>0</vsizetype>
+                                        <horstretch>0</horstretch>
+                                        <verstretch>0</verstretch>
+                                    </sizepolicy>
+                                </property>
+                                <property name="text">
+                                    <string>&amp;Affine Interaction</string>
+                                </property>
+                                <property name="accel">
+                                    <string>Alt+A</string>
+                                </property>
+                                <property name="toggleButton">
+                                    <bool>true</bool>
+                                </property>
+                                <property name="toolTip" stdset="0">
+                                    <string>Load data as child of the selected node: Ctrl-left: move, Ctrl-middle: rotate, Ctrl-right: scale</string>
+                                </property>
+                                <property name="whatsThis" stdset="0">
+                                    <string>Load data as child of the selected node: Ctrl-left: move, Ctrl-middle: rotate, Ctrl-right: scale</string>
+                                </property>
+                            </widget>
+                            <widget class="QPushButton">
+                                <property name="name">
+                                    <cstring>m_Info</cstring>
+                                </property>
+                                <property name="sizePolicy">
+                                    <sizepolicy>
+                                        <hsizetype>1</hsizetype>
+                                        <vsizetype>0</vsizetype>
+                                        <horstretch>0</horstretch>
+                                        <verstretch>0</verstretch>
+                                    </sizepolicy>
+                                </property>
+                                <property name="text">
+                                    <string>&amp;Info</string>
+                                </property>
+                                <property name="accel">
+                                    <string>Alt+I</string>
+                                </property>
+                                <property name="toolTip" stdset="0">
+                                    <string>Display information about the data of the selected node.</string>
+                                </property>
+                                <property name="whatsThis" stdset="0">
+                                    <string>Display information about the selected node.</string>
+                                </property>
+                            </widget>
+                        </hbox>
                     </widget>
                     <widget class="QLayoutWidget">
                         <property name="name">
@@ -394,6 +543,30 @@
         <receiver>QmitkDataManagerControls</receiver>
         <slot>RenderWindowComboMulti_activated(int)</slot>
     </connection>
+    <connection>
+        <sender>m_LoadButton</sender>
+        <signal>clicked()</signal>
+        <receiver>QmitkDataManagerControls</receiver>
+        <slot>LoadButton_clicked()</slot>
+    </connection>
+    <connection>
+        <sender>m_AffineInteraction</sender>
+        <signal>clicked()</signal>
+        <receiver>QmitkDataManagerControls</receiver>
+        <slot>AffineInteraction_clicked()</slot>
+    </connection>
+    <connection>
+        <sender>m_Info</sender>
+        <signal>clicked()</signal>
+        <receiver>QmitkDataManagerControls</receiver>
+        <slot>Info_clicked()</slot>
+    </connection>
+    <connection>
+        <sender>m_GlobalReInit</sender>
+        <signal>clicked()</signal>
+        <receiver>QmitkDataManagerControls</receiver>
+        <slot>GlobalReInit_clicked()</slot>
+    </connection>
 </connections>
 <includes>
     <include location="global" impldecl="in implementation">mitkStringProperty.h</include>
@@ -407,15 +580,20 @@
     <include location="local" impldecl="in declaration">mitkBaseProperty.h</include>
     <include location="global" impldecl="in declaration">string</include>
     <include location="local" impldecl="in declaration">mitkBaseData.h</include>
+    <include location="global" impldecl="in declaration">mitkDataTreeNode.h</include>
     <include location="local" impldecl="in implementation">QmitkDataManagerControls.ui.h</include>
 </includes>
 <variables>
-    <variable access="public">static mitk::PropertyList::Pointer m_PropertyList;</variable>
-    <variable>QHBoxLayout * treeLayout;</variable>
+    <variable>mitk::DataTreeNode::Pointer m_AffineInteractionNode;</variable>
     <variable>mitk::DataTreeIteratorClone m_DataTreeIterator;</variable>
+    <variable>QHBoxLayout * treeLayout;</variable>
+    <variable access="public">static mitk::PropertyList::Pointer m_PropertyList;</variable>
+    <variable>mitk::Interactor::Pointer m_PreviousInteractor;</variable>
+    <variable>mitk::Interactor::Pointer m_AffineInteractor;</variable>
 </variables>
 <signals>
-    <signal>InitializeStandardViews(mitk::BaseData*)</signal>
+    <signal>InitializeStandardViews(const mitk::Geometry3D *)</signal>
+    <signal>InitializeStandardViews(mitk::DataTreeIteratorBase *)</signal>
 </signals>
 <slots>
     <slot>SetDataTreeIterator( mitk::DataTreeIteratorBase * it )</slot>
@@ -425,23 +603,29 @@
     <slot>ReInitButton_clicked()</slot>
     <slot access="protected">TreeSelectionChanged( QListViewItem * item )</slot>
     <slot>RenderWindowSelected( int id )</slot>
-    <slot>InitMultiMode(mitk::BaseRenderer* renderer)</slot>
+    <slot>InitMultiMode( mitk::BaseRenderer * renderer )</slot>
     <slot>RenderWindowCB_toggled( bool isOn )</slot>
     <slot>RenderWindowCBMulti_toggled( bool isOn )</slot>
     <slot>RenderWindowCombo_activated( int )</slot>
     <slot>RenderWindowComboMulti_activated( int )</slot>
+    <slot>LoadButton_clicked()</slot>
+    <slot>AffineInteraction_clicked()</slot>
+    <slot>Info_clicked()</slot>
+    <slot>GlobalReInit_clicked()</slot>
 </slots>
 <functions>
-    <function access="private" specifier="non virtual">init()</function>
     <function access="private">destroy()</function>
     <function>UpdateRendererCombo()</function>
     <function>RendererChange()</function>
     <function>RendererChangeMulti()</function>
+    <function access="protected">FileOpen( const char * fileName, mitk::DataTreeIteratorBase * parentIterator )</function>
+    <function access="protected">TurnInteractionOff()</function>
+    <function>init()</function>
 </functions>
 <layoutdefaults spacing="0" margin="0"/>
 <includehints>
-    
-    
-    
+    <includehint>qmitkpropertylistview.h</includehint>
+    <includehint>qmitktransferfunctionwidget.h</includehint>
+    <includehint>qmitkpropertylistview.h</includehint>
 </includehints>
 </UI>

@@ -74,7 +74,8 @@ void QmitkDataManagerControls::init()
 }
 
 void QmitkDataManagerControls::destroy()
-{}
+{
+}
 
 // init the combobox with all
 void QmitkDataManagerControls::UpdateRendererCombo()
@@ -118,6 +119,7 @@ void QmitkDataManagerControls::UpdateRendererCombo()
   RendererChange();
   RendererChangeMulti();
 }
+
 void QmitkDataManagerControls::SetDataTreeIterator(mitk::DataTreeIteratorBase* it)
 {
   if (it == NULL) return;
@@ -139,37 +141,27 @@ void QmitkDataManagerControls::SetDataTreeIterator(mitk::DataTreeIteratorBase* i
   UpdateRendererCombo();
 }
 
-
-
 void QmitkDataManagerControls::RemoveButtonClicked()
 {
   QmitkDataTreeViewItem *selected = dynamic_cast<QmitkDataTreeViewItem*>(m_DataTreeView->selectedItem());
 
-  switch(QMessageBox::information(this, "Application name here",
-    "Do you really want do delete this item?\n",
-     "&Yes", "&No", "Cancel",
-    0,      // Enter == button 0
-    2)) { // Escape == button 2
-        case 0: // "Yes" clicked or Enter pressed.
-                    //Remove the item
-          if (selected == NULL)
-          {}
-          else
-          {
-            mitk::DataTreeIteratorClone selectedIterator = selected->GetDataTreeIterator();
-            assert(selectedIterator.IsNotNull());
-            delete selected;
-            selectedIterator->Remove();
-            mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-          }
-          break;
-        case 1: //"No" clicked
-          break;
-        case 2: // Cancel clicked or Escape pressed
-          break;
+  switch(QMessageBox::question(this, tr("DataManager"), tr("Do you really want do delete this item?"),
+           QMessageBox::Yes | QMessageBox::Default, QMessageBox::No, QMessageBox::Cancel | QMessageBox::Escape)) 
+    {
+      case QMessageBox::Yes: //Remove the item from view and tree
+        if (selected)
+        {
+          mitk::DataTreeIteratorClone selectedIterator = selected->GetDataTreeIterator();
+          assert(selectedIterator.IsNotNull());
+          delete selected;
+          selectedIterator->Remove();
+          mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+        }
+        break;
+      case QMessageBox::No: break;
+      case QMessageBox::Cancel: break;
     }
 }
-
 
 void QmitkDataManagerControls::SaveButton_clicked()
 {
@@ -198,7 +190,6 @@ void QmitkDataManagerControls::SaveButton_clicked()
     }
   }
 }
-
 
 void QmitkDataManagerControls::SaveLightBox_clicked()
 {
@@ -247,7 +238,6 @@ void QmitkDataManagerControls::SaveLightBox_clicked()
   }
 }
 
-
 void QmitkDataManagerControls::m_ReInitButton_clicked()
 {
   QmitkDataTreeViewItem *selected = dynamic_cast<QmitkDataTreeViewItem*>(m_DataTreeView->selectedItem());
@@ -264,7 +254,6 @@ void QmitkDataManagerControls::m_ReInitButton_clicked()
     }
   }
 }
-
 
 void QmitkDataManagerControls::TreeSelectionChanged( QListViewItem * item )
 {
@@ -319,20 +308,17 @@ void QmitkDataManagerControls::InitMultiMode(mitk::BaseRenderer* renderer)
   m_MultiNodePropertiesView->SetMultiMode(propNames,treeNodes);
 }
 
-
 void QmitkDataManagerControls::m_RenderWindowCB_toggled( bool isOn )
 {
   m_RenderWindowCombo->setEnabled(isOn);
   RendererChange();
 }
 
-
 void QmitkDataManagerControls::m_RenderWindowCBMulti_toggled( bool isOn )
 {
   m_RenderWindowComboMulti->setEnabled(isOn);
   RendererChangeMulti();
 }
-
 
 void QmitkDataManagerControls::m_RenderWindowCombo_activated( int )
 {
@@ -341,7 +327,6 @@ void QmitkDataManagerControls::m_RenderWindowCombo_activated( int )
   RendererChange();
 }
 
-
 void QmitkDataManagerControls::m_RenderWindowComboMulti_activated( int )
 {
   //
@@ -349,6 +334,7 @@ void QmitkDataManagerControls::m_RenderWindowComboMulti_activated( int )
   RendererChangeMulti();
 
 }
+
 void QmitkDataManagerControls::RendererChange()
 {
   QmitkDataTreeViewItem *selectedItem = dynamic_cast<QmitkDataTreeViewItem*>(m_DataTreeView->selectedItem());
@@ -371,6 +357,7 @@ void QmitkDataManagerControls::RendererChange()
     }
   }
 }
+
 void QmitkDataManagerControls::RendererChangeMulti()
 {
   std::vector<std::string> propNames;

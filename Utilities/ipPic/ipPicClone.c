@@ -88,6 +88,8 @@ ipPicDescriptor *ipPicClone( ipPicDescriptor *pic )
       size = _ipPicSize( pic );
 
       clone->data = malloc( size );
+      if ( ! ( clone->data ) )
+          return NULL;
       memcpy( clone->data, pic->data, size );
     }
 

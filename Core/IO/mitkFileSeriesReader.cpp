@@ -49,7 +49,8 @@ bool mitk::FileSeriesReader::GenerateFileList()
     // Get a list of all files in the directory
     //
     StringContainer unmatchedFiles;
-    for ( unsigned long i = 0; i < itkDir.GetNumberOfFiles(); i++ )
+    unsigned long i;
+    for ( i = 0; i < itkDir.GetNumberOfFiles(); i++ )
     {
         // Only read files
         std::string filename = directory + "/" + itkDir.GetFile( i );
@@ -133,7 +134,7 @@ bool mitk::FileSeriesReader::GenerateFileList()
     //
     m_MatchedFileNames.clear();
     m_MatchedFileNames.resize( sortedFiles.size() );
-    unsigned int i = 0;
+    i = 0;
     for ( SortedStringContainer::iterator it = sortedFiles.begin() ; it != sortedFiles.end() ; ++it, ++i )
     {
         m_MatchedFileNames[ i ] = it->second ;

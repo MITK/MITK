@@ -21,15 +21,14 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkIndex.h>
 #include <itkImageRegionIterator.h>
 
-//#include <itkImageFileWriter.h>
-
 #include <itkGraphCutSegmentationGridGraphFilter.h>
 #include <itkGraphCutSegmentationBoykovFilter.h>
+
 
 int itkGraphCutSegmentationFilterTest(int, char* [] )
 //int main(int, char* [] )
 {
-  typedef short PixelType;
+  //typedef short PixelType;
   typedef itk::Index<2> IndexType2D;
   typedef itk::Index<3> IndexType;
 
@@ -38,8 +37,8 @@ int itkGraphCutSegmentationFilterTest(int, char* [] )
   int testValue = 0;
   int referenceValue = 125000;
 
-  typedef itk::Image< PixelType, 2 > ImageType2D;
-  typedef itk::Image< PixelType, 3 > ImageType;
+  typedef itk::Image< short, 2 > ImageType2D;
+  typedef itk::Image< short, 3 > ImageType;
   typedef itk::ImageRegionIterator<ImageType2D>IteratorType2D;
   typedef itk::ImageRegionIterator<ImageType>IteratorType;
 
@@ -253,8 +252,8 @@ int itkGraphCutSegmentationFilterTest(int, char* [] )
 
   IteratorType2D testIterator2D(resultImage2D, resultImage2D->GetRequestedRegion());
   for (testIterator2D.GoToBegin(); !testIterator2D.IsAtEnd(); ++testIterator2D){
-	  if(testIterator2D.Get()==1)
-      testValue2D = testValue2D++;
+    if(testIterator2D.Get() == 1)
+      testValue2D = testValue2D + 1;
   }
 
   if(referenceValue2D != testValue2D){
@@ -282,25 +281,11 @@ int itkGraphCutSegmentationFilterTest(int, char* [] )
 
   ImageType::Pointer resultImage;
   resultImage = graphcutFilter->GetOutput();
-/*
-  typedef itk::ImageFileWriter<ImageType> FileWriterType;
-  FileWriterType::Pointer FileWriter = FileWriterType::New();
-  FileWriter->SetInput( resultImage );
-  FileWriter->SetFileName("C:\\pics\\testing.mhd");
-  try
-  {
-      FileWriter->Update();
-  }
-  catch ( itk::ExceptionObject & excep )
-  {
-      std::cerr << "Exception caught !" << std::endl;
-      std::cerr << excep << std::endl;
-  }
-*/
+
   IteratorType testIterator(resultImage, resultImage->GetRequestedRegion());
   for (testIterator.GoToBegin(); !testIterator.IsAtEnd(); ++testIterator){
-	  if(testIterator.Get()==1)
-      testValue = testValue++;
+	  if(testIterator.Get() == 1)
+      testValue = testValue + 1;
   }
 
   if(referenceValue != testValue){
@@ -332,8 +317,8 @@ int itkGraphCutSegmentationFilterTest(int, char* [] )
 
   IteratorType2D testIteratorBoykov2D(resultImage2D, resultImage2D->GetRequestedRegion());
   for (testIteratorBoykov2D.GoToBegin(); !testIteratorBoykov2D.IsAtEnd(); ++testIteratorBoykov2D){
-	  if(testIteratorBoykov2D.Get()==1)
-      testValue2D = testValue2D++;
+	  if(testIteratorBoykov2D.Get() == 1)
+      testValue2D = testValue2D + 1;
   }
 
   if(referenceValue2D != testValue2D){
@@ -360,13 +345,12 @@ int itkGraphCutSegmentationFilterTest(int, char* [] )
   graphcutFilter->SetSeedsImage(seedsImage);
   graphcutFilter->Update();
 
-  //ImageType::Pointer resultImage;
   resultImage = graphcutFilter->GetOutput();
 
   IteratorType testIteratorBoykov(resultImage, resultImage->GetRequestedRegion());
   for (testIteratorBoykov.GoToBegin(); !testIteratorBoykov.IsAtEnd(); ++testIteratorBoykov){
-	  if(testIteratorBoykov.Get()==1)
-      testValue = testValue++;
+	  if(testIteratorBoykov.Get() == 1)
+      testValue = testValue + 1;
   }
 
   if(referenceValue != testValue){
@@ -375,7 +359,6 @@ int itkGraphCutSegmentationFilterTest(int, char* [] )
   }
   std::cout<<"[PASSED]"<<std::endl;
   //} end testing itkGraphCutSegmentationBoykovFilter with 3D image
-
 
 std::cout<<"[TEST DONE]"<<std::endl;
 return EXIT_SUCCESS;

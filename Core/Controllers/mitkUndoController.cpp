@@ -21,6 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkLimitedLinearUndo.h"
 #include "mitkVerboseLimitedLinearUndo.h"
 #include "mitkInteractionConst.h"
+#include "mitkRenderingManager.h"
 
 //static member-variables init.
 //##ModelId=3EAEBEBD02DC
@@ -78,7 +79,11 @@ bool mitk::UndoController::Undo()
 //##ModelId=3F045196036A
 bool mitk::UndoController::Undo(bool fine)
 {
-  return m_CurUndoModel->Undo(fine);
+  bool ret = m_CurUndoModel->Undo(fine);
+  
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  
+  return ret;
 }
 
 //##ModelId=3E5F55E6003E
@@ -90,7 +95,11 @@ bool mitk::UndoController::Redo()
 //##ModelId=3F0451960398
 bool mitk::UndoController::Redo(bool fine)
 {
-  return m_CurUndoModel->Redo(fine);
+  bool ret = m_CurUndoModel->Redo(fine);
+  
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  
+  return ret;
 }
 
 //##ModelId=3F04519603B8

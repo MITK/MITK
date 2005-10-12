@@ -19,6 +19,13 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkPicFileReader.h"
 #include <itkImageFileReader.h>
+#include <mitkChiliPlugin.h>
+
+extern "C" 
+{
+ipPicDescriptor * MITKipPicGet( char *infile_name, ipPicDescriptor *pic );
+ipPicDescriptor * MITKipPicGetTags( char *infile_name, ipPicDescriptor *pic );
+}
 
 //##ModelId=3E1878400265
 void mitk::PicFileReader::GenerateOutputInformation()
@@ -41,7 +48,7 @@ void mitk::PicFileReader::GenerateOutputInformation()
     {
         ipPicDescriptor* header=ipPicGetHeader(const_cast<char *>(m_FileName.c_str()), NULL);
 
-        header=ipPicGetTags(const_cast<char *>(m_FileName.c_str()), header);
+        header=MITKipPicGetTags(const_cast<char *>(m_FileName.c_str()), header);
 
         if( header == NULL)
         {
@@ -85,7 +92,7 @@ void mitk::PicFileReader::GenerateOutputInformation()
                 if(header==NULL) 
                 {
                     header=ipPicGetHeader(fullName, NULL);
-                    header=ipPicGetTags(fullName, header);
+                    header=MITKipPicGetTags(fullName, header);
                 }
                 ++numberOfImages;
             }
@@ -164,7 +171,7 @@ void mitk::PicFileReader::GenerateData()
 
     if( m_FileName != "")
     {
-        ipPicDescriptor* pic=ipPicGet(const_cast<char *>(m_FileName.c_str()), output->GetPic());
+        ipPicDescriptor* pic=MITKipPicGet(const_cast<char *>(m_FileName.c_str()), output->GetPic());
         ConvertHandedness(pic);
 
         //slice-wise reading
@@ -205,7 +212,7 @@ void mitk::PicFileReader::GenerateData()
 
             sprintf(fullName, m_FilePattern.c_str(), m_FilePrefix.c_str(), m_StartFileIndex+position);
 
-            pic=ipPicGet(fullName, pic);
+            pic=MITKipPicGet(fullName, pic);
             if(pic==NULL)
             {
                 itkDebugMacro("Pic file '" << fullName << "' does not exist."); 

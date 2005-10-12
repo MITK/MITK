@@ -255,6 +255,7 @@ namespace CommonFunctionality
 #ifdef MBI_INTERNAL
   void SaveDirectedVesselGraph( mitk::DirectedVesselGraphData* graph, const char* fileName = NULL );
   void SaveUndirectedVesselGraph( mitk::UndirectedVesselGraphData* graph, const char* fileName = NULL );
+  void SaveUndirectedVesselGraphAsHOC( mitk::UndirectedVesselGraphData* graph, const char* fileName = NULL );
 #endif
 
   void SaveBaseData( mitk::BaseData* data, const char* name = NULL );

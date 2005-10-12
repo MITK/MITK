@@ -5,6 +5,7 @@
 #ifdef MBI_INTERNAL
 #include "mitkVesselGraphData.h"
 #include "mitkVesselGraphFileWriter.h"
+#include "mitkHOCVesselGraphFileWriter.h"
 #endif
 #define QMITKCOMMONFUNCTIONALITYIMPLEMENTATION
 #include "QmitkCommonFunctionality.h"
@@ -81,6 +82,34 @@ void CommonFunctionality::SaveUndirectedVesselGraph( mitk::UndirectedVesselGraph
     writer->Update();
   }
 }
+
+
+void CommonFunctionality::SaveUndirectedVesselGraphAsHOC( mitk::UndirectedVesselGraphData* graph, const char* aFileName)
+{
+  if(graph == NULL)
+  {
+    std::cout << "Warning in file " << __FILE__<< " line " << __LINE__ <<": vessel graph is NULL!" << std::endl;
+    return;
+  }
+  QString fileName;
+  if (aFileName == NULL)
+  {
+    fileName = QFileDialog::getSaveFileName(QString("neuron.hoc"),"Neuron file format (*.hoc)");
+  }
+  else
+    fileName = aFileName;
+
+  if (fileName.isEmpty() == false )
+  {
+    mitk::HOCVesselGraphFileWriter::Pointer writer = mitk::HOCVesselGraphFileWriter::New();
+    writer->SetInput( graph );
+    writer->SetFileName( fileName.ascii() );
+    writer->Update();
+  }
+}
+
+
+
 #endif
 
 /**
@@ -130,7 +159,8 @@ void CommonFunctionality::SaveBaseData( mitk::BaseData* data, const char * aFile
     mitk::UndirectedVesselGraphData::Pointer uvg = dynamic_cast<mitk::UndirectedVesselGraphData*>(data);
     if (uvg.IsNotNull())
     {
-      CommonFunctionality::SaveUndirectedVesselGraph(uvg.GetPointer(), aFileName);
+      //CommonFunctionality::SaveUndirectedVesselGraph(uvg.GetPointer(), aFileName);
+      CommonFunctionality::SaveUndirectedVesselGraphAsHOC(uvg.GetPointer(), NULL);
     }
 
     mitk::DirectedVesselGraphData::Pointer dvg = dynamic_cast<mitk::DirectedVesselGraphData*>(data);

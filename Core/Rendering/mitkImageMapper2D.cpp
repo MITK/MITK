@@ -431,6 +431,8 @@ void mitk::ImageMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
   {
     if(!GetLevelWindow(levelWindow,renderer,"levelWindow"))
       GetLevelWindow(levelWindow,renderer);
+    if(levelWindow.GetMin()<-1024)
+      levelWindow.SetMin(-1024);
     image->setExtrema(levelWindow.GetMin(), levelWindow.GetMax()); 
   }
 }

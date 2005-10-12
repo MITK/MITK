@@ -420,7 +420,7 @@ void QmitkDataManagerControls::Info_clicked()
     info->m_TabWidget->setCurrentPage(1);
     info->m_DataNodeName->setText(selected->text(0));
     ::itk::OStringStream itkOutput;
-    if(selected->GetDataTreeNode()->GetInteractor()!=NULL)
+    if(selected->GetDataTreeNode()->GetInteractor().IsNotNull())
       selected->GetDataTreeNode()->GetInteractor()->Print(itkOutput);
     selected->GetDataTreeNode()->GetData()->Print(itkOutput);
     info->m_teOutputPane->append("--------------------DataInfo--------------------");

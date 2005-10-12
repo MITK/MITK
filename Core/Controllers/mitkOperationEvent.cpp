@@ -129,7 +129,8 @@ mitk::OperationEvent::OperationEvent(OperationActor* destination,
 //##ModelId=3F0451960212
 mitk::OperationEvent::~OperationEvent()
 {
-  // nothing to do
+  delete m_Operation;
+  delete m_UndoOperation;
 }
 
 //##ModelId=3E957C1102E3

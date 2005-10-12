@@ -168,6 +168,10 @@ void mitk::LevelWindow::SetAuto(mitk::Image* image, bool tryPicTags, bool guessB
       minValue = wholeImage->GetScalarValue2ndMin();
       maxValue = wholeImage->GetScalarValue2ndMaxNoRecompute();
   }
+  if (minValue == maxValue)
+  {
+    maxValue = minValue+1;
+  }
   SetRangeMin(minValue);
   SetRangeMax(maxValue);
   SetMinMax(minValue, maxValue);

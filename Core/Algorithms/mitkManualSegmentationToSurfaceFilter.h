@@ -12,8 +12,8 @@ namespace mitk {
 /**
  * @brief Smooths 3D pixel data and create surface.
  *
- * The resulting image can be smoothed by a Median3D and a Gaussian Filter. When using Median3D 
- * with a kernel size from 3 in every direction the result can change the topology of the object.
+ * The resulting image can be smoothed by a Median3D and a Gaussian Filter. If interpolation
+ * is used all voxels are resized to 1mm in each direction.
  *
  * @ingroup ImageFilters
  * @ingroup Process

@@ -26,7 +26,6 @@ void mitk::ManualSegmentationToSurfaceFilter::GenerateData()
     vtkimage->Register(NULL);
 
     // Median -->smooth 3D 
-    // WARNING! possible loose of surface after interpolation.
     if(m_MedianFilter3D)
     {
       vtkImageMedian3D *median = vtkImageMedian3D::New();
@@ -51,18 +50,6 @@ void mitk::ManualSegmentationToSurfaceFilter::GenerateData()
       imageresample->InterpolateOn();//OFF: pixel replication is used 
       vtkimage=imageresample->GetOutput();
       vtkimage->UpdateInformation();
-    }
-
-    // Median -->smooth 2. mal ;-(
-    if(m_MedianFilter3D)
-    {
-      vtkImageMedian3D *median = vtkImageMedian3D::New();
-      median->SetInput(vtkimage); //RC++
-      vtkimage->Delete();//RC--
-      median->SetKernelSize(m_MedianKernelSizeX,m_MedianKernelSizeY,m_MedianKernelSizeZ);//Std: 3x3x3
-      median->ReleaseDataFlagOn();
-      median->UpdateInformation();
-      vtkimage = median->GetOutput(); 
     }
 
     if(m_UseStandardDeviation)//gauss

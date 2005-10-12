@@ -1,11 +1,9 @@
 #include "mitkManualSegmentationToSurfaceFilter.h"
-//#include <iostream>
+
 
 mitk::ManualSegmentationToSurfaceFilter::ManualSegmentationToSurfaceFilter() 
-  : m_MedianKernelSizeX(3), m_MedianKernelSizeY(3), m_MedianKernelSizeZ(3), m_StdDeviation(1.5)
-{}
-mitk::ManualSegmentationToSurfaceFilter::~ManualSegmentationToSurfaceFilter() 
-{}
+  : m_MedianKernelSizeX(3), m_MedianKernelSizeY(3), m_MedianKernelSizeZ(3), m_StandardDeviation(1.5){};
+mitk::ManualSegmentationToSurfaceFilter::~ManualSegmentationToSurfaceFilter(){};
 
 
 void mitk::ManualSegmentationToSurfaceFilter::GenerateData() 
@@ -27,8 +25,9 @@ void mitk::ManualSegmentationToSurfaceFilter::GenerateData()
     //Inkrement Referenzcounter Counter (hier: RC)
     vtkimage->Register(NULL);
 
-    // Median -->smooth
-    if(m_UseMedianFilter3D)
+    // Median -->smooth 3D 
+    // WARNING! possible loose of surface after interpolation.
+    if(m_MedianFilter3D)
     {
       vtkImageMedian3D *median = vtkImageMedian3D::New();
       median->SetInput(vtkimage); //RC++
@@ -45,37 +44,17 @@ void mitk::ManualSegmentationToSurfaceFilter::GenerateData()
       vtkImageResample * imageresample = vtkImageResample::New();
       imageresample->SetInput(vtkimage);
 
-      //Spacing Manual or Original (Original spacing is lost during image processing - 
-      
+      //Spacing Manual or Original (Original spacing is lost during image processing)      
       imageresample->SetAxisOutputSpacing(0, 1);
       imageresample->SetAxisOutputSpacing(1, 1);
       imageresample->SetAxisOutputSpacing(2, 1); //auf 1 interpoliert
       imageresample->InterpolateOn();//OFF: pixel replication is used 
-      
-      //int extent[6];
-      //vtkimage->GetWholeExtent(extent);
-      //double spacing[3];
-      //vtkimage->GetSpacing(spacing);
-      //cout << "0. spacing vtkimage: [0]" << spacing[0]<<"  ::[1]"<< spacing[1]<<"  ::[2]"<< spacing[2]  <<"\n";
-      //cout << "1. dimensions vtkimage: " << extent[1]<<"x"<< extent[3]<<"x"<< extent[5]  <<"\n";
-      //cout << "2. Dimensionen: " << imageresample->GetDimensionality()   <<"\n";
-      //cout << "3. GetAxisMagnificationFactor: " << imageresample->GetAxisMagnificationFactor (0)<< " x "
-      //    << imageresample->GetAxisMagnificationFactor (1) << " x "
-      //    << imageresample->GetAxisMagnificationFactor (2) <<"\n";
-      //cout << "4. interpolated? "<< imageresample->GetInterpolate()<<endl;
-
       vtkimage=imageresample->GetOutput();
       vtkimage->UpdateInformation();
-      
-      //vtkimage->GetWholeExtent(extent);
-      //vtkimage->GetSpacing(spacing);
-      //cout << "10. dimensions vtkimage: " << extent[1]<<"x"<< extent[3]<<"x"<< extent[5]  <<"\n";
-      //cout << "11. spacing vtkimage: [0]" << spacing[0]<<"  ::[1]"<< spacing[1]<<"  ::[2]"<< spacing[2]  <<"\n";
-      
     }
 
     // Median -->smooth 2. mal ;-(
-    if(m_UseMedianFilter3D)
+    if(m_MedianFilter3D)
     {
       vtkImageMedian3D *median = vtkImageMedian3D::New();
       median->SetInput(vtkimage); //RC++
@@ -104,7 +83,7 @@ void mitk::ManualSegmentationToSurfaceFilter::GenerateData()
       vtkimagethreshold->Delete(); //RC--
       gaussian->SetDimensionality(3);
       gaussian->SetRadiusFactor(0.49);
-      gaussian->SetStandardDeviation( m_StdDeviation );
+      gaussian->SetStandardDeviation( m_StandardDeviation );
       gaussian->ReleaseDataFlagOn();
       gaussian->UpdateInformation();
       vtkimage = gaussian->GetOutput();

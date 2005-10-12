@@ -18,21 +18,12 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include "mitkImageToSurfaceFilter.h"
-#if VTK_MAJOR_VERSION >= 5
-#define USE_VTK_DECIMATE_PRO
-#endif
-
-#ifdef USE_VTK_DECIMATE_PRO
+#include <vtkImageData.h>
 #include <vtkDecimatePro.h>
-#else
-#include <vtkDecimate.h>
-#endif
 
 mitk::ImageToSurfaceFilter::ImageToSurfaceFilter()
-  : m_SetSmooth(false), m_SetDecimate(false)
-  { }
+  : m_Smooth(false), m_Decimate(false), m_TargetReduction(0.05f){};
 mitk::ImageToSurfaceFilter::~ImageToSurfaceFilter(){};
-
 
 
 void mitk::ImageToSurfaceFilter::CreateSurface(int time, vtkImageData *vtkimage, mitk::Surface * surface, const ScalarType threshold)
@@ -47,14 +38,14 @@ void mitk::ImageToSurfaceFilter::CreateSurface(int time, vtkImageData *vtkimage,
   vtkMarchingCubes *skinExtractor = vtkMarchingCubes::New();
   skinExtractor->SetInput(vtkimage);//RC++
   vtkimage->Delete();//RC--
-  skinExtractor->SetValue(0, threshold); 
+  skinExtractor->SetValue(0, threshold);
   polydata = skinExtractor->GetOutput();
-  
-  if (m_SetSmooth)  
+
+  if (m_Smooth)
   {
     int spIterations =50;
     float spRelaxation =0.1;
-    
+
     vtkSmoothPolyDataFilter *smoother = vtkSmoothPolyDataFilter::New();
     //read poly1 (poly1 can be the original polygon, or the decimated polygon)
     smoother->SetInput(polydata);//RC++
@@ -66,45 +57,33 @@ void mitk::ImageToSurfaceFilter::CreateSurface(int time, vtkImageData *vtkimage,
     smoother->BoundarySmoothingOff();
     smoother->SetConvergence( 0 );
 
-    polydata = smoother->GetOutput(); 
+    polydata = smoother->GetOutput();
 
   }
 
   //decimate = to reduce number of polygons
-  if(m_SetDecimate)
+  if(m_Decimate)
   {
-#ifdef USE_VTK_DECIMATE_PRO
     vtkDecimatePro *decimate = vtkDecimatePro::New();
     decimate->SplittingOff();
-#else
-    vtkDecimate *decimate = vtkDecimate::New();
-    decimate->PreserveEdgesOn();
-    decimate->GenerateErrorScalarsOn();
-    decimate->SetInitialError(0.0005);
-    decimate->SetErrorIncrement(0.0005);
-    decimate->SetMaximumIterations(10);
-
-    decimate->SetInitialFeatureAngle(15);
-    decimate->SetFeatureAngleIncrement(5);
-    decimate->SetMaximumFeatureAngle(30);
-
-    decimate->SetAspectRatio(10);
-#endif
-    
+    decimate->AccumulateErrorOn();
+  	decimate->SetAccumulateError(0.0005);
+  	decimate->SetErrorIsAbsolute(5);
+  	decimate->SetFeatureAngle(30);
     decimate->PreserveTopologyOn();
     decimate->BoundaryVertexDeletionOff();
     decimate->SetDegree(10); //std-value is 25!
-    
+
     decimate->SetInput(polydata);//RC++
     polydata->Delete();//RC--
-    decimate->SetTargetReduction(0.05f);
+    decimate->SetTargetReduction(m_TargetReduction);
 
-    
+
     decimate->SetReleaseDataFlag(true);
     decimate->SetMaximumError(0.002);
 
     polydata = decimate->GetOutput();
-  
+
   }
 
 
@@ -118,7 +97,7 @@ void mitk::ImageToSurfaceFilter::GenerateData()
   mitk::Surface *surface = this->GetOutput();
   mitk::Image * image        =  (mitk::Image*)GetInput();
   mitk::Image::RegionType outputRegion = image->GetRequestedRegion();
- 
+
   int tstart=outputRegion.GetIndex(3);
   int tmax=tstart+outputRegion.GetSize(3); //GetSize()==1 - will aber 0 haben, wenn nicht zeitaufgelöst
 
@@ -131,29 +110,13 @@ void mitk::ImageToSurfaceFilter::GenerateData()
 }
 
 
-void mitk::ImageToSurfaceFilter::GenerateOutputInformation()
-{
-  mitk::Image::ConstPointer input = this->GetInput();
-  mitk::Surface::Pointer output  = this->GetOutput();
-
-  itkDebugMacro(<<"GenerateOutputInformation()");
-  if(input.IsNull()) return;
-
-  itkDebugMacro(<<"GenerateOutputInformation()");
-}
-
-
-
 void mitk::ImageToSurfaceFilter::SetInput(const mitk::Image *image)
 {
-  // Process object is not const-correct so the const_cast is required here  
+  // Process object is not const-correct so the const_cast is required here
   this->ProcessObject::SetNthInput(0, const_cast< mitk::Image * >( image ) );
 }
 
 
-/**
-* Get image input
-*/
 const mitk::Image *mitk::ImageToSurfaceFilter::GetInput(void)
 {
   if (this->GetNumberOfInputs() < 1)
@@ -163,4 +126,19 @@ const mitk::Image *mitk::ImageToSurfaceFilter::GetInput(void)
 
   return static_cast<const mitk::Image * >
     ( this->ProcessObject::GetInput(0) );
+}
+
+
+void mitk::ImageToSurfaceFilter::GenerateOutputInformation()
+{
+  mitk::Image::ConstPointer inputImage  =(mitk::Image*) this->GetInput();
+  
+  //mitk::Image *inputImage = (mitk::Image*)this->GetImage();
+  mitk::Surface::Pointer output = this->GetOutput();
+
+  itkDebugMacro(<<"GenerateOutputInformation()");
+
+  if(inputImage.IsNull()) return;
+  
+  //Set Data
 }

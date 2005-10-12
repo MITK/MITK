@@ -17,8 +17,8 @@ namespace mitk {
 /**
  * @brief Converts pixel data to surface data
  *
- * The resulting surface has the same size as the input image. The image is smoothed by 
- * vtkDecimate and vtkSmoothPolyDataFilter. Both are enabled by default. It's also posible 
+ * The resulting surface has the same size as the input image. The image is smoothed by
+ * vtkDecimatePro and vtkSmoothPolyDataFilter. Both are enabled by default. It's also possible
  * to create time sliced surfaces.
  *
  * @ingroup ImageFilters
@@ -27,7 +27,7 @@ namespace mitk {
 
 class ImageToSurfaceFilter : public SurfaceSource
 {
-public:  
+public:
   mitkClassMacro(ImageToSurfaceFilter, SurfaceSource);
   itkNewMacro(Self);
 
@@ -38,51 +38,68 @@ public:
   virtual void GenerateOutputInformation();
   //virtual void GenerateInputRequestRegion();
 
-  /** 
-  * Set/Get *image input 3D or 4D
+  /**
+  * Set/Get *image input 3D or 3D+t
   */
   const mitk::Image *GetInput(void);
+  
+  /**
+  * Set/Get *image input 3D or 3D+t
+  */
   virtual void SetInput(const mitk::Image *image);
 
   /**
-  * Set disired threshold for input image e.g. 1 for binary
+  * Set disired threshold for input image 1 for binary
   */
   itkSetMacro(Threshold, ScalarType);
+
+  /**
+  * Get Threshold from SkinExtractor. Threshold can be manipulated by inherited classes.
+  */
   itkGetConstMacro(Threshold, ScalarType);
 
   /*
-  * Turn On/Off Surface smoothing
+  * Enable/Disale surface smoothing.
   */
-  itkSetMacro(SetSmooth,bool);
-  itkGetConstMacro(SetSmooth,bool);
-  itkBooleanMacro(SetSmooth);
+  itkGetConstMacro(Smooth,bool);
+  itkSetMacro(Smooth,bool);
+  itkBooleanMacro(Smooth);
+
+  /** Turn On/Off Decimate triangulars  */
+  itkGetConstMacro(Decimate,bool);
+  itkSetMacro(Decimate,bool);
+  itkBooleanMacro(Decimate);
 
   /**
-  * Turn On/Off Decimate triangulars
+  * Set disired TargetReduction for decimate traiangles
   */
-  itkSetMacro(SetDecimate,bool);
-  itkGetConstMacro(SetDecimate,bool);
-  itkBooleanMacro(SetDecimate);
+  itkSetMacro(TargetReduction, float);
+
+  /**
+  * Return reduction factor for VtkDecimatePro
+  */
+  itkGetConstMacro(TargetReduction, float);
 
 
 protected:
   ImageToSurfaceFilter();
   virtual ~ImageToSurfaceFilter();
 
-  /** 
+  /**
   * With the given threshold vtkMarchingcube creates the Surface. By default nothing
-  * will be done. Optionaly its possible to reduce the number of triangles (vtkDecimat)
-  * or smooth th data (vtkSmoothPolyDataFilter).
+  * will be done. Optional its possible to reduce the number of triangles (vtkDecimat)
+  * or smooth the data (vtkSmoothPolyDataFilter).
   * @param time selected slice or "0" for single
   * @param *vtkimage input image
-  * @param *surface output 
+  * @param *surface output
   * @param threshold can be different from SetThreshold()
   */
   void CreateSurface(int time, vtkImageData *vtkimage, mitk::Surface * surface, const ScalarType threshold);
-  
-  bool m_SetSmooth;
-  bool m_SetDecimate;
-  ScalarType m_Threshold; //für MarchingCube oder Gaus bei ManualSegmentationFilter
+
+  bool m_Smooth;
+  bool m_Decimate;
+  ScalarType m_Threshold; 
+  float m_TargetReduction;
 
 };
 

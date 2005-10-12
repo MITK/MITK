@@ -6,7 +6,12 @@
 #include <vtkSTLWriter.h>
 
 #include <fstream>
-
+/**
+* Test class for ManualSegmentationToSurfaceFilter and ImageToSurface
+* 1. Read an image
+* 2. Create a surface
+* 3. Create a Surface with all image processing facillities
+*/
 int mitkManualSegmentationToSurfaceFilterTest(int argc, char* argv[])
 {
   
@@ -18,10 +23,8 @@ int mitkManualSegmentationToSurfaceFilterTest(int argc, char* argv[])
   
   std::string path = argv[1];
   itksys::SystemTools::ConvertToUnixSlashes(path);
-  //std::string fileIn = path + "/Pic3DLeber.pic";
-  //std::string fileOut = path + "/Pic3DLeberSurfaceResult.stl";
-  std::string fileIn = path + "/Pic3D.pic";
-  std::string fileOut = path + "/Pic3DSurfaceResult.stl";
+  std::string fileIn = path + "/BallBinary30x30x30.pic.gz";
+  std::string fileOut = path + "/BallBinary30x30x30.stl";
 
   
   fileIn = itksys::SystemTools::ConvertToOutputPath(fileIn.c_str());
@@ -58,7 +61,7 @@ int mitkManualSegmentationToSurfaceFilterTest(int argc, char* argv[])
 
 
   mitk::ManualSegmentationToSurfaceFilter::Pointer filter;
-  std::cout << "Testing mitk::ManualSegmentationToSurfaceFilter::New(): ";
+  std::cout << "Instantiat mitk::ManualSegmentationToSurfaceFilter - implicit: mitk::ImageToSurface: ";
   filter = mitk::ManualSegmentationToSurfaceFilter::New();
 
   if (filter.IsNull())
@@ -75,7 +78,7 @@ int mitkManualSegmentationToSurfaceFilterTest(int argc, char* argv[])
   mitk::SurfaceVtkWriter<vtkSTLWriter>::Pointer writer = mitk::SurfaceVtkWriter<vtkSTLWriter>::New();
   if (filter.IsNull())
   {
-    std::cout<<"[FAILED]"<<std::endl;
+    std::cout<<"Instantiat SurfaceVtkWirter: [FAILED]"<<std::endl;
     return EXIT_FAILURE;
   }
   else {  
@@ -85,7 +88,7 @@ int mitkManualSegmentationToSurfaceFilterTest(int argc, char* argv[])
    
   }
   
-  std::cout << "Only create surface: ";
+  std::cout << "Create surface with default settings: ";
   filter->SetInput(image);
   writer->SetInput(filter->GetOutput());
   writer->Write();
@@ -101,14 +104,16 @@ int mitkManualSegmentationToSurfaceFilterTest(int argc, char* argv[])
      std::cout<<"[PASSED]"<<std::endl;
   }
  
-  std::cout << "Create surface with image preprocessing and smoothing: ";
-  filter->UseMedianFilter3DOn();
+  std::cout << "Create surface all optimised settings: ";
+  //configure ImageToSurfaceFilter
+  filter->MedianFilter3DOn();
+  filter->SetStandardDeviation(1.5);
   filter->SetInterpolationOn();
   filter->UseStandardDeviationOn();
-  //configure ImageToSurfaceFilter
   filter->SetThreshold( 1 ); //if( Gauss ) --> TH manipulated for vtkMarchingCube
-  filter->SetDecimateOn();
-  filter->SetSmoothOn();
+  filter->DecimateOn();
+  filter->SetTargetReduction(0.05f);
+  filter->SmoothOn();
 
   //filter->Update();
   writer->SetInput( filter->GetOutput() );

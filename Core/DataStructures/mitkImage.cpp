@@ -1188,7 +1188,7 @@ void mitk::Image::PrintSelf(std::ostream& os, itk::Indent indent) const
   os << indent << " Dimension: " << m_Dimension << std::endl;
   os << indent << " Dimensions: ";
   for(i=0; i < m_Dimension; ++i)
-    os << GetDimension(i);
+    os << GetDimension(i) << " ";
   os << std::endl;
 
   Superclass::PrintSelf(os,indent);

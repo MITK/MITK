@@ -52,6 +52,9 @@
  *   reads a PicFile from disk
  *
  * $Log$
+ * Revision 1.2  2005/10/13 07:52:55  max
+ * fixed warnings  Algorithms/mitkImageFilters/mitkImageToSurfaceFilter.h  Algorithms/mitkImageFilters/mitkManualSegmentationToSurfaceFilter.h  Algorithms/mitkImageIO/mitkIpPicGet.c
+ *
  * Revision 1.1  2005/10/12 19:08:51  ivo
  * ADD: substitute for ipPicGet: original always deletes data pointer and re-allocs it using malloc, which is not compatible with mitk::ImageDataItem.
  *
@@ -128,7 +131,7 @@ char * MITKstrdup (const char * string)
   if (!string)
     return(NULL);
 
-  if (memory = (char*)malloc(strlen(string) + 1))
+  if ( ( memory = (char*)malloc(strlen(string) + 1) ) )
     return(strcpy(memory,string));
 
   return(NULL);
@@ -330,7 +333,7 @@ _MITKipPicReadTags( _ipPicTagsElement_t *head, ipUInt4_t bytes_to_read, FILE *st
       ipPicTag_t tag_name;
       ipUInt4_t len;
 
-      /*printf( "bytes_to_read: %i\n", bytes_to_read ); /**/
+      /*printf( "bytes_to_read: %i\n", bytes_to_read ); */
 
       tsv = malloc( sizeof(ipPicTSV_t) );
 

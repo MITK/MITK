@@ -69,17 +69,24 @@ void CommonFunctionality::SaveUndirectedVesselGraph( mitk::UndirectedVesselGraph
   QString fileName;
   if (aFileName == NULL)
   {
-    fileName = QFileDialog::getSaveFileName(QString("VesselGraph.uvg"),"MITK VesselGraph (*.uvg)");
+    fileName = QFileDialog::getSaveFileName(QString("VesselGraph.uvg"),"MITK VesselGraph (*.uvg *.hoc)");
   }
   else
     fileName = aFileName;
 
   if (fileName.isEmpty() == false )
   {
-    mitk::VesselGraphFileWriter<Undirected>::Pointer writer = mitk::VesselGraphFileWriter<Undirected>::New();
-    writer->SetInput( graph );
-    writer->SetFileName( fileName.ascii() );
-    writer->Update();
+    if ( fileName.endsWith(".hoc") || fileName.endsWith(".HOC") ) 
+    {
+      CommonFunctionality::SaveUndirectedVesselGraphAsHOC( graph, fileName.latin1() );
+    }
+    else
+    {
+      mitk::VesselGraphFileWriter<Undirected>::Pointer writer = mitk::VesselGraphFileWriter<Undirected>::New();
+      writer->SetInput( graph );
+      writer->SetFileName( fileName.ascii() );
+      writer->Update();
+    }
   }
 }
 
@@ -159,14 +166,13 @@ void CommonFunctionality::SaveBaseData( mitk::BaseData* data, const char * aFile
     mitk::UndirectedVesselGraphData::Pointer uvg = dynamic_cast<mitk::UndirectedVesselGraphData*>(data);
     if (uvg.IsNotNull())
     {
-      //CommonFunctionality::SaveUndirectedVesselGraph(uvg.GetPointer(), aFileName);
-      CommonFunctionality::SaveUndirectedVesselGraphAsHOC(uvg.GetPointer(), NULL);
+      CommonFunctionality::SaveUndirectedVesselGraph(uvg.GetPointer(), NULL);
     }
 
     mitk::DirectedVesselGraphData::Pointer dvg = dynamic_cast<mitk::DirectedVesselGraphData*>(data);
     if (dvg.IsNotNull())
     {
-      CommonFunctionality::SaveDirectedVesselGraph(dvg.GetPointer(), aFileName);
+      CommonFunctionality::SaveDirectedVesselGraph(dvg.GetPointer(), NULL);
     }
 #endif
   }

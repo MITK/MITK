@@ -214,19 +214,24 @@ void mitk::SurfaceVtkMapper3D::ApplyProperties(vtkActor* actor, mitk::BaseRender
     m_Actor->GetProperty()->SetRepresentationToSurface();
   
   //do we have materials?
+  
   mitk::MaterialProperty* materialProperty = dynamic_cast<mitk::MaterialProperty *>(this->GetDataTreeNode()->GetProperty("material").GetPointer() );
   if ( materialProperty != NULL )
   {
     vtkProperty* property = m_Actor->GetProperty();
+    
+    //property->SetColor( materialProperty->GetColor().GetDataPointer() );
     property->SetAmbientColor( materialProperty->GetColor().GetDataPointer() );    
     property->SetAmbient( materialProperty->GetColorCoefficient() );    
     property->SetDiffuseColor(materialProperty->GetColor().GetDataPointer() );    
-    property->SetDiffuse( materialProperty->GetColorCoefficient() );    
+    property->SetDiffuse( materialProperty->GetColorCoefficient() );
     property->SetSpecularColor( materialProperty->GetSpecularColor().GetDataPointer() );
     property->SetSpecular( materialProperty->GetSpecularCoefficient() );
     property->SetSpecularPower( materialProperty->GetSpecularPower() );
     property->SetOpacity( materialProperty->GetOpacity() );
     property->SetInterpolation( materialProperty->GetVtkInterpolation() );
     property->SetRepresentation( materialProperty->GetVtkRepresentation() );
+    
   }
+  
 }

@@ -32,6 +32,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkPolyData.h>
 #include <vtkStructuredPointsReader.h>
 #include <vtkStructuredPoints.h>
+#include <vtkLookupTable.h>
 #if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
 #include <vtkXMLImageDataReader.h>
 #endif
@@ -62,6 +63,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkImage.h"
 #include "mitkUSLookupTableSource.h"
 #include "mitkLookupTableProperty.h"
+#include "mitkLookupTable.h"
 #include "mitkImageChannelSelector.h"
 #include "mitkImageSliceSelector.h"
 #ifdef MBI_INTERNAL
@@ -825,6 +827,22 @@ void mitk::DataTreeNodeFactory::ReadFileTypeITKImageIOFactory()
     levWinProp->SetLevelWindow( levelwindow );
     node->GetPropertyList()->SetProperty( "levelwindow", levWinProp );
   }
+  /*
+  mitk::LookupTable::Pointer mitkLut = mitk::LookupTable::New();
+  vtkLookupTable* vtkLut = mitkLut->GetVtkLookupTable();
+  vtkLut->SetHueRange(0.6667, 0.0);
+  vtkLut->SetTableRange(0.0, 20.0);
+  vtkLut->Build();
+  
+  mitkLut->ChangeOpacityForAll(0.5);
+  mitkLut->ChangeOpacity(0, 0.0);
+  
+  
+  mitk::LookupTableProperty* mitkLutProp = new mitk::LookupTableProperty();
+  mitkLutProp->SetLookupTable(*mitkLut);
+  node->SetProperty( "LookupTable", mitkLutProp );
+  */
+  
   std::cout << "...finished!" << std::endl;
 }
 

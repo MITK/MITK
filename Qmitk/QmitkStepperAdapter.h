@@ -30,8 +30,8 @@ PURPOSE.  See the above copyright notices for more information.
 //##
 //## The constructor has to be provided with the \a Navigator 
 //## that wants to use the \a Stepper. The \a Navigator has to define the
-//## slots \a Refetch() and \a SetStepper(mitk::Stepper *). \a SetStepper will only
-//## called once to pass the \a Stepper to the \a Navigator. When the values of
+//## slots \a Refetch() and \a SetStepper(mitk::Stepper *). \a SetStepper will be
+//## called only once to pass the \a Stepper to the \a Navigator. When the values of
 //## the \a Stepper changes, \a Refetch() will be called. The \a Navigator can than
 //## ask the \a Stepper for its new values.
 //## \warning The \a Navigator has to be aware that it might have caused the changes 

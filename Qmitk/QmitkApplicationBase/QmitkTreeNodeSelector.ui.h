@@ -11,7 +11,9 @@
 *****************************************************************************/
 
 /**
-  \class QmitkTreeNodeSelector. A simple ComboXBox for selecting an image node
+  \class QmitkTreeNodeSelector
+  
+  A simple ComboXBox for selecting an image node
 */
 #include "mitkDataTreeNode.h"
 #include "QmitkCommonFunctionality.h"

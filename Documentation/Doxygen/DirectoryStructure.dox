@@ -1,8 +1,6 @@
 /**
 \page DirectoryStructurePage Directory Structure
 
-\warning This is the proposal as discussed in the meeting from 27.10.2003. If nobody objects, it will be considered final on 30.10.2003.
-
 There are eight directories on the top level, each containing several sub-directories that contain the implementation. Thus, as far as code is concerned, the depth of the directory structure is limited to two. Classes in a sub-directory may reference classes in other sub-directories on the same level and in sub-directories that have already been mentioned, when you the following list from top to bottom:
 \li \a DataStructures: contains sub-directories with data classes. Besides the actual data storage classes, the same sub-directory may contain functions inherently associated to the data storage class in the sense of object-oriented programming. For example a container class may include methods like \a add, \a remove, \a addSorted (add and keep the container sorted), and comparison operators. Classes in a directory may reference classes in other data-directories, but \em not in any of the other seven directories at the top level.
 \li \a Algorithms: contains sub-directories with algorithms, which may reference other algorithms and data-structures. 
@@ -20,11 +18,6 @@ If the classes within a sub-directory are implemented according to the mechanism
 If a file contains a class that is within a namespace, the file name \em must begin with the namespace name, e.g.  mitkImage.h and mitkImage.cpp contain the class mitk::Image. Namespace names are normally identical to toolkit acronyms. Consequently, name of the directory will begin with the acronym according to the previous section.
 
 \section Compilation Conventions
-Files created during compilation should be stored in a separate directory tree parallel to the source tree (e.g. \a ip++Binary). For mitk, cmake should be used.
+Files created during compilation should be stored in a separate directory tree parallel to the source tree (e.g. \a mitkBinary). For mitk, cmake should be used.
 
-\section Obsolete Directories
-There are two proposals, how to deal with obsolete directories:
-\li simply remove the contents with \a cvs \a remove. It has to be checked, whether it is possible to suppress such empty directories also in webcvs.
-\li move the obsolete directory to the respective folder in a cvs-repository \a ip++Attic.
-Maybe even a combination of both is reasonable: Use the first method, if a directory is no longer needed because a better method for the same purpose is available; use the second method, if the contents has been re-distributed to other directories.
 */

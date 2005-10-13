@@ -1,11 +1,14 @@
 /**
 \page NewFunctionalityPage How to create a new functionality
 
-\section Build the graphical functionality generator 
-\li Do a CVS checkout of mitk.
-\li Configure a cmake-Build for the Directory Build/Tools/InsertNewFunctionality
-\li Build it (does not work on Windows yet, CMake bug)
-\section Start the graphical functionality generator 
-\li On windows: double click on the generated InsertNewFunctionality.jar
+In the directory Build/Tools/InsertNewFunctionality
+\li On windows: double click on the generated <tt>InsertNewFunctionality.jar</tt>
 \li On linux: <tt>java -jar InsertNewFunctionality.jar</tt>
+
+Fill in the name of your functionality (e.g. "QmitkFooBar"). Then press Enter to fill the remaining fields with default values.
+
+The program creates a directory Functionalities/QmitkFooBar, which contains all the files belonging to your functionality.
+The QmitkFooBarControls.ui.h should handle the graphical user interface, while the QmitkFooBar.cpp should do the actual work.
+
+Build the project again.
 */

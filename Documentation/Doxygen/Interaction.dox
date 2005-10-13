@@ -28,6 +28,8 @@ A deterministic Mealy-statemachine has always one current state (here state 1). 
 Several actions can be defined in one transition. The execution of an action is the active part of the statemachine. Here is where the statemachine can make changes in data, e.g. add a Point into a list.
 
 
+See mitk::StateMachine, mitk::State, mitk::Event, mitk::Action, mitk::Transition, mitk::Interactor
+
 \subsection GuardState Guard States
 Guard States are a special kind of states. The action, that is executed after the state is set as current state, sends a new event to the statemachine, which leads out of the guard state. So the statemachine will only stay in a guard state for a short time. This kind of state is used to check different conditions, e.g. is an Object is picked of a set of points will be full after the addition of one point.
 
@@ -76,9 +78,12 @@ But now a new instance of the class "PointSetInteractor" has to be build. So we 
 \subsection StartupInteraction Loading Statemachines at Runtime
 During startup all statemachine-patterns are ckecked for not having states, that have no transitions leading out of it (dead states), or states, that have no transitions leading into it (magic states) [Bin99 p. 183]. If an error is found, an error-message will be displayed \b and the statemachine will be loaded.
 
+See mitk::StateMachineFactory
 
 \subsection Events Events
 During runtime, events are thrown from e.g. the mouse to the operationsystem, are then send to your graphical user interface and from there it has to be send to the MITK-object called \a mitkEventMapper. This class maps the events recieved with an internal list of all events that can be understood in MITK. The definition of all understandable events is also located in the XML-File the statemachines are defined in. If the recieved event can be found in the list, an internal mitk-eventnumber is added to the event and send to the object \a mitkGlobalInteraction. 
+
+See mitk::Event, mitk::GlobalInteraction
 
 \subsection GlobalInteraction GlobalInteraction
 This object administers the transmitt of events to registered statemachines. There can be two kinds of statemachines, the ones that are only listening and ones that also change data. Listening statemachines are here called Listeners and statemachines, that also change data, are called Interactors. \b Note that the dicrimination between \a Listener and \a Interactor is only made in mitkGlobalInteraction.Both, \a Listeners and \a Interactors, are of class \a mitkInteractor. See the interaction class diagramm for further information. 
@@ -90,9 +95,13 @@ So after the object \a GlobalInteraction has recieved an event, it sends this ev
 Due to the realization of an hierarchical statemachine mechanism (see press) the class \a Interactor has also a mode, which can be one of the following: deselected, subselected, selected. These modes are also used for the event mechanism.
 If a statemachine or better called an interactor is in a state, where the user builds up a graphical object, it is likely, that the following events are also for the build of the object. Here the interactor is in mode selected as long as the interactor couldn't handle an event. Then it changes to mode deselected. The mode changes are done in the actions through operations (described further down) and so declared inside the interaction pattern.
 
+See mitk::GlobalInteraction
+
 \subsection Interactors Interactors
 The class \a Interactor is the superclass for all statemachines, that solve the interaction for a single data-object.
 An example is the class \a mitkPointSetInteractor which handles the interaction of the data \a mitkPointSet. Inside the class \a mitkPointSetInteractor all actions, defined in the interaction-pattern "pointsetinteractor", are implemented. Inside the implementation of these actions (\a ExecuteAction(...) ), so called \a mitkOperations are created, filled with information and send to the \a mitkUndoController and to \a mitkOperactionActor (the data, the interaction is handled for).
+
+See mitk::Interactor
 
 \subsection ExecOperations Executing Operations
 The class mitkOperation and its subclasses basically holds all information needed to execute a certain change of data.
@@ -100,9 +109,13 @@ This change of data is only done inside the data-class itself, which is derived 
 
 When the operation-object, here called do-operation, is created inside the method \a ExecuteAction (in class \a mitkInteractor), an undo-operation is also created and together with the do-operation stored in an object called \a OperationEvent. After the Interactor has sent the do-operation to the data, the operaction-event-object then is sent to the instance of class \a mitkUndoController, which administrates the undo-mechanism.
 
+See mitk::Operation, mitk::OperationActor
+
 \subsection UndoController UndoController
 The instance of class \a mitkUndoController administrates different Undo-Models. Currently implemented is a limited linear Undo. 
 Only one Undo-Model can be activated at a time. The UndoController sends the recieved operactionEvents further to the current Undo-Model, which then stores it according to the model. If the method \a Undo() of UndoController is called (e.g. Undo-Button pressed from ) the call is send to the current Undo-Model. Here the undo-operation from the last operationEvent in list is taken and send to the data, referenced in a pointer which is also stored in the operation-event. A call of the method \a Redo() is handled accordingly.
+
+See mitk::UndoController, mitk::LimitedLinearUndo
 
 \subsection references References
 [Bin99] Robert V. Binder. Testing Object-Oriented Systems: Models, Patterns, and Tools. Addison-Wesley, 1999

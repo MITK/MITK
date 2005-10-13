@@ -36,15 +36,12 @@ MITK re-uses virtually anything from vtk and itk. Thus, it is not at all a compe
 an extension, which tries to ease the combination of both and to add the features outlined above.
 
 \section FurtherReading Further Reading
-\ref OverviewPage "Overview"
 
-<a href="modules.html">Details</a>
+\ref Concepts 
 
-\ref StylesAndNotesPage "Style Guide and Technical Notes"
+\ref Development 
 
-\ref DirectoryStructurePage "Directory Structure"
-
-\ref TutorialPage "Tutorial"
+<!--\ref UserManual -->
 */
 
 

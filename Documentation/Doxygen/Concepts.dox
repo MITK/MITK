@@ -1,0 +1,10 @@
+/**
+\page Concepts MITK concepts
+
+The following items describe some issues about MITK on a more abstract level. 
+
+If you want to start using MITK, you also want to see \ref Development
+
+\li \ref OverviewPage
+\li \ref InteractionPage
+*/

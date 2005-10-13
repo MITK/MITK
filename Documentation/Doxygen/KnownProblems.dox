@@ -2,16 +2,7 @@
 
 \page KnownProblemsPage Known Problems
 
-@bug 1:Switching from QmitkRegistration to another functionality sometimes takes a long time, probably because of a resize of an invisible OpenGL widget.
+\li Visual Studio 6 is currently not supported.
+\li Sometimes remote X sessions will display black rendering windows. It is not known whether this is a problem within MITK or within the X implementation.
 
-@bug 2:QmitkRegistration: Application crashes when pressing the "start registration" button without previously selecting both, fixed and moving image.
-
-@bug 3:Functionalities influence each other because they all work on the same data, i.e. when changing colors of the 2D planes in one functionality it will be the same color in the other functionalities and so on. Also all data sets added to the tree are visible in all functionlities! Its not a Bug, its a feature!
-
-@bug 4:Functionalities: The activated method is called twice - side effect when adding a state machine to GlobalInteraction in activated and removing it in deactivated one statemachine will remain. By the way, the same state machine pointer can be added more than once shouldn't this be impossible??? -->has to be replaced!
-
-@bug 5:mapped view in coronary mapping is a 2D view. Thus it is possible to interact like the usual views. The bug causes the interaction to operate strange! Selection of points is buggy! Has to be checked!
-
-@todo 1: remove Geometry2DData; derive Geometry3D from BaseData; derive a class StackedGeometry from Geometry3D, which contains Geometry2D's; derive Geometry2D from Geometry3D.
-@todo 2: derive DataTreeNode from DataObject instead of BaseData, since otherwise we have duplicated Geometry information.
 */

@@ -15,7 +15,7 @@
 namespace mitk {
 
 
-  class MovieGeneratorWin32 : public MovieGenerator
+class MovieGeneratorWin32 : public MovieGenerator
 {
 
 public:
@@ -24,7 +24,7 @@ public:
   itkNewMacro(Self);
 
   virtual void SetFileName( const char *fileName );
-    
+
 
 protected:
 
@@ -43,32 +43,32 @@ protected:
   virtual bool TerminateGenerator();
 
   //! name of output file
-	_bstr_t m_sFile;			
+  _bstr_t m_sFile;
 
   //! frame rate 
-	DWORD m_dwRate;	
+  DWORD m_dwRate;
 
   //! structure contains information for a single stream
-	BITMAPINFOHEADER m_bih;	
+  BITMAPINFOHEADER m_bih;
 
   //! last error string
-	_bstr_t m_sError;
+  _bstr_t m_sError;
 
 
 private:
 
-	//! frame counter
-	long m_lFrame;
+  //! frame counter
+  long m_lFrame;
 
   //! file interface pointer
-	PAVIFILE m_pAVIFile;
+  PAVIFILE m_pAVIFile;
 
   //! Address of the stream interface
-	PAVISTREAM m_pStream;		
+  PAVISTREAM m_pStream;
 
   //! Address of the compressed video stream
-	PAVISTREAM m_pStreamCompressed; 
-  
+  PAVISTREAM m_pStreamCompressed; 
+
 };
 
 } // namespace mitk

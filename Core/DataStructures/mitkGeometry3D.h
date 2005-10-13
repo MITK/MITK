@@ -419,7 +419,7 @@ protected:
   bool m_ImageGeometry;
 
   //##Documentation
-  //## \breif Spacing of the data. Only significant if the geometry describes 
+  //## @brief Spacing of the data. Only significant if the geometry describes 
   //## an Image (m_ImageGeometry==true).
   mitk::Vector3D m_Spacing;
 

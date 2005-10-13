@@ -31,6 +31,9 @@ template<class T>
 class TexCoord2 : public Tuple2<T> {
 /*
  * $Log$
+ * Revision 1.3  2005/10/13 13:42:39  maleike
+ * FIX: doxygen warnings
+ *
  * Revision 1.2  2003/04/22 14:42:11  max
  * made inclusions of vecmath header files "local" (for gcc 3.3 support)
  *
@@ -61,7 +64,7 @@ public:
 
     /**
       * Constructs and initializes a TexCoord2 from the specified array.
-      * @param p the array of length 2 containing xy in order
+      * @param v The array of length 2 containing xy in order
       */
     TexCoord2(const T v[]): Tuple2<T>(v) { }
 

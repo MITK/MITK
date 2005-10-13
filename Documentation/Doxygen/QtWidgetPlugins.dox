@@ -130,7 +130,7 @@ static const char *undoredobutton_xpm[] = {
 };
 \endcode
 
-The \i keys() method tells the Designer a number of widgets your plugin can construct. You simply
+The <i>keys()</i> method tells the Designer a number of widgets your plugin can construct. You simply
 return a <a href="http://doc.trolltech.com/3.3/qstringlist.html">QStringList</a>. 
 The most important rule (the Qt Designer documentation stresses this not enough): 
 The strings you return here, <i>must be identical</i> to your widget classes' names! 
@@ -154,8 +154,8 @@ QStringList QUndoRedoButtonPlugin::keys() const
 }
 \endcode
 
-The \i create() method of the widget plugin is called by the Designer, when it needs to add your
-widget to a form. \a key is one of the strings you returned in \i keys(). All you have to do in this
+The <i>create()</i> method of the widget plugin is called by the Designer, when it needs to add your
+widget to a form. \a key is one of the strings you returned in <i>keys()</i>. All you have to do in this
 method, is check, which widget is asked for and then return an instance of that widget.
 
 \code
@@ -169,7 +169,7 @@ QWidget* QUndoRedoButtonPlugin::create( const QString &key, QWidget* parent, con
 }
 \endcode
 
-The methods \i group(), \i iconSet() and \i includeFile(), \i toolTip(), and \i whatsThis() are
+The methods <i>group(), iconSet()</i> and <i>includeFile(), toolTip()</i>, and <i>whatsThis()</i> are
 pretty self-explanatory, so here are examples of their implementation.
 
 \code
@@ -210,7 +210,7 @@ QString QUndoRedoButtonPlugin::whatsThis( const QString& feature ) const
 }
 \endcode
 
-\i isContainter tells the Designer, wheter a widget may be parent of other widgets (like QFrame).
+<i>isContainter</i> tells the Designer, wheter a widget may be parent of other widgets (like QFrame).
 Default to false, so you don't have to implement it.
 
 \code

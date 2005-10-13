@@ -72,16 +72,15 @@ namespace mitk
 
     //##ModelId=3F017B320121
     //##Documentation
-    //## @brief deselects the Points in the PointSet.
+    //## @brief Deselects the Points in the PointSet.
     //## supports Undo if enabled
-    //## @param needed for declaring operations
     void UnselectAll();
 
     //##ModelId=3F05C0700185
     //##Documentation
     //## @brief Selects the point.
     //## supports Undo if enabled.
-    //## @param needed for declaring operations
+    //## @param position Needed for declaring operations
     void SelectPoint( int position );
 
   private:

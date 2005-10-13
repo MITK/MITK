@@ -47,20 +47,18 @@ public:
     /**
      * Handler function which is called, if characted data has been 
      * parsed by expat.
+     * @param inData a char array containing the parsed string data
+     * @param inLength the length of the parsed data string.
      */
     virtual void CharacterDataHandler (const char *inData, int inLength);
     
     /**
      * Converts the given data to mitk::ScalarType.
-     * @param inData a char array containing the parsed string data
-     * @param inLength the length of the parsed data string.
      */
     virtual mitk::ScalarType ParseScalarType(const std::string &data);
     
     /**
      * Converts the given data to an PointIdentifier
-     * @param inData a char array containing the parsed string data
-     * @param inLength the length of the parsed data string.
      */
     virtual PointIdentifier ParsePointIdentifier(const std::string &data);
     

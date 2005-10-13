@@ -29,7 +29,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkBaseProperty.h"
 #include <mitkXMLWriter.h>
 #include <mitkXMLReader.h>
-#include <mitkTransferFunction.h>
 
 namespace mitk {
 

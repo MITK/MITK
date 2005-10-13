@@ -52,6 +52,9 @@
  *   reads a PicFile from disk
  *
  * $Log$
+ * Revision 1.4  2005/10/13 11:21:12  ivo
+ * FIX: linker warning (unused var)
+ *
  * Revision 1.3  2005/10/13 08:35:47  ivo
  * FIX: warnings
  *
@@ -116,9 +119,6 @@
  *--------------------------------------------------------------------
  *  COPYRIGHT (c) 1993 by DKFZ (Dept. MBI) Heidelberg, FRG
  */
-#ifndef lint
-  static char *what = { "@(#)ipPicGet\t\tDKFZ (Dept. MBI)\t"__DATE__"\t$Revision$" };
-#endif
 
 #include "DataStructures/ipPic/ipPic.h"
 #ifdef DOS

@@ -1,4 +1,7 @@
-/** \page StylesAndNotesPage The MITK Style Guide and Technical Notes The style guide for MITK is almost identical to that of ITK, see the ITK Style Guide document. The only difference is that
+/** 
+\page StylesAndNotesPage The MITK Style Guide and Technical Notes 
+
+The style guide for MITK is almost identical to that of ITK, see the ITK Style Guide document. The only difference is that
 MITK has its own namespace (@a mitk ).
 
 Some technical notes:

@@ -62,7 +62,8 @@ public:
     
     /**
      * Allows to set the n-th output of the point set source. 
-     * @param output the intended output of the point set source
+     * @param idx The index of the output 
+     * @param output The intended output of the point set source
      */
     virtual void SetOutput( unsigned int idx, OutputType* output );
     

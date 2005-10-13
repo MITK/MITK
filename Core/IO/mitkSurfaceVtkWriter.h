@@ -38,7 +38,7 @@ namespace mitk
  * time, multiple files are written. The life-span (time-bounds) of each
  * each point of time is included in the filename according to the 
  * following scheme: 
- * <filename>_S<timebounds[0]>E<timebounds[1]>_T<framenumber>
+ * &lt;filename&gt;_S&lt;timebounds[0]&gt;E&lt;timebounds[1]&gt;_T&lt;framenumber&gt;
  * (S=start, E=end, T=time).
  * Writing of multiple files according to a given filename pattern is not
  * yet supported.
@@ -59,7 +59,7 @@ public:
 
     /**
      * Sets the filename of the file to write.
-     * @param FileName the name of the file to write.
+     * @param _arg the name of the file to write.
      */
     itkSetStringMacro( FileName );
 
@@ -70,7 +70,7 @@ public:
 
     /**
      * \brief Explicitly set the extension to be added to the filename.
-     * @param extension to be added to the filename, including a "." 
+     * @param _arg to be added to the filename, including a "." 
      * (e.g., ".vtk").
      * 
      * Partial template specialization is used for some vtk-writer types 

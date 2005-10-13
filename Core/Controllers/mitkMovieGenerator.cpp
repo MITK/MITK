@@ -54,7 +54,11 @@ bool mitk::MovieGenerator::WriteMovie()
     RenderingManager::GetInstance()->ForceImmediateUpdate(m_renderer->GetRenderWindow());
 
     ok = InitGenerator();
-    if (!ok) return false;
+    if (!ok) 
+    {
+      TerminateGenerator();
+      return false;
+    }
     int imgSize = 3 * m_width * m_height;
     printf( "Video size = %i x %i\n", m_width, m_height );
     GLbyte *data = new GLbyte[imgSize];

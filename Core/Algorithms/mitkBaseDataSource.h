@@ -66,7 +66,8 @@ public:
     
     /**
      * Allows to set the n-th output of the base data source. 
-     * @param output the intended output of the base data source
+     * @param idx The index of the output 
+     * @param output The intended output of the base data source
      */
     virtual void SetOutput( unsigned int idx, OutputType* output );
     

@@ -58,7 +58,7 @@ public:
 
   /**
   * Set/Get Standard Deviation for Gaussian Filter.
-  * @param double deviation by default 1.5
+  * @param _arg by default 1.5
   */
   itkSetMacro(StandardDeviation, double);
   itkGetConstMacro(StandardDeviation, double);

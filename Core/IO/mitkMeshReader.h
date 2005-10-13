@@ -50,7 +50,7 @@ public:
 
     /**
      * @brief Sets the filename of the file to be read
-     * @param FileName the filename of the point set xml-file
+     * @param _arg the filename of the point set xml-file
      */
     itkSetStringMacro( FileName );
 

@@ -28,6 +28,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 class vtkMatrix4x4;
 
+#ifndef DOXYGEN_SKIP
+
 namespace mitk {
 typedef float ScalarType;
 
@@ -53,7 +55,6 @@ typedef enum PointSpecificationType
   PTEDGE, 
   PTEND
 };
-
 
 typedef itk::NumericTraits<mitk::ScalarType> ScalarTypeNumericTraits;
 extern const ScalarType eps;
@@ -131,8 +132,6 @@ template<> class VectorTraits< itk::Point<int,3> > {
   public:
     typedef int ValueType;
 };
-
-
 
 template <class Tin, class Tout>
   inline void itk2vtk(const Tin& in, Tout& out)
@@ -271,6 +270,9 @@ void TransferVtkMatrixToItkTransform(const vtkMatrix4x4* vtkmatrix, mitk::Affine
 void TransferItkTransformToVtkMatrix(const mitk::AffineTransform3D* itkTransform, vtkMatrix4x4* vtkmatrix);
 
 } // namespace mitk
+
+#endif //DOXYGEN_SKIP
+
 
 #define mitkSetConstReferenceMacro(name,type) \
   virtual void Set##name (const type & _arg) \

@@ -38,7 +38,7 @@ void mitk::ManualSegmentationToSurfaceFilter::GenerateData()
     }
 
     //Interpolate image spacing 
-    if(m_SetInterpolation)
+    if(m_Interpolation)
     {
       vtkImageResample * imageresample = vtkImageResample::New();
       imageresample->SetInput(vtkimage);

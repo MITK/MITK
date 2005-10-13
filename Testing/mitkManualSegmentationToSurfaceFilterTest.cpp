@@ -108,7 +108,7 @@ int mitkManualSegmentationToSurfaceFilterTest(int argc, char* argv[])
   //configure ImageToSurfaceFilter
   filter->MedianFilter3DOn();
   filter->SetStandardDeviation(1.5);
-  filter->SetInterpolationOn();
+  filter->InterpolationOn();
   filter->UseStandardDeviationOn();
   filter->SetThreshold( 1 ); //if( Gauss ) --> TH manipulated for vtkMarchingCube
   filter->DecimateOn();

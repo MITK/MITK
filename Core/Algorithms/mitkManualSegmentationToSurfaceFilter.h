@@ -41,12 +41,12 @@ public:
   /**
   * Enable/Disable Interpolation to 1mm x 1mm x 1mm pixel.
   */
-  itkSetMacro(SetInterpolation,bool);
-  itkGetConstMacro(SetInterpolation,bool);
+  itkSetMacro(Interpolation,bool);
+  itkGetConstMacro(Interpolation,bool);
   /**
   * Enable/Disable Interpolation to 1mm x 1mm x 1mm pixel.
   */
-  itkBooleanMacro(SetInterpolation);
+  itkBooleanMacro(Interpolation);
 
   
   itkSetMacro(UseStandardDeviation,bool);
@@ -79,7 +79,7 @@ protected:
   int m_MedianKernelSizeX, m_MedianKernelSizeY, m_MedianKernelSizeZ;
   bool m_UseStandardDeviation; //Gaussian Filter
   double m_StandardDeviation;
-  bool m_SetInterpolation;
+  bool m_Interpolation;
   
 };//namespace
 

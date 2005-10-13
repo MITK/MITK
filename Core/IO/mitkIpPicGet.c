@@ -52,6 +52,9 @@
  *   reads a PicFile from disk
  *
  * $Log$
+ * Revision 1.3  2005/10/13 08:35:47  ivo
+ * FIX: warnings
+ *
  * Revision 1.2  2005/10/13 07:52:55  max
  * fixed warnings  Algorithms/mitkImageFilters/mitkImageToSurfaceFilter.h  Algorithms/mitkImageFilters/mitkManualSegmentationToSurfaceFilter.h  Algorithms/mitkImageIO/mitkIpPicGet.c
  *
@@ -128,13 +131,13 @@ char * MITKstrdup (const char * string)
 {
   char *memory;
 
-  if (!string)
-    return(NULL);
+  if (string==NULL)
+    return NULL;
 
   if ( ( memory = (char*)malloc(strlen(string) + 1) ) )
-    return(strcpy(memory,string));
+    return strcpy(memory,string);
 
-  return(NULL);
+  return NULL;
 }
 
 _ipPicTagsElement_t *
@@ -172,8 +175,6 @@ ipPicDescriptor * _MITKipPicOldGet( FILE *infile, ipPicDescriptor *pic )
   ipFReadLE( &(old_pic.type), sizeof(ipUInt4_t), 3, infile );
   if( old_pic.ntxt )
     {
-      /*text = (unsigned char *)malloc( old_pic.ltxt );
-      ipFReadLE( text, 1, old_pic.ltxt, infile );*/
       fseek( infile, old_pic.ltxt, SEEK_CUR );
     }
 
@@ -349,15 +350,6 @@ _MITKipPicReadTags( _ipPicTagsElement_t *head, ipUInt4_t bytes_to_read, FILE *st
 
 
       ipPicFReadLE( &(tsv->n), sizeof(ipUInt4_t), tsv->dim, stream );
-
-      /*printf( "%.*s\n", _ipPicTAGLEN, tsv->tag );
-      printf( "  %i\n", len );
-      printf( "  %i %i %i %i %i\n",
-              tsv->type,
-              tsv->bpe,
-              tsv->dim,
-              tsv->n[0],
-              tsv->n[1] ); /**/
 
       if( tsv->type == ipPicTSV )
         {

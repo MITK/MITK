@@ -1,26 +1,33 @@
 /**
 \page BuildInstructionsPage Build Instructions
 
+For the following examples we assume that you have your source in /src
+
+\section Get a source tree
+
+Since MITK is under active development we recommend to use the CVS version. To make sure you get a stable tree, check the
+<a href="http://public.kitware.com/MITK/Dashboard/MostRecentResults-Nightly/Dashboard.html">MITK dashboard</a> at Kitware before checking out. If the CVS is not clean, better get a stable tar ball from <a href="http://www.mitk.org">mitk.org</a>
+To checkout MITK's current cvs repository via anonymous cvs do (when asked for a password, just press enter):
+
+<tt>
+cd /src
+cvs -d :pserver:anonymous@mbi.dkfz-heidelberg.de:/usr/local/cvsroot login<br>
+cvs -d :pserver:anonymous@mbi.dkfz-heidelberg.de:/usr/local/cvsroot co mitk 
+</tt>
 
 \section Build MITK with CMake 
-Do a CVS checkout of \c mMITKExample for the sample application including the lib, \c mMITK for just the lib or the whole ip++ tree if you like.
 
-Start the CMake-GUI: 
+Create a new directory for the binary tree, change to it and call CMake:
 
-<b>Linux:</b>
-\c cd to your preferred build directory and use the command <c> ccmake <path-to-ip++-dir> </c><br>
-<b>Windows:</b>
-Start \c CMakeSetup and select the path to \c ip++ as source directory and the path you like for binary directory. Select your compiler.
-<br>
-After checking the configured values and changing them if needed you can generate the Makefiles or MSVC-Profiles. 
-<br>
-<b>Linux:</b>
-\c make
-<br>
-<b>Windows:</b>
-Open the just created solution file in \c ip++ and build the desired target.
-<br>
-<br>
-The compiled files (lib and applications) are then localted in the directory <binary-mitk-dir>/Build/MITK/bin.
+<tt>
+cd /src<br>
+mkdir mitkBinary<br>
+cd mitkBinary<br>
+ccmake ../mitk<br>
+make<br>
+</tt>
+
+If you use Windows, then you just start the CMake GUI and enter the location of the source and of the binary tree. 
+CMake will create a Visual Studio solution in the root of your binary tree.
 
 */

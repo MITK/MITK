@@ -45,6 +45,7 @@ class OperationEvent;
 class OperationActor
 {
 public:
+    virtual ~OperationActor() {};
     //##ModelId=3E5F62530359
     virtual void ExecuteOperation(Operation* operation) = 0;
 };

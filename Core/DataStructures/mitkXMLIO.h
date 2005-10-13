@@ -23,26 +23,28 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk {
 
-	class XMLWriter;
-	class XMLReader;
+  class XMLWriter;
+  class XMLReader;
 
-	class XMLIO {
-	
-	public:
+  class XMLIO {
+  
+  public:
 
-		/**
-		 *
-		 */
-		bool WriteXML( XMLWriter& xmlWriter );
+    virtual ~XMLIO() {};
 
-		/**
-		 *
-		 */
-		virtual bool ReadXMLData( XMLReader& xmlReader );
+    /**
+     *
+     */
+    bool WriteXML( XMLWriter& xmlWriter );
 
-		/**
-		 *
-		 */
+    /**
+     *
+     */
+    virtual bool ReadXMLData( XMLReader& xmlReader );
+
+    /**
+     *
+     */
     static const std::string CLASS_NAME;
 
   protected:
@@ -60,7 +62,7 @@ namespace mitk {
      *
      */
     static const std::string XML_NODE_NAME;
-	};
+  };
 
 }
 #endif // XMLIO_H_HEADER_INCLUDED

@@ -40,6 +40,9 @@ protected:
     static T cos(T t) { return VmUtil<T>::cos(t); }
 /*
  * $Log$
+ * Revision 1.3  2005/10/13 13:50:04  maleike
+ * FIX: doxygen warnings
+ *
  * Revision 1.2  2003/04/22 14:42:11  max
  * made inclusions of vecmath header files "local" (for gcc 3.3 support)
  *
@@ -359,7 +362,7 @@ public:
       * the result into this. Matrix m1 is not modified.
       * note this method is alias-safe.
       * @param scalar The scalar adder.
-      * @parm m1 The original matrix values.
+      * @param m1 The original matrix values.
       */
     void add(T scalar, const Matrix3& m1);
 
@@ -664,7 +667,7 @@ public:
      * Transform the vector vec using this Matrix3 and place the
      * result into vecOut.
      * note this method is alias-safe
-     * @paramt the double precision vector to be transformed
+     * @param t the double precision vector to be transformed
      * @param result the vector into which the transformed values are placed
      */
     void transform(const Tuple3<T>& t, Tuple3<T>* result) const;

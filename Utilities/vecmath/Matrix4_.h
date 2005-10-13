@@ -35,6 +35,9 @@ protected:
     static T abs(T t) { return VmUtil<T>::abs(t); }
 /*
  * $Log$
+ * Revision 1.3  2005/10/13 13:50:04  maleike
+ * FIX: doxygen warnings
+ *
  * Revision 1.2  2003/04/22 14:42:11  max
  * made inclusions of vecmath header files "local" (for gcc 3.3 support)
  *
@@ -584,7 +587,7 @@ public:
       * Adds a scalar to each component of the matrix m1 and places
       * the result into this. Matrix m1 is not modified.
       * @param scalar The scalar adder.
-      * @parm m1 The original matrix values.
+      * @param m1 The original matrix values.
       */
     void add(T scalar, const Matrix4& m1) {
         set(m1);

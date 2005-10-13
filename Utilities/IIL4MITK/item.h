@@ -20,8 +20,6 @@ public:
 
     /*!
     \brief The constructor.
-    @param parent the parent item
-    @param name the object name
     */
     iil4mitkItem();
 

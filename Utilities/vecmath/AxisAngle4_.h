@@ -33,6 +33,9 @@ template<class T>
 class AxisAngle4 {
 /*
  * $Log$
+ * Revision 1.3  2005/10/13 13:50:04  maleike
+ * FIX: doxygen warnings
+ *
  * Revision 1.2  2003/04/22 14:42:11  max
  * made inclusions of vecmath header files "local" (for gcc 3.3 support)
  *
@@ -174,7 +177,7 @@ public:
 
     /**
       * Sets the value of this axis angle to the value of axis angle t1.
-      * @param t1 the axis angle to be copied
+      * @param a1 the axis angle to be copied
       */
     void set(const AxisAngle4& a1) {
         x = a1.x;

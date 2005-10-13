@@ -78,8 +78,7 @@ public:
     int model () const;
 
     /*!
-    \brief Sets the interpolation method for scaled images.
-    @param 
+    \brief Switches interpolation for scaled images on or off.
     */
     virtual void setInterpolation (const bool on = true);
 

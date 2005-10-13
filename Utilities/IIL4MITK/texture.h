@@ -59,7 +59,6 @@ public:
 	\brief Sets the color model of the data. If the color is different from white,
 	the RGBA color model is used.
 	@param model the color model which is requested
-	@param red,blue,green,alpha the color
 	*/
 	void setModel (int model);
 

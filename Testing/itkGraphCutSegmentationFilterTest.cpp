@@ -22,7 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkImageRegionIterator.h>
 
 #include <itkGraphCutSegmentationGridGraphFilter.h>
-#include <itkGraphCutSegmentationBoykovFilter.h>
+//#include <itkGraphCutSegmentationBoykovFilter.h>
 
 
 int itkGraphCutSegmentationFilterTest(int, char* [] )
@@ -43,12 +43,12 @@ int itkGraphCutSegmentationFilterTest(int, char* [] )
   typedef itk::ImageRegionIterator<ImageType>IteratorType;
 
   typedef itk::GraphCutSegmentationGridGraphFilter<ImageType2D, ImageType2D> GraphCutSegmentationGridGraphFilterType2D;
- 	typedef itk::GraphCutSegmentationBoykovFilter<ImageType2D, ImageType2D> GraphCutSegmentationBoykovFilterType2D;
+ 	//typedef itk::GraphCutSegmentationBoykovFilter<ImageType2D, ImageType2D> GraphCutSegmentationBoykovFilterType2D;
   typedef itk::GraphCutSegmentationFilter<ImageType2D, ImageType2D> GraphCutSegmentationFilterType2D;
   GraphCutSegmentationFilterType2D::Pointer graphcutFilter2D;
  
  	typedef itk::GraphCutSegmentationGridGraphFilter<ImageType, ImageType> GraphCutSegmentationGridGraphFilterType;
- 	typedef itk::GraphCutSegmentationBoykovFilter<ImageType, ImageType> GraphCutSegmentationBoykovFilterType;
+ 	//typedef itk::GraphCutSegmentationBoykovFilter<ImageType, ImageType> GraphCutSegmentationBoykovFilterType;
   typedef itk::GraphCutSegmentationFilter<ImageType, ImageType> GraphCutSegmentationFilterType;
   GraphCutSegmentationFilterType::Pointer graphcutFilter;
 
@@ -295,7 +295,7 @@ int itkGraphCutSegmentationFilterTest(int, char* [] )
   std::cout<<"[PASSED]"<<std::endl;
   //} end testing itkGraphCutSegmentationGridGraphFilter with 3D image
 
-
+/*
   //{ start testing itkGraphCutSegmentationBoykovFilter with 2D image
   std::cout << "Testing itkGraphCutSegmentationBoykovFilter with 2D image: " <<std::endl;
 
@@ -359,7 +359,7 @@ int itkGraphCutSegmentationFilterTest(int, char* [] )
   }
   std::cout<<"[PASSED]"<<std::endl;
   //} end testing itkGraphCutSegmentationBoykovFilter with 3D image
-
+*/
 std::cout<<"[TEST DONE]"<<std::endl;
 return EXIT_SUCCESS;
 }

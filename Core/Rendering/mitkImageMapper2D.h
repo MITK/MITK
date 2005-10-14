@@ -26,12 +26,12 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkDataTreeNode.h"
 #include "mitkMapper2D.h"
 #include "mitkImageSliceSelector.h"
-
-#include <map>
-#include <assert.h>
 #include "mitkGLMapper2D.h"
 #include "mitkImageChannelSelector.h"
 #include "mitkBaseRenderer.h"
+
+#include <map>
+#include <assert.h>
 
 #include <itkCommand.h>
 #include <itkEventObject.h>
@@ -42,6 +42,7 @@ class Vtk2itk;
 class vtkImageReslice;
 class vtkLookupTable;
 class vtkGeneralTransform;
+class vtkImageChangeInformation;
 
 namespace mitk {
 
@@ -55,8 +56,9 @@ class BaseRenderer;
 //## Currently implemented for mapping on PlaneGeometry and AbstractTransformGeometry.
 //## This results in a flipped version when used for texture mapping. Furthermore,
 //## not the complete rectangular area described by the Geometry2D from the renderer
-//## is resampled, @em if the Geometry2D is larger than the image dimension in the requested
-//## direction. This results in a stretched version when used for texture mapping.
+//## is resampled, @em if the Geometry2D is larger than the image dimension in the
+//## requested direction. This results in a stretched version when used for texture
+//## mapping.
 //## @ingroup Mapper
 class ImageMapper2D : public GLMapper2D
 {
@@ -94,8 +96,10 @@ public:
 
   //##ModelId=3E6423D20047
   //##Documentation
-  //## @brief internal storage class for data needed for rendering into a renderer
-  class RendererInfo {
+  //## @brief internal storage class for data needed for rendering into a
+  //## renderer
+  class RendererInfo
+  {
     //##ModelId=3E6E83AB0346
     //##Documentation
     //## @brief internal id of the renderer the data is stored for
@@ -119,25 +123,31 @@ public:
     //## @brief stored data as a ipPicDescriptor
     ipPicDescriptor *m_Pic;
     //##Documentation
-    //## @brief number of pixels per mm in x- and y-direction of the resampled image m_Pic
+    //## @brief number of pixels per mm in x- and y-direction of the resampled
+    //image m_Pic
     Vector2D m_PixelsPerMM;
    
     bool m_IilInterpolation;
     //##ModelId=3E6423D30002
-    RendererInfo() :  m_RendererId(-1), m_iil4mitkImage(NULL), m_Renderer(NULL), m_ObserverId(0), m_Pic(NULL), m_IilInterpolation(true)
+    RendererInfo()
+      : m_RendererId(-1), m_iil4mitkImage(NULL), m_Renderer(NULL),
+        m_ObserverId(0), m_Pic(NULL), m_IilInterpolation(true)
     {
       m_PixelsPerMM.Fill(0);
     };
+
     //##ModelId=3E6423D30003
     ~RendererInfo()
     {
       Squeeze();
-      if(m_Renderer != NULL)
+      if (m_Renderer != NULL)
       {
         m_Renderer->RemoveObserver(m_ObserverId);
         m_Renderer = NULL;
       }
-      //         delete m_iil4mitkImage; //@FIXME: diese Zeile wird nie erreicht, s. Kommentar im desctuctor von ImageMapper2D
+      //delete m_iil4mitkImage;
+      //@FIXME: diese Zeile wird nie erreicht, s. Kommentar im desctuctor von
+      //ImageMapper2D
     }
 
     inline bool IsInitialized() const
@@ -154,9 +164,14 @@ public:
 
       itk::SimpleMemberCommand<RendererInfo>::Pointer deleteRendererCommand;
       deleteRendererCommand = itk::SimpleMemberCommand<RendererInfo>::New();
-      deleteRendererCommand->SetCallbackFunction(this, &RendererInfo::RendererDeleted);
+      
+      deleteRendererCommand->SetCallbackFunction(
+        this, &RendererInfo::RendererDeleted
+      );
 
-      m_ObserverId = renderer->AddObserver(mitk::BaseRenderer::RendererResetEvent(), deleteRendererCommand);
+      m_ObserverId = renderer->AddObserver(
+        mitk::BaseRenderer::RendererResetEvent(), deleteRendererCommand
+      );
     }
 
     void Set_iil4mitkImage(iil4mitkPicImage* iil4mitkImage);
@@ -172,7 +187,7 @@ public:
     }
 
     void Squeeze();
-  };
+  }; // RenderInfo
 
   //##ModelId=3E6E83B00343
   //##Documentation
@@ -223,7 +238,8 @@ protected:
 
   //##ModelId=3EDD039F02EC
   //##Documentation
-  //## @brief ImageSliceSelector for display of original slices (currently not used)
+  //## @brief ImageSliceSelector for display of original slices
+  //## (currently not used)
   ImageSliceSelector::Pointer m_SliceSelector;
 
   //##ModelId=3E6423D30004
@@ -237,7 +253,8 @@ protected:
   //## @sa RendererInfo
   RenderInfoMap m_RendererInfo;
 
-  vtkGeneralTransform* m_ComposedResliceTransformForAbstractTransformGeometry;
+  vtkGeneralTransform *m_ComposedResliceTransform;
+  vtkImageChangeInformation *m_UnitSpacingImageFilter;
 
 private:
 	int m_iil4mitkMode;

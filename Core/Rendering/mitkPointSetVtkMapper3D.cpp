@@ -238,6 +238,19 @@ void mitk::PointSetVtkMapper3D::GenerateData()
   if ( pointSizeProp.IsNotNull() )
     pointSize = pointSizeProp->GetValue();
 
+  bool showLabel = true;
+  this->GetDataTreeNode()->GetBoolProperty("show label", showLabel);
+  const char * pointLabel=NULL;
+  if(showLabel)
+  {
+    if(dynamic_cast<mitk::StringProperty *>(this->GetDataTreeNode()->GetProperty("label").GetPointer()) != NULL)
+    {
+      pointLabel =dynamic_cast<mitk::StringProperty *>(this->GetDataTreeNode()->GetProperty("label").GetPointer())->GetValue();
+    }
+    else
+      showLabel = false;
+  }
+
   m_vtkSelectedPointList = vtkAppendPolyData::New();
   m_vtkUnselectedPointList = vtkAppendPolyData::New();
   //now add an object for each point in data
@@ -313,9 +326,8 @@ void mitk::PointSetVtkMapper3D::GenerateData()
     }
     source->Delete();
 
-    if (dynamic_cast<mitk::StringProperty *>(this->GetDataTreeNode()->GetProperty("label").GetPointer()) != NULL)
+    if (showLabel)
     {
-      const char * pointLabel =dynamic_cast<mitk::StringProperty *>(this->GetDataTreeNode()->GetProperty("label").GetPointer())->GetValue();
       char buffer[20];
       std::string l = pointLabel;
       if ( input->GetSize()>1 )

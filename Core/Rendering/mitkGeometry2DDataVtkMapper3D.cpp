@@ -190,7 +190,7 @@ void mitk::Geometry2DDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
               const ImageMapper2D::RendererInfo* ri=imagemapper->GetRendererInfo(renderer);
               imagemapper->GenerateAllData();
               texture = true;
-              if((ri!=NULL) && (m_LastTextureUpdateTime<ri->m_LastUpdateTime))
+              if((ri!=NULL) && (ri->m_Pic!=NULL) &&(m_LastTextureUpdateTime<ri->m_LastUpdateTime))
               {
                 ipPicDescriptor *p=ri->m_Pic;
                 if((p->dim==2) && (p->n[0]>2) && (p->n[1]>2))

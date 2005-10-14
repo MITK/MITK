@@ -49,7 +49,7 @@ itk::DataObject::Pointer mitk::DataTreeNodeSource::MakeOutput ( unsigned int idx
 
 void mitk::DataTreeNodeSource::SetOutput( OutputType* output )
 {
-    this->ProcessObject::SetNthOutput( 0, output );
+    this->itk::ProcessObject::SetNthOutput( 0, output );
 }
 
 
@@ -57,7 +57,7 @@ void mitk::DataTreeNodeSource::SetOutput( OutputType* output )
 
 void mitk::DataTreeNodeSource::SetOutput( unsigned int idx, OutputType* output )
 {
-    this->ProcessObject::SetNthOutput(idx, output);    
+    this->itk::ProcessObject::SetNthOutput(idx, output);    
 }
 
 
@@ -80,7 +80,7 @@ mitk::DataTreeNodeSource::OutputType* mitk::DataTreeNodeSource::GetOutput()
 
 mitk::DataTreeNodeSource::OutputType* mitk::DataTreeNodeSource::GetOutput ( unsigned int idx )
 {
-    return dynamic_cast<OutputType*> ( this->ProcessObject::GetOutput( idx ) );
+    return dynamic_cast<OutputType*> ( this->itk::ProcessObject::GetOutput( idx ) );
 }
 
 

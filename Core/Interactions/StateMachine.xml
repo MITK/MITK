@@ -1804,20 +1804,6 @@
     <event NAME="Strg+Alt+A" ID="20" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0600" KEY="Key_A" />
     <!-- Strg + Alt + B -->
     <event NAME="Strg+Alt+B" ID="21" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0600" KEY="Key_B" />
-
-    <!-- Strg + Y + leftMouseButtonPress-->
-    <event NAME="Strg + Y + MousePress" ID="22" TYPE="Type_MouseButtonPress" BUTTON="BS_LeftButton" BUTTONSTATE="0x0100" KEY="Key_Y" />
-    <!-- Strg + Y leftMouseButton and MouseMove -->
-    <event NAME="Strg + Y + MouseMove" ID="23" TYPE="Type_MouseMove" BUTTON="BS_NoButton" BUTTONSTATE="0x0101" KEY="Key_Y" />
-    <!-- Strg + Y leftMouseButtonRelease -->
-    <event NAME="Strg + Y + leftMouseRelease" ID="24" TYPE="Type_MouseButtonRelease" BUTTON="BS_LeftButton" BUTTONSTATE="0x0101" KEY="Key_Y" />
-    <!-- Strg + X leftMouseButtonPress-->
-    <event NAME="Strg + X + MousePress" ID="25" TYPE="Type_MouseButtonPress" BUTTON="BS_LeftButton" BUTTONSTATE="0x0100" KEY="Key_X" />
-    <!-- Strg + X leftMouseButton and MouseMove -->
-    <event NAME="Strg + X + MouseMove" ID="26" TYPE="Type_MouseMove" BUTTON="BS_NoButton" BUTTONSTATE="0x0101" KEY="Key_X" />
-    <!-- Strg + X leftMouseButtonRelease -->
-    <event NAME="Strg + X + leftMouseRelease" ID="27" TYPE="Type_MouseButtonRelease" BUTTON="BS_LeftButton" BUTTONSTATE="0x0101" KEY="Key_X" />
-
     <!-- Strg + Alt + H -->
     <event NAME="Strg+Alt+H" ID="30" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0600" KEY="Key_H" />
     <!-- Strg + Alt + I -->
@@ -1828,7 +1814,6 @@
     <event NAME="Alt" ID="90" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0400" KEY="Key_Alt" />
     <!-- Strg + B -->
     <event NAME="Strg+B" ID="91" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0200" KEY="Key_B" />
-
     <!-- leftMouseButtonRelease -->
     <event NAME="leftMouseRelease" ID="505" TYPE="Type_MouseButtonRelease" BUTTON="BS_LeftButton" BUTTONSTATE="0x0001" KEY="Key_none" />
     <!-- MiddleMouseButtonRelease -->

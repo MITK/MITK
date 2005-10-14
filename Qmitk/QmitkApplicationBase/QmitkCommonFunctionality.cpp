@@ -542,8 +542,12 @@ std::string CommonFunctionality::SaveSurface(mitk::Surface* surface, const char*
       writer->SetFileName(qfileName.latin1());
       writer->Write();
     }
+    fileName = qfileName.ascii();
   }
-  fileName = qfileName.ascii();
+  else
+  {
+    fileName.clear();
+  }
   return fileName;
 }
 

@@ -25,7 +25,7 @@ mitk::ImageToLookupTableFilter::~ImageToLookupTableFilter()
 void mitk::ImageToLookupTableFilter::SetInput( const mitk::ImageToLookupTableFilter::InputImageType *input)
 {
     // Process object is not const-correct so the const_cast is required here
-    this->ProcessObject::SetNthInput( 0, const_cast< InputImageType * >( input ) );
+    this->itk::ProcessObject::SetNthInput( 0, const_cast< InputImageType * >( input ) );
     
 }
 

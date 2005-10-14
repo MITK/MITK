@@ -55,7 +55,7 @@ mitk::GeometryData* mitk::GeometryDataSource::GetOutput()
 mitk::GeometryData* mitk::GeometryDataSource::GetOutput(unsigned int idx)
 {
   return static_cast<mitk::GeometryData*>
-    (this->ProcessObject::GetOutput(idx));
+    (this->itk::ProcessObject::GetOutput(idx));
 }
 
 void mitk::GeometryDataSource::SetOutput(mitk::GeometryData* output)

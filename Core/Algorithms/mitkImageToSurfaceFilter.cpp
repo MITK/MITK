@@ -67,7 +67,7 @@ void mitk::ImageToSurfaceFilter::CreateSurface(int time, vtkImageData *vtkimage,
     vtkDecimatePro *decimate = vtkDecimatePro::New();
     decimate->SplittingOff();
     decimate->SetErrorIsAbsolute(5);
-  	decimate->SetFeatureAngle(30);
+    decimate->SetFeatureAngle(30);
     decimate->PreserveTopologyOn();
     decimate->BoundaryVertexDeletionOff();
     decimate->SetDegree(10); //std-value is 25!
@@ -75,9 +75,6 @@ void mitk::ImageToSurfaceFilter::CreateSurface(int time, vtkImageData *vtkimage,
     decimate->SetInput(polydata);//RC++
     polydata->Delete();//RC--
     decimate->SetTargetReduction(m_TargetReduction);
-
-
-    decimate->SetReleaseDataFlag(true);
     decimate->SetMaximumError(0.002);
 
     polydata = decimate->GetOutput();

@@ -81,8 +81,16 @@ void mitk::ImageToSurfaceFilter::CreateSurface(int time, vtkImageData *vtkimage,
 
   }
 
-
+  //
+  // HACK! Symptombekämpfung wegen ständiger Pipeline ausführung beim navigieren durch das Bild
+  // Disconnect the result from the vtk pipeline.
+  //
+  vtkSource* source = polydata->GetSource();
+  polydata->Update();
+  polydata->SetSource(NULL);
+  
   surface->SetVtkPolyData(polydata, time);
+  source->Delete();
 }
 
 

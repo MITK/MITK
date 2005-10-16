@@ -75,7 +75,7 @@ void mitk::BaseProcess::UnRegister() const
     {
         m_Unregistering=true;
 
-        int realReferenceCount = GetExternalReferenceCount()-1; //-1 because some is trying to unregister us
+        int realReferenceCount = GetExternalReferenceCount()-1; //-1 because someone is trying to unregister us
         if(realReferenceCount<0)
           m_ExternalReferenceCount=realReferenceCount=0;
 
@@ -134,7 +134,9 @@ void mitk::BaseProcess::SetNthOutput(unsigned int idx, itk::DataObject *output)
         dynamic_cast<mitk::BaseData*>(output)->ConnectSource(this, idx);
     }
 #endif
+    this->Register();
     Superclass::SetNthOutput(idx, output);
+    this->UnRegister();
 }
 
 /**

@@ -258,10 +258,72 @@ int runPipelineSmartPointerCorrectnessTestForFilterType()
   std::cout << "Testing MITK_WEAKPOINTER_PROBLEM_WORKAROUND_ENABLED part4: "<<std::endl;
   try 
   {
+    mitk::Image::Pointer output;
     {
       typename FilterType::Pointer localFilter = FilterType::New();
       filterWatcher = new ReferenceCountWatcher(localFilter, "filter4");
       filterOutputWatcher = new ReferenceCountWatcher(localFilter->GetOutput(), "filter4Output");
+      output = localFilter->GetOutput();
+      std::cout << "Testing running out of scope of filter, keeping reference to output (as in part 3):";
+    }
+    std::cout<<"[PASSED]"<<std::endl;
+
+    std::cout << "Testing output->DisconnectPipeline(): ";
+    output->DisconnectPipeline();
+    std::cout<<"[PASSED]"<<std::endl;
+
+    std::cout << "Testing reference count of output: ";
+    if(output->GetReferenceCount()!=1)
+    {
+      std::cout<<"[FAILED]"<<std::endl;
+      return EXIT_FAILURE;
+    }
+    else
+      std::cout<<"[PASSED]"<<std::endl;
+    std::cout << "Testing external reference count of output: ";
+    if(output->GetExternalReferenceCount()!=1)
+    {
+      std::cout<<"[FAILED]"<<std::endl;
+      return EXIT_FAILURE;
+    }
+    else
+      std::cout<<"[PASSED]"<<std::endl;
+
+    std::cout << "Testing reference count of filter:";
+    if(filterWatcher->GetReferenceCount()!=0)
+    {
+      std::cout<<"[FAILED]"<<std::endl;
+      return EXIT_FAILURE;
+    }
+    else
+      std::cout<<"[PASSED]"<<std::endl;
+
+    std::cout << "Testing to set output to NULL:";
+    output = NULL;
+    std::cout<<"[PASSED]"<<std::endl;
+
+    std::cout << "Testing reference count of filter output:";
+    if(filterOutputWatcher->GetReferenceCount()!=0)
+    {
+      std::cout<<"[FAILED]"<<std::endl;
+      return EXIT_FAILURE;
+    }
+    else
+      std::cout<<"[PASSED]"<<std::endl;
+  }
+  catch(...)
+  {
+    std::cout<<"[FAILED]"<<std::endl;
+    return EXIT_FAILURE;
+  }
+
+  std::cout << "Testing MITK_WEAKPOINTER_PROBLEM_WORKAROUND_ENABLED part5: "<<std::endl;
+  try 
+  {
+    {
+      typename FilterType::Pointer localFilter = FilterType::New();
+      filterWatcher = new ReferenceCountWatcher(localFilter, "filter5");
+      filterOutputWatcher = new ReferenceCountWatcher(localFilter->GetOutput(), "filter5Output");
       std::cout << "Testing running out of scope of filter, keeping NO reference to output:";
     }
     std::cout<<"[PASSED]"<<std::endl;

@@ -81,8 +81,7 @@ namespace mitk
 namespace CommonFunctionality
 {
 
-  const char* GetInternalFileExtensions();
-  const char* GetExternalFileExtensions();
+  const char* GetFileExtensions();
   const char* GetSaveFileExtensions();
 
   typedef std::vector<mitk::DataTreeIteratorClone> DataTreeIteratorVector;

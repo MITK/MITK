@@ -237,11 +237,7 @@ void QmitkMainTemplate::fileNew()
 
 void QmitkMainTemplate::fileOpen()
 {
-#ifdef MBI_INTERNAL
-  QStringList fileNames = QFileDialog::getOpenFileNames(CommonFunctionality::GetInternalFileExtensions(), NULL);
-#else
-  QStringList fileNames = QFileDialog::getOpenFileNames( CommonFunctionality::GetExternalFileExtensions(), NULL );
-#endif
+  QStringList fileNames = QFileDialog::getOpenFileNames(CommonFunctionality::GetFileExtensions(), NULL);
   for ( QStringList::Iterator it = fileNames.begin(); it != fileNames.end(); ++it )
   {
     fileOpen((*it).ascii());
@@ -272,7 +268,7 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
 
 void QmitkMainTemplate::fileOpenImageSequence()
 {
-  QString fileName = QFileDialog::getOpenFileName(NULL,CommonFunctionality::GetInternalFileExtensions());
+  QString fileName = QFileDialog::getOpenFileName(NULL,CommonFunctionality::GetFileExtensions());
 
   if ( !fileName.isNull() )
   {

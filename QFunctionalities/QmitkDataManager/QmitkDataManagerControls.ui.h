@@ -377,11 +377,7 @@ void QmitkDataManagerControls::LoadButton_clicked()
     selectedIterator = m_DataTreeIterator;
   }
 
-#ifdef MBI_INTERNAL
-  QStringList fileNames = QFileDialog::getOpenFileNames(CommonFunctionality::GetInternalFileExtensions(), NULL);
-#else
-  QStringList fileNames = QFileDialog::getOpenFileNames(CommonFunctionality::GetExternalFileExtensions(), NULL);
-#endif
+  QStringList fileNames = QFileDialog::getOpenFileNames(CommonFunctionality::GetFileExtensions(), NULL);
   for ( QStringList::Iterator it = fileNames.begin(); it != fileNames.end(); ++it )
   {
     FileOpen((*it).ascii(), selectedIterator.GetPointer());

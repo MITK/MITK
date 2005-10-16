@@ -13,16 +13,23 @@
 #include <mitkPicFileReader.h>
 
 #if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
-#define EXTERNAL_FILE_EXTENSIONS "All known formats(*.dcm *.DCM *.gdcm *.pic *.pic.gz *.png *.jpg *.tiff *.pvtk *.stl *.vtk *.vti *.hdr);;DICOM files(*.dcm *.DCM *.gdcm);;DKFZ Pic (*.seq *.pic *.pic.gz *.seq.gz);;Sets of 2D slices (*.pic *.pic.gz *.png *.dcm *.gdcm);;stl files (*.stl)"
-#define INTERNAL_FILE_EXTENSIONS "all (*.seq *.pic *.pic.gz *.seq.gz *.pvtk *.stl *.vtk *.vti *.ves *.uvg *.dvg *.par *.dcm *.gdcm *.mhd *.hdr hpsonos.db HPSONOS.DB *.png *.tiff *.jpg);;DKFZ Pic (*.seq *.pic *.pic.gz *.seq.gz);;surface files (*.stl *.vtk);;stl files (*.stl);;vtk surface files (*.vtk);;vtk image files (*.pvtk);;vessel files (*.ves *.uvg *.dvg);;par/rec files (*.par);;DSR files (hpsonos.db HPSONOS.DB);;DICOM files (*.dcm *.gdcm)"
+#define EXTERNAL_FILE_EXTENSIONS "All known formats(*.dcm *.DCM *.gdcm *.pic *.pic.gz *.bmp *.png *.jpg *.tiff *.pvtk *.stl *.vtk *.vti *.hdr);;DICOM files(*.dcm *.DCM *.gdcm);;DKFZ Pic (*.seq *.pic *.pic.gz *.seq.gz);;Sets of 2D slices (*.pic *.pic.gz *.bmp *.png *.dcm *.gdcm *.tiff);;stl files (*.stl)"
+#define INTERNAL_FILE_EXTENSIONS "all (*.seq *.pic *.pic.gz *.seq.gz *.pvtk *.stl *.vtk *.vti *.ves *.uvg *.dvg *.par *.dcm *.gdcm *.mhd *.hdr hpsonos.db HPSONOS.DB *.bmp *.png *.jpg *.tiff);;DKFZ Pic (*.seq *.pic *.pic.gz *.seq.gz);;surface files (*.stl *.vtk);;stl files (*.stl);;vtk surface files (*.vtk);;vtk image files (*.pvtk);;vessel files (*.ves *.uvg *.dvg);;par/rec files (*.par);;DSR files (hpsonos.db HPSONOS.DB);;DICOM files (*.dcm *.gdcm)"
 #else
-#define EXTERNAL_FILE_EXTENSIONS "All known formats(*.dcm *.DCM *.gdcm *.pic *.pic.gz *.png *.jpg *.tiff *.pvtk *.stl *.vtk *.hdr);;DICOM files(*.dcm *.DCM *.gdcm);;DKFZ Pic (*.seq *.pic *.pic.gz *.seq.gz);;Sets of 2D slices (*.pic *.pic.gz *.png *.dcm *.gdcm);;stl files (*.stl)"
-#define INTERNAL_FILE_EXTENSIONS "all (*.seq *.pic *.pic.gz *.seq.gz *.pvtk *.stl *.vtk *.ves *.uvg *.dvg *.par *.gdcm *.dcm *.mhd *.hdr hpsonos.db HPSONOS.DB *.png *.tiff *.jpg);;DKFZ Pic (*.seq *.pic *.pic.gz *.seq.gz);;surface files (*.stl *.vtk);;stl files (*.stl);;vtk surface files (*.vtk);;vtk image files (*.pvtk);;vessel files (*.ves *.uvg *.dvg);;par/rec files (*.par);;DSR files (hpsonos.db HPSONOS.DB);;DICOM files (*.dcm *.gdcm)"
+#define EXTERNAL_FILE_EXTENSIONS "All known formats(*.dcm *.DCM *.gdcm *.pic *.pic.gz *.bmp *.png *.jpg *.tiff *.pvtk *.stl *.vtk *.hdr);;DICOM files(*.dcm *.DCM *.gdcm);;DKFZ Pic (*.seq *.pic *.pic.gz *.seq.gz);;Sets of 2D slices (*.pic *.pic.gz *.bmp *.png *.dcm *.gdcm);;stl files (*.stl)"
+#define INTERNAL_FILE_EXTENSIONS "all (*.seq *.pic *.pic.gz *.seq.gz *.pvtk *.stl *.vtk *.ves *.uvg *.dvg *.par *.gdcm *.dcm *.mhd *.hdr hpsonos.db HPSONOS.DB *.bmp *.jpg *.png *.tiff);;DKFZ Pic (*.seq *.pic *.pic.gz *.seq.gz);;surface files (*.stl *.vtk);;stl files (*.stl);;vtk surface files (*.vtk);;vtk image files (*.pvtk);;vessel files (*.ves *.uvg *.dvg);;par/rec files (*.par);;DSR files (hpsonos.db HPSONOS.DB);;DICOM files (*.dcm *.gdcm)"
 #endif
 #define SAVE_FILE_EXTENSIONS "all (*.pic *.mhd *.png *.tiff *.jpg)"
 
-const char* CommonFunctionality::GetInternalFileExtensions() { return INTERNAL_FILE_EXTENSIONS; };
-const char* CommonFunctionality::GetExternalFileExtensions() { return EXTERNAL_FILE_EXTENSIONS; };
+const char* CommonFunctionality::GetFileExtensions() 
+{
+#ifdef MBI_INTERNAL
+  return INTERNAL_FILE_EXTENSIONS; 
+#else
+  return EXTERNAL_FILE_EXTENSIONS;
+#endif
+};
+
 const char* CommonFunctionality::GetSaveFileExtensions() { return SAVE_FILE_EXTENSIONS; };
 
 
@@ -334,7 +341,7 @@ mitk::DataTreeNode::Pointer CommonFunctionality::FileOpenImageSequence(const cha
 
 mitk::DataTreeNode::Pointer CommonFunctionality::FileOpenImageSequence()
 {
-  QString fileName = QFileDialog::getOpenFileName(NULL,GetExternalFileExtensions());
+  QString fileName = QFileDialog::getOpenFileName(NULL,GetFileExtensions());
 
   if ( !fileName.isNull() )
   {
@@ -348,11 +355,7 @@ mitk::DataTreeNode::Pointer CommonFunctionality::FileOpenImageSequence()
 
 mitk::DataTreeNode::Pointer CommonFunctionality::FileOpen()
 {
-#ifdef MBI_INTERNAL
-  QString fileName = QFileDialog::getOpenFileName(NULL,GetInternalFileExtensions() );
-#else
-  QString fileName = QFileDialog::getOpenFileName(NULL,GetExternalFileExtensions() );
-#endif
+  QString fileName = QFileDialog::getOpenFileName(NULL,GetFileExtensions() );
   if ( !fileName.isNull() )
   {
     mitk::DataTreeNode::Pointer result = FileOpen(fileName.ascii());
@@ -375,7 +378,7 @@ mitk::DataTreeNode::Pointer CommonFunctionality::OpenVolumeOrSliceStack()
 {
   mitk::DataTreeNode::Pointer newNode = NULL;
 
-  QString fileName = QFileDialog::getOpenFileName(NULL,GetExternalFileExtensions() );
+  QString fileName = QFileDialog::getOpenFileName(NULL,GetFileExtensions() );
   if ( !fileName.isNull() )
   {
     newNode = CommonFunctionality::FileOpen(fileName);

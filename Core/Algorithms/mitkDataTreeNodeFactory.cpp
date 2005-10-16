@@ -1358,8 +1358,8 @@ void mitk::DataTreeNodeFactory::SetDefaultImageProperties(mitk::DataTreeNode::Po
   node->SetProperty( "iilInterpolation", new mitk::BoolProperty( false ) );
   node->SetProperty( "vtkInterpolation", new mitk::BoolProperty( false ) );
   node->SetProperty( "texture interpolation", new mitk::BoolProperty( true ) );
-  node->SetProperty( "texture interpolation", new mitk::BoolProperty( true ) );
   node->SetProperty( "layer", new mitk::IntProperty(0));
+  node->SetProperty( "in plane resample extent by geometry", new mitk::BoolProperty( false ) );
   node->SetOpacity(1.0f);
   node->SetColor(1.0,1.0,1.0);  
 }; 

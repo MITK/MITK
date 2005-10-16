@@ -245,6 +245,7 @@ void mitk::ImageMapper2D::GenerateData(mitk::BaseRenderer *renderer)
   //where we want to sample
   Point3D origin;
   Vector3D right, bottom, normal;
+  Vector3D rightInIndex, bottomInIndex;
 
   //take transform of input image into account
   Geometry3D* inputGeometry = inputtimegeometry->GetGeometry3D(timestep);
@@ -252,27 +253,45 @@ void mitk::ImageMapper2D::GenerateData(mitk::BaseRenderer *renderer)
   ScalarType MMperPixel[2];
   if ( dynamic_cast<const PlaneGeometry *>(worldgeometry) != NULL )
   {
-    // let's use the values of worldgeometry->GetExtent(0) and
-    // worldgeometry->GetExtent(1) for that purpose
-    // maybe it is useful to add here a more sophisticated rule that depends
-    // on the actual size of the current display, so not to sample
-    // 1000x1000 pixels for a display of 10x10 pixels
-    width = worldgeometry->GetExtent(0);
-    height = worldgeometry->GetExtent(1);
- 
-    widthInMM = worldgeometry->GetExtentInMM(0);
-    heightInMM = worldgeometry->GetExtentInMM(1);
-
     const PlaneGeometry *planeview =
       static_cast<const PlaneGeometry *>(worldgeometry);  
 
     origin = planeview->GetOrigin();
-    right  = planeview->GetAxisVector(0); right.Normalize();
-    bottom = planeview->GetAxisVector(1); bottom.Normalize();
-    normal = planeview->GetNormal();      normal.Normalize();
+    right  = planeview->GetAxisVector(0);
+    bottom = planeview->GetAxisVector(1);
+    normal = planeview->GetNormal();
+
+    bool inPlaneResampleExtentByGeometry = false;
+    GetDataTreeNode()->GetBoolProperty(
+      "in plane resample extent by geometry", inPlaneResampleExtentByGeometry, renderer
+    );
+    if(inPlaneResampleExtentByGeometry)
+    {
+      // let's use the values of worldgeometry->GetExtent(0) and
+      // worldgeometry->GetExtent(1) for that purpose
+      // maybe it is useful to add here a more sophisticated rule that depends
+      // on the actual size of the current display, so not to sample
+      // 1000x1000 pixels for a display of 10x10 pixels
+      width = worldgeometry->GetExtent(0);
+      height = worldgeometry->GetExtent(1);
+    }
+    else
+    {
+      inputGeometry->WorldToIndex(origin, right, rightInIndex);
+      inputGeometry->WorldToIndex(origin, bottom, bottomInIndex);
+      width  = rightInIndex.GetNorm();
+      height = bottomInIndex.GetNorm();
+    }
+ 
+    widthInMM = worldgeometry->GetExtentInMM(0);
+    heightInMM = worldgeometry->GetExtentInMM(1);
 
     MMperPixel[0] = widthInMM/width;
     MMperPixel[1] = heightInMM/height;
+
+    right.Normalize();
+    bottom.Normalize();
+    normal.Normalize();
 
     origin += right * (MMperPixel[0]*0.5);
     origin += bottom * (MMperPixel[1]*0.5);

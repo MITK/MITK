@@ -940,7 +940,7 @@
         <action ID="46" /> <!--AcINITBACKGROUND-->
         <action ID="11" /> <!--AcADD-->
       </transition>  
-      <transition NAME="drawNeutralSeed" NEXT_STATE_ID="3" EVENT_ID="5">
+      <transition NAME="drawNeutralSeed" NEXT_STATE_ID="3" EVENT_ID="540">
         <action ID="1101" /> <!--AcMODE_SELECT-->
         <action ID="47" /> <!--AcINITNEUTRAL-->
         <action ID="11" /> <!--AcADD-->
@@ -965,10 +965,10 @@
       </transition>
     </state>
     <state NAME="drawNeutral" ID="3">
-      <transition NAME="drawNeutralSeeds" NEXT_STATE_ID="3" EVENT_ID="534">
+      <transition NAME="drawNeutralSeeds" NEXT_STATE_ID="3" EVENT_ID="542">
         <action ID="92" /> <!--AcMOVE-->
       </transition>
-      <transition NAME="drawSeeds" NEXT_STATE_ID="0" EVENT_ID="537">
+      <transition NAME="drawSeeds" NEXT_STATE_ID="0" EVENT_ID="543">
         <action ID="44" /> <!--AcFINISH-->
         <action ID="1100" /> <!--AcMODE_DESELECT-->
       </transition>
@@ -1849,8 +1849,12 @@
     <!-- CTRL + middle MouseButtonRelease -->
     <event NAME="CTRL+middleBNRelease" ID="539" TYPE="Type_MouseButtonRelease" BUTTON="BS_MidButton" BUTTONSTATE="0x0204" KEY="Key_none" />
     <!-- Shift + Ctrl + left MouseButton -->
-    <event NAME="SHIFT+CTRL+middleBN" ID="540" TYPE="Type_MouseButtonPress" BUTTON="BS_LeftButton" BUTTONSTATE="0x0300" KEY="Key_none" />
-     <!-- Shift + left MouseButton and MouseMove -->
+    <event NAME="SHIFT+CTRL+MousePress" ID="540" TYPE="Type_MouseButtonPress" BUTTON="BS_LeftButton" BUTTONSTATE="0x0300" KEY="Key_none" />
+    <!-- Shift + Ctrl + left MouseButtonMove -->
+    <event NAME="SHIFT+CTRL+MouseMove" ID="542" TYPE="Type_MouseMove" BUTTON="BS_NoButton" BUTTONSTATE="0x0301" KEY="Key_none" />
+    <!-- Shift + Ctrl + left MouseButtonRelease -->
+    <event NAME="SHIFT+CTRL+MouseRelease" ID="543" TYPE="Type_MouseButtonRelease" BUTTON="BS_LeftButton" BUTTONSTATE="0x0301" KEY="Key_none" />
+    <!-- Shift + left MouseButton and MouseMove -->
     <event NAME="Shift+leftBN+MouseMove" ID="541" TYPE="Type_MouseMove" BUTTON="BS_NoButton" BUTTONSTATE="0x0101" KEY="Key_none" />
     <!-- ALT + left MouseButton -->
     <event NAME="ALT+leftBN" ID="600" TYPE="Type_MouseButtonPress" BUTTON="BS_LeftButton" BUTTONSTATE="0x0400" KEY="Key_none" />

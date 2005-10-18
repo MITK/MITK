@@ -239,15 +239,13 @@ mitk::TransferFunctionProperty::Pointer tranferFunctionProp = dynamic_cast<mitk:
    // create one
     mitk::TransferFunction::Pointer newTF = mitk::TransferFunction::New();
     newTF->InitializeByMitkImage(input);
-//    newTF->SetMin(-10);
-//    newTF->SetMax(+310);
     this->GetDataTreeNode()->SetProperty("TransferFunction", new TransferFunctionProperty(newTF.GetPointer()));
   } 
     
   mitk::LookupTableProperty::Pointer lookupTableProp;
   lookupTableProp = dynamic_cast<mitk::LookupTableProperty*>(this->GetDataTreeNode()->GetProperty("LookupTable").GetPointer());
- mitk::TransferFunctionProperty::Pointer transferFunctionProp = dynamic_cast<mitk::TransferFunctionProperty*>(this->GetDataTreeNode()->GetProperty("TransferFunction").GetPointer());
-  if (transferFunctionProp.IsNotNull() && transferFunctionProp->GetValue()->GetValid())   {
+  mitk::TransferFunctionProperty::Pointer transferFunctionProp = dynamic_cast<mitk::TransferFunctionProperty*>(this->GetDataTreeNode()->GetProperty("TransferFunction").GetPointer());
+  if ( transferFunctionProp.IsNotNull() )   {
 
     opacityTransferFunction = transferFunctionProp->GetValue()->GetScalarOpacityFunction();
     colorTransferFunction = transferFunctionProp->GetValue()->GetColorTransferFunction();
@@ -313,7 +311,6 @@ mitk::TransferFunctionProperty::Pointer tranferFunctionProp = dynamic_cast<mitk:
 
     colorTransferFunction->ClampingOn();
   }
-  
   m_VolumeProperty->SetColor( colorTransferFunction );
   m_VolumeProperty->SetScalarOpacity( opacityTransferFunction ); 
   m_VolumeProperty->SetDiffuse(0.2);

@@ -3,6 +3,7 @@
 
 #include "mitkBaseProperty.h"
 #include <map>
+#include <string>
 
 namespace mitk
 {
@@ -99,7 +100,7 @@ public:
    * @returns the number of enumeration values associated with this Enumeration
    * Property
    */
-  virtual unsigned int Size();
+  virtual unsigned int Size() const;
 
   /**
    * Provides access to the set of known enumeration values. The string representation

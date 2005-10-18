@@ -77,9 +77,6 @@ namespace mitk {
        */
       virtual bool WriteXMLData( XMLWriter& xmlWriter )
       {
-        xmlWriter.WriteProperty( XMLReader::MIN, m_Value->GetMin() );
-        xmlWriter.WriteProperty( XMLReader::MAX, m_Value->GetMax() );
-        xmlWriter.WriteProperty( XMLReader::VALID, m_Value->GetValid() );    
         return true;
       }
 
@@ -88,14 +85,6 @@ namespace mitk {
        */
       virtual bool ReadXMLData( XMLReader& xmlReader )
       {
-        int min, max;
-        bool valid;
-
-        xmlReader.GetAttribute( XMLReader::MIN, min );
-        xmlReader.GetAttribute( XMLReader::MAX, max );
-        xmlReader.GetAttribute( XMLReader::VALID, valid );
-
-        m_Value = new mitk::TransferFunction( min, max );
         return true;
       }
 

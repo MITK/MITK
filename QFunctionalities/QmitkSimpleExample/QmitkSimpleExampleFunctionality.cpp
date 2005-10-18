@@ -119,8 +119,10 @@ void QmitkSimpleExampleFunctionality::generateMovie()
     movieGenerator->SetStepper( stepper );
     movieGenerator->SetRenderer( multiWidget->mitkWidget1->GetRenderer() );
     QString movieFileName = QFileDialog::getSaveFileName( QString::null, "Movie (*.avi)", 0, "movie file dialog", "Choose a file name" );
-    movieGenerator->SetFileName( movieFileName.ascii() );
-    movieGenerator->WriteMovie();
+    if (!movieFileName.isEmpty()) {
+      movieGenerator->SetFileName( movieFileName.ascii() );
+      movieGenerator->WriteMovie();
+    }
   }
 }
 

@@ -18,6 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include "mitkLimitedLinearUndo.h"
+#include <mitkRenderingManager.h>
 
 mitk::LimitedLinearUndo::LimitedLinearUndo()
 {
@@ -94,6 +95,8 @@ bool mitk::LimitedLinearUndo::Undo(int oeid)
   } 
   while ( m_UndoList.back()->GetObjectEventId() >= oeid );
 
+  //Update. This should belong into the ExecuteOperation() of OperationActors, but it seems not to be used everywhere
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   return true;
 }
 
@@ -130,6 +133,9 @@ bool mitk::LimitedLinearUndo::Redo(int oeid)
     }
   } 
   while ( m_RedoList.back()->GetObjectEventId() <= oeid );
+  
+  //Update. This should belong into the ExecuteOperation() of OperationActors, but it seems not to be used everywhere
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   return true;
 }
 

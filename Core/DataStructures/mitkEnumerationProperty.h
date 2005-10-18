@@ -42,7 +42,7 @@ public:
   /**
    * Type used for iterators over all defined enumeration values.
    */
-  typedef EnumStringsContainerType::const_iterator EnumConstIterator;
+  typedef EnumIdsContainerType::const_iterator EnumConstIterator;
 
   /**
    * Default constructor. The current value of the enumeration is undefined.
@@ -104,7 +104,7 @@ public:
 
   /**
    * Provides access to the set of known enumeration values. The string representation
-   * may be accessed via iterator->first, the id may be access via iterator->second
+   * may be accessed via iterator->second, the id may be access via iterator->first
    * @returns an iterator over all enumeration values.
    */
   virtual EnumConstIterator Begin() const;

@@ -80,13 +80,13 @@ unsigned int mitk::EnumerationProperty::Size() const
 
 mitk::EnumerationProperty::EnumConstIterator mitk::EnumerationProperty::Begin() const
 {
-  return m_EnumStrings.begin();
+  return m_EnumIds.begin();
 }
 
 
 mitk::EnumerationProperty::EnumConstIterator mitk::EnumerationProperty::End() const
 {
-  return m_EnumStrings.end();
+  return m_EnumIds.end();
 }
 
 

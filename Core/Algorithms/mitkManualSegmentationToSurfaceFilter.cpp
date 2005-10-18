@@ -43,11 +43,10 @@ void mitk::ManualSegmentationToSurfaceFilter::GenerateData()
       vtkImageResample * imageresample = vtkImageResample::New();
       imageresample->SetInput(vtkimage);
 
-      //Spacing Manual or Original (Original spacing is lost during image processing)      
+      //Set Spacing Manual to 1mm in each direction (Original spacing is lost during image processing)      
       imageresample->SetAxisOutputSpacing(0, 1);
       imageresample->SetAxisOutputSpacing(1, 1);
-      imageresample->SetAxisOutputSpacing(2, 1); //auf 1 interpoliert
-      imageresample->InterpolateOn();//OFF: pixel replication is used 
+      imageresample->SetAxisOutputSpacing(2, 1);
       vtkimage=imageresample->GetOutput();
       vtkimage->UpdateInformation();
     }

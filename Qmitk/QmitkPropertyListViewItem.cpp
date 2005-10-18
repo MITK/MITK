@@ -21,6 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkColorProperty.h"
 #include "mitkPropertyManager.h"
 #include "mitkRenderingManager.h"
+#include "mitkEnumerationProperty.h"
 
 #include <qcheckbox.h>
 #include <qlineedit.h>
@@ -32,6 +33,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qvalidator.h>
 #include <qhbox.h>
 #include <qslider.h>
+#include <qcombobox.h>
+
+
 QmitkPropertyListViewItem::QmitkPropertyListViewItem(std::string name, mitk::PropertyList* propertyList, QWidget* parent, bool createOnlyControl) : m_Name(name), m_PropertyList(propertyList), m_Control(NULL), m_Label(NULL)
 {
   if (!createOnlyControl)
@@ -88,6 +92,36 @@ QmitkPropertyListViewItem* QmitkPropertyListViewItem::CreateInstance(mitk::Prope
     // newItem->m_Control->setBackgroundPixmap(pm);
     newItem->m_Control->setPaletteBackgroundColor(qcol);
     connect((QObject*)(newItem->m_Control),SIGNAL(clicked()),(QObject*)(newItem),SLOT(ColorControlActivated()));
+  }
+  else if (mitk::EnumerationProperty* enumProp = dynamic_cast<mitk::EnumerationProperty*>(baseProp))
+  {
+    newItem = new QmitkPropertyListViewItem( name,propList,parent,createOnlyControl );
+    newItem->m_Control = new QComboBox( parent );
+    
+    //
+    // Fill the combo box with the possible enumeration values.
+    // Keep track of the index of the current value set in the enumeration property
+    // to set it as current item in the  combobox
+    //
+    int indexOfCurrentValue = -1;
+    int index = 0;
+    for ( mitk::EnumerationProperty::EnumConstIterator it = enumProp->Begin(); it !=enumProp->End(); ++it, ++index )
+    {
+      if ( enumProp->GetValueAsString() == it->second )
+      {
+        indexOfCurrentValue = index;
+      }
+      ( ( QComboBox* )( newItem->m_Control ) )->insertItem( it->second.c_str() );  
+    }
+    
+    //
+    // select the current item of the combo box to the value defined in the
+    // enumeration property
+    //
+    assert( indexOfCurrentValue != -1 );
+    ( ( QComboBox* )( newItem->m_Control ) )->setCurrentItem( indexOfCurrentValue );
+    
+    connect((QObject*)(newItem->m_Control),SIGNAL( activated(const QString&) ),(QObject*)(newItem),SLOT(ComboBoxItemActivated(const QString&)));
   }
   else if (mitk::FloatProperty* floatProp = dynamic_cast<mitk::FloatProperty*>(baseProp))
   {
@@ -276,6 +310,24 @@ void QmitkPropertyListViewItem::EnabledButtonClicked()
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
+
+void QmitkPropertyListViewItem::ComboBoxItemActivated(const QString &item)
+{
+  mitk::EnumerationProperty* enumProp = dynamic_cast<mitk::EnumerationProperty*>(m_PropertyList->GetProperty(m_Name.c_str()).GetPointer());
+  if ( enumProp != NULL )
+  {
+std::string activatedItem( item.latin1() );
+if ( activatedItem != enumProp->GetValueAsString() )
+{
+if ( enumProp->IsValidEnumerationValue( activatedItem ) )
+{
+   enumProp->SetValue( activatedItem );
+   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+}
+}
+  }
+}
+
 void  QmitkPropertyListViewFloatSlider::SliderValueChanged(int value)
 {
   m_PropertyList->SetProperty(m_Name.c_str(), new mitk::FloatProperty(value / 100.0f));
@@ -295,3 +347,4 @@ void QmitkPropertyListViewFloatSlider::UpdateView()
   }
   m_Slider->blockSignals(false);
 }
+

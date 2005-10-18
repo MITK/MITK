@@ -55,6 +55,8 @@ public slots:
   void ColorControlActivated();
   void FloatControlActivated(const QString &text);
   void IntControlActivated(const QString &text);
+  void ComboBoxItemActivated(const QString &item);
+  
 protected:
   QmitkPropertyListViewItem() {}
   void CreateEnabledButton(QWidget* parent);

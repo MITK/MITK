@@ -41,6 +41,10 @@ int mitkEnumerationPropertyTest( int argc, char* argv[] )
     std::cout << "[PASSED]" << std::endl;
   }
 
+  
+  
+  
+  
   std::cout << "Testing mitk::EnumerationProperty::Size(): " ;
   if ( enumerationProperty.Size() != 3 )
   {
@@ -63,6 +67,10 @@ int mitkEnumerationPropertyTest( int argc, char* argv[] )
     std::cout << "[PASSED]" << std::endl;
   }
 
+  
+  
+  
+  
   std::cout << "Testing mitk::EnumerationProperty::SetValue(id): ";
   if ( ! enumerationProperty.SetValue( 2 ) )
   {
@@ -81,6 +89,10 @@ int mitkEnumerationPropertyTest( int argc, char* argv[] )
   }
   std::cout << "[PASSED]" << std::endl;
 
+  
+  
+  
+  
   std::cout << "Testing mitk::EnumerationProperty::SetValue(name): ";
   if ( ! enumerationProperty.SetValue( "third" ) )
   {
@@ -99,6 +111,10 @@ int mitkEnumerationPropertyTest( int argc, char* argv[] )
   }
   std::cout << "[PASSED]" << std::endl;
 
+  
+  
+  
+  
   std::cout << "Testing mitk::EnumerationProperty::SetValue(invalid id): ";
   if ( enumerationProperty.SetValue( 100 ) )
   {
@@ -116,8 +132,12 @@ int mitkEnumerationPropertyTest( int argc, char* argv[] )
   std::cout << "[PASSED]" << std::endl;
 
 
-  mitk::VtkInterpolationProperty vtkInterpolationProperty;
+  
+  
+  
+  
   std::cout << "Testing mitk::VtkInterpolationType::SetInterpolationToPhong(): ";
+  mitk::VtkInterpolationProperty vtkInterpolationProperty;
   vtkInterpolationProperty.SetInterpolationToPhong();
   if ( vtkInterpolationProperty.GetValueAsString() != "Phong" )
   {
@@ -136,8 +156,12 @@ int mitkEnumerationPropertyTest( int argc, char* argv[] )
   }
   std::cout << "[PASSED]" << std::endl;
 
-  mitk::VtkRepresentationProperty vtkRepresentationProperty;
+  
+  
+  
+  
   std::cout << "Testing mitk::VtkRepresentationType::SetRepresentationToWireframe(): ";
+  mitk::VtkRepresentationProperty vtkRepresentationProperty;
   vtkRepresentationProperty.SetRepresentationToWireframe();
   if ( vtkRepresentationProperty.GetValueAsString() != "Wireframe" )
   {

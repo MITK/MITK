@@ -6,36 +6,6 @@
 
 #include <mitkHistogramGenerator.h>
 
-void mitk::TransferFunction::FillValues(std::vector<mitk::TransferFunction::RGBO> &values, const mitk::TransferFunction::ElementSetType &elements) {
-  for (unsigned int i=0;i<values.size();i++) {
-    float ix = (float)i / values.size();
-    values[i].m_Opacity =0.0f ;
-    for (mitk::TransferFunction::ElementSetType::const_iterator elemIt = elements.begin(); elemIt != elements.end(); elemIt++ ) {
-      //values[i].m_Opacity += (*elemIt)->GetValueAt(ix); 
-      values[i] = values[i] + (*elemIt)->GetRGBOAt(ix); 
-    } 
-  }
-  return;
-}
-void mitk::TransferFunction::UpdateVtkFunctions() {
-    std::vector<mitk::TransferFunction::RGBO> values(100);
-    FillValues(values,m_Elements);
-    if (m_ScalarOpacityFunction->GetSize() > 0) {
-      m_ScalarOpacityFunction->RemoveAllPoints();
-      m_ColorTransferFunction->RemoveAllPoints();
-    }  
-    for (unsigned int x = 0; x < values.size() ; x++) {
-      float fx = m_Min + x * (float)(m_Max - m_Min)/values.size(); 
-  //    std::cout << fx << "/" << values[x].m_Opacity << " ";
-      m_ScalarOpacityFunction->AddPoint(fx, values[x].m_Opacity);
-      m_ColorTransferFunction->AddRGBPoint(fx, values[x].m_Red / 255.0, values[x].m_Green / 255.0, values[x].m_Blue / 255.0); 
-    }
- //   std::cout << std::endl;
-   if (m_Elements.size() >= 1) {
-     m_Valid = true;
-   } 
-};
-
 void mitk::TransferFunction::InitializeByMitkImage( const mitk::Image * image )
 {
   mitk::HistogramGenerator::Pointer histGen= mitk::HistogramGenerator::New();
@@ -45,4 +15,18 @@ void mitk::TransferFunction::InitializeByMitkImage( const mitk::Image * image )
   m_Histogram = histGen->GetHistogram();
   m_Min = (int)GetHistogram()->GetBinMin(0,0);
   m_Max = (int)GetHistogram()->GetBinMax(0, GetHistogram()->Size()-1);
+  m_ScalarOpacityFunction->Initialize();
+  m_ScalarOpacityFunction->AddPoint(m_Min,0.0);
+  m_ScalarOpacityFunction->AddPoint(m_Max,1.0);
+  m_ColorTransferFunction->RemoveAllPoints();
+  m_ColorTransferFunction->AddRGBPoint(m_Min,1,0,0);
+  m_ColorTransferFunction->AddRGBPoint(m_Max,1,1,0);  
+  m_ColorTransferFunction->SetColorSpaceToHSV();
+  std::cout << "min/max in tf-c'tor:" << m_Min << "/" << m_Max << std::endl;
+}
+
+mitk::TransferFunction::Pointer CreateForMitkImage(const mitk::Image* image) {
+  mitk::TransferFunction::Pointer newTF = mitk::TransferFunction::New();
+  newTF->InitializeByMitkImage(image);
+  return newTF;
 }

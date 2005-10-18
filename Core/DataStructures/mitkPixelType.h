@@ -93,7 +93,7 @@ public:
 
   //##ModelId=3E140E4F00E9
   void Initialize(ipPicType_t type, int bpe, int numberOfComponents = 1);
-
+  virtual ~PixelType() {}
 private:
   //##ModelId=3E13FFAD038C
   const std::type_info* m_TypeId;

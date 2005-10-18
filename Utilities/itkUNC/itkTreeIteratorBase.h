@@ -173,7 +173,7 @@ public:
     m_Tree = iterator.m_Tree;
     return *this;
     }
-
+   virtual ~TreeIteratorBase() {}
 protected:
 
   /** Constructors */

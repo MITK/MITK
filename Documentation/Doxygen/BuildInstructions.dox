@@ -30,4 +30,5 @@ make<br>
 If you use Windows, then you just start the CMake GUI and enter the location of the source and of the binary tree. 
 CMake will create a Visual Studio solution in the root of your binary tree.
 
+\note "Installing" MITK via cmake (or using "make install") is not yet supported.
 */

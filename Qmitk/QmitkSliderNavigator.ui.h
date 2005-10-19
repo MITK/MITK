@@ -55,8 +55,11 @@ void QmitkSliderNavigator::SetStepper( mitk::Stepper * stepper)
 
 void QmitkSliderNavigator::slider_valueChanged( int )
 {
-  if(!m_InRefetch)
+  if (!m_InRefetch)
+  {
     m_Stepper->SetPos(slider->value());
+    this->Refetch();
+  }
 }
 
 void QmitkSliderNavigator::init()
@@ -68,7 +71,10 @@ void QmitkSliderNavigator::init()
 void QmitkSliderNavigator::spinBox_valueChanged( int )
 {
   if(!m_InRefetch)
+  {
     m_Stepper->SetPos( (int) m_Stepper->ConvertPosToUnit(spinBox->value()) );
+    this->Refetch();
+  }
 }
 
 int QmitkSliderNavigator::GetPos()

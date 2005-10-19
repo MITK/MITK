@@ -3,6 +3,7 @@
 #include <fstream>
 #include <string>
 #include <sstream>
+#include <itksys/SystemTools.hxx>
 
 namespace mitk {
 
@@ -15,13 +16,19 @@ XMLWriter::XMLWriter( const char* filename, const char* subDirectory, int space 
   : BaseXMLWriter( filename, space ), m_FileCounter(0)
 {		
   if(filename != NULL)
-    m_Filename = filename;
+    m_Filename = itksys::SystemTools::GetFilenameName(filename);
   else
     m_Filename = "";
+  m_SubFolder = itksys::SystemTools::GetFilenamePath(filename);
+  if(m_SubFolder.size() > 0)
+    m_SubFolder += "/";
   if(subDirectory != NULL)
-    m_SubFolder = subDirectory;
-  else
-    m_SubFolder = "";
+    m_SubFolder += subDirectory;
+  if(m_SubFolder.size() > 0)
+  {
+    itksys::SystemTools::ConvertToUnixSlashes(m_SubFolder);
+    m_SubFolder += "/";
+  }
 }
 
 /**
@@ -111,15 +118,7 @@ const char* XMLWriter::GetNewFileName()
   */
 const char* XMLWriter::GetNewFilenameAndSubFolder()
 {
-  static std::string newFilenameAndSubFolder;
-  newFilenameAndSubFolder = m_SubFolder;
-
-  std::string::size_type pos = m_SubFolder.find('\\');
-
-  if ( pos != std::string::npos )
-    newFilenameAndSubFolder += '\\';
-  else
-    newFilenameAndSubFolder += '/';
+  static std::string newFilenameAndSubFolder = m_SubFolder;
 
   newFilenameAndSubFolder += GetNewFileName();
   return newFilenameAndSubFolder.c_str();

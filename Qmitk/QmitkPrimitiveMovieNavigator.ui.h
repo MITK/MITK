@@ -74,9 +74,10 @@ void QmitkPrimitiveMovieNavigator::next()
 {
   if(!m_InRefetch) 
   {
-    m_Stepper->Next();
     if(m_Stepper->GetPos()==m_Stepper->GetSteps()-1)
       m_Stepper->First();
+    else
+      m_Stepper->Next();
   }
 }
 

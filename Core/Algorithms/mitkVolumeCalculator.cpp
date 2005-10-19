@@ -29,7 +29,7 @@ void mitk::InternalCompute(itk::Image< TPixel, VImageDimension >* itkImage, mitk
 
   for (imageIt.GoToBegin(); !imageIt.IsAtEnd(); ++imageIt)
   {
-    if ( (int)(imageIt.Get()) > volumeCalculator->m_Threshold )
+    if ( (int)(imageIt.Get()) >= volumeCalculator->m_Threshold )
     {
       count++;
     }

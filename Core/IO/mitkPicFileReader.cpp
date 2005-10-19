@@ -62,6 +62,7 @@ void mitk::PicFileReader::GenerateOutputInformation()
         }
 
         output->Initialize(header);
+        ipPicFree ( header );
     }
     else
     {
@@ -120,6 +121,7 @@ void mitk::PicFileReader::GenerateOutputInformation()
 
         printf(" \ninitialisize output\n");
         output->Initialize(header);
+        ipPicFree ( header );
     }
 
     m_ReadHeaderTime.Modified();

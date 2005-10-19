@@ -184,8 +184,7 @@ bool mitk::DataTree::Save( const mitk::DataTreeIteratorBase* it, const char* fil
 		return false;
 
   std::string stdFileName(fileName);
-  unsigned int pos = stdFileName.find('.');
-	mitk::XMLWriter writer( fileName, stdFileName.substr( 0, pos ).c_str() );
+	mitk::XMLWriter writer( fileName, NULL );
 
 	if ( !Save( it, writer ) )
 		writer.WriteComment( "Error" );

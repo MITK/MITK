@@ -161,6 +161,7 @@ void mitk::SlicedGeometry3D::InitializeEvenlySpaced(mitk::Geometry2D* geometry2D
   SetGeometry2D(geometry2D, 0);
   SetSpacing(spacing);
   SetEvenlySpaced();
+  SetTimeBounds(geometry2D->GetTimeBounds());
 
   assert(m_IndexToWorldTransform.GetPointer() != geometry2D->GetIndexToWorldTransform()); // (**) see above.
 

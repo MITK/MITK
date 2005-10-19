@@ -7,10 +7,12 @@
 ** place of a destructor.
 *****************************************************************************/
 
-#include <mitkSliceNavigationController.h>
-#include <QmitkStepperAdapter.h>
-#include <QmitkRenderWindow.h>
-#include <mitkLevelWindowProperty.h>
+#include "QmitkStepperAdapter.h"
+#include "QmitkRenderWindow.h"
+
+#include "mitkSliceNavigationController.h"
+#include "mitkLevelWindowProperty.h"
+
 #include <vtkRenderer.h>
 
 void QmitkSliceWidget::init()
@@ -42,13 +44,11 @@ void QmitkSliceWidget::init()
   m_RenderWindow = new QmitkRenderWindow(m_Renderer, container, composedName);
   hlayout->addWidget(m_RenderWindow);
 
-  m_SliceNavigator = new mitk::SliceNavigationController(NULL);
-  m_SliceNavigator->SetViewDirection(mitk::SliceNavigationController::Transversal);
-  m_SliceNavigator->ConnectGeometrySliceEvent(m_Renderer.GetPointer());
-  new QmitkStepperAdapter(m_NavigatorWidget, m_SliceNavigator->GetSlice(), "navigation");  
-  
-  SetLevelWindowEnabled(true);
+  new QmitkStepperAdapter( m_NavigatorWidget,
+    m_RenderWindow->GetSliceNavigationController()->GetSlice(), "navigation"
+  );  
 
+  SetLevelWindowEnabled(true);
 }
 
 
@@ -93,15 +93,20 @@ void QmitkSliceWidget::AddData( mitk::DataTreeNode::Pointer node)
 }
 
 
-void QmitkSliceWidget::SetData( mitk::DataTreeIteratorBase* it, mitk::SliceNavigationController::ViewDirection view )
+void
+QmitkSliceWidget
+::SetData( mitk::DataTreeIteratorBase* it,
+           mitk::SliceNavigationController::ViewDirection view )
 {
   m_DataTreeIterator = it;
   mitk::DataTreeIteratorClone tmpIterator=m_DataTreeIterator.GetPointer();
 
-  while(!tmpIterator->IsAtEnd()) 
+  while ( !tmpIterator->IsAtEnd() ) 
   {
-    mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(tmpIterator->Get()->GetData());
-    if(image.IsNotNull() && tmpIterator->Get()->IsVisible(GetRenderer()))
+    mitk::Image::Pointer image =
+      dynamic_cast<mitk::Image*>(tmpIterator->Get()->GetData());
+
+    if ( image.IsNotNull() && tmpIterator->Get()->IsVisible(GetRenderer()) )
     {
       m_SlicedGeometry = image->GetSlicedGeometry();
 
@@ -111,7 +116,7 @@ void QmitkSliceWidget::SetData( mitk::DataTreeIteratorBase* it, mitk::SliceNavig
       levelWindow->setLevelWindow(picLevelWindow);
 
       GetRenderer()->SetData(tmpIterator.GetPointer());
-//      tmpIterator->Get()->SetLevelWindow(levelWindow, NULL );
+      //tmpIterator->Get()->SetLevelWindow(levelWindow, NULL );
       break;
     }
  
@@ -120,30 +125,33 @@ void QmitkSliceWidget::SetData( mitk::DataTreeIteratorBase* it, mitk::SliceNavig
   InitWidget(view);
 }
 
-void QmitkSliceWidget::InitWidget( mitk::SliceNavigationController::ViewDirection viewDirection )
+void
+QmitkSliceWidget
+::InitWidget( mitk::SliceNavigationController::ViewDirection viewDirection )
 {
   m_View = viewDirection;
 
+  mitk::SliceNavigationController* controller =
+    m_RenderWindow->GetSliceNavigationController();
 
   if (viewDirection == mitk::SliceNavigationController::Transversal)
   {
-    m_SliceNavigator->SetViewDirection(mitk::SliceNavigationController::Transversal);
+    controller->SetViewDirection(mitk::SliceNavigationController::Transversal);
   }
   else if (viewDirection == mitk::SliceNavigationController::Frontal)
   {  
-    m_SliceNavigator->SetViewDirection(mitk::SliceNavigationController::Frontal);
+    controller->SetViewDirection(mitk::SliceNavigationController::Frontal);
   }
   // init sagittal view
   else 
   {
-    m_SliceNavigator->SetViewDirection(mitk::SliceNavigationController::Sagittal);
+    controller->SetViewDirection(mitk::SliceNavigationController::Sagittal);
   }    
 
-
   int currentPos = 0;
-  if (m_SliceNavigator.IsNotNull())
+  if ( m_RenderWindow->GetSliceNavigationController() )
   {
-    currentPos = m_SliceNavigator->GetSlice()->GetPos();
+    currentPos = controller->GetSlice()->GetPos();
   }
 
   if (m_DataTreeIterator.IsNull() || m_SlicedGeometry.IsNull() ) 
@@ -152,7 +160,8 @@ void QmitkSliceWidget::InitWidget( mitk::SliceNavigationController::ViewDirectio
   }
 
   // compute bounding box with respect to first images geometry
-  const mitk::BoundingBox::BoundsArrayType imageBounds = m_SlicedGeometry->GetBoundingBox()->GetBounds();
+  const mitk::BoundingBox::BoundsArrayType imageBounds =
+    m_SlicedGeometry->GetBoundingBox()->GetBounds();
 
 //  mitk::SlicedGeometry3D::Pointer correctGeometry = m_SlicedGeometry.GetPointer();
   mitk::Geometry3D::Pointer geometry = m_SlicedGeometry.GetPointer();
@@ -160,19 +169,27 @@ void QmitkSliceWidget::InitWidget( mitk::SliceNavigationController::ViewDirectio
   const mitk::BoundingBox::Pointer boundingbox = mitk::DataTree::ComputeVisibleBoundingBox(m_DataTreeIterator.GetPointer(), NULL, "includeInBoundingBox");
   if(boundingbox->GetPoints()->Size()>0)
   {
-////    geometry = mitk::Geometry3D::New();
-////    geometry->Initialize();
-//    geometry->SetBounds(boundingbox->GetBounds());
-//    geometry->SetSpacing(correctGeometry->GetSpacing());
+    ////geometry = mitk::Geometry3D::New();
+    ////geometry->Initialize();
+    //geometry->SetBounds(boundingbox->GetBounds());
+    //geometry->SetSpacing(correctGeometry->GetSpacing());
 
-    //lets see if we have data with a limited live-span ...
-    mitk::TimeBounds timebounds = mitk::DataTree::ComputeTimeBounds(m_DataTreeIterator.GetPointer(), NULL, "includeInBoundingBox");
-    if(timebounds[1]<mitk::ScalarTypeNumericTraits::max())
+    //let's see if we have data with a limited live-span ...
+    mitk::TimeBounds timebounds = mitk::DataTree::ComputeTimeBounds(
+      m_DataTreeIterator.GetPointer(), NULL, "includeInBoundingBox"
+    );
+
+    if (timebounds[1]<mitk::ScalarTypeNumericTraits::max())
     {
       mitk::ScalarType duration = timebounds[1]-timebounds[0];
 
-      mitk::TimeSlicedGeometry::Pointer timegeometry = mitk::TimeSlicedGeometry::New();
-      timegeometry->InitializeEvenlyTimed(m_SlicedGeometry.GetPointer(), (unsigned int) duration);
+      mitk::TimeSlicedGeometry::Pointer timegeometry =
+        mitk::TimeSlicedGeometry::New();
+
+      timegeometry->InitializeEvenlyTimed(
+        m_SlicedGeometry.GetPointer(), (unsigned int) duration
+      );
+
       timegeometry->SetTimeBounds(timebounds); //@bug really required? FIXME
 
       timebounds[1] = timebounds[0]+1.0f;
@@ -183,8 +200,8 @@ void QmitkSliceWidget::InitWidget( mitk::SliceNavigationController::ViewDirectio
 
     if(const_cast<mitk::BoundingBox*>(geometry->GetBoundingBox())->GetDiagonalLength2()>=mitk::eps)
     {
-      m_SliceNavigator->SetInputWorldGeometry(geometry); 
-      m_SliceNavigator->Update();
+      controller->SetInputWorldGeometry(geometry); 
+      controller->Update();
     }
   }
 
@@ -195,8 +212,6 @@ void QmitkSliceWidget::InitWidget( mitk::SliceNavigationController::ViewDirectio
   //vtkRenderer * vtkrenderer = ((mitk::OpenGLRenderer*)(GetRenderer()))->GetVtkRenderer();
   //if(vtkrenderer!=NULL) vtkrenderer->ResetCamera();
   //vtkObject::SetGlobalWarningDisplay(w);
-
-  
 }
 
 void QmitkSliceWidget::ChangeLevelWindow(mitk::LevelWindow* lw )
@@ -213,7 +228,9 @@ void QmitkSliceWidget::ChangeLevelWindow(mitk::LevelWindow* lw )
     if( image.IsNotNull() )
     {
       mitk::LevelWindowProperty::Pointer levWinProp = 
-        dynamic_cast<mitk::LevelWindowProperty*>(it->Get()->GetProperty("levelwindow", NULL).GetPointer());
+        dynamic_cast<mitk::LevelWindowProperty*>(
+          it->Get()->GetProperty("levelwindow", NULL).GetPointer()
+      );
 
       if (levWinProp.IsNotNull()) 
       {
@@ -301,25 +318,20 @@ QmitkSliderNavigator* QmitkSliceWidget::GetNavigatorWidget()
 }
 
 
-mitk::SliceNavigationController::Pointer QmitkSliceWidget::GetSliceController()
-{
-  return m_SliceNavigator;
-}
-
 
 void QmitkSliceWidget::SetLevelWindowEnabled( bool enable )
 {
-    levelWindow->setEnabled(enable);
-    if (!enable)
-    {
-      levelWindow->setMinimumWidth(0);
-      levelWindow->setMaximumWidth(0);
-    }
-    else
-    {
-     levelWindow->setMinimumWidth(28);
-     levelWindow->setMaximumWidth(28);
-    }
+  levelWindow->setEnabled(enable);
+  if (!enable)
+  {
+    levelWindow->setMinimumWidth(0);
+    levelWindow->setMaximumWidth(0);
+  }
+  else
+  {
+    levelWindow->setMinimumWidth(28);
+    levelWindow->setMaximumWidth(28);
+  }
 }
 
 
@@ -331,5 +343,28 @@ bool QmitkSliceWidget::IsLevelWindowEnabled()
 
 QmitkRenderWindow* QmitkSliceWidget::GetRenderWindow()
 {
-    return m_RenderWindow;
+  return m_RenderWindow;
+}
+
+mitk::SliceNavigationController*
+QmitkSliceWidget
+::GetSliceNavigationController() const
+{
+  return m_RenderWindow->GetSliceNavigationController();
+}
+
+
+mitk::CameraRotationController*
+QmitkSliceWidget
+::GetCameraRotationController() const
+{
+  return m_RenderWindow->GetCameraRotationController();
+}
+
+
+mitk::BaseController*
+QmitkSliceWidget
+::GetController() const
+{
+  return m_RenderWindow->GetController();
 }

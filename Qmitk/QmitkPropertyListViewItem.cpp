@@ -316,15 +316,16 @@ void QmitkPropertyListViewItem::ComboBoxItemActivated(const QString &item)
   mitk::EnumerationProperty* enumProp = dynamic_cast<mitk::EnumerationProperty*>(m_PropertyList->GetProperty(m_Name.c_str()).GetPointer());
   if ( enumProp != NULL )
   {
-std::string activatedItem( item.latin1() );
-if ( activatedItem != enumProp->GetValueAsString() )
-{
-if ( enumProp->IsValidEnumerationValue( activatedItem ) )
-{
-   enumProp->SetValue( activatedItem );
-   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-}
-}
+    std::string activatedItem( item.latin1() );
+    if ( activatedItem != enumProp->GetValueAsString() )
+    {
+      if ( enumProp->IsValidEnumerationValue( activatedItem ) )
+      {
+         enumProp->SetValue( activatedItem );
+         m_PropertyList->InvokeEvent( itk::ModifiedEvent() );
+         mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+      }
+    }
   }
 }
 

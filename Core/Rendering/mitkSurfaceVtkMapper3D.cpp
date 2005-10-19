@@ -208,13 +208,6 @@ void mitk::SurfaceVtkMapper3D::ApplyProperties(vtkActor* actor, mitk::BaseRender
     m_VtkPolyDataMapper->SetScalarRange(levelWindow.GetMin(),levelWindow.GetMax());
   }
 
-  bool wireframe=false;
-  GetDataTreeNode()->GetVisibility(wireframe, renderer, "wireframe");
-  if(wireframe)
-    m_Actor->GetProperty()->SetRepresentationToWireframe();
-  else
-    m_Actor->GetProperty()->SetRepresentationToSurface();
-  
   //do we have materials?
   
   mitk::MaterialProperty* materialProperty = dynamic_cast<mitk::MaterialProperty *>(this->GetDataTreeNode()->GetProperty("material").GetPointer() );
@@ -237,16 +230,10 @@ void mitk::SurfaceVtkMapper3D::ApplyProperties(vtkActor* actor, mitk::BaseRender
   }
   mitk::VtkRepresentationProperty* representationProperty = dynamic_cast<mitk::VtkRepresentationProperty *>(this->GetDataTreeNode()->GetProperty("representation").GetPointer() );
   if ( representationProperty != NULL )
-  {
-    vtkProperty* property = m_Actor->GetProperty();
-    property->SetRepresentation( representationProperty->GetVtkRepresentation() );
-  }
+    m_Actor->GetProperty()->SetRepresentation( representationProperty->GetVtkRepresentation() );
   
   mitk::VtkInterpolationProperty* interpolationProperty = dynamic_cast<mitk::VtkInterpolationProperty *>(this->GetDataTreeNode()->GetProperty("interpolation").GetPointer() );
   if ( interpolationProperty != NULL )
-  {
-    vtkProperty* property = m_Actor->GetProperty();
-    property->SetInterpolation( interpolationProperty->GetVtkInterpolation() );
-  }
+    m_Actor->GetProperty()->SetInterpolation( interpolationProperty->GetVtkInterpolation() );
   
 }

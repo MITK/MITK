@@ -13,6 +13,8 @@
 #include <mitkInteractionConst.h>
 #include <mitkPositionEvent.h>
 #include <mitkOpenGLRenderer.h>
+#include <mitkDataTreeNodeFactory.h>
+#include <mitkVtkRepresentationProperty.h>
 
 #include <vtkRenderer.h>
 #include <vtkCamera.h>
@@ -22,8 +24,7 @@ mitk::ExtrudedContourInteractor::ExtrudedContourInteractor(const char * type, mi
 {
   assert(m_DataTreeNode != NULL);
 
-  if(m_DataTreeNode->GetProperty("wireframe", NULL).IsNull())
-    m_DataTreeNode->SetProperty( "wireframe", new mitk::BoolProperty(false));
+  m_DataTreeNode->SetProperty( "representation", new mitk::VtkRepresentationProperty("surface") );
 
   m_Contour = mitk::Contour::New();
 

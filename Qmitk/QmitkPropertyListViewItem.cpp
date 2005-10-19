@@ -281,6 +281,20 @@ void QmitkPropertyListViewItem::UpdateView()
     QColor qcol((int)(col.GetRed() * 255), (int)(col.GetGreen() * 255),(int)( col.GetBlue() * 255));
     ((QPushButton*)(m_Control))->setPaletteBackgroundColor(qcol);
   }
+  
+  else if (mitk::EnumerationProperty* enumerationProp = dynamic_cast<mitk::EnumerationProperty*>(baseProp))
+  {
+    QComboBox* combo = ( ( QComboBox* ) m_Control );
+    std::string enumerationValue = enumerationProp->GetValueAsString();
+    for ( unsigned int item = 0 ; item < combo->count() ; ++item )
+    {
+      if ( enumerationValue == combo->text( item ).latin1() )
+      {
+         combo->setCurrentItem( item );
+         break;
+      }
+    }
+  }
   m_Control->blockSignals(false);
 }
 void QmitkPropertyListViewItem::UpdateEnabledView()

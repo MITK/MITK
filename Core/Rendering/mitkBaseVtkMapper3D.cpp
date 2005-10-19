@@ -23,10 +23,12 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkActor.h>
 #include <vtkProperty.h>
 #include <vtkLinearTransform.h>
+#include <vtkMapper.h>
 
 //##ModelId=3E3424950213
 mitk::BaseVtkMapper3D::BaseVtkMapper3D() : m_SliceNr(0), m_TimeNr(0), m_ChannelNr(0), m_Prop3D(NULL)
 {
+  //vtkMapper::GlobalImmediateModeRenderingOn();
 }
 
 //##ModelId=3E3424950231

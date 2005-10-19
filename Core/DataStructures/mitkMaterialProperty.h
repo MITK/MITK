@@ -10,6 +10,8 @@
 
 namespace mitk
 {
+// forward declarations
+class DataTreeNode;
 
 /**
  * Encapsulates 3D visualization properties which are forwarded to vtk for
@@ -41,7 +43,7 @@ public:
      * specular coefficient 1.0, specular power 10, opacity 1.0, interpolation
      * Gouraud, representation Surface.
      */
-    MaterialProperty();
+    MaterialProperty( mitk::DataTreeNode* node = NULL );
 
     /**
      * Constructor. All values besides the given ones are set to defaults as 
@@ -51,7 +53,7 @@ public:
      * @param opacity the opacity of the material. 0.0 means fully transparent
      *              and 1.0 means solid.
      */
-    MaterialProperty( Color color, vtkFloatingPointType opacity = 1.0f );
+    MaterialProperty( Color color, vtkFloatingPointType opacity = 1.0f, mitk::DataTreeNode* node = NULL );
 
     /**
      * Constructor. All values besides the given ones are set to defaults as 
@@ -62,7 +64,7 @@ public:
      * @param opacity the opacity of the material. 0.0 means fully transparent
      *        and 1.0 means solid.
      */
-    MaterialProperty( vtkFloatingPointType red, vtkFloatingPointType green, vtkFloatingPointType blue, vtkFloatingPointType opacity = 1.0f );
+    MaterialProperty( vtkFloatingPointType red, vtkFloatingPointType green, vtkFloatingPointType blue, vtkFloatingPointType opacity = 1.0f, mitk::DataTreeNode* node = NULL );
 
     /**
      * Constructor. All values besides the given ones are set to defaults as 
@@ -80,7 +82,7 @@ public:
      *        and 1.0 means solid.
      */
     MaterialProperty( vtkFloatingPointType red, vtkFloatingPointType green, vtkFloatingPointType blue, vtkFloatingPointType colorCoefficient, 
-      vtkFloatingPointType specularCoefficient, vtkFloatingPointType specularPower, vtkFloatingPointType opacity );
+      vtkFloatingPointType specularCoefficient, vtkFloatingPointType specularPower, vtkFloatingPointType opacity, mitk::DataTreeNode* node = NULL );
 
     /**
      * Constructor. All values besides the given ones are set to defaults as 
@@ -97,13 +99,31 @@ public:
      * @param opacity the opacity of the material. 0.0 means fully transparent
      *        and 1.0 means solid.
      */
-    MaterialProperty( Color color, vtkFloatingPointType colorCoefficient, vtkFloatingPointType specularCoefficient, vtkFloatingPointType specularPower, vtkFloatingPointType opacity );
+    MaterialProperty( Color color, vtkFloatingPointType colorCoefficient, vtkFloatingPointType specularCoefficient, vtkFloatingPointType specularPower, vtkFloatingPointType opacity, mitk::DataTreeNode* node = NULL );
 
     /**
      * Copy constructor
      */
     MaterialProperty( const MaterialProperty& property );
 
+    
+    /**
+     * The material Property is associated with a data tree node, which may be
+     * set via this function. If node is != NULL, each call to the set/get functions
+     * is forwarded to the node. If node is NULL, the local member variables are
+     * used to store/retrieve the values;
+     * @param node the data tree node associated with the given material property
+     */
+    virtual void SetDataTreeNode( mitk::DataTreeNode* node );
+    
+    /**
+     * Returns the data tree node associated with the current material property
+     * @returns the data tree node associated with the current matieral property.
+     *          NOte: this may be NULL. If the value returned is NULL, then the local
+     *          member variables are used for storing the properties
+     */
+    virtual mitk::DataTreeNode* GetDataTreeNode() const;
+    
     /**
      * Sets the materials color in RGB space. The rgb components have to be
      * in the range [0..1]
@@ -268,6 +288,17 @@ protected:
     InterpolationType m_Interpolation;
 
     RepresentationType m_Representation;
+    
+    mitk::DataTreeNode* m_DataTreeNode;
+    
+    static const char* COLOR_KEY;     
+    static const char* SPECULAR_COLOR_KEY;     
+    static const char* COLOR_COEFFICIENT_KEY; 
+    static const char* SPECULAR_COEFFICIENT_KEY; 
+    static const char* SPECULAR_POWER_KEY; 
+    static const char* OPACITY_KEY; 
+    static const char* INTERPOLATION_KEY; 
+    static const char* REPRESENTATION_KEY; 
 
 };
 

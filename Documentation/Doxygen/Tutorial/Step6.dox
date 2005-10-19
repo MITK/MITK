@@ -12,7 +12,9 @@ The source is now split among several files:
 
 \li \ref Step6.cpp "Step6.cpp"\n 
 \li \ref Step6.h "Step6.h"\n 
-\li \ref Step6RegionGrowing.cpp "Step6RegionGrowing.cpp"
+\li \ref Step6RegionGrowing.txx "Step6RegionGrowing.txx"
+\li \ref Step6RegionGrowing1.cpp "Step6RegionGrowing1.cpp"
+\li \ref Step6RegionGrowing2.cpp "Step6RegionGrowing2.cpp"
 \li \ref Step6main.cpp "Step6main.cpp"
 
 The class Step6 inherits from QMainWindow and provides methods for setting up the widgets. Step6RegionGrowing.cpp contains a method for performing the region-growing. Step6main.cpp contains main.\n
@@ -52,16 +54,25 @@ Then call the access method:
 AccessByItk(mitkImage, MyAccessMethod, ...)
 \endcode
 
-\dontinclude Step6RegionGrowing.cpp
+\dontinclude Step6RegionGrowing.txx
 
-In this step our access method is called RegionGrowing():
+In this step our access method is called RegionGrowing() (defined in \ref Step6RegionGrowing.txx "Step6RegionGrowing.txx"):
 \skipline template
 \until }
 \until }
 
-Additionally the access function has to be instantiated for all datatypes and dimensions as some compilers have memory problems without this explicit instantiation.
+Additionally the access function has to be instantiated for all datatypes and two/three dimensions as some compilers have memory problems without this explicit instantiation, some even need instantiations in separate files for 2D/3D: \n
+For 2D in \ref Step6RegionGrowing1.cpp "Step6RegionGrowing1.cpp" :
 
-\skipline InstantiateAccessFunction_1
+\dontinclude Step6RegionGrowing1.cpp
+
+\skipline InstantiateAccessFunctionForFixedDimension_1
+
+... and for 3D in \ref Step6RegionGrowing2.cpp "Step6RegionGrowing2.cpp":
+
+\dontinclude Step6RegionGrowing2.cpp
+
+\skipline InstantiateAccessFunctionForFixedDimension_1
 
 \dontinclude Step6.cpp
 
@@ -71,23 +82,21 @@ The method StartRegionGrowing() finally calls our access method RegionGrowing():
 
 \section ConvertingITKMITKSection Converting ITK images to MITK images and vice versa
 
-\li \code mitk::CastToMitkImage(itk::Image<...>, mitkImage) \endcode
-\li \code mitk::CastToItkImage(mitkImage, itk::Image<...>) \endcode
+In some cases it is useful to simply convert between ITK and MITK images. The direction ITK to MITK is easy, since mitk::Image can handle all (most) data types. The direction MITK to ITK is more critical, since ITK images have to instantiated with a fixed pixel type and fixed dimension at compile time. 
 
-Warning:\n
-Data types are converted if neccessary.\n
-The dimensions of the itk::Image and the mitkImage must equal.\n
+\li \code mitk::CastToMitkImage(itk::Image<...>, mitkImage) \endcode : Convert ITK to MITK image.
+\li \code mitk::CastToItkImage(mitkImage, itk::Image<...>) \endcode : Convert MITK to ITK image. Warning: Data types are converted if neccessary. The dimensions of the mitkImage and the itk::Image have to be equal.
 
 
 \section ConnectingMITKToVTKSection Connecting MITK images to VTK
 
-Images are not converted just accessed.
+Images are not converted or copied: The data array is just accessed via an encapsulating VTK object.
 
 \li \code vtkImageData* mitk::Image::GetVtkImageData(int time = 0) \endcode
 
 \section SurfacesMITKToVTKSection MITK Surfaces to VTK and vice versa
 
-Again: not a conversion, just accessing
+Again: not a conversion, just accessing.
 
 \li \code vtkPolyData* mitk::Surface::GetVtkPolyData(int time = 0) \endcode
 

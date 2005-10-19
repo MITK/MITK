@@ -3,6 +3,7 @@
 
 #include "Step6.h"
 
+#ifndef DOXYGEN_IGNORE
 class Step8 : public Step6
 {
   Q_OBJECT
@@ -14,6 +15,8 @@ protected:
   virtual void SetupWidgets();
 protected slots:
 };
+#endif // DOXYGEN_IGNORE
+
 #endif // STEP8_H
 
 /**

@@ -3,6 +3,7 @@
 
 #include "Step6.h"
 
+#ifndef DOXYGEN_IGNORE
 class Step7 : public Step6
 {
   Q_OBJECT
@@ -14,6 +15,8 @@ protected:
 protected slots:
   virtual void StartRegionGrowing();
 };
+#endif // DOXYGEN_IGNORE
+
 #endif // STEP7_H
 
 /**

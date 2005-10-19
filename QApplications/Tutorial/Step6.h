@@ -8,6 +8,7 @@
 
 #include <itkImage.h>
 
+#ifndef DOXYGEN_IGNORE
 class Step6 : public QMainWindow
 {
   Q_OBJECT
@@ -34,6 +35,8 @@ protected:
 protected slots:
   virtual void StartRegionGrowing();
 };
+#endif // DOXYGEN_IGNORE
+
 #endif // STEP6_H
 
 /**

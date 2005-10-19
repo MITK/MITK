@@ -14,6 +14,18 @@ namespace mitk
  * id. Note, that both string representation and id MUST be unique. This is checked
  * when inserting a new enumeration value. Please note that you have to add valid
  * enumeration values before you may use the Get/SetValue methods.
+ *
+ * To use the class enumeration property you have 2 choices:
+ * 
+ * 1. Directly use the class and add your possible enumeration values via 
+ *    AddEnum(name, id). NOte that the ids do not have to be in any order, they
+ *    just have to be unique. The current value is set via SetValue(...) and
+ *    retrieved via GetValueAsId() or GetValueAsString().
+ * 2. Create a subclass, which adds the possible enumeration values in its 
+ *    constructor and maybe adds some additional convenience functions to
+ *    set/get the value. NOte that you should override AddEnum(...) as protected
+ *    so that the user may not add additional invalid enumeration values.
+ *    As example see mitk::VtkRepresentationProperty or mitk::VtkInterpolationProperty 
  */
 class EnumerationProperty : public BaseProperty
 {

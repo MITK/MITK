@@ -80,20 +80,7 @@ void mitk::MaskImageFilter::GenerateOutputInformation()
 
   itkDebugMacro(<<"GenerateOutputInformation()");
 
-  unsigned int i;
-  unsigned int *tmpDimensions = new unsigned int[input->GetDimension()];
-
-  for(i=0;i<input->GetDimension();++i)
-    tmpDimensions[i]=input->GetDimension(i);
-
-  output->Initialize(input->GetPixelType(),
-    input->GetDimension(),
-    tmpDimensions,
-    input->GetNumberOfChannels());
-
-  delete [] tmpDimensions;
-
-  output->SetGeometry(static_cast<mitk::Geometry3D*>(input->GetGeometry()->Clone().GetPointer()));
+  output->Initialize(input->GetPixelType(), *input->GetTimeSlicedGeometry());
 
   output->SetPropertyList(input->GetPropertyList()->Clone());    
 

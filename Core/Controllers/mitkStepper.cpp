@@ -19,87 +19,144 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkStepper.h"
 
-mitk::Stepper::Stepper() : m_Pos(0), m_Steps(0), m_StepSize(1), m_PosToUnitFactor(1), m_ZeroLine(0), m_AutoRepeat(false)
+mitk::Stepper::Stepper()
+: m_Pos(0), m_Steps(0), m_StepSize(1), m_PosToUnitFactor(1), m_ZeroLine(0),
+  m_AutoRepeat(false), m_PingPong(false), m_InverseDirection(false)
 {
-
 }
 
 mitk::Stepper::~Stepper()
 {
-
 }
 
-//##ModelId=3DF8B9410142
-void mitk::Stepper::Previous()
+void mitk::Stepper::Increase()
 {
-  if(m_Pos>0)
+  if (m_Pos < m_Steps - 1)
   {
-    --m_Pos;
-    Modified();
+    ++m_Pos;
+    this->Modified();
   }
   else if (m_AutoRepeat)
   {
-    m_Pos = m_Steps-1;
-    Modified();
+    if (!m_PingPong)
+    {
+      m_Pos = 0;
+    }
+    else
+    {
+      m_InverseDirection = true;
+      if (m_Pos > 0)
+      {
+        --m_Pos;
+      }
+    }
+    this->Modified();
   }
 }
 
-//##ModelId=3DF8B92F01DF
-void mitk::Stepper::Last()
+void mitk::Stepper::Decrease()
 {
-  if(m_Pos != m_Steps-1)
+  if (m_Pos > 0)
   {
-    m_Pos = m_Steps-1;
-    Modified();
+    --m_Pos;
+    this->Modified();
   }
-}
-
-//##ModelId=3DF8B91502F8
-void mitk::Stepper::First()
-{
-  if(m_Pos != 0)
+  else if (m_AutoRepeat)
   {
-    m_Pos = 0;
-    Modified();
+    if (!m_PingPong)
+    {
+      m_Pos = m_Steps - 1;
+    }
+    else
+    {
+      m_InverseDirection = false;
+      if (m_Pos < m_Steps - 1)
+      {
+        ++m_Pos;
+      }
+    }
+    this->Modified();
   }
 }
 
 //##ModelId=3DF8B92703A4
 void mitk::Stepper::Next()
 {
-  if(m_Pos<m_Steps-1)
+  if (!m_InverseDirection)
   {
-    ++m_Pos;
-    Modified();
+    this->Increase();
   }
-  else if (m_AutoRepeat)
+  else
+  {
+    this->Decrease();
+  }
+}
+
+//##ModelId=3DF8B9410142
+void mitk::Stepper::Previous()
+{
+  if (!m_InverseDirection)
+  {
+    this->Decrease();
+  }
+  else
+  {
+    this->Increase();
+  }
+}
+
+//##ModelId=3DF8B91502F8
+void mitk::Stepper::First()
+{
+  if (m_Pos != 0)
   {
     m_Pos = 0;
-    Modified();
+    this->Modified();
+  }
+}
+
+//##ModelId=3DF8B92F01DF
+void mitk::Stepper::Last()
+{
+  if (m_Pos != m_Steps - 1)
+  {
+    m_Pos = m_Steps - 1;
+    this->Modified();
   }
 }
 
 float mitk::Stepper::ConvertPosToUnit(unsigned int posValue)
 {
-  if(posValue >= m_Steps)
+  if (posValue >= m_Steps)
   {
-    if(m_Steps==0)
+    if (m_Steps == 0)
+    {
       posValue = 0;
+    }
     else
+    {
       posValue = m_Steps-1;
+    }
   }
-  return posValue*m_PosToUnitFactor-m_ZeroLine;
+  return posValue * m_PosToUnitFactor - m_ZeroLine;
 }
 
 unsigned int mitk::Stepper::ConvertUnitToPos(float unitValue)
 {
-  unsigned int posValue = (unsigned int)(unitValue/m_PosToUnitFactor+m_ZeroLine+0.5);
-  if(posValue >= m_Steps)
+  unsigned int posValue = static_cast< unsigned int >(
+    unitValue / m_PosToUnitFactor + m_ZeroLine + 0.5
+  );
+
+  if (posValue >= m_Steps)
   {
-    if(m_Steps==0)
+    if (m_Steps == 0)
+    {
       posValue = 0;
+    }
     else
+    {
       posValue = m_Steps-1;
+    }
   }
   return posValue;
 }

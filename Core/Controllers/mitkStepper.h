@@ -64,26 +64,45 @@ public:
 
   itkGetMacro(AutoRepeat, bool);
   itkSetMacro(AutoRepeat, bool);
+  itkBooleanMacro(AutoRepeat);
+
+  //## Causes the stepper to shift direction when the boundary is reached
+  itkSetMacro(PingPong, bool);
+  itkGetMacro(PingPong, bool);
+  itkBooleanMacro(PingPong);
+
+  //## If set to true, the Next() decreases the stepper and Previous()
+  //## decreases it
+  itkSetMacro(InverseDirection, bool);
+  itkGetMacro(InverseDirection, bool);
+  itkBooleanMacro(InverseDirection);
+
+  //##ModelId=3DF8B92703A4
+  void Next();
 
   //##ModelId=3DF8B9410142
   void Previous();
 
-  //##ModelId=3DF8B92F01DF
-  void Last();
-
   //##ModelId=3DF8B91502F8
   void First();
 
-  //##ModelId=3DF8B92703A4
-  void Next();
+  //##ModelId=3DF8B92F01DF
+  void Last();
+
 protected:
   Stepper();
   virtual ~Stepper();
 
+  void Increase();
+
+  void Decrease();
+
   //##ModelId=3DD524BD00DC
   unsigned int m_Pos;
+
   //##ModelId=3DF8F73C0076
   unsigned int m_Steps;
+
   //##ModelId=3DF8F74101AE
   unsigned int m_StepSize;
 
@@ -93,6 +112,9 @@ protected:
   std::string m_UnitName;
 
   bool m_AutoRepeat;
+  
+  bool m_PingPong;
+  bool m_InverseDirection;
 
 private:
 

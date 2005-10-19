@@ -81,6 +81,22 @@ public:
   virtual void InitializeStandardPlane(mitk::ScalarType width, mitk::ScalarType height, const Vector3D & spacing, PlaneOrientation planeorientation = Transversal, mitk::ScalarType zPosition = 0, bool frontside=true);
 
   //##Documentation
+  //## @brief Initialize plane by width and height in pixels, right-/down-vector (itk) 
+  //## to describe orientation in world-space (vectors will be normalized) and spacing 
+  //## (default: 1.0 mm in all directions).
+  //##
+  //## The vectors are normalized and multiplied by the respective spacing before they are set in the matrix.
+  virtual void InitializeStandardPlane(mitk::ScalarType width, mitk::ScalarType height, const Vector3D& rightVector, const Vector3D& downVector, const Vector3D * spacing = NULL);
+
+  //##Documentation
+  //## @brief Initialize plane by width and height in pixels, right-/down-vector (vnl) 
+  //## to describe orientation in world-space (vectors will be normalized) and spacing 
+  //## (default: 1.0 mm in all directions).
+  //##
+  //## The vectors are normalized and multiplied by the respective spacing before they are set in the matrix.
+  virtual void InitializeStandardPlane(mitk::ScalarType width, mitk::ScalarType height, const VnlVector& rightVector, const VnlVector& downVector, const Vector3D * spacing = NULL);
+
+  //##Documentation
   //## @brief Initialize plane by right-/down-vector (itk) and spacing (default: 1.0 mm in all directions).
   //##
   //## The length of the right-/-down-vector is used as width/height in units, respectively. Then, 

@@ -241,6 +241,16 @@ void mitk::PlaneGeometry::InitializeStandardPlane(const VnlVector& rightVector, 
   mitk::ScalarType width  = rightVector.magnitude();
   mitk::ScalarType height = downVector.magnitude();
 
+  InitializeStandardPlane(width, height, rightVector, downVector, spacing);
+}
+
+void mitk::PlaneGeometry::InitializeStandardPlane(mitk::ScalarType width, mitk::ScalarType height, const Vector3D& rightVector, const Vector3D& downVector, const Vector3D * spacing)
+{
+  InitializeStandardPlane(width, height, rightVector.Get_vnl_vector(), downVector.Get_vnl_vector(), spacing);
+}
+
+void mitk::PlaneGeometry::InitializeStandardPlane(mitk::ScalarType width, mitk::ScalarType height, const VnlVector& rightVector, const VnlVector& downVector, const Vector3D * spacing)
+{
   assert(width > 0);
   assert(height > 0);
 

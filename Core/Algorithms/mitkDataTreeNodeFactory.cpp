@@ -123,6 +123,10 @@ void mitk::DataTreeNodeFactory::GenerateData()
     {
       this->ReadFileTypeGDCM();
     }
+    else if ( this->FileNameEndsWith( ".dcm" ) || this->FileNameEndsWith( ".DCM" ) || (itksys::SystemTools::GetFilenameLastExtension(m_FileName) == "" ) )
+    {
+      this->ReadFileSeriesTypeDCM();
+    }
 #if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
     else if ( this->FileNameEndsWith( ".vti" ) )
     {
@@ -131,9 +135,9 @@ void mitk::DataTreeNodeFactory::GenerateData()
 #endif
 #ifdef MBI_INTERNAL
 #ifdef HAVE_IPDICOM
-    else if ( this->FileNameEndsWith( ".DCM" ) || this->FileNameEndsWith( ".dcm" ) )
+    else if ( this->FileNameEndsWith( ".IPDCM" ) || this->FileNameEndsWith( ".ipdcm" ) )
     {
-      this->ReadFileTypeDCM();
+      this->ReadFileTypeIPDCM();
     }
 #endif /* HAVE_IPDICOM */
     else if ( this->FileNameEndsWith( ".ves" ) )
@@ -168,7 +172,7 @@ void mitk::DataTreeNodeFactory::GenerateData()
     {
       this->ReadFileSeriesTypePIC();
     }
-    else if ( this->FilePatternEndsWith( ".dcm" ) || this->FilePatternEndsWith( ".DCM" ) )
+    else if ( this->FilePatternEndsWith( ".dcm" ) || this->FilePatternEndsWith( ".DCM" ) || (itksys::SystemTools::GetFilenameLastExtension(m_FilePattern) == "" ) )
     {
       this->ReadFileSeriesTypeDCM();
     }
@@ -668,7 +672,7 @@ void mitk::DataTreeNodeFactory::ReadFileTypeHPSONOS()
 
 #ifdef HAVE_IPDICOM
 
-void mitk::DataTreeNodeFactory::ReadFileTypeDCM()
+void mitk::DataTreeNodeFactory::ReadFileTypeIPDCM()
 {
   std::cout << "loading " << m_FileName << " as DICOM... " << std::endl;
 

@@ -44,6 +44,12 @@ public:
   QmitkStepperAdapter( QObject * navigator, mitk::Stepper * stepper, const char * name );
   virtual ~QmitkStepperAdapter();
 
+  void SetStepper( mitk::Stepper* stepper )
+  {
+    this->SendStepper( stepper );
+    this->Refetch();
+  }
+
   class ItkEventListener : public itk::Command
   {
     public:

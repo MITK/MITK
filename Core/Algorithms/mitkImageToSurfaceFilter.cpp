@@ -20,26 +20,49 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkImageToSurfaceFilter.h"
 #include <vtkImageData.h>
 #include <vtkDecimatePro.h>
+#include <vtkImageChangeInformation.h>
+#include <vtkLinearTransform.h>
+#include <vtkMath.h>
+#include <vtkMatrix4x4.h>
 
 mitk::ImageToSurfaceFilter::ImageToSurfaceFilter()
-  : m_Smooth(false), m_Decimate(false), m_TargetReduction(0.05f){};
-mitk::ImageToSurfaceFilter::~ImageToSurfaceFilter(){};
+  : m_Smooth(false), m_Decimate(false), m_TargetReduction(0.05f)
+{
+};
 
+mitk::ImageToSurfaceFilter::~ImageToSurfaceFilter()
+{
+};
+
+template <class T1, class T2, class T3>
+inline void mitkVtkLinearTransformPoint(T1 matrix[4][4], 
+                                           T2 in[3], T3 out[3])
+{
+  T3 x = matrix[0][0]*in[0]+matrix[0][1]*in[1]+matrix[0][2]*in[2]+matrix[0][3];
+  T3 y = matrix[1][0]*in[0]+matrix[1][1]*in[1]+matrix[1][2]*in[2]+matrix[1][3];
+  T3 z = matrix[2][0]*in[0]+matrix[2][1]*in[1]+matrix[2][2]*in[2]+matrix[2][3];
+
+  out[0] = x;
+  out[1] = y;
+  out[2] = z;
+}
 
 void mitk::ImageToSurfaceFilter::CreateSurface(int time, vtkImageData *vtkimage, mitk::Surface * surface, const ScalarType threshold)
 {
-  //Inkrement Referenzcounter Counter (hier: RC)
-  vtkimage->Register(NULL);
-
-  vtkPolyData *polydata = vtkPolyData::New();
-  polydata->Register(NULL);// RC++
+  vtkImageChangeInformation *indexCoordinatesImageFilter = vtkImageChangeInformation::New();
+  indexCoordinatesImageFilter->SetInput(vtkimage);
+  indexCoordinatesImageFilter->SetOutputOrigin(0.0,0.0,0.0);
 
   //MarchingCube -->create Surface
   vtkMarchingCubes *skinExtractor = vtkMarchingCubes::New();
-  skinExtractor->SetInput(vtkimage);//RC++
-  vtkimage->Delete();//RC--
+  skinExtractor->SetInput(indexCoordinatesImageFilter->GetOutput());//RC++
+  indexCoordinatesImageFilter->Delete();
   skinExtractor->SetValue(0, threshold);
+
+  vtkPolyData *polydata;
   polydata = skinExtractor->GetOutput();
+  polydata->Register(NULL);//RC++
+  skinExtractor->Delete();
 
   if (m_Smooth)
   {
@@ -49,7 +72,6 @@ void mitk::ImageToSurfaceFilter::CreateSurface(int time, vtkImageData *vtkimage,
     vtkSmoothPolyDataFilter *smoother = vtkSmoothPolyDataFilter::New();
     //read poly1 (poly1 can be the original polygon, or the decimated polygon)
     smoother->SetInput(polydata);//RC++
-    polydata->Delete();//RC--
     smoother->SetNumberOfIterations( spIterations );
     smoother->SetRelaxationFactor( spRelaxation );
     smoother->SetFeatureAngle( 60 );
@@ -57,8 +79,10 @@ void mitk::ImageToSurfaceFilter::CreateSurface(int time, vtkImageData *vtkimage,
     smoother->BoundarySmoothingOff();
     smoother->SetConvergence( 0 );
 
+    polydata->Delete();//RC--
     polydata = smoother->GetOutput();
-
+    polydata->Register(NULL);//RC++
+    smoother->Delete();
   }
 
   //decimate = to reduce number of polygons
@@ -73,26 +97,46 @@ void mitk::ImageToSurfaceFilter::CreateSurface(int time, vtkImageData *vtkimage,
     decimate->SetDegree(10); //std-value is 25!
 
     decimate->SetInput(polydata);//RC++
-    polydata->Delete();//RC--
     decimate->SetTargetReduction(m_TargetReduction);
     decimate->SetMaximumError(0.002);
 
+    polydata->Delete();//RC--
     polydata = decimate->GetOutput();
-
+    polydata->Register(NULL);//RC++
+    decimate->Delete();
   }
 
-  //
-  // HACK! Symptombekämpfung wegen ständiger Pipeline ausführung beim navigieren durch das Bild
-  // Disconnect the result from the vtk pipeline.
-  //
-  vtkSource* source = polydata->GetSource();
   polydata->Update();
-  polydata->SetSource(NULL);
-  
-  surface->SetVtkPolyData(polydata, time);
-  source->Delete();
-}
 
+  polydata->SetSource(NULL);
+
+  vtkFloatingPointType* spacing;
+  spacing = vtkimage->GetSpacing();
+
+  vtkPoints * points = polydata->GetPoints();
+  vtkMatrix4x4 *vtkmatrix = vtkMatrix4x4::New();
+  GetInput()->GetGeometry(time)->GetVtkTransform()->GetMatrix(vtkmatrix);
+  vtkFloatingPointType (*matrix)[4] = vtkmatrix->Element;
+
+  unsigned int i,j;
+  for(i=0;i<3;++i)
+    for(j=0;j<3;++j)
+      matrix[i][j]/=spacing[j];
+
+  int n = points->GetNumberOfPoints();
+  vtkFloatingPointType point[3];
+
+  for (i = 0; i < n; i++)
+  {
+    points->GetPoint(i, point);
+    mitkVtkLinearTransformPoint(matrix,point,point);
+    points->SetPoint(i, point);
+  }
+  vtkmatrix->Delete();
+
+  surface->SetVtkPolyData(polydata, time);
+  polydata->UnRegister(NULL);
+}
 
 
 void mitk::ImageToSurfaceFilter::GenerateData()

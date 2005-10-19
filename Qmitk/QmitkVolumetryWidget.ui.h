@@ -47,6 +47,8 @@ void QmitkVolumetryWidget::SetDataTreeNodeIterator( mitk::DataTreeIteratorClone 
 
 void QmitkVolumetryWidget::SetDataTreeNode(mitk::DataTreeNode* node)
 {
+  if(node == m_OverlayNode.GetPointer())
+    return;
   m_Node = node;
   if (m_OverlayNode)
   {

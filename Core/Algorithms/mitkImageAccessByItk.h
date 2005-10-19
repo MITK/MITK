@@ -493,6 +493,16 @@ PURPOSE.  See the above copyright notices for more information.
   InstantiateAccessFunctionForFixedDimension_2(itkImgFunc, 2, param1Type, param2Type)  \
   InstantiateAccessFunctionForFixedDimension_2(itkImgFunc, 3, param1Type, param2Type)         
 
+//##Documentation
+//## @brief Instantiate access function without additional parammeters
+//## for all datatypes, but fixed dimension
+//##
+//## Use this macro once after the definition of your access function.
+//## Some compilers have memory problems without the explicit instantiation.
+//## You may need to move the access function to a separate file.
+//## \sa InstantiateAccessFunctionForFixedDimension_1
+//## \sa InstantiateAccessFunctionForFixedDimension_2
+//## @ingroup Adaptor
 #define InstantiateAccessFunctionForFixedDimension(itkImgFunc, dimension)  \
 template void itkImgFunc(itk::Image<double, dimension>*);                  \
 template void itkImgFunc(itk::Image<float, dimension>*);                   \
@@ -503,6 +513,16 @@ template void itkImgFunc(itk::Image<unsigned short, dimension>*);          \
 template void itkImgFunc(itk::Image<char, dimension>*);                    \
 template void itkImgFunc(itk::Image<unsigned char, dimension>*);           
 
+//##Documentation
+//## @brief Instantiate access function with one additional parammeter
+//## for all datatypes, but fixed dimension
+//##
+//## Use this macro once after the definition of your access function.
+//## Some compilers have memory problems without the explicit instantiation.
+//## You may need to move the access function to a separate file.
+//## \sa InstantiateAccessFunctionForFixedDimension
+//## \sa InstantiateAccessFunctionForFixedDimension_2
+//## @ingroup Adaptor
 #define InstantiateAccessFunctionForFixedDimension_1(itkImgFunc, dimension, param1Type)\
 template void itkImgFunc(itk::Image<double, dimension>*, param1Type);                  \
 template void itkImgFunc(itk::Image<float, dimension>*, param1Type);                   \
@@ -513,6 +533,16 @@ template void itkImgFunc(itk::Image<unsigned short, dimension>*, param1Type);   
 template void itkImgFunc(itk::Image<char, dimension>*, param1Type);                    \
 template void itkImgFunc(itk::Image<unsigned char, dimension>*, param1Type);           
 
+//##Documentation
+//## @brief Instantiate access function with two additional parammeters
+//## for all datatypes, but fixed dimension
+//##
+//## Use this macro once after the definition of your access function.
+//## Some compilers have memory problems without the explicit instantiation.
+//## You may need to move the access function to a separate file.
+//## \sa InstantiateAccessFunctionForFixedDimension
+//## \sa InstantiateAccessFunctionForFixedDimension_1
+//## @ingroup Adaptor
 #define InstantiateAccessFunctionForFixedDimension_2(itkImgFunc, dimension, param1Type, param2Type)\
 template void itkImgFunc(itk::Image<double, dimension>*, param1Type, param2Type);                  \
 template void itkImgFunc(itk::Image<float, dimension>*, param1Type, param2Type);                   \
@@ -523,17 +553,47 @@ template void itkImgFunc(itk::Image<unsigned short, dimension>*, param1Type, par
 template void itkImgFunc(itk::Image<char, dimension>*, param1Type, param2Type);                    \
 template void itkImgFunc(itk::Image<unsigned char, dimension>*, param1Type, param2Type);           
 
+//##Documentation
+//## @brief Instantiate access function without additional parammeters
+//## for a fixed datatype, but all dimensions
+//##
+//## Use this macro once after the definition of your access function.
+//## Some compilers have memory problems without the explicit instantiation.
+//## You may need to move the access function to a separate file.
+//## \sa InstantiateAccessFunctionForFixedPixelType_1
+//## \sa InstantiateAccessFunctionForFixedPixelType_2
+//## @ingroup Adaptor
 #define InstantiateAccessFunctionForFixedPixelType(itkImgFunc, pixelType)                          \
-template void itkImgFunc(itk::Image<double, 2>*, pixelType);                                       \
-template void itkImgFunc(itk::Image<float, 3>*, pixelType);                   
+template void itkImgFunc(itk::Image<pixelType, 2>*);                                               \
+template void itkImgFunc(itk::Image<pixelType, 3>*);                   
 
+//##Documentation
+//## @brief Instantiate access function with one additional parammeter
+//## for a fixed datatype, but all dimensions
+//##
+//## Use this macro once after the definition of your access function.
+//## Some compilers have memory problems without the explicit instantiation.
+//## You may need to move the access function to a separate file.
+//## \sa InstantiateAccessFunctionForFixedPixelType
+//## \sa InstantiateAccessFunctionForFixedPixelType_2
+//## @ingroup Adaptor
 #define InstantiateAccessFunctionForFixedPixelType_1(itkImgFunc, pixelType, param1Type)            \
-template void itkImgFunc(itk::Image<double, 2>*, pixelType, param1Type);                           \
-template void itkImgFunc(itk::Image<float, 3>*, pixelType, param1Type);                   
+template void itkImgFunc(itk::Image<pixelType, 2>*, param1Type);                                   \
+template void itkImgFunc(itk::Image<pixelType, 3>*, param1Type);                   
 
+//##Documentation
+//## @brief Instantiate access function with two additional parammeters
+//## for a fixed datatype, but all dimensions
+//##
+//## Use this macro once after the definition of your access function.
+//## Some compilers have memory problems without the explicit instantiation.
+//## You may need to move the access function to a separate file.
+//## \sa InstantiateAccessFunctionForFixedPixelType
+//## \sa InstantiateAccessFunctionForFixedPixelType_1
+//## @ingroup Adaptor
 #define InstantiateAccessFunctionForFixedPixelType_2(itkImgFunc, pixelType, param1Type, param2Type)\
-template void itkImgFunc(itk::Image<double, 2>*, pixelType, param1Type, param2Type);               \
-template void itkImgFunc(itk::Image<float, 3>*, pixelType, param1Type, param2Type);                   
+template void itkImgFunc(itk::Image<pixelType, 2>*, param1Type, param2Type);                       \
+template void itkImgFunc(itk::Image<pixelType, 3>*, param1Type, param2Type);                   
 
 //----------------------- cast functions. Will be moved to mitkImageCast.h -----------------
 namespace mitk 

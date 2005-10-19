@@ -249,13 +249,10 @@ void mitk::LightBoxImageReader::GenerateOutputInformation()
     mitk::vtk2itk(interSliceGeometry->ps, spacing);
     itkDebugMacro(<<"spacing: "<<spacing);
 
-    rightVector=rightVector*output->GetDimension(0);
-    downVector=downVector*output->GetDimension(1);
-
     mitk::PlaneGeometry::Pointer planegeometry = PlaneGeometry::New();
     spacing = GetSpacingFromLB(m_ImageNumbers);
     itkDebugMacro(<<"get spacing: "<<spacing);
-    planegeometry->InitializeStandardPlane( rightVector,downVector,&spacing);
+    planegeometry->InitializeStandardPlane( output->GetDimension(0), output->GetDimension(1), rightVector, downVector, &spacing);
     //planegeometry->InitializeStandardPlane( rightVector,downVector,&GetSpacingFromLB());
 
     mitk::Point3D origin;

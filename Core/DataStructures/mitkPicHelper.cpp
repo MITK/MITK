@@ -156,14 +156,8 @@ void mitk::PicHelper::InitializeEvenlySpaced(const ipPicDescriptor* pic, unsigne
     mitk::vtk2itk(((float*)geometryTag->value+6), downVector);
     mitk::vtk2itk(((float*)geometryTag->value+9), spacing);
 
-    rightVector.Normalize();
-    downVector.Normalize();
-
-    rightVector=rightVector*pic->n[0];
-    downVector=downVector*pic->n[1];
-
     mitk::PlaneGeometry::Pointer planegeometry = PlaneGeometry::New();
-    planegeometry->InitializeStandardPlane(rightVector,downVector,&spacing);
+    planegeometry->InitializeStandardPlane(pic->n[0], pic->n[1], rightVector, downVector, &spacing);
     planegeometry->SetOrigin(origin);
     slicedgeometry->InitializeEvenlySpaced(planegeometry, slices);    
   }
@@ -232,7 +226,7 @@ bool mitk::PicHelper::SetGeometry2D(const ipPicDescriptor* aPic, int s, SlicedGe
           FillVector3D(bottomDV, 0,         pic->n[1], 0);
 
           mitk::PlaneGeometry::Pointer planegeometry=mitk::PlaneGeometry::New();
-          planegeometry->InitializeStandardPlane(rightDV.Get_vnl_vector(), bottomDV.Get_vnl_vector(), &spacing);
+          planegeometry->InitializeStandardPlane(pic->n[0], pic->n[1], rightDV.Get_vnl_vector(), bottomDV.Get_vnl_vector(), &spacing);
           planegeometry->SetOrigin(origin);
           slicedgeometry->SetGeometry2D(planegeometry, s);
         }
@@ -248,7 +242,7 @@ bool mitk::PicHelper::SetGeometry2D(const ipPicDescriptor* aPic, int s, SlicedGe
       FillVector3D(bottomDV,0,pic->n[1],0);
 
       mitk::PlaneGeometry::Pointer planegeometry=mitk::PlaneGeometry::New();
-      planegeometry->InitializeStandardPlane(rightDV.Get_vnl_vector(), bottomDV.Get_vnl_vector(), &slicedgeometry->GetSpacing());
+      planegeometry->InitializeStandardPlane(pic->n[0], pic->n[1], rightDV.Get_vnl_vector(), bottomDV.Get_vnl_vector(), &slicedgeometry->GetSpacing());
       planegeometry->SetOrigin(origin);
       slicedgeometry->SetGeometry2D(planegeometry, s);
     }

@@ -768,7 +768,7 @@ public:
 
         itkPhysicalPoint = i->Value();
         geometryFrame->ItkPhysicalPointToWorld(itkPhysicalPoint, mitkWorldPoint);
-        mitk::itk2vtk(itkPhysicalPoint, vtkpoint);
+        mitk::itk2vtk(mitkWorldPoint, vtkpoint);
         // Set the vtk point at the index with the the coord array from itk
         // itk returns a const pointer, but vtk is not const correct, so
         // we have to use a const cast to get rid of the const

@@ -2,10 +2,14 @@
 #include <algorithm>
 
 
+
 mitk::EnumerationProperty::EnumerationProperty()
 {
   m_CurrentValue = 0;
 }
+
+
+
 
 
 bool mitk::EnumerationProperty::AddEnum( const std::string& name, const IdType& id )
@@ -23,6 +27,9 @@ bool mitk::EnumerationProperty::AddEnum( const std::string& name, const IdType& 
 }
 
 
+
+
+
 bool mitk::EnumerationProperty::SetValue( const std::string& name )
 {
   if ( IsValidEnumerationValue( name ) )
@@ -35,6 +42,9 @@ bool mitk::EnumerationProperty::SetValue( const std::string& name )
     return false;
   }
 }
+
+
+
 
 
 bool mitk::EnumerationProperty::SetValue( const IdType& id )
@@ -51,16 +61,25 @@ bool mitk::EnumerationProperty::SetValue( const IdType& id )
 }
 
 
+
+
+
 mitk::EnumerationProperty::IdType mitk::EnumerationProperty::GetValueAsId() const
 {
   return m_CurrentValue;
 }
 
 
+
+
+
 std::string mitk::EnumerationProperty::GetValueAsString() const
 {
   return GetEnumString( m_CurrentValue );
 }
+
+
+
 
 
 void mitk::EnumerationProperty::Clear()
@@ -71,10 +90,16 @@ void mitk::EnumerationProperty::Clear()
 }
 
 
+
+
+
 unsigned int mitk::EnumerationProperty::Size() const
 {
   return m_EnumIds.size();
 }
+
+
+
 
 
 
@@ -84,10 +109,16 @@ mitk::EnumerationProperty::EnumConstIterator mitk::EnumerationProperty::Begin() 
 }
 
 
+
+
+
 mitk::EnumerationProperty::EnumConstIterator mitk::EnumerationProperty::End() const
 {
   return m_EnumIds.end();
 }
+
+
+
 
 
 std::string mitk::EnumerationProperty::GetEnumString( const IdType& id ) const
@@ -103,6 +134,9 @@ std::string mitk::EnumerationProperty::GetEnumString( const IdType& id ) const
 }
 
 
+
+
+
 mitk::EnumerationProperty::IdType mitk::EnumerationProperty::GetEnumId( const std::string& name ) const
 {
   if ( IsValidEnumerationValue( name ) )
@@ -114,6 +148,9 @@ mitk::EnumerationProperty::IdType mitk::EnumerationProperty::GetEnumId( const st
     return 0;
   }
 }
+
+
+
 
 
 bool mitk::EnumerationProperty::operator==( const BaseProperty& property ) const
@@ -133,10 +170,16 @@ bool mitk::EnumerationProperty::operator==( const BaseProperty& property ) const
 }
 
 
+
+
+
 bool mitk::EnumerationProperty::IsValidEnumerationValue( const IdType& val ) const
 {
   return ( m_EnumIds.find( val ) != m_EnumIds.end() );
 }
+
+
+
 
 
 bool mitk::EnumerationProperty::IsValidEnumerationValue( const std::string& val ) const

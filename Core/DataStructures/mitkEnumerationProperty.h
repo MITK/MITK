@@ -25,7 +25,9 @@ namespace mitk
  *    constructor and maybe adds some additional convenience functions to
  *    set/get the value. NOte that you should override AddEnum(...) as protected
  *    so that the user may not add additional invalid enumeration values.
- *    As example see mitk::VtkRepresentationProperty or mitk::VtkInterpolationProperty 
+ *    As example see mitk::VtkRepresentationProperty or mitk::VtkInterpolationProperty
+ *
+ * @ingroup DataTree
  */
 class EnumerationProperty : public BaseProperty
 {
@@ -47,7 +49,6 @@ public:
   /**
    * Type used to store a mapping from enumeration string/description to 
    * enumeration id
-   * 
    */
   typedef std::map<std::string, IdType> EnumStringsContainerType;
 

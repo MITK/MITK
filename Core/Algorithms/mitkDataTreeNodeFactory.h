@@ -65,22 +65,22 @@ public:
   itkGetStringMacro( FileName );
 
   /**
-  * @warning multiple load not (yet) supported
+  * \brief Set prefix for multiple load
   */
   itkSetStringMacro( FilePrefix );
 
   /**
-  * @warning multiple load not (yet) supported
+  * \brief Get prefix for multiple load
   */
   itkGetStringMacro( FilePrefix );
 
   /**
-  * @warning multiple load not (yet) supported
+  * \brief Set pattern for multiple load
   */
   itkSetStringMacro( FilePattern );
 
   /**
-  * @warning multiple load not (yet) supported
+  * \brief Get pattern for multiple load
   */
   itkGetStringMacro( FilePattern );
 
@@ -175,7 +175,7 @@ protected:
 #ifdef MBI_INTERNAL
 
 #ifdef HAVE_IPDICOM
-  virtual void ReadFileTypeDCM();
+  virtual void ReadFileTypeIPDCM();
 
 #endif /* HAVE_IPDICOM */
   virtual void ReadFileTypeVES();

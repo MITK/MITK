@@ -59,6 +59,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkStringProperty.h"
 #include "mitkProperties.h"
 #include "mitkLevelWindowProperty.h"
+#include "mitkVtkRepresentationProperty.h"
+#include "mitkVtkInterpolationProperty.h"
 #include "mitkParRecFileReader.h"
 #include "mitkImage.h"
 #include "mitkUSLookupTableSource.h"
@@ -1373,4 +1375,6 @@ void mitk::DataTreeNodeFactory::SetDefaultSurfaceProperties(mitk::DataTreeNode::
     node->SetProperty( "color", new mitk::ColorProperty(1.0f, 1.0f, 1.0f));
     node->SetProperty( "opacity", new mitk::FloatProperty(1.0f));
     node->SetProperty( "layer", new mitk::IntProperty(0));
+    node->SetProperty( "representation", new mitk::VtkRepresentationProperty());
+    node->SetProperty( "interpolation", new mitk::VtkInterpolationProperty());
 }

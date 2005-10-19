@@ -214,7 +214,7 @@ protected:
    * needed.  Otherwise, the memory can be reused.
    */
     //##ModelId=3E1886F201E8
-  virtual void PrepareOutputs() {};
+  virtual void PrepareOutputs();
 
   /** @brief The GenerateData method normally allocates the buffers for all of the
    * outputs of a filter. 

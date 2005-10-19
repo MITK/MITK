@@ -262,6 +262,11 @@ ITK_THREAD_RETURN_TYPE mitk::ImageSource::ThreaderCallback( void *arg )
   return ITK_THREAD_RETURN_VALUE;
 }
 
+void mitk::ImageSource::PrepareOutputs()
+{
+  Superclass::PrepareOutputs();
+}
+
 //##ModelId=3E3BCBD4000C
 void* mitk::ImageSource::GetData()
 {

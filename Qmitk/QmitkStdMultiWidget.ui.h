@@ -25,16 +25,17 @@ PURPOSE.  See the above copyright notices for more information.
 ** init() function in place of a constructor, and a destroy() function in
 ** place of a destructor.
 *****************************************************************************/
-#include <mitkProperties.h>
-#include <mitkStringProperty.h>
-#include <mitkLevelWindowProperty.h>
-#include <mitkGeometry2DDataMapper2D.h>
-#include <vtkRenderer.h>
-#include <mitkOpenGLRenderer.h>
+#include "mitkProperties.h"
+#include "mitkStringProperty.h"
+#include "mitkLevelWindowProperty.h"
+#include "mitkGeometry2DDataMapper2D.h"
+#include "mitkOpenGLRenderer.h"
 // for AdjustCross
-#include <mitkPositionEvent.h>
-#include <mitkInteractionConst.h>
-#include <mitkGlobalInteraction.h>
+#include "mitkPositionEvent.h"
+#include "mitkInteractionConst.h"
+#include "mitkGlobalInteraction.h"
+
+#include <vtkRenderer.h>
 
 void QmitkStdMultiWidget::init()
 {
@@ -109,8 +110,8 @@ void QmitkStdMultiWidget::changeLayoutTo2DImagesUp()
   std::cout << "changing layout to 2D images up... " << std::endl;
   QmitkStdMultiWidgetLayout = new QHBoxLayout( this, 0,02, "QmitkStdMultiWidgetLayout");
 
-  QHBoxLayout  * layout4 = new QHBoxLayout( 0, 0, 6, "layout4");
-  QGridLayout *layout3 = new QGridLayout( 0, 2, 1, 0, 6, "layout3");
+  QHBoxLayout * layout4 = new QHBoxLayout( 0, 0, 6, "layout4");
+  QGridLayout* layout3 = new QGridLayout( 0, 2, 1, 0, 6, "layout3");
 
   QHBoxLayout *TwoDLayout = new QHBoxLayout( 0, 0, 6, "2DLayout");
 
@@ -118,9 +119,9 @@ void QmitkStdMultiWidget::changeLayoutTo2DImagesUp()
   mitkWidget2->setMaximumSize(2000,200);
   mitkWidget3->setMaximumSize(2000,200);
 
-  TwoDLayout ->addWidget( mitkWidget1 );
-  TwoDLayout ->addWidget( mitkWidget2 );
-  TwoDLayout ->addWidget( mitkWidget3 );
+  TwoDLayout->addWidget( mitkWidget1 );
+  TwoDLayout->addWidget( mitkWidget2 );
+  TwoDLayout->addWidget( mitkWidget3 );
 
   if ( mitkWidget1->isHidden() ) mitkWidget1->show();
   if ( mitkWidget2->isHidden() ) mitkWidget2->show();
@@ -133,6 +134,8 @@ void QmitkStdMultiWidget::changeLayoutTo2DImagesUp()
   layout4->addLayout( layout3 );
   layout4->addWidget( levelWindowWidget );
   QmitkStdMultiWidgetLayout->addLayout( layout4 );
+
+  m_Layout = LAYOUT_2D_IMAGES_UP;
 }
 
 void QmitkStdMultiWidget::changeLayoutTo2DImagesLeft()
@@ -151,9 +154,9 @@ void QmitkStdMultiWidget::changeLayoutTo2DImagesLeft()
   mitkWidget2->setMaximumSize(300,300);
   mitkWidget3->setMaximumSize(300,300);
 
-  TwoDLayout ->addWidget( mitkWidget1 );
-  TwoDLayout ->addWidget( mitkWidget2 );
-  TwoDLayout ->addWidget( mitkWidget3 );
+  TwoDLayout->addWidget( mitkWidget1 );
+  TwoDLayout->addWidget( mitkWidget2 );
+  TwoDLayout->addWidget( mitkWidget3 );
 
   if ( mitkWidget1->isHidden() ) mitkWidget1->show();
   if ( mitkWidget2->isHidden() ) mitkWidget2->show();
@@ -196,6 +199,8 @@ void QmitkStdMultiWidget::changeLayoutToDefault()
   layout4->addLayout( layout3 );
   layout4->addWidget( levelWindowWidget );
   QmitkStdMultiWidgetLayout->addLayout( layout4 );
+
+  m_Layout = LAYOUT_DEFAULT;
 }
 
 
@@ -215,6 +220,8 @@ void QmitkStdMultiWidget::changeLayoutToBig3D()
   layout4->addWidget( mitkWidget4 );
   layout4->addWidget( levelWindowWidget );
   QmitkStdMultiWidgetLayout->addLayout( layout4 );
+
+  m_Layout = LAYOUT_BIG_3D;
 }
 
 void QmitkStdMultiWidget::changeLayoutToWidget1()
@@ -236,6 +243,8 @@ void QmitkStdMultiWidget::changeLayoutToWidget1()
   layout4->addWidget( mitkWidget1 );
   layout4->addWidget( levelWindowWidget );
   QmitkStdMultiWidgetLayout->addLayout( layout4 );
+
+  m_Layout = LAYOUT_WIDGET1;
 }
 
 
@@ -257,6 +266,8 @@ void QmitkStdMultiWidget::changeLayoutToWidget2()
   layout4->addWidget( mitkWidget2 );
   layout4->addWidget( levelWindowWidget );
   QmitkStdMultiWidgetLayout->addLayout( layout4 );
+
+  m_Layout = LAYOUT_WIDGET2;
 }
 
 void QmitkStdMultiWidget::changeLayoutToWidget3()
@@ -278,6 +289,8 @@ void QmitkStdMultiWidget::changeLayoutToWidget3()
   layout4->addWidget( mitkWidget3 );
   layout4->addWidget( levelWindowWidget );
   QmitkStdMultiWidgetLayout->addLayout( layout4 );
+
+  m_Layout = LAYOUT_WIDGET3;
 }
 
 void QmitkStdMultiWidget::changeLayoutTo2x2Dand3DWidget()
@@ -306,6 +319,8 @@ void QmitkStdMultiWidget::changeLayoutTo2x2Dand3DWidget()
   if ( mitkWidget4->isHidden() ) mitkWidget4->show();
 
   QmitkStdMultiWidgetLayout->addLayout( layout2 );
+
+  m_Layout = LAYOUT_2X_2D_AND_3D_WIDGET;
 }
 
 void QmitkStdMultiWidget::changeLayoutToRowWidget3And4()
@@ -324,10 +339,12 @@ void QmitkStdMultiWidget::changeLayoutToRowWidget3And4()
   mitkWidget3->setMaximumSize(2000,2000);
   mitkWidget4->setMaximumSize(2000,2000);
 
-  layout4 ->addWidget( mitkWidget3);
-  layout4 ->addWidget( mitkWidget4);
+  layout4->addWidget( mitkWidget3);
+  layout4->addWidget( mitkWidget4);
   layout4->addWidget( levelWindowWidget );
   QmitkStdMultiWidgetLayout->addLayout( layout4 );
+
+  m_Layout = LAYOUT_ROW_WIDGET_3_AND_4;
 }
 
 
@@ -348,12 +365,14 @@ void QmitkStdMultiWidget::changeLayoutToColumnWidget3And4()//doesn't work yet
   mitkWidget3->setMaximumSize(2000,2000);
   mitkWidget4->setMaximumSize(2000,2000);
 
-  layout3 ->addWidget( mitkWidget3,0,0 );
-  layout3 ->addWidget( mitkWidget4,1,0 );
+  layout3->addWidget( mitkWidget3,0,0 );
+  layout3->addWidget( mitkWidget4,1,0 );
 
   layout4->addLayout( layout3 );
   layout4->addWidget( levelWindowWidget );
   QmitkStdMultiWidgetLayout->addLayout( layout4 );
+
+  m_Layout = LAYOUT_COLUMN_WIDGET_3_AND_4;
 }
 
 void QmitkStdMultiWidget::SetData( mitk::DataTreeIteratorBase* it )
@@ -749,4 +768,10 @@ void QmitkStdMultiWidget::DisableNavigationControllerEventListening()
   );
   
   globalInteraction->RemoveListener( timeNavigationController );
+}
+
+
+int QmitkStdMultiWidget::GetLayout() const
+{
+  return m_Layout;
 }

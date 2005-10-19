@@ -23,6 +23,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkColorProperty.h"
 #include "mitkLookupTableProperty.h"
 #include "mitkMaterialProperty.h"
+#include "mitkVtkRepresentationProperty.h"
+#include "mitkVtkInterpolationProperty.h"
 #include <vtkActor.h>
 #include <vtkProperty.h>
 #include <vtkPolyDataMapper.h>
@@ -232,6 +234,19 @@ void mitk::SurfaceVtkMapper3D::ApplyProperties(vtkActor* actor, mitk::BaseRender
     property->SetInterpolation( materialProperty->GetVtkInterpolation() );
     property->SetRepresentation( materialProperty->GetVtkRepresentation() );
     
+  }
+  mitk::VtkRepresentationProperty* representationProperty = dynamic_cast<mitk::VtkRepresentationProperty *>(this->GetDataTreeNode()->GetProperty("representation").GetPointer() );
+  if ( representationProperty != NULL )
+  {
+    vtkProperty* property = m_Actor->GetProperty();
+    property->SetRepresentation( representationProperty->GetVtkRepresentation() );
+  }
+  
+  mitk::VtkInterpolationProperty* interpolationProperty = dynamic_cast<mitk::VtkInterpolationProperty *>(this->GetDataTreeNode()->GetProperty("interpolation").GetPointer() );
+  if ( interpolationProperty != NULL )
+  {
+    vtkProperty* property = m_Actor->GetProperty();
+    property->SetInterpolation( interpolationProperty->GetVtkInterpolation() );
   }
   
 }

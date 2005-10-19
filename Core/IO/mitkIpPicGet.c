@@ -52,6 +52,9 @@
  *   reads a PicFile from disk
  *
  * $Log$
+ * Revision 1.5  2005/10/19 11:19:43  ivo
+ * ENH: Chili ipPic compatibility
+ *
  * Revision 1.4  2005/10/13 11:21:12  ivo
  * FIX: linker warning (unused var)
  *
@@ -119,6 +122,53 @@
  *--------------------------------------------------------------------
  *  COPYRIGHT (c) 1993 by DKFZ (Dept. MBI) Heidelberg, FRG
  */
+
+#ifdef CHILIPLUGIN
+#include <ipPic.h>
+
+ipPicDescriptor * 
+MITKipPicGetTags( char *infile_name, ipPicDescriptor *pic )
+{
+  return ipPicGetTags(infile_name, pic);
+}
+
+_ipPicTagsElement_t *
+_MITKipPicReadTags( _ipPicTagsElement_t *head, ipUInt4_t bytes_to_read, FILE *stream, char encryption_type )
+{
+  return _ipPicReadTags(head, bytes_to_read, stream, encryption_type);
+}
+
+//ipPicDescriptor * _MITKipPicOldGet( FILE *infile, ipPicDescriptor *pic )
+//{
+//  return _ipPicOldGet(infile, pic);
+//}
+
+ipPicDescriptor *
+MITKipPicGet( char *infile_name, ipPicDescriptor *pic )
+{
+  if(pic != NULL)
+  {
+    ipPicDescriptor * tmpPic;
+    ipUInt4_t sizePic, sizeTmpPic;
+    tmpPic = ipPicGet(infile_name, NULL);
+    sizePic = _ipPicSize(pic);
+    sizeTmpPic = _ipPicSize(tmpPic);
+    if(sizePic != sizeTmpPic)
+    {
+      fprintf( stderr, "Critical: MITKipPicGet was given a pic with wrong size\n" );
+      return tmpPic;
+    }
+    memcpy(pic->data, tmpPic->data, sizePic);
+    pic->info->tags_head = tmpPic->info->tags_head;
+    tmpPic->info->tags_head = NULL;
+    ipPicFree(tmpPic);
+    return pic;
+  }
+  else
+    return ipPicGet(infile_name, pic);
+}
+
+#else
 
 #include "DataStructures/ipPic/ipPic.h"
 #ifdef DOS
@@ -215,114 +265,21 @@ ipPicDescriptor * _MITKipPicOldGet( FILE *infile, ipPicDescriptor *pic )
   return( pic );
 }
 
-ipPicDescriptor *
-MITKipPicGet( char *infile_name, ipPicDescriptor *pic )
+ipUInt4_t _MITKipPicTSVElements( ipPicTSV_t *tsv )
 {
-  ipPicFile_t infile;
+  ipUInt4_t i;
+  ipUInt4_t elements;
 
-  ipPicTag_t tag_name;
-  ipUInt4_t len;
+  if( tsv->dim == 0 )
+    return( 0 );
 
-  ipUInt4_t to_read;
-  ipUInt4_t size;
+  elements = tsv->n[0];
+  for( i = 1; i < tsv->dim; i++ )
+    elements *= tsv->n[i];
 
-  infile = _ipPicOpenPicFileIn( infile_name );
-
-  if( !infile )
-    {
-      /*ipPrintErr( "ipPicGet: sorry, error opening infile\n" );*/
-      return( NULL );
-    }
-
-  /* read infile */
-  ipPicFRead( tag_name, 1, 4, infile );
-
-  if( strncmp( "\037\213", tag_name, 2 ) == 0 )
-    {
-      fprintf( stderr, "ipPicGetHeader: sorry, can't read compressed file\n" );
-      return( NULL );
-    }
-  else if( strncmp( ipPicVERSION, tag_name, 4 ) != 0 )
-    {
-      if( pic == NULL )
-        pic = _MITKipPicOldGet( infile,
-                            NULL );
-      else
-        _MITKipPicOldGet( infile,
-                      pic );
-      if( infile != stdin )
-        ipPicFClose( infile );
-      return( pic );
-    }
-
-  size = 0;
-  if( pic == NULL )
-    pic = ipPicNew();
-  else
-  {
-    size= _ipPicSize(pic);
-    if(pic->data == NULL)
-      size = 0;
-  }
-
-  if( pic->info != NULL )
-  {
-    _ipPicFreeTags( pic->info->tags_head );
-    pic->info->tags_head = NULL;
-  }
-
-  ipPicFRead( &(tag_name[4]), 1, sizeof(ipPicTag_t)-4, infile );
-  strncpy( pic->info->version, tag_name, _ipPicTAGLEN );
-
-  ipPicFReadLE( &len, sizeof(ipUInt4_t), 1, infile );
-
-  ipPicFReadLE( &(pic->type), sizeof(ipUInt4_t), 1, infile );
-  ipPicFReadLE( &(pic->bpe), sizeof(ipUInt4_t), 1, infile );
-  ipPicFReadLE( &(pic->dim), sizeof(ipUInt4_t), 1, infile );
-
-  ipPicFReadLE( &(pic->n), sizeof(ipUInt4_t), pic->dim, infile );
-
-
-  to_read = len -        3 * sizeof(ipUInt4_t)
-                - pic->dim * sizeof(ipUInt4_t);
-#if 0
-  ipPicFSeek( infile, to_read, SEEK_CUR );
-#else
-  pic->info->tags_head = _MITKipPicReadTags( pic->info->tags_head, to_read, infile, ipPicEncryptionType(pic) );
-#endif
-
-  pic->info->write_protect = ipFalse;
-
-  if((size == 0) || (size != _ipPicSize(pic)))
-    {
-      if( pic->data != NULL )
-        {
-          free( pic->data );
-          pic->data = NULL;
-        }
-#ifdef WIN
-      if ((pic->hdata = GlobalAlloc( GMEM_MOVEABLE, _ipPicSize(pic) )) != 0)
-        pic->data = GlobalLock( pic->hdata );
-#else
-      pic->data = malloc( _ipPicSize(pic) );
-#endif
-    }
-
-  pic->info->pixel_start_in_file = ipPicFTell( infile );
-  if( pic->type == ipPicNonUniform )
-    ipPicFRead( pic->data, pic->bpe / 8, _ipPicElements(pic), infile );
-  else
-    ipPicFReadLE( pic->data, pic->bpe / 8, _ipPicElements(pic), infile );
-
-  if( infile != stdin )
-    ipPicFClose( infile );
-
-#ifdef WIN
-  GlobalUnlock( pic->hdata );
-#endif
-
-  return( pic );
+  return( elements );
 }
+
 
 _ipPicTagsElement_t *
 _MITKipPicReadTags( _ipPicTagsElement_t *head, ipUInt4_t bytes_to_read, FILE *stream, char encryption_type )
@@ -364,7 +321,7 @@ _MITKipPicReadTags( _ipPicTagsElement_t *head, ipUInt4_t bytes_to_read, FILE *st
         {
           ipUInt4_t  elements;
 
-          elements = _ipPicTSVElements( tsv );
+          elements = _MITKipPicTSVElements( tsv );
 
           if( tsv->type == ipPicASCII
               || tsv->type == ipPicNonUniform )
@@ -473,3 +430,118 @@ MITKipPicGetTags( char *infile_name, ipPicDescriptor *pic )
 
   return( pic );
 }
+
+ipPicDescriptor *
+MITKipPicGet( char *infile_name, ipPicDescriptor *pic )
+{
+  ipPicFile_t infile;
+
+  ipPicTag_t tag_name;
+  ipUInt4_t len;
+
+  ipUInt4_t to_read;
+  ipUInt4_t size;
+
+  infile = _ipPicOpenPicFileIn( infile_name );
+
+  if( !infile )
+    {
+      /*ipPrintErr( "ipPicGet: sorry, error opening infile\n" );*/
+      return( NULL );
+    }
+
+  /* read infile */
+  ipPicFRead( tag_name, 1, 4, infile );
+
+  if( strncmp( "\037\213", tag_name, 2 ) == 0 )
+    {
+      fprintf( stderr, "ipPicGetHeader: sorry, can't read compressed file\n" );
+      return( NULL );
+    }
+  else if( strncmp( ipPicVERSION, tag_name, 4 ) != 0 )
+    {
+#ifndef CHILIPLUGIN
+      if( pic == NULL )
+        pic = _MITKipPicOldGet( infile,
+                            NULL );
+      else
+        _MITKipPicOldGet( infile,
+                      pic );
+      if( infile != stdin )
+        ipPicFClose( infile );
+#else
+      return NULL;
+#endif
+      return( pic );
+    }
+
+  size = 0;
+  if( pic == NULL )
+    pic = ipPicNew();
+  else
+  {
+    size= _ipPicSize(pic);
+    if(pic->data == NULL)
+      size = 0;
+  }
+
+  if( pic->info != NULL )
+  {
+    _ipPicFreeTags( pic->info->tags_head );
+    pic->info->tags_head = NULL;
+  }
+
+  ipPicFRead( &(tag_name[4]), 1, sizeof(ipPicTag_t)-4, infile );
+  strncpy( pic->info->version, tag_name, _ipPicTAGLEN );
+
+  ipPicFReadLE( &len, sizeof(ipUInt4_t), 1, infile );
+
+  ipPicFReadLE( &(pic->type), sizeof(ipUInt4_t), 1, infile );
+  ipPicFReadLE( &(pic->bpe), sizeof(ipUInt4_t), 1, infile );
+  ipPicFReadLE( &(pic->dim), sizeof(ipUInt4_t), 1, infile );
+
+  ipPicFReadLE( &(pic->n), sizeof(ipUInt4_t), pic->dim, infile );
+
+
+  to_read = len -        3 * sizeof(ipUInt4_t)
+                - pic->dim * sizeof(ipUInt4_t);
+#if 0
+  ipPicFSeek( infile, to_read, SEEK_CUR );
+#else
+  pic->info->tags_head = _MITKipPicReadTags( pic->info->tags_head, to_read, infile, ipPicEncryptionType(pic) );
+#endif
+
+  pic->info->write_protect = ipFalse;
+
+  if((size == 0) || (size != _ipPicSize(pic)))
+    {
+      if( pic->data != NULL )
+        {
+          free( pic->data );
+          pic->data = NULL;
+        }
+#ifdef WIN
+      if ((pic->hdata = GlobalAlloc( GMEM_MOVEABLE, _ipPicSize(pic) )) != 0)
+        pic->data = GlobalLock( pic->hdata );
+#else
+      pic->data = malloc( _ipPicSize(pic) );
+#endif
+    }
+
+  pic->info->pixel_start_in_file = ipPicFTell( infile );
+  if( pic->type == ipPicNonUniform )
+    ipPicFRead( pic->data, pic->bpe / 8, _ipPicElements(pic), infile );
+  else
+    ipPicFReadLE( pic->data, pic->bpe / 8, _ipPicElements(pic), infile );
+
+  if( infile != stdin )
+    ipPicFClose( infile );
+
+#ifdef WIN
+  GlobalUnlock( pic->hdata );
+#endif
+
+  return( pic );
+}
+
+#endif // CHILIPLUGIN

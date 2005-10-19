@@ -18,8 +18,15 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include "mitkPicVolumeTimeSeriesReader.h"
+#include "mitkPicFileReader.h"
 #include <itkImageFileReader.h>
 #include <string>
+
+extern "C" 
+{
+ipPicDescriptor * MITKipPicGet( char *infile_name, ipPicDescriptor *pic );
+ipPicDescriptor * MITKipPicGetTags( char *infile_name, ipPicDescriptor *pic );
+}
 
 
 void mitk::PicVolumeTimeSeriesReader::GenerateOutputInformation()
@@ -43,7 +50,7 @@ void mitk::PicVolumeTimeSeriesReader::GenerateOutputInformation()
     //
     char* filename = const_cast<char *> ( m_MatchedFileNames[ 0 ].c_str() );
     ipPicDescriptor * header = ipPicGetHeader( filename, NULL );
-    header = ipPicGetTags( filename, header );
+    header = MITKipPicGetTags( filename, header );
 
     if ( header == NULL )
     {
@@ -70,17 +77,6 @@ void mitk::PicVolumeTimeSeriesReader::GenerateOutputInformation()
     output->Initialize( header );
 
     ipPicFree( header );
-    
-    //
-    // Initialize the timebounds of the FIRST geometry/volume. 
-    // Since EvenlyTimed is activated, the timings are propagated 
-    // to the other volumes!
-    //
-    mitk::ScalarType timearray[ 2 ];
-    timearray[ 0 ] = 0;
-    timearray[ 1 ] = 1; 
-    TimeBounds timebounds( timearray );
-    output->GetSlicedGeometry()->SetTimeBounds( timebounds );
 
     m_ReadHeaderTime.Modified();
 }
@@ -112,7 +108,7 @@ void mitk::PicVolumeTimeSeriesReader::GenerateData()
     {
         char* filename = const_cast< char* >( m_MatchedFileNames[ t ].c_str() );
         std::cout << "Reading file " << filename << "..." << std::endl;
-        volume3d = ipPicGet( filename, NULL );
+        volume3d = MITKipPicGet( filename, NULL );
 
         if ( volume3d == NULL )
         {
@@ -124,15 +120,13 @@ void mitk::PicVolumeTimeSeriesReader::GenerateData()
         //
 
         //
-        // @TODO left to right handed conversion
-        //
-
-        //
         // copy the 3d data volume to the 4d volume
         //
+
+        // \todo use memory of Image as in PicFileReader (or integrate everything into the PicFileReader!)
+        PicFileReader::ConvertHandedness(volume3d);
         output->SetPicVolume( volume3d, t );
         ipPicFree ( volume3d );
-
     }
 }
 

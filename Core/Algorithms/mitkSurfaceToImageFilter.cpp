@@ -24,12 +24,14 @@ See MITKCopyright.txt or http://www.mitk.org/ for details.
 #include <vtkImageStencil.h>
 #include <vtkImageData.h>
 #include <vtkPolyData.h>
+#include <vtkLinearTransform.h>
 #include <vtkTriangleFilter.h>
 #include <vtkLinearExtrusionFilter.h>
 #include <vtkDataSetTriangleFilter.h>
 #include <vtkImageThreshold.h>
 #include <vtkImageMathematics.h>
 #include <vtkImageCast.h>
+#include <vtkImageChangeInformation.h>
 #include <vtkPolyDataNormals.h>
 
 #include <vtkTransformPolyDataFilter.h>
@@ -57,41 +59,18 @@ void mitk::SurfaceToImageFilter::GenerateInputRequestedRegion()
 
 void mitk::SurfaceToImageFilter::GenerateOutputInformation()
 {
-  mitk::Surface::ConstPointer input  = this->GetInput();
   mitk::Image *inputImage = (mitk::Image*)this->GetImage();
   mitk::Image::Pointer output = this->GetOutput();
-
-    // set input-requested-region, because we access it later in
-  // GenerateInputRequestedRegion (there we just set the time)
-//  inputImage->SetRequestedRegion( inputImage->GetLargestPossibleRegion() );
-
  
   itkDebugMacro(<<"GenerateOutputInformation()");
 
-  if(input.IsNull()) return;
+  if((inputImage == NULL) || 
+     (inputImage->IsInitialized() == false) || 
+     (inputImage->GetTimeSlicedGeometry() == NULL)) return;
 
-  unsigned int dimension = inputImage->GetDimension();
-  unsigned int *dimensions = new unsigned int [dimension];
-  memcpy(dimensions, inputImage->GetDimensions(), dimension*sizeof(unsigned int));
-  mitk::PixelType pixelType;
-  pixelType.Initialize(typeid(int));
-  output->Initialize( pixelType, dimension, dimensions);
-  delete [] dimensions;
+  output->Initialize(PixelType(typeid(int)), *inputImage->GetTimeSlicedGeometry());
 
-  // set the spacing
-  mitk::Vector3D spacing = inputImage->GetSlicedGeometry()->GetSpacing();
-  output->SetSpacing(spacing);
-  output->SetRequestedRegionToLargestPossibleRegion();
-
-  // Position the output Image to match the corresponding region of the input image
-  mitk::SlicedGeometry3D* slicedGeometry = output->GetSlicedGeometry();
-  const mitk::SlicedData::IndexType& start = inputImage->GetLargestPossibleRegion().GetIndex();
-  mitk::Vector3D vector; vtk2itk(start, vector);
-  slicedGeometry->Translate(vector);
-
-  mitk::TimeSlicedGeometry* timeSlicedGeometry = output->GetTimeSlicedGeometry();
-  timeSlicedGeometry->InitializeEvenlyTimed(slicedGeometry, output->GetDimension(3));
-  timeSlicedGeometry->CopyTimes(inputImage->GetTimeSlicedGeometry());
+  output->SetPropertyList(inputImage->GetPropertyList()->Clone());    
 }
 
 void mitk::SurfaceToImageFilter::GenerateData()
@@ -138,10 +117,14 @@ void mitk::SurfaceToImageFilter::Stencil3DImage(int time)
   move->ReleaseDataFlagOn();
 
   vtkTransform *transform=vtkTransform::New();
-  surfaceTimeGeometry->GetGeometry3D( surfaceTimeStep )->TransferItkToVtkTransform();
-  transform->SetMatrix(surfaceTimeGeometry->GetGeometry3D( surfaceTimeStep )->GetVtkTransform()->GetMatrix());
-  //@todo: take geometry of image into account! (cave: spacing of image also in vtkimagedata!)
+  Geometry3D* geometry = surfaceTimeGeometry->GetGeometry3D( surfaceTimeStep );
+  geometry->TransferItkToVtkTransform();
   transform->PostMultiply();
+  transform->Concatenate(geometry->GetVtkTransform()->GetMatrix());
+  // take image geometry into account. vtk-Image information will be changed to unit spacing and zero origin below.
+  Geometry3D* imageGeometry = imageTimeGeometry->GetGeometry3D(time);
+  imageGeometry->TransferItkToVtkTransform();
+  transform->Concatenate(imageGeometry->GetVtkTransform()->GetLinearInverse());
   move->SetTransform(transform);
 
   vtkPolyDataNormals * normalsFilter = vtkPolyDataNormals::New();
@@ -155,19 +138,22 @@ void mitk::SurfaceToImageFilter::Stencil3DImage(int time)
   move->Delete();
 
   vtkPolyDataToImageStencil * surfaceConverter = vtkPolyDataToImageStencil::New();
-  surfaceConverter->DebugOn();
   surfaceConverter->SetTolerance( 0.0 );
   surfaceConverter->ReleaseDataFlagOn();
 
   surfaceConverter->SetInput( normalsFilter->GetOutput() );
   normalsFilter->Delete();
 
-  vtkImageData * tmp = ( (mitk::Image*)GetImage() )->GetVtkImageData( time );
+  vtkImageChangeInformation *indexCoordinatesImageFilter = vtkImageChangeInformation::New();
+  indexCoordinatesImageFilter->SetInput(( (mitk::Image*)GetImage() )->GetVtkImageData( time ));
+  indexCoordinatesImageFilter->SetOutputSpacing(1.0,1.0,1.0);
+  indexCoordinatesImageFilter->SetOutputOrigin(0.0,0.0,0.0);
 
   vtkImageCast * castFilter = vtkImageCast::New();
   castFilter->ReleaseDataFlagOn();
   castFilter->SetOutputScalarTypeToInt();
-  castFilter->SetInput( tmp );
+  castFilter->SetInput( indexCoordinatesImageFilter->GetOutput() );
+  indexCoordinatesImageFilter->Delete();
 
   vtkImageStencil * stencil = vtkImageStencil::New();
   stencil->SetBackgroundValue( m_BackgroundValue );
@@ -179,7 +165,6 @@ void mitk::SurfaceToImageFilter::Stencil3DImage(int time)
 
   stencil->SetInput( castFilter->GetOutput() );
   castFilter->Delete();
-
 
   if (m_MakeOutputBinaryOn)
   {
@@ -205,6 +190,7 @@ void mitk::SurfaceToImageFilter::Stencil3DImage(int time)
     mitk::Image::Pointer output = this->GetOutput();
     output->SetVolume( stencil->GetOutput()->GetScalarPointer(), time );
     std::cout << "stencil ref count: " << stencil->GetReferenceCount() << std::endl;
+
     stencil->Delete();
   }
 }

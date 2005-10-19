@@ -19,6 +19,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkSurfaceVtkWriter.h"
 class vtkDataObject;
 #include <vtkConfigure.h>
+#include <vtkPolyData.h>
+#include <vtkLinearTransform.h>
+#include <vtkTransformPolyDataFilter.h>
 #include <sstream>
 
 template <class VTKWRITER>
@@ -53,6 +56,10 @@ void mitk::SurfaceVtkWriter<VTKWRITER>::GenerateData()
   }
 
   mitk::Surface::Pointer input = const_cast<mitk::Surface*>(this->GetInput());
+  
+  vtkTransformPolyDataFilter* transformPolyData = vtkTransformPolyDataFilter::New();
+  vtkPolyData * polyData;
+  Geometry3D* geometry;
 
   if(input->GetTimeSlicedGeometry()->GetTimeSteps()>1)
   {
@@ -63,9 +70,10 @@ void mitk::SurfaceVtkWriter<VTKWRITER>::GenerateData()
     for(t = 0; t < timesteps; ++t)
     {
       ::itk::OStringStream filename;
+      geometry = input->GetGeometry(t);
       if(input->GetTimeSlicedGeometry()->IsValidTime(t))
       {
-        const mitk::TimeBounds& timebounds = input->GetTimeSlicedGeometry()->GetGeometry3D(t)->GetTimeBounds();
+        const mitk::TimeBounds& timebounds = geometry->GetTimeBounds();
         filename <<  m_FileName.c_str() << "_S" << std::setprecision(0) << timebounds[0] << "_E" << std::setprecision(0) << timebounds[1] << "_T" << t << m_Extension;
       }
       else
@@ -73,26 +81,39 @@ void mitk::SurfaceVtkWriter<VTKWRITER>::GenerateData()
         itkWarningMacro(<<"Error on write: TimeSlicedGeometry invalid of surface " << filename << ".");
         filename <<  m_FileName.c_str() << "_T" << t << m_Extension;
       }
+      geometry->TransferItkToVtkTransform();
+      transformPolyData->SetInput(input->GetVtkPolyData(t));
+      transformPolyData->SetTransform(geometry->GetVtkTransform());
+      transformPolyData->UpdateWholeExtent();
+      polyData = transformPolyData->GetOutput();
+      
       m_VtkWriter->SetFileName(filename.str().c_str());
 #if VTK_MAJOR_VERSION >= 5 
-      m_VtkWriter->SetInput((vtkDataObject*)input->GetVtkPolyData(t));
+      m_VtkWriter->SetInput((vtkDataObject*)polyData);
 #else
-      m_VtkWriter->SetInput(input->GetVtkPolyData(t));
+      m_VtkWriter->SetInput(polyData);
 #endif
       m_VtkWriter->Write();
     }
   }
   else
   {
+    geometry = input->GetGeometry();
+    geometry->TransferItkToVtkTransform();
+    transformPolyData->SetInput(input->GetVtkPolyData());
+    transformPolyData->SetTransform(geometry->GetVtkTransform());
+    transformPolyData->UpdateWholeExtent();
+    polyData = transformPolyData->GetOutput();
+      
     m_VtkWriter->SetFileName(m_FileName.c_str());
 #if VTK_MAJOR_VERSION >= 5 
-    m_VtkWriter->SetInput((vtkDataObject*)input->GetVtkPolyData());
+    m_VtkWriter->SetInput((vtkDataObject*)polyData);
 #else
-    m_VtkWriter->SetInput(input->GetVtkPolyData());
+    m_VtkWriter->SetInput(polyData);
 #endif
     m_VtkWriter->Write();
   }
-
+  transformPolyData->Delete();
 }
 
 template <class VTKWRITER>

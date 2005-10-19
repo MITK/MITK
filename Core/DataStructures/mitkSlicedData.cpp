@@ -45,6 +45,18 @@ void mitk::SlicedData::UpdateOutputInformation()
   m_LastRequestedRegionWasOutsideOfTheBufferedRegion = 0;
 }
 
+void mitk::SlicedData::ReleaseData()
+{
+}
+
+void mitk::SlicedData::PrepareForNewData()
+{
+  if ( GetUpdateMTime() < GetPipelineMTime() || GetDataReleased() )
+  {
+   ReleaseData();
+  }
+}
+
 //##ModelId=3E14102C029E
 void mitk::SlicedData::SetRequestedRegionToLargestPossibleRegion()
 {

@@ -92,6 +92,8 @@ public:
   //## origin, etc.
   virtual void UpdateOutputInformation();
 
+  virtual void PrepareForNewData();
+
   //##ModelId=3E14102C029E
   //##Documentation
   //## Set the RequestedRegion to the LargestPossibleRegion.  This forces a
@@ -209,6 +211,10 @@ public:
   //## @warning This method will normally be called internally by the sub-class of SlicedData 
   //## during initialization.
   virtual void SetGeometry(Geometry3D* aGeometry3D);
+
+  //##Documentation
+  //## @brief release memory
+  virtual void ReleaseData();
 
 protected:
   //##ModelId=3E19EA3300BA

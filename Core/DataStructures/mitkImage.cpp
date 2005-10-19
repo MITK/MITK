@@ -648,16 +648,32 @@ void mitk::Image::Initialize(const mitk::PixelType& type, unsigned int dimension
   m_Initialized = true;
 }
 
-void mitk::Image::Initialize(const mitk::PixelType& type, const mitk::Geometry3D& geometry, bool shiftOriginToZero ) 
+void mitk::Image::Initialize(const mitk::PixelType& type, const mitk::Geometry3D& geometry, unsigned int channels, int tDim, bool shiftBoundingBoxMinimumToZero ) 
 {
-  unsigned int dimensions[3];
-  dimensions[0] = (unsigned int)geometry.GetExtent(0);
-  dimensions[1] = (unsigned int)geometry.GetExtent(1);
-  dimensions[2] = (unsigned int)geometry.GetExtent(2);
+  unsigned int dimensions[5];
+  dimensions[0] = (unsigned int)(geometry.GetExtent(0)+0.5);
+  dimensions[1] = (unsigned int)(geometry.GetExtent(1)+0.5);
+  dimensions[2] = (unsigned int)(geometry.GetExtent(2)+0.5);
 
   unsigned int dimension = 2;
   if ( dimensions[2] > 1 )
     dimension = 3;
+
+  if ( tDim > 0)
+  {
+    dimensions[3] = tDim;
+  }
+  else
+  {
+    const mitk::TimeSlicedGeometry* timeGeometry = dynamic_cast<const mitk::TimeSlicedGeometry*>(&geometry);
+    if ( timeGeometry != NULL ) 
+    {
+      dimensions[3] = timeGeometry->GetTimeSteps();
+    }
+  }
+
+  if ( dimensions[3] > 1 )
+    dimension = 4;
 
   Initialize( type, dimension, dimensions );
 
@@ -683,7 +699,7 @@ void mitk::Image::Initialize(const mitk::PixelType& type, const mitk::Geometry3D
 
 void mitk::Image::Initialize(const mitk::Image* image) 
 {
-  Initialize(*image->GetPixelType().GetTypeId(), *image->GetGeometry(), false);
+  Initialize(*image->GetPixelType().GetTypeId(), *image->GetTimeSlicedGeometry(), false);
 }
 
 void mitk::Image::Initialize(vtkImageData* vtkimagedata, int channels, int tDim, int sDim)
@@ -987,20 +1003,25 @@ void mitk::Image::Clear()
 
     if(m_Dimensions!=NULL)
       delete [] m_Dimensions;
+    
+    ReleaseData();
+  }
+}
 
-    ImageDataItemPointerArray::iterator it, end;
-    for( it=m_Slices.begin(), end=m_Slices.end(); it!=end; ++it )
-    {
-      (*it)=NULL;
-    }
-    for( it=m_Volumes.begin(), end=m_Volumes.end(); it!=end; ++it )
-    {
-      (*it)=NULL;
-    }
-    for( it=m_Channels.begin(), end=m_Channels.end(); it!=end; ++it )
-    {
-      (*it)=NULL;
-    }
+void mitk::Image::ReleaseData()
+{
+  ImageDataItemPointerArray::iterator it, end;
+  for( it=m_Slices.begin(), end=m_Slices.end(); it!=end; ++it )
+  {
+    (*it)=NULL;
+  }
+  for( it=m_Volumes.begin(), end=m_Volumes.end(); it!=end; ++it )
+  {
+    (*it)=NULL;
+  }
+  for( it=m_Channels.begin(), end=m_Channels.end(); it!=end; ++it )
+  {
+    (*it)=NULL;
   }
 }
 

@@ -200,7 +200,8 @@ public:
   //## If @a shiftBoundingBoxMinimumToZero is @a true it is shifted there
   //## without changing the world coordinate in mm of the minimum position
   //## (the translation in mm is changed accordingly).
-  virtual void Initialize(const mitk::PixelType& type, const mitk::Geometry3D& geometry, bool shiftBoundingBoxMinimumToZero = true);
+  //## @param tDim override time dimension (@a n[3]) if @a geometry is a TimeSlicedGeometry (if >0)
+  virtual void Initialize(const mitk::PixelType& type, const mitk::Geometry3D& geometry, unsigned int channels = 1, int tDim=-1, bool shiftBoundingBoxMinimumToZero = true);
 
   //##Documentation
   //## initialize new (or re-initialize) image information by another
@@ -217,8 +218,8 @@ public:
   //## Only the header is used, not the data vector! Use SetPicVolume(pic)
   //## to set the data vector.
   //##
-  //## @param tDim override time dimension (@a n[3]) in @a pic (if >0 and <)
-  //## @param sDim override z-space dimension (@a n[2]) in @a pic (if >0 and <)
+  //## @param tDim override time dimension (@a n[3]) in @a pic (if >0)
+  //## @param sDim override z-space dimension (@a n[2]) in @a pic (if >0)
   //## @warning Initialize() by pic assumes a plane, evenly spaced geometry starting at (0,0,0).
   virtual void Initialize(const ipPicDescriptor* pic, int channels = 1, int tDim = -1, int sDim = -1);
 
@@ -334,6 +335,8 @@ public:
   //##Documentation
   //## @brief reset image to non-initialized state, release memory
   virtual void Clear();
+
+  virtual void ReleaseData();
 
   virtual void SetGeometry(Geometry3D* aGeometry3D);
 

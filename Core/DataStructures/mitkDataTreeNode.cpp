@@ -180,12 +180,12 @@ bool mitk::DataTreeNode::VerifyRequestedRegion()
 }
 
 //##ModelId=3E860A640156
-void mitk::DataTreeNode::SetRequestedRegion(itk::DataObject *data)
+void mitk::DataTreeNode::SetRequestedRegion(itk::DataObject * /*data*/)
 {
 }
 
 //##ModelId=3E860A6601DB
-void mitk::DataTreeNode::CopyInformation(const itk::DataObject *data)
+void mitk::DataTreeNode::CopyInformation(const itk::DataObject * /*data*/)
 {
 }
 //##ModelId=3E3FE0420273

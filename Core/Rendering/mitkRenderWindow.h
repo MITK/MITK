@@ -20,13 +20,18 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITKRENDERWINDOW_H_HEADER_INCLUDED_C1EBD0AD
 #define MITKRENDERWINDOW_H_HEADER_INCLUDED_C1EBD0AD
 
+#include "mitkBaseRenderer.h"
+
 #include <set>
 #include <string>
-#include "mitkBaseRenderer.h"
+
 
 namespace mitk {
 
-  class VtkRenderWindow;
+class VtkRenderWindow;
+class BaseController;
+class SliceNavigationController;
+class CameraRotationController;
 
 //##ModelId=3E3ECC1201B2
 //##Documentation
@@ -65,8 +70,9 @@ public:
   //## @brief  Swaps the screen contents with an off-screen buffer. 
   //##
   //## This only works if the widget's format specifies double buffer mode.
-  //## Normally, there is no need to explicitly call this function because it is done automatically 
-  //## after each widget repaint, i.e. each time after paintGL() has been executed. 
+  //## Normally, there is no need to explicitly call this function because it
+  //## is done automatically after each widget repaint, i.e. each time after
+  //## paintGL() has been executed. 
   virtual void SwapBuffers ();
 
   //##Documentation
@@ -136,7 +142,12 @@ public:
   inline BaseRenderer* GetRenderer() const 
   {
     return m_Renderer.GetPointer();
-  } 
+  }
+
+  SliceNavigationController* GetSliceNavigationController() const;
+  CameraRotationController* GetCameraRotationController() const;
+
+  BaseController* GetController() const;
 
 protected:
   //##Documentation
@@ -150,6 +161,9 @@ protected:
   std::string m_Name;
   
   BaseRenderer::Pointer m_Renderer;
+
+  mitk::SliceNavigationController* m_SliceNavigationController;
+  mitk::CameraRotationController* m_CameraRotationController;
 };
 
 } // namespace mitk

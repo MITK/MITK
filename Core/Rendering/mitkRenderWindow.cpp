@@ -21,6 +21,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkVtkRenderWindow.h"
 #include "mitkOpenGLRenderer.h"
 #include "mitkRenderingManager.h"
+#include "mitkSliceNavigationController.h"
+#include "mitkCameraRotationController.h"
+
+
 #include <assert.h>
 
 std::set<mitk::RenderWindow*> mitk::RenderWindow::instances;
@@ -37,6 +41,14 @@ mitk::RenderWindow::RenderWindow(const char *name, mitk::BaseRenderer* renderer)
   RenderingManager::GetInstance()->AddRenderWindow( this );
 
   m_MitkVtkRenderWindow = mitk::VtkRenderWindow::New();
+
+  m_SliceNavigationController = new mitk::SliceNavigationController( "navigation" );
+  m_SliceNavigationController->ConnectGeometrySliceEvent( renderer );
+  m_SliceNavigationController->ConnectGeometryTimeEvent( renderer, false );
+
+  m_CameraRotationController = new mitk::CameraRotationController();
+  m_CameraRotationController->SetRenderWindow( this );
+  m_CameraRotationController->AcquireCamera();
 }
 
 mitk::RenderWindow::~RenderWindow()
@@ -110,5 +122,36 @@ void mitk::RenderWindow::SetVtkRenderWindow(VtkRenderWindow* renWin)
   {
     m_MitkVtkRenderWindow = renWin;
     InitRenderer();
+  }
+}
+
+mitk::SliceNavigationController*
+mitk::RenderWindow
+::GetSliceNavigationController() const
+{
+  return m_SliceNavigationController;
+}
+
+mitk::CameraRotationController*
+mitk::RenderWindow
+::GetCameraRotationController() const
+{
+  return m_CameraRotationController;
+}
+
+mitk::BaseController*
+mitk::RenderWindow
+::GetController() const
+{
+  switch ( m_Renderer->GetMapperID() )
+  {
+    case BaseRenderer::Standard2D:
+      return m_SliceNavigationController;
+
+    case BaseRenderer::Standard3D:
+      return m_CameraRotationController;
+
+    default:
+      return m_SliceNavigationController;
   }
 }

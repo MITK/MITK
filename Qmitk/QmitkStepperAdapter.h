@@ -59,11 +59,11 @@ public:
       {
         
       };
-      virtual void 	Execute (itk::Object *caller, const itk::EventObject &event)
+      virtual void 	Execute (itk::Object * /* caller */, const itk::EventObject & /* event */)
       {
         emit m_Receiver->Refetch();
       };
-      virtual void 	Execute (const itk::Object *caller, const itk::EventObject &event)
+      virtual void 	Execute (const itk::Object * /* caller */, const itk::EventObject & /* event */)
       {
         emit m_Receiver->Refetch();
       };

@@ -270,22 +270,22 @@ void VtkQRenderWindowInteractor::ExitCallback()
 
 
 //##ModelId=3E6D600F011F
-void VtkQRenderWindowInteractor::MousePressEvent(mitk::MouseEvent *me)
+void VtkQRenderWindowInteractor::MousePressEvent(mitk::MouseEvent *)
 {
 }
 
 //##ModelId=3E6D600F0128
-void VtkQRenderWindowInteractor::MouseReleaseEvent(mitk::MouseEvent *me)
+void VtkQRenderWindowInteractor::MouseReleaseEvent(mitk::MouseEvent *)
 {
 }
 
 //##ModelId=3E6D600F0130
-void VtkQRenderWindowInteractor::MouseMoveEvent(mitk::MouseEvent *me)
+void VtkQRenderWindowInteractor::MouseMoveEvent(mitk::MouseEvent *)
 {
 }
 
 //##ModelId=3E6D600F0133
-void VtkQRenderWindowInteractor::KeyPressEvent(mitk::KeyEvent *ke)
+void VtkQRenderWindowInteractor::KeyPressEvent(mitk::KeyEvent *)
 {
 }
 

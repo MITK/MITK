@@ -3,7 +3,7 @@
 
 For the following examples we assume that you have your source in /src
 
-\section Get a source tree
+\section one Get a source tree
 
 Since MITK is under active development we recommend to use the CVS version. To make sure you get a stable tree, check the
 <a href="http://public.kitware.com/MITK/Dashboard/MostRecentResults-Nightly/Dashboard.html">MITK dashboard</a> at Kitware before checking out. If the CVS is not clean, better get a stable tar ball from <a href="http://www.mitk.org">mitk.org</a>
@@ -15,7 +15,7 @@ cvs -d :pserver:anonymous@mbi.dkfz-heidelberg.de:/usr/local/cvsroot login<br>
 cvs -d :pserver:anonymous@mbi.dkfz-heidelberg.de:/usr/local/cvsroot co mitk 
 </tt>
 
-\section Build MITK with CMake 
+\section two Build MITK with CMake 
 
 Create a new directory for the binary tree, change to it and call CMake:
 

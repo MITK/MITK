@@ -437,7 +437,7 @@ void mitk::LightBoxImageReader::GenerateData()
 
 mitk::Vector3D mitk::LightBoxImageReader::GetSpacingFromLB(LocalImageInfoArray& imageNumbers)
 {
-  mitk::Vector3D spacing=(1.0 ,1.0 , 1.0);
+  mitk::Vector3D spacing;
 
 #ifdef CHILIPLUGIN
   interSliceGeometry_t*  isg_t  = m_LightBox->fetchDicomGeometry(0);

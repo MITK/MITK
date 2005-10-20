@@ -42,12 +42,6 @@ void RegionGrowing( itk::Image<TPixel, VImageDimension>* itkImage, Step6* step6)
   step6->m_ResultNode->SetProperty("layer", new mitk::IntProperty(1));
 }
 
-// Instantiate the access function for all datatypes and dimensions.
-// Some compilers have memory problems without the explicit instantiation.
-InstantiateAccessFunction_1(RegionGrowing, Step6*);
-
-
 /**
-\example Step6RegionGrowing.cpp
+\example Step6RegionGrowing.txx
 */
-

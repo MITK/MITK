@@ -286,7 +286,7 @@ void QmitkPropertyListViewItem::UpdateView()
   {
     QComboBox* combo = ( ( QComboBox* ) m_Control );
     std::string enumerationValue = enumerationProp->GetValueAsString();
-    for ( unsigned int item = 0 ; item < combo->count() ; ++item )
+    for ( int item = 0 ; item < combo->count() ; ++item )
     {
       if ( enumerationValue == combo->text( item ).latin1() )
       {

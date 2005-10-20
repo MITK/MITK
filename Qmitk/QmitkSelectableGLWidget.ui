@@ -31,6 +31,7 @@
     <include location="local" impldecl="in declaration">QmitkRenderWindow.h</include>
     <include location="local" impldecl="in declaration">mitkOpenGLRenderer.h</include>
     <include location="local" impldecl="in declaration">mitkSliceNavigationController.h</include>
+    <include location="local" impldecl="in declaration">mitkCameraRotationController.h</include>
     <include location="local" impldecl="in implementation">QmitkSelectableGLWidget.ui.h</include>
 </includes>
 <variables>

@@ -42,8 +42,8 @@ public:
   itkNewMacro(Self);
 
   itkGetMacro(Pos, unsigned int);
-  void SetPos(unsigned int pos) {
-    if (this->m_Pos != pos > m_Steps-1 ? m_Steps-1 : pos) {
+  void SetPos(unsigned int pos) { // copied from itkMacro.h, itkSetClampMacro(...)
+    if (this->m_Pos != (pos > m_Steps-1 ? m_Steps-1 : pos)) {
       this->m_Pos = pos > m_Steps-1 ? m_Steps-1 : pos ;
       this->Modified();
     }
@@ -53,8 +53,8 @@ public:
   itkSetMacro(Steps, unsigned int);
 
   itkGetMacro(StepSize, unsigned int);
-  void SetStepSize(unsigned int stepSize) {
-    if (this->m_StepSize != stepSize > m_Steps-1 ? m_Steps-1 : stepSize) {
+  void SetStepSize(unsigned int stepSize) { // copied from itkMacro.h, itkSetClampMacro(...)
+    if (this->m_StepSize != (stepSize > m_Steps-1 ? m_Steps-1 : stepSize)) {
       this->m_StepSize = stepSize > m_Steps-1 ? m_Steps-1 : stepSize;
       this->Modified();
     } 

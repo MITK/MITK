@@ -1,0 +1,438 @@
+<!DOCTYPE UI><UI version="3.3" stdsetdef="1">
+<class>QmitkMovieMakerControls</class>
+<widget class="QWidget">
+    <property name="name">
+        <cstring>QmitkMovieMakerControls</cstring>
+    </property>
+    <property name="geometry">
+        <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>282</width>
+            <height>601</height>
+        </rect>
+    </property>
+    <property name="minimumSize">
+        <size>
+            <width>0</width>
+            <height>0</height>
+        </size>
+    </property>
+    <property name="caption">
+        <string>MovieMaker</string>
+    </property>
+    <vbox>
+        <property name="name">
+            <cstring>unnamed</cstring>
+        </property>
+        <widget class="QLayoutWidget">
+            <property name="name">
+                <cstring>layout3</cstring>
+            </property>
+            <hbox>
+                <property name="name">
+                    <cstring>unnamed</cstring>
+                </property>
+                <widget class="QLabel">
+                    <property name="name">
+                        <cstring>textLabel1</cstring>
+                    </property>
+                    <property name="text">
+                        <string>Step</string>
+                    </property>
+                </widget>
+                <widget class="QmitkSliderNavigator">
+                    <property name="name">
+                        <cstring>slidAngle</cstring>
+                    </property>
+                </widget>
+            </hbox>
+        </widget>
+        <widget class="QLayoutWidget">
+            <property name="name">
+                <cstring>layout3</cstring>
+            </property>
+            <hbox>
+                <property name="name">
+                    <cstring>unnamed</cstring>
+                </property>
+                <widget class="QToolButton">
+                    <property name="name">
+                        <cstring>btnPlay</cstring>
+                    </property>
+                    <property name="text">
+                        <string></string>
+                    </property>
+                    <property name="iconSet">
+                        <iconset>image0</iconset>
+                    </property>
+                </widget>
+                <widget class="QToolButton">
+                    <property name="name">
+                        <cstring>btnPause</cstring>
+                    </property>
+                    <property name="text">
+                        <string></string>
+                    </property>
+                    <property name="iconSet">
+                        <iconset>image1</iconset>
+                    </property>
+                </widget>
+                <widget class="QToolButton">
+                    <property name="name">
+                        <cstring>btnStop</cstring>
+                    </property>
+                    <property name="text">
+                        <string></string>
+                    </property>
+                    <property name="iconSet">
+                        <iconset>image2</iconset>
+                    </property>
+                </widget>
+            </hbox>
+        </widget>
+        <widget class="QToolButton">
+            <property name="name">
+                <cstring>btnMovie</cstring>
+            </property>
+            <property name="minimumSize">
+                <size>
+                    <width>200</width>
+                    <height>0</height>
+                </size>
+            </property>
+            <property name="text">
+                <string>Write Movie (MS Windows only)</string>
+            </property>
+        </widget>
+        <widget class="QGroupBox">
+            <property name="name">
+                <cstring>groupBox1</cstring>
+            </property>
+            <property name="title">
+                <string>Playing options</string>
+            </property>
+            <hbox>
+                <property name="name">
+                    <cstring>unnamed</cstring>
+                </property>
+                <widget class="QLayoutWidget">
+                    <property name="name">
+                        <cstring>layout8</cstring>
+                    </property>
+                    <hbox>
+                        <property name="name">
+                            <cstring>unnamed</cstring>
+                        </property>
+                        <widget class="QButtonGroup">
+                            <property name="name">
+                                <cstring>buttonGroup2</cstring>
+                            </property>
+                            <property name="frameShape">
+                                <enum>NoFrame</enum>
+                            </property>
+                            <property name="title">
+                                <string></string>
+                            </property>
+                            <vbox>
+                                <property name="name">
+                                    <cstring>unnamed</cstring>
+                                </property>
+                                <widget class="QRadioButton">
+                                    <property name="name">
+                                        <cstring>rbtnForward</cstring>
+                                    </property>
+                                    <property name="text">
+                                        <string>Forward</string>
+                                    </property>
+                                    <property name="checked">
+                                        <bool>true</bool>
+                                    </property>
+                                </widget>
+                                <widget class="QRadioButton">
+                                    <property name="name">
+                                        <cstring>rbtnBackward</cstring>
+                                    </property>
+                                    <property name="text">
+                                        <string>Backward</string>
+                                    </property>
+                                </widget>
+                                <widget class="QRadioButton">
+                                    <property name="name">
+                                        <cstring>rbtnPingPong</cstring>
+                                    </property>
+                                    <property name="text">
+                                        <string>Ping-Pong</string>
+                                    </property>
+                                </widget>
+                            </vbox>
+                        </widget>
+                        <widget class="Line">
+                            <property name="name">
+                                <cstring>line2</cstring>
+                            </property>
+                            <property name="frameShape">
+                                <enum>VLine</enum>
+                            </property>
+                            <property name="frameShadow">
+                                <enum>Sunken</enum>
+                            </property>
+                            <property name="orientation">
+                                <enum>Vertical</enum>
+                            </property>
+                        </widget>
+                        <widget class="QButtonGroup">
+                            <property name="name">
+                                <cstring>buttonGroup1</cstring>
+                            </property>
+                            <property name="frameShape">
+                                <enum>NoFrame</enum>
+                            </property>
+                            <property name="title">
+                                <string></string>
+                            </property>
+                            <property name="flat">
+                                <bool>false</bool>
+                            </property>
+                            <property name="checkable">
+                                <bool>false</bool>
+                            </property>
+                            <vbox>
+                                <property name="name">
+                                    <cstring>unnamed</cstring>
+                                </property>
+                                <widget class="QRadioButton">
+                                    <property name="name">
+                                        <cstring>rbtnSpatial</cstring>
+                                    </property>
+                                    <property name="text">
+                                        <string>Spatial</string>
+                                    </property>
+                                    <property name="checked">
+                                        <bool>true</bool>
+                                    </property>
+                                </widget>
+                                <widget class="QRadioButton">
+                                    <property name="name">
+                                        <cstring>rbtnTemporal</cstring>
+                                    </property>
+                                    <property name="text">
+                                        <string>Temporal</string>
+                                    </property>
+                                </widget>
+                                <widget class="QLayoutWidget">
+                                    <property name="name">
+                                        <cstring>layout6</cstring>
+                                    </property>
+                                    <hbox>
+                                        <property name="name">
+                                            <cstring>unnamed</cstring>
+                                        </property>
+                                        <widget class="QLabel">
+                                            <property name="name">
+                                                <cstring>textLabel2</cstring>
+                                            </property>
+                                            <property name="text">
+                                                <string>Cycle (sec)</string>
+                                            </property>
+                                        </widget>
+                                        <widget class="QSpinBox">
+                                            <property name="name">
+                                                <cstring>spnDuration</cstring>
+                                            </property>
+                                            <property name="maxValue">
+                                                <number>200</number>
+                                            </property>
+                                            <property name="minValue">
+                                                <number>1</number>
+                                            </property>
+                                            <property name="value">
+                                                <number>5</number>
+                                            </property>
+                                        </widget>
+                                    </hbox>
+                                </widget>
+                            </vbox>
+                        </widget>
+                    </hbox>
+                </widget>
+            </hbox>
+        </widget>
+        <widget class="QLayoutWidget">
+            <property name="name">
+                <cstring>layout10</cstring>
+            </property>
+            <hbox>
+                <property name="name">
+                    <cstring>unnamed</cstring>
+                </property>
+                <widget class="QLabel">
+                    <property name="name">
+                        <cstring>textLabel3</cstring>
+                    </property>
+                    <property name="text">
+                        <string>Selected Window</string>
+                    </property>
+                </widget>
+                <widget class="QComboBox">
+                    <property name="name">
+                        <cstring>cmbSelectedWindow</cstring>
+                    </property>
+                </widget>
+            </hbox>
+        </widget>
+        <spacer>
+            <property name="name">
+                <cstring>spacer3</cstring>
+            </property>
+            <property name="orientation">
+                <enum>Vertical</enum>
+            </property>
+            <property name="sizeType">
+                <enum>Expanding</enum>
+            </property>
+            <property name="sizeHint">
+                <size>
+                    <width>20</width>
+                    <height>230</height>
+                </size>
+            </property>
+        </spacer>
+    </vbox>
+</widget>
+<customwidgets>
+    <customwidget>
+        <class>QmitkSliderNavigator</class>
+        <header location="global">QmitkSliderNavigator.h</header>
+        <sizehint>
+            <width>10</width>
+            <height>0</height>
+        </sizehint>
+        <container>0</container>
+        <sizepolicy>
+            <hordata>5</hordata>
+            <verdata>5</verdata>
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+        </sizepolicy>
+        <pixmap>image3</pixmap>
+        <slot access="public" specifier="">slot()</slot>
+        <slot access="public" specifier="">SetStepper(mitk::Stepper*)</slot>
+        <slot access="public" specifier="">Refetch()</slot>
+        <property type="0">4</property>
+    </customwidget>
+</customwidgets>
+<images>
+    <image name="image0">
+        <data format="PNG" length="298">89504e470d0a1a0a0000000d4948445200000018000000180806000000e0773df8000000f149444154789ce5d2416ac25010c6f12f998969df0b415dd813582a55dbaa1b1f5e44c10bb42e6cb7d52348bd82a0e710149263bdde4067a25988df01fe3f0626c8b20c652e2cb57e3f8073ce970a5c8288819fef7921440c3c1a83d9d7a71a11034c844eb78de5e257858801220213a3dfffc0fa6f2546e417308199c11ce1b9d9c46ebb11212c058808cc8488094118e2a9d1c0f1b08773ce7bef91e779700580c15184873886b509de7b039c8aab81c42630c6c05a8bee5bef6c5c05a4690a2642ad56c74beb551407946f9a56abaab80aa8c4150cdd48155701e3c9541d570145e262a0685c0c148d8b814b76fbc03fd37953bf071962c40000000049454e44ae426082</data>
+    </image>
+    <image name="image1">
+        <data format="PNG" length="270">89504e470d0a1a0a0000000d4948445200000018000000180806000000e0773df8000000d549444154789ced944d0ac2301046bf7426fe744ab1a027d053f40a227816dde805db0b75693bee6dad335211c4b77c13f20221095555e193241fddfd1fb0c0cf066559eaa3535584107a6b5515755df707630100389f4f288a02cc8ccbe5fad2bb032282dd768b5bdb9afc102fefa0eb3a14ab95d9bb02f3d90ccc041131797720cb043146a4929abc3b3005df0d6c366b6499205da626ef0e4cc16860b198838940493079778089c1cc48884cde1d2022e4798e18a3c90f1e726cb83f1c5dde1550ed7da6689a66d0bf1578f6fd7af9f1973c05772ae8300e0e8366c20000000049454e44ae426082</data>
+    </image>
+    <image name="image2">
+        <data format="PNG" length="289">89504e470d0a1a0a0000000d4948445200000018000000180806000000e0773df8000000e849444154789ced95516ec2300c86bfd40eb0ba2a8d340e30b1d75d6ebcb0a37028cec00bb700ea3dac2f40618c1624d07ec98ae224feec484e82bb734b65378dfe14003d748410de8071338dc006c8010742331ec658bbfbea22009080e59509874b0019c06cf6494a09d5b62dfb9acfbf4eae9d3c6d66bc4fa76c77bb5f01e77436bdbaae4955d53ba006180e06a80a66d63b0080a230628ce4967702dcbf0f68ae683279a5288cfce5012b0060341aa2224876d43b9d015b00154555c9447a07040011a12c4b628c9d00b8fb9e011ffc3c687fb24647f1da2a585ff9cb2dda9ce1ffcb7c7ec037985b4dd6990bb6960000000049454e44ae426082</data>
+    </image>
+    <image name="image3">
+        <data format="XBM.GZ" length="79">789c534e494dcbcc4b554829cdcdad8c2fcf4c29c95030e0524611cd48cd4ccf28010a1797249664262b2467241641a592324b8aa363156c15aab914146aadb90067111b1f</data>
+    </image>
+</images>
+<connections>
+    <connection>
+        <sender>btnPlay</sender>
+        <signal>clicked()</signal>
+        <receiver>QmitkMovieMakerControls</receiver>
+        <slot>BTNPlay()</slot>
+    </connection>
+    <connection>
+        <sender>btnPause</sender>
+        <signal>clicked()</signal>
+        <receiver>QmitkMovieMakerControls</receiver>
+        <slot>BTNPause()</slot>
+    </connection>
+    <connection>
+        <sender>btnStop</sender>
+        <signal>clicked()</signal>
+        <receiver>QmitkMovieMakerControls</receiver>
+        <slot>BTNStop()</slot>
+    </connection>
+    <connection>
+        <sender>rbtnForward</sender>
+        <signal>clicked()</signal>
+        <receiver>QmitkMovieMakerControls</receiver>
+        <slot>RBTNForward()</slot>
+    </connection>
+    <connection>
+        <sender>rbtnBackward</sender>
+        <signal>clicked()</signal>
+        <receiver>QmitkMovieMakerControls</receiver>
+        <slot>RBTNBackward()</slot>
+    </connection>
+    <connection>
+        <sender>rbtnPingPong</sender>
+        <signal>clicked()</signal>
+        <receiver>QmitkMovieMakerControls</receiver>
+        <slot>RBTNPingPong()</slot>
+    </connection>
+    <connection>
+        <sender>rbtnSpatial</sender>
+        <signal>clicked()</signal>
+        <receiver>QmitkMovieMakerControls</receiver>
+        <slot>RBTNSpatial()</slot>
+    </connection>
+    <connection>
+        <sender>rbtnTemporal</sender>
+        <signal>clicked()</signal>
+        <receiver>QmitkMovieMakerControls</receiver>
+        <slot>RBTNTemporal()</slot>
+    </connection>
+    <connection>
+        <sender>cmbSelectedWindow</sender>
+        <signal>activated(int)</signal>
+        <receiver>QmitkMovieMakerControls</receiver>
+        <slot>CMBSelectedWindow(int)</slot>
+    </connection>
+</connections>
+<tabstops>
+    <tabstop>rbtnForward</tabstop>
+    <tabstop>rbtnBackward</tabstop>
+    <tabstop>rbtnPingPong</tabstop>
+    <tabstop>rbtnSpatial</tabstop>
+    <tabstop>rbtnTemporal</tabstop>
+    <tabstop>spnDuration</tabstop>
+    <tabstop>cmbSelectedWindow</tabstop>
+</tabstops>
+<includes>
+    <include location="local" impldecl="in implementation">QmitkMovieMakerControls.ui.h</include>
+</includes>
+<variables>
+    <variable access="private">bool m_Playing;</variable>
+</variables>
+<signals>
+    <signal>SwitchDirection(int)</signal>
+    <signal>SwitchAspect(int)</signal>
+    <signal>StartPlaying()</signal>
+    <signal>PausePlaying()</signal>
+    <signal>StopPlaying()</signal>
+    <signal>SwitchSelectedWindow(int)</signal>
+</signals>
+<slots>
+    <slot>BTNPlay()</slot>
+    <slot>BTNPause()</slot>
+    <slot>BTNStop()</slot>
+    <slot>RBTNForward()</slot>
+    <slot>RBTNBackward()</slot>
+    <slot>RBTNPingPong()</slot>
+    <slot>RBTNSpatial()</slot>
+    <slot>RBTNTemporal()</slot>
+    <slot>CMBSelectedWindow( int window )</slot>
+    <slot>BlockControls()</slot>
+    <slot>UnBlockControls()</slot>
+</slots>
+<functions>
+    <function access="private" specifier="non virtual">init()</function>
+</functions>
+<layoutdefaults spacing="6" margin="11"/>
+<includehints>
+    <includehint>qmitkslidernavigator.h</includehint>
+</includehints>
+</UI>

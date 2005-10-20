@@ -259,7 +259,7 @@ namespace CommonFunctionality
 
   void SaveBaseData( mitk::BaseData* data, const char* name = NULL );
 
-  static mitk::DataTreeIteratorBase* GetIteratorToFirstImage(mitk::DataTreeIteratorBase* dataTreeIterator);
+  mitk::DataTreeIteratorBase* GetIteratorToFirstImage(mitk::DataTreeIteratorBase* dataTreeIterator);
 
   mitk::DataTreeIteratorBase* GetIteratorToFirstImageInDataTree(mitk::DataTree::Pointer dataTree);
   mitk::Image* GetFirstImageInDataTree(mitk::DataTree::Pointer dataTree);

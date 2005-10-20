@@ -7,7 +7,7 @@
 * Constructor
 */
 QmitkSliderLevelWindowWidget::QmitkSliderLevelWindowWidget( QWidget * parent, const char * name, WFlags f )
-: QWidget( parent, name, f ), brush( QBrush::SolidPattern ),mouseDown(false), lw()
+: QWidget( parent, name, f ), mouseDown(false), brush( QBrush::SolidPattern ), lw()
 {
   // Dense2Pattern
   // BDiagPattern

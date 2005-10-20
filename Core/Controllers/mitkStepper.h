@@ -42,13 +42,23 @@ public:
   itkNewMacro(Self);
 
   itkGetMacro(Pos, unsigned int);
-  itkSetClampMacro(Pos, unsigned int, 0, m_Steps-1);
+  void SetPos(unsigned int pos) {
+    if (this->m_Pos != pos > m_Steps-1 ? m_Steps-1 : pos) {
+      this->m_Pos = pos > m_Steps-1 ? m_Steps-1 : pos ;
+      this->Modified();
+    }
+  }
 
   itkGetMacro(Steps, unsigned int);
   itkSetMacro(Steps, unsigned int);
 
   itkGetMacro(StepSize, unsigned int);
-  itkSetClampMacro(StepSize, unsigned int, 0, m_Steps-1);
+  void SetStepSize(unsigned int stepSize) {
+    if (this->m_StepSize != stepSize > m_Steps-1 ? m_Steps-1 : stepSize) {
+      this->m_StepSize = stepSize > m_Steps-1 ? m_Steps-1 : stepSize;
+      this->Modified();
+    } 
+  }
 
   virtual float ConvertPosToUnit(unsigned int posValue);
   virtual unsigned int ConvertUnitToPos(float unitValue);

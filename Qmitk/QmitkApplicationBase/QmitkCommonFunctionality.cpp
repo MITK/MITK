@@ -398,8 +398,8 @@ mitk::DataTreeNode::Pointer CommonFunctionality::OpenVolumeOrSliceStack()
     return NULL;
   }
 }
-static mitk::DataTreeIteratorBase* GetIteratorToFirstImage(mitk::DataTreeIteratorBase* dataTreeIterator)
-{
+mitk::DataTreeIteratorBase* CommonFunctionality::GetIteratorToFirstImage(mitk::DataTreeIteratorBase* dataTreeIterator)
+{    
   mitk::DataTreeIteratorClone it = dataTreeIterator;
   while ( !it->IsAtEnd() )
   {

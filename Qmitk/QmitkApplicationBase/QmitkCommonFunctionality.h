@@ -259,30 +259,7 @@ namespace CommonFunctionality
 
   void SaveBaseData( mitk::BaseData* data, const char* name = NULL );
 
-
-
-  static mitk::DataTreeIteratorBase* GetIteratorToFirstImage(mitk::DataTreeIteratorBase* dataTreeIterator)
-  {
-    mitk::DataTreeIteratorClone it = dataTreeIterator;
-    while ( !it->IsAtEnd() )
-    {
-      mitk::DataTreeNode::Pointer node = it->Get();
-      if ( node->GetData() != NULL )
-      {
-        // access the original image
-        mitk::Image::Pointer img = dynamic_cast<mitk::Image*>( node->GetData() );
-
-        // enquiry whether img is NULL
-        if ( img.IsNotNull() )
-        {
-          return it->Clone();
-        }
-      }
-      ++it;
-    }
-    std::cout << "No node containing an mitk::Image found, returning NULL..." << std::endl;
-    return NULL;
-  }
+  static mitk::DataTreeIteratorBase* GetIteratorToFirstImage(mitk::DataTreeIteratorBase* dataTreeIterator);
 
   mitk::DataTreeIteratorBase* GetIteratorToFirstImageInDataTree(mitk::DataTree::Pointer dataTree);
   mitk::Image* GetFirstImageInDataTree(mitk::DataTree::Pointer dataTree);

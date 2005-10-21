@@ -30,7 +30,7 @@ namespace mitk
 
 template < typename TPixel, unsigned int VImageDimension, typename TOutputPixel > 
 void CutImageWithOutputTypeSelect
-  ( itk::Image<TPixel, VImageDimension>* inputItkImage, mitk::BoundingObjectCutter* cutter, int boTimeStep , TOutputPixel* dummy )
+  ( itk::Image<TPixel, VImageDimension>* inputItkImage, mitk::BoundingObjectCutter* cutter, int /* boTimeStep */, TOutputPixel* /* dummy */)
 {
   typedef itk::Image<TPixel, VImageDimension> ItkInputImageType;
   typedef itk::Image<TOutputPixel, VImageDimension> ItkOutputImageType;

@@ -123,7 +123,7 @@ void mitk::ImageToSurfaceFilter::CreateSurface(int time, vtkImageData *vtkimage,
     for(j=0;j<3;++j)
       matrix[i][j]/=spacing[j];
 
-  int n = points->GetNumberOfPoints();
+  unsigned int n = points->GetNumberOfPoints();
   vtkFloatingPointType point[3];
 
   for (i = 0; i < n; i++)

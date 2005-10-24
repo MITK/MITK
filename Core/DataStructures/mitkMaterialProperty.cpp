@@ -3,12 +3,15 @@
 #include "mitkVtkInterpolationProperty.h"
 #include "mitkVtkRepresentationProperty.h"
 #include <vtkProperty.h>
+#include "mitkDataTreeNode.h"
+#include "mitkBaseRenderer.h"
 
 
-mitk::MaterialProperty::MaterialProperty( Color color, vtkFloatingPointType opacity, mitk::DataTreeNode* node )
+mitk::MaterialProperty::MaterialProperty( Color color, vtkFloatingPointType opacity, mitk::DataTreeNode* node, mitk::BaseRenderer* renderer )
 {
   InitializeStandardValues();
   SetDataTreeNode( node );
+  SetRenderer( renderer );
   SetColor( color );
   SetColorCoefficient( GetColorCoefficient() );
   SetSpecularColor( GetSpecularColor() );
@@ -21,10 +24,11 @@ mitk::MaterialProperty::MaterialProperty( Color color, vtkFloatingPointType opac
 
 
 
-mitk::MaterialProperty::MaterialProperty( vtkFloatingPointType red, vtkFloatingPointType green, vtkFloatingPointType blue, vtkFloatingPointType opacity, mitk::DataTreeNode* node )
+mitk::MaterialProperty::MaterialProperty( vtkFloatingPointType red, vtkFloatingPointType green, vtkFloatingPointType blue, vtkFloatingPointType opacity, mitk::DataTreeNode* node, mitk::BaseRenderer* renderer )
 {
   InitializeStandardValues();
   SetDataTreeNode( node );
+  SetRenderer( renderer );
   SetColor( red, green, blue );
   SetColorCoefficient( GetColorCoefficient() );
   SetSpecularColor( GetSpecularColor() );
@@ -39,10 +43,11 @@ mitk::MaterialProperty::MaterialProperty( vtkFloatingPointType red, vtkFloatingP
 
 mitk::MaterialProperty::MaterialProperty( vtkFloatingPointType red, vtkFloatingPointType green, vtkFloatingPointType blue,
     vtkFloatingPointType colorCoefficient, vtkFloatingPointType specularCoefficient,
-    vtkFloatingPointType specularPower, vtkFloatingPointType opacity, mitk::DataTreeNode* node )
+    vtkFloatingPointType specularPower, vtkFloatingPointType opacity, mitk::DataTreeNode* node, mitk::BaseRenderer* renderer )
 {
   InitializeStandardValues();
   SetDataTreeNode( node );
+  SetRenderer( renderer );
   SetColor( red, green, blue );
   SetColorCoefficient( colorCoefficient );
   SetSpecularColor( GetSpecularColor() );
@@ -54,10 +59,11 @@ mitk::MaterialProperty::MaterialProperty( vtkFloatingPointType red, vtkFloatingP
 }
 
 
-mitk::MaterialProperty::MaterialProperty( mitk::MaterialProperty::Color color, vtkFloatingPointType colorCoefficient, vtkFloatingPointType specularCoefficient, vtkFloatingPointType specularPower, vtkFloatingPointType opacity, mitk::DataTreeNode* node )
+mitk::MaterialProperty::MaterialProperty( mitk::MaterialProperty::Color color, vtkFloatingPointType colorCoefficient, vtkFloatingPointType specularCoefficient, vtkFloatingPointType specularPower, vtkFloatingPointType opacity, mitk::DataTreeNode* node, mitk::BaseRenderer* renderer )
 {
   InitializeStandardValues();
   SetDataTreeNode( node );
+  SetRenderer( renderer );
   SetColor( color );
   SetColorCoefficient( colorCoefficient );
   SetSpecularColor( GetSpecularColor() );
@@ -69,10 +75,11 @@ mitk::MaterialProperty::MaterialProperty( mitk::MaterialProperty::Color color, v
 }
 
 
-mitk::MaterialProperty::MaterialProperty( mitk::DataTreeNode* node )
+mitk::MaterialProperty::MaterialProperty( mitk::DataTreeNode* node, mitk::BaseRenderer* renderer )
 {
   InitializeStandardValues();
   SetDataTreeNode( node );
+  SetRenderer( renderer );
   SetColor( GetColor() );
   SetColorCoefficient( GetColorCoefficient() );
   SetSpecularColor( GetSpecularColor() );
@@ -98,11 +105,21 @@ mitk::DataTreeNode* mitk::MaterialProperty::GetDataTreeNode() const
   return m_DataTreeNode;
 }
 
+void mitk::MaterialProperty::SetRenderer( mitk::BaseRenderer* renderer )
+{
+  m_Renderer = renderer;
+}
+
+mitk::BaseRenderer* mitk::MaterialProperty::GetRenderer( ) const
+{
+  return m_Renderer;
+}
+
 void mitk::MaterialProperty::SetColor( mitk::MaterialProperty::Color color )
 {
   if ( ForwardToDataTreeNode() )
   {
-    m_DataTreeNode->SetColor( color.GetRed(), color.GetGreen(), color.GetBlue() );
+    m_DataTreeNode->SetColor( color.GetRed(), color.GetGreen(), color.GetBlue(), m_Renderer );
   }
   m_Color = color;
 }
@@ -112,7 +129,7 @@ void mitk::MaterialProperty::SetColor( vtkFloatingPointType red, vtkFloatingPoin
 {
   if ( ForwardToDataTreeNode() )
   {
-    m_DataTreeNode->SetColor( red, green, blue );
+    m_DataTreeNode->SetColor( red, green, blue, m_Renderer );
   }
   m_Color.Set( red, green, blue );
 }
@@ -122,7 +139,7 @@ void mitk::MaterialProperty::SetColorCoefficient( vtkFloatingPointType coefficie
 {
   if ( ForwardToDataTreeNode() )
   {
-    m_DataTreeNode->SetProperty( COLOR_COEFFICIENT_KEY, new mitk::FloatProperty( coefficient ) );
+    m_DataTreeNode->SetProperty( COLOR_COEFFICIENT_KEY, new mitk::FloatProperty( coefficient ), m_Renderer );
   }
   m_ColorCoefficient = coefficient;
 }
@@ -131,7 +148,7 @@ void mitk::MaterialProperty::SetSpecularColor( mitk::MaterialProperty::Color spe
 {
   if ( ForwardToDataTreeNode() )
   {
-    m_DataTreeNode->SetProperty( SPECULAR_COLOR_KEY, new mitk::ColorProperty( specularColor.GetRed(), specularColor.GetGreen(), specularColor.GetBlue() ) );
+    m_DataTreeNode->SetProperty( SPECULAR_COLOR_KEY, new mitk::ColorProperty( specularColor.GetRed(), specularColor.GetGreen(), specularColor.GetBlue() ), m_Renderer );
   }
   m_SpecularColor = specularColor;
 }
@@ -141,7 +158,7 @@ void mitk::MaterialProperty::SetSpecularColor( vtkFloatingPointType red, vtkFloa
 {
   if ( ForwardToDataTreeNode() )
   {
-    m_DataTreeNode->SetProperty( SPECULAR_COLOR_KEY, new mitk::ColorProperty( red, green, blue ) );
+    m_DataTreeNode->SetProperty( SPECULAR_COLOR_KEY, new mitk::ColorProperty( red, green, blue ), m_Renderer );
   }
   m_SpecularColor.Set( red, green, blue );
 }
@@ -150,7 +167,7 @@ void mitk::MaterialProperty::SetSpecularCoefficient( vtkFloatingPointType specul
 {
   if ( ForwardToDataTreeNode() )
   {
-    m_DataTreeNode->SetProperty( SPECULAR_COEFFICIENT_KEY, new mitk::FloatProperty( specularCoefficient ) );
+    m_DataTreeNode->SetProperty( SPECULAR_COEFFICIENT_KEY, new mitk::FloatProperty( specularCoefficient ), m_Renderer );
   }
   m_SpecularCoefficient = specularCoefficient;
 }
@@ -160,7 +177,7 @@ void mitk::MaterialProperty::SetSpecularPower( vtkFloatingPointType specularPowe
 {
   if ( ForwardToDataTreeNode() )
   {
-    m_DataTreeNode->SetProperty( SPECULAR_POWER_KEY, new mitk::FloatProperty( specularPower ) );
+    m_DataTreeNode->SetProperty( SPECULAR_POWER_KEY, new mitk::FloatProperty( specularPower ), m_Renderer );
   }
   m_SpecularPower = specularPower;
 }
@@ -170,7 +187,7 @@ void mitk::MaterialProperty::SetOpacity( vtkFloatingPointType opacity )
 {
   if ( ForwardToDataTreeNode() )
   {
-    m_DataTreeNode->SetOpacity( opacity );
+    m_DataTreeNode->SetOpacity( opacity, m_Renderer );
   }
   m_Opacity = opacity;
 }
@@ -180,7 +197,7 @@ void mitk::MaterialProperty::SetInterpolation( InterpolationType interpolation )
 {
   if ( ForwardToDataTreeNode() )
   {
-    m_DataTreeNode->SetProperty( INTERPOLATION_KEY, new mitk::VtkInterpolationProperty( interpolation ) );
+    m_DataTreeNode->SetProperty( INTERPOLATION_KEY, new mitk::VtkInterpolationProperty( interpolation ), m_Renderer );
   }
   m_Interpolation = interpolation;
 }
@@ -190,7 +207,7 @@ void mitk::MaterialProperty::SetRepresentation( RepresentationType representatio
 {
   if ( ForwardToDataTreeNode() )
   {
-    m_DataTreeNode->SetProperty( REPRESENTATION_KEY, new mitk::VtkRepresentationProperty( representation ) );
+    m_DataTreeNode->SetProperty( REPRESENTATION_KEY, new mitk::VtkRepresentationProperty( representation ), m_Renderer );
   }
   m_Representation = representation;
 }
@@ -201,7 +218,7 @@ mitk::MaterialProperty::Color mitk::MaterialProperty::GetColor() const
   if ( ForwardToDataTreeNode() )
   {
     float rgb[ 3 ];
-    m_DataTreeNode->GetColor( rgb, NULL );
+    m_DataTreeNode->GetColor( rgb, m_Renderer );
     Color color;
     color.SetRed( rgb[ 0 ] );
     color.SetGreen( rgb[ 1 ] );
@@ -217,7 +234,7 @@ vtkFloatingPointType mitk::MaterialProperty::GetColorCoefficient() const
 {
   if ( ForwardToDataTreeNode() )
   {
-    mitk::FloatProperty * colorCoefficient = dynamic_cast<mitk::FloatProperty*>( m_DataTreeNode->GetProperty( COLOR_COEFFICIENT_KEY ).GetPointer() );
+    mitk::FloatProperty * colorCoefficient = dynamic_cast<mitk::FloatProperty*>( m_DataTreeNode->GetProperty( COLOR_COEFFICIENT_KEY ).GetPointer(), m_Renderer );
     if ( colorCoefficient != NULL )
       return colorCoefficient->GetValue();
     else
@@ -231,7 +248,7 @@ mitk::MaterialProperty::Color mitk::MaterialProperty::GetSpecularColor() const
 {
   if ( ForwardToDataTreeNode() )
   {
-    mitk::ColorProperty * colorProperty = dynamic_cast<mitk::ColorProperty*>( m_DataTreeNode->GetProperty( SPECULAR_COLOR_KEY ).GetPointer() );
+    mitk::ColorProperty * colorProperty = dynamic_cast<mitk::ColorProperty*>( m_DataTreeNode->GetProperty( SPECULAR_COLOR_KEY ).GetPointer(), m_Renderer );
     if ( colorProperty != NULL )
     {
       mitk::Color color = colorProperty->GetColor();
@@ -250,7 +267,7 @@ vtkFloatingPointType mitk::MaterialProperty::GetSpecularCoefficient() const
 {
   if ( ForwardToDataTreeNode() )
   {
-    mitk::FloatProperty * specularCoefficient = dynamic_cast<mitk::FloatProperty*>( m_DataTreeNode->GetProperty( SPECULAR_COEFFICIENT_KEY ).GetPointer() );
+    mitk::FloatProperty * specularCoefficient = dynamic_cast<mitk::FloatProperty*>( m_DataTreeNode->GetProperty( SPECULAR_COEFFICIENT_KEY ).GetPointer(), m_Renderer );
     if ( specularCoefficient != NULL )
       return specularCoefficient->GetValue();
     else
@@ -265,7 +282,7 @@ vtkFloatingPointType mitk::MaterialProperty::GetSpecularPower() const
 {
   if ( ForwardToDataTreeNode() )
   {
-    mitk::FloatProperty * specularPower = dynamic_cast<mitk::FloatProperty*>( m_DataTreeNode->GetProperty( SPECULAR_POWER_KEY ).GetPointer() );
+    mitk::FloatProperty * specularPower = dynamic_cast<mitk::FloatProperty*>( m_DataTreeNode->GetProperty( SPECULAR_POWER_KEY ).GetPointer(), m_Renderer );
     if ( specularPower != NULL )
       return specularPower->GetValue();
     else
@@ -281,7 +298,7 @@ vtkFloatingPointType mitk::MaterialProperty::GetOpacity() const
   if ( ForwardToDataTreeNode() )
   {
     float opacity = 1.0;
-    m_DataTreeNode->GetOpacity( opacity, NULL );
+    m_DataTreeNode->GetOpacity( opacity, m_Renderer );
     return opacity;
   }
   else
@@ -292,7 +309,7 @@ mitk::MaterialProperty::InterpolationType mitk::MaterialProperty::GetInterpolati
 {
   if ( ForwardToDataTreeNode() )
   {
-    mitk::VtkInterpolationProperty * interpolationProperty = dynamic_cast<mitk::VtkInterpolationProperty*>( m_DataTreeNode->GetProperty( INTERPOLATION_KEY ).GetPointer() );
+    mitk::VtkInterpolationProperty * interpolationProperty = dynamic_cast<mitk::VtkInterpolationProperty*>( m_DataTreeNode->GetProperty( INTERPOLATION_KEY ).GetPointer(), m_Renderer );
     if ( interpolationProperty != NULL )
       return static_cast<mitk::MaterialProperty::InterpolationType>( interpolationProperty->GetValueAsId() );
     else
@@ -306,7 +323,7 @@ mitk::MaterialProperty::RepresentationType mitk::MaterialProperty::GetRepresenta
 {
   if ( ForwardToDataTreeNode() )
   {
-    mitk::VtkRepresentationProperty * representationProperty = dynamic_cast<mitk::VtkRepresentationProperty*>( m_DataTreeNode->GetProperty( REPRESENTATION_KEY ).GetPointer() );
+    mitk::VtkRepresentationProperty * representationProperty = dynamic_cast<mitk::VtkRepresentationProperty*>( m_DataTreeNode->GetProperty( REPRESENTATION_KEY ).GetPointer(), m_Renderer );
     if ( representationProperty != NULL )
       return static_cast<mitk::MaterialProperty::RepresentationType>( representationProperty->GetValueAsId() );
     else
@@ -321,7 +338,7 @@ int mitk::MaterialProperty::GetVtkInterpolation() const
 {
   if ( ForwardToDataTreeNode() )
   {
-    mitk::VtkInterpolationProperty * interpolationProperty = dynamic_cast<mitk::VtkInterpolationProperty*>( m_DataTreeNode->GetProperty( INTERPOLATION_KEY ).GetPointer() );
+    mitk::VtkInterpolationProperty * interpolationProperty = dynamic_cast<mitk::VtkInterpolationProperty*>( m_DataTreeNode->GetProperty( INTERPOLATION_KEY ).GetPointer(), m_Renderer );
     if ( interpolationProperty != NULL )
       return interpolationProperty->GetVtkInterpolation();
     else
@@ -343,7 +360,7 @@ int mitk::MaterialProperty::GetVtkRepresentation() const
 {
   if ( ForwardToDataTreeNode() )
   {
-    mitk::VtkRepresentationProperty * representationProperty = dynamic_cast<mitk::VtkRepresentationProperty*>( m_DataTreeNode->GetProperty( REPRESENTATION_KEY ).GetPointer() );
+    mitk::VtkRepresentationProperty * representationProperty = dynamic_cast<mitk::VtkRepresentationProperty*>( m_DataTreeNode->GetProperty( REPRESENTATION_KEY ).GetPointer(), m_Renderer );
     if ( representationProperty != NULL )
       return representationProperty->GetVtkRepresentation();
     else
@@ -366,7 +383,10 @@ int mitk::MaterialProperty::GetVtkRepresentation() const
 void mitk::MaterialProperty::Initialize( const MaterialProperty& property, const bool& copyDataTreeNode )
 {
   if ( copyDataTreeNode )
+  {
     this->SetDataTreeNode( property.GetDataTreeNode() );
+    this->SetRenderer( property.GetRenderer() );
+  }
   this->SetColor( property.GetColor() );
   this->SetColorCoefficient( property.GetColorCoefficient() );
   this->SetSpecularColor( property.GetSpecularColor() );
@@ -386,6 +406,7 @@ bool mitk::MaterialProperty::operator==( const BaseProperty& property ) const
     return false;
   else
     return ( m_DataTreeNode == other->GetDataTreeNode() &&
+             m_Renderer == other->GetRenderer() &&
              m_Color == other->GetColor() &&
              m_ColorCoefficient == other->GetColorCoefficient() &&
              m_SpecularColor == other->GetSpecularColor() &&
@@ -407,6 +428,7 @@ bool mitk::MaterialProperty::ForwardToDataTreeNode() const
 void mitk::MaterialProperty::InitializeStandardValues()
 {
   m_DataTreeNode = NULL;
+  m_Renderer = NULL;
   m_Color.Set( 0.5, 0.5, 0.0 );
   m_ColorCoefficient = 0.5 ;
   m_SpecularColor.Set( 1.0, 1.0, 1.0 );
@@ -420,6 +442,7 @@ void mitk::MaterialProperty::InitializeStandardValues()
 void mitk::MaterialProperty::PrintSelf ( std::ostream &os ) const
 {
   os << "Data tree node: " << GetDataTreeNode() << std::endl;
+  os << "Renderer: " << GetRenderer() << std::endl;
   os << "Color: " << GetColor() << std::endl;
   os << "ColorCoefficient" << GetColorCoefficient() << std::endl;
   os << "SpecularColor: " << GetSpecularColor() << std::endl;

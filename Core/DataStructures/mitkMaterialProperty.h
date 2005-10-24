@@ -12,6 +12,7 @@ namespace mitk
 {
 // forward declarations
 class DataTreeNode;
+class BaseRenderer;
 
 /**
  * Encapsulates 3D visualization properties which are forwarded to vtk for
@@ -52,7 +53,7 @@ public:
      *             are forwarded. Please note, that if this node doesn't have the 
      *             needed properties associated, they will be added.
      */
-    MaterialProperty( mitk::DataTreeNode* node = NULL );
+    MaterialProperty( mitk::DataTreeNode* node = NULL, mitk::BaseRenderer* renderer = NULL );
 
     /**
      * Constructor. All values besides the given ones are set to defaults as 
@@ -65,7 +66,7 @@ public:
      *              are forwarded. Please note, that if this node doesn't have the 
      *              needed properties associated, they will be added.
      */
-    MaterialProperty( Color color, vtkFloatingPointType opacity = 1.0f, mitk::DataTreeNode* node = NULL );
+    MaterialProperty( Color color, vtkFloatingPointType opacity = 1.0f, mitk::DataTreeNode* node = NULL, mitk::BaseRenderer* renderer = NULL );
 
     /**
      * Constructor. All values besides the given ones are set to defaults as 
@@ -79,7 +80,7 @@ public:
      *        are forwarded. Please note, that if this node doesn't have the 
      *        needed properties associated, they will be added.
      */
-    MaterialProperty( vtkFloatingPointType red, vtkFloatingPointType green, vtkFloatingPointType blue, vtkFloatingPointType opacity = 1.0f, mitk::DataTreeNode* node = NULL );
+    MaterialProperty( vtkFloatingPointType red, vtkFloatingPointType green, vtkFloatingPointType blue, vtkFloatingPointType opacity = 1.0f, mitk::DataTreeNode* node = NULL, mitk::BaseRenderer* renderer = NULL );
 
     /**
      * Constructor. All values besides the given ones are set to defaults as 
@@ -100,7 +101,7 @@ public:
      *        needed properties associated, they will be added.
      */
     MaterialProperty( vtkFloatingPointType red, vtkFloatingPointType green, vtkFloatingPointType blue, vtkFloatingPointType colorCoefficient, 
-      vtkFloatingPointType specularCoefficient, vtkFloatingPointType specularPower, vtkFloatingPointType opacity, mitk::DataTreeNode* node = NULL );
+      vtkFloatingPointType specularCoefficient, vtkFloatingPointType specularPower, vtkFloatingPointType opacity, mitk::DataTreeNode* node = NULL, mitk::BaseRenderer* renderer = NULL );
 
     /**
      * Constructor. All values besides the given ones are set to defaults as 
@@ -120,7 +121,7 @@ public:
      *        are forwarded. Please note, that if this node doesn't have the 
      *        needed properties associated, they will be added.
      */
-    MaterialProperty( Color color, vtkFloatingPointType colorCoefficient, vtkFloatingPointType specularCoefficient, vtkFloatingPointType specularPower, vtkFloatingPointType opacity, mitk::DataTreeNode* node = NULL );
+    MaterialProperty( Color color, vtkFloatingPointType colorCoefficient, vtkFloatingPointType specularCoefficient, vtkFloatingPointType specularPower, vtkFloatingPointType opacity, mitk::DataTreeNode* node = NULL, mitk::BaseRenderer* renderer = NULL );
 
     /**
      * Copy constructor
@@ -144,6 +145,20 @@ public:
      *          member variables are used for storing the properties
      */
     virtual mitk::DataTreeNode* GetDataTreeNode() const;
+    
+    /**
+     * If material Property is associated with a data tree node, properties may
+     * be limited to a specific renderer. 
+     * @param the renderer, for which the material properties should be valid
+     */
+    virtual void SetRenderer( mitk::BaseRenderer* renderer );
+    
+    /**
+     * If the material property is associated with a data tree node, properties may
+     * be limited to a specific renderer.  
+     * @returns the renderer, for which the material properties should be valid
+     */
+    virtual  mitk::BaseRenderer* GetRenderer( ) const;
     
     /**
      * Sets the materials color in RGB space. The rgb components have to be
@@ -283,6 +298,9 @@ public:
      * given material.
      * @param property the materials which should be copied in the
      *        current materials
+     * @param copyToDataTreeNode If set to true, the data tree node and renderer
+     *        associated with the material property are also copied. Otherwise
+     *        these member variables will be left untouched 
      */
     virtual void Initialize( const MaterialProperty& property, const bool& copyDataTreeNode = true );
 
@@ -328,6 +346,8 @@ protected:
     
     mitk::DataTreeNode* m_DataTreeNode;
     
+    mitk::BaseRenderer* m_Renderer;
+    
     static const char* COLOR_KEY;     
     static const char* SPECULAR_COLOR_KEY;     
     static const char* COLOR_COEFFICIENT_KEY; 
@@ -339,7 +359,7 @@ protected:
 
 };
 
-typedef itk::VectorContainer< unsigned int, MaterialProperty* > MaterialPropertyVectorContainer;
+typedef itk::VectorContainer< unsigned int, MaterialProperty::Pointer > MaterialPropertyVectorContainer;
 
 }
 

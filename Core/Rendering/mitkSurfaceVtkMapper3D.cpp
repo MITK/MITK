@@ -135,6 +135,29 @@ void mitk::SurfaceVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
 
 void mitk::SurfaceVtkMapper3D::ApplyProperties(vtkActor* actor, mitk::BaseRenderer* renderer)
 {
+  mitk::MaterialProperty* materialProperty = dynamic_cast<mitk::MaterialProperty *>(this->GetDataTreeNode()->GetProperty("material").GetPointer() );
+  if ( materialProperty != NULL )
+  {
+    vtkProperty* property = m_Actor->GetProperty();
+    
+    //property->SetColor( materialProperty->GetColor().GetDataPointer() );
+    property->SetAmbientColor( materialProperty->GetColor().GetDataPointer() );    
+    property->SetAmbient( materialProperty->GetColorCoefficient() );    
+    property->SetDiffuseColor(materialProperty->GetColor().GetDataPointer() );    
+    property->SetDiffuse( materialProperty->GetColorCoefficient() );
+    property->SetSpecularColor( materialProperty->GetSpecularColor().GetDataPointer() );
+    property->SetSpecular( materialProperty->GetSpecularCoefficient() );
+    property->SetSpecularPower( materialProperty->GetSpecularPower() );
+    property->SetOpacity( materialProperty->GetOpacity() );
+    property->SetInterpolation( materialProperty->GetVtkInterpolation() );
+    property->SetRepresentation( materialProperty->GetVtkRepresentation() );
+  }
+  else
+  {
+    Superclass::ApplyProperties( m_Actor, renderer ) ;
+    m_VtkPolyDataMapper->ScalarVisibilityOff();
+  }
+  
   bool useCellData;
   if (dynamic_cast<mitk::BoolProperty *>(this->GetDataTreeNode()->GetProperty("useCellDataForColouring").GetPointer()) == NULL)
     useCellData = false;
@@ -174,11 +197,6 @@ void mitk::SurfaceVtkMapper3D::ApplyProperties(vtkActor* actor, mitk::BaseRender
     m_Actor->GetProperty()->SetSpecularPower (50);
     m_Actor->GetProperty()->SetInterpolationToPhong();
   }
-  else
-  {
-    Superclass::ApplyProperties( m_Actor, renderer ) ;
-    m_VtkPolyDataMapper->ScalarVisibilityOff();
-  }
 
   int scalarMode = VTK_COLOR_MODE_DEFAULT;
   if(this->GetDataTreeNode()->GetIntProperty("scalar mode", scalarMode, renderer))
@@ -208,26 +226,7 @@ void mitk::SurfaceVtkMapper3D::ApplyProperties(vtkActor* actor, mitk::BaseRender
     m_VtkPolyDataMapper->SetScalarRange(levelWindow.GetMin(),levelWindow.GetMax());
   }
 
-  //do we have materials?
   
-  mitk::MaterialProperty* materialProperty = dynamic_cast<mitk::MaterialProperty *>(this->GetDataTreeNode()->GetProperty("material").GetPointer() );
-  if ( materialProperty != NULL )
-  {
-    vtkProperty* property = m_Actor->GetProperty();
-    
-    //property->SetColor( materialProperty->GetColor().GetDataPointer() );
-    property->SetAmbientColor( materialProperty->GetColor().GetDataPointer() );    
-    property->SetAmbient( materialProperty->GetColorCoefficient() );    
-    property->SetDiffuseColor(materialProperty->GetColor().GetDataPointer() );    
-    property->SetDiffuse( materialProperty->GetColorCoefficient() );
-    property->SetSpecularColor( materialProperty->GetSpecularColor().GetDataPointer() );
-    property->SetSpecular( materialProperty->GetSpecularCoefficient() );
-    property->SetSpecularPower( materialProperty->GetSpecularPower() );
-    property->SetOpacity( materialProperty->GetOpacity() );
-    property->SetInterpolation( materialProperty->GetVtkInterpolation() );
-    property->SetRepresentation( materialProperty->GetVtkRepresentation() );
-    
-  }
   mitk::VtkRepresentationProperty* representationProperty = dynamic_cast<mitk::VtkRepresentationProperty *>(this->GetDataTreeNode()->GetProperty("representation").GetPointer() );
   if ( representationProperty != NULL )
     m_Actor->GetProperty()->SetRepresentation( representationProperty->GetVtkRepresentation() );

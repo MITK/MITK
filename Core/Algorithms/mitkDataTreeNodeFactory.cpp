@@ -30,6 +30,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkSTLReader.h>
 #include <vtkPolyDataReader.h>
 #include <vtkPolyData.h>
+#include <vtkPolyDataNormals.h>
 #include <vtkStructuredPointsReader.h>
 #include <vtkStructuredPoints.h>
 #include <vtkLookupTable.h>
@@ -58,6 +59,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkPicVolumeTimeSeriesReader.h"
 #include "mitkStringProperty.h"
 #include "mitkProperties.h"
+#include "mitkSmartPointerProperty.h"
 #include "mitkLevelWindowProperty.h"
 #include "mitkVtkRepresentationProperty.h"
 #include "mitkVtkInterpolationProperty.h"
@@ -71,6 +73,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifdef MBI_INTERNAL
 #include "mitkVesselGraphFileReader.h"
 #include "mitkVesselTreeFileReader.h"
+#include "mitkVesselTreeToLookupTableFilter.h"
 #ifdef HAVE_IPDICOM
 #include "mitkDICOMFileReader.h"
 #endif /* HAVE_IPDICOM */
@@ -257,12 +260,22 @@ void mitk::DataTreeNodeFactory::ReadFileTypeSTL()
 
   vtkSTLReader* stlReader = vtkSTLReader::New();
   stlReader->SetFileName( m_FileName.c_str() );
-  stlReader->Update();
 
-  if ( stlReader->GetOutput() != NULL )
+  vtkPolyDataNormals* normalsGenerator = vtkPolyDataNormals::New();
+  normalsGenerator->SetInput( stlReader->GetOutput() );
+  
+  normalsGenerator->Update();
+  if ( ( stlReader->GetOutput() != NULL ) && ( normalsGenerator->GetOutput() != NULL ) )
   {
     mitk::Surface::Pointer surface = mitk::Surface::New();
-    surface->SetVtkPolyData( stlReader->GetOutput() );
+    //
+    // @todo: Disconnect the result from the vtk pipeline.
+    vtkPolyData* surfaceWithNormals = normalsGenerator->GetOutput();
+    //vtkSource* source = surfaceWithNormals->GetSource();
+    //surfaceWithNormals->SetSource(NULL);
+    //source->Delete();
+    
+    surface->SetVtkPolyData( surfaceWithNormals );
     mitk::DataTreeNode::Pointer node = this->GetOutput();
     node->SetData( surface );
     SetDefaultSurfaceProperties( node );
@@ -271,6 +284,7 @@ void mitk::DataTreeNodeFactory::ReadFileTypeSTL()
     node->SetProperty( "name", nameProp );
   }
 
+  normalsGenerator->Delete();
   stlReader->Delete();
 
   std::cout << "...finished!" << std::endl;
@@ -448,6 +462,13 @@ void mitk::DataTreeNodeFactory::ReadFileTypeVES()
   mitk::DataTreeNode::Pointer node = this->GetOutput();
   node->SetData( reader->GetOutput() );
 
+  mitk::VesselTreeToLookupTableFilter::Pointer lutGenerator = mitk::VesselTreeToLookupTableFilter::New();
+  lutGenerator->SetInput( reader->GetOutput() );
+  lutGenerator->Update();
+  
+  mitk::SmartPointerProperty::Pointer lutProp = new mitk::SmartPointerProperty( lutGenerator->GetOutput() );
+  node->SetProperty( "VesselTreeLookupTable", lutProp );
+  
   // set filename without path as string property
   mitk::StringProperty::Pointer nameProp = new mitk::StringProperty( this->GetBaseFileName() );
   node->SetProperty( "name", nameProp );

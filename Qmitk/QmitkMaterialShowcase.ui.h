@@ -16,7 +16,6 @@
 #include <mitkCameraController.h>
 #include <mitkOpenGLRenderer.h>
 
-
 /**
  * A material showcase simply displays a sphere which is visualized with some
  * material property. This widget is used by the QmitkMaterialEditor dialog.
@@ -51,7 +50,6 @@ void QmitkMaterialShowcase::SetMaterialProperty( mitk::MaterialProperty* propert
 {
     if (m_MaterialProperty != NULL)
         delete m_MaterialProperty;
-    
     m_MaterialProperty = new mitk::MaterialProperty( *property );
     m_DataTreeNode->SetProperty( "material", m_MaterialProperty );
     this->UpdateRenderWindow();

@@ -74,47 +74,6 @@ void QmitkMaterialEditor::OnColorChanged( int value )
 }
 
 
-/**
- * Slot which reacts on a color coefficient change by the user. Fills the current 
- * material property with the new coefficient and forwards it to the current 
- * showcase.
- * @param value the slider value, which represents the new coefficient. The slider
- * value is normalized to be in range of the color coefficient value type
- */
-void QmitkMaterialEditor::OnColorCoefficientChanged( int value )
-{
-    //
-    // convert value into color coefficient ni range [0..1]
-    //
-    /*
-    vtkFloatingPointType coefficient = ( ( vtkFloatingPointType ) ( value - m_SlColorCoefficient->minValue() ) ) / ( ( vtkFloatingPointType ) ( m_SlColorCoefficient->maxValue() - m_SlColorCoefficient->minValue() ) );
-
-    m_MaterialProperties->GetElement( m_ActiveShowcase )->SetColorCoefficient( coefficient );
-    m_Showcases[ m_ActiveShowcase ]->SetColorCoefficient( coefficient );
-    */
-}
-
-
-/**
- * Slot which reacts on a specular coefficient change by the user. Fills the current 
- * material property with the new coefficient and forwards it to the current 
- * showcase.
- * @param value the slider value, which represents the new coefficient. The slider
- * value is normalized to be in range of the specular coefficient value type
- */
-void QmitkMaterialEditor::OnSpecularCoefficientChanged( int value ) 
-{
-    //
-    // convert value into specular coefficient ni range [0..1]
-    //
-    /*
-    vtkFloatingPointType coefficient = ( ( vtkFloatingPointType ) ( value - m_SlSpecularCoefficient->minValue() ) ) / ( ( vtkFloatingPointType ) ( m_SlSpecularCoefficient->maxValue() - m_SlSpecularCoefficient->minValue() ) );
-
-    m_MaterialProperties->GetElement( m_ActiveShowcase )->SetSpecularCoefficient( coefficient );
-    m_Showcases[ m_ActiveShowcase ]->SetSpecularCoefficient( coefficient );
-    */
-}
-
 
 /**
  * Slot which reacts on a specular power change by the user. Fills the current 
@@ -161,7 +120,7 @@ void QmitkMaterialEditor::OnOKClicked()
     {
         assert ( m_OriginalMaterialProperties->GetElement( i ) != NULL );
         assert ( m_MaterialProperties->GetElement( i ) != NULL );
-        m_OriginalMaterialProperties->GetElement( i )->Initialize( * ( m_MaterialProperties->GetElement( i ) ) ) ;
+        m_OriginalMaterialProperties->GetElement( i )->Initialize( * ( m_MaterialProperties->GetElement( i ) ), false ) ;
     }
     this->accept();
 }
@@ -196,8 +155,10 @@ void QmitkMaterialEditor::Initialize( mitk::MaterialProperty* materialProperty )
 {
     assert ( materialProperty != NULL );
     ClearMaterialProperties();
+    mitk::MaterialProperty* internalProperty = new mitk::MaterialProperty( *materialProperty );
+    internalProperty->SetDataTreeNode( NULL );
+    m_MaterialProperties->push_back( internalProperty );
     m_OriginalMaterialProperties->push_back( materialProperty );
-    m_MaterialProperties->push_back( new mitk::MaterialProperty( *materialProperty ) );
     Initialize();
 }
 
@@ -211,11 +172,14 @@ void QmitkMaterialEditor::Initialize( mitk::MaterialProperty* materialProperty )
 void QmitkMaterialEditor::Initialize( mitk::MaterialPropertyVectorContainer::Pointer materialPropertyVectorContainer )
 {
     assert ( materialPropertyVectorContainer.IsNotNull() );
-    ClearMaterialProperties();
+    ClearMaterialProperties();     
     for ( unsigned int i = 0 ; i < materialPropertyVectorContainer->size() ; ++i )
     {
-        m_OriginalMaterialProperties->push_back( materialPropertyVectorContainer->GetElement( i ) );
-        m_MaterialProperties->push_back( new mitk::MaterialProperty( *( materialPropertyVectorContainer->GetElement( i ) ) ) );
+        mitk::MaterialProperty* materialProperty = materialPropertyVectorContainer->GetElement( i );
+        mitk::MaterialProperty* internalProperty = new mitk::MaterialProperty( *materialProperty );
+        internalProperty->SetDataTreeNode( NULL );
+        m_MaterialProperties->push_back( new mitk::MaterialProperty( *materialProperty ) );
+        m_OriginalMaterialProperties->push_back( materialProperty );
     }
     Initialize();
 }
@@ -273,13 +237,15 @@ void QmitkMaterialEditor::SetActiveShowcase( unsigned int number )
     //
     // update sliders
     //
-    //m_SlColor->SetValue();
     mitk::MaterialProperty* materialProperty = m_MaterialProperties->GetElement( number );
     assert ( materialProperty != NULL );
-    m_SlColor->setValue( this->ColorToValue( materialProperty->GetColor() ) );
+    int value = this->ColorToValue( materialProperty->GetColor() );
+    if ( value != -1 )
+        m_SlColor->setValue( value );
+    else
+        m_SlColor->setValue( m_SlColor->minValue() );
+    
     m_SlCoefficients->setValue( static_cast<int> ( materialProperty->GetColorCoefficient() * ( m_SlCoefficients->maxValue() - m_SlCoefficients->minValue() ) + m_SlCoefficients->minValue() ) );
-    //m_SlColorCoefficient->setValue( static_cast<int> ( materialProperty->GetColorCoefficient() * ( m_SlColorCoefficient->maxValue() - m_SlColorCoefficient->minValue() ) + m_SlColorCoefficient->minValue() ) );
-    //m_SlSpecularCoefficient->setValue( static_cast<int> ( materialProperty->GetSpecularCoefficient() * ( m_SlSpecularCoefficient->maxValue() - m_SlSpecularCoefficient->minValue() ) + m_SlSpecularCoefficient->minValue() ) );
     m_SlSpecularPower->setValue( static_cast<int> ( materialProperty->GetSpecularPower() ) );
     m_SlOpacity->setValue( static_cast<int> ( materialProperty->GetOpacity() * ( m_SlOpacity->maxValue() - m_SlOpacity->minValue() ) + m_SlOpacity->minValue() ) );
 }
@@ -329,6 +295,31 @@ int QmitkMaterialEditor::ColorToValue( mitk::MaterialProperty::Color color )
 {
     int value = 0;
     vtkFloatingPointType* rgba = color.GetDataPointer();
+    
+    //
+    // Mindestens ein Wert muss 0 sein und die Summe der anderen
+    // Beiden 1. Ansonsten kommt die Farbe nicht aus dem Farbraum.
+    //
+    
+    // check that at least one value is 0
+    if ( rgba[0] > 0.00001 &&
+         rgba[1] > 0.00001 &&
+         rgba[2] > 0.00001 
+       )
+    {
+      return -1;
+    }
+    
+    // check that the sum is 1
+    if ( fabs ( rgba[0] + rgba[1] + rgba[2] - 1.0 ) > 0.00001 )
+    {
+        return -1;  
+    }
+    
+    //
+    // now we know, that the color is from the given color space an can convert
+    // it back to a slider value
+    //
     if ( rgba[ 1 ] == 0.0f && rgba[ 2 ] == 0.0f )
         value = 0;
     else if ( rgba[ 0 ] == 0.0f && rgba[ 2 ] == 0.0f )
@@ -342,7 +333,7 @@ int QmitkMaterialEditor::ColorToValue( mitk::MaterialProperty::Color color )
         value = ( int ) ( rgba[ 2 ] * 85.0f ) + 85;
     else
         value = ( int ) ( rgba[ 0 ] * 85.0f ) + 170;
-    //std::cout << "color: " << color << ", value : " << value << std::endl;
+    std::cout << "color: " << color << ", value : " << value << std::endl;
     return value;
 }
 

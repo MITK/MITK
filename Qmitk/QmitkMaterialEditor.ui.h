@@ -85,8 +85,11 @@ void QmitkMaterialEditor::OnColorChanged( int value )
 void QmitkMaterialEditor::OnSpecularPowerChanged( int value )
 {
     vtkFloatingPointType power = ( vtkFloatingPointType ) value;
-    m_MaterialProperties->GetElement( m_ActiveShowcase )->SetSpecularPower( power );
-    m_Showcases[ m_ActiveShowcase ]->SetSpecularPower( power );
+    for ( unsigned int index = 0 ; index < m_MaterialProperties->Size() ; ++index )
+    {
+      m_MaterialProperties->GetElement( index )->SetSpecularPower( power );
+      m_Showcases[ index ]->SetSpecularPower( power );
+    }
 }
 
 
@@ -100,8 +103,11 @@ void QmitkMaterialEditor::OnSpecularPowerChanged( int value )
 void QmitkMaterialEditor::OnOpacityChanged( int value )
 {
     vtkFloatingPointType opacity = ( ( vtkFloatingPointType ) ( value - m_SlOpacity->minValue() ) ) / ( ( vtkFloatingPointType ) ( m_SlOpacity->maxValue() - m_SlOpacity->minValue() ) );
-    m_MaterialProperties->GetElement( m_ActiveShowcase )->SetOpacity( opacity );
-    m_Showcases[ m_ActiveShowcase ]->SetOpacity( opacity );
+    for ( unsigned int index = 0 ; index < m_MaterialProperties->Size() ; ++index )
+    {
+      m_MaterialProperties->GetElement( index )->SetOpacity( opacity );
+      m_Showcases[ index ]->SetOpacity( opacity );
+    }
 }
 
 
@@ -118,8 +124,8 @@ void QmitkMaterialEditor::OnOKClicked()
     assert ( m_OriginalMaterialProperties->size() == m_MaterialProperties->size() );
     for ( unsigned int i = 0 ; i < m_MaterialProperties->size() ; ++i )
     {
-        assert ( m_OriginalMaterialProperties->GetElement( i ) != NULL );
-        assert ( m_MaterialProperties->GetElement( i ) != NULL );
+        assert ( m_OriginalMaterialProperties->GetElement( i ).IsNotNull() );
+        assert ( m_MaterialProperties->GetElement( i ).IsNotNull() );        
         m_OriginalMaterialProperties->GetElement( i )->Initialize( * ( m_MaterialProperties->GetElement( i ) ), false ) ;
     }
     this->accept();
@@ -157,6 +163,7 @@ void QmitkMaterialEditor::Initialize( mitk::MaterialProperty* materialProperty )
     ClearMaterialProperties();
     mitk::MaterialProperty* internalProperty = new mitk::MaterialProperty( *materialProperty );
     internalProperty->SetDataTreeNode( NULL );
+    internalProperty->SetRenderer( NULL );
     m_MaterialProperties->push_back( internalProperty );
     m_OriginalMaterialProperties->push_back( materialProperty );
     Initialize();
@@ -178,6 +185,7 @@ void QmitkMaterialEditor::Initialize( mitk::MaterialPropertyVectorContainer::Poi
         mitk::MaterialProperty* materialProperty = materialPropertyVectorContainer->GetElement( i );
         mitk::MaterialProperty* internalProperty = new mitk::MaterialProperty( *materialProperty );
         internalProperty->SetDataTreeNode( NULL );
+        internalProperty->SetRenderer( NULL );
         m_MaterialProperties->push_back( new mitk::MaterialProperty( *materialProperty ) );
         m_OriginalMaterialProperties->push_back( materialProperty );
     }
@@ -210,10 +218,6 @@ void QmitkMaterialEditor::Initialize()
  */
 void QmitkMaterialEditor::ClearMaterialProperties()
 {
-    for ( unsigned int i = 0 ; i < m_MaterialProperties->size() ; ++i )
-    {
-        delete( m_MaterialProperties->GetElement( i ) );
-    }
     m_MaterialProperties->clear();
     m_OriginalMaterialProperties->clear();
     m_Showcases.clear();
@@ -240,14 +244,31 @@ void QmitkMaterialEditor::SetActiveShowcase( unsigned int number )
     mitk::MaterialProperty* materialProperty = m_MaterialProperties->GetElement( number );
     assert ( materialProperty != NULL );
     int value = this->ColorToValue( materialProperty->GetColor() );
+    m_SlColor->blockSignals(true);
     if ( value != -1 )
+    {
         m_SlColor->setValue( value );
+    }
     else
+    {
         m_SlColor->setValue( m_SlColor->minValue() );
-    
+    }
+    m_SlColor->blockSignals(false);
+    m_SlCoefficients->blockSignals(true);
     m_SlCoefficients->setValue( static_cast<int> ( materialProperty->GetColorCoefficient() * ( m_SlCoefficients->maxValue() - m_SlCoefficients->minValue() ) + m_SlCoefficients->minValue() ) );
+    m_SlCoefficients->blockSignals(false);
+    m_SlSpecularPower->blockSignals(true);
     m_SlSpecularPower->setValue( static_cast<int> ( materialProperty->GetSpecularPower() ) );
+    m_SlSpecularPower->blockSignals(false);
+    m_SlOpacity->blockSignals(true);
     m_SlOpacity->setValue( static_cast<int> ( materialProperty->GetOpacity() * ( m_SlOpacity->maxValue() - m_SlOpacity->minValue() ) + m_SlOpacity->minValue() ) );
+    m_SlOpacity->blockSignals(false);
+    m_CbInterpolation->blockSignals(true);
+    m_CbInterpolation->setCurrentItem( materialProperty->GetVtkInterpolation() );
+    m_CbInterpolation->blockSignals(false);
+    m_CbRepresentation->blockSignals(true);
+    m_CbRepresentation->setCurrentItem( materialProperty->GetVtkRepresentation() );
+    m_CbRepresentation->blockSignals(false);
 }
 
 
@@ -333,7 +354,7 @@ int QmitkMaterialEditor::ColorToValue( mitk::MaterialProperty::Color color )
         value = ( int ) ( rgba[ 2 ] * 85.0f ) + 85;
     else
         value = ( int ) ( rgba[ 0 ] * 85.0f ) + 170;
-    std::cout << "color: " << color << ", value : " << value << std::endl;
+    //std::cout << "color: " << color << ", value : " << value << std::endl;
     return value;
 }
 
@@ -372,11 +393,13 @@ void QmitkMaterialEditor::OnCoefficientsChanged( int value )
     // convert value into color coefficient in range [0..1]
     //
     vtkFloatingPointType coefficient = ( ( vtkFloatingPointType ) ( value - m_SlCoefficients->minValue() ) ) / ( ( vtkFloatingPointType ) ( m_SlCoefficients->maxValue() - m_SlCoefficients->minValue() ) );
-
-    m_MaterialProperties->GetElement( m_ActiveShowcase )->SetColorCoefficient( coefficient );
-    m_MaterialProperties->GetElement( m_ActiveShowcase )->SetSpecularCoefficient( coefficient );
-    m_Showcases[ m_ActiveShowcase ]->SetColorCoefficient( coefficient );
-    m_Showcases[ m_ActiveShowcase ]->SetSpecularCoefficient( coefficient );
+    for ( unsigned int index = 0 ; index < m_MaterialProperties->Size() ; ++index )
+    {
+      m_MaterialProperties->GetElement( index )->SetColorCoefficient( coefficient );
+      m_MaterialProperties->GetElement( index )->SetSpecularCoefficient( coefficient );
+      m_Showcases[ index ]->SetColorCoefficient( coefficient );
+      m_Showcases[ index ]->SetSpecularCoefficient( coefficient );
+    }
 }
 
 /**
@@ -388,8 +411,11 @@ void QmitkMaterialEditor::OnInterpolationChanged( int item )
 {
     assert ( item >= 0 && item <= 2 );
     mitk::MaterialProperty::InterpolationType interpolation = static_cast<mitk::MaterialProperty::InterpolationType>( item );
-    m_MaterialProperties->GetElement( m_ActiveShowcase )->SetInterpolation( interpolation );
-    m_Showcases[ m_ActiveShowcase ]->SetInterpolation( interpolation );
+    for ( unsigned int index = 0 ; index < m_MaterialProperties->Size() ; ++index )
+    {
+      m_MaterialProperties->GetElement( index )->SetInterpolation( interpolation );
+      m_Showcases[ index ]->SetInterpolation( interpolation );
+    }
 }
 
 
@@ -402,8 +428,11 @@ void QmitkMaterialEditor::OnRepresentationChanged( int item )
 {
     assert ( item >= 0 && item <= 2 );
     mitk::MaterialProperty::RepresentationType representation = static_cast<mitk::MaterialProperty::RepresentationType>( item );
-    m_MaterialProperties->GetElement( m_ActiveShowcase )->SetRepresentation( representation );
-    m_Showcases[ m_ActiveShowcase ]->SetRepresentation( representation );
+    for ( unsigned int index = 0 ; index < m_MaterialProperties->Size() ; ++index )
+    {
+      m_MaterialProperties->GetElement( index )->SetRepresentation( representation );
+      m_Showcases[ index ]->SetRepresentation( representation );
+    }
 }
 
 
@@ -422,4 +451,10 @@ void QmitkMaterialEditor::OnMaterialShowcaseSelected( QmitkMaterialShowcase * sh
     {
         std::cout << "Warning: showcase is NULL!" << std::endl;    
     }
+}
+
+
+mitk::MaterialPropertyVectorContainer* QmitkMaterialEditor::GetMaterialProperties()
+{
+  return m_OriginalMaterialProperties.GetPointer();
 }

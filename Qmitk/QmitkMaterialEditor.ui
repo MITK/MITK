@@ -31,6 +31,13 @@
                     <verstretch>0</verstretch>
                 </sizepolicy>
             </property>
+            <property name="paletteBackgroundColor">
+                <color>
+                    <red>0</red>
+                    <green>0</green>
+                    <blue>0</blue>
+                </color>
+            </property>
             <property name="frameShape">
                 <enum>NoFrame</enum>
             </property>
@@ -357,6 +364,7 @@
     <function access="private" specifier="non virtual">destroy()</function>
     <function returnType="mitk::MaterialProperty::Color">ValueToColor( int value )</function>
     <function returnType="int">ColorToValue( mitk::MaterialProperty::Color color )</function>
+    <function returnType="mitk::MaterialPropertyVectorContainer *">GetMaterialProperties()</function>
 </functions>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

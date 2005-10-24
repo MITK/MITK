@@ -18,6 +18,12 @@ class DataTreeNode;
  * color mapping. This includes color, specular coefficient and power, opacity
  * interpolation type (flat, gouraud, phong) and representation (points, 
  * wireframe or surface).
+ *
+ * If a DataTreeNode has been set via SetDataTreeNode or one of the constructors,
+ * the values for visualization properties are also forwarded to the properties
+ * in the property list of the data tree node. If they don't exist yet, they are
+ * added.
+ *
  * @see vtkProperty
 */
 class MaterialProperty : public BaseProperty
@@ -42,6 +48,9 @@ public:
      * Color (0.5, 0.5, 0.5) color coefficient 1.0, specular color (1.0, 1.0, 1.0),
      * specular coefficient 1.0, specular power 10, opacity 1.0, interpolation
      * Gouraud, representation Surface.
+     * @param node optinally a data tree node may be defined to which the properties
+     *             are forwarded. Please note, that if this node doesn't have the 
+     *             needed properties associated, they will be added.
      */
     MaterialProperty( mitk::DataTreeNode* node = NULL );
 
@@ -52,6 +61,9 @@ public:
      *              range [0..1]
      * @param opacity the opacity of the material. 0.0 means fully transparent
      *              and 1.0 means solid.
+     * @param node optinally a data tree node may be defined to which the properties
+     *              are forwarded. Please note, that if this node doesn't have the 
+     *              needed properties associated, they will be added.
      */
     MaterialProperty( Color color, vtkFloatingPointType opacity = 1.0f, mitk::DataTreeNode* node = NULL );
 
@@ -63,6 +75,9 @@ public:
      * @param blue the blue component of the materials color (range [0..1])
      * @param opacity the opacity of the material. 0.0 means fully transparent
      *        and 1.0 means solid.
+     * @param node optionally a data tree node may be defined to which the properties
+     *        are forwarded. Please note, that if this node doesn't have the 
+     *        needed properties associated, they will be added.
      */
     MaterialProperty( vtkFloatingPointType red, vtkFloatingPointType green, vtkFloatingPointType blue, vtkFloatingPointType opacity = 1.0f, mitk::DataTreeNode* node = NULL );
 
@@ -80,6 +95,9 @@ public:
      *        how shiny the material will appear (range [0..inf]).
      * @param opacity the opacity of the material. 0.0 means fully transparent
      *        and 1.0 means solid.
+     * @param node optionally a data tree node may be defined to which the properties
+     *        are forwarded. Please note, that if this node doesn't have the 
+     *        needed properties associated, they will be added.
      */
     MaterialProperty( vtkFloatingPointType red, vtkFloatingPointType green, vtkFloatingPointType blue, vtkFloatingPointType colorCoefficient, 
       vtkFloatingPointType specularCoefficient, vtkFloatingPointType specularPower, vtkFloatingPointType opacity, mitk::DataTreeNode* node = NULL );
@@ -98,6 +116,9 @@ public:
      *        how shiny the material will appear (range [0..inf]).
      * @param opacity the opacity of the material. 0.0 means fully transparent
      *        and 1.0 means solid.
+     * @param node optionally a data tree node may be defined to which the properties
+     *        are forwarded. Please note, that if this node doesn't have the 
+     *        needed properties associated, they will be added.
      */
     MaterialProperty( Color color, vtkFloatingPointType colorCoefficient, vtkFloatingPointType specularCoefficient, vtkFloatingPointType specularPower, vtkFloatingPointType opacity, mitk::DataTreeNode* node = NULL );
 
@@ -263,15 +284,31 @@ public:
      * @param property the materials which should be copied in the
      *        current materials
      */
-    virtual void Initialize( const MaterialProperty& property );
+    virtual void Initialize( const MaterialProperty& property, const bool& copyDataTreeNode = true );
 
     /**
      * comparison operator which uses the member variables for
      * comparison
      */
     virtual bool operator==( const BaseProperty& property ) const;
-
+    
+    /**
+     * Determines, wther the property values are forwarded to a data tree node,
+     * or not. If DataTreeNode is != NULL, this funtion returns true, or false
+     * otherwise.
+     * @returns true, if the data tree node associated with the material property
+     * is != NULL or false if it is == NULL.
+     */
+    virtual bool ForwardToDataTreeNode() const;
+    
+    /**
+     * Dumps the properties to the out stream out
+     */
+    void PrintSelf ( std::ostream &os ) const;
+    
 protected:
+
+    virtual void InitializeStandardValues();
 
     Color m_Color;
 

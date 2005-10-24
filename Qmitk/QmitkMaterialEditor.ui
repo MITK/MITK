@@ -126,6 +126,9 @@
                     <property name="text">
                         <string>Coefficients</string>
                     </property>
+                    <property name="toolTip" stdset="0">
+                        <string>You would call it brightness. Defines the attenuation coefficients for ambient, diffuse and specular color.</string>
+                    </property>
                 </widget>
                 <widget class="QLayoutWidget" row="0" column="0">
                     <property name="name">
@@ -141,6 +144,9 @@
                             </property>
                             <property name="text">
                                 <string>Color</string>
+                            </property>
+                            <property name="toolTip" stdset="0">
+                                <string>Defines the ambient and diffuse color of the object. If you want arbitrary colors, press the select button.</string>
                             </property>
                         </widget>
                         <widget class="QPushButton">
@@ -169,6 +175,9 @@
                             </property>
                             <property name="flat">
                                 <bool>true</bool>
+                            </property>
+                            <property name="toolTip" stdset="0">
+                                <string>Here you may select from the complete rgb color space.</string>
                             </property>
                         </widget>
                     </hbox>
@@ -202,6 +211,9 @@
                     <property name="text">
                         <string>Opacity</string>
                     </property>
+                    <property name="toolTip" stdset="0">
+                        <string>Defines the transparency of the object.</string>
+                    </property>
                 </widget>
                 <widget class="QLabel" row="2" column="0">
                     <property name="name">
@@ -209,6 +221,9 @@
                     </property>
                     <property name="text">
                         <string>Specular power</string>
+                    </property>
+                    <property name="toolTip" stdset="0">
+                        <string>Defines the specular power. The more the slider moves to the right, the more the object looks like plastic. The specular color is set to white.</string>
                     </property>
                 </widget>
                 <widget class="QComboBox" row="5" column="1">
@@ -321,8 +336,6 @@
 </variables>
 <slots>
     <slot access="protected">OnColorChanged( int value )</slot>
-    <slot access="protected">OnColorCoefficientChanged( int value )</slot>
-    <slot access="protected">OnSpecularCoefficientChanged( int value )</slot>
     <slot access="protected">OnSpecularPowerChanged( int value )</slot>
     <slot access="protected">OnOpacityChanged( int value )</slot>
     <slot access="protected">OnOKClicked()</slot>

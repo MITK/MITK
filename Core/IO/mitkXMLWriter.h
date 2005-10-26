@@ -41,6 +41,7 @@ namespace mitk{
 		 * Write bool Property
 		 */
     void WriteProperty( const std::string& key, const mitk::Point3D& value ) const;
+    void WriteProperty( const std::string& key, const mitk::Point4D& value ) const;
 
 		/**
 		 * Write bool Property

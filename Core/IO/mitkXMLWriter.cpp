@@ -55,7 +55,12 @@ void XMLWriter::WriteProperty( const std::string& key, const mitk::Point3D& valu
   stream << value;
   BaseXMLWriter::WriteProperty( key, stream.str() );
 }
-
+void XMLWriter::WriteProperty( const std::string& key, const mitk::Point4D& value ) const
+{
+  std::stringstream stream;;
+  stream << value;
+  BaseXMLWriter::WriteProperty( key, stream.str() );
+}
 /**
 	* Write bool Property
 	*/

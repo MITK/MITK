@@ -175,6 +175,12 @@ namespace mitk {
 
     return true;
   }
+  bool XMLReader::GetAttribute( std::string name, mitk::Point4D& value ) const
+  {
+    // @todo: implementation
+    return false;
+  }
+
 
   /**
    *

@@ -25,4 +25,6 @@ template class mitk::GenericProperty<float>;
 template class mitk::GenericProperty<double>;
 template class mitk::GenericProperty<mitk::Point3D>;
 template class mitk::GenericProperty<itk::Point<int, 3> >;
+template class mitk::GenericProperty<mitk::Point4D>;
+
                

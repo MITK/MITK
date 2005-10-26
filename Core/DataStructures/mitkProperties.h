@@ -36,7 +36,10 @@ namespace mitk {
 
    typedef GenericProperty<Point3D> Point3dProperty;
 
+   typedef GenericProperty<Point4D> Point4dProperty;
+
    typedef GenericProperty<itk::Point<int, 3> > Point3iProperty;
+
 } // namespace mitk  
 
 #endif /* MITKPROPERTIES_H_HEADER_INCLUDED */

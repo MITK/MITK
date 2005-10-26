@@ -248,16 +248,12 @@ void mitk::SurfaceMapper2D::PaintCells(vtkPolyData* contour, const mitk::Geometr
       if (lut != NULL) 
       {  // color each cell according to cell data
 
-#if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
-        double *color;
-#else
-        float *color;
-#endif
+        vtkFloatingPointType color[3];
 
         if (vcellscalars != NULL )
         {
           vcellscalars->GetComponent(i,0);
-          color = lut->GetColor( vcellscalars->GetComponent(i,0) );
+          lut->GetColor( vcellscalars->GetComponent(i,0),color);
           glColor3f(color[0],color[1],color[2]);
         }
       }

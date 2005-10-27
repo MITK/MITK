@@ -52,7 +52,7 @@ namespace mitk{
     bool GetAttribute( std::string name, mitk::Point3D& value ) const;
     bool GetAttribute( std::string name, mitk::Vector3D& value ) const;
     bool GetAttribute( std::string name, itk::Point<int,3>& value ) const;
-    bool GetAttribute( std::string name, mitk::Point4D value ) const;
+    bool GetAttribute( std::string name, mitk::Point4D& value ) const;
     bool GetAttribute( std::string name, mitk::AffineGeometryFrame3D::TransformType& value ) const;
 
     static const std::string DATA;

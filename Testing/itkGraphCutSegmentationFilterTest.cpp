@@ -22,7 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkImageRegionIterator.h>
 
 #include <itkGraphCutSegmentationGridGraphFilter.h>
-//#include <itkGraphCutSegmentationBoykovFilter.h>
+#include <itkGraphCutSegmentationBoykovFilter.h>
 
 
 int itkGraphCutSegmentationFilterTest(int, char* [] )
@@ -33,9 +33,9 @@ int itkGraphCutSegmentationFilterTest(int, char* [] )
   typedef itk::Index<3> IndexType;
 
   int testValue2D = 0;
-  int referenceValue2D = 2500;
+  int referenceValue2D = 400;
   int testValue = 0;
-  int referenceValue = 125000;
+  int referenceValue = 8000;
 
   typedef itk::Image< short, 2 > ImageType2D;
   typedef itk::Image< short, 3 > ImageType;
@@ -43,24 +43,24 @@ int itkGraphCutSegmentationFilterTest(int, char* [] )
   typedef itk::ImageRegionIterator<ImageType>IteratorType;
 
   typedef itk::GraphCutSegmentationGridGraphFilter<ImageType2D, ImageType2D> GraphCutSegmentationGridGraphFilterType2D;
- 	//typedef itk::GraphCutSegmentationBoykovFilter<ImageType2D, ImageType2D> GraphCutSegmentationBoykovFilterType2D;
+ 	typedef itk::GraphCutSegmentationBoykovFilter<ImageType2D, ImageType2D> GraphCutSegmentationBoykovFilterType2D;
   typedef itk::GraphCutSegmentationFilter<ImageType2D, ImageType2D> GraphCutSegmentationFilterType2D;
   GraphCutSegmentationFilterType2D::Pointer graphcutFilter2D;
  
  	typedef itk::GraphCutSegmentationGridGraphFilter<ImageType, ImageType> GraphCutSegmentationGridGraphFilterType;
- 	//typedef itk::GraphCutSegmentationBoykovFilter<ImageType, ImageType> GraphCutSegmentationBoykovFilterType;
+ 	typedef itk::GraphCutSegmentationBoykovFilter<ImageType, ImageType> GraphCutSegmentationBoykovFilterType;
   typedef itk::GraphCutSegmentationFilter<ImageType, ImageType> GraphCutSegmentationFilterType;
   GraphCutSegmentationFilterType::Pointer graphcutFilter;
 
-  //{ start creating a 3D test image
+  //{ start creating a 2D test image
   ImageType2D::Pointer testImage2D = ImageType2D::New();
   ImageType2D::IndexType imageStart2D;
   imageStart2D[0] = 0;
   imageStart2D[1] = 0;
 
   ImageType2D::SizeType imageSize2D;
-  imageSize2D[0] = 128;
-  imageSize2D[1] = 128;
+  imageSize2D[0] = 60;
+  imageSize2D[1] = 60;
 
   ImageType2D::RegionType imageRegion2D;
   imageRegion2D.SetSize( imageSize2D );
@@ -74,12 +74,12 @@ int itkGraphCutSegmentationFilterTest(int, char* [] )
   }
 
   ImageType2D::IndexType objectStart2D;
-  objectStart2D[0] = 39;
-  objectStart2D[1] = 39;
+  objectStart2D[0] = 20;
+  objectStart2D[1] = 20;
 
   ImageType2D::SizeType objectSize2D;
-  objectSize2D[0] = 50;
-  objectSize2D[1] = 50;
+  objectSize2D[0] = 20;
+  objectSize2D[1] = 20;
 
   ImageType2D::RegionType objectRegion2D;
   objectRegion2D.SetSize( objectSize2D );
@@ -104,8 +104,8 @@ int itkGraphCutSegmentationFilterTest(int, char* [] )
   }
 
   ImageType2D::IndexType objectSeedsStart2D;
-  objectSeedsStart2D[0] = 60;
-  objectSeedsStart2D[1] = 60;
+  objectSeedsStart2D[0] = 25;
+  objectSeedsStart2D[1] = 25;
 
   ImageType2D::SizeType objectSeedsSize2D;
   objectSeedsSize2D[0] = 10;
@@ -146,9 +146,9 @@ int itkGraphCutSegmentationFilterTest(int, char* [] )
   imageStart[2] = 0;
 
   ImageType::SizeType imageSize;
-  imageSize[0] = 128;
-  imageSize[1] = 128;
-  imageSize[2] = 128;
+  imageSize[0] = 60;
+  imageSize[1] = 60;
+  imageSize[2] = 60;
 
   ImageType::RegionType imageRegion;
   imageRegion.SetSize( imageSize );
@@ -162,14 +162,14 @@ int itkGraphCutSegmentationFilterTest(int, char* [] )
   }
 
   ImageType::IndexType objectStart;
-  objectStart[0] = 39;
-  objectStart[1] = 39;
-  objectStart[2] = 39;
+  objectStart[0] = 20;
+  objectStart[1] = 20;
+  objectStart[2] = 20;
 
   ImageType::SizeType objectSize;
-  objectSize[0] = 50;
-  objectSize[1] = 50;
-  objectSize[2] = 50;
+  objectSize[0] = 20;
+  objectSize[1] = 20;
+  objectSize[2] = 20;
 
   ImageType::RegionType objectRegion;
   objectRegion.SetSize( objectSize );
@@ -194,9 +194,9 @@ int itkGraphCutSegmentationFilterTest(int, char* [] )
   }
 
   ImageType::IndexType objectSeedsStart;
-  objectSeedsStart[0] = 60;
-  objectSeedsStart[1] = 60;
-  objectSeedsStart[2] = 60;
+  objectSeedsStart[0] = 25;
+  objectSeedsStart[1] = 25;
+  objectSeedsStart[2] = 25;
 
   ImageType::SizeType objectSeedsSize;
   objectSeedsSize[0] = 10;
@@ -237,8 +237,8 @@ int itkGraphCutSegmentationFilterTest(int, char* [] )
 
   graphcutFilter2D = GraphCutSegmentationGridGraphFilterType2D::New();
   graphcutFilter2D->SetInput(testImage2D);
-  graphcutFilter2D->SetParameter_sigma_sqr(64);
-  graphcutFilter2D->SetParameter_h(-1);
+  graphcutFilter2D->SetParameter_sigma_sqr(32);
+  graphcutFilter2D->SetParameter_h(0);
   graphcutFilter2D->SetIntensityDifference(100);
   graphcutFilter2D->SetGradientMagnitude(90);
   graphcutFilter2D->SetParameter_MaxMagni(15);
@@ -269,8 +269,8 @@ int itkGraphCutSegmentationFilterTest(int, char* [] )
 
   graphcutFilter = GraphCutSegmentationGridGraphFilterType::New();
   graphcutFilter->SetInput(testImage);
-  graphcutFilter->SetParameter_sigma_sqr(64);
-  graphcutFilter->SetParameter_h(-1);
+  graphcutFilter->SetParameter_sigma_sqr(32);
+  graphcutFilter->SetParameter_h(0);
   graphcutFilter->SetIntensityDifference(100);
   graphcutFilter->SetGradientMagnitude(90);
   graphcutFilter->SetParameter_MaxMagni(15);
@@ -295,15 +295,15 @@ int itkGraphCutSegmentationFilterTest(int, char* [] )
   std::cout<<"[PASSED]"<<std::endl;
   //} end testing itkGraphCutSegmentationGridGraphFilter with 3D image
 
-/*
+
   //{ start testing itkGraphCutSegmentationBoykovFilter with 2D image
   std::cout << "Testing itkGraphCutSegmentationBoykovFilter with 2D image: " <<std::endl;
 
   testValue2D = 0;
   graphcutFilter2D = GraphCutSegmentationBoykovFilterType2D::New();
   graphcutFilter2D->SetInput(testImage2D);
-  graphcutFilter2D->SetParameter_sigma_sqr(64);
-  graphcutFilter2D->SetParameter_h(-1);
+  graphcutFilter2D->SetParameter_sigma_sqr(32);
+  graphcutFilter2D->SetParameter_h(0);
   graphcutFilter2D->SetIntensityDifference(100);
   graphcutFilter2D->SetGradientMagnitude(90);
   graphcutFilter2D->SetParameter_MaxMagni(15);
@@ -335,8 +335,8 @@ int itkGraphCutSegmentationFilterTest(int, char* [] )
   testValue = 0;
   graphcutFilter = GraphCutSegmentationBoykovFilterType::New();
   graphcutFilter->SetInput(testImage);
-  graphcutFilter->SetParameter_sigma_sqr(64);
-  graphcutFilter->SetParameter_h(-1);
+  graphcutFilter->SetParameter_sigma_sqr(32);
+  graphcutFilter->SetParameter_h(0);
   graphcutFilter->SetIntensityDifference(100);
   graphcutFilter->SetGradientMagnitude(90);
   graphcutFilter->SetParameter_MaxMagni(15);
@@ -359,7 +359,7 @@ int itkGraphCutSegmentationFilterTest(int, char* [] )
   }
   std::cout<<"[PASSED]"<<std::endl;
   //} end testing itkGraphCutSegmentationBoykovFilter with 3D image
-*/
+
 std::cout<<"[TEST DONE]"<<std::endl;
 return EXIT_SUCCESS;
 }

@@ -22,7 +22,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include <GL/gl.h>
 
 #ifdef WIN32
+#ifndef __GNUC__
 #include "mitkMovieGeneratorWin32.h"
+#endif
 #endif
 #ifndef GL_BGR
 #define GL_BGR GL_BGR_EXT
@@ -34,8 +36,10 @@ mitk::MovieGenerator::Pointer mitk::MovieGenerator::New()
   MovieGenerator *rawPtr = ::itk::ObjectFactory<MovieGenerator>::Create();
   if(rawPtr == NULL) {
 #ifdef WIN32
+#ifndef __GNUC__
     mitk::MovieGenerator::Pointer wp = static_cast<mitk::MovieGenerator*>(MovieGeneratorWin32::New());
     return wp;
+#endif
 #endif
   }
   smartPtr = rawPtr;

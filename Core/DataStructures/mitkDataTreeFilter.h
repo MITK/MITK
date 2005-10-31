@@ -86,6 +86,8 @@ namespace mitk
       /// One item of the filter result list or tree
       class Item : public itk::LightObject
       {
+        friend class mitk::DataTreeFilter;
+
         public:
 
           typedef itk::SmartPointer<Item> Pointer;
@@ -120,7 +122,7 @@ namespace mitk
           /// Returns the parent of this item (orphans throws exceptions)
           const Item* GetParent() const;
         protected:
-
+        
           /// Intentionally hidden
           Item(); 
           Item(mitk::DataTreeNode*, DataTreeFilter*, int, const Item*);
@@ -191,6 +193,8 @@ namespace mitk
       ~DataTreeFilter();
     
     private:
+
+      void AddMatchingChildren(mitk::DataTreeIteratorBase*, ItemList*, Item*);
       
       // build the model from the data tree
       void GenerateModelFromTree();

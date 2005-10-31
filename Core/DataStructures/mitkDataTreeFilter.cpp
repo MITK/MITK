@@ -1,6 +1,6 @@
 #include "mitkDataTreeFilter.h"
 #include <itkCommand.h>
-
+#include "mitkDataTree.h"
 
 namespace mitk
 {
@@ -114,8 +114,6 @@ DataTreeFilter::DataTreeFilter(mitk::DataTree* datatree)
   m_Renderer(NULL),
   m_ObserverTag(0)
 {
-  m_Items = ItemList::New();
-
   // connect tree's modified to my GenerateModelFromTree()
   itk::ReceptorMemberCommand<mitk::DataTreeFilter>::Pointer command =
                                                           itk::ReceptorMemberCommand<mitk::DataTreeFilter>::New();
@@ -127,7 +125,6 @@ DataTreeFilter::DataTreeFilter(mitk::DataTree* datatree)
 
 DataTreeFilter::~DataTreeFilter()
 {
-  ItemList::Iterator iter;
 }
 
 void DataTreeFilter::SetPropertiesLabels(const PropertyList labels)
@@ -215,8 +212,73 @@ void DataTreeFilter::TreeChanged(const itk::EventObject &)
   GenerateModelFromTree();
 }
 
+void DataTreeFilter::AddMatchingChildren(mitk::DataTreeIteratorBase* iter, ItemList* list, Item* parent)
+{
+  /* 
+  for each child of iter
+    check if filter matches
+    if it matches:
+      create an Item for this child
+      iter->GoToChild(thisChild)
+      call AddMatchingChildren(iter, newItem.m_ItemList)
+      iter->GotoParent();
+    if match fails:
+      iter->GoToChild(thisChild)
+      call AddMatchingChildren(iter, list)  // list from this call
+      iter->GotoParent();
+  */
+  int numChildren( iter->CountChildren() );
+
+  for ( int child = 0; child < numChildren; ++child )
+  {
+    if ( m_Filter( iter->Get() ) )
+    {
+      unsigned int newIndex = list->Size();
+      list->CreateElementAt( newIndex ) = Item::New( iter->Get(), this, newIndex, parent );
+      iter->GoToChild(child);
+      AddMatchingChildren( iter, 
+                           list->ElementAt(newIndex)->m_Children,
+                           list->ElementAt(newIndex).GetPointer() );
+      iter->GoToParent();
+    }
+    else
+    {
+      iter->GoToChild(child);
+      AddMatchingChildren( iter, list, parent );
+      iter->GoToParent();
+    }
+  }
+}
+
 void DataTreeFilter::GenerateModelFromTree()
 {
+  if (!m_Filter); // TODO install default filter (always true)
+
+  m_Items = ItemList::New(); // clear list (nice thanks to smart pointers)
+  
+  mitk::DataTreeIteratorBase* treeIter =  // get an iterator to the data tree
+    new mitk::DataTreePreOrderIterator::PreOrderTreeIterator(m_DataTree);
+
+  /*
+  if root matches
+    create an Item for root
+    call AddMatchingChildren(iter, newItem.m_ItemList)
+  else (no match on root)
+    call AddMatchingChildren(iter, m_ItemList)
+  */
+  if ( m_Filter( treeIter->Get() ) )
+  {
+    m_Items->CreateElementAt(0) = Item::New( treeIter->Get(), this, 0, 0 ); // 0 = first item, 0 = no parent
+    AddMatchingChildren( treeIter,
+                         m_Items->ElementAt(0)->m_Children,
+                         m_Items->ElementAt(0).GetPointer());
+  }
+  else
+  {
+    AddMatchingChildren( treeIter, m_Items, 0);
+  }
+  
+  delete treeIter; // release data tree iterator
 }
       
 

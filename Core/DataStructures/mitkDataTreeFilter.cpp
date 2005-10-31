@@ -1,4 +1,6 @@
 #include "mitkDataTreeFilter.h"
+#include <itkCommand.h>
+
 
 namespace mitk
 {
@@ -30,34 +32,36 @@ DataTreeFilter::BasePropertyAccessor::operator mitk::BaseProperty&()
 
 //------ Item ----------------------------------------------------------------------------
 
-DataTreeFilter::Item::Item(mitk::DataTreeNode& node, DataTreeFilter& treefilter, 
-                           int index, const Item& parent)
-: m_Index(index),
-  m_Parent(&parent),
-  m_Children(),
-  m_TreeFilter(treefilter),
-  m_Node(node)
+DataTreeFilter::Item::Pointer DataTreeFilter::Item::New(mitk::DataTreeNode* node, DataTreeFilter* treefilter, 
+                                                        int index, const Item* parent)
 {
-  // nothing to do
+  // from itkNewMacro()
+  Pointer smartPtr;
+  Item* rawPtr = new Item(node, treefilter, index, parent);
+  smartPtr = rawPtr;
+  rawPtr->UnRegister();
+  return smartPtr;
 }
 
-DataTreeFilter::Item::Item(mitk::DataTreeNode& node, DataTreeFilter& treefilter, 
-                           int index)
+DataTreeFilter::Item::Item(mitk::DataTreeNode* node, DataTreeFilter* treefilter, 
+                           int index, const Item* parent)
 : m_Index(index),
-  m_Parent(NULL),
-  m_Children(),
+  m_Parent(parent),
+  m_Children(NULL),
   m_TreeFilter(treefilter),
-  m_Node(node)
+  m_Node(node),
+  m_Selected(false)
 {
-  // nothing to do
+  m_Children = DataTreeFilter::ItemList::New();
 }
 
 DataTreeFilter::BasePropertyAccessor& DataTreeFilter::Item::operator[](const std::string& key) const
 {
 }
-         
-const DataTreeFilter::ItemList& DataTreeFilter::Item::GetChildren() const
+
+const DataTreeFilter::ItemList* DataTreeFilter::Item::GetChildren() const
 {
+  return m_Children;
 }
 
 int DataTreeFilter::Item::GetIndex() const
@@ -70,30 +74,30 @@ bool DataTreeFilter::Item::IsRoot() const
   return m_Parent == NULL;
 }
 
-const DataTreeFilter::Item& DataTreeFilter::Item::GetParent() const
+bool DataTreeFilter::Item::IsSelected() const
 {
-  if (m_Parent)
-  {
-    return *m_Parent;
-  }
-  else
-  { 
-    throw HasNoParent();
-  }
+  return m_Selected;
 }
 
-//------ RootItem ------------------------------------------------------------------------
-DataTreeFilter::RootItem::RootItem(mitk::DataTreeNode& node, DataTreeFilter& treefilter, 
-                                   int index)
-: Item(node, treefilter, index)
+void DataTreeFilter::Item::SetSelected(bool selected) 
 {
-  // nothing to do
+  m_Selected = selected;
+
+  // notify TreeFilter, whether this item is now selected
+  // ! notification can happen from SelectItem(Item, bool) of DataTreeFilter
+}
+
+const DataTreeFilter::Item* DataTreeFilter::Item::GetParent() const
+{
+  return m_Parent;
 }
 
 //------ DataTreeFilter ------------------------------------------------------------------
-     
-DataTreeFilter::Pointer DataTreeFilter::New(mitk::DataTree& datatree)
+
+// smart pointer constructor
+DataTreeFilter::Pointer DataTreeFilter::New(mitk::DataTree* datatree)
 {
+  // from itkNewMacro()
   Pointer smartPtr;
   DataTreeFilter* rawPtr = new DataTreeFilter(datatree);
   smartPtr = rawPtr;
@@ -101,55 +105,121 @@ DataTreeFilter::Pointer DataTreeFilter::New(mitk::DataTree& datatree)
   return smartPtr;
 }
 
-DataTreeFilter::DataTreeFilter(mitk::DataTree& datatree)
-: m_Items(),
-  m_Filter(NULL),
-  m_DataTree(datatree)
+// real constructor (protected)
+DataTreeFilter::DataTreeFilter(mitk::DataTree* datatree)
+: m_Filter(NULL),
+  m_DataTree(datatree),
+  m_HierarchyHandling(mitk::DataTreeFilter::PRESERVE_HIERARCHY),
+  m_SelectionMode(mitk::DataTreeFilter::MULTI_SELECT),
+  m_Renderer(NULL),
+  m_ObserverTag(0)
 {
+  m_Items = ItemList::New();
+
+  // connect tree's modified to my GenerateModelFromTree()
+  itk::ReceptorMemberCommand<mitk::DataTreeFilter>::Pointer command =
+                                                          itk::ReceptorMemberCommand<mitk::DataTreeFilter>::New();
+  
+  command->SetCallbackFunction(this, &DataTreeFilter::TreeChanged);
+  
+  m_ObserverTag = m_DataTree->AddObserver(itk::TreeChangeEvent<mitk::DataTreeBase>(), command);
 }
 
 DataTreeFilter::~DataTreeFilter()
 {
+  ItemList::Iterator iter;
 }
 
-void DataTreeFilter::SetVisibleProperties(const PropertyList keys)
-{
-}
-
-const DataTreeFilter::PropertyList& DataTreeFilter::GetVisibleProperties() const
-{
-}
-      
 void DataTreeFilter::SetPropertiesLabels(const PropertyList labels)
 {
+  m_PropertyLabels = labels;
 }
 
 const DataTreeFilter::PropertyList& DataTreeFilter::GetPropertiesLabels() const
 {
+  return m_PropertyLabels;
 }
 
+void DataTreeFilter::SetVisibleProperties(const PropertyList keys)
+{
+  m_VisibleProperties = keys;
+}
+
+const DataTreeFilter::PropertyList& DataTreeFilter::GetVisibleProperties() const
+{
+  return m_VisibleProperties;
+}
+      
 void DataTreeFilter::SetEditableProperties(const PropertyList keys)
 {
+  m_EditableProperties = keys;
 }
 
 const DataTreeFilter::PropertyList& DataTreeFilter::GetEditableProperties() const
 {
+  return m_EditableProperties;
 }
 
 void DataTreeFilter::SetRenderer(const mitk::BaseRenderer* renderer)
 {
+  m_Renderer = renderer;
+}
+      
+const mitk::BaseRenderer* DataTreeFilter::GetRenderer() const
+{
+  return m_Renderer;
 }
 
 void DataTreeFilter::SetFilter(FilterFunctionPointer filter)
 {
+  m_Filter = filter;
+}
+      
+const DataTreeFilter::FilterFunctionPointer DataTreeFilter::GetFilter() const
+{
+  return m_Filter;
+}
+      
+void DataTreeFilter::SetSelectionMode(const SelectionMode selectionMode)
+{
+  m_SelectionMode = selectionMode;
 }
 
-const DataTreeFilter::RootItemList& DataTreeFilter::GetItems() const
+DataTreeFilter::SelectionMode DataTreeFilter::GetSelectionMode() const
+{
+  return m_SelectionMode;
+}
+      
+void DataTreeFilter::SetHierarchyHandling(const HierarchyHandling hierarchyHandling)
+{
+  m_HierarchyHandling = hierarchyHandling;
+}
+
+DataTreeFilter::HierarchyHandling DataTreeFilter::GetHierarchyHandling() const
+{
+  return m_HierarchyHandling;
+}
+
+const DataTreeFilter::ItemList* DataTreeFilter::GetItems() const
+{
+  return m_Items;
+}
+      
+void DataTreeFilter::SelectItem(const Item* item, bool selected)
+{
+  const_cast<Item*>(item) -> SetSelected(selected);
+}
+
+void DataTreeFilter::TreeChanged(const itk::EventObject &)
+{
+  GenerateModelFromTree();
+}
+
+void DataTreeFilter::GenerateModelFromTree()
 {
 }
       
 
-} // namespace mitk
-
+} // namespace mitk 
 
 // vi: textwidth=90

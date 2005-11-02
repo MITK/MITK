@@ -172,7 +172,7 @@ protected:
 
   virtual void ReadFileTypeITKImageIOFactory();
 
-#ifdef MBI_INTERNAL
+  #ifdef MBI_INTERNAL
 
 #ifdef HAVE_IPDICOM
   virtual void ReadFileTypeIPDCM();
@@ -185,8 +185,10 @@ protected:
   virtual void ReadFileTypeDVG();
 
   virtual void ReadFileTypeHPSONOS();
-
+#ifdef USE_TUS_READER
+  virtual void ReadFileTypeTUS();
 #endif
+  #endif
 
   virtual void ReadFileSeriesTypePIC();
 

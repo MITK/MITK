@@ -79,11 +79,12 @@ PURPOSE.  See the above copyright notices for more information.
 #endif /* HAVE_IPDICOM */
 #include "mitkCylindricToCartesianFilter.h"
 #include "mitkDSRFileReader.h"
+
+#ifdef USE_TUS_READER
+#include "mitkBirdDataFromFileReader.h"
+#include "mitkTrackedUSDataFileParser.h"
 #endif
-
-
-
-
+#endif
 
 mitk::DataTreeNodeFactory::DataTreeNodeFactory()
 {
@@ -157,8 +158,16 @@ void mitk::DataTreeNodeFactory::GenerateData()
     }
     else if ( this->FileNameEndsWith( "HPSONOS.DB" ) || this->FileNameEndsWith( "hpsonos.db" ) )
     {
+      std::cout << "jetzt lese ich sono"<<endl;
       this->ReadFileTypeHPSONOS();
     }
+#ifdef USE_TUS_READER
+    else if ( this->FileNameEndsWith( ".TUS" ) || this->FileNameEndsWith( ".tus" ) )
+    {
+      std::cout << "jetzt lese ich tus"<<endl;
+      this->ReadFileTypeTUS();
+    }
+#endif
 #endif
     //else if (this->FileNameEndsWith("."))
     //{
@@ -690,6 +699,66 @@ void mitk::DataTreeNodeFactory::ReadFileTypeHPSONOS()
   }
   std::cout << "...finished!" << std::endl;
 }
+#ifdef USE_TUS_READER
+void mitk::DataTreeNodeFactory::ReadFileTypeTUS()
+{
+  unsigned int i,count;
+
+    mitk::TrackedUSDataFileParser* parser = new mitk::TrackedUSDataFileParser();
+    cout<<m_FileName<<endl;   
+    parser->LoadBehavior(m_FileName); 
+    
+    //Parse die Tus-File and get BirdDataPfadliste+ HpsonoPfadListe
+    std::vector< std::string > BirdDataPfadListe = mitk::TrackedUSDataFileParser::GetBirdDataPfadListe();
+    
+    std::vector< std::string > HpsonoPfadListe = mitk::TrackedUSDataFileParser::GetHpsonoPfadListe();
+    std::vector <std::string>::iterator it;
+
+    int OutputNumber=0;
+    i=0;// Laufvariable für die internen KanäleBilder aus DSRreader
+    count=0;// Laufvariable für die BilderAnzahl
+    BirdDataFromFileReader Birdreader;
+
+    for ( it= HpsonoPfadListe.begin( );it != HpsonoPfadListe.end( );it++ )
+    {  
+      mitk::DataTreeNodeFactory::Pointer HPSonoReader=mitk::DataTreeNodeFactory::New();
+      std::string name=*it;
+
+      //Lese USBilder mittels ReadFileTypeHPSONOS()
+      HPSonoReader->SetFileName(name.c_str() );           
+      HPSonoReader->Update(); 
+
+      OutputNumber+=HPSonoReader->GetNumberOfOutputs(); // Aktualisiere Anzahl Bilder
+
+      this->ResizeOutputs(OutputNumber);
+
+      Birdreader.SetFilename(BirdDataPfadListe[count].c_str()); 
+      mitk::BirdData BD= Birdreader.GetBirdData();
+      
+      //Set PositionProperty
+      mitk::Point3D PositionData= BD.GetPositionMean();
+      mitk::Point3dProperty::Pointer positionProp;
+      positionProp = new mitk::Point3dProperty(PositionData);
+      HPSonoReader->GetOutput(0)->SetProperty( "PositionData",positionProp );
+      HPSonoReader->GetOutput(1)->SetProperty( "PositionData",positionProp );
+      
+      Birdreader.getRotationMatrix();
+      
+      //Set RotationProperty
+      mitk::Point4D QuaternionData =BD.GetRotationMean();
+      mitk::Point4dProperty::Pointer quaternionProp;
+      quaternionProp = new mitk::Point4dProperty(QuaternionData);     
+      HPSonoReader->GetOutput(0)->SetProperty( "QuaternionData", quaternionProp );
+      HPSonoReader->GetOutput(1)->SetProperty( "QuaternionData", quaternionProp );
+
+      this->SetOutput(i,HPSonoReader->GetOutput(0));
+      this->SetOutput(i+1,HPSonoReader->GetOutput(1));
+
+      i+=2;
+      count++;
+    }
+}
+#endif
 
 #ifdef HAVE_IPDICOM
 
@@ -710,7 +779,6 @@ void mitk::DataTreeNodeFactory::ReadFileTypeIPDCM()
   // set filename without path as string property
   mitk::StringProperty::Pointer nameProp = new mitk::StringProperty( this->GetBaseFileName() );
   node->SetProperty( "name", nameProp );
-
   // add Level-Window property
   mitk::LevelWindow levelwindow;
   levelwindow.SetAuto( reader->GetOutput() );

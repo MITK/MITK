@@ -5,10 +5,17 @@
 namespace mitk
 {
 
+//------ Some common filter functions ----------------------------------------------------
+
+/// default filter, lets everything except NULL pointers pass
+static bool IsDataTreeNode(mitk::DataTreeNode* node)
+{
+  return ( node != 0 );
+}
 
 //------ BasePropertyAccessor ------------------------------------------------------------
   
-DataTreeFilter::BasePropertyAccessor::BasePropertyAccessor(mitk::BaseProperty& property, bool editable)
+DataTreeFilter::BasePropertyAccessor::BasePropertyAccessor(mitk::BaseProperty* property, bool editable)
 : m_Editable(editable),
   m_Property(property)
 {
@@ -20,14 +27,25 @@ bool DataTreeFilter::BasePropertyAccessor::IsEditable() const
   return m_Editable;
 }
 
-DataTreeFilter::BasePropertyAccessor::operator const mitk::BaseProperty&()
+DataTreeFilter::BasePropertyAccessor::operator const mitk::BaseProperty*()
 {
-  // return some const reference
+  // const access always permitted
+  return m_Property;
 }
 
-DataTreeFilter::BasePropertyAccessor::operator mitk::BaseProperty&()
+DataTreeFilter::BasePropertyAccessor::operator mitk::BaseProperty*()
 {
-  // return some non-const reference
+  // non-const access only permitted when editable
+  if (!m_Editable) throw NoPermissionException();
+  return m_Property;
+}
+
+DataTreeFilter::BasePropertyAccessor::operator const std::string()
+{
+  if (!m_Property) 
+    return std::string("[no value]");
+  else
+    return m_Property->GetValueAsString();
 }
 
 //------ Item ----------------------------------------------------------------------------
@@ -55,13 +73,28 @@ DataTreeFilter::Item::Item(mitk::DataTreeNode* node, DataTreeFilter* treefilter,
   m_Children = DataTreeFilter::ItemList::New();
 }
 
-DataTreeFilter::BasePropertyAccessor& DataTreeFilter::Item::operator[](const std::string& key) const
+DataTreeFilter::BasePropertyAccessor DataTreeFilter::Item::GetProperty(const std::string& key) const
 {
+  mitk::BaseProperty* prop = m_Node->GetProperty(key.c_str(), m_TreeFilter->m_Renderer);
+  if ( m_TreeFilter->m_VisibleProperties.find(key) == m_TreeFilter->m_VisibleProperties.end() ) 
+  {
+    // key not marked visible
+    return BasePropertyAccessor(0, false);
+  }
+
+  // visible. determine whether property may be edited
+  bool editable = m_TreeFilter->m_EditableProperties.find(key) != m_TreeFilter->m_EditableProperties.end();
+  return BasePropertyAccessor(prop, editable); 
 }
 
 const DataTreeFilter::ItemList* DataTreeFilter::Item::GetChildren() const
 {
   return m_Children;
+}
+
+bool DataTreeFilter::Item::HasChildren() const
+{
+  return m_Children->Size() > 0;
 }
 
 int DataTreeFilter::Item::GetIndex() const
@@ -226,33 +259,40 @@ void DataTreeFilter::AddMatchingChildren(mitk::DataTreeIteratorBase* iter, ItemL
       iter->GoToChild(thisChild)
       call AddMatchingChildren(iter, list)  // list from this call
       iter->GotoParent();
+  
+  Consideration of m_HierarchyHandling adds one branch
   */
   int numChildren( iter->CountChildren() );
 
   for ( int child = 0; child < numChildren; ++child )
   {
+    iter->GoToChild(child);
     if ( m_Filter( iter->Get() ) )
     {
       unsigned int newIndex = list->Size();
       list->CreateElementAt( newIndex ) = Item::New( iter->Get(), this, newIndex, parent );
-      iter->GoToChild(child);
-      AddMatchingChildren( iter, 
-                           list->ElementAt(newIndex)->m_Children,
-                           list->ElementAt(newIndex).GetPointer() );
-      iter->GoToParent();
+      if ( m_HierarchyHandling == DataTreeFilter::PRESERVE_HIERARCHY )
+      {
+        AddMatchingChildren( iter, 
+                            list->ElementAt(newIndex)->m_Children,
+                            list->ElementAt(newIndex).GetPointer() );
+      }
+      else
+      {
+        AddMatchingChildren( iter, list, parent );
+      }
     }
     else
     {
-      iter->GoToChild(child);
       AddMatchingChildren( iter, list, parent );
-      iter->GoToParent();
     }
+    iter->GoToParent();
   }
 }
 
 void DataTreeFilter::GenerateModelFromTree()
 {
-  if (!m_Filter); // TODO install default filter (always true)
+  if (!m_Filter) SetFilter( &mitk::IsDataTreeNode );
 
   m_Items = ItemList::New(); // clear list (nice thanks to smart pointers)
   
@@ -265,13 +305,23 @@ void DataTreeFilter::GenerateModelFromTree()
     call AddMatchingChildren(iter, newItem.m_ItemList)
   else (no match on root)
     call AddMatchingChildren(iter, m_ItemList)
+
+  Consideration of m_HierarchyHandling adds one branch
   */
+  if (!treeIter->IsAtEnd()) // do nothing if the tree is empty!
   if ( m_Filter( treeIter->Get() ) )
   {
     m_Items->CreateElementAt(0) = Item::New( treeIter->Get(), this, 0, 0 ); // 0 = first item, 0 = no parent
-    AddMatchingChildren( treeIter,
-                         m_Items->ElementAt(0)->m_Children,
-                         m_Items->ElementAt(0).GetPointer());
+    if ( m_HierarchyHandling == DataTreeFilter::PRESERVE_HIERARCHY )
+    {
+      AddMatchingChildren( treeIter,
+                          m_Items->ElementAt(0)->m_Children,
+                          m_Items->ElementAt(0).GetPointer());
+    }
+    else
+    {
+      AddMatchingChildren( treeIter, m_Items, 0);
+    }
   }
   else
   {

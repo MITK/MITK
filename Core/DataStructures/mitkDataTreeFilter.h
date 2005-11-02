@@ -47,7 +47,7 @@ namespace mitk
       typedef ItemList::ConstIterator ConstItemIterator;
       
       /// An ordered group of property keys
-      typedef std::vector<std::string> PropertyList;
+      typedef std::set<std::string> PropertyList;
 
       /// How the model should treat the data tree hierarchy
       typedef enum { PRESERVE_HIERARCHY = 0, FLATTEN_HIERARCHY = 1 } HierarchyHandling;
@@ -66,21 +66,24 @@ namespace mitk
       {
         public:
           /// bool parameter: whether property is editable/writeable
-          BasePropertyAccessor(mitk::BaseProperty&, bool);
+          BasePropertyAccessor(mitk::BaseProperty*, bool);
        
           /// Query, whether this item may be changed
           bool IsEditable() const;
           
           /// cast to a const BaseProperty
-          operator const mitk::BaseProperty&();
+          operator const mitk::BaseProperty*();
           
           /// Cast to a writeable BaseProperty
-          operator mitk::BaseProperty&();
+          operator mitk::BaseProperty*();
+          
+          /// cast to a const string
+          operator const std::string();
         
         private:
-          /// Wheter users of this class may write to the property
+          /// Whether users of this class may write to the property
           bool m_Editable; 
-          mitk::BaseProperty& m_Property;
+          mitk::BaseProperty* m_Property;
       };
       
       /// One item of the filter result list or tree
@@ -102,11 +105,13 @@ namespace mitk
           static Pointer New(mitk::DataTreeNode*, DataTreeFilter*, int, const Item*);
 
           /// Access to properties via their key
-          BasePropertyAccessor& operator[](const std::string&) const;
+          BasePropertyAccessor GetProperty(const std::string&) const;
 
           /// Access possible child nodes
-          // const because I don't want views to change the underlying vector
+          // const because I don't want views to change the underlying list
           const ItemList* GetChildren() const;
+          
+          bool HasChildren() const;
 
           /// Position within the childs of its parent (first item has 0)
           int GetIndex() const;
@@ -221,7 +226,8 @@ namespace mitk
       unsigned long m_ObserverTag;
   };
   
-
+static bool IsTreeNode(mitk::DataTreeNode*);
+  
 } // namespace mitk
 
 

@@ -26,6 +26,25 @@ PURPOSE.  See the above copyright notices for more information.
 ** place of a destructor.
 *****************************************************************************/
 
+// these files have to be included at this location
+// because otherwise microsoft visual c++ generates
+// an internal compiler error
+#ifdef MBI_INTERNAL
+  #include <mitkVesselTreeFileReader.h>
+  #include <mitkVesselGraphFileReader.h>
+  #include <mitkDICOMFileReader.h>
+  #include <mitkDSRFileReader.h>
+  #include <mitkCylindricToCartesianFilter.h>
+  #include <itksys/SystemTools.hxx>
+#else
+  #include "itkImage.h"
+  #include "itkImageFileReader.h"
+  #include "itkDICOMImageIO2.h"
+  #include "itkImageSeriesReader.h"
+  #include "itkDICOMSeriesFileNames.h"
+#endif
+
+#include "QmitkCommonFunctionality.h"
 #include "QmitkSelectableGLWidget.h"
 #include "QmitkLevelWindowWidget.h"
 
@@ -65,26 +84,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkUSLookupTableSource.h>
 #include <mitkConfig.h>
 
-#ifdef MBI_INTERNAL
-#include <mitkVesselTreeFileReader.h>
-#include <mitkVesselGraphFileReader.h>
-#include <mitkDICOMFileReader.h>
-#include <mitkDSRFileReader.h>
-#include <mitkCylindricToCartesianFilter.h>
-#include <itksys/SystemTools.hxx>
-#else
-#include "itkImage.h"
-#include "itkImageFileReader.h"
-#include "itkDICOMImageIO2.h"
-#include "itkImageSeriesReader.h"
-#include "itkDICOMSeriesFileNames.h"
-#endif
-
-#include "QmitkCommonFunctionality.h"
 #include <mitkParRecFileReader.h>
 #include <mitkInteractionConst.h>
 #include <QmitkStatusBar.h>
-
 
 #include <ipPicTypeMultiplex.h>
 #include <mitkDataTreeHelper.h>

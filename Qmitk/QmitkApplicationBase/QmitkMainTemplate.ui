@@ -834,6 +834,10 @@
     </connection>
 </connections>
 <includes>
+    <include location="global" impldecl="in declaration">mitkDataTreeNodeFactory.h</include>
+    <include location="global" impldecl="in declaration">mitkDataTree.h</include>
+    <include location="global" impldecl="in declaration">mitkUndoController.h</include>
+    <include location="global" impldecl="in declaration">mitkVerboseLimitedLinearUndo.h</include>
     <include location="global" impldecl="in implementation">QmitkStdMultiWidget.h</include>
     <include location="global" impldecl="in implementation">QmitkFctMediator.h</include>
     <include location="global" impldecl="in implementation">QmitkControlsRightFctLayoutTemplate.h</include>
@@ -844,10 +848,6 @@
     <include location="global" impldecl="in implementation">ipPic/ipPic.h</include>
     <include location="global" impldecl="in implementation">qstring.h</include>
     <include location="global" impldecl="in implementation">qapplication.h</include>
-    <include location="global" impldecl="in declaration">mitkDataTree.h</include>
-    <include location="global" impldecl="in declaration">mitkUndoController.h</include>
-    <include location="global" impldecl="in declaration">mitkVerboseLimitedLinearUndo.h</include>
-    <include location="global" impldecl="in declaration">mitkDataTreeNodeFactory.h</include>
     <include location="local" impldecl="in implementation">QmitkMainTemplate.ui.h</include>
     <include location="local" impldecl="in implementation">QmitkUndoRedoButton.h</include>
 </includes>

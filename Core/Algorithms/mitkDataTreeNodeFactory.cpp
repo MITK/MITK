@@ -19,6 +19,15 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkConfig.h"
 #include "mitkDataTreeNodeFactory.h"
 
+// these files have to be included at this location, 
+// otherwise visual c++ will produce an internal 
+// compiler error :(
+#ifdef MBI_INTERNAL
+ #include "mitkVesselGraphFileReader.h"
+ #include "mitkVesselTreeFileReader.h"
+ #include "mitkVesselTreeToLookupTableFilter.h"
+#endif
+
 // C-Standard library includes
 #include <stdlib.h>
 
@@ -71,20 +80,16 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkImageChannelSelector.h"
 #include "mitkImageSliceSelector.h"
 #ifdef MBI_INTERNAL
-#include "mitkVesselGraphFileReader.h"
-#include "mitkVesselTreeFileReader.h"
-#include "mitkVesselTreeToLookupTableFilter.h"
-#ifdef HAVE_IPDICOM
-#include "mitkDICOMFileReader.h"
-#endif /* HAVE_IPDICOM */
-#include "mitkCylindricToCartesianFilter.h"
-#include "mitkDSRFileReader.h"
-
-#ifdef USE_TUS_READER
-#include "mitkBirdDataFromFileReader.h"
-#include "mitkTrackedUSDataFileParser.h"
-#endif
-#endif
+ #ifdef HAVE_IPDICOM
+  #include "mitkDICOMFileReader.h"
+ #endif // HAVE_IPDICOM 
+ #ifdef USE_TUS_READER
+  #include "mitkBirdDataFromFileReader.h"
+  #include "mitkTrackedUSDataFileParser.h"
+ #endif // USE_TUS_READER
+ #include "mitkCylindricToCartesianFilter.h"
+ #include "mitkDSRFileReader.h"
+#endif // MBI_INTERNAL
 
 mitk::DataTreeNodeFactory::DataTreeNodeFactory()
 {

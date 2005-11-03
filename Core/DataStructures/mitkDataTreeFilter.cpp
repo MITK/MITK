@@ -1,6 +1,7 @@
 #include "mitkDataTreeFilter.h"
 #include <itkCommand.h>
 #include "mitkDataTree.h"
+#include "mitkPropertyManager.h"
 
 namespace mitk
 {
@@ -76,14 +77,29 @@ DataTreeFilter::Item::Item(mitk::DataTreeNode* node, DataTreeFilter* treefilter,
 DataTreeFilter::BasePropertyAccessor DataTreeFilter::Item::GetProperty(const std::string& key) const
 {
   mitk::BaseProperty* prop = m_Node->GetProperty(key.c_str(), m_TreeFilter->m_Renderer);
-  if ( m_TreeFilter->m_VisibleProperties.find(key) == m_TreeFilter->m_VisibleProperties.end() ) 
+  if ( std::find( m_TreeFilter->m_VisibleProperties.begin(), m_TreeFilter->m_VisibleProperties.end(), key ) 
+       == m_TreeFilter->m_VisibleProperties.end() )
   {
     // key not marked visible
     return BasePropertyAccessor(0, false);
   }
 
+  if ( !prop ) // property not found in list (or "disabled")
+  {
+    mitk::BaseProperty::Pointer defaultProp = // create a default property
+      mitk::PropertyManager::GetInstance()->CreateDefaultProperty(key.c_str());
+
+    if ( defaultProp.IsNotNull() )
+    {
+      m_Node->SetProperty( key.c_str(), defaultProp );
+      prop = defaultProp;
+    }
+  }
+
   // visible. determine whether property may be edited
-  bool editable = m_TreeFilter->m_EditableProperties.find(key) != m_TreeFilter->m_EditableProperties.end();
+  bool editable = 
+    std::find(m_TreeFilter->m_EditableProperties.begin(), m_TreeFilter->m_EditableProperties.end(), key)
+    != m_TreeFilter->m_EditableProperties.end();
   return BasePropertyAccessor(prop, editable); 
 }
 
@@ -114,8 +130,21 @@ bool DataTreeFilter::Item::IsSelected() const
 
 void DataTreeFilter::Item::SetSelected(bool selected) 
 {
-  m_Selected = selected;
+  if ( selected != m_Selected )
+  {
+    m_Selected = selected;
 
+    DataTreeFilter::ItemSet::iterator iter = m_TreeFilter->m_SelectedItems.find(this);
+
+    if ( selected )
+    {
+      m_TreeFilter->m_SelectedItems.insert(this);
+    }
+    else
+    {
+      m_TreeFilter->m_SelectedItems.erase(this);
+    }
+  }
   // notify TreeFilter, whether this item is now selected
   // ! notification can happen from SelectItem(Item, bool) of DataTreeFilter
 }
@@ -235,8 +264,15 @@ const DataTreeFilter::ItemList* DataTreeFilter::GetItems() const
   return m_Items;
 }
       
+const DataTreeFilter::ItemSet* DataTreeFilter::GetSelectedItems() const
+{
+  return &m_SelectedItems;
+}
+      
 void DataTreeFilter::SelectItem(const Item* item, bool selected)
 {
+  // Ich const_caste mir die Welt, wie sie mir gefällt :-)
+  // Aber die Items gehören ja dem Filter, deshalb ist das ok
   const_cast<Item*>(item) -> SetSelected(selected);
 }
 

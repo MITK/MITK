@@ -47,11 +47,11 @@ SmartPointerVectorContainer< TElementIdentifier , TElement >
  *
  */
 template <typename TElementIdentifier, typename TElement>
-const typename SmartPointerVectorContainer< TElementIdentifier , TElement >::ConstElementPointer&
+const typename SmartPointerVectorContainer< TElementIdentifier , TElement >::ConstElementPointer
 SmartPointerVectorContainer< TElementIdentifier , TElement >
 ::ElementAt(ElementIdentifier id) const
 {
-  return this->VectorType::operator[](id);
+  return ConstElementPointer(this->VectorType::operator[](id));
 }
 
 
@@ -83,11 +83,11 @@ SmartPointerVectorContainer< TElementIdentifier , TElement >
  * It is assumed that the index exists.
  */
 template <typename TElementIdentifier, typename TElement>
-typename SmartPointerVectorContainer< TElementIdentifier , TElement >::ElementPointer
+typename SmartPointerVectorContainer< TElementIdentifier , TElement >::ConstElementPointer
 SmartPointerVectorContainer< TElementIdentifier , TElement >
 ::GetElement(ElementIdentifier id) const
 {
-  return this->VectorType::operator[](id).GetPointer();
+  return ConstElementPointer(this->VectorType::operator[](id).GetPointer());
 }
 
 
@@ -215,7 +215,7 @@ typename SmartPointerVectorContainer< TElementIdentifier , TElement >::ConstIter
 SmartPointerVectorContainer< TElementIdentifier , TElement >
 ::Begin(void) const
 {
-  return ConstIterator(0, this->VectorType::begin());
+  return ConstIterator(0, this, this->VectorType::begin());
 }
 
 
@@ -227,7 +227,7 @@ typename SmartPointerVectorContainer< TElementIdentifier , TElement >::ConstIter
 SmartPointerVectorContainer< TElementIdentifier , TElement >
 ::End(void) const
 {
-  return ConstIterator(this->VectorType::size()-1, this->VectorType::end());
+  return ConstIterator(this->VectorType::size()-1, this, this->VectorType::end());
 }
 
 
@@ -239,7 +239,7 @@ typename SmartPointerVectorContainer< TElementIdentifier , TElement >::Iterator
 SmartPointerVectorContainer< TElementIdentifier , TElement >
 ::Begin(void) 
 {
-  return Iterator(0, this->VectorType::begin());
+  return Iterator(0, this, this->VectorType::begin());
 }
 
 
@@ -251,7 +251,7 @@ typename SmartPointerVectorContainer< TElementIdentifier , TElement >::Iterator
 SmartPointerVectorContainer< TElementIdentifier , TElement >
 ::End(void) 
 {
-  return Iterator(this->VectorType::size()-1, this->VectorType::end());
+  return Iterator(this->VectorType::size()-1, this, this->VectorType::end());
 }
 
 

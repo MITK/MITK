@@ -36,18 +36,20 @@ namespace mitk
       /// Defines a function for filtering tree nodes.
       typedef bool(*FilterFunctionPointer)(mitk::DataTreeNode*);
       
-      /// An ordered group of Items // TODO implement itk::SmartPointerVectorContainer. Handles SmartPointer<Item>
-      // internally
+      /// An ordered group of Items 
       typedef itk::SmartPointerVectorContainer<unsigned int, Item> ItemList; 
+     
+      /// A set of Items
+      typedef std::set<Item*> ItemSet; 
 
-      /// Iterator over (?) Items
+      /// Iterator over Items
       typedef ItemList::Iterator      ItemIterator;
       
-      /// Iterator over (?) const Items
+      /// Iterator over const Items
       typedef ItemList::ConstIterator ConstItemIterator;
       
-      /// An ordered group of property keys
-      typedef std::set<std::string> PropertyList;
+      /// An ordered group of property keys (ordered by user)
+      typedef std::vector<std::string> PropertyList;
 
       /// How the model should treat the data tree hierarchy
       typedef enum { PRESERVE_HIERARCHY = 0, FLATTEN_HIERARCHY = 1 } HierarchyHandling;
@@ -178,12 +180,15 @@ namespace mitk
       void SetSelectionMode(const SelectionMode);
       SelectionMode GetSelectionMode() const;
 
-      /// Set whether the tree hierarchy will be conserved
+      /// Set whether the tree hierarchy will be preserved
       void SetHierarchyHandling(const HierarchyHandling);
       HierarchyHandling GetHierarchyHandling() const;
         
       /// Access the top level items that passed the filter
       const ItemList* GetItems() const;
+      
+      /// Access the top level items that were selected
+      const ItemSet* GetSelectedItems() const;
 
       /// Views can call this to select items
       void SelectItem(const Item*, bool selected = true);
@@ -207,14 +212,19 @@ namespace mitk
       /// All items that passed the filter
       ItemList::Pointer m_Items;
 
+      /// All items that were selected
+      ItemSet m_SelectedItems;
+
       /// Pointer to a filter function
       FilterFunctionPointer m_Filter;
 
       /// The data tree filtered by this class
       mitk::DataTree* m_DataTree;
 
+      /// should we preserve the hierachy of the tree?
       HierarchyHandling m_HierarchyHandling;
 
+      /// modes: single select, multi select, extended select
       SelectionMode m_SelectionMode;
 
       PropertyList m_PropertyLabels;

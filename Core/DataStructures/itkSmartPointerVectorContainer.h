@@ -130,10 +130,10 @@ public:
   {
   public:
     Iterator() {}
-    Iterator(size_type d, const VectorIterator& i): m_Pos(d), m_Iter(i) {}
+    Iterator(size_type d, const VectorType* vec, const VectorIterator& i): m_Pos(d), m_Vector(vec), m_Iter(i) {}
     
     ElementPointer& operator* ()    { return *m_Iter; }
-    Element*        operator-> ()   { return m_Iter->GetPointer(); }
+    Element*        operator-> ()   { return m_Iter == m_Vector->end() ? NULL : m_Iter->GetPointer(); }
     ElementPointer& operator++ ()   { ++m_Pos; ++m_Iter; return *m_Iter; }
     ElementPointer  operator++ (int) { Iterator temp(*this); ++m_Pos; ++m_Iter; return *temp; }
     ElementPointer& operator-- ()   { --m_Pos; --m_Iter; return *this; }
@@ -152,6 +152,7 @@ public:
     
   private:
     size_type m_Pos;
+    const VectorType* m_Vector;
     VectorIterator m_Iter;
     friend class ConstIterator;
   };
@@ -160,14 +161,14 @@ public:
   {
   public:
     ConstIterator() {}
-    ConstIterator(size_type d, const VectorConstIterator& i): m_Pos(d), m_Iter(i) {}
-    ConstIterator(const Iterator& r) { m_Pos = r.m_Pos; m_Iter = r.m_Iter; }
+    ConstIterator(size_type d, const VectorType* vec, const VectorConstIterator& i): m_Pos(d), m_Vector(vec), m_Iter(i) {}
+    ConstIterator(const Iterator& r): m_Pos(r.m_Pos), m_Vector(r.m_Vector), m_Iter(r.m_Iter) {}
     
-    ConstElementPointer operator* ()    { return ConstElementPointer(m_Iter->GetPointer()); }  // assignment to const pointer is without meaning
-    ConstElement*       operator-> ()   { return m_Iter->GetPointer(); }
-    ConstElementPointer operator++ ()   { ++m_Pos; ++m_Iter; return ConstElementPointer(m_Iter->GetPointer()); }
-    ConstElementPointer operator++ (int) { ConstIterator temp(*this); ++m_Pos; ++m_Iter; *temp; }
-    ConstElementPointer operator-- ()   { --m_Pos; --m_Iter; return ConstElementPointer(m_Iter->GetPointer()); }
+    ConstElementPointer operator* ()    { return ConstElementPointer(m_Iter == m_Vector->end() ? NULL : m_Iter->GetPointer()); } 
+    ConstElement*       operator-> ()   { return m_Iter == m_Vector->end() ? NULL : m_Iter->GetPointer(); }
+    ConstElementPointer operator++ ()   { ++m_Pos; ++m_Iter; return ConstElementPointer(m_Iter == m_Vector->end() ? NULL : m_Iter->GetPointer()); }
+    ConstElementPointer operator++ (int) { ConstIterator temp(*this); ++m_Pos; ++m_Iter; return *temp; }
+    ConstElementPointer operator-- ()   { --m_Pos; --m_Iter; return ConstElementPointer(m_Iter == m_Vector->end() ? NULL : m_Iter->GetPointer()); }
     ConstElementPointer operator-- (int) { ConstIterator temp(*this); --m_Pos; --m_Iter; return *temp; }
 
     ConstIterator& operator = (const Iterator& r) { m_Pos = r.m_Pos; m_Iter = r.m_Iter; return *this; }
@@ -185,15 +186,16 @@ public:
     
   private:
     size_type m_Pos;
+    const VectorType* m_Vector;
     VectorConstIterator m_Iter;
     friend class Iterator;
   };  
   
   /** Declare the public interface routines. */
   ElementPointer& ElementAt(ElementIdentifier);
-  ConstElementPointer& ElementAt(ElementIdentifier) const;
+  ConstElementPointer ElementAt(ElementIdentifier) const; // no need to return reference, because assignment not allowed!
   ElementPointer& CreateElementAt(ElementIdentifier);
-  ElementPointer GetElement(ElementIdentifier) const;
+  ConstElementPointer GetElement(ElementIdentifier) const;
   void SetElement(ElementIdentifier, Element*);
   void InsertElement(ElementIdentifier, Element*);
   bool IndexExists(ElementIdentifier) const;

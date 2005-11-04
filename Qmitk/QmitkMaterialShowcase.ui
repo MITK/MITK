@@ -75,7 +75,7 @@
     <variable>mitk::Surface::Pointer m_Surface;</variable>
     <variable>mitk::DataTree::Pointer m_DataTree;</variable>
     <variable>mitk::DataTreeNode::Pointer m_DataTreeNode;</variable>
-    <variable>mitk::MaterialProperty* m_MaterialProperty;</variable>
+    <variable>mitk::MaterialProperty::Pointer m_MaterialProperty;</variable>
     <variable>unsigned int m_ShowcaseNumber;</variable>
 </variables>
 <signals>

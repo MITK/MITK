@@ -26,6 +26,7 @@ PURPOSE.  See the above copyright notices for more information.
  #include "mitkVesselGraphFileReader.h"
  #include "mitkVesselTreeFileReader.h"
  #include "mitkVesselTreeToLookupTableFilter.h"
+ #include "mitkVesselTreeLookupTableProperty.h"
 #endif
 
 // C-Standard library includes
@@ -68,7 +69,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkPicVolumeTimeSeriesReader.h"
 #include "mitkStringProperty.h"
 #include "mitkProperties.h"
-#include "mitkSmartPointerProperty.h"
+#include "mitkMaterialProperty.h"
 #include "mitkLevelWindowProperty.h"
 #include "mitkVtkRepresentationProperty.h"
 #include "mitkVtkInterpolationProperty.h"
@@ -480,7 +481,7 @@ void mitk::DataTreeNodeFactory::ReadFileTypeVES()
   lutGenerator->SetInput( reader->GetOutput() );
   lutGenerator->Update();
   
-  mitk::SmartPointerProperty::Pointer lutProp = new mitk::SmartPointerProperty( lutGenerator->GetOutput() );
+  mitk::VesselTreeLookupTableProperty::Pointer lutProp = new mitk::VesselTreeLookupTableProperty( dynamic_cast<mitk::VesselTreeLookupTable*>( lutGenerator->GetOutput() ) );
   node->SetProperty( "VesselTreeLookupTable", lutProp );
   
   // set filename without path as string property
@@ -1469,9 +1470,6 @@ void mitk::DataTreeNodeFactory::SetDefaultImageProperties(mitk::DataTreeNode::Po
 void mitk::DataTreeNodeFactory::SetDefaultSurfaceProperties(mitk::DataTreeNode::Pointer &node)
 {
     node->SetProperty( "lineWidth", new mitk::IntProperty(2) );
-    node->SetProperty( "color", new mitk::ColorProperty(1.0f, 1.0f, 1.0f));
-    node->SetProperty( "opacity", new mitk::FloatProperty(1.0f));
     node->SetProperty( "layer", new mitk::IntProperty(0));
-    node->SetProperty( "representation", new mitk::VtkRepresentationProperty());
-    node->SetProperty( "interpolation", new mitk::VtkInterpolationProperty());
+    node->SetProperty( "material", new mitk::MaterialProperty( 1.0, 1.0, 1.0, 1.0, node.GetPointer() ) );
 }

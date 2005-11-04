@@ -22,6 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qwidget.h>
 #include <qobject.h>
 #include <string>
+#include "mitkConfig.h"
 #include "enabled.xpm"
 #include "disabled.xpm"
 
@@ -56,6 +57,10 @@ public slots:
   void FloatControlActivated(const QString &text);
   void IntControlActivated(const QString &text);
   void ComboBoxItemActivated(const QString &item);
+  void MaterialEditorActivated();
+  #ifdef MBI_INTERNAL
+  void VesselMaterialEditorActivated(); 
+  #endif
   
 protected:
   QmitkPropertyListViewItem() {}

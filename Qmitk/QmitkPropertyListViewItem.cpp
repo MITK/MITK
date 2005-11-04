@@ -15,18 +15,28 @@ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
  
 =========================================================================*/
+// Qmitk related includes
 #include "QmitkPropertyListViewItem.h"
+#include "QmitkMaterialEditor.h"
+
+// mitk related includes
+#include "mitkRenderWindow.h"
 #include "mitkPropertyList.h"
 #include "mitkProperties.h"
 #include "mitkColorProperty.h"
 #include "mitkPropertyManager.h"
 #include "mitkRenderingManager.h"
 #include "mitkEnumerationProperty.h"
+#include "mitkMaterialProperty.h"
+#ifdef MBI_INTERNAL
+#include "mitkVesselTreeLookupTableProperty.h"
+#endif
 
+
+// QT related includes
 #include <qcheckbox.h>
 #include <qlineedit.h>
 #include <qlabel.h>
-#include "mitkRenderWindow.h"
 #include <qpushbutton.h>
 #include <qpixmap.h>
 #include <qcolordialog.h>
@@ -46,6 +56,7 @@ QmitkPropertyListViewItem::QmitkPropertyListViewItem(std::string name, mitk::Pro
   }
 };
 
+
 void QmitkPropertyListViewItem::CreateEnabledButton(QWidget* parent)
 {
   m_EnabledButton = new QPushButton(parent);
@@ -58,6 +69,8 @@ void QmitkPropertyListViewItem::CreateEnabledButton(QWidget* parent)
   m_EnabledButton->show();
   UpdateEnabledView();
 }
+
+
 QmitkPropertyListViewItem* QmitkPropertyListViewItem::CreateInstance(mitk::PropertyList *propList, const std::string name, QWidget* parent, bool createOnlyControl)
 {
   QmitkPropertyListViewItem* newItem = NULL;
@@ -169,6 +182,23 @@ QmitkPropertyListViewItem* QmitkPropertyListViewItem::CreateInstance(mitk::Prope
     }
     connect((QObject*)(newItem->m_Control),SIGNAL(textChanged(const QString &)),(QObject*)(newItem),SLOT(IntControlActivated(const QString &)));
   }
+  else if (mitk::MaterialProperty* materialProp = dynamic_cast<mitk::MaterialProperty*>(baseProp))
+  {
+    newItem = new QmitkPropertyListViewItem(name,propList,parent,createOnlyControl);
+    newItem->m_Control = new QPushButton("Edit",parent);
+    connect((QObject*)(newItem->m_Control),SIGNAL(clicked()),(QObject*)(newItem),SLOT(MaterialEditorActivated()));
+  }
+  #ifdef MBI_INTERNAL
+  else if ( mitk::VesselTreeLookupTableProperty* lutProperty = dynamic_cast<mitk::VesselTreeLookupTableProperty*>( baseProp ) )
+  {
+    if ( mitk::VesselTreeLookupTable* vesselTreeLut = dynamic_cast<mitk::VesselTreeLookupTable*>( lutProperty->GetValue().GetPointer() ) )
+    {
+      newItem = new QmitkPropertyListViewItem(name,propList,parent,createOnlyControl);
+      newItem->m_Control = new QPushButton("Edit",parent);
+      connect((QObject*)(newItem->m_Control),SIGNAL(clicked()),(QObject*)(newItem),SLOT(VesselMaterialEditorActivated()));
+    }
+  }
+  #endif
   else
   {
     newItem = new QmitkPropertyListViewItem(name,propList,parent,createOnlyControl);
@@ -184,17 +214,22 @@ QmitkPropertyListViewItem* QmitkPropertyListViewItem::CreateInstance(mitk::Prope
   newItem->m_Control->show();
   return newItem;
 }
+
+
 void QmitkPropertyListViewItem::CheckBoxControlActivated(bool on)
 {
   m_PropertyList->SetProperty(m_Name.c_str(), new mitk::BoolProperty(on));
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
+
 void QmitkPropertyListViewItem::StringControlActivated(const QString &text)
 {
   m_PropertyList->SetProperty(m_Name.c_str(), new mitk::StringProperty(text.ascii()));
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
+
+
 void QmitkPropertyListViewItem::FloatControlActivated(const QString &text)
 {
   if (((QLineEdit*)m_Control)->hasAcceptableInput())
@@ -213,6 +248,8 @@ void QmitkPropertyListViewItem::FloatControlActivated(const QString &text)
   }
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
+
+
 void QmitkPropertyListViewItem::IntControlActivated(const QString &text)
 {
   if (((QLineEdit*)m_Control)->hasAcceptableInput())
@@ -231,6 +268,8 @@ void QmitkPropertyListViewItem::IntControlActivated(const QString &text)
   }
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
+
+
 void QmitkPropertyListViewItem::ColorControlActivated()
 {
   mitk::ColorProperty* colorProp = dynamic_cast<mitk::ColorProperty*>(m_PropertyList->GetProperty(m_Name.c_str()).GetPointer());
@@ -247,6 +286,8 @@ void QmitkPropertyListViewItem::ColorControlActivated()
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
 }
+
+
 void QmitkPropertyListViewItem::UpdateView()
 {
   m_Control->blockSignals(true);
@@ -297,6 +338,8 @@ void QmitkPropertyListViewItem::UpdateView()
   }
   m_Control->blockSignals(false);
 }
+
+
 void QmitkPropertyListViewItem::UpdateEnabledView()
 {
   static const QPixmap enabledPix((const char **)enabled_xpm);
@@ -315,6 +358,8 @@ void QmitkPropertyListViewItem::UpdateEnabledView()
     if (m_Label) {m_Label->setEnabled(false);}
   }
 }
+
+
 void QmitkPropertyListViewItem::EnabledButtonClicked()
 {
   mitk::BaseProperty* baseProp = m_PropertyList->GetProperty(m_Name.c_str());
@@ -343,12 +388,15 @@ void QmitkPropertyListViewItem::ComboBoxItemActivated(const QString &item)
   }
 }
 
+
 void  QmitkPropertyListViewFloatSlider::SliderValueChanged(int value)
 {
   m_PropertyList->SetProperty(m_Name.c_str(), new mitk::FloatProperty(value / 100.0f));
   UpdateView();
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
+
+
 void QmitkPropertyListViewFloatSlider::UpdateView()
 {
   m_Slider->blockSignals(true);
@@ -363,3 +411,37 @@ void QmitkPropertyListViewFloatSlider::UpdateView()
   m_Slider->blockSignals(false);
 }
 
+
+void QmitkPropertyListViewItem::MaterialEditorActivated()
+{
+  mitk::MaterialProperty* materialProperty = dynamic_cast<mitk::MaterialProperty*>(m_PropertyList->GetProperty(m_Name.c_str()).GetPointer());
+  QmitkMaterialEditor* materialEditor = new QmitkMaterialEditor( NULL );
+  materialEditor->Initialize( materialProperty );
+  if ( materialEditor->exec() == QDialog::Accepted )
+  {
+    m_PropertyList->InvokeEvent(itk::ModifiedEvent());
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  }
+  delete materialEditor;
+}
+
+#ifdef MBI_INTERNAL
+
+void QmitkPropertyListViewItem::VesselMaterialEditorActivated()
+{
+  mitk::VesselTreeLookupTableProperty* lutProperty = dynamic_cast<mitk::VesselTreeLookupTableProperty*>(m_PropertyList->GetProperty(m_Name.c_str()).GetPointer());
+  if ( mitk::VesselTreeLookupTable* vesselTreeLut = lutProperty->GetValue().GetPointer() )
+  {
+    QmitkMaterialEditor* materialEditor = new QmitkMaterialEditor( NULL );
+    materialEditor->Initialize( vesselTreeLut->GetColorsAsMaterialProperties() );
+    if ( materialEditor->exec() == QDialog::Accepted)
+    {
+      vesselTreeLut->SetColorsFromMaterialProperties( materialEditor->GetMaterialProperties() );
+      m_PropertyList->InvokeEvent(itk::ModifiedEvent());
+      mitk::RenderingManager::GetInstance()->RequestUpdateAll();            
+    }
+    delete materialEditor;
+  }
+}
+
+#endif

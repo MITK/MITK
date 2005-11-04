@@ -43,13 +43,10 @@ void QmitkMaterialShowcase::init()
 
 void QmitkMaterialShowcase::destroy()
 {
-    if (m_MaterialProperty != NULL)
-        delete m_MaterialProperty;
 }
+
 void QmitkMaterialShowcase::SetMaterialProperty( mitk::MaterialProperty* property )
 {
-    if (m_MaterialProperty != NULL)
-        delete m_MaterialProperty;
     m_MaterialProperty = new mitk::MaterialProperty( *property );
     m_DataTreeNode->SetProperty( "material", m_MaterialProperty );
     this->UpdateRenderWindow();

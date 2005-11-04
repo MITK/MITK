@@ -1,14 +1,16 @@
 #include <mitkDataTree.h> 
-#include <itkObject.h>
 #include <itkSmartPointerVectorContainer.h>
+#include <itkEventObject.h>
+#include "itkMacro.h"
+
+
 /*
 
    TODO / Ideen:
 
-   - die View-Klassen bekommen Nachrichten ala "ItemChanged( item& )" - für ein einzelnes
-     Item mit allen Properties,  "ItemChanged( item&, string key )" - für einzelne
-     Properties eines Items, evtl auch "ModelChanged()" - wenn die View den kompletten
-     Baum neu rendern soll.
+   - Die views bekommen vom Filter nur Infos über hinzufügen/löschen von items.
+
+   - für änderungen der properties müssen sich die views selbst bei denen anmelden
 
      Über die member GetIndex() und IsRoot() GetParent() kann die View feststellen, welches
      ViewItem (Qt) gemeint ist (oder die View hält sich da irgendeine Tabelle für die
@@ -20,9 +22,10 @@
 
 */
 
-
 namespace mitk
 {
+
+//------ DataTreeFilter ------------------------------------------------------------------
 
   /// Inherits itk::Object for Subject/Observer functionality
   class DataTreeFilter : public itk::Object
@@ -30,14 +33,22 @@ namespace mitk
     public:
 
       class Item; // forward declare
+
+      typedef mitk::DataTreeFilter Self;
      
-      typedef itk::SmartPointer<DataTreeFilter> Pointer;
+      typedef itk::SmartPointer<Self> Pointer;
       
       /// Defines a function for filtering tree nodes.
       typedef bool(*FilterFunctionPointer)(mitk::DataTreeNode*);
+     
+      /// smart pointer to an item
+      typedef itk::SmartPointer<Item> ItemPointer;
       
       /// An ordered group of Items 
       typedef itk::SmartPointerVectorContainer<unsigned int, Item> ItemList; 
+     
+      /// map tree nodes to their corresponding items
+      typedef std::map<mitk::DataTreeNode*, Item*> TreeNodeItemMap; 
      
       /// A set of Items
       typedef std::set<Item*> ItemSet; 
@@ -132,6 +143,7 @@ namespace mitk
         
           /// Intentionally hidden
           Item(); 
+          ~Item(); 
           Item(mitk::DataTreeNode*, DataTreeFilter*, int, const Item*);
           
           /// Position within the childs of its parent (first item has 0)
@@ -193,8 +205,10 @@ namespace mitk
       /// Views can call this to select items
       void SelectItem(const Item*, bool selected = true);
       
-      // build the model from the data tree
-      void TreeChanged(const itk::EventObject &);
+      /// change notifications from the data tree
+      void TreeChange(const itk::EventObject &);
+      void TreeAdd(const itk::EventObject &);
+      void TreeRemove(const itk::EventObject &);
       
     protected:
    
@@ -204,13 +218,16 @@ namespace mitk
     
     private:
 
-      void AddMatchingChildren(mitk::DataTreeIteratorBase*, ItemList*, Item*);
+      void AddMatchingChildren(mitk::DataTreeIteratorBase*, ItemList*, Item*, bool = true);
       
       // build the model from the data tree
       void GenerateModelFromTree();
 
       /// All items that passed the filter
       ItemList::Pointer m_Items;
+      
+      /// map tree nodes to their corresponding items
+      TreeNodeItemMap m_Item;
 
       /// All items that were selected
       ItemSet m_SelectedItems;
@@ -233,11 +250,104 @@ namespace mitk
 
       const mitk::BaseRenderer* m_Renderer;
 
-      unsigned long m_ObserverTag;
+      unsigned long  m_TreeChangeConnection;
+      unsigned long  m_TreeAddConnection;
+      unsigned long  m_TreeRemoveConnection;
+      
+      // remember the most recently selected item
+      ItemPointer m_LastSelectedItem;
   };
   
-static bool IsTreeNode(mitk::DataTreeNode*);
+  static bool IsTreeNode(mitk::DataTreeNode*);
+
+//------ TreeFilterUpdateAllEvent --------------------------------------------------------
+
+itkEventMacro( TreeFilterUpdateAllEvent, itk::ModifiedEvent );
+
+//------ TreeFilterItemEvent -------------------------------------------------------------
+  class TreeFilterItemEvent : public itk::ModifiedEvent
+  { 
+  public: 
+    typedef TreeFilterItemEvent Self; 
+    typedef ModifiedEvent Superclass; 
+
+    TreeFilterItemEvent() 
+      : m_ChangedItem( NULL ){}
+
+    TreeFilterItemEvent( const mitk::DataTreeFilter::Item* item ) : 
+      m_ChangedItem(item) {} 
+
+    virtual ~TreeFilterItemEvent() {} 
+
+    virtual const char * GetEventName() const 
+    { 
+      return "TreeFilterItemEvent"; 
+    } 
+
+    virtual bool CheckEvent(const ::itk::EventObject* e) const 
+    { 
+      return dynamic_cast<const Self*>(e); 
+    } 
+
+    virtual ::itk::EventObject* MakeObject() const 
+    { 
+      return new Self( m_ChangedItem ); 
+    } 
+
+    const mitk::DataTreeFilter::Item* GetChangedItem() const 
+    { 
+      return m_ChangedItem; 
+    }
+
+  protected:
+    const mitk::DataTreeFilter::Item* m_ChangedItem;
   
+  private: 
+    // TreeFilterItemEvent(const Self&); 
+    void operator=(const Self&); 
+
+  };
+
+
+//------ TreeFilterItemAddedEvent --------------------------------------------------------
+  class TreeFilterItemAddedEvent : public TreeFilterItemEvent 
+  {
+  public:
+    typedef TreeFilterItemAddedEvent Self; 
+    typedef ModifiedEvent Superclass; 
+
+    TreeFilterItemAddedEvent() : TreeFilterItemEvent() {}
+    TreeFilterItemAddedEvent(const mitk::DataTreeFilter::Item* item) : TreeFilterItemEvent(item) {}
+    
+    virtual ~TreeFilterItemAddedEvent() {} 
+    
+    virtual const char * GetEventName() const 
+    { 
+      return "TreeFilterItemAddedEvent"; 
+    } 
+    
+  };
+  
+  
+//------ TreeFilterRemoveItemEvent -------------------------------------------------------
+  class TreeFilterRemoveItemEvent : public TreeFilterItemEvent 
+  {
+  public:
+    typedef TreeFilterRemoveItemEvent Self; 
+    typedef ModifiedEvent Superclass; 
+
+    TreeFilterRemoveItemEvent() : TreeFilterItemEvent() {}
+    TreeFilterRemoveItemEvent(const mitk::DataTreeFilter::Item* item) : TreeFilterItemEvent(item) {}
+    
+    virtual ~TreeFilterRemoveItemEvent() {} 
+    
+    virtual const char * GetEventName() const 
+    { 
+      return "TreeFilterRemoveItemEvent"; 
+    } 
+    
+  };
+
 } // namespace mitk
 
 

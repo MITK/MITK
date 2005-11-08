@@ -108,11 +108,11 @@ vtkImageData* mitk::Image::GetVtkImageData(int t, int n)
     return NULL;
 
 #if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
-  float *fspacing = const_cast<float *>(GetUpdatedSlicedGeometry(t)->GetFloatSpacing());
+  float *fspacing = const_cast<float *>(GetSlicedGeometry(t)->GetFloatSpacing());
   double dspacing[3] = {fspacing[0],fspacing[1],fspacing[2]};
   volume->GetVtkImageData()->SetSpacing( dspacing );
 #else
-  volume->GetVtkImageData()->SetSpacing(const_cast<float*>(GetUpdatedSlicedGeometry(t)->GetFloatSpacing()));
+  volume->GetVtkImageData()->SetSpacing(const_cast<float*>(GetSlicedGeometry(t)->GetFloatSpacing()));
 #endif
   return volume->GetVtkImageData();
 }

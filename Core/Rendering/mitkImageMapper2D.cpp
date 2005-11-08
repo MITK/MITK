@@ -247,6 +247,8 @@ void mitk::ImageMapper2D::GenerateData(mitk::BaseRenderer *renderer)
   Vector3D right, bottom, normal;
   Vector3D rightInIndex, bottomInIndex;
 
+  assert(input->GetTimeSlicedGeometry()==inputtimegeometry);
+
   //take transform of input image into account
   Geometry3D* inputGeometry = inputtimegeometry->GetGeometry3D(timestep);
 

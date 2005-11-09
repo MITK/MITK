@@ -185,10 +185,13 @@ protected:
   virtual void ReadFileTypeDVG();
 
   virtual void ReadFileTypeHPSONOS();
+
+  virtual void ReadFileTypeSSM();
+
 #ifdef USE_TUS_READER
   virtual void ReadFileTypeTUS();
 #endif
-  #endif
+  #endif /* MBI_INTERNAL */
 
   virtual void ReadFileSeriesTypePIC();
 

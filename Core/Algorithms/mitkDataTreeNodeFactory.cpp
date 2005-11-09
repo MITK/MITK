@@ -90,6 +90,7 @@ PURPOSE.  See the above copyright notices for more information.
  #endif // USE_TUS_READER
  #include "mitkCylindricToCartesianFilter.h"
  #include "mitkDSRFileReader.h"
+ #include "mitkShapeModelFileReader.h"
 #endif // MBI_INTERNAL
 
 mitk::DataTreeNodeFactory::DataTreeNodeFactory()
@@ -167,6 +168,10 @@ void mitk::DataTreeNodeFactory::GenerateData()
       std::cout << "jetzt lese ich sono"<<endl;
       this->ReadFileTypeHPSONOS();
     }
+    else if (this->FileNameEndsWith(".ssm"))
+    {
+      this->ReadFileTypeSSM();
+    }
 #ifdef USE_TUS_READER
     else if ( this->FileNameEndsWith( ".TUS" ) || this->FileNameEndsWith( ".tus" ) )
     {
@@ -174,7 +179,7 @@ void mitk::DataTreeNodeFactory::GenerateData()
       this->ReadFileTypeTUS();
     }
 #endif
-#endif
+#endif /* MBI_INTERNAL */
     //else if (this->FileNameEndsWith("."))
     //{
     //    //put your new filetype in here!
@@ -765,6 +770,25 @@ void mitk::DataTreeNodeFactory::ReadFileTypeTUS()
     }
 }
 #endif
+
+
+void mitk::DataTreeNodeFactory::ReadFileTypeSSM()
+{
+  std::cout << "Loading " << m_FileName << " as ssm... " << std::endl;
+
+  mitk::ShapeModelFileReader::Pointer reader = mitk::ShapeModelFileReader::New();
+  reader->SetFileName( m_FileName.c_str() );
+  reader->Update();
+  mitk::DataTreeNode::Pointer node = this->GetOutput();
+  node->SetData( reader->GetOutput() );
+
+  // set filename without path as string property
+  mitk::StringProperty::Pointer nameProp = new mitk::StringProperty( this->GetBaseFileName() );
+  node->SetProperty( "name", nameProp );
+
+  std::cout << "...finished!" << std::endl;
+}
+
 
 #ifdef HAVE_IPDICOM
 

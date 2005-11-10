@@ -935,12 +935,12 @@
         <action ID="45" /> <!--AcINITFOREGROUND-->
         <action ID="11" /> <!--AcADD-->
       </transition>
-      <transition NAME="drawBackgroundSeed" NEXT_STATE_ID="2" EVENT_ID="600">
+      <transition NAME="drawBackgroundSeed" NEXT_STATE_ID="2" EVENT_ID="2000">
         <action ID="1101" /> <!--AcMODE_SELECT-->
         <action ID="46" /> <!--AcINITBACKGROUND-->
         <action ID="11" /> <!--AcADD-->
       </transition>  
-      <transition NAME="drawNeutralSeed" NEXT_STATE_ID="3" EVENT_ID="540">
+      <transition NAME="drawNeutralSeed" NEXT_STATE_ID="3" EVENT_ID="2003">
         <action ID="1101" /> <!--AcMODE_SELECT-->
         <action ID="47" /> <!--AcINITNEUTRAL-->
         <action ID="11" /> <!--AcADD-->
@@ -956,19 +956,19 @@
       </transition>
     </state>
     <state NAME="drawBackground" ID="2">
-      <transition NAME="drawBackgroundSeeds" NEXT_STATE_ID="2" EVENT_ID="610">
+      <transition NAME="drawBackgroundSeeds" NEXT_STATE_ID="2" EVENT_ID="2001">
         <action ID="92" /> <!--AcMOVE-->
       </transition>
-      <transition NAME="drawSeeds" NEXT_STATE_ID="0" EVENT_ID="620">
+      <transition NAME="drawSeeds" NEXT_STATE_ID="0" EVENT_ID="2002">
         <action ID="44" /> <!--AcFINISH-->
         <action ID="1100" /> <!--AcMODE_DESELECT-->
       </transition>
     </state>
     <state NAME="drawNeutral" ID="3">
-      <transition NAME="drawNeutralSeeds" NEXT_STATE_ID="3" EVENT_ID="542">
+      <transition NAME="drawNeutralSeeds" NEXT_STATE_ID="3" EVENT_ID="2004">
         <action ID="92" /> <!--AcMOVE-->
       </transition>
-      <transition NAME="drawSeeds" NEXT_STATE_ID="0" EVENT_ID="543">
+      <transition NAME="drawSeeds" NEXT_STATE_ID="0" EVENT_ID="2005">
         <action ID="44" /> <!--AcFINISH-->
         <action ID="1100" /> <!--AcMODE_DESELECT-->
       </transition>
@@ -1864,6 +1864,16 @@
     <event NAME="ALT+leftMouseRelease" ID="620" TYPE="Type_MouseButtonRelease" BUTTON="BS_LeftButton" BUTTONSTATE="0x0401" KEY="Key_none" />
     <!-- SHIFT + rightMouseButtonPress -->
     <event NAME="Shift+rightMousePress" ID="2000" TYPE="Type_MouseButtonPress" BUTTON="BS_RightButton" BUTTONSTATE="0x0100" KEY="Key_none" />
+    <!-- SHIFT + rightMouseButtonMove -->
+    <event NAME="Shift+rightMouseMove" ID="2001" TYPE="Type_MouseMove" BUTTON="BS_NoButton" BUTTONSTATE="0x0102" KEY="Key_none" />
+    <!-- SHIFT + rightMouseButtonRelease -->
+    <event NAME="Shift+rightMouseRelease" ID="2002" TYPE="Type_MouseButtonRelease" BUTTON="BS_RightButton" BUTTONSTATE="0x0102" KEY="Key_none" />
+    <!-- SHIFT + middleMouseButtonPress -->
+    <event NAME="Shift+middleMousePress" ID="2003" TYPE="Type_MouseButtonPress" BUTTON="BS_MidButton" BUTTONSTATE="0x0100" KEY="Key_none" />
+    <!-- SHIFT + middleMouseButtonMove -->
+    <event NAME="Shift+middleMouseMove" ID="2004" TYPE="Type_MouseMove" BUTTON="BS_NoButton" BUTTONSTATE="0x0104" KEY="Key_none" />
+    <!-- SHIFT + middleMouseButtonRelease -->
+    <event NAME="Shift+middleMouseRelease" ID="2005" TYPE="Type_MouseButtonRelease" BUTTON="BS_MidButton" BUTTONSTATE="0x0104" KEY="Key_none" />
     <!-- -->
     <!-- -->
     <!-- own thrown events -->

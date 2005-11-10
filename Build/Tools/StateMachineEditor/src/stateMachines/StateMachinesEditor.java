@@ -3,6 +3,8 @@
  */
 package stateMachines;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.EventObject;
 import java.util.List;
 
@@ -17,27 +19,40 @@ import org.eclipse.gef.GraphicalViewer;
 import org.eclipse.gef.dnd.TemplateTransferDragSourceListener;
 import org.eclipse.gef.dnd.TemplateTransferDropTargetListener;
 import org.eclipse.gef.editparts.ScalableFreeformRootEditPart;
+import org.eclipse.gef.editparts.ZoomManager;
 import org.eclipse.gef.palette.PaletteRoot;
 import org.eclipse.gef.requests.CreationFactory;
 import org.eclipse.gef.requests.SimpleFactory;
 import org.eclipse.gef.ui.actions.ActionRegistry;
+import org.eclipse.gef.ui.actions.ZoomInAction;
+import org.eclipse.gef.ui.actions.ZoomOutAction;
 import org.eclipse.gef.ui.palette.PaletteViewer;
 import org.eclipse.gef.ui.palette.PaletteViewerProvider;
 import org.eclipse.gef.ui.palette.FlyoutPaletteComposite.FlyoutPreferences;
 import org.eclipse.gef.ui.parts.ContentOutlinePage;
 import org.eclipse.gef.ui.parts.GraphicalEditorWithFlyoutPalette;
 import org.eclipse.gef.ui.parts.GraphicalViewerKeyHandler;
+import org.eclipse.gef.ui.parts.ScrollingGraphicalViewer;
 import org.eclipse.gef.ui.parts.TreeViewer;
+import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.util.TransferDropTargetListener;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.FileDialog;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IFileEditorInput;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.ActionFactory;
 import org.eclipse.ui.part.IPageSite;
 import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
+
+import actions.AddAction;
+import actions.ChangeAction;
+import actions.RemoveAction;
 
 import parts.StateMachinesEditPartFactory;
 import parts.StateMachinesTreeEditPartFactory;
@@ -48,7 +63,9 @@ import dom.ReadDOMTree;
  * @author Daniel
  */
 public class StateMachinesEditor extends GraphicalEditorWithFlyoutPalette {
-
+	
+	private boolean saved = false;
+	
 	/** This is the root of the editor's model. */
 	private StateMachinesDiagram diagram;
 
@@ -72,13 +89,40 @@ public class StateMachinesEditor extends GraphicalEditorWithFlyoutPalette {
 	 * 
 	 * @see org.eclipse.gef.ui.parts.GraphicalEditor#configureGraphicalViewer()
 	 */
-	
 	protected void configureGraphicalViewer() {
 		super.configureGraphicalViewer();
-		GraphicalViewer viewer = getGraphicalViewer();
+		ScrollingGraphicalViewer viewer = (ScrollingGraphicalViewer)getGraphicalViewer();
+
+		ScalableFreeformRootEditPart root = new ScalableFreeformRootEditPart();
+
+		List zoomLevels = new ArrayList(3);
+		zoomLevels.add(ZoomManager.FIT_ALL);
+		zoomLevels.add(ZoomManager.FIT_WIDTH);
+		zoomLevels.add(ZoomManager.FIT_HEIGHT);
+		root.getZoomManager().setZoomLevelContributions(zoomLevels);
+
+		IAction zoomIn = new ZoomInAction(root.getZoomManager());
+		IAction zoomOut = new ZoomOutAction(root.getZoomManager());
+		IAction changeAction = new ChangeAction(this);
+		IAction addAction = new AddAction(this);
+		IAction removeAction = new RemoveAction(this);
+		getActionRegistry().registerAction(zoomIn);
+		getActionRegistry().registerAction(zoomOut);
+		getActionRegistry().registerAction(changeAction);
+		getActionRegistry().registerAction(addAction);
+		getActionRegistry().registerAction(removeAction);
+		getSite().getKeyBindingService().registerAction(zoomIn);
+		getSite().getKeyBindingService().registerAction(zoomOut);
+		getSite().getKeyBindingService().registerAction(changeAction);
+		getSite().getKeyBindingService().registerAction(addAction);
+		getSite().getKeyBindingService().registerAction(removeAction);
+		getSelectionActions().add(changeAction.getId());
+		getSelectionActions().add(addAction.getId());
+		getSelectionActions().add(removeAction.getId());
+		
 		viewer.setEditPartFactory(new StateMachinesEditPartFactory());
-		viewer.setRootEditPart(new ScalableFreeformRootEditPart());
 		viewer.setKeyHandler(new GraphicalViewerKeyHandler(viewer));
+		viewer.setRootEditPart(root);
 
 		// configure the context menu provider
 		ContextMenuProvider cmProvider = new StateMachinesEditorContextMenuProvider(
@@ -86,7 +130,7 @@ public class StateMachinesEditor extends GraphicalEditorWithFlyoutPalette {
 		viewer.setContextMenu(cmProvider);
 		getSite().registerContextMenu(cmProvider, viewer);
 	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -97,12 +141,6 @@ public class StateMachinesEditor extends GraphicalEditorWithFlyoutPalette {
 		firePropertyChange(IEditorPart.PROP_DIRTY);
 		super.commandStackChanged(event);
 	}
-
-	/*private void createOutputStream(OutputStream os) throws IOException {
-		ObjectOutputStream oos = new ObjectOutputStream(os);
-		oos.writeObject(getModel());
-		oos.close();
-	}*/
 
 	/*
 	 * (non-Javadoc)
@@ -142,7 +180,7 @@ public class StateMachinesEditor extends GraphicalEditorWithFlyoutPalette {
 			}
 		};
 	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -150,22 +188,12 @@ public class StateMachinesEditor extends GraphicalEditorWithFlyoutPalette {
 	 */
 	
 	public void doSave(IProgressMonitor monitor) {
+		saved = true;
+		getCommandStack().markSaveLocation();
 		ReadDOMTree tree = DOMGetInstance.getInstance();
-		tree.writeTree("C:/Dokumente und Einstellungen/Daniel/Desktop/StateMachine1.xml");
-		/*ByteArrayOutputStream out = new ByteArrayOutputStream();
-		try {
-			createOutputStream(out);
-			IFile file = ((IFileEditorInput) getEditorInput()).getFile();
-			file.setContents(new ByteArrayInputStream(out.toByteArray()), true, // keep
-					// saving, even if IFile is out of sync with the Workspace
-					false, // do not keep history
-					monitor); // progress monitor
-			getCommandStack().markSaveLocation();
-		} catch (CoreException ce) {
-			ce.printStackTrace();
-		} catch (IOException ioe) {
-			ioe.printStackTrace();
-		}*/
+		diagram.removeFromRoot(tree);
+		diagram.addToRoot(tree);
+		tree.writeTree();
 	}
 
 	/*
@@ -175,54 +203,22 @@ public class StateMachinesEditor extends GraphicalEditorWithFlyoutPalette {
 	 */
 	
 	public void doSaveAs() {
+		saved = true;
+		Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
+		FileDialog fileDialog = new FileDialog(shell, SWT.SAVE);
+		fileDialog.setFilterExtensions(new String[] {"*.xml"});
+		fileDialog.open();
+		String file2 = fileDialog.getFilterPath().toString() + File.separator + fileDialog.getFileName().toString();
+		getCommandStack().markSaveLocation();
 		ReadDOMTree tree = DOMGetInstance.getInstance();
-		tree.writeTree("C:/Dokumente und Einstellungen/Daniel/Desktop/StateMachine1.xml");
-		// Show a SaveAs dialog
-		/*Shell shell = getSite().getWorkbenchWindow().getShell();
-		SaveAsDialog dialog = new SaveAsDialog(shell);
-		dialog.setOriginalFile(((IFileEditorInput) getEditorInput()).getFile());
-		dialog.open();
-
-		IPath path = dialog.getResult();
-		if (path != null) {
-			// try to save the editor's contents under a different file name
-			final IFile file = ResourcesPlugin.getWorkspace().getRoot()
-					.getFile(path);
-			try {
-				new ProgressMonitorDialog(shell).run(false, // don't fork
-						false, // not cancelable
-						new WorkspaceModifyOperation() { // run this
-							// operation
-							public void execute(final IProgressMonitor monitor) {
-								try {
-									ByteArrayOutputStream out = new ByteArrayOutputStream();
-									createOutputStream(out);
-									file.create(new ByteArrayInputStream(out
-											.toByteArray()), // contents
-											true, // keep saving, even if
-											// IFile is out of sync with
-											// the Workspace
-											monitor); // progress monitor
-								} catch (CoreException ce) {
-									ce.printStackTrace();
-								} catch (IOException ioe) {
-									ioe.printStackTrace();
-								}
-							}
-						});
-				// set input to the new file
-				setInput(new FileEditorInput(file));
-				getCommandStack().markSaveLocation();
-			} catch (InterruptedException ie) {
-				// should not happen, since the monitor dialog is not cancelable
-				ie.printStackTrace();
-			} catch (InvocationTargetException ite) {
-				ite.printStackTrace();
-			}
-		}*/
+		diagram.removeFromRoot(tree);
+		diagram.addToRoot(tree);
+		tree.writeTree(file2);
 	}
 
 	public Object getAdapter(Class type) {
+		if (type == ZoomManager.class)
+			return getGraphicalViewer().getProperty(ZoomManager.class.toString());
 		if (type == IContentOutlinePage.class)
 			return new StateMachinesOutlinePage(new TreeViewer());
 		return super.getAdapter(type);
@@ -260,7 +256,6 @@ public class StateMachinesEditor extends GraphicalEditorWithFlyoutPalette {
 	 */
 	
 	private void openEditor(String stateMachineName) {
-		
 		ReadDOMTree tree = DOMGetInstance.getInstance();
 		// open diagram in editor
 		List allDiagrams = tree.getAllDiagrams();
@@ -317,6 +312,14 @@ public class StateMachinesEditor extends GraphicalEditorWithFlyoutPalette {
 		int length = file1.length();
 		String filename = file1.subSequence(0, length-7).toString();
 		openEditor(filename);
+	}
+	
+	public void dispose() {
+		if (!saved) {
+			diagram.changeToOldName();
+		}
+		ReadDOMTree tree = DOMGetInstance.getInstance();
+		tree.removeDiagram(diagram);
 	}
 
 	/**

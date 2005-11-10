@@ -1,9 +1,10 @@
 package wizard;
 
-import model.StateMachinesDiagram;
-
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.FileDialog;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
@@ -11,7 +12,10 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.core.runtime.*;
 import org.eclipse.jface.operation.*;
+
+import java.io.File;
 import java.lang.reflect.InvocationTargetException;
+
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.core.resources.*;
@@ -22,7 +26,7 @@ import org.jdom.Element;
 import dom.DOMGetInstance;
 import dom.ReadDOMTree;
 
-import view.StateMachinesList;
+import stateMachinesList.StateMachinesList;
 
 /**
  * This is a new wizard. Its role is to create a new statemachine
@@ -122,25 +126,26 @@ public class StateMachinesWizard extends Wizard implements INewWizard {
 					String file1 = file.getName().toString();
 					int length = file1.length();
 					String filename = file1.subSequence(0, length-7).toString();
-					StateMachinesDiagram diagram = new StateMachinesDiagram(machine);
-					tree.addDiagram(diagram);
-					diagram.changeName(filename);
-					diagram.addToRoot(tree);
-					StateMachinesList.addToStateMachinesList(file, filename);
+					machine.setAttribute("NAME", filename);
+					tree.addStateMachine1(machine);
+					StateMachinesList.addToStateMachinesList2(file, filename);
 				}
 				else {
 					DOMGetInstance.reset();
 					StateMachinesList.reset();
-					ReadDOMTree tree1 = DOMGetInstance.createNew();
+					Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
+					FileDialog fileDialog = new FileDialog(shell, SWT.SAVE);
+					fileDialog.setFilterExtensions(new String[] {"*.xml"});
+					fileDialog.open();
+					String file2 = fileDialog.getFilterPath().toString() + File.separator + fileDialog.getFileName().toString();
+					ReadDOMTree tree1 = DOMGetInstance.createNew(file2);
 					Element machine = new Element("stateMachine");
 					String file1 = file.getName().toString();
 					int length = file1.length();
 					String filename = file1.subSequence(0, length-7).toString();
-					StateMachinesDiagram diagram = new StateMachinesDiagram(machine);
-					tree1.addDiagram(diagram);
-					diagram.changeName(filename);
-					diagram.addToRoot(tree1);
-					StateMachinesList.addToStateMachinesList(file, filename);
+					machine.setAttribute("NAME", filename);
+					tree1.addStateMachine1(machine);
+					StateMachinesList.addToStateMachinesList2(file, filename);
 				}
 			}
 		});

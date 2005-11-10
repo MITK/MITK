@@ -1,7 +1,5 @@
 package wizard;
 
-import model.StateMachinesDiagram;
-
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ui.INewWizard;
@@ -23,7 +21,7 @@ import org.jdom.Element;
 import dom.DOMGetInstance;
 import dom.ReadDOMTree;
 
-import view.StateMachinesList;
+import stateMachinesList.StateMachinesList;
 
 /**
  * This is a new wizard. Its role is to create new statemachines  
@@ -72,6 +70,7 @@ public class StateMachinesWizard2 extends Wizard implements INewWizard {
 	 */
 	public boolean performFinish() {
 		IWorkbenchPage page1 = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage(); 
+		StateMachinesList.closeView();
 		try {
 			page1.showView("StatemachinesList");
 		} catch (PartInitException e1) {
@@ -82,7 +81,7 @@ public class StateMachinesWizard2 extends Wizard implements INewWizard {
 		final String containerName = page.getContainerName();
 		IRunnableWithProgress op = new IRunnableWithProgress() {
 			public void run(IProgressMonitor monitor) throws InvocationTargetException {
-				tree = DOMGetInstance.getInstance(file);
+				tree = DOMGetInstance.getFromXML(file);
 				List filenames = tree.getStateMachineNames();
 				for (int i = 0; i < filenames.size(); i++) {
 				try {					
@@ -140,8 +139,6 @@ public class StateMachinesWizard2 extends Wizard implements INewWizard {
 					int length = file2.length();
 					String filename = file2.subSequence(0, length-7).toString();
 					if (filename.equals(machine.getAttributeValue("NAME"))) {
-						StateMachinesDiagram diagram = new StateMachinesDiagram(machine);
-						tree.addDiagram(diagram);
 						StateMachinesList.addToStateMachinesList(file1, filename);
 						break;
 					}

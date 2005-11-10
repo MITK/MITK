@@ -6,10 +6,14 @@ package model;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.ui.views.properties.IPropertyDescriptor;
+import org.eclipse.ui.views.properties.TextPropertyDescriptor;
 import org.jdom.Attribute;
+import org.jdom.Comment;
 import org.jdom.Element;
 
 import stateMachines.StateMachinesEditor;
+import stateMachinesList.StateMachinesList;
 
 import dom.ReadDOMTree;
 
@@ -17,6 +21,12 @@ import dom.ReadDOMTree;
  * @author Daniel
  */
 public class StateMachinesDiagram extends ModelElement {
+	
+	private static IPropertyDescriptor[] descriptors;
+	
+	public static final String NAME_PROP = "StateMachinesDiagram.name";
+	
+	public static final String COMMENT_PROP = "StateMachinesDiagram.comment";
 
 	/** Property ID to use when a child is added to this diagram. */
 	public static final String CHILD_ADDED_PROP = "StateMachinesDiagram.ChildAdded";
@@ -28,14 +38,80 @@ public class StateMachinesDiagram extends ModelElement {
 
 	private List states = new ArrayList();
 	
-	private Element stateMachine;
+	private Element stateMachine, stateMachine2;
 	
 	private int maxID = 0;
 	
+	private double zoom = 1.0;
+	
 	private StateMachinesEditor editor1;
 	
+	private Comment comment = null;
+	
+	private String oldMachineName = null;
+	
+	/*
+	 * Initializes the property descriptors array.
+	 * 
+	 * @see #getPropertyDescriptors()
+	 * @see #getPropertyValue(Object)
+	 * @see #setPropertyValue(Object, Object)
+	 */
+	static {
+		descriptors = new IPropertyDescriptor[] {
+				new TextPropertyDescriptor(NAME_PROP, "Statemachine name"),
+				new TextPropertyDescriptor(COMMENT_PROP, "Comment")
+				};
+	}
+	
+	/**
+	 * Returns the descriptor for the properties
+	 * 
+	 * @see org.eclipse.ui.views.properties.IPropertySource#getPropertyDescriptors()
+	 */
+	public IPropertyDescriptor[] getPropertyDescriptors() {
+		return descriptors;
+	}
+	
+	/**
+	 * Returns the String for the Property Sheet
+	 * 
+	 * @see org.eclipse.ui.views.properties.IPropertySource#getPropertyValue(java.lang.Object)
+	 */
+	public Object getPropertyValue(Object id) {
+		if (id.equals(NAME_PROP)) {
+			return getStateMachineName();
+		}
+		else if (id.equals(COMMENT_PROP)) {
+			return getStateMachineComment();
+		}
+		return super.getPropertyValue(id);
+	}
+	
+	/**
+	 * Sets the properties based on the String provided by the PropertySheet
+	 * 
+	 * @see org.eclipse.ui.views.properties.IPropertySource#setPropertyValue(java.lang.Object,
+	 *      java.lang.Object)
+	 */
+	public void setPropertyValue(Object id, Object value) {
+		if (id.equals(NAME_PROP)) {
+			String newName = (String) value;
+			changeName(newName);
+		}
+		else if (id.equals(COMMENT_PROP)) {
+			String newComment = (String) value;
+			changeComment(newComment);
+		}
+		else
+			super.setPropertyValue(id, value);
+	}
+	
 	public StateMachinesDiagram(Element machine) {
-		List statesList = machine.getChildren("state", machine.getNamespace());
+		stateMachine2 = machine;
+		oldMachineName = stateMachine2.getAttributeValue("NAME");
+		stateMachine = (Element) machine.clone();
+		List statesList = stateMachine.getChildren("state", stateMachine.getNamespace());
         for (int i = 0; i < statesList.size(); i++) {
         	Element ele1 = (Element) statesList.get(i);
         	List attributes = ele1.getAttributes();
@@ -60,7 +136,6 @@ public class StateMachinesDiagram extends ModelElement {
     			this.addChildAtCreation(state);
         	}
         }
-        stateMachine = machine;
 		for (int j = 0; j < states.size(); j++) {
 			//create all transitions
 			States state = (States) states.get(j);
@@ -75,10 +150,15 @@ public class StateMachinesDiagram extends ModelElement {
 	public void setEditor(StateMachinesEditor editor) {
 		editor1 = editor;
 	}
-	/*public StateMachinesDiagram() {
-		
-	}*/
-
+	
+	public double getZoom() {
+		return zoom;
+	}
+	
+	public void setZoom(double zoom) {
+		this.zoom = zoom;
+	}
+	
 	/**
 	 * Add a state to this diagram.
 	 * 
@@ -140,18 +220,28 @@ public class StateMachinesDiagram extends ModelElement {
 	}
 	
 	public void addToRoot(ReadDOMTree tree) {
-		tree.addStateMachine(this, stateMachine);
+		Element stateMachine1 = (Element) stateMachine.clone();
+		tree.addStateMachine(this, stateMachine1);
+		stateMachine2 = stateMachine1;
 	}
 	
 	public void removeFromRoot(ReadDOMTree tree) {
-		tree.removeStateMachine(this, stateMachine);
+		tree.removeStateMachine(this, stateMachine2);
 	}
 	
 	public void changeName(String name) {
+		String oldName = stateMachine.getAttributeValue("NAME");
 		stateMachine.setAttribute("NAME", name);
 		if (!(editor1 == null)) {
 			editor1.setPartName1(name);
 		}
+		StateMachinesList.changeStateMachineName(oldName, name);
+		firePropertyChange(NAME_PROP, null, name);
+	}
+	
+	public void changeToOldName() {
+		String oldValue = stateMachine.getAttributeValue("NAME");
+		StateMachinesList.changeStateMachineName(oldValue, oldMachineName);
 	}
 	
 	public String getStateMachineName() {
@@ -164,5 +254,40 @@ public class StateMachinesDiagram extends ModelElement {
 	
 	public Element getStateMachinesElement() {
 		return stateMachine;
+	}
+	
+	public void changeComment(String machineComment) {
+		if (hasComment()) {
+			if (!(machineComment.equals("") && !(machineComment == null))) {
+				comment.setText(machineComment);
+			}
+			else if (machineComment.equals("") || machineComment == null) {
+				stateMachine.removeContent(comment);
+			}
+		}
+		else {
+			comment = new Comment(machineComment);
+			stateMachine.addContent(0, comment);
+		}
+		firePropertyChange(COMMENT_PROP, null, machineComment);
+	}
+	
+	public String getStateMachineComment() {
+		if (hasComment()) {
+			return comment.getText();
+		}
+		return "";
+	}
+	
+	public boolean hasComment() {
+		List machineComment = stateMachine.getContent();
+		for (int i = 0; i < machineComment.size(); i++) {
+			Object o = machineComment.get(i);
+			if (o instanceof Comment) {
+				comment = (Comment) o;
+				return true;
+			}
+		}
+		return false;
 	}
 }

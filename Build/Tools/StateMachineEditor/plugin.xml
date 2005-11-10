@@ -38,7 +38,7 @@
    <extension point="org.eclipse.ui.views">
    		<view id="StatemachinesList"
    			name="Statemachines List"
-   			class="view.StateMachinesList"
+   			class="stateMachinesList.StateMachinesList"
    			icon="states.gif"/>
    </extension>
    

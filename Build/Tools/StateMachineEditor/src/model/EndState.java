@@ -6,6 +6,7 @@ import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.swt.graphics.Image;
 import org.jdom.Attribute;
+import org.jdom.Comment;
 import org.jdom.Element;
 
 /**
@@ -18,6 +19,8 @@ public class EndState extends States {
 	private static final long serialVersionUID = 1;
 	
 	private Element state = new Element("state");
+	private Comment comment = null;
+	private boolean hasComment = false;
 
 	public Image getIcon() {
 		return RECTANGLE_ICON;
@@ -30,7 +33,24 @@ public class EndState extends States {
 	public Element getStateElement() {
 		return state;
 	}
-
+	
+	public Comment getStateComment() {
+		if (comment == null || !hasComment) {
+			comment = new Comment("");
+			state.addContent(0, comment);
+			hasComment = true;
+		}
+		return comment;
+	}
+	
+	public void removeStateComment() {
+		if (!(comment == null)) {
+			state.removeContent(comment);
+			comment = null;
+			hasComment = false;
+		}
+	}
+	
 	public void setStateElement(Element state1) {
 		state = state1;
 		Point location = new Point(0,0);
@@ -59,5 +79,14 @@ public class EndState extends States {
 		}
 		this.setLocation(location);
 		this.setSize(size);
+		List stateComment = state.getContent();
+		for (int i = 0; i < stateComment.size(); i++) {
+			Object o = stateComment.get(i);
+			if (o instanceof Comment) {
+				hasComment = true;
+				comment = (Comment) o;
+				this.setComment(comment.getText());
+			}
+		}
 	}
 }

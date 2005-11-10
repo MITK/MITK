@@ -45,7 +45,7 @@ final class StateMachinesEditorPaletteFactory {
 
 	/** Create the "States" drawer. */
 	private static PaletteContainer createStatesDrawer() {
-		PaletteDrawer componentsDrawer = new PaletteDrawer("GetDOMStates");
+		PaletteDrawer componentsDrawer = new PaletteDrawer("States");
 
 		CombinedTemplateCreationEntry component = new CombinedTemplateCreationEntry(
 				"startstate", "Create a startstate", StartState.class,

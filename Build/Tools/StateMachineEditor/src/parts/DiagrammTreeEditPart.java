@@ -103,12 +103,12 @@ class DiagramTreeEditPart extends AbstractTreeEditPart implements
 		if (StateMachinesDiagram.CHILD_ADDED_PROP.equals(prop)) {
 			// add a child to this edit part
 			// causes an additional entry to appear in the tree of the outline
-			// view
+			// dialog
 			addChild(createChild(evt.getNewValue()), -1);
 		} else if (StateMachinesDiagram.CHILD_REMOVED_PROP.equals(prop)) {
 			// remove a child from this edit part
 			// causes the corresponding edit part to disappear from the tree in
-			// the outline view
+			// the outline dialog
 			removeChild(getEditPartForChild(evt.getNewValue()));
 		} else {
 			refreshVisuals();

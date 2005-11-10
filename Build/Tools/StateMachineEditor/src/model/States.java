@@ -17,6 +17,7 @@ import org.eclipse.ui.views.properties.TextPropertyDescriptor;
 
 import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Point;
+import org.jdom.Comment;
 import org.jdom.Element;
 
 import stateMachines.StateMachinesPlugin;
@@ -36,6 +37,10 @@ import stateMachines.StateMachinesPlugin;
 public abstract class States extends ModelElement {
 	
 	public abstract Element getStateElement();
+	
+	public abstract Comment getStateComment();
+	
+	public abstract void removeStateComment();
 	
 	public abstract void setStateElement(Element state);
 	/**
@@ -64,6 +69,9 @@ public abstract class States extends ModelElement {
 	
 	/** Property ID to use when the states name is modified. */
 	public static final String STATE_NAME_PROP = "States.stateName";
+	
+	/** Property ID to use when the comment is modified. */
+	public static final String COMMENT_PROP = "States.stateComment";
 
 	/** Property ID to use when the states ID is modified. */
 	public static final String STATE_ID_PROP = "States.stateId";
@@ -100,16 +108,36 @@ public abstract class States extends ModelElement {
 	 * @see #setPropertyValue(Object, Object)
 	 */
 	static {
+		//String[] value = {"TRUE", "FALSE"};
 		descriptors = new IPropertyDescriptor[] {
-				new TextPropertyDescriptor(XPOS_PROP, "X"), // id and
-				// description pair
+				new TextPropertyDescriptor(XPOS_PROP, "X"), // id and description pair
 				new TextPropertyDescriptor(YPOS_PROP, "Y"),
 				new TextPropertyDescriptor(WIDTH_PROP, "Width"),
 				new TextPropertyDescriptor(HEIGHT_PROP, "Height"),
 				new TextPropertyDescriptor(STATE_ID_PROP, "ID"),
-				new TextPropertyDescriptor(STATE_NAME_PROP, "A Statename") };
+				new TextPropertyDescriptor(STATE_NAME_PROP, "Statename"),
+				new TextPropertyDescriptor(COMMENT_PROP, "Comment")
+				};
+
+		((PropertyDescriptor) descriptors[descriptors.length - 2]).setCategory("State");
+		((PropertyDescriptor) descriptors[descriptors.length - 1]).setCategory("Comment");
 		// use a custom cell editor validator for all four array entries
-		for (int i = 0; i < descriptors.length-1; i++) {
+		for (int i = 0; i < descriptors.length-2; i++) {
+			if (((PropertyDescriptor) descriptors[i]).getId().equals(XPOS_PROP)) {
+				((PropertyDescriptor) descriptors[i]).setCategory("Location");
+			}
+			else if (((PropertyDescriptor) descriptors[i]).getId().equals(YPOS_PROP)) {
+				((PropertyDescriptor) descriptors[i]).setCategory("Location");
+			}
+			else if (((PropertyDescriptor) descriptors[i]).getId().equals(WIDTH_PROP)) {
+				((PropertyDescriptor) descriptors[i]).setCategory("Size");
+			}
+			else if (((PropertyDescriptor) descriptors[i]).getId().equals(HEIGHT_PROP)) {
+				((PropertyDescriptor) descriptors[i]).setCategory("Size");
+			}
+			else if (((PropertyDescriptor) descriptors[i]).getId().equals(STATE_ID_PROP)) {
+				((PropertyDescriptor) descriptors[i]).setCategory("State");
+			}
 			((PropertyDescriptor) descriptors[i])
 					.setValidator(new ICellEditorValidator() {
 						public String isValid(Object value) {
@@ -151,6 +179,9 @@ public abstract class States extends ModelElement {
 
 	/** Name of this state */
 	private String stateName = new String("Statename");
+	
+	/** Comment of this state */
+	private String commentText = new String("");
 	
 	/** ID of this state */
 	private String stateId = new String("0");
@@ -199,7 +230,7 @@ public abstract class States extends ModelElement {
 	/**
 	 * Returns an array of IPropertyDescriptors for this state.
 	 * <p>
-	 * The returned array is used to fill the property view, when the edit-part
+	 * The returned array is used to fill the property dialog, when the edit-part
 	 * corresponding to this model element is selected.
 	 * </p>
 	 * 
@@ -214,7 +245,7 @@ public abstract class States extends ModelElement {
 	/**
 	 * Return the property value for the given propertyId, or null.
 	 * <p>
-	 * The property view uses the IDs from the IPropertyDescriptors array to
+	 * The property dialog uses the IDs from the IPropertyDescriptors array to
 	 * obtain the value of the corresponding properties.
 	 * </p>
 	 * 
@@ -237,6 +268,9 @@ public abstract class States extends ModelElement {
 		if (STATE_NAME_PROP.equals(propertyId)) {
 			return stateName;
 		}
+		if (COMMENT_PROP.equals(propertyId)) {
+			return commentText;
+		}
 		if (STATE_ID_PROP.equals(propertyId)) {
 			return stateId;
 		}
@@ -254,6 +288,10 @@ public abstract class States extends ModelElement {
 	
 	public String getStateName() {
 		return stateName;
+	}
+	
+	public String getComment() {
+		return commentText;
 	}
 	
 	public String getStateId() {
@@ -327,7 +365,7 @@ public abstract class States extends ModelElement {
 	 * Set the property value for the given property id. If no matching id is
 	 * found, the call is forwarded to the superclass.
 	 * <p>
-	 * The property view uses the IDs from the IPropertyDescriptors array to set
+	 * The property dialog uses the IDs from the IPropertyDescriptors array to set
 	 * the values of the corresponding properties.
 	 * </p>
 	 * 
@@ -335,31 +373,38 @@ public abstract class States extends ModelElement {
 	 * @see #getPropertyDescriptors()
 	 */
 	public void setPropertyValue(Object propertyId, Object value) {
-		Element state = getStateElement();
+		//Element state = getStateElement();
 		if (XPOS_PROP.equals(propertyId)) {
 			int x = Integer.parseInt((String) value);
 			setLocation(new Point(x, location.y));
-			state.setAttribute("X_POS", value.toString());
+			//state.setAttribute("X_POS", value.toString());
 		} else if (YPOS_PROP.equals(propertyId)) {
 			int y = Integer.parseInt((String) value);
 			setLocation(new Point(location.x, y));
-			state.setAttribute("Y_POS", value.toString());
+			//state.setAttribute("Y_POS", value.toString());
 		} else if (HEIGHT_PROP.equals(propertyId)) {
 			int height = Integer.parseInt((String) value);
 			setSize(new Dimension(size.width, height));
-			state.setAttribute("HEIGHT", Integer.toString(height));
+			//state.setAttribute("HEIGHT", Integer.toString(height));
 		} else if (WIDTH_PROP.equals(propertyId)) {
 			int width = Integer.parseInt((String) value);
 			setSize(new Dimension(width, size.height));
-			state.setAttribute("WIDTH", Integer.toString(width));
+			//state.setAttribute("WIDTH", Integer.toString(width));
 		} else if (STATE_NAME_PROP.equals(propertyId)) {
 			String name = (String) value;
 			setStateName(name);
-			state.setAttribute("NAME", name);
+			//state.setAttribute("NAME", name);
+		} else if (COMMENT_PROP.equals(propertyId)) {
+			String commentText = (String) value;
+			setComment(commentText);
+			/*if (!(commentText.equals("")) && !(commentText == null)) {
+				Comment comment = getStateComment();
+				comment.setText(commentText);
+			}*/
 		} else if (STATE_ID_PROP.equals(propertyId)) {
 			String id = (String)value;
 			setStateId(id);
-			state.setAttribute("ID", id);
+			//state.setAttribute("ID", id);
 			List connToChange = this.getTargetConnections();
 			for (int i = 0; i < connToChange.size(); i++) {
 				Connection conn1 = (Connection) connToChange.get(i);
@@ -396,6 +441,19 @@ public abstract class States extends ModelElement {
 		stateName = newName;
 		state.setAttribute("NAME", newName);
 		firePropertyChange(STATE_NAME_PROP, null, stateName);
+	}
+	
+	public void setComment(String newComment) {
+		if (!(newComment.equals("") && !(newComment == null))) {
+			Comment comment = getStateComment();
+			commentText = newComment;
+			comment.setText(commentText);
+		}
+		else if (newComment.equals("") || newComment == null) {
+			commentText = newComment;
+			removeStateComment();
+		}
+		firePropertyChange(COMMENT_PROP, null, commentText);
 	}
 	
 	public void setStateId(String newId) {

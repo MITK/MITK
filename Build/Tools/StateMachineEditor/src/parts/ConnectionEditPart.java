@@ -12,6 +12,7 @@ import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.Label;
 import org.eclipse.draw2d.PolygonDecoration;
 import org.eclipse.draw2d.PolylineConnection;
+import org.eclipse.draw2d.PositionConstants;
 
 import org.eclipse.gef.EditPolicy;
 import org.eclipse.gef.commands.Command;
@@ -50,6 +51,7 @@ class ConnectionEditPart extends AbstractConnectionEditPart implements
 	 * @see org.eclipse.gef.editparts.AbstractEditPart#createEditPolicies()
 	 */
 	protected void createEditPolicies() {
+		installEditPolicy(EditPolicy.COMPONENT_ROLE, new ActionEditPolicy());
 		// Selection handle edit policy.
 		// Makes the connection show a feedback, when selected by the user.
 		installEditPolicy(EditPolicy.CONNECTION_ENDPOINTS_ROLE,
@@ -69,23 +71,21 @@ class ConnectionEditPart extends AbstractConnectionEditPart implements
 	 * @see org.eclipse.gef.editparts.AbstractGraphicalEditPart#createFigure()
 	 */
 	protected IFigure createFigure() {
-		
-		PolylineConnection connection = (PolylineConnection) super
-				.createFigure();
+		PolylineConnection connection = (PolylineConnection) super.createFigure();
 		connection.setTargetDecoration(new PolygonDecoration()); // arrow at
 																	// target
 																	// endpoint
-		ConnectionLocator midpointLocator = new ConnectionLocator(connection, 4);
+		ConnectionLocator midpointLocator = new ConnectionLocator(connection, PositionConstants.RIGHT);
 		actionName.setOpaque(true);
 		actionName.setBackgroundColor(ColorConstants.green);
 		actionName.setText(getCastedModel().getAction()); // actionName of this connection
-		midpointLocator.setRelativePosition(4);
+		midpointLocator.setRelativePosition(PositionConstants.RIGHT);
 		connection.add(actionName, midpointLocator);
-		ConnectionLocator midpointLocator2 = new ConnectionLocator(connection, 4);
+		ConnectionLocator midpointLocator2 = new ConnectionLocator(connection, PositionConstants.RIGHT);
 		eventName.setOpaque(true);
 		eventName.setBackgroundColor(ColorConstants.red);
 		eventName.setText(getCastedModel().getEvent()); // eventName of this connection
-		midpointLocator2.setRelativePosition(1);
+		midpointLocator2.setRelativePosition(PositionConstants.LEFT);
 		connection.add(eventName, midpointLocator2);
 		
 		return connection;

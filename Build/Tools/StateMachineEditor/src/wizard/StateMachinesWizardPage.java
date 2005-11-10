@@ -12,7 +12,7 @@ import org.eclipse.swt.events.*;
 import org.eclipse.ui.dialogs.ContainerSelectionDialog;
 import org.eclipse.jface.viewers.*;
 
-import view.StateMachinesList;
+import stateMachinesList.StateMachinesList;
 
 /**
  * The wizard page allows setting the container for

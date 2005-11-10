@@ -55,57 +55,11 @@ public class ConnectionReconnectCommand extends Command {
 	 */
 	public boolean canExecute() {
 		if (newSource != null) {
-			return checkSourceReconnection();
+			return true;
 		} else if (newTarget != null) {
-			return checkTargetReconnection();
+			return true;
 		}
 		return false;
-	}
-
-	/**
-	 * Return true, if reconnecting the connection-instance to newSource is
-	 * allowed.
-	 */
-	private boolean checkSourceReconnection() {
-		// connection endpoints must be different GetDOMStates
-		/*if (newSource.equals(oldTarget)) {
-			return false;
-		}*/
-		// return false, if the connection exists already
-/*		for (Iterator iter = newSource.getSourceConnections().iterator(); iter
-				.hasNext();) {
-			Connection conn = (Connection) iter.next();
-			// return false if a newSource -> oldTarget connection exists
-			// already
-			// and it is a different instance than the connection-field
-			if (conn.getTarget().equals(oldTarget) && !conn.equals(connection)) {
-				return false;
-			}
-		}*/
-		return true;
-	}
-
-	/**
-	 * Return true, if reconnecting the connection-instance to newTarget is
-	 * allowed.
-	 */
-	private boolean checkTargetReconnection() {
-		// connection endpoints must be different GetDOMStates
-		/*if (newTarget.equals(oldSource)) {
-			return false;
-		}*/
-		// return false, if the connection exists already
-/*		for (Iterator iter = newTarget.getTargetConnections().iterator(); iter
-				.hasNext();) {
-			Connection conn = (Connection) iter.next();
-			// return false if a oldSource -> newTarget connection exists
-			// already
-			// and it is a different instance that the connection-field
-			if (conn.getSource().equals(oldSource) && !conn.equals(connection)) {
-				return false;
-			}
-		}*/
-		return true;
 	}
 
 	/**

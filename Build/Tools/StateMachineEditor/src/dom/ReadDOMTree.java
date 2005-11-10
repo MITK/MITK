@@ -19,6 +19,7 @@ import org.jdom.output.XMLOutputter;
 public class ReadDOMTree {
 	private List allMachines = new ArrayList();
 	private Document doc = null;
+	private String filename;
 	
 	public void addDiagram(StateMachinesDiagram diagram) {
 		allMachines.add(diagram);
@@ -39,6 +40,12 @@ public class ReadDOMTree {
 	public void addStateMachine(StateMachinesDiagram machine, Element stateMachine) {
 		stateMachine.setNamespace(doc.getRootElement().getNamespace());
 		doc.getRootElement().addContent(stateMachine);
+		allMachines.add(machine);
+	}
+	
+	public void addStateMachine1(Element stateMachine) {
+		stateMachine.setNamespace(doc.getRootElement().getNamespace());
+		doc.getRootElement().addContent(stateMachine);
 	}
 
 	public void removeStateMachine(StateMachinesDiagram machine, Element stateMachine) {
@@ -46,37 +53,49 @@ public class ReadDOMTree {
 		allMachines.remove(machine);
 	}
 	
+	public Element removeStateMachine1(String stateMachine) {
+		List stateMachines = getStateMachines();
+		for (int i = 0; i < stateMachines.size(); i++) {
+			Element ele = (Element) stateMachines.get(i);
+			if (ele.getAttributeValue("NAME").equals(stateMachine)) {
+				doc.getRootElement().removeContent(ele);
+				return ele;
+			}
+		}
+		return null;
+	}
+	
 	public StateMachinesDiagram getStateMachinesDiagram(String machineName) {
 		StateMachinesDiagram machine = null;
 		for (int j = 0; j < allMachines.size(); j++) {
 			machine = (StateMachinesDiagram) allMachines.get(j);
 			if (machine.getStateMachineName().equals(machineName)) {
-				break;
+				return machine;
 			}
 		}
-		return machine;
+		return null;
 	}
 	
-	public ReadDOMTree(String file) {
-        String filename = file;
-        try {
-            // Build the document with SAX and Xerces, no validation
-            SAXBuilder builder = new SAXBuilder();
-            // Create the document
-            doc = builder.build(new File(filename));
-        } catch (Exception e) {
-            e.printStackTrace();
+	public ReadDOMTree(String file, boolean newTree) {
+        filename = file;
+        if (!(newTree)) {
+        	try {
+            	// Build the document with SAX and Xerces, no validation
+            	SAXBuilder builder = new SAXBuilder();
+            	// Create the document
+            	doc = builder.build(new File(filename));
+        	} catch (Exception e) {
+        		e.printStackTrace();
+        	}
         }
-	}
-   
-	public ReadDOMTree() {
-		// create new DOMTree
-		 Element root = new Element("mitkInteraktionStates");
-		 Namespace xmlns = Namespace.getNamespace(
-				  "", "http://tempuri.org/StateMachine.xsd");
-		 root.setNamespace(xmlns);
-		 root.setAttribute("STYLE", "User001");
-		 doc = new Document(root);
+        else {
+        	Element root = new Element("mitkInteraktionStates");
+   		 	Namespace xmlns = Namespace.getNamespace(
+   		 			"", "http://tempuri.org/StateMachine.xsd");
+   		 	root.setNamespace(xmlns);
+   		 	root.setAttribute("STYLE", "User001");
+   		 	doc = new Document(root);
+        }
 	}
 
 	public void writeTree(String file) {
@@ -85,6 +104,20 @@ public class ReadDOMTree {
 		XMLOutputter xmlOut = new XMLOutputter(format);
 		try {
 			xmlOut.output(doc, new FileOutputStream(file));
+			filename = file;
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void writeTree() {
+		Format format = Format.getPrettyFormat();
+		format.setEncoding("utf-8");
+		XMLOutputter xmlOut = new XMLOutputter(format);
+		try {
+			xmlOut.output(doc, new FileOutputStream(filename));
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {

@@ -274,14 +274,20 @@ bool mitk::GlobalInteraction::StandardInteractionSetup(const char * XMLbehaviorF
   else
     result=mitk::StateMachineFactory::LoadBehavior(XMLbehaviorFile);
   if(result==false)
+  {
+    s_GlobalInteraction = new mitk::GlobalInteraction(NULL);
     return false;
+  }
   // load event-mappings from XML-file
   if(XMLbehaviorFile==NULL)
     result=mitk::EventMapper::LoadStandardBehavior();
   else
     result=mitk::EventMapper::LoadBehavior(XMLbehaviorFile);
   if(result==false)
+  {
+    s_GlobalInteraction = new mitk::GlobalInteraction(NULL);
     return false;
+  }
   // setup interaction mechanism by creating GlobalInteraction
   if(globalInteractionName == NULL)
     s_GlobalInteraction = new mitk::GlobalInteraction("global");

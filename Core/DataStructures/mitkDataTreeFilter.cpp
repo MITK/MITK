@@ -401,8 +401,6 @@ void DataTreeFilter::TreePrune(const itk::EventObject& e)
   const itk::TreeRemoveEvent<mitk::DataTreeBase>& event( static_cast<const itk::TreeRemoveEvent<mitk::DataTreeBase>&>(e) );
   mitk::DataTreeIteratorBase* treePosition = const_cast<mitk::DataTreeIteratorBase*>(&(event.GetChangePosition()));
   
-  if ( treePosition->Get().IsNull() ) return; // TODO this special case is used only in
- 
   /*
     if hierarchy is preserved AND if the event's position matches the filter (i.e. an item exists)
         remove that one item from its parent's list

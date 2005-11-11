@@ -379,7 +379,7 @@ void QcMITKSamplePlugin::selectSerie (QcLightbox* lightbox)
       //if so the sorting of the tree has to be changed
       mitk::StringProperty::Pointer seriesInstanceUID = dynamic_cast<mitk::StringProperty*>(node->GetProperty("series uid").GetPointer());
       mitk::DataTreeIteratorClone fatherIt = mitk::DataTreeHelper::FindIteratorToNode(ap->GetTree(), node );
-      if (seriesInstanceUID != NULL)
+      if (seriesInstanceUID.IsNotNull())
       {
         mitk::DataTreePreOrderIterator treeIt( ap->GetTree() );
         treeIt.GoToBegin();
@@ -390,7 +390,7 @@ void QcMITKSamplePlugin::selectSerie (QcLightbox* lightbox)
           if (fatherIt->ChildPosition(curNode) == -1)
           {
             mitk::StringProperty::Pointer seriesSourceUID = dynamic_cast<mitk::StringProperty*>(curNode->GetProperty("series source uid").GetPointer());
-            if (seriesSourceUID != NULL)
+            if (seriesSourceUID.IsNotNull())
             {
               if (*seriesSourceUID == *seriesInstanceUID)            
               {

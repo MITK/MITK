@@ -11,7 +11,7 @@ namespace mitk
 /// default filter, lets everything except NULL pointers pass
 static bool IsDataTreeNode(mitk::DataTreeNode* node)
 {
-  return ( node != 0 );
+  return ( node!= 0 );
 }
 
 //------ BasePropertyAccessor ------------------------------------------------------------
@@ -226,10 +226,10 @@ DataTreeFilter::DataTreeFilter(mitk::DataTree* datatree)
 DataTreeFilter::~DataTreeFilter()
 {
   // remove this as observer from the data tree
-  if (m_TreeNodeChangeConnection) m_DataTree->RemoveObserver( m_TreeNodeChangeConnection );
-  if (m_TreeAddConnection)        m_DataTree->RemoveObserver( m_TreeAddConnection );
-  if (m_TreeRemoveConnection)     m_DataTree->RemoveObserver( m_TreeRemoveConnection );
-  if (m_TreePruneConnection)      m_DataTree->RemoveObserver( m_TreePruneConnection );
+  m_DataTree->RemoveObserver( m_TreeNodeChangeConnection );
+  m_DataTree->RemoveObserver( m_TreeAddConnection );
+  m_DataTree->RemoveObserver( m_TreeRemoveConnection );
+  m_DataTree->RemoveObserver( m_TreePruneConnection );
 }
 
 void DataTreeFilter::SetPropertiesLabels(const PropertyList labels)
@@ -400,6 +400,8 @@ void DataTreeFilter::TreePrune(const itk::EventObject& e)
   // event has a iterator to the node that is about to be deleted
   const itk::TreeRemoveEvent<mitk::DataTreeBase>& event( static_cast<const itk::TreeRemoveEvent<mitk::DataTreeBase>&>(e) );
   mitk::DataTreeIteratorBase* treePosition = const_cast<mitk::DataTreeIteratorBase*>(&(event.GetChangePosition()));
+  
+  if ( treePosition->Get().IsNull() ) return; // TODO this special case is used only in
  
   /*
     if hierarchy is preserved AND if the event's position matches the filter (i.e. an item exists)
@@ -484,11 +486,11 @@ void DataTreeFilter::TreePrune(const itk::EventObject& e)
 void DataTreeFilter::TreeRemove(const itk::EventObject& e)
 {
   if ( typeid(e) != typeid(itk::TreeRemoveEvent<mitk::DataTreeBase>) ) return;
-
+  
   // event has a iterator to the node that is about to be deleted
   const itk::TreeRemoveEvent<mitk::DataTreeBase>& event( static_cast<const itk::TreeRemoveEvent<mitk::DataTreeBase>&>(e) );
   mitk::DataTreeIteratorBase* treePosition = const_cast<mitk::DataTreeIteratorBase*>(&(event.GetChangePosition()));
- 
+  
   if ( m_Filter(treePosition->Get()) )
   {
     Item* item = m_Item[ treePosition->Get() ];

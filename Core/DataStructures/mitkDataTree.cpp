@@ -33,12 +33,6 @@ DataTreeBase( )
 //##ModelId=3E38F46A01AE
 mitk::DataTree::~DataTree()
 {
-  DataTreePreOrderIterator it(this); 
-  while(!it.IsAtEnd())
-  {
-    it.Set(NULL);
-    ++it;
-  }
   Clear();
 }
 

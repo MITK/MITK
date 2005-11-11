@@ -2,7 +2,6 @@
 #include <mitkDataTreeFilter.h>
 #include <mitkDataTree.h>
 #include <mitkPropertyManager.h>
-#include <functional>
 
 namespace mitk
 {
@@ -189,34 +188,37 @@ DataTreeFilter::DataTreeFilter(mitk::DataTree* datatree)
   m_HierarchyHandling(mitk::DataTreeFilter::PRESERVE_HIERARCHY),
   m_SelectionMode(mitk::DataTreeFilter::MULTI_SELECT),
   m_Renderer(NULL),
-  m_TreeChangeConnection(0),
+  m_TreeNodeChangeConnection(0),
   m_TreeAddConnection(0),
+  m_TreePruneConnection(0),
   m_TreeRemoveConnection(0)
 {
   SetFilter( &mitk::IsDataTreeNode );
   m_Items = ItemList::New(); // create an empty list
 
-  // connect tree's modified to my GenerateModelFromTree() 
-  /**/
+  // connect tree notifications to member functions
   {
   itk::ReceptorMemberCommand<mitk::DataTreeFilter>::Pointer command = itk::ReceptorMemberCommand<mitk::DataTreeFilter>::New();
-  command->SetCallbackFunction(this, &DataTreeFilter::TreeChange);
-  m_TreeChangeConnection = m_DataTree->AddObserver(itk::TreeChangeEvent<mitk::DataTreeBase>(), command);
+  command->SetCallbackFunction(this, &DataTreeFilter::TreeNodeChange);
+  m_TreeNodeChangeConnection = m_DataTree->AddObserver(itk::TreeNodeChangeEvent<mitk::DataTreeBase>(), command);
   }
-  /**/
 
-  // connect tree's add to my GenerateModelFromTree()
   {
   itk::ReceptorMemberCommand<mitk::DataTreeFilter>::Pointer command = itk::ReceptorMemberCommand<mitk::DataTreeFilter>::New();
   command->SetCallbackFunction(this, &DataTreeFilter::TreeAdd);
   m_TreeAddConnection = m_DataTree->AddObserver(itk::TreeAddEvent<mitk::DataTreeBase>(), command);
   }
   
-  // connect tree's remove to my GenerateModelFromTree()
   {
   itk::ReceptorMemberCommand<mitk::DataTreeFilter>::Pointer command = itk::ReceptorMemberCommand<mitk::DataTreeFilter>::New();
   command->SetCallbackFunction(this, &DataTreeFilter::TreeRemove);
   m_TreeRemoveConnection = m_DataTree->AddObserver(itk::TreeRemoveEvent<mitk::DataTreeBase>(), command);
+  }
+
+  {
+  itk::ReceptorMemberCommand<mitk::DataTreeFilter>::Pointer command = itk::ReceptorMemberCommand<mitk::DataTreeFilter>::New();
+  command->SetCallbackFunction(this, &DataTreeFilter::TreePrune);
+  m_TreePruneConnection = m_DataTree->AddObserver(itk::TreePruneEvent<mitk::DataTreeBase>(), command);
   }
   
 }
@@ -224,9 +226,10 @@ DataTreeFilter::DataTreeFilter(mitk::DataTree* datatree)
 DataTreeFilter::~DataTreeFilter()
 {
   // remove this as observer from the data tree
-  if (m_TreeChangeConnection) m_DataTree->RemoveObserver( m_TreeChangeConnection );
-  if (m_TreeAddConnection)    m_DataTree->RemoveObserver( m_TreeAddConnection );
-  if (m_TreeRemoveConnection) m_DataTree->RemoveObserver( m_TreeRemoveConnection );
+  if (m_TreeNodeChangeConnection) m_DataTree->RemoveObserver( m_TreeNodeChangeConnection );
+  if (m_TreeAddConnection)        m_DataTree->RemoveObserver( m_TreeAddConnection );
+  if (m_TreeRemoveConnection)     m_DataTree->RemoveObserver( m_TreeRemoveConnection );
+  if (m_TreePruneConnection)      m_DataTree->RemoveObserver( m_TreePruneConnection );
 }
 
 void DataTreeFilter::SetPropertiesLabels(const PropertyList labels)
@@ -329,9 +332,9 @@ void DataTreeFilter::SelectItem(const Item* item, bool selected)
   const_cast<Item*>(item) -> SetSelected(selected);
 }
 
-void DataTreeFilter::TreeChange(const itk::EventObject& e)
+void DataTreeFilter::TreeNodeChange(const itk::EventObject& e)
 {
-  if ( typeid(e) != typeid(itk::TreeChangeEvent<mitk::DataTreeBase>) ) return;
+  if ( typeid(e) != typeid(itk::TreeNodeChangeEvent<mitk::DataTreeBase>) ) return;
  
   // if event.GetChangePosition()->GetNode() == NULL, then something was removed (while in ~DataTree()) by setting it to NULL
   const itk::TreeChangeEvent<mitk::DataTreeBase>& event( static_cast<const itk::TreeChangeEvent<mitk::DataTreeBase>&>(e) );
@@ -367,24 +370,17 @@ void DataTreeFilter::TreeAdd(const itk::EventObject& e)
   ItemList* list(m_Items);
   Item* parent(0);
 
-  if ( m_HierarchyHandling == DataTreeFilter::FLATTEN_HIERARCHY || !treePosition->HasParent())
-  {
-    // regenerate all
-  }
-  else
-  {
+  if ( m_HierarchyHandling == DataTreeFilter::PRESERVE_HIERARCHY && treePosition->HasParent())
     while ( treePosition->HasParent() )
     {
       treePosition->GoToParent();
-      if ( m_Filter(treePosition->Get()) ) break; // this is the new parent
+      if ( m_Filter(treePosition->Get()) )
+      {                                         // this is the new parent
+        parent = m_Item[treePosition->Get()];
+        list = parent->m_Children;
+        break; 
+      }
     }
-
-    if ( m_Item.find(treePosition->Get()) != m_Item.end() ) 
-    {
-      parent = m_Item[treePosition->Get()];   // there is a parent, so use that one
-      list = parent->m_Children;
-    }
-  }
 
   if (parent)
   {
@@ -394,19 +390,12 @@ void DataTreeFilter::TreeAdd(const itk::EventObject& e)
   }
   else
   {
-    // regenerate all
-    mitk::DataTreeIteratorBase* rootIter =  // get an iterator to the data tree
-      new mitk::DataTreePreOrderIterator::PreOrderTreeIterator(m_DataTree);
-
-    list->clear();
-    m_Items->CreateElementAt(0) = Item::New( rootIter->Get(), this, 0, 0 ); // 0 = first item, 0 = no parent
-    InvokeEvent( mitk::TreeFilterItemAddedEvent(m_Items->ElementAt(0)) );
-    AddMatchingChildren( rootIter, list, parent );
+    GenerateModelFromTree();
   }
   
 }
 
-void DataTreeFilter::TreeRemove(const itk::EventObject& e)
+void DataTreeFilter::TreePrune(const itk::EventObject& e)
 {
   // event has a iterator to the node that is about to be deleted
   const itk::TreeRemoveEvent<mitk::DataTreeBase>& event( static_cast<const itk::TreeRemoveEvent<mitk::DataTreeBase>&>(e) );
@@ -492,6 +481,50 @@ void DataTreeFilter::TreeRemove(const itk::EventObject& e)
 
 }
 
+void DataTreeFilter::TreeRemove(const itk::EventObject& e)
+{
+  if ( typeid(e) != typeid(itk::TreeRemoveEvent<mitk::DataTreeBase>) ) return;
+
+  // event has a iterator to the node that is about to be deleted
+  const itk::TreeRemoveEvent<mitk::DataTreeBase>& event( static_cast<const itk::TreeRemoveEvent<mitk::DataTreeBase>&>(e) );
+  mitk::DataTreeIteratorBase* treePosition = const_cast<mitk::DataTreeIteratorBase*>(&(event.GetChangePosition()));
+ 
+  if ( m_Filter(treePosition->Get()) )
+  {
+    Item* item = m_Item[ treePosition->Get() ];
+    ItemList* list(0);
+    
+    if ( item->IsRoot() )
+      list = m_Items;
+    else
+      list = item->m_Parent->m_Children;
+    
+    ItemList::iterator listIter;
+    for ( listIter = list->begin(); listIter != list->end(); ++listIter )
+      if ( *listIter == item ) break;
+
+    if ( item->m_Children->size() > 0 )
+    {
+      list->insert(listIter, item->m_Children->begin(), item->m_Children->end());
+    }
+    
+    // because I'm not sure if the STL guarantees something about the position of an
+    // iterator after insert, I once again look for the item to remove
+
+    for ( listIter = list->begin(); listIter != list->end(); ++listIter )
+      if ( *listIter == item ) break;
+    
+    list->erase(listIter);
+  
+    // renumber items of the remaining list
+    int i(0);
+    for ( listIter = list->begin(); listIter != list->end(); ++listIter, ++i )
+    {
+      (*listIter)->m_Index = i;
+    }
+  }
+}
+
 void DataTreeFilter::AddMatchingChildren(mitk::DataTreeIteratorBase* iter, ItemList* list,
     Item* parent, bool verbose )
 {
@@ -518,7 +551,7 @@ void DataTreeFilter::AddMatchingChildren(mitk::DataTreeIteratorBase* iter, ItemL
     {
       unsigned int newIndex = list->Size();
       list->CreateElementAt( newIndex ) = Item::New( iter->Get(), this, newIndex, parent );
-      if (verbose) InvokeEvent( mitk::TreeFilterItemAddedEvent(m_Items->ElementAt(0)) );
+      if (verbose) InvokeEvent( mitk::TreeFilterItemAddedEvent(m_Items->ElementAt(newIndex)) );
 
       if ( m_HierarchyHandling == DataTreeFilter::PRESERVE_HIERARCHY )
       {
@@ -542,7 +575,6 @@ void DataTreeFilter::AddMatchingChildren(mitk::DataTreeIteratorBase* iter, ItemL
 void DataTreeFilter::GenerateModelFromTree()
 {
   m_Items = ItemList::New(); // clear list (nice thanks to smart pointers)
-  
   mitk::DataTreeIteratorBase* treeIter =  // get an iterator to the data tree
     new mitk::DataTreePreOrderIterator::PreOrderTreeIterator(m_DataTree);
 

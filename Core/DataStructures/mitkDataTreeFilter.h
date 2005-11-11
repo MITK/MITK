@@ -206,8 +206,9 @@ namespace mitk
       void SelectItem(const Item*, bool selected = true);
       
       /// change notifications from the data tree
-      void TreeChange(const itk::EventObject &);
+      void TreeNodeChange(const itk::EventObject &);
       void TreeAdd(const itk::EventObject &);
+      void TreePrune(const itk::EventObject &);
       void TreeRemove(const itk::EventObject &);
       
     protected:
@@ -250,8 +251,9 @@ namespace mitk
 
       const mitk::BaseRenderer* m_Renderer;
 
-      unsigned long  m_TreeChangeConnection;
+      unsigned long  m_TreeNodeChangeConnection;
       unsigned long  m_TreeAddConnection;
+      unsigned long  m_TreePruneConnection;
       unsigned long  m_TreeRemoveConnection;
       
       // remember the most recently selected item

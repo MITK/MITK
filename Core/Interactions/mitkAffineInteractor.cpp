@@ -101,16 +101,33 @@ bool mitk::AffineInteractor::ExecuteAction(Action* action, mitk::StateEvent cons
       mitk::BoolProperty::Pointer selected;
       mitk::ColorProperty::Pointer color;
       mitk::StateEvent* newStateEvent = NULL;
+
+      selected = dynamic_cast<mitk::BoolProperty*>(m_DataTreeNode->GetProperty("selected").GetPointer());
+
+      if ( selected.IsNull() ) {
+        selected = new mitk::BoolProperty();
+        m_DataTreeNode->GetPropertyList()->SetProperty("selected", selected);
+      }
+
+      color = dynamic_cast<mitk::ColorProperty*>(m_DataTreeNode->GetProperty("color").GetPointer());
+
+      if ( color.IsNull() ) {
+        color = new mitk::ColorProperty();
+        m_DataTreeNode->GetPropertyList()->SetProperty("color", color);
+      }
+
       if (this->CheckSelected(worldPoint))
       {
         newStateEvent = new mitk::StateEvent(EIDYES, stateEvent->GetEvent());
-        selected = new mitk::BoolProperty(true);
-        color = new mitk::ColorProperty(1.0, 1.0, 0.0); // if selected, color is yellow
+        selected->SetValue(true);
+        color->SetColor(1.0, 1.0, 0.0);
       }
       else
       {
         newStateEvent = new mitk::StateEvent(EIDNO, stateEvent->GetEvent());
         selected = new mitk::BoolProperty(false);
+        color->SetColor(0.0, 0.0, 1.0);
+
         mitk::BoundingObject* b = dynamic_cast<mitk::BoundingObject*>(m_DataTreeNode->GetData());
         if(b != NULL)
         {
@@ -120,9 +137,7 @@ bool mitk::AffineInteractor::ExecuteAction(Action* action, mitk::StateEvent cons
           color = new mitk::ColorProperty(1.0, 1.0, 1.0);   // if deselcted and no bounding object, color is white
       }
 
-      /* write new state (selected/not selected) to the property */
-      m_DataTreeNode->GetPropertyList()->SetProperty("selected", selected);
-      m_DataTreeNode->GetPropertyList()->SetProperty("color", color);
+      /* write new state (selected/not selected) to the property */      
       this->HandleEvent( newStateEvent );
       ok = true;
       break;

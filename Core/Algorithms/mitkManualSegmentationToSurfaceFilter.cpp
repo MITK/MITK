@@ -2,7 +2,17 @@
 
 
 mitk::ManualSegmentationToSurfaceFilter::ManualSegmentationToSurfaceFilter() 
-  : m_MedianKernelSizeX(3), m_MedianKernelSizeY(3), m_MedianKernelSizeZ(3), m_StandardDeviation(1.5){};
+{
+  m_MedianFilter3D = false;
+  m_MedianKernelSizeX = 3;
+  m_MedianKernelSizeY = 3;
+  m_MedianKernelSizeZ = 3;
+  m_UseStandardDeviation = false;
+  m_StandardDeviation = 1.5;
+  m_Interpolation = false;
+};
+
+
 mitk::ManualSegmentationToSurfaceFilter::~ManualSegmentationToSurfaceFilter(){};
 
 

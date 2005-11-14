@@ -394,6 +394,7 @@ bool mitk::PointSetInteractor::ExecuteAction( Action* action, mitk::StateEvent c
               it++;
           }
 
+          if (it == end) { break; }  
           
         }//if
         it++;

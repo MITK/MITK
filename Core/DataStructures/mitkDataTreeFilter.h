@@ -1,6 +1,5 @@
 #include <mitkDataTree.h> 
 #include <itkSmartPointerVectorContainer.h>
-#include <itkEventObject.h>
 #include "itkMacro.h"
 
 
@@ -261,94 +260,6 @@ namespace mitk
   };
   
   static bool IsTreeNode(mitk::DataTreeNode*);
-
-//------ TreeFilterUpdateAllEvent --------------------------------------------------------
-
-itkEventMacro( TreeFilterUpdateAllEvent, itk::ModifiedEvent );
-
-//------ TreeFilterItemEvent -------------------------------------------------------------
-  class TreeFilterItemEvent : public itk::ModifiedEvent
-  { 
-  public: 
-    typedef TreeFilterItemEvent Self; 
-    typedef ModifiedEvent Superclass; 
-
-    TreeFilterItemEvent() 
-      : m_ChangedItem( NULL ){}
-
-    TreeFilterItemEvent( const mitk::DataTreeFilter::Item* item ) : 
-      m_ChangedItem(item) {} 
-
-    virtual ~TreeFilterItemEvent() {} 
-
-    virtual const char * GetEventName() const 
-    { 
-      return "TreeFilterItemEvent"; 
-    } 
-
-    virtual bool CheckEvent(const ::itk::EventObject* e) const 
-    { 
-      return dynamic_cast<const Self*>(e); 
-    } 
-
-    virtual ::itk::EventObject* MakeObject() const 
-    { 
-      return new Self( m_ChangedItem ); 
-    } 
-
-    const mitk::DataTreeFilter::Item* GetChangedItem() const 
-    { 
-      return m_ChangedItem; 
-    }
-
-  protected:
-    const mitk::DataTreeFilter::Item* m_ChangedItem;
-  
-  private: 
-    // TreeFilterItemEvent(const Self&); 
-    void operator=(const Self&); 
-
-  };
-
-
-//------ TreeFilterItemAddedEvent --------------------------------------------------------
-  class TreeFilterItemAddedEvent : public TreeFilterItemEvent 
-  {
-  public:
-    typedef TreeFilterItemAddedEvent Self; 
-    typedef ModifiedEvent Superclass; 
-
-    TreeFilterItemAddedEvent() : TreeFilterItemEvent() {}
-    TreeFilterItemAddedEvent(const mitk::DataTreeFilter::Item* item) : TreeFilterItemEvent(item) {}
-    
-    virtual ~TreeFilterItemAddedEvent() {} 
-    
-    virtual const char * GetEventName() const 
-    { 
-      return "TreeFilterItemAddedEvent"; 
-    } 
-    
-  };
-  
-  
-//------ TreeFilterRemoveItemEvent -------------------------------------------------------
-  class TreeFilterRemoveItemEvent : public TreeFilterItemEvent 
-  {
-  public:
-    typedef TreeFilterRemoveItemEvent Self; 
-    typedef ModifiedEvent Superclass; 
-
-    TreeFilterRemoveItemEvent() : TreeFilterItemEvent() {}
-    TreeFilterRemoveItemEvent(const mitk::DataTreeFilter::Item* item) : TreeFilterItemEvent(item) {}
-    
-    virtual ~TreeFilterRemoveItemEvent() {} 
-    
-    virtual const char * GetEventName() const 
-    { 
-      return "TreeFilterRemoveItemEvent"; 
-    } 
-    
-  };
 
 } // namespace mitk
 

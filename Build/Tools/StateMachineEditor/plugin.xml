@@ -6,7 +6,7 @@
    version="1.0.0"
    provider-name=""
    class="stateMachines.StateMachinesPlugin">
-
+	
    <runtime>
       <library name="StateMachines.jar">
          <export name="*"/>
@@ -42,8 +42,7 @@
    			icon="states.gif"/>
    </extension>
    
-   <extension
-         point="org.eclipse.ui.actionSets">
+   <extension point="org.eclipse.ui.actionSets">
       <actionSet
             label="Statemachines Action Set"
             visible="true"
@@ -67,8 +66,7 @@
       </actionSet>
    </extension>
    
-   <extension
-         point="org.eclipse.ui.actionSets">
+   <extension point="org.eclipse.ui.actionSets">
       <actionSet
             label="Statemachines Action Set2"
             visible="true"

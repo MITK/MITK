@@ -168,7 +168,7 @@ public class ActionDialog extends JDialog {
 							String action = act.getAttributeValue("NAME");
 							actionNameComboBox.addItem(action);
 							List commentList = act.getContent();
-							String toolTip = "no comment available";
+							String toolTip = "";
 							for (int j = 0; j < commentList.size(); j++) {
 								Object comEle = commentList.get(j);
 								if (comEle instanceof Comment) {
@@ -176,6 +176,9 @@ public class ActionDialog extends JDialog {
 									toolTip = comment.getText();
 									break;
 								}
+							}
+							if (toolTip.equals("")) {
+								toolTip = "no comment available";
 							}
 							tooltips.add(toolTip);
 						}
@@ -382,7 +385,7 @@ public class ActionDialog extends JDialog {
 				String action = act.getAttributeValue("NAME");
 				actionNameComboBox.addItem(action);
 				List commentList = act.getContent();
-				String toolTip = "no comment available";
+				String toolTip = "";
 				for (int j = 0; j < commentList.size(); j++) {
 					Object comEle = commentList.get(j);
 					if (comEle instanceof Comment) {
@@ -390,6 +393,9 @@ public class ActionDialog extends JDialog {
 						toolTip = comment.getText();
 						break;
 					}
+				}
+				if (toolTip.equals("")) {
+					toolTip = "no comment available";
 				}
 				tooltips.add(toolTip);
 			}
@@ -403,7 +409,7 @@ public class ActionDialog extends JDialog {
 				}
 				if (contains == false) {
 					actionNameComboBox.addItem(action.getAction());
-					tooltips.add("");
+					tooltips.add("no comment available");
 				}
 				actionNameComboBox.setSelectedItem(action.getAction());
 			}

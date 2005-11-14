@@ -4,6 +4,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.JOptionPane;
+
 import model.StateMachinesDiagram;
 
 import org.eclipse.core.resources.IContainer;
@@ -413,6 +415,9 @@ public class StateMachinesList extends ViewPart implements ISaveablePart, IDoubl
 			page1.hideView(this);
 			return false;
 		}
+		else if (workbenchIsClosing) {
+			return false;
+		}
 		if (dirty) {
 			return true;
 		}
@@ -422,6 +427,14 @@ public class StateMachinesList extends ViewPart implements ISaveablePart, IDoubl
 	public void dispose() {
 		if (!PlatformUI.getWorkbench().isClosing()) {
 			PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().closeAllEditors(true);
+		}
+		if (PlatformUI.getWorkbench().isClosing()) {
+			if (dirty) {
+				int result = JOptionPane.showConfirmDialog(null,"'StateMachinesList' has been modified. Save changes?", "Save Resource", JOptionPane.YES_NO_OPTION);
+				if (result == JOptionPane.YES_OPTION) {
+					doSave(null);
+				}
+			}
 		}
 		if (!(isSaved)) {
 			int listSize = undoList.size();

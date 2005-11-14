@@ -1,11 +1,13 @@
 package stateMachines;
 
+import org.eclipse.ui.IWorkbenchPreferenceConstants;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 
 /**
  * The main plugin class to be used in the desktop.
  */
-public class StateMachinesPlugin extends AbstractUIPlugin {
+public class StateMachinesPlugin extends AbstractUIPlugin implements IWorkbenchPreferenceConstants{
 
 	/** Single plugin instance. */
 	private static StateMachinesPlugin singleton;
@@ -14,6 +16,7 @@ public class StateMachinesPlugin extends AbstractUIPlugin {
 	 * Returns the shared plugin instance.
 	 */
 	public static StateMachinesPlugin getDefault() {
+		PlatformUI.getPreferenceStore().putValue(CLOSE_EDITORS_ON_EXIT, "true");
 		return singleton;
 	}
 

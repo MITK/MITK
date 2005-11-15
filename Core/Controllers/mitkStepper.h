@@ -42,7 +42,7 @@ public:
   itkNewMacro(Self);
 
   itkGetMacro(Pos, unsigned int);
-  void SetPos(unsigned int pos) { // copied from itkMacro.h, itkSetClampMacro(...)
+  virtual void SetPos(unsigned int pos) { // copied from itkMacro.h, itkSetClampMacro(...)
     if (this->m_Pos != (pos > m_Steps-1 ? m_Steps-1 : pos)) {
       this->m_Pos = pos > m_Steps-1 ? m_Steps-1 : pos ;
       this->Modified();
@@ -52,13 +52,6 @@ public:
   itkGetMacro(Steps, unsigned int);
   itkSetMacro(Steps, unsigned int);
 
-  itkGetMacro(StepSize, unsigned int);
-  void SetStepSize(unsigned int stepSize) { // copied from itkMacro.h, itkSetClampMacro(...)
-    if (this->m_StepSize != (stepSize > m_Steps-1 ? m_Steps-1 : stepSize)) {
-      this->m_StepSize = stepSize > m_Steps-1 ? m_Steps-1 : stepSize;
-      this->Modified();
-    } 
-  }
   itkGetMacro(AutoRepeat, bool);
   itkSetMacro(AutoRepeat, bool);
   itkBooleanMacro(AutoRepeat);
@@ -75,16 +68,16 @@ public:
   itkBooleanMacro(InverseDirection);
 
   //##ModelId=3DF8B92703A4
-  void Next();
+  virtual void Next();
 
   //##ModelId=3DF8B9410142
-  void Previous();
+  virtual void Previous();
 
   //##ModelId=3DF8B91502F8
-  void First();
+  virtual void First();
 
   //##ModelId=3DF8B92F01DF
-  void Last();
+  virtual void Last();
 
 protected:
   Stepper();
@@ -99,9 +92,6 @@ protected:
 
   //##ModelId=3DF8F73C0076
   unsigned int m_Steps;
-
-  //##ModelId=3DF8F74101AE
-  unsigned int m_StepSize;
 
   bool m_AutoRepeat;
   

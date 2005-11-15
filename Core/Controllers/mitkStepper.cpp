@@ -19,9 +19,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkStepper.h"
 
-mitk::Stepper::Stepper() : m_Pos(0), m_Steps(0), m_StepSize(1), 
-                           m_AutoRepeat(false), m_PingPong(false), 
-                           m_InverseDirection(false)
+mitk::Stepper::Stepper() : m_Pos(0), m_Steps(0), m_AutoRepeat(false), 
+                           m_PingPong(false), m_InverseDirection(false)
 {
 }
 

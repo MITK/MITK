@@ -19,9 +19,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkStepper.h"
 
-mitk::Stepper::Stepper()
-: m_Pos(0), m_Steps(0), m_StepSize(1), m_PosToUnitFactor(1), m_ZeroLine(0),
-  m_AutoRepeat(false), m_PingPong(false), m_InverseDirection(false)
+mitk::Stepper::Stepper() : m_Pos(0), m_Steps(0), m_StepSize(1), 
+                           m_AutoRepeat(false), m_PingPong(false), 
+                           m_InverseDirection(false)
 {
 }
 
@@ -125,38 +125,3 @@ void mitk::Stepper::Last()
   }
 }
 
-float mitk::Stepper::ConvertPosToUnit(unsigned int posValue)
-{
-  if (posValue >= m_Steps)
-  {
-    if (m_Steps == 0)
-    {
-      posValue = 0;
-    }
-    else
-    {
-      posValue = m_Steps-1;
-    }
-  }
-  return posValue * m_PosToUnitFactor - m_ZeroLine;
-}
-
-unsigned int mitk::Stepper::ConvertUnitToPos(float unitValue)
-{
-  unsigned int posValue = static_cast< unsigned int >(
-    unitValue / m_PosToUnitFactor + m_ZeroLine + 0.5
-  );
-
-  if (posValue >= m_Steps)
-  {
-    if (m_Steps == 0)
-    {
-      posValue = 0;
-    }
-    else
-    {
-      posValue = m_Steps-1;
-    }
-  }
-  return posValue;
-}

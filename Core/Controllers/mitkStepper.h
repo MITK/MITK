@@ -59,19 +59,6 @@ public:
       this->Modified();
     } 
   }
-
-  virtual float ConvertPosToUnit(unsigned int posValue);
-  virtual unsigned int ConvertUnitToPos(float unitValue);
-
-  itkGetMacro(PosToUnitFactor, float);
-  itkSetMacro(PosToUnitFactor, float);
-
-  itkGetMacro(ZeroLine, float);
-  itkSetMacro(ZeroLine, float);
-
-  itkGetStringMacro(UnitName);
-  itkSetStringMacro(UnitName);
-
   itkGetMacro(AutoRepeat, bool);
   itkSetMacro(AutoRepeat, bool);
   itkBooleanMacro(AutoRepeat);
@@ -116,17 +103,10 @@ protected:
   //##ModelId=3DF8F74101AE
   unsigned int m_StepSize;
 
-  float m_PosToUnitFactor;
-  float m_ZeroLine;
-
-  std::string m_UnitName;
-
   bool m_AutoRepeat;
   
   bool m_PingPong;
   bool m_InverseDirection;
-
-private:
 
 };
 

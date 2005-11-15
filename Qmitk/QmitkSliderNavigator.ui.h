@@ -37,9 +37,9 @@ void QmitkSliderNavigator::Refetch()
     slider->setMaxValue(m_Stepper->GetSteps()-1);
     slider->setValue(m_Stepper->GetPos());
     
-    spinBox->setMinValue( (int) m_Stepper->ConvertPosToUnit(0) );
-    spinBox->setMaxValue( (int) m_Stepper->ConvertPosToUnit(m_Stepper->GetSteps()));
-    spinBox->setValue((int) m_Stepper->ConvertPosToUnit(m_Stepper->GetPos()) );
+    spinBox->setMinValue( 0 );
+    spinBox->setMaxValue( m_Stepper->GetSteps()-1 );
+    spinBox->setValue( m_Stepper->GetPos() );
     
     m_InRefetch=false;
   }
@@ -72,7 +72,7 @@ void QmitkSliderNavigator::spinBox_valueChanged( int )
 {
   if(!m_InRefetch)
   {
-    m_Stepper->SetPos( (int) m_Stepper->ConvertPosToUnit(spinBox->value()) );
+    m_Stepper->SetPos( spinBox->value() );
     this->Refetch();
   }
 }

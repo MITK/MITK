@@ -31,9 +31,9 @@ void QmitkTwoButtonNavigator::Refetch()
   {
     m_InRefetch=true;
     
-    m_SpinBox->setMinValue( (int) m_Stepper->ConvertPosToUnit(0) );
-    m_SpinBox->setMaxValue( (int) m_Stepper->ConvertPosToUnit(m_Stepper->GetSteps()));
-    m_SpinBox->setValue((int) m_Stepper->ConvertPosToUnit(m_Stepper->GetPos()) );
+    m_SpinBox->setMinValue( 0 );
+    m_SpinBox->setMaxValue( m_Stepper->GetSteps()-1 );
+    m_SpinBox->setValue( m_Stepper->GetPos() );
     m_InRefetch=false;
   }
 }
@@ -53,7 +53,7 @@ void QmitkTwoButtonNavigator::init()
 void QmitkTwoButtonNavigator::SpinBoxValueChanged(int value)
 {
   if(!m_InRefetch)
-    m_Stepper->SetPos((int) m_Stepper->ConvertPosToUnit(m_SpinBox->value()));
+    m_Stepper->SetPos(m_SpinBox->value());
 }
 
 void QmitkTwoButtonNavigator::prevButton_clicked()

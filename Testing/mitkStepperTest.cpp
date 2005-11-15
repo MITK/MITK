@@ -36,7 +36,7 @@ int mitkStepperTest(int argc, char* argv[])
   mitk::Stepper::Pointer stepperB = mitk::Stepper::New();
   stepperA->SetSteps(4);
   //stepperA->PingPongOn();
-  tepperB->SetSteps(6);
+  stepperB->SetSteps(6);
   // stepperB->PingPongOn();
   /* for (int i=0 ; i<10; i++) {
     std::cout << i << ": A: " << stepperA->GetPos() << " B:" << stepperB->GetPos() << std::endl; 

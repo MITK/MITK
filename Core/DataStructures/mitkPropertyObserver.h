@@ -1,3 +1,6 @@
+#ifndef MITK_BASEPROPERTYOBSERVER_H_INCLUDED
+#define MITK_BASEPROPERTYOBSERVER_H_INCLUDED
+
 #include <mitkBaseProperty.h>
 
 namespace mitk {
@@ -12,12 +15,38 @@ namespace mitk {
   without the need to reimplement the Subject-Observer handling.
 
 */
-class PropertyObserver
+class PropertyObserver {};
+  
+class PropertyView : public PropertyObserver
 {
   public:
 
-    PropertyObserver( mitk::BaseProperty* );
-    virtual ~PropertyObserver();
+    PropertyView( const mitk::BaseProperty* );
+    virtual ~PropertyView();
+
+    void OnModified(const itk::EventObject& e);
+
+    void OnDelete(const itk::EventObject& e);
+
+  protected:
+
+    virtual void PropertyChanged() = 0;
+    virtual void PropertyRemoved() = 0;
+
+    void BeginModifyProperty();
+    void EndModifyProperty();
+    
+    const mitk::BaseProperty* m_Property;
+    unsigned long m_ModifiedTag;
+    unsigned long m_DeleteTag;
+};
+
+class PropertyEditor : public PropertyObserver
+{
+  public:
+
+    PropertyEditor( mitk::BaseProperty* );
+    virtual ~PropertyEditor();
 
     void OnModified(const itk::EventObject& e);
     virtual void PropertyChanged() = 0;
@@ -26,11 +55,16 @@ class PropertyObserver
     virtual void PropertyRemoved() = 0;
 
   protected:
+    
+    void BeginModifyProperty();
+    void EndModifyProperty();
 
     mitk::BaseProperty* m_Property;
-    unsigned long m_ModifiedObserverTag;
-    unsigned long m_DeleteObserverTag;
+    unsigned long m_ModifiedTag;
+    unsigned long m_DeleteTag;
 };
   
 }
+
+#endif
 

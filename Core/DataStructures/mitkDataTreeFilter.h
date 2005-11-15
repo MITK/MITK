@@ -1,7 +1,9 @@
+#ifndef MITK_DATATREEFILTER_H_INCLUDED
+#define MITK_DATATREEFILTER_H_INCLUDED
+
 #include <mitkDataTree.h> 
 #include <itkSmartPointerVectorContainer.h>
 #include "itkMacro.h"
-
 
 /*
 
@@ -263,5 +265,6 @@ namespace mitk
 
 } // namespace mitk
 
-
+#endif
 // vi: textwidth=90
+

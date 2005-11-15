@@ -1,3 +1,5 @@
+#ifndef __itkSmartPointerVectorContainer_h
+#define __itkSmartPointerVectorContainer_h
 /*
 
    Defines a vector container just like from itkSmartPointerVectorContainer.h.
@@ -27,8 +29,6 @@
      PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
-#ifndef __itkSmartPointerVectorContainer_h
-#define __itkSmartPointerVectorContainer_h
 
 #include "itkObject.h"
 #include "itkObjectFactory.h"
@@ -220,3 +220,4 @@ public:
 #endif
 
 #endif
+

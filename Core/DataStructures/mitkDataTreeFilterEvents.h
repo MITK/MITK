@@ -1,3 +1,6 @@
+#ifndef MITK_DATATREEFILTEREVENTS_H_INCLUDED
+#define MITK_DATATREEFILTEREVENTS_H_INCLUDED
+
 #include <itkEventObject.h>
 
 namespace mitk {
@@ -175,3 +178,6 @@ itkEventMacro( TreeFilterRemoveAllEvent, itk::ModifiedEvent );
   };
 
 }
+
+#endif
+

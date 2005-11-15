@@ -31,51 +31,47 @@ mitk::Stepper::~Stepper()
 
 void mitk::Stepper::Increase()
 {
-  if (m_Pos < m_Steps - 1)
+  if (this->GetPos() < this->GetSteps() - 1)
   {
-    ++m_Pos;
-    this->Modified();
+    this->SetPos(this->GetPos() + 1);
   }
   else if (m_AutoRepeat)
   {
     if (!m_PingPong)
     {
-      m_Pos = 0;
+      this->SetPos(0);
     }
     else
     {
       m_InverseDirection = true;
-      if (m_Pos > 0)
+      if (this->GetPos() > 0)
       {
-        --m_Pos;
+        this->SetPos(this->GetPos() - 1);
       }
     }
-    this->Modified();
   }
 }
 
 void mitk::Stepper::Decrease()
 {
-  if (m_Pos > 0)
+  if (this->GetPos() > 0)
   {
-    --m_Pos;
-    this->Modified();
+    this->SetPos(this->GetPos() - 1);
   }
   else if (m_AutoRepeat)
   {
     if (!m_PingPong)
     {
-      m_Pos = m_Steps - 1;
+      this->SetPos(this->GetSteps() - 1);
     }
     else
     {
       m_InverseDirection = false;
-      if (m_Pos < m_Steps - 1)
+      if (this->GetPos() < this->GetSteps() - 1)
       {
-        ++m_Pos;
+        this->SetPos(this->GetPos() + 1);
       }
     }
-    this->Modified();
   }
 }
 
@@ -108,20 +104,12 @@ void mitk::Stepper::Previous()
 //##ModelId=3DF8B91502F8
 void mitk::Stepper::First()
 {
-  if (m_Pos != 0)
-  {
-    m_Pos = 0;
-    this->Modified();
-  }
+    this->SetPos(0);
 }
 
 //##ModelId=3DF8B92F01DF
 void mitk::Stepper::Last()
 {
-  if (m_Pos != m_Steps - 1)
-  {
-    m_Pos = m_Steps - 1;
-    this->Modified();
-  }
+  this->SetPos(this->GetSteps() - 1);
 }
 

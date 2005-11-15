@@ -71,6 +71,7 @@ QUndoRedoButton::QUndoRedoButton( QWidget* parent, const char* name)
 QUndoRedoButton::~QUndoRedoButton()
 {
   // nothing to do
+  delete m_popup;
 }
 
 const QPixmap* QUndoRedoButton::pixmap() const

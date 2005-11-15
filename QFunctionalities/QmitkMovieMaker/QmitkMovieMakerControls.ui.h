@@ -71,6 +71,11 @@ void QmitkMovieMakerControls::RBTNTemporal()
   emit SwitchAspect( 1 );
 }
 
+void QmitkMovieMakerControls::RBTNCombined()
+{
+  emit SwitchAspect( 2 );
+}
+
 void QmitkMovieMakerControls::CMBSelectedWindow( int window )
 {
  emit SwitchSelectedWindow( window );

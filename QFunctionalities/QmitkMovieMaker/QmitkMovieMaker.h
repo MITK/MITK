@@ -22,6 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkFunctionality.h"
 #include "mitkCameraRotationController.h"
 #include "mitkStepper.h"
+#include "mitkMultiStepper.h"
 #include "itkCommand.h"
 
 class QmitkStdMultiWidget;
@@ -135,6 +136,6 @@ private:
   int m_Direction;
 
   int m_Aspect;
-
+  mitk::MultiStepper::Pointer m_Stepper;
 };
 #endif // !defined(QMITK_MOVIEMAKER_H__INCLUDED)

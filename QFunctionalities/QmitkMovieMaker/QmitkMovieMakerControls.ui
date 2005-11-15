@@ -219,7 +219,16 @@
                                     <property name="text">
                                         <string>Temporal</string>
                                     </property>
+                                    </widget>
+                                    <widget class="QRadioButton">
+                                    <property name="name">
+                                        <cstring>rbtnCombined</cstring>
+                                    </property>
+                                    <property name="text">
+                                        <string>Combined</string>
+                                    </property>
                                 </widget>
+                               
                                 <widget class="QLayoutWidget">
                                     <property name="name">
                                         <cstring>layout6</cstring>
@@ -385,7 +394,13 @@
         <receiver>QmitkMovieMakerControls</receiver>
         <slot>RBTNTemporal()</slot>
     </connection>
-    <connection>
+<connection>
+        <sender>rbtnCombined</sender>
+        <signal>clicked()</signal>
+        <receiver>QmitkMovieMakerControls</receiver>
+        <slot>RBTNCombined()</slot>
+    </connection>
+        <connection>
         <sender>cmbSelectedWindow</sender>
         <signal>activated(int)</signal>
         <receiver>QmitkMovieMakerControls</receiver>
@@ -424,6 +439,7 @@
     <slot>RBTNPingPong()</slot>
     <slot>RBTNSpatial()</slot>
     <slot>RBTNTemporal()</slot>
+    <slot>RBTNCombined()</slot>
     <slot>CMBSelectedWindow( int window )</slot>
     <slot>BlockControls()</slot>
     <slot>UnBlockControls()</slot>

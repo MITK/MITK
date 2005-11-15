@@ -1,0 +1,223 @@
+/*=========================================================================
+
+Program:   Medical Imaging & Interaction Toolkit
+Module:    $RCSfile$
+Language:  C++
+Date:      $Date$
+Version:   $Revision$ 
+ 
+Copyright (c) German Cancer Research Center, Division of Medical and
+Biological Informatics. All rights reserved.
+See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
+
+This software is distributed WITHOUT ANY WARRANTY; without even
+the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE.  See the above copyright notices for more information.
+
+=========================================================================*/
+#include <QmitkColorPropertyEditor.h>
+
+#include <qlayout.h>
+#include <qpainter.h>
+#include <qapplication.h>
+
+//----- QmitkPopupColorChooser ---------------------------------------------------------
+
+QmitkPopupColorChooser::QmitkPopupColorChooser(QWidget* parent, unsigned int steps, unsigned int size, const char* name)
+: QFrame (parent, name, WStyle_StaysOnTop | WStyle_Customize | WStyle_NoBorder | WStyle_Tool | WX11BypassWM),
+  m_moves(0),
+  my_parent(parent)
+{
+  setSteps(steps);
+  
+  QVBoxLayout* vbox = new QVBoxLayout(this, lineWidth());
+  
+  setLineWidth(2);
+  setMouseTracking ( TRUE );
+  
+  setMargin(0);
+  setAutoMask( FALSE );
+  setFrameStyle ( QFrame::Panel | QFrame::Raised );
+  setLineWidth( 1 );
+  polish();
+  resize(size, size);
+
+  hide();
+}
+
+QmitkPopupColorChooser::~QmitkPopupColorChooser()
+{
+}
+
+void QmitkPopupColorChooser::setSteps(int steps)
+{
+  m_Steps = steps;
+  m_Steps2 = m_Steps / 2;
+  m_HStep = 360 / m_Steps;
+  m_SStep = 512 / m_Steps;
+  m_VStep = 512 / m_Steps;
+}
+
+void QmitkPopupColorChooser::mouseMoveEvent (QMouseEvent* e)
+{  
+  double x(e->pos().x());
+  double y(e->pos().y());
+  x /= width();
+  
+  if ( x >= 0.0 ) 
+  {
+    //x = (int)(x / (1.0/m_Steps)) * (1.0/m_Steps); // div stepsize * stepsize
+    x = (int)(x * (float)(m_Steps-1)) / (float)(m_Steps-1); // same as above
+    if (x > 1.0) x = 1.0;
+    if (x < 0.0) x = 0.0;
+  }
+  
+  y /= height();
+  if (y >= 1.0) y = 0.9;
+  if (y < 0.0) y = 0.0;
+  y = (int)(y * (float)m_Steps) / (float)m_Steps;
+
+  m_H = static_cast<int>( y * 359.0 );
+  if ( x >= 0.5 )
+  {
+    m_S = static_cast<int>( (1.0 - x) * 511.0 );
+    if ( m_S > 255 ) m_S = 255;
+    m_V = 255;
+  }
+  else
+  {
+    m_S = 255;
+    if ( x < 0.0 )
+      m_V = 0;
+    else
+    {
+      m_V = static_cast<int>( x * 511.0 + 511.0 / (float)(m_Steps-1) );
+      if ( m_V > 255 ) m_V = 255;
+    }
+  }
+
+  QColor color;
+  color.setHsv(m_H, m_S, m_V);
+
+  emit colorSelected( color );
+
+  ++m_moves;
+}
+
+void QmitkPopupColorChooser::mouseReleaseEvent (QMouseEvent* e)
+{
+  if  (rect().contains( e->pos () ) || m_moves < 4) 
+    close ();
+  ++m_moves;
+}
+
+void QmitkPopupColorChooser::closeEvent (QCloseEvent*e)
+{
+  e->accept ();
+
+  releaseMouse();
+
+  if (!m_popupParent) return;
+
+  // remember that we (as a popup) might recieve the mouse release
+  // event instead of the popupParent. This is due to the fact that
+  // the popupParent popped us up in its mousePressEvent handler. To
+  // avoid the button remaining in pressed state we simply send a
+  // faked mouse button release event to it.
+  // Maleike: parent should not pop us on MouseRelease!
+  QMouseEvent  me( QEvent::MouseButtonRelease, QPoint(0,0), QPoint(0,0), QMouseEvent::LeftButton, QMouseEvent::NoButton);
+  QApplication::sendEvent ( m_popupParent, &me );
+}
+
+void QmitkPopupColorChooser::popup(QWidget* parent, const QPoint& point)
+{
+  m_popupParent = parent;
+  if (m_popupParent)
+  {
+    //QPoint newPos;
+    //newPos.setX( m_popupParent->rect().left() + m_popupParent->rect().width() / 2 - width() / 2);
+    //newPos.setY( m_popupParent->rect().top() + m_popupParent->rect().height() / 2 - height() / 2);
+    //move ( m_popupParent->mapToGlobal( newPos ) );
+    QPoint newPos;
+    newPos.setX( point.x() - width() / 2 );
+    newPos.setY( point.y() - height() / 2 );
+    move ( m_popupParent->mapToGlobal( newPos ) );
+  }
+  
+  show();
+  raise();
+  grabMouse();
+  m_moves = 0;
+}
+
+void QmitkPopupColorChooser::paintEvent(QPaintEvent* e)
+{
+  QPainter painter(this);
+  drawGradient( &painter );
+}
+
+void QmitkPopupColorChooser::drawGradient( QPainter* p)
+{
+  p->setWindow( 0, 0, m_Steps-1, m_Steps );       // defines coordinate system
+  p->setPen( Qt::NoPen ); 
+
+  QColor c;
+  for ( int h = 0; h < m_Steps; ++h )
+  {
+    for ( int v = 1; v < m_Steps2; ++v )
+    {                
+      c.setHsv( h*m_HStep, 255, v*m_VStep );             // rainbow effect
+      p->setBrush( c );                  // solid fill with color c
+      p->drawRect( v-1, h, m_Steps2, m_Steps );         // draw the rectangle
+    }
+    for ( int s = 0; s < m_Steps2; ++s )
+    {                
+      c.setHsv( h*m_HStep, 255 - s*m_SStep, 255 );             // rainbow effect
+      p->setBrush( c );                  // solid fill with color c
+      p->drawRect( m_Steps2+s-1, h, m_Steps2, m_Steps );         // draw the rectangle
+    }
+  }
+}
+
+//----- QmitkColorPropertyEditor --------------------------------------------------
+
+QmitkColorPropertyEditor::QmitkColorPropertyEditor( const mitk::ColorProperty* property, QWidget* parent, const char* name )
+: QmitkColorPropertyView( property, parent, name )
+{
+  // our popup belongs to the whole screen, so it could be drawn outside the toplevel window's borders
+  int scr;
+  if ( QApplication::desktop()->isVirtualDesktop() )
+    scr = QApplication::desktop()->screenNumber( parent->mapToGlobal( pos() ) ); 
+  else
+    scr = QApplication::desktop()->screenNumber( parent ); 
+      
+  colorChooser = new QmitkPopupColorChooser( QApplication::desktop()->screen( scr ) );
+
+  connect( colorChooser, SIGNAL(colorSelected(QColor)), this, SLOT(onColorSelected(QColor)) );
+}
+
+QmitkColorPropertyEditor::~QmitkColorPropertyEditor()
+{
+  delete colorChooser;
+}
+
+void QmitkColorPropertyEditor::mousePressEvent(QMouseEvent* e)
+{
+  colorChooser->popup(this, e->pos());
+}
+
+void QmitkColorPropertyEditor::mouseReleaseEvent(QMouseEvent*)
+{
+}
+
+void QmitkColorPropertyEditor::onColorSelected(QColor c)
+{
+  if (m_ColorProperty)
+  {
+    int r,g,b;
+    c.getRgb( &r, &g, &b );
+    const_cast<mitk::ColorProperty*>(m_ColorProperty)->SetColor( r / 255.0, g / 255.0, b / 255.0 );
+    const_cast<mitk::ColorProperty*>(m_ColorProperty)->Modified();
+  }
+}
+

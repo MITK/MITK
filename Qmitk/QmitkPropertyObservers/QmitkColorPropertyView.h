@@ -1,0 +1,48 @@
+/*=========================================================================
+
+Program:   Medical Imaging & Interaction Toolkit
+Module:    $RCSfile$
+Language:  C++
+Date:      $Date$
+Version:   $Revision$ 
+ 
+Copyright (c) German Cancer Research Center, Division of Medical and
+Biological Informatics. All rights reserved.
+See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
+
+This software is distributed WITHOUT ANY WARRANTY; without even
+the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE.  See the above copyright notices for more information.
+
+=========================================================================*/
+#ifndef QMITK_COLORPROPERTYVIEW_H_INCLUDED
+#define QMITK_COLORPROPERTYVIEW_H_INCLUDED
+
+#include <mitkPropertyObserver.h>
+#include <mitkColorProperty.h>
+#include <qlabel.h>
+
+class QmitkColorPropertyView : public QLabel, public mitk::PropertyView
+{
+  Q_OBJECT
+
+  public:
+    
+    QmitkColorPropertyView( const mitk::ColorProperty*, QWidget* parent, const char* name = 0 );
+    virtual ~QmitkColorPropertyView();
+      
+  protected:
+
+    virtual void PropertyChanged();
+    virtual void PropertyRemoved();
+
+    void DisplayColor();
+
+    const mitk::ColorProperty* m_ColorProperty;
+
+  private:
+
+};
+
+#endif
+

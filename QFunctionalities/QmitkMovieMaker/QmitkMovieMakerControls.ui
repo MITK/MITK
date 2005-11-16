@@ -8,7 +8,7 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>282</width>
+            <width>328</width>
             <height>601</height>
         </rect>
     </property>
@@ -165,6 +165,38 @@
                                         <string>Ping-Pong</string>
                                     </property>
                                 </widget>
+                                <widget class="QLayoutWidget">
+                                    <property name="name">
+                                        <cstring>layout6</cstring>
+                                    </property>
+                                    <hbox>
+                                        <property name="name">
+                                            <cstring>unnamed</cstring>
+                                        </property>
+                                        <widget class="QLabel">
+                                            <property name="name">
+                                                <cstring>textLabel2</cstring>
+                                            </property>
+                                            <property name="text">
+                                                <string>Cycle (sec)</string>
+                                            </property>
+                                        </widget>
+                                        <widget class="QSpinBox">
+                                            <property name="name">
+                                                <cstring>spnDuration</cstring>
+                                            </property>
+                                            <property name="maxValue">
+                                                <number>200</number>
+                                            </property>
+                                            <property name="minValue">
+                                                <number>1</number>
+                                            </property>
+                                            <property name="value">
+                                                <number>5</number>
+                                            </property>
+                                        </widget>
+                                    </hbox>
+                                </widget>
                             </vbox>
                         </widget>
                         <widget class="Line">
@@ -219,8 +251,8 @@
                                     <property name="text">
                                         <string>Temporal</string>
                                     </property>
-                                    </widget>
-                                    <widget class="QRadioButton">
+                                </widget>
+                                <widget class="QRadioButton">
                                     <property name="name">
                                         <cstring>rbtnCombined</cstring>
                                     </property>
@@ -228,10 +260,9 @@
                                         <string>Combined</string>
                                     </property>
                                 </widget>
-                               
                                 <widget class="QLayoutWidget">
                                     <property name="name">
-                                        <cstring>layout6</cstring>
+                                        <cstring>layout6_2</cstring>
                                     </property>
                                     <hbox>
                                         <property name="name">
@@ -239,24 +270,24 @@
                                         </property>
                                         <widget class="QLabel">
                                             <property name="name">
-                                                <cstring>textLabel2</cstring>
+                                                <cstring>textLabel2_2</cstring>
                                             </property>
                                             <property name="text">
-                                                <string>Cycle (sec)</string>
+                                                <string>S/T Relation</string>
                                             </property>
                                         </widget>
                                         <widget class="QSpinBox">
                                             <property name="name">
-                                                <cstring>spnDuration</cstring>
+                                                <cstring>spatialTimeRelation</cstring>
                                             </property>
                                             <property name="maxValue">
-                                                <number>200</number>
+                                                <number>10</number>
                                             </property>
                                             <property name="minValue">
-                                                <number>1</number>
+                                                <number>-10</number>
                                             </property>
                                             <property name="value">
-                                                <number>5</number>
+                                                <number>0</number>
                                             </property>
                                         </widget>
                                     </hbox>
@@ -339,7 +370,7 @@
         <data format="PNG" length="270">89504e470d0a1a0a0000000d4948445200000018000000180806000000e0773df8000000d549444154789ced944d0ac2301046bf7426fe744ab1a027d053f40a227816dde805db0b75693bee6dad335211c4b77c13f20221095555e193241fddfd1fb0c0cf066559eaa3535584107a6b5515755df707630100389f4f288a02cc8ccbe5fad2bb032282dd768b5bdb9afc102fefa0eb3a14ab95d9bb02f3d90ccc041131797720cb043146a4929abc3b3005df0d6c366b6499205da626ef0e4cc16860b198838940493079778089c1cc48884cde1d2022e4798e18a3c90f1e726cb83f1c5dde1550ed7da6689a66d0bf1578f6fd7af9f1973c05772ae8300e0e8366c20000000049454e44ae426082</data>
     </image>
     <image name="image2">
-        <data format="PNG" length="289">89504e470d0a1a0a0000000d4948445200000018000000180806000000e0773df8000000e849444154789ced95516ec2300c86bfd40eb0ba2a8d340e30b1d75d6ebcb0a37028cec00bb700ea3dac2f40618c1624d07ec98ae224feec484e82bb734b65378dfe14003d748410de8071338dc006c8010742331ec658bbfbea22009080e59509874b0019c06cf6494a09d5b62dfb9acfbf4eae9d3c6d66bc4fa76c77bb5f01e77436bdbaae4955d53ba006180e06a80a66d63b0080a230628ce4967702dcbf0f68ae683279a5288cfce5012b0060341aa2224876d43b9d015b00154555c9447a07040011a12c4b628c9d00b8fb9e011ffc3c687fb24647f1da2a585ff9cb2dda9ce1ffcb7c7ec037985b4dd6990bb6960000000049454e44ae426082</data>
+        <data format="PNG" length="247">89504e470d0a1a0a0000000d4948445200000018000000180806000000e0773df8000000be49444154789cdd95d10e82300c45ef6807b82e8425f205f885f282ff2ec317f00132506026781fb7aea7cdd25bd5f73d622a899afd2f003c3d504a6d4a14facb19608cdf440166d58500689a3b9c73600e86bcd5b68fe05df0b588e056d77876dd2a60498be579efe1ca320e204b53301344240ec05a81d61a46cc2ec0efe76054555d61adc05cceda419e67602250b26db257014c0c66464214074044288a025aeb5d003535a9c1ecbef6a221cf675e74e4969b7570b4cebfd1ce0f780101051f7c7cab3f560000000049454e44ae426082</data>
     </image>
     <image name="image3">
         <data format="XBM.GZ" length="79">789c534e494dcbcc4b554829cdcdad8c2fcf4c29c95030e0524611cd48cd4ccf28010a1797249664262b2467241641a592324b8aa363156c15aab914146aadb90067111b1f</data>
@@ -394,13 +425,13 @@
         <receiver>QmitkMovieMakerControls</receiver>
         <slot>RBTNTemporal()</slot>
     </connection>
-<connection>
+    <connection>
         <sender>rbtnCombined</sender>
         <signal>clicked()</signal>
         <receiver>QmitkMovieMakerControls</receiver>
         <slot>RBTNCombined()</slot>
     </connection>
-        <connection>
+    <connection>
         <sender>cmbSelectedWindow</sender>
         <signal>activated(int)</signal>
         <receiver>QmitkMovieMakerControls</receiver>
@@ -413,7 +444,6 @@
     <tabstop>rbtnPingPong</tabstop>
     <tabstop>rbtnSpatial</tabstop>
     <tabstop>rbtnTemporal</tabstop>
-    <tabstop>spnDuration</tabstop>
     <tabstop>cmbSelectedWindow</tabstop>
 </tabstops>
 <includes>

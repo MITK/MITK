@@ -363,9 +363,17 @@ mitk::Stepper* QmitkMovieMaker::GetAspectStepper()
     return this->GetTemporalController()->GetTime();
   } else if (m_Aspect == 2) {
     if (m_Stepper.IsNull()) {
+      int rel = m_Controls->spatialTimeRelation->value();
+      int timeRepeat =1 ;
+      int sliceRepeat = 1;
+      if (rel < 0 ) {
+        sliceRepeat = -rel;
+      } else if (rel > 0) {
+        imeRepeat = rel;
+      }
       m_Stepper = mitk::MultiStepper::New();
-      m_Stepper->AddStepper(this->GetSpatialController()->GetSlice());
-      m_Stepper->AddStepper(this->GetTemporalController()->GetTime());
+      m_Stepper->AddStepper(this->GetSpatialController()->GetSlice(),sliceRepeat);
+      m_Stepper->AddStepper(this->GetTemporalController()->GetTime(),timeRepeat);
     }
     return m_Stepper.GetPointer();
   }

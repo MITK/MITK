@@ -293,7 +293,6 @@ void QmitkMovieMaker::SetDirection( int direction )
 
 void QmitkMovieMaker::SetAspect( int aspect )
 {
-      std::cout << "in set aspect" << aspect << std::endl;
   m_Aspect = aspect;
   this->SwitchAspect( m_Aspect );
 }
@@ -364,7 +363,6 @@ mitk::Stepper* QmitkMovieMaker::GetAspectStepper()
     return this->GetTemporalController()->GetTime();
   } else if (m_Aspect == 2) {
     if (m_Stepper.IsNull()) {
-      std::cout << "creating multi stepper" << std::endl;
       m_Stepper = mitk::MultiStepper::New();
       m_Stepper->AddStepper(this->GetSpatialController()->GetSlice());
       m_Stepper->AddStepper(this->GetTemporalController()->GetTime());

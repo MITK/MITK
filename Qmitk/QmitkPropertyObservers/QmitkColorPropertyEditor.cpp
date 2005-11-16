@@ -129,18 +129,70 @@ void QmitkPopupColorChooser::closeEvent (QCloseEvent*e)
   QApplication::sendEvent ( m_popupParent, &me );
 }
 
-void QmitkPopupColorChooser::popup(QWidget* parent, const QPoint& point)
+void QmitkPopupColorChooser::popup(QWidget* parent, const QPoint& point, const mitk::Color* color)
 {
   m_popupParent = parent;
   if (m_popupParent)
   {
-    //QPoint newPos;
-    //newPos.setX( m_popupParent->rect().left() + m_popupParent->rect().width() / 2 - width() / 2);
-    //newPos.setY( m_popupParent->rect().top() + m_popupParent->rect().height() / 2 - height() / 2);
-    //move ( m_popupParent->mapToGlobal( newPos ) );
     QPoint newPos;
-    newPos.setX( point.x() - width() / 2 );
-    newPos.setY( point.y() - height() / 2 );
+
+    if (color)
+    {
+      QColor qcolor( (int)((*color)[0] * 255.0) , (int)((*color)[1] * 255.0) , (int)((*color)[2] * 255.0) );
+      int h,s,v;
+      qcolor.getHsv(&h, &s, &v);
+      
+      if ( h == -1 ) // set by Qt if color is achromatic ( but this widget does not display grays )
+        h = 10;  // red
+
+      int x, y;
+      float cellwidth = (float)width() / (float)(m_Steps);
+
+      if ( s > v ) // restrict to the colors we can display
+      {  // left side, ramp from v = 255/m_Steps to v = 255
+        s = 255;
+        x = (int)(
+           (
+             ((float)v / 255.0)      
+            *
+             ((float)m_Steps2)
+            -
+             1.0
+           )
+          *
+           cellwidth
+          + cellwidth/2
+          );
+      }
+      else
+      {
+        v = 255;
+        x = (int)(
+           (
+             (1.0 - ((float)s / 255.0))      
+            *
+             ((float)m_Steps2)
+           )
+          *
+           cellwidth
+          + cellwidth/2
+          
+          + width() / 2
+          );
+      }
+
+      y = (int)( (float)h/360.0 * (float)m_Steps * cellwidth );
+    
+      // new code - move to color
+      newPos.setX( point.x() - x );
+      newPos.setY( point.y() - y );
+    }
+    else
+    {
+      // old code - center widget
+      newPos.setX( point.x() - width() / 2 );
+      newPos.setY( point.y() - height() / 2 );
+    }
     move ( m_popupParent->mapToGlobal( newPos ) );
   }
   
@@ -191,7 +243,7 @@ QmitkColorPropertyEditor::QmitkColorPropertyEditor( const mitk::ColorProperty* p
   else
     scr = QApplication::desktop()->screenNumber( parent ); 
       
-  colorChooser = new QmitkPopupColorChooser( QApplication::desktop()->screen( scr ) );
+  colorChooser = new QmitkPopupColorChooser( QApplication::desktop()->screen( scr ), 50 );
 
   connect( colorChooser, SIGNAL(colorSelected(QColor)), this, SLOT(onColorSelected(QColor)) );
 }
@@ -203,7 +255,8 @@ QmitkColorPropertyEditor::~QmitkColorPropertyEditor()
 
 void QmitkColorPropertyEditor::mousePressEvent(QMouseEvent* e)
 {
-  colorChooser->popup(this, e->pos());
+  if (m_ColorProperty)
+    colorChooser->popup( this, e->pos(), &(m_ColorProperty->GetColor()) );
 }
 
 void QmitkColorPropertyEditor::mouseReleaseEvent(QMouseEvent*)

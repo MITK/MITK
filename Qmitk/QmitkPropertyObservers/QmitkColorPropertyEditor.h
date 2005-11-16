@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <QmitkColorPropertyView.h>
 #include <qframe.h>
+#include <mitkColorProperty.h>
 
 class QListBox;
 
@@ -33,7 +34,7 @@ class QmitkPopupColorChooser : public QFrame
 
     void setSteps(int);
     
-    virtual void popup(QWidget* parent, const QPoint& point);  /// Call to popup this widget. parent determines popup position
+    virtual void popup(QWidget* parent, const QPoint& point, const mitk::Color* = 0);  /// Call to popup this widget. parent determines popup position
    
   signals:
     

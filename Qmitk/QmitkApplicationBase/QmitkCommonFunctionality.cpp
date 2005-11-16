@@ -576,6 +576,9 @@ std::string CommonFunctionality::SaveImage(mitk::Image* image, const char* aFile
     std::string baseFilename = itksys::SystemTools::GetFilenameWithoutLastExtension( fileName );
     std::string extension = itksys::SystemTools::GetFilenameLastExtension( fileName );
 
+    if (extension == "")
+      extension = ".pic";
+
     dir += "/";
     dir += baseFilename;
 

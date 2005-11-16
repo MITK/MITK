@@ -28,17 +28,18 @@ void mitk::TransferVtkMatrixToItkTransform(const vtkMatrix4x4* vtkmatrix, mitk::
 {
   if(itkTransform==NULL)
     return;
-
-  // this ensures m_MatrixMTime.Modified(), which is therewith not equal to 
-  // m_InverseMatrixMTime, thus a new inverse will be calculated (when
-  // requested).
+  
   itkTransform->SetIdentity();
-
-  itk::Matrix<mitk::ScalarType,3,3>::InternalMatrixType& vnlMatrix = const_cast<itk::Matrix<mitk::ScalarType,3,3>::InternalMatrixType&>(itkTransform->GetMatrix().GetVnlMatrix());  
+  mitk::AffineTransform3D::MatrixType vnlMatrix;  
 
   for ( int i=0; i < 3; ++i)
     for( int j=0; j < 3; ++j )
-      vnlMatrix.put( i, j, vtkmatrix->GetElement( i, j ) );      
+      vnlMatrix[i][j] = vtkmatrix->GetElement( i, j );      
+
+  // *This* ensures m_MatrixMTime.Modified(), which is therewith not equal to 
+  // m_InverseMatrixMTime, thus a new inverse will be calculated (when
+  // requested).
+  itkTransform->SetMatrix( vnlMatrix );
 
   itk::AffineTransform<mitk::ScalarType>::OffsetType offset;
   offset[0] = vtkmatrix->GetElement( 0, 3 );

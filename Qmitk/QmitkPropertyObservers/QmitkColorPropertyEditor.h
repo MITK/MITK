@@ -79,7 +79,8 @@ class QmitkColorPropertyEditor : public QmitkColorPropertyView
     virtual void mousePressEvent(QMouseEvent*);
     virtual void mouseReleaseEvent(QMouseEvent*);
 
-    QmitkPopupColorChooser* colorChooser;
+    static QmitkPopupColorChooser* colorChooser;
+    static int colorChooserRefCount;
 
   protected slots:
 

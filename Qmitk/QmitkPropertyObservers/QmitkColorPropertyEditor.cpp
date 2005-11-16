@@ -233,6 +233,10 @@ void QmitkPopupColorChooser::drawGradient( QPainter* p)
 
 //----- QmitkColorPropertyEditor --------------------------------------------------
 
+// initialization of static pointer to color picker widget
+QmitkPopupColorChooser* QmitkColorPropertyEditor::colorChooser = NULL;
+                    int QmitkColorPropertyEditor::colorChooserRefCount = 0;
+
 QmitkColorPropertyEditor::QmitkColorPropertyEditor( const mitk::ColorProperty* property, QWidget* parent, const char* name )
 : QmitkColorPropertyView( property, parent, name )
 {
@@ -242,25 +246,36 @@ QmitkColorPropertyEditor::QmitkColorPropertyEditor( const mitk::ColorProperty* p
     scr = QApplication::desktop()->screenNumber( parent->mapToGlobal( pos() ) ); 
   else
     scr = QApplication::desktop()->screenNumber( parent ); 
-      
-  colorChooser = new QmitkPopupColorChooser( QApplication::desktop()->screen( scr ), 50 );
 
-  connect( colorChooser, SIGNAL(colorSelected(QColor)), this, SLOT(onColorSelected(QColor)) );
+  if ( colorChooserRefCount == 0 )
+  {
+    colorChooser = new QmitkPopupColorChooser( QApplication::desktop()->screen( scr ), 50 );
+  }
+  ++colorChooserRefCount;
 }
 
 QmitkColorPropertyEditor::~QmitkColorPropertyEditor()
 {
-  delete colorChooser;
+  --colorChooserRefCount;
+  if (!colorChooserRefCount)
+  {
+    delete colorChooser;
+    colorChooser = NULL;
+  }
 }
 
 void QmitkColorPropertyEditor::mousePressEvent(QMouseEvent* e)
 {
+  connect( colorChooser, SIGNAL(colorSelected(QColor)), this, SLOT(onColorSelected(QColor)) );
   if (m_ColorProperty)
+  {
     colorChooser->popup( this, e->pos(), &(m_ColorProperty->GetColor()) );
+  }
 }
 
 void QmitkColorPropertyEditor::mouseReleaseEvent(QMouseEvent*)
 {
+  disconnect( colorChooser, SIGNAL(colorSelected(QColor)), this, SLOT(onColorSelected(QColor)) );
 }
 
 void QmitkColorPropertyEditor::onColorSelected(QColor c)

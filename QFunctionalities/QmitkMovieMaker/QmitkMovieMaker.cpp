@@ -381,8 +381,6 @@ mitk::Stepper* QmitkMovieMaker::GetAspectStepper()
 
 void QmitkMovieMaker::GenerateMovie()
 {
-  mitk::RenderingManager::GetInstance()->DisableLOD();
-
   emit StartBlockControls();
   
   // provide the movie generator with the stepper and rotate the camera each step
@@ -412,6 +410,4 @@ void QmitkMovieMaker::GenerateMovie()
     std::cerr << " mitk::MovieGenerator::New()" << std::endl;
   }
   emit EndBlockControls();
-
-  mitk::RenderingManager::GetInstance()->EnableLOD();
 }

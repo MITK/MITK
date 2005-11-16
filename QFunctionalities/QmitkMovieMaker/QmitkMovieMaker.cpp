@@ -369,7 +369,7 @@ mitk::Stepper* QmitkMovieMaker::GetAspectStepper()
       if (rel < 0 ) {
         sliceRepeat = -rel;
       } else if (rel > 0) {
-        imeRepeat = rel;
+        timeRepeat = rel;
       }
       m_Stepper = mitk::MultiStepper::New();
       m_Stepper->AddStepper(this->GetSpatialController()->GetSlice(),sliceRepeat);
@@ -381,6 +381,8 @@ mitk::Stepper* QmitkMovieMaker::GetAspectStepper()
 
 void QmitkMovieMaker::GenerateMovie()
 {
+  mitk::RenderingManager::GetInstance()->DisableLOD();
+
   emit StartBlockControls();
   
   // provide the movie generator with the stepper and rotate the camera each step
@@ -410,4 +412,6 @@ void QmitkMovieMaker::GenerateMovie()
     std::cerr << " mitk::MovieGenerator::New()" << std::endl;
   }
   emit EndBlockControls();
+
+  mitk::RenderingManager::GetInstance()->EnableLOD();
 }

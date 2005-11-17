@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define QMITK_BASEPROPERTYVIEW_H_INCLUDED
 
 #include <mitkPropertyObserver.h>
+#include <mitkProperties.h>
 #include <qlabel.h>
 
 class QmitkBasePropertyView : public QLabel, public mitk::PropertyView
@@ -34,6 +35,8 @@ class QmitkBasePropertyView : public QLabel, public mitk::PropertyView
 
     virtual void PropertyChanged();
     virtual void PropertyRemoved();
+
+    const mitk::BoolProperty* m_BoolProperty;
 
   private:
 

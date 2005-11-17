@@ -16,9 +16,10 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 #include <qwidget.h>
-#include <mitkStringProperty.h>
 
 #include <QmitkBasePropertyView.h>
+#include <QmitkBoolPropertyView.h>
+#include <QmitkBoolPropertyEditor.h>
 #include <QmitkStringPropertyView.h>
 #include <QmitkStringPropertyEditor.h>
 #include <QmitkColorPropertyView.h>
@@ -32,7 +33,7 @@ class PropertyViewTest : public QWidget
 
   public:
 
-    PropertyViewTest(QWidget* parent, const char* name = 0);
+    PropertyViewTest(bool stay, QWidget* parent, const char* name = 0);
 
     virtual ~PropertyViewTest();
     
@@ -45,12 +46,17 @@ class PropertyViewTest : public QWidget
   private:
   
    QmitkBasePropertyView* baseview;
+   QmitkBoolPropertyView* boolview;
+   QmitkBoolPropertyEditor* booleditor;
    QmitkStringPropertyView* stringview;
    QmitkStringPropertyEditor* stringeditor;
    QmitkColorPropertyView* colorview;
    QmitkColorPropertyView* coloreditor;
+   mitk::BoolProperty* propb;
    mitk::StringProperty* props;
    mitk::ColorProperty* propcol;
    QTimer* timer;
+
+   bool m_Stay;
 };
 

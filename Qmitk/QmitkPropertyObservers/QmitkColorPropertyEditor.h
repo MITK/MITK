@@ -29,9 +29,10 @@ class QmitkPopupColorChooser : public QFrame
   Q_OBJECT
     
   public:
+
     QmitkPopupColorChooser(QWidget* parent = 0, unsigned int steps = 16, unsigned int size = 150, const char*  name = 0);
     virtual ~QmitkPopupColorChooser();
-
+    
     void setSteps(int);
     
     virtual void popup(QWidget* parent, const QPoint& point, const mitk::Color* = 0);  /// Call to popup this widget. parent determines popup position
@@ -41,6 +42,7 @@ class QmitkPopupColorChooser : public QFrame
     void colorSelected(QColor);
 
   protected:
+
     virtual void mouseMoveEvent(QMouseEvent*);
     virtual void mouseReleaseEvent(QMouseEvent*);
     virtual void closeEvent(QCloseEvent*);
@@ -49,6 +51,7 @@ class QmitkPopupColorChooser : public QFrame
     void drawGradient(QPainter* p);
 
   private:
+
     QWidget* m_popupParent;
     int m_moves;
     QWidget* my_parent;

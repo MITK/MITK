@@ -36,9 +36,10 @@ class QmitkStringPropertyView : public QLabel, public mitk::PropertyView
     virtual void PropertyChanged();
     virtual void PropertyRemoved();
 
+    const mitk::StringProperty* m_StringProperty;
+  
   private:
 
-    const mitk::StringProperty* m_StringProperty;
 
 };
 

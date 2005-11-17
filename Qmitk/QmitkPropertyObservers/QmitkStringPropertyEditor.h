@@ -40,9 +40,9 @@ class QmitkStringPropertyEditor : public QTextEdit, public mitk::PropertyEditor
     
     void onTextChanged();
 
-  private:
-
     mitk::StringProperty* m_StringProperty;
+  
+  private:
 
 };
 

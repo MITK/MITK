@@ -376,6 +376,9 @@ mitk::Stepper* QmitkMovieMaker::GetAspectStepper()
       m_Stepper->AddStepper(this->GetTemporalController()->GetTime(),timeRepeat);
     }
     return m_Stepper.GetPointer();
+  } else {
+    // should never get here
+	return 0;
   }
 }
 

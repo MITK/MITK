@@ -28,6 +28,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk {
 //##ModelId=3E5F53AA026C
+
+//## @ingroup Undo
 class UndoController
 {
   public:

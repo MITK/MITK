@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkImageToSurfaceFilter.h"
 #include <vtkImageData.h>
+#include <vtkDecimate.h>
 #include <vtkDecimatePro.h>
 #include <vtkImageChangeInformation.h>
 #include <vtkLinearTransform.h>
@@ -28,7 +29,7 @@ PURPOSE.  See the above copyright notices for more information.
 mitk::ImageToSurfaceFilter::ImageToSurfaceFilter()
 {
   m_Smooth = false;
-  m_Decimate = false;
+  m_Decimate = NoDecimation;
   m_Threshold = 1;
   m_TargetReduction = 0.95f;
 };
@@ -89,7 +90,7 @@ void mitk::ImageToSurfaceFilter::CreateSurface(int time, vtkImageData *vtkimage,
   }
 
   //decimate = to reduce number of polygons
-  if(m_Decimate)
+  if(m_Decimate==DecimatePro)
   {
     vtkDecimatePro *decimate = vtkDecimatePro::New();
     decimate->SplittingOff();
@@ -103,6 +104,18 @@ void mitk::ImageToSurfaceFilter::CreateSurface(int time, vtkImageData *vtkimage,
     decimate->SetTargetReduction(m_TargetReduction);
     decimate->SetMaximumError(0.002);
 
+    polydata->Delete();//RC--
+    polydata = decimate->GetOutput();
+    polydata->Register(NULL);//RC++
+    decimate->Delete();
+  }
+  else if (m_Decimate==Decimate)
+  {
+    vtkDecimate *decimate = vtkDecimate::New();
+    decimate->SetInput( polydata );
+    decimate->PreserveTopologyOn();
+    decimate->BoundaryVertexDeletionOff();
+    decimate->SetTargetReduction( m_TargetReduction );
     polydata->Delete();//RC--
     polydata = decimate->GetOutput();
     polydata->Register(NULL);//RC++

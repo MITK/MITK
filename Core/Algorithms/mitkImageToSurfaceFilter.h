@@ -28,6 +28,9 @@ namespace mitk {
 class ImageToSurfaceFilter : public SurfaceSource
 {
 public:
+
+  enum DecimationType {NoDecimation,Decimate,DecimatePro};
+
   mitkClassMacro(ImageToSurfaceFilter, SurfaceSource);
   itkNewMacro(Self);
 
@@ -65,11 +68,10 @@ public:
   itkSetMacro(Smooth,bool);
   itkBooleanMacro(Smooth);
 
-  /** Turn On/Off Decimate triangulars  */
-  itkGetConstMacro(Decimate,bool);
-  itkSetMacro(Decimate,bool);
-  itkBooleanMacro(Decimate);
-
+  /** Switch Decimate mode  */
+  itkGetConstMacro(Decimate,DecimationType);
+  itkSetMacro(Decimate,DecimationType);
+  
   /**
   * Set disired TargetReduction for decimate traiangles
   */
@@ -97,7 +99,7 @@ protected:
   void CreateSurface(int time, vtkImageData *vtkimage, mitk::Surface * surface, const ScalarType threshold);
 
   bool m_Smooth;
-  bool m_Decimate;
+  DecimationType m_Decimate;
   ScalarType m_Threshold; 
   float m_TargetReduction;
 

@@ -197,9 +197,8 @@ void QmitkMovieMaker::FocusChange()
   stepper->InverseDirectionOff();
 
   // Set stepping direction and aspect (spatial / temporal) for new stepper
-  this->SwitchLooping( m_Looping );
-  this->SwitchDirection( m_Direction );
-  this->SwitchAspect( m_Aspect );
+  this->UpdateLooping();
+  this->UpdateDirection();
 
   // Set newly focused window as active in "Selected Window" combo box
   const mitk::RenderWindow::RenderWindowSet rws =
@@ -282,19 +281,20 @@ void QmitkMovieMaker::StopPlaying()
 void QmitkMovieMaker::SetLooping( bool looping )
 {
   m_Looping = looping;
-  this->SwitchLooping( m_Looping );
+  this->UpdateLooping();
 }
 
 void QmitkMovieMaker::SetDirection( int direction )
 {
   m_Direction = direction;
-  this->SwitchDirection( m_Direction );
+  this->UpdateDirection();
 }
 
 void QmitkMovieMaker::SetAspect( int aspect )
 {
   m_Aspect = aspect;
-  this->SwitchAspect( m_Aspect );
+  this->UpdateLooping();
+  this->UpdateDirection();
 }
 
 void QmitkMovieMaker::SetWindow( int window )
@@ -316,16 +316,16 @@ void QmitkMovieMaker::SetWindow( int window )
   }
 }
 
-void QmitkMovieMaker::SwitchLooping( bool looping )
+void QmitkMovieMaker::UpdateLooping()
 {
- this->GetAspectStepper()->SetAutoRepeat( looping );
+ this->GetAspectStepper()->SetAutoRepeat( m_Looping );
 }
 
-void QmitkMovieMaker::SwitchDirection( int direction )
+void QmitkMovieMaker::UpdateDirection()
 {
   mitk::Stepper* stepper = this->GetAspectStepper();
 
-  switch ( direction )
+  switch ( m_Direction )
   {
   case 0:
     stepper->InverseDirectionOff();
@@ -341,13 +341,6 @@ void QmitkMovieMaker::SwitchDirection( int direction )
     stepper->PingPongOn();
     break;
   }
-}
-
-void QmitkMovieMaker::SwitchAspect( int aspect )
-{
-  // Initialize stepper direction and looping
-  this->SwitchDirection( m_Direction );
-  this->SwitchLooping( m_Looping );
 }
 
 mitk::Stepper* QmitkMovieMaker::GetAspectStepper()

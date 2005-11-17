@@ -115,12 +115,10 @@ private:
 
   mitk::BaseController* GetTemporalController();
 
-  void SwitchLooping(bool looping);
+  void UpdateLooping();
   
-  void SwitchDirection(int direction);
+  void UpdateDirection();
   
-  void SwitchAspect(int aspect);
-
   mitk::Stepper* GetAspectStepper();
 
   QmitkStepperAdapter* m_StepperAdapter;

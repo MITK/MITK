@@ -665,6 +665,6 @@ std::string CommonFunctionality::SaveScreenshot( mitk::RenderWindow* renderWindo
   QPixmap buffer = QPixmap::grabWindow( qtRenderWindow->winId() );
   QString extension = itksys::SystemTools::GetFilenameLastExtension( concreteFilename ).c_str();
   extension = extension.remove('.');  
-  buffer.save( concreteFilename, extension.upper() );
+  buffer.save( concreteFilename.c_str() , extension.upper() );
   return concreteFilename;  
 }

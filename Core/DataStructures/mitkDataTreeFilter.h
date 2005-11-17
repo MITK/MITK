@@ -118,6 +118,8 @@ namespace mitk
           /// Fourth parameter is the parent item.
           static Pointer New(mitk::DataTreeNode*, DataTreeFilter*, int, const Item*);
 
+          const PropertyList GetVisibleProperties() const;
+
           /// Access to properties via their key
           BasePropertyAccessor GetProperty(const std::string&) const;
 
@@ -173,7 +175,8 @@ namespace mitk
       void SetPropertiesLabels(const PropertyList);
       const PropertyList& GetPropertiesLabels() const;
 
-      /// Keys of visible properties
+      /// Keys of visible properties.
+      /// Special meaning of empty list: give all properties
       void SetVisibleProperties(const PropertyList);
       const PropertyList& GetVisibleProperties() const;
       

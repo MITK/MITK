@@ -72,6 +72,9 @@ DataTreeFilter::Item::Item(mitk::DataTreeNode* node, DataTreeFilter* treefilter,
   m_Node(node),
   m_Selected(false)
 {
+  // ensure we always have a vaild node pointer
+  if (!node) throw std::invalid_argument("NULL pointer makes no sense in DataTreeFilter::Item::Item()");
+    
   m_Children = DataTreeFilter::ItemList::New();
 }
 
@@ -83,11 +86,39 @@ DataTreeFilter::Item::~Item()
   m_TreeFilter->m_Item.erase(m_Node);
 }
 
+const DataTreeFilter::PropertyList DataTreeFilter::Item::GetVisibleProperties() const
+{
+  if ( m_TreeFilter->m_VisibleProperties.empty() )
+  {
+    // special case of empty list: return all the properties of a data tree node
+    const mitk::PropertyList::PropertyMap* prop_map = m_Node->GetPropertyList(m_TreeFilter->GetRenderer()) 
+                                                            -> GetMap();
+
+    mitk::PropertyList::PropertyMap::const_iterator iter;
+    PropertyList result_list;
+    for ( iter = prop_map->begin(); iter != prop_map->end(); ++iter )
+    {
+      if ( iter->second.second )                  // if this property IS enabled
+        result_list.push_back( iter->first );     // add it to the results list
+    }
+    
+    return result_list;
+  }
+  else
+  {
+    return m_TreeFilter->m_VisibleProperties;
+  }
+}
+
 DataTreeFilter::BasePropertyAccessor DataTreeFilter::Item::GetProperty(const std::string& key) const
 {
   mitk::BaseProperty* prop = m_Node->GetProperty(key.c_str(), m_TreeFilter->m_Renderer);
-  if ( std::find( m_TreeFilter->m_VisibleProperties.begin(), m_TreeFilter->m_VisibleProperties.end(), key ) 
-       == m_TreeFilter->m_VisibleProperties.end() )
+ 
+  // No access to property, if: not all properties are accessible (visible_list is not empty)
+  //                            AND the requested property cannot be found in visible_list
+  if (    !m_TreeFilter->m_VisibleProperties.empty()
+      &&  std::find( m_TreeFilter->m_VisibleProperties.begin(), m_TreeFilter->m_VisibleProperties.end(), key ) 
+             == m_TreeFilter->m_VisibleProperties.end() )
   {
     // key not marked visible
     return BasePropertyAccessor(0, false);
@@ -106,9 +137,14 @@ DataTreeFilter::BasePropertyAccessor DataTreeFilter::Item::GetProperty(const std
   }
 
   // visible. determine whether property may be edited
+  // Editable, if: all properties are accessible (visible_list is empty)
+  //               or only certain properties are accessible AND the requested property is
+  //               in the editable_list
   bool editable = 
-    std::find(m_TreeFilter->m_EditableProperties.begin(), m_TreeFilter->m_EditableProperties.end(), key)
-    != m_TreeFilter->m_EditableProperties.end();
+       m_TreeFilter->m_VisibleProperties.empty()
+    || std::find(m_TreeFilter->m_EditableProperties.begin(), m_TreeFilter->m_EditableProperties.end(), key)
+         != m_TreeFilter->m_EditableProperties.end();
+
   return BasePropertyAccessor(prop, editable); 
 }
 

@@ -50,7 +50,7 @@ public:
   void Last(); */
   // unsigned int GetPos();
   void SetPos(unsigned int pos);
-  void SetSteps(unsigned int steps);
+  void SetSteps(const unsigned int steps);
    
 protected:
   MultiStepper();

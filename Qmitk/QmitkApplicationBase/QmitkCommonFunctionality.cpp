@@ -1,7 +1,13 @@
 #include <qregexp.h>
+#include <qpixmap.h>
+#include <qimage.h>
 #include <string>
+#include <strstream>
+#include <ctime>
 #include "mitkPointSetWriter.h"
 #include "mitkConfig.h"
+#include "mitkRenderWindow.h"
+#include "QmitkRenderWindow.h"
 #ifdef MBI_INTERNAL
 #include "mitkVesselGraphData.h"
 #include "mitkVesselGraphFileWriter.h"
@@ -598,4 +604,67 @@ std::string CommonFunctionality::SaveImage(mitk::Image* image, const char* aFile
     itkGenericOutputMacro( << "Unknown type of exception during write" );
   }
   return fileName;
+}
+
+std::string CommonFunctionality::SaveScreenshot( mitk::RenderWindow* renderWindow , const char* filename )
+{
+  //
+  // perform some error checking
+  //
+  if ( ! renderWindow )
+  {
+    itkGenericOutputMacro( << "render window is NULL!" );
+    return std::string("");
+  }
+  QmitkRenderWindow* qtRenderWindow = dynamic_cast<QmitkRenderWindow*>(renderWindow);
+  if ( ! qtRenderWindow )
+  {
+    itkGenericOutputMacro( << "Unsupported type of render window! The only supported type is currently QmitkRenderWindow." );
+    return std::string("");
+  }
+  
+  //
+  // if the provided filename is empty ask the user 
+  // for the name of the file in which the screenshot
+  // should be saved
+  //
+  std::string concreteFilename = "";
+  if( filename == NULL )
+  {
+    //
+    // Build a string containing the supported file formats from qt
+    //
+    std::strstream format;
+    format << "all (";
+    for ( unsigned int i = 0; i < QImageIO::outputFormats().count(); i++ ) {
+      format << "*." << QImageIO::outputFormats().at( i ) << " ";
+    }
+    format << ")";
+    
+    //
+    // show a file selector with the supported file formats
+    //
+    QString qfileName = QFileDialog::getSaveFileName( QString( "" ), QString( format.str() ).lower() );
+    if ( qfileName == NULL )
+      return "";
+    concreteFilename = qfileName.latin1();
+  }
+  else
+    concreteFilename = filename;
+  //
+  // wait for 500 ms to let the file chooser close itself
+  //
+  
+  clock_t goal = 500 + std::clock();
+  while ( goal > std::clock() );
+
+  //
+  // grab the content of the QGLWidget, fill a pixmap with it and
+  // save the result
+  //
+  QPixmap buffer = QPixmap::grabWindow( qtRenderWindow->winId() );
+  QString extension = itksys::SystemTools::GetFilenameLastExtension( concreteFilename ).c_str();
+  extension = extension.remove('.');  
+  buffer.save( concreteFilename, extension.upper() );
+  return concreteFilename;  
 }

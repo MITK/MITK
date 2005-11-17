@@ -70,6 +70,7 @@ namespace mitk
   template <typename DirectedCategory> class VesselGraphData;
   typedef VesselGraphData< boost::undirectedS  > UndirectedVesselGraphData;
   typedef VesselGraphData< boost::directedS > DirectedVesselGraphData;
+  class RenderWindow;
 }
 #endif
 #endif
@@ -250,6 +251,18 @@ namespace CommonFunctionality
   std::string SaveImage(mitk::Image* image, const char* fileName = NULL);
 
   std::string SaveSurface(mitk::Surface* surface, const char* fileName = NULL);
+  
+  /**
+   * Saves a screenshot of the given renderer in a file.
+   * @param renderWindow the render window to generate a screenshot from. If renderWindow
+   *                     is NULL, the function returns an empty string.
+   * @param filename     the filename, under which the file should be saved. If 
+   *                     filename is NULL, a file selector pops up and asks for a
+   *                     file name. The file type is determined via the extension
+   *                     of the screen shot
+   * @returns the filename of the saved file
+   */
+  std::string SaveScreenshot( mitk::RenderWindow* renderWindow , const char* filename = NULL );
 
 #ifdef MBI_INTERNAL
   void SaveDirectedVesselGraph( mitk::DirectedVesselGraphData* graph, const char* fileName = NULL );

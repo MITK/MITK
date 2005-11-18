@@ -54,6 +54,7 @@ namespace mitk
 {
   class Surface;
   class Image;
+  class RenderWindow;
 }
 
 #ifdef MBI_INTERNAL
@@ -70,7 +71,6 @@ namespace mitk
   template <typename DirectedCategory> class VesselGraphData;
   typedef VesselGraphData< boost::undirectedS  > UndirectedVesselGraphData;
   typedef VesselGraphData< boost::directedS > DirectedVesselGraphData;
-  class RenderWindow;
 }
 #endif
 #endif

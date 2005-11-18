@@ -1,9 +1,9 @@
 #include <qregexp.h>
 #include <qpixmap.h>
 #include <qimage.h>
+#include <qmessagebox.h>
 #include <string>
 #include <strstream>
-#include <ctime>
 #include "mitkPointSetWriter.h"
 #include "mitkConfig.h"
 #include "mitkRenderWindow.h"
@@ -624,6 +624,12 @@ std::string CommonFunctionality::SaveScreenshot( mitk::RenderWindow* renderWindo
   }
   
   //
+  // create the screenshot before the filechooser is opened,
+  // so there the file chooser will not be part of the screenshot
+  //
+  QPixmap buffer = QPixmap::grabWindow( qtRenderWindow->winId() );
+  
+  //
   // if the provided filename is empty ask the user 
   // for the name of the file in which the screenshot
   // should be saved
@@ -651,20 +657,25 @@ std::string CommonFunctionality::SaveScreenshot( mitk::RenderWindow* renderWindo
   }
   else
     concreteFilename = filename;
+  
   //
   // wait for 500 ms to let the file chooser close itself
+  //  
+  // int msecs = 500;
+  // clock_t ticks = ( clock_t )( ( ( ( float ) msecs ) / 1000.0f ) * ( ( float ) CLOCKS_PER_SEC ) );
+  // clock_t goal = ticks + std::clock();
+  // while ( goal > std::clock() );
   //
   
-  clock_t goal = 500 + std::clock();
-  while ( goal > std::clock() );
-
   //
-  // grab the content of the QGLWidget, fill a pixmap with it and
-  // save the result
+  // save the screenshot under the given filename
   //
-  QPixmap buffer = QPixmap::grabWindow( qtRenderWindow->winId() );
   QString extension = itksys::SystemTools::GetFilenameLastExtension( concreteFilename ).c_str();
   extension = extension.remove('.');  
-  buffer.save( concreteFilename.c_str() , extension.upper() );
+  if ( ! buffer.save( concreteFilename.c_str() , extension.upper() ) )
+  {
+    QMessageBox::information(NULL, "Save Screenshot...", "The file could not be saved. Please check filename, format and access rights...");
+    itkGenericOutputMacro( << "" );
+  }
   return concreteFilename;  
 }

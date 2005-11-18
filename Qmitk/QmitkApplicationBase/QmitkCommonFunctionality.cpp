@@ -675,7 +675,6 @@ std::string CommonFunctionality::SaveScreenshot( mitk::RenderWindow* renderWindo
   if ( ! buffer.save( concreteFilename.c_str() , extension.upper() ) )
   {
     QMessageBox::information(NULL, "Save Screenshot...", "The file could not be saved. Please check filename, format and access rights...");
-    itkGenericOutputMacro( << "" );
   }
   return concreteFilename;  
 }

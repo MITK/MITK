@@ -21,6 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkTreeNodeSelector.h"
 #include "QmitkStepperAdapter.h"
 #include "QmitkStdMultiWidget.h"
+#include "QmitkCommonFunctionality.h"
 
 #include "mitkOpenGLRenderer.h"
 #include "mitkMovieGenerator.h"
@@ -160,6 +161,9 @@ void QmitkMovieMaker::CreateConnections()
     // when the movie button is clickethe movie button is clicked
     connect( (QObject*) m_Controls->btnMovie, SIGNAL(clicked()),
       this, SLOT(GenerateMovie()) );
+      
+    connect( (QObject*) m_Controls->btnScreenshot, SIGNAL(clicked()),
+      this, SLOT(GenerateScreenshot()) );
 
     // blocking of ui elements during movie generation
     connect( (QObject*) this, SIGNAL(StartBlockControls()),
@@ -407,3 +411,13 @@ void QmitkMovieMaker::GenerateMovie()
   }
   emit EndBlockControls();
 }
+
+void QmitkMovieMaker::GenerateScreenshot()
+{
+  emit StartBlockControls();
+  
+  CommonFunctionality::SaveScreenshot( mitk::GlobalInteraction::GetInstance()->GetFocus()->GetRenderWindow() );
+  
+  emit EndBlockControls();
+}
+

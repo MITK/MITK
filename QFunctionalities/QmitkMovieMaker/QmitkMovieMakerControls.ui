@@ -8,7 +8,7 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>328</width>
+            <width>377</width>
             <height>601</height>
         </rect>
     </property>
@@ -25,9 +25,12 @@
         <property name="name">
             <cstring>unnamed</cstring>
         </property>
+        <property name="spacing">
+            <number>13</number>
+        </property>
         <widget class="QLayoutWidget">
             <property name="name">
-                <cstring>layout3</cstring>
+                <cstring>layout10</cstring>
             </property>
             <hbox>
                 <property name="name">
@@ -35,79 +38,203 @@
                 </property>
                 <widget class="QLabel">
                     <property name="name">
-                        <cstring>textLabel1</cstring>
+                        <cstring>textLabel3</cstring>
+                    </property>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>4</hsizetype>
+                            <vsizetype>5</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
+                    <property name="font">
+                        <font>
+                            <bold>1</bold>
+                        </font>
                     </property>
                     <property name="text">
-                        <string>Step</string>
+                        <string>Selected Window</string>
                     </property>
                 </widget>
-                <widget class="QmitkSliderNavigator">
+                <widget class="QComboBox">
                     <property name="name">
-                        <cstring>slidAngle</cstring>
+                        <cstring>cmbSelectedWindow</cstring>
+                    </property>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>1</hsizetype>
+                            <vsizetype>0</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
                     </property>
                 </widget>
             </hbox>
         </widget>
-        <widget class="QLayoutWidget">
+        <widget class="QGroupBox">
             <property name="name">
-                <cstring>layout3</cstring>
+                <cstring>groupBox2</cstring>
             </property>
-            <hbox>
+            <property name="font">
+                <font>
+                    <bold>1</bold>
+                </font>
+            </property>
+            <property name="title">
+                <string>Recording options</string>
+            </property>
+            <vbox>
                 <property name="name">
                     <cstring>unnamed</cstring>
                 </property>
+                <widget class="QLayoutWidget">
+                    <property name="name">
+                        <cstring>layout3</cstring>
+                    </property>
+                    <hbox>
+                        <property name="name">
+                            <cstring>unnamed</cstring>
+                        </property>
+                        <widget class="QLabel">
+                            <property name="name">
+                                <cstring>textLabel1</cstring>
+                            </property>
+                            <property name="font">
+                                <font>
+                                    <bold>0</bold>
+                                </font>
+                            </property>
+                            <property name="text">
+                                <string>Step</string>
+                            </property>
+                        </widget>
+                        <widget class="QmitkSliderNavigator">
+                            <property name="name">
+                                <cstring>slidAngle</cstring>
+                            </property>
+                            <property name="font">
+                                <font>
+                                    <bold>0</bold>
+                                </font>
+                            </property>
+                        </widget>
+                    </hbox>
+                </widget>
+                <widget class="QLayoutWidget">
+                    <property name="name">
+                        <cstring>layout3</cstring>
+                    </property>
+                    <hbox>
+                        <property name="name">
+                            <cstring>unnamed</cstring>
+                        </property>
+                        <widget class="QToolButton">
+                            <property name="name">
+                                <cstring>btnPlay</cstring>
+                            </property>
+                            <property name="font">
+                                <font>
+                                    <bold>0</bold>
+                                </font>
+                            </property>
+                            <property name="text">
+                                <string></string>
+                            </property>
+                            <property name="iconSet">
+                                <iconset>image0</iconset>
+                            </property>
+                        </widget>
+                        <widget class="QToolButton">
+                            <property name="name">
+                                <cstring>btnPause</cstring>
+                            </property>
+                            <property name="font">
+                                <font>
+                                    <bold>0</bold>
+                                </font>
+                            </property>
+                            <property name="text">
+                                <string></string>
+                            </property>
+                            <property name="iconSet">
+                                <iconset>image1</iconset>
+                            </property>
+                        </widget>
+                        <widget class="QToolButton">
+                            <property name="name">
+                                <cstring>btnStop</cstring>
+                            </property>
+                            <property name="font">
+                                <font>
+                                    <bold>0</bold>
+                                </font>
+                            </property>
+                            <property name="text">
+                                <string></string>
+                            </property>
+                            <property name="iconSet">
+                                <iconset>image2</iconset>
+                            </property>
+                        </widget>
+                    </hbox>
+                </widget>
                 <widget class="QToolButton">
                     <property name="name">
-                        <cstring>btnPlay</cstring>
+                        <cstring>btnMovie</cstring>
+                    </property>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>1</hsizetype>
+                            <vsizetype>5</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
+                    <property name="font">
+                        <font>
+                            <bold>0</bold>
+                        </font>
                     </property>
                     <property name="text">
-                        <string></string>
+                        <string>Write Movie (MS Windows only) ...</string>
                     </property>
-                    <property name="iconSet">
-                        <iconset>image0</iconset>
+                    <property name="usesTextLabel">
+                        <bool>false</bool>
+                    </property>
+                    <property name="textLabel">
+                        <string>Write Movie (MS Windows only) ...</string>
+                    </property>
+                    <property name="textPosition">
+                        <enum>BelowIcon</enum>
                     </property>
                 </widget>
                 <widget class="QToolButton">
                     <property name="name">
-                        <cstring>btnPause</cstring>
+                        <cstring>btnScreenshot</cstring>
+                    </property>
+                    <property name="font">
+                        <font>
+                            <bold>0</bold>
+                        </font>
                     </property>
                     <property name="text">
-                        <string></string>
+                        <string>Write Screenshot ...</string>
                     </property>
-                    <property name="iconSet">
-                        <iconset>image1</iconset>
-                    </property>
-                </widget>
-                <widget class="QToolButton">
-                    <property name="name">
-                        <cstring>btnStop</cstring>
-                    </property>
-                    <property name="text">
-                        <string></string>
-                    </property>
-                    <property name="iconSet">
-                        <iconset>image2</iconset>
+                    <property name="toolTip" stdset="0">
+                        <string>Writes a screenshot of the selected window.</string>
                     </property>
                 </widget>
-            </hbox>
-        </widget>
-        <widget class="QToolButton">
-            <property name="name">
-                <cstring>btnMovie</cstring>
-            </property>
-            <property name="minimumSize">
-                <size>
-                    <width>200</width>
-                    <height>0</height>
-                </size>
-            </property>
-            <property name="text">
-                <string>Write Movie (MS Windows only)</string>
-            </property>
+            </vbox>
         </widget>
         <widget class="QGroupBox">
             <property name="name">
                 <cstring>groupBox1</cstring>
+            </property>
+            <property name="font">
+                <font>
+                    <bold>1</bold>
+                </font>
             </property>
             <property name="title">
                 <string>Playing options</string>
@@ -142,6 +269,11 @@
                                     <property name="name">
                                         <cstring>rbtnForward</cstring>
                                     </property>
+                                    <property name="font">
+                                        <font>
+                                            <bold>0</bold>
+                                        </font>
+                                    </property>
                                     <property name="text">
                                         <string>Forward</string>
                                     </property>
@@ -153,6 +285,11 @@
                                     <property name="name">
                                         <cstring>rbtnBackward</cstring>
                                     </property>
+                                    <property name="font">
+                                        <font>
+                                            <bold>0</bold>
+                                        </font>
+                                    </property>
                                     <property name="text">
                                         <string>Backward</string>
                                     </property>
@@ -160,6 +297,11 @@
                                 <widget class="QRadioButton">
                                     <property name="name">
                                         <cstring>rbtnPingPong</cstring>
+                                    </property>
+                                    <property name="font">
+                                        <font>
+                                            <bold>0</bold>
+                                        </font>
                                     </property>
                                     <property name="text">
                                         <string>Ping-Pong</string>
@@ -177,6 +319,11 @@
                                             <property name="name">
                                                 <cstring>textLabel2</cstring>
                                             </property>
+                                            <property name="font">
+                                                <font>
+                                                    <bold>0</bold>
+                                                </font>
+                                            </property>
                                             <property name="text">
                                                 <string>Cycle (sec)</string>
                                             </property>
@@ -184,6 +331,11 @@
                                         <widget class="QSpinBox">
                                             <property name="name">
                                                 <cstring>spnDuration</cstring>
+                                            </property>
+                                            <property name="font">
+                                                <font>
+                                                    <bold>0</bold>
+                                                </font>
                                             </property>
                                             <property name="maxValue">
                                                 <number>200</number>
@@ -237,6 +389,11 @@
                                     <property name="name">
                                         <cstring>rbtnSpatial</cstring>
                                     </property>
+                                    <property name="font">
+                                        <font>
+                                            <bold>0</bold>
+                                        </font>
+                                    </property>
                                     <property name="text">
                                         <string>Spatial</string>
                                     </property>
@@ -248,6 +405,11 @@
                                     <property name="name">
                                         <cstring>rbtnTemporal</cstring>
                                     </property>
+                                    <property name="font">
+                                        <font>
+                                            <bold>0</bold>
+                                        </font>
+                                    </property>
                                     <property name="text">
                                         <string>Temporal</string>
                                     </property>
@@ -255,6 +417,11 @@
                                 <widget class="QRadioButton">
                                     <property name="name">
                                         <cstring>rbtnCombined</cstring>
+                                    </property>
+                                    <property name="font">
+                                        <font>
+                                            <bold>0</bold>
+                                        </font>
                                     </property>
                                     <property name="text">
                                         <string>Combined</string>
@@ -272,6 +439,11 @@
                                             <property name="name">
                                                 <cstring>textLabel2_2</cstring>
                                             </property>
+                                            <property name="font">
+                                                <font>
+                                                    <bold>0</bold>
+                                                </font>
+                                            </property>
                                             <property name="text">
                                                 <string>S/T Relation</string>
                                             </property>
@@ -279,6 +451,11 @@
                                         <widget class="QSpinBox">
                                             <property name="name">
                                                 <cstring>spatialTimeRelation</cstring>
+                                            </property>
+                                            <property name="font">
+                                                <font>
+                                                    <bold>0</bold>
+                                                </font>
                                             </property>
                                             <property name="maxValue">
                                                 <number>10</number>
@@ -298,29 +475,6 @@
                 </widget>
             </hbox>
         </widget>
-        <widget class="QLayoutWidget">
-            <property name="name">
-                <cstring>layout10</cstring>
-            </property>
-            <hbox>
-                <property name="name">
-                    <cstring>unnamed</cstring>
-                </property>
-                <widget class="QLabel">
-                    <property name="name">
-                        <cstring>textLabel3</cstring>
-                    </property>
-                    <property name="text">
-                        <string>Selected Window</string>
-                    </property>
-                </widget>
-                <widget class="QComboBox">
-                    <property name="name">
-                        <cstring>cmbSelectedWindow</cstring>
-                    </property>
-                </widget>
-            </hbox>
-        </widget>
         <spacer>
             <property name="name">
                 <cstring>spacer3</cstring>
@@ -334,7 +488,7 @@
             <property name="sizeHint">
                 <size>
                     <width>20</width>
-                    <height>230</height>
+                    <height>140</height>
                 </size>
             </property>
         </spacer>
@@ -373,7 +527,7 @@
         <data format="PNG" length="247">89504e470d0a1a0a0000000d4948445200000018000000180806000000e0773df8000000be49444154789cdd95d10e82300c45ef6807b82e8425f205f885f282ff2ec317f00132506026781fb7aea7cdd25bd5f73d622a899afd2f003c3d504a6d4a14facb19608cdf440166d58500689a3b9c73600e86bcd5b68fe05df0b588e056d77876dd2a60498be579efe1ca320e204b53301344240ec05a81d61a46cc2ec0efe76054555d61adc05cceda419e67602250b26db257014c0c66464214074044288a025aeb5d003535a9c1ecbef6a221cf675e74e4969b7570b4cebfd1ce0f780101051f7c7cab3f560000000049454e44ae426082</data>
     </image>
     <image name="image3">
-        <data format="XBM.GZ" length="79">789c534e494dcbcc4b554829cdcdad8c2fcf4c29c95030e0524611cd48cd4ccf28010a1797249664262b2467241641a592324b8aa363156c15aab914146aadb90067111b1f</data>
+        <data format="PNG" length="1002">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b000003b149444154789cad94514c5b5518c77fe7dc4b7b4b6150bb96324418ca32358bee6192609c51d883892ce083f1718b3ebb185f8dc91e972cf39d2d6a78d0b027b3cd07d9e68c81c625a6c139408a4384f416100aed6d4b7bdb7b8e0fc0921a70c6ed7b3ae7e43bbff3fffedfc927e2f138bbd1dbdbab7902118fc785d8058f8d8de9aeae2e72b91cb66de338ce7f82e47239666767492412b8aefbf0dcdc553a323242f4501d918e2d3a8f15a9784584100809a609526eafd1a0f54e6142e029c5c21f3ef41583bb77a805efbe1ce9d86279e32619678eaab7853fa0f02a16abb64166ad0cdac75307eb3874b84cb0a14aa5a24108cc0688c48c9a4a1e826ddbe6f0b12219678e8ace610502ccdfafe3f68d3c33bf6c01c59dcc209d472c4e0d35d2f3ba81d205d06005e4de60c77170bd2255af80150870f70e8c0eaf009260a349577714e913a4175d16925b5cbe50607931cc3b677c68ca28a5f7066f5b26f00760febec9e8f032a0e81b68a17fc0201415989647a9d8c4c498cbe8f05f5cff3a4d4bac8bfe210b290b35e01afd428257b1b875cd01aaf4bd1de5dd0fea688e1530ad1c1bab16b7af17393558cf997311c0e49bafd670d6258621f6576c9ab09a3248fe5ae6c08103f49f36517213d33070369bf8e2529ee9c90ceb2b2eef7f14617c2c48722a4b7226845143fa87622905ebeb6514253a9eb5084504a66950c88618bee0303d99217cb09e9ed71a09369538fa523d00e9a50a42eed3bc6d8f41281fa0903e8561796cac86f8f2b33c33930ea0f0fb4d5adbeb30ad22866ffbbad226d2a805d7ee0484220208925aaa50deaa67e27b97e9c90ccdcdf5c462cdd8a94d2e7e62f3603244ea410989a4ed191f52a8fd156b056d9d553a9e0bf0e7ef45c6bf7339fd5e90ec7a88575e6d20d6e6e7e2a755ec854dce7fb8885b2cd014f6f3c2714d3a550bae55ac35c1068fb7061b00b87a7995899b25ce9e0b73e24d8fae97b37c7cbe9370b499fce6066eb54adf6098f6ee2a9a7ff9c70841a5023d270deca510d746537c7e29cdf8ad20475fb4307c82d4fc324ec6859d66fdfc6381e44014b36e9fe6e572393ca54068aa22cfd0598b686b3737aeae90bc9725796f0350802414b6e81b7c9a9f7e70708a2e6e5991cfeee3f1ecec2c0b0b3e8c068142a2a8d23728397132c6dc6f2e2b8b0a8da4b5ddc7f3c735ed47146f0cb4502983693a4c25ca7b83138904fa8a412466e00f48b4271086c2901263676c4a6990b615b6ade15b85694af239984a94585bf6f606bbae5b334f1f37e4a3531e031c8fc7c5a312ff17f849c3e3f1b8f81b8be6900aca9b61c90000000049454e44ae426082</data>
     </image>
 </images>
 <connections>
@@ -396,34 +550,10 @@
         <slot>BTNStop()</slot>
     </connection>
     <connection>
-        <sender>rbtnForward</sender>
-        <signal>clicked()</signal>
+        <sender>cmbSelectedWindow</sender>
+        <signal>activated(int)</signal>
         <receiver>QmitkMovieMakerControls</receiver>
-        <slot>RBTNForward()</slot>
-    </connection>
-    <connection>
-        <sender>rbtnBackward</sender>
-        <signal>clicked()</signal>
-        <receiver>QmitkMovieMakerControls</receiver>
-        <slot>RBTNBackward()</slot>
-    </connection>
-    <connection>
-        <sender>rbtnPingPong</sender>
-        <signal>clicked()</signal>
-        <receiver>QmitkMovieMakerControls</receiver>
-        <slot>RBTNPingPong()</slot>
-    </connection>
-    <connection>
-        <sender>rbtnSpatial</sender>
-        <signal>clicked()</signal>
-        <receiver>QmitkMovieMakerControls</receiver>
-        <slot>RBTNSpatial()</slot>
-    </connection>
-    <connection>
-        <sender>rbtnTemporal</sender>
-        <signal>clicked()</signal>
-        <receiver>QmitkMovieMakerControls</receiver>
-        <slot>RBTNTemporal()</slot>
+        <slot>CMBSelectedWindow(int)</slot>
     </connection>
     <connection>
         <sender>rbtnCombined</sender>
@@ -432,10 +562,34 @@
         <slot>RBTNCombined()</slot>
     </connection>
     <connection>
-        <sender>cmbSelectedWindow</sender>
-        <signal>activated(int)</signal>
+        <sender>rbtnTemporal</sender>
+        <signal>clicked()</signal>
         <receiver>QmitkMovieMakerControls</receiver>
-        <slot>CMBSelectedWindow(int)</slot>
+        <slot>RBTNTemporal()</slot>
+    </connection>
+    <connection>
+        <sender>rbtnSpatial</sender>
+        <signal>clicked()</signal>
+        <receiver>QmitkMovieMakerControls</receiver>
+        <slot>RBTNSpatial()</slot>
+    </connection>
+    <connection>
+        <sender>rbtnPingPong</sender>
+        <signal>clicked()</signal>
+        <receiver>QmitkMovieMakerControls</receiver>
+        <slot>RBTNPingPong()</slot>
+    </connection>
+    <connection>
+        <sender>rbtnBackward</sender>
+        <signal>clicked()</signal>
+        <receiver>QmitkMovieMakerControls</receiver>
+        <slot>RBTNBackward()</slot>
+    </connection>
+    <connection>
+        <sender>rbtnForward</sender>
+        <signal>clicked()</signal>
+        <receiver>QmitkMovieMakerControls</receiver>
+        <slot>RBTNForward()</slot>
     </connection>
 </connections>
 <tabstops>
@@ -473,6 +627,7 @@
     <slot>CMBSelectedWindow( int window )</slot>
     <slot>BlockControls()</slot>
     <slot>UnBlockControls()</slot>
+    <slot>BlockControls( bool blocked )</slot>
 </slots>
 <functions>
     <function access="private" specifier="non virtual">init()</function>

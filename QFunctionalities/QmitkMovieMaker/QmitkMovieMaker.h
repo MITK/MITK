@@ -96,6 +96,8 @@ public slots:
 protected slots:  
 
   void GenerateMovie();
+  
+  void GenerateScreenshot();
 
 protected:  
   /*!  

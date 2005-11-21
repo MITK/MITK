@@ -16,6 +16,7 @@ void QmitkMovieMakerControls::BTNPlay()
   slidAngle->setDisabled( true ); 
   btnMovie->setEnabled( false );
   btnPlay->setEnabled( false );
+  btnScreenshot->setEnabled( false );
 
   // signal that playing will start shortly
   emit StartPlaying();
@@ -26,6 +27,7 @@ void QmitkMovieMakerControls::BTNPause()
   slidAngle->setDisabled( false ); 
   btnMovie->setEnabled( true );
   btnPlay->setEnabled( true );
+  btnScreenshot->setEnabled( true );
 
   // signal that playing has ended
   emit PausePlaying();
@@ -37,7 +39,8 @@ void QmitkMovieMakerControls::BTNStop()
   slidAngle->setDisabled( false ); 
   btnMovie->setEnabled( true );
   btnPlay->setEnabled( true );
-
+  btnScreenshot->setEnabled( true );
+  
   // signal that playing has ended
   emit StopPlaying();
 }
@@ -83,23 +86,27 @@ void QmitkMovieMakerControls::CMBSelectedWindow( int window )
 
 void QmitkMovieMakerControls::BlockControls()
 {
-  slidAngle->setDisabled(true);
-  spnDuration->setEnabled(false);
-  btnPlay->setEnabled(false);
-  btnMovie->setEnabled(false);
+  BlockControls( true );
 }
 
 
 void QmitkMovieMakerControls::UnBlockControls()
 {
-  slidAngle->setDisabled(false); 
-  spnDuration->setEnabled(true);
-  btnPlay->setEnabled(true);
-  btnMovie->setEnabled(true);
+  BlockControls( false );    
 }
 
 
 void QmitkMovieMakerControls::init()
 {
   m_Playing = false;
+}
+
+
+void QmitkMovieMakerControls::BlockControls( bool blocked )
+{
+  slidAngle->setDisabled( blocked );
+  spnDuration->setEnabled( ! blocked );
+  btnPlay->setEnabled( ! blocked );
+  btnMovie->setEnabled( ! blocked );
+  btnScreenshot->setEnabled( ! blocked );
 }

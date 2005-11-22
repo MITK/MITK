@@ -460,8 +460,11 @@ mitk::OpenGLRenderer::~OpenGLRenderer()
 {
   if(m_VtkRenderer!=NULL)
   {
-    m_RenderWindow->GetVtkRenderWindow()->RemoveRenderer(m_VtkRenderer);
-    m_RenderWindow->GetVtkRenderWindow()->SetInteractor(NULL);
+    if(m_RenderWindow!=NULL)
+    {
+      m_RenderWindow->GetVtkRenderWindow()->RemoveRenderer(m_VtkRenderer);
+      m_RenderWindow->GetVtkRenderWindow()->SetInteractor(NULL);
+    }
     m_CameraController = NULL;
     //VtkInteractorCameraController* vicc=dynamic_cast<VtkInteractorCameraController*>(m_CameraController.GetPointer());
     //if(vicc!=NULL)

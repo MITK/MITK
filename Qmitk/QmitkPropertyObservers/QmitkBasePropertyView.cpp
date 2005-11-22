@@ -21,7 +21,7 @@ QmitkBasePropertyView::QmitkBasePropertyView( const mitk::BaseProperty* property
 : PropertyView( property ),
   QLabel( parent, name )
 {
-  setText( property->GetValueAsString() );
+  PropertyChanged();
 }
 
 QmitkBasePropertyView::~QmitkBasePropertyView()

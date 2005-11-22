@@ -22,7 +22,7 @@ QmitkStringPropertyEditor::QmitkStringPropertyEditor( mitk::StringProperty* prop
   QTextEdit( parent, name ),
   m_StringProperty(property)
 {
-  setText( property->GetValue() );
+  PropertyChanged();
   connect(this, SIGNAL(textChanged()), this, SLOT(onTextChanged()));
 }
 

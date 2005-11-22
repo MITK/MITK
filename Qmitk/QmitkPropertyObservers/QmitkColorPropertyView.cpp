@@ -26,7 +26,7 @@ QmitkColorPropertyView::QmitkColorPropertyView( const mitk::ColorProperty* prope
   m_ColorProperty(property)
 {
   setText("  "); // two spaces for some minimun height
-  DisplayColor();
+  PropertyChanged();
 }
 
 QmitkColorPropertyView::~QmitkColorPropertyView()

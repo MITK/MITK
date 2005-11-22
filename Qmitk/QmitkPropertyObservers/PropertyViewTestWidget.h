@@ -24,6 +24,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QmitkStringPropertyEditor.h>
 #include <QmitkColorPropertyView.h>
 #include <QmitkColorPropertyEditor.h>
+#include <QmitkNumberPropertyView.h>
+#include <QmitkNumberPropertyEditor.h>
 
 #include <qtimer.h>
 
@@ -51,10 +53,18 @@ class PropertyViewTest : public QWidget
    QmitkStringPropertyView* stringview;
    QmitkStringPropertyEditor* stringeditor;
    QmitkColorPropertyView* colorview;
-   QmitkColorPropertyView* coloreditor;
-   mitk::BoolProperty* propb;
-   mitk::StringProperty* props;
-   mitk::ColorProperty* propcol;
+   QmitkColorPropertyEditor* coloreditor;
+   QmitkNumberPropertyView* numberview;
+   QmitkNumberPropertyEditor* numbereditor;
+   
+   mitk::BoolProperty* propbool;
+   mitk::StringProperty* propstring;
+   mitk::ColorProperty* propcolor;
+   mitk::FloatProperty* propfloat;
+   mitk::DoubleProperty* propdouble;
+   mitk::IntProperty* propint;
+   //mitk::GenericProperty<short>* propshort;
+
    QTimer* timer;
 
    bool m_Stay;

@@ -27,42 +27,71 @@ PropertyViewTest::PropertyViewTest(bool stay, QWidget* parent, const char* name)
   QVBoxLayout* vl = new QVBoxLayout(this, QBoxLayout::TopToBottom);
  
   // string property
-  props = new mitk::StringProperty("Juhu");
+  propstring = new mitk::StringProperty("Juhu");
  
   // base property view for the string
-  baseview = new QmitkBasePropertyView( props, this );
+  baseview = new QmitkBasePropertyView( propstring, this );
   vl->addWidget(baseview);
  
   // string property view for the string
-  stringview = new QmitkStringPropertyView( props, this );
+  stringview = new QmitkStringPropertyView( propstring, this );
   vl->addWidget(stringview);
  
   // string property editor for the string
-  stringeditor = new QmitkStringPropertyEditor( props, this );
+  stringeditor = new QmitkStringPropertyEditor( propstring, this );
   vl->addWidget(stringeditor);
 
   // color property
-  propcol = new mitk::ColorProperty(0.5, 1.0, 0.25);
+  propcolor = new mitk::ColorProperty(0.5, 1.0, 0.25);
 
   // color prop view
-  colorview = new QmitkColorPropertyView( propcol, this );
+  colorview = new QmitkColorPropertyView( propcolor, this );
   vl->addWidget(colorview);
  
   // color prop editor
-  coloreditor = new QmitkColorPropertyEditor( propcol, this );
+  coloreditor = new QmitkColorPropertyEditor( propcolor, this );
   vl->addWidget(coloreditor);
 
   // bool property
-  propb = new mitk::BoolProperty(true);
+  propbool = new mitk::BoolProperty(true);
 
   // bool prop view
-  boolview = new QmitkBoolPropertyView( propb, this );
+  boolview = new QmitkBoolPropertyView( propbool, this );
   vl->addWidget(boolview);
  
   // bool prop editor
-  booleditor = new QmitkBoolPropertyEditor( propb, this );
+  booleditor = new QmitkBoolPropertyEditor( propbool, this );
   vl->addWidget(booleditor);
   
+  //propshort = new mitk::GenericProperty<short>(3);  // see comment below
+  propint = new mitk::IntProperty(4);
+  propfloat = new mitk::FloatProperty(4.5);
+  propdouble = new mitk::DoubleProperty(4.75);
+
+  // not possible because lack of: bool mitk::XMLReader::GetAttribute(std::basic_str, short int&)
+  // this is nedded in DataStructures/mitkProperties/mitkGenericProperty.h, l. 86
+  //numberview = new QmitkNumberPropertyView( propshort, this );
+  //vl->addWidget(numberview);
+  
+  numberview = new QmitkNumberPropertyView( propint, this );
+  numberview->setDecimalPlaces(4);
+  vl->addWidget(numberview);
+  numbereditor = new QmitkNumberPropertyEditor( propint, this );
+  numbereditor->setDecimalPlaces(4);
+  vl->addWidget(numbereditor);
+
+  numberview = new QmitkNumberPropertyView( propfloat, this );
+  numberview->setDecimalPlaces(3);
+  vl->addWidget(numberview);
+  numbereditor = new QmitkNumberPropertyEditor( propfloat, this );
+  numbereditor->setDecimalPlaces(3);
+  vl->addWidget(numbereditor);
+
+  numberview = new QmitkNumberPropertyView( propdouble, this );
+  vl->addWidget(numberview);
+  numbereditor = new QmitkNumberPropertyEditor( propdouble, this );
+  vl->addWidget(numbereditor);
+
 
   // finally, a timer that starts some testing
   timer = new QTimer(this);
@@ -82,26 +111,26 @@ PropertyViewTest::~PropertyViewTest()
   delete boolview;
   delete baseview;
   
-  delete props;
-  delete propcol;
-  delete propb;
-}
+  delete propstring;
+    delete propcolor;
+    delete propbool;
+  }
 
-void PropertyViewTest::run() 
-{
-  assert( baseview->text() == "Juhu" );
-  assert( stringview->text() == "Juhu" );
-  assert( stringeditor->text() == "Juhu" );
+  void PropertyViewTest::run() 
+  {
+    assert( baseview->text() == "Juhu" );
+    assert( stringview->text() == "Juhu" );
+    assert( stringeditor->text() == "Juhu" );
 
-  props->SetValue("Huhu Welt");
-  assert( baseview->text() == "Huhu Welt" );
-  assert( stringview->text() == "Huhu Welt" );
-  assert( stringeditor->text() == "Huhu Welt" );
+    propstring->SetValue("Huhu Welt");
+    assert( baseview->text() == "Huhu Welt" );
+    assert( stringview->text() == "Huhu Welt" );
+    assert( stringeditor->text() == "Huhu Welt" );
 
-  assert( boolview->isOn() );
-  assert( booleditor->isOn() );
+    assert( boolview->isOn() );
+    assert( booleditor->isOn() );
 
-  propb->SetValue(false);
+    propbool->SetValue(false);
   assert( !boolview->isOn() );
   assert( !booleditor->isOn() );
 

@@ -22,8 +22,8 @@ QmitkBoolPropertyView::QmitkBoolPropertyView( const mitk::BoolProperty* property
   QCheckBox( parent, name ),
   m_BoolProperty(property)
 {
-  setChecked( m_BoolProperty->GetValue() );
   setEnabled( false );
+  PropertyChanged();
 }
 
 QmitkBoolPropertyView::~QmitkBoolPropertyView()

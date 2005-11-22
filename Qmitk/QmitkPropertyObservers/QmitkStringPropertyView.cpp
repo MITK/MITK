@@ -22,7 +22,7 @@ QmitkStringPropertyView::QmitkStringPropertyView( const mitk::StringProperty* pr
   QLabel( parent, name ),
   m_StringProperty(property)
 {
-  setText( property->GetValue() );
+  PropertyChanged();
 }
 
 QmitkStringPropertyView::~QmitkStringPropertyView()

@@ -35,13 +35,13 @@ class QmitkStringPropertyEditor : public QTextEdit, public mitk::PropertyEditor
 
     virtual void PropertyChanged();
     virtual void PropertyRemoved();
+    
+    mitk::StringProperty* m_StringProperty;
 
   protected slots:
     
     void onTextChanged();
 
-    mitk::StringProperty* m_StringProperty;
-  
   private:
 
 };

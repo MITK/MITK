@@ -36,8 +36,6 @@ class QmitkBasePropertyView : public QLabel, public mitk::PropertyView
     virtual void PropertyChanged();
     virtual void PropertyRemoved();
 
-    const mitk::BoolProperty* m_BoolProperty;
-
   private:
 
 };

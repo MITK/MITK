@@ -67,18 +67,10 @@ template <class T> class VectorTraits {
   public:
     typedef T ValueType;
 };
-template <> class VectorTraits<Vector3D> {
-  public:
-    typedef Vector3D::ValueType ValueType;
-};
+
 template <> class VectorTraits<VnlVector> {
   public:
     typedef ScalarType ValueType;
-};
-
-template <> class VectorTraits<Point3D> {
-  public:
-    typedef Point3D::ValueType ValueType;
 };
 
 template<> class VectorTraits<double[4]> {
@@ -89,6 +81,7 @@ template<> class VectorTraits< itk::Index<5> > {
   public:
     typedef itk::Index<5>::IndexValueType ValueType;
 };
+
 template<> class VectorTraits< itk::Index<3> > {
   public:
     typedef itk::Index<3>::IndexValueType ValueType;
@@ -104,7 +97,7 @@ template<> class VectorTraits< float [3]> {
 };
 template<> class VectorTraits< double [3]> {
   public:
-    typedef float ValueType;
+    typedef double ValueType;
 };
 
 template<> class VectorTraits< vnl_vector_fixed<ScalarType, 3> > {
@@ -116,13 +109,35 @@ template<> class VectorTraits< long unsigned int[3]> {
   public:
     typedef long unsigned int ValueType;
 };
+
 template<> class VectorTraits< unsigned int *> {
   public:
     typedef unsigned int ValueType;
 };
+
 template<> class VectorTraits< ScalarType[4] > {
   public:
     typedef ScalarType ValueType;
+};
+
+template<> class VectorTraits< itk::Vector<float,3> > {
+  public:
+    typedef float ValueType;
+};
+
+template<> class VectorTraits< itk::Point<float,3> > {
+  public:
+    typedef float ValueType;
+};
+
+template<> class VectorTraits< itk::Vector<double,3> > {
+  public:
+    typedef double ValueType;
+};
+
+template<> class VectorTraits< itk::Point<double,3> > {
+  public:
+    typedef double ValueType;
 };
 
 template<> class VectorTraits< itk::Vector<int,3> > {

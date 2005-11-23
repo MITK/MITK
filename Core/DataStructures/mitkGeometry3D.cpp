@@ -18,6 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include "mitkGeometry3D.h"
+#include "mitkItkMatrixHack.h"
 #include "mitkOperation.h"
 #include "mitkRotationOperation.h"
 #include "mitkPointOperation.h"
@@ -194,6 +195,7 @@ mitk::AffineGeometryFrame3D::Pointer mitk::Geometry3D::Clone() const
 void mitk::Geometry3D::InitializeGeometry(Geometry3D * newGeometry) const
 {
   Superclass::InitializeGeometry(newGeometry);
+  static_cast<mitk::ItkMatrixHack*>(newGeometry->GetIndexToWorldTransform())->MatrixChanged();
 
   newGeometry->SetTimeBounds(m_TimeBounds);
 

@@ -17,6 +17,7 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 #include "mitkVector.h"
+#include "mitkItkMatrixHack.h"
 #include <vtkSystemIncludes.h>
 #include <vtkMatrix4x4.h>
 
@@ -29,7 +30,6 @@ void mitk::TransferVtkMatrixToItkTransform(const vtkMatrix4x4* vtkmatrix, mitk::
   if(itkTransform==NULL)
     return;
   
-  itkTransform->SetIdentity();
   mitk::AffineTransform3D::MatrixType vnlMatrix;  
 
   for ( int i=0; i < 3; ++i)
@@ -39,7 +39,7 @@ void mitk::TransferVtkMatrixToItkTransform(const vtkMatrix4x4* vtkmatrix, mitk::
   // *This* ensures m_MatrixMTime.Modified(), which is therewith not equal to 
   // m_InverseMatrixMTime, thus a new inverse will be calculated (when
   // requested).
-  itkTransform->SetMatrix( vnlMatrix );
+  static_cast<mitk::ItkMatrixHack*>(itkTransform)->MatrixChanged();
 
   itk::AffineTransform<mitk::ScalarType>::OffsetType offset;
   offset[0] = vtkmatrix->GetElement( 0, 3 );

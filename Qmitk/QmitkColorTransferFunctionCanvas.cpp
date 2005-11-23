@@ -1,3 +1,21 @@
+/*=========================================================================
+
+Program:   Medical Imaging & Interaction Toolkit
+Module:    $RCSfile$
+Language:  C++
+Date:      $Date$
+Version:   $Revision$
+
+Copyright (c) German Cancer Research Center, Division of Medical and
+Biological Informatics. All rights reserved.
+See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
+
+This software is distributed WITHOUT ANY WARRANTY; without even
+the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE.  See the above copyright notices for more information.
+
+=========================================================================*/
+
 #include "QmitkColorTransferFunctionCanvas.h"
 #include <qpainter.h>
 #include <qcolordialog.h>
@@ -30,7 +48,7 @@ void QmitkColorTransferFunctionCanvas::paintEvent( QPaintEvent* e ) {
     for (int i=0 ; i<this->GetFunctionSize(); i++) {
       int handleHeight = (i == m_GrabbedHandle) ? (int)(height() / 1.5) : height() / 2;
       int handleWidth= (i == m_GrabbedHandle) ? 6 : 4;
-      std::pair<int,int> point = this->FunctionToCanvas(std::make_pair(GetFunctionX(i),0));
+      std::pair<int,int> point = this->FunctionToCanvas(std::make_pair(GetFunctionX(i),0.0f));
       int y = height() / 2;
       painter.drawRoundRect(point.first-handleWidth/2,y-handleHeight/2,handleWidth,handleHeight,50,50);
     }

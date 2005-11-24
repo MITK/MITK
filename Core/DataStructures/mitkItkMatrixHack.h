@@ -44,7 +44,11 @@ public:
 
   void MatrixChanged()
   {
+#if (ITK_VERSION_MAJOR == 2 && ITK_VERSION_MINOR < 2)
+    m_InverseMatrixMTime.Modified();
+#else
     SetVarMatrix(GetMatrix());
+#endif
   }
 };
 

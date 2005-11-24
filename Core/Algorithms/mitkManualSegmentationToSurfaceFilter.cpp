@@ -68,9 +68,18 @@ void mitk::ManualSegmentationToSurfaceFilter::GenerateData()
       vtkimage->Delete();//RC--
       vtkimagethreshold->SetInValue( 100 );
       vtkimagethreshold->SetOutValue( 0 );
-      vtkimagethreshold->ThresholdByUpper( this->m_Threshold ); 
+      int vtkscalartype = vtkimage->GetScalarType();
+      if((vtkscalartype == VTK_FLOAT) || (vtkscalartype == VTK_DOUBLE))
+      {
+        vtkimagethreshold->ThresholdByUpper( this->m_Threshold );
+      }
+      else
+      {
+        vtkimagethreshold->ThresholdByUpper( this->m_Threshold + 0.5 );
+      }
+
       thresholdExpanded = 49;
-  
+
       vtkimagethreshold->SetOutputScalarTypeToUnsignedChar();
       vtkimagethreshold->ReleaseDataFlagOn();
       

@@ -6,10 +6,7 @@ namespace itk {
 
 template <class TScalarType>
 itk::VtkAbstractTransform<TScalarType>::VtkAbstractTransform() : 
-#if (ITK_VERSION_MAJOR == 2 && ITK_VERSION_MINOR <= 0)
-#else
   Superclass(3, 0),
-#endif
   m_VtkAbstractTransform(NULL), m_InverseVtkAbstractTransform(NULL), 
   m_LastVtkAbstractTransformTimeStamp(0)
 {

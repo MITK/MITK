@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkImageToSurfaceFilter.h"
 #include <vtkImageData.h>
+#include <vtkDecimate.h>
 #include <vtkDecimatePro.h>
 #include <vtkImageChangeInformation.h>
 #include <vtkLinearTransform.h>
@@ -26,8 +27,11 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkMatrix4x4.h>
 
 mitk::ImageToSurfaceFilter::ImageToSurfaceFilter()
-  : m_Smooth(false), m_Decimate(false), m_TargetReduction(0.05f)
 {
+  m_Smooth = false;
+  m_Decimate = NoDecimation;
+  m_Threshold = 1;
+  m_TargetReduction = 0.95f;
 };
 
 mitk::ImageToSurfaceFilter::~ImageToSurfaceFilter()
@@ -86,7 +90,7 @@ void mitk::ImageToSurfaceFilter::CreateSurface(int time, vtkImageData *vtkimage,
   }
 
   //decimate = to reduce number of polygons
-  if(m_Decimate)
+  if(m_Decimate==DecimatePro)
   {
     vtkDecimatePro *decimate = vtkDecimatePro::New();
     decimate->SplittingOff();
@@ -105,34 +109,49 @@ void mitk::ImageToSurfaceFilter::CreateSurface(int time, vtkImageData *vtkimage,
     polydata->Register(NULL);//RC++
     decimate->Delete();
   }
+  else if (m_Decimate==Decimate)
+  {
+    vtkDecimate *decimate = vtkDecimate::New();
+    decimate->SetInput( polydata );
+    decimate->PreserveTopologyOn();
+    decimate->BoundaryVertexDeletionOff();
+    decimate->SetTargetReduction( m_TargetReduction );
+    polydata->Delete();//RC--
+    polydata = decimate->GetOutput();
+    polydata->Register(NULL);//RC++
+    decimate->Delete();
+  }
 
   polydata->Update();
 
   polydata->SetSource(NULL);
 
-  vtkFloatingPointType* spacing;
-  spacing = vtkimage->GetSpacing();
-
-  vtkPoints * points = polydata->GetPoints();
-  vtkMatrix4x4 *vtkmatrix = vtkMatrix4x4::New();
-  GetInput()->GetGeometry(time)->GetVtkTransform()->GetMatrix(vtkmatrix);
-  double (*matrix)[4] = vtkmatrix->Element;
-
-  unsigned int i,j;
-  for(i=0;i<3;++i)
-    for(j=0;j<3;++j)
-      matrix[i][j]/=spacing[j];
-
-  unsigned int n = points->GetNumberOfPoints();
-  vtkFloatingPointType point[3];
-
-  for (i = 0; i < n; i++)
+  if(polydata->GetNumberOfPoints() > 0)
   {
-    points->GetPoint(i, point);
-    mitkVtkLinearTransformPoint(matrix,point,point);
-    points->SetPoint(i, point);
+    vtkFloatingPointType* spacing;
+    spacing = vtkimage->GetSpacing();
+
+    vtkPoints * points = polydata->GetPoints();
+    vtkMatrix4x4 *vtkmatrix = vtkMatrix4x4::New();
+    GetInput()->GetGeometry(time)->GetVtkTransform()->GetMatrix(vtkmatrix);
+    double (*matrix)[4] = vtkmatrix->Element;
+
+    unsigned int i,j;
+    for(i=0;i<3;++i)
+      for(j=0;j<3;++j)
+        matrix[i][j]/=spacing[j];
+
+    unsigned int n = points->GetNumberOfPoints();
+    vtkFloatingPointType point[3];
+
+    for (i = 0; i < n; i++)
+    {
+      points->GetPoint(i, point);
+      mitkVtkLinearTransformPoint(matrix,point,point);
+      points->SetPoint(i, point);
+    }
+    vtkmatrix->Delete();
   }
-  vtkmatrix->Delete();
 
   surface->SetVtkPolyData(polydata, time);
   polydata->UnRegister(NULL);

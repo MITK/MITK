@@ -64,7 +64,7 @@ int mitkContourMapper2DTest(int argc, char* argv[])
   bounds = mitk::DataTree::ComputeVisibleBoundingBox(&it);
   std::cout << "visible bounds: " << bounds << std::endl;
   
-  mitk::OpenGLRenderer::Pointer renderer = mitk::OpenGLRenderer::New();
+  mitk::OpenGLRenderer::Pointer renderer = new mitk::OpenGLRenderer;
   
   //  QmitkRenderWindow *rw = new QmitkRenderWindow(renderer, NULL, NULL);  
 

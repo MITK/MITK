@@ -43,6 +43,8 @@ class QmitkPopupColorChooser : public QFrame
 
   protected:
 
+    virtual void keyReleaseEvent(QKeyEvent*);
+
     virtual void mouseMoveEvent(QMouseEvent*);
     virtual void mouseReleaseEvent(QMouseEvent*);
     virtual void closeEvent(QCloseEvent*);
@@ -53,7 +55,6 @@ class QmitkPopupColorChooser : public QFrame
   private:
 
     QWidget* m_popupParent;
-    int m_moves;
     QWidget* my_parent;
 
     unsigned int m_Steps;
@@ -65,6 +66,7 @@ class QmitkPopupColorChooser : public QFrame
     int m_H;
     int m_S;
     int m_V;
+    QColor m_OriginalColor;
 };
 
 

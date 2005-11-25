@@ -25,7 +25,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 QmitkPopupColorChooser::QmitkPopupColorChooser(QWidget* parent, unsigned int steps, unsigned int size, const char* name)
 : QFrame (parent, name, WStyle_StaysOnTop | WStyle_Customize | WStyle_NoBorder | WStyle_Tool | WX11BypassWM),
-  m_moves(0),
   my_parent(parent)
 {
   setSteps(steps);
@@ -56,6 +55,12 @@ void QmitkPopupColorChooser::setSteps(int steps)
   m_HStep = 360 / m_Steps;
   m_SStep = 512 / m_Steps;
   m_VStep = 512 / m_Steps;
+}
+
+void QmitkPopupColorChooser::keyReleaseEvent(QKeyEvent* e)
+{
+  emit colorSelected( m_OriginalColor );
+  close();
 }
 
 void QmitkPopupColorChooser::mouseMoveEvent (QMouseEvent* e)
@@ -100,21 +105,18 @@ void QmitkPopupColorChooser::mouseMoveEvent (QMouseEvent* e)
   color.setHsv(m_H, m_S, m_V);
 
   emit colorSelected( color );
-
-  ++m_moves;
 }
 
 void QmitkPopupColorChooser::mouseReleaseEvent (QMouseEvent* e)
 {
-  if  (rect().contains( e->pos () ) || m_moves < 4) 
-    close ();
-  ++m_moves;
+  close ();
 }
 
 void QmitkPopupColorChooser::closeEvent (QCloseEvent*e)
 {
   e->accept ();
 
+  releaseKeyboard();
   releaseMouse();
 
   if (!m_popupParent) return;
@@ -182,14 +184,18 @@ void QmitkPopupColorChooser::popup(QWidget* parent, const QPoint& point, const m
       }
 
       y = (int)( (float)h/360.0 * (float)m_Steps * cellwidth );
-    
-      // new code - move to color
+   
+      m_OriginalColor.setHsv(h,s,v);
+      
+      // move to color
       newPos.setX( point.x() - x );
       newPos.setY( point.y() - y );
     }
     else
     {
-      // old code - center widget
+      // center widget
+      m_OriginalColor.setHsv(-1, 0, 0);
+
       newPos.setX( point.x() - width() / 2 );
       newPos.setY( point.y() - height() / 2 );
     }
@@ -199,7 +205,7 @@ void QmitkPopupColorChooser::popup(QWidget* parent, const QPoint& point, const m
   show();
   raise();
   grabMouse();
-  m_moves = 0;
+  grabKeyboard();
 }
 
 void QmitkPopupColorChooser::paintEvent(QPaintEvent* e)

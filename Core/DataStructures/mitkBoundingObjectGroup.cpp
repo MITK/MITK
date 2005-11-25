@@ -62,6 +62,8 @@ void mitk::BoundingObjectGroup::UpdateOutputInformation()
   mitk::Point3D point;
 
   mitk::AffineTransform3D* transform = GetTimeSlicedGeometry()->GetIndexToWorldTransform();
+  mitk::AffineTransform3D::Pointer inverse = mitk::AffineTransform3D::New();
+  transform->GetInverse(inverse);
 
   // calculate a bounding box that includes all BoundingObjects
   // \todo probably we should do this additionally for each time-step
@@ -71,7 +73,7 @@ void mitk::BoundingObjectGroup::UpdateOutputInformation()
     unsigned char i;
     for(i=0; i<8; ++i)
     {
-      point = transform->BackTransformPoint(geometry->GetCornerPoint(i));
+      point = inverse->TransformPoint(geometry->GetCornerPoint(i));
       if(point[0]*point[0]+point[1]*point[1]+point[2]*point[2] < mitk::large)
         pointscontainer->InsertElement( pointid++, point);
       else

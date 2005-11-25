@@ -236,8 +236,10 @@ mitk::BoundingBox::Pointer mitk::Geometry3D::CalculateBoundingBoxRelativeToTrans
   unsigned char i;
   if(transform!=NULL)
   {
+    mitk::AffineTransform3D::Pointer inverse = mitk::AffineTransform3D::New();
+    transform->GetInverse(inverse);
     for(i=0; i<8; ++i)
-      pointscontainer->InsertElement( pointid++, transform->BackTransformPoint( GetCornerPoint(i) ));
+      pointscontainer->InsertElement( pointid++, inverse->TransformPoint( GetCornerPoint(i) ));
   }
   else
   {

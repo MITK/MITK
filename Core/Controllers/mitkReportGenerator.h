@@ -28,6 +28,10 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk {
 
+/** 
+ * This class provides some basic functionality to generate reports based on text-format
+ * templates and keyword substitution
+ */  
 class ReportGenerator : public itk::Object
 {
 public:
@@ -36,9 +40,15 @@ public:
   mitkClassMacro(ReportGenerator, itk::Object);
   itkNewMacro(Self);
   itkGetMacro(OutputFileName,std::string);
+  /** 
+   * The filename to write the generated report to
+   */
   itkSetMacro(OutputFileName,std::string);
   itkGetMacro(TemplateFileName,std::string);
-  itkSetMacro(TemplateFileName,std::string);
+  /** 
+   * The filename of the report template that shold be used 
+   */
+   itkSetMacro(TemplateFileName,std::string);
   KeyValueMapType& GetKeyValueMap() { return m_KeyValueMap; }
   void AddKey(std::string key, std::string value);
   void Generate();

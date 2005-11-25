@@ -16,18 +16,19 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 #include <qwidget.h>
-
-#include <QmitkBasePropertyView.h>
-#include <QmitkBoolPropertyView.h>
-#include <QmitkBoolPropertyEditor.h>
-#include <QmitkStringPropertyView.h>
-#include <QmitkStringPropertyEditor.h>
-#include <QmitkColorPropertyView.h>
-#include <QmitkColorPropertyEditor.h>
-#include <QmitkNumberPropertyView.h>
-#include <QmitkNumberPropertyEditor.h>
-
 #include <qtimer.h>
+
+#include <mitkProperties.h>
+
+class QmitkBasePropertyView;
+class QmitkBoolPropertyView;
+class QmitkBoolPropertyEditor;
+class QmitkStringPropertyView;
+class QmitkStringPropertyEditor;
+class QmitkColorPropertyView;
+class QmitkColorPropertyEditor;
+class QmitkNumberPropertyView;
+class QmitkNumberPropertyEditor;
 
 class PropertyViewTest : public QWidget
 {
@@ -54,13 +55,26 @@ class PropertyViewTest : public QWidget
    QmitkStringPropertyEditor* stringeditor;
    QmitkColorPropertyView* colorview;
    QmitkColorPropertyEditor* coloreditor;
-   QmitkNumberPropertyView* numberview;
-   QmitkNumberPropertyEditor* numbereditor;
+   QmitkNumberPropertyView* numberview1;
+   QmitkNumberPropertyView* numberview2;
+   QmitkNumberPropertyView* numberview3;
+   QmitkNumberPropertyView* numberview4;
+   QmitkNumberPropertyView* numberview5;
+   QmitkNumberPropertyView* numberview6;
+   QmitkNumberPropertyEditor* numbereditor1;
+   QmitkNumberPropertyEditor* numbereditor2;
+   QmitkNumberPropertyEditor* numbereditor3;
+   QmitkNumberPropertyEditor* numbereditor4;
+   QmitkNumberPropertyEditor* numbereditor5;
+   QmitkNumberPropertyEditor* numbereditor6;
+   QmitkNumberPropertyEditor* numbereditor7;
+   QmitkNumberPropertyEditor* numbereditor8;
    
    mitk::BoolProperty* propbool;
    mitk::StringProperty* propstring;
    mitk::ColorProperty* propcolor;
    mitk::FloatProperty* propfloat;
+   mitk::FloatProperty* propfloat2;
    mitk::DoubleProperty* propdouble;
    mitk::IntProperty* propint;
    //mitk::GenericProperty<short>* propshort;

@@ -65,19 +65,28 @@ class QmitkNumberPropertyEditor : public QSpinBox, public mitk::PropertyEditor
     void DisplayNumber();
 
     union {
-      const mitk::GenericProperty<short>*   m_ShortProperty;
-      const mitk::GenericProperty<int>*     m_IntProperty;
-      const mitk::GenericProperty<float>*   m_FloatProperty;
-      const mitk::GenericProperty<double>*  m_DoubleProperty;
+      mitk::GenericProperty<short>*   m_ShortProperty;
+      mitk::GenericProperty<int>*     m_IntProperty;
+      mitk::GenericProperty<float>*   m_FloatProperty;
+      mitk::GenericProperty<double>*  m_DoubleProperty;
     };
 
     const int m_DataType;
     
-    short m_DecimalPlaces; /// -1 indicates "no limit to decimal places"
-    double m_DisplayFactor;
+    short m_DecimalPlaces;            // how many decimal places are shown
+    double m_FactorPropertyToSpinbox; // internal conversion factor. neccessary because spinbox ranges work only with ints
+    double m_FactorSpinboxToDisplay;  // internal conversion factor. neccessary because spinbox ranges work only with ints
+    bool m_ShowPercents;              // whether values are given in percent (0.5 -> 50%)
+  
+  protected slots:
+
+    void onValueChanged(int);
 
   private:
 
+    void adjustFactors(short, bool);
+
+    bool m_SelfChangeLock;
 };
 
 #endif

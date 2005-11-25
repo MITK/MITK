@@ -22,6 +22,9 @@ PURPOSE.  See the above copyright notices for more information.
 #define DT_FLOAT   3
 #define DT_DOUBLE  4
 
+#define ROUND(x)       (((x) > 0) ?   int((x) + 0.5) :   int((x) - 0.5))
+#define ROUND_SHORT(x) (((x) > 0) ? short((x) + 0.5) : short((x) - 0.5))
+
 QmitkNumberPropertyEditor::QmitkNumberPropertyEditor( mitk::GenericProperty<short>* property, QWidget* parent, const char* name )
 : PropertyEditor( property ),
   QSpinBox( parent, name ),
@@ -64,14 +67,53 @@ QmitkNumberPropertyEditor::~QmitkNumberPropertyEditor()
 
 void QmitkNumberPropertyEditor::initialize()
 { // only to be called from constructors
+  
+  // spinbox settings
   setValidator(0);
   setSuffix("");
-  m_DisplayFactor = 1.0;
+  
+  // protected
   m_DecimalPlaces = 0;
+  m_FactorPropertyToSpinbox = 1.0;
+  m_FactorSpinboxToDisplay = 1.0;
+  m_ShowPercents = false;
+ 
+  // private
+  m_SelfChangeLock = false;
 
+  connect( this, SIGNAL(valueChanged(int)), this, SLOT(onValueChanged(int)) );
+ 
+  // display current value of our property
   DisplayNumber();
 }
-    
+
+void QmitkNumberPropertyEditor::adjustFactors(short newDecimalPlaces, bool newShowPercents)
+{
+  int oldMax = maxValue();
+  int oldMin = minValue();
+
+  m_DecimalPlaces = newDecimalPlaces;
+  m_ShowPercents = newShowPercents;
+
+  m_FactorPropertyToSpinbox = pow(10,m_DecimalPlaces);
+  m_FactorSpinboxToDisplay = 1.0 / m_FactorPropertyToSpinbox;
+  setLineStep( ROUND(m_FactorPropertyToSpinbox) );
+       
+  if ( m_ShowPercents )
+  {
+    m_FactorPropertyToSpinbox *= 100.0;
+    setLineStep( ROUND(0.01 *m_FactorPropertyToSpinbox) );
+    setSuffix("%");
+  }
+  else
+  {
+    setSuffix("");
+  }
+  
+  setMinValue(oldMin);
+  setMaxValue(oldMax);
+}
+
 short QmitkNumberPropertyEditor::getDecimalPlaces() const
 {
   return m_DecimalPlaces;
@@ -84,16 +126,7 @@ void QmitkNumberPropertyEditor::setDecimalPlaces(short places)
     case DT_FLOAT:
     case DT_DOUBLE:
       {
-        int oldMax = maxValue();
-        int oldMin = minValue();
-
-        m_DecimalPlaces = places;
- 
-        setMinValue(oldMin);
-        setMaxValue(oldMax);
-
-        setLineStep( static_cast<int>(pow(10, m_DecimalPlaces)) );
-
+        adjustFactors( places, m_ShowPercents ); 
         DisplayNumber();
         break;
       }
@@ -104,73 +137,58 @@ void QmitkNumberPropertyEditor::setDecimalPlaces(short places)
 
 bool QmitkNumberPropertyEditor::getShowPercent() const
 {
-//  return m_DisplayFactor == 100.0;
+  return m_ShowPercents;
 }
 
-void QmitkNumberPropertyEditor::setShowPercent(bool show)
+void QmitkNumberPropertyEditor::setShowPercent(bool showPercent)
 {
-/*
+  if ( showPercent == m_ShowPercents ) return; // nothing to change
+    
   switch (m_DataType)
   {
     case DT_FLOAT:
     case DT_DOUBLE:
-      if (show)
-      {
-        m_DisplayFactor = 100.0;
-        setSuffix("%");
-      }
-      else
-      {
-        m_DisplayFactor = 1.0;
-        setSuffix("");
-      }
+    {
+      adjustFactors( m_DecimalPlaces, showPercent ); 
       break;
+    }
     default:
+    {
       break;
+    }
   }
   
   DisplayNumber();
-*/
 }
 
 int QmitkNumberPropertyEditor::minValue() const
 {
-  return static_cast<int>( (QSpinBox::minValue() / m_DisplayFactor / pow(10,m_DecimalPlaces)) );
+  return ROUND( QSpinBox::minValue() / m_FactorPropertyToSpinbox );
 }
 
 void QmitkNumberPropertyEditor::setMinValue(int value)
 {
-  QSpinBox::setMinValue( static_cast<int>( value / m_DisplayFactor * pow(10,m_DecimalPlaces) ) );
+  QSpinBox::setMinValue( ROUND(value * m_FactorPropertyToSpinbox ) );
 }
 
 int QmitkNumberPropertyEditor::maxValue() const
 {
-  return static_cast<int>( (QSpinBox::maxValue() / m_DisplayFactor / pow(10,m_DecimalPlaces)) );
+  return ROUND( QSpinBox::maxValue() / m_FactorPropertyToSpinbox );
 }
 
 void QmitkNumberPropertyEditor::setMaxValue(int value)
 {
-  QSpinBox::setMaxValue( static_cast<int>( value / m_DisplayFactor * pow(10,m_DecimalPlaces) ) );
+  QSpinBox::setMaxValue( ROUND( value * m_FactorPropertyToSpinbox ) );
 }
 
 double QmitkNumberPropertyEditor::doubleValue() const
 {
-  return static_cast<double>((QSpinBox::value()) / pow(10,m_DecimalPlaces) );
+  return static_cast<double>((QSpinBox::value()) / m_FactorPropertyToSpinbox );
 }
 
 void QmitkNumberPropertyEditor::setDoubleValue(double value)
 {
-  switch (m_DataType)
-  {
-    case DT_SHORT:
-    case DT_INT:
-      QSpinBox::setValue( static_cast<int>(value) );
-      break;
-    default:
-      QSpinBox::setValue( static_cast<int>( value * m_DisplayFactor * pow(10,m_DecimalPlaces) ) );
-      break;
-  }
-  
+  QSpinBox::setValue( ROUND( value * m_FactorPropertyToSpinbox ) );
   QSpinBox::updateDisplay();
 }
 
@@ -178,15 +196,17 @@ QString QmitkNumberPropertyEditor::mapValueToText(int value)
 {
   QString displayedText;
 
-  double d( value / pow(10,m_DecimalPlaces) );
+  //double d( value / m_FactorPropertyToSpinbox );
+  double d( value * m_FactorSpinboxToDisplay );
+
   if ( m_DecimalPlaces > 0 )
   {
     QString formatString;
     formatString.sprintf("%%.%if", m_DecimalPlaces); // do copy before sprintf
-    displayedText.sprintf( formatString , d * m_DisplayFactor);
+    displayedText.sprintf( formatString , d );
   }
   else
-    displayedText.sprintf( "%i" , static_cast<int>(d) );
+    displayedText.sprintf( "%i" , ROUND(d) );
 
   return displayedText;
 }
@@ -194,7 +214,51 @@ QString QmitkNumberPropertyEditor::mapValueToText(int value)
 int QmitkNumberPropertyEditor::mapTextToValue(bool* ok)
 {
   if (ok) *ok = true; // indicate successful parsing
-  return static_cast<int>( cleanText().toDouble() / m_DisplayFactor * pow(10,m_DecimalPlaces) );
+
+  return ROUND( cleanText().toDouble() / m_FactorSpinboxToDisplay );
+}
+
+void QmitkNumberPropertyEditor::onValueChanged(int value)
+{
+  if (m_SelfChangeLock) return; // valueChanged is even emitted, when this widget initiates a change to its value
+                                // this may be useful some times, but in this use, it would be wrong:
+                                //   (A) is an editor with 3 decimal places
+                                //   (B) is an editor with 2 decimal places
+                                //   User changes A's displayed value to 4.002
+                                //   A's onValueChanged gets called, sets the associated Property to 4.002
+                                //   B's onPropertyChanged gets called, sets its display to 4.00
+                                //   B's onValueChanged gets called and sets the associated Property to 4.00
+                                //   A's onPropertyChanged gets called, sets its display to 4.000
+
+  BeginModifyProperty();
+  
+  double newValue( value / m_FactorPropertyToSpinbox );
+    
+  switch (m_DataType)
+  {
+    case DT_SHORT:
+      {
+        m_ShortProperty->SetValue(ROUND_SHORT(newValue));
+        break;
+      }
+    case DT_INT:
+      {
+        m_IntProperty->SetValue(ROUND(newValue));
+        break;
+      }
+    case DT_FLOAT:
+      {
+        m_FloatProperty->SetValue(newValue);
+        break;
+      }
+    case DT_DOUBLE:
+      {
+        m_DoubleProperty->SetValue(newValue);
+        break;
+      }
+  }
+  
+  EndModifyProperty();
 }
 
 void QmitkNumberPropertyEditor::PropertyChanged()
@@ -211,6 +275,7 @@ void QmitkNumberPropertyEditor::DisplayNumber()
 {
   if (! m_Property ) return;
 
+  m_SelfChangeLock = true;
   switch (m_DataType)
   {
     case DT_SHORT:
@@ -240,5 +305,6 @@ void QmitkNumberPropertyEditor::DisplayNumber()
     default:
       break;
   }
+  m_SelfChangeLock = false;
 }
 

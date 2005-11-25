@@ -16,6 +16,17 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 #include "PropertyViewTestWidget.h"
+
+#include <QmitkBasePropertyView.h>
+#include <QmitkBoolPropertyView.h>
+#include <QmitkBoolPropertyEditor.h>
+#include <QmitkStringPropertyView.h>
+#include <QmitkStringPropertyEditor.h>
+#include <QmitkColorPropertyView.h>
+#include <QmitkColorPropertyEditor.h>
+#include <QmitkNumberPropertyView.h>
+#include <QmitkNumberPropertyEditor.h>
+
 #include <assert.h>
 #include <qlayout.h>
 #include <qapplication.h>
@@ -73,24 +84,48 @@ PropertyViewTest::PropertyViewTest(bool stay, QWidget* parent, const char* name)
   //numberview = new QmitkNumberPropertyView( propshort, this );
   //vl->addWidget(numberview);
   
-  numberview = new QmitkNumberPropertyView( propint, this );
-  numberview->setDecimalPlaces(4);
-  vl->addWidget(numberview);
-  numbereditor = new QmitkNumberPropertyEditor( propint, this );
-  numbereditor->setDecimalPlaces(4);
-  vl->addWidget(numbereditor);
+  numberview1 = new QmitkNumberPropertyView( propint, this );
+  numberview1->setDecimalPlaces(4);
+  vl->addWidget(numberview1);
+  numbereditor1 = new QmitkNumberPropertyEditor( propint, this );
+  numbereditor1->setDecimalPlaces(4);
+  vl->addWidget(numbereditor1);
 
-  numberview = new QmitkNumberPropertyView( propfloat, this );
-  numberview->setDecimalPlaces(3);
-  vl->addWidget(numberview);
-  numbereditor = new QmitkNumberPropertyEditor( propfloat, this );
-  numbereditor->setDecimalPlaces(3);
-  vl->addWidget(numbereditor);
+  numberview2 = new QmitkNumberPropertyView( propfloat, this );
+  numberview2->setDecimalPlaces(3);
+  vl->addWidget(numberview2);
+  numbereditor2 = new QmitkNumberPropertyEditor( propfloat, this );
+  numbereditor2->setDecimalPlaces(3);
+  vl->addWidget(numbereditor2);
+  numbereditor3 = new QmitkNumberPropertyEditor( propfloat, this );
+  numbereditor3->setDecimalPlaces(2);
+  vl->addWidget(numbereditor3);
+  numbereditor4 = new QmitkNumberPropertyEditor( propfloat, this );
+  vl->addWidget(numbereditor4);
+  numberview3 = new QmitkNumberPropertyView( propfloat, this );
+  numberview3->setDecimalPlaces(2);
+  vl->addWidget(numberview3);
 
-  numberview = new QmitkNumberPropertyView( propdouble, this );
-  vl->addWidget(numberview);
-  numbereditor = new QmitkNumberPropertyEditor( propdouble, this );
-  vl->addWidget(numbereditor);
+  numberview4 = new QmitkNumberPropertyView( propdouble, this );
+  vl->addWidget(numberview4);
+  numbereditor5 = new QmitkNumberPropertyEditor( propdouble, this );
+  numbereditor5->setDecimalPlaces(4);
+  vl->addWidget(numbereditor5);
+  numbereditor6 = new QmitkNumberPropertyEditor( propdouble, this );
+  vl->addWidget(numbereditor6);
+ 
+  // percents
+  propfloat2 = new mitk::FloatProperty(0.43);
+  numberview5 = new QmitkNumberPropertyView( propfloat2, this );
+  vl->addWidget(numberview5);
+  
+  numbereditor7 = new QmitkNumberPropertyEditor( propfloat2, this );
+  numbereditor7->setShowPercent(true);
+  vl->addWidget(numbereditor7);
+  numbereditor8 = new QmitkNumberPropertyEditor( propfloat2, this );
+  numbereditor8->setShowPercent(true);
+  numbereditor8->setDecimalPlaces(1);
+  vl->addWidget(numbereditor8);
 
 
   // finally, a timer that starts some testing
@@ -110,10 +145,26 @@ PropertyViewTest::~PropertyViewTest()
   delete booleditor;
   delete boolview;
   delete baseview;
+
+  delete numberview1;
+  delete numberview2;
+  delete numberview3;
+  delete numberview4;
+  delete numberview5;
+  delete numbereditor1;
+  delete numbereditor2;
+  delete numbereditor3;
+  delete numbereditor4;
+  delete numbereditor5;
+  delete numbereditor6;
+  delete numbereditor7;
+  delete numbereditor8;
   
   delete propstring;
-    delete propcolor;
-    delete propbool;
+  delete propcolor;
+  delete propbool;
+  delete propfloat;
+  delete propfloat2;
   }
 
   void PropertyViewTest::run() 

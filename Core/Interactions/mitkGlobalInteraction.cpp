@@ -54,6 +54,13 @@ inline mitk::StateEvent* GenerateEmptyStateEvent(int eventId)
 
 void mitk::GlobalInteraction::AddListener(mitk::StateMachine* listener)
 {
+  if(listener == NULL) return;
+  if(dynamic_cast<Interactor*>(listener)!=NULL)
+  {
+    itkWarningMacro(<<"Trying to add an Interactor ("
+      << listener->GetNameOfClass() << ") as a listener. "
+      << "This will probably cause problems");
+  }
   if ( std::find(m_ListenerList.begin(), m_ListenerList.end(),listener) == m_ListenerList.end() )
   {
     m_ListenerList.push_back(listener);
@@ -73,6 +80,7 @@ bool mitk::GlobalInteraction::RemoveListener(mitk::StateMachine* listener)
 
 void mitk::GlobalInteraction::AddInteractor(mitk::Interactor* interactor)
 {
+  if(interactor == NULL) return;
   if ( std::find(m_InteractorList.begin(), m_InteractorList.end(),interactor) == m_InteractorList.end() )
   {
     m_InteractorList.push_back(interactor);

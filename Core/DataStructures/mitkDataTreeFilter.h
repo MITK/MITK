@@ -142,6 +142,9 @@ namespace mitk
 
           /// Returns the parent of this item (orphans throws exceptions)
           const Item* GetParent() const;
+
+          /// 
+          const mitk::DataTreeNode* GetNode() const;  
         protected:
         
           /// Intentionally hidden

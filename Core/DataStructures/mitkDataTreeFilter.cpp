@@ -203,6 +203,11 @@ const DataTreeFilter::Item* DataTreeFilter::Item::GetParent() const
   return m_Parent;
 }
 
+const mitk::DataTreeNode* DataTreeFilter::Item::GetNode() const
+{
+  return m_Node;
+}
+
 //------ DataTreeFilter ------------------------------------------------------------------
 
 // smart pointer constructor
@@ -256,6 +261,7 @@ DataTreeFilter::DataTreeFilter(mitk::DataTree* datatree)
   m_TreePruneConnection = m_DataTree->AddObserver(itk::TreePruneEvent<mitk::DataTreeBase>(), command);
   }
   
+  GenerateModelFromTree();
 }
 
 DataTreeFilter::~DataTreeFilter()

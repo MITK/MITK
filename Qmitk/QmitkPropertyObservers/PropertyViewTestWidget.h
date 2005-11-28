@@ -19,6 +19,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qtimer.h>
 
 #include <mitkProperties.h>
+#include <mitkDataTree.h>
+#include "mitkDataTreeFilter.h"
 
 class QmitkBasePropertyView;
 class QmitkBoolPropertyView;
@@ -39,6 +41,8 @@ class PropertyViewTest : public QWidget
     PropertyViewTest(bool stay, QWidget* parent, const char* name = 0);
 
     virtual ~PropertyViewTest();
+
+    void prepare_tree();
     
   public slots:
     
@@ -78,6 +82,9 @@ class PropertyViewTest : public QWidget
    mitk::DoubleProperty* propdouble;
    mitk::IntProperty* propint;
    //mitk::GenericProperty<short>* propshort;
+
+   mitk::DataTree::Pointer data_tree;
+   mitk::DataTreeFilter::Pointer tree_filter;
 
    QTimer* timer;
 

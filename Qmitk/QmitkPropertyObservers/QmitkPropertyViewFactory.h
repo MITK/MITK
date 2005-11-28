@@ -16,18 +16,22 @@ PURPOSE.  See the above copyright notices for more information.
  
 =========================================================================*/
 
+#include <mitkProperties.h>
+
+class QWidget;
+
 class QmitkPropertyViewFactory
 {
   public:
 
-    typedef enum ViewTypes { DEFAULT = 0  };
-    typedef enum EditorTypes { DEFAULT = 0  };
+    typedef enum ViewTypes { vtDEFAULT = 0  };
+    typedef enum EditorTypes { etDEFAULT = 0  };
 
     static QmitkPropertyViewFactory* GetInstance(); // singleton
 
-    // Views and editors are created via operator new. After creation they belong to the caller of CreateView()/CreateEditor(),
-    // i.e. the caller has to ensure, that the objects are properly deleted!
-    QWidget* CreateView  (mitk::BaseProperty* property, unsigned int type = 0, QWidget* parent = 0, const char* name = 0);
+    /// Views and editors are created via operator new. After creation they belong to the caller of CreateView()/CreateEditor(),
+    /// i.e. the caller has to ensure, that the objects are properly deleted!
+    QWidget* CreateView  (const mitk::BaseProperty* property, unsigned int type = 0, QWidget* parent = 0, const char* name = 0);
     QWidget* CreateEditor(mitk::BaseProperty* property, unsigned int type = 0, QWidget* parent = 0, const char* name = 0);
 
   protected:

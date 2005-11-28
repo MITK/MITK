@@ -27,15 +27,22 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QmitkNumberPropertyView.h>
 #include <QmitkNumberPropertyEditor.h>
 
+#include <QmitkDataTreeListView.h>
+
+#include <mitkImage.h>
+
 #include <assert.h>
 #include <qlayout.h>
 #include <qapplication.h>
+
+#include <qlistview.h>
 
 PropertyViewTest::PropertyViewTest(bool stay, QWidget* parent, const char* name)
 :QWidget(parent,name),
  m_Stay(stay)
 {
-  QVBoxLayout* vl = new QVBoxLayout(this, QBoxLayout::TopToBottom);
+  QHBoxLayout* hl = new QHBoxLayout(this, QBoxLayout::LeftToRight);
+  QVBoxLayout* vl = new QVBoxLayout(hl, QBoxLayout::TopToBottom);
  
   // string property
   propstring = new mitk::StringProperty("Juhu");
@@ -127,11 +134,62 @@ PropertyViewTest::PropertyViewTest(bool stay, QWidget* parent, const char* name)
   numbereditor8->setDecimalPlaces(1);
   vl->addWidget(numbereditor8);
 
+  prepare_tree();
+  
+  QmitkDataTreeListView* temp = new QmitkDataTreeListView(tree_filter, this);
+  hl->addWidget( temp );
 
   // finally, a timer that starts some testing
   timer = new QTimer(this);
   connect ( timer, SIGNAL(timeout()), this, SLOT(run()) );
   timer->start(0, TRUE);
+}
+
+void PropertyViewTest::prepare_tree()
+{
+  data_tree = mitk::DataTree::New();
+  // create some test data
+  mitk::Image::Pointer image;
+  mitk::PixelType pt(typeid(int));
+  unsigned int dim[]={10,10,20}; // image dimensions
+
+  image = mitk::Image::New();
+  image->Initialize(mitk::PixelType(typeid(int)), 3, dim);
+  int *p = (int*)image->GetData(); // pointer to pixel data
+  int size = dim[0]*dim[1]*dim[2];
+  for(int i=0; i<size; ++i, ++p) *p=i; // fill image
+        
+  {
+    mitk::DataTreeNode::Pointer node = mitk::DataTreeNode::New();
+    node->SetData(image);
+  }
+
+  mitk::DataTreePreOrderIterator it(data_tree);
+
+  {
+    mitk::DataTreeNode::Pointer node = mitk::DataTreeNode::New(); node->SetData(image);
+    node->SetProperty("name", new mitk::StringProperty("Ruut"));
+    it.Set(node);
+  }
+  {
+    mitk::DataTreeNode::Pointer node = mitk::DataTreeNode::New(); node->SetData(image);
+    node->SetProperty("name", new mitk::StringProperty("Eins"));
+    node->SetProperty("visible", new mitk::BoolProperty(false));
+    it.Add(node);
+  }
+  {
+    mitk::DataTreeNode::Pointer node = mitk::DataTreeNode::New(); node->SetData(image);
+    node->SetProperty("name", new mitk::StringProperty("Zwo"));
+    it.Add(node);
+  }
+
+  mitk::DataTreeFilter::PropertyList visible_props;
+  visible_props.push_back("visible");
+  visible_props.push_back("name");
+  
+  tree_filter = mitk::DataTreeFilter::New(data_tree);
+  tree_filter->SetVisibleProperties(visible_props);
+          
 }
 
 PropertyViewTest::~PropertyViewTest() 
@@ -165,6 +223,9 @@ PropertyViewTest::~PropertyViewTest()
   delete propbool;
   delete propfloat;
   delete propfloat2;
+
+  tree_filter = 0;
+  data_tree = 0;
   }
 
   void PropertyViewTest::run() 

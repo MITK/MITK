@@ -19,44 +19,11 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkSurfaceToImageFilter.h"
 #include "mitkGeometryClipImageFilter.h"
+#include "mitkImageSliceSelector.h"
 
 #include <fstream>
 
-#include "itkCommand.h"
-class ReferenceCountWatcher : public itk::Object
-{
-public:
-  typedef itk::SimpleMemberCommand<ReferenceCountWatcher> CommandType;
-
-  mitkClassMacro(ReferenceCountWatcher, itk::Object);
-
-protected:
-  itk::Object* m_Object;
-  std::string m_Comment;
-  bool m_Deleted;
-  CommandType::Pointer m_DeleteCommand;
-
-public:
-  ReferenceCountWatcher(itk::Object* o, const char *comment="") : m_Object(o), m_Comment(comment), m_Deleted(false)
-  {
-    m_DeleteCommand = CommandType::New();
-    m_DeleteCommand->SetCallbackFunction(this, &ReferenceCountWatcher::DeleteObserver);
-    if(m_Object!=NULL)
-      m_Object->AddObserver(itk::DeleteEvent(), m_DeleteCommand);
-  }
-  int GetReferenceCount() const 
-  {
-    if(m_Object == NULL) return -1;
-    if(m_Deleted) return 0;
-    return m_Object->GetReferenceCount();
-  }
-  itkGetStringMacro(Comment);
-protected:
-  void DeleteObserver()
-  {
-    m_Deleted = true;
-  }
-};
+#include "mitkReferenceCountWatcher.h"
 
 class TwoOutputsFilter : public mitk::SurfaceToImageFilter
 {
@@ -77,8 +44,8 @@ protected:
   }
 };
 
-template <class FilterType>
-int runPipelineSmartPointerCorrectnessTestForFilterType()
+template <class FilterType, class InputType>
+int runPipelineSmartPointerCorrectnessTestForFilterType(InputType::Pointer input)
 {
   typename FilterType::Pointer filter;
   std::cout << "Testing " << typeid(FilterType).name() << "::New(): ";
@@ -88,10 +55,14 @@ int runPipelineSmartPointerCorrectnessTestForFilterType()
     std::cout<<"[FAILED]"<<std::endl;
      return EXIT_FAILURE;
   }
-  else {
-  std::cout<<"[PASSED]"<<std::endl;
+  else 
+  {
+    std::cout<<"[PASSED]"<<std::endl;
   } 
 
+  std::cout << "Testing SetInput(" << typeid(FilterType).name() << "): ";
+  filter->SetInput(input);
+  std::cout<<"[PASSED]"<<std::endl;
   //std::cout << "Testing mitk::SurfaceToImageFilter::*TESTED_METHOD_DESCRIPTION: ";
   //// METHOD_TEST_CODE
   //if (filter.IsNull()) {
@@ -104,10 +75,10 @@ int runPipelineSmartPointerCorrectnessTestForFilterType()
 
 //#ifdef MITK_WEAKPOINTER_PROBLEM_WORKAROUND_ENABLED
   //MITK_WEAKPOINTER_PROBLEM_WORKAROUND_ENABLED test
-  std::cout << "Initializing ReferenceCountWatcher: ";
-  ReferenceCountWatcher::Pointer filterWatcher, filterOutputWatcher;
-  filterWatcher = new ReferenceCountWatcher(filter, "filter1");
-  filterOutputWatcher = new ReferenceCountWatcher(filter->GetOutput(), "filter1Output");
+  std::cout << "Initializing mitk::ReferenceCountWatcher: ";
+  mitk::ReferenceCountWatcher::Pointer filterWatcher, filterOutputWatcher;
+  filterWatcher = new mitk::ReferenceCountWatcher(filter, "filter1");
+  filterOutputWatcher = new mitk::ReferenceCountWatcher(filter->GetOutput(), "filter1Output");
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "Testing MITK_WEAKPOINTER_PROBLEM_WORKAROUND_ENABLED part1: "<<std::endl;
@@ -166,8 +137,8 @@ int runPipelineSmartPointerCorrectnessTestForFilterType()
 
   std::cout << "Testing MITK_WEAKPOINTER_PROBLEM_WORKAROUND_ENABLED part2: "<<std::endl;
   filter = FilterType::New();
-  filterWatcher = new ReferenceCountWatcher(filter, "filter2");
-  filterOutputWatcher = new ReferenceCountWatcher(filter->GetOutput(), "filter2Output");
+  filterWatcher = new mitk::ReferenceCountWatcher(filter, "filter2");
+  filterOutputWatcher = new mitk::ReferenceCountWatcher(filter->GetOutput(), "filter2Output");
   try 
   {
     std::cout << "Testing to set filter to NULL, keeping NO reference to output:";
@@ -204,8 +175,8 @@ int runPipelineSmartPointerCorrectnessTestForFilterType()
     mitk::Image::Pointer output;
     {
       typename FilterType::Pointer localFilter = FilterType::New();
-      filterWatcher = new ReferenceCountWatcher(localFilter, "filter3");
-      filterOutputWatcher = new ReferenceCountWatcher(localFilter->GetOutput(), "filter3Output");
+      filterWatcher = new mitk::ReferenceCountWatcher(localFilter, "filter3");
+      filterOutputWatcher = new mitk::ReferenceCountWatcher(localFilter->GetOutput(), "filter3Output");
       output = localFilter->GetOutput();
       std::cout << "Testing running out of scope of filter, keeping reference to output:";
     }
@@ -261,8 +232,8 @@ int runPipelineSmartPointerCorrectnessTestForFilterType()
     mitk::Image::Pointer output;
     {
       typename FilterType::Pointer localFilter = FilterType::New();
-      filterWatcher = new ReferenceCountWatcher(localFilter, "filter4");
-      filterOutputWatcher = new ReferenceCountWatcher(localFilter->GetOutput(), "filter4Output");
+      filterWatcher = new mitk::ReferenceCountWatcher(localFilter, "filter4");
+      filterOutputWatcher = new mitk::ReferenceCountWatcher(localFilter->GetOutput(), "filter4Output");
       output = localFilter->GetOutput();
       std::cout << "Testing running out of scope of filter, keeping reference to output (as in part 3):";
     }
@@ -322,8 +293,8 @@ int runPipelineSmartPointerCorrectnessTestForFilterType()
   {
     {
       typename FilterType::Pointer localFilter = FilterType::New();
-      filterWatcher = new ReferenceCountWatcher(localFilter, "filter5");
-      filterOutputWatcher = new ReferenceCountWatcher(localFilter->GetOutput(), "filter5Output");
+      filterWatcher = new mitk::ReferenceCountWatcher(localFilter, "filter5");
+      filterOutputWatcher = new mitk::ReferenceCountWatcher(localFilter->GetOutput(), "filter5Output");
       std::cout << "Testing running out of scope of filter, keeping NO reference to output:";
     }
     std::cout<<"[PASSED]"<<std::endl;
@@ -358,17 +329,21 @@ int runPipelineSmartPointerCorrectnessTestForFilterType()
 int mitkPipelineSmartPointerCorrectnessTest(int argc, char* argv[])
 {
   int result;
-  result = runPipelineSmartPointerCorrectnessTestForFilterType<mitk::SurfaceToImageFilter>();
+  result = runPipelineSmartPointerCorrectnessTestForFilterType<mitk::SurfaceToImageFilter, mitk::Surface>(mitk::Surface::New());
   if( result != EXIT_SUCCESS )
     return result;
   std::cout << std::endl;
 
-  result = runPipelineSmartPointerCorrectnessTestForFilterType<mitk::GeometryClipImageFilter>();
+  result = runPipelineSmartPointerCorrectnessTestForFilterType<mitk::GeometryClipImageFilter, mitk::Image>(mitk::Image::New());
   if( result != EXIT_SUCCESS )
     return result;
   std::cout << std::endl;
 
-  result = runPipelineSmartPointerCorrectnessTestForFilterType<TwoOutputsFilter>();
+  result = runPipelineSmartPointerCorrectnessTestForFilterType<TwoOutputsFilter, mitk::Surface>(mitk::Surface::New());
+  if( result != EXIT_SUCCESS )
+    return result;
+
+  result = runPipelineSmartPointerCorrectnessTestForFilterType<mitk::ImageSliceSelector, mitk::Image>(mitk::Image::New());
   if( result != EXIT_SUCCESS )
     return result;
   

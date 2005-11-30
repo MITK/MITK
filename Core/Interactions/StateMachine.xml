@@ -396,7 +396,7 @@
       </transition>
     </state>
   </stateMachine>
-  <stateMachine name="drag">
+  <stateMachine NAME="drag">
     <state NAME="neutral" ID="1" START_STATE="TRUE">
       <transition NAME="check picked" NEXT_STATE_ID="1" EVENT_ID="1">
         <action ID="80" />
@@ -565,10 +565,6 @@
       <transition NAME="checkn Delete" NEXT_STATE_ID="30" EVENT_ID="12">
         <action ID="33" />
       </transition>
-      <transition NAME="clear all" NEXT_STATE_ID="1" EVENT_ID="700"><!--Event NotYetSpecified!NotInListBelow-->
-        <action ID="130" />
-        <action ID="1100" /> <!--AcMODE_DESELECT-->
-      </transition>
       <transition NAME="DeselectAll" NEXT_STATE_ID="2" EVENT_ID="14"><!--Event = ESC-->
         <action ID="72" />    <!--AcDESELECTALL-->
         <action ID="1100" />  <!--AcMODE_DESELECT-->
@@ -588,10 +584,6 @@
       </transition>
       <transition NAME="checkn Delete selected Point" NEXT_STATE_ID="30" EVENT_ID="12">
         <action ID="33" /> <!--AcCHECKEQUALS1-->
-      </transition>
-      <transition NAME="clear all" NEXT_STATE_ID="1" EVENT_ID="700"><!--Event NotYetSpecified!NotInListBelow-->
-        <action ID="130" /> <!--AcCLEAR-->
-        <action ID="1100" /> <!--AcMODEDESELECT-->
       </transition>
       <transition NAME="DeselectAll" NEXT_STATE_ID="2" EVENT_ID="14"><!--Event = ESC-->
         <action ID="72" />    <!--AcDESELECTALL-->
@@ -708,10 +700,6 @@
       <transition NAME="checkn Delete" NEXT_STATE_ID="30" EVENT_ID="12">
         <action ID="33" />
       </transition>
-      <transition NAME="clear all" NEXT_STATE_ID="1" EVENT_ID="700">
-        <action ID="130" />
-        <action ID="1100" /> <!--AcMODEDESELECT-->
-      </transition>
     </state>
     <state NAME="checkedN" ID="3">
       <transition NAME="n smaller N" NEXT_STATE_ID="40" EVENT_ID="1010">
@@ -727,10 +715,6 @@
       </transition>
       <transition NAME="checkn Delete selected Point" NEXT_STATE_ID="30" EVENT_ID="12">
         <action ID="33" />
-      </transition>
-      <transition NAME="clear all" NEXT_STATE_ID="1" EVENT_ID="700">
-        <action ID="130" />
-        <action ID="1100" /> <!--AcMODEDESELECT-->
       </transition>
     </state>
     <state NAME="picked NotFull" ID="10">
@@ -939,7 +923,7 @@
         <action ID="1101" /> <!--AcMODE_SELECT-->
         <action ID="46" /> <!--AcINITBACKGROUND-->
         <action ID="11" /> <!--AcADD-->
-      </transition>  
+      </transition>
       <transition NAME="drawNeutralSeed" NEXT_STATE_ID="3" EVENT_ID="2003">
         <action ID="1101" /> <!--AcMODE_SELECT-->
         <action ID="47" /> <!--AcINITNEUTRAL-->
@@ -973,7 +957,7 @@
         <action ID="1100" /> <!--AcMODE_DESELECT-->
       </transition>
     </state>
-  </stateMachine>  
+  </stateMachine>
   <!-- Behaviour of a Line. -->
   <stateMachine NAME="lineinteractor">
     <state NAME="unselected" ID="0" START_STATE="TRUE">
@@ -1772,6 +1756,8 @@
   <!-- -->
   <!-- EventDescriptions -->
   <events STYLE="Powerpoint">
+    <!-- Null Event -->
+    <!-- not here defined, cause this will never be send from external to mitk (to be mapped in mitkEventMapper to an mitk-event)-->
     <!-- left MouseButton -->
     <event NAME="left MouseBN" ID="1" TYPE="Type_MouseButtonPress" BUTTON="BS_LeftButton" BUTTONSTATE="0x0000" KEY="Key_none" />
     <!-- right MouseButton -->

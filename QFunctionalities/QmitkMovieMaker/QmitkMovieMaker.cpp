@@ -178,7 +178,7 @@ QAction* QmitkMovieMaker::CreateAction(QActionGroup *parent)
 {
   QAction* action;
   action = new QAction( tr( "MovieMaker" ), QPixmap((const char**)icon_xpm),
-    tr( "Camera Path" ), CTRL + Key_G, parent, "MovieMaker"
+    tr( "Camera Path" ), Qt::CTRL + Qt::Key_G, parent, "MovieMaker"
   );
 
   return action;

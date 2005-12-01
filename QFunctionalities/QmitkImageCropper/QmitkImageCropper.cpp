@@ -105,7 +105,7 @@ QAction * QmitkImageCropper::CreateAction(QActionGroup *parent)
                                  tr( "Image Cropper" ), 
                                  QPixmap((const char**)icon_xpm), 
                                  tr( "Image Cropper" ), 
-                                 CTRL + Key_R, 
+                                 Qt::CTRL + Qt::Key_R, 
                                  parent, 
                                  "BoundingObjectImageCropper" );
   return action;

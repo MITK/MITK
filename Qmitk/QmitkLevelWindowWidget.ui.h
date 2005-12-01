@@ -14,7 +14,6 @@
 #include <qmetaobject.h>
 #include <qapplication.h>
 
-#include <private/qucomextra_p.h>
 #include<qvalidator.h>
 
 //for constructor

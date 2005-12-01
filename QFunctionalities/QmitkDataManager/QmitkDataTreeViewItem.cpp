@@ -21,9 +21,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkDataTreeViewItem.h"
 #include "mitkPropertyList.h"
 #include "mitkStringProperty.h"
-#include "enabled.xpm"
-#include "disabled.xpm"
-QmitkDataTreeViewItem::QmitkDataTreeViewItem( QListView *parent, const QString &s1 , const QString &s2 , mitk::DataTreeIteratorBase* nodeIt )
+
+  QmitkDataTreeViewItem::QmitkDataTreeViewItem( QListView *parent, const QString &s1 , const QString &s2 , mitk::DataTreeIteratorBase* nodeIt )
   : QListViewItem( parent, s1, s2 ), m_DataTreeIterator(NULL)
 {
   assert(nodeIt!=NULL);

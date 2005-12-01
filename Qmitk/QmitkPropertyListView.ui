@@ -39,7 +39,7 @@
 </includes>
 <forwards>
     <forward>class QScrollView;</forward>
-    <forward>class mitk::BaseRenderer</forward>
+    <forward>namespace mitk { class BaseRenderer; }</forward>
 </forwards>
 <variables>
     <variable>bool m_MultiMode;</variable>

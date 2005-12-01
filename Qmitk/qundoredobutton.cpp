@@ -154,24 +154,6 @@ void QUndoRedoButton::insertStringList( const QStringList& sl, int index )
   m_popup->listbox()->insertStringList(sl,index);
 }
 
-void QUndoRedoButton::insertStrList( const QStrList* sl, int index )
-{
-  if (!m_popup) return;
-  m_popup->listbox()->insertStrList(sl,index);
-}
-
-void QUndoRedoButton::insertStrList( const QStrList& sl, int index )
-{
-  if (!m_popup) return;
-  m_popup->listbox()->insertStrList(sl,index);
-}
-
-void QUndoRedoButton::insertStrList( const char ** strs, int numStrings, int index )
-{
-  if (!m_popup) return;
-  m_popup->listbox()->insertStrList(strs,numStrings,index);
-}
-
 void QUndoRedoButton::insertItem( const QListBoxItem* lbi, int index )
 {
   if (!m_popup) return;

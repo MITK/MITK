@@ -29,7 +29,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qbuttongroup.h>
 #include <qtoolbar.h>
 #include <qaction.h>
-#include <qabstractlayout.h> 
 #include <qlayout.h>
 #include <qsplitter.h>
 

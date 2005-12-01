@@ -79,9 +79,6 @@ QUndoRedoButton : public QFrame
 
     /// Following methods are just reached through to m_popup->listbox(), this simplifies usage of this class
     void insertStringList( const QStringList& sl, int index=-1 );
-    void insertStrList( const QStrList* sl, int index=-1 );
-    void insertStrList( const QStrList& sl, int index=-1 );
-    void insertStrList( const char ** strs, int numStrings=-1, int index=-1 );
 
     void insertItem( const QListBoxItem* lbi, int index=-1 );
     void insertItem( const QListBoxItem* lbi, const QListBoxItem *after );

@@ -75,7 +75,7 @@ protected:
     //## \note works currently for PlaneGeometry only
     mitk::DataTreeIteratorClone m_IteratorToOtherGeometry2Ds;
 
-    typedef std::vector<mitk::DataTreeNode::Pointer> NodesVectorType;
+    typedef std::vector<mitk::DataTreeNode*> NodesVectorType;
     NodesVectorType m_OtherGeometry2Ds;
 };
 

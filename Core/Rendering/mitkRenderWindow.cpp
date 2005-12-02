@@ -57,10 +57,18 @@ mitk::RenderWindow::~RenderWindow()
 
   RenderingManager::GetInstance()->RemoveRenderWindow( this );
 
-  m_Renderer->InitRenderer(NULL);
-  m_Renderer = NULL;
+  // maybe the following block should be after the next one
+  if(m_Renderer.IsNotNull())
+  {
+    m_Renderer->InitRenderer(NULL);
+    m_Renderer = NULL;
+  }
 
-  m_MitkVtkRenderWindow->Delete(); //xxx
+  if(m_MitkVtkRenderWindow != NULL)
+  {
+    m_MitkVtkRenderWindow->Delete();
+    m_MitkVtkRenderWindow = NULL;
+  }
 }
 
 void mitk::RenderWindow::MakeCurrent() 

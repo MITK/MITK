@@ -419,6 +419,16 @@ This method is called from the two Constructors
 */
 void mitk::OpenGLRenderer::InitRenderer(mitk::RenderWindow* renderwindow)
 {
+  if(m_RenderWindow!=NULL)
+  {
+    m_RenderWindow->GetVtkRenderWindow()->RemoveRenderer(m_VtkRenderer);
+    m_RenderWindow->GetVtkRenderWindow()->SetInteractor(NULL);
+    if(m_VtkRenderer != NULL)
+    {
+      m_VtkRenderer->Delete();
+      m_VtkRenderer = NULL;
+    }
+  }
   BaseRenderer::InitRenderer(renderwindow);
   if(renderwindow == NULL)
   {
@@ -462,7 +472,7 @@ mitk::OpenGLRenderer::~OpenGLRenderer()
   {
     if(m_RenderWindow!=NULL)
     {
-      m_RenderWindow->GetVtkRenderWindow()->RemoveRenderer(m_VtkRenderer);
+      m_RenderWindow->GetVtkRenderWindow()->RemoveRenderer(this->m_VtkRenderer);
       m_RenderWindow->GetVtkRenderWindow()->SetInteractor(NULL);
     }
     m_CameraController = NULL;

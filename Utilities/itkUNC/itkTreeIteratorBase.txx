@@ -494,13 +494,27 @@ TreeIteratorBase<TTreeType>::Remove()
     m_Position->SetParent(parent);                               
     m_Tree->InvokeEvent( TreePruneEvent<TTreeType>(*this) );    
     m_Tree->Modified();
-    } 
+    m_Position->SetParent(NULL);
+
+    int size = m_Position->CountChildren();
+    for( int i=0; i< size; i++ ) 
+      {
+      TreeNodeType* child = dynamic_cast<TreeNodeType*>(m_Position->GetChild(i));
+      m_Position->Remove( child );
+      }
+    }
   else if (m_Root == m_Position)
     {
     m_Tree->InvokeEvent( TreePruneEvent<TTreeType>(*this) );
     m_Root = NULL;
     m_Tree->SetRoot(NULL);
     m_Tree->Modified();
+    int size = m_Position->CountChildren();
+    for( int i=0; i< size; i++ ) 
+      {
+      TreeNodeType* child = dynamic_cast<TreeNodeType*>(m_Position->GetChild(i));
+      m_Position->Remove( child );
+      }
     }
 
   m_Position = NULL;  // Smart pointer

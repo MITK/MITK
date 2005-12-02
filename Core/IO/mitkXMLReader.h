@@ -11,6 +11,15 @@
 
 namespace mitk{
 
+//##Documentation
+//## @brief Parses the XML file. Class is derived from the class vtkXMLParser.
+//## Reads a stream and parses XML element tags and corresponding attributes.
+//## Each element begin tag and its attributes are sent to the StartElement method.
+//## Each element end tag is sent to the EndElement method.
+//##
+//## Calls the ObjectFactory (methode CreateObject()) to create objects that are defined in the tags of the XML file.
+//## Don't forget to define the new elements in the ObjectFactory!
+
   class XMLReader : public vtkXMLParser {
 
 	public:
@@ -42,6 +51,9 @@ namespace mitk{
     };
 
     XMLReader( const mitk::DataTreeIteratorBase* it );
+
+    //##Documentation
+    //## @brief loads the XML file and starts to parse it
     static bool Load( std::string fileName, const mitk::DataTreeIteratorBase* it );
 
     bool GetAttribute( std::string name, std::string& value ) const;
@@ -71,9 +83,20 @@ namespace mitk{
     static const std::string MAX;
     static const std::string VALID;
 
+    //##Documentation
+    //## @brief goes to the specified XML tag
     bool Goto( const std::string& name );
+    
+    //##Documentation
+    //## @brief goes to the next XML tag
     bool GotoNext();
+
+    //##Documentation
+    //## @brief goes to the parent XML tag
     bool GotoParent();
+
+    //##Documentation
+    //## @brief creates the object that is specified in the XML tag's attribute CLASS_NAME 
     itk::Object::Pointer CreateObject();
 
   protected:

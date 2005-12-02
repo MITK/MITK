@@ -23,7 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <fstream>
 int mitkEventTest(int argc, char* argv[])
 {
-  mitk::OpenGLRenderer::Pointer renderer = mitk::OpenGLRenderer::New(); 
+  mitk::OpenGLRenderer::Pointer renderer = new mitk::OpenGLRenderer; 
   
   //Create Event
   mitk::Event * event = new mitk::Event(renderer, 0, 1, 2, 3);

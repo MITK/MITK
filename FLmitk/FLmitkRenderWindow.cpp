@@ -5,7 +5,7 @@
 void FLmitkRenderWindow::InitRenderer()
 { 
   if(m_Renderer.IsNull())
-    m_Renderer = mitk::OpenGLRenderer::New();
+    m_Renderer = new mitk::OpenGLRenderer;
 
   mitk::RenderWindow::InitRenderer();
 }

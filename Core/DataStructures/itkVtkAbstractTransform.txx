@@ -6,6 +6,7 @@ namespace itk {
 
 template <class TScalarType>
 itk::VtkAbstractTransform<TScalarType>::VtkAbstractTransform() : 
+  Superclass(3, 0),
   m_VtkAbstractTransform(NULL), m_InverseVtkAbstractTransform(NULL), 
   m_LastVtkAbstractTransformTimeStamp(0)
 {

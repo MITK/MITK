@@ -51,9 +51,6 @@ public:
   //##ModelId=3E33ECF301AD
   OpenGLRenderer( const char* name = "OpenGLRenderer" );
 
-  /** Method for creation through the object factory. */
-  itkNewMacro(Self);
-
   //##ModelId=3E3D28AB0018
   void SetData(const mitk::DataTreeIteratorBase* iterator);
 

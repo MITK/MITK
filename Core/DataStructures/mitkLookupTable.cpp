@@ -193,17 +193,9 @@ void mitk::LookupTable::CreateColorTransferFunction(vtkColorTransferFunction*& c
   int i, num_of_values=m_LookupTable->GetNumberOfTableValues();
 
 
-#if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
-  double *cols;
-  double *colsHead;
-  colsHead=cols=(double *)malloc(sizeof(double*)*num_of_values*3);
-#else
-  float *cols;
-  float *colsHead;
-  colsHead=cols=(float *)malloc(sizeof(float *)*num_of_values*3);
-#endif
-
-
+  vtkFloatingPointType *cols;
+  vtkFloatingPointType *colsHead;
+  colsHead=cols=(vtkFloatingPointType *)malloc(sizeof(vtkFloatingPointType)*num_of_values*3);
 
   for(i=0;i<num_of_values;++i)
   {

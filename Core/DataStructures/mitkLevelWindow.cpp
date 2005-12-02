@@ -148,7 +148,8 @@ void mitk::LevelWindow::SetAuto(mitk::Image* image, bool tryPicTags, bool guessB
       return;
   }
 
-  mitk::Image* wholeImage = image;
+  ScalarType minValue, maxValue;
+
   if(guessByCentralSlice)
   {
     mitk::ImageSliceSelector::Pointer sliceSelector = mitk::ImageSliceSelector::New();
@@ -158,16 +159,22 @@ void mitk::LevelWindow::SetAuto(mitk::Image* image, bool tryPicTags, bool guessB
       sliceSelector->SetChannelNr(image->GetDimension(4)/2);
       sliceSelector->Update();
 
-    image = sliceSelector->GetOutput();
+    mitk::Image* slice = sliceSelector->GetOutput();
+    minValue = slice->GetScalarValue2ndMin();
+    maxValue = slice->GetScalarValue2ndMaxNoRecompute();
+    if (minValue == maxValue)
+    {
+        // guessByCentralSlice seems to have failed, lets look at all data
+        minValue = image->GetScalarValue2ndMin();
+        maxValue = image->GetScalarValue2ndMaxNoRecompute();
+    }
   }
-  ScalarType minValue = image->GetScalarValue2ndMin();
-  ScalarType maxValue = image->GetScalarValue2ndMaxNoRecompute();
-  if (minValue == maxValue)
+  else
   {
-      // guessByCentralSlice seems to have failed, lets look at all data
-      minValue = wholeImage->GetScalarValue2ndMin();
-      maxValue = wholeImage->GetScalarValue2ndMaxNoRecompute();
+    minValue = image->GetScalarValue2ndMin();
+    maxValue = image->GetScalarValue2ndMaxNoRecompute();
   }
+
   if (minValue == maxValue)
   {
     maxValue = minValue+1;

@@ -51,9 +51,10 @@ mitk::Image::~Image()
 {
   Clear();
   m_ReferenceCountLock.Lock();
-  m_ReferenceCount = 2;
+  m_ReferenceCount = 3;
   m_ReferenceCountLock.Unlock();
   m_HistogramGeneratorObject = NULL;
+  m_TimeSelectorForExtremaObject = NULL;
   m_ReferenceCountLock.Lock();
   m_ReferenceCount = 0;
   m_ReferenceCountLock.Unlock();
@@ -108,11 +109,11 @@ vtkImageData* mitk::Image::GetVtkImageData(int t, int n)
     return NULL;
 
 #if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
-  float *fspacing = const_cast<float *>(GetUpdatedSlicedGeometry(t)->GetFloatSpacing());
+  float *fspacing = const_cast<float *>(GetSlicedGeometry(t)->GetFloatSpacing());
   double dspacing[3] = {fspacing[0],fspacing[1],fspacing[2]};
   volume->GetVtkImageData()->SetSpacing( dspacing );
 #else
-  volume->GetVtkImageData()->SetSpacing(const_cast<float*>(GetUpdatedSlicedGeometry(t)->GetFloatSpacing()));
+  volume->GetVtkImageData()->SetSpacing(const_cast<float*>(GetSlicedGeometry(t)->GetFloatSpacing()));
 #endif
   return volume->GetVtkImageData();
 }
@@ -574,14 +575,16 @@ bool mitk::Image::SetPicChannel(const ipPicDescriptor *pic, int n)
 void mitk::Image::Initialize()
 {
   mitk::HistogramGenerator* generator = static_cast<mitk::HistogramGenerator*>(m_HistogramGeneratorObject.GetPointer());
-  generator->SetImage(this);
 
   if(m_TimeSelectorForExtremaObject.IsNull())
+  {
     m_TimeSelectorForExtremaObject = mitk::ImageTimeSelector::New();
 
-  mitk::ImageTimeSelector* timeSelector;
-  timeSelector = static_cast<mitk::ImageTimeSelector*>(m_TimeSelectorForExtremaObject.GetPointer());
-  timeSelector->SetInput(this);
+    mitk::ImageTimeSelector* timeSelector;
+    timeSelector = static_cast<mitk::ImageTimeSelector*>(m_TimeSelectorForExtremaObject.GetPointer());
+    timeSelector->SetInput(this);
+    this->UnRegister();
+  }
 }
 
 //##ModelId=3E102AE9004B

@@ -38,7 +38,7 @@ public:
   ChildTreeIterator( TreeType* tree,const  TreeNodeType* start=NULL );
 
   /** Constructor */
-  ChildTreeIterator( const TreeIteratorBase<TTreeType>& iterator );
+  ChildTreeIterator( const TreeIteratorBase<TTreeType>& );
 
   /** Get the type of the iterator */
   int GetType( ) const;

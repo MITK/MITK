@@ -89,6 +89,10 @@ mitk::BaseRenderer::BaseRenderer( const char* name ) :
   m_DisplayGeometryNode->SetData(m_DisplayGeometryData);
   m_DisplayGeometryNode->GetPropertyList()->SetProperty("renderer", rendererProp);
   m_DisplayGeometryTransformTime = m_DisplayGeometryNode->GetVtkTransform()->GetMTime();
+
+  m_ReferenceCountLock.Lock();
+  m_ReferenceCount = 0;
+  m_ReferenceCountLock.Unlock();
 }
 
 

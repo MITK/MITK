@@ -54,6 +54,13 @@ inline mitk::StateEvent* GenerateEmptyStateEvent(int eventId)
 
 void mitk::GlobalInteraction::AddListener(mitk::StateMachine* listener)
 {
+  if(listener == NULL) return;
+  if(dynamic_cast<Interactor*>(listener)!=NULL)
+  {
+    itkWarningMacro(<<"Trying to add an Interactor ("
+      << listener->GetNameOfClass() << ") as a listener. "
+      << "This will probably cause problems");
+  }
   if ( std::find(m_ListenerList.begin(), m_ListenerList.end(),listener) == m_ListenerList.end() )
   {
     m_ListenerList.push_back(listener);
@@ -73,6 +80,7 @@ bool mitk::GlobalInteraction::RemoveListener(mitk::StateMachine* listener)
 
 void mitk::GlobalInteraction::AddInteractor(mitk::Interactor* interactor)
 {
+  if(interactor == NULL) return;
   if ( std::find(m_InteractorList.begin(), m_InteractorList.end(),interactor) == m_InteractorList.end() )
   {
     m_InteractorList.push_back(interactor);
@@ -274,14 +282,20 @@ bool mitk::GlobalInteraction::StandardInteractionSetup(const char * XMLbehaviorF
   else
     result=mitk::StateMachineFactory::LoadBehavior(XMLbehaviorFile);
   if(result==false)
+  {
+    s_GlobalInteraction = new mitk::GlobalInteraction(NULL);
     return false;
+  }
   // load event-mappings from XML-file
   if(XMLbehaviorFile==NULL)
     result=mitk::EventMapper::LoadStandardBehavior();
   else
     result=mitk::EventMapper::LoadBehavior(XMLbehaviorFile);
   if(result==false)
+  {
+    s_GlobalInteraction = new mitk::GlobalInteraction(NULL);
     return false;
+  }
   // setup interaction mechanism by creating GlobalInteraction
   if(globalInteractionName == NULL)
     s_GlobalInteraction = new mitk::GlobalInteraction("global");

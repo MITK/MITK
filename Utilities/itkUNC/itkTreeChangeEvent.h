@@ -23,6 +23,8 @@
 
 namespace itk
 {
+
+/** Signals some change in the tree */
   template <class TTreeType>
   class TreeChangeEvent : public ModifiedEvent
   { 
@@ -72,7 +74,42 @@ namespace itk
     const TreeIteratorBase<TTreeType>* m_ChangePosition;
   };
 
-/**  */
+/**  Signals, that a node has been set to another value. Position of the changed node is provided */
+  template <class TTreeType>
+  class TreeNodeChangeEvent : public TreeChangeEvent<TTreeType>
+  {  
+  public:
+    typedef TreeNodeChangeEvent Self; 
+    typedef TreeChangeEvent<TTreeType> Superclass; 
+
+    /** */
+    TreeNodeChangeEvent() {}
+
+    /** */
+    TreeNodeChangeEvent( const TreeIteratorBase<TTreeType>& position ) : 
+      TreeChangeEvent<TTreeType>(position) {} 
+
+    /** */
+    virtual const char * GetEventName() const 
+    { 
+      return "TreeNodeChangeEvent"; 
+    } 
+
+    /** */
+    virtual bool CheckEvent(const ::itk::EventObject* e) const 
+    { 
+      return dynamic_cast<const Self*>(e); 
+    } 
+
+    /** */     
+    virtual ::itk::EventObject* MakeObject() const 
+    { 
+      return new Self( *this->m_ChangePosition ); 
+    } 
+  
+  };
+
+/**  Signals that a node has been added. Position of the new node is provided */
   template <class TTreeType>
   class TreeAddEvent : public TreeChangeEvent<TTreeType>
   {  
@@ -107,7 +144,7 @@ namespace itk
   
   };
 
-/**  */
+/** Signals that a single node will shortly be removed. Position of this node is provided */
   template <class TTreeType>
   class TreeRemoveEvent : public TreeChangeEvent<TTreeType>
   {
@@ -126,6 +163,40 @@ namespace itk
     virtual const char * GetEventName() const 
     { 
       return "TreeRemoveEvent"; 
+    } 
+
+    /** */
+    virtual bool CheckEvent(const ::itk::EventObject* e) const 
+    { 
+      return dynamic_cast<const Self*>(e); 
+    } 
+
+    /** */     
+    virtual ::itk::EventObject* MakeObject() const 
+    { 
+      return new Self( *this->m_ChangePosition ); 
+    } 
+  };
+
+/** Signals that a node and all its childs will shortly be removed. Position of the top-level removed node is provided */
+  template <class TTreeType>
+  class TreePruneEvent : public TreeRemoveEvent<TTreeType>
+  {
+  public:
+    typedef TreePruneEvent Self; 
+    typedef TreeRemoveEvent<TTreeType> Superclass; 
+
+    /** */
+    TreePruneEvent(){}
+
+    /** */
+    TreePruneEvent( const TreeIteratorBase<TTreeType>& position ) : 
+      TreeRemoveEvent<TTreeType>(position) {} 
+
+    /** */
+    virtual const char * GetEventName() const 
+    { 
+      return "TreePruneEvent"; 
     } 
 
     /** */

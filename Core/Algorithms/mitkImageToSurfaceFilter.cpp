@@ -26,7 +26,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkMatrix4x4.h>
 
 mitk::ImageToSurfaceFilter::ImageToSurfaceFilter()
-  : m_Smooth(false), m_Decimate(false), m_TargetReduction(0.05f)
+  : m_Smooth(false), m_Decimate(false), m_TargetReduction(0.90f)
 {
 
 };

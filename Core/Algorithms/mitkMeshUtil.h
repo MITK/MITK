@@ -429,7 +429,7 @@ public:
         vtkpoints->GetPoint(i, vtkpoint);
         //std::cout << "next point: " << test[0]<< "," << test[1] << "," << test[2] << std::endl;
         //typename MeshType::PixelType* apoint = (typename MeshType::PixelType*) vtkpoints->GetPoint(i);
-        mitk::itk2vtk(itkPhysicalPoint, vtkpoint);
+        mitk::vtk2itk(vtkpoint, itkPhysicalPoint);
         output->SetPoint( i, itkPhysicalPoint );
       }
     }

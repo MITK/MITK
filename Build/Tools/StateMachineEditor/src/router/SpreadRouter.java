@@ -25,7 +25,7 @@ public class SpreadRouter extends MyAutomaticRouter {
 
 	/**
 	 * Modifies a given PointList that collides with some other PointList. The
-	 * given <i>index</i> indicates that this it the i<sup>th</sup> PointList
+	 * given <i>index</i> indicates that this is the i<sup>th</sup> PointList
 	 * in a group of colliding points.
 	 * 
 	 * @param points
@@ -67,6 +67,19 @@ public class SpreadRouter extends MyAutomaticRouter {
 		}
 	}
 	
+	/**
+	 * Modifies a given PointList that collides with some other PointList. The
+	 * given <i>index</i> indicates that this is the i<sup>th</sup> PointList
+	 * in a group of colliding points.
+	 * 
+	 * @param points
+	 *            the colliding points
+	 * @param index
+	 *            the index
+	 */
+	/* (non-Javadoc)
+	 * @see router.MyAutomaticRouter#handleCollision1(org.eclipse.draw2d.geometry.PointList, int)
+	 */
 	protected void handleCollision1(PointList points, int index) {
 		int i = -1;
 		Point start = points.getFirstPoint();
@@ -76,7 +89,6 @@ public class SpreadRouter extends MyAutomaticRouter {
 		Vector2d vk = new Vector2d(s.x, s.y);
 		vk.sub(e);
 		
-		//Point2d midPoint = new Point2d(e.x + index * separation / 2, s.y + index * separation / 2);
 		double radius = vk.length() / 2 + index * separation / 2;
 		double r = radius*radius;
 		double xa = e.x;

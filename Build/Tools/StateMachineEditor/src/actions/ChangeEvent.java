@@ -1,6 +1,8 @@
 package actions;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import model.Connection;
 
@@ -11,23 +13,25 @@ import org.eclipse.gef.commands.CompoundCommand;
 import org.eclipse.gef.ui.actions.SelectionAction;
 import org.eclipse.ui.IWorkbenchPart;
 
-public class AddAction extends SelectionAction {
+public class ChangeEvent extends SelectionAction {
 	
-	private static final String ADD_ACTION_REQUEST = "Add action";  //$NON-NLS-1$
+	private static final String CHANGE_EVENT_REQUEST = "Change event";  //$NON-NLS-1$
 	
-	public static final String ADD_ACTION = "Add action";   //$NON-NLS-1$
+	public static final String CHANGE_EVENT = "Change event";   //$NON-NLS-1$
+	
+	private Map map = null;
 	
 	Request request;
 
 	/**
-	 * constructor to add an action
+	 * constructor to change an event
 	 * @param part the IWorkbenchPart
 	 */
-	public AddAction(IWorkbenchPart part) {
+	public ChangeEvent(IWorkbenchPart part) {
 		super(part);
-		request = new Request(ADD_ACTION_REQUEST);
-		setId(ADD_ACTION);
-		setText("Add action");
+		request = new Request(CHANGE_EVENT_REQUEST);
+		setId(CHANGE_EVENT);
+		setText("Change event");
 	}
 
 	/* (non-Javadoc)
@@ -54,14 +58,21 @@ public class AddAction extends SelectionAction {
 			if (!(part.getModel() instanceof Connection)) {
 				return false;
 			}
+			// add connection to map
+			else {
+				Connection con = (Connection) part.getModel();
+				map = new HashMap();
+				map.put("1", con);
+			}
 		}
 		return true;
 	}
 
 	private Command getCommand() {
 		List editparts = getSelectedObjects();
+		request.setExtendedData(map);
 		CompoundCommand cc = new CompoundCommand();
-		cc.setDebugLabel("Add action");//$NON-NLS-1$
+		cc.setDebugLabel("Change event");//$NON-NLS-1$
 		for (int i=0; i < editparts.size(); i++) {
 			EditPart part = (EditPart)editparts.get(i);
 			cc.add(part.getCommand(request));

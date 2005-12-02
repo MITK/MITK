@@ -132,6 +132,7 @@ public class StateMachinesWizard2 extends Wizard implements INewWizard {
 		monitor.setTaskName("Opening file for editing...");
 		getShell().getDisplay().asyncExec(new Runnable() {
 			public void run() {
+				// create StateMachinesList view from xml file
 				List allMachines = tree.getStateMachines();
 				for (int i = 0; i < allMachines.size(); i++) {
 					Element machine = (Element) allMachines.get(i);

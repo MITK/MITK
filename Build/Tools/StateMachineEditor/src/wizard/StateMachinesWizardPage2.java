@@ -105,7 +105,7 @@ public class StateMachinesWizardPage2 extends WizardPage {
 	}
 	
 	/**
-	 * Ensures that both text fields are set.
+	 * Ensures that File container is specified.
 	 */
 
 	private void dialogChanged() {

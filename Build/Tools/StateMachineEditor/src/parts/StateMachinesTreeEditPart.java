@@ -63,6 +63,9 @@ class StateMachinesTreeEditPart extends AbstractTreeEditPart implements
 		}
 	}
 
+	/**
+	 * @return the States model
+	 */
 	private States getCastedModel() {
 		return (States) getModel();
 	}

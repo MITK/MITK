@@ -21,19 +21,32 @@ public class EndState extends States {
 	private Element state = new Element("state");
 	private Comment comment = null;
 	private boolean hasComment = false;
+	private StateMachinesDiagram parent = null;
 
+	/* (non-Javadoc)
+	 * @see model.States#getIcon()
+	 */
 	public Image getIcon() {
 		return RECTANGLE_ICON;
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
 	public String toString() {
 		return "Endstate " + getStateName() + " ID " + getStateId();
 	}
 
+	/* (non-Javadoc)
+	 * @see model.States#getStateElement()
+	 */
 	public Element getStateElement() {
 		return state;
 	}
 	
+	/* (non-Javadoc)
+	 * @see model.States#getStateComment()
+	 */
 	public Comment getStateComment() {
 		if (comment == null || !hasComment) {
 			comment = new Comment("");
@@ -43,6 +56,9 @@ public class EndState extends States {
 		return comment;
 	}
 	
+	/* (non-Javadoc)
+	 * @see model.States#removeStateComment()
+	 */
 	public void removeStateComment() {
 		if (!(comment == null)) {
 			state.removeContent(comment);
@@ -51,6 +67,9 @@ public class EndState extends States {
 		}
 	}
 	
+	/* (non-Javadoc)
+	 * @see model.States#setStateElement(org.jdom.Element)
+	 */
 	public void setStateElement(Element state1) {
 		state = state1;
 		Point location = new Point(0,0);
@@ -88,5 +107,19 @@ public class EndState extends States {
 				this.setComment(comment.getText());
 			}
 		}
+	}
+	
+	/* (non-Javadoc)
+	 * @see model.States#getParent()
+	 */
+	public StateMachinesDiagram getParent() {
+		return parent;
+	}
+
+	/* (non-Javadoc)
+	 * @see model.States#setParent(model.StateMachinesDiagram)
+	 */
+	public void setParent(StateMachinesDiagram parent) {
+		this.parent = parent;
 	}
 }

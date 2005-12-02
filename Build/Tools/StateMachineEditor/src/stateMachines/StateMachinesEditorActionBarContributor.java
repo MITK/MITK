@@ -19,6 +19,7 @@ import org.eclipse.gef.ui.actions.ZoomOutRetargetAction;
 
 import actions.AddRetargetAction;
 import actions.ChangeRetargetAction;
+import actions.ChangeRetargetEvent;
 import actions.RemoveRetargetAction;
 
 /**
@@ -41,6 +42,7 @@ public class StateMachinesEditorActionBarContributor extends
 		addRetargetAction(new ChangeRetargetAction());
 		addRetargetAction(new AddRetargetAction());
 		addRetargetAction(new RemoveRetargetAction());
+		addRetargetAction(new ChangeRetargetEvent());
 	}
 
 	/**

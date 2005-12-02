@@ -16,6 +16,7 @@ public class StateMachinesPlugin extends AbstractUIPlugin implements IWorkbenchP
 	 * Returns the shared plugin instance.
 	 */
 	public static StateMachinesPlugin getDefault() {
+		// all editors should be closed on exit eclipse
 		PlatformUI.getPreferenceStore().putValue(CLOSE_EDITORS_ON_EXIT, "true");
 		return singleton;
 	}

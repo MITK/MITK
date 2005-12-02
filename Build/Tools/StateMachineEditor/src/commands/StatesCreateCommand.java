@@ -64,6 +64,7 @@ public class StatesCreateCommand extends Command {
 	 */
 	public void execute() {
 		newState.setStateName("Statename");
+		newState.setParent(parent);
 		newState.setStateId(Integer.toString(parent.getMaxID()));
 		if (newState instanceof StartState) {
 			((StartState) newState).setStartState();

@@ -13,23 +13,40 @@ public class Action {
 	
 	private Element action = null;
 
+	/**
+	 * @return the jDOM action element
+	 */
 	public Element getActionElement() {
 		return action;
 	}
 	
+	/**
+	 * sets the jDOM element of this action
+	 * @param action1 the jDOM element
+	 */
 	public void setActionElement(Element action1) {
 		action = action1;
 	}
 	
-	public String getAction() {
+	/**
+	 * @return the id of this action
+	 */
+	public String getActionId() {
 		String action2 = action.getAttributeValue("ID");
 		return action2;
 	}
 	
+	/**
+	 * sets the id on this action
+	 * @param id the new id
+	 */
 	public void setAction(String id) {
 		this.getActionElement().setAttribute("ID", id);
 	}
 	
+	/**
+	 * @return all parameters the action element has as children
+	 */
 	public List getParameter() {
 		List paraList = action.getChildren();
 		List allVectors = new ArrayList();
@@ -56,6 +73,9 @@ public class Action {
 		return allVectors;
 	}
 	
+	/**
+	 * @return the comment on this action
+	 */
 	public String getActionComment() {
 		List actionComment = action.getContent();
 		for (int i = 0; i < actionComment.size(); i++) {

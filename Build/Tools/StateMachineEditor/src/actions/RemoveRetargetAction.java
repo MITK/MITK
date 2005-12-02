@@ -4,9 +4,7 @@ import org.eclipse.ui.actions.RetargetAction;
 
 public class RemoveRetargetAction extends RetargetAction {
 	/**
-	 * Constructor for IncrementRetargetAction.
-	 * @param actionID
-	 * @param label
+	 * Constructor for RemoveRetargetAction.
 	 */
 	public RemoveRetargetAction() {
 		super(RemoveAction.REMOVE_ACTION, "Remove action");

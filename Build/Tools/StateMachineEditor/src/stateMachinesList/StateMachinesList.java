@@ -70,22 +70,38 @@ public class StateMachinesList extends ViewPart implements ISaveablePart, IDoubl
 	private boolean workbenchIsClosing = false;
 	private static StateMachinesList view;
 	
+	/**
+	 * the constructor for this view
+	 */
 	public StateMachinesList() {
 		super();
 		view = this;
 	}
 	
+	/**
+	 * hides this view, asks for save if it is modified 
+	 */
 	public static void closeView() {
 		IWorkbenchPage page1 = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage(); 
 		page1.hideView(view);
 	}
 	
+	/**
+	 * adds a statemachine to this view at startup
+	 * @param file statemachine name with .states extension
+	 * @param fileName the name of the statemachine
+	 */
 	public static void addToStateMachinesList(IFile file, String fileName) {
 		stateMachinesList.add(file);
 		viewer.add(fileName);
 		allNames.add(fileName);
 	}
 	
+	/**
+	 * adds a newly created statemachine to this view
+	 * @param file statemachine name with .states extension
+	 * @param fileName the name of the statemachine
+	 */
 	public static void addToStateMachinesList2(IFile file, String fileName) {
 		stateMachinesList.add(file);
 		viewer.add(fileName);
@@ -93,6 +109,11 @@ public class StateMachinesList extends ViewPart implements ISaveablePart, IDoubl
 		dirty = true;
 	}
 	
+	/**
+	 * changes the name of a statemachine in the view
+	 * @param oldName old name to remove from list
+	 * @param newName new name to add to list
+	 */
 	public static void changeStateMachineName(String oldName, String newName) {
 		for (int i = 0; i < stateMachinesList.size(); i++) {
 			IFile name = (IFile) stateMachinesList.get(i);
@@ -107,6 +128,9 @@ public class StateMachinesList extends ViewPart implements ISaveablePart, IDoubl
 		}
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IWorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
+	 */
 	public void createPartControl(Composite parent) {
 		viewer = new ListViewer(parent);
 		viewer.setSorter(new ViewerSorter());
@@ -122,10 +146,16 @@ public class StateMachinesList extends ViewPart implements ISaveablePart, IDoubl
 		createContextMenu();	
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IWorkbenchPart#setFocus()
+	 */
 	public void setFocus() {
 		viewer.getControl().setFocus();
 	}
 	
+	/**
+	 * clears all lists in this view
+	 */
 	public static void reset() {
 		dirty = false;
 		for (int i = 0; i < stateMachinesList.size(); i++) {
@@ -145,7 +175,11 @@ public class StateMachinesList extends ViewPart implements ISaveablePart, IDoubl
 		redoAction.setText("Redo");
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.IDoubleClickListener#doubleClick(org.eclipse.jface.viewers.DoubleClickEvent)
+	 */
 	public void doubleClick(DoubleClickEvent event) {
+		// opens the selected statemachine editor
 		fileName = (String) ((IStructuredSelection)viewer.getSelection()).getFirstElement();
 		for (int i = 0; i < stateMachinesList.size(); i++) {
 			machineName = (IFile) stateMachinesList.get(i);
@@ -173,6 +207,9 @@ public class StateMachinesList extends ViewPart implements ISaveablePart, IDoubl
 		}	
 	}
 	
+	/**
+	 * creates the context menu for this view
+	 */
 	private void createContextMenu() {
 		//create menu manager
 		MenuManager menuMgr = new MenuManager();
@@ -191,6 +228,10 @@ public class StateMachinesList extends ViewPart implements ISaveablePart, IDoubl
 		getSite().registerContextMenu(menuMgr, viewer);
 	}
 	
+	/**
+	 * fills the context menu with actions
+	 * @param mgr the IMenuManager
+	 */
 	private void fillContextMenu(IMenuManager mgr) {
 		mgr.add(new GroupMarker(IWorkbenchActionConstants.MB_ADDITIONS));
 		mgr.add(undoAction);
@@ -201,6 +242,9 @@ public class StateMachinesList extends ViewPart implements ISaveablePart, IDoubl
 		mgr.add(new Separator("Additions"));
 	}
 	
+	/**
+	 * creates the actions for the context menu
+	 */
 	private void createActions() {
 		undoAction = new Action("Undo") {
 			public void run() {
@@ -250,6 +294,9 @@ public class StateMachinesList extends ViewPart implements ISaveablePart, IDoubl
 		});
 	}
 	
+	/**
+	 * updates whether an actionitem is selectable
+	 */
 	private void updateActionEnablement() {
 		IStructuredSelection sel = 
 			(IStructuredSelection)viewer.getSelection();
@@ -257,7 +304,11 @@ public class StateMachinesList extends ViewPart implements ISaveablePart, IDoubl
 		copyItemAction.setEnabled(sel.size() > 0 && sel.size() < 2);
 	}
 	
+	/**
+	 * the undo functionality for this view
+	 */
 	private void undo() {
+		// undo delete statemachine
 		if (undoList.get(undoList.size()-1) instanceof DeleteStateMachine) {
 			DeleteStateMachine delete = (DeleteStateMachine) undoList.get(undoList.size()-1);
 			delete.undo();
@@ -266,6 +317,7 @@ public class StateMachinesList extends ViewPart implements ISaveablePart, IDoubl
 			redoAction.setEnabled(true);
 			undoList.remove(undoList.size()-1);
 		}
+		// undo create statemachine
 		else if (undoList.get(undoList.size()-1) instanceof CopyStateMachine) {
 			CopyStateMachine copy = (CopyStateMachine) undoList.get(undoList.size()-1);
 			copy.undo();
@@ -287,7 +339,11 @@ public class StateMachinesList extends ViewPart implements ISaveablePart, IDoubl
 		}
 	}
 	
+	/**
+	 * the redo functionality for this view
+	 */
 	private void redo() {
+		// redo delete statemachine
 		if (redoList.get(redoList.size()-1) instanceof DeleteStateMachine) {
 			DeleteStateMachine delete = (DeleteStateMachine) redoList.get(redoList.size()-1);
 			delete.redo();
@@ -296,6 +352,7 @@ public class StateMachinesList extends ViewPart implements ISaveablePart, IDoubl
 			undoAction.setEnabled(true);
 			redoList.remove(redoList.size()-1);
 		}
+		// redo copy statemachine
 		else if (redoList.get(redoList.size()-1) instanceof CopyStateMachine) {
 			CopyStateMachine copy = (CopyStateMachine) redoList.get(redoList.size()-1);
 			copy.redo();
@@ -332,6 +389,9 @@ public class StateMachinesList extends ViewPart implements ISaveablePart, IDoubl
 		}
 	}
 	
+	/**
+	 * makes a copy of the selected statemachine and saves it under an entered name
+	 */
 	private void copyItem() {
 		redoList.clear();
 		redoAction.setEnabled(false);
@@ -354,6 +414,12 @@ public class StateMachinesList extends ViewPart implements ISaveablePart, IDoubl
 		}
 	}
 	
+	/**
+	 * input dialog
+	 * @param text the text which the dialog should show
+	 * @param oldValue the old value which should be changed
+	 * @return the new value
+	 */
 	private String promptForValue(String text, String oldValue) {
 		InputDialog dlg = new InputDialog(getSite().getShell(), 
 			"List View", text, oldValue, null);
@@ -362,10 +428,17 @@ public class StateMachinesList extends ViewPart implements ISaveablePart, IDoubl
 		return dlg.getValue();
 	}
 	
+	/**
+	 * sets the file container
+	 * @param container the file container
+	 */
 	public static void setContainer(IContainer container) {
 		container1 = container;
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.ISaveablePart#doSave(org.eclipse.core.runtime.IProgressMonitor)
+	 */
 	public void doSave(IProgressMonitor monitor) {
 		isSaved = true;
 		ReadDOMTree tree = DOMGetInstance.getInstance();
@@ -379,6 +452,9 @@ public class StateMachinesList extends ViewPart implements ISaveablePart, IDoubl
 		dirty = false;
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.ISaveablePart#doSaveAs()
+	 */
 	public void doSaveAs() {
 		Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
 		FileDialog fileDialog = new FileDialog(shell, SWT.SAVE);
@@ -397,6 +473,9 @@ public class StateMachinesList extends ViewPart implements ISaveablePart, IDoubl
 		dirty = false;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.ISaveablePart#isDirty()
+	 */
 	public boolean isDirty() {
 		if (dirty) {
 			return true;
@@ -404,11 +483,18 @@ public class StateMachinesList extends ViewPart implements ISaveablePart, IDoubl
 		return false;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.ISaveablePart#isSaveAsAllowed()
+	 */
 	public boolean isSaveAsAllowed() {
 		return true;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.ISaveablePart#isSaveOnCloseNeeded()
+	 */
 	public boolean isSaveOnCloseNeeded() {
+		// when eclipse is closing, close this view and ask separate for save, then return false
 		if (PlatformUI.getWorkbench().isClosing() && (workbenchIsClosing == false)) {
 			workbenchIsClosing = true;
 			IWorkbenchPage page1 = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage(); 
@@ -424,10 +510,15 @@ public class StateMachinesList extends ViewPart implements ISaveablePart, IDoubl
 		return false;
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IWorkbenchPart#dispose()
+	 */
 	public void dispose() {
+		// close all editors when closing this view if eclipse remains open
 		if (!PlatformUI.getWorkbench().isClosing()) {
 			PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().closeAllEditors(true);
 		}
+		// if eclipse is closing and this view is dirty => ask for save
 		if (PlatformUI.getWorkbench().isClosing()) {
 			if (dirty) {
 				int result = JOptionPane.showConfirmDialog(null,"'StateMachinesList' has been modified. Save changes?", "Save Resource", JOptionPane.YES_NO_OPTION);
@@ -436,6 +527,7 @@ public class StateMachinesList extends ViewPart implements ISaveablePart, IDoubl
 				}
 			}
 		}
+		// if not saved undo every change, reset every list and close
 		if (!(isSaved)) {
 			int listSize = undoList.size();
 			for(int i = 0; i < listSize; i++) {
@@ -461,6 +553,7 @@ public class StateMachinesList extends ViewPart implements ISaveablePart, IDoubl
 		undoAction.setText("Undo");
 		redoAction.setEnabled(false);
 		redoAction.setText("Redo");
+		// reset the DOMTree
 		if (!PlatformUI.getWorkbench().isClosing()) {
 			DOMGetInstance.reset();
 		}

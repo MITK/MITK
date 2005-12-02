@@ -21,38 +21,72 @@ public class ReadDOMTree {
 	private Document doc = null;
 	private String filename;
 	
+	/**
+	 * adds an open editor to the list allMachines
+	 * @param diagram StateMAchinesDiagram of an open editor
+	 */
 	public void addDiagram(StateMachinesDiagram diagram) {
 		allMachines.add(diagram);
 	}
 	
+	/**
+	 * removes an open editor from the list allMachines
+	 * @param diagram StateMAchinesDiagram of an open editor
+	 */
 	public void removeDiagram(StateMachinesDiagram diagram) {
 		allMachines.remove(diagram);
 	}
 	
+	/**
+	 * @return a list of all currently open editors
+	 */
 	public List getAllDiagrams() {
 		return allMachines;
 	}
 	
+	/**
+	 * @return a list of all statemachines in the DOMTree
+	 */
 	public List getStateMachines() {
 		return doc.getRootElement().getChildren("stateMachine", doc.getRootElement().getNamespace());
 	}
 
+	/**
+	 * adds a statemachine with an open editor to the DOMTree
+	 * @param machine the stateMachinesDiagram with an open editor
+	 * @param stateMachine the DOM element of the statemachine
+	 */
 	public void addStateMachine(StateMachinesDiagram machine, Element stateMachine) {
 		stateMachine.setNamespace(doc.getRootElement().getNamespace());
 		doc.getRootElement().addContent(stateMachine);
 		allMachines.add(machine);
 	}
 	
+	/**
+	 * adds a statemachine with no open editor to the DOMTree
+	 * @param stateMachine the DOM element of the statemachine
+	 */
 	public void addStateMachine1(Element stateMachine) {
 		stateMachine.setNamespace(doc.getRootElement().getNamespace());
 		doc.getRootElement().addContent(stateMachine);
 	}
 
+	/**
+	 * removes a statemachine with an open editor to the DOMTree
+	 * @param machine the stateMachinesDiagram with an open editor
+	 * @param stateMachine the DOM element of the statemachine
+	 */
 	public void removeStateMachine(StateMachinesDiagram machine, Element stateMachine) {
 		doc.getRootElement().removeContent(stateMachine);
 		allMachines.remove(machine);
 	}
 	
+	
+	/**
+	 * removes a statemachine with no open editor to the DOMTree
+	 * @param stateMachine the DOM element of the statemachine
+	 * @return the DOM element of the removed statemachine
+	 */
 	public Element removeStateMachine1(String stateMachine) {
 		List stateMachines = getStateMachines();
 		for (int i = 0; i < stateMachines.size(); i++) {
@@ -65,6 +99,11 @@ public class ReadDOMTree {
 		return null;
 	}
 	
+	/**
+	 * returns a diagram from the statemachine with the specified name
+	 * @param machineName name of the statemachine with the diagram
+	 * @return a StateMachinesDiagram with an open editor
+	 */
 	public StateMachinesDiagram getStateMachinesDiagram(String machineName) {
 		StateMachinesDiagram machine = null;
 		for (int j = 0; j < allMachines.size(); j++) {
@@ -76,6 +115,12 @@ public class ReadDOMTree {
 		return null;
 	}
 	
+	/**
+	 * constructor to build the DOMTree from the xml file
+	 * @param file the xml file
+	 * @param newTree boolean value to show if it has to create a new xml file
+	 * 			true = has to create
+	 */
 	public ReadDOMTree(String file, boolean newTree) {
         filename = file;
         if (!(newTree)) {
@@ -88,6 +133,7 @@ public class ReadDOMTree {
         		e.printStackTrace();
         	}
         }
+        // create new xml file
         else {
         	Element root = new Element("mitkInteraktionStates");
    		 	Namespace xmlns = Namespace.getNamespace(
@@ -98,6 +144,10 @@ public class ReadDOMTree {
         }
 	}
 
+	/**
+	 * saves the DOMTree on file location
+	 * @param file file location to save the xml file
+	 */
 	public void writeTree(String file) {
 		Format format = Format.getPrettyFormat();
 		format.setEncoding("utf-8");
@@ -112,6 +162,9 @@ public class ReadDOMTree {
 		}
 	}
 	
+	/**
+	 * saves the DOMTree on the same location where it has been loaded
+	 */
 	public void writeTree() {
 		Format format = Format.getPrettyFormat();
 		format.setEncoding("utf-8");
@@ -125,6 +178,9 @@ public class ReadDOMTree {
 		}
 	}
 
+	/**
+	 * @return returns a list of all names from the statemachine in the DOMTree
+	 */
 	public List getStateMachineNames() {
 		List stateMachines = doc.getRootElement().getChildren("stateMachine", doc.getRootElement().getNamespace());
 		List stateMachineNames = new ArrayList();

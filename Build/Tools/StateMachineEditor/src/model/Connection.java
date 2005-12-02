@@ -13,6 +13,9 @@ import org.eclipse.ui.views.properties.TextPropertyDescriptor;
 import org.jdom.Comment;
 import org.jdom.Element;
 
+import dom.DOMGetInstance;
+import dom.ReadActionAndEventDOMTree;
+
 /**
  * @author Daniel
  */
@@ -29,12 +32,24 @@ public class Connection extends ModelElement {
 	public static final Integer SOLID_CONNECTION = new Integer(
 			Graphics.LINE_SOLID);
 	
+	/**
+	 * property id for changes on the connection comment
+	 */
 	public static final String COMMENT_PROP = "Connection.comment";
 	
+	/**
+	 * property id for changes on the connection name
+	 */
 	public static final String NAME_PROP = "Connection.name";
 	
+	/**
+	 * property id for changes on the connection event
+	 */
 	public static final String EVENT_PROP = "Connection.event";
 	
+	/**
+	 * property id for changes on the connection actions
+	 */
 	public static final String ACTION_PROP = "Connection.action";
 
 	private static final long serialVersionUID = 1;
@@ -58,12 +73,18 @@ public class Connection extends ModelElement {
 	/** Connection's target endpoint. */
 	private States target;
 	
+	/**
+	 * List with all jDOM action elements 
+	 */
 	private List allActions = new ArrayList();
 	
 	private Element transition1;
 	private Comment comment1;
 	private boolean hasComment = false;
 	
+	/**
+	 * list with all action names
+	 */
 	private List actions = new ArrayList();
 	
 	/*
@@ -76,11 +97,12 @@ public class Connection extends ModelElement {
 	static {
 		descriptors = new IPropertyDescriptor[] {
 				new TextPropertyDescriptor(COMMENT_PROP, "Comment"),
-				new TextPropertyDescriptor(NAME_PROP, "Name"),
-				new TextPropertyDescriptor(EVENT_PROP, "Event"),
+				new TextPropertyDescriptor(NAME_PROP, "Transition name"),
+				new PropertyDescriptor(EVENT_PROP, "Event"),
 				new PropertyDescriptor(ACTION_PROP, "Action")
 				};
 		((PropertyDescriptor) descriptors[0]).setCategory("Comment");
+		((PropertyDescriptor) descriptors[1]).setCategory("Transition name");
 	}
 	
 	
@@ -91,7 +113,7 @@ public class Connection extends ModelElement {
 	 *            a source endpoint for this connection (non null)
 	 * @param target
 	 *            a target endpoint for this connection (non null)
-	 * @param transitions JDOMElement
+	 * @param transition JDOMElement
 	 */
 	public Connection(States source, States target, Element transition) {
         transition1 = transition;
@@ -104,13 +126,16 @@ public class Connection extends ModelElement {
 				this.setComment(comment1.getText());
 			}
 		}
-		/*if (!(hasComment)) {
-			comment1 = new Comment("");
-			transition1.addContent(0, comment1);
-		}*/
 		reconnect(source, target);
 	}
 	
+	/**
+	 * Create a connection between two distinct states.
+	 * 
+	 * @param transition JDOMElement
+	 * @param parentState source state
+	 * @param diagram parent StateMachinesDiagram
+	 */
 	public Connection(Element transition, States parentState, StateMachinesDiagram diagram) {
 		List actionList = transition.getChildren("action", transition.getNamespace());
         for (int i = 0; i < actionList.size(); i++) {
@@ -118,7 +143,7 @@ public class Connection extends ModelElement {
         	Action action = new Action();
         	action.setActionElement(ele1);
         	allActions.add(action);
-        }	
+        }
         transition1 = transition;
         List allStates = diagram.getChildren();
         for (int i = 0; i < allStates.size(); i++) {
@@ -129,43 +154,41 @@ public class Connection extends ModelElement {
         	}
         }
         String action1 = "";
-		for (int k = 0; k < allActions.size(); k++) {
+        ReadActionAndEventDOMTree actionTree = DOMGetInstance.getActionAndEventInstance();
+        for (int k = 0; k < allActions.size(); k++) {
 			Action action = (Action) allActions.get(k);
-			String act = action.getAction();
-			actions.add(act);
+			String act = action.getActionId();
+			actions.add(actionTree.getActionName(act));
 			// Fill action value in Propertysheet
-			this.actionPropertyValue = this.actionPropertyValue + act;
+			this.actionPropertyValue = this.actionPropertyValue + actionTree.getActionName(act);
 			if (k < allActions.size() - 1) {
 				this.actionPropertyValue = this.actionPropertyValue + "; ";
 			}
 		}
 		if (allActions.size() > 1) {
 			Action action = (Action) allActions.get(0);
-			String act = action.getAction();
-			action1 = act + "\n" + "...";
+			String act = action.getActionId();
+			action1 = actionTree.getActionName(act) + "\n" + "...";
 		}
 		else if (allActions.size() == 1) {
 			Action action = (Action) allActions.get(0);
-			String act = action.getAction();
-			action1 = act;
+			String act = action.getActionId();
+			action1 = actionTree.getActionName(act);
 		}
 		else action1 = "";
 		this.setAction(action1);
         this.setName(transition1.getAttributeValue("NAME"));
         this.setEvent(transition1.getAttributeValue("EVENT_ID"));
         List transComment = transition1.getContent();
-		for (int i = 0; i < transComment.size(); i++) {
+        for (int i = 0; i < transComment.size(); i++) {
 			Object o = transComment.get(i);
 			if (o instanceof Comment) {
 				hasComment = true;
 				comment1 = (Comment) o;
 				this.setComment(comment1.getText());
+				break;
 			}
 		}
-		/*if (!(hasComment)) {
-			comment1 = new Comment("");
-			transition1.addContent(0, comment1);
-		}*/
 		reconnect(parentState, target);
 		
 	}
@@ -200,7 +223,7 @@ public class Connection extends ModelElement {
 			return event;
 		}
 		else if (id.equals(ACTION_PROP)) {
-			return actionPropertyValue;//action;
+			return actionPropertyValue;
 		}
 		else if (id.equals(NAME_PROP)) {
 			return name;
@@ -270,23 +293,52 @@ public class Connection extends ModelElement {
 		reconnect();
 	}
 	
+	/**
+	 * set the action of this connection
+	 * @param newAction the new action
+	 */
 	public void setAction(String newAction) {
+		ReadActionAndEventDOMTree actionTree = DOMGetInstance.getActionAndEventInstance();
 		action = newAction;
+		if (!(actionTree.getActionName(newAction) == null)) {
+			action = actionTree.getActionName(newAction);
+		}
 		firePropertyChange(ACTION_PROP, null, action);
 	}
 	
+	/**
+	 * set the event of this connection
+	 * @param newEvent the new event
+	 */
 	public void setEvent(String newEvent) {
+		ReadActionAndEventDOMTree eventTree = DOMGetInstance.getActionAndEventInstance();
 		event = newEvent;
-		transition1.setAttribute("EVENT_ID", newEvent);
+		if ((eventTree.getEventId(newEvent) == null)) {
+			transition1.setAttribute("EVENT_ID", newEvent);
+		}
+		else {
+			transition1.setAttribute("EVENT_ID", eventTree.getEventId(newEvent));
+		}
+		if (!(eventTree.getEventName(newEvent) == null)) {
+			event = eventTree.getEventName(newEvent);
+		}
 		firePropertyChange(EVENT_PROP, null, event);
 	}
 	
+	/**
+	 * set the name of this connection
+	 * @param newName the new name
+	 */
 	public void setName(String newName) {
 		name = newName;
 		transition1.setAttribute("NAME", newName);
 		firePropertyChange(NAME_PROP, null, name);
 	}
 	
+	/**
+	 * set the comment of this connection
+	 * @param newComment the new comment
+	 */
 	public void setComment(String newComment) {
 		comment = newComment;
 		if (!(comment.equals("") && !(comment == null))) {
@@ -304,6 +356,10 @@ public class Connection extends ModelElement {
 		firePropertyChange(COMMENT_PROP, null, comment);
 	}
 	
+	/**
+	 * set the id of the target connection
+	 * @param id the id of the target connection
+	 */
 	public void setNextStateID(String id) {
 		transition1.setAttribute("NEXT_STATE_ID", id);
 	}
@@ -335,54 +391,87 @@ public class Connection extends ModelElement {
 			super.setPropertyValue(id, value);
 	}
 
+	/**
+	 * @return the action name
+	 */
 	public String getAction() {
 		return action;
 	}
 	
+	/**
+	 * @return the event name
+	 */
 	public String getEvent() {
 		return event;
 	}
 	
+	/**
+	 * @return the connection name
+	 */
 	public String getName() {
 		return name;
 	}
 	
+	/**
+	 * @return the connection comment
+	 */
 	public String getComment() {
 		return comment;
 	}
 	
+	/**
+	 * @return a list with all action names
+	 */
 	public List getActionList() {
 		return actions;
 	}
 	
+	/**
+	 * @return a list with all action elements
+	 */
 	public List getAllActions() {
 		return allActions;
 	}
 	
+	/**
+	 * @return this connection element
+	 */
 	public Element getElement() {
 		return transition1;
 	}
 	
+	/**
+	 * adds an action to this connection
+	 * @param act the action element
+	 * @param act1 the action name
+	 */
 	public void addAction(Action act, String act1) {
+		ReadActionAndEventDOMTree actionTree = DOMGetInstance.getActionAndEventInstance();
 		if (allActions.size() == 0) {
-			this.setAction(act1);
-			this.actionPropertyValue = act1;
+			this.setAction(actionTree.getActionName(act1));
+			this.actionPropertyValue = actionTree.getActionName(act1);
 		}
 		else if (allActions.size() == 1) {
 			this.setAction(this.getAction() + "\n" + "...");
-			this.actionPropertyValue = actionPropertyValue + "; " + act1;
+			this.actionPropertyValue = actionPropertyValue + "; " + actionTree.getActionName(act1);
 		}
 		else {
-			this.actionPropertyValue = actionPropertyValue + "; " + act1;
+			this.actionPropertyValue = actionPropertyValue + "; " + actionTree.getActionName(act1);
 		}
 		allActions.add(act);
-		actions.add(act1);
+		actions.add(actionTree.getActionName(act1));
 		transition1.addContent(act.getActionElement());
 	}
 	
+	/**
+	 * removes an action from this connection
+	 * @param act the action element
+	 * @param act1 the action name
+	 */
 	public void removeAction(Action act, String act1) {
+		ReadActionAndEventDOMTree actionTree = DOMGetInstance.getActionAndEventInstance();
 		allActions.remove(act);
-		actions.remove(act1);
+		actions.remove(actionTree.getActionName(act1));
 		if (actions.size() == 0) {
 			this.setAction("");
 			this.actionPropertyValue = "";
@@ -400,5 +489,4 @@ public class Connection extends ModelElement {
 		}
 		transition1.removeContent(act.getActionElement());
 	}
-
 }

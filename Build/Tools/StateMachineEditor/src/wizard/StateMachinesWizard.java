@@ -121,6 +121,7 @@ public class StateMachinesWizard extends Wizard implements INewWizard {
 		getShell().getDisplay().asyncExec(new Runnable() {
 			public void run() {
 				ReadDOMTree tree = DOMGetInstance.getInstance();
+				// tree already exists, add statemachine to tree
 				if (!(tree == null)) {
 					Element machine = new Element("stateMachine");
 					String file1 = file.getName().toString();
@@ -130,6 +131,7 @@ public class StateMachinesWizard extends Wizard implements INewWizard {
 					tree.addStateMachine1(machine);
 					StateMachinesList.addToStateMachinesList2(file, filename);
 				}
+				// tree does not exist, create a new tree and add a statemachine
 				else {
 					DOMGetInstance.reset();
 					StateMachinesList.reset();

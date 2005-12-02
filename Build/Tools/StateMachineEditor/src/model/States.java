@@ -11,6 +11,8 @@ import java.util.List;
 import org.eclipse.swt.graphics.Image;
 
 import org.eclipse.jface.viewers.ICellEditorValidator;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.views.properties.IPropertyDescriptor;
 import org.eclipse.ui.views.properties.PropertyDescriptor;
 import org.eclipse.ui.views.properties.TextPropertyDescriptor;
@@ -20,6 +22,7 @@ import org.eclipse.draw2d.geometry.Point;
 import org.jdom.Comment;
 import org.jdom.Element;
 
+import stateMachines.StateMachinesEditor;
 import stateMachines.StateMachinesPlugin;
 
 
@@ -36,12 +39,36 @@ import stateMachines.StateMachinesPlugin;
  */
 public abstract class States extends ModelElement {
 	
+	/**
+	 * @return the owner StateMachinesDiagram
+	 */
+	public abstract StateMachinesDiagram getParent();
+	
+	/**
+	 * sets the owner diagram of this state
+	 * @param parent the owner StateMachinesDiagram
+	 */
+	public abstract void setParent(StateMachinesDiagram parent);
+	
+	/**
+	 * @return the jDOM element of this state
+	 */
 	public abstract Element getStateElement();
 	
+	/**
+	 * @return the comment of this state
+	 */
 	public abstract Comment getStateComment();
 	
+	/**
+	 * removes the comment from this state
+	 */
 	public abstract void removeStateComment();
 	
+	/**
+	 * sets the jDOM element of this state
+	 * @param state the jDOM element of this state
+	 */
 	public abstract void setStateElement(Element state);
 	/**
 	 * A static array of property descriptors. There is one IPropertyDescriptor
@@ -99,7 +126,9 @@ public abstract class States extends ModelElement {
 	 * descriptor).
 	 */
 	private static final String YPOS_PROP = "States.yPos";
-
+	
+	public static StateMachinesDiagram parent = null;
+	
 	/*
 	 * Initializes the property descriptors array.
 	 * 
@@ -118,11 +147,11 @@ public abstract class States extends ModelElement {
 				new TextPropertyDescriptor(STATE_NAME_PROP, "Statename"),
 				new TextPropertyDescriptor(COMMENT_PROP, "Comment")
 				};
-
+		((PropertyDescriptor) descriptors[descriptors.length - 3]).setCategory("State");
 		((PropertyDescriptor) descriptors[descriptors.length - 2]).setCategory("State");
 		((PropertyDescriptor) descriptors[descriptors.length - 1]).setCategory("Comment");
 		// use a custom cell editor validator for all four array entries
-		for (int i = 0; i < descriptors.length-2; i++) {
+		for (int i = 0; i < descriptors.length - 3; i++) {
 			if (((PropertyDescriptor) descriptors[i]).getId().equals(XPOS_PROP)) {
 				((PropertyDescriptor) descriptors[i]).setCategory("Location");
 			}
@@ -134,9 +163,6 @@ public abstract class States extends ModelElement {
 			}
 			else if (((PropertyDescriptor) descriptors[i]).getId().equals(HEIGHT_PROP)) {
 				((PropertyDescriptor) descriptors[i]).setCategory("Size");
-			}
-			else if (((PropertyDescriptor) descriptors[i]).getId().equals(STATE_ID_PROP)) {
-				((PropertyDescriptor) descriptors[i]).setCategory("State");
 			}
 			((PropertyDescriptor) descriptors[i])
 					.setValidator(new ICellEditorValidator() {
@@ -151,9 +177,27 @@ public abstract class States extends ModelElement {
 									: "Value must be >=  0";
 						}
 					});
+			((PropertyDescriptor) descriptors[descriptors.length - 3])
+			.setValidator(new ICellEditorValidator() {
+				public String isValid(Object value) {
+					int intValue = -1;
+					try {
+						intValue = Integer.parseInt((String) value);
+					} catch (NumberFormatException exc) {
+							return "Not a number";
+					}
+					IWorkbenchWindow ui = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+					StateMachinesEditor activeEditor = (StateMachinesEditor) ui.getActivePage().getActiveEditor();
+					if (activeEditor.getDiagram().containsStateID((String)value)) {
+						return "id allready in use";
+					}
+					return (intValue >= 0) ? null
+							: "Value must be >=  0";
+				}
+			});
 		}
 	} // static
-
+	
 	protected static Image createImage(String name) {
 		InputStream stream = StateMachinesPlugin.class
 				.getResourceAsStream(name);
@@ -312,6 +356,9 @@ public abstract class States extends ModelElement {
 		return new ArrayList(targetConnections);
 	}
 	
+	/**
+	 * @return all jDOM elements of type transition
+	 */
 	public List getAllTransitions() {
 		List allTransitions = this.getStateElement().getChildren("transition", this.getStateElement().getNamespace());
 		return allTransitions;
@@ -443,6 +490,11 @@ public abstract class States extends ModelElement {
 		firePropertyChange(STATE_NAME_PROP, null, stateName);
 	}
 	
+	/**
+	 * Set the states comment.
+	 * 
+	 * @param newComment the new comment for the state
+	 */
 	public void setComment(String newComment) {
 		if (!(newComment.equals("") && !(newComment == null))) {
 			Comment comment = getStateComment();
@@ -456,10 +508,21 @@ public abstract class States extends ModelElement {
 		firePropertyChange(COMMENT_PROP, null, commentText);
 	}
 	
+	/**
+	 * Set the states id.
+	 * 
+	 * @param newId the new id for the state
+	 */
 	public void setStateId(String newId) {
 		Element state = getStateElement();
 		stateId = newId;
+		String oldID = state.getAttributeValue("ID");
+		parent = this.getParent();
+		if (this.getParent().containsStateID(oldID)) {
+			this.getParent().removeStateID(oldID);
+		}
+		this.getParent().addStateID(newId);
 		state.setAttribute("ID", newId);
-		firePropertyChange(STATE_ID_PROP, null, stateId);
+		firePropertyChange(STATE_ID_PROP, null, newId);
 	}
 }

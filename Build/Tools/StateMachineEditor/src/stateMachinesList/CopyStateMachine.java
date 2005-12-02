@@ -24,12 +24,21 @@ public class CopyStateMachine {
 	private StateMachinesDiagram diagram;
 	private Element machineElement;
 	
+	/**
+	 * constructor for copy action
+	 * @param machine statemachine which should be copied
+	 * @param name name for the new statemachine
+	 * @param container container in which the statemachine is located
+	 */
 	public CopyStateMachine(String machine, String name, IContainer container) {
 		this.machine = machine;
 		this.name = name;
 		this.container = container;
 	}
 	
+	/**
+	 * executes the copy command
+	 */
 	public void execute(){
 		Element machineEle = null;
 		StateMachinesList.allNames.add(name);
@@ -49,6 +58,9 @@ public class CopyStateMachine {
 		StateMachinesList.stateMachinesList.add(file);
 	}
 	
+	/**
+	 * deletes the new statemachine
+	 */
 	public void undo(){
 		ReadDOMTree tree = DOMGetInstance.getInstance();
 		diagram = tree.getStateMachinesDiagram(name);
@@ -61,11 +73,17 @@ public class CopyStateMachine {
 		StateMachinesList.stateMachinesList.remove(file);
 	}
 	
+	/**
+	 * undo functionallity when the listview is closed without saving
+	 */
 	public void undoForDispose(){
 		ReadDOMTree tree = DOMGetInstance.getInstance();
 		tree.removeStateMachine1(name);
 	}
 	
+	/**
+	 * recreates the new statemachine
+	 */
 	public void redo(){
 		StateMachinesList.allNames.add(name);
 		StateMachinesList.viewer.add(name);

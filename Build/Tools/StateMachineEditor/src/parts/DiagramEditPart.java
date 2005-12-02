@@ -98,6 +98,9 @@ class DiagramEditPart extends AbstractGraphicalEditPart implements
 		}
 	}
 
+	/**
+	 * @return the StateMAchinesDiagram model
+	 */
 	private StateMachinesDiagram getCastedModel() {
 		return (StateMachinesDiagram) getModel();
 	}

@@ -19,8 +19,12 @@ import org.eclipse.gef.EditPartViewer;
 import org.eclipse.gef.ui.actions.ActionRegistry;
 import org.eclipse.gef.ui.actions.GEFActionConstants;
 
+import dom.DOMGetInstance;
+import dom.ReadActionAndEventDOMTree;
+
 import actions.AddAction;
 import actions.ChangeAction;
+import actions.ChangeEvent;
 import actions.RemoveAction;
 
 /**
@@ -81,6 +85,10 @@ public class StateMachinesEditorContextMenuProvider extends ContextMenuProvider 
 		if (action.isEnabled())
 			menu.appendToGroup(GEFActionConstants.GROUP_EDIT, action);
 		
+		action = getActionRegistry().getAction(ChangeEvent.CHANGE_EVENT);
+		if (action.isEnabled())	
+			menu.appendToGroup(GEFActionConstants.GROUP_ADD, action);
+		
 		action = getActionRegistry().getAction(AddAction.ADD_ACTION);
 		if (action.isEnabled())	
 			menu.appendToGroup(GEFActionConstants.GROUP_ADD, action);
@@ -91,7 +99,8 @@ public class StateMachinesEditorContextMenuProvider extends ContextMenuProvider 
 			if (!(actions.isEmpty())) {
 				for (int i = 0; i < actions.size(); i++) {
 					Action act = (Action) actions.get(i);
-					submenu = new MenuManager(act.getAction(), Integer.toString(i));
+					ReadActionAndEventDOMTree actionTree = DOMGetInstance.getActionAndEventInstance();
+					submenu = new MenuManager(actionTree.getActionName(act.getActionId()), Integer.toString(i));
 					submenu.addMenuListener(listener);
 					action = getActionRegistry().getAction(RemoveAction.REMOVE_ACTION);					
 					submenu.add(action);
@@ -105,20 +114,34 @@ public class StateMachinesEditorContextMenuProvider extends ContextMenuProvider 
 		}
 	}
 	
+	
+	
+	/**
+	 * registers the selected action in the context menu
+	 */
 	IMenuListener listener = new IMenuListener() {
 		public void menuAboutToShow(IMenuManager manager) {
 			action = (Action) actions.get(Integer.parseInt(manager.getId()));
 		}
 	};
 	
+	/**
+	 * returns the selected action from the context menu
+	 */
 	public static Action getAction() {
 		return action;
 	}
 	
+	/**
+	 * @return the editor's action registry
+	 */
 	private ActionRegistry getActionRegistry() {
 		return actionRegistry;
 	}
 
+	/**
+	 * @param registry sets the editor's action registry
+	 */
 	private void setActionRegistry(ActionRegistry registry) {
 		actionRegistry = registry;
 	}

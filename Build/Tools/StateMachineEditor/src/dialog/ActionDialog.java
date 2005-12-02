@@ -23,7 +23,8 @@ import javax.swing.table.TableColumn;
 import org.jdom.Comment;
 import org.jdom.Element;
 
-import dom.ReadActionDOMTree;
+import dom.DOMGetInstance;
+import dom.ReadActionAndEventDOMTree;
 
 import model.Action;
 
@@ -42,7 +43,7 @@ public class ActionDialog extends JDialog {
 	private JTable jTable = null;
 	private JButton oKButton = null;
 	private JButton cancelButton = null;
-	private ActionInfo info;
+	private ActionAndEventInfo info;
 	private JButton addParameterButton = null;
 	private JButton removeParameterButton = null;
 	private JScrollPane jScrollPane = null;
@@ -50,25 +51,27 @@ public class ActionDialog extends JDialog {
 	private JLabel actionNameLabel = null;
 	private JComboBox actionNameComboBox = null;
 	private JButton newActionButton = null;
-	private ActionDialog dlg;
 	private Action action = null;
-	private ReadActionDOMTree actionTree = new ReadActionDOMTree();
+	private ReadActionAndEventDOMTree actionTree = null;
 	private String category;
 	private List tooltips = new ArrayList();
 	
 	/**
-	 * This is the default constructor
+	 * This is the default constructor for add action
 	 */
 	public ActionDialog() {
 		super();
 		initialize();
 	}
 	
+	/**
+	 * constructor for change action with action to fill dialog with values
+	 * @param action the action according to this dialog
+	 */
 	public ActionDialog(Action action) {
 		super();
 		this.action = action;
 		initialize();
-		
 	}
 
 	/**
@@ -77,11 +80,14 @@ public class ActionDialog extends JDialog {
 	 * @return void
 	 */
 	private void initialize() {
-		this.setSize(672, 362);
+		actionTree = DOMGetInstance.getActionAndEventInstance();
+		this.setSize(680, 360);
+		// add action
 		if (action == null) {
 			this.setName("ActionDialog");
 			this.setTitle("Add action");
 		}
+		// change action
 		else {
 			this.setName("ChangeActionDialog");
 			this.setTitle("Change action");
@@ -92,7 +98,6 @@ public class ActionDialog extends JDialog {
 		this.setAlwaysOnTop(true);
 		this.setComponentOrientation(java.awt.ComponentOrientation.LEFT_TO_RIGHT);
 		this.setContentPane(getJContentPane());
-		dlg = this;
 	}
 
 	/**
@@ -103,14 +108,14 @@ public class ActionDialog extends JDialog {
 	private javax.swing.JPanel getJContentPane() {
 		if(jContentPane == null) {
 			actionNameLabel = new JLabel();
-			actionNameLabel.setBounds(new java.awt.Rectangle(30,70,120,20));
+			actionNameLabel.setBounds(new java.awt.Rectangle(30,40,120,20));
 			actionNameLabel.setText("Action name:");
 			actionCategoryLabel = new JLabel();
-			actionCategoryLabel.setBounds(new java.awt.Rectangle(30,40,120,20));
+			actionCategoryLabel.setBounds(new java.awt.Rectangle(30,10,120,20));
 			actionCategoryLabel.setText("Action category:");
 			actionCommentLabel = new JLabel();
 			actionCommentLabel.setText("Comment on action:");
-			actionCommentLabel.setBounds(new java.awt.Rectangle(30,10,120,20));
+			actionCommentLabel.setBounds(new java.awt.Rectangle(30,70,120,20));
 			jContentPane = new javax.swing.JPanel();
 			jContentPane.setLayout(null);
 			jContentPane.setComponentOrientation(java.awt.ComponentOrientation.LEFT_TO_RIGHT);
@@ -139,7 +144,7 @@ public class ActionDialog extends JDialog {
 	private JTextField getActionCommentTextField() {
 		if (actionCommentTextField == null) {
 			actionCommentTextField = new JTextField();
-			actionCommentTextField.setBounds(new java.awt.Rectangle(160,10,360,20));
+			actionCommentTextField.setBounds(new java.awt.Rectangle(160,70,360,20));
 			actionCommentTextField.setText("");
 			if (!(action == null)) {
 				actionCommentTextField.setText(action.getActionComment());
@@ -168,6 +173,7 @@ public class ActionDialog extends JDialog {
 							String action = act.getAttributeValue("NAME");
 							actionNameComboBox.addItem(action);
 							List commentList = act.getContent();
+							// set comments for each category to the tooltip
 							String toolTip = "";
 							for (int j = 0; j < commentList.size(); j++) {
 								Object comEle = commentList.get(j);
@@ -187,11 +193,18 @@ public class ActionDialog extends JDialog {
 				}
 			});
 			actionCategoryComboBox.setMaximumRowCount(5);
-			List allCategories = actionTree.getCategories();
+			List allCategories = actionTree.getActionCategories();
 			for (int i = 0; i < allCategories.size(); i++) {
 				actionCategoryComboBox.addItem(allCategories.get(i).toString());
 			}
-			actionCategoryComboBox.setBounds(new java.awt.Rectangle(160,40,360,20));
+			actionCategoryComboBox.setBounds(new java.awt.Rectangle(160,10,360,20));
+			// for change action set correct combobox entry
+			if (!(action == null)) {
+				String id = action.getActionId();
+				if (!(actionTree.getActionCategoryName(actionTree.getActionName(id)) == null)) {
+					actionCategoryComboBox.setSelectedItem(actionTree.getActionCategoryName(actionTree.getActionName(id)));
+				}
+			}
 		}
 		return actionCategoryComboBox;
 	}
@@ -204,24 +217,22 @@ public class ActionDialog extends JDialog {
 	private JButton getNewCategoryButton() {
 		if (newCategoryButton == null) {
 			newCategoryButton = new JButton();
-			newCategoryButton.setBounds(new java.awt.Rectangle(530,40,120,20));
+			newCategoryButton.setBounds(new java.awt.Rectangle(530,10,120,20));
 			newCategoryButton.setText("New category");
 			newCategoryButton.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
-					dlg.setAlwaysOnTop(false);
-					String inputValue = JOptionPane.showInputDialog("New category name:");
+					String inputValue = JOptionPane.showInputDialog(ActionDialog.this, "New category name:");
 					if (!(inputValue == null) && !inputValue.equals("")) {
 						Object[] options = { "OK", "CANCEL" };
 						int option = JOptionPane.showOptionDialog(null, "Do you really want to add this category?\nAdded category can not be removed!", "Click OK to continue",
 						            JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE,
 						            null, options, options[0]);
 						if (option == 0) {
+							actionTree.addActionCategory(inputValue);
 							actionCategoryComboBox.addItem(inputValue);
 							actionCategoryComboBox.setSelectedItem(inputValue);
-							actionTree.addCategory(inputValue);
 						}
 					}
-					dlg.setAlwaysOnTop(true);
 				}
 			});
 		}
@@ -251,6 +262,7 @@ public class ActionDialog extends JDialog {
 		comboBox.addItem("floatParameter");
 		comboBox.addItem("boolParameter");
 		typeColumn.setCellEditor(new DefaultCellEditor(comboBox));
+		// if change action: set parameters
 		if (!(action == null)) {
 			List allParas = action.getParameter();
 			for (int i = 0; i < allParas.size(); i++) {
@@ -278,7 +290,14 @@ public class ActionDialog extends JDialog {
 						if (jTable.getSelectedRowCount() > 0) {
 							cellEditor.stopCellEditing();
 						}
-						info = new ActionInfo(actionCommentTextField.getText(), actionNameComboBox.getSelectedItem().toString(), model.getDataVector());
+						if (actionNameComboBox.getSelectedItem() == null) {
+							JOptionPane.showMessageDialog(ActionDialog.this,
+									"You have to select an action name!", "Error Message",
+									JOptionPane.ERROR_MESSAGE);
+							return;
+						}
+						String id = actionTree.getActionId(actionNameComboBox.getSelectedItem().toString());
+						info = new ActionAndEventInfo(actionCommentTextField.getText(), id, model.getDataVector());
 					}
 					cancel();
 				}
@@ -306,11 +325,17 @@ public class ActionDialog extends JDialog {
 		return cancelButton;
 	}
 	
+	/**
+	 * disposes this dialog
+	 */
 	void cancel() {
 		dispose();
 	}
 	
-	public ActionInfo getInfo() {
+	/**
+	 * @return the info object with comment, name and parameter
+	 */
+	public ActionAndEventInfo getInfo() {
 		return info;
 	}
 
@@ -385,6 +410,7 @@ public class ActionDialog extends JDialog {
 				String action = act.getAttributeValue("NAME");
 				actionNameComboBox.addItem(action);
 				List commentList = act.getContent();
+				// set comments for each action to the tooltip
 				String toolTip = "";
 				for (int j = 0; j < commentList.size(); j++) {
 					Object comEle = commentList.get(j);
@@ -399,26 +425,32 @@ public class ActionDialog extends JDialog {
 				}
 				tooltips.add(toolTip);
 			}
+			// if change action: set combobox to the correct entry
 			if (!(action == null)) {
+				String id = action.getActionId();
 				for (int i = 0; i < actionNameComboBox.getItemCount(); i++) {
 					String actionName = (String) actionNameComboBox.getItemAt(i);
-					if (actionName.equals(action.getAction())) {
+					if (actionName.equals(actionTree.getActionName(id))) {
 						contains = true;
 						break;
 					}
 				}
 				if (contains == false) {
-					actionNameComboBox.addItem(action.getAction());
+					actionNameComboBox.addItem(actionTree.getActionName(id));
 					tooltips.add("no comment available");
 				}
-				actionNameComboBox.setSelectedItem(action.getAction());
+				actionNameComboBox.setSelectedItem(actionTree.getActionName(id));
 			}
 			actionNameComboBox.setRenderer(new MyComboBoxRenderer());
-			actionNameComboBox.setBounds(new java.awt.Rectangle(160,70,360,20));
+			actionNameComboBox.setBounds(new java.awt.Rectangle(160,40,360,20));
 		}
 		return actionNameComboBox;
 	}
 	
+	/**
+	 * @author Daniel
+	 * adds a tooltip to each combobox entry
+	 */
 	class MyComboBoxRenderer extends BasicComboBoxRenderer {
 		private static final long serialVersionUID = 1L;
 		
@@ -448,24 +480,33 @@ public class ActionDialog extends JDialog {
 	private JButton getNewActionButton() {
 		if (newActionButton == null) {
 			newActionButton = new JButton();
-			newActionButton.setBounds(new java.awt.Rectangle(530,70,120,20));
+			newActionButton.setBounds(new java.awt.Rectangle(530,40,120,20));
 			newActionButton.setText("New action");
 			newActionButton.setActionCommand("New action");
 			newActionButton.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
-					dlg.setAlwaysOnTop(false);
-					String inputValue = JOptionPane.showInputDialog("New action name:");
-					if (!(inputValue == null) && !inputValue.equals("")) {
+					NewActionDialog acDlg = new NewActionDialog(ActionDialog.this);
+					acDlg.setVisible(true);
+					String newComment = acDlg.getActionComment();
+					String newName = acDlg.getActionName();
+					String newId = acDlg.getActionId();
+					if (!(newName == null || newId == null) && !(newName.equals("") || newId.equals(""))) {
 						Object[] options = { "OK", "CANCEL" };
-						int option = JOptionPane.showOptionDialog(null, "Do you really want to add this action?\nAdded action can not be removed!", "Click OK to continue",
-						            JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE,
-						            null, options, options[0]);
+						int option = JOptionPane.showOptionDialog(ActionDialog.this, "Do you really want to add this action?\nAdded action can not be removed!", "Click OK to continue",
+									JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE,
+									null, options, options[0]);
 						if (option == 0) {
-							actionNameComboBox.addItem(inputValue);
-							actionNameComboBox.setSelectedItem(inputValue);
+							actionTree.addAction(actionCategoryComboBox.getSelectedItem().toString(), newComment, newName, newId);
+							actionNameComboBox.addItem(newName);
+							if (!newComment.equals("")) {
+								tooltips.add(newComment);
+							}
+							else {
+								tooltips.add("no comment available");
+							}
+							actionNameComboBox.setSelectedItem(newName);
 						}
 					}
-					dlg.setAlwaysOnTop(true);
 				}
 			});
 		}

@@ -4,9 +4,7 @@ import org.eclipse.ui.actions.RetargetAction;
 
 public class AddRetargetAction extends RetargetAction {
 	/**
-	 * Constructor for IncrementRetargetAction.
-	 * @param actionID
-	 * @param label
+	 * Constructor for AddRetargetAction.
 	 */
 	public AddRetargetAction() {
 		super(AddAction.ADD_ACTION, "Add action");

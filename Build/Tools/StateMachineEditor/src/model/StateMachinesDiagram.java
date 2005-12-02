@@ -50,6 +50,8 @@ public class StateMachinesDiagram extends ModelElement {
 	
 	private String oldMachineName = null;
 	
+	private List allStateIDs = new ArrayList();
+	
 	/*
 	 * Initializes the property descriptors array.
 	 * 
@@ -120,6 +122,7 @@ public class StateMachinesDiagram extends ModelElement {
     			Attribute attr = (Attribute) attributes.get(j);
     			if (attr.getName().equals("START_STATE")) {
     				StartState state = new StartState();
+    				state.setParent(this);
     				state.setStateElement(ele1);
         			this.addChildAtCreation(state);
         			startState = true;
@@ -132,6 +135,7 @@ public class StateMachinesDiagram extends ModelElement {
     		}
         	if (!startState) {
         		NormalState state = new NormalState();
+        		state.setParent(this);
         		state.setStateElement(ele1);
     			this.addChildAtCreation(state);
         	}
@@ -212,6 +216,8 @@ public class StateMachinesDiagram extends ModelElement {
 	public boolean removeChild(States s) {
 		if (s != null && states.remove(s)) {
 			Element eleState = s.getStateElement();
+			String id = eleState.getAttributeValue("ID");
+			removeStateID(id);
 			stateMachine.removeContent(eleState);
 			firePropertyChange(CHILD_REMOVED_PROP, null, s);
 			return true;
@@ -287,6 +293,21 @@ public class StateMachinesDiagram extends ModelElement {
 				comment = (Comment) o;
 				return true;
 			}
+		}
+		return false;
+	}
+	
+	public void addStateID(String id) {
+		allStateIDs.add(id);
+	}
+	
+	public void removeStateID (String id) {
+		allStateIDs.remove(id);
+	}
+	
+	public boolean containsStateID (String id) {
+		if (allStateIDs.contains(id)) {
+			return true;
 		}
 		return false;
 	}

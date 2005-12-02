@@ -1,0 +1,9 @@
+This software is licensed by Sun:
+
+i) for research use under terms of the Java Research License (JRL) as
+specified in the LICENSE-JRL.txt file and on the web at
+"http://java3d.dev.java.net/jrl.html"; or
+
+ii) for commercial use under the terms of the Java Distribution License
+(JDL) as specified in the LICENSE-JDL.txt file and on the web at
+"http://java3d.dev.java.net/jdl-java3d.pdf".

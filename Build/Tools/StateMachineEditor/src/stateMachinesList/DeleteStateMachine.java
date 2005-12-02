@@ -20,14 +20,24 @@ public class DeleteStateMachine {
 	private StateMachinesDiagram diagram;
 	private Element machineElement;
 	
+	/**
+	 * constructor for delete action
+	 * @param machine statemachine which should be deleted
+	 * @param container container in which the statemachine is located
+	 */
 	public DeleteStateMachine(String machine, IContainer container) {
 		this.machine = machine;
 		this.container = container;
 	}
 	
+	/**
+	 * executes the delete command
+	 * @return successful
+	 */
 	public boolean execute(){
 		ReadDOMTree tree = DOMGetInstance.getInstance();
 		diagram = tree.getStateMachinesDiagram(machine);
+		// close the editor
 		if (!(diagram == null)) {
 			StateMachinesEditor editor1 = diagram.getEditor();
 			PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().closeEditor(editor1, true);
@@ -44,6 +54,9 @@ public class DeleteStateMachine {
 		return false;
 	}
 	
+	/**
+	 * recreates the statemachine
+	 */
 	public void undo(){
 		ReadDOMTree tree = DOMGetInstance.getInstance();
 		tree.addStateMachine1(machineElement);
@@ -52,11 +65,17 @@ public class DeleteStateMachine {
 		StateMachinesList.stateMachinesList.add(file);
 	}
 	
+	/**
+	 * undo functionallity when the listview is closed without saving
+	 */
 	public void undoForDispose(){
 		ReadDOMTree tree = DOMGetInstance.getInstance();
 		tree.addStateMachine1(machineElement);
 	}
 	
+	/**
+	 * redeletes the statemachine
+	 */
 	public void redo(){
 		execute();
 	}

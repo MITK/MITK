@@ -51,7 +51,7 @@ class ConnectionEditPart extends AbstractConnectionEditPart implements
 	 * @see org.eclipse.gef.editparts.AbstractEditPart#createEditPolicies()
 	 */
 	protected void createEditPolicies() {
-		installEditPolicy(EditPolicy.COMPONENT_ROLE, new ActionEditPolicy());
+		installEditPolicy(EditPolicy.COMPONENT_ROLE, new ActionAndEventEditPolicy());
 		// Selection handle edit policy.
 		// Makes the connection show a feedback, when selected by the user.
 		installEditPolicy(EditPolicy.CONNECTION_ENDPOINTS_ROLE,
@@ -79,12 +79,14 @@ class ConnectionEditPart extends AbstractConnectionEditPart implements
 		actionName.setOpaque(true);
 		actionName.setBackgroundColor(ColorConstants.green);
 		actionName.setText(getCastedModel().getAction()); // actionName of this connection
+		// add action on midpoint
 		midpointLocator.setRelativePosition(PositionConstants.RIGHT);
 		connection.add(actionName, midpointLocator);
 		ConnectionLocator midpointLocator2 = new ConnectionLocator(connection, PositionConstants.RIGHT);
 		eventName.setOpaque(true);
 		eventName.setBackgroundColor(ColorConstants.red);
 		eventName.setText(getCastedModel().getEvent()); // eventName of this connection
+		// add event on midpoint
 		midpointLocator2.setRelativePosition(PositionConstants.LEFT);
 		connection.add(eventName, midpointLocator2);
 		
@@ -102,6 +104,9 @@ class ConnectionEditPart extends AbstractConnectionEditPart implements
 		}
 	}
 
+	/**
+	 * @return the Connection model
+	 */
 	private Connection getCastedModel() {
 		return (Connection) getModel();
 	}

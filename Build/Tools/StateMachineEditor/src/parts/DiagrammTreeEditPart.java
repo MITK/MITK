@@ -68,6 +68,9 @@ class DiagramTreeEditPart extends AbstractTreeEditPart implements
 		}
 	}
 
+	/**
+	 * @return the StateMAchinesDiagram model
+	 */
 	private StateMachinesDiagram getCastedModel() {
 		return (StateMachinesDiagram) getModel();
 	}

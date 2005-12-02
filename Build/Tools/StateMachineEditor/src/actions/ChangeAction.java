@@ -24,6 +24,10 @@ public class ChangeAction extends SelectionAction {
 	
 	Request request;
 
+	/**
+	 * constructor to change an action
+	 * @param part the IWorkbenchPart
+	 */
 	public ChangeAction(IWorkbenchPart part) {
 		super(part);
 		request = new Request(CHANGE_ACTION_REQUEST);
@@ -31,10 +35,16 @@ public class ChangeAction extends SelectionAction {
 		setText("Change action");
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.gef.ui.actions.WorkbenchPartAction#calculateEnabled()
+	 */
 	protected boolean calculateEnabled() {
 		return canPerformAction();
 	}
 
+	/**
+	 * @return true if selected item instance of connection
+	 */
 	private boolean canPerformAction() {
 		if (getSelectedObjects().isEmpty()) {
 			return false;
@@ -54,6 +64,7 @@ public class ChangeAction extends SelectionAction {
 	}
 
 	private Command getCommand(Action act) {
+		// add action to map
 		Map map = new HashMap();
 		map.put("1", act);
 		request.setExtendedData(map);
@@ -67,10 +78,11 @@ public class ChangeAction extends SelectionAction {
 		return cc;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.action.IAction#run()
+	 */
 	public void run() {
 		Action act = (StateMachinesEditorContextMenuProvider.getAction());
 		execute(getCommand(act));
 	}
-
-
 }

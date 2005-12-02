@@ -27,6 +27,10 @@ public class RemoveAction extends SelectionAction {
 	
 	public static List actionList = new ArrayList();
 
+	/**
+	 * constructor to remove an action
+	 * @param part the IWorkbenchPart
+	 */
 	public RemoveAction(IWorkbenchPart part) {
 		super(part);
 		request = new Request(REMOVE_ACTION_REQUEST);
@@ -34,10 +38,16 @@ public class RemoveAction extends SelectionAction {
 		setText("Remove action");
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.gef.ui.actions.WorkbenchPartAction#calculateEnabled()
+	 */
 	protected boolean calculateEnabled() {
 		return canPerformAction();
 	}
 
+	/**
+	 * @return true if selected item instance of connection
+	 */
 	private boolean canPerformAction() {
 		if (getSelectedObjects().isEmpty()) {
 			return false;
@@ -61,6 +71,7 @@ public class RemoveAction extends SelectionAction {
 	}
 
 	private Command getCommand(Action act) {
+		// add action to map
 		Map map = new HashMap();
 		map.put("1", act);
 		request.setExtendedData(map);
@@ -74,11 +85,17 @@ public class RemoveAction extends SelectionAction {
 		return cc;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.action.IAction#run()
+	 */
 	public void run() {
 		Action act = (StateMachinesEditorContextMenuProvider.getAction());
 		execute(getCommand(act));
 	}
 	
+	/**
+	 * @return List with all actions
+	 */
 	public List actionList() {
 		return actionList;
 	}

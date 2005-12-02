@@ -9,7 +9,7 @@ import org.eclipse.gef.commands.Command;
 import org.jdom.Comment;
 import org.jdom.Element;
 
-import dialog.ActionInfo;
+import dialog.ActionAndEventInfo;
 
 
 public class ChangeActionCommand extends Command {
@@ -18,9 +18,15 @@ public class ChangeActionCommand extends Command {
 	private Action oldAction;
 	private Action newAction = new Action();
 	private String name = null;
-	private ActionInfo info;
+	private ActionAndEventInfo info;
 	
-	public ChangeActionCommand(Connection con, Action act, ActionInfo info){
+	/**
+	 * Instantiate a command that changes an action
+	 * @param con connection on which to change the action
+	 * @param act the action to change
+	 * @param info object which holds comment, name, id and parameters from the new action
+	 */
+	public ChangeActionCommand(Connection con, Action act, ActionAndEventInfo info){
 		if (con == null) {
 			throw new IllegalArgumentException();
 		}
@@ -30,12 +36,17 @@ public class ChangeActionCommand extends Command {
 		this.info = info;
 	}
 	
+	/**
+	 * removes the old action and adds the new one
+	 * 
+	 * @see org.eclipse.gef.commands.Command#execute()
+	 */
 	public void execute(){
-		con.removeAction(oldAction, oldAction.getAction());
-		name = info.getActionName();
+		con.removeAction(oldAction, oldAction.getActionId());
+		name = info.getActionEventName();
 		Element act = new Element("action");
-		if (!(info.getActionComment().equals("") && !(info.getActionComment() == null))) {
-			Comment actionComment = new Comment(info.getActionComment());
+		if (!(info.getActionEventComment().equals("") && !(info.getActionEventComment() == null))) {
+			Comment actionComment = new Comment(info.getActionEventComment());
 			act.addContent(0, actionComment);
 		}
 		Vector paraVector = info.getActionParameter();
@@ -64,14 +75,19 @@ public class ChangeActionCommand extends Command {
 		con.addAction(newAction, name);
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.gef.commands.Command#undo()
+	 */
 	public void undo(){
 		con.removeAction(newAction, name);
-		con.addAction(oldAction, oldAction.getAction());
+		con.addAction(oldAction, oldAction.getActionId());
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.gef.commands.Command#redo()
+	 */
 	public void redo(){
-		con.removeAction(oldAction, oldAction.getAction());
+		con.removeAction(oldAction, oldAction.getActionId());
 		con.addAction(newAction, name);
 	}
 }
-

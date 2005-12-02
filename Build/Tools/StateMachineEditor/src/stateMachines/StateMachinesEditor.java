@@ -52,6 +52,7 @@ import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 
 import actions.AddAction;
 import actions.ChangeAction;
+import actions.ChangeEvent;
 import actions.RemoveAction;
 
 import parts.StateMachinesEditPartFactory;
@@ -94,7 +95,8 @@ public class StateMachinesEditor extends GraphicalEditorWithFlyoutPalette {
 		ScrollingGraphicalViewer viewer = (ScrollingGraphicalViewer)getGraphicalViewer();
 
 		ScalableFreeformRootEditPart root = new ScalableFreeformRootEditPart();
-
+		
+		// adding all actions to the editor
 		List zoomLevels = new ArrayList(3);
 		zoomLevels.add(ZoomManager.FIT_ALL);
 		zoomLevels.add(ZoomManager.FIT_WIDTH);
@@ -106,19 +108,23 @@ public class StateMachinesEditor extends GraphicalEditorWithFlyoutPalette {
 		IAction changeAction = new ChangeAction(this);
 		IAction addAction = new AddAction(this);
 		IAction removeAction = new RemoveAction(this);
+		IAction changeEvent = new ChangeEvent(this);
 		getActionRegistry().registerAction(zoomIn);
 		getActionRegistry().registerAction(zoomOut);
 		getActionRegistry().registerAction(changeAction);
 		getActionRegistry().registerAction(addAction);
 		getActionRegistry().registerAction(removeAction);
+		getActionRegistry().registerAction(changeEvent);
 		getSite().getKeyBindingService().registerAction(zoomIn);
 		getSite().getKeyBindingService().registerAction(zoomOut);
 		getSite().getKeyBindingService().registerAction(changeAction);
 		getSite().getKeyBindingService().registerAction(addAction);
 		getSite().getKeyBindingService().registerAction(removeAction);
+		getSite().getKeyBindingService().registerAction(changeEvent);
 		getSelectionActions().add(changeAction.getId());
 		getSelectionActions().add(addAction.getId());
 		getSelectionActions().add(removeAction.getId());
+		getSelectionActions().add(changeEvent.getId());
 		
 		viewer.setEditPartFactory(new StateMachinesEditPartFactory());
 		viewer.setKeyHandler(new GraphicalViewerKeyHandler(viewer));
@@ -194,6 +200,13 @@ public class StateMachinesEditor extends GraphicalEditorWithFlyoutPalette {
 		diagram.removeFromRoot(tree);
 		diagram.addToRoot(tree);
 		tree.writeTree();
+	}
+	
+	/**
+	 * @return the StateMachinesDiagram for this editor
+	 */
+	public StateMachinesDiagram getDiagram() {
+		return diagram;
 	}
 
 	/*

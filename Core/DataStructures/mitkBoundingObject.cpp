@@ -25,7 +25,7 @@ PURPOSE.  See the above copyright notices for more information.
 mitk::BoundingObject::BoundingObject()
   : Surface(), m_Positive(true)
 {
-  GetTimeSlicedGeometry()->Initialize(1);
+  Initialize(1);
 
   /* bounding box around the unscaled bounding object */ 
   ScalarType bounds[6]={-1,1,-1,1,-1,1};  //{xmin,x_max, ymin,y_max,zmin,z_max}

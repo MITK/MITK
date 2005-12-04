@@ -30,7 +30,8 @@ void mitk::TransferVtkMatrixToItkTransform(const vtkMatrix4x4* vtkmatrix, mitk::
   if(itkTransform==NULL)
     return;
   
-  mitk::AffineTransform3D::MatrixType vnlMatrix;  
+  itk::Matrix<mitk::ScalarType,3,3>::InternalMatrixType& vnlMatrix = 
+    const_cast<itk::Matrix<mitk::ScalarType,3,3>::InternalMatrixType&>(itkTransform->GetMatrix().GetVnlMatrix());
 
   for ( int i=0; i < 3; ++i)
     for( int j=0; j < 3; ++j )

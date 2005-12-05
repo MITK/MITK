@@ -19,11 +19,11 @@ PURPOSE.  See the above copyright notices for more information.
 
 QmitkStringPropertyEditor::QmitkStringPropertyEditor( mitk::StringProperty* property, QWidget* parent, const char* name )
 : PropertyEditor( property ),
-  QTextEdit( parent, name ),
+  QLineEdit( parent, name ),
   m_StringProperty(property)
 {
   PropertyChanged();
-  connect(this, SIGNAL(textChanged()), this, SLOT(onTextChanged()));
+  connect(this, SIGNAL(textChanged(const QString&)), this, SLOT(onTextChanged(const QString&)));
 }
 
 QmitkStringPropertyEditor::~QmitkStringPropertyEditor()
@@ -43,11 +43,11 @@ void QmitkStringPropertyEditor::PropertyRemoved()
   setText("n/a");
 }
 
-void QmitkStringPropertyEditor::onTextChanged()
+void QmitkStringPropertyEditor::onTextChanged(const QString& text)
 {
   BeginModifyProperty();  // deregister from events
   
-  m_StringProperty->SetValue(text());
+  m_StringProperty->SetValue(text);
   
   EndModifyProperty();  // again register for events
 }

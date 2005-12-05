@@ -20,9 +20,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <mitkPropertyObserver.h>
 #include <mitkStringProperty.h>
-#include <qtextedit.h>
+#include <qlineedit.h>
 
-class QmitkStringPropertyEditor : public QTextEdit, public mitk::PropertyEditor
+class QmitkStringPropertyEditor : public QLineEdit, public mitk::PropertyEditor
 {
   Q_OBJECT
 
@@ -40,7 +40,7 @@ class QmitkStringPropertyEditor : public QTextEdit, public mitk::PropertyEditor
 
   protected slots:
     
-    void onTextChanged();
+    void onTextChanged(const QString&);
 
   private:
 

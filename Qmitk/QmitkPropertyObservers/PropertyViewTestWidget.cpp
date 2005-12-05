@@ -62,10 +62,6 @@ PropertyViewTest::PropertyViewTest(bool stay, QWidget* parent, const char* name)
   // color property
   propcolor = new mitk::ColorProperty(0.5, 1.0, 0.25);
 
-  // color prop view
-  colorview = new QmitkColorPropertyView( propcolor, this );
-  vl->addWidget(colorview);
- 
   // color prop editor
   coloreditor = new QmitkColorPropertyEditor( propcolor, this );
   vl->addWidget(coloreditor);
@@ -137,7 +133,15 @@ PropertyViewTest::PropertyViewTest(bool stay, QWidget* parent, const char* name)
   prepare_tree();
   
   QmitkDataTreeListView* temp = new QmitkDataTreeListView(tree_filter, this);
-  hl->addWidget( temp );
+  
+  QVBoxLayout* vlright = new QVBoxLayout(hl, QBoxLayout::TopToBottom);
+  //hl->addWidget( vlright );
+  
+  vlright->addWidget( temp );
+  
+  // color prop view
+  colorview = new QmitkColorPropertyView( propcolor, this );
+  vlright->addWidget(colorview, 10);
 
   // finally, a timer that starts some testing
   timer = new QTimer(this);
@@ -186,9 +190,13 @@ void PropertyViewTest::prepare_tree()
   mitk::DataTreeFilter::PropertyList visible_props;
   visible_props.push_back("visible");
   visible_props.push_back("name");
+  mitk::DataTreeFilter::PropertyList editable_props;
+  editable_props.push_back("visible");
+//  editable_props.push_back("name");
   
   tree_filter = mitk::DataTreeFilter::New(data_tree);
   tree_filter->SetVisibleProperties(visible_props);
+  tree_filter->SetEditableProperties(editable_props);
           
 }
 

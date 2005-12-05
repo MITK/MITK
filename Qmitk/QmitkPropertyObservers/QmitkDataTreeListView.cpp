@@ -1,37 +1,50 @@
 #include <QmitkDataTreeListView.h>
 #include <QmitkPropertyViewFactory.h>
+#include <QmitkDataTreeListViewExpander.h>
 
-#include <mitkDataTreeFilter.h>
+#include <qlayout.h>
+#include <qpainter.h>
 
 QmitkDataTreeListView::QmitkDataTreeListView(QWidget* parent, const char* name)
-: QListView(parent, name),
+: QWidget(parent, name),
   m_DataTreeFilter(NULL)
 {
+  initialize();
 }
 
 QmitkDataTreeListView::QmitkDataTreeListView(mitk::DataTreeFilter* filter,QWidget* parent, const char* name)
-: QListView(parent, name),
+: QWidget(parent, name),
   m_DataTreeFilter(filter)
 {
+  initialize();
   SetFilter(filter);
 }
 
 QmitkDataTreeListView::QmitkDataTreeListView(mitk::DataTree* tree,QWidget* parent, const char* name)
-: QListView(parent, name),
+: QWidget(parent, name),
   m_DataTreeFilter(NULL)
 {
+  initialize();
   SetDataTree(tree);
 }
 
 QmitkDataTreeListView::QmitkDataTreeListView(mitk::DataTreeIteratorBase* iterator,QWidget* parent, const char* name)
-: QListView(parent, name),
+: QWidget(parent, name),
   m_DataTreeFilter(NULL)
 {
+  initialize();
   SetDataTree(iterator);
+}
+
+void QmitkDataTreeListView::initialize()
+{
+  m_Grid = 0;
+  m_StretchedColumn = -1;
 }
 
 QmitkDataTreeListView::~QmitkDataTreeListView()
 {
+  if (m_Grid) delete m_Grid;
 }
 
 void QmitkDataTreeListView::SetDataTree(mitk::DataTree* tree)
@@ -49,41 +62,44 @@ void QmitkDataTreeListView::SetFilter(mitk::DataTreeFilter* filter)
   m_DataTreeFilter = filter;
   GenerateItems();
 }
-    
-void QmitkDataTreeListView::GenerateItems()
+
+int QmitkDataTreeListView::stretchedColumn()
 {
-  if (!m_DataTreeFilter) return;
+  return m_StretchedColumn;
+}
 
-std::cout << "GenerateItems()" << std::endl;
-  while ( columns() ) removeColumn(0); // remove everything from the list. QListView will call delete!
+void QmitkDataTreeListView::setStretchedColumn(int col)
+{
+  m_StretchedColumn = col;
+
+  // GenerateItems;
+}
+
+void QmitkDataTreeListView::paintEvent(QPaintEvent* e)
+{
+  QPainter painter(this);
+  //painter.setBrush(QColor(QWidget::palettePaletteHighlight));
+  painter.setBrush( colorGroup().brush(QColorGroup::Highlight) );
+
+  //QRect rect( m_ChildContainer->cellGeometry(1,1) );
+  //painter.fillRect(rect, painter.brush() );
   
-  // query DataTreeFilter about items and properties, 
-  // then ask factory to create PropertyObservers, 
-  // add them to the visible Qt items
-  const mitk::DataTreeFilter::PropertyList&  visibleProps( m_DataTreeFilter->GetVisibleProperties() );
-  const mitk::DataTreeFilter::PropertyList& editableProps( m_DataTreeFilter->GetEditableProperties() );
+  painter.fillRect(0,0,width(),height(), painter.brush() );
+}
 
-  // create columns
-  for( mitk::DataTreeFilter::PropertyList::const_iterator nameiter = visibleProps.begin();
-       nameiter != visibleProps.end();
-       ++nameiter )
-  {
-    addColumn( nameiter->c_str() );
-  }
-std::cout << "Added Columns()" << std::endl;
- 
-  // fill rows with property views for the visible items 
-  mitk::DataTreeFilter::ConstItemIterator itemiter( m_DataTreeFilter->GetItems()->Begin() ); 
-  mitk::DataTreeFilter::ConstItemIterator itemiterend( m_DataTreeFilter->GetItems()->End() ); 
-      
-std::cout << "Create Items()" << std::endl;
+void QmitkDataTreeListView::AddItemsToList(QWidget* parent, QmitkListViewExpanderIcon* expander, QGridLayout* layout,
+                                           const mitk::DataTreeFilter::ItemList* items,
+                                           const mitk::DataTreeFilter::PropertyList& visibleProps,
+                                           const mitk::DataTreeFilter::PropertyList editableProps)
+{
+  mitk::DataTreeFilter::ConstItemIterator itemiter( items->Begin() ); 
+  mitk::DataTreeFilter::ConstItemIterator itemiterend( items->End() ); 
+  int row(0);
   while ( itemiter != itemiterend ) // for all items
   {
-    const mitk::BaseProperty* prop = itemiter->GetProperty("name");
-
-    std::cout << "One Item" << std::endl;
-  
-    // show all visible properties
+    // first column: reserved for expansion symbol
+    int column(1);
+    // following columns: all visible properties
     for( mitk::DataTreeFilter::PropertyList::const_iterator nameiter = visibleProps.begin();
          nameiter != visibleProps.end();
          ++nameiter )
@@ -94,30 +110,97 @@ std::cout << "Create Items()" << std::endl;
       if ( std::find( editableProps.begin(), editableProps.end(), *nameiter ) != editableProps.end() )
       {
         // create editor
-std::cout << "create editor" << std::endl;
         try 
         {
-          QmitkPropertyViewFactory::GetInstance()->CreateEditor( itemiter->GetProperty(*nameiter), QmitkPropertyViewFactory::vtDEFAULT, this);
+          observerWidget = QmitkPropertyViewFactory::GetInstance()->CreateEditor( itemiter->GetProperty(*nameiter), 
+                                                                                  QmitkPropertyViewFactory::etDEFAULT, 
+                                                                                  parent);
         }
         catch ( mitk::DataTreeFilter::NoPermissionException& e )
         {
           std::cerr << "Some error in mitk::DataTreeFilter: Filter object reports " << *nameiter << " to be editable, but "
                        "trying to access the non-const version yields exceptions..." << std::endl;
         }
-std::cout << "created editor" << std::endl;
       }
       else
       {
         // create (read-only) view
-std::cout << "create view" << std::endl;
-        QmitkPropertyViewFactory::GetInstance()->CreateView( itemiter->GetProperty(*nameiter), QmitkPropertyViewFactory::etDEFAULT, this);
-std::cout << "created view" << std::endl;
+        observerWidget  = QmitkPropertyViewFactory::GetInstance()->CreateView( itemiter->GetProperty(*nameiter), 
+                                                                               QmitkPropertyViewFactory::vtDEFAULT, 
+                                                                               parent);
       }
+
+      if (observerWidget)
+      { // widget ready, now add it
+        layout->addWidget(observerWidget, row, column, Qt::AlignVCenter);
+        if (expander != 0)
+          expander->addWidget(observerWidget);
+
+        observerWidget->setBackgroundMode(Qt::PaletteHighlight);
+      }
+
+      if (column == m_StretchedColumn)
+        layout->setColStretch(column, 10);
       
+      ++column;
     }
     
-    ++itemiter; // next item
+    if ( itemiter->HasChildren() )
+    {
+      // add expansion symbol
+      QGridLayout* childrenGridLayout = new QGridLayout( 0, 1, visibleProps.size()+1 ); // 1 extra for expansion symbol
+      QmitkListViewExpanderIcon* childExpander = new QmitkListViewExpanderIcon(childrenGridLayout, parent);
+      
+      childExpander->setBackgroundMode(Qt::PaletteHighlight);
+
+      layout->addMultiCellWidget(childExpander, row, row+1, 0, 0, Qt::AlignTop); 
+                                                                                     // fromRow, toRow, fromCol, toCol
+     
+      layout->addMultiCellLayout( childrenGridLayout, row+1, row+1, 1, visibleProps.size(), Qt::AlignVCenter );
+      // add children
+      AddItemsToList(parent, childExpander, childrenGridLayout, itemiter->GetChildren(), visibleProps, editableProps);
+      
+      ++row;
+    }
+    else
+    {
+      // to get some indent for child elements
+      QLabel* label = new QLabel(" ", parent);
+      label->setBackgroundMode(Qt::PaletteHighlight);
+      layout->addWidget(label, row, 0, Qt::AlignVCenter); 
+      if (expander != 0)
+        expander->addWidget(label);
+    }
+    
+    ++row;
+
+    ++itemiter; 
   }
+
+}
+
+void QmitkDataTreeListView::GenerateItems()
+{
+  resize(300,400);
+  if (!m_DataTreeFilter) return;
+
+  // query DataTreeFilter about items and properties, 
+  // then ask factory to create PropertyObservers, 
+  // add them to the visible Qt items
+  const mitk::DataTreeFilter::PropertyList&  visibleProps( m_DataTreeFilter->GetVisibleProperties() );
+  const mitk::DataTreeFilter::PropertyList& editableProps( m_DataTreeFilter->GetEditableProperties() );
+
+  // create a new layout grid
+  if (m_Grid) delete m_Grid;
+  m_Grid = new QGridLayout( this, 1, visibleProps.size()+1 ); // 1 extra for expansion symbol
+  m_Grid->setSpacing(4);
+  
+  if (m_StretchedColumn = -1)
+    m_StretchedColumn = visibleProps.size();
+
+ 
+  // fill rows with property views for the visible items 
+  AddItemsToList(this, 0, m_Grid, m_DataTreeFilter->GetItems(), visibleProps, editableProps);
 }
 
 

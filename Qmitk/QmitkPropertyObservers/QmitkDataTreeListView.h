@@ -22,14 +22,13 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qlistview.h>
 
 #include <mitkDataTree.h>
+#include <mitkDataTreeFilter.h>
 
-namespace mitk
-{
-  class DataTreeFilter;
-}
+class QGridLayout;
+class QmitkListViewExpanderIcon;
 
 /// @brief Displays items of a mitk::DataTree
-class QmitkDataTreeListView : public QListView
+class QmitkDataTreeListView : public QWidget
 {
   Q_OBJECT;
 
@@ -45,15 +44,28 @@ class QmitkDataTreeListView : public QListView
     void SetDataTree(mitk::DataTreeIteratorBase*);
 
     void SetFilter(mitk::DataTreeFilter*);
+
+    int stretchedColumn();
+    void setStretchedColumn(int);
     
   protected:
 
+    void initialize();
     void GenerateItems();
+
+    virtual void paintEvent(QPaintEvent*);
+
+    QGridLayout* m_Grid;
     
   private:
 
-    mitk::DataTreeFilter* m_DataTreeFilter;
+    void QmitkDataTreeListView::AddItemsToList(QWidget* parent, QmitkListViewExpanderIcon* expander, QGridLayout* layout,
+                                               const mitk::DataTreeFilter::ItemList* items,
+                                               const mitk::DataTreeFilter::PropertyList& visibleProps,
+                                               const mitk::DataTreeFilter::PropertyList editableProps);
 
+    mitk::DataTreeFilter* m_DataTreeFilter;
+    int m_StretchedColumn;
 };
 
 #endif

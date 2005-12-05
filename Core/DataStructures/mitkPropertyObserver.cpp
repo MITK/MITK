@@ -1,7 +1,7 @@
 
 #include <mitkPropertyObserver.h>
 #include <itkCommand.h>
-#include <exception>
+#include <stdexcept>
 
 namespace mitk {
 

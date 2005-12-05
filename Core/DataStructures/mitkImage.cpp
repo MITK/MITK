@@ -574,7 +574,6 @@ bool mitk::Image::SetPicChannel(const ipPicDescriptor *pic, int n)
 
 void mitk::Image::Initialize()
 {
-  mitk::HistogramGenerator* generator = static_cast<mitk::HistogramGenerator*>(m_HistogramGeneratorObject.GetPointer());
 
   if(m_TimeSelectorForExtremaObject.IsNull())
   {

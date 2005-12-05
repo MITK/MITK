@@ -47,7 +47,7 @@ int main(int argc, char **argv) {
     ui.mainWid->SetNode(node);
   }
   ui.mainWid->GetRenderer()->SetData(&it);
-  ui.mainWid->Repaint();
+  ui.mainWid->RequestUpdate();
 
   mitk::BoundingBox::Pointer bb = mitk::DataTree::ComputeVisibleBoundingBox(&it);
 
@@ -71,7 +71,7 @@ int main(int argc, char **argv) {
 
   ui.sliceSlider->bounds(0,sliceCtrl->GetSlice()->GetSteps()-1);
   ui.sliceSlider->precision(0); 
-  ui.mainWid->Update();
+  ui.mainWid->RequestUpdate();
   ui.mainWin->show(argc, argv);
 
   return Fl::run();

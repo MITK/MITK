@@ -18,15 +18,13 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include "mitkPointSetVtkMapper3D.h"
-#include <mitkDataTreeNode.h>
-#include <mitkProperties.h>
-#include <mitkColorProperty.h>
-#include <mitkOpenGLRenderer.h>
+#include "mitkDataTreeNode.h"
+#include "mitkProperties.h"
+#include "mitkColorProperty.h"
+#include "mitkOpenGLRenderer.h"
 #include "mitkPointSet.h"
 
 #include <vtkActor.h>
-
-#include <vtkPolyData.h>
 #include <vtkAppendPolyData.h>
 #include <vtkPropAssembly.h>
 #include <vtkTubeFilter.h>
@@ -41,6 +39,13 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkVectorText.h>
 #include <vtkTransform.h>
 #include <vtkTransformPolyDataFilter.h>
+
+#if (VTK_MAJOR_VERSION >= 5)
+#include <vtkPolyDataAlgorithm.h>
+#else
+#include <vtkPolyData.h>
+#endif
+
 #include <stdlib.h>
 
 
@@ -260,7 +265,13 @@ void mitk::PointSetVtkMapper3D::GenerateData()
   {
     //check for the pointtype in data and decide which geom-object to take and then add to the selected or unselected list
     int pointType = pointDataIter.Value().pointSpec;
+    
+#if (VTK_MAJOR_VERSION >= 5)
+    vtkPolyDataAlgorithm *source;
+#else
     vtkPolyDataSource *source;
+#endif
+
     switch (pointType)
     {
     case mitk::PTUNDEFINED:

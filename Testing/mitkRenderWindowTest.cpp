@@ -73,7 +73,12 @@ int mitkRenderWindowTest(int argc, char* argv[])
   vtkRenderer * ownvtkrenderer = vtkRenderer::New();
   renderwindow->GetVtkRenderWindow()->AddRenderer(ownvtkrenderer);
  // assign the actor to the rendering environment
+  
+#if (VTK_MAJOR_VERSION < 5)
   ownvtkrenderer->AddProp(coneActor);
+#else
+  ownvtkrenderer->AddViewProp(coneActor);
+#endif
 
   // interact with data
   mitk::NativeRenderWindowInteractor::Pointer iren = mitk::NativeRenderWindowInteractor::New();

@@ -52,11 +52,15 @@ class QmitkDataTreeListView : public QWidget, public QmitkListViewItemIndex
     void initialize();
     void GenerateItems();
 
+
+    void paintListBackground(QPainter& painter, QmitkListViewItemIndex* index);
     virtual void paintEvent(QPaintEvent*);
+
+    virtual void mouseReleaseEvent (QMouseEvent*);
 
   private:
 
-    void QmitkDataTreeListView::AddItemsToList(QWidget* parent, QmitkListViewExpanderIcon* expander, QGridLayout* layout,
+    void QmitkDataTreeListView::AddItemsToList(QWidget* parent, QmitkListViewItemIndex* index,
                                                const mitk::DataTreeFilter::ItemList* items,
                                                const mitk::DataTreeFilter::PropertyList& visibleProps,
                                                const mitk::DataTreeFilter::PropertyList editableProps);

@@ -14,19 +14,26 @@ class QmitkListViewItemIndex
     QmitkListViewItemIndex(QGridLayout* layout);
     ~QmitkListViewItemIndex();
 
-    void addWidget(QWidget*);
+    void addIndex(QmitkListViewItemIndex*, int row);
+    void addWidget(QWidget*, int row, int col, int alignment = 0);
+    void addMultiCellWidget(QWidget*, int fromRow, int toRow, int fromCol, int toCol, int alignment = 0);
+    void addItem(mitk::DataTreeFilter::Item*, int row);
     
     int rowAt(int y);  // y coordinate -> row index
+
+    QmitkListViewItemIndex* indexAt(int row); // index for sub-items in a row
+    mitk::DataTreeFilter::Item* itemAt(int row);     // mitkDataTreeFilter::Item of a row
+    std::list<QWidget*>& widgetsAt(int row);        // widgets of a row
     
-    QmitkListViewItemIndex* childrenIndexAt(int row); // index for sub-items in a row
-    mitk::DataTreeFilter::Item* itemAt(int row);   // mitkDataTreeFilter::Item of a row
+    QGridLayout* m_Grid;
     
   protected:
 
+    typedef std::vector< std::pair< mitk::DataTreeFilter::Item*, std::list<QWidget*> > > RowStructureType;
+
     QmitkListViewItemIndex();
-    
-    QGridLayout* m_Grid;
-    std::list<QWidget*> m_Children;
+    RowStructureType m_Rows;
+    std::vector<QmitkListViewItemIndex*> m_Indices;
 
   private:
 };

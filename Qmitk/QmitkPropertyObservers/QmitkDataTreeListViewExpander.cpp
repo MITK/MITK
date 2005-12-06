@@ -30,26 +30,132 @@ QmitkListViewItemIndex::~QmitkListViewItemIndex()
 {
 }
 
-void QmitkListViewItemIndex::addWidget(QWidget* widget)
+void QmitkListViewItemIndex::addIndex(QmitkListViewItemIndex* index, int row)
+{
+  try
+  {
+    m_Indices.at(row) = index;
+  }
+  catch (std::out_of_range)
+  {
+    int oldSize = m_Indices.size();
+    m_Indices.resize(row+1); // we need more elements
+    m_Indices[row] = index;
+
+    // Rows missing? Then fill with NULLs
+    if ( m_Indices.size() - oldSize > 1 )
+      for (int i = oldSize; i < row; ++i)
+        m_Indices[i] = NULL;
+  }
+}
+
+/// If some rows are missing, or if some rows do not hold both a QWidget and an Item,
+/// then ONLY front-to-back build-order is supported, i.e. start with row 0 and then
+/// go on with row 1, row 2, etc.
+void QmitkListViewItemIndex::addWidget(QWidget* widget, int row, int col, int alignment)
 {
   if (widget)
-    m_Children.push_back(widget);
+  {
+    if (m_Grid)
+      m_Grid->addWidget(widget, row, col, alignment);
+
+    try
+    {
+      m_Rows.at(row).second.push_back(widget);
+    }
+    catch (std::out_of_range)
+    {
+      m_Rows.resize(row+1); // we need more elements
+      m_Rows[row].first = NULL;
+      m_Rows[row].second.push_back(widget);
+    }
+  }
+}
+    
+void QmitkListViewItemIndex::addMultiCellWidget(QWidget* widget, int fromRow, int toRow, int fromCol, int toCol, int alignment)
+{
+  if (widget)
+  {
+    if (m_Grid)
+      m_Grid->addMultiCellWidget(widget, fromRow, toRow, fromCol, toCol, alignment);
+
+    try
+    {
+      m_Rows.at(fromRow).second.push_back(widget);
+    }
+    catch (std::out_of_range)
+    {
+      m_Rows.resize(toRow+1); // we need more elements
+      m_Rows[fromRow].second.push_back(widget);
+      for (int curRow = fromRow; curRow <= toRow; ++curRow)
+      {
+        m_Rows[curRow].first = NULL;
+      }
+    }
+  }
+}
+
+/// If some rows are missing, or if some rows do not hold both a QWidget and an Item,
+/// then ONLY front-to-back build-order is supported, i.e. start with row 0 and then
+/// go on with row 1, row 2, etc.
+void QmitkListViewItemIndex::addItem(mitk::DataTreeFilter::Item* item, int row)
+{
+  if (item)
+  {
+    try
+    {
+      m_Rows.at(row).first = item;
+    }
+    catch (std::out_of_range)
+    {
+      m_Rows.resize(row+1); // we need more elements
+      m_Rows[row].first = item;
+    }
+  }
 }
 
 int QmitkListViewItemIndex::rowAt(int y)
 {
   // y coordinate -> row index
-  return -1;
+  if ( m_Grid->numRows() > 0)
+    for (int row = 0; row < m_Grid->numRows(); ++row)
+    {
+      QRect cell( m_Grid->cellGeometry(row, m_Grid->numCols()-1) );
+      if ( cell.top() <= y && cell.bottom() >= y )
+        return row;
+    }
+  
+  return -1; // defaul = not found
 }
 
-QmitkListViewItemIndex* QmitkListViewItemIndex::childrenIndexAt(int row)
+QmitkListViewItemIndex* QmitkListViewItemIndex::indexAt(int row)
 {
-  return 0;
+  try
+  {
+    return m_Indices.at(row);
+  }
+  catch (std::out_of_range)
+  {
+    return 0;
+  }
 }
 
 mitk::DataTreeFilter::Item* QmitkListViewItemIndex::itemAt(int row)
 {
-  return 0;
+  try
+  {
+    return m_Rows.at(row).first;
+  }
+  catch (std::out_of_range)
+  {
+    return 0;
+  }
+}
+
+/// throws std::out_of_range on bad row
+std::list<QWidget*>& QmitkListViewItemIndex::widgetsAt(int row)
+{
+  return m_Rows.at(row).second;
 }
 
 //--- QmitkListViewExpanderIcon ---------------------------------------------
@@ -89,27 +195,32 @@ void QmitkListViewExpanderIcon::mouseReleaseEvent ( QMouseEvent * e )
 
 void QmitkListViewExpanderIcon::showEvent(QShowEvent* e)
 {
-  setAllChildrenVisible(true);
+  if (m_Expanded)
+    setAllChildrenVisible(true);
   QLabel::showEvent(e);
 }
 
 void QmitkListViewExpanderIcon::hideEvent(QHideEvent* e)
 {
-  setAllChildrenVisible(false);
+  if (m_Expanded)
+    setAllChildrenVisible(false);
   QLabel::hideEvent(e);
 }
 
 void QmitkListViewExpanderIcon::setAllChildrenVisible(bool visible)
 {
   // show/hide all children
-  for (std::list<QWidget*>::iterator iter = m_Children.begin();
-       iter != m_Children.end();
-       ++iter)
-  {
-    if (visible)
-      (*iter)->show();
-    else
-      (*iter)->hide();
-  }
+  for (RowStructureType::iterator iterrow = m_Rows.begin();
+       iterrow != m_Rows.end();
+       ++iterrow)
+    for (std::list<QWidget*>::iterator iterwidget = iterrow->second.begin();
+        iterwidget != iterrow->second.end();
+        ++iterwidget)
+    {
+      if (visible)
+        (*iterwidget)->show();
+      else
+        (*iterwidget)->hide();
+    }
 }
 

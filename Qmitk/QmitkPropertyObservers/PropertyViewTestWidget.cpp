@@ -186,6 +186,25 @@ void PropertyViewTest::prepare_tree()
     node->SetProperty("name", new mitk::StringProperty("Zwo"));
     it.Add(node);
   }
+  {
+    mitk::DataTreeNode::Pointer node = mitk::DataTreeNode::New(); node->SetData(image);
+    node->SetProperty("name", new mitk::StringProperty("Trei"));
+    it.Add(node);
+  }
+
+  it.GoToChild(1);
+  
+  {
+    mitk::DataTreeNode::Pointer node = mitk::DataTreeNode::New(); node->SetData(image);
+    node->SetProperty("name", new mitk::StringProperty("Wnuk"));
+    it.Add(node);
+  }
+  {
+    mitk::DataTreeNode::Pointer node = mitk::DataTreeNode::New(); node->SetData(image);
+    node->SetProperty("name", new mitk::StringProperty("Wnuka"));
+    node->SetProperty("visible", new mitk::BoolProperty(false));
+    it.Add(node);
+  }
 
   mitk::DataTreeFilter::PropertyList visible_props;
   visible_props.push_back("visible");

@@ -42,6 +42,7 @@ QmitkDataTreeListView::QmitkDataTreeListView(mitk::DataTreeIteratorBase* iterato
 void QmitkDataTreeListView::initialize()
 {
   m_StretchedColumn = -1;
+  setBackgroundMode( Qt::PaletteBase );
 }
 
 QmitkDataTreeListView::~QmitkDataTreeListView()
@@ -74,25 +75,113 @@ void QmitkDataTreeListView::setStretchedColumn(int col)
   m_StretchedColumn = col;
 }
 
+void QmitkDataTreeListView::paintListBackground(QPainter& painter, QmitkListViewItemIndex* index)
+{
+  if (index && index->m_Grid)
+  {
+    for (int row = 0; row < index->m_Grid->numRows(); ++row)
+    {
+      if ( QmitkListViewItemIndex* temp = index->indexAt(row-1) )
+        paintListBackground(painter, temp);
+      else
+      {
+        QRect cell( index->m_Grid->cellGeometry(row, 1) );
+      
+        bool selected(false);
+        mitk::DataTreeFilter::Item* item = index->itemAt(row);
+        if (item)
+        {
+          if ( item->IsSelected() )
+            selected = true;
+        }
+
+        if (selected)
+          painter.fillRect(cell.left() - 4, cell.top()-2, width(), cell.height()+4 , colorGroup().brush(QColorGroup::Highlight) );
+        else
+          painter.fillRect(cell.left() - 4, cell.top()-2 ,width(),cell.height()+4, colorGroup().brush(QColorGroup::Base) );
+      }
+    }
+  }
+}
+
 void QmitkDataTreeListView::paintEvent(QPaintEvent* e)
 {
   QPainter painter(this);
-  //painter.setBrush(QColor(QWidget::palettePaletteHighlight));
-  painter.setBrush( colorGroup().brush(QColorGroup::Highlight) );
-
-  //QRect rect( m_ChildContainer->cellGeometry(1,1) );
-  //painter.fillRect(rect, painter.brush() );
-  
-  painter.fillRect(0,0,width(),height(), painter.brush() );
+  paintListBackground(painter,this);
 }
 
-void QmitkDataTreeListView::AddItemsToList(QWidget* parent, QmitkListViewExpanderIcon* expander, QGridLayout* layout,
+void QmitkDataTreeListView::mouseReleaseEvent ( QMouseEvent* e )
+{
+  // determine row
+  // toggle selection status of item under cursor
+  // tell row's widgets/expander to set their background according to their associated item's selection status
+  // 
+  // initiate paintEvent
+  
+  QmitkListViewItemIndex* index(this);
+  int row(-1);
+ 
+  row = index->rowAt( e->y() );
+  if ( row == -1 ) return; // no row under cursor
+
+  // find item
+  QmitkListViewItemIndex* temp(0);
+
+  while ( (temp = index->indexAt(row-1)) )
+  {
+    index = temp;
+    row = index->rowAt( e->y() );
+  }
+
+  mitk::DataTreeFilter::Item* item = index->itemAt(row);
+
+  bool selected(false);
+  
+  if (item)
+  {
+    selected = !item->IsSelected();
+    item->SetSelected( selected ); // toggle selection
+  }
+
+  try
+  {
+    // set backgrounds of widgets accordingly
+    std::list<QWidget*>& widgets( index->widgetsAt(row) );
+  
+  std::list<QWidget*>::reverse_iterator iter;
+  for ( iter = widgets.rbegin(), ++iter; iter != widgets.rend(); ++iter) // ignore last item (expander symbol)
+  {
+    if (selected)
+    {
+      (*iter)->setBackgroundMode(Qt::PaletteHighlight);
+      const_cast<QColorGroup&>((*iter)->colorGroup()).setColor(QColorGroup::ButtonText, Qt::PaletteHighlightedText);
+    }
+    else
+    {
+      (*iter)->setBackgroundMode( Qt::PaletteBase );
+      const_cast<QColorGroup&>((*iter)->colorGroup()).setColor(QColorGroup::ButtonText, Qt::PaletteButtonText);
+    }
+  }
+
+  }
+  catch (std::out_of_range)
+  {
+    // no recovery
+  }
+
+  update();
+}
+
+void QmitkDataTreeListView::AddItemsToList(QWidget* parent, QmitkListViewItemIndex* index,
                                            const mitk::DataTreeFilter::ItemList* items,
                                            const mitk::DataTreeFilter::PropertyList& visibleProps,
                                            const mitk::DataTreeFilter::PropertyList editableProps)
 {
+  index->m_Grid->setSpacing(4);
+  
   mitk::DataTreeFilter::ConstItemIterator itemiter( items->Begin() ); 
   mitk::DataTreeFilter::ConstItemIterator itemiterend( items->End() ); 
+  
   int row(0);
   while ( itemiter != itemiterend ) // for all items
   {
@@ -131,33 +220,32 @@ void QmitkDataTreeListView::AddItemsToList(QWidget* parent, QmitkListViewExpande
 
       if (observerWidget)
       { // widget ready, now add it
-        layout->addWidget(observerWidget, row, column, Qt::AlignVCenter);
-        if (expander != 0)
-          expander->addWidget(observerWidget);
-
-        observerWidget->setBackgroundMode(Qt::PaletteHighlight);
+        observerWidget->setBackgroundMode( Qt::PaletteBase );
+        index->addWidget(observerWidget, row, column, Qt::AlignVCenter);
       }
 
       if (column == m_StretchedColumn)
-        layout->setColStretch(column, 10);
+        index->m_Grid->setColStretch(column, 10);
       
       ++column;
     }
+
+    index->addItem(const_cast<mitk::DataTreeFilter::Item*>((*itemiter).GetPointer()), row);
     
     if ( itemiter->HasChildren() )
     {
       // add expansion symbol
       QGridLayout* childrenGridLayout = new QGridLayout( 0, 1, visibleProps.size()+1 ); // 1 extra for expansion symbol
       QmitkListViewExpanderIcon* childExpander = new QmitkListViewExpanderIcon(childrenGridLayout, parent);
+      childExpander->setBackgroundMode( Qt::PaletteBase );
       
-      childExpander->setBackgroundMode(Qt::PaletteHighlight);
-
-      layout->addMultiCellWidget(childExpander, row, row+1, 0, 0, Qt::AlignTop); 
-                                                                                     // fromRow, toRow, fromCol, toCol
+      index->addMultiCellWidget(childExpander, row, row+1, 0, 0, Qt::AlignTop); 
+                                        // fromRow, toRow, fromCol, toCol
+      index->addIndex(childExpander, row); 
      
-      layout->addMultiCellLayout( childrenGridLayout, row+1, row+1, 1, visibleProps.size(), Qt::AlignVCenter );
+      index->m_Grid->addMultiCellLayout( childrenGridLayout, row+1, row+1, 1, visibleProps.size(), Qt::AlignVCenter );
       // add children
-      AddItemsToList(parent, childExpander, childrenGridLayout, itemiter->GetChildren(), visibleProps, editableProps);
+      AddItemsToList(parent, childExpander, itemiter->GetChildren(), visibleProps, editableProps);
       
       ++row;
     }
@@ -165,10 +253,8 @@ void QmitkDataTreeListView::AddItemsToList(QWidget* parent, QmitkListViewExpande
     {
       // to get some indent for child elements
       QLabel* label = new QLabel(" ", parent);
-      label->setBackgroundMode(Qt::PaletteHighlight);
-      layout->addWidget(label, row, 0, Qt::AlignVCenter); 
-      if (expander != 0)
-        expander->addWidget(label);
+      label->setBackgroundMode( Qt::PaletteBase );
+      index->addWidget(label, row, 0, Qt::AlignVCenter); 
     }
     
     ++row;
@@ -192,14 +278,13 @@ void QmitkDataTreeListView::GenerateItems()
   // create a new layout grid
   if (m_Grid) delete m_Grid;
   m_Grid = new QGridLayout( this, 1, visibleProps.size()+1 ); // 1 extra for expansion symbol
-  m_Grid->setSpacing(4);
   
   if (m_StretchedColumn == -1)
     m_StretchedColumn = visibleProps.size();
 
  
   // fill rows with property views for the visible items 
-  AddItemsToList(this, 0, m_Grid, m_DataTreeFilter->GetItems(), visibleProps, editableProps);
+  AddItemsToList(this, this, m_DataTreeFilter->GetItems(), visibleProps, editableProps);
 }
 
 

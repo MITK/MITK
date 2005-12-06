@@ -153,7 +153,11 @@ void mitk::OpenGLRenderer::UpdateIncludingVtkActors()
     m_LightKit->AddLightsToRenderer(m_VtkRenderer);
   }
 
+#if (VTK_MAJOR_VERSION < 5)
   m_VtkRenderer->RemoveAllProps();
+#else
+  m_VtkRenderer->RemoveAllViewProps();
+#endif
 
   //strange: when using a simple light, the backface of the planes are not shown (regardless of SetNumberOfLayers)
   //m_Light->Delete();
@@ -218,7 +222,11 @@ void mitk::OpenGLRenderer::UpdateIncludingVtkActors()
 
     while (!layers.empty())
     {
+#if (VTK_MAJOR_VERSION < 5)
       m_VtkRenderer->AddProp(layers.top().second);
+#else
+      m_VtkRenderer->AddViewProp(layers.top().second);
+#endif
       layers.pop();
     }
   }

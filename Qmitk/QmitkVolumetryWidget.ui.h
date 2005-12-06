@@ -82,6 +82,13 @@ void QmitkVolumetryWidget::SetDataTreeNode(mitk::DataTreeNode* node)
       {
         m_CalcButton->setEnabled(true);
       }
+      int minVal = (int)image->GetScalarValue2ndMin();
+      int maxVal = (int)image->GetScalarValueMax();
+      if (minVal == maxVal)
+        --minVal;
+      m_ThresholdSlider->setMinValue(minVal);
+      m_ThresholdSlider->setMaxValue(maxVal);
+      m_ThresholdSlider->setEnabled(true);
       UpdateSlider();
       mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     }
@@ -142,16 +149,6 @@ void QmitkVolumetryWidget::UpdateSlider()
 {
   if (m_Node && dynamic_cast<mitk::Image*>(m_Node->GetData()))
   {
-    mitk::Image* image = dynamic_cast<mitk::Image*>(m_Node->GetData());
-    image->Update();
-    int minVal = (int)image->GetScalarValue2ndMin();
-    int maxVal = (int)image->GetScalarValueMax();
-    if (minVal == maxVal)
-      --minVal;
-    m_ThresholdSlider->setMinValue(minVal);
-    m_ThresholdSlider->setMaxValue(maxVal);
-    m_ThresholdSlider->setEnabled(true);
-
     int intSliderValue = (int)m_ThresholdSlider->value();
     QString stringSliderValue;
     stringSliderValue.setNum(intSliderValue);

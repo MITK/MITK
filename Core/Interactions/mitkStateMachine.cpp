@@ -54,6 +54,10 @@ mitk::StateMachine::StateMachine(const char * type) : m_CurrentState(NULL)
   m_ReferenceCountLock.Lock();
   m_ReferenceCount = 0;
   m_ReferenceCountLock.Unlock();
+
+  #ifdef INTERACTION_DEBUG
+  InteractionDebug->GetInstance()->NewStateMachine( type, this );
+  #endif
 }
 mitk::StateMachine::~StateMachine()
 {

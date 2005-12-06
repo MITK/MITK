@@ -19,12 +19,15 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkImageToSurfaceFilter.h"
 #include <vtkImageData.h>
-#include <vtkDecimate.h>
 #include <vtkDecimatePro.h>
 #include <vtkImageChangeInformation.h>
 #include <vtkLinearTransform.h>
 #include <vtkMath.h>
 #include <vtkMatrix4x4.h>
+
+#if (VTK_MAJOR_VERSION < 5)
+#include <vtkDecimate.h>
+#endif
 
 mitk::ImageToSurfaceFilter::ImageToSurfaceFilter()
 {
@@ -32,11 +35,11 @@ mitk::ImageToSurfaceFilter::ImageToSurfaceFilter()
   m_Decimate = NoDecimation;
   m_Threshold = 1;
   m_TargetReduction = 0.95f;
-};
+}
 
 mitk::ImageToSurfaceFilter::~ImageToSurfaceFilter()
 {
-};
+}
 
 template <class T1, class T2, class T3>
 inline void mitkVtkLinearTransformPoint(T1 matrix[4][4], 
@@ -111,6 +114,8 @@ void mitk::ImageToSurfaceFilter::CreateSurface(int time, vtkImageData *vtkimage,
   }
   else if (m_Decimate==Decimate)
   {
+
+#if (VTK_MAJOR_VERSION < 5)
     vtkDecimate *decimate = vtkDecimate::New();
     decimate->SetInput( polydata );
     decimate->PreserveTopologyOn();
@@ -120,6 +125,11 @@ void mitk::ImageToSurfaceFilter::CreateSurface(int time, vtkImageData *vtkimage,
     polydata = decimate->GetOutput();
     polydata->Register(NULL);//RC++
     decimate->Delete();
+#else
+    std::cerr << "vtkDecimate not available in used VTK version.";
+    std::cerr << std::endl;
+#endif
+
   }
 
   polydata->Update();

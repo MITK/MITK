@@ -898,6 +898,9 @@ void mitk::DataTreeNodeFactory::ReadFileTypeITKImageIOFactory()
   spacing[ 2 ] = 1.0f;
   spacing[ 3 ] = 1.0f;
 
+  Point3D origin;
+  origin.Fill(0);
+
   for ( unsigned int i = 0; i < ndim ; ++i )
   {
     ioStart[ i ] = 0;
@@ -906,6 +909,7 @@ void mitk::DataTreeNodeFactory::ReadFileTypeITKImageIOFactory()
     spacing[ i ] = imageIO->GetSpacing( i );
     if(spacing[ i ] <= 0)
       spacing[ i ] = 1.0f;
+    origin[ i ] = imageIO->GetOrigin( i );
   }
 
   ioRegion.SetSize( ioSize );
@@ -932,6 +936,7 @@ void mitk::DataTreeNodeFactory::ReadFileTypeITKImageIOFactory()
   image->Initialize( pixelType, ndim, dimensions );
 #endif 
   image->SetVolume( buffer );
+  image->GetSlicedGeometry()->SetOrigin( origin );
   image->GetSlicedGeometry()->SetSpacing( spacing );
   image->GetTimeSlicedGeometry()->InitializeEvenlyTimed(image->GetSlicedGeometry(), image->GetDimension(3));
   free( buffer );
@@ -1482,8 +1487,8 @@ void mitk::DataTreeNodeFactory::ReadFileSeriesTypeVTK()
 void mitk::DataTreeNodeFactory::SetDefaultImageProperties(mitk::DataTreeNode::Pointer &node) 
 {
   node->SetProperty( "volumerendering", new mitk::BoolProperty( false ) );
-  node->SetProperty( "iilInterpolation", new mitk::BoolProperty( false ) );
-  node->SetProperty( "vtkInterpolation", new mitk::BoolProperty( false ) );
+  node->SetProperty( "iilInterpolation", new mitk::BoolProperty( true ) );
+  node->SetProperty( "vtkInterpolation", new mitk::BoolProperty( true ) );
   node->SetProperty( "texture interpolation", new mitk::BoolProperty( true ) );
   node->SetProperty( "layer", new mitk::IntProperty(0));
   node->SetProperty( "in plane resample extent by geometry", new mitk::BoolProperty( false ) );

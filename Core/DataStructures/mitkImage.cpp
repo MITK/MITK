@@ -574,7 +574,6 @@ bool mitk::Image::SetPicChannel(const ipPicDescriptor *pic, int n)
 
 void mitk::Image::Initialize()
 {
-  mitk::HistogramGenerator* generator = static_cast<mitk::HistogramGenerator*>(m_HistogramGeneratorObject.GetPointer());
 
   if(m_TimeSelectorForExtremaObject.IsNull())
   {
@@ -1106,6 +1105,8 @@ const mitk::Image::HistogramType* mitk::Image::GetScalarHistogram(int t) const
 
 #include "mitkImageAccessByItk.h"
 
+//#define BOUNDINGOBJECT_IGNORE
+
 template < typename ItkImageType >
 void mitk::_ComputeExtremaInItkImage(ItkImageType* itkImage, mitk::Image* mitkImage)
 {
@@ -1126,7 +1127,10 @@ void mitk::_ComputeExtremaInItkImage(ItkImageType* itkImage, mitk::Image* mitkIm
     //  else if (value < mitkImage->m_ScalarMin)                                              mitkImage->m_ScalarMin = value;
 
     // if numbers start with 2ndMin or 2ndMax and never have that value again, the previous above logic failed
-
+#ifdef BOUNDINGOBJECT_IGNORE
+    if( value > -32765)
+    {
+#endif
     if ( value > mitkImage->m_ScalarMax )
     {
         mitkImage->m_Scalar2ndMax = mitkImage->m_ScalarMax;    mitkImage->m_ScalarMax = value;
@@ -1152,6 +1156,9 @@ void mitk::_ComputeExtremaInItkImage(ItkImageType* itkImage, mitk::Image* mitkIm
     {
         mitkImage->m_Scalar2ndMin = value;
     }
+#ifdef BOUNDINGOBJECT_IGNORE
+    }
+#endif
 
     ++it;
   }

@@ -1487,8 +1487,8 @@ void mitk::DataTreeNodeFactory::ReadFileSeriesTypeVTK()
 void mitk::DataTreeNodeFactory::SetDefaultImageProperties(mitk::DataTreeNode::Pointer &node) 
 {
   node->SetProperty( "volumerendering", new mitk::BoolProperty( false ) );
-  node->SetProperty( "iilInterpolation", new mitk::BoolProperty( true ) );
-  node->SetProperty( "vtkInterpolation", new mitk::BoolProperty( true ) );
+  node->SetProperty( "iilInterpolation", new mitk::BoolProperty( false ) );
+  node->SetProperty( "vtkInterpolation", new mitk::BoolProperty( false ) );
   node->SetProperty( "texture interpolation", new mitk::BoolProperty( true ) );
   node->SetProperty( "layer", new mitk::IntProperty(0));
   node->SetProperty( "in plane resample extent by geometry", new mitk::BoolProperty( false ) );

@@ -26,8 +26,8 @@ PURPOSE.  See the above copyright notices for more information.
 #define ROUND_SHORT(x) (((x) > 0) ? short((x) + 0.5) : short((x) - 0.5))
 
 QmitkNumberPropertyEditor::QmitkNumberPropertyEditor( mitk::GenericProperty<short>* property, QWidget* parent, const char* name )
-: PropertyEditor( property ),
-  QSpinBox( parent, name ),
+: QSpinBox( parent, name ),
+  PropertyEditor( property ),
   m_ShortProperty(property),
   m_DataType(DT_SHORT)
 {
@@ -35,8 +35,8 @@ QmitkNumberPropertyEditor::QmitkNumberPropertyEditor( mitk::GenericProperty<shor
 }
 
 QmitkNumberPropertyEditor::QmitkNumberPropertyEditor( mitk::IntProperty* property, QWidget* parent, const char* name )
-: PropertyEditor( property ),
-  QSpinBox( parent, name ),
+: QSpinBox( parent, name ),
+  PropertyEditor( property ),
   m_IntProperty(property),
   m_DataType(DT_INT)
 {
@@ -44,8 +44,8 @@ QmitkNumberPropertyEditor::QmitkNumberPropertyEditor( mitk::IntProperty* propert
 }
 
 QmitkNumberPropertyEditor::QmitkNumberPropertyEditor( mitk::FloatProperty* property, QWidget* parent, const char* name )
-: PropertyEditor( property ),
-  QSpinBox( parent, name ),
+: QSpinBox( parent, name ),
+  PropertyEditor( property ),
   m_FloatProperty(property),
   m_DataType(DT_FLOAT)
 {
@@ -53,8 +53,8 @@ QmitkNumberPropertyEditor::QmitkNumberPropertyEditor( mitk::FloatProperty* prope
 }
 
 QmitkNumberPropertyEditor::QmitkNumberPropertyEditor( mitk::DoubleProperty* property, QWidget* parent, const char* name )
-: PropertyEditor( property ),
-  QSpinBox( parent, name ),
+: QSpinBox( parent, name ),
+  PropertyEditor( property ),
   m_DoubleProperty(property),
   m_DataType(DT_DOUBLE)
 {

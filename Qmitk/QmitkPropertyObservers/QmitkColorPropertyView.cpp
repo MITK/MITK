@@ -21,8 +21,8 @@ PURPOSE.  See the above copyright notices for more information.
 #define ROUND_P(x) ((int)((x)+0.5))
 
 QmitkColorPropertyView::QmitkColorPropertyView( const mitk::ColorProperty* property, QWidget* parent, const char* name )
-: PropertyView( property ),
-  QLabel( parent, name ),
+: QLabel( parent, name ),
+  PropertyView( property ),
   m_ColorProperty(property)
 {
   setText("  "); // two spaces for some minimun height

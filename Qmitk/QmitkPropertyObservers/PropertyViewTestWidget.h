@@ -31,6 +31,7 @@ class QmitkColorPropertyView;
 class QmitkColorPropertyEditor;
 class QmitkNumberPropertyView;
 class QmitkNumberPropertyEditor;
+class QmitkDataTreeListView;
 
 class PropertyViewTest : public QWidget
 {
@@ -85,6 +86,8 @@ class PropertyViewTest : public QWidget
 
    mitk::DataTree::Pointer data_tree;
    mitk::DataTreeFilter::Pointer tree_filter;
+
+   QmitkDataTreeListView* treelistview;
 
    QTimer* timer;
 

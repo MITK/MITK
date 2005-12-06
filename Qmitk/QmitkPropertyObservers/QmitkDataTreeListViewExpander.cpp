@@ -12,23 +12,57 @@
 // for debugging
 #include <iostream>
 
-QmitkListViewExpanderIcon::QmitkListViewExpanderIcon(const QGridLayout* childContainer, QWidget* parent, const char* name )
-: QLabel(parent, name),
-  m_Expanded(true),
-  m_ChildContainer(childContainer)
+//--- QmitkListViewItemIndex ------------------------------------------------
+
+QmitkListViewItemIndex::QmitkListViewItemIndex(QGridLayout* grid)
+: m_Grid(grid)
 {
-  if (!childContainer) throw std::invalid_argument("NULL pointer for childContainer makes no sense in QmitkListViewExpanderIcon()");
+  if (!grid) throw std::invalid_argument("NULL pointer for grid makes no sense in QmitkListViewExpanderIcon()");
+}
+
+// protected (for QmitkDataTreeListView
+QmitkListViewItemIndex::QmitkListViewItemIndex()
+: m_Grid(0)
+{
+}
+
+QmitkListViewItemIndex::~QmitkListViewItemIndex()
+{
+}
+
+void QmitkListViewItemIndex::addWidget(QWidget* widget)
+{
+  if (widget)
+    m_Children.push_back(widget);
+}
+
+int QmitkListViewItemIndex::rowAt(int y)
+{
+  // y coordinate -> row index
+  return -1;
+}
+
+QmitkListViewItemIndex* QmitkListViewItemIndex::childrenIndexAt(int row)
+{
+  return 0;
+}
+
+mitk::DataTreeFilter::Item* QmitkListViewItemIndex::itemAt(int row)
+{
+  return 0;
+}
+
+//--- QmitkListViewExpanderIcon ---------------------------------------------
+QmitkListViewExpanderIcon::QmitkListViewExpanderIcon( QGridLayout* grid, QWidget* parent, const char* name )
+: QLabel(parent, name),
+  QmitkListViewItemIndex(grid),
+  m_Expanded(true)
+{
   setExpanded(m_Expanded);
 }
 
 QmitkListViewExpanderIcon::~QmitkListViewExpanderIcon()
 {
-}
-
-void QmitkListViewExpanderIcon::addWidget(QWidget* widget)
-{
-  if (widget)
-    m_Children.push_back(widget);
 }
 
 bool QmitkListViewExpanderIcon::expanded()

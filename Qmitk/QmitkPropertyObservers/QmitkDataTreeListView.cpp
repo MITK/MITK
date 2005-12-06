@@ -1,12 +1,12 @@
 #include <QmitkDataTreeListView.h>
 #include <QmitkPropertyViewFactory.h>
-#include <QmitkDataTreeListViewExpander.h>
 
 #include <qlayout.h>
 #include <qpainter.h>
 
 QmitkDataTreeListView::QmitkDataTreeListView(QWidget* parent, const char* name)
 : QWidget(parent, name),
+  QmitkListViewItemIndex(),
   m_DataTreeFilter(NULL)
 {
   initialize();
@@ -14,6 +14,7 @@ QmitkDataTreeListView::QmitkDataTreeListView(QWidget* parent, const char* name)
 
 QmitkDataTreeListView::QmitkDataTreeListView(mitk::DataTreeFilter* filter,QWidget* parent, const char* name)
 : QWidget(parent, name),
+  QmitkListViewItemIndex(),
   m_DataTreeFilter(filter)
 {
   initialize();
@@ -22,6 +23,7 @@ QmitkDataTreeListView::QmitkDataTreeListView(mitk::DataTreeFilter* filter,QWidge
 
 QmitkDataTreeListView::QmitkDataTreeListView(mitk::DataTree* tree,QWidget* parent, const char* name)
 : QWidget(parent, name),
+  QmitkListViewItemIndex(),
   m_DataTreeFilter(NULL)
 {
   initialize();
@@ -30,6 +32,7 @@ QmitkDataTreeListView::QmitkDataTreeListView(mitk::DataTree* tree,QWidget* paren
 
 QmitkDataTreeListView::QmitkDataTreeListView(mitk::DataTreeIteratorBase* iterator,QWidget* parent, const char* name)
 : QWidget(parent, name),
+  QmitkListViewItemIndex(),
   m_DataTreeFilter(NULL)
 {
   initialize();
@@ -38,13 +41,11 @@ QmitkDataTreeListView::QmitkDataTreeListView(mitk::DataTreeIteratorBase* iterato
 
 void QmitkDataTreeListView::initialize()
 {
-  m_Grid = 0;
   m_StretchedColumn = -1;
 }
 
 QmitkDataTreeListView::~QmitkDataTreeListView()
 {
-  if (m_Grid) delete m_Grid;
 }
 
 void QmitkDataTreeListView::SetDataTree(mitk::DataTree* tree)
@@ -71,8 +72,6 @@ int QmitkDataTreeListView::stretchedColumn()
 void QmitkDataTreeListView::setStretchedColumn(int col)
 {
   m_StretchedColumn = col;
-
-  // GenerateItems;
 }
 
 void QmitkDataTreeListView::paintEvent(QPaintEvent* e)
@@ -195,7 +194,7 @@ void QmitkDataTreeListView::GenerateItems()
   m_Grid = new QGridLayout( this, 1, visibleProps.size()+1 ); // 1 extra for expansion symbol
   m_Grid->setSpacing(4);
   
-  if (m_StretchedColumn = -1)
+  if (m_StretchedColumn == -1)
     m_StretchedColumn = visibleProps.size();
 
  

@@ -10,7 +10,7 @@ namespace mitk
 //------ Some common filter functions ----------------------------------------------------
 
 /// default filter, lets everything except NULL pointers pass
-static bool IsDataTreeNode(mitk::DataTreeNode* node)
+bool IsDataTreeNode(mitk::DataTreeNode* node)
 {
   return ( node!= 0 );
 }

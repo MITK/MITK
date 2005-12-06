@@ -18,8 +18,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QmitkStringPropertyView.h>
 
 QmitkStringPropertyView::QmitkStringPropertyView( const mitk::StringProperty* property, QWidget* parent, const char* name )
-: PropertyView( property ),
-  QLabel( parent, name ),
+: QLabel( parent, name ),
+  PropertyView( property ),
   m_StringProperty(property)
 {
   PropertyChanged();

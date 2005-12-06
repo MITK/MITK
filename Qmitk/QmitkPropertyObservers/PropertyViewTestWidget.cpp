@@ -132,12 +132,12 @@ PropertyViewTest::PropertyViewTest(bool stay, QWidget* parent, const char* name)
 
   prepare_tree();
   
-  QmitkDataTreeListView* temp = new QmitkDataTreeListView(tree_filter, this);
+  treelistview = new QmitkDataTreeListView(tree_filter, this);
   
   QVBoxLayout* vlright = new QVBoxLayout(hl, QBoxLayout::TopToBottom);
   //hl->addWidget( vlright );
   
-  vlright->addWidget( temp );
+  vlright->addWidget( treelistview );
   
   // color prop view
   colorview = new QmitkColorPropertyView( propcolor, this );
@@ -232,9 +232,11 @@ PropertyViewTest::~PropertyViewTest()
   delete propfloat;
   delete propfloat2;
 
+  delete treelistview;
+  
   tree_filter = 0;
   data_tree = 0;
-  }
+}
 
   void PropertyViewTest::run() 
   {

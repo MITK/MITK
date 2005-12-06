@@ -3,20 +3,43 @@
 
 #include<qlabel.h>
 #include<list>
+#include<mitkDataTreeFilter.h>
 
 class QGridLayout;
 
-class QmitkListViewExpanderIcon : public QLabel
+class QmitkListViewItemIndex
+{
+  public:
+
+    QmitkListViewItemIndex(QGridLayout* layout);
+    ~QmitkListViewItemIndex();
+
+    void addWidget(QWidget*);
+    
+    int rowAt(int y);  // y coordinate -> row index
+    
+    QmitkListViewItemIndex* childrenIndexAt(int row); // index for sub-items in a row
+    mitk::DataTreeFilter::Item* itemAt(int row);   // mitkDataTreeFilter::Item of a row
+    
+  protected:
+
+    QmitkListViewItemIndex();
+    
+    QGridLayout* m_Grid;
+    std::list<QWidget*> m_Children;
+
+  private:
+};
+
+class QmitkListViewExpanderIcon : public QLabel, public QmitkListViewItemIndex
 {
   Q_OBJECT
 
   public:
     
-    QmitkListViewExpanderIcon( const QGridLayout* childContainer, QWidget* parent, const char* name = 0 );
+    QmitkListViewExpanderIcon( QGridLayout* childContainer, QWidget* parent, const char* name = 0 );
     virtual ~QmitkListViewExpanderIcon();
 
-    void addWidget(QWidget*);
-    
     bool expanded();
     void setExpanded(bool);
     
@@ -32,10 +55,6 @@ class QmitkListViewExpanderIcon : public QLabel
     void setAllChildrenVisible(bool);
 
     bool m_Expanded;
-    const QGridLayout* m_ChildContainer;
-
-    std::list<QWidget*> m_Children;
-
 };
 
 

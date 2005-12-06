@@ -18,8 +18,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QmitkBoolPropertyView.h>
 
 QmitkBoolPropertyView::QmitkBoolPropertyView( const mitk::BoolProperty* property, QWidget* parent, const char* name )
-: PropertyView( property ),
-  QCheckBox( parent, name ),
+: QCheckBox( parent, name ),
+  PropertyView( property ),
   m_BoolProperty(property)
 {
   setEnabled( false );

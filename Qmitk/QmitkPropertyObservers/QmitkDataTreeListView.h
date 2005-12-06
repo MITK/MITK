@@ -21,14 +21,13 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <qlistview.h>
 
-#include <mitkDataTree.h>
-#include <mitkDataTreeFilter.h>
+#include <QmitkDataTreeListViewExpander.h>
 
 class QGridLayout;
 class QmitkListViewExpanderIcon;
 
 /// @brief Displays items of a mitk::DataTree
-class QmitkDataTreeListView : public QWidget
+class QmitkDataTreeListView : public QWidget, public QmitkListViewItemIndex
 {
   Q_OBJECT;
 
@@ -55,8 +54,6 @@ class QmitkDataTreeListView : public QWidget
 
     virtual void paintEvent(QPaintEvent*);
 
-    QGridLayout* m_Grid;
-    
   private:
 
     void QmitkDataTreeListView::AddItemsToList(QWidget* parent, QmitkListViewExpanderIcon* expander, QGridLayout* layout,

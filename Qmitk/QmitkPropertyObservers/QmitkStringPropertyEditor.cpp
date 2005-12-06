@@ -18,8 +18,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QmitkStringPropertyEditor.h>
 
 QmitkStringPropertyEditor::QmitkStringPropertyEditor( mitk::StringProperty* property, QWidget* parent, const char* name )
-: PropertyEditor( property ),
-  QLineEdit( parent, name ),
+: QLineEdit( parent, name ),
+  PropertyEditor( property ),
   m_StringProperty(property)
 {
   PropertyChanged();

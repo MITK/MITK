@@ -267,7 +267,7 @@ namespace mitk
       ItemPointer m_LastSelectedItem;
   };
   
-  static bool IsTreeNode(mitk::DataTreeNode*);
+  bool IsDataTreeNode(mitk::DataTreeNode*);
 
 } // namespace mitk
 

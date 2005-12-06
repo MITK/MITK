@@ -29,8 +29,6 @@ QmitkPopupColorChooser::QmitkPopupColorChooser(QWidget* parent, unsigned int ste
 {
   setSteps(steps);
   
-  QVBoxLayout* vbox = new QVBoxLayout(this, lineWidth());
-  
   setLineWidth(2);
   setMouseTracking ( TRUE );
   
@@ -220,15 +218,15 @@ void QmitkPopupColorChooser::drawGradient( QPainter* p)
   p->setPen( Qt::NoPen ); 
 
   QColor c;
-  for ( int h = 0; h < m_Steps; ++h )
+  for ( unsigned int h = 0; h < m_Steps; ++h )
   {
-    for ( int v = 1; v < m_Steps2; ++v )
+    for ( unsigned int v = 1; v < m_Steps2; ++v )
     {                
       c.setHsv( h*m_HStep, 255, v*m_VStep );             // rainbow effect
       p->setBrush( c );                  // solid fill with color c
       p->drawRect( v-1, h, m_Steps2, m_Steps );         // draw the rectangle
     }
-    for ( int s = 0; s < m_Steps2; ++s )
+    for ( unsigned int s = 0; s < m_Steps2; ++s )
     {                
       c.setHsv( h*m_HStep, 255 - s*m_SStep, 255 );             // rainbow effect
       p->setBrush( c );                  // solid fill with color c

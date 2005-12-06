@@ -23,8 +23,8 @@ PURPOSE.  See the above copyright notices for more information.
 #define DT_DOUBLE  4
 
 QmitkNumberPropertyView::QmitkNumberPropertyView( const mitk::GenericProperty<short>* property, QWidget* parent, const char* name )
-: PropertyView( property ),
-  QLabel( parent, name ),
+: QLabel( parent, name ),
+  PropertyView( property ),
   m_ShortProperty(property),
   m_DataType(DT_SHORT)
 {
@@ -32,8 +32,8 @@ QmitkNumberPropertyView::QmitkNumberPropertyView( const mitk::GenericProperty<sh
 }
 
 QmitkNumberPropertyView::QmitkNumberPropertyView( const mitk::IntProperty* property, QWidget* parent, const char* name )
-: PropertyView( property ),
-  QLabel( parent, name ),
+: QLabel( parent, name ),
+  PropertyView( property ),
   m_IntProperty(property),
   m_DataType(DT_INT)
 {
@@ -41,8 +41,8 @@ QmitkNumberPropertyView::QmitkNumberPropertyView( const mitk::IntProperty* prope
 }
 
 QmitkNumberPropertyView::QmitkNumberPropertyView( const mitk::FloatProperty* property, QWidget* parent, const char* name )
-: PropertyView( property ),
-  QLabel( parent, name ),
+: QLabel( parent, name ),
+  PropertyView( property ),
   m_FloatProperty(property),
   m_DataType(DT_FLOAT)
 {
@@ -50,8 +50,8 @@ QmitkNumberPropertyView::QmitkNumberPropertyView( const mitk::FloatProperty* pro
 }
 
 QmitkNumberPropertyView::QmitkNumberPropertyView( const mitk::DoubleProperty* property, QWidget* parent, const char* name )
-: PropertyView( property ),
-  QLabel( parent, name ),
+: QLabel( parent, name ),
+  PropertyView( property ),
   m_DoubleProperty(property),
   m_DataType(DT_DOUBLE)
 {

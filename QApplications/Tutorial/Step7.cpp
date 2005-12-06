@@ -10,6 +10,7 @@
 
 #include <vtkMarchingCubes.h>
 #include <vtkSTLWriter.h>
+#include <vtkImageData.h>
 
 
 
@@ -20,8 +21,6 @@ Step7::Step7( int argc, char* argv[], QWidget *parent, const char *name )
   : Step6( argc, argv, parent, name )
 {
 }
-
-
 void Step7::StartRegionGrowing()
 {
   Step6::StartRegionGrowing();

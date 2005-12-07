@@ -154,12 +154,16 @@ void QmitkDataTreeListView::mouseReleaseEvent ( QMouseEvent* e )
     if (selected)
     {
       (*iter)->setBackgroundMode(Qt::PaletteHighlight);
-      const_cast<QColorGroup&>((*iter)->colorGroup()).setColor(QColorGroup::ButtonText, Qt::PaletteHighlightedText);
+    
+      // following lines seem too complicated, but I could not find an easier way of changing the foreground color
+      QPalette palette( (*iter)->palette() );
+      palette.setColor( QColorGroup::Foreground, palette.color( QPalette::Active, QColorGroup::HighlightedText ) );
+      (*iter)->setPalette( palette );
     }
     else
     {
       (*iter)->setBackgroundMode( Qt::PaletteBase );
-      const_cast<QColorGroup&>((*iter)->colorGroup()).setColor(QColorGroup::ButtonText, Qt::PaletteButtonText);
+      (*iter)->unsetPalette();
     }
   }
 

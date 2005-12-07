@@ -121,8 +121,8 @@ int QmitkListViewItemIndex::rowAt(int y)
     for (int row = 0; row < m_Grid->numRows(); ++row)
     {
       QRect cell( m_Grid->cellGeometry(row, m_Grid->numCols()-1) );
-      if ( cell.top() <= y && cell.bottom() >= y )
-        return row;
+      if ( cell.top()-2 <= y && cell.bottom()+2 >= y ) // 2 was chosen because it's half the spacing of the gridlayouts 
+        return row;                                   // which is set in QmitkDataTreeListView.cpp
     }
   
   return -1; // defaul = not found

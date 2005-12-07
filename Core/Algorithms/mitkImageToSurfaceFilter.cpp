@@ -92,6 +92,12 @@ void mitk::ImageToSurfaceFilter::CreateSurface(int time, vtkImageData *vtkimage,
     smoother->Delete();
   }
 
+#if (VTK_MAJOR_VERSION >= 5)
+  std::cerr << "vtkDecimate not available for VTK 5.0 and above.";
+  std::cerr << " Using vtkDecimatePro instead." << std::endl;
+  m_Decimate = DecimatePro;
+#endif
+
   //decimate = to reduce number of polygons
   if(m_Decimate==DecimatePro)
   {
@@ -112,10 +118,9 @@ void mitk::ImageToSurfaceFilter::CreateSurface(int time, vtkImageData *vtkimage,
     polydata->Register(NULL);//RC++
     decimate->Delete();
   }
+#if (VTK_MAJOR_VERSION < 5)
   else if (m_Decimate==Decimate)
   {
-
-#if (VTK_MAJOR_VERSION < 5)
     vtkDecimate *decimate = vtkDecimate::New();
     decimate->SetInput( polydata );
     decimate->PreserveTopologyOn();
@@ -125,12 +130,8 @@ void mitk::ImageToSurfaceFilter::CreateSurface(int time, vtkImageData *vtkimage,
     polydata = decimate->GetOutput();
     polydata->Register(NULL);//RC++
     decimate->Delete();
-#else
-    std::cerr << "vtkDecimate not available in used VTK version.";
-    std::cerr << std::endl;
-#endif
-
   }
+#endif
 
   polydata->Update();
 

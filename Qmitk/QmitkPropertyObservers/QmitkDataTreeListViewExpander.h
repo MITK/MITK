@@ -11,7 +11,7 @@ class QmitkListViewItemIndex
 {
   public:
 
-    QmitkListViewItemIndex(QGridLayout* layout);
+    QmitkListViewItemIndex(QGridLayout* layout, QmitkListViewItemIndex* parentIndex);
     ~QmitkListViewItemIndex();
 
     void addIndex(QmitkListViewItemIndex*, int row);
@@ -21,10 +21,13 @@ class QmitkListViewItemIndex
     
     int rowAt(int y);  // y coordinate -> row index
 
-    QmitkListViewItemIndex* indexAt(int row); // index for sub-items in a row
-    mitk::DataTreeFilter::Item* itemAt(int row);     // mitkDataTreeFilter::Item of a row
-    std::list<QWidget*>& widgetsAt(int row);        // widgets of a row
+    QmitkListViewItemIndex* indexAt(int row);       // index for sub-items in a row
+    mitk::DataTreeFilter::Item* itemAt(int row);   // mitkDataTreeFilter::Item of a row
+    std::list<QWidget*>& widgetsAt(int row);      // widgets of a row
     
+    void lockBecauseOfSelection(bool);
+    QmitkListViewItemIndex* parentIndex();
+
     QGridLayout* m_Grid;
     
   protected:
@@ -35,6 +38,9 @@ class QmitkListViewItemIndex
     RowStructureType m_Rows;
     std::vector<QmitkListViewItemIndex*> m_Indices;
 
+    int m_Locked;
+    QmitkListViewItemIndex* m_ParentIndex;
+
   private:
 };
 
@@ -44,7 +50,7 @@ class QmitkListViewExpanderIcon : public QLabel, public QmitkListViewItemIndex
 
   public:
     
-    QmitkListViewExpanderIcon( QGridLayout* childContainer, QWidget* parent, const char* name = 0 );
+    QmitkListViewExpanderIcon( QGridLayout* childContainer, QmitkListViewItemIndex* parentIndex, QWidget* parent, const char* name = 0 );
     virtual ~QmitkListViewExpanderIcon();
 
     bool expanded();
@@ -56,6 +62,10 @@ class QmitkListViewExpanderIcon : public QLabel, public QmitkListViewItemIndex
 
     virtual void showEvent(QShowEvent*);
     virtual void hideEvent(QHideEvent*);
+
+  protected slots:
+
+    void displayCorrectIcon();
     
   private:
 

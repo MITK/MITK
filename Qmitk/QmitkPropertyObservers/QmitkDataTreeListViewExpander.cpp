@@ -3,26 +3,32 @@
 #include <qpixmap.h>
 #include <qobjectlist.h>
 #include <qlayout.h>
+#include <qtimer.h>
 
 #include <stdexcept>
 
 #include "collapsed.xpm"
 #include "expanded.xpm"
+#include "notpossible.xpm"
 
 // for debugging
 #include <iostream>
 
 //--- QmitkListViewItemIndex ------------------------------------------------
 
-QmitkListViewItemIndex::QmitkListViewItemIndex(QGridLayout* grid)
-: m_Grid(grid)
+QmitkListViewItemIndex::QmitkListViewItemIndex(QGridLayout* grid, QmitkListViewItemIndex* parentIndex)
+: m_Grid(grid),
+  m_Locked(0),
+  m_ParentIndex(parentIndex)
 {
   if (!grid) throw std::invalid_argument("NULL pointer for grid makes no sense in QmitkListViewExpanderIcon()");
 }
 
 // protected (for QmitkDataTreeListView
 QmitkListViewItemIndex::QmitkListViewItemIndex()
-: m_Grid(0)
+: m_Grid(NULL),
+  m_Locked(0),
+  m_ParentIndex(NULL)
 {
 }
 
@@ -114,7 +120,7 @@ void QmitkListViewItemIndex::addItem(mitk::DataTreeFilter::Item* item, int row)
   }
 }
 
-int QmitkListViewItemIndex::rowAt(int y)
+int QmitkListViewItemIndex::rowAt(int y) 
 {
   // y coordinate -> row index
   if ( m_Grid->numRows() > 0)
@@ -128,7 +134,7 @@ int QmitkListViewItemIndex::rowAt(int y)
   return -1; // defaul = not found
 }
 
-QmitkListViewItemIndex* QmitkListViewItemIndex::indexAt(int row)
+QmitkListViewItemIndex* QmitkListViewItemIndex::indexAt(int row) 
 {
   try
   {
@@ -140,7 +146,7 @@ QmitkListViewItemIndex* QmitkListViewItemIndex::indexAt(int row)
   }
 }
 
-mitk::DataTreeFilter::Item* QmitkListViewItemIndex::itemAt(int row)
+mitk::DataTreeFilter::Item* QmitkListViewItemIndex::itemAt(int row) 
 {
   try
   {
@@ -153,15 +159,28 @@ mitk::DataTreeFilter::Item* QmitkListViewItemIndex::itemAt(int row)
 }
 
 /// throws std::out_of_range on bad row
-std::list<QWidget*>& QmitkListViewItemIndex::widgetsAt(int row)
+std::list<QWidget*>& QmitkListViewItemIndex::widgetsAt(int row) 
 {
   return m_Rows.at(row).second;
 }
 
+void QmitkListViewItemIndex::lockBecauseOfSelection(bool locked)
+{
+  if (locked)
+    ++m_Locked;
+  else
+    --m_Locked;
+}
+
+QmitkListViewItemIndex* QmitkListViewItemIndex::parentIndex() 
+{
+  return m_ParentIndex;
+}
+
 //--- QmitkListViewExpanderIcon ---------------------------------------------
-QmitkListViewExpanderIcon::QmitkListViewExpanderIcon( QGridLayout* grid, QWidget* parent, const char* name )
+QmitkListViewExpanderIcon::QmitkListViewExpanderIcon( QGridLayout* grid, QmitkListViewItemIndex* parentIndex, QWidget* parent, const char* name )
 : QLabel(parent, name),
-  QmitkListViewItemIndex(grid),
+  QmitkListViewItemIndex(grid, parentIndex),
   m_Expanded(true)
 {
   setExpanded(m_Expanded);
@@ -180,17 +199,21 @@ void QmitkListViewExpanderIcon::setExpanded(bool expanded)
 {
   m_Expanded = expanded;
 
-  if (m_Expanded)
-    setPixmap( QPixmap(expanded_xpm) );
-  else
-    setPixmap( QPixmap(collapsed_xpm) );
- 
+  displayCorrectIcon();
+    
   setAllChildrenVisible(m_Expanded);
 }
 
 void QmitkListViewExpanderIcon::mouseReleaseEvent ( QMouseEvent * e )
 {
-  setExpanded(!m_Expanded); //toggle status
+  if (!m_Locked)
+    setExpanded(!m_Expanded); //toggle status
+  else
+  {
+    // bing
+    setPixmap( QPixmap(notpossible_xpm) );
+    QTimer::singleShot(100,this,SLOT(displayCorrectIcon()));
+  }
 }
 
 void QmitkListViewExpanderIcon::showEvent(QShowEvent* e)
@@ -205,6 +228,14 @@ void QmitkListViewExpanderIcon::hideEvent(QHideEvent* e)
   if (m_Expanded)
     setAllChildrenVisible(false);
   QLabel::hideEvent(e);
+}
+
+void QmitkListViewExpanderIcon::displayCorrectIcon()
+{
+  if (m_Expanded)
+    setPixmap( QPixmap(expanded_xpm) );
+  else
+    setPixmap( QPixmap(collapsed_xpm) );
 }
 
 void QmitkListViewExpanderIcon::setAllChildrenVisible(bool visible)

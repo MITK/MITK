@@ -33,6 +33,8 @@ class QmitkDataTreeListView : public QWidget, public QmitkListViewItemIndex
 
   public:
 
+    typedef mitk::DataTreeFilter::PropertyList PropertyList;
+
     QmitkDataTreeListView(QWidget* parent = 0, const char* name = 0);
     QmitkDataTreeListView(mitk::DataTreeFilter* filter,QWidget* parent = 0, const char* name = 0);
     QmitkDataTreeListView(mitk::DataTree* filter,QWidget* parent = 0, const char* name = 0);
@@ -43,6 +45,9 @@ class QmitkDataTreeListView : public QWidget, public QmitkListViewItemIndex
     void SetDataTree(mitk::DataTreeIteratorBase*);
 
     void SetFilter(mitk::DataTreeFilter*);
+
+    const PropertyList& visibleProperties();
+    const PropertyList& editableProperties();
 
     int stretchedColumn();
     void setStretchedColumn(int);

@@ -4,6 +4,8 @@
 #include <qlayout.h>
 #include <qpainter.h>
 
+#include <stdexcept>
+
 QmitkDataTreeListView::QmitkDataTreeListView(QWidget* parent, const char* name)
 : QWidget(parent, name),
   QmitkListViewItemIndex(),
@@ -63,6 +65,20 @@ void QmitkDataTreeListView::SetFilter(mitk::DataTreeFilter* filter)
 {
   m_DataTreeFilter = filter;
   GenerateItems();
+}
+
+const QmitkDataTreeListView::PropertyList& QmitkDataTreeListView::visibleProperties()
+{
+  if (m_DataTreeFilter)
+    return m_DataTreeFilter->GetVisibleProperties();
+  else throw std::logic_error("You can't access the visible properties until a filter is installed (via setFilter or setDataTree)");
+}
+
+const QmitkDataTreeListView::PropertyList& QmitkDataTreeListView::editableProperties()
+{
+  if (m_DataTreeFilter)
+    return m_DataTreeFilter->GetVisibleProperties();
+  else throw std::logic_error("You can't access the editable properties until a filter is installed (via setFilter or setDataTree)");
 }
 
 int QmitkDataTreeListView::stretchedColumn()
@@ -142,7 +158,14 @@ void QmitkDataTreeListView::mouseReleaseEvent ( QMouseEvent* e )
     selected = !item->IsSelected();
     item->SetSelected( selected ); // toggle selection
   }
-
+ 
+  temp = index;
+  temp->lockBecauseOfSelection( selected );
+  while ((temp = temp->parentIndex()))
+  {
+    temp->lockBecauseOfSelection( selected );
+  }
+  
   try
   {
     // set backgrounds of widgets accordingly
@@ -240,7 +263,7 @@ void QmitkDataTreeListView::AddItemsToList(QWidget* parent, QmitkListViewItemInd
     {
       // add expansion symbol
       QGridLayout* childrenGridLayout = new QGridLayout( 0, 1, visibleProps.size()+1 ); // 1 extra for expansion symbol
-      QmitkListViewExpanderIcon* childExpander = new QmitkListViewExpanderIcon(childrenGridLayout, parent);
+      QmitkListViewExpanderIcon* childExpander = new QmitkListViewExpanderIcon(childrenGridLayout, index, parent);
       childExpander->setBackgroundMode( Qt::PaletteBase );
       
       index->addMultiCellWidget(childExpander, row, row+1, 0, 0, Qt::AlignTop); 

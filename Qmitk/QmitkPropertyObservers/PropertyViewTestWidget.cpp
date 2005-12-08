@@ -172,23 +172,23 @@ void PropertyViewTest::prepare_tree()
 
   {
     mitk::DataTreeNode::Pointer node = mitk::DataTreeNode::New(); node->SetData(image);
-    node->SetProperty("name", new mitk::StringProperty("Ruut"));
+    node->SetProperty("name", new mitk::StringProperty("Opa"));
     it.Set(node);
   }
   {
     mitk::DataTreeNode::Pointer node = mitk::DataTreeNode::New(); node->SetData(image);
-    node->SetProperty("name", new mitk::StringProperty("Eins"));
+    node->SetProperty("name", new mitk::StringProperty("Bruder"));
     node->SetProperty("visible", new mitk::BoolProperty(false));
     it.Add(node);
   }
   {
     mitk::DataTreeNode::Pointer node = mitk::DataTreeNode::New(); node->SetData(image);
-    node->SetProperty("name", new mitk::StringProperty("Zwo"));
+    node->SetProperty("name", new mitk::StringProperty("Ich"));
     it.Add(node);
   }
   {
     mitk::DataTreeNode::Pointer node = mitk::DataTreeNode::New(); node->SetData(image);
-    node->SetProperty("name", new mitk::StringProperty("Trei"));
+    node->SetProperty("name", new mitk::StringProperty("Schwester"));
     it.Add(node);
   }
 
@@ -196,12 +196,12 @@ void PropertyViewTest::prepare_tree()
   
   {
     mitk::DataTreeNode::Pointer node = mitk::DataTreeNode::New(); node->SetData(image);
-    node->SetProperty("name", new mitk::StringProperty("Wnuk"));
+    node->SetProperty("name", new mitk::StringProperty("Sohn"));
     it.Add(node);
   }
   {
     mitk::DataTreeNode::Pointer node = mitk::DataTreeNode::New(); node->SetData(image);
-    node->SetProperty("name", new mitk::StringProperty("Wnuka"));
+    node->SetProperty("name", new mitk::StringProperty("Tochter"));
     node->SetProperty("visible", new mitk::BoolProperty(false));
     it.Add(node);
   }

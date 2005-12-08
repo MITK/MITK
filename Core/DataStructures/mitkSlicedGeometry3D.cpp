@@ -95,6 +95,8 @@ void mitk::SlicedGeometry3D::Initialize(unsigned int slices)
   Vector3D spacing;
   spacing.Fill(1.0);
   SetSpacing(spacing);
+
+  m_DirectionVector.Fill(0);
 }
 
 

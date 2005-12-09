@@ -2,12 +2,121 @@
   \defgroup Functionalities Functionalities
   \ingroup Application
 
-  This category includes functionality classes. 
+<b>
+
+This is a preliminary version and not yet official documentation.
+
+</b>
+
+Available sections:
+  - \ref overview 
+    - \ref inthisgroup
+    - \ref notinthisgroup
+    - \ref implement
+  - \ref seealso
+  - \ref future
   
-  "Functionalities" is a concept to organize an application. Each functionality (sub-class of QmitkFunctionality) 
-  can have its own workspace area (or share one workspace with other functionalities) and a control area. 
-  Functionalities are added to an instance of QmitkFctMediator, which organizes the switching between the 
-  functionalities. This is a "toolbox-in-the-large", e.g., for combining and switching between one 
-  functionality for segmentation and another for registration.
+
+  \section overview Rationale and overview
+
+So-called \e functionalities are currently the top-most layer of hidden 
+complexity within MITK. Functionalities facilitate the structured combination of
+modules. A functionality is a module for a specific task, combining a user 
+interface with algorithmic function. It consists of (compare screenshot)
+
+\li an identification (name of the functionality, icon, tooltip, ...),
+\li a workspace area, where the main interaction with data objects is taking place,
+\li a control area containing GUI elements to set parameters of the used algorithms
+\li the algorithmic implementation (not visible to the user).
+
+\image html PartsOfAFunctionaliy.jpg "The visible parts of a functionality. The algorithmic implementation, which is also part of a functionality has no visual representation."
+
+Communication between functionalities is largely based on the data tree. Each 
+functionality accesses the data objects contained in the tree, changes them and/or 
+creates new data objects. Other functionalities can continue to work on the changed 
+and/or newly created data tree entries. By that, functionalities can communicate 
+without becoming dependent on each other.
   
+  
+  \subsection inthisgroup What belongs into this group 
+
+A functionality should comprise a complete set of controls that are neccessary to 
+complete a certain task, where the task should be on a reasonably high level that makes
+sense for the user of the application. 
+Before you consider a new functionality, check if the feature you want to implement could 
+instead be implemented as a \ref Widgets "widget" that can be used in different contexts.
+Possible examples for functionalities are:
+
+ - "Segmentation": a tool for segmentation that comprises several controls (selection of the 
+   image to be segmented, list of available segmentations, selection of tools for segmentation)
+ - "Movie generation": when you have a scene ready for presentation and want to generate
+   a movie from it, with animation through slices, rotation in 3D, stepping through time, etc.
+ - "Vessel editing": a complete set of tools for working with a vessel tree (creating from segmentation,
+    editing, annotation, searching, etc.
+  
+  \subsection notinthisgroup What does belongs not into this group
+
+A set of controls that could possibly be of use in more than one context should not 
+be a functionality, but rather a widget. Widgets are good for sub-tasks from the user's 
+point of view. 
+Some examples for things that should not be implemented as functionality
+
+ - a control that allows to select an image
+ - a control that lists available segmentations
+ - a control that shows information about certain scene elements
+
+  \subsection implement Practical issues
+
+Technically a functionality is a derivative class of QmitkFunctionality. The
+functionality object gets an mitk::DataTreeIteratorBase when it is created and
+has to return on request QWidgets for its main widget and its control area, and
+a QAction (Combination of icon, description and keyboard shortcut) for its identification.
+
+The functionality can own and use arbitrary objects to create and manipulate
+objects of the data tree. 
+
+A functionality is meant to exist only with the context of an application. It is
+the application's task to create an environment, where it can place the main and
+control widgets of functionalities, and to create a data tree. 
+
+Since the intention is to combine several functionalities in one application,
+there is a "functionality mediator" of class QmitkFctMediator. A single instance
+of this object is created by the application and it is told about every
+functionality that should be available for the application. It is then the
+mediator's job to arrange the correct switching between functionalities, which
+involves calling the functionalities' Activated() and Deactived() methods and
+hiding/showing the correct main and control widgets for each functionality.
+
+The diagram below shows the important classes related to a functionality.
+
+\image html ModuleApplicationsFunctionalities.png "Classes related to a functionality"
+
+ \section seealso See also
+ 
+ Documentation you should read
+ 
+ \li \ref Widgets
+ \li \ref Applications
+ \li \ref SampleApp
+ 
+ Classes you should be aware of:
+ 
+ \li QmitkFunctionality
+ \li QmitkFctMediator
+ \li mitk::DataTree
+
+ If you want to enhance the SampleApp, you should read the directions on \ref NewFunctionalityPage "how to create a new functionality".
+  
+  \section future Plans for the future 
+
+One idea for future development is to change the current use of functionalities in a way that 
+different functionalities can be active at the same time. This would allow the user to select
+and arrange a sensible set of functionalities for his or her specific task at runtime. This would
+allow for more flexible applications.
+
+Implementing this idea would probably require changes to existing functionalities, since currently
+authors of functionalities can assume that nothing else is manipulating the data tree when their 
+functionality is active.
+
 */
+

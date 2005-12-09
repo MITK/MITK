@@ -39,12 +39,15 @@ void mitk::ManualSegmentationToSurfaceFilter::GenerateData()
     if(m_MedianFilter3D)
     {
       vtkImageMedian3D *median = vtkImageMedian3D::New();
-      median->SetInput(vtkimage); //RC++
-      vtkimage->Delete();//RC--
+      median->SetInput(vtkimage); //RC++ (VTK < 5.0)
       median->SetKernelSize(m_MedianKernelSizeX,m_MedianKernelSizeY,m_MedianKernelSizeZ);//Std: 3x3x3
       median->ReleaseDataFlagOn();
       median->UpdateInformation();
-      vtkimage = median->GetOutput(); 
+      median->Update();
+      vtkimage->Delete(); //->Input
+      vtkimage = median->GetOutput(); //->Out
+      vtkimage->Register(NULL);
+      median->Delete();
     }
 
     //Interpolate image spacing 
@@ -57,41 +60,38 @@ void mitk::ManualSegmentationToSurfaceFilter::GenerateData()
       imageresample->SetAxisOutputSpacing(0, 1);
       imageresample->SetAxisOutputSpacing(1, 1);
       imageresample->SetAxisOutputSpacing(2, 1);
-      vtkimage=imageresample->GetOutput();
-      vtkimage->UpdateInformation();
+      imageresample->UpdateInformation();
+      imageresample->Update();
+      vtkimage->Delete(); //->Input
+      vtkimage=imageresample->GetOutput();//->Output
+      vtkimage->Register(NULL);
+      imageresample->Delete();
     }
 
     if(m_UseStandardDeviation)//gauss
     {
       vtkImageThreshold* vtkimagethreshold = vtkImageThreshold::New();
-      vtkimagethreshold->SetInput(vtkimage);//RC++
-      vtkimage->Delete();//RC--
+      vtkimagethreshold->SetInput(vtkimage);
       vtkimagethreshold->SetInValue( 100 );
       vtkimagethreshold->SetOutValue( 0 );
-      int vtkscalartype = vtkimage->GetScalarType();
-      if((vtkscalartype == VTK_FLOAT) || (vtkscalartype == VTK_DOUBLE))
-      {
-        vtkimagethreshold->ThresholdByUpper( this->m_Threshold );
-      }
-      else
-      {
-        vtkimagethreshold->ThresholdByUpper( this->m_Threshold + 0.5 );
-      }
-
+      vtkimagethreshold->ThresholdByUpper( this->m_Threshold ); 
       thresholdExpanded = 49;
-
+  
       vtkimagethreshold->SetOutputScalarTypeToUnsignedChar();
       vtkimagethreshold->ReleaseDataFlagOn();
       
       vtkImageGaussianSmooth *gaussian = vtkImageGaussianSmooth::New();
-      gaussian->SetInput(vtkimagethreshold->GetOutput()); //RC ++
-      vtkimagethreshold->Delete(); //RC--
+      gaussian->SetInput(vtkimagethreshold->GetOutput()); 
       gaussian->SetDimensionality(3);
       gaussian->SetRadiusFactor(0.49);
       gaussian->SetStandardDeviation( m_StandardDeviation );
       gaussian->ReleaseDataFlagOn();
       gaussian->UpdateInformation();
-      vtkimage = gaussian->GetOutput();
+      gaussian->Update();
+      vtkimage->Delete();//->Input
+      vtkimage = gaussian->GetOutput(); //->Out
+      gaussian->Register(NULL);
+      gaussian->Delete();
    }
 
     // Create sureface for t-Slice

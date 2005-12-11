@@ -28,11 +28,13 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkTreeIteratorClone.h>
 #include <itkPreOrderTreeIterator.h>
 #include <itkChildTreeIterator.h>
+#include <itkEventObject.h>
 
 namespace mitk 
 {
 
 class XMLWriter;
+
 
 //##ModelId=3EA93EC901B8
 typedef itk::TreeContainer<mitk::DataTreeNode::Pointer> DataTreeBase;

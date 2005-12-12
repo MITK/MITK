@@ -23,6 +23,12 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk {
 
+  /**
+   * The function WriteXML() writes a complete XML node and its data (BeginNode(), WriteXMLData() and EndNode()).
+   * Use function WriteXML() to write mitk classes to the XML file.
+   * For other elements like datatypes you can use the functions BeginNode(), EndNode() from the class BaseXMLWriter to write a XML node.
+   */
+
   class XMLWriter;
   class XMLReader;
 
@@ -33,7 +39,7 @@ namespace mitk {
     virtual ~XMLIO() {};
 
     /**
-     *
+     * Writes a XML node and its data (BeginNode(), WriteXMLData() and EndNode()).
      */
     bool WriteXML( XMLWriter& xmlWriter );
 

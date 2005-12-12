@@ -14,6 +14,11 @@ bool IsDataTreeNode(mitk::DataTreeNode* node)
 {
   return ( node!= 0 );
 }
+  
+bool IsGoodDataTreeNode(mitk::DataTreeNode* node)
+{
+  return ( node!= 0 && node->GetData() );
+}
 
 //------ BasePropertyAccessor ------------------------------------------------------------
   
@@ -211,7 +216,7 @@ const mitk::DataTreeNode* DataTreeFilter::Item::GetNode() const
 //------ DataTreeFilter ------------------------------------------------------------------
 
 // smart pointer constructor
-DataTreeFilter::Pointer DataTreeFilter::New(mitk::DataTree* datatree)
+DataTreeFilter::Pointer DataTreeFilter::New(mitk::DataTreeBase* datatree)
 {
   // from itkNewMacro()
   Pointer smartPtr;
@@ -222,7 +227,7 @@ DataTreeFilter::Pointer DataTreeFilter::New(mitk::DataTree* datatree)
 }
 
 // real constructor (protected)
-DataTreeFilter::DataTreeFilter(mitk::DataTree* datatree)
+DataTreeFilter::DataTreeFilter(mitk::DataTreeBase* datatree)
 : m_Filter(NULL),
   m_DataTree(datatree),
   m_HierarchyHandling(mitk::DataTreeFilter::PRESERVE_HIERARCHY),
@@ -636,7 +641,7 @@ void DataTreeFilter::GenerateModelFromTree()
   m_Items = ItemList::New(); // clear list (nice thanks to smart pointers)
   mitk::DataTreeIteratorBase* treeIter =  // get an iterator to the data tree
     new mitk::DataTreePreOrderIterator::PreOrderTreeIterator(m_DataTree);
-
+  
   /*
   if root matches
     create an Item for root

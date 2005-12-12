@@ -112,7 +112,7 @@ namespace mitk
           /// \brief Items have 1:1 relations to DataTreeNodes and DataTreeFilters, a
           ///        position within all (sub)items and a parent.
           ///
-          /// Requires a mitk::DataTree, otherwise it has no meaning.
+          /// Requires a mitk::DataTreeBase, otherwise it has no meaning.
           /// Needs the DataTreeFilter it belongs to (for checking the editability (?) of
           /// properties).  Third parameter is the position within all siblings.
           /// Fourth parameter is the parent item.
@@ -171,8 +171,8 @@ namespace mitk
           bool m_Selected;
       };
 
-      /// No meaning without a mitk::DataTree 
-      static Pointer New(mitk::DataTree*);
+      /// No meaning without a mitk::DataTreeBase
+      static Pointer New(mitk::DataTreeBase*);
 
       /// Labels (for Header) of visible properties
       void SetPropertiesLabels(const PropertyList);
@@ -221,7 +221,7 @@ namespace mitk
     protected:
    
       // intentionally hidden (itk::Object / SmartPointer)
-      DataTreeFilter(mitk::DataTree*);
+      DataTreeFilter(mitk::DataTreeBase*);
       ~DataTreeFilter();
     
     private:
@@ -244,7 +244,7 @@ namespace mitk
       FilterFunctionPointer m_Filter;
 
       /// The data tree filtered by this class
-      mitk::DataTree* m_DataTree;
+      mitk::DataTreeBase* m_DataTree;
 
       /// should we preserve the hierachy of the tree?
       HierarchyHandling m_HierarchyHandling;
@@ -268,6 +268,7 @@ namespace mitk
   };
   
   bool IsDataTreeNode(mitk::DataTreeNode*);
+  bool IsGoodDataTreeNode(mitk::DataTreeNode*);
 
 } // namespace mitk
 

@@ -123,15 +123,26 @@ void QmitkListViewItemIndex::addItem(mitk::DataTreeFilter::Item* item, int row)
 int QmitkListViewItemIndex::rowAt(int y) 
 {
   // y coordinate -> row index
+  int r = -1;
   if ( m_Grid->numRows() > 0)
     for (int row = 0; row < m_Grid->numRows(); ++row)
     {
       QRect cell( m_Grid->cellGeometry(row, m_Grid->numCols()-1) );
       if ( cell.top()-2 <= y && cell.bottom()+2 >= y ) // 2 was chosen because it's half the spacing of the gridlayouts 
-        return row;                                   // which is set in QmitkDataTreeListView.cpp
+      {                                               // which is set in QmitkDataTreeListView.cpp
+        r = row;
+        break;
+      }
     }
+ 
+  // three lines fixing: makes selection of invisible rows impossible. 
+  // This problem would better be fixed by not even showing invisible rows,
+  // but currently they still show as 4 pixel empty lines because of setSpacing(4)...
+  QmitkListViewExpanderIcon* i = static_cast<QmitkListViewExpanderIcon*>(indexAt(r-1));
+  if ( i && !(i->expanded()) )
+    --r;
   
-  return -1; // defaul = not found
+  return r; // defaul = not found
 }
 
 QmitkListViewItemIndex* QmitkListViewItemIndex::indexAt(int row) 

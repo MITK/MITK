@@ -25,7 +25,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 class QmitkListViewExpanderIcon;
 
-/// @brief Displays items of a mitk::DataTree
+/// @brief Displays items of a mitk::DataTreeBase
 class QmitkDataTreeListView : public QWidget, public QmitkListViewItemIndex
 {
   Q_OBJECT;
@@ -36,11 +36,11 @@ class QmitkDataTreeListView : public QWidget, public QmitkListViewItemIndex
 
     QmitkDataTreeListView(QWidget* parent = 0, const char* name = 0);
     QmitkDataTreeListView(mitk::DataTreeFilter* filter,QWidget* parent = 0, const char* name = 0);
-    QmitkDataTreeListView(mitk::DataTree* filter,QWidget* parent = 0, const char* name = 0);
+    QmitkDataTreeListView(mitk::DataTreeBase* filter,QWidget* parent = 0, const char* name = 0);
     QmitkDataTreeListView(mitk::DataTreeIteratorBase* filter,QWidget* parent = 0, const char* name = 0);
     ~QmitkDataTreeListView();
 
-    void SetDataTree(mitk::DataTree*);
+    void SetDataTree(mitk::DataTreeBase*);
     void SetDataTree(mitk::DataTreeIteratorBase*);
 
     void SetFilter(mitk::DataTreeFilter*);
@@ -74,6 +74,8 @@ class QmitkDataTreeListView : public QWidget, public QmitkListViewItemIndex
     int m_StretchedColumn;
 
     QSize m_SizeHint;
+    
+    mitk::DataTreeFilter::Pointer m_PrivateFilter;
 };
 
 #endif

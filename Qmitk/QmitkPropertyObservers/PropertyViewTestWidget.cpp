@@ -136,6 +136,8 @@ PropertyViewTest::PropertyViewTest(bool stay, QWidget* parent, const char* name)
 //QVBoxLayout* vlright = new QVBoxLayout(this, QBoxLayout::TopToBottom);
   
   treelistview = new QmitkDataTreeListView(tree_filter, this);
+  // alternative constructor, will create default filter
+  //treelistview = new QmitkDataTreeListView(data_tree, this);
   treelistview->setStretchedColumn(2);
 
 //vlright->addWidget(treelistview);

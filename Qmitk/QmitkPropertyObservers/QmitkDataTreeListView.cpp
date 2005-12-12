@@ -24,7 +24,7 @@ QmitkDataTreeListView::QmitkDataTreeListView(mitk::DataTreeFilter* filter,QWidge
   SetFilter(filter);
 }
 
-QmitkDataTreeListView::QmitkDataTreeListView(mitk::DataTree* tree,QWidget* parent, const char* name)
+QmitkDataTreeListView::QmitkDataTreeListView(mitk::DataTreeBase* tree,QWidget* parent, const char* name)
 : QWidget(parent, name),
   QmitkListViewItemIndex(),
   m_DataTreeFilter(NULL)
@@ -54,14 +54,31 @@ QmitkDataTreeListView::~QmitkDataTreeListView()
 {
 }
 
-void QmitkDataTreeListView::SetDataTree(mitk::DataTree* tree)
+void QmitkDataTreeListView::SetDataTree(mitk::DataTreeBase* tree)
 {
-  // create default filter if neccessary
+  if (tree)
+  {
+    // create default filter with visibility (editable) and name (non-editable)
+    m_PrivateFilter = mitk::DataTreeFilter::New(tree);
+    m_PrivateFilter->SetFilter(&mitk::IsGoodDataTreeNode);
+    mitk::DataTreeFilter::PropertyList visible;
+    visible.push_back("visible");
+    visible.push_back("name");
+    m_PrivateFilter->SetVisibleProperties(visible);
+    mitk::DataTreeFilter::PropertyList editable;
+    editable.push_back("visible");
+    m_PrivateFilter->SetEditableProperties(editable);
+    
+    m_DataTreeFilter = m_PrivateFilter;
+    GenerateItems();
+  }
 }
 
-void QmitkDataTreeListView::SetDataTree(mitk::DataTreeIteratorBase*)
+void QmitkDataTreeListView::SetDataTree(mitk::DataTreeIteratorBase* iterator)
 {
   // create default filter if neccessary
+  if (iterator && iterator->GetTree())
+    SetDataTree(iterator->GetTree());
 }
 
 void QmitkDataTreeListView::SetFilter(mitk::DataTreeFilter* filter)
@@ -161,48 +178,56 @@ void QmitkDataTreeListView::mouseReleaseEvent ( QMouseEvent* e )
   mitk::DataTreeFilter::Item* item = index->itemAt(row);
 
   bool selected(false);
-  
-  if (item)
-  {
-    selected = !item->IsSelected();
-    item->SetSelected( selected ); // toggle selection
-  }
- 
-  temp = index;
-  temp->lockBecauseOfSelection( selected );
-  while ((temp = temp->parentIndex()))
-  {
-    temp->lockBecauseOfSelection( selected );
-  }
-  
-  try
-  {
-    // set clicked row's widget backgrounds according to the selection status
-    std::list<QWidget*>& widgets( index->widgetsAt(row) );
-  
-  std::list<QWidget*>::reverse_iterator iter;
-  for ( iter = widgets.rbegin(), ++iter; iter != widgets.rend(); ++iter) // ignore last item (expander symbol)
-  {
-    if (selected)
-    {
-      (*iter)->setBackgroundMode(Qt::PaletteHighlight);
-    
-      // following lines seem too complicated, but I could not find an easier way of changing the foreground color
-      QPalette palette( (*iter)->palette() );
-      palette.setColor( QColorGroup::Foreground, palette.color( QPalette::Active, QColorGroup::HighlightedText ) );
-      (*iter)->setPalette( palette );
-    }
-    else
-    {
-      (*iter)->setBackgroundMode( Qt::PaletteBase );
-      (*iter)->unsetPalette();
-    }
-  }
 
-  }
-  catch (std::out_of_range)
+  if ( e->button() == Qt::LeftButton )
   {
-    // no recovery
+  
+    if (item)
+    {
+      selected = !item->IsSelected();
+      item->SetSelected( selected ); // toggle selection
+    }
+ 
+    temp = index;
+    temp->lockBecauseOfSelection( selected );
+    while ((temp = temp->parentIndex()))
+    {
+      temp->lockBecauseOfSelection( selected );
+    }
+  
+    try
+    {
+      // set clicked row's widget backgrounds according to the selection status
+      std::list<QWidget*>& widgets( index->widgetsAt(row) );
+  
+    std::list<QWidget*>::reverse_iterator iter;
+    for ( iter = widgets.rbegin(), ++iter; iter != widgets.rend(); ++iter) // ignore last item (expander symbol)
+    {
+      if (selected)
+      {
+        (*iter)->setBackgroundMode(Qt::PaletteHighlight);
+      
+        // following lines seem too complicated, but I could not find an easier way of changing the foreground color
+        QPalette palette( (*iter)->palette() );
+        palette.setColor( QColorGroup::Foreground, palette.color( QPalette::Active, QColorGroup::HighlightedText ) );
+        (*iter)->setPalette( palette );
+      }
+      else
+      {
+        (*iter)->setBackgroundMode( Qt::PaletteBase );
+        (*iter)->unsetPalette();
+      }
+    }
+
+    }
+    catch (std::out_of_range)
+    {
+      // no recovery
+    }
+  }
+  else // not left mouse button
+  {
+    // future enhancement. signal with item as parameter -> opportunity to generate a popup menu
   }
 
   update();
@@ -275,7 +300,8 @@ void QmitkDataTreeListView::AddItemsToList(QWidget* parent, QmitkListViewItemInd
       QmitkListViewExpanderIcon* childExpander = new QmitkListViewExpanderIcon(childrenGridLayout, index, parent);
       childExpander->setBackgroundMode( Qt::PaletteBase );
       
-      index->addMultiCellWidget(childExpander, row, row+1, 0, 0, Qt::AlignTop); 
+      index->addWidget(childExpander, row, 0, Qt::AlignVCenter); 
+      //index->addMultiCellWidget(childExpander, row, row+1, 0, 0, Qt::AlignTop); 
                                         // fromRow, toRow, fromCol, toCol
       index->addIndex(childExpander, row); 
      

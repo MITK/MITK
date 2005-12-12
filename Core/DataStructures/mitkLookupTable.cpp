@@ -19,10 +19,12 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkLookupTable.h"
 #include "itkProcessObject.h"
+#include <mitkXMLWriter.h>
 
 #include <vtkColorTransferFunction.h>
 #include <vtkPiecewiseFunction.h>
 
+const std::string mitk::LookupTable::XML_NODE_NAME = "lookupTable";
 
 mitk::LookupTable::LookupTable()
 {
@@ -238,4 +240,19 @@ void mitk::LookupTable::CreateOpacityTransferFunction(vtkPiecewiseFunction*& opa
   opacityFunction->BuildFunctionFromTable(m_LookupTable->GetTableRange()[0], m_LookupTable->GetTableRange()[1], num_of_values-1, alphasHead);
 
   free(alphasHead);
+}
+
+bool mitk::LookupTable::WriteXMLData( XMLWriter& xmlWriter )
+{
+  return true;
+}
+ 
+bool mitk::LookupTable::ReadXMLData( XMLReader& xmlReader )
+{
+  return true;
+}
+ 
+const std::string& mitk::LookupTable::GetXMLNodeName() const
+{
+  return XML_NODE_NAME;
 }

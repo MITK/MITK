@@ -24,6 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "vtkLookupTable.h"
 #include <itkDataObject.h>
 #include <itkObjectFactory.h>
+#include <mitkXMLIO.h>
 
 class vtkColorTransferFunction;
 class vtkPiecewiseFunction;
@@ -36,7 +37,7 @@ namespace mitk
 //## @brief LookupTable containing a vtkLookupTable
 //## @ingroup Data
 //##
-class LookupTable : public itk::DataObject 
+class LookupTable : public itk::DataObject, public XMLIO
 {
 public:
     /** 
@@ -117,7 +118,16 @@ public:
 
     void CreateColorTransferFunction(vtkColorTransferFunction*& colorFunction);
     void CreateOpacityTransferFunction(vtkPiecewiseFunction*& opacityFunction);
+
+    virtual bool WriteXMLData( XMLWriter& xmlWriter );
+
+    virtual bool ReadXMLData( XMLReader& xmlReader );
+
+    static const std::string XML_NODE_NAME;
+
 protected:
+
+    virtual const std::string& GetXMLNodeName() const;
 
     vtkLookupTable* m_LookupTable;
 

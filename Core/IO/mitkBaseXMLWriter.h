@@ -8,7 +8,15 @@
 
 namespace mitk{
 
-	class BaseXMLWriter {
+//##Documentation
+//## @brief Base class for the XML writer.
+//## Implements methods for writing a XML file.
+//##
+//## Note - the functions WriteProperty() are used to write XML attributes.
+//##
+//## This XML writer concept supports to store the data with XML attributes.
+
+  class BaseXMLWriter {
 
     class StreamNode
     {
@@ -28,100 +36,100 @@ namespace mitk{
     };
 
     std::stack<StreamNode*> m_Stack;
-		std::ostream* m_Out;
-		int m_Increase;
-		int m_Space;
-		int m_NodeCount;
-		bool m_File;
-		bool m_FirstNode;
+    std::ostream* m_Out;
+    int m_Increase;
+    int m_Space;
+    int m_NodeCount;
+    bool m_File;
+    bool m_FirstNode;
 
-	public:
+  public:
 
-		/**
-		 * Construktor
-		 */
-		BaseXMLWriter( const char* filename, int space = 3);
+    /**
+     * Construktor
+     */
+    BaseXMLWriter( const char* filename, int space = 3);
 
-		/**
-		 * Construktor
-		 */
-		BaseXMLWriter( std::ostream& out, int space = 3 );
+    /**
+     * Construktor
+     */
+    BaseXMLWriter( std::ostream& out, int space = 3 );
 
-		/**
-		 * Destruktor
-		 */
-		virtual ~BaseXMLWriter();
+    /**
+     * Destruktor
+     */
+    virtual ~BaseXMLWriter();
 
-		/*
-		 * begin an new node
-		 */
-		void BeginNode( const std::string& name );
+    /*
+     * begins a new XML node
+     */
+    void BeginNode( const std::string& name );
 
-		/**
-		 * close an open node
-		 */
-		void EndNode( );
+    /**
+     * closes an open XML node
+     */
+    void EndNode( );
 
-		/**
-		 * Write string Property
-		 */
-		void WriteProperty( const std::string& key, const char* value ) const;
+    /**
+     * Writes a string XML attribute
+     */
+    void WriteProperty( const std::string& key, const char* value ) const;
 
-		/**
-		 * Write string Property
-		 */
-		void WriteProperty( const std::string& key, const std::string& value ) const;
+    /**
+     * Writes a string XML attribute
+     */
+    void WriteProperty( const std::string& key, const std::string& value ) const;
 
-		/**
-		 * Write int Property
-		 */
-		void WriteProperty( const std::string& key, int value ) const;
+    /**
+     * Writes a int XML attribute
+     */
+    void WriteProperty( const std::string& key, int value ) const;
 
-		/**
-		 * Write float Property
-		 */
-		void WriteProperty( const std::string& key, float value ) const;
+    /**
+     * Writes a float XML attribute
+     */
+    void WriteProperty( const std::string& key, float value ) const;
 
-		/**
-		 * Write double Property
-		 */
-		void WriteProperty( const std::string& key, double value ) const;
+    /**
+     * Writes a double XML attribute
+     */
+    void WriteProperty( const std::string& key, double value ) const;
 
-		/**
-		 * Write bool Property
-		 */
-		void WriteProperty( const std::string& key, bool value ) const;
+    /**
+     * Writes a bool XML attribute
+     */
+    void WriteProperty( const std::string& key, bool value ) const;
 
-		/**
-		 * Write comment
-		 */
-		void WriteComment( const std::string& key );
-	
-		/**
-		 * retun the current deph
-		 */
-		int GetCurrentDeph() const;
+    /**
+     * Writes a comment
+     */
+    void WriteComment( const std::string& key );
+  
+    /**
+     * retun the current deph
+     */
+    int GetCurrentDeph() const;
 
-		/**
-		 * Get the current count of nodes
-		 */
-		int GetNodeCount() const;
+    /**
+     * Get the current count of nodes
+     */
+    int GetNodeCount() const;
 
-		/**
-		 * Get the space
-		 */
-		int GetSpace() const;
+    /**
+     * Get the space
+     */
+    int GetSpace() const;
 
-		/**
-		 *
-		 */
-		void SetSpace( int space );
+    /**
+     *
+     */
+    void SetSpace( int space );
 
 protected:
-		/**
-		 * replace char < and > through { and }
-		 */
-		const char* ConvertString( const char* string ) const;
-	};
+    /**
+     * replace char < and > through { and }
+     */
+    const char* ConvertString( const char* string ) const;
+  };
 }
 #endif // MITK_BASE_XML_WRITER

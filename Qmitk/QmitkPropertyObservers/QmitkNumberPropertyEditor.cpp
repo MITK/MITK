@@ -97,12 +97,14 @@ void QmitkNumberPropertyEditor::adjustFactors(short newDecimalPlaces, bool newSh
 
   m_FactorPropertyToSpinbox = pow(10,m_DecimalPlaces);
   m_FactorSpinboxToDisplay = 1.0 / m_FactorPropertyToSpinbox;
-  setLineStep( ROUND(m_FactorPropertyToSpinbox) );
+
+  // commented line would set the default increase/decrease to 1.0, no matter how many decimal places are available
+  //setLineStep( ROUND(m_FactorPropertyToSpinbox) );
        
   if ( m_ShowPercents )
   {
     m_FactorPropertyToSpinbox *= 100.0;
-    setLineStep( ROUND(0.01 *m_FactorPropertyToSpinbox) );
+    //setLineStep( ROUND(0.01 *m_FactorPropertyToSpinbox) );
     setSuffix("%");
   }
   else

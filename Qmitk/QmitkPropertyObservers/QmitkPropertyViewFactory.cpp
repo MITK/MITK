@@ -80,15 +80,19 @@ QWidget* QmitkPropertyViewFactory::CreateView(const mitk::BaseProperty* property
     // a number property
     return new QmitkNumberPropertyView(prop, parent, name);
   }
-  else
+  else if ( property != NULL )
   {
     // some unknown property --> use the GetValueAsString() method to 
     return new QmitkBasePropertyView(prop, parent, name);
   }
+
+  return NULL;
 }
 
 QWidget* QmitkPropertyViewFactory::CreateEditor(mitk::BaseProperty* property, unsigned int type, QWidget* parent, const char* name)
 {
+  if (!property) return NULL;
+
   if ( mitk::StringProperty* prop = dynamic_cast<mitk::StringProperty*>(property) )
   {
     // a string property
@@ -117,12 +121,16 @@ QWidget* QmitkPropertyViewFactory::CreateEditor(mitk::BaseProperty* property, un
   else if ( mitk::FloatProperty* prop = dynamic_cast<mitk::FloatProperty*>(property) )
   {
     // a number property
-    return new QmitkNumberPropertyEditor(prop, parent, name);
+    QmitkNumberPropertyEditor* pe = new QmitkNumberPropertyEditor(prop, parent, name);
+    pe->setDecimalPlaces(2);
+    return pe;
   }
   else if ( mitk::DoubleProperty* prop = dynamic_cast<mitk::DoubleProperty*>(property) )
   {
     // a number property
-    return new QmitkNumberPropertyEditor(prop, parent, name);
+    QmitkNumberPropertyEditor* pe = new QmitkNumberPropertyEditor(prop, parent, name);
+    pe->setDecimalPlaces(2);
+    return pe;
   }
   else
   {

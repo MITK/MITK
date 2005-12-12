@@ -23,7 +23,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <QmitkDataTreeListViewExpander.h>
 
-class QGridLayout;
 class QmitkListViewExpanderIcon;
 
 /// @brief Displays items of a mitk::DataTree
@@ -51,12 +50,13 @@ class QmitkDataTreeListView : public QWidget, public QmitkListViewItemIndex
 
     int stretchedColumn();
     void setStretchedColumn(int);
+   
+    virtual QSize sizeHint() const;
     
   protected:
 
     void initialize();
     void GenerateItems();
-
 
     void paintListBackground(QPainter& painter, QmitkListViewItemIndex* index);
     virtual void paintEvent(QPaintEvent*);
@@ -72,6 +72,8 @@ class QmitkDataTreeListView : public QWidget, public QmitkListViewItemIndex
 
     mitk::DataTreeFilter* m_DataTreeFilter;
     int m_StretchedColumn;
+
+    QSize m_SizeHint;
 };
 
 #endif

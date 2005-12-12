@@ -3,6 +3,7 @@
 
 #include <qlayout.h>
 #include <qpainter.h>
+#include <qobjectlist.h>
 
 #include <stdexcept>
 
@@ -43,7 +44,9 @@ QmitkDataTreeListView::QmitkDataTreeListView(mitk::DataTreeIteratorBase* iterato
 
 void QmitkDataTreeListView::initialize()
 {
-  m_StretchedColumn = -1;
+  //m_SizeHint = QSize(); // invalid size (default constructor)
+  
+  m_StretchedColumn = 2;
   setBackgroundMode( Qt::PaletteBase );
 }
 
@@ -89,6 +92,12 @@ int QmitkDataTreeListView::stretchedColumn()
 void QmitkDataTreeListView::setStretchedColumn(int col)
 {
   m_StretchedColumn = col;
+  GenerateItems();
+}
+
+QSize QmitkDataTreeListView::sizeHint() const
+{
+  return m_SizeHint;
 }
 
 void QmitkDataTreeListView::paintListBackground(QPainter& painter, QmitkListViewItemIndex* index)
@@ -97,7 +106,7 @@ void QmitkDataTreeListView::paintListBackground(QPainter& painter, QmitkListView
   {
     for (int row = 0; row < index->m_Grid->numRows(); ++row)
     {
-      if ( QmitkListViewItemIndex* temp = index->indexAt(row-1) )
+      if ( QmitkListViewItemIndex* temp = index->indexAt(row-1) ) 
         paintListBackground(painter, temp);
       else
       {
@@ -168,7 +177,7 @@ void QmitkDataTreeListView::mouseReleaseEvent ( QMouseEvent* e )
   
   try
   {
-    // set backgrounds of widgets accordingly
+    // set clicked row's widget backgrounds according to the selection status
     std::list<QWidget*>& widgets( index->widgetsAt(row) );
   
   std::list<QWidget*>::reverse_iterator iter;
@@ -293,7 +302,6 @@ void QmitkDataTreeListView::AddItemsToList(QWidget* parent, QmitkListViewItemInd
 
 void QmitkDataTreeListView::GenerateItems()
 {
-  resize(300,400);
   if (!m_DataTreeFilter) return;
 
   // query DataTreeFilter about items and properties, 
@@ -302,16 +310,27 @@ void QmitkDataTreeListView::GenerateItems()
   const mitk::DataTreeFilter::PropertyList&  visibleProps( m_DataTreeFilter->GetVisibleProperties() );
   const mitk::DataTreeFilter::PropertyList& editableProps( m_DataTreeFilter->GetEditableProperties() );
 
+  // delete all existing children
+  while ( !queryList()->isEmpty() )
+    delete queryList()->first();
+ 
+  // delete references to now deleted children
+  clearIndex();
+  
   // create a new layout grid
-  if (m_Grid) delete m_Grid;
   m_Grid = new QGridLayout( this, 1, visibleProps.size()+1 ); // 1 extra for expansion symbol
+  //m_Grid->setMargin(2);
   
   if (m_StretchedColumn == -1)
     m_StretchedColumn = visibleProps.size();
-
  
   // fill rows with property views for the visible items 
   AddItemsToList(this, this, m_DataTreeFilter->GetItems(), visibleProps, editableProps);
+  
+  m_SizeHint = m_Grid->sizeHint();
+
+  m_Grid->addItem( new QSpacerItem(1, 5, QSizePolicy::Minimum, QSizePolicy::Ignored) , m_Grid->numRows(),0);
+  m_Grid->setRowStretch( m_Grid->numRows()-1, 1 );
 }
 
 

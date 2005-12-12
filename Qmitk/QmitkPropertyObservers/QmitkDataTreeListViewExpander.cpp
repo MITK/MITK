@@ -177,6 +177,13 @@ QmitkListViewItemIndex* QmitkListViewItemIndex::parentIndex()
   return m_ParentIndex;
 }
 
+void QmitkListViewItemIndex::clearIndex() 
+{
+  m_Rows.clear();
+  m_Indices.clear();
+  m_Locked = 0;
+}
+
 //--- QmitkListViewExpanderIcon ---------------------------------------------
 QmitkListViewExpanderIcon::QmitkListViewExpanderIcon( QGridLayout* grid, QmitkListViewItemIndex* parentIndex, QWidget* parent, const char* name )
 : QLabel(parent, name),
@@ -194,7 +201,12 @@ bool QmitkListViewExpanderIcon::expanded()
 {
   return m_Expanded;
 }
-  
+ 
+QSize QmitkListViewExpanderIcon::sizeHint()
+{
+  return QSize(16, 16);
+}
+
 void QmitkListViewExpanderIcon::setExpanded(bool expanded)
 {
   m_Expanded = expanded;
@@ -202,6 +214,9 @@ void QmitkListViewExpanderIcon::setExpanded(bool expanded)
   displayCorrectIcon();
     
   setAllChildrenVisible(m_Expanded);
+
+  if (parent()) 
+    static_cast<QWidget*>(parent())->update(); // redraw
 }
 
 void QmitkListViewExpanderIcon::mouseReleaseEvent ( QMouseEvent * e )

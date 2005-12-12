@@ -41,6 +41,7 @@ PropertyViewTest::PropertyViewTest(bool stay, QWidget* parent, const char* name)
 :QWidget(parent,name),
  m_Stay(stay)
 {
+/**/
   QHBoxLayout* hl = new QHBoxLayout(this, QBoxLayout::LeftToRight);
   QVBoxLayout* vl = new QVBoxLayout(hl, QBoxLayout::TopToBottom);
  
@@ -129,11 +130,17 @@ PropertyViewTest::PropertyViewTest(bool stay, QWidget* parent, const char* name)
   numbereditor8->setShowPercent(true);
   numbereditor8->setDecimalPlaces(1);
   vl->addWidget(numbereditor8);
-
+/**/
   prepare_tree();
   
-  treelistview = new QmitkDataTreeListView(tree_filter, this);
+//QVBoxLayout* vlright = new QVBoxLayout(this, QBoxLayout::TopToBottom);
   
+  treelistview = new QmitkDataTreeListView(tree_filter, this);
+  treelistview->setStretchedColumn(2);
+
+//vlright->addWidget(treelistview);
+  
+/**/
   QVBoxLayout* vlright = new QVBoxLayout(hl, QBoxLayout::TopToBottom);
   //hl->addWidget( vlright );
   
@@ -141,12 +148,14 @@ PropertyViewTest::PropertyViewTest(bool stay, QWidget* parent, const char* name)
   
   // color prop view
   colorview = new QmitkColorPropertyView( propcolor, this );
-  vlright->addWidget(colorview, 10);
+  //vlright->addWidget(colorview, 10);
+  vlright->addWidget(colorview);
 
   // finally, a timer that starts some testing
   timer = new QTimer(this);
   connect ( timer, SIGNAL(timeout()), this, SLOT(run()) );
   timer->start(0, TRUE);
+/**/
 }
 
 void PropertyViewTest::prepare_tree()
@@ -169,26 +178,31 @@ void PropertyViewTest::prepare_tree()
   }
 
   mitk::DataTreePreOrderIterator it(data_tree);
-
+/*
   {
     mitk::DataTreeNode::Pointer node = mitk::DataTreeNode::New(); node->SetData(image);
     node->SetProperty("name", new mitk::StringProperty("Opa"));
+//    node->SetProperty("opacity", new mitk::FloatProperty(0.8));
     it.Set(node);
   }
+*/
   {
     mitk::DataTreeNode::Pointer node = mitk::DataTreeNode::New(); node->SetData(image);
     node->SetProperty("name", new mitk::StringProperty("Bruder"));
     node->SetProperty("visible", new mitk::BoolProperty(false));
+    node->SetProperty("opacity", new mitk::FloatProperty(0.8));
     it.Add(node);
   }
   {
     mitk::DataTreeNode::Pointer node = mitk::DataTreeNode::New(); node->SetData(image);
     node->SetProperty("name", new mitk::StringProperty("Ich"));
+    node->SetProperty("opacity", new mitk::FloatProperty(0.8));
     it.Add(node);
   }
   {
     mitk::DataTreeNode::Pointer node = mitk::DataTreeNode::New(); node->SetData(image);
     node->SetProperty("name", new mitk::StringProperty("Schwester"));
+    node->SetProperty("opacity", new mitk::FloatProperty(0.8));
     it.Add(node);
   }
 
@@ -197,23 +211,28 @@ void PropertyViewTest::prepare_tree()
   {
     mitk::DataTreeNode::Pointer node = mitk::DataTreeNode::New(); node->SetData(image);
     node->SetProperty("name", new mitk::StringProperty("Sohn"));
+//    node->SetProperty("opacity", new mitk::FloatProperty(0.8));
     it.Add(node);
   }
   {
     mitk::DataTreeNode::Pointer node = mitk::DataTreeNode::New(); node->SetData(image);
     node->SetProperty("name", new mitk::StringProperty("Tochter"));
     node->SetProperty("visible", new mitk::BoolProperty(false));
+    node->SetProperty("opacity", new mitk::FloatProperty(0.8));
     it.Add(node);
   }
 
   mitk::DataTreeFilter::PropertyList visible_props;
   visible_props.push_back("visible");
   visible_props.push_back("name");
+  visible_props.push_back("opacity");
   mitk::DataTreeFilter::PropertyList editable_props;
   editable_props.push_back("visible");
 //  editable_props.push_back("name");
+  editable_props.push_back("opacity");
   
   tree_filter = mitk::DataTreeFilter::New(data_tree);
+  tree_filter->SetFilter(&mitk::IsGoodDataTreeNode);
   tree_filter->SetVisibleProperties(visible_props);
   tree_filter->SetEditableProperties(editable_props);
           
@@ -257,8 +276,11 @@ PropertyViewTest::~PropertyViewTest()
   data_tree = 0;
 }
 
-  void PropertyViewTest::run() 
-  {
+void PropertyViewTest::run() 
+{
+  
+  /*
+     
     assert( baseview->text() == "Juhu" );
     assert( stringview->text() == "Juhu" );
     assert( stringeditor->text() == "Juhu" );
@@ -272,10 +294,12 @@ PropertyViewTest::~PropertyViewTest()
     assert( booleditor->isOn() );
 
     propbool->SetValue(false);
-  assert( !boolview->isOn() );
-  assert( !booleditor->isOn() );
+    assert( !boolview->isOn() );
+    assert( !booleditor->isOn() );
 
   if (!m_Stay)
     qApp->quit();
+
+  */
 }
     

@@ -35,6 +35,8 @@ class QmitkListViewItemIndex
     typedef std::vector< std::pair< mitk::DataTreeFilter::Item*, std::list<QWidget*> > > RowStructureType;
 
     QmitkListViewItemIndex();
+    void clearIndex();
+    
     RowStructureType m_Rows;
     std::vector<QmitkListViewItemIndex*> m_Indices;
 
@@ -55,6 +57,8 @@ class QmitkListViewExpanderIcon : public QLabel, public QmitkListViewItemIndex
 
     bool expanded();
     void setExpanded(bool);
+
+    virtual QSize sizeHint();
     
   protected:
    

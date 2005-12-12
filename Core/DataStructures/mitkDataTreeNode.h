@@ -185,6 +185,17 @@ public:
   //## @return @a true property was found
   bool GetLevelWindow(mitk::LevelWindow &levelWindow, mitk::BaseRenderer* renderer, const char* propertyKey = "levelwindow") const;
 
+  //## 
+  //##Documentation 
+  //## @brief set the node as selected
+  void SetSelected(bool selected, mitk::BaseRenderer* renderer=NULL);
+
+  //## 
+  //##Documentation 
+  //## @brief set the node as selected
+  //## @return @a true node is selected
+  bool IsSelected(mitk::BaseRenderer* renderer=NULL);
+
   //##Documentation
   //## @brief Convenience access method for accessing the name of an object (instance of
   //## StringProperty with property-key "name")

@@ -520,3 +520,58 @@ const std::string& mitk::DataTreeNode::GetXMLNodeName() const
 {
   return XML_NODE_NAME;
 }
+
+void mitk::DataTreeNode::SetSelected(bool selected, mitk::BaseRenderer* renderer)
+{
+  mitk::BoolProperty* selectedProperty = dynamic_cast<mitk::BoolProperty*>(GetProperty("selected").GetPointer());
+
+  if ( selectedProperty == NULL ) 
+  {
+    selectedProperty = new mitk::BoolProperty();
+    selectedProperty->SetValue(false);
+    SetProperty("selected", selectedProperty, renderer);	
+  }
+
+  if( selectedProperty->GetValue() != selected ) 
+  {
+    selectedProperty->SetValue(selected);
+    itk::ModifiedEvent event;
+    InvokeEvent( event );
+  }
+}
+
+/*
+class SelectedEvent : public itk::ModifiedEvent
+{ 
+public: 
+  typedef SelectedEvent Self; 
+  typedef itk::ModifiedEvent Superclass; 
+
+  SelectedEvent(DataTreeNode* dataTreeNode)
+    { m_DataTreeNode = dataTreeNode; };
+  DataTreeNode* GetDataTreeNode() 
+    { return m_DataTreeNode; };
+  virtual const char * GetEventName() const 
+    { return "SelectedEvent"; } 
+  virtual bool CheckEvent(const ::itk::EventObject* e) const 
+    { return dynamic_cast<const Self*>(e); } 
+  virtual ::itk::EventObject* MakeObject() const 
+    { return new Self(m_DataTreeNode); } 
+private: 
+  DataTreeNode* m_DataTreeNode;
+  SelectedEvent(const Self& event)
+    { m_DataTreeNode = event.m_DataTreeNode; }; 
+  void operator=(const Self& event)
+  { m_DataTreeNode = event.m_DataTreeNode; }
+};
+*/
+
+bool mitk::DataTreeNode::IsSelected(mitk::BaseRenderer* renderer)
+{
+  bool selected;
+
+  if ( !GetBoolProperty("selected", selected, renderer) )
+    return false;
+
+  return selected;
+}

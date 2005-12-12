@@ -12,7 +12,7 @@ Available sections:
   - \ref overview 
     - \ref inthisgroup
     - \ref notinthisgroup
-    - \ref implement
+  - \ref implement
   - \ref seealso
   - \ref future
   
@@ -65,7 +65,7 @@ Some examples for things that should not be implemented as functionality
  - a control that lists available segmentations
  - a control that shows information about certain scene elements
 
-  \subsection implement Practical issues
+  \section implement Practical issues
 
 Technically a functionality is a derivative class of QmitkFunctionality. The
 functionality object gets an mitk::DataTreeIteratorBase when it is created and

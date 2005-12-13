@@ -3,8 +3,16 @@
 
 #include "mitkBaseXMLWriter.h"
 #include <mitkVector.h>
+#include <itkRGBAPixel.h>
+#include <itkRGBPixel.h>
+#include <vtkSystemIncludes.h>
 
 namespace mitk{
+
+//##Documentation
+//## @brief derived class of BaseXMLWriter.
+//##
+//## Note - the functions WriteProperty() are used to write XML attributes.
 
   class XMLWriter : public BaseXMLWriter {
 
@@ -13,22 +21,25 @@ namespace mitk{
     int m_FileCounter;
     static std::string m_ImageExtension;
 
-	public:
+  public:
 
-		/**
-		 * Construktor
-		 */
-		XMLWriter( const char* filename, const char* subDirectory, int space = 3);
+    /**
+     * Construktor
+     */
+    XMLWriter( const char* filename, const char* subDirectory, int space = 3);
 
-		/**
-		 * Construktor
-		 */
-		XMLWriter( std::ostream& out, int space = 3 );
+    /**
+     * Construktor
+     */
+    XMLWriter( std::ostream& out, int space = 3 );
 
-		/**
-		 * Destruktor
-		 */
-		virtual ~XMLWriter();
+    /**
+     * Destruktor
+     */
+    virtual ~XMLWriter();
+
+    typedef itk::RGBAPixel< vtkFloatingPointType >  RGBAType;
+    typedef itk::RGBPixel<vtkFloatingPointType> Color;
 
     void WriteProperty( const std::string& key, const char* value ) const;
     void WriteProperty( const std::string& key, const std::string& value ) const;
@@ -37,21 +48,35 @@ namespace mitk{
     void WriteProperty( const std::string& key, double value ) const;
     void WriteProperty( const std::string& key, bool value ) const;
 
-		/**
-		 * Write bool Property
-		 */
+    /**
+     * Writes a mitk::Point3D XML attribute
+     */
     void WriteProperty( const std::string& key, const mitk::Point3D& value ) const;
+
+    /**
+     * Writes a mitk::Point4D XML attribute
+     */
     void WriteProperty( const std::string& key, const mitk::Point4D& value ) const;
 
-		/**
-		 * Write bool Property
-		 */
+    /**
+     * Writes a mitk::Vector3D XML attribute
+     */
     void WriteProperty( const std::string& key, const mitk::Vector3D& value ) const;
 
-		/**
-		 * Write bool Property
-		 */
+    /**
+     * Writes a itk::Point<int,3> XML attribute
+     */
     void WriteProperty( const std::string& key, const itk::Point<int,3> value ) const;
+
+    /**
+     * Writes a RGBAType XML attribute
+     */
+    void WriteProperty( const std::string& key, RGBAType value ) const;
+
+    /**
+     * Writes a RGBType XML attribute
+     */
+    void WriteProperty( const std::string& key, Color value ) const;
 
     /**
      * get the subfolder of the xml-File. 
@@ -76,6 +101,6 @@ namespace mitk{
     void SetImageExtension( const std::string& imageExtension );
 
     const std::string GetImageExtension();
-	};
+  };
 }
 #endif

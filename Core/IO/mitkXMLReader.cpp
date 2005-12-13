@@ -31,15 +31,11 @@ namespace mitk {
   const std::string XMLReader::MAX = "MAX";
   const std::string XMLReader::VALID = "VALID";
   
-  /**
-   *
-   */
+
   XMLReader::XMLReader( const mitk::DataTreeIteratorBase* it )
     :vtkXMLParser(), m_Root(NULL), m_CurrentNode(NULL), m_CurrentPosition(const_cast<mitk::DataTreeIteratorBase*>(it)) { }
 
-  /**
-   *
-   */
+
   bool XMLReader::Load( std::string fileName, const mitk::DataTreeIteratorBase* it )
   {
    if ( fileName.empty() )
@@ -64,9 +60,7 @@ namespace mitk {
    return true;
   }
 
-  /**
-   *
-   */
+
   bool XMLReader::GetAttribute( std::string name, std::string& value ) const
   {
     if ( !m_CurrentNode )
@@ -81,9 +75,7 @@ namespace mitk {
     return true;
   }
   
-  /**
-   *
-   */
+
   bool XMLReader::GetAttribute( std::string name, float& value ) const
   {  
     if ( !m_CurrentNode )
@@ -98,9 +90,7 @@ namespace mitk {
     return true;
   }
   
-  /**
-   *
-   */
+
   bool XMLReader::GetAttribute( std::string name, double& value ) const
   {
     if ( !m_CurrentNode )
@@ -115,9 +105,7 @@ namespace mitk {
     return true;  
   }
   
-  /**
-   *
-   */
+
   bool XMLReader::GetAttribute( std::string name, int& value ) const
   {
     if ( !m_CurrentNode )
@@ -133,9 +121,7 @@ namespace mitk {
     return true;
   }
   
-  /**
-   *
-   */
+
   bool XMLReader::GetAttribute( std::string name, bool& value ) const
   {
     if ( !m_CurrentNode )
@@ -154,9 +140,7 @@ namespace mitk {
     return true;
   }
 
-  /**
-   *
-   */
+
   bool XMLReader::GetAttribute( std::string name, mitk::Point3D& value ) const
   {
     std::string string;
@@ -182,9 +166,6 @@ namespace mitk {
   }
 
 
-  /**
-   *
-   */
   bool XMLReader::GetAttribute( std::string name, mitk::Vector3D& value ) const
   {
     mitk::Point3D point;
@@ -195,9 +176,7 @@ namespace mitk {
     return true;
   }
 
-  /**
-   *
-   */
+
   bool XMLReader::GetAttribute( std::string name, itk::Point<int,3>& value ) const
   {
     std::string string;
@@ -217,9 +196,6 @@ namespace mitk {
   }
 
 
-  /**
-   *
-   */
   bool XMLReader::GetAttribute( std::string name, mitk::AffineGeometryFrame3D::TransformType& value ) const
   {
     AffineGeometryFrame3D::TransformType::MatrixType matrix;
@@ -257,9 +233,47 @@ namespace mitk {
     return true;
   }
 
-  /**
-   *
-   */
+
+  bool XMLReader::GetAttribute( std::string name, RGBAType& value ) const
+  {
+    std::string string;
+
+    if ( !GetAttribute( name, string ) )
+      return false;
+
+    int e0 = string.find( " " );
+    int e1 = string.find( " ", e0 + 1 );
+    int e2 = string.find( " ", e1 + 1 );
+    int e3 = string.length()-1;
+
+    value[0] = atof( string.substr( 0, e0 ).c_str() );
+    value[1] = atof( string.substr( e0 + 1, e1 - e0 - 1).c_str() );
+    value[2] = atof( string.substr( e1 + 1, e2 - e1 - 1 ).c_str() );
+    value[3] = atof( string.substr( e2 + 1, e3 - e2 ).c_str() );
+
+    return true;
+  }
+
+
+  bool XMLReader::GetAttribute( std::string name, Color& value ) const
+  {
+    std::string string;
+
+    if ( !GetAttribute( name, string ) )
+      return false;
+
+    int e0 = string.find( " " );
+    int e1 = string.find( " ", e0 + 1 );
+    int e2 = string.length()-1;
+
+    value[0] = atof( string.substr( 0, e0 ).c_str() );
+    value[1] = atof( string.substr( e0 + 1, e1 - e0 - 1).c_str() );
+    value[2] = atof( string.substr( e1 + 1, e2 - e1 ).c_str() );
+
+    return true;
+  }
+
+
   void XMLReader::Build()
   {
     if ( !m_Root )
@@ -278,9 +292,7 @@ namespace mitk {
     m_ConnectorList.clear();
   }
 
-  /**
-   *
-   */
+
   void XMLReader::StartElement( const char *elementName, const char **atts )
   {
     std::string name( elementName );
@@ -310,9 +322,7 @@ namespace mitk {
 
   }
 
-  /**
-   *
-   */
+
   void  XMLReader::EndElement( const char *name )
   {
     m_CurrentNode = m_CurrentNode->GetParent();
@@ -321,9 +331,7 @@ namespace mitk {
       m_CurrentPosition->GoToParent();
   }
 
-  /**
-   *
-   */
+
   std::string mitk::XMLReader::ReadXMLStringAttribut( std::string name, const char** atts ) const
   {
     if(atts)
@@ -345,9 +353,7 @@ namespace mitk {
       return std::string();
   }
 
-  /**
-   *
-   */
+
   bool XMLReader::Goto( const std::string& name )
   {
     if ( !m_CurrentNode )
@@ -371,9 +377,7 @@ namespace mitk {
     return false;
   }
 
-  /**
-   *
-   */
+
   bool XMLReader::GotoNext()
   {
     if ( !m_CurrentNode )
@@ -405,9 +409,7 @@ namespace mitk {
     return false;
   }
 
-  /**
-   *
-   */
+
   bool XMLReader::GotoParent()
   {
     if ( !m_CurrentNode )
@@ -418,9 +420,7 @@ namespace mitk {
     return true;
   }
 
-  /**
-   *
-   */
+
   itk::Object::Pointer XMLReader::CreateObject()
   {
     if ( !m_CurrentNode )
@@ -453,9 +453,7 @@ namespace mitk {
     }
   }
 
-  /** 
-   *
-   */
+
   void XMLReader::XMLNode::Add( XMLNode* node )
   {
     node->m_Parent = this;
@@ -518,9 +516,7 @@ namespace mitk {
 	  return buffer;
   }
 
-  /**
-   *
-   */
+
   itk::Object::Pointer XMLReader::XMLNode::CreateObject()
   {
     std::string className = GetProperty( XMLIO::CLASS_NAME );

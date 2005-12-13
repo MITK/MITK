@@ -9,27 +9,23 @@ This is a preliminary version and not yet official documentation.
 </b>
 
 Available sections:
-  - \ref overview 
-    - \ref inthisgroup
-    - \ref notinthisgroup
-  - \ref implement
-  - \ref seealso
-  - \ref future
+  - \ref overviewApplicationFunctionalities
+    - \ref inthisgroupApplicationFunctionalities
+    - \ref notinthisgroupApplicationFunctionalities
+  - \ref implementApplicationFunctionalities
+  - \ref seealsoApplicationFunctionalities
+  - \ref futureApplicationFunctionalities
   
 
-  \section overview Rationale and overview
+  \section overviewApplicationFunctionalities Rationale and overview
 
-So-called \e functionalities are currently the top-most layer of hidden 
-complexity within MITK. Functionalities facilitate the structured combination of
-modules. A functionality is a module for a specific task, combining a user 
-interface with algorithmic function. It consists of (compare screenshot)
+Functionalities facilitate the structured combination of modules for specific tasks.
+They combine a user interface with algorithmic function. A functionality consists of (compare screen-shot)
 
-\li an identification (name of the functionality, icon, tooltip, ...),
-\li a workspace area, where the main interaction with data objects is taking place,
+\li an identification (name of the functionality, icon, tool-tip, ...)
+\li a workspace area, where the main interaction with data objects is taking place
 \li a control area containing GUI elements to set parameters of the used algorithms
-\li the algorithmic implementation (not visible to the user).
-
-\image html PartsOfAFunctionaliy.jpg "The visible parts of a functionality. The algorithmic implementation, which is also part of a functionality has no visual representation."
+\li the algorithmic implementation (not visible to the user)
 
 Communication between functionalities is largely based on the data tree. Each 
 functionality accesses the data objects contained in the tree, changes them and/or 
@@ -37,10 +33,12 @@ creates new data objects. Other functionalities can continue to work on the chan
 and/or newly created data tree entries. By that, functionalities can communicate 
 without becoming dependent on each other.
   
-  
-  \subsection inthisgroup What belongs into this group 
+\image html PartsOfAFunctionaliy.jpg "The visible parts of a functionality. The algorithmic implementation, which is also part of a functionality has no visual representation."
 
-A functionality should comprise a complete set of controls that are neccessary to 
+  
+  \subsection inthisgroupApplicationFunctionalities What belongs into this group 
+
+A functionality should comprise a complete set of controls that are necessary to 
 complete a certain task, where the task should be on a reasonably high level that makes
 sense for the user of the application. 
 Before you consider a new functionality, check if the feature you want to implement could 
@@ -54,7 +52,7 @@ Possible examples for functionalities are:
  - "Vessel editing": a complete set of tools for working with a vessel tree (creating from segmentation,
     editing, annotation, searching, etc.
   
-  \subsection notinthisgroup What does belongs not into this group
+  \subsection notinthisgroupApplicationFunctionalities What does not belong into this group
 
 A set of controls that could possibly be of use in more than one context should not 
 be a functionality, but rather a widget. Widgets are good for sub-tasks from the user's 
@@ -65,7 +63,7 @@ Some examples for things that should not be implemented as functionality
  - a control that lists available segmentations
  - a control that shows information about certain scene elements
 
-  \section implement Practical issues
+  \section implementApplicationFunctionalities Practical issues
 
 Technically a functionality is a derivative class of QmitkFunctionality. The
 functionality object gets an mitk::DataTreeIteratorBase when it is created and
@@ -84,14 +82,14 @@ there is a "functionality mediator" of class QmitkFctMediator. A single instance
 of this object is created by the application and it is told about every
 functionality that should be available for the application. It is then the
 mediator's job to arrange the correct switching between functionalities, which
-involves calling the functionalities' Activated() and Deactived() methods and
+involves calling the functionalities' Activated() and Deactivated() methods and
 hiding/showing the correct main and control widgets for each functionality.
 
 The diagram below shows the important classes related to a functionality.
 
 \image html ModuleApplicationsFunctionalities.png "Classes related to a functionality"
 
- \section seealso See also
+ \section seealsoApplicationFunctionalities See also
  
  Documentation you should read
  
@@ -107,11 +105,11 @@ The diagram below shows the important classes related to a functionality.
 
  If you want to enhance the SampleApp, you should read the directions on \ref NewFunctionalityPage "how to create a new functionality".
   
-  \section future Plans for the future 
+  \section futureApplicationFunctionalities Plans for the future 
 
 One idea for future development is to change the current use of functionalities in a way that 
 different functionalities can be active at the same time. This would allow the user to select
-and arrange a sensible set of functionalities for his or her specific task at runtime. This would
+and arrange a sensible set of functionalities for his or her specific task at run-time. This would
 allow for more flexible applications.
 
 Implementing this idea would probably require changes to existing functionalities, since currently

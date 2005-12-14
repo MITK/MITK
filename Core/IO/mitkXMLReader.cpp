@@ -242,14 +242,14 @@ namespace mitk {
       return false;
 
     int e0 = string.find( " " );
-    int e1 = string.find( " ", e0 + 1 );
-    int e2 = string.find( " ", e1 + 1 );
+    int e1 = string.find( " ", e0 + 2 );
+    int e2 = string.find( " ", e1 + 2 );
     int e3 = string.length()-1;
 
     value[0] = atof( string.substr( 0, e0 ).c_str() );
-    value[1] = atof( string.substr( e0 + 1, e1 - e0 - 1).c_str() );
-    value[2] = atof( string.substr( e1 + 1, e2 - e1 - 1 ).c_str() );
-    value[3] = atof( string.substr( e2 + 1, e3 - e2 ).c_str() );
+    value[1] = atof( string.substr( e0 + 2, e1 - e0 - 2).c_str() );
+    value[2] = atof( string.substr( e1 + 2, e2 - e1 - 2 ).c_str() );
+    value[3] = atof( string.substr( e2 + 2, e3 - e2 - 1 ).c_str() );
 
     return true;
   }
@@ -263,12 +263,12 @@ namespace mitk {
       return false;
 
     int e0 = string.find( " " );
-    int e1 = string.find( " ", e0 + 1 );
+    int e1 = string.find( " ", e0 + 2 );
     int e2 = string.length()-1;
 
     value[0] = atof( string.substr( 0, e0 ).c_str() );
-    value[1] = atof( string.substr( e0 + 1, e1 - e0 - 1).c_str() );
-    value[2] = atof( string.substr( e1 + 1, e2 - e1 ).c_str() );
+    value[1] = atof( string.substr( e0 + 2, e1 - e0 - 2).c_str() );
+    value[2] = atof( string.substr( e1 + 2, e2 - e1 - 1).c_str() );
 
     return true;
   }

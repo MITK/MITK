@@ -475,6 +475,50 @@ void mitk::MaterialProperty::PrintSelf ( std::ostream &os ) const
   }
 }
 
+bool mitk::MaterialProperty::WriteXMLData( XMLWriter& xmlWriter )
+{
+  xmlWriter.WriteProperty( "COLOR", m_Color );
+  xmlWriter.WriteProperty( "COLOR_COEFFICIENT", m_ColorCoefficient );
+  //xmlWriter.WriteProperty( "SPECULAR_COEFFICIENT", m_SpecularCoefficient );
+  xmlWriter.WriteProperty( "SPECULARPOWER", m_SpecularPower );
+  xmlWriter.WriteProperty( "OPACITY", m_Opacity );
+  xmlWriter.WriteProperty( "INTERPOLATION", m_Interpolation );
+  xmlWriter.WriteProperty( "REPRESENTATION", m_Representation );
+  return true;
+}
+ 
+bool mitk::MaterialProperty::ReadXMLData( XMLReader& xmlReader )
+{
+  float specular, opacity, color_coeff; //specular_coeff;
+  int interpolation, representation;
+  Color color;
+
+  if (xmlReader.GetAttribute("COLOR", color)){
+    SetColor(color);
+  }
+
+  if (xmlReader.GetAttribute("COLOR_COEFFICIENT", color_coeff))
+    SetColorCoefficient(color_coeff);
+
+  //if (xmlReader.GetAttribute("SPECULAR_COEFFICIENT", specular_coeff))
+    //SetSpecularCoefficient(specular_coeff);
+
+  if (xmlReader.GetAttribute("SPECULARPOWER", specular))
+    SetSpecularPower(specular);
+
+  if(xmlReader.GetAttribute("OPACITY", opacity))
+    SetOpacity(opacity);
+
+  if(xmlReader.GetAttribute("INTERPOLATION", interpolation))
+    SetInterpolation((InterpolationType)interpolation);
+
+  if(xmlReader.GetAttribute("REPRESENTATION", representation))
+    SetRepresentation((RepresentationType)representation);
+
+  std::cout << "read mitk::MaterialProperty: " << " " << std::endl;
+  return true;
+}
+
 const char* mitk::MaterialProperty::COLOR_KEY = "color";
 const char* mitk::MaterialProperty::SPECULAR_COLOR_KEY = "specular_color";
 const char* mitk::MaterialProperty::COLOR_COEFFICIENT_KEY = "color_coefficient";

@@ -323,6 +323,10 @@ public:
      * Dumps the properties to the out stream out
      */
     void PrintSelf ( std::ostream &os ) const;
+
+    virtual bool WriteXMLData( XMLWriter& xmlWriter );
+
+    virtual bool ReadXMLData( XMLReader& xmlReader );
     
 protected:
 

@@ -366,7 +366,7 @@ void mitk::ImageMapper2D::GenerateData(mitk::BaseRenderer *renderer)
 
   assert(normal.GetSquaredNorm()>0.1);
 
-  if ( (width <= 1) && (height <= 1) )
+  if ( (width <= 2) && (height <= 2) )
   {
     return;
   }

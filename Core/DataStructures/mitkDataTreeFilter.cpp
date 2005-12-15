@@ -189,6 +189,8 @@ void DataTreeFilter::Item::SetSelected(bool selected)
       if ( m_TreeFilter->m_SelectionMode == mitk::DataTreeFilter::SINGLE_SELECT )
       { // deselect last selected item
         m_TreeFilter->m_SelectedItems.erase( m_TreeFilter->m_LastSelectedItem.GetPointer() );
+        m_TreeFilter->InvokeEvent(
+            mitk::TreeFilterSelectionChangedEvent(m_TreeFilter->m_LastSelectedItem.GetPointer(), false) );
       }
       
       if ( m_TreeFilter->m_LastSelectedItem.IsNotNull() ) // remember this item as most recently selected
@@ -200,6 +202,7 @@ void DataTreeFilter::Item::SetSelected(bool selected)
     {
       m_TreeFilter->m_SelectedItems.erase(this);
     }
+    m_TreeFilter->InvokeEvent( mitk::TreeFilterSelectionChangedEvent(this, selected) );
   }
 }
 
@@ -283,7 +286,7 @@ DataTreeFilter::~DataTreeFilter()
 void DataTreeFilter::SetPropertiesLabels(const PropertyList labels)
 {
   m_PropertyLabels = labels;
-  InvokeEvent( mitk::TreeFilterUpdateAllEvent() );
+  GenerateModelFromTree();
 }
 
 const DataTreeFilter::PropertyList& DataTreeFilter::GetPropertiesLabels() const
@@ -294,7 +297,7 @@ const DataTreeFilter::PropertyList& DataTreeFilter::GetPropertiesLabels() const
 void DataTreeFilter::SetVisibleProperties(const PropertyList keys)
 {
   m_VisibleProperties = keys;
-  InvokeEvent( mitk::TreeFilterUpdateAllEvent() );
+  GenerateModelFromTree();
 }
 
 const DataTreeFilter::PropertyList& DataTreeFilter::GetVisibleProperties() const
@@ -305,7 +308,7 @@ const DataTreeFilter::PropertyList& DataTreeFilter::GetVisibleProperties() const
 void DataTreeFilter::SetEditableProperties(const PropertyList keys)
 {
   m_EditableProperties = keys;
-  InvokeEvent( mitk::TreeFilterUpdateAllEvent() );
+  GenerateModelFromTree();
 }
 
 const DataTreeFilter::PropertyList& DataTreeFilter::GetEditableProperties() const
@@ -316,7 +319,7 @@ const DataTreeFilter::PropertyList& DataTreeFilter::GetEditableProperties() cons
 void DataTreeFilter::SetRenderer(const mitk::BaseRenderer* renderer)
 {
   m_Renderer = renderer;
-  InvokeEvent( mitk::TreeFilterUpdateAllEvent() );
+  GenerateModelFromTree();
 }
       
 const mitk::BaseRenderer* DataTreeFilter::GetRenderer() const
@@ -384,7 +387,6 @@ void DataTreeFilter::SelectItem(const Item* item, bool selected)
   // Ich const_caste mir die Welt, wie sie mir gefällt :-)
   // Aber die Items gehören ja dem Filter, deshalb ist das ok
   const_cast<Item*>(item) -> SetSelected(selected);
-  InvokeEvent( mitk::TreeFilterSelectionChangedEvent( item, selected ) );
 }
 
 void DataTreeFilter::TreeNodeChange(const itk::EventObject& e)
@@ -400,6 +402,7 @@ void DataTreeFilter::TreeNodeChange(const itk::EventObject& e)
                                               // line here has to be removed. But probably
                                               // nobody should set a node to NULL
 
+  // nothing is known about real TreeNodeChange events so we play safe and regenerate all
   GenerateModelFromTree();
 }
 
@@ -527,7 +530,7 @@ void DataTreeFilter::TreePrune(const itk::EventObject& e)
   // clean selected list
   ++listLastIter; // erase does delete until the item _before_ the second iterator
 
-  InvokeEvent( mitk::TreeFilterRemoveChildrenEvent( item->m_Parent ) );
+  InvokeEvent( mitk::TreeFilterRemoveChildrenEvent( item->m_Parent ) );  // first tell everything is deleted
   list->erase( listFirstIter, listLastIter );
     
   // renumber items of the remaining list
@@ -535,7 +538,7 @@ void DataTreeFilter::TreePrune(const itk::EventObject& e)
   for ( listFirstIter = list->begin(); listFirstIter != list->end(); ++listFirstIter, ++i )
   {
     (*listFirstIter)->m_Index = i;
-    InvokeEvent( mitk::TreeFilterItemAddedEvent( *listFirstIter ) );
+    InvokeEvent( mitk::TreeFilterItemAddedEvent( *listFirstIter ) );  // then add some items again
   }
 
 }
@@ -562,19 +565,20 @@ void DataTreeFilter::TreeRemove(const itk::EventObject& e)
     for ( listIter = list->begin(); listIter != list->end(); ++listIter )
       if ( *listIter == item ) break;
 
+    InvokeEvent( mitk::TreeFilterRemoveChildrenEvent( item->m_Parent ) );
+    
     if ( item->m_Children->size() > 0 )
     {
       list->insert(listIter, item->m_Children->begin(), item->m_Children->end());
     }
   
-    InvokeEvent( mitk::TreeFilterRemoveChildrenEvent( item->m_Parent ) );
-    
     // because I'm not sure if the STL guarantees something about the position of an
     // iterator after insert, I once again look for the item to remove
 
     for ( listIter = list->begin(); listIter != list->end(); ++listIter )
       if ( *listIter == item ) break;
     
+    InvokeEvent( mitk::TreeFilterRemoveItemEvent(item) );
     list->erase(listIter);
   
     // renumber items of the remaining list

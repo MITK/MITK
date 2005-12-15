@@ -23,8 +23,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <QmitkDataTreeListViewExpander.h>
 
-class QmitkListViewExpanderIcon;
-
 /// @brief Displays items of a mitk::DataTreeBase
 class QmitkDataTreeListView : public QWidget, public QmitkListViewItemIndex
 {
@@ -45,24 +43,31 @@ class QmitkDataTreeListView : public QWidget, public QmitkListViewItemIndex
 
     void SetFilter(mitk::DataTreeFilter*);
 
-    const PropertyList& visibleProperties();
-    const PropertyList& editableProperties();
-
     int stretchedColumn();
     void setStretchedColumn(int);
    
     virtual QSize sizeHint() const;
+
+    // handler for event notification
+    void removeItemHandler( const itk::EventObject& e );
+    void removeChildrenHandler( const itk::EventObject& e );
+    void removeAllHandler( const itk::EventObject& e );
+    void selectionChangedHandler( const itk::EventObject& e );
+    void itemAddedHandler( const itk::EventObject& e );
+    void updateAllHandler( const itk::EventObject& e );
     
   protected:
 
     void initialize();
-    void GenerateItems();
+    void generateItems();
 
     void paintListBackground(QPainter& painter, QmitkListViewItemIndex* index);
     virtual void paintEvent(QPaintEvent*);
 
     virtual void mouseReleaseEvent (QMouseEvent*);
 
+    void clearItems();
+    
   private:
 
     void QmitkDataTreeListView::AddItemsToList(QWidget* parent, QmitkListViewItemIndex* index,
@@ -70,12 +75,26 @@ class QmitkDataTreeListView : public QWidget, public QmitkListViewItemIndex
                                                const mitk::DataTreeFilter::PropertyList& visibleProps,
                                                const mitk::DataTreeFilter::PropertyList editableProps);
 
+    void connectNotifications();
+    void disconnectNotifications();
+    
     mitk::DataTreeFilter* m_DataTreeFilter;
     int m_StretchedColumn;
 
     QSize m_SizeHint;
     
     mitk::DataTreeFilter::Pointer m_PrivateFilter;
+    const mitk::DataTreeFilter::Item* m_SkipItem;
+    const mitk::DataTreeFilter::Item* m_SkipItemParent;
+
+    unsigned long  m_RemoveItemConnection;
+    unsigned long  m_RemoveChildrenConnection;
+    unsigned long  m_RemoveAllConnection;
+    unsigned long  m_SelectionChangedConnection;
+    unsigned long  m_ItemAddedConnection;
+    unsigned long  m_UpdateAllConnection;
+
+    bool m_SelfCall;
 };
 
 #endif

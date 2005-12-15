@@ -180,14 +180,14 @@ void PropertyViewTest::prepare_tree()
   }
 
   mitk::DataTreePreOrderIterator it(data_tree);
-/*
+/**/
   {
     mitk::DataTreeNode::Pointer node = mitk::DataTreeNode::New(); node->SetData(image);
     node->SetProperty("name", new mitk::StringProperty("Opa"));
 //    node->SetProperty("opacity", new mitk::FloatProperty(0.8));
     it.Set(node);
   }
-*/
+/**/
   {
     mitk::DataTreeNode::Pointer node = mitk::DataTreeNode::New(); node->SetData(image);
     node->SetProperty("name", new mitk::StringProperty("Bruder"));
@@ -281,8 +281,6 @@ PropertyViewTest::~PropertyViewTest()
 void PropertyViewTest::run() 
 {
   
-  /*
-     
     assert( baseview->text() == "Juhu" );
     assert( stringview->text() == "Juhu" );
     assert( stringeditor->text() == "Juhu" );
@@ -301,7 +299,5 @@ void PropertyViewTest::run()
 
   if (!m_Stay)
     qApp->quit();
-
-  */
 }
     

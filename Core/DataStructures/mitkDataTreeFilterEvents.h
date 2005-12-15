@@ -17,7 +17,7 @@ itkEventMacro( TreeFilterRemoveAllEvent, itk::ModifiedEvent );
   { 
   public: 
     typedef TreeFilterItemEvent Self; 
-    typedef ModifiedEvent Superclass; 
+    typedef itk::ModifiedEvent Superclass; 
 
     TreeFilterItemEvent() 
       : m_ChangedItem( NULL ){}
@@ -46,12 +46,13 @@ itkEventMacro( TreeFilterRemoveAllEvent, itk::ModifiedEvent );
     { 
       return m_ChangedItem; 
     }
+    
+    TreeFilterItemEvent(const Self& s) : itk::ModifiedEvent(s), m_ChangedItem(s.m_ChangedItem) {}; 
 
   protected:
     const mitk::DataTreeFilter::Item* m_ChangedItem;
   
   private: 
-    TreeFilterItemEvent(const Self&); 
     void operator=(const Self&); 
 
   };
@@ -62,7 +63,7 @@ itkEventMacro( TreeFilterRemoveAllEvent, itk::ModifiedEvent );
   {
   public:
     typedef TreeFilterItemAddedEvent Self; 
-    typedef ModifiedEvent Superclass; 
+    typedef TreeFilterItemEvent Superclass; 
 
     TreeFilterItemAddedEvent() : TreeFilterItemEvent() {}
     TreeFilterItemAddedEvent(const mitk::DataTreeFilter::Item* item) : TreeFilterItemEvent(item) {}
@@ -73,19 +74,30 @@ itkEventMacro( TreeFilterRemoveAllEvent, itk::ModifiedEvent );
     { 
       return "TreeFilterItemAddedEvent"; 
     } 
+    
+    virtual bool CheckEvent(const ::itk::EventObject* e) const 
+    { 
+      return dynamic_cast<const Self*>(e); 
+    } 
+
+    virtual ::itk::EventObject* MakeObject() const 
+    { 
+      return new Self( m_ChangedItem ); 
+    } 
+    
+    TreeFilterItemAddedEvent(const Self& s) : TreeFilterItemEvent(s) {}; 
   
   private: 
-    TreeFilterItemAddedEvent(const Self&); 
     void operator=(const Self&); 
     
   };
 
-//------ TreeFilterSelectionChanged ------------------------------------------------------
+//------ TreeFilterSelectionChangedEvent -------------------------------------------------
   class TreeFilterSelectionChangedEvent : public TreeFilterItemEvent 
   {
   public:
     typedef TreeFilterSelectionChangedEvent Self; 
-    typedef ModifiedEvent Superclass; 
+    typedef TreeFilterItemEvent Superclass; 
 
     TreeFilterSelectionChangedEvent() : TreeFilterItemEvent() {}
     TreeFilterSelectionChangedEvent(const mitk::DataTreeFilter::Item* item, bool selected) : TreeFilterItemEvent(item), m_Selected(selected) {}
@@ -96,23 +108,33 @@ itkEventMacro( TreeFilterRemoveAllEvent, itk::ModifiedEvent );
     { 
       return "TreeFilterSelectionChangedEvent"; 
     } 
+    
+    virtual bool CheckEvent(const ::itk::EventObject* e) const 
+    { 
+      return dynamic_cast<const Self*>(e); 
+    } 
 
-    virtual bool IsSelected() { return m_Selected; }
+    virtual ::itk::EventObject* MakeObject() const 
+    { 
+      return new Self( m_ChangedItem, m_Selected ); 
+    } 
+
+    virtual bool IsSelected() const { return m_Selected; }
   
+    TreeFilterSelectionChangedEvent(const Self&s) : TreeFilterItemEvent(s) {}; 
   private: 
-    TreeFilterSelectionChangedEvent(const Self&); 
     void operator=(const Self&); 
 
     bool m_Selected;
     
   };
 
-//------ TreeFilterItemChangedEvent ------------------------------------------------------
+  //------ TreeFilterItemChangedEvent ------------------------------------------------------
   class TreeFilterItemChangedEvent : public TreeFilterItemEvent 
   {
   public:
     typedef TreeFilterItemChangedEvent Self; 
-    typedef ModifiedEvent Superclass; 
+    typedef TreeFilterItemEvent Superclass; 
 
     TreeFilterItemChangedEvent() : TreeFilterItemEvent() {}
     TreeFilterItemChangedEvent(const mitk::DataTreeFilter::Item* item) : TreeFilterItemEvent(item) {}
@@ -123,20 +145,30 @@ itkEventMacro( TreeFilterRemoveAllEvent, itk::ModifiedEvent );
     { 
       return "TreeFilterItemChangedEvent"; 
     } 
+    
+    virtual bool CheckEvent(const ::itk::EventObject* e) const 
+    { 
+      return dynamic_cast<const Self*>(e); 
+    } 
+
+    virtual ::itk::EventObject* MakeObject() const 
+    { 
+      return new Self( m_ChangedItem ); 
+    } 
+    
+    TreeFilterItemChangedEvent(const Self&s) : TreeFilterItemEvent(s) {}; 
   
   private: 
-    TreeFilterItemChangedEvent(const Self&); 
     void operator=(const Self&); 
     
   };
-  
   
 //------ TreeFilterRemoveItemEvent -------------------------------------------------------
   class TreeFilterRemoveItemEvent : public TreeFilterItemEvent 
   {
   public:
     typedef TreeFilterRemoveItemEvent Self; 
-    typedef ModifiedEvent Superclass; 
+    typedef TreeFilterItemEvent Superclass; 
 
     TreeFilterRemoveItemEvent() : TreeFilterItemEvent() {}
     TreeFilterRemoveItemEvent(const mitk::DataTreeFilter::Item* item) : TreeFilterItemEvent(item) {}
@@ -147,9 +179,20 @@ itkEventMacro( TreeFilterRemoveAllEvent, itk::ModifiedEvent );
     { 
       return "TreeFilterRemoveItemEvent"; 
     } 
+    
+    virtual bool CheckEvent(const ::itk::EventObject* e) const 
+    { 
+      return dynamic_cast<const Self*>(e); 
+    } 
+
+    virtual ::itk::EventObject* MakeObject() const 
+    { 
+      return new Self( m_ChangedItem ); 
+    } 
+    
+    TreeFilterRemoveItemEvent(const Self&s) : TreeFilterItemEvent(s) {}; 
   
   private: 
-    TreeFilterRemoveItemEvent(const Self&); 
     void operator=(const Self&); 
     
   };
@@ -159,7 +202,7 @@ itkEventMacro( TreeFilterRemoveAllEvent, itk::ModifiedEvent );
   {
   public:
     typedef TreeFilterRemoveChildrenEvent Self; 
-    typedef ModifiedEvent Superclass; 
+    typedef TreeFilterItemEvent Superclass; 
 
     TreeFilterRemoveChildrenEvent() : TreeFilterItemEvent() {}
     TreeFilterRemoveChildrenEvent(const mitk::DataTreeFilter::Item* item) : TreeFilterItemEvent(item) {}
@@ -170,13 +213,23 @@ itkEventMacro( TreeFilterRemoveAllEvent, itk::ModifiedEvent );
     { 
       return "TreeFilterRemoveChildrenEvent"; 
     } 
+    
+    virtual bool CheckEvent(const ::itk::EventObject* e) const 
+    { 
+      return dynamic_cast<const Self*>(e); 
+    } 
+
+    virtual ::itk::EventObject* MakeObject() const 
+    { 
+      return new Self( m_ChangedItem ); 
+    } 
   
+    TreeFilterRemoveChildrenEvent(const Self&s) : TreeFilterItemEvent(s) {}; 
+    
   private: 
-    TreeFilterRemoveChildrenEvent(const Self&); 
     void operator=(const Self&); 
     
   };
-
 }
 
 #endif

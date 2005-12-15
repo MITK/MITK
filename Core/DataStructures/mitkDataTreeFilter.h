@@ -20,6 +20,9 @@
 
    - Die Auswahl (welche Items sind selektiert) gehört in das Modell. Damit kann man in
      mehreren Views die Auswahl konsistent halten (Combo- und Listbox).
+     Die Auswahl gehört nicht in den Datenbaum, weil man so verhindern würde, daß zwei
+     unabhängige Comboboxen, die dann im Hintergrund zwei versch. Filter haben, ihre
+     Auswahl voneinander trennen können.
 
 */
 
@@ -266,9 +269,25 @@ namespace mitk
       // remember the most recently selected item
       ItemPointer m_LastSelectedItem;
   };
+
+
+  // some default filters in mitk:: namespace for use by clients
   
+  /// Accepts all nodes
+  /// (accepts nodes that are not NULL)
   bool IsDataTreeNode(mitk::DataTreeNode*);
+
+  /// Accepts all data objects
+  /// (accepts nodes that have associated mitk::BaseData (tested via GetData))
   bool IsGoodDataTreeNode(mitk::DataTreeNode*);
+
+  /// Accepts all images
+  /// (accepts nodes that have associated an mitk::Image)
+  //bool IsImage(mitk::DataTreeNode*);
+  //bool IsSurface(mitk::DataTreeNode*);
+  // .
+  // .
+  // .
 
 } // namespace mitk
 

@@ -24,7 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #define ROUND(x)       (((x) > 0) ?   int((x) + 0.5) :   int((x) - 0.5))
 #define ROUND_SHORT(x) (((x) > 0) ? short((x) + 0.5) : short((x) - 0.5))
-
+/*
 QmitkNumberPropertyEditor::QmitkNumberPropertyEditor( mitk::GenericProperty<short>* property, QWidget* parent, const char* name )
 : QSpinBox( parent, name ),
   PropertyEditor( property ),
@@ -33,7 +33,7 @@ QmitkNumberPropertyEditor::QmitkNumberPropertyEditor( mitk::GenericProperty<shor
 {
   initialize();
 }
-
+*/
 QmitkNumberPropertyEditor::QmitkNumberPropertyEditor( mitk::IntProperty* property, QWidget* parent, const char* name )
 : QSpinBox( parent, name ),
   PropertyEditor( property ),
@@ -198,7 +198,6 @@ QString QmitkNumberPropertyEditor::mapValueToText(int value)
 {
   QString displayedText;
 
-  //double d( value / m_FactorPropertyToSpinbox );
   double d( value * m_FactorSpinboxToDisplay );
 
   if ( m_DecimalPlaces > 0 )
@@ -238,11 +237,13 @@ void QmitkNumberPropertyEditor::onValueChanged(int value)
     
   switch (m_DataType)
   {
+	/*
     case DT_SHORT:
       {
         m_ShortProperty->SetValue(ROUND_SHORT(newValue));
         break;
       }
+    */
     case DT_INT:
       {
         m_IntProperty->SetValue(ROUND(newValue));
@@ -280,12 +281,14 @@ void QmitkNumberPropertyEditor::DisplayNumber()
   m_SelfChangeLock = true;
   switch (m_DataType)
   {
+	/*
     case DT_SHORT:
       {
         short s = m_ShortProperty->GetValue();
         QSpinBox::setValue( s );
         break;
       }
+	*/
     case DT_INT:
       {
         int i = m_IntProperty->GetValue();

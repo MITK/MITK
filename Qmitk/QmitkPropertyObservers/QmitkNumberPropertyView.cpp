@@ -21,7 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define DT_INT     2
 #define DT_FLOAT   3
 #define DT_DOUBLE  4
-
+/*
 QmitkNumberPropertyView::QmitkNumberPropertyView( const mitk::GenericProperty<short>* property, QWidget* parent, const char* name )
 : QLabel( parent, name ),
   PropertyView( property ),
@@ -30,7 +30,7 @@ QmitkNumberPropertyView::QmitkNumberPropertyView( const mitk::GenericProperty<sh
 {
   initialize();
 }
-
+*/
 QmitkNumberPropertyView::QmitkNumberPropertyView( const mitk::IntProperty* property, QWidget* parent, const char* name )
 : QLabel( parent, name ),
   PropertyView( property ),
@@ -145,12 +145,14 @@ void QmitkNumberPropertyView::DisplayNumber()
 
   switch (m_DataType)
   {
+	/*
     case DT_SHORT:
       {
         short s = m_ShortProperty->GetValue();
         displayedText.sprintf(m_FormatString, s * m_DisplayFactor);
         break;
       }
+    */
     case DT_INT:
       {
         int i = m_IntProperty->GetValue();

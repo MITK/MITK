@@ -31,7 +31,7 @@ class QmitkNumberPropertyView : public QLabel, public mitk::PropertyView
 
   public:
     
-    QmitkNumberPropertyView( const mitk::GenericProperty<short>*, QWidget* parent, const char* name = 0 );
+    //QmitkNumberPropertyView( const mitk::GenericProperty<short>*, QWidget* parent, const char* name = 0 );
     QmitkNumberPropertyView( const mitk::IntProperty*, QWidget* parent, const char* name = 0 );
     QmitkNumberPropertyView( const mitk::FloatProperty*, QWidget* parent, const char* name = 0 );
     QmitkNumberPropertyView( const mitk::DoubleProperty*, QWidget* parent, const char* name = 0 );
@@ -57,7 +57,7 @@ class QmitkNumberPropertyView : public QLabel, public mitk::PropertyView
     void DisplayNumber();
 
     union {
-      const mitk::GenericProperty<short>*   m_ShortProperty;
+      //const mitk::GenericProperty<short>*   m_ShortProperty;
       const mitk::GenericProperty<int>*     m_IntProperty;
       const mitk::GenericProperty<float>*   m_FloatProperty;
       const mitk::GenericProperty<double>*  m_DoubleProperty;

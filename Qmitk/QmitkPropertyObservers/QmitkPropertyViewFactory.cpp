@@ -60,11 +60,13 @@ QWidget* QmitkPropertyViewFactory::CreateView(const mitk::BaseProperty* property
     // a bool property
     return new QmitkBoolPropertyView(prop, parent, name);
   }
+  /*
   else if ( const mitk::GenericProperty<short>* prop = dynamic_cast<const mitk::GenericProperty<short>*>(property) )
   {
     // a number property
     return new QmitkNumberPropertyView(prop, parent, name);
   }
+  */
   else if ( const mitk::IntProperty* prop = dynamic_cast<const mitk::IntProperty*>(property) )
   {
     // a number property
@@ -108,11 +110,13 @@ QWidget* QmitkPropertyViewFactory::CreateEditor(mitk::BaseProperty* property, un
     // a bool property
     return new QmitkBoolPropertyEditor(prop, parent, name);
   }
+  /*
   else if ( mitk::GenericProperty<short>* prop = dynamic_cast<mitk::GenericProperty<short>*>(property) )
   {
     // a number property
     return new QmitkNumberPropertyEditor(prop, parent, name);
   }
+  */
   else if ( mitk::IntProperty* prop = dynamic_cast<mitk::IntProperty*>(property) )
   {
     // a number property

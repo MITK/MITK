@@ -644,7 +644,7 @@ void DataTreeFilter::GenerateModelFromTree()
 
   m_Items = ItemList::New(); // clear list (nice thanks to smart pointers)
   mitk::DataTreeIteratorBase* treeIter =  // get an iterator to the data tree
-    new mitk::DataTreePreOrderIterator::PreOrderTreeIterator(m_DataTree);
+    new mitk::DataTreePreOrderIterator(m_DataTree);
   
   /*
   if root matches

@@ -65,9 +65,10 @@ namespace itk
     { 
       return *m_ChangePosition; 
     }
+    
+    TreeChangeEvent(const Self&s) : itk::ModifiedEvent(s) {}; 
 
   private: 
-    // TreeChangeEvent(const Self&); 
     void operator=(const Self&); 
 
   protected:
@@ -106,6 +107,10 @@ namespace itk
     { 
       return new Self( *this->m_ChangePosition ); 
     } 
+
+    TreeNodeChangeEvent(const Self&s) : TreeChangeEvent<TTreeType>(s) {}
+  private:
+    void operator=(const Self&);
   
   };
 
@@ -141,6 +146,10 @@ namespace itk
     { 
       return new Self( *this->m_ChangePosition ); 
     } 
+
+    TreeAddEvent(const Self&s) : TreeChangeEvent<TTreeType>(s) {}
+  private:
+    void operator=(const Self&);
   
   };
 
@@ -176,6 +185,11 @@ namespace itk
     { 
       return new Self( *this->m_ChangePosition ); 
     } 
+
+    TreeRemoveEvent(const Self&s) : TreeChangeEvent<TTreeType>(s) {}
+
+  private:
+    void operator=(const Self&);
   };
 
 /** Signals that a node and all its childs will shortly be removed. Position of the top-level removed node is provided */
@@ -210,6 +224,10 @@ namespace itk
     { 
       return new Self( *this->m_ChangePosition ); 
     } 
+
+    TreePruneEvent(const Self& s) : TreeRemoveEvent<TTreeType>(s) {}
+  private:
+    void operator=(const Self&);
   };
 
 

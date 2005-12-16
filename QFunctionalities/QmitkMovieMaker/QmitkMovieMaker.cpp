@@ -152,10 +152,10 @@ void QmitkMovieMaker::CreateConnections()
       this, SLOT(SetWindow(int)) );
 
 
-    // camera rotation
+    // advance the animation
     // every timer tick
     connect( (QObject*) m_Timer, SIGNAL(timeout()),
-      this, SLOT(RotateCamera()) );
+      this, SLOT(AdvanceAnimation()) );
 
     // movie generation
     // when the movie button is clickethe movie button is clicked
@@ -223,12 +223,12 @@ void QmitkMovieMaker::FocusChange()
   }
 }
 
-void QmitkMovieMaker::RotateCamera()
+void QmitkMovieMaker::AdvanceAnimation()
 {
   // This method is called when a timer timeout occurs. It increases the
-  // stepper value according to the elapsed time and camera rotation inteval.
+  // stepper value according to the elapsed time and the stepper interval.
   // Note that a screen refresh is not forced, but merely requested, and may
-  // occur only after more calls to RotateCamera().
+  // occur only after more calls to AdvanceAnimation().
 
   mitk::Stepper* stepper = this->GetAspectStepper();
 

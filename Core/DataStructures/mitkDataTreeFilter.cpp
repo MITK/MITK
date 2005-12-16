@@ -281,6 +281,10 @@ DataTreeFilter::~DataTreeFilter()
   m_DataTree->RemoveObserver( m_TreePruneConnection );
   
   InvokeEvent( mitk::TreeFilterRemoveAllEvent() );
+
+  m_Items->clear();
+  m_Item.clear();
+  m_SelectedItems.clear();
 }
 
 void DataTreeFilter::SetPropertiesLabels(const PropertyList labels)

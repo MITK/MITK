@@ -30,7 +30,7 @@ QmitkBoolPropertyEditor::~QmitkBoolPropertyEditor()
 
 void QmitkBoolPropertyEditor::PropertyRemoved()
 {
-  QmitkBoolPropertyEditor::PropertyRemoved(); // inherited function
+  QmitkBoolPropertyView::PropertyRemoved(); // inherited function
 
   setEnabled(false);
 }

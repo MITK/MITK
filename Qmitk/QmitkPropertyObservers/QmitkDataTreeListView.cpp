@@ -316,7 +316,7 @@ void QmitkDataTreeListView::AddItemsToList(QWidget* parent, QmitkListViewItemInd
                                                                                   QmitkPropertyViewFactory::etDEFAULT, 
                                                                                   parent);
         }
-        catch ( mitk::DataTreeFilter::NoPermissionException& e )
+        catch ( mitk::DataTreeFilter::NoPermissionException& )
         {
           std::cerr << "Some error in mitk::DataTreeFilter: Filter object reports " << *nameiter << " to be editable, but "
                        "trying to access the non-const version yields exceptions..." << std::endl;

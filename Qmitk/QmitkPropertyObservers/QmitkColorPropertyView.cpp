@@ -43,7 +43,7 @@ void QmitkColorPropertyView::PropertyRemoved()
 {
   m_Property = NULL;
   m_ColorProperty = NULL;
-  setPaletteBackgroundPixmap( QPixmap(static_cast<const char**>(no_color_icon_xpm)) );
+  setPaletteBackgroundPixmap( QPixmap(no_color_icon_xpm) );
 }
 
 void QmitkColorPropertyView::DisplayColor()

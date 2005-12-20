@@ -79,11 +79,11 @@ ipPicDescriptor *_ipFuncScNN( ipPicDescriptor *pic_old,
 
 #define SCNN4ALL( type, pic_old, pic_new, size, weights, n, shift, step )\
 {                                                                        \
-   ipInt4_t         ind[_ipPicNDIM];      /* loop index vector         */\
-   ipInt4_t         offset[_ipPicNDIM];   /* offset vector             */\
-   ipUInt4_t        i;                    /* loop index                */\
-   ipUInt4_t        off_new;              /* offset of scaled image    */\
-   ipUInt4_t        off_orig;             /* offset of orig. image     */\
+   size_t           ind[_ipPicNDIM];      /* loop index vector         */\
+   size_t           offset[_ipPicNDIM];   /* offset vector             */\
+   size_t           i;                    /* loop index                */\
+   size_t           off_new;              /* offset of scaled image    */\
+   size_t           off_orig;             /* offset of orig. image     */\
                                                                          \
                                                                          \
    /* calculate offsets for scaling an image                          */ \
@@ -158,7 +158,7 @@ ipPicDescriptor *_ipFuncScNN( ipPicDescriptor *pic_old,
 {
 
   ipUInt4_t       i;               /* loopindex                      */
-  ipInt4_t        n[_ipPicNDIM];      /* no. of pixels in each dimension*/
+  ipUInt4_t       n[_ipPicNDIM];      /* no. of pixels in each dimension*/
   ipFloat8_t      weights[_ipPicNDIM];
   ipUInt4_t       size[_ipPicNDIM];                                    
   char            is_color=0;

@@ -98,8 +98,8 @@ ipPicDescriptor *ipFuncConvert ( ipPicDescriptor *pic_old,
 
 #define CONV_4( type_new, pic_new, pic_old, type_old )                   \
 {                                                                        \
-  ipUInt4_t  i;                                                          \
-  ipUInt4_t  no_elem;                                                    \
+  size_t  i;                                                          \
+  size_t  no_elem;                                                    \
                                                                          \
   no_elem =  _ipPicElements ( pic_old );                                 \
   for ( i = 0; i < no_elem; i++ )                                        \
@@ -111,8 +111,8 @@ ipPicDescriptor *ipFuncConvert ( ipPicDescriptor *pic_old,
 
 #define CONV_2( type_new, pic_new, pic_old, type_old, min_gv, max_gv )   \
 {                                                                        \
-  ipUInt4_t  i;                                                          \
-  ipUInt4_t  no_elem;                                                    \
+  size_t  i;                                                          \
+  size_t  no_elem;                                                    \
   type_old   help;                                                       \
                                                                          \
   no_elem =  _ipPicElements ( pic_new );                                 \

@@ -36,7 +36,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "ipFunc/ipFunc.h"
 
 //##ModelId=3E0B7882024B
-mitk::ImageDataItem::ImageDataItem(const ImageDataItem& aParent, unsigned int dimension, int offset) : 
+mitk::ImageDataItem::ImageDataItem(const ImageDataItem& aParent, unsigned int dimension, size_t offset) : 
   m_Data(NULL), m_PicDescriptor(NULL), m_VtkImageData(NULL), m_Offset(offset), m_IsComplete(false),
   m_Parent(&aParent)
 {

@@ -233,7 +233,7 @@ mitk::ImageDataItem::Pointer mitk::Image::GetVolumeData(int t, int n)
     if(vol.IsNull())
       vol=new ImageDataItem(m_PixelType, 3, m_Dimensions);
     vol->SetComplete(true);
-    int size=m_OffsetTable[2]*m_PixelType.GetBpe()/8;
+    size_t size=m_OffsetTable[2]*m_PixelType.GetBpe()/8;
     for(s=0;s<m_Dimensions[2];++s)
     {
       int posSl;
@@ -244,7 +244,7 @@ mitk::ImageDataItem::Pointer mitk::Image::GetVolumeData(int t, int n)
       if(sl->GetParent()!=vol)
       {
         // copy data of slices in volume
-        int offset = s*size;
+        size_t offset = s*size;
         memcpy(static_cast<char*>(vol->GetData())+offset, sl->GetData(), size);
 
         ipPicDescriptor * pic = sl->GetPicDescriptor();
@@ -317,7 +317,7 @@ mitk::ImageDataItem::Pointer mitk::Image::GetChannelData(int n)
       if(ch.IsNull())
         ch=new ImageDataItem(m_PixelType, m_Dimension, m_Dimensions);
       ch->SetComplete(true);
-      int size=m_OffsetTable[m_Dimension-1]*m_PixelType.GetBpe()/8;
+      size_t size=m_OffsetTable[m_Dimension-1]*m_PixelType.GetBpe()/8;
       unsigned int t;
       for(t=0;t<m_Dimensions[3];++t)
       {
@@ -330,7 +330,7 @@ mitk::ImageDataItem::Pointer mitk::Image::GetChannelData(int n)
         if(vol->GetParent()!=ch)
         {
           // copy data of volume in channel
-          int offset = t*m_OffsetTable[3]*m_PixelType.GetBpe()/8;
+          size_t offset = t*m_OffsetTable[3]*m_PixelType.GetBpe()/8;
           memcpy(static_cast<char*>(ch->GetData())+offset, vol->GetData(), size);
 
           ipPicDescriptor * pic = vol->GetPicDescriptor();
@@ -895,10 +895,10 @@ void mitk::Image::ComputeOffsetTable()
   if(m_OffsetTable!=NULL)
     delete [] m_OffsetTable;
 
-  m_OffsetTable=new unsigned int[m_Dimension>4 ? m_Dimension+1 : 4+1];
+  m_OffsetTable=new size_t[m_Dimension>4 ? m_Dimension+1 : 4+1];
 
   unsigned int i;
-  int num=1;
+  size_t num=1;
   m_OffsetTable[0] = 1;
   for (i=0; i < m_Dimension; ++i)
   {

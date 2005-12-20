@@ -134,11 +134,11 @@ void mitk::PicFileReader::ConvertHandedness(ipPicDescriptor* pic)
   {
       ipPicDescriptor* slice=ipPicCopyHeader(pic, NULL);
       slice->dim=2;
-      int size=_ipPicSize(slice);
+      size_t size=_ipPicSize(slice);
       slice->data=malloc(size);
 
-      int v, volumes = (pic->dim>3? pic->n[3] : 1);
-      int volume_size = size*pic->n[2];
+      size_t v, volumes = (pic->dim>3? pic->n[3] : 1);
+      size_t volume_size = size*pic->n[2];
 
       for(v=0; v<volumes; ++v)
       {
@@ -147,7 +147,7 @@ void mitk::PicFileReader::ConvertHandedness(ipPicDescriptor* pic)
         p_first+=v*volume_size;
         p_last+=size*(pic->n[2]-1)+v*volume_size;
 
-        int i, smid=pic->n[2]/2;
+        size_t i, smid=pic->n[2]/2;
         for(i=0; i<smid;++i,p_last-=size, p_first+=size)
         {
             memcpy(slice->data, p_last, size);

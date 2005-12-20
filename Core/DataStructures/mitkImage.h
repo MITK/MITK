@@ -438,7 +438,7 @@ protected:
   //##ModelId=3E0B890702C4
   unsigned int *m_Dimensions;
   //##ModelId=3E0B8907036E
-  unsigned int *m_OffsetTable;
+  size_t *m_OffsetTable;
   //##ModelId=3E10151F001F
   ImageDataItem::Pointer m_CompleteData;
   //##ModelId=3E13FE96005F

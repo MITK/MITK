@@ -37,7 +37,7 @@ public:
   mitkClassMacro(ImageDataItem, itk::LightObject);
   
   //##ModelId=3E0B7882024B
-  ImageDataItem(const ImageDataItem& aParent, unsigned int dimension, int offset = 0);
+  ImageDataItem(const ImageDataItem& aParent, unsigned int dimension, size_t offset = 0);
   
   //##ModelId=3E0B78820287
   ~ImageDataItem();

@@ -417,14 +417,14 @@ void QmitkPropertyListViewItem::MaterialEditorActivated()
 {
   if ( mitk::MaterialProperty* materialProperty = dynamic_cast<mitk::MaterialProperty*>(m_PropertyList->GetProperty(m_Name.c_str()).GetPointer()))
   {
-  QmitkMaterialEditor* materialEditor = new QmitkMaterialEditor( NULL );
-  materialEditor->Initialize( materialProperty );
-  if ( materialEditor->exec() == QDialog::Accepted )
-  {
-    m_PropertyList->InvokeEvent(itk::ModifiedEvent());
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-  }
-  delete materialEditor;
+    QmitkMaterialEditor* materialEditor = new QmitkMaterialEditor( NULL );
+    materialEditor->Initialize( materialProperty );
+    if ( materialEditor->exec() == QDialog::Accepted )
+    {
+      m_PropertyList->InvokeEvent(itk::ModifiedEvent());
+      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    }
+    delete materialEditor;
   }
   #ifdef MBI_INTERNAL
   else if (mitk::VesselTreeLookupTableProperty* lutProperty = dynamic_cast<mitk::VesselTreeLookupTableProperty*>(m_PropertyList->GetProperty(m_Name.c_str()).GetPointer()))

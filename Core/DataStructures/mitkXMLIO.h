@@ -23,50 +23,35 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk {
 
-  /**
-   * The function WriteXML() writes a complete XML node and its data (BeginNode(), WriteXMLData() and EndNode()).
-   * Use function WriteXML() to write mitk classes to the XML file.
-   * For other elements like datatypes you can use the functions BeginNode(), EndNode() from the class BaseXMLWriter to write a XML node.
-   */
-
   class XMLWriter;
   class XMLReader;
 
+  /// Brief Class for writing mitk classes as a XML node to the XML file.
+  ///
+  /// The function WriteXML() writes a complete XML node and its data (calls the functions BeginNode(), WriteXMLData() and EndNode()).
+  /// Use function WriteXML() to write mitk classes to the XML file.
+  /// e.g. <dataTreeNode CLASS_NAME="class mitk::DataTreeNode"> ...data... </dataTreeNode>
+  /// For other elements e.g. the data of data types you can use the functions BeginNode(), EndNode() from the class BaseXMLWriter to write a XML node.
+  /// Ingroup IO
   class XMLIO {
   
   public:
 
     virtual ~XMLIO() {};
 
-    /**
-     * Writes a XML node and its data (BeginNode(), WriteXMLData() and EndNode()).
-     */
+    /// writes a XML node and its data (calls the functions BeginNode(), WriteXMLData() and EndNode()).
     bool WriteXML( XMLWriter& xmlWriter );
 
-    /**
-     *
-     */
     virtual bool ReadXMLData( XMLReader& xmlReader );
 
-    /**
-     *
-     */
     static const std::string CLASS_NAME;
 
   protected:
-    /**
-     *
-     */
+
     virtual bool WriteXMLData( XMLWriter& xmlWriter );
 
-    /**
-     *
-     */
     virtual const std::string& GetXMLNodeName() const;
 
-    /**
-     *
-     */
     static const std::string XML_NODE_NAME;
   };
 

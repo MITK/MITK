@@ -429,10 +429,7 @@ namespace mitk {
     return m_CurrentNode->CreateObject();
   }
 
-  /**
-   * -----------------------------------------------------------------------
-   * XMLReader
-   */
+  //XMLReader
   XMLReader::XMLNode::XMLNode( const char *elementName, const char **atts ) 
     :m_Parent(NULL)
   {
@@ -485,9 +482,6 @@ namespace mitk {
     return NULL;
   }
 
-  /**
-   * replace char { and } through < and >
-   */
   const char* XMLReader::XMLNode::ConvertString( const char* string )
   {
 	  static std::char_traits<char>::char_type buffer[255];

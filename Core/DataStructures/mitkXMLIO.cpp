@@ -6,9 +6,7 @@ namespace mitk {
 const std::string XMLIO::XML_NODE_NAME = "nameless";
 const std::string XMLIO::CLASS_NAME = "CLASS_NAME";
 
-/**
- *
- */
+
 bool XMLIO::WriteXML( XMLWriter& xmlWriter ) 
 {
   const std::string& nodeName = GetXMLNodeName();
@@ -22,26 +20,19 @@ bool XMLIO::WriteXML( XMLWriter& xmlWriter )
 	return result;				
 }
 
-/**
- *
- */
+
 bool XMLIO::WriteXMLData( XMLWriter& xmlWriter )
 {
   return true;
 }
 
-/**
- *
- */
+
 bool XMLIO::ReadXMLData( XMLReader& xmlReader )
 {
  return false;
 }
 
 
-/**
- *
- */
 const std::string& XMLIO::GetXMLNodeName() const
 {
   return XML_NODE_NAME;

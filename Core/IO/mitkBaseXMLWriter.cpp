@@ -9,9 +9,7 @@
 
 namespace mitk {
 
-/**
- * Construktor
- */
+
 BaseXMLWriter::BaseXMLWriter( const char* filename, int space )
 :m_Out(NULL), m_Increase(0), m_Space(space), m_NodeCount(0) , m_File(true), m_FirstNode(true)
 
@@ -19,16 +17,12 @@ BaseXMLWriter::BaseXMLWriter( const char* filename, int space )
 	m_Out = new std::ofstream( filename );			
 }
 
-/**
- * Construktor
- */
+
 BaseXMLWriter::BaseXMLWriter( std::ostream& out, int space )
 :m_Out(&out), m_Increase(0), m_Space(space), m_NodeCount(0), m_File(false), m_FirstNode(true) 
 {}
 
-/**
- * Destruktor
- */
+
 BaseXMLWriter::~BaseXMLWriter() 
 {
   if ( !m_Out )
@@ -44,9 +38,7 @@ BaseXMLWriter::~BaseXMLWriter()
 	}
 }
 
-/*
- *
- */
+
 void BaseXMLWriter::BeginNode( const std::string& name ) 
 {		
 	if ( m_FirstNode ) 
@@ -61,9 +53,7 @@ void BaseXMLWriter::BeginNode( const std::string& name )
 	m_NodeCount++;
 }
 
-/**
- *
- */
+
 void BaseXMLWriter::EndNode( )
 {			
 	m_Increase--;
@@ -84,9 +74,7 @@ void BaseXMLWriter::EndNode( )
   }
 }
 
-/**
- * Write Property
- */
+
 void BaseXMLWriter::WriteProperty( const std::string& key, const char* value ) const
 {
   std::ostream& stream = m_Stack.top()->GetPropertyStream();
@@ -94,9 +82,7 @@ void BaseXMLWriter::WriteProperty( const std::string& key, const char* value ) c
 	stream << "=\"" << ConvertString( value ) << "\" ";
 }
 
-/**
- * Write string Property
- */
+
 void BaseXMLWriter::WriteProperty( const std::string& key, const std::string& value ) const 
 {
   std::ostream& stream = m_Stack.top()->GetPropertyStream();
@@ -104,9 +90,7 @@ void BaseXMLWriter::WriteProperty( const std::string& key, const std::string& va
 	stream << "=\"" << ConvertString( value.c_str() ) << "\" ";
 }
 
-/**
- * Write int Property
- */
+
 void BaseXMLWriter::WriteProperty( const std::string& key, int value ) const 
 {
   std::ostream& stream = m_Stack.top()->GetPropertyStream();
@@ -114,9 +98,7 @@ void BaseXMLWriter::WriteProperty( const std::string& key, int value ) const
 	stream << "=\"" << value << "\" ";
 }
 
-/**
- * Write float Property
- */
+
 void BaseXMLWriter::WriteProperty( const std::string& key, float value ) const
 {
   std::ostream& stream = m_Stack.top()->GetPropertyStream();
@@ -124,9 +106,7 @@ void BaseXMLWriter::WriteProperty( const std::string& key, float value ) const
 	stream << "=\"" << value << "\" ";
 }
 
-/**
- * Write double Property
- */
+
 void BaseXMLWriter::WriteProperty( const std::string& key, double value ) const
 {
   std::ostream& stream = m_Stack.top()->GetPropertyStream();
@@ -134,9 +114,7 @@ void BaseXMLWriter::WriteProperty( const std::string& key, double value ) const
 	stream << "=\"" << value << "\" ";
 }
 
-/**
-	* Write bool Property
-	*/
+
 void BaseXMLWriter::WriteProperty( const std::string& key, bool value ) const
 {
   std::ostream& stream = m_Stack.top()->GetPropertyStream();
@@ -148,9 +126,7 @@ void BaseXMLWriter::WriteProperty( const std::string& key, bool value ) const
     stream << "=\"" << "FALSE\" ";
 }
 
-/**
-	* Write comment
-	*/
+
 void BaseXMLWriter::WriteComment( const std::string& text ) 
 {
   std::ostream& stream = m_Stack.top()->GetComment();
@@ -164,41 +140,31 @@ void BaseXMLWriter::WriteComment( const std::string& text )
   stream << ConvertString( text.c_str() );
 }
 	
-/**
- * retun the current deph
- */
+
 int BaseXMLWriter::GetCurrentDeph() const
 {
 	return m_Stack.size();
 }
 
-/**
- *
- */
+
 int BaseXMLWriter::GetNodeCount() const
 {
 	return m_NodeCount;
 }
 
-/**
- * Get the space
- */
+
 int BaseXMLWriter::GetSpace() const
 {
 	return m_Space;
 }
 
-/**
- *
- */
+
 void BaseXMLWriter::SetSpace( int space )
 {
 	m_Space = space;
 }
 
-/**
- * replace char < and > through { and }
- */
+
 const char* BaseXMLWriter::ConvertString( const char* string ) const
 {
 	static std::char_traits<char>::char_type buffer[255];
@@ -227,9 +193,7 @@ const char* BaseXMLWriter::ConvertString( const char* string ) const
 	return buffer;
 }
 
-/**
- *
- */
+
 void BaseXMLWriter::StreamNode::Write( std::ostream& out, int steps )
 {
   std::string comment = m_Comment.str();

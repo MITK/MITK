@@ -8,16 +8,15 @@
 
 namespace mitk{
 
-//##Documentation
-//## @brief Base class for the XML writer.
-//## Implements methods for writing a XML file.
-//##
-//## Note - the functions WriteProperty() are used to write XML attributes.
-//##
-//## This XML writer concept supports to store the data with XML attributes.
-
+  /// Brief Base class for writing XML nodes and XML attributes.
+  ///
+  /// Implements methods for writing a XML file (XML nodes and XML attributes).
+  /// The data is stored with XML attributes.
+  /// The functions WriteProperty() are used to write XML attributes. The first parameter specifies the name of the attribute. The second parameter holds the data of the attribute.
+  /// Ingroup IO
   class BaseXMLWriter {
-
+    
+    /// encapsulates all information of a node in a stream
     class StreamNode
     {
     public:
@@ -45,90 +44,56 @@ namespace mitk{
 
   public:
 
-    /**
-     * Construktor
-     */
+    /// constructor
     BaseXMLWriter( const char* filename, int space = 3);
 
-    /**
-     * Construktor
-     */
+    /// constructor
     BaseXMLWriter( std::ostream& out, int space = 3 );
 
-    /**
-     * Destruktor
-     */
+    /// destructor
     virtual ~BaseXMLWriter();
 
-    /*
-     * begins a new XML node
-     */
+    /// begins a new XML node
+    //  the parameter name specifies the name of the XML node
     void BeginNode( const std::string& name );
 
-    /**
-     * closes an open XML node
-     */
+    /// closes an open XML node
     void EndNode( );
 
-    /**
-     * Writes a string XML attribute
-     */
+    /// writes a XML attribute that datatype is a string
     void WriteProperty( const std::string& key, const char* value ) const;
 
-    /**
-     * Writes a string XML attribute
-     */
+    /// writes a XML attribute that datatype is a string
     void WriteProperty( const std::string& key, const std::string& value ) const;
 
-    /**
-     * Writes a int XML attribute
-     */
+    /// writes a XML attribute that datatype is an integer
     void WriteProperty( const std::string& key, int value ) const;
 
-    /**
-     * Writes a float XML attribute
-     */
+    /// writes a XML attribute that datatype is a float
     void WriteProperty( const std::string& key, float value ) const;
 
-    /**
-     * Writes a double XML attribute
-     */
+    /// writes a XML attribute that datatype is a double
     void WriteProperty( const std::string& key, double value ) const;
 
-    /**
-     * Writes a bool XML attribute
-     */
+    /// writes a XML attribute that datatype is a bool
     void WriteProperty( const std::string& key, bool value ) const;
 
-    /**
-     * Writes a comment
-     */
+    /// writes a comment in the XML file
     void WriteComment( const std::string& key );
   
-    /**
-     * retun the current deph
-     */
+    /// returns the current node depth
     int GetCurrentDeph() const;
 
-    /**
-     * Get the current count of nodes
-     */
+    /// returns the current count of nodes
     int GetNodeCount() const;
 
-    /**
-     * Get the space
-     */
     int GetSpace() const;
 
-    /**
-     *
-     */
     void SetSpace( int space );
 
 protected:
-    /**
-     * replace char < and > through { and }
-     */
+
+    /// replaces characters "<" and ">" with "{" and "}"
     const char* ConvertString( const char* string ) const;
   };
 }

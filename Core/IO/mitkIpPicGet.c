@@ -52,6 +52,9 @@
  *   reads a PicFile from disk
  *
  * $Log$
+ * Revision 1.6  2005/12/20 12:56:35  max
+ * ENH: Added possibility to read beyond 2GB limit.
+ *
  * Revision 1.5  2005/10/19 11:19:43  ivo
  * ENH: Chili ipPic compatibility
  *
@@ -149,7 +152,7 @@ MITKipPicGet( char *infile_name, ipPicDescriptor *pic )
   if(pic != NULL)
   {
     ipPicDescriptor * tmpPic;
-    ipUInt4_t sizePic, sizeTmpPic;
+    size_t sizePic, sizeTmpPic;
     tmpPic = ipPicGet(infile_name, NULL);
     sizePic = _ipPicSize(pic);
     sizeTmpPic = _ipPicSize(tmpPic);
@@ -197,9 +200,9 @@ ipPicDescriptor * _MITKipPicOldGet( FILE *infile, ipPicDescriptor *pic )
 {
   _ipPicOldHeader old_pic;
 
-  unsigned long int elements;
+  size_t elements;
 
-  ipUInt4_t size;
+  size_t size;
   size = 0;
   if( pic == NULL )
     pic = ipPicNew();
@@ -243,7 +246,26 @@ ipPicDescriptor * _MITKipPicOldGet( FILE *infile, ipPicDescriptor *pic )
       pic->data = malloc( _ipPicSize(pic) );
     }
 
-  ipFReadLE( pic->data, old_pic.type, elements, infile );
+  /*
+   * data is read in blocks of size 'block_size' to prevent from
+   * errors due to large file sizes (>=2GB)
+   */
+  ipSize_t number_of_elements = elements;
+  ipSize_t bytes_per_element = old_pic.type;
+  ipSize_t number_of_bytes = number_of_elements * bytes_per_element;
+  ipSize_t block_size = 1024*1024; /* Use 1 MB blocks. Make sure that block size is smaller than 2^31 */
+  ipSize_t number_of_blocks = number_of_bytes / block_size;
+  ipSize_t remaining_bytes = number_of_bytes % block_size;
+  ipSize_t bytes_read = 0;
+  ipSize_t block_nr = 0;
+  
+  ipUInt1_t* data = (ipUInt1_t*) pic->data;
+  for ( block_nr = 0 ; block_nr < number_of_blocks ; ++block_nr )
+    bytes_read += ipPicFReadLE( data + ( block_nr * block_size ), 1, block_size, infile );
+  bytes_read += ipPicFReadLE( data + ( number_of_blocks * block_size ), 1, remaining_bytes, infile );
+    
+  if ( bytes_read != number_of_bytes )
+    fprintf( stderr, "Error while reading (ferror indicates %u), only %lu bytes were read! Eof indicator is %u.\n", ferror(infile), bytes_read, feof(infile) );
 
   /* convert to the new pic3 format */
 
@@ -440,7 +462,7 @@ MITKipPicGet( char *infile_name, ipPicDescriptor *pic )
   ipUInt4_t len;
 
   ipUInt4_t to_read;
-  ipUInt4_t size;
+  size_t size;
 
   infile = _ipPicOpenPicFileIn( infile_name );
 
@@ -529,10 +551,36 @@ MITKipPicGet( char *infile_name, ipPicDescriptor *pic )
     }
 
   pic->info->pixel_start_in_file = ipPicFTell( infile );
+  /*
+   * data is read in blocks of size 'block_size' to prevent from
+   * errors due to large file sizes (>=2GB)
+   */
+  ipSize_t number_of_elements = _ipPicElements(pic);
+  ipSize_t bytes_per_element = pic->bpe / 8;
+  ipSize_t number_of_bytes = number_of_elements * bytes_per_element;
+  ipSize_t block_size = 1024*1024; /* Use 1 MB blocks. Make sure that block size is smaller than 2^31 */
+  ipSize_t number_of_blocks = number_of_bytes / block_size;
+  ipSize_t remaining_bytes = number_of_bytes % block_size;
+  ipSize_t bytes_read = 0;
+  ipSize_t block_nr = 0;
+  /*printf( "mitkIpPicGet: number of blocks to read is %ul.\n", number_of_blocks ); */
+  
+  ipUInt1_t* data = (ipUInt1_t*) pic->data;
   if( pic->type == ipPicNonUniform )
-    ipPicFRead( pic->data, pic->bpe / 8, _ipPicElements(pic), infile );
+    {
+      for ( block_nr = 0 ; block_nr < number_of_blocks ; ++block_nr )
+        bytes_read += ipPicFRead( data + ( block_nr * block_size ), 1, block_size, infile );
+      bytes_read += ipPicFRead( data + ( number_of_blocks * block_size ), 1, remaining_bytes, infile );
+    }
   else
-    ipPicFReadLE( pic->data, pic->bpe / 8, _ipPicElements(pic), infile );
+    {
+      for ( block_nr = 0 ; block_nr < number_of_blocks ; ++block_nr )
+        bytes_read += ipPicFReadLE( data + ( block_nr * block_size ), 1, block_size, infile );
+      bytes_read += ipPicFReadLE( data + ( number_of_blocks * block_size ), 1, remaining_bytes, infile );
+    }
+    
+  if ( bytes_read != number_of_bytes )
+    fprintf( stderr, "Error while reading (ferror indicates %u), only %lu bytes were read! Eof indicator is %u.\n", ferror(infile), bytes_read, feof(infile) );
 
   if( infile != stdin )
     ipPicFClose( infile );

@@ -1,7 +1,7 @@
 TEMPLATE = lib
 TARGET = ipFunc
 LANGUAGE = C
-CONFIG += warn_on debug
+CONFIG += warn_on release
 
 OBJECTS_DIR = obj
 

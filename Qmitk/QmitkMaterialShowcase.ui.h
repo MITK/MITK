@@ -39,6 +39,7 @@ void QmitkMaterialShowcase::init()
     it.Add( m_DataTreeNode );
     m_SelectableGLWidget->GetRenderer()->SetData( &it );
     m_SelectableGLWidget->GetRenderer()->SetMapperID( 2 );
+    sphereSource->Delete();    
 }
 
 void QmitkMaterialShowcase::destroy()

@@ -52,6 +52,9 @@
  *   reads a PicFile from disk
  *
  * $Log$
+ * Revision 1.7  2005/12/21 08:28:42  max
+ * FIX: renamed ipSize_t to size_t, since ipSize_t is only available in the 64Bit branch op ipPic.
+ *
  * Revision 1.6  2005/12/20 12:56:35  max
  * ENH: Added possibility to read beyond 2GB limit.
  *
@@ -250,14 +253,14 @@ ipPicDescriptor * _MITKipPicOldGet( FILE *infile, ipPicDescriptor *pic )
    * data is read in blocks of size 'block_size' to prevent from
    * errors due to large file sizes (>=2GB)
    */
-  ipSize_t number_of_elements = elements;
-  ipSize_t bytes_per_element = old_pic.type;
-  ipSize_t number_of_bytes = number_of_elements * bytes_per_element;
-  ipSize_t block_size = 1024*1024; /* Use 1 MB blocks. Make sure that block size is smaller than 2^31 */
-  ipSize_t number_of_blocks = number_of_bytes / block_size;
-  ipSize_t remaining_bytes = number_of_bytes % block_size;
-  ipSize_t bytes_read = 0;
-  ipSize_t block_nr = 0;
+  size_t number_of_elements = elements;
+  size_t bytes_per_element = old_pic.type;
+  size_t number_of_bytes = number_of_elements * bytes_per_element;
+  size_t block_size = 1024*1024; /* Use 1 MB blocks. Make sure that block size is smaller than 2^31 */
+  size_t number_of_blocks = number_of_bytes / block_size;
+  size_t remaining_bytes = number_of_bytes % block_size;
+  size_t bytes_read = 0;
+  size_t block_nr = 0;
   
   ipUInt1_t* data = (ipUInt1_t*) pic->data;
   for ( block_nr = 0 ; block_nr < number_of_blocks ; ++block_nr )
@@ -555,14 +558,14 @@ MITKipPicGet( char *infile_name, ipPicDescriptor *pic )
    * data is read in blocks of size 'block_size' to prevent from
    * errors due to large file sizes (>=2GB)
    */
-  ipSize_t number_of_elements = _ipPicElements(pic);
-  ipSize_t bytes_per_element = pic->bpe / 8;
-  ipSize_t number_of_bytes = number_of_elements * bytes_per_element;
-  ipSize_t block_size = 1024*1024; /* Use 1 MB blocks. Make sure that block size is smaller than 2^31 */
-  ipSize_t number_of_blocks = number_of_bytes / block_size;
-  ipSize_t remaining_bytes = number_of_bytes % block_size;
-  ipSize_t bytes_read = 0;
-  ipSize_t block_nr = 0;
+  size_t number_of_elements = _ipPicElements(pic);
+  size_t bytes_per_element = pic->bpe / 8;
+  size_t number_of_bytes = number_of_elements * bytes_per_element;
+  size_t block_size = 1024*1024; /* Use 1 MB blocks. Make sure that block size is smaller than 2^31 */
+  size_t number_of_blocks = number_of_bytes / block_size;
+  size_t remaining_bytes = number_of_bytes % block_size;
+  size_t bytes_read = 0;
+  size_t block_nr = 0;
   /*printf( "mitkIpPicGet: number of blocks to read is %ul.\n", number_of_blocks ); */
   
   ipUInt1_t* data = (ipUInt1_t*) pic->data;

@@ -187,7 +187,7 @@ void QmitkDataTreeListView::paintListBackground(QPainter& painter, QmitkListView
   }
 }
 
-void QmitkDataTreeListView::paintEvent(QPaintEvent* e)
+void QmitkDataTreeListView::paintEvent(QPaintEvent*)
 {
   QPainter painter(this);
   paintListBackground(painter,this);
@@ -440,7 +440,7 @@ void QmitkDataTreeListView::removeAllHandler( const itk::EventObject& )
   clearItems();
 }
 
-void QmitkDataTreeListView::selectionChangedHandler( const itk::EventObject& e )
+void QmitkDataTreeListView::selectionChangedHandler( const itk::EventObject& )
 {
   if (m_SelfCall) return; // invoked by this object
   /*

@@ -230,7 +230,7 @@ void QmitkListViewExpanderIcon::setExpanded(bool expanded)
     static_cast<QWidget*>(parent())->update(); // redraw
 }
 
-void QmitkListViewExpanderIcon::mouseReleaseEvent ( QMouseEvent * e )
+void QmitkListViewExpanderIcon::mouseReleaseEvent ( QMouseEvent* )
 {
   if (!m_Locked)
     setExpanded(!m_Expanded); //toggle status

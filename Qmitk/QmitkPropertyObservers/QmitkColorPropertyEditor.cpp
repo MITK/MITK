@@ -55,7 +55,7 @@ void QmitkPopupColorChooser::setSteps(int steps)
   m_VStep = 512 / m_Steps;
 }
 
-void QmitkPopupColorChooser::keyReleaseEvent(QKeyEvent* e)
+void QmitkPopupColorChooser::keyReleaseEvent(QKeyEvent*)
 {
   emit colorSelected( m_OriginalColor );
   close();
@@ -105,7 +105,7 @@ void QmitkPopupColorChooser::mouseMoveEvent (QMouseEvent* e)
   emit colorSelected( color );
 }
 
-void QmitkPopupColorChooser::mouseReleaseEvent (QMouseEvent* e)
+void QmitkPopupColorChooser::mouseReleaseEvent (QMouseEvent*)
 {
   close ();
 }
@@ -206,7 +206,7 @@ void QmitkPopupColorChooser::popup(QWidget* parent, const QPoint& point, const m
   grabKeyboard();
 }
 
-void QmitkPopupColorChooser::paintEvent(QPaintEvent* e)
+void QmitkPopupColorChooser::paintEvent(QPaintEvent*)
 {
   QPainter painter(this);
   drawGradient( &painter );

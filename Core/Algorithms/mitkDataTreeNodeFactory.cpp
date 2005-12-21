@@ -39,6 +39,7 @@ PURPOSE.  See the above copyright notices for more information.
 // VTK-related includes
 #include <vtkSTLReader.h>
 #include <vtkPolyDataReader.h>
+#include <vtkOBJReader.h>
 #include <vtkPolyData.h>
 #include <vtkPolyDataNormals.h>
 #include <vtkStructuredPointsReader.h>
@@ -117,6 +118,10 @@ void mitk::DataTreeNodeFactory::GenerateData()
     else if ( this->FileNameEndsWith( ".vtk" ) )
     {
       this->ReadFileTypeVTK();
+    }
+    else if ( this->FileNameEndsWith( ".obj" ) )
+    {
+      this->ReadFileTypeOBJ();
     }
     else if ( this->FileNameEndsWith( ".pic" ) || this->FileNameEndsWith( ".pic.gz" ) || this->FileNameEndsWith( ".seq" ) )
     {
@@ -318,6 +323,35 @@ void mitk::DataTreeNodeFactory::ReadFileTypeVTK()
   std::cout << "Loading " << m_FileName << " as vtk..." << std::endl;
 
   vtkPolyDataReader *reader = vtkPolyDataReader::New();
+  reader->SetFileName( m_FileName.c_str() );
+  reader->Update();
+
+  if ( reader->GetOutput() != NULL )
+  {
+    mitk::Surface::Pointer surface = mitk::Surface::New();
+    surface->SetVtkPolyData( reader->GetOutput() );
+    mitk::DataTreeNode::Pointer node = this->GetOutput();
+    node->SetData( surface );
+
+    // set filename without path as string property
+    mitk::StringProperty::Pointer nameProp = new mitk::StringProperty( this->GetBaseFileName() );
+    node->SetProperty( "name", nameProp );
+    SetDefaultSurfaceProperties( node );
+  }
+
+  reader->Delete();
+
+  std::cout << "...finished!" << std::endl;
+}
+
+
+
+
+void mitk::DataTreeNodeFactory::ReadFileTypeOBJ()
+{
+  std::cout << "Loading " << m_FileName << " as obj..." << std::endl;
+
+  vtkOBJReader *reader = vtkOBJReader::New();
   reader->SetFileName( m_FileName.c_str() );
   reader->Update();
 

@@ -158,6 +158,8 @@ protected:
 
   virtual void ReadFileTypeVTK();
 
+  virtual void ReadFileTypeOBJ();
+
   virtual void ReadFileTypePIC();
 
   virtual void ReadFileTypePAR();

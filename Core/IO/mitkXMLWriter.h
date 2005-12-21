@@ -9,12 +9,11 @@
 
 namespace mitk{
 
-  /// Brief Class for writing XML nodes and XML attributes.
+  /// Class for writing XML nodes and XML attributes.
   ///
   /// Derived class of BaseXMLWriter.
   /// The data is stored with XML attributes.
   /// The functions WriteProperty() are used to write XML attributes. The first parameter specifies the name of the attribute. The second parameter holds the data of the attribute.
-  /// Ingroup IO
   class XMLWriter : public BaseXMLWriter {
 
     std::string m_Filename;

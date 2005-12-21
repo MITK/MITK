@@ -8,12 +8,11 @@
 
 namespace mitk{
 
-  /// Brief Base class for writing XML nodes and XML attributes.
+  /// Base class for writing XML nodes and XML attributes.
   ///
   /// Implements methods for writing a XML file (XML nodes and XML attributes).
   /// The data is stored with XML attributes.
   /// The functions WriteProperty() are used to write XML attributes. The first parameter specifies the name of the attribute. The second parameter holds the data of the attribute.
-  /// Ingroup IO
   class BaseXMLWriter {
     
     /// encapsulates all information of a node in a stream

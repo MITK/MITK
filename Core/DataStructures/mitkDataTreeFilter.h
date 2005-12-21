@@ -26,12 +26,25 @@
 
 */
 
+/*!
+  \class mitk::DataTreeFilter mitkDataTreeFilter.h mitkDataTreeFilter.h
+
+  \brief Provides a filtered view on the data tree
+
+  Inherits itk::Object for Subject/Observer functionality
+
+  Documentations will follow.
+
+  This diagram provides enlightenment...
+
+  \image html doc_mitkDataTreeFilterRelatedClasses.png Relations of the DataTreeFilter to other classes.
+*/
+
 namespace mitk
 {
 
 //------ DataTreeFilter ------------------------------------------------------------------
 
-  /// Inherits itk::Object for Subject/Observer functionality
   class DataTreeFilter : public itk::Object
   {
     public:

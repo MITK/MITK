@@ -66,47 +66,6 @@
 */
 
 /**
-  \defgroup Visualization Visualization and Visualization Organization Classes
-
-  \brief This category includes renderwindows (currently one for OpenGL), renderers (currently only one, 
-  for OpenGL-based renderwindows), mappers  and classes for navigating in the data.
-
-  Mappers visualize data objects of a specific classes by creating rendering primitives that 
-  interface to the graphics library (e.g., OpenGL, vtk). 
-  Renderers organize the rendering process. A Renderer contains a reference to a (sub-) data tree 
-  and asks the mappers of the data objects to render the data into the renderwindow it is associated to.
-*/
-
-/** 
- \defgroup Renderer Renderer and RenderWindow Classes
- \ingroup Visualization
-
- \brief Renderers organize the rendering process. A Renderer contains a reference to a (sub-) data tree
- and asks the mappers of the data objects to render the data into the renderwindow it is associated to.
-*/
-
-/** 
- \defgroup Mapper Mapper Classes
- \ingroup Visualization
-
- \brief Mappers visualize data objects of a specific classes by creating rendering primitives 
- that interface to the graphics library (e.g., OpenGL, vtk).
-*/
-
-/** 
- \defgroup NavigationControl Navigation Control Classes
- \ingroup Visualization
-
- \brief The classes in this category tell the render (subclass of mitk::BaseRenderer) which 
- slice (subclass mitk::SliceNavigationController) or from which direction (subclass
- mitk::CameraController) it has to render.
- 
- Contains two Stepper for stepping through the slices or through different camera views (e.g., 
- for the creation of a movie around the data), respectively, and through time, if
- there is 3D+t data.
-*/
-
-/**
   \defgroup InteractionUndo Interaction and Undo Classes
 
   \brief This category includes classes that support the developer to create 

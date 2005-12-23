@@ -1,0 +1,10 @@
+
+/**
+
+\defgroup Mappers Mapper Classes
+\ingroup Visualization
+
+\brief Mapper visualize data objects of a specific classes by creating rendering primitives 
+has interface to the graphics library (e.g., OpenGL, vtk).
+
+*/

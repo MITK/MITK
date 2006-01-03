@@ -21,6 +21,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkXMLWriter.h>
 #include <mitkXMLReader.h>
 
+const std::string mitk::DataTree::XML_NODE_NAME = "mitkDataTree";
+const std::string mitk::DataTree::XML_TAG_TREE_NODE = "treeNode";
 
 //##ModelId=3E38F46A0190
 mitk::DataTree::DataTree() : 
@@ -192,7 +194,7 @@ bool mitk::DataTree::SaveNext( const mitk::DataTreeIteratorBase* it, mitk::XMLWr
 		return false;
 
 	mitk::DataTreeNode* node = it->Get();
-  xmlWriter.BeginNode("treeNode");
+  xmlWriter.BeginNode(XML_TAG_TREE_NODE);
 
 	if (node) 
 	{
@@ -217,7 +219,7 @@ bool mitk::DataTree::SaveNext( const mitk::DataTreeIteratorBase* it, mitk::XMLWr
 
 bool mitk::DataTree::Save( const mitk::DataTreeIteratorBase* it, mitk::XMLWriter& xmlWriter ) 
 {
-	xmlWriter.BeginNode( "mitkDataTree" );
+	xmlWriter.BeginNode(XML_NODE_NAME);
 	bool result = SaveNext( it, xmlWriter );
 	xmlWriter.EndNode(); // mitkDataTree
 	return result;

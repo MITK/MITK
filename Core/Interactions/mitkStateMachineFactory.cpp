@@ -28,6 +28,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkConfig.h>
 #include <itksys/SystemTools.hxx>
 
+#ifdef INTERACTION_DEBUG
+#include <mitkInteractionDebug.h>
+#endif
 
 //##Documentation
 //## this class builds up all the necessary structures for a statemachine.
@@ -164,6 +167,11 @@ bool mitk::StateMachineFactory::LoadBehavior(std::string fileName)
 
    mitk::StateMachineFactory* stateMachineFactory = new StateMachineFactory();
    stateMachineFactory->SetFileName( fileName.c_str() );
+
+   #ifdef INTERACTION_DEBUG
+   InteractionDebug::SetXMLFileName( fileName.c_str() );
+   InteractionDebug::GetInstance()->OpenConection();
+   #endif
 
    if ( stateMachineFactory->Parse()==0 )    
    {

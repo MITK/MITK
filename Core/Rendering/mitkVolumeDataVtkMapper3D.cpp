@@ -233,7 +233,7 @@ void mitk::VolumeDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
 
   m_ImageCast->SetShift(0);
 
-  
+/*  
 mitk::TransferFunctionProperty::Pointer tranferFunctionProp = dynamic_cast<mitk::TransferFunctionProperty*>(this->GetDataTreeNode()->GetProperty("TransferFunction").GetPointer());
   if (tranferFunctionProp.IsNull()) {
    // create one
@@ -241,6 +241,7 @@ mitk::TransferFunctionProperty::Pointer tranferFunctionProp = dynamic_cast<mitk:
     newTF->InitializeByMitkImage(input);
     this->GetDataTreeNode()->SetProperty("TransferFunction", new TransferFunctionProperty(newTF.GetPointer()));
   } 
+  */
     
   mitk::LookupTableProperty::Pointer lookupTableProp;
   lookupTableProp = dynamic_cast<mitk::LookupTableProperty*>(this->GetDataTreeNode()->GetProperty("LookupTable").GetPointer());

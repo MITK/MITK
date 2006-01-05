@@ -27,6 +27,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkXMLWriter.h>
 #include <mitkXMLReader.h>
 
+#ifdef INTERACTION_DEBUG
+#include <mitkInteractionDebug.h>
+#endif
+
 const std::string mitk::StateMachine::XML_NODE_NAME = "stateMachine";
 const std::string mitk::StateMachine::STATE_MACHINE_TYPE = "STATE_MACHINE_TYPE";
 const std::string mitk::StateMachine::STATE_ID = "STATE_ID";
@@ -56,12 +60,16 @@ mitk::StateMachine::StateMachine(const char * type) : m_CurrentState(NULL)
   m_ReferenceCountLock.Unlock();
 
   #ifdef INTERACTION_DEBUG
-  InteractionDebug->GetInstance()->NewStateMachine( type, this );
+  InteractionDebug::GetInstance()->NewStateMachine( type, this );
   #endif
 }
 mitk::StateMachine::~StateMachine()
 {
   delete m_UndoController;
+
+  #ifdef INTERACTION_DEBUG
+  InteractionDebug::GetInstance()->DeleteStateMachine( this );
+  #endif
 }
 
 //##ModelId=3E5B2E660087
@@ -80,6 +88,10 @@ const mitk::State* mitk::StateMachine::GetCurrentState() const
 //##ModelId=3E5B2DE30378
 bool mitk::StateMachine::HandleEvent(StateEvent const* stateEvent)
 {
+  #ifdef INTERACTION_DEBUG
+  InteractionDebug::GetInstance()->Event( this, stateEvent->GetId() );
+  #endif
+
   if (m_CurrentState == NULL)
     return false;//m_CurrentState needs to be set first!
 
@@ -134,6 +146,10 @@ bool mitk::StateMachine::HandleEvent(StateEvent const* stateEvent)
     #endif
   }
 
+  #ifdef INTERACTION_DEBUG
+  InteractionDebug::GetInstance()->Transition( this, tempTransition->GetName().c_str() );
+  #endif
+
 
   std::vector<Action*>::iterator actionIdIterator = tempTransition->GetActionBeginIterator();
   const std::vector<Action*>::iterator actionIdIteratorEnd = tempTransition->GetActionEndIterator();
@@ -145,6 +161,10 @@ bool mitk::StateMachine::HandleEvent(StateEvent const* stateEvent)
     {
       #ifdef INTERDEBUG
       itkWarningMacro( << "Warning: no action defind for " << *actionIdIterator << " in " << m_Type );
+      #endif
+
+      #ifdef INTERACTION_DEBUG
+      InteractionDebug::GetInstance()->Action( this, tempTransition->GetName().c_str(), (*actionIdIterator)->GetActionId() );
       #endif
 
       ok = false;
@@ -237,3 +257,7 @@ const std::string& mitk::StateMachine::GetXMLNodeName() const
 {
   return XML_NODE_NAME;
 }
+
+#ifdef INTERACTION_DEBUG
+#include <mitkInteractionDebug.cpp>
+#endif

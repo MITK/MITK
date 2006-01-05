@@ -1030,14 +1030,16 @@ void mitk::Image::ReleaseData()
 bool mitk::Image::WriteXMLData( XMLWriter& xmlWriter ) 
 {
   std::string fileName = xmlWriter.GetNewFilenameAndSubFolder();
-  mitk::ImageWriter::Pointer imageWriter = mitk::ImageWriter::New();
-  imageWriter->SetInput( this );
-  imageWriter->SetFileName( fileName.c_str() );
-  imageWriter->SetExtension( xmlWriter.GetImageExtension().c_str() );
-  imageWriter->Write();
-
   fileName += xmlWriter.GetImageExtension();
   xmlWriter.WriteProperty( "FILENAME", fileName.c_str() );
+
+  if(xmlWriter.SaveSourceFiles()){
+    mitk::ImageWriter::Pointer imageWriter = mitk::ImageWriter::New();
+    imageWriter->SetInput( this );
+    imageWriter->SetFileName( fileName.c_str() );
+    imageWriter->SetExtension( xmlWriter.GetImageExtension().c_str() );
+    imageWriter->Write();
+  }
 
 	mitk::Geometry3D* geomety = GetGeometry();
 

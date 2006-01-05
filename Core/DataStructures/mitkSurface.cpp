@@ -265,10 +265,12 @@ bool mitk::Surface::WriteXMLData( XMLWriter& xmlWriter )
   fileName += ".stl";
   xmlWriter.WriteProperty( XMLReader::FILENAME, fileName.c_str() );
 
-  mitk::SurfaceVtkWriter<vtkSTLWriter>::Pointer writer = mitk::SurfaceVtkWriter<vtkSTLWriter>::New();
-  writer->SetInput( this );
-  writer->SetFileName( fileName.c_str() );
-  writer->Write();
+  if(xmlWriter.SaveSourceFiles()){
+    mitk::SurfaceVtkWriter<vtkSTLWriter>::Pointer writer = mitk::SurfaceVtkWriter<vtkSTLWriter>::New();
+    writer->SetInput( this );
+    writer->SetFileName( fileName.c_str() );
+    writer->Write();
+  }
 	return true;
   
 }

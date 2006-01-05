@@ -58,17 +58,17 @@ public class StateMachineDebugConsole {
 	 * @return
 	 * @throws IOException
 	 */
-	int readInteger( BufferedReader in ) throws IOException {
+	long readUnsignedInteger( BufferedReader in ) throws IOException {
 	
-		int value = 0;
-		char buffer[] = new char[4];
-		in.read( buffer, 0, 4 );
+		long value = 0;
+		char buffer[] = new char[4];	
+		in.read( buffer, 0, 4 );	
 		
-		value = (int) buffer[0];
-		value |= ((int)buffer[1])<<8;
-		value |= ((int)buffer[2])<<16;
-		value |= ((int)buffer[3])<<24;		
-	
+		value = (long)(buffer[0] & 0xff);
+		value |= ((long)(buffer[1] & 0xff))<<8;
+		value |= ((long)(buffer[2] & 0xff))<<16;
+		value |= ((long)(buffer[3] & 0xff))<<24;		
+		
 		return value;
 	}
 
@@ -79,11 +79,11 @@ public class StateMachineDebugConsole {
 	 * @return string
 	 * @throws IOException
 	 */
-	String readString( BufferedReader in, int length ) throws IOException {
+	String readString( BufferedReader in, long length ) throws IOException {
 	
 		char buffer[] = new char[255];
-		m_In.read( buffer, 0, length );
-		String string = new String( buffer, 0, length );
+		in.read( buffer, 0, (int)length );
+		String string = new String( buffer, 0, (int)length );
 		return string;
 	}
 	
@@ -100,80 +100,86 @@ public class StateMachineDebugConsole {
 			
 			while ( true ) {
 				
-				int messageType = readInteger( m_In ); 
-				int bodysize = readInteger( m_In );
+				int messageType = (int) readUnsignedInteger( m_In ); 
+				long bodysize = readUnsignedInteger( m_In );
 				
-				System.out.print("\n\nMITK Interaction Debugger: \n\tMessageType: ");
+				System.out.print("\nMITK Interaction Debugger: MessageType: ");
 				System.out.print( messageType );
-				System.out.print("\n\t BodySize: ");
+				System.out.print(" BodySize: ");
 				System.out.print( bodysize );				
 				
 				switch ( messageType){
 				
 					case 1: { // OPEN_CONNECTION
-						int hashValue = readInteger( m_In );
-						int stringlength = readInteger( m_In );
+						long hashValue = readUnsignedInteger( m_In );
+						long stringlength = readUnsignedInteger( m_In );
 						String name = readString( m_In, stringlength );
 						
-						System.out.print("\n\tOPEN_CONNECTION: ");
-						System.out.print("\n\tHashValue: ");
+						System.out.print("\tOPEN_CONNECTION: ");
+						System.out.print("\tHashValue: ");
 						System.out.print( hashValue );
-						System.out.print("\n\tFilename: " + name );						
+						System.out.print("\tFilename: " + name );						
 						break;
 						}
 					case 2: { // NEW_STATE_MACHINE
-						int instanceAddress = readInteger( m_In );
-						int stringlength = readInteger( m_In );
+						long instanceAddress = readUnsignedInteger( m_In );
+						long stringlength = readUnsignedInteger( m_In );
 						String name = readString( m_In, stringlength );						
 
-						System.out.print("\n\tNEW_STATE_MACHINE: ");
-						System.out.print("\n\tInstanceAddress: ");
+						System.out.print("\tNEW_STATE_MACHINE: ");
+						System.out.print("\tInstanceAddress: ");
 						System.out.print( instanceAddress );
-						System.out.print("\n\tType Name: " + name );
+						System.out.print("\tType Name: " + name );
 						break;
 						}
 					case 3: { // EVENT
-						int instanceAddress = readInteger( m_In );
-						int eventId = readInteger( m_In );						
+						long instanceAddress = readUnsignedInteger( m_In );
+						long eventId = readUnsignedInteger( m_In );						
 						
-						System.out.print("\n\tEVENT: ");
-						System.out.print("\n\tInstanceAddress: ");
+						System.out.print("\tEVENT: ");
+						System.out.print("\tInstanceAddress: ");
 						System.out.print( instanceAddress );
-						System.out.print("\n\tEventId: " );
+						System.out.print("\tEventId: " );
 						System.out.print( eventId );						
 						break;
 						}						
 					case 4: { // TRANSITION
-						int instanceAddress = readInteger( m_In );
-						int stringlength = readInteger( m_In );
+						long instanceAddress = readUnsignedInteger( m_In );
+						long stringlength = readUnsignedInteger( m_In );
 						String name = readString( m_In, stringlength );
 						
-						System.out.print("\n\tTRANSITION: ");
-						System.out.print("\n\tInstanceAddress: ");
+						System.out.print("\tTRANSITION: ");
+						System.out.print("\tInstanceAddress: ");
 						System.out.print( instanceAddress );
-						System.out.print("\n\tTransition Name: " + name );						
+						System.out.print("\tTransition Name: " + name );						
 						break;
 					}
 					case 5: { // ACTION
-						int instanceAddress = readInteger( m_In );
-						int stringlength = readInteger( m_In );
+						long instanceAddress = readUnsignedInteger( m_In );
+						long stringlength = readUnsignedInteger( m_In );
 						String name = readString( m_In, stringlength );						
 						
-						System.out.print("\n\tACTION: ");
-						System.out.print("\n\tInstanceAddress: ");
+						System.out.print("\tACTION: ");
+						System.out.print("\tInstanceAddress: ");
 						System.out.print( instanceAddress );
-						System.out.print("\n\tAction Name: " + name );					
+						System.out.print("\tAction Name: " + name );					
 						
 						break;
 					}
 						case 6: { // DELETE_STATE_MACHINE
-							int instanceAddress = readInteger( m_In );
+							long instanceAddress = readUnsignedInteger( m_In );
 							
-							System.out.print("\n\tDELETE_STATE_MACHINE: ");
-							System.out.print("\n\tInstanceAddress: ");
+							System.out.print("\tDELETE_STATE_MACHINE: ");
+							System.out.print("\tInstanceAddress: ");
 							System.out.print( instanceAddress );							
 						break;
 						}
+					case 7: {
+						long counter = readUnsignedInteger( m_In );
+						System.out.print(" -->>Counter: ");
+						System.out.print( counter );
+						break;
+					}
 					default:
 						System.out.println("unbekannter Nachrichtentype!!");
 				}				

@@ -9,16 +9,21 @@
 
 namespace mitk{
 
-  /// Class for writing XML nodes and XML attributes.
-  ///
-  /// Derived class of BaseXMLWriter.
-  /// The data is stored with XML attributes.
-  /// The functions WriteProperty() are used to write XML attributes. The first parameter specifies the name of the attribute. The second parameter holds the data of the attribute.
+  //##Documentation
+  //## @brief XMLWriter class for writing XML nodes and XML attributes.
+  //##
+  //## Derived class of BaseXMLWriter.
+  //## The data is stored with XML attributes.
+  //## The functions WriteProperty() are used to write XML attributes. The first parameter specifies the name of the attribute. The second parameter holds the data of the attribute.
+  //## @ingroup IO
   class XMLWriter : public BaseXMLWriter {
 
     std::string m_Filename;
     std::string m_SubFolder;
+    std::string m_SourceFileName;
+    std::string m_FilenameAndSubFolder;
     int m_FileCounter;
+    bool m_SaveSourceFiles;
     static std::string m_ImageExtension;
 
   public:
@@ -71,19 +76,21 @@ namespace mitk{
     /// writes a XML attribute that datatype is a Color (RGB)
     void WriteProperty( const std::string& key, Color value ) const;
 
+    /// sets the filename of a source file that will be written in the XML file
+    void SetSourceFileName( const char* sourceFileName);
    
-    /// sets the subfolder of the XML file. 
+    /// sets the subfolder of the source files that will be written in the XML file 
     void SetSubFolder( const char* subFolder );
 
-    /// returns the subfolder of the XML file. 
+    /// returns the subfolder of the source files that will be written in the XML file 
     const char* GetSubFolder();
 
    
-    /// returns a new unique filename in the subdirectory of the XML file
+    /// returns a new unique filename in the subdirectory of the source file that will be written in the XML file
     const char* GetNewFileName();
 
     
-    /// returns a new unique filename in the subdirectory of the XML file
+    /// returns the complete path (subfolder + filename) of the source file that will be written in the XML file
     const char* GetNewFilenameAndSubFolder();
 
     /// sets the image file extension (e.g. .pic, .mhd)
@@ -92,6 +99,12 @@ namespace mitk{
 
     /// returns the image file extension (e.g. .pic, .mhd)
     const std::string GetImageExtension();
+
+    /// sets to save the source files
+    void SetSaveSourceFiles(bool saveSourceFiles);
+
+    /// checks whether the source files will be written 
+    bool SaveSourceFiles();
   };
 }
 #endif

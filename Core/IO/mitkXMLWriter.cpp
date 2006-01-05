@@ -88,6 +88,12 @@ void XMLWriter::WriteProperty( const std::string& key, Color value ) const
 }
 
 
+void XMLWriter::SetSourceFileName( const char* sourceFileName)
+{
+  m_SourceFileName = sourceFileName;
+}
+
+
 void XMLWriter::SetSubFolder( const char* subFolder )
 {
   m_SubFolder = subFolder;
@@ -122,8 +128,15 @@ const char* XMLWriter::GetNewFilenameAndSubFolder()
 {
   static std::string newFilenameAndSubFolder = m_SubFolder;
 
-  newFilenameAndSubFolder += GetNewFileName();
-  return newFilenameAndSubFolder.c_str();
+  if (m_SourceFileName != ""){
+    m_FilenameAndSubFolder = m_SubFolder;
+    m_FilenameAndSubFolder += m_SourceFileName;
+    return m_FilenameAndSubFolder.c_str();
+  }
+  else{
+    newFilenameAndSubFolder += GetNewFileName();
+    return newFilenameAndSubFolder.c_str();
+  }
 }
 
 
@@ -137,6 +150,19 @@ const std::string XMLWriter::GetImageExtension()
 {
   return m_ImageExtension;
 }
+
+
+void XMLWriter::SetSaveSourceFiles(bool saveSourceFiles)
+{
+  m_SaveSourceFiles = saveSourceFiles;
+}
+
+
+bool XMLWriter::SaveSourceFiles()
+{
+  return m_SaveSourceFiles;
+}
+
 
 void XMLWriter::WriteProperty( const std::string& key, const char* value ) const
 { XMLWriter::BaseXMLWriter::WriteProperty( key, value ); }

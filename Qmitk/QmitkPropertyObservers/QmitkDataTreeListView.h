@@ -20,7 +20,6 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 #include <qlistview.h>
-
 #include <QmitkDataTreeListViewExpander.h>
 
 /// @brief Displays items of a mitk::DataTreeBase

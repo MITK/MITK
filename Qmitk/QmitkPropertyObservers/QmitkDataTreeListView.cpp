@@ -138,6 +138,10 @@ void QmitkDataTreeListView::SetFilter(mitk::DataTreeFilter* filter)
   if (m_DataTreeFilter) // remove observers
     disconnectNotifications();
   m_DataTreeFilter = filter;
+  // in the case that somebody first sets a datatree and then a filter
+  // destroy the default filter that was created in SetDataTree
+  if (filter != m_PrivateFilter.GetPointer())
+    m_PrivateFilter = NULL;
   connectNotifications(); // add observers
   generateItems();
 }

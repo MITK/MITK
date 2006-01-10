@@ -506,7 +506,7 @@ CommonFunctionality::DataTreeIteratorVector CommonFunctionality::FilterNodes(mit
     while ( !iteratorClone->IsAtEnd() )
     {
       mitk::DataTreeNode::Pointer node = iteratorClone->Get();
-      if ( FilterFunction( node ) )
+      if ( (FilterFunction == NULL) || FilterFunction( node ) )
       {
         result.push_back(iteratorClone);
       }

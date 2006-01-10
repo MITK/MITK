@@ -55,7 +55,6 @@ SmartPointerVectorContainer< TElementIdentifier , TElement >
 }
 
 
-
 /**
  * Get a reference to the element at the given index.
  * If the element location does not exist, it will be created with a
@@ -83,7 +82,7 @@ SmartPointerVectorContainer< TElementIdentifier , TElement >
  * It is assumed that the index exists.
  */
 template <typename TElementIdentifier, typename TElement>
-typename SmartPointerVectorContainer< TElementIdentifier , TElement >::ConstElementPointer
+const typename SmartPointerVectorContainer< TElementIdentifier , TElement >::ConstElementPointer
 SmartPointerVectorContainer< TElementIdentifier , TElement >
 ::GetElement(ElementIdentifier id) const
 {

@@ -631,7 +631,7 @@ void smart_pointer_vector_container_test()
 
 }
 
-int mitkDataTreeFilterTest(int argc, char** argv)
+int mitkDataTreeFilterTest(int argc, char ** const argv)
 {
   verbose = argc - 1;
 

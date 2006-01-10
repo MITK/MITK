@@ -52,6 +52,9 @@
  *   reads a PicFile from disk
  *
  * $Log$
+ * Revision 1.8  2006/01/10 16:53:09  hasselberg
+ * FIX: ANSI C conformance (required for MSVC7.0)
+ *
  * Revision 1.7  2005/12/21 08:28:42  max
  * FIX: renamed ipSize_t to size_t, since ipSize_t is only available in the 64Bit branch op ipPic.
  *
@@ -205,8 +208,19 @@ ipPicDescriptor * _MITKipPicOldGet( FILE *infile, ipPicDescriptor *pic )
 
   size_t elements;
 
-  size_t size;
-  size = 0;
+  size_t size = 0;
+
+  size_t number_of_elements;
+  size_t bytes_per_element;
+  size_t number_of_bytes;
+  size_t block_size;
+  size_t number_of_blocks;
+  size_t remaining_bytes;
+  size_t bytes_read;
+  size_t block_nr;
+
+  ipUInt1_t* data;
+
   if( pic == NULL )
     pic = ipPicNew();
   else
@@ -253,16 +267,16 @@ ipPicDescriptor * _MITKipPicOldGet( FILE *infile, ipPicDescriptor *pic )
    * data is read in blocks of size 'block_size' to prevent from
    * errors due to large file sizes (>=2GB)
    */
-  size_t number_of_elements = elements;
-  size_t bytes_per_element = old_pic.type;
-  size_t number_of_bytes = number_of_elements * bytes_per_element;
-  size_t block_size = 1024*1024; /* Use 1 MB blocks. Make sure that block size is smaller than 2^31 */
-  size_t number_of_blocks = number_of_bytes / block_size;
-  size_t remaining_bytes = number_of_bytes % block_size;
-  size_t bytes_read = 0;
-  size_t block_nr = 0;
+  number_of_elements = elements;
+  bytes_per_element = old_pic.type;
+  number_of_bytes = number_of_elements * bytes_per_element;
+  block_size = 1024*1024; /* Use 1 MB blocks. Make sure that block size is smaller than 2^31 */
+  number_of_blocks = number_of_bytes / block_size;
+  remaining_bytes = number_of_bytes % block_size;
+  bytes_read = 0;
+  block_nr = 0;
   
-  ipUInt1_t* data = (ipUInt1_t*) pic->data;
+  data = (ipUInt1_t*) pic->data;
   for ( block_nr = 0 ; block_nr < number_of_blocks ; ++block_nr )
     bytes_read += ipPicFReadLE( data + ( block_nr * block_size ), 1, block_size, infile );
   bytes_read += ipPicFReadLE( data + ( number_of_blocks * block_size ), 1, remaining_bytes, infile );
@@ -467,6 +481,17 @@ MITKipPicGet( char *infile_name, ipPicDescriptor *pic )
   ipUInt4_t to_read;
   size_t size;
 
+  size_t number_of_elements;
+  size_t bytes_per_element;
+  size_t number_of_bytes;
+  size_t block_size;
+  size_t number_of_blocks;
+  size_t remaining_bytes;
+  size_t bytes_read;
+  size_t block_nr;
+
+  ipUInt1_t* data;
+
   infile = _ipPicOpenPicFileIn( infile_name );
 
   if( !infile )
@@ -558,17 +583,17 @@ MITKipPicGet( char *infile_name, ipPicDescriptor *pic )
    * data is read in blocks of size 'block_size' to prevent from
    * errors due to large file sizes (>=2GB)
    */
-  size_t number_of_elements = _ipPicElements(pic);
-  size_t bytes_per_element = pic->bpe / 8;
-  size_t number_of_bytes = number_of_elements * bytes_per_element;
-  size_t block_size = 1024*1024; /* Use 1 MB blocks. Make sure that block size is smaller than 2^31 */
-  size_t number_of_blocks = number_of_bytes / block_size;
-  size_t remaining_bytes = number_of_bytes % block_size;
-  size_t bytes_read = 0;
-  size_t block_nr = 0;
+  number_of_elements = _ipPicElements(pic);
+  bytes_per_element = pic->bpe / 8;
+  number_of_bytes = number_of_elements * bytes_per_element;
+  block_size = 1024*1024; /* Use 1 MB blocks. Make sure that block size is smaller than 2^31 */
+  number_of_blocks = number_of_bytes / block_size;
+  remaining_bytes = number_of_bytes % block_size;
+  bytes_read = 0;
+  block_nr = 0;
   /*printf( "mitkIpPicGet: number of blocks to read is %ul.\n", number_of_blocks ); */
   
-  ipUInt1_t* data = (ipUInt1_t*) pic->data;
+  data = (ipUInt1_t*) pic->data;
   if( pic->type == ipPicNonUniform )
     {
       for ( block_nr = 0 ; block_nr < number_of_blocks ; ++block_nr )
@@ -583,7 +608,12 @@ MITKipPicGet( char *infile_name, ipPicDescriptor *pic )
     }
     
   if ( bytes_read != number_of_bytes )
-    fprintf( stderr, "Error while reading (ferror indicates %u), only %lu bytes were read! Eof indicator is %u.\n", ferror(infile), bytes_read, feof(infile) );
+  {
+    fprintf( stderr, "Error while reading, only %lu bytes were read! Eof indicator is %u.\n", bytes_read, ipPicFEOF(infile) );
+#ifndef USE_ZLIB
+    fprintf( stderr, "(ferror indicates %u).\n", ferror(infile));    
+#endif
+  }
 
   if( infile != stdin )
     ipPicFClose( infile );

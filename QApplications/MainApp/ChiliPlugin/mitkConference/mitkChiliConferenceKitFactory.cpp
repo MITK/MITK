@@ -1,21 +1,25 @@
 #include <mitkChiliConferenceKitFactory.h>
-#include <qmitkQChili3Conference.h>
+#include <QmitkQChili3Conference.h>
+#include <itkSmartPointer.h>
 
 namespace mitk{
+//class ConferenceKit;
 
-ConferenceKit::Pointer ChiliConferenceKitFactory::m_QCInstance = NULL;
+//ConferenceKit::Pointer ChiliConferenceKitFactory::m_QCInstance;
 
-ChiliConferenceKitFactory::ChiliConferenceKitFactory(){};
+ChiliConferenceKitFactory::ChiliConferenceKitFactory()
+{
+  ConferenceKit::SetFactory( this );
+};
+
 ChiliConferenceKitFactory::~ChiliConferenceKitFactory(){};
 
-ConferenceKit::Pointer
-ChiliConferenceKitFactory::GetConferenceKit()
+ConferenceKit*
+ChiliConferenceKitFactory::CreateConferenceKit()
 {
-  if(m_QCInstance.IsNull())
-  {
-    m_QCInstance = QChili3Conference::New();
-  }
-  return m_QCInstance;
+//   QChili3Conference::Pointer qcc = QChili3Conference::New();
+//   return qcc->GetPointer();
+     return new QChili3Conference;
 };
 
 }//namespace

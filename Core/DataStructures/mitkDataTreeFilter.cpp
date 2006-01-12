@@ -178,7 +178,7 @@ bool DataTreeFilter::Item::IsSelected() const
   return m_Selected;
 }
 
-void DataTreeFilter::Item::SetSelected(bool selected) 
+void DataTreeFilter::Item::SetSelected(bool selected)
 {
   if ( selected != m_Selected )
   {
@@ -187,13 +187,17 @@ void DataTreeFilter::Item::SetSelected(bool selected)
     if ( selected )
     {
       if ( m_TreeFilter->m_SelectionMode == mitk::DataTreeFilter::SINGLE_SELECT )
+        if (m_TreeFilter->m_LastSelectedItem.IsNotNull() && m_TreeFilter->m_LastSelectedItem != this)
+          m_TreeFilter->m_LastSelectedItem->SetSelected(false);
+/*
       { // deselect last selected item
         m_TreeFilter->m_SelectedItems.erase( m_TreeFilter->m_LastSelectedItem.GetPointer() );
         m_TreeFilter->InvokeEvent(
             mitk::TreeFilterSelectionChangedEvent(m_TreeFilter->m_LastSelectedItem.GetPointer(), false) );
       }
+*/
       
-      if ( m_TreeFilter->m_LastSelectedItem.IsNotNull() ) // remember this item as most recently selected
+      //if ( m_TreeFilter->m_LastSelectedItem.IsNotNull() ) // remember this item as most recently selected
         m_TreeFilter->m_LastSelectedItem = this;
 
       m_TreeFilter->m_SelectedItems.insert(this);

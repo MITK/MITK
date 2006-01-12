@@ -28,6 +28,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QmitkNumberPropertyEditor.h>
 
 #include <QmitkDataTreeListView.h>
+#include <QmitkDataTreeComboBox.h>
 
 #include <mitkImage.h>
 
@@ -152,6 +153,9 @@ PropertyViewTest::PropertyViewTest(bool stay, QWidget* parent, const char* name)
   colorview = new QmitkColorPropertyView( propcolor, this );
   //vlright->addWidget(colorview, 10);
   vlright->addWidget(colorview);
+  
+  treecombobox = new QmitkDataTreeComboBox(tree_filter, this);
+  vlright->addWidget( treecombobox );
 
   // finally, a timer that starts some testing
   timer = new QTimer(this);
@@ -234,6 +238,7 @@ void PropertyViewTest::prepare_tree()
   editable_props.push_back("opacity");
   
   tree_filter = mitk::DataTreeFilter::New(data_tree);
+  tree_filter->SetSelectionMode(mitk::DataTreeFilter::SINGLE_SELECT);
   tree_filter->SetFilter(&mitk::IsGoodDataTreeNode);
   tree_filter->SetVisibleProperties(visible_props);
   tree_filter->SetEditableProperties(editable_props);
@@ -273,6 +278,7 @@ PropertyViewTest::~PropertyViewTest()
   delete propfloat2;
 
   delete treelistview;
+  delete treecombobox;
   
   tree_filter = 0;
   data_tree = 0;

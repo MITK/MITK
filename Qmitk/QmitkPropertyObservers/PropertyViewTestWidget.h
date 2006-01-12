@@ -32,6 +32,7 @@ class QmitkColorPropertyEditor;
 class QmitkNumberPropertyView;
 class QmitkNumberPropertyEditor;
 class QmitkDataTreeListView;
+class QmitkDataTreeComboBox;
 
 class PropertyViewTest : public QWidget
 {
@@ -88,6 +89,7 @@ class PropertyViewTest : public QWidget
    mitk::DataTreeFilter::Pointer tree_filter;
 
    QmitkDataTreeListView* treelistview;
+   QmitkDataTreeComboBox* treecombobox;
 
    QTimer* timer;
 

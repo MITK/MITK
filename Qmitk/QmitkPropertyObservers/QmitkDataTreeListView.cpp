@@ -183,9 +183,9 @@ void QmitkDataTreeListView::paintListBackground(QPainter& painter, QmitkListView
         }
 
         if (selected)
-          painter.fillRect(cell.left() - 4, cell.top()-2, width(), cell.height()+4 , colorGroup().brush(QColorGroup::Highlight) );
+          painter.fillRect(cell.left() - 4, cell.top()-2, width(), cell.height()+4, colorGroup().brush(QColorGroup::Highlight) );
         else
-          painter.fillRect(cell.left() - 4, cell.top()-2 ,width(),cell.height()+4, colorGroup().brush(QColorGroup::Base) );
+          painter.fillRect(cell.left() - 4, cell.top()-2, width(), cell.height()+4, colorGroup().brush(QColorGroup::Base) );
       }
     }
   }
@@ -234,50 +234,12 @@ void QmitkDataTreeListView::mouseReleaseEvent ( QMouseEvent* e )
       item->SetSelected( selected ); // toggle selection
       m_SelfCall = false;
     }
- 
-    temp = index;
-    temp->lockBecauseOfSelection( selected );
-    while ((temp = temp->parentIndex()))
-    {
-      temp->lockBecauseOfSelection( selected );
-    }
-  
-    try
-    {
-      // set clicked row's widget backgrounds according to the selection status
-      std::list<QWidget*>& widgets( index->widgetsAt(row) );
-  
-    std::list<QWidget*>::reverse_iterator iter;
-    for ( iter = widgets.rbegin(), ++iter; iter != widgets.rend(); ++iter) // ignore last item (expander symbol)
-    {
-      if (selected)
-      {
-        (*iter)->setBackgroundMode(Qt::PaletteHighlight);
-      
-        // following lines seem too complicated, but I could not find an easier way of changing the foreground color
-        QPalette palette( (*iter)->palette() );
-        palette.setColor( QColorGroup::Foreground, palette.color( QPalette::Active, QColorGroup::HighlightedText ) );
-        (*iter)->setPalette( palette );
-      }
-      else
-      {
-        (*iter)->setBackgroundMode( Qt::PaletteBase );
-        (*iter)->unsetPalette();
-      }
-    }
-
-    }
-    catch (std::out_of_range)
-    {
-      // no recovery
-    }
   }
   else // not left mouse button
   {
     // future enhancement. signal with item as parameter -> opportunity to generate a popup menu
   }
 
-  update();
 }
 
 void QmitkDataTreeListView::AddItemsToList(QWidget* parent, QmitkListViewItemIndex* index,
@@ -444,15 +406,85 @@ void QmitkDataTreeListView::removeAllHandler( const itk::EventObject& )
   clearItems();
 }
 
-void QmitkDataTreeListView::selectionChangedHandler( const itk::EventObject& )
+bool QmitkDataTreeListView::selectItemInGrid(const mitk::DataTreeFilter::Item* item, bool selected, QmitkListViewItemIndex* index)
 {
-  if (m_SelfCall) return; // invoked by this object
-  /*
+  // find item, change selection, done
+  //std::vector<QmitkListViewItemIndex*>::iterator iterindices = index->m_Indices.begin();
+  for (int row = 0; row < index->m_Grid->numRows(); ++row)
+  {
+    // if this is the item, (un)select it
+    // then break, return true
+    if ( index->itemAt(row) == item )
+    {
+      // locking issues
+      QmitkListViewItemIndex* temp(index);
+      temp->lockBecauseOfSelection( selected );
+      while ((temp = temp->parentIndex()))
+      {
+        temp->lockBecauseOfSelection( selected );
+      }
+      
+      QRect cell( index->m_Grid->cellGeometry(row, 1) );
+     
+      QPainter painter(this);
+      if (selected)
+        painter.fillRect(cell.left() - 4, cell.top()-2, width(), cell.height()+4, colorGroup().brush(QColorGroup::Highlight) );
+      else
+        painter.fillRect(cell.left() - 4, cell.top()-2, width(), cell.height()+4, colorGroup().brush(QColorGroup::Base) );
+      // do the appropriate magic on all widgets
+      std::list<QWidget*>::reverse_iterator iter;
+      for ( iter = index->widgetsAt(row).rbegin(), ++iter; iter != index->widgetsAt(row).rend(); ++iter) // ignore last item (expander symbol)
+      {
+        if (selected)
+        {
+          (*iter)->setBackgroundMode(Qt::PaletteHighlight);
+        
+          // following lines seem too complicated, but I could not find an easier way of changing the foreground color
+          QPalette palette( (*iter)->palette() );
+          palette.setColor( QColorGroup::Foreground, palette.color( QPalette::Active, QColorGroup::HighlightedText ) );
+          (*iter)->setPalette( palette );
+        }
+        else
+        {
+          (*iter)->setBackgroundMode( Qt::PaletteBase );
+          (*iter)->unsetPalette();
+        }
+      }
+      
+      return true;
+    }
+    
+    // if the current item has children, recurse, break on positive return value
+    try
+    {
+      //if (iterindices != index->m_Indices.end() && *iterindices != NULL)
+      QmitkListViewItemIndex* ind(index->indexAt(row));
+      if (ind)
+      {
+        if ( selectItemInGrid(item, selected, ind) )
+        {
+          return true;
+        }
+      }
+    }
+    catch (std::out_of_range)
+    {
+    }
+
+  }
+
+  // by default return false 
+  return false;
+}
+
+void QmitkDataTreeListView::selectionChangedHandler( const itk::EventObject& e)
+{
   const mitk::TreeFilterSelectionChangedEvent& event( static_cast<const mitk::TreeFilterSelectionChangedEvent&>(e) );
   const mitk::DataTreeFilter::Item* item = event.GetChangedItem();
   bool selected = event.IsSelected();
-  */
-  // find item, change selection, done
+ 
+  selectItemInGrid(item, selected, this);
+  update();
 }
 
 void QmitkDataTreeListView::itemAddedHandler( const itk::EventObject& /*e*/ )

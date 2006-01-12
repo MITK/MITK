@@ -6,7 +6,9 @@ package model;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.jface.viewers.ICellEditorValidator;
 import org.eclipse.ui.views.properties.IPropertyDescriptor;
+import org.eclipse.ui.views.properties.PropertyDescriptor;
 import org.eclipse.ui.views.properties.TextPropertyDescriptor;
 import org.jdom.Attribute;
 import org.jdom.Comment;
@@ -24,9 +26,9 @@ public class StateMachinesDiagram extends ModelElement {
 	
 	private static IPropertyDescriptor[] descriptors;
 	
-	public static final String NAME_PROP = "StateMachinesDiagram.name";
+	public static final String NAME_PROP = "StateMachinesDiagram.Name";
 	
-	public static final String COMMENT_PROP = "StateMachinesDiagram.comment";
+	public static final String COMMENT_PROP = "StateMachinesDiagram.Comment";
 
 	/** Property ID to use when a child is added to this diagram. */
 	public static final String CHILD_ADDED_PROP = "StateMachinesDiagram.ChildAdded";
@@ -34,6 +36,12 @@ public class StateMachinesDiagram extends ModelElement {
 	/** Property ID to use when a child is removed from this diagram. */
 	public static final String CHILD_REMOVED_PROP = "StateMachinesDiagram.ChildRemoved";
 
+	/** Property ID to use when the EditPolicies should be deactivated in debug mode. */
+	public static final String DEACTIVATE_POLICY_PROP = "StateMachinesDiagram.Deactivate";
+	
+	/** Property ID to use when the EditPolicies should be activated in debug mode. */
+	public static final String ACTIVATE_POLICY_PROP = "StateMachinesDiagram.Activate";
+	
 	private static final long serialVersionUID = 1;
 
 	private List states = new ArrayList();
@@ -310,5 +318,39 @@ public class StateMachinesDiagram extends ModelElement {
 			return true;
 		}
 		return false;
+	}
+	
+	/**
+	 * Deactivates the editpolicies for add states. Has to be called after the editor is opened.
+	 * Calls the methods to deactivate policies of states and connections as well.
+	 */
+	public void setDebugMode() {
+		for (int i = 0; i < states.size(); i++) {
+			States state = (States) states.get(i);
+			state.deactivatePolicy();
+		}
+		for (int i = 0; i < descriptors.length; i++) {
+			((PropertyDescriptor) descriptors[i]).setValidator(new ICellEditorValidator() 
+					{
+						public String isValid(Object value) {
+							return "no changes possible during debug mode";
+						}
+					});
+		}
+		firePropertyChange(DEACTIVATE_POLICY_PROP, null, null);
+	}
+	
+	/**
+	 * Reactivates the editpolicies for add states.
+	 */
+	public void resetFromDebugMode() {
+		for (int i = 0; i < states.size(); i++) {
+			States state = (States) states.get(i);
+			state.activatePolicy();
+		}
+		for (int i = 0; i < descriptors.length; i++) {
+			((PropertyDescriptor) descriptors[i]).setValidator(null);
+		}
+		firePropertyChange(ACTIVATE_POLICY_PROP, null, null);
 	}
 }

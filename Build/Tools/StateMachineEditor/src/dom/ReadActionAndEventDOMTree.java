@@ -27,6 +27,8 @@ public class ReadActionAndEventDOMTree {
 	private Map actionIdMap = new HashMap();
 	private Map actionNameMap = new HashMap();
 	private Map actionCategoryMap = new HashMap();
+	private List allEventCats = new ArrayList();
+	private List allActionCats = new ArrayList();
 	private File filename = null;
 
 	/**
@@ -44,6 +46,9 @@ public class ReadActionAndEventDOMTree {
         	List allEventCategories = getAllEventCategories();
         	for (int i = 0; i < allEventCategories.size(); i++) {
         		Element cat = (Element) allEventCategories.get(i);
+        		if (!allEventCats.contains(cat.getAttributeValue("NAME"))) {
+        			allEventCats.add(cat.getAttributeValue("NAME"));
+        		}
         		List allEvents = getEvents(cat.getAttributeValue("NAME"));
         		for (int j = 0; j < allEvents.size(); j++) {
         			Element ev = (Element) allEvents.get(j);
@@ -55,6 +60,9 @@ public class ReadActionAndEventDOMTree {
         	List allActionCategories = getAllActionCategories();
         	for (int i = 0; i < allActionCategories.size(); i++) {
         		Element cat = (Element) allActionCategories.get(i);
+        		if (!allActionCats.contains(cat.getAttributeValue("NAME"))) {
+        			allActionCats.add(cat.getAttributeValue("NAME"));
+        		}
         		List allActions = getActions(cat.getAttributeValue("NAME"));
         		for (int j = 0; j < allActions.size(); j++) {
         			Element act = (Element) allActions.get(j);
@@ -312,7 +320,7 @@ public class ReadActionAndEventDOMTree {
 	
 	/**
 	 * @param id the searched event id
-	 * @return true if the id is already in use, false otherwise
+	 * @return true if the event id is allready in use, false otherwise
 	 */
 	public boolean containsEventId (String id) {
 		if (eventIdMap.containsKey(id)) {
@@ -322,11 +330,55 @@ public class ReadActionAndEventDOMTree {
 	}
 	
 	/**
+	 * @param id the searched event name
+	 * @return true if the event name is allready in use, false otherwise
+	 */
+	public boolean containsEventName (String eventName) {
+		if (eventNameMap.containsKey(eventName)) {
+			return true;
+		}
+		return false;
+	}
+	
+	/**
+	 * @param id the searched event category
+	 * @return true if the event category is allready in use, false otherwise
+	 */
+	public boolean containsEventCategory (String eventCategory) {
+		if (allEventCats.contains(eventCategory)) {
+			return true;
+		}
+		return false;
+	}
+	
+	/**
 	 * @param id the searched action id
-	 * @return true if the id is already in use, false otherwise
+	 * @return true if the action id is allready in use, false otherwise
 	 */
 	public boolean containsActionId (String id) {
 		if (actionIdMap.containsKey(id)) {
+			return true;
+		}
+		return false;
+	}
+	
+	/**
+	 * @param actionName the searched action name
+	 * @return true if the action name is allready in use, false otherwise
+	 */
+	public boolean containsActionName (String actionName) {
+		if (actionNameMap.containsKey(actionName)) {
+			return true;
+		}
+		return false;
+	}
+	
+	/**
+	 * @param actionCategory the searched action category
+	 * @return true if the action category is allready in use, false otherwise
+	 */
+	public boolean containsActionCategory (String actionCategory) {
+		if (allActionCats.contains(actionCategory)) {
 			return true;
 		}
 		return false;

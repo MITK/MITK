@@ -111,14 +111,32 @@ public class SpreadRouter extends MyAutomaticRouter {
 		xmin = midPoint.x - radius;
 		xmax = midPoint.x + radius;
 		points.removeAllPoints();
+		double xmaxi = 0;
+		// test if the state is in the -X area
+		if (xmax < 0) {
+			xmaxi = xmax;
+		}
+		else {
+			xmaxi = xmax + 1;
+		}
 		if (s.y > midPoint.y) {
-			for ( int x = (int) s.x; x > (int) xmin; x--) {
-				double y = midPoint.y + Math.sqrt(radius * radius - (x - midPoint.x) * (x - midPoint.x));
-				Point v = new Point(x, y);
-				i++;
-				points.insertPoint(v, i);
+			if (xmin > 0) {
+				for ( int x = (int) s.x; x > (int) xmin; x--) {
+					double y = midPoint.y + Math.sqrt(radius * radius - (x - midPoint.x) * (x - midPoint.x));
+					Point v = new Point(x, y);
+					i++;
+					points.insertPoint(v, i);
+				}
 			}
-			for (int x = (int) xmin + 1; x <(int) xmax + 1; x++) {
+			else {
+				for ( int x = (int) s.x; x >= (int) xmin; x--) {
+					double y = midPoint.y + Math.sqrt(radius * radius - (x - midPoint.x) * (x - midPoint.x));
+					Point v = new Point(x, y);
+					i++;
+					points.insertPoint(v, i);
+				}
+			}
+			for (int x = (int) xmin + 1; x < (int) xmaxi; x++) {
 				double y = midPoint.y - Math.sqrt(radius * radius - (x - midPoint.x) * (x - midPoint.x));
 				Point v = new Point(x, y);
 				i++;
@@ -126,14 +144,14 @@ public class SpreadRouter extends MyAutomaticRouter {
 			}
 		}
 		else if (xmin < s.x) {
-			for (int x = (int) s.x; x <(int) xmax + 1; x++) {
+			for (int x = (int) s.x; x < (int) xmaxi; x++) {
 				double y = midPoint.y - Math.sqrt(radius * radius - (x - midPoint.x) * (x - midPoint.x));
 				Point v = new Point(x, y);
 				i++;
 				points.insertPoint(v, i);
 			}
 		}
-		for (int x = (int) xmax; x >= (int) e.x; x--) {
+		for (int x = (int) xmax - 1; x >= (int) e.x; x--) {
 			double y = midPoint.y + Math.sqrt(radius * radius - (x - midPoint.x) * (x - midPoint.x));
 			Point v = new Point(x, y);
 			i++;

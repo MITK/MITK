@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.draw2d.Graphics;
+import org.eclipse.jface.viewers.ICellEditorValidator;
 import org.eclipse.ui.views.properties.IPropertyDescriptor;
 import org.eclipse.ui.views.properties.PropertyDescriptor;
 import org.eclipse.ui.views.properties.TextPropertyDescriptor;
@@ -32,25 +33,29 @@ public class Connection extends ModelElement {
 	public static final Integer SOLID_CONNECTION = new Integer(
 			Graphics.LINE_SOLID);
 	
-	/**
-	 * property id for changes on the connection comment
-	 */
+	/** property id for changes on the connection comment. */
 	public static final String COMMENT_PROP = "Connection.comment";
 	
-	/**
-	 * property id for changes on the connection name
-	 */
+	/** property id for changes on the connection name. */
 	public static final String NAME_PROP = "Connection.name";
 	
-	/**
-	 * property id for changes on the connection event
-	 */
+	/** property id for changes on the connection event. */
 	public static final String EVENT_PROP = "Connection.event";
 	
-	/**
-	 * property id for changes on the connection actions
-	 */
+	/** property id for changes on the connection actions. */
 	public static final String ACTION_PROP = "Connection.action";
+	
+	/** Property ID to use when a connection is active in debug mode. */
+	public static final String ACTIVE_PROP = "Connection.active";
+	
+	/** Property ID to use when a connection is inactive in debug mode. */
+	public static final String INACTIVE_PROP = "Connection.inactive";
+	
+	/** Property ID to use when the EditPolicies should be deactivated in debug mode. */
+	public static final String DEACTIVATE_POLICY_PROP = "Connection.deactivatePolicy";
+	
+	/** Property ID to use when the EditPolicies should be deactivated in debug mode. */
+	public static final String ACTIVATE_POLICY_PROP = "Connection.activatePolicy";
 
 	private static final long serialVersionUID = 1;
 
@@ -73,18 +78,14 @@ public class Connection extends ModelElement {
 	/** Connection's target endpoint. */
 	private States target;
 	
-	/**
-	 * List with all jDOM action elements 
-	 */
+	/** List with all jDOM action elements. */
 	private List allActions = new ArrayList();
 	
 	private Element transition1;
 	private Comment comment1;
 	private boolean hasComment = false;
 	
-	/**
-	 * list with all action names
-	 */
+	/** List with all action names. */
 	private List actions = new ArrayList();
 	
 	/*
@@ -323,6 +324,47 @@ public class Connection extends ModelElement {
 			event = eventTree.getEventName(newEvent);
 		}
 		firePropertyChange(EVENT_PROP, null, event);
+	}
+	
+	/**
+	 * Set the backgroundcolor of this connection to orange 
+	 * if it is the active state in debug mode.
+	 */
+	public void setActive() {
+		firePropertyChange(ACTIVE_PROP, null, null);
+	}
+	
+	/**
+	 * Set the backgroundcolor of this connection to its normal color 
+	 * if it is not the active state in debug mode anymore.
+	 */
+	public void setInactive() {
+		firePropertyChange(INACTIVE_PROP, null, null);
+	}
+	
+	/**
+	 * Deactivates the editpolicies for remove connections.
+	 */
+	public void deactivatePolicy() {
+		for (int i = 0; i < descriptors.length; i++) {
+		((PropertyDescriptor) descriptors[i]).setValidator(new ICellEditorValidator() 
+				{
+					public String isValid(Object value) {
+						return "no changes possible during debug mode";
+					}
+				});
+		}
+		firePropertyChange(DEACTIVATE_POLICY_PROP, null, null);
+	}
+	
+	/**
+	 * Reactivates the editpolicies for remove connections.
+	 */
+	public void activatePolicy() {
+		for (int i = 0; i < descriptors.length; i++) {
+			((PropertyDescriptor) descriptors[i]).setValidator(null);
+		}
+		firePropertyChange(ACTIVATE_POLICY_PROP, null, null);
 	}
 	
 	/**

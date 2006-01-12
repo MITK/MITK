@@ -57,6 +57,8 @@ import actions.RemoveAction;
 
 import parts.StateMachinesEditPartFactory;
 import parts.StateMachinesTreeEditPartFactory;
+import stateMachinesList.StateMachinesList;
+import debug.DebugEventsList;
 import dom.DOMGetInstance;
 import dom.ReadDOMTree;
 
@@ -330,6 +332,9 @@ public class StateMachinesEditor extends GraphicalEditorWithFlyoutPalette {
 	public void dispose() {
 		if (!saved) {
 			diagram.changeToOldName();
+		}
+		if (StateMachinesList.isDebugMode()) {
+			DebugEventsList.closeView();
 		}
 		ReadDOMTree tree = DOMGetInstance.getInstance();
 		tree.removeDiagram(diagram);

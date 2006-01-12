@@ -21,7 +21,6 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.core.resources.*;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ui.*;
-import org.jdom.Element;
 
 import dom.DOMGetInstance;
 import dom.ReadDOMTree;
@@ -89,8 +88,7 @@ public class StateMachinesWizard extends Wizard implements INewWizard {
 		} catch (InterruptedException e) {
 			return false;
 		} catch (InvocationTargetException e) {
-			Throwable realException = e.getTargetException();
-			MessageDialog.openError(getShell(), "Error", realException.getMessage());
+			MessageDialog.openError(getShell(), "Error", "Project does not exist!");
 			return false;
 		}
 		return true;
@@ -113,9 +111,10 @@ public class StateMachinesWizard extends Wizard implements INewWizard {
 		if (!resource.exists() || !(resource instanceof IContainer)) {
 			throwCoreException("Container \"" + containerName + "\" does not exist.");
 		}
+		
 		IContainer container = (IContainer) resource;
 		final IFile file = container.getFile(new Path(fileName));
-		StateMachinesList.setContainer(container);
+		DOMGetInstance.setContainer(container);
 		monitor.worked(1);
 		monitor.setTaskName("Opening file for editing...");
 		getShell().getDisplay().asyncExec(new Runnable() {
@@ -123,12 +122,9 @@ public class StateMachinesWizard extends Wizard implements INewWizard {
 				ReadDOMTree tree = DOMGetInstance.getInstance();
 				// tree already exists, add statemachine to tree
 				if (!(tree == null)) {
-					Element machine = new Element("stateMachine");
 					String file1 = file.getName().toString();
 					int length = file1.length();
 					String filename = file1.subSequence(0, length-7).toString();
-					machine.setAttribute("NAME", filename);
-					tree.addStateMachine1(machine);
 					StateMachinesList.addToStateMachinesList2(file, filename);
 				}
 				// tree does not exist, create a new tree and add a statemachine
@@ -140,14 +136,13 @@ public class StateMachinesWizard extends Wizard implements INewWizard {
 					fileDialog.setFilterExtensions(new String[] {"*.xml"});
 					fileDialog.open();
 					String file2 = fileDialog.getFilterPath().toString() + File.separator + fileDialog.getFileName().toString();
-					ReadDOMTree tree1 = DOMGetInstance.createNew(file2);
-					Element machine = new Element("stateMachine");
-					String file1 = file.getName().toString();
-					int length = file1.length();
-					String filename = file1.subSequence(0, length-7).toString();
-					machine.setAttribute("NAME", filename);
-					tree1.addStateMachine1(machine);
-					StateMachinesList.addToStateMachinesList2(file, filename);
+					if (!(fileDialog.getFileName() == null) && !(fileDialog.getFileName().equals(""))) {
+						DOMGetInstance.createNew(file2);
+						String file1 = file.getName().toString();
+						int length = file1.length();
+						String filename = file1.subSequence(0, length-7).toString();
+						StateMachinesList.addToStateMachinesList2(file, filename);
+					}
 				}
 			}
 		});

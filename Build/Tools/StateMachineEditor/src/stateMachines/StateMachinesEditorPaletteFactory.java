@@ -48,7 +48,7 @@ final class StateMachinesEditorPaletteFactory {
 		PaletteDrawer componentsDrawer = new PaletteDrawer("States");
 
 		CombinedTemplateCreationEntry component = new CombinedTemplateCreationEntry(
-				"startstate", "Create a startstate", StartState.class,
+				"Startstate", "Create a startstate", StartState.class,
 				new SimpleFactory(StartState.class), ImageDescriptor
 						.createFromFile(StateMachinesPlugin.class,
 								"ellipse16.gif"), ImageDescriptor
@@ -56,7 +56,7 @@ final class StateMachinesEditorPaletteFactory {
 								"ellipse24.gif"));
 		componentsDrawer.add(component);
 
-		component = new CombinedTemplateCreationEntry("normalstate",
+		component = new CombinedTemplateCreationEntry("Normalstate",
 				"Create a state", NormalState.class, new SimpleFactory(
 						NormalState.class), ImageDescriptor
 						.createFromFile(StateMachinesPlugin.class,
@@ -65,7 +65,7 @@ final class StateMachinesEditorPaletteFactory {
 								"rectangle24.gif"));
 		componentsDrawer.add(component);
 
-		component = new CombinedTemplateCreationEntry("endstate",
+		component = new CombinedTemplateCreationEntry("Endstate",
 				"Create an endstate", EndState.class,
 				new SimpleFactory(EndState.class), ImageDescriptor
 						.createFromFile(StateMachinesPlugin.class,

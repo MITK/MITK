@@ -24,6 +24,7 @@ public class NewActionDialog extends JDialog {
 	private JTextField actionNameTextField = null;
 	private JLabel actionIdLabel = null;
 	private IntegerTextField actionIdTextField = null;
+	private boolean isCanceled = false;
 	
 	/**
 	 * This is the default constructor
@@ -143,6 +144,12 @@ public class NewActionDialog extends JDialog {
 								JOptionPane.ERROR_MESSAGE);
 						return;
 					}
+					else if (actionTree.containsActionName(actionNameTextField.getText())) {
+						JOptionPane.showMessageDialog(NewActionDialog.this,
+								"Action name allready exists, please choose another one!", "Error Message",
+								JOptionPane.ERROR_MESSAGE);
+						return;
+					}
 					else if (actionIdTextField.getText().equals("")) {
 						JOptionPane.showMessageDialog(NewActionDialog.this,
 								"You have to enter an id!", "Error Message",
@@ -155,7 +162,7 @@ public class NewActionDialog extends JDialog {
 								JOptionPane.ERROR_MESSAGE);
 						return;
 					}
-					cancel();
+					dispose();
 				}
 			});
 		}
@@ -174,18 +181,12 @@ public class NewActionDialog extends JDialog {
 			cancelButton.setText("Cancel");
 			cancelButton.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
-					cancel();
+					isCanceled = true;
+					dispose();
 				}
 			});
 		}
 		return cancelButton;
-	}
-	
-	/**
-	 * disposes this dialog
-	 */
-	void cancel() {
-		dispose();
 	}
 	
 	/**
@@ -207,5 +208,12 @@ public class NewActionDialog extends JDialog {
 	 */
 	public String getActionId() {
 		return actionIdTextField.getText();
+	}
+	
+	/**
+	 * @return returns whether this dialog is canceled
+	 */
+	public boolean isCanceled() {
+		return isCanceled;
 	}
 }

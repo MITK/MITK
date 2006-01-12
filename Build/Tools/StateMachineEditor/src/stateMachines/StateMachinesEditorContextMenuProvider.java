@@ -19,6 +19,8 @@ import org.eclipse.gef.EditPartViewer;
 import org.eclipse.gef.ui.actions.ActionRegistry;
 import org.eclipse.gef.ui.actions.GEFActionConstants;
 
+import stateMachinesList.StateMachinesList;
+
 import dom.DOMGetInstance;
 import dom.ReadActionAndEventDOMTree;
 
@@ -67,47 +69,49 @@ public class StateMachinesEditorContextMenuProvider extends ContextMenuProvider 
 	 * @see org.eclipse.gef.ContextMenuProvider#buildContextMenu(org.eclipse.jface.action.IMenuManager)
 	 */
 	public void buildContextMenu(IMenuManager menu) {
+		
 		// Add standard action groups to the menu
 		GEFActionConstants.addStandardActionGroups(menu);
-		
+			
 		IAction action;
-		
-		action = getActionRegistry().getAction(ActionFactory.UNDO.getId());
-		menu.appendToGroup(GEFActionConstants.GROUP_UNDO, action);
-
-		action = getActionRegistry().getAction(ActionFactory.REDO.getId());
-		menu.appendToGroup(GEFActionConstants.GROUP_UNDO, action);
-		
-		action = getActionRegistry().getAction(ActionFactory.SAVE.getId());
-		menu.appendToGroup(GEFActionConstants.GROUP_SAVE, action);
-		
-		action = getActionRegistry().getAction(ActionFactory.DELETE.getId());
-		if (action.isEnabled())
-			menu.appendToGroup(GEFActionConstants.GROUP_EDIT, action);
-		
-		action = getActionRegistry().getAction(ChangeEvent.CHANGE_EVENT);
-		if (action.isEnabled())	
-			menu.appendToGroup(GEFActionConstants.GROUP_ADD, action);
-		
-		action = getActionRegistry().getAction(AddAction.ADD_ACTION);
-		if (action.isEnabled())	
-			menu.appendToGroup(GEFActionConstants.GROUP_ADD, action);
-		
-		action = getActionRegistry().getAction(RemoveAction.REMOVE_ACTION);
-		if (action.isEnabled()) {
-			actions = RemoveAction.actionList;
-			if (!(actions.isEmpty())) {
-				for (int i = 0; i < actions.size(); i++) {
-					Action act = (Action) actions.get(i);
-					ReadActionAndEventDOMTree actionTree = DOMGetInstance.getActionAndEventInstance();
-					submenu = new MenuManager(actionTree.getActionName(act.getActionId()), Integer.toString(i));
-					submenu.addMenuListener(listener);
-					action = getActionRegistry().getAction(RemoveAction.REMOVE_ACTION);					
-					submenu.add(action);
-					action = getActionRegistry().getAction(ChangeAction.CHANGE_ACTION);
-					submenu.add(action);
-					if (!submenu.isEmpty()) {
-						menu.appendToGroup(GEFActionConstants.GROUP_REST, submenu);
+		if (!(StateMachinesList.isDebugMode())) {	
+			action = getActionRegistry().getAction(ActionFactory.UNDO.getId());
+			menu.appendToGroup(GEFActionConstants.GROUP_UNDO, action);
+			
+			action = getActionRegistry().getAction(ActionFactory.REDO.getId());
+			menu.appendToGroup(GEFActionConstants.GROUP_UNDO, action);
+			
+			action = getActionRegistry().getAction(ActionFactory.SAVE.getId());
+			menu.appendToGroup(GEFActionConstants.GROUP_SAVE, action);
+			
+			action = getActionRegistry().getAction(ActionFactory.DELETE.getId());
+			if (action.isEnabled())
+				menu.appendToGroup(GEFActionConstants.GROUP_EDIT, action);
+			
+			action = getActionRegistry().getAction(ChangeEvent.CHANGE_EVENT);
+			if (action.isEnabled())	
+				menu.appendToGroup(GEFActionConstants.GROUP_ADD, action);
+			
+			action = getActionRegistry().getAction(AddAction.ADD_ACTION);
+			if (action.isEnabled())	
+				menu.appendToGroup(GEFActionConstants.GROUP_ADD, action);
+			
+			action = getActionRegistry().getAction(RemoveAction.REMOVE_ACTION);
+			if (action.isEnabled()) {
+				actions = RemoveAction.actionList;
+				if (!(actions.isEmpty())) {
+					for (int i = 0; i < actions.size(); i++) {
+						Action act = (Action) actions.get(i);
+						ReadActionAndEventDOMTree actionTree = DOMGetInstance.getActionAndEventInstance();
+						submenu = new MenuManager(actionTree.getActionName(act.getActionId()), Integer.toString(i));
+						submenu.addMenuListener(listener);
+						action = getActionRegistry().getAction(RemoveAction.REMOVE_ACTION);					
+						submenu.add(action);
+						action = getActionRegistry().getAction(ChangeAction.CHANGE_ACTION);
+						submenu.add(action);
+						if (!submenu.isEmpty()) {
+							menu.appendToGroup(GEFActionConstants.GROUP_REST, submenu);
+						}
 					}
 				}
 			}

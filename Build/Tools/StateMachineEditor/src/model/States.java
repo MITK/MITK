@@ -108,7 +108,19 @@ public abstract class States extends ModelElement {
 
 	/** Property ID to use when the list of incoming connections is modified. */
 	public static final String TARGET_CONNECTIONS_PROP = "States.TargetConn";
+	
+	/** Property ID to use when a state is active in debug mode. */
+	public static final String ACTIVE_PROP = "States.Active";
+	
+	/** Property ID to use when a state is inactive in debug mode. */
+	public static final String INACTIVE_PROP = "States.Inactive";
 
+	/** Property ID to use when the EditPolicies should be deactivated in debug mode. */
+	public static final String DEACTIVATE_POLICY_PROP = "States.Deactivate";
+	
+	/** Property ID to use when the EditPolicies should be activated in debug mode. */
+	public static final String ACTIVATE_POLICY_PROP = "States.Activate";
+	
 	/**
 	 * ID for the Width property value (used for by the corresponding property
 	 * descriptor).
@@ -126,6 +138,8 @@ public abstract class States extends ModelElement {
 	 * descriptor).
 	 */
 	private static final String YPOS_PROP = "States.yPos";
+	
+	
 	
 	public static StateMachinesDiagram parent = null;
 	
@@ -189,7 +203,7 @@ public abstract class States extends ModelElement {
 					IWorkbenchWindow ui = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 					StateMachinesEditor activeEditor = (StateMachinesEditor) ui.getActivePage().getActiveEditor();
 					if (activeEditor.getDiagram().containsStateID((String)value)) {
-						return "id allready in use";
+						return "ID allready in use";
 					}
 					return (intValue >= 0) ? null
 							: "Value must be >=  0";
@@ -488,6 +502,88 @@ public abstract class States extends ModelElement {
 		stateName = newName;
 		state.setAttribute("NAME", newName);
 		firePropertyChange(STATE_NAME_PROP, null, stateName);
+	}
+	
+	/**
+	 * Set the backgroundcolor of this state to orange 
+	 * if it is the active state in debug mode.
+	 */
+	public void setActive() {
+		firePropertyChange(ACTIVE_PROP, null, null);
+	}
+	
+	/**
+	 * Set the backgroundcolor of this state to its normal color 
+	 * if it is not the active state in debug mode anymore.
+	 */
+	public void setInactive() {
+		firePropertyChange(INACTIVE_PROP, null, null);
+	}
+	
+	/**
+	 * Deactivates the editpolicies for remove states and create connections.
+	 */
+	public void deactivatePolicy() {
+		for (int i = 0; i < sourceConnections.size(); i++) {
+			Connection con = (Connection) sourceConnections.get(i);
+			con.deactivatePolicy();
+		}
+		for (int i = 0; i < descriptors.length; i++) {
+			((PropertyDescriptor) descriptors[i]).setValidator(new ICellEditorValidator() 
+					{
+						public String isValid(Object value) {
+							return "no changes possible during debug mode";
+						}
+					});
+			}
+		firePropertyChange(DEACTIVATE_POLICY_PROP, null, null);
+	}
+	
+	/**
+	 * Reactivates the editpolicies for remove states and create connections.
+	 */
+	public void activatePolicy() {
+		for (int i = 0; i < sourceConnections.size(); i++) {
+			Connection con = (Connection) sourceConnections.get(i);
+			con.activatePolicy();
+		}
+		for (int i = 0; i < descriptors.length; i++) {
+			((PropertyDescriptor) descriptors[i]).setValidator(null);
+		}
+		for (int i = 0; i < descriptors.length - 3; i++) {
+			((PropertyDescriptor) descriptors[i])
+					.setValidator(new ICellEditorValidator() {
+						public String isValid(Object value) {
+							int intValue = -1;
+							try {
+								intValue = Integer.parseInt((String) value);
+							} catch (NumberFormatException exc) {
+									return "Not a number";
+							}
+							return (intValue >= 0) ? null
+									: "Value must be >=  0";
+						}
+					});
+			((PropertyDescriptor) descriptors[descriptors.length - 3])
+			.setValidator(new ICellEditorValidator() {
+				public String isValid(Object value) {
+					int intValue = -1;
+					try {
+						intValue = Integer.parseInt((String) value);
+					} catch (NumberFormatException exc) {
+							return "Not a number";
+					}
+					IWorkbenchWindow ui = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+					StateMachinesEditor activeEditor = (StateMachinesEditor) ui.getActivePage().getActiveEditor();
+					if (activeEditor.getDiagram().containsStateID((String)value)) {
+						return "ID allready in use";
+					}
+					return (intValue >= 0) ? null
+							: "Value must be >=  0";
+				}
+			});
+		}
+		firePropertyChange(ACTIVATE_POLICY_PROP, null, null);
 	}
 	
 	/**

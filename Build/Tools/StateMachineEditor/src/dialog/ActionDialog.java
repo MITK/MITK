@@ -221,16 +221,33 @@ public class ActionDialog extends JDialog {
 			newCategoryButton.setText("New category");
 			newCategoryButton.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
-					String inputValue = JOptionPane.showInputDialog(ActionDialog.this, "New category name:");
-					if (!(inputValue == null) && !inputValue.equals("")) {
+					while (true) {
+						String inputValue = JOptionPane.showInputDialog(ActionDialog.this, "New category name:");
+						if (inputValue == null) {
+							//cancel
+							break;
+						}
+						else if (!(inputValue == null) && !inputValue.equals("") && !actionTree.containsActionCategory(inputValue)) {
 						Object[] options = { "OK", "CANCEL" };
-						int option = JOptionPane.showOptionDialog(null, "Do you really want to add this category?\nAdded category can not be removed!", "Click OK to continue",
+						int option = JOptionPane.showOptionDialog(ActionDialog.this, "Do you really want to add this category?\nAdded category can not be removed!", "Click OK to continue",
 						            JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE,
 						            null, options, options[0]);
-						if (option == 0) {
-							actionTree.addActionCategory(inputValue);
-							actionCategoryComboBox.addItem(inputValue);
-							actionCategoryComboBox.setSelectedItem(inputValue);
+							if (option == 0) {
+								actionTree.addActionCategory(inputValue);
+								actionCategoryComboBox.addItem(inputValue);
+								actionCategoryComboBox.setSelectedItem(inputValue);
+							}
+							break;
+						}
+						else if (actionTree.containsActionCategory(inputValue)) {
+							JOptionPane.showMessageDialog(ActionDialog.this,
+									"Action category allready exists, please choose another one!", "Error Message",
+									JOptionPane.ERROR_MESSAGE);
+						}
+						else {
+							JOptionPane.showMessageDialog(ActionDialog.this,
+									"You have to enter a category name!", "Error Message",
+									JOptionPane.ERROR_MESSAGE);
 						}
 					}
 				}
@@ -286,10 +303,40 @@ public class ActionDialog extends JDialog {
 			oKButton.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					if (!(actionCategoryComboBox.getSelectedItem() == null)) {
+						Vector paraVector = model.getDataVector();
 						TableCellEditor cellEditor = jTable.getCellEditor();
 						if (jTable.getSelectedRowCount() > 0) {
-							cellEditor.stopCellEditing();
+							if (!(jTable.getSelectedColumn() == 1)) {
+								if (!(jTable.getEditingRow() == -1)) {
+									cellEditor.stopCellEditing();
+								}
+							}
+							else {
+								jTable.clearSelection();
+							}
 						}
+						for (int i = 0; i < paraVector.size(); i++) {
+							Vector para = (Vector) paraVector.get(i);
+							if ((para.get(0) == null) || (para.get(0).toString().equals(""))) {
+								JOptionPane.showMessageDialog(ActionDialog.this,
+										"One or more parameters have no name! Please enter a name", "Error Message",
+										JOptionPane.ERROR_MESSAGE);
+								return;
+							}
+							else if ((para.get(2) == null) || (para.get(2).toString().equals(""))) {
+								JOptionPane.showMessageDialog(ActionDialog.this,
+										"One or more parameters have no value! Please enter a value", "Error Message",
+										JOptionPane.ERROR_MESSAGE);
+								return;
+							}
+							else if ((para.get(1) == null) || (para.get(1).toString().equals(""))) {
+								JOptionPane.showMessageDialog(ActionDialog.this,
+										"One or more parameters have no type! Please select a type", "Error Message",
+										JOptionPane.ERROR_MESSAGE);
+								return;
+							}
+						}
+						
 						if (actionNameComboBox.getSelectedItem() == null) {
 							JOptionPane.showMessageDialog(ActionDialog.this,
 									"You have to select an action name!", "Error Message",
@@ -352,6 +399,10 @@ public class ActionDialog extends JDialog {
 			addParameterButton.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					Vector newElement = new Vector(4);
+					newElement.add(0,"");
+					newElement.add(1,"");
+					newElement.add(2,"");
+					newElement.add(3,"");
 					model.addRow(newElement);
 				}
 			});
@@ -490,7 +541,8 @@ public class ActionDialog extends JDialog {
 					String newComment = acDlg.getActionComment();
 					String newName = acDlg.getActionName();
 					String newId = acDlg.getActionId();
-					if (!(newName == null || newId == null) && !(newName.equals("") || newId.equals(""))) {
+					if (!(acDlg.isCanceled())) {
+					if (!(newName == null || newId == null) && (!(newName.equals("") || newId.equals("")))) {
 						Object[] options = { "OK", "CANCEL" };
 						int option = JOptionPane.showOptionDialog(ActionDialog.this, "Do you really want to add this action?\nAdded action can not be removed!", "Click OK to continue",
 									JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE,
@@ -506,6 +558,7 @@ public class ActionDialog extends JDialog {
 							}
 							actionNameComboBox.setSelectedItem(newName);
 						}
+					}
 					}
 				}
 			});

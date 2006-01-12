@@ -11,9 +11,6 @@ import dom.ReadActionAndEventDOMTree;
 
 public class NewEventDialog extends JDialog {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	private javax.swing.JPanel jContentPane = null;
 	private JButton oKButton = null;
@@ -24,6 +21,7 @@ public class NewEventDialog extends JDialog {
 	private JTextField eventNameTextField = null;
 	private JLabel eventIdLabel = null;
 	private IntegerTextField eventIdTextField = null;
+	private boolean isCanceled = false;
 	
 	/**
 	 * This is the default constructor
@@ -143,6 +141,12 @@ public class NewEventDialog extends JDialog {
 								JOptionPane.ERROR_MESSAGE);
 						return;
 					}
+					else if (eventTree.containsEventName(eventNameTextField.getText())) {
+						JOptionPane.showMessageDialog(NewEventDialog.this,
+								"Event name allready exists, please choose another one!", "Error Message",
+								JOptionPane.ERROR_MESSAGE);
+						return;
+					}
 					else if (eventIdTextField.getText().equals("")) {
 						JOptionPane.showMessageDialog(NewEventDialog.this,
 								"You have to enter an id!", "Error Message",
@@ -155,7 +159,7 @@ public class NewEventDialog extends JDialog {
 								JOptionPane.ERROR_MESSAGE);
 						return;
 					}
-					cancel();
+					dispose();
 				}
 			});
 		}
@@ -174,18 +178,12 @@ public class NewEventDialog extends JDialog {
 			cancelButton.setText("Cancel");
 			cancelButton.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
-					cancel();
+					isCanceled = true;
+					dispose();
 				}
 			});
 		}
 		return cancelButton;
-	}
-	
-	/**
-	 * disposes this dialog
-	 */
-	void cancel() {
-		dispose();
 	}
 	
 	/**
@@ -207,5 +205,13 @@ public class NewEventDialog extends JDialog {
 	 */
 	public String getEventId() {
 		return eventIdTextField.getText();
+	}
+	
+	
+	/**
+	 * @return returns whether this dialog is canceled
+	 */
+	public boolean isCanceled() {
+		return isCanceled;
 	}
 }

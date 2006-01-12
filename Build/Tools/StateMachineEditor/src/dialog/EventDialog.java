@@ -169,16 +169,33 @@ public class EventDialog extends JDialog {
 			newCategoryButton.setText("New category");
 			newCategoryButton.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
-					String inputValue = JOptionPane.showInputDialog(EventDialog.this, "New category name:");
-					if (!(inputValue == null) && !inputValue.equals("")) {
-						Object[] options = { "OK", "CANCEL" };
-						int option = JOptionPane.showOptionDialog(EventDialog.this, "Do you really want to add this category?\nAdded category can not be removed!", "Click OK to continue",
-						            JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE,
-						            null, options, options[0]);
-						if (option == 0) {
-							eventTree.addEventCategory(inputValue);
-							eventCategoryComboBox.addItem(inputValue);
-							eventCategoryComboBox.setSelectedItem(inputValue);
+					while (true) {
+						String inputValue = JOptionPane.showInputDialog(EventDialog.this, "New category name:");
+						if (inputValue == null) {
+							//cancel
+							break;
+						}
+						else if (!(inputValue == null) && !inputValue.equals("") && !eventTree.containsEventCategory(inputValue)) {
+							Object[] options = { "OK", "CANCEL" };
+							int option = JOptionPane.showOptionDialog(EventDialog.this, "Do you really want to add this category?\nAdded category can not be removed!", "Click OK to continue",
+										JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE,
+										null, options, options[0]);
+							if (option == 0) {
+								eventTree.addEventCategory(inputValue);
+								eventCategoryComboBox.addItem(inputValue);
+								eventCategoryComboBox.setSelectedItem(inputValue);
+							}
+							break;
+						}
+						else if (eventTree.containsEventCategory(inputValue)) {
+							JOptionPane.showMessageDialog(EventDialog.this,
+									"Event category allready exists, please choose another one!", "Error Message",
+									JOptionPane.ERROR_MESSAGE);
+						}
+						else {
+							JOptionPane.showMessageDialog(EventDialog.this,
+									"You have to enter a category name!", "Error Message",
+									JOptionPane.ERROR_MESSAGE);
 						}
 					}
 				}
@@ -340,21 +357,23 @@ public class EventDialog extends JDialog {
 					String newComment = evDlg.getEventComment();
 					String newName = evDlg.getEventName();
 					String newId = evDlg.getEventId();
-					if (!(newName == null || newId == null) && !(newName.equals("") || newId.equals(""))) {
-						Object[] options = { "OK", "CANCEL" };
-						int option = JOptionPane.showOptionDialog(EventDialog.this, "Do you really want to add this event?\nAdded event can not be removed!", "Click OK to continue",
-									JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE,
-									null, options, options[0]);
-						if (option == 0) {
-							eventTree.addEvent(eventCategoryComboBox.getSelectedItem().toString(), newComment, newName, newId);
-							eventNameComboBox.addItem(newName);
-							if (!newComment.equals("")) {
-								tooltips.add(newComment);
+					if (!evDlg.isCanceled()) {
+						if (!(newName == null || newId == null) && !(newName.equals("") || newId.equals(""))) {
+							Object[] options = { "OK", "CANCEL" };
+							int option = JOptionPane.showOptionDialog(EventDialog.this, "Do you really want to add this event?\nAdded event can not be removed!", "Click OK to continue",
+										JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE,
+										null, options, options[0]);
+							if (option == 0) {
+								eventTree.addEvent(eventCategoryComboBox.getSelectedItem().toString(), newComment, newName, newId);
+								eventNameComboBox.addItem(newName);
+								if (!newComment.equals("")) {
+									tooltips.add(newComment);
+								}
+								else {
+									tooltips.add("no comment available");
+								}
+								eventNameComboBox.setSelectedItem(newName);
 							}
-							else {
-								tooltips.add("no comment available");
-							}
-							eventNameComboBox.setSelectedItem(newName);
 						}
 					}
 				}

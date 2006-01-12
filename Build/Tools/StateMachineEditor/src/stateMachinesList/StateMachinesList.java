@@ -8,7 +8,6 @@ import javax.swing.JOptionPane;
 
 import model.StateMachinesDiagram;
 
-import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
@@ -59,7 +58,7 @@ public class StateMachinesList extends ViewPart implements ISaveablePart, IDoubl
 	public static List allNames = new ArrayList();
 	private static List undoList = new ArrayList();
 	private static List redoList = new ArrayList();
-	private static IContainer container1;
+	private static List undoNewStateMachine = new ArrayList();
 	
 	public static final String DELETE = "delete statemachine";
 	public static final String RENAME = "rename statemachine";
@@ -69,6 +68,7 @@ public class StateMachinesList extends ViewPart implements ISaveablePart, IDoubl
 	private boolean isSaved = false;
 	private boolean workbenchIsClosing = false;
 	private static StateMachinesList view;
+	private static boolean debugMode = false;
 	
 	/**
 	 * the constructor for this view
@@ -103,10 +103,28 @@ public class StateMachinesList extends ViewPart implements ISaveablePart, IDoubl
 	 * @param fileName the name of the statemachine
 	 */
 	public static void addToStateMachinesList2(IFile file, String fileName) {
+		ReadDOMTree tree = DOMGetInstance.getInstance();
+		Element machine = new Element("stateMachine");
+		machine.setAttribute("NAME", fileName);
+		tree.addStateMachine1(machine);
+		undoNewStateMachine.add(machine);
 		stateMachinesList.add(file);
 		viewer.add(fileName);
 		allNames.add(fileName);
 		dirty = true;
+	}
+	
+	/**
+	 * deletes all new statemachines if StateMachinesList is not saved.
+	 * New statemachines with an open modified Editor can still be saved
+	 * when the editor closes.
+	 */
+	private void undoCreateNewStateMachine() {
+		ReadDOMTree tree = DOMGetInstance.getInstance();
+		for (int i = 0; i < undoNewStateMachine.size(); i++) {
+			Element machineEle = (Element) undoNewStateMachine.get(i);
+			tree.removeStateMachine1(machineEle.getAttributeValue("NAME"));
+		}
 	}
 	
 	/**
@@ -119,7 +137,7 @@ public class StateMachinesList extends ViewPart implements ISaveablePart, IDoubl
 			IFile name = (IFile) stateMachinesList.get(i);
 			if (name.getName().equals(oldName + ".states")) {
 				stateMachinesList.remove(i);
-				final IFile file1 = container1.getFile(new Path(newName + ".states"));
+				final IFile file1 = DOMGetInstance.getContainer().getFile(new Path(newName + ".states"));
 				stateMachinesList.add(file1);
 				viewer.remove(oldName);
 				viewer.add(newName);
@@ -179,32 +197,34 @@ public class StateMachinesList extends ViewPart implements ISaveablePart, IDoubl
 	 * @see org.eclipse.jface.viewers.IDoubleClickListener#doubleClick(org.eclipse.jface.viewers.DoubleClickEvent)
 	 */
 	public void doubleClick(DoubleClickEvent event) {
-		// opens the selected statemachine editor
-		fileName = (String) ((IStructuredSelection)viewer.getSelection()).getFirstElement();
-		for (int i = 0; i < stateMachinesList.size(); i++) {
-			machineName = (IFile) stateMachinesList.get(i);
-			if (machineName.getName().equals(fileName + ".states")) {
-				break;
-			}
-		}
-		try {
-			Element machine = null;
-			ReadDOMTree tree = DOMGetInstance.getInstance();
-			List allMachines = tree.getStateMachines();
-			for (int i = 0; i < allMachines.size(); i++) {
-				machine = (Element) allMachines.get(i);
-				if (machine.getAttributeValue("NAME").equals(fileName)) {
+		// opens the selected statemachine editor if not in debug-mode
+		if (!(debugMode)) {
+			fileName = (String) ((IStructuredSelection)viewer.getSelection()).getFirstElement();
+			for (int i = 0; i < stateMachinesList.size(); i++) {
+				machineName = (IFile) stateMachinesList.get(i);
+				if (machineName.getName().equals(fileName + ".states")) {
 					break;
 				}
 			}
-			if (!(machine == null)) {
-				StateMachinesDiagram diagram = new StateMachinesDiagram(machine);
-				tree.addDiagram(diagram);
-				IDE.openEditor(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage(), machineName, true);
+			try {
+				Element machine = null;
+				ReadDOMTree tree = DOMGetInstance.getInstance();
+				List allMachines = tree.getStateMachines();
+				for (int i = 0; i < allMachines.size(); i++) {
+					machine = (Element) allMachines.get(i);
+					if (machine.getAttributeValue("NAME").equals(fileName)) {
+						break;
+					}
+				}
+				if (!(machine == null)) {
+					StateMachinesDiagram diagram = new StateMachinesDiagram(machine);
+					tree.addDiagram(diagram);
+					IDE.openEditor(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage(), machineName, true);
+				}
+			} catch (PartInitException e) {
+				e.printStackTrace();
 			}
-		} catch (PartInitException e) {
-			e.printStackTrace();
-		}	
+		}
 	}
 	
 	/**
@@ -269,7 +289,6 @@ public class StateMachinesList extends ViewPart implements ISaveablePart, IDoubl
 		deleteItemAction = new Action("Delete") {
 			public void run() {
 				deleteItem();
-				dirty = true;
 			}
 		};
 		deleteItemAction.setEnabled(false);
@@ -279,7 +298,6 @@ public class StateMachinesList extends ViewPart implements ISaveablePart, IDoubl
 		copyItemAction = new Action("Copy") {
 			public void run() {
 				copyItem();
-				dirty = true;
 			}
 		};
 		copyItemAction.setEnabled(false);
@@ -298,10 +316,15 @@ public class StateMachinesList extends ViewPart implements ISaveablePart, IDoubl
 	 * updates whether an actionitem is selectable
 	 */
 	private void updateActionEnablement() {
-		IStructuredSelection sel = 
-			(IStructuredSelection)viewer.getSelection();
-		deleteItemAction.setEnabled(sel.size() > 0 && sel.size() < 2);
-		copyItemAction.setEnabled(sel.size() > 0 && sel.size() < 2);
+		if (debugMode) {
+			deleteItemAction.setEnabled(false);
+			copyItemAction.setEnabled(false);
+		}
+		else {
+			IStructuredSelection sel = (IStructuredSelection)viewer.getSelection();
+			deleteItemAction.setEnabled(sel.size() > 0 && sel.size() < 2);
+			copyItemAction.setEnabled(sel.size() > 0 && sel.size() < 2);
+		}
 	}
 	
 	/**
@@ -377,12 +400,13 @@ public class StateMachinesList extends ViewPart implements ISaveablePart, IDoubl
 	 * Remove item from list.
 	 */
 	private void deleteItem() {
-		redoList.clear();
-		redoAction.setEnabled(false);
-		redoAction.setText("Redo");
 		fileName = (String) ((IStructuredSelection)viewer.getSelection()).getFirstElement();
-		DeleteStateMachine delete = new DeleteStateMachine(fileName, container1);
+		DeleteStateMachine delete = new DeleteStateMachine(fileName, DOMGetInstance.getContainer());
 		if (delete.execute()) {
+			dirty = true;
+			redoList.clear();
+			redoAction.setEnabled(false);
+			redoAction.setText("Redo");
 			undoList.add(delete);
 			undoAction.setText("Undo " + DELETE);
 			undoAction.setEnabled(true);
@@ -393,9 +417,6 @@ public class StateMachinesList extends ViewPart implements ISaveablePart, IDoubl
 	 * makes a copy of the selected statemachine and saves it under an entered name
 	 */
 	private void copyItem() {
-		redoList.clear();
-		redoAction.setEnabled(false);
-		redoAction.setText("Redo");
 		String machine = (String) ((IStructuredSelection)viewer.getSelection()).getFirstElement();
 		String name = promptForValue("Enter name for copy:", null);
 		boolean exist = false;
@@ -405,12 +426,24 @@ public class StateMachinesList extends ViewPart implements ISaveablePart, IDoubl
 				break;
 			}
 		}
-		if (!(name == null) && exist == false) {
-			CopyStateMachine copy = new CopyStateMachine(machine, name, container1);
+		if (!(name == null) && !(name.equals("")) && exist == false) {
+			dirty = true;
+			redoList.clear();
+			redoAction.setEnabled(false);
+			redoAction.setText("Redo");
+			CopyStateMachine copy = new CopyStateMachine(machine, name, DOMGetInstance.getContainer());
 			undoList.add(copy);
 			copy.execute();
 			undoAction.setEnabled(true);
 			undoAction.setText("Undo " + COPY);
+		}
+		else if (name == null || name.equals("")) {
+			JOptionPane.showMessageDialog(null, "You have to enter a name for the new statemachine!",
+					"Error Message", JOptionPane.ERROR_MESSAGE);
+		}
+		else if (exist == true) {
+			JOptionPane.showMessageDialog(null, "Name allready exists!",
+					"Error Message", JOptionPane.ERROR_MESSAGE);
 		}
 	}
 	
@@ -426,14 +459,6 @@ public class StateMachinesList extends ViewPart implements ISaveablePart, IDoubl
 		if (dlg.open() != Window.OK)
 			return null;
 		return dlg.getValue();
-	}
-	
-	/**
-	 * sets the file container
-	 * @param container the file container
-	 */
-	public static void setContainer(IContainer container) {
-		container1 = container;
 	}
 	
 	/* (non-Javadoc)
@@ -540,8 +565,7 @@ public class StateMachinesList extends ViewPart implements ISaveablePart, IDoubl
 					copy.undoForDispose();
 				}
 			}
-			ReadDOMTree tree = DOMGetInstance.getInstance();
-			tree.writeTree();
+			undoCreateNewStateMachine();
 		}
 		isSaved = false;
 		workbenchIsClosing = false;
@@ -557,5 +581,26 @@ public class StateMachinesList extends ViewPart implements ISaveablePart, IDoubl
 		if (!PlatformUI.getWorkbench().isClosing()) {
 			DOMGetInstance.reset();
 		}
+	}
+	
+	public static void setDebugMode(boolean debugMode1) {
+		debugMode = debugMode1;
+		//PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().closeAllEditors(true);
+		if (debugMode) {
+			undoAction.setEnabled(false);
+			redoAction.setEnabled(false);
+		}
+		else {
+			if (undoList.size() > 0) {
+				undoAction.setEnabled(true);
+			}
+			if (redoList.size() > 0) {
+				redoAction.setEnabled(true);
+			}
+		}
+	}
+	
+	public static boolean isDebugMode() {
+		return debugMode;
 	}
 }

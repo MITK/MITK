@@ -2,9 +2,12 @@ package dom;
 
 import java.io.File;
 
+import org.eclipse.core.resources.IContainer;
+
 public class DOMGetInstance {
 	private static ReadDOMTree tree = null;
 	private static String filename1 = null;
+	private static IContainer container1 = null;
 	
 	/**
 	 * creates a DOMTree from an specified xml file
@@ -57,5 +60,23 @@ public class DOMGetInstance {
 			actionAndEventTree = new ReadActionAndEventDOMTree(file1);
 		}
 		return actionAndEventTree;
+	}
+	
+	/**
+	 * sets the file container
+	 * @param container the file container
+	 */
+	public static void setContainer(IContainer container) {
+		container1 = container;
+	}
+	
+	public static IContainer getContainer() {
+		return container1;
+	}
+	
+	public static String getFilename() {
+		File file = new File(filename1);
+		String filename = file.getName();
+		return filename;
 	}
 }

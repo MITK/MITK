@@ -78,6 +78,7 @@ class ConnectionEditPart extends AbstractConnectionEditPart implements
 		ConnectionLocator midpointLocator = new ConnectionLocator(connection, PositionConstants.RIGHT);
 		actionName.setOpaque(true);
 		actionName.setBackgroundColor(ColorConstants.green);
+		actionName.setForegroundColor(ColorConstants.black);
 		actionName.setText(getCastedModel().getAction()); // actionName of this connection
 		// add action on midpoint
 		midpointLocator.setRelativePosition(PositionConstants.RIGHT);
@@ -85,6 +86,7 @@ class ConnectionEditPart extends AbstractConnectionEditPart implements
 		ConnectionLocator midpointLocator2 = new ConnectionLocator(connection, PositionConstants.RIGHT);
 		eventName.setOpaque(true);
 		eventName.setBackgroundColor(ColorConstants.red);
+		eventName.setForegroundColor(ColorConstants.black);
 		eventName.setText(getCastedModel().getEvent()); // eventName of this connection
 		// add event on midpoint
 		midpointLocator2.setRelativePosition(PositionConstants.LEFT);
@@ -123,6 +125,18 @@ class ConnectionEditPart extends AbstractConnectionEditPart implements
 		}
 		else if (Connection.ACTION_PROP.equals(property)) {
 			actionName.setText(getCastedModel().getAction());
+		} else if (Connection.ACTIVE_PROP.equals(property)) {
+			PolylineConnection connection = (PolylineConnection) getFigure();
+			connection.setForegroundColor(ColorConstants.red);
+		} else if (Connection.INACTIVE_PROP.equals(property)) {
+			PolylineConnection connection = (PolylineConnection) getFigure();
+			connection.setForegroundColor(ColorConstants.black);
+		} else if (Connection.DEACTIVATE_POLICY_PROP.equals(property)) {
+			this.removeEditPolicy(EditPolicy.COMPONENT_ROLE);
+			this.removeEditPolicy(EditPolicy.CONNECTION_ENDPOINTS_ROLE);
+			this.removeEditPolicy(EditPolicy.CONNECTION_ROLE);
+		} else if (Connection.ACTIVATE_POLICY_PROP.equals(property)) {
+			createEditPolicies();
 		}
 	}
 

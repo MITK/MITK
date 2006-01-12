@@ -30,8 +30,8 @@ public class ReadDOMTree {
 	}
 	
 	/**
-	 * removes an open editor from the list allMachines
-	 * @param diagram StateMAchinesDiagram of an open editor
+	 * removes an open editor from list allMachines
+	 * @param diagram StateMachinesDiagram of an open editor
 	 */
 	public void removeDiagram(StateMachinesDiagram diagram) {
 		allMachines.remove(diagram);
@@ -72,7 +72,7 @@ public class ReadDOMTree {
 	}
 
 	/**
-	 * removes a statemachine with an open editor to the DOMTree
+	 * removes a statemachine with an open editor from DOMTree
 	 * @param machine the stateMachinesDiagram with an open editor
 	 * @param stateMachine the DOM element of the statemachine
 	 */
@@ -83,7 +83,7 @@ public class ReadDOMTree {
 	
 	
 	/**
-	 * removes a statemachine with no open editor to the DOMTree
+	 * removes a statemachine with no open editor from DOMTree
 	 * @param stateMachine the DOM element of the statemachine
 	 * @return the DOM element of the removed statemachine
 	 */

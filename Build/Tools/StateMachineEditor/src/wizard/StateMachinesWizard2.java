@@ -101,8 +101,7 @@ public class StateMachinesWizard2 extends Wizard implements INewWizard {
 		} catch (InterruptedException e) {
 			return false;
 		} catch (InvocationTargetException e) {
-			Throwable realException = e.getTargetException();
-			MessageDialog.openError(getShell(), "Error", realException.getMessage());
+			MessageDialog.openError(getShell(), "Error", "Project does not exist!");
 			return false;
 		}
 		return true;
@@ -127,7 +126,7 @@ public class StateMachinesWizard2 extends Wizard implements INewWizard {
 		}
 		IContainer container = (IContainer) resource;
 		final IFile file1 = container.getFile(new Path(fileName));
-		StateMachinesList.setContainer(container);
+		DOMGetInstance.setContainer(container);
 		monitor.worked(1);
 		monitor.setTaskName("Opening file for editing...");
 		getShell().getDisplay().asyncExec(new Runnable() {

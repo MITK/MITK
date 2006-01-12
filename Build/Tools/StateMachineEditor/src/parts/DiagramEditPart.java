@@ -99,7 +99,7 @@ class DiagramEditPart extends AbstractGraphicalEditPart implements
 	}
 
 	/**
-	 * @return the StateMAchinesDiagram model
+	 * @return the StateMachinesDiagram model
 	 */
 	private StateMachinesDiagram getCastedModel() {
 		return (StateMachinesDiagram) getModel();
@@ -121,12 +121,17 @@ class DiagramEditPart extends AbstractGraphicalEditPart implements
 	 */
 	public void propertyChange(PropertyChangeEvent evt) {
 		String prop = evt.getPropertyName();
-		// these properties are fired when GetDOMStates are added into or removed from
+		// these properties are fired when States are added into or removed from
 		// the StateMachinesDiagram instance and must cause a call of refreshChildren()
 		// to update the diagram's contents.
 		if (StateMachinesDiagram.CHILD_ADDED_PROP.equals(prop)
 				|| StateMachinesDiagram.CHILD_REMOVED_PROP.equals(prop)) {
 			refreshChildren();
+		} else if (StateMachinesDiagram.DEACTIVATE_POLICY_PROP.equals(prop)) {
+			this.removeEditPolicy(EditPolicy.LAYOUT_ROLE);
+		} else if (StateMachinesDiagram.ACTIVATE_POLICY_PROP.equals(prop)) {
+			installEditPolicy(EditPolicy.LAYOUT_ROLE,
+					new StateMachinesXYLayoutEditPolicy());
 		}
 	}
 

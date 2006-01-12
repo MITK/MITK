@@ -62,6 +62,21 @@ public class StatesDeleteCommand extends Command {
 			conn.reconnect();
 		}
 	}
+	
+	/**
+	 * Reconnects a List of Connections with their previous endpoints.
+	 * 
+	 * @param connections
+	 *            a non-null List of connections
+	 */
+	private void addConnections2(List connections) {
+		for (Iterator iter = connections.iterator(); iter.hasNext();) {
+			Connection conn = (Connection) iter.next();
+			if (!(conn.getSource() == conn.getTarget())) {
+				conn.reconnect();
+			}
+		}
+	}
 
 	/*
 	 * (non-Javadoc)
@@ -120,7 +135,7 @@ public class StatesDeleteCommand extends Command {
 		// add the child and reconnect its connections
 		if (parent.addChild(child)) {
 			addConnections(sourceConnections);
-			addConnections(targetConnections);
+			addConnections2(targetConnections);
 		}
 	}
 }

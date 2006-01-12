@@ -144,12 +144,12 @@ class StateMachinesEditPart extends AbstractGraphicalEditPart implements
 			f.setForegroundColor(ColorConstants.black);
 		}
 		else if (getModel() instanceof EndState){
-			f.setBackgroundColor(ColorConstants.red);
+			f.setBackgroundColor(ColorConstants.orange);
 			f.setForegroundColor(ColorConstants.black);
 		}
 		else {
-			f.setBackgroundColor(ColorConstants.blue);
-			f.setForegroundColor(ColorConstants.black);
+			// if States gets extended the conditions above must be updated
+			throw new IllegalArgumentException();
 		}
 		return f;
 	}
@@ -284,6 +284,25 @@ class StateMachinesEditPart extends AbstractGraphicalEditPart implements
 			refreshSourceConnections();
 			refreshTargetConnections();
 			refreshVisuals();
+		} else if (States.ACTIVE_PROP.equals(prop)) {
+			RoundLabel label = (RoundLabel)getFigure();
+			label.setBackgroundColor(ColorConstants.red);
+		} else if (States.INACTIVE_PROP.equals(prop)) {
+			RoundLabel label = (RoundLabel)getFigure();
+			if (getModel() instanceof StartState) {
+				label.setBackgroundColor(ColorConstants.green);
+			}
+			else if (getModel() instanceof NormalState){
+				label.setBackgroundColor(ColorConstants.yellow);
+			}
+			else if (getModel() instanceof EndState){
+				label.setBackgroundColor(ColorConstants.orange);
+			}
+		} else if (States.DEACTIVATE_POLICY_PROP.equals(prop)) {
+			this.removeEditPolicy(EditPolicy.COMPONENT_ROLE);
+			this.removeEditPolicy(EditPolicy.GRAPHICAL_NODE_ROLE);
+		} else if (States.ACTIVATE_POLICY_PROP.equals(prop)) {
+			createEditPolicies();
 		}
 	}
 

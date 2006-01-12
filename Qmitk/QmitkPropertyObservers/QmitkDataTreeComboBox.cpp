@@ -240,7 +240,7 @@ void QmitkDataTreeComboBox::AddItemsToList(const mitk::DataTreeFilter::ItemList*
     }
    
     // use first string property of visible properties list
-    QString displayedText( itemiter->GetProperty(m_DisplayedProperty) );
+    QString displayedText( ((const std::string)itemiter->GetProperty(m_DisplayedProperty)).c_str() );
 
     if ( m_DataTreeFilter->GetHierarchyHandling() != mitk::DataTreeFilter::FLATTEN_HIERARCHY )
     {

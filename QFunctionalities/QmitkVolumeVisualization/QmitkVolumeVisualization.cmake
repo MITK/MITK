@@ -1,9 +1,9 @@
-INCLUDE_DIRECTORIES( ../../Functionalities/QmitkVolumeVisualization)
+INCLUDE_DIRECTORIES( ${IP_ROOT}/Functionalities/QmitkVolumeVisualization)
 
 # VolumeVisualization
 
-SET( APPMOD_H ${APPMOD_H} ../../Functionalities/QmitkVolumeVisualization/QmitkVolumeVisualization.h )
-SET( APPMOD_MOC_H ${APPMOD_MOC_H} ../../Functionalities/QmitkVolumeVisualization/QmitkVolumeVisualization.h )
-SET( APPMOD_CPP ${APPMOD_CPP} ../../Functionalities/QmitkVolumeVisualization/QmitkVolumeVisualization.cpp )
+SET( APPMOD_H ${APPMOD_H} ${IP_ROOT}/Functionalities/QmitkVolumeVisualization/QmitkVolumeVisualization.h )
+SET( APPMOD_MOC_H ${APPMOD_MOC_H} ${IP_ROOT}/Functionalities/QmitkVolumeVisualization/QmitkVolumeVisualization.h )
+SET( APPMOD_CPP ${APPMOD_CPP} ${IP_ROOT}/Functionalities/QmitkVolumeVisualization/QmitkVolumeVisualization.cpp )
 
-SET (APPMOD_FORMS ${APPMOD_FORMS} ../../Functionalities/QmitkVolumeVisualization/QmitkVolumeVisualizationControls.ui)
+SET (APPMOD_FORMS ${APPMOD_FORMS} ${IP_ROOT}/Functionalities/QmitkVolumeVisualization/QmitkVolumeVisualizationControls.ui)

@@ -32,6 +32,7 @@ PURPOSE.  See the above copyright notices for more information.
  *
  * A property m_Mode is inherited from QUndoRedoButton, which can be either "Undo" or "Redo".
  * Depending on this mode, differenct functions of the associated undo model are called.
+ * \ingroup Widgets
  */
 class 
 MITK_EXPORT

@@ -31,6 +31,11 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkDataTreeNode.h>
 #include <mitkRenderingManager.h>
 
+/**
+ * \class QmitkTransferFunctionWidget
+ * \brief A custom widget for editing transfer funtctions for volume rendering. 
+ * \ingroup Widgets
+ */ 
 void QmitkTransferFunctionWidget::SetDataTreeNode( mitk::DataTreeNode* node)
 {
   if (node) {

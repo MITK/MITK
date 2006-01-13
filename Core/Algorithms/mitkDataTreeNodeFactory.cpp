@@ -139,7 +139,10 @@ void mitk::DataTreeNodeFactory::GenerateData()
     {
       this->ReadFileTypeGDCM();
     }
-    else if ( this->FileNameEndsWith( ".dcm" ) || this->FileNameEndsWith( ".DCM" ) || (itksys::SystemTools::GetFilenameLastExtension(m_FileName) == "" ) )
+    else if ( this->FileNameEndsWith( ".dcm" ) || this->FileNameEndsWith( ".DCM" ) 
+      || this->FileNameEndsWith( ".ima" ) 
+      || this->FileNameEndsWith( ".IMA" ) 
+      || (itksys::SystemTools::GetFilenameLastExtension(m_FileName) == "" ) )
     {
       this->ReadFileSeriesTypeDCM();
     }
@@ -200,7 +203,10 @@ void mitk::DataTreeNodeFactory::GenerateData()
     {
       this->ReadFileSeriesTypePIC();
     }
-    else if ( this->FilePatternEndsWith( ".dcm" ) || this->FilePatternEndsWith( ".DCM" ) || (itksys::SystemTools::GetFilenameLastExtension(m_FilePattern) == "" ) )
+    else if ( this->FilePatternEndsWith( ".dcm" ) || this->FilePatternEndsWith( ".DCM" ) 
+      || this->FileNameEndsWith( ".ima" ) 
+      || this->FileNameEndsWith( ".IMA" ) 
+      || (itksys::SystemTools::GetFilenameLastExtension(m_FilePattern) == "" ) )
     {
       this->ReadFileSeriesTypeDCM();
     }
@@ -224,7 +230,19 @@ void mitk::DataTreeNodeFactory::GenerateData()
   unsigned int nOut = this->GetNumberOfOutputs();
   for ( unsigned int i = 0; i < nOut; ++i )
   {
-    this->GetOutput(i)->SetVisibility(true);
+    mitk::DataTreeNode::Pointer node = this->GetOutput(i);
+    // set path without filename as string property
+    mitk::StringProperty::Pointer pathProp = new mitk::StringProperty( itksys::SystemTools::GetFilenamePath( m_FileName ) );
+    node->SetProperty( "path", pathProp );
+    // set filename without path as string property
+    mitk::StringProperty::Pointer nameProp = dynamic_cast<mitk::StringProperty*>(node->GetProperty("name").GetPointer());
+    if(nameProp.IsNull() || nameProp->GetValue()=="No Name!")
+    {
+      nameProp = new mitk::StringProperty( this->GetBaseFileName() );
+      node->SetProperty( "name", nameProp );
+    }
+
+    node->SetVisibility(true);
   }
 }
 
@@ -304,9 +322,6 @@ void mitk::DataTreeNodeFactory::ReadFileTypeSTL()
     mitk::DataTreeNode::Pointer node = this->GetOutput();
     node->SetData( surface );
     SetDefaultSurfaceProperties( node );
-    // set filename without path as string property
-    mitk::StringProperty::Pointer nameProp = new mitk::StringProperty( this->GetBaseFileName() );
-    node->SetProperty( "name", nameProp );
   }
 
   normalsGenerator->Delete();
@@ -333,9 +348,6 @@ void mitk::DataTreeNodeFactory::ReadFileTypeVTK()
     mitk::DataTreeNode::Pointer node = this->GetOutput();
     node->SetData( surface );
 
-    // set filename without path as string property
-    mitk::StringProperty::Pointer nameProp = new mitk::StringProperty( this->GetBaseFileName() );
-    node->SetProperty( "name", nameProp );
     SetDefaultSurfaceProperties( node );
   }
 
@@ -362,9 +374,6 @@ void mitk::DataTreeNodeFactory::ReadFileTypeOBJ()
     mitk::DataTreeNode::Pointer node = this->GetOutput();
     node->SetData( surface );
 
-    // set filename without path as string property
-    mitk::StringProperty::Pointer nameProp = new mitk::StringProperty( this->GetBaseFileName() );
-    node->SetProperty( "name", nameProp );
     SetDefaultSurfaceProperties( node );
   }
 
@@ -388,11 +397,6 @@ void mitk::DataTreeNodeFactory::ReadFileTypePIC()
     reader->UpdateLargestPossibleRegion();
     mitk::DataTreeNode::Pointer node = this->GetOutput();
     node->SetData( reader->GetOutput() );
-
-    // set filename without path as string property
-    mitk::StringProperty::Pointer nameProp = new mitk::StringProperty( this->GetBaseFileName() );
-    node->SetProperty( "name", nameProp );
-
 
     SetDefaultImageProperties(node);
 
@@ -425,10 +429,6 @@ void mitk::DataTreeNodeFactory::ReadFileTypePAR()
 
   SetDefaultImageProperties(node);
 
-  // set filename without path as string property
-  mitk::StringProperty::Pointer nameProp = new mitk::StringProperty( this->GetBaseFileName() );
-  node->SetProperty( "name", nameProp );
-
   // add level-window property
   mitk::LevelWindowProperty::Pointer levWinProp = new mitk::LevelWindowProperty();
   mitk::LevelWindow levelwindow;
@@ -457,10 +457,6 @@ void mitk::DataTreeNodeFactory::ReadFileTypePVTK()
     node->SetData( image );
 
     SetDefaultImageProperties(node);
-
-    // set filename without path as string property
-    mitk::StringProperty::Pointer nameProp = new mitk::StringProperty( this->GetBaseFileName() );
-    node->SetProperty( "name", nameProp );
 
     // add level-window property
     mitk::LevelWindowProperty::Pointer levWinProp = new mitk::LevelWindowProperty();
@@ -523,10 +519,6 @@ void mitk::DataTreeNodeFactory::ReadFileTypeVES()
   mitk::VesselTreeLookupTableProperty::Pointer lutProp = new mitk::VesselTreeLookupTableProperty( dynamic_cast<mitk::VesselTreeLookupTable*>( lutGenerator->GetOutput() ) );
   node->SetProperty( "VesselTreeLookupTable", lutProp );
   
-  // set filename without path as string property
-  mitk::StringProperty::Pointer nameProp = new mitk::StringProperty( this->GetBaseFileName() );
-  node->SetProperty( "name", nameProp );
-
   std::cout << "...finished!" << std::endl;
 }
 
@@ -543,10 +535,6 @@ void mitk::DataTreeNodeFactory::ReadFileTypeUVG()
   mitk::DataTreeNode::Pointer node = this->GetOutput();
   node->SetData( reader->GetOutput() );
 
-  // set filename without path as string property
-  mitk::StringProperty::Pointer nameProp = new mitk::StringProperty( this->GetBaseFileName() );
-  node->SetProperty( "name", nameProp );
-
   std::cout << "...finished!" << std::endl;
 }
 
@@ -559,10 +547,6 @@ void mitk::DataTreeNodeFactory::ReadFileTypeDVG()
   reader->Update();
   mitk::DataTreeNode::Pointer node = this->GetOutput();
   node->SetData( reader->GetOutput() );
-
-  // set filename without path as string property
-  mitk::StringProperty::Pointer nameProp = new mitk::StringProperty( this->GetBaseFileName() );
-  node->SetProperty( "name", nameProp );
 
   std::cout << "...finished!" << std::endl;
 }
@@ -816,10 +800,6 @@ void mitk::DataTreeNodeFactory::ReadFileTypeSSM()
   mitk::DataTreeNode::Pointer node = this->GetOutput();
   node->SetData( reader->GetOutput() );
 
-  // set filename without path as string property
-  mitk::StringProperty::Pointer nameProp = new mitk::StringProperty( this->GetBaseFileName() );
-  node->SetProperty( "name", nameProp );
-
   std::cout << "...finished!" << std::endl;
 }
 
@@ -840,9 +820,6 @@ void mitk::DataTreeNodeFactory::ReadFileTypeIPDCM()
   SetDefaultImageProperties(node);
 
 
-  // set filename without path as string property
-  mitk::StringProperty::Pointer nameProp = new mitk::StringProperty( this->GetBaseFileName() );
-  node->SetProperty( "name", nameProp );
   // add Level-Window property
   mitk::LevelWindow levelwindow;
   levelwindow.SetAuto( reader->GetOutput() );
@@ -863,10 +840,6 @@ void mitk::DataTreeNodeFactory::ReadFileTypeGDCM()
   /*
   SetDefaultImageProperties(node);
 
-
-  // set filename without path as string property
-  mitk::StringProperty::Pointer nameProp = new mitk::StringProperty( this->GetBaseFileName() );
-  node->SetProperty( "name", nameProp );
 
   // add Level-Window property
   mitk::LevelWindow levelwindow;
@@ -978,10 +951,6 @@ void mitk::DataTreeNodeFactory::ReadFileTypeITKImageIOFactory()
   std::cout << "number of image components: "<< image->GetPixelType().GetNumberOfComponents() << std::endl;
   mitk::DataTreeNode::Pointer node = this->GetOutput();
   node->SetData( image );
-
-  // set filename without path as string property
-  mitk::StringProperty::Pointer nameProp = new mitk::StringProperty( this->GetBaseFileName() );
-  node->SetProperty( "name", nameProp );
 
   // add level-window property
   if ( image->GetPixelType().GetNumberOfComponents() == 1 )
@@ -1469,9 +1438,6 @@ void mitk::DataTreeNodeFactory::ReadFileSeriesTypeSTL()
   mitk::DataTreeNode::Pointer node = this->GetOutput();
   node->SetData( surface );
   SetDefaultSurfaceProperties( node );
-  // set filename without path as string property
-  mitk::StringProperty::Pointer nameProp = new mitk::StringProperty( this->GetBaseFilePrefix() + ".stl" );
-  node->SetProperty( "name", nameProp );
   std::cout << "...finished!" << std::endl;
 }
 
@@ -1511,9 +1477,6 @@ void mitk::DataTreeNodeFactory::ReadFileSeriesTypeVTK()
   mitk::DataTreeNode::Pointer node = this->GetOutput();
   node->SetData( surface );
   SetDefaultSurfaceProperties( node );
-  // set filename without path as string property
-  mitk::StringProperty::Pointer nameProp = new mitk::StringProperty( this->GetBaseFilePrefix() + ".vtk" );
-  node->SetProperty( "name", nameProp );
   std::cout << "...finished!" << std::endl;
 }
 

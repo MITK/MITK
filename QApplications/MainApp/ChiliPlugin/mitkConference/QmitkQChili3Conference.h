@@ -21,6 +21,7 @@ class QChili3Conference:public mitk::ConferenceKit
 
     void Launch();
     void SendQt(const char* s);
+    void SendMITK(int eventID, short int p0, short int p1, short int p2);
 
   protected:
     //QChili3Conference();

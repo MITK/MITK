@@ -24,7 +24,7 @@ class ConferenceKitFactory;
  //   virtual void Launch() = 0;
  //   virtual void Close() = 0;
  //   virtual void UpdateMe() = 0;
- //   virtual void SendMITK() = 0;
+    virtual void SendMITK(int, short int, short int, short int) = 0;
     virtual void SendQt(const char* s) = 0;
     virtual ~ConferenceKit(){}
 

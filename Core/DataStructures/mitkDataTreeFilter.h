@@ -190,6 +190,9 @@ namespace mitk
       /// No meaning without a mitk::DataTreeBase
       static Pointer New(mitk::DataTreeBase*);
 
+      void ConstrainToNodeAndChildren(mitk::DataTreeNode*);
+      bool DataTreeFilter::IsWithinConstrains( mitk::DataTreeIteratorClone nodeIter );
+
       /// Labels (for Header) of visible properties
       void SetPropertiesLabels(const PropertyList);
       const PropertyList& GetPropertiesLabels() const;
@@ -261,6 +264,9 @@ namespace mitk
 
       /// The data tree filtered by this class
       mitk::DataTreeBase* m_DataTree;
+      
+      /// The root data tree node to which display is constrained
+      mitk::DataTreeNode* m_RootNode;
 
       /// should we preserve the hierachy of the tree?
       HierarchyHandling m_HierarchyHandling;
@@ -280,7 +286,8 @@ namespace mitk
       unsigned long  m_TreeRemoveConnection;
       
       // remember the most recently selected item
-      ItemPointer m_LastSelectedItem;
+      //ItemPointer m_LastSelectedItem;
+      Item* m_LastSelectedItem;
   };
 
 
@@ -296,7 +303,8 @@ namespace mitk
 
   /// Accepts all images
   /// (accepts nodes that have associated an mitk::Image)
-  //bool IsImage(mitk::DataTreeNode*);
+  bool IsImage(mitk::DataTreeNode*);
+
   //bool IsSurface(mitk::DataTreeNode*);
   // .
   // .

@@ -20,6 +20,11 @@ bool IsGoodDataTreeNode(mitk::DataTreeNode* node)
   return ( node!= 0 && node->GetData() );
 }
 
+bool IsImage(mitk::DataTreeNode* node)
+{
+  return ( node!= 0 && dynamic_cast<mitk::Image*>( node->GetData() ) );
+}
+
 //------ BasePropertyAccessor ------------------------------------------------------------
   
 DataTreeFilter::BasePropertyAccessor::BasePropertyAccessor(mitk::BaseProperty* property, bool editable)
@@ -187,24 +192,19 @@ void DataTreeFilter::Item::SetSelected(bool selected)
     if ( selected )
     {
       if ( m_TreeFilter->m_SelectionMode == mitk::DataTreeFilter::SINGLE_SELECT )
-        if (m_TreeFilter->m_LastSelectedItem.IsNotNull() && m_TreeFilter->m_LastSelectedItem != this)
+        if (   m_TreeFilter->m_LastSelectedItem && m_TreeFilter->m_LastSelectedItem != this
+            && std::find( m_TreeFilter->m_Items->begin(), m_TreeFilter->m_Items->end(), m_TreeFilter->m_LastSelectedItem ) != m_TreeFilter->m_Items->end() 
+           )
+           
           m_TreeFilter->m_LastSelectedItem->SetSelected(false);
-/*
-      { // deselect last selected item
-        m_TreeFilter->m_SelectedItems.erase( m_TreeFilter->m_LastSelectedItem.GetPointer() );
-        m_TreeFilter->InvokeEvent(
-            mitk::TreeFilterSelectionChangedEvent(m_TreeFilter->m_LastSelectedItem.GetPointer(), false) );
-      }
-*/
-      
-      //if ( m_TreeFilter->m_LastSelectedItem.IsNotNull() ) // remember this item as most recently selected
-        m_TreeFilter->m_LastSelectedItem = this;
 
       m_TreeFilter->m_SelectedItems.insert(this);
     }
     else
     {
       m_TreeFilter->m_SelectedItems.erase(this);
+      if (m_TreeFilter->m_LastSelectedItem == this)
+        m_TreeFilter->m_LastSelectedItem = NULL;
     }
     m_TreeFilter->InvokeEvent( mitk::TreeFilterSelectionChangedEvent(this, selected) );
   }
@@ -237,15 +237,18 @@ DataTreeFilter::Pointer DataTreeFilter::New(mitk::DataTreeBase* datatree)
 DataTreeFilter::DataTreeFilter(mitk::DataTreeBase* datatree)
 : m_Filter(NULL),
   m_DataTree(datatree),
+  m_RootNode(NULL),
   m_HierarchyHandling(mitk::DataTreeFilter::PRESERVE_HIERARCHY),
   m_SelectionMode(mitk::DataTreeFilter::MULTI_SELECT),
   m_Renderer(NULL),
   m_TreeNodeChangeConnection(0),
   m_TreeAddConnection(0),
   m_TreePruneConnection(0),
-  m_TreeRemoveConnection(0)
+  m_TreeRemoveConnection(0),
+  m_LastSelectedItem(NULL)
 {
-  SetFilter( &mitk::IsDataTreeNode );
+  //SetFilter( &mitk::IsDataTreeNode );
+  SetFilter( &mitk::IsImage );
   m_Items = ItemList::New(); // create an empty list
 
   // connect tree notifications to member functions
@@ -272,6 +275,7 @@ DataTreeFilter::DataTreeFilter(mitk::DataTreeBase* datatree)
   command->SetCallbackFunction(this, &DataTreeFilter::TreePrune);
   m_TreePruneConnection = m_DataTree->AddObserver(itk::TreePruneEvent<mitk::DataTreeBase>(), command);
   }
+
   
   GenerateModelFromTree();
 }
@@ -289,6 +293,32 @@ DataTreeFilter::~DataTreeFilter()
   m_Items->clear();
   m_Item.clear();
   m_SelectedItems.clear();
+}
+
+void DataTreeFilter::ConstrainToNodeAndChildren(mitk::DataTreeNode* node)
+{
+  m_RootNode = node;
+  GenerateModelFromTree();
+}
+ 
+bool DataTreeFilter::IsWithinConstrains( mitk::DataTreeIteratorClone nodeIter )
+{
+  if ( m_RootNode != 0 && nodeIter.IsNotNull() != 0 && m_DataTree != 0)
+  {
+    if ( nodeIter->Get() == m_RootNode ) return true;
+
+    while ( nodeIter->HasParent() )
+    {
+      nodeIter->GoToParent();
+
+      if ( nodeIter->Get() == m_RootNode ) return true;
+    }
+
+    return false;
+  }
+
+  // default true (no constrain given or node == 0 or both)
+  return true;
 }
 
 void DataTreeFilter::SetPropertiesLabels(const PropertyList labels)
@@ -342,7 +372,8 @@ void DataTreeFilter::SetFilter(FilterFunctionPointer filter)
   if (filter)
     m_Filter = filter;
   else
-    m_Filter = &mitk::IsDataTreeNode;
+    //m_Filter = &mitk::IsDataTreeNode;
+    m_Filter = &mitk::IsImage;
 
   GenerateModelFromTree();
 }
@@ -424,6 +455,7 @@ void DataTreeFilter::TreeAdd(const itk::EventObject& e)
 
   mitk::DataTreeNode* newNode = treePosition->Get();
 
+  if ( !IsWithinConstrains(treePosition) ) return;
   if ( !m_Filter(newNode) ) return; // if filter does not match, then nothing has to be done
 
   /*
@@ -489,6 +521,7 @@ void DataTreeFilter::TreePrune(const itk::EventObject& e)
   ItemList::iterator listFirstIter;
   ItemList::iterator listLastIter;
   
+  if ( IsWithinConstrains(treePosition) )
   if (   m_HierarchyHandling == DataTreeFilter::PRESERVE_HIERARCHY 
       && m_Filter(treePosition->Get()) )
   {
@@ -559,6 +592,7 @@ void DataTreeFilter::TreeRemove(const itk::EventObject& e)
   const itk::TreeRemoveEvent<mitk::DataTreeBase>& event( static_cast<const itk::TreeRemoveEvent<mitk::DataTreeBase>&>(e) );
   mitk::DataTreeIteratorBase* treePosition = const_cast<mitk::DataTreeIteratorBase*>(&(event.GetChangePosition()));
   
+  if ( IsWithinConstrains(treePosition) )
   if ( m_Filter(treePosition->Get()) )
   {
     Item* item = m_Item[ treePosition->Get() ];
@@ -621,6 +655,7 @@ void DataTreeFilter::AddMatchingChildren(mitk::DataTreeIteratorBase* iter, ItemL
   for ( int child = 0; child < numChildren; ++child )
   {
     iter->GoToChild(child);
+    if ( IsWithinConstrains(iter) )
     if ( m_Filter( iter->Get() ) )
     {
       unsigned int newIndex = list->Size();
@@ -664,6 +699,7 @@ void DataTreeFilter::GenerateModelFromTree()
   Consideration of m_HierarchyHandling adds one branch
   */
   if (!treeIter->IsAtEnd()) // do nothing if the tree is empty!
+  if ( IsWithinConstrains(treeIter) )
   if ( m_Filter( treeIter->Get() ) )
   {
     m_Items->CreateElementAt(0) = Item::New( treeIter->Get(), this, 0, 0 ); // 0 = first item, 0 = no parent

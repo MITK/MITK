@@ -19,7 +19,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "QmitkRenderingManagerFactory.h"
 #include "QmitkRenderingManager.h"
-#include <qtimer.h>
 
 QmitkRenderingManagerFactory
 ::QmitkRenderingManagerFactory()

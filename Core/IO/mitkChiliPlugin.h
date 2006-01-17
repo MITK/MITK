@@ -24,15 +24,28 @@ class QcPlugin;
 
 namespace mitk {
 
+const int m_QmitkChiliPluginConferenceID = 5001;
+typedef enum
+{
+  MITKc = 0,
+  QTc,
+  LAUNCHc,
+  TEXTc,
+} ConfMsgType;
+
 class ChiliPlugin
 {
 public:
   static bool IsPlugin();
   static QcPlugin* GetPluginInstance();
   static void SetPluginInstance(QcPlugin* instance);
+  static int GetConferenceID();
+
 private:
   static QcPlugin* s_PluginInstance;
 };
+
+
 
 } // namespace mitk
 

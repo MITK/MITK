@@ -14,14 +14,16 @@
 
 namespace mitk{
 
-  /// Class for parsing a XML file. 
-  ///
-  /// Class mitkXMLReader is derived from the class vtkXMLParser.
-  /// Reads a stream and parses XML element tags and corresponding attributes.
-  /// Each element begin tag and its attributes are sent to the StartElement method.
-  /// Each element end tag is sent to the EndElement method.
-  /// Calls the ObjectFactory (methode CreateObject()) to create objects that are defined in the tags of the XML file.
-  /// Don't forget to define new elements in the ObjectFactory!
+  //##Documentation
+  //## @brief XMLReader class for parsing a XML file. 
+  //##
+  //## Class mitkXMLReader is derived from the class vtkXMLParser.
+  //## Reads a stream and parses XML element tags and corresponding attributes.
+  //## Each element begin tag and its attributes are sent to the StartElement method.
+  //## Each element end tag is sent to the EndElement method.
+  //## Calls the ObjectFactory (methode CreateObject()) to create objects that are defined in the tags of the XML file.
+  //## Don't forget to define new elements in the ObjectFactory!
+  //## @ingroup IO
   class XMLReader : public vtkXMLParser {
 
 	public:
@@ -128,6 +130,7 @@ namespace mitk{
     /// creates the object that is specified in the XML tag's attribute CLASS_NAME 
     itk::Object::Pointer CreateObject();
 
+
   protected:
     void  StartElement (const char *elementName, const char **atts);
     void  EndElement (const char *elementName);
@@ -144,8 +147,7 @@ namespace mitk{
     typedef std::vector<Connector> ConnectorList;
     ConnectorList m_ConnectorList;
     mitk::DataTreeIteratorBase* m_CurrentPosition;
-
-
+    
     std::string ReadXMLStringAttribut( std::string name, const char** atts) const;
 	};
 }

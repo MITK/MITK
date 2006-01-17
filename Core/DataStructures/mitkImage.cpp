@@ -34,6 +34,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkImageWriter.h>
 #include "mitkDataTreeNodeFactory.h"
 
+
 mitk::Image::Image() : 
   m_Dimension(0), m_Dimensions(NULL), m_OffsetTable(NULL),
   m_CompleteData(NULL), m_PixelType(NULL), m_Initialized(false),
@@ -1029,14 +1030,14 @@ void mitk::Image::ReleaseData()
 
 bool mitk::Image::WriteXMLData( XMLWriter& xmlWriter ) 
 {
-  std::string fileName = xmlWriter.GetNewFilenameAndSubFolder();
+  std::string fileName = xmlWriter.GetRelativePath();
   fileName += xmlWriter.GetImageExtension();
   xmlWriter.WriteProperty( "FILENAME", fileName.c_str() );
 
   if(xmlWriter.SaveSourceFiles()){
     mitk::ImageWriter::Pointer imageWriter = mitk::ImageWriter::New();
     imageWriter->SetInput( this );
-    imageWriter->SetFileName( fileName.c_str() );
+    imageWriter->SetFileName( xmlWriter.GetAbsolutePath().c_str() );
     imageWriter->SetExtension( xmlWriter.GetImageExtension().c_str() );
     imageWriter->Write();
   }
@@ -1054,7 +1055,6 @@ bool mitk::Image::ReadXMLData( XMLReader& xmlReader )
   BaseData::ReadXMLData( xmlReader );
   std::string fileName;
   xmlReader.GetAttribute( XMLReader::FILENAME, fileName );
-
   std::cout << fileName << std::endl;
 
   mitk::DataTreeNodeFactory::Pointer factory = mitk::DataTreeNodeFactory::New();

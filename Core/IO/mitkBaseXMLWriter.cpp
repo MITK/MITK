@@ -11,16 +11,16 @@ namespace mitk {
 
 
 BaseXMLWriter::BaseXMLWriter( const char* filename, int space )
-:m_Out(NULL), m_Increase(0), m_Space(space), m_NodeCount(0) , m_File(true), m_FirstNode(true)
+:m_Out(NULL), m_Increase(0), m_Space(space), m_NodeCount(0) , m_File(true), m_FirstNode(true), m_XMLFilename(filename)
 
 {		
 	m_Out = new std::ofstream( filename );			
 }
 
 
-BaseXMLWriter::BaseXMLWriter( std::ostream& out, int space )
-:m_Out(&out), m_Increase(0), m_Space(space), m_NodeCount(0), m_File(false), m_FirstNode(true) 
-{}
+//BaseXMLWriter::BaseXMLWriter( std::ostream& out, int space )
+//:m_Out(&out), m_Increase(0), m_Space(space), m_NodeCount(0), m_File(false), m_FirstNode(true) 
+//{}
 
 
 BaseXMLWriter::~BaseXMLWriter() 
@@ -226,6 +226,12 @@ void BaseXMLWriter::StreamNode::Write( std::ostream& out, int steps )
   {
     out << "/>\n";
   }
+}
+
+
+const std::string BaseXMLWriter::GetXMLFileName()
+{
+  return m_XMLFilename;
 }
 
 } // namespace mitk

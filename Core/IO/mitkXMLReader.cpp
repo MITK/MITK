@@ -7,6 +7,7 @@
 #include <mitkGlobalInteraction.h>
 #include <mitkEventMapper.h>
 #include <mitkRenderWindow.h>
+#include <itksys/SystemTools.hxx>
 
 #include <fstream>
 #include <string>
@@ -31,6 +32,7 @@ namespace mitk {
   const std::string XMLReader::MAX = "MAX";
   const std::string XMLReader::VALID = "VALID";
   
+  std::string m_FileName;
 
   XMLReader::XMLReader( const mitk::DataTreeIteratorBase* it )
     :vtkXMLParser(), m_Root(NULL), m_CurrentNode(NULL), m_CurrentPosition(const_cast<mitk::DataTreeIteratorBase*>(it)) { }
@@ -43,6 +45,7 @@ namespace mitk {
 
    XMLReader* xmlReader = new XMLReader( it );
    xmlReader->SetFileName( fileName.c_str() );
+   m_FileName = fileName;
 
    if ( xmlReader->Parse() == 0 )    
    {
@@ -71,7 +74,11 @@ namespace mitk {
     if ( s.empty() )
       return false;
       
-    value = s;    
+    value = s;
+
+    if(name==FILENAME)
+      value = itksys::SystemTools::CollapseFullPath(s.c_str(), m_FileName.c_str());
+
     return true;
   }
   

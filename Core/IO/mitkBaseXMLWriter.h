@@ -8,11 +8,13 @@
 
 namespace mitk{
 
-  /// Base class for writing XML nodes and XML attributes.
-  ///
-  /// Implements methods for writing a XML file (XML nodes and XML attributes).
-  /// The data is stored with XML attributes.
-  /// The functions WriteProperty() are used to write XML attributes. The first parameter specifies the name of the attribute. The second parameter holds the data of the attribute.
+  //##Documentation
+  //## @brief Base class for writing XML nodes and XML attributes.
+  //##
+  //## Implements methods for writing a XML file (XML nodes and XML attributes).
+  //## The data is stored with XML attributes.
+  //## The functions WriteProperty() are used to write XML attributes. The first parameter specifies the name of the attribute. The second parameter holds the data of the attribute.
+  //## @ingroup IO
   class BaseXMLWriter {
     
     /// encapsulates all information of a node in a stream
@@ -47,7 +49,7 @@ namespace mitk{
     BaseXMLWriter( const char* filename, int space = 3);
 
     /// constructor
-    BaseXMLWriter( std::ostream& out, int space = 3 );
+    //BaseXMLWriter( std::ostream& out, int space = 3 );
 
     /// destructor
     virtual ~BaseXMLWriter();
@@ -86,14 +88,20 @@ namespace mitk{
     /// returns the current count of nodes
     int GetNodeCount() const;
 
+    /// returns the indention space of the XML nodes
     int GetSpace() const;
 
+    /// sets the indention space of the XML nodes
     void SetSpace( int space );
+
+    /// returns the filename of the XML file
+    const std::string GetXMLFileName();
 
 protected:
 
     /// replaces characters "<" and ">" with "{" and "}"
     const char* ConvertString( const char* string ) const;
+    const char* m_XMLFilename;
   };
 }
 #endif // MITK_BASE_XML_WRITER

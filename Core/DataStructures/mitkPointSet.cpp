@@ -293,13 +293,18 @@ void mitk::PointSet::SetRequestedRegion(itk::DataObject*)
 bool mitk::PointSet::WriteXMLData( XMLWriter& xmlWriter )
 {
   BaseData::WriteXMLData( xmlWriter );
-  std::string fileName = xmlWriter.GetNewFilenameAndSubFolder();
+  std::string fileName = xmlWriter.GetRelativePath();
   fileName += ".mps";
   xmlWriter.WriteProperty( XMLReader::FILENAME, fileName.c_str() );
-  PointSetWriter::Pointer writer = PointSetWriter::New();
-  writer->SetFileName( fileName.c_str() );
-  writer->SetInput( this );
-  writer->Update();
+
+  if(xmlWriter.SaveSourceFiles()){
+    PointSetWriter::Pointer writer = PointSetWriter::New();
+    fileName = xmlWriter.GetAbsolutePath();
+    fileName += ".mps";
+    writer->SetFileName( fileName.c_str() );
+    writer->SetInput( this );
+    writer->Update();
+  }
   return true;
 }
 

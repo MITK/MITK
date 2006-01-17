@@ -26,13 +26,17 @@ namespace mitk{
     bool m_SaveSourceFiles;
     static std::string m_ImageExtension;
 
+
   public:
 
     /// constructor
     XMLWriter( const char* filename, const char* subDirectory, int space = 3);
 
     /// constructor
-    XMLWriter( std::ostream& out, int space = 3 );
+    //XMLWriter( std::ostream& out, int space = 3 );
+
+    /// constructor
+    XMLWriter( const char* filename, int space = 3 );
 
     /// destructor
     virtual ~XMLWriter();
@@ -84,14 +88,12 @@ namespace mitk{
 
     /// returns the subfolder of the source files that will be written in the XML file 
     const char* GetSubFolder();
-
    
     /// returns a new unique filename in the subdirectory of the source file that will be written in the XML file
     const char* GetNewFileName();
-
     
-    /// returns the complete path (subfolder + filename) of the source file that will be written in the XML file
-    const char* GetNewFilenameAndSubFolder();
+    /// returns the relative path (subfolder + filename) of the source file that will be written in the XML file
+    const std::string GetRelativePath();
 
     /// sets the image file extension (e.g. .pic, .mhd)
     // .pic is default
@@ -105,6 +107,14 @@ namespace mitk{
 
     /// checks whether the source files will be written 
     bool SaveSourceFiles();
+
+    /// returns the absolute path of the source files. The path of the source files is written relative in the XML file
+    const std::string GetAbsolutePath();
+
+  protected:
+    /// returns the relative path
+    const std::string GetRelativePath(std::string sourcePath);
+
   };
 }
 #endif

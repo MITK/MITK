@@ -51,6 +51,7 @@ namespace mitk {
 
     virtual bool WriteXMLData( XMLWriter& xmlWriter );
 
+    /// returns the name of the XML node
     virtual const std::string& GetXMLNodeName() const;
 
     static const std::string XML_NODE_NAME;

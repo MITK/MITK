@@ -208,11 +208,4 @@
     <function returnType="int">GetLayout() const</function>
 </functions>
 <layoutdefaults spacing="6" margin="11"/>
-<includehints>
-    <includehint>qmitkselectableglwidget.h</includehint>
-    <includehint>qmitkselectableglwidget.h</includehint>
-    <includehint>qmitkselectableglwidget.h</includehint>
-    <includehint>qmitkselectableglwidget.h</includehint>
-    <includehint>qmitklevelwindowwidget.h</includehint>
-</includehints>
 </UI>

@@ -165,8 +165,4 @@
     <function>UpdateMinMaxLabels()</function>
 </functions>
 <layoutdefaults spacing="6" margin="11"/>
-<includehints>
-    <includehint>qmitkpiecewisefunctioncanvas.h</includehint>
-    <includehint>qmitkcolortransferfunctioncanvas.h</includehint>
-</includehints>
 </UI>

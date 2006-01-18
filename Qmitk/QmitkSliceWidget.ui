@@ -256,8 +256,4 @@
     <function returnType="mitk::BaseController *">GetController() const</function>
 </functions>
 <layoutdefaults spacing="6" margin="11"/>
-<includehints>
-    <includehint>qmitklevelwindowwidget.h</includehint>
-    <includehint>qmitkslidernavigator.h</includehint>
-</includehints>
 </UI>

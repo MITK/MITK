@@ -633,7 +633,4 @@
     <function access="private" specifier="non virtual">init()</function>
 </functions>
 <layoutdefaults spacing="6" margin="11"/>
-<includehints>
-    <includehint>qmitkslidernavigator.h</includehint>
-</includehints>
 </UI>

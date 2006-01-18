@@ -141,8 +141,4 @@ Press delete to remove selected handle.</string>
     <slot>EnableRenderingCB_toggled( bool state )</slot>
 </slots>
 <layoutdefaults spacing="6" margin="11"/>
-<includehints>
-    <includehint>qmitktreenodeselector.h</includehint>
-    <includehint>qmitktransferfunctionwidget.h</includehint>
-</includehints>
 </UI>

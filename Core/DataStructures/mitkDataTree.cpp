@@ -179,8 +179,8 @@ bool mitk::DataTree::Save( const mitk::DataTreeIteratorBase* it, const char* fil
 	if ( fileName == NULL || it == NULL || it->IsAtEnd() )
 		return false;
 
-  std::string stdFileName(fileName);
-	mitk::XMLWriter writer( fileName, NULL );
+  //std::string stdFileName(fileName);
+	mitk::XMLWriter writer( fileName );
 
 	if ( !Save( it, writer ) )
 		writer.WriteComment( "Error" );

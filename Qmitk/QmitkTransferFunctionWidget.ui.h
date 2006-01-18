@@ -33,7 +33,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 /**
  * \class QmitkTransferFunctionWidget
- * \brief A custom widget for editing transfer funtctions for volume rendering. 
+ * \brief A custom widget for editing transfer functions for volume rendering. 
  * \ingroup Widgets
  */ 
 void QmitkTransferFunctionWidget::SetDataTreeNode( mitk::DataTreeNode* node)

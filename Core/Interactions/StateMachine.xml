@@ -1752,6 +1752,27 @@
       </transition>
     </state>
   </stateMachine>
+
+<stateMachine NAME="EasySegmentation">
+<!-- State machine for interaction with segmentations. 
+     Original author: Daniel Maleike
+     Status: idea/experiment
+     Basic behaviour: Collision detection checks, whether the mouse cursor is inside some segmentation.
+                      When outside, the behaviour is identical to moveNzoom, i.e. translation of the
+                      whole scene using the middle button, scaling of the whole scene using the right button.
+                      When the pointer is inside a segmentation, middle button behaviour changes to
+                      moving the segmentation under the cursor, right mouse button generates 
+                      parameters for segmentation algorithms (TODO: clarify)
+                      The mouse wheel should change the currently selected segmentation tool.  -->
+  <state NAME="Moving around" ID="0" START_STATE="TRUE">
+  <!-- initial state: outside anything and checking for collisions -->
+    <transition NAME="OnMouseMove" EVENT_ID="520" NEXT_STATE="0">
+      <action ID="31" /> <!-- AcCheckObject -->
+    </transition>
+  </state>
+</stateMachine>
+
+  
   <!-- -->
   <!-- -->
   <!-- EventDescriptions -->

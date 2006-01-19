@@ -42,6 +42,7 @@ class QmitkDataTreeComboBox : public QComboBox
     void SetDataTree(mitk::DataTreeIteratorBase*);
 
     void SetFilter(mitk::DataTreeFilter*);
+    mitk::DataTreeFilter* GetFilter();
 
     void SetDisplayedProperty(std::string);
 
@@ -55,6 +56,7 @@ class QmitkDataTreeComboBox : public QComboBox
    
   signals:
     void activated(const mitk::DataTreeFilter::Item*);
+    //void selectionCleared();
 
   protected:
 

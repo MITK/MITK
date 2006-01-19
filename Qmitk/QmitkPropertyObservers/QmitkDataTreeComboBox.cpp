@@ -107,7 +107,7 @@ void QmitkDataTreeComboBox::SetDataTree(mitk::DataTreeBase* tree)
   {
     // create default filter with visibility (editable) and name (non-editable)
     m_PrivateFilter = mitk::DataTreeFilter::New(tree);
-    m_PrivateFilter->SetFilter(&mitk::IsGoodDataTreeNode);
+    m_PrivateFilter->SetFilter(&mitk::IsImage);
     mitk::DataTreeFilter::PropertyList visible;
     visible.push_back("name");
     m_PrivateFilter->SetVisibleProperties(visible);
@@ -152,6 +152,11 @@ void QmitkDataTreeComboBox::SetFilter(mitk::DataTreeFilter* filter)
   
   determineDisplayedProperty();
   generateItems();
+}
+
+mitk::DataTreeFilter* QmitkDataTreeComboBox::GetFilter()
+{
+  return m_DataTreeFilter;
 }
 
 void QmitkDataTreeComboBox::onActivated(int index)

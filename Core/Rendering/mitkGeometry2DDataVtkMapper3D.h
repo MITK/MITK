@@ -58,10 +58,10 @@ class Geometry2DDataVtkMapper3D : public BaseVtkMapper3D
     //##ModelId=3E6E874F0007
     //##Documentation
     //## @brief The first image found when traversing the @a iterator (stored in m_DataTreeIterator)
-	//## will be used as a texture on the mapped Geometry2D, when it has 
-	//## been resliced by an ImageMapper2D according to the Geometry2D.
+    //## will be used as a texture on the mapped Geometry2D, when it has 
+    //## been resliced by an ImageMapper2D according to the Geometry2D.
     //## See ImageMapper2D for problems of the current version.
-	//## @warning Works only when the node to the Geometry2DData was created by 
+    //## @warning Works only when the node to the Geometry2DData was created by 
     //## calling BaseRenderer::GetCurrentWorldGeometry2DNode()
     virtual void SetDataIteratorForTexture(const mitk::DataTreeIteratorBase* iterator);
 
@@ -77,35 +77,25 @@ class Geometry2DDataVtkMapper3D : public BaseVtkMapper3D
     //##ModelId=3E691E090331
     //##Documentation
     //## @brief vtk-mapper to map the vtk-representation of the Geometry2D
-	vtkPolyDataMapper* m_VtkPolyDataMapper;
+    vtkPolyDataMapper* m_VtkPolyDataMapper;
 
     //##ModelId=3E691E090344
     //##Documentation
     //## @brief vtk-actor containing the m_VtkPolyDataMapper and the m_VtkTexture
-	//## if set.
-    vtkActor* m_Actor;
-
-    //##ModelId=3E691E090358
-    //##Documentation
-    //## @brief vtk-representation of the Geometry2D
-    vtkPolyData* m_VtkPolyData;
-
-    //##ModelId=3E691E090362
-    //##Documentation
-    //## @brief source to create the vtk-representation of a PlaneGeometry
-    vtkPlaneSource* m_VtkPlaneSource;
+    //## if set.
+    vtkActor* m_ImageActor;
 
     //##ModelId=3E6E8AA40375
     //## @brief The first image found when traversing the this iterator (if set)
-	//## will be used as a texture on the mapped Geometry2D, when it has 
-	//## been resliced by an ImageMapper2D according to the Geometry2D.
-	//## \sa SetDataIteratorForTexture
+    //## will be used as a texture on the mapped Geometry2D, when it has 
+    //## been resliced by an ImageMapper2D according to the Geometry2D.
+    //## \sa SetDataIteratorForTexture
     mitk::DataTreeIteratorClone m_DataTreeIterator;
 
     //##ModelId=3E691E09034E
     //##Documentation
     //## @brief vtk-texture when m_DataTreeIterator is set (by SetDataIteratorForTexture)
-	//## if set.
+    //## if set.
     vtkTexture* m_VtkTexture;
 
     //##ModelId=3E6E8AA4034C
@@ -120,7 +110,7 @@ class Geometry2DDataVtkMapper3D : public BaseVtkMapper3D
     //##ModelId=3EDD039F0240
     //##Documentation
     //## @brief timestamp of last update of texture (m_VtkTexture) from image data
-	unsigned long int m_LastTextureUpdateTime;
+    unsigned long int m_LastTextureUpdateTime;
 };
 
 } // namespace mitk

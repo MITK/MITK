@@ -51,16 +51,14 @@ PURPOSE.  See the above copyright notices for more information.
 //##ModelId=3E691E09038E
 mitk::Geometry2DDataVtkMapper3D::Geometry2DDataVtkMapper3D() : m_DataTreeIterator(NULL), m_LastTextureUpdateTime(0)
 {
-  m_VtkPlaneSource = vtkPlaneSource::New();
-
   m_VtkPolyDataMapper = vtkPolyDataMapper::New();
   m_VtkPolyDataMapper->ImmediateModeRenderingOn();
 
-  m_Actor = vtkActor::New();
-  m_Actor->SetMapper(m_VtkPolyDataMapper);
-  m_Actor->GetProperty()->SetAmbient(0.5);
-
-  m_Prop3D = m_Actor;
+  m_ImageActor = vtkActor::New();
+  m_ImageActor->SetMapper(m_VtkPolyDataMapper);
+  m_ImageActor->GetProperty()->SetAmbient(0.5);
+  
+  m_Prop3D = m_ImageActor;
   m_Prop3D->Register(NULL);
 
   m_VtkLookupTable = vtkLookupTable::New();
@@ -81,9 +79,8 @@ mitk::Geometry2DDataVtkMapper3D::Geometry2DDataVtkMapper3D() : m_DataTreeIterato
 //##ModelId=3E691E090394
 mitk::Geometry2DDataVtkMapper3D::~Geometry2DDataVtkMapper3D()
 {
-  m_VtkPlaneSource->Delete();
   m_VtkPolyDataMapper->Delete();
-  m_Actor->Delete();
+  m_ImageActor->Delete();
   m_VtkLookupTable->Delete();
   m_VtkTexture->Delete();
 }
@@ -111,10 +108,10 @@ void mitk::Geometry2DDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
 {
   if(IsVisible(renderer)==false)
   {
-    m_Actor->VisibilityOff();
+    m_ImageActor->VisibilityOff();
     return;
   }
-  m_Actor->VisibilityOn();
+  m_ImageActor->VisibilityOn();
 
   mitk::Geometry2DData::Pointer input  = const_cast<mitk::Geometry2DData*>(this->GetInput());
 
@@ -157,7 +154,8 @@ void mitk::Geometry2DDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
 
         if((node->IsVisible(renderer)) && (imagemapper))
         {
-          mitk::WeakPointerProperty::Pointer rendererProp = dynamic_cast<mitk::WeakPointerProperty*>(GetDataTreeNode()->GetPropertyList()->GetProperty("renderer").GetPointer());
+          mitk::WeakPointerProperty::Pointer rendererProp 
+                                               = dynamic_cast<mitk::WeakPointerProperty*>(GetDataTreeNode()->GetPropertyList()->GetProperty("renderer").GetPointer());
           if(rendererProp.IsNotNull())
           {
             mitk::BaseRenderer::Pointer renderer = dynamic_cast<mitk::BaseRenderer*>(rendererProp->GetWeakPointer().GetPointer());
@@ -171,7 +169,7 @@ void mitk::Geometry2DDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
               {
                 m_VtkLookupTable = LookupTableProb->GetLookupTable().GetVtkLookupTable();
                 m_VtkTexture->SetLookupTable(m_VtkLookupTable);
-                //						    m_VtkTexture->Modified();
+                // m_VtkTexture->Modified();
               } else {
                 m_VtkLookupTable = m_VtkLookupTableDefault;
               }
@@ -198,7 +196,7 @@ void mitk::Geometry2DDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
                   vtkImageData* vtkimage=Pic2vtk::convert(p);
                   m_VtkTexture->SetInput(vtkimage);
                   vtkimage->Delete(); vtkimage=NULL;
-                  m_Actor->SetTexture(m_VtkTexture);
+                  m_ImageActor->SetTexture(m_VtkTexture);
                   m_LastTextureUpdateTime=ri->m_LastUpdateTime;
                   bool textureInterpolation=true;
                   m_VtkTexture->SetInterpolate(textureInterpolation ? 1 : 0);
@@ -215,11 +213,11 @@ void mitk::Geometry2DDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
     }
     if(texture==false)
     {
-      m_Actor->SetTexture(NULL);
+      m_ImageActor->SetTexture(NULL);
     }
 
     //apply properties read from the PropertyList
-    ApplyProperties(m_Actor, renderer);
+    ApplyProperties(m_ImageActor, renderer);
     m_Prop3D->SetUserTransform(GetDataTreeNode()->GetVtkTransform());
   }
 }

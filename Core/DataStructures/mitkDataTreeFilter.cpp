@@ -2,6 +2,7 @@
 #include <mitkDataTreeFilter.h>
 #include <mitkDataTreeFilterEvents.h>
 #include <mitkDataTree.h>
+#include <mitkDataTreeHelper.h>
 #include <mitkPropertyManager.h>
 
 namespace mitk
@@ -295,7 +296,7 @@ DataTreeFilter::~DataTreeFilter()
   m_SelectedItems.clear();
 }
 
-void DataTreeFilter::ConstrainToNodeAndChildren(mitk::DataTreeNode* node)
+void DataTreeFilter::ConstrainToNodeAndChildren(const mitk::DataTreeNode* node)
 {
   m_RootNode = node;
   GenerateModelFromTree();
@@ -419,6 +420,21 @@ const DataTreeFilter::ItemList* DataTreeFilter::GetItems() const
 const DataTreeFilter::ItemSet* DataTreeFilter::GetSelectedItems() const
 {
   return &m_SelectedItems;
+}
+
+const mitk::DataTreeFilter::Item* DataTreeFilter::GetSelectedItem() const
+{
+  return m_LastSelectedItem;
+}
+
+const mitk::DataTreeIteratorClone DataTreeFilter::GetIteratorToSelectedItem() const
+{
+  if ( m_LastSelectedItem && m_DataTree )
+  {
+    return mitk::DataTreeHelper::FindIteratorToNode(m_DataTree, m_LastSelectedItem->GetNode());
+  }
+  
+  return NULL;
 }
       
 void DataTreeFilter::SelectItem(const Item* item, bool selected)

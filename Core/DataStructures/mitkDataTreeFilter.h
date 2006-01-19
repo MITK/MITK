@@ -190,7 +190,7 @@ namespace mitk
       /// No meaning without a mitk::DataTreeBase
       static Pointer New(mitk::DataTreeBase*);
 
-      void ConstrainToNodeAndChildren(mitk::DataTreeNode*);
+      void ConstrainToNodeAndChildren(const mitk::DataTreeNode*);
       bool DataTreeFilter::IsWithinConstrains( mitk::DataTreeIteratorClone nodeIter );
 
       /// Labels (for Header) of visible properties
@@ -227,6 +227,8 @@ namespace mitk
       
       /// Access the top level items that were selected
       const ItemSet* GetSelectedItems() const;
+      const Item* GetSelectedItem() const;
+      const mitk::DataTreeIteratorClone GetIteratorToSelectedItem() const;
 
       /// Views can call this to select items
       void SelectItem(const Item*, bool selected = true);
@@ -266,7 +268,7 @@ namespace mitk
       mitk::DataTreeBase* m_DataTree;
       
       /// The root data tree node to which display is constrained
-      mitk::DataTreeNode* m_RootNode;
+      const mitk::DataTreeNode* m_RootNode;
 
       /// should we preserve the hierachy of the tree?
       HierarchyHandling m_HierarchyHandling;

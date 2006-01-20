@@ -93,6 +93,8 @@ void QmitkDataTreeComboBox::connectNotifications()
 
 void QmitkDataTreeComboBox::disconnectNotifications()
 {
+  if (!m_DataTreeFilter) return;
+
   m_DataTreeFilter->RemoveObserver( m_RemoveItemConnection );
   m_DataTreeFilter->RemoveObserver( m_RemoveChildrenConnection );
   m_DataTreeFilter->RemoveObserver( m_RemoveAllConnection );
@@ -108,11 +110,14 @@ void QmitkDataTreeComboBox::SetDataTree(mitk::DataTreeBase* tree)
     // create default filter with visibility (editable) and name (non-editable)
     m_PrivateFilter = mitk::DataTreeFilter::New(tree);
     m_PrivateFilter->SetFilter(&mitk::IsImage);
+    m_PrivateFilter->SetSelectionMode(mitk::DataTreeFilter::SINGLE_SELECT);
     mitk::DataTreeFilter::PropertyList visible;
     visible.push_back("name");
     m_PrivateFilter->SetVisibleProperties(visible);
     
+    disconnectNotifications(); // add observers
     m_DataTreeFilter = m_PrivateFilter;
+    connectNotifications(); // add observers
   
     SetDisplayedProperty("name");
     generateItems();
@@ -128,8 +133,7 @@ void QmitkDataTreeComboBox::SetDataTree(mitk::DataTreeIteratorBase* iterator)
 
 void QmitkDataTreeComboBox::SetFilter(mitk::DataTreeFilter* filter)
 {
-  if (m_DataTreeFilter) // remove observers
-    disconnectNotifications();
+  disconnectNotifications();
   m_DataTreeFilter = filter;
   // in the case that somebody first sets a datatree and then a filter
   // destroy the default filter that was created in SetDataTree

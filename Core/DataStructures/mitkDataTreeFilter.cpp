@@ -192,13 +192,13 @@ void DataTreeFilter::Item::SetSelected(bool selected)
 
     if ( selected )
     {
-      if ( m_TreeFilter->m_SelectionMode == mitk::DataTreeFilter::SINGLE_SELECT )
-        if (   m_TreeFilter->m_LastSelectedItem && m_TreeFilter->m_LastSelectedItem != this
-            && std::find( m_TreeFilter->m_Items->begin(), m_TreeFilter->m_Items->end(), m_TreeFilter->m_LastSelectedItem ) != m_TreeFilter->m_Items->end() 
-           )
-           
+      if ( m_TreeFilter->m_SelectionMode == mitk::DataTreeFilter::SINGLE_SELECT &&
+          m_TreeFilter->m_LastSelectedItem && m_TreeFilter->m_LastSelectedItem != this)
+// TODO this compares smartpointers with "weak" pointers. Rewrite
+//            if ( std::find( m_TreeFilter->m_Items->begin(), m_TreeFilter->m_Items->end(), m_TreeFilter->m_LastSelectedItem ) != m_TreeFilter->m_Items->end() )
           m_TreeFilter->m_LastSelectedItem->SetSelected(false);
 
+      m_TreeFilter->m_LastSelectedItem = this;
       m_TreeFilter->m_SelectedItems.insert(this);
     }
     else
@@ -389,6 +389,8 @@ void DataTreeFilter::SetSelectionMode(const SelectionMode selectionMode)
   if (m_SelectionMode == selectionMode) return;
   
   m_SelectionMode = selectionMode;
+
+  GenerateModelFromTree();
   // TODO update selection (if changed from multi to single)
   // InvokeEvent( mitk::TreeFilterSelectionChanged( item, selected ) );
 }

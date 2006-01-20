@@ -41,6 +41,7 @@ class QmitkDataTreeListView : public QWidget, public QmitkListViewItemIndex
     void SetDataTree(mitk::DataTreeIteratorBase*);
 
     void SetFilter(mitk::DataTreeFilter*);
+    mitk::DataTreeFilter* GetFilter();
 
     int stretchedColumn();
     void setStretchedColumn(int);
@@ -54,7 +55,11 @@ class QmitkDataTreeListView : public QWidget, public QmitkListViewItemIndex
     void selectionChangedHandler( const itk::EventObject& e );
     void itemAddedHandler( const itk::EventObject& e );
     void updateAllHandler( const itk::EventObject& e );
-    
+   
+    // TODO remove this. this should never ever be neccessary
+    // notification of selectionmode changes should be issued by datatreefilter
+    void regenerate();
+
   protected:
 
     void initialize();

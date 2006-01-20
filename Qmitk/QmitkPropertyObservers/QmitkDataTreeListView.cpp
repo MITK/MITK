@@ -98,6 +98,9 @@ void QmitkDataTreeListView::connectNotifications()
 
 void QmitkDataTreeListView::disconnectNotifications()
 {
+  if (!m_DataTreeFilter) return;
+  
+  // remove observers
   m_DataTreeFilter->RemoveObserver( m_RemoveItemConnection );
   m_DataTreeFilter->RemoveObserver( m_RemoveChildrenConnection );
   m_DataTreeFilter->RemoveObserver( m_RemoveAllConnection );
@@ -121,7 +124,9 @@ void QmitkDataTreeListView::SetDataTree(mitk::DataTreeBase* tree)
     editable.push_back("visible");
     m_PrivateFilter->SetEditableProperties(editable);
     
+    disconnectNotifications(); 
     m_DataTreeFilter = m_PrivateFilter;
+    connectNotifications(); // add observers
     generateItems();
   }
 }
@@ -135,8 +140,7 @@ void QmitkDataTreeListView::SetDataTree(mitk::DataTreeIteratorBase* iterator)
 
 void QmitkDataTreeListView::SetFilter(mitk::DataTreeFilter* filter)
 {
-  if (m_DataTreeFilter) // remove observers
-    disconnectNotifications();
+  disconnectNotifications();
   m_DataTreeFilter = filter;
   // in the case that somebody first sets a datatree and then a filter
   // destroy the default filter that was created in SetDataTree
@@ -144,6 +148,11 @@ void QmitkDataTreeListView::SetFilter(mitk::DataTreeFilter* filter)
     m_PrivateFilter = NULL;
   connectNotifications(); // add observers
   generateItems();
+}
+
+mitk::DataTreeFilter* QmitkDataTreeListView::GetFilter()
+{
+  return m_DataTreeFilter;
 }
 
 int QmitkDataTreeListView::stretchedColumn()
@@ -381,6 +390,7 @@ void QmitkDataTreeListView::generateItems()
   m_Grid->addItem( new QSpacerItem(1, 5, QSizePolicy::Minimum, QSizePolicy::Ignored) , m_Grid->numRows(),0);
   m_Grid->setRowStretch( m_Grid->numRows()-1, 1 );
 
+  update();
 }
 
 void QmitkDataTreeListView::removeItemHandler( const itk::EventObject& e )
@@ -500,6 +510,10 @@ void QmitkDataTreeListView::updateAllHandler( const itk::EventObject& )
   generateItems();
 }
 
+void QmitkDataTreeListView::regenerate()
+{
+  generateItems();
+}
 
 
 

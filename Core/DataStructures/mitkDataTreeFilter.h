@@ -190,8 +190,8 @@ namespace mitk
       /// No meaning without a mitk::DataTreeBase
       static Pointer New(mitk::DataTreeBase*);
 
+      /// moves the hierarchical aspect out of the filter function
       void ConstrainToNodeAndChildren(const mitk::DataTreeNode*);
-      bool DataTreeFilter::IsWithinConstrains( mitk::DataTreeIteratorClone nodeIter );
 
       /// Labels (for Header) of visible properties
       void SetPropertiesLabels(const PropertyList);
@@ -246,6 +246,8 @@ namespace mitk
       ~DataTreeFilter();
     
     private:
+      
+      bool DataTreeFilter::IsWithinConstrains( mitk::DataTreeIteratorClone nodeIter );
 
       void AddMatchingChildren(mitk::DataTreeIteratorBase*, ItemList*, Item*, bool = true);
       

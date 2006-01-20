@@ -34,6 +34,9 @@ class vtkImageMapToWindowLevelColors;
 class vtkPolyData;
 class vtkPolyDataMapper;
 class vtkLookupTable;
+class vtkAssembly;
+class vtkFeatureEdges;
+class vtkTubeFilter;
 
 namespace mitk {
 
@@ -82,8 +85,38 @@ class Geometry2DDataVtkMapper3D : public BaseVtkMapper3D
     //##ModelId=3E691E090344
     //##Documentation
     //## @brief vtk-actor containing the m_VtkPolyDataMapper and the m_VtkTexture
-    //## if set.
+	//## if set.
     vtkActor* m_ImageActor;
+
+    //##Documentation
+    //## @brief PropAssembly to hold the plane and its tubal frame
+    vtkAssembly* m_Prop3DAssembly;
+
+    //##ModelId=3E691E090358
+    //##Documentation
+    //## @brief vtk-representation of the Geometry2D
+    vtkPolyData* m_VtkPolyData;
+
+    //##ModelId=3E691E090362
+    //##Documentation
+    //## @brief source to create the vtk-representation of a PlaneGeometry
+    vtkPlaneSource* m_VtkPlaneSource;
+
+    //##Documentation
+    //## @brief Edge extractor for tube-shaped frame
+    vtkFeatureEdges* m_Edges;
+
+    //##Documentation
+    //## @brief Source to create the tube-shaped frame
+    vtkTubeFilter* m_EdgeTuber;
+
+    //##Documentation
+    //## @brief Mapper for the tube-shaped frame
+    vtkPolyDataMapper* m_EdgeMapper;
+
+    //##Documentation
+    //## @brief Actor for the tube-shaped frame
+    vtkActor* m_EdgeActor;
 
     //##ModelId=3E6E8AA40375
     //## @brief The first image found when traversing the this iterator (if set)

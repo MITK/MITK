@@ -18,33 +18,30 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include "mitkGeometry2DDataVtkMapper3D.h"
-
 #include "mitkPlaneGeometry.h"
-
 #include "mitkDataTree.h"
 #include "mitkImageMapper2D.h"
-
 #include "mitkSurface.h"
 #include "mitkGeometry2DDataToSurfaceFilter.h"
-
-#include "vtkActor.h"
-#include "vtkProperty.h"
-#include "vtkTexture.h"
-#include "vtkPlaneSource.h"
-#include "vtkPolyDataMapper.h"
-#include "vtkLookupTable.h"
-//#include "vtkImageMapToWindowLevelColors";
 #include "mitkColorProperty.h"
 #include "mitkProperties.h"
 #include "mitkLookupTableProperty.h"
-
-
 #include "mitkLevelWindowProperty.h"
 #include "mitkSmartPointerProperty.h"
 #include "mitkWeakPointerProperty.h"
+
+#include <vtkActor.h>
+#include <vtkProperty.h>
+#include <vtkTexture.h>
+#include <vtkPlaneSource.h>
+#include <vtkPolyDataMapper.h>
+#include <vtkLookupTable.h>
 #include <vtkActor.h>
 #include <vtkImageData.h>
 #include <vtkLinearTransform.h>
+#include <vtkAssembly.h>
+#include <vtkFeatureEdges.h>
+#include <vtkTubeFilter.h>
 
 #include "pic2vtk.h"
 
@@ -57,9 +54,6 @@ mitk::Geometry2DDataVtkMapper3D::Geometry2DDataVtkMapper3D() : m_DataTreeIterato
   m_ImageActor = vtkActor::New();
   m_ImageActor->SetMapper(m_VtkPolyDataMapper);
   m_ImageActor->GetProperty()->SetAmbient(0.5);
-  
-  m_Prop3D = m_ImageActor;
-  m_Prop3D->Register(NULL);
 
   m_VtkLookupTable = vtkLookupTable::New();
   m_VtkLookupTable->SetTableRange (-1024, 4096);
@@ -74,17 +68,42 @@ mitk::Geometry2DDataVtkMapper3D::Geometry2DDataVtkMapper3D() : m_DataTreeIterato
   m_VtkTexture->InterpolateOn();
   m_VtkTexture->SetLookupTable(m_VtkLookupTable);
   m_VtkTexture->MapColorScalarsThroughLookupTableOn();
+
+  m_EdgeTuber = vtkTubeFilter::New();
+  m_EdgeMapper = vtkPolyDataMapper::New();
+  m_Edges = vtkFeatureEdges::New();
+  m_EdgeActor = vtkActor::New();
+
+  m_EdgeTuber->SetInput( m_Edges->GetOutput() );
+  m_EdgeTuber->SetNumberOfSides( 12 );
+  m_EdgeTuber->CappingOn();
+
+  m_EdgeMapper->SetInput( m_EdgeTuber->GetOutput() );
+  m_EdgeMapper->ScalarVisibilityOff();
+
+  m_EdgeActor->SetMapper( m_EdgeMapper );
+
+  m_Prop3DAssembly = vtkAssembly::New();
+  m_Prop3DAssembly->AddPart( m_ImageActor );
+  m_Prop3DAssembly->AddPart( m_EdgeActor );
+  
+  m_Prop3D = m_Prop3DAssembly;
+  m_Prop3D->Register(NULL);
 }
 
 //##ModelId=3E691E090394
 mitk::Geometry2DDataVtkMapper3D::~Geometry2DDataVtkMapper3D()
 {
   m_VtkPolyDataMapper->Delete();
+  m_Prop3DAssembly->Delete();
   m_ImageActor->Delete();
   m_VtkLookupTable->Delete();
   m_VtkTexture->Delete();
+  m_EdgeTuber->Delete();
+  m_EdgeMapper->Delete();
+  m_Edges->Delete();
+  m_EdgeActor->Delete();
 }
-
 
 
 //##ModelId=3E691E090380
@@ -106,12 +125,13 @@ void mitk::Geometry2DDataVtkMapper3D::SetDataIteratorForTexture(const mitk::Data
 //##ModelId=3EF19F850151
 void mitk::Geometry2DDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
 {
-  if(IsVisible(renderer)==false)
+  if ( !this->IsVisible(renderer) )
   {
-    m_ImageActor->VisibilityOff();
+    m_Prop3DAssembly->VisibilityOff();
     return;
   }
-  m_ImageActor->VisibilityOn();
+
+  m_Prop3DAssembly->VisibilityOn();
 
   mitk::Geometry2DData::Pointer input  = const_cast<mitk::Geometry2DData*>(this->GetInput());
 
@@ -216,8 +236,38 @@ void mitk::Geometry2DDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
       m_ImageActor->SetTexture(NULL);
     }
 
-    //apply properties read from the PropertyList
-    ApplyProperties(m_ImageActor, renderer);
+    // Configurate the tube-shaped frame: size according to the surface
+    // bounds, color as specified in the plane's properties
+    vtkPolyData* surfacePolyData = surfaceCreator->GetOutput()->GetVtkPolyData();
+    m_Edges->SetInput( surfacePolyData );
+
+    // Determine maximum extent
+    vtkFloatingPointType* surfaceBounds = surfacePolyData->GetBounds();
+    vtkFloatingPointType extent = surfaceBounds[1] - surfaceBounds[0];
+    vtkFloatingPointType extentY = surfaceBounds[3] - surfaceBounds[2];
+    vtkFloatingPointType extentZ = surfaceBounds[5] - surfaceBounds[4];
+    
+    if ( extent < extentY ) extent = extentY;
+    if ( extent < extentZ ) extent = extentZ;
+
+    // Adjust the radius according to extent
+    m_EdgeTuber->SetRadius( extent / 250.0 );
+
+    // Get the plane's color and set the tube properties accordingly
+    mitk::ColorProperty::Pointer colorProperty;
+    colorProperty = dynamic_cast<mitk::ColorProperty*>(
+      this->GetDataTreeNode()->GetProperty("color").GetPointer( )
+    );
+    
+    const mitk::Color& color = colorProperty->GetColor();
+    m_EdgeActor->GetProperty()->SetColor(
+      color.GetRed(), color.GetGreen(), color.GetBlue()
+    );
+
+
+    // Apply properties read from the PropertyList
+    this->ApplyProperties(m_ImageActor, renderer);
+
     m_Prop3D->SetUserTransform(GetDataTreeNode()->GetVtkTransform());
   }
 }

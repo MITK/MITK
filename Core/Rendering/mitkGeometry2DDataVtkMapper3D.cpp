@@ -35,6 +35,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkTexture.h>
 #include <vtkPlaneSource.h>
 #include <vtkPolyDataMapper.h>
+#include <vtkPolyData.h>
 #include <vtkLookupTable.h>
 #include <vtkActor.h>
 #include <vtkImageData.h>

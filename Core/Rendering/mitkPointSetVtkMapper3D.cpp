@@ -162,11 +162,8 @@ void mitk::PointSetVtkMapper3D::GenerateData()
   //finished color fishing!
 
   //check if a contour shall be drawn
-  bool makeContour;
-  if (dynamic_cast<mitk::BoolProperty *>(this->GetDataTreeNode()->GetProperty("contour").GetPointer()) == NULL)
-    makeContour = false;
-  else
-    makeContour = dynamic_cast<mitk::BoolProperty *>(this->GetDataTreeNode()->GetProperty("contour").GetPointer())->GetValue();
+  bool makeContour = false;
+  this->GetDataTreeNode()->GetBoolProperty("contour", makeContour);
 
   //create contour
   if (makeContour)
@@ -416,11 +413,8 @@ void mitk::PointSetVtkMapper3D::GenerateData()
 //##ModelId=3EF19FA803BF
 void mitk::PointSetVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
 {
-  bool makeContour;
-  if (dynamic_cast<mitk::BoolProperty *>(this->GetDataTreeNode()->GetProperty("contour").GetPointer()) == NULL)
-    makeContour = false;
-  else
-    makeContour = dynamic_cast<mitk::BoolProperty *>(this->GetDataTreeNode()->GetProperty("contour").GetPointer())->GetValue();
+  bool makeContour = false;
+  this->GetDataTreeNode()->GetBoolProperty("contour", makeContour);
 
   if(IsVisible(renderer)==false)
   {
@@ -430,8 +424,18 @@ void mitk::PointSetVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
     return;
   }
 
-  m_UnselectedActor->VisibilityOn();
-  m_SelectedActor->VisibilityOn();
+  bool showPoints = true;
+  this->GetDataTreeNode()->GetBoolProperty("show points", showPoints);
+  if(showPoints)
+  {
+    m_UnselectedActor->VisibilityOn();
+    m_SelectedActor->VisibilityOn();
+  }
+  else
+  {
+    m_UnselectedActor->VisibilityOff();
+    m_SelectedActor->VisibilityOff();
+  }
 
   if (makeContour)
   {

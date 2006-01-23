@@ -80,6 +80,9 @@ void mitk::PointSetMapper2D::Paint(mitk::BaseRenderer * renderer)
       //apply color and opacity read from the PropertyList
       ApplyProperties(renderer);
 
+      bool showPoints = true;
+      this->GetDataTreeNode()->GetBoolProperty("show points", showPoints);
+
       vtkLinearTransform* transform = GetDataTreeNode()->GetVtkTransform();
 
       //List of the Points
@@ -142,37 +145,40 @@ void mitk::PointSetMapper2D::Paint(mitk::BaseRenderer * renderer)
 		    		      glutBitmapCharacter (GLUT_BITMAP_HELVETICA_10, l[i]);
 		        	}
 
-              //check if the point is to be marked as selected 
-              if (selIt->Value().selected)
+              if(showPoints)
               {
-                horz[0]=8;
-                vert[1]=8;
-                glColor3f(selectedColor[0],selectedColor[1],selectedColor[2]);//red
+                //check if the point is to be marked as selected 
+                if (selIt->Value().selected)
+                {
+                  horz[0]=8;
+                  vert[1]=8;
+                  glColor3f(selectedColor[0],selectedColor[1],selectedColor[2]);//red
 
-                //a diamond around the point with the selected color
-                glBegin (GL_LINE_LOOP);
-                    tmp=pt2d-horz;      glVertex2fv(&tmp[0]);
-                    tmp=pt2d+vert;      glVertex2fv(&tmp[0]);
-                    tmp=pt2d+horz;			glVertex2fv(&tmp[0]);
-                    tmp=pt2d-vert;      glVertex2fv(&tmp[0]);
-                glEnd ();
+                  //a diamond around the point with the selected color
+                  glBegin (GL_LINE_LOOP);
+                      tmp=pt2d-horz;      glVertex2fv(&tmp[0]);
+                      tmp=pt2d+vert;      glVertex2fv(&tmp[0]);
+                      tmp=pt2d+horz;			glVertex2fv(&tmp[0]);
+                      tmp=pt2d-vert;      glVertex2fv(&tmp[0]);
+                  glEnd ();
 
-                //the actual point in the specified color to see the usual color of the point
-                glColor3f(unselectedColor[0],unselectedColor[1],unselectedColor[2]);
-                glBegin (GL_POINTS);
-                  tmp=pt2d;             glVertex2fv(&tmp[0]);
-                glEnd ();
-              }
-              else //if not selected
-              {
-                glColor3f(unselectedColor[0],unselectedColor[1],unselectedColor[2]);
-								//drawing crosses
-                glBegin (GL_LINES);
-                    tmp=pt2d-horz;      glVertex2fv(&tmp[0]);
-                    tmp=pt2d+horz;      glVertex2fv(&tmp[0]);
-                    tmp=pt2d-vert;      glVertex2fv(&tmp[0]);
-                    tmp=pt2d+vert;      glVertex2fv(&tmp[0]);
-                glEnd ();
+                  //the actual point in the specified color to see the usual color of the point
+                  glColor3f(unselectedColor[0],unselectedColor[1],unselectedColor[2]);
+                  glBegin (GL_POINTS);
+                    tmp=pt2d;             glVertex2fv(&tmp[0]);
+                  glEnd ();
+                }
+                else //if not selected
+                {
+                  glColor3f(unselectedColor[0],unselectedColor[1],unselectedColor[2]);
+								  //drawing crosses
+                  glBegin (GL_LINES);
+                      tmp=pt2d-horz;      glVertex2fv(&tmp[0]);
+                      tmp=pt2d+horz;      glVertex2fv(&tmp[0]);
+                      tmp=pt2d-vert;      glVertex2fv(&tmp[0]);
+                      tmp=pt2d+vert;      glVertex2fv(&tmp[0]);
+                  glEnd ();
+                }
               }
 
               if ( m_Polygon && counter > 0 )

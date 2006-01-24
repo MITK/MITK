@@ -20,12 +20,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkDrawOperation.h>
 
 
-mitk::DrawOperation::DrawOperation(OperationType operationType,	Point3D point, Point3D last_point, int draw_state, int radius)
+mitk::DrawOperation::DrawOperation(OperationType operationType, Point3D point, Point3D last_point, int draw_state, int radius)
 : Operation(operationType), m_Point(point), m_LastPoint(last_point), m_DrawState(draw_state), m_Radius(radius)
-{}
-
-mitk::DrawOperation::DrawOperation(OperationType operationType,	SeedsImage::Pointer seedsImage, SeedsImage::Pointer lastSeedsImage)
-: Operation(operationType), m_SeedsImage(seedsImage), m_LastSeedsImage(lastSeedsImage)
 {}
 
 
@@ -36,12 +32,12 @@ mitk::DrawOperation::~DrawOperation()
 
 mitk::Point3D mitk::DrawOperation::GetPoint()
 {
-	return m_Point;
+  return m_Point;
 }
 
 mitk::Point3D mitk::DrawOperation::GetLastPoint()
 {
-	return m_LastPoint;
+  return m_LastPoint;
 }
 
 int mitk::DrawOperation::GetDrawState()

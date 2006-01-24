@@ -44,14 +44,14 @@ protected:
 
 
 protected:
-	mitk::Point3D point;
-	mitk::Point3D last_point;
+  mitk::Point3D point;
+  mitk::Point3D last_point;
   mitk::Vector3D spacing;
   int orig_size[3];
   int m_DrawState;
   int m_Radius;
   float delta_x, delta_y, delta_z;
-	float sphere_distance;
+  float sphere_distance;
 };
 } // namespace mitk
 

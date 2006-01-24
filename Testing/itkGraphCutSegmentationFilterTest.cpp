@@ -43,12 +43,12 @@ int itkGraphCutSegmentationFilterTest(int, char* [] )
   typedef itk::ImageRegionIterator<ImageType>IteratorType;
 
   typedef itk::GraphCutSegmentationGridGraphFilter<ImageType2D, ImageType2D> GraphCutSegmentationGridGraphFilterType2D;
- 	typedef itk::GraphCutSegmentationBoykovFilter<ImageType2D, ImageType2D> GraphCutSegmentationBoykovFilterType2D;
+  typedef itk::GraphCutSegmentationBoykovFilter<ImageType2D, ImageType2D> GraphCutSegmentationBoykovFilterType2D;
   typedef itk::GraphCutSegmentationFilter<ImageType2D, ImageType2D> GraphCutSegmentationFilterType2D;
   GraphCutSegmentationFilterType2D::Pointer graphcutFilter2D;
  
- 	typedef itk::GraphCutSegmentationGridGraphFilter<ImageType, ImageType> GraphCutSegmentationGridGraphFilterType;
- 	typedef itk::GraphCutSegmentationBoykovFilter<ImageType, ImageType> GraphCutSegmentationBoykovFilterType;
+  typedef itk::GraphCutSegmentationGridGraphFilter<ImageType, ImageType> GraphCutSegmentationGridGraphFilterType;
+  typedef itk::GraphCutSegmentationBoykovFilter<ImageType, ImageType> GraphCutSegmentationBoykovFilterType;
   typedef itk::GraphCutSegmentationFilter<ImageType, ImageType> GraphCutSegmentationFilterType;
   GraphCutSegmentationFilterType::Pointer graphcutFilter;
 
@@ -70,7 +70,7 @@ int itkGraphCutSegmentationFilterTest(int, char* [] )
 
   IteratorType2D blackIterator2D(testImage2D, imageRegion2D);
   for (blackIterator2D.GoToBegin(); !blackIterator2D.IsAtEnd(); ++blackIterator2D){
-	  blackIterator2D.Set(0);
+    blackIterator2D.Set(0);
   }
 
   ImageType2D::IndexType objectStart2D;
@@ -87,7 +87,7 @@ int itkGraphCutSegmentationFilterTest(int, char* [] )
 
   IteratorType2D objectIterator2D(testImage2D, objectRegion2D);
   for (objectIterator2D.GoToBegin(); !objectIterator2D.IsAtEnd(); ++objectIterator2D){
-	  objectIterator2D.Set(200);
+    objectIterator2D.Set(200);
   }
   //} end creating a 2D test image
 
@@ -100,7 +100,7 @@ int itkGraphCutSegmentationFilterTest(int, char* [] )
 
   IteratorType2D blackIterator2_2D(seedsImage2D, imageRegion2D);
   for (blackIterator2_2D.GoToBegin(); !blackIterator2_2D.IsAtEnd(); ++blackIterator2_2D){
-	  blackIterator2_2D.Set(0);
+    blackIterator2_2D.Set(0);
   }
 
   ImageType2D::IndexType objectSeedsStart2D;
@@ -117,7 +117,7 @@ int itkGraphCutSegmentationFilterTest(int, char* [] )
 
   IteratorType2D objectSeedsIterator2D(seedsImage2D, objectSeedsRegion2D);
   for (objectSeedsIterator2D.GoToBegin(); !objectSeedsIterator2D.IsAtEnd(); ++objectSeedsIterator2D){
-	  objectSeedsIterator2D.Set(255);
+    objectSeedsIterator2D.Set(255);
   }
 
   ImageType2D::IndexType backgroundSeedsStart2D;
@@ -134,7 +134,7 @@ int itkGraphCutSegmentationFilterTest(int, char* [] )
 
   IteratorType2D backgroundSeedsIterator2D(seedsImage2D, backgroundSeedsRegion2D);
   for (backgroundSeedsIterator2D.GoToBegin(); !backgroundSeedsIterator2D.IsAtEnd(); ++backgroundSeedsIterator2D){
-	  backgroundSeedsIterator2D.Set(254);
+    backgroundSeedsIterator2D.Set(254);
   }
   //} end creating a 2D seeds image
 
@@ -158,7 +158,7 @@ int itkGraphCutSegmentationFilterTest(int, char* [] )
 
   IteratorType blackIterator(testImage, imageRegion);
   for (blackIterator.GoToBegin(); !blackIterator.IsAtEnd(); ++blackIterator){
-	  blackIterator.Set(0);
+    blackIterator.Set(0);
   }
 
   ImageType::IndexType objectStart;
@@ -177,7 +177,7 @@ int itkGraphCutSegmentationFilterTest(int, char* [] )
 
   IteratorType objectIterator(testImage, objectRegion);
   for (objectIterator.GoToBegin(); !objectIterator.IsAtEnd(); ++objectIterator){
-	  objectIterator.Set(200);
+    objectIterator.Set(200);
   }
   //} end creating a 3D test image
 
@@ -190,7 +190,7 @@ int itkGraphCutSegmentationFilterTest(int, char* [] )
 
   IteratorType blackIterator2(seedsImage, imageRegion);
   for (blackIterator2.GoToBegin(); !blackIterator2.IsAtEnd(); ++blackIterator2){
-	  blackIterator2.Set(0);
+    blackIterator2.Set(0);
   }
 
   ImageType::IndexType objectSeedsStart;
@@ -209,7 +209,7 @@ int itkGraphCutSegmentationFilterTest(int, char* [] )
 
   IteratorType objectSeedsIterator(seedsImage, objectSeedsRegion);
   for (objectSeedsIterator.GoToBegin(); !objectSeedsIterator.IsAtEnd(); ++objectSeedsIterator){
-	  objectSeedsIterator.Set(255);
+    objectSeedsIterator.Set(255);
   }
 
   ImageType::IndexType backgroundSeedsStart;
@@ -228,7 +228,7 @@ int itkGraphCutSegmentationFilterTest(int, char* [] )
 
   IteratorType backgroundSeedsIterator(seedsImage, backgroundSeedsRegion);
   for (backgroundSeedsIterator.GoToBegin(); !backgroundSeedsIterator.IsAtEnd(); ++backgroundSeedsIterator){
-	  backgroundSeedsIterator.Set(254);
+    backgroundSeedsIterator.Set(254);
   }
   //} end creating a 3D seeds image
 
@@ -284,7 +284,7 @@ int itkGraphCutSegmentationFilterTest(int, char* [] )
 
   IteratorType testIterator(resultImage, resultImage->GetRequestedRegion());
   for (testIterator.GoToBegin(); !testIterator.IsAtEnd(); ++testIterator){
-	  if(testIterator.Get() == 1)
+    if(testIterator.Get() == 1)
       testValue = testValue + 1;
   }
 
@@ -317,7 +317,7 @@ int itkGraphCutSegmentationFilterTest(int, char* [] )
 
   IteratorType2D testIteratorBoykov2D(resultImage2D, resultImage2D->GetRequestedRegion());
   for (testIteratorBoykov2D.GoToBegin(); !testIteratorBoykov2D.IsAtEnd(); ++testIteratorBoykov2D){
-	  if(testIteratorBoykov2D.Get() == 1)
+    if(testIteratorBoykov2D.Get() == 1)
       testValue2D = testValue2D + 1;
   }
 
@@ -349,7 +349,7 @@ int itkGraphCutSegmentationFilterTest(int, char* [] )
 
   IteratorType testIteratorBoykov(resultImage, resultImage->GetRequestedRegion());
   for (testIteratorBoykov.GoToBegin(); !testIteratorBoykov.IsAtEnd(); ++testIteratorBoykov){
-	  if(testIteratorBoykov.Get() == 1)
+    if(testIteratorBoykov.Get() == 1)
       testValue = testValue + 1;
   }
 

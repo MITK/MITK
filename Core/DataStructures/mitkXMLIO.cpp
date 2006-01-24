@@ -11,13 +11,13 @@ bool XMLIO::WriteXML( XMLWriter& xmlWriter )
 {
   const std::string& nodeName = GetXMLNodeName();
   std::cout << nodeName.c_str() << std::endl; // test
-	xmlWriter.BeginNode( nodeName );
-	xmlWriter.WriteProperty( CLASS_NAME, typeid( *this ).name() );
+  xmlWriter.BeginNode( nodeName );
+  xmlWriter.WriteProperty( CLASS_NAME, typeid( *this ).name() );
 
   bool result = WriteXMLData( xmlWriter );
 
-	xmlWriter.EndNode();
-	return result;				
+  xmlWriter.EndNode();
+  return result;        
 }
 
 

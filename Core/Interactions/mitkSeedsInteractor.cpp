@@ -76,35 +76,35 @@ bool mitk::SeedsInteractor::ExecuteAction(mitk::Action* action, mitk::StateEvent
     }
   case mitk::AcADD:
     {
-			last_point = event_point;
+      last_point = event_point;
       mitk::DrawOperation* doOp = new mitk::DrawOperation(OpADD, event_point, last_point, m_DrawState, m_Radius);
-      if (m_UndoEnabled){	//write to UndoMechanism/ Can probably be removed!
+      if (m_UndoEnabled){ //write to UndoMechanism/ Can probably be removed!
         mitk::DrawOperation* undoOp = new mitk::DrawOperation(OpUNDOADD, event_point, last_point, m_DrawState, m_Radius);
         mitk::OperationEvent *operationEvent = new mitk::OperationEvent(m_SeedsImage, doOp, undoOp, "Add seed point");
-			  m_UndoController->SetOperationEvent(operationEvent);
-	    }
-		  //execute the Operation
-		  m_SeedsImage->ExecuteOperation(doOp);
+        m_UndoController->SetOperationEvent(operationEvent);
+      }
+      //execute the Operation
+      m_SeedsImage->ExecuteOperation(doOp);
       ok = true;
       break;
     }
   case mitk::AcMOVE:
     {
-			last_point = event_point;
+      last_point = event_point;
       mitk::DrawOperation* doOp = new mitk::DrawOperation(OpMOVE, event_point, last_point, m_DrawState, m_Radius);
-      if (m_UndoEnabled){	//write to UndoMechanism/ Can probably be removed!
+      if (m_UndoEnabled){ //write to UndoMechanism/ Can probably be removed!
         mitk::DrawOperation* undoOp = new mitk::DrawOperation(OpUNDOMOVE, event_point, last_point, m_DrawState, m_Radius);
         mitk::OperationEvent *operationEvent = new mitk::OperationEvent(m_SeedsImage, doOp, undoOp, "Move seed point");
-			  m_UndoController->SetOperationEvent(operationEvent);
-	    }
-		  //execute the Operation
-		  m_SeedsImage->ExecuteOperation(doOp);   
+        m_UndoController->SetOperationEvent(operationEvent);
+      }
+      //execute the Operation
+      m_SeedsImage->ExecuteOperation(doOp);   
       ok = true;
       break;
     }
   case mitk::AcFINISH:
     {
-			last_point = event_point;
+      last_point = event_point;
       ok = true;
       break;
     }

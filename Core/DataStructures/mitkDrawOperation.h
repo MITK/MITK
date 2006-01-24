@@ -30,52 +30,43 @@ namespace mitk {
 
 //##ModelId=3F0189F0016F
 //##Documentation
-//## @brief Operation, that handles all aktions on Seeds.
+//## @brief DrawOperation, that handles all actions on seeds.
 //##
-//## Stores everything for Adding and Deleting Seeds.
+//## Stores everything for adding and deleting seeds.
 //## @ingroup Undo
 class DrawOperation : public Operation
 {
   public:
   //##ModelId=3F0189F003A2
-	//##Documentation
-	//##@brief Operation, that handles all aktions on Seeds.
-	//##
-	//## @param operationType is the type of that operation (see mitkOperation.h; e.g. move or add; Information for StateMachine::ExecuteOperation());
-  //## @param point is the information of the seed point to add to the seeds image
+  //##Documentation
+  //##@brief DrawOperation, that handles all actions on seeds.
+  //##
+  //## @param operationType is the type of that operation (see mitkOperation.h; e.g. move or add; Information for StateMachine::ExecuteOperation());
+  //## @param point is the information of the seedpoint to add to the seedsimage
   //## @param last_point is the information of the point added before
   //## @param draw_state represents the seeds type e.g foreground or background seeds
   //## @param radius is the radius of seeds 
-  DrawOperation(OperationType operationType,	Point3D point, Point3D last_point, int draw_state, int radius);
- 
-	//##Documentation
-	//##@brief Operation, that handles all aktions on Seeds.
-	//##
-	//## @param operationType is the type of that operation (see mitkOperation.h; e.g. move or add; Information for StateMachine::ExecuteOperation());
-  //## @param seedsImage is the current image of seeds
-  //## @param lastSeedsImage is the image before a seed point is set
-  DrawOperation(OperationType operationType,	SeedsImage::Pointer seedsImage, SeedsImage::Pointer lastSeedsImage);
-
+  DrawOperation(OperationType operationType,  Point3D point, Point3D last_point, int draw_state, int radius);
 
   virtual ~DrawOperation();
 
-	Point3D GetPoint();
+  Point3D GetPoint();
 
-	Point3D GetLastPoint();
+  Point3D GetLastPoint();
 
-	int GetDrawState();
+  int GetDrawState();
 
-	int GetRadius();
+  int GetRadius();
 
   SeedsImage::Pointer DrawOperation::GetSeedsImage();
 
   SeedsImage::Pointer DrawOperation::GetLastSeedsImage();
 
   private:
-	Point3D m_Point;
-	Point3D m_LastPoint;
+  Point3D m_Point;
+  Point3D m_LastPoint;
 
-	int m_DrawState;
+  int m_DrawState;
   int m_Radius;
 
   SeedsImage::Pointer m_SeedsImage;

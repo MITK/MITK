@@ -30,7 +30,7 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk {
 
   //##Documentation
-  //## @brief Interactor for the creation of a seeds image
+  //## @brief SeedsInteractor handles all actions on the seedsimage
   //## @ingroup Interaction
   class SeedsInteractor : public Interactor
   {
@@ -40,8 +40,7 @@ namespace mitk {
     SeedsInteractor(const char * type, DataTreeNode* dataTreeNode);
     virtual ~SeedsInteractor();
 
-	  //##Documentation
-	  //##@brief Operation, that sets the radius of the seeds.
+    /// sets the radius of the seeds.
     void SetRadius(int val){m_Radius=val;};
 
   protected:

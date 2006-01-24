@@ -23,7 +23,7 @@ bool IsGoodDataTreeNode(mitk::DataTreeNode* node)
 
 bool IsImage(mitk::DataTreeNode* node)
 {
-  return ( node!= 0 && dynamic_cast<mitk::Image*>( node->GetData() ) );
+  return ( node!= 0 && node->GetData() && dynamic_cast<mitk::Image*>( node->GetData() ) );
 }
 
 //------ BasePropertyAccessor ------------------------------------------------------------
@@ -304,7 +304,7 @@ void DataTreeFilter::ConstrainToNodeAndChildren(const mitk::DataTreeNode* node)
  
 bool DataTreeFilter::IsWithinConstrains( mitk::DataTreeIteratorClone nodeIter )
 {
-  if ( m_RootNode != 0 && nodeIter.IsNotNull() != 0 && m_DataTree != 0)
+  if ( m_RootNode != 0 && nodeIter.IsNotNull() && m_DataTree != 0)
   {
     if ( nodeIter->Get() == m_RootNode ) return true;
 
@@ -540,6 +540,7 @@ void DataTreeFilter::TreePrune(const itk::EventObject& e)
   ItemList::iterator listLastIter;
   
   if ( IsWithinConstrains(treePosition) )
+  {
   if (   m_HierarchyHandling == DataTreeFilter::PRESERVE_HIERARCHY 
       && m_Filter(treePosition->Get()) )
   {
@@ -567,6 +568,7 @@ void DataTreeFilter::TreePrune(const itk::EventObject& e)
         if ( firstMatch )
         {
           item = m_Item[ treeIter.Get() ];
+          if (!item) return; // TODO is that possible? At least this happens sometimes, may be a bug
           
           if ( item->IsRoot() )
             list = m_Items;
@@ -586,20 +588,24 @@ void DataTreeFilter::TreePrune(const itk::EventObject& e)
     }
   }
 
-  // clean selected list
-  ++listLastIter; // erase does delete until the item _before_ the second iterator
-
-  InvokeEvent( mitk::TreeFilterRemoveChildrenEvent( item->m_Parent ) );  // first tell everything is deleted
-  list->erase( listFirstIter, listLastIter );
-    
-  // renumber items of the remaining list
-  int i(0);
-  for ( listFirstIter = list->begin(); listFirstIter != list->end(); ++listFirstIter, ++i )
+  if (item)
   {
-    (*listFirstIter)->m_Index = i;
-    InvokeEvent( mitk::TreeFilterItemAddedEvent( *listFirstIter ) );  // then add some items again
+    // clean selected list
+    ++listLastIter; // erase does delete until the item _before_ the second iterator
+
+    InvokeEvent( mitk::TreeFilterRemoveChildrenEvent( item->m_Parent ) );  // first tell everything is deleted
+    list->erase( listFirstIter, listLastIter );
+    
+    // renumber items of the remaining list
+    int i(0);
+    for ( listFirstIter = list->begin(); listFirstIter != list->end(); ++listFirstIter, ++i )
+    {
+      (*listFirstIter)->m_Index = i;
+      InvokeEvent( mitk::TreeFilterItemAddedEvent( *listFirstIter ) );  // then add some items again
+    }
   }
 
+  }
 }
 
 void DataTreeFilter::TreeRemove(const itk::EventObject& e)
@@ -741,7 +747,6 @@ void DataTreeFilter::GenerateModelFromTree()
   }
   
   delete treeIter; // release data tree iterator
-
   InvokeEvent( mitk::TreeFilterUpdateAllEvent() );
 }
       

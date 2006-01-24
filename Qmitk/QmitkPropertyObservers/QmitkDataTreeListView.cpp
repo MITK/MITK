@@ -347,7 +347,7 @@ void QmitkDataTreeListView::AddItemsToList(QWidget* parent, QmitkListViewItemInd
     }
     
     ++row;
-
+    
     ++itemiter; 
   }
 

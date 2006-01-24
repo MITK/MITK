@@ -119,10 +119,7 @@ void CutImageWithOutputTypeSelect
     {
       vtk2itk(inputIt.GetIndex(), p);
       inputGeometry->IndexToWorld(p, p);
-      // change for tumor segmentation
-      outputIt.Set( (TOutputPixel) inputIt.Value() );
-      ++cutter->m_InsidePixelCount;
-      /*if(cutter->m_BoundingObject->IsInside(p))
+      if(cutter->m_BoundingObject->IsInside(p))
       {
         outputIt.Set( (TOutputPixel) inputIt.Value() );
         ++cutter->m_InsidePixelCount;
@@ -131,7 +128,7 @@ void CutImageWithOutputTypeSelect
       {
         outputIt.Set( outsideValue );
         ++cutter->m_OutsidePixelCount;
-      }*/
+      }
     }
   }
 }
@@ -148,4 +145,3 @@ void CutImage( itk::Image< TPixel, VImageDimension >* inputItkImage, mitk::Bound
 #include "mitkImageCast.h"
 
 #endif // of MITKBOUNDINGOBJECTCUTTER_TXX
-

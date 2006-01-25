@@ -39,6 +39,7 @@ mitk::Image::Image() :
   m_Dimension(0), m_Dimensions(NULL), m_OffsetTable(NULL),
   m_CompleteData(NULL), m_PixelType(NULL), m_Initialized(false),
   m_TimeSelectorForExtremaObject(NULL),
+  m_CountOfMinValuedVoxels(0), m_CountOfMaxValuedVoxels(0), 
   m_ScalarMin(0), m_ScalarMax(0), m_Scalar2ndMin(0), m_Scalar2ndMax(0)
 {
   mitk::HistogramGenerator::Pointer generator = mitk::HistogramGenerator::New();
@@ -1116,10 +1117,15 @@ void mitk::_ComputeExtremaInItkImage(ItkImageType* itkImage, mitk::Image* mitkIm
   //typedef itk::Image<TPixel, VImageDimension> ItkImageType;
   typedef typename ItkImageType::PixelType TPixel;
 	TPixel value;
+
+    mitkImage->m_CountOfMinValuedVoxels = 0;
+    mitkImage->m_CountOfMaxValuedVoxels = 0;
+
   mitkImage->m_Scalar2ndMin=
     mitkImage->m_ScalarMin = itk::NumericTraits<TPixel>::max();
   mitkImage->m_Scalar2ndMax=
     mitkImage->m_ScalarMax = itk::NumericTraits<TPixel>::NonpositiveMin();
+
 	while( !it.IsAtEnd() )
   {
     value = it.Get();  
@@ -1133,30 +1139,34 @@ void mitk::_ComputeExtremaInItkImage(ItkImageType* itkImage, mitk::Image* mitkIm
     if( value > -32765)
     {
 #endif
-    if ( value > mitkImage->m_ScalarMax )
-    {
-        mitkImage->m_Scalar2ndMax = mitkImage->m_ScalarMax;    mitkImage->m_ScalarMax = value;
-    }
-    else if ( value == mitkImage->m_ScalarMax )
-    {
-        // do nothing
-    }
-    else if ( value > mitkImage->m_Scalar2ndMax )
-    {
-        mitkImage->m_Scalar2ndMax = value;
-    }
-
+    // update min
     if ( value < mitkImage->m_ScalarMin )
     {
         mitkImage->m_Scalar2ndMin = mitkImage->m_ScalarMin;    mitkImage->m_ScalarMin = value;
+        mitkImage->m_CountOfMinValuedVoxels = 1;
     }
     else if ( value == mitkImage->m_ScalarMin )
     {
-        // do nothing
+        ++mitkImage->m_CountOfMinValuedVoxels;
     }
     else if ( value < mitkImage->m_Scalar2ndMin )
     {
         mitkImage->m_Scalar2ndMin = value;
+    }
+
+    // update max
+    if ( value > mitkImage->m_ScalarMax )
+    {
+        mitkImage->m_Scalar2ndMax = mitkImage->m_ScalarMax;    mitkImage->m_ScalarMax = value;
+        mitkImage->m_CountOfMaxValuedVoxels = 1;
+    }
+    else if ( value == mitkImage->m_ScalarMax )
+    {
+        ++mitkImage->m_CountOfMaxValuedVoxels;
+    }
+    else if ( value > mitkImage->m_Scalar2ndMax )
+    {
+        mitkImage->m_Scalar2ndMax = value;
     }
 #ifdef BOUNDINGOBJECT_IGNORE
     }

@@ -139,16 +139,102 @@ mitk::ScalarType mitk::LevelWindow::GetRange() const
 
 void mitk::LevelWindow::SetAuto(mitk::Image* image, bool tryPicTags, bool guessByCentralSlice)
 {
-  if( image == NULL )
-    return;
+    if ( image == NULL )
+        return;
 
-  if(tryPicTags)
-  {
-    if(SetAutoByPicTags(image->GetPic()))
-      return;
-  }
+    if ( tryPicTags )
+    {
+        if ( SetAutoByPicTags(image->GetPic()) )
+            return;
+    }
 
-  ScalarType minValue, maxValue;
+    mitk::Image* wholeImage = image;
+    mitk::ImageSliceSelector::Pointer sliceSelector = mitk::ImageSliceSelector::New();
+    if ( guessByCentralSlice )
+    {
+        sliceSelector->SetInput(image);
+        sliceSelector->SetSliceNr(image->GetDimension(2)/2);
+        sliceSelector->SetTimeNr(image->GetDimension(3)/2);
+        sliceSelector->SetChannelNr(image->GetDimension(4)/2);
+        sliceSelector->Update();
+
+        image = sliceSelector->GetOutput();
+    }
+    ScalarType minValue    = image->GetScalarValueMin();
+    ScalarType maxValue    = image->GetScalarValueMaxNoRecompute();
+    ScalarType min2ndValue = image->GetScalarValue2ndMinNoRecompute();
+    ScalarType max2ndValue = image->GetScalarValue2ndMaxNoRecompute();
+    unsigned int numPixelsInSlice = image->GetDimensions()[0];
+    for ( int k=0;  k<image->GetDimension();  ++k ) numPixelsInSlice *= image->GetDimensions()[k];
+    unsigned int minCount = image->GetCountOfMinValuedVoxelsNoRecompute();
+    unsigned int maxCount = image->GetCountOfMaxValuedVoxelsNoRecompute();
+    float minCountFraction = minCount/float(numPixelsInSlice);
+    float maxCountFraction = maxCount/float(numPixelsInSlice);
+    if ( minValue == maxValue )
+    {
+        // guessByCentralSlice seems to have failed, lets look at all data
+        minValue    = wholeImage->GetScalarValueMin();                   
+        maxValue    = wholeImage->GetScalarValueMaxNoRecompute();        
+        min2ndValue = wholeImage->GetScalarValue2ndMinNoRecompute();  
+        max2ndValue = wholeImage->GetScalarValue2ndMaxNoRecompute();  
+        unsigned int numPixelsInDataset = image->GetDimensions()[0];
+        for ( int k=0;  k<image->GetDimension();  ++k ) numPixelsInDataset *= image->GetDimensions()[k];
+        minCount = image->GetCountOfMinValuedVoxelsNoRecompute();
+        maxCount = image->GetCountOfMaxValuedVoxelsNoRecompute();
+        minCountFraction = minCount/float(numPixelsInDataset);
+        maxCountFraction = maxCount/float(numPixelsInDataset);
+    }
+    //// uniform image
+    if ( minValue == maxValue )
+    {
+        maxValue = minValue+1;
+    }
+
+    //// binary image
+    else if ( min2ndValue == maxValue )
+    {
+        // noop; full range is fine
+    }
+
+    //// triple value image, put middle value in center of gray level ramp
+    else if ( min2ndValue == max2ndValue )
+    {
+        ScalarType minDelta = std::min(min2ndValue-minValue, maxValue-min2ndValue);
+        minValue = min2ndValue - minDelta;
+        maxValue = min2ndValue + minDelta;
+    }
+    // now we can assume more than three distict scalar values
+
+
+    else
+    {
+        ScalarType innerRange = max2ndValue - min2ndValue;
+        //// lots of min values -> make different from rest, but not miles away
+        if ( minCountFraction > 0.2 )
+        {
+            ScalarType halfInnerRangeGapMinValue = min2ndValue - innerRange/2.0;
+            minValue = std::max(minValue, halfInnerRangeGapMinValue);
+        }
+        else
+        //// few min values -> focus on innerRange
+        {
+            minValue = min2ndValue;
+        }
+
+        //// lots of max values -> make different from rest
+        if ( maxCountFraction > 0.2 )
+        {
+            ScalarType halfInnerRangeGapMaxValue = max2ndValue + innerRange/2.0;
+            maxValue = std::min(maxValue, halfInnerRangeGapMaxValue);
+        }
+        else
+        //// few max values -> focus on innerRange
+        {
+            maxValue = max2ndValue;
+        }
+    }
+
+
 
   if(guessByCentralSlice)
   {

@@ -16,37 +16,57 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 #include <itkImage.h>
+#include <itkITTFilterContext.h>
 #include <itkImageToTreeFilter.h>
 
-
-namespace itk
+int itkImageToTreeFilterTest(int, char* argv[] )
 {
   typedef unsigned char   PixelType;
   const unsigned int      Dimension = 3;
 
-  typedef Image<PixelType, Dimension>     ImageType;
+  typedef itk::Image<PixelType, Dimension>        ImageType;
+  typedef ImageType::Pointer                      ImagePointer;
+  typedef ImageType::PointType                    PointType;
+//   typedef itk::ImageFileReader<ImageType>         ImageReaderType;
+//   typedef ImageReaderType::Pointer                ImageReaderPointer;
 
-  typedef ImageToTreeFilter<ImageType>    ImageToTreeFilterType;
-  typedef ImageToTreeFilterType::Pointer  ImageToTreeFilterPointer;
+  // test classes
+  typedef itk::ImageToTreeFilter<ImageType>       ImageToTreeFilterType;
+  typedef ImageToTreeFilterType::Pointer          ImageToTreeFilterPointer;
+  typedef itk::ITTFilterContext<ImageType, PointType>
+                                                  FilterContextType;
+  typedef FilterContextType::Pointer              FilterContextPointer;
+  typedef FilterContextType::PointQueueType       PointQueueType;
 
-  int itkImageToTreeFilterTest(int, char* [] )
-  {
-    /******************************************************************
-     * TEST 1: Saving and loading data objects to the filter context
-    *****************************************************************/
+  // TODO: read files with mitk and convert to itk
+  // read in first file
+//   ImageReaderPointer reader = ImageReaderType::New();
+//   reader->SetFileName(argv[1]);
+//   reader->Update();
+//
+//   ImagePointer testImage = reader->GetOutput();
+//   ImagePointer testImage2;
 
-    //itkITTFilterContext::Pointer filterContext = itkITTFilterContext::New();
+  /******************************************************************
+   * TEST 1: Saving and loading data objects to the filter context
+  *****************************************************************/
+  std::cout << "Testing ITTFilterContext for storage of objects...\n";
+  FilterContextPointer filterContext = FilterContextType::New();
 
-    /****************************************************************
-     * TEST 2: Initialising the filter
-     ****************************************************************/
-    ImageToTreeFilterPointer testFilter = ImageToTreeFilterType::New();
+  PointType testPoint1;
+  testPoint1.Fill(0);
+
+
+  std::cout << "[TEST PASSED]\n";
+
+  /****************************************************************
+   * TEST 2: Initialising the filter
+   ****************************************************************/
+  ImageToTreeFilterPointer testFilter = ImageToTreeFilterType::New();
 
 
 
-
-    return EXIT_SUCCESS;
-  }
-
+  std::cout << "[TEST DONE]\n";
+  return EXIT_SUCCESS;
 }
 

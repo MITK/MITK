@@ -1815,8 +1815,28 @@
   </state>
   <state NAME="Right mouse down - what to do?" ID="5">
   <!-- right mouse button was pressed, now the user could either zoom (hold button) or start drawing a line (release) -->
+    <transition NAME="OnMouseMove(while right button down)" EVENT_ID="531" NEXT_STATE_ID="6">
+      <!-- woah, that one could mean zooming  -->
+    </transition>
     <transition NAME="OnRightMouseUp" EVENT_ID="507" NEXT_STATE_ID="4">
+      <!-- no zooming but initiate line drawing-->
       <action ID="48004" /> <!-- AcInitLine -->
+    </transition>
+  </state>
+  <state NAME="Right mouse down and some movement - what to do?" ID="6">
+  <!-- right mouse button was pressed, now the user could either zoom (hold button) or start drawing a line (release) -->
+    <transition NAME="OnMouseMove" EVENT_ID="531" NEXT_STATE_ID="7">
+      <!-- now the user gets her zooming  -->
+    </transition>
+    <transition NAME="OnRightMouseUp" EVENT_ID="507" NEXT_STATE_ID="4">
+      <!-- no zooming but initiate line drawing-->
+      <action ID="48004" /> <!-- AcInitLine -->
+    </transition>
+  </state>
+  <state NAME="Zooming" ID="7">
+  <!-- right mouse button was pressed and two mouse move events occured, now the user zooms -->
+    <transition NAME="OnRightMouseUp" EVENT_ID="531" NEXT_STATE_ID="0">
+      <!-- end of zooming, return to normal operation -->
     </transition>
   </state>
 </stateMachine>

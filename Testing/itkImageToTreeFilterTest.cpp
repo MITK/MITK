@@ -21,6 +21,47 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <mitkVesselTreeData.h>
 
+
+
+// namespace itk
+// {
+//   class  ITTFilterContextTest: public CppUnit::TestFixture
+//   {
+//   private:
+//     FilterContextPointer                                m_FilterContext;
+//     PointType                                           point1;
+//     PointType                                           point2;
+//   public:
+//     void setUp()
+//     {
+//       m_FilterContext = FilterContextType::New();
+//
+//       // init some test data
+//       testPoint1.Fill(0);
+//       testPoint2.Fill(1);
+//
+//       PointQueueType* pointQueue = m_FilterContext->GetStartPointQueue();
+//       std::cout << "Pushing points to filter context...\n";
+//       pointQueue1->push(testPoint1);
+//       pointQueue1->push(testPoint2);
+//     }
+//
+//     void tearDown()
+//     {
+//       m_FilterContext::Delete();
+//     }
+//
+//     void testPointQueue()
+//     {
+//       PointQueueType* pointQueue = m_FilterContext->GetStartPointQueue();
+//
+//       CPPUNIT_ASSERT( pointQueue->front() == point1 );
+//       pointQueue.pop();
+//       CPPUNIT_ASSERT( pointQueue->front() == point2 );
+//     }
+//   };
+// }
+
 int itkImageToTreeFilterTest(int, char* argv[] )
 {
   // image type
@@ -36,15 +77,15 @@ int itkImageToTreeFilterTest(int, char* argv[] )
 
 
 
-//   typedef itk::ImageFileReader<ImageType>         ImageReaderType;
-//   typedef ImageReaderType::Pointer                ImageReaderPointer;
+  //   typedef itk::ImageFileReader<ImageType>         ImageReaderType;
+  //   typedef ImageReaderType::Pointer                ImageReaderPointer;
 
   // test classes
   typedef itk::ImageToTreeFilter<ImageType, OutputTreeType>
-                                                      ImageToTreeFilterType;
+  ImageToTreeFilterType;
   typedef ImageToTreeFilterType::Pointer              ImageToTreeFilterPointer;
   typedef itk::ITTFilterContext<ImageType, OutputTreeType>
-                                                      FilterContextType;
+  FilterContextType;
   typedef FilterContextType::Pointer                  FilterContextPointer;
   typedef FilterContextType::PointQueueType           PointQueueType;
 
@@ -53,16 +94,16 @@ int itkImageToTreeFilterTest(int, char* argv[] )
   testPoint1.Fill(0);
 
   PointType testPoint2;
-  testPoint1.Fill(1);
+  testPoint2.Fill(1);
 
   // TODO: read files with mitk and convert to itk
   // read in first file
-//   ImageReaderPointer reader = ImageReaderType::New();
-//   reader->SetFileName(argv[1]);
-//   reader->Update();
-//
-//   ImagePointer testImage = reader->GetOutput();
-//   ImagePointer testImage2;
+  //   ImageReaderPointer reader = ImageReaderType::New();
+  //   reader->SetFileName(argv[1]);
+  //   reader->Update();
+  //
+  //   ImagePointer testImage = reader->GetOutput();
+  //   ImagePointer testImage2;
 
   /******************************************************************
    * TEST 1: Saving and loading data objects to the filter context
@@ -98,7 +139,6 @@ int itkImageToTreeFilterTest(int, char* argv[] )
     std::cout << "[TEST FAILED]\n";
     return EXIT_FAILURE;
   }
-
   std::cout << "[TEST PASSED]\n";
 
   /****************************************************************
@@ -117,8 +157,10 @@ int itkImageToTreeFilterTest(int, char* argv[] )
     std::cout << "[TEST FAILED]\n";
     return EXIT_FAILURE;
   }
+  std::cout << "[TEST PASSED]\n";
 
-  std::cout << "[TEST DONE]\n";
+
+  std::cout << "[ALL TESTS DONE]\n";
   return EXIT_SUCCESS;
 }
 

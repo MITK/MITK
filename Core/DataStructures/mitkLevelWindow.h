@@ -34,6 +34,10 @@ class Image;
 //## Current min and max value are stored in m_Min and m_Max.
 //## The maximum and minimum of valid value range is stored in
 //## m_RangeMin and m_RangeMax.
+//##
+//## See documentation of SetAuto for information on how the
+//## level window is initialized from an image.
+//##
 //## @ingroup DataTree
 class LevelWindow
 {

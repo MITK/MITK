@@ -137,6 +137,42 @@ mitk::ScalarType mitk::LevelWindow::GetRange() const
   return  m_RangeMax - m_RangeMin;
 }
 
+/*!
+This method initializes a mitk::LevelWindow from an mitk::Image. The algorithm is as follows:
+  
+Default to taking the central image slice for quick analysis.
+
+Compute the smallest (minValue), second smallest (min2ndValue), second largest (max2ndValue), and
+largest (maxValue) data value by traversing the pixel values only once. In the
+same scan it also computes the count of minValue values and maxValue values.
+After that a basic histogram with specific information about the
+extrems is complete.
+
+If minValue == maxValue, the center slice is uniform and the above scan is repeated for
+the complete image, not just one slice
+
+Next, special cases of images with only 1, 2 or 3 distinct data values
+have hand assigned level window ranges.
+
+Next the level window is set relative to the inner range IR = lengthOf([min2ndValue, max2ndValue])
+
+For count(minValue) > 20% the smallest values are frequent and should be
+distinct from the min2ndValue and larger values (minValue may be std:min, may signify
+something special) hence the lower end of the level window is set to min2ndValue - 0.5 * IR
+ 
+For count(minValue) <= 20% the smallest values are not so important and can
+blend with the next ones => min(level window) = min2ndValue
+
+And analog for max(level window):
+count(max2ndValue) > 20%:  max(level window) = max2ndValue + 0.5 * IR
+count(max2ndValue) < 20%:  max(level window) = max2ndValue
+
+In both 20%+ cases the level window bounds are clamped to the [minValue, maxValue] range
+
+In consequence the level window maximizes contrast with minimal amount of
+computation and does do useful things if the data contains std::min or
+std:max values or has only 1 or 2 or 3 data values.
+*/
 void mitk::LevelWindow::SetAuto(mitk::Image* image, bool tryPicTags, bool guessByCentralSlice)
 {
     if ( image == NULL )

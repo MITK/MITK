@@ -56,10 +56,6 @@ class QmitkDataTreeListView : public QWidget, public QmitkListViewItemIndex
     void itemAddedHandler( const itk::EventObject& e );
     void updateAllHandler( const itk::EventObject& e );
    
-    // TODO remove this. this should never ever be neccessary
-    // notification of selectionmode changes should be issued by datatreefilter
-    void regenerate();
-
   protected:
 
     void initialize();

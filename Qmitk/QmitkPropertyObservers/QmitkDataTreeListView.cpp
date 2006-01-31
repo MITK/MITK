@@ -80,7 +80,7 @@ void QmitkDataTreeListView::initialize()
   // member initializations that are equal for all constructors
   m_SkipItem = NULL;
   m_SkipItemParent = NULL;
-  m_StretchedColumn = 2; // TODO: is this sensible?
+  m_StretchedColumn = -1; 
   m_SelfCall = false;
   setBackgroundMode( Qt::PaletteBase );
 }
@@ -524,8 +524,6 @@ void QmitkDataTreeListView::generateItems()
 
   m_Grid->addItem( new QSpacerItem(1, 5, QSizePolicy::Minimum, QSizePolicy::Ignored) , m_Grid->numRows(),0);
   m_Grid->setRowStretch( m_Grid->numRows()-1, 1 );
-
-  update();
 }
 
 /**

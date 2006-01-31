@@ -8,6 +8,12 @@
 
 #include <stdexcept>
 
+/**
+  Initializes QmitkDataTreeComboBox from nothing. Results in an empty widget. Call SetDataTree or GetFilter later to fill widget with items.
+
+  \param parent Qt widget that is parent
+  \param name Qt name
+*/
 QmitkDataTreeComboBox::QmitkDataTreeComboBox(QWidget* parent, const char* name)
 : QComboBox(parent, name),
   m_DataTreeFilter(NULL)
@@ -15,6 +21,13 @@ QmitkDataTreeComboBox::QmitkDataTreeComboBox(QWidget* parent, const char* name)
   initialize();
 }
 
+/**
+  Initializes DataTreeComboBox from a mitk::DataTreeFilter. 
+
+  \param filter pointer to the mitk::DataTreeFilter to be displayed
+  \param parent Qt widget that is parent
+  \param name Qt name
+*/
 QmitkDataTreeComboBox::QmitkDataTreeComboBox(mitk::DataTreeFilter* filter,QWidget* parent, const char* name)
 : QComboBox(parent, name),
   m_DataTreeFilter(filter)
@@ -23,6 +36,13 @@ QmitkDataTreeComboBox::QmitkDataTreeComboBox(mitk::DataTreeFilter* filter,QWidge
   SetFilter(filter);
 }
 
+/**
+  Initializes DataTreeComboBox from a mitk::DataTreeBase. Will create a private mitk::DataTreeFilter, containing only the "name" and "visible" properties of anything
+
+  \param tree pointer to the mitk::DataTreeBase to be displayed (after creating a private filter)
+  \param parent Qt widget that is parent
+  \param name Qt name
+*/
 QmitkDataTreeComboBox::QmitkDataTreeComboBox(mitk::DataTreeBase* tree,QWidget* parent, const char* name)
 : QComboBox(parent, name),
   m_DataTreeFilter(NULL)
@@ -31,6 +51,13 @@ QmitkDataTreeComboBox::QmitkDataTreeComboBox(mitk::DataTreeBase* tree,QWidget* p
   SetDataTree(tree);
 }
 
+/**
+  Initializes DataTreeListView from a mitk::DataTreeIteratorBase. Will create a private mitk::DataTreeFilter, containing only the "name" and "visible" properties of anything
+
+  \param iterator  pointer to the mitk::DataTreeIteratorBase, which points anywhere into the data tree to be displayed (after creating a private filter)
+  \param parent Qt widget that is parent
+  \param name Qt name
+*/
 QmitkDataTreeComboBox::QmitkDataTreeComboBox(mitk::DataTreeIteratorBase* iterator,QWidget* parent, const char* name)
 : QComboBox(parent, name),
   m_DataTreeFilter(NULL)
@@ -39,6 +66,9 @@ QmitkDataTreeComboBox::QmitkDataTreeComboBox(mitk::DataTreeIteratorBase* iterato
   SetDataTree(iterator);
 }
 
+/**
+  This is called by all constructors. Initializes some members.
+*/
 void QmitkDataTreeComboBox::initialize()
 {
   // member initializations that are equal for all constructors
@@ -51,13 +81,21 @@ void QmitkDataTreeComboBox::initialize()
   connect(this, SIGNAL(activated(int)), this, SLOT(onActivated(int)));
 }
 
+/**
+  Minor cleanup. Disconnect all itk-observers.
+*/
 QmitkDataTreeComboBox::~QmitkDataTreeComboBox()
 {
   disconnectNotifications();
 }
 
+/**
+  Creates new itk-observers for the notifications of mitk::DataTreeFilter. Connects them to ...Handler(itk::EventObject) functions.
+*/
 void QmitkDataTreeComboBox::connectNotifications()
 {
+  if (!m_DataTreeFilter) return;
+  
   // connect to our filter's notifications
   {
   itk::ReceptorMemberCommand<QmitkDataTreeComboBox>::Pointer command1 = itk::ReceptorMemberCommand<QmitkDataTreeComboBox>::New();
@@ -91,6 +129,9 @@ void QmitkDataTreeComboBox::connectNotifications()
   }
 }
 
+/**
+  removes all itk-Observers
+*/
 void QmitkDataTreeComboBox::disconnectNotifications()
 {
   if (!m_DataTreeFilter) return;
@@ -103,6 +144,13 @@ void QmitkDataTreeComboBox::disconnectNotifications()
   m_DataTreeFilter->RemoveObserver( m_UpdateAllConnection );
 } 
 
+/**
+  User provides only a data tree and does not tell, what should be displayed. So this method creates a private
+  mitk::DataTreeFilter, determines only "name" to be visible.
+  Then the pointer m_DataTreeFilter is set to this private filter.
+
+  \param tree Tree to display
+*/
 void QmitkDataTreeComboBox::SetDataTree(mitk::DataTreeBase* tree)
 {
   if (tree)
@@ -115,15 +163,27 @@ void QmitkDataTreeComboBox::SetDataTree(mitk::DataTreeBase* tree)
     visible.push_back("name");
     m_PrivateFilter->SetVisibleProperties(visible);
     
-    disconnectNotifications(); // add observers
+    disconnectNotifications(); 
     m_DataTreeFilter = m_PrivateFilter;
     connectNotifications(); // add observers
   
     SetDisplayedProperty("name");
     generateItems();
   }
+  else
+  {
+    disconnectNotifications(); 
+    m_DataTreeFilter = NULL;
+    m_PrivateFilter = NULL;
+    generateItems();
+  }
 }
 
+/**
+  Get the tree behind the iterator and call the other SetDataTree()
+
+  \param iterator  pointer to the mitk::DataTreeIteratorBase, which points anywhere into the data tree to be displayed (after creating a private filter)
+*/
 void QmitkDataTreeComboBox::SetDataTree(mitk::DataTreeIteratorBase* iterator)
 {
   // create default filter if neccessary
@@ -131,6 +191,12 @@ void QmitkDataTreeComboBox::SetDataTree(mitk::DataTreeIteratorBase* iterator)
     SetDataTree(iterator->GetTree());
 }
 
+/**
+  Display items from the mitk::DataTreeFilter provided in \a filter. Warn if filter's selection mode is not SINGLE_SELECT,
+  because a combobox can only mark one object as selected.
+  
+  \param filter pointer to the mitk::DataTreeFilter to be displayed
+*/
 void QmitkDataTreeComboBox::SetFilter(mitk::DataTreeFilter* filter)
 {
   disconnectNotifications();
@@ -158,11 +224,21 @@ void QmitkDataTreeComboBox::SetFilter(mitk::DataTreeFilter* filter)
   generateItems();
 }
 
+/**
+  Get the currently active mitk::DataTreeFilter. May either be user provided or created privatly for some data tree.
+  
+  \return active mitk::DataTreeFilter
+*/
 mitk::DataTreeFilter* QmitkDataTreeComboBox::GetFilter()
 {
   return m_DataTreeFilter;
 }
 
+/**
+  Called whenever the user selects a different item. The task here is to find the belonging item and change its selection status.
+  The formerly selected item is correctly deselected by mitk::DataTreeFilter::Item::SetSelected(bool), when the DataTreeFilter's
+  selection mode is SINGLE_SELECT.
+*/
 void QmitkDataTreeComboBox::onActivated(int index)
 {
   // find item, generate signal
@@ -183,6 +259,12 @@ void QmitkDataTreeComboBox::onActivated(int index)
   // TODO on selectionChanged notifications from treefilter => change selection!
 }
 
+/**
+  If the user has not determined (via SetDisplayedProperty), which property should be displayed, this method
+  tries to find a mitk::StringProperty in the DataTreeFilter's list of available properties.
+
+  Defaults to the "name" property.
+*/
 void QmitkDataTreeComboBox::determineDisplayedProperty()
 {
   if ( !m_UserSetDisplayedProperty.empty() )
@@ -225,12 +307,27 @@ void QmitkDataTreeComboBox::determineDisplayedProperty()
   m_DisplayedProperty = "name";
 }
 
+/**
+  Let the user set the property to be displayed. Then regenerate items.
+
+  \param prop String key to the property to be displayed
+*/
 void QmitkDataTreeComboBox::SetDisplayedProperty(std::string prop)
 {
   m_UserSetDisplayedProperty = prop;
   determineDisplayedProperty();
+  generateItems();
 }
 
+
+/**
+  This method creates combo box items for the item list that is provided by a mitk::DataTreeFilter.
+  
+  \param items The top level item list (items may have children, then this method calls itself recursively)
+  \param visibleProps Properties for which display widgets should be created
+  \param level Level of recursion. Needed to display the right amout of indentation for child items.
+*/
+*/
 void QmitkDataTreeComboBox::AddItemsToList(const mitk::DataTreeFilter::ItemList* items,
                                            const mitk::DataTreeFilter::PropertyList& visibleProps,
                                            int level)
@@ -272,12 +369,18 @@ void QmitkDataTreeComboBox::AddItemsToList(const mitk::DataTreeFilter::ItemList*
   }
 }
 
+/**
+  Deletes all child widgets. 
+*/
 void QmitkDataTreeComboBox::clearItems()
 {
   QComboBox::clear();
   m_Items.clear();
 } 
 
+/**
+  Regenerates all displayed items.
+*/
 void QmitkDataTreeComboBox::generateItems()
 {
   if (!m_DataTreeFilter) return;
@@ -293,6 +396,12 @@ void QmitkDataTreeComboBox::generateItems()
   AddItemsToList(m_DataTreeFilter->GetItems(), visibleProps, 0);
 }
 
+/**
+  Handles TreeFilterRemoveItemEvents from the DataTreeFilter. For this purpose a variable m_SkipItem is set to contain the
+  item, which will shortly be deleted. This is necessary because the notification is sent while the item still exists.
+  m_SkipItem is considered in generateItem().
+  Perhaps something more sophisticated could be implemented.
+*/
 void QmitkDataTreeComboBox::removeItemHandler( const itk::EventObject& e )
 {
   const mitk::TreeFilterRemoveItemEvent& event( static_cast<const mitk::TreeFilterRemoveItemEvent&>(e) );
@@ -302,6 +411,12 @@ void QmitkDataTreeComboBox::removeItemHandler( const itk::EventObject& e )
   m_SkipItem = NULL;
 }
 
+/**
+  Handles TreeFilterRemoveChildrenEvents from the DataTreeFilter. For this purpose a variable m_SkipItemParent is set to contain the
+  item, which will shortly be deleted. This is necessary because the notification is sent while the item still exists.
+  m_SkipItemParent is considered in generateItem().
+  Perhaps something more sophisticated could be implemented.
+*/
 void QmitkDataTreeComboBox::removeChildrenHandler( const itk::EventObject& e )
 {
   const mitk::TreeFilterRemoveChildrenEvent& event( static_cast<const mitk::TreeFilterRemoveChildrenEvent&>(e) );
@@ -311,11 +426,18 @@ void QmitkDataTreeComboBox::removeChildrenHandler( const itk::EventObject& e )
   m_SkipItemParent = NULL;
 }
 
+/**
+  Handles TreeFilterRemoveAllEvents from the DataTreeFilter. The implementation is extremely easy, as clearing all items is
+  needed in other contexts as well.
+*/
 void QmitkDataTreeComboBox::removeAllHandler( const itk::EventObject& )
 {
   clearItems();
 }
 
+/**
+  Handles TreeFilterSelectionChangedEvents from the DataTreeFilter. 
+*/
 void QmitkDataTreeComboBox::selectionChangedHandler( const itk::EventObject& e)
 {
   if (m_SelfCall) return; // invoked by this object
@@ -343,6 +465,10 @@ void QmitkDataTreeComboBox::selectionChangedHandler( const itk::EventObject& e)
 
 }
 
+/**
+  Handles TreeFilterItemAddedEvents from the DataTreeFilter. Implemented by simply regenerating everything.
+  Perhaps something more sophisticated could be implemented.
+*/
 void QmitkDataTreeComboBox::itemAddedHandler( const itk::EventObject& /*e*/ )
 {
   //const mitk::TreeFilterItemAddedEvent& event( static_cast<const TreeFilterItemAddedEvent&>(e) );
@@ -351,6 +477,9 @@ void QmitkDataTreeComboBox::itemAddedHandler( const itk::EventObject& /*e*/ )
   generateItems();
 }
 
+/**
+  Handles TreeFilterUpdateAllEvents from the DataTreeFilter. 
+*/
 void QmitkDataTreeComboBox::updateAllHandler( const itk::EventObject& )
 {
   determineDisplayedProperty();

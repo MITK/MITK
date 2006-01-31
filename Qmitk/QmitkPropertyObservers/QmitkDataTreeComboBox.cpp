@@ -327,7 +327,6 @@ void QmitkDataTreeComboBox::SetDisplayedProperty(std::string prop)
   \param visibleProps Properties for which display widgets should be created
   \param level Level of recursion. Needed to display the right amout of indentation for child items.
 */
-*/
 void QmitkDataTreeComboBox::AddItemsToList(const mitk::DataTreeFilter::ItemList* items,
                                            const mitk::DataTreeFilter::PropertyList& visibleProps,
                                            int level)

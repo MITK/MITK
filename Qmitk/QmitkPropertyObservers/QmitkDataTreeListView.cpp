@@ -370,9 +370,9 @@ void QmitkDataTreeListView::mouseReleaseEvent ( QMouseEvent* e )
   the item list that is provided by a mitk::DataTreeFilter.
 
   \param parent Qt parent of all newly created widgets
-  \param items the top level item list (items may have children, then this method calls itself recursively)
-  \param visibleProps properties for which display widgets should be created
-  \param editableProps properties for which editable widgets should be created
+  \param items The top level item list (items may have children, then this method calls itself recursively)
+  \param visibleProps Properties for which display widgets should be created
+  \param editableProps Properties for which editable widgets should be created
 */
 void QmitkDataTreeListView::AddItemsToList(QWidget* parent, QmitkListViewItemIndex* index,
                                            const mitk::DataTreeFilter::ItemList* items,

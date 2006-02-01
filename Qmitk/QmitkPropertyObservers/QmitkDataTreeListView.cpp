@@ -442,7 +442,7 @@ void QmitkDataTreeListView::AddItemsToList(QWidget* parent, QmitkListViewItemInd
 
       if (observerWidget)
       { // widget ready, now add it
-std::cout << ".";
+        observerWidget->show();
         observerWidget->setBackgroundMode( Qt::PaletteBase );
         index->addWidget(observerWidget, row, column, Qt::AlignVCenter);
       }
@@ -460,14 +460,16 @@ std::cout << ".";
       // add expansion symbol
       QGridLayout* childrenGridLayout = new QGridLayout( 0, 1, visibleProps.size()+1 ); // 1 extra for expansion symbol
       QmitkListViewExpanderIcon* childExpander = new QmitkListViewExpanderIcon(childrenGridLayout, index, parent);
+      childExpander->show();
       childExpander->setBackgroundMode( Qt::PaletteBase );
+      
+      index->m_Grid->addMultiCellLayout( childrenGridLayout, row+1, row+1, 1, visibleProps.size(), Qt::AlignVCenter );
       
       index->addWidget(childExpander, row, 0, Qt::AlignVCenter); 
       //index->addMultiCellWidget(childExpander, row, row+1, 0, 0, Qt::AlignTop); 
                                         // fromRow, toRow, fromCol, toCol
       index->addIndex(childExpander, row); 
      
-      index->m_Grid->addMultiCellLayout( childrenGridLayout, row+1, row+1, 1, visibleProps.size(), Qt::AlignVCenter );
       // add children, unless this item is the parent whose children were just deleted
       if (*itemiter != m_SkipItemParent)
         AddItemsToList(parent, childExpander, itemiter->GetChildren(), visibleProps, editableProps);
@@ -478,6 +480,7 @@ std::cout << ".";
     {
       // to get some indent for child elements
       QLabel* label = new QLabel(" ", parent);
+      label->show();
       label->setBackgroundMode( Qt::PaletteBase );
       index->addWidget(label, row, 0, Qt::AlignVCenter); 
     }
@@ -496,8 +499,10 @@ void QmitkDataTreeListView::clearItems()
 {
   // delete all existing children
   while ( !queryList()->isEmpty() )
+  {
     delete queryList()->first();
- 
+  }
+  
   // delete references to now deleted children
   clearIndex();
 } 
@@ -533,14 +538,13 @@ void QmitkDataTreeListView::generateItems()
     m_StretchedColumn = visibleProps.size();
  
   // fill rows with property views for the visible items 
-std::cout << "Creating widgets ";
   AddItemsToList(this, this, m_DataTreeFilter->GetItems(), visibleProps, editableProps);
-std::cout << std::endl;
   
   m_SizeHint = m_Grid->sizeHint();
-
   m_Grid->addItem( new QSpacerItem(1, 5, QSizePolicy::Minimum, QSizePolicy::Ignored) , m_Grid->numRows(),0);
   m_Grid->setRowStretch( m_Grid->numRows()-1, 1 );
+
+  m_Grid->activate();
 }
 
 /**
@@ -551,7 +555,6 @@ std::cout << std::endl;
 */
 void QmitkDataTreeListView::removeItemHandler( const itk::EventObject& e )
 {
-std::cout << "removeItemHandler" << std::endl;
   const mitk::TreeFilterRemoveItemEvent& event( static_cast<const mitk::TreeFilterRemoveItemEvent&>(e) );
   m_SkipItem = event.GetChangedItem();
   // TODO: do something more clever
@@ -567,7 +570,6 @@ std::cout << "removeItemHandler" << std::endl;
 */
 void QmitkDataTreeListView::removeChildrenHandler( const itk::EventObject& e )
 {
-std::cout << "removeChildrenHandler" << std::endl;
   const mitk::TreeFilterRemoveChildrenEvent& event( static_cast<const mitk::TreeFilterRemoveChildrenEvent&>(e) );
   // TODO: do something more clever
   m_SkipItemParent = event.GetChangedItem();
@@ -581,7 +583,6 @@ std::cout << "removeChildrenHandler" << std::endl;
 */
 void QmitkDataTreeListView::removeAllHandler( const itk::EventObject& )
 {
-std::cout << "removeAllHandler" << std::endl;
   clearItems();
 }
 
@@ -687,7 +688,6 @@ void QmitkDataTreeListView::itemAddedHandler( const itk::EventObject& /*e*/ )
   //const mitk::TreeFilterItemAddedEvent& event( static_cast<const TreeFilterItemAddedEvent&>(e) );
   //mitk::DataTreeFilter::Item* item = event.GetChangedItem();
   // TODO: do something more clever
-std::cout << "addedHandler" << std::endl;
   generateItems();
 }
 
@@ -696,7 +696,6 @@ std::cout << "addedHandler" << std::endl;
 */
 void QmitkDataTreeListView::updateAllHandler( const itk::EventObject& )
 {
-std::cout << "updateAllHandler" << std::endl;
   generateItems();
 }
 

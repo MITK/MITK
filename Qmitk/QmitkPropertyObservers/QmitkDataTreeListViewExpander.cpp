@@ -16,15 +16,21 @@
 
 //--- QmitkListViewItemIndex ------------------------------------------------
 
+/**
+  This constructor may be only called for children, so the parent QmitkListViewItemIndex and the managed
+  GridLayout have to be given.
+*/
 QmitkListViewItemIndex::QmitkListViewItemIndex(QGridLayout* grid, QmitkListViewItemIndex* parentIndex)
 : m_Grid(grid),
   m_Locked(0),
   m_ParentIndex(parentIndex)
 {
-  if (!grid) throw std::invalid_argument("NULL pointer for grid makes no sense in QmitkListViewExpanderIcon()");
+  if (!grid) throw std::invalid_argument("NULL pointer for grid makes no sense in QmitkListViewItemIndex()");
 }
 
-// protected (for QmitkDataTreeListView
+/**
+  Protected for QmitkDataTreeListView, which creates m_Grid on updates (before any calls to addWidget, etc.). 
+*/
 QmitkListViewItemIndex::QmitkListViewItemIndex()
 : m_Grid(NULL),
   m_Locked(0),
@@ -36,6 +42,10 @@ QmitkListViewItemIndex::~QmitkListViewItemIndex()
 {
 }
 
+/**
+  Tells the class, that row \a row has now a QmitkListViewItemIndex, because the row has sub-items
+  which need to be managed.
+*/
 void QmitkListViewItemIndex::addIndex(QmitkListViewItemIndex* index, int row)
 {
   try
@@ -55,11 +65,13 @@ void QmitkListViewItemIndex::addIndex(QmitkListViewItemIndex* index, int row)
   }
 }
 
-/// If some rows are missing, or if some rows do not hold both a QWidget and an Item,
-/// then ONLY front-to-back build-order is supported, i.e. start with row 0 and then
-/// go on with row 1, row 2, etc.
+/**
+  Adds a widget to the GridLayout and stores information about the widget.
+
+  \warning Always add widgets top-to-bottom and left-to-right.
+*/
 void QmitkListViewItemIndex::addWidget(QWidget* widget, int row, int col, int alignment)
-{
+{ 
   if (widget)
   {
     if (m_Grid)
@@ -78,6 +90,11 @@ void QmitkListViewItemIndex::addWidget(QWidget* widget, int row, int col, int al
   }
 }
     
+/**
+  Adds a widget to the GridLayout and stores information about the widget.
+
+  \warning Always add widgets top-to-bottom and left-to-right.
+*/
 void QmitkListViewItemIndex::addMultiCellWidget(QWidget* widget, int fromRow, int toRow, int fromCol, int toCol, int alignment)
 {
   if (widget)
@@ -101,9 +118,11 @@ void QmitkListViewItemIndex::addMultiCellWidget(QWidget* widget, int fromRow, in
   }
 }
 
-/// If some rows are missing, or if some rows do not hold both a QWidget and an Item,
-/// then ONLY front-to-back build-order is supported, i.e. start with row 0 and then
-/// go on with row 1, row 2, etc.
+/**
+  Tell about the item that is associated to a row.
+
+  \warning Always add items top-to-bottom and left-to-right.
+*/
 void QmitkListViewItemIndex::addItem(mitk::DataTreeFilter::Item* item, int row)
 {
   if (item)
@@ -120,6 +139,9 @@ void QmitkListViewItemIndex::addItem(mitk::DataTreeFilter::Item* item, int row)
   }
 }
 
+/**
+  \return Index of the row that contains the coordinate \a y, starting with row 0.
+*/
 int QmitkListViewItemIndex::rowAt(int y) 
 {
   // y coordinate -> row index
@@ -142,9 +164,12 @@ int QmitkListViewItemIndex::rowAt(int y)
   if ( i && !(i->expanded()) )
     --r;
   
-  return r; // defaul = not found
+  return r; // default = not found
 }
 
+/**
+  \return QmitkListViewItemIndex that is associated with a row, starting with row 0.
+*/
 QmitkListViewItemIndex* QmitkListViewItemIndex::indexAt(int row) 
 {
   try
@@ -157,6 +182,9 @@ QmitkListViewItemIndex* QmitkListViewItemIndex::indexAt(int row)
   }
 }
 
+/**
+  \return mitk::DataTreeFilter::Item that is associated with a row, starting with row 0.
+*/
 mitk::DataTreeFilter::Item* QmitkListViewItemIndex::itemAt(int row) 
 {
   try
@@ -169,12 +197,23 @@ mitk::DataTreeFilter::Item* QmitkListViewItemIndex::itemAt(int row)
   }
 }
 
-/// throws std::out_of_range on bad row
+/**
+  \return A list of Qt widgets that is associated with a row, starting with row 0.
+ 
+  Throws std::out_of_range on bad row
+*/
 std::list<QWidget*>& QmitkListViewItemIndex::widgetsAt(int row) 
 {
   return m_Rows.at(row).second;
 }
 
+/**
+  A basic locking mechanism is implemented to prevent the user from collapsing subtrees that contain selected
+  items (thus hiding and removing from his attention a selection).
+  
+  Putting this here instead of QmitkListViewExpanderIcon is lazy, because QmitkDataTreeListView never needs locking,
+  but it makes the handling easier.
+*/
 void QmitkListViewItemIndex::lockBecauseOfSelection(bool locked)
 {
   if (locked)
@@ -183,11 +222,17 @@ void QmitkListViewItemIndex::lockBecauseOfSelection(bool locked)
     --m_Locked;
 }
 
+/**
+  \return The parent index.
+*/
 QmitkListViewItemIndex* QmitkListViewItemIndex::parentIndex() 
 {
   return m_ParentIndex;
 }
 
+/**
+  Clears all managed information. This is needed for rebuilding QmitkDataTreeListView completely.
+*/
 void QmitkListViewItemIndex::clearIndex() 
 {
   m_Rows.clear();
@@ -236,7 +281,6 @@ void QmitkListViewExpanderIcon::mouseReleaseEvent ( QMouseEvent* )
     setExpanded(!m_Expanded); //toggle status
   else
   {
-    // bing
     setPixmap( QPixmap(notpossible_xpm) );
     QTimer::singleShot(100,this,SLOT(displayCorrectIcon()));
   }

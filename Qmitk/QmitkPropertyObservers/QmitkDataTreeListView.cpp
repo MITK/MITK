@@ -19,7 +19,8 @@
 QmitkDataTreeListView::QmitkDataTreeListView(QWidget* parent, const char* name)
 : QWidget(parent, name),
   QmitkListViewItemIndex(),
-  m_DataTreeFilter(NULL)
+  m_DataTreeFilter(NULL),
+  m_PrivateFilter(NULL)
 {
   initialize();
 }
@@ -34,7 +35,8 @@ QmitkDataTreeListView::QmitkDataTreeListView(QWidget* parent, const char* name)
 QmitkDataTreeListView::QmitkDataTreeListView(mitk::DataTreeFilter* filter, QWidget* parent, const char* name)
 : QWidget(parent, name),
   QmitkListViewItemIndex(),
-  m_DataTreeFilter(filter)
+  m_DataTreeFilter(filter),
+  m_PrivateFilter(NULL)
 {
   initialize();
   SetFilter(filter);
@@ -50,7 +52,8 @@ QmitkDataTreeListView::QmitkDataTreeListView(mitk::DataTreeFilter* filter, QWidg
 QmitkDataTreeListView::QmitkDataTreeListView(mitk::DataTreeBase* tree, QWidget* parent, const char* name)
 : QWidget(parent, name),
   QmitkListViewItemIndex(),
-  m_DataTreeFilter(NULL)
+  m_DataTreeFilter(NULL),
+  m_PrivateFilter(NULL)
 {
   initialize();
   SetDataTree(tree);
@@ -66,7 +69,8 @@ QmitkDataTreeListView::QmitkDataTreeListView(mitk::DataTreeBase* tree, QWidget* 
 QmitkDataTreeListView::QmitkDataTreeListView(mitk::DataTreeIteratorBase* iterator, QWidget* parent, const char* name)
 : QWidget(parent, name),
   QmitkListViewItemIndex(),
-  m_DataTreeFilter(NULL)
+  m_DataTreeFilter(NULL),
+  m_PrivateFilter(NULL)
 {
   initialize();
   SetDataTree(iterator);
@@ -82,11 +86,19 @@ void QmitkDataTreeListView::initialize()
   m_SkipItemParent = NULL;
   m_StretchedColumn = -1; 
   m_SelfCall = false;
+  
+  m_RemoveItemConnection       = 63535;
+  m_RemoveChildrenConnection   = 63535;
+  m_RemoveAllConnection        = 63535;
+  m_SelectionChangedConnection = 63535;
+  m_ItemAddedConnection        = 63535;
+  m_UpdateAllConnection        = 63535;
+  
   setBackgroundMode( Qt::PaletteBase );
 }
 
 /**
-  Minor cleanup. Disconnect all itk-observers.
+    Minor cleanup. Disconnect all itk-observers. If a private filter exists, it is destructed due to the smart pointer.
 */
 QmitkDataTreeListView::~QmitkDataTreeListView()
 {
@@ -263,7 +275,7 @@ QSize QmitkDataTreeListView::sizeHint() const
 }
 
 /**
-  Called from paintEvent to draw the highlights behind selected rows.
+  Called from paintEvent() to draw the highlights behind selected rows.
   This method iterates over the rows of all GridLayouts that are used internally and
   each time asks the associated items, whether they are selected or not. The background color is determined
   from the items' answers.
@@ -430,6 +442,7 @@ void QmitkDataTreeListView::AddItemsToList(QWidget* parent, QmitkListViewItemInd
 
       if (observerWidget)
       { // widget ready, now add it
+std::cout << ".";
         observerWidget->setBackgroundMode( Qt::PaletteBase );
         index->addWidget(observerWidget, row, column, Qt::AlignVCenter);
       }
@@ -492,11 +505,13 @@ void QmitkDataTreeListView::clearItems()
 /**
   Regenerates all widgets.
 
-   1. Delete all items and index information
-   2. Get lists of visible and editable properties from the mitk::DataTreeFilter
-   3. Create a new top level GridLayout and
-   4. Call AddItemsToList() to populate the GridLayout with observer widgets
-   5. Finally, add an empty row to fill space at the bottom of this widget
+  <ol>
+   <li> Delete all items and index information
+   <li> Get lists of visible and editable properties from the mitk::DataTreeFilter
+   <li> Create a new top level GridLayout and
+   <li> Call AddItemsToList() to populate the GridLayout with observer widgets
+   <li> Finally, add an empty row to fill space at the bottom of this widget
+  </ol>
 */
 void QmitkDataTreeListView::generateItems()
 {
@@ -518,7 +533,9 @@ void QmitkDataTreeListView::generateItems()
     m_StretchedColumn = visibleProps.size();
  
   // fill rows with property views for the visible items 
+std::cout << "Creating widgets ";
   AddItemsToList(this, this, m_DataTreeFilter->GetItems(), visibleProps, editableProps);
+std::cout << std::endl;
   
   m_SizeHint = m_Grid->sizeHint();
 
@@ -534,6 +551,7 @@ void QmitkDataTreeListView::generateItems()
 */
 void QmitkDataTreeListView::removeItemHandler( const itk::EventObject& e )
 {
+std::cout << "removeItemHandler" << std::endl;
   const mitk::TreeFilterRemoveItemEvent& event( static_cast<const mitk::TreeFilterRemoveItemEvent&>(e) );
   m_SkipItem = event.GetChangedItem();
   // TODO: do something more clever
@@ -549,6 +567,7 @@ void QmitkDataTreeListView::removeItemHandler( const itk::EventObject& e )
 */
 void QmitkDataTreeListView::removeChildrenHandler( const itk::EventObject& e )
 {
+std::cout << "removeChildrenHandler" << std::endl;
   const mitk::TreeFilterRemoveChildrenEvent& event( static_cast<const mitk::TreeFilterRemoveChildrenEvent&>(e) );
   // TODO: do something more clever
   m_SkipItemParent = event.GetChangedItem();
@@ -562,6 +581,7 @@ void QmitkDataTreeListView::removeChildrenHandler( const itk::EventObject& e )
 */
 void QmitkDataTreeListView::removeAllHandler( const itk::EventObject& )
 {
+std::cout << "removeAllHandler" << std::endl;
   clearItems();
 }
 
@@ -667,6 +687,7 @@ void QmitkDataTreeListView::itemAddedHandler( const itk::EventObject& /*e*/ )
   //const mitk::TreeFilterItemAddedEvent& event( static_cast<const TreeFilterItemAddedEvent&>(e) );
   //mitk::DataTreeFilter::Item* item = event.GetChangedItem();
   // TODO: do something more clever
+std::cout << "addedHandler" << std::endl;
   generateItems();
 }
 
@@ -675,6 +696,7 @@ void QmitkDataTreeListView::itemAddedHandler( const itk::EventObject& /*e*/ )
 */
 void QmitkDataTreeListView::updateAllHandler( const itk::EventObject& )
 {
+std::cout << "updateAllHandler" << std::endl;
   generateItems();
 }
 

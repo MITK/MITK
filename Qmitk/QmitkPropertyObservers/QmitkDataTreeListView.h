@@ -22,7 +22,23 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qlistview.h>
 #include <QmitkDataTreeListViewExpander.h>
 
-/// @brief Displays items of a mitk::DataTreeBase
+/**
+ @brief Displays items of a mitk::DataTreeFilter
+
+ This class provides a view on a mitk::DataTreeFilter. It displays all the contained items, including
+ the hierarchy and allows for multi-selections.
+
+ All communication from the DataTreeFilter to this view is done via itk::Events. I.e. the QmitkDataTreeListView
+ installs a handful of listeners on a given DataTreeFilter and reacts to changes.
+
+ The only communication from this view to the DataTreeFilter is the selection state of single items. To change this,
+ mitk::DataTreeFilter::Item::SetSelected() is called on the appropriate items.
+
+ Initialization of a QmitkDataTreeView is done either through the constructor (if a data tree is available at the
+ time you want to call the constructor), or through one of the methods SetDataTree(), SetFilter().
+ 
+ TODO a source code example on how to use this class should be added
+*/
 class QmitkDataTreeListView : public QWidget, public QmitkListViewItemIndex
 {
   Q_OBJECT;

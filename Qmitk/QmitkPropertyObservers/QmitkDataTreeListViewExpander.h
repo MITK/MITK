@@ -7,6 +7,21 @@
 
 class QGridLayout;
 
+/**
+  @brief Helper class for QmitkDataTreeListView (does the indexing of items).
+
+  This class manages the information about what widgets are contained in it, 
+  where on the screen (which row) to find them.
+
+  A QmitkListViewItemIndex can have children, which results in a tree-like structure.
+  When hierarchies are displayed, the QmitkDataTreeListView uses QmitkListViewExpanderIcon to
+  show/hide subtrees on user request.
+
+  On-screen arrangement of widget is done in a QGridLayout, which has most of the necessary methods.
+  The row structuring is done in a vector of items and widgets. Each item in this vector represents one
+  row on the screen. One row always corresponds to one mitk::DataTreeFilter::Item and a list of widgets
+  (which display different properties of a mitk::DataTreeNode).
+*/
 class QmitkListViewItemIndex
 {
   public:
@@ -19,11 +34,11 @@ class QmitkListViewItemIndex
     void addMultiCellWidget(QWidget*, int fromRow, int toRow, int fromCol, int toCol, int alignment = 0);
     void addItem(mitk::DataTreeFilter::Item*, int row);
     
-    int rowAt(int y);  // y coordinate -> row index
+    int rowAt(int y);  /// y coordinate -> row index
 
-    QmitkListViewItemIndex* indexAt(int row);       // index for sub-items in a row
-    mitk::DataTreeFilter::Item* itemAt(int row);   // mitkDataTreeFilter::Item of a row
-    std::list<QWidget*>& widgetsAt(int row);      // widgets of a row
+    QmitkListViewItemIndex* indexAt(int row);      /// index for sub-items in a row
+    mitk::DataTreeFilter::Item* itemAt(int row);  /// mitkDataTreeFilter::Item of a row
+    std::list<QWidget*>& widgetsAt(int row);     /// widgets of a row
     
     void lockBecauseOfSelection(bool);
     QmitkListViewItemIndex* parentIndex();
@@ -46,6 +61,12 @@ class QmitkListViewItemIndex
   private:
 };
 
+/**
+  @brief Helper class for QmitkDataTreeListView (Shows/hides subtrees).
+
+  Not much new information here, if you know QmitkListViewItemIndex. This class only adds
+  show/hide methods.
+*/
 class QmitkListViewExpanderIcon : public QLabel, public QmitkListViewItemIndex
 {
   Q_OBJECT

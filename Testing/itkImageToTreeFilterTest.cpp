@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkITTFilterContext.h>
 #include <itkImageToTreeFilter.h>
 #include <itkStartPointData.h>
+#include <itkTubeSegmentModel.h>
 
 #include <mitkVesselTreeData.h>
 
@@ -49,12 +50,16 @@ typedef FilterContextType::StartPointQueueType      StartPointQueueType;
 typedef itk::StartPointData<ImageType>              StartPointDataType;
 typedef StartPointDataType::Pointer                 StartPointDataPointer;
 
+typedef itk::TubeSegmentModel<PixelType, DirectionType>
+                                                    TubeSegmentModelType;
+typedef TubeSegmentModelType::Pointer               TubeSegmentModelPointer;
+
 typedef std::list<int>                              ResultListType;
 
 /******************************************************************
  * TEST 1: Saving and loading data objects to the filter context
  *****************************************************************/
-int testFilterContext(char* argv[])
+int testFilterContext()
 {
   // init some test data
   PointType testPoint1;
@@ -107,13 +112,14 @@ int testFilterContext(char* argv[])
   }
 
   std::cout << " *** [TEST PASSED] ***\n";
+  return EXIT_SUCCESS;
 }
 
 /****************************************************************
  * TEST 2: Initialising the filter
  ****************************************************************/
  // TODO: test init of image
-int testInitFilter(char* argv[])
+int testInitFilter()
 {
     // init some test data
   PointType testPoint1;
@@ -154,9 +160,16 @@ int testInitFilter(char* argv[])
   return EXIT_SUCCESS;
 }
 
-int testTubeSegmentDetector(char* argv[] )
+/****************************************************************
+ * TEST 3: TubeSegmentModel
+ ****************************************************************/
+int testTubeSegmentModel()
 {
-  return EXIT_FAILURE;
+  std::cout << " *** Testing the tube segments ***\n";
+  TubeSegmentModelPointer tubeSegment = TubeSegmentModelType::New();
+
+  std::cout << " *** [TEST PASSED] ***\n";
+  return EXIT_SUCCESS;
 }
 
 
@@ -168,9 +181,9 @@ int itkImageToTreeFilterTest(int, char* argv[] )
   float failRatio;
 
   // run all tests
-  resultList.push_back(testFilterContext(argv));
-  resultList.push_back(testInitFilter(argv));
-//   resultList.push_back(testTubeSegmentDetector(argv));
+  resultList.push_back(testFilterContext());
+  resultList.push_back(testInitFilter());
+  resultList.push_back(testTubeSegmentModel());
 
   std::cout << " *** [ALL TESTS DONE] ***\n";
 

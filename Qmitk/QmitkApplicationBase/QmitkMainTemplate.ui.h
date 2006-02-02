@@ -35,6 +35,7 @@ PURPOSE.  See the above copyright notices for more information.
   #include <mitkDICOMFileReader.h>
   #include <mitkDSRFileReader.h>
   #include <mitkCylindricToCartesianFilter.h>
+  #include <QmitkSaveProjectWidget.h>
   #include <itksys/SystemTools.hxx>
 #else
   #include "itkImage.h"
@@ -234,6 +235,10 @@ public:
 
 QmitkMainTemplate* QmitkMainTemplate::m_Instance = NULL;
 
+#ifdef MBI_INTERNAL
+  QmitkSaveProjectWidget* m_SceneWidget;
+#endif
+
 void QmitkMainTemplate::fileNew()
 {}
 
@@ -363,6 +368,21 @@ void QmitkMainTemplate::fileOpenGetFactoryOutput( mitk::DataTreeNodeFactory & fa
 
 void QmitkMainTemplate::fileOpenProject()
 {
+#ifdef MBI_INTERNAL
+  QString filename = QFileDialog::getOpenFileName( QString::null, "XML Project description (*.xml)",0,
+                                                   "Open Project File", "Choose a file to open");
+  if ( !filename.isEmpty() ) {
+    try
+    {
+      mitk::DataTreePreOrderIterator it(m_Tree);
+      mitk::DataTree::Load(&it, filename);
+    }
+    catch ( itk::ExceptionObject & ex )
+    {
+      itkGenericOutputMacro( << "Exception during file open project: " << ex );
+    }
+  } 
+#else
   QString fileName = QFileDialog::getOpenFileName(NULL,"MITK Project File (*.mitk)");
 
   if ( !fileName.isNull() )
@@ -382,15 +402,27 @@ void QmitkMainTemplate::fileOpenProject()
     }
     QApplication::restoreOverrideCursor();
   }
+#endif
 }
 
 void QmitkMainTemplate::fileSaveProjectAs()
 {
+#ifdef MBI_INTERNAL
+  try
+  {
+    m_SceneWidget = new QmitkSaveProjectWidget(m_Tree, 0);
+    m_SceneWidget->show();
+  }
+  catch ( itk::ExceptionObject & ex )
+  {
+    itkGenericOutputMacro( << "Exception during file open project: " << ex );
+  }
+#else
   QString fileName = QFileDialog::getSaveFileName(NULL,"MITK Project File (*.mitk)");
 
   if ( !fileName.isNull() )
   {
-   try
+  try
     {    
       QApplication::setOverrideCursor( QCursor(Qt::WaitCursor) );
 
@@ -405,10 +437,22 @@ void QmitkMainTemplate::fileSaveProjectAs()
     }
   }
   QApplication::restoreOverrideCursor();
+#endif
 }
 
 void QmitkMainTemplate::fileSave()
 {
+#ifdef MBI_INTERNAL
+  try
+  {
+    m_SceneWidget = new QmitkSaveProjectWidget(m_Tree, 0);
+    m_SceneWidget->show();
+  }
+  catch ( itk::ExceptionObject & ex )
+  {
+    itkGenericOutputMacro( << "Exception during file open project: " << ex );
+  }
+#else
   QString fileName;
 
   if ( m_ProjectFileName.length() > 5 )
@@ -418,7 +462,7 @@ void QmitkMainTemplate::fileSave()
 
   if ( !fileName.isNull() )
   {
-   try
+  try
     {    
       QApplication::setOverrideCursor( QCursor(Qt::WaitCursor) );
 
@@ -433,6 +477,7 @@ void QmitkMainTemplate::fileSave()
     }
   }
   QApplication::restoreOverrideCursor();
+#endif
 }
 
 void QmitkMainTemplate::filePrint()
@@ -670,6 +715,9 @@ void QmitkMainTemplate::ShowPlanesCheckBox_clicked()
 void QmitkMainTemplate::destroy()
 {
   delete qfm;
+#ifdef MBI_INTERNAL
+  delete m_SceneWidget;
+#endif
 }
 
 QmitkMainTemplate* QmitkMainTemplate::GetInstance()

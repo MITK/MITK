@@ -29,46 +29,60 @@
 /**
   \class mitk::DataTreeFilter mitkDataTreeFilter.h mitkDataTreeFilter.h
 
-    \brief Provides a filtered view on the data tree, useful as basis for GUI elements.
+  \brief Provides a filtered view on the data tree, useful as basis for GUI elements.
     
-    Before reading this, you should know the following classes: 
-    DataTree, DataTreeNode,  DataTreeIteratorBase, BaseProperty, itk::Event.
+  Before reading this, you should know the following classes: 
+  DataTree, DataTreeNode,  DataTreeIteratorBase, BaseProperty, itk::Event.
 
-    \section sectionMitkDataTreeFilterOverview Overview 
+  \section sectionMitkDataTreeFilterOverview Overview 
 
-    This class is intended to provide a ready-to-use model of the data tree,
-    so that GUI classes, which want to display information about some
-    nodes in the data tree, have to add only code for the UI.
-
+  This class is intended to provide a ready-to-use model of the data tree,
+  so that GUI classes, which want to display information about some
+  nodes in the data tree, have to add only code for the UI.
   
-    What does this class offer to you beyond the features of a tree iterator? 
-    These are the features:
+  What does this class offer to you beyond the features of a tree iterator? 
+  These are the features:
 
-      - The offered model of the data tree is <b>constrained by a filter</b>, i.e. you
-        only get tree nodes of your very special interest. The filter is realized as a
-        user provided function pointer, so you can use any filter that can be called via
-        C++ function pointer syntax. A sensible set of default filters is available in
-        the mitk namespace.
+    - The offered model of the data tree is <b>constrained by a filter</b>, i.e. you
+      only get tree nodes of your very special interest. The filter is realized as a
+      user provided function pointer, so you can use any filter that can be called via
+      C++ function pointer syntax. A sensible set of default filters is available in
+      the mitk namespace.
         
-      - Not all views of the data tree need the hierarchy of it preserved. So <b>you can
-        choose between a hierarchy-preserving and a flattening model</b>. You can switch
-        between these possibilities without recreating the model.
+    - Not all views of the data tree need the hierarchy of it preserved. So <b>you can
+      choose between a hierarchy-preserving and a flattening model</b>. You can switch
+      between these possibilities without recreating the model.
         
-      - Usually you want not only to display the content of the data tree, but you want to
-        let the user choose some nodes of the tree. Therefore this class keeps <b>a
-        selection marker</b> for each displayed node. You can
-        choose between <b>single-select or multi-select</b>. 
+    - Usually you want not only to display the content of the data tree, but you want to
+      let the user choose some nodes of the tree. Therefore this class keeps <b>a
+      selection marker</b> for each displayed node. You can
+      choose between <b>single-select or multi-select</b>. 
         
-      - In many cases you will want to display some properties for each node of the
-        (filtered) data tree. For this end, this class holds <b>two lists to tell GUI classes
-        which properties to display and which to make editable</b>. Toghether with the
-        derivations of PropertyObserver, this allows to implement GUI classes that can 
-        display a whole range of information.
+    - In many cases you will want to display some properties for each node of the
+      (filtered) data tree. For this end, this class holds <b>two lists to tell GUI classes
+      which properties to display and which to make editable</b>. Toghether with the
+      derivations of PropertyObserver, this allows to implement GUI classes that can 
+      display a whole range of information.
 
-      - To keep clients / GUI elements in sync with the model of the data tree, the
-        tree filter uses the <b>ITK event mechanism to notify about changes</b>.
+    - To keep clients / GUI elements in sync with the model of the data tree, the
+      tree filter uses the <b>ITK event mechanism to notify about changes</b>.
+
+  Why would you want such features? You will like them, if ...
+
+    - you need to display a list of images from the data tree.
+    - a user should be able to select one (several) image(s) from that list.
+    - you need two lists of images and a user should be able to select an image in both
+      independently. This is the motivation for keeping the selection status within the
+      items and not in a property of the DataTreeNodes.
+    - you want to display color and name of all bounding objects in your data tree.
+    - you don't want to display all bounding objects in your data tree, but you simply
+      need a list of them all, e.g. for an Interactor that wants to determine the object
+      under the mouse cursor.
+    - you want to save parts the data tree, but only nodes that actually contain data
+    - ...
   
   \image html doc_mitkDataTreeFilterRelatedClasses.png Relations of the DataTreeFilter to other classes.
+  \image latex doc_mitkDataTreeFilterRelatedClasses.eps Relations of the DataTreeFilter to other classes.
 
   The above image illustrates the relationship between the MITK data tree, the
   DataTreeFilter and its clients. The most important observation is, that <i>the filter does

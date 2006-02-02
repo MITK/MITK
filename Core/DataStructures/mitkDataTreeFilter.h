@@ -26,18 +26,313 @@
 
 */
 
-/*!
+/**
   \class mitk::DataTreeFilter mitkDataTreeFilter.h mitkDataTreeFilter.h
 
-  \brief Provides a filtered view on the data tree
+    \brief Provides a filtered view on the data tree, useful as basis for GUI elements.
+    
+    Before reading this, you should know the following classes: 
+    DataTree, DataTreeNode,  DataTreeIteratorBase, BaseProperty, itk::Event.
 
-  Inherits itk::Object for Subject/Observer functionality
+    \section sectionMitkDataTreeFilterOverview Overview 
 
-  Documentations will follow.
+    This class is intended to provide a ready-to-use model of the data tree,
+    so that GUI classes, which want to display information about some
+    nodes in the data tree, have to add only code for the UI.
 
-  This diagram provides enlightenment...
+  
+    What does this class offer to you beyond the features of a tree iterator? 
+    These are the features:
 
+      - The offered model of the data tree is <b>constrained by a filter</b>, i.e. you
+        only get tree nodes of your very special interest. The filter is realized as a
+        user provided function pointer, so you can use any filter that can be called via
+        C++ function pointer syntax. A sensible set of default filters is available in
+        the mitk namespace.
+        
+      - Not all views of the data tree need the hierarchy of it preserved. So <b>you can
+        choose between a hierarchy-preserving and a flattening model</b>. You can switch
+        between these possibilities without recreating the model.
+        
+      - Usually you want not only to display the content of the data tree, but you want to
+        let the user choose some nodes of the tree. Therefore this class keeps <b>a
+        selection marker</b> for each displayed node. You can
+        choose between <b>single-select or multi-select</b>. 
+        
+      - In many cases you will want to display some properties for each node of the
+        (filtered) data tree. For this end, this class holds <b>two lists to tell GUI classes
+        which properties to display and which to make editable</b>. Toghether with the
+        derivations of PropertyObserver, this allows to implement GUI classes that can 
+        display a whole range of information.
+
+      - To keep clients / GUI elements in sync with the model of the data tree, the
+        tree filter uses the <b>ITK event mechanism to notify about changes</b>.
+  
   \image html doc_mitkDataTreeFilterRelatedClasses.png Relations of the DataTreeFilter to other classes.
+
+  The above image illustrates the relationship between the MITK data tree, the
+  DataTreeFilter and its clients. The most important observation is, that <i>the filter does
+  not destroy or modify the data tree</i>. It doesn't even change a single property of any
+  tree node. The filter simply provides a representation that is more suitable to GUI classes than
+  is a tree iterator. The client gets a list (actually a STL list) of so called items,
+  where <i>each Item is something like a convenience pointer to a DataTreeNode</i>.
+  You can ask items to return the node's properties, if you need it
+  you can get the bare tree node, and you can (un)select items.
+  To represent a tree structure, each item can have a list of children.
+
+  \section sectionMitkDataTreeFilterUsage Usage examples
+ 
+  This section will discuss some code blocks that are commonly needed to work with the
+  DataTreeFilter. For the whole truth, have a look at the implementation of
+  (recommended order)
+  DataTreeFilter, QmitkDataTreeComboBox, and QmitkDataTreeListView.
+
+  This section is divided into two parts: first, we describe how to setup a
+  DataTreeFilter, so that it may be used by some GUI element. Then we look at the
+  DataTreeFilter from the point of view of a GUI class, i.e. we consider how to access the
+  information contained in the items.
+
+  \subsection sectionMitkDataTreeFilterUsage1 Setting up a data tree filter
+  
+  This sections tells you how to prepare a DataTreeFilter. If you are a user of the MITK
+  library, this will most probably the only thing you have to do with this class. There
+  are GUI classes which will take the set up filter and display its information, but the
+  internals of how they do that need not worry you.
+  
+  \subsubsection sectionMitkDataTreeFilterUsage11 Creating a data tree filter
+
+  The minimum you have to provide in order to use the DataTreeFilter, is the data tree.
+  You have to do this in the constructor, because a filter does not make sense without a
+  tree (and using more than one tree is not very common).
+
+\code
+  #include <mitkDataTreeFilter.h>
+
+  //...
+
+  mitk::DataTreeBase* dataTree = foo();                                              // get a pointer to your data tree
+  mitk::DataTreeFilter::Pointer treeFilter = mitk::DataTreeFilter::New(dataTree);    // create a filter
+\endcode
+
+  This will create a default filter that matches any mitk::Image in the tree. It will tell
+  clients to display the "name" property of each image. After calling the constructor, the
+  filter is ready to be used.
+  
+  \subsubsection sectionMitkDataTreeFilterUsage12 Installing a different filter function
+
+  If you want to access not only images, you have to assign a different filter function. A
+  filter function must be able to return a bool for each DataTreeNode it is shown. The
+  default filter IsImage is defined like this:
+
+\code
+  namespace mitk
+  {
+    bool IsImage(mitk::DataTreeNode* node)
+    {
+      return ( node!= 0 && node->GetData() && dynamic_cast<mitk::Image*>( node->GetData() ) );
+    }
+  }
+\endcode
+
+  Define your own filter functions to suit your needs and install them via SetFilter().
+  The filter functions must conform to the type DataTreeFilter::FilterFunctionPointer.
+  
+\code
+  treeFilter->SetFilter( &mitk::IsImage );
+\endcode
+ 
+  \subsubsection sectionMitkDataTreeFilterUsage13 Defining the filter's behaviour
+
+  You may want to define what kind of selections are possible and how the tree's hierarchy
+  is handled. 
+  
+\code
+  treeFilter->SetSelectionMode(mitk::DataTreeFilter::MULTI_SELECT);           // default behaviour
+  treeFilter->SetSelectionMode(mitk::DataTreeFilter::SINGLE_SELECT);
+
+  treeFilter->SetHierarchyHandling(mitk::DataTreeFilter::PRESERVE_HIERARCHY); // default behaviour
+  treeFilter->SetHierarchyHandling(mitk::DataTreeFilter::FLATTEN_HIERARCHY);
+\endcode
+  
+  The behaviour of the different modes will not surprise you:
+  <ul>
+    <li> MULTI_SELECT: any number of items may be selected
+    <li> SINGLE_SELECT: only zero or one items may be selected. This is guarantied by the
+          DataTreeFilter. If you call SetSelected() on an item, while another item is
+          still selected, the Filter will simply deselect the other item, before your
+          request is executed.
+    <li> PRESERVE_HIERARCHY: items will have the same hierarchy as the data tree. If some
+          nodes in the hierarchy do not match the filter function, children of those nodes
+          will move up the hierarchy and become children of the first node (looking
+          bottom-to-top) that matches the filter.
+    <li> FLATTEN_HIERARCHY: hierarchy will be destroyed. The order of items will be that
+          of a preorder traversing.
+  </ul> 
+
+  \subsubsection sectionMitkDataTreeFilterUsage14 Telling GUI classes what properties to display
+
+  If you keep the defaults, clients like the QmitkDataTreeComboBox or the
+  QmitkDataTreeListView will display the "name" property of each item (not editable by the user).
+  You can change this by defining two lists. The first list contains the <i>visible
+  properties</i>. Only properties that are mentioned in this list are displayed. The
+  second list holds <i>editable properties</i>, which should be presented in a way that
+  the user can change them. The editable properties have to be a subset of the visible
+  properties! This is required but not enforced or checked in any way, it is <b>your
+  responsibility</b> to check this! 
+
+  Both lists are given as a PropertyList, which is a typedef for a STL container:
+
+\code
+  mitk::DataTreeFilter::PropertyList visibleProperties;
+  visibleProperties.push_back("visible");
+  visibleProperties.push_back("color");
+  visibleProperties.push_back("name");
+  treeFilter->SetVisibleProperties( visibleProperties );
+  
+  mitk::DataTreeFilter::PropertyList editableProperties;
+  editableProperties.push_back("visible");
+  editableProperties.push_back("color");
+  treeFilter->SetEditableProperties( editableProperties );
+\endcode
+  
+  
+  \subsubsection sectionMitkDataTreeFilterUsage15 Destroying a data tree filter
+
+  As you keep a reference to the filter in a Pointer, which is a itk::SmartPointer, you
+  destroy a DataTreeFilter just like most ITK things: assign NULL to the pointer.
+  
+\code
+  treeFilter = NULL;
+\endcode
+  
+  \subsection sectionMitkDataTreeFilterUsage2 Accessing the information behind a DataTreeFilter
+
+  This section's purpose is to clarify how GUI elements can access the information, which
+  is contained in a DataTreeFilter.
+  
+  \subsubsection sectionMitkDataTreeFilterUsage21 Iterating over all items 
+
+  To visit all items, you need recursion unless you can be sure to get a flattened
+  hierarchy. The following code example will only illustrate this recursive case, as the
+  more simple case of a flat list can be learnt from that one, too.
+
+\code
+  void QmitkSomeGUIClass::GenerateItems()
+  {
+    // m_DataTreeFilter is our mitk::DataTreeFilter::Pointer that is already initialized 
+  
+    ProcessAllItems( m_DataTreeFilter->GetItems(), 0 );
+  }
+
+  void QmitkSomeGUIClass::ProcessAllItems(const mitk::DataTreeFilter::ItemList* items,
+                                          int level)
+  {
+    // one iterator to the beginning of the list
+    mitk::DataTreeFilter::ConstItemIterator itemiter( items->Begin() ); 
+    // another one to the end of the list
+    mitk::DataTreeFilter::ConstItemIterator itemiterend( items->End() ); 
+  
+    // visit each item until the end is reached
+    while ( itemiter != itemiterend )
+    {
+  
+      // work all visible properties
+      for( mitk::DataTreeFilter::PropertyList::const_iterator nameiter = visibleProps.begin();
+          nameiter != visibleProps.end();
+          ++nameiter )
+      {
+        // get the "name" property and cast it to a string
+        std::string displayedText( static_cast<const std::string> itemiter->GetProperty(*nameiter) );
+  
+        // do something useful with displayedText
+      }
+  
+      // visit children if necessary
+      if ( itemiter->HasChildren() )
+          ProcessAllItems( itemiter->GetChildren(), visibleProps, level+1 );
+    
+      // visit next item
+      ++itemiter; 
+    }
+  }
+\endcode
+  
+  \subsubsection sectionMitkDataTreeFilterUsage22 Notifications / keeping in sync
+
+  If you need to get informed about changes in the structure of the items, or about the
+  selection state of individual items, you have to use the ITK Observer mechanism. We
+  decided for this mechanism (and against Qt signals) to keep the tree filter toolkit
+  independent.
+
+  Somewhere very early, you will want to create observers:
+  
+\code
+  QmitkSomeGUIClass::ConnectTreeFilterEvents()
+  {
+    // the author of this example is lazy and connects only to a single event
+    // (TreeFilterUpdateAllEvent)
+    itk::ReceptorMemberCommand<QmitkSomeGUIClass>::Pointer command = itk::ReceptorMemberCommand<QmitkSomeGUIClass>::New();
+    command->SetCallbackFunction(this, &QmitkSomeGUIClass::updateAllHandler);
+  
+    // m_UpdateAllConnection is an "unsigned long"
+    m_UpdateAllConnection = m_DataTreeFilter->AddObserver(mitk::TreeFilterUpdateAllEvent(), command);
+  }
+\endcode
+
+  For the above code block to work, you have to define a member function, which handles
+  all update-all events.
+\code
+  void QmitkSomeGUIClass::updateAllHandler( const itk::EventObject& )
+  {
+    GenerateItems();
+  }
+\endcode
+
+  Later, probably in the destructor of your GUI element, you want to remove the observers:
+
+\code
+  QmitkSomeGUIClass::DisconnectTreeFilterEvents()
+  {
+    m_DataTreeFilter->RemoveObserver( m_UpdateAllConnection );
+  } 
+\endcode
+
+  In a realistic scenario, you want to create handlers for all available events. For
+  examples, please refer to the implementation of QmitkDataTreeComboBox or
+  QmitkDataTreeListView. Here is only a description of when each event is triggered:
+
+  <ul>
+    <li> TreeFilterRemoveItemEvent: 
+         a single item (but not its children) is removed
+    <li> TreeFilterRemoveChildrenEvent:
+         all children (and grandchildren, ...) of an item are removed
+    <li> TreeFilterRemoveAllEvent: 
+         all items of the tree filter are removed
+    <li> TreeFilterSelectionChangedEvent: 
+         the selection status of a single item has changed
+    <li> TreeFilterItemAddedEvent: 
+         an item was added
+    <li> TreeFilterUpdateAllEvent:
+         the filter underwent a greater reorganization, so you should consider all your
+         information invalid (and update it)
+  </ul>
+
+  The information about where the change has occurred (in case of the add-event) or will
+  occur shortly (remove-events) is contained in the itk::EventObject. You can access it
+  like this:
+
+\code
+  void QmitkSomeGUIClass::removeItemHandler( const itk::EventObject& e )
+  {
+    const mitk::TreeFilterRemoveItemEvent& event( static_cast<const mitk::TreeFilterRemoveItemEvent&>(e) );
+   
+    const mitk::DataTreeFilter::Item* removedItem = event.GetChangedItem();
+
+    // removedItem will be removed shortly, so do something clever now
+  }
+\endcode
+
+\section sectionMitkDataTreeFilterUndocumented Undocumented features
 */
 
 namespace mitk
@@ -292,6 +587,7 @@ namespace mitk
       // remember the most recently selected item
       //ItemPointer m_LastSelectedItem;
       Item* m_LastSelectedItem;
+      const mitk::DataTreeNode* firstNode;
   };
 
 

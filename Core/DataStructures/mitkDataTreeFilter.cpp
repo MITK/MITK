@@ -246,8 +246,7 @@ DataTreeFilter::DataTreeFilter(mitk::DataTreeBase* datatree)
   m_TreeAddConnection(0),
   m_TreePruneConnection(0),
   m_TreeRemoveConnection(0),
-  m_LastSelectedItem(NULL),
-  firstNode(0)
+  m_LastSelectedItem(NULL)
 {
   //SetFilter( &mitk::IsDataTreeNode );
   SetFilter( &mitk::IsImage );
@@ -301,15 +300,12 @@ DataTreeFilter::~DataTreeFilter()
 
 void DataTreeFilter::ConstrainToNodeAndChildren(const mitk::DataTreeNode* node)
 {
-  if (!firstNode) firstNode = node;
   m_RootNode = node;
   GenerateModelFromTree();
 }
  
 bool DataTreeFilter::IsWithinConstrains( mitk::DataTreeIteratorClone nodeIter )
 {
-if (m_RootNode != firstNode)
-std::cout << "rootnode changed" << std::endl;
   if ( m_RootNode != 0 && nodeIter.IsNotNull() && m_DataTree != 0)
   {
     if ( nodeIter->Get() == m_RootNode ) return true;

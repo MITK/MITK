@@ -630,7 +630,6 @@ namespace mitk
       // remember the most recently selected item
       //ItemPointer m_LastSelectedItem;
       Item* m_LastSelectedItem;
-      const mitk::DataTreeNode* firstNode;
   };
 
 

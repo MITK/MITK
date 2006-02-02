@@ -76,9 +76,18 @@ namespace mitk {
       
     value = s;
 
-    if(name==FILENAME)
-      value = itksys::SystemTools::CollapseFullPath(s.c_str(), m_FileName.c_str());
+    if(name==FILENAME){
+      std::string xmlFilePath = itksys::SystemTools::GetProgramPath(m_FileName.c_str());
+      value = itksys::SystemTools::CollapseFullPath(s.c_str(), xmlFilePath.c_str());
 
+      // insert a "/" after ":"  necessary for windows when source file and xml file stored on different devices "c:abc"->"c:/abc"
+      int e0 = value.find(":");
+      if(e0 != std::string::npos){
+        int e1 = value.find("/", e0);
+        if((e1 != std::string::npos)&&(e1 > e0+1))
+          value.insert(e0+1, "/");
+      }
+    }
     return true;
   }
   
@@ -168,8 +177,23 @@ namespace mitk {
   }
   bool XMLReader::GetAttribute( std::string name, mitk::Point4D& value ) const
   {
-    // @todo: implementation
-    return false;
+    std::string string;
+
+    if ( !GetAttribute( name, string ) )
+      return false;
+
+    int e0 = string.find( "[" );
+    int e1 = string.find( ",", e0 + 1 );
+    int e2 = string.find( ",", e1 + 1 );
+    int e3 = string.find( ",", e2 + 1 );
+    int e4 = string.find( "]", e3 + 1 );
+
+    value[0] = (mitk::Point4D::ValueType) atof( string.substr( e0 + 1, e1 ).c_str() );
+    value[1] = (mitk::Point4D::ValueType) atof( string.substr( e1 + 1, e2 - e1 - 1).c_str() );
+    value[2] = (mitk::Point4D::ValueType) atof( string.substr( e2 + 1, e3 - e2 - 1).c_str() );
+    value[3] = (mitk::Point4D::ValueType) atof( string.substr( e3 + 1, e4 - e3 ).c_str() );
+
+    return true;
   }
 
 

@@ -90,7 +90,7 @@ namespace mitk{
     /// gets the data as a itk::Point of the specified XML attribute
     bool GetAttribute( std::string name, itk::Point<int,3>& value ) const;
 
-    /// todo
+    /// gets the data as a mitk::Point4D of the specified XML attribute
     bool GetAttribute( std::string name, mitk::Point4D& value ) const;
 
     /// gets the data of the specified XML attribute

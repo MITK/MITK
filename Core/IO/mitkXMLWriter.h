@@ -14,7 +14,9 @@ namespace mitk{
   //##
   //## Derived class of BaseXMLWriter.
   //## The data is stored with XML attributes.
-  //## The functions WriteProperty() are used to write XML attributes. The first parameter specifies the name of the attribute. The second parameter holds the data of the attribute.
+  //## Function BeginNode() writes a XML node.
+  //## The functions WriteProperty() are used to write XML attributes.
+  //## Function EndNode() closes an open XML node tag.
   //## @ingroup IO
   class XMLWriter : public BaseXMLWriter {
 
@@ -24,6 +26,7 @@ namespace mitk{
     std::string m_FilenameAndSubFolder;
     int m_FileCounter;
     bool m_SaveSourceFiles;
+    bool isNotPath;
     static std::string m_ImageExtension;
 
 
@@ -45,10 +48,10 @@ namespace mitk{
     typedef itk::RGBPixel<vtkFloatingPointType> Color;
 
     /// writes a XML attribute that datatype is a const char*
-    void WriteProperty( const std::string& key, const char* value ) const;
+    void WriteProperty( const std::string& key, const char* value );
 
-    /// writes a XML attribute that datatype is a const std::string&
-    void WriteProperty( const std::string& key, const std::string& value ) const;
+    /// Writes a XML attribute that datatype is a const std::string&. Parameter key specifies the name of the attribute. Parameter value represents the data of the attribute.
+    void WriteProperty( const std::string& key, const std::string& value );
 
     /// writes a XML attribute that datatype is an integer
     void WriteProperty( const std::string& key, int value ) const;
@@ -80,20 +83,23 @@ namespace mitk{
     /// writes a XML attribute that datatype is a Color (RGB)
     void WriteProperty( const std::string& key, Color value ) const;
 
-    /// sets the filename of a source file that will be written in the XML file
+    /// sets the filename of a source file
     void SetSourceFileName( const char* sourceFileName);
    
-    /// sets the subfolder of the source files that will be written in the XML file 
+    /// sets the subfolder of the source files
     void SetSubFolder( const char* subFolder );
 
-    /// returns the subfolder of the source files that will be written in the XML file 
+    /// returns the subfolder of the source files 
     const char* GetSubFolder();
    
-    /// returns a new unique filename in the subdirectory of the source file that will be written in the XML file
+    /// returns a new unique filename in the subdirectory of the source file
     const char* GetNewFileName();
     
-    /// returns the relative path (subfolder + filename) of the source file that will be written in the XML file
+    /// Returns the relative path (subfolder + filename) of the source file. The path of the source file is relative to the XML file.
     const std::string GetRelativePath();
+
+    /// Returns the absolute path (subfolder + filename) of the source file. 
+    const std::string GetAbsolutePath();
 
     /// sets the image file extension (e.g. .pic, .mhd)
     // .pic is default
@@ -108,12 +114,9 @@ namespace mitk{
     /// checks whether the source files will be written 
     bool SaveSourceFiles();
 
-    /// returns the absolute path of the source files. The path of the source files is written relative in the XML file
-    const std::string GetAbsolutePath();
-
   protected:
     /// returns the relative path
-    const std::string GetRelativePath(std::string sourcePath);
+    const std::string GetRelativePathAndFilename(std::string sourcePath);
 
   };
 }

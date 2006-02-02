@@ -70,6 +70,7 @@ void XMLWriter::WriteProperty( const std::string& key, const mitk::Vector3D& val
   BaseXMLWriter::WriteProperty( key, stream.str() );
 }
 
+
 void XMLWriter::WriteProperty( const std::string& key, const itk::Point<int,3> value ) const
 {
   std::stringstream stream;;
@@ -137,12 +138,13 @@ const std::string XMLWriter::GetRelativePath()
 
   if (m_SourceFileName != ""){
     m_FilenameAndSubFolder = m_SubFolder;
+    m_SourceFileName = itksys::SystemTools::GetFilenameWithoutExtension( m_SourceFileName );
     m_FilenameAndSubFolder += m_SourceFileName;
-    return GetRelativePath(m_FilenameAndSubFolder);
+    return GetRelativePathAndFilename(m_FilenameAndSubFolder);
   }
   else{
     newFilenameAndSubFolder += GetNewFileName();
-    return GetRelativePath(newFilenameAndSubFolder);
+    return GetRelativePathAndFilename(newFilenameAndSubFolder);
   }
   m_SourceFileName = "";
 }
@@ -171,7 +173,7 @@ bool XMLWriter::SaveSourceFiles()
   return m_SaveSourceFiles;
 }
 
-const std::string XMLWriter::GetRelativePath(std::string sourcePath)
+const std::string XMLWriter::GetRelativePathAndFilename(std::string sourcePath)
 { 
   // var declaration
   std::string relativePath;
@@ -189,7 +191,7 @@ const std::string XMLWriter::GetRelativePath(std::string sourcePath)
   //
 
   // get paths
-  const std::string xmlFilePath = GetXMLFileName();
+  const std::string xmlFilePath = GetXMLPathAndFileName();
   const std::string sourceFilePath = sourcePath;
 
   // get number of elements of the xmlFilePath
@@ -207,14 +209,17 @@ const std::string XMLWriter::GetRelativePath(std::string sourcePath)
     pos = sourceFilePath.find("/", pos+1);
   }
 
-  // the sourceFilePath contains only the file name 
-  if(sourceComps==0){
-    return sourceFilePath;
-  }
-
   // split paths into its components
   itksys::SystemTools::SplitPath(xmlFilePath.c_str(), xmlPathComponents);
   itksys::SystemTools::SplitPath(sourceFilePath.c_str(), sourcePathComponents);
+
+  // the sourceFilePath contains only the file name
+  // todo check wenn string leer!!!
+  if(sourceComps==0){
+    xmlPathComponents[xmlComps] = sourceFilePath;
+    m_FilenameAndSubFolder = itksys::SystemTools::JoinPath(xmlPathComponents);
+    return sourceFilePath;
+  }
 
   // get the position of the component that differs in both paths  
   int counter = 0;
@@ -226,13 +231,13 @@ const std::string XMLWriter::GetRelativePath(std::string sourcePath)
     ++counter;
   }
 
-  // sourceFilePath and xmlFilePath are equal or consist different devices
-  if(pathDiffPos<=0)
-    return sourceFilePath;
+  // sourceFilePath and xmlFilePath are equal  
+  if(pathDiffPos<0)
+    return sourcePathComponents[sourceComps];
 
   // calculate how many "../" have to add
-  if(pathDiffPos>0)
-    directoriesUp = (xmlComps - pathDiffPos)+1;
+  if(pathDiffPos>=0)
+    directoriesUp = (xmlComps - pathDiffPos);
 
   // setup of the relative path components
   relativePathComponents.resize(directoriesUp+(sourceComps-pathDiffPos)+2);
@@ -248,6 +253,14 @@ const std::string XMLWriter::GetRelativePath(std::string sourcePath)
   }
   relativePath = itksys::SystemTools::JoinPath(relativePathComponents);
 
+  // remove one "/" after ":"  necessary for windows when source file and xml file stored on different devices "://"->":/"
+  if(pathDiffPos==0){
+    int m_pos = relativePath.find(":");
+      if(m_pos!=std::string::npos)
+        relativePath.erase(m_pos+1, 1);
+    return relativePath;
+  }
+
   return relativePath;
 }
 
@@ -257,10 +270,32 @@ const std::string XMLWriter::GetAbsolutePath()
   return m_FilenameAndSubFolder;
 }
 
-void XMLWriter::WriteProperty( const std::string& key, const char* value ) const
-{ XMLWriter::BaseXMLWriter::WriteProperty( key, value ); }
-void XMLWriter::WriteProperty( const std::string& key, const std::string& value ) const
-{ XMLWriter::BaseXMLWriter::WriteProperty( key, value ); }
+
+void XMLWriter::WriteProperty( const std::string& key, const char* value )
+{ 
+  // todo independent implementation of the XML file
+  XMLWriter::BaseXMLWriter::WriteProperty( key, value ); 
+  std::string v;
+  v=value;
+  if(v=="path")
+    isNotPath = false;
+}
+
+/**
+  writes a XML attribute that datatype is a const string&
+
+  \ param key specifies the name of the attribute
+  \ param value represents the data of the attribute
+*/
+void XMLWriter::WriteProperty( const std::string& key, const std::string& value )
+{
+  // todo independent implementation of the XML file
+  XMLWriter::BaseXMLWriter::WriteProperty( key, value );
+  if((!isNotPath)&&(!SaveSourceFiles()))
+    SetSubFolder(value.c_str());
+  isNotPath = true;
+}
+
 void XMLWriter::WriteProperty( const std::string& key, int value ) const
 { XMLWriter::BaseXMLWriter::WriteProperty( key, value ); }
 void XMLWriter::WriteProperty( const std::string& key, float value ) const

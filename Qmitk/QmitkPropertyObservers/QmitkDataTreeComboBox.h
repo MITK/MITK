@@ -24,6 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vector>
 
 /// @brief Displays items of a mitk::DataTree
+/// @ingroup widgets
 class QmitkDataTreeComboBox : public QComboBox
 {
   Q_OBJECT;

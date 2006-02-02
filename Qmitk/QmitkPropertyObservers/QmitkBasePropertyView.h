@@ -22,6 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkProperties.h>
 #include <qlabel.h>
 
+/// @ingroup widgets
 class QmitkBasePropertyView : public QLabel, public mitk::PropertyView
 {
   Q_OBJECT

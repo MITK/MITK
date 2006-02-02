@@ -22,7 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkProperties.h>
 #include <qspinbox.h>
 
-/// @ingroup widgets
+/// @ingroup Widgets
 class QmitkNumberPropertyEditor : public QSpinBox, public mitk::PropertyEditor
 {
   Q_OBJECT

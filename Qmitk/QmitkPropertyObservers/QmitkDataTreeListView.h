@@ -24,7 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 /**
  @brief Displays items of a mitk::DataTreeFilter
- @ingroup widgets
+ @ingroup Widgets
 
  This class provides a view on a mitk::DataTreeFilter. It displays all the contained items, including
  the hierarchy and allows for multi-selections.

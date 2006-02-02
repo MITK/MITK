@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <QmitkBoolPropertyView.h>
 
-/// @ingroup widgets
+/// @ingroup Widgets
 class QmitkBoolPropertyEditor : public QmitkBoolPropertyView
 {
   Q_OBJECT

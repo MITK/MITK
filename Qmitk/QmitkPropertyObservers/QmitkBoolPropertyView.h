@@ -22,7 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkProperties.h>
 #include <qcheckbox.h>
 
-/// @ingroup widgets
+/// @ingroup Widgets
 class QmitkBoolPropertyView : public QCheckBox, public mitk::PropertyView
 {
   Q_OBJECT

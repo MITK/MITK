@@ -11,7 +11,7 @@ namespace mitk {
 
 
 BaseXMLWriter::BaseXMLWriter( const char* filename, int space )
-:m_Out(NULL), m_Increase(0), m_Space(space), m_NodeCount(0) , m_File(true), m_FirstNode(true), m_XMLFilename(filename)
+:m_Out(NULL), m_Increase(0), m_Space(space), m_NodeCount(0) , m_File(true), m_FirstNode(true), m_XMLPathAndFilename(filename)
 
 {		
 	m_Out = new std::ofstream( filename );			
@@ -38,7 +38,11 @@ BaseXMLWriter::~BaseXMLWriter()
 	}
 }
 
+/**
+  begins a new XML node
 
+  \ param name specifies the name of the XML node
+*/
 void BaseXMLWriter::BeginNode( const std::string& name ) 
 {		
 	if ( m_FirstNode ) 
@@ -74,7 +78,12 @@ void BaseXMLWriter::EndNode( )
   }
 }
 
+/**
+  writes a XML attribute that datatype is a const char*
 
+  \ param key specifies the name of the attribute
+  \ param value represents the data of the attribute
+*/
 void BaseXMLWriter::WriteProperty( const std::string& key, const char* value ) const
 {
   std::ostream& stream = m_Stack.top()->GetPropertyStream();
@@ -229,9 +238,9 @@ void BaseXMLWriter::StreamNode::Write( std::ostream& out, int steps )
 }
 
 
-const std::string BaseXMLWriter::GetXMLFileName()
+const std::string BaseXMLWriter::GetXMLPathAndFileName()
 {
-  return m_XMLFilename;
+  return m_XMLPathAndFilename;
 }
 
 } // namespace mitk

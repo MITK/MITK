@@ -31,6 +31,12 @@ class QCheckBox;
 class QLineEdit;
 class QToolButton;
 
+//##Documentation
+//## @brief QmitkSaveProjectWidget class for storing a project. 
+//##
+//## Class QmitkSaveProjectWidget represents a dialog for storing a project.
+//## Items (nodes of the datatree) can be selected to store.
+//## @ingroup Widgets
 class QmitkSaveProjectWidget : public QWidget
 {
   Q_OBJECT
@@ -40,35 +46,36 @@ class QmitkSaveProjectWidget : public QWidget
     QmitkSaveProjectWidget(mitk::DataTree::Pointer dataTree, QWidget* parent, const char* name = 0);
 
     virtual ~QmitkSaveProjectWidget();
-    //void QmitkSaveProjectWidget::WriteSelectedItems(const mitk::DataTreeFilter::ItemList*, mitk::XMLWriter&);   
  
   public slots:
     
-    // opens the save dialog and calls the function to write the XML file
+    /// opens the save dialog and calls the function to write the XML file
     void Save();
 
-    // opens a dialog to set the directory of the source files
+    /// opens a dialog to set the directory of the source files
     void ChooseSourceFolder();
-
-    void SetEditable(int state);
     
   protected:
     void PrepareDataTreeFilter();
 
-    // sets the layout of the QmitkSaveProjectWidget
+    /// sets the layout of the QmitkSaveProjectWidget
     void SetLayout();
     
+    /// connects signals and slots
     void AddConnections();
 
-    // starts the xmlWriter
+    /// starts the xmlWriter
     void TryToExportTree(QString);
     
-    // writes the selected nodes of the datatree to the XML file
+    /// writes the selected nodes of the datatree to the XML file
     void WriteSelectedItems(const mitk::DataTreeFilter::ItemList*, mitk::XMLWriter&);
+    
+    /// sets elements (folderChooseButton, folderLineEdit, treelistview) of the GUI editable
+    void SetEditable(int state);
 
   private:
-    // replaces white spaces with "_"
-    std::string ReplaceWhiteSpacesAndRemoveFileExtension(std::string);
+    /// replaces white spaces with "_"
+    std::string ReplaceWhiteSpaces(std::string);
 
     mitk::DataTree::Pointer m_DataTree;
 

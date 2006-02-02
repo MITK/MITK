@@ -74,8 +74,7 @@ void QmitkSaveProjectWidget::SetLayout()
 
   vertical->insertLayout(1, horizontal);
 
-  treelistview = new QmitkDataTreeListView(tree_filter, this);
-  //treelistview->setStretchedColumn(2); 
+  treelistview = new QmitkDataTreeListView(tree_filter, this); 
   vertical->addWidget( treelistview );
 
   saveButton = new QPushButton("Save", this);
@@ -101,13 +100,9 @@ void QmitkSaveProjectWidget::Save()
 
   if ( !filename.isEmpty() ) {
       TryToExportTree(filename);
-      std::cout<<filename.ascii()<<std::endl;
+      //std::cout<<filename.ascii()<<std::endl;
       this->close();
-  } //else {
-      //statusBar()->message( "Saving aborted", 2000 );
-  //}
-//std::cout<<filename.ascii()<<std::endl;
-
+  }
 }
 
 
@@ -163,7 +158,7 @@ void QmitkSaveProjectWidget::WriteSelectedItems(const mitk::DataTreeFilter::Item
         if (m_Property){
           sourceFileName = m_Property->GetValueAsString();
           if (sourceFileName != "") 
-            sourceFileName = ReplaceWhiteSpacesAndRemoveFileExtension(sourceFileName);
+            sourceFileName = ReplaceWhiteSpaces(sourceFileName);
         }
         xmlWriter.SetSourceFileName(sourceFileName.c_str());
         //
@@ -192,8 +187,6 @@ void QmitkSaveProjectWidget::TryToExportTree(QString filename)
   
   items = tree_filter->GetItems();
   
-  //std::ofstream os(filename);
-  //mitk::XMLWriter xmlWriter( os );
   mitk::XMLWriter xmlWriter(filename.ascii());
 
   xmlWriter.SetSaveSourceFiles(sourceCheckBox->isChecked());
@@ -216,14 +209,13 @@ QmitkSaveProjectWidget::~QmitkSaveProjectWidget()
   m_DataTree = 0;
 }
 
-std::string QmitkSaveProjectWidget::ReplaceWhiteSpacesAndRemoveFileExtension(std::string string) 
+std::string QmitkSaveProjectWidget::ReplaceWhiteSpaces(std::string string) 
 {
   int pos = string.find(" ");
   while (pos != string.npos){
     string.replace(pos, 1, "_");
     pos = string.find(" ");
-  }
-  
+  }  
   //int e0 = string.find(".");
   //return string.substr(0, e0).c_str();
   return string;

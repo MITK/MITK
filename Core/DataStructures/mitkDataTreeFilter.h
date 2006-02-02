@@ -34,6 +34,28 @@
   Before reading this, you should know the following classes: 
   DataTree, DataTreeNode,  DataTreeIteratorBase, BaseProperty, itk::Event.
 
+  Available sections:
+  <ul>
+  <li> \ref sectionMitkDataTreeFilterOverview
+  <li> \ref sectionMitkDataTreeFilterUsage 
+    <ul>
+    <li> \ref sectionMitkDataTreeFilterUsage1
+      <ul>
+      <li> \ref sectionMitkDataTreeFilterUsage11
+      <li> \ref sectionMitkDataTreeFilterUsage12
+      <li> \ref sectionMitkDataTreeFilterUsage13
+      <li> \ref sectionMitkDataTreeFilterUsage14
+      <li> \ref sectionMitkDataTreeFilterUsage15
+      </ul>
+    <li> \ref sectionMitkDataTreeFilterUsage2
+      <ul>
+      <li> \ref sectionMitkDataTreeFilterUsage21
+      <li> \ref sectionMitkDataTreeFilterUsage22
+      </ul>
+    </ul>
+  <li> \ref sectionMitkDataTreeFilterUndocumented 
+  </ul>
+  
   \section sectionMitkDataTreeFilterOverview Overview 
 
   This class is intended to provide a ready-to-use model of the data tree,
@@ -346,7 +368,14 @@
   }
 \endcode
 
-\section sectionMitkDataTreeFilterUndocumented Undocumented features
+\section sectionMitkDataTreeFilterUndocumented Untold stories 
+
+  - What is the role of BasePropertyAccessor?
+  - What happens if you provide empty lists of visible and editable properties?
+  - Why all this const/non-const fuss?
+  - Why did nobody remove EXTENDED_SELECT? It is not implemented! It's only an idea.
+  - Has anybody ever tested GetSelectedItems?
+
 */
 
 namespace mitk

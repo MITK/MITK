@@ -53,7 +53,7 @@ public:
   const mitk::Surface * GetInput(void);
 
   //##ModelId=3EF18053039D
-  virtual void Paint(mitk::BaseRenderer * renderer);
+  virtual void Paint(BaseRenderer * renderer);
 
   //##Documentation
   //## @brief The Surface to map can be explicitly set by this method. If
@@ -68,7 +68,10 @@ public:
   //## @sa SetSurface
   itkGetConstObjectMacro(Surface, Surface);
 
-  void PaintCells(vtkPolyData* contour, const Geometry2D* worldGeometry, const DisplayGeometry* displayGeometry, vtkLinearTransform * vtktransform, vtkLookupTable *lut = NULL);
+  // overwritten to initialize lookup table for point scalar data
+ void SetDataTreeNode( DataTreeNode::Pointer node );
+
+  void PaintCells(vtkPolyData* contour, const Geometry2D* worldGeometry, const DisplayGeometry* displayGeometry, vtkLinearTransform * vtktransform, vtkLookupTable *lut = NULL, bool useCellData=false);
 protected:
   //##ModelId=3EF180540006
   SurfaceMapper2D();

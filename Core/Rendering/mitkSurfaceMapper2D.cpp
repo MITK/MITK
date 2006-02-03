@@ -69,6 +69,50 @@ const mitk::Surface *mitk::SurfaceMapper2D::GetInput(void)
   return static_cast<const mitk::Surface * > ( GetData() );
 }
 
+void mitk::SurfaceMapper2D::SetDataTreeNode( mitk::DataTreeNode::Pointer node )
+{
+  this->m_DataTreeNode = node;
+
+  bool useCellData;
+  if (dynamic_cast<mitk::BoolProperty *>(node->GetProperty("useCellDataForColouring").GetPointer()) == NULL)
+    useCellData = false;
+  else
+    useCellData = dynamic_cast<mitk::BoolProperty *>(node->GetProperty("useCellDataForColouring").GetPointer())->GetValue();
+
+  if (!useCellData)
+  {
+    // search min/max point scalars over all time steps
+    double dataRange[2] = {0,0};
+    mitk::Surface::Pointer input  = const_cast<mitk::Surface*>(this->GetInput());
+    if(input.IsNull()) return;
+    const TimeSlicedGeometry* inputTimeGeometry = input->GetTimeSlicedGeometry();
+    if(( inputTimeGeometry == NULL ) || ( inputTimeGeometry->GetTimeSteps() == 0 ) ) return;
+    for (int timestep=0; timestep<inputTimeGeometry->GetTimeSteps(); timestep++)
+    {
+      vtkPolyData * vtkpolydata = input->GetVtkPolyData( timestep );
+      if((vtkpolydata==NULL) || (vtkpolydata->GetNumberOfPoints() < 1 )) continue;
+      vtkDataArray *vpointscalars = vtkpolydata->GetPointData()->GetScalars();
+      if (vpointscalars) {
+        double range[2];
+        vpointscalars->GetRange( range, 0 );
+        if (dataRange[0]==0 && dataRange[1]==0) {
+          dataRange[0] = range[0];
+          dataRange[1] = range[1];
+        }
+        else {
+          if (range[0] < dataRange[0]) dataRange[0] = range[0];
+          if (range[1] > dataRange[1]) dataRange[1] = range[1];
+        }
+      }
+    }
+    if (dataRange[1] - dataRange[0] > 0) {
+      m_LUT->SetTableRange( dataRange );
+      m_LUT->Build();
+    }
+  }
+}
+
+
 //##ModelId=3EF18053039D
 void mitk::SurfaceMapper2D::Paint(mitk::BaseRenderer * renderer)
 {
@@ -140,7 +184,7 @@ void mitk::SurfaceMapper2D::Paint(mitk::BaseRenderer * renderer)
         AbstractTransformGeometry::ConstPointer surfaceAbstractGeometry = dynamic_cast<const AbstractTransformGeometry*>(input->GetTimeSlicedGeometry()->GetGeometry3D(0));
         if(surfaceAbstractGeometry.IsNotNull()) //@todo substitude by operator== after implementation, see bug id 28
         {
-          PaintCells(vtkpolydata, worldGeometry, renderer->GetDisplayGeometry(), vtktransform, (useCellData ? m_LUT : NULL));
+          PaintCells(vtkpolydata, worldGeometry, renderer->GetDisplayGeometry(), vtktransform, m_LUT, useCellData);
           return;
         }
         else
@@ -189,24 +233,27 @@ void mitk::SurfaceMapper2D::Paint(mitk::BaseRenderer * renderer)
     ApplyProperties(renderer);
 
     // travers the cut contour
-    PaintCells(m_Cutter->GetOutput(), worldGeometry, renderer->GetDisplayGeometry(), vtktransform, (useCellData ? m_LUT : NULL));
+    PaintCells(m_Cutter->GetOutput(), worldGeometry, renderer->GetDisplayGeometry(), vtktransform, m_LUT, useCellData );
   }
 }
 
-void mitk::SurfaceMapper2D::PaintCells(vtkPolyData* contour, const mitk::Geometry2D* worldGeometry, const mitk::DisplayGeometry* displayGeometry, vtkLinearTransform * vtktransform, vtkLookupTable *lut)
+void mitk::SurfaceMapper2D::PaintCells(vtkPolyData* contour, const mitk::Geometry2D* worldGeometry, const mitk::DisplayGeometry* displayGeometry, vtkLinearTransform * vtktransform, vtkLookupTable *lut, bool useCellData)
 {
   vtkPoints    *vpoints = contour->GetPoints();
-  vtkCellArray *vpolys  = contour->GetLines();
+  vtkDataArray *vpointscalars = contour->GetPointData()->GetScalars();
 
-  vtkCellData * vcelldata    = contour->GetCellData();
-  vtkDataArray* vcellscalars = vcelldata->GetScalars();
+  vtkCellArray *vlines  = contour->GetLines();
+  vtkDataArray* vcellscalars = contour->GetCellData()->GetScalars();
 
-  int i,numberOfCells=vpolys->GetNumberOfCells();
+  Point3D p; Point2D p2d, last;
+  int i, j;
+  int numberOfLines = vlines->GetNumberOfCells();
 
-  Point3D p; Point2D p2d, last, first;
+  glLineWidth( m_LineWidth );
+  glBegin (GL_LINES);
 
-  vpolys->InitTraversal();
-  for(i=0;i<numberOfCells;++i)
+  vlines->InitTraversal();
+  for(i=0;i<numberOfLines;++i)
   {
     int *cell, cellSize;
 #if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
@@ -215,7 +262,7 @@ void mitk::SurfaceMapper2D::PaintCells(vtkPolyData* contour, const mitk::Geometr
     float vp[3];
 #endif
 
-    vpolys->GetNextCell(cellSize, cell);
+    vlines->GetNextCell(cellSize, cell);
 
     vpoints->GetPoint(cell[0], vp);
     //take transformation via vtktransform into account 	 
@@ -227,10 +274,9 @@ void mitk::SurfaceMapper2D::PaintCells(vtkPolyData* contour, const mitk::Geometr
 
     //convert point (until now mm and in worldcoordinates) to display coordinates (units )
     displayGeometry->WorldToDisplay(p2d, p2d);
-    first=last=p2d;
+    last=p2d;
 
-    int j;
-    for(j=1;j<cellSize;++j)
+    for(j=1; j<cellSize; ++j)
     {
       vpoints->GetPoint(cell[j], vp);
       //take transformation via vtktransform into account 	 
@@ -243,29 +289,32 @@ void mitk::SurfaceMapper2D::PaintCells(vtkPolyData* contour, const mitk::Geometr
       //convert point (until now mm and in worldcoordinates) to display coordinates (units )
       displayGeometry->WorldToDisplay(p2d, p2d);
 
-      glLineWidth( m_LineWidth );
-
-      if (lut != NULL) 
-      {  // color each cell according to cell data
-
-        vtkFloatingPointType color[3];
-
-        if (vcellscalars != NULL )
-        {
-          vcellscalars->GetComponent(i,0);
-          lut->GetColor( vcellscalars->GetComponent(i,0),color);
-          glColor3f(color[0],color[1],color[2]);
-        }
+      vtkFloatingPointType color[3];
+      if (useCellData && vcellscalars != NULL )
+      {
+        // color each cell according to cell data
+        lut->GetColor( vcellscalars->GetComponent(i,0),color);
+        glColor3f(color[0],color[1],color[2]);
+        glVertex2f(last[0], last[1]);
+        glVertex2f(p2d[0], p2d[1]);
       }
-      //draw the line
-      glBegin (GL_LINE_LOOP);
-
-      glVertex2f(last[0], last[1]);
-      glVertex2f(p2d[0], p2d[1]);
-      glVertex2f(last[0], last[1]);
-      glEnd ();
-      glLineWidth(1.0);
+      else if (vpointscalars != NULL )
+      {
+        lut->GetColor( vpointscalars->GetComponent(cell[j-1],0),color);
+        glColor3f(color[0],color[1],color[2]);
+        glVertex2f(last[0], last[1]);
+        lut->GetColor( vpointscalars->GetComponent(cell[j],0),color);
+        glColor3f(color[0],color[1],color[2]);
+        glVertex2f(p2d[0], p2d[1]);
+      }
+      else {
+        glVertex2f(last[0], last[1]);
+        glVertex2f(p2d[0], p2d[1]);
+      }
       last=p2d;
     }
   }
+
+  glEnd ();
+  glLineWidth(1.0);
 }

@@ -32,7 +32,7 @@
   \brief Provides a filtered view on the data tree, useful as basis for GUI elements.
     
   Before reading this, you should know the following classes: 
-  DataTree, DataTreeNode,  DataTreeIteratorBase, BaseProperty, itk::Event.
+  DataTree, DataTreeNode,  itk::TreeIteratorBase, BaseProperty, itk::Event.
 
   Available sections:
   <ul>
@@ -82,9 +82,9 @@
         
     - In many cases you will want to display some properties for each node of the
       (filtered) data tree. For this end, this class holds <b>two lists to tell GUI classes
-      which properties to display and which to make editable</b>. Toghether with the
+      which properties to display and which to make editable</b>. Together with the
       derivations of PropertyObserver, this allows to implement GUI classes that can 
-      display a whole range of information.
+      display a whole range of different information on tree nodes.
 
     - To keep clients / GUI elements in sync with the model of the data tree, the
       tree filter uses the <b>ITK event mechanism to notify about changes</b>.
@@ -96,21 +96,19 @@
     - you need two lists of images and a user should be able to select an image in both
       independently. This is the motivation for keeping the selection status within the
       items and not in a property of the DataTreeNodes.
-    - you want to display color and name of all bounding objects in your data tree.
-    - you don't want to display all bounding objects in your data tree, but you simply
-      need a list of them all, e.g. for an Interactor that wants to determine the object
-      under the mouse cursor.
+    - you want to display color and name of all segmentations in your data tree.
+    - you need a list of all children of an image that are also segmentations, e.g. for an 
+      Interactor that wants to determine the object under the mouse cursor.
     - you want to save parts the data tree, but only nodes that actually contain data
-    - ...
   
   \image html doc_mitkDataTreeFilterRelatedClasses.png Relations of the DataTreeFilter to other classes.
   \image latex doc_mitkDataTreeFilterRelatedClasses.eps Relations of the DataTreeFilter to other classes.
 
-  The above image illustrates the relationship between the MITK data tree, the
+  The above diagram illustrates the relationship between the MITK data tree, the
   DataTreeFilter and its clients. The most important observation is, that <i>the filter does
   not destroy or modify the data tree</i>. It doesn't even change a single property of any
   tree node. The filter simply provides a representation that is more suitable to GUI classes than
-  is a tree iterator. The client gets a list (actually a STL list) of so called items,
+  is a tree iterator. The client gets a list of so called items,
   where <i>each Item is something like a convenience pointer to a DataTreeNode</i>.
   You can ask items to return the node's properties, if you need it
   you can get the bare tree node, and you can (un)select items.
@@ -118,7 +116,7 @@
 
   \section sectionMitkDataTreeFilterUsage Usage examples
  
-  This section will discuss some code blocks that are commonly needed to work with the
+  This section will discuss some code blocks that are commonly needed when working with the
   DataTreeFilter. For the whole truth, have a look at the implementation of
   (recommended order)
   DataTreeFilter, QmitkDataTreeComboBox, and QmitkDataTreeListView.
@@ -132,8 +130,8 @@
   
   This sections tells you how to prepare a DataTreeFilter. If you are a user of the MITK
   library, this will most probably the only thing you have to do with this class. There
-  are GUI classes which will take the set up filter and display its information, but the
-  internals of how they do that need not worry you.
+  are GUI classes which will take the prepared filter and display its information, but the
+  internals of how they process this information need not worry you.
   
   \subsubsection sectionMitkDataTreeFilterUsage11 Creating a data tree filter
 
@@ -151,27 +149,29 @@
 \endcode
 
   This will create a default filter that matches any mitk::Image in the tree. It will tell
-  clients to display the "name" property of each image. After calling the constructor, the
-  filter is ready to be used.
+  clients to display the "name" property of each image. 
+  After calling the constructor, the filter is ready to be used.
   
   \subsubsection sectionMitkDataTreeFilterUsage12 Installing a different filter function
 
   If you want to access not only images, you have to assign a different filter function. A
-  filter function must be able to return a bool for each DataTreeNode it is shown. The
-  default filter IsImage is defined like this:
+  filter function must be able to return a bool for each DataTreeNode it is shown, i.e. 
+  it must conform to the type DataTreeFilter::FilterFunctionPointer.
+  The default filter IsImage is defined like this:
 
 \code
   namespace mitk
   {
     bool IsImage(mitk::DataTreeNode* node)
     {
-      return ( node!= 0 && node->GetData() && dynamic_cast<mitk::Image*>( node->GetData() ) );
+      return (   node                                               // not a NULL pointer
+              && node->GetData()                                    // data in this node is not NULL either
+              && dynamic_cast<mitk::Image*>( node->GetData() ) );   // AND data is an mitk::Image (of some kind)
     }
   }
 \endcode
 
   Define your own filter functions to suit your needs and install them via SetFilter().
-  The filter functions must conform to the type DataTreeFilter::FilterFunctionPointer.
   
 \code
   treeFilter->SetFilter( &mitk::IsImage );
@@ -199,11 +199,14 @@
           request is executed.
     <li> PRESERVE_HIERARCHY: items will have the same hierarchy as the data tree. If some
           nodes in the hierarchy do not match the filter function, children of those nodes
-          will move up the hierarchy and become children of the first node (looking
-          bottom-to-top) that matches the filter.
+          will move up the hierarchy and become children of the first node that matches
+          the filter (see diagram below).
     <li> FLATTEN_HIERARCHY: hierarchy will be destroyed. The order of items will be that
-          of a preorder traversing.
+          of a preorder traversal.
   </ul> 
+  
+  \image html doc_mitkDataTreeFilterHierarchyHandling.png How hierarchy is handled when not all nodes match a filter: nodes move up the tree structure until there is a possible parent.
+  \image latex doc_mitkDataTreeFilterHierarchyHandling.eps How hierarchy is handled when not all nodes match a filter: nodes move up the tree structure until there is a possible parent.
 
   \subsubsection sectionMitkDataTreeFilterUsage14 Telling GUI classes what properties to display
 

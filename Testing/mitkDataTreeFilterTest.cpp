@@ -65,6 +65,11 @@ class Test
           data_tree = NULL;
           data_tree = mitk::DataTree::New();
           tree_filter = mitk::DataTreeFilter::New(data_tree);
+          // change from default to "pass nearly all" filter
+          tree_filter->SetFilter( &mitk::IsDataTreeNode );
+          // change from visible props default "name" to nothing
+          mitk::DataTreeFilter::PropertyList visible_props;
+          tree_filter->SetVisibleProperties(visible_props);
           break;
         }
         case -2: {

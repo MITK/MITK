@@ -71,7 +71,7 @@ const mitk::Surface *mitk::SurfaceMapper2D::GetInput(void)
 
 void mitk::SurfaceMapper2D::SetDataTreeNode( mitk::DataTreeNode::Pointer node )
 {
-  this->m_DataTreeNode = node;
+  Superclass::SetDataTreeNode( node );
 
   bool useCellData;
   if (dynamic_cast<mitk::BoolProperty *>(node->GetProperty("useCellDataForColouring").GetPointer()) == NULL)

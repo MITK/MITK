@@ -23,22 +23,95 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QmitkDataTreeListViewExpander.h>
 
 /**
- @brief Displays items of a mitk::DataTreeFilter
+ @brief Displays hierarchical items of a DataTreeFilter
  @ingroup Widgets
 
- This class provides a view on a mitk::DataTreeFilter. It displays all the contained items, including
+ \section sectionQmitkDataTreeListViewOverview Overview
+ 
+ This class provides a graphical view of a DataTreeFilter. It displays all the contained items, including
  the hierarchy and allows for multi-selections.
 
+ \section sectionQmitkDataTreeListViewUsage Usage
+
+ There are two principal ways to initialize this class. Either you create a
+ DataTreeFilter and then tell the QmitkDataTreeListView about it, or you let the
+ view itself create a tree filter by giving it a pointer to the data tree. You
+ can always access (and modify) the underlying DataTreeFilter through
+ GetFilter().
+
+ \subsection sectionQmitkDataTreeListViewInit1Initialization 1: using a ready-made DataTreeFilter
+
+ \e You own both the tree filter and the view widget:
+\code
+  mitk::DataTreeFilter* treeFilter = bar();  // see documentation of DataTreeFilter 
+                                            //  on how to configure this class
+
+  if ( ) // you are just creating your widgets
+  {
+    QmitkDataTreeListView* listView = new QmitkDataTreeFilter(treeFilter, this); // create a new Qt widget
+  }
+  else   // widgets already exists
+  {
+    listView->SetFilter( treeFilter );
+  }
+\endcode
+ 
+ \subsection sectionQmitkDataTreeListViewInit2 Initialization 2: implicit creation of a DataTreeFilter
+
+ You own the view widget, the view widget own the tree filter:
+\code
+  if ( ) // you are just creating your widgets
+  {
+    QmitkDataTreeListView* listView = new QmitkDataTreeFilter( GetDataTree(), this); // create a new Qt widget
+  }
+  else   // widgets already exists
+  {
+    listView->SetDataTree( GetDataTree() );
+  }
+\endcode
+ 
+ \subsection sectionQmitkDataTreeListViewInit3 Changing the "stretched" column
+
+ Oftenly there will be more space available for the widget than is actually
+ needed to display all items. When this happens, Qt enlarges with width of one of the
+ displayed columns to use more space, which is called stretching. By default, the right-most column is
+ strechted. 
+ In case you want to have another column stretched, use SetStretchedColumn() to do so.
+
+ \section sectionQmitkDataTreeListViewImplementation Implementation
+ \subsection sectionQmitkDataTreeListViewImplementation1 Synchronization with the tree filter
+
  All communication from the DataTreeFilter to this view is done via itk::Events. I.e. the QmitkDataTreeListView
- installs a handful of listeners on a given DataTreeFilter and reacts to changes.
+ installs a handful of listeners on a given DataTreeFilter and reacts to changes (see the ...Handler() methods).
 
  The only communication from this view to the DataTreeFilter is the selection state of single items. To change this,
  mitk::DataTreeFilter::Item::SetSelected() is called on the appropriate items.
 
- Initialization of a QmitkDataTreeView is done either through the constructor (if a data tree is available at the
- time you want to call the constructor), or through one of the methods SetDataTree(), SetFilter().
- 
- TODO a source code example on how to use this class should be added
+ \subsection sectionQmitkDataTreeListViewImplementation2 Layout of child widgets
+
+ QmitkDataTreeListView uses Qt derivations of mitk::PropertyView to display the
+ properties of single items. These derived classes are all QWidgets, so they
+ cannot be easily displayed in a QListView. Instead, this class does the layout
+ of its child widgets on its own, using a hierarchy of QGridLayouts.
+
+  To allow for maintenance of this class, the following paragraph sketches, how
+  the layout is done:
+
+  \image html doc_QmitkDataTreeListViewChildrenLayout.png Illustration of children layout
+  \image latex doc_QmitkDataTreeListViewChildrenLayout.eps Illustration of children layout
+
+  All top-level widgets are contained in one Gridlayout, one row per item.
+  For each displayed property of each item, one view widget is created. These
+  widgets are placed in the Gridlayout left-to-right, beginning with column 1(!).
+  Column zero is reserved for an expand/collapse icon of those items, that have
+  children.
+
+  When an item has children, a QmitkListViewExpanderIcon is inserted in column 0.
+  This expander icon owns and manages a newly created Gridlayout (green in the
+  diagram above), where observer widgets for the child items' properties are
+  placed. This placing of sub-GridLayouts is done recursively for all children
+  lists.
+
 */
 class QmitkDataTreeListView : public QWidget, public QmitkListViewItemIndex
 {

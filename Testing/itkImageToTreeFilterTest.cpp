@@ -21,6 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkImageToTreeFilter.h>
 #include <itkStartPointData.h>
 #include <itkTubeSegmentModel.h>
+#include <itkRegistrationModelXMLWriter.h>
 
 #include <mitkVesselTreeData.h>
 
@@ -53,6 +54,13 @@ typedef StartPointDataType::Pointer                 StartPointDataPointer;
 typedef itk::TubeSegmentModel<PixelType, DirectionType>
                                                     TubeSegmentModelType;
 typedef TubeSegmentModelType::Pointer               TubeSegmentModelPointer;
+
+typedef itk::RegistrationModel<PixelType, DirectionType>
+                                                    RegistrationModelType;
+
+typedef itk::RegistrationModelXMLWriter<RegistrationModelType>
+                                                    RegistrationModelWriterType;
+typedef RegistrationModelWriterType::Pointer        RegistrationModelWriterPointer;
 
 typedef std::list<int>                              ResultListType;
 
@@ -172,6 +180,19 @@ int testTubeSegmentModel()
   return EXIT_SUCCESS;
 }
 
+/****************************************************************
+ * TEST 4: XML Writer
+ ****************************************************************/
+int testRegistrationModelXMLWriter()
+{
+  std::cout << " *** Testing the RegistrationModelXMLWriter ***\n";
+  RegistrationModelWriterPointer modelWriter = RegistrationModelWriterType::New();
+
+  std::cout << " *** [TEST PASSED] ***\n";
+  return EXIT_SUCCESS;
+}
+
+
 
 int itkImageToTreeFilterTest(int, char* argv[] )
 {
@@ -184,6 +205,7 @@ int itkImageToTreeFilterTest(int, char* argv[] )
   resultList.push_back(testFilterContext());
   resultList.push_back(testInitFilter());
   resultList.push_back(testTubeSegmentModel());
+  resultList.push_back(testRegistrationModelXMLWriter());
 
   std::cout << " *** [ALL TESTS DONE] ***\n";
 

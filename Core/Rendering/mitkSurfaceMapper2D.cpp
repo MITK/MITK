@@ -82,7 +82,14 @@ void mitk::SurfaceMapper2D::SetDataTreeNode( mitk::DataTreeNode::Pointer node )
   if (!useCellData)
   {
     // search min/max point scalars over all time steps
-    double dataRange[2] = {0,0};
+    #if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
+      double dataRange[2] = {0,0};
+      double range[2];
+    #else
+      float dataRange[2] = {0,0};
+      float range[2];
+    #endif
+    
     mitk::Surface::Pointer input  = const_cast<mitk::Surface*>(this->GetInput());
     if(input.IsNull()) return;
     const TimeSlicedGeometry* inputTimeGeometry = input->GetTimeSlicedGeometry();
@@ -93,7 +100,6 @@ void mitk::SurfaceMapper2D::SetDataTreeNode( mitk::DataTreeNode::Pointer node )
       if((vtkpolydata==NULL) || (vtkpolydata->GetNumberOfPoints() < 1 )) continue;
       vtkDataArray *vpointscalars = vtkpolydata->GetPointData()->GetScalars();
       if (vpointscalars) {
-        double range[2];
         vpointscalars->GetRange( range, 0 );
         if (dataRange[0]==0 && dataRange[1]==0) {
           dataRange[0] = range[0];

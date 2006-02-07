@@ -24,6 +24,7 @@ namespace mitk{
     std::string m_SubFolder;
     std::string m_SourceFileName;
     std::string m_FilenameAndSubFolder;
+    std::string m_OriginPath;
     int m_FileCounter;
     bool m_SaveSourceFiles;
     bool isNotPath;
@@ -48,10 +49,10 @@ namespace mitk{
     typedef itk::RGBPixel<vtkFloatingPointType> Color;
 
     /// writes a XML attribute that datatype is a const char*
-    void WriteProperty( const std::string& key, const char* value );
+    void WriteProperty( const std::string& key, const char* value ) const;
 
     /// Writes a XML attribute that datatype is a const std::string&. Parameter key specifies the name of the attribute. Parameter value represents the data of the attribute.
-    void WriteProperty( const std::string& key, const std::string& value );
+    void WriteProperty( const std::string& key, const std::string& value ) const;
 
     /// writes a XML attribute that datatype is an integer
     void WriteProperty( const std::string& key, int value ) const;
@@ -113,6 +114,9 @@ namespace mitk{
 
     /// checks whether the source files will be written 
     bool SaveSourceFiles();
+
+    /// sets the origin path of the source file
+    void SetOriginPath(std::string originPath);
 
   protected:
     /// returns the relative path

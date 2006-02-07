@@ -290,7 +290,6 @@ bool mitk::Surface::ReadXMLData( XMLReader& xmlReader )
 
   try
   {
-    std::cout << fileName << std::endl;
     factory->SetFileName( fileName.c_str() );
     factory->Update();
     mitk::DataTreeNode::Pointer tmpNode = factory->GetOutput( 0 );

@@ -21,6 +21,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkXMLWriter.h>
 #include <mitkXMLReader.h>
 
+const char* mitk::StringProperty::PATH = "path";
+
 //##ModelId=3E3FF04F005F
 mitk::StringProperty::StringProperty( const char* string ) 
 : m_Value()

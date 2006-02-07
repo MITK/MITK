@@ -53,6 +53,8 @@ public:
   virtual bool WriteXMLData( XMLWriter& xmlWriter );
   //##
   virtual bool ReadXMLData( XMLReader& xmlReader );
+
+  static const char* PATH;
 };
 
 } // namespace mitk

@@ -259,11 +259,18 @@ void mitk::Geometry2DDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
     colorProperty = dynamic_cast<mitk::ColorProperty*>(
       this->GetDataTreeNode()->GetProperty("color").GetPointer( )
     );
-    
-    const mitk::Color& color = colorProperty->GetColor();
-    m_EdgeActor->GetProperty()->SetColor(
-      color.GetRed(), color.GetGreen(), color.GetBlue()
-    );
+
+    if ( colorProperty.IsNotNull() )
+    {
+      const mitk::Color& color = colorProperty->GetColor();
+      m_EdgeActor->GetProperty()->SetColor(
+        color.GetRed(), color.GetGreen(), color.GetBlue()
+      );
+    }
+    else
+    {
+      m_EdgeActor->GetProperty()->SetColor( 1.0, 1.0, 1.0 );
+    }
 
 
     // Apply properties read from the PropertyList

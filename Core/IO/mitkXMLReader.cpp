@@ -64,7 +64,7 @@ namespace mitk {
   }
 
 
-  bool XMLReader::GetAttribute( std::string name, std::string& value ) const
+  bool XMLReader::GetAttribute( std::string name, std::string& value )
   {
     if ( !m_CurrentNode )
       return false;
@@ -81,12 +81,14 @@ namespace mitk {
       value = itksys::SystemTools::CollapseFullPath(s.c_str(), xmlFilePath.c_str());
 
       // insert a "/" after ":"  necessary for windows when source file and xml file stored on different devices "c:abc"->"c:/abc"
-      int e0 = value.find(":");
+      std::string::size_type e0 = value.find(":");
       if(e0 != std::string::npos){
-        int e1 = value.find("/", e0);
+        std::string::size_type e1 = value.find("/", e0);
         if((e1 != std::string::npos)&&(e1 > e0+1))
           value.insert(e0+1, "/");
       }
+      m_SourceFilePath = itksys::SystemTools::GetProgramPath(value.c_str());
+      m_SourceFilePath += "/";
     }
     return true;
   }
@@ -157,7 +159,7 @@ namespace mitk {
   }
 
 
-  bool XMLReader::GetAttribute( std::string name, mitk::Point3D& value ) const
+  bool XMLReader::GetAttribute( std::string name, mitk::Point3D& value ) 
   {
     std::string string;
 
@@ -175,7 +177,7 @@ namespace mitk {
 
     return true;
   }
-  bool XMLReader::GetAttribute( std::string name, mitk::Point4D& value ) const
+  bool XMLReader::GetAttribute( std::string name, mitk::Point4D& value ) 
   {
     std::string string;
 
@@ -197,7 +199,7 @@ namespace mitk {
   }
 
 
-  bool XMLReader::GetAttribute( std::string name, mitk::Vector3D& value ) const
+  bool XMLReader::GetAttribute( std::string name, mitk::Vector3D& value ) 
   {
     mitk::Point3D point;
     GetAttribute( name, point );
@@ -208,7 +210,7 @@ namespace mitk {
   }
 
 
-  bool XMLReader::GetAttribute( std::string name, itk::Point<int,3>& value ) const
+  bool XMLReader::GetAttribute( std::string name, itk::Point<int,3>& value ) 
   {
     std::string string;
 
@@ -227,7 +229,7 @@ namespace mitk {
   }
 
 
-  bool XMLReader::GetAttribute( std::string name, mitk::AffineGeometryFrame3D::TransformType& value ) const
+  bool XMLReader::GetAttribute( std::string name, mitk::AffineGeometryFrame3D::TransformType& value ) 
   {
     AffineGeometryFrame3D::TransformType::MatrixType matrix;
     AffineGeometryFrame3D::TransformType::OffsetType offset;
@@ -265,7 +267,7 @@ namespace mitk {
   }
 
 
-  bool XMLReader::GetAttribute( std::string name, RGBAType& value ) const
+  bool XMLReader::GetAttribute( std::string name, RGBAType& value ) 
   {
     std::string string;
 
@@ -286,7 +288,7 @@ namespace mitk {
   }
 
 
-  bool XMLReader::GetAttribute( std::string name, Color& value ) const
+  bool XMLReader::GetAttribute( std::string name, Color& value ) 
   {
     std::string string;
 
@@ -552,6 +554,11 @@ namespace mitk {
       return NULL;
 
     return mitk::ObjectFactory::CreateObject( className );
+  }
+
+  std::string XMLReader::GetSourceFilePath()
+  {
+    return m_SourceFilePath;
   }
 
 } // namespace mitk

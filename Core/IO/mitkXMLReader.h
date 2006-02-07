@@ -67,7 +67,7 @@ namespace mitk{
     typedef itk::RGBPixel<vtkFloatingPointType> Color;
 
     /// gets the data as a string of the specified XML attribute
-    bool GetAttribute( std::string name, std::string& value ) const;
+    bool GetAttribute( std::string name, std::string& value ) ;
     
     /// gets the data as a float of the specified XML attribute
     bool GetAttribute( std::string name, float& value ) const;
@@ -82,25 +82,25 @@ namespace mitk{
     bool GetAttribute( std::string name, bool& value ) const;
 
     /// gets the data as a mitk::Point3D of the specified XML attribute
-    bool GetAttribute( std::string name, mitk::Point3D& value ) const;
+    bool GetAttribute( std::string name, mitk::Point3D& value ) ;
 
     /// gets the data as a mitk::Vector3D of the specified XML attribute
-    bool GetAttribute( std::string name, mitk::Vector3D& value ) const;
+    bool GetAttribute( std::string name, mitk::Vector3D& value ) ;
 
     /// gets the data as a itk::Point of the specified XML attribute
-    bool GetAttribute( std::string name, itk::Point<int,3>& value ) const;
+    bool GetAttribute( std::string name, itk::Point<int,3>& value ) ;
 
     /// gets the data as a mitk::Point4D of the specified XML attribute
-    bool GetAttribute( std::string name, mitk::Point4D& value ) const;
+    bool GetAttribute( std::string name, mitk::Point4D& value ) ;
 
     /// gets the data of the specified XML attribute
-    bool GetAttribute( std::string name, mitk::AffineGeometryFrame3D::TransformType& value ) const;
+    bool GetAttribute( std::string name, mitk::AffineGeometryFrame3D::TransformType& value ) ;
 
     /// gets the data as a RGBAType of the specified XML attribute
-    bool GetAttribute( std::string name, RGBAType& value ) const; 
+    bool GetAttribute( std::string name, RGBAType& value ) ; 
 
     /// gets the data as a RGBType of the specified XML attribute
-    bool GetAttribute( std::string name, Color& value ) const;
+    bool GetAttribute( std::string name, Color& value ) ;
 
     static const std::string DATA;
     static const std::string TREE_NODE;
@@ -130,6 +130,8 @@ namespace mitk{
     /// creates the object that is specified in the XML tag's attribute CLASS_NAME 
     itk::Object::Pointer CreateObject();
 
+    /// returns the path of the source file
+    std::string GetSourceFilePath();
 
   protected:
     void  StartElement (const char *elementName, const char **atts);
@@ -149,6 +151,8 @@ namespace mitk{
     mitk::DataTreeIteratorBase* m_CurrentPosition;
     
     std::string ReadXMLStringAttribut( std::string name, const char** atts) const;
+
+    std::string m_SourceFilePath;
 	};
 }
 #endif

@@ -54,6 +54,9 @@ class QmitkSaveProjectWidget : public QWidget
 
     /// opens a dialog to set the directory of the source files
     void ChooseSourceFolder();
+
+    /// sets elements (folderChooseButton, folderLineEdit, treelistview) of the GUI editable
+    void SetEditable(int state);
     
   protected:
     void PrepareDataTreeFilter();
@@ -69,9 +72,6 @@ class QmitkSaveProjectWidget : public QWidget
     
     /// writes the selected nodes of the datatree to the XML file
     void WriteSelectedItems(const mitk::DataTreeFilter::ItemList*, mitk::XMLWriter&);
-    
-    /// sets elements (folderChooseButton, folderLineEdit, treelistview) of the GUI editable
-    void SetEditable(int state);
 
   private:
     /// replaces white spaces with "_"

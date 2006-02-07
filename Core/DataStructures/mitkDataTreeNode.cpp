@@ -490,6 +490,8 @@ bool mitk::DataTreeNode::ReadXMLData( XMLReader& xmlReader )
     if ( m_PropertyList.IsNotNull() ) m_PropertyList->ReadXMLData( xmlReader );
     xmlReader.GotoParent();
   }
+  mitk::StringProperty::Pointer pathProp = new mitk::StringProperty( xmlReader.GetSourceFilePath() );
+  this->SetProperty( StringProperty::PATH, pathProp );
 
   if ( xmlReader.Goto( "mapperList" ) ) {
 

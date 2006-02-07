@@ -30,7 +30,7 @@ mitk::BaseProperty::Pointer mitk::PropertyList::GetProperty(const char *property
     
     it=m_Properties.find( propertyKey );
     if(it!=m_Properties.end() &&  it->second.second )
-	    return it->second.first;
+      return it->second.first;
     else 
         return NULL;
 }
@@ -49,14 +49,14 @@ void mitk::PropertyList::SetProperty(const char* propertyKey, BaseProperty* prop
         if( it->second.first == property) {
             // yes? do nothing and return.
             return;
-	}
+  }
         //no? erase the old entry.
         it->second.first=NULL;
         m_Properties.erase(it);
     }
 
     //no? add/replace it.
-	//std::pair<PropertyMap::iterator, bool> o=
+  //std::pair<PropertyMap::iterator, bool> o=
        PropertyMapElementType newProp;
        newProp.first = propertyKey;
        newProp.second = std::pair<BaseProperty::Pointer,bool>(property,true);
@@ -79,14 +79,14 @@ mitk::PropertyList::~PropertyList()
 unsigned long mitk::PropertyList::GetMTime() const
 {
     PropertyMap::const_iterator it = m_Properties.begin(), end = m_Properties.end();
-	for(;it!=end;++it)
-	{
-		if(Superclass::GetMTime()<it->second.first->GetMTime())
-		{
-			Modified();
-			break;
-		}
-	}
+  for(;it!=end;++it)
+  {
+    if(Superclass::GetMTime()<it->second.first->GetMTime())
+    {
+      Modified();
+      break;
+    }
+  }
     return Superclass::GetMTime();
 }
 //##ModelId=3EF1B0160286
@@ -128,20 +128,22 @@ void mitk::PropertyList::Clear()
 
 bool mitk::PropertyList::WriteXMLData( mitk::XMLWriter& xmlWriter ) 
 {
-	const mitk::PropertyList::PropertyMap* map = GetMap();
-	mitk::PropertyList::PropertyMap::const_iterator i = map->begin();
-	const mitk::PropertyList::PropertyMap::const_iterator end = map->end();	
+  const mitk::PropertyList::PropertyMap* map = GetMap();
+  mitk::PropertyList::PropertyMap::const_iterator i = map->begin();
+  const mitk::PropertyList::PropertyMap::const_iterator end = map->end(); 
 
-	while ( i != end ) {
+  while ( i != end ) {
     xmlWriter.BeginNode( (*i).second.first->GetXMLNodeName() );
     xmlWriter.WriteProperty( XMLIO::CLASS_NAME, typeid( *(*i).second.first ).name() );
     xmlWriter.WriteProperty( XMLReader::PROPERTY_KEY, (*i).first.c_str() );
     (*i).second.first->WriteXMLData( xmlWriter );
-		*i++;
+    if((*i).first==StringProperty::PATH)
+      xmlWriter.SetOriginPath((*i).second.first->GetValueAsString());
+    *i++;
     xmlWriter.EndNode();
-	}
+  }
 
-	return true;
+  return true;
 }
 
 bool mitk::PropertyList::ReadXMLData( XMLReader& xmlReader )

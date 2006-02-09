@@ -784,7 +784,8 @@ public:
 
     // Set the points on the vtk grid
     polydata->SetPoints(vpoints);
-    polydata->GetPointData()->SetScalars(scalars);
+    if (useScalarAccessor)
+      polydata->GetPointData()->SetScalars(scalars);
     polydata->GetPointData()->CopyAllOn();
 
 

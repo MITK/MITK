@@ -62,5 +62,5 @@ bool mitk::StringProperty::ReadXMLData( XMLReader& xmlReader )
 {
   xmlReader.GetAttribute( VALUE, m_Value );
   std::cout << "StringProperty: " << m_Value << std::endl;
-  return false;
+  return true;
 }

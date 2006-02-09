@@ -445,6 +445,18 @@ void mitk::MaterialProperty::InitializeStandardValues()
   m_Representation = Surface;
 }
 
+void mitk::MaterialProperty::Update()
+{
+  this->SetColor( this->GetColor() );
+  this->SetColorCoefficient( this->GetColorCoefficient() );
+  this->SetSpecularColor( this->GetSpecularColor() );
+  this->SetSpecularCoefficient( this->GetSpecularCoefficient() );
+  this->SetSpecularPower( this->GetSpecularPower() );
+  this->SetOpacity( this->GetOpacity() );
+  this->SetInterpolation( this->GetInterpolation() );
+  this->SetRepresentation( this->GetRepresentation() );
+}
+
 void mitk::MaterialProperty::PrintSelf ( std::ostream &os ) const
 {
   os << "Data tree node: " << GetDataTreeNode() << std::endl;
@@ -477,14 +489,15 @@ void mitk::MaterialProperty::PrintSelf ( std::ostream &os ) const
 
 bool mitk::MaterialProperty::WriteXMLData( XMLWriter& xmlWriter )
 {
-  xmlWriter.WriteProperty( COLOR_KEY, m_Color );
-  xmlWriter.WriteProperty( COLOR_COEFFICIENT_KEY, m_ColorCoefficient );
-  xmlWriter.WriteProperty( SPECULAR_COLOR_KEY, m_SpecularColor );
-  xmlWriter.WriteProperty( SPECULAR_COEFFICIENT_KEY, m_SpecularCoefficient );
-  xmlWriter.WriteProperty( SPECULAR_POWER_KEY, m_SpecularPower );
-  xmlWriter.WriteProperty( OPACITY_KEY, m_Opacity );
-  xmlWriter.WriteProperty( INTERPOLATION_KEY, m_Interpolation );
-  xmlWriter.WriteProperty( REPRESENTATION_KEY, m_Representation );
+  this->Update();
+  xmlWriter.WriteProperty( COLOR, m_Color );
+  xmlWriter.WriteProperty( COLOR_COEFFICIENT, m_ColorCoefficient );
+  xmlWriter.WriteProperty( SPECULAR_COLOR, m_SpecularColor );
+  xmlWriter.WriteProperty( SPECULAR_COEFFICIENT, m_SpecularCoefficient );
+  xmlWriter.WriteProperty( SPECULAR_POWER, m_SpecularPower );
+  xmlWriter.WriteProperty( OPACITY, m_Opacity );
+  xmlWriter.WriteProperty( INTERPOLATION, m_Interpolation );
+  xmlWriter.WriteProperty( REPRESENTATION, m_Representation );
   return true;
 }
  
@@ -494,40 +507,49 @@ bool mitk::MaterialProperty::ReadXMLData( XMLReader& xmlReader )
   int interpolation, representation;
   Color color, specular_color;
 
-  if (xmlReader.GetAttribute(COLOR_KEY, color)){
+  if (xmlReader.GetAttribute(COLOR, color)){
     SetColor(color);
   }
 
-  if (xmlReader.GetAttribute(COLOR_COEFFICIENT_KEY, color_coeff))
+  if (xmlReader.GetAttribute(COLOR_COEFFICIENT, color_coeff))
     SetColorCoefficient(color_coeff);
 
-  if (xmlReader.GetAttribute(SPECULAR_COLOR_KEY, specular_color))
+  if (xmlReader.GetAttribute(SPECULAR_COLOR, specular_color))
     SetSpecularColor(specular_color);
 
-  if (xmlReader.GetAttribute(SPECULAR_COEFFICIENT_KEY, specular_coeff))
+  if (xmlReader.GetAttribute(SPECULAR_COEFFICIENT, specular_coeff))
     SetSpecularCoefficient(specular_coeff);
 
-  if (xmlReader.GetAttribute(SPECULAR_POWER_KEY, specular))
+  if (xmlReader.GetAttribute(SPECULAR_POWER, specular))
     SetSpecularPower(specular);
 
-  if(xmlReader.GetAttribute(OPACITY_KEY, opacity))
+  if(xmlReader.GetAttribute(OPACITY, opacity))
     SetOpacity(opacity);
 
-  if(xmlReader.GetAttribute(INTERPOLATION_KEY, interpolation))
+  if(xmlReader.GetAttribute(INTERPOLATION, interpolation))
     SetInterpolation((InterpolationType)interpolation);
 
-  if(xmlReader.GetAttribute(REPRESENTATION_KEY, representation))
+  if(xmlReader.GetAttribute(REPRESENTATION, representation))
     SetRepresentation((RepresentationType)representation);
 
   std::cout << "read mitk::MaterialProperty: " << " " << std::endl;
   return true;
 }
 
-const char* mitk::MaterialProperty::COLOR_KEY = "COLOR";
-const char* mitk::MaterialProperty::SPECULAR_COLOR_KEY = "SPECULAR_COLOR";
-const char* mitk::MaterialProperty::COLOR_COEFFICIENT_KEY = "COLOR_COEFFICIENT";
-const char* mitk::MaterialProperty::SPECULAR_COEFFICIENT_KEY = "SPECULAR_COEFFICIENT";
-const char* mitk::MaterialProperty::SPECULAR_POWER_KEY = "SPECULAR_POWER";
-const char* mitk::MaterialProperty::OPACITY_KEY = "OPACITY";
-const char* mitk::MaterialProperty::INTERPOLATION_KEY = "INTERPOLATION";
-const char* mitk::MaterialProperty::REPRESENTATION_KEY = "REPRESENTATION";
+const char* mitk::MaterialProperty::COLOR_KEY = "color";
+const char* mitk::MaterialProperty::SPECULAR_COLOR_KEY = "specular_color";
+const char* mitk::MaterialProperty::COLOR_COEFFICIENT_KEY = "color_coefficient";
+const char* mitk::MaterialProperty::SPECULAR_COEFFICIENT_KEY = "specular_coefficient";
+const char* mitk::MaterialProperty::SPECULAR_POWER_KEY = "specular_power";
+const char* mitk::MaterialProperty::OPACITY_KEY = "opacity";
+const char* mitk::MaterialProperty::INTERPOLATION_KEY = "interpolation";
+const char* mitk::MaterialProperty::REPRESENTATION_KEY = "representation";
+
+const char* mitk::MaterialProperty::COLOR = "COLOR";
+const char* mitk::MaterialProperty::SPECULAR_COLOR = "SPECULAR_COLOR";
+const char* mitk::MaterialProperty::COLOR_COEFFICIENT = "COLOR_COEFFICIENT";
+const char* mitk::MaterialProperty::SPECULAR_COEFFICIENT = "SPECULAR_COEFFICIENT";
+const char* mitk::MaterialProperty::SPECULAR_POWER = "SPECULAR_POWER";
+const char* mitk::MaterialProperty::OPACITY = "OPACITY";
+const char* mitk::MaterialProperty::INTERPOLATION = "INTERPOLATION";
+const char* mitk::MaterialProperty::REPRESENTATION = "REPRESENTATION";

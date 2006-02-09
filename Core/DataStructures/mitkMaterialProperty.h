@@ -332,6 +332,8 @@ protected:
 
     virtual void InitializeStandardValues();
 
+    virtual void Update();
+
     Color m_Color;
 
     Color m_SpecularColor;
@@ -359,7 +361,16 @@ protected:
     static const char* SPECULAR_POWER_KEY; 
     static const char* OPACITY_KEY; 
     static const char* INTERPOLATION_KEY; 
-    static const char* REPRESENTATION_KEY; 
+    static const char* REPRESENTATION_KEY;
+
+    static const char* COLOR;     
+    static const char* SPECULAR_COLOR;     
+    static const char* COLOR_COEFFICIENT; 
+    static const char* SPECULAR_COEFFICIENT; 
+    static const char* SPECULAR_POWER; 
+    static const char* OPACITY; 
+    static const char* INTERPOLATION; 
+    static const char* REPRESENTATION;
 
 };
 

@@ -1,7 +1,7 @@
 #include "mitkEnumerationProperty.h"
 #include <algorithm>
-
-
+#include <mitkXMLWriter.h>
+#include <mitkXMLReader.h>
 
 mitk::EnumerationProperty::EnumerationProperty()
 {
@@ -188,3 +188,18 @@ bool mitk::EnumerationProperty::IsValidEnumerationValue( const std::string& val 
 }
 
 
+bool mitk::EnumerationProperty::WriteXMLData( XMLWriter& xmlWriter )
+{
+  xmlWriter.WriteProperty( VALUE, GetValueAsString() );
+  return true;
+}
+
+
+bool mitk::EnumerationProperty::ReadXMLData( XMLReader& xmlReader )
+{
+  std::string m_EnumValueString;
+  xmlReader.GetAttribute( VALUE, m_EnumValueString );
+  SetValue(m_EnumValueString);
+  std::cout << "EnumerationProperty: " << GetValueAsString() << std::endl;
+  return true;
+}

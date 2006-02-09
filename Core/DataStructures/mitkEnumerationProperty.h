@@ -163,6 +163,10 @@ public:
 
   virtual bool operator==( const BaseProperty& property ) const;
 
+  virtual bool WriteXMLData( XMLWriter& xmlWriter );
+
+  virtual bool ReadXMLData( XMLReader& xmlReader );
+
 protected:
 
   IdType m_CurrentValue;

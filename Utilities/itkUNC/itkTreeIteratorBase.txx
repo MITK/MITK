@@ -283,11 +283,7 @@ template <class TTreeType>
 bool 
 TreeIteratorBase<TTreeType>::HasParent( ) const 
 {
-  if ( m_Position != NULL && m_Position->GetParent() == NULL )
-    {
-    return false;
-    }
-  return true;
+  return ( m_Position != NULL && m_Position->GetParent() != NULL);
 }
 
 /** Disconnect the tree */

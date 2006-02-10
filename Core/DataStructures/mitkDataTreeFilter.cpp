@@ -308,16 +308,16 @@ bool DataTreeFilter::IsWithinConstrains( mitk::DataTreeIteratorClone nodeIter )
 {
   if ( m_RootNode != 0 && nodeIter.IsNotNull() && m_DataTree != 0)
   {
-    if ( nodeIter->Get() == m_RootNode ) return true;
+    if ( nodeIter->Get().GetPointer() == m_RootNode ) return true;
 
     while ( nodeIter->GoToParent() )
     {
-      if ( nodeIter->Get() == m_RootNode ) return true;
+      if ( nodeIter->Get().GetPointer() == m_RootNode ) return true;
     }
 
     return false;
   }
-
+  
   // default true (no constrain given or node == 0 or both)
   return true;
 }

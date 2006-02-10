@@ -373,7 +373,6 @@ void DataTreeFilter::SetFilter(FilterFunctionPointer filter)
   if (filter)
     m_Filter = filter;
   else
-    //m_Filter = &mitk::IsDataTreeNode;
     m_Filter = &mitk::IsImage;
 
   GenerateModelFromTree();
@@ -486,14 +485,12 @@ void DataTreeFilter::TreeAdd(const itk::EventObject& e)
   ItemList* list(m_Items);
   Item* parent(0);
 
-  if ( m_HierarchyHandling == DataTreeFilter::PRESERVE_HIERARCHY && treePosition->HasParent())
-    while ( treePosition->HasParent() )
+  if ( m_HierarchyHandling == DataTreeFilter::PRESERVE_HIERARCHY )
+    while ( treePosition->GoToParent() )
     {
-      treePosition->GoToParent();
       if ( m_Filter(treePosition->Get()) )
       {                                         // this is the new parent
         parent = m_Item[treePosition->Get()];
-        list = parent->m_Children;
         break; 
       }
     }
@@ -501,6 +498,7 @@ void DataTreeFilter::TreeAdd(const itk::EventObject& e)
   if (parent)
   {
     // regenerate only in part
+    list = parent->m_Children;
     InvokeEvent( mitk::TreeFilterRemoveChildrenEvent( parent ) );
     list->clear();
     AddMatchingChildren( treePosition, list, parent, true );
@@ -575,7 +573,12 @@ void DataTreeFilter::TreePrune(const itk::EventObject& e)
             else
               list = item->m_Parent->m_Children;
     
-            listFirstIter = list->begin();
+          for ( listFirstIter = list->begin(); listFirstIter != list->end(); ++listFirstIter )
+            if ( *listFirstIter == item )
+            {
+              listLastIter = listFirstIter;
+              break;
+            }
             listLastIter = listFirstIter;
 
             firstMatch = false;

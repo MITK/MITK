@@ -531,9 +531,6 @@ namespace mitk
       /// No meaning without a mitk::DataTreeBase
       static Pointer New(mitk::DataTreeBase*);
 
-      /// moves the hierarchical aspect out of the filter function
-      void ConstrainToNodeAndChildren(const mitk::DataTreeNode*);
-
       /// Labels (for Header) of visible properties
       void SetPropertiesLabels(const PropertyList);
       const PropertyList& GetPropertiesLabels() const;
@@ -588,8 +585,6 @@ namespace mitk
     
     private:
       
-      bool DataTreeFilter::IsWithinConstrains( mitk::DataTreeIteratorClone nodeIter );
-
       void AddMatchingChildren(mitk::DataTreeIteratorBase*, ItemList*, Item*, bool = true);
       
       // build the model from the data tree
@@ -610,9 +605,6 @@ namespace mitk
       /// The data tree filtered by this class
       mitk::DataTreeBase* m_DataTree;
       
-      /// The root data tree node to which display is constrained
-      const mitk::DataTreeNode* m_RootNode;
-
       /// should we preserve the hierachy of the tree?
       HierarchyHandling m_HierarchyHandling;
 

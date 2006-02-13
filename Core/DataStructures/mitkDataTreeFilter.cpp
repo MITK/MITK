@@ -238,7 +238,6 @@ DataTreeFilter::Pointer DataTreeFilter::New(mitk::DataTreeBase* datatree)
 DataTreeFilter::DataTreeFilter(mitk::DataTreeBase* datatree)
 : m_Filter(NULL),
   m_DataTree(datatree),
-  m_RootNode(NULL),
   m_HierarchyHandling(mitk::DataTreeFilter::PRESERVE_HIERARCHY),
   m_SelectionMode(mitk::DataTreeFilter::MULTI_SELECT),
   m_Renderer(NULL),
@@ -296,30 +295,6 @@ DataTreeFilter::~DataTreeFilter()
   m_Items->clear();
   m_Item.clear();
   m_SelectedItems.clear();
-}
-
-void DataTreeFilter::ConstrainToNodeAndChildren(const mitk::DataTreeNode* node)
-{
-  m_RootNode = node;
-  GenerateModelFromTree();
-}
- 
-bool DataTreeFilter::IsWithinConstrains( mitk::DataTreeIteratorClone nodeIter )
-{
-  if ( m_RootNode != 0 && nodeIter.IsNotNull() && m_DataTree != 0)
-  {
-    if ( nodeIter->Get().GetPointer() == m_RootNode ) return true;
-
-    while ( nodeIter->GoToParent() )
-    {
-      if ( nodeIter->Get().GetPointer() == m_RootNode ) return true;
-    }
-
-    return false;
-  }
-  
-  // default true (no constrain given or node == 0 or both)
-  return true;
 }
 
 void DataTreeFilter::SetPropertiesLabels(const PropertyList labels)
@@ -472,7 +447,6 @@ void DataTreeFilter::TreeAdd(const itk::EventObject& e)
 
   mitk::DataTreeNode* newNode = treePosition->Get();
 
-  if ( !IsWithinConstrains(treePosition) ) return;
   if ( !m_Filter(newNode) ) return; // if filter does not match, then nothing has to be done
 
   /*
@@ -537,77 +511,73 @@ void DataTreeFilter::TreePrune(const itk::EventObject& e)
   ItemList::iterator listFirstIter;
   ItemList::iterator listLastIter;
   
-  if ( IsWithinConstrains(treePosition) )
+  if (   m_HierarchyHandling == DataTreeFilter::PRESERVE_HIERARCHY 
+      && m_Filter(treePosition->Get()) )
   {
-    if (   m_HierarchyHandling == DataTreeFilter::PRESERVE_HIERARCHY 
-        && m_Filter(treePosition->Get()) )
+    item = m_Item[ treePosition->Get() ];
+
+    if ( item->IsRoot() )
+      list = m_Items;
+    else
+      list = item->m_Parent->m_Children;
+    
+    for ( listFirstIter = list->begin(); listFirstIter != list->end(); ++listFirstIter )
+      if ( *listFirstIter == item )
+      {
+        listLastIter = listFirstIter;
+        break;
+      }
+  }
+  else // no hierachy preserved OR removed data tree item not matching the filter
+  {
+    mitk::DataTreePreOrderIterator treeIter( m_DataTree, treePosition->GetNode() );
+    bool firstMatch(true);
+    while ( !treeIter.IsAtEnd() )
     {
-      item = m_Item[ treePosition->Get() ];
-  
-      if ( item->IsRoot() )
-        list = m_Items;
-      else
-        list = item->m_Parent->m_Children;
-      
-      for ( listFirstIter = list->begin(); listFirstIter != list->end(); ++listFirstIter )
-        if ( *listFirstIter == item )
+      if ( m_Filter(treeIter.Get()) )
+        if ( firstMatch )
         {
-          listLastIter = listFirstIter;
-          break;
-        }
-    }
-    else // no hierachy preserved OR removed data tree item not matching the filter
-    {
-      mitk::DataTreePreOrderIterator treeIter( m_DataTree, treePosition->GetNode() );
-      bool firstMatch(true);
-      while ( !treeIter.IsAtEnd() )
-      {
-        if ( m_Filter(treeIter.Get()) )
-          if ( firstMatch )
-          {
-            item = m_Item[ treeIter.Get() ];
-            if (!item) return; // TODO is that possible? At least this happens sometimes, may be a bug
-            
-            if ( item->IsRoot() )
-              list = m_Items;
-            else
-              list = item->m_Parent->m_Children;
-    
-          for ( listFirstIter = list->begin(); listFirstIter != list->end(); ++listFirstIter )
-            if ( *listFirstIter == item )
-            {
-              listLastIter = listFirstIter;
-              break;
-            }
-            listLastIter = listFirstIter;
-
-            firstMatch = false;
-          }
-          else // later matches
-          {
-            ++listLastIter;
-          }
-        ++treeIter;    
-      }
-    }
-
-    if (item)
-    {
-      // clean selected list
-      ++listLastIter; // erase does delete until the item _before_ the second iterator
+          item = m_Item[ treeIter.Get() ];
+          if (!item) return; // TODO is that possible? At least this happens sometimes, may be a bug
+          
+          if ( item->IsRoot() )
+            list = m_Items;
+          else
+            list = item->m_Parent->m_Children;
   
-      InvokeEvent( mitk::TreeFilterRemoveChildrenEvent( item->m_Parent ) );  // first tell everything is deleted
-      list->erase( listFirstIter, listLastIter );
-    
-      // renumber items of the remaining list
-      int i(0);
-      for ( listFirstIter = list->begin(); listFirstIter != list->end(); ++listFirstIter, ++i )
-      {
-        (*listFirstIter)->m_Index = i;
-        InvokeEvent( mitk::TreeFilterItemAddedEvent( *listFirstIter ) );  // then add some items again
-      }
-    }
+        for ( listFirstIter = list->begin(); listFirstIter != list->end(); ++listFirstIter )
+          if ( *listFirstIter == item )
+          {
+            listLastIter = listFirstIter;
+            break;
+          }
+          listLastIter = listFirstIter;
 
+          firstMatch = false;
+        }
+        else // later matches
+        {
+          ++listLastIter;
+        }
+      ++treeIter;    
+    }
+  }
+
+  if (item)
+  {
+    // clean selected list
+    ++listLastIter; // erase does delete until the item _before_ the second iterator
+
+    InvokeEvent( mitk::TreeFilterRemoveChildrenEvent( item->m_Parent ) );  // first tell everything is deleted
+    list->erase( listFirstIter, listLastIter );
+  
+    // renumber items of the remaining list
+    int i(0);
+    for ( listFirstIter = list->begin(); listFirstIter != list->end(); ++listFirstIter, ++i )
+    {
+      (*listFirstIter)->m_Index = i;
+      InvokeEvent( mitk::TreeFilterItemAddedEvent( *listFirstIter ) );  // then add some items again
+    }
   }
 }
 
@@ -619,7 +589,6 @@ void DataTreeFilter::TreeRemove(const itk::EventObject& e)
   const itk::TreeRemoveEvent<mitk::DataTreeBase>& event( static_cast<const itk::TreeRemoveEvent<mitk::DataTreeBase>&>(e) );
   mitk::DataTreeIteratorBase* treePosition = const_cast<mitk::DataTreeIteratorBase*>(&(event.GetChangePosition()));
   
-  if ( IsWithinConstrains(treePosition) )
   if ( m_Filter(treePosition->Get()) )
   {
     Item* item = m_Item[ treePosition->Get() ];
@@ -682,24 +651,17 @@ void DataTreeFilter::AddMatchingChildren(mitk::DataTreeIteratorBase* iter, ItemL
   for ( int child = 0; child < numChildren; ++child )
   {
     iter->GoToChild(child);
-    if ( IsWithinConstrains(iter) )
+    if ( m_Filter( iter->Get() ) )
     {
-      if ( m_Filter( iter->Get() ) )
+      unsigned int newIndex = list->Size();
+      list->CreateElementAt( newIndex ) = Item::New( iter->Get(), this, newIndex, parent );
+      if (verbose) InvokeEvent( mitk::TreeFilterItemAddedEvent(m_Items->ElementAt(newIndex)) );
+
+      if ( m_HierarchyHandling == DataTreeFilter::PRESERVE_HIERARCHY )
       {
-        unsigned int newIndex = list->Size();
-        list->CreateElementAt( newIndex ) = Item::New( iter->Get(), this, newIndex, parent );
-        if (verbose) InvokeEvent( mitk::TreeFilterItemAddedEvent(m_Items->ElementAt(newIndex)) );
-  
-        if ( m_HierarchyHandling == DataTreeFilter::PRESERVE_HIERARCHY )
-        {
-          AddMatchingChildren( iter, 
-                              list->ElementAt(newIndex)->m_Children,
-                              list->ElementAt(newIndex).GetPointer(), verbose );
-        }
-        else
-        {
-          AddMatchingChildren( iter, list, parent, verbose );
-        }
+        AddMatchingChildren( iter, 
+                            list->ElementAt(newIndex)->m_Children,
+                            list->ElementAt(newIndex).GetPointer(), verbose );
       }
       else
       {
@@ -732,24 +694,17 @@ void DataTreeFilter::GenerateModelFromTree()
   Consideration of m_HierarchyHandling adds one branch
   */
   if (!treeIter->IsAtEnd()) // do nothing if the tree is empty!
-  if ( IsWithinConstrains(treeIter) )
+  if ( m_Filter( treeIter->Get() ) )
   {
-    if ( m_Filter( treeIter->Get() ) )
+    m_Items->CreateElementAt(0) = Item::New( treeIter->Get(), this, 0, 0 ); // 0 = first item, 0 = no parent
+    InvokeEvent( mitk::TreeFilterItemAddedEvent(m_Items->ElementAt(0)) );
+
+    if ( m_HierarchyHandling == DataTreeFilter::PRESERVE_HIERARCHY )
     {
-      m_Items->CreateElementAt(0) = Item::New( treeIter->Get(), this, 0, 0 ); // 0 = first item, 0 = no parent
-      InvokeEvent( mitk::TreeFilterItemAddedEvent(m_Items->ElementAt(0)) );
-  
-      if ( m_HierarchyHandling == DataTreeFilter::PRESERVE_HIERARCHY )
-      {
-        AddMatchingChildren( treeIter,
-                            m_Items->ElementAt(0)->m_Children,
-                            m_Items->ElementAt(0).GetPointer(),
-                            false );
-      }
-      else
-      {
-        AddMatchingChildren( treeIter, m_Items, 0, false );
-      }
+      AddMatchingChildren( treeIter,
+                          m_Items->ElementAt(0)->m_Children,
+                          m_Items->ElementAt(0).GetPointer(),
+                          false );
     }
     else
     {

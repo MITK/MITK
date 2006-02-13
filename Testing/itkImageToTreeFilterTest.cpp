@@ -17,52 +17,48 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <list>
 #include <itkImage.h>
-#include <itkITTFilterContext.h>
+#include <itkTreeContainer.h>
+
 #include <itkImageToTreeFilter.h>
+#include <itkITTFilterContext.h>
+#include <itkRegistrationModelXMLWriter.h>
 #include <itkStartPointData.h>
 #include <itkTubeSegmentModel.h>
-#include <itkRegistrationModelXMLWriter.h>
-
-#include <mitkVesselTreeData.h>
 
 // image type
 typedef unsigned char   PixelType;
 const unsigned int      Dimension = 3;
-typedef itk::Image<PixelType, Dimension>            ImageType;
-typedef ImageType::Pointer                          ImagePointer;
-typedef ImageType::PointType                        PointType;
-typedef ImageType::DirectionType                    DirectionType;
+typedef itk::Image<PixelType, Dimension>              ImageType;
+typedef ImageType::Pointer                            ImagePointer;
+typedef ImageType::PointType                          PointType;
+typedef ImageType::DirectionType                      DirectionType;
+
+typedef itk::RegistrationModel<PixelType>             RegistrationModelType;
+typedef RegistrationModelType::Pointer                RegistrationModelPointer;
 
 // tree type
-typedef mitk::VesselTreeData                        OutputTreeType;
-typedef OutputTreeType::Pointer                     OutputTreePointer;
-
-//   typedef itk::ImageFileReader<ImageType>         ImageReaderType;
-//   typedef ImageReaderType::Pointer                ImageReaderPointer;
+typedef itk::TreeContainer<RegistrationModelPointer>  OutputTreeType;
+typedef OutputTreeType::Pointer                       OutputTreePointer;
 
 // test classes
 typedef itk::ImageToTreeFilter<ImageType, OutputTreeType>
-                                                    ImageToTreeFilterType;
-typedef ImageToTreeFilterType::Pointer              ImageToTreeFilterPointer;
+                                                      ImageToTreeFilterType;
+typedef ImageToTreeFilterType::Pointer                ImageToTreeFilterPointer;
 typedef itk::ITTFilterContext<ImageType, OutputTreeType>
-                                                    FilterContextType;
-typedef FilterContextType::Pointer                  FilterContextPointer;
-typedef FilterContextType::StartPointQueueType      StartPointQueueType;
-typedef itk::StartPointData<ImageType>              StartPointDataType;
-typedef StartPointDataType::Pointer                 StartPointDataPointer;
+                                                      FilterContextType;
+typedef FilterContextType::Pointer                    FilterContextPointer;
+typedef FilterContextType::StartPointQueueType        StartPointQueueType;
+typedef itk::StartPointData<ImageType>                StartPointDataType;
+typedef StartPointDataType::Pointer                   StartPointDataPointer;
 
-typedef itk::TubeSegmentModel<PixelType, DirectionType>
-                                                    TubeSegmentModelType;
-typedef TubeSegmentModelType::Pointer               TubeSegmentModelPointer;
+typedef itk::TubeSegmentModel<PixelType>              TubeSegmentModelType;
+typedef TubeSegmentModelType::Pointer                 TubeSegmentModelPointer;
 
-typedef itk::RegistrationModel<PixelType, DirectionType>
-                                                    RegistrationModelType;
+typedef itk::RegistrationModelXMLWriter<TubeSegmentModelType>
+                                                      RegistrationModelWriterType;
+typedef RegistrationModelWriterType::Pointer          RegistrationModelWriterPointer;
 
-typedef itk::RegistrationModelXMLWriter<RegistrationModelType>
-                                                    RegistrationModelWriterType;
-typedef RegistrationModelWriterType::Pointer        RegistrationModelWriterPointer;
-
-typedef std::list<int>                              ResultListType;
+typedef std::list<int>                                ResultListType;
 
 /******************************************************************
  * TEST 1: Saving and loading data objects to the filter context
@@ -169,24 +165,66 @@ int testInitFilter()
 }
 
 /****************************************************************
- * TEST 3: TubeSegmentModel
- ****************************************************************/
-int testTubeSegmentModel()
-{
-  std::cout << " *** Testing the tube segments ***\n";
-  TubeSegmentModelPointer tubeSegment = TubeSegmentModelType::New();
-
-  std::cout << " *** [TEST PASSED] ***\n";
-  return EXIT_SUCCESS;
-}
-
-/****************************************************************
- * TEST 4: XML Writer
+ * TEST 3: XML Writer
  ****************************************************************/
 int testRegistrationModelXMLWriter()
 {
   std::cout << " *** Testing the RegistrationModelXMLWriter ***\n";
+
+  typedef TubeSegmentModelType::PointSetType          PointSetType;
+  typedef PointSetType::Pointer                       PointSetPointer;
+  typedef PointSetType::PointType                     PointType;
+  typedef PointSetType::PointsContainer               PointsContainerType;
+  typedef PointsContainerType::Pointer                PointsContainerPointer;
+  typedef PointsContainerType::ElementIdentifier      ElementIdentifier;
+  typedef PointSetType::PointDataContainer            PointDataContainerType;
+  typedef PointDataContainerType::Pointer             PointDataContainerPointer;
+
+  TubeSegmentModelPointer tubeSegment = TubeSegmentModelType::New();
+  ElementIdentifier index = 0;
+  PointSetPointer pointSet = PointSetType::New();
+  PointsContainerPointer pointsContainer = PointsContainerType::New();
+  PointDataContainerPointer pointDataContainer = PointDataContainerType::New();
+
+  // init test data
+  PointType startPoint;
+  startPoint.Fill(0);
+  tubeSegment->SetStartPoint(&startPoint);
+
+  PointType point1; // 1, 1, 0
+  point1[0] = 1;
+  point1[1] = 1;
+  point1[2] = 0;
+//   pointsContainer->InsertElement(index, &point1);
+//   pointDataContainer->InsertElement(index, 1);
+  index++;
+
+  PointType point2; // 1, 0, 1
+  point2[0] = 1;
+  point2[1] = 0;
+  point2[2] = 1;
+//   pointsContainer->InsertElement(index, &point2);
+//   pointDataContainer->InsertElement(index, 1);
+  index++;
+
+  PointType point3; // 1, 0, 1
+  point3[0] = 1;
+  point3[1] = 0;
+  point3[2] = 1;
+//   pointsContainer->InsertElement(index, &point3);
+//   pointDataContainer->InsertElement(index, 1);
+  index++;
+
+  pointSet->SetPoints(pointsContainer);
+  pointSet->SetPointData(pointDataContainer);
+  tubeSegment->SetPointSet(pointSet);
+
   RegistrationModelWriterPointer modelWriter = RegistrationModelWriterType::New();
+  modelWriter->SetRegistrationModel(tubeSegment);
+  modelWriter->SetFilename("test.xml");
+  modelWriter->WriteFile();
+
+  // TODO: compare to normal data
 
   std::cout << " *** [TEST PASSED] ***\n";
   return EXIT_SUCCESS;
@@ -194,7 +232,7 @@ int testRegistrationModelXMLWriter()
 
 
 
-int itkImageToTreeFilterTest(int, char* argv[] )
+int itkImageToTreeFilterTest(int i, char* argv[] )
 {
   ResultListType resultList;
   int failedCount = 0;
@@ -204,7 +242,6 @@ int itkImageToTreeFilterTest(int, char* argv[] )
   // run all tests
   resultList.push_back(testFilterContext());
   resultList.push_back(testInitFilter());
-  resultList.push_back(testTubeSegmentModel());
   resultList.push_back(testRegistrationModelXMLWriter());
 
   std::cout << " *** [ALL TESTS DONE] ***\n";

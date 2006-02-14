@@ -66,7 +66,8 @@ void QmitkNumberPropertyView::initialize()
 { // only to be called from constructors
   m_Suffix = "";
   m_DisplayFactor = 1.0;
-  setDecimalPlaces(-1);
+  //setDecimalPlaces(-1); // unlimited
+  setDecimalPlaces(2);
 }
     
 short QmitkNumberPropertyView::decimalPlaces() const

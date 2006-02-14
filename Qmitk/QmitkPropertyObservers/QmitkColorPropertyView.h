@@ -32,6 +32,10 @@ class QmitkColorPropertyView : public QLabel, public mitk::PropertyView
     QmitkColorPropertyView( const mitk::ColorProperty*, QWidget* parent, const char* name = 0 );
     virtual ~QmitkColorPropertyView();
       
+    virtual void unsetPalette();
+    virtual void setPalette( const QPalette & );
+    virtual void setBackgroundMode( QWidget::BackgroundMode );
+    virtual void setPaletteBackgroundColor( const QColor & );
   protected:
 
     virtual void PropertyChanged();
@@ -42,7 +46,8 @@ class QmitkColorPropertyView : public QLabel, public mitk::PropertyView
     const mitk::ColorProperty* m_ColorProperty;
 
   private:
-
+    
+    bool m_SelfCall;
 };
 
 #endif

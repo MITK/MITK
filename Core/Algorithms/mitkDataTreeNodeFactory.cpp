@@ -232,9 +232,7 @@ void mitk::DataTreeNodeFactory::GenerateData()
   {
     mitk::DataTreeNode::Pointer node = this->GetOutput(i);
     // set path without filename as string property
-    std::string path = itksys::SystemTools::GetFilenamePath( m_FileName );
-    path += "/";
-    mitk::StringProperty::Pointer pathProp = new mitk::StringProperty( path );
+    mitk::StringProperty::Pointer pathProp = new mitk::StringProperty( itksys::SystemTools::GetFilenamePath( m_FileName ) );
     node->SetProperty( StringProperty::PATH, pathProp );
     // set filename without path as string property
     mitk::StringProperty::Pointer nameProp = dynamic_cast<mitk::StringProperty*>(node->GetProperty("name").GetPointer());

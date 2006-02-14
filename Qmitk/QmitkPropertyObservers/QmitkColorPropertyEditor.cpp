@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qlayout.h>
 #include <qpainter.h>
 #include <qapplication.h>
+#include <mitkRenderingManager.h>
 
 //----- QmitkPopupColorChooser ---------------------------------------------------------
 
@@ -290,6 +291,8 @@ void QmitkColorPropertyEditor::onColorSelected(QColor c)
     c.getRgb( &r, &g, &b );
     const_cast<mitk::ColorProperty*>(m_ColorProperty)->SetColor( r / 255.0, g / 255.0, b / 255.0 );
     const_cast<mitk::ColorProperty*>(m_ColorProperty)->Modified();
+
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
 }
 

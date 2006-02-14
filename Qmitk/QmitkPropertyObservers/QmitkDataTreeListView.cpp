@@ -289,7 +289,7 @@ void QmitkDataTreeListView::paintListBackground(QPainter& painter, QmitkListView
 {
   if (index && index->m_Grid)
   {
-    for (int row = 0; row < index->m_Grid->numRows(); ++row)
+    for (int row = 1; row < index->m_Grid->numRows(); ++row)
     {
       if ( QmitkListViewItemIndex* temp = index->indexAt(row-1) ) 
         paintListBackground(painter, temp);
@@ -344,7 +344,7 @@ void QmitkDataTreeListView::mouseReleaseEvent ( QMouseEvent* e )
   int row(-1);
  
   row = index->rowAt( e->y() );
-  if ( row == -1 ) return; // no row under cursor
+  if ( row <= 0 ) return; // no row under cursor
 
   // find item
   QmitkListViewItemIndex* temp(0);
@@ -392,11 +392,13 @@ void QmitkDataTreeListView::AddItemsToList(QWidget* parent, QmitkListViewItemInd
                                            const mitk::DataTreeFilter::PropertyList editableProps)
 {
   index->m_Grid->setSpacing(4);
+      
+  index->m_Grid->setColStretch(m_StretchedColumn, 10);
   
   mitk::DataTreeFilter::ConstItemIterator itemiter( items->Begin() ); 
   mitk::DataTreeFilter::ConstItemIterator itemiterend( items->End() ); 
   
-  int row(0);
+  int row(1); // headings are row 0
   while ( itemiter != itemiterend ) // for all items
   {
 
@@ -447,9 +449,6 @@ void QmitkDataTreeListView::AddItemsToList(QWidget* parent, QmitkListViewItemInd
         index->addWidget(observerWidget, row, column, Qt::AlignVCenter);
       }
 
-      if (column == m_StretchedColumn)
-        index->m_Grid->setColStretch(column, 10);
-      
       ++column;
     }
  
@@ -466,8 +465,6 @@ void QmitkDataTreeListView::AddItemsToList(QWidget* parent, QmitkListViewItemInd
       index->m_Grid->addMultiCellLayout( childrenGridLayout, row+1, row+1, 1, visibleProps.size(), Qt::AlignVCenter );
       
       index->addWidget(childExpander, row, 0, Qt::AlignVCenter); 
-      //index->addMultiCellWidget(childExpander, row, row+1, 0, 0, Qt::AlignTop); 
-                                        // fromRow, toRow, fromCol, toCol
       index->addIndex(childExpander, row); 
      
       // add children, unless this item is the parent whose children were just deleted
@@ -531,7 +528,30 @@ void QmitkDataTreeListView::generateItems()
   const mitk::DataTreeFilter::PropertyList& editableProps( m_DataTreeFilter->GetEditableProperties() );
 
   // create a new layout grid
-  m_Grid = new QGridLayout( this, 1, visibleProps.size()+1 ); // 1 extra for expansion symbol
+  m_Grid = new QGridLayout( this, 2, visibleProps.size()+1 ); // 1 extra for expansion symbol
+
+  // fill column headings
+  QLabel* label = new QLabel("", this);
+  label->show();
+  label->setFrameStyle( QFrame::Panel | QFrame::Raised );
+  label->setBackgroundMode( Qt::PaletteButton );
+  QmitkListViewItemIndex::addWidget(label, 0, 0, Qt::AlignVCenter); 
+  int column(1); // column zero is reserved for expander icons and empty labels (see above)
+  const mitk::DataTreeFilter::PropertyList* labels( &(m_DataTreeFilter->GetPropertiesLabels()) );
+  // if there are no lables, then use the property keys
+  if ( labels->empty() )
+    labels = &(m_DataTreeFilter->GetVisibleProperties());
+
+  for( mitk::DataTreeFilter::PropertyList::const_iterator labeliter = labels->begin();
+       labeliter != labels->end();
+       ++labeliter, ++column )
+  {
+    QLabel* label = new QLabel( *labeliter, this);
+    label->show();
+    label->setFrameStyle( QFrame::Panel | QFrame::Raised );
+    label->setBackgroundMode( Qt::PaletteButton );
+    QmitkListViewItemIndex::addWidget(label, 0, column, Qt::AlignVCenter); 
+  }
   //m_Grid->setMargin(2);
   
   if (m_StretchedColumn == -1)
@@ -598,7 +618,7 @@ bool QmitkDataTreeListView::selectItemInGrid(const mitk::DataTreeFilter::Item* i
 {
   // find item, change selection, done
   //std::vector<QmitkListViewItemIndex*>::iterator iterindices = index->m_Indices.begin();
-  for (int row = 0; row < index->m_Grid->numRows(); ++row)
+  for (int row = 1; row < index->m_Grid->numRows(); ++row)
   {
     // if this is the item, (un)select it
     // then break, return true

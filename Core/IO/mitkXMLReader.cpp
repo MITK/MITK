@@ -7,7 +7,9 @@
 #include <mitkGlobalInteraction.h>
 #include <mitkEventMapper.h>
 #include <mitkRenderWindow.h>
+#include <mitkBaseXMLWriter.h>
 #include <itksys/SystemTools.hxx>
+
 
 #include <fstream>
 #include <string>
@@ -53,7 +55,7 @@ namespace mitk {
      xmlReader->Delete();  
      return false;
    }
-   
+
    xmlReader->Build();  
    xmlReader->Delete();  
 
@@ -314,7 +316,7 @@ namespace mitk {
 
     ConnectorList::iterator i = m_ConnectorList.begin();
     const ConnectorList::iterator end = m_ConnectorList.end();
-
+    
     while ( i != end )
     {
       m_CurrentNode = (*i).m_XMLNode;
@@ -334,6 +336,7 @@ namespace mitk {
     if ( !m_Root )
     {
       m_Root = node;
+      m_FileVersion = atof( m_Root->GetProperty(BaseXMLWriter::FILE_VERSION_KEY).c_str() );
       m_CurrentNode = node;
     }
     else
@@ -517,30 +520,30 @@ namespace mitk {
 
   const char* XMLReader::XMLNode::ConvertString( const char* string )
   {
-	  static std::char_traits<char>::char_type buffer[255];
-	  int length = std::char_traits<char>::length( string );
-	  std::char_traits<char>::copy ( buffer, string, length + 1 );
-	  const char* pos = buffer;
-  	
-	  while ( pos != NULL ) 
-	  {
+    static std::char_traits<char>::char_type buffer[255];
+    int length = std::char_traits<char>::length( string );
+    std::char_traits<char>::copy ( buffer, string, length + 1 );
+    const char* pos = buffer;
+    
+    while ( pos != NULL ) 
+    {
       pos = std::char_traits<char>::find ( buffer, length , '{');
 
-		  if( pos != NULL )
-			  *(const_cast<char*>(pos)) = '<';
-	  }
+      if( pos != NULL )
+        *(const_cast<char*>(pos)) = '<';
+    }
 
-	  pos = buffer;
-  	
-	  while ( pos != NULL ) 
-	  {
+    pos = buffer;
+    
+    while ( pos != NULL ) 
+    {
       pos = std::char_traits<char>::find ( buffer, length , '}');
 
-		  if( pos != NULL )
-			  *(const_cast<char*>(pos)) = '>';
-	  }
+      if( pos != NULL )
+        *(const_cast<char*>(pos)) = '>';
+    }
 
-	  return buffer;
+    return buffer;
   }
 
 

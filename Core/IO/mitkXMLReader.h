@@ -151,8 +151,8 @@ namespace mitk{
     mitk::DataTreeIteratorBase* m_CurrentPosition;
     
     std::string ReadXMLStringAttribut( std::string name, const char** atts) const;
-
     std::string m_SourceFilePath;
+    float m_FileVersion;
 	};
 }
 #endif

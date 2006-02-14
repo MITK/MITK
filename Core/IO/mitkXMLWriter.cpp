@@ -103,8 +103,7 @@ void XMLWriter::SetSourceFileName( const char* sourceFileName)
 
 void XMLWriter::SetSubFolder( const char* subFolder )
 {
-  //m_SubFolder = GetRelativePath(subFolder);
-  m_SubFolder = subFolder;  
+  m_SubFolder = CheckLastSlash(subFolder);
 }
 
 
@@ -285,7 +284,18 @@ const std::string XMLWriter::GetAbsolutePath()
 
 void XMLWriter::SetOriginPath(std::string originPath)
 {
-  m_OriginPath = originPath;
+  m_OriginPath = CheckLastSlash(originPath);
+}
+
+
+std::string XMLWriter::CheckLastSlash(std::string m_String)
+{
+  if(m_String != ""){
+    std::string::size_type lenght = m_String.length();
+    if(m_String.substr(lenght-1, 1) != "/")
+      m_String += "/";
+  }
+  return m_String;
 }
 
 

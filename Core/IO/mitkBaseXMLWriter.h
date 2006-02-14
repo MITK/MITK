@@ -99,6 +99,9 @@ namespace mitk{
     /// returns the path and the filename of the XML file
     const std::string GetXMLPathAndFileName();
 
+    static const std::string FILE_VERSION_KEY;
+    static const std::string VERSION;
+
 protected:
 
     /// replaces characters "<" and ">" with "{" and "}"

@@ -122,6 +122,9 @@ namespace mitk{
     /// returns the relative path
     const std::string GetRelativePathAndFilename(std::string sourcePath);
 
+    /// Checks whether the path has an ending slash. If there is no slash a ending slash is been added.
+    std::string CheckLastSlash(std::string m_String);
+
   };
 }
 #endif

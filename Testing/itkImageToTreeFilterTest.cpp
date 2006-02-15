@@ -25,11 +25,10 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <itkImageToTreeFilter.h>
 #include <itkITTFilterContext.h>
+#include <itkRegistrationModelXMLReader.h>
 #include <itkRegistrationModelXMLWriter.h>
 #include <itkStartPointData.h>
 #include <itkTubeSegmentModel.h>
-
-
 
 // image type
 typedef double                                        PixelType;
@@ -64,6 +63,10 @@ typedef TubeSegmentModelType::Pointer                 TubeSegmentModelPointer;
 typedef itk::RegistrationModelXMLWriter<TubeSegmentModelType>
                                                       RegistrationModelWriterType;
 typedef RegistrationModelWriterType::Pointer          RegistrationModelWriterPointer;
+typedef itk::RegistrationModelXMLReader<TubeSegmentModelType>
+                                                      RegistrationModelReaderType;
+typedef RegistrationModelReaderType::Pointer          RegistrationModelReaderPointer;
+
 
 typedef std::list<int>                                ResultListType;
 
@@ -182,6 +185,7 @@ int testRegistrationModelXMLWriter()
   typedef PointSetType::Pointer                       PointSetPointer;
   typedef PointSetType::PointType                     PointType;
   typedef PointSetType::PointsContainer               PointsContainerType;
+  typedef PointsContainerType::Iterator               PointsIterator;
   typedef PointsContainerType::Pointer                PointsContainerPointer;
   typedef PointsContainerType::ElementIdentifier      ElementIdentifier;
   typedef PointSetType::PointDataContainer            PointDataContainerType;
@@ -198,7 +202,7 @@ int testRegistrationModelXMLWriter()
   // init test data
   PointType startPoint;
   startPoint.Fill(0);
-  tubeSegment->SetStartPoint(&startPoint);
+  tubeSegment->SetStartPoint(startPoint);
 
   PointType point1; // 1, 1, 0
   point1[0] = 1;
@@ -218,8 +222,8 @@ int testRegistrationModelXMLWriter()
 
   PointType point3; // 1, 0, 1
   point3[0] = 1;
-  point3[1] = 0;
-  point3[2] = 1;
+  point3[1] = 1;
+  point3[2] = 0;
   pointsContainer->InsertElement(index, point3);
   pointDataContainer->InsertElement(index, pixelValue);
   index++;
@@ -240,7 +244,10 @@ int testRegistrationModelXMLWriter()
   char charBuffer;
   while (file.get(charBuffer))
   {
-    buffer.put(charBuffer);
+    if (charBuffer != ' ' && charBuffer != '\n')
+    {
+      buffer.put(charBuffer);
+    }
   }
 
   if (!file.eof() || buffer.bad())
@@ -250,14 +257,58 @@ int testRegistrationModelXMLWriter()
 
   // TODO: find a better way to compare the strings
   std::string value = buffer.str();
-  std::string expected = "<model>\n  <name>TubeSegment</name>\n  <startPoint>\n    <point>\n      <x>0</x>\n      <y>0</y>\n      <z>0</z>\n      </point>\n      </startPoint>\n      <points>\n      <point>\n      <x>1</x>\n      <y>1</y>\n      <z>0</z>\n      <value>1</value>\n      </point>\n      <point>\n      <x>1</x>\n      <y>0</y>\n      <z>1</z>\n      <value>1</value>\n      </point>\n      <point>\n      <x>1</x>\n      <y>0</y>\n      <z>1</z>\n      <value>1</value>\n      </point>\n      </points>\n      </model>\n";
+  std::string expected = "<model><name>TubeSegment</name><startPoint><point><x>0</x><y>0</y><z>0</z></point></startPoint><points><point><x>1</x><y>1</y><z>0</z><value>255</value></point><point><x>1</x><y>0</y><z>1</z><value>255</value></point><point><x>1</x><y>1</y><z>0</z><value>255</value></point></points></model>";
 
 
   if (value != expected)
   {
     std::cout << "XML does not match!\n";
-    std::cout << value;
+    std::cout << expected << std::endl;
+    std::cout << value << std::endl;
     return EXIT_FAILURE;
+  }
+
+  std::cout << "Testfile okay." << std::endl;
+
+  std::cout << " *** Testing the RegistrationModelXMLReader ***\n";
+
+  RegistrationModelReaderPointer registrationModelReader = RegistrationModelReaderType::New();
+//   registrationModelReader->SetDebug(true);
+  registrationModelReader->SetFilename("test.xml");
+  registrationModelReader->GenerateOutputInformation();
+
+  TubeSegmentModelPointer readTubeSegment = registrationModelReader->GetTubeSegment();
+  PointSetPointer readPointSet = readTubeSegment->GetPointSet();
+  PointType readStartPoint = readTubeSegment->GetStartPoint();
+
+  std::cout << readStartPoint << std::endl;
+
+  if (startPoint != readStartPoint)
+  {
+    std::cout << "Start points do not match!" << std::endl;
+    std::cout << "Written Point: " << startPoint << std::endl;
+    std::cout << "Read Point:    " << readStartPoint << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  PointsIterator origPointsIter = pointsContainer->Begin();
+  PointsIterator readPointsIter = readPointSet->GetPoints()->Begin();
+
+  while (origPointsIter != pointsContainer->End())
+  {
+    PointType origPoint = origPointsIter.Value();
+    PointType readPoint = readPointsIter.Value();
+
+    if (origPoint != readPoint)
+    {
+      std::cout << "Points do not match." << std::endl;
+      std::cout << "Orignal point: " << origPoint << std::endl;
+      std::cout << "Read point:    " << readPoint << std::endl;
+      return EXIT_FAILURE;
+    }
+
+    origPointsIter++;
+    readPointsIter++;
   }
 
   std::cout << " *** [TEST PASSED] ***\n";
@@ -272,11 +323,10 @@ int itkImageToTreeFilterTest(int i, char* argv[] )
   int failedCount = 0;
   int testCount;
   float failRatio;
-
   // run all tests
   resultList.push_back(testFilterContext());
   resultList.push_back(testInitFilter());
-//   resultList.push_back(testRegistrationModelXMLWriter());
+  resultList.push_back(testRegistrationModelXMLWriter());
 
   std::cout << " *** [ALL TESTS DONE] ***\n";
 
@@ -291,13 +341,7 @@ int itkImageToTreeFilterTest(int i, char* argv[] )
 
   failRatio = 100 * (float) failedCount / (float) testCount;
 
-  std::cout << "Result: ";
-  std::cout << failedCount;
-  std::cout << "/";
-  std::cout << testCount;
-  std::cout << " Tests failed (";
-  std::cout << failRatio;
-  std::cout << " %)\n";
+  std::cout << "Result: " << failedCount << "/" << testCount << " Tests failed (" << failRatio << " %)" << std::endl;
 
   return EXIT_SUCCESS;
 }

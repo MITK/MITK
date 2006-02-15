@@ -201,7 +201,7 @@ void mitk::LevelWindow::SetAuto(mitk::Image* image, bool tryPicTags, bool guessB
     ScalarType min2ndValue = image->GetScalarValue2ndMinNoRecompute();
     ScalarType max2ndValue = image->GetScalarValue2ndMaxNoRecompute();
     unsigned int numPixelsInSlice = image->GetDimensions()[0];
-    for ( int k=0;  k<image->GetDimension();  ++k ) numPixelsInSlice *= image->GetDimensions()[k];
+    for ( unsigned int k=0;  k<image->GetDimension();  ++k ) numPixelsInSlice *= image->GetDimensions()[k];
     unsigned int minCount = image->GetCountOfMinValuedVoxelsNoRecompute();
     unsigned int maxCount = image->GetCountOfMaxValuedVoxelsNoRecompute();
     float minCountFraction = minCount/float(numPixelsInSlice);
@@ -214,7 +214,7 @@ void mitk::LevelWindow::SetAuto(mitk::Image* image, bool tryPicTags, bool guessB
         min2ndValue = wholeImage->GetScalarValue2ndMinNoRecompute();  
         max2ndValue = wholeImage->GetScalarValue2ndMaxNoRecompute();  
         unsigned int numPixelsInDataset = image->GetDimensions()[0];
-        for ( int k=0;  k<image->GetDimension();  ++k ) numPixelsInDataset *= image->GetDimensions()[k];
+        for ( unsigned int k=0;  k<image->GetDimension();  ++k ) numPixelsInDataset *= image->GetDimensions()[k];
         minCount = image->GetCountOfMinValuedVoxelsNoRecompute();
         maxCount = image->GetCountOfMaxValuedVoxelsNoRecompute();
         minCountFraction = minCount/float(numPixelsInDataset);

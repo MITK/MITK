@@ -94,7 +94,7 @@ void mitk::SurfaceMapper2D::SetDataTreeNode( mitk::DataTreeNode::Pointer node )
     if(input.IsNull()) return;
     const TimeSlicedGeometry* inputTimeGeometry = input->GetTimeSlicedGeometry();
     if(( inputTimeGeometry == NULL ) || ( inputTimeGeometry->GetTimeSteps() == 0 ) ) return;
-    for (int timestep=0; timestep<inputTimeGeometry->GetTimeSteps(); timestep++)
+    for (unsigned int timestep=0; timestep<inputTimeGeometry->GetTimeSteps(); timestep++)
     {
       vtkPolyData * vtkpolydata = input->GetVtkPolyData( timestep );
       if((vtkpolydata==NULL) || (vtkpolydata->GetNumberOfPoints() < 1 )) continue;

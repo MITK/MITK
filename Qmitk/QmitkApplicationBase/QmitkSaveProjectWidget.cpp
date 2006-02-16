@@ -211,7 +211,7 @@ QmitkSaveProjectWidget::~QmitkSaveProjectWidget()
 
 std::string QmitkSaveProjectWidget::ReplaceWhiteSpaces(std::string string) 
 {
-  int pos = string.find(" ");
+  std::string::size_type pos = string.find(" ");
   while (pos != string.npos){
     string.replace(pos, 1, "_");
     pos = string.find(" ");

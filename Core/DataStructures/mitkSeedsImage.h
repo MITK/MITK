@@ -25,6 +25,11 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk {
 
+//##Documentation
+//## @brief SeedsImage class for storing seeds-images
+//##
+//## Handles operations for drawing seeds. 
+//## @ingroup Data
 class SeedsImage : public Image
 {
 
@@ -33,12 +38,15 @@ public:
   mitkClassMacro(SeedsImage, Image);
   itkNewMacro(Self);
 
+  /// handles operations
   virtual void ExecuteOperation(Operation* operation);
 
 protected:
+  /// sets a sphere of seeds around the point
   template < typename SeedsImageType >
   void AddSeedPoint(SeedsImageType * itkImage);
 
+  /// interpolates a tube of seeds between two points
   template < typename SeedsImageType >
   void PointInterpolation(SeedsImageType * itkImage);
 

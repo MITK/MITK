@@ -37,10 +37,13 @@ void QmitkBoolPropertyEditor::PropertyRemoved()
 
 void QmitkBoolPropertyEditor::onToggle(bool on)
 {
-  BeginModifyProperty();  // deregister from events
+  if (m_BoolProperty)
+  {
+    BeginModifyProperty();  // deregister from events
   
-  const_cast<mitk::BoolProperty*>(m_BoolProperty)->SetValue(on);
+    const_cast<mitk::BoolProperty*>(m_BoolProperty)->SetValue(on);
   
-  EndModifyProperty();  // again register for events
+    EndModifyProperty();  // again register for events
+  }
 }
 

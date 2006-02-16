@@ -118,6 +118,9 @@ namespace mitk{
     /// sets the origin path of the source file
     void SetOriginPath(std::string originPath);
 
+    /// returns false if file extension not exists
+    bool IsFileExtension(std::string fileExtensionKey, std::string& fileName);
+
   protected:
     /// returns the relative path
     const std::string GetRelativePathAndFilename(std::string sourcePath);

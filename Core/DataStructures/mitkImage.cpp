@@ -458,7 +458,7 @@ bool mitk::Image::SetSlice(const void *data, int s, int t, int n)
   {
     sl=AllocateSliceData(s,t,n);
     if(sl.IsNull()) return false;
-    memcpy(sl->GetData(), data, m_OffsetTable[2]*m_PixelType.GetBpe()/8);		
+    memcpy(sl->GetData(), data, m_OffsetTable[2]*m_PixelType.GetBpe()/8);   
     //we just added a missing slice, which is not regarded as modification.
     //Therefore, we do not call Modified()!
   }
@@ -1032,23 +1032,29 @@ void mitk::Image::ReleaseData()
 bool mitk::Image::WriteXMLData( XMLWriter& xmlWriter ) 
 {
   std::string fileName = xmlWriter.GetRelativePath();
-  fileName += xmlWriter.GetImageExtension();
+  std::string imageExtension = xmlWriter.GetImageExtension();
+  if(!xmlWriter.IsFileExtension(imageExtension, fileName))
+    fileName += imageExtension;
   xmlWriter.WriteProperty( "FILENAME", fileName.c_str() );
 
   if(xmlWriter.SaveSourceFiles()){
     mitk::ImageWriter::Pointer imageWriter = mitk::ImageWriter::New();
     imageWriter->SetInput( this );
-    imageWriter->SetFileName( xmlWriter.GetAbsolutePath().c_str() );
-    imageWriter->SetExtension( xmlWriter.GetImageExtension().c_str() );
+    std::string absolutePath = xmlWriter.GetAbsolutePath().c_str();
+    if(xmlWriter.IsFileExtension(imageExtension, absolutePath))
+      // remove file extension
+      absolutePath.erase(absolutePath.find(imageExtension), absolutePath.length()-absolutePath.find(imageExtension));
+    imageWriter->SetFileName( absolutePath.c_str() );
+    imageWriter->SetExtension( imageExtension.c_str() );
     imageWriter->Write();
   }
 
-	mitk::Geometry3D* geomety = GetGeometry();
+  mitk::Geometry3D* geomety = GetGeometry();
 
-	if ( geomety )
-		geomety->WriteXML( xmlWriter );
+  if ( geomety )
+    geomety->WriteXML( xmlWriter );
 
-	return true;
+  return true;
 }
 
 bool mitk::Image::ReadXMLData( XMLReader& xmlReader )
@@ -1112,10 +1118,10 @@ const mitk::Image::HistogramType* mitk::Image::GetScalarHistogram(int t) const
 template < typename ItkImageType >
 void mitk::_ComputeExtremaInItkImage(ItkImageType* itkImage, mitk::Image* mitkImage)
 {
-	itk::ImageRegionConstIterator<ItkImageType> it(itkImage, itkImage->GetRequestedRegion());
+  itk::ImageRegionConstIterator<ItkImageType> it(itkImage, itkImage->GetRequestedRegion());
   //typedef itk::Image<TPixel, VImageDimension> ItkImageType;
   typedef typename ItkImageType::PixelType TPixel;
-	TPixel value;
+  TPixel value;
 
     mitkImage->m_CountOfMinValuedVoxels = 0;
     mitkImage->m_CountOfMaxValuedVoxels = 0;
@@ -1125,12 +1131,12 @@ void mitk::_ComputeExtremaInItkImage(ItkImageType* itkImage, mitk::Image* mitkIm
   mitkImage->m_Scalar2ndMax=
     mitkImage->m_ScalarMax = itk::NumericTraits<TPixel>::NonpositiveMin();
 
-	while( !it.IsAtEnd() )
+  while( !it.IsAtEnd() )
   {
     value = it.Get();  
     //  if ( (value > mitkImage->m_ScalarMin) && (value < mitkImage->m_Scalar2ndMin) )        mitkImage->m_Scalar2ndMin = value;  
-    //	else if ( (value < mitkImage->m_ScalarMax) && (value > mitkImage->m_Scalar2ndMax) )   mitkImage->m_Scalar2ndMax = value;	
-    //	else if (value > mitkImage->m_ScalarMax)                                              mitkImage->m_ScalarMax = value;
+    //  else if ( (value < mitkImage->m_ScalarMax) && (value > mitkImage->m_Scalar2ndMax) )   mitkImage->m_Scalar2ndMax = value;  
+    //  else if (value > mitkImage->m_ScalarMax)                                              mitkImage->m_ScalarMax = value;
     //  else if (value < mitkImage->m_ScalarMin)                                              mitkImage->m_ScalarMin = value;
 
     // if numbers start with 2ndMin or 2ndMax and never have that value again, the previous above logic failed

@@ -75,8 +75,8 @@ int mitk::PointSet::SearchPoint(Point3D point, float distance )
   distance = distance*distance;
   ScalarType bestDist=distance;
   ScalarType dist, tmp;
- 	for (it = m_ItkData->GetPoints()->Begin(), i=0; it != end; ++it, ++i)
-	{
+  for (it = m_ItkData->GetPoints()->Begin(), i=0; it != end; ++it, ++i)
+  {
     bool ok = m_ItkData->GetPoints()->GetElementIfIndexExists(it->Index(), &out);
     if (!ok)
       return -1;
@@ -93,8 +93,8 @@ int mitk::PointSet::SearchPoint(Point3D point, float distance )
       bestIndex = it->Index();
       bestDist  = dist;
     }
-	}
-	return bestIndex;
+  }
+  return bestIndex;
 }
 
 //##ModelId=3F0177E901CE
@@ -123,13 +123,13 @@ bool mitk::PointSet::IndexExists(int position)
 bool mitk::PointSet::GetSelectInfo(int position)
 {
   if (m_ItkData->GetPoints()->IndexExists(position))
-	{
+  {
     PointDataType pointData = {0, false, PTUNDEFINED};
     m_ItkData->GetPointData(position, &pointData);
     return pointData.selected;
-	}
-	else
-		return false;
+  }
+  else
+    return false;
 }
 
 //##ModelId=3F05B07B0147
@@ -160,12 +160,12 @@ int mitk::PointSet::SearchSelectedPoint()
 void mitk::PointSet::ExecuteOperation(Operation* operation)
 {
 
-	switch (operation->GetOperationType())
-	{
-	case OpNOTHING:
-		break;
-	case OpINSERT://inserts the point at the given position and selects it. 
-		{
+  switch (operation->GetOperationType())
+  {
+  case OpNOTHING:
+    break;
+  case OpINSERT://inserts the point at the given position and selects it. 
+    {
       mitkCheckOperationTypeMacro(PointOperation, operation, pointOp);
       
       int position = pointOp->GetIndex();
@@ -179,30 +179,30 @@ void mitk::PointSet::ExecuteOperation(Operation* operation)
       m_ItkData->GetPointData()->InsertElement(position, pointData);
       this->Modified();
       ((const itk::Object*)this)->InvokeEvent( NewPointEvent() );
-		}
-		break;
-	case OpMOVE://moves the point given by index
-		{
+    }
+    break;
+  case OpMOVE://moves the point given by index
+    {
       mitkCheckOperationTypeMacro(PointOperation, operation, pointOp);
 
-			PointType pt;
+      PointType pt;
       pt.CastFrom(pointOp->GetPoint());
       m_ItkData->SetPoint(pointOp->GetIndex(), pt);
       this->Modified();
-		}
-		break;
-	case OpREMOVE://removes the point at given by position 
-		{
+    }
+    break;
+  case OpREMOVE://removes the point at given by position 
+    {
       mitkCheckOperationTypeMacro(PointOperation, operation, pointOp);
 
       m_ItkData->GetPoints()->DeleteIndex((unsigned)pointOp->GetIndex());
       m_ItkData->GetPointData()->DeleteIndex((unsigned)pointOp->GetIndex());
       this->Modified();
      ((const itk::Object*)this)->InvokeEvent( RemovedPointEvent() );
-		}
-		break;
+    }
+    break;
   case OpSELECTPOINT://select the given point
-		{
+    {
       mitkCheckOperationTypeMacro(PointOperation, operation, pointOp);
 
       PointDataType pointData = {0, false, PTUNDEFINED};
@@ -210,10 +210,10 @@ void mitk::PointSet::ExecuteOperation(Operation* operation)
       pointData.selected = true;
       m_ItkData->SetPointData(pointOp->GetIndex(), pointData);
       this->Modified();
-		}
-		break;
-	case OpDESELECTPOINT://unselect the given point
-		{
+    }
+    break;
+  case OpDESELECTPOINT://unselect the given point
+    {
       mitkCheckOperationTypeMacro(PointOperation, operation, pointOp);
 
       PointDataType pointData = {0, false, PTUNDEFINED};
@@ -221,8 +221,8 @@ void mitk::PointSet::ExecuteOperation(Operation* operation)
       pointData.selected = false;
       m_ItkData->SetPointData(pointOp->GetIndex(), pointData);
       this->Modified();
-		}
-		break;
+    }
+    break;
   case OpSETPOINTTYPE:
     {
       mitkCheckOperationTypeMacro(PointOperation, operation, pointOp);
@@ -233,14 +233,14 @@ void mitk::PointSet::ExecuteOperation(Operation* operation)
       this->Modified();
     }
     break;
-	default:
+  default:
     itkWarningMacro("mitkPointSet could not understrand the operation. Please check!");
-		break;
-	}
+    break;
+  }
   
-  //to tell the mappers, that the data is modifierd and has to be updated	
+  //to tell the mappers, that the data is modifierd and has to be updated 
   //only call modified if anything is done, so call in cases
-	//this->Modified();
+  //this->Modified();
 
   mitk::OperationEndEvent endevent(operation);
   ((const itk::Object*)this)->InvokeEvent(endevent);
@@ -294,13 +294,15 @@ bool mitk::PointSet::WriteXMLData( XMLWriter& xmlWriter )
 {
   BaseData::WriteXMLData( xmlWriter );
   std::string fileName = xmlWriter.GetRelativePath();
-  fileName += ".mps";
+  if(!xmlWriter.IsFileExtension(".mps", fileName))
+    fileName += ".mps";
   xmlWriter.WriteProperty( XMLReader::FILENAME, fileName.c_str() );
 
   if(xmlWriter.SaveSourceFiles()){
     PointSetWriter::Pointer writer = PointSetWriter::New();
     fileName = xmlWriter.GetAbsolutePath();
-    fileName += ".mps";
+    if(!xmlWriter.IsFileExtension(".mps", fileName))
+      fileName += ".mps";
     writer->SetFileName( fileName.c_str() );
     writer->SetInput( this );
     writer->Update();

@@ -139,7 +139,7 @@ const std::string XMLWriter::GetRelativePath()
     if(!SaveSourceFiles())
       SetSubFolder( m_OriginPath.c_str() );
     m_FilenameAndSubFolder = m_SubFolder;
-    m_SourceFileName = itksys::SystemTools::GetFilenameWithoutExtension( m_SourceFileName );
+    //m_SourceFileName = itksys::SystemTools::GetFilenameWithoutExtension( m_SourceFileName );
     m_FilenameAndSubFolder += m_SourceFileName;
     return GetRelativePathAndFilename(m_FilenameAndSubFolder);
   }
@@ -296,6 +296,22 @@ std::string XMLWriter::CheckLastSlash(std::string m_String)
       m_String += "/";
   }
   return m_String;
+}
+
+bool XMLWriter::IsFileExtension(std::string fileExtensionKey, std::string& fileName)
+{
+  std::string::size_type extensionPos;
+  extensionPos = fileName.find(fileExtensionKey);
+  if(extensionPos==std::string::npos)
+    return false;
+  else{
+    std::string::size_type lengthWithExtension;
+    lengthWithExtension = extensionPos+fileExtensionKey.length();
+    // removes e.g. ".gz" after the file extension
+    if(lengthWithExtension < fileName.length())
+      fileName.erase(lengthWithExtension, fileName.length()-lengthWithExtension);
+    return true;
+  }
 }
 
 

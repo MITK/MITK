@@ -257,23 +257,25 @@ bool mitk::Surface::WriteXMLData( XMLWriter& xmlWriter )
   writer->SetInput( this );
   writer->SetFileName( fileName.c_str() );
   writer->Write();
-	return true;
+  return true;
 */
   
   BaseData::WriteXMLData( xmlWriter );
   std::string fileName = xmlWriter.GetRelativePath();
-  fileName += ".stl";
+  if(!xmlWriter.IsFileExtension(".stl", fileName))
+    fileName += ".stl";
   xmlWriter.WriteProperty( XMLReader::FILENAME, fileName.c_str() );
 
   if(xmlWriter.SaveSourceFiles()){
     mitk::SurfaceVtkWriter<vtkSTLWriter>::Pointer writer = mitk::SurfaceVtkWriter<vtkSTLWriter>::New();
     writer->SetInput( this );
     fileName = xmlWriter.GetAbsolutePath();
-    fileName += ".stl";
+    if(!xmlWriter.IsFileExtension(".stl", fileName))
+      fileName += ".stl";
     writer->SetFileName( fileName.c_str() );
     writer->Write();
   }
-	return true;
+  return true;
   
 }
 

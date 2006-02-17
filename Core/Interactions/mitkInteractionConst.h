@@ -89,7 +89,8 @@ typedef enum EEventIds
   EIDSUBDESELECT = 1020,
   EIDSMTOSELECTED = 1030,
   //external thrown events:
-  EIDCLEAR = 1100
+  EIDCLEAR = 1100,
+  EIDACTIVATETOOL  = 1300,
 };
 
 //##Constants for Operations
@@ -252,7 +253,18 @@ typedef enum EActions
   AcATTRIBUTATION = 3005,              //used in VesselGraphInteractor
   AcDEFAULT = 3007,                  //used in VesselGraphInteractor
   AcSETVESSELELEMENT = 3008,         //used in VesselGraphInteractor
-  AcCHECKBARRIERSTATUS = 3010        //used in VesselGraphInteractor
+  AcCHECKBARRIERSTATUS = 3010,        //used in VesselGraphInteractor
+  // some actions for SegmentationInteractor
+  AcENTEROBJECT     = 48000,
+  AcLEAVEOBJECT     = 48001,
+  AcSWITCHOBJECT    = 48002,
+  AcUPDATELINE      = 48003,
+  AcINITLINE        = 48004,
+  AcTERMINATELINE   = 48005,
+  AcCREATEBOX       = 48006,
+  AcCREATEOBJECTFROMLINE = 48007,
+  AcCANCEL          = 48008,
+  AcACTIVATETOOL    = 48009
 };
 
 

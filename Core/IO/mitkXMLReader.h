@@ -21,12 +21,12 @@ namespace mitk{
   //## Reads a stream and parses XML element tags and corresponding attributes.
   //## Each element begin tag and its attributes are sent to the StartElement method.
   //## Each element end tag is sent to the EndElement method.
-  //## Calls the ObjectFactory (methode CreateObject()) to create objects that are defined in the tags of the XML file.
+  //## Calls the ObjectFactory (methode CreateObject()) to create objects that are defined in the tags (node name) of the XML file.
   //## Don't forget to define new elements in the ObjectFactory!
   //## @ingroup IO
   class XMLReader : public vtkXMLParser {
 
-	public:
+  public:
     
     /// Brief Class defines XML nodes
     class XMLNode
@@ -63,7 +63,7 @@ namespace mitk{
     /// loads the XML file and starts to parse it
     static bool Load( std::string fileName, const mitk::DataTreeIteratorBase* it );
 
-    typedef itk::RGBAPixel< vtkFloatingPointType > 	RGBAType;
+    typedef itk::RGBAPixel< vtkFloatingPointType >  RGBAType;
     typedef itk::RGBPixel<vtkFloatingPointType> Color;
 
     /// gets the data as a string of the specified XML attribute
@@ -153,6 +153,6 @@ namespace mitk{
     std::string ReadXMLStringAttribut( std::string name, const char** atts) const;
     std::string m_SourceFilePath;
     float m_FileVersion;
-	};
+  };
 }
 #endif

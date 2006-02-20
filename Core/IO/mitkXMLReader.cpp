@@ -90,7 +90,7 @@ namespace mitk {
           value.insert(e0+1, "/");
       }
       m_SourceFilePath = itksys::SystemTools::GetProgramPath(value.c_str());
-      m_SourceFilePath += "/";
+      //m_SourceFilePath += "/";
     }
     return true;
   }

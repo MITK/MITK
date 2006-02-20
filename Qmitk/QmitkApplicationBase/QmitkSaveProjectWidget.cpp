@@ -27,7 +27,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qlineedit.h>
 #include <qtoolbutton.h>
 
-//#include <qstatusbar.h>
 
 QmitkSaveProjectWidget::QmitkSaveProjectWidget(mitk::DataTree::Pointer dataTree, QWidget* parent, const char* name)
 :QWidget(parent,name), m_DataTree(dataTree)
@@ -39,19 +38,23 @@ QmitkSaveProjectWidget::QmitkSaveProjectWidget(mitk::DataTree::Pointer dataTree,
 
 void QmitkSaveProjectWidget::PrepareDataTreeFilter()
 {
-  //mitk::DataTreeFilter::PropertyList visible_props;
+  visible_props.push_back("write");
   visible_props.push_back("name");
-  //mitk::DataTreeFilter::PropertyList editable_props;
+
+  editable_props.push_back("write");
   editable_props.push_back("name");
   
   tree_filter = mitk::DataTreeFilter::New(m_DataTree);
   tree_filter->SetFilter(&mitk::IsDataTreeNode);
+
+  const mitk::DataTreeFilter::ItemList* items;  
+  items = tree_filter->GetItems();
+  AddCheckBoxWrite(items);
+
   //tree_filter->SetFilter(&mitk::IsGoodDataTreeNode);  // filters all nodes without a name
   tree_filter->SetVisibleProperties(visible_props);
-  tree_filter->SetEditableProperties(editable_props);
-          
+  tree_filter->SetEditableProperties(editable_props);          
 }
-
 
 void QmitkSaveProjectWidget::SetLayout()
 {
@@ -74,14 +77,13 @@ void QmitkSaveProjectWidget::SetLayout()
 
   vertical->insertLayout(1, horizontal);
 
-  treelistview = new QmitkDataTreeListView(tree_filter, this); 
+  treelistview = new QmitkDataTreeListView(tree_filter, this);
   vertical->addWidget( treelistview );
 
   saveButton = new QPushButton("Save", this);
   saveButton->setMaximumWidth(80);
   vertical->addWidget(saveButton);
 }
-
 
 void QmitkSaveProjectWidget::AddConnections()
 {
@@ -90,21 +92,17 @@ void QmitkSaveProjectWidget::AddConnections()
   QObject::connect(sourceCheckBox, SIGNAL(stateChanged(int)), this, SLOT(SetEditable(int)));
 }
 
-
 void QmitkSaveProjectWidget::Save()
 {
   // save dialog
   QString filename = QFileDialog::getSaveFileName( QString::null, "XML Project description (*.xml)", this,
                                                    "Save Project File", "Choose a filename to save under");
-
-
   if ( !filename.isEmpty() ) {
       TryToExportTree(filename);
       //std::cout<<filename.ascii()<<std::endl;
       this->close();
   }
 }
-
 
 void QmitkSaveProjectWidget::ChooseSourceFolder()
 {
@@ -116,23 +114,23 @@ void QmitkSaveProjectWidget::ChooseSourceFolder()
       //std::cout<<filename.ascii()<<std::endl;
 }
 
-
 void QmitkSaveProjectWidget::SetEditable(int state)
 {
   if(state == QButton::On){
     folderChooseButton->setDisabled(false);
     folderLineEdit->setDisabled(false);
+    editable_props.push_back("write");
     editable_props.push_back("name");
     tree_filter->SetEditableProperties(editable_props);
   }
   if(state == QButton::Off){
-    editable_props.clear();
+    //editable_props.clear();
+    editable_props.pop_back();
     tree_filter->SetEditableProperties(editable_props);
     folderChooseButton->setDisabled(true);
     folderLineEdit->setDisabled(true);
   }
 }
-
 
 void QmitkSaveProjectWidget::WriteSelectedItems(const mitk::DataTreeFilter::ItemList* items,
                                           mitk::XMLWriter& xmlWriter)
@@ -142,17 +140,18 @@ void QmitkSaveProjectWidget::WriteSelectedItems(const mitk::DataTreeFilter::Item
 
   while ( itemiter != itemiterend ) // for all items
   {
-    // check, whether item is selected
-    if ( itemiter->IsSelected() )
-    {
-      xmlWriter.BeginNode(mitk::DataTree::XML_TAG_TREE_NODE);
-
-      // write node via XMLWriter
-      const mitk::DataTreeNode* node = itemiter->GetNode();
-
-      if (node) // could be, that node is NULL
+    // check, whether item is selected    
+    const mitk::DataTreeNode* node = itemiter->GetNode();
+    if (node){
+      mitk::BaseProperty::Pointer property = node->GetProperty("write");
+      std::string m_bool = property->GetValueAsString();
+      if (m_bool == "1")
       {
+        xmlWriter.BeginNode(mitk::DataTree::XML_TAG_TREE_NODE);
+
+        // writes node via XMLWriter
         // sets the source file name
+
         mitk::BaseProperty::Pointer m_Property = node->GetProperty("name");
         std::string sourceFileName;
         if (m_Property){
@@ -160,10 +159,9 @@ void QmitkSaveProjectWidget::WriteSelectedItems(const mitk::DataTreeFilter::Item
           if (sourceFileName != "") 
             sourceFileName = ReplaceWhiteSpaces(sourceFileName);
         }
-        xmlWriter.SetSourceFileName(sourceFileName.c_str());
-        //
-      }      
-      const_cast<mitk::DataTreeNode*>(node)->WriteXML( xmlWriter );
+        xmlWriter.SetSourceFileName(sourceFileName.c_str());      
+        const_cast<mitk::DataTreeNode*>(node)->WriteXML( xmlWriter );
+      }
     }
     // write children
     if ( itemiter->HasChildren() )
@@ -172,11 +170,12 @@ void QmitkSaveProjectWidget::WriteSelectedItems(const mitk::DataTreeFilter::Item
     }
 
     // close XML node
-    if (itemiter->IsSelected())
-    {
-      xmlWriter.EndNode();
+    if (node){
+      mitk::BaseProperty::Pointer property = node->GetProperty("write");
+      std::string m_bool = property->GetValueAsString();
+      if (m_bool == "1")
+        xmlWriter.EndNode();
     }
-
     ++itemiter; // next item
   }
 }
@@ -220,4 +219,22 @@ std::string QmitkSaveProjectWidget::ReplaceWhiteSpaces(std::string string)
   //return string.substr(0, e0).c_str();
   return string;
 }
-    
+
+void QmitkSaveProjectWidget::AddCheckBoxWrite(const mitk::DataTreeFilter::ItemList* items)
+{
+  mitk::DataTreeFilter::ConstItemIterator itemiter( items->Begin() ); 
+  mitk::DataTreeFilter::ConstItemIterator itemiterend( items->End() ); 
+
+  while ( itemiter != itemiterend ) // for all items
+  {
+    mitk::DataTreeNode* node = const_cast<mitk::DataTreeNode*>(itemiter->GetNode());
+    if (node) // could be, that node is NULL
+      node->SetProperty("write", new mitk::BoolProperty(true));
+     
+    if ( itemiter->HasChildren() )
+    {
+      AddCheckBoxWrite( itemiter->GetChildren() );
+    }
+  ++itemiter; // next item
+  }
+}

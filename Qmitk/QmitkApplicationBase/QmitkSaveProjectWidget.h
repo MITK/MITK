@@ -77,6 +77,8 @@ class QmitkSaveProjectWidget : public QWidget
     /// replaces white spaces with "_"
     std::string ReplaceWhiteSpaces(std::string);
 
+    void AddCheckBoxWrite(const mitk::DataTreeFilter::ItemList*);
+
     mitk::DataTree::Pointer m_DataTree;
 
     mitk::DataTreeFilter::Pointer tree_filter;

@@ -365,9 +365,7 @@ void QmitkDataTreeListView::mouseReleaseEvent ( QMouseEvent* e )
     if (item)
     {
       selected = !item->IsSelected();
-      m_SelfCall = true;
       item->SetSelected( selected ); // toggle selection
-      m_SelfCall = false;
     }
   }
   else // not left mouse button
@@ -694,6 +692,8 @@ void QmitkDataTreeListView::selectionChangedHandler( const itk::EventObject& e)
   const mitk::TreeFilterSelectionChangedEvent& event( static_cast<const mitk::TreeFilterSelectionChangedEvent&>(e) );
   const mitk::DataTreeFilter::Item* item = event.GetChangedItem();
   bool selected = event.IsSelected();
+
+  emit activated(item, selected);
  
   selectItemInGrid(item, selected, this);
   update();

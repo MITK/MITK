@@ -16,6 +16,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 #include <QmitkNumberPropertyEditor.h>
+#include <mitkRenderingManager.h>
 
 #define DT_SHORT   1
 #define DT_INT     2
@@ -267,6 +268,7 @@ void QmitkNumberPropertyEditor::onValueChanged(int value)
 void QmitkNumberPropertyEditor::PropertyChanged()
 {
   DisplayNumber();
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkNumberPropertyEditor::PropertyRemoved()

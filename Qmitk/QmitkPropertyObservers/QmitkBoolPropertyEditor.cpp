@@ -16,6 +16,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 #include <QmitkBoolPropertyEditor.h>
+#include <mitkRenderingManager.h>
 
 QmitkBoolPropertyEditor::QmitkBoolPropertyEditor( const mitk::BoolProperty* property, QWidget* parent, const char* name )
 : QmitkBoolPropertyView( property, parent, name )
@@ -42,6 +43,7 @@ void QmitkBoolPropertyEditor::onToggle(bool on)
     BeginModifyProperty();  // deregister from events
   
     const_cast<mitk::BoolProperty*>(m_BoolProperty)->SetValue(on);
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   
     EndModifyProperty();  // again register for events
   }

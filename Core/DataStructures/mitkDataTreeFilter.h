@@ -101,8 +101,8 @@
       Interactor that wants to determine the object under the mouse cursor.
     - you want to save parts the data tree, but only nodes that actually contain data
   
-  \image html doc_mitkDataTreeFilterRelatedClasses.png Relations of the DataTreeFilter to other classes.
-  \image latex doc_mitkDataTreeFilterRelatedClasses.eps Relations of the DataTreeFilter to other classes.
+  \image html doc_mitkDataTreeFilterRelatedClasses.png 
+  \image latex doc_mitkDataTreeFilterRelatedClasses.eps
 
   The above diagram illustrates the relationship between the MITK data tree, the
   DataTreeFilter and its clients. The most important observation is, that <i>the filter does

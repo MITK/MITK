@@ -247,7 +247,8 @@ void QmitkDataTreeComboBox::onActivated(int index)
     // following cast is due to bad design... class Item needs needs rework 
     m_SelfCall = true;
     const_cast<mitk::DataTreeFilter::Item*>(m_Items.at(index))->SetSelected(true);
-    emit activated(m_Items.at(index));
+    m_CurrentItem = m_Items.at(index);
+    emit activated( m_CurrentItem );
     m_SelfCall = false;
   }
   catch (std::out_of_range)
@@ -393,6 +394,20 @@ void QmitkDataTreeComboBox::generateItems()
 
   // fill rows with property views for the visible items 
   AddItemsToList(m_DataTreeFilter->GetItems(), visibleProps, 0);
+    
+  try
+  {
+    const mitk::DataTreeFilter::Item* currentItem = m_Items.at( QComboBox::currentItem() );
+    if ( currentItem != m_CurrentItem )
+    {
+      m_CurrentItem = currentItem; 
+      emit activated( m_CurrentItem );
+    }
+  }
+  catch (std::out_of_range)
+  {
+    std::cerr << "in generateItems(), " << __FILE__ << "l. " << __LINE__ << ": not a good index..." << std::endl;
+  }
 }
 
 /**

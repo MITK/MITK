@@ -99,6 +99,8 @@ class QmitkDataTreeComboBox : public QComboBox
     
     std::string m_UserSetDisplayedProperty;
     std::string m_DisplayedProperty;
+    
+    const mitk::DataTreeFilter::Item* m_CurrentItem;
 };
 
 #endif

@@ -5,9 +5,6 @@
 # This file is configured by MITK and used by the UseMITK.cmake module
 # to load MITK's settings for an external project.
 
-# The MITK source tree.
-SET(MITK_SOURCE_DIR "@MITK_SOURCE_DIR@")
-
 # The MITK include file directories.
 SET(MITK_INCLUDE_DIRS "@MITK_INCLUDE_DIRS@")
 SET(QMITK_INCLUDE_DIRS "@QMITK_INCLUDE_DIRS@")

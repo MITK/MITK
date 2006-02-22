@@ -25,6 +25,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <float.h>
 #include <itkIndex.h>
 #include <itkVector.h>
+#include <vnl/vnl_quaternion.h>
 
 class vtkMatrix4x4;
 
@@ -46,6 +47,7 @@ typedef itk::Point<ScalarType,3> Point3D;
 typedef itk::Point<ScalarType,4> Point4D;
 typedef itk::Vector<ScalarType,2> Vector2D;
 typedef itk::Vector<ScalarType,3> Vector3D;
+typedef vnl_quaternion<ScalarType> Quaternion;
 
 //##Documentation
 //##@brief enumeration of the type a point can be

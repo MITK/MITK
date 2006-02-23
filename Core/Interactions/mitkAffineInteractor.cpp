@@ -203,9 +203,9 @@ bool mitk::AffineInteractor::ExecuteAction(Action* action, mitk::StateEvent cons
 
       mitk::Point3D dataPosition = geometry->GetCenter();
 
-      newPosition -= dataPosition;  // calculate vector from center of the data object to the current mouse position
+      newPosition = newPosition - dataPosition.GetVectorFromOrigin();  // calculate vector from center of the data object to the current mouse position
 
-      mitk::Vector3D startPosition = m_LastMousePosition.GetVectorFromOrigin() - dataPosition;  // calculate vector from center of the data object to the last mouse position
+      mitk::Vector3D startPosition = m_LastMousePosition.GetVectorFromOrigin() - dataPosition.GetVectorFromOrigin();  // calculate vector from center of the data object to the last mouse position
 
       /* calculate rotation axis (by calculating the cross produkt of the vectors) */
       mitk::Vector3D rotationaxis;   

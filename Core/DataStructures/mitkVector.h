@@ -21,7 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITKVECTOR_H_HEADER_INCLUDED_C1EBD0AD
 
 #include <itkPoint.h>
-#include <itkFixedCenterOfRotationAffineTransform.h>
+#include <itkAffineGeometryFrame.h>
 #include <float.h>
 #include <itkIndex.h>
 #include <itkVector.h>
@@ -38,7 +38,7 @@ typedef itk::Matrix<ScalarType, 3, 3> Matrix3D;
 typedef itk::Matrix<ScalarType,4,4> Matrix4D;
 typedef vnl_matrix_fixed<ScalarType, 3, 3> VnlMatrix3D;
 typedef itk::Transform<ScalarType, 3, 3> Transform3D;
-typedef itk::FixedCenterOfRotationAffineTransform<ScalarType, 3> AffineTransform3D;
+typedef itk::AffineGeometryFrame<ScalarType, 3>::TransformType AffineTransform3D;
 typedef vnl_vector<ScalarType> VnlVector;
 typedef vnl_vector_ref<ScalarType> VnlVectorRef;
 

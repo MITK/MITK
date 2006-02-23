@@ -35,94 +35,94 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkPoints.h>
 
 namespace mitk {
-  
-//##Documentation
-//##@brief DataStructure which stores a set of points (incl. pointdata) where each point can be associated to an element of a cell.
-//##
-//## A mesh contains several cells that can be of different celltypes (Line, Triangle, Polygone...).
-//## A cell is always closed. If a linestrip is to be created, then declare several cells, each containing one line.
-//## The operations take care about the coherence. If a line is added to an existing LineCell, 
-//## then a TriangleCell is built with the old and the new parameter (and so on).
-//## Deletion is done the opposite way.
-//## Example for inserting a line into a TriangleCell:
-//## existing PIds ind the cell:1,2,4; 
-//## inserting 2,3 so that new PIds in Cell:1,2,3,4 
-//## The cell is now of type QuadrilateralCell
-//## @ingroup Data
-class Mesh : public PointSet
-{
-public:
-  mitkClassMacro(Mesh, PointSet);
-
-  itkNewMacro(Self);
-
-  typedef Superclass::DataType::CellType CellType;
-  typedef CellType::CellAutoPointer CellAutoPointer;
-  typedef Superclass::MeshTraits::CellTraits CellTraits;
-  typedef CellTraits::PointIdConstIterator PointIdConstIterator;
-  typedef CellTraits::PointIdIterator PointIdIterator;
-  typedef DataType::CellDataContainer CellDataContainer;
-  typedef DataType::CellDataContainerIterator CellDataIterator;
-  typedef Superclass::DataType::CellsContainer::Iterator CellIterator;
-  typedef Superclass::DataType::CellsContainer::ConstIterator ConstCellIterator;
-  typedef itk::PolygonCell< CellType > PolygonType;
-  typedef MeshType::CellType::MultiVisitor MeshMultiVisitor;    
 
   //##Documentation
-	//## @brief returns the current number of cells in the mesh
-	virtual unsigned long GetNumberOfCells();
+  //##@brief DataStructure which stores a set of points (incl. pointdata) where each point can be associated to an element of a cell.
+  //##
+  //## A mesh contains several cells that can be of different celltypes (Line, Triangle, Polygone...).
+  //## A cell is always closed. If a linestrip is to be created, then declare several cells, each containing one line.
+  //## The operations take care about the coherence. If a line is added to an existing LineCell, 
+  //## then a TriangleCell is built with the old and the new parameter (and so on).
+  //## Deletion is done the opposite way.
+  //## Example for inserting a line into a TriangleCell:
+  //## existing PIds ind the cell:1,2,4; 
+  //## inserting 2,3 so that new PIds in Cell:1,2,3,4 
+  //## The cell is now of type QuadrilateralCell
+  //## @ingroup Data
+  class Mesh : public PointSet
+  {
+  public:
+    mitkClassMacro(Mesh, PointSet);
 
-  //##Documentation
-	//## @brief returns the mesh 
-  virtual DataType* GetMesh() const;
+    itkNewMacro(Self);
 
-  //##Documentation
-	//## @brief returns the mesh 
-  virtual DataType* GetMesh();
+    typedef Superclass::DataType::CellType CellType;
+    typedef CellType::CellAutoPointer CellAutoPointer;
+    typedef Superclass::MeshTraits::CellTraits CellTraits;
+    typedef CellTraits::PointIdConstIterator PointIdConstIterator;
+    typedef CellTraits::PointIdIterator PointIdIterator;
+    typedef DataType::CellDataContainer CellDataContainer;
+    typedef DataType::CellDataContainerIterator CellDataIterator;
+    typedef Superclass::DataType::CellsContainer::Iterator CellIterator;
+    typedef Superclass::DataType::CellsContainer::ConstIterator ConstCellIterator;
+    typedef itk::PolygonCell< CellType > PolygonType;
+    typedef MeshType::CellType::MultiVisitor MeshMultiVisitor;    
 
-  void SetMesh(DataType*);
+    //##Documentation
+    //## @brief returns the current number of cells in the mesh
+    virtual unsigned long GetNumberOfCells();
 
-  //##Documentation
-	//## @brief checks if the given point is in a cell and returns that cellId.
-  //## Basicaly it searches lines and points that are hit.
-  virtual bool EvaluatePosition(Point3D point, unsigned long &cellId, float precision);
+    //##Documentation
+    //## @brief returns the mesh 
+    virtual DataType* GetMesh() const;
 
-  //##Documentation
-	//## @brief searches for the next new cellId and returns that id
-  unsigned long GetNewCellId();
+    //##Documentation
+    //## @brief returns the mesh 
+    virtual DataType* GetMesh();
 
-  //##Documentation
-	//## @brief returns the first cell that includes the given pointId
-  virtual int SearchFirstCell(unsigned long pointId);
+    void SetMesh(DataType*);
 
-  //##Documentation
-	//## @brief searches for a line, that is hit by the given point.
-  //## Then returns the lineId and the cellId
-  virtual bool SearchLine(Point3D point, float distance , unsigned long &lineId, unsigned long &cellId);
+    //##Documentation
+    //## @brief checks if the given point is in a cell and returns that cellId.
+    //## Basicaly it searches lines and points that are hit.
+    virtual bool EvaluatePosition(Point3D point, unsigned long &cellId, float precision);
 
-  //##Documentation
-	//## @brief searches a line according to the cellId and lineId and 
-  //## returns the PointIds, that assign the line; if successful, then return param = true;
-  virtual bool GetPointIds(unsigned long cellId, unsigned long lineId, int &idA, int &idB);
+    //##Documentation
+    //## @brief searches for the next new cellId and returns that id
+    unsigned long GetNewCellId();
 
-  //##Documentation
-  //## @brief searches a selected cell and returns the id of that cell. if no cell is found, then -1 is returned
-  virtual int SearchSelectedCell();
+    //##Documentation
+    //## @brief returns the first cell that includes the given pointId
+    virtual int SearchFirstCell(unsigned long pointId);
 
-  //##Documentation
-	//## @brief creates a BoundingBox and computes it with the given points of the cell
-  //## Returns the BoundingBox != IsNull() if successful.
-  virtual DataType::BoundingBoxPointer GetBoundingBoxFromCell(unsigned long cellId);
+    //##Documentation
+    //## @brief searches for a line, that is hit by the given point.
+    //## Then returns the lineId and the cellId
+    virtual bool SearchLine(Point3D point, float distance , unsigned long &lineId, unsigned long &cellId);
 
-  //##Documentation
-  //## @brief executes the given Operation
-	virtual void ExecuteOperation(Operation* operation);
+    //##Documentation
+    //## @brief searches a line according to the cellId and lineId and 
+    //## returns the PointIds, that assign the line; if successful, then return param = true;
+    virtual bool GetPointIds(unsigned long cellId, unsigned long lineId, int &idA, int &idB);
 
-protected:
-	Mesh();
-	virtual ~Mesh();
+    //##Documentation
+    //## @brief searches a selected cell and returns the id of that cell. if no cell is found, then -1 is returned
+    virtual int SearchSelectedCell();
 
-};
+    //##Documentation
+    //## @brief creates a BoundingBox and computes it with the given points of the cell
+    //## Returns the BoundingBox != IsNull() if successful.
+    virtual DataType::BoundingBoxPointer GetBoundingBoxFromCell(unsigned long cellId);
+
+    //##Documentation
+    //## @brief executes the given Operation
+    virtual void ExecuteOperation(Operation* operation);
+
+  protected:
+    Mesh();
+    virtual ~Mesh();
+
+  };
 
 } // namespace mitk
 

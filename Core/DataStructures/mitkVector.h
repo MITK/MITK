@@ -21,10 +21,11 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITKVECTOR_H_HEADER_INCLUDED_C1EBD0AD
 
 #include <itkPoint.h>
-#include <itkAffineGeometryFrame.h>
 #include <float.h>
 #include <itkIndex.h>
 #include <itkVector.h>
+#include <itkMatrix.h>
+#include <itkTransform.h>
 #include <vnl/vnl_quaternion.h>
 
 class vtkMatrix4x4;
@@ -38,7 +39,6 @@ typedef itk::Matrix<ScalarType, 3, 3> Matrix3D;
 typedef itk::Matrix<ScalarType,4,4> Matrix4D;
 typedef vnl_matrix_fixed<ScalarType, 3, 3> VnlMatrix3D;
 typedef itk::Transform<ScalarType, 3, 3> Transform3D;
-typedef itk::AffineGeometryFrame<ScalarType, 3>::TransformType AffineTransform3D;
 typedef vnl_vector<ScalarType> VnlVector;
 typedef vnl_vector_ref<ScalarType> VnlVectorRef;
 
@@ -284,11 +284,26 @@ inline bool Equal(double scalar1, double scalar2)
   return fabs(scalar1-scalar2) < mitk::eps;
 }
 
+} // namespace mitk
+
+
+/*
+ * This part of the code has been shifted here to avoid compiler clashes
+ * caused by including <itkAffineGeometryFrame.h> before the declaration of
+ * the Equal() methods above. This problem occurs when using MSVC and is
+ * probably related to a compiler bug. 
+ */
+#include <itkAffineGeometryFrame.h>
+
+namespace mitk
+{
+typedef itk::AffineGeometryFrame<ScalarType, 3>::TransformType AffineTransform3D;
+
 void TransferVtkMatrixToItkTransform(const vtkMatrix4x4* vtkmatrix, mitk::AffineTransform3D* itkTransform);
 
 void TransferItkTransformToVtkMatrix(const mitk::AffineTransform3D* itkTransform, vtkMatrix4x4* vtkmatrix);
+}
 
-} // namespace mitk
 
 #endif //DOXYGEN_SKIP
 

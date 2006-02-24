@@ -376,6 +376,8 @@ void QmitkMainTemplate::fileOpenProject()
     {
       mitk::DataTreePreOrderIterator it(m_Tree);
       mitk::DataTree::Load(&it, filename);
+      m_MultiWidget->InitializeStandardViews(&it);
+      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     }
     catch ( itk::ExceptionObject & ex )
     {
@@ -393,7 +395,8 @@ void QmitkMainTemplate::fileOpenProject()
 
       mitk::DataTreePreOrderIterator it(m_Tree);
       mitk::DataTree::Load( &it, fileName.ascii() );
-
+      m_MultiWidget->InitializeStandardViews(&it);
+      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
       m_ProjectFileName = fileName;
     }
     catch ( itk::ExceptionObject & ex )

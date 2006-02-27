@@ -81,16 +81,16 @@ int testFilterContext()
   DirectionType testDirection1;
   testDirection1.Fill(0);
   StartPointDataPointer data1 = StartPointDataType::New();
-  data1->SetStartPoint(&testPoint1);
-  data1->SetStartDirection(&testDirection1);
+  data1->SetStartPoint(testPoint1);
+  data1->SetStartDirection(testDirection1);
 
   PointType testPoint2;
   testPoint2.Fill(1);
   DirectionType testDirection2;
   testDirection2.Fill(0);
   StartPointDataPointer data2 = StartPointDataType::New();
-  data2->SetStartPoint(&testPoint2);
-  data2->SetStartDirection(&testDirection2);
+  data2->SetStartPoint(testPoint2);
+  data2->SetStartDirection(testDirection2);
 
 
   std::cout << " *** Testing ITTFilterContext for storage of objects ***\n";
@@ -145,25 +145,25 @@ int testInitFilter()
   std::cout << " *** Testing initialization of filter ***\n";
   std::cout << "Loading new StartPointData to filter...\n";
   ImageToTreeFilterPointer testFilter = ImageToTreeFilterType::New();
-  testFilter->SetStartPoint(&testPoint1);
-  testFilter->SetStartDirection(&testDirection1);
+  testFilter->SetStartPoint(testPoint1);
+  testFilter->SetStartDirection(testDirection1);
 
   // start point should be the first point in the filter
   std::cout << "Reading StartPointData from filter...\n";
   FilterContextPointer testFilterContext = testFilter->GetFilterContext();
   StartPointQueueType* testQueue = testFilterContext->GetStartPointQueue();
   StartPointDataPointer testData = testQueue->front();
-  PointType* testPoint2 = testData->GetStartPoint();
-  DirectionType* testDirection2 = testData->GetStartDirection();
+  PointType testPoint2 = testData->GetStartPoint();
+  DirectionType testDirection2 = testData->GetStartDirection();
 
-  if(testPoint1 != *testPoint2)
+  if(testPoint1 != testPoint2)
   {
     std::cout << "Startpoint not in queue.\n";
     std::cout << " *** [TEST FAILED] ***\n";
     return EXIT_FAILURE;
   }
 
-  if(testDirection1 != *testDirection2)
+  if(testDirection1 != testDirection2)
   {
     std::cout << "Startdirection not in queue.\n";
     std::cout << " *** [TEST FAILED] ***\n";

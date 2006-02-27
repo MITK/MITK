@@ -1,3 +1,21 @@
+/*=========================================================================
+
+Program:   Medical Imaging & Interaction Toolkit
+Module:    $RCSfile$
+Language:  C++
+Date:      $Date$
+Version:   $Revision$
+
+Copyright (c) German Cancer Research Center, Division of Medical and
+Biological Informatics. All rights reserved.
+See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
+
+This software is distributed WITHOUT ANY WARRANTY; without even
+the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE.  See the above copyright notices for more information.
+
+=========================================================================*/
+
 #ifndef MITK_XML_READER
 #define MITK_XML_READER
 
@@ -21,8 +39,11 @@ namespace mitk{
   //## Reads a stream and parses XML element tags and corresponding attributes.
   //## Each element begin tag and its attributes are sent to the StartElement method.
   //## Each element end tag is sent to the EndElement method.
-  //## Calls the ObjectFactory (methode CreateObject()) to create objects that are defined in the tags (node name) of the XML file.
+  //## Calls the ObjectFactory (function CreateObject()) to create objects that are defined in the tags (node name) of the XML file.
   //## Don't forget to define new elements in the ObjectFactory!
+  //##
+  //## The XMLIO class manages the writing and reading of the data.
+  //## An example of how to start the XMLWriter can be found in the function Load() of the DataTree class.
   //## @ingroup IO
   class XMLReader : public vtkXMLParser {
 

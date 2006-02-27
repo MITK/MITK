@@ -1,3 +1,21 @@
+/*=========================================================================
+
+Program:   Medical Imaging & Interaction Toolkit
+Module:    $RCSfile$
+Language:  C++
+Date:      $Date$
+Version:   $Revision$
+
+Copyright (c) German Cancer Research Center, Division of Medical and
+Biological Informatics. All rights reserved.
+See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
+
+This software is distributed WITHOUT ANY WARRANTY; without even
+the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE.  See the above copyright notices for more information.
+
+=========================================================================*/
+
 #ifndef MITK_BASE_XML_WRITER
 #define MITK_BASE_XML_WRITER
 
@@ -16,6 +34,9 @@ namespace mitk{
   //## Function BeginNode() writes a XML node.
   //## The functions WriteProperty() are used to write XML attributes.
   //## Function EndNode() closes an open XML node tag.
+  //##
+  //## The XMLIO class manages the writing and reading of the data.
+  //## An example of how to start the XMLWriter can be found in the function Save() of the DataTree class.
   //## @ingroup IO
   class BaseXMLWriter {
     

@@ -29,10 +29,14 @@ namespace mitk {
   //##Documentation
   //## @brief XMLIO class for writing mitk classes as a XML node to the XML file.
   //##
+  //## The XMLIO class manages the writing and reading of the data.
   //## The function WriteXML() writes a complete XML node and its data (calls the functions BeginNode(), WriteXMLData() and EndNode()).
+  //## To write the data of a XML node (e.g. child nodes, attributes) use the function WriteXMLData().
   //## Use function WriteXML() to write mitk classes to the XML file.
   //## e.g. <dataTreeNode CLASS_NAME="class mitk::DataTreeNode"> ...data... </dataTreeNode>
   //## For other elements e.g. the data of data types you can use the functions BeginNode(), EndNode() from the class BaseXMLWriter to write a XML node.
+  //##
+  //## What should be implemented in the functions WriteXMLData() and ReadXMLData() of new classes? It is preffered to look at similar classes. The DataTreeNode class gives an introduction.
   //## @ingroup IO
   class XMLIO {
   
@@ -49,6 +53,7 @@ namespace mitk {
 
   protected:
 
+    /// writes the data of a XML node (child nodes, attributes)
     virtual bool WriteXMLData( XMLWriter& xmlWriter );
 
     /// returns the name of the XML node

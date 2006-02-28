@@ -23,6 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkProperties.h"
 #include "mitkStringProperty.h"
+#include "mitkMaterialProperty.h"
 #include "mitkColorProperty.h"
 #include "mitkLevelWindowProperty.h"
 #include "mitkGeometry3D.h"
@@ -388,15 +389,15 @@ unsigned long mitk::DataTreeNode::GetMTime() const
 {
   unsigned long time = Superclass::GetMTime();
   if(m_Data.IsNotNull())
-	{
+  {
     if((time < m_Data->GetMTime()) ||
       ((m_Data->GetSource() != NULL) && (time < m_Data->GetSource()->GetMTime()))
     )
     {
-		  Modified();
+      Modified();
       return Superclass::GetMTime();
     }
-	}
+  }
   return time;
 }
 
@@ -419,8 +420,8 @@ bool mitk::DataTreeNode::WriteXMLData( XMLWriter& xmlWriter )
       else
         xmlWriter.WriteProperty( "rendererName", "" );
 
-  	  if ( propertyList )
-	  	  propertyList->WriteXML( xmlWriter );
+      if ( propertyList )
+        propertyList->WriteXML( xmlWriter );
 
       xmlWriter.EndNode(); // Renderer
     }
@@ -433,36 +434,36 @@ bool mitk::DataTreeNode::WriteXMLData( XMLWriter& xmlWriter )
     propertyList->WriteXML( xmlWriter );
 
   // Data
-	BaseData* data = GetData();
+  BaseData* data = GetData();
 
-	if ( data )
-		data->WriteXML( xmlWriter );
+  if ( data )
+    data->WriteXML( xmlWriter );
 
   // mapperList
-	xmlWriter.BeginNode("mapperList");
-	int mappercount = m_Mappers.size();
+  xmlWriter.BeginNode("mapperList");
+  int mappercount = m_Mappers.size();
 
-	for ( int i=0; i<mappercount; i++ )
-	{
-		mitk::Mapper* mapper = GetMapper( i );
+  for ( int i=0; i<mappercount; i++ )
+  {
+    mitk::Mapper* mapper = GetMapper( i );
 
-		if ( mapper )
-		{
-			xmlWriter.BeginNode("mapperSlot");
-			xmlWriter.WriteProperty( "id", i );
-			mapper->WriteXML( xmlWriter );
-			xmlWriter.EndNode(); // mapperSlot
-		}
-	}
+    if ( mapper )
+    {
+      xmlWriter.BeginNode("mapperSlot");
+      xmlWriter.WriteProperty( "id", i );
+      mapper->WriteXML( xmlWriter );
+      xmlWriter.EndNode(); // mapperSlot
+    }
+  }
   xmlWriter.EndNode(); // mapperList
 
   // Interactor
-	Interactor::Pointer interactor = GetInteractor();
+  Interactor::Pointer interactor = GetInteractor();
 
-	if ( interactor.IsNotNull() )
-		interactor->WriteXML( xmlWriter );
+  if ( interactor.IsNotNull() )
+    interactor->WriteXML( xmlWriter );
   
-	return true;		
+  return true;    
 }
 
 bool mitk::DataTreeNode::ReadXMLData( XMLReader& xmlReader ) 
@@ -472,7 +473,6 @@ bool mitk::DataTreeNode::ReadXMLData( XMLReader& xmlReader )
     if ( m_Data.IsNotNull() ) m_Data->ReadXMLData( xmlReader );
     xmlReader.GotoParent();
   }
-
   if ( xmlReader.Goto( Interactor::XML_NODE_NAME ) ) {
     m_Interactor = dynamic_cast<mitk::Interactor*>( xmlReader.CreateObject().GetPointer() );
     if ( m_Interactor.IsNotNull() ) 
@@ -490,8 +490,15 @@ bool mitk::DataTreeNode::ReadXMLData( XMLReader& xmlReader )
     if ( m_PropertyList.IsNotNull() ) m_PropertyList->ReadXMLData( xmlReader );
     xmlReader.GotoParent();
   }
+
+  // additional property settings prevent update problems
+  // the advantage to manipulate the property path here is that you get the SourceFilePath from relative - negative is that the XML file contains old information
   mitk::StringProperty::Pointer pathProp = new mitk::StringProperty( xmlReader.GetSourceFilePath() );
   this->SetProperty( StringProperty::PATH, pathProp );
+  // fixes the update problem of colorProperty and materialProperty
+  mitk::MaterialProperty::Pointer material = dynamic_cast<mitk::MaterialProperty*>(m_PropertyList->GetProperty("material").GetPointer());
+  if(material)
+    material->SetDataTreeNode(this);
 
   if ( xmlReader.Goto( "mapperList" ) ) {
 
@@ -515,7 +522,7 @@ bool mitk::DataTreeNode::ReadXMLData( XMLReader& xmlReader )
     }
     xmlReader.GotoParent();
   }
-	return true;
+  return true;
 }
 
 const std::string& mitk::DataTreeNode::GetXMLNodeName() const
@@ -531,7 +538,7 @@ void mitk::DataTreeNode::SetSelected(bool selected, mitk::BaseRenderer* renderer
   {
     selectedProperty = new mitk::BoolProperty();
     selectedProperty->SetValue(false);
-    SetProperty("selected", selectedProperty, renderer);	
+    SetProperty("selected", selectedProperty, renderer);  
   }
 
   if( selectedProperty->GetValue() != selected ) 

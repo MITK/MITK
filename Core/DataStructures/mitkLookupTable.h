@@ -124,7 +124,11 @@ public:
     virtual bool ReadXMLData( XMLReader& xmlReader );
 
     static const std::string XML_NODE_NAME;
-
+    static const std::string TABLE_RANGE;
+    static const std::string TABLE_VALUE;
+    static const std::string NUMBER_OF_COLORS;
+    static const std::string TABLE_LOWER_RANGE;
+    static const std::string TABLE_UPPER_RANGE;
 protected:
 
     virtual const std::string& GetXMLNodeName() const;

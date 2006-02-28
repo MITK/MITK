@@ -18,6 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include "mitkLookupTableProperty.h"
+#include <mitkXMLReader.h>
 
 mitk::LookupTableProperty::LookupTableProperty()
 {
@@ -26,8 +27,8 @@ mitk::LookupTableProperty::LookupTableProperty()
 //##ModelId=3ED953090121
 mitk::LookupTableProperty::LookupTableProperty(const mitk::LookupTable &lut)
 {
-		std::cout << "created new mitk::LookupTableProperty..." << std::endl;
-		this->SetLookupTable(lut);
+    std::cout << "created new mitk::LookupTableProperty..." << std::endl;
+    this->SetLookupTable(lut);
 }
 
 ////##ModelId=3EF198D9012D
@@ -61,13 +62,34 @@ mitk::LookupTable & mitk::LookupTableProperty::GetLookupTable()
 //##ModelId=3ED953090135
 void mitk::LookupTableProperty::SetLookupTable(const mitk::LookupTable &aLookupTable)
 {
-//		std::cout << "setting LUT property ... " << std::endl;
+//    std::cout << "setting LUT property ... " << std::endl;
    
     if(m_LookupTable != aLookupTable)
     {
         m_LookupTable = aLookupTable;
         Modified();
     }
-      		
-//		std::cout << "setting LUT property OK! " << std::endl;    
+          
+//    std::cout << "setting LUT property OK! " << std::endl;    
+}
+
+bool mitk::LookupTableProperty::WriteXMLData(XMLWriter &xmlWriter)
+{
+    m_LookupTable.WriteXML( xmlWriter );
+    return true;
+}
+
+bool mitk::LookupTableProperty::ReadXMLData(XMLReader &xmlReader)
+{
+  int value;
+
+  if ( xmlReader.Goto( mitk::LookupTable::XML_NODE_NAME ) ) {
+    mitk::LookupTable::Pointer lookupTable = dynamic_cast<LookupTable*>(xmlReader.CreateObject().GetPointer()); 
+    if (xmlReader.GetAttribute(mitk::LookupTable::NUMBER_OF_COLORS, value))
+      lookupTable->GetVtkLookupTable()->SetNumberOfColors(value);
+    lookupTable->ReadXMLData(xmlReader);
+    xmlReader.GotoParent(); // now we are back on tag <lookupTable>
+    xmlReader.GotoParent(); // now we are back on tag <property>
+  }
+return true;
 }

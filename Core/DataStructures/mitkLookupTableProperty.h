@@ -60,6 +60,10 @@ public:
 
     //##ModelId=3ED953090135
     void SetLookupTable(const mitk::LookupTable & aLookupTable);
+
+    virtual bool WriteXMLData(XMLWriter &xmlWriter);
+
+    virtual bool ReadXMLData(XMLReader &xmlReader);
 };
 
 } // namespace mitk

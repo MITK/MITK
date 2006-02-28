@@ -20,11 +20,17 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkLookupTable.h"
 #include "itkProcessObject.h"
 #include <mitkXMLWriter.h>
+#include <mitkXMLReader.h>
 
 #include <vtkColorTransferFunction.h>
 #include <vtkPiecewiseFunction.h>
 
 const std::string mitk::LookupTable::XML_NODE_NAME = "lookupTable";
+const std::string mitk::LookupTable::TABLE_RANGE = "tableRange";
+const std::string mitk::LookupTable::TABLE_VALUE = "tableValue";
+const std::string mitk::LookupTable::NUMBER_OF_COLORS = "NUMBER_OF_COLORS";
+const std::string mitk::LookupTable::TABLE_LOWER_RANGE = "TABLE_LOWER_RANGE";
+const std::string mitk::LookupTable::TABLE_UPPER_RANGE = "TABLE_UPPER_RANGE";
 
 mitk::LookupTable::LookupTable()
 {
@@ -72,12 +78,12 @@ void mitk::LookupTable::ChangeOpacity(int index, float opacity )
 {
 
     int noValues = m_LookupTable->GetNumberOfTableValues ();
-		if (index>noValues)
-		{
-			std::cout << "could not change opacity. index exceed size of lut ... " << std::endl;
-			return;
-		}
-		
+    if (index>noValues)
+    {
+      std::cout << "could not change opacity. index exceed size of lut ... " << std::endl;
+      return;
+    }
+    
 #if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
     double rgba[ 4 ];
 #else
@@ -99,7 +105,7 @@ vtkLookupTable* mitk::LookupTable::GetVtkLookupTable() const
 mitk::LookupTable::RawLookupTableType * mitk::LookupTable::GetRawLookupTable() const
 {
 
-		if (m_LookupTable==NULL) std::cout << "uuups..." << std::endl;
+    if (m_LookupTable==NULL) std::cout << "uuups..." << std::endl;
     return m_LookupTable->GetPointer( 0 );
 };
 
@@ -244,11 +250,53 @@ void mitk::LookupTable::CreateOpacityTransferFunction(vtkPiecewiseFunction*& opa
 
 bool mitk::LookupTable::WriteXMLData( XMLWriter& xmlWriter )
 {
+  XMLWriter::RGBAType rgba;
+  double color[4];
+
+  xmlWriter.WriteProperty( NUMBER_OF_COLORS, m_LookupTable->GetNumberOfColors() );
+  xmlWriter.BeginNode(TABLE_RANGE);
+    xmlWriter.WriteProperty( TABLE_LOWER_RANGE, m_LookupTable->GetTableRange()[0] );
+    xmlWriter.WriteProperty( TABLE_UPPER_RANGE, m_LookupTable->GetTableRange()[1] );
+    for(int i=m_LookupTable->GetTableRange()[0]; i<=m_LookupTable->GetTableRange()[1]; ++i){
+      xmlWriter.BeginNode(TABLE_VALUE);
+        xmlWriter.WriteProperty( "INDEX", i );
+        m_LookupTable->GetTableValue(i, color);
+        for(int j=0; j<4; ++j)
+          rgba[j]=color[j];
+        xmlWriter.WriteProperty( "COLOR", rgba );
+      xmlWriter.EndNode();
+  }
+  xmlWriter.EndNode();
   return true;
 }
  
 bool mitk::LookupTable::ReadXMLData( XMLReader& xmlReader )
 {
+  double lowerRange, upperRange;
+  int index;
+  XMLReader::RGBAType rgba;
+  double color[4];
+
+  if(xmlReader.Goto(TABLE_RANGE)){
+    xmlReader.GetAttribute(TABLE_LOWER_RANGE, lowerRange);
+    xmlReader.GetAttribute(TABLE_UPPER_RANGE, upperRange);
+    m_LookupTable->SetTableRange(lowerRange, upperRange);
+    m_LookupTable->Build();
+    if(xmlReader.Goto(TABLE_VALUE)){
+      for(int i = (int)lowerRange; i<=(int)upperRange; ++i){
+        if (xmlReader.GetAttribute("INDEX", index) && xmlReader.GetAttribute("COLOR", rgba)){
+          for(int j=0; j<4; ++j)
+            color[j]=rgba[j];
+          m_LookupTable->SetTableValue(index, color);
+          xmlReader.GotoNext();
+        }
+      }
+    }
+    this->UpdateOutputInformation();
+    xmlReader.GotoParent();
+  }
+  std::cout << "read mitk::LookupTable: " << " " << std::endl;
+
   return true;
 }
  

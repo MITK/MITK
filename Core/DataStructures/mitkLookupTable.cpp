@@ -250,14 +250,20 @@ void mitk::LookupTable::CreateOpacityTransferFunction(vtkPiecewiseFunction*& opa
 
 bool mitk::LookupTable::WriteXMLData( XMLWriter& xmlWriter )
 {
+
+#if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
+  double color[ 4 ];
+#else
+  float color[ 4 ];
+#endif
+  
   XMLWriter::RGBAType rgba;
-  double color[4];
 
   xmlWriter.WriteProperty( NUMBER_OF_COLORS, m_LookupTable->GetNumberOfColors() );
   xmlWriter.BeginNode(TABLE_RANGE);
     xmlWriter.WriteProperty( TABLE_LOWER_RANGE, m_LookupTable->GetTableRange()[0] );
     xmlWriter.WriteProperty( TABLE_UPPER_RANGE, m_LookupTable->GetTableRange()[1] );
-    for(int i=m_LookupTable->GetTableRange()[0]; i<=m_LookupTable->GetTableRange()[1]; ++i){
+    for(int i=(int)m_LookupTable->GetTableRange()[0]; i<=(int)m_LookupTable->GetTableRange()[1]; ++i){
       xmlWriter.BeginNode(TABLE_VALUE);
         xmlWriter.WriteProperty( "INDEX", i );
         m_LookupTable->GetTableValue(i, color);
@@ -272,10 +278,15 @@ bool mitk::LookupTable::WriteXMLData( XMLWriter& xmlWriter )
  
 bool mitk::LookupTable::ReadXMLData( XMLReader& xmlReader )
 {
-  double lowerRange, upperRange;
+
+#if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
+  double color[ 4 ], lowerRange, upperRange;
+#else
+  float color[ 4 ], lowerRange, upperRange;
+#endif
+
   int index;
   XMLReader::RGBAType rgba;
-  double color[4];
 
   if(xmlReader.Goto(TABLE_RANGE)){
     xmlReader.GetAttribute(TABLE_LOWER_RANGE, lowerRange);

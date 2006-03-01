@@ -36,7 +36,14 @@ public class EndState extends States {
 	public String toString() {
 		return "Endstate " + getStateName() + " ID " + getStateId();
 	}
-
+	
+	/**
+	 * sets the "END_STATE" attribute value of this state in the jDOM element to true
+	 */
+	public void setEndState() {
+		state.setAttribute("END_STATE", "TRUE");
+	}
+	
 	/* (non-Javadoc)
 	 * @see model.States#getStateElement()
 	 */

@@ -8,6 +8,7 @@ import org.eclipse.draw2d.geometry.Rectangle;
 
 import org.eclipse.gef.commands.Command;
 
+import model.EndState;
 import model.StartState;
 import model.States;
 import model.StateMachinesDiagram;
@@ -68,6 +69,9 @@ public class StatesCreateCommand extends Command {
 		newState.setStateId(Integer.toString(parent.getMaxID()));
 		if (newState instanceof StartState) {
 			((StartState) newState).setStartState();
+		}
+		if (newState instanceof EndState) {
+			((EndState) newState).setEndState();
 		}
 		newState.setLocation(bounds.getLocation());
 		Dimension size = new Dimension();

@@ -42,33 +42,57 @@ public class ReadActionAndEventDOMTree {
         	SAXBuilder builder = new SAXBuilder();
         	// Create the document
         	this.filename = filename;
-        	doc = builder.build(filename);
-        	List allEventCategories = getAllEventCategories();
-        	for (int i = 0; i < allEventCategories.size(); i++) {
-        		Element cat = (Element) allEventCategories.get(i);
-        		if (!allEventCats.contains(cat.getAttributeValue("NAME"))) {
-        			allEventCats.add(cat.getAttributeValue("NAME"));
-        		}
-        		List allEvents = getEvents(cat.getAttributeValue("NAME"));
-        		for (int j = 0; j < allEvents.size(); j++) {
-        			Element ev = (Element) allEvents.get(j);
-        			eventCategoryMap.put(ev.getAttributeValue("NAME"), cat.getAttributeValue("NAME"));
-        			eventIdMap.put(ev.getAttributeValue("ID"), ev.getAttributeValue("NAME"));
-        			eventNameMap.put(ev.getAttributeValue("NAME"), ev.getAttributeValue("ID"));
-        		}
+        	if (!filename.exists()) {
+        		Element root = new Element("mitkInteraktionEvents");
+       		 	Element events = new Element("events");
+       		 	Element evcat = new Element ("eventCategory");
+       		 	evcat.setAttribute("NAME", "NullEvent");
+       		 	Element event = new Element("event");
+       		 	event.setAttribute("NAME", "EIDNULLEVENT");
+       		 	event.setAttribute("ID", "0");
+       		 	evcat.addContent(event);
+       		 	events.addContent(evcat);
+       		 	root.addContent(events);
+       		 	Element actions = new Element("actions");
+    		 	Element accat = new Element ("actionCategory");
+    		 	accat.setAttribute("NAME", "DoNothing");
+    		 	Element action = new Element("action");
+    		 	action.setAttribute("NAME", "AcDONOTHING");
+    		 	action.setAttribute("ID", "0");
+    		 	accat.addContent(action);
+    		 	actions.addContent(accat);
+    		 	root.addContent(actions);
+       		 	doc = new Document(root);
         	}
-        	List allActionCategories = getAllActionCategories();
-        	for (int i = 0; i < allActionCategories.size(); i++) {
-        		Element cat = (Element) allActionCategories.get(i);
-        		if (!allActionCats.contains(cat.getAttributeValue("NAME"))) {
-        			allActionCats.add(cat.getAttributeValue("NAME"));
+        	else {
+        		doc = builder.build(filename);
+        		List allEventCategories = getAllEventCategories();
+        		for (int i = 0; i < allEventCategories.size(); i++) {
+        			Element cat = (Element) allEventCategories.get(i);
+        			if (!allEventCats.contains(cat.getAttributeValue("NAME"))) {
+        				allEventCats.add(cat.getAttributeValue("NAME"));
+        			}
+        			List allEvents = getEvents(cat.getAttributeValue("NAME"));
+        			for (int j = 0; j < allEvents.size(); j++) {
+        				Element ev = (Element) allEvents.get(j);
+        				eventCategoryMap.put(ev.getAttributeValue("NAME"), cat.getAttributeValue("NAME"));
+        				eventIdMap.put(ev.getAttributeValue("ID"), ev.getAttributeValue("NAME"));
+        				eventNameMap.put(ev.getAttributeValue("NAME"), ev.getAttributeValue("ID"));
+        			}
         		}
-        		List allActions = getActions(cat.getAttributeValue("NAME"));
-        		for (int j = 0; j < allActions.size(); j++) {
-        			Element act = (Element) allActions.get(j);
-        			actionCategoryMap.put(act.getAttributeValue("NAME"), cat.getAttributeValue("NAME"));
-        			actionIdMap.put(act.getAttributeValue("ID"), act.getAttributeValue("NAME"));
-        			actionNameMap.put(act.getAttributeValue("NAME"), act.getAttributeValue("ID"));
+        		List allActionCategories = getAllActionCategories();
+        		for (int i = 0; i < allActionCategories.size(); i++) {
+        			Element cat = (Element) allActionCategories.get(i);
+        			if (!allActionCats.contains(cat.getAttributeValue("NAME"))) {
+        				allActionCats.add(cat.getAttributeValue("NAME"));
+        			}
+        			List allActions = getActions(cat.getAttributeValue("NAME"));
+        			for (int j = 0; j < allActions.size(); j++) {
+        				Element act = (Element) allActions.get(j);
+        				actionCategoryMap.put(act.getAttributeValue("NAME"), cat.getAttributeValue("NAME"));
+        				actionIdMap.put(act.getAttributeValue("ID"), act.getAttributeValue("NAME"));
+        				actionNameMap.put(act.getAttributeValue("NAME"), act.getAttributeValue("ID"));
+        			}
         		}
         	}
 		} catch (Exception e) {

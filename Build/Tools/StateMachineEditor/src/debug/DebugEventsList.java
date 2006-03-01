@@ -9,10 +9,10 @@ import model.StartState;
 import model.StateMachinesDiagram;
 import model.States;
 
-import org.eclipse.jface.viewers.DoubleClickEvent;
-import org.eclipse.jface.viewers.IDoubleClickListener;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ListViewer;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
@@ -21,12 +21,13 @@ import org.eclipse.ui.part.ViewPart;
 import dom.DOMGetInstance;
 import dom.ReadActionAndEventDOMTree;
 
-public class DebugEventsList extends ViewPart implements IDoubleClickListener {
+public class DebugEventsList extends ViewPart implements ISelectionChangedListener {
 
 	private static DebugEventsList view;
 	private static ListViewer viewer = null;
 	private static Map transitionToEvent = new HashMap();
 	private static Map countEvents = new HashMap();
+	private static Map notExistingCon = new HashMap();
 	private static States activeState = null;
 	private static Connection activeCon = null;
 	private static Connection doubleClickedCon = null;
@@ -34,6 +35,7 @@ public class DebugEventsList extends ViewPart implements IDoubleClickListener {
 	private static List allStates = null;
 	private static String instanceAddress = null;
 	private static int counter = 1;
+	private static States active = null;
 	
 	public DebugEventsList() {
 		super();
@@ -49,10 +51,15 @@ public class DebugEventsList extends ViewPart implements IDoubleClickListener {
 		viewer.add(countEvent);
 		countEvents.put(countEvent, event);
 		if (!(activeState == null)) {
+			boolean conExists = false;
 			List allConnections = activeState.getSourceConnections();
 			for (int i = 0; i < allConnections.size(); i++) {
 				Connection connection =  (Connection) allConnections.get(i);
 				if (event.equals(connection.getEvent())) {
+					conExists = true;
+					if (!(active == null)) {
+						active.setInactive();
+					}
 					if (!(doubleClickedCon == null)) {
 						doubleClickedCon.setInactive();
 						doubleClickedCon.getTarget().setInactive();
@@ -71,6 +78,15 @@ public class DebugEventsList extends ViewPart implements IDoubleClickListener {
 					break;
 				}
 			}
+			if (conExists == false) {
+				notExistingCon.put(countEvent, activeState);
+				if (!(activeCon == null)) {
+					activeCon.setInactive();
+				}
+				if (!(doubleClickedCon == null)) {
+					doubleClickedCon.setInactive();
+				}
+			}
 		}
 	}
 	
@@ -84,33 +100,11 @@ public class DebugEventsList extends ViewPart implements IDoubleClickListener {
 	
 	public void createPartControl(Composite parent) {
 		viewer = new ListViewer(parent);
-		viewer.addDoubleClickListener(this);
+		viewer.addSelectionChangedListener(this);
 	}
 
 	public void setFocus() {
 		viewer.getControl().setFocus();
-	}
-
-	public void doubleClick(DoubleClickEvent event) {
-		String eventString = (String) ((IStructuredSelection)viewer.getSelection()).getFirstElement();
-		if (!(doubleClickedCon == null)) {
-			doubleClickedCon.setInactive();
-			//doubleClickedCon.getTarget().setInactive();
-		}
-		if (!(activeCon == null)) {
-			activeCon.setInactive();
-		}
-		if(!(transitionToEvent.get(eventString) == null)) {
-			if (!(doubleClickedCon == null)) {
-				doubleClickedCon.getTarget().setInactive();
-			}
-			doubleClickedCon = (Connection) transitionToEvent.get(eventString);
-			doubleClickedCon.setActive();
-			if (!(activeState == null)) {
-				activeState.setInactive();
-			}
-			doubleClickedCon.getTarget().setActive();
-		}
 	}
 	
 	public static void clear() {
@@ -147,5 +141,39 @@ public class DebugEventsList extends ViewPart implements IDoubleClickListener {
 	
 	public static String getInstanceAddress() {
 		return instanceAddress;
+	}
+
+	public void selectionChanged(SelectionChangedEvent event) {
+		String eventString = (String) ((IStructuredSelection)viewer.getSelection()).getFirstElement();
+		if (!(active == null)) {
+			active.setInactive();
+		}
+		if (!(doubleClickedCon == null)) {
+			doubleClickedCon.setInactive();
+			//doubleClickedCon.getTarget().setInactive();
+		}
+		if (!(activeCon == null)) {
+			activeCon.setInactive();
+		}
+		if(!(transitionToEvent.get(eventString) == null)) {
+			if (!(doubleClickedCon == null)) {
+				doubleClickedCon.getTarget().setInactive();
+			}
+			doubleClickedCon = (Connection) transitionToEvent.get(eventString);
+			doubleClickedCon.setActive();
+			if (!(activeState == null)) {
+				activeState.setInactive();
+			}
+			doubleClickedCon.getTarget().setActive();
+		}
+		else {
+			if (notExistingCon.containsKey(eventString)){
+				if (!(doubleClickedCon == null)) {
+					doubleClickedCon.getTarget().setInactive();
+				}
+				active = (States) notExistingCon.get(eventString);
+				active.setActive();
+			}
+		}
 	}
 }

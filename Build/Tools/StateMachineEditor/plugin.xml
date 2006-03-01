@@ -140,9 +140,9 @@
             </separator>
          </menu>
          <action
-               label="&amp;Statemachines Debugdaten holen"
-               class="debug.HoleDaten"
-               tooltip="Starts the Debug-Mode"
+               label="&amp;Get Debug-Data"
+               class="debug.GetData"
+               tooltip="Gets the statemachines used in Debug-Mode"
                menubarPath="statemachinesMenu/statemachinesGroup"
                toolbarPath="Statemachines"
                id="StateMachines5">

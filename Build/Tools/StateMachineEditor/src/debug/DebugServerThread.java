@@ -37,7 +37,7 @@ public class DebugServerThread extends Thread {
 	private static final int DELETE_STATE_MACHINE = 6;
 	
 	public DebugServerThread() {
-		super("ServerThread");		
+		super("ServerThread");	
 	}
 	
 	public EventsForStatemachine getEventsForStatemachine(String instanceAddress) {
@@ -45,27 +45,7 @@ public class DebugServerThread extends Thread {
 			return (EventsForStatemachine) eventsToMachine.get(instanceAddress);
 		}
 		return null;
-	}
-
-	/**
-	 * @param in
-	 * @return
-	 * @throws IOException
-	 *//*
-	int readInteger( BufferedReader in ) throws IOException {
-	
-		int value = 0;
-		char buffer[] = new char[4];
-		in.read( buffer, 0, 4 );
-		
-		value = (int) buffer[0];
-		value |= ((int)buffer[1])<<8;
-		value |= ((int)buffer[2])<<16;
-		value |= ((int)buffer[3])<<24;		
-	
-		return value;
-	}*/
-	
+	}	
 
 	/**
 	 * 

@@ -62,7 +62,7 @@ public class Connection extends ModelElement {
 	/** True, if the connection is attached to its endpoints. */
 	private boolean isConnected;
 	
-	private String action = new String("action");
+	private String action = new String("");
 	
 	private String actionPropertyValue = new String("");
 	

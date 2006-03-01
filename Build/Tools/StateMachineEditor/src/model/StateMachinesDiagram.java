@@ -126,6 +126,7 @@ public class StateMachinesDiagram extends ModelElement {
         	Element ele1 = (Element) statesList.get(i);
         	List attributes = ele1.getAttributes();
         	boolean startState = false;
+        	boolean endState = false;
         	for (int j = 0; j < attributes.size(); j++) {
     			Attribute attr = (Attribute) attributes.get(j);
     			if (attr.getName().equals("START_STATE")) {
@@ -135,13 +136,20 @@ public class StateMachinesDiagram extends ModelElement {
         			this.addChildAtCreation(state);
         			startState = true;
     			}
+    			if (attr.getName().equals("END_STATE")) {
+    				EndState state = new EndState();
+    				state.setParent(this);
+    				state.setStateElement(ele1);
+        			this.addChildAtCreation(state);
+        			endState = true;
+    			}
     			if (attr.getName().equals("ID")) {
     				if (Integer.parseInt(attr.getValue()) > maxID) {
     					maxID = Integer.parseInt(attr.getValue());
     				}
     			}
     		}
-        	if (!startState) {
+        	if (!startState && !endState) {
         		NormalState state = new NormalState();
         		state.setParent(this);
         		state.setStateElement(ele1);

@@ -31,6 +31,20 @@ const std::string mitk::LookupTable::TABLE_VALUE = "tableValue";
 const std::string mitk::LookupTable::NUMBER_OF_COLORS = "NUMBER_OF_COLORS";
 const std::string mitk::LookupTable::TABLE_LOWER_RANGE = "TABLE_LOWER_RANGE";
 const std::string mitk::LookupTable::TABLE_UPPER_RANGE = "TABLE_UPPER_RANGE";
+const std::string mitk::LookupTable::VALUE_RANGE = "valueRange";
+const std::string mitk::LookupTable::VALUE_LOWER_RANGE = "VALUE_LOWER_RANGE";
+const std::string mitk::LookupTable::VALUE_UPPER_RANGE = "VALUE_UPPER_RANGE";
+const std::string mitk::LookupTable::HUE_RANGE = "hueRange";
+const std::string mitk::LookupTable::HUE_LOWER_RANGE = "HUE_LOWER_RANGE";
+const std::string mitk::LookupTable::HUE_UPPER_RANGE = "HUE_UPPER_RANGE";
+const std::string mitk::LookupTable::SATURATION_RANGE = "saturationRange";
+const std::string mitk::LookupTable::SATURATION_LOWER_RANGE = "SATURATION_LOWER_RANGE";
+const std::string mitk::LookupTable::SATURATION_UPPER_RANGE = "SATURATION_UPPER_RANGE";
+const std::string mitk::LookupTable::ALPHA_RANGE = "alphaRange";
+const std::string mitk::LookupTable::ALPHA_LOWER_RANGE = "ALPHA_LOWER_RANGE";
+const std::string mitk::LookupTable::ALPHA_UPPER_RANGE = "ALPHA_UPPER_RANGE";
+const std::string mitk::LookupTable::SCALE = "SCALE";
+const std::string mitk::LookupTable::RAMP = "RAMP";
 
 mitk::LookupTable::LookupTable()
 {
@@ -252,18 +266,38 @@ bool mitk::LookupTable::WriteXMLData( XMLWriter& xmlWriter )
 {
 
 #if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
-  double color[ 4 ];
+  double color[ 4 ], lowerRange, upperRange;
 #else
-  float color[ 4 ];
+  float color[ 4 ], lowerRange, upperRange;
 #endif
   
   XMLWriter::RGBAType rgba;
 
   xmlWriter.WriteProperty( NUMBER_OF_COLORS, m_LookupTable->GetNumberOfColors() );
+  xmlWriter.WriteProperty( SCALE, m_LookupTable->GetScale() );
+  xmlWriter.WriteProperty( RAMP, m_LookupTable->GetRamp() );
+  xmlWriter.BeginNode( VALUE_RANGE );
+  xmlWriter.WriteProperty( VALUE_LOWER_RANGE, m_LookupTable->GetValueRange()[0] );
+  xmlWriter.WriteProperty( VALUE_UPPER_RANGE, m_LookupTable->GetValueRange()[1] );
+  xmlWriter.EndNode();
+  xmlWriter.BeginNode( HUE_RANGE );
+  xmlWriter.WriteProperty( HUE_LOWER_RANGE, m_LookupTable->GetHueRange()[0] );
+  xmlWriter.WriteProperty( HUE_UPPER_RANGE, m_LookupTable->GetHueRange()[1] );
+  xmlWriter.EndNode();
+  xmlWriter.BeginNode( SATURATION_RANGE );
+  xmlWriter.WriteProperty( SATURATION_LOWER_RANGE, m_LookupTable->GetSaturationRange()[0] );
+  xmlWriter.WriteProperty( SATURATION_UPPER_RANGE, m_LookupTable->GetSaturationRange()[1] );
+  xmlWriter.EndNode();
+  xmlWriter.BeginNode( ALPHA_RANGE );
+  xmlWriter.WriteProperty( ALPHA_LOWER_RANGE, m_LookupTable->GetAlphaRange()[0] );
+  xmlWriter.WriteProperty( ALPHA_UPPER_RANGE, m_LookupTable->GetAlphaRange()[1] );
+  xmlWriter.EndNode();
   xmlWriter.BeginNode(TABLE_RANGE);
-    xmlWriter.WriteProperty( TABLE_LOWER_RANGE, m_LookupTable->GetTableRange()[0] );
-    xmlWriter.WriteProperty( TABLE_UPPER_RANGE, m_LookupTable->GetTableRange()[1] );
-    for(int i=(int)m_LookupTable->GetTableRange()[0]; i<=(int)m_LookupTable->GetTableRange()[1]; ++i){
+    lowerRange = m_LookupTable->GetTableRange()[0];
+    upperRange = m_LookupTable->GetTableRange()[1];
+    xmlWriter.WriteProperty( TABLE_LOWER_RANGE, lowerRange );
+    xmlWriter.WriteProperty( TABLE_UPPER_RANGE, upperRange );
+    for(int i=(int)lowerRange; i<=(int)upperRange; ++i){
       xmlWriter.BeginNode(TABLE_VALUE);
         xmlWriter.WriteProperty( "INDEX", i );
         m_LookupTable->GetTableValue(i, color);
@@ -288,11 +322,38 @@ bool mitk::LookupTable::ReadXMLData( XMLReader& xmlReader )
   int index;
   XMLReader::RGBAType rgba;
 
+  if(xmlReader.Goto(VALUE_RANGE)){
+    xmlReader.GetAttribute(VALUE_LOWER_RANGE, lowerRange);
+    xmlReader.GetAttribute(VALUE_UPPER_RANGE, upperRange);
+    m_LookupTable->SetValueRange(lowerRange, upperRange);
+    xmlReader.GotoParent();
+  }
+
+  if(xmlReader.Goto(HUE_RANGE)){
+    xmlReader.GetAttribute(HUE_LOWER_RANGE, lowerRange);
+    xmlReader.GetAttribute(HUE_UPPER_RANGE, upperRange);
+    m_LookupTable->SetHueRange(lowerRange, upperRange);
+    xmlReader.GotoParent();
+  }
+
+  if(xmlReader.Goto(SATURATION_RANGE)){
+    xmlReader.GetAttribute(SATURATION_LOWER_RANGE, lowerRange);
+    xmlReader.GetAttribute(SATURATION_UPPER_RANGE, upperRange);
+    m_LookupTable->SetSaturationRange(lowerRange, upperRange);
+    xmlReader.GotoParent();
+  }
+
+  if(xmlReader.Goto(ALPHA_RANGE)){
+    xmlReader.GetAttribute(ALPHA_LOWER_RANGE, lowerRange);
+    xmlReader.GetAttribute(ALPHA_UPPER_RANGE, upperRange);
+    m_LookupTable->SetAlphaRange(lowerRange, upperRange);
+    xmlReader.GotoParent();
+  }
+
   if(xmlReader.Goto(TABLE_RANGE)){
     xmlReader.GetAttribute(TABLE_LOWER_RANGE, lowerRange);
     xmlReader.GetAttribute(TABLE_UPPER_RANGE, upperRange);
     m_LookupTable->SetTableRange(lowerRange, upperRange);
-    m_LookupTable->Build();
     if(xmlReader.Goto(TABLE_VALUE)){
       for(int i = (int)lowerRange; i<=(int)upperRange; ++i){
         if (xmlReader.GetAttribute("INDEX", index) && xmlReader.GetAttribute("COLOR", rgba)){

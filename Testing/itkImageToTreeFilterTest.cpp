@@ -183,7 +183,7 @@ int testRegistrationModelXMLWriter()
 
   typedef TubeSegmentModelType::PointSetType          PointSetType;
   typedef PointSetType::Pointer                       PointSetPointer;
-  typedef PointSetType::PointType                     PointType;
+  typedef PointSetType::PointType                     PointSetPointType;
   typedef PointSetType::PointsContainer               PointsContainerType;
   typedef PointsContainerType::Iterator               PointsIterator;
   typedef PointsContainerType::Pointer                PointsContainerPointer;
@@ -204,7 +204,7 @@ int testRegistrationModelXMLWriter()
   startPoint.Fill(0);
   tubeSegment->SetStartPoint(startPoint);
 
-  PointType point1; // 1, 1, 0
+  PointSetPointType point1; // 1, 1, 0
   point1[0] = 1;
   point1[1] = 1;
   point1[2] = 0;
@@ -212,7 +212,7 @@ int testRegistrationModelXMLWriter()
   pointDataContainer->InsertElement(index, pixelValue);
   index++;
 
-  PointType point2; // 1, 0, 1
+  PointSetPointType point2; // 1, 0, 1
   point2[0] = 1;
   point2[1] = 0;
   point2[2] = 1;
@@ -220,7 +220,7 @@ int testRegistrationModelXMLWriter()
   pointDataContainer->InsertElement(index, pixelValue);
   index++;
 
-  PointType point3; // 1, 0, 1
+  PointSetPointType point3; // 1, 0, 1
   point3[0] = 1;
   point3[1] = 1;
   point3[2] = 0;
@@ -296,8 +296,8 @@ int testRegistrationModelXMLWriter()
 
   while (origPointsIter != pointsContainer->End())
   {
-    PointType origPoint = origPointsIter.Value();
-    PointType readPoint = readPointsIter.Value();
+    PointSetPointType origPoint = origPointsIter.Value();
+    PointSetPointType readPoint = readPointsIter.Value();
 
     if (origPoint != readPoint)
     {

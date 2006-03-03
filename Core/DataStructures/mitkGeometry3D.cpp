@@ -429,7 +429,7 @@ void mitk::Geometry3D::SetOrigin(const Point3D & origin)
 
 void mitk::Geometry3D::Translate(const Vector3D & vector)
 {
-  if((vector[0] != 0) && (vector[1] != 0) && (vector[2] != 0))
+  if((vector[0] != 0) || (vector[1] != 0) || (vector[2] != 0))
   {
     m_IndexToWorldTransform->SetOffset(m_IndexToWorldTransform->GetOffset()+vector);
     TransferItkToVtkTransform();

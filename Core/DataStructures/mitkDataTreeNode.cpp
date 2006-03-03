@@ -337,9 +337,11 @@ void mitk::DataTreeNode::SetColor(const float rgb[3], mitk::BaseRenderer* render
 //##ModelId=3EF1966703D6
 void mitk::DataTreeNode::SetVisibility(bool visible, mitk::BaseRenderer* renderer, const char* propertyKey)
 {
-  mitk::BoolProperty::Pointer prop;
-  prop = new mitk::BoolProperty(visible);
-  GetPropertyList(renderer)->SetProperty(propertyKey, prop);
+  mitk::BoolProperty::Pointer prop = dynamic_cast<mitk::BoolProperty*>(GetProperty(propertyKey, renderer).GetPointer());
+  if (prop)
+    prop->SetValue(visible);
+  else
+    GetPropertyList(renderer)->SetProperty(propertyKey, new mitk::BoolProperty(visible));
 }
 
 //##ModelId=3EF196880095

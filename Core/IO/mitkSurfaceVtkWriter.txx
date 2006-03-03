@@ -30,7 +30,10 @@ mitk::SurfaceVtkWriter<VTKWRITER>::SurfaceVtkWriter()
   this->SetNumberOfRequiredInputs( 1 );
   
   m_VtkWriter = VtkWriterType::New();
-  
+
+  //enable to write ascii-formatted-file
+  //m_VtkWriter->SetFileTypeToASCII();
+
   SetDefaultExtension();
 }
 
@@ -93,6 +96,7 @@ void mitk::SurfaceVtkWriter<VTKWRITER>::GenerateData()
 #else
       m_VtkWriter->SetInput(polyData);
 #endif
+      
       m_VtkWriter->Write();
     }
   }
@@ -111,6 +115,7 @@ void mitk::SurfaceVtkWriter<VTKWRITER>::GenerateData()
 #else
     m_VtkWriter->SetInput(polyData);
 #endif
+    
     m_VtkWriter->Write();
   }
   transformPolyData->Delete();

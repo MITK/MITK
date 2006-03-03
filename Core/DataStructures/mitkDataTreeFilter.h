@@ -568,7 +568,7 @@ namespace mitk
       const Item* GetSelectedItem() const;
       const mitk::DataTreeIteratorClone GetIteratorToSelectedItem() const;
 
-      const Item* FindItem(DataTreeNode* node);
+      const Item* FindItem(DataTreeNode* node) const;
 
       /// Views can call this to select items
       void SelectItem(const Item*, bool selected = true);
@@ -587,7 +587,7 @@ namespace mitk
     
     private:
       
-      const Item* FindItem(DataTreeNode* node, ItemList* itemList);
+      const Item* FindItem(DataTreeNode* node, ItemList* itemList) const;
       
       void AddMatchingChildren(mitk::DataTreeIteratorBase*, ItemList*, Item*, bool = true);
       

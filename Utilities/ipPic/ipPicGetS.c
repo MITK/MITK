@@ -52,6 +52,9 @@
  *   reads a slice from a PicFile
  *
  * $Log$
+ * Revision 1.12  2006/03/03 14:07:58  maleike
+ * try to fix warning "cast from pointer to integer of different size"
+ *
  * Revision 1.11  2005/10/09 08:56:31  ivo
  * FIX: warning: comparison between pointer and integer
  *
@@ -142,7 +145,7 @@ ipPicDescriptor *ipPicGetSlice( char *infile_name, ipPicDescriptor *pic, ipUInt4
     }
 
 
-  if( ((int)pic) == 3 )
+  if( (void*)pic == (void*)3 )
     {
       pic = NULL;
       number = 3;

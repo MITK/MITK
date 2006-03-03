@@ -500,7 +500,7 @@ namespace mitk
           /// Returns the parent of this item (orphans throws exceptions)
           const Item* GetParent() const;
 
-          /// 
+          /// Returns the associated DataTreeNode
           const mitk::DataTreeNode* GetNode() const;  
         protected:
         
@@ -568,6 +568,8 @@ namespace mitk
       const Item* GetSelectedItem() const;
       const mitk::DataTreeIteratorClone GetIteratorToSelectedItem() const;
 
+      const Item* FindItem(DataTreeNode* node);
+
       /// Views can call this to select items
       void SelectItem(const Item*, bool selected = true);
       
@@ -584,6 +586,8 @@ namespace mitk
       ~DataTreeFilter();
     
     private:
+      
+      const Item* FindItem(DataTreeNode* node, ItemList* itemList);
       
       void AddMatchingChildren(mitk::DataTreeIteratorBase*, ItemList*, Item*, bool = true);
       

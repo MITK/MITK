@@ -195,7 +195,7 @@ void DataTreeFilter::Item::SetSelected(bool selected)
           m_TreeFilter->m_LastSelectedItem && m_TreeFilter->m_LastSelectedItem != this)
 // TODO this compares smartpointers with "weak" pointers. Rewrite
 //            if ( std::find( m_TreeFilter->m_Items->begin(), m_TreeFilter->m_Items->end(), m_TreeFilter->m_LastSelectedItem ) != m_TreeFilter->m_Items->end() )
-          m_TreeFilter->m_LastSelectedItem->SetSelected(false);
+        m_TreeFilter->m_LastSelectedItem->SetSelected(false);
 
       m_TreeFilter->m_LastSelectedItem = this;
       m_TreeFilter->m_SelectedItems.insert(this);
@@ -722,6 +722,7 @@ void DataTreeFilter::GenerateModelFromTree()
   InvokeEvent( TreeFilterRemoveAllEvent() );
 
   m_Items = ItemList::New(); // clear list (nice thanks to smart pointers)
+  m_LastSelectedItem = NULL;
   DataTreeIteratorBase* treeIter =  // get an iterator to the data tree
     new DataTreePreOrderIterator(m_DataTree);
   

@@ -59,3 +59,24 @@ void mitk::VtkRenderWindow::Render()
     itkExceptionMacro("MitkRenderer not set.");
 }
 
+void mitk::VtkRenderWindow::SetSize(int x, int y)
+{
+  //Fix for vtkSizeBug: when Mapped is true, native
+  //routines would be used to resize the window -
+  //Qt does not like this.
+  bool mapped = this->Mapped;
+  this->Mapped = 0;
+  Superclass::SetSize(x, y);
+  this->Mapped = mapped;
+}
+
+void mitk::VtkRenderWindow::SetPosition(int x, int y)
+{
+  //Fix for vtkSizeBug: when Mapped is true, native
+  //routines would be used to re-position the window -
+  //Qt does not like this.
+  bool mapped = this->Mapped;
+  this->Mapped = 0;
+  Superclass::SetPosition(x, y);
+  this->Mapped = mapped;
+}

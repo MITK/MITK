@@ -38,16 +38,16 @@ namespace mitk
 #endif
 
 class VtkRenderWindow : public PARENTCLASS
-#undef PARENTCLASS
 {
 public:
   // Description:
   // Construct object so that light follows camera motion.
   static VtkRenderWindow *New();
 
-  vtkTypeMacro(VtkRenderWindow,vtkRenderWindow);
+  vtkTypeMacro(VtkRenderWindow,PARENTCLASS);
 
-  itkTypeMacro(VtkRenderWindow,vtkRenderWindow);
+  itkTypeMacro(VtkRenderWindow,PARENTCLASS);
+#undef PARENTCLASS
 
   itkSetObjectMacro(MitkRenderer, BaseRenderer);
   itkGetObjectMacro(MitkRenderer, BaseRenderer);
@@ -57,6 +57,9 @@ public:
   //##Documentation
   //##@brief call the render process from vtk
   virtual void MitkRender(){vtkRenderWindow::Render();};
+
+  virtual void SetSize(int,int); //Fix for vtkSizeBug
+  virtual void SetPosition(int,int); //Fix for vtkSizeBug
 
 protected:
   VtkRenderWindow();

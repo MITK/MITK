@@ -27,14 +27,7 @@ void _mitkItkImageWrite(itk::Image< TPixel, VImageDimension >* itkImage, const s
 {
   typedef itk::Image< TPixel, VImageDimension > TImageType;
 
-  if (fileName.find(".mhd") != std::string::npos)
-  {
-    typename itk::ImageFileWriter<TImageType>::Pointer writer = itk::ImageFileWriter<TImageType>::New();
-    writer->SetInput( itkImage );
-    writer->SetFileName( fileName.c_str() );
-    writer->Update();
-  }
-  else if (fileName.find(".png") != std::string::npos || fileName.find(".tif") != std::string::npos || fileName.find(".jpg") != std::string::npos)
+  if (fileName.find(".png") != std::string::npos || fileName.find(".tif") != std::string::npos || fileName.find(".jpg") != std::string::npos)
   {
     typedef itk::Image<unsigned char,3> OutputImage3DType;
     typedef itk::Image<unsigned char,2> OutputImage2DType;
@@ -60,17 +53,9 @@ void _mitkItkImageWrite(itk::Image< TPixel, VImageDimension >* itkImage, const s
   }
   else
   {
-    typedef typename TImageType::PixelType PixelType;
-    typedef itk::Image<PixelType,2> OutputImage2DType;
-    typename itk::ImageSeriesWriter<TImageType, OutputImage2DType>::Pointer writer = itk::ImageSeriesWriter<TImageType, OutputImage2DType >::New();
+    typename itk::ImageFileWriter<TImageType>::Pointer writer = itk::ImageFileWriter<TImageType>::New();
     writer->SetInput( itkImage );
-    std::string finalFileName = fileName;
-    std::string::size_type pos = fileName.find_last_of(".",fileName.length()-1);
-    if(pos==std::string::npos)
-      finalFileName.append(".%d.png");
-    else
-      finalFileName.insert(pos,".%d");
-    writer->SetSeriesFormat( finalFileName.c_str() );
+    writer->SetFileName( fileName.c_str() );
     writer->Update();
   }
 }

@@ -19,13 +19,13 @@
 #include <mitkPicFileReader.h>
 
 #if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
-#define EXTERNAL_FILE_EXTENSIONS "All known formats(*.dcm *.DCM *.gdcm *.pic *.pic.gz *.bmp *.png *.jpg *.tiff *.pvtk *.stl *.vtk *.obj *.vti *.hdr);;DICOM files(*.dcm *.DCM *.gdcm);;DKFZ Pic (*.seq *.pic *.pic.gz *.seq.gz);;Sets of 2D slices (*.pic *.pic.gz *.bmp *.png *.dcm *.gdcm *.tiff);;stl files (*.stl)"
-#define INTERNAL_FILE_EXTENSIONS "all (*.seq *.pic *.pic.gz *.seq.gz *.pvtk *.stl *.vtk *.obj *.vti *.ves *.uvg *.dvg *.par *.dcm *.gdcm *.mhd *.hdr hpsonos.db HPSONOS.DB *.ssm *.bmp *.png *.jpg *.tiff);;DKFZ Pic (*.seq *.pic *.pic.gz *.seq.gz);;surface files (*.stl *.vtk *.obj);;stl files (*.stl);;vtk surface files (*.vtk);;vtk image files (*.pvtk);;vessel files (*.ves *.uvg *.dvg);;par/rec files (*.par);;DSR files (hpsonos.db HPSONOS.DB);;DICOM files (*.dcm *.gdcm)"
+#define EXTERNAL_FILE_EXTENSIONS "All known formats(*.dcm *.DCM *.gdcm *.ima *.pic *.pic.gz *.bmp *.png *.jpg *.tiff *.pvtk *.stl *.vtk *.obj *.vti *.hdr);;DICOM files(*.dcm *.DCM *.gdcm);;DKFZ Pic (*.seq *.pic *.pic.gz *.seq.gz);;Sets of 2D slices (*.pic *.pic.gz *.bmp *.png *.dcm *.gdcm *.ima *.tiff);;stl files (*.stl)"
+#define INTERNAL_FILE_EXTENSIONS "all (*.seq *.pic *.pic.gz *.seq.gz *.pvtk *.stl *.vtk *.obj *.vti *.ves *.uvg *.dvg *.par *.dcm *.gdcm *.ima *.mhd *.hdr hpsonos.db HPSONOS.DB *.ssm *.bmp *.png *.jpg *.tiff);;DKFZ Pic (*.seq *.pic *.pic.gz *.seq.gz);;surface files (*.stl *.vtk *.obj);;stl files (*.stl);;vtk surface files (*.vtk);;vtk image files (*.pvtk);;vessel files (*.ves *.uvg *.dvg);;par/rec files (*.par);;DSR files (hpsonos.db HPSONOS.DB);;DICOM files (*.dcm *.gdcm *.ima)"
 #else
-#define EXTERNAL_FILE_EXTENSIONS "All known formats(*.dcm *.DCM *.gdcm *.pic *.pic.gz *.bmp *.png *.jpg *.tiff *.pvtk *.stl *.vtk *.obj *.hdr);;DICOM files(*.dcm *.DCM *.gdcm);;DKFZ Pic (*.seq *.pic *.pic.gz *.seq.gz);;Sets of 2D slices (*.pic *.pic.gz *.bmp *.png *.dcm *.gdcm);;stl files (*.stl)"
-#define INTERNAL_FILE_EXTENSIONS "all (*.seq *.pic *.pic.gz *.seq.gz *.pvtk *.stl *.vtk *.obj *.ves *.uvg *.dvg *.par *.gdcm *.dcm *.mhd *.hdr hpsonos.db HPSONOS.DB *.ssm *.bmp *.jpg *.png *.tiff);;DKFZ Pic (*.seq *.pic *.pic.gz *.seq.gz);;surface files (*.stl *.vtk *.obj);;stl files (*.stl);;vtk surface files (*.vtk);;vtk image files (*.pvtk);;vessel files (*.ves *.uvg *.dvg);;par/rec files (*.par);;DSR files (hpsonos.db HPSONOS.DB);;DICOM files (*.dcm *.gdcm)"
+#define EXTERNAL_FILE_EXTENSIONS "All known formats(*.dcm *.DCM *.gdcm *.ima *.pic *.pic.gz *.bmp *.png *.jpg *.tiff *.pvtk *.stl *.vtk *.obj *.hdr);;DICOM files(*.dcm *.DCM *.gdcm);;DKFZ Pic (*.seq *.pic *.pic.gz *.seq.gz);;Sets of 2D slices (*.pic *.pic.gz *.bmp *.png *.dcm *.gdcm *.ima);;stl files (*.stl)"
+#define INTERNAL_FILE_EXTENSIONS "all (*.seq *.pic *.pic.gz *.seq.gz *.pvtk *.stl *.vtk *.obj *.ves *.uvg *.dvg *.par *.gdcm *.dcm *.ima *.mhd *.hdr hpsonos.db HPSONOS.DB *.ssm *.bmp *.jpg *.png *.tiff);;DKFZ Pic (*.seq *.pic *.pic.gz *.seq.gz);;surface files (*.stl *.vtk *.obj);;stl files (*.stl);;vtk surface files (*.vtk);;vtk image files (*.pvtk);;vessel files (*.ves *.uvg *.dvg);;par/rec files (*.par);;DSR files (hpsonos.db HPSONOS.DB);;DICOM files (*.dcm *.gdcm *.ima)"
 #endif
-#define SAVE_FILE_EXTENSIONS "all (*.pic *.mhd *.png *.tiff *.jpg)"
+#define SAVE_FILE_EXTENSIONS "all (*.pic *.mhd *.vtk *.hdr *.png *.tiff *.jpg)"
 
 const char* CommonFunctionality::GetFileExtensions() 
 {

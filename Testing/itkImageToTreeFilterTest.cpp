@@ -53,7 +53,7 @@ typedef ImageToTreeFilterType::Pointer                ImageToTreeFilterPointer;
 typedef itk::ITTFilterContext<ImageType, OutputTreeType>
                                                       FilterContextType;
 typedef FilterContextType::Pointer                    FilterContextPointer;
-typedef FilterContextType::StartPointQueueType        StartPointQueueType;
+typedef FilterContextType::StartPointDataQueueType    StartPointDataQueueType;
 typedef itk::StartPointData<ImageType>                StartPointDataType;
 typedef StartPointDataType::Pointer                   StartPointDataPointer;
 
@@ -76,7 +76,7 @@ typedef std::list<int>                                ResultListType;
 int testFilterContext()
 {
   // init some test data
-  PointType testPoint1;
+  StartPointDataType::PointType testPoint1;
   testPoint1.Fill(0);
   DirectionType testDirection1;
   testDirection1.Fill(0);
@@ -96,13 +96,13 @@ int testFilterContext()
   std::cout << " *** Testing ITTFilterContext for storage of objects ***\n";
   FilterContextPointer filterContext = FilterContextType::New();
 
-  StartPointQueueType* pointQueue1 = filterContext->GetStartPointQueue();
+  StartPointDataQueueType* pointQueue1 = filterContext->GetStartPointDataQueue();
   std::cout << "Pushing points to filter context...\n";
   pointQueue1->push(data1);
   pointQueue1->push(data2);
 
   std::cout << "Reading points from filter context...\n";
-  StartPointQueueType* pointQueue2 = filterContext->GetStartPointQueue();
+  StartPointDataQueueType* pointQueue2 = filterContext->GetStartPointDataQueue();
   if (pointQueue2->front() == data1)
   {
     pointQueue2->pop();
@@ -151,7 +151,7 @@ int testInitFilter()
   // start point should be the first point in the filter
   std::cout << "Reading StartPointData from filter...\n";
   FilterContextPointer testFilterContext = testFilter->GetFilterContext();
-  StartPointQueueType* testQueue = testFilterContext->GetStartPointQueue();
+  StartPointDataQueueType* testQueue = testFilterContext->GetStartPointDataQueue();
   StartPointDataPointer testData = testQueue->front();
   PointType testPoint2 = testData->GetStartPoint();
   DirectionType testDirection2 = testData->GetStartDirection();

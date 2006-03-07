@@ -38,11 +38,14 @@ PURPOSE.  See the above copyright notices for more information.
 
 // VTK-related includes
 #include <vtkSTLReader.h>
-#include <vtkPolyDataReader.h>
 #include <vtkOBJReader.h>
 #include <vtkPolyData.h>
 #include <vtkPolyDataNormals.h>
+
+#include <vtkDataReader.h>
+#include <vtkPolyDataReader.h>
 #include <vtkStructuredPointsReader.h>
+
 #include <vtkStructuredPoints.h>
 #include <vtkLookupTable.h>
 #if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
@@ -335,25 +338,70 @@ void mitk::DataTreeNodeFactory::ReadFileTypeSTL()
 
 void mitk::DataTreeNodeFactory::ReadFileTypeVTK()
 {
-  std::cout << "Loading " << m_FileName << " as vtk..." << std::endl;
+  std::cout << "Loading " << m_FileName << " as vtk" << std::flush;
 
-  vtkPolyDataReader *reader = vtkPolyDataReader::New();
-  reader->SetFileName( m_FileName.c_str() );
-  reader->Update();
+  ///We create a Generic Reader to test de .vtk/
+  vtkDataReader *chooser=vtkDataReader::New();
+  chooser->SetFileName(m_FileName.c_str() );
 
-  if ( reader->GetOutput() != NULL )
+  if( chooser->IsFilePolyData())
   {
-    mitk::Surface::Pointer surface = mitk::Surface::New();
-    surface->SetVtkPolyData( reader->GetOutput() );
-    mitk::DataTreeNode::Pointer node = this->GetOutput();
-    node->SetData( surface );
+    ///PolyData/
+    std::cout << "PolyData" << std::endl;
+    vtkPolyDataReader *reader = vtkPolyDataReader::New();
+    reader->SetFileName( m_FileName.c_str() );
+    reader->Update();
 
-    SetDefaultSurfaceProperties( node );
+    if ( reader->GetOutput() != NULL )
+    {
+      mitk::Surface::Pointer surface = mitk::Surface::New();
+      surface->SetVtkPolyData( reader->GetOutput() );
+      mitk::DataTreeNode::Pointer node = this->GetOutput();
+      node->SetData( surface );
+
+      mitk::StringProperty::Pointer nameProp = new mitk::StringProperty(this->GetBaseFileName());
+      node->SetProperty( "name", nameProp );
+
+      this->SetDefaultSurfaceProperties( node );
+    }
+
+    reader->Delete();
   }
+  else if(chooser->IsFileStructuredPoints())
+  {
+    ///StructuredPoints/
+    std::cout << "StructuredPoints"<< std::endl;
+    vtkStructuredPointsReader *reader=vtkStructuredPointsReader::New();
+    reader->SetFileName(m_FileName.c_str());
+    reader->Update();
 
-  reader->Delete();
+    if ( reader->GetOutput() != NULL )
+    {
+      mitk::Image::Pointer image = mitk::Image::New();
+      image->Initialize( reader->GetOutput() );
+      image->SetVolume(  reader->GetOutput()->GetScalarPointer());
+      mitk::DataTreeNode::Pointer node = this->GetOutput();
+      node->SetData( image );
 
-  std::cout << "...finished!" << std::endl;
+      mitk::StringProperty::Pointer nameProp = new mitk::StringProperty(this->GetBaseFileName());
+      node->SetProperty( "name", nameProp );
+
+      this->SetDefaultImageProperties( node );
+
+      // add level-window property
+      mitk::LevelWindowProperty::Pointer levWinProp = new mitk::LevelWindowProperty();
+      mitk::LevelWindow levelwindow;
+      levelwindow.SetAuto( image );
+      levWinProp->SetLevelWindow( levelwindow );
+      node->GetPropertyList()->SetProperty( "levelwindow", levWinProp );
+    }
+    reader->Delete();
+  }
+  else
+  {
+    std::cerr << " ... sorry, this .vtk format is not supported yet."<<std::endl;
+  }
+  chooser->Delete();
 }
 
 
@@ -395,20 +443,95 @@ void mitk::DataTreeNodeFactory::ReadFileTypePIC()
 
     reader->SetFileName( m_FileName.c_str() );
     reader->UpdateLargestPossibleRegion();
-    mitk::DataTreeNode::Pointer node = this->GetOutput();
-    node->SetData( reader->GetOutput() );
 
-    SetDefaultImageProperties(node);
+    if ( reader->GetOutput()->GetNumberOfChannels() == 1 )
+    {
+      mitk::DataTreeNode::Pointer node = this->GetOutput();
+      node->SetData( reader->GetOutput() );
+      SetDefaultImageProperties(node);
 
-    // add level-window property
-    mitk::LevelWindowProperty::Pointer levWinProp = new mitk::LevelWindowProperty();
-    mitk::LevelWindow levelwindow;
+      // add level-window property
+      mitk::LevelWindowProperty::Pointer levWinProp = new mitk::LevelWindowProperty();
+      mitk::LevelWindow levelwindow;
 
-    levelwindow.SetAuto( reader->GetOutput() );
-    levWinProp->SetLevelWindow( levelwindow );
+      levelwindow.SetAuto( reader->GetOutput() );
+      levWinProp->SetLevelWindow( levelwindow );
 
-    node->GetPropertyList()->SetProperty( "levelwindow", levWinProp );
+      node->GetPropertyList()->SetProperty( "levelwindow", levWinProp );
+    }
+    else
+    if ( reader->GetOutput()->GetNumberOfChannels() > 1 )
+    {
+      mitk::ImageChannelSelector::Pointer morphologyChannelSelector = mitk::ImageChannelSelector::New();
+      mitk::ImageChannelSelector::Pointer dopplerChannelSelector = mitk::ImageChannelSelector::New();
 
+      morphologyChannelSelector->SetInput( reader->GetOutput() );
+      dopplerChannelSelector->SetInput( reader->GetOutput() );
+
+      // insert morphology
+      mitk::DataTreeNode::Pointer node = this->GetOutput( 0 );
+      node->SetData( morphologyChannelSelector->GetOutput() );
+      mitk::StringProperty::Pointer ultrasoundProp = new mitk::StringProperty( "TransformedBackscatter" );
+      node->SetProperty( "ultrasound", ultrasoundProp );
+      mitk::StringProperty::Pointer nameProp = new mitk::StringProperty( this->GetBaseFileName()+" (morphology)" );
+      node->SetProperty( "name", nameProp );
+
+      node->SetProperty( "layer", new mitk::IntProperty( -11 ) );
+      mitk::LevelWindow levelwindow;
+      levelwindow.SetAuto( morphologyChannelSelector->GetOutput() );
+      node->SetLevelWindow( levelwindow, NULL );
+      node->SetVisibility( false, NULL );
+      node->SetColor( 1.0, 1.0, 1.0, NULL );
+      node->Update();
+
+      SetDefaultImageProperties(node);
+
+
+      // now deal with Doppler
+      this->ResizeOutputs( 2 );
+      dopplerChannelSelector->SetChannelNr( 1 );
+
+      // create a Doppler lookup table
+      // TODO: map must depend on velocity meta information ( e.g., baseline shift)
+      mitk::USLookupTableSource::Pointer LookupTableSource = mitk::USLookupTableSource::New();
+      LookupTableSource->SetUseDSRDopplerLookupTable();
+      LookupTableSource->Update();
+      mitk::LookupTableSource::OutputTypePointer LookupTable = LookupTableSource->GetOutput();
+      mitk::LookupTableProperty::Pointer LookupTableProp = new mitk::LookupTableProperty( *LookupTable );
+
+      int start = 128 - 1;
+      int end = 128 + 1;
+      for (int i=start; i<=end;i++)
+        LookupTableProp->GetLookupTable().ChangeOpacity(i, 0);
+
+      // insert Doppler
+      node = this->GetOutput( 1 );
+      node->SetData( dopplerChannelSelector->GetOutput() );
+      SetDefaultImageProperties(node);
+
+      ultrasoundProp = new mitk::StringProperty( "TransformedDoppler" );
+      node->SetProperty( "ultrasound", ultrasoundProp );
+      nameProp = new mitk::StringProperty( this->GetBaseFileName()+" (Doppler)" );
+      node->SetProperty( "name", nameProp );
+      node->SetProperty( "layer", new mitk::IntProperty( -6 ) );
+
+      mitk::LevelWindowProperty::Pointer levWinProp = new mitk::LevelWindowProperty();
+      levelwindow.SetLevelWindow( 128, 255 );
+      levWinProp->SetLevelWindow( levelwindow );
+      // set the overwrite LevelWindow
+      // if "levelwindow" is used if "levelwindow" is not available
+      // else "levelwindow" is used
+      // "levelwindow" is not affected by the slider
+      node->GetPropertyList()->SetProperty( "levelWindow", levWinProp );
+
+      levWinProp = new mitk::LevelWindowProperty();
+      levWinProp->SetLevelWindow( levelwindow );
+      node->GetPropertyList()->SetProperty( "levelwindow", levWinProp );
+
+      node->SetProperty( "LookupTable", LookupTableProp );
+      node->SetVisibility( false, NULL );
+      node->Update();
+    }
   }
   std::cout << "...finished!" << std::endl;
 }
@@ -444,28 +567,7 @@ void mitk::DataTreeNodeFactory::ReadFileTypePAR()
 
 void mitk::DataTreeNodeFactory::ReadFileTypePVTK()
 {
-  vtkStructuredPointsReader * vtkreader = vtkStructuredPointsReader::New();
-  vtkreader->SetFileName( m_FileName.c_str() );
-  vtkreader->Update();
-
-  if ( vtkreader->GetOutput() != NULL )
-  {
-    mitk::Image::Pointer image = mitk::Image::New();
-    image->Initialize( vtkreader->GetOutput() );
-    image->SetVolume( vtkreader->GetOutput()->GetScalarPointer() );
-    mitk::DataTreeNode::Pointer node = this->GetOutput();
-    node->SetData( image );
-
-    SetDefaultImageProperties(node);
-
-    // add level-window property
-    mitk::LevelWindowProperty::Pointer levWinProp = new mitk::LevelWindowProperty();
-    mitk::LevelWindow levelwindow;
-    levelwindow.SetAuto( image );
-    levWinProp->SetLevelWindow( levelwindow );
-    node->GetPropertyList()->SetProperty( "levelwindow", levWinProp );
-  }
-  vtkreader->Delete();
+  ReadFileTypeVTK();
 }
 
 #if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
@@ -850,7 +952,6 @@ void mitk::DataTreeNodeFactory::ReadFileTypeGDCM()
   std::cout << "...finished!" << std::endl;
 }
 
-
 void mitk::DataTreeNodeFactory::ReadFileTypeITKImageIOFactory()
 {
   const unsigned int MINDIM = 2;
@@ -886,7 +987,7 @@ void mitk::DataTreeNodeFactory::ReadFileTypeITKImageIOFactory()
   if ( ndim < MINDIM || ndim > MAXDIM )
   {
     itkWarningMacro( << "Sorry, only dimensions 2, 3 and 4 are supported. The given file has " << ndim << " dimensions! Reading as 4D." );
-    ndim = 4;
+    ndim = MAXDIM;
   }
 
   itk::ImageIORegion ioRegion( ndim );
@@ -924,8 +1025,6 @@ void mitk::DataTreeNodeFactory::ReadFileTypeITKImageIOFactory()
 
   std::cout << "ioRegion: " << ioRegion << std::endl;
   imageIO->SetIORegion( ioRegion );
-
-
   void* buffer = malloc( imageIO->GetImageSizeInBytes() );
   imageIO->Read( buffer );
   mitk::Image::Pointer image = mitk::Image::New();
@@ -977,7 +1076,7 @@ void mitk::DataTreeNodeFactory::ReadFileTypeITKImageIOFactory()
   mitkLutProp->SetLookupTable(*mitkLut);
   node->SetProperty( "LookupTable", mitkLutProp );
   */
-  
+ 
   std::cout << "...finished!" << std::endl;
 }
 

@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkRenderingManager.h"
 #include "mitkRenderingManagerFactory.h"
 #include "mitkRenderWindow.h"
+#include "mitkOpenGLRenderer.h"
 
 mitk::RenderingManager *mitk::RenderingManager::m_Instance = 0;
 mitk::RenderingManagerFactory *mitk::RenderingManager::m_RenderingManagerFactory = 0;
@@ -137,6 +138,31 @@ mitk::RenderingManager
   for ( it = m_RenderWindowList.begin(); it != m_RenderWindowList.end(); ++it )
   {
     // Immediately repaint this window (implementation platform specific)
+    it->first->Repaint();
+
+    // Erase potentially pending requests
+    it->second = false;
+  }
+
+  if ( m_UpdatePending )
+  {
+    this->StopTimer();
+    m_UpdatePending = false;
+  }
+}
+
+void 
+mitk::RenderingManager
+::ForceImmediateUpdateIncludingVtkActors()
+{
+  RenderWindowList::iterator it;
+  for ( it = m_RenderWindowList.begin(); it != m_RenderWindowList.end(); ++it )
+  {
+    // if the render window is rendered via an mitk::OpenGLRenderer
+    // call UpdateIncludingVtkActors. 
+    mitk::OpenGLRenderer* openGLRenderer = dynamic_cast<mitk::OpenGLRenderer*>( it->first->GetRenderer() );
+    if ( openGLRenderer )
+      openGLRenderer->UpdateIncludingVtkActors();
     it->first->Repaint();
 
     // Erase potentially pending requests

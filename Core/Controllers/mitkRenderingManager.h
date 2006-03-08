@@ -97,6 +97,13 @@ public:
   /** Immediately executes an update of all registered RenderWindows. */
   void ForceImmediateUpdateAll();
 
+  /** Immediately executes an update of all registered RenderWindows.
+   * If the renderer associated with a render window is an OpenGLRenderer,
+   * its method UpdateIncludingVtkActors is called. Otherwise the
+   * repaint method of the widget will be called.
+   */
+  void ForceImmediateUpdateIncludingVtkActors();
+
   /** Sets the minimum time interval in msec. When requesting an update for
    * a specific RenderWindow for the first time, it will be executed only
    * after at least this time interval has elapsed. */

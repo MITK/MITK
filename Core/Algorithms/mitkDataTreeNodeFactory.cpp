@@ -459,6 +459,7 @@ void mitk::DataTreeNodeFactory::ReadFileTypePIC()
 
       node->GetPropertyList()->SetProperty( "levelwindow", levWinProp );
     }
+#ifdef MBI_INTERNAL
     else
     if ( reader->GetOutput()->GetNumberOfChannels() > 1 )
     {
@@ -532,6 +533,7 @@ void mitk::DataTreeNodeFactory::ReadFileTypePIC()
       node->SetVisibility( false, NULL );
       node->Update();
     }
+#endif
   }
   std::cout << "...finished!" << std::endl;
 }

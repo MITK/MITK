@@ -146,7 +146,7 @@ public class NewActionDialog extends JDialog {
 					}
 					else if (actionTree.containsActionName(actionNameTextField.getText())) {
 						JOptionPane.showMessageDialog(NewActionDialog.this,
-								"Action name allready exists, please choose another one!", "Error Message",
+								"Action name already exists, please choose another one!", "Error Message",
 								JOptionPane.ERROR_MESSAGE);
 						return;
 					}
@@ -158,7 +158,7 @@ public class NewActionDialog extends JDialog {
 					}
 					else if (actionTree.containsActionId(actionIdTextField.getText())) {
 						JOptionPane.showMessageDialog(NewActionDialog.this,
-								"Id allready exists, please choose another one!", "Error Message",
+								"Id already exists, please choose another one!", "Error Message",
 								JOptionPane.ERROR_MESSAGE);
 						return;
 					}

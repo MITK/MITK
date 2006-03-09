@@ -442,7 +442,7 @@ public class StateMachinesList extends ViewPart implements ISaveablePart, IDoubl
 					"Error Message", JOptionPane.ERROR_MESSAGE);
 		}
 		else if (exist == true) {
-			JOptionPane.showMessageDialog(null, "Name allready exists!",
+			JOptionPane.showMessageDialog(null, "Name already exists!",
 					"Error Message", JOptionPane.ERROR_MESSAGE);
 		}
 	}

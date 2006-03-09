@@ -344,7 +344,7 @@ public class ReadActionAndEventDOMTree {
 	
 	/**
 	 * @param id the searched event id
-	 * @return true if the event id is allready in use, false otherwise
+	 * @return true if the event id is already in use, false otherwise
 	 */
 	public boolean containsEventId (String id) {
 		if (eventIdMap.containsKey(id)) {
@@ -355,7 +355,7 @@ public class ReadActionAndEventDOMTree {
 	
 	/**
 	 * @param id the searched event name
-	 * @return true if the event name is allready in use, false otherwise
+	 * @return true if the event name is already in use, false otherwise
 	 */
 	public boolean containsEventName (String eventName) {
 		if (eventNameMap.containsKey(eventName)) {
@@ -366,7 +366,7 @@ public class ReadActionAndEventDOMTree {
 	
 	/**
 	 * @param id the searched event category
-	 * @return true if the event category is allready in use, false otherwise
+	 * @return true if the event category is already in use, false otherwise
 	 */
 	public boolean containsEventCategory (String eventCategory) {
 		if (allEventCats.contains(eventCategory)) {
@@ -377,7 +377,7 @@ public class ReadActionAndEventDOMTree {
 	
 	/**
 	 * @param id the searched action id
-	 * @return true if the action id is allready in use, false otherwise
+	 * @return true if the action id is already in use, false otherwise
 	 */
 	public boolean containsActionId (String id) {
 		if (actionIdMap.containsKey(id)) {
@@ -388,7 +388,7 @@ public class ReadActionAndEventDOMTree {
 	
 	/**
 	 * @param actionName the searched action name
-	 * @return true if the action name is allready in use, false otherwise
+	 * @return true if the action name is already in use, false otherwise
 	 */
 	public boolean containsActionName (String actionName) {
 		if (actionNameMap.containsKey(actionName)) {
@@ -399,7 +399,7 @@ public class ReadActionAndEventDOMTree {
 	
 	/**
 	 * @param actionCategory the searched action category
-	 * @return true if the action category is allready in use, false otherwise
+	 * @return true if the action category is already in use, false otherwise
 	 */
 	public boolean containsActionCategory (String actionCategory) {
 		if (allActionCats.contains(actionCategory)) {

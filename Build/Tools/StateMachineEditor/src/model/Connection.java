@@ -169,12 +169,12 @@ public class Connection extends ModelElement {
 		if (allActions.size() > 1) {
 			Action action = (Action) allActions.get(0);
 			String act = action.getActionId();
-			action1 = actionTree.getActionName(act) + "\n" + "...";
+			action1 = "<" + actionTree.getActionName(act) + ">" + "\n" + "<...>";
 		}
 		else if (allActions.size() == 1) {
 			Action action = (Action) allActions.get(0);
 			String act = action.getActionId();
-			action1 = actionTree.getActionName(act);
+			action1 = "<" + actionTree.getActionName(act) + ">";
 		}
 		else action1 = "";
 		this.setAction(action1);
@@ -419,7 +419,7 @@ public class Connection extends ModelElement {
 		}
 		else if (id.equals(ACTION_PROP)) {
 			String actionName = (String) value;
-			setAction(actionName);
+			setAction("<" + actionName + ">");
 		}
 		else if (id.equals(NAME_PROP)) {
 			String newName = (String) value;
@@ -490,11 +490,11 @@ public class Connection extends ModelElement {
 	public void addAction(Action act, String act1) {
 		ReadActionAndEventDOMTree actionTree = DOMGetInstance.getActionAndEventInstance();
 		if (allActions.size() == 0) {
-			this.setAction(actionTree.getActionName(act1));
+			this.setAction("<" + actionTree.getActionName(act1) + ">");
 			this.actionPropertyValue = actionTree.getActionName(act1);
 		}
 		else if (allActions.size() == 1) {
-			this.setAction(this.getAction() + "\n" + "...");
+			this.setAction(this.getAction() + "\n" + "<...>");
 			this.actionPropertyValue = actionPropertyValue + "; " + actionTree.getActionName(act1);
 		}
 		else {
@@ -519,11 +519,11 @@ public class Connection extends ModelElement {
 			this.actionPropertyValue = "";
 		}
 		else if (actions.size() == 1) {
-			this.setAction(actions.get(0).toString());
+			this.setAction("<" + actions.get(0).toString() + ">");
 			this.actionPropertyValue = actions.get(0).toString();
 		}
 		else {
-			this.setAction(actions.get(0).toString() + "\n" + "...");
+			this.setAction("<" + actions.get(0).toString() + ">" + "\n" + "<...>");
 			this.actionPropertyValue = actions.get(0).toString();
 			for (int i = 1; i < allActions.size(); i++) {
 				this.actionPropertyValue = this.actionPropertyValue + "; " + actions.get(i).toString();

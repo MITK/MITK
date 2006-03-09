@@ -203,7 +203,7 @@ public abstract class States extends ModelElement {
 					IWorkbenchWindow ui = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 					StateMachinesEditor activeEditor = (StateMachinesEditor) ui.getActivePage().getActiveEditor();
 					if (activeEditor.getDiagram().containsStateID((String)value)) {
-						return "ID allready in use";
+						return "ID already in use";
 					}
 					return (intValue >= 0) ? null
 							: "Value must be >=  0";
@@ -576,7 +576,7 @@ public abstract class States extends ModelElement {
 					IWorkbenchWindow ui = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 					StateMachinesEditor activeEditor = (StateMachinesEditor) ui.getActivePage().getActiveEditor();
 					if (activeEditor.getDiagram().containsStateID((String)value)) {
-						return "ID allready in use";
+						return "ID already in use";
 					}
 					return (intValue >= 0) ? null
 							: "Value must be >=  0";

@@ -77,7 +77,7 @@ class ConnectionEditPart extends AbstractConnectionEditPart implements
 																	// endpoint
 		ConnectionLocator midpointLocator = new ConnectionLocator(connection, PositionConstants.RIGHT);
 		actionName.setOpaque(true);
-		actionName.setBackgroundColor(ColorConstants.green);
+		//actionName.setBackgroundColor(ColorConstants.green);
 		actionName.setForegroundColor(ColorConstants.black);
 		actionName.setText(getCastedModel().getAction()); // actionName of this connection
 		// add action on midpoint
@@ -85,7 +85,7 @@ class ConnectionEditPart extends AbstractConnectionEditPart implements
 		connection.add(actionName, midpointLocator);
 		ConnectionLocator midpointLocator2 = new ConnectionLocator(connection, PositionConstants.RIGHT);
 		eventName.setOpaque(true);
-		eventName.setBackgroundColor(ColorConstants.red);
+		//eventName.setBackgroundColor(ColorConstants.red);
 		eventName.setForegroundColor(ColorConstants.black);
 		eventName.setText(getCastedModel().getEvent()); // eventName of this connection
 		// add event on midpoint

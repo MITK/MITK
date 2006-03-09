@@ -241,7 +241,7 @@ public class ActionDialog extends JDialog {
 						}
 						else if (actionTree.containsActionCategory(inputValue)) {
 							JOptionPane.showMessageDialog(ActionDialog.this,
-									"Action category allready exists, please choose another one!", "Error Message",
+									"Action category already exists, please choose another one!", "Error Message",
 									JOptionPane.ERROR_MESSAGE);
 						}
 						else {

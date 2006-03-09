@@ -143,7 +143,7 @@ public class NewEventDialog extends JDialog {
 					}
 					else if (eventTree.containsEventName(eventNameTextField.getText())) {
 						JOptionPane.showMessageDialog(NewEventDialog.this,
-								"Event name allready exists, please choose another one!", "Error Message",
+								"Event name already exists, please choose another one!", "Error Message",
 								JOptionPane.ERROR_MESSAGE);
 						return;
 					}
@@ -155,7 +155,7 @@ public class NewEventDialog extends JDialog {
 					}
 					else if (eventTree.containsEventId(eventIdTextField.getText())) {
 						JOptionPane.showMessageDialog(NewEventDialog.this,
-								"Id allready exists, please choose another one!", "Error Message",
+								"Id already exists, please choose another one!", "Error Message",
 								JOptionPane.ERROR_MESSAGE);
 						return;
 					}

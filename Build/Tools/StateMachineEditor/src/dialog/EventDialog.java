@@ -189,7 +189,7 @@ public class EventDialog extends JDialog {
 						}
 						else if (eventTree.containsEventCategory(inputValue)) {
 							JOptionPane.showMessageDialog(EventDialog.this,
-									"Event category allready exists, please choose another one!", "Error Message",
+									"Event category already exists, please choose another one!", "Error Message",
 									JOptionPane.ERROR_MESSAGE);
 						}
 						else {

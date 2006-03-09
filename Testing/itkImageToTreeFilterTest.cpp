@@ -179,6 +179,7 @@ int testInitFilter()
  ****************************************************************/
 int testRegistrationModelXMLWriter()
 {
+  // TODO: add new point types
   std::cout << " *** Testing the RegistrationModelXMLWriter ***\n";
 
   typedef TubeSegmentModelType::PointSetType          PointSetType;
@@ -203,6 +204,7 @@ int testRegistrationModelXMLWriter()
   PointType startPoint;
   startPoint.Fill(0);
   tubeSegment->SetStartPoint(startPoint);
+  tubeSegment->SetRotationPoint(startPoint);
 
   PointSetPointType point1; // 1, 1, 0
   point1[0] = 1;
@@ -232,6 +234,13 @@ int testRegistrationModelXMLWriter()
   pointSet->SetPointData(pointDataContainer);
   tubeSegment->SetPointSet(pointSet);
 
+  PointSetPointer connectionPointSet = PointSetType::New();
+  PointsContainerPointer connectionPointsContainer = PointsContainerType::New();
+  index = 0;
+  connectionPointsContainer->InsertElement(index, point1);
+  connectionPointSet->SetPoints(connectionPointsContainer);
+  tubeSegment->SetConnectionPoints(connectionPointSet);
+
   RegistrationModelWriterPointer modelWriter = RegistrationModelWriterType::New();
   modelWriter->SetRegistrationModel(tubeSegment);
   modelWriter->SetFilename("test.xml");
@@ -257,8 +266,7 @@ int testRegistrationModelXMLWriter()
 
   // TODO: find a better way to compare the strings
   std::string value = buffer.str();
-  std::string expected = "<model><name>TubeSegment</name><startPoint><point><x>0</x><y>0</y><z>0</z></point></startPoint><points><point><x>1</x><y>1</y><z>0</z><value>255</value></point><point><x>1</x><y>0</y><z>1</z><value>255</value></point><point><x>1</x><y>1</y><z>0</z><value>255</value></point></points></model>";
-
+  std::string expected = "<model><name>TubeSegment</name><startPoint><point><x>0</x><y>0</y><z>0</z></point></startPoint><rotationPoint><point><x>0</x><y>0</y><z>0</z></point></rotationPoint><connectionPoints><point><x>1</x><y>1</y><z>0</z></point></connectionPoints><points><point><x>1</x><y>1</y><z>0</z><value>255</value></point><point><x>1</x><y>0</y><z>1</z><value>255</value></point><point><x>1</x><y>1</y><z>0</z><value>255</value></point></points></model>";
 
   if (value != expected)
   {
@@ -280,8 +288,6 @@ int testRegistrationModelXMLWriter()
   TubeSegmentModelPointer readTubeSegment = registrationModelReader->GetTubeSegment();
   PointSetPointer readPointSet = readTubeSegment->GetPointSet();
   PointType readStartPoint = readTubeSegment->GetStartPoint();
-
-  std::cout << readStartPoint << std::endl;
 
   if (startPoint != readStartPoint)
   {
@@ -311,11 +317,21 @@ int testRegistrationModelXMLWriter()
     readPointsIter++;
   }
 
+  PointSetPointer readConnectionPoints      = readTubeSegment->GetConnectionPoints();
+  PointsIterator  readConnectionPointsIter  = readConnectionPoints->GetPoints()->Begin();
+  PointSetPointType readConnectionPoint     = readConnectionPointsIter.Value();
+
+  if (readConnectionPoint != point1)
+  {
+    std::cout << "Connection points do not match." << std::endl;
+    std::cout << "Orignal point: " << point1 << std::endl;
+    std::cout << "Read point:    " << readConnectionPoint << std::endl;
+    return EXIT_FAILURE;
+  }
+
   std::cout << " *** [TEST PASSED] ***\n";
   return EXIT_SUCCESS;
 }
-
-
 
 int itkImageToTreeFilterTest(int i, char* argv[] )
 {

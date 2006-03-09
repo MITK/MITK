@@ -206,8 +206,11 @@ mitk::PropertyList::Pointer mitk::DataTreeNode::GetPropertyList(const mitk::Base
 }
 
 //##ModelId=3EF189DB0111
-mitk::BaseProperty::Pointer mitk::DataTreeNode::GetProperty(const char *propertyKey, const mitk::BaseRenderer* renderer) const
+mitk::BaseProperty::Pointer mitk::DataTreeNode::GetProperty(const char *propertyKey, const mitk::BaseRenderer* renderer, bool* defaultRendererUsed) const
 {
+  if (defaultRendererUsed)
+      *defaultRendererUsed = false;
+
   if(propertyKey==NULL)
     return NULL;
 
@@ -216,8 +219,13 @@ mitk::BaseProperty::Pointer mitk::DataTreeNode::GetProperty(const char *property
   //does a renderer-specific PropertyList exist?
   it=m_MapOfPropertyLists.find(renderer);
   if(it==m_MapOfPropertyLists.end())
+  {
     //no? use the renderer-independent one!
+    
+    if (defaultRendererUsed)
+      *defaultRendererUsed = true;
     return m_PropertyList->GetProperty(propertyKey);
+  }
 
   //does the renderer-specific PropertyList contain the @a propertyKey?
   //and is it enabled
@@ -337,8 +345,10 @@ void mitk::DataTreeNode::SetColor(const float rgb[3], mitk::BaseRenderer* render
 //##ModelId=3EF1966703D6
 void mitk::DataTreeNode::SetVisibility(bool visible, mitk::BaseRenderer* renderer, const char* propertyKey)
 {
-  mitk::BoolProperty::Pointer prop = dynamic_cast<mitk::BoolProperty*>(GetProperty(propertyKey, renderer).GetPointer());
-  if (prop)
+  bool defaultRendererUsed = false;
+  mitk::BoolProperty::Pointer prop = dynamic_cast<mitk::BoolProperty*>(GetProperty(propertyKey, renderer, &defaultRendererUsed).GetPointer());
+
+  if (prop && !defaultRendererUsed)
     prop->SetValue(visible);
   else
     GetPropertyList(renderer)->SetProperty(propertyKey, new mitk::BoolProperty(visible));

@@ -143,7 +143,7 @@ public:
   //## @sa GetPropertyList
   //## @sa m_PropertyList
   //## @sa m_MapOfPropertyLists
-  mitk::BaseProperty::Pointer GetProperty(const char *propertyKey, const mitk::BaseRenderer* renderer = NULL) const;
+  mitk::BaseProperty::Pointer GetProperty(const char *propertyKey, const mitk::BaseRenderer* renderer = NULL, bool* defaultRendererUsed = NULL) const;
 
   void SetProperty(const char *propertyKey, BaseProperty* property, const mitk::BaseRenderer* renderer = NULL);	
 
@@ -225,6 +225,8 @@ public:
   //## of BoolProperty with property-key "visibile")
   //## @return @a true property was found
   //## @sa IsVisible
+  //## @defaultRendererUsed is set to true if the specific renderer wasn't found so the default renderer was used
+  //##    if set to Null, this variable is not set
   bool GetVisibility(bool &visible, mitk::BaseRenderer* renderer, const char* propertyKey = "visible") const
   {
     return GetBoolProperty(propertyKey, visible, renderer);

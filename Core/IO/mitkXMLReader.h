@@ -35,14 +35,14 @@ namespace mitk{
   //##Documentation
   //## @brief XMLReader class for parsing a XML file. 
   //##
-  //## Class mitkXMLReader is derived from the class vtkXMLParser.
+  //## XMLReader class is derived from the class vtkXMLParser.
   //## Reads a stream and parses XML element tags and corresponding attributes.
+  //## Relevant functions for parsing are Goto(), GotoNext(), GotoParent() and GetAttribute().
+  //## Calls the ObjectFactory (function CreateObject()) to create objects that are defined in the tags (attribute CLASS_NAME) of the XML file.
   //## Each element begin tag and its attributes are sent to the StartElement method.
   //## Each element end tag is sent to the EndElement method.
-  //## Calls the ObjectFactory (function CreateObject()) to create objects that are defined in the tags (node name) of the XML file.
-  //## Don't forget to define new elements in the ObjectFactory!
   //##
-  //## The XMLIO class manages the writing and reading of the data.
+  //## The XMLIO class manages the writing and reading of data.
   //## An example of how to start the XMLWriter can be found in the function Load() of the DataTree class.
   //## @ingroup IO
   class XMLReader : public vtkXMLParser {

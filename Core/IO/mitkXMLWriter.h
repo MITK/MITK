@@ -32,11 +32,12 @@ namespace mitk{
   //##
   //## Derived class of BaseXMLWriter.
   //## The data is stored with XML attributes.
-  //## Function BeginNode() writes a XML node.
+  //## Function BeginNode() begins a XML node.
   //## The functions WriteProperty() are used to write XML attributes.
   //## Function EndNode() closes an open XML node tag.
+  //## This class can also manage the writing of source files (path and filename operations).
   //##
-  //## The XMLIO class manages the writting and reading of the data.
+  //## The XMLIO class manages the writing and reading of data.
   //## An example of how to start the XMLWriter can be found in the function Save() of the DataTree class.
   //## @ingroup IO
   class XMLWriter : public BaseXMLWriter {

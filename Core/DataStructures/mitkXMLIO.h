@@ -27,16 +27,19 @@ namespace mitk {
   class XMLReader;
 
   //##Documentation
-  //## @brief XMLIO class for writing mitk classes as a XML node to the XML file.
+  //## @brief XMLIO class manages the writing and reading of data to a XML file.
   //##
-  //## The XMLIO class manages the writing and reading of the data.
-  //## The function WriteXML() writes a complete XML node and its data (calls the functions BeginNode(), WriteXMLData() and EndNode()).
-  //## To write the data of a XML node (e.g. child nodes, attributes) use the function WriteXMLData().
-  //## Use function WriteXML() to write mitk classes to the XML file.
+  //## The function WriteXML() writes a complete XML node and its data (calls the functions BeginNode(), WriteProperty(), WriteXMLData() and EndNode() of the XMLWriter class).
+  //## Normally the function WriteXML() is used to write mitk classes to the XML file
   //## e.g. <dataTreeNode CLASS_NAME="class mitk::DataTreeNode"> ...data... </dataTreeNode>
-  //## For other elements e.g. the data of data types you can use the functions BeginNode(), EndNode() from the class BaseXMLWriter to write a XML node.
+  //## To write the data of a XML node (e.g. child nodes, attributes) call the function WriteXMLData().
+  //## For elements like the data of data types you can use the functions BeginNode(), EndNode() from the BaseXMLWriter class to write a XML node.
+  //## To read data from the XML file call the function ReadXMLData().
   //##
-  //## What should be implemented in the functions WriteXMLData() and ReadXMLData() of new classes? It is preffered to look at similar classes. The DataTreeNode class gives an introduction.
+  //## New classes should be derived from this class for writing/ reading and should be defined in the
+  //## MapClassIDToClassName class and in the ObjectFactory class.
+  //## What should be implemented in the functions WriteXMLData() and ReadXMLData() of new classes?
+  //## Just have a look to the documentation of the module IO classes.
   //## @ingroup IO
   class XMLIO {
   

@@ -79,7 +79,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkVtkInterpolationProperty.h"
 #include "mitkParRecFileReader.h"
 #include "mitkImage.h"
-#include "mitkUSLookupTableSource.h"
 #include "mitkLookupTableProperty.h"
 #include "mitkLookupTable.h"
 #include "mitkImageChannelSelector.h"
@@ -92,6 +91,7 @@ PURPOSE.  See the above copyright notices for more information.
   #include "mitkBirdDataFromFileReader.h"
   #include "mitkTrackedUSDataFileParser.h"
  #endif // USE_TUS_READER
+ #include "mitkUSLookupTableSource.h"
  #include "mitkCylindricToCartesianFilter.h"
  #include "mitkDSRFileReader.h"
  #include "mitkShapeModelFileReader.h"

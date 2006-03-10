@@ -23,6 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkImageTimeSelector.h"
 #include "mitkImageAccessByItk.h"
 #include "mitkPicFileWriter.h"
+#include <vtkXMLImageDataWriter.h>
 
 #include <itksys/SystemTools.hxx>
 
@@ -44,6 +45,15 @@ void mitk::ImageWriter::SetDefaultExtension()
   m_Extension = ".mhd";
 }
 
+static void writeVti(const char * filename, mitk::Image* image, int t=0)
+{
+  vtkXMLImageDataWriter * vtkwriter = vtkXMLImageDataWriter::New();
+  vtkwriter->SetFileName( filename );
+  vtkwriter->SetInput(image->GetVtkImageData(t));
+  vtkwriter->Write();
+  vtkwriter->Delete();
+}
+
 void mitk::ImageWriter::GenerateData()
 {
   if ( m_FileName == "" )
@@ -53,6 +63,8 @@ void mitk::ImageWriter::GenerateData()
   }
 
   mitk::Image::Pointer input = const_cast<mitk::Image*>(this->GetInput());
+
+  bool vti = (m_Extension.find(".vti") != std::string::npos);
 
   if ( m_Extension.find(".pic") == std::string::npos )
   {
@@ -79,8 +91,21 @@ void mitk::ImageWriter::GenerateData()
           itkWarningMacro(<<"Error on write: TimeSlicedGeometry invalid of image " << filename << ".");
           filename <<  m_FileName.c_str() << "_T" << t << m_Extension;
         }
-        AccessByItk_1( image, _mitkItkImageWrite, filename.str() );
+        if ( vti )
+        {
+          writeVti(filename.str().c_str(), input, t);
+        }
+        else
+        {        
+          AccessByItk_1( image, _mitkItkImageWrite, filename.str() );
+        }
       }
+    }
+    else if ( vti )
+    {
+      ::itk::OStringStream filename;
+      filename <<  m_FileName.c_str() << m_Extension;
+      writeVti(filename.str().c_str(), input);
     }
     else
     {

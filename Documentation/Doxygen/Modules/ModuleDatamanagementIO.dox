@@ -14,7 +14,7 @@
   
   \section XMLWriterAndXMLReader XMLWriter and XMLReader
   
-  The XMLWriter and XMLReader give the possibility to write and to read XML files.
+  The mitk::XMLWriter and mitk::XMLReader give the possibility to write and to read XML files.
   These classes were developed with the aim to store and to load the MITK datatree (mitk::DataTree).
   To avoid external dependencies of the MITK these classes are realized without XML parsers like DOM or SAX.
   Only dependencies to ITK and VTK are existing.
@@ -35,6 +35,9 @@
   
   Technically the XMLWriter class is derived from mitkBaseXMLWriter class. The constructor needs the filename of the XML file at least.
   
+  The following diagram displays the main components:
+  \image html XMLWriterOverview.png "XMLWriter classes dependency" 
+  
   For writing a XML file the following funtions are important.
   
   \li mitk::XMLIO::WriteXML()  
@@ -43,8 +46,9 @@
   \li mitk::BaseXMLWriter::EndNode()
   \li mitk::XMLWriter::WriteProperty()
   
-  Easily speaking the mitkXMLIO class manages the input and the output of the XML file.
-  New classes that should be written to the XML file have to be derived from the mitkXMLIO class.
+  Easily speaking the mitk::XMLIO class manages the input and the output of the XML file.
+  New classes that should be written to the XML file have to be derived from the XMLIO class.
+  New classes should also be declared in the mitk::MapClassIDToClassName class.
   Calling the function WriteXML() writes automatically a complete node of the referenced class to the XML file.
   The function WriteXML() calls sequential the functions BeginNode(), WriteProperty(), WriteXMLData() and EndNode().
   A new XML node is initialized with the function BeginNode("nameOfNewNode"). 
@@ -52,7 +56,7 @@
   This function has to be overwritten in new classes. The data is stored with XML attributes.
   These attributes can be written with the function WriteProperty("key", value). 
   The parameter "key" specifies the name of the attribute and the parameter "value" the data.
-  Different datatypes are supported. For details you can look in the mitkBaseXMLWriter and mitkXMLWriter class.
+  Different datatypes are supported. For details you can look in the mitk::BaseXMLWriter and mitk::XMLWriter class.
   The function EndNode() writes the end tag of the started XML node to the XML file.
   
   It is also possible to write custom data apart from classes to the XML file (e.g. data of complex datatypes).
@@ -66,7 +70,7 @@
   These base data is stored in the respectively fitting dataformat. 
   Such files are called source files and are referenced in the XML file.
   
-  To manage these references there are different functions implemented in the mitkXMLWriter class.
+  To manage these references there are different functions implemented in the mitk::XMLWriter class.
   
   \li mitk::XMLWriter::SetSaveSourceFiles()
   \li mitk::XMLWriter::SetSourceFileName() 
@@ -77,7 +81,7 @@
   \li mitk::XMLWriter::GetAbsolutePath()
   \li mitk::XMLWriter::GetSubFolder() 
 
-  A special feature of the mitkXMLWriter is to store the source files relative to the XML file. 
+  A special feature of the XMLWriter is to store the source files relative to the XML file. 
   If no filename is set a new filename is generated.
   
   \subsection XMLWriterCodeSnippets XMLWriter code snippets
@@ -140,31 +144,34 @@
   
   \subsection XMLReader XMLReader 
     
-  The mitkXMLReader reads a stream and parses XML element tags and corresponding attributes.
+  The mitk::XMLReader reads a stream and parses XML element tags and corresponding attributes.
   Technically the XMLReader class is derived from vtkXMLParser class.
   The constructor needs the filename ((path)+filename) of the XML file and a datatree iterator (mitk::DataTreeIteratorBase) of the datatree.
   
+  The following diagram displays the main components:
+  \image html XMLReaderOverview.png "XMLReader classes dependency" 
+
   For reading a XML file the following funtions are important.
   
-  \li mitk::XMLIO::ReadXMLData();
+  \li mitk::XMLIO::ReadXMLData()
   \li mitk::XMLReader::Goto()  
   \li mitk::XMLReader::GotoNext()
   \li mitk::XMLReader::GotoParent()
   \li mitk::XMLReader::CreateObject()
   \li mitk::XMLReader::GetAttribute()
     
-  As mentioned in the section before the mitkXMLIO class manages the input and the output of the XML file.
+  As mentioned in the section before the mitk::XMLIO class manages the input and the output of the XML file.
   New classes that should be read data from the XML file have to be derived from the mitkXMLIO class.
   In new classes the function ReadXMLData() have to be overwritten. 
   Easily speaking this function reads the data from the XML file, provides for instantiation of new objects and sets the data.
   With the Goto functions it is possible to navigate the parser through the XML document.
   To get the root XML node call the function Goto("root"). Be careful with the hierarchy of the XML nodes and the actual position of the parser.
   The function Goto() is looking always for child nodes and function GotoNext() is looking for further XML nodes in the same hierarchy.
-  For creation of new objects of the read class (the class is specified in the XML nodename) the function CreateObject() has to be called.
-  The creation of the asked object is only successful when the new class has already be defined in the ObjectFactory() class.
+  For creation of new objects of the read class (the class is specified in the XML attribute "CLASS_NAME") the function CreateObject() has to be called.
+  The creation of the asked object is only successful when the new class has already be defined in the mitk::ObjectFactory class.
   If the asked XML node is reached, the data stored in XML attributes, can be read by the function GetAttribute("key", value).
   The parameter "key" specifies the name of the attribute and the parameter "value" keeps the data.
-  Different datatypes are supported. For details you can look in the mitkXMLReader class.
+  Different datatypes are supported. For details you can look in the mitk::XMLReader class.
   When the parser should climb up in the XML tree hierarchy the function GotoParent() does a good job.
   
   The source file management

@@ -25,6 +25,7 @@ PURPOSE.  See the above copyright notices for more information.
 ** init() function in place of a constructor, and a destroy() function in
 ** place of a destructor.
 *****************************************************************************/
+#include <qstring.h>
 
 const int QmitkPointListWidget::UNLIMITED = 999;
 
@@ -71,6 +72,7 @@ void QmitkPointListWidget::ItemsOfListUpdate()
   InteractivePointList->clear();
   m_PointSet = (mitk::PointSet*)(m_DatatreeNode->GetData());
   int size =m_PointSet->GetSize();
+  m_NumberOfPointsLabel->setText(QString::number(size));
   if (size!=0)
   {
     const mitk::PointSet::DataType::Pointer Pointlist= m_PointSet->GetPointSet();
@@ -93,7 +95,7 @@ void QmitkPointListWidget::ItemsOfListUpdate()
 
 void QmitkPointListWidget::RemoveInteraction()
 {
-	mitk::PointSet::Pointer pointset;
+ mitk::PointSet::Pointer pointset;
 
     if (m_CurrentInteraction.IsNotNull())
     {

@@ -437,7 +437,7 @@ void QmitkPropertyListViewItem::MaterialEditorActivated()
       {
         vesselTreeLut->SetColorsFromMaterialProperties( materialEditor->GetMaterialProperties() );
         m_PropertyList->InvokeEvent(itk::ModifiedEvent());
-        mitk::RenderingManager::GetInstance()->RequestUpdateAll();            
+        mitk::RenderingManager::GetInstance()->ForceImmediateUpdateIncludingVtkActors();            
       }
       delete materialEditor;
     }

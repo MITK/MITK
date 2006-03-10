@@ -23,8 +23,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkImageTimeSelector.h"
 #include "mitkImageAccessByItk.h"
 #include "mitkPicFileWriter.h"
-#include <vtkXMLImageDataWriter.h>
-
 #include <itksys/SystemTools.hxx>
 
 #include <sstream>
@@ -45,6 +43,8 @@ void mitk::ImageWriter::SetDefaultExtension()
   m_Extension = ".mhd";
 }
 
+#if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
+#include <vtkXMLImageDataWriter.h>
 static void writeVti(const char * filename, mitk::Image* image, int t=0)
 {
   vtkXMLImageDataWriter * vtkwriter = vtkXMLImageDataWriter::New();
@@ -53,6 +53,7 @@ static void writeVti(const char * filename, mitk::Image* image, int t=0)
   vtkwriter->Write();
   vtkwriter->Delete();
 }
+#endif
 
 void mitk::ImageWriter::GenerateData()
 {
@@ -91,22 +92,26 @@ void mitk::ImageWriter::GenerateData()
           itkWarningMacro(<<"Error on write: TimeSlicedGeometry invalid of image " << filename << ".");
           filename <<  m_FileName.c_str() << "_T" << t << m_Extension;
         }
+#if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
         if ( vti )
         {
           writeVti(filename.str().c_str(), input, t);
         }
         else
+#endif
         {        
           AccessByItk_1( image, _mitkItkImageWrite, filename.str() );
         }
       }
     }
+#if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
     else if ( vti )
     {
       ::itk::OStringStream filename;
       filename <<  m_FileName.c_str() << m_Extension;
       writeVti(filename.str().c_str(), input);
     }
+#endif
     else
     {
       ::itk::OStringStream filename;

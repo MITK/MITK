@@ -43,6 +43,7 @@ void mitk::ImageWriter::SetDefaultExtension()
   m_Extension = ".mhd";
 }
 
+#include <vtkConfigure.h>
 #if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
 #include <vtkXMLImageDataWriter.h>
 static void writeVti(const char * filename, mitk::Image* image, int t=0)
@@ -65,7 +66,9 @@ void mitk::ImageWriter::GenerateData()
 
   mitk::Image::Pointer input = const_cast<mitk::Image*>(this->GetInput());
 
+#if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
   bool vti = (m_Extension.find(".vti") != std::string::npos);
+#endif
 
   if ( m_Extension.find(".pic") == std::string::npos )
   {

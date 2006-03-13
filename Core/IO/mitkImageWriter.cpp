@@ -104,7 +104,7 @@ void mitk::ImageWriter::GenerateData()
         else
 #endif
         {        
-          AccessFixedDimensionByItk_2( image, _mitkItkImageWrite, 3, input->GetTimeSlicedGeometry()->GetGeometry3D(t), filename.str() );
+          AccessByItk_1( image, _mitkItkImageWrite, filename.str() );
         }
       }
     }
@@ -120,7 +120,7 @@ void mitk::ImageWriter::GenerateData()
     {
       ::itk::OStringStream filename;
       filename <<  m_FileName.c_str() << m_Extension;
-      AccessFixedDimensionByItk_2( input, _mitkItkImageWrite, 3, input->GetGeometry(), filename.str() );
+      AccessByItk_1( input, _mitkItkImageWrite, filename.str() );
     }
   }
   else

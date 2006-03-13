@@ -45,6 +45,7 @@ void mitk::ImageWriter::SetDefaultExtension()
 
 #include <vtkConfigure.h>
 #if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
+#include <vtkImageData.h>
 #include <vtkXMLImageDataWriter.h>
 static void writeVti(const char * filename, mitk::Image* image, int t=0)
 {
@@ -103,7 +104,7 @@ void mitk::ImageWriter::GenerateData()
         else
 #endif
         {        
-          AccessByItk_1( image, _mitkItkImageWrite, filename.str() );
+          AccessFixedDimensionByItk_2( image, _mitkItkImageWrite, 3, input->GetTimeSlicedGeometry()->GetGeometry3D(t), filename.str() );
         }
       }
     }
@@ -119,7 +120,7 @@ void mitk::ImageWriter::GenerateData()
     {
       ::itk::OStringStream filename;
       filename <<  m_FileName.c_str() << m_Extension;
-      AccessByItk_1( input, _mitkItkImageWrite, filename.str() );
+      AccessFixedDimensionByItk_2( input, _mitkItkImageWrite, 3, input->GetGeometry(), filename.str() );
     }
   }
   else

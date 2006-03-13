@@ -455,6 +455,45 @@ namespace CommonFunctionality
 
   }
 
+  /**
+   * Counts the number of nodes of a given type in a data tree. This
+   * can for example be used to calculate the number of point sets in
+   * the data tree.
+   * @param it an iterator pointing to the position in the data tree, where
+   *          the search should start
+   * @returns the number of nodes holding a data element of the given template
+   *          parameter
+   */
+  template <typename T>
+  static unsigned int GetNumberOfNodesOfType( mitk::DataTreeIteratorClone it )
+  {
+    if ( it.GetPointer() == NULL )
+    {
+      return 0;
+    }
+    unsigned int numberOfNodes = 0;
+    mitk::DataTreeIteratorClone iteratorClone = it;
+    while ( !iteratorClone->IsAtEnd() )
+    {
+      mitk::DataTreeNode::Pointer node = iteratorClone->Get();
+      if ( node->GetData() != NULL )
+      {
+        // access the original data
+        T* data = dynamic_cast<T*>( node->GetData() );
+
+        // enquiry whether data is NULL or not, that is
+        // if the data is of type T
+        if ( data != NULL )
+        {
+          numberOfNodes++;
+        }
+      }
+      ++iteratorClone;
+    }
+    return numberOfNodes;
+  }
+
+
   DataTreeIteratorVector FilterNodes(mitk::DataTreeIteratorClone it, bool (* FilterFunction)(mitk::DataTreeNode*));
 };
 #endif // _CommonFunctionality__h_

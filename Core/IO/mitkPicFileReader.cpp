@@ -50,6 +50,30 @@ void mitk::PicFileReader::GenerateOutputInformation()
 
         header=MITKipPicGetTags(const_cast<char *>(m_FileName.c_str()), header);
 
+        int channels = 1;
+
+        ipPicTSV_t *tsv;
+        if ( (tsv = ipPicQueryTag( header, "SOURCE HEADER" )) != NULL)
+        {
+          if(tsv->n[0]>1e+06)
+          {
+            ipPicTSV_t *tsvSH;
+            tsvSH = ipPicDelTag( header, "SOURCE HEADER" );
+            ipPicFreeTag(tsvSH);
+          }
+        }
+        if ( (tsv = ipPicQueryTag( header, "ICON80x80" )) != NULL)
+        {
+          ipPicTSV_t *tsvSH;
+          tsvSH = ipPicDelTag( header, "ICON80x80" );
+          ipPicFreeTag(tsvSH);
+        }
+        if ( (tsv = ipPicQueryTag( header, "VELOCITY" )) != NULL)
+        {
+          ++channels;
+          ipPicDelTag( header, "VELOCITY" );
+        }
+
         if( header == NULL)
         {
             itk::ImageFileReaderException e(__FILE__, __LINE__);
@@ -61,7 +85,7 @@ void mitk::PicFileReader::GenerateOutputInformation()
             return;
         }
 
-        output->Initialize(header);
+        output->Initialize(header, channels);
         ipPicFree ( header );
     }
     else
@@ -175,6 +199,33 @@ void mitk::PicFileReader::GenerateData()
     {
         ipPicDescriptor* pic=MITKipPicGet(const_cast<char *>(m_FileName.c_str()), output->GetPic());
         ConvertHandedness(pic);
+
+        ipPicTSV_t *tsv;
+        if ( (tsv = ipPicQueryTag( pic, "SOURCE HEADER" )) != NULL)
+        {
+          if(tsv->n[0]>1e+06)
+          {
+            ipPicTSV_t *tsvSH;
+            tsvSH = ipPicDelTag( pic, "SOURCE HEADER" );
+            ipPicFreeTag(tsvSH);
+          }
+        }
+        if ( (tsv = ipPicQueryTag( pic, "ICON80x80" )) != NULL)
+        {
+          ipPicTSV_t *tsvSH;
+          tsvSH = ipPicDelTag( pic, "ICON80x80" );
+          ipPicFreeTag(tsvSH);
+        }
+        if ( (tsv = ipPicQueryTag( pic, "VELOCITY" )) != NULL)
+        {
+          ipPicDescriptor* header = ipPicCopyHeader(pic, NULL);
+          header->data = tsv->value;
+          ConvertHandedness(header);
+          output->SetChannel(header->data, 1);
+          header->data = NULL;
+          ipPicFree(header);
+          ipPicDelTag( pic, "VELOCITY" );
+        }
 
         //slice-wise reading
         //currently much too slow.

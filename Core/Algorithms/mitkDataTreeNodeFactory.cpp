@@ -363,8 +363,11 @@ void mitk::DataTreeNodeFactory::ReadFileTypeVTK()
       node->SetProperty( "name", nameProp );
 
       this->SetDefaultSurfaceProperties( node );
+      if (reader->GetOutput()->GetPointData()->GetScalars() != 0) 
+      {
+        node->SetProperty( "usePointDataForColouring", new mitk::BoolProperty(true) );
+      }
     }
-
     reader->Delete();
   }
   else if(chooser->IsFileStructuredPoints())
@@ -1569,7 +1572,7 @@ void mitk::DataTreeNodeFactory::ReadFileSeriesTypeVTK()
     }
     else
     {
-      itkWarningMacro(<< "stlReader returned NULL while reading " << fileName << ". Trying to continue with empty vtkPolyData...");
+      itkWarningMacro(<< "vtkPolyDataReader returned NULL while reading " << fileName << ". Trying to continue with empty vtkPolyData...");
       surface->SetVtkPolyData( vtkPolyData::New(), i ); 
     }
     reader->Delete();

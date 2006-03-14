@@ -28,6 +28,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkRegistrationModelXMLReader.h>
 #include <itkRegistrationModelXMLWriter.h>
 #include <itkStartPointData.h>
+#include <itkTransform.h>
+#include <itkTranslationTransform.h>
 #include <itkTubeSegmentModel.h>
 
 // image type
@@ -39,19 +41,21 @@ typedef ImageType::Pointer                            ImagePointer;
 typedef ImageType::PointType                          PointType;
 typedef ImageType::DirectionType                      DirectionType;
 
+typedef itk::RegistratedModel<PixelType>              RegistratedModelType;
+typedef RegistratedModelType::Pointer                 RegistratedModelPointer;
 typedef itk::RegistrationModel<PixelType>             RegistrationModelType;
 typedef RegistrationModelType::Pointer                RegistrationModelPointer;
 
 // tree type
-typedef itk::TreeContainer<RegistrationModelPointer>  OutputTreeType;
+typedef itk::TreeContainer<RegistratedModelPointer>   OutputTreeType;
 typedef OutputTreeType::Pointer                       OutputTreePointer;
 
 // test classes
 typedef itk::ImageToTreeFilter<ImageType, OutputTreeType>
-                                                      ImageToTreeFilterType;
+ImageToTreeFilterType;
 typedef ImageToTreeFilterType::Pointer                ImageToTreeFilterPointer;
 typedef itk::ITTFilterContext<ImageType, OutputTreeType>
-                                                      FilterContextType;
+FilterContextType;
 typedef FilterContextType::Pointer                    FilterContextPointer;
 typedef FilterContextType::StartPointDataQueueType    StartPointDataQueueType;
 typedef itk::StartPointData<ImageType>                StartPointDataType;
@@ -61,14 +65,141 @@ typedef itk::TubeSegmentModel<PixelType>              TubeSegmentModelType;
 typedef TubeSegmentModelType::Pointer                 TubeSegmentModelPointer;
 
 typedef itk::RegistrationModelXMLWriter<TubeSegmentModelType>
-                                                      RegistrationModelWriterType;
+RegistrationModelWriterType;
 typedef RegistrationModelWriterType::Pointer          RegistrationModelWriterPointer;
 typedef itk::RegistrationModelXMLReader<TubeSegmentModelType>
-                                                      RegistrationModelReaderType;
+RegistrationModelReaderType;
 typedef RegistrationModelReaderType::Pointer          RegistrationModelReaderPointer;
 
+typedef TubeSegmentModelType::PointSetType            PointSetType;
+typedef PointSetType::Pointer                         PointSetPointer;
+typedef PointSetType::PointType                       PointSetPointType;
+typedef PointSetType::PointsContainer                 PointsContainerType;
+typedef PointsContainerType::Iterator                 PointsIterator;
+typedef PointsContainerType::Pointer                  PointsContainerPointer;
+typedef PointsContainerType::ElementIdentifier        ElementIdentifier;
+typedef PointSetType::PointDataContainer              PointDataContainerType;
+typedef PointDataContainerType::Pointer               PointDataContainerPointer;
+
+typedef itk::Transform<PixelType>                     BaseTransformType;
+typedef BaseTransformType::Pointer                    BaseTransformPointer;
+typedef itk::TranslationTransform<PixelType>          TransformType;
+typedef TransformType::Pointer                        TransformPointer;
+typedef TransformType::ParametersType                 TransformParamtersType;
+typedef TransformType::OutputVectorType               TransformOutputVectorType;
+typedef TransformType::InputPointType                 TransformInputPointType;
+typedef TransformType::OutputPointType                TransformOutputPointType;
 
 typedef std::list<int>                                ResultListType;
+
+TubeSegmentModelPointer generateTubeSegment()
+{
+  PixelType pixelValue = 255;
+
+  TubeSegmentModelPointer tubeSegment = TubeSegmentModelType::New();
+  ElementIdentifier index = 0;
+  PointSetPointer pointSet = PointSetType::New();
+  PointsContainerPointer pointsContainer = PointsContainerType::New();
+  PointDataContainerPointer pointDataContainer = PointDataContainerType::New();
+
+  // init test data
+  PointType startPoint;
+  startPoint.Fill(0);
+  tubeSegment->SetStartPoint(startPoint);
+  tubeSegment->SetRotationPoint(startPoint);
+
+  PointSetPointType point1; // 1, 1, 0
+  point1[0] = 1;
+  point1[1] = 1;
+  point1[2] = 0;
+  pointsContainer->InsertElement(index, point1);
+  pointDataContainer->InsertElement(index, pixelValue);
+  index++;
+
+  PointSetPointType point2; // 1, 0, 1
+  point2[0] = 1;
+  point2[1] = 0;
+  point2[2] = 1;
+  pointsContainer->InsertElement(index, point2);
+  pointDataContainer->InsertElement(index, pixelValue);
+  index++;
+
+  PointSetPointType point3; // 1, 0, 1
+  point3[0] = 1;
+  point3[1] = 1;
+  point3[2] = 0;
+  pointsContainer->InsertElement(index, point3);
+  pointDataContainer->InsertElement(index, pixelValue);
+  index++;
+
+  pointSet->SetPoints(pointsContainer);
+  pointSet->SetPointData(pointDataContainer);
+  tubeSegment->SetPointSet(pointSet);
+
+  PointSetPointer connectionPointSet = PointSetType::New();
+  PointsContainerPointer connectionPointsContainer = PointsContainerType::New();
+  index = 0;
+  connectionPointsContainer->InsertElement(index, point1);
+  connectionPointSet->SetPoints(connectionPointsContainer);
+  tubeSegment->SetConnectionPoints(connectionPointSet);
+
+  return tubeSegment;
+}
+
+PointType transformPoint(TransformPointer transform, TransformParamtersType parameters, PointType point)
+{
+  transform->SetParameters(parameters);
+
+  TransformInputPointType inputPoint;
+  for (unsigned int dim = 0; dim < Dimension; dim++)
+  {
+    inputPoint[dim] = point[dim];
+  }
+  TransformOutputPointType outputPoint;
+  outputPoint = transform->TransformPoint(inputPoint);
+  PointType transformedPoint;
+  for (unsigned int dim = 0; dim < Dimension; dim++)
+  {
+    transformedPoint[dim] = outputPoint[dim];
+  }
+  return transformedPoint;
+}
+
+PointSetPointer transformPointSet(TransformPointer transform, TransformParamtersType parameters, PointSetPointer pointSet)
+{
+  transform->SetParameters(parameters);
+
+  PointsContainerPointer transformedPoints = PointsContainerType::New();
+  ElementIdentifier index = 0;
+
+  PointsIterator pointsIter = pointSet->GetPoints()->Begin();
+  PointsIterator lastPoint  = pointSet->GetPoints()->End();
+  while(pointsIter != lastPoint)
+  {
+    PointSetPointType point = pointsIter.Value();
+    TransformInputPointType inputPoint;
+    for (unsigned int dim = 0; dim < Dimension; dim++)
+    {
+      inputPoint[dim] = point[dim];
+    }
+    TransformOutputPointType outputPoint;
+    outputPoint = transform->TransformPoint(inputPoint);
+    PointSetPointType transformedPoint;
+    for (unsigned int dim = 0; dim < Dimension; dim++)
+    {
+      transformedPoint[dim] = outputPoint[dim];
+    }
+    transformedPoints->InsertElement(index, transformedPoint);
+
+    ++pointsIter;
+    ++index;
+  }
+
+  PointSetPointer transformedPointSet = PointSetType::New();
+  transformedPointSet->SetPoints(transformedPoints);
+
+  return transformedPointSet;
+}
 
 /******************************************************************
  * TEST 1: Saving and loading data objects to the filter context
@@ -132,10 +263,10 @@ int testFilterContext()
 /****************************************************************
  * TEST 2: Initialising the filter
  ****************************************************************/
- // TODO: test init of image
+// TODO: test init of image
 int testInitFilter()
 {
-    // init some test data
+  // init some test data
   PointType testPoint1;
   testPoint1.Fill(0);
 
@@ -182,64 +313,9 @@ int testRegistrationModelXMLWriter()
   // TODO: add new point types
   std::cout << " *** Testing the RegistrationModelXMLWriter ***\n";
 
-  typedef TubeSegmentModelType::PointSetType          PointSetType;
-  typedef PointSetType::Pointer                       PointSetPointer;
-  typedef PointSetType::PointType                     PointSetPointType;
-  typedef PointSetType::PointsContainer               PointsContainerType;
-  typedef PointsContainerType::Iterator               PointsIterator;
-  typedef PointsContainerType::Pointer                PointsContainerPointer;
-  typedef PointsContainerType::ElementIdentifier      ElementIdentifier;
-  typedef PointSetType::PointDataContainer            PointDataContainerType;
-  typedef PointDataContainerType::Pointer             PointDataContainerPointer;
-
-  PixelType pixelValue = 255;
-
-  TubeSegmentModelPointer tubeSegment = TubeSegmentModelType::New();
-  ElementIdentifier index = 0;
-  PointSetPointer pointSet = PointSetType::New();
-  PointsContainerPointer pointsContainer = PointsContainerType::New();
-  PointDataContainerPointer pointDataContainer = PointDataContainerType::New();
-
-  // init test data
-  PointType startPoint;
-  startPoint.Fill(0);
-  tubeSegment->SetStartPoint(startPoint);
-  tubeSegment->SetRotationPoint(startPoint);
-
-  PointSetPointType point1; // 1, 1, 0
-  point1[0] = 1;
-  point1[1] = 1;
-  point1[2] = 0;
-  pointsContainer->InsertElement(index, point1);
-  pointDataContainer->InsertElement(index, pixelValue);
-  index++;
-
-  PointSetPointType point2; // 1, 0, 1
-  point2[0] = 1;
-  point2[1] = 0;
-  point2[2] = 1;
-  pointsContainer->InsertElement(index, point2);
-  pointDataContainer->InsertElement(index, pixelValue);
-  index++;
-
-  PointSetPointType point3; // 1, 0, 1
-  point3[0] = 1;
-  point3[1] = 1;
-  point3[2] = 0;
-  pointsContainer->InsertElement(index, point3);
-  pointDataContainer->InsertElement(index, pixelValue);
-  index++;
-
-  pointSet->SetPoints(pointsContainer);
-  pointSet->SetPointData(pointDataContainer);
-  tubeSegment->SetPointSet(pointSet);
-
-  PointSetPointer connectionPointSet = PointSetType::New();
-  PointsContainerPointer connectionPointsContainer = PointsContainerType::New();
-  index = 0;
-  connectionPointsContainer->InsertElement(index, point1);
-  connectionPointSet->SetPoints(connectionPointsContainer);
-  tubeSegment->SetConnectionPoints(connectionPointSet);
+  TubeSegmentModelPointer tubeSegment = generateTubeSegment();
+  PointType startPoint = tubeSegment->GetStartPoint();
+  PointsContainerPointer pointsContainer = tubeSegment->GetPointSet()->GetPoints();
 
   RegistrationModelWriterPointer modelWriter = RegistrationModelWriterType::New();
   modelWriter->SetRegistrationModel(tubeSegment);
@@ -281,7 +357,7 @@ int testRegistrationModelXMLWriter()
   std::cout << " *** Testing the RegistrationModelXMLReader ***\n";
 
   RegistrationModelReaderPointer registrationModelReader = RegistrationModelReaderType::New();
-//   registrationModelReader->SetDebug(true);
+  //   registrationModelReader->SetDebug(true);
   registrationModelReader->SetFilename("test.xml");
   registrationModelReader->GenerateOutputInformation();
 
@@ -321,12 +397,107 @@ int testRegistrationModelXMLWriter()
   PointsIterator  readConnectionPointsIter  = readConnectionPoints->GetPoints()->Begin();
   PointSetPointType readConnectionPoint     = readConnectionPointsIter.Value();
 
-  if (readConnectionPoint != point1)
+  PointSetPointType origConnectionPoint     = tubeSegment->GetConnectionPoints()->GetPoints()->Begin().Value();
+
+  if (readConnectionPoint != origConnectionPoint)
   {
     std::cout << "Connection points do not match." << std::endl;
-    std::cout << "Orignal point: " << point1 << std::endl;
+    std::cout << "Orignal point: " << origConnectionPoint << std::endl;
     std::cout << "Read point:    " << readConnectionPoint << std::endl;
     return EXIT_FAILURE;
+  }
+
+  std::cout << " *** [TEST PASSED] ***\n";
+  return EXIT_SUCCESS;
+}
+
+/****************************************************************
+ * TEST 4: Registrated Model
+ ****************************************************************/
+int testRegistratedModel()
+{
+  std::cout << " *** Testing the transfer of a model part via RegistratedModel ***\n";
+
+  TubeSegmentModelPointer tubeSegment = generateTubeSegment();
+
+  TransformOutputVectorType offset;
+  offset.Fill(1);
+
+  TransformPointer transform = TransformType::New();
+  transform->SetOffset(offset);
+  TransformParamtersType transformParameters = transform->GetParameters();
+
+  RegistratedModelPointer registratedModel = RegistratedModelType::New();
+  registratedModel->SetTransform((BaseTransformPointer)transform);
+  registratedModel->SetTransformParameters(transformParameters);
+  registratedModel->SetBaseModel((RegistrationModelPointer)tubeSegment);
+
+  PointType transformedStartPoint = transformPoint(transform, transformParameters, tubeSegment->GetStartPoint());
+  PointType registratedStartPoint = registratedModel->GetStartPoint();
+  if (transformedStartPoint != registratedStartPoint)
+  {
+    std::cout << "Start points do not match!" << std::endl;
+    std::cout << "Transformed point: " << transformedStartPoint << std::endl;
+    std::cout << "Point via RegistratedModel: " << registratedStartPoint << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  PointType transformedRotationPoint = transformPoint(transform, transformParameters, tubeSegment->GetRotationPoint());
+  PointType registratedRotationPoint = registratedModel->GetRotationPoint();
+  if (transformedRotationPoint != registratedRotationPoint)
+  {
+    std::cout << "Start points do not match!" << std::endl;
+    std::cout << "Transformed point: " << transformedRotationPoint << std::endl;
+    std::cout << "Point via RegistratedModel: " << registratedRotationPoint << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  PointSetPointer transformedConnectionPoints = transformPointSet(transform, transformParameters, tubeSegment->GetConnectionPoints());
+  PointsIterator  transformedConPointsIter    = transformedConnectionPoints->GetPoints()->Begin();
+
+  PointSetPointer registratedConnectionPoints = registratedModel->GetConnectionPoints();
+  PointsIterator  registratedConPointsIter    = registratedConnectionPoints->GetPoints()->Begin();
+  PointsIterator  lastRegistratedPoint        = registratedConnectionPoints->GetPoints()->End();
+
+  while(registratedConPointsIter != lastRegistratedPoint)
+  {
+    PointSetPointType registratedPoint = registratedConPointsIter.Value();
+    PointSetPointType transformedPoint = transformedConPointsIter.Value();
+
+    if (registratedPoint != transformedPoint)
+    {
+      std::cout << "Connection points do not match!" << std::endl;
+      std::cout << "Transformed point: " << transformedPoint << std::endl;
+      std::cout << "Point via RegistratedModel: " << registratedPoint << std::endl;
+      return EXIT_FAILURE;
+    }
+
+    ++transformedConPointsIter;
+    ++registratedConPointsIter;
+  }
+
+  PointSetPointer transformedPointSet   = transformPointSet(transform, transformParameters, tubeSegment->GetPointSet());
+  PointsIterator  transformedPointsIter = transformedPointSet->GetPoints()->Begin();
+
+  PointSetPointer registratedPoints     = registratedModel->GetPointSet();
+  PointsIterator  registratedPointsIter = registratedPoints->GetPoints()->Begin();
+  PointsIterator  lastPoint             = registratedPoints->GetPoints()->End();
+
+  while(registratedPointsIter != lastPoint)
+  {
+    PointSetPointType registratedPoint = registratedPointsIter.Value();
+    PointSetPointType transformedPoint = transformedPointsIter.Value();
+
+    if (registratedPoint != transformedPoint)
+    {
+      std::cout << "Points do not match!" << std::endl;
+      std::cout << "Transformed point: " << transformedPoint << std::endl;
+      std::cout << "Point via RegistratedModel: " << registratedPoint << std::endl;
+      return EXIT_FAILURE;
+    }
+
+    ++registratedPointsIter;
+    ++transformedPointsIter;
   }
 
   std::cout << " *** [TEST PASSED] ***\n";
@@ -343,6 +514,7 @@ int itkImageToTreeFilterTest(int i, char* argv[] )
   resultList.push_back(testFilterContext());
   resultList.push_back(testInitFilter());
   resultList.push_back(testRegistrationModelXMLWriter());
+  resultList.push_back(testRegistratedModel());
 
   std::cout << " *** [ALL TESTS DONE] ***\n";
 

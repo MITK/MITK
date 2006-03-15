@@ -193,7 +193,7 @@ public:
   virtual void Initialize(const mitk::PixelType& type, unsigned int dimension, unsigned int *dimensions, unsigned int channels = 1);
 
   //##Documentation
-  //## initialize new (or re-initialize) image information
+  //## initialize new (or re-initialize) image information by a Geometry3D
   //##
   //## @param shiftBoundingBoxMinimumToZero The bounding-box (in units) 
   //## of @a geometry does not necessarily has its minimum of (0,0,0). 
@@ -202,6 +202,21 @@ public:
   //## (the translation in mm is changed accordingly).
   //## @param tDim override time dimension (@a n[3]) if @a geometry is a TimeSlicedGeometry (if >0)
   virtual void Initialize(const mitk::PixelType& type, const mitk::Geometry3D& geometry, unsigned int channels = 1, int tDim=-1, bool shiftBoundingBoxMinimumToZero = true);
+
+  //##Documentation
+  //## initialize new (or re-initialize) image information by a Geometry2D and number of slices
+  //##
+  //## Initializes the bounding box according to the width/height of the 
+  //## Geometry2D and @a sDim via SlicedGeometry3D::InitializeEvenlySpaced.
+  //## The spacing is calculated from the Geometry2D.
+  //## @param shiftBoundingBoxMinimumToZero The bounding-box (in units) 
+  //## of @a geometry2d does not necessarily has its minimum of (0,0,0). 
+  //## If @a shiftBoundingBoxMinimumToZero is @a true it is shifted there
+  //## without changing the world coordinate in mm of the minimum position
+  //## (the translation in mm is changed accordingly).
+  //## @param tDim override time dimension (@a n[3]) if @a geometry is a TimeSlicedGeometry (if >0)
+  //## \sa SlicedGeometry3D::InitializeEvenlySpaced
+  virtual void Initialize(const mitk::PixelType& type, int sDim, const mitk::Geometry2D& geometry2d, bool flipped = false, unsigned int channels = 1, int tDim=-1, bool shiftBoundingBoxMinimumToZero = true);
 
   //##Documentation
   //## initialize new (or re-initialize) image information by another
@@ -246,9 +261,11 @@ public:
   {
     if(itkimage==NULL) return;
 
+    // build array with dimensions in each direction with at least 4 entries
     m_Dimension=itkimage->GetImageDimension();
     unsigned int i, *tmpDimensions=new unsigned int[m_Dimension>4?m_Dimension:4];
-    for(i=0;i<m_Dimension;++i) tmpDimensions[i]=itkimage->GetLargestPossibleRegion().GetSize().GetSize()[i];
+    for(i=0;i<m_Dimension;++i) 
+      tmpDimensions[i]=itkimage->GetLargestPossibleRegion().GetSize().GetSize()[i];
     if(m_Dimension<4)
     {
       unsigned int *p;
@@ -256,11 +273,14 @@ public:
         *p=1;
     }
 
+    // overwrite number of slices if sDim is set
     if((m_Dimension>2) && (sDim>=0))
       tmpDimensions[2]=sDim;
+    // overwrite number of time points if tDim is set
     if((m_Dimension>3) && (tDim>=0))
       tmpDimensions[3]=tDim;
 
+    // rough initialization of Image
     Initialize(mitk::PixelType(typeid(typename itkImageType::PixelType)), 
       m_Dimension, 
       tmpDimensions,
@@ -270,13 +290,16 @@ public:
 #else
     const double *itkspacing = itkimage->GetSpacing();  
 #endif 
+
+    // access spacing of itk::Image
     Vector3D spacing;
     FillVector3D(spacing, itkspacing[0], 1.0, 1.0);
-    if(m_Dimension>=2)
+    if(m_Dimension >= 2)
       spacing[1]=itkspacing[1];
-    if(m_Dimension>=3)
+    if(m_Dimension >= 3)
       spacing[2]=itkspacing[2];
 
+    // access origin of itk::Image
     Point3D origin;
     const typename itkImageType::PointType & itkorigin = itkimage->GetOrigin();  
     FillVector3D(origin, itkorigin[0], 0.0, 0.0);
@@ -285,12 +308,29 @@ public:
     if(m_Dimension>=3)
       origin[2]=itkorigin[2];
 
+    // access direction of itk::Image and include spacing
+    const typename itkImageType::DirectionType & itkdirection = itkimage->GetDirection();  
+    mitk::Matrix3D matrix;
+    matrix.SetIdentity();
+    unsigned int j, itkDimMax3 = (m_Dimension >= 3? 3 : m_Dimension);
+    for ( i=0; i < itkDimMax3; ++i)
+      for( j=0; j < itkDimMax3; ++j )
+        matrix[i][j] = itkdirection[i][j]*spacing[j];
+
+    // re-initialize PlaneGeometry with origin and direction
     PlaneGeometry* planeGeometry = static_cast<PlaneGeometry*>(GetSlicedGeometry(0)->GetGeometry2D(0));
     planeGeometry->SetOrigin(origin);
+    planeGeometry->GetIndexToWorldTransform()->SetMatrix(matrix);
+
+    // re-initialize SlicedGeometry3D
     SlicedGeometry3D* slicedGeometry = GetSlicedGeometry(0);
     slicedGeometry->InitializeEvenlySpaced(planeGeometry, m_Dimensions[2]);
     slicedGeometry->SetSpacing(spacing);
+
+    // re-initialize TimeSlicedGeometry
     GetTimeSlicedGeometry()->InitializeEvenlyTimed(slicedGeometry, m_Dimensions[3]);
+    
+    // clean-up
     delete [] tmpDimensions;
 
     this->Initialize();

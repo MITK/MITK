@@ -204,6 +204,8 @@ void mitk::TimeSlicedGeometry::InitializeEvenlyTimed(mitk::Geometry3D* geometry3
 
 void mitk::TimeSlicedGeometry::InitializeEmpty(unsigned int timeSteps)
 {
+  m_IndexToWorldTransform = NULL;
+
   Superclass::Initialize();
 
   m_TimeSteps = timeSteps;

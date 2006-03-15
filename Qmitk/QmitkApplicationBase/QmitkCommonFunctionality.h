@@ -476,16 +476,19 @@ namespace CommonFunctionality
     while ( !iteratorClone->IsAtEnd() )
     {
       mitk::DataTreeNode::Pointer node = iteratorClone->Get();
-      if ( node->GetData() != NULL )
+      if ( node.IsNotNull() )
       {
-        // access the original data
-        T* data = dynamic_cast<T*>( node->GetData() );
-
-        // enquiry whether data is NULL or not, that is
-        // if the data is of type T
-        if ( data != NULL )
+        if ( node->GetData() != NULL )
         {
-          numberOfNodes++;
+          // access the original data
+          T* data = dynamic_cast<T*>( node->GetData() );
+
+          // enquiry whether data is NULL or not, that is
+          // if the data is of type T
+          if ( data != NULL )
+          {
+            numberOfNodes++;
+          }
         }
       }
       ++iteratorClone;

@@ -170,62 +170,65 @@ void mitk::Geometry2DDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
       while(!it->IsAtEnd())
       {
         mitk::DataTreeNode* node=it->Get();
-        mitk::Mapper::Pointer mapper = node->GetMapper(1);
-        mitk::ImageMapper2D* imagemapper = dynamic_cast<ImageMapper2D*>(mapper.GetPointer());
-
-        if((node->IsVisible(renderer)) && (imagemapper))
+        if ( node != NULL )
         {
-          mitk::WeakPointerProperty::Pointer rendererProp 
-                                               = dynamic_cast<mitk::WeakPointerProperty*>(GetDataTreeNode()->GetPropertyList()->GetProperty("renderer").GetPointer());
-          if(rendererProp.IsNotNull())
+          mitk::Mapper::Pointer mapper = node->GetMapper(1);
+          mitk::ImageMapper2D* imagemapper = dynamic_cast<ImageMapper2D*>(mapper.GetPointer());
+
+          if((node->IsVisible(renderer)) && (imagemapper))
           {
-            mitk::BaseRenderer::Pointer renderer = dynamic_cast<mitk::BaseRenderer*>(rendererProp->GetWeakPointer().GetPointer());
-            if(renderer.IsNotNull())
+            mitk::WeakPointerProperty::Pointer rendererProp 
+                                                = dynamic_cast<mitk::WeakPointerProperty*>(GetDataTreeNode()->GetPropertyList()->GetProperty("renderer").GetPointer());
+            if(rendererProp.IsNotNull())
             {
-
-              // check for LookupTable
-              mitk::LookupTableProperty::Pointer LookupTableProb;
-              LookupTableProb = dynamic_cast<mitk::LookupTableProperty*>(node->GetPropertyList()->GetProperty("LookupTable").GetPointer());
-              if (LookupTableProb.IsNotNull() )
+              mitk::BaseRenderer::Pointer renderer = dynamic_cast<mitk::BaseRenderer*>(rendererProp->GetWeakPointer().GetPointer());
+              if(renderer.IsNotNull())
               {
-                m_VtkLookupTable = LookupTableProb->GetLookupTable().GetVtkLookupTable();
-                m_VtkTexture->SetLookupTable(m_VtkLookupTable);
-                // m_VtkTexture->Modified();
-              } else {
-                m_VtkLookupTable = m_VtkLookupTableDefault;
-              }
 
-
-              // check for level window prop and use it for display if it exists
-              mitk::LevelWindow levelWindow;
-              if(node->GetLevelWindow(levelWindow, renderer))
-                m_VtkLookupTable->SetTableRange(levelWindow.GetMin(),levelWindow.GetMax());
-
-
-              //we have to do this before GenerateAllData() is called there may be
-              //no RendererInfo for renderer yet, thus GenerateAllData won't update
-              //the (non-existing) RendererInfo for renderer. By calling GetRendererInfo
-              //a RendererInfo will be created for renderer (if it does not exist yet).
-              const ImageMapper2D::RendererInfo* ri=imagemapper->GetRendererInfo(renderer);
-              imagemapper->GenerateAllData();
-              texture = true;
-              if((ri!=NULL) && (ri->m_Pic!=NULL) &&(m_LastTextureUpdateTime<ri->m_LastUpdateTime))
-              {
-                ipPicDescriptor *p=ri->m_Pic;
-                if((p->dim==2) && (p->n[0]>2) && (p->n[1]>2))
+                // check for LookupTable
+                mitk::LookupTableProperty::Pointer LookupTableProb;
+                LookupTableProb = dynamic_cast<mitk::LookupTableProperty*>(node->GetPropertyList()->GetProperty("LookupTable").GetPointer());
+                if (LookupTableProb.IsNotNull() )
                 {
-                  vtkImageData* vtkimage=Pic2vtk::convert(p);
-                  m_VtkTexture->SetInput(vtkimage);
-                  vtkimage->Delete(); vtkimage=NULL;
-                  m_ImageActor->SetTexture(m_VtkTexture);
-                  m_LastTextureUpdateTime=ri->m_LastUpdateTime;
-                  bool textureInterpolation=true;
-                  m_VtkTexture->SetInterpolate(textureInterpolation ? 1 : 0);
+                  m_VtkLookupTable = LookupTableProb->GetLookupTable().GetVtkLookupTable();
+                  m_VtkTexture->SetLookupTable(m_VtkLookupTable);
+                  // m_VtkTexture->Modified();
+                } else {
+                  m_VtkLookupTable = m_VtkLookupTableDefault;
                 }
-                else
-                  texture = false;
+
+
+                // check for level window prop and use it for display if it exists
+                mitk::LevelWindow levelWindow;
+                if(node->GetLevelWindow(levelWindow, renderer))
+                  m_VtkLookupTable->SetTableRange(levelWindow.GetMin(),levelWindow.GetMax());
+
+
+                //we have to do this before GenerateAllData() is called there may be
+                //no RendererInfo for renderer yet, thus GenerateAllData won't update
+                //the (non-existing) RendererInfo for renderer. By calling GetRendererInfo
+                //a RendererInfo will be created for renderer (if it does not exist yet).
+                const ImageMapper2D::RendererInfo* ri=imagemapper->GetRendererInfo(renderer);
+                imagemapper->GenerateAllData();
+                texture = true;
+                if((ri!=NULL) && (ri->m_Pic!=NULL) &&(m_LastTextureUpdateTime<ri->m_LastUpdateTime))
+                {
+                  ipPicDescriptor *p=ri->m_Pic;
+                  if((p->dim==2) && (p->n[0]>2) && (p->n[1]>2))
+                  {
+                    vtkImageData* vtkimage=Pic2vtk::convert(p);
+                    m_VtkTexture->SetInput(vtkimage);
+                    vtkimage->Delete(); vtkimage=NULL;
+                    m_ImageActor->SetTexture(m_VtkTexture);
+                    m_LastTextureUpdateTime=ri->m_LastUpdateTime;
+                    bool textureInterpolation=true;
+                    m_VtkTexture->SetInterpolate(textureInterpolation ? 1 : 0);
+                  }
+                  else
+                    texture = false;
+                }
+                break;
               }
-              break;
             }
           }
         }

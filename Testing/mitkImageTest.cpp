@@ -203,6 +203,42 @@ int mitkImageTest(int argc, char* argv[])
 
   ipPicFree(pic_slice);
 
+  //-----------------
+  // geometry information for image
+  mitk::Point3D origin;
+  mitk::Vector3D right, bottom;
+  mitk::Vector3D spacing;
+  mitk::FillVector3D(origin, 17.0, 19.92, 7.83);
+  mitk::FillVector3D(right, 1.0, 2.0, 3.0);
+  mitk::FillVector3D(bottom, 0.0, -3.0, 2.0);
+  mitk::FillVector3D(spacing, 0.78, 0.91, 2.23);
+
+  std::cout << "Testing InitializeStandardPlane(rightVector, downVector, spacing): " << std::flush;
+  mitk::PlaneGeometry::Pointer planegeometry = mitk::PlaneGeometry::New();
+  planegeometry->InitializeStandardPlane(100, 100, right, bottom, &spacing);
+  planegeometry->SetOrigin(origin);
+  std::cout << "done" << std::endl;
+
+  std::cout << "Testing Initialize(const mitk::PixelType& type, const mitk::Geometry3D& geometry, unsigned int slices) with PlaneGeometry and GetData(): ";
+  imgMem->Initialize(mitk::PixelType(typeid(int)), *planegeometry);
+  p = (int*)imgMem->GetData();
+  if(p==NULL)
+  {
+    std::cout<<"[FAILED]"<<std::endl;
+    return EXIT_FAILURE;
+  }
+  std::cout<<"[PASSED]"<<std::endl;
+
+  std::cout << "Testing Initialize(const mitk::PixelType& type, int sDim, const mitk::PlaneGeometry& geometry) and GetData(): ";
+  imgMem->Initialize(mitk::PixelType(typeid(int)), 40, *planegeometry);
+  p = (int*)imgMem->GetData();
+  if(p==NULL)
+  {
+    std::cout<<"[FAILED]"<<std::endl;
+    return EXIT_FAILURE;
+  }
+  std::cout<<"[PASSED]"<<std::endl;
+
   std::cout<<"[TEST DONE]"<<std::endl;
   return EXIT_SUCCESS;
 }

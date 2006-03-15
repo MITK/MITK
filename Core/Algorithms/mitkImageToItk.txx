@@ -155,32 +155,52 @@ template<class TOutputImage>
   mitk::Image::ConstPointer input = this->GetInput();
   typename Superclass::OutputImageType::Pointer output = this->GetOutput();
   
+  // allocate size, origin, spacing, direction in types of output image
   SizeType  size;
-  double origin[ 4 ];   // itk2vtk() expects 3 dimensions, so we can't use VImageDimension if image is 2d!
-  double *spacing = new double[ TOutputImage::GetImageDimension() ];
+  const unsigned int itkDimMin3 = (TOutputImage::ImageDimension > 3 ? TOutputImage::ImageDimension : 3);
+  const unsigned int itkDimMax3 = (TOutputImage::ImageDimension < 3 ? TOutputImage::ImageDimension : 3);
+  typename Superclass::OutputImageType::PointType::ValueType origin[ itkDimMin3 ];   
+  typename Superclass::OutputImageType::SpacingType::ComponentType spacing[ itkDimMin3 ];
+  typename Superclass::OutputImageType::DirectionType direction;
 
-  for (unsigned int i=0; i < TOutputImage::GetImageDimension(); ++i)
+  // copy as much information as possible into size and spacing
+  unsigned int i;
+  for ( i=0; i < itkDimMax3; ++i)
   {
     size[i]    = input->GetDimension(i);
-    spacing[i] = input->GetSlicedGeometry()->GetSpacing()[i];
+    spacing[i] = input->GetGeometry()->GetSpacing()[i];
   }
-  
-  mitk::Point3D mitkorigin;
-  mitkorigin.Fill(0.0);
-  input->GetGeometry()->IndexToWorld(mitkorigin, mitkorigin);
-  itk2vtk(mitkorigin, origin);
-  
+  for ( ; i < TOutputImage::ImageDimension; ++i)
+  {
+    origin[i]  = 0.0;
+    size[i]    = input->GetDimension(i);
+    spacing[i] = 1.0;
+  }
+
+  // build region from size  
   IndexType start;
   start.Fill( 0 );
-  
   RegionType region;
   region.SetIndex( start );
   region.SetSize(  size  );
   
+  // copy as much information as possible into origin
+  const mitk::Point3D& mitkorigin = input->GetGeometry()->GetOrigin();
+  itk2vtk(mitkorigin, origin);
+  
+  // copy as much information as possible into direction
+  direction.SetIdentity();
+  unsigned int j;
+  const AffineTransform3D::MatrixType& matrix = input->GetGeometry()->GetIndexToWorldTransform()->GetMatrix();
+  for ( i=0; i < itkDimMax3; ++i)
+    for( j=0; j < itkDimMax3; ++j )
+      direction[i][j] = matrix[i][j];
+
+  // set information into output image
   output->SetRegions( region );
   output->SetOrigin( origin );
   output->SetSpacing( spacing );
-  delete [] spacing;
+  output->SetDirection( direction );
 }
 
 template<class TOutputImage>

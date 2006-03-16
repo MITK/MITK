@@ -21,10 +21,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include <string>
 
 #include <itkImage.h>
-#include <itkTreeContainer.h>
 
 #include <itkImageToTreeFilter.h>
 #include <itkITTFilterContext.h>
+#include <itkRegistrationModelTree.h>
 #include <itkRegistrationModelXMLReader.h>
 #include <itkRegistrationModelXMLWriter.h>
 #include <itkStartPointData.h>
@@ -47,7 +47,8 @@ typedef itk::RegistrationModel<PixelType>             RegistrationModelType;
 typedef RegistrationModelType::Pointer                RegistrationModelPointer;
 
 // tree type
-typedef itk::TreeContainer<RegistratedModelPointer>   OutputTreeType;
+typedef itk::RegistrationModelTree<RegistratedModelPointer>
+OutputTreeType;
 typedef OutputTreeType::Pointer                       OutputTreePointer;
 
 // test classes
@@ -252,51 +253,6 @@ int testFilterContext()
   else
   {
     std::cout << "Points not in queue.\n";
-    std::cout << " *** [TEST FAILED] ***\n";
-    return EXIT_FAILURE;
-  }
-
-  std::cout << " *** [TEST PASSED] ***\n";
-  return EXIT_SUCCESS;
-}
-
-/****************************************************************
- * TEST 2: Initialising the filter
- ****************************************************************/
-// TODO: test init of image
-int testInitFilter()
-{
-  // init some test data
-  PointType testPoint1;
-  testPoint1.Fill(0);
-
-  DirectionType testDirection1;
-  testDirection1.Fill(0);
-
-  std::cout << " *** Testing initialization of filter ***\n";
-  std::cout << "Loading new StartPointData to filter...\n";
-  ImageToTreeFilterPointer testFilter = ImageToTreeFilterType::New();
-  testFilter->SetStartPoint(testPoint1);
-  testFilter->SetStartDirection(testDirection1);
-
-  // start point should be the first point in the filter
-  std::cout << "Reading StartPointData from filter...\n";
-  FilterContextPointer testFilterContext = testFilter->GetFilterContext();
-  StartPointDataQueueType* testQueue = testFilterContext->GetStartPointDataQueue();
-  StartPointDataPointer testData = testQueue->front();
-  PointType testPoint2 = testData->GetStartPoint();
-  DirectionType testDirection2 = testData->GetStartDirection();
-
-  if(testPoint1 != testPoint2)
-  {
-    std::cout << "Startpoint not in queue.\n";
-    std::cout << " *** [TEST FAILED] ***\n";
-    return EXIT_FAILURE;
-  }
-
-  if(testDirection1 != testDirection2)
-  {
-    std::cout << "Startdirection not in queue.\n";
     std::cout << " *** [TEST FAILED] ***\n";
     return EXIT_FAILURE;
   }
@@ -512,7 +468,6 @@ int itkImageToTreeFilterTest(int i, char* argv[] )
   float failRatio;
   // run all tests
   resultList.push_back(testFilterContext());
-  resultList.push_back(testInitFilter());
   resultList.push_back(testRegistrationModelXMLWriter());
   resultList.push_back(testRegistratedModel());
 

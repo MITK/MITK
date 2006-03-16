@@ -276,6 +276,8 @@ void mitk::PointSetVtkMapper3D::GenerateData()
         vtkSphereSource *sphere = vtkSphereSource::New();
         sphere->SetRadius(pointSize);
         sphere->SetCenter(pointsIter.Value()[0],pointsIter.Value()[1],pointsIter.Value()[2]);
+        sphere->SetThetaResolution(20);
+        sphere->SetPhiResolution(20);
         source = sphere;
       }
       break;
@@ -294,6 +296,7 @@ void mitk::PointSetVtkMapper3D::GenerateData()
         vtkConeSource *cone = vtkConeSource::New();
         cone->SetRadius(pointSize);
         cone->SetCenter(pointsIter.Value()[0],pointsIter.Value()[1],pointsIter.Value()[2]);
+        cone->SetResolution(20);
         source = cone;
       }
       break;
@@ -302,6 +305,7 @@ void mitk::PointSetVtkMapper3D::GenerateData()
         vtkCylinderSource *cylinder = vtkCylinderSource::New();
         cylinder->SetRadius(pointSize);
         cylinder->SetCenter(pointsIter.Value()[0],pointsIter.Value()[1],pointsIter.Value()[2]);
+        cylinder->SetResolution(20);
         source = cylinder;
       }
       break;
@@ -310,6 +314,8 @@ void mitk::PointSetVtkMapper3D::GenerateData()
         vtkSphereSource *sphere = vtkSphereSource::New();
         sphere->SetRadius(pointSize);
         sphere->SetCenter(pointsIter.Value()[0],pointsIter.Value()[1],pointsIter.Value()[2]);
+        sphere->SetThetaResolution(20);
+        sphere->SetPhiResolution(20);
         source = sphere;
       }
       break;
@@ -318,6 +324,8 @@ void mitk::PointSetVtkMapper3D::GenerateData()
         vtkSphereSource *sphere = vtkSphereSource::New();
         sphere->SetRadius(pointSize);
         sphere->SetCenter(pointsIter.Value()[0],pointsIter.Value()[1],pointsIter.Value()[2]);
+        sphere->SetThetaResolution(20);
+        sphere->SetPhiResolution(20);
         source = sphere;
       }
       break;

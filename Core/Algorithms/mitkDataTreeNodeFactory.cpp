@@ -48,6 +48,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <vtkStructuredPoints.h>
 #include <vtkLookupTable.h>
+#include <vtkPointData.h>
 #if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
 #include <vtkXMLImageDataReader.h>
 #endif

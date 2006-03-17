@@ -1019,11 +1019,17 @@ void mitk::DataTreeNodeFactory::ReadFileTypeITKImageIOFactory()
   {
     ioStart[ i ] = 0;
     ioSize[ i ] = imageIO->GetDimensions( i );
-    dimensions[ i ] = imageIO->GetDimensions( i );
-    spacing[ i ] = imageIO->GetSpacing( i );
-    if(spacing[ i ] <= 0)
-      spacing[ i ] = 1.0f;
-    origin[ i ] = imageIO->GetOrigin( i );
+    if(i<MAXDIM)
+    {
+      dimensions[ i ] = imageIO->GetDimensions( i );
+      spacing[ i ] = imageIO->GetSpacing( i );
+      if(spacing[ i ] <= 0)
+        spacing[ i ] = 1.0f;
+    }
+    if(i<3)
+    {
+      origin[ i ] = imageIO->GetOrigin( i );
+    }
   }
 
   ioRegion.SetSize( ioSize );

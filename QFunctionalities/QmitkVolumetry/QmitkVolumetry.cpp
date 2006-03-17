@@ -86,7 +86,7 @@ void QmitkVolumetry::CreateConnections()
 QAction * QmitkVolumetry::CreateAction(QActionGroup *parent)
 {  
   QAction* action;  
-  action = new QAction( tr( "Volumetry" ), QPixmap((const char**)volumetry_xpm), tr( "Volumetry" ), NULL, parent, "Volumetry" );
+  action = new QAction( tr( "Volumetry" ), QPixmap((const char**)volumetry_xpm), tr( "Volumetry" ), 0, parent, "Volumetry" );
   return action;
 }
 

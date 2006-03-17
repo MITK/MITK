@@ -61,7 +61,7 @@ void QmitkVolumeVisualization::CreateConnections()
 QAction * QmitkVolumeVisualization::CreateAction(QActionGroup *parent)
 {
   QAction* action;
-  action = new QAction( tr( "VolumeVisualization" ), QPixmap((const char**)icon_xpm), tr( "VolumeVisualization" ), NULL, parent, "VolumeVisualization" );
+  action = new QAction( tr( "VolumeVisualization" ), QPixmap((const char**)icon_xpm), tr( "VolumeVisualization" ), 0, parent, "VolumeVisualization" );
   return action;
 }
 

@@ -56,7 +56,7 @@ void QmitkFunctionalityTemplate::CreateConnections()
 QAction * QmitkFunctionalityTemplate::CreateAction(QActionGroup *parent)
 {
   QAction* action;
-  action = new QAction( tr( "ToolTip" ), QPixmap((const char**)icon_xpm), tr( "MenueEintrag" ), NULL, parent, "FunctionalityTemplate" );
+  action = new QAction( tr( "ToolTip" ), QPixmap((const char**)icon_xpm), tr( "MenueEintrag" ), 0, parent, "FunctionalityTemplate" );
   return action;
 }
 

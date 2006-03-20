@@ -94,8 +94,8 @@ void mitk::SeedsImage::AddSeedPoint(SeedsImageType* itkImage)
   itk::Index<dimension> baseIndex;
   itk::Index<dimension> setIndex;
 
-//  GetGeometry()->WorldToIndex(point, baseIndex); // commented out because of the slices problem
-  for (int i=0; i<3; i++) baseIndex[i] = (int)ceil((point[i]/spacing[i])-(itkImage->GetOrigin()[i]/spacing[i]));
+  GetGeometry()->WorldToIndex(point, baseIndex); // commented out because of the slices problem
+//  for (int i=0; i<3; i++) baseIndex[i] = (int)ceil((point[i]/spacing[i])-(itkImage->GetOrigin()[i]/spacing[i]));
   
   // setting a sphere around the point
   if(dimension==2){
@@ -167,11 +167,11 @@ void mitk::SeedsImage::PointInterpolation(SeedsImageType* itkImage)
   float t;
 
   // coordinate transformation from physical coordinates to index coordinates
-//  GetGeometry()->WorldToIndex(point, pointIndex);
-//  GetGeometry()->WorldToIndex(last_point, last_pointIndex);
+  GetGeometry()->WorldToIndex(point, pointIndex);
+  GetGeometry()->WorldToIndex(last_point, last_pointIndex);
 
-  for (int i=0; i<3; i++) pointIndex[i] = (int)ceil((point[i]/spacing[i])-(itkImage->GetOrigin()[i]/spacing[i]));
-  for (int i=0; i<3; i++) last_pointIndex[i] = (int)ceil((last_point[i]/spacing[i])-(itkImage->GetOrigin()[i]/spacing[i]));
+//  for (int i=0; i<3; i++) pointIndex[i] = (int)ceil((point[i]/spacing[i])-(itkImage->GetOrigin()[i]/spacing[i]));
+//  for (int i=0; i<3; i++) last_pointIndex[i] = (int)ceil((last_point[i]/spacing[i])-(itkImage->GetOrigin()[i]/spacing[i]));
 
   delta_x = fabsf(last_point[0] - point[0]);
   delta_y = fabsf(last_point[1] - point[1]);

@@ -34,7 +34,7 @@ public class ConnectionCreateCommand extends Command {
 		if (source == null) {
 			throw new IllegalArgumentException();
 		}
-		setLabel("connection creation");
+		setLabel("Connection creation");
 		this.source = source;
 	}
 

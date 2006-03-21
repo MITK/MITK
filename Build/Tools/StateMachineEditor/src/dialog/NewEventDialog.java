@@ -149,13 +149,13 @@ public class NewEventDialog extends JDialog {
 					}
 					else if (eventIdTextField.getText().equals("")) {
 						JOptionPane.showMessageDialog(NewEventDialog.this,
-								"You have to enter an id!", "Error Message",
+								"You have to enter an ID!", "Error Message",
 								JOptionPane.ERROR_MESSAGE);
 						return;
 					}
 					else if (eventTree.containsEventId(eventIdTextField.getText())) {
 						JOptionPane.showMessageDialog(NewEventDialog.this,
-								"Id already exists, please choose another one!", "Error Message",
+								"ID already exists, please choose another one!", "Error Message",
 								JOptionPane.ERROR_MESSAGE);
 						return;
 					}
@@ -201,7 +201,7 @@ public class NewEventDialog extends JDialog {
 	}
 	
 	/**
-	 * @return the id of this new event
+	 * @return the ID of this new event
 	 */
 	public String getEventId() {
 		return eventIdTextField.getText();

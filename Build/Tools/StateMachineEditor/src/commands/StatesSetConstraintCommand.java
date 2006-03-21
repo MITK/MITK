@@ -47,7 +47,7 @@ public class StatesSetConstraintCommand extends Command {
 		this.state = state;
 		this.request = req;
 		this.newBounds = newBounds.getCopy();
-		setLabel("move / resize");
+		setLabel("Move / Resize");
 	}
 
 	/*

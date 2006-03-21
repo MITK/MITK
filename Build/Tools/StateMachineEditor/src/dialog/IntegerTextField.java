@@ -79,7 +79,7 @@ public class IntegerTextField extends JTextField {
 				String textValue = textBuffer.toString();
 				if (textBuffer.length() > maxLength) {
 					JOptionPane.showMessageDialog(IntegerTextField.this,
-							"The number of characters 	must be less than or equal to "
+							"The number of characters must be less than or equal to "
 									+ getMaxLength(), "Error Message",
 							JOptionPane.ERROR_MESSAGE);
 					return;

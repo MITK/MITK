@@ -46,7 +46,7 @@ public class StatesCreateCommand extends Command {
 		this.newState = newState;
 		this.parent = parent;
 		this.bounds = bounds;
-		setLabel("state creation");
+		setLabel("State creation");
 	}
 
 	/**

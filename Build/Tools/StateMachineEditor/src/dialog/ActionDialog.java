@@ -184,7 +184,7 @@ public class ActionDialog extends JDialog {
 								}
 							}
 							if (toolTip.equals("")) {
-								toolTip = "no comment available";
+								toolTip = "No comment available";
 							}
 							tooltips.add(toolTip);
 						}
@@ -229,7 +229,7 @@ public class ActionDialog extends JDialog {
 						}
 						else if (!(inputValue == null) && !inputValue.equals("") && !actionTree.containsActionCategory(inputValue)) {
 						Object[] options = { "OK", "CANCEL" };
-						int option = JOptionPane.showOptionDialog(ActionDialog.this, "Do you really want to add this category?\nAdded category can not be removed!", "Click OK to continue",
+						int option = JOptionPane.showOptionDialog(ActionDialog.this, "Do you really want to add this category?\nAdded categories can not be removed!", "Click OK to continue",
 						            JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE,
 						            null, options, options[0]);
 							if (option == 0) {
@@ -472,7 +472,7 @@ public class ActionDialog extends JDialog {
 					}
 				}
 				if (toolTip.equals("")) {
-					toolTip = "no comment available";
+					toolTip = "No comment available";
 				}
 				tooltips.add(toolTip);
 			}
@@ -488,7 +488,7 @@ public class ActionDialog extends JDialog {
 				}
 				if (contains == false) {
 					actionNameComboBox.addItem(actionTree.getActionName(id));
-					tooltips.add("no comment available");
+					tooltips.add("No comment available");
 				}
 				actionNameComboBox.setSelectedItem(actionTree.getActionName(id));
 			}
@@ -544,7 +544,7 @@ public class ActionDialog extends JDialog {
 					if (!(acDlg.isCanceled())) {
 					if (!(newName == null || newId == null) && (!(newName.equals("") || newId.equals("")))) {
 						Object[] options = { "OK", "CANCEL" };
-						int option = JOptionPane.showOptionDialog(ActionDialog.this, "Do you really want to add this action?\nAdded action can not be removed!", "Click OK to continue",
+						int option = JOptionPane.showOptionDialog(ActionDialog.this, "Do you really want to add this action?\nAdded actions can not be removed!", "Click OK to continue",
 									JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE,
 									null, options, options[0]);
 						if (option == 0) {
@@ -554,7 +554,7 @@ public class ActionDialog extends JDialog {
 								tooltips.add(newComment);
 							}
 							else {
-								tooltips.add("no comment available");
+								tooltips.add("No comment available");
 							}
 							actionNameComboBox.setSelectedItem(newName);
 						}

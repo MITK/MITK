@@ -152,13 +152,13 @@ public class NewActionDialog extends JDialog {
 					}
 					else if (actionIdTextField.getText().equals("")) {
 						JOptionPane.showMessageDialog(NewActionDialog.this,
-								"You have to enter an id!", "Error Message",
+								"You have to enter an ID!", "Error Message",
 								JOptionPane.ERROR_MESSAGE);
 						return;
 					}
 					else if (actionTree.containsActionId(actionIdTextField.getText())) {
 						JOptionPane.showMessageDialog(NewActionDialog.this,
-								"Id already exists, please choose another one!", "Error Message",
+								"ID already exists, please choose another one!", "Error Message",
 								JOptionPane.ERROR_MESSAGE);
 						return;
 					}
@@ -204,7 +204,7 @@ public class NewActionDialog extends JDialog {
 	}
 	
 	/**
-	 * @return the id of the new action
+	 * @return the ID of the new action
 	 */
 	public String getActionId() {
 		return actionIdTextField.getText();

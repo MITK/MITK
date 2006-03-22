@@ -30,6 +30,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkStartPointData.h>
 #include <itkTransform.h>
 #include <itkTranslationTransform.h>
+#include <itkTreeToBinaryImageFilter.h>
 #include <itkTubeSegmentModel.h>
 
 // image type
@@ -49,7 +50,11 @@ typedef RegistrationModelType::Pointer                RegistrationModelPointer;
 // tree type
 typedef itk::RegistrationModelTree<RegistratedModelPointer>
 OutputTreeType;
+typedef OutputTreeType::TreeContainerPointer          OutputTreeContainerPointer;
 typedef OutputTreeType::Pointer                       OutputTreePointer;
+
+typedef short                                         OutputPixelType;
+typedef itk::Image<OutputPixelType, Dimension>        OutputImageType;
 
 // test classes
 typedef itk::ImageToTreeFilter<ImageType, OutputTreeType>
@@ -90,6 +95,10 @@ typedef TransformType::ParametersType                 TransformParamtersType;
 typedef TransformType::OutputVectorType               TransformOutputVectorType;
 typedef TransformType::InputPointType                 TransformInputPointType;
 typedef TransformType::OutputPointType                TransformOutputPointType;
+
+typedef itk::TreeToBinaryImageFilter<OutputTreeType, RegistratedModelType, OutputImageType>
+TreeToImageFilterType;
+typedef TreeToImageFilterType::Pointer                TreeToImageFilterPointer;
 
 typedef std::list<int>                                ResultListType;
 
@@ -460,6 +469,51 @@ int testRegistratedModel()
   return EXIT_SUCCESS;
 }
 
+/****************************************************************
+ * TEST: TreeToBinaryImageFilter
+ ****************************************************************/
+int testTreeToBinaryImageFilter()
+{
+  std::cout << " *** Testing the TreeToImageFilter ***\n";
+
+  OutputTreePointer           outputTree    = OutputTreeType::New();
+  OutputTreeContainerPointer  treeContainer = outputTree->GetTreeContainer();
+  TransformPointer            transform     = TransformType::New();
+  TubeSegmentModelPointer     tubeSegment   = generateTubeSegment();
+
+  TransformOutputVectorType offset1;
+  offset1.Fill(1);
+  transform->SetOffset(offset1);
+  RegistratedModelPointer model1 = RegistratedModelType::New();
+  model1->SetBaseModel((RegistrationModelPointer)tubeSegment);
+  model1->SetTransform((BaseTransformPointer)transform);
+  model1->SetTransformParameters(transform->GetParameters());
+  treeContainer->SetRoot(model1);
+
+  TransformOutputVectorType offset2;
+  offset2.Fill(2);
+  transform->SetOffset(offset2);
+  RegistratedModelPointer model2 = RegistratedModelType::New();
+  model2->SetBaseModel((RegistrationModelPointer)tubeSegment);
+  model2->SetTransform((BaseTransformPointer)transform);
+  model2->SetTransformParameters(transform->GetParameters());
+  treeContainer->Add(model2, model1);
+
+  TreeToImageFilterPointer treeToImageFilter = TreeToImageFilterType::New();
+  OutputImageType::SizeType size;
+  size.Fill(100);
+  OutputImageType::SpacingType spacing;
+  spacing.Fill(1);
+  treeToImageFilter->SetOutputImageSize(size);
+  treeToImageFilter->SetOutputImageSpacing(spacing);
+  treeToImageFilter->SetInput(outputTree);
+  treeToImageFilter->Update();
+
+  std::cout << " *** [TEST PASSED] ***\n";
+  return EXIT_SUCCESS;
+}
+
+
 int itkImageToTreeFilterTest(int i, char* argv[] )
 {
   ResultListType resultList;
@@ -470,6 +524,7 @@ int itkImageToTreeFilterTest(int i, char* argv[] )
   resultList.push_back(testFilterContext());
   resultList.push_back(testRegistrationModelXMLWriter());
   resultList.push_back(testRegistratedModel());
+  resultList.push_back(testTreeToBinaryImageFilter());
 
   std::cout << " *** [ALL TESTS DONE] ***\n";
 

@@ -641,6 +641,7 @@ public:
     // Clean up vtk objects (no vtkSmartPointer ... )
     cells->Delete();
     vpoints->Delete();
+    delete[] types;
 
     //std::cout << "meshToUnstructuredGrid end" << std::endl;
     return vgrid;
@@ -863,6 +864,7 @@ public:
       polygoncells->Delete();
     }
     vpoints->Delete();
+    scalars->Delete();
 
     //std::cout << "meshToUnstructuredGrid end" << std::endl;
     return polydata;
@@ -952,50 +954,50 @@ public:
 
   static typename MeshType::Pointer CreateRegularSphereMesh2(typename MeshType::PointType center, typename MeshType::PointType scale, int resolution)
   {
-	  typedef typename itk::AutomaticTopologyMeshSource<MeshType> MeshSourceType;
-	  typename MeshSourceType::Pointer mySphereSource = MeshSourceType::New();
+    typedef typename itk::AutomaticTopologyMeshSource<MeshType> MeshSourceType;
+    typename MeshSourceType::Pointer mySphereSource = MeshSourceType::New();
 
-	  typename MeshType::PointType pnt0, pnt1, pnt2, pnt3, pnt4, pnt5, pnt6, pnt7, pnt8, pnt9, pnt10, pnt11;
-      double c1= 0.5 * (1.0 + sqrt(5.0));
-      double c2= 1.0;
-      double len = sqrt( c1*c1 + c2*c2 );
-      c1 /= len;  c2 /= len;
-    
-	  pnt0[0] = center[0] - c1*scale[0];    pnt0[1] = center[1];                pnt0[2] = center[2] + c2*scale[2];
-	  pnt1[0] = center[0];                  pnt1[1] = center[1] + c2*scale[1];  pnt1[2] = center[2] - c1*scale[2];
-	  pnt2[0] = center[0];                  pnt2[1] = center[1] + c2*scale[1];  pnt2[2] = center[2] + c1*scale[2];
-	  pnt3[0] = center[0] + c1*scale[0];    pnt3[1] = center[1];                pnt3[2] = center[2] - c2*scale[2];
-      pnt4[0] = center[0] - c2*scale[0];    pnt4[1] = center[1] - c1*scale[1];  pnt4[2] = center[2];
-      pnt5[0] = center[0] - c2*scale[0];    pnt5[1] = center[1] + c1*scale[1];  pnt5[2] = center[2];
-      pnt6[0] = center[0];                  pnt6[1] = center[1] - c2*scale[1];  pnt6[2] = center[2] + c1*scale[2];
-      pnt7[0] = center[0] + c2*scale[0];    pnt7[1] = center[1] + c1*scale[1];  pnt7[2] = center[2];
-      pnt8[0] = center[0];                  pnt8[1] = center[1] - c2*scale[1];  pnt8[2] = center[2] - c1*scale[2];
-      pnt9[0] = center[0] + c1*scale[0];    pnt9[1] = center[1];                pnt9[2] = center[2] + c2*scale[2];
-      pnt10[0]= center[0] + c2*scale[0];    pnt10[1]= center[1] - c1*scale[1];  pnt10[2]= center[2];
-      pnt11[0]= center[0] - c1*scale[0];    pnt11[1]= center[1];                pnt11[2]= center[2] - c2*scale[2];
+    typename MeshType::PointType pnt0, pnt1, pnt2, pnt3, pnt4, pnt5, pnt6, pnt7, pnt8, pnt9, pnt10, pnt11;
+    double c1= 0.5 * (1.0 + sqrt(5.0));
+    double c2= 1.0;
+    double len = sqrt( c1*c1 + c2*c2 );
+    c1 /= len;  c2 /= len;
 
-      addTriangle( mySphereSource, scale, pnt9, pnt2, pnt6, resolution );
-	  addTriangle( mySphereSource, scale, pnt1, pnt11, pnt5, resolution );
-	  addTriangle( mySphereSource, scale, pnt11, pnt1, pnt8, resolution );
-	  addTriangle( mySphereSource, scale, pnt0, pnt11, pnt4, resolution );
-      addTriangle( mySphereSource, scale, pnt3, pnt1, pnt7, resolution );
-	  addTriangle( mySphereSource, scale, pnt3, pnt8, pnt1, resolution );
-	  addTriangle( mySphereSource, scale, pnt9, pnt3, pnt7, resolution );
-	  addTriangle( mySphereSource, scale, pnt0, pnt6, pnt2, resolution );
-      addTriangle( mySphereSource, scale, pnt4, pnt10, pnt6, resolution );
-	  addTriangle( mySphereSource, scale, pnt1, pnt5, pnt7, resolution );
-	  addTriangle( mySphereSource, scale, pnt7, pnt5, pnt2, resolution );
-	  addTriangle( mySphereSource, scale, pnt8, pnt3, pnt10, resolution );
-      addTriangle( mySphereSource, scale, pnt4, pnt11, pnt8, resolution );
-	  addTriangle( mySphereSource, scale, pnt9, pnt7, pnt2, resolution );
-	  addTriangle( mySphereSource, scale, pnt10, pnt9, pnt6, resolution );
-	  addTriangle( mySphereSource, scale, pnt0, pnt5, pnt11, resolution );
-      addTriangle( mySphereSource, scale, pnt0, pnt2, pnt5, resolution );
-	  addTriangle( mySphereSource, scale, pnt8, pnt10, pnt4, resolution );
-	  addTriangle( mySphereSource, scale, pnt3, pnt9, pnt10, resolution );
-	  addTriangle( mySphereSource, scale, pnt6, pnt0, pnt4, resolution );
+    pnt0[0] = center[0] - c1*scale[0];    pnt0[1] = center[1];                pnt0[2] = center[2] + c2*scale[2];
+    pnt1[0] = center[0];                  pnt1[1] = center[1] + c2*scale[1];  pnt1[2] = center[2] - c1*scale[2];
+    pnt2[0] = center[0];                  pnt2[1] = center[1] + c2*scale[1];  pnt2[2] = center[2] + c1*scale[2];
+    pnt3[0] = center[0] + c1*scale[0];    pnt3[1] = center[1];                pnt3[2] = center[2] - c2*scale[2];
+    pnt4[0] = center[0] - c2*scale[0];    pnt4[1] = center[1] - c1*scale[1];  pnt4[2] = center[2];
+    pnt5[0] = center[0] - c2*scale[0];    pnt5[1] = center[1] + c1*scale[1];  pnt5[2] = center[2];
+    pnt6[0] = center[0];                  pnt6[1] = center[1] - c2*scale[1];  pnt6[2] = center[2] + c1*scale[2];
+    pnt7[0] = center[0] + c2*scale[0];    pnt7[1] = center[1] + c1*scale[1];  pnt7[2] = center[2];
+    pnt8[0] = center[0];                  pnt8[1] = center[1] - c2*scale[1];  pnt8[2] = center[2] - c1*scale[2];
+    pnt9[0] = center[0] + c1*scale[0];    pnt9[1] = center[1];                pnt9[2] = center[2] + c2*scale[2];
+    pnt10[0]= center[0] + c2*scale[0];    pnt10[1]= center[1] - c1*scale[1];  pnt10[2]= center[2];
+    pnt11[0]= center[0] - c1*scale[0];    pnt11[1]= center[1];                pnt11[2]= center[2] - c2*scale[2];
 
-	  return mySphereSource->GetOutput();
+    addTriangle( mySphereSource, scale, pnt9, pnt2, pnt6, resolution );
+    addTriangle( mySphereSource, scale, pnt1, pnt11, pnt5, resolution );
+    addTriangle( mySphereSource, scale, pnt11, pnt1, pnt8, resolution );
+    addTriangle( mySphereSource, scale, pnt0, pnt11, pnt4, resolution );
+    addTriangle( mySphereSource, scale, pnt3, pnt1, pnt7, resolution );
+    addTriangle( mySphereSource, scale, pnt3, pnt8, pnt1, resolution );
+    addTriangle( mySphereSource, scale, pnt9, pnt3, pnt7, resolution );
+    addTriangle( mySphereSource, scale, pnt0, pnt6, pnt2, resolution );
+    addTriangle( mySphereSource, scale, pnt4, pnt10, pnt6, resolution );
+    addTriangle( mySphereSource, scale, pnt1, pnt5, pnt7, resolution );
+    addTriangle( mySphereSource, scale, pnt7, pnt5, pnt2, resolution );
+    addTriangle( mySphereSource, scale, pnt8, pnt3, pnt10, resolution );
+    addTriangle( mySphereSource, scale, pnt4, pnt11, pnt8, resolution );
+    addTriangle( mySphereSource, scale, pnt9, pnt7, pnt2, resolution );
+    addTriangle( mySphereSource, scale, pnt10, pnt9, pnt6, resolution );
+    addTriangle( mySphereSource, scale, pnt0, pnt5, pnt11, resolution );
+    addTriangle( mySphereSource, scale, pnt0, pnt2, pnt5, resolution );
+    addTriangle( mySphereSource, scale, pnt8, pnt10, pnt4, resolution );
+    addTriangle( mySphereSource, scale, pnt3, pnt9, pnt10, resolution );
+    addTriangle( mySphereSource, scale, pnt6, pnt0, pnt4, resolution );
+
+    return mySphereSource->GetOutput();
   }
 
  

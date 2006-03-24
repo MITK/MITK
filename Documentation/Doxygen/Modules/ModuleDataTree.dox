@@ -8,8 +8,8 @@
 \section overviewDataTree Overview
 
 All data objects, like images or surfaces, are contained in DataTreeNodes. These
-DataTreeNodes describe the data itself (BaseData), how they can be rendered in
-2D or 3D (a list of Mappers), what Interactor is associated with it, and a list
+DataTreeNodes describe the data itself (mitk::BaseData), how they can be rendered in
+2D or 3D (a list of mitk::Mapper), what mitk::Interactor is associated with it, and a list
 of arbirary properties (name, visibility, opacity, etc.). Information about the
 position of a data object in space/time is stored in a Geometry, which is
 attached to the data object itself, not to the node.
@@ -22,7 +22,7 @@ modify data trees, we use iterators (mitk::DataTreeIteratorBase).
 To clarify the relation between the tree, its nodes and iterators, have a look
 at the following diagram. The main point of this diagram is, that you need an 
 iterator to change the tree. A tree node does not know about the tree! 
-Once again: a tree node does not know about the tree!
+Once again: <b>a tree node does not know about the tree</b>!
 
 \image html DataTreeAndIterators.png "The data tree, its nodes and iterators"
 

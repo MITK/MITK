@@ -60,6 +60,9 @@ protected:
   int m_Radius;
   float delta_x, delta_y, delta_z;
   float sphere_distance;
+
+  typedef itk::Image<float,3> MaskImageType;
+  MaskImageType::Pointer m_SmoothingMask;
 };
 } // namespace mitk
 

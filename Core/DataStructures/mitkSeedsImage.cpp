@@ -25,6 +25,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkInteractionConst.h"
 
 #include "mitkRenderingManager.h"
+#include <itkDiscreteGaussianImageFilter.h>
 
 void mitk::SeedsImage::ExecuteOperation(mitk::Operation* operation)
 {
@@ -93,6 +94,65 @@ void mitk::SeedsImage::AddSeedPoint(SeedsImageType* itkImage)
   const unsigned int dimension = ::itk::GetImageDimension<SeedsImageType>::ImageDimension;
   itk::Index<dimension> baseIndex;
   itk::Index<dimension> setIndex;
+  itk::Point<SeedsImageType::PixelType, dimension> p;
+  p[0] = point[0];
+  p[1] = point[1];
+  p[2] = point[2];
+  itk::ContinuousIndex<SeedsImageType::PixelType, dimension> contIndex;
+  itkImage->TransformPhysicalPointToContinuousIndex(p, contIndex);
+
+  MaskImageType::Pointer mask =  MaskImageType::New();
+  MaskImageType::SpacingType spacing;
+  spacing.Fill(1);
+  double origin[3] = {0,0,0};
+  mask->SetOrigin(origin);
+  MaskImageType::SizeType size;
+  size.Fill(2*m_Radius+1);
+  MaskImageType::IndexType start;
+  start.Fill(0);
+  MaskImageType::RegionType region;
+  region.SetIndex(start);
+  region.SetSize(size);
+  mask->SetRegions(region);
+  mask->Allocate();
+  mask->FillBuffer(0);
+  MaskImageType::IndexType idx;
+  idx.Fill(m_Radius);
+  MaskImageType::IndexType getIndex;
+
+  if (m_DrawState == -1)
+  {
+    mask->SetPixel(idx, -100);
+    idx[0] += 1; mask->SetPixel(idx, -100);
+    idx[0] -= 2; mask->SetPixel(idx, -100);idx[0] += 1;
+    idx[1] += 1; mask->SetPixel(idx, -100);
+    idx[1] -= 2; mask->SetPixel(idx, -100);idx[1] += 1;
+    idx[2] += 1; mask->SetPixel(idx, -100);
+    idx[2] -= 2; mask->SetPixel(idx, -100);idx[2] += 1;
+  }
+  else if (m_DrawState == 1)
+  {
+    mask->SetPixel(idx, 100);
+    idx[0] += 1; mask->SetPixel(idx, 100);
+    idx[0] -= 2; mask->SetPixel(idx, 100);idx[0] += 1;
+    idx[1] += 1; mask->SetPixel(idx, 100);
+    idx[1] -= 2; mask->SetPixel(idx, 100);idx[1] += 1;
+    idx[2] += 1; mask->SetPixel(idx, 100);
+    idx[2] -= 2; mask->SetPixel(idx, 100);idx[2] += 1;
+  }
+
+  if (m_DrawState == -1 || m_DrawState == 1)
+  {  
+    typedef itk::DiscreteGaussianImageFilter<MaskImageType,MaskImageType> BlurFT;
+    BlurFT::Pointer blurring = BlurFT::New();
+    blurring->SetInput( mask );
+    float variance[3] = {m_Radius,m_Radius,m_Radius};
+    blurring->SetVariance( variance );
+    blurring->Update();
+
+    mask = blurring->GetOutput();
+    mask->DisconnectPipeline();
+  }
 
   GetGeometry()->WorldToIndex(point, baseIndex); // commented out because of the slices problem
 //  for (int i=0; i<3; i++) baseIndex[i] = (int)ceil((point[i]/spacing[i])-(itkImage->GetOrigin()[i]/spacing[i]));
@@ -103,10 +163,10 @@ void mitk::SeedsImage::AddSeedPoint(SeedsImageType* itkImage)
     for(unsigned int i=0; i<dimension; i++)
       radius[i] = int(m_Radius/spacing[i]);
     //FillVector2D(radius, ((ScalarType)m_Radius)/spacing[0], ((ScalarType)m_Radius)/spacing[1]);
-      for(int y = baseIndex[1] - radius[1]; y <= baseIndex[1] + radius[1]; ++y){
-        for(int x = baseIndex[0] - radius[0]; x <= baseIndex[0] + radius[0]; ++x){
-          delta_x = abs(x - baseIndex[0])*spacing[0];
-          delta_y = abs(y - baseIndex[1])*spacing[1];
+      for(int y = contIndex[1] - radius[1]; y <= contIndex[1] + radius[1]; ++y){
+        for(int x = contIndex[0] - radius[0]; x <= contIndex[0] + radius[0]; ++x){
+          delta_x = abs(x - contIndex[0])*spacing[0];
+          delta_y = abs(y - contIndex[1])*spacing[1];
           sphere_distance = (delta_x * delta_x) + (delta_y * delta_y);
           if (sphere_distance <= (m_Radius*m_Radius)){
             // check -> is the point inside the image?
@@ -126,13 +186,13 @@ void mitk::SeedsImage::AddSeedPoint(SeedsImageType* itkImage)
 //    FillVector3D(radius, m_Radius/spacing[0], m_Radius/spacing[1], m_Radius/spacing[2]);
     int radius[dimension];
     for(unsigned int i=0; i<dimension; i++)
-      radius[i] = int(m_Radius/spacing[i]);
-    for(int z = baseIndex[2] - radius[2]; z <= baseIndex[2] + radius[2]; ++z){
-      for(int y = baseIndex[1] - radius[1]; y <= baseIndex[1] + radius[1]; ++y){
-        for(int x = baseIndex[0] - radius[0]; x <= baseIndex[0] + radius[0]; ++x){
-          delta_x = abs(x - baseIndex[0])*spacing[0];
-          delta_y = abs(y - baseIndex[1])*spacing[1];
-          delta_z = abs(z - baseIndex[2])*spacing[2];
+      radius[i] = int(m_Radius);//int(m_Radius/spacing[i]);
+    for(int z = contIndex[2] - radius[2]; z <= contIndex[2] + radius[2]; ++z){
+      for(int y = contIndex[1] - radius[1]; y <= contIndex[1] + radius[1]; ++y){
+        for(int x = contIndex[0] - radius[0]; x <= contIndex[0] + radius[0]; ++x){
+          delta_x = abs(x - contIndex[0]);//spacing[0];
+          delta_y = abs(y - contIndex[1]);//spacing[1];
+          delta_z = abs(z - contIndex[2]);//spacing[2];
           sphere_distance = (delta_x * delta_x) + (delta_y * delta_y) + (delta_z * delta_z);
           if (sphere_distance <= (m_Radius*m_Radius)){
             // check -> is the point inside the image?
@@ -141,7 +201,20 @@ void mitk::SeedsImage::AddSeedPoint(SeedsImageType* itkImage)
               setIndex[1]=y;
               setIndex[0]=x;
               iterator.SetIndex(setIndex);
-              iterator.Set(m_DrawState);
+              if (m_DrawState == -1 || m_DrawState == 1)
+              {  
+                getIndex[2]=z + m_Radius -contIndex[2] ;
+                getIndex[1]=y + m_Radius -contIndex[1];
+                getIndex[0]=x + m_Radius -contIndex[0];
+                float val = iterator.Get() + mask->GetPixel(getIndex) ;
+                if (val > 128) val = 128; 
+                if (val < -128) val = 128; 
+                iterator.Set( val );
+              }
+              else
+              {
+                iterator.Set(m_DrawState);
+              }
             }
           }
         }
@@ -231,13 +304,13 @@ void mitk::SeedsImage::PointInterpolation(SeedsImageType* itkImage)
 //        FillVector3D(radius, m_Radius/spacing[0], m_Radius/spacing[1], m_Radius/spacing[2]);
         int radius[dimension];
         for(unsigned int i=0; i<dimension; i++)
-          radius[i] = int(m_Radius/spacing[i]);
+          radius[i] = int(m_Radius);
         for(int z = baseIndex[2] - radius[2]; z <= baseIndex[2] + radius[2]; ++z){
           for(int y = baseIndex[1] - radius[1]; y <= baseIndex[1] + radius[1]; ++y){
             for(int x = baseIndex[0] - radius[0]; x <= baseIndex[0] + radius[0]; ++x){
-              delta_x = fabsf(x - baseIndex[0])*spacing[0];
-              delta_y = fabsf(y - baseIndex[1])*spacing[1];
-              delta_z = fabsf(z - baseIndex[2])*spacing[2];
+              delta_x = fabsf(x - baseIndex[0]);
+              delta_y = fabsf(y - baseIndex[1]);
+              delta_z = fabsf(z - baseIndex[2]);
               sphere_distance = (delta_x * delta_x) + (delta_y * delta_y) + (delta_z * delta_z);
               if (sphere_distance <= (m_Radius*m_Radius)){
                 // is the point inside the image?

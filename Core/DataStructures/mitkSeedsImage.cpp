@@ -94,32 +94,34 @@ void mitk::SeedsImage::AddSeedPoint(SeedsImageType* itkImage)
   const unsigned int dimension = ::itk::GetImageDimension<SeedsImageType>::ImageDimension;
   itk::Index<dimension> baseIndex;
   itk::Index<dimension> setIndex;
-  itk::Point<SeedsImageType::PixelType, dimension> p;
+  itk::Point<typename SeedsImageType::PixelType, dimension> p;
   p[0] = point[0];
   p[1] = point[1];
   p[2] = point[2];
-  itk::ContinuousIndex<SeedsImageType::PixelType, dimension> contIndex;
+  itk::ContinuousIndex<typename SeedsImageType::PixelType, dimension> contIndex;
   itkImage->TransformPhysicalPointToContinuousIndex(p, contIndex);
+  typename MaskImageType::IndexType getIndex;
+  typename MaskImageType::Pointer mask =  MaskImageType::New();
 
-  MaskImageType::Pointer mask =  MaskImageType::New();
-  MaskImageType::SpacingType spacing;
+  if (m_DrawState == -1 || m_DrawState == 1)
+  {  
+  typename MaskImageType::SpacingType spacing;
   spacing.Fill(1);
   double origin[3] = {0,0,0};
   mask->SetOrigin(origin);
-  MaskImageType::SizeType size;
+  typename MaskImageType::SizeType size;
   size.Fill(2*m_Radius+1);
-  MaskImageType::IndexType start;
+  typename MaskImageType::IndexType start;
   start.Fill(0);
-  MaskImageType::RegionType region;
+  typename MaskImageType::RegionType region;
   region.SetIndex(start);
   region.SetSize(size);
   mask->SetRegions(region);
   mask->Allocate();
   mask->FillBuffer(0);
-  MaskImageType::IndexType idx;
+  typename MaskImageType::IndexType idx;
   idx.Fill(m_Radius);
-  MaskImageType::IndexType getIndex;
-
+ 
   if (m_DrawState == -1)
   {
     mask->SetPixel(idx, -100);
@@ -141,10 +143,8 @@ void mitk::SeedsImage::AddSeedPoint(SeedsImageType* itkImage)
     idx[2] -= 2; mask->SetPixel(idx, 100);idx[2] += 1;
   }
 
-  if (m_DrawState == -1 || m_DrawState == 1)
-  {  
     typedef itk::DiscreteGaussianImageFilter<MaskImageType,MaskImageType> BlurFT;
-    BlurFT::Pointer blurring = BlurFT::New();
+    typename BlurFT::Pointer blurring = BlurFT::New();
     blurring->SetInput( mask );
     float variance[3] = {m_Radius,m_Radius,m_Radius};
     blurring->SetVariance( variance );

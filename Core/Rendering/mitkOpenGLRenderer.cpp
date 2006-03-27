@@ -22,12 +22,15 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkImageMapper2D.h"
 #include "mitkBaseVtkMapper2D.h"
 #include "mitkBaseVtkMapper3D.h"
+#include <mitkDisplayGeometry.h>
 #include "mitkLevelWindow.h"
 #include "mitkVtkInteractorCameraController.h"
 #include "mitkVtkRenderWindow.h"
 #include "mitkVtkARRenderWindow.h"
 #include "mitkRenderWindow.h"
 #include "mitkGeometry2DDataVtkMapper3D.h"
+#include <mitkGeometry3D.h>
+#include <mitkPointSetMapper2D.h>
 
 #include <vtkRenderer.h>
 #include <vtkRendererCollection.h>
@@ -48,8 +51,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 //##ModelId=3E33ECF301AD
-mitk::OpenGLRenderer::OpenGLRenderer( const char* name ) 
-: BaseRenderer(name), m_VtkMapperPresent(false), m_VtkRenderer(NULL), m_LastUpdateVtkActorsTime(0)
+mitk::OpenGLRenderer::OpenGLRenderer( const char* name )
+: BaseRenderer(name), m_VtkMapperPresent(false), m_VtkRenderer(NULL), m_LastUpdateVtkActorsTime(0),m_PixelMapGL(NULL)
 {
   m_CameraController=NULL;//\*todo remove line
   m_CameraController = new VtkInteractorCameraController();
@@ -305,10 +308,11 @@ void mitk::OpenGLRenderer::Update()
 }
 
 //##ModelId=3E330D2903CC
-void mitk::OpenGLRenderer::Repaint()
+void mitk::OpenGLRenderer::Repaint( bool onlyOverlay )
 //first render vtkActors, then render mitkMappers
 {
   //if we do not have any data, we do nothing else but clearing our window
+  /*
   if(GetData() == NULL)
   {
     glClear(GL_COLOR_BUFFER_BIT);
@@ -325,86 +329,104 @@ void mitk::OpenGLRenderer::Repaint()
 
     return;
   }
-
-  //has the data tree been changed?
-  if(dynamic_cast<mitk::DataTree*>(GetData()->GetTree()) == NULL ) return;
-  if(m_LastUpdateVtkActorsTime < static_cast<mitk::DataTree*>(GetData()->GetTree())->GetMTime() )
+  */
+  
+  if ( onlyOverlay )
   {
-    //yes: update vtk-actors
-    UpdateIncludingVtkActors();
+    glDisable(GL_BLEND);
+    glDrawPixels( m_Size[1], m_Size[0], GL_BGRA, GL_UNSIGNED_BYTE, (const GLvoid*)m_PixelMapGL);
+    glEnable(GL_BLEND);
+    
+    this->DrawOverlay();
   }
   else
-    //has anything else changed (geometry to display, etc.)?
-    if ( m_LastUpdateTime < GetMTime() || m_LastUpdateTime < GetDisplayGeometry()->GetMTime() )
+  {
+    //has the data tree been changed?
+    if(dynamic_cast<mitk::DataTree*>(GetData()->GetTree()) == NULL ) return;
+    if(m_LastUpdateVtkActorsTime < static_cast<mitk::DataTree*>(GetData()->GetTree())->GetMTime() )
     {
-      //std::cout << "OpenGLRenderer calling its update..." << std::endl;
-      Update();
+      //yes: update vtk-actors
+      UpdateIncludingVtkActors();
     }
     else
-      if(m_MapperID>=2)
-      { //@todo in 3D mode wird sonst nix geupdated, da z.Z. weder camera noch �derung des Baums beachtet wird!!!
+      //has anything else changed (geometry to display, etc.)?
+      if ( m_LastUpdateTime < GetMTime() || m_LastUpdateTime < GetDisplayGeometry()->GetMTime() )
+      {
+        //std::cout << "OpenGLRenderer calling its update..." << std::endl;
         Update();
       }
+      else
+        if(m_MapperID>=2)
+        { //@todo in 3D mode wird sonst nix geupdated, da z.Z. weder camera noch �derung des Baums beachtet wird!!!
+          Update();
+        }
 
-  glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT);
 
-  //PlaneGeometry* myPlaneGeom =
-  //  dynamic_cast<PlaneGeometry *>((mitk::Geometry2D*)(GetCurrentWorldGeometry2D()));
+    //PlaneGeometry* myPlaneGeom =
+    //  dynamic_cast<PlaneGeometry *>((mitk::Geometry2D*)(GetCurrentWorldGeometry2D()));
 
-  glViewport (0, 0, m_Size[0], m_Size[1]);
-  glMatrixMode( GL_PROJECTION );
-  glLoadIdentity();
-  gluOrtho2D( 0.0, m_Size[0], 0.0, m_Size[1] );
-  glMatrixMode( GL_MODELVIEW );
+    glViewport (0, 0, m_Size[0], m_Size[1]);
+    glMatrixMode( GL_PROJECTION );
+    glLoadIdentity();
+    gluOrtho2D( 0.0, m_Size[0], 0.0, m_Size[1] );
+    glMatrixMode( GL_MODELVIEW );
 
-  //------------------
-  //rendering VTK-Mappers if present
-  if(m_VtkMapperPresent)
-  {
-    mitk::VtkARRenderWindow *arRenderWindow = dynamic_cast<mitk::VtkARRenderWindow *>(m_RenderWindow->GetVtkRenderWindow());
-    if (arRenderWindow)
-      arRenderWindow->SetFinishRendering(false);
-
-    //start vtk render process with the updated scenegraph
-    m_RenderWindow->GetVtkRenderWindow()->MitkRender();
-  }
-
-  //------------------
-  //preparing and gaining information about 2D rendering for OpenGL
-  if(GetDisplayGeometry()->IsValid())
-  {
-    mitk::DataTreeIteratorClone it = m_DataTreeIterator;
-    typedef std::pair<int, GLMapper2D*> LayerMapperPair;
-    std::priority_queue<LayerMapperPair> layers;
-    int mapperNo = 0;
-
-    for(;it->IsAtEnd()==false;++it)
+    //------------------
+    //rendering VTK-Mappers if present
+    if(m_VtkMapperPresent)
     {
-      mitk::DataTreeNode::Pointer node = it->Get();
-      if(node.IsNull())
-        continue;
-      mitk::Mapper::Pointer mapper = node->GetMapper(m_MapperID);
-      if(mapper.IsNull())
-        continue;
-      GLMapper2D* mapper2d=dynamic_cast<GLMapper2D*>(mapper.GetPointer());
-      if(mapper2d!=NULL)
+      mitk::VtkARRenderWindow *arRenderWindow = dynamic_cast<mitk::VtkARRenderWindow *>(m_RenderWindow->GetVtkRenderWindow());
+      if (arRenderWindow)
+        arRenderWindow->SetFinishRendering(false);
+
+      //start vtk render process with the updated scenegraph
+      m_RenderWindow->GetVtkRenderWindow()->MitkRender();
+    }
+
+    //------------------
+    //preparing and gaining information about 2D rendering for OpenGL
+    if(GetDisplayGeometry()->IsValid())
+    {
+      mitk::DataTreeIteratorClone it = m_DataTreeIterator;
+      typedef std::pair<int, GLMapper2D*> LayerMapperPair;
+      std::priority_queue<LayerMapperPair> layers;
+      int mapperNo = 0;
+
+      for(;it->IsAtEnd()==false;++it)
       {
-        // mapper without a layer property get layer number 1
-        int layer=1;
-        node->GetIntProperty("layer", layer, this);
-        // default sort for priority_queue is lessthan, thus paint 
-        // smaller layers first
-        layers.push(LayerMapperPair(- (layer<<16) - mapperNo ,mapper2d));
-        mapperNo++;
+        mitk::DataTreeNode::Pointer node = it->Get();
+        if(node.IsNull())
+          continue;
+        mitk::Mapper::Pointer mapper = node->GetMapper(m_MapperID);
+        if(mapper.IsNull())
+          continue;
+        GLMapper2D* mapper2d=dynamic_cast<GLMapper2D*>(mapper.GetPointer());
+        if(mapper2d!=NULL)
+        {
+          // mapper without a layer property get layer number 1
+          int layer=1;
+          node->GetIntProperty("layer", layer, this);
+          // default sort for priority_queue is lessthan, thus paint
+          // smaller layers first
+          layers.push(LayerMapperPair(- (layer<<16) - mapperNo ,mapper2d));
+          mapperNo++;
+        }
+      }
+
+      //go through the generated list and let the sorted mappers paint
+      while (!layers.empty())
+      {
+        layers.top().second->Paint(this);
+        layers.pop();
       }
     }
 
-    //go through the generated list and let the sorted mappers paint
-    while (!layers.empty())
-    {
-      layers.top().second->Paint(this);
-      layers.pop();
-    }
+    glReadPixels(0,0, m_Size[1], m_Size[0], GL_BGRA, GL_UNSIGNED_BYTE, (GLvoid *) m_PixelMapGL);
+
+    // Overlay the new rendering result
+    this->DrawOverlay();
+
   }
 
   //swap buffers
@@ -422,7 +444,7 @@ void mitk::OpenGLRenderer::Repaint()
 
 /*!
 \brief Initialize the OpenGLRenderer
- 
+
 This method is called from the two Constructors
 */
 void mitk::OpenGLRenderer::InitRenderer(mitk::RenderWindow* renderwindow)
@@ -520,6 +542,11 @@ void mitk::OpenGLRenderer::Resize(int w, int h)
 
   BaseRenderer::Resize(w, h);
 
+  if(m_PixelMapGL != NULL)
+    delete m_PixelMapGL;
+  
+  m_PixelMapGL = new GLbyte[4 * w * h]; //imagesize
+   
   Update();
 }
 
@@ -537,6 +564,11 @@ void mitk::OpenGLRenderer::InitSize(int w, int h)
     m_VtkRenderer->ResetCamera();
     vtkObject::SetGlobalWarningDisplay(w);
   }
+  
+  if(m_PixelMapGL != NULL)
+    delete m_PixelMapGL;
+  
+   m_PixelMapGL = new GLbyte[4 * w * h]; //imagesize
 }
 
 //##ModelId=3EF59AD20235
@@ -586,5 +618,36 @@ void mitk::OpenGLRenderer::PrintSelf(std::ostream& os, itk::Indent indent) const
   os << indent << " VtkMapperPresent: " << m_VtkMapperPresent << std::endl;
   os << indent << " VtkRenderer: " << m_VtkRenderer << std::endl;
   os << indent << " LastUpdateVtkActorsTime: " << m_LastUpdateVtkActorsTime << std::endl;
+}
+
+void mitk::OpenGLRenderer::DrawOverlay()
+{
+  if ( m_DrawOverlayPosition[0]>0 && m_DrawOverlayPosition[1]>0 )
+  {
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+    glClearColor(0.0,0.0,0.0,0.0);
+    glShadeModel(GL_FLAT);
+    glColor4f(1.0,1.0,0.0, 0.65);//YELLOW half transparent
+    glBegin(GL_POLYGON);
+      // a openGL Mouse primitiv  (-;
+      glVertex2f(m_DrawOverlayPosition[0] + 0.0 ,m_DrawOverlayPosition[1] + 0.0);
+      glVertex2f(m_DrawOverlayPosition[0] - 35.0,m_DrawOverlayPosition[1] - 20.0);
+      glVertex2f(m_DrawOverlayPosition[0] - 25.0,m_DrawOverlayPosition[1] - 25.0);
+      glVertex2f(m_DrawOverlayPosition[0] - 40.0,m_DrawOverlayPosition[1] - 40.0);
+      glVertex2f(m_DrawOverlayPosition[0] - 32.0,m_DrawOverlayPosition[1] - 47.0);
+      glVertex2f(m_DrawOverlayPosition[0] - 15.0,m_DrawOverlayPosition[1] - 30.0);
+      glVertex2f(m_DrawOverlayPosition[0] - 5.0,m_DrawOverlayPosition[1] - 40.0);
+    glEnd();
+
+    m_DrawOverlayPosition[0] = -1;
+    m_DrawOverlayPosition[1] = -1;
+  }
+
+}
+
+void mitk::OpenGLRenderer::DrawOverlayMouse( mitk::Point2D& pos_unit )
+{
+  m_DrawOverlayPosition= pos_unit;
 }
 

@@ -68,12 +68,12 @@ public:
   //##ModelId=3ED91D060305
   //##Documentation
   //## @brief Update the vtk-based-mappers by adding the produced actors to the m_VtkRenderer.
-  //## 
+  //##
   //## @warning Always call Update() before, which checks, whether there are vtk-based-mappers.
   virtual void UpdateIncludingVtkActors();
 
   inline VtkRenderWindow* GetVtkRenderWindow() const
-  { 
+  {
     if(m_RenderWindow!=NULL)
       return m_RenderWindow->GetVtkRenderWindow();
     else
@@ -89,18 +89,33 @@ public:
 
   virtual void PickWorldPoint(const Point2D& displayPoint, Point3D& worldPoint) const;
 
+  //##Documentation
+  //## @brief Save a point to
+  //## Should be used during conferences to hand the postion of a mouse curser
+  virtual void DrawOverlayMouse(Point2D& p2d);
+  
+  //##Documentation
+  //## @brief Draws a mouse primitive to a specified point on the widget.
+  //## will be requested during Repaint()
+  virtual void DrawOverlay();
+
+  //##Documentation
+  //## @brief Draws a point on the widget.
+  //## Should be used during conferences to show the position of the remote mouse
+  // virtual void RemoveRemoteMouse(BaseRenderer *br = 0) const;
+
 protected:
   //##ModelId=3E330D260255
   virtual void Update();
 
   //##ModelId=3E330D2903CC
   //##Documentation
-  //## @brief Do the rendering. 
+  //## @brief Do the rendering.
   //## If necessary, Update() and UpdateVtkActors() is called first.
-  //## The order of rendering is: First update the VTK Actors and render them, 
+  //## The order of rendering is: First update the VTK Actors and render them,
   //## then prepare 2D-rendering informations with layers and render them.
   //## Due to that order, 2D-Layers or e.g. a video can be manually put in the background
-  virtual void Repaint();
+  virtual void Repaint(bool overlay=false );
 
   //##ModelId=3E33145B0096
   virtual void Initialize();
@@ -133,6 +148,12 @@ private:
   //##ModelId=3E33145A0383
   vtkRenderer* m_VtkRenderer;
 
+  // will disable rendering - instead using only a copy
+  bool m_RequestOverlay;
+
+  // keep the position for an overlay mouse curser
+  mitk::Point2D m_DrawOverlayPosition;
+
   //##ModelId=3E33145B001E
   vtkLight* m_Light;
 
@@ -146,6 +167,9 @@ private:
   vtkWorldPointPicker *m_WorldPointPicker;
 
   mitk::Mapper::Pointer m_CurrentWorldGeometry2DMapper;
+  
+  // save a copy of the rendered window.
+  GLbyte *m_PixelMapGL;
 };
 
 } // namespace mitk

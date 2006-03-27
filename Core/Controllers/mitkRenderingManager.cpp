@@ -61,7 +61,7 @@ void
 mitk::RenderingManager
 ::AddRenderWindow( RenderWindow *renderWindow )
 {
-  m_RenderWindowList[renderWindow] = false;
+  m_RenderWindowList[renderWindow] = 0;
 }
 
 void
@@ -75,7 +75,7 @@ void
 mitk::RenderingManager
 ::RequestUpdate( RenderWindow *renderWindow )
 {
-  m_RenderWindowList[renderWindow] = true;
+  m_RenderWindowList[renderWindow] = 2;
   
   if ( !m_UpdatePending )
   {
@@ -88,18 +88,20 @@ void
 mitk::RenderingManager
 ::ForceImmediateUpdate( RenderWindow *renderWindow )
 {
+  bool onlyOverlay = ( m_RenderWindowList[renderWindow] == 1 )?true:false;
+
   // Immediately repaint this window (implementation platform specific)
-  renderWindow->Repaint();
+  renderWindow->Repaint(onlyOverlay);
 
   // Erase potentially pending requests for this window
-  m_RenderWindowList[renderWindow] = false;
+  m_RenderWindowList[renderWindow] = 0;
 
   // Check if there are pending requests for any other windows
   m_UpdatePending = false;
   RenderWindowList::iterator it;
   for ( it = m_RenderWindowList.begin(); it != m_RenderWindowList.end(); ++it )
   {
-    if ( it->second )
+    if ( it->second > 0 )
     {
       m_UpdatePending = true;
     }
@@ -119,7 +121,7 @@ mitk::RenderingManager
   RenderWindowList::iterator it;
   for ( it = m_RenderWindowList.begin(); it != m_RenderWindowList.end(); ++it )
   {
-    it->second = true;
+    it->second = 2;
   }
 
   // Restart the timer if there are no requests already
@@ -137,11 +139,13 @@ mitk::RenderingManager
   RenderWindowList::iterator it;
   for ( it = m_RenderWindowList.begin(); it != m_RenderWindowList.end(); ++it )
   {
+    bool onlyOverlay = ( it->second == 1 )?true:false;
+    
     // Immediately repaint this window (implementation platform specific)
-    it->first->Repaint();
+    it->first->Repaint(onlyOverlay);
 
     // Erase potentially pending requests
-    it->second = false;
+    it->second = 0;
   }
 
   if ( m_UpdatePending )
@@ -158,15 +162,17 @@ mitk::RenderingManager
   RenderWindowList::iterator it;
   for ( it = m_RenderWindowList.begin(); it != m_RenderWindowList.end(); ++it )
   {
+    bool onlyOverlay = ( it->second == 1 )?true:false;
+    
     // if the render window is rendered via an mitk::OpenGLRenderer
     // call UpdateIncludingVtkActors. 
     mitk::OpenGLRenderer* openGLRenderer = dynamic_cast<mitk::OpenGLRenderer*>( it->first->GetRenderer() );
     if ( openGLRenderer )
       openGLRenderer->UpdateIncludingVtkActors();
-    it->first->Repaint();
+    it->first->Repaint(onlyOverlay);
 
     // Erase potentially pending requests
-    it->second = false;
+    it->second = 0;
   }
 
   if ( m_UpdatePending )
@@ -212,10 +218,46 @@ mitk::RenderingManager
     if ( it->second )
     {
       this->ForceImmediateUpdate( it->first );
-      it->second = false;
+      it->second = 0;
     }
   }
 }
+
+void
+mitk::RenderingManager
+::RequestOverlayUpdate( RenderWindow *renderWindow )
+{
+
+  // don't distroy rendering request
+  if( m_RenderWindowList[renderWindow] < 1 )
+    m_RenderWindowList[renderWindow] = 1;
+  
+  if ( !m_UpdatePending )
+  {
+    m_UpdatePending = true;
+    this->RestartTimer();
+  }
+}
+
+void
+mitk::RenderingManager
+::RequestOverlayUpdateAll( )
+{
+  RenderWindowList::iterator it;
+  for ( it = m_RenderWindowList.begin(); it != m_RenderWindowList.end(); ++it )
+  {
+    if( it->second < 1 )
+      it->second = 1;
+  }
+
+  // Restart the timer if there are no requests already
+  if ( !m_UpdatePending )
+  {
+    m_UpdatePending = true;
+    this->RestartTimer();
+  }
+}
+
 
 namespace mitk
 {

@@ -45,9 +45,9 @@ mitk::BaseRenderer::RendererSet mitk::BaseRenderer::instances;
 template class itk::SmartPointerForwardReference<mitk::CameraController>;
 
 //##ModelId=3E3D2F120050
-mitk::BaseRenderer::BaseRenderer( const char* name ) : 
+mitk::BaseRenderer::BaseRenderer( const char* name ) :
   m_MapperID(defaultMapper), m_DataTreeIterator(NULL), m_RenderWindow(NULL),
-  m_LastUpdateTime(0), m_CameraController(NULL), m_Focused(false), 
+  m_LastUpdateTime(0), m_CameraController(NULL), m_Focused(false),
   m_WorldGeometry(NULL), m_TimeSlicedWorldGeometry(NULL),
   m_CurrentWorldGeometry2D(NULL), m_Slice(0), m_TimeStep(0)
 {
@@ -411,13 +411,13 @@ void mitk::BaseRenderer::KeyPressEvent(mitk::KeyEvent *ke)
   mitk::EventMapper::MapEvent(&event);
 }
 
-void mitk::BaseRenderer::Render()
+void mitk::BaseRenderer::Render( bool drawOverlayOnly )
 {
   // Initialize the render context and do the rendering, if the RenderWindow
   // allows for it.
   if ( m_RenderWindow && m_RenderWindow->PrepareRendering() )
   {
-    this->Repaint();
+    this->Repaint(drawOverlayOnly );
   }
 }
 
@@ -425,6 +425,14 @@ void mitk::BaseRenderer::Render()
 void mitk::BaseRenderer::MakeCurrent()
 {
 }
+
+
+void mitk::BaseRenderer::DrawOverlayMouse(mitk::Point2D& p2d)
+{
+  
+  std::cout<<"FALSCH - BaseRenderer.cpp DrawOverlay()"<<std::endl;
+}
+
 
 void mitk::BaseRenderer::PrintSelf(std::ostream& os, itk::Indent indent) const
 {

@@ -153,7 +153,7 @@ protected:
   //##Documentation
   //## Abstract method for repainting the RenderWindow. This method has to be
   //## implemented by subclasses.
-  virtual void Repaint() {};
+  virtual void Repaint(bool overlay=false) {};
 
   VtkRenderWindow* m_MitkVtkRenderWindow;
 

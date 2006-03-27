@@ -25,7 +25,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkRenderingManagerFactory.h"
 
 //##ModelId=3E1EB4410304
-QmitkRenderWindow::QmitkRenderWindow(mitk::BaseRenderer* renderer, QGLFormat glf, QWidget *parent, const char *name) 
+QmitkRenderWindow::QmitkRenderWindow(mitk::BaseRenderer* renderer, QGLFormat glf, QWidget *parent, const char *name)
   : QGLWidget(glf, parent, name), mitk::RenderWindow(name, renderer), m_InitNeeded(false), m_ResizeNeeded(false), m_InResize(false)
 {
   this->InitRenderer();
@@ -33,7 +33,7 @@ QmitkRenderWindow::QmitkRenderWindow(mitk::BaseRenderer* renderer, QGLFormat glf
   setMouseTracking(true);
 }
 
-QmitkRenderWindow::QmitkRenderWindow(QGLFormat glf, QWidget *parent, const char *name) 
+QmitkRenderWindow::QmitkRenderWindow(QGLFormat glf, QWidget *parent, const char *name)
   : QGLWidget(glf, parent, name), mitk::RenderWindow(name, NULL), m_InitNeeded(false), m_ResizeNeeded(false), m_InResize(false)
 {
   this->InitRenderer();
@@ -132,7 +132,7 @@ void QmitkRenderWindow::resizeGL( int w, int h )
 void QmitkRenderWindow::paintGL( )
 {
   // Calls back to PrepareRendering()
-  m_Renderer->Render();
+  m_Renderer->Render(m_DrawOverlayOnly);
 }
 
 void QmitkRenderWindow::showEvent ( QShowEvent * )
@@ -219,10 +219,11 @@ void QmitkRenderWindow::keyPressEvent(QKeyEvent *ke)
   }
 }
 
-void QmitkRenderWindow::Repaint()
+void QmitkRenderWindow::Repaint( bool onlyOverlay )
 {
+  m_DrawOverlayOnly = onlyOverlay;
   repaint();
-};
+}; 
 
 QSize QmitkRenderWindow::minimumSizeHint () const
 {

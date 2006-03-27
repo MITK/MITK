@@ -96,13 +96,19 @@ public:
 
   /** Immediately executes an update of all registered RenderWindows. */
   void ForceImmediateUpdateAll();
-
+  
   /** Immediately executes an update of all registered RenderWindows.
    * If the renderer associated with a render window is an OpenGLRenderer,
    * its method UpdateIncludingVtkActors is called. Otherwise the
    * repaint method of the widget will be called.
    */
   void ForceImmediateUpdateIncludingVtkActors();
+  
+  /** Requests an Overlay for the specified RenderWindow. */
+  void RequestOverlayUpdate( RenderWindow *renderWindow );
+
+  /** Requests an overlay update all RenderWindows.*/
+  void RequestOverlayUpdateAll();
 
   /** Sets the minimum time interval in msec. When requesting an update for
    * a specific RenderWindow for the first time, it will be executed only
@@ -135,7 +141,7 @@ protected:
   int m_Interval;
 
 private:
-  typedef std::map< RenderWindow *, bool > RenderWindowList;
+  typedef std::map< RenderWindow *, int > RenderWindowList;
 
   RenderWindowList m_RenderWindowList;
 

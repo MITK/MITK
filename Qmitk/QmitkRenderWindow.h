@@ -59,7 +59,7 @@ public:
   virtual QSize sizeHint () const;
 
 protected:
-  virtual void Repaint();
+  virtual void Repaint(bool onlyOverlay = false );
 
   //##ModelId=3E3314590396
   virtual void paintGL();
@@ -101,6 +101,8 @@ public:
   virtual void focusInEvent(QFocusEvent*);
   //##ModelId=3E6D5DD403E2
   virtual void focusOutEvent(QFocusEvent*); 
+
+  bool m_DrawOverlayOnly;
 
 };
 

@@ -7,9 +7,12 @@
 
 namespace mitk{
 
-class ConferenceKitFactory;
+  // Changes in the functions above has to follow a rounding to the next higher whole number
+  // changes in Conference functions shall add +0.1 to significate a change but maybe not so dagnerouse for stability...
+  const float ConferenceVersion = 0.1; 
+  
+  class ConferenceKitFactory;
 
-//class ConferenceKit:public ConferenceToken {
   class ConferenceKit:public itk::Object
   {
   public:
@@ -24,8 +27,11 @@ class ConferenceKitFactory;
  //   virtual void Launch() = 0;
  //   virtual void Close() = 0;
  //   virtual void UpdateMe() = 0;
-    virtual void SendMITK(signed int,const char* sender, float, float, float, float, float) = 0;
+    virtual void SendMITK(signed int,const char* sender, int, int, int, int, float, float, float, float, float) = 0;
     virtual void SendQt(const char* s) = 0;
+    virtual void MyTokenPriority(long int) = 0;
+    virtual void AskForToken(long int requester) = 0;
+    virtual void SetToken(long int sender,long int requester) = 0;
     virtual ~ConferenceKit(){}
 
   private:

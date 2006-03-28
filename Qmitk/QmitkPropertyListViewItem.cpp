@@ -212,6 +212,7 @@ QmitkPropertyListViewItem* QmitkPropertyListViewItem::CreateInstance(mitk::Prope
       newItem->m_Control = new QLabel("n/a",parent);
     }
   }
+  newItem->m_Control->setName((name + "_" + "QmitkPropertyListViewItem_control").c_str());
   newItem->m_Control->show();
   return newItem;
 }

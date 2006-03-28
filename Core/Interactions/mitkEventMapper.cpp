@@ -28,7 +28,6 @@ PURPOSE.  See the above copyright notices for more information.
 *
 */
 
-#include "mitkPositionEvent.h"
 #include "mitkEventMapper.h"
 #include <itkOutputWindow.h>
 #include <itkMacro.h>
@@ -42,6 +41,23 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkInteractionDebugger.h>
 #include <mitkConfig.h>
 #include <itksys/SystemTools.hxx>
+
+#ifdef MBI_INTERNAL
+  #include <mitkGeometry3D.h>
+  #include <mitkDisplayPositionEvent.h>
+  #include <stdio.h>
+  #include <sstream>
+
+  #include <mitkConferenceKit.h>
+  #include <mitkConferenceToken.h>
+  #include <mitkBaseRenderer.h>
+  #include <mitkPositionEvent.h>
+  #include <Skeletonizer/Point3D.h>
+  #include <mitkCameraController.h>
+  #include <mitkEventTypedefs.h>
+  //#include <QmitkRenderWindow.h>
+  #include <mitkRenderingManager.h>
+#endif //MBI_INTERNAL
 
 //XML Event
 //##ModelId=3E788FC000E5
@@ -86,76 +102,76 @@ mitk::EventMapper::EventMapper()
 {
 
   //map with string to key for mapping string from xml-file to int
-  m_EventConstMap["Type_None"] = mitk::Type_None;		// invalid event 
-  m_EventConstMap["Type_Timer"] = mitk::Type_Timer;		// timer event
-  m_EventConstMap["Type_MouseButtonPress"] = mitk::Type_MouseButtonPress;		// mouse button pressed
-  m_EventConstMap["Type_MouseButtonRelease"] = mitk::Type_MouseButtonRelease;		// mouse button released
-  m_EventConstMap["Type_MouseButtonDblClick"] =	mitk::Type_MouseButtonDblClick;		// mouse button double click
-  m_EventConstMap["Type_MouseMove"] = mitk::Type_MouseMove;		// mouse move
-  m_EventConstMap["Type_KeyPress"] = mitk::Type_KeyPress;		// key pressed
-  m_EventConstMap["Type_KeyRelease"] = mitk::Type_KeyRelease;		// key released
-  m_EventConstMap["Type_FocusIn"] = 				8;		// keyboard focus received
-  m_EventConstMap["Type_FocusOut"] = 				9;		// keyboard focus lost
-  m_EventConstMap["Type_Enter"] = 					10;	// mouse enters widget
-  m_EventConstMap["Type_Leave"] = 					11;	// mouse leaves widget
-  m_EventConstMap["Type_Paint"] = 					12;	// paint widget
-  m_EventConstMap["Type_Move"] = 					13;	// move widget
-  m_EventConstMap["Type_Resize"] = 				14;	// resize widget
-  m_EventConstMap["Type_Create"] = 				15;	// after object creation
-  m_EventConstMap["Type_Destroy"] = 				16;	// during object destruction
-  m_EventConstMap["Type_Show"] = 					17;	// widget is shown
-  m_EventConstMap["Type_Hide"] = 					18;	// widget is hidden
-  m_EventConstMap["Type_Close"] = 					19;	// request to close widget
-  m_EventConstMap["Type_Quit"] = 					20;	// request to quit application
-  m_EventConstMap["Type_Reparent"] = 				21;	// widget has been reparented
-  m_EventConstMap["Type_ShowMinimized"] = 			22;	// widget is shown minimized
-  m_EventConstMap["Type_ShowNormal"] = 			23;	// widget is shown normal
-  m_EventConstMap["Type_WindowActivate"] = 		24;	// window was activated
-  m_EventConstMap["Type_WindowDeactivate"] = 		25;	// window was deactivated
-  m_EventConstMap["Type_ShowToParent"] = 			26;	// widget is shown to parent
-  m_EventConstMap["Type_HideToParent"] = 			27;	// widget is hidden to parent
-  m_EventConstMap["Type_ShowMaximized"] = 			28;	// widget is shown maximized
-  m_EventConstMap["Type_ShowFullScreen"] = 		29;	// widget is shown full-screen
-  m_EventConstMap["Type_Accel"] = 					30;	// accelerator event
-  m_EventConstMap["Type_Wheel"] = 					31;	// wheel event
-  m_EventConstMap["Type_AccelAvailable"] = 		32;	// accelerator available event
-  m_EventConstMap["Type_CaptionChange"] = 			33;	// caption changed
-  m_EventConstMap["Type_IconChange"] = 			34;	// icon changed
-  m_EventConstMap["Type_ParentFontChange"] = 		35;	// parent font changed
-  m_EventConstMap["Type_ApplicationFontChange"] = 	36;// application font changed
-  m_EventConstMap["Type_ParentPaletteChange"] = 	37;	// parent palette changed
+  m_EventConstMap["Type_None"] = mitk::Type_None;               // invalid event
+  m_EventConstMap["Type_Timer"] = mitk::Type_Timer;             // timer event
+  m_EventConstMap["Type_MouseButtonPress"] = mitk::Type_MouseButtonPress;               // mouse button pressed
+  m_EventConstMap["Type_MouseButtonRelease"] = mitk::Type_MouseButtonRelease;           // mouse button released
+  m_EventConstMap["Type_MouseButtonDblClick"] = mitk::Type_MouseButtonDblClick;         // mouse button double click
+  m_EventConstMap["Type_MouseMove"] = mitk::Type_MouseMove;             // mouse move
+  m_EventConstMap["Type_KeyPress"] = mitk::Type_KeyPress;               // key pressed
+  m_EventConstMap["Type_KeyRelease"] = mitk::Type_KeyRelease;           // key released
+  m_EventConstMap["Type_FocusIn"] =                             8;              // keyboard focus received
+  m_EventConstMap["Type_FocusOut"] =                            9;              // keyboard focus lost
+  m_EventConstMap["Type_Enter"] =                                       10;     // mouse enters widget
+  m_EventConstMap["Type_Leave"] =                                       11;     // mouse leaves widget
+  m_EventConstMap["Type_Paint"] =                                       12;     // paint widget
+  m_EventConstMap["Type_Move"] =                                        13;     // move widget
+  m_EventConstMap["Type_Resize"] =                              14;     // resize widget
+  m_EventConstMap["Type_Create"] =                              15;     // after object creation
+  m_EventConstMap["Type_Destroy"] =                             16;     // during object destruction
+  m_EventConstMap["Type_Show"] =                                        17;     // widget is shown
+  m_EventConstMap["Type_Hide"] =                                        18;     // widget is hidden
+  m_EventConstMap["Type_Close"] =                                       19;     // request to close widget
+  m_EventConstMap["Type_Quit"] =                                        20;     // request to quit application
+  m_EventConstMap["Type_Reparent"] =                            21;     // widget has been reparented
+  m_EventConstMap["Type_ShowMinimized"] =                       22;     // widget is shown minimized
+  m_EventConstMap["Type_ShowNormal"] =                  23;     // widget is shown normal
+  m_EventConstMap["Type_WindowActivate"] =              24;     // window was activated
+  m_EventConstMap["Type_WindowDeactivate"] =            25;     // window was deactivated
+  m_EventConstMap["Type_ShowToParent"] =                        26;     // widget is shown to parent
+  m_EventConstMap["Type_HideToParent"] =                        27;     // widget is hidden to parent
+  m_EventConstMap["Type_ShowMaximized"] =                       28;     // widget is shown maximized
+  m_EventConstMap["Type_ShowFullScreen"] =              29;     // widget is shown full-screen
+  m_EventConstMap["Type_Accel"] =                                       30;     // accelerator event
+  m_EventConstMap["Type_Wheel"] =                                       31;     // wheel event
+  m_EventConstMap["Type_AccelAvailable"] =              32;     // accelerator available event
+  m_EventConstMap["Type_CaptionChange"] =                       33;     // caption changed
+  m_EventConstMap["Type_IconChange"] =                  34;     // icon changed
+  m_EventConstMap["Type_ParentFontChange"] =            35;     // parent font changed
+  m_EventConstMap["Type_ApplicationFontChange"] =       36;// application font changed
+  m_EventConstMap["Type_ParentPaletteChange"] =         37;     // parent palette changed
   m_EventConstMap["Type_ApplicationPaletteChange"] =  38;// application palette changed
-  m_EventConstMap["Type_PaletteChange"] = 			39;	// widget palette changed
-  m_EventConstMap["Type_Clipboard"] = 				40;	// internal clipboard event
-  m_EventConstMap["Type_Speech"] = 				42;	// reserved for speech input
-  m_EventConstMap["Type_SockAct"] = 				50;	// socket activation
-  m_EventConstMap["Type_AccelOverride"] = 			51;	// accelerator override event
-  m_EventConstMap["Type_DeferredDelete"] = 		52;	// deferred delete event
-  m_EventConstMap["Type_DragEnter"] = 				60;	// drag moves into widget
-  m_EventConstMap["Type_DragMove"] = 				61;	// drag moves in widget
-  m_EventConstMap["Type_DragLeave"] = 				62;	// drag leaves or is cancelled
-  m_EventConstMap["Type_Drop"] = 					63;	// actual drop
-  m_EventConstMap["Type_DragResponse"] = 			64;	// drag accepted/rejected
-  m_EventConstMap["Type_ChildInserted"] = 			70;	// new child widget
-  m_EventConstMap["Type_ChildRemoved"] = 			71;	// deleted child widget
-  m_EventConstMap["Type_LayoutHint"] = 			72;	// child min/max size changed
-  m_EventConstMap["Type_ShowWindowRequest"] = 		73;	// widget's window should be mapped
-  m_EventConstMap["Type_ActivateControl"] = 		80;	// ActiveX activation
-  m_EventConstMap["Type_DeactivateControl"] = 		81;	// ActiveX deactivation
-  m_EventConstMap["Type_ContextMenu"] = 			82;	// context popup menu
-  m_EventConstMap["Type_IMStart"] = 				83;	// input method composition start
-  m_EventConstMap["Type_IMCompose"] = 				84;	// input method composition
-  m_EventConstMap["Type_IMEnd"] = 					85;	// input method composition end
-  m_EventConstMap["Type_Accessibility"] = 			86;	// accessibility information is requested
-  m_EventConstMap["Type_TabletMove"] = 			87;	// Wacom tablet event
-  m_EventConstMap["Type_LocaleChange"] = 			88;	// the system locale changed
-  m_EventConstMap["Type_LanguageChange"] = 		89;	// the application language changed
-  m_EventConstMap["Type_LayoutDirectionChange"] = 	90;	// the layout direction changed
-  m_EventConstMap["Type_Style"] = 					91;	// internal style event
-  m_EventConstMap["Type_TabletPress"] = 			92;	// tablet press
-  m_EventConstMap["Type_TabletRelease"] = 			93;	// tablet release
-  m_EventConstMap["Type_User"] = 					1000;	// first user event id
-  m_EventConstMap["Type_MaxUser"] = 				65535;	// last user event id
+  m_EventConstMap["Type_PaletteChange"] =                       39;     // widget palette changed
+  m_EventConstMap["Type_Clipboard"] =                           40;     // internal clipboard event
+  m_EventConstMap["Type_Speech"] =                              42;     // reserved for speech input
+  m_EventConstMap["Type_SockAct"] =                             50;     // socket activation
+  m_EventConstMap["Type_AccelOverride"] =                       51;     // accelerator override event
+  m_EventConstMap["Type_DeferredDelete"] =              52;     // deferred delete event
+  m_EventConstMap["Type_DragEnter"] =                           60;     // drag moves into widget
+  m_EventConstMap["Type_DragMove"] =                            61;     // drag moves in widget
+  m_EventConstMap["Type_DragLeave"] =                           62;     // drag leaves or is cancelled
+  m_EventConstMap["Type_Drop"] =                                        63;     // actual drop
+  m_EventConstMap["Type_DragResponse"] =                        64;     // drag accepted/rejected
+  m_EventConstMap["Type_ChildInserted"] =                       70;     // new child widget
+  m_EventConstMap["Type_ChildRemoved"] =                        71;     // deleted child widget
+  m_EventConstMap["Type_LayoutHint"] =                  72;     // child min/max size changed
+  m_EventConstMap["Type_ShowWindowRequest"] =           73;     // widget's window should be mapped
+  m_EventConstMap["Type_ActivateControl"] =             80;     // ActiveX activation
+  m_EventConstMap["Type_DeactivateControl"] =           81;     // ActiveX deactivation
+  m_EventConstMap["Type_ContextMenu"] =                         82;     // context popup menu
+  m_EventConstMap["Type_IMStart"] =                             83;     // input method composition start
+  m_EventConstMap["Type_IMCompose"] =                           84;     // input method composition
+  m_EventConstMap["Type_IMEnd"] =                                       85;     // input method composition end
+  m_EventConstMap["Type_Accessibility"] =                       86;     // accessibility information is requested
+  m_EventConstMap["Type_TabletMove"] =                  87;     // Wacom tablet event
+  m_EventConstMap["Type_LocaleChange"] =                        88;     // the system locale changed
+  m_EventConstMap["Type_LanguageChange"] =              89;     // the application language changed
+  m_EventConstMap["Type_LayoutDirectionChange"] =       90;     // the layout direction changed
+  m_EventConstMap["Type_Style"] =                                       91;     // internal style event
+  m_EventConstMap["Type_TabletPress"] =                         92;     // tablet press
+  m_EventConstMap["Type_TabletRelease"] =                       93;     // tablet release
+  m_EventConstMap["Type_User"] =                                        1000;   // first user event id
+  m_EventConstMap["Type_MaxUser"] =                             65535;  // last user event id
 
   //ButtonState
   m_EventConstMap["BS_NoButton"] =  mitk::BS_NoButton;//0x0000
@@ -459,24 +475,29 @@ mitk::StateMachine* mitk::EventMapper::GetGlobalStateMachine()
 //##Documentation
 //## searches the Event in m_EventDescription
 //## and if included
-bool mitk::EventMapper::MapEvent(Event* event)
+bool mitk::EventMapper::MapEvent(Event* event, bool posted, int mitkE )
 {
   if (GetGlobalStateMachine() == NULL)
     return false;
 
-  //search the event in the list of event descriptions, if found, then take the number and produce a stateevent
-  EventDescriptionVecIter iter;
-  for (iter = m_EventDescriptions.begin(); iter!=m_EventDescriptions.end();iter++)
+  int eventID = mitkE;
+  if( !posted && mitkE == 0 )
   {
-    if (*iter == *event)
-      break;
+    //search the event in the list of event descriptions, if found, then take the number and produce a stateevent
+    EventDescriptionVecIter iter;
+    for (iter = m_EventDescriptions.begin(); iter!=m_EventDescriptions.end();iter++)
+    {
+      if (*iter == *event)
+        break;
+    }
+
+    if (iter == m_EventDescriptions.end())//not found
+      return false;
+    eventID = (*iter).GetId();
   }
 
-  if (iter == m_EventDescriptions.end())//not found
-    return false;
-
   //set the Menger_Var m_StateEvent and send to StateMachine, which does everything further!
-  m_StateEvent.Set( (*iter).GetId(), event );
+  m_StateEvent.Set( eventID, event );
   /*
   Group and Object EventId:
   then EventMapper has the power to decide which operations hang together;
@@ -513,11 +534,128 @@ bool mitk::EventMapper::MapEvent(Event* event)
   default://increase
     mitk::OperationEvent::IncCurrObjectEventId();
   }
+
+#ifdef MBI_INTERNAL
+  //Conferen Stop and Enable Events
+  if (!posted)
+  {
+    mitk::ConferenceToken* ct = mitk::ConferenceToken::GetInstance();
+    if(!ct->HaveToken() && !(eventID == 520) )
+    {
+      ct->GetToken();
+      std::cout<<"TOKEN: WILL BE REQUESTED "<<eventID<<std::endl;
+    }
+
+    mitk::DisplayPositionEvent *dpe = dynamic_cast<mitk::DisplayPositionEvent *>(event);
+    if ( dpe )
+    {
+      mitk::Point3D p3;
+      mitk::Point2D p2; //kein nutzen, weil es sich mit den weltkoordinaten besser arbeiten lässt.
+      //short int BEI Point3D
+      p3 = dpe->GetWorldPosition();
+      p2 = dpe->GetDisplayPosition();
+
+      mitk::BaseRenderer* bp = event->GetSender();
+      const char* baseRendererName = bp->GetName();
+      //const int size[2] = bp->GetSize();
+
+      ConferenceKit* ck = ConferenceKit::GetInstance();
+      if( ck != NULL )
+      {
+        ck->SendMITK( eventID, baseRendererName, event->GetType(), event->GetButton(), event->GetButtonState(), event->GetKey(), p3[0], p3[1], p3[2], (p2[0]/bp->GetSizeX()), (p2[1]/bp->GetSizeY()) );
+        //if(eventID!=520) std::cout<<"ID( "<<eventID<<") Widget("<<baseRendererName<<") Koordinaten 3D("<<p3[0]<<", "<<p3[1]<<", "<<p3[2]<<")"<<p2[0]/bp->GetSizeX()<<", "<<p2[1]/bp->GetSizeY()<<std::endl;
+         if(eventID!=520) std::cout<<bp->GetSizeX()<<" / (("<<p2[0]<<")) =X "<<p2[0]/bp->GetSizeX()<<"   UND "<<bp->GetSizeY()<<" / (("<< p2[1] <<")) =Y "<<p2[1]/bp->GetSizeY()<<std::endl;
+      }
+    }
+  }
+#endif //MBI_INTERNAL
+
   mitk::OperationEvent::ExecuteIncrement();
   ok = GetGlobalStateMachine()->HandleEvent(&m_StateEvent);
 
   return ok;
 }
+
+
+#ifdef MBI_INTERNAL
+//CONFERENCE USE
+bool
+mitk::EventMapper::MapEvent(signed int mitkEventID, const char* sender, int Etype, int Estate, int Ebuttonstate, int Ekey, float w1,float w2,float w3,float p1,float p2)
+{
+
+  //CONFERENCE EVENT
+  mitk::BaseRenderer *br = const_cast<mitk::BaseRenderer*>(mitk::BaseRenderer::GetByName( std::string(sender) ));
+  
+  mitk::Point3D p3d;
+  p3d[0] = (mitk::ScalarType) w1;
+  p3d[1] = (mitk::ScalarType) w2;
+  p3d[2] = (mitk::ScalarType) w3;
+
+  // fit relative values to absolut....
+  mitk::Point2D p2d;
+  p2d[0] = (mitk::ScalarType) p1 * br->GetSizeX();
+  p2d[1] = (mitk::ScalarType) p1 * br->GetSizeX();
+
+
+  mitk::PositionEvent *pe = new mitk::PositionEvent(br,Etype,Estate,Ebuttonstate,Ekey,p2d,p3d);
+  
+  // MOUSE Overlay
+  mitk::Point2D  p2d_mm, pos_unit;     
+  //Map world to 2d mm
+  if (br->GetDisplayGeometry()->Map( p3d, p2d_mm ) )
+  {
+    //calculate position of the real inner widget
+    br->GetDisplayGeometry()->WorldToDisplay( p2d_mm, pos_unit);
+    //std::cout<<p2d_mm[0]<<", "<<p2d_mm[1]<<", U: "<<pos_unit[0]<<", "<<pos_unit[1]<<" p3d ( "<<p3d[0]<<p3d[1]<<p3d[2]<<" ) "<<std::endl;
+    br->DrawOverlayMouse(pos_unit); //TEST
+    mitk::RenderingManager::GetInstance()->RequestOverlayUpdateAll();
+  }
+
+
+  //std::cout<<"mitkEventMapper::MapEvent(): "<<br->GetSizeX()<<" * "<<p1<<" =X (("<<p2d[0]<<"))   UND "<<br->GetSizeY()<<" * "<< p2 <<" =Y (("<<p2d[1]<<"))"<<std::endl;
+  
+  //ONlY 3D Widget
+  if( br->GetMapperID() == 2 )
+  {
+    mitk::CameraController* cc = br->GetCameraController();
+    
+    //Qt Event IDs
+    if (Etype == 6)
+    {
+      // KeyPress
+      //cc->KeyPressEvent( keyevent); */
+      ;
+    }
+    else
+    {
+      //Umrechnung für VTKCameraControler
+      p2d[1] = (mitk::ScalarType) (br->GetSizeY() - p2) * br->GetSizeY(); 
+      mitk::PositionEvent *peVTK = new mitk::PositionEvent(br,Etype,Estate,Ebuttonstate,Ekey,p2d,p3d);
+      // END
+      
+      //PRESS
+      if(Etype == 2)
+      {
+        cc->MousePressEvent( peVTK );
+      }
+      else if (Etype == 3 )
+      {
+        //RELEASE
+        cc->MouseReleaseEvent( peVTK );
+      }
+      else if (Etype == 5)
+      {
+        //MOVE
+        cc->MouseMoveEvent( peVTK );
+      }
+    }
+  }
+  
+  bool ok = MapEvent( pe, true, mitkEventID );
+
+  return ok;
+}
+#endif
 
 //##ModelId=3E5B35140072
 //##Documentation
@@ -531,7 +669,7 @@ bool mitk::EventMapper::LoadBehavior(std::string fileName)
   mitk::EventMapper* eventMapper = new EventMapper();
   eventMapper->SetFileName( fileName.c_str() );
 
-  if ( ! eventMapper->Parse() )    
+  if ( ! eventMapper->Parse() )
   {
 #ifdef INTERDEBUG
     //itkWarningMacro("mitk::EventMapper::LoadBehavior xml file cannot parse!" );
@@ -549,7 +687,7 @@ bool mitk::EventMapper::LoadStandardBehavior()
   std::string xmlFileName;
 
   const char* mitkConf = itksys::SystemTools::GetEnv("MITKCONF");
-  if (mitkConf != NULL) 
+  if (mitkConf != NULL)
   {
     xmlFileName  = mitkConf;
     xmlFileName += "/";
@@ -557,7 +695,7 @@ bool mitk::EventMapper::LoadStandardBehavior()
     xmlFileName += "StateMachine.xml";
     if(itksys::SystemTools::FileExists(xmlFileName.c_str()))
       return LoadBehavior(xmlFileName);
-  } 
+  }
   xmlFileName = "StateMachine.xml";
 
   if(itksys::SystemTools::FileExists(xmlFileName.c_str()))
@@ -586,7 +724,7 @@ inline const int mitk::EventMapper::convertConstString2ConstInt(std::string inpu
   return -1;//for didn't find anything
 }
 
-void  mitk::EventMapper::StartElement (const char *elementName, const char **atts) 
+void  mitk::EventMapper::StartElement (const char *elementName, const char **atts)
 {
 
   if ( elementName == EVENT )
@@ -600,10 +738,10 @@ void  mitk::EventMapper::StartElement (const char *elementName, const char **att
       ReadXMLStringAttribut( NAME, atts ),
       ReadXMLIntegerAttribut( ID, atts ));
 
-    m_EventDescriptions.push_back(eventDescr);  
+    m_EventDescriptions.push_back(eventDescr);
   }
   else if ( elementName == EVENTS )
-    m_StyleName = ReadXMLStringAttribut( STYLE, atts ); 
+    m_StyleName = ReadXMLStringAttribut( STYLE, atts );
 
 }
 
@@ -618,13 +756,13 @@ std::string mitk::EventMapper::ReadXMLStringAttribut( std::string name, const ch
 {
   if(atts)
   {
-    const char** attsIter = atts;  
+    const char** attsIter = atts;
 
-    while(*attsIter) 
-    {     
+    while(*attsIter)
+    {
       if ( name == *attsIter )
       {
-        attsIter++;      
+        attsIter++;
         return *attsIter;
       }
       attsIter++;
@@ -639,12 +777,12 @@ std::string mitk::EventMapper::ReadXMLStringAttribut( std::string name, const ch
 int mitk::EventMapper::ReadXMLIntegerAttribut( std::string name, const char** atts )
 {
   std::string s = ReadXMLStringAttribut( name, atts );
-  static const std::string hex = "0x"; 
+  static const std::string hex = "0x";
   int result;
 
   if ( s[0] == hex[0] && s[1] == hex[1] )
     result = strtol( s.c_str(), NULL, 16 );
-  else 
+  else
     result = atoi( s.c_str() );
 
   return result;
@@ -672,3 +810,4 @@ mitk::StateEvent* mitk::EventMapper::RefreshStateEvent(mitk::StateEvent* stateEv
 
   return stateEvent;
 }
+

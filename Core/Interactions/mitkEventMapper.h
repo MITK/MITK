@@ -23,7 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkEvent.h"
 #include "mitkCommon.h"
 #include "mitkEventDescription.h"
-#include <vtkXMLParser.h> 
+#include <vtkXMLParser.h>
 #include <vector>
 #include <string>
 #include <map>
@@ -36,6 +36,7 @@ namespace mitk {
       return strcmp(s1, s2) < 0;
     }
   };
+  typedef std::string msgString;
   //for friendship wor to set the stateevent after calculating
   class GlobalInteraction;
   class StateMachine;
@@ -43,18 +44,18 @@ namespace mitk {
 
   //##ModelId=3E5A390401F2
   //##Documentation
-  //## @brief Maps an Event to its description 
-  //## 
+  //## @brief Maps an Event to its description
+  //##
   //## EventMapping:
   //## This class mapps the Events, usually given by the OS or here by QT, to a MITK internal EventId.
   //## It loads all information from the xml-file (possible, understandable Events with the mitkEventID).
   //## If an event appears, the method MapEvent is called with the event params.
   //## This Method looks up the event params, and tries to find an mitkEventId to it.
-  //## If yes, then sends the event and the found ID to the globalStateMachine, which handles all 
+  //## If yes, then sends the event and the found ID to the globalStateMachine, which handles all
   //## further operations of that event.
   //## For Undo-Mechanism a statechanging StateMachine::HandleEvent is connected to an ObjectEventID and an GroupEventId.
   //## That way a fine an raw Undo is possible (fine for ObjectID by ObjectID, raw for GroupID for GroupID)
-  //## Here the ObjectEventID gets increased, 
+  //## Here the ObjectEventID gets increased,
   //## not the GroupEventId(must get increased by a StateMachine, that has the information when a new Group of operation starts)
   //## @ingroup Interaction
   class EventMapper : public vtkXMLParser
@@ -86,7 +87,12 @@ namespace mitk {
     //##Documentation
     //## searches the Event in m_EventDescription
     //## and if included transmitts the event to globalInteraction
-    static bool MapEvent(Event* event);
+    static bool MapEvent(Event* event, bool posted = false, int eventID=0 );
+    
+    // First part MITK Event ID and baserendere name
+    // Second the normaly not needed integer information from the GUI Event (type, state, button, key)
+    // Third the koordinated 3D and the relativ 2D
+    static bool MapEvent(signed int id, const char* sender, int Etype, int Estate, int EButtonState, int key, float w1,float w2,float w3,float d0,float d1);
 
     //##Documentation
     //## maps the Event in m_EventDescription with the ID
@@ -106,7 +112,7 @@ namespace mitk {
     //## Search strategy:
     //## \li try environment variable "MITKCONF" (path to "StateMachine.xml")
     //## \li try "./StateMachine.xml"
-    //## \li try via source directory (using MITKROOT from cmake-created 
+    //## \li try via source directory (using MITKROOT from cmake-created
     //## mitkConfig.h) "MITKROOT/Interactions/mitkBaseInteraction/StateMachine.xml"
     static bool LoadStandardBehavior();
 
@@ -143,6 +149,9 @@ namespace mitk {
     //##Documentation
     //## @brief converts the strings given by the XML-Behaviour-File to int
     inline const int convertConstString2ConstInt(std::string input);
+//    static std::string Convert2String(int input);
+//    static std::string Convert2String(double input);
+//    static std::string Convert2String(float input);
 
     //##Documentation
     //## @brief maps the strings to int for convertion from XML-Behaviour-File
@@ -183,6 +192,7 @@ namespace mitk {
     static const std::string EVENTS;
     //##
     static const std::string EVENT;
+
   };
 } // namespace mitk
 

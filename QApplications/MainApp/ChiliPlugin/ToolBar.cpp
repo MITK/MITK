@@ -17,21 +17,25 @@ ToolBar::ToolBar(QWidget* parent,QcPlugin* qcplugin)
     toolbar->setMaximumHeight(40);
     layout=new QGridLayout(parent,2,0,0,0);
     toolbar->setExclusive(true);
-    
-    layout->addWidget(toolbar,2,0); 
-    
+
+    layout->addWidget(toolbar,2,0);
+
     QGridLayout* layout2=new QGridLayout(toolbar,1,6,5);
-   
-    for(int i=1;i<7;++i)
+
+    for(int i=1;i<8;++i)
     {
-      QPushButton* button= new QPushButton(QString("%1").arg(i), toolbar);
+      //QPushButton* button= new QPushButton(QString("LightBox %1").arg(i), toolbar,QString("toolbarSelectLightBox%1").arg(i).latin1());
+      QPushButton* button= new QPushButton(toolbar, QString("toolbarSelectLightBox%1").arg(i).latin1());
       button->setToggleButton(true);
+      //button->setName(QString("toolbarSelectLightBox%1").arg(i).latin1());
       layout2->addWidget(button,1,i-1);
       toolbar->insert(button,i);
     }
-    
-    toolbar->find(5)->setText(QString("re-initialize"));
-    toolbar->find(6)->setText(QString("mode multi"));
+
+    toolbar->find(5)->setText(QString("Reinitialise"));
+    toolbar->find(6)->setText(QString("Multi-Mode"));
+    toolbar->find(7)->setText(QString("Conference INFO"));
+
     for (int i=1;i<5;++i)
       connect(toolbar->find(i),SIGNAL(toggled(bool)),this,SLOT(ButtonToggled(bool)));
     connect(toolbar->find(5),SIGNAL(toggled(bool)),this,SLOT(Reinitialize(bool)));
@@ -41,8 +45,8 @@ ToolBar::ToolBar(QWidget* parent,QcPlugin* qcplugin)
 
 ToolBar::~ToolBar()
 {
-  
-}       
+
+}
 
 QButtonGroup* ToolBar::GetToolBar()
 {
@@ -63,11 +67,11 @@ void ToolBar::ConnectButton(int number)
 {
   for (int i=1;i<=number;++i)
     toolbar->find(i)->show();
-    
+
   for (int i=number+1;i<5;++i)
     toolbar->find(i)->hide();
   /////itkGenericOutputMacro(<<"connect buttons");
-} 
+}
 
 void ToolBar::Reinitialize(bool on)
 {
@@ -76,7 +80,7 @@ void ToolBar::Reinitialize(bool on)
     if (on)
     {
       toolbar->setButton(idLightbox+1);
-    } 
+    }
     /////itkGenericOutputMacro(<<"reinitialize");
   }
   else
@@ -87,7 +91,7 @@ void ToolBar::Reinitialize(bool on)
 }
 
 void ToolBar::ButtonToggled(bool on)
-{   
+{
   if (!toolbar->find(6)->isOn())
   {
     if (on)
@@ -102,7 +106,7 @@ void ToolBar::ButtonToggled(bool on)
     emit ChangeWidget();
     for(int i=1;i<5;++i)
       if (toolbar->find(i)->isOn())
-          SelectLightbox(i-1);    
+          SelectLightbox(i-1);
   }
 }
 
@@ -112,7 +116,7 @@ void ToolBar::SelectLightbox(int id)
     QcLightboxManager *lbm=plugin->lightboxManager();
     QPtrList<QcLightbox> list;
     QcLightbox* lb;
-    list=lbm->getLightboxes();  
+    list=lbm->getLightboxes();
     lb=list.take(idLightbox);
     emit LightboxSelected(lb);
     /////itkGenericOutputMacro(<<"select lightbox");
@@ -123,7 +127,7 @@ void ToolBar::ToolbarMode(bool on)
   if (on)
   {
     toolbar->setExclusive(false);
-    emit ChangeWidget();    
+    emit ChangeWidget();
   }
   else
   {

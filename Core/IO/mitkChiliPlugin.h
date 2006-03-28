@@ -30,6 +30,9 @@ typedef enum
   MITKc = 0,
   QTc,
   LAUNCHc,
+  ARRANGEc,
+  TOKENREQUESTc,
+  TOKENSETc,
   TEXTc,
 } ConfMsgType;
 

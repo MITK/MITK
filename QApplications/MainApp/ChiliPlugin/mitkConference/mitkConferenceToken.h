@@ -1,33 +1,70 @@
 #ifndef MITK_CONFERENC_TOKEN
 #define MITK_CONFERENC_TOKEN
 
-#include <itkObject.h>
-
 namespace mitk
 {
-/*
-typedef enum
-{
-  succes=1,
-  trylater= 2,
-  networkerror= 30,
-  networktimeout= 31,
-}state;
-*/
 
-class ConferenceToken : public itk::Object
-{
-  public:
-    ConferenceToken();
-    ~ConferenceToken();
-    bool HaveToken();
-    bool GetToken();
+  class ConferenceToken 
+  {
+    public:
+      ConferenceToken();
+      ~ConferenceToken();
 
-  private:
-    //Use only one global token
-    static bool m_Token;
-    static int m_Ref;
-};
+      /* Token at hand.
+       * returns the token state.
+       */
+      bool HaveToken();
+
+      /* Instance call of ConferenceToken.
+       * Every Application holds only one instance of the token.
+       */
+      static ConferenceToken* GetInstance();
+
+      /* Request for token used by Application.
+       *   will call the conference factory call to hand on the request to all participants
+       */
+      void GetToken();
+
+
+      /* Request for token used by conference factory to pass the token request.
+       *  if availible the token will be removed by the token holder and sended to the requesting conference partner. 
+       *  if the token is not availible nothing take place
+       */
+      void GetToken(int long tokenRequester);
+
+
+      /* Give token to the requester .
+       * if the id is equal to the application own the conference apllication will get the token.
+       */
+      void SetToken(int long tokenReceiver);
+
+
+      /* initial call to create exactly one global token for the conference.
+       * th function will call the conference factory to pass the own random created application id
+       */   
+      void ArrangeToken();
+
+
+      /* factory call from all other participants.
+       * the token goes to the participant with the lowest id.
+       */
+      void ArrangeToken(long int);
+
+
+    private:
+      //Use only one global token
+      static bool m_Token;
+      // static int m_Ref;
+      static long int m_Unique;
+      static ConferenceToken* m_Instance;
+
+
+      /* Create Random Integer.
+       *
+       */
+      static long int Random();
+
+  };
 
 }
 #endif

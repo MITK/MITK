@@ -5,19 +5,15 @@
 #include <qstring.h>
 #include <string>
 
-//#include <Applications/MITKSampleApp/QcMITKSamplePlugin.h>
 
 
-
-/** Collects all kind of QT Events.
+/** Collects all kind of QT events.
  * To collect events like like Actions to include in your application use.
  * #include <qapplication.h>
  * qmitk::EventCollector* logger = new qmitk::EventCollector();
  * qApp->installEventFilter(logger);
- * PROGRESS in work!
+ * 
  */
-
-
 
 class EventCollector : public QObject
 {
@@ -26,23 +22,28 @@ class EventCollector : public QObject
   public:
     EventCollector( QObject * parent = 0, const char * name = 0 );
     virtual ~EventCollector();
+    static bool PostEvent(QString, QWidget* w);
 
 
   protected:
+    QString Event2String( QEvent* event);
     virtual bool eventFilter( QObject *o, QEvent *e );
     void SetMousePressed(bool b);
     bool IsMousePressed();
     void SetKeyDown(bool b);
     bool IsKeyDown();
-    QString GetObjectValue(QObject* o, QObject* o2);
-    QString Object2String( QEvent::Type event, QObject* o);
-    void StringChangeObject( const QString &s );
-    void SetEventObject(QObject * o);
+    QString Object2String( QEvent::Type eid, QObject* o);
     QObject * GetEventObject();
+
   private:
-    bool m_MousePressed;
-    bool m_KeyDown;
+    QString GetObjectValue( QObject* o2);
+    static bool SetObjectValue( QObject * o, QString className, QString value, QString value2 );
+    static bool m_ReadyToSend;
+    static bool m_PostedEvent;
     QObject* m_EventObject;
+    QEvent*  m_Event;
+    static QString m_EventStr;
+    static QEvent::Type m_EventID;
 
 };
 

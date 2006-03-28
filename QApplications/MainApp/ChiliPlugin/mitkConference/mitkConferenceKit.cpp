@@ -6,11 +6,15 @@ namespace mitk{
 
   ConferenceKitFactory* ConferenceKit::m_ConferenceKitFactory = NULL;
 
+  /* Set the factory instance for further use.
+   */
   void ConferenceKit::SetFactory( ConferenceKitFactory* factory )
   {
     m_ConferenceKitFactory = factory;
   };
 
+  /* Returns the ConferenceKit instance to create the specific products.
+   */
   ConferenceKit*
   ConferenceKit::GetInstance()
   {
@@ -18,20 +22,10 @@ namespace mitk{
     {
       if (m_ConferenceKitFactory)
       {
-           //m_ConferenceKitFactory = ChiliConferenceKitFactory::CreateConferenceKit()
-           //Weakpointer for casting to itkSmartPointer
-//           itk::WeakPointer wp = itk::WeakPointer::New();
-//           wp = m_ConferenceKitFactory.CreateConferenceKit();
-//           m_Instance = wp;
           m_Instance = m_ConferenceKitFactory->CreateConferenceKit();
       }
     }
     return m_Instance;
   }
-
- //   virtual void Launch() = 0;
- //   virtual void Close() = 0;
- //   virtual void UpdateMe() = 0;
- //   virtual void SendMITK() = 0;
 
 }//namespace

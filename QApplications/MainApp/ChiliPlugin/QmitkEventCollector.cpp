@@ -1,9 +1,12 @@
-#include "QmitkEventCollector.h"
+#include <QmitkEventCollector.h>
 #include <qevent.h>
-#include <qobject.h>
+#include <qpoint.h>
+#include <qpushbutton.h>
+#include <qtabbar.h>
+#include <qcombobox.h>
 #include <iostream>
 
-//#include <fstream.h>
+#include <qapplication.h>
 #include <qcheckbox.h>
 #include <qlineedit.h>
 #include <qlistbox.h>
@@ -12,219 +15,548 @@
 #include <qstringlist.h>
 #include <qrangecontrol.h>
 #include <qvaluelist.h>
-#include <qapplication.h>
 #include <qpoint.h>
 #include <qobjectlist.h>
+#include <qlistview.h>
+#include <qwidget.h>
+#include <qwidgetlist.h>
 
-//#include <mitkConferenceToken.h>
-//#include <mitkConferenceKitFactory.h>
+#include <mitkConferenceToken.h>
 #include <mitkConferenceKit.h>
 #include <stdlib.h>
 
+
 EventCollector::EventCollector( QObject * parent, const char * name)
-    : QObject(parent, name), m_EventObject(NULL),m_KeyDown(false),m_MousePressed(false) {};
+    : QObject(parent, name), m_EventObject(NULL),m_Event(NULL) {};
 EventCollector::~EventCollector() {};
 
 
-bool EventCollector::eventFilter( QObject *o, QEvent *e )
+bool EventCollector::m_PostedEvent = false;
+bool EventCollector::m_ReadyToSend = false;
+QString EventCollector::m_EventStr = "";
+QEvent::Type EventCollector::m_EventID =QEvent::MouseMove ;
+
+const QString Seperator = QString("&&");
+
+
+bool
+EventCollector::eventFilter( QObject *o, QEvent *e )
 {
-  std::ostream &logFile=std::cout;
-  //std::ofstream logFile("/home/hasselberg/chiliTele.ses", std::ios::app);
-  //std::ofstream logFile("chiliTele.ses", std::ios::app);
+  mitk::ConferenceToken* ct = mitk::ConferenceToken::GetInstance();
 
-
-//   mitk::ConferenceToken* cf = new mitk::ConferenceToken;
-//   if(!cf->HaveToken())
-//   {
-//
-//     if(!cf->GetToken())
-//     {
-//       logFile<<"q_TOKEN: "<<"FALSE"<<std::endl;
-//       return false;
-//     }
-//     logFile<<"q_TOKEN: "<<"get it"<<std::endl;
-//   }
-
-  if(e->type()==5) return false; //no MouseMove yet
-
-  //create Object for having a look in the event history
-  QString value="undefined";
-  //Unterscheidung zwischen System Events und selbsterstellten...
-
-  if( this->m_EventObject != NULL )
+  if(m_ReadyToSend)
   {
-    //QWidget Value of interesst -QLine, QCheckBox...
-    QString complete = Object2String(e->type(), o);
-    if( complete.isNull() )
-      std::cout<<"1_-_-_NULL"<<std::endl;
-    else
+    if ( !QString("QGLWidget").compare( QString(m_EventObject->className()) ) )
+      if( m_EventID != QEvent::Wheel )
+      {
+        //std::cout<<"QmitkEventCollector::eventFilter() im MITK Widget und deshalb nicht weiter interessant"<<std::endl;
+        m_ReadyToSend = false;
+        return false;
+      }
+
+    QString complete = m_EventStr;   // field 0 - 3 
+    complete += GetObjectValue( m_EventObject ); // field 4 - 5
+    complete += Object2String( m_EventID, m_EventObject ); //field 6 - ??
+    //std::cout<<"QmitkEventCollector::eventFilter(): JETZT WIRD GESENDET: "<<complete.latin1()<<std::endl;
+
+    mitk::ConferenceKit* ck = mitk::ConferenceKit::GetInstance();
+    if( ck != NULL )
     {
-       //Teleconfenrence -->send to XXX
-       mitk::ConferenceKit* ck = mitk::ConferenceKit::GetInstance();
-       ck->SendQt( complete.latin1() );
-     // //StringChangeObject(complete);
+      ck->SendQt( complete.latin1() );
     }
 
-    this->SetEventObject( NULL );
+    m_ReadyToSend = false;
   }
 
-  switch( e->type() )
+  //only for this events will be handled here other wise return to event handler
+  if( e->type() != QEvent::MouseButtonDblClick &&
+      e->type() != QEvent::MouseButtonPress &&
+      e->type() != QEvent::MouseButtonRelease &&
+      e->type() != QEvent::KeyPress &&
+      e->type() != QEvent::KeyRelease &&
+      e->type() != QEvent::Wheel
+      ) return false;
+
+  //Events sended from PostEvent() will not be handled here.
+  if(m_PostedEvent)
   {
-    case QEvent::MouseButtonPress: logFile << "MouseButtonPress"<<std::endl; SetMousePressed(true); break;
-    case QEvent::KeyPress: logFile << "KeyPress"<<std::endl; SetKeyDown(true); break;
-    //case QEvent::MouseMove:logFile << "MouseMove"; break;
-    case QEvent::KeyRelease: logFile << "KeyRelease";
-    case QEvent::MouseButtonRelease: logFile << "MouseButtonRelease ->";
-                if(IsMousePressed() || IsKeyDown())
-                {
-                  this->SetEventObject(o);
-                  logFile << " Object Gesetzt gespeichert!";
-                }
-                SetMousePressed(false);
-                SetKeyDown(false);
-                logFile<<std::endl;
-                break;
-
-    //case QEvent::MouseButtonDblClick: logFile << "MouseButtonDblClick"; break;
-    //case QEvent::Wheel: logFile<< "MouseWhele"; break;
-    //case QEvent::Accel: logFile<< "Wahrscheinlich Shortcut"; break;
-    default: ;//logFile<<std::endl;
+    m_PostedEvent = false;
+    return false;
   }
 
-  //logFile<<std::endl;
+  // Spontaneous events are created by the OS
+  if( !e->spontaneous() ) return false;
+
+
+  if( !ct->HaveToken() )
+  {
+      //std::cout<<"QmitkEventCollector::eventFilter() try getting token"<<std::endl;
+      ct->GetToken();
+  }
+
+
+  // Neccesary because some internal QT-Objects are named equal.
+  // so there is the posibility to use the hirachy for some hidden
+  // objects. in this case the hirachie will be shifted here.
+  // QViewPortWidget<-QListBox<-QComboBox
+  // The QComboBox is the only object with a epxlicitly set name
+  if ( !QString(o->className()).compare("QViewportWidget") ||
+       !QString(o->name()).compare("in-combo") ||
+       ( !QString(o->name()).compare("controls") && !QString(o->className()).compare("QSpinWidget")) 
+     )
+  {
+    m_EventObject = o->parent();
+    //std::cout<<"QmitkEventCollector::eventFilter() EVENT OBJECT set to parent..."<<m_EventObject->name()<<std::endl;
+  }
+  else
+  {
+    m_EventObject = o;
+  }
+  m_EventStr    = Event2String( e ) + Seperator;
+  m_EventID     = e->type();
+  m_ReadyToSend = true;
 
   return false;
 }
 
-QString EventCollector::GetObjectValue( QObject * o, QObject * o2 )
+bool
+EventCollector::SetObjectValue( QObject* o, QString className, QString value, QString value2 )
 {
-  QString objvalue="";
+
+  if (!value.compare("NULL")) return true;
+
+  if(!className.compare("QLineEdit"))
+  {
+    // QLineEdit
+    QLineEdit *qle = dynamic_cast<QLineEdit *>(o);
+    if ( qle )
+      qle->setText(value);
+  }
+//  else if( !className.compare( "QListView" ) )
+//  {
+//    QListView* qlv = dynamic_cast<QListView *>(o);
+//    if ( qlv )
+//    {
+//      qlv->setCurrentItem( qlv->findItem(QString(""),value2.toInt(),ExactMatch) );
+//      qlv->setSelected ( qlv->findItem(QString(""),value2.toInt()), true );
+//    }
+//  }
+  else if ( value.isEmpty() )
+  {
+    return true;
+  }
+
+  //std::cout<<"QmitkEventCollector::SetObjectValue(): "<<value.latin1()<<std::endl;
+
+  //QSlider
+  if(!className.compare("QSlider"))
+  {
+    QSlider *qs = dynamic_cast<QSlider *>(o);
+    if ( qs )
+      qs->setValue(value.toInt());
+  }
+  else if(!className.compare("QSpinBox") )
+  {
+    //QSpinBox
+    QSpinBox *qsb = dynamic_cast<QSpinBox *>(o);
+    if ( qsb )
+      qsb->setValue(value.toInt());
+     // std::cout<<"EventCollector::SetObjectValue(): QSpinBox oder QSpinWidget = "<<value.latin1()<<std::endl;
+  }
+  else if(!className.compare("QListBox"))
+  {
+    //QListBox
+    QListBox *qlb =dynamic_cast<QListBox *>(o);
+    if ( qlb )
+      qlb->setSelected(value.toInt(),true);
+  }
+  else if(!className.compare("QCheckBox"))
+  {
+    // QCheckBox
+    QCheckBox *qcb = dynamic_cast<QCheckBox *>(o);
+    if ( qcb )
+    {
+      bool v = (value.toInt() == 1)?true:false;
+      if(v == qcb->isChecked() ) return false;
+    }
+  }
+//  else if( className.find("Button",0) > 0 )
+//  {
+//  }
+  else if ( !className.compare("QTabBar") )
+  {
+    QTabBar* qtb = dynamic_cast<QTabBar *>(o);
+    if ( qtb )
+    {
+      qtb->setCurrentTab( value.toInt() );
+    }
+  }
+  else if( !className.compare("QComboBox") )
+  {
+    QComboBox* qcb = dynamic_cast<QComboBox *>(o);
+    if ( qcb )
+      qcb->setCurrentItem(value.toInt());
+  }
+
+
+  return true;
+}
+
+QString
+EventCollector::GetObjectValue( QObject * o2 )
+{
+  QString objvalue;
   QString className = o2->className();
 
   //QSlider
   if(!className.compare("QSlider"))
   {
-    QSlider *qs = static_cast<QSlider *>(o2);
-    objvalue.number(qs->value());
+    QSlider *qs = dynamic_cast<QSlider *>(o2);
+    if( qs )
+      objvalue = QString("%1").arg(qs->value());
+    objvalue += Seperator;
   }
-
-  //QSpinBox
-  if(!className.compare("QSpinWidget") )
+  else if(!className.compare("QSpinBox") )
   {
-    QSpinWidget *qsb = static_cast<QSpinWidget *>(o2);
-    objvalue = (qsb->isDownEnabled())?"-1":"1";
+    //QSpinBox
+    QSpinBox *qsb = dynamic_cast<QSpinBox *>(o2);
+    if ( qsb )
+      objvalue = QString("%1").arg(qsb->value());
+    objvalue += Seperator;
   }
-
-  //QListBox
-  if(!className.compare("QListBox"))
+  else if(!className.compare("QListBox"))
   {
-    QListBox *qlb =static_cast<QListBox *>(o2);
-    objvalue = objvalue.number(qlb->currentItem());
+    //QListBox
+    QListBox *qlb =dynamic_cast<QListBox *>(o2);
+    if (qlb )
+      objvalue = QString("%1").arg(qlb->currentItem());
+    objvalue += Seperator;
   }
-
-  // QLineEdit
-  if(!className.compare("QLineEdit"))
+  else if(!className.compare("QLineEdit"))
   {
-    QLineEdit *qle = static_cast<QLineEdit *>(o2);
-    objvalue = qle->text();
+    // QLineEdit
+    QLineEdit *qle = dynamic_cast<QLineEdit *>(o2);
+    if ( qle )
+      objvalue = qle->text();
+    objvalue += Seperator;
   }
-
-  // QCheckBox
-  if(!className.compare("QCheckBox"))
+  else if(!className.compare("QCheckBox"))
   {
-    QCheckBox *qcb = static_cast<QCheckBox *>(o2);
-    objvalue = (qcb->isChecked())?'1':'0';
+    // QCheckBox
+    QCheckBox *qcb = dynamic_cast<QCheckBox *>(o2);
+    if ( qcb )
+      objvalue = (qcb->isChecked())?'1':'0';
+    objvalue += Seperator;
   }
-
-  // for all *Button
-  QString button = className.right(6);
-  //std::cout<<button<<className<<std::endl;
-  if(!button.compare("Button"))
+  else if( className.find("Button",0) > 0 )
   {
-    QButton *qb = static_cast<QButton *>(o);
-    QButton::ToggleState state = qb->state();
-    if(state==QButton::On) objvalue='2';
-    else if(state==QButton::NoChange) objvalue='1';
-    else if(state==QButton::Off) objvalue='0';
-
+    // for all *Button
+    QButton *qb = dynamic_cast<QButton *>(o2);
+    if ( qb )
+      objvalue = QString("%1").arg((int)qb->state());
+    objvalue += Seperator;
     }
+  else if ( !className.compare("QTabBar") )
+  {
+    QTabBar* qtb = dynamic_cast<QTabBar *>(o2);
+    if ( qtb )
+      objvalue = QString("%1").arg(qtb->currentTab());
+    objvalue += Seperator;
+  }
+  else if( !className.compare("QComboBox"))
+  {
+    QComboBox* qcb = dynamic_cast<QComboBox *>(o2);
+    if ( qcb )
+      objvalue = QString("%1").arg(qcb->currentItem());
+    objvalue += Seperator;
+  }
+  else if( !className.compare("QListBox") )
+  {
+    QListBox* qlb = dynamic_cast<QListBox *>(o2);
+    if ( qlb )
+      objvalue = QString("%1").arg(qlb->currentItem());
+    objvalue += Seperator;
+  }
+//  else if( !className.compare("QListView") )
+//  {
+//    QListView* qlv = dynamic_cast<QListView *>(o2);
+//    if ( qlv )
+//    {
+//      QListViewItem* qlvi = qlv->selectedItem();
+//      objvalue  = QString("%1").arg( qlvi->text( qlv->itemPos( qlvi ) ) );
+//      objvalue += Seperator;
+//      objvalue += QString("%1").arg( qlv->itemPos( qlv->selectedItem() ) );
+//    }
+//  }
 
-  return objvalue;
+  return (objvalue.isNull())?QString("NULL" + Seperator ):objvalue;
 }
 
-void EventCollector::SetKeyDown(bool b) { this->m_KeyDown = b; };
 
-bool EventCollector::IsKeyDown() {return this->m_KeyDown; };
-
-void EventCollector::SetMousePressed(bool b) { this->m_MousePressed = b; };
-
-bool EventCollector::IsMousePressed() {return this->m_MousePressed; };
-
-void EventCollector::SetEventObject(QObject * o){  this->m_EventObject = o; };
-
-QObject* EventCollector::GetEventObject(){ return this->m_EventObject; };
-
-QString EventCollector::Object2String( QEvent::Type event, QObject* o)
+QString
+EventCollector::Object2String( QEvent::Type eventid, QObject* o)
 {
-  const QString sep = QString("&&");
   QStringList objlist;
-  QString seventid;
-  seventid = seventid.setNum(event);
-  objlist += seventid;
+
+  //Parent information
+  QObject *po = o->parent();
+  if( po )
+  {
+    //GrandParent
+    QObject* gpo = po->parent();
+    if(gpo)
+    {
+      objlist += gpo->className();
+      objlist += gpo->name();
+    }
+    objlist += po->className();
+    objlist += po->name();
+  }
+  
   objlist += o->className();
   objlist += o->name();
 
-   QObject * o2 = new QObject;
-   o2=this->GetEventObject();
-   if(o2==NULL) return NULL;
-   QString value = GetObjectValue(o, o2);
-   //if(value.isNull()) return NULL;
-   if(value.isEmpty()) return NULL;
-   objlist += value;
 
-  return objlist.join(sep);
-};
+  return objlist.join(Seperator);
+}
 
-void EventCollector::StringChangeObject( const QString &s )
+QString
+EventCollector::Event2String(QEvent* event)
 {
   QStringList objlist;
-  objlist = objlist.split ( QString("&&") , s, true );
-  std::cout<<s.latin1()<<std::endl;
 
-  QStringList::Iterator it = objlist.begin();
+  // 1. Event Type
+  objlist = QString("%1").arg(event->type());
 
-  QEvent::Type event_t = (QEvent::Type )( *it).toInt();
-  QString inheritclass = (*objlist.at(1));
-  QString objectname   = (*objlist.at(2));
-  QString value        = (*objlist.at(3));
+   // if MouseEvent
+   if(event->type() == QEvent::MouseButtonPress || event->type() == QEvent::MouseButtonRelease )
+   {
+     // 2. M Button
+     int button_ = static_cast<QMouseEvent *>(event)->button();
+     objlist += QString("%1").arg(button_);
+     // 3. M State
+     int state_ =static_cast<QMouseEvent *>(event)->state();
+     objlist += QString("%1").arg(state_);
+     //4. empty field
+     objlist += "";
+   }
+   else if ( event->type() == QEvent::KeyPress || event->type() == QEvent::KeyRelease )
+   {
+     // 2. Key
+     int key_ = static_cast<QKeyEvent *>(event)->key();
+     objlist += QString("%1").arg(key_);
+     // 3. ASCII
+     int ascii_ = static_cast<QKeyEvent *>(event)->ascii();
+     objlist += QString("%1").arg(ascii_);
+     // 4. State
+     int state_ = static_cast<QKeyEvent *>(event)->state();
+     objlist += QString("%1").arg(state_);
 
+   }
+   else if ( event->type() == QEvent::Wheel )
+   {
+     // 2. Wheel delta rotation
+     int delta_ = static_cast<QWheelEvent *>(event)->delta();
+     objlist += QString("%1").arg(delta_);
+     // 3. Wheel orientation
+     int orientation_ = static_cast<QWheelEvent *>(event)->orientation();
+     objlist += QString("%1").arg(orientation_);
+     // 4. Wheel State
+     int state_ = static_cast<QWheelEvent *>(event)->state();
+     objlist += QString("%1").arg(state_);
+   }
 
-  QObjectList *l = qApp->queryList( inheritclass, objectname );
-  QObjectListIterator iter( *l ); // iterate over all objects
-  QObject *obj;
-
-  if(obj = iter.current())
-    std::cout << "Erfolg: " << obj->name() << iter.count() << std::endl;
-  //while ( (obj = it.current()) != 0 ) {
-  //  // for each found object...
-  //  ++it;
-  //  ((QButton*)obj)->setEnabled( FALSE );
-  //}
-  delete l; // delete the list, not the objects
-
-  //QString object = (*objlist.at(1)).latin1();
-  //for ( QStringList::Iterator it = objlist.begin(); it != objlist.end(); ++it )
-  //{
-  //  std::cout<<(*it).latin1()<<" : ";
-  //}
-  //std::cout << std::endl;
-  //QPoint pos(1,1);
-  //QMouseEvent me( QEvent::MouseButtonPress, pos, 0, 0 );
-  /*if(QApplication::sendEvent( , &me ))
-    std::cout << "Event return bool" << std::endl;
-  else
-    std::cout << "Event return false" << std::endl;
-*/
+  return objlist.join(Seperator);
 };
 
+
+bool
+EventCollector::PostEvent(QString str, QWidget* w)
+{
+  QObject* aObject = NULL;
+  
+  //encrypt string
+  QStringList objlist;
+  objlist = objlist.split ( Seperator , str, true );
+
+
+  //QEvent::Type event_t = (QEvent::Type )( *it).toInt();
+  QEvent::Type event_t  = (QEvent::Type )(*objlist.at(0)).toInt();
+  int event_v1          = (*objlist.at(1)).toInt();
+  int event_v2          = (*objlist.at(2)).toInt();
+  int event_v3          = (*objlist.at(3)).toInt();
+  
+  QString value              = (*objlist.at(4));
+  QString value2             = (*objlist.at(5));
+
+  
+  QStringList::Iterator it = objlist.begin();
+  for(int i=0; i<5; i++)
+    ++it;
+ 
+  // in dependence to the number of hierachie values sended this 
+  // loop will try to follow the structure of the Qt-object tree.
+  // if this for reasans like naming is not possible this loop will try
+  // to find an child of the allready configuered objects.
+  // NOTE: this is importent because uses fixed names for some sub objects.
+  //       only following the tree can identify the object of the desired event.
+  QString oName ;
+  QString oClass;
+  while( objlist.end() != it++ && objlist.end()!=it++ )
+  {
+    
+    oName  = *(--it);
+    oClass = *(--it);
+    ++it; 
+    ++it;
+    
+    if( aObject == NULL )
+    {
+      QObjectList *pl = w->queryList( oClass, oName  );
+      QObjectListIt p_iter( *pl );
+
+      if ( p_iter.count() == 1 )
+      {
+        aObject = p_iter.current();
+        //std::cout<<"aObject war NULL jetzt: "<<oClass<<" --> "<< oName <<std::endl;
+      }
+      else
+      {
+        //std::cout<<"aObject BLEIBT NULL (iterator): "<<oClass<<" --> "<< oName <<std::endl;
+      }
+      delete pl;
+    }
+    else
+    {
+      QObjectList *pl = aObject->queryList( oClass, oName  );
+      QObjectListIt p_iter( *pl );
+      
+      if ( p_iter.count() == 1 )
+      {
+        aObject = p_iter.current();
+        //std::cout<<"aObject hat ein Kind: "<<oClass<<" --> "<< oName <<std::endl;
+      }
+      else
+      {
+        QObjectList *pl1 = w->queryList( oClass, oName  );
+        QObjectListIt p_iter( *pl1 );
+      
+        if ( p_iter.count() == 1 )
+        {
+          aObject = p_iter.current();
+          //std::cout<<"aObject hatte KEIN Kind aber eindeutige Klasse vom Sample Widget: "<<oClass<<" --> "<< oName <<std::endl;
+        }
+        else
+        {       
+          //last try child from last aObject
+          if( p_iter.count()>1 )            
+          {
+            // if there is no child with this characterisation in last instance there will be only NULL in the Object
+            aObject = aObject->child( oName, oClass, false );
+            //std::cout<<"aObject last TRY: "<<oClass<<" --> "<< oName <<std::endl;
+          }
+          else
+          {
+            std::cout<<"DIESEN TYP GIBT ES IN DER GANZEN APP NICHT: "<<oClass<<" --> "<< oName <<std::endl;
+            aObject = NULL;
+          }
+        }
+        delete pl1;
+      }
+      delete pl;    
+    }
+  }
+  if( !aObject )
+  {
+    //last possibilitie for stuff from outside widgets if there is the following keyword we will search all widgets.
+    if( oName.find("TeleConference123",0) > 0 )
+    {
+      // Show all hidden top level widgets.
+      QWidgetList  *list = qApp->topLevelWidgets();
+      QWidgetListIt w_it( *list );  // iterate over the widgets
+      QWidget * wExt;
+      while ( (wExt=w_it.current()) != 0 ) {   // for each top level widget...
+        ++w_it;
+        QObjectList *l = wExt->queryList( oClass, oName  );
+        QObjectListIt p_iter( *l );
+//        std::cout<<"EXTERN: "<<oClass<<" --> "<<oName<<" ( "<<p_iter.count()<<" )"<<wExt->name()<<std::endl;
+        if ( p_iter.count() == 1 )
+        {
+          aObject = p_iter.current();
+          delete l;
+          break;
+        }
+        delete l;
+         
+      }
+      delete list;                // delete the list, not the widgets
+    }
+  }
+  
+  bool send;
+  if(aObject)
+  {
+    std::cout<<"POST: "<<aObject->className()<<" --> "<< aObject->name()<<std::endl;
+    // use global exception for wheel events send. mitkEventMapper will use the not handle wheel events!
+    if( aObject->inherits( "QGLWidget" ) && event_t!=QEvent::Wheel )
+    {
+      //std::cout<<"QmitkEventCollector::PostEvent() WEG mit MITK WIDGET EVENTS"<<std::endl;
+      return false;
+    }
+
+    if( event_t == QEvent::MouseButtonRelease || event_t == QEvent::KeyRelease || event_t == QEvent::MouseButtonDblClick )
+    {
+      if( !SetObjectValue( aObject, QString(aObject->className()), value, value2 ))
+      {
+        //std::cout<<"QmitkEventCollector::PostEvent() THIS EVENT has no effect..."<<std::endl;
+        return false;
+      }
+    }
+
+    if(event_t == QEvent::MouseButtonRelease || event_t == QEvent::MouseButtonPress || event_t == QEvent::MouseButtonDblClick )
+    {
+      Qt::ButtonState bsButton = (Qt::ButtonState) event_v1;
+      Qt::ButtonState bsState  = (Qt::ButtonState) event_v2;
+
+      QMouseEvent* me = new QMouseEvent( event_t, QPoint(2,2), bsButton, bsState);
+
+      //std::cout<<"QmitkEventCollector::PostEvent() _mouse_ TRY POSTING TO qApp"<<std::endl;
+      qApp->postEvent(aObject, me);
+      m_PostedEvent = true;
+      send = true;
+    }
+    else if ( event_t == QEvent::KeyPress || event_t == QEvent::KeyRelease )
+    {
+       int key   =  event_v1;
+       int ascii =  event_v2;
+       Qt::ButtonState bsState =  (Qt::ButtonState) event_v3;
+
+       QKeyEvent* ke = new   QKeyEvent(event_t, ascii, key, bsState );
+
+       //std::cout<<"QmitkEventCollector::PostEvent() _key_ TRY POSTING TO qApp"<<std::endl;
+       qApp->postEvent(aObject, ke);
+       m_PostedEvent = true;
+       send = true;
+    }
+    else if( event_t == QEvent::Wheel )
+    {
+       int delta_ =  event_v1;
+       int state_  =  event_v2;
+       Qt::Orientation orientation_ =(Qt::Orientation) event_v3;
+
+       QWheelEvent* turn = new QWheelEvent ( QPoint(10,10), delta_, state_, orientation_ );
+
+       qApp->postEvent( aObject, turn );
+       m_PostedEvent = true;
+       send = true;
+    }
+  }
+  else
+  {
+    std::cout<<" EVENT Konnte nicht zugeordnet werden - "<<std::endl;
+    send = false;
+  }
+
+  return send;
+}
 

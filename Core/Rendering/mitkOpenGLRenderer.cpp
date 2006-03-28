@@ -334,7 +334,7 @@ void mitk::OpenGLRenderer::Repaint( bool onlyOverlay )
   if ( onlyOverlay )
   {
     glDisable(GL_BLEND);
-    glDrawPixels( m_Size[1], m_Size[0], GL_BGRA, GL_UNSIGNED_BYTE, (const GLvoid*)m_PixelMapGL);
+    glDrawPixels( m_Size[1], m_Size[0], GL_RGBA, GL_UNSIGNED_BYTE, (const GLvoid*)m_PixelMapGL);
     glEnable(GL_BLEND);
     
     this->DrawOverlay();
@@ -422,7 +422,7 @@ void mitk::OpenGLRenderer::Repaint( bool onlyOverlay )
       }
     }
 
-    glReadPixels(0,0, m_Size[1], m_Size[0], GL_BGRA, GL_UNSIGNED_BYTE, (GLvoid *) m_PixelMapGL);
+    glReadPixels(0,0, m_Size[1], m_Size[0], GL_RGBA, GL_UNSIGNED_BYTE, (GLvoid *) m_PixelMapGL);
 
     // Overlay the new rendering result
     this->DrawOverlay();

@@ -66,6 +66,7 @@ typedef FilterContextType::Pointer                    FilterContextPointer;
 typedef FilterContextType::StartPointDataQueueType    StartPointDataQueueType;
 typedef itk::StartPointData<ImageType>                StartPointDataType;
 typedef StartPointDataType::Pointer                   StartPointDataPointer;
+typedef StartPointDataType::VectorType                StartPointDataVectorType;
 
 typedef itk::TubeSegmentModel<PixelType>              TubeSegmentModelType;
 typedef TubeSegmentModelType::Pointer                 TubeSegmentModelPointer;
@@ -219,7 +220,7 @@ int testFilterContext()
   // init some test data
   StartPointDataType::PointType testPoint1;
   testPoint1.Fill(0);
-  DirectionType testDirection1;
+  StartPointDataVectorType testDirection1;
   testDirection1.Fill(0);
   StartPointDataPointer data1 = StartPointDataType::New();
   data1->SetStartPoint(testPoint1);
@@ -227,7 +228,7 @@ int testFilterContext()
 
   PointType testPoint2;
   testPoint2.Fill(1);
-  DirectionType testDirection2;
+  StartPointDataVectorType testDirection2;
   testDirection2.Fill(0);
   StartPointDataPointer data2 = StartPointDataType::New();
   data2->SetStartPoint(testPoint2);

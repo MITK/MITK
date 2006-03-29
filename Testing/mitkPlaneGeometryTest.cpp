@@ -605,8 +605,8 @@ int mitkPlaneGeometryTest(int argc, char* argv[])
 
   //set origin back to the one of the transversal slice:
   origin = clonedplanegeometry->GetOrigin();
-  std::cout << "Testing backside initialization: InitializeStandardPlane(clonedplanegeometry, planeorientation = Transversal, zPosition = 0, frontside=false): " <<std::endl;
-  planegeometry->InitializeStandardPlane(clonedplanegeometry, mitk::PlaneGeometry::Transversal, 0, false);
+  std::cout << "Testing backside initialization: InitializeStandardPlane(clonedplanegeometry, planeorientation = Transversal, zPosition = 0, frontside=false, rotated=true): " <<std::endl;
+  planegeometry->InitializeStandardPlane(clonedplanegeometry, mitk::PlaneGeometry::Transversal, 0, false, true);
   mitk::Point3D backsideorigin;
   backsideorigin=origin+clonedplanegeometry->GetAxisVector(1);//+clonedplanegeometry->GetAxisVector(2);
 

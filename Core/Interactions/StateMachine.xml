@@ -1,1847 +1,8 @@
-<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8"?>
 <!-- Event_Id = 0: this is a * transition with all other eventId's not declared in that state -->
 <mitkInteraktionStates xmlns="http://tempuri.org/StateMachine.xsd" STYLE="User001">
   <!-- ***WARNING*** do not use any &, % and so on in NAME -->
-  <!-- Behaviour of the AriadneAssistent -->
-  <stateMachine NAME="AriadneAssistent">
-    <state NAME="start" ID="1" START_STATE="TRUE">
-      <transition NAME="EV_INIT" NEXT_STATE_ID="2" EVENT_ID="5551001">
-        <action ID="55500010" /> <!--AC_INIT-->
-      </transition>
-    </state>
-    <state NAME="chooseApplication" ID="2">
-      <transition NAME="EV_PATH_COLLECTION_SELECTED" NEXT_STATE_ID="3" EVENT_ID="5551003">
-        <action ID="5550001" /> <!--AC_SET_NEXT_BUTTON_VISIBLE-->
-      </transition>
-      <transition NAME="EV_NAVIGATION_SELECTED" NEXT_STATE_ID="40" EVENT_ID="5551004">
-        <action ID="5550001" /> <!--AC_SET_NEXT_BUTTON_VISIBLE-->
-      </transition>
-    </state>
-    <state NAME="choosePathCollection" ID="3">
-      <transition NAME="EV_NEXT" NEXT_STATE_ID="4" EVENT_ID="5551007">
-        <action ID="5550003" /> <!--AC_SET_PREVIOUS_BUTTON_VISIBLE-->
-        <action ID="5550002" /> <!--AC_SET_NEXT_BUTTON_INVISIBLE-->
-        <action ID="5550005"> <!--AC_SET_ASSISTAND_WIDGET_STECK-->
-          <intParameter NAME="WIDGET_ID" VALUE="1" />
-        </action>
-      </transition>
-      <transition NAME="EV_NAVIGATION_SELECTED" NEXT_STATE_ID="40" EVENT_ID="5551004" />
-      <transition NAME="EV_INIT" NEXT_STATE_ID="2" EVENT_ID="5551001">
-        <action ID="55500010" /> <!--AC_INIT-->
-      </transition>
-    </state>
-    <state NAME="mountSensorForPathCollection" ID="4">
-      <transition NAME="EV_DONE" NEXT_STATE_ID="5" EVENT_ID="5551008">
-        <action ID="5550001" /> <!--AC_SET_NEXT_BUTTON_VISIBLE-->
-      </transition>
-      <transition NAME="EV_PREVIOUS" NEXT_STATE_ID="2" EVENT_ID="5551002">
-        <action ID="5550004" /> <!--AC_SET_PREVIOUS_BUTTON_INVISIBLE-->
-        <action ID="5550001" /> <!--AC_SET_NEXT_BUTTON_VISIBLE-->
-        <action ID="55500011" /> <!--AC_SET_APPLICATION_SELECTED_FALSE-->
-        <action ID="5550005"> <!--AC_SET_ASSISTAND_WIDGET_STECK-->
-          <intParameter NAME="WIDGET_ID" VALUE="0" />
-        </action>
-      </transition>
-      <transition NAME="EV_INIT" NEXT_STATE_ID="2" EVENT_ID="5551001">
-        <action ID="55500010" /> <!--AC_INIT-->
-      </transition>
-    </state>
-    <state NAME="sensorMountedForPathCollection" ID="5">
-      <transition NAME="EV_NEXT" NEXT_STATE_ID="7" EVENT_ID="5551007">
-        <action ID="5550002" /> <!--AC_SET_NEXT_BUTTON_INVISIBLE-->
-  <action ID="55500012" /> <!--AC_SENSOR_ATTACHED-->
-        <action ID="5550005"> <!--AC_SET_ASSISTAND_WIDGET_STECK-->
-          <intParameter NAME="WIDGET_ID" VALUE="2" />
-        </action>
-        <action ID="5550008"> <!--AC_CHECK_LANDMARK_COUNT-->
-          <intParameter NAME="MIN_COUNT" VALUE="3" />
-        </action>
-      </transition>
-      <transition NAME="EV_PREVIOUS" NEXT_STATE_ID="4" EVENT_ID="5551002">
-        <action ID="5550009" /> <!--AC_SET_DONE_FALSE-->
-        <action ID="5550002" /> <!--AC_SET_NEXT_BUTTON_INVISIBLE-->
-      </transition>
-      <transition NAME="EV_INIT" NEXT_STATE_ID="2" EVENT_ID="5551001">
-        <action ID="55500010" /> <!--AC_INIT-->
-      </transition>
-    </state>
-    <state NAME="setLandmarks" ID="6">
-      <transition NAME="EV_NEW_LANDMARK" NEXT_STATE_ID="7" EVENT_ID="5551009">
-        <action ID="5550008"> <!--AC_CHECK_LANDMARK_COUNT-->
-          <intParameter NAME="MIN_COUNT" VALUE="3" />
-        </action>
-      </transition>
-      <transition NAME="EV_PREVIOUS" NEXT_STATE_ID="4" EVENT_ID="5551002">
-        <action ID="5550005"> <!--AC_SET_ASSISTAND_WIDGET_STECK-->
-          <intParameter NAME="WIDGET_ID" VALUE="1" />
-        </action>
-        <action ID="5550009" /> <!--AC_SET_DONE_FALSE-->
-      </transition>
-      <transition NAME="EV_INIT" NEXT_STATE_ID="2" EVENT_ID="5551001">
-        <action ID="55500010" /> <!--AC_INIT-->
-      </transition>
-    </state>
-    <state NAME="checkCount" ID="7">
-      <transition NAME="EV_READY_FOR_COLLECTING_PATH" NEXT_STATE_ID="8" EVENT_ID="5551006">
-        <action ID="5550001" /> <!--AC_SET_NEXT_BUTTON_VISIBLE-->
-      </transition>
-      <transition NAME="EV_LESS_THEN_MIN_COUNT" NEXT_STATE_ID="6" EVENT_ID="5551005" />
-      <transition NAME="EV_INIT" NEXT_STATE_ID="2" EVENT_ID="5551001">
-        <action ID="55500010" /> <!--AC_INIT-->
-      </transition>
-    </state>
-    <state NAME="readyForCollectingPath" ID="8">
-      <transition NAME="EV_NEXT" NEXT_STATE_ID="9" EVENT_ID="5551007">
-        <action ID="5550005"> <!--AC_SET_ASSISTAND_WIDGET_STECK-->
-          <intParameter NAME="WIDGET_ID" VALUE="4" />
-        </action>
-        <action ID="55500014"> <!--AC_START_APPLICATION_TEXT-->
-          <stringParameter NAME="START_APPLICATION_TEXT" VALUE="Ariadne is now ready for path collection" />
-        </action>
-        <action ID="5550007"> <!--AC_SET_NEXT_BUTTON_TEXT-->
-          <stringParameter NAME="BUTTON_TEXT" VALUE="Start" />
-        </action>
-      </transition>
-      <transition NAME="EV_PREVIOUS" NEXT_STATE_ID="4" EVENT_ID="5551002">
-        <action ID="5550005"> <!--AC_SET_ASSISTAND_WIDGET_STECK-->
-          <intParameter NAME="WIDGET_ID" VALUE="1" />
-        </action>
-        <action ID="5550002" /> <!--AC_SET_NEXT_BUTTON_INVISIBLE-->
-        <action ID="5550009" /> <!--AC_SET_DONE_FALSE-->
-      </transition>
-      <transition NAME="EV_REMOVE_LANDMARK" NEXT_STATE_ID="7" EVENT_ID="5551010">
-        <action ID="5550002" /> <!--AC_SET_NEXT_BUTTON_INVISIBLE-->
-        <action ID="5550007"> <!--AC_SET_NEXT_BUTTON_TEXT-->
-          <stringParameter NAME="BUTTON_TEXT" VALUE=">" />
-        </action>
-        <action ID="5550008"> <!--AC_CHECK_LANDMARK_COUNT-->
-          <intParameter NAME="MIN_COUNT" VALUE="3" />
-        </action>
-      </transition>
-      <transition NAME="EV_INIT" NEXT_STATE_ID="2" EVENT_ID="5551001">
-        <action ID="55500010" /> <!--AC_INIT-->
-      </transition>
-    </state>
-    <state NAME="collectingPath" ID="9">
-      <transition NAME="EV_NEXT" NEXT_STATE_ID="2" EVENT_ID="5551007">
-        <action ID="55500013" /> <!--AC_CLOSE_ASSISTENT-->
-        <action ID="55500011" /> <!--AC_SET_APPLICATION_SELECTED_FALSE-->
-        <action ID="5550002" /> <!--AC_SET_NEXT_BUTTON_INVISIBLE-->
-        <action ID="5550004" /> <!--AC_SET_PREVIOUS_BUTTON_INVISIBLE-->
-        <action ID="55500016" /> <!--AC_START_PATHCOLLECTION-->
-        <action ID="5550005"> <!--AC_SET_ASSISTAND_WIDGET_STECK-->
-          <intParameter NAME="WIDGET_ID" VALUE="0" />
-        </action>
-        <action ID="5550007"> <!--AC_SET_NEXT_BUTTON_TEXT-->
-          <stringParameter NAME="BUTTON_TEXT" VALUE=">" />
-        </action>
-      </transition>
-      <transition NAME="EV_PREVIOUS" NEXT_STATE_ID="8" EVENT_ID="5551002">
-        <action ID="5550005"> <!--AC_SET_ASSISTAND_WIDGET_STECK-->
-          <intParameter NAME="WIDGET_ID" VALUE="2" />
-        </action>
-        <action ID="5550007"> <!--AC_SET_NEXT_BUTTON_TEXT-->
-          <stringParameter NAME="BUTTON_TEXT" VALUE=">" />
-        </action>
-      </transition>
-      <transition NAME="EV_INIT" NEXT_STATE_ID="2" EVENT_ID="5551001">
-        <action ID="55500010" /> <!--AC_INIT-->
-        <action ID="5550007"> <!--AC_SET_NEXT_BUTTON_TEXT-->
-          <stringParameter NAME="BUTTON_TEXT" VALUE=">" />
-        </action>
-      </transition>
-    </state>
-    <state NAME="chooseNavigation" ID="40">
-      <transition NAME="EV_PATH_COLLECTION_SELECTED" NEXT_STATE_ID="3" EVENT_ID="5551003" />
-      <transition NAME="EV_INIT" NEXT_STATE_ID="2" EVENT_ID="5551001">
-        <action ID="55500010" /> <!--AC_INIT-->
-      </transition>
-      <transition NAME="EV_NEXT" NEXT_STATE_ID="41" EVENT_ID="5551007">
-        <action ID="5550003" /> <!--AC_SET_PREVIOUS_BUTTON_VISIBLE-->
-        <action ID="5550002" /> <!--AC_SET_NEXT_BUTTON_INVISIBLE-->
-        <action ID="5550005"> <!--AC_SET_ASSISTAND_WIDGET_STECK-->
-          <intParameter NAME="WIDGET_ID" VALUE="3" />
-        </action>
-      </transition>
-      <transition NAME="EV_INIT" NEXT_STATE_ID="2" EVENT_ID="5551001">
-        <action ID="55500010" /> <!--AC_INIT-->
-      </transition>
-    </state>
-    <state NAME="chooseData" ID="41">
-      <transition NAME="EV_DONE" NEXT_STATE_ID="42" EVENT_ID="5551008">
-        <action ID="5550001" /> <!--AC_SET_NEXT_BUTTON_VISIBLE-->
-      </transition>
-      <transition NAME="EV_PREVIOUS" NEXT_STATE_ID="2" EVENT_ID="5551002">
-        <action ID="5550004" /> <!--AC_SET_PREVIOUS_BUTTON_INVISIBLE-->
-        <action ID="5550001" /> <!--AC_SET_NEXT_BUTTON_VISIBLE-->
-        <action ID="55500011" /> <!--AC_SET_APPLICATION_SELECTED_FALSE-->
-        <action ID="5550005"> <!--AC_SET_ASSISTAND_WIDGET_STECK-->
-          <intParameter NAME="WIDGET_ID" VALUE="0" />
-        </action>
-      </transition>
-      <transition NAME="EV_INIT" NEXT_STATE_ID="2" EVENT_ID="5551001">
-        <action ID="55500010" /> <!--AC_INIT-->
-      </transition>
-    </state>
-    <state NAME="dataChoosed" ID="42">
-      <transition NAME="EV_NEXT" NEXT_STATE_ID="43" EVENT_ID="5551007">
-        <action ID="55500017" /> <!--AC_LOAD_LANDMARKS-->
-        <action ID="5550002" /> <!--AC_SET_NEXT_BUTTON_INVISIBLE-->
-        <action ID="5550005"> <!--AC_SET_ASSISTAND_WIDGET_STECK-->
-          <intParameter NAME="WIDGET_ID" VALUE="1" />
-        </action>
-      </transition>
-      <transition NAME="EV_PREVIOUS" NEXT_STATE_ID="2" EVENT_ID="5551002">
-        <action ID="5550004" /> <!--AC_SET_PREVIOUS_BUTTON_INVISIBLE-->
-        <action ID="5550001" /> <!--AC_SET_NEXT_BUTTON_VISIBLE-->
-        <action ID="55500011" /> <!--AC_SET_APPLICATION_SELECTED_FALSE-->
-        <action ID="5550005"> <!--AC_SET_ASSISTAND_WIDGET_STECK-->
-          <intParameter NAME="WIDGET_ID" VALUE="0" />
-        </action>
-      </transition>
-      <transition NAME="EV_INIT" NEXT_STATE_ID="2" EVENT_ID="5551001">
-        <action ID="55500010" /> <!--AC_INIT-->
-      </transition>
-    </state>
-    <state NAME="mountSensorForNavigation" ID="43">
-      <transition NAME="EV_DONE" NEXT_STATE_ID="44" EVENT_ID="5551008">
-        <action ID="5550001" /> <!--AC_SET_NEXT_BUTTON_VISIBLE-->
-      </transition>
-      <transition NAME="EV_PREVIOUS" NEXT_STATE_ID="42" EVENT_ID="5551002">
-        <action ID="5550001" /> <!--AC_SET_NEXT_BUTTON_VISIBLE-->
-        <action ID="5550005"> <!--AC_SET_ASSISTAND_WIDGET_STECK-->
-          <intParameter NAME="WIDGET_ID" VALUE="3" />
-        </action>
-      </transition>
-      <transition NAME="EV_INIT" NEXT_STATE_ID="2" EVENT_ID="5551001">
-        <action ID="55500010" /> <!--AC_INIT-->
-      </transition>
-    </state>
-    <state NAME="sensorMountedForNavigation" ID="44">
-      <transition NAME="EV_NEXT" NEXT_STATE_ID="46" EVENT_ID="5551007">
-        <action ID="5550002" /> <!--AC_SET_NEXT_BUTTON_INVISIBLE-->
-  <action ID="55500012" /> <!--AC_SENSOR_ATTACHED-->
-        <action ID="5550005"> <!--AC_SET_ASSISTAND_WIDGET_STECK-->
-          <intParameter NAME="WIDGET_ID" VALUE="2" />
-        </action>
-        <action ID="5550008"> <!--AC_CHECK_LANDMARK_COUNT-->
-          <intParameter NAME="MIN_COUNT" VALUE="3" />
-        </action>
-      </transition>
-      <transition NAME="EV_PREVIOUS" NEXT_STATE_ID="43" EVENT_ID="5551002">
-        <action ID="5550009" /> <!--AC_SET_DONE_FALSE-->
-        <action ID="5550002" /> <!--AC_SET_NEXT_BUTTON_INVISIBLE-->
-      </transition>
-      <transition NAME="EV_INIT" NEXT_STATE_ID="2" EVENT_ID="5551001">
-        <action ID="55500010" /> <!--AC_INIT-->
-      </transition>
-    </state>
-    <state NAME="setLandmarks" ID="45">
-      <transition NAME="EV_NEW_LANDMARK" NEXT_STATE_ID="46" EVENT_ID="5551009">
-        <action ID="5550008"> <!--AC_CHECK_LANDMARK_COUNT-->
-          <intParameter NAME="MIN_COUNT" VALUE="3" />
-        </action>
-      </transition>
-      <transition NAME="EV_PREVIOUS" NEXT_STATE_ID="43" EVENT_ID="5551002">
-        <action ID="5550005"> <!--AC_SET_ASSISTAND_WIDGET_STECK-->
-          <intParameter NAME="WIDGET_ID" VALUE="3" />
-        </action>
-        <action ID="5550009" /> <!--AC_SET_DONE_FALSE-->
-      </transition>
-      <transition NAME="EV_INIT" NEXT_STATE_ID="2" EVENT_ID="5551001">
-        <action ID="55500010" /> <!--AC_INIT-->
-      </transition>
-    </state>
-    <state NAME="checkCount" ID="46">
-      <transition NAME="EV_READY_FOR_COLLECTING_PATH" NEXT_STATE_ID="47" EVENT_ID="5551006">
-        <action ID="5550001" /> <!--AC_SET_NEXT_BUTTON_VISIBLE-->
-      </transition>
-      <transition NAME="EV_LESS_THEN_MIN_COUNT" NEXT_STATE_ID="45" EVENT_ID="5551005" />
-      <transition NAME="EV_INIT" NEXT_STATE_ID="2" EVENT_ID="5551001">
-        <action ID="55500010" /> <!--AC_INIT-->
-      </transition>
-    </state>
-    <state NAME="readyForNavigation" ID="47">
-      <transition NAME="EV_NEXT" NEXT_STATE_ID="48" EVENT_ID="5551007">
-        <action ID="55500018" /> <!--AC_CALCULATE_LANDMARK_TRANSFORM-->
-        <action ID="5550005"> <!--AC_SET_ASSISTAND_WIDGET_STECK-->
-          <intParameter NAME="WIDGET_ID" VALUE="4" />
-        </action>
-        <action ID="55500014"> <!--AC_START_APPLICATION_TEXT-->
-          <stringParameter NAME="START_APPLICATION_TEXT" VALUE="Ariadne is now ready for navigation" />
-        </action>
-        <action ID="5550007"> <!--AC_SET_NEXT_BUTTON_TEXT-->
-          <stringParameter NAME="BUTTON_TEXT" VALUE="Start" />
-        </action>
-      </transition>
-      <transition NAME="EV_PREVIOUS" NEXT_STATE_ID="43" EVENT_ID="5551002">
-        <action ID="5550005"> <!--AC_SET_ASSISTAND_WIDGET_STECK-->
-          <intParameter NAME="WIDGET_ID" VALUE="3" />
-        </action>
-        <action ID="5550002" /> <!--AC_SET_NEXT_BUTTON_INVISIBLE-->
-        <action ID="5550009" /> <!--AC_SET_DONE_FALSE-->
-      </transition>
-      <transition NAME="EV_REMOVE_LANDMARK" NEXT_STATE_ID="46" EVENT_ID="5551010">
-        <action ID="5550002" /> <!--AC_SET_NEXT_BUTTON_INVISIBLE-->
-        <action ID="5550007"> <!--AC_SET_NEXT_BUTTON_TEXT-->
-          <stringParameter NAME="BUTTON_TEXT" VALUE=">" />
-        </action>
-        <action ID="5550008"> <!--AC_CHECK_LANDMARK_COUNT-->
-          <intParameter NAME="MIN_COUNT" VALUE="3" />
-        </action>
-      </transition>
-      <transition NAME="EV_INIT" NEXT_STATE_ID="2" EVENT_ID="5551001">
-        <action ID="55500010" /> <!--AC_INIT-->
-      </transition>
-    </state>
-    <state NAME="Navigation" ID="48">
-      <transition NAME="EV_NEXT" NEXT_STATE_ID="2" EVENT_ID="5551007">
-        <action ID="55500013" /> <!--AC_CLOSE_ASSISTENT-->
-        <action ID="55500011" /> <!--AC_SET_APPLICATION_SELECTED_FALSE-->
-        <action ID="5550002" /> <!--AC_SET_NEXT_BUTTON_INVISIBLE-->
-        <action ID="5550004" /> <!--AC_SET_PREVIOUS_BUTTON_INVISIBLE-->
-        <action ID="55500015" /> <!--AC_START_NAVIGATION-->
-        <action ID="5550005"> <!--AC_SET_ASSISTAND_WIDGET_STECK-->
-          <intParameter NAME="WIDGET_ID" VALUE="0" />
-        </action>
-        <action ID="5550007"> <!--AC_SET_NEXT_BUTTON_TEXT-->
-          <stringParameter NAME="BUTTON_TEXT" VALUE=">" />
-        </action>
-      </transition>
-      <transition NAME="EV_PREVIOUS" NEXT_STATE_ID="47" EVENT_ID="5551002">
-        <action ID="5550005"> <!--AC_SET_ASSISTAND_WIDGET_STECK-->
-          <intParameter NAME="WIDGET_ID" VALUE="2" />
-        </action>
-        <action ID="5550007"> <!--AC_SET_NEXT_BUTTON_TEXT-->
-          <stringParameter NAME="BUTTON_TEXT" VALUE=">" />
-        </action>
-      </transition>
-      <transition NAME="EV_INIT" NEXT_STATE_ID="2" EVENT_ID="5551001">
-        <action ID="55500010" /> <!--AC_INIT-->
-        <action ID="5550007"> <!--AC_SET_NEXT_BUTTON_TEXT-->
-          <stringParameter NAME="BUTTON_TEXT" VALUE=">" />
-        </action>
-      </transition>
-    </state>
-</stateMachine>
-
-<!-- Interaction State Machine Patterns: -->
-
-  <!-- Behaviour the global statemachine -->
-  <stateMachine NAME="global">
-    <state NAME="neutral" ID="1" START_STATE="TRUE">
-      <transition NAME="edit objects" NEXT_STATE_ID="2" EVENT_ID="1013" /> <!--EIDEDIT-->
-      <transition NAME="transmitt to all" NEXT_STATE_ID="1" EVENT_ID="0"> <!--EventId = 0-> all other events not defined here-->
-        <action ID="1200" /> <!--AcINFORMLISTENERS-->
-        <action ID="1201" /> <!--AcASKINTERACTORS-->
-      </transition>
-    </state>
-    <state NAME="edit object" ID="2">
-      <transition NAME="ready" NEXT_STATE_ID="1" EVENT_ID="1002"/> <!--EIDFINISHED-->
-      <transition NAME="transmitt to interactors only" NEXT_STATE_ID="2" EVENT_ID="0">
-        <action ID="1201" /> <!--AcASKINTERACTORS-->
-      </transition>
-    </state>
-  </stateMachine>
-
-
-
-  <stateMachine NAME="leftmouse">
-    <state NAME="neutral" ID="1" START_STATE="TRUE">
-      <transition NAME="send Koordinates" NEXT_STATE_ID="1" EVENT_ID="1" SIDE_EFFECT_ID="80">
-        <action ID="80" />
-      </transition>
-      <transition NAME="send Koordinates Move" NEXT_STATE_ID="1" EVENT_ID="530" SIDE_EFFECT_ID="80">
-        <action ID="80" />
-      </transition>
-    </state>
-  </stateMachine>
-  <stateMachine NAME="seedroi">
-    <state NAME="neutral" ID="1" START_STATE="TRUE">
-      <transition NAME="send Koordinates" NEXT_STATE_ID="1" EVENT_ID="3">
-        <action ID="80" />
-      </transition>
-    </state>
-  </stateMachine>
-  <stateMachine NAME="navigation">
-    <state NAME="neutral" ID="1" START_STATE="TRUE">
-      <transition NAME="send Koordinates press" NEXT_STATE_ID="1" EVENT_ID="1">
-        <action ID="90" />
-      </transition>
-      <transition NAME="send Koordinates move" NEXT_STATE_ID="1" EVENT_ID="530">
-        <action ID="90" />
-      </transition>
-      <transition NAME="send Koordinates release" NEXT_STATE_ID="1" EVENT_ID="505">
-        <action ID="42" />
-      </transition>
-    </state>
-  </stateMachine>
-  <stateMachine NAME="coordinate-supply">
-    <state NAME="neutral" ID="1" START_STATE="TRUE">
-      <transition NAME="send Koordinates release" NEXT_STATE_ID="1" EVENT_ID="505">
-        <action ID="42" />
-      </transition>
-    </state>
-  </stateMachine>
-  <stateMachine NAME="PressMoveRelease">
-    <state NAME="neutral" ID="1" START_STATE="TRUE">
-      <transition NAME="send Koordinates press" NEXT_STATE_ID="1" EVENT_ID="1">
-        <action ID="80" />
-      </transition>
-      <transition NAME="send Koordinates move" NEXT_STATE_ID="1" EVENT_ID="530">
-        <action ID="90" />
-      </transition>
-      <transition NAME="send Koordinates release" NEXT_STATE_ID="1" EVENT_ID="505">
-        <action ID="42" />
-      </transition>
-    </state>
-  </stateMachine>
-  <stateMachine NAME="drag">
-    <state NAME="neutral" ID="1" START_STATE="TRUE">
-      <transition NAME="check picked" NEXT_STATE_ID="1" EVENT_ID="1">
-        <action ID="80" />
-      </transition>
-      <transition NAME="continue" NEXT_STATE_ID="1" EVENT_ID="530">
-        <action ID="90" />
-      </transition>
-      <transition NAME="exit" NEXT_STATE_ID="1" EVENT_ID="505">
-        <action ID="42" />
-      </transition>
-    </state>
-    <state NAME="picked guard" ID="2">
-      <transition NAME="yes" NEXT_STATE_ID="3" EVENT_ID="1004">
-        <action ID="0" />
-      </transition>
-      <transition NAME="no" NEXT_STATE_ID="3" EVENT_ID="1003">
-        <action ID="0" />
-      </transition>
-    </state>
-    <state NAME="move" ID="3">
-      <transition NAME="continue" NEXT_STATE_ID="3" EVENT_ID="530">
-        <action ID="90" />
-      </transition>
-      <transition NAME="exit" NEXT_STATE_ID="1" EVENT_ID="505">
-        <action ID="42" />
-      </transition>
-    </state>
-  </stateMachine>
-  <stateMachine NAME="dragWithCtrl">
-    <state NAME="neutral" ID="1" START_STATE="TRUE">
-      <transition NAME="check picked" NEXT_STATE_ID="1" EVENT_ID="5">
-        <action ID="80" />
-      </transition>
-      <transition NAME="continue" NEXT_STATE_ID="1" EVENT_ID="534">
-        <action ID="90" />
-      </transition>
-<!--            <transition NAME="exit" NEXT_STATE_ID="1" EVENT_ID="505">
-        <action ID="42" />
-      </transition>
--->
-      <transition NAME="exit" NEXT_STATE_ID="1" EVENT_ID="537">
-        <action ID="42" />
-      </transition>
-      <transition NAME="exit" NEXT_STATE_ID="1" EVENT_ID="505">
-        <action ID="42" />
-      </transition>
-    <transition NAME="remove" NEXT_STATE_ID="1" EVENT_ID="12">
-      <action ID="100" /> <!--AcREMOVEPOINT-->
-     </transition>
-
-
-    </state>
-    <state NAME="picked guard" ID="2">
-      <transition NAME="yes" NEXT_STATE_ID="3" EVENT_ID="1004">
-        <action ID="0" />
-      </transition>
-      <transition NAME="no" NEXT_STATE_ID="3" EVENT_ID="1003">
-        <action ID="0" />
-      </transition>
-    </state>
-    <state NAME="move" ID="3">
-      <transition NAME="continue" NEXT_STATE_ID="3" EVENT_ID="534">
-        <action ID="90" />
-      </transition>
-      <transition NAME="exit" NEXT_STATE_ID="1" EVENT_ID="505">
-        <action ID="42" />
-      </transition>
-      <transition NAME="exit" NEXT_STATE_ID="1" EVENT_ID="537">
-        <action ID="42" />
-      </transition>
-    </state>
-  </stateMachine>
-  <stateMachine NAME="moveNzoom">
-    <state NAME="neutral" ID="0" START_STATE="TRUE">
-      <transition NAME="initmove" NEXT_STATE_ID="1" EVENT_ID="4">
-        <action ID="9" />
-      </transition>
-      <transition NAME="initzoom" NEXT_STATE_ID="2" EVENT_ID="2">
-        <action ID="1011" />
-      </transition>
-    </state>
-    <state NAME="move" ID="1">
-      <transition NAME="move" NEXT_STATE_ID="1" EVENT_ID="533">
-        <action ID="92" />
-      </transition>
-      <transition NAME="finish" NEXT_STATE_ID="0" EVENT_ID="506" />
-    </state>
-    <state NAME="zoom" ID="2">
-      <transition NAME="zoom" NEXT_STATE_ID="2" EVENT_ID="531">
-        <action ID="1012" />
-      </transition>
-      <transition NAME="finish" NEXT_STATE_ID="0" EVENT_ID="507" />
-    </state>
-  </stateMachine>
-  <stateMachine NAME="picking">
-    <state NAME="neutral" ID="1" START_STATE="TRUE">
-      <transition NAME="do picking" NEXT_STATE_ID="1" EVENT_ID="3">
-        <action ID="1003" />
-      </transition>
-    </state>
-  </stateMachine>
-  <stateMachine NAME="vesseltreeinteraction">
-    <state NAME="neutral" ID="1" START_STATE="TRUE">
-      <transition NAME="do picking" NEXT_STATE_ID="1" EVENT_ID="5">
-        <action ID="1600" />
-      </transition>
-    </state>
-  </stateMachine>
-  <stateMachine NAME="focus">
-    <state NAME="neutral" ID="1" START_STATE="TRUE">
-      <transition NAME="changefocus" NEXT_STATE_ID="1" EVENT_ID="1">
-        <action ID="0" />
-      </transition>
-    </state>
-  </stateMachine>
-  <stateMachine NAME="meshmove">
-    <state NAME="neutral" ID="1" START_STATE="TRUE">
-      <transition NAME="check picked" NEXT_STATE_ID="2" EVENT_ID="1">
-        <action ID="30" />
-      </transition>
-    </state>
-    <state NAME="picked guard" ID="2">
-      <transition NAME="yes" NEXT_STATE_ID="3" EVENT_ID="1004">
-        <action ID="0" />
-      </transition>
-      <transition NAME="no" NEXT_STATE_ID="1" EVENT_ID="1003">
-        <action ID="0" />
-      </transition>
-    </state>
-    <state NAME="move" ID="3">
-      <transition NAME="continue" NEXT_STATE_ID="3" EVENT_ID="530">
-        <action ID="90" />
-      </transition>
-      <transition NAME="exit" NEXT_STATE_ID="1" EVENT_ID="505">
-        <action ID="666" />
-      </transition>
-    </state>
-  </stateMachine>
-  <!-- Behaviour of a set of Points. a defined number of points can be set/removed/selected/deselectd/moved -->
-  <stateMachine NAME="pointsetinteractor">
-    <state NAME="no points or loaded points" ID="1" START_STATE="TRUE">
-      <transition NAME="addPoint but check n" NEXT_STATE_ID="3" EVENT_ID="3">
-        <action ID="1101" /> <!--AcMODE_SELECT-->
-        <action ID="32" />
-      </transition>
-      <transition NAME="Select or move point Space" NEXT_STATE_ID="10" EVENT_ID="1">
-        <action ID="30" />
-      </transition>
-      <transition NAME="checkn Delete" NEXT_STATE_ID="30" EVENT_ID="12">
-        <action ID="33" />
-      </transition>
-      <transition NAME="SetThisStatemachineOnSelected" NEXT_STATE_ID="1" EVENT_ID="1030">
-        <action ID="1101" /> <!--AcMODE_SELECT-->
-      </transition>
-      <transition NAME="SetThisStatemachineOnDeselected" NEXT_STATE_ID="1" EVENT_ID="1031">
-        <action ID="1100" /> <!--AcMODE_DESELECT-->
-      </transition>
-    </state>
-    <state NAME="space left" ID="2">
-      <transition NAME="addPoint but check n" NEXT_STATE_ID="3" EVENT_ID="3">
-        <action ID="32" />
-      </transition>
-      <transition NAME="Select or move point Space" NEXT_STATE_ID="10" EVENT_ID="1">
-        <action ID="30" />
-      </transition>
-      <transition NAME="checkn Delete" NEXT_STATE_ID="30" EVENT_ID="12">
-        <action ID="33" />
-      </transition>
-      <transition NAME="DeselectAll" NEXT_STATE_ID="2" EVENT_ID="14"><!--Event = ESC-->
-        <action ID="72" />    <!--AcDESELECTALL-->
-        <action ID="1100" />  <!--AcMODE_DESELECT-->
-      </transition>
-    </state>
-    <state NAME="checkedN" ID="3">
-      <transition NAME="n smaller N" NEXT_STATE_ID="40" EVENT_ID="1010">
-        <action ID="37" />
-      </transition>
-      <transition NAME="n greater equals N" NEXT_STATE_ID="41" EVENT_ID="1011">
-        <action ID="37" />
-      </transition>
-    </state>
-    <state NAME="set full" ID="4">
-      <transition NAME="Select or move point FULL" NEXT_STATE_ID="20" EVENT_ID="1">
-        <action ID="30" /> <!--AcCHECKELEMENT-->
-      </transition>
-      <transition NAME="checkn Delete selected Point" NEXT_STATE_ID="30" EVENT_ID="12">
-        <action ID="33" /> <!--AcCHECKEQUALS1-->
-      </transition>
-      <transition NAME="DeselectAll" NEXT_STATE_ID="2" EVENT_ID="14"><!--Event = ESC-->
-        <action ID="72" />    <!--AcDESELECTALL-->
-        <action ID="1100" />  <!--AcMODEDESELECT-->
-      </transition>
-    </state>
-    <state NAME="picked NotFull" ID="10">
-      <transition NAME="StNo" NEXT_STATE_ID="2" EVENT_ID="1003">
-        <action ID="72" /> <!--AcDESELECTALL-->
-        <action ID="1100" />  <!--AcMODEDESELECT-->
-      </transition>
-      <transition NAME="StYes" NEXT_STATE_ID="11" EVENT_ID="1004">
-        <action ID="34" /> <!--AcCHECKSELECTED-->
-        <action ID="1101" /> <!--AcMODESELECT-->
-      </transition>
-    </state>
-    <state NAME="already selected Space" ID="11">
-      <transition NAME="StNo" NEXT_STATE_ID="2" EVENT_ID="1003">
-        <action ID="60" />
-      </transition>
-      <transition NAME="StYes" NEXT_STATE_ID="12" EVENT_ID="1004">
-        <action ID="8" />
-      </transition>
-    </state>
-    <state NAME="move Point Space" ID="12">
-      <transition NAME="move point" NEXT_STATE_ID="12" EVENT_ID="530">
-        <action ID="91" />
-      </transition>
-      <transition NAME="finish move" NEXT_STATE_ID="2" EVENT_ID="505">
-        <action ID="42" />
-      </transition>
-      <transition NAME="Safety init" NEXT_STATE_ID="12" EVENT_ID="1"> -->
-        <action ID="8" />
-      </transition>
-    </state>
-    <state NAME="picked Full" ID="20">
-      <transition NAME="StNO" NEXT_STATE_ID="4" EVENT_ID="1003">
-        <action ID="72" /><!--AcDESELECTALL-->
-        <action ID="1100" />  <!--AcMODEDESELECT-->
-      </transition>
-      <transition NAME="StYES" NEXT_STATE_ID="21" EVENT_ID="1004">
-        <action ID="34" /> <!--AcCHECKSELECTED-->
-        <action ID="1101" /> <!--AcMODESELECT-->
-      </transition>
-    </state>
-    <state NAME="selected Full" ID="21">
-      <transition NAME="StNo" NEXT_STATE_ID="4" EVENT_ID="1003">
-        <action ID="60" /> <!--AcSELECTPICKEDOBJECT-->
-      </transition>
-      <transition NAME="StYes" NEXT_STATE_ID="22" EVENT_ID="1004">
-        <action ID="8" /> <!--AcINITMOVEMENT-->
-      </transition>
-    </state>
-    <state NAME="move Point Full" ID="22">
-      <!--  since the MouseMove Event is send by QT we don't have the information about the position of the point in the list -->
-      <!--  we had it before, when we checked, if it was picked, or if it was selected -->
-      <transition NAME="move point" NEXT_STATE_ID="22" EVENT_ID="530">
-        <action ID="91" />
-      </transition>
-      <transition NAME="finish move" NEXT_STATE_ID="4" EVENT_ID="505">
-        <action ID="42" />
-      </transition>
-      <transition NAME="Safety init" NEXT_STATE_ID="22" EVENT_ID="1">
-        <action ID="8" />
-      </transition>
-    </state>
-    <state NAME="checkn Delete" ID="30">
-      <transition NAME="StNo" NEXT_STATE_ID="2" EVENT_ID="1003">
-        <action ID="100" />
-      </transition>
-      <transition NAME="StYes" NEXT_STATE_ID="1" EVENT_ID="1004">
-        <action ID="100" />
-        <action ID="1100" /> <!--AcMODEDESELECT-->
-      </transition>
-    </state>
-    <state NAME="checkedPositionEventSmallerN" ID="40">
-      <transition NAME="PositionEvent" NEXT_STATE_ID="2" EVENT_ID="1004">
-        <action ID="10" />
-      </transition>
-      <transition NAME="others" NEXT_STATE_ID="2" EVENT_ID="1003">
-        <action ID="0" />
-      </transition>
-    </state>
-    <state NAME="checkedPositionEventGreaterN" ID="41">
-      <transition NAME="PositionEvent" NEXT_STATE_ID="4" EVENT_ID="1004">
-        <action ID="10" />
-      </transition>
-      <transition NAME="others" NEXT_STATE_ID="2" EVENT_ID="1003">
-        <action ID="0" />
-      </transition>
-    </state>
-  </stateMachine>
-  <!-- Behaviour of a Point. -->
-  <stateMachine NAME="seedpointsetinteractor">
-    <state NAME="no points or loaded points" ID="1" START_STATE="TRUE">
-      <transition NAME="addPoint but check n" NEXT_STATE_ID="3" EVENT_ID="5">
-        <action ID="1101" /> <!--AcMODESELECT-->
-        <action ID="32" />
-      </transition>
-      <transition NAME="Select or move point Space" NEXT_STATE_ID="10" EVENT_ID="1">
-        <action ID="30" />
-      </transition>
-      <transition NAME="checkn Delete" NEXT_STATE_ID="30" EVENT_ID="12">
-        <action ID="33" />
-      </transition>
-    </state>
-    <state NAME="space left" ID="2">
-      <transition NAME="addPoint but check n" NEXT_STATE_ID="3" EVENT_ID="5">
-        <action ID="32" />
-      </transition>
-      <transition NAME="Select or move point Space" NEXT_STATE_ID="10" EVENT_ID="1">
-        <action ID="30" />
-      </transition>
-      <transition NAME="checkn Delete" NEXT_STATE_ID="30" EVENT_ID="12">
-        <action ID="33" />
-      </transition>
-    </state>
-    <state NAME="checkedN" ID="3">
-      <transition NAME="n smaller N" NEXT_STATE_ID="40" EVENT_ID="1010">
-        <action ID="37" />
-      </transition>
-      <transition NAME="n greater equals N" NEXT_STATE_ID="41" EVENT_ID="1011">
-        <action ID="37" />
-      </transition>
-    </state>
-    <state NAME="set full" ID="4">
-      <transition NAME="Select or move point FULL" NEXT_STATE_ID="20" EVENT_ID="1">
-        <action ID="30" />
-      </transition>
-      <transition NAME="checkn Delete selected Point" NEXT_STATE_ID="30" EVENT_ID="12">
-        <action ID="33" />
-      </transition>
-    </state>
-    <state NAME="picked NotFull" ID="10">
-      <transition NAME="StNo" NEXT_STATE_ID="2" EVENT_ID="1003">
-        <action ID="72" />
-      </transition>
-      <transition NAME="StYes" NEXT_STATE_ID="11" EVENT_ID="1004">
-        <action ID="34" />
-      </transition>
-    </state>
-    <state NAME="already selected Space" ID="11">
-      <transition NAME="StNo" NEXT_STATE_ID="2" EVENT_ID="1003">
-        <action ID="60" />
-      </transition>
-      <transition NAME="StYes" NEXT_STATE_ID="12" EVENT_ID="1004">
-        <action ID="8" />
-      </transition>
-    </state>
-    <state NAME="move Point Space" ID="12">
-      <transition NAME="move point" NEXT_STATE_ID="12" EVENT_ID="530">
-        <action ID="91" />
-      </transition>
-      <transition NAME="finish move" NEXT_STATE_ID="2" EVENT_ID="505">
-        <action ID="42" />
-      </transition>
-      <transition NAME="Safety init" NEXT_STATE_ID="12" EVENT_ID="1"> -->
-				<action ID="8" />
-	    </transition>
-    </state>
-    <state NAME="picked Full" ID="20">
-      <transition NAME="StNO" NEXT_STATE_ID="4" EVENT_ID="1003">
-        <action ID="72" />
-      </transition>
-      <transition NAME="StYES" NEXT_STATE_ID="21" EVENT_ID="1004">
-        <action ID="34" />
-      </transition>
-    </state>
-    <state NAME="selected Full" ID="21">
-      <transition NAME="StNo" NEXT_STATE_ID="4" EVENT_ID="1003">
-        <action ID="60" />
-      </transition>
-      <transition NAME="StYes" NEXT_STATE_ID="22" EVENT_ID="1004">
-        <action ID="8" />
-      </transition>
-    </state>
-    <state NAME="move Point Full" ID="22">
-      <!--  since the MouseMove Event is send by QT we don't have the information about the position of the point in the list -->
-      <!--  we had it before, when we checked, if it was picked, or if it was selected -->
-      <transition NAME="move point" NEXT_STATE_ID="22" EVENT_ID="530">
-        <action ID="91" />
-      </transition>
-      <transition NAME="finish move" NEXT_STATE_ID="4" EVENT_ID="505">
-        <action ID="42" />
-      </transition>
-      <transition NAME="Safety init" NEXT_STATE_ID="22" EVENT_ID="1">
-        <action ID="8" />
-      </transition>
-    </state>
-    <state NAME="checkn Delete" ID="30">
-      <transition NAME="StNo" NEXT_STATE_ID="2" EVENT_ID="1003">
-        <action ID="100" />
-      </transition>
-      <transition NAME="StYes" NEXT_STATE_ID="1" EVENT_ID="1004">
-        <action ID="100" />
-        <action ID="1100" /> <!--AcMODEDESELECT-->
-      </transition>
-    </state>
-    <state NAME="checkedPositionEventSmallerN" ID="40">
-      <transition NAME="PositionEvent" NEXT_STATE_ID="2" EVENT_ID="1004">
-        <action ID="10" />
-      </transition>
-      <transition NAME="others" NEXT_STATE_ID="2" EVENT_ID="1003">
-        <action ID="0" />
-      </transition>
-    </state>
-    <state NAME="checkedPositionEventGreaterN" ID="41">
-      <transition NAME="PositionEvent" NEXT_STATE_ID="4" EVENT_ID="1004">
-        <action ID="10" />
-      </transition>
-      <transition NAME="others" NEXT_STATE_ID="2" EVENT_ID="1003">
-        <action ID="0" />
-      </transition>
-    </state>
-  </stateMachine>
-  <stateMachine NAME="pointinteractor">
-    <state NAME="unselected" ID="0" START_STATE="TRUE">
-      <transition NAME="addPoint" NEXT_STATE_ID="1" EVENT_ID="3">
-        <action ID="1101" /> <!--AcMODESELECT-->
-        <action ID="10" /> <!--AcADDPOINT-->
-        <action ID="30"> <!--AcCHECKELEMENT-->
-          <intParam Name="precision" VALUE="4" />
-        </action>
-      </transition>
-      <transition NAME="checkpicked" NEXT_STATE_ID="2" EVENT_ID="1">
-        <action ID="30"> <!--AcCHECKELEMENT-->
-          <intParam Name="precision" VALUE="4" />
-        </action>
-      </transition>
-    </state>
-    <state NAME="selected" ID="1">
-      <transition NAME="deselect all and add point" NEXT_STATE_ID="1" EVENT_ID="3">
-        <action ID="72" /> <!--AcDESELECTALL-->
-        <action ID="10" /> <!--AcADDPOINT-->
-        <action ID="30"> <!--AcCHECKELEMENT-->
-          <intParam Name="precision" VALUE="4" />
-        </action>
-      </transition>
-      <transition NAME="remove" NEXT_STATE_ID="5" EVENT_ID="12">
-        <action ID="1500" /> <!--AcCHECKGREATERONE-->
-      </transition>
-      <transition NAME="checkSamePick" NEXT_STATE_ID="3" EVENT_ID="1">
-        <action ID="34"> <!--AcCHECKSELECTED-->
-          <intParam Name="precision" VALUE="4" />
-        </action>
-      </transition>
-      <transition NAME="deselect all" NEXT_STATE_ID="0" EVENT_ID="2000">
-        <action ID="72" /> <!--AcDESELECTALL-->
-        <action ID="1100" /> <!--AcMODEDESELECT-->
-      </transition>
-    </state>
-    <state NAME="checkpicked" ID="2">
-      <transition NAME="EIDNo" NEXT_STATE_ID="0" EVENT_ID="1003" />
-      <transition NAME="EIDYes" NEXT_STATE_ID="1" EVENT_ID="1004">
-        <action ID="1101" /> <!--AcMODESELECT-->
-        <action ID="65" /> <!--AcSELECT-->
-      </transition>
-    </state>
-    <state NAME="checkStillPicked" ID="3">
-      <transition NAME="EIDNo" NEXT_STATE_ID="0" EVENT_ID="1003">
-        <action ID="72" /> <!--AcDESELECTALL-->
-        <action ID="1100" /> <!--AcMODEDESELECT-->
-      </transition>
-      <transition NAME="EIDYes" NEXT_STATE_ID="4" EVENT_ID="1004">
-        <action ID="8" /> <!--AcINITMOVEMENT-->
-      </transition>
-    </state>
-    <state NAME="moves" ID="4">
-      <transition NAME="mousemove" NEXT_STATE_ID="4" EVENT_ID="530">
-        <action ID="91" /> <!--AcMOVESELECTED-->
-      </transition>
-      <transition NAME="finishmove" NEXT_STATE_ID="1" EVENT_ID="505">
-        <action ID="42" /> <!--AcFINISHMOVEMENT-->
-      </transition>
-    </state>
-    <state NAME="checkGreaterOne" ID="5">
-      <transition NAME="StYes" NEXT_STATE_ID="1" EVENT_ID="1004">
-        <action ID="100" /> <!--AcREMOVEPOINT-->
-        <action ID="61" /> <!--AcSELECTANOTHEROBJECT-->
-      </transition>
-      <transition NAME="StNo" NEXT_STATE_ID="0" EVENT_ID="1003">
-        <action ID="100" /> <!--AcREMOVEPOINT-->
-        <action ID="1100" /> <!--AcMODEDESELECT-->
-      </transition>
-    </state>
-  </stateMachine>
-  <!-- Behaviour of Points, that can be snaped and then selected. -->
-  <stateMachine NAME="pointSNAPinteractor">
-    <state NAME="active" ID="0" START_STATE="TRUE">
-      <transition NAME="checkPointSnap" NEXT_STATE_ID="1" EVENT_ID="3">
-        <action ID="1102" /> <!--AcMODESUBSELECT-->
-        <action ID="21"> <!--AcCHECKPOINT-->
-          <floatParam Name="precision" VALUE="5" />
-        </action>
-      </transition>
-      <transition NAME="checkPointPick" NEXT_STATE_ID="2" EVENT_ID="1">
-        <action ID="38"> <!--AcCHECKONESUBINTERACTOR-->
-          <floatParam Name="threshold" VALUE="0.5" />
-        </action>
-      </transition>
-      <transition NAME="SubInteractorDeselect" NEXT_STATE_ID="0" EVENT_ID="1020"> <!-- necessary transition of the state subSelected -->
-        <action ID="1100" /> <!--AcMODEDESELECT--> <!-- the event will produced from the hirachical interactor -->
-      </transition>
-    </state>
-    <state NAME="checkPointSnap" ID="1">
-      <transition NAME="EIDNo" NEXT_STATE_ID="3" EVENT_ID="1003">
-        <action ID="1550" /> <!--AcFORCESUBINTERACTORS-->
-        <action ID="2000" /> <!--AcTRANSMITEVENT-->
-      </transition>
-      <transition NAME="EIDYes" NEXT_STATE_ID="3" EVENT_ID="1004">
-        <action ID="72" /> <!--AcDESELECTALL-->
-        <action ID="66" /> <!--AcSELECTPOINT-->
-      </transition>
-    </state>
-    <state NAME="checkSubInteractor" ID="2">
-      <transition NAME="EIDNo" NEXT_STATE_ID="0" EVENT_ID="1003" />
-      <transition NAME="EIDYes" NEXT_STATE_ID="3" EVENT_ID="1004">
-        <action ID="1102" /> <!--AcMODESUBSELECT-->
-        <action ID="2000" /> <!--AcTRANSMITEVENT-->
-      </transition>
-    </state>
-    <state NAME="SSD" ID="3">
-      <transition NAME="SubInteractorDeselect" NEXT_STATE_ID="0" EVENT_ID="1020"> <!-- necessary transition of the state subSelected -->
-        <action ID="1100" /> <!--AcMODEDESELECT--> <!-- the event will produced from the hirachical interactor -->
-      </transition>
-    </state>
-  </stateMachine>
-  <!-- Behaviour of Seed Points -->
-  <stateMachine NAME="seedsinteractor">
-    <state NAME="drawSeeds" ID="0" START_STATE="TRUE">
-      <transition NAME="drawForegroundSeed" NEXT_STATE_ID="1" EVENT_ID="3">
-        <action ID="1101" /> <!--AcMODE_SELECT-->
-        <action ID="45" /> <!--AcINITFOREGROUND-->
-        <action ID="11" /> <!--AcADD-->
-      </transition>
-      <transition NAME="drawBackgroundSeed" NEXT_STATE_ID="2" EVENT_ID="2000">
-        <action ID="1101" /> <!--AcMODE_SELECT-->
-        <action ID="46" /> <!--AcINITBACKGROUND-->
-        <action ID="11" /> <!--AcADD-->
-      </transition>
-      <transition NAME="drawNeutralSeed" NEXT_STATE_ID="3" EVENT_ID="2003">
-        <action ID="1101" /> <!--AcMODE_SELECT-->
-        <action ID="47" /> <!--AcINITNEUTRAL-->
-        <action ID="11" /> <!--AcADD-->
-      </transition>
-    </state>
-    <state NAME="drawForeground" ID="1">
-      <transition NAME="drawForegroundSeeds" NEXT_STATE_ID="1" EVENT_ID="541">
-        <action ID="92" /> <!--AcMOVE-->
-      </transition>
-      <transition NAME="drawSeeds" NEXT_STATE_ID="0" EVENT_ID="508">
-        <action ID="44" /> <!--AcFINISH-->
-        <action ID="1100" /> <!--AcMODE_DESELECT-->
-      </transition>
-    </state>
-    <state NAME="drawBackground" ID="2">
-      <transition NAME="drawBackgroundSeeds" NEXT_STATE_ID="2" EVENT_ID="2001">
-        <action ID="92" /> <!--AcMOVE-->
-      </transition>
-      <transition NAME="drawSeeds" NEXT_STATE_ID="0" EVENT_ID="2002">
-        <action ID="44" /> <!--AcFINISH-->
-        <action ID="1100" /> <!--AcMODE_DESELECT-->
-      </transition>
-    </state>
-    <state NAME="drawNeutral" ID="3">
-      <transition NAME="drawNeutralSeeds" NEXT_STATE_ID="3" EVENT_ID="2004">
-        <action ID="92" /> <!--AcMOVE-->
-      </transition>
-      <transition NAME="drawSeeds" NEXT_STATE_ID="0" EVENT_ID="2005">
-        <action ID="44" /> <!--AcFINISH-->
-        <action ID="1100" /> <!--AcMODE_DESELECT-->
-      </transition>
-    </state>
-  </stateMachine>
-  <!-- Behaviour of a Line. -->
-  <stateMachine NAME="lineinteractor">
-    <state NAME="unselected" ID="0" START_STATE="TRUE">
-      <transition NAME="insertLine" NEXT_STATE_ID="4" EVENT_ID="3">
-        <action ID="22"> <!--AcCHECKLINE-->
-          <intParam Name="precision" VALUE="5" />
-        </action>
-      </transition>
-      <transition NAME="checkPointPick" NEXT_STATE_ID="2" EVENT_ID="1">
-        <action ID="38"> <!--AcCHECKONESUBINTERACTOR-->
-          <floatParam Name="threshold" VALUE="0.5" />
-        </action>
-      </transition>
-      <transition NAME="SubInteractorDeselect" NEXT_STATE_ID="0" EVENT_ID="1020"> <!-- necessary transition of the state subSelected -->
-        <action ID="1101" /> <!--AcMODEDESELECT--> <!-- the event will produced from the hirachical interactor -->
-      </transition>
-    </state>
-    <state NAME="createLineSSD" ID="1">
-      <transition NAME="addLine" NEXT_STATE_ID="1" EVENT_ID="3">
-        <action ID="2000" /> <!--AcTRANSMITEVENT-->
-        <action ID="12" /> <!--AcADDLINE -->
-        <action ID="72" /> <!--AcDESELECTALL-->
-      </transition>
-      <transition NAME="Finish" NEXT_STATE_ID="0" EVENT_ID="2000">
-        <action ID="72" /> <!--AcDESELECTALL-->
-        <action ID="2000" /> <!--AcTRANSMITEVENT-->
-        <action ID="1100" /> <!--AcMODEDESELECT-->
-      </transition>
-      <transition NAME="SubInteractorDeselect" NEXT_STATE_ID="0" EVENT_ID="1020"> <!-- necessary transition of the state subSelected -->
-        <action ID="1101" /> <!--AcMODEDESELECT--> <!-- the event will produced from the hirachical interactor -->
-      </transition>
-    </state>
-    <state NAME="checkSubInteractor" ID="2">
-      <transition NAME="EIDNo" NEXT_STATE_ID="3" EVENT_ID="1003">
-        <action ID="22"> <!--AcCHECKLINE-->
-          <intParam Name="precision" VALUE="5" />
-        </action>
-      </transition>
-      <transition NAME="EIDYes" NEXT_STATE_ID="0" EVENT_ID="1004">
-        <action ID="72" /> <!--AcDESELECTALL-->
-        <action ID="1102" /> <!--AcMODESUBSELECT-->
-        <action ID="2000" /> <!--AcTRANSMITEVENT-->
-      </transition>
-    </state>
-    <state NAME="checkLinePickedIFFselect" ID="3">
-      <transition NAME="EIDNo" NEXT_STATE_ID="0" EVENT_ID="1003">
-        <action ID="1100" /> <!--AcMODEDESELECT-->
-      </transition>
-      <transition NAME="EIDYes" NEXT_STATE_ID="20" EVENT_ID="1004">
-        <action ID="1101" /> <!--AcMODESELECT-->
-        <action ID="65" /> <!--AcSELECT-->
-      </transition>
-    </state>
-    <state NAME="checkLinePickedIFFinsert" ID="4">
-      <transition NAME="EIDNo" NEXT_STATE_ID="1" EVENT_ID="1003">
-        <action ID="1102" /> <!--AcMODESUBSELECT-->
-        <action ID="1550" /> <!--AcFORCESUBINTERACTORS-->
-        <action ID="2000" /> <!--AcTRANSMITEVENT-->
-        <action ID="72" /> <!--AcDESELECTALL-->
-        <action ID="12" /> <!--AcADDLINE -->
-      </transition>
-      <transition NAME="EIDYes" NEXT_STATE_ID="0" EVENT_ID="1004">
-        <action ID="1102" /> <!--AcMODESUBSELECT-->
-        <action ID="1550" /> <!--AcFORCESUBINTERACTORS-->
-        <action ID="2000" /> <!--AcTRANSMITEVENT-->
-        <action ID="12" /> <!--12AcADDLINE111AcINSERTLINE -->
-        <action ID="72" /> <!--AcDESELECTALL-->
-      </transition>
-    </state>
-    <state NAME="SSD" ID="10">
-      <transition NAME="SubInteractorDeselect" NEXT_STATE_ID="0" EVENT_ID="1020"> <!-- necessary transition of the state subSelected -->
-        <action ID="1101" /> <!--AcMODEDESELECT--> <!-- the event will produced from the hirachical interactor -->
-      </transition>
-    </state>
-    <state NAME="selected" ID="20">
-      <transition NAME="checkSamePick" NEXT_STATE_ID="21" EVENT_ID="1">
-        <action ID="34"> <!--AcCHECKSELECTED-->
-          <intParam Name="precision" VALUE="10" />
-        </action>
-      </transition>
-    </state>
-    <state NAME="checkStillPicked" ID="21">
-      <transition NAME="EIDYes" NEXT_STATE_ID="22" EVENT_ID="1004">
-        <action ID="8" /> <!--AcINITMOVEMENT-->
-      </transition>
-      <transition NAME="EIDNo" NEXT_STATE_ID="0" EVENT_ID="1003">
-        <action ID="72" /> <!--AcDESELECTALL-->
-        <action ID="1100" /> <!--AcMODEDESELECT-->
-      </transition>
-    </state>
-    <state NAME="moves" ID="22">
-      <transition NAME="mousemove" NEXT_STATE_ID="22" EVENT_ID="530">
-        <action ID="92" />
-      </transition>
-      <transition NAME="finishmove" NEXT_STATE_ID="20" EVENT_ID="505">
-        <action ID="42" />
-      </transition>
-    </state>
-  </stateMachine>
-  <!-- Behaviour of a Strip of primitives (lines ad points) -->
-  <stateMachine NAME="primstripinteractor">
-    <state NAME="unselected" ID="0" START_STATE="TRUE">
-      <transition NAME="forceSSD" NEXT_STATE_ID="1" EVENT_ID="3">
-        <action ID="5" /> <!--AcINITNEWOBJECT-->
-        <action ID="1550" /> <!--AcFORCESUBINTERACTORS-->
-        <action ID="1102" /> <!--AcMODESUBSELECT-->
-        <action ID="2000" /> <!--AcTRANSMITEVENT-->
-        <action ID="1050" /> <!--AcSETSTARTPOINT-->
-      </transition>
-      <transition NAME="checkObjectPick" NEXT_STATE_ID="3" EVENT_ID="1">
-        <action ID="31" /> <!--AcCHECKOBJECT-->
-      </transition>
-    </state>
-    <state NAME="drawStripSSD" ID="1">
-      <transition NAME="finish" NEXT_STATE_ID="4" EVENT_ID="2000">
-        <action ID="2000" /> <!--AcTRANSMITEVENT-->
-        <action ID="1101" /> <!--AcMODESELECT-->
-      </transition>
-      <transition NAME="SubInteractorDeselect" NEXT_STATE_ID="4" EVENT_ID="1020"> <!-- necessary transition of the state subSelected -->
-        <action ID="1101" /> <!--AcMODEDESELECT--> <!-- the event will produced from the hirachical interactor -->
-      </transition>
-    </state>
-    <state NAME="checkpicked" ID="3">
-      <transition NAME="EIDNO" NEXT_STATE_ID="0" EVENT_ID="1003">
-        <action ID="1101" /> <!--AcMODEDESELECT-->
-      </transition>
-      <transition NAME="EIDYes" NEXT_STATE_ID="4" EVENT_ID="1004">
-        <action ID="1101" /> <!--AcMODESELECT-->
-        <action ID="67" /> <!--AcSELECTCELL-->
-      </transition>
-    </state>
-    <state NAME="selected" ID="4">
-      <transition NAME="checkSubSelectForInsertLineAndPoint" NEXT_STATE_ID="7" EVENT_ID="3">
-        <action ID="38"> <!--AcCHECKONESUBINTERACTOR-->
-          <floatParam Name="threshold" VALUE="0.5" />
-        </action>
-      </transition>
-      <transition NAME="remove" NEXT_STATE_ID="0" EVENT_ID="12">
-        <action ID="101" />
-        <action ID="1100" /> <!--AcMODEDESELECT-->
-      </transition>
-      <transition NAME="checkSubSelect" NEXT_STATE_ID="5" EVENT_ID="1">
-        <action ID="38"> <!--AcCHECKONESUBINTERACTOR-->
-          <floatParam Name="threshold" VALUE="0.5" />
-        </action>
-        <transition NAME="SubInteractorDeselect" NEXT_STATE_ID="0" EVENT_ID="1020"> <!-- necessary transition of the state subSelected -->
-          <action ID="1101" /> <!--AcMODESELECT-->
-        </transition>
-      </transition>
-    </state>
-    <state NAME="CheckSubSelect" ID="5">
-      <transition NAME="EIDYES" NEXT_STATE_ID="10" EVENT_ID="1004">
-        <action ID="1102" /> <!--AcMODESUBSELECT-->
-        <action ID="2000" /> <!--AcTRANSMITEVENT-->
-      </transition>
-      <transition NAME="EIDNO" NEXT_STATE_ID="6" EVENT_ID="1003">
-        <action ID="1510" /> <!--AcCHECKBOUNDINGBOX-->
-      </transition>
-    </state>
-    <state NAME="CheckPickedSelf" ID="6">
-      <transition NAME="EIDYES" NEXT_STATE_ID="20" EVENT_ID="1004">
-        <action ID="8" /> <!--AcINITMOVEMENT-->
-      </transition>
-      <transition NAME="EIDNO" NEXT_STATE_ID="0" EVENT_ID="1003">
-        <action ID="77" /> <!--AcDESELECTCELL-->
-        <action ID="1100" /> <!--AcMODEDESELECT-->
-      </transition>
-    </state>
-    <state NAME="CheckSubSelectForInsertLineAndPoint" ID="7">
-      <transition NAME="EIDYES" NEXT_STATE_ID="4" EVENT_ID="1004">
-        <action ID="1102" /> <!--AcMODESUBSELECT-->
-        <action ID="2000" /> <!--AcTRANSMITEVENT-->
-      </transition>
-      <transition NAME="EIDNO" NEXT_STATE_ID="4" EVENT_ID="1003"></transition>
-    </state>
-    <state NAME="SSD" ID="10">
-      <transition NAME="SubInteractorDeselect" NEXT_STATE_ID="6" EVENT_ID="1020"> <!-- necessary transition of the state subSelected -->
-        <action ID="1101" /> <!--AcMODESELECT-->
-        <action ID="1510" /> <!--AcCHECKBOUNDINGBOX-->
-      </transition>
-    </state>
-    <state NAME="primstripmoves" ID="20">
-      <transition NAME="mousemove" NEXT_STATE_ID="20" EVENT_ID="530">
-        <action ID="92" />
-      </transition>
-      <transition NAME="finishmove" NEXT_STATE_ID="4" EVENT_ID="505">
-        <action ID="42" />
-      </transition>
-    </state>
-  </stateMachine>
-  <!-- Behaviour of a Polygon -->
-  <stateMachine NAME="polygoninteractor">
-    <state NAME="unselected" ID="0" START_STATE="TRUE">
-      <transition NAME="buildUp" NEXT_STATE_ID="1" EVENT_ID="3">
-        <action ID="5" /> <!--AcINITNEWOBJECT-->
-        <action ID="1550" /> <!--AcFORCESUBINTERACTORS-->
-        <action ID="1102" /> <!--AcMODESUBSELECT-->
-        <action ID="2000" /> <!--AcTRANSMITEVENT-->
-      </transition>
-      <transition NAME="checkSubSelect" NEXT_STATE_ID="2" EVENT_ID="1">
-        <action ID="38"> <!--AcCHECKONESUBINTERACTOR-->
-          <floatParam Name="threshold" VALUE="0.5" />
-        </action>
-      </transition>
-    </state>
-    <state NAME="buildUp" ID="1">
-      <transition NAME="finish" NEXT_STATE_ID="3" EVENT_ID="2000">
-        <action ID="2000" /> <!--AcTRANSMITEVENT-->
-        <action ID="40" /> <!--AcFINISHOBJECT-->
-        <action ID="1102" /> <!--AcMODESUBSELECT-->
-      </transition>
-    </state>
-    <state NAME="checkSubSelected" ID="2">
-      <transition NAME="EIDYes" NEXT_STATE_ID="3" EVENT_ID="1004">
-        <action ID="1102" /> <!--AcMODESUBSELECT--> <!-- the event will produced from the hirachical interactor -->
-        <action ID="1550" /> <!--AcFORCESUBINTERACTORS-->
-        <action ID="2000" /> <!--AcTRANSMITEVENT-->
-      </transition>
-      <transition NAME="EIDNo" NEXT_STATE_ID="0" EVENT_ID="1003" />
-    </state>
-    <state NAME="subSelected" ID="3">
-      <transition NAME="SubInteractorDeselect" NEXT_STATE_ID="0" EVENT_ID="1020"> <!-- necessary transition of the state subSelected -->
-        <action ID="1100" /> <!--AcMODEDESELECT--> <!-- the event will produced from the hirachical interactor -->
-      </transition>
-    </state>
-  </stateMachine>
-  <!-- Behaviour for measuring a length with lines-->
-  <stateMachine NAME="measureinteractor">
-    <state NAME="unbuild" ID="0" START_STATE="TRUE">
-      <transition NAME="forceSSD" NEXT_STATE_ID="1" EVENT_ID="3">
-        <action ID="5" /> <!--AcINITNEWOBJECT-->
-        <action ID="1550" /> <!--AcFORCESUBINTERACTORS-->
-        <action ID="1102" /> <!--AcMODESUBSELECT-->
-        <action ID="2000" /> <!--AcTRANSMITEVENT-->
-      </transition>
-    </state>
-    <state NAME="BuildUpSSD" ID="1">
-      <transition NAME="SubInteractorDeselect" NEXT_STATE_ID="10" EVENT_ID="1020"> <!-- necessary transition of the state subSelected -->
-        <action ID="1101" /> <!--AcMODEDESELECT--> <!-- the event will produced from the hirachical interactor -->
-      </transition>
-      <transition NAME="reinit" NEXT_STATE_ID="0" EVENT_ID="2">
-        <action ID="101" />
-        <action ID="1100" /> <!--AcMODEDESELECT-->
-      </transition>
-    </state>
-    <state NAME="selected" ID="10">
-      <transition NAME="remove" NEXT_STATE_ID="0" EVENT_ID="12">
-        <action ID="101" />
-        <action ID="1100" /> <!--AcMODEDESELECT-->
-      </transition>
-      <transition NAME="reinit" NEXT_STATE_ID="0" EVENT_ID="2">
-        <action ID="101" />
-        <action ID="1100" /> <!--AcMODEDESELECT-->
-      </transition>
-    </state>
-  </stateMachine>
-  <!-- affine interactions standard statemachine  -->
-  <stateMachine NAME="AffineInteractions ctrl-drag">
-    <state NAME="start" ID="0" START_STATE="TRUE">
-      <transition NAME="leftButtonPress" NEXT_STATE_ID="12" EVENT_ID="5"> <!-- CTRL+LBM_Down -->
-        <action ID="30" /> <!--AcCHECKELEMENT-->
-      </transition>
-      <transition NAME="leftButtonPress" NEXT_STATE_ID="12" EVENT_ID="540"> <!-- SHIFT+CTRL+LBM_Down -->
-        <action ID="11" /> <!--AcADD-->
-      </transition>
-      <transition NAME="middleButtonPress" NEXT_STATE_ID="14" EVENT_ID="6"> <!-- CTRL+MBM_Down -->
-        <action ID="30" /> <!--AcCHECKELEMENT-->
-      </transition>
-      <transition NAME="rightButtonPress" NEXT_STATE_ID="13" EVENT_ID="7"> <!-- CTRL+RBM_Down -->
-        <action ID="30" /> <!--AcCHECKELEMENT-->
-      </transition>
-    </state>
-    <state NAME="picked guard Translate" ID="12">
-      <transition NAME="yes" NEXT_STATE_ID="2" EVENT_ID="1004"> <!-- EIDYES -->
-        <action ID="1101" /> <!--AcMODE_SELECT-->
-        <action ID="1000" /> <!--AcTRANSLATESTART-->
-      </transition>
-      <transition NAME="no" NEXT_STATE_ID="0" EVENT_ID="1003" /> <!-- StNO -->
-    </state>
-    <state NAME="picked guard Scale" ID="13">
-      <transition NAME="yes" NEXT_STATE_ID="3" EVENT_ID="1004"> <!-- EIDYES -->
-        <action ID="1101" /> <!--AcMODE_SELECT-->
-        <action ID="1002" /> <!--AcSCALESTART-->
-      </transition>
-      <transition NAME="no" NEXT_STATE_ID="0" EVENT_ID="1003"> <!-- StNO -->
-        <action ID="0" />
-      </transition>
-    </state>
-    <state NAME="picked guard Rotate" ID="14">
-      <transition NAME="yes" NEXT_STATE_ID="4" EVENT_ID="1004"> <!-- EIDYES -->
-        <action ID="1101" /> <!--AcMODE_SELECT-->
-        <action ID="1004" />
-      </transition>
-      <transition NAME="no" NEXT_STATE_ID="0" EVENT_ID="1003"> <!-- StNO -->
-        <action ID="0" />
-      </transition>
-    </state>
-    <state NAME="translating" ID="2">
-      <transition NAME="leftButtonMove" NEXT_STATE_ID="2" EVENT_ID="534"> <!-- CTRL+LBM_Move -->
-        <action ID="1001" /> <!--AcTRANSLATE-->
-      </transition>
-      <transition NAME="leftButtonRelease" NEXT_STATE_ID="0" EVENT_ID="505"> <!-- LBM_Release-->
-        <action ID="1100" /> <!--AcMODE_DESELECT-->
-        <action ID="1008" /> <!--AcTRANSLATEEND-->
-      </transition>
-      <transition NAME="leftButtonRelease" NEXT_STATE_ID="0" EVENT_ID="537"> <!-- CTRL+LBM_Release -->
-        <action ID="1100" /> <!--AcMODE_DESELECT-->
-        <action ID="1008" /> <!--AcTRANSLATEEND-->
-      </transition>
-    </state>
-    <state NAME="rotating" ID="4">
-      <transition NAME="middleButtonMove" NEXT_STATE_ID="4" EVENT_ID="536"> <!-- CTRL+MBM_Move-->
-        <action ID="1005" /> <!--AcROTATE-->
-      </transition>
-      <transition NAME="middleButtonRelease" NEXT_STATE_ID="0" EVENT_ID="506"> <!-- MBM_Release-->
-        <action ID="1100" /> <!--AcMODE_DESELECT-->
-        <action ID="1010" /> <!--AcROTATEEEND-->
-      </transition>
-      <transition NAME="middleButtonRelease" NEXT_STATE_ID="0" EVENT_ID="539"> <!-- CTRL+MBM_Release-->
-        <action ID="1100" /> <!--AcMODE_DESELECT-->
-        <action ID="1010" /> <!--AcROTATEEEND-->
-      </transition>
-    </state>
-    <state NAME="scaling" ID="3">
-      <transition NAME="rightButtonMove" NEXT_STATE_ID="3" EVENT_ID="535"> <!-- CTRL+RBM_Move -->
-        <action ID="1003" /> <!--AcROTATE -->
-      </transition>
-      <transition NAME="rightButtonRelease" NEXT_STATE_ID="0" EVENT_ID="507"> <!-- RBM_Release ==> SeSCALE  -->
-        <action ID="1100" /> <!--AcMODE_DESELECT-->
-        <action ID="1009" /> <!--AcSCALEEND-->
-      </transition>
-      <transition NAME="rightButtonRelease" NEXT_STATE_ID="0" EVENT_ID="538"> <!-- CTRL+RBM_Release ==> SeSCALE  -->
-        <action ID="1100" /> <!--AcMODE_DESELECT-->
-        <action ID="1009" /> <!--AcSCALEEND-->
-      </transition>
-    </state>
-  </stateMachine>
-  <!-- Behaviour of a HirachicalInteractor -->
-  <stateMachine NAME="HierachicalInteractor">
-    <state NAME="notSelected" ID="0" START_STATE="TRUE">
-      <transition NAME="leftButtonPress" NEXT_STATE_ID="1" EVENT_ID="1">
-        <action ID="1101" /> <!--AcMODESELECT-->
-      </transition>
-    </state>
-    <state NAME="selected" ID="1">
-      <transition NAME="checkSubSelected" NEXT_STATE_ID="2" EVENT_ID="1">
-        <action ID="38">
-          <floatParam Name="threshold" VALUE="0.5" />
-        </action>
-      </transition>
-      <transition NAME="Esc" NEXT_STATE_ID="0" EVENT_ID="13">
-        <action ID="1100" /> <!--AcMODEDESELECT-->
-      </transition>
-    </state>
-    <state NAME="checkSubSelected" ID="2">
-      <transition NAME="Yes" NEXT_STATE_ID="3" EVENT_ID="1004"> <!-- necessary transition of the state subSelected -->
-        <action ID="1102" /> <!--AcMODESUBSELECT--> <!-- the event will produced from the hirachical interactor -->
-      </transition>
-      <transition NAME="No" NEXT_STATE_ID="1" EVENT_ID="1003"> <!-- necessary transition of the state subSelected --></transition> <!-- the event will produced from the hirachical interactor -->
-    </state>
-    <state NAME="subSelected" ID="3">
-      <transition NAME="SubInteractorDeselect" NEXT_STATE_ID="1" EVENT_ID="1020"> <!-- necessary transition of the state subSelected -->
-        <action ID="1101" /> <!--AcMODEDESELECT--> <!-- the event will produced from the hirachical interactor -->
-      </transition>
-      <transition NAME="Esc" NEXT_STATE_ID="1" EVENT_ID="13">
-        <action ID="1101" /> <!--AcMODESELECT-->
-      </transition>
-    </state>
-  </stateMachine>
-  <!-- end of the HirachicalInteractor -->
-  <stateMachine NAME="AffineInteractions ctrl-drag_marcus">
-    <state NAME="start" ID="0" START_STATE="TRUE">
-      <transition NAME="leftButtonPress" NEXT_STATE_ID="12" EVENT_ID="1"> <!-- 30 = SeCHECKELEMENT  -->
-        <action ID="30" />
-      </transition>
-      <transition NAME="rightButtonPress" NEXT_STATE_ID="13" EVENT_ID="2"> <!-- 1002 = SeSCALESTART  -->
-        <action ID="30" />
-      </transition>
-      <transition NAME="middleButtonPress" NEXT_STATE_ID="14" EVENT_ID="4"> <!-- 1004 = SeROTATESTART  -->
-        <action ID="30" />
-      </transition>
-    </state>
-    <state NAME="picked guard Translate" ID="12">
-      <transition NAME="yes" NEXT_STATE_ID="2" EVENT_ID="1004"> <!-- EIDYES -->
-        <action ID="1000" />
-      </transition>
-      <transition NAME="no" NEXT_STATE_ID="0" EVENT_ID="1003"> <!-- StNO -->
-        <action ID="0" />
-      </transition>
-    </state>
-    <state NAME="picked guard Scale" ID="13">
-      <transition NAME="yes" NEXT_STATE_ID="3" EVENT_ID="1004"> <!-- EIDYES -->
-        <action ID="1002" />
-      </transition>
-      <transition NAME="no" NEXT_STATE_ID="0" EVENT_ID="1003"> <!-- StNO -->
-        <action ID="0" />
-      </transition>
-    </state>
-    <state NAME="picked guard Rotate" ID="14">
-      <transition NAME="yes" NEXT_STATE_ID="4" EVENT_ID="1004"> <!-- EIDYES -->
-        <action ID="1004" />
-      </transition>
-      <transition NAME="no" NEXT_STATE_ID="0" EVENT_ID="1003"> <!-- StNO -->
-        <action ID="0" />
-      </transition>
-    </state>
-    <state NAME="translating" ID="2">
-      <transition NAME="leftButtonMove" NEXT_STATE_ID="2" EVENT_ID="530"> <!-- 1000 = SeTRANSLATE  -->
-        <action ID="1001" />
-      </transition>
-      <transition NAME="leftButtonRelease" NEXT_STATE_ID="0" EVENT_ID="505"> <!-- 1000 = SeTRANSLATE  -->
-        <action ID="1001" />
-      </transition>
-      <transition NAME="leftButtonRelease" NEXT_STATE_ID="0" EVENT_ID="537"> <!-- CTRL+LBM_Release ==> SeTRANSLATE  -->
-        <action ID="1001" />
-      </transition>
-    </state>
-    <state NAME="scaling" ID="3">
-      <transition NAME="rightButtonMove" NEXT_STATE_ID="3" EVENT_ID="531"> <!-- 1003 = SeSCALE  -->
-        <action ID="1003" />
-      </transition>
-      <transition NAME="rightButtonRelease" NEXT_STATE_ID="0" EVENT_ID="507"> <!-- 1003 = SeSCALE  -->
-        <action ID="1003" />
-      </transition>
-      <transition NAME="rightButtonRelease" NEXT_STATE_ID="0" EVENT_ID="538"> <!-- CTRL+RBM_Release ==> SeSCALE  -->
-        <action ID="1003" />
-      </transition>
-    </state>
-    <state NAME="rotating" ID="4">
-      <transition NAME="middleButtonMove" NEXT_STATE_ID="4" EVENT_ID="533"> <!-- 1005 = SeROTATE  -->
-        <action ID="1005" />
-      </transition>
-      <transition NAME="middleButtonRelease" NEXT_STATE_ID="0" EVENT_ID="506"> <!-- 1005 = SeROTATE  -->
-        <action ID="1005" />
-      </transition>
-      <transition NAME="middleButtonRelease" NEXT_STATE_ID="0" EVENT_ID="539"> <!-- 1005 = SeROTATE  -->
-        <action ID="1005" />
-      </transition>
-    </state>
-  </stateMachine>
-  <stateMachine NAME="AffineInteractions click to select">
-    <state NAME="start" ID="1" START_STATE="TRUE">
-      <transition NAME="leftButtonPress" NEXT_STATE_ID="2" EVENT_ID="1"> <!-- 30 = SeCHECKELEMENT  -->
-        <action ID="30" />
-      </transition>
-    </state>
-    <state NAME="object selected check" ID="2">
-      <transition NAME="yes" NEXT_STATE_ID="10" EVENT_ID="1004"> <!-- EIDYES -->
-        <action ID="0" />
-      </transition>
-      <transition NAME="no" NEXT_STATE_ID="1" EVENT_ID="1003"> <!-- EIDNO -->
-        <action ID="0" />
-      </transition>
-    </state>
-    <state NAME="neutral" ID="10">
-      <transition NAME="leftButtonPress" NEXT_STATE_ID="20" EVENT_ID="1"> <!-- 30 = SeCHECKELEMENT  -->
-        <action ID="30" />
-      </transition>
-      <transition NAME="rightButtonPress" NEXT_STATE_ID="31" EVENT_ID="2"> <!-- 1002 = SeSCALESTART  -->
-        <action ID="1002" />
-      </transition>
-      <transition NAME="middleButtonPress" NEXT_STATE_ID="41" EVENT_ID="4"> <!-- 1004 = SeROTATESTART  -->
-        <action ID="1004" />
-      </transition>
-    </state>
-    <state NAME="object deselect check" ID="20">
-      <transition NAME="yes" NEXT_STATE_ID="21" EVENT_ID="1004"> <!-- 1000 = SeTRANSLATESTART -->
-        <action ID="1000" />
-      </transition>
-      <transition NAME="no" NEXT_STATE_ID="1" EVENT_ID="1003"> <!-- EIDNO -->
-        <action ID="0" />
-      </transition>
-    </state>
-    <state NAME="translating" ID="21">
-      <transition NAME="leftButtonMove" NEXT_STATE_ID="21" EVENT_ID="530"> <!-- 1001 = SeTRANSLATE  -->
-        <action ID="1000" />
-      </transition>
-      <transition NAME="leftButtonRelease" NEXT_STATE_ID="10" EVENT_ID="505"> <!-- 0 = no sideeffect  -->
-        <action ID="0" />
-      </transition>
-    </state>
-    <state NAME="scaling" ID="31">
-      <transition NAME="rightButtonMove" NEXT_STATE_ID="31" EVENT_ID="531"> <!-- 1003 = SeSCALE  -->
-        <action ID="1003" />
-      </transition>
-      <transition NAME="rightButtonRelease" NEXT_STATE_ID="10" EVENT_ID="507"> <!-- 0 = no sideeffect  -->
-        <action ID="0" />
-      </transition>
-    </state>
-    <state NAME="rotating" ID="41">
-      <transition NAME="middleButtonMove" NEXT_STATE_ID="41" EVENT_ID="533"> <!-- 1005 = SeROTATE  -->
-        <action ID="1005" />
-      </transition>
-      <transition NAME="middleButtonRelease" NEXT_STATE_ID="10" EVENT_ID="506"> <!-- 0 = no sideeffect  -->
-        <action ID="0" />
-      </transition>
-    </state>
-  </stateMachine>
-  <!-- Behaviour for connecting points using mitk::ConnectPointsInteractor -->
-  <stateMachine NAME="connectpointsinteractor">
-    <state NAME="ready" ID="1" START_STATE="TRUE">
-      <transition NAME="addPoint but check n" NEXT_STATE_ID="1" EVENT_ID="3">
-        <action ID="10" /> <!--AcADDPOINT-->
-      </transition>
-      <transition NAME="remove" NEXT_STATE_ID="1" EVENT_ID="12">
-    <action ID="100" /> <!--AcREMOVEPOINT-->
-     </transition>
-    </state>
-  </stateMachine>
-  <stateMachine NAME="VesselGraphInteractor">
-    <state NAME="Start" ID="1" START_STATE="TRUE">
-      <transition NAME="goToCheckPicking" NEXT_STATE_ID="2" EVENT_ID="5">
-         <action ID="31"/>  <!-- AcCHECKOBJECT  -->
-      </transition>
-    </state>
-    <state NAME="CheckPicking" ID="2">
-      <transition NAME="noPicked" NEXT_STATE_ID="4" EVENT_ID="1003" >
-        <action ID="66" /> <!-- AcSELECTPOINT  -->
-      </transition>
-      <transition NAME="yesPicked" NEXT_STATE_ID="3" EVENT_ID="1004">
-        <action ID="69"/>  <!-- AcSELECTSUBOBJECT  -->
-      </transition>
-     </state>
-    <state NAME="OneVesselPicked" ID="3">
-      <transition NAME="goToCheckPicking" NEXT_STATE_ID="5" EVENT_ID="5" >
-        <action ID="31"/>  <!-- AcCHECKOBJECT  -->
-      </transition>
-      <transition NAME="delete" NEXT_STATE_ID="1" EVENT_ID="12" >
-        <action ID="104"/>  <!-- AcREMOVESELECTEDSUBOBJECT -->
-      </transition>
-      <transition NAME="deselectAll" NEXT_STATE_ID="1" EVENT_ID="14" >
-        <action ID="72"/>  <!-- AcDESELECTALL -->
-      </transition>
-      <transition NAME="searchPeriphery" NEXT_STATE_ID="11" EVENT_ID="15" >
-        <action ID="3000"/>  <!-- AcPERIPHERYSEARCH -->
-      </transition>
-      <transition NAME="searchToRoot" NEXT_STATE_ID="11" EVENT_ID="16" >
-        <action ID="3001"/>  <!-- AcROOTSEARCH -->
-      </transition>
-      <transition NAME="searchToThickstVessel" NEXT_STATE_ID="11" EVENT_ID="17" >
-        <action ID="3002"/>  <!-- AcTHICKSTVESSELSEARCH -->
-      </transition>
-
-      <!--now follow the attibutations for different vessel types-->
-      <transition NAME="attributation" NEXT_STATE_ID="3" EVENT_ID="20" >
-        <action ID="3005">  <!-- AcATTRIBUTATION -->
-     <intParameter NAME="attribute_id" VALUE="0" />
-        </action>
-      </transition>
-      <transition NAME="attributation" NEXT_STATE_ID="3" EVENT_ID="21" >
-        <action ID="3005">  <!-- AcATTRIBUTATION -->
-          <intParameter NAME="attribute_id" VALUE="1" />
-        </action>
-      </transition>
-      <transition NAME="attributation" NEXT_STATE_ID="3" EVENT_ID="30" >
-        <action ID="3005">  <!-- AcATTRIBUTATION -->
-          <intParameter NAME="attribute_id" VALUE="2" />
-        </action>
-      </transition>
-      <transition NAME="attributation" NEXT_STATE_ID="3" EVENT_ID="31" >
-        <action ID="3005">  <!-- AcATTRIBUTATION -->
-          <intParameter NAME="attribute_id" VALUE="3" />
-         </action>
-      </transition>
-      <transition NAME="attributation" NEXT_STATE_ID="3" EVENT_ID="40" >
-        <action ID="3005">  <!-- AcATTRIBUTATION -->
-          <intParameter NAME="attribute_id" VALUE="4" />
-        </action>
-      </transition>
-      <transition NAME="default" NEXT_STATE_ID="1" EVENT_ID="90" >
-         <action ID="3007"/>  <!-- AcDEFAULT -->
-      </transition>
-    </state>
-    <state NAME="OnePointPicked" ID="4">
-      <transition NAME="goToCheckPicking" NEXT_STATE_ID="6" EVENT_ID="5">
-        <action ID="31"/>  <!-- AcCHECKOBJECT  -->
-      </transition>
-      <transition NAME="deselectAll" NEXT_STATE_ID="1" EVENT_ID="14" >
-        <action ID="72"/>  <!-- AcDESELECTALL -->
-      </transition>
-    </state>
-    <state NAME="CheckPicking" ID="5">
-      <transition NAME="noPicked" NEXT_STATE_ID="7" EVENT_ID="1003" >
-        <action ID="66" /> <!-- AcSELECTPOINT  -->
-      </transition>
-      <transition NAME="yesPicked" NEXT_STATE_ID="13" EVENT_ID="1004" >
-        <action ID="69"/>    <!-- AcSELECTSUBOBJECT  -->
-        <action ID="3010" />   <!-- AcCHECKBARRIERSTATUS -->
-      </transition>
-    </state>
-    <state NAME="CheckPicking" ID="6">
-      <transition NAME="noPicked" NEXT_STATE_ID="9" EVENT_ID="1003" >
-        <action ID="66" /> <!-- AcSELECTPOINT  -->
-      </transition>
-      <transition NAME="yesPicked" NEXT_STATE_ID="7" EVENT_ID="1004" >
-        <action ID="69"/>    <!-- AcSELECTSUBOBJECT  -->
-      </transition>
-    </state>
-    <state NAME="OneVesselOnePointPicked" ID="7" >
-      <transition NAME="ENew" NEXT_STATE_ID="1" EVENT_ID="13">
-        <action ID="81"/>   <!-- AcNEWSUBOBJECT -->
-        <action ID="72"/>   <!-- AcDESELECTALL -->
-      </transition>
-      <transition NAME="deselectAll" NEXT_STATE_ID="1" EVENT_ID="14" >
-        <action ID="72"/>  <!-- AcDESELECTALL -->
-      </transition>
-      <transition NAME="delete" NEXT_STATE_ID="1" EVENT_ID="12" >
-        <action ID="104"/>  <!-- AcREMOVESELECTEDSUBOBJECT -->
-      </transition>
-      <transition NAME="setVesselElement" NEXT_STATE_ID="7" EVENT_ID="91" >
-        <action ID="3008"/>  <!-- AcSETVESSELELEMENT-->
-      </transition>
-
-      <!--now follow the attibutations for different vessel types-->
-      <transition NAME="attributation" NEXT_STATE_ID="7" EVENT_ID="20" >
-        <action ID="3005">  <!-- AcATTRIBUTATION -->
-     <intParameter NAME="attribute_id" VALUE="0" />
-        </action>
-      </transition>
-      <transition NAME="attributation" NEXT_STATE_ID="7" EVENT_ID="21" >
-        <action ID="3005">  <!-- AcATTRIBUTATION -->
-          <intParameter NAME="attribute_id" VALUE="1" />
-        </action>
-      </transition>
-      <transition NAME="attributation" NEXT_STATE_ID="7" EVENT_ID="30" >
-        <action ID="3005">  <!-- AcATTRIBUTATION -->
-          <intParameter NAME="attribute_id" VALUE="2" />
-        </action>
-      </transition>
-      <transition NAME="attributation" NEXT_STATE_ID="7" EVENT_ID="31" >
-        <action ID="3005">  <!-- AcATTRIBUTATION -->
-          <intParameter NAME="attribute_id" VALUE="3" />
-         </action>
-      </transition>
-      <transition NAME="attributation" NEXT_STATE_ID="7" EVENT_ID="40" >
-        <action ID="3005">  <!-- AcATTRIBUTATION -->
-          <intParameter NAME="attribute_id" VALUE="4" />
-        </action>
-      </transition>
-      <transition NAME="default" NEXT_STATE_ID="1" EVENT_ID="90" >
-         <action ID="3007"/>  <!-- AcDEFAULT -->
-      </transition>
-    </state>
-    <state NAME="TwoVesselsPicked" ID="8" >
-      <transition NAME="ENew" NEXT_STATE_ID="1" EVENT_ID="13">
-        <action ID="81"/>  <!-- AcNEWSUBOBJECT -->
-        <action ID="72"/>   <!-- AcDESELECTALL -->
-      </transition>
-      <transition NAME="goToCheckPicking" NEXT_STATE_ID="10" EVENT_ID="5" >
-        <action ID="31"/>  <!-- AcCHECKOBJECT  -->
-      </transition>
-      <transition NAME="searchShortestPathBetween2Edges" NEXT_STATE_ID="11" EVENT_ID="18" >
-        <action ID="3003"/>  <!-- AcSHORTESTPATHSEARCH -->
-      </transition>
-      <transition NAME="deselectAll" NEXT_STATE_ID="1" EVENT_ID="14" >
-        <action ID="72"/>  <!-- AcDESELECTALL -->
-      </transition>
-      <transition NAME="delete" NEXT_STATE_ID="1" EVENT_ID="12" >
-        <action ID="104"/>  <!-- AcREMOVESELECTEDSUBOBJECT -->
-      </transition>
-      <transition NAME="setVesselElement" NEXT_STATE_ID="8" EVENT_ID="91" >
-        <action ID="3008"/>  <!-- AcSETVESSELELEMENT-->
-      </transition>
-
-      <!--now follow the attibutations for different vessel types-->
-      <transition NAME="attributation" NEXT_STATE_ID="8" EVENT_ID="20" >
-       <action ID="3005">  <!-- AcATTRIBUTATION -->
-         <intParameter NAME="attribute_id" VALUE="0" />
-       </action>
-      </transition>
-      <transition NAME="attributation" NEXT_STATE_ID="8" EVENT_ID="21" >
-       <action ID="3005">  <!-- AcATTRIBUTATION -->
-   <intParameter NAME="attribute_id" VALUE="1" />
-       </action>
-      </transition>
-      <transition NAME="attributation" NEXT_STATE_ID="8" EVENT_ID="30" >
-       <action ID="3005">  <!-- AcATTRIBUTATION -->
-  <intParameter NAME="attribute_id" VALUE="2" />
-       </action>
-      </transition>
-      <transition NAME="attributation" NEXT_STATE_ID="8" EVENT_ID="31" >
-       <action ID="3005">  <!-- AcATTRIBUTATION -->
-  <intParameter NAME="attribute_id" VALUE="3" />
-       </action>
-      </transition>
-      <transition NAME="attributation" NEXT_STATE_ID="8" EVENT_ID="40" >
-       <action ID="3005">  <!-- AcATTRIBUTATION -->
-   <intParameter NAME="attribute_id" VALUE="4" />
-       </action>
-      </transition>
-      <transition NAME="default" NEXT_STATE_ID="1" EVENT_ID="90" >
-         <action ID="3007"/>  <!-- AcDEFAULT -->
-      </transition>
-    </state>
-    <state NAME="TwoPointsPicked" ID="9" >
-      <transition NAME="ENew" NEXT_STATE_ID="1" EVENT_ID="13">
-        <action ID="81"/>  <!-- AcNEWSUBOBJECT -->
-      </transition>
-      <transition NAME="deselectAll" NEXT_STATE_ID="1" EVENT_ID="14" >
-        <action ID="72"/>  <!-- AcDESELECTALL -->
-      </transition>
-      <transition NAME="setVesselElement" NEXT_STATE_ID="9" EVENT_ID="91" >
-        <action ID="3008"/>  <!-- AcSETVESSELELEMENT-->
-      </transition>
-    </state>
-    <state NAME="CheckPicking" ID="10">
-      <transition NAME="noPicked" NEXT_STATE_ID="12" EVENT_ID="1003" >
-        <action ID="36"/>    <!--AcCHECKGREATERTWO-->
-      </transition>
-      <transition NAME="yesPicked" NEXT_STATE_ID="14" EVENT_ID="1004">
-        <action ID="69"/>  <!-- AcSELECTSUBOBJECT  -->
-        <action ID="3010" />   <!-- AcCHECKBARRIERSTATUS -->
-      </transition>
-     </state>
-     <state NAME="MoreVesselsPicked" ID="11" >
-      <transition NAME="delete" NEXT_STATE_ID="1" EVENT_ID="12">
-        <action ID="104"/>   <!-- AcDESELECTALL -->
-      </transition>
-      <transition NAME="goToCheckPicking" NEXT_STATE_ID="10" EVENT_ID="5" >
-        <action ID="31"/>  <!-- AcCHECKOBJECT  -->
-      </transition>
-      <transition NAME="deselectAll" NEXT_STATE_ID="1" EVENT_ID="14" >
-        <action ID="72"/>  <!-- AcDESELECTALL -->
-      </transition>
-      <transition NAME="singleSignal" NEXT_STATE_ID="3" EVENT_ID="19" >
-        <action ID="3004"/>  <!-- AcSINGLE -->
-      </transition>
-
-      <!--now follow the attibutations for different vessel types-->
-      <transition NAME="attributation" NEXT_STATE_ID="11" EVENT_ID="20" >
-       <action ID="3005">  <!-- AcATTRIBUTATION -->
-         <intParameter NAME="attribute_id" VALUE="0" />
-       </action>
-      </transition>
-      <transition NAME="attributation" NEXT_STATE_ID="11" EVENT_ID="21" >
-       <action ID="3005">  <!-- AcATTRIBUTATION -->
-   <intParameter NAME="attribute_id" VALUE="1" />
-       </action>
-      </transition>
-      <transition NAME="attributation" NEXT_STATE_ID="11" EVENT_ID="30" >
-       <action ID="3005">  <!-- AcATTRIBUTATION -->
-  <intParameter NAME="attribute_id" VALUE="2" />
-       </action>
-      </transition>
-      <transition NAME="attributation" NEXT_STATE_ID="11" EVENT_ID="31" >
-       <action ID="3005">  <!-- AcATTRIBUTATION -->
-   <intParameter NAME="attribute_id" VALUE="3" />
-        </action>
-      </transition>
-      <transition NAME="attributation" NEXT_STATE_ID="11" EVENT_ID="40" >
-       <action ID="3005">  <!-- AcATTRIBUTATION -->
-   <intParameter NAME="attribute_id" VALUE="4" />
-       </action>
-      </transition>
-      <transition NAME="default" NEXT_STATE_ID="1" EVENT_ID="90" >
-         <action ID="3007"/>  <!-- AcDEFAULT -->
-      </transition>
-      </state>
-      <state NAME="CheckNumberPickedVesselsSmaller2" ID="12">
-      <transition NAME="yes" NEXT_STATE_ID="8" EVENT_ID="1004" />
-      <transition NAME="no" NEXT_STATE_ID="11" EVENT_ID="1003">
-        <action ID="69"/>  <!-- AcSELECTSUBOBJECT  -->
-      </transition>
-     </state>
-     <state NAME="CheckBarrierStatus" ID="13">
-      <transition NAME="yes" NEXT_STATE_ID="3" EVENT_ID="1004" />
-      <transition NAME="no" NEXT_STATE_ID="8" EVENT_ID="1003" />
-     </state>
-     <state NAME="CheckBarrierStatus" ID="14">
-      <transition NAME="yes" NEXT_STATE_ID="8" EVENT_ID="1004" />
-      <transition NAME="no" NEXT_STATE_ID="11" EVENT_ID="1003" />
-     </state>
-  </stateMachine>
-  <!-- state machine for vessel TREE interaction -->
-  <stateMachine NAME="YetAnotherVesselTreeInteractor">
-    <state NAME="no-vessel-picked" ID="0" START_STATE="TRUE">
-      <transition NAME="checkpicked" NEXT_STATE_ID="1" EVENT_ID="5">
-        <action ID="30"/> <!--AcCHECKELEMENT-->
-      </transition>
-    </state>
-    <state NAME="check-guard" ID="1">
-      <transition NAME="check-successful" NEXT_STATE_ID="2" EVENT_ID="1004">
-        <action ID="65" /> <!--AcSELECT-->
-      </transition>
-      <transition NAME="check-not-successful" NEXT_STATE_ID="0" EVENT_ID="1003">
-        <action ID="75" /> <!--AcDESELECT-->
-      </transition>
-    </state>
-    <state NAME="vessel-picked" ID="2">
-      <transition NAME="checkpicked" NEXT_STATE_ID="1" EVENT_ID="5">
-        <action ID="30"/> <!--AcCHECKELEMENT-->
-      </transition>
-    </state>
-  </stateMachine>
-
-<stateMachine NAME="EasySegmentation">
-<!-- State machine for interaction with segmentations. 
-     Original author: Daniel Maleike
-     Status: idea/experiment
-     Basic behaviour: Collision detection checks, whether the mouse cursor is inside some segmentation.
-                      When outside, the behaviour is identical to moveNzoom, i.e. translation of the
-                      whole scene using the middle button, scaling of the whole scene using the right button.
-                      When the pointer is inside a segmentation, middle button behaviour changes to
-                      moving the segmentation under the cursor, right mouse button generates 
-                      parameters for segmentation algorithms (TODO: clarify)
-                      The mouse wheel should change the currently selected segmentation tool.  -->
-  <state NAME="Moving around outside object" ID="0" START_STATE="TRUE">
-  <!-- initial state: outside anything and checking for collisions -->
-    <transition NAME="OnMouseMove" EVENT_ID="520" NEXT_STATE_ID="2">
-      <action ID="31" /> <!-- AcCheckObject -->
-    </transition>
-    <transition NAME="OnRightMouseDown" EVENT_ID="2" NEXT_STATE_ID="5">
-      <!-- nothing to do here -->
-    </transition>
-  </state>
-  <state NAME="Moving around inside object" ID="1">
-  <!-- inside an object, checking for non-collision -->
-    <transition NAME="OnMouseMove" EVENT_ID="520" NEXT_STATE_ID="3">
-      <action ID="31" /> <!-- AcCheckObject -->
-    </transition>
-  </state>
-  <state NAME="Checking if still outside" ID="2">
-  <!-- "guard state": check for collision and generate new event from descision -->
-    <transition NAME="OnCollision" EVENT_ID="1004" NEXT_STATE_ID="1">
-      <action ID="48000" /> <!-- AcEnterObject -->
-    </transition>
-    <transition NAME="OnCollision" EVENT_ID="64000" NEXT_STATE_ID="1">
-      <action ID="48000" /> <!-- AcEnterObject -->
-    </transition>
-    <transition NAME="NoCollision" EVENT_ID="1003" NEXT_STATE_ID="0">
-      <!-- no change in collision status-->
-    </transition>
-  </state>
-  <state NAME="Checking if still inside" ID="3">
-  <!-- "guard state": check for collision and generate new event from descision -->
-    <transition NAME="OnCollision" EVENT_ID="1004" NEXT_STATE_ID="1">
-      <!-- no change in collision status-->
-    </transition>
-    <transition NAME="OnCollisionWithOtherObject" EVENT_ID="64000" NEXT_STATE_ID="1">
-      <action ID="48002" /> <!-- AcSwitchObject -->
-    </transition>
-    <transition NAME="NoCollision" EVENT_ID="1003" NEXT_STATE_ID="0">
-      <action ID="48001" /> <!-- AcLeaveObject -->
-    </transition>
-  </state>
-  <state NAME="Drawing line" ID="4">
-  <!-- line drawing started, now always update the end point of the line -->
-    <transition NAME="OnMouseMove" EVENT_ID="520" NEXT_STATE_ID="4">
-      <action ID="48003" /> <!-- AcUpdateLine -->
-    </transition>
-    <transition NAME="OnRightMouseUp" EVENT_ID="507" NEXT_STATE_ID="0">
-      <action ID="48005" /> <!-- AcTerminateLine -->
-      <action ID="48006" /> <!-- AcCreateBox -->
-    </transition>
-  </state>
-  <state NAME="Right mouse down - what to do?" ID="5">
-  <!-- right mouse button was pressed, now the user could either zoom (hold button) or start drawing a line (release) -->
-    <transition NAME="OnMouseMove(while right button down)" EVENT_ID="531" NEXT_STATE_ID="6">
-      <!-- woah, that one could mean zooming  -->
-    </transition>
-    <transition NAME="OnRightMouseUp" EVENT_ID="507" NEXT_STATE_ID="4">
-      <!-- no zooming but initiate line drawing-->
-      <action ID="48004" /> <!-- AcInitLine -->
-    </transition>
-  </state>
-  <state NAME="Right mouse down and some movement - what to do?" ID="6">
-  <!-- right mouse button was pressed, now the user could either zoom (hold button) or start drawing a line (release) -->
-    <transition NAME="OnMouseMove" EVENT_ID="531" NEXT_STATE_ID="7">
-      <!-- now the user gets her zooming  -->
-    </transition>
-    <transition NAME="OnRightMouseUp" EVENT_ID="507" NEXT_STATE_ID="4">
-      <!-- no zooming but initiate line drawing-->
-      <action ID="48004" /> <!-- AcInitLine -->
-    </transition>
-  </state>
-  <state NAME="Zooming" ID="7">
-  <!-- right mouse button was pressed and two mouse move events occured, now the user zooms -->
-    <transition NAME="OnRightMouseUp" EVENT_ID="531" NEXT_STATE_ID="0">
-      <!-- end of zooming, return to normal operation -->
-    </transition>
-  </state>
-</stateMachine>
-
-  
+  <!-- Interaction State Machine Patterns: -->
   <!-- -->
   <!-- -->
   <!-- EventDescriptions -->
@@ -1981,6 +142,2568 @@
     <!-- Puncture Application -->
     <event NAME="print" ID="3001" TYPE="Type_Application" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_none" />
   </events>
+  <stateMachine NAME="AffineInteractions click to select">
+    <state NAME="start" ID="1" START_STATE="TRUE" X_POS="3" Y_POS="40" WIDTH="100" HEIGHT="50">
+      <transition NAME="leftButtonPress" NEXT_STATE_ID="2" EVENT_ID="1">
+        <!-- 30 = SeCHECKELEMENT  -->
+        <action ID="30" />
+      </transition>
+    </state>
+    <state NAME="object selected check" ID="2" X_POS="282" Y_POS="23" WIDTH="126" HEIGHT="50">
+      <transition NAME="yes" NEXT_STATE_ID="10" EVENT_ID="1004">
+        <!-- EIDYES -->
+        <action ID="0" />
+      </transition>
+      <transition NAME="no" NEXT_STATE_ID="1" EVENT_ID="1003">
+        <!-- EIDNO -->
+        <action ID="0" />
+      </transition>
+    </state>
+    <state NAME="neutral" ID="10" X_POS="714" Y_POS="85" WIDTH="100" HEIGHT="50">
+      <transition NAME="leftButtonPress" NEXT_STATE_ID="20" EVENT_ID="1">
+        <!-- 30 = SeCHECKELEMENT  -->
+        <action ID="30" />
+      </transition>
+      <transition NAME="rightButtonPress" NEXT_STATE_ID="31" EVENT_ID="2">
+        <!-- 1002 = SeSCALESTART  -->
+        <action ID="1002" />
+      </transition>
+      <transition NAME="middleButtonPress" NEXT_STATE_ID="41" EVENT_ID="4">
+        <!-- 1004 = SeROTATESTART  -->
+        <action ID="1004" />
+      </transition>
+    </state>
+    <state NAME="object deselect check" ID="20" X_POS="57" Y_POS="396" WIDTH="122" HEIGHT="50">
+      <transition NAME="yes" NEXT_STATE_ID="21" EVENT_ID="1004">
+        <!-- 1000 = SeTRANSLATESTART -->
+        <action ID="1000" />
+      </transition>
+      <transition NAME="no" NEXT_STATE_ID="1" EVENT_ID="1003">
+        <!-- EIDNO -->
+        <action ID="0" />
+      </transition>
+    </state>
+    <state NAME="translating" ID="21" X_POS="203" Y_POS="150" WIDTH="100" HEIGHT="50">
+      <transition NAME="leftButtonMove" NEXT_STATE_ID="21" EVENT_ID="530">
+        <!-- 1001 = SeTRANSLATE  -->
+        <action ID="1000" />
+      </transition>
+      <transition NAME="leftButtonRelease" NEXT_STATE_ID="10" EVENT_ID="505">
+        <!-- 0 = no sideeffect  -->
+        <action ID="0" />
+      </transition>
+    </state>
+    <state NAME="scaling" ID="31" X_POS="347" Y_POS="459" WIDTH="100" HEIGHT="50">
+      <transition NAME="rightButtonMove" NEXT_STATE_ID="31" EVENT_ID="531">
+        <!-- 1003 = SeSCALE  -->
+        <action ID="1003" />
+      </transition>
+      <transition NAME="rightButtonRelease" NEXT_STATE_ID="10" EVENT_ID="507">
+        <!-- 0 = no sideeffect  -->
+        <action ID="0" />
+      </transition>
+    </state>
+    <state NAME="rotating" ID="41" X_POS="657" Y_POS="465" WIDTH="100" HEIGHT="50">
+      <transition NAME="middleButtonMove" NEXT_STATE_ID="41" EVENT_ID="533">
+        <!-- 1005 = SeROTATE  -->
+        <action ID="1005" />
+      </transition>
+      <transition NAME="middleButtonRelease" NEXT_STATE_ID="10" EVENT_ID="506">
+        <!-- 0 = no sideeffect  -->
+        <action ID="0" />
+      </transition>
+    </state>
+  </stateMachine>
+  <stateMachine NAME="AffineInteractions ctrl-drag">
+    <!-- affine interactions standard statemachine  -->
+    <state NAME="start" ID="0" START_STATE="TRUE" X_POS="29" Y_POS="70" WIDTH="100" HEIGHT="50">
+      <transition NAME="leftButtonPress" NEXT_STATE_ID="12" EVENT_ID="5">
+        <!-- CTRL+LBM_Down -->
+        <action ID="30">
+          <!--AcCHECKELEMENT-->
+        </action>
+      </transition>
+      <transition NAME="leftButtonPress" NEXT_STATE_ID="12" EVENT_ID="540">
+        <!-- SHIFT+CTRL+LBM_Down -->
+        <action ID="11">
+          <!--AcADD-->
+        </action>
+      </transition>
+      <transition NAME="middleButtonPress" NEXT_STATE_ID="14" EVENT_ID="6">
+        <!-- CTRL+MBM_Down -->
+        <action ID="30">
+          <!--AcCHECKELEMENT-->
+        </action>
+      </transition>
+      <transition NAME="rightButtonPress" NEXT_STATE_ID="13" EVENT_ID="7">
+        <!-- CTRL+RBM_Down -->
+        <action ID="30">
+          <!--AcCHECKELEMENT-->
+        </action>
+      </transition>
+    </state>
+    <state NAME="picked guard Translate" ID="12" X_POS="376" Y_POS="34" WIDTH="151" HEIGHT="50">
+      <transition NAME="yes" NEXT_STATE_ID="2" EVENT_ID="1004">
+        <!-- EIDYES -->
+        <action ID="1101">
+          <!--AcMODE_SELECT-->
+        </action>
+        <action ID="1000">
+          <!--AcTRANSLATESTART-->
+        </action>
+      </transition>
+      <transition NAME="no" NEXT_STATE_ID="0" EVENT_ID="1003">
+        <!-- StNO -->
+      </transition>
+    </state>
+    <state NAME="picked guard Scale" ID="13" X_POS="647" Y_POS="312" WIDTH="100" HEIGHT="50">
+      <transition NAME="yes" NEXT_STATE_ID="3" EVENT_ID="1004">
+        <!-- EIDYES -->
+        <action ID="1101">
+          <!--AcMODE_SELECT-->
+        </action>
+        <action ID="1002">
+          <!--AcSCALESTART-->
+        </action>
+      </transition>
+      <transition NAME="no" NEXT_STATE_ID="0" EVENT_ID="1003">
+        <!-- StNO -->
+        <action ID="0" />
+      </transition>
+    </state>
+    <state NAME="picked guard Rotate" ID="14" X_POS="33" Y_POS="467" WIDTH="110" HEIGHT="50">
+      <transition NAME="yes" NEXT_STATE_ID="4" EVENT_ID="1004">
+        <!-- EIDYES -->
+        <action ID="1101">
+          <!--AcMODE_SELECT-->
+        </action>
+        <action ID="1004" />
+      </transition>
+      <transition NAME="no" NEXT_STATE_ID="0" EVENT_ID="1003">
+        <!-- StNO -->
+        <action ID="0" />
+      </transition>
+    </state>
+    <state NAME="translating" ID="2" X_POS="724" Y_POS="59" WIDTH="100" HEIGHT="50">
+      <transition NAME="leftButtonMove" NEXT_STATE_ID="2" EVENT_ID="534">
+        <!-- CTRL+LBM_Move -->
+        <action ID="1001">
+          <!--AcTRANSLATE-->
+        </action>
+      </transition>
+      <transition NAME="leftButtonRelease" NEXT_STATE_ID="0" EVENT_ID="505">
+        <!-- LBM_Release-->
+        <action ID="1100">
+          <!--AcMODE_DESELECT-->
+        </action>
+        <action ID="1008">
+          <!--AcTRANSLATEEND-->
+        </action>
+      </transition>
+      <transition NAME="leftButtonRelease" NEXT_STATE_ID="0" EVENT_ID="537">
+        <!-- CTRL+LBM_Release -->
+        <action ID="1100">
+          <!--AcMODE_DESELECT-->
+        </action>
+        <action ID="1008">
+          <!--AcTRANSLATEEND-->
+        </action>
+      </transition>
+    </state>
+    <state NAME="rotating" ID="4" X_POS="371" Y_POS="481" WIDTH="100" HEIGHT="50">
+      <transition NAME="middleButtonMove" NEXT_STATE_ID="4" EVENT_ID="536">
+        <!-- CTRL+MBM_Move-->
+        <action ID="1005">
+          <!--AcROTATE-->
+        </action>
+      </transition>
+      <transition NAME="middleButtonRelease" NEXT_STATE_ID="0" EVENT_ID="506">
+        <!-- MBM_Release-->
+        <action ID="1100">
+          <!--AcMODE_DESELECT-->
+        </action>
+        <action ID="1010">
+          <!--AcROTATEEEND-->
+        </action>
+      </transition>
+      <transition NAME="middleButtonRelease" NEXT_STATE_ID="0" EVENT_ID="539">
+        <!-- CTRL+MBM_Release-->
+        <action ID="1100">
+          <!--AcMODE_DESELECT-->
+        </action>
+        <action ID="1010">
+          <!--AcROTATEEEND-->
+        </action>
+      </transition>
+    </state>
+    <state NAME="scaling" ID="3" X_POS="710" Y_POS="432" WIDTH="100" HEIGHT="50">
+      <transition NAME="rightButtonMove" NEXT_STATE_ID="3" EVENT_ID="535">
+        <!-- CTRL+RBM_Move -->
+        <action ID="1003">
+          <!--AcROTATE -->
+        </action>
+      </transition>
+      <transition NAME="rightButtonRelease" NEXT_STATE_ID="0" EVENT_ID="507">
+        <!-- RBM_Release ==> SeSCALE  -->
+        <action ID="1100">
+          <!--AcMODE_DESELECT-->
+        </action>
+        <action ID="1009">
+          <!--AcSCALEEND-->
+        </action>
+      </transition>
+      <transition NAME="rightButtonRelease" NEXT_STATE_ID="0" EVENT_ID="538">
+        <!-- CTRL+RBM_Release ==> SeSCALE  -->
+        <action ID="1100">
+          <!--AcMODE_DESELECT-->
+        </action>
+        <action ID="1009">
+          <!--AcSCALEEND-->
+        </action>
+      </transition>
+    </state>
+  </stateMachine>
+  <stateMachine NAME="drag">
+    <state NAME="neutral" ID="1" START_STATE="TRUE" X_POS="232" Y_POS="131" WIDTH="100" HEIGHT="50">
+      <transition NAME="check picked" NEXT_STATE_ID="1" EVENT_ID="1">
+        <action ID="80" />
+      </transition>
+      <transition NAME="continue" NEXT_STATE_ID="1" EVENT_ID="530">
+        <action ID="90" />
+      </transition>
+      <transition NAME="exit" NEXT_STATE_ID="1" EVENT_ID="505">
+        <action ID="42" />
+      </transition>
+    </state>
+    <state NAME="picked guard" ID="2" X_POS="94" Y_POS="360" WIDTH="100" HEIGHT="50">
+      <transition NAME="yes" NEXT_STATE_ID="3" EVENT_ID="1004">
+        <action ID="0" />
+      </transition>
+      <transition NAME="no" NEXT_STATE_ID="3" EVENT_ID="1003">
+        <action ID="0" />
+      </transition>
+    </state>
+    <state NAME="move" ID="3" X_POS="368" Y_POS="289" WIDTH="100" HEIGHT="50">
+      <transition NAME="continue" NEXT_STATE_ID="3" EVENT_ID="530">
+        <action ID="90" />
+      </transition>
+      <transition NAME="exit" NEXT_STATE_ID="1" EVENT_ID="505">
+        <action ID="42" />
+      </transition>
+    </state>
+  </stateMachine>
+  <stateMachine NAME="dragWithCtrl">
+    <state NAME="neutral" ID="1" START_STATE="TRUE" X_POS="439" Y_POS="166" WIDTH="100" HEIGHT="50">
+      <transition NAME="check picked" NEXT_STATE_ID="1" EVENT_ID="5">
+        <action ID="80" />
+      </transition>
+      <transition NAME="continue" NEXT_STATE_ID="1" EVENT_ID="534">
+        <action ID="90" />
+      </transition>
+      <!--            <transition NAME="exit" NEXT_STATE_ID="1" EVENT_ID="505">
+        <action ID="42" />
+      </transition>
+-->
+      <transition NAME="exit" NEXT_STATE_ID="1" EVENT_ID="537">
+        <action ID="42" />
+      </transition>
+      <transition NAME="exit" NEXT_STATE_ID="1" EVENT_ID="505">
+        <action ID="42" />
+      </transition>
+      <transition NAME="remove" NEXT_STATE_ID="1" EVENT_ID="12">
+        <action ID="100">
+          <!--AcREMOVEPOINT-->
+        </action>
+      </transition>
+    </state>
+    <state NAME="picked guard" ID="2" X_POS="141" Y_POS="427" WIDTH="100" HEIGHT="50">
+      <transition NAME="yes" NEXT_STATE_ID="3" EVENT_ID="1004">
+        <action ID="0" />
+      </transition>
+      <transition NAME="no" NEXT_STATE_ID="3" EVENT_ID="1003">
+        <action ID="0" />
+      </transition>
+    </state>
+    <state NAME="move" ID="3" X_POS="560" Y_POS="381" WIDTH="100" HEIGHT="50">
+      <transition NAME="continue" NEXT_STATE_ID="3" EVENT_ID="534">
+        <action ID="90" />
+      </transition>
+      <transition NAME="exit" NEXT_STATE_ID="1" EVENT_ID="505">
+        <action ID="42" />
+      </transition>
+      <transition NAME="exit" NEXT_STATE_ID="1" EVENT_ID="537">
+        <action ID="42" />
+      </transition>
+    </state>
+  </stateMachine>
+  <stateMachine NAME="focus">
+    <state NAME="neutral" ID="1" START_STATE="TRUE" X_POS="250" Y_POS="191" WIDTH="100" HEIGHT="50">
+      <transition NAME="changefocus" NEXT_STATE_ID="1" EVENT_ID="1">
+        <action ID="0" />
+      </transition>
+    </state>
+  </stateMachine>
+  <stateMachine NAME="global">
+    <!-- Behaviour the global statemachine -->
+    <state NAME="neutral" ID="1" START_STATE="TRUE" X_POS="203" Y_POS="168" WIDTH="100" HEIGHT="50">
+      <transition NAME="edit objects" NEXT_STATE_ID="2" EVENT_ID="1013" />
+      <!--EIDEDIT-->
+      <transition NAME="transmitt to all" NEXT_STATE_ID="1" EVENT_ID="0">
+        <!--EventId = 0-> all other events not defined here-->
+        <action ID="1200">
+          <!--AcINFORMLISTENERS-->
+        </action>
+        <action ID="1201">
+          <!--AcASKINTERACTORS-->
+        </action>
+      </transition>
+    </state>
+    <state NAME="edit object" ID="2" X_POS="508" Y_POS="404" WIDTH="100" HEIGHT="50">
+      <transition NAME="ready" NEXT_STATE_ID="1" EVENT_ID="1002" />
+      <!--EIDFINISHED-->
+      <transition NAME="transmitt to interactors only" NEXT_STATE_ID="2" EVENT_ID="0">
+        <action ID="1201">
+          <!--AcASKINTERACTORS-->
+        </action>
+      </transition>
+    </state>
+  </stateMachine>
+  <stateMachine NAME="leftmouse">
+    <state NAME="neutral" ID="1" START_STATE="TRUE" X_POS="197" Y_POS="164" WIDTH="100" HEIGHT="50">
+      <transition NAME="send Koordinates" NEXT_STATE_ID="1" EVENT_ID="1" SIDE_EFFECT_ID="80">
+        <action ID="80" />
+      </transition>
+      <transition NAME="send Koordinates Move" NEXT_STATE_ID="1" EVENT_ID="530" SIDE_EFFECT_ID="80">
+        <action ID="80" />
+      </transition>
+    </state>
+  </stateMachine>
+  <stateMachine NAME="measureinteractor">
+    <!-- Behaviour for measuring a length with lines-->
+    <state NAME="unbuild" ID="0" START_STATE="TRUE" X_POS="167" Y_POS="49" WIDTH="100" HEIGHT="50">
+      <transition NAME="forceSSD" NEXT_STATE_ID="1" EVENT_ID="3">
+        <action ID="5">
+          <!--AcINITNEWOBJECT-->
+        </action>
+        <action ID="1550">
+          <!--AcFORCESUBINTERACTORS-->
+        </action>
+        <action ID="1102">
+          <!--AcMODESUBSELECT-->
+        </action>
+        <action ID="2000">
+          <!--AcTRANSMITEVENT-->
+        </action>
+      </transition>
+    </state>
+    <state NAME="BuildUpSSD" ID="1" X_POS="433" Y_POS="329" WIDTH="100" HEIGHT="50">
+      <transition NAME="SubInteractorDeselect" NEXT_STATE_ID="10" EVENT_ID="1020">
+        <!-- necessary transition of the state subSelected. the event will produced from the hirachical interactor -->
+        <action ID="1101">
+          <!--AcMODEDESELECT-->
+        </action>
+      </transition>
+      <transition NAME="reinit" NEXT_STATE_ID="0" EVENT_ID="2">
+        <action ID="101" />
+        <action ID="1100">
+          <!--AcMODEDESELECT-->
+        </action>
+      </transition>
+    </state>
+    <state NAME="selected" ID="10" X_POS="617" Y_POS="56" WIDTH="100" HEIGHT="50">
+      <transition NAME="remove" NEXT_STATE_ID="0" EVENT_ID="12">
+        <action ID="101" />
+        <action ID="1100">
+          <!--AcMODEDESELECT-->
+        </action>
+      </transition>
+      <transition NAME="reinit" NEXT_STATE_ID="0" EVENT_ID="2">
+        <action ID="101" />
+        <action ID="1100">
+          <!--AcMODEDESELECT-->
+        </action>
+      </transition>
+    </state>
+  </stateMachine>
+  <stateMachine NAME="meshmove">
+    <state NAME="neutral" ID="1" START_STATE="TRUE" X_POS="193" Y_POS="74" WIDTH="100" HEIGHT="50">
+      <transition NAME="check picked" NEXT_STATE_ID="2" EVENT_ID="1">
+        <action ID="30" />
+      </transition>
+    </state>
+    <state NAME="picked guard" ID="2" X_POS="98" Y_POS="296" WIDTH="100" HEIGHT="50">
+      <transition NAME="yes" NEXT_STATE_ID="3" EVENT_ID="1004">
+        <action ID="0" />
+      </transition>
+      <transition NAME="no" NEXT_STATE_ID="1" EVENT_ID="1003">
+        <action ID="0" />
+      </transition>
+    </state>
+    <state NAME="move" ID="3" X_POS="467" Y_POS="276" WIDTH="100" HEIGHT="50">
+      <transition NAME="continue" NEXT_STATE_ID="3" EVENT_ID="530">
+        <action ID="90" />
+      </transition>
+      <transition NAME="exit" NEXT_STATE_ID="1" EVENT_ID="505">
+        <action ID="666" />
+      </transition>
+    </state>
+  </stateMachine>
+  <stateMachine NAME="moveNzoom">
+    <state NAME="neutral" ID="0" START_STATE="TRUE" X_POS="288" Y_POS="81" WIDTH="100" HEIGHT="50">
+      <transition NAME="initmove" NEXT_STATE_ID="1" EVENT_ID="4">
+        <action ID="9" />
+      </transition>
+      <transition NAME="initzoom" NEXT_STATE_ID="2" EVENT_ID="2">
+        <action ID="1011" />
+      </transition>
+    </state>
+    <state NAME="move" ID="1" X_POS="170" Y_POS="413" WIDTH="100" HEIGHT="50">
+      <transition NAME="move" NEXT_STATE_ID="1" EVENT_ID="533">
+        <action ID="92" />
+      </transition>
+      <transition NAME="finish" NEXT_STATE_ID="0" EVENT_ID="506" />
+    </state>
+    <state NAME="zoom" ID="2" X_POS="584" Y_POS="432" WIDTH="100" HEIGHT="50">
+      <transition NAME="zoom" NEXT_STATE_ID="2" EVENT_ID="531">
+        <action ID="1012" />
+      </transition>
+      <transition NAME="finish" NEXT_STATE_ID="0" EVENT_ID="507" />
+    </state>
+  </stateMachine>
+  <stateMachine NAME="navigation">
+    <state NAME="neutral" ID="1" START_STATE="TRUE" X_POS="189" Y_POS="175" WIDTH="100" HEIGHT="50">
+      <transition NAME="send Koordinates press" NEXT_STATE_ID="1" EVENT_ID="1">
+        <action ID="90" />
+      </transition>
+      <transition NAME="send Koordinates move" NEXT_STATE_ID="1" EVENT_ID="530">
+        <action ID="90" />
+      </transition>
+      <transition NAME="send Koordinates release" NEXT_STATE_ID="1" EVENT_ID="505">
+        <action ID="42" />
+      </transition>
+    </state>
+  </stateMachine>
+  <stateMachine NAME="picking">
+    <state NAME="neutral" ID="1" START_STATE="TRUE" X_POS="264" Y_POS="239" WIDTH="100" HEIGHT="50">
+      <transition NAME="do picking" NEXT_STATE_ID="1" EVENT_ID="3">
+        <action ID="1003" />
+      </transition>
+    </state>
+  </stateMachine>
+  <stateMachine NAME="pointSNAPinteractor">
+    <!-- Behaviour of Points, that can be snaped and then selected. -->
+    <state NAME="active" ID="0" START_STATE="TRUE" X_POS="79" Y_POS="100" WIDTH="100" HEIGHT="50">
+      <transition NAME="checkPointSnap" NEXT_STATE_ID="1" EVENT_ID="3">
+        <action ID="1102">
+          <!--AcMODESUBSELECT-->
+        </action>
+        <action ID="21">
+          <!--AcCHECKPOINT-->
+          <floatParameter NAME="precision" VALUE="5" />
+        </action>
+      </transition>
+      <transition NAME="checkPointPick" NEXT_STATE_ID="2" EVENT_ID="1">
+        <action ID="38">
+          <!--AcCHECKONESUBINTERACTOR-->
+          <floatParameter NAME="threshold" VALUE="0.5" />
+        </action>
+      </transition>
+      <transition NAME="SubInteractorDeselect" NEXT_STATE_ID="0" EVENT_ID="1020">
+        <!-- necessary transition of the state subSelected. the event will produced from the hirachical interactor -->
+        <action ID="1100">
+          <!--AcMODEDESELECT-->
+        </action>
+      </transition>
+    </state>
+    <state NAME="checkPointSnap" ID="1" X_POS="423" Y_POS="124" WIDTH="100" HEIGHT="50">
+      <transition NAME="EIDNo" NEXT_STATE_ID="3" EVENT_ID="1003">
+        <action ID="1550">
+          <!--AcFORCESUBINTERACTORS-->
+        </action>
+        <action ID="2000">
+          <!--AcTRANSMITEVENT-->
+        </action>
+      </transition>
+      <transition NAME="EIDYes" NEXT_STATE_ID="3" EVENT_ID="1004">
+        <action ID="72">
+          <!--AcDESELECTALL-->
+        </action>
+        <action ID="66">
+          <!--AcSELECTPOINT-->
+        </action>
+      </transition>
+    </state>
+    <state NAME="checkSubInteractor" ID="2" X_POS="138" Y_POS="457" WIDTH="100" HEIGHT="50">
+      <transition NAME="EIDNo" NEXT_STATE_ID="0" EVENT_ID="1003" />
+      <transition NAME="EIDYes" NEXT_STATE_ID="3" EVENT_ID="1004">
+        <action ID="1102">
+          <!--AcMODESUBSELECT-->
+        </action>
+        <action ID="2000">
+          <!--AcTRANSMITEVENT-->
+        </action>
+      </transition>
+    </state>
+    <state NAME="SSD" ID="3" X_POS="745" Y_POS="240" WIDTH="100" HEIGHT="50">
+      <transition NAME="SubInteractorDeselect" NEXT_STATE_ID="0" EVENT_ID="1020">
+        <!-- necessary transition of the state subSelected. the event will produced from the hirachical interactor -->
+        <action ID="1100">
+          <!--AcMODEDESELECT-->
+        </action>
+      </transition>
+    </state>
+  </stateMachine>
+  <stateMachine NAME="PressMoveRelease">
+    <state NAME="neutral" ID="1" START_STATE="TRUE" X_POS="197" Y_POS="183" WIDTH="100" HEIGHT="50">
+      <transition NAME="send Koordinates press" NEXT_STATE_ID="1" EVENT_ID="1">
+        <action ID="80" />
+      </transition>
+      <transition NAME="send Koordinates move" NEXT_STATE_ID="1" EVENT_ID="530">
+        <action ID="90" />
+      </transition>
+      <transition NAME="send Koordinates release" NEXT_STATE_ID="1" EVENT_ID="505">
+        <action ID="42" />
+      </transition>
+    </state>
+  </stateMachine>
+  <stateMachine NAME="seedroi">
+    <state NAME="neutral" ID="1" START_STATE="TRUE" X_POS="381" Y_POS="315" WIDTH="100" HEIGHT="50">
+      <transition NAME="send Koordinates" NEXT_STATE_ID="1" EVENT_ID="3">
+        <action ID="80" />
+      </transition>
+    </state>
+  </stateMachine>
+  <stateMachine NAME="seedsinteractor">
+    <!-- Behaviour of Seed Points -->
+    <state NAME="drawSeeds" ID="0" START_STATE="TRUE" X_POS="125" Y_POS="102" WIDTH="100" HEIGHT="50">
+      <transition NAME="drawForegroundSeed" NEXT_STATE_ID="1" EVENT_ID="3">
+        <action ID="1101">
+          <!--AcMODE_SELECT-->
+        </action>
+        <action ID="45">
+          <!--AcINITFOREGROUND-->
+        </action>
+        <action ID="11">
+          <!--AcADD-->
+        </action>
+      </transition>
+      <transition NAME="drawBackgroundSeed" NEXT_STATE_ID="2" EVENT_ID="2000">
+        <action ID="1101">
+          <!--AcMODE_SELECT-->
+        </action>
+        <action ID="46">
+          <!--AcINITBACKGROUND-->
+        </action>
+        <action ID="11">
+          <!--AcADD-->
+        </action>
+      </transition>
+      <transition NAME="drawNeutralSeed" NEXT_STATE_ID="3" EVENT_ID="2003">
+        <action ID="1101">
+          <!--AcMODE_SELECT-->
+        </action>
+        <action ID="47">
+          <!--AcINITNEUTRAL-->
+        </action>
+        <action ID="11">
+          <!--AcADD-->
+        </action>
+      </transition>
+    </state>
+    <state NAME="drawForeground" ID="1" X_POS="515" Y_POS="108" WIDTH="100" HEIGHT="50">
+      <transition NAME="drawForegroundSeeds" NEXT_STATE_ID="1" EVENT_ID="541">
+        <action ID="92">
+          <!--AcMOVE-->
+        </action>
+      </transition>
+      <transition NAME="drawSeeds" NEXT_STATE_ID="0" EVENT_ID="508">
+        <action ID="44">
+          <!--AcFINISH-->
+        </action>
+        <action ID="1100">
+          <!--AcMODE_DESELECT-->
+        </action>
+      </transition>
+    </state>
+    <state NAME="drawBackground" ID="2" X_POS="510" Y_POS="323" WIDTH="100" HEIGHT="50">
+      <transition NAME="drawBackgroundSeeds" NEXT_STATE_ID="2" EVENT_ID="2001">
+        <action ID="92">
+          <!--AcMOVE-->
+        </action>
+      </transition>
+      <transition NAME="drawSeeds" NEXT_STATE_ID="0" EVENT_ID="2002">
+        <action ID="44">
+          <!--AcFINISH-->
+        </action>
+        <action ID="1100">
+          <!--AcMODE_DESELECT-->
+        </action>
+      </transition>
+    </state>
+    <state NAME="drawNeutral" ID="3" X_POS="290" Y_POS="478" WIDTH="100" HEIGHT="50">
+      <transition NAME="drawNeutralSeeds" NEXT_STATE_ID="3" EVENT_ID="2004">
+        <action ID="92">
+          <!--AcMOVE-->
+        </action>
+      </transition>
+      <transition NAME="drawSeeds" NEXT_STATE_ID="0" EVENT_ID="2005">
+        <action ID="44">
+          <!--AcFINISH-->
+        </action>
+        <action ID="1100">
+          <!--AcMODE_DESELECT-->
+        </action>
+      </transition>
+    </state>
+  </stateMachine>
+  <stateMachine NAME="vesseltreeinteraction">
+    <state NAME="neutral" ID="1" START_STATE="TRUE" X_POS="268" Y_POS="260" WIDTH="100" HEIGHT="50">
+      <transition NAME="do picking" NEXT_STATE_ID="1" EVENT_ID="5">
+        <action ID="1600" />
+      </transition>
+    </state>
+  </stateMachine>
+  <stateMachine NAME="YetAnotherVesselTreeInteractor">
+    <!-- state machine for vessel TREE interaction -->
+    <state NAME="no-vessel-picked" ID="0" START_STATE="TRUE" X_POS="282" Y_POS="146" WIDTH="100" HEIGHT="50">
+      <transition NAME="checkpicked" NEXT_STATE_ID="1" EVENT_ID="5">
+        <action ID="30">
+          <!--AcCHECKELEMENT-->
+        </action>
+      </transition>
+    </state>
+    <state NAME="check-guard" ID="1" X_POS="91" Y_POS="347" WIDTH="100" HEIGHT="50">
+      <transition NAME="check-successful" NEXT_STATE_ID="2" EVENT_ID="1004">
+        <action ID="65">
+          <!--AcSELECT-->
+        </action>
+      </transition>
+      <transition NAME="check-not-successful" NEXT_STATE_ID="0" EVENT_ID="1003">
+        <action ID="75">
+          <!--AcDESELECT-->
+        </action>
+      </transition>
+    </state>
+    <state NAME="vessel-picked" ID="2" X_POS="419" Y_POS="340" WIDTH="100" HEIGHT="50">
+      <transition NAME="checkpicked" NEXT_STATE_ID="1" EVENT_ID="5">
+        <action ID="30">
+          <!--AcCHECKELEMENT-->
+        </action>
+      </transition>
+    </state>
+  </stateMachine>
+  <stateMachine NAME="AriadneAssistent">
+    <!-- Behaviour of the AriadneAssistent -->
+    <state NAME="start" ID="1" START_STATE="TRUE" X_POS="500" Y_POS="530" WIDTH="100" HEIGHT="50">
+      <transition NAME="EV_INIT" NEXT_STATE_ID="2" EVENT_ID="5551001">
+        <action ID="55500010">
+          <!--AC_INIT-->
+        </action>
+      </transition>
+    </state>
+    <state NAME="chooseApplication" ID="2" X_POS="616" Y_POS="351" WIDTH="100" HEIGHT="50">
+      <transition NAME="EV_PATH_COLLECTION_SELECTED" NEXT_STATE_ID="3" EVENT_ID="5551003">
+        <action ID="5550001">
+          <!--AC_SET_NEXT_BUTTON_VISIBLE-->
+        </action>
+      </transition>
+      <transition NAME="EV_NAVIGATION_SELECTED" NEXT_STATE_ID="40" EVENT_ID="5551004">
+        <action ID="5550001">
+          <!--AC_SET_NEXT_BUTTON_VISIBLE-->
+        </action>
+      </transition>
+    </state>
+    <state NAME="choosePathCollection" ID="3" X_POS="657" Y_POS="23" WIDTH="126" HEIGHT="50">
+      <transition NAME="EV_NEXT" NEXT_STATE_ID="4" EVENT_ID="5551007">
+        <action ID="5550003">
+          <!--AC_SET_PREVIOUS_BUTTON_VISIBLE-->
+        </action>
+        <action ID="5550002">
+          <!--AC_SET_NEXT_BUTTON_INVISIBLE-->
+        </action>
+        <action ID="5550005">
+          <!--AC_SET_ASSISTAND_WIDGET_STECK-->
+          <intParameter NAME="WIDGET_ID" VALUE="1" />
+        </action>
+      </transition>
+      <transition NAME="EV_NAVIGATION_SELECTED" NEXT_STATE_ID="40" EVENT_ID="5551004" />
+      <transition NAME="EV_INIT" NEXT_STATE_ID="2" EVENT_ID="5551001">
+        <action ID="55500010">
+          <!--AC_INIT-->
+        </action>
+      </transition>
+    </state>
+    <state NAME="mountSensorForPathCollection" ID="4" X_POS="331" Y_POS="11" WIDTH="167" HEIGHT="50">
+      <transition NAME="EV_DONE" NEXT_STATE_ID="5" EVENT_ID="5551008">
+        <action ID="5550001">
+          <!--AC_SET_NEXT_BUTTON_VISIBLE-->
+        </action>
+      </transition>
+      <transition NAME="EV_PREVIOUS" NEXT_STATE_ID="2" EVENT_ID="5551002">
+        <action ID="5550004">
+          <!--AC_SET_PREVIOUS_BUTTON_INVISIBLE-->
+        </action>
+        <action ID="5550001">
+          <!--AC_SET_NEXT_BUTTON_VISIBLE-->
+        </action>
+        <action ID="55500011">
+          <!--AC_SET_APPLICATION_SELECTED_FALSE-->
+        </action>
+        <action ID="5550005">
+          <!--AC_SET_ASSISTAND_WIDGET_STECK-->
+          <intParameter NAME="WIDGET_ID" VALUE="0" />
+        </action>
+      </transition>
+      <transition NAME="EV_INIT" NEXT_STATE_ID="2" EVENT_ID="5551001">
+        <action ID="55500010">
+          <!--AC_INIT-->
+        </action>
+      </transition>
+    </state>
+    <state NAME="sensorMountedForPathCollection" ID="5" X_POS="7" Y_POS="26" WIDTH="191" HEIGHT="50">
+      <transition NAME="EV_NEXT" NEXT_STATE_ID="7" EVENT_ID="5551007">
+        <action ID="5550002">
+          <!--AC_SET_NEXT_BUTTON_INVISIBLE-->
+        </action>
+        <action ID="55500012">
+          <!--AC_SENSOR_ATTACHED-->
+        </action>
+        <action ID="5550005">
+          <!--AC_SET_ASSISTAND_WIDGET_STECK-->
+          <intParameter NAME="WIDGET_ID" VALUE="2" />
+        </action>
+        <action ID="5550008">
+          <!--AC_CHECK_LANDMARK_COUNT-->
+          <intParameter NAME="MIN_COUNT" VALUE="3" />
+        </action>
+      </transition>
+      <transition NAME="EV_PREVIOUS" NEXT_STATE_ID="4" EVENT_ID="5551002">
+        <action ID="5550009">
+          <!--AC_SET_DONE_FALSE-->
+        </action>
+        <action ID="5550002">
+          <!--AC_SET_NEXT_BUTTON_INVISIBLE-->
+        </action>
+      </transition>
+      <transition NAME="EV_INIT" NEXT_STATE_ID="2" EVENT_ID="5551001">
+        <action ID="55500010">
+          <!--AC_INIT-->
+        </action>
+      </transition>
+    </state>
+    <state NAME="setLandmarks" ID="6" X_POS="229" Y_POS="369" WIDTH="100" HEIGHT="50">
+      <transition NAME="EV_NEW_LANDMARK" NEXT_STATE_ID="7" EVENT_ID="5551009">
+        <action ID="5550008">
+          <!--AC_CHECK_LANDMARK_COUNT-->
+          <intParameter NAME="MIN_COUNT" VALUE="3" />
+        </action>
+      </transition>
+      <transition NAME="EV_PREVIOUS" NEXT_STATE_ID="4" EVENT_ID="5551002">
+        <action ID="5550005">
+          <!--AC_SET_ASSISTAND_WIDGET_STECK-->
+          <intParameter NAME="WIDGET_ID" VALUE="1" />
+        </action>
+        <action ID="5550009">
+          <!--AC_SET_DONE_FALSE-->
+        </action>
+      </transition>
+      <transition NAME="EV_INIT" NEXT_STATE_ID="2" EVENT_ID="5551001">
+        <action ID="55500010">
+          <!--AC_INIT-->
+        </action>
+      </transition>
+    </state>
+    <state NAME="checkCount" ID="7" X_POS="-5" Y_POS="255" WIDTH="100" HEIGHT="50">
+      <transition NAME="EV_READY_FOR_COLLECTING_PATH" NEXT_STATE_ID="8" EVENT_ID="5551006">
+        <action ID="5550001">
+          <!--AC_SET_NEXT_BUTTON_VISIBLE-->
+        </action>
+      </transition>
+      <transition NAME="EV_LESS_THEN_MIN_COUNT" NEXT_STATE_ID="6" EVENT_ID="5551005" />
+      <transition NAME="EV_INIT" NEXT_STATE_ID="2" EVENT_ID="5551001">
+        <action ID="55500010">
+          <!--AC_INIT-->
+        </action>
+      </transition>
+    </state>
+    <state NAME="readyForCollectingPath" ID="8" X_POS="-5" Y_POS="462" WIDTH="146" HEIGHT="50">
+      <transition NAME="EV_NEXT" NEXT_STATE_ID="9" EVENT_ID="5551007">
+        <action ID="5550005">
+          <!--AC_SET_ASSISTAND_WIDGET_STECK-->
+          <intParameter NAME="WIDGET_ID" VALUE="4" />
+        </action>
+        <action ID="55500014">
+          <!--AC_START_APPLICATION_TEXT-->
+          <stringParameter NAME="START_APPLICATION_TEXT" VALUE="Ariadne is now ready for path collection" />
+        </action>
+        <action ID="5550007">
+          <!--AC_SET_NEXT_BUTTON_TEXT-->
+          <stringParameter NAME="BUTTON_TEXT" VALUE="Start" />
+        </action>
+      </transition>
+      <transition NAME="EV_PREVIOUS" NEXT_STATE_ID="4" EVENT_ID="5551002">
+        <action ID="5550005">
+          <!--AC_SET_ASSISTAND_WIDGET_STECK-->
+          <intParameter NAME="WIDGET_ID" VALUE="1" />
+        </action>
+        <action ID="5550002">
+          <!--AC_SET_NEXT_BUTTON_INVISIBLE-->
+        </action>
+        <action ID="5550009">
+          <!--AC_SET_DONE_FALSE-->
+        </action>
+      </transition>
+      <transition NAME="EV_REMOVE_LANDMARK" NEXT_STATE_ID="7" EVENT_ID="5551010">
+        <action ID="5550002">
+          <!--AC_SET_NEXT_BUTTON_INVISIBLE-->
+        </action>
+        <action ID="5550007">
+          <!--AC_SET_NEXT_BUTTON_TEXT-->
+          <stringParameter NAME="BUTTON_TEXT" VALUE="&gt;" />
+        </action>
+        <action ID="5550008">
+          <!--AC_CHECK_LANDMARK_COUNT-->
+          <intParameter NAME="MIN_COUNT" VALUE="3" />
+        </action>
+      </transition>
+      <transition NAME="EV_INIT" NEXT_STATE_ID="2" EVENT_ID="5551001">
+        <action ID="55500010">
+          <!--AC_INIT-->
+        </action>
+      </transition>
+    </state>
+    <state NAME="collectingPath" ID="9" X_POS="30" Y_POS="607" WIDTH="100" HEIGHT="50">
+      <transition NAME="EV_NEXT" NEXT_STATE_ID="2" EVENT_ID="5551007">
+        <action ID="55500013">
+          <!--AC_CLOSE_ASSISTENT-->
+        </action>
+        <action ID="55500011">
+          <!--AC_SET_APPLICATION_SELECTED_FALSE-->
+        </action>
+        <action ID="5550002">
+          <!--AC_SET_NEXT_BUTTON_INVISIBLE-->
+        </action>
+        <action ID="5550004">
+          <!--AC_SET_PREVIOUS_BUTTON_INVISIBLE-->
+        </action>
+        <action ID="55500016">
+          <!--AC_START_PATHCOLLECTION-->
+        </action>
+        <action ID="5550005">
+          <!--AC_SET_ASSISTAND_WIDGET_STECK-->
+          <intParameter NAME="WIDGET_ID" VALUE="0" />
+        </action>
+        <action ID="5550007">
+          <!--AC_SET_NEXT_BUTTON_TEXT-->
+          <stringParameter NAME="BUTTON_TEXT" VALUE="&gt;" />
+        </action>
+      </transition>
+      <transition NAME="EV_PREVIOUS" NEXT_STATE_ID="8" EVENT_ID="5551002">
+        <action ID="5550005">
+          <!--AC_SET_ASSISTAND_WIDGET_STECK-->
+          <intParameter NAME="WIDGET_ID" VALUE="2" />
+        </action>
+        <action ID="5550007">
+          <!--AC_SET_NEXT_BUTTON_TEXT-->
+          <stringParameter NAME="BUTTON_TEXT" VALUE="&gt;" />
+        </action>
+      </transition>
+      <transition NAME="EV_INIT" NEXT_STATE_ID="2" EVENT_ID="5551001">
+        <action ID="55500010">
+          <!--AC_INIT-->
+        </action>
+        <action ID="5550007">
+          <!--AC_SET_NEXT_BUTTON_TEXT-->
+          <stringParameter NAME="BUTTON_TEXT" VALUE="&gt;" />
+        </action>
+      </transition>
+    </state>
+    <state NAME="chooseNavigation" ID="40" X_POS="1080" Y_POS="38" WIDTH="100" HEIGHT="50">
+      <transition NAME="EV_PATH_COLLECTION_SELECTED" NEXT_STATE_ID="3" EVENT_ID="5551003" />
+      <transition NAME="EV_INIT" NEXT_STATE_ID="2" EVENT_ID="5551001">
+        <action ID="55500010">
+          <!--AC_INIT-->
+        </action>
+      </transition>
+      <transition NAME="EV_NEXT" NEXT_STATE_ID="41" EVENT_ID="5551007">
+        <action ID="5550003">
+          <!--AC_SET_PREVIOUS_BUTTON_VISIBLE-->
+        </action>
+        <action ID="5550002">
+          <!--AC_SET_NEXT_BUTTON_INVISIBLE-->
+        </action>
+        <action ID="5550005">
+          <!--AC_SET_ASSISTAND_WIDGET_STECK-->
+          <intParameter NAME="WIDGET_ID" VALUE="3" />
+        </action>
+      </transition>
+      <transition NAME="EV_INIT" NEXT_STATE_ID="2" EVENT_ID="5551001">
+        <action ID="55500010">
+          <!--AC_INIT-->
+        </action>
+      </transition>
+    </state>
+    <state NAME="chooseData" ID="41" X_POS="1100" Y_POS="199" WIDTH="100" HEIGHT="50">
+      <transition NAME="EV_DONE" NEXT_STATE_ID="42" EVENT_ID="5551008">
+        <action ID="5550001">
+          <!--AC_SET_NEXT_BUTTON_VISIBLE-->
+        </action>
+      </transition>
+      <transition NAME="EV_PREVIOUS" NEXT_STATE_ID="2" EVENT_ID="5551002">
+        <action ID="5550004">
+          <!--AC_SET_PREVIOUS_BUTTON_INVISIBLE-->
+        </action>
+        <action ID="5550001">
+          <!--AC_SET_NEXT_BUTTON_VISIBLE-->
+        </action>
+        <action ID="55500011">
+          <!--AC_SET_APPLICATION_SELECTED_FALSE-->
+        </action>
+        <action ID="5550005">
+          <!--AC_SET_ASSISTAND_WIDGET_STECK-->
+          <intParameter NAME="WIDGET_ID" VALUE="0" />
+        </action>
+      </transition>
+      <transition NAME="EV_INIT" NEXT_STATE_ID="2" EVENT_ID="5551001">
+        <action ID="55500010">
+          <!--AC_INIT-->
+        </action>
+      </transition>
+    </state>
+    <state NAME="dataChoosed" ID="42" X_POS="1111" Y_POS="353" WIDTH="100" HEIGHT="50">
+      <transition NAME="EV_NEXT" NEXT_STATE_ID="43" EVENT_ID="5551007">
+        <action ID="55500017">
+          <!--AC_LOAD_LANDMARKS-->
+        </action>
+        <action ID="5550002">
+          <!--AC_SET_NEXT_BUTTON_INVISIBLE-->
+        </action>
+        <action ID="5550005">
+          <!--AC_SET_ASSISTAND_WIDGET_STECK-->
+          <intParameter NAME="WIDGET_ID" VALUE="1" />
+        </action>
+      </transition>
+      <transition NAME="EV_PREVIOUS" NEXT_STATE_ID="2" EVENT_ID="5551002">
+        <action ID="5550004">
+          <!--AC_SET_PREVIOUS_BUTTON_INVISIBLE-->
+        </action>
+        <action ID="5550001">
+          <!--AC_SET_NEXT_BUTTON_VISIBLE-->
+        </action>
+        <action ID="55500011">
+          <!--AC_SET_APPLICATION_SELECTED_FALSE-->
+        </action>
+        <action ID="5550005">
+          <!--AC_SET_ASSISTAND_WIDGET_STECK-->
+          <intParameter NAME="WIDGET_ID" VALUE="0" />
+        </action>
+      </transition>
+      <transition NAME="EV_INIT" NEXT_STATE_ID="2" EVENT_ID="5551001">
+        <action ID="55500010">
+          <!--AC_INIT-->
+        </action>
+      </transition>
+    </state>
+    <state NAME="mountSensorForNavigation" ID="43" X_POS="1059" Y_POS="473" WIDTH="144" HEIGHT="50">
+      <transition NAME="EV_DONE" NEXT_STATE_ID="44" EVENT_ID="5551008">
+        <action ID="5550001">
+          <!--AC_SET_NEXT_BUTTON_VISIBLE-->
+        </action>
+      </transition>
+      <transition NAME="EV_PREVIOUS" NEXT_STATE_ID="42" EVENT_ID="5551002">
+        <action ID="5550001">
+          <!--AC_SET_NEXT_BUTTON_VISIBLE-->
+        </action>
+        <action ID="5550005">
+          <!--AC_SET_ASSISTAND_WIDGET_STECK-->
+          <intParameter NAME="WIDGET_ID" VALUE="3" />
+        </action>
+      </transition>
+      <transition NAME="EV_INIT" NEXT_STATE_ID="2" EVENT_ID="5551001">
+        <action ID="55500010">
+          <!--AC_INIT-->
+        </action>
+      </transition>
+    </state>
+    <state NAME="sensorMountedForNavigation" ID="44" X_POS="844" Y_POS="613" WIDTH="100" HEIGHT="50">
+      <transition NAME="EV_NEXT" NEXT_STATE_ID="46" EVENT_ID="5551007">
+        <action ID="5550002">
+          <!--AC_SET_NEXT_BUTTON_INVISIBLE-->
+        </action>
+        <action ID="55500012">
+          <!--AC_SENSOR_ATTACHED-->
+        </action>
+        <action ID="5550005">
+          <!--AC_SET_ASSISTAND_WIDGET_STECK-->
+          <intParameter NAME="WIDGET_ID" VALUE="2" />
+        </action>
+        <action ID="5550008">
+          <!--AC_CHECK_LANDMARK_COUNT-->
+          <intParameter NAME="MIN_COUNT" VALUE="3" />
+        </action>
+      </transition>
+      <transition NAME="EV_PREVIOUS" NEXT_STATE_ID="43" EVENT_ID="5551002">
+        <action ID="5550009">
+          <!--AC_SET_DONE_FALSE-->
+        </action>
+        <action ID="5550002">
+          <!--AC_SET_NEXT_BUTTON_INVISIBLE-->
+        </action>
+      </transition>
+      <transition NAME="EV_INIT" NEXT_STATE_ID="2" EVENT_ID="5551001">
+        <action ID="55500010">
+          <!--AC_INIT-->
+        </action>
+      </transition>
+    </state>
+    <state NAME="setLandmarks" ID="45" X_POS="1110" Y_POS="754" WIDTH="100" HEIGHT="50">
+      <transition NAME="EV_NEW_LANDMARK" NEXT_STATE_ID="46" EVENT_ID="5551009">
+        <action ID="5550008">
+          <!--AC_CHECK_LANDMARK_COUNT-->
+          <intParameter NAME="MIN_COUNT" VALUE="3" />
+        </action>
+      </transition>
+      <transition NAME="EV_PREVIOUS" NEXT_STATE_ID="43" EVENT_ID="5551002">
+        <action ID="5550005">
+          <!--AC_SET_ASSISTAND_WIDGET_STECK-->
+          <intParameter NAME="WIDGET_ID" VALUE="3" />
+        </action>
+        <action ID="5550009">
+          <!--AC_SET_DONE_FALSE-->
+        </action>
+      </transition>
+      <transition NAME="EV_INIT" NEXT_STATE_ID="2" EVENT_ID="5551001">
+        <action ID="55500010">
+          <!--AC_INIT-->
+        </action>
+      </transition>
+    </state>
+    <state NAME="checkCount" ID="46" X_POS="615" Y_POS="748" WIDTH="100" HEIGHT="50">
+      <transition NAME="EV_READY_FOR_COLLECTING_PATH" NEXT_STATE_ID="47" EVENT_ID="5551006">
+        <action ID="5550001">
+          <!--AC_SET_NEXT_BUTTON_VISIBLE-->
+        </action>
+      </transition>
+      <transition NAME="EV_LESS_THEN_MIN_COUNT" NEXT_STATE_ID="45" EVENT_ID="5551005" />
+      <transition NAME="EV_INIT" NEXT_STATE_ID="2" EVENT_ID="5551001">
+        <action ID="55500010">
+          <!--AC_INIT-->
+        </action>
+      </transition>
+    </state>
+    <state NAME="readyForNavigation" ID="47" X_POS="120" Y_POS="750" WIDTH="115" HEIGHT="50">
+      <transition NAME="EV_NEXT" NEXT_STATE_ID="48" EVENT_ID="5551007">
+        <action ID="55500018">
+          <!--AC_CALCULATE_LANDMARK_TRANSFORM-->
+        </action>
+        <action ID="5550005">
+          <!--AC_SET_ASSISTAND_WIDGET_STECK-->
+          <intParameter NAME="WIDGET_ID" VALUE="4" />
+        </action>
+        <action ID="55500014">
+          <!--AC_START_APPLICATION_TEXT-->
+          <stringParameter NAME="START_APPLICATION_TEXT" VALUE="Ariadne is now ready for navigation" />
+        </action>
+        <action ID="5550007">
+          <!--AC_SET_NEXT_BUTTON_TEXT-->
+          <stringParameter NAME="BUTTON_TEXT" VALUE="Start" />
+        </action>
+      </transition>
+      <transition NAME="EV_PREVIOUS" NEXT_STATE_ID="43" EVENT_ID="5551002">
+        <action ID="5550005">
+          <!--AC_SET_ASSISTAND_WIDGET_STECK-->
+          <intParameter NAME="WIDGET_ID" VALUE="3" />
+        </action>
+        <action ID="5550002">
+          <!--AC_SET_NEXT_BUTTON_INVISIBLE-->
+        </action>
+        <action ID="5550009">
+          <!--AC_SET_DONE_FALSE-->
+        </action>
+      </transition>
+      <transition NAME="EV_REMOVE_LANDMARK" NEXT_STATE_ID="46" EVENT_ID="5551010">
+        <action ID="5550002">
+          <!--AC_SET_NEXT_BUTTON_INVISIBLE-->
+        </action>
+        <action ID="5550007">
+          <!--AC_SET_NEXT_BUTTON_TEXT-->
+          <stringParameter NAME="BUTTON_TEXT" VALUE="&gt;" />
+        </action>
+        <action ID="5550008">
+          <!--AC_CHECK_LANDMARK_COUNT-->
+          <intParameter NAME="MIN_COUNT" VALUE="3" />
+        </action>
+      </transition>
+      <transition NAME="EV_INIT" NEXT_STATE_ID="2" EVENT_ID="5551001">
+        <action ID="55500010">
+          <!--AC_INIT-->
+        </action>
+      </transition>
+    </state>
+    <state NAME="Navigation" ID="48" X_POS="164" Y_POS="623" WIDTH="100" HEIGHT="50">
+      <transition NAME="EV_NEXT" NEXT_STATE_ID="2" EVENT_ID="5551007">
+        <action ID="55500013">
+          <!--AC_CLOSE_ASSISTENT-->
+        </action>
+        <action ID="55500011">
+          <!--AC_SET_APPLICATION_SELECTED_FALSE-->
+        </action>
+        <action ID="5550002">
+          <!--AC_SET_NEXT_BUTTON_INVISIBLE-->
+        </action>
+        <action ID="5550004">
+          <!--AC_SET_PREVIOUS_BUTTON_INVISIBLE-->
+        </action>
+        <action ID="55500015">
+          <!--AC_START_NAVIGATION-->
+        </action>
+        <action ID="5550005">
+          <!--AC_SET_ASSISTAND_WIDGET_STECK-->
+          <intParameter NAME="WIDGET_ID" VALUE="0" />
+        </action>
+        <action ID="5550007">
+          <!--AC_SET_NEXT_BUTTON_TEXT-->
+          <stringParameter NAME="BUTTON_TEXT" VALUE="&gt;" />
+        </action>
+      </transition>
+      <transition NAME="EV_PREVIOUS" NEXT_STATE_ID="47" EVENT_ID="5551002">
+        <action ID="5550005">
+          <!--AC_SET_ASSISTAND_WIDGET_STECK-->
+          <intParameter NAME="WIDGET_ID" VALUE="2" />
+        </action>
+        <action ID="5550007">
+          <!--AC_SET_NEXT_BUTTON_TEXT-->
+          <stringParameter NAME="BUTTON_TEXT" VALUE="&gt;" />
+        </action>
+      </transition>
+      <transition NAME="EV_INIT" NEXT_STATE_ID="2" EVENT_ID="5551001">
+        <action ID="55500010">
+          <!--AC_INIT-->
+        </action>
+        <action ID="5550007">
+          <!--AC_SET_NEXT_BUTTON_TEXT-->
+          <stringParameter NAME="BUTTON_TEXT" VALUE="&gt;" />
+        </action>
+      </transition>
+    </state>
+  </stateMachine>
+  <stateMachine NAME="AffineInteractions ctrl-drag_marcus">
+    <state NAME="start" ID="0" START_STATE="TRUE" X_POS="314" Y_POS="214" WIDTH="100" HEIGHT="50">
+      <transition NAME="leftButtonPress" NEXT_STATE_ID="12" EVENT_ID="1">
+        <!-- 30 = SeCHECKELEMENT  -->
+        <action ID="30" />
+      </transition>
+      <transition NAME="rightButtonPress" NEXT_STATE_ID="13" EVENT_ID="2">
+        <!-- 1002 = SeSCALESTART  -->
+        <action ID="30" />
+      </transition>
+      <transition NAME="middleButtonPress" NEXT_STATE_ID="14" EVENT_ID="4">
+        <!-- 1004 = SeROTATESTART  -->
+        <action ID="30" />
+      </transition>
+    </state>
+    <state NAME="picked guard Translate" ID="12" X_POS="52" Y_POS="62" WIDTH="143" HEIGHT="50">
+      <transition NAME="yes" NEXT_STATE_ID="2" EVENT_ID="1004">
+        <!-- EIDYES -->
+        <action ID="1000" />
+      </transition>
+      <transition NAME="no" NEXT_STATE_ID="0" EVENT_ID="1003">
+        <!-- StNO -->
+        <action ID="0" />
+      </transition>
+    </state>
+    <state NAME="picked guard Scale" ID="13" X_POS="848" Y_POS="233" WIDTH="100" HEIGHT="50">
+      <transition NAME="yes" NEXT_STATE_ID="3" EVENT_ID="1004">
+        <!-- EIDYES -->
+        <action ID="1002" />
+      </transition>
+      <transition NAME="no" NEXT_STATE_ID="0" EVENT_ID="1003">
+        <!-- StNO -->
+        <action ID="0" />
+      </transition>
+    </state>
+    <state NAME="picked guard Rotate" ID="14" X_POS="37" Y_POS="334" WIDTH="100" HEIGHT="50">
+      <transition NAME="yes" NEXT_STATE_ID="4" EVENT_ID="1004">
+        <!-- EIDYES -->
+        <action ID="1004" />
+      </transition>
+      <transition NAME="no" NEXT_STATE_ID="0" EVENT_ID="1003">
+        <!-- StNO -->
+        <action ID="0" />
+      </transition>
+    </state>
+    <state NAME="translating" ID="2" X_POS="481" Y_POS="47" WIDTH="100" HEIGHT="50">
+      <transition NAME="leftButtonMove" NEXT_STATE_ID="2" EVENT_ID="530">
+        <!-- 1000 = SeTRANSLATE  -->
+        <action ID="1001" />
+      </transition>
+      <transition NAME="leftButtonRelease" NEXT_STATE_ID="0" EVENT_ID="505">
+        <!-- 1000 = SeTRANSLATE  -->
+        <action ID="1001" />
+      </transition>
+      <transition NAME="leftButtonRelease" NEXT_STATE_ID="0" EVENT_ID="537">
+        <!-- CTRL+LBM_Release ==> SeTRANSLATE  -->
+        <action ID="1001" />
+      </transition>
+    </state>
+    <state NAME="scaling" ID="3" X_POS="630" Y_POS="461" WIDTH="100" HEIGHT="50">
+      <transition NAME="rightButtonMove" NEXT_STATE_ID="3" EVENT_ID="531">
+        <!-- 1003 = SeSCALE  -->
+        <action ID="1003" />
+      </transition>
+      <transition NAME="rightButtonRelease" NEXT_STATE_ID="0" EVENT_ID="507">
+        <!-- 1003 = SeSCALE  -->
+        <action ID="1003" />
+      </transition>
+      <transition NAME="rightButtonRelease" NEXT_STATE_ID="0" EVENT_ID="538">
+        <!-- CTRL+RBM_Release ==> SeSCALE  -->
+        <action ID="1003" />
+      </transition>
+    </state>
+    <state NAME="rotating" ID="4" X_POS="295" Y_POS="487" WIDTH="100" HEIGHT="50">
+      <transition NAME="middleButtonMove" NEXT_STATE_ID="4" EVENT_ID="533">
+        <!-- 1005 = SeROTATE  -->
+        <action ID="1005" />
+      </transition>
+      <transition NAME="middleButtonRelease" NEXT_STATE_ID="0" EVENT_ID="506">
+        <!-- 1005 = SeROTATE  -->
+        <action ID="1005" />
+      </transition>
+      <transition NAME="middleButtonRelease" NEXT_STATE_ID="0" EVENT_ID="539">
+        <!-- 1005 = SeROTATE  -->
+        <action ID="1005" />
+      </transition>
+    </state>
+  </stateMachine>
+  <stateMachine NAME="connectpointsinteractor">
+    <!-- Behaviour for connecting points using mitk::ConnectPointsInteractor -->
+    <state NAME="ready" ID="1" START_STATE="TRUE" X_POS="357" Y_POS="236" WIDTH="100" HEIGHT="50">
+      <transition NAME="addPoint but check n" NEXT_STATE_ID="1" EVENT_ID="3">
+        <action ID="10">
+          <!--AcADDPOINT-->
+        </action>
+      </transition>
+      <transition NAME="remove" NEXT_STATE_ID="1" EVENT_ID="12">
+        <action ID="100">
+          <!--AcREMOVEPOINT-->
+        </action>
+      </transition>
+    </state>
+  </stateMachine>
+  <stateMachine NAME="coordinate-supply">
+    <state NAME="neutral" ID="1" START_STATE="TRUE" X_POS="439" Y_POS="228" WIDTH="100" HEIGHT="50">
+      <transition NAME="send Koordinates release" NEXT_STATE_ID="1" EVENT_ID="505">
+        <action ID="42" />
+      </transition>
+    </state>
+  </stateMachine>
+  <stateMachine NAME="EasySegmentation">
+    <!-- State machine for interaction with segmentations. 
+     Original author: Daniel Maleike
+     Status: idea/experiment
+     Basic behaviour: Collision detection checks, whether the mouse cursor is inside some segmentation.
+                      When outside, the behaviour is identical to moveNzoom, i.e. translation of the
+                      whole scene using the middle button, scaling of the whole scene using the right button.
+                      When the pointer is inside a segmentation, middle button behaviour changes to
+                      moving the segmentation under the cursor, right mouse button generates 
+                      parameters for segmentation algorithms (TODO: clarify)
+                      The mouse wheel should change the currently selected segmentation tool.  -->
+    <state NAME="Moving around outside object" ID="0" START_STATE="TRUE" X_POS="21" Y_POS="15" WIDTH="172" HEIGHT="50">
+      <!-- initial state: outside anything and checking for collisions -->
+      <transition NAME="OnMouseMove" EVENT_ID="520" NEXT_STATE_ID="2">
+        <action ID="31">
+          <!-- AcCheckObject -->
+        </action>
+      </transition>
+      <transition NAME="OnRightMouseDown" EVENT_ID="2" NEXT_STATE_ID="5">
+        <!-- nothing to do here -->
+      </transition>
+    </state>
+    <state NAME="Moving around inside object" ID="1" X_POS="421" Y_POS="329" WIDTH="154" HEIGHT="50">
+      <!-- inside an object, checking for non-collision -->
+      <transition NAME="OnMouseMove" EVENT_ID="520" NEXT_STATE_ID="3">
+        <action ID="31">
+          <!-- AcCheckObject -->
+        </action>
+      </transition>
+    </state>
+    <state NAME="Checking if still outside" ID="2" X_POS="210" Y_POS="199" WIDTH="125" HEIGHT="50">
+      <!-- "guard state": check for collision and generate new event from descision -->
+      <transition NAME="OnCollision" EVENT_ID="1004" NEXT_STATE_ID="1">
+        <action ID="48000">
+          <!-- AcEnterObject -->
+        </action>
+      </transition>
+      <transition NAME="OnCollision" EVENT_ID="64000" NEXT_STATE_ID="1">
+        <action ID="48000">
+          <!-- AcEnterObject -->
+        </action>
+      </transition>
+      <transition NAME="NoCollision" EVENT_ID="1003" NEXT_STATE_ID="0">
+        <!-- no change in collision status-->
+      </transition>
+    </state>
+    <state NAME="Checking if still inside" ID="3" X_POS="186" Y_POS="354" WIDTH="118" HEIGHT="50">
+      <!-- "guard state": check for collision and generate new event from descision -->
+      <transition NAME="OnCollision" EVENT_ID="1004" NEXT_STATE_ID="1">
+        <!-- no change in collision status-->
+      </transition>
+      <transition NAME="OnCollisionWithOtherObject" EVENT_ID="64000" NEXT_STATE_ID="1">
+        <action ID="48002">
+          <!-- AcSwitchObject -->
+        </action>
+      </transition>
+      <transition NAME="NoCollision" EVENT_ID="1003" NEXT_STATE_ID="0">
+        <action ID="48001">
+          <!-- AcLeaveObject -->
+        </action>
+      </transition>
+    </state>
+    <state NAME="Drawing line" ID="4" X_POS="451" Y_POS="137" WIDTH="100" HEIGHT="50">
+      <!-- line drawing started, now always update the end point of the line -->
+      <transition NAME="OnMouseMove" EVENT_ID="520" NEXT_STATE_ID="4">
+        <action ID="48003">
+          <!-- AcUpdateLine -->
+        </action>
+      </transition>
+      <transition NAME="OnRightMouseUp" EVENT_ID="507" NEXT_STATE_ID="0">
+        <action ID="48005">
+          <!-- AcTerminateLine -->
+        </action>
+        <action ID="48006">
+          <!-- AcCreateBox -->
+        </action>
+      </transition>
+    </state>
+    <state NAME="Right mouse down - what to do?" ID="5" X_POS="650" Y_POS="85" WIDTH="211" HEIGHT="50">
+      <!-- right mouse button was pressed, now the user could either zoom (hold button) or start drawing a line (release) -->
+      <transition NAME="OnMouseMove(while right button down)" EVENT_ID="531" NEXT_STATE_ID="6">
+        <!-- woah, that one could mean zooming  -->
+      </transition>
+      <transition NAME="OnRightMouseUp" EVENT_ID="507" NEXT_STATE_ID="4">
+        <!-- no zooming but initiate line drawing-->
+        <action ID="48004">
+          <!-- AcInitLine -->
+        </action>
+      </transition>
+    </state>
+    <state NAME="Right mouse down and some movement - what to do?" ID="6" X_POS="542" Y_POS="384" WIDTH="274" HEIGHT="50">
+      <!-- right mouse button was pressed, now the user could either zoom (hold button) or start drawing a line (release) -->
+      <transition NAME="OnMouseMove" EVENT_ID="531" NEXT_STATE_ID="7">
+        <!-- now the user gets her zooming  -->
+      </transition>
+      <transition NAME="OnRightMouseUp" EVENT_ID="507" NEXT_STATE_ID="4">
+        <!-- no zooming but initiate line drawing-->
+        <action ID="48004">
+          <!-- AcInitLine -->
+        </action>
+      </transition>
+    </state>
+    <state NAME="Zooming" ID="7" X_POS="61" Y_POS="438" WIDTH="100" HEIGHT="50">
+      <!-- right mouse button was pressed and two mouse move events occured, now the user zooms -->
+      <transition NAME="OnRightMouseUp" EVENT_ID="531" NEXT_STATE_ID="0">
+        <!-- end of zooming, return to normal operation -->
+      </transition>
+    </state>
+  </stateMachine>
+  <stateMachine NAME="HierachicalInteractor">
+    <!-- Behaviour of a HirachicalInteractor -->
+    <state NAME="notSelected" ID="0" START_STATE="TRUE" X_POS="153" Y_POS="45" WIDTH="100" HEIGHT="50">
+      <transition NAME="leftButtonPress" NEXT_STATE_ID="1" EVENT_ID="1">
+        <action ID="1101">
+          <!--AcMODESELECT-->
+        </action>
+      </transition>
+    </state>
+    <state NAME="selected" ID="1" X_POS="368" Y_POS="162" WIDTH="100" HEIGHT="50">
+      <transition NAME="checkSubSelected" NEXT_STATE_ID="2" EVENT_ID="1">
+        <action ID="38">
+          <floatParameter NAME="threshold" VALUE="0.5" />
+        </action>
+      </transition>
+      <transition NAME="Esc" NEXT_STATE_ID="0" EVENT_ID="13">
+        <action ID="1100">
+          <!--AcMODEDESELECT-->
+        </action>
+      </transition>
+    </state>
+    <state NAME="checkSubSelected" ID="2" X_POS="135" Y_POS="403" WIDTH="100" HEIGHT="50">
+      <transition NAME="Yes" NEXT_STATE_ID="3" EVENT_ID="1004">
+        <!-- necessary transition of the state subSelected.the event will produced from the hirachical interactor  -->
+        <action ID="1102">
+          <!--AcMODESUBSELECT-->
+        </action>
+      </transition>
+      <transition NAME="No" NEXT_STATE_ID="1" EVENT_ID="1003">
+        <!-- necessary transition of the state subSelected. the event will produced from the hirachical interactor -->
+      </transition>
+    </state>
+    <state NAME="subSelected" ID="3" X_POS="644" Y_POS="353" WIDTH="100" HEIGHT="50">
+      <transition NAME="SubInteractorDeselect" NEXT_STATE_ID="1" EVENT_ID="1020">
+        <!-- necessary transition of the state subSelected. the event will produced from the hirachical interactor -->
+        <action ID="1101">
+          <!--AcMODEDESELECT-->
+        </action>
+      </transition>
+      <transition NAME="Esc" NEXT_STATE_ID="1" EVENT_ID="13">
+        <action ID="1101">
+          <!--AcMODESELECT-->
+        </action>
+      </transition>
+    </state>
+  </stateMachine>
+  <stateMachine NAME="lineinteractor">
+    <!-- Behaviour of a Line. -->
+    <state NAME="unselected" ID="0" START_STATE="TRUE" X_POS="43" Y_POS="80" WIDTH="100" HEIGHT="50">
+      <transition NAME="insertLine" NEXT_STATE_ID="4" EVENT_ID="3">
+        <action ID="22">
+          <!--AcCHECKLINE-->
+          <intParameter NAME="precision" VALUE="5" />
+        </action>
+      </transition>
+      <transition NAME="checkPointPick" NEXT_STATE_ID="2" EVENT_ID="1">
+        <action ID="38">
+          <!--AcCHECKONESUBINTERACTOR-->
+          <floatParameter NAME="threshold" VALUE="0.5" />
+        </action>
+      </transition>
+      <transition NAME="SubInteractorDeselect" NEXT_STATE_ID="0" EVENT_ID="1020">
+        <!-- necessary transition of the state subSelected. the event will produced from the hirachical interactor -->
+        <action ID="1101">
+          <!--AcMODEDESELECT-->
+        </action>
+      </transition>
+    </state>
+    <state NAME="createLineSSD" ID="1" X_POS="41" Y_POS="430" WIDTH="100" HEIGHT="50">
+      <transition NAME="addLine" NEXT_STATE_ID="1" EVENT_ID="3">
+        <action ID="2000">
+          <!--AcTRANSMITEVENT-->
+        </action>
+        <action ID="12">
+          <!--AcADDLINE -->
+        </action>
+        <action ID="72">
+          <!--AcDESELECTALL-->
+        </action>
+      </transition>
+      <transition NAME="Finish" NEXT_STATE_ID="0" EVENT_ID="2000">
+        <action ID="72">
+          <!--AcDESELECTALL-->
+        </action>
+        <action ID="2000">
+          <!--AcTRANSMITEVENT-->
+        </action>
+        <action ID="1100">
+          <!--AcMODEDESELECT-->
+        </action>
+      </transition>
+      <transition NAME="SubInteractorDeselect" NEXT_STATE_ID="0" EVENT_ID="1020">
+        <!-- necessary transition of the state subSelected. the event will produced from the hirachical interactor -->
+        <action ID="1101">
+          <!--AcMODEDESELECT-->
+        </action>
+      </transition>
+    </state>
+    <state NAME="checkSubInteractor" ID="2" X_POS="510" Y_POS="31" WIDTH="118" HEIGHT="50">
+      <transition NAME="EIDNo" NEXT_STATE_ID="3" EVENT_ID="1003">
+        <action ID="22">
+          <!--AcCHECKLINE-->
+          <intParameter NAME="precision" VALUE="5" />
+        </action>
+      </transition>
+      <transition NAME="EIDYes" NEXT_STATE_ID="0" EVENT_ID="1004">
+        <action ID="72">
+          <!--AcDESELECTALL-->
+        </action>
+        <action ID="1102">
+          <!--AcMODESUBSELECT-->
+        </action>
+        <action ID="2000">
+          <!--AcTRANSMITEVENT-->
+        </action>
+      </transition>
+    </state>
+    <state NAME="checkLinePickedIFFselect" ID="3" X_POS="509" Y_POS="180" WIDTH="100" HEIGHT="50">
+      <transition NAME="EIDNo" NEXT_STATE_ID="0" EVENT_ID="1003">
+        <action ID="1100">
+          <!--AcMODEDESELECT-->
+        </action>
+      </transition>
+      <transition NAME="EIDYes" NEXT_STATE_ID="20" EVENT_ID="1004">
+        <action ID="1101">
+          <!--AcMODESELECT-->
+        </action>
+        <action ID="65">
+          <!--AcSELECT-->
+        </action>
+      </transition>
+    </state>
+    <state NAME="checkLinePickedIFFinsert" ID="4" X_POS="278" Y_POS="465" WIDTH="156" HEIGHT="50">
+      <transition NAME="EIDNo" NEXT_STATE_ID="1" EVENT_ID="1003">
+        <action ID="1102">
+          <!--AcMODESUBSELECT-->
+        </action>
+        <action ID="1550">
+          <!--AcFORCESUBINTERACTORS-->
+        </action>
+        <action ID="2000">
+          <!--AcTRANSMITEVENT-->
+        </action>
+        <action ID="72">
+          <!--AcDESELECTALL-->
+        </action>
+        <action ID="12">
+          <!--AcADDLINE -->
+        </action>
+      </transition>
+      <transition NAME="EIDYes" NEXT_STATE_ID="0" EVENT_ID="1004">
+        <action ID="1102">
+          <!--AcMODESUBSELECT-->
+        </action>
+        <action ID="1550">
+          <!--AcFORCESUBINTERACTORS-->
+        </action>
+        <action ID="2000">
+          <!--AcTRANSMITEVENT-->
+        </action>
+        <action ID="12">
+          <!--12AcADDLINE111AcINSERTLINE -->
+        </action>
+        <action ID="72">
+          <!--AcDESELECTALL-->
+        </action>
+      </transition>
+    </state>
+    <state NAME="SSD" ID="10" X_POS="503" Y_POS="259" WIDTH="100" HEIGHT="50">
+      <transition NAME="SubInteractorDeselect" NEXT_STATE_ID="0" EVENT_ID="1020">
+        <!-- necessary transition of the state subSelected. the event will produced from the hirachical interactor -->
+        <action ID="1101">
+          <!--AcMODEDESELECT-->
+        </action>
+      </transition>
+    </state>
+    <state NAME="selected" ID="20" X_POS="760" Y_POS="157" WIDTH="100" HEIGHT="50">
+      <transition NAME="checkSamePick" NEXT_STATE_ID="21" EVENT_ID="1">
+        <action ID="34">
+          <!--AcCHECKSELECTED-->
+          <intParameter NAME="precision" VALUE="10" />
+        </action>
+      </transition>
+    </state>
+    <state NAME="checkStillPicked" ID="21" X_POS="524" Y_POS="431" WIDTH="100" HEIGHT="50">
+      <transition NAME="EIDYes" NEXT_STATE_ID="22" EVENT_ID="1004">
+        <action ID="8">
+          <!--AcINITMOVEMENT-->
+        </action>
+      </transition>
+      <transition NAME="EIDNo" NEXT_STATE_ID="0" EVENT_ID="1003">
+        <action ID="72">
+          <!--AcDESELECTALL-->
+        </action>
+        <action ID="1100">
+          <!--AcMODEDESELECT-->
+        </action>
+      </transition>
+    </state>
+    <state NAME="moves" ID="22" X_POS="751" Y_POS="459" WIDTH="100" HEIGHT="50">
+      <transition NAME="mousemove" NEXT_STATE_ID="22" EVENT_ID="530">
+        <action ID="92" />
+      </transition>
+      <transition NAME="finishmove" NEXT_STATE_ID="20" EVENT_ID="505">
+        <action ID="42" />
+      </transition>
+    </state>
+  </stateMachine>
+  <stateMachine NAME="pointinteractor">
+    <state NAME="unselected" ID="0" START_STATE="TRUE" X_POS="17" Y_POS="23" WIDTH="100" HEIGHT="50">
+      <transition NAME="addPoint" NEXT_STATE_ID="1" EVENT_ID="3">
+        <action ID="1101">
+          <!--AcMODESELECT-->
+        </action>
+        <action ID="10">
+          <!--AcADDPOINT-->
+        </action>
+        <action ID="30">
+          <!--AcCHECKELEMENT-->
+          <intParameter NAME="precision" VALUE="4" />
+        </action>
+      </transition>
+      <transition NAME="checkpicked" NEXT_STATE_ID="2" EVENT_ID="1">
+        <action ID="30">
+          <!--AcCHECKELEMENT-->
+          <intParameter NAME="precision" VALUE="4" />
+        </action>
+      </transition>
+    </state>
+    <state NAME="selected" ID="1" X_POS="663" Y_POS="89" WIDTH="100" HEIGHT="50">
+      <transition NAME="deselect all and add point" NEXT_STATE_ID="1" EVENT_ID="3">
+        <action ID="72">
+          <!--AcDESELECTALL-->
+        </action>
+        <action ID="10">
+          <!--AcADDPOINT-->
+        </action>
+        <action ID="30">
+          <!--AcCHECKELEMENT-->
+          <intParameter NAME="precision" VALUE="4" />
+        </action>
+      </transition>
+      <transition NAME="remove" NEXT_STATE_ID="5" EVENT_ID="12">
+        <action ID="1500">
+          <!--AcCHECKGREATERONE-->
+        </action>
+      </transition>
+      <transition NAME="checkSamePick" NEXT_STATE_ID="3" EVENT_ID="1">
+        <action ID="34">
+          <!--AcCHECKSELECTED-->
+          <intParameter NAME="precision" VALUE="4" />
+        </action>
+      </transition>
+      <transition NAME="deselect all" NEXT_STATE_ID="0" EVENT_ID="2000">
+        <action ID="72">
+          <!--AcDESELECTALL-->
+        </action>
+        <action ID="1100">
+          <!--AcMODEDESELECT-->
+        </action>
+      </transition>
+    </state>
+    <state NAME="checkpicked" ID="2" X_POS="385" Y_POS="221" WIDTH="100" HEIGHT="50">
+      <transition NAME="EIDNo" NEXT_STATE_ID="0" EVENT_ID="1003" />
+      <transition NAME="EIDYes" NEXT_STATE_ID="1" EVENT_ID="1004">
+        <action ID="1101">
+          <!--AcMODESELECT-->
+        </action>
+        <action ID="65">
+          <!--AcSELECT-->
+        </action>
+      </transition>
+    </state>
+    <state NAME="checkStillPicked" ID="3" X_POS="417" Y_POS="497" WIDTH="100" HEIGHT="50">
+      <transition NAME="EIDNo" NEXT_STATE_ID="0" EVENT_ID="1003">
+        <action ID="72">
+          <!--AcDESELECTALL-->
+        </action>
+        <action ID="1100">
+          <!--AcMODEDESELECT-->
+        </action>
+      </transition>
+      <transition NAME="EIDYes" NEXT_STATE_ID="4" EVENT_ID="1004">
+        <action ID="8">
+          <!--AcINITMOVEMENT-->
+        </action>
+      </transition>
+    </state>
+    <state NAME="moves" ID="4" X_POS="799" Y_POS="483" WIDTH="100" HEIGHT="50">
+      <transition NAME="mousemove" NEXT_STATE_ID="4" EVENT_ID="530">
+        <action ID="91">
+          <!--AcMOVESELECTED-->
+        </action>
+      </transition>
+      <transition NAME="finishmove" NEXT_STATE_ID="1" EVENT_ID="505">
+        <action ID="42">
+          <!--AcFINISHMOVEMENT-->
+        </action>
+      </transition>
+    </state>
+    <state NAME="checkGreaterOne" ID="5" X_POS="416" Y_POS="344" WIDTH="100" HEIGHT="50">
+      <transition NAME="StYes" NEXT_STATE_ID="1" EVENT_ID="1004">
+        <action ID="100">
+          <!--AcREMOVEPOINT-->
+        </action>
+        <action ID="61">
+          <!--AcSELECTANOTHEROBJECT-->
+        </action>
+      </transition>
+      <transition NAME="StNo" NEXT_STATE_ID="0" EVENT_ID="1003">
+        <action ID="100">
+          <!--AcREMOVEPOINT-->
+        </action>
+        <action ID="1100">
+          <!--AcMODEDESELECT-->
+        </action>
+      </transition>
+    </state>
+  </stateMachine>
+  <stateMachine NAME="polygoninteractor">
+    <!-- Behaviour of a Polygon -->
+    <state NAME="unselected" ID="0" START_STATE="TRUE" X_POS="195" Y_POS="98" WIDTH="100" HEIGHT="50">
+      <transition NAME="buildUp" NEXT_STATE_ID="1" EVENT_ID="3">
+        <action ID="5">
+          <!--AcINITNEWOBJECT-->
+        </action>
+        <action ID="1550">
+          <!--AcFORCESUBINTERACTORS-->
+        </action>
+        <action ID="1102">
+          <!--AcMODESUBSELECT-->
+        </action>
+        <action ID="2000">
+          <!--AcTRANSMITEVENT-->
+        </action>
+      </transition>
+      <transition NAME="checkSubSelect" NEXT_STATE_ID="2" EVENT_ID="1">
+        <action ID="38">
+          <!--AcCHECKONESUBINTERACTOR-->
+          <floatParameter NAME="threshold" VALUE="0.5" />
+        </action>
+      </transition>
+    </state>
+    <state NAME="buildUp" ID="1" X_POS="640" Y_POS="139" WIDTH="100" HEIGHT="50">
+      <transition NAME="finish" NEXT_STATE_ID="3" EVENT_ID="2000">
+        <action ID="2000">
+          <!--AcTRANSMITEVENT-->
+        </action>
+        <action ID="40">
+          <!--AcFINISHOBJECT-->
+        </action>
+        <action ID="1102">
+          <!--AcMODESUBSELECT-->
+        </action>
+      </transition>
+    </state>
+    <state NAME="checkSubSelected" ID="2" X_POS="52" Y_POS="383" WIDTH="100" HEIGHT="50">
+      <transition NAME="EIDYes" NEXT_STATE_ID="3" EVENT_ID="1004">
+        <!-- the event will produced from the hirachical interactor -->
+        <action ID="1102">
+          <!--AcMODESUBSELECT-->
+        </action>
+        <action ID="1550">
+          <!--AcFORCESUBINTERACTORS-->
+        </action>
+        <action ID="2000">
+          <!--AcTRANSMITEVENT-->
+        </action>
+      </transition>
+      <transition NAME="EIDNo" NEXT_STATE_ID="0" EVENT_ID="1003" />
+    </state>
+    <state NAME="subSelected" ID="3" X_POS="558" Y_POS="347" WIDTH="100" HEIGHT="50">
+      <transition NAME="SubInteractorDeselect" NEXT_STATE_ID="0" EVENT_ID="1020">
+        <!-- necessary transition of the state subSelected. the event will produced from the hirachical interactor -->
+        <action ID="1100">
+          <!--AcMODEDESELECT-->
+        </action>
+      </transition>
+    </state>
+  </stateMachine>
+  <stateMachine NAME="pointsetinteractor">
+    <!-- Behaviour of a set of Points. a defined number of points can be set/removed/selected/deselectd/moved -->
+    <state NAME="no points or loaded points" ID="1" START_STATE="TRUE" X_POS="1066" Y_POS="281" WIDTH="100" HEIGHT="50">
+      <transition NAME="addPoint but check n" NEXT_STATE_ID="3" EVENT_ID="3">
+        <action ID="1101">
+          <!--AcMODE_SELECT-->
+        </action>
+        <action ID="32" />
+      </transition>
+      <transition NAME="Select or move point Space" NEXT_STATE_ID="10" EVENT_ID="1">
+        <action ID="30" />
+      </transition>
+      <transition NAME="checkn Delete" NEXT_STATE_ID="30" EVENT_ID="12">
+        <action ID="33" />
+      </transition>
+      <transition NAME="SetThisStatemachineOnSelected" NEXT_STATE_ID="1" EVENT_ID="1030">
+        <action ID="1101">
+          <!--AcMODE_SELECT-->
+        </action>
+      </transition>
+      <transition NAME="SetThisStatemachineOnDeselected" NEXT_STATE_ID="1" EVENT_ID="1031">
+        <action ID="1100">
+          <!--AcMODE_DESELECT-->
+        </action>
+      </transition>
+    </state>
+    <state NAME="space left" ID="2" X_POS="659" Y_POS="257" WIDTH="100" HEIGHT="50">
+      <transition NAME="addPoint but check n" NEXT_STATE_ID="3" EVENT_ID="3">
+        <action ID="32" />
+      </transition>
+      <transition NAME="Select or move point Space" NEXT_STATE_ID="10" EVENT_ID="1">
+        <action ID="30" />
+      </transition>
+      <transition NAME="checkn Delete" NEXT_STATE_ID="30" EVENT_ID="12">
+        <action ID="33" />
+      </transition>
+      <transition NAME="DeselectAll" NEXT_STATE_ID="2" EVENT_ID="14">
+        <!--Event = ESC-->
+        <action ID="72">
+          <!--AcDESELECTALL-->
+        </action>
+        <action ID="1100">
+          <!--AcMODE_DESELECT-->
+        </action>
+      </transition>
+    </state>
+    <state NAME="checkedN" ID="3" X_POS="745" Y_POS="744" WIDTH="100" HEIGHT="50">
+      <transition NAME="n smaller N" NEXT_STATE_ID="40" EVENT_ID="1010">
+        <action ID="37" />
+      </transition>
+      <transition NAME="n greater equals N" NEXT_STATE_ID="41" EVENT_ID="1011">
+        <action ID="37" />
+      </transition>
+    </state>
+    <state NAME="set full" ID="4" X_POS="267" Y_POS="633" WIDTH="100" HEIGHT="50">
+      <transition NAME="Select or move point FULL" NEXT_STATE_ID="20" EVENT_ID="1">
+        <action ID="30">
+          <!--AcCHECKELEMENT-->
+        </action>
+      </transition>
+      <transition NAME="checkn Delete selected Point" NEXT_STATE_ID="30" EVENT_ID="12">
+        <action ID="33">
+          <!--AcCHECKEQUALS1-->
+        </action>
+      </transition>
+      <transition NAME="DeselectAll" NEXT_STATE_ID="2" EVENT_ID="14">
+        <!--Event = ESC-->
+        <action ID="72">
+          <!--AcDESELECTALL-->
+        </action>
+        <action ID="1100">
+          <!--AcMODEDESELECT-->
+        </action>
+      </transition>
+    </state>
+    <state NAME="picked NotFull" ID="10" X_POS="903" Y_POS="38" WIDTH="100" HEIGHT="50">
+      <transition NAME="StNo" NEXT_STATE_ID="2" EVENT_ID="1003">
+        <action ID="72">
+          <!--AcDESELECTALL-->
+        </action>
+        <action ID="1100">
+          <!--AcMODEDESELECT-->
+        </action>
+      </transition>
+      <transition NAME="StYes" NEXT_STATE_ID="11" EVENT_ID="1004">
+        <action ID="34">
+          <!--AcCHECKSELECTED-->
+        </action>
+        <action ID="1101">
+          <!--AcMODESELECT-->
+        </action>
+      </transition>
+    </state>
+    <state NAME="already selected Space" ID="11" X_POS="391" Y_POS="11" WIDTH="100" HEIGHT="50">
+      <transition NAME="StNo" NEXT_STATE_ID="2" EVENT_ID="1003">
+        <action ID="60" />
+      </transition>
+      <transition NAME="StYes" NEXT_STATE_ID="12" EVENT_ID="1004">
+        <action ID="8" />
+      </transition>
+    </state>
+    <state NAME="move Point Space" ID="12" X_POS="100" Y_POS="99" WIDTH="100" HEIGHT="50">
+      <transition NAME="move point" NEXT_STATE_ID="12" EVENT_ID="530">
+        <action ID="91" />
+      </transition>
+      <transition NAME="finish move" NEXT_STATE_ID="2" EVENT_ID="505">
+        <action ID="42" />
+      </transition>
+      <transition NAME="Safety init" NEXT_STATE_ID="12" EVENT_ID="1">
+        <action ID="8" />
+      </transition>
+    </state>
+    <state NAME="picked Full" ID="20" X_POS="122" Y_POS="766" WIDTH="100" HEIGHT="50">
+      <transition NAME="StNO" NEXT_STATE_ID="4" EVENT_ID="1003">
+        <action ID="72">
+          <!--AcDESELECTALL-->
+        </action>
+        <action ID="1100">
+          <!--AcMODEDESELECT-->
+        </action>
+      </transition>
+      <transition NAME="StYES" NEXT_STATE_ID="21" EVENT_ID="1004">
+        <action ID="34">
+          <!--AcCHECKSELECTED-->
+        </action>
+        <action ID="1101">
+          <!--AcMODESELECT-->
+        </action>
+      </transition>
+    </state>
+    <state NAME="selected Full" ID="21" X_POS="23" Y_POS="485" WIDTH="100" HEIGHT="50">
+      <transition NAME="StNo" NEXT_STATE_ID="4" EVENT_ID="1003">
+        <action ID="60">
+          <!--AcSELECTPICKEDOBJECT-->
+        </action>
+      </transition>
+      <transition NAME="StYes" NEXT_STATE_ID="22" EVENT_ID="1004">
+        <action ID="8">
+          <!--AcINITMOVEMENT-->
+        </action>
+      </transition>
+    </state>
+    <state NAME="move Point Full" ID="22" X_POS="67" Y_POS="255" WIDTH="100" HEIGHT="50">
+      <!--  since the MouseMove Event is send by QT we don't have the information about the position of the point in the list. we had it before, when we checked, if it was picked, or if it was selected -->
+      <transition NAME="move point" NEXT_STATE_ID="22" EVENT_ID="530">
+        <action ID="91" />
+      </transition>
+      <transition NAME="finish move" NEXT_STATE_ID="4" EVENT_ID="505">
+        <action ID="42" />
+      </transition>
+      <transition NAME="Safety init" NEXT_STATE_ID="22" EVENT_ID="1">
+        <action ID="8" />
+      </transition>
+    </state>
+    <state NAME="checkn Delete" ID="30" X_POS="1124" Y_POS="708" WIDTH="100" HEIGHT="50">
+      <transition NAME="StNo" NEXT_STATE_ID="2" EVENT_ID="1003">
+        <action ID="100" />
+      </transition>
+      <transition NAME="StYes" NEXT_STATE_ID="1" EVENT_ID="1004">
+        <action ID="100" />
+        <action ID="1100">
+          <!--AcMODEDESELECT-->
+        </action>
+      </transition>
+    </state>
+    <state NAME="checkedPositionEventSmallerN" ID="40" X_POS="267" Y_POS="301" WIDTH="173" HEIGHT="50">
+      <transition NAME="PositionEvent" NEXT_STATE_ID="2" EVENT_ID="1004">
+        <action ID="10" />
+      </transition>
+      <transition NAME="others" NEXT_STATE_ID="2" EVENT_ID="1003">
+        <action ID="0" />
+      </transition>
+    </state>
+    <state NAME="checkedPositionEventGreaterN" ID="41" X_POS="562" Y_POS="424" WIDTH="168" HEIGHT="50">
+      <transition NAME="PositionEvent" NEXT_STATE_ID="4" EVENT_ID="1004">
+        <action ID="10" />
+      </transition>
+      <transition NAME="others" NEXT_STATE_ID="2" EVENT_ID="1003">
+        <action ID="0" />
+      </transition>
+    </state>
+  </stateMachine>
+  <stateMachine NAME="primstripinteractor">
+    <!-- Behaviour of a Strip of primitives (lines ad points) -->
+    <state NAME="unselected" ID="0" START_STATE="TRUE" X_POS="71" Y_POS="101" WIDTH="100" HEIGHT="50">
+      <transition NAME="forceSSD" NEXT_STATE_ID="1" EVENT_ID="3">
+        <action ID="5">
+          <!--AcINITNEWOBJECT-->
+        </action>
+        <action ID="1550">
+          <!--AcFORCESUBINTERACTORS-->
+        </action>
+        <action ID="1102">
+          <!--AcMODESUBSELECT-->
+        </action>
+        <action ID="2000">
+          <!--AcTRANSMITEVENT-->
+        </action>
+        <action ID="1050">
+          <!--AcSETSTARTPOINT-->
+        </action>
+      </transition>
+      <transition NAME="checkObjectPick" NEXT_STATE_ID="3" EVENT_ID="1">
+        <action ID="31">
+          <!--AcCHECKOBJECT-->
+        </action>
+      </transition>
+    </state>
+    <state NAME="drawStripSSD" ID="1" X_POS="821" Y_POS="57" WIDTH="100" HEIGHT="50">
+      <transition NAME="finish" NEXT_STATE_ID="4" EVENT_ID="2000">
+        <action ID="2000">
+          <!--AcTRANSMITEVENT-->
+        </action>
+        <action ID="1101">
+          <!--AcMODESELECT-->
+        </action>
+      </transition>
+      <transition NAME="SubInteractorDeselect" NEXT_STATE_ID="4" EVENT_ID="1020">
+        <!-- necessary transition of the state subSelected. the event will produced from the hirachical interactor -->
+        <action ID="1101">
+          <!--AcMODEDESELECT-->
+        </action>
+      </transition>
+    </state>
+    <state NAME="checkpicked" ID="3" X_POS="389" Y_POS="200" WIDTH="100" HEIGHT="50">
+      <transition NAME="EIDNO" NEXT_STATE_ID="0" EVENT_ID="1003">
+        <action ID="1101">
+          <!--AcMODEDESELECT-->
+        </action>
+      </transition>
+      <transition NAME="EIDYes" NEXT_STATE_ID="4" EVENT_ID="1004">
+        <action ID="1101">
+          <!--AcMODESELECT-->
+        </action>
+        <action ID="67">
+          <!--AcSELECTCELL-->
+        </action>
+      </transition>
+    </state>
+    <state NAME="selected" ID="4" X_POS="350" Y_POS="406" WIDTH="100" HEIGHT="50">
+      <transition NAME="checkSubSelectForInsertLineAndPoint" NEXT_STATE_ID="7" EVENT_ID="3">
+        <action ID="38">
+          <!--AcCHECKONESUBINTERACTOR-->
+          <floatParameter NAME="threshold" VALUE="0.5" />
+        </action>
+      </transition>
+      <transition NAME="remove" NEXT_STATE_ID="0" EVENT_ID="12">
+        <action ID="101" />
+        <action ID="1100">
+          <!--AcMODEDESELECT-->
+        </action>
+      </transition>
+      <transition NAME="checkSubSelect" NEXT_STATE_ID="5" EVENT_ID="1">
+        <action ID="38">
+          <!--AcCHECKONESUBINTERACTOR-->
+          <floatParameter NAME="threshold" VALUE="0.5" />
+        </action>
+      </transition>
+      <transition NAME="SubInteractorDeselect" NEXT_STATE_ID="0" EVENT_ID="1020">
+        <!-- necessary transition of the state subSelected -->
+        <action ID="1101">
+          <!--AcMODESELECT-->
+        </action>
+      </transition>
+    </state>
+    <state NAME="CheckSubSelect" ID="5" X_POS="791" Y_POS="609" WIDTH="100" HEIGHT="50">
+      <transition NAME="EIDYES" NEXT_STATE_ID="10" EVENT_ID="1004">
+        <action ID="1102">
+          <!--AcMODESUBSELECT-->
+        </action>
+        <action ID="2000">
+          <!--AcTRANSMITEVENT-->
+        </action>
+      </transition>
+      <transition NAME="EIDNO" NEXT_STATE_ID="6" EVENT_ID="1003">
+        <action ID="1510">
+          <!--AcCHECKBOUNDINGBOX-->
+        </action>
+      </transition>
+    </state>
+    <state NAME="CheckPickedSelf" ID="6" X_POS="55" Y_POS="738" WIDTH="100" HEIGHT="50">
+      <transition NAME="EIDYES" NEXT_STATE_ID="20" EVENT_ID="1004">
+        <action ID="8">
+          <!--AcINITMOVEMENT-->
+        </action>
+      </transition>
+      <transition NAME="EIDNO" NEXT_STATE_ID="0" EVENT_ID="1003">
+        <action ID="77">
+          <!--AcDESELECTCELL-->
+        </action>
+        <action ID="1100">
+          <!--AcMODEDESELECT-->
+        </action>
+      </transition>
+    </state>
+    <state NAME="CheckSubSelectForInsertLineAndPoint" ID="7" X_POS="1078" Y_POS="386" WIDTH="100" HEIGHT="50">
+      <transition NAME="EIDYES" NEXT_STATE_ID="4" EVENT_ID="1004">
+        <action ID="1102">
+          <!--AcMODESUBSELECT-->
+        </action>
+        <action ID="2000">
+          <!--AcTRANSMITEVENT-->
+        </action>
+      </transition>
+      <transition NAME="EIDNO" NEXT_STATE_ID="4" EVENT_ID="1003" />
+    </state>
+    <state NAME="SSD" ID="10" X_POS="913" Y_POS="745" WIDTH="100" HEIGHT="50">
+      <transition NAME="SubInteractorDeselect" NEXT_STATE_ID="6" EVENT_ID="1020">
+        <!-- necessary transition of the state subSelected -->
+        <action ID="1101">
+          <!--AcMODESELECT-->
+        </action>
+        <action ID="1510">
+          <!--AcCHECKBOUNDINGBOX-->
+        </action>
+      </transition>
+    </state>
+    <state NAME="primstripmoves" ID="20" X_POS="301" Y_POS="649" WIDTH="100" HEIGHT="50">
+      <transition NAME="mousemove" NEXT_STATE_ID="20" EVENT_ID="530">
+        <action ID="92" />
+      </transition>
+      <transition NAME="finishmove" NEXT_STATE_ID="4" EVENT_ID="505">
+        <action ID="42" />
+      </transition>
+    </state>
+  </stateMachine>
+  <stateMachine NAME="seedpointsetinteractor">
+    <!-- Behaviour of a Point. -->
+    <state NAME="no points or loaded points" ID="1" START_STATE="TRUE" X_POS="59" Y_POS="45" WIDTH="169" HEIGHT="50">
+      <transition NAME="addPoint but check n" NEXT_STATE_ID="3" EVENT_ID="5">
+        <action ID="1101">
+          <!--AcMODESELECT-->
+        </action>
+        <action ID="32" />
+      </transition>
+      <transition NAME="Select or move point Space" NEXT_STATE_ID="10" EVENT_ID="1">
+        <action ID="30" />
+      </transition>
+      <transition NAME="checkn Delete" NEXT_STATE_ID="30" EVENT_ID="12">
+        <action ID="33" />
+      </transition>
+    </state>
+    <state NAME="space left" ID="2" X_POS="914" Y_POS="734" WIDTH="100" HEIGHT="50">
+      <transition NAME="addPoint but check n" NEXT_STATE_ID="3" EVENT_ID="5">
+        <action ID="32" />
+      </transition>
+      <transition NAME="Select or move point Space" NEXT_STATE_ID="10" EVENT_ID="1">
+        <action ID="30" />
+      </transition>
+      <transition NAME="checkn Delete" NEXT_STATE_ID="30" EVENT_ID="12">
+        <action ID="33" />
+      </transition>
+    </state>
+    <state NAME="checkedN" ID="3" X_POS="416" Y_POS="155" WIDTH="100" HEIGHT="50">
+      <transition NAME="n smaller N" NEXT_STATE_ID="40" EVENT_ID="1010">
+        <action ID="37" />
+      </transition>
+      <transition NAME="n greater equals N" NEXT_STATE_ID="41" EVENT_ID="1011">
+        <action ID="37" />
+      </transition>
+    </state>
+    <state NAME="set full" ID="4" X_POS="658" Y_POS="159" WIDTH="100" HEIGHT="50">
+      <transition NAME="Select or move point FULL" NEXT_STATE_ID="20" EVENT_ID="1">
+        <action ID="30" />
+      </transition>
+      <transition NAME="checkn Delete selected Point" NEXT_STATE_ID="30" EVENT_ID="12">
+        <action ID="33" />
+      </transition>
+    </state>
+    <state NAME="picked NotFull" ID="10" X_POS="51" Y_POS="397" WIDTH="100" HEIGHT="50">
+      <transition NAME="StNo" NEXT_STATE_ID="2" EVENT_ID="1003">
+        <action ID="72" />
+      </transition>
+      <transition NAME="StYes" NEXT_STATE_ID="11" EVENT_ID="1004">
+        <action ID="34" />
+      </transition>
+    </state>
+    <state NAME="already selected Space" ID="11" X_POS="23" Y_POS="560" WIDTH="150" HEIGHT="50">
+      <transition NAME="StNo" NEXT_STATE_ID="2" EVENT_ID="1003">
+        <action ID="60" />
+      </transition>
+      <transition NAME="StYes" NEXT_STATE_ID="12" EVENT_ID="1004">
+        <action ID="8" />
+      </transition>
+    </state>
+    <state NAME="move Point Space" ID="12" X_POS="76" Y_POS="731" WIDTH="100" HEIGHT="50">
+      <transition NAME="move point" NEXT_STATE_ID="12" EVENT_ID="530">
+        <action ID="91" />
+      </transition>
+      <transition NAME="finish move" NEXT_STATE_ID="2" EVENT_ID="505">
+        <action ID="42" />
+      </transition>
+      <transition NAME="Safety init" NEXT_STATE_ID="12" EVENT_ID="1">
+        <action ID="8" />
+      </transition>
+    </state>
+    <state NAME="picked Full" ID="20" X_POS="1016" Y_POS="142" WIDTH="100" HEIGHT="50">
+      <transition NAME="StNO" NEXT_STATE_ID="4" EVENT_ID="1003">
+        <action ID="72" />
+      </transition>
+      <transition NAME="StYES" NEXT_STATE_ID="21" EVENT_ID="1004">
+        <action ID="34" />
+      </transition>
+    </state>
+    <state NAME="selected Full" ID="21" X_POS="872" Y_POS="490" WIDTH="100" HEIGHT="50">
+      <transition NAME="StNo" NEXT_STATE_ID="4" EVENT_ID="1003">
+        <action ID="60" />
+      </transition>
+      <transition NAME="StYes" NEXT_STATE_ID="22" EVENT_ID="1004">
+        <action ID="8" />
+      </transition>
+    </state>
+    <state NAME="move Point Full" ID="22" X_POS="847" Y_POS="289" WIDTH="100" HEIGHT="50">
+      <!--  since the MouseMove Event is send by QT we don't have the information about the position of the point in the list. we had it before, when we checked, if it was picked, or if it was selected -->
+      <transition NAME="move point" NEXT_STATE_ID="22" EVENT_ID="530">
+        <action ID="91" />
+      </transition>
+      <transition NAME="finish move" NEXT_STATE_ID="4" EVENT_ID="505">
+        <action ID="42" />
+      </transition>
+      <transition NAME="Safety init" NEXT_STATE_ID="22" EVENT_ID="1">
+        <action ID="8" />
+      </transition>
+    </state>
+    <state NAME="checkn Delete" ID="30" X_POS="1151" Y_POS="19" WIDTH="100" HEIGHT="50">
+      <transition NAME="StNo" NEXT_STATE_ID="2" EVENT_ID="1003">
+        <action ID="100" />
+      </transition>
+      <transition NAME="StYes" NEXT_STATE_ID="1" EVENT_ID="1004">
+        <action ID="100" />
+        <action ID="1100">
+          <!--AcMODEDESELECT-->
+        </action>
+      </transition>
+    </state>
+    <state NAME="checkedPositionEventSmallerN" ID="40" X_POS="164" Y_POS="334" WIDTH="166" HEIGHT="50">
+      <transition NAME="PositionEvent" NEXT_STATE_ID="2" EVENT_ID="1004">
+        <action ID="10" />
+      </transition>
+      <transition NAME="others" NEXT_STATE_ID="2" EVENT_ID="1003">
+        <action ID="0" />
+      </transition>
+    </state>
+    <state NAME="checkedPositionEventGreaterN" ID="41" X_POS="758" Y_POS="478" WIDTH="100" HEIGHT="50">
+      <transition NAME="PositionEvent" NEXT_STATE_ID="4" EVENT_ID="1004">
+        <action ID="10" />
+      </transition>
+      <transition NAME="others" NEXT_STATE_ID="2" EVENT_ID="1003">
+        <action ID="0" />
+      </transition>
+    </state>
+  </stateMachine>
+  <stateMachine NAME="VesselGraphInteractor">
+    <state NAME="Start" ID="1" START_STATE="TRUE" X_POS="1390" Y_POS="-1" WIDTH="100" HEIGHT="50">
+      <transition NAME="goToCheckPicking" NEXT_STATE_ID="2" EVENT_ID="5">
+        <action ID="31">
+          <!--AcCHECKOBJECT-->
+        </action>
+      </transition>
+    </state>
+    <state NAME="CheckPicking" ID="2" X_POS="515" Y_POS="263" WIDTH="100" HEIGHT="50">
+      <transition NAME="noPicked" NEXT_STATE_ID="4" EVENT_ID="1003">
+        <action ID="66">
+          <!-- AcSELECTPOINT  -->
+        </action>
+      </transition>
+      <transition NAME="yesPicked" NEXT_STATE_ID="3" EVENT_ID="1004">
+        <action ID="69">
+          <!-- AcSELECTSUBOBJECT  -->
+        </action>
+      </transition>
+    </state>
+    <state NAME="OneVesselPicked" ID="3" X_POS="1488" Y_POS="350" WIDTH="100" HEIGHT="50">
+      <transition NAME="goToCheckPicking" NEXT_STATE_ID="5" EVENT_ID="5">
+        <action ID="31">
+          <!-- AcCHECKOBJECT  -->
+        </action>
+      </transition>
+      <transition NAME="delete" NEXT_STATE_ID="1" EVENT_ID="12">
+        <action ID="104">
+          <!-- AcREMOVESELECTEDSUBOBJECT -->
+        </action>
+      </transition>
+      <transition NAME="deselectAll" NEXT_STATE_ID="1" EVENT_ID="14">
+        <action ID="72">
+          <!-- AcDESELECTALL -->
+        </action>
+      </transition>
+      <transition NAME="searchPeriphery" NEXT_STATE_ID="11" EVENT_ID="15">
+        <action ID="3000">
+          <!-- AcPERIPHERYSEARCH -->
+        </action>
+      </transition>
+      <transition NAME="searchToRoot" NEXT_STATE_ID="11" EVENT_ID="16">
+        <action ID="3001">
+          <!-- AcROOTSEARCH -->
+        </action>
+      </transition>
+      <transition NAME="searchToThickstVessel" NEXT_STATE_ID="11" EVENT_ID="17">
+        <action ID="3002">
+          <!-- AcTHICKSTVESSELSEARCH -->
+        </action>
+      </transition>
+      <!--now follow the attibutations for different vessel types-->
+      <transition NAME="attributation" NEXT_STATE_ID="3" EVENT_ID="20">
+        <action ID="3005">
+          <!-- AcATTRIBUTATION -->
+          <intParameter NAME="attribute_id" VALUE="0" />
+        </action>
+      </transition>
+      <transition NAME="attributation" NEXT_STATE_ID="3" EVENT_ID="21">
+        <action ID="3005">
+          <!-- AcATTRIBUTATION -->
+          <intParameter NAME="attribute_id" VALUE="1" />
+        </action>
+      </transition>
+      <transition NAME="attributation" NEXT_STATE_ID="3" EVENT_ID="30">
+        <action ID="3005">
+          <!-- AcATTRIBUTATION -->
+          <intParameter NAME="attribute_id" VALUE="2" />
+        </action>
+      </transition>
+      <transition NAME="attributation" NEXT_STATE_ID="3" EVENT_ID="31">
+        <action ID="3005">
+          <!-- AcATTRIBUTATION -->
+          <intParameter NAME="attribute_id" VALUE="3" />
+        </action>
+      </transition>
+      <transition NAME="attributation" NEXT_STATE_ID="3" EVENT_ID="40">
+        <action ID="3005">
+          <!-- AcATTRIBUTATION -->
+          <intParameter NAME="attribute_id" VALUE="4" />
+        </action>
+      </transition>
+      <transition NAME="default" NEXT_STATE_ID="1" EVENT_ID="90">
+        <action ID="3007">
+          <!-- AcDEFAULT -->
+        </action>
+      </transition>
+    </state>
+    <state NAME="OnePointPicked" ID="4" X_POS="339" Y_POS="103" WIDTH="100" HEIGHT="50">
+      <transition NAME="goToCheckPicking" NEXT_STATE_ID="6" EVENT_ID="5">
+        <action ID="31">
+          <!-- AcCHECKOBJECT  -->
+        </action>
+      </transition>
+      <transition NAME="deselectAll" NEXT_STATE_ID="1" EVENT_ID="14">
+        <action ID="72">
+          <!-- AcDESELECTALL -->
+        </action>
+      </transition>
+    </state>
+    <state NAME="CheckPicking" ID="5" X_POS="43" Y_POS="721" WIDTH="100" HEIGHT="50">
+      <transition NAME="noPicked" NEXT_STATE_ID="7" EVENT_ID="1003">
+        <action ID="66">
+          <!-- AcSELECTPOINT  -->
+        </action>
+      </transition>
+      <transition NAME="yesPicked" NEXT_STATE_ID="13" EVENT_ID="1004">
+        <action ID="69">
+          <!-- AcSELECTSUBOBJECT  -->
+        </action>
+        <action ID="3010">
+          <!-- AcCHECKBARRIERSTATUS -->
+        </action>
+      </transition>
+    </state>
+    <state NAME="CheckPicking" ID="6" X_POS="552" Y_POS="156" WIDTH="100" HEIGHT="50">
+      <transition NAME="noPicked" NEXT_STATE_ID="9" EVENT_ID="1003">
+        <action ID="66">
+          <!-- AcSELECTPOINT  -->
+        </action>
+      </transition>
+      <transition NAME="yesPicked" NEXT_STATE_ID="7" EVENT_ID="1004">
+        <action ID="69">
+          <!-- AcSELECTSUBOBJECT  -->
+        </action>
+      </transition>
+    </state>
+    <state NAME="OneVesselOnePointPicked" ID="7" X_POS="665" Y_POS="378" WIDTH="151" HEIGHT="50">
+      <transition NAME="ENew" NEXT_STATE_ID="1" EVENT_ID="13">
+        <action ID="81">
+          <!-- AcNEWSUBOBJECT -->
+        </action>
+        <action ID="72">
+          <!-- AcDESELECTALL -->
+        </action>
+      </transition>
+      <transition NAME="deselectAll" NEXT_STATE_ID="1" EVENT_ID="14">
+        <action ID="72">
+          <!-- AcDESELECTALL -->
+        </action>
+      </transition>
+      <transition NAME="delete" NEXT_STATE_ID="1" EVENT_ID="12">
+        <action ID="104">
+          <!-- AcREMOVESELECTEDSUBOBJECT -->
+        </action>
+      </transition>
+      <transition NAME="setVesselElement" NEXT_STATE_ID="7" EVENT_ID="91">
+        <action ID="3008">
+          <!-- AcSETVESSELELEMENT-->
+        </action>
+      </transition>
+      <!--now follow the attibutations for different vessel types-->
+      <transition NAME="attributation" NEXT_STATE_ID="7" EVENT_ID="20">
+        <action ID="3005">
+          <!-- AcATTRIBUTATION -->
+          <intParameter NAME="attribute_id" VALUE="0" />
+        </action>
+      </transition>
+      <transition NAME="attributation" NEXT_STATE_ID="7" EVENT_ID="21">
+        <action ID="3005">
+          <!-- AcATTRIBUTATION -->
+          <intParameter NAME="attribute_id" VALUE="1" />
+        </action>
+      </transition>
+      <transition NAME="attributation" NEXT_STATE_ID="7" EVENT_ID="30">
+        <action ID="3005">
+          <!-- AcATTRIBUTATION -->
+          <intParameter NAME="attribute_id" VALUE="2" />
+        </action>
+      </transition>
+      <transition NAME="attributation" NEXT_STATE_ID="7" EVENT_ID="31">
+        <action ID="3005">
+          <!-- AcATTRIBUTATION -->
+          <intParameter NAME="attribute_id" VALUE="3" />
+        </action>
+      </transition>
+      <transition NAME="attributation" NEXT_STATE_ID="7" EVENT_ID="40">
+        <action ID="3005">
+          <!-- AcATTRIBUTATION -->
+          <intParameter NAME="attribute_id" VALUE="4" />
+        </action>
+      </transition>
+      <transition NAME="default" NEXT_STATE_ID="1" EVENT_ID="90">
+        <action ID="3007">
+          <!-- AcDEFAULT -->
+        </action>
+      </transition>
+    </state>
+    <state NAME="TwoVesselsPicked" ID="8" X_POS="77" Y_POS="79" WIDTH="100" HEIGHT="50">
+      <transition NAME="ENew" NEXT_STATE_ID="1" EVENT_ID="13">
+        <action ID="81">
+          <!-- AcNEWSUBOBJECT -->
+        </action>
+        <action ID="72">
+          <!-- AcDESELECTALL -->
+        </action>
+      </transition>
+      <transition NAME="goToCheckPicking" NEXT_STATE_ID="10" EVENT_ID="5">
+        <action ID="31">
+          <!-- AcCHECKOBJECT  -->
+        </action>
+      </transition>
+      <transition NAME="searchShortestPathBetween2Edges" NEXT_STATE_ID="11" EVENT_ID="18">
+        <action ID="3003">
+          <!-- AcSHORTESTPATHSEARCH -->
+        </action>
+      </transition>
+      <transition NAME="deselectAll" NEXT_STATE_ID="1" EVENT_ID="14">
+        <action ID="72">
+          <!-- AcDESELECTALL -->
+        </action>
+      </transition>
+      <transition NAME="delete" NEXT_STATE_ID="1" EVENT_ID="12">
+        <action ID="104">
+          <!-- AcREMOVESELECTEDSUBOBJECT -->
+        </action>
+      </transition>
+      <transition NAME="setVesselElement" NEXT_STATE_ID="8" EVENT_ID="91">
+        <action ID="3008">
+          <!-- AcSETVESSELELEMENT-->
+        </action>
+      </transition>
+      <!--now follow the attibutations for different vessel types-->
+      <transition NAME="attributation" NEXT_STATE_ID="8" EVENT_ID="20">
+        <action ID="3005">
+          <!-- AcATTRIBUTATION -->
+          <intParameter NAME="attribute_id" VALUE="0" />
+        </action>
+      </transition>
+      <transition NAME="attributation" NEXT_STATE_ID="8" EVENT_ID="21">
+        <action ID="3005">
+          <!-- AcATTRIBUTATION -->
+          <intParameter NAME="attribute_id" VALUE="1" />
+        </action>
+      </transition>
+      <transition NAME="attributation" NEXT_STATE_ID="8" EVENT_ID="30">
+        <action ID="3005">
+          <!-- AcATTRIBUTATION -->
+          <intParameter NAME="attribute_id" VALUE="2" />
+        </action>
+      </transition>
+      <transition NAME="attributation" NEXT_STATE_ID="8" EVENT_ID="31">
+        <action ID="3005">
+          <!-- AcATTRIBUTATION -->
+          <intParameter NAME="attribute_id" VALUE="3" />
+        </action>
+      </transition>
+      <transition NAME="attributation" NEXT_STATE_ID="8" EVENT_ID="40">
+        <action ID="3005">
+          <!-- AcATTRIBUTATION -->
+          <intParameter NAME="attribute_id" VALUE="4" />
+        </action>
+      </transition>
+      <transition NAME="default" NEXT_STATE_ID="1" EVENT_ID="90">
+        <action ID="3007">
+          <!-- AcDEFAULT -->
+        </action>
+      </transition>
+    </state>
+    <state NAME="TwoPointsPicked" ID="9" X_POS="748" Y_POS="140" WIDTH="100" HEIGHT="50">
+      <transition NAME="ENew" NEXT_STATE_ID="1" EVENT_ID="13">
+        <action ID="81">
+          <!-- AcNEWSUBOBJECT -->
+        </action>
+      </transition>
+      <transition NAME="deselectAll" NEXT_STATE_ID="1" EVENT_ID="14">
+        <action ID="72">
+          <!-- AcDESELECTALL -->
+        </action>
+      </transition>
+      <transition NAME="setVesselElement" NEXT_STATE_ID="9" EVENT_ID="91">
+        <action ID="3008">
+          <!-- AcSETVESSELELEMENT-->
+        </action>
+      </transition>
+    </state>
+    <state NAME="CheckPicking" ID="10" X_POS="642" Y_POS="805" WIDTH="100" HEIGHT="50">
+      <transition NAME="noPicked" NEXT_STATE_ID="12" EVENT_ID="1003">
+        <action ID="36">
+          <!--AcCHECKGREATERTWO-->
+        </action>
+      </transition>
+      <transition NAME="yesPicked" NEXT_STATE_ID="14" EVENT_ID="1004">
+        <action ID="69">
+          <!-- AcSELECTSUBOBJECT  -->
+        </action>
+        <action ID="3010">
+          <!-- AcCHECKBARRIERSTATUS -->
+        </action>
+      </transition>
+    </state>
+    <state NAME="MoreVesselsPicked" ID="11" X_POS="933" Y_POS="754" WIDTH="100" HEIGHT="50">
+      <transition NAME="delete" NEXT_STATE_ID="1" EVENT_ID="12">
+        <action ID="104">
+          <!-- AcDESELECTALL -->
+        </action>
+      </transition>
+      <transition NAME="goToCheckPicking" NEXT_STATE_ID="10" EVENT_ID="5">
+        <action ID="31">
+          <!-- AcCHECKOBJECT  -->
+        </action>
+      </transition>
+      <transition NAME="deselectAll" NEXT_STATE_ID="1" EVENT_ID="14">
+        <action ID="72">
+          <!-- AcDESELECTALL -->
+        </action>
+      </transition>
+      <transition NAME="singleSignal" NEXT_STATE_ID="3" EVENT_ID="19">
+        <action ID="3004">
+          <!-- AcSINGLE -->
+        </action>
+      </transition>
+      <!--now follow the attibutations for different vessel types-->
+      <transition NAME="attributation" NEXT_STATE_ID="11" EVENT_ID="20">
+        <action ID="3005">
+          <!-- AcATTRIBUTATION -->
+          <intParameter NAME="attribute_id" VALUE="0" />
+        </action>
+      </transition>
+      <transition NAME="attributation" NEXT_STATE_ID="11" EVENT_ID="21">
+        <action ID="3005">
+          <!-- AcATTRIBUTATION -->
+          <intParameter NAME="attribute_id" VALUE="1" />
+        </action>
+      </transition>
+      <transition NAME="attributation" NEXT_STATE_ID="11" EVENT_ID="30">
+        <action ID="3005">
+          <!-- AcATTRIBUTATION -->
+          <intParameter NAME="attribute_id" VALUE="2" />
+        </action>
+      </transition>
+      <transition NAME="attributation" NEXT_STATE_ID="11" EVENT_ID="31">
+        <action ID="3005">
+          <!-- AcATTRIBUTATION -->
+          <intParameter NAME="attribute_id" VALUE="3" />
+        </action>
+      </transition>
+      <transition NAME="attributation" NEXT_STATE_ID="11" EVENT_ID="40">
+        <action ID="3005">
+          <!-- AcATTRIBUTATION -->
+          <intParameter NAME="attribute_id" VALUE="4" />
+        </action>
+      </transition>
+      <transition NAME="default" NEXT_STATE_ID="1" EVENT_ID="90">
+        <action ID="3007">
+          <!-- AcDEFAULT -->
+        </action>
+      </transition>
+    </state>
+    <state NAME="CheckNumberPickedVesselsSmaller2" ID="12" X_POS="259" Y_POS="707" WIDTH="188" HEIGHT="50">
+      <transition NAME="yes" NEXT_STATE_ID="8" EVENT_ID="1004" />
+      <transition NAME="no" NEXT_STATE_ID="11" EVENT_ID="1003">
+        <action ID="69">
+          <!-- AcSELECTSUBOBJECT  -->
+        </action>
+      </transition>
+    </state>
+    <state NAME="CheckBarrierStatus" ID="13" X_POS="8" Y_POS="318" WIDTH="100" HEIGHT="50">
+      <transition NAME="yes" NEXT_STATE_ID="3" EVENT_ID="1004" />
+      <transition NAME="no" NEXT_STATE_ID="8" EVENT_ID="1003" />
+    </state>
+    <state NAME="CheckBarrierStatus" ID="14" X_POS="557" Y_POS="510" WIDTH="100" HEIGHT="50">
+      <transition NAME="yes" NEXT_STATE_ID="8" EVENT_ID="1004" />
+      <transition NAME="no" NEXT_STATE_ID="11" EVENT_ID="1003" />
+    </state>
+  </stateMachine>
 </mitkInteraktionStates>
 <!-- DOKUMENTATION -->
 <!-- this is StateMachine.xml| includes Information about different StateMachines and Events. Used by EventMapper and StateMachineFactory-->
@@ -1991,3 +2714,4 @@
 <!-- Question: the Application, that is loading this file doesn't act on the Interaction. Why? -->
 <!-- The QXMLFileLoader probably isn't able to load the file due to an error.-->
 <!-- Check the file for XML-Syntax like  "<" at beginning and "/>" at end -->
+

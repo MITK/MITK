@@ -286,6 +286,40 @@ void mitk::PicFileReader::EnlargeOutputRequestedRegion(itk::DataObject *output)
   output->SetRequestedRegionToLargestPossibleRegion();
 }
 
+bool mitk::PicFileReader::CanReadFile(const char* file) 
+{
+  // First check the extension
+  std::string filename = file;
+  if(  filename == "" )
+    {
+      //std::cout<<"No filename specified."<<std::endl;
+    return false;
+    }
+
+  bool extensionFound = false;
+  std::string::size_type PICPos = filename.rfind(".pic");
+  if ((PICPos != std::string::npos)
+      && (PICPos == filename.length() - 4))
+    {
+    extensionFound = true;
+    }
+
+  PICPos = filename.rfind(".pic.gz");
+  if ((PICPos != std::string::npos)
+      && (PICPos == filename.length() - 7))
+    {
+    extensionFound = true;
+    }
+
+  if( !extensionFound )
+    {
+      //std::cout<<"The filename extension is not recognized."<<std::endl;
+    return false;
+    }
+
+  return true;
+}
+
 //##ModelId=3E1874D202D0
 mitk::PicFileReader::PicFileReader()
     : m_FileName(""), m_FilePrefix(""), m_FilePattern("")

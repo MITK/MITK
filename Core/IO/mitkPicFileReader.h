@@ -50,6 +50,8 @@ public:
 
     static void ConvertHandedness(ipPicDescriptor* pic);
 
+    static bool CanReadFile(const char* file);
+
 protected:
     //##ModelId=3E187255016C
     virtual void GenerateData();

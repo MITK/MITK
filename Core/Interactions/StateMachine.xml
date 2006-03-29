@@ -2,7 +2,6 @@
 <!-- Event_Id = 0: this is a * transition with all other eventId's not declared in that state -->
 <mitkInteraktionStates xmlns="http://tempuri.org/StateMachine.xsd" STYLE="User001">
   <!-- ***WARNING*** do not use any &, % and so on in NAME -->
-  <!-- Interaction State Machine Patterns: -->
   <!-- -->
   <!-- -->
   <!-- EventDescriptions -->
@@ -41,6 +40,14 @@
     <event NAME="Strg+Alt+A" ID="20" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0600" KEY="Key_A" />
     <!-- Strg + Alt + B -->
     <event NAME="Strg+Alt+B" ID="21" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0600" KEY="Key_B" />
+    <!-- H-->
+    <event NAME="H" ID="22" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_H" />
+    <!-- Return -->
+    <event NAME="Return" ID="23" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_Return" />
+    <!-- Enter -->
+    <event NAME="Enter" ID="24" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_Enter" />
+    <!-- Space -->
+    <event NAME="Space" ID="25" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_Space" />
     <!-- Strg + Alt + H -->
     <event NAME="Strg+Alt+H" ID="30" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0600" KEY="Key_H" />
     <!-- Strg + Alt + I -->
@@ -133,6 +140,7 @@
     <event NAME="StSMALERNMINUS1 " ID="1010" TYPE="Type_User" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_none" />
     <event NAME="StLARGERNMINUS1" ID="1011" TYPE="Type_User" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_none" />
     <!-- -->
+    <event NAME="ActivateTool" ID="1300" TYPE="Type_User" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_none" />
     <!-- -->
     <!-- Sonstiges -->
     <event NAME="PositionEvent" ID="1012" TYPE="Type_MouseButtonPress" BUTTON="BS_LeftButton" BUTTONSTATE="0x0000" KEY="Key_none" />
@@ -1398,111 +1406,198 @@
     </state>
   </stateMachine>
   <stateMachine NAME="EasySegmentation">
-    <!-- State machine for interaction with segmentations. 
-     Original author: Daniel Maleike
-     Status: idea/experiment
-     Basic behaviour: Collision detection checks, whether the mouse cursor is inside some segmentation.
-                      When outside, the behaviour is identical to moveNzoom, i.e. translation of the
-                      whole scene using the middle button, scaling of the whole scene using the right button.
-                      When the pointer is inside a segmentation, middle button behaviour changes to
-                      moving the segmentation under the cursor, right mouse button generates 
-                      parameters for segmentation algorithms (TODO: clarify)
-                      The mouse wheel should change the currently selected segmentation tool.  -->
-    <state NAME="Moving around outside object" ID="0" START_STATE="TRUE" X_POS="21" Y_POS="15" WIDTH="172" HEIGHT="50">
+    <state NAME="Checking for ActivateToolEvents" ID="0" START_STATE="TRUE" X_POS="193" Y_POS="206" WIDTH="174" HEIGHT="50">
+      <transition NAME="OnActivateToolEvent" EVENT_ID="1300" NEXT_STATE_ID="0">
+        <action ID="48009">
+          <!-- AcActivateTool -->
+        </action>
+      </transition>
+    </state>
+  </stateMachine>
+  <stateMachine NAME="segmentation-interactor-tool:movenzoom">
+    <state NAME="Ready to start" ID="0" START_STATE="TRUE">
+      <transition NAME="OnLeftMouseDown" EVENT_ID="1" NEXT_STATE_ID="3" />
+      <transition NAME="OnMiddleMouseDown" EVENT_ID="4" NEXT_STATE_ID="1">
+        <action ID="9">
+          <!-- AcInitMove -->
+        </action>
+      </transition>
+      <transition NAME="OnRightMouseDown" EVENT_ID="2" NEXT_STATE_ID="2">
+        <action ID="1011">
+          <!-- AcInitZoom -->
+        </action>
+      </transition>
+    </state>
+    <state NAME="Moving" ID="1">
+      <transition NAME="OnMouseMove" EVENT_ID="533" NEXT_STATE_ID="1">
+        <action ID="92">
+          <!-- AcMove -->
+        </action>
+      </transition>
+      <transition NAME="OnMiddleMouseUp" EVENT_ID="506" NEXT_STATE_ID="0" />
+    </state>
+    <state NAME="Zooming" ID="2">
+      <transition NAME="OnMouseMove" EVENT_ID="531" NEXT_STATE_ID="2">
+        <action ID="1012">
+          <!-- AcZoom -->
+        </action>
+      </transition>
+      <transition NAME="OnRightMouseUp" EVENT_ID="507" NEXT_STATE_ID="0" />
+    </state>
+    <state NAME="Click" ID="3">
+      <transition NAME="OnLeftMouseUp" EVENT_ID="505" NEXT_STATE_ID="0">
+        <action ID="31">
+          <!-- AcCheckObject -->
+        </action>
+      </transition>
+    </state>
+  </stateMachine>
+  <stateMachine NAME="segmentation-interactor-tool:needle">
+    <state NAME="Ready to start" ID="0" START_STATE="TRUE">
+      <transition NAME="OnMouseMove" EVENT_ID="520" NEXT_STATE_ID="0">
+        <action ID="49006">
+          <!-- AcUpdatePoint -->
+        </action>
+      </transition>
+      <transition NAME="OnKeyH" EVENT_ID="22" NEXT_STATE_ID="0">
+        <action ID="49004">
+          <!-- AcMovePoint1 -->
+        </action>
+      </transition>
+      <transition NAME="OnKeyT" EVENT_ID="17" NEXT_STATE_ID="0">
+        <action ID="49005">
+          <!-- AcMovePoint2 -->
+        </action>
+      </transition>
+      <transition NAME="OnKeyEsc" EVENT_ID="14" NEXT_STATE_ID="7">
+        <action ID="49009">
+          <!-- AcDisplayOptions -->
+        </action>
+        <action ID="49010">
+          <!-- AcCycle (cycle to first different needle) -->
+        </action>
+      </transition>
+      <transition NAME="OnLeftMouseDown" EVENT_ID="1" NEXT_STATE_ID="3">
+        <action ID="31">
+          <!-- AcCheckObject -->
+        </action>
+      </transition>
+      <transition NAME="OnMiddleMouseDown" EVENT_ID="4" NEXT_STATE_ID="1">
+        <action ID="9">
+          <!-- AcInitMove -->
+        </action>
+      </transition>
+      <transition NAME="OnRightMouseDown" EVENT_ID="2" NEXT_STATE_ID="2">
+        <action ID="1011">
+          <!-- AcInitZoom -->
+        </action>
+      </transition>
+      <transition NAME="OnShiftLeftMouseDown" EVENT_ID="3" NEXT_STATE_ID="0">
+        <action ID="21">
+          <!-- AcCheckPoint -->
+        </action>
+      </transition>
+    </state>
+    <state NAME="Moving" ID="1">
+      <transition NAME="OnMouseMove" EVENT_ID="533" NEXT_STATE_ID="1">
+        <action ID="92">
+          <!-- AcMove -->
+        </action>
+      </transition>
+      <transition NAME="OnMiddleMouseUp" EVENT_ID="506" NEXT_STATE_ID="0" />
+    </state>
+    <state NAME="Zooming" ID="2">
+      <transition NAME="OnMouseMove" EVENT_ID="531" NEXT_STATE_ID="2">
+        <action ID="1012">
+          <!-- AcZoom -->
+        </action>
+      </transition>
+      <transition NAME="OnRightMouseUp" EVENT_ID="507" NEXT_STATE_ID="0" />
+    </state>
+    <state NAME="Descision: what to drag?" ID="3">
+      <transition NAME="OnTip" EVENT_ID="1050" NEXT_STATE_ID="4" />
+      <transition NAME="OnHead" EVENT_ID="1051" NEXT_STATE_ID="5" />
+      <transition NAME="OnBody" EVENT_ID="1052" NEXT_STATE_ID="6" />
+      <transition NAME="OnNothing" EVENT_ID="1003" NEXT_STATE_ID="0" />
+    </state>
+    <state NAME="Tip dragging" ID="4">
+      <transition NAME="OnMouseMove" EVENT_ID="530" NEXT_STATE_ID="4">
+        <action ID="49002">
+          <!-- AcRotateAroundHead (Point1)-->
+        </action>
+      </transition>
+      <transition NAME="OnLeftMouseUp" EVENT_ID="505" NEXT_STATE_ID="0" />
+    </state>
+    <state NAME="Head dragging" ID="5">
+      <transition NAME="OnMouseMove" EVENT_ID="530" NEXT_STATE_ID="5">
+        <action ID="49003">
+          <!-- AcRotateAroundTip (Point2)-->
+        </action>
+      </transition>
+      <transition NAME="OnLeftMouseUp" EVENT_ID="505" NEXT_STATE_ID="0" />
+    </state>
+    <state NAME="Body dragging" ID="6">
+      <transition NAME="OnMouseMove" EVENT_ID="530" NEXT_STATE_ID="6">
+        <action ID="1001">
+          <!-- AcTranslate -->
+        </action>
+      </transition>
+      <transition NAME="OnLeftMouseUp" EVENT_ID="505" NEXT_STATE_ID="0" />
+    </state>
+    <state NAME="Needle choosing" ID="7">
+      <transition NAME="OnKeyEsc" EVENT_ID="14" NEXT_STATE_ID="7">
+        <action ID="49010">
+          <!-- AcCycle -->
+        </action>
+      </transition>
+      <transition NAME="OnKeyReturn" EVENT_ID="23" NEXT_STATE_ID="0">
+        <action ID="49011">
+          <!-- AcAccept -->
+        </action>
+      </transition>
+      <transition NAME="OnKeyReturn" EVENT_ID="24" NEXT_STATE_ID="0">
+        <action ID="49011">
+          <!-- AcAccept -->
+        </action>
+      </transition>
+      <transition NAME="OnKeySpace" EVENT_ID="25" NEXT_STATE_ID="0">
+        <action ID="49011">
+          <!-- AcAccept -->
+        </action>
+      </transition>
+    </state>
+  </stateMachine>
+  <stateMachine NAME="segmentation-interactor-tool:bubble">
+    <state NAME="Ready to start" ID="0" START_STATE="TRUE">
       <!-- initial state: outside anything and checking for collisions -->
-      <transition NAME="OnMouseMove" EVENT_ID="520" NEXT_STATE_ID="2">
-        <action ID="31">
-          <!-- AcCheckObject -->
-        </action>
-      </transition>
-      <transition NAME="OnRightMouseDown" EVENT_ID="2" NEXT_STATE_ID="5">
-        <!-- nothing to do here -->
-      </transition>
-    </state>
-    <state NAME="Moving around inside object" ID="1" X_POS="421" Y_POS="329" WIDTH="154" HEIGHT="50">
-      <!-- inside an object, checking for non-collision -->
-      <transition NAME="OnMouseMove" EVENT_ID="520" NEXT_STATE_ID="3">
-        <action ID="31">
-          <!-- AcCheckObject -->
+      <transition NAME="OnLeftMouseDown" EVENT_ID="1" NEXT_STATE_ID="1">
+        <action ID="48004">
+          <!-- AcInitLine -->
         </action>
       </transition>
     </state>
-    <state NAME="Checking if still outside" ID="2" X_POS="210" Y_POS="199" WIDTH="125" HEIGHT="50">
-      <!-- "guard state": check for collision and generate new event from descision -->
-      <transition NAME="OnCollision" EVENT_ID="1004" NEXT_STATE_ID="1">
-        <action ID="48000">
-          <!-- AcEnterObject -->
-        </action>
-      </transition>
-      <transition NAME="OnCollision" EVENT_ID="64000" NEXT_STATE_ID="1">
-        <action ID="48000">
-          <!-- AcEnterObject -->
-        </action>
-      </transition>
-      <transition NAME="NoCollision" EVENT_ID="1003" NEXT_STATE_ID="0">
-        <!-- no change in collision status-->
-      </transition>
-    </state>
-    <state NAME="Checking if still inside" ID="3" X_POS="186" Y_POS="354" WIDTH="118" HEIGHT="50">
-      <!-- "guard state": check for collision and generate new event from descision -->
-      <transition NAME="OnCollision" EVENT_ID="1004" NEXT_STATE_ID="1">
-        <!-- no change in collision status-->
-      </transition>
-      <transition NAME="OnCollisionWithOtherObject" EVENT_ID="64000" NEXT_STATE_ID="1">
-        <action ID="48002">
-          <!-- AcSwitchObject -->
-        </action>
-      </transition>
-      <transition NAME="NoCollision" EVENT_ID="1003" NEXT_STATE_ID="0">
-        <action ID="48001">
-          <!-- AcLeaveObject -->
-        </action>
-      </transition>
-    </state>
-    <state NAME="Drawing line" ID="4" X_POS="451" Y_POS="137" WIDTH="100" HEIGHT="50">
+    <state NAME="Drawing line" ID="1">
       <!-- line drawing started, now always update the end point of the line -->
-      <transition NAME="OnMouseMove" EVENT_ID="520" NEXT_STATE_ID="4">
+      <transition NAME="OnEscape" EVENT_ID="14" NEXT_STATE_ID="0">
+        <action ID="48008">
+          <!-- AcCancel -->
+        </action>
+      </transition>
+      <transition NAME="OnMouseMove" EVENT_ID="530" NEXT_STATE_ID="1">
         <action ID="48003">
           <!-- AcUpdateLine -->
         </action>
       </transition>
-      <transition NAME="OnRightMouseUp" EVENT_ID="507" NEXT_STATE_ID="0">
+      <transition NAME="OnLeftMouseUp" EVENT_ID="505" NEXT_STATE_ID="0">
         <action ID="48005">
           <!-- AcTerminateLine -->
         </action>
-        <action ID="48006">
-          <!-- AcCreateBox -->
+        <action ID="48007">
+          <!-- AcCreateObjectFromLine -->
         </action>
-      </transition>
-    </state>
-    <state NAME="Right mouse down - what to do?" ID="5" X_POS="650" Y_POS="85" WIDTH="211" HEIGHT="50">
-      <!-- right mouse button was pressed, now the user could either zoom (hold button) or start drawing a line (release) -->
-      <transition NAME="OnMouseMove(while right button down)" EVENT_ID="531" NEXT_STATE_ID="6">
-        <!-- woah, that one could mean zooming  -->
-      </transition>
-      <transition NAME="OnRightMouseUp" EVENT_ID="507" NEXT_STATE_ID="4">
-        <!-- no zooming but initiate line drawing-->
-        <action ID="48004">
-          <!-- AcInitLine -->
+        <action ID="48008">
+          <!-- AcCancel -->
         </action>
-      </transition>
-    </state>
-    <state NAME="Right mouse down and some movement - what to do?" ID="6" X_POS="542" Y_POS="384" WIDTH="274" HEIGHT="50">
-      <!-- right mouse button was pressed, now the user could either zoom (hold button) or start drawing a line (release) -->
-      <transition NAME="OnMouseMove" EVENT_ID="531" NEXT_STATE_ID="7">
-        <!-- now the user gets her zooming  -->
-      </transition>
-      <transition NAME="OnRightMouseUp" EVENT_ID="507" NEXT_STATE_ID="4">
-        <!-- no zooming but initiate line drawing-->
-        <action ID="48004">
-          <!-- AcInitLine -->
-        </action>
-      </transition>
-    </state>
-    <state NAME="Zooming" ID="7" X_POS="61" Y_POS="438" WIDTH="100" HEIGHT="50">
-      <!-- right mouse button was pressed and two mouse move events occured, now the user zooms -->
-      <transition NAME="OnRightMouseUp" EVENT_ID="531" NEXT_STATE_ID="0">
-        <!-- end of zooming, return to normal operation -->
       </transition>
     </state>
   </stateMachine>

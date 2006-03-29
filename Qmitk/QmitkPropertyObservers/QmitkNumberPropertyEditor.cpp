@@ -261,6 +261,7 @@ void QmitkNumberPropertyEditor::onValueChanged(int value)
         break;
       }
   }
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   
   EndModifyProperty();
 }

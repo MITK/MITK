@@ -66,19 +66,27 @@ public:
   //##   // additionally, for unit spacing in normal direction (former version did not do this):
   //##   thisgeometry->SetExtentInMM(2, 1.0);
   //## \endcode
-  virtual void InitializeStandardPlane(const mitk::Geometry3D* geometry3D, PlaneOrientation planeorientation = Transversal, mitk::ScalarType zPosition = 0, bool frontside=true);
+  virtual void InitializeStandardPlane(const mitk::Geometry3D* geometry3D, PlaneOrientation planeorientation = Transversal, mitk::ScalarType zPosition = 0, bool frontside=true, bool rotated=false);
+
+  //##Documentation
+  //## @brief Initialize a plane with orientation @a planeorientation (default: transversal) with respect to 
+  //## @a geometry3D (default: identity). Spacing also taken from @a geometry3D.
+  //##
+  //## \param top if \a true, create plane at top, otherwise at bottom 
+  //## (for PlaneOrientation Transversal, for other plane locations respectively)
+  virtual void InitializeStandardPlane(const mitk::Geometry3D* geometry3D, bool top, PlaneOrientation planeorientation = Transversal, bool frontside=true, bool rotated=false);
 
   //##Documentation
   //## @brief Initialize a plane with orientation @a planeorientation (default: transversal) with respect to 
   //## @a transform (default: identity) given width and height in units.
   //##
-  virtual void InitializeStandardPlane(mitk::ScalarType width, mitk::ScalarType height, const mitk::AffineTransform3D* transform=NULL, PlaneOrientation planeorientation = Transversal, mitk::ScalarType zPosition = 0, bool frontside=true);
+  virtual void InitializeStandardPlane(mitk::ScalarType width, mitk::ScalarType height, const mitk::AffineTransform3D* transform=NULL, PlaneOrientation planeorientation = Transversal, mitk::ScalarType zPosition = 0, bool frontside=true, bool rotated=false);
 
   //##Documentation
   //## @brief Initialize plane with orientation @a planeorientation (default: transversal) 
   //## given width, height and spacing.
   //##
-  virtual void InitializeStandardPlane(mitk::ScalarType width, mitk::ScalarType height, const Vector3D & spacing, PlaneOrientation planeorientation = Transversal, mitk::ScalarType zPosition = 0, bool frontside=true);
+  virtual void InitializeStandardPlane(mitk::ScalarType width, mitk::ScalarType height, const Vector3D & spacing, PlaneOrientation planeorientation = Transversal, mitk::ScalarType zPosition = 0, bool frontside=true, bool rotated=false);
 
   //##Documentation
   //## @brief Initialize plane by width and height in pixels, right-/down-vector (itk) 

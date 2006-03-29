@@ -97,7 +97,7 @@ void mitk::PlaneGeometry::WorldToIndex(const mitk::Point2D &atPt2d_mm, const mit
   vec_units[1]=vec_mm[1]*(1.0/m_ScaleFactorMMPerUnitY);
 }
 
-void mitk::PlaneGeometry::InitializeStandardPlane(mitk::ScalarType width, mitk::ScalarType height, const Vector3D & spacing, mitk::PlaneGeometry::PlaneOrientation planeorientation, mitk::ScalarType zPosition, bool frontside)
+void mitk::PlaneGeometry::InitializeStandardPlane(mitk::ScalarType width, mitk::ScalarType height, const Vector3D & spacing, mitk::PlaneGeometry::PlaneOrientation planeorientation, mitk::ScalarType zPosition, bool frontside, bool rotated)
 {
   AffineTransform3D::Pointer transform;
 
@@ -111,10 +111,10 @@ void mitk::PlaneGeometry::InitializeStandardPlane(mitk::ScalarType width, mitk::
   transform->SetIdentity();
   transform->SetMatrix(matrix);
   
-  InitializeStandardPlane(width, height, transform.GetPointer(), planeorientation, zPosition, frontside);
+  InitializeStandardPlane(width, height, transform.GetPointer(), planeorientation, zPosition, frontside, rotated);
 }
 
-void mitk::PlaneGeometry::InitializeStandardPlane(mitk::ScalarType width, mitk::ScalarType height, const mitk::AffineTransform3D* transform, mitk::PlaneGeometry::PlaneOrientation planeorientation, mitk::ScalarType zPosition, bool frontside)
+void mitk::PlaneGeometry::InitializeStandardPlane(mitk::ScalarType width, mitk::ScalarType height, const mitk::AffineTransform3D* transform, mitk::PlaneGeometry::PlaneOrientation planeorientation, mitk::ScalarType zPosition, bool frontside, bool rotated)
 {
   Superclass::Initialize();
 
@@ -128,45 +128,99 @@ void mitk::PlaneGeometry::InitializeStandardPlane(mitk::ScalarType width, mitk::
     case Transversal:
       if(frontside)
       {
-        FillVector3D(origin,   0,  0, zPosition);
-        FillVector3D(rightDV,  1,  0, 0        );
-        FillVector3D(bottomDV, 0,  1, 0        );
+        if(rotated==false)
+        {
+          FillVector3D(origin,   0,  0, zPosition);
+          FillVector3D(rightDV,  1,  0,         0);
+          FillVector3D(bottomDV, 0,  1,         0);
+        }
+        else
+        {
+          FillVector3D(origin,   width,  height, zPosition);
+          FillVector3D(rightDV,     -1,       0,         0);
+          FillVector3D(bottomDV,     0,      -1,         0);
+        }
       }
       else
       {
-        FillVector3D(origin,   0,  height, zPosition/*+1*/);
-        FillVector3D(rightDV,  1,  0,      0          );
-        FillVector3D(bottomDV, 0,  -1,     0          );
+        if(rotated==false)
+        {
+          FillVector3D(origin,   width,  0, zPosition);
+          FillVector3D(rightDV,     -1,  0,         0);
+          FillVector3D(bottomDV,     0,  1,         0);
+        }
+        else
+        {
+          FillVector3D(origin,   0,  height, zPosition);
+          FillVector3D(rightDV,  1,       0,         0);
+          FillVector3D(bottomDV, 0,      -1,         0);
+        }
       }
       normalDirection = 2;
       break;
     case Frontal:
       if(frontside)
       {
-        FillVector3D(origin,   0, zPosition, 0);
-        FillVector3D(rightDV,  1, 0,         0);
-        FillVector3D(bottomDV, 0, 0,         1);
+        if(rotated==false)
+        {
+          FillVector3D(origin,   0, zPosition, 0);
+          FillVector3D(rightDV,  1, 0,         0);
+          FillVector3D(bottomDV, 0, 0,         1);
+        }
+        else
+        {
+          FillVector3D(origin,   width, zPosition, height);
+          FillVector3D(rightDV,     -1,         0,      0);
+          FillVector3D(bottomDV,     0,         0,     -1);
+        }
       }
       else
       {
-        FillVector3D(origin,   0, zPosition/*+1*/,  height);
-        FillVector3D(rightDV,  1, 0,            0     );
-        FillVector3D(bottomDV, 0, 0,           -1     );
+        if(rotated==false)
+        {
+          FillVector3D(origin,    width, zPosition,  0);
+          FillVector3D(rightDV,      -1,         0,  0);
+          FillVector3D(bottomDV,      0,         0,  1);
+        }
+        else
+        {
+          FillVector3D(origin,   0, zPosition,  height);
+          FillVector3D(rightDV,  1,         0,       0);
+          FillVector3D(bottomDV, 0,         0,      -1);
+        }
       }
       normalDirection = 1;
       break;
     case Sagittal:
       if(frontside)
       {
-        FillVector3D(origin,   zPosition, 0, 0);
-        FillVector3D(rightDV,  0,         1, 0);
-        FillVector3D(bottomDV, 0,         0, 1);
+        if(rotated==false)
+        {
+          FillVector3D(origin,   zPosition, 0, 0);
+          FillVector3D(rightDV,  0,         1, 0);
+          FillVector3D(bottomDV, 0,         0, 1);
+        }
+        else
+        {
+          FillVector3D(origin,   zPosition, width, height);
+          FillVector3D(rightDV,          0,    -1,      0);
+          FillVector3D(bottomDV,         0,     0,     -1);
+        }
       }
       else
       {
-        FillVector3D(origin,   zPosition/*+1*/,  0,  height);
-        FillVector3D(rightDV,  0,        1,  0         );
-        FillVector3D(bottomDV, 0,        0, -1         );
+        if(rotated==false)
+        {
+          FillVector3D(origin,   zPosition,  width, 0);
+          FillVector3D(rightDV,          0,     -1, 0);
+          FillVector3D(bottomDV,         0,      0, 1);
+        }
+        else
+        {
+          FillVector3D(origin,   zPosition,  0, height);
+          FillVector3D(rightDV,          0,  1,      0);
+          FillVector3D(bottomDV,         0,  0,     -1);
+        }
       }
       normalDirection = 0;
       break;
@@ -191,7 +245,7 @@ void mitk::PlaneGeometry::InitializeStandardPlane(mitk::ScalarType width, mitk::
   SetOrigin(origin);
 }
 
-void mitk::PlaneGeometry::InitializeStandardPlane(const mitk::Geometry3D* geometry3D, PlaneOrientation planeorientation, mitk::ScalarType zPosition, bool frontside)
+void mitk::PlaneGeometry::InitializeStandardPlane(const mitk::Geometry3D* geometry3D, PlaneOrientation planeorientation, mitk::ScalarType zPosition, bool frontside, bool rotated)
 {
   mitk::ScalarType width, height;
 
@@ -220,7 +274,7 @@ void mitk::PlaneGeometry::InitializeStandardPlane(const mitk::Geometry3D* geomet
       itkExceptionMacro("unknown PlaneOrientation");
   }
 
-  InitializeStandardPlane(width, height, geometry3D->GetIndexToWorldTransform(), planeorientation, zPosition, frontside);
+  InitializeStandardPlane(width, height, geometry3D->GetIndexToWorldTransform(), planeorientation, zPosition, frontside, rotated);
 
   ScalarType bounds[6]={0, width, 0, height, 0, 1};
   SetBounds(bounds);
@@ -229,6 +283,28 @@ void mitk::PlaneGeometry::InitializeStandardPlane(const mitk::Geometry3D* geomet
   originVector = geometry3D->GetIndexToWorldTransform()->TransformVector(originVector);
   origin = GetOrigin()+originVector;
   SetOrigin(origin);
+}
+
+void mitk::PlaneGeometry::InitializeStandardPlane(const mitk::Geometry3D* geometry3D, bool top, PlaneOrientation planeorientation, bool frontside, bool rotated)
+{
+  mitk::ScalarType zPosition;
+
+  switch(planeorientation)
+  {
+    case Transversal:
+      zPosition = (top ? 0 : geometry3D->GetExtent(2)-1+0.5);
+      break;
+    case Frontal:
+      zPosition = (top ? 0 : geometry3D->GetExtent(1)-1+0.5);
+      break;
+    case Sagittal:
+      zPosition = (top ? 0 : geometry3D->GetExtent(0)-1+0.5);
+      break;
+    default:
+      itkExceptionMacro("unknown PlaneOrientation");
+  }
+
+  InitializeStandardPlane(geometry3D, planeorientation, zPosition, frontside, rotated);
 }
 
 void mitk::PlaneGeometry::InitializeStandardPlane(const Vector3D& rightVector, const Vector3D& downVector, const Vector3D * spacing)

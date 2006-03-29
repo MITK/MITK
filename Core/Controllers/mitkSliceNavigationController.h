@@ -45,7 +45,6 @@ namespace mitk {
      void operator=(const Self&); \
  }
 
-//##ModelId=3DD523E00048
 //##Documentation
 //## @brief controls the selection of the slice the associated BaseRenderer
 //## will display
@@ -91,22 +90,61 @@ public:
   //itkNewMacro(Self);
   SliceNavigationController(const char * type = NULL);
 
+  //##Documentation
+  //## @brief Possible view directions, \a Original will uses 
+  //## the Geometry2D instances in a SlicedGeometry3D provided
+  //## as input world geometry (by SetInputWorldGeometry).
   enum ViewDirection{Transversal, Sagittal, Frontal, Original};
 
+  //##Documentation
+  //## @brief Set the input world geometry out of which the
+  //## geometries for slicing will be created.
   void SetInputWorldGeometry(const mitk::Geometry3D* geometry);
   itkGetConstObjectMacro(InputWorldGeometry, mitk::Geometry3D);
 
+  //##Documentation
+  //## @brief Access the created geometry
   itkGetConstObjectMacro(CreatedWorldGeometry, mitk::Geometry3D);
 
+  //##Documentation
+  //## @brief Set the desired view directions
+  //##
+  //## \sa ViewDirection
+  //## \sa Update(ViewDirection viewDirection, bool top = true, bool frontside = true, bool rotated = false)
   itkSetMacro(ViewDirection, ViewDirection);
   itkGetMacro(ViewDirection, ViewDirection);
 
+  //##Documentation
+  //## @brief Do the actual creation and send it to the connected 
+  //## observers (renderers)
+  //##
   virtual void Update();
 
+  //##Documentation
+  //## @brief Extended version of Update, additionally allowing to
+  //## specify the direction/orientation of the created geometry.
+  //##
+  virtual void Update(ViewDirection viewDirection, bool top = true, bool frontside = true, bool rotated = false);
+
+  //##Documentation
+  //## @brief Send the created geometry to the connected
+  //## observers (renderers)
+  //##
+  //## Called by Update().
   virtual void SendCreatedWorldGeometry();
 
+  //##Documentation
+  //## @brief Send the currently selected slice to the connected
+  //## observers (renderers)
+  //##
+  //## Called by Update().
   virtual void SendSlice();
 
+  //##Documentation
+  //## @brief Send the currently selected time to the connected
+  //## observers (renderers)
+  //##
+  //## Called by Update().
   virtual void SendTime();
 
   itkEventMacro( UpdateEvent      , itk::AnyEvent );
@@ -170,10 +208,23 @@ public:
     ConnectGeometryTimeEvent(receiver);
   }
 
+  //##Documentation
+  //## @brief To connect multiple SliceNavigationController, we can 
+  //## act as an observer ourselves: implemented interface
+  //##
+  //## \warning not implemented
   virtual void SetGeometry(const itk::EventObject & geometrySliceEvent);
 
+  //##Documentation
+  //## @brief To connect multiple SliceNavigationController, we can 
+  //## act as an observer ourselves: implemented interface
+  //##
   virtual void SetGeometrySlice(const itk::EventObject & geometrySliceEvent);
 
+  //##Documentation
+  //## @brief To connect multiple SliceNavigationController, we can 
+  //## act as an observer ourselves: implemented interface
+  //##
   virtual void SetGeometryTime(const itk::EventObject & geometryTimeEvent);
 
 protected:
@@ -189,6 +240,22 @@ protected:
   mitk::TimeSlicedGeometry::Pointer m_CreatedWorldGeometry;
 
   ViewDirection m_ViewDirection;
+
+  itkSetMacro(Top, bool);
+  itkGetMacro(Top, bool);
+  itkBooleanMacro(Top);
+
+  itkSetMacro(FrontSide, bool);
+  itkGetMacro(FrontSide, bool);
+  itkBooleanMacro(FrontSide);
+
+  itkSetMacro(Rotated, bool);
+  itkGetMacro(Rotated, bool);
+  itkBooleanMacro(Rotated);
+
+  bool m_Top;
+  bool m_FrontSide;
+  bool m_Rotated;
 
   bool m_BlockUpdate;
 };

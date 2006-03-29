@@ -73,17 +73,39 @@ void mitk::SliceNavigationController::SetInputWorldGeometry(const mitk::Geometry
   }
 }
 
+
 void mitk::SliceNavigationController::Update()
+{
+  if(m_BlockUpdate)
+    return;
+
+  if(m_ViewDirection == Transversal)
+  {
+    Update(Transversal, false, false, true);
+  }
+  else
+  {
+    Update(m_ViewDirection);
+  }
+}
+
+void mitk::SliceNavigationController::Update(mitk::SliceNavigationController::ViewDirection viewDirection, bool top, bool frontside, bool rotated)
 {
   if(m_InputWorldGeometry.IsNull())
     return;
   if(m_BlockUpdate)
     return;
   m_BlockUpdate = true;
+
   if(m_LastUpdateTime < m_InputWorldGeometry->GetMTime())
   {
     Modified();
   }
+  SetViewDirection(viewDirection);
+  SetTop(top);
+  SetFrontSide(frontside);
+  SetRotated(rotated);
+
   if(m_LastUpdateTime < GetMTime())
   {
     m_LastUpdateTime = GetMTime();
@@ -96,7 +118,7 @@ void mitk::SliceNavigationController::Update()
     mitk::SlicedGeometry3D::Pointer slicedWorldGeometry = NULL;
     m_CreatedWorldGeometry = NULL;
     const TimeSlicedGeometry* worldTimeSlicedGeometry = dynamic_cast<const TimeSlicedGeometry*>(m_InputWorldGeometry.GetPointer());
-    switch(m_ViewDirection)
+    switch(viewDirection)
     {
     case Original:
       if(worldTimeSlicedGeometry != NULL)
@@ -121,26 +143,16 @@ void mitk::SliceNavigationController::Update()
       }
       //else: use Transversal: no "break" here!!
     case Transversal:
-      planegeometry->InitializeStandardPlane(            
-        m_InputWorldGeometry,
-        PlaneGeometry::Transversal, 
-        m_InputWorldGeometry->GetExtent(2)-1+0.5, false);
-      m_Slice->SetSteps((int)m_InputWorldGeometry->GetExtent(2));
-      viewSpacing=m_InputWorldGeometry->GetExtentInMM(2)/m_InputWorldGeometry->GetExtent(2);
+      slicedWorldGeometry=mitk::SlicedGeometry3D::New();
+      slicedWorldGeometry->InitializePlanes(m_InputWorldGeometry, mitk::PlaneGeometry::Transversal, top, frontside, rotated);
       break;
     case Frontal:
-      planegeometry->InitializeStandardPlane(
-        m_InputWorldGeometry,
-        PlaneGeometry::Frontal, +0.5);
-      m_Slice->SetSteps((int)(m_InputWorldGeometry->GetExtent(1)));
-      viewSpacing=m_InputWorldGeometry->GetExtentInMM(1)/m_InputWorldGeometry->GetExtent(1);
+      slicedWorldGeometry=mitk::SlicedGeometry3D::New();
+      slicedWorldGeometry->InitializePlanes(m_InputWorldGeometry, mitk::PlaneGeometry::Frontal, top, frontside, rotated);
       break;
     case Sagittal:
-      planegeometry->InitializeStandardPlane(
-        m_InputWorldGeometry,
-        PlaneGeometry::Sagittal, +0.5);
-      m_Slice->SetSteps((int)(m_InputWorldGeometry->GetExtent(0)));
-      viewSpacing=m_InputWorldGeometry->GetExtentInMM(0)/m_InputWorldGeometry->GetExtent(0);
+      slicedWorldGeometry=mitk::SlicedGeometry3D::New();
+      slicedWorldGeometry->InitializePlanes(m_InputWorldGeometry, mitk::PlaneGeometry::Sagittal, top, frontside, rotated);
       break;
     default:
       itkExceptionMacro("unknown ViewDirection");
@@ -148,15 +160,7 @@ void mitk::SliceNavigationController::Update()
 
     m_Slice->SetPos(0);
 
-    if(slicedWorldGeometry.IsNull())
-    {
-      slicedWorldGeometry=mitk::SlicedGeometry3D::New();
-      slicedWorldGeometry->InitializeEvenlySpaced(planegeometry, viewSpacing, m_Slice->GetSteps(), (m_ViewDirection==Frontal?true:false));
-    }
-    else
-    {
-      m_Slice->SetSteps((int)slicedWorldGeometry->GetSlices());
-    }
+    m_Slice->SetSteps((int)slicedWorldGeometry->GetSlices());
 
     if(m_CreatedWorldGeometry.IsNull())
     {

@@ -21,7 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITKSLICEDGEOMETRY3D_H_HEADER_INCLUDED_C1EBD0AD
 
 #include "mitkGeometry3D.h"
-#include "mitkGeometry2D.h"
+#include "mitkPlaneGeometry.h"
 
 namespace mitk {
 
@@ -171,6 +171,21 @@ public:
   //## Initializes the bounding box according to the width/height of the Geometry2D and @a slices.
   //## The x-/y-spacing is calculated from the Geometry2D.
   virtual void InitializeEvenlySpaced(mitk::Geometry2D* geometry2D, mitk::ScalarType zSpacing, unsigned int slices, bool flipped=false);
+
+  //##Documentation
+  //## @brief Completely initialize this instance as evenly-spaced plane slices 
+  //## parallel to a side of the provided Geometry3D and using its spacing information.
+  //##
+  //## Initializes the bounding box according to the width/height of the Geometry3D and the
+  //## number of slices according to Geometry3D::GetExtent(2).
+  //## \param planeorientation side parallel to which the slices will be oriented
+  //## \param top if \a true, create plane at top, otherwise at bottom 
+  //## (for PlaneOrientation Transversal, for other plane locations respectively)
+  //## \param frontside defines the side of the plane (the definition of front/back is
+  //## somewhat arbitrary)
+  //## \param rotate rotates the plane by 180 degree around its normal (the definition 
+  //## of rotated vs not rotated is somewhat arbitrary)
+  virtual void InitializePlanes(const mitk::Geometry3D* geometry3D, mitk::PlaneGeometry::PlaneOrientation planeorientation, bool top=true, bool frontside=true, bool rotated=false);
 
   virtual void SetImageGeometry(const bool isAnImageGeometry);
 protected:

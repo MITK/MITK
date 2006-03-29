@@ -173,6 +173,40 @@ void mitk::SlicedGeometry3D::InitializeEvenlySpaced(mitk::Geometry2D* geometry2D
   geometry2D->UnRegister();
 }
 
+void mitk::SlicedGeometry3D::InitializePlanes(const mitk::Geometry3D* geometry3D, mitk::PlaneGeometry::PlaneOrientation planeorientation, bool top, bool frontside, bool rotated)
+{
+  PlaneGeometry::Pointer planegeometry = mitk::PlaneGeometry::New();
+  planegeometry->InitializeStandardPlane(geometry3D, top, planeorientation, frontside, rotated);
+
+  ScalarType viewSpacing = 1;
+  unsigned int slices = 1;
+
+  switch(planeorientation)
+  {
+    case PlaneGeometry::Transversal:
+      viewSpacing = geometry3D->GetSpacing()[2];
+      slices = geometry3D->GetExtent(2);
+      break;
+    case PlaneGeometry::Frontal:
+      viewSpacing = geometry3D->GetSpacing()[1];
+      slices = geometry3D->GetExtent(1);
+      break;
+    case PlaneGeometry::Sagittal:
+      viewSpacing = geometry3D->GetSpacing()[0];
+      slices = geometry3D->GetExtent(0);
+      break;
+    default:
+      itkExceptionMacro("unknown PlaneOrientation");
+  }
+
+  bool flipped = (top == false);
+  if(frontside == false)
+    flipped = !flipped;
+  if(planeorientation == PlaneGeometry::Frontal)
+    flipped = !flipped;
+  InitializeEvenlySpaced(planegeometry, viewSpacing, slices, flipped);
+}
+
 void mitk::SlicedGeometry3D::SetImageGeometry(const bool isAnImageGeometry)
 {
   Superclass::SetImageGeometry(isAnImageGeometry);

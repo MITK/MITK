@@ -1,19 +1,4 @@
 /**
-  \defgroup DataManagement Data Management Classes
-
-  \brief This category includes the data classes themselves as well as management classes to organize the
-  data during run-time in a tree structure (data tree, mitk::DataTree).
-*/
-
-/**
-  \defgroup DataTree Data Tree Classes
-  \ingroup DataManagement
-
-  \brief This subcategory includes the data tree classes, which organizes the
-  data during run-time in a tree structure.
-*/
-
-/**
   \defgroup Data Data Classes
   \ingroup DataManagement
 

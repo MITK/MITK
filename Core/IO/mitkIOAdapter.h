@@ -39,8 +39,7 @@ public:
   typedef itk::SmartPointer<Self>Pointer;
   typedef itk::SmartPointer<const Self>ConstPointer;
   
-  /** Create an object and return a pointer to it as an
-   * itk::LightObject. */
+  /// Create an object and return a pointer to it as a mitk::BaseProcess.
   virtual itk::SmartPointer<BaseProcess> CreateIOProcessObject(const char* filename) = 0;
   virtual bool CanReadFile(const char* filename) = 0;
 
@@ -66,9 +65,8 @@ public:
   typedef IOAdapter Self;
   typedef itk::SmartPointer<Self> Pointer;
     
-  /** Methods from itk:LightObject. */
+  /** Methods from mitk::BaseProcess. */
   itkFactorylessNewMacro(Self);
-
   mitk::BaseProcess::Pointer CreateIOProcessObject(const char* filename)
   { 
     typename T::Pointer ioProcessObject = T::New();
@@ -91,6 +89,6 @@ private:
 };
 
 
-} // end namespace itk
+} // end namespace mitk
 
 #endif

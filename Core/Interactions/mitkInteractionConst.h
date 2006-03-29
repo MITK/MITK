@@ -275,7 +275,10 @@ typedef enum EActions
   AcUPDATEPOINT     = 49006,
   AcDISPLAYOPTIONS  = 49009,
   AcCYCLE           = 49010,
-  AcACCEPT          = 49011
+  AcACCEPT          = 49011,
+  AcINCREASE        = 49012,
+  AcDECREASE        = 49013,
+  AcMODIFY          = 49014
 };
 
 

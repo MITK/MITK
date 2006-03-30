@@ -25,7 +25,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk
 {
-
+//##Documentation
 //## @brief BaseDataIOFactory class creates instances of BaseDataIO objects using an object factory.
 //##
 //## @ingroup IO

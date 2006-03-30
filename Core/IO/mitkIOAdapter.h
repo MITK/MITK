@@ -26,7 +26,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk
 {
-
+//##Documentation
 //## @brief IOAdapterBase class is an abstract adapter class for IO process objects. 
 //##
 //## @ingroup IO
@@ -52,7 +52,7 @@ private:
   void operator=(const Self&); //purposely not implemented  
 };
 
-
+//##Documentation
 //## @brief IOAdapter class is an adapter class for instantiation of IO process objects.
 //## Additional this interface defines the function CanReadFile(). 
 //## This interface allows the target (object) the access to the adaptee (IO process object).

@@ -292,13 +292,13 @@ void mitk::PlaneGeometry::InitializeStandardPlane(const mitk::Geometry3D* geomet
   switch(planeorientation)
   {
     case Transversal:
-      zPosition = (top ? 0 : geometry3D->GetExtent(2)-1+0.5);
+      zPosition = (top ? 0.5 : geometry3D->GetExtent(2)-1+0.5);
       break;
     case Frontal:
-      zPosition = (top ? 0 : geometry3D->GetExtent(1)-1+0.5);
+      zPosition = (top ? 0.5 : geometry3D->GetExtent(1)-1+0.5);
       break;
     case Sagittal:
-      zPosition = (top ? 0 : geometry3D->GetExtent(0)-1+0.5);
+      zPosition = (top ? 0.5 : geometry3D->GetExtent(0)-1+0.5);
       break;
     default:
       itkExceptionMacro("unknown PlaneOrientation");

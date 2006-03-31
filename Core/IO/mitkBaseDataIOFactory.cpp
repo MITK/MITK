@@ -25,6 +25,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkIOAdapter.h"
 
 #include "mitkPicFileReaderIOFactory.h"
+//#include "mitkParFileReaderIOFactory.h"
+#include "mitkSTLFileReaderIOFactory.h"
 
 
 #include "itkMutexLock.h"
@@ -89,8 +91,9 @@ void BaseDataIOFactory::RegisterBuiltInFactories()
     itk::MutexLockHolder<itk::SimpleMutexLock> mutexHolder( mutex );
     if( firstTime )
     {
-      itk::ObjectFactoryBase::RegisterFactory( PicFileReaderIOFactory::New() );
-      //ObjectFactoryBase::RegisterFactory( MetaBaseDataIOFactory::New() );
+//      itk::ObjectFactoryBase::RegisterFactory( PicFileReaderIOFactory::New() );
+//      itk::ObjectFactoryBase::RegisterFactory( ParFileReaderIOFactory::New() );
+      itk::ObjectFactoryBase::RegisterFactory( STLFileReaderIOFactory::New() );
       //ObjectFactoryBase::RegisterFactory( PNGBaseDataIOFactory::New() );
       //ObjectFactoryBase::RegisterFactory( VTKBaseDataIOFactory::New() );
       //ObjectFactoryBase::RegisterFactory( GiplBaseDataIOFactory::New() );

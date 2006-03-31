@@ -44,6 +44,8 @@ public:
   
   itkSetStringMacro(FilePattern);
   itkGetStringMacro(FilePattern);
+
+  static bool CanReadFile(const char* file);
   
 protected:
   virtual void GenerateData();

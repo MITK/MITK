@@ -234,6 +234,33 @@ void mitk::ParRecFileReader::GenerateData()
   }
 }
 
+bool mitk::ParRecFileReader::CanReadFile(const char* file) 
+{
+  // First check the extension
+  std::string filename = file;
+  if(  filename == "" )
+    {
+      //std::cout<<"No filename specified."<<std::endl;
+    return false;
+    }
+
+  bool extensionFound = false;
+  std::string::size_type PARPos = filename.rfind(".par");
+  if ((PARPos != std::string::npos)
+      && (PARPos == filename.length() - 4))
+    {
+    extensionFound = true;
+    }
+
+  if( !extensionFound )
+    {
+      //std::cout<<"The filename extension is not recognized."<<std::endl;
+    return false;
+    }
+
+  return true;
+}
+
 mitk::ParRecFileReader::ParRecFileReader()
 : m_FileName(""), m_FilePrefix(""), m_FilePattern("")
 {

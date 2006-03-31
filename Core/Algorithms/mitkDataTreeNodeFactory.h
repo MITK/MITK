@@ -94,6 +94,11 @@ public:
    */
   static void SetDefaultSurfaceProperties(DataTreeNode::Pointer &node);
   
+  /**
+   * Sets default common properites
+   */
+  void SetDefaultCommonProperties(DataTreeNode::Pointer &node);
+  
 protected:
 
   /**

@@ -18,6 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkConfig.h"
 #include "mitkDataTreeNodeFactory.h"
+#include "mitkBaseDataIOFactory.h"
 
 // these files have to be included at this location, 
 // otherwise visual c++ will produce an internal 
@@ -84,6 +85,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkLookupTable.h"
 #include "mitkImageChannelSelector.h"
 #include "mitkImageSliceSelector.h"
+#include "mitkSTLFileReader.h"
 #ifdef MBI_INTERNAL
  #ifdef HAVE_IPDICOM
   #include "mitkDICOMFileReader.h"
@@ -113,140 +115,162 @@ mitk::DataTreeNodeFactory::~DataTreeNodeFactory()
 
 void mitk::DataTreeNodeFactory::GenerateData()
 {
-  if ( m_FileName != "" )
-  {
-    if ( this->FileNameEndsWith( ".stl" ) )
-    {
-      this->ReadFileTypeSTL();
-    }
-    else if ( this->FileNameEndsWith( ".vtk" ) )
-    {
-      this->ReadFileTypeVTK();
-    }
-    else if ( this->FileNameEndsWith( ".obj" ) )
-    {
-      this->ReadFileTypeOBJ();
-    }
-    else if ( this->FileNameEndsWith( ".pic" ) || this->FileNameEndsWith( ".pic.gz" ) || this->FileNameEndsWith( ".seq" ) )
-    {
-      this->ReadFileTypePIC();
-    }
-    else if ( this->FileNameEndsWith( ".par" ) )
-    {
-      this->ReadFileTypePAR();
-    }
-    else if ( this->FileNameEndsWith( ".pvtk" ) )
-    {
-      this->ReadFileTypePVTK();
-    }
-    else if ( this->FileNameEndsWith( ".gdcm" ) || this->FileNameEndsWith( ".GDCM" ) )
-    {
-      this->ReadFileTypeGDCM();
-    }
-    else if ( this->FileNameEndsWith( ".dcm" ) || this->FileNameEndsWith( ".DCM" ) 
-      || this->FileNameEndsWith( ".ima" ) 
-      || this->FileNameEndsWith( ".IMA" ) 
-      || (itksys::SystemTools::GetFilenameLastExtension(m_FileName) == "" ) )
-    {
-      this->ReadFileSeriesTypeDCM();
-    }
-#if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
-    else if ( this->FileNameEndsWith( ".vti" ) )
-    {
-      this->ReadFileTypeVTI();
-    }
-#endif
-#ifdef MBI_INTERNAL
-#ifdef HAVE_IPDICOM
-    else if ( this->FileNameEndsWith( ".IPDCM" ) || this->FileNameEndsWith( ".ipdcm" ) )
-    {
-      this->ReadFileTypeIPDCM();
-    }
-#endif /* HAVE_IPDICOM */
-    else if ( this->FileNameEndsWith( ".ves" ) )
-    {
-      this->ReadFileTypeVES();
-    }
-    else if ( this->FileNameEndsWith( ".uvg" ) )
-    {
-      this->ReadFileTypeUVG();
-    }
-    else if ( this->FileNameEndsWith( ".dvg" ) )
-    {
-      this->ReadFileTypeDVG();
-    }
-    else if ( this->FileNameEndsWith( "HPSONOS.DB" ) || this->FileNameEndsWith( "hpsonos.db" ) )
-    {
-      std::cout << "jetzt lese ich sono"<<endl;
-      this->ReadFileTypeHPSONOS();
-    }
-    else if (this->FileNameEndsWith(".ssm"))
-    {
-      this->ReadFileTypeSSM();
-    }
-#ifdef USE_TUS_READER
-    else if ( this->FileNameEndsWith( ".TUS" ) || this->FileNameEndsWith( ".tus" ) )
-    {
-      std::cout << "jetzt lese ich tus"<<endl;
-      this->ReadFileTypeTUS();
-    }
-#endif
-#endif /* MBI_INTERNAL */
-    //else if (this->FileNameEndsWith("."))
-    //{
-    //    //put your new filetype in here!
-    //}
-    else
-    {
-      this->ReadFileTypeITKImageIOFactory();
-    }
-  }
-  else if ( m_FilePattern != "" && m_FilePrefix != "" )
-  {
-    if ( this->FilePatternEndsWith( ".pic" ) || this->FilePatternEndsWith( ".pic.gz" ) )
-    {
-      this->ReadFileSeriesTypePIC();
-    }
-    else if ( this->FilePatternEndsWith( ".dcm" ) || this->FilePatternEndsWith( ".DCM" ) 
-      || this->FileNameEndsWith( ".ima" ) 
-      || this->FileNameEndsWith( ".IMA" ) 
-      || (itksys::SystemTools::GetFilenameLastExtension(m_FilePattern) == "" ) )
-    {
-      this->ReadFileSeriesTypeDCM();
-    }
-    else if ( this->FilePatternEndsWith( ".gdcm" ) || this->FilePatternEndsWith( ".GDCM" ) )
-    {
-      this->ReadFileSeriesTypeGDCM();
-    }
-    else if ( this->FilePatternEndsWith( ".stl" ) || this->FilePatternEndsWith( ".STL" ) )
-    {
-      this->ReadFileSeriesTypeSTL();
-    }
-    else if ( this->FilePatternEndsWith( ".vtk" ) || this->FilePatternEndsWith( ".VTK" ) )
-    {
-      this->ReadFileSeriesTypeVTK();
-    }
-    else
-    {
-      this->ReadFileSeriesTypeITKImageSeriesReader();
-    }
-  }
-  unsigned int nOut = this->GetNumberOfOutputs();
-  for ( unsigned int i = 0; i < nOut; ++i )
-  {
-    mitk::DataTreeNode::Pointer node = this->GetOutput(i);
-    // set path without filename as string property
-    mitk::StringProperty::Pointer pathProp = new mitk::StringProperty( itksys::SystemTools::GetFilenamePath( m_FileName ) );
-    node->SetProperty( StringProperty::PATH, pathProp );
-    // set filename without path as string property
-    mitk::StringProperty::Pointer nameProp = dynamic_cast<mitk::StringProperty*>(node->GetProperty("name").GetPointer());
-    if(nameProp.IsNull() || nameProp->GetValue()=="No Name!")
-    {
-      nameProp = new mitk::StringProperty( this->GetBaseFileName() );
-      node->SetProperty( "name", nameProp );
-    }
 
-    node->SetVisibility(true);
+  mitk::BaseData::Pointer baseData = mitk::BaseDataIOFactory::CreateBaseDataIO( m_FileName.c_str(), mitk::BaseDataIOFactory::ReadMode );
+  
+  if( baseData.IsNotNull() )
+  {
+    mitk::DataTreeNode::Pointer node = this->GetOutput();
+    node->SetData(baseData);
+    this->SetDefaultCommonProperties( node );
+
+    //mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
+    //if(image.IsNotNull())
+    //  this->SetDefaultImageProperties(node);
+    
+    mitk::Surface::Pointer surface = dynamic_cast<mitk::Surface*>(node->GetData());
+    if(surface.IsNotNull())
+      this->SetDefaultSurfaceProperties(node);
+
+    node->SetVisibility(true);    
+  }
+  else
+  {  
+    if ( m_FileName != "" )
+    {
+      if ( this->FileNameEndsWith( ".stl" ) )
+      {
+        this->ReadFileTypeSTL();
+      }
+      else if ( this->FileNameEndsWith( ".vtk" ) )
+      {
+        this->ReadFileTypeVTK();
+      }
+      else if ( this->FileNameEndsWith( ".obj" ) )
+      {
+        this->ReadFileTypeOBJ();
+      }
+      else if ( this->FileNameEndsWith( ".pic" ) || this->FileNameEndsWith( ".pic.gz" ) || this->FileNameEndsWith( ".seq" ) )
+      {
+        this->ReadFileTypePIC();
+      }
+      else if ( this->FileNameEndsWith( ".par" ) )
+      {
+        this->ReadFileTypePAR();
+      }
+      else if ( this->FileNameEndsWith( ".pvtk" ) )
+      {
+        this->ReadFileTypePVTK();
+      }
+      else if ( this->FileNameEndsWith( ".gdcm" ) || this->FileNameEndsWith( ".GDCM" ) )
+      {
+        this->ReadFileTypeGDCM();
+      }
+      else if ( this->FileNameEndsWith( ".dcm" ) || this->FileNameEndsWith( ".DCM" ) 
+        || this->FileNameEndsWith( ".ima" ) 
+        || this->FileNameEndsWith( ".IMA" ) 
+        || (itksys::SystemTools::GetFilenameLastExtension(m_FileName) == "" ) )
+      {
+        this->ReadFileSeriesTypeDCM();
+      }
+  #if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
+      else if ( this->FileNameEndsWith( ".vti" ) )
+      {
+        this->ReadFileTypeVTI();
+      }
+  #endif
+  #ifdef MBI_INTERNAL
+  #ifdef HAVE_IPDICOM
+      else if ( this->FileNameEndsWith( ".IPDCM" ) || this->FileNameEndsWith( ".ipdcm" ) )
+      {
+        this->ReadFileTypeIPDCM();
+      }
+  #endif /* HAVE_IPDICOM */
+      else if ( this->FileNameEndsWith( ".ves" ) )
+      {
+        this->ReadFileTypeVES();
+      }
+      else if ( this->FileNameEndsWith( ".uvg" ) )
+      {
+        this->ReadFileTypeUVG();
+      }
+      else if ( this->FileNameEndsWith( ".dvg" ) )
+      {
+        this->ReadFileTypeDVG();
+      }
+      else if ( this->FileNameEndsWith( "HPSONOS.DB" ) || this->FileNameEndsWith( "hpsonos.db" ) )
+      {
+        std::cout << "jetzt lese ich sono"<<endl;
+        this->ReadFileTypeHPSONOS();
+      }
+      else if (this->FileNameEndsWith(".ssm"))
+      {
+        this->ReadFileTypeSSM();
+      }
+  #ifdef USE_TUS_READER
+      else if ( this->FileNameEndsWith( ".TUS" ) || this->FileNameEndsWith( ".tus" ) )
+      {
+        std::cout << "jetzt lese ich tus"<<endl;
+        this->ReadFileTypeTUS();
+      }
+  #endif
+  #endif /* MBI_INTERNAL */
+      //else if (this->FileNameEndsWith("."))
+      //{
+      //    //put your new filetype in here!
+      //}
+      else
+      {
+        this->ReadFileTypeITKImageIOFactory();
+      }
+    }
+    else if ( m_FilePattern != "" && m_FilePrefix != "" )
+    {
+      if ( this->FilePatternEndsWith( ".pic" ) || this->FilePatternEndsWith( ".pic.gz" ) )
+      {
+        this->ReadFileSeriesTypePIC();
+      }
+      else if ( this->FilePatternEndsWith( ".dcm" ) || this->FilePatternEndsWith( ".DCM" ) 
+        || this->FileNameEndsWith( ".ima" ) 
+        || this->FileNameEndsWith( ".IMA" ) 
+        || (itksys::SystemTools::GetFilenameLastExtension(m_FilePattern) == "" ) )
+      {
+        this->ReadFileSeriesTypeDCM();
+      }
+      else if ( this->FilePatternEndsWith( ".gdcm" ) || this->FilePatternEndsWith( ".GDCM" ) )
+      {
+        this->ReadFileSeriesTypeGDCM();
+      }
+      else if ( this->FilePatternEndsWith( ".stl" ) || this->FilePatternEndsWith( ".STL" ) )
+      {
+        this->ReadFileSeriesTypeSTL();
+      }
+      else if ( this->FilePatternEndsWith( ".vtk" ) || this->FilePatternEndsWith( ".VTK" ) )
+      {
+        this->ReadFileSeriesTypeVTK();
+      }
+      else
+      {
+        this->ReadFileSeriesTypeITKImageSeriesReader();
+      }
+    }
+    unsigned int nOut = this->GetNumberOfOutputs();
+    for ( unsigned int i = 0; i < nOut; ++i )
+    {
+      mitk::DataTreeNode::Pointer node = this->GetOutput(i);
+      //// set path without filename as string property
+      //mitk::StringProperty::Pointer pathProp = new mitk::StringProperty( itksys::SystemTools::GetFilenamePath( m_FileName ) );
+      //node->SetProperty( StringProperty::PATH, pathProp );
+      //// set filename without path as string property
+      //mitk::StringProperty::Pointer nameProp = dynamic_cast<mitk::StringProperty*>(node->GetProperty("name").GetPointer());
+      //if(nameProp.IsNull() || nameProp->GetValue()=="No Name!")
+      //{
+      //  nameProp = new mitk::StringProperty( this->GetBaseFileName() );
+      //  node->SetProperty( "name", nameProp );
+      //}
+      this->SetDefaultCommonProperties( node );
+      node->SetVisibility(true);
+    }
   }
 }
 
@@ -303,35 +327,41 @@ std::string mitk::DataTreeNodeFactory::GetDirectory()
 
 void mitk::DataTreeNodeFactory::ReadFileTypeSTL()
 {
-  std::cout << "Loading " << m_FileName << " as stl..." << std::endl;
+  //std::cout << "Loading " << m_FileName << " as stl..." << std::endl;
 
-  vtkSTLReader* stlReader = vtkSTLReader::New();
-  stlReader->SetFileName( m_FileName.c_str() );
+  //vtkSTLReader* stlReader = vtkSTLReader::New();
+  //stlReader->SetFileName( m_FileName.c_str() );
 
-  vtkPolyDataNormals* normalsGenerator = vtkPolyDataNormals::New();
-  normalsGenerator->SetInput( stlReader->GetOutput() );
-  
-  normalsGenerator->Update();
-  if ( ( stlReader->GetOutput() != NULL ) && ( normalsGenerator->GetOutput() != NULL ) )
-  {
-    mitk::Surface::Pointer surface = mitk::Surface::New();
-    //
-    // @todo: Disconnect the result from the vtk pipeline.
-    vtkPolyData* surfaceWithNormals = normalsGenerator->GetOutput();
-    //vtkSource* source = surfaceWithNormals->GetSource();
-    //surfaceWithNormals->SetSource(NULL);
-    //source->Delete();
-    
-    surface->SetVtkPolyData( surfaceWithNormals );
-    mitk::DataTreeNode::Pointer node = this->GetOutput();
-    node->SetData( surface );
-    SetDefaultSurfaceProperties( node );
-  }
+  //vtkPolyDataNormals* normalsGenerator = vtkPolyDataNormals::New();
+  //normalsGenerator->SetInput( stlReader->GetOutput() );
+  //
+  //normalsGenerator->Update();
+  //if ( ( stlReader->GetOutput() != NULL ) && ( normalsGenerator->GetOutput() != NULL ) )
+  //{
+  //  mitk::Surface::Pointer surface = mitk::Surface::New();
+  //  //
+  //  // @todo: Disconnect the result from the vtk pipeline.
+  //  vtkPolyData* surfaceWithNormals = normalsGenerator->GetOutput();
+  //  //vtkSource* source = surfaceWithNormals->GetSource();
+  //  //surfaceWithNormals->SetSource(NULL);
+  //  //source->Delete();
+  //  surface->SetVtkPolyData( surfaceWithNormals );
+  //  mitk::DataTreeNode::Pointer node = this->GetOutput();
+  //  node->SetData( surface );
+  //  SetDefaultSurfaceProperties( node );
+  //}
 
-  normalsGenerator->Delete();
-  stlReader->Delete();
+  //normalsGenerator->Delete();
+  //stlReader->Delete();
 
-  std::cout << "...finished!" << std::endl;
+  //std::cout << "...finished!" << std::endl;
+  mitk::DataTreeNode::Pointer node = this->GetOutput();
+  //mitk::Surface::Pointer surface = mitk::Surface::New();
+  mitk::STLFileReader::Pointer STLFileReader = mitk::STLFileReader::New();
+  STLFileReader->SetFileName(m_FileName.c_str());
+  STLFileReader->Update();
+  node->SetData(STLFileReader->GetOutput());
+  SetDefaultSurfaceProperties( node );
 }
 
 
@@ -393,11 +423,11 @@ void mitk::DataTreeNodeFactory::ReadFileTypeVTK()
       this->SetDefaultImageProperties( node );
 
       // add level-window property
-      mitk::LevelWindowProperty::Pointer levWinProp = new mitk::LevelWindowProperty();
-      mitk::LevelWindow levelwindow;
-      levelwindow.SetAuto( image );
-      levWinProp->SetLevelWindow( levelwindow );
-      node->GetPropertyList()->SetProperty( "levelwindow", levWinProp );
+      //mitk::LevelWindowProperty::Pointer levWinProp = new mitk::LevelWindowProperty();
+      //mitk::LevelWindow levelwindow;
+      //levelwindow.SetAuto( image );
+      //levWinProp->SetLevelWindow( levelwindow );
+      //node->GetPropertyList()->SetProperty( "levelwindow", levWinProp );
     }
     reader->Delete();
   }
@@ -455,13 +485,13 @@ void mitk::DataTreeNodeFactory::ReadFileTypePIC()
       SetDefaultImageProperties(node);
 
       // add level-window property
-      mitk::LevelWindowProperty::Pointer levWinProp = new mitk::LevelWindowProperty();
-      mitk::LevelWindow levelwindow;
+      //mitk::LevelWindowProperty::Pointer levWinProp = new mitk::LevelWindowProperty();
+      //mitk::LevelWindow levelwindow;
 
-      levelwindow.SetAuto( reader->GetOutput() );
-      levWinProp->SetLevelWindow( levelwindow );
+      //levelwindow.SetAuto( reader->GetOutput() );
+      //levWinProp->SetLevelWindow( levelwindow );
 
-      node->GetPropertyList()->SetProperty( "levelwindow", levWinProp );
+      //node->GetPropertyList()->SetProperty( "levelwindow", levWinProp );
     }
 #ifdef MBI_INTERNAL
     else
@@ -481,12 +511,12 @@ void mitk::DataTreeNodeFactory::ReadFileTypePIC()
       mitk::StringProperty::Pointer nameProp = new mitk::StringProperty( this->GetBaseFileName()+" (morphology)" );
       node->SetProperty( "name", nameProp );
 
-      node->SetProperty( "layer", new mitk::IntProperty( -11 ) );
+      //node->SetProperty( "layer", new mitk::IntProperty( -11 ) );
       mitk::LevelWindow levelwindow;
       levelwindow.SetAuto( morphologyChannelSelector->GetOutput() );
-      node->SetLevelWindow( levelwindow, NULL );
+      //node->SetLevelWindow( levelwindow, NULL );
       node->SetVisibility( false, NULL );
-      node->SetColor( 1.0, 1.0, 1.0, NULL );
+      //node->SetColor( 1.0, 1.0, 1.0, NULL );
       node->Update();
 
       SetDefaultImageProperties(node);
@@ -559,11 +589,11 @@ void mitk::DataTreeNodeFactory::ReadFileTypePAR()
   SetDefaultImageProperties(node);
 
   // add level-window property
-  mitk::LevelWindowProperty::Pointer levWinProp = new mitk::LevelWindowProperty();
-  mitk::LevelWindow levelwindow;
-  levelwindow.SetAuto( reader->GetOutput() );
-  levWinProp->SetLevelWindow( levelwindow );
-  node->GetPropertyList()->SetProperty( "levelwindow", levWinProp );
+  //mitk::LevelWindowProperty::Pointer levWinProp = new mitk::LevelWindowProperty();
+  //mitk::LevelWindow levelwindow;
+  //levelwindow.SetAuto( reader->GetOutput() );
+  //levWinProp->SetLevelWindow( levelwindow );
+  //node->GetPropertyList()->SetProperty( "levelwindow", levWinProp );
 
   std::cout << "...finished!" << std::endl;
 }
@@ -598,11 +628,11 @@ void mitk::DataTreeNodeFactory::ReadFileTypeVTI()
     node->SetProperty( "name", nameProp );
 
     // add level-window property
-    mitk::LevelWindowProperty::Pointer levWinProp = new mitk::LevelWindowProperty();
-    mitk::LevelWindow levelwindow;
-    levelwindow.SetAuto( image );
-    levWinProp->SetLevelWindow( levelwindow );
-    node->GetPropertyList()->SetProperty( "levelwindow", levWinProp );
+    //mitk::LevelWindowProperty::Pointer levWinProp = new mitk::LevelWindowProperty();
+    //mitk::LevelWindow levelwindow;
+    //levelwindow.SetAuto( image );
+    //levWinProp->SetLevelWindow( levelwindow );
+    //node->GetPropertyList()->SetProperty( "levelwindow", levWinProp );
   }
   vtkreader->Delete();
 }
@@ -723,12 +753,13 @@ void mitk::DataTreeNodeFactory::ReadFileTypeHPSONOS()
 
   mitk::StringProperty::Pointer nameProp = new mitk::StringProperty( m_dir+"(OBS)" );
   node->SetProperty( "name", nameProp );
-  node->SetProperty( "layer", new mitk::IntProperty( -11 ) );
-  mitk::LevelWindow levelwindow;
-  levelwindow.SetAuto( sliceSelector->GetOutput() );
-  node->SetLevelWindow( levelwindow, NULL );
+
+  //node->SetProperty( "layer", new mitk::IntProperty( -11 ) );
+  //mitk::LevelWindow levelwindow;
+  //levelwindow.SetAuto( sliceSelector->GetOutput() );
+  //node->SetLevelWindow( levelwindow, NULL );
   node->SetVisibility( false, NULL );
-  node->SetColor( 1.0, 1.0, 1.0, NULL );
+  //node->SetColor( 1.0, 1.0, 1.0, NULL );
   node->Update();
 
   SetDefaultImageProperties(node);
@@ -744,10 +775,10 @@ void mitk::DataTreeNodeFactory::ReadFileTypeHPSONOS()
   node->SetProperty( "ultrasound", ultrasoundProp );
   nameProp = new mitk::StringProperty( m_dir+"(TBS)" );
   node->SetProperty( "name", nameProp );
-  node->SetProperty( "layer", new mitk::IntProperty( -10 ) );
+  //node->SetProperty( "layer", new mitk::IntProperty( -10 ) );
 
-  node->SetLevelWindow( levelwindow, NULL );
-  node->SetColor( 1.0, 1.0, 1.0, NULL );
+  //node->SetLevelWindow( levelwindow, NULL );
+  //node->SetColor( 1.0, 1.0, 1.0, NULL );
   node->Update();
 
 
@@ -789,22 +820,21 @@ void mitk::DataTreeNodeFactory::ReadFileTypeHPSONOS()
     node->SetProperty( "ultrasound", ultrasoundProp );
     nameProp = new mitk::StringProperty( m_dir+"(OD)" );
     node->SetProperty( "name", nameProp );
-    node->SetProperty( "layer", new mitk::IntProperty( -6 ) );
+    //node->SetProperty( "layer", new mitk::IntProperty( -6 ) );
 
-    mitk::LevelWindowProperty::Pointer levWinProp = new mitk::LevelWindowProperty();
-    mitk::LevelWindow levelwindow;
-    levelwindow.SetLevelWindow( 128, 255 );
-    levWinProp->SetLevelWindow( levelwindow );
+    //mitk::LevelWindowProperty::Pointer levWinProp = new mitk::LevelWindowProperty();
+    //mitk::LevelWindow levelwindow;
+    //levelwindow.SetLevelWindow( 128, 255 );
+    //levWinProp->SetLevelWindow( levelwindow );
     // set the overwrite LevelWindow
     // if "levelwindow" is used if "levelwindow" is not available
     // else "levelwindow" is used
     // "levelwindow" is not affected by the slider
-    node->GetPropertyList()->SetProperty( "levelWindow", levWinProp );
+    //node->GetPropertyList()->SetProperty( "levelWindow", levWinProp );
 
     node->SetProperty( "LookupTable", LookupTableProp );
     node->SetVisibility( false, NULL );
     node->Update();
-
 
     SetDefaultImageProperties(node);
 
@@ -820,13 +850,13 @@ void mitk::DataTreeNodeFactory::ReadFileTypeHPSONOS()
     node->SetProperty( "ultrasound", ultrasoundProp );
     nameProp = new mitk::StringProperty( m_dir+"(TD)" );
     node->SetProperty( "name", nameProp );
-    node->SetProperty( "layer", new mitk::IntProperty( -5 ) );
+    //node->SetProperty( "layer", new mitk::IntProperty( -5 ) );
 
     // set the overwrite LevelWindow
     // if "levelwindow" is used if "levelwindow" is not available
     // else "levelwindow" is used
     // "levelwindow" is not affected by the slider
-    node->GetPropertyList()->SetProperty( "levelWindow", levWinProp );
+    //node->GetPropertyList()->SetProperty( "levelWindow", levWinProp );
 
     node->SetProperty( "LookupTable", LookupTableProp );
     node->Update();
@@ -929,9 +959,9 @@ void mitk::DataTreeNodeFactory::ReadFileTypeIPDCM()
 
 
   // add Level-Window property
-  mitk::LevelWindow levelwindow;
-  levelwindow.SetAuto( reader->GetOutput() );
-  node->SetLevelWindow( levelwindow, NULL );
+  //mitk::LevelWindow levelwindow;
+  //levelwindow.SetAuto( reader->GetOutput() );
+  //node->SetLevelWindow( levelwindow, NULL );
 
 
   std::cout << "...finished!" << std::endl;
@@ -1067,11 +1097,11 @@ void mitk::DataTreeNodeFactory::ReadFileTypeITKImageIOFactory()
   if ( image->GetPixelType().GetNumberOfComponents() == 1 )
   {
     SetDefaultImageProperties( node );
-    mitk::LevelWindowProperty::Pointer levWinProp = new mitk::LevelWindowProperty();
-    mitk::LevelWindow levelwindow;
-    levelwindow.SetAuto( image );
-    levWinProp->SetLevelWindow( levelwindow );
-    node->GetPropertyList()->SetProperty( "levelwindow", levWinProp );
+    //mitk::LevelWindowProperty::Pointer levWinProp = new mitk::LevelWindowProperty();
+    //mitk::LevelWindow levelwindow;
+    //levelwindow.SetAuto( image );
+    //levWinProp->SetLevelWindow( levelwindow );
+    //node->GetPropertyList()->SetProperty( "levelwindow", levWinProp );
   }
   /*
   mitk::LookupTable::Pointer mitkLut = mitk::LookupTable::New();
@@ -1114,13 +1144,13 @@ void mitk::DataTreeNodeFactory::ReadFileSeriesTypePIC()
   SetDefaultImageProperties(node);
 
   // add level-window property
-  mitk::LevelWindowProperty::Pointer levWinProp = new mitk::LevelWindowProperty();
-  mitk::LevelWindow levelwindow;
+  //mitk::LevelWindowProperty::Pointer levWinProp = new mitk::LevelWindowProperty();
+  //mitk::LevelWindow levelwindow;
 
-  levelwindow.SetAuto( reader->GetOutput() );
-  levWinProp->SetLevelWindow( levelwindow );
+  //levelwindow.SetAuto( reader->GetOutput() );
+  //levWinProp->SetLevelWindow( levelwindow );
 
-  node->GetPropertyList()->SetProperty( "levelwindow", levWinProp );
+  //node->GetPropertyList()->SetProperty( "levelwindow", levWinProp );
 
   std::cout << "...finished!" << std::endl;
 }
@@ -1189,11 +1219,11 @@ void mitk::DataTreeNodeFactory::ReadFileSeriesTypeDCM()
       SetDefaultImageProperties(node);
 
       // add level-window property
-      mitk::LevelWindowProperty::Pointer levWinProp = new mitk::LevelWindowProperty();
-      mitk::LevelWindow levelwindow;
-      levelwindow.SetAuto( image );
-      levWinProp->SetLevelWindow( levelwindow );
-      node->GetPropertyList()->SetProperty( "levelwindow", levWinProp );
+      //mitk::LevelWindowProperty::Pointer levWinProp = new mitk::LevelWindowProperty();
+      //mitk::LevelWindow levelwindow;
+      //levelwindow.SetAuto( image );
+      //levWinProp->SetLevelWindow( levelwindow );
+      //node->GetPropertyList()->SetProperty( "levelwindow", levWinProp );
 
 
 
@@ -1265,11 +1295,11 @@ void mitk::DataTreeNodeFactory::ReadFileSeriesTypeGDCM()
     SetDefaultImageProperties(node);
     
     // add level-window property
-    mitk::LevelWindowProperty::Pointer levWinProp = new mitk::LevelWindowProperty();
-    mitk::LevelWindow levelwindow;
-    levelwindow.SetAuto( image );
-    levWinProp->SetLevelWindow( levelwindow );
-    node->GetPropertyList()->SetProperty( "levelwindow", levWinProp );
+    //mitk::LevelWindowProperty::Pointer levWinProp = new mitk::LevelWindowProperty();
+    //mitk::LevelWindow levelwindow;
+    //levelwindow.SetAuto( image );
+    //levWinProp->SetLevelWindow( levelwindow );
+    //node->GetPropertyList()->SetProperty( "levelwindow", levWinProp );
     
     // set filename without path as string property
     std::string filename = std::string( this->GetBaseFilePrefix() );
@@ -1497,11 +1527,11 @@ void mitk::DataTreeNodeFactory::ReadFileSeriesTypeITKImageSeriesReader()
       {
         SetDefaultImageProperties(node);
         // add level-window property
-        mitk::LevelWindowProperty::Pointer levWinProp = new mitk::LevelWindowProperty();
-        mitk::LevelWindow levelwindow;
-        levelwindow.SetAuto( image );
-        levWinProp->SetLevelWindow( levelwindow );
-        node->GetPropertyList()->SetProperty( "levelwindow", levWinProp );
+        //mitk::LevelWindowProperty::Pointer levWinProp = new mitk::LevelWindowProperty();
+        //mitk::LevelWindow levelwindow;
+        //levelwindow.SetAuto( image );
+        //levWinProp->SetLevelWindow( levelwindow );
+        //node->GetPropertyList()->SetProperty( "levelwindow", levWinProp );
       }
     }
   }
@@ -1602,11 +1632,33 @@ void mitk::DataTreeNodeFactory::SetDefaultImageProperties(mitk::DataTreeNode::Po
   node->SetProperty( "in plane resample extent by geometry", new mitk::BoolProperty( false ) );
   node->SetOpacity(1.0f);
   node->SetColor(1.0,1.0,1.0);  
+
+  mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
+  if(image.IsNotNull())
+  {
+    mitk::LevelWindowProperty::Pointer levWinProp = new mitk::LevelWindowProperty();
+    mitk::LevelWindow levelwindow;
+    levelwindow.SetAuto( image );
+    levWinProp->SetLevelWindow( levelwindow );
+    node->GetPropertyList()->SetProperty( "levelwindow", levWinProp );
+  }
 }; 
 
 void mitk::DataTreeNodeFactory::SetDefaultSurfaceProperties(mitk::DataTreeNode::Pointer &node)
 {
-    node->SetProperty( "lineWidth", new mitk::IntProperty(2) );
-    node->SetProperty( "layer", new mitk::IntProperty(0));
-    node->SetProperty( "material", new mitk::MaterialProperty( 1.0, 1.0, 1.0, 1.0, node.GetPointer() ) );
+  node->SetProperty( "lineWidth", new mitk::IntProperty(2) );
+  node->SetProperty( "layer", new mitk::IntProperty(0));
+  node->SetProperty( "material", new mitk::MaterialProperty( 1.0, 1.0, 1.0, 1.0, node.GetPointer() ) );
+}
+
+void mitk::DataTreeNodeFactory::SetDefaultCommonProperties(mitk::DataTreeNode::Pointer &node)
+{
+  mitk::StringProperty::Pointer pathProp = new mitk::StringProperty( itksys::SystemTools::GetFilenamePath( m_FileName ) );
+  node->SetProperty( StringProperty::PATH, pathProp );
+  mitk::StringProperty::Pointer nameProp = dynamic_cast<mitk::StringProperty*>(node->GetProperty("name").GetPointer());
+  if(nameProp.IsNull() || nameProp->GetValue()=="No Name!")
+  {
+    nameProp = new mitk::StringProperty( this->GetBaseFileName() );
+    node->SetProperty( "name", nameProp );
+  }
 }

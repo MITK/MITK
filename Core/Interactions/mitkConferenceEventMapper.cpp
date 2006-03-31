@@ -26,7 +26,7 @@ mitk::ConferenceEventMapper::MapEvent(signed int mitkEventID, const char* sender
   // fit relative values to absolut....
   mitk::Point2D p2d;
   p2d[0] = (mitk::ScalarType) p1 * br->GetSizeX();
-  p2d[1] = (mitk::ScalarType) p1 * br->GetSizeX();
+  p2d[1] = (mitk::ScalarType) p2 * br->GetSizeX();
 
 
   mitk::PositionEvent *pe = new mitk::PositionEvent(br,Etype,Estate,Ebuttonstate,Ekey,p2d,p3d);

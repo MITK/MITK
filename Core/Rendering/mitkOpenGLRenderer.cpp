@@ -312,7 +312,7 @@ void mitk::OpenGLRenderer::Repaint( bool onlyOverlay )
 //first render vtkActors, then render mitkMappers
 {
   //if we do not have any data, we do nothing else but clearing our window
-  /*
+  
   if(GetData() == NULL)
   {
     glClear(GL_COLOR_BUFFER_BIT);
@@ -329,8 +329,7 @@ void mitk::OpenGLRenderer::Repaint( bool onlyOverlay )
 
     return;
   }
-  */
-  
+
   if ( onlyOverlay )
   {
     glDisable(GL_BLEND);

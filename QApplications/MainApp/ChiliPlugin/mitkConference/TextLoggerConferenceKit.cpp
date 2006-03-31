@@ -25,8 +25,7 @@ TextLoggerConferenceKit::SendQt(const char* s)
   }
 }; 
 
-
-  void
+ void
 TextLoggerConferenceKit::SendMITK(signed int eventID, const char* sender, int etype, int estate, int ebuttonstate, int ekey, float w1, float w2, float w3, float p1, float p2)
 {  
 
@@ -34,6 +33,18 @@ TextLoggerConferenceKit::SendMITK(signed int eventID, const char* sender, int et
   if (MITKGlobalFile )
   {
     MITKGlobalFile<<eventID<<"&&"<<sender<<"&&"<<etype<<"&&"<<estate<<"&&"<< ebuttonstate<<"&&"<< ekey<<"&&"<< w1<<"&&"<< w2<<"&&"<< w3<<"&&"<<p1<<"&&"<< p2<<endl;
+  }
+};
+
+
+  void
+TextLoggerConferenceKit::MouseMove(signed int eventID, const char* sender, float w1, float w2, float w3 )
+{  
+
+  ofstream MITKGlobalFile( FILEPATH, ios::app);
+  if (MITKGlobalFile )
+  {
+    MITKGlobalFile<<eventID<<"&&"<<sender<<"&&"<< w1<<"&&"<< w2<<"&&"<< w3<<endl;
   }
 };
 

@@ -1,3 +1,4 @@
+
 #include "QmitkQChili3Conference.h"
 #include <iostream>
 #include <chili/plugin.h>
@@ -53,3 +54,5 @@ void QChili3Conference::SendMITK(signed int eventID, const char* sender, float w
   if( list )
     ipMsgRemoveList( list, _MSG_REMOVE_LIST_ONLY );
 };
+
+

@@ -33,7 +33,8 @@
 #include <QmitkChili3ConferenceKitFactory.h>
 #include <mitkDisplayGeometry.h>
 #include <mitkVector.h>
-#include "mitkEventMapper.h"
+#include <mitkConferenceEventMapper.h>
+#include <mitkEventMapper.h>
 #include <mitkConferenceToken.h>
 
 
@@ -506,7 +507,7 @@ QcMITKSamplePlugin::handleMessage( ipInt4_t type, ipMsgParaList_t *list )
 //                    .arg(eventID).arg( w1 ).arg( w2 ).arg( w3 ).arg( p1 ).arg( p2 ).arg(str));
          tb->find(7)->setText(QString( "ID:%1 von %2").arg(eventID).arg(str));
 
-      if(!mitk::EventMapper::MapEvent(eventID, str,etype,estate,ebuttonstate,ekey,w1,w2,w3,p1,p2))
+      if(!mitk::ConferenceEventMapper::MapEvent(eventID, str,etype,estate,ebuttonstate,ekey,w1,w2,w3,p1,p2))
         std::cout<<"EventMaper no funciona"<<std::endl;
 
     break;
@@ -552,6 +553,19 @@ QcMITKSamplePlugin::handleMessage( ipInt4_t type, ipMsgParaList_t *list )
         ct->SetToken( receiver );
         }
     break;
+    case mitk::m_QmitkChiliPluginConferenceID + mitk::MOUSEMOVEc:
+      ipMsgListToVar( list,
+                      ipTypeInt4, &eventID,
+                      ipTypeStringPtr, &str,
+                      ipTypeFloat4, &w1,
+                      ipTypeFloat4, &w2,
+                      ipTypeFloat4, &w3
+          );
+
+      if( !mitk::ConferenceEventMapper::MapEvent(eventID, str, w1, w2, w3) )
+        std::cout<<"QcMITKSamplePlugin::handleMessage() -> MouseMoveEvent couldn't pass through"<<std::endl;
+
+    break;   
     default:
 //       message = QString( " type %1" ).arg( type );
 //       arguments = "argumente unbekannt";

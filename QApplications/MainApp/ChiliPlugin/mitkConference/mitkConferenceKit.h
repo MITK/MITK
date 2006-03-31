@@ -29,6 +29,7 @@ namespace mitk{
  //   virtual void UpdateMe() = 0;
     virtual void SendMITK(signed int,const char* sender, int, int, int, int, float, float, float, float, float) = 0;
     virtual void SendQt(const char* s) = 0;
+    virtual void MouseMove(signed int, const char* sender,float, float, float ) = 0;
     virtual void MyTokenPriority(long int) = 0;
     virtual void AskForToken(long int requester) = 0;
     virtual void SetToken(long int sender,long int requester) = 0;

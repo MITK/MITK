@@ -1,3 +1,4 @@
+
 #ifndef MITK_QCHILI_CONFERENCE_H
 #define MITK_QCHILI_CONFERENCE_H
 
@@ -30,3 +31,5 @@ class QChili3Conference:public mitk::ConferenceKit
 };
 
 #endif
+
+

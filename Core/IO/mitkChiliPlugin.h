@@ -34,6 +34,7 @@ typedef enum
   TOKENREQUESTc,
   TOKENSETc,
   TEXTc,
+  MOUSEMOVEc ,
 } ConfMsgType;
 
 class ChiliPlugin

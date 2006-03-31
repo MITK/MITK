@@ -42,22 +42,14 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkConfig.h>
 #include <itksys/SystemTools.hxx>
 
-#ifdef MBI_INTERNAL
+#ifdef MBI_INTERNAL_CONFERENCE
   #include <mitkGeometry3D.h>
   #include <mitkDisplayPositionEvent.h>
-  #include <stdio.h>
-  #include <sstream>
 
   #include <mitkConferenceKit.h>
   #include <mitkConferenceToken.h>
   #include <mitkBaseRenderer.h>
-  #include <mitkPositionEvent.h>
-  #include <Skeletonizer/Point3D.h>
-  #include <mitkCameraController.h>
-  #include <mitkEventTypedefs.h>
-  //#include <QmitkRenderWindow.h>
-  #include <mitkRenderingManager.h>
-#endif //MBI_INTERNAL
+#endif //MBI_INTERNAL_CONFERENCE
 
 //XML Event
 //##ModelId=3E788FC000E5
@@ -474,14 +466,15 @@ mitk::StateMachine* mitk::EventMapper::GetGlobalStateMachine()
 //##ModelId=3E5B34CF0041
 //##Documentation
 //## searches the Event in m_EventDescription
-//## and if included
-bool mitk::EventMapper::MapEvent(Event* event, bool posted, int mitkE )
+//##  
+bool mitk::EventMapper::MapEvent(Event* event, int mitkPostedEventID )
 {
+  int eventID = mitkPostedEventID;
+
   if (GetGlobalStateMachine() == NULL)
     return false;
 
-  int eventID = mitkE;
-  if( !posted && mitkE == 0 )
+  if( mitkPostedEventID == 0 )
   {
     //search the event in the list of event descriptions, if found, then take the number and produce a stateevent
     EventDescriptionVecIter iter;
@@ -535,9 +528,9 @@ bool mitk::EventMapper::MapEvent(Event* event, bool posted, int mitkE )
     mitk::OperationEvent::IncCurrObjectEventId();
   }
 
-#ifdef MBI_INTERNAL
+#ifdef MBI_INTERNAL_CONFERENCE
   //Conferen Stop and Enable Events
-  if (!posted)
+  if ( mitkPostedEventID == 0 )
   {
     mitk::ConferenceToken* ct = mitk::ConferenceToken::GetInstance();
     if(!ct->HaveToken() && !(eventID == 520) )
@@ -549,113 +542,37 @@ bool mitk::EventMapper::MapEvent(Event* event, bool posted, int mitkE )
     mitk::DisplayPositionEvent *dpe = dynamic_cast<mitk::DisplayPositionEvent *>(event);
     if ( dpe )
     {
-      mitk::Point3D p3;
-      mitk::Point2D p2; //kein nutzen, weil es sich mit den weltkoordinaten besser arbeiten lässt.
-      //short int BEI Point3D
-      p3 = dpe->GetWorldPosition();
-      p2 = dpe->GetDisplayPosition();
-
       mitk::BaseRenderer* bp = event->GetSender();
       const char* baseRendererName = bp->GetName();
-      //const int size[2] = bp->GetSize();
+
+      mitk::Point3D p3;
+      p3 = dpe->GetWorldPosition();
 
       ConferenceKit* ck = ConferenceKit::GetInstance();
       if( ck != NULL )
       {
-        ck->SendMITK( eventID, baseRendererName, event->GetType(), event->GetButton(), event->GetButtonState(), event->GetKey(), p3[0], p3[1], p3[2], (p2[0]/bp->GetSizeX()), (p2[1]/bp->GetSizeY()) );
-        //if(eventID!=520) std::cout<<"ID( "<<eventID<<") Widget("<<baseRendererName<<") Koordinaten 3D("<<p3[0]<<", "<<p3[1]<<", "<<p3[2]<<")"<<p2[0]/bp->GetSizeX()<<", "<<p2[1]/bp->GetSizeY()<<std::endl;
-         if(eventID!=520) std::cout<<bp->GetSizeX()<<" / (("<<p2[0]<<")) =X "<<p2[0]/bp->GetSizeX()<<"   UND "<<bp->GetSizeY()<<" / (("<< p2[1] <<")) =Y "<<p2[1]/bp->GetSizeY()<<std::endl;
+        if( eventID == 520 ) // MouseMove
+        {
+          ck->MouseMove(eventID, baseRendererName,  p3[0], p3[1], p3[2] );
+        }
+        else
+        {
+          mitk::Point2D p2; 
+          p2 = dpe->GetDisplayPosition();
+
+          ck->SendMITK( eventID, baseRendererName, event->GetType(), event->GetButton(), event->GetButtonState(), event->GetKey(), p3[0], p3[1], p3[2], (p2[0]/bp->GetSizeX()), (p2[1]/bp->GetSizeY()) );
+          std::cout<<bp->GetSizeX()<<" / (("<<p2[0]<<")) =X "<<p2[0]/bp->GetSizeX()<<"   UND "<<bp->GetSizeY()<<" / (("<< p2[1] <<")) =Y "<<p2[1]/bp->GetSizeY()<<std::endl;
+        }
       }
     }
   }
-#endif //MBI_INTERNAL
+#endif //MBI_INTERNAL_CONFERENCE
 
   mitk::OperationEvent::ExecuteIncrement();
   ok = GetGlobalStateMachine()->HandleEvent(&m_StateEvent);
 
   return ok;
 }
-
-
-#ifdef MBI_INTERNAL
-//CONFERENCE USE
-bool
-mitk::EventMapper::MapEvent(signed int mitkEventID, const char* sender, int Etype, int Estate, int Ebuttonstate, int Ekey, float w1,float w2,float w3,float p1,float p2)
-{
-
-  //CONFERENCE EVENT
-  mitk::BaseRenderer *br = const_cast<mitk::BaseRenderer*>(mitk::BaseRenderer::GetByName( std::string(sender) ));
-  
-  mitk::Point3D p3d;
-  p3d[0] = (mitk::ScalarType) w1;
-  p3d[1] = (mitk::ScalarType) w2;
-  p3d[2] = (mitk::ScalarType) w3;
-
-  // fit relative values to absolut....
-  mitk::Point2D p2d;
-  p2d[0] = (mitk::ScalarType) p1 * br->GetSizeX();
-  p2d[1] = (mitk::ScalarType) p1 * br->GetSizeX();
-
-
-  mitk::PositionEvent *pe = new mitk::PositionEvent(br,Etype,Estate,Ebuttonstate,Ekey,p2d,p3d);
-  
-  // MOUSE Overlay
-  mitk::Point2D  p2d_mm, pos_unit;     
-  //Map world to 2d mm
-  if (br->GetDisplayGeometry()->Map( p3d, p2d_mm ) )
-  {
-    //calculate position of the real inner widget
-    br->GetDisplayGeometry()->WorldToDisplay( p2d_mm, pos_unit);
-    //std::cout<<p2d_mm[0]<<", "<<p2d_mm[1]<<", U: "<<pos_unit[0]<<", "<<pos_unit[1]<<" p3d ( "<<p3d[0]<<p3d[1]<<p3d[2]<<" ) "<<std::endl;
-    br->DrawOverlayMouse(pos_unit); //TEST
-    mitk::RenderingManager::GetInstance()->RequestOverlayUpdateAll();
-  }
-
-
-  //std::cout<<"mitkEventMapper::MapEvent(): "<<br->GetSizeX()<<" * "<<p1<<" =X (("<<p2d[0]<<"))   UND "<<br->GetSizeY()<<" * "<< p2 <<" =Y (("<<p2d[1]<<"))"<<std::endl;
-  
-  //ONlY 3D Widget
-  if( br->GetMapperID() == 2 )
-  {
-    mitk::CameraController* cc = br->GetCameraController();
-    
-    //Qt Event IDs
-    if (Etype == 6)
-    {
-      // KeyPress
-      //cc->KeyPressEvent( keyevent); */
-      ;
-    }
-    else
-    {
-      //Umrechnung für VTKCameraControler
-      p2d[1] = (mitk::ScalarType) (br->GetSizeY() - p2) * br->GetSizeY(); 
-      mitk::PositionEvent *peVTK = new mitk::PositionEvent(br,Etype,Estate,Ebuttonstate,Ekey,p2d,p3d);
-      // END
-      
-      //PRESS
-      if(Etype == 2)
-      {
-        cc->MousePressEvent( peVTK );
-      }
-      else if (Etype == 3 )
-      {
-        //RELEASE
-        cc->MouseReleaseEvent( peVTK );
-      }
-      else if (Etype == 5)
-      {
-        //MOVE
-        cc->MouseMoveEvent( peVTK );
-      }
-    }
-  }
-  
-  bool ok = MapEvent( pe, true, mitkEventID );
-
-  return ok;
-}
-#endif
 
 //##ModelId=3E5B35140072
 //##Documentation

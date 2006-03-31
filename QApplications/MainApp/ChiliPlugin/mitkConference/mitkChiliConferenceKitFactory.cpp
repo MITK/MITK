@@ -1,6 +1,5 @@
 #include <mitkChiliConferenceKitFactory.h>
-#include <QmitkQChili3Conference.h>
-#include <itkSmartPointer.h>
+#include <QmitkChili3ConferenceKit.h>
 
 namespace mitk{
 //class ConferenceKit;

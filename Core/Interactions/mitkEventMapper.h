@@ -87,13 +87,10 @@ namespace mitk {
     //##Documentation
     //## searches the Event in m_EventDescription
     //## and if included transmitts the event to globalInteraction
-    static bool MapEvent(Event* event, bool posted = false, int eventID=0 );
+    //## the optinal parameter should be used in a conference to avoid a
+    //## feedback
+    static bool MapEvent(Event* event, int mitkPostedEventID=0 );
     
-    // First part MITK Event ID and baserendere name
-    // Second the normaly not needed integer information from the GUI Event (type, state, button, key)
-    // Third the koordinated 3D and the relativ 2D
-    static bool MapEvent(signed int id, const char* sender, int Etype, int Estate, int EButtonState, int key, float w1,float w2,float w3,float d0,float d1);
-
     //##Documentation
     //## maps the Event in m_EventDescription with the ID
     //## and if found returns the Id,

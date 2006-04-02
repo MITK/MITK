@@ -113,8 +113,6 @@ void mitk::SliceNavigationController::Update(mitk::SliceNavigationController::Vi
     // initialize the viewplane
     mitk::PlaneGeometry::Pointer planegeometry = mitk::PlaneGeometry::New();
 
-    ScalarType viewSpacing = 1;
-
     mitk::SlicedGeometry3D::Pointer slicedWorldGeometry = NULL;
     m_CreatedWorldGeometry = NULL;
     const TimeSlicedGeometry* worldTimeSlicedGeometry = dynamic_cast<const TimeSlicedGeometry*>(m_InputWorldGeometry.GetPointer());

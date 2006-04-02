@@ -185,15 +185,15 @@ void mitk::SlicedGeometry3D::InitializePlanes(const mitk::Geometry3D* geometry3D
   {
     case PlaneGeometry::Transversal:
       viewSpacing = geometry3D->GetSpacing()[2];
-      slices = geometry3D->GetExtent(2);
+      slices = (unsigned int) geometry3D->GetExtent(2);
       break;
     case PlaneGeometry::Frontal:
       viewSpacing = geometry3D->GetSpacing()[1];
-      slices = geometry3D->GetExtent(1);
+      slices = (unsigned int) geometry3D->GetExtent(1);
       break;
     case PlaneGeometry::Sagittal:
       viewSpacing = geometry3D->GetSpacing()[0];
-      slices = geometry3D->GetExtent(0);
+      slices = (unsigned int) geometry3D->GetExtent(0);
       break;
     default:
       itkExceptionMacro("unknown PlaneOrientation");

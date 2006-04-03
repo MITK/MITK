@@ -86,6 +86,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkImageChannelSelector.h"
 #include "mitkImageSliceSelector.h"
 #include "mitkSTLFileReader.h"
+//#include "mitkVtkFileReader.h"
+//#include "mitkObjFileReader.h"
+
 #ifdef MBI_INTERNAL
  #ifdef HAVE_IPDICOM
   #include "mitkDICOMFileReader.h"
@@ -116,7 +119,7 @@ mitk::DataTreeNodeFactory::~DataTreeNodeFactory()
 void mitk::DataTreeNodeFactory::GenerateData()
 {
 
-  mitk::BaseData::Pointer baseData = mitk::BaseDataIOFactory::CreateBaseDataIO( m_FileName.c_str(), mitk::BaseDataIOFactory::ReadMode );
+/*  mitk::BaseData::Pointer baseData = mitk::BaseDataIOFactory::CreateBaseDataIO( m_FileName.c_str(), mitk::BaseDataIOFactory::ReadMode );
   
   if( baseData.IsNotNull() )
   {
@@ -124,9 +127,9 @@ void mitk::DataTreeNodeFactory::GenerateData()
     node->SetData(baseData);
     this->SetDefaultCommonProperties( node );
 
-    //mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
-    //if(image.IsNotNull())
-    //  this->SetDefaultImageProperties(node);
+    mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
+    if(image.IsNotNull())
+      this->SetDefaultImageProperties(node);
     
     mitk::Surface::Pointer surface = dynamic_cast<mitk::Surface*>(node->GetData());
     if(surface.IsNotNull())
@@ -135,7 +138,7 @@ void mitk::DataTreeNodeFactory::GenerateData()
     node->SetVisibility(true);    
   }
   else
-  {  
+  { */ 
     if ( m_FileName != "" )
     {
       if ( this->FileNameEndsWith( ".stl" ) )
@@ -271,7 +274,7 @@ void mitk::DataTreeNodeFactory::GenerateData()
       this->SetDefaultCommonProperties( node );
       node->SetVisibility(true);
     }
-  }
+//  }
 }
 
 
@@ -436,6 +439,12 @@ void mitk::DataTreeNodeFactory::ReadFileTypeVTK()
     std::cerr << " ... sorry, this .vtk format is not supported yet."<<std::endl;
   }
   chooser->Delete();
+  //mitk::DataTreeNode::Pointer node = this->GetOutput();
+  //mitk::VtkFileReader::Pointer VtkFileReader = mitk::VtkFileReader::New();
+  //VtkFileReader->SetFileName(m_FileName.c_str());
+  //VtkFileReader->Update();
+  //node->SetData(VtkFileReader->GetOutput());
+  //SetDefaultSurfaceProperties( node );
 }
 
 

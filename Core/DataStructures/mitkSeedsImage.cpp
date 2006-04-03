@@ -92,14 +92,15 @@ void mitk::SeedsImage::AddSeedPoint(SeedsImageType* itkImage)
   itk::ImageRegionIterator<SeedsImageType>
   iterator(itkImage, itkImage->GetRequestedRegion());
   const unsigned int dimension = ::itk::GetImageDimension<SeedsImageType>::ImageDimension;
-  itk::Index<dimension> baseIndex;
+//  itk::Index<dimension> baseIndex;
   itk::Index<dimension> setIndex;
   itk::Point<typename SeedsImageType::PixelType, dimension> p;
   p[0] = point[0];
   p[1] = point[1];
   p[2] = point[2];
-  itk::ContinuousIndex<typename SeedsImageType::PixelType, dimension> contIndex;
-  itkImage->TransformPhysicalPointToContinuousIndex(p, contIndex);
+  //itk::ContinuousIndex<typename SeedsImageType::PixelType, dimension> contIndex;
+  //itkImage->TransformPhysicalPointToContinuousIndex(p, contIndex);
+  itk::Index<dimension> contIndex;
   typename MaskImageType::IndexType getIndex;
   typename MaskImageType::Pointer mask =  MaskImageType::New();
 
@@ -154,8 +155,9 @@ void mitk::SeedsImage::AddSeedPoint(SeedsImageType* itkImage)
     mask->DisconnectPipeline();
   }
 
-  GetGeometry()->WorldToIndex(point, baseIndex); // commented out because of the slices problem
+//  GetGeometry()->WorldToIndex(point, baseIndex); // commented out because of the slices problem
 //  for (int i=0; i<3; i++) baseIndex[i] = (int)ceil((point[i]/spacing[i])-(itkImage->GetOrigin()[i]/spacing[i]));
+  GetGeometry()->WorldToIndex(point, contIndex); // commented out because of the slices problem
   
   // setting a sphere around the point
   if(dimension==2){
@@ -163,10 +165,10 @@ void mitk::SeedsImage::AddSeedPoint(SeedsImageType* itkImage)
     for(unsigned int i=0; i<dimension; i++)
       radius[i] = int(m_Radius/spacing[i]);
     //FillVector2D(radius, ((ScalarType)m_Radius)/spacing[0], ((ScalarType)m_Radius)/spacing[1]);
-      for(int y = (int)contIndex[1] - radius[1]; y <= (int)contIndex[1] + radius[1]; ++y){
-        for(int x = (int)contIndex[0] - radius[0]; x <= (int)contIndex[0] + radius[0]; ++x){
-          delta_x = abs(x - (int)contIndex[0])*spacing[0];
-          delta_y = abs(y - (int)contIndex[1])*spacing[1];
+      for(int y = contIndex[1] - radius[1]; y <= contIndex[1] + radius[1]; ++y){
+        for(int x = contIndex[0] - radius[0]; x <= contIndex[0] + radius[0]; ++x){
+          delta_x = abs(x - contIndex[0])*spacing[0];
+          delta_y = abs(y - contIndex[1])*spacing[1];
           sphere_distance = (delta_x * delta_x) + (delta_y * delta_y);
           if (sphere_distance <= (m_Radius*m_Radius)){
             // check -> is the point inside the image?
@@ -187,12 +189,12 @@ void mitk::SeedsImage::AddSeedPoint(SeedsImageType* itkImage)
     int radius[dimension];
     for(unsigned int i=0; i<dimension; i++)
       radius[i] = int(m_Radius/spacing[i]);
-    for(int z = (int)contIndex[2] - radius[2]; z <= (int)contIndex[2] + radius[2]; ++z){
-      for(int y = (int)contIndex[1] - radius[1]; y <= (int)contIndex[1] + radius[1]; ++y){
-        for(int x = (int)contIndex[0] - radius[0]; x <= (int)contIndex[0] + radius[0]; ++x){
-          delta_x = abs(x - (int)contIndex[0])*spacing[0];
-          delta_y = abs(y - (int)contIndex[1])*spacing[1];
-          delta_z = abs(z - (int)contIndex[2])*spacing[2];
+    for(int z = contIndex[2] - radius[2]; z <= contIndex[2] + radius[2]; ++z){
+      for(int y = contIndex[1] - radius[1]; y <= contIndex[1] + radius[1]; ++y){
+        for(int x = contIndex[0] - radius[0]; x <= contIndex[0] + radius[0]; ++x){
+          delta_x = abs(x - contIndex[0])*spacing[0];
+          delta_y = abs(y - contIndex[1])*spacing[1];
+          delta_z = abs(z - contIndex[2])*spacing[2];
           sphere_distance = (delta_x * delta_x) + (delta_y * delta_y) + (delta_z * delta_z);
           if (sphere_distance <= (m_Radius*m_Radius)){
             // check -> is the point inside the image?
@@ -203,9 +205,9 @@ void mitk::SeedsImage::AddSeedPoint(SeedsImageType* itkImage)
               iterator.SetIndex(setIndex);
               if (m_DrawState == -1 || m_DrawState == 1)
               {  
-                getIndex[2]=z + m_Radius -(int)contIndex[2] ;
-                getIndex[1]=y + m_Radius -(int)contIndex[1];
-                getIndex[0]=x + m_Radius -(int)contIndex[0];
+                getIndex[2]=z + m_Radius -contIndex[2] ;
+                getIndex[1]=y + m_Radius -contIndex[1];
+                getIndex[0]=x + m_Radius -contIndex[0];
                 float val = iterator.Get() + mask->GetPixel(getIndex) ;
                 if (val > 128) val = 128; 
                 if (val < -128) val = 128; 
@@ -230,8 +232,8 @@ void mitk::SeedsImage::PointInterpolation(SeedsImageType* itkImage)
   itk::ImageRegionIterator<SeedsImageType >
   iterator(itkImage, itkImage->GetRequestedRegion());
   const unsigned int dimension = ::itk::GetImageDimension<SeedsImageType>::ImageDimension;
-//  itk::Index<dimension> pointIndex;
-//  itk::Index<dimension> last_pointIndex;
+  itk::Index<dimension> pointIndex;
+  itk::Index<dimension> last_pointIndex;
   itk::Index<dimension> baseIndex;
   itk::Index<dimension> setIndex;
   float point_distance;
@@ -243,17 +245,17 @@ void mitk::SeedsImage::PointInterpolation(SeedsImageType* itkImage)
   p[0] = point[0];
   p[1] = point[1];
   p[2] = point[2];
-  itk::ContinuousIndex<typename SeedsImageType::PixelType, dimension> pointIndex;
-  itk::ContinuousIndex<typename SeedsImageType::PixelType, dimension> last_pointIndex;
-  itkImage->TransformPhysicalPointToContinuousIndex(p, pointIndex);
+  //itk::ContinuousIndex<typename SeedsImageType::PixelType, dimension> pointIndex;
+  //itk::ContinuousIndex<typename SeedsImageType::PixelType, dimension> last_pointIndex;
+  //itkImage->TransformPhysicalPointToContinuousIndex(p, pointIndex);
   p[0] = last_point[0];
   p[1] = last_point[1];
   p[2] = last_point[2];
-  itkImage->TransformPhysicalPointToContinuousIndex(p, last_pointIndex);
+  //itkImage->TransformPhysicalPointToContinuousIndex(p, last_pointIndex);
 
   // coordinate transformation from physical coordinates to index coordinates
-  //GetGeometry()->WorldToIndex(point, pointIndex);
-  //GetGeometry()->WorldToIndex(last_point, last_pointIndex);
+  GetGeometry()->WorldToIndex(point, pointIndex);
+  GetGeometry()->WorldToIndex(last_point, last_pointIndex);
 
 //  for (int i=0; i<3; i++) pointIndex[i] = (int)ceil((point[i]/spacing[i])-(itkImage->GetOrigin()[i]/spacing[i]));
 //  for (int i=0; i<3; i++) last_pointIndex[i] = (int)ceil((last_point[i]/spacing[i])-(itkImage->GetOrigin()[i]/spacing[i]));

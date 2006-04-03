@@ -37,7 +37,7 @@ class EventCollector : public QObject
 
   private:
     QString GetObjectValue( QObject* o2);
-    static bool SetObjectValue( QObject * o, QString className, QString value, QString value2 );
+    static bool SetObjectValue( QObject * o, QString className, QString value, QString value2="" );
     static bool m_ReadyToSend;
     static bool m_PostedEvent;
     QObject* m_EventObject;

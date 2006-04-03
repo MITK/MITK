@@ -20,6 +20,8 @@
 #include <qlistview.h>
 #include <qwidget.h>
 #include <qwidgetlist.h>
+#include <QmitkSliderLevelWindowWidget.h>
+#include <mitkLevelWindow.h>
 
 #include <mitkConferenceToken.h>
 #include <mitkConferenceKit.h>
@@ -54,10 +56,10 @@ EventCollector::eventFilter( QObject *o, QEvent *e )
         return false;
       }
 
-    QString complete = m_EventStr;   // field 0 - 3 
-    complete += GetObjectValue( m_EventObject ); // field 4 - 5
+    QString complete = m_EventStr + Seperator;   // field 0 - 3 
+    complete += GetObjectValue( m_EventObject ) + Seperator; // field 4 - 5
     complete += Object2String( m_EventID, m_EventObject ); //field 6 - ??
-    //std::cout<<"QmitkEventCollector::eventFilter(): JETZT WIRD GESENDET: "<<complete.latin1()<<std::endl;
+    std::cout<<"QmitkEventCollector::eventFilter(): JETZT WIRD GESENDET: "<<complete.latin1()<<std::endl;
 
     mitk::ConferenceKit* ck = mitk::ConferenceKit::GetInstance();
     if( ck != NULL )
@@ -112,7 +114,7 @@ EventCollector::eventFilter( QObject *o, QEvent *e )
   {
     m_EventObject = o;
   }
-  m_EventStr    = Event2String( e ) + Seperator;
+  m_EventStr    = Event2String( e );
   m_EventID     = e->type();
   m_ReadyToSend = true;
 
@@ -197,7 +199,17 @@ EventCollector::SetObjectValue( QObject* o, QString className, QString value, QS
     if ( qcb )
       qcb->setCurrentItem(value.toInt());
   }
-
+  else if( !className.compare("QmitkSliderLevelWindowWidget") )
+  {
+    QmitkSliderLevelWindowWidget* qslw = dynamic_cast<QmitkSliderLevelWindowWidget *>(o);
+    if ( qslw )
+    {
+      mitk::LevelWindow lw = qslw->getLevelWindow();
+      lw.SetMinMax(value.toFloat(), value2.toFloat());
+      qslw->setLevelWindow(lw);
+      qslw->update();
+    }
+  }
 
   return true;
 }
@@ -277,6 +289,20 @@ EventCollector::GetObjectValue( QObject * o2 )
       objvalue = QString("%1").arg(qlb->currentItem());
     objvalue += Seperator;
   }
+  else if( !className.compare("QmitkSliderLevelWindowWidget") )
+  {
+    QmitkSliderLevelWindowWidget* qlb = dynamic_cast<QmitkSliderLevelWindowWidget *>(o2);
+    if ( qlb )
+    {
+      mitk::LevelWindow lw = qlb->getLevelWindow();
+      objvalue = QString("%1").arg(lw.GetMin());
+      objvalue += Seperator;
+      objvalue += QString("%1").arg(lw.GetMax());
+    }
+    std::cout<<"QmitkSliderLevelWindowWidget Value: "<<objvalue.latin1()<<std::endl;
+  }
+
+
 //  else if( !className.compare("QListView") )
 //  {
 //    QListView* qlv = dynamic_cast<QListView *>(o2);
@@ -391,7 +417,7 @@ EventCollector::PostEvent(QString str, QWidget* w)
 
   
   QStringList::Iterator it = objlist.begin();
-  for(int i=0; i<5; i++)
+  for(int i=0; i<6; i++)
     ++it;
  
   // in dependence to the number of hierachie values sended this 

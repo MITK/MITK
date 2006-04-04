@@ -15,13 +15,10 @@ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
-
-
 #ifndef STLFileReader_H_HEADER_INCLUDED
 #define STLFileReader_H_HEADER_INCLUDED
 
 #include "mitkCommon.h"
-#include "mitkFileReader.h"
 #include "mitkSurfaceSource.h"
 
 namespace mitk {
@@ -36,10 +33,22 @@ public:
     /** Method for creation through the object factory. */
     itkNewMacro(Self);
 
+    itkSetMacro(FileName, std::string);
     itkSetStringMacro(FileName);
+    itkGetMacro(FileName, std::string);
     itkGetStringMacro(FileName);
 
-    static bool CanReadFile(const char* file);
+    itkSetMacro(FilePrefix, std::string);
+    itkSetStringMacro(FilePrefix);
+    itkGetMacro(FilePrefix, std::string);
+    itkGetStringMacro(FilePrefix);
+
+    itkSetMacro(FilePattern, std::string);
+    itkSetStringMacro(FilePattern);
+    itkGetMacro(FilePattern, std::string);
+    itkGetStringMacro(FilePattern);
+
+    static bool CanReadFile(const std::string filename, const std::string filePrefix, const std::string filePattern);
 
 protected:
     virtual void GenerateData();
@@ -48,7 +57,7 @@ protected:
 
     ~STLFileReader();
 
-    std::string m_FileName;
+    std::string m_FileName, m_FilePrefix, m_FilePattern;
 
 };
 

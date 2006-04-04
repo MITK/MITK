@@ -23,11 +23,15 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkBaseDataIOFactory.h"
 #include "mitkBaseProcess.h"
 #include "mitkIOAdapter.h"
+//#include "mitkConfig.h"
 
 #include "mitkPicFileReaderIOFactory.h"
-//#include "mitkParFileReaderIOFactory.h"
+#include "mitkParRecFileReaderIOFactory.h"
 #include "mitkSTLFileReaderIOFactory.h"
 
+//#ifdef MBI_INTERNAL
+//#include "mitkVesselTreeFileReaderIOFactory.h"
+//#endif // MBI_INTERNAL
 
 #include "itkMutexLock.h"
 #include "itkMutexLockHolder.h"
@@ -35,7 +39,7 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk
 {
 
-BaseData::Pointer BaseDataIOFactory::CreateBaseDataIO(const char* path, FileModeType mode)
+BaseData::Pointer BaseDataIOFactory::CreateBaseDataIO(const std::string path, const std::string filePrefix, const std::string filePattern, FileModeType mode)
 {
 
   RegisterBuiltInFactories();
@@ -61,9 +65,9 @@ BaseData::Pointer BaseDataIOFactory::CreateBaseDataIO(const char* path, FileMode
   { 
     if( mode == ReadMode )
     {
-      if((*k)->CanReadFile(path))
+      if((*k)->CanReadFile(path, filePrefix, filePattern))
       {
-        BaseProcess::Pointer ioObject = (*k)->CreateIOProcessObject(path);
+        BaseProcess::Pointer ioObject = (*k)->CreateIOProcessObject(path, filePrefix, filePattern);
         ioObject->Update();
         return dynamic_cast<BaseData*>(ioObject->GetOutputs()[0].GetPointer());
       }
@@ -91,10 +95,12 @@ void BaseDataIOFactory::RegisterBuiltInFactories()
     itk::MutexLockHolder<itk::SimpleMutexLock> mutexHolder( mutex );
     if( firstTime )
     {
-//      itk::ObjectFactoryBase::RegisterFactory( PicFileReaderIOFactory::New() );
-//      itk::ObjectFactoryBase::RegisterFactory( ParFileReaderIOFactory::New() );
+      itk::ObjectFactoryBase::RegisterFactory( PicFileReaderIOFactory::New() );
+      itk::ObjectFactoryBase::RegisterFactory( ParRecFileReaderIOFactory::New() );
       itk::ObjectFactoryBase::RegisterFactory( STLFileReaderIOFactory::New() );
-      //ObjectFactoryBase::RegisterFactory( PNGBaseDataIOFactory::New() );
+//#ifdef MBI_INTERNAL
+      //itk::ObjectFactoryBase::RegisterFactory( VesselTreeFileReaderIOFactory::New() );
+//#endif // MBI_INTERNAL
       //ObjectFactoryBase::RegisterFactory( VTKBaseDataIOFactory::New() );
       //ObjectFactoryBase::RegisterFactory( GiplBaseDataIOFactory::New() );
       //ObjectFactoryBase::RegisterFactory( BioRadBaseDataIOFactory::New() );

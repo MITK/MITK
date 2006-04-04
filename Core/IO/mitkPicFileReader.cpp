@@ -286,10 +286,9 @@ void mitk::PicFileReader::EnlargeOutputRequestedRegion(itk::DataObject *output)
   output->SetRequestedRegionToLargestPossibleRegion();
 }
 
-bool mitk::PicFileReader::CanReadFile(const char* file) 
+bool mitk::PicFileReader::CanReadFile(const std::string filename, const std::string filePrefix, const std::string filePattern) 
 {
   // First check the extension
-  std::string filename = file;
   if(  filename == "" )
     {
       //std::cout<<"No filename specified."<<std::endl;

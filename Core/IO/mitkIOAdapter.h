@@ -40,8 +40,8 @@ public:
   typedef itk::SmartPointer<const Self>ConstPointer;
   
   /// Create an object and return a pointer to it as a mitk::BaseProcess.
-  virtual itk::SmartPointer<BaseProcess> CreateIOProcessObject(const char* filename) = 0;
-  virtual bool CanReadFile(const char* filename) = 0;
+  virtual itk::SmartPointer<BaseProcess> CreateIOProcessObject(const std::string filename, const std::string filePrefix, const std::string filePattern) = 0;
+  virtual bool CanReadFile(const std::string filename, const std::string filePrefix, const std::string filePattern) = 0;
 
 protected:
   IOAdapterBase() {}
@@ -67,16 +67,18 @@ public:
     
   /** Methods from mitk::BaseProcess. */
   itkFactorylessNewMacro(Self);
-  mitk::BaseProcess::Pointer CreateIOProcessObject(const char* filename)
+  mitk::BaseProcess::Pointer CreateIOProcessObject(const std::string filename, const std::string filePrefix, const std::string filePattern)
   { 
     typename T::Pointer ioProcessObject = T::New();
     ioProcessObject->SetFileName(filename);
+    ioProcessObject->SetFilePrefix(filePrefix);
+    ioProcessObject->SetFilePattern(filePattern);
     return ioProcessObject.GetPointer(); 
   }
   
-  virtual bool CanReadFile(const char* filename)
+  virtual bool CanReadFile(const std::string filename, const std::string filePrefix, const std::string filePattern)
   {
-    return T::CanReadFile(filename);
+    return T::CanReadFile(filename, filePrefix, filePattern);
   }
 
 protected:

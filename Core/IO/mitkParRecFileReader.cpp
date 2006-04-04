@@ -234,10 +234,9 @@ void mitk::ParRecFileReader::GenerateData()
   }
 }
 
-bool mitk::ParRecFileReader::CanReadFile(const char* file) 
+bool mitk::ParRecFileReader::CanReadFile(const std::string filename, const std::string filePrefix, const std::string filePattern) 
 {
   // First check the extension
-  std::string filename = file;
   if(  filename == "" )
     {
       //std::cout<<"No filename specified."<<std::endl;

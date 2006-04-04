@@ -98,6 +98,11 @@ public:
    * Sets default common properites
    */
   void SetDefaultCommonProperties(DataTreeNode::Pointer &node);
+
+  /**
+   * Sets default properites common to all vessel trees
+   */
+  void SetDefaultVesselTreeProperties(DataTreeNode::Pointer &node);
   
 protected:
 

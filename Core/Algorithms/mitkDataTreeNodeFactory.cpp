@@ -119,26 +119,32 @@ mitk::DataTreeNodeFactory::~DataTreeNodeFactory()
 void mitk::DataTreeNodeFactory::GenerateData()
 {
 
-/*  mitk::BaseData::Pointer baseData = mitk::BaseDataIOFactory::CreateBaseDataIO( m_FileName.c_str(), mitk::BaseDataIOFactory::ReadMode );
-  
-  if( baseData.IsNotNull() )
-  {
-    mitk::DataTreeNode::Pointer node = this->GetOutput();
-    node->SetData(baseData);
-    this->SetDefaultCommonProperties( node );
-
-    mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
-    if(image.IsNotNull())
-      this->SetDefaultImageProperties(node);
-    
-    mitk::Surface::Pointer surface = dynamic_cast<mitk::Surface*>(node->GetData());
-    if(surface.IsNotNull())
-      this->SetDefaultSurfaceProperties(node);
-
-    node->SetVisibility(true);    
-  }
-  else
-  { */ 
+//  mitk::BaseData::Pointer baseData = mitk::BaseDataIOFactory::CreateBaseDataIO( m_FileName, m_FilePrefix, m_FilePattern, mitk::BaseDataIOFactory::ReadMode );
+//  
+//  if( baseData.IsNotNull() )
+//  {
+//    mitk::DataTreeNode::Pointer node = this->GetOutput();
+//    node->SetData(baseData);
+//    this->SetDefaultCommonProperties( node );
+//
+//    mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
+//    if(image.IsNotNull())
+//      this->SetDefaultImageProperties(node);
+//    
+//    mitk::Surface::Pointer surface = dynamic_cast<mitk::Surface*>(node->GetData());
+//    if(surface.IsNotNull())
+//      this->SetDefaultSurfaceProperties(node);
+//
+//#ifdef MBI_INTERNAL
+//    mitk::VesselTreeData::Pointer vesselTree = dynamic_cast<mitk::VesselTreeData*>(node->GetData());
+//    if(vesselTree.IsNotNull())
+//      this->SetDefaultVesselTreeProperties(node);
+//#endif // MBI_INTERNAL
+//
+//    node->SetVisibility(true);    
+//  }
+//  else
+//  { 
     if ( m_FileName != "" )
     {
       if ( this->FileNameEndsWith( ".stl" ) )
@@ -1671,3 +1677,17 @@ void mitk::DataTreeNodeFactory::SetDefaultCommonProperties(mitk::DataTreeNode::P
     node->SetProperty( "name", nameProp );
   }
 }
+
+#ifdef MBI_INTERNAL
+void mitk::DataTreeNodeFactory::SetDefaultVesselTreeProperties(mitk::DataTreeNode::Pointer &node)
+{
+  mitk::VesselTreeData::Pointer vesselTree = dynamic_cast<VesselTreeData*>(node->GetData());
+  if(vesselTree.IsNotNull()){
+    mitk::VesselTreeToLookupTableFilter::Pointer lutGenerator = mitk::VesselTreeToLookupTableFilter::New();
+    lutGenerator->SetInput( vesselTree );
+    lutGenerator->Update(); 
+    mitk::VesselTreeLookupTableProperty::Pointer lutProp = new mitk::VesselTreeLookupTableProperty( dynamic_cast<mitk::VesselTreeLookupTable*>( lutGenerator->GetOutput() ) );
+    node->SetProperty( "VesselTreeLookupTable", lutProp );
+  }
+}
+#endif MBI_INTERNAL

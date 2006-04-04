@@ -37,20 +37,26 @@ public:
     /** Method for creation through the object factory. */
     itkNewMacro(Self);
 
+    itkSetMacro(FileName, std::string);
     itkSetStringMacro(FileName);
+    itkGetMacro(FileName, std::string);
     itkGetStringMacro(FileName);
 
+    itkSetMacro(FilePrefix, std::string);
     itkSetStringMacro(FilePrefix);
+    itkGetMacro(FilePrefix, std::string);
     itkGetStringMacro(FilePrefix);
 
+    itkSetMacro(FilePattern, std::string);
     itkSetStringMacro(FilePattern);
+    itkGetMacro(FilePattern, std::string);
     itkGetStringMacro(FilePattern);
 
     virtual void EnlargeOutputRequestedRegion(itk::DataObject *output);
 
     static void ConvertHandedness(ipPicDescriptor* pic);
 
-    static bool CanReadFile(const char* file);
+    static bool CanReadFile(const std::string filename, const std::string filePrefix, const std::string filePattern);
 
 protected:
     //##ModelId=3E187255016C

@@ -25,9 +25,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkIOAdapter.h"
 //#include "mitkConfig.h"
 
-#include "mitkPicFileReaderIOFactory.h"
-#include "mitkParRecFileReaderIOFactory.h"
-#include "mitkSTLFileReaderIOFactory.h"
+#include "mitkPicFileIOFactory.h"
+#include "mitkParRecFileIOFactory.h"
+#include "mitkSTLFileIOFactory.h"
 
 //#ifdef MBI_INTERNAL
 //#include "mitkVesselTreeFileReaderIOFactory.h"
@@ -95,11 +95,11 @@ void BaseDataIOFactory::RegisterBuiltInFactories()
     itk::MutexLockHolder<itk::SimpleMutexLock> mutexHolder( mutex );
     if( firstTime )
     {
-      itk::ObjectFactoryBase::RegisterFactory( PicFileReaderIOFactory::New() );
-      itk::ObjectFactoryBase::RegisterFactory( ParRecFileReaderIOFactory::New() );
-      itk::ObjectFactoryBase::RegisterFactory( STLFileReaderIOFactory::New() );
+      itk::ObjectFactoryBase::RegisterFactory( PicFileIOFactory::New() );
+      itk::ObjectFactoryBase::RegisterFactory( ParRecFileIOFactory::New() );
+      itk::ObjectFactoryBase::RegisterFactory( STLFileIOFactory::New() );
 //#ifdef MBI_INTERNAL
-      //itk::ObjectFactoryBase::RegisterFactory( VesselTreeFileReaderIOFactory::New() );
+      //itk::ObjectFactoryBase::RegisterFactory( VesselTreeFileIOFactory::New() );
 //#endif // MBI_INTERNAL
       //ObjectFactoryBase::RegisterFactory( VTKBaseDataIOFactory::New() );
       //ObjectFactoryBase::RegisterFactory( GiplBaseDataIOFactory::New() );

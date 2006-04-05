@@ -130,6 +130,32 @@ void mitk::PicVolumeTimeSeriesReader::GenerateData()
     }
 }
 
+bool mitk::PicVolumeTimeSeriesReader::CanReadFile(const std::string filename, const std::string filePrefix, const std::string filePattern) 
+{
+  if( filePattern != "" && filePrefix != "" )
+    return false;
+
+  bool extensionFound = false;
+  std::string::size_type PICPos = filePattern.rfind(".pic");
+  if ((PICPos != std::string::npos)
+      && (PICPos == filePattern.length() - 4))
+    {
+    extensionFound = true;
+    }
+
+  PICPos = filePattern.rfind(".pic.gz");
+  if ((PICPos != std::string::npos)
+      && (PICPos == filePattern.length() - 7))
+    {
+    extensionFound = true;
+    }
+
+  if( !extensionFound )
+    return false;
+
+  return true;
+}
+
 mitk::PicVolumeTimeSeriesReader::PicVolumeTimeSeriesReader()
 {
     //this->DebugOn();

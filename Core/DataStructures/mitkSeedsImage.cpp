@@ -94,10 +94,10 @@ void mitk::SeedsImage::AddSeedPoint(SeedsImageType* itkImage)
   const unsigned int dimension = ::itk::GetImageDimension<SeedsImageType>::ImageDimension;
 //  itk::Index<dimension> baseIndex;
   itk::Index<dimension> setIndex;
-  itk::Point<typename SeedsImageType::PixelType, dimension> p;
-  p[0] = point[0];
-  p[1] = point[1];
-  p[2] = point[2];
+  //itk::Point<typename SeedsImageType::PixelType, dimension> p;
+  //p[0] = point[0];
+  //p[1] = point[1];
+  //p[2] = point[2];
   //itk::ContinuousIndex<typename SeedsImageType::PixelType, dimension> contIndex;
   //itkImage->TransformPhysicalPointToContinuousIndex(p, contIndex);
   itk::Index<dimension> contIndex;
@@ -241,16 +241,16 @@ void mitk::SeedsImage::PointInterpolation(SeedsImageType* itkImage)
   int distance_iterator;
   float t;
 
-  itk::Point<typename SeedsImageType::PixelType, dimension> p;
-  p[0] = point[0];
-  p[1] = point[1];
-  p[2] = point[2];
+  //itk::Point<typename SeedsImageType::PixelType, dimension> p;
+  //p[0] = point[0];
+  //p[1] = point[1];
+  //p[2] = point[2];
   //itk::ContinuousIndex<typename SeedsImageType::PixelType, dimension> pointIndex;
   //itk::ContinuousIndex<typename SeedsImageType::PixelType, dimension> last_pointIndex;
   //itkImage->TransformPhysicalPointToContinuousIndex(p, pointIndex);
-  p[0] = last_point[0];
-  p[1] = last_point[1];
-  p[2] = last_point[2];
+  //p[0] = last_point[0];
+  //p[1] = last_point[1];
+  //p[2] = last_point[2];
   //itkImage->TransformPhysicalPointToContinuousIndex(p, last_pointIndex);
 
   // coordinate transformation from physical coordinates to index coordinates

@@ -60,12 +60,13 @@ bool mitk::StlVolumeTimeSeriesReader::CanReadFile(const std::string filename, co
     return false;
 
   bool extensionFound = false;
-  std::string::size_type STLPos = filePattern.rfind(".Stl");
-  if ((STLPos != std::string::npos)
-      && (STLPos == filePattern.length() - 4))
-    {
+  std::string::size_type STLPos = filePattern.rfind(".stl");
+  if ((STLPos != std::string::npos) && (STLPos == filePattern.length() - 4))
     extensionFound = true;
-    }
+
+  STLPos = filePattern.rfind(".STL");
+  if ((STLPos != std::string::npos) && (STLPos == filePattern.length() - 4))
+    extensionFound = true;
 
   if( !extensionFound )
     return false;

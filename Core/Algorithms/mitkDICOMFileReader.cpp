@@ -140,6 +140,26 @@ void mitk::DICOMFileReader::GenerateData()
   }
 }
 
+bool mitk::DICOMFileReader::CanReadFile(const std::string filename, const std::string filePrefix, const std::string filePattern) 
+{
+  if(  filename == "" )
+    return false;
+
+  bool extensionFound = false;
+  std::string::size_type DICOMPos = filename.rfind(".ipdcm");
+  if ((DICOMPos != std::string::npos) && (DICOMPos == filename.length() - 6))
+    extensionFound = true;
+
+  DICOMPos = filename.rfind(".IPDCM");
+  if ((DICOMPos != std::string::npos) && (DICOMPos == filename.length() - 6))
+    extensionFound = true;
+
+  if( !extensionFound )
+    return false;
+
+  return true;
+}
+
 //##ModelId=3E1874D202D0
 mitk::DICOMFileReader::DICOMFileReader()
 : m_FileName(""), m_FilePrefix(""), m_FilePattern("")

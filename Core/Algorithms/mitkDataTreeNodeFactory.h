@@ -103,6 +103,16 @@ public:
    * Sets default properites common to all vessel trees
    */
   void SetDefaultVesselTreeProperties(DataTreeNode::Pointer &node);
+
+  /**
+   * Sets default properites common to ultrasound content
+   */
+  void SetDefaultUltraSoundProperties(DataTreeNode::Pointer &node);
+
+  /**
+   * Sets default properites common to tus files
+   */
+  void SetDefaultTusProperties(int count, DataTreeNode::Pointer &node);
   
 protected:
 

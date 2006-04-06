@@ -50,7 +50,7 @@ public:
   typedef enum { ReadMode, WriteMode } FileModeType;
   
   /** Create the appropriate BaseData depending on the particulars of the file. */
-  static mitk::BaseData::Pointer CreateBaseDataIO(const std::string path, const std::string filePrefix, const std::string filePattern, FileModeType mode);
+  static std::vector<mitk::BaseData::Pointer>* CreateBaseDataIO(const std::string path, const std::string filePrefix, const std::string filePattern, FileModeType mode);
 
   /** Register Built-in factories */
   static void RegisterBuiltInFactories();

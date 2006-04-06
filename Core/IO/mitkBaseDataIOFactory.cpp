@@ -23,15 +23,23 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkBaseDataIOFactory.h"
 #include "mitkBaseProcess.h"
 #include "mitkIOAdapter.h"
-//#include "mitkConfig.h"
+#include "mitkConfig.h"
 
 #include "mitkPicFileIOFactory.h"
 #include "mitkParRecFileIOFactory.h"
 #include "mitkSTLFileIOFactory.h"
+#include "mitkVtkSurfaceIOFactory.h"
+#include "mitkVtkImageIOFactory.h"
+#include "mitkPicVolumeTimeSeriesIOFactory.h"
 
-//#ifdef MBI_INTERNAL
-//#include "mitkVesselTreeFileReaderIOFactory.h"
-//#endif // MBI_INTERNAL
+
+#ifdef MBI_INTERNAL
+#include "mitkVesselTreeFileIOFactory.h"
+//#include "mitkVesselGraphFileIOFactory.h"
+#include "mitkDvgFileIOFactory.h"
+#include "mitkUvgFileIOFactory.h"
+#include "mitkSsmFileIOFactory.h"
+#endif // MBI_INTERNAL
 
 #include "itkMutexLock.h"
 #include "itkMutexLockHolder.h"
@@ -39,10 +47,11 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk
 {
 
-BaseData::Pointer BaseDataIOFactory::CreateBaseDataIO(const std::string path, const std::string filePrefix, const std::string filePattern, FileModeType mode)
+std::vector<BaseData::Pointer>* BaseDataIOFactory::CreateBaseDataIO(const std::string path, const std::string filePrefix, const std::string filePattern, FileModeType mode)
 {
 
   RegisterBuiltInFactories();
+  std::vector<BaseData::Pointer>* baseDataVector = new std::vector<BaseData::Pointer>;
   std::list<IOAdapterBase::Pointer> possibleIOAdapter;
   std::list<LightObject::Pointer> allobjects = itk::ObjectFactoryBase::CreateAllInstance("mitkIOAdapter");
   for(std::list<LightObject::Pointer>::iterator i = allobjects.begin();
@@ -69,7 +78,18 @@ BaseData::Pointer BaseDataIOFactory::CreateBaseDataIO(const std::string path, co
       {
         BaseProcess::Pointer ioObject = (*k)->CreateIOProcessObject(path, filePrefix, filePattern);
         ioObject->Update();
-        return dynamic_cast<BaseData*>(ioObject->GetOutputs()[0].GetPointer());
+        //return dynamic_cast<BaseData*>(ioObject->GetOutputs()[0].GetPointer());
+        int numberOfContents = (int)ioObject->GetNumberOfOutputs();
+        baseDataVector->resize(numberOfContents-1);
+        BaseData::Pointer baseData;
+        std::vector <BaseData::Pointer>::iterator it;
+        it = baseDataVector->begin();
+        for(int i=0; i<numberOfContents; i++){
+          baseData = dynamic_cast<BaseData*>(ioObject->GetOutputs()[i].GetPointer());
+          baseDataVector->insert(it, baseData);
+          ++it;
+        }
+        return baseDataVector;
       }
     }
     //else if( mode == WriteMode )
@@ -81,7 +101,7 @@ BaseData::Pointer BaseDataIOFactory::CreateBaseDataIO(const std::string path, co
 
     //}
   }
-  return 0;
+  return baseDataVector;
 }
 
 void BaseDataIOFactory::RegisterBuiltInFactories()
@@ -98,12 +118,17 @@ void BaseDataIOFactory::RegisterBuiltInFactories()
       itk::ObjectFactoryBase::RegisterFactory( PicFileIOFactory::New() );
       itk::ObjectFactoryBase::RegisterFactory( ParRecFileIOFactory::New() );
       itk::ObjectFactoryBase::RegisterFactory( STLFileIOFactory::New() );
-//#ifdef MBI_INTERNAL
-      //itk::ObjectFactoryBase::RegisterFactory( VesselTreeFileIOFactory::New() );
-//#endif // MBI_INTERNAL
-      //ObjectFactoryBase::RegisterFactory( VTKBaseDataIOFactory::New() );
-      //ObjectFactoryBase::RegisterFactory( GiplBaseDataIOFactory::New() );
-      //ObjectFactoryBase::RegisterFactory( BioRadBaseDataIOFactory::New() );
+      itk::ObjectFactoryBase::RegisterFactory( VtkSurfaceIOFactory::New() );
+      itk::ObjectFactoryBase::RegisterFactory( VtkImageIOFactory::New() );
+      itk::ObjectFactoryBase::RegisterFactory( PicVolumeTimeSeriesIOFactory::New() );
+#ifdef MBI_INTERNAL
+      itk::ObjectFactoryBase::RegisterFactory( VesselTreeFileIOFactory::New() );
+      //itk::ObjectFactoryBase::RegisterFactory( VesselGraphFileIOFactory<Directed>::New() );
+      itk::ObjectFactoryBase::RegisterFactory( UvgFileIOFactory::New() );
+      itk::ObjectFactoryBase::RegisterFactory( DvgFileIOFactory::New() );
+      itk::ObjectFactoryBase::RegisterFactory( SsmFileIOFactory::New() );
+#endif // MBI_INTERNAL
+
       //ObjectFactoryBase::RegisterFactory( LSMBaseDataIOFactory::New()); //should be before TIFF
       //ObjectFactoryBase::RegisterFactory( NiftiBaseDataIOFactory::New());
       //ObjectFactoryBase::RegisterFactory( AnalyzeBaseDataIOFactory::New());

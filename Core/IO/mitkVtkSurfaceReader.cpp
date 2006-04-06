@@ -76,12 +76,6 @@ bool mitk::VtkSurfaceReader::CanReadFile(const std::string filename, const std::
     {
     extensionFound = true;
     }
-  VtkPos = filename.rfind(".pvtk");
-  if ((VtkPos != std::string::npos)
-      && (VtkPos == filename.length() - 5))
-    {
-    extensionFound = true;
-    }
 
   if (extensionFound)
   {

@@ -209,10 +209,10 @@ void mitk::SeedsImage::AddSeedPoint(SeedsImageType* itkImage)
                 getIndex[1]=y + m_Radius -contIndex[1];
                 getIndex[0]=x + m_Radius -contIndex[0];
                 //float val = iterator.Get() + mask->GetPixel(getIndex) ;
-                typename SeedsImageType::PixelType val = iterator.Get() + mask->GetPixel(getIndex);
-                if (val > 128) val = 128; 
-                if (val < -128) val = 128; 
-                iterator.Set( val );
+                //typename SeedsImageType::PixelType val = iterator.Get() + (typename SeedsImageType::PixelType)mask->GetPixel(getIndex);
+                //if (val > 128) val = 128; 
+                //if (val < -128) val = 128; 
+                //iterator.Set( val );
               }
               else
               {

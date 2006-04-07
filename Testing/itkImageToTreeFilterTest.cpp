@@ -21,9 +21,12 @@ PURPOSE.  See the above copyright notices for more information.
 #include <string>
 
 #include <itkImage.h>
+#include <itkTimeProbe.h>
 
 #include <itkImageToTreeFilter.h>
 #include <itkITTFilterContext.h>
+#include <itkProfileData.h>
+#include <itkProfileGradientFinder.h>
 #include <itkRegistrationModelTree.h>
 #include <itkRegistrationModelXMLReader.h>
 #include <itkRegistrationModelXMLWriter.h>
@@ -55,6 +58,8 @@ typedef OutputTreeType::Pointer                       OutputTreePointer;
 
 typedef short                                         OutputPixelType;
 typedef itk::Image<OutputPixelType, Dimension>        OutputImageType;
+typedef OutputImageType::Pointer                      OutputImagePointer;
+typedef OutputImageType::PointType                    OutputImagePointType;
 
 // test classes
 typedef itk::ImageToTreeFilter<ImageType, OutputTreeType>
@@ -100,6 +105,12 @@ typedef TransformType::OutputPointType                TransformOutputPointType;
 typedef itk::TreeToBinaryImageFilter<OutputTreeType, RegistratedModelType, OutputImageType>
 TreeToImageFilterType;
 typedef TreeToImageFilterType::Pointer                TreeToImageFilterPointer;
+
+typedef itk::ProfileGradientFinder<OutputImageType>   ProfileGradientFinderType;
+typedef ProfileGradientFinderType::Pointer            ProfileGradientFinderPointer;
+
+typedef ProfileGradientFinderType::ProfileDataType    ProfileDataType;
+typedef ProfileDataType::Pointer                      ProfileDataPointer;
 
 typedef std::list<int>                                ResultListType;
 
@@ -515,6 +526,64 @@ int testTreeToBinaryImageFilter()
 }
 
 
+/****************************************************************
+ * TEST: ProfileGradientFinder
+ ****************************************************************/
+int testProfileGradientFinder()
+{
+  std::cout << " *** Testing the ProfileGradientFinder ***\n";
+
+  OutputImagePointer image = OutputImageType::New();
+  OutputImageType::SizeType size;
+  size.Fill(100);
+  image->SetRegions(size);
+  image->Allocate();
+  image->FillBuffer(0);
+  OutputImageType::IndexType index;
+  index.Fill(10);
+  image->SetPixel(index, 255);
+
+  OutputImageType::PointType startPoint;
+  startPoint.Fill(0);
+  OutputImageType::PointType endPoint;
+  endPoint.Fill(50);
+
+  itk::TimeProbe profileClock;
+
+  ProfileGradientFinderPointer gradientFinder = ProfileGradientFinderType::New();
+  gradientFinder->SetInput(image);
+  gradientFinder->SetStartPoint(startPoint);
+  gradientFinder->SetEndPoint(endPoint);
+
+  profileClock.Start();
+  gradientFinder->Update();
+  profileClock.Stop();
+
+  std::cout << "Counting profile took " << profileClock.GetMeanTime() << "s" << std::endl;
+
+  ProfileDataType* profileData = gradientFinder->GetOutput();
+  if(profileData == NULL)
+  {
+    std::cout << "Profile data is NULL!" << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  OutputImageType::PointType bestPoint = profileData->GetPoint();
+  const unsigned int imageDimension = image->GetImageDimension();
+  for(unsigned int dim = 0; dim < imageDimension; dim++)
+  {
+    const double diff = bestPoint[dim] - 50;
+    if (diff > 1.0 || diff < -1.0)
+    {
+      std::cout << "Point outisde of tolerance: " << bestPoint << std::endl;
+      return EXIT_FAILURE;
+    }
+  }
+
+  std::cout << " *** [TEST PASSED] ***\n";
+  return EXIT_SUCCESS;
+}
+
 int itkImageToTreeFilterTest(int i, char* argv[] )
 {
   ResultListType resultList;
@@ -526,6 +595,7 @@ int itkImageToTreeFilterTest(int i, char* argv[] )
   resultList.push_back(testRegistrationModelXMLWriter());
   resultList.push_back(testRegistratedModel());
   resultList.push_back(testTreeToBinaryImageFilter());
+  resultList.push_back(testProfileGradientFinder());
 
   std::cout << " *** [ALL TESTS DONE] ***\n";
 

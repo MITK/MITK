@@ -68,6 +68,13 @@ bool mitk::ObjFileReader::CanReadFile(const std::string filename, const std::str
     extensionFound = true;
     }
 
+  ObjPos = filename.rfind(".OBJ");
+  if ((ObjPos != std::string::npos)
+      && (ObjPos == filename.length() - 4))
+    {
+    extensionFound = true;
+    }
+
   if( !extensionFound )
     {
       //std::cout<<"The filename extension is not recognized."<<std::endl;

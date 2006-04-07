@@ -251,6 +251,13 @@ bool mitk::ParRecFileReader::CanReadFile(const std::string filename, const std::
     extensionFound = true;
     }
 
+  PARPos = filename.rfind(".PAR");
+  if ((PARPos != std::string::npos)
+      && (PARPos == filename.length() - 4))
+    {
+    extensionFound = true;
+    }
+
   if( !extensionFound )
     {
       //std::cout<<"The filename extension is not recognized."<<std::endl;

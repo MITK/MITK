@@ -303,6 +303,13 @@ bool mitk::PicFileReader::CanReadFile(const std::string filename, const std::str
     extensionFound = true;
     }
 
+  PICPos = filename.rfind(".PIC");
+  if ((PICPos != std::string::npos)
+      && (PICPos == filename.length() - 4))
+    {
+    extensionFound = true;
+    }
+
   PICPos = filename.rfind(".pic.gz");
   if ((PICPos != std::string::npos)
       && (PICPos == filename.length() - 7))

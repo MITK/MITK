@@ -72,6 +72,13 @@ bool mitk::STLFileReader::CanReadFile(const std::string filename, const std::str
     extensionFound = true;
     }
 
+  STLPos = filename.rfind(".STL");
+  if ((STLPos != std::string::npos)
+      && (STLPos == filename.length() - 4))
+    {
+    extensionFound = true;
+    }
+
   if( !extensionFound )
     {
       //std::cout<<"The filename extension is not recognized."<<std::endl;

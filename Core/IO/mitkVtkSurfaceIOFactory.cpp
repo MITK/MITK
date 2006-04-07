@@ -45,7 +45,7 @@ const char* VtkSurfaceIOFactory::GetITKSourceVersion() const
 
 const char* VtkSurfaceIOFactory::GetDescription() const
 {
-  return "VtkSurface IO Factory, allows the loading of STL files";
+  return "VtkSurface IO Factory, allows the loading of Vtk files";
 }
 
 } // end namespace mitk

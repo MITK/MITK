@@ -58,7 +58,7 @@ int QmitkPiecewiseFunctionCanvas::GetNearHandle(int x,int y,unsigned int maxSqua
   for (int i=0; i< m_PiecewiseFunction->GetSize(); i++)
   {
     std::pair<int,int> point = this->FunctionToCanvas(std::make_pair(dp[i*2],dp[i*2+1]));
-    if ((point.first-x)*(point.first-x)+(point.second-y)*(point.second-y) < maxSquaredDistance)
+    if ((point.first-x)*(point.first-x)+(point.second-y)*(point.second-y) <= maxSquaredDistance)
     {
       return i;
     }

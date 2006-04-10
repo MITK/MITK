@@ -28,7 +28,7 @@ class QmitkColorTransferFunctionCanvas : public QmitkTransferFunctionCanvas {
 
     QmitkColorTransferFunctionCanvas( QWidget * parent=0, const char * name=0, WFlags f = false );
     virtual void paintEvent( QPaintEvent* e );
-    int GetNearHandle(int x,int y,unsigned int maxSquaredDistance = 6);
+    int GetNearHandle(int x,int y,unsigned int maxSquaredDistance = 32);
     void SetColorTransferFunction(vtkColorTransferFunction* colorTransferFunction)
     {
       this->m_ColorTransferFunction = colorTransferFunction;

@@ -51,7 +51,7 @@ typedef itk::RegistrationModel<PixelType>             RegistrationModelType;
 typedef RegistrationModelType::Pointer                RegistrationModelPointer;
 
 // tree type
-typedef itk::RegistrationModelTree<RegistratedModelPointer>
+typedef itk::RegistrationModelTree<RegistrationModelType>
 OutputTreeType;
 typedef OutputTreeType::TreeContainerPointer          OutputTreeContainerPointer;
 typedef OutputTreeType::Pointer                       OutputTreePointer;
@@ -102,7 +102,7 @@ typedef TransformType::OutputVectorType               TransformOutputVectorType;
 typedef TransformType::InputPointType                 TransformInputPointType;
 typedef TransformType::OutputPointType                TransformOutputPointType;
 
-typedef itk::TreeToBinaryImageFilter<OutputTreeType, RegistratedModelType, OutputImageType>
+typedef itk::TreeToBinaryImageFilter<OutputTreeType, OutputImageType>
 TreeToImageFilterType;
 typedef TreeToImageFilterType::Pointer                TreeToImageFilterPointer;
 
@@ -500,7 +500,7 @@ int testTreeToBinaryImageFilter()
   model1->SetBaseModel((RegistrationModelPointer)tubeSegment);
   model1->SetTransform((BaseTransformPointer)transform);
   model1->SetTransformParameters(transform->GetParameters());
-  treeContainer->SetRoot(model1);
+  treeContainer->SetRoot(static_cast<RegistrationModelPointer>(model1));
 
   TransformOutputVectorType offset2;
   offset2.Fill(2);
@@ -509,7 +509,8 @@ int testTreeToBinaryImageFilter()
   model2->SetBaseModel((RegistrationModelPointer)tubeSegment);
   model2->SetTransform((BaseTransformPointer)transform);
   model2->SetTransformParameters(transform->GetParameters());
-  treeContainer->Add(model2, model1);
+  treeContainer->Add(static_cast<RegistrationModelPointer>(model2),
+                     static_cast<RegistrationModelPointer>(model1));
 
   TreeToImageFilterPointer treeToImageFilter = TreeToImageFilterType::New();
   OutputImageType::SizeType size;
@@ -543,9 +544,9 @@ int testProfileGradientFinder()
   index.Fill(10);
   image->SetPixel(index, 255);
 
-  OutputImageType::PointType startPoint;
+  ProfileGradientFinderType::VectorType startPoint;
   startPoint.Fill(0);
-  OutputImageType::PointType endPoint;
+  ProfileGradientFinderType::VectorType endPoint;
   endPoint.Fill(50);
 
   itk::TimeProbe profileClock;
@@ -568,7 +569,7 @@ int testProfileGradientFinder()
     return EXIT_FAILURE;
   }
 
-  OutputImageType::PointType bestPoint = profileData->GetPoint();
+  ProfileDataType::PointType bestPoint = profileData->GetPoint();
   const unsigned int imageDimension = image->GetImageDimension();
   for(unsigned int dim = 0; dim < imageDimension; dim++)
   {

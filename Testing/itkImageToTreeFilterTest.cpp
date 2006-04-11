@@ -520,7 +520,16 @@ int testTreeToBinaryImageFilter()
   treeToImageFilter->SetOutputImageSize(size);
   treeToImageFilter->SetOutputImageSpacing(spacing);
   treeToImageFilter->SetInput(outputTree);
-  treeToImageFilter->Update();
+  try
+  {
+    treeToImageFilter->Update();
+  }
+  catch(itk::ExceptionObject ex)
+  {
+    std::cout << "Exception occured" << std::endl;
+    std::cout << ex << std::endl;
+    return EXIT_FAILURE;
+  }
 
   std::cout << " *** [TEST PASSED] ***\n";
   return EXIT_SUCCESS;

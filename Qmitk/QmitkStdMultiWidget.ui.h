@@ -80,6 +80,15 @@ void QmitkStdMultiWidget::init()
   layer = new mitk::IntProperty(1000);
   planeNode->SetProperty("layer",layer);
 
+  // create a slice rotator
+  //m_SlicesRotator = mitk::SlicesRotator::New();
+  // @TODO next line causes sure memory leak
+  m_SlicesRotation = false; // rotator will be created nonetheless (will be switched on and off)
+  m_SlicesRotator = new mitk::SlicesRotator("slices-rotator");
+  m_SlicesRotator->AddSliceController( mitkWidget1->GetSliceNavigationController() );
+  m_SlicesRotator->AddSliceController( mitkWidget2->GetSliceNavigationController() );
+  m_SlicesRotator->AddSliceController( mitkWidget3->GetSliceNavigationController() );
+
   //initialize timeNavigationController: send time via sliceNavigationControllers
   timeNavigationController = new mitk::SliceNavigationController(NULL);
   timeNavigationController->ConnectGeometryTimeEvent(mitkWidget1->GetSliceNavigationController(), false);
@@ -203,7 +212,6 @@ void QmitkStdMultiWidget::changeLayoutToDefault()
   m_Layout = LAYOUT_DEFAULT;
 }
 
-
 void QmitkStdMultiWidget::changeLayoutToBig3D()
 {
   delete QmitkStdMultiWidgetLayout ;
@@ -246,7 +254,6 @@ void QmitkStdMultiWidget::changeLayoutToWidget1()
 
   m_Layout = LAYOUT_WIDGET1;
 }
-
 
 void QmitkStdMultiWidget::changeLayoutToWidget2()
 {
@@ -346,7 +353,6 @@ void QmitkStdMultiWidget::changeLayoutToRowWidget3And4()
 
   m_Layout = LAYOUT_ROW_WIDGET_3_AND_4;
 }
-
 
 void QmitkStdMultiWidget::changeLayoutToColumnWidget3And4()//doesn't work yet
 {
@@ -449,7 +455,6 @@ void QmitkStdMultiWidget::AddDisplayPlaneSubTree(mitk::DataTreeIteratorBase* it)
   planesIterator = dit;
 }
 
-
 mitk::SliceNavigationController* QmitkStdMultiWidget::GetTimeNavigationController()
 {
   return timeNavigationController.GetPointer();
@@ -549,7 +554,6 @@ bool QmitkStdMultiWidget::InitializeStandardViews(mitk::DataTreeIteratorBase * i
   }
   return boundingBoxInitialized;
 }
-
 
 bool QmitkStdMultiWidget::InitializeStandardViews( const mitk::Geometry3D * geometry )
 {
@@ -730,46 +734,72 @@ void QmitkStdMultiWidget::AdjustCross()
   delete stateEvent;  
 }
 
-
-
-
 void QmitkStdMultiWidget::EnableNavigationControllerEventListening()
 {
   // Let NavigationControllers listen to GlobalInteraction
-  mitk::GlobalInteraction *globalInteraction =
-    mitk::GlobalInteraction::GetInstance();
-
-  globalInteraction->AddListener( mitkWidget1->GetSliceNavigationController() );
-  globalInteraction->AddListener( mitkWidget2->GetSliceNavigationController() );
-  globalInteraction->AddListener( mitkWidget3->GetSliceNavigationController() );
-  globalInteraction->AddListener( mitkWidget4->GetSliceNavigationController() );
-
+  mitk::GlobalInteraction* globalInteraction = mitk::GlobalInteraction::GetInstance();
+  
+  if (m_SlicesRotation)
+  {
+    globalInteraction->AddListener( m_SlicesRotator );
+  }
+  else
+  {
+    globalInteraction->AddListener( mitkWidget1->GetSliceNavigationController() );
+    globalInteraction->AddListener( mitkWidget2->GetSliceNavigationController() );
+    globalInteraction->AddListener( mitkWidget3->GetSliceNavigationController() );
+    globalInteraction->AddListener( mitkWidget4->GetSliceNavigationController() );
+  }
+    
   globalInteraction->AddListener( timeNavigationController );
 }
-
 
 void QmitkStdMultiWidget::DisableNavigationControllerEventListening()
 {
   // Do not let NavigationControllers listen to GlobalInteraction
-  mitk::GlobalInteraction *globalInteraction =
-    mitk::GlobalInteraction::GetInstance();
+  mitk::GlobalInteraction* globalInteraction = mitk::GlobalInteraction::GetInstance();
 
-  globalInteraction->RemoveListener(
-    mitkWidget1->GetSliceNavigationController()
-  );
-  globalInteraction->RemoveListener(
-    mitkWidget2->GetSliceNavigationController()
-  );
-  globalInteraction->RemoveListener(
-    mitkWidget3->GetSliceNavigationController()
-  );
-  globalInteraction->RemoveListener(
-    mitkWidget4->GetSliceNavigationController()
-  );
+  if (m_SlicesRotation)
+  {
+    globalInteraction->RemoveListener( m_SlicesRotator );
+  }
+  else
+  {
+    globalInteraction->RemoveListener( mitkWidget1->GetSliceNavigationController());
+    globalInteraction->RemoveListener( mitkWidget2->GetSliceNavigationController());
+    globalInteraction->RemoveListener( mitkWidget3->GetSliceNavigationController());
+    globalInteraction->RemoveListener( mitkWidget4->GetSliceNavigationController());
+  }
   
   globalInteraction->RemoveListener( timeNavigationController );
 }
 
+void QmitkStdMultiWidget::EnableSliceRotation(bool on)
+{
+  if (on == m_SlicesRotation) return;
+
+  m_SlicesRotation = on;
+  // @ TODO add bool m_NavigationControllerListeningEnable!
+  mitk::GlobalInteraction* globalInteraction = mitk::GlobalInteraction::GetInstance();
+  if (on)
+  {
+    globalInteraction->RemoveListener( mitkWidget1->GetSliceNavigationController());
+    globalInteraction->RemoveListener( mitkWidget2->GetSliceNavigationController());
+    globalInteraction->RemoveListener( mitkWidget3->GetSliceNavigationController());
+    globalInteraction->RemoveListener( mitkWidget4->GetSliceNavigationController());
+    globalInteraction->AddListener( m_SlicesRotator );
+  }
+  else
+  {
+    globalInteraction->RemoveListener( m_SlicesRotator );
+    globalInteraction->AddListener( mitkWidget1->GetSliceNavigationController() );
+    globalInteraction->AddListener( mitkWidget2->GetSliceNavigationController() );
+    globalInteraction->AddListener( mitkWidget3->GetSliceNavigationController() );
+    globalInteraction->AddListener( mitkWidget4->GetSliceNavigationController() );
+
+    ReInitializeStandardViews();
+  }
+}
 
 int QmitkStdMultiWidget::GetLayout() const
 {

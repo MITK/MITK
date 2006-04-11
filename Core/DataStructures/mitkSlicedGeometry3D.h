@@ -188,6 +188,8 @@ public:
   virtual void InitializePlanes(const mitk::Geometry3D* geometry3D, mitk::PlaneGeometry::PlaneOrientation planeorientation, bool top=true, bool frontside=true, bool rotated=false);
 
   virtual void SetImageGeometry(const bool isAnImageGeometry);
+  
+  virtual void ExecuteOperation(Operation* operation); 
 protected:
   SlicedGeometry3D();
 

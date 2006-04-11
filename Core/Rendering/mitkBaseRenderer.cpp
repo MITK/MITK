@@ -280,6 +280,25 @@ void mitk::BaseRenderer::SetGeometry(const itk::EventObject & geometrySendEvent)
   SetWorldGeometry(sendEvent ->GetTimeSlicedGeometry());
 }
 
+void mitk::BaseRenderer::UpdateGeometry(const itk::EventObject & geometryUpdateEvent)
+{
+  const SliceNavigationController::GeometryUpdateEvent* updateEvent =
+    dynamic_cast<const SliceNavigationController::GeometryUpdateEvent*>(&geometryUpdateEvent);
+
+  assert(updateEvent !=NULL);
+
+  if (m_CurrentWorldGeometry.IsNotNull())
+  {
+    SlicedGeometry3D* slicedWorldGeometry=dynamic_cast<SlicedGeometry3D*>(m_CurrentWorldGeometry.GetPointer());
+    if (slicedWorldGeometry)
+    {
+      Geometry2D* geometry2D = slicedWorldGeometry->GetGeometry2D(m_Slice);
+    
+      SetCurrentWorldGeometry2D(geometry2D); // calls Modified()
+    }
+  }
+}
+
 void mitk::BaseRenderer::SetGeometrySlice(const itk::EventObject & geometrySliceEvent)
 {
   const SliceNavigationController::GeometrySliceEvent* sliceEvent =

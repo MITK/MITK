@@ -361,3 +361,19 @@ bool mitk::TimeSlicedGeometry::ReadXMLData( XMLReader& xmlReader )
 
   return true;
 }
+
+void mitk::TimeSlicedGeometry::ExecuteOperation(Operation* operation)
+{
+  // reach through to all time steps
+  for (std::vector<Geometry3D::Pointer>::iterator iter = m_Geometry3Ds.begin();
+       iter != m_Geometry3Ds.end();
+       ++iter)
+  {
+    (*iter)->ExecuteOperation(operation);
+  }
+    
+  Geometry3D::ExecuteOperation(operation);
+
+  Modified();
+}
+

@@ -581,10 +581,10 @@
   <stateMachine NAME="navigation">
     <state NAME="neutral" ID="1" START_STATE="TRUE" X_POS="189" Y_POS="175" WIDTH="100" HEIGHT="50">
       <transition NAME="send Koordinates press" NEXT_STATE_ID="1" EVENT_ID="1">
-        <action ID="90" />
+        <action ID="92" />
       </transition>
       <transition NAME="send Koordinates move" NEXT_STATE_ID="1" EVENT_ID="530">
-        <action ID="90" />
+        <action ID="92" />
       </transition>
       <transition NAME="send Koordinates release" NEXT_STATE_ID="1" EVENT_ID="505">
         <action ID="42" />
@@ -2799,10 +2799,38 @@
       <transition NAME="no" NEXT_STATE_ID="11" EVENT_ID="1003" />
     </state>
   </stateMachine>
+  <stateMachine NAME="slices-rotator">
+    <state NAME="neutral" ID="1" START_STATE="TRUE">
+      <!-- mouse down: jump to decision state -->
+      <transition NAME="mouse down" NEXT_STATE_ID="2" EVENT_ID="1">
+        <action ID="21"> <!-- AcCheckPoint --> </action>
+      </transition>
+    </state>
+    <state NAME="rotate?" ID="2">
+      <transition NAME="yes" NEXT_STATE_ID="3" EVENT_ID="1004"/>
+      <transition NAME="no" NEXT_STATE_ID="4" EVENT_ID="1003">
+        <action ID="92"> <!--AcMove--> </action>
+      </transition>
+    </state>
+    <state NAME="rotate" ID="3">
+      <!-- send rotate events -->
+      <transition NAME="mouse move" NEXT_STATE_ID="3" EVENT_ID="530">
+        <action ID="1005"> <!--AcRotate--> </action>
+      </transition>
+      <transition NAME="mouse release" NEXT_STATE_ID="1" EVENT_ID="505"/>
+    </state>
+    <state NAME="move" ID="4">
+      <!-- send move events -->
+      <transition NAME="mouse move" NEXT_STATE_ID="4" EVENT_ID="530">
+        <action ID="92"> <!--AcMove--> </action>
+      </transition>
+      <transition NAME="mouse release" NEXT_STATE_ID="1" EVENT_ID="505"/>
+    </state>
+  </stateMachine>
 </mitkInteraktionStates>
-<!-- DOKUMENTATION -->
-<!-- this is StateMachine.xml| includes Information about different StateMachines and Events. Used by EventMapper and StateMachineFactory-->
-<!-- ***WARNING*** do not use any &, % and so on in NAME -->
+<!-- DOCUMENTATION -->
+<!-- This is StateMachine.xml. Includes Information about different StateMachines and Events. Used by EventMapper and StateMachineFactory -->
+<!-- ***WARNING*** do not use any &, % and so on in NAME. TODO "and so on" is not helpful at all! What is the problem with these chars?-->
 <!-- -->
 <!-- -->
 <!-- FAQ -->

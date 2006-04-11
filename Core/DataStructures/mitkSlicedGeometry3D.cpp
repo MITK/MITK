@@ -16,10 +16,11 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#include "mitkSlicedGeometry3D.h"
-#include "mitkPlaneGeometry.h"
+#include <mitkSlicedGeometry3D.h>
+#include <mitkPlaneGeometry.h>
 #include <mitkXMLWriter.h>
 #include <mitkXMLReader.h>
+#include <mitkRotationOperation.h>
 
 const std::string mitk::SlicedGeometry3D::DIRECTION_VECTOR = "DIRECTION_VECTOR";
 const std::string mitk::SlicedGeometry3D::EVENLY_SPACED = "EVENLY_SPACED";
@@ -464,4 +465,50 @@ bool mitk::SlicedGeometry3D::ReadXMLData( XMLReader& xmlReader )
 
 
   return false;
+}
+
+void mitk::SlicedGeometry3D::ExecuteOperation(Operation* operation)
+{
+  // processing is done for all operations, but only with a RotationOperation in mind.
+  // @TODO check the operation for Move, Rotate, Scale, ...
+  if (m_EvenlySpaced)
+  {
+    // clear all generated geometries and then rotate only the first slice
+    // the other slices will be re-generated on demand
+    // 1. save first slice
+    Geometry2D::Pointer geometry2d = m_Geometry2Ds[0];
+    // 2. rotate first slice
+    geometry2d->ExecuteOperation(operation);
+
+    // 3. clear all slices
+    m_Geometry2Ds.clear();
+
+    // 4. reset first slice 
+    m_Geometry2Ds.reserve(m_Slices);
+    m_Geometry2Ds.assign(m_Slices, NULL);
+    m_Geometry2Ds[0] = geometry2d;
+     
+    // also rotate direction vector (which tells us, how to get the other slices from the first one)
+
+    RotationOperation* rotOp = dynamic_cast<RotationOperation*>(operation);
+    // m_DirectionVector = rot.matrix * m_DirectionVector
+    typedef itk::AffineTransform<ScalarType, 3> TransformType;
+    TransformType::Pointer rotation = TransformType::New();
+    rotation->Rotate3D( rotOp->GetVectorOfRotation(), rotOp->GetAngleOfRotation() * vnl_math::pi / 180.0 );
+    m_DirectionVector = rotation->TransformVector( m_DirectionVector );
+  }
+  else
+  {
+    // reach through to all slices
+    for (std::vector<Geometry2D::Pointer>::iterator iter = m_Geometry2Ds.begin();
+        iter != m_Geometry2Ds.end();
+        ++iter)
+    {
+      (*iter)->ExecuteOperation(operation);
+    }
+  }
+
+  Geometry3D::ExecuteOperation(operation); // this class itself has a transform, too
+
+  Modified();
 }

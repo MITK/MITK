@@ -204,6 +204,11 @@ public:
   //## @brief SetWorldGeometry is called according to the geometrySliceEvent,
   //## which is supposed to be a SliceNavigationController::GeometrySendEvent
   virtual void SetGeometry(const itk::EventObject & geometrySliceEvent);
+  
+  //##Documentation
+  //## @brief UpdateWorldGeometry is called to re-read the 2D geometry from the
+  //## slice navigation controller
+  virtual void UpdateGeometry(const itk::EventObject & geometrySliceEvent);
 
   //##Documentation
   //## @brief SetSlice is called according to the geometrySliceEvent,

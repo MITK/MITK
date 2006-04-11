@@ -155,6 +155,7 @@
     <include location="global" impldecl="in declaration">mitkDisplayInteractor.h</include>
     <include location="global" impldecl="in declaration">mitkDisplayVectorInteractor.h</include>
     <include location="global" impldecl="in declaration">mitkCoordinateSupplier.h</include>
+    <include location="global" impldecl="in declaration">mitkSlicesRotator.h</include>
     <include location="local" impldecl="in implementation">QmitkStdMultiWidget.ui.h</include>
 </includes>
 <variables>
@@ -165,6 +166,8 @@
     <variable>mitk::DataTreeBase* planesSubTree;</variable>
     <variable>mitk::SliceNavigationController::Pointer timeNavigationController;</variable>
     <variable>mitk::CoordinateSupplier::Pointer m_LastLeftClickPositionSupplier;</variable>
+    <variable>mitk::SlicesRotator* m_SlicesRotator;</variable>
+    <variable>bool m_SlicesRotation;</variable>
 </variables>
 <signals>
     <signal>WheelMoved( QWheelEvent* )</signal>
@@ -193,6 +196,7 @@
     <slot>AdjustCross()</slot>
     <slot>EnableNavigationControllerEventListening()</slot>
     <slot>DisableNavigationControllerEventListening()</slot>
+    <slot>EnableSliceRotation(bool on)</slot>
 </slots>
 <functions>
     <function access="private" specifier="non virtual">init()</function>

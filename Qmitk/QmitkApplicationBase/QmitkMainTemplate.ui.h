@@ -232,15 +232,11 @@ public:
   }
 };
 
-
 QmitkMainTemplate* QmitkMainTemplate::m_Instance = NULL;
 
 #ifdef MBI_INTERNAL
   QmitkSaveProjectWidget* m_SceneWidget;
 #endif
-
-void QmitkMainTemplate::fileNew()
-{}
 
 void QmitkMainTemplate::fileOpen()
 {
@@ -483,35 +479,10 @@ void QmitkMainTemplate::fileSave()
 #endif
 }
 
-void QmitkMainTemplate::filePrint()
-{}
-
 void QmitkMainTemplate::fileExit()
 {
   qApp->quit();
 }
-
-void QmitkMainTemplate::editCut()
-{}
-
-void QmitkMainTemplate::editCopy()
-{}
-
-void QmitkMainTemplate::editPaste()
-{}
-
-void QmitkMainTemplate::editFind()
-{}
-
-void QmitkMainTemplate::helpIndex()
-{}
-
-void QmitkMainTemplate::helpContents()
-{}
-
-void QmitkMainTemplate::helpAbout()
-{}
-
 
 void QmitkMainTemplate::init()
 {
@@ -599,9 +570,6 @@ void QmitkMainTemplate::Initialize()
 }
 
 
-/*!
-
-*/
 void QmitkMainTemplate::InitializeFunctionality()
 {}
 
@@ -625,15 +593,6 @@ void QmitkMainTemplate::InitializeQfm()
   //let the QmitkFctMediator know about the layout. This includes the toolbar and the layoutTemplate.
   qfm->Initialize(this);
 }
-
-// @FIXME: probably obsolete
-// mitk::DataTree* QmitkMainTemplate::getDataTree()
-// {
-//     return m_Tree;
-//}
-
-
-
 
 QmitkStdMultiWidget* QmitkMainTemplate::GetMultiWidget()
 {
@@ -672,10 +631,12 @@ void QmitkMainTemplate::changeTo2DImagesUpLayout()
 {
   m_MultiWidget->changeLayoutTo2DImagesUp();
 }
+
 void QmitkMainTemplate::changeTo2DImagesLeftLayout()
 {
   m_MultiWidget->changeLayoutTo2DImagesLeft();
 }
+
 void QmitkMainTemplate::changeToDefaultLayout()
 {
   m_MultiWidget->changeLayoutToDefault();
@@ -714,7 +675,6 @@ void QmitkMainTemplate::ShowPlanesCheckBox_clicked()
   emit ShowWidgetPlanesToggled( ShowPlanesCheckBox->isOn() );
 }
 
-
 void QmitkMainTemplate::destroy()
 {
   delete qfm;
@@ -728,7 +688,6 @@ QmitkMainTemplate* QmitkMainTemplate::GetInstance()
   return m_Instance;
 }
 
-
 QmitkFctMediator* QmitkMainTemplate::GetFctMediator()
 {
   return qfm;
@@ -739,12 +698,10 @@ void QmitkMainTemplate::changeToColumnWidget3n4Layout()
   m_MultiWidget->changeLayoutToColumnWidget3And4();
 }
 
-
 void QmitkMainTemplate::changeToRowWidget3n4Layout()
 {
   m_MultiWidget->changeLayoutToRowWidget3And4();
 }
-
 
 void QmitkMainTemplate::hideToolbar(bool on)
 {
@@ -753,7 +710,6 @@ void QmitkMainTemplate::hideToolbar(bool on)
   else
     ToolBar->show();
 }
-
 
 void QmitkMainTemplate::enableFineUndo( bool enabled )
 {
@@ -779,16 +735,19 @@ void QmitkMainTemplate::SetStandardViewsInitialized( bool areInitialized )
   m_StandardViewsInitialized = areInitialized;
 }
 
-
 void QmitkMainTemplate::editUndo()
 {
   if (undoButton->isEnabled())
     undoButton->doUndoRedoLast(1);
 }
 
-
 void QmitkMainTemplate::editRedo()
 {
   if (redoButton->isEnabled())
     redoButton->doUndoRedoLast(1);
+}
+
+void QmitkMainTemplate::optionsSlicesRotation(bool on)
+{
+  m_MultiWidget->EnableSliceRotation(on);
 }

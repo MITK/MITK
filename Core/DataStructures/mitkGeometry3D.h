@@ -374,7 +374,7 @@ public:
 
   //##Documentation
   //##@brief executes affine operations (translate, rotate, scale)
-  void ExecuteOperation(Operation* operation); 
+  virtual void ExecuteOperation(Operation* operation); 
 
   //##
   virtual bool WriteXMLData( XMLWriter& xmlWriter );

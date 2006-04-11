@@ -44,6 +44,7 @@ mitk::RenderWindow::RenderWindow(const char *name, mitk::BaseRenderer* renderer)
 
   m_SliceNavigationController = new mitk::SliceNavigationController( "navigation" );
   m_SliceNavigationController->ConnectGeometrySliceEvent( renderer );
+  m_SliceNavigationController->ConnectGeometryUpdateEvent( renderer );
   m_SliceNavigationController->ConnectGeometryTimeEvent( renderer, false );
 
   m_CameraRotationController = new mitk::CameraRotationController();

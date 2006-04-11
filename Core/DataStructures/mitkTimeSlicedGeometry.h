@@ -124,6 +124,8 @@ public:
   //##Documentation
   //## @brief duplicates the geometry
   virtual AffineGeometryFrame3D::Pointer Clone() const;
+  
+  virtual void ExecuteOperation(Operation* operation); 
 protected:
   TimeSlicedGeometry();
 

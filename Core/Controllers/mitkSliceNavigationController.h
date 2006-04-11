@@ -85,179 +85,202 @@ namespace mitk {
 //## @ingroup NavigationControl
 class SliceNavigationController : public BaseController
 {
-public:
-  mitkClassMacro(SliceNavigationController,BaseController);
-  //itkNewMacro(Self);
-  SliceNavigationController(const char * type = NULL);
+  public:
+    mitkClassMacro(SliceNavigationController,BaseController);
 
-  //##Documentation
-  //## @brief Possible view directions, \a Original will uses 
-  //## the Geometry2D instances in a SlicedGeometry3D provided
-  //## as input world geometry (by SetInputWorldGeometry).
-  enum ViewDirection{Transversal, Sagittal, Frontal, Original};
-
-  //##Documentation
-  //## @brief Set the input world geometry out of which the
-  //## geometries for slicing will be created.
-  void SetInputWorldGeometry(const mitk::Geometry3D* geometry);
-  itkGetConstObjectMacro(InputWorldGeometry, mitk::Geometry3D);
-
-  //##Documentation
-  //## @brief Access the created geometry
-  itkGetConstObjectMacro(CreatedWorldGeometry, mitk::Geometry3D);
-
-  //##Documentation
-  //## @brief Set the desired view directions
-  //##
-  //## \sa ViewDirection
-  //## \sa Update(ViewDirection viewDirection, bool top = true, bool frontside = true, bool rotated = false)
-  itkSetMacro(ViewDirection, ViewDirection);
-  itkGetMacro(ViewDirection, ViewDirection);
-
-  //##Documentation
-  //## @brief Do the actual creation and send it to the connected 
-  //## observers (renderers)
-  //##
-  virtual void Update();
-
-  //##Documentation
-  //## @brief Extended version of Update, additionally allowing to
-  //## specify the direction/orientation of the created geometry.
-  //##
-  virtual void Update(ViewDirection viewDirection, bool top = true, bool frontside = true, bool rotated = false);
-
-  //##Documentation
-  //## @brief Send the created geometry to the connected
-  //## observers (renderers)
-  //##
-  //## Called by Update().
-  virtual void SendCreatedWorldGeometry();
-
-  //##Documentation
-  //## @brief Send the currently selected slice to the connected
-  //## observers (renderers)
-  //##
-  //## Called by Update().
-  virtual void SendSlice();
-
-  //##Documentation
-  //## @brief Send the currently selected time to the connected
-  //## observers (renderers)
-  //##
-  //## Called by Update().
-  virtual void SendTime();
-
-  itkEventMacro( UpdateEvent      , itk::AnyEvent );
-
-  class TimeSlicedGeometryEvent : public itk::AnyEvent 
-  { 
-  public: 
-    typedef TimeSlicedGeometryEvent Self; 
-    typedef itk::AnyEvent Superclass; 
-    TimeSlicedGeometryEvent(TimeSlicedGeometry* aTimeSlicedGeometry, unsigned int aPos) : 
-      m_TimeSlicedGeometry(aTimeSlicedGeometry), m_Pos(aPos) {} 
-    virtual ~TimeSlicedGeometryEvent() {} 
-    virtual const char * GetEventName() const { return "TimeSlicedGeometryEvent"; } 
-    virtual bool CheckEvent(const ::itk::EventObject* e) const 
-    { return dynamic_cast<const Self*>(e); } 
-    virtual ::itk::EventObject* MakeObject() const 
-    { return new Self(m_TimeSlicedGeometry, m_Pos); } 
-    TimeSlicedGeometry* GetTimeSlicedGeometry() const { return m_TimeSlicedGeometry; }
-    unsigned int GetPos() const { return m_Pos; }
-  private: 
-    TimeSlicedGeometry::Pointer m_TimeSlicedGeometry;
-    unsigned int m_Pos;
-    // TimeSlicedGeometryEvent(const Self&); 
-    void operator=(const Self&); 
-  };
-  mitkTimeSlicedGeometryEventMacro( GeometrySendEvent    , TimeSlicedGeometryEvent );
-  mitkTimeSlicedGeometryEventMacro( GeometryTimeEvent    , TimeSlicedGeometryEvent );
-  mitkTimeSlicedGeometryEventMacro( GeometrySliceEvent   , TimeSlicedGeometryEvent );
+    //itkNewMacro(Self);
+    SliceNavigationController(const char * type = NULL);
   
-  template <typename T> void ConnectGeometrySendEvent(T* receiver)
-  {
-    typedef typename itk::ReceptorMemberCommand<T>::Pointer ReceptorMemberCommandPointer;
-    ReceptorMemberCommandPointer eventReceptorCommand = itk::ReceptorMemberCommand<T>::New();
-    eventReceptorCommand->SetCallbackFunction(receiver, &T::SetGeometry);
-    AddObserver(GeometrySendEvent(NULL,0), eventReceptorCommand);
-  }
+    //##Documentation
+    //## @brief Possible view directions, \a Original will uses 
+    //## the Geometry2D instances in a SlicedGeometry3D provided
+    //## as input world geometry (by SetInputWorldGeometry).
+    enum ViewDirection{Transversal, Sagittal, Frontal, Original};
+
+    //##Documentation
+    //## @brief Set the input world geometry out of which the
+    //## geometries for slicing will be created.
+    void SetInputWorldGeometry(const mitk::Geometry3D* geometry);
+    itkGetConstObjectMacro(InputWorldGeometry, mitk::Geometry3D);
+
+    //##Documentation
+    //## @brief Access the created geometry
+    itkGetConstObjectMacro(CreatedWorldGeometry, mitk::Geometry3D);
+
+    //##Documentation
+    //## @brief Set the desired view directions
+    //##
+    //## \sa ViewDirection
+    //## \sa Update(ViewDirection viewDirection, bool top = true, bool frontside = true, bool rotated = false)
+    itkSetMacro(ViewDirection, ViewDirection);
+    itkGetMacro(ViewDirection, ViewDirection);
+
+    //##Documentation
+    //## @brief Do the actual creation and send it to the connected 
+    //## observers (renderers)
+    //##
+    virtual void Update();
+
+    //##Documentation
+    //## @brief Extended version of Update, additionally allowing to
+    //## specify the direction/orientation of the created geometry.
+    //##
+    virtual void Update(ViewDirection viewDirection, bool top = true, bool frontside = true, bool rotated = false);
+
+    //##Documentation
+    //## @brief Send the created geometry to the connected
+    //## observers (renderers)
+    //##
+    //## Called by Update().
+    virtual void SendCreatedWorldGeometry();
+   
+    //##Documentation
+    //## @brief Tell observers to re-read the currently selected 2D geometry
+    //##
+    //## Called by mitk::SlicesRotator during rotation.
+    virtual void SendCreatedWorldGeometryUpdate();
+
+    //##Documentation
+    //## @brief Send the currently selected slice to the connected
+    //## observers (renderers)
+    //##
+    //## Called by Update().
+    virtual void SendSlice();
+
+    //##Documentation
+    //## @brief Send the currently selected time to the connected
+    //## observers (renderers)
+    //##
+    //## Called by Update().
+    virtual void SendTime();
+
+    itkEventMacro( UpdateEvent, itk::AnyEvent );
+
+    class TimeSlicedGeometryEvent : public itk::AnyEvent 
+    { 
+      public: 
+        typedef TimeSlicedGeometryEvent Self; 
+        typedef itk::AnyEvent Superclass; 
+        TimeSlicedGeometryEvent(TimeSlicedGeometry* aTimeSlicedGeometry, unsigned int aPos) 
+          : m_TimeSlicedGeometry(aTimeSlicedGeometry), m_Pos(aPos) 
+          {} 
+        virtual ~TimeSlicedGeometryEvent() 
+          {} 
+        virtual const char * GetEventName() const 
+          { return "TimeSlicedGeometryEvent"; } 
+        virtual bool CheckEvent(const ::itk::EventObject* e) const 
+          { return dynamic_cast<const Self*>(e); } 
+        virtual ::itk::EventObject* MakeObject() const 
+          { return new Self(m_TimeSlicedGeometry, m_Pos); } 
+        TimeSlicedGeometry* GetTimeSlicedGeometry() const 
+          { return m_TimeSlicedGeometry; }
+        unsigned int GetPos() const 
+          { return m_Pos; }
+      private: 
+        TimeSlicedGeometry::Pointer m_TimeSlicedGeometry;
+        unsigned int m_Pos;
+        // TimeSlicedGeometryEvent(const Self&); 
+        void operator=(const Self&); //just hide
+    };
   
-  template <typename T> void ConnectGeometrySliceEvent(T* receiver, bool connectSendEvent=true)
-  {
-    typedef typename itk::ReceptorMemberCommand<T>::Pointer ReceptorMemberCommandPointer;
-    ReceptorMemberCommandPointer eventReceptorCommand = itk::ReceptorMemberCommand<T>::New();
-    eventReceptorCommand->SetCallbackFunction(receiver, &T::SetGeometrySlice);
-    AddObserver(GeometrySliceEvent(NULL,0), eventReceptorCommand);
-    if(connectSendEvent)
-      ConnectGeometrySendEvent(receiver);
-  }
+    mitkTimeSlicedGeometryEventMacro( GeometrySendEvent  , TimeSlicedGeometryEvent );
+    mitkTimeSlicedGeometryEventMacro( GeometryUpdateEvent, TimeSlicedGeometryEvent );
+    mitkTimeSlicedGeometryEventMacro( GeometryTimeEvent  , TimeSlicedGeometryEvent );
+    mitkTimeSlicedGeometryEventMacro( GeometrySliceEvent , TimeSlicedGeometryEvent );
+  
+    template <typename T> void ConnectGeometrySendEvent(T* receiver)
+    {
+      typedef typename itk::ReceptorMemberCommand<T>::Pointer ReceptorMemberCommandPointer;
+      ReceptorMemberCommandPointer eventReceptorCommand = itk::ReceptorMemberCommand<T>::New();
+      eventReceptorCommand->SetCallbackFunction(receiver, &T::SetGeometry);
+      AddObserver(GeometrySendEvent(NULL,0), eventReceptorCommand);
+    }
+    
+    template <typename T> void ConnectGeometryUpdateEvent(T* receiver)
+    {
+      typedef typename itk::ReceptorMemberCommand<T>::Pointer ReceptorMemberCommandPointer;
+      ReceptorMemberCommandPointer eventReceptorCommand = itk::ReceptorMemberCommand<T>::New();
+      eventReceptorCommand->SetCallbackFunction(receiver, &T::UpdateGeometry);
+      AddObserver(GeometryUpdateEvent(NULL,0), eventReceptorCommand);
+    }
+  
+    template <typename T> void ConnectGeometrySliceEvent(T* receiver, bool connectSendEvent=true)
+    {
+      typedef typename itk::ReceptorMemberCommand<T>::Pointer ReceptorMemberCommandPointer;
+      ReceptorMemberCommandPointer eventReceptorCommand = itk::ReceptorMemberCommand<T>::New();
+      eventReceptorCommand->SetCallbackFunction(receiver, &T::SetGeometrySlice);
+      AddObserver(GeometrySliceEvent(NULL,0), eventReceptorCommand);
+      if(connectSendEvent)
+        ConnectGeometrySendEvent(receiver);
+    }
 
-  template <typename T> void ConnectGeometryTimeEvent(T* receiver, bool connectSendEvent=true)
-  {
-    typedef typename itk::ReceptorMemberCommand<T>::Pointer ReceptorMemberCommandPointer;
-    ReceptorMemberCommandPointer eventReceptorCommand = itk::ReceptorMemberCommand<T>::New();
-    eventReceptorCommand->SetCallbackFunction(receiver, &T::SetGeometryTime);
-    AddObserver(GeometryTimeEvent(NULL,0), eventReceptorCommand);
-    if(connectSendEvent)
-      ConnectGeometrySendEvent(receiver);
-  }
+    template <typename T> void ConnectGeometryTimeEvent(T* receiver, bool connectSendEvent=true)
+    {
+      typedef typename itk::ReceptorMemberCommand<T>::Pointer ReceptorMemberCommandPointer;
+      ReceptorMemberCommandPointer eventReceptorCommand = itk::ReceptorMemberCommand<T>::New();
+      eventReceptorCommand->SetCallbackFunction(receiver, &T::SetGeometryTime);
+      AddObserver(GeometryTimeEvent(NULL,0), eventReceptorCommand);
+      if(connectSendEvent)
+        ConnectGeometrySendEvent(receiver);
+    }
 
-  template <typename T> void ConnectGeometryEvents(T* receiver)
-  {
-    ConnectGeometrySliceEvent(receiver, false); //connect sendEvent only once
-    ConnectGeometryTimeEvent(receiver);
-  }
+    template <typename T> void ConnectGeometryEvents(T* receiver)
+    {
+      ConnectGeometrySliceEvent(receiver, false); //connect sendEvent only once
+      ConnectGeometryTimeEvent(receiver);
+    }
 
-  //##Documentation
-  //## @brief To connect multiple SliceNavigationController, we can 
-  //## act as an observer ourselves: implemented interface
-  //##
-  //## \warning not implemented
-  virtual void SetGeometry(const itk::EventObject & geometrySliceEvent);
+    //## @brief To connect multiple SliceNavigationController, we can 
+    //## act as an observer ourselves: implemented interface
+    //##
+    //## \warning not implemented
+    virtual void SetGeometry(const itk::EventObject & geometrySliceEvent);
 
-  //##Documentation
-  //## @brief To connect multiple SliceNavigationController, we can 
-  //## act as an observer ourselves: implemented interface
-  //##
-  virtual void SetGeometrySlice(const itk::EventObject & geometrySliceEvent);
+    //##Documentation
+    //## @brief To connect multiple SliceNavigationController, we can 
+    //## act as an observer ourselves: implemented interface
+    //##
+    virtual void SetGeometrySlice(const itk::EventObject & geometrySliceEvent);
 
-  //##Documentation
-  //## @brief To connect multiple SliceNavigationController, we can 
-  //## act as an observer ourselves: implemented interface
-  //##
-  virtual void SetGeometryTime(const itk::EventObject & geometryTimeEvent);
+    //##Documentation
+    //## @brief To connect multiple SliceNavigationController, we can 
+    //## act as an observer ourselves: implemented interface
+    //##
+    virtual void SetGeometryTime(const itk::EventObject & geometryTimeEvent);
 
-protected:
-  //SliceNavigationController();
+    virtual bool ExecuteAction( Action* action, mitk::StateEvent const* stateEvent);
 
-  //##ModelId=3E189B1D00BF
-  virtual ~SliceNavigationController();
+    void ExecuteOperation(Operation* operation);
 
-	virtual bool ExecuteAction( Action* action, mitk::StateEvent const* stateEvent);
+  protected:
+    //SliceNavigationController();
 
-  mitk::Geometry3D::ConstPointer m_InputWorldGeometry;
+    //##ModelId=3E189B1D00BF
+    virtual ~SliceNavigationController();
 
-  mitk::TimeSlicedGeometry::Pointer m_CreatedWorldGeometry;
+    mitk::Geometry3D::ConstPointer m_InputWorldGeometry;
 
-  ViewDirection m_ViewDirection;
+    mitk::TimeSlicedGeometry::Pointer m_CreatedWorldGeometry;
 
-  itkSetMacro(Top, bool);
-  itkGetMacro(Top, bool);
-  itkBooleanMacro(Top);
+    ViewDirection m_ViewDirection;
 
-  itkSetMacro(FrontSide, bool);
-  itkGetMacro(FrontSide, bool);
-  itkBooleanMacro(FrontSide);
+    itkSetMacro(Top, bool);
+    itkGetMacro(Top, bool);
+    itkBooleanMacro(Top);
 
-  itkSetMacro(Rotated, bool);
-  itkGetMacro(Rotated, bool);
-  itkBooleanMacro(Rotated);
+    itkSetMacro(FrontSide, bool);
+    itkGetMacro(FrontSide, bool);
+    itkBooleanMacro(FrontSide);
 
-  bool m_Top;
-  bool m_FrontSide;
-  bool m_Rotated;
+    itkSetMacro(Rotated, bool);
+    itkGetMacro(Rotated, bool);
+    itkBooleanMacro(Rotated);
 
-  bool m_BlockUpdate;
+    bool m_Top;
+    bool m_FrontSide;
+    bool m_Rotated;
+
+    bool m_BlockUpdate;
 };
 
 } // namespace mitk

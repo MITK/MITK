@@ -66,7 +66,7 @@ void QmitkViewInitialization::CreateConnections()
 QAction * QmitkViewInitialization::CreateAction(QActionGroup *parent)
 {
   QAction* action;
-  action = new QAction( tr( "change view initialization" ), QPixmap((const char**)icon_xpm), tr( "&View Initialization" ), NULL, parent, "ViewInitialization" );
+  action = new QAction( tr( "change view initialization" ), QPixmap((const char**)icon_xpm), tr( "&View Initialization" ), 0, parent, "ViewInitialization" );
   return action;
 }
 

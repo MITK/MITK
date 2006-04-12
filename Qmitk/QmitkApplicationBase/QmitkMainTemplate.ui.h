@@ -751,3 +751,10 @@ void QmitkMainTemplate::optionsSlicesRotation(bool on)
 {
   m_MultiWidget->EnableSliceRotation(on);
 }
+
+void QmitkMainTemplate::optionsReinitMultiWidget()
+{
+  mitk::DataTreePreOrderIterator it(m_Tree);
+  m_MultiWidget->InitializeStandardViews( &it );
+}
+

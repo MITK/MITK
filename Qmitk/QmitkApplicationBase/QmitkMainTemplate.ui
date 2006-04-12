@@ -43,6 +43,7 @@
     </item>
     <item text="&amp;Options" name="Options">
         <action name="optionsSlicesRotationAction"/>
+        <action name="optionsReinitMultiWidgetAction"/>
         <action name="HideToolbarAction"/>
         <action name="optionsFine_Undo_enabledAction"/>
         <action name="optionsSystem_InformationAction"/>
@@ -71,8 +72,6 @@
                 <enum>Redo</enum>
             </property>
         </widget>
-        <action name="editUndoAction"/>
-        <action name="editRedoAction"/>
         <action name="Fullscreen"/>
         <separator/>
         <widget class="QCheckBox">
@@ -432,6 +431,20 @@
     </action>
     <action>
         <property name="name">
+            <cstring>optionsReinitMultiWidgetAction</cstring>
+        </property>
+        <property name="text">
+            <string>Reinit view</string>
+        </property>
+        <property name="menuText">
+            <string>Re&amp;init view</string>
+        </property>
+        <property name="accel">
+            <string>Ctrl+I</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
             <cstring>optionsSystem_InformationAction</cstring>
         </property>
         <property name="text">
@@ -637,6 +650,12 @@
         <receiver>QmitkMainTemplate</receiver>
         <slot>optionsSlicesRotation(bool)</slot>
     </connection>
+    <connection>
+        <sender>optionsReinitMultiWidgetAction</sender>
+        <signal>activated()</signal>
+        <receiver>QmitkMainTemplate</receiver>
+        <slot>optionsReinitMultiWidget()</slot>
+    </connection>
 </connections>
 <includes>
     <include location="global" impldecl="in declaration">mitkDataTreeNodeFactory.h</include>
@@ -700,6 +719,7 @@
     <slot>editUndo()</slot>
     <slot>editRedo()</slot>
     <slot>optionsSlicesRotation(bool on)</slot>
+    <slot>optionsReinitMultiWidget()</slot>
 </slots>
 <functions>
     <function>fileOpen( const char * fileName )</function>

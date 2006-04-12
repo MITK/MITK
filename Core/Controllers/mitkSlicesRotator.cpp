@@ -136,7 +136,7 @@ void SlicesRotator::UpdateRelevantSNCs()
 
 bool SlicesRotator::ExecuteAction(Action* action, StateEvent const* stateEvent)
 {
-  const ScalarType ThreshHoldDistancePixels = 4;
+  const ScalarType ThreshHoldDistancePixels = 6;
   
   bool ok = false;
   

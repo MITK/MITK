@@ -27,6 +27,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkITTFilterContext.h>
 #include <itkProfileData.h>
 #include <itkProfileGradientFinder.h>
+#include <itkRefinementModelProcessor.h>
 #include <itkRegistrationModelTree.h>
 #include <itkRegistrationModelXMLReader.h>
 #include <itkRegistrationModelXMLWriter.h>
@@ -35,6 +36,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkTranslationTransform.h>
 #include <itkTreeToBinaryImageFilter.h>
 #include <itkTubeSegmentModel.h>
+#include <itkTubeSegmentModelGenerator.h>
 
 // image type
 typedef double                                        PixelType;
@@ -111,6 +113,19 @@ typedef ProfileGradientFinderType::Pointer            ProfileGradientFinderPoint
 
 typedef ProfileGradientFinderType::ProfileDataType    ProfileDataType;
 typedef ProfileDataType::Pointer                      ProfileDataPointer;
+
+typedef itk::RefinementModelProcessor<RegistrationModelType, ImageType>
+    RefinementModelProcessorType;
+typedef RefinementModelProcessorType::Pointer         RefinementModelProcessorPointer;
+
+typedef itk::PointSetToImageFilter<PointSetType, ImageType>
+    PointSetToImageFilterType;
+typedef PointSetToImageFilterType::Pointer            PointSetToImageFilterPointer;
+
+typedef itk::TubeSegmentModelGenerator<PixelType>
+    TubeSegmentModelGeneratorType;
+typedef TubeSegmentModelGeneratorType::Pointer        TubeSegmentModelGeneratorPointer;
+
 
 typedef std::list<int>                                ResultListType;
 
@@ -224,7 +239,7 @@ PointSetPointer transformPointSet(TransformPointer transform, TransformParamters
 }
 
 /******************************************************************
- * TEST 1: Saving and loading data objects to the filter context
+ * TEST: Saving and loading data objects to the filter context
  *****************************************************************/
 int testFilterContext()
 {
@@ -283,7 +298,7 @@ int testFilterContext()
 }
 
 /****************************************************************
- * TEST 3: XML Writer
+ * TEST: XML Writer
  ****************************************************************/
 int testRegistrationModelXMLWriter()
 {
@@ -389,7 +404,7 @@ int testRegistrationModelXMLWriter()
 }
 
 /****************************************************************
- * TEST 4: Registrated Model
+ * TEST: Registrated Model
  ****************************************************************/
 int testRegistratedModel()
 {
@@ -522,7 +537,7 @@ int testTreeToBinaryImageFilter()
   treeToImageFilter->SetInput(outputTree);
   try
   {
-    treeToImageFilter->Update();
+//     treeToImageFilter->Update();
   }
   catch(itk::ExceptionObject ex)
   {
@@ -594,6 +609,41 @@ int testProfileGradientFinder()
   return EXIT_SUCCESS;
 }
 
+/****************************************************************
+ * TEST: RefinementModelProcessor
+ ****************************************************************/
+int testRefinementModelProcessor()
+{
+  std::cout << " *** Testing the RefinementModelProcessor ***\n";
+
+  TubeSegmentModelGeneratorPointer tubeGenerator = TubeSegmentModelGeneratorType::New();
+  tubeGenerator->SetXDimension(100);
+  tubeGenerator->SetYDimension(100);
+  tubeGenerator->SetZDimension(10);
+  tubeGenerator->SetNumberOfSlices(10);
+  tubeGenerator->SetRadius(10);
+  tubeGenerator->SetInnerRing(false);
+  tubeGenerator->SetOuterRing(false);
+  tubeGenerator->Update();
+  TubeSegmentModelPointer tubeSegment = tubeGenerator->GetOutputModel();
+
+  PointSetToImageFilterPointer pointSetToImageFilter = PointSetToImageFilterType::New();
+  OutputImageType::SizeType size;
+  size.Fill(100);
+  pointSetToImageFilter->SetSize(size);
+  pointSetToImageFilter->SetInput(tubeSegment->GetPointSet());
+  pointSetToImageFilter->Update();
+
+  RefinementModelProcessorPointer refinementProcessor = RefinementModelProcessorType::New();
+  refinementProcessor->SetInput(tubeSegment);
+  refinementProcessor->SetImage(pointSetToImageFilter->GetOutput());
+  refinementProcessor->Update();
+
+  std::cout << " *** [TEST PASSED] ***\n";
+  return EXIT_SUCCESS;
+}
+
+
 int itkImageToTreeFilterTest(int i, char* argv[] )
 {
   ResultListType resultList;
@@ -606,6 +656,7 @@ int itkImageToTreeFilterTest(int i, char* argv[] )
   resultList.push_back(testRegistratedModel());
   resultList.push_back(testTreeToBinaryImageFilter());
   resultList.push_back(testProfileGradientFinder());
+  resultList.push_back(testRefinementModelProcessor());
 
   std::cout << " *** [ALL TESTS DONE] ***\n";
 

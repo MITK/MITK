@@ -170,6 +170,10 @@ private:
   
   // save a copy of the rendered window.
   GLbyte *m_PixelMapGL;
+
+  //##Documentation
+  //## @brief Keep track whether m_PixelMapGL contains valid data
+  bool m_PixelMapGLValid;
 };
 
 } // namespace mitk

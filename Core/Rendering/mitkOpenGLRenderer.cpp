@@ -52,7 +52,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 //##ModelId=3E33ECF301AD
 mitk::OpenGLRenderer::OpenGLRenderer( const char* name )
-: BaseRenderer(name), m_VtkMapperPresent(false), m_VtkRenderer(NULL), m_LastUpdateVtkActorsTime(0),m_PixelMapGL(NULL)
+  : BaseRenderer(name), m_VtkMapperPresent(false), m_VtkRenderer(NULL), m_LastUpdateVtkActorsTime(0), m_PixelMapGL(NULL), m_PixelMapGLValid(false)
 {
   m_CameraController=NULL;//\*todo remove line
   m_CameraController = new VtkInteractorCameraController();
@@ -330,11 +330,14 @@ void mitk::OpenGLRenderer::Repaint( bool onlyOverlay )
     return;
   }
 
-  if ( onlyOverlay )
+  if( onlyOverlay )
   {
-    glDisable(GL_BLEND);
-    glDrawPixels( m_Size[1], m_Size[0], GL_RGBA, GL_UNSIGNED_BYTE, (const GLvoid*)m_PixelMapGL);
-    glEnable(GL_BLEND);
+    if( m_PixelMapGLValid )
+    {
+      glDisable(GL_BLEND);
+      glDrawPixels( m_Size[1], m_Size[0], GL_RGBA, GL_UNSIGNED_BYTE, (const GLvoid*)m_PixelMapGL);
+      glEnable(GL_BLEND);
+    }
     
     this->DrawOverlay();
   }
@@ -421,11 +424,14 @@ void mitk::OpenGLRenderer::Repaint( bool onlyOverlay )
       }
     }
 
-    glReadPixels(0,0, m_Size[1], m_Size[0], GL_RGBA, GL_UNSIGNED_BYTE, (GLvoid *) m_PixelMapGL);
+    if( m_DrawOverlayPosition[0]>0)
+    {
+      glReadPixels(0,0, m_Size[1], m_Size[0], GL_RGBA, GL_UNSIGNED_BYTE, (GLvoid *) m_PixelMapGL);
+      m_PixelMapGLValid = true;
 
-    // Overlay the new rendering result
-    this->DrawOverlay();
-
+      // Overlay the new rendering result
+      this->DrawOverlay();
+    }
   }
 
   //swap buffers
@@ -542,9 +548,10 @@ void mitk::OpenGLRenderer::Resize(int w, int h)
   BaseRenderer::Resize(w, h);
 
   if(m_PixelMapGL != NULL)
-    delete m_PixelMapGL;
+    delete [] m_PixelMapGL;
   
   m_PixelMapGL = new GLbyte[4 * w * h]; //imagesize
+  m_PixelMapGLValid = false;
    
   Update();
 }
@@ -563,11 +570,12 @@ void mitk::OpenGLRenderer::InitSize(int w, int h)
     m_VtkRenderer->ResetCamera();
     vtkObject::SetGlobalWarningDisplay(w);
   }
-  
+
   if(m_PixelMapGL != NULL)
-    delete m_PixelMapGL;
-  
-   m_PixelMapGL = new GLbyte[4 * w * h]; //imagesize
+    delete [] m_PixelMapGL;
+
+  m_PixelMapGL = new GLbyte[4 * w * h]; //imagesize
+  m_PixelMapGLValid = false;
 }
 
 //##ModelId=3EF59AD20235

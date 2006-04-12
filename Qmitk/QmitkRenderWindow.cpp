@@ -26,7 +26,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 //##ModelId=3E1EB4410304
 QmitkRenderWindow::QmitkRenderWindow(mitk::BaseRenderer* renderer, QGLFormat glf, QWidget *parent, const char *name)
-  : QGLWidget(glf, parent, name), mitk::RenderWindow(name, renderer), m_InitNeeded(false), m_ResizeNeeded(false), m_InResize(false)
+  : QGLWidget(glf, parent, name), mitk::RenderWindow(name, renderer), m_InitNeeded(false), m_ResizeNeeded(false), 
+    m_InResize(false), m_DrawOverlayOnly(false)
 {
   this->InitRenderer();
   setFocusPolicy(QWidget::StrongFocus);

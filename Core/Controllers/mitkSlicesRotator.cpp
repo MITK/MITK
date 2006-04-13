@@ -38,7 +38,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkSlicedGeometry3D.h>
 #include <mitkTimeSlicedGeometry.h>
 
-#include <iostream>
 #include <math.h>
 
 namespace mitk {
@@ -168,7 +167,7 @@ bool SlicesRotator::ExecuteAction(Action* action, StateEvent const* stateEvent)
       
       // scalar product: A * B = |A| * |B| * cos(angle)
       // tan = sin / cos
-      ScalarType angle = - atan2( axisOfRotation.GetNorm(), toCursor * toProjected );
+      ScalarType angle = - atan2( (double)(axisOfRotation.GetNorm()), (double)(toCursor * toProjected) );
       angle *= 180.0 / vnl_math::pi;
       m_LastCursorPosition = cursor;
 

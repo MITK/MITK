@@ -26,17 +26,34 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk {
 
-/** \brief Enables rotation of visible slices.
+/** \brief Enables rotation of visible slices (for sliced geometries).
+  @ingroup NavigationControl
 
   This class takes care of several SliceNavigationControllers and handles 
-  slice selection / slice rotation.
-  It is added as listener to GlobalInteraction by QmitkStdMultiWidget.
+  slice selection / slice rotation. It is added as listener to 
+  GlobalInteraction by QmitkStdMultiWidget.
+
+
+  The SlicesRotator class adds the possibility of slice rotation to the "normal" behaviour of
+  SliceNavigationControllers. This additional class is needed, because one has to be aware of several
+  "visible slices" (selected Geometry2Ds of some SliceNavigationControllers) in order to choose 
+  between rotation and slice selection.
+
+  Rotation is achieved by modifying (rotating) the generated TimeSlicedGeometry of the
+  corresponding SliceNavigationController.
 
   The rule to choose between slice rotation and selection is easy:
+
   - For a mouse down event, count the number of visible planes, which
     are "near" the cursor. If this number equals 2 (one for the window, which
     currently holds the cursor, one for the intersection line of another visible slice), 
     then initiate rotation, else select slices near the cursor.
+  
+  In contrast to the situation without the SlicesRotator, the SliceNavigationControllers are now
+  not directly registered as listeners to GlobalInteraction. SlicesRotator is registered as a listener
+  and decides whether something should be rotated or whether another slice should be selected. In the latter
+  case, a PositionEvent is just forwarded to the SliceNavigationController.
+  
   */
 class SlicesRotator : public SlicesCoordinator
 {

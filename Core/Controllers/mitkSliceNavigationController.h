@@ -46,11 +46,24 @@ namespace mitk {
  }
 
 //##Documentation
-//## @brief controls the selection of the slice the associated BaseRenderer
+//## @brief Controls the selection of the slice the associated BaseRenderer
 //## will display
 //##
-//## Subclass of BaseController. Controls the selection of the slice the
-//## associated BaseRenderer will display.
+//##  A SliceNavigationController takes a Geometry3D as input world geometry (TODO what are
+//##  the exact requirements?) and generates a TimeSlicedGeometry as output. 
+//##  The TimeSlicedGeometry holds a number of SlicedGeometry3Ds and these in turn hold a 
+//##  series of Geometry2Ds. One of these Geometry2Ds is selected as world geometry for the
+//##  BaseRenderers associated to 2D views.
+//##  
+//##  The SliceNavigationController holds has Steppers (one for 
+//##  the slice, a second for the time step), which control the selection of a single Geometry2D
+//##  from the TimeSlicedGeometry. SliceNavigationController generates ITK events to tell observers, 
+//##  like a BaseRenderer,  when the selected slice or timestep changes.
+//##
+//##  SliceNavigationControllers are registered as listeners to GlobalInteraction by the QmitkStdMultiWidget.
+//##  In ExecuteAction, the controllers react to PositionEvents by setting the steppers to the slice which 
+//##  is nearest to the point of the PositionEvent.
+//##  
 //## Example:
 //## \code
 //## //Initialization
@@ -68,6 +81,7 @@ namespace mitk {
 //## //create a world geometry and send the information to the connected renderer(s)
 //##   sliceCtrl->Update();
 //## \endcode
+//##
 //## You can connect visible navigators to a SliceNavigationController, e.g., a
 //## QmitkSliderNavigator (for Qt):
 //## \code
@@ -81,6 +95,7 @@ namespace mitk {
 //##   //to Qt-independent itk-events.
 //##   new QmitkStepperAdapter(navigator, sliceCtrl->GetSlice(), "navigatoradaptor");
 //## \endcode
+//##
 //## @todo implement for non-evenly-timed geometry!
 //## @ingroup NavigationControl
 class SliceNavigationController : public BaseController

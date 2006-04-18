@@ -185,34 +185,34 @@ void mitk::BaseData::ConnectSource(itk::ProcessObject *arg, unsigned int idx) co
 
 mitk::PropertyList::Pointer mitk::BaseData::GetPropertyList() const
 {
-	  return m_PropertyList;
+  return m_PropertyList;
 }
 
 
 mitk::BaseProperty::Pointer mitk::BaseData::GetProperty(const char *propertyKey) const
 {
-   return m_PropertyList->GetProperty(propertyKey);
+  return m_PropertyList->GetProperty(propertyKey);
 }
 
 void mitk::BaseData::SetProperty(const char *propertyKey,
-                                     BaseProperty* propertyValue)
+                                 BaseProperty* propertyValue)
 {
-    m_PropertyList->SetProperty(propertyKey, propertyValue);
+  m_PropertyList->SetProperty(propertyKey, propertyValue);
 }
 
 void mitk::BaseData::SetPropertyList(PropertyList *pList)
 {
-    m_PropertyList = pList;
+  m_PropertyList = pList;
 }
 
 unsigned long mitk::BaseData::GetMTime() const
 {
   unsigned long time = Superclass::GetMTime();
   if(m_TimeSlicedGeometry.IsNotNull())
-	{
+  {
     if((time < m_TimeSlicedGeometry->GetMTime()))
     {
-		  Modified();
+      Modified();
       return Superclass::GetMTime();
     }
     //unsigned long geometryTime = m_TimeSlicedGeometry->GetMTime();
@@ -220,7 +220,7 @@ unsigned long mitk::BaseData::GetMTime() const
     //{
     //  return geometryTime;
     //}
-	}
+  }
   return time;
 }
 
@@ -240,10 +240,10 @@ void mitk::BaseData::PrintSelf(std::ostream& os, itk::Indent indent) const
 
 bool mitk::BaseData::WriteXMLData( XMLWriter& xmlWriter ) 
 {
-	if ( m_TimeSlicedGeometry )
+  if ( m_TimeSlicedGeometry )
     this->m_TimeSlicedGeometry->WriteXML( xmlWriter );
 
-	return true;
+  return true;
 }
 
 bool mitk::BaseData::ReadXMLData( XMLReader& xmlReader ) 
@@ -254,7 +254,7 @@ bool mitk::BaseData::ReadXMLData( XMLReader& xmlReader )
     if ( this->m_TimeSlicedGeometry.IsNotNull() ) this->m_TimeSlicedGeometry->ReadXMLData( xmlReader );
     xmlReader.GotoParent();
   }
-	return true;
+  return true;
 }
 
 const std::string& mitk::BaseData::GetXMLNodeName() const

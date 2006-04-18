@@ -108,11 +108,11 @@ void mitk::SeedsImage::AddSeedPoint(SeedsImageType* itkImage)
   const unsigned int dimension = ::itk::GetImageDimension<SeedsImageType>::ImageDimension;
   itk::Index<dimension> baseIndex;
   itk::Index<dimension> setIndex;
-  itk::Point<SeedsImageType::PixelType, dimension> p;
+  itk::Point<typename SeedsImageType::PixelType, dimension> p;
   p[0] = m_Point[0];
   p[1] = m_Point[1];
   p[2] = m_Point[2];
-  itk::ContinuousIndex<SeedsImageType::PixelType, dimension> contIndex;
+  itk::ContinuousIndex<typename SeedsImageType::PixelType, dimension> contIndex;
   itkImage->TransformPhysicalPointToContinuousIndex(p, contIndex);
 
   GetGeometry()->WorldToIndex(m_Point, baseIndex); // commented out because of the slices problem
@@ -126,8 +126,8 @@ void mitk::SeedsImage::AddSeedPoint(SeedsImageType* itkImage)
     //FillVector2D(radius, ((ScalarType)m_Radius)/m_Spacing[0], ((ScalarType)m_Radius)/m_Spacing[1]);
       for(int y = contIndex[1] - radius[1]; y <= contIndex[1] + radius[1]; ++y){
         for(int x = contIndex[0] - radius[0]; x <= contIndex[0] + radius[0]; ++x){
-          delta_x = abs(x - contIndex[0])*m_Spacing[0];
-          delta_y = abs(y - contIndex[1])*m_Spacing[1];
+          delta_x = fabs((float)(x - contIndex[0]))*m_Spacing[0];
+          delta_y = fabs((float)(y - contIndex[1]))*m_Spacing[1];
           sphere_distance = (delta_x * delta_x) + (delta_y * delta_y);
           if (sphere_distance <= (m_Radius*m_Radius)){
             // check -> is the point inside the image?
@@ -152,9 +152,9 @@ void mitk::SeedsImage::AddSeedPoint(SeedsImageType* itkImage)
     for(int z = contIndex[2] - radius[2]; z <= contIndex[2] + radius[2]; ++z){
       for(int y = contIndex[1] - radius[1]; y <= contIndex[1] + radius[1]; ++y){
         for(int x = contIndex[0] - radius[0]; x <= contIndex[0] + radius[0]; ++x){
-          delta_x = abs(x - contIndex[0])*m_Spacing[0];
-          delta_y = abs(y - contIndex[1])*m_Spacing[1];
-          delta_z = abs(z - contIndex[2])*m_Spacing[2];
+          delta_x = abs((float)(x - contIndex[0]))*m_Spacing[0];
+          delta_y = abs((float)(y - contIndex[1]))*m_Spacing[1];
+          delta_z = abs((float)(z - contIndex[2]))*m_Spacing[2];
           sphere_distance = (delta_x * delta_x) + (delta_y * delta_y) + (delta_z * delta_z);
           if (sphere_distance <= (m_Radius*m_Radius)){
             // check -> is the point inside the image?
@@ -204,16 +204,16 @@ void mitk::SeedsImage::PointInterpolation(SeedsImageType* itkImage)
   int distance_iterator;
   float t;
 
-  itk::Point<SeedsImageType::PixelType, dimension> p;
+  itk::Point<typename SeedsImageType::PixelType, dimension> p;
   p[0] = m_Point[0];
   p[1] = m_Point[1];
   p[2] = m_Point[2];
-  itk::ContinuousIndex<SeedsImageType::PixelType, dimension> pointIndex;
+  itk::ContinuousIndex<typename SeedsImageType::PixelType, dimension> pointIndex;
   itkImage->TransformPhysicalPointToContinuousIndex(p, pointIndex);
   p[0] = m_LastPoint[0];
   p[1] = m_LastPoint[1];
   p[2] = m_LastPoint[2];
-  itk::ContinuousIndex<SeedsImageType::PixelType, dimension> last_pointIndex;
+  itk::ContinuousIndex<typename SeedsImageType::PixelType, dimension> last_pointIndex;
   itkImage->TransformPhysicalPointToContinuousIndex(p, last_pointIndex);
 
   // coordinate transformation from physical coordinates to index coordinates
@@ -361,7 +361,7 @@ void mitk::SeedsImage::CreateBrush()
   MaskImageType::IndexType center;
   center.Fill(m_Radius);
   MaskImageType::IndexType half;
-  half.Fill( ceil(m_Radius/2.0) );
+  half.Fill( (unsigned long)(ceil(m_Radius/2.0)) );
 
   for (idx[0] = center[0]-half[0]; idx[0] < center[0]+half[0]; idx[0]++)   
     for (idx[1] = center[1]-half[1]; idx[1] < center[1]+half[1]; idx[1]++)

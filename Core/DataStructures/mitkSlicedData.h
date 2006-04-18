@@ -29,10 +29,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "itkSize.h"
 #include "itkImageRegion.h"
 
-#if _MSC_VER < 1300
-#define VmitkImageDimension 5
-#endif
-
 namespace mitk {
 
 class SlicedGeometry3D;
@@ -49,34 +45,30 @@ class SlicedGeometry3D;
 //## @ingroup Data
 class SlicedData : public BaseData
 {
-protected:
-#if !(_MSC_VER < 1300)
-  //##ModelId=3E144ED20061
-  static const int VmitkImageDimension=5;
-#endif
 public:
   mitkClassMacro(SlicedData, BaseData);
 
+  itkStaticConstMacro(RegionDimension, unsigned int, 5);
+
   /** Region typedef support. A region is used to specify a subset of a @a SlicedData. */
-  //##ModelId=3E143BF1002F
-  typedef itk::ImageRegion<VmitkImageDimension>  RegionType;
+  typedef itk::ImageRegion<RegionDimension>  RegionType;
 
   /** Index typedef support. An index is used to access pixel values. */
   //##ModelId=3E144ED10331
-  typedef itk::Index<VmitkImageDimension>  IndexType;
+  typedef itk::Index<RegionDimension>  IndexType;
   //##ModelId=3E144ED10346
   typedef IndexType::IndexValueType  IndexValueType;
 
   /** Offset typedef support. An offset represent relative position
   * between indices. */
   //##ModelId=3E144ED1035A
-  typedef itk::Offset<VmitkImageDimension>  OffsetType;
+  typedef itk::Offset<RegionDimension>  OffsetType;
   //##ModelId=3E144ED1036D
   typedef OffsetType::OffsetValueType OffsetValueType;
 
   /** Size typedef support. A size is used to define region bounds. */
   //##ModelId=3E144ED10377
-  typedef itk::Size<VmitkImageDimension>  SizeType;
+  typedef itk::Size<RegionDimension>  SizeType;
   //##ModelId=3E144ED10382
   typedef SizeType::SizeValueType SizeValueType;
 

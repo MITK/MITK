@@ -66,7 +66,7 @@ void mitk::SlicedData::SetRequestedRegionToLargestPossibleRegion()
   unsigned int i;
   const RegionType::IndexType & index = GetLargestPossibleRegion().GetIndex();
   const RegionType::SizeType & size = GetLargestPossibleRegion().GetSize();
-  for(i=0;i<VmitkImageDimension;++i)
+  for(i=0;i<RegionDimension;++i)
   {
     m_RequestedRegion.SetIndex(i, index[i]);
     m_RequestedRegion.SetSize(i, size[i]);
@@ -140,7 +140,7 @@ bool mitk::SlicedData::VerifyRequestedRegion()
   const SizeType& largestPossibleRegionSize
     = GetLargestPossibleRegion().GetSize();
 
-  for (i=0; i< VmitkImageDimension; ++i)
+  for (i=0; i< RegionDimension; ++i)
   {
     if ( (requestedRegionIndex[i] < largestPossibleRegionIndex[i]) ||
       ((requestedRegionIndex[i] + static_cast<long>(requestedRegionSize[i]))

@@ -38,10 +38,20 @@ public:
   mitkClassMacro(SeedsImage, Image);
   itkNewMacro(Self);
 
+  itkGetMacro(LastPoint, mitk::Point3D);
+
+  void Initialize(); 
+
   /// handles operations
   virtual void ExecuteOperation(Operation* operation);
 
+  void ClearBuffer();
+
+
 protected:
+
+  void CreateBrush();
+
   /// sets a sphere of seeds around the point
   template < typename SeedsImageType >
   void AddSeedPoint(SeedsImageType * itkImage);
@@ -50,11 +60,15 @@ protected:
   template < typename SeedsImageType >
   void PointInterpolation(SeedsImageType * itkImage);
 
+  /// interpolates a tube of seeds between two points
+  template < typename SeedsImageType >
+  void ClearBuffer(SeedsImageType * itkImage);
+
 
 protected:
-  mitk::Point3D point;
-  mitk::Point3D last_point;
-  mitk::Vector3D spacing;
+  mitk::Point3D m_Point;
+  mitk::Point3D m_LastPoint;
+  mitk::Vector3D m_Spacing;
   int orig_size[3];
   int m_DrawState;
   int m_Radius;
@@ -62,7 +76,7 @@ protected:
   float sphere_distance;
 
   typedef itk::Image<float,3> MaskImageType;
-  MaskImageType::Pointer m_SmoothingMask;
+  MaskImageType::Pointer m_Brush;
 };
 } // namespace mitk
 

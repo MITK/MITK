@@ -35,9 +35,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "ipFunc/ipFunc.h"
 
-//##ModelId=3E0B7882024B
-mitk::ImageDataItem::ImageDataItem(const ImageDataItem& aParent, unsigned int dimension, size_t offset) : 
-  m_Data(NULL), m_PicDescriptor(NULL), m_VtkImageData(NULL), m_Offset(offset), m_IsComplete(false),
+mitk::ImageDataItem::ImageDataItem(const ImageDataItem& aParent, unsigned int dimension, void *data, bool manageMemory, size_t offset) : 
+  m_Data(NULL), m_ManageMemory(false), m_PicDescriptor(NULL), m_VtkImageData(NULL), m_Offset(offset), m_IsComplete(false),
   m_Parent(&aParent)
 {
   m_PixelType = aParent.GetPixelType();
@@ -49,12 +48,20 @@ mitk::ImageDataItem::ImageDataItem(const ImageDataItem& aParent, unsigned int di
   m_PicDescriptor->data=m_Data=static_cast<unsigned char*>(aParent.GetData())+offset;
   ipFuncCopyTags(m_PicDescriptor, aParent.GetPicDescriptor());
 
+  if(data != NULL)
+  {
+    memcpy(m_Data, data, _ipPicSize(m_PicDescriptor));
+    if(manageMemory)
+    {
+      delete data;
+    }
+  }
+
   m_ReferenceCountLock.Lock();
   m_ReferenceCount = 0;
   m_ReferenceCountLock.Unlock();
 }
 
-//##ModelId=3E0B78820287
 mitk::ImageDataItem::~ImageDataItem()
 {
   if(m_VtkImageData!=NULL)
@@ -66,15 +73,13 @@ mitk::ImageDataItem::~ImageDataItem()
   }
   if(m_Parent.IsNull())
   {
-    if(m_Data!=NULL)
+    if(m_ManageMemory)
       delete m_Data;
   }
 }
 
-
-//##ModelId=3E159C240213
-mitk::ImageDataItem::ImageDataItem(const mitk::PixelType& type, unsigned int dimension, unsigned int *dimensions) : 
-  m_Data(NULL), m_PicDescriptor(NULL), m_VtkImageData(NULL), m_Offset(0), m_IsComplete(false),
+mitk::ImageDataItem::ImageDataItem(const mitk::PixelType& type, unsigned int dimension, unsigned int *dimensions, void *data, bool manageMemory) : 
+  m_Data((unsigned char*)data), m_ManageMemory(manageMemory), m_PicDescriptor(NULL), m_VtkImageData(NULL), m_Offset(0), m_IsComplete(false),
   m_Parent(NULL)
 {
   //const std::type_info & typeId=*type.GetTypeId();
@@ -84,15 +89,18 @@ mitk::ImageDataItem::ImageDataItem(const mitk::PixelType& type, unsigned int dim
   m_PicDescriptor->type=m_PixelType.GetType();
   m_PicDescriptor->dim=dimension;
   memcpy(m_PicDescriptor->n, dimensions, sizeof(unsigned int)*(dimension<=8?dimension:8));
-  m_PicDescriptor->data=m_Data=new unsigned char[_ipPicSize(m_PicDescriptor)];
+  if(m_Data == NULL)
+  {
+    m_Data=new unsigned char[_ipPicSize(m_PicDescriptor)];
+    m_ManageMemory = true;
+  }
+  m_PicDescriptor->data=m_Data;
   
   m_ReferenceCountLock.Lock();
   m_ReferenceCount = 0;
   m_ReferenceCountLock.Unlock();
 }
 
-//##ModelId=3E33F08A03B8
-#include "pic2vtk/pic2vtk.h"
 void mitk::ImageDataItem::ConstructVtkImageData() const
 {
   vtkImageData *inData = vtkImageData::New();
@@ -201,7 +209,6 @@ void mitk::ImageDataItem::ConstructVtkImageData() const
   scalars->Delete();
 }
 
-//##ModelId=3E70F51001F2
 void mitk::ImageDataItem::Modified() const
 {
   if(m_VtkImageData)

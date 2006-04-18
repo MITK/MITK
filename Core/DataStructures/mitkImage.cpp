@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkHistogramGenerator.h"
 
 #include "mitkImage.h"
+#include "mitkImageDataItem.h"
 
 #include "mitkBaseProcess.h"
 #include "mitkSlicedGeometry3D.h"
@@ -34,6 +35,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkImageWriter.h>
 #include "mitkDataTreeNodeFactory.h"
 
+#include <itkSmartPointerForwardReference.txx>
 
 mitk::Image::Image() : 
   m_Dimension(0), m_Dimensions(NULL), m_OffsetTable(NULL),
@@ -106,8 +108,8 @@ vtkImageData* mitk::Image::GetVtkImageData(int t, int n)
     if(GetSource()->Updating()==false)
       GetSource()->UpdateOutputInformation();
   }
-  mitk::ImageDataItem::Pointer volume=GetVolumeData(t, n);
-  if(volume.IsNull() || volume->GetVtkImageData() == NULL)
+  ImageDataItemPointer volume=GetVolumeData(t, n);
+  if(volume.GetPointer()==NULL || volume->GetVtkImageData() == NULL)
     return NULL;
 
 #if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
@@ -131,36 +133,36 @@ ipPicDescriptor* mitk::Image::GetPic()
       GetSource()->UpdateOutputInformation();
   }
   m_CompleteData=GetChannelData();
-  if(m_CompleteData.IsNull()) 
+  if(m_CompleteData.GetPointer()==NULL) 
     return NULL;
   return m_CompleteData->GetPicDescriptor();
 }
 
 //##ModelId=3E0B4A6A01EC
-mitk::ImageDataItem::Pointer mitk::Image::GetSliceData(int s, int t, int n)
+mitk::Image::ImageDataItemPointer mitk::Image::GetSliceData(int s, int t, int n, void *data, ImportMemoryManagementType importMemoryManagement)
 {
   if(IsValidSlice(s,t,n)==false) return NULL;
 
   // slice directly available?
   int pos=GetSliceIndex(s,t,n);
-  if(m_Slices[pos].IsNotNull())
+  if(m_Slices[pos].GetPointer()!=NULL)
     return m_Slices[pos];
 
   // is slice available as part of a volume that is available?
   ImageDataItemPointer sl, ch, vol;
   vol=m_Volumes[GetVolumeIndex(t,n)];
-  if((vol.IsNotNull()) && (vol->IsComplete()))
+  if((vol.GetPointer()!=NULL) && (vol->IsComplete()))
   {
-    sl=new ImageDataItem(*vol, 2, s*m_OffsetTable[2]*m_PixelType.GetBpe()/8);
+    sl=new ImageDataItem(*vol, 2, data, importMemoryManagement == ManageMemory, s*m_OffsetTable[2]*m_PixelType.GetBpe()/8);
     sl->SetComplete(true);
     return m_Slices[pos]=sl;
   }
 
   // is slice available as part of a channel that is available?
   ch=m_Channels[n];
-  if((ch.IsNotNull()) && (ch->IsComplete()))
+  if((ch.GetPointer()!=NULL) && (ch->IsComplete()))
   {
-    sl=new ImageDataItem(*ch, 2, (s*m_OffsetTable[2]+t*m_OffsetTable[3])*m_PixelType.GetBpe()/8);
+    sl=new ImageDataItem(*ch, 2, data, importMemoryManagement == ManageMemory, (s*m_OffsetTable[2]+t*m_OffsetTable[3])*m_PixelType.GetBpe()/8);
     sl->SetComplete(true);
     return m_Slices[pos]=sl;
   }
@@ -183,20 +185,20 @@ mitk::ImageDataItem::Pointer mitk::Image::GetSliceData(int s, int t, int n)
     GetSource()->Update();
     if(IsSliceSet(s,t,n))
       //yes: now we can call ourselves without the risk of a endless loop (see "if" above)
-      return GetSliceData(s,t,n);
+      return GetSliceData(s,t,n,data,importMemoryManagement);
     else
       return NULL;
   }
   else
   {
-    mitk::ImageDataItem::Pointer item = AllocateSliceData(s,t,n);
+    ImageDataItemPointer item = AllocateSliceData(s,t,n,data,importMemoryManagement);
     item->SetComplete(true);
     return item;
   }
 }
 
 //##ModelId=3E0B4A82001A
-mitk::ImageDataItem::Pointer mitk::Image::GetVolumeData(int t, int n)
+mitk::Image::ImageDataItemPointer mitk::Image::GetVolumeData(int t, int n, void *data, ImportMemoryManagementType importMemoryManagement)
 {
   if(IsValidVolume(t,n)==false) return NULL;
 
@@ -205,14 +207,14 @@ mitk::ImageDataItem::Pointer mitk::Image::GetVolumeData(int t, int n)
   // volume directly available?
   int pos=GetVolumeIndex(t,n);
   vol=m_Volumes[pos];
-  if((vol.IsNotNull()) && (vol->IsComplete()))
+  if((vol.GetPointer()!=NULL) && (vol->IsComplete()))
     return vol;
 
   // is volume available as part of a channel that is available?
   ch=m_Channels[n];
-  if((ch.IsNotNull()) && (ch->IsComplete()))
+  if((ch.GetPointer()!=NULL) && (ch->IsComplete()))
   {
-    vol=new ImageDataItem(*ch, 3, (t*m_OffsetTable[3])*m_PixelType.GetBpe()/8);
+    vol=new ImageDataItem(*ch, 3, data, importMemoryManagement == ManageMemory, (t*m_OffsetTable[3])*m_PixelType.GetBpe()/8);
     vol->SetComplete(true);
     return m_Volumes[pos]=vol;
   }
@@ -222,7 +224,7 @@ mitk::ImageDataItem::Pointer mitk::Image::GetVolumeData(int t, int n)
   unsigned int s;
   for(s=0;s<m_Dimensions[2];++s)
   {
-    if(m_Slices[GetSliceIndex(s,t,n)].IsNull())
+    if(m_Slices[GetSliceIndex(s,t,n)].GetPointer()==NULL)
     {
       complete=false;
       break;
@@ -232,8 +234,8 @@ mitk::ImageDataItem::Pointer mitk::Image::GetVolumeData(int t, int n)
   {
     vol=m_Volumes[pos];
     // ok, let's combine the slices!
-    if(vol.IsNull())
-      vol=new ImageDataItem(m_PixelType, 3, m_Dimensions);
+    if(vol.GetPointer()==NULL)
+      vol=new ImageDataItem(m_PixelType, 3, m_Dimensions, NULL, true);
     vol->SetComplete(true);
     size_t size=m_OffsetTable[2]*m_PixelType.GetBpe()/8;
     for(s=0;s<m_Dimensions[2];++s)
@@ -252,7 +254,7 @@ mitk::ImageDataItem::Pointer mitk::Image::GetVolumeData(int t, int n)
         ipPicDescriptor * pic = sl->GetPicDescriptor();
 
         // replace old slice with reference to volume
-        sl=new ImageDataItem(*vol, 2, s*size);
+        sl=new ImageDataItem(*vol, 2, data, importMemoryManagement == ManageMemory, s*size);
         sl->SetComplete(true);
         ipFuncCopyTags(sl->GetPicDescriptor(), pic);
         m_Slices[posSl]=sl;
@@ -281,25 +283,25 @@ mitk::ImageDataItem::Pointer mitk::Image::GetVolumeData(int t, int n)
     GetSource()->Update();
     if(IsVolumeSet(t,n))
       //yes: now we can call ourselves without the risk of a endless loop (see "if" above)
-      return GetVolumeData(t,n);
+      return GetVolumeData(t,n,data,importMemoryManagement);
     else
       return NULL;
   }
   else
   {
-    mitk::ImageDataItem::Pointer item = AllocateVolumeData(t,n);
+    ImageDataItemPointer item = AllocateVolumeData(t,n,data,importMemoryManagement);
     item->SetComplete(true);
     return item;
   }
 }
 
 //##ModelId=3E0B4A9100BC
-mitk::ImageDataItem::Pointer mitk::Image::GetChannelData(int n)
+mitk::Image::ImageDataItemPointer mitk::Image::GetChannelData(int n, void *data, ImportMemoryManagementType importMemoryManagement)
 {
   if(IsValidChannel(n)==false) return NULL;
   ImageDataItemPointer ch, vol;
   ch=m_Channels[n];
-  if((ch.IsNotNull()) && (ch->IsComplete()))
+  if((ch.GetPointer()!=NULL) && (ch->IsComplete()))
     return ch;
 
   // let's see if all volumes are set, so that we can (could) combine them to a channel
@@ -308,16 +310,16 @@ mitk::ImageDataItem::Pointer mitk::Image::GetChannelData(int n)
     // if there is only one time frame we do not need to combine anything
     if(m_Dimensions[3]<=1)
     {
-      vol=GetVolumeData(0,n);
-      ch=new ImageDataItem(*vol, 3);
+      vol=GetVolumeData(0,n,data,importMemoryManagement);
+      ch=new ImageDataItem(*vol, 3, data, importMemoryManagement == ManageMemory);
       ch->SetComplete(true);
     }
     else
     {
       ch=m_Channels[n];
       // ok, let's combine the volumes!
-      if(ch.IsNull())
-        ch=new ImageDataItem(m_PixelType, m_Dimension, m_Dimensions);
+      if(ch.GetPointer()==NULL)
+        ch=new ImageDataItem(m_PixelType, m_Dimension, m_Dimensions, NULL, true);
       ch->SetComplete(true);
       size_t size=m_OffsetTable[m_Dimension-1]*m_PixelType.GetBpe()/8;
       unsigned int t;
@@ -327,7 +329,7 @@ mitk::ImageDataItem::Pointer mitk::Image::GetChannelData(int n)
         ImageDataItemPointer vol;
 
         posVol=GetVolumeIndex(t,n);
-        vol=GetVolumeData(t,n);
+        vol=GetVolumeData(t,n,data,importMemoryManagement);
 
         if(vol->GetParent()!=ch)
         {
@@ -338,7 +340,7 @@ mitk::ImageDataItem::Pointer mitk::Image::GetChannelData(int n)
           ipPicDescriptor * pic = vol->GetPicDescriptor();
 
           // replace old volume with reference to channel
-          vol=new ImageDataItem(*ch, 3, offset);
+          vol=new ImageDataItem(*ch, 3, data, importMemoryManagement == ManageMemory, offset);
           vol->SetComplete(true);
           ipFuncCopyTags(vol->GetPicDescriptor(), pic);
 
@@ -370,13 +372,13 @@ mitk::ImageDataItem::Pointer mitk::Image::GetChannelData(int n)
     // did it work?
     if(IsChannelSet(n))
       //yes: now we can call ourselves without the risk of a endless loop (see "if" above)
-      return GetChannelData(n);
+      return GetChannelData(n,data,importMemoryManagement);
     else
       return NULL;
   }
   else
   {
-    mitk::ImageDataItem::Pointer item = AllocateChannelData(n);
+    ImageDataItemPointer item = AllocateChannelData(n,data,importMemoryManagement);
     item->SetComplete(true);
     return item;
   }
@@ -387,15 +389,15 @@ bool mitk::Image::IsSliceSet(int s, int t, int n) const
 {
   if(IsValidSlice(s,t,n)==false) return false;
 
-  if(m_Slices[GetSliceIndex(s,t,n)].IsNotNull())
+  if(m_Slices[GetSliceIndex(s,t,n)].GetPointer()!=NULL)
     return true;
 
   ImageDataItemPointer ch, vol;
   vol=m_Volumes[GetVolumeIndex(t,n)];
-  if((vol.IsNotNull()) && (vol->IsComplete()))
+  if((vol.GetPointer()!=NULL) && (vol->IsComplete()))
     return true;
   ch=m_Channels[n];
-  if((ch.IsNotNull()) && (ch->IsComplete()))
+  if((ch.GetPointer()!=NULL) && (ch->IsComplete()))
     return true;
   return false;
 }
@@ -408,18 +410,18 @@ bool mitk::Image::IsVolumeSet(int t, int n) const
 
   // volume directly available?
   vol=m_Volumes[GetVolumeIndex(t,n)];
-  if((vol.IsNotNull()) && (vol->IsComplete()))
+  if((vol.GetPointer()!=NULL) && (vol->IsComplete()))
     return true;
 
   // is volume available as part of a channel that is available?
   ch=m_Channels[n];
-  if((ch.IsNotNull()) && (ch->IsComplete()))
+  if((ch.GetPointer()!=NULL) && (ch->IsComplete()))
     return true;
 
   // let's see if all slices of the volume are set, so that we can (could) combine them to a volume
   unsigned int s;
   for(s=0;s<m_Dimensions[2];++s)
-    if(m_Slices[GetSliceIndex(s,t,n)].IsNull())
+    if(m_Slices[GetSliceIndex(s,t,n)].GetPointer()==NULL)
       return false;
   return true;
 }
@@ -430,7 +432,7 @@ bool mitk::Image::IsChannelSet(int n) const
   if(IsValidChannel(n)==false) return false;
   ImageDataItemPointer ch, vol;
   ch=m_Channels[n];
-  if((ch.IsNotNull()) && (ch->IsComplete()))
+  if((ch.GetPointer()!=NULL) && (ch->IsComplete()))
 
     return true;
   // let's see if all volumes are set, so that we can (could) combine them to a channel
@@ -441,14 +443,31 @@ bool mitk::Image::IsChannelSet(int n) const
   return true;
 }
 
-//##ModelId=3E10148003D7
 bool mitk::Image::SetSlice(const void *data, int s, int t, int n)
+{
+  // const_cast is no risk for ImportMemoryManagementType == CopyMemory
+  return SetImportSlice(const_cast<void*>(data), s, t, n, CopyMemory);
+}
+
+bool mitk::Image::SetVolume(const void *data, int t, int n)
+{
+  // const_cast is no risk for ImportMemoryManagementType == CopyMemory
+  return SetImportVolume(const_cast<void*>(data), t, n, CopyMemory);
+}
+
+bool mitk::Image::SetChannel(const void *data, int n)
+{
+  // const_cast is no risk for ImportMemoryManagementType == CopyMemory
+  return SetImportChannel(const_cast<void*>(data), n, CopyMemory);
+}
+
+bool mitk::Image::SetImportSlice(void *data, int s, int t, int n, ImportMemoryManagementType importMemoryManagement)
 {
   if(IsValidSlice(s,t,n)==false) return false;
   ImageDataItemPointer sl;
   if(IsSliceSet(s,t,n))
   {
-    sl=GetSliceData(s,t,n);
+    sl=GetSliceData(s,t,n,data,importMemoryManagement);
     memcpy(sl->GetData(), data, m_OffsetTable[2]*m_PixelType.GetBpe()/8);
     sl->Modified();
     //we have changed the data: call Modified()! 
@@ -456,8 +475,8 @@ bool mitk::Image::SetSlice(const void *data, int s, int t, int n)
   }
   else
   {
-    sl=AllocateSliceData(s,t,n);
-    if(sl.IsNull()) return false;
+    sl=AllocateSliceData(s,t,n,data,importMemoryManagement);
+    if(sl.GetPointer()==NULL) return false;
     memcpy(sl->GetData(), data, m_OffsetTable[2]*m_PixelType.GetBpe()/8);   
     //we just added a missing slice, which is not regarded as modification.
     //Therefore, we do not call Modified()!
@@ -465,14 +484,13 @@ bool mitk::Image::SetSlice(const void *data, int s, int t, int n)
   return true;
 }
 
-//##ModelId=3E1014A00211
-bool mitk::Image::SetVolume(const void *data, int t, int n)
+bool mitk::Image::SetImportVolume(void *data, int t, int n, ImportMemoryManagementType importMemoryManagement)
 {
   if(IsValidVolume(t,n)==false) return false;
   ImageDataItemPointer vol;
   if(IsVolumeSet(t,n))
   {
-    vol=GetVolumeData(t,n);
+    vol=GetVolumeData(t,n,data,importMemoryManagement);
     memcpy(vol->GetData(), data, m_OffsetTable[3]*m_PixelType.GetBpe()/8);
     vol->Modified();
     vol->SetComplete(true);
@@ -481,8 +499,8 @@ bool mitk::Image::SetVolume(const void *data, int t, int n)
   }
   else
   {
-    vol=AllocateVolumeData(t,n);
-    if(vol.IsNull()) return false;
+    vol=AllocateVolumeData(t,n,data,importMemoryManagement);
+    if(vol.GetPointer()==NULL) return false;
     memcpy(vol->GetData(), data, m_OffsetTable[3]*m_PixelType.GetBpe()/8);
     vol->SetComplete(true);
     //we just added a missing Volume, which is not regarded as modification.
@@ -491,13 +509,13 @@ bool mitk::Image::SetVolume(const void *data, int t, int n)
   return true;
 }
 
-bool mitk::Image::SetChannel(const void *data, int n)
+bool mitk::Image::SetImportChannel(void *data, int n, ImportMemoryManagementType importMemoryManagement)
 {
   if(IsValidChannel(n)==false) return false;
   ImageDataItemPointer ch;
   if(IsChannelSet(n))
   {
-    ch=GetChannelData(n);
+    ch=GetChannelData(n,data,importMemoryManagement);
     memcpy(ch->GetData(), ch, m_OffsetTable[4]*m_PixelType.GetBpe()/8);
     ch->Modified();
     ch->SetComplete(true);
@@ -506,8 +524,8 @@ bool mitk::Image::SetChannel(const void *data, int n)
   }
   else
   {
-    ch=AllocateChannelData(n);
-    if(ch.IsNull()) return false;
+    ch=AllocateChannelData(n,data,importMemoryManagement);
+    if(ch.GetPointer()==NULL) return false;
     memcpy(ch->GetData(), data, m_OffsetTable[4]*m_PixelType.GetBpe()/8);
     ch->SetComplete(true);
     //we just added a missing Channel, which is not regarded as modification.
@@ -516,8 +534,7 @@ bool mitk::Image::SetChannel(const void *data, int n)
   return true;
 }
 
-//##ModelId=3E1027F8023D
-bool mitk::Image::SetPicSlice(const ipPicDescriptor *pic, int s, int t, int n)
+bool mitk::Image::SetPicSlice(const ipPicDescriptor *pic, int s, int t, int n, ImportMemoryManagementType importMemoryManagement)
 {
   if(pic==NULL) return false;
   if(pic->dim!=2) return false;
@@ -525,7 +542,7 @@ bool mitk::Image::SetPicSlice(const ipPicDescriptor *pic, int s, int t, int n)
   if(SetSlice(pic->data,s,t,n)) //@todo: add geometry!
   {
     ImageDataItemPointer sl;
-    sl=GetSliceData(s,t,n);
+    sl=GetSliceData(s,t,n,NULL,CopyMemory);
     ipFuncCopyTags(sl->GetPicDescriptor(), const_cast<ipPicDescriptor *>(pic));
     return true;
   }
@@ -533,8 +550,7 @@ bool mitk::Image::SetPicSlice(const ipPicDescriptor *pic, int s, int t, int n)
     return false;
 }
 
-//##ModelId=3E102818024D
-bool mitk::Image::SetPicVolume(const ipPicDescriptor *pic, int t, int n)
+bool mitk::Image::SetPicVolume(const ipPicDescriptor *pic, int t, int n, ImportMemoryManagementType importMemoryManagement)
 {
   if(pic==NULL) return false;
   if((pic->dim==2) && ((m_Dimension==2) || ((m_Dimension>2) && (m_Dimensions[2]==1)))) return SetPicSlice(pic, 0, t, n);
@@ -543,7 +559,7 @@ bool mitk::Image::SetPicVolume(const ipPicDescriptor *pic, int t, int n)
   if(SetVolume(pic->data,t,n)) //@todo: add geometry!
   {
     ImageDataItemPointer vol;
-    vol=GetVolumeData(t,n);
+    vol=GetVolumeData(t,n,NULL,CopyMemory);
     ipFuncCopyTags(vol->GetPicDescriptor(), const_cast<ipPicDescriptor *>(pic));
     return true;
   }
@@ -551,7 +567,7 @@ bool mitk::Image::SetPicVolume(const ipPicDescriptor *pic, int t, int n)
     return false;
 }
 
-bool mitk::Image::SetPicChannel(const ipPicDescriptor *pic, int n)
+bool mitk::Image::SetPicChannel(const ipPicDescriptor *pic, int n, ImportMemoryManagementType importMemoryManagement)
 {
   if(pic==NULL) return false;
   if(pic->dim<=3) return SetPicVolume(pic, 0, n);
@@ -564,7 +580,7 @@ bool mitk::Image::SetPicChannel(const ipPicDescriptor *pic, int n)
   if(SetChannel(pic->data,n)) //@todo: add geometry!
   {
     ImageDataItemPointer ch;
-    ch=GetChannelData(n);
+    ch=GetChannelData(n,NULL,CopyMemory);
     // commented the next line, because 
     // it crashes when called from mitkDICOMFileReader for the Live3D data
     // ipFuncCopyTags(ch->GetPicDescriptor(), pic);
@@ -935,7 +951,7 @@ int mitk::Image::GetVolumeIndex(int t, int n) const
 }
 
 //##ModelId=3E1569310328
-mitk::ImageDataItem::Pointer mitk::Image::AllocateSliceData(int s, int t, int n)
+mitk::Image::ImageDataItemPointer mitk::Image::AllocateSliceData(int s, int t, int n, void *data, ImportMemoryManagementType importMemoryManagement)
 {
   int pos;
   pos=GetSliceIndex(s,t,n);
@@ -943,25 +959,25 @@ mitk::ImageDataItem::Pointer mitk::Image::AllocateSliceData(int s, int t, int n)
   // is slice available as part of a volume that is available?
   ImageDataItemPointer sl, ch, vol;
   vol=m_Volumes[GetVolumeIndex(t,n)];
-  if(vol.IsNotNull())
+  if(vol.GetPointer()!=NULL)
   {
-    sl=new ImageDataItem(*vol, 2, s*m_OffsetTable[2]*m_PixelType.GetBpe()/8);
+    sl=new ImageDataItem(*vol, 2, data, importMemoryManagement == ManageMemory, s*m_OffsetTable[2]*m_PixelType.GetBpe()/8);
     sl->SetComplete(true);
     return m_Slices[pos]=sl;
   }
 
   // is slice available as part of a channel that is available?
   ch=m_Channels[n];
-  if(ch.IsNotNull())
+  if(ch.GetPointer()!=NULL)
   {
-    sl=new ImageDataItem(*ch, 2, (s*m_OffsetTable[2]+t*m_OffsetTable[3])*m_PixelType.GetBpe()/8);
+    sl=new ImageDataItem(*ch, 2, data, importMemoryManagement == ManageMemory, (s*m_OffsetTable[2]+t*m_OffsetTable[3])*m_PixelType.GetBpe()/8);
     sl->SetComplete(true);
     return m_Slices[pos]=sl;
   }
 
   // allocate new volume (instead of a single slice to keep data together!)
-  m_Volumes[GetVolumeIndex(t,n)]=vol=AllocateVolumeData(t,n);
-  sl=new ImageDataItem(*vol, 2, s*m_OffsetTable[2]*m_PixelType.GetBpe()/8);
+  m_Volumes[GetVolumeIndex(t,n)]=vol=AllocateVolumeData(t,n,NULL,importMemoryManagement);
+  sl=new ImageDataItem(*vol, 2, data, importMemoryManagement == ManageMemory, s*m_OffsetTable[2]*m_PixelType.GetBpe()/8);
   sl->SetComplete(true);
   return m_Slices[pos]=sl;
 
@@ -973,7 +989,7 @@ mitk::ImageDataItem::Pointer mitk::Image::AllocateSliceData(int s, int t, int n)
 }
 
 //##ModelId=3E15694500EC
-mitk::ImageDataItem::Pointer mitk::Image::AllocateVolumeData(int t, int n)
+mitk::Image::ImageDataItemPointer mitk::Image::AllocateVolumeData(int t, int n, void *data, ImportMemoryManagementType importMemoryManagement)
 {
   int pos;
   pos=GetVolumeIndex(t,n);
@@ -981,23 +997,42 @@ mitk::ImageDataItem::Pointer mitk::Image::AllocateVolumeData(int t, int n)
   // is volume available as part of a channel that is available?
   ImageDataItemPointer ch, vol;
   ch=m_Channels[n];
-  if(ch.IsNotNull())
+  if(ch.GetPointer()!=NULL)
   {
-    vol=new ImageDataItem(*ch, 3, (t*m_OffsetTable[3])*m_PixelType.GetBpe()/8);
+    vol=new ImageDataItem(*ch, 3, data, importMemoryManagement == ManageMemory, (t*m_OffsetTable[3])*m_PixelType.GetBpe()/8);
     return m_Volumes[pos]=vol;
   }
 
   // allocate new volume
-  vol=new ImageDataItem(m_PixelType, 3, m_Dimensions);
+  if(importMemoryManagement == CopyMemory)
+  {
+    vol=new ImageDataItem(m_PixelType, 3, m_Dimensions, NULL, true);
+    if(data != NULL)
+      memcpy(vol->GetData(), data, m_OffsetTable[3]*m_PixelType.GetBpe()/8);
+  }
+  else
+  {
+    vol=new ImageDataItem(m_PixelType, 3, m_Dimensions, data, importMemoryManagement == ManageMemory);
+  }
   m_Volumes[pos]=vol;
   return vol;
 }
 
 //##ModelId=3E1569500322
-mitk::ImageDataItem::Pointer mitk::Image::AllocateChannelData(int n)
+mitk::Image::ImageDataItemPointer mitk::Image::AllocateChannelData(int n, void *data, ImportMemoryManagementType importMemoryManagement)
 {
+  ImageDataItemPointer ch;
   // allocate new channel
-  ImageDataItemPointer ch=new ImageDataItem(m_PixelType, m_Dimension, m_Dimensions);
+  if(importMemoryManagement == CopyMemory)
+  {
+    ch=new ImageDataItem(m_PixelType, m_Dimension, m_Dimensions, NULL, true);
+    if(data != NULL)
+      memcpy(ch->GetData(), data, m_OffsetTable[4]*m_PixelType.GetBpe()/8);
+  }
+  else
+  {
+    ch=new ImageDataItem(m_PixelType, m_Dimension, m_Dimensions, data, importMemoryManagement == ManageMemory);
+  }
   m_Channels[n]=ch;
   return ch;
 }

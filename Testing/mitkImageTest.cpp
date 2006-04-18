@@ -18,6 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include "mitkImage.h"
+#include "mitkImageDataItem.h"
 
 #include <fstream>
 int mitkImageTest(int argc, char* argv[])

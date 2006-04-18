@@ -103,12 +103,15 @@ bool mitk::SeedsInteractor::ExecuteAction(mitk::Action* action, mitk::StateEvent
       //execute the Operation
       m_SeedsImage->ExecuteOperation(doOp);   
       ok = true;
+      //this->Modified();
       break;
     }
   case mitk::AcFINISH:
     {
       last_point = event_point;
       ok = true;
+      this->Modified();
+
       break;
     }
   default:

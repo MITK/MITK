@@ -27,7 +27,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk {
 
-//##ModelId=3DCBFE1800BB
 //##Documentation
 //## @brief Base class of all classes providing access to parts of an image
 //##
@@ -39,34 +38,27 @@ namespace mitk {
 class SubImageSelector : public ImageToImageFilter
 {
 public:
-	/** Run-time type information (and related methods). */
-	mitkClassMacro(SubImageSelector,ImageToImageFilter);
+  /** Run-time type information (and related methods). */
+  mitkClassMacro(SubImageSelector,ImageToImageFilter);
 
-	itkNewMacro(Self);  
+  itkNewMacro(Self);  
 
-    //##ModelId=3E0B4663009F
-	virtual void SetPosNr(int p);
+  virtual void SetPosNr(int p);
 
-    //##ModelId=3E1B19AD02A6
-    SubImageSelector();
+  SubImageSelector();
 
-    //##ModelId=3E1B19AD02CE
-    virtual ~SubImageSelector();
+  virtual ~SubImageSelector();
 
 protected:
-	//##ModelId=3E1A0FC903A5
-	mitk::ImageDataItem::Pointer GetSliceData(int s = 0, int t = 0, int n = 0);
-	mitk::ImageDataItem::Pointer GetVolumeData(int t = 0, int n = 0);
-	mitk::ImageDataItem::Pointer GetChannelData(int n = 0);
+  mitk::Image::ImageDataItemPointer GetSliceData(int s = 0, int t = 0, int n = 0);
+  mitk::Image::ImageDataItemPointer GetVolumeData(int t = 0, int n = 0);
+  mitk::Image::ImageDataItemPointer GetChannelData(int n = 0);
 
-	//##ModelId=3E1A123E0396
-	void SetSliceItem(mitk::ImageDataItem::Pointer dataItem, int s = 0, int t = 0, int n = 0);
-	void SetVolumeItem(mitk::ImageDataItem::Pointer dataItem, int t = 0, int n = 0);
-	void SetChannelItem(mitk::ImageDataItem::Pointer dataItem, int n = 0);
+  void SetSliceItem(mitk::Image::ImageDataItemPointer dataItem, int s = 0, int t = 0, int n = 0);
+  void SetVolumeItem(mitk::Image::ImageDataItemPointer dataItem, int t = 0, int n = 0);
+  void SetChannelItem(mitk::Image::ImageDataItemPointer dataItem, int n = 0);
 };
 
 } // namespace mitk
-
-
 
 #endif /* SUBIMAGESELECTOR_H_HEADER_INCLUDED_C1E4F463 */

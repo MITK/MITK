@@ -19,11 +19,47 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkImage.h"
 #include "mitkImageAccessByItk.h"
+#include "mitkITKImageImport.h"
 
 #include <fstream>
+
+int compareGeometries(mitk::Geometry3D* geometry1, mitk::Geometry3D* geometry2)
+{
+  std::cout << "Testing transfer of GetGeometry()->GetOrigin(): " << std::flush;
+  if(mitk::Equal(geometry1->GetOrigin(), geometry2->GetOrigin()) == false)
+  {
+    std::cout<<"[FAILED]"<<std::endl;
+    return EXIT_FAILURE;
+  }
+  std::cout<<"[PASSED]"<<std::endl;
+
+  std::cout << "Testing transfer of GetGeometry()->GetSpacing(): " << std::flush;
+  if(mitk::Equal(geometry1->GetSpacing(), geometry2->GetSpacing()) == false)
+  {
+    std::cout<<"[FAILED]"<<std::endl;
+    return EXIT_FAILURE;
+  }
+  std::cout<<"[PASSED]"<<std::endl;
+
+  int i;
+  for(i=0; i<3; ++i)
+  {
+    std::cout << "Testing transfer of GetGeometry()->GetAxisVector(" << i << "): " << std::flush;
+    if(mitk::Equal(geometry1->GetAxisVector(i), geometry2->GetAxisVector(i)) == false)
+    {
+      std::cout<<"[FAILED]"<<std::endl;
+      return EXIT_FAILURE;
+    }
+    std::cout<<"[PASSED]"<<std::endl;
+  }
+  return EXIT_SUCCESS;
+}
+  
 int mitkImageToItkTest(int argc, char* argv[])
 {
-	//Create Image out of nowhere
+  int result;
+
+  //Create Image out of nowhere
 	mitk::Image::Pointer imgMem;
 	mitk::PixelType pt(typeid(int));
 	unsigned int dim[]={100,100,20};
@@ -73,33 +109,17 @@ int mitkImageToItkTest(int argc, char* argv[])
   mitk::CastToMitkImage( itkImage, mitkImage );
   std::cout<<"[PASSED]"<<std::endl;
 
-  std::cout << "Testing transfer of GetGeometry()->GetOrigin(): " << std::flush;
-  if(mitk::Equal(imgMem->GetGeometry()->GetOrigin(), mitkImage->GetGeometry()->GetOrigin()) == false)
-  {
-    std::cout<<"[FAILED]"<<std::endl;
-    return EXIT_FAILURE;
-  }
+  result = compareGeometries(imgMem->GetGeometry(), mitkImage->GetGeometry());
+  if(result != EXIT_SUCCESS)
+    return result;
+
+  std::cout << "Testing mitk::ImportItkImage: " << std::flush;
+  mitkImage = mitk::ImportItkImage(itkImage);
   std::cout<<"[PASSED]"<<std::endl;
 
-  std::cout << "Testing transfer of GetGeometry()->GetSpacing(): " << std::flush;
-  if(mitk::Equal(imgMem->GetGeometry()->GetSpacing(), mitkImage->GetGeometry()->GetSpacing()) == false)
-  {
-    std::cout<<"[FAILED]"<<std::endl;
-    return EXIT_FAILURE;
-  }
-  std::cout<<"[PASSED]"<<std::endl;
-
-  int i;
-  for(i=0; i<3; ++i)
-  {
-    std::cout << "Testing transfer of GetGeometry()->GetAxisVector(" << i << "): " << std::flush;
-    if(mitk::Equal(imgMem->GetGeometry()->GetAxisVector(i), mitkImage->GetGeometry()->GetAxisVector(i)) == false)
-    {
-      std::cout<<"[FAILED]"<<std::endl;
-      return EXIT_FAILURE;
-    }
-    std::cout<<"[PASSED]"<<std::endl;
-  }
+  result = compareGeometries(imgMem->GetGeometry(), mitkImage->GetGeometry());
+  if(result != EXIT_SUCCESS)
+    return result;
 
   std::cout<<"[TEST DONE]"<<std::endl;
   return EXIT_SUCCESS;

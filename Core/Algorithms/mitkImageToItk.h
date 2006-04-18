@@ -37,7 +37,7 @@ class ITK_EXPORT ImageToItk : public itk::ImageSource< TOutputImage >
 {
 protected:
 	mitk::Image::Pointer m_MitkImage;
-	mitk::ImageDataItem::Pointer m_ImageDataItem;
+  mitk::Image::ImageDataItemPointer m_ImageDataItem;
   
 public:
   typedef ImageToItk  Self;

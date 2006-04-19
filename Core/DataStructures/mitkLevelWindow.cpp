@@ -175,7 +175,7 @@ std:max values or has only 1 or 2 or 3 data values.
 */
 void mitk::LevelWindow::SetAuto(mitk::Image* image, bool tryPicTags, bool guessByCentralSlice)
 {
-    if ( image == NULL )
+    if ( ( image == NULL ) || ( !image->IsInitialized()) )
         return;
 
     if ( tryPicTags )

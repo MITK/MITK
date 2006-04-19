@@ -46,7 +46,19 @@ void mitk::Geometry2DData::SetGeometry(mitk::Geometry3D *geometry)
 //##ModelId=3E6423D2030E
 void mitk::Geometry2DData::SetGeometry2D(mitk::Geometry2D *geometry2d)
 {
-  Superclass::SetGeometry(geometry2d);
+  if(geometry2d != NULL)
+  {
+    TimeSlicedGeometry* timeSlicedGeometry = GetTimeSlicedGeometry();
+    if(timeSlicedGeometry == NULL)
+    {
+      Superclass::SetGeometry(geometry2d);
+      return;
+    }
+    timeSlicedGeometry->InitializeEvenlyTimed(geometry2d, 1);
+    Modified();
+  }
+  else
+    Superclass::SetGeometry(geometry2d);
 }
 
 //##ModelId=3E66CC5A0295

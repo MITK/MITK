@@ -113,11 +113,10 @@ Image::Pointer ImportItkImage(const itk::SmartPointer<ItkOutputImageType>& itkim
 template <typename ItkOutputImageType> 
 Image::Pointer ImportItkImage(const ItkOutputImageType* itkimage, bool update = true);
 
+} // namespace mitk
+
 #ifndef MITK_MANUAL_INSTANTIATION
 #include "mitkITKImageImport.txx"
 #endif
-
-} // namespace mitk
-
 
 #endif /* MITKITKIMAGEIMPORT_H_HEADER_INCLUDED_C1E4861D */

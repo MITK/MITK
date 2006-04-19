@@ -106,7 +106,7 @@ void mitk::ITKImageImport<TInputImage>::SetNthOutput(unsigned int idx, itk::Data
 template <typename ItkOutputImageType> 
 mitk::Image::Pointer mitk::ImportItkImage(const itk::SmartPointer<ItkOutputImageType>& itkimage, bool update)
 {
-  mitk::ITKImageImport<ItkOutputImageType>::Pointer importer = mitk::ITKImageImport<ItkOutputImageType>::New();
+  typename mitk::ITKImageImport<ItkOutputImageType>::Pointer importer = mitk::ITKImageImport<ItkOutputImageType>::New();
   importer->SetInput(itkimage);
   if(update)
     importer->Update();
@@ -116,7 +116,7 @@ mitk::Image::Pointer mitk::ImportItkImage(const itk::SmartPointer<ItkOutputImage
 template <typename ItkOutputImageType> 
 mitk::Image::Pointer mitk::ImportItkImage(const ItkOutputImageType* itkimage, bool update)
 {
-  mitk::ITKImageImport<ItkOutputImageType>::Pointer importer = mitk::ITKImageImport<ItkOutputImageType>::New();
+  typename mitk::ITKImageImport<ItkOutputImageType>::Pointer importer = mitk::ITKImageImport<ItkOutputImageType>::New();
   importer->SetInput(itkimage);
   if(update)
     importer->Update();

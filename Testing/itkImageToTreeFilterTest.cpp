@@ -537,7 +537,7 @@ int testTreeToBinaryImageFilter()
   treeToImageFilter->SetInput(outputTree);
   try
   {
-//     treeToImageFilter->Update();
+    treeToImageFilter->Update();
   }
   catch(itk::ExceptionObject ex)
   {
@@ -638,6 +638,16 @@ int testRefinementModelProcessor()
   refinementProcessor->SetInput(tubeSegment);
   refinementProcessor->SetImage(pointSetToImageFilter->GetOutput());
   refinementProcessor->Update();
+
+  RegistrationModelPointer  outputModel   = refinementProcessor->GetOutput();
+  PointsContainerPointer    inputPoints   = tubeSegment->GetPointSet()->GetPoints();
+  PointsContainerPointer    outputPoints  = outputModel->GetPointSet()->GetPoints();
+
+  if(inputPoints->Size() != outputPoints->Size())
+  {
+    std::cout << "Output does not have the same number of points as input." << std::endl;
+    return EXIT_FAILURE;
+  }
 
   std::cout << " *** [TEST PASSED] ***\n";
   return EXIT_SUCCESS;

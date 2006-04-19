@@ -40,9 +40,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk {
 
-//##ModelId=3E189B1D008D
 SliceNavigationController::SliceNavigationController(const char * type) 
-: BaseController(type), m_InputWorldGeometry(NULL), m_CreatedWorldGeometry(NULL), m_ViewDirection(Transversal), m_BlockUpdate(false)
+  : BaseController(type), m_InputWorldGeometry(NULL), m_CreatedWorldGeometry(NULL), 
+    m_ViewDirection(Transversal), m_BlockUpdate(false)
 {
   itk::SimpleMemberCommand<SliceNavigationController>::Pointer sliceStepperChangedCommand, timeStepperChangedCommand;
   sliceStepperChangedCommand = itk::SimpleMemberCommand<SliceNavigationController>::New();
@@ -54,7 +54,6 @@ SliceNavigationController::SliceNavigationController(const char * type)
   m_Time->AddObserver(itk::ModifiedEvent(),  timeStepperChangedCommand);
 }
 
-//##ModelId=3E189B1D00BF
 SliceNavigationController::~SliceNavigationController()
 {
 
@@ -77,6 +76,14 @@ void SliceNavigationController::SetInputWorldGeometry(const Geometry3D* geometry
   }
 }
 
+RenderingManager* SliceNavigationController::GetRenderingManager() const
+{
+  mitk::RenderingManager* renderingManager = m_RenderingManager.GetPointer();
+  if(renderingManager == NULL)
+    return mitk::RenderingManager::GetInstance();
+  return renderingManager;
+}
+
 void SliceNavigationController::Update()
 {
   if(m_BlockUpdate)
@@ -89,7 +96,9 @@ void SliceNavigationController::Update()
   else
   {
     Update(m_ViewDirection);
-  } } 
+  }
+} 
+
 void SliceNavigationController::Update(SliceNavigationController::ViewDirection viewDirection, bool top, bool frontside, bool rotated)
 {
   if(m_InputWorldGeometry.IsNull())
@@ -222,7 +231,7 @@ void SliceNavigationController::SendSlice()
       InvokeEvent(GeometrySliceEvent(m_CreatedWorldGeometry, m_Slice->GetPos()));
 
       // Request rendering update for all views
-      RenderingManager::GetInstance()->RequestUpdateAll();
+      GetRenderingManager()->RequestUpdateAll();
     }
   }
 }
@@ -236,7 +245,7 @@ void SliceNavigationController::SendTime()
       InvokeEvent(GeometryTimeEvent(m_CreatedWorldGeometry, m_Time->GetPos()));
 
       // Request rendering update for all views
-      RenderingManager::GetInstance()->RequestUpdateAll();
+      GetRenderingManager()->RequestUpdateAll();
     }
   }
 }

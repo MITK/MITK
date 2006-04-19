@@ -22,7 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkCommon.h"
 #include "mitkBaseController.h"
-#include "mitkImageToImageFilter.h"
+#include "mitkRenderingManager.h"
 #include "mitkTimeSlicedGeometry.h"
 #include <itkEventObject.h>
 #include <itkCommand.h>
@@ -169,6 +169,13 @@ class SliceNavigationController : public BaseController
     //## Called by Update().
     virtual void SendTime();
 
+    //##Documentation
+    //## @brief Set the RenderingManager to be used
+    //##
+    //## If \a NULL, the default RenderingManager will be used.
+    itkSetObjectMacro(RenderingManager, RenderingManager);
+    mitk::RenderingManager* GetRenderingManager() const;
+
     itkEventMacro( UpdateEvent, itk::AnyEvent );
 
     class TimeSlicedGeometryEvent : public itk::AnyEvent 
@@ -278,6 +285,8 @@ class SliceNavigationController : public BaseController
     mitk::TimeSlicedGeometry::Pointer m_CreatedWorldGeometry;
 
     ViewDirection m_ViewDirection;
+
+    mitk::RenderingManager::Pointer m_RenderingManager;
 
     itkSetMacro(Top, bool);
     itkGetMacro(Top, bool);

@@ -52,7 +52,6 @@ SliceNavigationController::SliceNavigationController(const char * type)
 
   m_Slice->AddObserver(itk::ModifiedEvent(), sliceStepperChangedCommand);
   m_Time->AddObserver(itk::ModifiedEvent(),  timeStepperChangedCommand);
-  ConnectGeometryEvents(this);
 }
 
 //##ModelId=3E189B1D00BF

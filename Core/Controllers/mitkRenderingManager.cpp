@@ -21,29 +21,46 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkRenderWindow.h"
 #include "mitkOpenGLRenderer.h"
 
-mitk::RenderingManager *mitk::RenderingManager::m_Instance = 0;
-mitk::RenderingManagerFactory *mitk::RenderingManager::m_RenderingManagerFactory = 0;
+mitk::RenderingManager::RenderWindowList mitk::RenderingManager::s_RenderWindowList;
+mitk::RenderingManager *mitk::RenderingManager::s_Instance = 0;
+mitk::RenderingManagerFactory *mitk::RenderingManager::s_RenderingManagerFactory = 0;
 
 void
 mitk::RenderingManager
 ::SetFactory( RenderingManagerFactory *factory )
 {
-  m_RenderingManagerFactory = factory;
+  s_RenderingManagerFactory = factory;
+}
+
+const mitk::RenderingManagerFactory * 
+mitk::RenderingManager
+::GetFactory()
+{
+  return s_RenderingManagerFactory;
+}
+
+
+mitk::RenderingManager::Pointer mitk::RenderingManager::New()
+{
+  const mitk::RenderingManagerFactory* factory = GetFactory();
+  if(factory == NULL)
+    return NULL;
+  return factory->CreateRenderingManager();
 }
 
 mitk::RenderingManager *
 mitk::RenderingManager
 ::GetInstance()
 {
-  if ( !RenderingManager::m_Instance )
+  if ( !RenderingManager::s_Instance )
   {
-    if ( m_RenderingManagerFactory )
+    if ( s_RenderingManagerFactory )
     {
-      m_Instance = m_RenderingManagerFactory->CreateRenderingManager();
+      s_Instance = s_RenderingManagerFactory->CreateRenderingManager();
     }
   }
 
-  return m_Instance;
+  return s_Instance;
 }
 
 mitk::RenderingManager::RenderingManager()
@@ -62,6 +79,7 @@ mitk::RenderingManager
 ::AddRenderWindow( RenderWindow *renderWindow )
 {
   m_RenderWindowList[renderWindow] = 0;
+  s_RenderWindowList[renderWindow] = 0;
 }
 
 void
@@ -69,13 +87,17 @@ mitk::RenderingManager
 ::RemoveRenderWindow( RenderWindow *renderWindow )
 {
   m_RenderWindowList.erase( renderWindow );
+  if(s_Instance == this)
+  {
+    s_RenderWindowList.erase( renderWindow );
+  }
 }
 
 void
 mitk::RenderingManager
 ::RequestUpdate( RenderWindow *renderWindow )
 {
-  m_RenderWindowList[renderWindow] = 2;
+  s_RenderWindowList[renderWindow] = 2;
   
   if ( !m_UpdatePending )
   {
@@ -86,16 +108,8 @@ mitk::RenderingManager
 
 void
 mitk::RenderingManager
-::ForceImmediateUpdate( RenderWindow *renderWindow )
+::CheckUpdatePending()
 {
-  bool onlyOverlay = ( m_RenderWindowList[renderWindow] == 1 )?true:false;
-
-  // Immediately repaint this window (implementation platform specific)
-  renderWindow->Repaint(onlyOverlay);
-
-  // Erase potentially pending requests for this window
-  m_RenderWindowList[renderWindow] = 0;
-
   // Check if there are pending requests for any other windows
   m_UpdatePending = false;
   RenderWindowList::iterator it;
@@ -106,6 +120,25 @@ mitk::RenderingManager
       m_UpdatePending = true;
     }
   }
+
+}
+
+void
+mitk::RenderingManager
+::ForceImmediateUpdate( RenderWindow *renderWindow )
+{
+  bool onlyOverlay = (( m_RenderWindowList[renderWindow] == 1 ) && ( s_RenderWindowList[renderWindow] == 1 )) ?true:false;
+
+  // Immediately repaint this window (implementation platform specific)
+  renderWindow->Repaint(onlyOverlay);
+
+  // Erase potentially pending requests for this window
+  m_RenderWindowList[renderWindow] = 0;
+  s_RenderWindowList[renderWindow] = 0;
+
+  CheckUpdatePending();
+  if(s_Instance != this)
+    GetInstance()->CheckUpdatePending();
 
   // Stop the timer if no more requests are pending
   if ( !m_UpdatePending )
@@ -122,6 +155,7 @@ mitk::RenderingManager
   for ( it = m_RenderWindowList.begin(); it != m_RenderWindowList.end(); ++it )
   {
     it->second = 2;
+    s_RenderWindowList[it->first] = 2;
   }
 
   // Restart the timer if there are no requests already
@@ -139,13 +173,15 @@ mitk::RenderingManager
   RenderWindowList::iterator it;
   for ( it = m_RenderWindowList.begin(); it != m_RenderWindowList.end(); ++it )
   {
-    bool onlyOverlay = ( it->second == 1 )?true:false;
-    
-    // Immediately repaint this window (implementation platform specific)
-    it->first->Repaint(onlyOverlay);
+    int& globalRequest = s_RenderWindowList[it->first];
+    bool onlyOverlay = (( it->second == 1 ) && ( globalRequest == 1 )) ?true:false;
 
     // Erase potentially pending requests
     it->second = 0;
+    globalRequest = 0;
+
+    // Immediately repaint this window (implementation platform specific)
+    it->first->Repaint(onlyOverlay);
   }
 
   if ( m_UpdatePending )
@@ -153,6 +189,9 @@ mitk::RenderingManager
     this->StopTimer();
     m_UpdatePending = false;
   }
+
+  if(s_Instance != this)
+    GetInstance()->CheckUpdatePending();
 }
 
 void 
@@ -162,7 +201,12 @@ mitk::RenderingManager
   RenderWindowList::iterator it;
   for ( it = m_RenderWindowList.begin(); it != m_RenderWindowList.end(); ++it )
   {
-    bool onlyOverlay = ( it->second == 1 )?true:false;
+    int& globalRequest = s_RenderWindowList[it->first];
+    bool onlyOverlay = (( it->second == 1 ) && ( globalRequest == 1 )) ?true:false;
+
+    // Erase potentially pending requests
+    it->second = 0;
+    globalRequest = 0;
     
     // if the render window is rendered via an mitk::OpenGLRenderer
     // call UpdateIncludingVtkActors. 
@@ -170,9 +214,6 @@ mitk::RenderingManager
     if ( openGLRenderer )
       openGLRenderer->UpdateIncludingVtkActors();
     it->first->Repaint(onlyOverlay);
-
-    // Erase potentially pending requests
-    it->second = 0;
   }
 
   if ( m_UpdatePending )
@@ -180,6 +221,9 @@ mitk::RenderingManager
     this->StopTimer();
     m_UpdatePending = false;
   }
+
+  if(s_Instance != this)
+    GetInstance()->CheckUpdatePending();
 }
 
 void
@@ -212,13 +256,28 @@ mitk::RenderingManager
   m_UpdatePending = false;
 
   // Satisfy all pending update requests
-  RenderWindowList::iterator it;
-  for ( it = m_RenderWindowList.begin(); it != m_RenderWindowList.end(); ++it )
+  if(s_Instance == this)
   {
-    if ( it->second )
+    RenderWindowList::iterator it;
+    for ( it = s_RenderWindowList.begin(); it != s_RenderWindowList.end(); ++it )
     {
-      this->ForceImmediateUpdate( it->first );
-      it->second = 0;
+      if ( it->second )
+      {
+        this->ForceImmediateUpdate( it->first );
+        it->second = 0;
+      }
+    }
+  }
+  else
+  {
+    RenderWindowList::iterator it;
+    for ( it = m_RenderWindowList.begin(); it != m_RenderWindowList.end(); ++it )
+    {
+      if ( it->second )
+      {
+        this->ForceImmediateUpdate( it->first );
+        it->second = 0;
+      }
     }
   }
 }
@@ -261,8 +320,13 @@ mitk::RenderingManager
 
 namespace mitk
 {
-class GenericRenderingManager : public mitk::RenderingManager
+class GenericRenderingManager : public RenderingManager
 {
+public:
+  mitkClassMacro(GenericRenderingManager,RenderingManager);
+  itkNewMacro(Self);
+
+protected:
   virtual void RestartTimer()
   {
   };
@@ -282,9 +346,9 @@ public:
   };
   virtual ~GenericRenderingManagerFactory() {};
 
-  virtual mitk::RenderingManager *CreateRenderingManager()
+  virtual mitk::RenderingManager::Pointer CreateRenderingManager() const
   {
-    return new GenericRenderingManager;
+    return GenericRenderingManager::New().GetPointer();
   };
 };
 }

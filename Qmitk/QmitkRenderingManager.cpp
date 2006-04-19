@@ -20,23 +20,52 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkRenderingManager.h"
 #include <qtimer.h>
 
-QmitkRenderingManager* QmitkRenderingManager::m_Instance;
+QmitkRenderingManager* QmitkRenderingManager::s_Instance;
+
+class QmitkRenderingManagerInternal : public mitk::RenderingManager
+{
+public:
+  mitkClassMacro(QmitkRenderingManagerInternal,mitk::RenderingManager);
+  itkNewMacro(Self);
+  
+  friend class QmitkRenderingManager;
+
+protected:
+  virtual void RestartTimer()
+  {
+    m_QmitkRenderingManager->RestartTimer();
+  };
+
+  virtual void StopTimer()
+  {
+    m_QmitkRenderingManager->StopTimer();
+  };
+
+  QmitkRenderingManager* m_QmitkRenderingManager;
+};
+
+
 
 QmitkRenderingManager *
 QmitkRenderingManager
 ::GetInstance()
 {
-  if ( !QmitkRenderingManager::m_Instance )
+  if ( !QmitkRenderingManager::s_Instance )
   {
     QmitkRenderingManager *rawPtr = new QmitkRenderingManager;
-    QmitkRenderingManager::m_Instance = rawPtr;
+    QmitkRenderingManager::s_Instance = rawPtr;
   }
 
-  return m_Instance;
+  return s_Instance;
 }
 
 QmitkRenderingManager::QmitkRenderingManager()
 {
+  QmitkRenderingManagerInternal::Pointer internalManager = QmitkRenderingManagerInternal::New();
+  internalManager->Register();
+  m_QmitkRenderingManagerInternal = internalManager;
+  m_QmitkRenderingManagerInternal->m_QmitkRenderingManager = this;
+
   m_Timer = new QTimer( this );
   connect( m_Timer, SIGNAL( timeout() ), this, SLOT( QUpdateCallback() ) );
 }
@@ -44,6 +73,7 @@ QmitkRenderingManager::QmitkRenderingManager()
 QmitkRenderingManager::~QmitkRenderingManager()
 {
   delete m_Timer;
+  m_QmitkRenderingManagerInternal->Delete();
 }
 
 void QmitkRenderingManager::RestartTimer()

@@ -31,9 +31,9 @@ QmitkRenderingManagerFactory
 {
 }
 
-mitk::RenderingManager *
+mitk::RenderingManager::Pointer
 QmitkRenderingManagerFactory
-::CreateRenderingManager()
+::CreateRenderingManager() const
 {
-  return QmitkRenderingManager::GetInstance();
+  return new QmitkRenderingManager;
 }

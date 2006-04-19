@@ -24,6 +24,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qobject.h>
 
 class QTimer;
+class QmitkRenderingManagerInternal;
+class QmitkRenderingManagerFactory;
 
 /**
  * \brief Qt specific implementation of mitk::RenderingManager.
@@ -58,8 +60,12 @@ protected slots:
 private:
   QTimer *m_Timer;
 
-  static QmitkRenderingManager* m_Instance;
+  static QmitkRenderingManager* s_Instance;
 
+  QmitkRenderingManagerInternal* m_QmitkRenderingManagerInternal;
+
+  friend class QmitkRenderingManagerInternal;
+  friend class QmitkRenderingManagerFactory;
 };
 
 

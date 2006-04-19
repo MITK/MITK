@@ -22,6 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkCommon.h"
 #include <vector>
+#include <itkObject.h>
 #include <itkObjectFactory.h>
 
 namespace mitk
@@ -67,12 +68,20 @@ class RenderingManagerFactory;
  * update frequency of a 3D window could be less then that of a 2D window
  * \ingroup Renderer
  */
-class RenderingManager
+class RenderingManager : public itk::Object
 {
 public:
+  mitkClassMacro(RenderingManager,itk::Object);
+
+  static Pointer New();
+
   /** Set the object factory which produces the desired platform specific
    * RenderingManager singleton instance. */
   static void SetFactory( RenderingManagerFactory *factory );
+
+  /** Get the object factory which produces the platform specific
+   * RenderingManager instances. */
+  static const RenderingManagerFactory * GetFactory();
 
   /** Get the RenderingManager singleton instance. */
   static RenderingManager *GetInstance();
@@ -137,6 +146,12 @@ protected:
    * pending. */
   virtual void StopTimer() = 0;
 
+  /** Checks whether there are still pending update requests and sets
+   * m_UpdatePending accordingly. To be called when it is not clear that
+   * m_UpdatePending is still correct, e.g. typically after a single forced 
+   * after update. */
+  virtual void CheckUpdatePending();
+
   bool m_UpdatePending;
   int m_Interval;
 
@@ -145,8 +160,10 @@ private:
 
   RenderWindowList m_RenderWindowList;
 
-  static RenderingManager *m_Instance;
-  static RenderingManagerFactory *m_RenderingManagerFactory;
+  static RenderWindowList s_RenderWindowList;
+
+  static RenderingManager *s_Instance;
+  static RenderingManagerFactory *s_RenderingManagerFactory;
 
 };
 

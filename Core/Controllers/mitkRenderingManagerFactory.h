@@ -20,10 +20,10 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITKRENDERINGMANAGERFACTORY_H_HEADER_INCLUDED_C135A197
 #define MITKRENDERINGMANAGERFACTORY_H_HEADER_INCLUDED_C135A197
 
+#include "mitkRenderingManager.h"
+
 namespace mitk
 {
-
-class RenderingManager;
 
 /**
  * \brief Factory interface for facilitating the usage of a platform-specific
@@ -52,7 +52,7 @@ public:
 
   /** \brief Factory method to create platform specific instances of
    * RenderingManager. */
-  virtual RenderingManager *CreateRenderingManager() = 0;
+  virtual RenderingManager::Pointer CreateRenderingManager() const = 0;
 
 protected:
   RenderingManagerFactory()

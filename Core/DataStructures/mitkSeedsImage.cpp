@@ -108,10 +108,13 @@ void mitk::SeedsImage::AddSeedPoint(SeedsImageType* itkImage)
   const unsigned int dimension = ::itk::GetImageDimension<SeedsImageType>::ImageDimension;
   itk::Index<dimension> baseIndex;
   itk::Index<dimension> setIndex;
-  itk::Point<typename SeedsImageType::PixelType, dimension> p;
-  p[0] = m_Point[0];
-  p[1] = m_Point[1];
-  p[2] = m_Point[2];
+
+  typedef SeedsImageType::PixelType CoordType;
+
+  itk::Point<CoordType, dimension> p;
+  p[0] = (CoordType) m_Point[0];
+  p[1] = (CoordType) m_Point[1];
+  p[2] = (CoordType) m_Point[2];
   itk::ContinuousIndex<typename SeedsImageType::PixelType, dimension> contIndex;
   itkImage->TransformPhysicalPointToContinuousIndex(p, contIndex);
 
@@ -165,9 +168,9 @@ void mitk::SeedsImage::AddSeedPoint(SeedsImageType* itkImage)
               iterator.SetIndex(setIndex);
               if (m_DrawState == -1 || m_DrawState == 1)
               {  
-                getIndex[2]=z + m_Radius -contIndex[2] ;
-                getIndex[1]=y + m_Radius -contIndex[1];
-                getIndex[0]=x + m_Radius -contIndex[0];
+                getIndex[2]=(MaskImageType::IndexType::IndexValueType) (z + m_Radius -contIndex[2]);
+                getIndex[1]=(MaskImageType::IndexType::IndexValueType) (y + m_Radius -contIndex[1]);
+                getIndex[0]=(MaskImageType::IndexType::IndexValueType) (x + m_Radius -contIndex[0]);
                 float val = m_Brush->GetPixel(getIndex);
                 if (m_DrawState == -1) 
                 {

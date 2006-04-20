@@ -53,7 +53,7 @@ mitk::ImageDataItem::ImageDataItem(const ImageDataItem& aParent, unsigned int di
     memcpy(m_Data, data, _ipPicSize(m_PicDescriptor));
     if(manageMemory)
     {
-      delete data;
+      delete [] (unsigned char*) data;
     }
   }
 
@@ -74,7 +74,7 @@ mitk::ImageDataItem::~ImageDataItem()
   if(m_Parent.IsNull())
   {
     if(m_ManageMemory)
-      delete m_Data;
+      delete [] m_Data;
   }
 }
 

@@ -26,7 +26,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkProperties.h"
 #include <vtkLinearTransform.h>
 
-#include <GL/glut.h>
+#include "mitkGLUT.h"
 
 mitk::ContourSetMapper2D::ContourSetMapper2D()
 {

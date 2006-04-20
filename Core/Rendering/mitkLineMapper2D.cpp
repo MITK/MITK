@@ -25,7 +25,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkProperties.h"
 #include <vtkLinearTransform.h>
 #include "mitkPointSet.h"
-#include <GL/glut.h>
+#include "mitkGLUT.h"
 	
 mitk::LineMapper2D::LineMapper2D()
 : mitk::PointSetMapper2D()

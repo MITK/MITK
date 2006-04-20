@@ -27,7 +27,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkStringProperty.h"
 #include "mitkPointSet.h"
 
-#include <GL/glut.h>
+#include "mitkGLUT.h"
 
 //##Documentation
 //##@brief color to mark a selected point

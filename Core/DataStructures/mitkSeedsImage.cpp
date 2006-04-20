@@ -109,7 +109,7 @@ void mitk::SeedsImage::AddSeedPoint(SeedsImageType* itkImage)
   itk::Index<dimension> baseIndex;
   itk::Index<dimension> setIndex;
 
-  typedef SeedsImageType::PixelType CoordType;
+  typedef typename SeedsImageType::PixelType CoordType;
 
   itk::Point<CoordType, dimension> p;
   p[0] = (CoordType) m_Point[0];

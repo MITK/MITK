@@ -653,6 +653,16 @@ int testRefinementModelProcessor()
   return EXIT_SUCCESS;
 }
 
+/****************************************************************
+ * TEST: DetectorSphereSurfaceExtractor
+ ****************************************************************/
+int testDetectorSphereSurfaceExtractor()
+{
+  std::cout << " *** Testing the DetectorSphereSurfaceExtractor ***\n";
+
+  std::cout << " *** [TEST PASSED] ***\n";
+  return EXIT_SUCCESS;
+}
 
 int itkImageToTreeFilterTest(int i, char* argv[] )
 {
@@ -667,6 +677,7 @@ int itkImageToTreeFilterTest(int i, char* argv[] )
   resultList.push_back(testTreeToBinaryImageFilter());
   resultList.push_back(testProfileGradientFinder());
   resultList.push_back(testRefinementModelProcessor());
+  resultList.push_back(testDetectorSphereSurfaceExtractor());
 
   std::cout << " *** [ALL TESTS DONE] ***\n";
 

@@ -39,6 +39,16 @@ mitk::RenderingManager
   return s_RenderingManagerFactory;
 }
 
+bool
+mitk::RenderingManager
+::HasFactory()
+{
+  if ( RenderingManager::s_RenderingManagerFactory )
+    return true;
+  else
+    return false;
+}
+
 
 mitk::RenderingManager::Pointer mitk::RenderingManager::New()
 {
@@ -61,6 +71,16 @@ mitk::RenderingManager
   }
 
   return s_Instance;
+}
+
+bool
+mitk::RenderingManager
+::IsInstantiated()
+{
+  if ( RenderingManager::s_Instance )
+    return true;
+  else
+    return false;
 }
 
 mitk::RenderingManager::RenderingManager()
@@ -341,9 +361,12 @@ class GenericRenderingManagerFactory : public mitk::RenderingManagerFactory
 public:
   GenericRenderingManagerFactory()
   {
-    if(mitk::RenderingManager::GetInstance() == NULL)
+    if ( !mitk::RenderingManager::HasFactory() )
+    {
       mitk::RenderingManager::SetFactory( this );
+    }
   };
+
   virtual ~GenericRenderingManagerFactory() {};
 
   virtual mitk::RenderingManager::Pointer CreateRenderingManager() const

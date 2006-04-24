@@ -83,8 +83,14 @@ public:
    * RenderingManager instances. */
   static const RenderingManagerFactory * GetFactory();
 
+  /** Returns true if a factory has already been set. */
+  static bool HasFactory();
+
   /** Get the RenderingManager singleton instance. */
   static RenderingManager *GetInstance();
+
+  /** Returns true if the singleton instance does already exist. */
+  static bool IsInstantiated();
 
   /** Adds a RenderWindow. This is required if the methods #RequestUpdateAll
    * or #ForceImmediateUpdate are to be used. */

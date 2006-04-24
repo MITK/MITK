@@ -60,6 +60,7 @@ void QmitkSaveProjectWidget::SetLayout()
 {
   QVBoxLayout* vertical = new QVBoxLayout(this, QBoxLayout::TopToBottom);
   QHBoxLayout* horizontal = new QHBoxLayout();
+  QHBoxLayout* pushButtonsHorizontal = new QHBoxLayout();
 
   sourceCheckBox = new QCheckBox("Save Source Files", this);
   sourceCheckBox->setChecked(true);
@@ -80,14 +81,20 @@ void QmitkSaveProjectWidget::SetLayout()
   treelistview = new QmitkDataTreeListView(tree_filter, this);
   vertical->addWidget( treelistview );
 
-  saveButton = new QPushButton("Save", this);
-  saveButton->setMaximumWidth(80);
-  vertical->addWidget(saveButton);
+  saveButton = new QPushButton("&Save", this);
+  saveButton->setDefault(true);
+  pushButtonsHorizontal->addWidget(saveButton);
+
+  cancelButton = new QPushButton("&Cancel", this);
+  pushButtonsHorizontal->addWidget(cancelButton);
+
+  vertical->insertLayout(-1, pushButtonsHorizontal);
 }
 
 void QmitkSaveProjectWidget::AddConnections()
 {
   QObject::connect(saveButton, SIGNAL(clicked()), this, SLOT(Save()));
+  QObject::connect(cancelButton, SIGNAL(clicked()), this, SLOT(Cancel()));
   QObject::connect(folderChooseButton, SIGNAL(clicked()), this, SLOT(ChooseSourceFolder()));
   QObject::connect(sourceCheckBox, SIGNAL(stateChanged(int)), this, SLOT(SetEditable(int)));
 }
@@ -102,6 +109,11 @@ void QmitkSaveProjectWidget::Save()
       //std::cout<<filename.ascii()<<std::endl;
       this->close();
   }
+}
+
+void QmitkSaveProjectWidget::Cancel()
+{
+  this->close();
 }
 
 void QmitkSaveProjectWidget::ChooseSourceFolder()

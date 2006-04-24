@@ -52,6 +52,9 @@ class QmitkSaveProjectWidget : public QWidget
     /// opens the save dialog and calls the function to write the XML file
     void Save();
 
+    /// closes the save dialog without saving the datatree
+    void Cancel();
+
     /// opens a dialog to set the directory of the source files
     void ChooseSourceFolder();
 
@@ -90,6 +93,7 @@ class QmitkSaveProjectWidget : public QWidget
     QToolButton * folderChooseButton;
     QLineEdit * folderLineEdit;
     QPushButton * saveButton;
+    QPushButton * cancelButton;
     QCheckBox * sourceCheckBox;
 
 

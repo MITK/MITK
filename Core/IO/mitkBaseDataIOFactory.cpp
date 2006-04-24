@@ -25,22 +25,28 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkIOAdapter.h"
 #include "mitkConfig.h"
 
-//#include "mitkPicFileIOFactory.h"
-//#include "mitkParRecFileIOFactory.h"
-//#include "mitkSTLFileIOFactory.h"
-//#include "mitkObjFileIOFactory.h"
-//#include "mitkVtkSurfaceIOFactory.h"
-//#include "mitkVtkImageIOFactory.h"
-//#include "mitkPicVolumeTimeSeriesIOFactory.h"
-//
-//
-//#ifdef MBI_INTERNAL
-//#include "mitkVesselTreeFileIOFactory.h"
-////#include "mitkVesselGraphFileIOFactory.h"
-//#include "mitkDvgFileIOFactory.h"
-//#include "mitkUvgFileIOFactory.h"
-//#include "mitkSsmFileIOFactory.h"
-//#endif // MBI_INTERNAL
+#include "mitkPicFileIOFactory.h"
+#include "mitkParRecFileIOFactory.h"
+#include "mitkSTLFileIOFactory.h"
+#include "mitkObjFileIOFactory.h"
+#include "mitkVtkSurfaceIOFactory.h"
+#include "mitkVtkImageIOFactory.h"
+#include "mitkVtiFileIOFactory.h"
+#include "mitkPicVolumeTimeSeriesIOFactory.h"
+#include "mitkStlVolumeTimeSeriesIOFactory.h"
+#include "mitkVtkVolumeTimeSeriesIOFactory.h"
+
+#ifdef MBI_INTERNAL
+#include "mitkVesselTreeFileIOFactory.h"
+//#include "mitkVesselGraphFileIOFactory.h"
+#include "mitkDvgFileIOFactory.h"
+#include "mitkUvgFileIOFactory.h"
+#include "mitkSsmFileIOFactory.h"
+//#include "mitkTusFileIOFactory.h"
+#ifdef HAVE_IPDICOM
+#include "mitkDICOMFileIOFactory.h"
+#endif // HAVE_IPDICOM 
+#endif // MBI_INTERNAL
 
 #include "itkMutexLock.h"
 #include "itkMutexLockHolder.h"
@@ -116,20 +122,27 @@ void BaseDataIOFactory::RegisterBuiltInFactories()
     itk::MutexLockHolder<itk::SimpleMutexLock> mutexHolder( mutex );
     if( firstTime )
     {
-      //itk::ObjectFactoryBase::RegisterFactory( PicFileIOFactory::New() );
-      //itk::ObjectFactoryBase::RegisterFactory( ParRecFileIOFactory::New() );
-      //itk::ObjectFactoryBase::RegisterFactory( STLFileIOFactory::New() );
-      //itk::ObjectFactoryBase::RegisterFactory( ObjFileIOFactory::New() );
-//      itk::ObjectFactoryBase::RegisterFactory( VtkSurfaceIOFactory::New() );
-//      itk::ObjectFactoryBase::RegisterFactory( VtkImageIOFactory::New() );
-//      itk::ObjectFactoryBase::RegisterFactory( PicVolumeTimeSeriesIOFactory::New() );
-//#ifdef MBI_INTERNAL
-//      itk::ObjectFactoryBase::RegisterFactory( VesselTreeFileIOFactory::New() );
-//      //itk::ObjectFactoryBase::RegisterFactory( VesselGraphFileIOFactory<Directed>::New() );
-//      itk::ObjectFactoryBase::RegisterFactory( UvgFileIOFactory::New() );
-//      itk::ObjectFactoryBase::RegisterFactory( DvgFileIOFactory::New() );
-//      itk::ObjectFactoryBase::RegisterFactory( SsmFileIOFactory::New() );
-//#endif // MBI_INTERNAL
+      itk::ObjectFactoryBase::RegisterFactory( PicFileIOFactory::New() );
+      itk::ObjectFactoryBase::RegisterFactory( ParRecFileIOFactory::New() );
+      itk::ObjectFactoryBase::RegisterFactory( STLFileIOFactory::New() );
+      itk::ObjectFactoryBase::RegisterFactory( ObjFileIOFactory::New() );
+      itk::ObjectFactoryBase::RegisterFactory( VtkSurfaceIOFactory::New() );
+      itk::ObjectFactoryBase::RegisterFactory( VtkImageIOFactory::New() );
+      itk::ObjectFactoryBase::RegisterFactory( VtiFileIOFactory::New() );
+      itk::ObjectFactoryBase::RegisterFactory( PicVolumeTimeSeriesIOFactory::New() );
+      itk::ObjectFactoryBase::RegisterFactory( StlVolumeTimeSeriesIOFactory::New() );
+      itk::ObjectFactoryBase::RegisterFactory( VtkVolumeTimeSeriesIOFactory::New() );
+#ifdef MBI_INTERNAL
+      itk::ObjectFactoryBase::RegisterFactory( VesselTreeFileIOFactory::New() );
+      //itk::ObjectFactoryBase::RegisterFactory( VesselGraphFileIOFactory<Directed>::New() );
+      itk::ObjectFactoryBase::RegisterFactory( UvgFileIOFactory::New() );
+      itk::ObjectFactoryBase::RegisterFactory( DvgFileIOFactory::New() );
+      itk::ObjectFactoryBase::RegisterFactory( SsmFileIOFactory::New() );
+#ifdef HAVE_IPDICOM
+      itk::ObjectFactoryBase::RegisterFactory( DICOMFileIOFactory::New() );
+#endif // HAVE_IPDICOM 
+      //itk::ObjectFactoryBase::RegisterFactory( TusFileIOFactory::New() );
+#endif // MBI_INTERNAL
 
       //ObjectFactoryBase::RegisterFactory( LSMBaseDataIOFactory::New()); //should be before TIFF
       //ObjectFactoryBase::RegisterFactory( NiftiBaseDataIOFactory::New());

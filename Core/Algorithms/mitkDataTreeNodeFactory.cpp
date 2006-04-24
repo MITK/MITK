@@ -93,10 +93,8 @@ PURPOSE.  See the above copyright notices for more information.
  #ifdef HAVE_IPDICOM
   #include "mitkDICOMFileReader.h"
  #endif // HAVE_IPDICOM 
- #ifdef USE_TUS_READER
-  #include "mitkBirdDataFromFileReader.h"
-  #include "mitkTrackedUSDataFileParser.h"
- #endif // USE_TUS_READER
+ #include "mitkBirdDataFromFileReader.h"
+ #include "mitkTrackedUSDataFileParser.h"
  #include "mitkUSLookupTableSource.h"
  #include "mitkCylindricToCartesianFilter.h"
  #include "mitkDSRFileReader.h"
@@ -118,191 +116,194 @@ mitk::DataTreeNodeFactory::~DataTreeNodeFactory()
 
 void mitk::DataTreeNodeFactory::GenerateData()
 {
+  bool usedNewDTNF = false;
+  std::vector<mitk::BaseData::Pointer>* baseDataVector = mitk::BaseDataIOFactory::CreateBaseDataIO( m_FileName, m_FilePrefix, m_FilePattern, mitk::BaseDataIOFactory::ReadMode );
 
-  //std::vector<mitk::BaseData::Pointer>* baseDataVector = mitk::BaseDataIOFactory::CreateBaseDataIO( m_FileName, m_FilePrefix, m_FilePattern, mitk::BaseDataIOFactory::ReadMode );
+  if(baseDataVector)
+    this->ResizeOutputs((unsigned int)baseDataVector->size());
 
-  //for(int i=0; i<(int)baseDataVector->size(); i++)
-  //{
-  //  mitk::BaseData::Pointer baseData = baseDataVector->at(i);
-  //
-  //  if( baseData.IsNotNull() )
-  //  {
-  //    mitk::DataTreeNode::Pointer node = this->GetOutput();
-  //    node->SetData(baseData);
-  //    this->SetDefaultCommonProperties( node );
+  for(int i=0; i<(int)baseDataVector->size(); i++)
+  {
+    mitk::BaseData::Pointer baseData = baseDataVector->at(i);
+  
+    if( baseData.IsNotNull() )
+    {
+      usedNewDTNF = true;
+      mitk::DataTreeNode::Pointer node = mitk::DataTreeNode::New();//this->GetOutput();
+      node->SetData(baseData);
+      this->SetDefaultCommonProperties( node );
 
-  //    mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
-  //    if(image.IsNotNull()){
-  //      this->SetDefaultImageProperties(node);
-  //#ifdef MBI_INTERNAL
-  //      if ( this->FileNameEndsWith( ".pic" ) || this->FileNameEndsWith( ".pic.gz" ) || this->FileNameEndsWith( ".seq" ) )
-  //      {
-  //        if ( image->GetNumberOfChannels() > 1 )
-  //          this->SetDefaultUltraSoundProperties( node );
-  //      }
-  //#ifdef USE_TUS_READER
-  //      else if ( this->FileNameEndsWith( ".TUS" ) || this->FileNameEndsWith( ".tus" ) )
-  //      {
-  //        if ( image->GetNumberOfChannels() > 1 ){
-  //          int i=0;
-  //          this->SetDefaultUltraSoundProperties( node );
-  //          this->SetDefaultTusProperties( i, node );
-  //        }
-  //      }
-  //#endif // USE_TUS_READER
-  //    }
-
-  //    mitk::VesselTreeData::Pointer vesselTree = dynamic_cast<mitk::VesselTreeData*>(node->GetData());
-  //    if(vesselTree.IsNotNull())
-  //      this->SetDefaultVesselTreeProperties(node);
-  //#endif // MBI_INTERNAL
-
-  //      
-  //    mitk::Surface::Pointer surface = dynamic_cast<mitk::Surface*>(node->GetData());
-  //    if(surface.IsNotNull())
-  //      this->SetDefaultSurfaceProperties(node);
-
-  //    node->SetVisibility(true);    
-  //  }
-  //  else
-  //  { 
-      if ( m_FileName != "" )
-      {
-        if ( this->FileNameEndsWith( ".stl" ) )
+      mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
+      if(image.IsNotNull()){
+        this->SetDefaultImageProperties(node);
+  #ifdef MBI_INTERNAL
+        if ( this->FileNameEndsWith( ".pic" ) || this->FileNameEndsWith( ".pic.gz" ) || this->FileNameEndsWith( ".seq" ) )
         {
-          this->ReadFileTypeSTL();
+          if ( image->GetNumberOfChannels() > 1 )
+            this->SetDefaultUltraSoundProperties( node );
         }
-        else if ( this->FileNameEndsWith( ".vtk" ) )
-        {
-          this->ReadFileTypeVTK();
-        }
-        else if ( this->FileNameEndsWith( ".obj" ) )
-        {
-          this->ReadFileTypeOBJ();
-        }
-        else if ( this->FileNameEndsWith( ".pic" ) || this->FileNameEndsWith( ".pic.gz" ) || this->FileNameEndsWith( ".seq" ) )
-        {
-          this->ReadFileTypePIC();
-        }
-        else if ( this->FileNameEndsWith( ".par" ) )
-        {
-          this->ReadFileTypePAR();
-        }
-        else if ( this->FileNameEndsWith( ".pvtk" ) )
-        {
-          this->ReadFileTypePVTK();
-        }
-        else if ( this->FileNameEndsWith( ".gdcm" ) || this->FileNameEndsWith( ".GDCM" ) )
-        {
-          this->ReadFileTypeGDCM();
-        }
-        else if ( this->FileNameEndsWith( ".dcm" ) || this->FileNameEndsWith( ".DCM" ) 
-          || this->FileNameEndsWith( ".ima" ) 
-          || this->FileNameEndsWith( ".IMA" ) 
-          || (itksys::SystemTools::GetFilenameLastExtension(m_FileName) == "" ) )
-        {
-          this->ReadFileSeriesTypeDCM();
-        }
-    #if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
-        else if ( this->FileNameEndsWith( ".vti" ) )
-        {
-          this->ReadFileTypeVTI();
-        }
-    #endif
-    #ifdef MBI_INTERNAL
-    #ifdef HAVE_IPDICOM
-        else if ( this->FileNameEndsWith( ".IPDCM" ) || this->FileNameEndsWith( ".ipdcm" ) )
-        {
-          this->ReadFileTypeIPDCM();
-        }
-    #endif /* HAVE_IPDICOM */
-        else if ( this->FileNameEndsWith( ".ves" ) )
-        {
-          this->ReadFileTypeVES();
-        }
-        else if ( this->FileNameEndsWith( ".uvg" ) )
-        {
-          this->ReadFileTypeUVG();
-        }
-        else if ( this->FileNameEndsWith( ".dvg" ) )
-        {
-          this->ReadFileTypeDVG();
-        }
-        else if ( this->FileNameEndsWith( "HPSONOS.DB" ) || this->FileNameEndsWith( "hpsonos.db" ) )
-        {
-          std::cout << "jetzt lese ich sono"<<endl;
-          this->ReadFileTypeHPSONOS();
-        }
-        else if (this->FileNameEndsWith(".ssm"))
-        {
-          this->ReadFileTypeSSM();
-        }
-    #ifdef USE_TUS_READER
         else if ( this->FileNameEndsWith( ".TUS" ) || this->FileNameEndsWith( ".tus" ) )
         {
-          std::cout << "jetzt lese ich tus"<<endl;
-          this->ReadFileTypeTUS();
+          if ( image->GetNumberOfChannels() > 1 ){
+            this->SetDefaultUltraSoundProperties( node );
+            this->SetDefaultTusProperties( i, node );
+          }
         }
-    #endif
-    #endif /* MBI_INTERNAL */
-        //else if (this->FileNameEndsWith("."))
-        //{
-        //    //put your new filetype in here!
-        //}
-        else
-        {
-          this->ReadFileTypeITKImageIOFactory();
-        }
+
       }
-      else if ( m_FilePattern != "" && m_FilePrefix != "" )
+
+      mitk::VesselTreeData::Pointer vesselTree = dynamic_cast<mitk::VesselTreeData*>(node->GetData());
+      if(vesselTree.IsNotNull())
+        this->SetDefaultVesselTreeProperties(node);
+  #endif // MBI_INTERNAL
+
+        
+      mitk::Surface::Pointer surface = dynamic_cast<mitk::Surface*>(node->GetData());
+      if(surface.IsNotNull())
+        this->SetDefaultSurfaceProperties(node);
+
+      node->SetVisibility(true);
+      this->SetOutput(i, node);
+    }
+  }
+  if(!usedNewDTNF)
+  { 
+    if ( m_FileName != "" )
+    {
+      if ( this->FileNameEndsWith( ".stl" ) )
       {
-        if ( this->FilePatternEndsWith( ".pic" ) || this->FilePatternEndsWith( ".pic.gz" ) )
-        {
-          this->ReadFileSeriesTypePIC();
-        }
-        else if ( this->FilePatternEndsWith( ".dcm" ) || this->FilePatternEndsWith( ".DCM" ) 
-          || this->FileNameEndsWith( ".ima" ) 
-          || this->FileNameEndsWith( ".IMA" ) 
-          || (itksys::SystemTools::GetFilenameLastExtension(m_FilePattern) == "" ) )
-        {
-          this->ReadFileSeriesTypeDCM();
-        }
-        else if ( this->FilePatternEndsWith( ".gdcm" ) || this->FilePatternEndsWith( ".GDCM" ) )
-        {
-          this->ReadFileSeriesTypeGDCM();
-        }
-        else if ( this->FilePatternEndsWith( ".stl" ) || this->FilePatternEndsWith( ".STL" ) )
-        {
-          this->ReadFileSeriesTypeSTL();
-        }
-        else if ( this->FilePatternEndsWith( ".vtk" ) || this->FilePatternEndsWith( ".VTK" ) )
-        {
-          this->ReadFileSeriesTypeVTK();
-        }
-        else
-        {
-          this->ReadFileSeriesTypeITKImageSeriesReader();
-        }
+        this->ReadFileTypeSTL();
       }
-      unsigned int nOut = this->GetNumberOfOutputs();
-      for ( unsigned int i = 0; i < nOut; ++i )
+      else if ( this->FileNameEndsWith( ".vtk" ) )
       {
-        mitk::DataTreeNode::Pointer node = this->GetOutput(i);
-        //// set path without filename as string property
-        //mitk::StringProperty::Pointer pathProp = new mitk::StringProperty( itksys::SystemTools::GetFilenamePath( m_FileName ) );
-        //node->SetProperty( StringProperty::PATH, pathProp );
-        //// set filename without path as string property
-        //mitk::StringProperty::Pointer nameProp = dynamic_cast<mitk::StringProperty*>(node->GetProperty("name").GetPointer());
-        //if(nameProp.IsNull() || nameProp->GetValue()=="No Name!")
-        //{
-        //  nameProp = new mitk::StringProperty( this->GetBaseFileName() );
-        //  node->SetProperty( "name", nameProp );
-        //}
-        this->SetDefaultCommonProperties( node );
-        node->SetVisibility(true);
+        this->ReadFileTypeVTK();
       }
-//    }
-//  }
+      else if ( this->FileNameEndsWith( ".obj" ) )
+      {
+        this->ReadFileTypeOBJ();
+      }
+      else if ( this->FileNameEndsWith( ".pic" ) || this->FileNameEndsWith( ".pic.gz" ) || this->FileNameEndsWith( ".seq" ) )
+      {
+        this->ReadFileTypePIC();
+      }
+      else if ( this->FileNameEndsWith( ".par" ) )
+      {
+        this->ReadFileTypePAR();
+      }
+      else if ( this->FileNameEndsWith( ".pvtk" ) )
+      {
+        this->ReadFileTypePVTK();
+      }
+      else if ( this->FileNameEndsWith( ".gdcm" ) || this->FileNameEndsWith( ".GDCM" ) )
+      {
+        this->ReadFileTypeGDCM();
+      }
+      else if ( this->FileNameEndsWith( ".dcm" ) || this->FileNameEndsWith( ".DCM" ) 
+        || this->FileNameEndsWith( ".ima" ) 
+        || this->FileNameEndsWith( ".IMA" ) 
+        || (itksys::SystemTools::GetFilenameLastExtension(m_FileName) == "" ) )
+      {
+        this->ReadFileSeriesTypeDCM();
+      }
+  #if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
+      else if ( this->FileNameEndsWith( ".vti" ) )
+      {
+        this->ReadFileTypeVTI();
+      }
+  #endif
+  #ifdef MBI_INTERNAL
+  #ifdef HAVE_IPDICOM
+      else if ( this->FileNameEndsWith( ".IPDCM" ) || this->FileNameEndsWith( ".ipdcm" ) )
+      {
+        this->ReadFileTypeIPDCM();
+      }
+  #endif /* HAVE_IPDICOM */
+      else if ( this->FileNameEndsWith( ".ves" ) )
+      {
+        this->ReadFileTypeVES();
+      }
+      else if ( this->FileNameEndsWith( ".uvg" ) )
+      {
+        this->ReadFileTypeUVG();
+      }
+      else if ( this->FileNameEndsWith( ".dvg" ) )
+      {
+        this->ReadFileTypeDVG();
+      }
+      else if ( this->FileNameEndsWith( "HPSONOS.DB" ) || this->FileNameEndsWith( "hpsonos.db" ) )
+      {
+        std::cout << "jetzt lese ich sono"<<endl;
+        this->ReadFileTypeHPSONOS();
+      }
+      else if (this->FileNameEndsWith(".ssm"))
+      {
+        this->ReadFileTypeSSM();
+      }
+  #ifdef USE_TUS_READER
+      else if ( this->FileNameEndsWith( ".TUS" ) || this->FileNameEndsWith( ".tus" ) )
+      {
+        std::cout << "jetzt lese ich tus"<<endl;
+        this->ReadFileTypeTUS();
+      }
+  #endif
+  #endif /* MBI_INTERNAL */
+      //else if (this->FileNameEndsWith("."))
+      //{
+      //    //put your new filetype in here!
+      //}
+      else
+      {
+        this->ReadFileTypeITKImageIOFactory();
+      }
+    }
+    else if ( m_FilePattern != "" && m_FilePrefix != "" )
+    {
+      if ( this->FilePatternEndsWith( ".pic" ) || this->FilePatternEndsWith( ".pic.gz" ) )
+      {
+        this->ReadFileSeriesTypePIC();
+      }
+      else if ( this->FilePatternEndsWith( ".dcm" ) || this->FilePatternEndsWith( ".DCM" ) 
+        || this->FileNameEndsWith( ".ima" ) 
+        || this->FileNameEndsWith( ".IMA" ) 
+        || (itksys::SystemTools::GetFilenameLastExtension(m_FilePattern) == "" ) )
+      {
+        this->ReadFileSeriesTypeDCM();
+      }
+      else if ( this->FilePatternEndsWith( ".gdcm" ) || this->FilePatternEndsWith( ".GDCM" ) )
+      {
+        this->ReadFileSeriesTypeGDCM();
+      }
+      else if ( this->FilePatternEndsWith( ".stl" ) || this->FilePatternEndsWith( ".STL" ) )
+      {
+        this->ReadFileSeriesTypeSTL();
+      }
+      else if ( this->FilePatternEndsWith( ".vtk" ) || this->FilePatternEndsWith( ".VTK" ) )
+      {
+        this->ReadFileSeriesTypeVTK();
+      }
+      else
+      {
+        this->ReadFileSeriesTypeITKImageSeriesReader();
+      }
+    }
+    unsigned int nOut = this->GetNumberOfOutputs();
+    for ( unsigned int i = 0; i < nOut; ++i )
+    {
+      mitk::DataTreeNode::Pointer node = this->GetOutput(i);
+      //// set path without filename as string property
+      //mitk::StringProperty::Pointer pathProp = new mitk::StringProperty( itksys::SystemTools::GetFilenamePath( m_FileName ) );
+      //node->SetProperty( StringProperty::PATH, pathProp );
+      //// set filename without path as string property
+      //mitk::StringProperty::Pointer nameProp = dynamic_cast<mitk::StringProperty*>(node->GetProperty("name").GetPointer());
+      //if(nameProp.IsNull() || nameProp->GetValue()=="No Name!")
+      //{
+      //  nameProp = new mitk::StringProperty( this->GetBaseFileName() );
+      //  node->SetProperty( "name", nameProp );
+      //}
+      this->SetDefaultCommonProperties( node );
+      node->SetVisibility(true);
+    }
+  }
 }
 
 
@@ -1791,7 +1792,6 @@ void mitk::DataTreeNodeFactory::SetDefaultUltraSoundProperties(mitk::DataTreeNod
   }
 }
 
-#ifdef USE_TUS_READER
 void mitk::DataTreeNodeFactory::SetDefaultTusProperties(int count, mitk::DataTreeNode::Pointer &node) 
 {
   mitk::TrackedUSDataFileParser* parser = new mitk::TrackedUSDataFileParser();
@@ -1804,7 +1804,7 @@ void mitk::DataTreeNodeFactory::SetDefaultTusProperties(int count, mitk::DataTre
   BirdDataFromFileReader Birdreader;
 
   Birdreader.SetFilename(BirdDataPfadListe[count].c_str());
-  mitk::BirdData BD= Birdreader.GetBirdData();
+  mitk::BirdData BD = Birdreader.GetBirdData();
 
   mitk::DoublePoint3D pData=BD.GetPositionMean();
   mitk::Point3D PositionData;
@@ -1828,5 +1828,4 @@ void mitk::DataTreeNodeFactory::SetDefaultTusProperties(int count, mitk::DataTre
   quaternionProp = new mitk::Point4dProperty(QuaternionData);    
   node->SetProperty( "QuaternionData", quaternionProp );
 }
-#endif // USE_TUS_READER
 #endif // MBI_INTERNAL

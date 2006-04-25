@@ -149,9 +149,9 @@ void mitk::DataTreeNodeFactory::GenerateData()
             this->SetDefaultTusProperties( i, node );
           }
         }
-
+  #endif // MBI_INTERNAL
       }
-
+  #ifdef MBI_INTERNAL
       mitk::VesselTreeData::Pointer vesselTree = dynamic_cast<mitk::VesselTreeData*>(node->GetData());
       if(vesselTree.IsNotNull())
         this->SetDefaultVesselTreeProperties(node);

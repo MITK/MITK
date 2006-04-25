@@ -5,6 +5,7 @@
   \brief This subcategory includes the IO classes to read or write data objects.
   
   Available sections:
+    - \ref DataTreeNodeFactory
     - \ref XMLWriterAndXMLReader
     - \ref XMLFile
     - \ref XMLWriter
@@ -12,6 +13,20 @@
     - \ref XMLReader
     - \ref XMLReaderCodeSnippets
   
+  \section DataTreeNodeFactory DataTreeNodeFactory
+
+  The mitk::DataTreeNodeFactory creates instances of mitk::DataTreeNodes filled with data read from a given file.
+  This class reads files, creates an appropriate mitk::BaseData and adds the BaseData to a mitk::DataTreeNode.
+  This filter may produce one or more outputs (i.e. mitk::DataTreeNodes). The number of generated nodes can be retrieved by a call of GetNumberOfOutputs().
+  If you want to add a new file type, you have to register the factory of the file reader in the class mitk::BaseDataIOFactory.
+
+  \image html DataTreeNodeFactoryMechanism.png "A short overview of the factory mechanism of the DataTreeNodeFactory."
+  
+  The mitk::DataTreeNodeFactory calls the mitk::BaseDataIOFactory to create a pointer of a vector of mitk::BaseData. 
+  The mitk::BaseDataIOFactory registers the defined factories of the file readers. 
+  After registration each registered factory will be asked if it can read the file specified in the filename.
+  If the asked factory can read the file it instantiates the adequate reader. The reader reads the file and returns a pointer of mitk::BaseData.
+
   \section XMLWriterAndXMLReader XMLWriter and XMLReader
   
   The mitk::XMLWriter and mitk::XMLReader give the possibility to write and to read XML files.

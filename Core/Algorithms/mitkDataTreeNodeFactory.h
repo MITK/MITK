@@ -38,11 +38,8 @@ namespace mitk
 * (i.e. mitk::DataTreeNodes). The number of generated nodes can be retrieved by a 
 * call of GetNumberOfOutputs().
 *
-* If you want to add a new file type, you have to create a protected 
-* ReadFileTypeXYZ() function which implements the process of reading
-* the base data, adding it to a node and filling the node with properties
-* as appropriate. Second, you have to add an additional condition to
-* GenerateData which identifies your file type.
+* If you want to add a new file type, you have to register the factory 
+* of the file reader in the class mitk::BaseDataIOFactory.
 * @ingroup IO
 */
 class DataTreeNodeFactory : public DataTreeNodeSource, public FileSeriesReader

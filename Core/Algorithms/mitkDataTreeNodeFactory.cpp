@@ -86,8 +86,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkImageChannelSelector.h"
 #include "mitkImageSliceSelector.h"
 #include "mitkSTLFileReader.h"
-//#include "mitkVtkFileReader.h"
-//#include "mitkObjFileReader.h"
 
 #ifdef MBI_INTERNAL
  #ifdef HAVE_IPDICOM
@@ -116,6 +114,10 @@ mitk::DataTreeNodeFactory::~DataTreeNodeFactory()
 
 void mitk::DataTreeNodeFactory::GenerateData()
 {
+/***************************************** new datatreenode factory mechanism **********************************************/
+// the mitkBaseDataIOFactory class returns a pointer of a vector of BaseData objects
+// the IO factories of the file readers are registered in the class mitkBaseDataIOFactory
+// for more details see the doxygen documentation (modules IO)
   bool usedNewDTNF = false;
   std::vector<mitk::BaseData::Pointer>* baseDataVector = mitk::BaseDataIOFactory::CreateBaseDataIO( m_FileName, m_FilePrefix, m_FilePattern, mitk::BaseDataIOFactory::ReadMode );
 
@@ -166,6 +168,7 @@ void mitk::DataTreeNodeFactory::GenerateData()
       this->SetOutput(i, node);
     }
   }
+/***********************************************************************************************************/
   if(!usedNewDTNF)
   { 
     if ( m_FileName != "" )
@@ -174,71 +177,71 @@ void mitk::DataTreeNodeFactory::GenerateData()
       {
         this->ReadFileTypeSTL();
       }
-      else if ( this->FileNameEndsWith( ".vtk" ) )
-      {
-        this->ReadFileTypeVTK();
-      }
-      else if ( this->FileNameEndsWith( ".obj" ) )
-      {
-        this->ReadFileTypeOBJ();
-      }
-      else if ( this->FileNameEndsWith( ".pic" ) || this->FileNameEndsWith( ".pic.gz" ) || this->FileNameEndsWith( ".seq" ) )
-      {
-        this->ReadFileTypePIC();
-      }
-      else if ( this->FileNameEndsWith( ".par" ) )
-      {
-        this->ReadFileTypePAR();
-      }
-      else if ( this->FileNameEndsWith( ".pvtk" ) )
-      {
-        this->ReadFileTypePVTK();
-      }
-      else if ( this->FileNameEndsWith( ".gdcm" ) || this->FileNameEndsWith( ".GDCM" ) )
-      {
-        this->ReadFileTypeGDCM();
-      }
-      else if ( this->FileNameEndsWith( ".dcm" ) || this->FileNameEndsWith( ".DCM" ) 
-        || this->FileNameEndsWith( ".ima" ) 
-        || this->FileNameEndsWith( ".IMA" ) 
-        || (itksys::SystemTools::GetFilenameLastExtension(m_FileName) == "" ) )
-      {
-        this->ReadFileSeriesTypeDCM();
-      }
-  #if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
-      else if ( this->FileNameEndsWith( ".vti" ) )
-      {
-        this->ReadFileTypeVTI();
-      }
-  #endif
+  //    else if ( this->FileNameEndsWith( ".vtk" ) )
+  //    {
+  //      this->ReadFileTypeVTK();
+  //    }
+  //    else if ( this->FileNameEndsWith( ".obj" ) )
+  //    {
+  //      this->ReadFileTypeOBJ();
+  //    }
+  //    else if ( this->FileNameEndsWith( ".pic" ) || this->FileNameEndsWith( ".pic.gz" ) || this->FileNameEndsWith( ".seq" ) )
+  //    {
+  //      this->ReadFileTypePIC();
+  //    }
+  //    else if ( this->FileNameEndsWith( ".par" ) )
+  //    {
+  //      this->ReadFileTypePAR();
+  //    }
+  //    else if ( this->FileNameEndsWith( ".pvtk" ) )
+  //    {
+  //      this->ReadFileTypePVTK();
+  //    }
+  //    else if ( this->FileNameEndsWith( ".gdcm" ) || this->FileNameEndsWith( ".GDCM" ) )
+  //    {
+  //      this->ReadFileTypeGDCM();
+  //    }
+  //    else if ( this->FileNameEndsWith( ".dcm" ) || this->FileNameEndsWith( ".DCM" ) 
+  //      || this->FileNameEndsWith( ".ima" ) 
+  //      || this->FileNameEndsWith( ".IMA" ) 
+  //      || (itksys::SystemTools::GetFilenameLastExtension(m_FileName) == "" ) )
+  //    {
+  //      this->ReadFileSeriesTypeDCM();
+  //    }
+  //#if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
+  //    else if ( this->FileNameEndsWith( ".vti" ) )
+  //    {
+  //      this->ReadFileTypeVTI();
+  //    }
+  //#endif
   #ifdef MBI_INTERNAL
-  #ifdef HAVE_IPDICOM
-      else if ( this->FileNameEndsWith( ".IPDCM" ) || this->FileNameEndsWith( ".ipdcm" ) )
-      {
-        this->ReadFileTypeIPDCM();
-      }
-  #endif /* HAVE_IPDICOM */
-      else if ( this->FileNameEndsWith( ".ves" ) )
-      {
-        this->ReadFileTypeVES();
-      }
-      else if ( this->FileNameEndsWith( ".uvg" ) )
-      {
-        this->ReadFileTypeUVG();
-      }
-      else if ( this->FileNameEndsWith( ".dvg" ) )
-      {
-        this->ReadFileTypeDVG();
-      }
+  //#ifdef HAVE_IPDICOM
+  //    else if ( this->FileNameEndsWith( ".IPDCM" ) || this->FileNameEndsWith( ".ipdcm" ) )
+  //    {
+  //      this->ReadFileTypeIPDCM();
+  //    }
+  //#endif /* HAVE_IPDICOM */
+  //    else if ( this->FileNameEndsWith( ".ves" ) )
+  //    {
+  //      this->ReadFileTypeVES();
+  //    }
+  //    else if ( this->FileNameEndsWith( ".uvg" ) )
+  //    {
+  //      this->ReadFileTypeUVG();
+  //    }
+  //    else if ( this->FileNameEndsWith( ".dvg" ) )
+  //    {
+  //      this->ReadFileTypeDVG();
+  //    }
       else if ( this->FileNameEndsWith( "HPSONOS.DB" ) || this->FileNameEndsWith( "hpsonos.db" ) )
       {
         std::cout << "jetzt lese ich sono"<<endl;
         this->ReadFileTypeHPSONOS();
       }
-      else if (this->FileNameEndsWith(".ssm"))
-      {
-        this->ReadFileTypeSSM();
-      }
+      //else if (this->FileNameEndsWith(".ssm"))
+      //{
+      //  this->ReadFileTypeSSM();
+      //}
   #ifdef USE_TUS_READER
       else if ( this->FileNameEndsWith( ".TUS" ) || this->FileNameEndsWith( ".tus" ) )
       {
@@ -251,10 +254,10 @@ void mitk::DataTreeNodeFactory::GenerateData()
       //{
       //    //put your new filetype in here!
       //}
-      else
-      {
-        this->ReadFileTypeITKImageIOFactory();
-      }
+      //else
+      //{
+      //  this->ReadFileTypeITKImageIOFactory();
+      //}
     }
     else if ( m_FilePattern != "" && m_FilePrefix != "" )
     {
@@ -262,25 +265,25 @@ void mitk::DataTreeNodeFactory::GenerateData()
       {
         this->ReadFileSeriesTypePIC();
       }
-      else if ( this->FilePatternEndsWith( ".dcm" ) || this->FilePatternEndsWith( ".DCM" ) 
-        || this->FileNameEndsWith( ".ima" ) 
-        || this->FileNameEndsWith( ".IMA" ) 
-        || (itksys::SystemTools::GetFilenameLastExtension(m_FilePattern) == "" ) )
-      {
-        this->ReadFileSeriesTypeDCM();
-      }
-      else if ( this->FilePatternEndsWith( ".gdcm" ) || this->FilePatternEndsWith( ".GDCM" ) )
-      {
-        this->ReadFileSeriesTypeGDCM();
-      }
-      else if ( this->FilePatternEndsWith( ".stl" ) || this->FilePatternEndsWith( ".STL" ) )
-      {
-        this->ReadFileSeriesTypeSTL();
-      }
-      else if ( this->FilePatternEndsWith( ".vtk" ) || this->FilePatternEndsWith( ".VTK" ) )
-      {
-        this->ReadFileSeriesTypeVTK();
-      }
+      //else if ( this->FilePatternEndsWith( ".dcm" ) || this->FilePatternEndsWith( ".DCM" ) 
+      //  || this->FileNameEndsWith( ".ima" ) 
+      //  || this->FileNameEndsWith( ".IMA" ) 
+      //  || (itksys::SystemTools::GetFilenameLastExtension(m_FilePattern) == "" ) )
+      //{
+      //  this->ReadFileSeriesTypeDCM();
+      //}
+      //else if ( this->FilePatternEndsWith( ".gdcm" ) || this->FilePatternEndsWith( ".GDCM" ) )
+      //{
+      //  this->ReadFileSeriesTypeGDCM();
+      //}
+      //else if ( this->FilePatternEndsWith( ".stl" ) || this->FilePatternEndsWith( ".STL" ) )
+      //{
+      //  this->ReadFileSeriesTypeSTL();
+      //}
+      //else if ( this->FilePatternEndsWith( ".vtk" ) || this->FilePatternEndsWith( ".VTK" ) )
+      //{
+      //  this->ReadFileSeriesTypeVTK();
+      //}
       else
       {
         this->ReadFileSeriesTypeITKImageSeriesReader();
@@ -359,36 +362,7 @@ std::string mitk::DataTreeNodeFactory::GetDirectory()
 
 void mitk::DataTreeNodeFactory::ReadFileTypeSTL()
 {
-  //std::cout << "Loading " << m_FileName << " as stl..." << std::endl;
-
-  //vtkSTLReader* stlReader = vtkSTLReader::New();
-  //stlReader->SetFileName( m_FileName.c_str() );
-
-  //vtkPolyDataNormals* normalsGenerator = vtkPolyDataNormals::New();
-  //normalsGenerator->SetInput( stlReader->GetOutput() );
-  //
-  //normalsGenerator->Update();
-  //if ( ( stlReader->GetOutput() != NULL ) && ( normalsGenerator->GetOutput() != NULL ) )
-  //{
-  //  mitk::Surface::Pointer surface = mitk::Surface::New();
-  //  //
-  //  // @todo: Disconnect the result from the vtk pipeline.
-  //  vtkPolyData* surfaceWithNormals = normalsGenerator->GetOutput();
-  //  //vtkSource* source = surfaceWithNormals->GetSource();
-  //  //surfaceWithNormals->SetSource(NULL);
-  //  //source->Delete();
-  //  surface->SetVtkPolyData( surfaceWithNormals );
-  //  mitk::DataTreeNode::Pointer node = this->GetOutput();
-  //  node->SetData( surface );
-  //  SetDefaultSurfaceProperties( node );
-  //}
-
-  //normalsGenerator->Delete();
-  //stlReader->Delete();
-
-  //std::cout << "...finished!" << std::endl;
   mitk::DataTreeNode::Pointer node = this->GetOutput();
-  //mitk::Surface::Pointer surface = mitk::Surface::New();
   mitk::STLFileReader::Pointer STLFileReader = mitk::STLFileReader::New();
   STLFileReader->SetFileName(m_FileName.c_str());
   STLFileReader->Update();
@@ -1027,7 +1001,7 @@ void mitk::DataTreeNodeFactory::ReadFileTypeGDCM()
 }
 
 void mitk::DataTreeNodeFactory::ReadFileTypeITKImageIOFactory()
-{
+  {
   const unsigned int MINDIM = 2;
   const unsigned int MAXDIM = 4;
 

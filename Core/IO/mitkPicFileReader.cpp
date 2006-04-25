@@ -317,6 +317,13 @@ bool mitk::PicFileReader::CanReadFile(const std::string filename, const std::str
     extensionFound = true;
     }
 
+  PICPos = filename.rfind(".seq");
+  if ((PICPos != std::string::npos)
+      && (PICPos == filename.length() - 4))
+    {
+    extensionFound = true;
+    }
+
   if( !extensionFound )
     {
       //std::cout<<"The filename extension is not recognized."<<std::endl;

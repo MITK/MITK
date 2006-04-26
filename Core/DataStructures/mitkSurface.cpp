@@ -246,37 +246,40 @@ void mitk::Surface::Resize( unsigned int timeSteps )
 
 bool mitk::Surface::WriteXMLData( XMLWriter& xmlWriter )
 {
-// todo choice of .vtk or .stl file
-/*
-  BaseData::WriteXMLData( xmlWriter );
-  std::string fileName = xmlWriter.GetNewFilenameAndSubFolder();
-  fileName += ".vtk";
-  xmlWriter.WriteProperty( XMLReader::FILENAME, fileName.c_str() );
-
-  mitk::SurfaceVtkWriter<vtkPolyDataWriter>::Pointer writer = mitk::SurfaceVtkWriter<vtkPolyDataWriter>::New();
-  writer->SetInput( this );
-  writer->SetFileName( fileName.c_str() );
-  writer->Write();
-  return true;
-*/
-  
   BaseData::WriteXMLData( xmlWriter );
   std::string fileName = xmlWriter.GetRelativePath();
-  if(!xmlWriter.IsFileExtension(".stl", fileName))
-    fileName += ".stl";
-  xmlWriter.WriteProperty( XMLReader::FILENAME, fileName.c_str() );
 
-  if(xmlWriter.SaveSourceFiles()){
-    mitk::SurfaceVtkWriter<vtkSTLWriter>::Pointer writer = mitk::SurfaceVtkWriter<vtkSTLWriter>::New();
-    writer->SetInput( this );
-    fileName = xmlWriter.GetAbsolutePath();
+  if(xmlWriter.IsFileExtension(".vtk", fileName))
+  {
+    xmlWriter.WriteProperty( XMLReader::FILENAME, fileName.c_str() );
+
+    if(xmlWriter.SaveSourceFiles()){
+      mitk::SurfaceVtkWriter<vtkPolyDataWriter>::Pointer writer = mitk::SurfaceVtkWriter<vtkPolyDataWriter>::New();
+      writer->SetInput( this );
+      fileName = xmlWriter.GetAbsolutePath();
+      if(!xmlWriter.IsFileExtension(".vtk", fileName))
+        fileName += ".vtk";
+      writer->SetFileName( fileName.c_str() );
+      writer->Write();
+    }
+  }
+  else
+  {
     if(!xmlWriter.IsFileExtension(".stl", fileName))
       fileName += ".stl";
-    writer->SetFileName( fileName.c_str() );
-    writer->Write();
+    xmlWriter.WriteProperty( XMLReader::FILENAME, fileName.c_str() );
+
+    if(xmlWriter.SaveSourceFiles()){
+      mitk::SurfaceVtkWriter<vtkSTLWriter>::Pointer writer = mitk::SurfaceVtkWriter<vtkSTLWriter>::New();
+      writer->SetInput( this );
+      fileName = xmlWriter.GetAbsolutePath();
+      if(!xmlWriter.IsFileExtension(".stl", fileName))
+        fileName += ".stl";
+      writer->SetFileName( fileName.c_str() );
+      writer->Write();
+    }
   }
   return true;
-  
 }
 
 

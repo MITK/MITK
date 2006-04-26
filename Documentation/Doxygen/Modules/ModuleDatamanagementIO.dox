@@ -22,10 +22,16 @@
 
   \image html DataTreeNodeFactoryMechanism.png "A short overview of the factory mechanism of the DataTreeNodeFactory."
   
-  The mitk::DataTreeNodeFactory calls the mitk::BaseDataIOFactory to create a pointer of a vector of mitk::BaseData. 
-  The mitk::BaseDataIOFactory registers the defined factories of the file readers. 
-  After registration each registered factory will be asked if it can read the file specified in the filename.
-  If the asked factory can read the file it instantiates the adequate reader. The reader reads the file and returns a pointer of mitk::BaseData.
+  The mitk::DataTreeNodeFactory calls the mitk::BaseDataIOFactory. 
+  The BaseDataIOFactory registers the defined factories of the file readers. 
+  After registration each registered factory will be asked if it can read the file specified by the filename.
+  If the asked factory can read the file it instantiates the adequate reader. The reader reads the file and returns as output a pointer of BaseData.
+  It is possible that a reader has more than one output. The BaseData is stored in a vector of BaseData.
+  The pointer of this vector is returned to the DataTreeNodeFactory. A node is created for each element of the vector.
+  
+  Between the BaseDataIOFactory and the ObjectFactoryBase there is still an adapter (mitk::IOAdapter).
+  The instantiated reader returns a pointer of mitk::BaseProcess. In the class BaseProcess there couldn't be defined the necessary function CanReadFile().
+  So we need an adapter class to handle this.
 
   \section XMLWriterAndXMLReader XMLWriter and XMLReader
   
@@ -51,7 +57,7 @@
   Technically the XMLWriter class is derived from mitkBaseXMLWriter class. The constructor needs the filename of the XML file at least.
   
   The following diagram displays the main components:
-  \image html XMLWriterOverview.png "XMLWriter classes dependency" 
+  \image html XMLWriterOverview.png "Classes related to XMLWriter" 
   
   For writing a XML file the following funtions are important.
   
@@ -164,7 +170,7 @@
   The constructor needs the filename ((path)+filename) of the XML file and a datatree iterator (mitk::DataTreeIteratorBase) of the datatree.
   
   The following diagram displays the main components:
-  \image html XMLReaderOverview.png "XMLReader classes dependency" 
+  \image html XMLReaderOverview.png "Classes related to XMLReader" 
 
   For reading a XML file the following funtions are important.
   

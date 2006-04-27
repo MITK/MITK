@@ -171,7 +171,7 @@ void mitk::SeedsImage::AddSeedPoint(SeedsImageType* itkImage)
                 getIndex[2]=(MaskImageType::IndexType::IndexValueType) (z + m_Radius -contIndex[2]);
                 getIndex[1]=(MaskImageType::IndexType::IndexValueType) (y + m_Radius -contIndex[1]);
                 getIndex[0]=(MaskImageType::IndexType::IndexValueType) (x + m_Radius -contIndex[0]);
-                float val = m_Brush->GetPixel(getIndex);
+                SeedsImageType::PixelType val = m_Brush->GetPixel(getIndex);
                 if (m_DrawState == -1) 
                 {
                   val *= -1.0;
@@ -208,14 +208,14 @@ void mitk::SeedsImage::PointInterpolation(SeedsImageType* itkImage)
   float t;
 
   itk::Point<typename SeedsImageType::PixelType, dimension> p;
-  p[0] = m_Point[0];
-  p[1] = m_Point[1];
-  p[2] = m_Point[2];
+  p[0] = (typename SeedsImageType::PixelType) m_Point[0];
+  p[1] = (typename SeedsImageType::PixelType) m_Point[1];
+  p[2] = (typename SeedsImageType::PixelType) m_Point[2];
   itk::ContinuousIndex<typename SeedsImageType::PixelType, dimension> pointIndex;
   itkImage->TransformPhysicalPointToContinuousIndex(p, pointIndex);
-  p[0] = m_LastPoint[0];
-  p[1] = m_LastPoint[1];
-  p[2] = m_LastPoint[2];
+  p[0] = (typename SeedsImageType::PixelType) m_LastPoint[0];
+  p[1] = (typename SeedsImageType::PixelType) m_LastPoint[1];
+  p[2] = (typename SeedsImageType::PixelType) m_LastPoint[2];
   itk::ContinuousIndex<typename SeedsImageType::PixelType, dimension> last_pointIndex;
   itkImage->TransformPhysicalPointToContinuousIndex(p, last_pointIndex);
 
@@ -306,7 +306,7 @@ void mitk::SeedsImage::PointInterpolation(SeedsImageType* itkImage)
                     getIndex[2]= (MaskImageType::IndexType::IndexValueType) (z + m_Radius -baseIndex[2]);
                     getIndex[1]= (MaskImageType::IndexType::IndexValueType) (y + m_Radius -baseIndex[1]);
                     getIndex[0]= (MaskImageType::IndexType::IndexValueType) (x + m_Radius -baseIndex[0]);
-                    float val = m_Brush->GetPixel(getIndex);
+                    SeedsImageType::PixelType val = m_Brush->GetPixel(getIndex);
                     if (m_DrawState == -1) 
                     {
                       val *= -1.0;

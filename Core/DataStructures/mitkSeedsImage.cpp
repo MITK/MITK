@@ -171,10 +171,10 @@ void mitk::SeedsImage::AddSeedPoint(SeedsImageType* itkImage)
                 getIndex[2]=(MaskImageType::IndexType::IndexValueType) (z + m_Radius -contIndex[2]);
                 getIndex[1]=(MaskImageType::IndexType::IndexValueType) (y + m_Radius -contIndex[1]);
                 getIndex[0]=(MaskImageType::IndexType::IndexValueType) (x + m_Radius -contIndex[0]);
-                CoordType val = m_Brush->GetPixel(getIndex);
+                CoordType val = (CoordType) m_Brush->GetPixel(getIndex);
                 if (m_DrawState == -1) 
                 {
-                  val *= -1.0;
+                  val *= (CoordType)-1.0;
                 }
                 val += iterator.Get();
                 iterator.Set( val );
@@ -307,10 +307,10 @@ void mitk::SeedsImage::PointInterpolation(SeedsImageType* itkImage)
                     getIndex[2]= (MaskImageType::IndexType::IndexValueType) (z + m_Radius -baseIndex[2]);
                     getIndex[1]= (MaskImageType::IndexType::IndexValueType) (y + m_Radius -baseIndex[1]);
                     getIndex[0]= (MaskImageType::IndexType::IndexValueType) (x + m_Radius -baseIndex[0]);
-                    CoordType val = m_Brush->GetPixel(getIndex);
+                    CoordType val = (CoordType) m_Brush->GetPixel(getIndex);
                     if (m_DrawState == -1) 
                     {
-                      val *= -1.0;
+                      val *= (CoordType)-1.0;
                     }
                     val += iterator.Get();
                     iterator.Set( val );

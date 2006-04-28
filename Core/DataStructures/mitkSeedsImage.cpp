@@ -115,7 +115,7 @@ void mitk::SeedsImage::AddSeedPoint(SeedsImageType* itkImage)
   p[0] = (CoordType) m_Point[0];
   p[1] = (CoordType) m_Point[1];
   p[2] = (CoordType) m_Point[2];
-  itk::ContinuousIndex<typename SeedsImageType::PixelType, dimension> contIndex;
+  itk::ContinuousIndex<CoordType, dimension> contIndex;
   itkImage->TransformPhysicalPointToContinuousIndex(p, contIndex);
 
   GetGeometry()->WorldToIndex(m_Point, baseIndex); // commented out because of the slices problem
@@ -171,7 +171,7 @@ void mitk::SeedsImage::AddSeedPoint(SeedsImageType* itkImage)
                 getIndex[2]=(MaskImageType::IndexType::IndexValueType) (z + m_Radius -contIndex[2]);
                 getIndex[1]=(MaskImageType::IndexType::IndexValueType) (y + m_Radius -contIndex[1]);
                 getIndex[0]=(MaskImageType::IndexType::IndexValueType) (x + m_Radius -contIndex[0]);
-                SeedsImageType::PixelType val = m_Brush->GetPixel(getIndex);
+                CoordType val = m_Brush->GetPixel(getIndex);
                 if (m_DrawState == -1) 
                 {
                   val *= -1.0;
@@ -195,6 +195,7 @@ void mitk::SeedsImage::AddSeedPoint(SeedsImageType* itkImage)
 template < typename SeedsImageType >
 void mitk::SeedsImage::PointInterpolation(SeedsImageType* itkImage)
 {
+  typedef typename SeedsImageType::PixelType CoordType;
   itk::ImageRegionIterator<SeedsImageType >
   iterator(itkImage, itkImage->GetRequestedRegion());
   const unsigned int dimension = ::itk::GetImageDimension<SeedsImageType>::ImageDimension;
@@ -207,16 +208,16 @@ void mitk::SeedsImage::PointInterpolation(SeedsImageType* itkImage)
   int distance_iterator;
   float t;
 
-  itk::Point<typename SeedsImageType::PixelType, dimension> p;
-  p[0] = (typename SeedsImageType::PixelType) m_Point[0];
-  p[1] = (typename SeedsImageType::PixelType) m_Point[1];
-  p[2] = (typename SeedsImageType::PixelType) m_Point[2];
-  itk::ContinuousIndex<typename SeedsImageType::PixelType, dimension> pointIndex;
+  itk::Point<CoordType, dimension> p;
+  p[0] = (CoordType) m_Point[0];
+  p[1] = (CoordType) m_Point[1];
+  p[2] = (CoordType) m_Point[2];
+  itk::ContinuousIndex<CoordType, dimension> pointIndex;
   itkImage->TransformPhysicalPointToContinuousIndex(p, pointIndex);
-  p[0] = (typename SeedsImageType::PixelType) m_LastPoint[0];
-  p[1] = (typename SeedsImageType::PixelType) m_LastPoint[1];
-  p[2] = (typename SeedsImageType::PixelType) m_LastPoint[2];
-  itk::ContinuousIndex<typename SeedsImageType::PixelType, dimension> last_pointIndex;
+  p[0] = (CoordType) m_LastPoint[0];
+  p[1] = (CoordType) m_LastPoint[1];
+  p[2] = (CoordType) m_LastPoint[2];
+  itk::ContinuousIndex<CoordType, dimension> last_pointIndex;
   itkImage->TransformPhysicalPointToContinuousIndex(p, last_pointIndex);
 
   // coordinate transformation from physical coordinates to index coordinates
@@ -306,7 +307,7 @@ void mitk::SeedsImage::PointInterpolation(SeedsImageType* itkImage)
                     getIndex[2]= (MaskImageType::IndexType::IndexValueType) (z + m_Radius -baseIndex[2]);
                     getIndex[1]= (MaskImageType::IndexType::IndexValueType) (y + m_Radius -baseIndex[1]);
                     getIndex[0]= (MaskImageType::IndexType::IndexValueType) (x + m_Radius -baseIndex[0]);
-                    SeedsImageType::PixelType val = m_Brush->GetPixel(getIndex);
+                    CoordType val = m_Brush->GetPixel(getIndex);
                     if (m_DrawState == -1) 
                     {
                       val *= -1.0;

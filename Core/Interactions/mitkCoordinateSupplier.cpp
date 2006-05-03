@@ -93,6 +93,7 @@ bool mitk::CoordinateSupplier::ExecuteAction(Action* action, mitk::StateEvent co
           break;
         }
         case AcMOVEPOINT:
+        case AcMOVE:
         {
           mitk::Point3D movePoint = posEvent->GetWorldPosition();
           m_CurrentPoint = movePoint;

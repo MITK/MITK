@@ -30,7 +30,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkLevelWindowProperty.h"
 #include "mitkGeometry2DDataMapper2D.h"
 #include "mitkOpenGLRenderer.h"
-// for AdjustCross
 #include "mitkPositionEvent.h"
 #include "mitkInteractionConst.h"
 #include "mitkGlobalInteraction.h"
@@ -719,19 +718,66 @@ const mitk::Point3D & QmitkStdMultiWidget::GetCrossPosition() const
   return m_LastLeftClickPositionSupplier->GetCurrentPoint();
 }
 
-void QmitkStdMultiWidget::AdjustCross()
+void QmitkStdMultiWidget::EnsureDisplayContainsPoint(mitk::DisplayGeometry* displayGeometry, const mitk::Point3D& p)
 {
-  mitk::Point2D p2d;
-  mitk::Point3D p3d;
-  p3d = GetCrossPosition();
-  mitk::PositionEvent event(mitkWidget1->GetRenderer(), 0, 0, 0, mitk::Key_unknown, p2d, p3d);
-  mitk::StateEvent *stateEvent = new mitk::StateEvent(mitk::EIDLEFTMOUSEBTN , &event);    
-  
-  mitk::GlobalInteraction::GetInstance()->HandleEvent( stateEvent );
-  stateEvent->Set(mitk::EIDLEFTMOUSERELEASE , &event);
-  mitk::GlobalInteraction::GetInstance()->HandleEvent( stateEvent );
+  mitk::Point2D pointOnPlane;
+  displayGeometry->Map( p, pointOnPlane );
 
-  delete stateEvent;  
+  // point minus origin < width or height ==> outside ?
+  mitk::Vector2D pointOnRenderWindow_MM;
+  pointOnRenderWindow_MM = pointOnPlane.GetVectorFromOrigin() - displayGeometry->GetOriginInMM();
+  
+  mitk::Vector2D sizeOfDisplay( displayGeometry->GetSizeInMM() );
+
+  if (   sizeOfDisplay[0] < pointOnRenderWindow_MM[0] 
+      ||                0 > pointOnRenderWindow_MM[0]
+      || sizeOfDisplay[1] < pointOnRenderWindow_MM[1]
+      ||                0 > pointOnRenderWindow_MM[1] )
+  {
+    // point is not visible -> move geometry
+    mitk::Vector2D offset( (pointOnRenderWindow_MM - sizeOfDisplay / 2.0) / displayGeometry->GetScaleFactorMMPerDisplayUnit() );
+    
+    displayGeometry->MoveBy( offset );
+  }
+}
+
+void QmitkStdMultiWidget::MoveCrossToPosition(const mitk::Point3D& newPosition)
+{
+  // create a PositionEvent with the given position and
+  // tell the slice navigation controllers to move there
+
+  mitk::Point2D p2d;
+  mitk::PositionEvent event( mitkWidget1->GetRenderer(), 0, 0, 0, mitk::Key_unknown, p2d, newPosition );
+  mitk::StateEvent stateEvent(mitk::EIDLEFTMOUSEBTN, &event);
+  mitk::StateEvent stateEvent2(mitk::EIDRIGHTMOUSEBTN, &event);
+
+  if (m_SlicesRotation)
+  {
+    m_SlicesRotator->HandleEvent( &stateEvent );
+    
+    // just in case SNCs will develop something that depends on the mouse button being released again
+    m_SlicesRotator->HandleEvent( &stateEvent2 );
+  }
+  else
+  {
+    mitkWidget1->GetSliceNavigationController()->HandleEvent( &stateEvent );
+    mitkWidget2->GetSliceNavigationController()->HandleEvent( &stateEvent );
+    mitkWidget3->GetSliceNavigationController()->HandleEvent( &stateEvent );
+    
+    // just in case SNCs will develop something that depends on the mouse button being released again
+    mitkWidget1->GetSliceNavigationController()->HandleEvent( &stateEvent2 );
+    mitkWidget2->GetSliceNavigationController()->HandleEvent( &stateEvent2 );
+    mitkWidget3->GetSliceNavigationController()->HandleEvent( &stateEvent2 );
+  }
+  
+  // determine if cross is now out of display
+  // if so, move the display window
+  EnsureDisplayContainsPoint( mitkWidget1->GetRenderer()->GetDisplayGeometry(), newPosition );
+  EnsureDisplayContainsPoint( mitkWidget2->GetRenderer()->GetDisplayGeometry(), newPosition );
+  EnsureDisplayContainsPoint( mitkWidget3->GetRenderer()->GetDisplayGeometry(), newPosition );
+
+  // update displays
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkStdMultiWidget::EnableNavigationControllerEventListening()

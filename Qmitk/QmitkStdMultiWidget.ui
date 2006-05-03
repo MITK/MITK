@@ -193,7 +193,8 @@
     <slot>wheelEvent( QWheelEvent * e )</slot>
     <slot>ReInitializeStandardViews()</slot>
     <slot>changeLevelWindow( mitk::LevelWindow * lw )</slot>
-    <slot>AdjustCross()</slot>
+    <slot>MoveCrossToPosition(const mitk::Point3D&amp; newPosition)</slot>
+    <slot>EnsureDisplayContainsPoint(mitk::DisplayGeometry* displayGeometry, const mitk::Point3D&amp; p)</slot>
     <slot>EnableNavigationControllerEventListening()</slot>
     <slot>DisableNavigationControllerEventListening()</slot>
     <slot>EnableSliceRotation(bool on)</slot>

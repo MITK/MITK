@@ -906,51 +906,51 @@ public:
 		  return resultMesh;
   }
 
-  static typename MeshType::Pointer TranslateMesh(typename MeshType::PointType vec, MeshType* input)
-  {
-
-    typename MeshType::Pointer output = MeshType::New();
-    {
-      output->SetPoints(input->GetPoints());
-      output->SetPointData(input->GetPointData());
-      output->SetCells(input->GetCells());
-      output->SetLastCellId( input->GetLastCellId() );
-      typename MeshType::GeometryMapIterator pointDataIterator = input->GetGeometryData()->Begin();
-      typename MeshType::GeometryMapIterator pointDataEnd = input->GetGeometryData()->End();
-
-      typename MeshType::PointType inputPoint,outputPoint;
-
-      while (pointDataIterator != pointDataEnd)
-      {
-        unsigned long pointId = pointDataIterator->Index();
-        itk::SimplexMeshGeometry* newGeometry = new itk::SimplexMeshGeometry();
-        itk::SimplexMeshGeometry* refGeometry = pointDataIterator->Value();
-
-        input->GetPoint(pointId, &inputPoint );
-        outputPoint[0] = inputPoint[0] + vec[0];
-        outputPoint[1] = inputPoint[1] + vec[1];
-        outputPoint[2] = inputPoint[2] + vec[2];
-        output->SetPoint( pointId, outputPoint );
-
-
-        newGeometry->pos = outputPoint;
-        newGeometry->neighborIndices = refGeometry->neighborIndices;
-        newGeometry->meanCurvature = refGeometry->meanCurvature;
-        newGeometry->neighbors = refGeometry->neighbors;
-        newGeometry->oldPos = refGeometry->oldPos;
-        newGeometry->eps = refGeometry->eps;
-        newGeometry->referenceMetrics = refGeometry->referenceMetrics;
-        newGeometry->neighborSet = refGeometry->neighborSet;
-        newGeometry->distance = refGeometry->distance;
-        newGeometry->externalForce = refGeometry->externalForce;
-        newGeometry->internalForce = refGeometry->internalForce;
-        output->SetGeometryData(pointId, newGeometry);
-        pointDataIterator++;
-      }
-    }
-//    output->SetGeometryData( inputMesh->GetGeometryData() );
-    return output;
-  }
+//  static typename MeshType::Pointer TranslateMesh(typename MeshType::PointType vec, MeshType* input)
+//  {
+//
+//    typename MeshType::Pointer output = MeshType::New();
+//    {
+//      output->SetPoints(input->GetPoints());
+//      output->SetPointData(input->GetPointData());
+//      output->SetCells(input->GetCells());
+//      output->SetLastCellId( input->GetLastCellId() );
+//      typename MeshType::GeometryMapIterator pointDataIterator = input->GetGeometryData()->Begin();
+//      typename MeshType::GeometryMapIterator pointDataEnd = input->GetGeometryData()->End();
+//
+//      typename MeshType::PointType inputPoint,outputPoint;
+//
+//      while (pointDataIterator != pointDataEnd)
+//      {
+//        unsigned long pointId = pointDataIterator->Index();
+//        itk::SimplexMeshGeometry* newGeometry = new itk::SimplexMeshGeometry();
+//        itk::SimplexMeshGeometry* refGeometry = pointDataIterator->Value();
+//
+//        input->GetPoint(pointId, &inputPoint );
+//        outputPoint[0] = inputPoint[0] + vec[0];
+//        outputPoint[1] = inputPoint[1] + vec[1];
+//        outputPoint[2] = inputPoint[2] + vec[2];
+//        output->SetPoint( pointId, outputPoint );
+//
+//
+//        newGeometry->pos = outputPoint;
+//        newGeometry->neighborIndices = refGeometry->neighborIndices;
+//        newGeometry->meanCurvature = refGeometry->meanCurvature;
+//        newGeometry->neighbors = refGeometry->neighbors;
+//        newGeometry->oldPos = refGeometry->oldPos;
+//        newGeometry->eps = refGeometry->eps;
+//        newGeometry->referenceMetrics = refGeometry->referenceMetrics;
+//        newGeometry->neighborSet = refGeometry->neighborSet;
+//        newGeometry->distance = refGeometry->distance;
+//        newGeometry->externalForce = refGeometry->externalForce;
+//        newGeometry->internalForce = refGeometry->internalForce;
+//        output->SetGeometryData(pointId, newGeometry);
+//        pointDataIterator++;
+//      }
+//    }
+////    output->SetGeometryData( inputMesh->GetGeometryData() );
+//    return output;
+//  }
 
   static typename MeshType::Pointer CreateRegularSphereMesh2(typename MeshType::PointType center, typename MeshType::PointType scale, int resolution)
   {

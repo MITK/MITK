@@ -31,8 +31,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkGeometry2DDataToSurfaceFilter.h"
 #include "mitkSurfaceMapper2D.h"
 
-#include "GL/glu.h"
-
 //##ModelId=3E639E100243
 mitk::Geometry2DDataMapper2D::Geometry2DDataMapper2D() : m_SurfaceMapper(NULL)
 {

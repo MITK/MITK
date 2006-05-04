@@ -1570,9 +1570,14 @@
   <stateMachine NAME="segmentation-interactor-tool:bubble">
     <state NAME="Ready to start" ID="0" START_STATE="TRUE">
       <!-- initial state: outside anything and checking for collisions -->
-      <transition NAME="OnLeftMouseDown" EVENT_ID="1" NEXT_STATE_ID="1">
-        <action ID="48004">
-          <!-- AcInitLine -->
+      <transition NAME="OnLeftMouseDown" EVENT_ID="1" NEXT_STATE_ID="2">
+        <action ID="31">
+          <!-- AcCheckObject -->
+        </action>
+      </transition>
+      <transition NAME="OnRightMouseDown" EVENT_ID="2" NEXT_STATE_ID="4">
+        <action ID="31">
+          <!-- AcCheckObject -->
         </action>
       </transition>
     </state>
@@ -1598,6 +1603,35 @@
         <action ID="48008">
           <!-- AcCancel -->
         </action>
+      </transition>
+    </state>
+    <state NAME="Decide between creating and modifying. modify?" ID="2">
+      <transition NAME="OnNo" EVENT_ID="1003" NEXT_STATE_ID="1">
+        <action ID="48004">
+          <!-- AcInitLine -->
+        </action>
+      </transition>
+      <transition NAME="OnYes" EVENT_ID="1004" NEXT_STATE_ID="3">
+        <action ID="49012">
+          <!-- AcIncrease -->
+        </action>
+      </transition>
+    </state>
+    <state NAME="Enlarge segmented area" ID="3">
+      <transition NAME="OnLeftMouseUp" EVENT_ID="505" NEXT_STATE_ID="0">
+      </transition>
+    </state>
+    <state NAME="Decide whether to shrink segmentation. shrink?" ID="4">
+      <transition NAME="OnYes" EVENT_ID="1004" NEXT_STATE_ID="5">
+        <action ID="49013">
+          <!-- AcDecrease -->
+        </action>
+      </transition>
+      <transition NAME="OnNo" EVENT_ID="1003" NEXT_STATE_ID="5">
+      </transition>
+    </state>
+     <state NAME="Shrink segmented area" ID="5">
+      <transition NAME="OnRightMouseUp" EVENT_ID="505" NEXT_STATE_ID="0">
       </transition>
     </state>
   </stateMachine>

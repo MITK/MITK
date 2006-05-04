@@ -5,6 +5,23 @@
 #include <mitkDataTreeHelper.h>
 #include <mitkPropertyManager.h>
 
+#ifndef NDEBUG
+#include <ostream.h>
+  #define DEBUG_STATE           if (m_DEBUG) PrintStateForDebug(std::cout);
+
+  #define DEBUG_MSG_STATE(MSG)  if (m_DEBUG) { \
+                                              std::cout << "========================================" << std::endl; \
+                                              std::cout << MSG << std::endl; \
+                                              PrintStateForDebug(std::cout); \
+                                             }
+
+  #define DEBUG_MSG(MSG)        if (m_DEBUG) std::cout << MSG << std::endl;
+#else
+  #define DEBUG_STATE
+  #define DEBUG_MSG_STATE(MSG)
+  #define DEBUG_MSG(MSG)
+#endif
+
 namespace mitk
 {
 
@@ -245,6 +262,9 @@ DataTreeFilter::DataTreeFilter(DataTreeBase* datatree)
   m_TreePruneConnection(0),
   m_TreeRemoveConnection(0),
   m_LastSelectedItem(NULL)
+#ifndef NDEBUG
+  , m_DEBUG(false)
+#endif
 {
   //SetFilter( &IsDataTreeNode );
   SetFilter( &IsImage );
@@ -439,6 +459,18 @@ void DataTreeFilter::SelectItem(const Item* item, bool selected)
   // Ich const_caste mir die Welt, wie sie mir gefällt :-)
   // Aber die Items gehören ja dem Filter, deshalb ist das ok
   const_cast<Item*>(item) -> SetSelected(selected);
+} 
+
+void DataTreeFilter::DeleteSelectedItems()
+{
+  ItemSet::iterator itemiter( m_SelectedItems.begin() ); 
+  ItemSet::iterator itemiterend( m_SelectedItems.end() ); 
+  
+  while ( itemiter != itemiterend ) // for all selected items
+  {
+    DataTreeIteratorClone toNode( DataTreeHelper::FindIteratorToNode(m_DataTree, (*itemiter)->GetNode()) );
+    toNode->Remove();
+  }
 }
 
 void DataTreeFilter::TreeNodeChange(const itk::EventObject& e)
@@ -447,7 +479,7 @@ void DataTreeFilter::TreeNodeChange(const itk::EventObject& e)
  
   // if event.GetChangePosition()->GetNode() == NULL, then something was removed (while in ~DataTree()) by setting it to NULL
   const itk::TreeChangeEvent<DataTreeBase>& event( static_cast<const itk::TreeChangeEvent<DataTreeBase>&>(e) );
-  DataTreeIteratorBase* treePosition = const_cast<DataTreeIteratorBase*>(&(event.GetChangePosition()));
+  DataTreeIteratorBase* treePosition = const_cast<DataTreeIteratorBase*>(&(event.GetChangePosition()))->Clone();
 
   if ( treePosition->Get().IsNull() ) return; // TODO this special case is used only in
                                               // ~DataTree(). If used anywhere else, this
@@ -461,11 +493,14 @@ void DataTreeFilter::TreeNodeChange(const itk::EventObject& e)
 /// @todo Could TreeAdd be implemented more intelligent?
 void DataTreeFilter::TreeAdd(const itk::EventObject& e)
 {
-  std::cout << (void*)this << " TreeAddEvent" << std::endl;
+  DEBUG_MSG_STATE("Before TreeAddEvent")
   /// Regenerate item tree only from the changed position on (when hierarchy is preserved,
   /// otherwise rebuild everything)
   const itk::TreeAddEvent<DataTreeBase>& event( static_cast<const itk::TreeAddEvent<DataTreeBase>&>(e) );
-  DataTreeIteratorBase* treePosition = const_cast<DataTreeIteratorBase*>(&(event.GetChangePosition()));
+  DataTreeIteratorBase* treePosition = const_cast<DataTreeIteratorBase*>(&(event.GetChangePosition()))->Clone();
+
+  DEBUG_MSG("treePosition " << (void*)treePosition)
+  DEBUG_MSG("treePosition->Get() " << (void*)(treePosition->Get()))
 
   if ( !m_Filter(treePosition->Get()) ) return; // if filter does not match, then nothing has to be done
 
@@ -507,14 +542,15 @@ void DataTreeFilter::TreeAdd(const itk::EventObject& e)
     GenerateModelFromTree();
   }
   
+  DEBUG_MSG_STATE("After TreeAddEvent")
 }
 
 void DataTreeFilter::TreePrune(const itk::EventObject& e)
 {
-  std::cout << (void*)this << " TreePruneEvent" << std::endl;
+  DEBUG_MSG_STATE("Before TreePruneEvent")
   // event has a iterator to the node that is about to be deleted
   const itk::TreeRemoveEvent<DataTreeBase>& event( static_cast<const itk::TreeRemoveEvent<DataTreeBase>&>(e) );
-  DataTreeIteratorBase* treePosition = const_cast<DataTreeIteratorBase*>(&(event.GetChangePosition()));
+  DataTreeIteratorBase* treePosition = const_cast<DataTreeIteratorBase*>(&(event.GetChangePosition()))->Clone();
   
   /*
     if hierarchy is preserved AND if the event's position matches the filter (i.e. an item exists)
@@ -615,15 +651,17 @@ void DataTreeFilter::TreePrune(const itk::EventObject& e)
       InvokeEvent( TreeFilterItemAddedEvent( *listFirstIter ) );  // then add some items again
     }
   }
+  DEBUG_MSG_STATE("After TreePruneEvent")
 }
 
 void DataTreeFilter::TreeRemove(const itk::EventObject& e)
 {
   if ( typeid(e) != typeid(itk::TreeRemoveEvent<DataTreeBase>) ) return;
+  DEBUG_MSG_STATE("Before TreeRemoveEvent")
   
   // event has a iterator to the node that is about to be deleted
   const itk::TreeRemoveEvent<DataTreeBase>& event( static_cast<const itk::TreeRemoveEvent<DataTreeBase>&>(e) );
-  DataTreeIteratorBase* treePosition = const_cast<DataTreeIteratorBase*>(&(event.GetChangePosition()));
+  DataTreeIteratorBase* treePosition = const_cast<DataTreeIteratorBase*>(&(event.GetChangePosition()))->Clone();
   
   if ( m_Filter(treePosition->Get()) )
   {
@@ -668,6 +706,7 @@ void DataTreeFilter::TreeRemove(const itk::EventObject& e)
       InvokeEvent( TreeFilterItemAddedEvent( *listIter ) );
     }
   }
+  DEBUG_MSG_STATE("After TreeRemoveEvent")
 }
 
 void DataTreeFilter::AddMatchingChildren(DataTreeIteratorBase* iter, ItemList* list,
@@ -719,6 +758,7 @@ void DataTreeFilter::AddMatchingChildren(DataTreeIteratorBase* iter, ItemList* l
 
 void DataTreeFilter::GenerateModelFromTree()
 {
+  DEBUG_MSG_STATE("Before GenerateModel")
   InvokeEvent( TreeFilterRemoveAllEvent() );
 
   m_Items = ItemList::New(); // clear list (nice thanks to smart pointers)
@@ -760,8 +800,36 @@ void DataTreeFilter::GenerateModelFromTree()
   
   delete treeIter; // release data tree iterator
   InvokeEvent( TreeFilterUpdateAllEvent() );
+
+  DEBUG_MSG_STATE("After GenerateModel")
 }
-      
+
+#ifndef NDEBUG
+void DataTreeFilter::PrintStateForDebug(std::ostream& out)
+{
+  out << "Current state: " 
+      << m_Items->size() << " items, "
+      << m_SelectedItems.size() << " selected, "
+      << m_Item.size() << " mapped to nodes, "
+      << "filter at " << (void*)m_Filter << ","
+      << std::endl;
+  
+  ItemList::iterator listIter;
+  for ( listIter = m_Items->begin(); listIter != m_Items->end(); ++listIter )
+  {
+    out << (void*)(*listIter) << ": ";
+    if (*listIter)
+    {
+      std::string name;
+      (*listIter)->GetNode()->GetName(name);
+      out << name;
+      if ( (*listIter)->HasChildren() )
+        out << " has children" << std::endl;
+    }
+  }
+  out << std::endl;
+}
+#endif
 
 } // namespace mitk 
 

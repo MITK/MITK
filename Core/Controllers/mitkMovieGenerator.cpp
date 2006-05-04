@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkMovieGenerator.h"
 #include <mitkRenderingManager.h>
-#include <GL/gl.h>
+#include "mitkGL.h"
 
 #ifdef WIN32
 #ifndef __GNUC__

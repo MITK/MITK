@@ -42,8 +42,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkImageData.h>
 #include <vtkImageChangeInformation.h>
 
-#include "GL/glu.h"
-
 int mitk::ImageMapper2D::numRenderer = 0;
  
 
@@ -118,7 +116,7 @@ void mitk::ImageMapper2D::Paint(mitk::BaseRenderer * renderer)
 
   glMatrixMode (GL_PROJECTION);
   glLoadIdentity ();
-  gluOrtho2D(topLeft[0], bottomRight[0], topLeft[1]/*+1*/, bottomRight[1]);
+  glOrtho(topLeft[0], bottomRight[0], topLeft[1]/*+1*/, bottomRight[1],0.0,1.0);
   glMatrixMode( GL_MODELVIEW );
 
   GLdouble eqn0[4] = {0.0, 1.0, 0.0, 0.0};
@@ -146,8 +144,8 @@ void mitk::ImageMapper2D::Paint(mitk::BaseRenderer * renderer)
   glPushMatrix ();
   glMatrixMode (GL_PROJECTION);
   glLoadIdentity ();
-  gluOrtho2D(0, displayGeometry->GetDisplayWidth(), 0,
-    displayGeometry->GetDisplayHeight()
+  glOrtho(0, displayGeometry->GetDisplayWidth(), 0,
+    displayGeometry->GetDisplayHeight(),0.0,1.0
   );
 
   glMatrixMode( GL_MODELVIEW );

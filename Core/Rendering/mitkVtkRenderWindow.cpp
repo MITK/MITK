@@ -38,7 +38,9 @@ mitk::VtkRenderWindow* mitk::VtkRenderWindow::New()
 // Construct object so that light follows camera motion.
 mitk::VtkRenderWindow::VtkRenderWindow() : m_MitkRenderer(NULL)
 {
-  OwnWindow = 0; // do initializition missing in vtk
+  #ifndef VTK_USE_COCOA
+    OwnWindow = 0; // do initializition missing in vtk
+  #endif
 }
 
 mitk::VtkRenderWindow::~VtkRenderWindow() 

@@ -25,13 +25,17 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkConfigure.h>
 #ifdef WIN32
   #include <vtkWin32OpenGLRenderWindow.h>
-
 #else
   #ifdef VTK_USE_COCOA
-    # include "vtkCocoaRenderWindow.h"
-    # include "vtkCocoaRenderWindowInteractor.h"
+    #include "vtkCocoaRenderWindow.h"
+    #include "vtkCocoaRenderWindowInteractor.h"
   #else
-    #include <vtkXOpenGLRenderWindow.h>
+    #ifdef VTK_USE_CARBON
+      #include "vtkCarbonRenderWindow.h"
+      #include "vtkCarbonRenderWindowInteractor.h"
+    #else
+      #include <vtkXOpenGLRenderWindow.h>
+    #endif
   #endif
 #endif
 
@@ -44,7 +48,11 @@ namespace mitk
   #ifdef VTK_USE_COCOA
     #define PARENTCLASS vtkCocoaRenderWindow
   #else
-    #define PARENTCLASS vtkXOpenGLRenderWindow
+    #ifdef VTK_USE_CARBON
+      #define PARENTCLASS vtkCarbonRenderWindow
+    #else 
+      #define PARENTCLASS vtkXOpenGLRenderWindow
+    #endif  
   #endif
 #endif
 

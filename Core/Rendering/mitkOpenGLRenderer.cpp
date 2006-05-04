@@ -47,7 +47,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <utility>
 
 #include "mitkGL.h"
-#include <GL/glu.h>
 
 
 //##ModelId=3E33ECF301AD
@@ -371,7 +370,7 @@ void mitk::OpenGLRenderer::Repaint( bool onlyOverlay )
     glViewport (0, 0, m_Size[0], m_Size[1]);
     glMatrixMode( GL_PROJECTION );
     glLoadIdentity();
-    gluOrtho2D( 0.0, m_Size[0], 0.0, m_Size[1] );
+    glOrtho( 0.0, m_Size[0], 0.0, m_Size[1], 0.0, 1.0 );
     glMatrixMode( GL_MODELVIEW );
 
     //------------------
@@ -542,7 +541,7 @@ void mitk::OpenGLRenderer::Resize(int w, int h)
   glViewport (0, 0, w, h);
   glMatrixMode( GL_PROJECTION );
   glLoadIdentity();
-  gluOrtho2D( 0.0, w, 0.0, h );
+  glOrtho( 0.0, w, 0.0, h , 0.0 , 1.0);
   glMatrixMode( GL_MODELVIEW );
 
   BaseRenderer::Resize(w, h);

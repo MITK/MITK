@@ -572,6 +572,9 @@ namespace mitk
 
       /// Views can call this to select items
       void SelectItem(const Item*, bool selected = true);
+     
+      /// This will delete all selected items without further confirmation
+      void DeleteSelectedItems();
       
       /// change notifications from the data tree
       void TreeNodeChange(const itk::EventObject &);
@@ -629,6 +632,14 @@ namespace mitk
       // remember the most recently selected item
       //ItemPointer m_LastSelectedItem;
       Item* m_LastSelectedItem;
+
+#ifndef NDEBUG
+    public:
+      void SetDebugOn() { m_DEBUG = true; }
+    private:
+      void PrintStateForDebug(std::ostream& out);
+      bool m_DEBUG;
+#endif
   };
 
 

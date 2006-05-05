@@ -102,8 +102,8 @@ void SlicesRotator::UpdateRelevantSNCs()
     const SlicedGeometry3D* slicedGeometry = dynamic_cast<const SlicedGeometry3D*>( timeSlicedGeometry->GetGeometry3D(0) );
     if (!slicedGeometry) continue;
 
-    Geometry2D* firstSlice;
-    Geometry2D* secondSlice;
+    Geometry2D* firstSlice(NULL);
+    Geometry2D* secondSlice(NULL);
     if (slicedGeometry->IsValidSlice(0))  firstSlice = slicedGeometry->GetGeometry2D(0);
     if (slicedGeometry->IsValidSlice(1)) secondSlice = slicedGeometry->GetGeometry2D(1);
     

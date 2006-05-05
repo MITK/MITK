@@ -463,13 +463,10 @@ void DataTreeFilter::SelectItem(const Item* item, bool selected)
 
 void DataTreeFilter::DeleteSelectedItems()
 {
-  ItemSet::iterator itemiter( m_SelectedItems.begin() ); 
-  ItemSet::iterator itemiterend( m_SelectedItems.end() ); 
-  
-  while ( itemiter != itemiterend ) // for all selected items
+  while ( m_SelectedItems.size() != 0 ) // for all selected items
   {
-    DataTreeIteratorClone toNode( DataTreeHelper::FindIteratorToNode(m_DataTree, (*itemiter)->GetNode()) );
-    toNode->Remove();
+    DataTreeIteratorClone toNode( DataTreeHelper::FindIteratorToNode(m_DataTree, (*(m_SelectedItems.begin()))->GetNode()) );
+    toNode->Disconnect(); // remove just this one item (Remove() would kill all children, too)
   }
 }
 
@@ -663,7 +660,7 @@ void DataTreeFilter::TreeRemove(const itk::EventObject& e)
   if ( typeid(e) != typeid(itk::TreeRemoveEvent<DataTreeBase>) ) return;
   DEBUG_MSG_STATE("Before TreeRemoveEvent")
   
-  // event has a iterator to the node that is about to be deleted
+  // event has an iterator to the node that is about to be deleted
   const itk::TreeRemoveEvent<DataTreeBase>& event( static_cast<const itk::TreeRemoveEvent<DataTreeBase>&>(e) );
   DataTreeIteratorBase* treePosition = const_cast<DataTreeIteratorBase*>(&(event.GetChangePosition()))->Clone();
   

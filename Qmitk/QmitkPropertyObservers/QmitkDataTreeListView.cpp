@@ -95,6 +95,7 @@ void QmitkDataTreeListView::initialize()
   m_UpdateAllConnection        = 63535;
   
   setBackgroundMode( Qt::PaletteBase );
+  setFocusPolicy( QWidget::StrongFocus ); // to receive keyboard events
 }
 
 /**
@@ -373,6 +374,18 @@ void QmitkDataTreeListView::mouseReleaseEvent ( QMouseEvent* e )
     // future enhancement. signal with item as parameter -> opportunity to generate a popup menu
   }
 
+  setFocus(); // this focus things is somehow strange
+}
+
+/**
+  When the DELETE button is pressed, the currently selected items are deleted (after confirmation).
+*/
+void QmitkDataTreeListView::keyReleaseEvent(QKeyEvent* e)
+{
+  if ( e->key() == Qt::Key_Delete )
+  {
+    m_DataTreeFilter->DeleteSelectedItems();
+  }
 }
 
 /**

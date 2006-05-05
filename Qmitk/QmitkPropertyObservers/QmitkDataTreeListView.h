@@ -159,6 +159,7 @@ class QmitkDataTreeListView : public QWidget, public QmitkListViewItemIndex
     virtual void paintEvent(QPaintEvent*);
 
     virtual void mouseReleaseEvent (QMouseEvent*);
+    virtual void keyReleaseEvent(QKeyEvent*);
 
     void clearItems();
     

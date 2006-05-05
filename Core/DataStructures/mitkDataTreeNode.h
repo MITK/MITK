@@ -163,7 +163,7 @@ public:
   //## @brief Convenience access method for float properties (instances of
   //## FloatProperty)
   //## @return @a true property was found
-  bool GetFloatProperty(const char* propertyKey, float &intValue, mitk::BaseRenderer* renderer=NULL) const;
+  bool GetFloatProperty(const char* propertyKey, float &floatValue, mitk::BaseRenderer* renderer=NULL) const;
 
   //##Documentation
   //## @brief Convenience access method for string properties (instances of

@@ -488,6 +488,7 @@ void DataTreeFilter::TreeNodeChange(const itk::EventObject& e)
 
   // nothing is known about real TreeNodeChange events so we play safe and regenerate all
   GenerateModelFromTree();
+  delete treePosition;
 }
 
 /// @todo Could TreeAdd be implemented more intelligent?
@@ -542,6 +543,7 @@ void DataTreeFilter::TreeAdd(const itk::EventObject& e)
     GenerateModelFromTree();
   }
   
+  delete treePosition;
   DEBUG_MSG_STATE("After TreeAddEvent")
 }
 
@@ -651,6 +653,8 @@ void DataTreeFilter::TreePrune(const itk::EventObject& e)
       InvokeEvent( TreeFilterItemAddedEvent( *listFirstIter ) );  // then add some items again
     }
   }
+  
+  delete treePosition;
   DEBUG_MSG_STATE("After TreePruneEvent")
 }
 
@@ -706,6 +710,8 @@ void DataTreeFilter::TreeRemove(const itk::EventObject& e)
       InvokeEvent( TreeFilterItemAddedEvent( *listIter ) );
     }
   }
+
+  delete treePosition;
   DEBUG_MSG_STATE("After TreeRemoveEvent")
 }
 

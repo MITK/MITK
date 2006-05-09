@@ -6,7 +6,7 @@
 #include <mitkPropertyManager.h>
 
 #ifndef NDEBUG
-#include <ostream.h>
+#include <ostream>
   #define DEBUG_STATE           if (m_DEBUG) PrintStateForDebug(std::cout);
 
   #define DEBUG_MSG_STATE(MSG)  if (m_DEBUG) { \
@@ -300,7 +300,7 @@ DataTreeFilter::DataTreeFilter(DataTreeBase* datatree)
   
   GenerateModelFromTree();
 }
-
+ 
 DataTreeFilter::~DataTreeFilter()
 {
   // remove this as observer from the data tree

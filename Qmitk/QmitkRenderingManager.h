@@ -35,38 +35,52 @@ class QmitkRenderingManagerFactory;
  * timer.
  * \ingroup Renderer
  */
-class QmitkRenderingManager : public QObject, public mitk::RenderingManager
+class QmitkRenderingManager : public mitk::RenderingManager
 {
-  Q_OBJECT
 public:
   mitkClassMacro( QmitkRenderingManager, mitk::RenderingManager );
 
-  /** Get the RenderingManager singleton instance. */
-  static QmitkRenderingManager *GetInstance();
+  virtual ~QmitkRenderingManager();
 
-  ~QmitkRenderingManager();
-  
 protected:
-  QmitkRenderingManager();
+  itkFactorylessNewMacro(Self);
 
-protected slots:
+  QmitkRenderingManager();
 
   virtual void RestartTimer();
 
   virtual void StopTimer();
 
-  virtual void QUpdateCallback();
-
 private:
-  QTimer *m_Timer;
-
-  static QmitkRenderingManager* s_Instance;
-
   QmitkRenderingManagerInternal* m_QmitkRenderingManagerInternal;
 
-  friend class QmitkRenderingManagerInternal;
   friend class QmitkRenderingManagerFactory;
 };
 
+class QmitkRenderingManagerInternal : public QObject
+{
+  Q_OBJECT
+
+public:  
+  friend class QmitkRenderingManager;
+
+  virtual ~QmitkRenderingManagerInternal();
+
+protected:
+  QmitkRenderingManagerInternal();
+
+protected slots:
+
+  void RestartTimer();
+
+  void StopTimer();
+
+  void QUpdateCallback();
+
+  QmitkRenderingManager* m_QmitkRenderingManager;
+
+private:
+  QTimer *m_Timer;
+};
 
 #endif /* MITKRenderingManager_H_HEADER_INCLUDED_C135A197 */

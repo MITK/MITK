@@ -22,7 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkOpenGLRenderer.h"
 
 mitk::RenderingManager::RenderWindowList mitk::RenderingManager::s_RenderWindowList;
-mitk::RenderingManager *mitk::RenderingManager::s_Instance = 0;
+mitk::RenderingManager::Pointer mitk::RenderingManager::s_Instance = 0;
 mitk::RenderingManagerFactory *mitk::RenderingManager::s_RenderingManagerFactory = 0;
 
 void
@@ -371,7 +371,9 @@ public:
 
   virtual mitk::RenderingManager::Pointer CreateRenderingManager() const
   {
-    return GenericRenderingManager::New().GetPointer();
+    GenericRenderingManager::Pointer specificSmartPtr = GenericRenderingManager::New();
+    RenderingManager::Pointer smartPtr = specificSmartPtr.GetPointer();
+    return smartPtr;
   };
 };
 }

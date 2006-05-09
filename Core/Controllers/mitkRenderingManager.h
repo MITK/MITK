@@ -168,7 +168,7 @@ private:
 
   static RenderWindowList s_RenderWindowList;
 
-  static RenderingManager *s_Instance;
+  static RenderingManager::Pointer s_Instance;
   static RenderingManagerFactory *s_RenderingManagerFactory;
 
 };

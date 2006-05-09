@@ -24,6 +24,7 @@ QmitkRenderingManagerFactory
 ::QmitkRenderingManagerFactory()
 {
   mitk::RenderingManager::SetFactory( this );
+
 }
 
 QmitkRenderingManagerFactory
@@ -35,5 +36,7 @@ mitk::RenderingManager::Pointer
 QmitkRenderingManagerFactory
 ::CreateRenderingManager() const
 {
-  return new QmitkRenderingManager;
+  QmitkRenderingManager::Pointer specificSmartPtr = QmitkRenderingManager::New();
+  mitk::RenderingManager::Pointer smartPtr = specificSmartPtr.GetPointer();
+  return smartPtr;
 }

@@ -1575,11 +1575,6 @@
           <!-- AcCheckObject -->
         </action>
       </transition>
-      <transition NAME="OnRightMouseDown" EVENT_ID="2" NEXT_STATE_ID="4">
-        <action ID="31">
-          <!-- AcCheckObject -->
-        </action>
-      </transition>
     </state>
     <state NAME="Drawing line" ID="1">
       <!-- line drawing started, now always update the end point of the line -->
@@ -1611,30 +1606,31 @@
           <!-- AcInitLine -->
         </action>
       </transition>
-      <transition NAME="OnYes" EVENT_ID="1004" NEXT_STATE_ID="3">
+      <transition NAME="OnYes" EVENT_ID="1004" NEXT_STATE_ID="6">
+      </transition>
+    </state>
+    <state NAME="Decide between left and right movement. Left?" ID="5">
+      <transition NAME="OnNo" EVENT_ID="1003" NEXT_STATE_ID="6">
         <action ID="49012">
           <!-- AcIncrease -->
         </action>
       </transition>
-    </state>
-    <state NAME="Enlarge segmented area" ID="3">
-      <transition NAME="OnLeftMouseUp" EVENT_ID="505" NEXT_STATE_ID="0">
-      </transition>
-    </state>
-    <state NAME="Decide whether to shrink segmentation. shrink?" ID="4">
-      <transition NAME="OnYes" EVENT_ID="1004" NEXT_STATE_ID="5">
+      <transition NAME="OnYes" EVENT_ID="1004" NEXT_STATE_ID="6">
         <action ID="49013">
           <!-- AcDecrease -->
         </action>
       </transition>
-      <transition NAME="OnNo" EVENT_ID="1003" NEXT_STATE_ID="5">
+    </state>
+     <state NAME="Decide between left and right movement. Left?" ID="6">
+      <transition NAME="OnMouseMove" EVENT_ID="530" NEXT_STATE_ID="5">
+        <action ID="8">
+          <!-- AcInitMovement -->
+        </action>
+      </transition>
+      <transition NAME="OnMouseUp" EVENT_ID="505" NEXT_STATE_ID="0">
       </transition>
     </state>
-     <state NAME="Shrink segmented area" ID="5">
-      <transition NAME="OnRightMouseUp" EVENT_ID="505" NEXT_STATE_ID="0">
-      </transition>
-    </state>
-  </stateMachine>
+   </stateMachine>
   <stateMachine NAME="HierachicalInteractor">
     <!-- Behaviour of a HirachicalInteractor -->
     <state NAME="notSelected" ID="0" START_STATE="TRUE" X_POS="153" Y_POS="45" WIDTH="100" HEIGHT="50">

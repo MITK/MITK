@@ -148,6 +148,7 @@ class QmitkDataTreeListView : public QWidget, public QmitkListViewItemIndex
 
   signals:
     
+    void clicked(const mitk::DataTreeFilter::Item*, bool selected);
     void activated(const mitk::DataTreeFilter::Item*, bool);
    
   protected:

@@ -367,6 +367,7 @@ void QmitkDataTreeListView::mouseReleaseEvent ( QMouseEvent* e )
     {
       selected = !item->IsSelected();
       item->SetSelected( selected ); // toggle selection
+      emit clicked(item, selected);
     }
   }
   else // not left mouse button

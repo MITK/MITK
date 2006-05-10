@@ -625,7 +625,7 @@ int testRefinementModelProcessor()
   tubeGenerator->SetInnerRing(false);
   tubeGenerator->SetOuterRing(false);
   tubeGenerator->Update();
-  TubeSegmentModelPointer tubeSegment = tubeGenerator->GetOutputModel();
+  TubeSegmentModelPointer tubeSegment = tubeGenerator->GetOutput();
 
   PointSetToImageFilterPointer pointSetToImageFilter = PointSetToImageFilterType::New();
   OutputImageType::SizeType size;

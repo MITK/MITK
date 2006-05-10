@@ -42,6 +42,38 @@
 #include <mitkLevelWindow.h>
 #include <qstring.h>
 
+/**
+
+  This documentation actually refers to the QmitkLevelWindowWidget and is only put in this class due to technical issues (should be moved later).
+  
+  The QmitkLevelWindowWidget is a kind of container for a
+  QmitkSliderLevelWindowWidget (this is the cyan bar above the text input
+  fields) and two text input fields. It holds a reference to a
+  mitk::LevelWindow variable, which is manipulated by the text inputs and the
+  bar to adjust brightness/contrast of a single image.
+
+  Which image is changed is determined by the QmitkStdMultiWidget or another
+  widget that contains the level window widget. In case of the
+  QmitkStdMultiWidget the level window widget should always refer to the
+  top-most image in the data tree (top-most is determined by the "layer"
+  property).
+
+  The internal mitk::LevelWindow variable contains a range that is valid for
+  a given image. It should not be possible to move the level/window
+  parameters outside this range.
+
+  Now for the behaviour of the text inputs: The upper one contains the
+  value of the level (brightness), the lower one shows the window (contrast).
+  In a cleaned up version of the widget, I would like to show the upper and
+  lower limit of the window.
+
+  The behaviour of the cyan bar is more obvious: the height of the gray
+  background stands for the valid range. The cyan bar in front displays the
+  currently selected level/window setting. You can change the level by
+  dragging the bar with the left mouse button. The window is changed by
+  dragging with the right mouse button.
+
+  */
 class QmitkSliderLevelWindowWidget : public QWidget {
 
   Q_OBJECT

@@ -96,6 +96,23 @@ namespace mitk {
 //##   new QmitkStepperAdapter(navigator, sliceCtrl->GetSlice(), "navigatoradaptor");
 //## \endcode
 //##
+//## If you do not want that all renderwindows are updated when a new slice is 
+//## selected, you can use a specific RenderingManager, which updates only those 
+//## renderwindows that should be updated. This is sometimes useful when a 3D view
+//## does not need to be updated when the slices in some 2D views are changed.
+//## QmitkSliderNavigator (for Qt):
+//## \code
+//##   // create a specific RenderingManager
+//##   mitk::RenderingManager::Pointer myManager = mitk::RenderingManager::New();
+//##   // tell the RenderingManager to update only renderwindow1 and renderwindow2
+//##   myManager->AddRenderWindow(renderwindow1);
+//##   myManager->AddRenderWindow(renderwindow2);
+//##   // tell the SliceNavigationController of renderwindow1 and renderwindow2
+//##   // to use the specific RenderingManager instead of the global one
+//##   renderwindow1->GetSliceNavigationController()->SetRenderingManager(myManager); 
+//##   renderwindow2->GetSliceNavigationController()->SetRenderingManager(myManager); 
+//## \endcode
+//##
 //## @todo implement for non-evenly-timed geometry!
 //## @ingroup NavigationControl
 class SliceNavigationController : public BaseController

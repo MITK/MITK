@@ -22,7 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkVector.h"
 
 template <class T>
-void _planesSet(ipPicDescriptor *dest, const mitk::Geometry3D* srcgeometry, const mitk::PlaneCutFilter::PlanesContainerType* planes, float _outside_value, T * dummy=0)
+void _planesSet(ipPicDescriptor *dest, const mitk::Geometry3D* srcgeometry, const mitk::PlaneCutFilter::PlanesContainerType* planes, float _outside_value)
 {
   T outside_value = static_cast<T>(_outside_value);
   T *d=(T*)dest->data;

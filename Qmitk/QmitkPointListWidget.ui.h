@@ -49,7 +49,7 @@ void QmitkPointListWidget::PointSelect( int ItemIndex )
   //assert(m_PointSet->IndexExists(ItemIndex));
   mitk::PointSet::PointType ppt;
   mitk::PointSet::PointsContainer::Iterator it, end;  
-  unsigned int i=0;
+  int i=0;
   for (it = m_PointSet->GetPointSet()->GetPoints()->Begin(); i<ItemIndex; it++) i++; ///the iterator will be set to the position needed 
   m_PointSet->GetPointSet()->GetPoints()->GetElementIfIndexExists(it->Index(), &ppt);
   mitk::Point2D p2d;
@@ -191,7 +191,7 @@ void QmitkPointListWidget::SwitchInteraction( mitk::PointSetInteractor::Pointer 
   ItemsOfListUpdate();
 }
 
-void QmitkPointListWidget::SwitchInteraction( mitk::PolygonInteractor::Pointer *sop, mitk::DataTreeNode::Pointer * node, int numberOfPoints, mitk::Point3D c, std::string l )
+void QmitkPointListWidget::SwitchInteraction( mitk::PolygonInteractor::Pointer *sop, mitk::DataTreeNode::Pointer * node, int itkNotUsed(numberOfPoints), mitk::Point3D c, std::string l )
 {
   if ((*sop).IsNull())
   {

@@ -77,10 +77,9 @@ protected slots:
 
   void QUpdateCallback();
 
-  QmitkRenderingManager* m_QmitkRenderingManager;
-
 private:
   QTimer *m_Timer;
+  QmitkRenderingManager* m_QmitkRenderingManager;
 };
 
 #endif /* MITKRenderingManager_H_HEADER_INCLUDED_C135A197 */

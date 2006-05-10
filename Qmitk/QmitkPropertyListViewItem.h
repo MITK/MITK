@@ -22,8 +22,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qwidget.h>
 #include <qobject.h>
 #include <string>
-#include "enabled.xpm"
-#include "disabled.xpm"
 
 class QPushButton;
 class QTextEdit;

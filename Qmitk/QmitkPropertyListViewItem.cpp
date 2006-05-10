@@ -46,8 +46,12 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qslider.h>
 #include <qcombobox.h>
 
+#include "enabled.xpm"
+#include "disabled.xpm"
 
-QmitkPropertyListViewItem::QmitkPropertyListViewItem(std::string name, mitk::PropertyList* propertyList, QWidget* parent, bool createOnlyControl) : m_Name(name), m_PropertyList(propertyList), m_Control(NULL), m_Label(NULL)
+
+QmitkPropertyListViewItem::QmitkPropertyListViewItem(std::string name, mitk::PropertyList* propertyList, QWidget* parent, bool createOnlyControl) 
+  : m_Name(name), m_PropertyList(propertyList), m_Label(NULL), m_Control(NULL)
 {
   if (!createOnlyControl)
   {
@@ -183,7 +187,7 @@ QmitkPropertyListViewItem* QmitkPropertyListViewItem::CreateInstance(mitk::Prope
     }
     connect((QObject*)(newItem->m_Control),SIGNAL(textChanged(const QString &)),(QObject*)(newItem),SLOT(IntControlActivated(const QString &)));
   }
-  else if (mitk::MaterialProperty* materialProp = dynamic_cast<mitk::MaterialProperty*>(baseProp))
+  else if (dynamic_cast<mitk::MaterialProperty*>(baseProp))
   {
     newItem = new QmitkPropertyListViewItem(name,propList,parent,createOnlyControl);
     newItem->m_Control = new QPushButton("Edit",parent);
@@ -346,7 +350,6 @@ void QmitkPropertyListViewItem::UpdateEnabledView()
 {
   static const QPixmap enabledPix((const char **)enabled_xpm);
   static const QPixmap disabledPix((const char **)disabled_xpm);
-  mitk::BaseProperty* baseProp = m_PropertyList->GetProperty(m_Name.c_str());
   if (m_PropertyList->IsEnabled(m_Name.c_str())) /* baseProp->GetEnabled()) */
   {
     m_EnabledButton->setPixmap(enabledPix);
@@ -364,7 +367,6 @@ void QmitkPropertyListViewItem::UpdateEnabledView()
 
 void QmitkPropertyListViewItem::EnabledButtonClicked()
 {
-  mitk::BaseProperty* baseProp = m_PropertyList->GetProperty(m_Name.c_str());
   //baseProp->SetEnabled(! baseProp->GetEnabled());
   m_PropertyList->SetEnabled(m_Name.c_str(), ! m_PropertyList->IsEnabled(m_Name.c_str()));
   UpdateEnabledView();

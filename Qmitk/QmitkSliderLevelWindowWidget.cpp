@@ -71,7 +71,7 @@ QString QmitkSliderLevelWindowWidget::GetLevel()
   return level;
 }
 
-void QmitkSliderLevelWindowWidget::paintEvent( QPaintEvent* e ) 
+void QmitkSliderLevelWindowWidget::paintEvent( QPaintEvent* itkNotUsed(e) ) 
 {
   newPaintEvent();
 

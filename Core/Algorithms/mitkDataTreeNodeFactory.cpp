@@ -949,6 +949,9 @@ void mitk::DataTreeNodeFactory::ReadFileTypeSSM()
   reader->Update();
   mitk::DataTreeNode::Pointer node = this->GetOutput();
   node->SetData( reader->GetOutput() );
+  std::string filename = this->GetBaseFilePrefix();
+  mitk::StringProperty::Pointer nameProp = new mitk::StringProperty( filename );
+  node->SetProperty( "name", nameProp );
 
   std::cout << "...finished!" << std::endl;
 }
@@ -1663,8 +1666,13 @@ void mitk::DataTreeNodeFactory::SetDefaultSurfaceProperties(mitk::DataTreeNode::
   node->SetProperty( "material", new mitk::MaterialProperty( 1.0, 1.0, 1.0, 1.0, node.GetPointer() ) );
   mitk::Surface::Pointer surface = dynamic_cast<Surface*>(node->GetData());
   if(surface.IsNotNull()){
-    if (surface->GetVtkPolyData()->GetPointData()->GetScalars() != 0) 
-      node->SetProperty( "usePointDataForColouring", new mitk::BoolProperty(true) );
+    if (surface->GetVtkPolyData() != 0) {
+      if (surface->GetVtkPolyData()->GetPointData() != 0) {
+        if (surface->GetVtkPolyData()->GetPointData()->GetScalars() != 0) {
+          node->SetProperty( "usePointDataForColouring", new mitk::BoolProperty(true) );
+        }
+      }
+    }
   }
 }
 

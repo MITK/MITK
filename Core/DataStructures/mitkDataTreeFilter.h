@@ -657,6 +657,9 @@ namespace mitk
   /// (accepts nodes that have associated an mitk::Image)
   bool IsImage(mitk::DataTreeNode*);
 
+  /// Accepts all sahep models
+  bool IsShapeModel(mitk::DataTreeNode*);
+
   //bool IsSurface(mitk::DataTreeNode*);
   // .
   // .

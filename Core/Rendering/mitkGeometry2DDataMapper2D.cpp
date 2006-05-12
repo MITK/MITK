@@ -236,8 +236,8 @@ void mitk::Geometry2DDataMapper2D::Paint(mitk::BaseRenderer * renderer)
       
       if(m_SurfaceMapper.IsNull())
         m_SurfaceMapper=mitk::SurfaceMapper2D::New();
-      m_SurfaceMapper->SetDataTreeNode(GetDataTreeNode());
       m_SurfaceMapper->SetSurface(surfaceCreator->GetOutput());
+      m_SurfaceMapper->SetDataTreeNode(GetDataTreeNode());
       
       m_SurfaceMapper->Paint(renderer);
     }

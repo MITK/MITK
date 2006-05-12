@@ -22,6 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 //MITK-Elements
 #include <mitkManualSegmentationToSurfaceFilter.h>
+#include <mitkColorSequenceRainbow.h>
 
 //QMitk-Elements
 #include "QmitkCommonFunctionality.h"
@@ -49,6 +50,8 @@ QmitkIsoSurface::QmitkIsoSurface(QObject *parent, const char *name, QmitkStdMult
   m_r = 0.75;
   m_g = 0.42;
   m_b = -0.75;
+  m_Color.Set(1.0, 0.67, 0.0);
+  m_RainbowColor = new mitk::ColorSequenceRainbow();
 }
 
 
@@ -158,6 +161,7 @@ void QmitkIsoSurface::CreateSurface()
   m_b += 0.25; if(m_b > 1){m_b = m_b - 1;}
 
   iteratorOnImageToBeSkinExtracted->Get()->GetIntProperty("layer", layer);
+  //mitk::DataTreeNodeFactory::SetDefaultSurfaceProperties(surfaceNode);
   surfaceNode->SetIntProperty("layer", layer+1);
   surfaceNode->SetProperty("Surface", new mitk::BoolProperty(true));
   surfaceNode->SetProperty("name", new mitk::StringProperty(surfaceNodeName));
@@ -182,7 +186,8 @@ void QmitkIsoSurface::CreateSurface()
   mitk::Surface::Pointer surface = filter->GetOutput();
  
   //to show surfaceContur
-  surfaceNode->SetColor(m_r, m_g, m_b);
+  m_Color = m_RainbowColor->GetNextColor();
+  surfaceNode->SetColor(m_Color);
   surfaceNode->SetVisibility(true);
 
   m_MultiWidget->RequestUpdate();
@@ -207,5 +212,5 @@ float QmitkIsoSurface::getThreshold()
 
 QmitkIsoSurface::~QmitkIsoSurface()
 {
-
+  delete m_RainbowColor;
 }

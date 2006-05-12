@@ -21,6 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "QmitkFunctionality.h"
 #include "mitkSurface.h"
+#include <mitkColorSequence.h>
 
 class QmitkStdMultiWidget;
 class QmitkIsoSurfaceControls;
@@ -126,5 +127,8 @@ protected:
   float m_r;
   float m_g;
   float m_b;
+
+  mitk::Color m_Color;
+  mitk::ColorSequence* m_RainbowColor;
 };
 #endif // !defined(QMITK_ISOSURFACE_H__INCLUDED)

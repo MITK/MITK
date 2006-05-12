@@ -69,6 +69,7 @@ void QmitkFunctionalityTemplate::Activated()
 {
   QmitkFunctionality::Activated();
 }
+
 void QmitkFunctionalityTemplate::ImageSelected(mitk::DataTreeIteratorClone imageIt)
 {
   std::string name;

@@ -86,6 +86,8 @@ namespace mitk {
     //##Documentation
     //## @brief stores all lower Interactors
     InteractorList m_AllInteractors;
+
+    virtual void SetDataTreeNode( DataTreeNode* dataTreeNode );
   };
 
 }//namespace mitk

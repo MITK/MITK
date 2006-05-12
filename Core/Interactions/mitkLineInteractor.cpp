@@ -38,7 +38,7 @@ PURPOSE.  See the above copyright notices for more information.
 mitk::LineInteractor::LineInteractor(const char * type, DataTreeNode* dataTreeNode)
   : HierarchicalInteractor(type, dataTreeNode), m_CurrentLineId(0), m_CurrentCellId(0)
 {
-    m_PointInteractor = new mitk::PointSnapInteractor("pointSNAPinteractor",dataTreeNode);
+    m_PointInteractor = new mitk::PointSnapInteractor("pointSNAPinteractor",NULL);
     this->AddInteractor((Interactor::Pointer)m_PointInteractor);
     m_LastPoint.Fill(0);
 }

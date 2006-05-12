@@ -121,6 +121,12 @@ float mitk::PointInteractor::CalculateJurisdiction(StateEvent const* stateEvent)
     return 0;
   }
 
+  //if the event can be understood and if there is a transition waiting for that event
+  if (this->GetCurrentState()->GetTransition(stateEvent->GetId())!=NULL)
+  {
+    returnValue = 0.5;//it can be understood
+  }
+
   //check on the right data-type
   mitk::PointSet* pointSet = dynamic_cast<mitk::PointSet*>(m_DataTreeNode->GetData());
   if (pointSet == NULL)
@@ -161,7 +167,7 @@ float mitk::PointInteractor::CalculateJurisdiction(StateEvent const* stateEvent)
   }
   else //not found
   {
-    return 0;
+    return returnValue;
   }
 
 }

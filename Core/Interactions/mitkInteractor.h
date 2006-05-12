@@ -31,6 +31,7 @@ namespace mitk {
 
 class DataTreeNode;
 class BaseData;
+class HierarchicalInteractor;
 
 //##Documentation
 //## @brief Interface for an Interactor.
@@ -129,7 +130,7 @@ protected:
 
   //##Documentation
   //## @brief Used by friend class DataTreeNode
-  void SetDataTreeNode( DataTreeNode* dataTreeNode );
+  virtual void SetDataTreeNode( DataTreeNode* dataTreeNode );
 
   //##Documentation
   //## @brief Pointer to the data, this object handles the Interaction for
@@ -140,6 +141,7 @@ protected:
   ModeType m_Mode;
 
   friend class mitk::DataTreeNode;
+  friend class mitk::HierarchicalInteractor;
 };
 
 }//namespace mitk

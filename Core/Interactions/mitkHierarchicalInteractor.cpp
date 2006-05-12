@@ -282,8 +282,23 @@ bool mitk::HierarchicalInteractor::AddInteractor(mitk::Interactor::Pointer inter
   if (interactor.IsNotNull())
   {
     m_AllInteractors.push_back(interactor);
+    interactor->SetDataTreeNode(m_DataTreeNode);
     return true;
   }
   else
     return false;
+}
+
+void mitk::HierarchicalInteractor::SetDataTreeNode( mitk::DataTreeNode* dataTreeNode )
+{
+  Superclass::SetDataTreeNode(dataTreeNode);
+
+  InteractorListConstIter i = m_AllInteractors.begin();
+  InteractorListConstIter end = m_AllInteractors.end();
+
+  while ( i != end )
+  {
+    (*i)->SetDataTreeNode( dataTreeNode );
+    i++;
+  }
 }

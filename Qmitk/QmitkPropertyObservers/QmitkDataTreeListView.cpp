@@ -577,6 +577,8 @@ void QmitkDataTreeListView::generateItems()
   m_Grid->setRowStretch( m_Grid->numRows()-1, 1 );
 
   m_Grid->activate();
+
+  repaint();
 }
 
 /**

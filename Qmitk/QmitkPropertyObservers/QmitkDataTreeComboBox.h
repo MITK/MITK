@@ -27,7 +27,7 @@ PURPOSE.  See the above copyright notices for more information.
  @brief Displays items of a DataTreeFilter
  @ingroup Widgets
 
- \attention{This class is meant as a replacement for QmitkTreeNodeSelector, as it provides the same functionality but better separation of GUI and non-GUI tasks}
+ \attention This class is meant as a replacement for QmitkTreeNodeSelector, as it provides the same functionality but better separation of GUI and non-GUI tasks.
  
  \section sectionQmitkDataTreeComboBoxOverview Overview
  

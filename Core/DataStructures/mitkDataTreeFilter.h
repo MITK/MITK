@@ -29,7 +29,7 @@
 /**
   \class mitk::DataTreeFilter mitkDataTreeFilter.h mitkDataTreeFilter.h
 
-  \brief Provides a filtered view on the data tree, useful as basis for GUI elements.
+  \brief Provides a filtered view on the data tree, useful as basis for GUI elements (such as QmitkDataTreeListView and QmitkDataTreeComboBox).
     
   Before reading this, you should know the following classes: 
   DataTree, DataTreeNode,  itk::TreeIteratorBase, BaseProperty, itk::Event.

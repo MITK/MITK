@@ -94,5 +94,13 @@ Color ColorSequenceCycleH::GetNextColor()
   return returnColor;
 }
 
+void ColorSequenceCycleH::GoToBegin()
+{
+  color_h = -60.0; // after the first increase this will yield red
+  color_s = 1.0;  // full saturation
+  color_v = 1.0; // full value
+  color_cycle = 0;
+}
+
 }  // mitk
 

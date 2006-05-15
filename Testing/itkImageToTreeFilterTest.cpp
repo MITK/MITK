@@ -597,10 +597,10 @@ int testProfileGradientFinder()
   const unsigned int imageDimension = image->GetImageDimension();
   for(unsigned int dim = 0; dim < imageDimension; dim++)
   {
-    const double diff = bestPoint[dim] - 50;
+    const double diff = bestPoint[dim] - 10;
     if (diff > 1.0 || diff < -1.0)
     {
-      std::cout << "Point outisde of tolerance: " << bestPoint << std::endl;
+      std::cout << "Point outisde of tolerance: " << diff << " at Point " << bestPoint << " dimension " << dim << std::endl;
       return EXIT_FAILURE;
     }
   }
@@ -654,11 +654,31 @@ int testRefinementModelProcessor()
 }
 
 /****************************************************************
- * TEST: DetectorSphereSurfaceExtractor
+ * TEST: RegistrationModel
  ****************************************************************/
-int testDetectorSphereSurfaceExtractor()
+int testRegistrationModelRadius()
 {
-  std::cout << " *** Testing the DetectorSphereSurfaceExtractor ***\n";
+  std::cout << " *** Testing the Radius calculation of the RegistrationModel ***\n";
+
+  TubeSegmentModelGeneratorPointer tubeGenerator = TubeSegmentModelGeneratorType::New();
+  tubeGenerator->SetXDimension(100);
+  tubeGenerator->SetYDimension(100);
+  tubeGenerator->SetZDimension(10);
+  tubeGenerator->SetNumberOfSlices(10);
+  tubeGenerator->SetRadius(10);
+  tubeGenerator->SetInnerRing(false);
+  tubeGenerator->SetOuterRing(false);
+  tubeGenerator->Update();
+  TubeSegmentModelPointer tubeSegment = tubeGenerator->GetOutput();
+
+  PixelType radius = tubeSegment->GetRadius(tubeSegment->GetConnectionPoints()->GetPoints()->Begin().Value());
+
+  PixelType diff = 10.0 - radius;
+  if (diff > 1.0 || diff < -1.0)
+  {
+    std::cout << "Radius outside of tolerance: " << radius << std::endl;
+    return EXIT_FAILURE;
+  }
 
   std::cout << " *** [TEST PASSED] ***\n";
   return EXIT_SUCCESS;
@@ -677,7 +697,8 @@ int itkImageToTreeFilterTest(int i, char* argv[] )
   resultList.push_back(testTreeToBinaryImageFilter());
   resultList.push_back(testProfileGradientFinder());
   resultList.push_back(testRefinementModelProcessor());
-  resultList.push_back(testDetectorSphereSurfaceExtractor());
+  resultList.push_back(testRegistrationModelRadius());
+
 
   std::cout << " *** [ALL TESTS DONE] ***\n";
 

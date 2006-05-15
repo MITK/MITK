@@ -108,7 +108,8 @@ PURPOSE.  See the above copyright notices for more information.
  - When no StringProperty is found, try the "name" property
 
 */
-cclass QmitkDataTreeComboBox : public QComboBox
+
+class QmitkDataTreeComboBox : public QComboBox
 {
   Q_OBJECT;
 

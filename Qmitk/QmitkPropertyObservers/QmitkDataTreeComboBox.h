@@ -23,9 +23,92 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkDataTreeFilter.h>
 #include <vector>
 
-/// @brief Displays items of a mitk::DataTree
-/// @ingroup Widgets
-class QmitkDataTreeComboBox : public QComboBox
+/**
+ @brief Displays items of a DataTreeFilter
+ @ingroup Widgets
+
+ \attention{This class is meant as a replacement for QmitkTreeNodeSelector, as it provides the same functionality but better separation of GUI and non-GUI tasks}
+ 
+ \section sectionQmitkDataTreeComboBoxOverview Overview
+ 
+ This class provides a graphical view of a DataTreeFilter. It displays all the contained items in a combo box 
+ (indicating the hierarchie only by dashes) and allows for single-selections.
+
+ \section sectionQmitkDataTreeComboBoxUsage Usage
+
+ There are two principal ways to initialize this class. Either you create a
+ DataTreeFilter and then tell the QmitkDataTreeComboBox about it, or you let the
+ view itself create a tree filter by giving it a pointer to the data tree. You
+ can always access (and modify) the underlying DataTreeFilter through
+ GetFilter().
+
+ \subsection sectionQmitkDataTreeComboBoxInit1 Initialization 1: using a ready-made DataTreeFilter
+
+ \e You own both the tree filter and the combo box widget:
+\code
+  mitk::DataTreeFilter* treeFilter = bar();  // see documentation of DataTreeFilter 
+                                            //  on how to configure this class
+
+  if ( ) // you are just creating your widgets
+  {
+    QmitkDataTreeComboBox* comboBox = new QmitkDataTreeComboBox(treeFilter, this); // create a new Qt widget
+  }
+  else   // widgets already exists
+  {
+    comboBox->SetFilter( treeFilter );
+  }
+\endcode
+ 
+ \subsection sectionQmitkDataTreeComboBoxInit2 Initialization 2: implicit creation of a DataTreeFilter
+
+ You own the view widget, the view widget own the tree filter:
+\code
+  if ( ) // you are just creating your widgets
+  {
+    QmitkDataTreeListView* comboBox = new QmitkDataTreeFilter( GetDataTree(), this); // create a new Qt widget
+  }
+  else   // widgets already exists
+  {
+    comboBox->SetDataTree( GetDataTree() );
+  }
+\endcode
+ 
+\subsection sectionQmitkDataTreeComboBoxInit5 Signals and when they are emited
+
+ - \e activated(item, bool) is emitted, whenever the selection of any item in the list changes. This can occur as
+      a result of user interaction with this widget, of due to a change in the underlying DataTreeFilter or the DataTree itself.
+      The bool parameter will tell you if the affected item is now selected or not.
+ 
+ - \e clicked(item, bool) is emitted, whenever the selection of any item in the list changes due to
+      user interaction with this widget. The bool parameter will tell you if the affected item is now selected or not.
+
+ \todo{This class is still work in progress: if further signals are required by anyone, file bugs or mail your requirements.}
+ 
+ \section sectionQmitkDataTreeComboBoxImplementation Implementation
+ \subsection sectionQmitkDataTreeComboBoxImplementation1 Synchronization with the tree filter
+
+ All communication from the DataTreeFilter to this view is done via itk::Events. I.e. the QmitkDataTreeComboBox
+ installs a handful of listeners on a given DataTreeFilter and reacts to changes (see the ...Handler() methods).
+
+ The only communication from this view to the DataTreeFilter is the selection state of single items. To change this,
+ mitk::DataTreeFilter::Item::SetSelected() is called on the appropriate items.
+
+ \subsection sectionQmitkDataTreeComboBoxImplementation2 Determining what is displayed
+
+ As this widget is basically a combo box, it can display only a single property of the DataTreeNodes. 
+ You can have full control over what is displayed (if you want that): use SetDisplayedProperty to set which property is
+ used to get a string describing each DataTreeNode. If you omit calling this function, the logic to
+ determine a property is as follows:
+
+ - Ask the contained DataTreeFilter about visible properties
+ - Iterate over all visible properties of the \e last item in the current item
+   list of the filter. For each property of this last item, test whether it is a 
+   StringProperty (by doing a dynamic_cast).
+ - Stop when the first StringProperty is found, and use this property on all items to fill the combo box.
+ - When no StringProperty is found, try the "name" property
+
+*/
+cclass QmitkDataTreeComboBox : public QComboBox
 {
   Q_OBJECT;
 

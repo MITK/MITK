@@ -25,7 +25,7 @@ PURPOSE.  See the above copyright notices for more information.
 /**
  @brief Displays hierarchical items of a DataTreeFilter
  @ingroup Widgets
-
+ 
  \section sectionQmitkDataTreeListViewOverview Overview
  
  This class provides a graphical view of a DataTreeFilter. It displays all the contained items, including
@@ -39,7 +39,7 @@ PURPOSE.  See the above copyright notices for more information.
  can always access (and modify) the underlying DataTreeFilter through
  GetFilter().
 
- \subsection sectionQmitkDataTreeListViewInit1Initialization 1: using a ready-made DataTreeFilter
+ \subsection sectionQmitkDataTreeListViewInit1 Initialization 1: using a ready-made DataTreeFilter
 
  \e You own both the tree filter and the view widget:
 \code
@@ -48,7 +48,7 @@ PURPOSE.  See the above copyright notices for more information.
 
   if ( ) // you are just creating your widgets
   {
-    QmitkDataTreeListView* listView = new QmitkDataTreeFilter(treeFilter, this); // create a new Qt widget
+    QmitkDataTreeListView* listView = new QmitkDataTreeListView(treeFilter, this); // create a new Qt widget
   }
   else   // widgets already exists
   {
@@ -77,7 +77,16 @@ PURPOSE.  See the above copyright notices for more information.
  displayed columns to use more space, which is called stretching. By default, the right-most column is
  strechted. 
  In case you want to have another column stretched, use SetStretchedColumn() to do so.
+ 
+\subsection sectionQmitkDataTreeListViewInit5 Signals and when they are emited
 
+ - \e activated(item, bool) is emitted, whenever the selection of any item in the list changes. This can occur as
+      a result of user interaction with this widget, of due to a change in the underlying DataTreeFilter or the DataTree itself.
+      The bool parameter will tell you if the affected item is now selected or not.
+ 
+ \todo{This class is still work in progress: if further signals are required by anyone, file bugs or mail your requirements.}
+ 
+ 
  \section sectionQmitkDataTreeListViewImplementation Implementation
  \subsection sectionQmitkDataTreeListViewImplementation1 Synchronization with the tree filter
 

@@ -80,3 +80,4 @@ void ColorSequenceRainbow::GoToBegin()
 }
 
 }//end of namespace
+

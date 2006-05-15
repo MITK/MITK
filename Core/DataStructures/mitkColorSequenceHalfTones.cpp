@@ -79,4 +79,6 @@ void ColorSequenceHalfTones::GoToBegin()
 {
   m_ColorIndex = 0;
 }
+
 }//end of namespace
+

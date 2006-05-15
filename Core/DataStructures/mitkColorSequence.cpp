@@ -31,3 +31,4 @@ ColorSequence::~ColorSequence()
 }//end of destructor
 
 }//end of namespace
+

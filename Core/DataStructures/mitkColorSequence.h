@@ -23,6 +23,11 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk
 {
 
+/*!
+  \brief Inferface for creating a sequence of nice/matching/appropriate/... colors.
+
+  See derived classes for implemented sequences. 
+*/
 class ColorSequence
 {
 public:
@@ -30,12 +35,12 @@ public:
   virtual ~ColorSequence();
 
   /*!  
-  \brief method to return another color
+  \brief Return another color
   */ 
   virtual Color GetNextColor() = 0; 
 
   /*!  
-  \brief method to set the color-index to begin again
+  \brief Set the color-index to begin again
   */ 
   virtual void GoToBegin() = 0;
 
@@ -44,3 +49,4 @@ public:
 }
 
 #endif
+

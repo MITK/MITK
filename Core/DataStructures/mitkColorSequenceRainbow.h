@@ -53,7 +53,7 @@ private:
   /*!  
   \brief color-index to iterate through the colors
   */ 
-  int m_ColorIndex;
+  unsigned int m_ColorIndex;
 
   /*!  
   \brief vector-List with all pre-defined colors
@@ -64,3 +64,4 @@ private:
 }
 
 #endif
+

@@ -4,7 +4,6 @@
 #include <mitkDataTree.h>
 #include <mitkDataTreeHelper.h>
 #include <mitkPropertyManager.h>
-#include <mitkShapeModelData.h>
 
 #ifndef NDEBUG
 #include <ostream>
@@ -42,11 +41,6 @@ bool IsGoodDataTreeNode(DataTreeNode* node)
 bool IsImage(DataTreeNode* node)
 {
   return ( node!= 0 && node->GetData() && dynamic_cast<Image*>( node->GetData() ) );
-}
-
-bool IsShapeModel(DataTreeNode* node)
-{
-  return ( node!= 0 && node->GetData() && dynamic_cast<ShapeModelData*>( node->GetData() ) );
 }
 
 //------ BasePropertyAccessor ------------------------------------------------------------

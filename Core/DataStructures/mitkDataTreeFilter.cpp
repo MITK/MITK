@@ -5,6 +5,10 @@
 #include <mitkDataTreeHelper.h>
 #include <mitkPropertyManager.h>
 
+#ifdef MBI_INTERNAL
+#include <mitkShapeModelData.h>
+#endif
+
 #ifndef NDEBUG
 #include <ostream>
   #define DEBUG_STATE           if (m_DEBUG) PrintStateForDebug(std::cout);
@@ -26,6 +30,13 @@ namespace mitk
 {
 
 //------ Some common filter functions ----------------------------------------------------
+
+#ifdef MBI_INTERNAL
+bool IsShapeModel(DataTreeNode* node) 
+{
+  return ( node!= 0 && node->GetData() && dynamic_cast<ShapeModelData*>( node->GetData() ));
+}
+#endif
 
 /// default filter, lets everything except NULL pointers pass
 bool IsDataTreeNode(DataTreeNode* node)

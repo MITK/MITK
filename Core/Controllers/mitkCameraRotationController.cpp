@@ -74,7 +74,7 @@ void mitk::CameraRotationController::AcquireCamera()
 }
 
 bool mitk::CameraRotationController::ExecuteAction(
-  Action* action, mitk::StateEvent const* stateEvent)
+  Action*, mitk::StateEvent const*)
 {
   return false;
 }

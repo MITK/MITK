@@ -66,17 +66,17 @@ void SlicesCoordinator::RemoveSliceController(SliceNavigationController* snc)
   }
 }
 
-void SlicesCoordinator::OnSliceControllerAdded(SliceNavigationController* snc)
+void SlicesCoordinator::OnSliceControllerAdded(SliceNavigationController*)
 {
   // implement in subclasses
 }
   
-void SlicesCoordinator::OnSliceControllerRemoved(SliceNavigationController* snc)
+void SlicesCoordinator::OnSliceControllerRemoved(SliceNavigationController*)
 {
   // implement in subclasses
 }
 
-bool SlicesCoordinator::ExecuteAction(Action * action, StateEvent const* stateEvent)
+bool SlicesCoordinator::ExecuteAction(Action*, StateEvent const*)
 {
   // implement in subclasses
   return false;

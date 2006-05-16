@@ -250,7 +250,7 @@ void SliceNavigationController::SendTime()
   }
 }
 
-void SliceNavigationController::SetGeometry(const itk::EventObject & geometrySendEvent)
+void SliceNavigationController::SetGeometry(const itk::EventObject&)
 {
 }
 

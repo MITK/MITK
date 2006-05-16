@@ -37,19 +37,19 @@ void mitk::CameraController::Resize(int w, int h)
 {}
 
 //##ModelId=3E6D5DD400C1
-void mitk::CameraController::MousePressEvent(mitk::MouseEvent *me)
+void mitk::CameraController::MousePressEvent(mitk::MouseEvent*)
 {}
 
 //##ModelId=3E6D5DD400D5
-void mitk::CameraController::MouseReleaseEvent(mitk::MouseEvent *me)
+void mitk::CameraController::MouseReleaseEvent(mitk::MouseEvent*)
 {}
 
 //##ModelId=3E6D5DD400F3
-void mitk::CameraController::MouseMoveEvent(mitk::MouseEvent *me)
+void mitk::CameraController::MouseMoveEvent(mitk::MouseEvent*)
 {}
 
 //##ModelId=3E6D5DD40107
-void mitk::CameraController::KeyPressEvent(mitk::KeyEvent *ke)
+void mitk::CameraController::KeyPressEvent(mitk::KeyEvent*)
 {}
 void mitk::CameraController::SetViewToAnterior()
 {

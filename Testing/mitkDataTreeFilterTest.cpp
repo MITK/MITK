@@ -2,6 +2,7 @@
 #include <sstream>
 #include "mitkDataTreeFilter.h"
 #include "mitkDataTreeFilterEvents.h"
+#include "mitkDataTreeFilterFunctions.h"
 
 #include <string>
 #include <itkVectorContainer.h>

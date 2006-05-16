@@ -1,6 +1,7 @@
 #ifndef MITK_DATATREEFILTER_H_INCLUDED
 #define MITK_DATATREEFILTER_H_INCLUDED
 
+#include "mitkConfig.h"
 #include <mitkDataTree.h> 
 #include <itkSmartPointerVectorContainer.h>
 #include "itkMacro.h"

@@ -173,6 +173,9 @@
 \endcode
 
   Define your own filter functions to suit your needs and install them via SetFilter().
+
+  Some oftenly used filters are collected in mitkDataTreeFilterFunctions.h. Have a look at
+  them and add your own if they may be useful for others.
   
 \code
   treeFilter->SetFilter( &mitk::IsImage );
@@ -642,31 +645,6 @@ namespace mitk
       bool m_DEBUG;
 #endif
   };
-
-
-  // some default filters in mitk:: namespace for use by clients
-  
-  /// Accepts all nodes
-  /// (accepts nodes that are not NULL)
-  bool IsDataTreeNode(mitk::DataTreeNode*);
-
-  /// Accepts all data objects
-  /// (accepts nodes that have associated mitk::BaseData (tested via GetData))
-  bool IsGoodDataTreeNode(mitk::DataTreeNode*);
-
-  /// Accepts all images
-  /// (accepts nodes that have associated an mitk::Image)
-  bool IsImage(mitk::DataTreeNode*);
-
-#ifdef MBI_INTERNAL
-  /// Accepts all shape models
-  bool IsShapeModel(mitk::DataTreeNode*);
-#endif
-
-  //bool IsSurface(mitk::DataTreeNode*);
-  // .
-  // .
-  // .
 
 } // namespace mitk
 

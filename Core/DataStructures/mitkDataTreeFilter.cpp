@@ -4,10 +4,8 @@
 #include <mitkDataTree.h>
 #include <mitkDataTreeHelper.h>
 #include <mitkPropertyManager.h>
-
-#ifdef MBI_INTERNAL
-#include <mitkShapeModelData.h>
-#endif
+#include <mitkImage.h>
+#include <mitkDataTreeFilterFunctions.h>
 
 #ifndef NDEBUG
 #include <ostream>
@@ -28,31 +26,6 @@
 
 namespace mitk
 {
-
-//------ Some common filter functions ----------------------------------------------------
-
-#ifdef MBI_INTERNAL
-bool IsShapeModel(DataTreeNode* node) 
-{
-  return ( node!= 0 && node->GetData() && dynamic_cast<ShapeModelData*>( node->GetData() ));
-}
-#endif
-
-/// default filter, lets everything except NULL pointers pass
-bool IsDataTreeNode(DataTreeNode* node)
-{
-  return ( node!= 0 );
-}
-  
-bool IsGoodDataTreeNode(DataTreeNode* node)
-{
-  return ( node!= 0 && node->GetData() );
-}
-
-bool IsImage(DataTreeNode* node)
-{
-  return ( node!= 0 && node->GetData() && dynamic_cast<Image*>( node->GetData() ) );
-}
 
 //------ BasePropertyAccessor ------------------------------------------------------------
   
@@ -278,7 +251,7 @@ DataTreeFilter::DataTreeFilter(DataTreeBase* datatree)
 #endif
 {
   //SetFilter( &IsDataTreeNode );
-  SetFilter( &IsImage );
+  SetFilter( &IsBaseDataType<Image> );
   m_VisibleProperties.push_back("name");
   
   m_Items = ItemList::New(); // create an empty list
@@ -378,7 +351,7 @@ void DataTreeFilter::SetFilter(FilterFunctionPointer filter)
   if (filter)
     m_Filter = filter;
   else
-    m_Filter = &IsImage;
+    m_Filter = &IsBaseDataType<Image>;
 
   GenerateModelFromTree();
 }

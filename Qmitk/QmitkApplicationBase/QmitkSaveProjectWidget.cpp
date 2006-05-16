@@ -18,6 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkSaveProjectWidget.h"
 #include <QmitkDataTreeListView.h>
 
+#include <mitkDataTreeFilterFunctions.h>
 #include <mitkXMLWriter.h>
 
 #include <qlayout.h>

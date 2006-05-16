@@ -3,6 +3,7 @@
 
 #include <itkCommand.h>
 #include <mitkDataTreeFilterEvents.h>
+#include <mitkDataTreeFilterFunctions.h>
 
 #include <qlayout.h>
 #include <qpainter.h>

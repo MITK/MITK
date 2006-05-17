@@ -15,6 +15,12 @@ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
+
+/**
+  This is a mini-application to demonstrate and test the PropertyObserver
+  classes in one place without the whole lot of SampleApp stuff around.
+  */
+
 #include "PropertyViewTestWidget.h"
 
 #include <QmitkBasePropertyView.h>
@@ -27,6 +33,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QmitkNumberPropertyView.h>
 #include <QmitkNumberPropertyEditor.h>
 
+#include <mitkDataTreeFilterFunctions.h>
 #include <QmitkDataTreeListView.h>
 #include <QmitkDataTreeComboBox.h>
 
@@ -198,18 +205,21 @@ void PropertyViewTest::prepare_tree()
     mitk::DataTreeNode::Pointer node = mitk::DataTreeNode::New(); node->SetData(image);
     node->SetProperty("name", new mitk::StringProperty("Bruder"));
     node->SetProperty("visible", new mitk::BoolProperty(false));
+    node->SetProperty("color", new mitk::ColorProperty(1.0,0.0,0.0));
     node->SetProperty("opacity", new mitk::FloatProperty(0.8));
     it.Add(node);
   }
   {
     mitk::DataTreeNode::Pointer node = mitk::DataTreeNode::New(); node->SetData(image);
     node->SetProperty("name", new mitk::StringProperty("Ich"));
+    node->SetProperty("color", new mitk::ColorProperty(0.0,0.0,1.0));
     node->SetProperty("opacity", new mitk::FloatProperty(0.8));
     it.Add(node);
   }
   {
     mitk::DataTreeNode::Pointer node = mitk::DataTreeNode::New(); node->SetData(image);
     node->SetProperty("name", new mitk::StringProperty("Schwester"));
+    node->SetProperty("color", new mitk::ColorProperty(0.0,1.0,0.0));
     node->SetProperty("opacity", new mitk::FloatProperty(0.8));
     it.Add(node);
   }
@@ -231,18 +241,20 @@ void PropertyViewTest::prepare_tree()
   }
 
   mitk::DataTreeFilter::PropertyList visible_props;
-//  visible_props.push_back("visible");
+  visible_props.push_back("visible");
   visible_props.push_back("name");
-//  visible_props.push_back("opacity");
+  visible_props.push_back("color");
+  visible_props.push_back("opacity");
   mitk::DataTreeFilter::PropertyList editable_props;
-//  editable_props.push_back("visible");
+  editable_props.push_back("visible");
 //  editable_props.push_back("name");
-//  editable_props.push_back("opacity");
+  editable_props.push_back("opacity");
+  editable_props.push_back("color");
   
   tree_filter = mitk::DataTreeFilter::New(data_tree);
   tree_filter->SetSelectionMode(mitk::DataTreeFilter::SINGLE_SELECT);
   tree_filter->SetHierarchyHandling(mitk::DataTreeFilter::FLATTEN_HIERARCHY);
-  tree_filter->SetFilter(&mitk::IsGoodDataTreeNode);
+  tree_filter->SetFilter(mitk::IsGoodDataTreeNode());
   tree_filter->SetVisibleProperties(visible_props);
   tree_filter->SetEditableProperties(editable_props);
           

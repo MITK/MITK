@@ -46,7 +46,7 @@ void QmitkSaveProjectWidget::PrepareDataTreeFilter()
   editable_props.push_back("name");
   
   tree_filter = mitk::DataTreeFilter::New(m_DataTree);
-  tree_filter->SetFilter(&mitk::IsDataTreeNode);
+  tree_filter->SetFilter(mitk::IsDataTreeNode());
 
   const mitk::DataTreeFilter::ItemList* items;  
   items = tree_filter->GetItems();

@@ -552,8 +552,8 @@ namespace mitk
       const mitk::BaseRenderer* GetRenderer() const;
 
       /// Install the filter function
-      void SetFilter(DataTreeFilterFunction*);
-      void SetFilter(DataTreeFilterFunction&);
+      void SetFilter(const DataTreeFilterFunction*);
+      void SetFilter(const DataTreeFilterFunction&);
       const DataTreeFilterFunction* GetFilter() const;
 
       /// Set the selection mode (single/multi)

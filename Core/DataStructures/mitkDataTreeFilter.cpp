@@ -344,7 +344,7 @@ const BaseRenderer* DataTreeFilter::GetRenderer() const
   return m_Renderer;
 }
 
-void DataTreeFilter::SetFilter(DataTreeFilterFunction* filter)
+void DataTreeFilter::SetFilter(const DataTreeFilterFunction* filter)
 {
   if (m_Filter == filter) return; //TODO check for class identity, not object identity
   
@@ -362,7 +362,7 @@ void DataTreeFilter::SetFilter(DataTreeFilterFunction* filter)
   GenerateModelFromTree();
 }
 
-void DataTreeFilter::SetFilter(DataTreeFilterFunction& filter)
+void DataTreeFilter::SetFilter(const DataTreeFilterFunction& filter)
 {
   SetFilter(&filter);
 }

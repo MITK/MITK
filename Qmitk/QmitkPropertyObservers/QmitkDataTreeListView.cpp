@@ -176,7 +176,7 @@ void QmitkDataTreeListView::SetDataTree(mitk::DataTreeBase* tree)
   {
     // create default filter with visibility (editable) and name (non-editable)
     m_PrivateFilter = mitk::DataTreeFilter::New(tree);
-    m_PrivateFilter->SetFilter(&mitk::IsGoodDataTreeNode);
+    m_PrivateFilter->SetFilter(mitk::IsGoodDataTreeNode());
     mitk::DataTreeFilter::PropertyList visible;
     visible.push_back("visible");
     visible.push_back("name");

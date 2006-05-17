@@ -251,7 +251,7 @@ DataTreeFilter::DataTreeFilter(DataTreeBase* datatree)
 #endif
 {
   //SetFilter( &IsDataTreeNode );
-  SetFilter( &IsBaseDataType<Image> );
+  SetFilter( IsBaseDataType<Image>() );
   m_VisibleProperties.push_back("name");
   
   m_Items = ItemList::New(); // create an empty list
@@ -344,19 +344,30 @@ const BaseRenderer* DataTreeFilter::GetRenderer() const
   return m_Renderer;
 }
 
-void DataTreeFilter::SetFilter(FilterFunctionPointer filter)
+void DataTreeFilter::SetFilter(DataTreeFilterFunction* filter)
 {
-  if (m_Filter == filter) return;
+  if (m_Filter == filter) return; //TODO check for class identity, not object identity
   
   if (filter)
-    m_Filter = filter;
+  {
+    delete m_Filter;
+    m_Filter = filter->Clone();
+  }
   else
-    m_Filter = &IsBaseDataType<Image>;
+  {
+    delete m_Filter;
+    m_Filter = new IsBaseDataType<Image>;
+  }
 
   GenerateModelFromTree();
 }
+
+void DataTreeFilter::SetFilter(DataTreeFilterFunction& filter)
+{
+  SetFilter(&filter);
+}
       
-const DataTreeFilter::FilterFunctionPointer DataTreeFilter::GetFilter() const
+const DataTreeFilterFunction* DataTreeFilter::GetFilter() const
 {
   return m_Filter;
 }
@@ -484,7 +495,7 @@ void DataTreeFilter::TreeAdd(const itk::EventObject& e)
   DEBUG_MSG("treePosition " << (void*)treePosition)
   DEBUG_MSG("treePosition->Get() " << (void*)(treePosition->Get()))
 
-  if ( !m_Filter(treePosition->Get()) ) return; // if filter does not match, then nothing has to be done
+  if ( !(*m_Filter)(treePosition->Get()) ) return; // if filter does not match, then nothing has to be done
 
   /*
      find out, whether there is an item that will be this new node's parent
@@ -499,7 +510,7 @@ void DataTreeFilter::TreeAdd(const itk::EventObject& e)
   if ( m_HierarchyHandling == DataTreeFilter::PRESERVE_HIERARCHY )
     while ( treePosition->GoToParent() )
     {
-      if ( m_Filter(treePosition->Get()) )
+      if ( (*m_Filter)(treePosition->Get()) )
       {                                         // this is the new parent
         parent = m_Item[treePosition->Get()];
           if (!parent) 
@@ -557,7 +568,7 @@ void DataTreeFilter::TreePrune(const itk::EventObject& e)
   ItemList::iterator listLastIter;
   
   if (   m_HierarchyHandling == DataTreeFilter::PRESERVE_HIERARCHY 
-      && m_Filter(treePosition->Get()) )
+      && (*m_Filter)(treePosition->Get()) )
   {
     item = m_Item[ treePosition->Get() ];
           if (!item) 
@@ -584,7 +595,7 @@ void DataTreeFilter::TreePrune(const itk::EventObject& e)
     bool firstMatch(true);
     while ( !treeIter.IsAtEnd() )
     {
-      if ( m_Filter(treeIter.Get()) )
+      if ( (*m_Filter)(treeIter.Get()) )
       {
         if ( firstMatch )
         {
@@ -648,7 +659,7 @@ void DataTreeFilter::TreeRemove(const itk::EventObject& e)
   const itk::TreeRemoveEvent<DataTreeBase>& event( static_cast<const itk::TreeRemoveEvent<DataTreeBase>&>(e) );
   DataTreeIteratorBase* treePosition = const_cast<DataTreeIteratorBase*>(&(event.GetChangePosition()))->Clone();
   
-  if ( m_Filter(treePosition->Get()) )
+  if ( (*m_Filter)(treePosition->Get()) )
   {
     Item* item = m_Item[ treePosition->Get() ];
           if (!item) 
@@ -718,7 +729,7 @@ void DataTreeFilter::AddMatchingChildren(DataTreeIteratorBase* iter, ItemList* l
   for ( int child = 0; child < numChildren; ++child )
   {
     iter->GoToChild(child);
-    if ( m_Filter( iter->Get() ) )
+    if ( (*m_Filter)( iter->Get() ) )
     {
       unsigned int newIndex = list->Size();
       list->CreateElementAt( newIndex ) = Item::New( iter->Get(), this, newIndex, parent );
@@ -763,7 +774,7 @@ void DataTreeFilter::GenerateModelFromTree()
   Consideration of m_HierarchyHandling adds one branch
   */
   if (!treeIter->IsAtEnd()) // do nothing if the tree is empty!
-  if ( m_Filter( treeIter->Get() ) )
+  if ( (*m_Filter)( treeIter->Get() ) )
   {
     m_Items->CreateElementAt(0) = Item::New( treeIter->Get(), this, 0, 0 ); // 0 = first item, 0 = no parent
     InvokeEvent( TreeFilterItemAddedEvent(m_Items->ElementAt(0)) );

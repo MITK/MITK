@@ -388,6 +388,8 @@
 namespace mitk
 {
 
+  class DataTreeFilterFunction;
+
 //------ DataTreeFilter ------------------------------------------------------------------
 
   class DataTreeFilter : public itk::Object
@@ -400,9 +402,6 @@ namespace mitk
      
       typedef itk::SmartPointer<Self> Pointer;
       
-      /// Defines a function for filtering tree nodes.
-      typedef bool(*FilterFunctionPointer)(mitk::DataTreeNode*);
-     
       /// smart pointer to an item
       typedef itk::SmartPointer<Item> ItemPointer;
       
@@ -553,8 +552,9 @@ namespace mitk
       const mitk::BaseRenderer* GetRenderer() const;
 
       /// Install the filter function
-      void SetFilter(FilterFunctionPointer);
-      const FilterFunctionPointer GetFilter() const;
+      void SetFilter(DataTreeFilterFunction*);
+      void SetFilter(DataTreeFilterFunction&);
+      const DataTreeFilterFunction* GetFilter() const;
 
       /// Set the selection mode (single/multi)
       void SetSelectionMode(const SelectionMode);
@@ -611,7 +611,7 @@ namespace mitk
       ItemSet m_SelectedItems;
 
       /// Pointer to a filter function
-      FilterFunctionPointer m_Filter;
+      DataTreeFilterFunction* m_Filter;
 
       /// The data tree filtered by this class
       mitk::DataTreeBase* m_DataTree;

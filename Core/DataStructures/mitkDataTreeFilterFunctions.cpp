@@ -21,31 +21,30 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk
 {
 
-//------ Some common filter functions ----------------------------------------------------
-
-/// default filter, lets everything except NULL pointers pass
-bool IsDataTreeNode(DataTreeNode* node)
+bool DataTreeFilterFunction::operator()(DataTreeNode* node) const
 {
-  return ( node!= 0 );
-}
-  
-bool IsGoodDataTreeNode(DataTreeNode* node)
-{
-  return ( node!= 0 && node->GetData() );
+  return NodeMatches(node);
 }
 
-/* example for other possible tests *//*
-bool IsASegmentation(DataTreeNode* node)
+bool IsDataTreeNode::NodeMatches(DataTreeNode* node) const
 {
-  return (    node
-          &&  node->GetData() 
-          &&  dynamic_cast<Image*>( node->GetData() ) 
-          &&  node->GetProperty("segmentation").IsNotNull() 
-         );
-  return true;
+  return ( node != NULL );
 }
-*/
 
+DataTreeFilterFunction* IsDataTreeNode::Clone() const
+{
+  return new IsDataTreeNode();
+}
+
+bool IsGoodDataTreeNode::NodeMatches(DataTreeNode* node) const
+{
+  return ( node != NULL && node->GetData() );
+}
+
+DataTreeFilterFunction* IsGoodDataTreeNode::Clone() const
+{
+  return new IsGoodDataTreeNode();
+}
 
 } // namespace
 

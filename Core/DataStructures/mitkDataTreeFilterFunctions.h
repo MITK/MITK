@@ -29,23 +29,48 @@ namespace mitk
 {
   class DataTreeNode; 
 
+  class DataTreeFilterFunction
+  {
+    public:
+      virtual bool operator()(DataTreeNode*) const;
+      virtual bool NodeMatches(DataTreeNode*) const = 0;
+      virtual DataTreeFilterFunction* Clone() const = 0;
+  };
+
+  template <class T>
+  class IsBaseDataType : public DataTreeFilterFunction
+  {
+    public:
+      virtual bool NodeMatches(DataTreeNode* node) const
+      {
+        return ( node != NULL && node->GetData() && dynamic_cast<T*>(node) );
+      }
+
+      virtual DataTreeFilterFunction* Clone() const
+      {
+        return new IsBaseDataType<T>();
+      }
+  };
+
   // some default filters in mitk:: namespace for use by clients of mitk::DataTreeFilter
   
   /// Accepts all nodes
   /// (accepts nodes that are not NULL)
-  bool IsDataTreeNode(DataTreeNode*);
+  class IsDataTreeNode : public DataTreeFilterFunction
+  {
+    public:
+      virtual bool NodeMatches(DataTreeNode*) const;
+      virtual DataTreeFilterFunction* Clone() const;
+  };
 
   /// Accepts all data objects
   /// (accepts nodes that have associated mitk::BaseData (tested via GetData))
-  bool IsGoodDataTreeNode(DataTreeNode*);
-
-  /// to be used with any BaseData derived class
-  /// IsBaseDataType<mitk::Image>
-  template <class T>
-  bool IsBaseDataType(DataTreeNode* node)
+  class IsGoodDataTreeNode : public DataTreeFilterFunction
   {
-    return ( node!= 0 && node->GetData() && dynamic_cast<T*>( node->GetData() ) );
-  }
+    public:
+      virtual bool NodeMatches(DataTreeNode*) const;
+      virtual DataTreeFilterFunction* Clone() const;
+  };
 
 } // namespace mitk
 

@@ -159,7 +159,7 @@ void QmitkDataTreeComboBox::SetDataTree(mitk::DataTreeBase* tree)
   {
     // create default filter with visibility (editable) and name (non-editable)
     m_PrivateFilter = mitk::DataTreeFilter::New(tree);
-    m_PrivateFilter->SetFilter(&mitk::IsBaseDataType<mitk::Image>);
+    m_PrivateFilter->SetFilter(&mitk::IsBaseDataType<mitk::Image>());
     m_PrivateFilter->SetSelectionMode(mitk::DataTreeFilter::SINGLE_SELECT);
     mitk::DataTreeFilter::PropertyList visible;
     visible.push_back("name");

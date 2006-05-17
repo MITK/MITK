@@ -26,11 +26,32 @@
 
 int verbose;
 
+class EinsZwoFilterDing : public mitk::DataTreeFilterFunction
+{
+  public:
+  
+  bool NodeMatches( mitk::DataTreeNode* node ) const
+    {
+      std::string name;
+      node->GetName( name );
+      if ( name == "Eins" || name == "Zwo" )
+        return true;
+      else 
+        return false;
+    }
+
+    DataTreeFilterFunction* Clone() const
+    {
+      return new EinsZwoFilterDing();
+    }
+}; 
 
 
 class Test
 {
   public:
+
+    EinsZwoFilterDing m_EinsZwoFilter;
 
     Test()
     {
@@ -47,16 +68,6 @@ class Test
       data_tree = NULL;  // release data tree
     }
     
-    static bool EinsZwoFilter( mitk::DataTreeNode* node )
-    {
-      std::string name;
-      node->GetName( name );
-      if ( name == "Eins" || name == "Zwo" )
-        return true;
-      else 
-        return false;
-    }
-  
     void prepare(int type)
     {
       switch (type)
@@ -67,7 +78,7 @@ class Test
           data_tree = mitk::DataTree::New();
           tree_filter = mitk::DataTreeFilter::New(data_tree);
           // change from default to "pass nearly all" filter
-          tree_filter->SetFilter( &mitk::IsDataTreeNode );
+          tree_filter->SetFilter( mitk::IsDataTreeNode() );
           // change from visible props default "name" to nothing
           mitk::DataTreeFilter::PropertyList visible_props;
           tree_filter->SetVisibleProperties(visible_props);
@@ -199,7 +210,7 @@ class Test
           break;
         }
         case 9: { // install filter that lets only names "Eins" and "Zwo" pass
-          tree_filter->SetFilter( EinsZwoFilter );
+          tree_filter->SetFilter( m_EinsZwoFilter );
           break;
         }
         case 10: { // delete tree, then selections and all items should be removed
@@ -211,7 +222,7 @@ class Test
           mitk::DataTreeFilter::PropertyList visible_props;
           visible_props.push_back("name");
           tree_filter->SetVisibleProperties(visible_props);
-          tree_filter->SetFilter( EinsZwoFilter );
+          tree_filter->SetFilter( m_EinsZwoFilter );
           break;
         }
         default: {

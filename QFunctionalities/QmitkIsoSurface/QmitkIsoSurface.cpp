@@ -26,7 +26,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 //QMitk-Elements
 #include "QmitkCommonFunctionality.h"
-#include <QmitkMultiTreeNodeSelector.h>
 #include "QmitkSelectableGLWidget.h"
 #include "QmitkStdMultiWidget.h"
 #include "QmitkTreeNodeSelector.h"

@@ -8,4 +8,3 @@ SET( APPMOD_MOC_H ${APPMOD_MOC_H} ${IP_ROOT}/Functionalities/QmitkIsoSurface/Qmi
 SET( APPMOD_CPP ${APPMOD_CPP} ${IP_ROOT}/Functionalities/QmitkIsoSurface/QmitkIsoSurface.cpp )
 
 SET (APPMOD_FORMS ${APPMOD_FORMS} ${IP_ROOT}/Functionalities/QmitkIsoSurface/QmitkIsoSurfaceControls.ui)
-SET( APPMOD_MOC_H ${APPMOD_MOC_H} ${IP_ROOT}/Components/QmitkTreeNodeImageSelector/QmitkMultiTreeNodeSelector.h )

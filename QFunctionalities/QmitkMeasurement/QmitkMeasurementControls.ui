@@ -1,0 +1,72 @@
+<!DOCTYPE UI><UI version="3.3" stdsetdef="1">
+<class>QmitkMeasurementControls</class>
+<widget class="QWidget">
+    <property name="name">
+        <cstring>QmitkMeasurementControls</cstring>
+    </property>
+    <property name="geometry">
+        <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>222</width>
+            <height>605</height>
+        </rect>
+    </property>
+    <property name="minimumSize">
+        <size>
+            <width>0</width>
+            <height>0</height>
+        </size>
+    </property>
+    <property name="caption">
+        <string>Measurement</string>
+    </property>
+    <vbox>
+        <property name="name">
+            <cstring>unnamed</cstring>
+        </property>
+        <widget class="QPushButton">
+            <property name="name">
+                <cstring>pbDistance</cstring>
+            </property>
+            <property name="text">
+                <string>Distance</string>
+            </property>
+        </widget>
+        <widget class="QPushButton">
+            <property name="name">
+                <cstring>pbAngle</cstring>
+            </property>
+            <property name="text">
+                <string>Angle</string>
+            </property>
+        </widget>
+        <widget class="QPushButton">
+            <property name="name">
+                <cstring>pbPath</cstring>
+            </property>
+            <property name="text">
+                <string>Path</string>
+            </property>
+        </widget>
+        <spacer>
+            <property name="name">
+                <cstring>spacer2</cstring>
+            </property>
+            <property name="orientation">
+                <enum>Vertical</enum>
+            </property>
+            <property name="sizeType">
+                <enum>Expanding</enum>
+            </property>
+            <property name="sizeHint">
+                <size>
+                    <width>20</width>
+                    <height>80</height>
+                </size>
+            </property>
+        </spacer>
+    </vbox>
+</widget>
+<layoutdefaults spacing="6" margin="11"/>
+</UI>

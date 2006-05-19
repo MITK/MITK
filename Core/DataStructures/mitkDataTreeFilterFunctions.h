@@ -43,7 +43,7 @@ namespace mitk
     public:
       virtual bool NodeMatches(DataTreeNode* node) const
       {
-        return ( node != NULL && node->GetData() && dynamic_cast<T*>(node) );
+        return ( node != NULL && node->GetData() && dynamic_cast<T*>(node->GetData()) );
       }
 
       virtual DataTreeFilterFunction* Clone() const

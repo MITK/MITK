@@ -140,12 +140,12 @@ void mitk::PointSetMapper2D::Paint(mitk::BaseRenderer * renderer)
     //get current color to recall colorchange after paint
     glGetFloatv(GL_CURRENT_COLOR,unselectedColor);
 
-    Point3D p;          // currently visited point 
-    Point3D lastP;      // last visited point 
-    Vector3D vec;       // p - lastP
-    Vector3D lastVec;   // lastP - point before lastP
+    Point3D p;                      // currently visited point 
+    Point3D lastP;                  // last visited point 
+    Vector3D vec = (0.0, 0.0, 0.0); // p - lastP
+    Vector3D lastVec;               // lastP - point before lastP
 
-    mitk::Point3D projected_p; // p projected on viewplane
+    mitk::Point3D projected_p;      // p projected on viewplane
 
     Point2D pt2d;       // projected_p in display coordinates
     Point2D lastPt2d;   // last projected_p in display coordinates

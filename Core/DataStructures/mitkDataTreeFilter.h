@@ -614,7 +614,7 @@ namespace mitk
       DataTreeFilterFunction* m_Filter;
 
       /// The data tree filtered by this class
-      mitk::DataTreeBase* m_DataTree;
+      mitk::DataTreeBase::Pointer m_DataTree;
       
       /// should we preserve the hierachy of the tree?
       HierarchyHandling m_HierarchyHandling;

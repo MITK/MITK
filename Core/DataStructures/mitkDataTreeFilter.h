@@ -388,266 +388,265 @@
 namespace mitk
 {
 
-  class DataTreeFilterFunction;
+class DataTreeFilterFunction;
 
 //------ DataTreeFilter ------------------------------------------------------------------
 
-  class DataTreeFilter : public itk::Object
+class DataTreeFilter : public itk::Object
+{
+public:
+
+  class Item; // forward declare
+
+  typedef mitk::DataTreeFilter Self;
+
+  typedef itk::SmartPointer<Self> Pointer;
+
+  /// smart pointer to an item
+  typedef itk::SmartPointer<Item> ItemPointer;
+
+  /// An ordered group of Items 
+  typedef itk::SmartPointerVectorContainer<unsigned int, Item> ItemList; 
+
+  /// map tree nodes to their corresponding items
+  typedef std::map<mitk::DataTreeNode*, Item*> TreeNodeItemMap; 
+
+  /// A set of Items
+  typedef std::set<Item*> ItemSet; 
+
+  /// Iterator over Items
+  typedef ItemList::Iterator      ItemIterator;
+
+  /// Iterator over const Items
+  typedef ItemList::ConstIterator ConstItemIterator;
+
+  /// An ordered group of property keys (ordered by user)
+  typedef std::vector<std::string> PropertyList;
+
+  /// How the model should treat the data tree hierarchy
+  typedef enum { PRESERVE_HIERARCHY = 0, FLATTEN_HIERARCHY = 1 } HierarchyHandling;
+
+  /// What kind of selections should be possible
+  typedef enum { SINGLE_SELECT = 0, MULTI_SELECT = 1, EXTENDED_SELECT = 2 } SelectionMode;
+
+  /// Exception, that is thrown, when an not-editable property should be accessed as a
+  /// non-const object
+  class NoPermissionException {};
+
+  /// Objects of this class are returned by Item[string]
+  /// This class provides access to a BaseProperty, where the permission to write
+  /// depends on the constructor's bool parameter
+  class BasePropertyAccessor
   {
-    public:
+  public:
+    /// bool parameter: whether property is editable/writeable
+    BasePropertyAccessor(mitk::BaseProperty*, bool);
 
-      class Item; // forward declare
+    /// Query, whether this item may be changed
+    bool IsEditable() const;
 
-      typedef mitk::DataTreeFilter Self;
-     
-      typedef itk::SmartPointer<Self> Pointer;
-      
-      /// smart pointer to an item
-      typedef itk::SmartPointer<Item> ItemPointer;
-      
-      /// An ordered group of Items 
-      typedef itk::SmartPointerVectorContainer<unsigned int, Item> ItemList; 
-     
-      /// map tree nodes to their corresponding items
-      typedef std::map<mitk::DataTreeNode*, Item*> TreeNodeItemMap; 
-     
-      /// A set of Items
-      typedef std::set<Item*> ItemSet; 
+    /// cast to a const BaseProperty
+    operator const mitk::BaseProperty*();
 
-      /// Iterator over Items
-      typedef ItemList::Iterator      ItemIterator;
-      
-      /// Iterator over const Items
-      typedef ItemList::ConstIterator ConstItemIterator;
-      
-      /// An ordered group of property keys (ordered by user)
-      typedef std::vector<std::string> PropertyList;
+    /// Cast to a writeable BaseProperty
+    operator mitk::BaseProperty*();
 
-      /// How the model should treat the data tree hierarchy
-      typedef enum { PRESERVE_HIERARCHY = 0, FLATTEN_HIERARCHY = 1 } HierarchyHandling;
-     
-      /// What kind of selections should be possible
-      typedef enum { SINGLE_SELECT = 0, MULTI_SELECT = 1, EXTENDED_SELECT = 2 } SelectionMode;
+    /// cast to a const string
+    operator const std::string();
 
-      /// Exception, that is thrown, when an not-editable property should be accessed as a
-      /// non-const object
-      class NoPermissionException {};
-     
-      /// Objects of this class are returned by Item[string]
-      /// This class provides access to a BaseProperty, where the permission to write
-      /// depends on the constructor's bool parameter
-      class BasePropertyAccessor
-      {
-        public:
-          /// bool parameter: whether property is editable/writeable
-          BasePropertyAccessor(mitk::BaseProperty*, bool);
-       
-          /// Query, whether this item may be changed
-          bool IsEditable() const;
-          
-          /// cast to a const BaseProperty
-          operator const mitk::BaseProperty*();
-          
-          /// Cast to a writeable BaseProperty
-          operator mitk::BaseProperty*();
-          
-          /// cast to a const string
-          operator const std::string();
-        
-        private:
-          /// Whether users of this class may write to the property
-          bool m_Editable; 
-          mitk::BaseProperty* m_Property;
-      };
-      
-      /// One item of the filter result list or tree
-      class Item : public itk::LightObject
-      {
-        friend class mitk::DataTreeFilter;
+  private:
+    /// Whether users of this class may write to the property
+    bool m_Editable; 
+    mitk::BaseProperty* m_Property;
+  };
 
-        public:
+  /// One item of the filter result list or tree
+  class Item : public itk::LightObject
+  {
+    friend class mitk::DataTreeFilter;
 
-          typedef itk::SmartPointer<Item> Pointer;
-      
-          /// \brief Items have 1:1 relations to DataTreeNodes and DataTreeFilters, a
-          ///        position within all (sub)items and a parent.
-          ///
-          /// Requires a mitk::DataTreeBase, otherwise it has no meaning.
-          /// Needs the DataTreeFilter it belongs to (for checking the editability (?) of
-          /// properties).  Third parameter is the position within all siblings.
-          /// Fourth parameter is the parent item.
-          static Pointer New(mitk::DataTreeNode*, DataTreeFilter*, int, const Item*);
+  public:
 
-          const PropertyList GetVisibleProperties() const;
+    typedef itk::SmartPointer<Item> Pointer;
 
-          /// Access to properties via their key
-          BasePropertyAccessor GetProperty(const std::string&) const;
+    /// \brief Items have 1:1 relations to DataTreeNodes and DataTreeFilters, a
+    ///        position within all (sub)items and a parent.
+    ///
+    /// Requires a mitk::DataTreeBase, otherwise it has no meaning.
+    /// Needs the DataTreeFilter it belongs to (for checking the editability (?) of
+    /// properties).  Third parameter is the position within all siblings.
+    /// Fourth parameter is the parent item.
+    static Pointer New(mitk::DataTreeNode*, DataTreeFilter*, int, const Item*);
 
-          /// Access possible child nodes
-          // const because I don't want views to change the underlying list
-          const ItemList* GetChildren() const;
-          
-          bool HasChildren() const;
+    const PropertyList GetVisibleProperties() const;
 
-          /// Position within the childs of its parent (first item has 0)
-          int GetIndex() const;
+    /// Access to properties via their key
+    BasePropertyAccessor GetProperty(const std::string&) const;
 
-          /// True, when item is an orphan
-          /// (has no parent)
-          bool IsRoot() const;
+    /// Access possible child nodes
+    // const because I don't want views to change the underlying list
+    const ItemList* GetChildren() const;
 
-          /// True, when item is selected
-          bool IsSelected() const;
-          void SetSelected(bool);
+    bool HasChildren() const;
 
-          /// Returns the parent of this item (orphans throws exceptions)
-          const Item* GetParent() const;
+    /// Position within the childs of its parent (first item has 0)
+    int GetIndex() const;
 
-          /// Returns the associated DataTreeNode
-          const mitk::DataTreeNode* GetNode() const;  
-        protected:
-        
-          /// Intentionally hidden
-          Item(); 
-          ~Item(); 
-          Item(mitk::DataTreeNode*, DataTreeFilter*, int, const Item*);
-          
-          /// Position within the childs of its parent (first item has 0)
-          int m_Index;
-          
-          /// The parent of this item 
-          const Item* const m_Parent;
-          
-          /// Child nodes of this node
-          ItemList::Pointer m_Children;
+    /// True, when item is an orphan
+    /// (has no parent)
+    bool IsRoot() const;
 
-          /// Our DataTreeFilter
-          DataTreeFilter* m_TreeFilter;
+    /// True, when item is selected
+    bool IsSelected() const;
+    void SetSelected(bool);
 
-          /// Our DataTreeNode
-          DataTreeNode* m_Node;
+    /// Returns the parent of this item (orphans throws exceptions)
+    const Item* GetParent() const;
 
-          /// Whether this item is selected or not
-          bool m_Selected;
-      };
+    /// Returns the associated DataTreeNode
+    const mitk::DataTreeNode* GetNode() const;  
+  protected:
 
-      /// No meaning without a mitk::DataTreeBase
-      static Pointer New(mitk::DataTreeBase*);
+    /// Intentionally hidden
+    Item(); 
+    ~Item(); 
+    Item(mitk::DataTreeNode*, DataTreeFilter*, int, const Item*);
 
-      /// Labels (for Header) of visible properties
-      void SetPropertiesLabels(const PropertyList);
-      const PropertyList& GetPropertiesLabels() const;
+    /// Position within the childs of its parent (first item has 0)
+    int m_Index;
 
-      /// Keys of visible properties.
-      /// Special meaning of empty list: give all properties
-      void SetVisibleProperties(const PropertyList);
-      const PropertyList& GetVisibleProperties() const;
-      
-      /// Keys of editable properties. Subset of the visible properties!
-      void SetEditableProperties(const PropertyList);
-      const PropertyList& GetEditableProperties() const;
+    /// The parent of this item 
+    const Item* const m_Parent;
 
-      /// The mitk::BaseRenderer, for which node properties are given
-      void SetRenderer(const mitk::BaseRenderer*);
-      const mitk::BaseRenderer* GetRenderer() const;
+    /// Child nodes of this node
+    ItemList::Pointer m_Children;
 
-      /// Install the filter function
-      void SetFilter(const DataTreeFilterFunction*);
-      void SetFilter(const DataTreeFilterFunction&);
-      const DataTreeFilterFunction* GetFilter() const;
+    /// Our DataTreeFilter
+    DataTreeFilter* m_TreeFilter;
 
-      /// Set the selection mode (single/multi)
-      void SetSelectionMode(const SelectionMode);
-      SelectionMode GetSelectionMode() const;
+    /// Our DataTreeNode
+    DataTreeNode* m_Node;
 
-      /// Set whether the tree hierarchy will be preserved
-      void SetHierarchyHandling(const HierarchyHandling);
-      HierarchyHandling GetHierarchyHandling() const;
-        
-      /// Access the top level items that passed the filter
-      const ItemList* GetItems() const;
-      
-      /// Access the top level items that were selected
-      const ItemSet* GetSelectedItems() const;
-      const Item* GetSelectedItem() const;
-      const mitk::DataTreeIteratorClone GetIteratorToSelectedItem() const;
+    /// Whether this item is selected or not
+    bool m_Selected;
+  };
 
-      const Item* FindItem(DataTreeNode* node) const;
+  /// No meaning without a mitk::DataTreeBase
+  static Pointer New(mitk::DataTreeBase*);
 
-      /// Views can call this to select items
-      void SelectItem(const Item*, bool selected = true);
-     
-      /// This will delete all selected items without further confirmation
-      void DeleteSelectedItems();
-      
-      /// change notifications from the data tree
-      void TreeNodeChange(const itk::EventObject &);
-      void TreeAdd(const itk::EventObject &);
-      void TreePrune(const itk::EventObject &);
-      void TreeRemove(const itk::EventObject &);
-      
-    protected:
-   
-      // intentionally hidden (itk::Object / SmartPointer)
-      DataTreeFilter(mitk::DataTreeBase*);
-      ~DataTreeFilter();
-    
-    private:
-      
-      const Item* FindItem(DataTreeNode* node, ItemList* itemList) const;
-      
-      void AddMatchingChildren(mitk::DataTreeIteratorBase*, ItemList*, Item*, bool = true);
-      
-      // build the model from the data tree
-      void GenerateModelFromTree();
+  /// Labels (for Header) of visible properties
+  void SetPropertiesLabels(const PropertyList);
+  const PropertyList& GetPropertiesLabels() const;
 
-      /// All items that passed the filter
-      ItemList::Pointer m_Items;
-      
-      /// map tree nodes to their corresponding items
-      TreeNodeItemMap m_Item;
+  /// Keys of visible properties.
+  /// Special meaning of empty list: give all properties
+  void SetVisibleProperties(const PropertyList);
+  const PropertyList& GetVisibleProperties() const;
 
-      /// All items that were selected
-      ItemSet m_SelectedItems;
+  /// Keys of editable properties. Subset of the visible properties!
+  void SetEditableProperties(const PropertyList);
+  const PropertyList& GetEditableProperties() const;
 
-      /// Pointer to a filter function
-      DataTreeFilterFunction* m_Filter;
+  /// The mitk::BaseRenderer, for which node properties are given
+  void SetRenderer(const mitk::BaseRenderer*);
+  const mitk::BaseRenderer* GetRenderer() const;
 
-      /// The data tree filtered by this class
-      mitk::DataTreeBase::Pointer m_DataTree;
-      
-      /// should we preserve the hierachy of the tree?
-      HierarchyHandling m_HierarchyHandling;
+  /// Install the filter function
+  void SetFilter(const DataTreeFilterFunction*);
+  void SetFilter(const DataTreeFilterFunction&);
+  const DataTreeFilterFunction* GetFilter() const;
 
-      /// modes: single select, multi select, extended select
-      SelectionMode m_SelectionMode;
+  /// Set the selection mode (single/multi)
+  void SetSelectionMode(const SelectionMode);
+  SelectionMode GetSelectionMode() const;
 
-      PropertyList m_PropertyLabels;
-      PropertyList m_VisibleProperties;
-      PropertyList m_EditableProperties;
+  /// Set whether the tree hierarchy will be preserved
+  void SetHierarchyHandling(const HierarchyHandling);
+  HierarchyHandling GetHierarchyHandling() const;
 
-      const mitk::BaseRenderer* m_Renderer;
+  /// Access the top level items that passed the filter
+  const ItemList* GetItems() const;
 
-      unsigned long  m_TreeNodeChangeConnection;
-      unsigned long  m_TreeAddConnection;
-      unsigned long  m_TreePruneConnection;
-      unsigned long  m_TreeRemoveConnection;
-      
-      // remember the most recently selected item
-      //ItemPointer m_LastSelectedItem;
-      Item* m_LastSelectedItem;
+  /// Access the top level items that were selected
+  const ItemSet* GetSelectedItems() const;
+  const Item* GetSelectedItem() const;
+  const mitk::DataTreeIteratorClone GetIteratorToSelectedItem() const;
+
+  const Item* FindItem(DataTreeNode* node) const;
+
+  /// Views can call this to select items
+  void SelectItem(const Item*, bool selected = true);
+
+  /// This will delete all selected items without further confirmation
+  void DeleteSelectedItems();
+
+  /// change notifications from the data tree
+  void TreeNodeChange(const itk::EventObject &);
+  void TreeAdd(const itk::EventObject &);
+  void TreePrune(const itk::EventObject &);
+  void TreeRemove(const itk::EventObject &);
+
+protected:
+
+  // intentionally hidden (itk::Object / SmartPointer)
+  DataTreeFilter(mitk::DataTreeBase*);
+  ~DataTreeFilter();
+
+private:
+
+  const Item* FindItem(DataTreeNode* node, ItemList* itemList) const;
+
+  void AddMatchingChildren(mitk::DataTreeIteratorBase*, ItemList*, Item*, bool = true);
+
+  // build the model from the data tree
+  void GenerateModelFromTree();
+
+  /// All items that passed the filter
+  ItemList::Pointer m_Items;
+
+  /// map tree nodes to their corresponding items
+  TreeNodeItemMap m_Item;
+
+  /// All items that were selected
+  ItemSet m_SelectedItems;
+
+  /// Pointer to a filter function
+  DataTreeFilterFunction* m_Filter;
+
+  /// The data tree filtered by this class
+  mitk::DataTreeBase::Pointer m_DataTree;
+
+  /// should we preserve the hierachy of the tree?
+  HierarchyHandling m_HierarchyHandling;
+
+  /// modes: single select, multi select, extended select
+  SelectionMode m_SelectionMode;
+
+  PropertyList m_PropertyLabels;
+  PropertyList m_VisibleProperties;
+  PropertyList m_EditableProperties;
+
+  const mitk::BaseRenderer* m_Renderer;
+
+  unsigned long  m_TreeNodeChangeConnection;
+  unsigned long  m_TreeAddConnection;
+  unsigned long  m_TreePruneConnection;
+  unsigned long  m_TreeRemoveConnection;
+
+  // remember the most recently selected item
+  //ItemPointer m_LastSelectedItem;
+  Item* m_LastSelectedItem;
 
 #ifndef NDEBUG
-    public:
-      void SetDebugOn() { m_DEBUG = true; }
-    private:
-      void PrintStateForDebug(std::ostream& out);
-      bool m_DEBUG;
+public:
+  void SetDebugOn() { m_DEBUG = true; }
+private:
+  void PrintStateForDebug(std::ostream& out);
+  bool m_DEBUG;
 #endif
-  };
+};
 
 } // namespace mitk
 
 #endif
 // vi: textwidth=90
-

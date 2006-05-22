@@ -120,7 +120,7 @@ void QmitkIsoSurface::CreateSurface()
 
   //ImageToSurface Instance
   mitk::DataTreeIteratorClone  iteratorOnImageToBeSkinExtracted;
-  if(m_MitkImageIterator != NULL)
+  if(m_MitkImageIterator.IsNotNull())
   {
       
     iteratorOnImageToBeSkinExtracted = m_MitkImageIterator;

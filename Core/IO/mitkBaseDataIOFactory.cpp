@@ -43,6 +43,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkDvgFileIOFactory.h"
 #include "mitkUvgFileIOFactory.h"
 #include "mitkSsmFileIOFactory.h"
+#include "mitkMsmFileIOFactory.h"
 //#include "mitkTusFileIOFactory.h"
 #ifdef HAVE_IPDICOM
 #include "mitkDICOMFileIOFactory.h"
@@ -140,6 +141,7 @@ void BaseDataIOFactory::RegisterBuiltInFactories()
       itk::ObjectFactoryBase::RegisterFactory( UvgFileIOFactory::New() );
       itk::ObjectFactoryBase::RegisterFactory( DvgFileIOFactory::New() );
       itk::ObjectFactoryBase::RegisterFactory( SsmFileIOFactory::New() );
+      itk::ObjectFactoryBase::RegisterFactory( MsmFileIOFactory::New() );
 #ifdef HAVE_IPDICOM
       itk::ObjectFactoryBase::RegisterFactory( DICOMFileIOFactory::New() );
 #endif // HAVE_IPDICOM 

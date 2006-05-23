@@ -43,7 +43,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkDvgFileIOFactory.h"
 #include "mitkUvgFileIOFactory.h"
 #include "mitkSsmFileIOFactory.h"
-#include "mitkMsmFileIOFactory.h"
+#include "mitkMSMFileIOFactory.h"
 //#include "mitkTusFileIOFactory.h"
 #ifdef HAVE_IPDICOM
 #include "mitkDICOMFileIOFactory.h"

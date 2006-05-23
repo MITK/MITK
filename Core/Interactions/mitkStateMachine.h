@@ -42,24 +42,110 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk {
 
-  //class State;
-  //class Action;
-  //class StateEvent;
-  //class UndoController;
+  // base class of statem machine functors
+  class TStateMachineFunctor
+  {
+    public:
+      virtual bool DoAction(Action*, const StateEvent*)=0;        // call using function
+      virtual ~TStateMachineFunctor() {} 
+  };
+  
+  // the template functor for arbitrary StateMachine derivations
+  template <class T> 
+  class TSpecificStateMachineFunctor : public TStateMachineFunctor
+  {
+    public:
+  
+      // constructor - takes pointer to an object and pointer to a member and stores
+      // them in two private variables
+      TSpecificStateMachineFunctor(T* object, bool(T::*memberFunctionPointer)(Action*, const StateEvent*))
+      :m_Object(object), 
+      m_MemberFunctionPointer(memberFunctionPointer)
+      {
+      }
+    
+      virtual ~TSpecificStateMachineFunctor() {} // virtual destructor
+  
+      // override function "Call"
+      virtual bool DoAction(Action* action, const StateEvent* stateEvent)
+      { 
+        return (*m_Object.*m_MemberFunctionPointer)(action, stateEvent);             // execute member function
+      }
 
-  //##ModelId=3E5A397B01D5
-  //##Documentation
-  //## @brief superior statemachine
-  //##
-  //## Realizes the methods, that every statemachine has to have.
-  //## Undo can be enabled and disabled through EnableUndo
-  //## Developers must derive its statemachines and implement ExecuteAction
-  //## @ingroup Interaction
+    private:
+      T* m_Object;                  // pointer to object
+      bool (T::*m_MemberFunctionPointer)(Action*, const StateEvent*);   // pointer to member function
+  }; 
+
+/// Can be uses by derived classes of StateMachine to connect action IDs to methods
+/// Assumes that there is a typedef Classname Self in classes that use this macro
+#define CONNECT_ACTION(a, f) \
+  StateMachine::AddActionFunction(a, new TSpecificStateMachineFunctor<Self>(this, &Self::f));
+
+
+//##ModelId=3E5A397B01D5
+/**
+@brief Superior statemachine
+@ingroup Interaction
+
+  Realizes the methods, that every statemachine has to have.
+  Undo can be enabled and disabled through EnableUndo.
+  
+  To implement your own state machine, you have to derive a class from mitk::StateMachine and either
+  
+  - override ExecuteAction()
+  or 
+  - Write bool methods that take (Action*, const StateEvent*) as parameter and use the CONNECT_ACTION macro in your constructor
+  
+  The second version is recommended, since it provides more structured code. The following piece of code demonstrates how to
+  use the CONNECT_ACTION macro. The important detail is to provide a <i>typedef classname Self</i>
+  
+  \code 
+class LightSwitch : public StateMachine
+{
+  public:
+    
+    mitkClassMacro(LightSwitch, StateMachine); // this creates the Self typedef
+
+    LightSwitch(const char*);
+
+    bool DoSwitchOn(Action*, const StateEvent*);
+    bool DoSwitchOff(Action*, const StateEvent*);
+}
+
+LightSwitch::LightSwitch(const char* type)
+:StateMachine(type)
+{
+  // make sure that AcSWITCHON and AcSWITCHOFF are defined int constants somewhere (e.g. mitkInteractionConst.h)
+  CONNECT_ACTION( AcSWITCHON, DoSwitchOn );
+  CONNECT_ACTION( AcSWITCHOFF, DoSwitchOff );
+}
+
+bool LightSwitch::DoSwitchOn(Action*, const StateEvent*)
+{
+  std::cout << "Enlightenment" << std::endl;
+}
+
+bool LightSwitch::DoSwitchOff(Action*, const StateEvent*)
+{
+  std::cout << "Confusion" << std::endl;
+}
+\endcode
+
+  What CONNECT_ACTION does, is call StateMachine::AddActionFunction(...) to add some function pointer wrapping class (functor) to
+  a std::map of StateMachine. Whenever StateMachines ExecuteAction is called, StateMachine will lookup the desired Action in its
+  map and call the appropriate method in your derived class.
+
+**/
   class StateMachine : public itk::Object, public mitk::OperationActor, public XMLIO
   {
 
   public:
     mitkClassMacro(StateMachine,itk::Object);
+   
+    /// map to connect action IDs with method calls
+    /// Use AddActionFunction or (even better) the CONNECT_ACTION macro to fill the map
+    typedef std::map<int, TStateMachineFunctor*> ActionFunctionsMapType;
 
     //##ModelId=3E5B2DB301FD
     //##Documentation
@@ -105,6 +191,8 @@ namespace mitk {
 
   protected:
 
+    void AddActionFunction(int action, TStateMachineFunctor* functor);
+
     //##ModelId=3E5B2E170228
     //##Documentation
     //## @brief Method called in HandleEvent after Statechange.
@@ -112,7 +200,7 @@ namespace mitk {
     //## Each statechange has actions, which can be assigned by it's number.
     //## If you are developing a new statemachine, declare all your operations here and send them to Undo-Controller and to the Data.
     //## Object- and group-EventId can also be accessed through static methods from OperationEvent
-    virtual bool ExecuteAction(Action* action, mitk::StateEvent const* stateEvent)= 0;
+    virtual bool ExecuteAction(Action* action, StateEvent const* stateEvent);
 
     //##Documentation
     //## @brief returns the current state
@@ -159,6 +247,8 @@ namespace mitk {
     //##Documentation
     //## @brief holds the current state the machine is in
     State* m_CurrentState;
+    
+    ActionFunctionsMapType m_ActionFunctionsMap;
 
   };
 

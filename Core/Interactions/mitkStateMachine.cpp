@@ -63,9 +63,18 @@ mitk::StateMachine::StateMachine(const char * type) : m_CurrentState(NULL)
   InteractionDebug::GetInstance()->NewStateMachine( type, this );
   #endif
 }
+
 mitk::StateMachine::~StateMachine()
 {
-  delete m_UndoController;
+  //clean up map using deletes
+  for ( mitk::StateMachine::ActionFunctionsMapType::iterator iter = m_ActionFunctionsMap.begin();
+        iter != m_ActionFunctionsMap.end();
+        ++iter )
+  {
+    delete iter->second;
+  }
+
+   delete m_UndoController;
 
   #ifdef INTERACTION_DEBUG
   InteractionDebug::GetInstance()->DeleteStateMachine( this );
@@ -185,6 +194,31 @@ void mitk::StateMachine::IncCurrGroupEventId()
 {
 	mitk::OperationEvent::IncCurrGroupEventId();
 }
+
+/// look up which object method is associated to the given action and call the method
+bool mitk::StateMachine::ExecuteAction(Action* action, StateEvent const* stateEvent)
+{
+  if (!action) return false;
+
+  int actionId = action->GetActionId();
+
+  TStateMachineFunctor* actionFunction = m_ActionFunctionsMap[actionId];
+  if (!actionFunction) return false;
+
+  bool retVal = actionFunction->DoAction(action, stateEvent);
+  return retVal;
+}
+
+void mitk::StateMachine::AddActionFunction(int action, mitk::TStateMachineFunctor* functor)
+{
+  if (!functor) return;
+
+  // make sure double calls for same action won't cause memory leaks
+  delete m_ActionFunctionsMap[action]; // delete NULL does no harm
+
+  m_ActionFunctionsMap[action] = functor;
+}
+
 
 void mitk::StateMachine::ExecuteOperation(Operation* operation)
 {

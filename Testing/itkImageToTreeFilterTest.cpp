@@ -624,9 +624,7 @@ int testRefinementModelProcessor()
   std::cout << " *** Testing the RefinementModelProcessor ***\n";
 
   TubeSegmentModelGeneratorPointer tubeGenerator = TubeSegmentModelGeneratorType::New();
-  tubeGenerator->SetXDimension(100);
-  tubeGenerator->SetYDimension(100);
-  tubeGenerator->SetZDimension(10);
+
   tubeGenerator->SetNumberOfSlices(10);
   tubeGenerator->SetRadius(10);
   tubeGenerator->SetInnerRing(false);
@@ -634,15 +632,25 @@ int testRefinementModelProcessor()
   tubeGenerator->Update();
   TubeSegmentModelPointer tubeSegment = tubeGenerator->GetOutput();
 
+  TransformPointer transform = TransformType::New();
+  TransformOutputVectorType startPoint;
+  startPoint.Fill(50);
+  transform->SetOffset(startPoint);
+
+  RegistratedModelPointer registratedModel = RegistratedModelType::New();
+  registratedModel->SetBaseModel(static_cast<RegistrationModelPointer>(tubeSegment));
+  registratedModel->SetTransform(static_cast<BaseTransformPointer>(transform));
+  registratedModel->SetTransformParameters(transform->GetParameters());
+
   PointSetToImageFilterPointer pointSetToImageFilter = PointSetToImageFilterType::New();
   OutputImageType::SizeType size;
   size.Fill(100);
   pointSetToImageFilter->SetSize(size);
-  pointSetToImageFilter->SetInput(tubeSegment->GetPointSet());
+  pointSetToImageFilter->SetInput(registratedModel->GetPointSet());
   pointSetToImageFilter->Update();
 
   RefinementModelProcessorPointer refinementProcessor = RefinementModelProcessorType::New();
-  refinementProcessor->SetInput(tubeSegment);
+  refinementProcessor->SetInput(registratedModel);
   refinementProcessor->SetImage(pointSetToImageFilter->GetOutput());
   refinementProcessor->Update();
 
@@ -668,9 +676,7 @@ int testTubeSegmentRegistrator()
   std::cout << " *** Testing the TubeSegmentRegistrator ***\n";
 
   TubeSegmentModelGeneratorPointer tubeGenerator = TubeSegmentModelGeneratorType::New();
-  tubeGenerator->SetXDimension(100);
-  tubeGenerator->SetYDimension(100);
-  tubeGenerator->SetZDimension(10);
+  tubeGenerator->SetLength(10);
   tubeGenerator->SetNumberOfSlices(10);
   tubeGenerator->SetRadius(10);
   tubeGenerator->SetInnerRing(false);
@@ -755,9 +761,7 @@ int testRegistrationModelRadius()
   std::cout << " *** Testing the Radius calculation of the RegistrationModel ***\n";
 
   TubeSegmentModelGeneratorPointer tubeGenerator = TubeSegmentModelGeneratorType::New();
-  tubeGenerator->SetXDimension(100);
-  tubeGenerator->SetYDimension(100);
-  tubeGenerator->SetZDimension(10);
+  tubeGenerator->SetLength(10);
   tubeGenerator->SetNumberOfSlices(10);
   tubeGenerator->SetRadius(10);
   tubeGenerator->SetInnerRing(false);

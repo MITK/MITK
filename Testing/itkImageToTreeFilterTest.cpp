@@ -22,6 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <itkImage.h>
 #include <itkTimeProbe.h>
+#include <itkVector.h>
 
 #include <itkImageToTreeFilter.h>
 #include <itkITTFilterContext.h>
@@ -125,6 +126,12 @@ typedef PointSetToImageFilterType::Pointer            PointSetToImageFilterPoint
 typedef itk::TubeSegmentModelGenerator<PixelType>
     TubeSegmentModelGeneratorType;
 typedef TubeSegmentModelGeneratorType::Pointer        TubeSegmentModelGeneratorPointer;
+
+typedef itk::TubeSegmentModelRegistrator<PointSetType, ImageType, OutputTreeType>
+    TubeSegmentModelRegistratorType;
+typedef TubeSegmentModelRegistratorType::Pointer          TubeSegmentModelRegistratorPointer;
+
+typedef itk::Vector<PixelType>                        VectorType;
 
 
 typedef std::list<int>                                ResultListType;
@@ -654,6 +661,93 @@ int testRefinementModelProcessor()
 }
 
 /****************************************************************
+ * TEST: TubeSegmentRegistrator
+ ****************************************************************/
+int testTubeSegmentRegistrator()
+{
+  std::cout << " *** Testing the TubeSegmentRegistrator ***\n";
+
+  TubeSegmentModelGeneratorPointer tubeGenerator = TubeSegmentModelGeneratorType::New();
+  tubeGenerator->SetXDimension(100);
+  tubeGenerator->SetYDimension(100);
+  tubeGenerator->SetZDimension(10);
+  tubeGenerator->SetNumberOfSlices(10);
+  tubeGenerator->SetRadius(10);
+  tubeGenerator->SetInnerRing(false);
+  tubeGenerator->SetOuterRing(false);
+  tubeGenerator->Update();
+  TubeSegmentModelPointer tubeSegment = tubeGenerator->GetOutput();
+
+  TubeSegmentModelType::PointType          tubeStartPoint       = tubeSegment->GetStartPoint();
+  TubeSegmentModelType::PointSetPointType  tubeConnectionPoint  = tubeSegment->GetConnectionPoints()->GetPoints()->Begin().Value();
+
+  RegistrationModelWriterPointer modelWriter = RegistrationModelWriterType::New();
+  modelWriter->SetRegistrationModel(tubeSegment);
+  modelWriter->SetFilename("test.xml");
+  modelWriter->WriteFile();
+
+  PointSetToImageFilterPointer pointSetToImageFilter = PointSetToImageFilterType::New();
+  OutputImageType::SizeType size;
+  size.Fill(100);
+  pointSetToImageFilter->SetSize(size);
+  pointSetToImageFilter->SetInput(tubeSegment->GetPointSet());
+  pointSetToImageFilter->Update();
+
+  OutputTreePointer outputTree = OutputTreeType::New();
+
+  FilterContextPointer filterContext = FilterContextType::New();
+  filterContext->SetInputImage(pointSetToImageFilter->GetOutput());
+  filterContext->SetDryRun(true);
+  filterContext->SetDryRun(true);
+  filterContext->SetOutputTree(outputTree);
+  filterContext->SetModelFilename("test.xml");
+
+  StartPointDataPointer startPointData = StartPointDataType::New();
+  StartPointDataType::PointType startPoint;
+  startPoint.Fill(50);
+  startPointData->SetStartPoint(startPoint);
+  StartPointDataType::VectorType startDirection;
+  startDirection.Fill(1.0);
+  startPointData->SetStartDirection(startDirection);
+  filterContext->GetStartPointDataQueue()->push(startPointData);
+
+  TubeSegmentModelRegistratorPointer tubeModelRegistrator = TubeSegmentModelRegistratorType::New();
+  tubeModelRegistrator->SetFilterContext(filterContext);
+  tubeModelRegistrator->SetStartPointData(startPointData);
+  tubeModelRegistrator->Update();
+
+  RegistrationModelPointer movedModel = filterContext->GetOutputTree()->GetTreeContainer()->GetRoot()->Get();
+  RegistrationModelType::PointType          modelStartPoint       = movedModel->GetStartPoint();
+  RegistrationModelType::PointSetPointType  modelConnectionPoint  = movedModel->GetConnectionPoints()->GetPoints()->Begin().Value();
+
+
+  VectorType modelAxis;
+  for(unsigned int dim = 0; dim < Dimension; dim++)
+  {
+    modelAxis[dim] = modelConnectionPoint[dim] - modelStartPoint[dim];
+  }
+  modelAxis.Normalize();
+
+  if(modelAxis[0] == modelAxis[1] && modelAxis[1] == modelAxis[2])
+  {
+    std::cout << "Model StartPoint: " << modelStartPoint << std::endl;
+    std::cout << "Model Axis: " << modelAxis << std::endl;
+
+    std::cout << " *** [TEST PASSED] ***" << std::endl;
+  }
+  else
+  {
+    std::cout << "Model StartPoint: " << modelStartPoint << std::endl;
+    std::cout << "Model Axis: " << modelAxis << std::endl;
+
+    std::cout << " *** [TEST FAILED] ***" << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  return EXIT_SUCCESS;
+}
+
+/****************************************************************
  * TEST: RegistrationModel
  ****************************************************************/
 int testRegistrationModelRadius()
@@ -698,7 +792,7 @@ int itkImageToTreeFilterTest(int i, char* argv[] )
   resultList.push_back(testProfileGradientFinder());
   resultList.push_back(testRefinementModelProcessor());
   resultList.push_back(testRegistrationModelRadius());
-
+  resultList.push_back(testTubeSegmentRegistrator());
 
   std::cout << " *** [ALL TESTS DONE] ***\n";
 

@@ -38,46 +38,46 @@ Color ColorSequenceCycleH::GetNextColor()
 {
   color_h += 60.0;
 
-  if (color_h > 365.0)
+  if (color_h >= 360.0)
   {
     if ( color_cycle == 0 )
     {
-      color_h = -30.0;
+      color_h = 30.0;
       color_s = 1.0;
       color_v = 1.0;
       color_cycle = 1;
     }
     else if (color_cycle == 1)
     {
-      color_h = -60.0;
+      color_h = 0.0;
       color_s = 0.5;
       color_v = 1.0;
       color_cycle = 2;
     }
     else if (color_cycle == 2)
     {
-      color_h = -30.0;
+      color_h = 30.0;
       color_s = 0.5;
       color_v = 1.0;
       color_cycle = 3;
     }
     else if (color_cycle == 3)
     {
-      color_h = -60.0;
+      color_h = 0.0;
       color_s = 1.0;
       color_v = 0.5;
       color_cycle = 4;
     }
     else if (color_cycle == 4)
     {
-      color_h = -30.0;
+      color_h = 30.0;
       color_s = 1.0;
       color_v = 0.5;
       color_cycle = 5;
     }
     else if (color_cycle == 5)
     {
-      color_h = -60.0;
+      color_h = 0.0;
       color_s = 1.0;
       color_v = 1.0;
       color_cycle = 0;

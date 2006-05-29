@@ -23,6 +23,8 @@ namespace mitk {
     
     /// convert a HSV color to RGB color, H from 0 to 360, all other parameters 0 to 1
     void Hsv2Rgb(float h, float s, float v, float& r, float& g, float& b);
+    /// convert a RGB color to HSV color, rgb parameters from 0 to 1
+    void Rgb2Hsv(float r, float g, float b, float &h, float &s, float &v);
 
   } // ColorConversion
 

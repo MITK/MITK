@@ -24,7 +24,7 @@ void Hsv2Rgb(float h, float s, float v, float& r, float& g, float& b)
   int Hi = (int)( h / 60.0 ) % 6;
   if (h >= 360 ) Hi = 6;
 
-  float f = h / 60.0 - (float)Hi;
+  float f = (float)(h / 60.0 - (float)Hi);
   float p = (float)(v * (1.0 - s));
   float q = (float)(v * (1.0 - s * f));
   float t = (float)(v * (1.0 - s * (1.0 - f)));

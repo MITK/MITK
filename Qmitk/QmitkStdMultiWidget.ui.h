@@ -417,7 +417,7 @@ void QmitkStdMultiWidget::AddDisplayPlaneSubTree(mitk::DataTreeIteratorBase* it)
   mitk::DataTreeIteratorClone dit = it;
   dit->Add(node);
   dit->GoToChild(dit->ChildPosition(node));
-  planesSubTree=dynamic_cast<mitk::DataTreeBase*>(dit->GetSubTree());
+  planesSubTree=dit->GetSubTree();
 
   float white[3] = {1.0f,1.0f,1.0f};
   mitk::DataTreeNode::Pointer planeNode;

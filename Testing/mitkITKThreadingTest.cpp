@@ -116,7 +116,7 @@ int mitkITKThreadingTest(int argc, char* argv[])
   m_ResultAvailable->Initialize(0); // no pieces left (thread has to create one)
   
   itk::Semaphore::Pointer m_RunThreadRun = itk::Semaphore::New();
-  m_ResultAvailable->Initialize(0); // no pieces left (thread has to create one)
+  m_RunThreadRun->Initialize(0); // no pieces left (thread has to create one)
   
   itk::FastMutexLock::Pointer m_Mutex = itk::FastMutexLock::New();
 

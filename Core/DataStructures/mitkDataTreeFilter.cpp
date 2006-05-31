@@ -748,7 +748,6 @@ void DataTreeFilter::AddMatchingChildren(DataTreeIteratorBase* iter, ItemList* l
       {
         if ( *siter == newItem->GetNode() )
         {
-          std::cout << "m_SelectedItems.insert(newItem);" << std::endl;
           m_SelectedItems.insert(newItem);
           newItem->m_Selected = true;
         }
@@ -756,7 +755,6 @@ void DataTreeFilter::AddMatchingChildren(DataTreeIteratorBase* iter, ItemList* l
 
       if ( m_LastSelectedNode == newItem->GetNode() )
       {
-        std::cout << "m_LastSelectedItem = newItem;" << std::endl;
         m_LastSelectedItem = newItem;
         newItem->m_Selected = true; // probably not neccessary
       }
@@ -796,7 +794,6 @@ void DataTreeFilter::StoreCurrentSelectionState()
        ++iter)
   {
     m_LastSelectedNodes.insert( (*iter)->GetNode() );
-    std::cout << "m_LastSelectedNodes.insert( (*iter)->GetNode() );" << std::endl;
   }
 }
 

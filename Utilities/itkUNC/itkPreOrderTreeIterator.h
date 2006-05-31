@@ -123,6 +123,12 @@ PreOrderTreeIterator<TTreeType>::FindNextNode() const
   TreeNodeType* child = this->m_Position;
   TreeNodeType* parent = dynamic_cast<TreeNodeType*>(this->m_Position->GetParent());
 
+  // Subtree
+  if( parent && parent->ChildPosition( this->m_Root ) >= 0 )
+  {
+    return NULL;
+  }
+
   int childPosition = parent->ChildPosition( child ); 
   int lastChildPosition = parent->CountChildren() - 1;
 

@@ -49,7 +49,7 @@ public:
   virtual const ValueType& Get() const ;
 
   /** Get the subtree */
-  virtual TTreeType* GetSubTree() const ;
+  virtual typename TTreeType::Pointer GetSubTree() const ;
 
   /** Return true if the current node is a leaf */
   virtual bool IsLeaf() const;

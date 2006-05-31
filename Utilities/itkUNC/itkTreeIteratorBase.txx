@@ -202,12 +202,12 @@ TreeIteratorBase<TTreeType>::Add( TTreeType& subTree )
 
 /** Return the subtree */
 template <class TTreeType>
-TTreeType*
+typename TTreeType::Pointer
 TreeIteratorBase<TTreeType>::GetSubTree() const 
 {
   typename TTreeType::Pointer tree = TTreeType::New();
-  tree->SetSubtree(true);
   tree->SetRoot(m_Position);
+  tree->SetSubtree(true);
   return tree;
   return NULL;
 }
@@ -491,13 +491,13 @@ TreeIteratorBase<TTreeType>::Remove()
   
   if ( m_Position->HasParent() )
     {
+    m_Tree->InvokeEvent( TreePruneEvent<TTreeType>(*this) );    
     TreeNodeType* parent = m_Position->GetParent();
     //keep node alive just a bit longer
     typename TreeNodeType::Pointer position = m_Position;
     parent->Remove( m_Position );                        // removes this node (and implicitly all children, too)
     //restore parent, which was set to NULL in the previous line ( so the event receiver can still find the parent )
     m_Position->SetParent(parent);                               
-    m_Tree->InvokeEvent( TreePruneEvent<TTreeType>(*this) );    
     m_Tree->Modified();
     m_Position->SetParent(NULL);
 

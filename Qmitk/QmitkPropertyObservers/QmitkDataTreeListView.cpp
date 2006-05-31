@@ -458,8 +458,20 @@ void QmitkDataTreeListView::AddItemsToList(QWidget* parent, QmitkListViewItemInd
       if (observerWidget)
       { // widget ready, now add it
         observerWidget->show();
-        observerWidget->setBackgroundMode( Qt::PaletteBase );
-        index->addWidget(observerWidget, row, column, Qt::AlignVCenter);
+        if (itemiter->IsSelected())
+        {
+          observerWidget->setBackgroundMode(Qt::PaletteHighlight);
+       
+          // following lines seem too complicated, but I could not find an easier way of changing the foreground color
+          QPalette palette( observerWidget->palette() );
+          palette.setColor( QColorGroup::Foreground, palette.color( QPalette::Active, QColorGroup::HighlightedText ) );
+          observerWidget->setPalette( palette );
+        }
+        else
+        {
+          observerWidget->setBackgroundMode( Qt::PaletteBase );
+        }
+    index->addWidget(observerWidget, row, column, Qt::AlignVCenter);
       }
 
       ++column;

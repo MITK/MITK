@@ -452,9 +452,9 @@ soll <<
         }
         case 9: {
 soll <<
-"+- Eins" << std::endl <<
+"+- Eins*" << std::endl <<
 "|    name: Eins" << std::endl <<
-"+- Zwo" << std::endl <<
+"+- Zwo*" << std::endl <<
 "|    name: Zwo" << std::endl;
           assert ( ost.str() == soll.str() || verbose > 1 );
 

@@ -94,6 +94,8 @@ DataTreeFilter::Item::~Item()
 {
   // remove selection
   m_TreeFilter->m_SelectedItems.erase(this);
+  if (m_TreeFilter->m_LastSelectedItem == this)
+    m_TreeFilter->m_LastSelectedItem = NULL;
   // remove map entry
   m_TreeFilter->m_Item.erase(m_Node);
 }
@@ -527,6 +529,7 @@ void DataTreeFilter::TreeAdd(const itk::EventObject& e)
     // regenerate only in part
     list = parent->m_Children;
     InvokeEvent( TreeFilterRemoveChildrenEvent( parent ) );
+    StoreCurrentSelectionState();
     list->clear();
     AddMatchingChildren( treePosition, list, parent, true );
   }
@@ -591,7 +594,8 @@ void DataTreeFilter::TreePrune(const itk::EventObject& e)
   }
   else // no hierachy preserved OR removed data tree item not matching the filter
   {
-    DataTreePreOrderIterator treeIter( m_DataTree, treePosition->GetNode() );
+    DataTreeBase::Pointer subTree = treePosition->GetSubTree();
+    DataTreePreOrderIterator treeIter( subTree );
     bool firstMatch(true);
     while ( !treeIter.IsAtEnd() )
     {
@@ -643,6 +647,8 @@ void DataTreeFilter::TreePrune(const itk::EventObject& e)
     {
       (*listFirstIter)->m_Index = i;
       InvokeEvent( TreeFilterItemAddedEvent( *listFirstIter ) );  // then add some items again
+                                                                 // is this notification wanted
+                                                                // behaviour?
     }
   }
   
@@ -732,7 +738,29 @@ void DataTreeFilter::AddMatchingChildren(DataTreeIteratorBase* iter, ItemList* l
     if ( (*m_Filter)( iter->Get() ) )
     {
       unsigned int newIndex = list->Size();
-      list->CreateElementAt( newIndex ) = Item::New( iter->Get(), this, newIndex, parent );
+      Item::Pointer newItem = Item::New( iter->Get(), this, newIndex, parent );
+      list->CreateElementAt( newIndex ) = newItem;
+    
+      // restore selection state for this new item
+      for (DataTreeNodeSet::iterator siter = m_LastSelectedNodes.begin();
+           siter != m_LastSelectedNodes.end();
+           ++siter)
+      {
+        if ( *siter == newItem->GetNode() )
+        {
+          std::cout << "m_SelectedItems.insert(newItem);" << std::endl;
+          m_SelectedItems.insert(newItem);
+          newItem->m_Selected = true;
+        }
+      }
+
+      if ( m_LastSelectedNode == newItem->GetNode() )
+      {
+        std::cout << "m_LastSelectedItem = newItem;" << std::endl;
+        m_LastSelectedItem = newItem;
+        newItem->m_Selected = true; // probably not neccessary
+      }
+
       if (verbose) InvokeEvent( TreeFilterItemAddedEvent(m_Items->ElementAt(newIndex)) );
 
       if ( m_HierarchyHandling == DataTreeFilter::PRESERVE_HIERARCHY )
@@ -754,13 +782,33 @@ void DataTreeFilter::AddMatchingChildren(DataTreeIteratorBase* iter, ItemList* l
   }
 }
 
+void DataTreeFilter::StoreCurrentSelectionState()
+{
+  // save current selection
+  if (m_LastSelectedItem)
+    m_LastSelectedNode = m_LastSelectedItem->GetNode();
+  else
+    m_LastSelectedNode = NULL;
+
+  m_LastSelectedNodes.clear();
+  for (ItemSet::iterator iter = m_SelectedItems.begin();
+       iter != m_SelectedItems.end();
+       ++iter)
+  {
+    m_LastSelectedNodes.insert( (*iter)->GetNode() );
+    std::cout << "m_LastSelectedNodes.insert( (*iter)->GetNode() );" << std::endl;
+  }
+}
+
 void DataTreeFilter::GenerateModelFromTree()
 {
   DEBUG_MSG_STATE("Before GenerateModel")
   InvokeEvent( TreeFilterRemoveAllEvent() );
 
+  StoreCurrentSelectionState();
+  
   m_Items = ItemList::New(); // clear list (nice thanks to smart pointers)
-  m_LastSelectedItem = NULL;
+
   DataTreeIteratorBase* treeIter =  // get an iterator to the data tree
     new DataTreePreOrderIterator(m_DataTree);
   
@@ -777,6 +825,26 @@ void DataTreeFilter::GenerateModelFromTree()
   if ( (*m_Filter)( treeIter->Get() ) )
   {
     m_Items->CreateElementAt(0) = Item::New( treeIter->Get(), this, 0, 0 ); // 0 = first item, 0 = no parent
+    Item* newItem = m_Items->ElementAt(0); 
+
+    // restore selection state for this new item
+    for (DataTreeNodeSet::iterator siter = m_LastSelectedNodes.begin();
+         siter != m_LastSelectedNodes.end();
+         ++siter)
+    {
+      if ( *siter == newItem->GetNode() )
+      {
+        m_SelectedItems.insert(newItem);
+        newItem->m_Selected = true;
+      }
+    }
+
+    if ( m_LastSelectedNode == newItem->GetNode() )
+    {
+      m_LastSelectedItem = newItem;
+      newItem->m_Selected = true; // probably not neccessary
+    }
+
     InvokeEvent( TreeFilterItemAddedEvent(m_Items->ElementAt(0)) );
 
     if ( m_HierarchyHandling == DataTreeFilter::PRESERVE_HIERARCHY )
@@ -821,8 +889,11 @@ void DataTreeFilter::PrintStateForDebug(std::ostream& out)
       std::string name;
       (*listIter)->GetNode()->GetName(name);
       out << name;
+      if ((*listIter)->IsSelected()) 
+        out << ", is selected ";
       if ( (*listIter)->HasChildren() )
-        out << " has children" << std::endl;
+        out << ", has children";
+      out << std::endl;
     }
   }
   out << std::endl;

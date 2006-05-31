@@ -399,11 +399,14 @@ void QmitkDataTreeComboBox::generateItems()
     
   try
   {
-    const mitk::DataTreeFilter::Item* currentItem = m_Items.at( QComboBox::currentItem() );
+    mitk::DataTreeFilter::Item* currentItem = const_cast<mitk::DataTreeFilter::Item*>(m_Items.at( QComboBox::currentItem() ));
     if ( currentItem != m_CurrentItem )
     {
       m_CurrentItem = currentItem; 
-      emit activated( m_CurrentItem );
+      m_SelfCall = true;
+      currentItem->SetSelected(true);
+      emit activated(m_CurrentItem);
+      m_SelfCall = false;
     }
   }
   catch (std::out_of_range)

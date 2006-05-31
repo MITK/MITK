@@ -414,6 +414,9 @@ public:
   /// A set of Items
   typedef std::set<Item*> ItemSet; 
 
+  /// A set of DataTreeNodes
+  typedef std::set<const DataTreeNode*> DataTreeNodeSet; 
+
   /// Iterator over Items
   typedef ItemList::Iterator      ItemIterator;
 
@@ -598,6 +601,8 @@ private:
 
   void AddMatchingChildren(mitk::DataTreeIteratorBase*, ItemList*, Item*, bool = true);
 
+  void StoreCurrentSelectionState();
+  
   // build the model from the data tree
   void GenerateModelFromTree();
 
@@ -636,6 +641,9 @@ private:
   // remember the most recently selected item
   //ItemPointer m_LastSelectedItem;
   Item* m_LastSelectedItem;
+
+  const DataTreeNode* m_LastSelectedNode; /// for reconstruction of selection after regeneration of items
+  DataTreeNodeSet m_LastSelectedNodes; /// for reconstruction of selection after regeneration of items
 
 #ifndef NDEBUG
 public:

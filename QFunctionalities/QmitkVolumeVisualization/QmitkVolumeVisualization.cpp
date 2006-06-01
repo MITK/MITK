@@ -67,7 +67,7 @@ QAction * QmitkVolumeVisualization::CreateAction(QActionGroup *parent)
 
 void QmitkVolumeVisualization::TreeChanged()
 {
-  m_Controls->m_TreeNodeSelector->SetDataTreeNodeIterator(this->GetDataTree());
+  m_Controls->m_TreeNodeSelector->SetDataTreeNodeIterator(this->GetDataTreeIterator());
 }
 
 void QmitkVolumeVisualization::Activated()

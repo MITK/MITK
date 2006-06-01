@@ -62,7 +62,7 @@ QAction * QmitkFunctionalityTemplate::CreateAction(QActionGroup *parent)
 
 void QmitkFunctionalityTemplate::TreeChanged()
 {
-  m_Controls->m_TreeNodeSelector->SetDataTreeNodeIterator(this->GetDataTree());
+  m_Controls->m_TreeNodeSelector->SetDataTreeNodeIterator(this->GetDataTreeIterator());
 }
 
 void QmitkFunctionalityTemplate::Activated()

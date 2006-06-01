@@ -125,7 +125,7 @@ public:
   \brief getter for dataTree attribute. It returns the 
   reference to a data tree iterator object
   */
-  mitk::DataTreeIteratorBase* GetDataTree();
+  mitk::DataTreeIteratorBase* GetDataTreeIterator();
 
   virtual void TreeChanged(const itk::EventObject & treeChangedEvent);
 

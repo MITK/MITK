@@ -90,7 +90,7 @@ void QmitkFunctionality::SetDataTree(mitk::DataTreeIteratorBase* it)
   }
 }
 
-mitk::DataTreeIteratorBase* QmitkFunctionality::GetDataTree()
+mitk::DataTreeIteratorBase* QmitkFunctionality::GetDataTreeIterator()
 {
   return m_DataTreeIterator.GetPointer();
 }

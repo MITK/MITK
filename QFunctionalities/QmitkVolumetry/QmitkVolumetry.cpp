@@ -69,7 +69,7 @@ QWidget * QmitkVolumetry::CreateControlWidget(QWidget *parent)
   if (m_Controls == NULL)  
   {    
     m_Controls = new QmitkVolumetryControls(parent);          
-    m_Controls->SetDataTreeIterator(GetDataTree());
+    m_Controls->SetDataTreeIterator(GetDataTreeIterator());
     m_Controls->m_TreeNodeSelector->m_FilterFunction=QmitkVolumetry::IsImageNodeButNotOverlayNode;
   }  
   return m_Controls;

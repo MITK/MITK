@@ -87,7 +87,7 @@ QAction * QmitkIsoSurface::CreateAction(QActionGroup *parent)
 
 void QmitkIsoSurface::TreeChanged()
 {
-  m_Controls->m_TreeNodeSelector->SetDataTreeNodeIterator(this->GetDataTree());
+  m_Controls->m_TreeNodeSelector->SetDataTreeNodeIterator(this->GetDataTreeIterator());
 }
 
 void QmitkIsoSurface::Activated()

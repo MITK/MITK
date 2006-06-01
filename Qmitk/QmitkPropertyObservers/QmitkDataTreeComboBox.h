@@ -65,7 +65,7 @@ PURPOSE.  See the above copyright notices for more information.
 \code
   if ( ) // you are just creating your widgets
   {
-    QmitkDataTreeListView* comboBox = new QmitkDataTreeFilter( GetDataTree(), this); // create a new Qt widget
+    QmitkDataTreeListView* comboBox = new QmitkDataTreeListView( GetDataTree(), this); // create a new Qt widget
   }
   else   // widgets already exists
   {

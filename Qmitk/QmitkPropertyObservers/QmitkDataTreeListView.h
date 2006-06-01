@@ -62,7 +62,7 @@ PURPOSE.  See the above copyright notices for more information.
 \code
   if ( ) // you are just creating your widgets
   {
-    QmitkDataTreeListView* listView = new QmitkDataTreeFilter( GetDataTree(), this); // create a new Qt widget
+    QmitkDataTreeListView* listView = new QmitkDataTreeListView( GetDataTree(), this); // create a new Qt widget
   }
   else   // widgets already exists
   {

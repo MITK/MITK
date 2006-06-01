@@ -275,6 +275,7 @@ int testFilterContext()
   std::cout << "Pushing points to filter context...\n";
   pointQueue1->push(data1);
   pointQueue1->push(data2);
+  filterContext->ReleaseStartPointDataQueue();
 
   std::cout << "Reading points from filter context...\n";
   StartPointDataQueueType* pointQueue2 = filterContext->GetStartPointDataQueue();
@@ -299,6 +300,7 @@ int testFilterContext()
     std::cout << " *** [TEST FAILED] ***\n";
     return EXIT_FAILURE;
   }
+  filterContext->ReleaseStartPointDataQueue();
 
   std::cout << " *** [TEST PASSED] ***\n";
   return EXIT_SUCCESS;
@@ -716,6 +718,7 @@ int testTubeSegmentRegistrator()
   startDirection.Fill(1.0);
   startPointData->SetStartDirection(startDirection);
   filterContext->GetStartPointDataQueue()->push(startPointData);
+  filterContext->ReleaseStartPointDataQueue();
 
   TubeSegmentModelRegistratorPointer tubeModelRegistrator = TubeSegmentModelRegistratorType::New();
   tubeModelRegistrator->SetFilterContext(filterContext);

@@ -236,6 +236,17 @@ DataTreeFilter::Pointer DataTreeFilter::New(DataTreeBase* datatree)
   return smartPtr;
 }
 
+// smart pointer constructor
+DataTreeFilter::Pointer DataTreeFilter::New(DataTreeIteratorBase* iterator)
+{
+  // from itkNewMacro()
+  Pointer smartPtr;
+  DataTreeFilter* rawPtr = new DataTreeFilter(iterator->GetTree());
+  smartPtr = rawPtr;
+  rawPtr->UnRegister();
+  return smartPtr;
+}
+
 // real constructor (protected)
 DataTreeFilter::DataTreeFilter(DataTreeBase* datatree)
 : m_Filter(NULL),

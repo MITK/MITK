@@ -537,6 +537,9 @@ public:
   /// No meaning without a mitk::DataTreeBase
   static Pointer New(mitk::DataTreeBase*);
 
+  /// Alternative New() with iterator instead of DataTree
+  static Pointer New(mitk::DataTreeIteratorBase*);
+
   /// Labels (for Header) of visible properties
   void SetPropertiesLabels(const PropertyList);
   const PropertyList& GetPropertiesLabels() const;

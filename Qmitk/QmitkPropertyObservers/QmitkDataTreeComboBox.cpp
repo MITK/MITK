@@ -18,7 +18,8 @@
 */
 QmitkDataTreeComboBox::QmitkDataTreeComboBox(QWidget* parent, const char* name)
 : QComboBox(parent, name),
-  m_DataTreeFilter(NULL)
+  m_DataTreeFilter(NULL),
+  m_CurrentItem(NULL)
 {
   initialize();
 }
@@ -32,7 +33,8 @@ QmitkDataTreeComboBox::QmitkDataTreeComboBox(QWidget* parent, const char* name)
 */
 QmitkDataTreeComboBox::QmitkDataTreeComboBox(mitk::DataTreeFilter* filter,QWidget* parent, const char* name)
 : QComboBox(parent, name),
-  m_DataTreeFilter(filter)
+  m_DataTreeFilter(filter),
+  m_CurrentItem(NULL)
 {
   initialize();
   SetFilter(filter);
@@ -47,7 +49,8 @@ QmitkDataTreeComboBox::QmitkDataTreeComboBox(mitk::DataTreeFilter* filter,QWidge
 */
 QmitkDataTreeComboBox::QmitkDataTreeComboBox(mitk::DataTreeBase* tree,QWidget* parent, const char* name)
 : QComboBox(parent, name),
-  m_DataTreeFilter(NULL)
+  m_DataTreeFilter(NULL),
+  m_CurrentItem(NULL)
 {
   initialize();
   SetDataTree(tree);
@@ -62,7 +65,8 @@ QmitkDataTreeComboBox::QmitkDataTreeComboBox(mitk::DataTreeBase* tree,QWidget* p
 */
 QmitkDataTreeComboBox::QmitkDataTreeComboBox(mitk::DataTreeIteratorBase* iterator,QWidget* parent, const char* name)
 : QComboBox(parent, name),
-  m_DataTreeFilter(NULL)
+  m_DataTreeFilter(NULL),
+  m_CurrentItem(NULL)
 {
   initialize();
   SetDataTree(iterator);
@@ -396,7 +400,7 @@ void QmitkDataTreeComboBox::generateItems()
 
   // fill rows with property views for the visible items 
   AddItemsToList(m_DataTreeFilter->GetItems(), visibleProps, 0);
-    
+
   try
   {
     mitk::DataTreeFilter::Item* currentItem = const_cast<mitk::DataTreeFilter::Item*>(m_Items.at( QComboBox::currentItem() ));

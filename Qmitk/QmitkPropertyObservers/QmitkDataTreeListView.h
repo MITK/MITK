@@ -83,7 +83,10 @@ PURPOSE.  See the above copyright notices for more information.
  - \e activated(item, bool) is emitted, whenever the selection of any item in the list changes. This can occur as
       a result of user interaction with this widget, of due to a change in the underlying DataTreeFilter or the DataTree itself.
       The bool parameter will tell you if the affected item is now selected or not.
- 
+ - \e clicked(item, bool) is only emitted, when the selection of any item in the list changes because it was clicked in this
+      widget. The signal is not emitted when a selection changes due to changes in the DataTreeFilter.
+      The bool parameter will tell you if the affected item is now selected or not.
+  
  \todo{This class is still work in progress: if further signals are required by anyone, file bugs or mail your requirements.}
  
  
@@ -142,6 +145,8 @@ class QmitkDataTreeListView : public QWidget, public QmitkListViewItemIndex
     void SetFilter(mitk::DataTreeFilter*);
     mitk::DataTreeFilter* GetFilter();
 
+    void SetViewType(const std::string& property, unsigned int type); /// use QmitkPropertyViewFactory::ViewTypes or QmitkPropertyViewFactory::EditorTypes for type
+
     int stretchedColumn();
     void setStretchedColumn(int);
    
@@ -175,10 +180,12 @@ class QmitkDataTreeListView : public QWidget, public QmitkListViewItemIndex
     
   private:
 
+    typedef std::map<std::string, unsigned int> PropertyViewTypeMap;
+
     void QmitkDataTreeListView::AddItemsToList(QWidget* parent, QmitkListViewItemIndex* index,
                                                const mitk::DataTreeFilter::ItemList* items,
                                                const mitk::DataTreeFilter::PropertyList& visibleProps,
-                                               const mitk::DataTreeFilter::PropertyList editableProps);
+                                               const mitk::DataTreeFilter::PropertyList& editableProps);
 
     void connectNotifications();
     void disconnectNotifications();
@@ -202,6 +209,8 @@ class QmitkDataTreeListView : public QWidget, public QmitkListViewItemIndex
     unsigned long  m_UpdateAllConnection;
 
     bool m_SelfCall;
+
+    PropertyViewTypeMap m_ViewTypes;
 };
 
 #endif

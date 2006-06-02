@@ -24,6 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QmitkBoolPropertyEditor.h>
 #include <QmitkStringPropertyView.h>
 #include <QmitkStringPropertyEditor.h>
+#include <QmitkStringPropertyOnDemandEdit.h>
 #include <QmitkColorPropertyView.h>
 #include <QmitkColorPropertyEditor.h>
 #include <QmitkNumberPropertyView.h>
@@ -97,8 +98,15 @@ QWidget* QmitkPropertyViewFactory::CreateEditor(mitk::BaseProperty* property, un
 
   if ( mitk::StringProperty* prop = dynamic_cast<mitk::StringProperty*>(property) )
   {
-    // a string property
-    return new QmitkStringPropertyEditor(prop, parent, name);
+    switch (type)
+    {
+      case etON_DEMAND_EDIT:
+        // a string property
+        return new QmitkStringPropertyOnDemandEdit(prop, parent, name);
+      default:
+        // a string property
+        return new QmitkStringPropertyEditor(prop, parent, name);
+    }
   }
   else if ( mitk::ColorProperty* prop = dynamic_cast<mitk::ColorProperty*>(property) )
   {

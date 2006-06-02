@@ -47,7 +47,7 @@ void QmitkStringPropertyEditor::onTextChanged(const QString& text)
 {
   BeginModifyProperty();  // deregister from events
   
-  m_StringProperty->SetValue(text);
+  m_StringProperty->SetValue(text.ascii());
   
   EndModifyProperty();  // again register for events
 }

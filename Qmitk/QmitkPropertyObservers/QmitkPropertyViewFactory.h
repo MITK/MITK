@@ -25,7 +25,7 @@ class QmitkPropertyViewFactory
   public:
 
     typedef enum ViewTypes { vtDEFAULT = 0  };
-    typedef enum EditorTypes { etDEFAULT = 0  };
+    typedef enum EditorTypes { etDEFAULT = 0, etALWAYS_EDIT = 1, etON_DEMAND_EDIT = 2 };
 
     static QmitkPropertyViewFactory* GetInstance(); // singleton
 

@@ -246,6 +246,19 @@ mitk::DataTreeFilter* QmitkDataTreeListView::GetFilter()
 }
 
 /**
+  Define what kind of widget should be created to display or edit the given property.
+
+  E.g. call SetViewType("name", QmitkPropertyViewFactory::etON_DEMAND_EDIT) to display the "name" property
+  in QLabels which switch to input fields on demand (will only work, when "name" is included in the DataTreeFilter's 
+  list of editable properties - see SetEditableProperties()).
+*/
+void QmitkDataTreeListView::SetViewType(const std::string& property, unsigned int type)
+{
+  if ( property.length() > 0 )
+    m_ViewTypes[property] = type;
+}
+
+/**
   Get the column number that is currently stretched, when free display space has to be filled.
 */
 int QmitkDataTreeListView::stretchedColumn()
@@ -402,7 +415,7 @@ void QmitkDataTreeListView::keyReleaseEvent(QKeyEvent* e)
 void QmitkDataTreeListView::AddItemsToList(QWidget* parent, QmitkListViewItemIndex* index,
                                            const mitk::DataTreeFilter::ItemList* items,
                                            const mitk::DataTreeFilter::PropertyList& visibleProps,
-                                           const mitk::DataTreeFilter::PropertyList editableProps)
+                                           const mitk::DataTreeFilter::PropertyList& editableProps)
 {
   index->m_Grid->setSpacing(4);
       
@@ -431,14 +444,17 @@ void QmitkDataTreeListView::AddItemsToList(QWidget* parent, QmitkListViewItemInd
     {
       QWidget* observerWidget(NULL);
         
+      unsigned int viewType = m_ViewTypes[*nameiter];
+        
       // editable?
       if ( std::find( editableProps.begin(), editableProps.end(), *nameiter ) != editableProps.end() )
       {
+        
         // create editor
         try 
         {
           observerWidget = QmitkPropertyViewFactory::GetInstance()->CreateEditor( itemiter->GetProperty(*nameiter), 
-                                                                                  QmitkPropertyViewFactory::etDEFAULT, 
+                                                                                  viewType,
                                                                                   parent);
         }
         catch ( mitk::DataTreeFilter::NoPermissionException& )
@@ -451,7 +467,7 @@ void QmitkDataTreeListView::AddItemsToList(QWidget* parent, QmitkListViewItemInd
       {
         // create (read-only) view
         observerWidget  = QmitkPropertyViewFactory::GetInstance()->CreateView( itemiter->GetProperty(*nameiter), 
-                                                                               QmitkPropertyViewFactory::vtDEFAULT, 
+                                                                               viewType,
                                                                                parent);
       }
 

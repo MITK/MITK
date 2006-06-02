@@ -21,7 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkUIDGenerator.h>
 #include <ctime>
 #include <sstream>
-#include <cstdlib>
+#include <math.h>
 #include <stdexcept>
 #include <iostream>
 

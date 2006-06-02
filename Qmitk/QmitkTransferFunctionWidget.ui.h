@@ -91,7 +91,3 @@ void QmitkTransferFunctionWidget::UpdateMinMaxLabels()
     m_MaxLabel->setText(QString::number(m_ScalarOpacityFunctionCanvas->GetMax()));
   }
 }
-void QmitkTransferFunctionWidget::PropertyChange( QListViewItem * PropertyItem )
-{
-  return;
-}

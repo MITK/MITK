@@ -152,14 +152,12 @@
 <includes>
     <include location="local" impldecl="in declaration">mitkDataTreeNode.h</include>
     <include location="local" impldecl="in implementation">mitkProperties.h</include>
-    <include location="local" impldecl="in implementation">QmitkDataTreeViewItem.h</include>
 </includes>
 <forwards>
     <forward>class QListViewItem</forward>
 </forwards>
 <slots>
     <slot>SetDataTreeNode( mitk::DataTreeNode * node )</slot>
-    <slot>PropertyChange( QListViewItem * PropertyItem )</slot>
 </slots>
 <functions>
     <function>UpdateMinMaxLabels()</function>

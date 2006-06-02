@@ -1,7 +1,7 @@
 INCLUDE_DIRECTORIES( ${IP_ROOT}/Functionalities/QmitkVolumeVisualization)
 
 # VolumeVisualization
-INCLUDE(${IP_ROOT}/AppModules/QmitkTransferFunctionWidget/QmitkTransferFunctionWidget.cmake)
+# INCLUDE(${IP_ROOT}/AppModules/QmitkTransferFunctionWidget/QmitkTransferFunctionWidget.cmake)
 
 SET( APPMOD_H ${APPMOD_H} ${IP_ROOT}/Functionalities/QmitkVolumeVisualization/QmitkVolumeVisualization.h )
 SET( APPMOD_MOC_H ${APPMOD_MOC_H} ${IP_ROOT}/Functionalities/QmitkVolumeVisualization/QmitkVolumeVisualization.h )

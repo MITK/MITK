@@ -1,6 +1,11 @@
 /**
 \page NewFunctionalityPage How to create a new functionality
 
+\section JavaFuncGen Java GUI Functionality Generator
+
+\b WARNING: This section describes a deprecated mechanism which will soon be 
+superseded by a new one (see sections below).
+
 In the directory Build/Tools/InsertNewFunctionality
 \li On windows: double click on the generated <tt>InsertNewFunctionality.jar</tt>
 \li On linux: <tt>java -jar InsertNewFunctionality.jar</tt>
@@ -11,4 +16,13 @@ The program creates a directory Functionalities/QmitkFooBar, which contains all 
 The QmitkFooBarControls.ui.h should handle the graphical user interface, while the QmitkFooBar.cpp should do the actual work.
 
 Build the project again.
+
+\section CmakeFuncGen CMake-based functionality generator
+
+To be written.
+
+\section BuildSystem Build system for functionalities
+
+To be written.
+
 */

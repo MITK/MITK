@@ -88,20 +88,6 @@ ITK_THREAD_RETURN_TYPE ThreadedFunction(void* param)
   }
   
   userData->semaphore->Up(); // signal "job done"
-  
-  std::cout<<"waiting for main thread's signal... "<<std::endl;;
-  userData->mayIRun->Down(); // wait for signal
-  std::cout<<"got main thread's signal... "<<std::endl;
-
-  // inc variable TOGETHER WITH main thread (using NO mutex)
-  for (int i = 1; i <= 1000000; ++i)
-  {
-    *(userData->intPointer) += 1;
-  }
-  
-  userData->semaphore->Up(); // signal "job done"
-
-
 
  return ITK_THREAD_RETURN_VALUE;
 }
@@ -164,29 +150,6 @@ int mitkITKThreadingTest(int argc, char* argv[])
     std::cout<<"[FAILED] localInt == "<< localInt <<std::endl;
     return EXIT_FAILURE;
   }
-
-  // increase int simultaneously with thread (NOT coordinated by mutex)
-  localInt = 0;
-  m_RunThreadRun->Up(); // let thread work again
-  for (int i = 1; i <= 1000000; ++i)
-  {
-    ++localInt;
-  }
-
-  std::cout<<"waiting for thread's signal"<<std::endl;;
-  m_ResultAvailable->Down(); // wait for thread
-  std::cout<<"got thread's signal"<<std::endl;;
-
-  // last test is supposed to NOT result in localInt == 20000
-  std::cout<<"sharing an unprotected variable among threads";
-  if (localInt == 2000000)
-  {
-    std::cout<<"[FAILED]. THIS IS PROBABLY NO SERIOUS FAILURE! Check test if it fails regularly"<<std::endl;
-    return EXIT_FAILURE;
-  }
-  else
-    std::cout<<"[PASSED] localInt == "<< localInt <<std::endl;
-
 
   // terminating work thread
   std::cout<<"waiting for idling thread ";

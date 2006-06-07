@@ -142,8 +142,9 @@ void mitk::PointSetMapper2D::Paint(mitk::BaseRenderer * renderer)
 
     Point3D p;                      // currently visited point 
     Point3D lastP;                  // last visited point 
-    Vector3D vec = (0.0, 0.0, 0.0); // p - lastP
+    Vector3D vec;                   // p - lastP
     Vector3D lastVec;               // lastP - point before lastP
+    vec.Fill(0);
 
     mitk::Point3D projected_p;      // p projected on viewplane
 

@@ -25,6 +25,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkMaterialProperty.h"
 #include "mitkVtkRepresentationProperty.h"
 #include "mitkVtkInterpolationProperty.h"
+#include "mitkVtkScalarModeProperty.h"
 #include <vtkActor.h>
 #include <vtkProperty.h>
 #include <vtkPolyDataMapper.h>
@@ -135,7 +136,8 @@ void mitk::SurfaceVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
 
 void mitk::SurfaceVtkMapper3D::ApplyProperties(vtkActor* actor, mitk::BaseRenderer* renderer)
 {
-  mitk::MaterialProperty* materialProperty = dynamic_cast<mitk::MaterialProperty *>(this->GetDataTreeNode()->GetProperty("material").GetPointer() );
+  mitk::MaterialProperty* materialProperty;
+  this->GetDataTreeNode()->GetProperty(materialProperty, "material");
   if ( materialProperty != NULL )
   {
     if ( materialProperty->GetRenderer() == NULL || materialProperty->GetRenderer() == renderer )
@@ -159,20 +161,72 @@ void mitk::SurfaceVtkMapper3D::ApplyProperties(vtkActor* actor, mitk::BaseRender
     Superclass::ApplyProperties( m_Actor, renderer ) ;
     m_VtkPolyDataMapper->ScalarVisibilityOff();
   }
+
+  mitk::LookupTableProperty::Pointer lookupTableProp;
+  this->GetDataTreeNode()->GetProperty(lookupTableProp, "LookupTable", renderer);
+  if (lookupTableProp.IsNotNull() )
+	{
+    m_VtkPolyDataMapper->SetLookupTable(lookupTableProp->GetLookupTable().GetVtkLookupTable());
+  }
+
+  mitk::LevelWindow levelWindow;
+  if(this->GetDataTreeNode()->GetLevelWindow(levelWindow, renderer, "levelWindow"))
+  {
+    m_VtkPolyDataMapper->SetScalarRange(levelWindow.GetMin(),levelWindow.GetMax());
+  }
+  else
+  if(this->GetDataTreeNode()->GetLevelWindow(levelWindow, renderer))
+  {
+    m_VtkPolyDataMapper->SetScalarRange(levelWindow.GetMin(),levelWindow.GetMax());
+  }
   
-  bool useCellData;
-  if (dynamic_cast<mitk::BoolProperty *>(this->GetDataTreeNode()->GetProperty("useCellDataForColouring").GetPointer()) == NULL)
-    useCellData = false;
-  else
-    useCellData = dynamic_cast<mitk::BoolProperty *>(this->GetDataTreeNode()->GetProperty("useCellDataForColouring").GetPointer())->GetValue();
+  mitk::VtkRepresentationProperty* representationProperty;
+  this->GetDataTreeNode()->GetProperty(representationProperty, "representation", renderer);
+  if ( representationProperty != NULL )
+    m_Actor->GetProperty()->SetRepresentation( representationProperty->GetVtkRepresentation() );
+  
+  mitk::VtkInterpolationProperty* interpolationProperty;
+  this->GetDataTreeNode()->GetProperty(interpolationProperty, "interpolation", renderer);
+  if ( interpolationProperty != NULL )
+    m_Actor->GetProperty()->SetInterpolation( interpolationProperty->GetVtkInterpolation() );
+  
+  bool scalarVisibility = false;
+  this->GetDataTreeNode()->GetBoolProperty("scalar visibility", scalarVisibility);
+  m_VtkPolyDataMapper->SetScalarVisibility( (scalarVisibility ? 1 : 0) );
 
-  bool usePointData;
-  if (dynamic_cast<mitk::BoolProperty *>(this->GetDataTreeNode()->GetProperty("usePointDataForColouring").GetPointer()) == NULL)
-    usePointData = false;
-  else
-    usePointData = dynamic_cast<mitk::BoolProperty *>(this->GetDataTreeNode()->GetProperty("usePointDataForColouring").GetPointer())->GetValue();
+  if(scalarVisibility)
+  {
+    mitk::VtkScalarModeProperty* scalarMode;
+    if(this->GetDataTreeNode()->GetProperty(scalarMode, "scalar mode", renderer))
+    {
+      m_VtkPolyDataMapper->SetScalarMode(scalarMode->GetVtkScalarMode());
+    }
+    else
+      m_VtkPolyDataMapper->SetScalarModeToDefault();
 
-  if (useCellData)
+    bool colorMode = false;
+    this->GetDataTreeNode()->GetBoolProperty("color mode", colorMode);
+    m_VtkPolyDataMapper->SetColorMode( (colorMode ? 1 : 0) );
+
+    float scalarsMin = 0;
+    if (dynamic_cast<mitk::FloatProperty *>(this->GetDataTreeNode()->GetProperty("ScalarsRangeMinimum").GetPointer()) != NULL)
+      scalarsMin = dynamic_cast<mitk::FloatProperty*>(this->GetDataTreeNode()->GetProperty("ScalarsRangeMinimum").GetPointer())->GetValue();
+
+    float scalarsMax = 0.1;
+    if (dynamic_cast<mitk::FloatProperty *>(this->GetDataTreeNode()->GetProperty("ScalarsRangeMaximum").GetPointer()) != NULL)
+      scalarsMax = dynamic_cast<mitk::FloatProperty*>(this->GetDataTreeNode()->GetProperty("ScalarsRangeMaximum").GetPointer())->GetValue();
+
+    m_VtkPolyDataMapper->SetScalarRange(scalarsMin,scalarsMax);
+  }
+
+  // deprecated settings
+  bool deprecatedUseCellData = false;
+  this->GetDataTreeNode()->GetBoolProperty("deprecated useCellDataForColouring", deprecatedUseCellData);
+
+  bool deprecatedUsePointData = false;
+  this->GetDataTreeNode()->GetBoolProperty("deprecated usePointDataForColouring", deprecatedUsePointData);
+
+  if (deprecatedUseCellData)
   {
     m_VtkPolyDataMapper->SetColorModeToDefault();
     m_VtkPolyDataMapper->SetScalarRange(0,255);
@@ -182,7 +236,7 @@ void mitk::SurfaceVtkMapper3D::ApplyProperties(vtkActor* actor, mitk::BaseRender
     m_Actor->GetProperty()->SetSpecularPower (50);
     m_Actor->GetProperty()->SetInterpolationToPhong();
   }
-  else if (usePointData)
+  else if (deprecatedUsePointData)
   {
     float scalarsMin = 0;
     if (dynamic_cast<mitk::FloatProperty *>(this->GetDataTreeNode()->GetProperty("ScalarsRangeMinimum").GetPointer()) != NULL)
@@ -200,41 +254,13 @@ void mitk::SurfaceVtkMapper3D::ApplyProperties(vtkActor* actor, mitk::BaseRender
     m_Actor->GetProperty()->SetInterpolationToPhong();
   }
 
-  int scalarMode = VTK_COLOR_MODE_DEFAULT;
-  if(this->GetDataTreeNode()->GetIntProperty("scalar mode", scalarMode, renderer))
+  int deprecatedScalarMode = VTK_COLOR_MODE_DEFAULT;
+  if(this->GetDataTreeNode()->GetIntProperty("deprecated scalar mode", deprecatedScalarMode, renderer))
   {
-    m_VtkPolyDataMapper->SetScalarMode(scalarMode);
+    m_VtkPolyDataMapper->SetScalarMode(deprecatedScalarMode);
     m_VtkPolyDataMapper->ScalarVisibilityOn();
     m_Actor->GetProperty()->SetSpecular (1);
     m_Actor->GetProperty()->SetSpecularPower (50);
     //m_Actor->GetProperty()->SetInterpolationToPhong();
   }
-
-  mitk::LookupTableProperty::Pointer lookupTableProp;
-  lookupTableProp = dynamic_cast<mitk::LookupTableProperty*>(this->GetDataTreeNode()->GetProperty("LookupTable", renderer).GetPointer());
-	if (lookupTableProp.IsNotNull() )
-	{
-    m_VtkPolyDataMapper->SetLookupTable(lookupTableProp->GetLookupTable().GetVtkLookupTable());
-  }
-
-  mitk::LevelWindow levelWindow;
-  if(this->GetDataTreeNode()->GetLevelWindow(levelWindow, renderer, "levelWindow"))
-  {
-    m_VtkPolyDataMapper->SetScalarRange(levelWindow.GetMin(),levelWindow.GetMax());
-  }
-  else
-  if(this->GetDataTreeNode()->GetLevelWindow(levelWindow, renderer))
-  {
-    m_VtkPolyDataMapper->SetScalarRange(levelWindow.GetMin(),levelWindow.GetMax());
-  }
-
-  
-  mitk::VtkRepresentationProperty* representationProperty = dynamic_cast<mitk::VtkRepresentationProperty *>(this->GetDataTreeNode()->GetProperty("representation").GetPointer() );
-  if ( representationProperty != NULL )
-    m_Actor->GetProperty()->SetRepresentation( representationProperty->GetVtkRepresentation() );
-  
-  mitk::VtkInterpolationProperty* interpolationProperty = dynamic_cast<mitk::VtkInterpolationProperty *>(this->GetDataTreeNode()->GetProperty("interpolation").GetPointer() );
-  if ( interpolationProperty != NULL )
-    m_Actor->GetProperty()->SetInterpolation( interpolationProperty->GetVtkInterpolation() );
-  
 }

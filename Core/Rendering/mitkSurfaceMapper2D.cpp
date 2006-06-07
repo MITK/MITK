@@ -24,6 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkSurface.h"
 #include "mitkColorProperty.h"
 #include "mitkProperties.h"
+#include "mitkVtkScalarModeProperty.h"
 #include "mitkAbstractTransformGeometry.h"
 
 #include <vtkPolyData.h>
@@ -38,6 +39,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkDataArray.h>
 #include <vtkPolyData.h>
 #include <vtkLinearTransform.h>
+#include <vtkAbstractMapper.h>
 
 //##ModelId=3EF180540006
 mitk::SurfaceMapper2D::SurfaceMapper2D()
@@ -74,10 +76,10 @@ void mitk::SurfaceMapper2D::SetDataTreeNode( mitk::DataTreeNode::Pointer node )
   Superclass::SetDataTreeNode( node );
 
   bool useCellData;
-  if (dynamic_cast<mitk::BoolProperty *>(node->GetProperty("useCellDataForColouring").GetPointer()) == NULL)
+  if (dynamic_cast<mitk::BoolProperty *>(node->GetProperty("deprecated useCellDataForColouring").GetPointer()) == NULL)
     useCellData = false;
   else
-    useCellData = dynamic_cast<mitk::BoolProperty *>(node->GetProperty("useCellDataForColouring").GetPointer())->GetValue();
+    useCellData = dynamic_cast<mitk::BoolProperty *>(node->GetProperty("deprecated useCellDataForColouring").GetPointer())->GetValue();
 
   if (!useCellData)
   {
@@ -90,10 +92,10 @@ void mitk::SurfaceMapper2D::SetDataTreeNode( mitk::DataTreeNode::Pointer node )
       float range[2];
     #endif
     
-    mitk::Surface::Pointer input  = const_cast<mitk::Surface*>(this->GetInput());
+    mitk::Surface::Pointer input  = const_cast< mitk::Surface* >(dynamic_cast<const mitk::Surface*>( this->GetDataTreeNode()->GetData() ));
     if(input.IsNull()) return;
-    const TimeSlicedGeometry* inputTimeGeometry = input->GetTimeSlicedGeometry();
-    if(( inputTimeGeometry == NULL ) || ( inputTimeGeometry->GetTimeSteps() == 0 ) ) return;
+    const TimeSlicedGeometry::Pointer inputTimeGeometry = input->GetTimeSlicedGeometry();
+    if(( inputTimeGeometry.IsNull() ) || ( inputTimeGeometry->GetTimeSteps() == 0 ) ) return;
     for (unsigned int timestep=0; timestep<inputTimeGeometry->GetTimeSteps(); timestep++)
     {
       vtkPolyData * vtkpolydata = input->GetVtkPolyData( timestep );
@@ -135,12 +137,6 @@ void mitk::SurfaceMapper2D::Paint(mitk::BaseRenderer * renderer)
   const TimeSlicedGeometry* inputTimeGeometry = input->GetTimeSlicedGeometry();
   if(( inputTimeGeometry == NULL ) || ( inputTimeGeometry->GetTimeSteps() == 0 ) )
     return;
-
-  bool useCellData;
-  if (dynamic_cast<mitk::BoolProperty *>(this->GetDataTreeNode()->GetProperty("useCellDataForColouring").GetPointer()) == NULL)
-    useCellData = false;
-  else
-    useCellData = dynamic_cast<mitk::BoolProperty *>(this->GetDataTreeNode()->GetProperty("useCellDataForColouring").GetPointer())->GetValue();
 
   if (dynamic_cast<mitk::IntProperty *>(this->GetDataTreeNode()->GetProperty("lineWidth").GetPointer()) == NULL)
     m_LineWidth = 1;
@@ -190,7 +186,7 @@ void mitk::SurfaceMapper2D::Paint(mitk::BaseRenderer * renderer)
         AbstractTransformGeometry::ConstPointer surfaceAbstractGeometry = dynamic_cast<const AbstractTransformGeometry*>(input->GetTimeSlicedGeometry()->GetGeometry3D(0));
         if(surfaceAbstractGeometry.IsNotNull()) //@todo substitude by operator== after implementation, see bug id 28
         {
-          PaintCells(vtkpolydata, worldGeometry, renderer->GetDisplayGeometry(), vtktransform, m_LUT, useCellData);
+          PaintCells(renderer, vtkpolydata, worldGeometry, renderer->GetDisplayGeometry(), vtktransform, m_LUT);
           return;
         }
         else
@@ -239,12 +235,39 @@ void mitk::SurfaceMapper2D::Paint(mitk::BaseRenderer * renderer)
     ApplyProperties(renderer);
 
     // travers the cut contour
-    PaintCells(m_Cutter->GetOutput(), worldGeometry, renderer->GetDisplayGeometry(), vtktransform, m_LUT, useCellData );
+    PaintCells(renderer, m_Cutter->GetOutput(), worldGeometry, renderer->GetDisplayGeometry(), vtktransform, m_LUT);
   }
 }
 
-void mitk::SurfaceMapper2D::PaintCells(vtkPolyData* contour, const mitk::Geometry2D* worldGeometry, const mitk::DisplayGeometry* displayGeometry, vtkLinearTransform * vtktransform, vtkLookupTable *lut, bool useCellData)
+void mitk::SurfaceMapper2D::PaintCells(mitk::BaseRenderer* renderer, vtkPolyData* contour, const mitk::Geometry2D* worldGeometry, const mitk::DisplayGeometry* displayGeometry, vtkLinearTransform * vtktransform, vtkLookupTable *lut)
 {
+  // deprecated settings
+  bool usePointData = false;
+
+  bool useCellData = false;
+  this->GetDataTreeNode()->GetBoolProperty("deprecated useCellDataForColouring", useCellData);
+
+  bool scalarVisibility = false;
+  this->GetDataTreeNode()->GetBoolProperty("scalar visibility", scalarVisibility);
+
+  if(scalarVisibility)
+  {
+    mitk::VtkScalarModeProperty* scalarMode;
+    if(this->GetDataTreeNode()->GetProperty(scalarMode, "scalar mode", renderer))
+    {
+      if( (scalarMode->GetVtkScalarMode() == VTK_SCALAR_MODE_USE_POINT_DATA) ||
+          (scalarMode->GetVtkScalarMode() == VTK_SCALAR_MODE_DEFAULT) )
+      {
+        usePointData = true;
+      }
+      if(scalarMode->GetVtkScalarMode() == VTK_SCALAR_MODE_USE_CELL_DATA)
+      {
+        useCellData = true;
+      }
+    }
+  }
+
+
   vtkPoints    *vpoints = contour->GetPoints();
   vtkDataArray *vpointscalars = contour->GetPointData()->GetScalars();
 
@@ -304,7 +327,7 @@ void mitk::SurfaceMapper2D::PaintCells(vtkPolyData* contour, const mitk::Geometr
         glVertex2f(last[0], last[1]);
         glVertex2f(p2d[0], p2d[1]);
       }
-      else if (vpointscalars != NULL )
+      else if (usePointData && vpointscalars != NULL )
       {
         lut->GetColor( vpointscalars->GetComponent(cell[j-1],0),color);
         glColor3f(color[0],color[1],color[2]);

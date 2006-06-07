@@ -79,6 +79,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkLevelWindowProperty.h"
 #include "mitkVtkRepresentationProperty.h"
 #include "mitkVtkInterpolationProperty.h"
+#include "mitkVtkScalarModeProperty.h"
 #include "mitkParRecFileReader.h"
 #include "mitkImage.h"
 #include "mitkLookupTableProperty.h"
@@ -402,7 +403,9 @@ void mitk::DataTreeNodeFactory::ReadFileTypeVTK()
       this->SetDefaultSurfaceProperties( node );
       if (reader->GetOutput()->GetPointData()->GetScalars() != 0) 
       {
-        node->SetProperty( "usePointDataForColouring", new mitk::BoolProperty(true) );
+        node->SetProperty( "scalar visibility", new mitk::BoolProperty(true) );
+        node->SetProperty( "color mode", new mitk::BoolProperty(true) );
+        node->SetProperty( "scalar mode", new mitk::VtkScalarModeProperty );
       }
     }
     reader->Delete();
@@ -1664,14 +1667,18 @@ void mitk::DataTreeNodeFactory::SetDefaultSurfaceProperties(mitk::DataTreeNode::
   node->SetProperty( "lineWidth", new mitk::IntProperty(2) );
   node->SetProperty( "layer", new mitk::IntProperty(0));
   node->SetProperty( "material", new mitk::MaterialProperty( 1.0, 1.0, 1.0, 1.0, node.GetPointer() ) );
+  node->SetProperty( "scalar visibility", new mitk::BoolProperty(false) );
+  node->SetProperty( "color mode", new mitk::BoolProperty(false) );
+  node->SetProperty( "representation", new mitk::VtkRepresentationProperty );
+  node->SetProperty( "interpolation", new mitk::VtkInterpolationProperty );
   mitk::Surface::Pointer surface = dynamic_cast<Surface*>(node->GetData());
-  if(surface.IsNotNull()){
-    if (surface->GetVtkPolyData() != 0) {
-      if (surface->GetVtkPolyData()->GetPointData() != 0) {
-        if (surface->GetVtkPolyData()->GetPointData()->GetScalars() != 0) {
-          node->SetProperty( "usePointDataForColouring", new mitk::BoolProperty(true) );
-        }
-      }
+  if(surface.IsNotNull())
+  {
+    if((surface->GetVtkPolyData() != 0) && (surface->GetVtkPolyData()->GetPointData() != 0) && (surface->GetVtkPolyData()->GetPointData()->GetScalars() != 0))
+    {
+      node->SetProperty( "scalar visibility", new mitk::BoolProperty(true) );
+      node->SetProperty( "color mode", new mitk::BoolProperty(true) );
+      node->SetProperty( "scalar mode", new mitk::VtkScalarModeProperty );
     }
   }
 }

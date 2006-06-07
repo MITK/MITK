@@ -71,7 +71,7 @@ public:
   // overwritten to initialize lookup table for point scalar data
  void SetDataTreeNode( DataTreeNode::Pointer node );
 
-  void PaintCells(vtkPolyData* contour, const Geometry2D* worldGeometry, const DisplayGeometry* displayGeometry, vtkLinearTransform * vtktransform, vtkLookupTable *lut = NULL, bool useCellData=false);
+  void PaintCells(mitk::BaseRenderer* renderer, vtkPolyData* contour, const Geometry2D* worldGeometry, const DisplayGeometry* displayGeometry, vtkLinearTransform * vtktransform, vtkLookupTable *lut = NULL);
 protected:
   //##ModelId=3EF180540006
   SurfaceMapper2D();

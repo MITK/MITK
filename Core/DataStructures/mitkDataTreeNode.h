@@ -122,7 +122,18 @@ public:
 
   //##ModelId=3E860A6601DB
   virtual void CopyInformation(const itk::DataObject *data);
-  //##ModelId=3E3FE0420273
+
+  //##Documentation
+  //## @brief Set the property (instance of BaseProperty) with key @a propertyKey to the PropertyList 
+  //## of the @a renderer (if NULL, use BaseRenderer-independent PropertyList).
+  //## 
+  //## If @a renderer is @a NULL the property is set in the BaseRenderer-independent 
+  //## PropertyList of this DataTreeNode.
+  //## @sa GetProperty
+  //## @sa m_PropertyList
+  //## @sa m_MapOfPropertyLists
+  void SetProperty(const char *propertyKey, BaseProperty* property, const mitk::BaseRenderer* renderer = NULL);	
+
   //##Documentation
   //## @brief Get the PropertyList of the @a renderer. If @a renderer is @a
   //## NULL, the BaseRenderer-independent PropertyList of this DataTreeNode
@@ -145,7 +156,55 @@ public:
   //## @sa m_MapOfPropertyLists
   mitk::BaseProperty::Pointer GetProperty(const char *propertyKey, const mitk::BaseRenderer* renderer = NULL, bool* defaultRendererUsed = NULL) const;
 
-  void SetProperty(const char *propertyKey, BaseProperty* property, const mitk::BaseRenderer* renderer = NULL);	
+  //##Documentation
+  //## @brief Get the property of type T with key @a propertyKey from the PropertyList 
+  //## of the @a renderer, if available there, otherwise use the BaseRenderer-independent PropertyList.
+  //## 
+  //## If @a renderer is @a NULL or the @a propertyKey cannot be found 
+  //## in the PropertyList specific to @a renderer or is disabled there, the BaseRenderer-independent 
+  //## PropertyList of this DataTreeNode is queried.
+  //## @sa GetPropertyList
+  //## @sa m_PropertyList
+  //## @sa m_MapOfPropertyLists
+  template <typename T>
+    bool GetProperty(itk::SmartPointer<T> &property, const char *propertyKey, const mitk::BaseRenderer* renderer = NULL, bool* defaultRendererUsed = NULL) const
+  {
+    property = dynamic_cast<T *>(GetProperty(propertyKey, renderer, defaultRendererUsed).GetPointer());
+    return property.IsNotNull();
+  }
+
+  //##Documentation
+  //## @brief Get the property of type T with key @a propertyKey from the PropertyList 
+  //## of the @a renderer, if available there, otherwise use the BaseRenderer-independent PropertyList.
+  //## 
+  //## If @a renderer is @a NULL or the @a propertyKey cannot be found 
+  //## in the PropertyList specific to @a renderer or is disabled there, the BaseRenderer-independent 
+  //## PropertyList of this DataTreeNode is queried.
+  //## @sa GetPropertyList
+  //## @sa m_PropertyList
+  //## @sa m_MapOfPropertyLists
+  template <typename T>
+    bool GetProperty(T* &property, const char *propertyKey, const mitk::BaseRenderer* renderer = NULL, bool* defaultRendererUsed = NULL) const
+  {
+    property = dynamic_cast<T *>(GetProperty(propertyKey, renderer, defaultRendererUsed).GetPointer());
+    return property!=NULL;
+  }
+
+  //##Documentation
+  //## @brief Convenience access method for GenericProperty<T> properties 
+  //## (T being the type of the second parameter)
+  //## @return @a true property was found
+  template <typename T>
+    bool GetPropertyValue(const char* propertyKey, T & value, mitk::BaseRenderer* renderer=NULL, bool* defaultRendererUsed = NULL)
+  {
+    GenericProperty<T>* gp= dynamic_cast<GenericProperty<T>*>(GetProperty(propertyKey, renderer, defaultRendererUsed).GetPointer());
+    if ( gp != NULL )
+    {
+      value = gp->GetValue();
+      return true;
+    }
+    return false;
+  }
 
   //##Documentation
   //## @brief Convenience access method for bool properties (instances of

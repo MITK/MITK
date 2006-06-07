@@ -19,10 +19,14 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkSurface.h>
 #include <vtkDataReader.h>
 #include <vtkPolyDataReader.h>
+#if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
+#include <vtkXMLPolyDataReader.h>
+#endif
+#include <itksys/SystemTools.hxx>
 
 
 mitk::VtkSurfaceReader::VtkSurfaceReader()
-    : m_FileName("")
+: m_FileName("")
 {
 }
 
@@ -34,32 +38,59 @@ void mitk::VtkSurfaceReader::GenerateData()
 {
   if( m_FileName != "")
   {
-  std::cout << "Loading " << m_FileName << " as vtk" << std::flush;
+    bool success = false;
+    std::cout << "Loading " << m_FileName << " as vtk" << std::flush;
 
-  ///We create a Generic Reader to test de .vtk/
-  vtkDataReader *chooser=vtkDataReader::New();
-  chooser->SetFileName(m_FileName.c_str() );
-
-  if( chooser->IsFilePolyData())
-  {
-    ///PolyData/
-    std::cout << "PolyData" << std::endl;
-    vtkPolyDataReader *reader = vtkPolyDataReader::New();
-    reader->SetFileName( m_FileName.c_str() );
-    reader->Update();
-
-    if ( reader->GetOutput() != NULL )
+    std::string ext = itksys::SystemTools::GetFilenameLastExtension(m_FileName);
+    ext = itksys::SystemTools::LowerCase(ext);
+    if (ext == ".vtk")
     {
-      mitk::Surface::Pointer output = this->GetOutput();
-      output->SetVtkPolyData( reader->GetOutput() );
+      ///We create a Generic Reader to test de .vtk/
+      vtkDataReader *chooser=vtkDataReader::New();
+      chooser->SetFileName(m_FileName.c_str() );
+      if( chooser->IsFilePolyData())
+      {
+        ///PolyData/
+        itkDebugMacro( << "PolyData" );
+        vtkPolyDataReader *reader = vtkPolyDataReader::New();
+        reader->SetFileName( m_FileName.c_str() );
+        reader->Update();
+
+        if ( reader->GetOutput() != NULL )
+        {
+          mitk::Surface::Pointer output = this->GetOutput();
+          output->SetVtkPolyData( reader->GetOutput() );
+          success = true;
+        }
+        reader->Delete();
+      }
     }
-    reader->Delete();
-  }
-  else
-  {
-    std::cerr << " ... sorry, this .vtk format is not supported yet."<<std::endl;
-  }
-  chooser->Delete();
+#if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
+    else
+    if (ext == ".vtp")
+    {
+      vtkXMLPolyDataReader *reader=vtkXMLPolyDataReader::New();
+      if( reader->CanReadFile(m_FileName.c_str()) )
+      {
+        ///PolyData/
+        itkDebugMacro( << "XMLPolyData" );
+        reader->SetFileName( m_FileName.c_str() );
+        reader->Update();
+
+        if ( reader->GetOutput() != NULL )
+        {
+          mitk::Surface::Pointer output = this->GetOutput();
+          output->SetVtkPolyData( reader->GetOutput() );
+          success = true;
+        }
+        reader->Delete();
+      }
+    }
+#endif
+    if(!success)
+    {
+      itkWarningMacro( << " ... sorry, this .vtk format is not supported yet." );
+    }
   }
 }
 
@@ -69,31 +100,32 @@ bool mitk::VtkSurfaceReader::CanReadFile(const std::string filename, const std::
   if(  filename == "" )
     return false;
 
-  bool extensionFound = false;
-  std::string::size_type VTKPos = filename.rfind(".vtk");
-  if ((VTKPos != std::string::npos)
-      && (VTKPos == filename.length() - 4))
-    {
-    extensionFound = true;
-    }
-
-  VTKPos = filename.rfind(".VTK");
-  if ((VTKPos != std::string::npos)
-      && (VTKPos == filename.length() - 4))
-    {
-    extensionFound = true;
-    }
-
-  if (extensionFound)
+  std::string ext = itksys::SystemTools::GetFilenameLastExtension(filename);
+  ext = itksys::SystemTools::LowerCase(ext);
+  if (ext == ".vtk")
   {
     vtkDataReader *chooser=vtkDataReader::New();
     chooser->SetFileName(filename.c_str() );
     if(!chooser->IsFilePolyData())
+    {
+      chooser->Delete();
       return false;
-
+    }
   }
+#if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
   else
-    return false;
+    if (ext == ".vtp")
+    {
+      vtkXMLPolyDataReader *chooser=vtkXMLPolyDataReader::New();
+      if(!chooser->CanReadFile(filename.c_str()))
+      {
+        chooser->Delete();
+        return false;
+      }
+    }
+#endif
+    else
+      return false;
 
   return true;
 }

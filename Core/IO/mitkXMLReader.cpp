@@ -569,7 +569,7 @@ namespace mitk {
   {
     std::string className = GetProperty( XMLIO::CLASS_NAME );
 
-    std::cout << "creat class: " << className << std::endl;
+    std::cout << "create class: " << className << std::endl;
 
     if ( className.empty() )
       return NULL;

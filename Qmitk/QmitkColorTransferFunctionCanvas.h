@@ -37,7 +37,7 @@ class QmitkColorTransferFunctionCanvas : public QmitkTransferFunctionCanvas {
       setEnabled(true);
       update();
     };
-    void AddFunctionPoint(vtkFloatingPointType x,vtkFloatingPointType val) {
+    void AddFunctionPoint(vtkFloatingPointType x,vtkFloatingPointType /*val*/) {
       m_ColorTransferFunction->AddRGBPoint(x,m_ColorTransferFunction->GetRedValue(x),m_ColorTransferFunction->GetGreenValue(x),m_ColorTransferFunction->GetBlueValue(x));  
     };  
     void RemoveFunctionPoint(vtkFloatingPointType x) {

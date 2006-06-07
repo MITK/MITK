@@ -55,7 +55,7 @@ class QmitkPiecewiseFunctionCanvas : public QmitkTransferFunctionCanvas {
     int GetFunctionSize() {
       return m_PiecewiseFunction->GetSize();
     }
-    void DoubleClickOnHandle(int handle) {};
+    void DoubleClickOnHandle(int /*handle*/) {};
     void MoveFunctionPoint(int index, std::pair<vtkFloatingPointType,vtkFloatingPointType> pos);
   protected: 
     vtkPiecewiseFunction* m_PiecewiseFunction;

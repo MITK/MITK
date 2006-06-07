@@ -188,7 +188,7 @@ void QmitkSliderLevelWindowWidget::resizeEvent ( QResizeEvent * event ) {
 /**
 *
 */
-void QmitkSliderLevelWindowWidget::mouseReleaseEvent( QMouseEvent* mouseEvent ) 
+void QmitkSliderLevelWindowWidget::mouseReleaseEvent( QMouseEvent* /* mouseEvent  */) 
 {
   mouseDown = false;
 }

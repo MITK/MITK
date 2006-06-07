@@ -82,7 +82,7 @@ void QmitkPrimitiveMovieNavigator::next()
 }
 
 
-void QmitkPrimitiveMovieNavigator::spinBoxValueChanged(int value)
+void QmitkPrimitiveMovieNavigator::spinBoxValueChanged(int)
 {
   if(!m_InRefetch) 
   {

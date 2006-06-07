@@ -39,7 +39,7 @@ mitk::DataTreeNodeSource::~DataTreeNodeSource()
 
 
 
-itk::DataObject::Pointer mitk::DataTreeNodeSource::MakeOutput ( unsigned int idx )
+itk::DataObject::Pointer mitk::DataTreeNodeSource::MakeOutput ( unsigned int /*idx*/ )
 {
     return OutputType::New().GetPointer();
 }

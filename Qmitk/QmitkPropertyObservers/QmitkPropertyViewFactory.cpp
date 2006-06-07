@@ -43,8 +43,7 @@ QmitkPropertyViewFactory::QmitkPropertyViewFactory()
 QmitkPropertyViewFactory::~QmitkPropertyViewFactory()
 {
 }
-
-QWidget* QmitkPropertyViewFactory::CreateView(const mitk::BaseProperty* property, unsigned int type, QWidget* parent, const char* name)
+QWidget* QmitkPropertyViewFactory::CreateView(const mitk::BaseProperty* property, unsigned int /*type*/, QWidget* parent, const char* name)
 {
   if ( const mitk::StringProperty* prop = dynamic_cast<const mitk::StringProperty*>(property) )
   {

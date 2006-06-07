@@ -75,7 +75,7 @@ namespace mitk {
       /**
        *
        */
-      virtual bool WriteXMLData( XMLWriter& xmlWriter )
+      virtual bool WriteXMLData( XMLWriter& /*xmlWriter*/ )
       {
         return true;
       }
@@ -83,7 +83,7 @@ namespace mitk {
       /**
        *
        */
-      virtual bool ReadXMLData( XMLReader& xmlReader )
+      virtual bool ReadXMLData( XMLReader& /*xmlReader*/ )
       {
         return true;
       }

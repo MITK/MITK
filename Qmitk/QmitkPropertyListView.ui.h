@@ -89,7 +89,6 @@ void QmitkPropertyListView::SetPropertyList( mitk::PropertyList *propertyList )
         itk::MemberCommand<QmitkPropertyListView>::New();
       propertyListDeletedCommand->SetCallbackFunction(this, &QmitkPropertyListView::PropertyListDeleted);
       m_PropertyList->AddObserver(itk::DeleteEvent(), propertyListDeletedCommand);
-      int row = 0;
       const mitk::PropertyList::PropertyMap* propertyMap = propertyList->GetMap();
 
       // from c'tor
@@ -214,7 +213,7 @@ void QmitkPropertyListView::SetMultiMode( std::vector<std::string> propertyNames
   }
   m_MultiMode = true;
 }
-void QmitkPropertyListView::PropertyListDeleted(const itk::Object *caller, const itk::EventObject &event)
+void QmitkPropertyListView::PropertyListDeleted(const itk::Object *caller, const itk::EventObject&)
 {
   const mitk::PropertyList* propList = dynamic_cast<const mitk::PropertyList*>(caller);
   if (propList)

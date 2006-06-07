@@ -50,7 +50,7 @@ void QmitkTwoButtonNavigator::init()
   m_InRefetch = true; // this avoids trying to use m_Stepper until it is set to something != NULL (additionally to the avoiding recursions during refetching)
 }
 
-void QmitkTwoButtonNavigator::SpinBoxValueChanged(int value)
+void QmitkTwoButtonNavigator::SpinBoxValueChanged(int)
 {
   if(!m_InRefetch)
     m_Stepper->SetPos(m_SpinBox->value());

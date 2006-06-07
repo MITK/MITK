@@ -24,7 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 QmitkColorTransferFunctionCanvas::QmitkColorTransferFunctionCanvas(QWidget * parent, const char * name, WFlags f) : QmitkTransferFunctionCanvas(parent,name,f), m_ColorTransferFunction(0) { 
 
 }
-void QmitkColorTransferFunctionCanvas::paintEvent( QPaintEvent* e ) {
+void QmitkColorTransferFunctionCanvas::paintEvent( QPaintEvent* ) {
 
   QPainter painter( this );
   painter.save();
@@ -55,12 +55,12 @@ void QmitkColorTransferFunctionCanvas::paintEvent( QPaintEvent* e ) {
   }
   painter.restore();
 }
-int QmitkColorTransferFunctionCanvas::GetNearHandle(int x,int y,unsigned int maxSquaredDistance)
+int QmitkColorTransferFunctionCanvas::GetNearHandle(int x,int /*y*/,unsigned int maxSquaredDistance)
 {
   for (int i=0; i< this->GetFunctionSize(); i++)
   {
     std::pair<int,int> point = this->FunctionToCanvas(std::make_pair(GetFunctionX(i),(vtkFloatingPointType)0.0));
-    if ((point.first-x)*(point.first-x) < maxSquaredDistance)
+    if ((unsigned int)((point.first-x)*(point.first-x)) < maxSquaredDistance)
     {
       return i;
     }

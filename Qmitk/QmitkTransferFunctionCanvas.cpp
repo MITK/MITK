@@ -56,7 +56,7 @@ void QmitkTransferFunctionCanvas::mouseDoubleClickEvent(QMouseEvent* mouseEvent)
 }
 /** returns index of a near handle or -1 if none is near
 */
-int QmitkTransferFunctionCanvas::GetNearHandle(int x,int y,unsigned int maxSquaredDistance)
+int QmitkTransferFunctionCanvas::GetNearHandle(int /*x*/,int /*y*/,unsigned int /*maxSquaredDistance*/)
 {
   return -1;
 }
@@ -150,7 +150,7 @@ void QmitkTransferFunctionCanvas::PaintHistogram(QPainter &p)
     p.setPen(Qt::blue);
     float scaleFactor = (float)(this->GetHistogram()->GetSize()[0]) / width();
     float maxFreqLog = vcl_log(mitk::HistogramGenerator::CalculateMaximumFrequency(this->GetHistogram()));
-    for (unsigned int x = 0; x<width(); x++)
+    for (int x = 0; x<width(); x++)
     {
       int tfIndex = static_cast<int> ( x * scaleFactor );
       float freq = this->GetHistogram()->GetFrequency(tfIndex);

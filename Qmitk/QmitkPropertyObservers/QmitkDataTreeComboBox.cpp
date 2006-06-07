@@ -403,6 +403,7 @@ void QmitkDataTreeComboBox::generateItems()
 
   try
   {
+    if ( QComboBox::currentItem() < 0 ) return; // nothing selected (e.g. because there are no items)
     mitk::DataTreeFilter::Item* currentItem = const_cast<mitk::DataTreeFilter::Item*>(m_Items.at( QComboBox::currentItem() ));
     if ( currentItem != m_CurrentItem )
     {

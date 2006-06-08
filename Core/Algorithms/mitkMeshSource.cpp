@@ -40,7 +40,7 @@ mitk::MeshSource::~MeshSource()
 
 
 
-itk::DataObject::Pointer mitk::MeshSource::MakeOutput ( unsigned int idx )
+itk::DataObject::Pointer mitk::MeshSource::MakeOutput ( unsigned int /*idx */)
 {
     return OutputType::New().GetPointer();
 }

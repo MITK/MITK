@@ -39,7 +39,7 @@ mitk::SurfaceSource::~SurfaceSource()
 }
 
 //##ModelId=3EF56B0703A4
-mitk::SurfaceSource::DataObjectPointer mitk::SurfaceSource::MakeOutput(unsigned int idx)
+mitk::SurfaceSource::DataObjectPointer mitk::SurfaceSource::MakeOutput(unsigned int /*idx*/)
 {
   return static_cast<itk::DataObject*>(mitk::Surface::New().GetPointer());
 }

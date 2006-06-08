@@ -130,7 +130,7 @@ void mitk::PicVolumeTimeSeriesReader::GenerateData()
     }
 }
 
-bool mitk::PicVolumeTimeSeriesReader::CanReadFile(const std::string filename, const std::string filePrefix, const std::string filePattern) 
+bool mitk::PicVolumeTimeSeriesReader::CanReadFile(const std::string /*filename*/, const std::string filePrefix, const std::string filePattern) 
 {
   if( filePattern != "" && filePrefix != "" )
     return false;

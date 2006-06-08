@@ -48,7 +48,7 @@ void mitk::VtiFileReader::GenerateData()
   }
 }
 
-bool mitk::VtiFileReader::CanReadFile(const std::string filename, const std::string filePrefix, const std::string filePattern) 
+bool mitk::VtiFileReader::CanReadFile(const std::string filename, const std::string /*filePrefix*/, const std::string /*filePattern*/) 
 {
   // First check the extension
   if(  filename == "" )

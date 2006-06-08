@@ -40,7 +40,7 @@ mitk::PointSetSource::~PointSetSource()
 
 
 
-itk::DataObject::Pointer mitk::PointSetSource::MakeOutput ( unsigned int idx )
+itk::DataObject::Pointer mitk::PointSetSource::MakeOutput ( unsigned int /*idx */)
 {
     return OutputType::New().GetPointer();
 }

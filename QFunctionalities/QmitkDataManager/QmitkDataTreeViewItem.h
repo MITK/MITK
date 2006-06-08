@@ -56,7 +56,7 @@ class QmitkFocusChangeCommand : public itk::Command {
   public: 
     mitkClassMacro(QmitkFocusChangeCommand,itk::Command);
     itkNewMacro(Self);
-    virtual void Execute (itk::Object *caller, const itk::EventObject &event) {
+    virtual void Execute (itk::Object * /*caller*/, const itk::EventObject & /*event*/) {
       DoAction();
     }
     virtual void Execute (const itk::Object *caller, const itk::EventObject &event) {

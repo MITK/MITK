@@ -54,7 +54,7 @@ void mitk::StlVolumeTimeSeriesReader::GenerateData()
   }
 }
 
-bool mitk::StlVolumeTimeSeriesReader::CanReadFile(const std::string filename, const std::string filePrefix, const std::string filePattern) 
+bool mitk::StlVolumeTimeSeriesReader::CanReadFile(const std::string /*filename*/, const std::string filePrefix, const std::string filePattern) 
 {
   if( filePattern != "" && filePrefix != "" )
     return false;

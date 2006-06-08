@@ -36,7 +36,7 @@ mitk::GeometryDataSource::~GeometryDataSource()
 {
 }
 
-mitk::GeometryDataSource::DataObjectPointer mitk::GeometryDataSource::MakeOutput(unsigned int idx)
+mitk::GeometryDataSource::DataObjectPointer mitk::GeometryDataSource::MakeOutput(unsigned int /*idx*/)
 {
   return static_cast<itk::DataObject*>(mitk::GeometryData::New().GetPointer());
 }

@@ -7,7 +7,7 @@
 
 
 
-void mitk::vtkPointSetXMLParser::StartElement ( const char *name, const char **atts )
+void mitk::vtkPointSetXMLParser::StartElement ( const char *name, const char ** /*atts */)
 {
     std::string currentElement = name;
     //

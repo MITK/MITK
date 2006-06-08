@@ -22,7 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkSmartPointerForwardReference.txx>
 
 //##ModelId=3E0B4663009F
-void mitk::SubImageSelector::SetPosNr(int p)
+void mitk::SubImageSelector::SetPosNr(int /*p*/)
 {
 }
 

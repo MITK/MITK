@@ -152,7 +152,7 @@ void mitk::ItkImageFileReader::GenerateData()
 }
 
 
-bool mitk::ItkImageFileReader::CanReadFile(const std::string filename, const std::string filePrefix, const std::string filePattern) 
+bool mitk::ItkImageFileReader::CanReadFile(const std::string filename, const std::string /*filePrefix*/, const std::string /*filePattern*/) 
 {
   // First check the extension
   if(  filename == "" )

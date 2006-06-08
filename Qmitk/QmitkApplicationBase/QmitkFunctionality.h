@@ -85,7 +85,7 @@ public:
   /*!
   \brief method for creating a QAction object, i.e., toolbar button and menu entry
   */
-  virtual QAction * CreateAction(QActionGroup * parent) { return NULL; };
+  virtual QAction * CreateAction(QActionGroup * /*parent*/) { return NULL; };
 
   /*!
   \brief method for defining the name of the functionality

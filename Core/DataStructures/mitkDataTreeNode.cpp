@@ -33,6 +33,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkGlobalInteraction.h"
 #include "mitkEventMapper.h"
 #include "mitkRenderWindow.h"
+#include "mitkGenericProperty.h"
 
 const std::string mitk::DataTreeNode::XML_NODE_NAME = "dataTreeNode";
 
@@ -596,3 +597,22 @@ bool mitk::DataTreeNode::IsSelected(mitk::BaseRenderer* renderer)
 
   return selected;
 }
+
+export
+template <typename T>
+bool mitk::DataTreeNode::GetPropertyValue(const char* propertyKey, T & value, mitk::BaseRenderer* renderer, bool* defaultRendererUsed)
+{
+  GenericProperty<T>* gp= dynamic_cast<GenericProperty<T>*>(GetProperty(propertyKey, renderer, defaultRendererUsed).GetPointer());
+  if ( gp != NULL )
+  {
+    value = gp->GetValue();
+    return true;
+  }
+  return false;
+}
+
+template bool mitk::DataTreeNode::GetPropertyValue<double>(char const*, double&, mitk::BaseRenderer*, bool*);
+template bool mitk::DataTreeNode::GetPropertyValue<float>(char const*, float&, mitk::BaseRenderer*, bool*);
+template bool mitk::DataTreeNode::GetPropertyValue<int>(char const*, int&, mitk::BaseRenderer*, bool*);
+template bool mitk::DataTreeNode::GetPropertyValue<bool>(char const*, bool&, mitk::BaseRenderer*, bool*);
+

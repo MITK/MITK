@@ -35,14 +35,13 @@ PURPOSE.  See the above copyright notices for more information.
 #include <fstream>
 #endif
 
+#include "mitkStringProperty.h"
+#include "mitkColorProperty.h"
 #include "mitkPropertyList.h"
 
 #include <map>
 #include "mitkLevelWindow.h"
-#include "mitkColorProperty.h"
 #include "mitkXMLIO.h"
-#include "mitkStringProperty.h"
-
 
 class vtkLinearTransform;
 
@@ -195,16 +194,7 @@ public:
   //## (T being the type of the second parameter)
   //## @return @a true property was found
   template <typename T>
-    bool GetPropertyValue(const char* propertyKey, T & value, mitk::BaseRenderer* renderer=NULL, bool* defaultRendererUsed = NULL)
-  {
-    GenericProperty<T>* gp= dynamic_cast<GenericProperty<T>*>(GetProperty(propertyKey, renderer, defaultRendererUsed).GetPointer());
-    if ( gp != NULL )
-    {
-      value = gp->GetValue();
-      return true;
-    }
-    return false;
-  }
+    bool GetPropertyValue(const char* propertyKey, T & value, mitk::BaseRenderer* renderer=NULL, bool* defaultRendererUsed = NULL);
 
   //##Documentation
   //## @brief Convenience access method for bool properties (instances of

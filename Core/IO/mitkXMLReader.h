@@ -20,15 +20,13 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITK_XML_READER
 
 #include <vtkXMLParser.h> 
+#include <mitkDataTree.h>
+
 #include <string>
 #include <stack>
-#include <mitkDataTree.h>
-#include <mitkTransferFunction.h>
-#include <mitkGeometry3D.h>
-#include <mitkTimeSlicedGeometry.h>
+
 #include <itkRGBAPixel.h>
 #include <itkRGBPixel.h>
-#include <vtkSystemIncludes.h>
 
 namespace mitk{
 

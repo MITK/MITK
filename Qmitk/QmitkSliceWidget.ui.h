@@ -246,7 +246,7 @@ void QmitkSliceWidget::ChangeLevelWindow(mitk::LevelWindow* lw )
     }
     ++it;
   }
-  GetRenderer()->GetRenderWindow()->RequestUpdate();
+  GetRenderer()->GetRenderWindow()->GetSliceNavigationController()->GetRenderingManager()->RequestUpdateAll();
 }
 
 

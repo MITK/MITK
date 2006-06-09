@@ -4,6 +4,7 @@
 #include <itkCommand.h>
 #include <mitkDataTreeFilterEvents.h>
 #include <mitkDataTreeFilterFunctions.h>
+#include <mitkRenderingManager.h>
 
 #include <qlayout.h>
 #include <qpainter.h>
@@ -401,6 +402,8 @@ void QmitkDataTreeListView::keyReleaseEvent(QKeyEvent* e)
   {
     m_DataTreeFilter->DeleteSelectedItems();
   }
+
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 /**

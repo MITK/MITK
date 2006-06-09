@@ -49,11 +49,13 @@ namespace mitk {
   //## Then the three Actors are combined inside a vtkPropAssembly and this object is returned in GetProp()
   //## and so hooked up into the rendering pipeline.
   //## Other properties looked for are:
-  //## "contour" = if set to on, lines between the points are shown
-  //## "close" = if set to on, the open strip is closed (first point connected with last point)
-  //## "pointsize" = size of the points mapped
-  //## "label" = text of the Points to show besides points
-  //## "contoursize" = size of the contour drawn between the points // if not set, the pointsize is taken!
+  //##
+  //##   - \b "contour": if set to on, lines between the points are shown
+  //##   - \b "close": if set to on, the open strip is closed (first point connected with last point)
+  //##   - \b "pointsize": size of the points mapped
+  //##   - \b "label": text of the Points to show besides points
+  //##   - \b "contoursize": size of the contour drawn between the points (if not set, the pointsize is taken)
+  //##
   //## @ingroup Mapper
   class PointSetVtkMapper3D : public BaseVtkMapper3D
   {

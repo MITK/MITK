@@ -53,6 +53,12 @@ namespace mitk {
 //##
 //## The class uses an itkMesh internaly, because mitk::Mesh is derived from mitk::PointSet and needs the itk::Mesh structure which is also derived from itk::PointSet.
 //## Thus several typedefs, that seem to be in wrong place, are declared here (for example SelectedLinesType).
+//##
+//## \subsection mitkPointSetDisplayOptions
+//## 
+//## The default mappers for this data structure are mitk::PointSetMapper2D and mitk::PointSetVtkMapper3D. See these classes for display options, that can be
+//## set via properties.
+//##
 //## @ingroup Data
 class PointSet : public BaseData
 {

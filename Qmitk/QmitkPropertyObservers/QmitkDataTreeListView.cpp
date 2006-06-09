@@ -593,6 +593,7 @@ void QmitkDataTreeListView::generateItems()
     QLabel* label = new QLabel( labeliter->c_str(), this);
     label->show();
     label->setFrameStyle( QFrame::Panel | QFrame::Raised );
+    label->setTextFormat( Qt::RichText );
     label->setBackgroundMode( Qt::PaletteButton );
     QmitkListViewItemIndex::addWidget(label, 0, column, Qt::AlignVCenter); 
   }

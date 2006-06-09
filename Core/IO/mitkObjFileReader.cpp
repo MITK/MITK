@@ -50,7 +50,7 @@ void mitk::ObjFileReader::GenerateData()
   }
 }
 
-bool mitk::ObjFileReader::CanReadFile(const std::string filename, const std::string filePrefix, const std::string filePattern) 
+bool mitk::ObjFileReader::CanReadFile(const std::string filename, const std::string /*filePrefix*/, const std::string /*filePattern*/) 
 {
   // First check the extension
   //std::string filename = file;

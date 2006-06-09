@@ -59,7 +59,7 @@ class QmitkFocusChangeCommand : public itk::Command {
     virtual void Execute (itk::Object * /*caller*/, const itk::EventObject & /*event*/) {
       DoAction();
     }
-    virtual void Execute (const itk::Object *caller, const itk::EventObject &event) {
+    virtual void Execute (const itk::Object * /*caller*/, const itk::EventObject & /*event*/) {
       DoAction();
     } 
     void DoAction(); 

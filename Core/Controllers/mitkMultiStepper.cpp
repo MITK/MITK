@@ -32,7 +32,7 @@ void mitk::MultiStepper::AddStepper(Stepper::Pointer stepper,unsigned int repeat
   m_ScaleFactors.insert(std::make_pair(stepper,repeat));
   UpdateStepCount();
 }
-void mitk::MultiStepper::RemoveStepper(Stepper::Pointer stepper, unsigned int repeat) {
+void mitk::MultiStepper::RemoveStepper(Stepper::Pointer stepper, unsigned int /* repeat */) {
   m_SubSteppers.erase(stepper);
   m_ScaleFactors.erase(stepper);
   UpdateStepCount();
@@ -66,7 +66,7 @@ void mitk::MultiStepper::SetPos(unsigned int pos) {
   }
 };
 
-void mitk::MultiStepper::SetSteps(unsigned int steps) {
+void mitk::MultiStepper::SetSteps(unsigned int /*steps*/) {
   assert(false); 
 };
  

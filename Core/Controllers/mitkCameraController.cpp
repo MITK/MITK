@@ -33,7 +33,7 @@ mitk::CameraController::~CameraController()
 {}
 
 //##ModelId=3E6D5DD400A3
-void mitk::CameraController::Resize(int w, int h)
+void mitk::CameraController::Resize(int, int)
 {}
 
 //##ModelId=3E6D5DD400C1

@@ -81,7 +81,7 @@ void SlicesRotator::OnSliceControllerRemoved(SliceNavigationController* snc)
 
 /// Is called whenever a SliceNavigationController invokes an event. Will update the list
 /// of SliceNavigationControllers that can handle rotation 
-void SlicesRotator::SetGeometry(const itk::EventObject& EventObject)
+void SlicesRotator::SetGeometry(const itk::EventObject& /*EventObject*/)
 {
   // there is no way to determine the sender?
   // ==> update whole list of SNCs

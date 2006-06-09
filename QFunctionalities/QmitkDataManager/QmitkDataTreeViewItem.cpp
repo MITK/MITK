@@ -34,7 +34,7 @@ PURPOSE.  See the above copyright notices for more information.
   mitk::DataTreeChildIterator it(*nodeIt);
   while (!it.IsAtEnd())
   {
-    QmitkDataTreeViewItem * nextItem = new QmitkDataTreeViewItem(this,&it);
+    new QmitkDataTreeViewItem(this,&it);
     ++it;
   }
   setOpen(true);
@@ -77,7 +77,7 @@ QmitkDataTreeViewItem::QmitkDataTreeViewItem( QmitkDataTreeViewItem * parent, mi
   mitk::DataTreeChildIterator it(*nodeIt);
   while (!it.IsAtEnd())
   {
-    QmitkDataTreeViewItem * nextItem = new QmitkDataTreeViewItem(this,&it);
+    new QmitkDataTreeViewItem(this,&it);
     ++it;
   }
   setOpen(true);

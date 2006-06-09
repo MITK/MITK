@@ -98,15 +98,16 @@ protected slots:
 protected:
 
   /*!
+  * controls containing sliders for scrolling through the slices
+  */
+  QmitkSimpleExampleControls * controls;
+  
+  /*!
   * default main widget containing 4 windows showing 3 
   * orthogonal slices of the volume and a 3d render window
   */
   QmitkStdMultiWidget * multiWidget;
 
-  /*!
-  * controls containing sliders for scrolling through the slices
-  */
-  QmitkSimpleExampleControls * controls;
 
 //  mitk::DisplayInteractor* moveNzoom;
 

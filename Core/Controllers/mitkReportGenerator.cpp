@@ -34,8 +34,8 @@ void mitk::ReportGenerator::Generate() {
       std::cout << "orig " << ++i << ":" << line << std::endl;
       for (KeyValueMapType::iterator it = m_KeyValueMap.begin(); it != m_KeyValueMap.end() ; it++) {
         std::string key = it->first ;    
-        unsigned int idx = line.find(key);
-        if (idx >=0 && idx < line.size() ) {
+        std::string::size_type idx = line.find(key);
+        if (idx != std::string::npos ) {
           std::string value = m_KeyValueMap[key];
           line.replace(idx, value.size(), value);
         }

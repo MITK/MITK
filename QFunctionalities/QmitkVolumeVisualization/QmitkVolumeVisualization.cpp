@@ -27,7 +27,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkProperties.h>
 
   QmitkVolumeVisualization::QmitkVolumeVisualization(QObject *parent, const char *name, QmitkStdMultiWidget *mitkStdMultiWidget, mitk::DataTreeIteratorBase* it)
-: QmitkFunctionality(parent, name, it) ,m_Controls(NULL), m_MultiWidget(mitkStdMultiWidget)
+: QmitkFunctionality(parent, name, it) , m_MultiWidget(mitkStdMultiWidget) ,m_Controls(NULL)
 {
   SetAvailability(true);
 }
@@ -35,7 +35,7 @@ PURPOSE.  See the above copyright notices for more information.
 QmitkVolumeVisualization::~QmitkVolumeVisualization()
 {}
 
-QWidget * QmitkVolumeVisualization::CreateMainWidget(QWidget *parent)
+QWidget * QmitkVolumeVisualization::CreateMainWidget(QWidget*)
 {
   return NULL;
 }
@@ -74,7 +74,7 @@ void QmitkVolumeVisualization::Activated()
 {
   QmitkFunctionality::Activated();
 }
-void QmitkVolumeVisualization::ImageSelected(mitk::DataTreeIteratorClone imageIt)
+void QmitkVolumeVisualization::ImageSelected(mitk::DataTreeIteratorClone)
 {
   mitk::DataTreeNode* node = m_Controls->m_TreeNodeSelector->GetSelectedNode();
   bool enabled = false; 

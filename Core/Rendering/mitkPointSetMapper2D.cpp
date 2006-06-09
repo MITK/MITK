@@ -35,7 +35,12 @@ const float selectedColor[]={1.0,0.0,0.6}; //for selected!
 
 //##ModelId=3F0189F00378
 mitk::PointSetMapper2D::PointSetMapper2D()
-: m_Polygon(false) {
+: m_Polygon(false),
+  m_ShowPoints(true),
+  m_ShowDistances(false),
+  m_ShowAngles(false),
+  m_ShowDistantLines(true)
+{
 }
 
 //##ModelId=3F0189F00382
@@ -57,7 +62,11 @@ void mitk::PointSetMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
   if( node == NULL )
     return;
 
-  node->GetBoolProperty( "contour", m_Polygon );
+  node->GetBoolProperty("contour",            m_Polygon);
+  node->GetBoolProperty("show points",        m_ShowPoints);
+  node->GetBoolProperty("show distances",     m_ShowDistances);
+  node->GetBoolProperty("show angles",        m_ShowAngles);
+  node->GetBoolProperty("show distant lines", m_ShowDistantLines);
 }
 
 static void WriteTextXY(float x, float y, const std::string & text)
@@ -98,9 +107,9 @@ void mitk::PointSetMapper2D::Paint(mitk::BaseRenderer * renderer)
   //	@FIXME: Logik fuer update
   bool updateNeccesary=true;
 
-  if (updateNeccesary) {
+  if (updateNeccesary) 
+  {
     // ok, das ist aus GenerateData kopiert
-
     mitk::PointSet::Pointer input  = const_cast<mitk::PointSet*>(this->GetInput());
 
     mitk::DisplayGeometry::Pointer displayGeometry = renderer->GetDisplayGeometry();
@@ -109,15 +118,6 @@ void mitk::PointSetMapper2D::Paint(mitk::BaseRenderer * renderer)
 
     //apply color and opacity read from the PropertyList
     ApplyProperties(renderer);
-
-    bool showPoints = true;
-    this->GetDataTreeNode()->GetBoolProperty("show points", showPoints);
-
-    bool showDistances = false;
-    this->GetDataTreeNode()->GetBoolProperty("show distances", showDistances);
-
-    bool showAngles = false;
-    this->GetDataTreeNode()->GetBoolProperty("show angles", showAngles);
 
     vtkLinearTransform* transform = GetDataTreeNode()->GetVtkTransform();
 
@@ -152,7 +152,7 @@ void mitk::PointSetMapper2D::Paint(mitk::BaseRenderer * renderer)
     Point2D lastPt2d;   // last projected_p in display coordinates
     Point2D preLastPt2d;// projected_p in display coordinates before lastPt2d
 
-    while(it!=end)
+    while(it!=end) // iterate over all points
     {
       lastP = p;        // valid only for counter > 0
       lastVec = vec;    // valid only for counter > 1
@@ -195,7 +195,7 @@ void mitk::PointSetMapper2D::Paint(mitk::BaseRenderer * renderer)
           WriteTextXY(pt2d[0] + text2dDistance, pt2d[1] + text2dDistance, l);
         }
 
-        if((showPoints) && (scalardiff<4.0))
+        if((m_ShowPoints) && (scalardiff<4.0))
         {
           //check if the point is to be marked as selected 
           if (selIt->Value().selected)
@@ -231,16 +231,26 @@ void mitk::PointSetMapper2D::Paint(mitk::BaseRenderer * renderer)
           }
         }
 
-        if ( m_Polygon && counter > 0 )
+        bool drawLinesEtc = true;
+        if (!m_ShowDistantLines && counter > 0) // check, whether this line should be drawn
+        {
+          ScalarType currentDistance = displayGeometry->GetWorldGeometry()->SignedDistance(p);
+          ScalarType lastDistance =    displayGeometry->GetWorldGeometry()->SignedDistance(lastP);
+          if ( currentDistance * lastDistance > 0.5 ) // points on same side of plane
+            drawLinesEtc = false;
+        }
+ 
+        if ( m_Polygon && counter > 0 && drawLinesEtc) // draw a line
         {
           glBegin (GL_LINES);
           glVertex2fv(&pt2d[0]);
           glVertex2fv(&lastPt2d[0]);
           glEnd ();
-          if(showDistances)
+          if(m_ShowDistances) // calculate and print a distance
           {
             std::stringstream buffer;
             buffer << vec.GetNorm();
+            // TODO limit to 1 or 0 decimal places (by default)
 
             Vector2D vec2d = pt2d-lastPt2d;
             makePerpendicularVector2D(vec2d, vec2d);
@@ -249,7 +259,8 @@ void mitk::PointSetMapper2D::Paint(mitk::BaseRenderer * renderer)
 
             WriteTextXY(pos2d[0], pos2d[1], buffer.str());
           }
-          if(showAngles && counter > 1 )
+
+          if(m_ShowAngles && counter > 1 ) // calculate and print the angle btw. two lines
           {
             std::stringstream buffer;
             buffer << angle(vec.Get_vnl_vector(), -lastVec.Get_vnl_vector())*180/vnl_math::pi << "°";
@@ -265,7 +276,7 @@ void mitk::PointSetMapper2D::Paint(mitk::BaseRenderer * renderer)
 
             WriteTextXY(pos2d[0], pos2d[1], buffer.str());
           }
-        }
+      }
         counter++;
       }
       ++it;

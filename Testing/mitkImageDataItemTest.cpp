@@ -21,7 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkImageDataItem.h"
 
 #include <fstream>
-int mitkImageDataItemTest(int argc, char* argv[])
+int mitkImageDataItemTest(int /*argc*/, char* /*argv*/[])
 {
   unsigned long *pixels = new unsigned long [100];
   void * data = pixels;

@@ -95,7 +95,7 @@ mitk::DataTreeIteratorBase* QmitkFunctionality::GetDataTreeIterator()
   return m_DataTreeIterator.GetPointer();
 }
 
-void QmitkFunctionality::TreeChanged(const itk::EventObject & treeChangedEvent)
+void QmitkFunctionality::TreeChanged(const itk::EventObject & /*treeChangedEvent*/)
 {
   if(IsActivated())
   {

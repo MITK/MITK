@@ -1473,7 +1473,7 @@ void mitk::DataTreeNodeFactory::ReadFileSeriesTypeITKImageSeriesReader()
       baseFilename = itksys::SystemTools::GetFilenameWithoutLastExtension( baseFilename );
 
     std::string number;
-    for ( unsigned int i = baseFilename.length() - 1; i >= 0; --i )
+    for ( unsigned int i = baseFilename.length() - 1; ; --i )
     {
       char character = baseFilename[ i ];
       //do we have a digit?

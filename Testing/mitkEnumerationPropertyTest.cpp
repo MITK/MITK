@@ -22,7 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkVtkRepresentationProperty.h"
 
 
-int mitkEnumerationPropertyTest( int argc, char* argv[] )
+int mitkEnumerationPropertyTest( int /*argc*/, char* /*argv*/[] )
 {
   mitk::EnumerationProperty enumerationProperty;
 

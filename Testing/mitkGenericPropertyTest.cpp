@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkGenericProperty.h"
 
 #include <fstream>
-int mitkGenericPropertyTest(int argc, char* argv[])
+int mitkGenericPropertyTest(int /*argc*/, char* /*argv*/[])
 {
   std::cout << "Testing mitk::GenericProperty<int>:";
   mitk::GenericProperty<int>::Pointer prop = new mitk::GenericProperty<int>();

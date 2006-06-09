@@ -27,7 +27,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkNativeRenderWindowInteractor.h>
 
 #include <fstream>
-int mitkImageMapper2DTest(int argc, char* argv[])
+int mitkImageMapper2DTest(int /*argc*/, char* /*argv*/[])
 {
 	//Create Image out of nowhere
 	mitk::Image::Pointer image;

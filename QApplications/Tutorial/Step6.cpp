@@ -76,7 +76,7 @@ void Step6::Load(int argc, char* argv[])
   mitk::DataTreePreOrderIterator it(m_Tree);
 
   //Part II: Create some data by reading files
-  unsigned int i;
+  int i;
   for(i=1; i<argc; ++i)
   {
     // for testing

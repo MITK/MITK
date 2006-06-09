@@ -65,7 +65,7 @@ mitk::Image::~Image()
 }
 
 //##ModelId=3DCBC2B50345
-const mitk::PixelType& mitk::Image::GetPixelType(int n) const
+const mitk::PixelType& mitk::Image::GetPixelType(int /*n*/) const
 {
   return m_PixelType;
 }
@@ -534,7 +534,7 @@ bool mitk::Image::SetImportChannel(void *data, int n, ImportMemoryManagementType
   return true;
 }
 
-bool mitk::Image::SetPicSlice(const ipPicDescriptor *pic, int s, int t, int n, ImportMemoryManagementType importMemoryManagement)
+bool mitk::Image::SetPicSlice(const ipPicDescriptor *pic, int s, int t, int n, ImportMemoryManagementType /*importMemoryManagement*/)
 {
   if(pic==NULL) return false;
   if(pic->dim!=2) return false;
@@ -550,7 +550,7 @@ bool mitk::Image::SetPicSlice(const ipPicDescriptor *pic, int s, int t, int n, I
     return false;
 }
 
-bool mitk::Image::SetPicVolume(const ipPicDescriptor *pic, int t, int n, ImportMemoryManagementType importMemoryManagement)
+bool mitk::Image::SetPicVolume(const ipPicDescriptor *pic, int t, int n, ImportMemoryManagementType /*importMemoryManagement*/)
 {
   if(pic==NULL) return false;
   if((pic->dim==2) && ((m_Dimension==2) || ((m_Dimension>2) && (m_Dimensions[2]==1)))) return SetPicSlice(pic, 0, t, n);
@@ -567,7 +567,7 @@ bool mitk::Image::SetPicVolume(const ipPicDescriptor *pic, int t, int n, ImportM
     return false;
 }
 
-bool mitk::Image::SetPicChannel(const ipPicDescriptor *pic, int n, ImportMemoryManagementType importMemoryManagement)
+bool mitk::Image::SetPicChannel(const ipPicDescriptor *pic, int n, ImportMemoryManagementType /*importMemoryManagement*/)
 {
   if(pic==NULL) return false;
   if(pic->dim<=3) return SetPicVolume(pic, 0, n);
@@ -668,7 +668,7 @@ void mitk::Image::Initialize(const mitk::PixelType& type, unsigned int dimension
   m_Initialized = true;
 }
 
-void mitk::Image::Initialize(const mitk::PixelType& type, const mitk::Geometry3D& geometry, unsigned int channels, int tDim, bool shiftBoundingBoxMinimumToZero ) 
+void mitk::Image::Initialize(const mitk::PixelType& type, const mitk::Geometry3D& geometry, unsigned int /*channels*/, int tDim, bool /*shiftBoundingBoxMinimumToZero*/ ) 
 {
   unsigned int dimensions[5];
   dimensions[0] = (unsigned int)(geometry.GetExtent(0)+0.5);

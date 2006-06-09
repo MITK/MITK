@@ -31,7 +31,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include <fstream>
-int mitkRenderWindowTest(int argc, char* argv[])
+int mitkRenderWindowTest(int /*argc*/, char* /*argv*/[])
 {
   //Create a (native) mitk::RenderWindow
   std::cout << "Testing creation of RenderWindow: ";

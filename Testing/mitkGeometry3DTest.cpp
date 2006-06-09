@@ -61,7 +61,7 @@ bool testGetAxisVectorExtent(mitk::Geometry3D* geometry)
   return true;
 }
 
-int mitkGeometry3DTest(int argc, char* argv[])
+int mitkGeometry3DTest(int /*argc*/, char* /*argv*/[])
 {
   float bounds[ ] = {-10.0, 17.0, -12.0, 188.0, 13.0, 211.0};
 

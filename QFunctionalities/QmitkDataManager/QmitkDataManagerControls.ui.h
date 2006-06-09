@@ -112,7 +112,7 @@ void QmitkDataManagerControls::SetDataTreeIterator(mitk::DataTreeIteratorBase* i
 
   if (!tempIt->IsAtEnd())
   {
-    QmitkDataTreeViewItem * rootItem = new QmitkDataTreeViewItem(m_DataTreeView, "Loaded Data", "root", tempIt.GetPointer());
+    new QmitkDataTreeViewItem(m_DataTreeView, "Loaded Data", "root", tempIt.GetPointer());
     ++tempIt;
   }
   UpdateRendererCombo();
@@ -248,7 +248,6 @@ void QmitkDataManagerControls::RenderWindowSelected( int id )
   QmitkDataTreeViewItem *selected = dynamic_cast<QmitkDataTreeViewItem*>(m_DataTreeView->selectedItem());
   if (selected != NULL)
   {
-    mitk::DataTreeNode* node = selected->GetDataTreeIterator()->Get();
     int selectedItem = id;
     int itemNumber = -1;
     const mitk::RenderWindow::RenderWindowSet rws = mitk::RenderWindow::GetInstances();
@@ -266,7 +265,7 @@ void QmitkDataManagerControls::RenderWindowSelected( int id )
   }
 }
 
-void QmitkDataManagerControls::InitMultiMode(mitk::BaseRenderer* renderer)
+void QmitkDataManagerControls::InitMultiMode(mitk::BaseRenderer* /*renderer*/)
 {
   std::vector<std::string> propNames;
   propNames.push_back("name");

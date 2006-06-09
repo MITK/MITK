@@ -21,7 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkTransition.h>
 #include <fstream>
 
-int mitkStateTest(int argc, char* argv[])
+int mitkStateTest(int /*argc*/, char* /*argv*/[])
 {
   int stateId = 10;
   

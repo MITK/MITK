@@ -90,7 +90,7 @@ mitk::MaterialProperty::MaterialProperty( mitk::DataTreeNode* node, mitk::BaseRe
   SetRepresentation( GetRepresentation() );
 }
 
-mitk::MaterialProperty::MaterialProperty( const MaterialProperty& property )
+mitk::MaterialProperty::MaterialProperty( const MaterialProperty& property ) : mitk::BaseProperty()
 {
   Initialize( property );
 }

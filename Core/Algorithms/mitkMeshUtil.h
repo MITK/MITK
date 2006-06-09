@@ -50,7 +50,7 @@ template <typename MeshType>
 class NullScalarAccessor
 {
 public:
-  static inline vtkFloatingPointType GetScalar(typename MeshType::PointDataContainer* point, typename MeshType::PointIdentifier idx, MeshType* mesh = NULL, unsigned int type = 0)
+  static inline vtkFloatingPointType GetScalar(typename MeshType::PointDataContainer* /*point*/, typename MeshType::PointIdentifier /*idx*/, MeshType* /*mesh*/ = NULL, unsigned int /*type*/ = 0)
   {
     return (vtkFloatingPointType) 0.0;
   };

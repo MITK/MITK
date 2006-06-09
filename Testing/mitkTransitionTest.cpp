@@ -22,7 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkState.h>
 
 #include <fstream>
-int mitkTransitionTest(int argc, char* argv[])
+int mitkTransitionTest(int /*argc*/, char* /*argv*/[])
 {
   int nextStateId = 10;
   int eventId = 100;

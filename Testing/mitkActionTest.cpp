@@ -21,7 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkProperties.h>
 
 #include <fstream>
-int mitkActionTest(int argc, char* argv[])
+int mitkActionTest(int /*argc*/, char* /*argv*/[])
 {
   int actionId = 10;
   //Create Action

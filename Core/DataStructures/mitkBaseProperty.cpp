@@ -49,7 +49,7 @@ bool mitk::BaseProperty::WriteXMLData( XMLWriter& xmlWriter )
   return true;
 }
 
-bool mitk::BaseProperty::ReadXMLData( XMLReader& xmlReader )
+bool mitk::BaseProperty::ReadXMLData( XMLReader& /*xmlReader*/ )
 {
   return false;
 }

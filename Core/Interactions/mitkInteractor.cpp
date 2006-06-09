@@ -80,7 +80,7 @@ void mitk::Interactor::CreateModeOperation(ModeType mode)
   this->ExecuteOperation(doOp);
 }
 
-bool mitk::Interactor::ExecuteAction(Action* action, mitk::StateEvent const* stateEvent) 
+bool mitk::Interactor::ExecuteAction(Action* action, mitk::StateEvent const* /*stateEvent*/) 
 {
   GlobalInteraction* global = mitk::GlobalInteraction::GetInstance();
   if (global == NULL)

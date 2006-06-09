@@ -55,14 +55,13 @@ int compareGeometries(mitk::Geometry3D* geometry1, mitk::Geometry3D* geometry2)
   return EXIT_SUCCESS;
 }
   
-int mitkImageToItkTest(int argc, char* argv[])
+int mitkImageToItkTest(int /*argc*/, char* /*argv*/[])
 {
   int result;
 
   //Create Image out of nowhere
 	mitk::Image::Pointer imgMem;
 	mitk::PixelType pt(typeid(int));
-	unsigned int dim[]={100,100,20};
 
   std::cout << "Testing creation of Image: ";
 	imgMem=mitk::Image::New();

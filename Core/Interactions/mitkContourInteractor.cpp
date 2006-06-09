@@ -168,7 +168,7 @@ void mitk::ContourInteractor::Move(mitk::Point3D& point)
 //  m_Parent->UpdateWidgets();
 }
 
-void mitk::ContourInteractor::Release(mitk::Point3D& point)
+void mitk::ContourInteractor::Release(mitk::Point3D& /*point*/)
 {
 //vermutlich  m_Parent->UpdateWidgets();
 }

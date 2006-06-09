@@ -113,7 +113,7 @@ TransformVector(const InputVnlVectorType &vect) const
 template<class TScalarType>
 typename itk::VtkAbstractTransform<TScalarType>::OutputCovariantVectorType
 itk::VtkAbstractTransform<TScalarType>::
-TransformCovariantVector(const InputCovariantVectorType &vec) const 
+TransformCovariantVector(const InputCovariantVectorType &/*vec*/) const 
 {
   itkExceptionMacro( << "implement before using!" );
   OutputCovariantVectorType  result;    // Converted vector

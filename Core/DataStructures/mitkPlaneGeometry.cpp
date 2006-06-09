@@ -84,14 +84,14 @@ void mitk::PlaneGeometry::WorldToIndex(const mitk::Point2D &pt_mm, mitk::Point2D
 }
 
 //##ModelId=3E3B9C8C0145
-void mitk::PlaneGeometry::IndexToWorld(const mitk::Point2D &atPt2d_units, const mitk::Vector2D &vec_units, mitk::Vector2D &vec_mm) const
+void mitk::PlaneGeometry::IndexToWorld(const mitk::Point2D &/*atPt2d_units*/, const mitk::Vector2D &vec_units, mitk::Vector2D &vec_mm) const
 {
   vec_mm[0]=m_ScaleFactorMMPerUnitX*vec_units[0];
   vec_mm[1]=m_ScaleFactorMMPerUnitY*vec_units[1];
 }
 
 //##ModelId=3E3B9C8E0152
-void mitk::PlaneGeometry::WorldToIndex(const mitk::Point2D &atPt2d_mm, const mitk::Vector2D &vec_mm, mitk::Vector2D &vec_units) const
+void mitk::PlaneGeometry::WorldToIndex(const mitk::Point2D &/*atPt2d_mm*/, const mitk::Vector2D &vec_mm, mitk::Vector2D &vec_units) const
 {
   vec_units[0]=vec_mm[0]*(1.0/m_ScaleFactorMMPerUnitX);
   vec_units[1]=vec_mm[1]*(1.0/m_ScaleFactorMMPerUnitY);

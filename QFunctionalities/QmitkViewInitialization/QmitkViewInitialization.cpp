@@ -31,7 +31,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkSliceNavigationController.h>
 
 QmitkViewInitialization::QmitkViewInitialization(QObject *parent, const char *name, QmitkStdMultiWidget *mitkStdMultiWidget, mitk::DataTreeIteratorBase* it)
-  : QmitkFunctionality(parent, name, it), m_Controls(NULL), m_MultiWidget(mitkStdMultiWidget)
+  : QmitkFunctionality(parent, name, it), m_MultiWidget(mitkStdMultiWidget), m_Controls(NULL)
 {
   SetAvailability(true);
 }
@@ -40,7 +40,7 @@ QmitkViewInitialization::~QmitkViewInitialization()
 {
 }
 
-QWidget * QmitkViewInitialization::CreateMainWidget(QWidget *parent)
+QWidget * QmitkViewInitialization::CreateMainWidget(QWidget * /*parent*/)
 {
   return NULL;
 }

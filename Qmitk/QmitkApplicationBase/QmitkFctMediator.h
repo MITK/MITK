@@ -54,9 +54,9 @@ protected:
   QWidget* m_DefaultMain;
 
   int m_NumOfFuncs;
+  QActionGroup* m_FunctionalityActionGroup;
   int m_CurrentFunctionality;
 
-  QActionGroup* m_FunctionalityActionGroup;
 
   QPtrList<QmitkFunctionality> qfl;
   QPtrList<QAction> qal;

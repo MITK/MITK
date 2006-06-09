@@ -75,7 +75,7 @@ int mappingTests2D(const mitk::PlaneGeometry* planegeometry, const mitk::ScalarT
   return EXIT_SUCCESS;
 }
 
-int mitkPlaneGeometryTest(int argc, char* argv[])
+int mitkPlaneGeometryTest(int /*argc*/, char* /*argv*/[])
 {
   int result;
 

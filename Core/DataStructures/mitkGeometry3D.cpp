@@ -166,7 +166,7 @@ void mitk::Geometry3D::WorldToIndex(const mitk::Point3D &atPt3d_mm, const mitk::
 }
 
 //##ModelId=3E3B987503A3
-void mitk::Geometry3D::IndexToWorld(const mitk::Point3D &atPt3d_units, const mitk::Vector3D &vec_units, mitk::Vector3D &vec_mm) const
+void mitk::Geometry3D::IndexToWorld(const mitk::Point3D &/*atPt3d_units*/, const mitk::Vector3D &vec_units, mitk::Vector3D &vec_mm) const
 {
   vec_mm = m_ParametricTransform->TransformVector(vec_units);
 }
@@ -362,7 +362,7 @@ void mitk::Geometry3D::BackTransform(const mitk::Point3D &in, mitk::Point3D& out
   }
 }
 
-void mitk::Geometry3D::BackTransform(const mitk::Point3D &at, const mitk::Vector3D &in, mitk::Vector3D& out) const
+void mitk::Geometry3D::BackTransform(const mitk::Point3D &/*at*/, const mitk::Vector3D &in, mitk::Vector3D& out) const
 {
 #if (ITK_VERSION_MAJOR == 1 && ITK_VERSION_MINOR <= 8)
   const TransformType::MatrixType& inverse = m_IndexToWorldTransform->GetInverse();

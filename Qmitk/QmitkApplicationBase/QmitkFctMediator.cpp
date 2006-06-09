@@ -45,9 +45,15 @@ const QSizePolicy preferred(QSizePolicy::Preferred, QSizePolicy::Preferred);
 //////////////////////////////////////////////////////////////////////
 
 QmitkFctMediator::QmitkFctMediator(QObject *parent, const char *name) : QObject(parent, name), 
-m_MainStack(NULL), m_ControlStack(NULL), m_ButtonMenu(NULL), m_ToolBar(NULL), m_DefaultMain(NULL), 
-m_FunctionalityActionGroup(NULL),
-m_NumOfFuncs(0), m_CurrentFunctionality(0), m_LayoutTemplate(NULL)
+                                                                        m_LayoutTemplate(NULL),
+                                                                       m_MainStack(NULL), 
+                                                                       m_ControlStack(NULL), 
+                                                                       m_ButtonMenu(NULL), 
+                                                                       m_ToolBar(NULL), 
+                                                                       m_DefaultMain(NULL), 
+                                                                       m_NumOfFuncs(0), 
+                                                                       m_FunctionalityActionGroup(NULL), 
+                                                                       m_CurrentFunctionality(0)
 {
 
 }
@@ -380,7 +386,7 @@ void QmitkFctMediator::HideControls(bool hide)
 
 void QmitkFctMediator::HideMenu(bool hide)
 {
-  if(m_ButtonMenu=NULL) return;
+  if(m_ButtonMenu==NULL) return;
 
   if(hide)
     m_ButtonMenu->hide();

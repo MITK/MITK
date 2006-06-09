@@ -21,7 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkOpenGLRenderer.h>
 
 #include <fstream>
-int mitkEventTest(int argc, char* argv[])
+int mitkEventTest(int /*argc*/, char* /*argv*/[])
 {
   mitk::OpenGLRenderer::Pointer renderer = new mitk::OpenGLRenderer; 
   

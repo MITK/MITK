@@ -415,7 +415,7 @@ void mitk::BaseRenderer::PickWorldPoint(const mitk::Point2D& displayPoint, mitk:
   GetDisplayGeometry()->Map(worldPoint2D, worldPoint);
 }
 
-void mitk::BaseRenderer::WheelEvent(mitk::WheelEvent *we)
+void mitk::BaseRenderer::WheelEvent(mitk::WheelEvent */*we*/)
 {
   //mitk::Event event(this, ke->type(), Qt::NoButton, Qt::NoButton, ke->key());
   //mitk::EventMapper::MapEvent(&event);
@@ -446,7 +446,7 @@ void mitk::BaseRenderer::MakeCurrent()
 }
 
 
-void mitk::BaseRenderer::DrawOverlayMouse(mitk::Point2D& p2d)
+void mitk::BaseRenderer::DrawOverlayMouse(mitk::Point2D& /*p2d*/)
 {
   
   std::cout<<"FALSCH - BaseRenderer.cpp DrawOverlay()"<<std::endl;

@@ -27,7 +27,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <fstream>
 
-int mitkSurfaceTest(int argc, char* argv[])
+int mitkSurfaceTest(int /*argc*/, char* /*argv*/[])
 {
   mitk::Surface::Pointer surface;
   std::cout << "Testing mitk::Surface::New(): ";

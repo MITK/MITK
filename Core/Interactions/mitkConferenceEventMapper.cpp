@@ -89,7 +89,7 @@ mitk::ConferenceEventMapper::MapEvent(signed int mitkEventID, const char* sender
 }
 
 bool
-mitk::ConferenceEventMapper::MapEvent(signed int mitkEventID, const char* sender, float w1, float w2, float w3)
+mitk::ConferenceEventMapper::MapEvent(signed int /*mitkEventID*/, const char* sender, float w1, float w2, float w3)
 {
 
   //CONFERENCE EVENT

@@ -30,7 +30,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkStringProperty.h>
 
 QmitkMeasurement::QmitkMeasurement(QObject *parent, const char *name, QmitkStdMultiWidget *mitkStdMultiWidget, mitk::DataTreeIteratorBase* it)
-  : QmitkFunctionality(parent, name, it) ,m_Controls(NULL), m_MultiWidget(mitkStdMultiWidget)
+  : QmitkFunctionality(parent, name, it) , m_MultiWidget(mitkStdMultiWidget), m_Controls(NULL)
 {
   SetAvailability(true);
 }
@@ -39,7 +39,7 @@ QmitkMeasurement::~QmitkMeasurement()
 {
 }
 
-QWidget * QmitkMeasurement::CreateMainWidget(QWidget *parent)
+QWidget * QmitkMeasurement::CreateMainWidget(QWidget */*parent*/)
 {
   return NULL;
 }

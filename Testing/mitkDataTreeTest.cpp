@@ -41,7 +41,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define memcheck
 #endif
 
-int mitkDataTreeTest(int argc, char* argv[])
+int mitkDataTreeTest(int /*argc*/, char* /*argv*/[])
 {
   itk::OutputWindow::SetInstance(
        itk::TextOutput::New().GetPointer() );

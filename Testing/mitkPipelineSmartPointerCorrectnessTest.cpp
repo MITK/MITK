@@ -326,7 +326,7 @@ int runPipelineSmartPointerCorrectnessTestForFilterType(typename InputType::Poin
 //#endif
 }
 
-int mitkPipelineSmartPointerCorrectnessTest(int argc, char* argv[])
+int mitkPipelineSmartPointerCorrectnessTest(int /*argc*/, char* /*argv*/[])
 {
   int result;
   result = runPipelineSmartPointerCorrectnessTestForFilterType<mitk::SurfaceToImageFilter, mitk::Surface>(mitk::Surface::New());

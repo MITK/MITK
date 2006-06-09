@@ -134,7 +134,7 @@ void mitk::SurfaceVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
     m_Actor->VisibilityOn();
 }
 
-void mitk::SurfaceVtkMapper3D::ApplyProperties(vtkActor* actor, mitk::BaseRenderer* renderer)
+void mitk::SurfaceVtkMapper3D::ApplyProperties(vtkActor* /*actor*/, mitk::BaseRenderer* renderer)
 {
   mitk::MaterialProperty* materialProperty;
   this->GetDataTreeNode()->GetProperty(materialProperty, "material");

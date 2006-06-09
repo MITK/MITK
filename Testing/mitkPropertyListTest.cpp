@@ -21,7 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkProperties.h"
 
 #include <fstream>
-int mitkPropertyListTest(int argc, char* argv[])
+int mitkPropertyListTest(int /*argc*/, char* /*argv*/[])
 {
   mitk::PropertyList::Pointer propList;
   std::cout << "Testing mitk::PropertyList::New(): ";

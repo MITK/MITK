@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkAutoCropImageFilter.h"
 
 
-int mitkAutoCropImageFilterTest(int argc, char* argv[])
+int mitkAutoCropImageFilterTest(int /*argc*/, char* /*argv*/[])
 {
   mitk::AutoCropImageFilter::Pointer filter;
   std::cout << "Testing mitk::AutoCropImageFilter::New(): ";

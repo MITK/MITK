@@ -66,7 +66,7 @@ QmitkImageCropper::~QmitkImageCropper()
 }
 
 
-QWidget * QmitkImageCropper::CreateMainWidget(QWidget *parent)
+QWidget * QmitkImageCropper::CreateMainWidget(QWidget */*parent*/)
 {
   // We use the standard multi-widget. If there isn't one, we probably crash :-(
   return NULL;

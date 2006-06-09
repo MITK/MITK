@@ -21,7 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkCommon.h"
 
 #include <fstream>
-int mitkContourTest(int argc, char* argv[])
+int mitkContourTest(int /*argc*/, char* /*argv*/[])
 {
   mitk::Contour::Pointer contour;
   std::cout << "Testing mitk::Contour::New(): ";

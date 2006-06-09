@@ -44,7 +44,7 @@ bool  mitk::PointData::VerifyRequestedRegion()
    return true;
 }
  
-void  mitk::PointData::SetRequestedRegion(itk::DataObject *data)
+void  mitk::PointData::SetRequestedRegion(itk::DataObject */*data*/)
 {
 
 }

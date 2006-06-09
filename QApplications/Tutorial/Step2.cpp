@@ -28,7 +28,7 @@ int main(int argc, char* argv[])
   mitk::DataTreePreOrderIterator it(tree);
 
   //Part II: Create some data by reading files
-  unsigned int i;
+  int i;
   for(i=1; i<argc; ++i)
   {
     // for testing

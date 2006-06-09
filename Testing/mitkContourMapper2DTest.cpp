@@ -27,7 +27,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkRenderWindow.h"
 
 #include <fstream>
-int mitkContourMapper2DTest(int argc, char* argv[])
+int mitkContourMapper2DTest(int /*argc*/, char* /*argv*/[])
 {
   mitk::Contour::Pointer contour;
   mitk::ContourMapper2D::Pointer contourMapper;

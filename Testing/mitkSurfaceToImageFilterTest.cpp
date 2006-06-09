@@ -21,7 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <fstream>
 
-int mitkSurfaceToImageFilterTest(int argc, char* argv[])
+int mitkSurfaceToImageFilterTest(int /*argc*/, char* /*argv*/[])
 {
   mitk::SurfaceToImageFilter::Pointer filter;
   std::cout << "Testing mitk::Surface::New(): ";

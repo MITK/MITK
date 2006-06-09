@@ -27,7 +27,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <fstream>
 
-int mitkSlicedGeometry3DTest(int argc, char* argv[])
+int mitkSlicedGeometry3DTest(int /*argc*/, char* /*argv*/[])
 {
   mitk::PlaneGeometry::Pointer planegeometry1 = mitk::PlaneGeometry::New();
  

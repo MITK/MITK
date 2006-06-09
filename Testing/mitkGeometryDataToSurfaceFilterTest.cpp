@@ -157,7 +157,7 @@ int testGeometryDataToSurfaceFilter(mitk::Geometry2DDataToSurfaceFilter* geometr
   return EXIT_SUCCESS;
 }
 
-int mitkGeometryDataToSurfaceFilterTest(int argc, char* argv[])
+int mitkGeometryDataToSurfaceFilterTest(int /*argc*/, char* /*argv*/[])
 {
   int result;
 

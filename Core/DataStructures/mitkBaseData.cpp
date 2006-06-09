@@ -224,7 +224,7 @@ unsigned long mitk::BaseData::GetMTime() const
   return time;
 }
 
-void mitk::BaseData::ExecuteOperation(mitk::Operation* operation)
+void mitk::BaseData::ExecuteOperation(mitk::Operation* /*operation*/)
 {
   //empty by default. override if needed!
 }

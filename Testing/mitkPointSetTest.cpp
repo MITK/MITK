@@ -24,7 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include <fstream>
-int mitkPointSetTest(int argc, char* argv[])
+int mitkPointSetTest(int /*argc*/, char* /*argv*/[])
 {
   //Create PointSet
   mitk::PointSet::Pointer pointSet;

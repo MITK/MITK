@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkStepper.h"
 #include "mitkMultiStepper.h"
 
-int mitkStepperTest(int argc, char* argv[])
+int mitkStepperTest(int /*argc*/, char* /*argv*/[])
 {
   mitk::Stepper::Pointer stepperA;
   std::cout << "Testing mitk::Stepper::New(): ";

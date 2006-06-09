@@ -45,7 +45,7 @@ QmitkMovieMaker::QmitkMovieMaker( QObject *parent, const char *name,
   QmitkStdMultiWidget *mitkStdMultiWidget, mitk::DataTreeIteratorBase* it )
 
 : QmitkFunctionality(parent, name, it),
-  m_Controls(NULL), m_StepperAdapter(NULL), m_MultiWidget(mitkStdMultiWidget),
+  m_Controls(NULL), m_MultiWidget(mitkStdMultiWidget), m_StepperAdapter(NULL), 
   m_Looping(true), m_Direction(0), m_Aspect(0)
 {
   this->SetAvailability(true);
@@ -96,7 +96,7 @@ mitk::BaseController* QmitkMovieMaker::GetTemporalController()
   return m_MultiWidget->GetTimeNavigationController();
 }
 
-QWidget* QmitkMovieMaker::CreateMainWidget(QWidget *parent)
+QWidget* QmitkMovieMaker::CreateMainWidget(QWidget */*parent*/)
 {
   return NULL;
 }

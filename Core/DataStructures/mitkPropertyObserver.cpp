@@ -37,13 +37,13 @@ PropertyView::~PropertyView()
 }
 
 
-void PropertyView::OnModified(const itk::EventObject& e)
+void PropertyView::OnModified(const itk::EventObject& /*e*/)
 {
   PropertyChanged();
 }
 
 
-void PropertyView::OnDelete(const itk::EventObject& e)
+void PropertyView::OnDelete(const itk::EventObject& /*e*/)
 {
   PropertyRemoved();
   if (m_Property)
@@ -113,13 +113,13 @@ PropertyEditor::~PropertyEditor()
 }
 
 
-void PropertyEditor::OnModified(const itk::EventObject& e)
+void PropertyEditor::OnModified(const itk::EventObject& /*e*/)
 {
   PropertyChanged();
 }
 
 
-void PropertyEditor::OnDelete(const itk::EventObject& e)
+void PropertyEditor::OnDelete(const itk::EventObject& /*e*/)
 {
   PropertyRemoved();
   if (m_Property)

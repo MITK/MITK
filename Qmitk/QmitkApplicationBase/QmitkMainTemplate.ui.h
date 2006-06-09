@@ -96,10 +96,11 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkStatusBar.h>
 
 template <class T>
-static void __buildstring( ipPicDescriptor *pic, itk::Point<int, 3> p, QString &s, T dummy=0)
+static void __buildstring( ipPicDescriptor *pic, itk::Point<int, 3> p, QString &s, T /*dummy*/=0)
 {
   QString value;
-  if ( p[0] < pic->n[0] && p[1] < pic->n[1] && p[2] < pic->n[2] )
+  
+  if ( (p[0]>=0 && p[1] >=0 && p[2]>=0) && (unsigned int)p[0] < pic->n[0] && (unsigned int)p[1] < pic->n[1] && (unsigned int)p[2] < pic->n[2] )
   {
     if(pic->bpe!=24)
     {

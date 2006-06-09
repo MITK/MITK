@@ -205,10 +205,10 @@ protected slots:
 
 
 protected:  
-  QmitkStdMultiWidget* m_MultiWidget;
-
+  
   QmitkMovieMakerControls* m_Controls;
-
+  
+  QmitkStdMultiWidget* m_MultiWidget;
 
 private:
   mitk::BaseController* GetSpatialController();

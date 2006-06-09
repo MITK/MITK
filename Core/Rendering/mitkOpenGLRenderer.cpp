@@ -598,7 +598,7 @@ void mitk::OpenGLRenderer::MakeCurrent()
   }
 }
 
-void mitk::OpenGLRenderer::DataChangedEvent(const itk::Object *caller, const itk::EventObject &event)
+void mitk::OpenGLRenderer::DataChangedEvent(const itk::Object */*caller*/, const itk::EventObject &/*event*/)
 {
   if(m_RenderWindow!=NULL)
   {

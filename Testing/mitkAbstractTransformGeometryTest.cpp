@@ -27,7 +27,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <fstream>
 
-int mitkAbstractTransformGeometryTest(int argc, char* argv[])
+int mitkAbstractTransformGeometryTest(int /*argc*/, char** /*argv*/ )
 {
   mitk::Point3D origin;
   mitk::Vector3D right, bottom;

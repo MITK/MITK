@@ -21,7 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkImageDataItem.h"
 
 #include <fstream>
-int mitkImageTest(int argc, char* argv[])
+int mitkImageTest(int /*argc*/, char* /*argv*/[])
 {
 	//Create Image out of nowhere
 	mitk::Image::Pointer imgMem;
@@ -59,10 +59,10 @@ int mitkImageTest(int argc, char* argv[])
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "Filling image: ";
-  int i;
-  int size = dim[0]*dim[1]*dim[2];
+  unsigned int i;
+  unsigned int size = dim[0]*dim[1]*dim[2];
   for(i=0; i<size; ++i, ++p)
-    *p=i;
+    *p= (signed int)i;
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "Getting it again and compare with filled values: ";
@@ -74,7 +74,7 @@ int mitkImageTest(int argc, char* argv[])
   }
   for(i=0; i<size; ++i, ++p2)
   {
-    if(*p2!=i)
+    if(*p2!= (signed int)i )
     {
       std::cout<<"[FAILED]"<<std::endl;
       return EXIT_FAILURE;
@@ -92,11 +92,11 @@ int mitkImageTest(int argc, char* argv[])
   
   std::cout << "Testing GetSliceData() and compare with filled values: ";
   p2 = (int*)imgMem->GetSliceData(dim[2]/2)->GetData();
-  int xy_size = dim[0]*dim[1];
-  int start_mid_slice = (dim[2]/2)*xy_size;
+  unsigned int xy_size = dim[0]*dim[1];
+  unsigned int start_mid_slice = (dim[2]/2)*xy_size;
   for(i=0; i<xy_size; ++i, ++p2)
   {
-    if(*p2!=i+start_mid_slice)
+    if(*p2!=(signed int)(i+start_mid_slice))
     {
       std::cout<<"[FAILED]"<<std::endl;
       return EXIT_FAILURE;
@@ -128,7 +128,7 @@ int mitkImageTest(int argc, char* argv[])
   }
   for(i=0; i<size; ++i, ++p2)
   {
-    if(*p2!=(i%xy_size)+start_mid_slice)
+    if(*p2!= (signed int)((i%xy_size)+start_mid_slice))
     {
       std::cout<<"[FAILED]"<<std::endl;
       return EXIT_FAILURE;

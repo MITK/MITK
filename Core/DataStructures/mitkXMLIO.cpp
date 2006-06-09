@@ -40,13 +40,13 @@ bool XMLIO::WriteXML( XMLWriter& xmlWriter )
 }
 
 
-bool XMLIO::WriteXMLData( XMLWriter& xmlWriter )
+bool XMLIO::WriteXMLData( XMLWriter& /*xmlWriter*/ )
 {
   return true;
 }
 
 
-bool XMLIO::ReadXMLData( XMLReader& xmlReader )
+bool XMLIO::ReadXMLData( XMLReader& /*xmlReader*/ )
 {
  return false;
 }

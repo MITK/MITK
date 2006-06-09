@@ -41,7 +41,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 QmitkIsoSurface::QmitkIsoSurface(QObject *parent, const char *name, QmitkStdMultiWidget *mitkStdMultiWidget, mitk::DataTreeIteratorBase* it)
-    : QmitkFunctionality(parent, name, it) ,m_Controls(NULL), m_MultiWidget(mitkStdMultiWidget)
+    : QmitkFunctionality(parent, name, it) , m_MultiWidget(mitkStdMultiWidget), m_Controls(NULL)
 {
   SetAvailability(true);
   m_SurfaceCounter = 0;
@@ -55,7 +55,7 @@ QmitkIsoSurface::QmitkIsoSurface(QObject *parent, const char *name, QmitkStdMult
 
 
 
-QWidget * QmitkIsoSurface::CreateMainWidget(QWidget *parent)
+QWidget * QmitkIsoSurface::CreateMainWidget(QWidget */*parent*/)
 {
   return NULL;
 }
@@ -113,7 +113,7 @@ void QmitkIsoSurface::CreateSurface()
   if(m_MitkImage != NULL)
   {
   //Value Gauss
-  float gsDev = 1.5;
+  //float gsDev = 1.5;
 
   //Value for DecimatePro 
   float targetReduction = 0.05;

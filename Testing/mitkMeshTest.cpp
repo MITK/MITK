@@ -23,7 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkInteractionConst.h>
 #include <fstream>
 
-int mitkMeshTest(int argc, char* argv[])
+int mitkMeshTest(int /*argc*/, char* /*argv*/[])
 {
   //Create mesh
   mitk::Mesh::Pointer mesh;

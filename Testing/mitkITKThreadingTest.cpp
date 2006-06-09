@@ -92,7 +92,7 @@ ITK_THREAD_RETURN_TYPE ThreadedFunction(void* param)
  return ITK_THREAD_RETURN_VALUE;
 }
 
-int mitkITKThreadingTest(int argc, char* argv[])
+int mitkITKThreadingTest(int /*argc*/, char* /*argv*/[])
 {
   itk::MultiThreader::Pointer threader = itk::MultiThreader::New();
 

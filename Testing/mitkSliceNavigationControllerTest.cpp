@@ -204,7 +204,7 @@ int testGeometry(const mitk::Geometry3D * geometry,
   return EXIT_SUCCESS;
 }
 
-int mitkSliceNavigationControllerTest(int argc, char* argv[])
+int mitkSliceNavigationControllerTest(int /*argc*/, char* /*argv*/[])
 {
   int result=EXIT_FAILURE;
 

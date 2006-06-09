@@ -93,7 +93,7 @@ void mitk::Mapper::GenerateData()
 
 }
 
-void mitk::Mapper::GenerateData(mitk::BaseRenderer* renderer)
+void mitk::Mapper::GenerateData(mitk::BaseRenderer* /*renderer*/)
 {
 
 }

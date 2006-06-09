@@ -21,7 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkPointSetInteractor.h>
 
 #include <fstream>
-int mitkGlobalInteractionTest(int argc, char* argv[])
+int mitkGlobalInteractionTest(int /*argc*/, char* /*argv*/[])
 {
   //create Interactors
   mitk::PointSetInteractor * firstInteractor = new mitk::PointSetInteractor("pointsetinteractor", NULL, 1);

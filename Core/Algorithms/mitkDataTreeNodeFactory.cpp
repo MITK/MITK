@@ -180,12 +180,12 @@ void mitk::DataTreeNodeFactory::GenerateData()
     { 
       if ( m_FileName != "" )
       {
+#ifdef MBI_INTERNAL
         if ( this->FileNameEndsWith( "HPSONOS.DB" ) || this->FileNameEndsWith( "hpsonos.db" ) )
         {
           std::cout << "reading HPSONOS" << endl;
           this->ReadFileTypeHPSONOS();
         }
-#ifdef MBI_INTERNAL
 #ifdef USE_TUS_READER
         else if ( this->FileNameEndsWith( ".TUS" ) || this->FileNameEndsWith( ".tus" ) )
         {

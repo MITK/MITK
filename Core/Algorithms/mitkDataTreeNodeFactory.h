@@ -171,52 +171,15 @@ protected:
   */
   virtual std::string GetDirectory();
 
-  virtual void ReadFileTypeSTL();
-
-  virtual void ReadFileTypeVTK();
-
-  virtual void ReadFileTypeOBJ();
-
-  virtual void ReadFileTypePIC();
-
-  virtual void ReadFileTypePAR();
-
-  virtual void ReadFileTypePVTK();
-  
-  virtual void ReadFileTypeGDCM();
-
-#if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
-  virtual void ReadFileTypeVTI();
-#endif
-
-  virtual void ReadFileTypeITKImageIOFactory();
-
-  #ifdef MBI_INTERNAL
-
+#ifdef MBI_INTERNAL
+  virtual void ReadFileTypeHPSONOS();
 #ifdef HAVE_IPDICOM
   virtual void ReadFileTypeIPDCM();
-
 #endif /* HAVE_IPDICOM */
-  virtual void ReadFileTypeVES();
-
-  virtual void ReadFileTypeUVG();
-
-  virtual void ReadFileTypeDVG();
-
-  virtual void ReadFileTypeHPSONOS();
-
-  virtual void ReadFileTypeSSM();
-
 #ifdef USE_TUS_READER
   virtual void ReadFileTypeTUS();
 #endif
-  #endif /* MBI_INTERNAL */
-
-  virtual void ReadFileSeriesTypePIC();
-
-  virtual void ReadFileSeriesTypeSTL();
-
-  virtual void ReadFileSeriesTypeVTK();
+#endif /* MBI_INTERNAL */
 
   virtual void ReadFileSeriesTypeDCM();
 

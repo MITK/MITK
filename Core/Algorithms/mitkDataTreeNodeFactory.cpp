@@ -71,8 +71,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 // MITK-related includes
 #include "mitkSurface.h"
-#include "mitkPicFileReader.h"
-#include "mitkPicVolumeTimeSeriesReader.h"
 #include "mitkStringProperty.h"
 #include "mitkProperties.h"
 #include "mitkMaterialProperty.h"
@@ -80,13 +78,11 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkVtkRepresentationProperty.h"
 #include "mitkVtkInterpolationProperty.h"
 #include "mitkVtkScalarModeProperty.h"
-#include "mitkParRecFileReader.h"
 #include "mitkImage.h"
 #include "mitkLookupTableProperty.h"
 #include "mitkLookupTable.h"
 #include "mitkImageChannelSelector.h"
 #include "mitkImageSliceSelector.h"
-#include "mitkSTLFileReader.h"
 
 #ifdef MBI_INTERNAL
  #ifdef HAVE_IPDICOM
@@ -105,211 +101,114 @@ mitk::DataTreeNodeFactory::DataTreeNodeFactory()
   this->Modified();
 }
 
-
-
 mitk::DataTreeNodeFactory::~DataTreeNodeFactory()
 {}
 
-
-
-
 void mitk::DataTreeNodeFactory::GenerateData()
 {
-/***************************************** new datatreenode factory mechanism **********************************************/
-// the mitkBaseDataIOFactory class returns a pointer of a vector of BaseData objects
-// the IO factories of the file readers are registered in the class mitkBaseDataIOFactory
-// for more details see the doxygen documentation (modules IO)
-  bool usedNewDTNF = false;
-  std::vector<mitk::BaseData::Pointer>* baseDataVector = mitk::BaseDataIOFactory::CreateBaseDataIO( m_FileName, m_FilePrefix, m_FilePattern, mitk::BaseDataIOFactory::ReadMode );
-
-  if(baseDataVector)
-    this->ResizeOutputs((unsigned int)baseDataVector->size());
-
-  for(int i=0; i<(int)baseDataVector->size(); i++)
+  // part for DICOM
+  if ( this->FileNameEndsWith( ".dcm" ) || this->FileNameEndsWith( ".DCM" ) 
+    || this->FileNameEndsWith( ".ima" ) 
+    || this->FileNameEndsWith( ".IMA" ) 
+    || (itksys::SystemTools::GetFilenameLastExtension(m_FileName) == "" ) )
   {
-    mitk::BaseData::Pointer baseData = baseDataVector->at(i);
-  
-    if( baseData.IsNotNull() )
-    {
-      usedNewDTNF = true;
-      mitk::DataTreeNode::Pointer node = mitk::DataTreeNode::New();//this->GetOutput();
-      node->SetData(baseData);
-      this->SetDefaultCommonProperties( node );
+    this->ReadFileSeriesTypeDCM();
+  }
+  else if ( this->FileNameEndsWith( ".gdcm" ) || this->FileNameEndsWith( ".GDCM" ) )
+  {
+    this->ReadFileSeriesTypeGDCM();
+  }
+  else
+  {
+    /***************************************** new datatreenode factory mechanism **********************************************/
+    // the mitkBaseDataIOFactory class returns a pointer of a vector of BaseData objects
+    // the IO factories of the file readers are registered in the class mitkBaseDataIOFactory
+    // for more details see the doxygen documentation (modules IO)
+    bool usedNewDTNF = false;
+    std::vector<mitk::BaseData::Pointer>* baseDataVector = mitk::BaseDataIOFactory::CreateBaseDataIO( m_FileName, m_FilePrefix, m_FilePattern, mitk::BaseDataIOFactory::ReadMode );
 
-      mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
-      if(image.IsNotNull()){
-        this->SetDefaultImageProperties(node);
-  #ifdef MBI_INTERNAL
-        if ( this->FileNameEndsWith( ".pic" ) || this->FileNameEndsWith( ".pic.gz" ) || this->FileNameEndsWith( ".seq" ) )
+    if(baseDataVector)
+      this->ResizeOutputs((unsigned int)baseDataVector->size());
+
+    for(int i=0; i<(int)baseDataVector->size(); i++)
+    {
+      mitk::BaseData::Pointer baseData = baseDataVector->at(i);
+
+      if( baseData.IsNotNull() )
+      {
+        usedNewDTNF = true;
+        mitk::DataTreeNode::Pointer node = mitk::DataTreeNode::New();//this->GetOutput();
+        node->SetData(baseData);
+        this->SetDefaultCommonProperties( node );
+
+        mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
+        if(image.IsNotNull())
         {
-          if ( image->GetNumberOfChannels() > 1 )
-            this->SetDefaultUltraSoundProperties( node );
+          this->SetDefaultImageProperties(node);
+#ifdef MBI_INTERNAL
+          if ( this->FileNameEndsWith( ".pic" ) || this->FileNameEndsWith( ".pic.gz" ) || this->FileNameEndsWith( ".seq" ) )
+          {
+            if ( image->GetNumberOfChannels() > 1 )
+              this->SetDefaultUltraSoundProperties( node );
+          }
+          else if ( this->FileNameEndsWith( ".TUS" ) || this->FileNameEndsWith( ".tus" ) )
+          {
+            if ( image->GetNumberOfChannels() > 1 )
+            {
+              this->SetDefaultUltraSoundProperties( node );
+              this->SetDefaultTusProperties( i, node );
+            }
+          }
+#endif // MBI_INTERNAL
         }
+#ifdef MBI_INTERNAL
+        mitk::VesselTreeData::Pointer vesselTree = dynamic_cast<mitk::VesselTreeData*>(node->GetData());
+        if(vesselTree.IsNotNull())
+          this->SetDefaultVesselTreeProperties(node);
+#endif // MBI_INTERNAL
+
+        mitk::Surface::Pointer surface = dynamic_cast<mitk::Surface*>(node->GetData());
+        if(surface.IsNotNull())
+          this->SetDefaultSurfaceProperties(node);
+
+        node->SetVisibility(true);
+        this->SetOutput(i, node);
+      }
+    }
+    /***********************************************************************************************************/
+    if(!usedNewDTNF)
+    { 
+      if ( m_FileName != "" )
+      {
+        if ( this->FileNameEndsWith( "HPSONOS.DB" ) || this->FileNameEndsWith( "hpsonos.db" ) )
+        {
+          std::cout << "reading HPSONOS" << endl;
+          this->ReadFileTypeHPSONOS();
+        }
+#ifdef MBI_INTERNAL
+#ifdef USE_TUS_READER
         else if ( this->FileNameEndsWith( ".TUS" ) || this->FileNameEndsWith( ".tus" ) )
         {
-          if ( image->GetNumberOfChannels() > 1 ){
-            this->SetDefaultUltraSoundProperties( node );
-            this->SetDefaultTusProperties( i, node );
-          }
+          std::cout << "reading tus" << endl;
+          this->ReadFileTypeTUS();
         }
-  #endif // MBI_INTERNAL
+#endif
+#ifdef HAVE_IPDICOM
+        else if ( this->FileNameEndsWith( ".IPDCM" ) || this->FileNameEndsWith( ".ipdcm" ) )
+        {
+          this->ReadFileTypeIPDCM();
+        }
+#endif /* HAVE_IPDICOM */
+#endif /* MBI_INTERNAL */
       }
-  #ifdef MBI_INTERNAL
-      mitk::VesselTreeData::Pointer vesselTree = dynamic_cast<mitk::VesselTreeData*>(node->GetData());
-      if(vesselTree.IsNotNull())
-        this->SetDefaultVesselTreeProperties(node);
-  #endif // MBI_INTERNAL
-
-        
-      mitk::Surface::Pointer surface = dynamic_cast<mitk::Surface*>(node->GetData());
-      if(surface.IsNotNull())
-        this->SetDefaultSurfaceProperties(node);
-
-      node->SetVisibility(true);
-      this->SetOutput(i, node);
-    }
-  }
-/***********************************************************************************************************/
-  if(!usedNewDTNF)
-  { 
-    if ( m_FileName != "" )
-    {
-      if ( this->FileNameEndsWith( ".stl" ) )
+      // part for series of data
+      else if ( m_FilePattern != "" && m_FilePrefix != "" )
       {
-        this->ReadFileTypeSTL();
+          this->ReadFileSeriesTypeITKImageSeriesReader();
       }
-  //    else if ( this->FileNameEndsWith( ".vtk" ) )
-  //    {
-  //      this->ReadFileTypeVTK();
-  //    }
-  //    else if ( this->FileNameEndsWith( ".obj" ) )
-  //    {
-  //      this->ReadFileTypeOBJ();
-  //    }
-  //    else if ( this->FileNameEndsWith( ".pic" ) || this->FileNameEndsWith( ".pic.gz" ) || this->FileNameEndsWith( ".seq" ) )
-  //    {
-  //      this->ReadFileTypePIC();
-  //    }
-  //    else if ( this->FileNameEndsWith( ".par" ) )
-  //    {
-  //      this->ReadFileTypePAR();
-  //    }
-  //    else if ( this->FileNameEndsWith( ".pvtk" ) )
-  //    {
-  //      this->ReadFileTypePVTK();
-  //    }
-  //    else if ( this->FileNameEndsWith( ".gdcm" ) || this->FileNameEndsWith( ".GDCM" ) )
-  //    {
-  //      this->ReadFileTypeGDCM();
-  //    }
-  //    else if ( this->FileNameEndsWith( ".dcm" ) || this->FileNameEndsWith( ".DCM" ) 
-  //      || this->FileNameEndsWith( ".ima" ) 
-  //      || this->FileNameEndsWith( ".IMA" ) 
-  //      || (itksys::SystemTools::GetFilenameLastExtension(m_FileName) == "" ) )
-  //    {
-  //      this->ReadFileSeriesTypeDCM();
-  //    }
-  //#if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
-  //    else if ( this->FileNameEndsWith( ".vti" ) )
-  //    {
-  //      this->ReadFileTypeVTI();
-  //    }
-  //#endif
-  #ifdef MBI_INTERNAL
-  //#ifdef HAVE_IPDICOM
-  //    else if ( this->FileNameEndsWith( ".IPDCM" ) || this->FileNameEndsWith( ".ipdcm" ) )
-  //    {
-  //      this->ReadFileTypeIPDCM();
-  //    }
-  //#endif /* HAVE_IPDICOM */
-  //    else if ( this->FileNameEndsWith( ".ves" ) )
-  //    {
-  //      this->ReadFileTypeVES();
-  //    }
-  //    else if ( this->FileNameEndsWith( ".uvg" ) )
-  //    {
-  //      this->ReadFileTypeUVG();
-  //    }
-  //    else if ( this->FileNameEndsWith( ".dvg" ) )
-  //    {
-  //      this->ReadFileTypeDVG();
-  //    }
-      else if ( this->FileNameEndsWith( "HPSONOS.DB" ) || this->FileNameEndsWith( "hpsonos.db" ) )
-      {
-        std::cout << "jetzt lese ich sono"<<endl;
-        this->ReadFileTypeHPSONOS();
-      }
-      //else if (this->FileNameEndsWith(".ssm"))
-      //{
-      //  this->ReadFileTypeSSM();
-      //}
-  #ifdef USE_TUS_READER
-      else if ( this->FileNameEndsWith( ".TUS" ) || this->FileNameEndsWith( ".tus" ) )
-      {
-        std::cout << "jetzt lese ich tus"<<endl;
-        this->ReadFileTypeTUS();
-      }
-  #endif
-  #endif /* MBI_INTERNAL */
-      //else if (this->FileNameEndsWith("."))
-      //{
-      //    //put your new filetype in here!
-      //}
-      //else
-      //{
-      //  this->ReadFileTypeITKImageIOFactory();
-      //}
-    }
-    else if ( m_FilePattern != "" && m_FilePrefix != "" )
-    {
-      if ( this->FilePatternEndsWith( ".pic" ) || this->FilePatternEndsWith( ".pic.gz" ) )
-      {
-        this->ReadFileSeriesTypePIC();
-      }
-      //else if ( this->FilePatternEndsWith( ".dcm" ) || this->FilePatternEndsWith( ".DCM" ) 
-      //  || this->FileNameEndsWith( ".ima" ) 
-      //  || this->FileNameEndsWith( ".IMA" ) 
-      //  || (itksys::SystemTools::GetFilenameLastExtension(m_FilePattern) == "" ) )
-      //{
-      //  this->ReadFileSeriesTypeDCM();
-      //}
-      //else if ( this->FilePatternEndsWith( ".gdcm" ) || this->FilePatternEndsWith( ".GDCM" ) )
-      //{
-      //  this->ReadFileSeriesTypeGDCM();
-      //}
-      //else if ( this->FilePatternEndsWith( ".stl" ) || this->FilePatternEndsWith( ".STL" ) )
-      //{
-      //  this->ReadFileSeriesTypeSTL();
-      //}
-      //else if ( this->FilePatternEndsWith( ".vtk" ) || this->FilePatternEndsWith( ".VTK" ) )
-      //{
-      //  this->ReadFileSeriesTypeVTK();
-      //}
-      else
-      {
-        this->ReadFileSeriesTypeITKImageSeriesReader();
-      }
-    }
-    unsigned int nOut = this->GetNumberOfOutputs();
-    for ( unsigned int i = 0; i < nOut; ++i )
-    {
-      mitk::DataTreeNode::Pointer node = this->GetOutput(i);
-      //// set path without filename as string property
-      //mitk::StringProperty::Pointer pathProp = new mitk::StringProperty( itksys::SystemTools::GetFilenamePath( m_FileName ) );
-      //node->SetProperty( StringProperty::PATH, pathProp );
-      //// set filename without path as string property
-      //mitk::StringProperty::Pointer nameProp = dynamic_cast<mitk::StringProperty*>(node->GetProperty("name").GetPointer());
-      //if(nameProp.IsNull() || nameProp->GetValue()=="No Name!")
-      //{
-      //  nameProp = new mitk::StringProperty( this->GetBaseFileName() );
-      //  node->SetProperty( "name", nameProp );
-      //}
-      this->SetDefaultCommonProperties( node );
-      node->SetVisibility(true);
     }
   }
 }
-
 
 void mitk::DataTreeNodeFactory::ResizeOutputs( const unsigned int& num )
 {
@@ -321,20 +220,15 @@ void mitk::DataTreeNodeFactory::ResizeOutputs( const unsigned int& num )
   }
 }
 
-
 bool mitk::DataTreeNodeFactory::FileNameEndsWith( const std::string& name )
 {
   return m_FileName.find( name ) != std::string::npos;
 }
 
-
-
 bool mitk::DataTreeNodeFactory::FilePatternEndsWith( const std::string& name )
 {
   return m_FilePattern.find( name ) != std::string::npos;
 }
-
-
 
 std::string mitk::DataTreeNodeFactory::GetBaseFileName()
 {
@@ -346,8 +240,6 @@ std::string mitk::DataTreeNodeFactory::GetBaseFilePrefix()
   return itksys::SystemTools::GetFilenameName( m_FilePrefix );
 }
 
-
-
 std::string mitk::DataTreeNodeFactory::GetDirectory()
 {
   if ( m_FileName != "" )
@@ -358,353 +250,7 @@ std::string mitk::DataTreeNodeFactory::GetDirectory()
     return std::string( "" );
 }
 
-
-
-
-void mitk::DataTreeNodeFactory::ReadFileTypeSTL()
-{
-  mitk::DataTreeNode::Pointer node = this->GetOutput();
-  mitk::STLFileReader::Pointer STLFileReader = mitk::STLFileReader::New();
-  STLFileReader->SetFileName(m_FileName.c_str());
-  STLFileReader->Update();
-  node->SetData(STLFileReader->GetOutput());
-  SetDefaultSurfaceProperties( node );
-}
-
-
-
-
-void mitk::DataTreeNodeFactory::ReadFileTypeVTK()
-{
-  std::cout << "Loading " << m_FileName << " as vtk" << std::flush;
-
-  ///We create a Generic Reader to test de .vtk/
-  vtkDataReader *chooser=vtkDataReader::New();
-  chooser->SetFileName(m_FileName.c_str() );
-
-  if( chooser->IsFilePolyData())
-  {
-    ///PolyData/
-    std::cout << "PolyData" << std::endl;
-    vtkPolyDataReader *reader = vtkPolyDataReader::New();
-    reader->SetFileName( m_FileName.c_str() );
-    reader->Update();
-
-    if ( reader->GetOutput() != NULL )
-    {
-      mitk::Surface::Pointer surface = mitk::Surface::New();
-      surface->SetVtkPolyData( reader->GetOutput() );
-      mitk::DataTreeNode::Pointer node = this->GetOutput();
-      node->SetData( surface );
-
-      mitk::StringProperty::Pointer nameProp = new mitk::StringProperty(this->GetBaseFileName());
-      node->SetProperty( "name", nameProp );
-
-      this->SetDefaultSurfaceProperties( node );
-      if (reader->GetOutput()->GetPointData()->GetScalars() != 0) 
-      {
-        node->SetProperty( "scalar visibility", new mitk::BoolProperty(true) );
-        node->SetProperty( "color mode", new mitk::BoolProperty(true) );
-        node->SetProperty( "scalar mode", new mitk::VtkScalarModeProperty );
-      }
-    }
-    reader->Delete();
-  }
-  else if(chooser->IsFileStructuredPoints())
-  {
-    ///StructuredPoints/
-    std::cout << "StructuredPoints"<< std::endl;
-    vtkStructuredPointsReader *reader=vtkStructuredPointsReader::New();
-    reader->SetFileName(m_FileName.c_str());
-    reader->Update();
-
-    if ( reader->GetOutput() != NULL )
-    {
-      mitk::Image::Pointer image = mitk::Image::New();
-      image->Initialize( reader->GetOutput() );
-      image->SetVolume(  reader->GetOutput()->GetScalarPointer());
-      mitk::DataTreeNode::Pointer node = this->GetOutput();
-      node->SetData( image );
-
-      mitk::StringProperty::Pointer nameProp = new mitk::StringProperty(this->GetBaseFileName());
-      node->SetProperty( "name", nameProp );
-
-      this->SetDefaultImageProperties( node );
-
-      // add level-window property
-      //mitk::LevelWindowProperty::Pointer levWinProp = new mitk::LevelWindowProperty();
-      //mitk::LevelWindow levelwindow;
-      //levelwindow.SetAuto( image );
-      //levWinProp->SetLevelWindow( levelwindow );
-      //node->GetPropertyList()->SetProperty( "levelwindow", levWinProp );
-    }
-    reader->Delete();
-  }
-  else
-  {
-    std::cerr << " ... sorry, this .vtk format is not supported yet."<<std::endl;
-  }
-  chooser->Delete();
-  //mitk::DataTreeNode::Pointer node = this->GetOutput();
-  //mitk::VtkFileReader::Pointer VtkFileReader = mitk::VtkFileReader::New();
-  //VtkFileReader->SetFileName(m_FileName.c_str());
-  //VtkFileReader->Update();
-  //node->SetData(VtkFileReader->GetOutput());
-  //SetDefaultSurfaceProperties( node );
-}
-
-
-
-
-void mitk::DataTreeNodeFactory::ReadFileTypeOBJ()
-{
-  std::cout << "Loading " << m_FileName << " as obj..." << std::endl;
-
-  vtkOBJReader *reader = vtkOBJReader::New();
-  reader->SetFileName( m_FileName.c_str() );
-  reader->Update();
-
-  if ( reader->GetOutput() != NULL )
-  {
-    mitk::Surface::Pointer surface = mitk::Surface::New();
-    surface->SetVtkPolyData( reader->GetOutput() );
-    mitk::DataTreeNode::Pointer node = this->GetOutput();
-    node->SetData( surface );
-
-    SetDefaultSurfaceProperties( node );
-  }
-
-  reader->Delete();
-
-  std::cout << "...finished!" << std::endl;
-}
-
-
-
-
-void mitk::DataTreeNodeFactory::ReadFileTypePIC()
-{
-  std::cout << "Loading " << m_FileName << " as pic... " << std::endl;
-  ipPicDescriptor * header = ipPicGetHeader( const_cast<char *>( m_FileName.c_str() ), NULL );
-  if ( header != NULL )
-  {
-    mitk::PicFileReader::Pointer reader = mitk::PicFileReader::New();
-
-    reader->SetFileName( m_FileName.c_str() );
-    reader->UpdateLargestPossibleRegion();
-
-    if ( reader->GetOutput()->GetNumberOfChannels() == 1 )
-    {
-      mitk::DataTreeNode::Pointer node = this->GetOutput();
-      node->SetData( reader->GetOutput() );
-      SetDefaultImageProperties(node);
-
-      // add level-window property
-      //mitk::LevelWindowProperty::Pointer levWinProp = new mitk::LevelWindowProperty();
-      //mitk::LevelWindow levelwindow;
-
-      //levelwindow.SetAuto( reader->GetOutput() );
-      //levWinProp->SetLevelWindow( levelwindow );
-
-      //node->GetPropertyList()->SetProperty( "levelwindow", levWinProp );
-    }
 #ifdef MBI_INTERNAL
-    else
-    if ( reader->GetOutput()->GetNumberOfChannels() > 1 )
-    {
-      mitk::ImageChannelSelector::Pointer morphologyChannelSelector = mitk::ImageChannelSelector::New();
-      mitk::ImageChannelSelector::Pointer dopplerChannelSelector = mitk::ImageChannelSelector::New();
-
-      morphologyChannelSelector->SetInput( reader->GetOutput() );
-      dopplerChannelSelector->SetInput( reader->GetOutput() );
-
-      // insert morphology
-      mitk::DataTreeNode::Pointer node = this->GetOutput( 0 );
-      node->SetData( morphologyChannelSelector->GetOutput() );
-      mitk::StringProperty::Pointer ultrasoundProp = new mitk::StringProperty( "TransformedBackscatter" );
-      node->SetProperty( "ultrasound", ultrasoundProp );
-      mitk::StringProperty::Pointer nameProp = new mitk::StringProperty( this->GetBaseFileName()+" (morphology)" );
-      node->SetProperty( "name", nameProp );
-
-      //node->SetProperty( "layer", new mitk::IntProperty( -11 ) );
-      mitk::LevelWindow levelwindow;
-      levelwindow.SetAuto( morphologyChannelSelector->GetOutput() );
-      //node->SetLevelWindow( levelwindow, NULL );
-      node->SetVisibility( false, NULL );
-      //node->SetColor( 1.0, 1.0, 1.0, NULL );
-      node->Update();
-
-      SetDefaultImageProperties(node);
-
-
-      // now deal with Doppler
-      this->ResizeOutputs( 2 );
-      dopplerChannelSelector->SetChannelNr( 1 );
-
-      // create a Doppler lookup table
-      // TODO: map must depend on velocity meta information ( e.g., baseline shift)
-      mitk::USLookupTableSource::Pointer LookupTableSource = mitk::USLookupTableSource::New();
-      LookupTableSource->SetUseDSRDopplerLookupTable();
-      LookupTableSource->Update();
-      mitk::LookupTableSource::OutputTypePointer LookupTable = LookupTableSource->GetOutput();
-      mitk::LookupTableProperty::Pointer LookupTableProp = new mitk::LookupTableProperty( *LookupTable );
-
-      int start = 128 - 1;
-      int end = 128 + 1;
-      for (int i=start; i<=end;i++)
-        LookupTableProp->GetLookupTable().ChangeOpacity(i, 0);
-
-      // insert Doppler
-      node = this->GetOutput( 1 );
-      node->SetData( dopplerChannelSelector->GetOutput() );
-      SetDefaultImageProperties(node);
-
-      ultrasoundProp = new mitk::StringProperty( "TransformedDoppler" );
-      node->SetProperty( "ultrasound", ultrasoundProp );
-      nameProp = new mitk::StringProperty( this->GetBaseFileName()+" (Doppler)" );
-      node->SetProperty( "name", nameProp );
-      node->SetProperty( "layer", new mitk::IntProperty( -6 ) );
-
-      mitk::LevelWindowProperty::Pointer levWinProp = new mitk::LevelWindowProperty();
-      levelwindow.SetLevelWindow( 128, 255 );
-      levWinProp->SetLevelWindow( levelwindow );
-      // set the overwrite LevelWindow
-      // if "levelwindow" is used if "levelwindow" is not available
-      // else "levelwindow" is used
-      // "levelwindow" is not affected by the slider
-      node->GetPropertyList()->SetProperty( "levelWindow", levWinProp );
-
-      levWinProp = new mitk::LevelWindowProperty();
-      levWinProp->SetLevelWindow( levelwindow );
-      node->GetPropertyList()->SetProperty( "levelwindow", levWinProp );
-
-      node->SetProperty( "LookupTable", LookupTableProp );
-      node->SetVisibility( false, NULL );
-      node->Update();
-    }
-#endif
-  }
-  std::cout << "...finished!" << std::endl;
-}
-
-
-
-
-void mitk::DataTreeNodeFactory::ReadFileTypePAR()
-{
-  std::cout << "loading " << m_FileName << " as par/rec ... " << std::endl;
-
-  mitk::ParRecFileReader::Pointer reader = mitk::ParRecFileReader::New();
-  reader->SetFileName( m_FileName.c_str() );
-  reader->Update();
-  mitk::DataTreeNode::Pointer node = this->GetOutput();
-  node->SetData( reader->GetOutput() );
-
-
-  SetDefaultImageProperties(node);
-
-  // add level-window property
-  //mitk::LevelWindowProperty::Pointer levWinProp = new mitk::LevelWindowProperty();
-  //mitk::LevelWindow levelwindow;
-  //levelwindow.SetAuto( reader->GetOutput() );
-  //levWinProp->SetLevelWindow( levelwindow );
-  //node->GetPropertyList()->SetProperty( "levelwindow", levWinProp );
-
-  std::cout << "...finished!" << std::endl;
-}
-
-
-
-
-void mitk::DataTreeNodeFactory::ReadFileTypePVTK()
-{
-  ReadFileTypeVTK();
-}
-
-#if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
-void mitk::DataTreeNodeFactory::ReadFileTypeVTI()
-{
-  vtkXMLImageDataReader * vtkreader = vtkXMLImageDataReader::New();
-  vtkreader->SetFileName( m_FileName.c_str() );
-  vtkreader->Update();
-
-  if ( vtkreader->GetOutput() != NULL )
-  {
-    mitk::Image::Pointer image = mitk::Image::New();
-    image->Initialize( vtkreader->GetOutput() );
-    image->SetVolume( vtkreader->GetOutput()->GetScalarPointer() );
-    mitk::DataTreeNode::Pointer node = this->GetOutput();
-    node->SetData( image );
-
-    SetDefaultImageProperties(node);
-
-    // set filename without path as string property
-    mitk::StringProperty::Pointer nameProp = new mitk::StringProperty( this->GetBaseFileName() );
-    node->SetProperty( "name", nameProp );
-
-    // add level-window property
-    //mitk::LevelWindowProperty::Pointer levWinProp = new mitk::LevelWindowProperty();
-    //mitk::LevelWindow levelwindow;
-    //levelwindow.SetAuto( image );
-    //levWinProp->SetLevelWindow( levelwindow );
-    //node->GetPropertyList()->SetProperty( "levelwindow", levWinProp );
-  }
-  vtkreader->Delete();
-}
-#endif
-
-
-#ifdef MBI_INTERNAL
-void mitk::DataTreeNodeFactory::ReadFileTypeVES()
-{
-  std::cout << "Loading " << m_FileName << " as ves... " << std::endl;
-
-  mitk::VesselTreeFileReader::Pointer reader = mitk::VesselTreeFileReader::New();
-  reader->SetFileName( m_FileName.c_str() );
-  reader->Update();
-  mitk::DataTreeNode::Pointer node = this->GetOutput();
-  node->SetData( reader->GetOutput() );
-
-  mitk::VesselTreeToLookupTableFilter::Pointer lutGenerator = mitk::VesselTreeToLookupTableFilter::New();
-  lutGenerator->SetInput( reader->GetOutput() );
-  lutGenerator->Update();
-  
-  mitk::VesselTreeLookupTableProperty::Pointer lutProp = new mitk::VesselTreeLookupTableProperty( dynamic_cast<mitk::VesselTreeLookupTable*>( lutGenerator->GetOutput() ) );
-  node->SetProperty( "VesselTreeLookupTable", lutProp );
-  
-  std::cout << "...finished!" << std::endl;
-}
-
-
-
-
-void mitk::DataTreeNodeFactory::ReadFileTypeUVG()
-{
-  std::cout << "Loading " << m_FileName << " as uvg... " << std::endl;
-
-  mitk::VesselGraphFileReader<Undirected>::Pointer reader = mitk::VesselGraphFileReader<Undirected>::New();
-  reader->SetFileName( m_FileName.c_str() );
-  reader->Update();
-  mitk::DataTreeNode::Pointer node = this->GetOutput();
-  node->SetData( reader->GetOutput() );
-
-  std::cout << "...finished!" << std::endl;
-}
-
-void mitk::DataTreeNodeFactory::ReadFileTypeDVG()
-{
-  std::cout << "Loading " << m_FileName << " as dvg... " << std::endl;
-
-  mitk::VesselGraphFileReader<Directed>::Pointer reader = mitk::VesselGraphFileReader<Directed>::New();
-  reader->SetFileName( m_FileName.c_str() );
-  reader->Update();
-  mitk::DataTreeNode::Pointer node = this->GetOutput();
-  node->SetData( reader->GetOutput() );
-
-  std::cout << "...finished!" << std::endl;
-}
-
-
 void mitk::DataTreeNodeFactory::ReadFileTypeHPSONOS()
 {
   std::cout << "loading " << m_FileName << " as DSR ... " << std::endl;
@@ -881,6 +427,7 @@ void mitk::DataTreeNodeFactory::ReadFileTypeHPSONOS()
   }
   std::cout << "...finished!" << std::endl;
 }
+
 #ifdef USE_TUS_READER
 void mitk::DataTreeNodeFactory::ReadFileTypeTUS()
 {
@@ -940,28 +487,9 @@ void mitk::DataTreeNodeFactory::ReadFileTypeTUS()
       count++;
     }
 }
-#endif
-
-
-void mitk::DataTreeNodeFactory::ReadFileTypeSSM()
-{
-  std::cout << "Loading " << m_FileName << " as ssm... " << std::endl;
-
-  mitk::ShapeModelFileReader::Pointer reader = mitk::ShapeModelFileReader::New();
-  reader->SetFileName( m_FileName.c_str() );
-  reader->Update();
-  mitk::DataTreeNode::Pointer node = this->GetOutput();
-  node->SetData( reader->GetOutput() );
-  std::string filename = this->GetBaseFilePrefix();
-  mitk::StringProperty::Pointer nameProp = new mitk::StringProperty( filename );
-  node->SetProperty( "name", nameProp );
-
-  std::cout << "...finished!" << std::endl;
-}
-
+#endif //USE_TUS_READER
 
 #ifdef HAVE_IPDICOM
-
 void mitk::DataTreeNodeFactory::ReadFileTypeIPDCM()
 {
   std::cout << "loading " << m_FileName << " as DICOM... " << std::endl;
@@ -977,9 +505,9 @@ void mitk::DataTreeNodeFactory::ReadFileTypeIPDCM()
 
 
   // add Level-Window property
-  //mitk::LevelWindow levelwindow;
-  //levelwindow.SetAuto( reader->GetOutput() );
-  //node->SetLevelWindow( levelwindow, NULL );
+  mitk::LevelWindow levelwindow;
+  levelwindow.SetAuto( reader->GetOutput() );
+  node->SetLevelWindow( levelwindow, NULL );
 
 
   std::cout << "...finished!" << std::endl;
@@ -987,197 +515,14 @@ void mitk::DataTreeNodeFactory::ReadFileTypeIPDCM()
 
 
 #endif /* HAVE_IPDICOM */
-#endif
+#endif // MBI_INTERNAL
 
-void mitk::DataTreeNodeFactory::ReadFileTypeGDCM()
-{
-  std::cout << "loading " << m_FileName << " as DICOM by gdcm reader... " << std::endl;
-  this->ReadFileSeriesTypeGDCM();
-  /*
-  SetDefaultImageProperties(node);
-
-
-  // add Level-Window property
-  mitk::LevelWindow levelwindow;
-  levelwindow.SetAuto( reader->GetOutput() );
-  node->SetLevelWindow( levelwindow, NULL );
- */
-
-  std::cout << "...finished!" << std::endl;
-}
-
-void mitk::DataTreeNodeFactory::ReadFileTypeITKImageIOFactory()
-  {
-  const unsigned int MINDIM = 2;
-  const unsigned int MAXDIM = 4;
-
-  std::cout << "loading " << m_FileName << " via itk::ImageIOFactory... " << std::endl;
-
-  // Check to see if we can read the file given the name or prefix
-  if ( m_FileName == "" )
-  {
-    itkWarningMacro( << "File Type not supported!" );
-    return ;
-  }
-
-  if ( m_FileName == "--no-server" )
-  {
-    return ;
-  }
-
-  itk::ImageIOBase::Pointer imageIO = itk::ImageIOFactory::CreateImageIO( m_FileName.c_str(), itk::ImageIOFactory::ReadMode );
-  if ( imageIO.IsNull() )
-  {
-    itkWarningMacro( << "File Type not supported!" );
-    return ;
-  }
-
-  // Got to allocate space for the image. Determine the characteristics of
-  // the image.
-  imageIO->SetFileName( m_FileName.c_str() );
-  imageIO->ReadImageInformation();
-
-  unsigned int ndim = imageIO->GetNumberOfDimensions();
-  if ( ndim < MINDIM || ndim > MAXDIM )
-  {
-    itkWarningMacro( << "Sorry, only dimensions 2, 3 and 4 are supported. The given file has " << ndim << " dimensions! Reading as 4D." );
-    ndim = MAXDIM;
-  }
-
-  itk::ImageIORegion ioRegion( ndim );
-  itk::ImageIORegion::SizeType ioSize = ioRegion.GetSize();
-  itk::ImageIORegion::IndexType ioStart = ioRegion.GetIndex();
-
-  unsigned int dimensions[ MAXDIM ];
-  dimensions[ 0 ] = 0;
-  dimensions[ 1 ] = 0;
-  dimensions[ 2 ] = 0;
-  dimensions[ 3 ] = 0;
-
-  float spacing[ MAXDIM ];
-  spacing[ 0 ] = 1.0f;
-  spacing[ 1 ] = 1.0f;
-  spacing[ 2 ] = 1.0f;
-  spacing[ 3 ] = 1.0f;
-
-  Point3D origin;
-  origin.Fill(0);
-
-  for ( unsigned int i = 0; i < ndim ; ++i )
-  {
-    ioStart[ i ] = 0;
-    ioSize[ i ] = imageIO->GetDimensions( i );
-    if(i<MAXDIM)
-    {
-      dimensions[ i ] = imageIO->GetDimensions( i );
-      spacing[ i ] = imageIO->GetSpacing( i );
-      if(spacing[ i ] <= 0)
-        spacing[ i ] = 1.0f;
-    }
-    if(i<3)
-    {
-      origin[ i ] = imageIO->GetOrigin( i );
-    }
-  }
-
-  ioRegion.SetSize( ioSize );
-  ioRegion.SetIndex( ioStart );
-
-  std::cout << "ioRegion: " << ioRegion << std::endl;
-  imageIO->SetIORegion( ioRegion );
-  void* buffer = malloc( imageIO->GetImageSizeInBytes() );
-  imageIO->Read( buffer );
-  mitk::Image::Pointer image = mitk::Image::New();
-  if((ndim==4) && (dimensions[3]<=1))
-    ndim = 3;
-  if((ndim==3) && (dimensions[2]<=1))
-    ndim = 2;
-#if ITK_VERSION_MAJOR == 2 || ( ITK_VERSION_MAJOR == 1 && ITK_VERSION_MINOR > 6 )
-  mitk::PixelType pixelType( imageIO->GetComponentTypeInfo(), imageIO->GetNumberOfComponents() );
-  image->Initialize( pixelType, ndim, dimensions );
-#else
-  if ( imageIO->GetNumberOfComponents() > 1)
-    itkWarningMacro(<<"For older itk versions, only scalar images are supported!");
-  mitk::PixelType pixelType( imageIO->GetPixelType() );
-  image->Initialize( pixelType, ndim, dimensions );
-#endif 
-  image->SetVolume( buffer );
-  image->GetSlicedGeometry()->SetOrigin( origin );
-  image->GetSlicedGeometry()->SetSpacing( spacing );
-  image->GetTimeSlicedGeometry()->InitializeEvenlyTimed(image->GetSlicedGeometry(), image->GetDimension(3));
-  free( buffer );
-  buffer = NULL;
-  std::cout << "number of image components: "<< image->GetPixelType().GetNumberOfComponents() << std::endl;
-  mitk::DataTreeNode::Pointer node = this->GetOutput();
-  node->SetData( image );
-
-  // add level-window property
-  if ( image->GetPixelType().GetNumberOfComponents() == 1 )
-  {
-    SetDefaultImageProperties( node );
-    //mitk::LevelWindowProperty::Pointer levWinProp = new mitk::LevelWindowProperty();
-    //mitk::LevelWindow levelwindow;
-    //levelwindow.SetAuto( image );
-    //levWinProp->SetLevelWindow( levelwindow );
-    //node->GetPropertyList()->SetProperty( "levelwindow", levWinProp );
-  }
-  /*
-  mitk::LookupTable::Pointer mitkLut = mitk::LookupTable::New();
-  vtkLookupTable* vtkLut = mitkLut->GetVtkLookupTable();
-  vtkLut->SetHueRange(0.6667, 0.0);
-  vtkLut->SetTableRange(0.0, 20.0);
-  vtkLut->Build();
-  
-  mitkLut->ChangeOpacityForAll(0.5);
-  mitkLut->ChangeOpacity(0, 0.0);
-  
-  
-  mitk::LookupTableProperty* mitkLutProp = new mitk::LookupTableProperty();
-  mitkLutProp->SetLookupTable(*mitkLut);
-  node->SetProperty( "LookupTable", mitkLutProp );
-  */
- 
-  std::cout << "...finished!" << std::endl;
-}
-
-void mitk::DataTreeNodeFactory::ReadFileSeriesTypePIC()
-{
-  std::cout << "loading image series with prefix " << m_FilePrefix << " and pattern " << m_FilePattern << " as pic..." << std::endl;
-
-  mitk::PicVolumeTimeSeriesReader::Pointer reader;
-  reader = mitk::PicVolumeTimeSeriesReader::New();
-  reader->SetFilePrefix( m_FilePrefix.c_str() );
-  reader->SetFilePattern( m_FilePattern.c_str() );
-  reader->UpdateLargestPossibleRegion();
-
-  mitk::DataTreeNode::Pointer node = this->GetOutput();
-  node->SetData( reader->GetOutput() );
-
-  // set filename without path as string property
-  std::string filename = this->GetBaseFilePrefix() + "pic";
-  mitk::StringProperty::Pointer nameProp = new mitk::StringProperty( filename );
-  node->SetProperty( "name", nameProp );
-
-
-  SetDefaultImageProperties(node);
-
-  // add level-window property
-  //mitk::LevelWindowProperty::Pointer levWinProp = new mitk::LevelWindowProperty();
-  //mitk::LevelWindow levelwindow;
-
-  //levelwindow.SetAuto( reader->GetOutput() );
-  //levWinProp->SetLevelWindow( levelwindow );
-
-  //node->GetPropertyList()->SetProperty( "levelwindow", levWinProp );
-
-  std::cout << "...finished!" << std::endl;
-}
 
 void mitk::DataTreeNodeFactory::ReadFileSeriesTypeDCM()
 {
   std::cout << "loading image series with prefix " << m_FilePrefix << " and pattern " << m_FilePattern << " as DICOM..." << std::endl;
 
-  typedef itk::Image<int, 3> ImageType;
+  typedef itk::Image<short, 3> ImageType;
   typedef itk::ImageSeriesReader< ImageType > ReaderType;
   typedef std::vector<std::string> StringContainer;
   typedef itk::DICOMImageIO2 IOType;
@@ -1232,18 +577,7 @@ void mitk::DataTreeNodeFactory::ReadFileSeriesTypeDCM()
       mitk::DataTreeNode::Pointer node = this->GetOutput( i );
       node->SetData( image );
 
-
-
       SetDefaultImageProperties(node);
-
-      // add level-window property
-      //mitk::LevelWindowProperty::Pointer levWinProp = new mitk::LevelWindowProperty();
-      //mitk::LevelWindow levelwindow;
-      //levelwindow.SetAuto( image );
-      //levWinProp->SetLevelWindow( levelwindow );
-      //node->GetPropertyList()->SetProperty( "levelwindow", levWinProp );
-
-
 
       // set filename without path as string property
       std::string filename = std::string( this->GetBaseFilePrefix() );
@@ -1258,8 +592,6 @@ void mitk::DataTreeNodeFactory::ReadFileSeriesTypeDCM()
     }
   }
 }
-
-
 
 void mitk::DataTreeNodeFactory::ReadFileSeriesTypeGDCM()
 {
@@ -1312,91 +644,10 @@ void mitk::DataTreeNodeFactory::ReadFileSeriesTypeGDCM()
     
     SetDefaultImageProperties(node);
     
-    // add level-window property
-    //mitk::LevelWindowProperty::Pointer levWinProp = new mitk::LevelWindowProperty();
-    //mitk::LevelWindow levelwindow;
-    //levelwindow.SetAuto( image );
-    //levWinProp->SetLevelWindow( levelwindow );
-    //node->GetPropertyList()->SetProperty( "levelwindow", levWinProp );
-    
     // set filename without path as string property
     std::string filename = std::string( this->GetBaseFilePrefix() );
     mitk::StringProperty::Pointer nameProp = new mitk::StringProperty( "unknownName.gdcm" );
     node->SetProperty( "name", nameProp );
-
-  //
-  // Implementation for itk >= 2.2
-  //
-  /* 
-  
-  ImageIOType::Pointer gdcmIO = ImageIOType::New();
-  SeriesFileNames::Pointer seriesFileNames = SeriesFileNames::New();
-
-  // Get the DICOM filenames from the directory
-  seriesFileNames->SetInputDirectory( this->GetDirectory() );
-
-  const StringContainer& seriesUID = seriesFileNames->GetSeriesUIDs();
-  StringContainer::const_iterator seriesItr = seriesUID.begin();
-  StringContainer::const_iterator seriesEnd = seriesUID.end();
-
-  std::cout << "The directory " << this->GetDirectory() << " contains the following DICOM Series: " << std::endl;
-  while ( seriesItr != seriesEnd )
-  {
-    std::cout << *seriesItr << std::endl;
-    seriesItr++;
-  }
-
-  this->ResizeOutputs( seriesUID.size() );
-
-  for ( unsigned int i = 0 ; i < seriesUID.size() ; ++i )
-  {
-    std::cout << "Reading series " << seriesUID[ i ] << std::endl;
-    StringContainer fileNames = seriesFileNames->GetFileNames( seriesUID[ i ] );
-    StringContainer::const_iterator fnItr = fileNames.begin();
-    StringContainer::const_iterator fnEnd = fileNames.end();
-    while ( fnItr != fnEnd )
-    {
-      std::cout << *fnItr << std::endl;
-      fnItr++;
-    }
-    ReaderType::Pointer reader = ReaderType::New();
-    reader->SetFileNames( fileNames );
-    reader->SetImageIO( gdcmIO );
-    try
-    {
-      reader->Update();
-
-      //Initialize mitk image from itk
-      mitk::Image::Pointer image = mitk::Image::New();
-      image->InitializeByItk( reader->GetOutput() );
-      image->SetVolume( reader->GetOutput()->GetBufferPointer() );
-
-      //add the mitk image to the node
-      mitk::DataTreeNode::Pointer node = this->GetOutput( i );
-      node->SetData( image );
-
-      SetDefaultImageProperties(node);
-
-      // add level-window property
-      mitk::LevelWindowProperty::Pointer levWinProp = new mitk::LevelWindowProperty();
-      mitk::LevelWindow levelwindow;
-      levelwindow.SetAuto( image );
-      levWinProp->SetLevelWindow( levelwindow );
-      node->GetPropertyList()->SetProperty( "levelwindow", levWinProp );
-
-      // set filename without path as string property
-      std::string filename = std::string( this->GetBaseFilePrefix() );
-      mitk::StringProperty::Pointer nameProp = new mitk::StringProperty( seriesUID[ i ] );
-      node->SetProperty( "name", nameProp );
-
-    }
-    catch ( const std::exception & e )
-    {
-      itkWarningMacro( << e.what() );
-      reader->ResetPipeline();
-    }
-  }
-  */
 }
 
 
@@ -1559,86 +810,6 @@ void mitk::DataTreeNodeFactory::ReadFileSeriesTypeITKImageSeriesReader()
     return ;
   }
 }
-
-
-void mitk::DataTreeNodeFactory::ReadFileSeriesTypeSTL()
-{
-  if ( !this->GenerateFileList() )
-  {
-    itkWarningMacro( << "Sorry, file list could not be determined..." );
-    return ;
-  }
-
-  mitk::Surface::Pointer surface = mitk::Surface::New();
-  std::cout << "prefix: "<< m_FilePrefix << ", pattern: " <<m_FilePattern << std::endl;
-  surface->Initialize(m_MatchedFileNames.size());
-  //surface->Resize( m_MatchedFileNames.size() );
-  for ( unsigned int i = 0 ; i < m_MatchedFileNames.size(); ++i )
-  {
-    std::string fileName = m_MatchedFileNames[i];
-    std::cout << "Loading " << fileName << " as stl..." << std::endl;
-
-    vtkSTLReader* stlReader = vtkSTLReader::New();
-    stlReader->SetFileName( fileName.c_str() );
-    stlReader->Update();
-
-    if ( stlReader->GetOutput() != NULL )
-    {
-      surface->SetVtkPolyData( stlReader->GetOutput(), i );
-    }
-    else
-    {
-      itkWarningMacro(<< "stlReader returned NULL while reading " << fileName << ". Trying to continue with empty vtkPolyData...");
-      surface->SetVtkPolyData( vtkPolyData::New(), i ); 
-    }
-    stlReader->Delete();
-  }
-
-  mitk::DataTreeNode::Pointer node = this->GetOutput();
-  node->SetData( surface );
-  SetDefaultSurfaceProperties( node );
-  std::cout << "...finished!" << std::endl;
-}
-
-void mitk::DataTreeNodeFactory::ReadFileSeriesTypeVTK()
-{
-  if ( !this->GenerateFileList() )
-  {
-    itkWarningMacro( << "Sorry, file list could not be determined..." );
-    return ;
-  }
-
-  mitk::Surface::Pointer surface = mitk::Surface::New();
-  std::cout << "prefix: "<< m_FilePrefix << ", pattern: " <<m_FilePattern << std::endl;
-  surface->Initialize(m_MatchedFileNames.size());
-  //surface->Resize( m_MatchedFileNames.size() );
-  for ( unsigned int i = 0 ; i < m_MatchedFileNames.size(); ++i )
-  {
-    std::string fileName = m_MatchedFileNames[i];
-    std::cout << "Loading " << fileName << " as vtk..." << std::endl;
-
-    vtkPolyDataReader *reader = vtkPolyDataReader::New();
-    reader->SetFileName( fileName.c_str() );
-    reader->Update();
-
-    if ( reader->GetOutput() != NULL )
-    {
-      surface->SetVtkPolyData( reader->GetOutput(), i );
-    }
-    else
-    {
-      itkWarningMacro(<< "vtkPolyDataReader returned NULL while reading " << fileName << ". Trying to continue with empty vtkPolyData...");
-      surface->SetVtkPolyData( vtkPolyData::New(), i ); 
-    }
-    reader->Delete();
-  }
-
-  mitk::DataTreeNode::Pointer node = this->GetOutput();
-  node->SetData( surface );
-  SetDefaultSurfaceProperties( node );
-  std::cout << "...finished!" << std::endl;
-}
-
 
 void mitk::DataTreeNodeFactory::SetDefaultImageProperties(mitk::DataTreeNode::Pointer &node) 
 {

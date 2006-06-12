@@ -132,7 +132,7 @@ mitk::VolumeDataVtkMapper3D::~VolumeDataVtkMapper3D()
   m_VolumeProperty->Delete();
   m_VolumeLOD->Delete();
 }
-void mitk::VolumeDataVtkMapper3D::AbortCallback(vtkObject *caller, unsigned long /*eid*/, void */*clientdata*/, void */*calldata*/) {
+void mitk::VolumeDataVtkMapper3D::AbortCallback(vtkObject *caller, unsigned long , void *, void *) {
   // std::cout << "abort test called" << std::endl;
   vtkRenderWindow* renWin = dynamic_cast<vtkRenderWindow*>(caller);
   assert(renWin);

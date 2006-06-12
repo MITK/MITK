@@ -32,7 +32,7 @@ mitk::GLMapper2D::~GLMapper2D()
 }
 
 //##ModelId=3E67E9390346
-void mitk::GLMapper2D::Paint(mitk::BaseRenderer */*renderer*/)
+void mitk::GLMapper2D::Paint(mitk::BaseRenderer *)
 {
 }
 

@@ -200,7 +200,7 @@ bool mitk::LookupTable::VerifyRequestedRegion( )
 }
 
 
-void mitk::LookupTable::SetRequestedRegion( itk::DataObject */*data*/ )
+void mitk::LookupTable::SetRequestedRegion( itk::DataObject *)
 {
     //not implemented, since we always want to have the RequestedRegion
     //to be set to LargestPossibleRegion

@@ -39,7 +39,7 @@ QmitkMeasurement::~QmitkMeasurement()
 {
 }
 
-QWidget * QmitkMeasurement::CreateMainWidget(QWidget */*parent*/)
+QWidget * QmitkMeasurement::CreateMainWidget(QWidget *)
 {
   return NULL;
 }

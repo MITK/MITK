@@ -90,12 +90,12 @@ bool mitk::Geometry2DData::VerifyRequestedRegion()
 }
 
 //##ModelId=3E66CC5A030E
-void mitk::Geometry2DData::SetRequestedRegion(itk::DataObject */*data*/)
+void mitk::Geometry2DData::SetRequestedRegion(itk::DataObject *)
 {
 
 }
 
 //##ModelId=3E67D85E00B7
-void mitk::Geometry2DData::CopyInformation(const itk::DataObject */*data*/)
+void mitk::Geometry2DData::CopyInformation(const itk::DataObject *)
 {
 }

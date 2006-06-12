@@ -415,7 +415,7 @@ void mitk::BaseRenderer::PickWorldPoint(const mitk::Point2D& displayPoint, mitk:
   GetDisplayGeometry()->Map(worldPoint2D, worldPoint);
 }
 
-void mitk::BaseRenderer::WheelEvent(mitk::WheelEvent */*we*/)
+void mitk::BaseRenderer::WheelEvent(mitk::WheelEvent *)
 {
   //mitk::Event event(this, ke->type(), Qt::NoButton, Qt::NoButton, ke->key());
   //mitk::EventMapper::MapEvent(&event);

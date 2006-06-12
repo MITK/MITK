@@ -55,7 +55,7 @@ QmitkIsoSurface::QmitkIsoSurface(QObject *parent, const char *name, QmitkStdMult
 
 
 
-QWidget * QmitkIsoSurface::CreateMainWidget(QWidget */*parent*/)
+QWidget * QmitkIsoSurface::CreateMainWidget(QWidget *)
 {
   return NULL;
 }

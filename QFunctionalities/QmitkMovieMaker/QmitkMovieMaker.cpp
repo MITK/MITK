@@ -96,7 +96,7 @@ mitk::BaseController* QmitkMovieMaker::GetTemporalController()
   return m_MultiWidget->GetTimeNavigationController();
 }
 
-QWidget* QmitkMovieMaker::CreateMainWidget(QWidget */*parent*/)
+QWidget* QmitkMovieMaker::CreateMainWidget(QWidget *)
 {
   return NULL;
 }

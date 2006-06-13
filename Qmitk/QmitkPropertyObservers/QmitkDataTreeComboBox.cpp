@@ -259,11 +259,7 @@ void QmitkDataTreeComboBox::onActivated(int index)
   }
   catch (std::out_of_range)
   {
-    std::cerr << "in onActivated(" << index << "), " << __FILE__ << "l. " << __LINE__ << ": not a good index..." << std::endl;
   }
-  
-  
-  // TODO on selectionChanged notifications from treefilter => change selection!
 }
 
 /**
@@ -416,7 +412,6 @@ void QmitkDataTreeComboBox::generateItems()
   }
   catch (std::out_of_range)
   {
-    std::cerr << "in generateItems(), " << __FILE__ << "l. " << __LINE__ << ": not a good index..." << std::endl;
   }
 }
 
@@ -484,7 +479,6 @@ void QmitkDataTreeComboBox::selectionChangedHandler( const itk::EventObject& e)
   }
   catch (std::out_of_range)
   {
-    std::cerr << "in selectionChangedHandler(" << row << "), " << __FILE__ << " l. " << __LINE__ << ": not a good index..." << std::endl;
   }
 
 }

@@ -221,7 +221,7 @@ void mitk::Surface::SetRequestedRegion(Surface::RegionType *region)  //by arin
 
 //##ModelId=3E70F66100C1
 
-void mitk::Surface::CopyInformation( const itk::DataObject */*data*/ )
+void mitk::Surface::CopyInformation( const itk::DataObject * )
 {}
 
 void mitk::Surface::Update()

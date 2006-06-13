@@ -192,7 +192,7 @@ class QmitkDataTreeListView : public QWidget, public QmitkListViewItemIndex
 
     bool selectItemInGrid(const mitk::DataTreeFilter::Item* item, bool selected, QmitkListViewItemIndex* index);
     
-    mitk::DataTreeFilter* m_DataTreeFilter;
+    mitk::DataTreeFilter::Pointer m_DataTreeFilter;
     int m_StretchedColumn;
 
     QSize m_SizeHint;

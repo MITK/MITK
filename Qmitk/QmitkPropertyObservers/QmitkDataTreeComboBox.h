@@ -164,7 +164,7 @@ class QmitkDataTreeComboBox : public QComboBox
 
     void determineDisplayedProperty();
     
-    mitk::DataTreeFilter* m_DataTreeFilter;
+    mitk::DataTreeFilter::Pointer m_DataTreeFilter;
 
     mitk::DataTreeFilter::Pointer m_PrivateFilter;
     const mitk::DataTreeFilter::Item* m_SkipItem;

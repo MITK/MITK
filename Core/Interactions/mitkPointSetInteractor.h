@@ -50,9 +50,7 @@ namespace mitk
     virtual ~PointSetInteractor();
 
     //##Documentation
-    //## @brief clears all the elements in the list with undo-functionality
-    //##
-    //## moved due to use in functionalities
+    //## @brief Clears all the elements in the list with undo-functionality and resets the statemachine
     void Clear();
 
     //##Documentation

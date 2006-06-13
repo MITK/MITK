@@ -25,6 +25,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkDataTreeNode.h>
 #include <mitkInteractionConst.h>
 #include "mitkAction.h"
+#include <mitkStateMachineFactory.h>
+#include <mitkStateTransitionOperation.h>
+
 
 //how precise must the user pick the point
 //default value
@@ -93,6 +96,22 @@ float mitk::PointSetInteractor::CalculateJurisdiction(StateEvent const* stateEve
   return returnvalue;
 }
 
+//TODO: add a new calculation of precision here! Input: StateEvent and Precision
+//the method does a 2D picking with display coordinates and display geometry. Here the distance between the mouse position and the point is not as relative anymore!
+//float mitk::PointSetInteractor::CalculatePrecision(float precision, mitk::StateEvent stateEvent)
+//{
+//  mitk::BaseRenderer *renderer = stateEvent->GetEvent()->GetSender();
+//  if (renderer != NULL)
+//  {
+//    const mitk::DisplayGeometry* displayGeometry = renderer->GetDisplayGeometry();
+//    if (displayGeometry != NULL)
+//      displayGeometry->WorldToDisplay(, lineFrom);
+//    precision = 
+//  }
+//  
+//  return precision;
+//
+//}
 
 //##ModelId=3F017B320121
 void mitk::PointSetInteractor::UnselectAll()
@@ -433,28 +452,6 @@ bool mitk::PointSetInteractor::ExecuteAction( Action* action, mitk::StateEvent c
     }//else
   }
   break;
-  //case AcDELETEPOINT://delete last element in list
-  //  {
-  //    mitk::PositionEvent const  *posEvent = dynamic_cast <const mitk::PositionEvent *> (stateEvent->GetEvent());
-  //    if (posEvent == NULL) return false;
-
-  //    mitk::Point3D itkPoint;
-  //    itkPoint = posEvent->GetWorldPosition();
-
-  //    int position = pointSet->GetSize()-1;//not needed for the doOp, but for UndoOp
-  //    PointOperation* doOp = new mitk::PointOperation(OpDELETE, itkPoint, position);
-  //    //Undo
-  //    if (m_UndoEnabled)  //write to UndoMechanism
-  //    {
-  //      PointOperation* undoOp = new mitk::PointOperation(OpADD, itkPoint, position);
-  //      OperationEvent *operationEvent = new OperationEvent(pointSet, doOp, undoOp);
-  //      m_UndoController->SetOperationEvent(operationEvent);
-  //    }
-  //    //execute the Operation
-  //    pointSet->ExecuteOperation(doOp);
-  //    ok = true;
-  //  }
-  //  break;
 
   case AcCHECKELEMENT:
     /*checking if the Point transmitted is close enough to one point. Then generate a new event with the point and let this statemaschine handle the event.*/
@@ -731,13 +728,13 @@ void mitk::PointSetInteractor::Clear()
   mitk::PointSet::PointsIterator it, end;
   it = points->Begin();
   end = points->End();
-  while( it != end )
+  while( it != end && pointSet->GetSize()>0)
   {
     point = pointSet->GetPoint(it->Index());
-    PointOperation* doOp = new mitk::PointOperation(OpDELETE, point, it->Index());
-    if (m_UndoEnabled)  //write to UndoMechanism/ Can probably be removed!
+    PointOperation* doOp = new mitk::PointOperation(OpREMOVE, point, it->Index());
+    if (m_UndoEnabled)  //write to UndoMechanism
     {
-      PointOperation* undoOp = new mitk::PointOperation(OpADD, point, it->Index());
+      PointOperation* undoOp = new mitk::PointOperation(OpINSERT, point, it->Index());
       OperationEvent *operationEvent = new OperationEvent(pointSet, doOp, undoOp);
       m_UndoController->SetOperationEvent(operationEvent);
     }
@@ -745,5 +742,8 @@ void mitk::PointSetInteractor::Clear()
     pointSet->ExecuteOperation(doOp);
     ++it;
   }
+
+  //reset the statemachine
+  this->ResetStatemachineToStartState();
 }
 

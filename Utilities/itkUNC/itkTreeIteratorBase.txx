@@ -302,9 +302,9 @@ TreeIteratorBase<TTreeType>::Disconnect()
     }
   
   TreeNodeType* parent = dynamic_cast<TreeNodeType*>(m_Position->GetParent());
-  m_Tree->InvokeEvent( TreeRemoveEvent<TTreeType>( *this ) );
   parent->Remove( const_cast<TreeNodeType*>(m_Position) );
   m_Tree->Modified();
+  m_Tree->InvokeEvent( TreeRemoveEvent<TTreeType>( *this ) );
   int size = m_Position->CountChildren();
 
   for( int i=0; i< size; i++ ) 
@@ -491,7 +491,6 @@ TreeIteratorBase<TTreeType>::Remove()
   
   if ( m_Position->HasParent() )
     {
-    m_Tree->InvokeEvent( TreePruneEvent<TTreeType>(*this) );    
     TreeNodeType* parent = m_Position->GetParent();
     //keep node alive just a bit longer
     typename TreeNodeType::Pointer position = m_Position;
@@ -500,6 +499,7 @@ TreeIteratorBase<TTreeType>::Remove()
     m_Position->SetParent(parent);                               
     m_Tree->Modified();
     m_Position->SetParent(NULL);
+    m_Tree->InvokeEvent( TreePruneEvent<TTreeType>(*this) );    
 
     int size = m_Position->CountChildren();
     for( int i=0; i< size; i++ ) 
@@ -510,10 +510,10 @@ TreeIteratorBase<TTreeType>::Remove()
     }
   else if (m_Root == m_Position)
     {
-    m_Tree->InvokeEvent( TreePruneEvent<TTreeType>(*this) );
     m_Root = NULL;
     m_Tree->SetRoot(NULL);
     m_Tree->Modified();
+    m_Tree->InvokeEvent( TreePruneEvent<TTreeType>(*this) );
     int size = m_Position->CountChildren();
     for( int i=0; i< size; i++ ) 
       {

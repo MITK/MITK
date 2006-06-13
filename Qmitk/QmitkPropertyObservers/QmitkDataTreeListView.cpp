@@ -335,6 +335,7 @@ void QmitkDataTreeListView::paintListBackground(QPainter& painter, QmitkListView
 */
 void QmitkDataTreeListView::paintEvent(QPaintEvent*)
 {
+  m_Grid->activate();
   QPainter painter(this);
   paintListBackground(painter,this);
 }
@@ -355,10 +356,12 @@ void QmitkDataTreeListView::mouseReleaseEvent ( QMouseEvent* e )
   // tell row's widgets/expander to set their background according to their associated item's selection status
   // 
   // initiate paintEvent
-  
+
+  m_Grid->activate(); // don't know why this has to be here, but it fixes a selection problem. It SHOULD do calling this in generateItems(), but it doesn't...
+
   QmitkListViewItemIndex* index(this);
   int row(-1);
- 
+  
   row = index->rowAt( e->y() );
   if ( row <= 0 ) return; // no row under cursor
 
@@ -490,7 +493,7 @@ void QmitkDataTreeListView::AddItemsToList(QWidget* parent, QmitkListViewItemInd
         {
           observerWidget->setBackgroundMode( Qt::PaletteBase );
         }
-    index->addWidget(observerWidget, row, column, Qt::AlignVCenter);
+        index->addWidget(observerWidget, row, column, Qt::AlignVCenter);
       }
 
       ++column;
@@ -608,8 +611,6 @@ void QmitkDataTreeListView::generateItems()
   m_SizeHint = m_Grid->sizeHint();
   m_Grid->addItem( new QSpacerItem(1, 5, QSizePolicy::Minimum, QSizePolicy::Ignored) , m_Grid->numRows(),0);
   m_Grid->setRowStretch( m_Grid->numRows()-1, 1 );
-
-  m_Grid->activate();
 
   repaint();
 }

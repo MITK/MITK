@@ -232,6 +232,10 @@ bool LightSwitch::DoSwitchOff(Action*, const StateEvent*)
     virtual void ExecuteOperation(Operation* operation);
 
     //##Documentation
+    //## @brief resets the current state to the startstate with undo functionality! Use carefully!
+    void ResetStatemachineToStartState();
+
+    //##Documentation
     // XML
     virtual const std::string& GetXMLNodeName() const;
 

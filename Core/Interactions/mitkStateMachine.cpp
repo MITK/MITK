@@ -94,6 +94,23 @@ const mitk::State* mitk::StateMachine::GetCurrentState() const
   return NULL;
 }
 
+void mitk::StateMachine::ResetStatemachineToStartState()
+{
+  mitk::State* startState = mitk::StateMachineFactory::GetStartState((const char *)(&m_Type[0]));
+
+  if ( m_UndoEnabled )	//write to UndoMechanism if Undo is enabled
+  {
+    //UNDO for this statechange; 
+    StateTransitionOperation* doOp = new StateTransitionOperation(OpSTATECHANGE, startState);
+    StateTransitionOperation* undoOp = new StateTransitionOperation(OpSTATECHANGE, m_CurrentState);
+    OperationEvent *operationEvent = new OperationEvent(((mitk::OperationActor*)(this)), doOp, undoOp);
+    m_UndoController->SetOperationEvent(operationEvent);
+  }
+  //can be done without calling this->ExecuteOperation()
+  m_CurrentState = startState;
+
+}
+
 //##ModelId=3E5B2DE30378
 bool mitk::StateMachine::HandleEvent(StateEvent const* stateEvent)
 {

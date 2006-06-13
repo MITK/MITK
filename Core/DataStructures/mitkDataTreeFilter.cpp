@@ -853,8 +853,6 @@ void DataTreeFilter::GenerateModelFromTree()
       newItem->m_Selected = true; // probably not neccessary
     }
 
-    InvokeEvent( TreeFilterItemAddedEvent(m_Items->ElementAt(0)) );
-
     if ( m_HierarchyHandling == DataTreeFilter::PRESERVE_HIERARCHY )
     {
       AddMatchingChildren( treeIter,

@@ -28,7 +28,7 @@ PURPOSE.  See the above copyright notices for more information.
 const std::string mitk::BaseData::XML_NODE_NAME = "data";
 
 //##ModelId=3E3FE04202B9
-mitk::BaseData::BaseData() : m_SmartSourcePointer(NULL), m_SourceOutputIndexDuplicate(0), m_Unregistering(false), m_CalculatingExternalReferenceCount(false), m_ExternalReferenceCount(-1)
+mitk::BaseData::BaseData() : m_RequestedRegionInitialized(false), m_SmartSourcePointer(NULL), m_SourceOutputIndexDuplicate(0), m_Unregistering(false), m_CalculatingExternalReferenceCount(false), m_ExternalReferenceCount(-1)
 {
   m_TimeSlicedGeometry = TimeSlicedGeometry::New();
   m_PropertyList = PropertyList::New(); 

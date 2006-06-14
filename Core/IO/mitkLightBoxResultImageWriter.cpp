@@ -332,7 +332,7 @@ void mitk::LightBoxResultImageWriter::GenerateData()
       QcPlugin::addDicomHeader( cur, &isg );
       QcPlugin::addIcon( cur, true );
 
-      QcPlugin::addLevelWindow( cur, m_LevelWindow.GetLevel(), m_LevelWindow.GetWindow());
+      QcPlugin::addLevelWindow( cur, (int)(m_LevelWindow.GetLevel()), (int)(m_LevelWindow.GetWindow()));
 
       QcPlugin::changeImageType( cur, const_cast<char*>(m_ImageTypeName.c_str()) ); 
 

@@ -323,10 +323,16 @@ bool mitk::PointSet::ReadXMLData( XMLReader& xmlReader )
   PointSetReader::Pointer reader = PointSetReader::New();
   reader->SetFileName( fileName.c_str() );
   reader->Update();
-  m_ItkData = dynamic_cast<DataType*>( reader->GetOutput() );
+  mitk::PointSet::Pointer psp = dynamic_cast<mitk::PointSet*>( reader->GetOutput() );
+  if (psp.IsNotNull())
+  {
+    m_ItkData = psp->GetPointSet();
+  }
 
   if ( m_ItkData.IsNull() )
+  {
     return false;
+  }
 
   return true;
 }

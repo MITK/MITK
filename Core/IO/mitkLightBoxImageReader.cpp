@@ -435,7 +435,11 @@ void mitk::LightBoxImageReader::GenerateData()
 #endif
 }
 
+#ifdef CHILIPLUGIN
 mitk::Vector3D mitk::LightBoxImageReader::GetSpacingFromLB(LocalImageInfoArray& imageNumbers)
+#else
+mitk::Vector3D mitk::LightBoxImageReader::GetSpacingFromLB(LocalImageInfoArray&)
+#endif
 {
   mitk::Vector3D spacing;
   spacing.Fill(1.0);
@@ -483,9 +487,13 @@ bool mitk::LightBoxImageReader::ImageNumberLesser ( const LocalImageInfo& elem1,
   return elem1.imageNumber < elem2.imageNumber;
 };
 
+#ifndef CHILIPLUGIN
+void mitk::LightBoxImageReader::SortImage(LocalImageInfoArray&)
+{
+}
+#else
 void mitk::LightBoxImageReader::SortImage(LocalImageInfoArray& imageNumbers)
 {
-#ifdef CHILIPLUGIN
   ipPicDescriptor*  pic=NULL;
   ipPicTSV_t *tsv;
   void* data;
@@ -563,8 +571,8 @@ void mitk::LightBoxImageReader::SortImage(LocalImageInfoArray& imageNumbers)
   }
 
   std::sort(imageNumbers.begin(), imageNumbers.end(), ImageOriginLesser);
-#endif
 }
+#endif
 
 int mitk::LightBoxImageReader::GetRealPosition(int position, LocalImageInfoArray& list)
 {

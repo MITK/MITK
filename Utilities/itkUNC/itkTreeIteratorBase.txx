@@ -301,6 +301,9 @@ TreeIteratorBase<TTreeType>::Disconnect()
     return false;
     }
   
+  //keep node alive just a bit longer
+  typename TreeNodeType::Pointer position = m_Position;
+ 
   TreeNodeType* parent = dynamic_cast<TreeNodeType*>(m_Position->GetParent());
   parent->Remove( const_cast<TreeNodeType*>(m_Position) );
   m_Tree->Modified();

@@ -38,10 +38,6 @@ TreeNode<TValueType>::~TreeNode()
     m_Parent->Remove(this);
     }
     
- for ( int i=m_Children.size() - 1; i >= 0; i-- )
-   {
-   delete m_Children[i];
-   }
   m_Children.clear();
   m_Data = 0;
 }
@@ -205,11 +201,6 @@ TreeNode<TValueType>
     return;
     }
 
-  TreeNode<TValueType>* old = m_Children[number];
-  if ( old != NULL )
-    {
-    delete old;
-    }
   m_Children[number] = node;
 }
 

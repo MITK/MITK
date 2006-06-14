@@ -23,6 +23,12 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkImageSource.h"
 #include "mitkCommon.h"
 
+#ifdef CHILIPLUGIN
+  #define IF_CHILI_PLUGIN(text) text
+#else
+  #define IF_CHILI_PLUGIN(text)
+#endif
+
 class QcLightbox;
 
 namespace mitk {
@@ -109,9 +115,9 @@ protected:
 
     //##Description 
     //## @brief Virtually sort the lightbox
-    void SortImage(LocalImageInfoArray& imageNumbers);
+    void SortImage(LocalImageInfoArray& IF_CHILI_PLUGIN(imageNumbers));
 
-    mitk::Vector3D GetSpacingFromLB(LocalImageInfoArray& imageNumbers);
+    mitk::Vector3D GetSpacingFromLB(LocalImageInfoArray& IF_CHILI_PLUGIN(imageNumbers));
     
     QcLightbox* m_LightBox;
 

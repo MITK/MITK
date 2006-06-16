@@ -40,7 +40,8 @@ UIDGenerator::UIDGenerator(const char* prefix, unsigned int lengthOfRandomPart)
 
 std::string UIDGenerator::GetUID()
 {
-  std::ostringstream s(m_Prefix);
+  std::ostringstream s;
+  s << m_Prefix;
   time_t tt = time(0);
   tm* t = gmtime(&tt);
 

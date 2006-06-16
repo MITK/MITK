@@ -583,8 +583,11 @@ public:
   /// Views can call this to select items
   void SelectItem(const Item*, bool selected = true);
 
-  /// This will delete all selected items without further confirmation
+  /// This will delete all selected items from the data tree
   void DeleteSelectedItems();
+  
+  /// This will delete all selected items and their subitems data tree
+  void DeleteSelectedItemsAndSubItems();
 
   /// change notifications from the data tree
   void TreeNodeChange(const itk::EventObject &);

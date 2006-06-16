@@ -403,7 +403,12 @@ void QmitkDataTreeListView::keyReleaseEvent(QKeyEvent* e)
 {
   if ( e->key() == Qt::Key_Delete )
   {
-    m_DataTreeFilter->DeleteSelectedItems();
+    m_DataTreeFilter->DeleteSelectedItemsAndSubItems();
+    e->accept();
+  }
+  else
+  {
+    e->ignore();
   }
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();

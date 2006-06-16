@@ -478,6 +478,15 @@ void DataTreeFilter::DeleteSelectedItems()
   }
 }
 
+void DataTreeFilter::DeleteSelectedItemsAndSubItems()
+{
+  while ( m_SelectedItems.size() != 0 ) // for all selected items
+  {
+    DataTreeIteratorClone toNode( DataTreeHelper::FindIteratorToNode(m_DataTree, (*(m_SelectedItems.begin()))->GetNode()) );
+    toNode->Remove(); 
+  }
+}
+
 void DataTreeFilter::TreeNodeChange(const itk::EventObject& e)
 {
   if ( typeid(e) != typeid(itk::TreeNodeChangeEvent<DataTreeBase>) ) return;

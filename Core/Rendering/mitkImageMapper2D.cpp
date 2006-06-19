@@ -369,6 +369,22 @@ void mitk::ImageMapper2D::GenerateData(mitk::BaseRenderer *renderer)
     return;
   }
 
+  if((input->GetDimension() >= 3) && (input->GetDimension(2) > 1))
+  {
+    bool vtkInterpolation=false;
+    GetDataTreeNode()->GetBoolProperty(
+      "vtkInterpolation", vtkInterpolation, renderer
+    );
+
+    if (vtkInterpolation) 
+      m_Reslicer->SetInterpolationModeToLinear();
+    else 
+      m_Reslicer->SetInterpolationModeToNearestNeighbor();
+  }
+  else
+    m_Reslicer->SetInterpolationModeToNearestNeighbor();
+
+
   vtkMatrix4x4* geometry = vtkMatrix4x4::New();
   geometry->Identity();
 
@@ -471,22 +487,12 @@ void mitk::ImageMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
   GetOpacity(rgba[3], renderer);
 
   // check for interpolation properties
-  bool vtkInterpolation=false;
-  GetDataTreeNode()->GetBoolProperty(
-    "vtkInterpolation", vtkInterpolation, renderer
-  );
-
   bool iilInterpolation=false;
   GetDataTreeNode()->GetBoolProperty(
     "iilInterpolation", iilInterpolation, renderer
   );
 
   renderinfo.m_IilInterpolation = iilInterpolation;
-  if (vtkInterpolation) 
-    m_Reslicer->SetInterpolationModeToLinear();
-  else 
-    m_Reslicer->SetInterpolationModeToNearestNeighbor();
-
 
   bool useColor=false;
   GetDataTreeNode()->GetBoolProperty("use color", useColor, renderer);

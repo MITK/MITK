@@ -89,7 +89,15 @@ void CutImageWithOutputTypeSelect
   mitk::Point3D p;
   mitk::Geometry3D* inputGeometry = cutter->GetInput()->GetGeometry();
 
-  TOutputPixel outsideValue = (TOutputPixel) cutter->m_OutsideValue;
+  TOutputPixel outsideValue;
+  if(cutter->m_AutoOutsideValue)
+  {
+    outsideValue = itk::NumericTraits<TOutputPixel>::min();
+  }
+  else
+  {
+    outsideValue = (TOutputPixel) cutter->m_OutsideValue;
+  }
 
   //shall we use a fixed value for each inside pixel?
   if (cutter->GetUseInsideValue())

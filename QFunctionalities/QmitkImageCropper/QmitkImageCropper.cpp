@@ -192,6 +192,7 @@ void QmitkImageCropper::CropImage()
   mitk::BoundingObjectCutter::Pointer cutter = mitk::BoundingObjectCutter::New();
   cutter->SetBoundingObject( m_CroppingObject );
   cutter->SetInput( m_ImageToCrop );
+  cutter->AutoOutsideValueOn();
 
   // do the actual cutting
   try

@@ -99,7 +99,6 @@ void QmitkIsoSurface::ImageSelected(mitk::DataTreeIteratorClone imageIt)
   std::string name;
   if (imageIt->Get()->GetName(name))
   {
-    std::cout << "Tree node selected with name '" << name << "'" << std::endl;
   }
 
   m_MitkImageIterator = imageIt;
@@ -160,7 +159,7 @@ void QmitkIsoSurface::CreateSurface()
   m_b += 0.25; if(m_b > 1){m_b = m_b - 1;}
 
   iteratorOnImageToBeSkinExtracted->Get()->GetIntProperty("layer", layer);
-  //mitk::DataTreeNodeFactory::SetDefaultSurfaceProperties(surfaceNode);
+  mitk::DataTreeNodeFactory::SetDefaultSurfaceProperties(surfaceNode);
   surfaceNode->SetIntProperty("layer", layer+1);
   surfaceNode->SetProperty("Surface", new mitk::BoolProperty(true));
   surfaceNode->SetProperty("name", new mitk::StringProperty(surfaceNodeName));
@@ -191,13 +190,7 @@ void QmitkIsoSurface::CreateSurface()
 
   m_MultiWidget->RequestUpdate();
 
-  std::cout<<"*************"<<std::endl;
-  std::cout<<"*  surface  *"<<std::endl;
-  std::cout<<"*************"<<std::endl;
   }//if m_MitkImage != NULL
-
-  else
-    std::cout << "No Image selected" << std::endl;
 
   QApplication::restoreOverrideCursor();
 }

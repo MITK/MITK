@@ -629,6 +629,13 @@ void mitk::Image::Initialize(const mitk::PixelType& type, unsigned int dimension
   m_LargestPossibleRegion.SetIndex(i, 0);
   m_LargestPossibleRegion.SetSize(i, channels);
 
+  if(m_LargestPossibleRegion.GetNumberOfPixels()==0)
+  {
+    delete [] m_Dimensions;
+    m_Dimensions = NULL;
+    return;
+  }
+
   m_PixelType=type;
 
   PlaneGeometry::Pointer planegeometry = PlaneGeometry::New();
@@ -1049,8 +1056,8 @@ void mitk::Image::Clear()
   {
     m_Initialized = false;
 
-    if(m_Dimensions!=NULL)
-      delete [] m_Dimensions;
+    delete [] m_Dimensions;
+    m_Dimensions = NULL;
     
     ReleaseData();
   }

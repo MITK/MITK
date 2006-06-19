@@ -705,8 +705,8 @@ void QmitkStdMultiWidget::changeLevelWindow(mitk::LevelWindow* lw)
 
     levWin.SetMin(lw->GetMin());
     levWin.SetMax(lw->GetMax());
-    levWin.SetRangeMin(lw->GetRangeMin());
-    levWin.SetRangeMax(lw->GetRangeMax());
+    lw->SetRangeMin(levWin.GetRangeMin());
+    lw->SetRangeMax(levWin.GetRangeMax());
 
     topLevWinProp->SetLevelWindow(levWin);
     this->RequestUpdate();

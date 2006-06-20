@@ -371,6 +371,5 @@ The original image will not be modified, it will only be hidden.</string>
 </functions>
 <layoutdefaults spacing="6" margin="11"/>
 <includehints>
-    <includehint>qmitktreenodeselector.h</includehint>
 </includehints>
 </UI>

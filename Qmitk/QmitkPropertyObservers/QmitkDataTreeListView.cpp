@@ -335,7 +335,7 @@ void QmitkDataTreeListView::paintListBackground(QPainter& painter, QmitkListView
 */
 void QmitkDataTreeListView::paintEvent(QPaintEvent*)
 {
-  m_Grid->activate();
+  if (m_Grid) m_Grid->activate(); // after clearItems there is no m_Grid
   QPainter painter(this);
   paintListBackground(painter,this);
 }
@@ -357,7 +357,7 @@ void QmitkDataTreeListView::mouseReleaseEvent ( QMouseEvent* e )
   // 
   // initiate paintEvent
 
-  m_Grid->activate(); // don't know why this has to be here, but it fixes a selection problem. It SHOULD do calling this in generateItems(), but it doesn't...
+  if (m_Grid) m_Grid->activate(); // don't know why this has to be here, but it fixes a selection problem. It SHOULD do calling this in generateItems(), but it doesn't...
 
   QmitkListViewItemIndex* index(this);
   int row(-1);
@@ -429,7 +429,6 @@ void QmitkDataTreeListView::AddItemsToList(QWidget* parent, QmitkListViewItemInd
                                            const mitk::DataTreeFilter::PropertyList& editableProps)
 {
   index->m_Grid->setSpacing(4);
-      
   index->m_Grid->setColStretch(m_StretchedColumn, 10);
   
   mitk::DataTreeFilter::ConstItemIterator itemiter( items->Begin() ); 
@@ -522,7 +521,7 @@ void QmitkDataTreeListView::AddItemsToList(QWidget* parent, QmitkListViewItemInd
       // add children, unless this item is the parent whose children were just deleted
       if (*itemiter != m_SkipItemParent)
         AddItemsToList(parent, childExpander, itemiter->GetChildren(), visibleProps, editableProps);
-      
+     
       ++row;
     }
     else
@@ -551,7 +550,9 @@ void QmitkDataTreeListView::clearItems()
   {
     delete queryList()->first();
   }
-  
+    
+  m_Grid = NULL;
+
   // delete references to now deleted children
   clearIndex();
 } 
@@ -570,6 +571,7 @@ void QmitkDataTreeListView::clearItems()
 void QmitkDataTreeListView::generateItems()
 {
   if (!m_DataTreeFilter) return;
+  QWidget::setUpdatesEnabled(false);
 
   clearItems();
   
@@ -611,12 +613,19 @@ void QmitkDataTreeListView::generateItems()
     m_StretchedColumn = visibleProps.size();
  
   // fill rows with property views for the visible items 
-  AddItemsToList(this, this, m_DataTreeFilter->GetItems(), visibleProps, editableProps);
-  
+  if (m_SkipItemParent != (mitk::DataTreeFilter::Item*) -1)
+    AddItemsToList(this, this, m_DataTreeFilter->GetItems(), visibleProps, editableProps);
+  else
+  {
+    m_Grid->setSpacing(4);
+    m_Grid->setColStretch(m_StretchedColumn, 10);
+  }
+   
   m_SizeHint = m_Grid->sizeHint();
   m_Grid->addItem( new QSpacerItem(1, 5, QSizePolicy::Minimum, QSizePolicy::Ignored) , m_Grid->numRows(),0);
   m_Grid->setRowStretch( m_Grid->numRows()-1, 1 );
-
+  
+  QWidget::setUpdatesEnabled(true);
   repaint();
 }
 
@@ -644,8 +653,10 @@ void QmitkDataTreeListView::removeItemHandler( const itk::EventObject& e )
 void QmitkDataTreeListView::removeChildrenHandler( const itk::EventObject& e )
 {
   const mitk::TreeFilterRemoveChildrenEvent& event( static_cast<const mitk::TreeFilterRemoveChildrenEvent&>(e) );
-  // TODO: do something more clever
+  // TODO: do something more clever (still TODO?)
   m_SkipItemParent = event.GetChangedItem();
+  if ( m_SkipItemParent == NULL ) 
+    m_SkipItemParent = (mitk::DataTreeFilter::Item*) -1; // in generateItems --> don't draw any content
   generateItems();
   m_SkipItemParent = NULL;
 }

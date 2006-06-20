@@ -820,7 +820,6 @@ void DataTreeFilter::StoreCurrentSelectionState()
 void DataTreeFilter::GenerateModelFromTree()
 {
   DEBUG_MSG_STATE("Before GenerateModel")
-  InvokeEvent( TreeFilterRemoveAllEvent() );
 
   StoreCurrentSelectionState();
   

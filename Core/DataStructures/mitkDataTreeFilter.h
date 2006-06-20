@@ -590,7 +590,7 @@ public:
   void DeleteSelectedItemsAndSubItems();
 
   /// change notifications from the data tree
-  void TreeNodeChange(const itk::EventObject &);
+  void TreeChange(const itk::EventObject &);
   void TreeAdd(const itk::EventObject &);
   void TreePrune(const itk::EventObject &);
   void TreeRemove(const itk::EventObject &);
@@ -639,7 +639,7 @@ private:
 
   const mitk::BaseRenderer* m_Renderer;
 
-  unsigned long  m_TreeNodeChangeConnection;
+  unsigned long  m_TreeChangeConnection;
   unsigned long  m_TreeAddConnection;
   unsigned long  m_TreePruneConnection;
   unsigned long  m_TreeRemoveConnection;

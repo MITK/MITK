@@ -254,7 +254,7 @@ DataTreeFilter::DataTreeFilter(DataTreeBase* datatree)
   m_HierarchyHandling(DataTreeFilter::PRESERVE_HIERARCHY),
   m_SelectionMode(DataTreeFilter::MULTI_SELECT),
   m_Renderer(NULL),
-  m_TreeNodeChangeConnection(0),
+  m_TreeChangeConnection(0),
   m_TreeAddConnection(0),
   m_TreePruneConnection(0),
   m_TreeRemoveConnection(0),
@@ -272,8 +272,8 @@ DataTreeFilter::DataTreeFilter(DataTreeBase* datatree)
   // connect tree notifications to member functions
   {
   itk::ReceptorMemberCommand<DataTreeFilter>::Pointer command = itk::ReceptorMemberCommand<DataTreeFilter>::New();
-  command->SetCallbackFunction(this, &DataTreeFilter::TreeNodeChange);
-  m_TreeNodeChangeConnection = m_DataTree->AddObserver(itk::TreeNodeChangeEvent<DataTreeBase>(), command);
+  command->SetCallbackFunction(this, &DataTreeFilter::TreeChange);
+  m_TreeChangeConnection = m_DataTree->AddObserver(itk::TreeChangeEvent<DataTreeBase>(), command);
   }
 
   {
@@ -301,7 +301,7 @@ DataTreeFilter::DataTreeFilter(DataTreeBase* datatree)
 DataTreeFilter::~DataTreeFilter()
 {
   // remove this as observer from the data tree
-  m_DataTree->RemoveObserver( m_TreeNodeChangeConnection );
+  m_DataTree->RemoveObserver( m_TreeChangeConnection );
   m_DataTree->RemoveObserver( m_TreeAddConnection );
   m_DataTree->RemoveObserver( m_TreeRemoveConnection );
   m_DataTree->RemoveObserver( m_TreePruneConnection );
@@ -487,22 +487,14 @@ void DataTreeFilter::DeleteSelectedItemsAndSubItems()
   }
 }
 
-void DataTreeFilter::TreeNodeChange(const itk::EventObject& e)
+void DataTreeFilter::TreeChange(const itk::EventObject& e)
 {
-  if ( typeid(e) != typeid(itk::TreeNodeChangeEvent<DataTreeBase>) ) return;
+  if ( typeid(e) != typeid(itk::TreeChangeEvent<DataTreeBase>) ) return;
+  DEBUG_MSG_STATE("Before TreeChangeEvent")
  
-  // if event.GetChangePosition()->GetNode() == NULL, then something was removed (while in ~DataTree()) by setting it to NULL
-  const itk::TreeChangeEvent<DataTreeBase>& event( static_cast<const itk::TreeChangeEvent<DataTreeBase>&>(e) );
-  DataTreeIteratorBase* treePosition = const_cast<DataTreeIteratorBase*>(&(event.GetChangePosition()))->Clone();
 
-  if ( treePosition->Get().IsNull() ) return; // TODO this special case is used only in
-                                              // ~DataTree(). If used anywhere else, this
-                                              // line here has to be removed. But probably
-                                              // nobody should set a node to NULL
-
-  // nothing is known about real TreeNodeChange events so we play safe and regenerate all
   GenerateModelFromTree();
-  delete treePosition;
+  DEBUG_MSG_STATE("After TreeChangeEvent")
 }
 
 /// @todo Could TreeAdd be implemented more intelligent?

@@ -182,7 +182,7 @@ class QmitkDataTreeListView : public QWidget, public QmitkListViewItemIndex
 
     typedef std::map<std::string, unsigned int> PropertyViewTypeMap;
 
-    void QmitkDataTreeListView::AddItemsToList(QWidget* parent, QmitkListViewItemIndex* index,
+    void AddItemsToList(QWidget* parent, QmitkListViewItemIndex* index,
                                                const mitk::DataTreeFilter::ItemList* items,
                                                const mitk::DataTreeFilter::PropertyList& visibleProps,
                                                const mitk::DataTreeFilter::PropertyList& editableProps);

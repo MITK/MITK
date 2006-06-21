@@ -120,7 +120,7 @@ public:
   //## and is set to @a false, the node is ignored for the time-bounds calculation.
   //## @param renderer see @a boolPropertyKey
   //## @param boolPropertyKey2 a second condition that is applied additionally to @a boolPropertyKey
-  static TimeBounds mitk::DataTree::ComputeTimeBounds(mitk::DataTreeIteratorBase* it, const char* boolPropertyKey, mitk::BaseRenderer* renderer, const char* boolPropertyKey2);
+  static TimeBounds ComputeTimeBounds(mitk::DataTreeIteratorBase* it, const char* boolPropertyKey, mitk::BaseRenderer* renderer, const char* boolPropertyKey2);
 
   //##Documentation
   //## @brief Compute the time-bounds of all visible parts of the data tree structure, for general 
@@ -133,7 +133,7 @@ public:
   //## @param boolPropertyKey if a BoolProperty with this boolPropertyKey exists for a node (for @a renderer) 
   //## and is set to @a false, the node is ignored for the time-bounds calculation.
   //## @param renderer see @a boolPropertyKey
-  static TimeBounds mitk::DataTree::ComputeTimeBounds(mitk::DataTreeIteratorBase* it, mitk::BaseRenderer* renderer, const char* boolPropertyKey)
+  static TimeBounds ComputeTimeBounds(mitk::DataTreeIteratorBase* it, mitk::BaseRenderer* renderer, const char* boolPropertyKey)
   {
     return ComputeTimeBounds(it, "visible", renderer, boolPropertyKey);
   }
@@ -153,7 +153,7 @@ protected:
   //##ModelId=3E38F46A01AE
   virtual ~DataTree();
 
-  static bool mitk::DataTree::SaveNext( const mitk::DataTreeIteratorBase* it, mitk::XMLWriter& xmlWriter );  
+  static bool SaveNext( const mitk::DataTreeIteratorBase* it, mitk::XMLWriter& xmlWriter );  
 };
 
 } // namespace mitk

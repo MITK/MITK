@@ -155,7 +155,7 @@ class QmitkDataTreeComboBox : public QComboBox
     
   private:
 
-    void QmitkDataTreeComboBox::AddItemsToList(const mitk::DataTreeFilter::ItemList* items,
+    void AddItemsToList(const mitk::DataTreeFilter::ItemList* items,
                                                const mitk::DataTreeFilter::PropertyList& visibleProps,
                                                int level);
 

@@ -422,14 +422,14 @@ public:
 
   //##Documentation
   //## \brief Get the second largest value for scalar images, but do not recompute it first
-  virtual mitk::ScalarType mitk::Image::GetScalarValueMinNoRecompute() const
+  virtual mitk::ScalarType GetScalarValueMinNoRecompute() const
   {
       return m_ScalarMin;
   }
 
   //##Documentation
   //## \brief Get the second largest value for scalar images, but do not recompute it first
-  virtual mitk::ScalarType mitk::Image::GetScalarValue2ndMinNoRecompute() const
+  virtual mitk::ScalarType GetScalarValue2ndMinNoRecompute() const
   {
       return m_Scalar2ndMin;
   }
@@ -440,28 +440,28 @@ public:
 
   //##Documentation
   //## \brief Get the second largest value for scalar images, but do not recompute it first
-  virtual mitk::ScalarType mitk::Image::GetScalarValueMaxNoRecompute() const
+  virtual mitk::ScalarType GetScalarValueMaxNoRecompute() const
   {
       return m_ScalarMax;
   }
 
   //##Documentation
   //## \brief Get the second largest value for scalar images, but do not recompute it first
-  virtual mitk::ScalarType mitk::Image::GetScalarValue2ndMaxNoRecompute() const
+  virtual mitk::ScalarType GetScalarValue2ndMaxNoRecompute() const
   {
       return m_Scalar2ndMax;
   }
 
   //##Documentation
   //## \brief Get the count of voxels with the largest scalar value in the dataset
-  virtual unsigned int mitk::Image::GetCountOfMaxValuedVoxelsNoRecompute() const
+  virtual unsigned int GetCountOfMaxValuedVoxelsNoRecompute() const
   {
       return m_CountOfMaxValuedVoxels;
   }
 
   //##Documentation
   //## \brief Get the count of voxels with the largest scalar value in the dataset
-  virtual unsigned int mitk::Image::GetCountOfMinValuedVoxelsNoRecompute() const
+  virtual unsigned int GetCountOfMinValuedVoxelsNoRecompute() const
   {
       return m_CountOfMinValuedVoxels;
   }

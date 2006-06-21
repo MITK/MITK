@@ -66,7 +66,7 @@ public:
   const mitk::Color & GetColor() const;
   //##ModelId=3E86AABB0399
   const mitk::Color & GetValue() const;
-  std::string mitk::ColorProperty::GetValueAsString() const;
+  std::string GetValueAsString() const;
   void SetColor(const mitk::Color & color );
   void SetColor( float red, float green, float blue );
 

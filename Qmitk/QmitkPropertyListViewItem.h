@@ -45,7 +45,7 @@ public:
   QWidget* m_Control;
   static QmitkPropertyListViewItem* CreateInstance(mitk::PropertyList *propList, const std::string name, QWidget* parent, bool createOnlyControl);
   virtual void UpdateView();
-  void QmitkPropertyListViewItem::UpdateEnabledView();
+  void UpdateEnabledView();
   // ~QmitkPropertyListViewItem()
 public slots:
   void CheckBoxControlActivated(bool on);

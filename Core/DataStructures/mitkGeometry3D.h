@@ -387,7 +387,7 @@ public:
 
 protected:
   Geometry3D();
-  static const char* mitk::Geometry3D::GetTransformAsString( TransformType* transformType );
+  static const char* GetTransformAsString( TransformType* transformType );
 
   //##ModelId=3E3456C50067
   virtual ~Geometry3D();

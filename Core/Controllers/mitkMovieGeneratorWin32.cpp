@@ -11,7 +11,7 @@ mitk::MovieGeneratorWin32::MovieGeneratorWin32()
 void mitk::MovieGeneratorWin32::SetFileName( const char *fileName )
 {
   m_sFile = _T( fileName );
-  if( _tcsstr( m_sFile, _T("avi") ) == NULL ) m_sFile += _T( ".avi" );
+  if( _tcsstr( (char*)m_sFile, _T("avi") ) == NULL ) m_sFile += _T( ".avi" );
 }
 
 

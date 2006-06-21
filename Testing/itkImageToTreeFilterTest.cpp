@@ -86,6 +86,9 @@ typedef itk::RegistrationModelXMLReader<TubeSegmentModelType>
 RegistrationModelReaderType;
 typedef RegistrationModelReaderType::Pointer          RegistrationModelReaderPointer;
 
+typedef TubeSegmentModelType::MeshType                MeshType;
+typedef MeshType::Pointer                             MeshPointer;
+
 typedef TubeSegmentModelType::PointSetType            PointSetType;
 typedef PointSetType::Pointer                         PointSetPointer;
 typedef PointSetType::PointType                       PointSetPointType;
@@ -785,6 +788,46 @@ int testRegistrationModelRadius()
   return EXIT_SUCCESS;
 }
 
+int testMeshReadWrite()
+{
+  std::cout << " *** Testing the Reading and Writing of meshes ***\n";
+
+  TubeSegmentModelGeneratorPointer tubeGenerator = TubeSegmentModelGeneratorType::New();
+  tubeGenerator->SetLength(10);
+  tubeGenerator->SetNumberOfSlices(10);
+  tubeGenerator->SetRadius(10);
+  tubeGenerator->SetInnerRing(false);
+  tubeGenerator->SetOuterRing(false);
+  tubeGenerator->Update();
+  TubeSegmentModelPointer tubeSegment = tubeGenerator->GetOutput();
+
+  RegistrationModelWriterPointer modelWriter = RegistrationModelWriterType::New();
+  modelWriter->SetRegistrationModel(tubeSegment);
+  modelWriter->SetFilename("test.xml");
+  modelWriter->WriteFile();
+
+  RegistrationModelReaderPointer registrationModelReader = RegistrationModelReaderType::New();
+  registrationModelReader->SetFilename("test.xml");
+  registrationModelReader->GenerateOutputInformation();
+
+  TubeSegmentModelPointer readTubeSegment = registrationModelReader->GetTubeSegment();
+
+  MeshPointer mesh      = tubeSegment->GetMesh();
+  MeshPointer readMesh  = readTubeSegment->GetMesh();
+
+  if(mesh->GetPoints()->Size() != readMesh->GetPoints()->Size() &&
+      mesh->GetPointData()->Size() != readMesh->GetPointData()->Size() &&
+      mesh->GetCells()->Size() != readMesh->GetCells()->Size())
+  {
+    std::cout << "Meshes do not match." << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  std::cout << " *** [TEST PASSED] ***\n";
+  return EXIT_SUCCESS;
+
+}
+
 int itkImageToTreeFilterTest(int i, char* argv[] )
 {
   ResultListType resultList;
@@ -800,6 +843,7 @@ int itkImageToTreeFilterTest(int i, char* argv[] )
   resultList.push_back(testRefinementModelProcessor());
   resultList.push_back(testRegistrationModelRadius());
   resultList.push_back(testTubeSegmentRegistrator());
+  resultList.push_back(testMeshReadWrite());
 
   std::cout << " *** [ALL TESTS DONE] ***\n";
 

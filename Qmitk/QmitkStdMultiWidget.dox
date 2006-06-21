@@ -7,21 +7,25 @@ Available sections:
 
 \section QmitkStdMultiWidgetUserManualOverview Overview
 
-This page tells you how to use the MPR widget that is used by most (if not all) functionalities. For the technical documentation, please reas \ref QmitkStdMultiWidget.
+This page tells you how to use the MPR widget that is used by most (if not all) functionalities. For the technical documentation, please read \ref QmitkStdMultiWidget.
 
 \section QmitkStdMultiWidgetUserManualDetails Details
 
+This widget is used to display (and scroll through) slices of a scene. In most cases this means three orthogonal planes through an image and one 3D view of the scene.
+
 Interaction in 2D views:
 
- - Left-click (and drag): position the cross to the cursor
- - Middle-click and drag: move around the visible portion of the image
- - Right-click and drag: zoom in (mouse up) and out (mouse down)
+ \li <tt>Left mouse-button</tt>: Move the cross-hair to another position, i.e. select different slices in the other 2D views.
+           This is probably the fastest way of getting an overview of the image.
+ \li <tt>Middle mouse-button</tt>: Pan the visible part of the image. This is useful when you zoomed "too much" into an image.
+ \li <tt>Right mouse-button</tt>: Zooming the image: drag up to zoom into, drag down to zoom out.
+ \li <tt>Mouse wheel<\tt>: Scrolls through the slices one by one. This is sometimes very slow.
 
 Interaction in 3D scene:
 
- - Left-click and drag: rotate the whole scene
- - R: reset the scene, to that it is centered in your current viewport
- - W/S: change surfaces representation to wireframe or solid
- - F: pick the position where your mouse cursor is currently and fly to/near it
+ \li <tt>Left-click and drag</tt>: rotate the whole scene
+ \li <tt>R</tt>: reset the scene, to that it is centered in your current viewport
+ \li <tt>W/S</tt>: change surfaces representation to wireframe or solid
+ \li <tt>F</tt>: pick the position where your mouse cursor is currently and fly to/near it
 
 */

@@ -788,9 +788,17 @@ int testRegistrationModelRadius()
   return EXIT_SUCCESS;
 }
 
+/*
+ * WARNING: This test will crash on ITK > 2.6. ITK 2.4 and below is broken,
+ *          when saving spatial objects to files.
+ */
 int testMeshReadWrite()
 {
-  std::cout << " *** Testing the Reading and Writing of meshes ***\n";
+  std::cout << " *** Testing the Reading and Writing of meshes ***" << std::endl;
+
+  std::cout << "--------------- WARNING ---------------" << std::endl;
+  std::cout << "This test will crash on ITK > 2.6!" << std::endl;
+  std::cout << "--------------- WARNING ---------------" << std::endl;
 
   TubeSegmentModelGeneratorPointer tubeGenerator = TubeSegmentModelGeneratorType::New();
   tubeGenerator->SetLength(10);

@@ -530,7 +530,6 @@ void DataTreeFilter::TreeAdd(const itk::EventObject& e)
           if (!parent) 
           {
             std::cerr << "l. " << __LINE__ << ": Treefilter " << (void*)this << " looked for m_Item[...] but couldn't find anything." << std::endl;
-            return; // TODO is that possible? At least this happens sometimes, may be a bug
           }
         break; 
       }

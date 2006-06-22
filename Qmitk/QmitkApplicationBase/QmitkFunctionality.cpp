@@ -109,3 +109,13 @@ void QmitkFunctionality::TreeChanged(const itk::EventObject & /*treeChangedEvent
 void QmitkFunctionality::TreeChanged()
 {
 }
+
+QWidget * QmitkFunctionality::CreateOptionWidget(QWidget *parent)
+{
+  return NULL;
+}
+
+void QmitkFunctionality::OptionsChanged(QWidget* optionDialog)
+{
+  // Read new values from your option dialog and update your functionality accordingly
+}

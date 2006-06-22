@@ -73,6 +73,11 @@ public:
   virtual QWidget * CreateControlWidget(QWidget *parent) = 0;
 
   /*!
+  \brief method for creating the widget that contains the functionality options
+  */
+  virtual QWidget * CreateOptionWidget(QWidget *parent);
+
+  /*!
   \brief method for creating the functionality's main widget
   */
   virtual QWidget * CreateMainWidget(QWidget * parent) = 0;
@@ -130,6 +135,13 @@ public:
   virtual void TreeChanged(const itk::EventObject & treeChangedEvent);
 
   virtual void TreeChanged();
+
+  /*!
+  \brief Gets called when the user changed something in the functionality's 
+  option dialog. The functionaliy has to read the new values from the 
+  option dialog widgets and apply them to the functionality
+  */
+  virtual void OptionsChanged(QWidget* optionDialog);
 
 signals:
   void Signal_dummy();

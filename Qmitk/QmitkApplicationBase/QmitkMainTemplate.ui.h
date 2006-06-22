@@ -89,6 +89,11 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkInteractionConst.h>
 #include <QmitkStatusBar.h>
 
+#include <QmitkOptionDialog.h>
+#include <qlistbox.h>
+#include <qwidgetstack.h>
+#include <qlabel.h>
+
 #include <ipPicTypeMultiplex.h>
 #include <mitkDataTreeHelper.h>
 #include <mitkPointOperation.h>
@@ -759,3 +764,30 @@ void QmitkMainTemplate::optionsReinitMultiWidget()
   m_MultiWidget->InitializeStandardViews( &it );
 }
 
+void QmitkMainTemplate::optionsShow_OptionsAction_activated()
+{
+  QmitkOptionDialog* optionDialog = new QmitkOptionDialog(this, "Options");
+  // for each functionality: If the funcionality has an option widget, 
+  // add it to the  m_FunctionalitySelectionList and the m_OptionWidgetStack
+  for (unsigned int i = 0; i < qfm->GetFunctionalityCount(); ++i)
+  {
+    QmitkFunctionality* f = qfm->GetFunctionalityById(i);
+    optionDialog->m_FunctionalitySelectionList->insertItem(f->GetFunctionalityName(), i);
+    QWidget* optionWidget = f->CreateOptionWidget(this);
+    if (optionWidget == NULL)
+      optionWidget = new QLabel("no options available", this);
+    optionDialog->m_OptionWidgetStack->addWidget(optionWidget, i);
+  }
+  // preselect active functionality
+  optionDialog->m_FunctionalitySelectionList->setSelected(qfm->GetActiveFunctionalityId(), true);
+  optionDialog->m_OptionWidgetStack->raiseWidget(qfm->GetActiveFunctionalityId());
+  // show the dialog
+  optionDialog->exec();
+  // now, notify the functionalities of changes
+  for (unsigned int i = 0; i < qfm->GetFunctionalityCount(); ++i)
+  {
+    QmitkFunctionality* f = qfm->GetFunctionalityById(i);
+    if (f != NULL)
+      f->OptionsChanged(optionDialog->m_OptionWidgetStack->widget(i));
+  }  
+}

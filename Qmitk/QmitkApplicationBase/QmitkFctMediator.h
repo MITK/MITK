@@ -92,7 +92,8 @@ public:
   virtual int GetActiveFunctionalityId() const;
   virtual QmitkFunctionality* GetActiveFunctionality();
   virtual QmitkFunctionality* GetFunctionalityById(int id);
-
+  virtual unsigned int GetFunctionalityCount();
+  
   QmitkFctMediator(QObject *parent=0, const char *name=0);
   virtual ~QmitkFctMediator();
 

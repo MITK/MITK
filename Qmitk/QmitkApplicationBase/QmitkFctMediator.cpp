@@ -408,3 +408,8 @@ QmitkFunctionality* QmitkFctMediator::GetFunctionalityById(int id)
 {
   return qfl.at(id);
 }
+
+unsigned int QmitkFctMediator::GetFunctionalityCount()
+{  
+  return m_NumOfFuncs;
+}

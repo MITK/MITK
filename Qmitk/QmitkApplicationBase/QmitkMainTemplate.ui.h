@@ -48,6 +48,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkCommonFunctionality.h"
 #include "QmitkSelectableGLWidget.h"
 #include "QmitkLevelWindowWidget.h"
+#include "QmitkHelpBrowser.h"
 
 #include <vtkSTLReader.h>
 #include <vtkSTLWriter.h>
@@ -73,6 +74,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <mitkStringProperty.h>
 #include <qstring.h>
+#include <qmetaobject.h>
 #include "mitkImageTimeSelector.h"
 #include "mitkImageChannelSelector.h"
 
@@ -764,6 +766,35 @@ void QmitkMainTemplate::optionsReinitMultiWidget()
   m_MultiWidget->InitializeStandardViews( &it );
 }
 
+void QmitkMainTemplate::helpContents()
+{
+  QDir homedir("./Documentations/Doxygen/html/");
+  QString home( homedir.absPath() + "/" );
+  QString firstpage = home;
+
+  if (qfm)
+  {
+    // try to find documentation of the active functionality
+    QmitkFunctionality* f = qfm->GetActiveFunctionality();
+    if (f)
+    {
+      firstpage += f->metaObject()->className(); 
+      firstpage += "UserManual.html";
+    }
+
+    // fallback to SampleApp index page
+    if (!QFile::exists( firstpage ))
+    {
+      firstpage = home + "MITKSampleApp";
+      firstpage += "UserManual.html";
+
+    }
+  }
+  QmitkHelpBrowser* browser = new QmitkHelpBrowser( firstpage, ".", NULL, "Online help");
+  browser->setCaption("MITK documentation");
+  browser->showMaximized();
+}
+
 void QmitkMainTemplate::optionsShow_OptionsAction_activated()
 {
   QmitkOptionDialog* optionDialog = new QmitkOptionDialog(this, "Options");
@@ -791,3 +822,4 @@ void QmitkMainTemplate::optionsShow_OptionsAction_activated()
       f->OptionsChanged(optionDialog->m_OptionWidgetStack->widget(i));
   }  
 }
+

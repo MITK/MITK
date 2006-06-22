@@ -49,6 +49,9 @@
         <action name="optionsSystem_InformationAction"/>
         <action name="optionsShow_OptionsAction"/>
     </item>
+    <item text="&amp;Help" name="helpMenu">
+        <action name="helpContentsAction"/>
+    </item>
 </menubar>
 <toolbars>
     <toolbar dock="2">
@@ -89,7 +92,7 @@
 <customwidgets>
     <customwidget>
         <class>QmitkUndoRedoButton</class>
-        <header location="global">C:/home/jochen/ip++/AppModules/QmitkUndoRedoButton/QmitkUndoRedoButton.h</header>
+        <header location="global">QmitkUndoRedoButton.h</header>
         <sizehint>
             <width>-1</width>
             <height>-1</height>
@@ -513,6 +516,20 @@
         </property>
     </action>
     <action>
+      <property name="name">
+        <cstring>helpContentsAction</cstring>
+      </property>
+      <property name="text">
+        <string>Contents</string>
+      </property>
+      <property name="menuText">
+        <string>&amp;Contents...</string>
+      </property>
+      <property name="accel">
+        <string>F1</string>
+      </property>
+    </action>
+    <action>
         <property name="name">
             <cstring>optionsShow_OptionsAction</cstring>
         </property>
@@ -690,6 +707,12 @@
         <slot>optionsReinitMultiWidget()</slot>
     </connection>
     <connection>
+        <sender>helpContentsAction</sender>
+        <signal>activated()</signal>
+        <receiver>QmitkMainTemplate</receiver>
+        <slot>helpContents()</slot>
+    </connection>
+    <connection>
         <sender>optionsShow_OptionsAction</sender>
         <signal>activated()</signal>
         <receiver>QmitkMainTemplate</receiver>
@@ -759,6 +782,7 @@
     <slot>editRedo()</slot>
     <slot>optionsSlicesRotation( bool on )</slot>
     <slot>optionsReinitMultiWidget()</slot>
+    <slot>helpContents()</slot>
     <slot>optionsShow_OptionsAction_activated()</slot>
 </slots>
 <functions>

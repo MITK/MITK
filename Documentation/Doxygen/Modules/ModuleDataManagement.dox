@@ -6,7 +6,7 @@
 etc.) as well as management classes to organize the data during run-time in a
 tree structure, called the data tree (mitk::DataTree).
 
-\section overviewDataManagement Overview
+\section DataManagementOverview Overview
 
 There are two things in MITK: data itself and the organization of data in a
 tree. The data tree is used for communication between different parts of an
@@ -22,6 +22,5 @@ For an explanation of the data tree, iterators and tree nodes, refer to
 
 \ref Geometry groups all classes that describe the spatial/temporal position and
 orientation of data sets. 
-\section futureDataManagement Plans for the future 
 
 */

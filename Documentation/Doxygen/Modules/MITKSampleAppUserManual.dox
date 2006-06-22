@@ -1,0 +1,18 @@
+/**
+\page MITKSampleAppUserManual Sampleapp User Manual
+
+Some introductory words. There are functionalities.
+
+Your typical SampleApp will look like this:
+
+\image html MITKSampleAppScreenShot.png "The MITKSampleApp"
+
+The image/scene control that takes up most of your screen is documented here: \ref QmitkStdMultiWidgetUserManual.
+
+Since they differ much in what they do, each functionality has its own documentation:
+
+ - \ref QmitkEasySegmentationUserManual
+
+If your functionality is not listed here, ask the author to provide a user manual: mitk@dkfz-heidelberg.de
+
+*/

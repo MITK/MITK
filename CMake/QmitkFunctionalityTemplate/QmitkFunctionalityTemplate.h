@@ -16,16 +16,16 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#if !defined(QMITK_FUNCTIONALITYTEMPLATE_H__INCLUDED)
-#define QMITK_FUNCTIONALITYTEMPLATE_H__INCLUDED
+#if !defined(@FUNCTIONALITY_NAME@_H__INCLUDED)
+#define @FUNCTIONALITY_NAME@_H__INCLUDED
 
 #include "QmitkFunctionality.h"
 
 class QmitkStdMultiWidget;
-class QmitkFunctionalityTemplateControls;
+class @FUNCTIONALITY_NAME@Controls;
 
 /*!
-\brief FunctionalityTemplate 
+\brief @FUNCTIONALITY_NAME@ 
 
 One needs to reimplement the methods CreateControlWidget(..), CreateMainWidget(..) 
 and CreateAction(..) from QmitkFunctionality. 
@@ -33,7 +33,7 @@ and CreateAction(..) from QmitkFunctionality.
 \sa QmitkFunctionality
 \ingroup Functionalities
 */
-class QmitkFunctionalityTemplate : public QmitkFunctionality
+class @FUNCTIONALITY_NAME@ : public QmitkFunctionality
 {  
   Q_OBJECT
   
@@ -41,12 +41,12 @@ class QmitkFunctionalityTemplate : public QmitkFunctionality
   /*!  
   \brief default constructor  
   */  
-  QmitkFunctionalityTemplate(QObject *parent=0, const char *name=0, QmitkStdMultiWidget *mitkStdMultiWidget = NULL, mitk::DataTreeIteratorBase* dataIt = NULL);
+  @FUNCTIONALITY_NAME@(QObject *parent=0, const char *name=0, QmitkStdMultiWidget *mitkStdMultiWidget = NULL, mitk::DataTreeIteratorBase* dataIt = NULL);
 
   /*!  
   \brief default destructor  
   */  
-  virtual ~QmitkFunctionalityTemplate();
+  virtual ~@FUNCTIONALITY_NAME@();
 
   /*!  
   \brief method for creating the widget containing the application   controls, like sliders, buttons etc.  
@@ -87,7 +87,7 @@ protected:
   /*!  
   * controls containing sliders for scrolling through the slices  
   */  
-  QmitkFunctionalityTemplateControls * m_Controls;
+  @FUNCTIONALITY_NAME@Controls * m_Controls;
 
 };
-#endif // !defined(QMITK_FUNCTIONALITYTEMPLATE_H__INCLUDED)
+#endif // !defined(@FUNCTIONALITY_NAME@_H__INCLUDED)

@@ -35,6 +35,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkGlobalInteraction.h"
 
 #include <vtkRenderer.h>
+#include <vtkRenderWindow.h>
 
 void QmitkStdMultiWidget::init()
 {
@@ -109,6 +110,22 @@ void QmitkStdMultiWidget::init()
   mitk::GlobalInteraction::GetInstance()->AddListener(
     m_LastLeftClickPositionSupplier
   );
+  
+  m_GradientBackground1 = mitk::GradientBackground::New();
+  m_GradientBackground1->SetVtkRenderWindow( (vtkRenderWindow*)( mitkWidget1->GetRenderWindow()->GetVtkRenderWindow() ) );
+  m_GradientBackground1->Enable();
+  
+  m_GradientBackground2 = mitk::GradientBackground::New();
+  m_GradientBackground2->SetVtkRenderWindow( (vtkRenderWindow*)( mitkWidget2->GetRenderWindow()->GetVtkRenderWindow() ) );
+  m_GradientBackground2->Enable();
+  
+  m_GradientBackground3 = mitk::GradientBackground::New();
+  m_GradientBackground3->SetVtkRenderWindow( (vtkRenderWindow*)( mitkWidget3->GetRenderWindow()->GetVtkRenderWindow() ) );
+  m_GradientBackground3->Enable();
+  
+  m_GradientBackground4 = mitk::GradientBackground::New();
+  m_GradientBackground4->SetVtkRenderWindow( (vtkRenderWindow*)( mitkWidget4->GetRenderWindow()->GetVtkRenderWindow() ) );
+  m_GradientBackground4->Enable();
 }
 
 void QmitkStdMultiWidget::changeLayoutTo2DImagesUp()
@@ -850,4 +867,22 @@ void QmitkStdMultiWidget::EnableSliceRotation(bool on)
 int QmitkStdMultiWidget::GetLayout() const
 {
   return m_Layout;
+}
+
+
+void QmitkStdMultiWidget::EnableGradientBackground()
+{
+  m_GradientBackground1->Enable();
+  m_GradientBackground2->Enable();
+  m_GradientBackground3->Enable();
+  m_GradientBackground4->Enable();
+}
+
+
+void QmitkStdMultiWidget::DisableGradientBackground()
+{
+  m_GradientBackground1->Disable();
+  m_GradientBackground2->Disable();
+  m_GradientBackground3->Disable();
+  m_GradientBackground4->Disable();
 }

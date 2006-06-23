@@ -41,6 +41,8 @@
 #include <ipFunc/ipFunc.h>
 #include <mitkLevelWindow.h>
 #include <qstring.h>
+#include <mitkLevelWindowPreset.h>
+#include <qpopupmenu.h>
 
 /**
 
@@ -92,12 +94,17 @@ protected:
   */
   QPoint startPos;
 
+  bool resize;
+  bool bottom;
+  float factor;
   bool mouseDown;
   bool leftbutton;
   int moveHeight;
   QString level;
   QString window;
   QFont font;
+  QPopupMenu *presetSubmenu;
+  
 
 public:
 
@@ -109,8 +116,11 @@ public:
   *	by a QmitkSliderLevelWindowWidget
   */
   mitk::LevelWindow lw;
+  mitk::LevelWindowPreset pre;
 
 protected:
+
+  bool getPresets();
 
   /*! 
   * repaint the slider
@@ -145,7 +155,13 @@ protected:
 
 protected slots:
 
+void changeImage();
+void setPreset(int id);
+void addPreset();
 
+private:
+   void contextMenuEvent ( QContextMenuEvent * );
+   
 
 public:
 

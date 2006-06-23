@@ -18,11 +18,39 @@ The QmitkFooBarControls.ui.h should handle the graphical user interface, while t
 Build the project again.
 
 \section CmakeFuncGen CMake-based functionality generator
+The FunctionalityGenerator is a tool to simplify the process of creating your own MITK functionality and integrating it into the SampleApp.
 
-To be written.
+\par Introduction
+Start by building a MITKSampleApp. If everything works you have to think about a name for your new functionality and where you want
+to put the source code. The generator uses the CMake GUI for configuration.  
+
+\par Windows
+\li Start the CMake GUI
+\li Choose \c Build/Tools/FunctionalityGenerator as source directory
+\li Choose a temporary directory as binary directory (create it if it doesn't exist)
+\li Press "Configure" and don't care about the generator
+\li Select a direcory for the source code of your new functionality in the FUNCTIONALITY_DIR field. CMake will create it for you.
+\li Enter a name for the new functionality in the FUNCTIONALITY_NAME field
+\li Check that FUNCTIONALITY_TEMPLATE was found
+\li Turn on GENERATE_FUNCTIONALITY and press "Configure" once more.
+
+\par Linux
+\li Create a temporary directory and cd into it. 
+\li Start <tt>ccmake</tt> with <tt>Build/Tools/FunctionalityGenerator</tt> as source directory
+\li Press "Configure" 
+\li Select a direcory for the source code of your new functionality in the FUNCTIONALITY_DIR field. CMake will create it for you.
+\li Enter a name for the new functionality in the FUNCTIONALITY_NAME field
+\li Check that FUNCTIONALITY_TEMPLATE was found
+\li Turn on GENERATE_FUNCTIONALITY and press "Configure" once more.
+
+\par Integrating your new functionality
+Switch back to the configuration of your MITK build. On Windows you can switch the "Where to build the binaries" combobox back 
+to your MITK binary directory. In the CMake GUI you can find a variable EXTERNAL_FUNCTIONALITIES_CMAKE. Set it to the <tt>AddToMITK.cmake</tt>
+which is located in your newly created functionality source directory.
+\note If you want to add multiple external functionalities to your MITK build, you have to merge the different <tt>AddToMITK.cmake</tt> files. 
 
 \section BuildSystem Build system for functionalities
 
-To be written.
+To be written. Until then please have a look at a functionality generated with the FunctionalityGenerator and the macros in <tt>AppModules/QmitkApplicationBase/QmitkFunctionalityBaseInclude.cmake</tt>.
 
 */

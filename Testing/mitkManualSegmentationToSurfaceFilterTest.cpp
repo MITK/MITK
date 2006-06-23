@@ -24,7 +24,7 @@ int mitkManualSegmentationToSurfaceFilterTest(int argc, char* argv[])
   std::string path = argv[1];
   itksys::SystemTools::ConvertToUnixSlashes(path);
   std::string fileIn = path + "/BallBinary30x30x30.pic.gz";
-  std::string fileOut = path + "/BallBinary30x30x30.stl";
+  std::string fileOut = "BallBinary30x30x30.stl";
 
   
   fileIn = itksys::SystemTools::ConvertToOutputPath(fileIn.c_str());

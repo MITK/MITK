@@ -13,5 +13,5 @@
 
 void QmitkOptionDialog::m_FunctionalitySelectionList_selected( int newSelection)
 {
-  m_OptionWidgetStack->raiseWidget(newSelection);
+  m_OptionWidgetStack->raiseWidget(newSelection+1);
 }

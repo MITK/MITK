@@ -32,6 +32,7 @@ PURPOSE.  See the above copyright notices for more information.
 class QActionGroup;
 
 #include "mitkDataTree.h"
+#include "mitkPropertyList.h"
 
 class QmitkFctMediator;
 
@@ -143,6 +144,18 @@ public:
   */
   virtual void OptionsChanged(QWidget* optionDialog);
 
+  /*!
+  \brief Can return a list of properties that hold some state or options of the functionality.
+  */
+  virtual mitk::PropertyList* GetFunctionalityOptionsList();
+  /*!
+  \brief On startup of MITKSampleApp this will be called to restore options or state of the functionality.
+  MITKSampleApp will create a PropertyList from some file and then call this method. Copy the information
+  from this PropertyList! DO NOT SAVE THE POINTER, because the list will be deleted by MITKSampleApp after 
+  this method returns!
+  */
+  virtual void SetFunctionalityOptionsList(mitk::PropertyList*);
+
 signals:
   void Signal_dummy();
   void AvailabilityChanged(QmitkFunctionality*);
@@ -160,6 +173,8 @@ protected:
 
   unsigned long m_ObserverTag;
   friend class QmitkFctMediator;
+
+  mitk::PropertyList::Pointer m_Options;
 };
 
 #endif // !defined(AFX_QUSFUNCTIONALITY_H__1DC0BA6E_9B8D_4D63_8A63_5B661CE33712__INCLUDED_)

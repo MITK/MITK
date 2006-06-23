@@ -74,6 +74,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <mitkStringProperty.h>
 #include <qstring.h>
+#include <qgrid.h>
+#include <mitkMapClassIDToClassName.h>
+#include <QmitkStringPropertyEditor.h>
 #include <qmetaobject.h>
 #include "mitkImageTimeSelector.h"
 #include "mitkImageChannelSelector.h"
@@ -509,6 +512,9 @@ void QmitkMainTemplate::init()
 
   //create the data m_Tree
   m_Tree=mitk::DataTree::New();
+
+  m_Options = mitk::PropertyList::New();
+  m_Options->SetProperty( "HTML documentation path", new mitk::StringProperty("/local/ip++bin/Documentations/Doxygen/html/") );
 }
 
 /*!
@@ -547,6 +553,10 @@ void QmitkMainTemplate::Initialize()
 
   //initialize functionality management
   InitializeQfm();
+
+  LoadOptionsFromFile("MITKOptions.xml");
+  m_Options->SetProperty( "MITKSampleAppFunctionalityName", new mitk::StringProperty("MITKSampleApp") );
+
   QWidget* defaultMain = qfm->GetDefaultMain();
 
   if ( defaultMain!=NULL )
@@ -685,6 +695,8 @@ void QmitkMainTemplate::ShowPlanesCheckBox_clicked()
 
 void QmitkMainTemplate::destroy()
 {
+  SaveOptionsToFile("MITKOptions.xml");
+  
   delete qfm;
 #ifdef MBI_INTERNAL
   delete m_SceneWidget;
@@ -768,7 +780,10 @@ void QmitkMainTemplate::optionsReinitMultiWidget()
 
 void QmitkMainTemplate::helpContents()
 {
-  QDir homedir("./Documentations/Doxygen/html/");
+  mitk::BaseProperty::Pointer bp = m_Options->GetProperty("HTML documentation path");
+  mitk::StringProperty* pathproperty = dynamic_cast<mitk::StringProperty*>( bp.GetPointer() );
+  
+  QDir homedir( pathproperty->GetValueAsString().c_str() );
   QString home( homedir.absPath() + "/" );
   QString firstpage = home;
 
@@ -798,28 +813,139 @@ void QmitkMainTemplate::helpContents()
 void QmitkMainTemplate::optionsShow_OptionsAction_activated()
 {
   QmitkOptionDialog* optionDialog = new QmitkOptionDialog(this, "Options");
+
+  unsigned int i = 0;
+
+  // first add a global options panel
+  optionDialog->m_FunctionalitySelectionList->insertItem("Global options", i+1);
+ 
+  // TODO this building up of the options widget should be placed elsewhere...
+  QWidget* globalOptionsWidget = new QGrid(2, this);
+  new QLabel("Path to HTML documentation", globalOptionsWidget);
+        
+  mitk::BaseProperty::Pointer bp = m_Options->GetProperty("HTML documentation path");
+  mitk::StringProperty* pathproperty = dynamic_cast<mitk::StringProperty*>( bp.GetPointer() );
+  new QmitkStringPropertyEditor(pathproperty, globalOptionsWidget); 
+  // end TODO
+  
+  optionDialog->m_OptionWidgetStack->addWidget(globalOptionsWidget, i+1);
+  
   // for each functionality: If the funcionality has an option widget, 
   // add it to the  m_FunctionalitySelectionList and the m_OptionWidgetStack
-  for (unsigned int i = 0; i < qfm->GetFunctionalityCount(); ++i)
+  for ( i = 0; i < qfm->GetFunctionalityCount(); ++i)
   {
     QmitkFunctionality* f = qfm->GetFunctionalityById(i);
-    optionDialog->m_FunctionalitySelectionList->insertItem(f->GetFunctionalityName(), i);
+    optionDialog->m_FunctionalitySelectionList->insertItem(f->GetFunctionalityName(), i+2);
     QWidget* optionWidget = f->CreateOptionWidget(this);
     if (optionWidget == NULL)
       optionWidget = new QLabel("no options available", this);
-    optionDialog->m_OptionWidgetStack->addWidget(optionWidget, i);
+    optionDialog->m_OptionWidgetStack->addWidget(optionWidget, i+2);
   }
+
   // preselect active functionality
-  optionDialog->m_FunctionalitySelectionList->setSelected(qfm->GetActiveFunctionalityId(), true);
-  optionDialog->m_OptionWidgetStack->raiseWidget(qfm->GetActiveFunctionalityId());
+  optionDialog->m_FunctionalitySelectionList->setSelected(qfm->GetActiveFunctionalityId()+2, true);
+  optionDialog->m_OptionWidgetStack->raiseWidget(qfm->GetActiveFunctionalityId()+2);
+
   // show the dialog
   optionDialog->exec();
+
   // now, notify the functionalities of changes
   for (unsigned int i = 0; i < qfm->GetFunctionalityCount(); ++i)
   {
-    QmitkFunctionality* f = qfm->GetFunctionalityById(i);
+    QmitkFunctionality* f = qfm->GetFunctionalityById(i+2);
     if (f != NULL)
-      f->OptionsChanged(optionDialog->m_OptionWidgetStack->widget(i));
+      f->OptionsChanged(optionDialog->m_OptionWidgetStack->widget(i+2));
   }  
+}
+
+void QmitkMainTemplate::SaveOptionsToFile(const char* filename)
+{
+  //create a XMLWriter
+  mitk::XMLWriter xmlw(filename);
+  // start tree
+  xmlw.BeginNode(mitk::DataTree::XML_NODE_NAME);
+
+  // write SampleApp's options
+  xmlw.BeginNode(mitk::DataTree::XML_TAG_TREE_NODE);
+  xmlw.BeginNode(mitk::DataTreeNode::XML_NODE_NAME);
+  xmlw.WriteProperty(mitk::XMLIO::CLASS_NAME, mitk::MapClassIDToClassName::MapIDToName(typeid( mitk::DataTreeNode ).name()));
+    xmlw.BeginNode(mitk::PropertyList::XML_NODE_NAME);
+    xmlw.WriteProperty(mitk::XMLIO::CLASS_NAME, mitk::MapClassIDToClassName::MapIDToName(typeid( mitk::PropertyList ).name()));
+      m_Options->WriteXMLData( xmlw );
+    xmlw.EndNode();
+  xmlw.EndNode();
+  xmlw.EndNode();
+
+  // write each functionalities options
+  for (unsigned int i = 0; i < qfm->GetFunctionalityCount(); ++i)
+  {
+    QmitkFunctionality* f = qfm->GetFunctionalityById(i);
+    mitk::PropertyList* fo = f->GetFunctionalityOptionsList();
+    if (fo)
+    {
+      fo->SetProperty( "MITKSampleAppFunctionalityName", new mitk::StringProperty( f->GetFunctionalityName().ascii() ) );
+
+      xmlw.BeginNode(mitk::DataTree::XML_TAG_TREE_NODE);
+      xmlw.BeginNode(mitk::DataTreeNode::XML_NODE_NAME);
+      xmlw.WriteProperty(mitk::XMLIO::CLASS_NAME, mitk::MapClassIDToClassName::MapIDToName(typeid( mitk::DataTreeNode ).name()));
+        xmlw.BeginNode(mitk::PropertyList::XML_NODE_NAME);
+        xmlw.WriteProperty(mitk::XMLIO::CLASS_NAME, mitk::MapClassIDToClassName::MapIDToName(typeid( mitk::PropertyList ).name()));
+          fo->WriteXMLData( xmlw );
+        xmlw.EndNode();
+      xmlw.EndNode();
+      xmlw.EndNode();
+    }
+
+  }
+ 
+  // end tree
+  xmlw.EndNode();
+}
+
+void QmitkMainTemplate::LoadOptionsFromFile(const char* filename)
+{
+  // create a dummy tree with all the functionalities' propertylists
+  mitk::DataTree::Pointer dummyTree = mitk::DataTree::New();
+
+  mitk::DataTreePreOrderIterator iter(m_Tree);
+  mitk::DataTree::Load( &iter, filename );
+
+  // traverse the tree, tell the appropriate functionalities about their loaded options
+  iter.GoToBegin();
+ 
+  while (!iter.IsAtEnd())
+  {
+    // get propertylist
+    // look for property "MITKSampleAppFunctionalityName"
+    // if this is "MITKSampleApp", then take it as global options
+    // else find the belonging functionality, ask it to take that list
+    mitk::DataTreeNode* node = iter.Get();
+    if (node)
+    {
+      mitk::PropertyList* pl = node->GetPropertyList();
+      if (pl)
+      {
+        mitk::BaseProperty::Pointer bp = pl->GetProperty("MITKSampleAppFunctionalityName");
+        mitk::StringProperty* id = dynamic_cast<mitk::StringProperty*>( bp.GetPointer() );
+        std::string idstring;
+        if (id) idstring = id->GetValueAsString();
+        
+        if (idstring == "MITKSampleApp")
+        {
+          //take it as global options
+          m_Options = pl->Clone();
+        }
+        else
+        {
+          // give it to the appropriate functionality
+          QmitkFunctionality* f = qfm->GetFunctionalityByName( idstring.c_str() );
+          if (f)
+            f->SetFunctionalityOptionsList( pl );
+        }
+      }
+    } 
+    
+    ++iter;
+  }
 }
 

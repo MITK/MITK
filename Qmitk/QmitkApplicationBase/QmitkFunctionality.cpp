@@ -119,3 +119,22 @@ void QmitkFunctionality::OptionsChanged(QWidget* optionDialog)
 {
   // Read new values from your option dialog and update your functionality accordingly
 }
+
+mitk::PropertyList* QmitkFunctionality::GetFunctionalityOptionsList()
+{
+  return m_Options.GetPointer();
+}
+
+void QmitkFunctionality::SetFunctionalityOptionsList(mitk::PropertyList* pl)
+{
+  if (pl)
+  {
+    if ( m_Options.IsNull() )
+      m_Options = mitk::PropertyList::New();
+    m_Options = pl->Clone();
+  }
+  
+  // more meaningful implementation, i.e. reaction to property values, to be done in sub-classes
+}
+
+

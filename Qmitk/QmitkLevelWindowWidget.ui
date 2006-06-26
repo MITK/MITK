@@ -1,4 +1,4 @@
-<!DOCTYPE UI><UI version="3.1" stdsetdef="1">
+<!DOCTYPE UI><UI version="3.3" stdsetdef="1">
 <class>QmitkLevelWindowWidget</class>
 <widget class="QWidget">
     <property name="name">
@@ -6,7 +6,7 @@
     </property>
     <property name="geometry">
         <rect>
-            <x>42</x>
+            <x>40</x>
             <y>0</y>
             <width>40</width>
             <height>477</height>
@@ -67,13 +67,13 @@
                     </property>
                     <property name="minimumSize">
                         <size>
-                            <width>30</width>
+                            <width>50</width>
                             <height>50</height>
                         </size>
                     </property>
                     <property name="maximumSize">
                         <size>
-                            <width>30</width>
+                            <width>50</width>
                             <height>2000</height>
                         </size>
                     </property>
@@ -92,13 +92,13 @@
                     </property>
                     <property name="minimumSize">
                         <size>
-                            <width>30</width>
+                            <width>40</width>
                             <height>15</height>
                         </size>
                     </property>
                     <property name="maximumSize">
                         <size>
-                            <width>30</width>
+                            <width>40</width>
                             <height>10</height>
                         </size>
                     </property>
@@ -132,13 +132,13 @@
                     </property>
                     <property name="minimumSize">
                         <size>
-                            <width>30</width>
+                            <width>40</width>
                             <height>15</height>
                         </size>
                     </property>
                     <property name="maximumSize">
                         <size>
-                            <width>30</width>
+                            <width>40</width>
                             <height>10</height>
                         </size>
                     </property>
@@ -184,7 +184,7 @@
 </customwidgets>
 <images>
     <image name="image0">
-        <data format="XPM.GZ" length="4430">789cb597496f1d370cc7eff91446780b0a7636cd82a207ef8e1d2fcf8ed7a2076a166fef3def89eda2dfbd1af23f83c20e8af6d02807ffccbf284a22a9f1cf9f164ef6b6173efdfce1e1511e2feb85fa42ee173e354fb3d9cb6fbffffac7878f49b2d0ff8fca85e4e34f1f3e4e1e17ea859d9b79db033f05a048ff294f94937ef44ce72367ca3c72aefa6ae452f96c6451de1bb956de1fb9e9595e94b3613de191d53f7d1f59e7cb2b38b378c25607563b7523ab7f6e95f37ea87e4bb90c6cfeae9525fcc6e28f949ba88bf53ce8b9e7380ac3e2bb022771aa76a79cf443ed5f95d3d8c1ff74648d8776945d9c43ff0c2ec147e01041cf7eae9cc715ceff6160d3530aae2d1e362e07a65c59c2b0fd1f806becef58b98e1bb353619c246697cb912dbe43e53671e65fea9e833187ff2fca4952c44ee3390097c6b4aa5c260de6af1ba711ec7abe89249dd9bd18a7715428cf46b6fbda55f6698cf9dbe014bca45ca749acf9489f95bb60b7fc8cc159acfe48ef2f8dd3ca9813b0c495f2a37291c59171a35cf643e757e0cef4b239b2adbfdc7348cfdafc8be66b9664ade949f33173812d9f09dcc596cfea2fab5d857aca943be7cd2e6b3dbbc855e00d30ecb407aec13a5fd351efdbeb7dbac475967f5c18e711ea55cfcfa5791c6bfff00d18f5ecfdc86aa7b3819358f9169cda7cd6fc73d9a097136597a7c67e3ab0e5a3d77a76799e597cb20876163f693f7345ee503f7abeaeca4bece774609cafe69f93bc82bf66e044f3dd6bff733e17d44b3bb0d9691fec63db9ff60f570f767fa1dce4a847590637d8dfd5c0f01f8f6c7aed2fae1dd79b80bd9d9fccc143bfb81cd8e261bbcfae1faab7fbee823fab6f01b7a6f79a7f795cc4a8ff1d30fa0169bfcdb322b578e4019c25d66f36c039f25deb3f77c16eefcb3218f7c54b60e845cf33cf8bd04174fe05384decbdd1facc8b02f72377ca52e4c6acf99737fd502e95dba2c17a3b23eb7e45fb65919725ce370157b06bff2c8ab248acbed7c0a5ed576864b37f03633eaf8c6cfd70112cf0aff915a60f76bd8f42faa1acfdb4ece576be6a2fabaac67e4e8c25b2fecbcf235b3cfa9e94b50ce7a7ef69d904b6f85ec199e513dd0c6c7a317d27696ae75382b3d4e2d7fba9a2a0b77a3a01e789c5ff02ae10dff6c8f63eea7d55b1a05ff12a5810cfe2c0b81f3d8f2a910af11d837da2fdd3f3c8b6bede4f95f64359f3b5cac4a5567f66cf05fd951a631fd97d8ade5f55f808efc53a38467f3f1dd9ec1b60bc37520d8c78b47f56e5a0976d7092785d5fdfb7aaf219deaf17b0c37baffdbf121fa39f7a30faab68fe567e889fa6e0a15ecfc00ee7affdb8aa035b7c6b60d4231f810bd4b3be7f5513d6b7f8f7c00eefd72b7878efb7c015f87064ebffc6ad2f2dff690e16e47b3db2e9b5beaace4799dd7f0baeecfc24020bde3f7dbf240afead9fdc81c5f29573b0c77d6afe49ec338b4766e0cae6cb048cfa6507f6e8a77a3e92fa06f5b032b2c5a3fd5d42f9a25f6abf16a933e49bbe5fd2d41ef9aedf37d2d635fa83e93bdfe696cffa7ef8c877b97e1fb2f66f1f3ee88c45cfcb274d86fc3e1d18fd43ebd787cf91c2e2df053b67f5780fcec17a9fde0d7a9e821dd6d77ee68bf07963f77103ce61bf0517e0d9c8b6bf3b7009d6f7db97be163d7f367fe5689f832b63d1fee49ba6c5fde9fbe2dbc07a5e93c77f3ffeae676261ff835173c3ed5b3d777cce177cc9577ccd539ef19c6ff8368c3bbee7077ee4a7bfeb83ef73fec6dff9995ff89517798997798557798dd779833ff3e61bbdf056507fe16ddee15ddee34918fb7cc05ff9908fc2ace3377a1f223909ea533e0bea88634e380d3f9d71c68e732edee9af42242557c44424e4a9a6865aeae89c2ee8f207feaff995ae82f59aa634a339ddd02dddd17df0f0408ff4f44e3fa56ff49d9e83ef177aa5455a0aca655aa1d5e0638dd6dfe967b4112c9f6993b6e80b6d07f50eafd02eed85df4e68ff9dfe860e78425fe9908ed437d3319dd0299d057d44f13bfd9c12dea734ec320b6a4779985150191a2b4ba8cef7f188979af7a491563a39970bb9e4895cc9b54c6526f3b77ab9915bb90bfa7b79904779926ff25d9ee5455e65519664f907fe576455d6c2bd9ec9ba6cc867d994ada07e952fb22d3b6ff4b5ecf2baecc944f6e520447e1ef67e2e5f83ef433992633979a36ff8414ee54ca2f06761f8534ac26b28e1134a4aa9424a937fbbdf3664eca6f7bef68d6f7de7cffd85bff457b2ecaffdd4cffc9bfd86194fff3cded7d77fadc7ff45ffe72f1ffe02059d03ad</data>
+        <data format="PNG" length="817">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b000002f849444154789ccd9531681c4714863f8535bc0515b320c32e38e08518ac2e27d2dc810ba9bca0e2623024a98c4813486148e532080792daa4106aa522c42e8cec42201581bdc24627b061050aac21077360c14c61d8075eb814bb3ee9ee644820814cb33b6f77bef7efffdecc2e64fd8cff6204b381a3e747636b2dfeadff5b00e71dc56941ff459fecf76ce152705916e3b4a5a42d45df290270e5fc2d69ae5a5d585d4151806e099d76679cf56bf8047cf4fc689cb614eb9ee27d019488285a097618e2df944088b90ae9f512593c4f208b90c430b8cc0a6b2d694b1ba84344c85f461c3c71e4c71ed0e64d21bd29acf522daab4055d65199b66802f66f3dfa4e27d0ec10767eb18d2221bd699000ec50294e94ed1f2df6b5e1ebbb2150ce793fe5b13499f397610355d6d663babd10b30448896a42f64cd9d9b23cdd1d91c429dd3b11305dec8fa66657402be1e0b19b40bffa26c4c40ec4e1cf420e1e3b3eef091bdf2580f0dbaec3bd9995383b0dc00e43f2571e630cdd5e08818300d4476cff54921f7bfc196cdc8bc8f685fc95273f89261d73b96268aaaf24d7a5fefc06faf0415d44b324b46e8548a42cb7ea8ad9a26c8cfc00b8ce1ad6f7527bea47110f1f94e4c70a2822905e93fa7910362bc3392be6149bab004231545423b2436aa5468863c368e8d9bc6fc907067b5a774392ca2c663a8f5675f3a79f08c51f4af64ce97e29f83343fb5648724dd8bc0fa3d79ecd6f0b5415b324ac7caaecfda953e039c5b208dd5e04c0ce96a5bfaf6cdc8b585985b4e5f8fe8714131bbcf768a5acf512e21b7382e70f21ada0b30a766878b43b62fb674bb62f2c2f0b08d8538b9ee964e5e0d051ac27848170be3b2f809d77936049c9edbb21519cb2f76bdd0df9f1853a2c09dd5e4a76e870aaa882f3d3564cc0c5694151008be7f0ee1721edd584fc24c216753cf95858f94c896fc0da7a528b0c1cf9e003e0fe8b3eba252471d36a15107808deb7a1d41bc8c2de1300250c04e7211f2876346de9c2c53f48a7dd19cf7afe4fc6fbb3780efc6f8eb976fbdf83ff02a7f74fb45d03c2d50000000049454e44ae426082</data>
     </image>
 </images>
 <connections>
@@ -219,17 +219,17 @@
     <slot>SetLevelValue()</slot>
     <slot>SetWindowValue()</slot>
     <slot>SliderRepaint()</slot>
-    <slot>levelWindowSliderChanged( mitk::LevelWindow * lw )</slot>
+    <slot>levelWindowSliderChanged( mitk::LevelWindow * slw )</slot>
 </slots>
 <functions>
     <function access="private" specifier="non virtual">init()</function>
     <function>validWindow()</function>
-    <function>setLevelWindow( const mitk::LevelWindow &amp; levelWindow )</function>
+    <function>setLevelWindow( const mitk::LevelWindow &amp; slw )</function>
     <function returnType="mitk::LevelWindow &amp;">getLevelWindow()</function>
     <function access="private" specifier="non virtual">destroy()</function>
 </functions>
 <layoutdefaults spacing="6" margin="11"/>
 <includehints>
-    
+    <includehint>qmitksliderlevelwindowwidget.h</includehint>
 </includehints>
 </UI>

@@ -160,7 +160,10 @@ public:
           mitk::DataTreeIteratorClone it = m_DataTreeIterator;
           while ( !it->IsAtEnd() )
           {
-            if ( (it->Get().GetPointer() != NULL) && (it->Get()->GetData() != NULL) && it->Get()->IsVisible(NULL) )
+            bool include = true;
+            if(it->Get()->GetBoolProperty("include for pixel inspection", include) == false)
+              include = it->Get()->IsVisible(NULL);
+            if ( (it->Get().GetPointer() != NULL) && (it->Get()->GetData() != NULL) && include )
             {
               int layer = 0;
               it->Get()->GetIntProperty("layer", layer);

@@ -104,6 +104,7 @@ protected:
   bool leftbutton;
   int moveHeight;
   int m_presetID;
+  bool scale;
   
   QFont font;
   QPopupMenu *presetSubmenu;
@@ -161,6 +162,8 @@ protected slots:
 void changeImage();
 void setPreset(int id);
 void addPreset();
+void hideScale();
+void showScale();
 
 private:
    void contextMenuEvent ( QContextMenuEvent * );

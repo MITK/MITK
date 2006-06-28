@@ -34,6 +34,7 @@ QmitkSliderLevelWindowWidget::QmitkSliderLevelWindowWidget( QWidget * parent, co
   brush.setColor( QColor( 0, 0, 0 ) );
   moveHeight = height() - 25;
   factor = 0;
+  scale = TRUE;
   update();
 }
 
@@ -65,39 +66,42 @@ void QmitkSliderLevelWindowWidget::newPaintEvent()
   painter.setPen(black);
 
   //begin draw scale
-  painter.drawLine( 9, moveHeight + (int)(lw.GetRangeMin()*fact) , 19, moveHeight + (int)(lw.GetRangeMin()*fact));
-  QString s = " 0";
-  painter.drawText( 21, moveHeight + (int)(lw.GetRangeMin()*fact + 3), s );
-
-  int count = 1;
-  for(int i = moveHeight + (int)(lw.GetRangeMin()*fact + 20*fact); i < moveHeight; i+=(int)(20*fact))
+  if (scale)
   {
-    s = QString::number(-count*20);
-    if (count % 5)
-      painter.drawLine( 12, moveHeight + (int)(lw.GetRangeMin()*fact + count*20*fact), 16, moveHeight + (int)(lw.GetRangeMin()*fact + count*20*fact));
-    else 
-    {
-      painter.drawLine( 9, moveHeight + (int)(lw.GetRangeMin()*fact + count*20*fact), 19, moveHeight + (int)(lw.GetRangeMin()*fact + count*20*fact));
-      painter.drawText( 21, moveHeight + (int)(lw.GetRangeMin()*fact + count*20*fact + 3), s );
-    }
-    i=moveHeight + (int)(lw.GetRangeMin()*fact + count*20*fact);
-    count++;
-  }
+    painter.drawLine( 5, moveHeight + (int)(lw.GetRangeMin()*fact) , 15, moveHeight + (int)(lw.GetRangeMin()*fact));
+    QString s = " 0";
+    painter.drawText( 21, moveHeight + (int)(lw.GetRangeMin()*fact + 3), s );
 
-  count = 1;
-
-  for(int i = moveHeight + (int)(lw.GetRangeMin()*fact); i >= 0; i-=(int)(20*fact))
-  {
-    s = QString::number(count*20);
-    if(count % 5)
-      painter.drawLine( 12, moveHeight + (int)(lw.GetRangeMin()*fact - count*20*fact), 16, moveHeight + (int)(lw.GetRangeMin()*fact - count*20*fact));
-    else
+    int count = 1;
+    for(int i = moveHeight + (int)(lw.GetRangeMin()*fact + 20*fact); i < moveHeight; i+=(int)(20*fact))
     {
-      painter.drawLine( 9, moveHeight + (int)(lw.GetRangeMin()*fact - count*20*fact), 19, moveHeight + (int)(lw.GetRangeMin()*fact - count*20*fact));
-      painter.drawText( 21, moveHeight + (int)(lw.GetRangeMin()*fact - count*20*fact + 3), s );
+      s = QString::number(-count*20);
+      if (count % 5)
+        painter.drawLine( 8, moveHeight + (int)(lw.GetRangeMin()*fact + count*20*fact), 12, moveHeight + (int)(lw.GetRangeMin()*fact + count*20*fact));
+      else 
+      {
+        painter.drawLine( 5, moveHeight + (int)(lw.GetRangeMin()*fact + count*20*fact), 15, moveHeight + (int)(lw.GetRangeMin()*fact + count*20*fact));
+        painter.drawText( 21, moveHeight + (int)(lw.GetRangeMin()*fact + count*20*fact + 3), s );
+      }
+      i=moveHeight + (int)(lw.GetRangeMin()*fact + count*20*fact);
+      count++;
     }
-    i=moveHeight + (int)(lw.GetRangeMin()*fact - count*20*fact);
-    count++;
+
+    count = 1;
+
+    for(int i = moveHeight + (int)(lw.GetRangeMin()*fact); i >= 0; i-=(int)(20*fact))
+    {
+      s = QString::number(count*20);
+      if(count % 5)
+        painter.drawLine( 8, moveHeight + (int)(lw.GetRangeMin()*fact - count*20*fact), 12, moveHeight + (int)(lw.GetRangeMin()*fact - count*20*fact));
+      else
+      {
+        painter.drawLine( 5, moveHeight + (int)(lw.GetRangeMin()*fact - count*20*fact), 15, moveHeight + (int)(lw.GetRangeMin()*fact - count*20*fact));
+        painter.drawText( 21, moveHeight + (int)(lw.GetRangeMin()*fact - count*20*fact + 3), s );
+      }
+      i=moveHeight + (int)(lw.GetRangeMin()*fact - count*20*fact);
+      count++;
+    }
   }
   //end draw scale
 
@@ -317,9 +321,9 @@ void QmitkSliderLevelWindowWidget::update() {
     rectHeight = 15;
 
   if ( lw.GetMin() < 0 )
-    rect.setRect( 2, (int) (moveHeight - (lw.GetMax() - lw.GetRangeMin()) * fact) , 24, (int) rectHeight );
+    rect.setRect( 2, (int) (moveHeight - (lw.GetMax() - lw.GetRangeMin()) * fact) , 17, (int) rectHeight );
   else
-    rect.setRect( 2, (int) (moveHeight - (lw.GetMax() - lw.GetRangeMin()) * fact), 24, (int) rectHeight );
+    rect.setRect( 2, (int) (moveHeight - (lw.GetMax() - lw.GetRangeMin()) * fact), 17, (int) rectHeight );
 
   //level = QString::number( (int) lw.GetLevel() );// + " L";
   //window = QString::number( (int) lw.GetWindow() );// + " W";
@@ -346,9 +350,9 @@ void QmitkSliderLevelWindowWidget::updateFromLineEdit(int lineEditLevel, int lin
     rectHeight = 5;
 
   if ( lw.GetMin() < 0 )
-    rect.setRect( 2, (int) (moveHeight - (lw.GetMax() - lw.GetRangeMin()) * fact) , 24, (int) rectHeight );
+    rect.setRect( 2, (int) (moveHeight - (lw.GetMax() - lw.GetRangeMin()) * fact) , 17, (int) rectHeight );
   else
-    rect.setRect( 2, (int) (moveHeight - (lw.GetMax() - lw.GetRangeMin()) * fact), 24, (int) rectHeight );
+    rect.setRect( 2, (int) (moveHeight - (lw.GetMax() - lw.GetRangeMin()) * fact), 17, (int) rectHeight );
 
   //level = QString::number( (int) lineEditLevel );// + " L";
   //window = QString::number( (int) lineEditWindow );// + " W";
@@ -363,7 +367,10 @@ void QmitkSliderLevelWindowWidget::contextMenuEvent( QContextMenuEvent * )
 {  
   QPopupMenu *contextMenu = new QPopupMenu( this );
   Q_CHECK_PTR( contextMenu );
-  
+  if (scale)
+    contextMenu->insertItem(tr("Hide scale"), this, SLOT(hideScale()));
+  else
+    contextMenu->insertItem(tr("Show scale"), this, SLOT(showScale()));
   presetSubmenu = new QPopupMenu( this );
   Q_CHECK_PTR( presetSubmenu );
   m_presetID = presetSubmenu->insertItem(tr("Preset definition"), this, SLOT(addPreset()));
@@ -435,4 +442,16 @@ void QmitkSliderLevelWindowWidget::addPreset()
   {
     pre.newPresets(addPreset.getLevelPresets(), addPreset.getWindowPresets());
   }
+}
+
+void QmitkSliderLevelWindowWidget::hideScale()
+{
+  scale = FALSE;
+  repaint();
+}
+
+void QmitkSliderLevelWindowWidget::showScale()
+{
+  scale = TRUE;
+  repaint();
 }

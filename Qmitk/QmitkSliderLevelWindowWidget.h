@@ -44,6 +44,9 @@
 #include <mitkLevelWindowPreset.h>
 #include <qpopupmenu.h>
 
+#include "mitkDataTreeNode.h"
+#include "mitkDataTree.h"
+
 /**
 
   This documentation actually refers to the QmitkLevelWindowWidget and is only put in this class due to technical issues (should be moved later).
@@ -100,8 +103,8 @@ protected:
   bool mouseDown;
   bool leftbutton;
   int moveHeight;
-  QString level;
-  QString window;
+  int m_presetID;
+  
   QFont font;
   QPopupMenu *presetSubmenu;
   
@@ -176,7 +179,7 @@ public:
 signals:
 
   void levelWindow(mitk::LevelWindow* lw );
-};
 
+};
 
 #endif //QSLIDERLEVELWINDOW_WIDGET

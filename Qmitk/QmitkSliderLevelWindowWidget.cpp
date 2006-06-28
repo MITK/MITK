@@ -124,12 +124,12 @@ void QmitkSliderLevelWindowWidget::newPaintEvent()
 
 QString QmitkSliderLevelWindowWidget::GetWindow()
 {
-  return window;
+  return QString::number( (int) lw.GetWindow() );//window;
 }
 
 QString QmitkSliderLevelWindowWidget::GetLevel()
 {
-  return level;
+  return QString::number( (int) lw.GetLevel() );//level;
 }
 
 void QmitkSliderLevelWindowWidget::paintEvent( QPaintEvent* itkNotUsed(e) ) 
@@ -321,8 +321,8 @@ void QmitkSliderLevelWindowWidget::update() {
   else
     rect.setRect( 2, (int) (moveHeight - (lw.GetMax() - lw.GetRangeMin()) * fact), 24, (int) rectHeight );
 
-  level = QString::number( (int) lw.GetLevel() );// + " L";
-  window = QString::number( (int) lw.GetWindow() );// + " W";
+  //level = QString::number( (int) lw.GetLevel() );// + " L";
+  //window = QString::number( (int) lw.GetWindow() );// + " W";
 
 
   QWidget::repaint();
@@ -350,8 +350,8 @@ void QmitkSliderLevelWindowWidget::updateFromLineEdit(int lineEditLevel, int lin
   else
     rect.setRect( 2, (int) (moveHeight - (lw.GetMax() - lw.GetRangeMin()) * fact), 24, (int) rectHeight );
 
-  level = QString::number( (int) lineEditLevel );// + " L";
-  window = QString::number( (int) lineEditWindow );// + " W";
+  //level = QString::number( (int) lineEditLevel );// + " L";
+  //window = QString::number( (int) lineEditWindow );// + " W";
 
   update();
 
@@ -366,7 +366,7 @@ void QmitkSliderLevelWindowWidget::contextMenuEvent( QContextMenuEvent * )
   
   presetSubmenu = new QPopupMenu( this );
   Q_CHECK_PTR( presetSubmenu );
-  presetSubmenu->insertItem("Preset definition", this, SLOT(addPreset()));
+  m_presetID = presetSubmenu->insertItem(tr("Preset definition"), this, SLOT(addPreset()));
   presetSubmenu->insertSeparator();
   std::map<std::string, double> pres = pre.getLevelPresets();
   for( std::map<std::string, double>::iterator iter = pres.begin(); iter != pres.end(); iter++ ) {
@@ -376,7 +376,6 @@ void QmitkSliderLevelWindowWidget::contextMenuEvent( QContextMenuEvent * )
   connect(presetSubmenu, SIGNAL(activated(int)), this, SLOT(setPreset(int)));
   contextMenu->insertItem( "Presets",  presetSubmenu );
 
-    
   contextMenu->exec( QCursor::pos() );
   delete contextMenu;
 }
@@ -389,40 +388,40 @@ void QmitkSliderLevelWindowWidget::changeImage()
 void QmitkSliderLevelWindowWidget::setPreset(int id)
 {
   QString item = presetSubmenu->text(id);
-  if (!(item == "New Preset"))
+  if (!(id == m_presetID))
   {
-    double level = pre.getLevel(std::string((const char*)item));
-    double window = pre.getWindow(std::string((const char*)item));
-    if ((level + window/2) > lw.GetRangeMax())
+    double dlevel = pre.getLevel(std::string((const char*)item));
+    double dwindow = pre.getWindow(std::string((const char*)item));
+    if ((dlevel + dwindow/2) > lw.GetRangeMax())
     {
-      double lowerBound = (level - window/2);
+      double lowerBound = (dlevel - dwindow/2);
       if (!(lowerBound > lw.GetRangeMax()))
       {
-        window = lw.GetRangeMax() - lowerBound;
-        level = lowerBound + window/2;
+        dwindow = lw.GetRangeMax() - lowerBound;
+        dlevel = lowerBound + dwindow/2;
       }
       else
       {
-        level = lw.GetRangeMax() - 1;
-        window = 2;
+        dlevel = lw.GetRangeMax() - 1;
+        dwindow = 2;
       }
     }
-    else if ((level - window/2) < lw.GetRangeMin())
+    else if ((dlevel - dwindow/2) < lw.GetRangeMin())
     {
-      double upperBound = (level + window/2);
+      double upperBound = (dlevel + dwindow/2);
       if (!(upperBound < lw.GetRangeMin()))
       {
-        window = lw.GetRangeMin() + upperBound;
-        level = upperBound - window/2;
+        dwindow = lw.GetRangeMin() + upperBound;
+        dlevel = upperBound - dwindow/2;
       }
       else
       {
-        level = lw.GetRangeMin() + 1;
-        window = 2;
+        dlevel = lw.GetRangeMin() + 1;
+        dwindow = 2;
       }
     }
-    lw.SetLevel(level);
-    lw.SetWindow(window);
+    lw.SetLevel(dlevel);
+    lw.SetWindow(dwindow);
     update();
     emit levelWindow( &lw );
   }
@@ -431,7 +430,7 @@ void QmitkSliderLevelWindowWidget::setPreset(int id)
 void QmitkSliderLevelWindowWidget::addPreset()
 {
   QmitkLevelWindowPresetDefinition addPreset(this, "newPreset", TRUE);
-  addPreset.setPresets(pre.getLevelPresets(), pre.getWindowPresets(), level, window);
+  addPreset.setPresets(pre.getLevelPresets(), pre.getWindowPresets(), QString::number( (int) lw.GetLevel() ), QString::number( (int) lw.GetWindow() ));
   if(addPreset.exec())
   {
     pre.newPresets(addPreset.getLevelPresets(), addPreset.getWindowPresets());

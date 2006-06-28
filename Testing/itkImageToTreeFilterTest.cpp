@@ -40,8 +40,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkTubeSegmentModelGenerator.h>
 
 // image type
-typedef double                                        PixelType;
+typedef short                                         PixelType;
 const unsigned int                                    Dimension = 3;
+
+typedef double                                        ScalarType;
 
 typedef itk::Image<PixelType, Dimension>              ImageType;
 typedef ImageType::Pointer                            ImagePointer;
@@ -99,9 +101,9 @@ typedef PointsContainerType::ElementIdentifier        ElementIdentifier;
 typedef PointSetType::PointDataContainer              PointDataContainerType;
 typedef PointDataContainerType::Pointer               PointDataContainerPointer;
 
-typedef itk::Transform<PixelType>                     BaseTransformType;
+typedef itk::Transform<ScalarType>                    BaseTransformType;
 typedef BaseTransformType::Pointer                    BaseTransformPointer;
-typedef itk::TranslationTransform<PixelType>          TransformType;
+typedef itk::TranslationTransform<ScalarType>         TransformType;
 typedef TransformType::Pointer                        TransformPointer;
 typedef TransformType::ParametersType                 TransformParamtersType;
 typedef TransformType::OutputVectorType               TransformOutputVectorType;
@@ -134,7 +136,7 @@ typedef itk::TubeSegmentModelRegistrator<PointSetType, ImageType, OutputTreeType
     TubeSegmentModelRegistratorType;
 typedef TubeSegmentModelRegistratorType::Pointer          TubeSegmentModelRegistratorPointer;
 
-typedef itk::Vector<PixelType>                        VectorType;
+typedef itk::Vector<ScalarType>                       VectorType;
 
 
 typedef std::list<int>                                ResultListType;
@@ -432,7 +434,7 @@ int testRegistratedModel()
   TransformParamtersType transformParameters = transform->GetParameters();
 
   RegistratedModelPointer registratedModel = RegistratedModelType::New();
-  registratedModel->SetTransform((BaseTransformPointer)transform);
+  registratedModel->SetTransform(transform.GetPointer());
   registratedModel->SetTransformParameters(transformParameters);
   registratedModel->SetBaseModel((RegistrationModelPointer)tubeSegment);
 
@@ -775,9 +777,9 @@ int testRegistrationModelRadius()
   tubeGenerator->Update();
   TubeSegmentModelPointer tubeSegment = tubeGenerator->GetOutput();
 
-  PixelType radius = tubeSegment->GetRadius(tubeSegment->GetConnectionPoints()->GetPoints()->Begin().Value());
+  ScalarType radius = tubeSegment->GetRadius(tubeSegment->GetConnectionPoints()->GetPoints()->Begin().Value());
 
-  PixelType diff = 10.0 - radius;
+  ScalarType diff = 10.0 - radius;
   if (diff > 1.0 || diff < -1.0)
   {
     std::cout << "Radius outside of tolerance: " << radius << std::endl;

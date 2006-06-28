@@ -79,10 +79,15 @@ mitk::PropertyList::~PropertyList()
 
 unsigned long mitk::PropertyList::GetMTime() const
 {
-    PropertyMap::const_iterator it = m_Properties.begin(), end = m_Properties.end();
+  PropertyMap::const_iterator it = m_Properties.begin(), end = m_Properties.end();
   for(;it!=end;++it)
   {
-    if(Superclass::GetMTime()<it->second.first->GetMTime())
+    if(it->second.first.IsNull())
+    {
+      itkWarningMacro(<< "Property '" << it->first <<"' contains nothing (NULL).");
+      continue;
+    }
+    if(Superclass::GetMTime() < it->second.first->GetMTime())
     {
       Modified();
       break;

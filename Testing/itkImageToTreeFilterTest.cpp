@@ -41,19 +41,26 @@ PURPOSE.  See the above copyright notices for more information.
 
 // image type
 typedef short                                         PixelType;
-const unsigned int                                    Dimension = 3;
+const unsigned int                                    DIMENSION = 3;
 
 typedef double                                        ScalarType;
 
-typedef itk::Image<PixelType, Dimension>              ImageType;
+typedef itk::Image<PixelType, DIMENSION>              ImageType;
 typedef ImageType::Pointer                            ImagePointer;
 typedef ImageType::PointType                          PointType;
 typedef ImageType::DirectionType                      DirectionType;
 
-typedef itk::RegistratedModel<PixelType>              RegistratedModelType;
-typedef RegistratedModelType::Pointer                 RegistratedModelPointer;
-typedef itk::RegistrationModel<PixelType>             RegistrationModelType;
+typedef itk::DefaultDynamicMeshTraits<PixelType, DIMENSION, DIMENSION,
+    ScalarType, ScalarType, PixelType>
+    MeshTraits;
+
+typedef itk::RegistrationModel<PixelType, DIMENSION, MeshTraits>
+    RegistrationModelType;
 typedef RegistrationModelType::Pointer                RegistrationModelPointer;
+
+typedef itk::RegistratedModel<PixelType, DIMENSION, MeshTraits>
+    RegistratedModelType;
+typedef RegistratedModelType::Pointer                 RegistratedModelPointer;
 
 // tree type
 typedef itk::RegistrationModelTree<RegistrationModelType>
@@ -62,7 +69,7 @@ typedef OutputTreeType::TreeContainerPointer          OutputTreeContainerPointer
 typedef OutputTreeType::Pointer                       OutputTreePointer;
 
 typedef short                                         OutputPixelType;
-typedef itk::Image<OutputPixelType, Dimension>        OutputImageType;
+typedef itk::Image<OutputPixelType, DIMENSION>        OutputImageType;
 typedef OutputImageType::Pointer                      OutputImagePointer;
 typedef OutputImageType::PointType                    OutputImagePointType;
 
@@ -78,7 +85,8 @@ typedef itk::StartPointData<ImageType>                StartPointDataType;
 typedef StartPointDataType::Pointer                   StartPointDataPointer;
 typedef StartPointDataType::VectorType                StartPointDataVectorType;
 
-typedef itk::TubeSegmentModel<PixelType>              TubeSegmentModelType;
+typedef itk::TubeSegmentModel<PixelType, DIMENSION, MeshTraits>
+    TubeSegmentModelType;
 typedef TubeSegmentModelType::Pointer                 TubeSegmentModelPointer;
 
 typedef itk::RegistrationModelXMLWriter<TubeSegmentModelType>
@@ -200,14 +208,14 @@ PointType transformPoint(TransformPointer transform, TransformParamtersType para
   transform->SetParameters(parameters);
 
   TransformInputPointType inputPoint;
-  for (unsigned int dim = 0; dim < Dimension; dim++)
+  for (unsigned int dim = 0; dim < DIMENSION; dim++)
   {
     inputPoint[dim] = point[dim];
   }
   TransformOutputPointType outputPoint;
   outputPoint = transform->TransformPoint(inputPoint);
   PointType transformedPoint;
-  for (unsigned int dim = 0; dim < Dimension; dim++)
+  for (unsigned int dim = 0; dim < DIMENSION; dim++)
   {
     transformedPoint[dim] = outputPoint[dim];
   }
@@ -227,14 +235,14 @@ PointSetPointer transformPointSet(TransformPointer transform, TransformParamters
   {
     PointSetPointType point = pointsIter.Value();
     TransformInputPointType inputPoint;
-    for (unsigned int dim = 0; dim < Dimension; dim++)
+    for (unsigned int dim = 0; dim < DIMENSION; dim++)
     {
       inputPoint[dim] = point[dim];
     }
     TransformOutputPointType outputPoint;
     outputPoint = transform->TransformPoint(inputPoint);
     PointSetPointType transformedPoint;
-    for (unsigned int dim = 0; dim < Dimension; dim++)
+    for (unsigned int dim = 0; dim < DIMENSION; dim++)
     {
       transformedPoint[dim] = outputPoint[dim];
     }
@@ -436,7 +444,7 @@ int testRegistratedModel()
   RegistratedModelPointer registratedModel = RegistratedModelType::New();
   registratedModel->SetTransform(transform.GetPointer());
   registratedModel->SetTransformParameters(transformParameters);
-  registratedModel->SetBaseModel((RegistrationModelPointer)tubeSegment);
+  registratedModel->SetBaseModel(tubeSegment.GetPointer());
 
   PointType transformedStartPoint = transformPoint(transform, transformParameters, tubeSegment->GetStartPoint());
   PointType registratedStartPoint = registratedModel->GetStartPoint();
@@ -526,10 +534,10 @@ int testTreeToBinaryImageFilter()
   offset1.Fill(1);
   transform->SetOffset(offset1);
   RegistratedModelPointer model1 = RegistratedModelType::New();
-  model1->SetBaseModel((RegistrationModelPointer)tubeSegment);
-  model1->SetTransform((BaseTransformPointer)transform);
+  model1->SetBaseModel(tubeSegment.GetPointer());
+  model1->SetTransform(transform.GetPointer());
   model1->SetTransformParameters(transform->GetParameters());
-  treeContainer->SetRoot(static_cast<RegistrationModelPointer>(model1));
+  treeContainer->SetRoot(model1.GetPointer());
 
   TransformOutputVectorType offset2;
   offset2.Fill(2);
@@ -608,8 +616,8 @@ int testProfileGradientFinder()
   }
 
   ProfileDataType::PointType bestPoint = profileData->GetPoint();
-  const unsigned int imageDimension = image->GetImageDimension();
-  for(unsigned int dim = 0; dim < imageDimension; dim++)
+  const unsigned int imageDIMENSION = image->GetImageDimension();
+  for(unsigned int dim = 0; dim < imageDIMENSION; dim++)
   {
     const double diff = bestPoint[dim] - 10;
     if (diff > 1.0 || diff < -1.0)
@@ -736,7 +744,7 @@ int testTubeSegmentRegistrator()
 
 
   VectorType modelAxis;
-  for(unsigned int dim = 0; dim < Dimension; dim++)
+  for(unsigned int dim = 0; dim < DIMENSION; dim++)
   {
     modelAxis[dim] = modelConnectionPoint[dim] - modelStartPoint[dim];
   }

@@ -20,7 +20,7 @@ namespace mitk {
       /* EasyEvent for MousMove Interaction.
        * used during conferences
        */
-      static bool MapEvent(signed int id, const char* sender, float w1,float w2,float w3);
+      static bool MapEvent(const char* sender, float w1,float w2,float w3);
   };
 } // namespace mitk
 

@@ -331,8 +331,12 @@ void mitk::OpenGLRenderer::Repaint( bool onlyOverlay )
 
   if( onlyOverlay )
   {
+
+    std::cout<< "OVERLAY TRUE: m_PixelMapGLValid (false) "<<std::endl;
+    
     if( m_PixelMapGLValid )
     {
+      // draw pixels from PixelMapCache
       glDisable(GL_BLEND);
       glDrawPixels( m_Size[1], m_Size[0], GL_RGBA, GL_UNSIGNED_BYTE, (const GLvoid*)m_PixelMapGL);
       glEnable(GL_BLEND);
@@ -648,6 +652,8 @@ void mitk::OpenGLRenderer::DrawOverlay()
 
     m_DrawOverlayPosition[0] = -1;
     m_DrawOverlayPosition[1] = -1;
+
+//    m_PixelMapGLValid = false;
   }
 
 }

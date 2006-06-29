@@ -38,13 +38,13 @@ TextLoggerConferenceKit::SendMITK(signed int eventID, const char* sender, int et
 
 
   void
-TextLoggerConferenceKit::MouseMove(signed int eventID, const char* sender, float w1, float w2, float w3 )
+TextLoggerConferenceKit::MouseMove( const char* sender, float w1, float w2, float w3 )
 {  
 
   ofstream MITKGlobalFile( FILEPATH, ios::app);
   if (MITKGlobalFile )
   {
-    MITKGlobalFile<<eventID<<"&&"<<sender<<"&&"<< w1<<"&&"<< w2<<"&&"<< w3<<endl;
+    MITKGlobalFile<<sender<<"&&"<< w1<<"&&"<< w2<<"&&"<< w3<<endl;
   }
 };
 

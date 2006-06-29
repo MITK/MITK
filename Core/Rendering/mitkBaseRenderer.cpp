@@ -446,10 +446,9 @@ void mitk::BaseRenderer::MakeCurrent()
 }
 
 
-void mitk::BaseRenderer::DrawOverlayMouse(mitk::Point2D& /*p2d*/)
+void mitk::BaseRenderer::DrawOverlayMouse(mitk::Point2D& itkNotUsed(p2d))
 {
-  
-  std::cout<<"FALSCH - BaseRenderer.cpp DrawOverlay()"<<std::endl;
+  std::cout<<"BaseRenderer::DrawOverlayMouse()- should be inconcret implementation OpenGLRenderer."<<std::endl;
 }
 
 

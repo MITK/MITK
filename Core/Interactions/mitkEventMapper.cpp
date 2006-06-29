@@ -533,7 +533,7 @@ bool mitk::EventMapper::MapEvent(Event* event, int mitkPostedEventID )
   if ( mitkPostedEventID == 0 )
   {
     mitk::ConferenceToken* ct = mitk::ConferenceToken::GetInstance();
-    if(!ct->HaveToken() && !(eventID == 520) )
+    if(!ct->HaveToken() && !( eventID == mitk::Type_MouseMove ) )
     {
       ct->GetToken();
       std::cout<<"TOKEN: WILL BE REQUESTED "<<eventID<<std::endl;
@@ -551,9 +551,9 @@ bool mitk::EventMapper::MapEvent(Event* event, int mitkPostedEventID )
       ConferenceKit* ck = ConferenceKit::GetInstance();
       if( ck != NULL )
       {
-        if( eventID == 520 ) // MouseMove
+        if( eventID == mitk::Type_MouseMove ) // MouseMove
         {
-          ck->MouseMove(eventID, baseRendererName,  p3[0], p3[1], p3[2] );
+          ck->MouseMove( baseRendererName,  p3[0], p3[1], p3[2] );
         }
         else
         {
@@ -561,7 +561,7 @@ bool mitk::EventMapper::MapEvent(Event* event, int mitkPostedEventID )
           p2 = dpe->GetDisplayPosition();
 
           ck->SendMITK( eventID, baseRendererName, event->GetType(), event->GetButton(), event->GetButtonState(), event->GetKey(), p3[0], p3[1], p3[2], (p2[0]/bp->GetSizeX()), (p2[1]/bp->GetSizeY()) );
-          std::cout<<bp->GetSizeX()<<" / (("<<p2[0]<<")) =X "<<p2[0]/bp->GetSizeX()<<"   UND "<<bp->GetSizeY()<<" / (("<< p2[1] <<")) =Y "<<p2[1]/bp->GetSizeY()<<std::endl;
+          //std::cout<<bp->GetSizeX()<<" / (("<<p2[0]<<")) =X "<<p2[0]/bp->GetSizeX()<<"   UND "<<bp->GetSizeY()<<" / (("<< p2[1] <<")) =Y "<<p2[1]/bp->GetSizeY()<<std::endl;
         }
       }
     }

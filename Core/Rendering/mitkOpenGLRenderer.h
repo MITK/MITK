@@ -99,11 +99,6 @@ public:
   //## will be requested during Repaint()
   virtual void DrawOverlay();
 
-  //##Documentation
-  //## @brief Draws a point on the widget.
-  //## Should be used during conferences to show the position of the remote mouse
-  // virtual void RemoveRemoteMouse(BaseRenderer *br = 0) const;
-
 protected:
   //##ModelId=3E330D260255
   virtual void Update();

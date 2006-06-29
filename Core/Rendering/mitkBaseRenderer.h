@@ -145,7 +145,6 @@ public:
   //##Documentation
   //## @brief Draws a point on the widget.
   //## Should be used during conferences to show the position of the remote mouse
-  //  virtual void DrawOverlay(Point2D& p2d);
   virtual void DrawOverlayMouse(Point2D& p2d);
 
   //##Documentation

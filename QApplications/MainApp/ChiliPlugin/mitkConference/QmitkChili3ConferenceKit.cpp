@@ -56,7 +56,7 @@ Chili3Conference::SendMITK(signed int eventID, const char* sender, int etype, in
 
 
 void
-Chili3Conference::MouseMove(signed int eventID, const char* sender, float w1, float w2, float w3 )
+Chili3Conference::MouseMove( const char* sender, float w1, float w2, float w3 )
 { 
   QcPlugin* qp;
   qp = mitk::ChiliPlugin::GetPluginInstance();
@@ -64,7 +64,6 @@ Chili3Conference::MouseMove(signed int eventID, const char* sender, float w1, fl
   ipMsgParaList_t *list = NULL;
 
   list = ipMsgVarToList( list,
-                         ipTypeInt4, &eventID,
                          ipTypeString, sender,
                          ipTypeFloat4, &w1,
                          ipTypeFloat4, &w2,

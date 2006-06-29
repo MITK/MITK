@@ -12,6 +12,13 @@ public:
 
     virtual void showEvent(QShowEvent *se);
     virtual void hideEvent(QHideEvent *se);
+
+    virtual void VisibleOff();
+    virtual void VisibleOn();
+    virtual bool IsVisible();
+
+private:
+    bool m_Visible;
 };
 
 

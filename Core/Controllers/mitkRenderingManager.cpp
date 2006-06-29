@@ -308,8 +308,11 @@ mitk::RenderingManager
 {
 
   // don't distroy rendering request
-  if( m_RenderWindowList[renderWindow] < 1 )
+  if( s_RenderWindowList[renderWindow] < 1 && m_RenderWindowList[renderWindow] < 1 )
+  {
+    s_RenderWindowList[renderWindow] = 1;
     m_RenderWindowList[renderWindow] = 1;
+  }
   
   if ( !m_UpdatePending )
   {
@@ -326,7 +329,10 @@ mitk::RenderingManager
   for ( it = m_RenderWindowList.begin(); it != m_RenderWindowList.end(); ++it )
   {
     if( it->second < 1 )
+    {
       it->second = 1;
+      s_RenderWindowList[it->first] = 1;
+    }
   }
 
   // Restart the timer if there are no requests already

@@ -555,14 +555,13 @@ QcMITKSamplePlugin::handleMessage( ipInt4_t type, ipMsgParaList_t *list )
     break;
     case mitk::m_QmitkChiliPluginConferenceID + mitk::MOUSEMOVEc:
       ipMsgListToVar( list,
-                      ipTypeInt4, &eventID,
                       ipTypeStringPtr, &str,
                       ipTypeFloat4, &w1,
                       ipTypeFloat4, &w2,
                       ipTypeFloat4, &w3
           );
 
-      if( !mitk::ConferenceEventMapper::MapEvent(eventID, str, w1, w2, w3) )
+      if( !mitk::ConferenceEventMapper::MapEvent( str, w1, w2, w3 ) )
         std::cout<<"QcMITKSamplePlugin::handleMessage() -> MouseMoveEvent couldn't pass through"<<std::endl;
 
     break;   

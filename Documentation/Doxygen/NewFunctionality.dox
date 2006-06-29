@@ -1,22 +1,6 @@
 /**
 \page NewFunctionalityPage How to create a new functionality
 
-\section JavaFuncGen Java GUI Functionality Generator
-
-\b WARNING: This section describes a deprecated mechanism which will soon be 
-superseded by a new one (see sections below).
-
-In the directory Build/Tools/InsertNewFunctionality
-\li On windows: double click on the generated <tt>InsertNewFunctionality.jar</tt>
-\li On linux: <tt>java -jar InsertNewFunctionality.jar</tt>
-
-Fill in the name of your functionality (e.g. "QmitkFooBar"). Then press Enter to fill the remaining fields with default values.
-
-The program creates a directory Functionalities/QmitkFooBar, which contains all the files belonging to your functionality.
-The QmitkFooBarControls.ui.h should handle the graphical user interface, while the QmitkFooBar.cpp should do the actual work.
-
-Build the project again.
-
 \section CmakeFuncGen CMake-based functionality generator
 The FunctionalityGenerator is a tool to simplify the process of creating your own MITK functionality and integrating it into the SampleApp.
 

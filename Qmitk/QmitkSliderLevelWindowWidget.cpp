@@ -76,12 +76,25 @@ void QmitkSliderLevelWindowWidget::newPaintEvent()
     for(int i = moveHeight + (int)(lw.GetRangeMin()*fact + 20*fact); i < moveHeight; i+=(int)(20*fact))
     {
       s = QString::number(-count*20);
-      if (count % 5)
+      if (count % 5 && (((count*20*fact) - (count - 1)*20*fact) > 2.5) )
         painter.drawLine( 8, moveHeight + (int)(lw.GetRangeMin()*fact + count*20*fact), 12, moveHeight + (int)(lw.GetRangeMin()*fact + count*20*fact));
-      else 
+      else if (!(count % 5))
       {
-        painter.drawLine( 5, moveHeight + (int)(lw.GetRangeMin()*fact + count*20*fact), 15, moveHeight + (int)(lw.GetRangeMin()*fact + count*20*fact));
-        painter.drawText( 21, moveHeight + (int)(lw.GetRangeMin()*fact + count*20*fact + 3), s );
+        if (((count*20*fact) - (count - 5)*20*fact) > 7)
+        {
+          painter.drawLine( 5, moveHeight + (int)(lw.GetRangeMin()*fact + count*20*fact), 15, moveHeight + (int)(lw.GetRangeMin()*fact + count*20*fact));
+          painter.drawText( 21, moveHeight + (int)(lw.GetRangeMin()*fact + count*20*fact + 3), s );
+        }
+        else if (!(count % 10) && (((count*20*fact) - (count - 10)*20*fact) > 7) )
+        {
+          painter.drawLine( 5, moveHeight + (int)(lw.GetRangeMin()*fact + count*20*fact), 15, moveHeight + (int)(lw.GetRangeMin()*fact + count*20*fact));
+          painter.drawText( 21, moveHeight + (int)(lw.GetRangeMin()*fact + count*20*fact + 3), s );
+        }
+        else if (!(count % 30))
+        {
+          painter.drawLine( 5, moveHeight + (int)(lw.GetRangeMin()*fact + count*20*fact), 15, moveHeight + (int)(lw.GetRangeMin()*fact + count*20*fact));
+          painter.drawText( 21, moveHeight + (int)(lw.GetRangeMin()*fact + count*20*fact + 3), s );
+        }
       }
       i=moveHeight + (int)(lw.GetRangeMin()*fact + count*20*fact);
       count++;
@@ -92,12 +105,25 @@ void QmitkSliderLevelWindowWidget::newPaintEvent()
     for(int i = moveHeight + (int)(lw.GetRangeMin()*fact); i >= 0; i-=(int)(20*fact))
     {
       s = QString::number(count*20);
-      if(count % 5)
+      if(count % 5 && (((count*20*fact) - (count - 1)*20*fact) > 2.5))
         painter.drawLine( 8, moveHeight + (int)(lw.GetRangeMin()*fact - count*20*fact), 12, moveHeight + (int)(lw.GetRangeMin()*fact - count*20*fact));
-      else
+      else if (!(count % 5))
       {
-        painter.drawLine( 5, moveHeight + (int)(lw.GetRangeMin()*fact - count*20*fact), 15, moveHeight + (int)(lw.GetRangeMin()*fact - count*20*fact));
-        painter.drawText( 21, moveHeight + (int)(lw.GetRangeMin()*fact - count*20*fact + 3), s );
+        if (((count*20*fact) - (count - 5)*20*fact) > 7)
+        {
+          painter.drawLine( 5, moveHeight + (int)(lw.GetRangeMin()*fact - count*20*fact), 15, moveHeight + (int)(lw.GetRangeMin()*fact - count*20*fact));
+          painter.drawText( 21, moveHeight + (int)(lw.GetRangeMin()*fact - count*20*fact + 3), s );
+        }
+        else if (!(count % 10) && (((count*20*fact) - (count - 10)*20*fact) > 7))
+        {
+          painter.drawLine( 5, moveHeight + (int)(lw.GetRangeMin()*fact - count*20*fact), 15, moveHeight + (int)(lw.GetRangeMin()*fact - count*20*fact));
+          painter.drawText( 21, moveHeight + (int)(lw.GetRangeMin()*fact - count*20*fact + 3), s );
+        }
+        else if (!(count % 30))
+        {
+          painter.drawLine( 5, moveHeight + (int)(lw.GetRangeMin()*fact - count*20*fact), 15, moveHeight + (int)(lw.GetRangeMin()*fact - count*20*fact));
+          painter.drawText( 21, moveHeight + (int)(lw.GetRangeMin()*fact - count*20*fact + 3), s );
+        }
       }
       i=moveHeight + (int)(lw.GetRangeMin()*fact - count*20*fact);
       count++;

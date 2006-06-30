@@ -122,7 +122,8 @@ void mitk::SeedsImage::AddSeedPoint(SeedsImageType* itkImage)
 //  for (int i=0; i<3; i++) baseIndex[i] = (int)ceil((point[i]/m_Spacing[i])-(itkImage->GetOrigin()[i]/m_Spacing[i]));
   
   // setting a sphere around the point
-  if(dimension==2){
+  if(dimension==2)
+  {
     int radius[dimension];
     for(unsigned int i=0; i<dimension; i++)
       radius[i] = int(m_Radius/m_Spacing[i]);

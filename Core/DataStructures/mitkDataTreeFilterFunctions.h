@@ -50,6 +50,7 @@ namespace mitk
       {
         return new IsBaseDataType<T>();
       }
+      virtual ~IsBaseDataType() {}
   };
 
   // some default filters in mitk:: namespace for use by clients of mitk::DataTreeFilter

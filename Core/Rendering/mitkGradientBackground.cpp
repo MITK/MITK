@@ -187,9 +187,36 @@ void mitk::GradientBackground::Enable()
     return;
   if ( m_Renderer == NULL )
     return;
-
+  
+  //
+  // layer ordering has changed from vtk 4.4 to vtk 5.0
+  //
+  #if ( VTK_MAJOR_VERSION >= 5 )
+    int foregroundLayer = 1;
+    int backgroundLayer = 0;
+  #else
+    int foregroundLayer = 0;
+    int backgroundLayer = 1;
+  #endif
+  
+  //
+  // traverse the set of renderers and set their 
+  // layer to foreground / background
+  //
   m_RenderWindow->SetNumberOfLayers( 2 );
+  m_Renderer->SetLayer( backgroundLayer );
   m_RenderWindow->AddRenderer( m_Renderer );
+  for( int i = 0 ; i < m_RenderWindow->GetNumberOfLayers() ; ++i )
+  {
+      vtkRenderer* currentRenderer =  dynamic_cast<vtkRenderer*>( m_RenderWindow->GetRenderers()->GetItemAsObject(i) );
+      if ( currentRenderer != NULL )
+      {
+          if (currentRenderer == m_Renderer)
+              currentRenderer->SetLayer( backgroundLayer );
+          else
+              currentRenderer->SetLayer( foregroundLayer );
+      }
+  }
 }
 
 /**

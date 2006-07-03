@@ -22,7 +22,9 @@ public:
     \brief The constructor.
     */
     iil4mitkItem();
-
+  
+    virtual ~iil4mitkItem() {}
+    
     /*!
     \brief Displays the item.
     \note Make sure that the proper OpenGL context has been 

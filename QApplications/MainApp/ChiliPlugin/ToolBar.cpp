@@ -24,17 +24,14 @@ ToolBar::ToolBar(QWidget* parent,QcPlugin* qcplugin)
 
     for(int i=1;i<8;++i)
     {
-      //QPushButton* button= new QPushButton(QString("LightBox %1").arg(i), toolbar,QString("toolbarSelectLightBox%1").arg(i).latin1());
+      // for some strange reason the "text" is not accepted
+      // when set in the constructor, therefore it is set
+      // in ConnectButton below.
       QPushButton* button= new QPushButton(toolbar, QString("toolbarSelectLightBox%1").arg(i).latin1());
       button->setToggleButton(true);
-      //button->setName(QString("toolbarSelectLightBox%1").arg(i).latin1());
       layout2->addWidget(button,1,i-1);
       toolbar->insert(button,i);
     }
-
-    toolbar->find(5)->setText(QString("Reinitialise"));
-    toolbar->find(6)->setText(QString("Multi-Mode"));
-    toolbar->find(7)->setText(QString("Conference INFO"));
 
     for (int i=1;i<5;++i)
       connect(toolbar->find(i),SIGNAL(toggled(bool)),this,SLOT(ButtonToggled(bool)));
@@ -70,6 +67,18 @@ void ToolBar::ConnectButton(int number)
 
   for (int i=number+1;i<5;++i)
     toolbar->find(i)->hide();
+  // for some strange reason the "text" is not accepted
+  // when set in the constructor (if the plugin was already
+  // enabled on chili-startup - if it was not enabled in the
+  // beginning but during the chili session, then it works !??)
+  // Therefore we put it here.
+  for(int i=1;i<5;++i)
+  {
+    toolbar->find(i)->setText(QString("LightBox %1").arg(i));
+  }
+  toolbar->find(5)->setText(QString("Reinitialise"));
+  toolbar->find(6)->setText(QString("Multi-Mode"));
+  toolbar->find(7)->setText(QString("Conference INFO"));
   /////itkGenericOutputMacro(<<"connect buttons");
 }
 

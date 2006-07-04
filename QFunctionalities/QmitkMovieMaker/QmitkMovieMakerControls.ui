@@ -649,7 +649,8 @@
     <signal>StartPlaying()</signal>
     <signal>PausePlaying()</signal>
     <signal>StopPlaying()</signal>
-    <signal>SwitchSelectedWindow(int)</signal>
+    <signal>SwitchSelectedStepperWindow(int)</signal>
+    <signal>SwitchSelectedRecordingWindow(int)</signal>
 </signals>
 <slots>
     <slot>BTNPlay()</slot>
@@ -666,8 +667,6 @@
     <slot>BlockControls()</slot>
     <slot>UnBlockControls()</slot>
     <slot>BlockControls( bool blocked )</slot>
-    <slot>SwitchSelectedStepperWindow( int window )</slot>
-    <slot>SwitchSelectedRecordingWindow( int window )</slot>
 </slots>
 <functions>
     <function access="private" specifier="non virtual">init()</function>

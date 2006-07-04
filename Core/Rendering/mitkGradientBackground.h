@@ -72,19 +72,6 @@ public:
   virtual void SetLowerColor(vtkFloatingPointType r, vtkFloatingPointType g, vtkFloatingPointType b );
 
   /**
-   * The layer, which will be used for rendering into
-   * the renderwindow may be set using this function.
-   * The default layer is one.
-   */
-  virtual void SetLayer( int layer );
-
-  /**
-   * Returns the layer, in which the color gradient
-   * will be drawn
-   */
-  virtual int GetLayer();
-
-  /**
    * Enables drawing of the color gradient background.
    * If you want to disable it, call the Disable() function.
    */
@@ -149,8 +136,6 @@ protected:
   vtkLookupTable* m_Lut;
 
   vtkPolyData* m_Plane;
-
-  int m_Layer; 
 };
 
 } //end of namespace mitk

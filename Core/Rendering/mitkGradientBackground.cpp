@@ -22,7 +22,6 @@ mitk::GradientBackground::GradientBackground()
   m_Mapper = vtkPolyDataMapper::New();
   m_Lut = vtkLookupTable::New();
   m_Plane = vtkPolyData::New();
-  m_Layer = 1;
 
   vtkPoints* points = vtkPoints::New( ); 
   points->InsertPoint(0,-10,0,0);
@@ -62,7 +61,6 @@ mitk::GradientBackground::GradientBackground()
   m_Renderer->GetActiveCamera()->ParallelProjectionOn();
   m_Renderer->ResetCamera();
   m_Renderer->GetActiveCamera()->SetParallelScale(0.5);
-  m_Renderer->SetLayer( m_Layer );
 }
 
 mitk::GradientBackground::~GradientBackground()
@@ -158,26 +156,6 @@ void mitk::GradientBackground::SetLowerColor(vtkFloatingPointType r, vtkFloating
 
 
 /**
- * The layer, which will be used for rendering into
- * the renderwindow may be set using this function.
- * The default layer is one.
- */
-void mitk::GradientBackground::SetLayer( int layer )
-{
-  m_Layer = layer;
-  m_Renderer->SetLayer( m_Layer );
-}
-
-/**
- * Returns the layer, in which the color gradient
- * will be drawn
- */
-int mitk::GradientBackground::GetLayer()
-{
-  return m_Layer;
-}
-
-/**
  * Enables drawing of the color gradient background.
  * If you want to disable it, call the Disable() function.
  */
@@ -186,6 +164,8 @@ void mitk::GradientBackground::Enable()
   if ( m_RenderWindow == NULL )
     return;
   if ( m_Renderer == NULL )
+    return;
+  if ( IsEnabled() )
     return;
   
   //
@@ -206,16 +186,16 @@ void mitk::GradientBackground::Enable()
   m_RenderWindow->SetNumberOfLayers( 2 );
   m_Renderer->SetLayer( backgroundLayer );
   m_RenderWindow->AddRenderer( m_Renderer );
-  for( int i = 0 ; i < m_RenderWindow->GetNumberOfLayers() ; ++i )
+  for( int i = 0 ; i < m_RenderWindow->GetRenderers()->GetNumberOfItems() ; ++i )
   {
-      vtkRenderer* currentRenderer =  dynamic_cast<vtkRenderer*>( m_RenderWindow->GetRenderers()->GetItemAsObject(i) );
-      if ( currentRenderer != NULL )
-      {
-          if (currentRenderer == m_Renderer)
-              currentRenderer->SetLayer( backgroundLayer );
-          else
-              currentRenderer->SetLayer( foregroundLayer );
-      }
+    vtkRenderer* currentRenderer =  dynamic_cast<vtkRenderer*>( m_RenderWindow->GetRenderers()->GetItemAsObject(i) );
+    if ( currentRenderer != NULL )
+    {
+      if (currentRenderer == m_Renderer)
+        currentRenderer->SetLayer( backgroundLayer );
+      else
+        currentRenderer->SetLayer( foregroundLayer );
+    }
   }
 }
 

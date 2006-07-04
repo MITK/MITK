@@ -64,6 +64,7 @@ QmitkMovieMaker::~QmitkMovieMaker()
   delete m_StepperAdapter;
   delete m_Timer;
   delete m_Time;
+  //delete m_RecordingRenderer;
 }
 
 mitk::BaseController* QmitkMovieMaker::GetSpatialController()
@@ -119,7 +120,8 @@ QWidget* QmitkMovieMaker::CreateControlWidget(QWidget *parent)
     mitk::RenderWindow::RenderWindowSet::const_iterator iter;
     for (iter = rws.begin(); iter != rws.end(); ++iter)
     {
-      m_Controls->cmbSelectedWindow->insertItem((*iter)->GetName(), -1);
+      m_Controls->cmbSelectedStepperWindow->insertItem((*iter)->GetName(), -1);
+      m_Controls->cmbSelectedRecordingWindow->insertItem((*iter)->GetName(), -1);
     }
   }
   return m_Controls;
@@ -147,10 +149,13 @@ void QmitkMovieMaker::CreateConnections()
     connect( (QObject*) m_Controls, SIGNAL(SwitchAspect(int)),
       this, SLOT(SetAspect(int)) );
 
-    // window selection
-    connect( (QObject*) m_Controls, SIGNAL(SwitchSelectedWindow(int)),
-      this, SLOT(SetWindow(int)) );
+    // stepper window selection
+    connect( (QObject*) m_Controls, SIGNAL(SwitchSelectedStepperWindow(int)),
+      this, SLOT(SetStepperWindow(int)) );
 
+    // recording window selection
+    connect( (QObject*) m_Controls, SIGNAL(SwitchSelectedRecordingWindow(int)),
+      this, SLOT(SetRecordingWindow(int)) );
 
     // advance the animation
     // every timer tick
@@ -217,7 +222,7 @@ void QmitkMovieMaker::FocusChange()
 
     if ( focusedRenderer == (*iter)->GetRenderer() )
     {
-      m_Controls->cmbSelectedWindow->setCurrentItem( i );
+      m_Controls->cmbSelectedStepperWindow->setCurrentItem( i );
       break;
     }
   }
@@ -301,7 +306,7 @@ void QmitkMovieMaker::SetAspect( int aspect )
   this->UpdateDirection();
 }
 
-void QmitkMovieMaker::SetWindow( int window )
+void QmitkMovieMaker::SetStepperWindow( int window )
 {
   // Set newly selected window / renderer as focused
   const mitk::RenderWindow::RenderWindowSet rws =
@@ -315,6 +320,23 @@ void QmitkMovieMaker::SetWindow( int window )
     {
       mitk::GlobalInteraction::GetInstance()->GetFocusManager()
         ->SetFocused( (*iter)->GetRenderer() );
+      break;
+    }
+  }
+}
+void QmitkMovieMaker::SetRecordingWindow( int window )
+{
+  // Set newly selected window for recording
+  const mitk::RenderWindow::RenderWindowSet rws =
+    mitk::RenderWindow::GetInstances();
+ 
+  int i;
+  mitk::RenderWindow::RenderWindowSet::const_iterator iter;
+  for (iter = rws.begin(), i = 0; iter != rws.end(); ++iter, ++i)
+  {
+    if ( i == window )
+    {
+      m_RecordingRenderer = (*iter)->GetRenderer();
       break;
     }
   }
@@ -389,9 +411,7 @@ void QmitkMovieMaker::GenerateMovie()
   if ( movieGenerator.IsNotNull() )
   {
     movieGenerator->SetStepper( this->GetAspectStepper() );
-    movieGenerator->SetRenderer(
-      mitk::GlobalInteraction::GetInstance()->GetFocus()
-    );
+    movieGenerator->SetRenderer(m_RecordingRenderer);
 
     QString movieFileName = QFileDialog::getSaveFileName(
       QString::null, "Movie (*.avi)", 0, "movie file dialog", "Choose a file name"

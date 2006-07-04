@@ -21,213 +21,28 @@
     <property name="caption">
         <string>MovieMaker</string>
     </property>
-    <vbox>
+    <grid>
         <property name="name">
             <cstring>unnamed</cstring>
         </property>
-        <property name="spacing">
-            <number>13</number>
-        </property>
-        <widget class="QLayoutWidget">
+        <spacer row="3" column="0">
             <property name="name">
-                <cstring>layout10</cstring>
+                <cstring>spacer3</cstring>
             </property>
-            <hbox>
-                <property name="name">
-                    <cstring>unnamed</cstring>
-                </property>
-                <widget class="QLabel">
-                    <property name="name">
-                        <cstring>textLabel3</cstring>
-                    </property>
-                    <property name="sizePolicy">
-                        <sizepolicy>
-                            <hsizetype>4</hsizetype>
-                            <vsizetype>5</vsizetype>
-                            <horstretch>0</horstretch>
-                            <verstretch>0</verstretch>
-                        </sizepolicy>
-                    </property>
-                    <property name="font">
-                        <font>
-                            <bold>1</bold>
-                        </font>
-                    </property>
-                    <property name="text">
-                        <string>Selected Window</string>
-                    </property>
-                </widget>
-                <widget class="QComboBox">
-                    <property name="name">
-                        <cstring>cmbSelectedWindow</cstring>
-                    </property>
-                    <property name="sizePolicy">
-                        <sizepolicy>
-                            <hsizetype>1</hsizetype>
-                            <vsizetype>0</vsizetype>
-                            <horstretch>0</horstretch>
-                            <verstretch>0</verstretch>
-                        </sizepolicy>
-                    </property>
-                </widget>
-            </hbox>
-        </widget>
-        <widget class="QGroupBox">
-            <property name="name">
-                <cstring>groupBox2</cstring>
+            <property name="orientation">
+                <enum>Vertical</enum>
             </property>
-            <property name="font">
-                <font>
-                    <bold>1</bold>
-                </font>
+            <property name="sizeType">
+                <enum>Expanding</enum>
             </property>
-            <property name="title">
-                <string>Recording options</string>
+            <property name="sizeHint">
+                <size>
+                    <width>20</width>
+                    <height>200</height>
+                </size>
             </property>
-            <vbox>
-                <property name="name">
-                    <cstring>unnamed</cstring>
-                </property>
-                <widget class="QLayoutWidget">
-                    <property name="name">
-                        <cstring>layout3</cstring>
-                    </property>
-                    <hbox>
-                        <property name="name">
-                            <cstring>unnamed</cstring>
-                        </property>
-                        <widget class="QLabel">
-                            <property name="name">
-                                <cstring>textLabel1</cstring>
-                            </property>
-                            <property name="font">
-                                <font>
-                                    <bold>0</bold>
-                                </font>
-                            </property>
-                            <property name="text">
-                                <string>Step</string>
-                            </property>
-                        </widget>
-                        <widget class="QmitkSliderNavigator">
-                            <property name="name">
-                                <cstring>slidAngle</cstring>
-                            </property>
-                            <property name="font">
-                                <font>
-                                    <bold>0</bold>
-                                </font>
-                            </property>
-                        </widget>
-                    </hbox>
-                </widget>
-                <widget class="QLayoutWidget">
-                    <property name="name">
-                        <cstring>layout3</cstring>
-                    </property>
-                    <hbox>
-                        <property name="name">
-                            <cstring>unnamed</cstring>
-                        </property>
-                        <widget class="QToolButton">
-                            <property name="name">
-                                <cstring>btnPlay</cstring>
-                            </property>
-                            <property name="font">
-                                <font>
-                                    <bold>0</bold>
-                                </font>
-                            </property>
-                            <property name="text">
-                                <string></string>
-                            </property>
-                            <property name="iconSet">
-                                <iconset>image0</iconset>
-                            </property>
-                        </widget>
-                        <widget class="QToolButton">
-                            <property name="name">
-                                <cstring>btnPause</cstring>
-                            </property>
-                            <property name="font">
-                                <font>
-                                    <bold>0</bold>
-                                </font>
-                            </property>
-                            <property name="text">
-                                <string></string>
-                            </property>
-                            <property name="iconSet">
-                                <iconset>image1</iconset>
-                            </property>
-                        </widget>
-                        <widget class="QToolButton">
-                            <property name="name">
-                                <cstring>btnStop</cstring>
-                            </property>
-                            <property name="font">
-                                <font>
-                                    <bold>0</bold>
-                                </font>
-                            </property>
-                            <property name="text">
-                                <string></string>
-                            </property>
-                            <property name="iconSet">
-                                <iconset>image2</iconset>
-                            </property>
-                        </widget>
-                    </hbox>
-                </widget>
-                <widget class="QToolButton">
-                    <property name="name">
-                        <cstring>btnMovie</cstring>
-                    </property>
-                    <property name="sizePolicy">
-                        <sizepolicy>
-                            <hsizetype>1</hsizetype>
-                            <vsizetype>5</vsizetype>
-                            <horstretch>0</horstretch>
-                            <verstretch>0</verstretch>
-                        </sizepolicy>
-                    </property>
-                    <property name="font">
-                        <font>
-                            <bold>0</bold>
-                        </font>
-                    </property>
-                    <property name="text">
-                        <string>Write Movie (MS Windows only) ...</string>
-                    </property>
-                    <property name="usesTextLabel">
-                        <bool>false</bool>
-                    </property>
-                    <property name="textLabel">
-                        <string>Write Movie (MS Windows only) ...</string>
-                    </property>
-                    <property name="textPosition">
-                        <enum>BelowIcon</enum>
-                    </property>
-                </widget>
-                <widget class="QToolButton">
-                    <property name="name">
-                        <cstring>btnScreenshot</cstring>
-                    </property>
-                    <property name="font">
-                        <font>
-                            <bold>0</bold>
-                        </font>
-                    </property>
-                    <property name="text">
-                        <string>Write Screenshot ...</string>
-                    </property>
-                    <property name="toolTip" stdset="0">
-                        <string>Writes a screenshot of the selected window.</string>
-                    </property>
-                </widget>
-            </vbox>
-        </widget>
-        <widget class="QGroupBox">
+        </spacer>
+        <widget class="QGroupBox" row="2" column="0">
             <property name="name">
                 <cstring>groupBox1</cstring>
             </property>
@@ -475,24 +290,240 @@
                 </widget>
             </hbox>
         </widget>
-        <spacer>
+        <widget class="QGroupBox" row="1" column="0">
             <property name="name">
-                <cstring>spacer3</cstring>
+                <cstring>groupBox2</cstring>
             </property>
-            <property name="orientation">
-                <enum>Vertical</enum>
+            <property name="font">
+                <font>
+                    <bold>1</bold>
+                </font>
             </property>
-            <property name="sizeType">
-                <enum>Expanding</enum>
+            <property name="title">
+                <string>Recording options</string>
             </property>
-            <property name="sizeHint">
-                <size>
-                    <width>20</width>
-                    <height>140</height>
-                </size>
+            <vbox>
+                <property name="name">
+                    <cstring>unnamed</cstring>
+                </property>
+                <widget class="QLayoutWidget">
+                    <property name="name">
+                        <cstring>layout3</cstring>
+                    </property>
+                    <hbox>
+                        <property name="name">
+                            <cstring>unnamed</cstring>
+                        </property>
+                        <widget class="QLabel">
+                            <property name="name">
+                                <cstring>textLabel1</cstring>
+                            </property>
+                            <property name="font">
+                                <font>
+                                    <bold>0</bold>
+                                </font>
+                            </property>
+                            <property name="text">
+                                <string>Step</string>
+                            </property>
+                        </widget>
+                        <widget class="QmitkSliderNavigator">
+                            <property name="name">
+                                <cstring>slidAngle</cstring>
+                            </property>
+                            <property name="font">
+                                <font>
+                                    <bold>0</bold>
+                                </font>
+                            </property>
+                        </widget>
+                    </hbox>
+                </widget>
+                <widget class="QLayoutWidget">
+                    <property name="name">
+                        <cstring>layout3</cstring>
+                    </property>
+                    <hbox>
+                        <property name="name">
+                            <cstring>unnamed</cstring>
+                        </property>
+                        <widget class="QToolButton">
+                            <property name="name">
+                                <cstring>btnPlay</cstring>
+                            </property>
+                            <property name="font">
+                                <font>
+                                    <bold>0</bold>
+                                </font>
+                            </property>
+                            <property name="text">
+                                <string></string>
+                            </property>
+                            <property name="iconSet">
+                                <iconset>image0</iconset>
+                            </property>
+                        </widget>
+                        <widget class="QToolButton">
+                            <property name="name">
+                                <cstring>btnPause</cstring>
+                            </property>
+                            <property name="font">
+                                <font>
+                                    <bold>0</bold>
+                                </font>
+                            </property>
+                            <property name="text">
+                                <string></string>
+                            </property>
+                            <property name="iconSet">
+                                <iconset>image1</iconset>
+                            </property>
+                        </widget>
+                        <widget class="QToolButton">
+                            <property name="name">
+                                <cstring>btnStop</cstring>
+                            </property>
+                            <property name="font">
+                                <font>
+                                    <bold>0</bold>
+                                </font>
+                            </property>
+                            <property name="text">
+                                <string></string>
+                            </property>
+                            <property name="iconSet">
+                                <iconset>image2</iconset>
+                            </property>
+                        </widget>
+                    </hbox>
+                </widget>
+                <widget class="QToolButton">
+                    <property name="name">
+                        <cstring>btnMovie</cstring>
+                    </property>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>1</hsizetype>
+                            <vsizetype>5</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
+                    <property name="font">
+                        <font>
+                            <bold>0</bold>
+                        </font>
+                    </property>
+                    <property name="text">
+                        <string>Write Movie (MS Windows only) ...</string>
+                    </property>
+                    <property name="usesTextLabel">
+                        <bool>false</bool>
+                    </property>
+                    <property name="textLabel">
+                        <string>Write Movie (MS Windows only) ...</string>
+                    </property>
+                    <property name="textPosition">
+                        <enum>BelowIcon</enum>
+                    </property>
+                </widget>
+                <widget class="QToolButton">
+                    <property name="name">
+                        <cstring>btnScreenshot</cstring>
+                    </property>
+                    <property name="font">
+                        <font>
+                            <bold>0</bold>
+                        </font>
+                    </property>
+                    <property name="text">
+                        <string>Write Screenshot ...</string>
+                    </property>
+                    <property name="toolTip" stdset="0">
+                        <string>Writes a screenshot of the selected window.</string>
+                    </property>
+                </widget>
+            </vbox>
+        </widget>
+        <widget class="QLayoutWidget" row="0" column="0">
+            <property name="name">
+                <cstring>layout8</cstring>
             </property>
-        </spacer>
-    </vbox>
+            <grid>
+                <property name="name">
+                    <cstring>unnamed</cstring>
+                </property>
+                <widget class="QComboBox" row="0" column="1">
+                    <property name="name">
+                        <cstring>cmbSelectedStepperWindow</cstring>
+                    </property>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>1</hsizetype>
+                            <vsizetype>0</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
+                </widget>
+                <widget class="QLabel" row="0" column="0">
+                    <property name="name">
+                        <cstring>textLabel3</cstring>
+                    </property>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>4</hsizetype>
+                            <vsizetype>5</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
+                    <property name="font">
+                        <font>
+                            <bold>1</bold>
+                        </font>
+                    </property>
+                    <property name="text">
+                        <string>Select window for stepping </string>
+                    </property>
+                </widget>
+                <widget class="QLabel" row="1" column="0">
+                    <property name="name">
+                        <cstring>textLabel3_2</cstring>
+                    </property>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>4</hsizetype>
+                            <vsizetype>5</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
+                    <property name="font">
+                        <font>
+                            <bold>1</bold>
+                        </font>
+                    </property>
+                    <property name="text">
+                        <string>Select window for recording</string>
+                    </property>
+                </widget>
+                <widget class="QComboBox" row="1" column="1">
+                    <property name="name">
+                        <cstring>cmbSelectedRecordingWindow</cstring>
+                    </property>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>1</hsizetype>
+                            <vsizetype>0</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
+                </widget>
+            </grid>
+        </widget>
+    </grid>
 </widget>
 <customwidgets>
     <customwidget>
@@ -550,12 +581,6 @@
         <slot>BTNStop()</slot>
     </connection>
     <connection>
-        <sender>cmbSelectedWindow</sender>
-        <signal>activated(int)</signal>
-        <receiver>QmitkMovieMakerControls</receiver>
-        <slot>CMBSelectedWindow(int)</slot>
-    </connection>
-    <connection>
         <sender>rbtnCombined</sender>
         <signal>clicked()</signal>
         <receiver>QmitkMovieMakerControls</receiver>
@@ -591,6 +616,18 @@
         <receiver>QmitkMovieMakerControls</receiver>
         <slot>RBTNForward()</slot>
     </connection>
+    <connection>
+        <sender>cmbSelectedRecordingWindow</sender>
+        <signal>activated(int)</signal>
+        <receiver>QmitkMovieMakerControls</receiver>
+        <slot>cmbSelectedRecordWindow_activated(int)</slot>
+    </connection>
+    <connection>
+        <sender>cmbSelectedStepperWindow</sender>
+        <signal>activated(int)</signal>
+        <receiver>QmitkMovieMakerControls</receiver>
+        <slot>cmbSelectedStepperWindow_activated(int)</slot>
+    </connection>
 </connections>
 <tabstops>
     <tabstop>rbtnForward</tabstop>
@@ -598,7 +635,7 @@
     <tabstop>rbtnPingPong</tabstop>
     <tabstop>rbtnSpatial</tabstop>
     <tabstop>rbtnTemporal</tabstop>
-    <tabstop>cmbSelectedWindow</tabstop>
+    <tabstop>cmbSelectedStepperWindow</tabstop>
 </tabstops>
 <includes>
     <include location="local" impldecl="in implementation">QmitkMovieMakerControls.ui.h</include>
@@ -624,13 +661,19 @@
     <slot>RBTNSpatial()</slot>
     <slot>RBTNTemporal()</slot>
     <slot>RBTNCombined()</slot>
-    <slot>CMBSelectedWindow( int window )</slot>
+    <slot>cmbSelectedStepperWindow_activated( int window )</slot>
+    <slot>cmbSelectedRecordWindow_activated( int window )</slot>
     <slot>BlockControls()</slot>
     <slot>UnBlockControls()</slot>
     <slot>BlockControls( bool blocked )</slot>
+    <slot>SwitchSelectedStepperWindow( int window )</slot>
+    <slot>SwitchSelectedRecordingWindow( int window )</slot>
 </slots>
 <functions>
     <function access="private" specifier="non virtual">init()</function>
 </functions>
 <layoutdefaults spacing="6" margin="11"/>
+<includehints>
+    <includehint>qmitkslidernavigator.h</includehint>
+</includehints>
 </UI>

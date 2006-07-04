@@ -23,6 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkCameraRotationController.h"
 #include "mitkStepper.h"
 #include "mitkMultiStepper.h"
+#include "mitkRenderWindow.h"
 #include "itkCommand.h"
 
 class QmitkStdMultiWidget;
@@ -188,8 +189,11 @@ public slots:
    */
   void SetAspect( int aspect );
 
-  /** \brief Sets the specified window as focused. */
-  void SetWindow( int window );
+  /** \brief Sets a specified stepper window, which is moving. */
+  void SetStepperWindow( int window );
+
+  /** \brief Sets a specified recording window, from which the movie is generated. */
+  void SetRecordingWindow( int window );
 
   /** \brief Advances the animation by one frame.
    * Exactly how much the stepper advances depends on the time elapsed since
@@ -235,6 +239,7 @@ private:
 
   int m_Aspect;
   mitk::MultiStepper::Pointer m_Stepper;
+  mitk::BaseRenderer * m_RecordingRenderer;
 
 };
 #endif // !defined(QMITK_MOVIEMAKER_H__INCLUDED)

@@ -79,9 +79,19 @@ void QmitkMovieMakerControls::RBTNCombined()
   emit SwitchAspect( 2 );
 }
 
-void QmitkMovieMakerControls::CMBSelectedWindow( int window )
+//void QmitkMovieMakerControls::CMBSelectedWindow( int window )
+//{
+// emit SwitchSelectedWindow( window );
+//}
+
+void QmitkMovieMakerControls::cmbSelectedStepperWindow_activated( int window)
 {
- emit SwitchSelectedWindow( window );
+  emit SwitchSelectedStepperWindow( window );
+}
+
+void QmitkMovieMakerControls::cmbSelectedRecordWindow_activated( int window)
+{
+    emit SwitchSelectedRecordingWindow( window );
 }
 
 void QmitkMovieMakerControls::BlockControls()

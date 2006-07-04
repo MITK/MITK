@@ -139,8 +139,19 @@ void mitk::OpenGLRenderer::UpdateIncludingVtkActors()
   bool newRenderer = false;
   if(m_VtkRenderer==NULL)
   {
+    //
+    // new renderers are always added to the topmost layer
+    // of the current render window. This must be handled 
+    // carefully, since layer ordering changed between vtk 4.4 
+    // and vtk 5.0
+    //
+    #if ( VTK_MAJOR_VERSION >= 5 )
+      int topLayer = m_RenderWindow->GetVtkRenderWindow()->GetNumberOfLayers() - 1;
+    #else
+      int topLayer = 0;
+    #endif
     m_VtkRenderer = vtkRenderer::New();
-    m_VtkRenderer->SetLayer(0);
+    m_VtkRenderer->SetLayer( topLayer );
     m_RenderWindow->GetVtkRenderWindow()->AddRenderer( this->m_VtkRenderer );
     newRenderer = true;
 

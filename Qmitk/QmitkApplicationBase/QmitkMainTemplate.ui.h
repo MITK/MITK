@@ -816,11 +816,9 @@ void QmitkMainTemplate::helpContents()
 void QmitkMainTemplate::optionsShow_OptionsAction_activated()
 {
   QmitkOptionDialog* optionDialog = new QmitkOptionDialog(this, "Options");
-
-  unsigned int i = 0;
-
-  // first add a global options panel
-  optionDialog->m_FunctionalitySelectionList->insertItem("Global options", i+1);
+  
+    // first add a global options panel
+  optionDialog->m_FunctionalitySelectionList->insertItem("Global options", 1);  // start at index 1, because index 0 does not show up in gui
  
   // TODO this building up of the options widget should be placed elsewhere...
   QWidget* globalOptionsWidget = new QGrid(2, this);
@@ -831,11 +829,11 @@ void QmitkMainTemplate::optionsShow_OptionsAction_activated()
   new QmitkStringPropertyEditor(pathproperty, globalOptionsWidget); 
   // end TODO
   
-  optionDialog->m_OptionWidgetStack->addWidget(globalOptionsWidget, i+1);
+  optionDialog->m_OptionWidgetStack->addWidget(globalOptionsWidget, 1);
   
   // for each functionality: If the funcionality has an option widget, 
   // add it to the  m_FunctionalitySelectionList and the m_OptionWidgetStack
-  for ( i = 0; i < qfm->GetFunctionalityCount(); ++i)
+  for (unsigned int i = 0; i < qfm->GetFunctionalityCount(); ++i)
   {
     QmitkFunctionality* f = qfm->GetFunctionalityById(i);
     optionDialog->m_FunctionalitySelectionList->insertItem(f->GetFunctionalityName(), i+2);
@@ -844,21 +842,23 @@ void QmitkMainTemplate::optionsShow_OptionsAction_activated()
       optionWidget = new QLabel("no options available", this);
     optionDialog->m_OptionWidgetStack->addWidget(optionWidget, i+2);
   }
-
+  
   // preselect active functionality
-  optionDialog->m_FunctionalitySelectionList->setSelected(qfm->GetActiveFunctionalityId()+2, true);
-  optionDialog->m_OptionWidgetStack->raiseWidget(qfm->GetActiveFunctionalityId()+2);
+  optionDialog->m_FunctionalitySelectionList->setSelected(qfm->GetActiveFunctionalityId() + 1, true);
+  optionDialog->m_OptionWidgetStack->raiseWidget(qfm->GetActiveFunctionalityId() + 2);
 
   // show the dialog
-  optionDialog->exec();
-
-  // now, notify the functionalities of changes
-  for (unsigned int i = 0; i < qfm->GetFunctionalityCount(); ++i)
+  if (optionDialog->exec() == QDialog::Accepted)
   {
-    QmitkFunctionality* f = qfm->GetFunctionalityById(i+2);
-    if (f != NULL)
-      f->OptionsChanged(optionDialog->m_OptionWidgetStack->widget(i+2));
-  }  
+    // if the dialog is closed with 'Okay', notify the functionalities of changes
+    for (unsigned int i = 0; i < qfm->GetFunctionalityCount(); ++i)
+    {
+      QmitkFunctionality* f = qfm->GetFunctionalityById(i);
+      if (f != NULL)
+        f->OptionsChanged(optionDialog->m_OptionWidgetStack->widget(i + 2));
+    }  
+  }
+  delete optionDialog;
 }
 
 void QmitkMainTemplate::SaveOptionsToFile(const char* filename)

@@ -80,7 +80,6 @@ typedef ImageToTreeFilterType::Pointer                ImageToTreeFilterPointer;
 typedef itk::ITTFilterContext<ImageType, OutputTreeType>
 FilterContextType;
 typedef FilterContextType::Pointer                    FilterContextPointer;
-typedef FilterContextType::StartPointDataQueueType    StartPointDataQueueType;
 typedef itk::StartPointData<ImageType>                StartPointDataType;
 typedef StartPointDataType::Pointer                   StartPointDataPointer;
 typedef StartPointDataType::VectorType                StartPointDataVectorType;
@@ -256,67 +255,6 @@ PointSetPointer transformPointSet(TransformPointer transform, TransformParamters
   transformedPointSet->SetPoints(transformedPoints);
 
   return transformedPointSet;
-}
-
-/******************************************************************
- * TEST: Saving and loading data objects to the filter context
- *****************************************************************/
-int testFilterContext()
-{
-  // init some test data
-  StartPointDataType::PointType testPoint1;
-  testPoint1.Fill(0);
-  StartPointDataVectorType testDirection1;
-  testDirection1.Fill(0);
-  StartPointDataPointer data1 = StartPointDataType::New();
-  data1->SetStartPoint(testPoint1);
-  data1->SetStartDirection(testDirection1);
-
-  PointType testPoint2;
-  testPoint2.Fill(1);
-  StartPointDataVectorType testDirection2;
-  testDirection2.Fill(0);
-  StartPointDataPointer data2 = StartPointDataType::New();
-  data2->SetStartPoint(testPoint2);
-  data2->SetStartDirection(testDirection2);
-
-
-  std::cout << " *** Testing ITTFilterContext for storage of objects ***\n";
-  FilterContextPointer filterContext = FilterContextType::New();
-
-  StartPointDataQueueType* pointQueue1 = filterContext->GetStartPointDataQueue();
-  std::cout << "Pushing points to filter context...\n";
-  pointQueue1->push(data1);
-  pointQueue1->push(data2);
-  filterContext->ReleaseStartPointDataQueue();
-
-  std::cout << "Reading points from filter context...\n";
-  StartPointDataQueueType* pointQueue2 = filterContext->GetStartPointDataQueue();
-  if (pointQueue2->front() == data1)
-  {
-    pointQueue2->pop();
-  }
-  else
-  {
-    std::cout << "Points not in queue.\n";
-    std::cout << "[TEST FAILED]\n";
-    return EXIT_FAILURE;
-  }
-
-  if (pointQueue2->front() == data2)
-  {
-    pointQueue2->pop();
-  }
-  else
-  {
-    std::cout << "Points not in queue.\n";
-    std::cout << " *** [TEST FAILED] ***\n";
-    return EXIT_FAILURE;
-  }
-  filterContext->ReleaseStartPointDataQueue();
-
-  std::cout << " *** [TEST PASSED] ***\n";
-  return EXIT_SUCCESS;
 }
 
 /****************************************************************
@@ -730,8 +668,6 @@ int testTubeSegmentRegistrator()
   StartPointDataType::VectorType startDirection;
   startDirection.Fill(1.0);
   startPointData->SetStartDirection(startDirection);
-  filterContext->GetStartPointDataQueue()->push(startPointData);
-  filterContext->ReleaseStartPointDataQueue();
 
   TubeSegmentModelRegistratorPointer tubeModelRegistrator = TubeSegmentModelRegistratorType::New();
   tubeModelRegistrator->SetFilterContext(filterContext);
@@ -852,8 +788,7 @@ int itkImageToTreeFilterTest(int i, char* argv[] )
   int failedCount = 0;
   int testCount;
   float failRatio;
-  // run all tests
-  resultList.push_back(testFilterContext());
+
   resultList.push_back(testRegistrationModelXMLWriter());
   resultList.push_back(testRegistratedModel());
   resultList.push_back(testTreeToBinaryImageFilter());

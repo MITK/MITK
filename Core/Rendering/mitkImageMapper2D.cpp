@@ -513,7 +513,7 @@ void mitk::ImageMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
   else 
   {
     m_iil4mitkMode = iil4mitkImage::COLOR_ALPHA;
-    image->setColors(LookupTableProp->GetLookupTable().GetRawLookupTable());	
+    image->setColors(LookupTableProp->GetLookupTable()->GetRawLookupTable());	
   }
 
   mitk::LevelWindow levelWindow;

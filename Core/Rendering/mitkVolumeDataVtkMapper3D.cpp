@@ -252,9 +252,9 @@ mitk::TransferFunctionProperty::Pointer tranferFunctionProp = dynamic_cast<mitk:
     colorTransferFunction = transferFunctionProp->GetValue()->GetColorTransferFunction();
   } else if (lookupTableProp.IsNotNull() )
   {
-    lookupTableProp->GetLookupTable().CreateColorTransferFunction(colorTransferFunction);
+    lookupTableProp->GetLookupTable()->CreateColorTransferFunction(colorTransferFunction);
     colorTransferFunction->ClampingOn();
-    lookupTableProp->GetLookupTable().CreateOpacityTransferFunction(opacityTransferFunction);
+    lookupTableProp->GetLookupTable()->CreateOpacityTransferFunction(opacityTransferFunction);
     opacityTransferFunction->ClampingOn();
   }
   else

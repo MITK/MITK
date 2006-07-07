@@ -364,12 +364,12 @@ void mitk::DataTreeNodeFactory::ReadFileTypeHPSONOS()
     LookupTableSource->SetUseDSRDopplerLookupTable();
     LookupTableSource->Update();
     mitk::LookupTableSource::OutputTypePointer LookupTable = LookupTableSource->GetOutput();
-    mitk::LookupTableProperty::Pointer LookupTableProp = new mitk::LookupTableProperty( *LookupTable );
+    mitk::LookupTableProperty::Pointer LookupTableProp = new mitk::LookupTableProperty( LookupTable );
 
     int start = 128 - 1;
     int end = 128 + 1;
     for (int i=start; i<=end;i++)
-      LookupTableProp->GetLookupTable().ChangeOpacity(i, 0);
+      LookupTableProp->GetLookupTable()->ChangeOpacity(i, 0);
 
     //
     // insert original (in cylindric coordinates) Doppler information
@@ -915,12 +915,12 @@ void mitk::DataTreeNodeFactory::SetDefaultUltraSoundProperties(mitk::DataTreeNod
     LookupTableSource->SetUseDSRDopplerLookupTable();
     LookupTableSource->Update();
     mitk::LookupTableSource::OutputTypePointer LookupTable = LookupTableSource->GetOutput();
-    mitk::LookupTableProperty::Pointer LookupTableProp = new mitk::LookupTableProperty( *LookupTable );
+    mitk::LookupTableProperty::Pointer LookupTableProp = new mitk::LookupTableProperty( LookupTable );
 
     int start = 128 - 1;
     int end = 128 + 1;
     for (int i=start; i<=end;i++)
-      LookupTableProp->GetLookupTable().ChangeOpacity(i, 0);
+      LookupTableProp->GetLookupTable()->ChangeOpacity(i, 0);
 
     // insert Doppler
     node = this->GetOutput( 1 );

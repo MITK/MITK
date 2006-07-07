@@ -25,7 +25,7 @@ mitk::LookupTableProperty::LookupTableProperty()
 }
 
 //##ModelId=3ED953090121
-mitk::LookupTableProperty::LookupTableProperty(const mitk::LookupTable &lut)
+mitk::LookupTableProperty::LookupTableProperty(mitk::LookupTable::Pointer lut)
 {
     std::cout << "created new mitk::LookupTableProperty..." << std::endl;
     this->SetLookupTable(lut);
@@ -53,18 +53,12 @@ bool mitk::LookupTableProperty::operator==(const BaseProperty& property) const
 
 }
 
-//##ModelId=3ED953090133
-mitk::LookupTable & mitk::LookupTableProperty::GetLookupTable() 
-{
-    return m_LookupTable;
-}
-
 //##ModelId=3ED953090135
-void mitk::LookupTableProperty::SetLookupTable(const mitk::LookupTable &aLookupTable)
+void mitk::LookupTableProperty::SetLookupTable(mitk::LookupTable::Pointer aLookupTable)
 {
 //    std::cout << "setting LUT property ... " << std::endl;
    
-    if(m_LookupTable != aLookupTable)
+    if(*m_LookupTable != *aLookupTable)
     {
         m_LookupTable = aLookupTable;
         Modified();
@@ -75,7 +69,7 @@ void mitk::LookupTableProperty::SetLookupTable(const mitk::LookupTable &aLookupT
 
 bool mitk::LookupTableProperty::WriteXMLData(XMLWriter &xmlWriter)
 {
-    m_LookupTable.WriteXML( xmlWriter );
+    m_LookupTable->WriteXML( xmlWriter );
     return true;
 }
 

@@ -166,7 +166,7 @@ void mitk::SurfaceVtkMapper3D::ApplyProperties(vtkActor* /*actor*/, mitk::BaseRe
   this->GetDataTreeNode()->GetProperty(lookupTableProp, "LookupTable", renderer);
   if (lookupTableProp.IsNotNull() )
 	{
-    m_VtkPolyDataMapper->SetLookupTable(lookupTableProp->GetLookupTable().GetVtkLookupTable());
+    m_VtkPolyDataMapper->SetLookupTable(lookupTableProp->GetLookupTable()->GetVtkLookupTable());
   }
 
   mitk::LevelWindow levelWindow;

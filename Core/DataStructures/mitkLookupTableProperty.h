@@ -36,7 +36,7 @@ class LookupTableProperty : public BaseProperty
 
 protected:
     //##ModelId=3ED953090113
-    mitk::LookupTable m_LookupTable;
+  LookupTable::Pointer m_LookupTable;
 
 public:
     mitkClassMacro(LookupTableProperty, BaseProperty);
@@ -44,7 +44,7 @@ public:
     LookupTableProperty();
 
     //##ModelId=3ED953090121
-    LookupTableProperty(const mitk::LookupTable &lut);
+    LookupTableProperty(mitk::LookupTable::Pointer lut);
 
     //##ModelId=3EF198D9012D
 //    LookupTableProperty(const mitk::LookupTable& aLookupTable);
@@ -55,11 +55,10 @@ public:
     //##ModelId=3ED953090124
     virtual bool operator==(const BaseProperty& property) const;
 
-    //##ModelId=3ED953090133
-    mitk::LookupTable & GetLookupTable() ;
+    itkGetObjectMacro(LookupTable, LookupTable );
 
     //##ModelId=3ED953090135
-    void SetLookupTable(const mitk::LookupTable & aLookupTable);
+    void SetLookupTable(mitk::LookupTable::Pointer aLookupTable);
 
     virtual bool WriteXMLData(XMLWriter &xmlWriter);
 

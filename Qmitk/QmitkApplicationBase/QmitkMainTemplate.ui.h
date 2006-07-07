@@ -62,7 +62,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkSurface.h>
 
 #include <mitkProperties.h>
-#include <mitkLookupTableProperty.h>
 #include <mitkColorProperty.h>
 #include <mitkProperties.h>
 #include <mitkLevelWindowProperty.h>
@@ -87,7 +86,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkEventMapper.h>
 #include <mitkOperation.h>
 #include <mitkGlobalInteraction.h>
-#include <mitkUSLookupTableSource.h>
 #include <mitkConfig.h>
 
 #include <mitkParRecFileReader.h>

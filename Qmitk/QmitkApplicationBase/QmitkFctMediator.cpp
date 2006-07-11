@@ -30,7 +30,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qtoolbar.h>
 #include <qaction.h>
 #include <qlayout.h>
-#include <qsplitter.h>
 
 #include <stdio.h>
 

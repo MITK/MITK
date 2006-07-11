@@ -59,7 +59,7 @@ namespace mitk{
     XMLWriter( const char* filename, const char* subDirectory, int space = 3);
 
     /// constructor
-    //XMLWriter( std::ostream& out, int space = 3 );
+    //XMLWriter( std::ostringstream& out, int space = 3 );
 
     /// constructor
     XMLWriter( const char* filename, int space = 3 );

@@ -48,11 +48,13 @@ XMLWriter::XMLWriter( const char* filename, const char* subDirectory, int space 
 }
 
 
-//XMLWriter::XMLWriter( std::ostream& out, int space )
-//  : BaseXMLWriter( out, space ), m_FileCounter(0)
-//{
-//}
+/*
+XMLWriter::XMLWriter( std::ostringstream& out, int space )
+: BaseXMLWriter( out, space ), m_FileCounter(0)
+{
 
+}
+*/
 
 XMLWriter::XMLWriter( const char* filename, int space )
   : BaseXMLWriter( filename, space ), m_FileCounter(0)

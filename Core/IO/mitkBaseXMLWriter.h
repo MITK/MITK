@@ -68,11 +68,11 @@ namespace mitk{
 
   public:
 
-    /// constructor
+    /// constructor (output to file)
     BaseXMLWriter( const char* filename, int space = 3);
 
-    /// constructor
-    //BaseXMLWriter( std::ostream& out, int space = 3 );
+    /// constructor (output to stringstream)
+    //BaseXMLWriter( std::ostringstream& out, int space = 3 );
 
     /// destructor
     virtual ~BaseXMLWriter();

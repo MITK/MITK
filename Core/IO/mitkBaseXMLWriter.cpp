@@ -38,10 +38,13 @@ BaseXMLWriter::BaseXMLWriter( const char* filename, int space )
 }
 
 
-//BaseXMLWriter::BaseXMLWriter( std::ostream& out, int space )
-//:m_Out(&out), m_Increase(0), m_Space(space), m_NodeCount(0), m_File(false), m_FirstNode(true) 
-//{}
-
+/*
+BaseXMLWriter::BaseXMLWriter( std::ostringstream& out, int space )
+:m_Out(&out), m_Increase(0), m_Space(space), m_NodeCount(0), m_File(false), m_FirstNode(true) 
+{
+  // nothing to do
+}
+*/
 
 BaseXMLWriter::~BaseXMLWriter() 
 { 

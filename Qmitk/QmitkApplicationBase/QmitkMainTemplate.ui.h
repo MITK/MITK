@@ -289,7 +289,7 @@ void QmitkMainTemplate::fileOpenImageSequence()
   {
     mitk::DataTreePreOrderIterator it(m_Tree);
 
-    int fnstart = fileName.findRev( QRegExp("[/\\\\]"), fileName.length() );
+    int fnstart = fileName.findRev( QRegExp("[/\\\\]"), fileName.length() ); // last occurence of / or \  (\\\\ because of C++ quoting and regex syntax)
     if ( fnstart<0 ) fnstart=0;
     int start = fileName.find( QRegExp("[0-9]"), fnstart );
     if ( start<0 )
@@ -908,7 +908,7 @@ void QmitkMainTemplate::LoadOptionsFromFile(const char* filename)
   // create a dummy tree with all the functionalities' propertylists
   mitk::DataTree::Pointer dummyTree = mitk::DataTree::New();
 
-  mitk::DataTreePreOrderIterator iter(m_Tree);
+  mitk::DataTreePreOrderIterator iter(dummyTree);
   mitk::DataTree::Load( &iter, filename );
 
   // traverse the tree, tell the appropriate functionalities about their loaded options

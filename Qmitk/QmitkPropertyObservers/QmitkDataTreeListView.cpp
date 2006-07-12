@@ -785,4 +785,11 @@ void QmitkDataTreeListView::updateAllHandler( const itk::EventObject& )
   generateItems();
 }
 
+void QmitkDataTreeListView::updateAll()
+{
+  generateItems();
+}
+
+
+
 

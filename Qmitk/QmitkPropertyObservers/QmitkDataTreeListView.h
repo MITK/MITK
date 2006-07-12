@@ -159,6 +159,8 @@ class QmitkDataTreeListView : public QWidget, public QmitkListViewItemIndex
     void selectionChangedHandler( const itk::EventObject& e );
     void itemAddedHandler( const itk::EventObject& e );
     void updateAllHandler( const itk::EventObject& e );
+    
+    void updateAll();
 
   signals:
     

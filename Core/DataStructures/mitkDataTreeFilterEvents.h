@@ -57,6 +57,40 @@ itkEventMacro( TreeFilterRemoveAllEvent, itk::ModifiedEvent );
 
   };
 
+//------ TreeFilterEvent --------------------------------------------------------
+  class TreeFilterNewItemEvent : public TreeFilterItemEvent 
+  {
+  public:
+    typedef TreeFilterNewItemEvent Self; 
+    typedef TreeFilterItemEvent Superclass; 
+
+    TreeFilterNewItemEvent() : TreeFilterItemEvent() {}
+    TreeFilterNewItemEvent(const mitk::DataTreeFilter::Item* item) : TreeFilterItemEvent(item) {}
+    
+    virtual ~TreeFilterNewItemEvent() {} 
+    
+    virtual const char * GetEventName() const 
+    { 
+      return "TreeFilterNewItemEvent"; 
+    } 
+    
+    virtual bool CheckEvent(const ::itk::EventObject* e) const 
+    { 
+      return dynamic_cast<const Self*>(e); 
+    } 
+
+    virtual ::itk::EventObject* MakeObject() const 
+    { 
+      return new Self( m_ChangedItem ); 
+    } 
+    
+    TreeFilterNewItemEvent(const Self& s) : TreeFilterItemEvent(s) {}; 
+  
+  private: 
+    void operator=(const Self&); 
+    
+  };
+
 
 //------ TreeFilterItemAddedEvent --------------------------------------------------------
   class TreeFilterItemAddedEvent : public TreeFilterItemEvent 

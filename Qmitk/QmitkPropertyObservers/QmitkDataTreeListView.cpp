@@ -146,6 +146,11 @@ void QmitkDataTreeListView::connectNotifications()
   command6->SetCallbackFunction(this, &QmitkDataTreeListView::updateAllHandler);
   m_UpdateAllConnection = m_DataTreeFilter->AddObserver(mitk::TreeFilterUpdateAllEvent(), command6);
   }
+  {
+  itk::ReceptorMemberCommand<QmitkDataTreeListView>::Pointer command7 = itk::ReceptorMemberCommand<QmitkDataTreeListView>::New();
+  command7->SetCallbackFunction(this, &QmitkDataTreeListView::newItemHandler);
+  m_NewItemConnection = m_DataTreeFilter->AddObserver(mitk::TreeFilterNewItemEvent(), command7);
+  }
 }
 
 /**
@@ -162,6 +167,7 @@ void QmitkDataTreeListView::disconnectNotifications()
   m_DataTreeFilter->RemoveObserver( m_SelectionChangedConnection );
   m_DataTreeFilter->RemoveObserver( m_ItemAddedConnection );
   m_DataTreeFilter->RemoveObserver( m_UpdateAllConnection );
+  m_DataTreeFilter->RemoveObserver( m_NewItemConnection );
 } 
 
 /**
@@ -775,6 +781,19 @@ void QmitkDataTreeListView::itemAddedHandler( const itk::EventObject& /*e*/ )
   //mitk::DataTreeFilter::Item* item = event.GetChangedItem();
   // TODO: do something more clever
   generateItems();
+}
+
+
+/**
+  Handles TreeFilterNewItemEvents from the DataTreeFilter. Will just forward a notification to any Qt observers.
+*/
+void QmitkDataTreeListView::newItemHandler( const itk::EventObject& e )
+{
+  const mitk::TreeFilterItemAddedEvent& event( static_cast<const mitk::TreeFilterItemAddedEvent&>(e) );
+  const mitk::DataTreeFilter::Item* item = event.GetChangedItem();
+
+  if (item)
+    emit newItem( item );
 }
 
 /**

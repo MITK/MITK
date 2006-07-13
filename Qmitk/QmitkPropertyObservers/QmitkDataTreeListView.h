@@ -159,6 +159,7 @@ class QmitkDataTreeListView : public QWidget, public QmitkListViewItemIndex
     void selectionChangedHandler( const itk::EventObject& e );
     void itemAddedHandler( const itk::EventObject& e );
     void updateAllHandler( const itk::EventObject& e );
+    void newItemHandler( const itk::EventObject& e );
     
     void updateAll();
 
@@ -166,6 +167,7 @@ class QmitkDataTreeListView : public QWidget, public QmitkListViewItemIndex
     
     void clicked(const mitk::DataTreeFilter::Item*, bool selected);
     void activated(const mitk::DataTreeFilter::Item*, bool);
+    void newItem(const mitk::DataTreeFilter::Item*);
    
   protected:
 
@@ -209,6 +211,7 @@ class QmitkDataTreeListView : public QWidget, public QmitkListViewItemIndex
     unsigned long  m_SelectionChangedConnection;
     unsigned long  m_ItemAddedConnection;
     unsigned long  m_UpdateAllConnection;
+    unsigned long  m_NewItemConnection;
 
     bool m_SelfCall;
 

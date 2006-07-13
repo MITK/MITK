@@ -549,6 +549,10 @@ void DataTreeFilter::TreeAdd(const itk::EventObject& e)
     GenerateModelFromTree();
   }
   
+  Item* newItem ( m_Item[ treePosition->Get() ] );
+  if (newItem)
+    InvokeEvent( TreeFilterNewItemEvent( newItem ) );
+  
   delete treePosition;
   DEBUG_MSG_STATE("After TreeAddEvent")
 }

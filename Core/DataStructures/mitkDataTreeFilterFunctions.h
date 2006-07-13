@@ -32,6 +32,7 @@ namespace mitk
   class DataTreeFilterFunction
   {
     public:
+      virtual ~DataTreeFilterFunction() {}
       virtual bool operator()(DataTreeNode*) const;
       virtual bool NodeMatches(DataTreeNode*) const = 0;
       virtual DataTreeFilterFunction* Clone() const = 0;
@@ -60,6 +61,7 @@ namespace mitk
   class IsDataTreeNode : public DataTreeFilterFunction
   {
     public:
+      virtual ~IsDataTreeNode() {}
       virtual bool NodeMatches(DataTreeNode*) const;
       virtual DataTreeFilterFunction* Clone() const;
   };
@@ -69,6 +71,7 @@ namespace mitk
   class IsGoodDataTreeNode : public DataTreeFilterFunction
   {
     public:
+      virtual ~IsGoodDataTreeNode() {}
       virtual bool NodeMatches(DataTreeNode*) const;
       virtual DataTreeFilterFunction* Clone() const;
   };

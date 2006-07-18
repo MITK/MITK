@@ -53,46 +53,58 @@ class PlaneFit : public GeometryDataSource
 public:
 
   mitkClassMacro( PlaneFit, GeometryDataSource);
-
   itkNewMacro(Self);
-
   
   virtual void GenerateOutputInformation();
 
   virtual void GenerateData();
 
+  /*!Getter for point set.
+  *
+  */
   const mitk::PointSet *GetInput(void);
 
+  /*! filter initialisation.
+  *
+  */
   virtual void SetInput(const mitk::PointSet* ps);
 
-  // check number of data points 
-  bool CheckInput();
-  
-  void SetPointSet( mitk::PointSet::Pointer ps );
-
-  // calculate centroid
-  mitk::ScalarType* GetCentroid();
-  
-  // form matrix A of translated points
-  void ProcessPointSet();
- 
-  // find the smallest singular value in S and extract from V the
-  // corresponding right singular vector 
-  mitk::ScalarType GetPlaneVector();
-  
-  // calculate residual distances, if required  
-  int GetPointDistance();
+  virtual const mitk::Point3D &GetCentroid() const;
 
 protected:
 	PlaneFit();
 	virtual ~PlaneFit();
 
+  /*! Calculates the centroid of the point set.
+  *
+  */
+  void CalculateCentroid();
+  
+  /*! working with an SVD algorithm form matrix dataM.
+  * ITK suplies the vnl_svd to solve an plan fit eigentvector problem
+  * points are processed in the SVD matrix. The normal vector is the
+  * singular vector of dataM corresponding to its smalest singular value.
+  * The mehtod uses VNL library from ITK and at least the mehtod nullvector()
+  * to extract the normalvector.
+  */
+  void ProcessPointSet();
+ 
+  /*! Initialize Plane and configuration.
+  *
+  */
+  void InitializePlane();
+  
+  
 private:
 
+  /*!keeps a copy of the pointset.*/
 	const mitk::PointSet* m_PointSet;
-  mitk::PlaneGeometry* m_Plane;
-  mitk::ScalarType  m_Centroid[3];
-	mitk::Vector3D* m_Vector3D;
+  /* output object - a plane geometry.*/
+  mitk::PlaneGeometry::Pointer m_Plane;
+  /*! the calculatet center point of all points in the point set.*/
+  mitk::Point3D m_Centroid;
+  /* the normal vector to descrie a plane gemoetry.*/
+	mitk::Vector3D m_PlaneVector;
 };
 }//namespace mitk
 #endif //MITK_PLANFIT_INCLUDE_

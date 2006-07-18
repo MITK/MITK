@@ -93,7 +93,7 @@ bool mitk::PlaneFit::CheckInput()
 
   }
   else 
-    true;
+    return true;
 }
 
 void mitk::PlaneFit::SetInput( const mitk::PointSet* ps )
@@ -177,7 +177,7 @@ mitk::ScalarType mitk::PlaneFit::GetPlaneVector()
 // corresponding right singular vector
 //  [s, i] = min(diag(S));
 //  a = V(:, i);
-  mitk::ScalarType v3;
+  mitk::ScalarType v3 = 0.0;
   return v3;
 }
 

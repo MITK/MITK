@@ -58,17 +58,29 @@ const mitk::PointSet* mitk::PlaneFit::GetInput()
 
 void mitk::PlaneFit::CalculateCentroid()
 {  
+  //typedef mitk::PointSet::DataType PointSetTyp;
+  typedef mitk::PointSet::PointDataType PointDataType;
+  //typedef mitk::Mesh::DataType::PointDataContainerIterator PointDataIterator;
+  typedef mitk::PointSet::PointDataIterator PointDataIterator;
+  //typedef mitk::PointSet::PointsContainer PointsContainer;
+  
+  
+
   if( m_PointSet == NULL ) return;
 
   int ps_total = m_PointSet->GetSize();
   m_Centroid[0]=m_Centroid[1]=m_Centroid[2]=0;
 
   // summ of all points
-  for(int i=0; i<ps_total; i++)
+  mitk::PointSet::PointsContainer::Iterator pit, end;
+  pit = m_PointSet->GetPointSet()->GetPoints()->Begin();
+  end = m_PointSet->GetPointSet()->GetPoints()->End();
+  for (pit; pit!=end; pit++)
   {
-     m_Centroid[0] += m_PointSet->GetPointSet()->GetPoints()->GetElement(i)[0];
-     m_Centroid[1] += m_PointSet->GetPointSet()->GetPoints()->GetElement(i)[1];
-     m_Centroid[2] += m_PointSet->GetPointSet()->GetPoints()->GetElement(i)[2];
+     mitk::Point3D p3d = pit.Value();
+     m_Centroid[0] += p3d[0]; 
+     m_Centroid[1] += p3d[0];
+     m_Centroid[2] += p3d[0];
   }
 
   // calculation of centroid
@@ -86,11 +98,15 @@ void mitk::PlaneFit::ProcessPointSet()
   vnl_matrix<mitk::ScalarType> dataM( m_PointSet->GetSize(), 3);
 
   //calculate point distance to centroid and inserting it in the matrix
-  for(int p = 0; p < m_PointSet->GetSize(); p++)
+  mitk::PointSet::PointsContainer::Iterator pit, end;
+  pit = m_PointSet->GetPointSet()->GetPoints()->Begin();
+  end = m_PointSet->GetPointSet()->GetPoints()->End();
+  for (int p=0; pit!=end; pit++, p++)
   {
-    dataM[p][0] = m_PointSet->GetPointSet()->GetPoints()->GetElement(p)[0] - m_Centroid[0];
-    dataM[p][1] = m_PointSet->GetPointSet()->GetPoints()->GetElement(p)[1] - m_Centroid[1];
-    dataM[p][2] = m_PointSet->GetPointSet()->GetPoints()->GetElement(p)[2] - m_Centroid[2];
+    mitk::Point3D p3d = pit.Value();
+    dataM[p][0] = p3d[0] - m_Centroid[0];
+    dataM[p][1] = p3d[1] - m_Centroid[1];
+    dataM[p][2] = p3d[2] - m_Centroid[2];
   }
 
   // process the SVD (singular value decomposition) from ITK

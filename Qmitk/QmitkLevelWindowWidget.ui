@@ -220,7 +220,7 @@
     <slot>SetWindowValue()</slot>
     <slot>SliderRepaint()</slot>
     <slot>levelWindowSliderChanged( mitk::LevelWindow * slw )</slot>
-    <slot>rangeChanged( mitk::LevelWindow* lw )</slot>
+    <slot>rangeChanged( mitk::LevelWindow * lw )</slot>
 </slots>
 <functions>
     <function access="private" specifier="non virtual">init()</function>
@@ -230,4 +230,7 @@
     <function access="private" specifier="non virtual">destroy()</function>
 </functions>
 <layoutdefaults spacing="6" margin="11"/>
+<includehints>
+    <includehint>qmitksliderlevelwindowwidget.h</includehint>
+</includehints>
 </UI>

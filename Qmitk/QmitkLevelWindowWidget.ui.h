@@ -139,7 +139,12 @@ void QmitkLevelWindowWidget::destroy()
 }
 
 
-void QmitkLevelWindowWidget::rangeChanged( mitk::LevelWindow &lw )
+void QmitkLevelWindowWidget::rangeChanged( mitk::LevelWindow *lw )
 {
+  //Validator for both LineEdit-widgets, to limit the valid input-range to int.
+  QValidator* validatorWindowInput = new QIntValidator(0, (int)(lw->GetRange()), this);
+  WindowInput->setValidator(validatorWindowInput);
 
+  QValidator* validatorLevelInput = new QIntValidator((int)(lw->GetRangeMin()), (int)(lw->GetRangeMax()), this);
+  LevelInput->setValidator(validatorLevelInput);
 }

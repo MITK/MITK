@@ -38,12 +38,13 @@ void QmitkLevelWindowWidget::init()
   WindowInput->setText(initWindow);//write initial in LineEdit
 
   connect(SliderLevelWindowWidget,SIGNAL(levelWindow(mitk::LevelWindow*)),this,SLOT(levelWindowSliderChanged(mitk::LevelWindow*)) );
+  connect(SliderLevelWindowWidget, SIGNAL(newRange(mitk::LevelWindow*)), this, SLOT(rangeChanged(mitk::LevelWindow*)) );
 
   //Validator for both LineEdit-widgets, to limit the valid input-range to int.
   QValidator* validatorWindowInput = new QIntValidator(0, 4096, this);
   WindowInput->setValidator(validatorWindowInput);
 
-  QValidator* validatorLevelInput = new QIntValidator(-1024, 3072, this);
+  QValidator* validatorLevelInput = new QIntValidator(-2048, 2048, this);
   LevelInput->setValidator(validatorLevelInput);
 
 }
@@ -94,7 +95,7 @@ void QmitkLevelWindowWidget::validWindow()
 //repaint slider after a value was changed
 void QmitkLevelWindowWidget::SliderRepaint()
 {
-  SliderLevelWindowWidget->updateFromLineEdit(m_Level, m_Window);
+  SliderLevelWindowWidget->updateFromLineEdit();
 }
 
 
@@ -129,6 +130,16 @@ void QmitkLevelWindowWidget::levelWindowSliderChanged( mitk::LevelWindow * slw )
   LevelInput->setText(l);
   WindowInput->setText(w);
   validWindow();
+}
+
+void QmitkLevelWindowWidget::rangeChanged( mitk::LevelWindow * lw )
+{
+  //Validator for both LineEdit-widgets, to limit the valid input-range to int.
+  QValidator* validatorWindowInput = new QIntValidator(0, lw->GetRange(), this);
+  WindowInput->setValidator(validatorWindowInput);
+
+  QValidator* validatorLevelInput = new QIntValidator(lw->GetRangeMin(), lw->GetRangeMax(), this);
+  LevelInput->setValidator(validatorLevelInput);
 }
 
 //for destructor

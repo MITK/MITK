@@ -1,40 +1,23 @@
-// SliderLevelWindowWidget.h
+/*=========================================================================
+
+Program:   Medical Imaging & Interaction Toolkit
+Module:    $RCSfile$
+Language:  C++
+Date:      $Date$
+Version:   $Revision$
+
+Copyright (c) German Cancer Research Center, Division of Medical and
+Biological Informatics. All rights reserved.
+See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
+
+This software is distributed WITHOUT ANY WARRANTY; without even
+the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE.  See the above copyright notices for more information.
+
+=========================================================================*/
 
 #ifndef QSLIDERLEVELWINDOW_WIDGET
 #define QSLIDERLEVELWINDOW_WIDGET
-
-/*! @file
-*	DKFZ - Heidelberg
-*
-*	Module Name: QmitkSliderLevelWindowWidget
-* 
-*	Module Klasse: 	ADT --- nee, GUI Komponente
-*
-*	Beschreibung: should be a widget for adjusting level/window 
-*									values with one slider
-*					
-*					
-*
-*	Exportierte Klassen und Funktionen:
-*									
-*
-*	Importierte Klassen und Funktionen: mitk::LevelWindow
-*					
-*
-*	@warning		Dieses Modul wurde noch nicht abgenommen!  - ist klar...
-*
-*	@version		0.1
-*
-*  @date			
-*
-*  @author			Marcus Vetter
-*
-* changes by Thomas B. :
-*
-*			exchanged old LevelWindow for mitk::LevelWindow
-*
-*
-*/
 
 #include <qwidget.h> 
 #include <qpainter.h>
@@ -46,6 +29,7 @@
 
 #include "mitkDataTreeNode.h"
 #include "mitkDataTree.h"
+#include "mitkVector.h"
 
 /**
 
@@ -104,7 +88,10 @@ protected:
   bool leftbutton;
   int moveHeight;
   int m_presetID;
+  int m_defaultID;
   bool scale;
+  mitk::ScalarType m_upperLimit;
+  mitk::ScalarType m_lowerLimit;
   
   QFont font;
   QPopupMenu *presetSubmenu;
@@ -151,17 +138,11 @@ protected:
   */
   void virtual resizeEvent ( QResizeEvent * event );
 
-  /*! 
-  * method triggers repainting of the component and emits a signal
-  */
-  //void update();
-  void newPaintEvent();
-
 protected slots:
 
-void changeImage();
 void setPreset(int id);
 void addPreset();
+void setDefault();
 void hideScale();
 void showScale();
 
@@ -175,13 +156,14 @@ public:
   mitk::LevelWindow& getLevelWindow();
   void update( ipPicDescriptor* pic );
   void update( );
-  void updateFromLineEdit(int lineEditLevel, int lineEditWindow);
+  void updateFromLineEdit();
   QString GetWindow();
   QString GetLevel();
 
 signals:
 
   void levelWindow(mitk::LevelWindow* lw );
+  void newRange(mitk::LevelWindow* lw);
 
 };
 

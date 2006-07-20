@@ -58,6 +58,16 @@ public:
   ScalarType GetWindow() const;
 
   /*!
+  * \brief method returns the default level value for image
+  */
+  ScalarType GetDefaultLevel() const;
+
+  /*!
+  * \brief returns the default window size for image
+  */
+  ScalarType GetDefaultWindow() const;
+
+  /*!
   * getter for window minimum value
   */
   ScalarType GetMin() const;
@@ -76,6 +86,16 @@ public:
   * setter for window value
   */
   void SetWindow(ScalarType window);
+
+  /*!
+  * setter for default level value
+  */
+  void SetDefaultLevel(ScalarType level);
+
+  /*!
+  * setter for default window value
+  */
+  void SetDefaultWindow(ScalarType window);
 
   /*!
   * setter for level and window value
@@ -170,6 +190,16 @@ protected:
   * maximum gray value of the window
   */
   ScalarType m_RangeMax;
+
+  /*!
+  * default value of the level for image
+  */
+  ScalarType m_DefaultLevel;
+
+  /*!
+  * default value of the window for image
+  */
+  ScalarType m_DefaultWindow;
 
   /*!
   * confidence tests

@@ -6,9 +6,9 @@
     </property>
     <property name="geometry">
         <rect>
-            <x>40</x>
+            <x>35</x>
             <y>0</y>
-            <width>40</width>
+            <width>50</width>
             <height>477</height>
         </rect>
     </property>
@@ -22,7 +22,7 @@
     </property>
     <property name="maximumSize">
         <size>
-            <width>40</width>
+            <width>50</width>
             <height>32767</height>
         </size>
     </property>
@@ -229,4 +229,7 @@
     <function access="private" specifier="non virtual">destroy()</function>
 </functions>
 <layoutdefaults spacing="6" margin="11"/>
+<includehints>
+    <includehint>qmitksliderlevelwindowwidget.h</includehint>
+</includehints>
 </UI>

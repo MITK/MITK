@@ -1,4 +1,20 @@
-// SliderLevelWindowWidget.cpp
+/*=========================================================================
+
+Program:   Medical Imaging & Interaction Toolkit
+Module:    $RCSfile$
+Language:  C++
+Date:      $Date$
+Version:   $Revision$
+
+Copyright (c) German Cancer Research Center, Division of Medical and
+Biological Informatics. All rights reserved.
+See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
+
+This software is distributed WITHOUT ANY WARRANTY; without even
+the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE.  See the above copyright notices for more information.
+
+=========================================================================*/
 
 #include "QmitkSliderLevelWindowWidget.h"
 #include <qcursor.h>
@@ -17,16 +33,22 @@
 QmitkSliderLevelWindowWidget::QmitkSliderLevelWindowWidget( QWidget * parent, const char * name, WFlags f )
 : QWidget( parent, name, f ), mouseDown(false), brush( QBrush::SolidPattern ), lw(), pre()
 {
-  // Dense2Pattern
-  // BDiagPattern
   pre.LoadPreset();
   setMouseTracking(TRUE);
   resize = FALSE;
   bottom = FALSE;
   lw.SetLevel(0);
+  lw.SetDefaultLevel(0);
   lw.SetWindow(200);
+  lw.SetDefaultWindow(200);
   lw.SetRangeMin(-2048);
+  m_lowerLimit = -2048;
   lw.SetRangeMax(2048);
+  m_upperLimit = 2048;
+  
+  //refresh validators for line edits
+  emit newRange( &lw);
+  
   font.setPointSize( 6 );
   setMinimumSize ( QSize( 50, 50 ) );
   setMaximumSize ( QSize( 50, 2000 ) );
@@ -38,11 +60,17 @@ QmitkSliderLevelWindowWidget::QmitkSliderLevelWindowWidget( QWidget * parent, co
   update();
 }
 
+QString QmitkSliderLevelWindowWidget::GetWindow()
+{
+  return QString::number( (int) lw.GetWindow() );
+}
 
-/**
-*
-*/
-void QmitkSliderLevelWindowWidget::newPaintEvent()
+QString QmitkSliderLevelWindowWidget::GetLevel()
+{
+  return QString::number( (int) lw.GetLevel() );
+}
+
+void QmitkSliderLevelWindowWidget::paintEvent( QPaintEvent* itkNotUsed(e) ) 
 {
   QPainter painter(this);
 
@@ -51,11 +79,18 @@ void QmitkSliderLevelWindowWidget::newPaintEvent()
   QColor c(93,144,169);
   QColor cl = c.light();
   QColor cd = c.dark();
-  //std::cout << c.red() << "/" << cl.red() << "/" << cd.red() << std::endl; 
+
   painter.setBrush(c);
   painter.drawRect(rect);
   
-  
+  // test if slider range has changed, if true -> refresh validator for line edits
+  if (!(m_lowerLimit == lw.GetMin() && m_upperLimit == lw.GetMax()))
+  {
+    m_lowerLimit = lw.GetMin();
+    m_upperLimit = lw.GetMax();
+    emit newRange(&lw);
+  } // end test if slider range has changed
+
   float mr = lw.GetRange();
 
   if ( mr < 1 )
@@ -134,71 +169,11 @@ void QmitkSliderLevelWindowWidget::newPaintEvent()
   painter.setPen (cl);
   painter.drawLine(rect.topLeft(),rect.topRight());
   painter.drawLine(rect.topLeft(),rect.bottomLeft());
-
-  //debug
-  // painter.drawLine(rect.topLeft(),rect.bottomRight());
   
   painter.setPen (cd);
   painter.drawLine(rect.topRight(),rect.bottomRight());
   painter.drawLine(rect.bottomRight(),rect.bottomLeft());
   painter.end();
-  
-
-  //painter.setPen ( brush.color () );
-  //	painter.drawText ( 2, moveHeight + 10, level );
-  //	painter.drawText ( 2, moveHeight + 20, window );
-  //painter.fillRect ( rect, brush );
-  //painter.setPen ( brush.color () );
-  // painter.drawRect ( rect );
-}
-
-QString QmitkSliderLevelWindowWidget::GetWindow()
-{
-  return QString::number( (int) lw.GetWindow() );//window;
-}
-
-QString QmitkSliderLevelWindowWidget::GetLevel()
-{
-  return QString::number( (int) lw.GetLevel() );//level;
-}
-
-void QmitkSliderLevelWindowWidget::paintEvent( QPaintEvent* itkNotUsed(e) ) 
-{
-  newPaintEvent();
-
-  //QPainter painter(this);
-
-  //painter.setFont( font );
-  //painter.setPen ( brush.color () );
-  //painter.drawText ( 2, moveHeight + 10, level );
-  //painter.drawText ( 2, moveHeight + 20, window );
-  //painter.fillRect ( rect, brush );
-  //painter.setPen ( brush.color () );
-  //painter.drawRect ( rect );
-  /*
-  QString text("Lewel: ");
-  text += QString::number( lw.getLevel() );
-  text += " / Window: ";
-  text += QString::number( lw.getWindow() );
-  painter.drawText ( 100, 50, text );
-
-  text = "MaximumRange: ";
-  text += QString::number( lw.getMaximumRange() );
-  painter.drawText ( 100, 75, text );
-
-  text = "Min: ";
-  text += QString::number( lw.getMin() );
-  painter.drawText ( 100, 100, text );
-
-  text = "Max: ";
-  text += QString::number( lw.getMax() );
-  painter.drawText ( 100, 125, text );
-
-  text = "Window: ";
-  text += QString::number( lw.getMax() - lw.getMin() );
-  painter.drawText ( 100, 150, text );
-  */
-
 }
 
 /**
@@ -296,7 +271,7 @@ void QmitkSliderLevelWindowWidget::resizeEvent ( QResizeEvent * event ) {
 /**
 *
 */
-void QmitkSliderLevelWindowWidget::mouseReleaseEvent( QMouseEvent* /* mouseEvent  */) 
+void QmitkSliderLevelWindowWidget::mouseReleaseEvent( QMouseEvent* ) 
 {
   mouseDown = false;
 }
@@ -351,17 +326,13 @@ void QmitkSliderLevelWindowWidget::update() {
   else
     rect.setRect( 2, (int) (moveHeight - (lw.GetMax() - lw.GetRangeMin()) * fact), 17, (int) rectHeight );
 
-  //level = QString::number( (int) lw.GetLevel() );// + " L";
-  //window = QString::number( (int) lw.GetWindow() );// + " W";
-
-
   QWidget::repaint();
 
   // FIX: only emit the signal if the level window was changed by the user via mouse
   if (mouseDown) emit levelWindow( &lw );
 }
 
-void QmitkSliderLevelWindowWidget::updateFromLineEdit(int lineEditLevel, int lineEditWindow) 
+void QmitkSliderLevelWindowWidget::updateFromLineEdit() 
 {
   float mr = lw.GetRange();
 
@@ -380,13 +351,7 @@ void QmitkSliderLevelWindowWidget::updateFromLineEdit(int lineEditLevel, int lin
   else
     rect.setRect( 2, (int) (moveHeight - (lw.GetMax() - lw.GetRangeMin()) * fact), 17, (int) rectHeight );
 
-  //level = QString::number( (int) lineEditLevel );// + " L";
-  //window = QString::number( (int) lineEditWindow );// + " W";
-
   update();
-
-  // FIX: only emit the signal if the level window was changed by the user via mouse
-  if (mouseDown) emit levelWindow( &lw );
 }//end of updateFromLineEdit
 
 void QmitkSliderLevelWindowWidget::contextMenuEvent( QContextMenuEvent * )
@@ -397,6 +362,9 @@ void QmitkSliderLevelWindowWidget::contextMenuEvent( QContextMenuEvent * )
     contextMenu->insertItem(tr("Hide scale"), this, SLOT(hideScale()));
   else
     contextMenu->insertItem(tr("Show scale"), this, SLOT(showScale()));
+  contextMenu->insertSeparator();
+  contextMenu->insertItem(tr("Default Level/Window"), this, SLOT(setDefault()));
+  contextMenu->insertSeparator();
   presetSubmenu = new QPopupMenu( this );
   Q_CHECK_PTR( presetSubmenu );
   m_presetID = presetSubmenu->insertItem(tr("Preset definition"), this, SLOT(addPreset()));
@@ -411,11 +379,6 @@ void QmitkSliderLevelWindowWidget::contextMenuEvent( QContextMenuEvent * )
 
   contextMenu->exec( QCursor::pos() );
   delete contextMenu;
-}
-
-void QmitkSliderLevelWindowWidget::changeImage()
-{
-
 }
 
 void QmitkSliderLevelWindowWidget::setPreset(int id)
@@ -468,6 +431,13 @@ void QmitkSliderLevelWindowWidget::addPreset()
   {
     pre.newPresets(addPreset.getLevelPresets(), addPreset.getWindowPresets());
   }
+}
+
+void QmitkSliderLevelWindowWidget::setDefault()
+{
+  lw.SetLevelWindow(lw.GetDefaultLevel(), lw.GetDefaultWindow());
+  update();
+  emit levelWindow( &lw );
 }
 
 void QmitkSliderLevelWindowWidget::hideScale()

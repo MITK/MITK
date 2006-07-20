@@ -220,7 +220,7 @@
     <slot>SetWindowValue()</slot>
     <slot>SliderRepaint()</slot>
     <slot>levelWindowSliderChanged( mitk::LevelWindow * slw )</slot>
-    <slot>rangeChanged( mitk::LevelWindow &amp; lw )</slot>
+    <slot>rangeChanged( mitk::LevelWindow* lw )</slot>
 </slots>
 <functions>
     <function access="private" specifier="non virtual">init()</function>

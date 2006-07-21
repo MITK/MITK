@@ -32,6 +32,7 @@ class VtkRenderWindow;
 class BaseController;
 class SliceNavigationController;
 class CameraRotationController;
+class VtkLayerController;
 
 //##ModelId=3E3ECC1201B2
 //##Documentation
@@ -146,7 +147,7 @@ public:
 
   SliceNavigationController* GetSliceNavigationController() const;
   CameraRotationController* GetCameraRotationController() const;
-
+  VtkLayerController* GetVtkLayerController() const;
   BaseController* GetController() const;
 
 protected:
@@ -163,7 +164,8 @@ protected:
   BaseRenderer::Pointer m_Renderer;
 
   mitk::SliceNavigationController* m_SliceNavigationController;
-  mitk::CameraRotationController* m_CameraRotationController;
+  mitk::CameraRotationController*  m_CameraRotationController;
+  mitk::VtkLayerController*        m_VtkLayerController;
 };
 
 } // namespace mitk

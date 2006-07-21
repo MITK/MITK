@@ -112,19 +112,19 @@ void QmitkStdMultiWidget::init()
   );
   
   m_GradientBackground1 = mitk::GradientBackground::New();
-  m_GradientBackground1->SetVtkRenderWindow( (vtkRenderWindow*)( mitkWidget1->GetRenderWindow()->GetVtkRenderWindow() ) );
+  m_GradientBackground1->SetRenderWindow( mitkWidget1->GetRenderer()->GetRenderWindow() );
   m_GradientBackground1->Enable();
   
   m_GradientBackground2 = mitk::GradientBackground::New();
-  m_GradientBackground2->SetVtkRenderWindow( (vtkRenderWindow*)( mitkWidget2->GetRenderWindow()->GetVtkRenderWindow() ) );
+  m_GradientBackground2->SetRenderWindow( mitkWidget2->GetRenderer()->GetRenderWindow() );
   m_GradientBackground2->Enable();
   
   m_GradientBackground3 = mitk::GradientBackground::New();
-  m_GradientBackground3->SetVtkRenderWindow( (vtkRenderWindow*)( mitkWidget3->GetRenderWindow()->GetVtkRenderWindow() ) );
+  m_GradientBackground3->SetRenderWindow( mitkWidget3->GetRenderer()->GetRenderWindow() );
   m_GradientBackground3->Enable();
   
   m_GradientBackground4 = mitk::GradientBackground::New();
-  m_GradientBackground4->SetVtkRenderWindow( (vtkRenderWindow*)( mitkWidget4->GetRenderWindow()->GetVtkRenderWindow() ) );
+  m_GradientBackground4->SetRenderWindow( mitkWidget4->GetRenderer()->GetRenderWindow() );
   m_GradientBackground4->Enable();
 }
 

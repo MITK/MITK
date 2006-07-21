@@ -4,14 +4,17 @@
 
 #include <vtkSystemIncludes.h>
 #include <mitkBaseData.h>
+#include <mitkRenderWindow.h>
+#include <mitkVtkRenderWindow.h>
 
-class vtkRenderWindow;
 class vtkRenderer;
 class vtkMapper;
 class vtkActor;
 class vtkPolyDataMapper;
 class vtkLookupTable;
 class vtkPolyData;
+
+
 
 namespace mitk
 {
@@ -37,13 +40,13 @@ public:
    * will be shown. Make sure, you have called this function
    * before calling Enable()
    */
-  virtual void SetVtkRenderWindow( vtkRenderWindow* renderWindow );
+  virtual void SetRenderWindow( mitk::RenderWindow* renderWindow );
 
   /**
    * Returns the vtkRenderWindow, which is used
    * for displaying the gradient background
    */
-  virtual vtkRenderWindow* GetVtkRenderWindow();
+  virtual mitk::RenderWindow* GetRenderWindow();
 
   /**
    * Returns the renderer responsible for
@@ -125,7 +128,7 @@ protected:
    */
   ~GradientBackground();
 
-  vtkRenderWindow* m_RenderWindow;
+  mitk::RenderWindow* m_RenderWindow;
 
   vtkRenderer* m_Renderer;
 

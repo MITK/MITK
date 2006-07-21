@@ -51,7 +51,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 //##ModelId=3E33ECF301AD
 mitk::OpenGLRenderer::OpenGLRenderer( const char* name )
-  : BaseRenderer(name), m_VtkMapperPresent(false), m_VtkRenderer(NULL), m_LastUpdateVtkActorsTime(0), m_PixelMapGL(NULL), m_PixelMapGLValid(false)
+  : BaseRenderer(name), m_VtkMapperPresent(false), m_VtkRenderer(NULL), m_LastUpdateVtkActorsTime(0), m_PixelMapGL(NULL), m_PixelMapGLValid(false), m_NewRenderer(true)
 {
   m_CameraController=NULL;//\*todo remove line
   m_CameraController = new VtkInteractorCameraController();
@@ -64,6 +64,8 @@ mitk::OpenGLRenderer::OpenGLRenderer( const char* name )
   mitk::Geometry2DDataVtkMapper3D::Pointer geometryMapper = mitk::Geometry2DDataVtkMapper3D::New();
   m_CurrentWorldGeometry2DMapper = geometryMapper;
   m_CurrentWorldGeometry2DNode->SetMapper(2, geometryMapper);
+
+  m_VtkRenderer = vtkRenderer::New();
 }
 
 //##ModelId=3E3D28AB0018
@@ -131,37 +133,8 @@ void mitk::OpenGLRenderer::UpdateIncludingVtkActors()
   if(vicc!=NULL)
     vicc->GetVtkInteractor()->Enable();
 
-  //    m_LightKit->RemoveLightsFromRenderer(this->m_VtkRenderer);
-
-  //    m_RenderWindow->GetVtkRenderWindow()->RemoveRenderer(m_VtkRenderer);
-  //    m_VtkRenderer->Delete();
-
-  bool newRenderer = false;
-  if(m_VtkRenderer==NULL)
+  if(m_NewRenderer)
   {
-    //
-    // new renderers are always added to the topmost layer
-    // of the current render window. This must be handled 
-    // carefully, since layer ordering changed between vtk 4.4 
-    // and vtk 5.0
-    //
-    #if ( VTK_MAJOR_VERSION >= 5 )
-      int topLayer = m_RenderWindow->GetVtkRenderWindow()->GetNumberOfLayers() - 1;
-    #else
-      int topLayer = 0;
-    #endif
-    m_VtkRenderer = vtkRenderer::New();
-    m_VtkRenderer->SetLayer( topLayer );
-    m_RenderWindow->GetVtkRenderWindow()->AddRenderer( this->m_VtkRenderer );
-    newRenderer = true;
-
-    //strange: when using a simple light, the backface of the planes are not shown (regardless of SetNumberOfLayers)
-    //m_Light = vtkLight::New();
-    //m_Light->SetLightTypeToCameraLight();
-    //double pos[]= {0.5,-2.0,1.0};
-    //m_Light->SetPosition(pos);
-
-    //m_VtkRenderer->AddLight( m_Light );
     m_LightKit = vtkLightKit::New();
     m_LightKit->AddLightsToRenderer(m_VtkRenderer);
   }
@@ -244,13 +217,14 @@ void mitk::OpenGLRenderer::UpdateIncludingVtkActors()
     }
   }
 
-  if(newRenderer)
+  if(m_NewRenderer)
   {
     int w=vtkObject::GetGlobalWarningDisplay();
     vtkObject::GlobalWarningDisplayOff();
     m_VtkRenderer->ResetCamera();
     m_VtkRenderer->GetActiveCamera()->Elevation(-90);
     vtkObject::SetGlobalWarningDisplay(w);
+    m_NewRenderer=false;
   }
   //    catch( ::itk::ExceptionObject ee)
   //    {

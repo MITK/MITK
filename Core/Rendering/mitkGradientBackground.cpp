@@ -1,5 +1,7 @@
 #include "mitkGradientBackground.h"
-#include <vtkRenderWindow.h>
+
+#include "mitkVtkLayerController.h"
+
 #include <vtkRenderer.h>
 #include <vtkMapper.h>
 #include <vtkActor.h>
@@ -13,6 +15,7 @@
 #include <vtkPointData.h>
 #include <vtkObjectFactory.h>
 #include <vtkRendererCollection.h>
+
 
 mitk::GradientBackground::GradientBackground()
 {
@@ -90,7 +93,7 @@ mitk::GradientBackground::~GradientBackground()
  * will be shown. Make sure, you have called this function
  * before calling Enable()
  */
-void mitk::GradientBackground::SetVtkRenderWindow( vtkRenderWindow* renderWindow )
+void mitk::GradientBackground::SetRenderWindow( mitk::RenderWindow* renderWindow )
 {
   m_RenderWindow = renderWindow;
 }
@@ -99,7 +102,7 @@ void mitk::GradientBackground::SetVtkRenderWindow( vtkRenderWindow* renderWindow
  * Returns the vtkRenderWindow, which is used
  * for displaying the gradient background
  */
-vtkRenderWindow* mitk::GradientBackground::GetVtkRenderWindow()
+mitk::RenderWindow* mitk::GradientBackground::GetRenderWindow()
 {
   return m_RenderWindow;
 }
@@ -161,42 +164,7 @@ void mitk::GradientBackground::SetLowerColor(vtkFloatingPointType r, vtkFloating
  */
 void mitk::GradientBackground::Enable()
 {
-  if ( m_RenderWindow == NULL )
-    return;
-  if ( m_Renderer == NULL )
-    return;
-  if ( IsEnabled() )
-    return;
-  
-  //
-  // layer ordering has changed from vtk 4.4 to vtk 5.0
-  //
-  #if ( VTK_MAJOR_VERSION >= 5 )
-    int foregroundLayer = 1;
-    int backgroundLayer = 0;
-  #else
-    int foregroundLayer = 0;
-    int backgroundLayer = 1;
-  #endif
-  
-  //
-  // traverse the set of renderers and set their 
-  // layer to foreground / background
-  //
-  m_RenderWindow->SetNumberOfLayers( 2 );
-  m_Renderer->SetLayer( backgroundLayer );
-  m_RenderWindow->AddRenderer( m_Renderer );
-  for( int i = 0 ; i < m_RenderWindow->GetRenderers()->GetNumberOfItems() ; ++i )
-  {
-    vtkRenderer* currentRenderer =  dynamic_cast<vtkRenderer*>( m_RenderWindow->GetRenderers()->GetItemAsObject(i) );
-    if ( currentRenderer != NULL )
-    {
-      if (currentRenderer == m_Renderer)
-        currentRenderer->SetLayer( backgroundLayer );
-      else
-        currentRenderer->SetLayer( foregroundLayer );
-    }
-  }
+  m_RenderWindow->GetVtkLayerController()->InsertBackgroundRenderer(m_Renderer,true);  
 }
 
 /**
@@ -206,7 +174,9 @@ void mitk::GradientBackground::Enable()
 void mitk::GradientBackground::Disable()
 {
   if ( this->IsEnabled() )
-    m_RenderWindow->RemoveRenderer( m_Renderer );
+  {
+    m_RenderWindow->GetVtkLayerController()->RemoveRenderer(m_Renderer);
+  }
 }
 
 
@@ -220,7 +190,7 @@ bool mitk::GradientBackground::IsEnabled()
     if ( m_RenderWindow == NULL )
         return false;
     else
-        return ( m_RenderWindow->GetRenderers()->IsItemPresent( m_Renderer ) != 0 );    
+        return ( m_RenderWindow->GetVtkRenderWindow()->GetRenderers()->IsItemPresent( m_Renderer ) != 0 );    
 }
 
 

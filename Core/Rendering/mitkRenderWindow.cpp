@@ -23,6 +23,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkRenderingManager.h"
 #include "mitkSliceNavigationController.h"
 #include "mitkCameraRotationController.h"
+#include "mitkVtkLayerController.h"
+
 
 
 #include <assert.h>
@@ -50,6 +52,9 @@ mitk::RenderWindow::RenderWindow(const char *name, mitk::BaseRenderer* renderer)
   m_CameraRotationController = new mitk::CameraRotationController();
   m_CameraRotationController->SetRenderWindow( this );
   m_CameraRotationController->AcquireCamera();
+
+  // Initialize Layer Controller
+  m_VtkLayerController = new mitk::VtkLayerController(m_MitkVtkRenderWindow);
 }
 
 mitk::RenderWindow::~RenderWindow()
@@ -104,20 +109,30 @@ void mitk::RenderWindow::SetSize(int w, int h)
 
 void mitk::RenderWindow::InitRenderer()
 {
+  
+    
   if(m_Renderer.IsNull())
   {
     std::string rendererName("Renderer::");
     rendererName += m_Name;
     m_Renderer = new OpenGLRenderer( rendererName.c_str() );
   }
-
+ 
   m_MitkVtkRenderWindow->SetMitkRenderer(m_Renderer);
-
   m_Renderer->InitRenderer(this);
+  
 
   int * size = m_MitkVtkRenderWindow->GetSize();
   if((size[0]>10) && (size[1]>10))
     m_Renderer->InitSize(size[0], size[1]);
+
+  // VTK Layer Controller
+  mitk::OpenGLRenderer* o = dynamic_cast<mitk::OpenGLRenderer*>( m_Renderer.GetPointer());
+  if( o != NULL)
+  {
+      vtkRenderer* r = o->GetVtkRenderer();
+      m_VtkLayerController->InsertSceneRenderer(r);
+  }
 }
 
 void mitk::RenderWindow::SetWindowId(void * id)
@@ -130,6 +145,7 @@ void mitk::RenderWindow::SetVtkRenderWindow(VtkRenderWindow* renWin)
   if (renWin != NULL)
   {
     m_MitkVtkRenderWindow = renWin;
+    m_VtkLayerController->SetRenderWindow(renWin);
     InitRenderer();
   }
 }
@@ -163,4 +179,11 @@ mitk::RenderWindow
     default:
       return m_SliceNavigationController;
   }
+}
+
+mitk::VtkLayerController*
+mitk::RenderWindow
+::GetVtkLayerController() const
+{
+  return m_VtkLayerController;
 }

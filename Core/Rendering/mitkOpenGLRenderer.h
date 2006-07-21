@@ -146,6 +146,8 @@ private:
   // will disable rendering - instead using only a copy
   bool m_RequestOverlay;
 
+  bool m_NewRenderer;
+
   // keep the position for an overlay mouse curser
   mitk::Point2D m_DrawOverlayPosition;
 

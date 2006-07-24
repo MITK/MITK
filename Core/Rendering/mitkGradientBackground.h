@@ -4,8 +4,6 @@
 
 #include <vtkSystemIncludes.h>
 #include <mitkBaseData.h>
-#include <mitkRenderWindow.h>
-#include <mitkVtkRenderWindow.h>
 
 class vtkRenderer;
 class vtkMapper;
@@ -15,10 +13,9 @@ class vtkLookupTable;
 class vtkPolyData;
 
 
+namespace mitk {
 
-namespace mitk
-{
-
+class RenderWindow;  
 /**
  * Displays a color gradient in the background
  * of a vtkRenderWindow.

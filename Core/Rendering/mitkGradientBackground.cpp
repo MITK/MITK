@@ -1,6 +1,7 @@
 #include "mitkGradientBackground.h"
 
 #include "mitkVtkLayerController.h"
+#include <mitkVtkRenderWindow.h>
 
 #include <vtkRenderer.h>
 #include <vtkMapper.h>

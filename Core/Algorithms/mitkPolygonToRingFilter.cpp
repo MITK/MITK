@@ -249,7 +249,7 @@ void mitk::PolygonToRingFilter::BuildPointAndVectorList(mitk::Mesh::CellType& ce
   //  unsigned int numOfPointsInCell = cell.GetNumberOfPoints();
   //}
 
-  unsigned int closed_loop_pre_load=m_SplineResolution;
+  unsigned int closed_loop_pre_load=2;//m_SplineResolution;
   //bei geschlossener Kontur: vor dem ersten Punkt die zwei letzten einfügen für glatten Übergang
   ptIt = ptEnd; ptIt-=closed_loop_pre_load+1;
   for(i=0;i<closed_loop_pre_load;++i, ++ptIt)

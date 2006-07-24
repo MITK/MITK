@@ -2,8 +2,6 @@
 #if !defined(MITK_PLANEFIT_H__INCLUDED_)
 #define MITK_PLANEFIT_H__INCLUDED_
 
-//#include <mitkCommon.h>
-//#include <mitkBaseProcess.h>
 #include <Vector3.h>
 #include <mitkPointSet.h>
 #include <mitkPlaneGeometry.h>
@@ -12,7 +10,8 @@
 #include "mitkGeometryDataSource.h"
 
 namespace mitk {
-	
+
+  //!  
 //  kind regards to dr. math!
 //	function [x0, a, d, normd] = lsplane(X)
 // ---------------------------------------------------------------------
@@ -69,6 +68,9 @@ public:
   */
   virtual void SetInput(const mitk::PointSet* ps);
 
+  /*! return the center of gravity of the point set.
+  *
+  */
   virtual const mitk::Point3D &GetCentroid() const;
 
 protected:
@@ -76,7 +78,7 @@ protected:
 	virtual ~PlaneFit();
 
   /*! Calculates the centroid of the point set.
-  *
+  * the center of gravity is calculated  through the mean value of the whole point set
   */
   void CalculateCentroid();
   

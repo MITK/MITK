@@ -4,6 +4,7 @@
 
 #include <vtkSystemIncludes.h>
 #include <mitkBaseData.h>
+#include <mitkRenderWindow.h>
 
 class vtkRenderer;
 class vtkMapper;
@@ -11,7 +12,6 @@ class vtkActor;
 class vtkPolyDataMapper;
 class vtkLookupTable;
 class vtkPolyData;
-
 
 namespace mitk {
 

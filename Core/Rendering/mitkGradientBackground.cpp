@@ -193,7 +193,7 @@ bool mitk::GradientBackground::IsEnabled()
     if ( m_RenderWindow == NULL )
         return false;
     else
-        return ( m_RenderWindow->GetVtkRenderWindow()->GetRenderers()->IsItemPresent( m_Renderer ) != 0 );    
+        return ( m_RenderWindow->GetVtkLayerController()->IsRendererInserted(m_Renderer));    
 }
 
 

@@ -145,7 +145,12 @@ bool SlicesRotator::ExecuteAction(Action* action, StateEvent const* stateEvent)
     {
       // just reach through
       for (SNCVector::iterator iter = m_RelevantSNCs.begin(); iter != m_RelevantSNCs.end(); ++iter)
-        (*iter)->ExecuteAction(action, stateEvent); 
+      {
+        if ( !(*iter)->GetSliceLocked() )
+        {
+          (*iter)->ExecuteAction(action, stateEvent);
+        }
+      }
       
       ok = true;
       break;
@@ -175,13 +180,16 @@ bool SlicesRotator::ExecuteAction(Action* action, StateEvent const* stateEvent)
       RotationOperation op(OpROTATE, m_CenterOfRotation, axisOfRotation, angle);
       for (SNCVector::iterator iter = m_SNCsToBeRotated.begin(); iter != m_SNCsToBeRotated.end(); ++iter)
       {
-        const Geometry3D* geometry3D = (*iter)->GetCreatedWorldGeometry();
-        const TimeSlicedGeometry* timeSlicedGeometry = dynamic_cast<const TimeSlicedGeometry*>(geometry3D);
-        if (!timeSlicedGeometry) continue;
-        
-        const_cast<TimeSlicedGeometry*>(timeSlicedGeometry)->ExecuteOperation(&op);
-        
-        (*iter)->SendCreatedWorldGeometryUpdate();
+        if ( !(*iter)->GetSliceLocked() )
+        {
+          const Geometry3D* geometry3D = (*iter)->GetCreatedWorldGeometry();
+          const TimeSlicedGeometry* timeSlicedGeometry = dynamic_cast<const TimeSlicedGeometry*>(geometry3D);
+          if (!timeSlicedGeometry) continue;
+          
+          const_cast<TimeSlicedGeometry*>(timeSlicedGeometry)->ExecuteOperation(&op);
+          
+          (*iter)->SendCreatedWorldGeometryUpdate();
+        }
       } 
  
       RenderingManager::GetInstance()->RequestUpdateAll();

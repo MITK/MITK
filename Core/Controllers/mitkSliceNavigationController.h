@@ -291,7 +291,19 @@ class SliceNavigationController : public BaseController
 
     void ExecuteOperation(Operation* operation);
 
+    //##Documentation
+    //## @brief Feature option to lock planes to disable mouse te cross 
+    //## move when the mouse is clicked.
+    //##
+
+    itkSetMacro(SliceLocked, bool);
+    itkGetMacro(SliceLocked, bool);
+    itkBooleanMacro(SliceLocked);
+    
+
   protected:
+
+    bool m_SliceLocked;
     //SliceNavigationController();
 
     //##ModelId=3E189B1D00BF

@@ -42,7 +42,7 @@ namespace mitk {
 
 SliceNavigationController::SliceNavigationController(const char * type) 
   : BaseController(type), m_InputWorldGeometry(NULL), m_CreatedWorldGeometry(NULL), 
-    m_ViewDirection(Transversal), m_BlockUpdate(false)
+    m_ViewDirection(Transversal), m_BlockUpdate(false), m_SliceLocked(false)
 {
   itk::SimpleMemberCommand<SliceNavigationController>::Pointer sliceStepperChangedCommand, timeStepperChangedCommand;
   sliceStepperChangedCommand = itk::SimpleMemberCommand<SliceNavigationController>::New();
@@ -293,6 +293,7 @@ void SliceNavigationController::ExecuteOperation(Operation* operation)
   {
     case OpMOVE: // should be a point operation
     {
+      if (m_SliceLocked) break; //do not move the cross position
       // select a slice
       PointOperation* po = dynamic_cast<PointOperation*>(operation);
       if (!po) return;

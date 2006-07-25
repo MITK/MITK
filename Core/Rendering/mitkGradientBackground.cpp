@@ -2,6 +2,8 @@
 
 #include "mitkVtkLayerController.h"
 #include <mitkVtkRenderWindow.h>
+#include <mitkRenderWindow.h>
+
 
 #include <vtkRenderer.h>
 #include <vtkMapper.h>

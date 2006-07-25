@@ -4,7 +4,6 @@
 
 #include <vtkSystemIncludes.h>
 #include <mitkBaseData.h>
-#include <mitkRenderWindow.h>
 
 class vtkRenderer;
 class vtkMapper;

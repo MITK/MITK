@@ -54,6 +54,11 @@ class VtkLayerController
     */
     void RemoveRenderer(vtkRenderer* renderer);
 
+    /**
+    * Returns true if a renderer has been inserted 
+    */
+    bool IsRendererInserted(vtkRenderer* renderer);
+
 	protected:
     vtkRenderWindow*    m_RenderWindow;
        	

@@ -115,6 +115,43 @@ void mitk::VtkLayerController::SetRenderWindow(vtkRenderWindow* renwin)
     m_RenderWindow = renwin;
   UpdateLayers();
 }
+
+/**
+* Returns true if a renderer has been inserted 
+*/
+bool mitk::VtkLayerController::IsRendererInserted(vtkRenderer* renderer)
+{
+  RendererVectorType::iterator it;
+  // background layers
+  if(m_BackgroundRenderers.size() > 0)
+  {
+    it = std::find(m_BackgroundRenderers.begin(),m_BackgroundRenderers.end(),renderer);
+    if((*it) == renderer)
+    {
+      return true;
+    }
+  }
+  // scene layers
+  if(m_SceneRenderers.size() > 0)
+  {
+    it = std::find(m_SceneRenderers.begin(),m_SceneRenderers.end(),renderer);
+    if((*it) == renderer)
+    {
+      return true;
+    }
+  }
+  // foreground layers
+  if(m_ForegroundRenderers.size() > 0 )
+  {
+    it = std::find(m_ForegroundRenderers.begin(),m_ForegroundRenderers.end(),renderer);
+    if((*it) == renderer)
+    {
+      return true;
+    }
+  }
+  return false;
+  
+}
 /**
  * Internally used to sort all registered renderers and to connect the with the vtkRenderWindow.
  * Mention that VTK Version 5 and above is rendering higher numbers in the background and VTK

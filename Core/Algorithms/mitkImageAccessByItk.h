@@ -600,24 +600,12 @@ namespace mitk
 {
 #ifndef DOXYGEN_SKIP
   template < typename TPixel, unsigned int VImageDimension, class ItkOutputImageType > 
-  void _CastToItkImage2Access( itk::Image<TPixel, VImageDimension>* itkInputImage, itk::SmartPointer<ItkOutputImageType>& itkOutputImage)
-  {
-    typedef itk::Image<TPixel, VImageDimension> ItkInputImageType;
-    typedef itk::CastImageFilter< ItkInputImageType, ItkOutputImageType > CastImageFilterType;
-    typename CastImageFilterType::Pointer castImageFilter = CastImageFilterType::New();
-    castImageFilter->SetInput( itkInputImage );
-    castImageFilter->Update();
-    itkOutputImage = castImageFilter->GetOutput();
-  }
+  void _CastToItkImage2Access( itk::Image<TPixel, VImageDimension>* itkInputImage, itk::SmartPointer<ItkOutputImageType>& itkOutputImage);
 #endif //DOXYGEN_SKIP
-
   //##Documentation
   //## @brief Cast an mitk::Image to an itk::Image with a specific type.
   //## @ingroup Adaptor
-  template <typename ItkOutputImageType> void CastToItkImage(const mitk::Image * mitkImage, itk::SmartPointer<ItkOutputImageType>& itkOutputImage)
-  {
-    AccessByItk_1(mitkImage, _CastToItkImage2Access, itkOutputImage);;
-  }
+  template <typename ItkOutputImageType> void CastToItkImage(const mitk::Image * mitkImage, itk::SmartPointer<ItkOutputImageType>& itkOutputImage);
 }
 
 #endif // of MITKIMAGEACCESSBYITK_H_HEADER_INCLUDED

@@ -1,94 +1,82 @@
-#include <QcMITKTask.h>
 #include <chili/plugin.xpm>
 #include <chili/qclightbox.h>
 #include <chili/qclightboxmanager.h>
+#include <QcMITKTask.h>
+
 #include <qlayout.h>
 #include <qpushbutton.h>
 #include <qptrlist.h>
 #include <qbuttongroup.h>
-#include <mitkDataTree.h>
-#include <QmitkStdMultiWidget.h>
-#include <mitkLightBoxImageReader.h>
-#include "SampleApp.h"
-#include "QcMITKSamplePlugin.h"
-#include "mitkDataTreeNodeFactory.h"
-#include "mitkDataTreeHelper.h"
-#include "mitkProperties.h"
-#include "mitkLevelWindowProperty.h"
-#include "mitkStringProperty.h"
-#include "ToolBar.h"
-#include <mitkChiliPlugin.h>
+#include <qapplication.h>
 
-#include <qmessagebox.h>
+#include <mitkLightBoxImageReader.h>
+#include <mitkDataTreeHelper.h>
+#include <mitkConferenceToken.h>
+#include <QmitkEventCollector.h>
+#include <mitkConferenceEventMapper.h>
+#include <QmitkChili3ConferenceKitFactory.h>
+
+#include <QmitkStdMultiWidget.h>
+#include <QmitkCommonFunctionality.h>
+
+#include "SampleApp.h"
+#include "ToolBar.h"
+#include "mitkChiliPlugin.h"
+#include "QcMITKSamplePlugin.h"
 
 #include <ipPic.h>
 #include <ipFunc.h>
 #include <ipDicom/ipDicom.h>
 
-#include "QmitkCommonFunctionality.h"
-#include "QmitkEventCollector.h"
-#include <qapplication.h>
-#include <iostream>
 
-#include <QmitkChili3ConferenceKitFactory.h>
-#include <mitkDisplayGeometry.h>
-#include <mitkVector.h>
-#include <mitkConferenceEventMapper.h>
-#include <mitkEventMapper.h>
-#include <mitkConferenceToken.h>
-
-
-//LoggerInstance schaffen!
+// create event-logging object (ConferenceKit)
 Chili3ConferenceKitFactory chiliconferencekitfactory;
 
 QcPlugin* QcMITKSamplePlugin::s_PluginInstance = NULL;
 
 QcMITKSamplePlugin::QcMITKSamplePlugin( QWidget *parent )
-  : QcPlugin( parent ), ap(NULL)
+  : QcPlugin( parent ), app(NULL)
 {
 
   task = new QcMITKTask( xpm(), parent, name() );
 
-  toolbar =new ToolBar(task,this);
+  toolbar = new ToolBar(task,this);
 
-  QButtonGroup* tb;
-  tb=toolbar->GetToolBar();
+  QButtonGroup* tb = toolbar->GetToolBar();
 
-  connect(toolbar,SIGNAL(LightboxSelected(QcLightbox*)),this,SLOT(selectSerie(QcLightbox*)));
-  connect(toolbar,SIGNAL(ChangeWidget()),this,SLOT(CreateNewSampleApp()));
-  activated =false;
+  connect( toolbar, SIGNAL(LightboxSelected(QcLightbox*)), this, SLOT(selectSerie(QcLightbox*)) );
+  connect( toolbar, SIGNAL(ChangeWidget()), this, SLOT(CreateNewSampleApp()) );
+  activated = false;
 
   s_PluginInstance = this;
 
   EventCollector* logger = new EventCollector();
   qApp->installEventFilter(logger);
 
-  std::cout<< "QEventLogger initialisiert..."<<std::endl;
+  //std::cout<< "QEventLogger initialisiert..."<<std::endl;
 
   mitk::ChiliPlugin::SetPluginInstance(s_PluginInstance);
 }
 
-QString
-QcMITKSamplePlugin::name()
+QString QcMITKSamplePlugin::name()
 {
   return QString( "MITK PlugIn" );
 }
 
-const char **
-QcMITKSamplePlugin::xpm()
+const char** QcMITKSamplePlugin::xpm()
 {
   return (const char **)plugin_xpm;
 }
 
-QcMITKSamplePlugin::~QcMITKSamplePlugin ()
+QcMITKSamplePlugin::~QcMITKSamplePlugin()
 {
   task->deleteLater();
 }
 
-extern "C" QcEXPORT QObject *
-create( QWidget *parent )
+extern "C" 
+QcEXPORT QObject* create( QWidget *parent )
 {
-return new QcMITKSamplePlugin( parent );
+  return new QcMITKSamplePlugin( parent );
 }
 
 void QcMITKSamplePlugin::lightboxFilled (QcLightbox* lightbox)
@@ -103,7 +91,7 @@ void QcMITKSamplePlugin::lightboxFilled (QcLightbox* lightbox)
   if (id>0)
   {
     if (!tb->find(6)->isOn())
-      if (activated&&(list.take(id-1))->isActive())
+      if (activated && (list.take(id-1))->isActive())
           selectSerie(lightbox);
   }
   else
@@ -136,9 +124,9 @@ void QcMITKSamplePlugin::selectSerie (QcLightbox* lightbox)
 
   if ( image.IsNotNull() )
   {
-    unsigned long initTime = ap->GetMultiWidget()->GetRenderWindow1()->GetRenderer()->GetMTime();
+    unsigned long initTime = app->GetMultiWidget()->GetRenderWindow1()->GetRenderer()->GetMTime();
 
-    mitk::DataTree::Pointer tree = ap->GetTree();
+    mitk::DataTree::Pointer tree = app->GetTree();
     mitk::DataTreePreOrderIterator it(tree);
     mitk::DataTreeNode::Pointer node = mitk::DataTreeNode::New();
     node->SetData(image);
@@ -386,7 +374,7 @@ void QcMITKSamplePlugin::selectSerie (QcLightbox* lightbox)
     {
       if (fatherNode)
       {
-        mitk::DataTreeIteratorClone fatherIt = mitk::DataTreeHelper::FindIteratorToNode(ap->GetTree(), fatherNode );
+        mitk::DataTreeIteratorClone fatherIt = mitk::DataTreeHelper::FindIteratorToNode(app->GetTree(), fatherNode );
         fatherIt->Add(node);
       }
       else
@@ -396,10 +384,10 @@ void QcMITKSamplePlugin::selectSerie (QcLightbox* lightbox)
       //are child nodes of it already in the data tree?
       //if so the sorting of the tree has to be changed
       mitk::StringProperty::Pointer seriesInstanceUID = dynamic_cast<mitk::StringProperty*>(node->GetProperty("series uid").GetPointer());
-      mitk::DataTreeIteratorClone fatherIt = mitk::DataTreeHelper::FindIteratorToNode(ap->GetTree(), node );
+      mitk::DataTreeIteratorClone fatherIt = mitk::DataTreeHelper::FindIteratorToNode(app->GetTree(), node );
       if (seriesInstanceUID.IsNotNull())
       {
-        mitk::DataTreePreOrderIterator treeIt( ap->GetTree() );
+        mitk::DataTreePreOrderIterator treeIt( app->GetTree() );
         treeIt.GoToBegin();
         bool iterate = true;
         while (!treeIt.IsAtEnd())
@@ -429,31 +417,33 @@ void QcMITKSamplePlugin::selectSerie (QcLightbox* lightbox)
       }
     }
 
-    if((ap->GetMultiWidget()->GetRenderWindow1()->GetRenderer()->GetMTime()==initTime) && (ap->GetStandardViewsInitialized()==false))
+    if((app->GetMultiWidget()->GetRenderWindow1()->GetRenderer()->GetMTime()==initTime) && (app->GetStandardViewsInitialized()==false))
     {
-      ap->SetStandardViewsInitialized(ap->GetMultiWidget()->InitializeStandardViews(&it));
+      app->SetStandardViewsInitialized(app->GetMultiWidget()->InitializeStandardViews(&it));
     }
 
-    ap->GetMultiWidget()->RequestUpdate();
-    ap->GetMultiWidget()->Fit();
+    app->GetMultiWidget()->RequestUpdate();
+    app->GetMultiWidget()->Fit();
 
   }
 
 }
 
-
 void QcMITKSamplePlugin::CreateNewSampleApp()
 {
-  if(ap!=NULL)
-    delete ap;
-  ap = new SampleApp(task,"sample",0);
-  toolbar->SetWidget(ap);
+  if(app)
+    delete app;
+  
+  app = new SampleApp(task, "sample", 0);
+
+  toolbar->SetWidget(app);
 }
 
-void
-QcMITKSamplePlugin::connectPartner()
+// teleconference methods
+
+void QcMITKSamplePlugin::connectPartner()
 {
-  std::cout<< "MITKchili Connected..."<<std::endl;
+  //std::cout<< "MITKchili Connected..."<<std::endl;
   QButtonGroup* tb;
   tb=toolbar->GetToolBar();
   tb->find(7)->setText(QString("Conference online"));
@@ -463,10 +453,9 @@ QcMITKSamplePlugin::connectPartner()
 
 }
 
-void
-QcMITKSamplePlugin::disconnectPartner()
+void QcMITKSamplePlugin::disconnectPartner()
 {
-  std::cout<< "MITKchili Disonnected..."<<std::endl;
+  //std::cout<< "MITKchili Disonnected..."<<std::endl;
   QButtonGroup* tb;
   tb=toolbar->GetToolBar();
   tb->find(7)->setText(QString("Conference offline"));
@@ -474,8 +463,7 @@ QcMITKSamplePlugin::disconnectPartner()
   ct->SetToken( 0 );
 }
 
-void
-QcMITKSamplePlugin::handleMessage( ipInt4_t type, ipMsgParaList_t *list )
+void QcMITKSamplePlugin::handleMessage( ipInt4_t type, ipMsgParaList_t *list )
 {
   //QString message;
   //QString arguments;
@@ -508,23 +496,24 @@ QcMITKSamplePlugin::handleMessage( ipInt4_t type, ipMsgParaList_t *list )
          tb->find(7)->setText(QString( "ID:%1 von %2").arg(eventID).arg(str));
 
       if(!mitk::ConferenceEventMapper::MapEvent(eventID, str,etype,estate,ebuttonstate,ekey,w1,w2,w3,p1,p2))
-        std::cout<<"EventMaper no funciona"<<std::endl;
+        //std::cout<<"EventMaper no funciona"<<std::endl;
 
     break;
     case mitk::m_QmitkChiliPluginConferenceID +mitk::QTc :
       ipMsgListToVar( list,
                       ipTypeStringPtr, &str );
-      std::cout<<"CONFERENCE: (1) "<<str;
+      //std::cout<<"CONFERENCE: (1) "<<str;
       if( ! EventCollector::PostEvent(QString(str), task))
-        std::cout<<" NO SUCCES!"<<std::endl;
-      std::cout<<std::endl;
+        //std::cout<<" NO SUCCES!"<<std::endl;
+        ;
+      //std::cout<<std::endl;
 
     break;
     case mitk::m_QmitkChiliPluginConferenceID + mitk::ARRANGEc:
         {
         ipMsgListToVar( list,
                         ipTypeInt4, &sender );
-        std::cout<<"CONFERENCE TOKEN ID:  "<<sender<<std::endl;
+        //std::cout<<"CONFERENCE TOKEN ID:  "<<sender<<std::endl;
 
         mitk::ConferenceToken* ct = mitk::ConferenceToken::GetInstance();
         ct->ArrangeToken(sender);
@@ -562,7 +551,7 @@ QcMITKSamplePlugin::handleMessage( ipInt4_t type, ipMsgParaList_t *list )
           );
 
       if( !mitk::ConferenceEventMapper::MapEvent( str, w1, w2, w3 ) )
-        std::cout<<"QcMITKSamplePlugin::handleMessage() -> MouseMoveEvent couldn't pass through"<<std::endl;
+        //std::cout<<"QcMITKSamplePlugin::handleMessage() -> MouseMoveEvent couldn't pass through"<<std::endl;
 
     break;   
     default:

@@ -1,8 +1,11 @@
 #include <QcMITKTask.h>
-#include <iostream>
 
 QcMITKTask::QcMITKTask(const char** xpm, QWidget* parent, const char* name) :
-            QcTask(xpm, parent, name), m_Visible(true){};
+            QcTask(xpm, parent, name), m_Visible(true)
+{
+}
+
+
 QcMITKTask::~QcMITKTask()
 {
 }
@@ -10,15 +13,13 @@ QcMITKTask::~QcMITKTask()
 
 void QcMITKTask::showEvent(QShowEvent *se)
 {
-  VisibleOn();
-  std::cout<<"SHOW"<<std::endl;
+  setVisible( true );
 }
 
 
 void QcMITKTask::hideEvent(QHideEvent *he)
 { 
-  VisibleOff();
-  std::cout<<"HIDE"<<std::endl;
+  setVisible( false );
 }
 
 
@@ -28,14 +29,8 @@ bool QcMITKTask::IsVisible()
 }
 
 
-void QcMITKTask::VisibleOn()
+void QcMITKTask::setVisible( bool isVisible )
 {
-  m_Visible = true;
-}
-
-
-void QcMITKTask::VisibleOff()
-{
-  m_Visible = false;
+  m_Visible = isVisible;
 }
 

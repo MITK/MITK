@@ -3,25 +3,23 @@
 
 #include <chili/task.h>
 
-class  QcMITKTask: public QcTask {
-
-public:
+class  QcMITKTask: public QcTask 
+{
+  public:
 
     QcMITKTask (const char* xpm[], QWidget* parent, const char* name);
     ~QcMITKTask ();
 
-    virtual void showEvent(QShowEvent *se);
-    virtual void hideEvent(QHideEvent *se);
+    virtual void showEvent(QShowEvent*);
+    virtual void hideEvent(QHideEvent*);
 
-    virtual void VisibleOff();
-    virtual void VisibleOn();
+    virtual void setVisible(bool isVisible);
     virtual bool IsVisible();
 
-private:
+  private:
     bool m_Visible;
+
 };
-
-
 
 #endif
 

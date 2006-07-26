@@ -8,26 +8,26 @@
 #include <ipMsg/ipMsgTypes.h>
 #include <ipPic/ipTypes.h>
 
-#include <qevent.h>
 #include "QmitkEventCollector.h"
 
 class QcMITKTask;
 class SampleApp;
 class ToolBar;
 
-class QcEXPORT QcMITKSamplePlugin: public QcPlugin {
+class QcEXPORT QcMITKSamplePlugin: public QcPlugin
+{
 
     Q_OBJECT
 
-public:
+  public:
 
-    QcMITKSamplePlugin (QWidget *parent);
-    ~QcMITKSamplePlugin ();
+    QcMITKSamplePlugin(QWidget* parent);
+    ~QcMITKSamplePlugin();
 
     QString name();
-    const char ** xpm();
+    const char** xpm();
 
-    SampleApp *ap;
+    SampleApp* app;
 
     static QcPlugin* GetPluginInstance()
     {
@@ -36,26 +36,38 @@ public:
 
     virtual void handleMessage( ipInt4_t type, ipMsgParaList_t *list );
 
-public slots :
+  public slots:
 
+    // image selection methods
     void selectSerie (QcLightbox*);
-    virtual void        lightboxFilled (QcLightbox* lightbox);
-    virtual void        lightboxTiles (QcLightboxManager *lbm, int tiles);
+
+    // still undocumented slot of QcPlugin
+    virtual void lightboxFilled (QcLightbox* lightbox);
+    
+    // still undocumented slot of QcPlugin
+    virtual void lightboxTiles (QcLightboxManager *lbm, int tiles);
+
     void CreateNewSampleApp();
 
-protected:
+  protected:
+
+    // teleconference methods
     virtual void connectPartner();
     virtual void disconnectPartner();
 
-private:
+  private:
 
-    QcMITKTask *task;
-    ToolBar *toolbar ;
+    // the Chili task object
+    QcMITKTask* task;
+
+    // the MITK toolbar for selecting a lightbox (to indicate it should be loaded)
+    ToolBar* toolbar;
+
     bool activated;
 
+    // single instance of this plugin
     static QcPlugin* s_PluginInstance;
 };
 
-
-
 #endif
+

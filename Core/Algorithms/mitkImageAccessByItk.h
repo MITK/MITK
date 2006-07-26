@@ -29,7 +29,7 @@ PURPOSE.  See the above copyright notices for more information.
 {                                                                                      \
     typedef itk::Image<pixeltype, dimension> ImageType;                                \
     typedef mitk::ImageToItk<ImageType> ImageToItkType;                                \
-    ImageToItkType::Pointer imagetoitk = ImageToItkType::New();                        \
+    itk::SmartPointer<ImageToItkType> imagetoitk = ImageToItkType::New();                                  \
     imagetoitk->SetInput(mitkImage);                                                   \
     imagetoitk->Update();                                                              \
     itkImageTypeFunction(imagetoitk->GetOutput());               \
@@ -181,7 +181,7 @@ PURPOSE.  See the above copyright notices for more information.
   {                                                                                              \
     typedef itk::Image<pixeltype, dimension> ImageType;                                          \
     typedef mitk::ImageToItk<ImageType> ImageToItkType;                                          \
-    ImageToItkType::Pointer imagetoitk = ImageToItkType::New();                                  \
+    itk::SmartPointer<ImageToItkType> imagetoitk = ImageToItkType::New();                                  \
     imagetoitk->SetInput(mitkImage);                                                             \
     imagetoitk->Update();                                                                        \
     itkImageTypeFunction(imagetoitk->GetOutput(), param1);                 \
@@ -319,7 +319,7 @@ PURPOSE.  See the above copyright notices for more information.
 {                                                                                                \
     typedef itk::Image<pixeltype, dimension> ImageType;                                          \
     typedef mitk::ImageToItk<ImageType> ImageToItkType;                                          \
-    ImageToItkType::Pointer imagetoitk = ImageToItkType::New();                                  \
+    itk::SmartPointer<ImageToItkType> imagetoitk = ImageToItkType::New();                                  \
     imagetoitk->SetInput(mitkImage);                                                             \
     imagetoitk->Update();                                                                        \
     itkImageTypeFunction(imagetoitk->GetOutput(), param1, param2);         \

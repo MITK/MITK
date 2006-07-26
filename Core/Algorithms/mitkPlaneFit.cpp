@@ -97,7 +97,7 @@ void mitk::PlaneFit::ProcessPointSet()
   // int matrix with POINTS x (X,Y,Z)
   vnl_matrix<mitk::ScalarType> dataM( m_PointSet->GetSize(), 3);
 
-  //calculate point distance to centroid and inserting it in the matrix
+  // calculate point distance to centroid and inserting it in the matrix
   mitk::PointSet::PointsContainer::Iterator pit, end;
   pit = m_PointSet->GetPointSet()->GetPoints()->Begin();
   end = m_PointSet->GetPointSet()->GetPoints()->End();
@@ -117,6 +117,13 @@ void mitk::PlaneFit::ProcessPointSet()
   vnl_vector<mitk::ScalarType> v = svd.nullvector();
 
   std::cout<<"NULLVECTOR: "<<v[0]<<", "<<v[1]<<", "<<v[2]<<std::endl;
+
+  // Avoid erratic normal sign switching when the plane changes minimally
+  // by negating the vector for negative x values.
+  if ( v[0] < 0 )
+  {
+    v = -v;
+  }
 
   m_PlaneVector[0] = v[0];
   m_PlaneVector[1] = v[1];

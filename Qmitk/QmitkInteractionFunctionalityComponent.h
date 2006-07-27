@@ -42,6 +42,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 class QmitkInteractionFunctionalityComponent : public QmitkBaseFunctionalityComponent
 {
+  Q_OBJECT
 
   public:
 

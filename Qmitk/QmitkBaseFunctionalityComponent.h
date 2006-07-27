@@ -43,12 +43,15 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkDataTree.h"
 #include <qstring.h>
+#include <qobject.h>
 
 
 
 //namespace mitk {
-class QmitkBaseFunctionalityComponent 
+class QmitkBaseFunctionalityComponent : public QObject
 {
+  Q_OBJECT
+
   bool m_Available;
   bool m_Activated;
 public:

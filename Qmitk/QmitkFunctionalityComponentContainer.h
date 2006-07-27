@@ -45,6 +45,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 class QmitkFunctionalityComponentContainer : public QmitkBaseFunctionalityComponent
 {
+  Q_OBJECT
 
   public:
 

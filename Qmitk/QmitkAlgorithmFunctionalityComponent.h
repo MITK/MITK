@@ -1,8 +1,3 @@
-#ifndef QMITK_ALGORITHMFUNCTIONALITYCOMPONENT_H
-#define QMITK_ALGORITHMENFUNCTIONALITYCOMPONENT_H
-
-#include "QmitkBaseFunctionalityComponent.h"
-#include "QmitkBaseAlgorithmComponent.h"
 /*=========================================================================
  
 Program:   Medical Imaging & Interaction Toolkit
@@ -20,6 +15,11 @@ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
  
 =========================================================================*/
+#ifndef QMITK_ALGORITHMFUNCTIONALITYCOMPONENT_H
+#define QMITK_ALGORITHMENFUNCTIONALITYCOMPONENT_H
+
+#include "QmitkBaseFunctionalityComponent.h"
+#include "QmitkBaseAlgorithmComponent.h"
 
 /**
  * \brief Class for components based on ITK- and MITK-Filters 
@@ -38,11 +38,17 @@ PURPOSE.  See the above copyright notices for more information.
 
  */
 
+// TODO : check inheritance! only one base class can be subtype of QObject (see man moc)
 
 class QmitkAlgorithmFunctionalityComponent : public QmitkBaseFunctionalityComponent, public QmitkBaseAlgorithmComponent
 {
 
+  Q_OBJECT
+
   public:
+
+    QmitkAlgorithmFunctionalityComponent();
+    ~QmitkAlgorithmFunctionalityComponent();
 
   protected:
 

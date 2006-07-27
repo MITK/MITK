@@ -52,8 +52,6 @@ class QmitkBaseFunctionalityComponent : public QObject
 {
   Q_OBJECT
 
-  bool m_Available;
-  bool m_Activated;
 public:
 
 
@@ -118,6 +116,10 @@ public:
   virtual bool IsAvailable();
 
 protected:
+
+  
+  bool m_Available;
+  bool m_Activated;
 
   virtual void SetAvailability(bool available);
 

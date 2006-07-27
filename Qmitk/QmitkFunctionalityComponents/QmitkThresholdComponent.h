@@ -41,7 +41,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 class QmitkThresholdComponent : public QmitkFunctionalityComponentContainer
 {
-
+ QObject
   public:
 
      /** \brief Constructor. */

@@ -42,7 +42,7 @@ namespace mitk {
 
 SliceNavigationController::SliceNavigationController(const char * type) 
   : BaseController(type), m_InputWorldGeometry(NULL), m_CreatedWorldGeometry(NULL), 
-    m_ViewDirection(Transversal), m_BlockUpdate(false), m_SliceLocked(false)
+    m_ViewDirection(Transversal), m_BlockUpdate(false), m_SliceLocked(false), m_SliceRotationLocked(false)
 {
   itk::SimpleMemberCommand<SliceNavigationController>::Pointer sliceStepperChangedCommand, timeStepperChangedCommand;
   sliceStepperChangedCommand = itk::SimpleMemberCommand<SliceNavigationController>::New();

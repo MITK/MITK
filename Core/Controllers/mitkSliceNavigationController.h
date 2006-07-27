@@ -292,18 +292,26 @@ class SliceNavigationController : public BaseController
     void ExecuteOperation(Operation* operation);
 
     //##Documentation
-    //## @brief Feature option to lock planes to disable mouse te cross 
-    //## move when the mouse is clicked.
+    //## @brief Feature option to lock planes during mouse interaction.
+    //## This option flag disables the mouse event which causes the center cross to move near by.
     //##
-
     itkSetMacro(SliceLocked, bool);
     itkGetMacro(SliceLocked, bool);
     itkBooleanMacro(SliceLocked);
     
+    //##Documentation
+    //## @brief Feature option to lock slice rotation.
+    //## This option flag disables separately the rotation of a slice which is implemented in mitkSliceRotator.
+    //##
+    itkSetMacro(SliceRotationLocked, bool);
+    itkGetMacro(SliceRotationLocked, bool);
+    itkBooleanMacro(SliceRotationLocked);
+
 
   protected:
 
     bool m_SliceLocked;
+    bool m_SliceRotationLocked;
     //SliceNavigationController();
 
     //##ModelId=3E189B1D00BF

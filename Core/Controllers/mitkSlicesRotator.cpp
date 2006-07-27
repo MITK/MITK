@@ -146,7 +146,7 @@ bool SlicesRotator::ExecuteAction(Action* action, StateEvent const* stateEvent)
       // just reach through
       for (SNCVector::iterator iter = m_RelevantSNCs.begin(); iter != m_RelevantSNCs.end(); ++iter)
       {
-        if ( !(*iter)->GetSliceLocked() )
+        if ( !(*iter)->GetSliceRotationLocked()  )
         {
           (*iter)->ExecuteAction(action, stateEvent);
         }
@@ -180,7 +180,7 @@ bool SlicesRotator::ExecuteAction(Action* action, StateEvent const* stateEvent)
       RotationOperation op(OpROTATE, m_CenterOfRotation, axisOfRotation, angle);
       for (SNCVector::iterator iter = m_SNCsToBeRotated.begin(); iter != m_SNCsToBeRotated.end(); ++iter)
       {
-        if ( !(*iter)->GetSliceLocked() )
+        if ( !(*iter)->GetSliceRotationLocked() )
         {
           const Geometry3D* geometry3D = (*iter)->GetCreatedWorldGeometry();
           const TimeSlicedGeometry* timeSlicedGeometry = dynamic_cast<const TimeSlicedGeometry*>(geometry3D);

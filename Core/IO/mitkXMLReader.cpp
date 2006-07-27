@@ -32,7 +32,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <fstream>
 #include <string>
 #include <stack>
-#include <stdio.h>
+//#include <iostream>
 
 namespace mitk {
 
@@ -422,7 +422,7 @@ namespace mitk {
       if ( (*i)->GetName() == name )
       {
         m_CurrentNode = *i;
-        std::cout << "Position: " << (*i)->GetName() << std::endl;
+        //std::cout << "Position: " << (*i)->GetName() << std::endl;
         return true;
       }
       i++;
@@ -454,7 +454,7 @@ namespace mitk {
     while ( i != end ) {
       if ( (*i)->GetName() == name && *i != m_CurrentNode ) {
         m_CurrentNode = *i;
-        std::cout << "Position: " << (*i)->GetName() << std::endl;
+        //std::cout << "Position: " << (*i)->GetName() << std::endl;
         return true;
       }
       i++;
@@ -470,7 +470,7 @@ namespace mitk {
       return false;
 
     m_CurrentNode = m_CurrentNode->GetParent();
-    std::cout << "Position: " << m_CurrentNode->GetName() << std::endl;
+    //std::cout << "Position: " << m_CurrentNode->GetName() << std::endl;
     return true;
   }
 
@@ -569,7 +569,7 @@ namespace mitk {
   {
     std::string className = GetProperty( XMLIO::CLASS_NAME );
 
-    std::cout << "create class: " << className << std::endl;
+    //std::cout << "create class: " << className << std::endl;
 
     if ( className.empty() )
       return NULL;

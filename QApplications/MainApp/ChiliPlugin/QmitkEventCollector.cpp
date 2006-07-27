@@ -59,7 +59,7 @@ EventCollector::eventFilter( QObject *o, QEvent *e )
     QString complete = m_EventStr + Seperator;   // field 0 - 3 
     complete += GetObjectValue( m_EventObject ) + Seperator; // field 4 - 5
     complete += Object2String( m_EventID, m_EventObject ); //field 6 - ??
-    std::cout<<"QmitkEventCollector::eventFilter(): JETZT WIRD GESENDET: "<<complete.latin1()<<std::endl;
+    //std::cout<<"QmitkEventCollector::eventFilter(): JETZT WIRD GESENDET: "<<complete.latin1()<<std::endl;
 
     mitk::ConferenceKit* ck = mitk::ConferenceKit::GetInstance();
     if( ck != NULL )

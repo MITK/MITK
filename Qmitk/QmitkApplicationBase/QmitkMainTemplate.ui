@@ -8,14 +8,14 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>684</width>
-            <height>499</height>
+            <width>472</width>
+            <height>792</height>
         </rect>
     </property>
     <property name="minimumSize">
         <size>
             <width>21</width>
-            <height>197</height>
+            <height>226</height>
         </size>
     </property>
     <property name="caption">
@@ -71,9 +71,6 @@
         <widget class="QmitkUndoRedoButton">
             <property name="name">
                 <cstring>redoButton</cstring>
-            </property>
-            <property name="mode">
-                <enum>Redo</enum>
             </property>
         </widget>
         <action name="Fullscreen"/>
@@ -519,18 +516,18 @@
         </property>
     </action>
     <action>
-      <property name="name">
-        <cstring>helpContentsAction</cstring>
-      </property>
-      <property name="text">
-        <string>Contents</string>
-      </property>
-      <property name="menuText">
-        <string>&amp;Contents...</string>
-      </property>
-      <property name="accel">
-        <string>F1</string>
-      </property>
+        <property name="name">
+            <cstring>helpContentsAction</cstring>
+        </property>
+        <property name="text">
+            <string>Contents</string>
+        </property>
+        <property name="menuText">
+            <string>&amp;Contents...</string>
+        </property>
+        <property name="accel">
+            <string>F1</string>
+        </property>
     </action>
     <action>
         <property name="name">
@@ -739,6 +736,7 @@
     <include location="global" impldecl="in implementation">qstring.h</include>
     <include location="global" impldecl="in implementation">qapplication.h</include>
     <include location="local" impldecl="in implementation">QmitkUndoRedoButton.h</include>
+    <include location="local" impldecl="in implementation">QmitkFctCompMediator.h</include>
     <include location="local" impldecl="in implementation">QmitkMainTemplate.ui.h</include>
 </includes>
 <forwards>
@@ -747,17 +745,19 @@
     <forward>class QmitkSimpleExampleFunctionality</forward>
     <forward>class QmitkStdMultiWidget</forward>
     <forward>class QmitkSelectableGLWidget</forward>
+    <forward>class QmitkFctCompMediator</forward>
 </forwards>
 <variables>
-    <variable access="private">static QmitkMainTemplate* m_Instance;</variable>
-    <variable>mitk::UndoController* m_UndoController;</variable>
-    <variable>QmitkFctMediator* qfm;</variable>
-    <variable>QmitkStdMultiWidget* m_MultiWidget;</variable>
-    <variable>mitk::DataTree::Pointer m_Tree;</variable>
-    <variable>bool m_StandardViewsInitialized;</variable>
-    <variable access="private">bool m_FineUndoEnabled;</variable>
-    <variable access="protected">mitk::PropertyList::Pointer m_Options;</variable>
     <variable>QString m_ProjectFileName;</variable>
+    <variable>mitk::PropertyList::Pointer m_Options;</variable>
+    <variable access="private">bool m_FineUndoEnabled;</variable>
+    <variable>bool m_StandardViewsInitialized;</variable>
+    <variable>mitk::DataTree::Pointer m_Tree;</variable>
+    <variable>QmitkStdMultiWidget* m_MultiWidget;</variable>
+    <variable>QmitkFctMediator* qfm;</variable>
+    <variable>mitk::UndoController* m_UndoController;</variable>
+    <variable access="private">static QmitkMainTemplate* m_Instance;</variable>
+    <variable>QmitkFctCompMediator* qfcm;</variable>
 </variables>
 <signals>
     <signal>ShowWidgetPlanesToggled(bool)</signal>
@@ -793,8 +793,6 @@
 <functions>
     <function>fileOpen( const char * fileName )</function>
     <function access="protected">fileOpenGetFactoryOutput( mitk::DataTreeNodeFactory &amp; factory )</function>
-    <function access="protected">SaveOptionsToFile(const char*)</function>
-    <function access="protected">LoadOptionsFromFile(const char*)</function>
     <function access="private" specifier="non virtual">init()</function>
     <function>Initialize()</function>
     <function>InitializeFunctionality()</function>
@@ -805,8 +803,13 @@
     <function access="private">destroy()</function>
     <function specifier="static" returnType="QmitkMainTemplate *">GetInstance()</function>
     <function specifier="non virtual" returnType="QmitkFctMediator *">GetFctMediator()</function>
+    <function returnType="QmitkFctCompMediator *">GetFctCompMediator()</function>
     <function returnType="bool">GetStandardViewsInitialized()</function>
     <function>SetStandardViewsInitialized( bool areInitialized )</function>
+    <function access="protected">SaveOptionsToFile( const char * filename )</function>
+    <function access="protected">LoadOptionsFromFile( const char * filename )</function>
+    <function>InitializeQfcm()</function>
+    <function>InitializeFunctionalityComponent()</function>
 </functions>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

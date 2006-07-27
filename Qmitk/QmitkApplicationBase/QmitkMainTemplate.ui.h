@@ -577,6 +577,7 @@ void QmitkMainTemplate::Initialize()
     m_MultiWidget->EnableStandardLevelWindow();
   }
   InitializeFunctionality();
+  InitializeFunctionalityComponent();
 
 
   // Add MoveAndZoomInteractor and widget NavigationControllers as
@@ -602,7 +603,7 @@ void QmitkMainTemplate::InitializeQfm()
 {
   //create an QmitkFctMediator. This is an invisible object that controls, manages and mediates functionalities
   qfm=new QmitkFctMediator(this);
-
+ 
   //create an QmitkButtonFctLayoutTemplate. This is an simple example for an layout of the different widgets, of which
   //a functionality and the management consists: the main widget, the control widget and a menu for selecting the
   //active functionality.
@@ -611,7 +612,10 @@ void QmitkMainTemplate::InitializeQfm()
 
   //let the QmitkFctMediator know about the layout. This includes the toolbar and the layoutTemplate.
   qfm->Initialize(this);
+  
 }
+
+
 
 QmitkStdMultiWidget* QmitkMainTemplate::GetMultiWidget()
 {
@@ -712,6 +716,11 @@ QmitkMainTemplate* QmitkMainTemplate::GetInstance()
 QmitkFctMediator* QmitkMainTemplate::GetFctMediator()
 {
   return qfm;
+}
+
+QmitkFctCompMediator* QmitkMainTemplate::GetFctCompMediator()
+{
+  return qfcm;
 }
 
 void QmitkMainTemplate::changeToColumnWidget3n4Layout()
@@ -950,3 +959,19 @@ void QmitkMainTemplate::LoadOptionsFromFile(const char* filename)
   }
 }
 
+
+
+void QmitkMainTemplate::InitializeQfcm()
+{
+  //create an QmitkFctCompMediator. This is an invisible object that controls, manages and mediates functionalities
+  qfcm=new QmitkFctCompMediator(this);
+
+  //let the QmitkFctCompMediator know about the layout. This includes the toolbar and the layoutTemplate.
+  qfcm->Initialize(this);
+}
+
+
+void QmitkMainTemplate::InitializeFunctionalityComponent()
+{
+
+}

@@ -62,3 +62,4 @@ class QmitkBaseAlgorithmComponent
 };
 
 #endif
+

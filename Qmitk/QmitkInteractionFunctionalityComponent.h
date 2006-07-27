@@ -62,3 +62,4 @@ class QmitkInteractionFunctionalityComponent : public QmitkBaseFunctionalityComp
 };
 
 #endif
+

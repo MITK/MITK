@@ -78,3 +78,4 @@ class QmitkFunctionalityComponentContainer : public QmitkBaseFunctionalityCompon
 };
 
 #endif
+

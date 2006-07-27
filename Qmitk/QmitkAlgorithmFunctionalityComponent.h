@@ -53,3 +53,4 @@ class QmitkAlgorithmFunctionalityComponent : public QmitkBaseFunctionalityCompon
 };
 
 #endif
+

@@ -73,3 +73,4 @@ class QmitkThresholdComponent : public QmitkFunctionalityComponentContainer
 };
 
 #endif
+

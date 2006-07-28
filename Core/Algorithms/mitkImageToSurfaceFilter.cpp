@@ -93,9 +93,12 @@ void mitk::ImageToSurfaceFilter::CreateSurface(int time, vtkImageData *vtkimage,
   }
 
 #if (VTK_MAJOR_VERSION >= 5)
-  std::cerr << "vtkDecimate not available for VTK 5.0 and above.";
-  std::cerr << " Using vtkDecimatePro instead." << std::endl;
-  m_Decimate = DecimatePro;
+  if (m_Decimate == Decimate )
+  {
+    std::cerr << "vtkDecimate not available for VTK 5.0 and above.";
+    std::cerr << " Using vtkDecimatePro instead." << std::endl;
+    m_Decimate = DecimatePro;
+  }
 #endif
 
   //decimate = to reduce number of polygons

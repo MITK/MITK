@@ -29,7 +29,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkDataTreeNode.h"
 #include "mitkDataTree.h"
-#include "mitkVector.h"
 
 /**
 
@@ -86,10 +85,13 @@ protected:
   float factor;
   bool mouseDown;
   bool leftbutton;
+  bool ctrlPressed;
   int moveHeight;
   int m_presetID;
   int m_defaultID;
   bool scale;
+  QRect m_LowerBound;
+  QRect m_UpperBound;
   mitk::ScalarType m_upperLimit;
   mitk::ScalarType m_lowerLimit;
   
@@ -103,7 +105,7 @@ public:
   QBrush brush;
 
   /*!
-  *	data structure which stores the values manipulated
+  *	data structures which store the values manipulated
   *	by a QmitkSliderLevelWindowWidget
   */
   mitk::LevelWindow lw;
@@ -142,7 +144,9 @@ protected slots:
 
 void setPreset(int id);
 void addPreset();
-void setDefault();
+void setDefaultLevelWindow();
+void setDefaultScaleRange();
+void changeScaleRange();
 void hideScale();
 void showScale();
 

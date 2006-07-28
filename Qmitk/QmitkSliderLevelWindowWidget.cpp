@@ -19,13 +19,16 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkSliderLevelWindowWidget.h"
 #include <qcursor.h>
 #include <qpopupmenu.h>
+#include <qmessagebox.h>
 #include <mitkConfig.h>
 #include <itksys/SystemTools.hxx>
 #include <mitkLevelWindowPreset.h>
 #include <qdialog.h>
 #include <qlayout.h>
 #include <QmitkLevelWindowPresetDefinition.h>
+#include <QmitkLevelWindowRangeChange.h>
 #include <qlineedit.h>
+#include <qtooltip.h>
 
 /**
 * Constructor
@@ -37,13 +40,12 @@ QmitkSliderLevelWindowWidget::QmitkSliderLevelWindowWidget( QWidget * parent, co
   setMouseTracking(TRUE);
   resize = FALSE;
   bottom = FALSE;
-  lw.SetLevel(0);
-  lw.SetDefaultLevel(0);
-  lw.SetWindow(200);
-  lw.SetDefaultWindow(200);
-  lw.SetRangeMin(-2048);
+  ctrlPressed = FALSE;
+  lw.SetLevelWindow(0, 200);
+  lw.SetDefaultLevelWindow(0, 200);
   m_lowerLimit = -2048;
-  lw.SetRangeMax(2048);
+  lw.SetRangeMinMax(-2048, 2048);
+  lw.SetDefaultRangeMinMax(-2048, 2048);
   m_upperLimit = 2048;
   
   //refresh validators for line edits
@@ -187,12 +189,20 @@ void QmitkSliderLevelWindowWidget::mouseMoveEvent( QMouseEvent* mouseEvent ) {
       && mouseEvent->pos().x() >= rect.topLeft().x() && mouseEvent->pos().x() <= rect.topRight().x())
     {
       setCursor(SizeVerCursor);
+      QToolTip::remove(this, m_UpperBound);
+      QToolTip::remove(this, m_LowerBound);
+      m_LowerBound.setRect(rect.bottomLeft().x(), rect.bottomLeft().y() - 3, 17, 7);
+      QToolTip::add(this, m_LowerBound, "Ctrl + left click to change only lower bound");
+      m_UpperBound.setRect(rect.topLeft().x(), rect.topLeft().y() - 3, 17, 7);
+      QToolTip::add(this, m_UpperBound, "Ctrl + left click to change only upper bound");
       resize = TRUE;
       if ((mouseEvent->pos().y() >= (rect.bottomLeft().y() - 3) && mouseEvent->pos().y() <= (rect.bottomLeft().y() + 3)))
         bottom = TRUE;
     }
     else
     {
+      QToolTip::remove(this, m_LowerBound);
+      QToolTip::remove(this, m_UpperBound);
       setCursor(ArrowCursor);
       resize = FALSE;
       bottom = FALSE;
@@ -205,7 +215,7 @@ void QmitkSliderLevelWindowWidget::mouseMoveEvent( QMouseEvent* mouseEvent ) {
 
     if ( leftbutton ) 
     {
-      if (resize)
+      if (resize && !ctrlPressed)
       {
         double diff = (mouseEvent->pos().y()) / fact;
         diff -= (startPos.y()) / fact;
@@ -223,6 +233,53 @@ void QmitkSliderLevelWindowWidget::mouseMoveEvent( QMouseEvent* mouseEvent ) {
 
         lw.SetWindow( value );
       } 
+      else if(resize && ctrlPressed)
+      {
+        if (!bottom)
+        {
+          double diff = (mouseEvent->pos().y()) / fact;
+          diff -= (startPos.y()) / fact;
+          startPos = mouseEvent->pos();
+
+          if (diff == 0) return;
+          float value;
+          
+          value = lw.GetWindow() - ( ( diff ) );
+
+          if ( value < 1 )
+            value = 1;
+          float oldWindow;
+          float oldLevel;
+          float newLevel;
+          oldWindow = lw.GetWindow();
+          oldLevel = lw.GetLevel();
+          newLevel = oldLevel + (value - oldWindow)/2;
+          if (!((newLevel + value/2) > lw.GetRangeMax())) 
+            lw.SetLevelWindow( newLevel, value );
+        }
+        else
+        {
+          double diff = (mouseEvent->pos().y()) / fact;
+          diff -= (startPos.y()) / fact;
+          startPos = mouseEvent->pos();
+
+          if (diff == 0) return;
+          float value;
+          
+          value = lw.GetWindow() + ( ( diff ) );
+
+          if ( value < 1 )
+            value = 1;
+          float oldWindow;
+          float oldLevel;
+          float newLevel;
+          oldWindow = lw.GetWindow();
+          oldLevel = lw.GetLevel();
+          newLevel = oldLevel - (value - oldWindow)/2;
+          if (!((newLevel - value/2) < lw.GetRangeMin())) 
+            lw.SetLevelWindow( newLevel, value );
+        }
+      }
       else
       {
         float maxv = lw.GetRangeMax();
@@ -240,8 +297,8 @@ void QmitkSliderLevelWindowWidget::mouseMoveEvent( QMouseEvent* mouseEvent ) {
         else
           lw.SetLevel( value );
       }
+      update();
     }
-    update();
   }
 }
 
@@ -253,7 +310,17 @@ void QmitkSliderLevelWindowWidget::mousePressEvent( QMouseEvent* mouseEvent ) {
   startPos = mouseEvent->pos();
 
   if ( mouseEvent->button() == QMouseEvent::LeftButton )
+  {
+    if (mouseEvent->state() == Qt::ControlButton || mouseEvent->state() == Qt::ShiftButton)
+    {
+      ctrlPressed = true;
+    }
+    else
+    {
+      ctrlPressed = false;
+    }
     leftbutton = true;
+  }
   else
     leftbutton = false;
 
@@ -297,10 +364,8 @@ void QmitkSliderLevelWindowWidget::update( ipPicDescriptor* pic ) {
 
   double min, max;
   ipFuncExtr( pic, &min, &max );
-  lw.SetRangeMin( min );
-  lw.SetRangeMax( max );
-  lw.SetLevel( (max - min) / 2 );
-  lw.SetWindow( (max - min) / 2 );
+  lw.SetRangeMinMax(min, max);
+  lw.SetLevelWindow( (max - min) / 2, (max - min) / 2 );
   update();
 }
 
@@ -329,7 +394,7 @@ void QmitkSliderLevelWindowWidget::update() {
   QWidget::repaint();
 
   // FIX: only emit the signal if the level window was changed by the user via mouse
-  if (mouseDown) emit levelWindow( &lw );
+  if (mouseDown && leftbutton) emit levelWindow( &lw );
 }
 
 void QmitkSliderLevelWindowWidget::updateFromLineEdit() 
@@ -363,7 +428,10 @@ void QmitkSliderLevelWindowWidget::contextMenuEvent( QContextMenuEvent * )
   else
     contextMenu->insertItem(tr("Show scale"), this, SLOT(showScale()));
   contextMenu->insertSeparator();
-  contextMenu->insertItem(tr("Default Level/Window"), this, SLOT(setDefault()));
+  contextMenu->insertItem(tr("Default Level/Window"), this, SLOT(setDefaultLevelWindow()));
+  contextMenu->insertSeparator();
+  contextMenu->insertItem(tr("Change Scale Range"), this, SLOT(changeScaleRange()));
+  contextMenu->insertItem(tr("Default Scale Range"), this, SLOT(setDefaultScaleRange()));
   contextMenu->insertSeparator();
   presetSubmenu = new QPopupMenu( this );
   Q_CHECK_PTR( presetSubmenu );
@@ -416,8 +484,7 @@ void QmitkSliderLevelWindowWidget::setPreset(int id)
         dwindow = 2;
       }
     }
-    lw.SetLevel(dlevel);
-    lw.SetWindow(dwindow);
+    lw.SetLevelWindow(dlevel, dwindow);
     update();
     emit levelWindow( &lw );
   }
@@ -433,7 +500,7 @@ void QmitkSliderLevelWindowWidget::addPreset()
   }
 }
 
-void QmitkSliderLevelWindowWidget::setDefault()
+void QmitkSliderLevelWindowWidget::setDefaultLevelWindow()
 {
   lw.SetLevelWindow(lw.GetDefaultLevel(), lw.GetDefaultWindow());
   update();
@@ -443,11 +510,37 @@ void QmitkSliderLevelWindowWidget::setDefault()
 void QmitkSliderLevelWindowWidget::hideScale()
 {
   scale = FALSE;
-  repaint();
+  update();
+  emit levelWindow( &lw );
 }
 
 void QmitkSliderLevelWindowWidget::showScale()
 {
   scale = TRUE;
-  repaint();
+  update();
+  emit levelWindow( &lw );
+}
+
+void QmitkSliderLevelWindowWidget::setDefaultScaleRange()
+{
+  //lw.SetRangeMin(lw.GetDefaultRangeMin());
+  //lw.SetRangeMax(lw.GetDefaultRangeMax());
+  lw.SetRangeMinMax(lw.GetDefaultRangeMin(), lw.GetDefaultRangeMax());
+  lw.SetLevelWindow(lw.GetLevel(), lw.GetWindow());
+  update();
+  emit levelWindow( &lw );
+}
+
+void QmitkSliderLevelWindowWidget::changeScaleRange()
+{
+  QmitkLevelWindowRangeChange changeRange(this, "changeRange", TRUE);
+  changeRange.setLowerLimit(lw.GetRangeMin());
+  changeRange.setUpperLimit(lw.GetRangeMax());
+  if(changeRange.exec())
+  {
+    lw.SetRangeMinMax(changeRange.getLowerLimit(), changeRange.getUpperLimit());
+    lw.SetLevelWindow(lw.GetLevel(), lw.GetWindow());
+  }
+  update();
+  emit levelWindow( &lw );
 }

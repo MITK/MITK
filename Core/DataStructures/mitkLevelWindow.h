@@ -88,19 +88,14 @@ public:
   void SetWindow(ScalarType window);
 
   /*!
-  * setter for default level value
-  */
-  void SetDefaultLevel(ScalarType level);
-
-  /*!
-  * setter for default window value
-  */
-  void SetDefaultWindow(ScalarType window);
-
-  /*!
   * setter for level and window value
   */
   void SetLevelWindow(ScalarType level, ScalarType window);
+
+  /*!
+  * setter for default level and window value
+  */
+  void SetDefaultLevelWindow(ScalarType level, ScalarType window);
 
   /*!
   * setter for window minimum value
@@ -128,14 +123,34 @@ public:
   void SetRangeMax(ScalarType max);
 
   /*!
+  * setter for total range minimum and maximum value
+  */
+  void SetRangeMinMax(ScalarType min, ScalarType max);
+
+  /*!
+  * setter for default total range maximum value
+  */
+  void SetDefaultRangeMinMax(ScalarType min, ScalarType max);
+
+  /*!
   * getter for total range minimum value
   */
   ScalarType GetRangeMin() const;
 
   /*!
+  * getter for default total range minimum value
+  */
+  ScalarType GetDefaultRangeMin() const;
+
+  /*!
   * getter for total range maximum value
   */
   ScalarType GetRangeMax() const;
+
+  /*!
+  * getter for default total range maximum value
+  */
+  ScalarType GetDefaultRangeMax() const;
 
   /**!
   * \brief method returns the size of the grey value range
@@ -192,6 +207,16 @@ protected:
   ScalarType m_RangeMax;
 
   /*!
+  * default minimum gray value of the window
+  */
+  ScalarType m_DefaultRangeMin;
+
+  /*!
+  * default maximum gray value of the window
+  */
+  ScalarType m_DefaultRangeMax;
+
+  /*!
   * default value of the level for image
   */
   ScalarType m_DefaultLevel;
@@ -206,14 +231,30 @@ protected:
   */
   inline void testValues()
   {
+    if ( m_Min > m_Max )
+      std::swap(m_Min,m_Max);
+    else if (m_Min == m_Max )
+      m_Min = m_Max - 1;
+    ScalarType diff;
     if ( m_Min < m_RangeMin )
+    {
+      diff = m_RangeMin - m_Min;
       m_Min = m_RangeMin;
+      if (!((m_Max - diff) > m_RangeMin))
+        m_Max = m_RangeMin + 1;
+      else
+        m_Max -= diff;
+    }
 
     if ( m_Max > m_RangeMax )
+    {
+      diff = m_Max - m_RangeMax;
       m_Max = m_RangeMax;
-
-    if ( m_Min > m_Max )
-      m_Min = m_Max;
+      if (!((m_Min + diff) < m_RangeMax))
+        m_Min = m_RangeMax - 1;
+      else
+        m_Min += diff;
+    }
   }
 
 };

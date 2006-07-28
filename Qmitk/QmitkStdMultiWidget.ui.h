@@ -39,6 +39,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 void QmitkStdMultiWidget::init()
 {
+  m_PrevTopLevWinProp = NULL;
   mitkWidget1->setPaletteBackgroundColor ("red");
   mitkWidget2->setPaletteBackgroundColor ("green");
   mitkWidget3->setPaletteBackgroundColor ("blue");
@@ -719,11 +720,22 @@ void QmitkStdMultiWidget::changeLevelWindow(mitk::LevelWindow* lw)
   if ( topLevWinProp.IsNotNull() )
   {
     mitk::LevelWindow levWin = topLevWinProp->GetLevelWindow();
-
-    levWin.SetMin(lw->GetMin());
-    levWin.SetMax(lw->GetMax());
-    lw->SetRangeMin(levWin.GetRangeMin());
-    lw->SetRangeMax(levWin.GetRangeMax());
+    
+    if (m_PrevTopLevWinProp == topLevWinProp) //if toplevel image does not change: store level/window and range values and default values
+    {
+      levWin.SetRangeMinMax(lw->GetRangeMin(), lw->GetRangeMax());
+      levWin.SetMinMax(lw->GetMin(), lw->GetMax());
+      levWin.SetDefaultRangeMinMax(lw->GetDefaultRangeMin(), lw->GetDefaultRangeMax());
+      levWin.SetDefaultLevelWindow(lw->GetDefaultLevel(), lw->GetDefaultWindow());
+    }
+    else //if toplevel image changes: set level/window and range values and default values for new toplevel image
+    {
+      lw->SetRangeMinMax(levWin.GetRangeMin(), levWin.GetRangeMax());
+      lw->SetMinMax(levWin.GetMin(), levWin.GetMax());
+      lw->SetDefaultRangeMinMax(levWin.GetDefaultRangeMin(), levWin.GetDefaultRangeMax());
+      lw->SetDefaultLevelWindow(levWin.GetDefaultLevel(), levWin.GetDefaultWindow());
+      m_PrevTopLevWinProp = topLevWinProp;
+    }
 
     topLevWinProp->SetLevelWindow(levWin);
     this->RequestUpdate();

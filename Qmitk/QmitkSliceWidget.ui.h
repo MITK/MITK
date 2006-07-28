@@ -235,10 +235,9 @@ void QmitkSliceWidget::ChangeLevelWindow(mitk::LevelWindow* lw )
       if (levWinProp.IsNotNull()) 
       {
         mitk::LevelWindow levWin = levWinProp->GetLevelWindow();
-        levWin.SetMin(lw->GetMin());
-        levWin.SetMax(lw->GetMax());
-//        levWin.SetRangeMin(lw->GetRangeMin());
-//        levWin.SetRangeMax(lw->GetRangeMax());
+
+        levWin.SetMinMax(lw->GetMin(), lw->GetMax());
+//        levWin.SetRangeMinMax(lw->GetRangeMin(), lw->GetRangeMax());
 
         levWinProp->SetLevelWindow(levWin);
         it->Get()->SetLevelWindow(levWin, NULL);

@@ -139,8 +139,8 @@ public:
   }
 
   //## 
-  static bool Save( const mitk::DataTreeIteratorBase* it, const char* fileName );
-  static bool Save( const mitk::DataTreeIteratorBase* it, mitk::XMLWriter& xmlWriter );
+  static bool Save( const mitk::DataTreeIteratorBase* it, const char* fileName, bool writeRootNodeToo = true );
+  static bool Save( const mitk::DataTreeIteratorBase* it, mitk::XMLWriter& xmlWriter, bool writeRootNodeToo = true );
   static bool Load( const mitk::DataTreeIteratorBase* it, const char* filename );
 
   static const std::string 	XML_NODE_NAME;
@@ -153,7 +153,7 @@ protected:
   //##ModelId=3E38F46A01AE
   virtual ~DataTree();
 
-  static bool SaveNext( const mitk::DataTreeIteratorBase* it, mitk::XMLWriter& xmlWriter );  
+  static bool SaveNext( const mitk::DataTreeIteratorBase* it, mitk::XMLWriter& xmlWriter, bool writeRootNodeToo = true );  
 };
 
 } // namespace mitk

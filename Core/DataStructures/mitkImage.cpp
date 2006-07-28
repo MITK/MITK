@@ -1169,7 +1169,12 @@ const mitk::Image::HistogramType* mitk::Image::GetScalarHistogram(int t) const
 template < typename ItkImageType >
 void mitk::_ComputeExtremaInItkImage(ItkImageType* itkImage, mitk::Image* mitkImage)
 {
-  itk::ImageRegionConstIterator<ItkImageType> it(itkImage, itkImage->GetRequestedRegion());
+  typename ItkImageType::RegionType region;
+  region = itkImage->GetBufferedRegion();
+  if(region.Crop(itkImage->GetRequestedRegion()) == false) return;
+  if(region != itkImage->GetRequestedRegion()) return;
+
+  itk::ImageRegionConstIterator<ItkImageType> it(itkImage, region);
   //typedef itk::Image<TPixel, VImageDimension> ItkImageType;
   typedef typename ItkImageType::PixelType TPixel;
   TPixel value;

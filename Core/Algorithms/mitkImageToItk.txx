@@ -96,6 +96,17 @@ template<class TOutputImage>
     noBytes = noBytes * input->GetDimension(i);
   }
   
+  // hier wird momentan wohl nur der erste Channel verwendet??!!
+  m_ImageDataItem = const_cast<mitk::Image*>(input.GetPointer())->GetChannelData( m_Channel );
+  if(m_ImageDataItem.GetPointer() == NULL)
+  {
+    itkWarningMacro(<< "no image data to import in ITK image");
+
+    RegionType bufferedRegion;
+    output->SetBufferedRegion(bufferedRegion);
+    return;
+  }
+
   if (m_CopyMemFlag)
   {
     itkDebugMacro("copyMem ...");
@@ -103,15 +114,11 @@ template<class TOutputImage>
     
     output->Allocate();
     
-    // hier wird momentan wohl nur der erste Channel verwendet??!!
-    m_ImageDataItem = const_cast<mitk::Image*>(input.GetPointer())->GetChannelData( m_Channel );
     memcpy( (PixelType *) output->GetBufferPointer(), m_ImageDataItem->GetData(), sizeof(PixelType)*noBytes);
     
   }
   else
   {
-    m_ImageDataItem = const_cast<mitk::Image*>(input.GetPointer())->GetChannelData( m_Channel );
-    
     itkDebugMacro("do not copyMem ...");
     typedef itk::ImportImageContainer< unsigned long, PixelType >   ImportContainerType;
     typename ImportContainerType::Pointer import;

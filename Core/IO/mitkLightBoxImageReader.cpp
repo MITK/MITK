@@ -183,20 +183,21 @@ void mitk::LightBoxImageReader::GenerateOutputInformation()
   //check whether all slices have the same number of time points
   bool differentNumberOfTimePoints = false;
   SliceInfoArray::iterator slit, slend =sliceInfos.end();
-  for(slit = sliceInfos.begin(); slit!=slend;++slit)
+  unsigned int sliceNo;
+  for(slit = sliceInfos.begin(), sliceNo = 0; slit!=slend;++slit, ++sliceNo)
   {
     if(slit->numberOfTimePoints != numberOfTimePoints)
     {
-      itkWarningMacro(<<"problem: different number of time points in slices - taking minimum");
       if(slit->numberOfTimePoints < numberOfTimePoints)
         numberOfTimePoints = slit->numberOfTimePoints;
+      itkWarningMacro(<<"problem: different number of time points in slices (slice: " << sliceNo << " has " << slit->numberOfTimePoints << ") - will take minimum (currently: " << numberOfTimePoints);
       differentNumberOfTimePoints = true;
     }
   }
   int numberOfSlices = sliceInfos.size();
   if(differentNumberOfTimePoints)
   {
-    itkWarningMacro(<<"minimum of numberOfTimePoints is" << numberOfTimePoints);
+    itkWarningMacro(<<"minimum of numberOfTimePoints is " << numberOfTimePoints);
   }
   else
   {
@@ -549,18 +550,19 @@ void mitk::LightBoxImageReader::SortImage(LocalImageInfoArray& IF_CHILI_PLUGIN(i
     imageNumbers.push_back(info);
   }
 
-  LocalImageInfoArray::iterator it = imageNumbers.begin(), infoEnd=imageNumbers.end();
+  ////do not understand the necessity of the following anymore
+  //LocalImageInfoArray::iterator it = imageNumbers.begin(), infoEnd=imageNumbers.end();
 
-  int maxNumber = std::max_element(it, infoEnd, ImageNumberLesser)->imageNumber;
-  int minNumber = std::min_element(it, infoEnd, ImageNumberLesser)->imageNumber;
-  int layers=imageNumbers.size()/maxNumber;//number of the layer
+  //int maxNumber = std::max_element(it, infoEnd, ImageNumberLesser)->imageNumber;
+  //int minNumber = std::min_element(it, infoEnd, ImageNumberLesser)->imageNumber;
+  //int layers=imageNumbers.size()/maxNumber;//number of the layer
 
-  int afterFirstLayer=imageNumbers.size()-(maxNumber-minNumber+1);
-  if(afterFirstLayer>0)
-  {
-    it+=afterFirstLayer;
-    imageNumbers.erase(it, infoEnd);
-  }
+  //int afterFirstLayer=imageNumbers.size()-(maxNumber-minNumber+1);
+  //if(afterFirstLayer>0)
+  //{
+  //  it+=afterFirstLayer;
+  //  imageNumbers.erase(it, infoEnd);
+  //}
 
   std::sort(imageNumbers.begin(), imageNumbers.end(), ImageOriginLesser);
 #endif

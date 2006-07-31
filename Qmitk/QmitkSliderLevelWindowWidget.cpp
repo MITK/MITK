@@ -534,8 +534,8 @@ void QmitkSliderLevelWindowWidget::setDefaultScaleRange()
 void QmitkSliderLevelWindowWidget::changeScaleRange()
 {
   QmitkLevelWindowRangeChange changeRange(this, "changeRange", TRUE);
-  changeRange.setLowerLimit(lw.GetRangeMin());
-  changeRange.setUpperLimit(lw.GetRangeMax());
+  changeRange.setLowerLimit((int)lw.GetRangeMin());
+  changeRange.setUpperLimit((int)lw.GetRangeMax());
   if(changeRange.exec())
   {
     lw.SetRangeMinMax(changeRange.getLowerLimit(), changeRange.getUpperLimit());

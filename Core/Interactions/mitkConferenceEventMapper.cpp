@@ -60,7 +60,7 @@ mitk::ConferenceEventMapper::MapEvent(signed int mitkEventID, const char* sender
     }
     else
     {
-      //Umrechnung für VTKCameraControler
+      //Umrechnung fuer VTKCameraControler
       p2d[1] = (mitk::ScalarType) (br->GetSizeY() - p2) * br->GetSizeY(); 
       mitk::PositionEvent *peVTK = new mitk::PositionEvent(br,Etype,Estate,Ebuttonstate,Ekey,p2d,p3d);
       // END

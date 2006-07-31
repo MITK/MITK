@@ -58,9 +58,9 @@ class DrawOperation : public Operation
 
   int GetRadius();
 
-  SeedsImage::Pointer DrawOperation::GetSeedsImage();
+  SeedsImage::Pointer GetSeedsImage();
 
-  SeedsImage::Pointer DrawOperation::GetLastSeedsImage();
+  SeedsImage::Pointer GetLastSeedsImage();
 
   private:
   Point3D m_Point;

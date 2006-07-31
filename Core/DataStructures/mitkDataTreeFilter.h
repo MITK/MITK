@@ -10,20 +10,20 @@
 
    TODO / Ideen:
 
-   - Die views bekommen vom Filter nur Infos über hinzufügen/löschen von items.
+   - Die views bekommen vom Filter nur Infos ueber hinzufuegen/loeschen von items.
 
-   - für änderungen der properties müssen sich die views selbst bei denen anmelden
+   - fuer aenderungen der properties muessen sich die views selbst bei denen anmelden
 
-     Über die member GetIndex() und IsRoot() GetParent() kann die View feststellen, welches
-     ViewItem (Qt) gemeint ist (oder die View hält sich da irgendeine Tabelle für die
+     Ueber die member GetIndex() und IsRoot() GetParent() kann die View feststellen, welches
+     ViewItem (Qt) gemeint ist (oder die View haelt sich da irgendeine Tabelle fuer die
      Zuordnung). GetIndex() liefert die Position unterhalb vom Parent, und wenn
-     IsRoot() true liefert, dann ist man schon auf höchster Ebene. 
+     IsRoot() true liefert, dann ist man schon auf hoechster Ebene. 
 
-   - Die Auswahl (welche Items sind selektiert) gehört in das Modell. Damit kann man in
+   - Die Auswahl (welche Items sind selektiert) gehoert in das Modell. Damit kann man in
      mehreren Views die Auswahl konsistent halten (Combo- und Listbox).
-     Die Auswahl gehört nicht in den Datenbaum, weil man so verhindern würde, daß zwei
-     unabhängige Comboboxen, die dann im Hintergrund zwei versch. Filter haben, ihre
-     Auswahl voneinander trennen können.
+     Die Auswahl gehoert nicht in den Datenbaum, weil man so verhindern wuerde, dass zwei
+     unabhaengige Comboboxen, die dann im Hintergrund zwei versch. Filter haben, ihre
+     Auswahl voneinander trennen koennen.
 
 */
 

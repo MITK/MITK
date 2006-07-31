@@ -16,13 +16,13 @@
 #include <mitkImageMapper2D.h>
 #include <mitkProperties.h>
 
-// TODO how to get _all_ properties? (visible = []?) Ist das erwünscht? Soll der data manager ersetzt werden? vielleicht eher nicht
+// TODO how to get _all_ properties? (visible = []?) Ist das erwuenscht? Soll der data manager ersetzt werden? vielleicht eher nicht
 // TODO DeleteSelected sinnvoll?
 // TODO Views schreiben:
 //       combobox: prop displayed_property (default "name")
-//       listview: prop underdrückte_properties
+//       listview: prop underdrueckte_properties
 //       die propertyviews aus dem datamanager wiedervewrwenden?
-// TODO  ExtendedSelect (mehrfache auswahl möglich, aber nur items am stück, ohne lücke)
+// TODO  ExtendedSelect (mehrfache auswahl moeglich, aber nur items am stueck, ohne luecke)
 
 int verbose;
 

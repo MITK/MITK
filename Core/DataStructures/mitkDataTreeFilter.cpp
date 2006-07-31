@@ -464,8 +464,8 @@ const DataTreeFilter::Item* DataTreeFilter::FindItem(DataTreeNode* node) const
       
 void DataTreeFilter::SelectItem(const Item* item, bool selected)
 {
-  // Ich const_caste mir die Welt, wie sie mir gefällt :-)
-  // Aber die Items gehören ja dem Filter, deshalb ist das ok
+  // Ich const_caste mir die Welt, wie sie mir gefaellt :-)
+  // Aber die Items gehoeren ja dem Filter, deshalb ist das ok
   const_cast<Item*>(item) -> SetSelected(selected);
 } 
 

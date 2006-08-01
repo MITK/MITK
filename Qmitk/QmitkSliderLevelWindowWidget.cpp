@@ -78,7 +78,7 @@ QString QmitkSliderLevelWindowWidget::GetLevel()
 
 void QmitkSliderLevelWindowWidget::paintEvent( QPaintEvent* itkNotUsed(e) ) 
 {
-  QPixmap pm(width(), moveHeight);
+  QPixmap pm(width(), height());
   pm.fill(backgroundColor());
   QPainter painter(&pm);
 
@@ -122,6 +122,8 @@ void QmitkSliderLevelWindowWidget::paintEvent( QPaintEvent* itkNotUsed(e) )
 
     for(int i = moveHeight + (int)(lw.GetRangeMin()*fact); i < moveHeight;)
     {
+      if (-count*20 < (int)lw.GetRangeMin())
+        break;
       s = QString::number(-count*20);
       if (count % k && (((count*20*fact) - (count - 1)*20*fact) > 2.5))
       {
@@ -165,18 +167,24 @@ void QmitkSliderLevelWindowWidget::paintEvent( QPaintEvent* itkNotUsed(e) )
 
     for(int i = moveHeight + (int)(lw.GetRangeMin()*fact); i >= 0;)
     {
+      if (count*20 > (int)lw.GetRangeMax())
+        break;
       s = QString::number(count*20);
       if(count % k && (((count*20*fact) - (count - 1)*20*fact) > 2.5))
       {
-        painter.drawLine( 8, moveHeight + (int)(lw.GetRangeMin()*fact - count*20*fact), 12, moveHeight + (int)(lw.GetRangeMin()*fact - count*20*fact));
+        if (!((int)(lw.GetRangeMin()) > 0 && (count*20) < (int)lw.GetRangeMin()))
+          painter.drawLine( 8, moveHeight + (int)(lw.GetRangeMin()*fact - count*20*fact), 12, moveHeight + (int)(lw.GetRangeMin()*fact - count*20*fact));
         enoughSpace = true;
       }
       else if (!(count % k))
       {
         if (((count*20*fact) - (count - k)*20*fact) > 7)
         {
-          painter.drawLine( 5, moveHeight + (int)(lw.GetRangeMin()*fact - count*20*fact), 15, moveHeight + (int)(lw.GetRangeMin()*fact - count*20*fact));
-          painter.drawText( 21, moveHeight + (int)(lw.GetRangeMin()*fact - count*20*fact + 3), s );
+          if (!((int)lw.GetRangeMin() > 0 && (count*20) < (int)lw.GetRangeMin()))
+          {
+            painter.drawLine( 5, moveHeight + (int)(lw.GetRangeMin()*fact - count*20*fact), 15, moveHeight + (int)(lw.GetRangeMin()*fact - count*20*fact));
+            painter.drawText( 21, moveHeight + (int)(lw.GetRangeMin()*fact - count*20*fact + 3), s );
+          }
           enoughSpace2 = true;
         }
         else

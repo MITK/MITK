@@ -8,289 +8,86 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>377</width>
-            <height>601</height>
+            <width>234</width>
+            <height>596</height>
         </rect>
-    </property>
-    <property name="minimumSize">
-        <size>
-            <width>0</width>
-            <height>0</height>
-        </size>
     </property>
     <property name="caption">
         <string>MovieMaker</string>
     </property>
-    <grid>
+    <vbox>
         <property name="name">
             <cstring>unnamed</cstring>
         </property>
-        <spacer row="3" column="0">
+        <widget class="QLabel">
             <property name="name">
-                <cstring>spacer3</cstring>
+                <cstring>textLabel3</cstring>
             </property>
-            <property name="orientation">
-                <enum>Vertical</enum>
-            </property>
-            <property name="sizeType">
-                <enum>Expanding</enum>
-            </property>
-            <property name="sizeHint">
-                <size>
-                    <width>20</width>
-                    <height>200</height>
-                </size>
-            </property>
-        </spacer>
-        <widget class="QGroupBox" row="2" column="0">
-            <property name="name">
-                <cstring>groupBox1</cstring>
+            <property name="sizePolicy">
+                <sizepolicy>
+                    <hsizetype>4</hsizetype>
+                    <vsizetype>5</vsizetype>
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                </sizepolicy>
             </property>
             <property name="font">
                 <font>
                     <bold>1</bold>
                 </font>
             </property>
-            <property name="title">
-                <string>Playing options</string>
+            <property name="text">
+                <string>Window for stepping</string>
             </property>
-            <hbox>
-                <property name="name">
-                    <cstring>unnamed</cstring>
-                </property>
-                <widget class="QLayoutWidget">
-                    <property name="name">
-                        <cstring>layout8</cstring>
-                    </property>
-                    <hbox>
-                        <property name="name">
-                            <cstring>unnamed</cstring>
-                        </property>
-                        <widget class="QButtonGroup">
-                            <property name="name">
-                                <cstring>buttonGroup2</cstring>
-                            </property>
-                            <property name="frameShape">
-                                <enum>NoFrame</enum>
-                            </property>
-                            <property name="title">
-                                <string></string>
-                            </property>
-                            <vbox>
-                                <property name="name">
-                                    <cstring>unnamed</cstring>
-                                </property>
-                                <widget class="QRadioButton">
-                                    <property name="name">
-                                        <cstring>rbtnForward</cstring>
-                                    </property>
-                                    <property name="font">
-                                        <font>
-                                            <bold>0</bold>
-                                        </font>
-                                    </property>
-                                    <property name="text">
-                                        <string>Forward</string>
-                                    </property>
-                                    <property name="checked">
-                                        <bool>true</bool>
-                                    </property>
-                                </widget>
-                                <widget class="QRadioButton">
-                                    <property name="name">
-                                        <cstring>rbtnBackward</cstring>
-                                    </property>
-                                    <property name="font">
-                                        <font>
-                                            <bold>0</bold>
-                                        </font>
-                                    </property>
-                                    <property name="text">
-                                        <string>Backward</string>
-                                    </property>
-                                </widget>
-                                <widget class="QRadioButton">
-                                    <property name="name">
-                                        <cstring>rbtnPingPong</cstring>
-                                    </property>
-                                    <property name="font">
-                                        <font>
-                                            <bold>0</bold>
-                                        </font>
-                                    </property>
-                                    <property name="text">
-                                        <string>Ping-Pong</string>
-                                    </property>
-                                </widget>
-                                <widget class="QLayoutWidget">
-                                    <property name="name">
-                                        <cstring>layout6</cstring>
-                                    </property>
-                                    <hbox>
-                                        <property name="name">
-                                            <cstring>unnamed</cstring>
-                                        </property>
-                                        <widget class="QLabel">
-                                            <property name="name">
-                                                <cstring>textLabel2</cstring>
-                                            </property>
-                                            <property name="font">
-                                                <font>
-                                                    <bold>0</bold>
-                                                </font>
-                                            </property>
-                                            <property name="text">
-                                                <string>Cycle (sec)</string>
-                                            </property>
-                                        </widget>
-                                        <widget class="QSpinBox">
-                                            <property name="name">
-                                                <cstring>spnDuration</cstring>
-                                            </property>
-                                            <property name="font">
-                                                <font>
-                                                    <bold>0</bold>
-                                                </font>
-                                            </property>
-                                            <property name="maxValue">
-                                                <number>200</number>
-                                            </property>
-                                            <property name="minValue">
-                                                <number>1</number>
-                                            </property>
-                                            <property name="value">
-                                                <number>5</number>
-                                            </property>
-                                        </widget>
-                                    </hbox>
-                                </widget>
-                            </vbox>
-                        </widget>
-                        <widget class="Line">
-                            <property name="name">
-                                <cstring>line2</cstring>
-                            </property>
-                            <property name="frameShape">
-                                <enum>VLine</enum>
-                            </property>
-                            <property name="frameShadow">
-                                <enum>Sunken</enum>
-                            </property>
-                            <property name="orientation">
-                                <enum>Vertical</enum>
-                            </property>
-                        </widget>
-                        <widget class="QButtonGroup">
-                            <property name="name">
-                                <cstring>buttonGroup1</cstring>
-                            </property>
-                            <property name="frameShape">
-                                <enum>NoFrame</enum>
-                            </property>
-                            <property name="title">
-                                <string></string>
-                            </property>
-                            <property name="flat">
-                                <bool>false</bool>
-                            </property>
-                            <property name="checkable">
-                                <bool>false</bool>
-                            </property>
-                            <vbox>
-                                <property name="name">
-                                    <cstring>unnamed</cstring>
-                                </property>
-                                <widget class="QRadioButton">
-                                    <property name="name">
-                                        <cstring>rbtnSpatial</cstring>
-                                    </property>
-                                    <property name="font">
-                                        <font>
-                                            <bold>0</bold>
-                                        </font>
-                                    </property>
-                                    <property name="text">
-                                        <string>Spatial</string>
-                                    </property>
-                                    <property name="checked">
-                                        <bool>true</bool>
-                                    </property>
-                                </widget>
-                                <widget class="QRadioButton">
-                                    <property name="name">
-                                        <cstring>rbtnTemporal</cstring>
-                                    </property>
-                                    <property name="font">
-                                        <font>
-                                            <bold>0</bold>
-                                        </font>
-                                    </property>
-                                    <property name="text">
-                                        <string>Temporal</string>
-                                    </property>
-                                </widget>
-                                <widget class="QRadioButton">
-                                    <property name="name">
-                                        <cstring>rbtnCombined</cstring>
-                                    </property>
-                                    <property name="font">
-                                        <font>
-                                            <bold>0</bold>
-                                        </font>
-                                    </property>
-                                    <property name="text">
-                                        <string>Combined</string>
-                                    </property>
-                                </widget>
-                                <widget class="QLayoutWidget">
-                                    <property name="name">
-                                        <cstring>layout6_2</cstring>
-                                    </property>
-                                    <hbox>
-                                        <property name="name">
-                                            <cstring>unnamed</cstring>
-                                        </property>
-                                        <widget class="QLabel">
-                                            <property name="name">
-                                                <cstring>textLabel2_2</cstring>
-                                            </property>
-                                            <property name="font">
-                                                <font>
-                                                    <bold>0</bold>
-                                                </font>
-                                            </property>
-                                            <property name="text">
-                                                <string>S/T Relation</string>
-                                            </property>
-                                        </widget>
-                                        <widget class="QSpinBox">
-                                            <property name="name">
-                                                <cstring>spatialTimeRelation</cstring>
-                                            </property>
-                                            <property name="font">
-                                                <font>
-                                                    <bold>0</bold>
-                                                </font>
-                                            </property>
-                                            <property name="maxValue">
-                                                <number>10</number>
-                                            </property>
-                                            <property name="minValue">
-                                                <number>-10</number>
-                                            </property>
-                                            <property name="value">
-                                                <number>0</number>
-                                            </property>
-                                        </widget>
-                                    </hbox>
-                                </widget>
-                            </vbox>
-                        </widget>
-                    </hbox>
-                </widget>
-            </hbox>
         </widget>
-        <widget class="QGroupBox" row="1" column="0">
+        <widget class="QComboBox">
+            <property name="name">
+                <cstring>cmbSelectedStepperWindow</cstring>
+            </property>
+            <property name="sizePolicy">
+                <sizepolicy>
+                    <hsizetype>1</hsizetype>
+                    <vsizetype>0</vsizetype>
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                </sizepolicy>
+            </property>
+        </widget>
+        <widget class="QLabel">
+            <property name="name">
+                <cstring>textLabel3_2</cstring>
+            </property>
+            <property name="sizePolicy">
+                <sizepolicy>
+                    <hsizetype>4</hsizetype>
+                    <vsizetype>5</vsizetype>
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                </sizepolicy>
+            </property>
+            <property name="font">
+                <font>
+                    <bold>1</bold>
+                </font>
+            </property>
+            <property name="text">
+                <string>Window for recording</string>
+            </property>
+        </widget>
+        <widget class="QComboBox">
+            <property name="name">
+                <cstring>cmbSelectedRecordingWindow</cstring>
+            </property>
+            <property name="sizePolicy">
+                <sizepolicy>
+                    <hsizetype>1</hsizetype>
+                    <vsizetype>0</vsizetype>
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                </sizepolicy>
+            </property>
+        </widget>
+        <widget class="QGroupBox">
             <property name="name">
                 <cstring>groupBox2</cstring>
             </property>
@@ -302,102 +99,11 @@
             <property name="title">
                 <string>Recording options</string>
             </property>
-            <vbox>
+            <grid>
                 <property name="name">
                     <cstring>unnamed</cstring>
                 </property>
-                <widget class="QLayoutWidget">
-                    <property name="name">
-                        <cstring>layout3</cstring>
-                    </property>
-                    <hbox>
-                        <property name="name">
-                            <cstring>unnamed</cstring>
-                        </property>
-                        <widget class="QLabel">
-                            <property name="name">
-                                <cstring>textLabel1</cstring>
-                            </property>
-                            <property name="font">
-                                <font>
-                                    <bold>0</bold>
-                                </font>
-                            </property>
-                            <property name="text">
-                                <string>Step</string>
-                            </property>
-                        </widget>
-                        <widget class="QmitkSliderNavigator">
-                            <property name="name">
-                                <cstring>slidAngle</cstring>
-                            </property>
-                            <property name="font">
-                                <font>
-                                    <bold>0</bold>
-                                </font>
-                            </property>
-                        </widget>
-                    </hbox>
-                </widget>
-                <widget class="QLayoutWidget">
-                    <property name="name">
-                        <cstring>layout3</cstring>
-                    </property>
-                    <hbox>
-                        <property name="name">
-                            <cstring>unnamed</cstring>
-                        </property>
-                        <widget class="QToolButton">
-                            <property name="name">
-                                <cstring>btnPlay</cstring>
-                            </property>
-                            <property name="font">
-                                <font>
-                                    <bold>0</bold>
-                                </font>
-                            </property>
-                            <property name="text">
-                                <string></string>
-                            </property>
-                            <property name="iconSet">
-                                <iconset>image0</iconset>
-                            </property>
-                        </widget>
-                        <widget class="QToolButton">
-                            <property name="name">
-                                <cstring>btnPause</cstring>
-                            </property>
-                            <property name="font">
-                                <font>
-                                    <bold>0</bold>
-                                </font>
-                            </property>
-                            <property name="text">
-                                <string></string>
-                            </property>
-                            <property name="iconSet">
-                                <iconset>image1</iconset>
-                            </property>
-                        </widget>
-                        <widget class="QToolButton">
-                            <property name="name">
-                                <cstring>btnStop</cstring>
-                            </property>
-                            <property name="font">
-                                <font>
-                                    <bold>0</bold>
-                                </font>
-                            </property>
-                            <property name="text">
-                                <string></string>
-                            </property>
-                            <property name="iconSet">
-                                <iconset>image2</iconset>
-                            </property>
-                        </widget>
-                    </hbox>
-                </widget>
-                <widget class="QToolButton">
+                <widget class="QToolButton" row="2" column="0" rowspan="1" colspan="3">
                     <property name="name">
                         <cstring>btnMovie</cstring>
                     </property>
@@ -415,7 +121,7 @@
                         </font>
                     </property>
                     <property name="text">
-                        <string>Write Movie (MS Windows only) ...</string>
+                        <string>Write Movie...</string>
                     </property>
                     <property name="usesTextLabel">
                         <bool>false</bool>
@@ -427,7 +133,7 @@
                         <enum>BelowIcon</enum>
                     </property>
                 </widget>
-                <widget class="QToolButton">
+                <widget class="QToolButton" row="3" column="0" rowspan="1" colspan="3">
                     <property name="name">
                         <cstring>btnScreenshot</cstring>
                     </property>
@@ -443,87 +149,315 @@
                         <string>Writes a screenshot of the selected window.</string>
                     </property>
                 </widget>
-            </vbox>
+                <widget class="QToolButton" row="1" column="0">
+                    <property name="name">
+                        <cstring>btnPlay</cstring>
+                    </property>
+                    <property name="font">
+                        <font>
+                            <bold>0</bold>
+                        </font>
+                    </property>
+                    <property name="text">
+                        <string></string>
+                    </property>
+                    <property name="iconSet">
+                        <iconset>image0</iconset>
+                    </property>
+                </widget>
+                <widget class="QToolButton" row="1" column="1">
+                    <property name="name">
+                        <cstring>btnPause</cstring>
+                    </property>
+                    <property name="font">
+                        <font>
+                            <bold>0</bold>
+                        </font>
+                    </property>
+                    <property name="text">
+                        <string></string>
+                    </property>
+                    <property name="iconSet">
+                        <iconset>image1</iconset>
+                    </property>
+                </widget>
+                <widget class="QToolButton" row="1" column="2">
+                    <property name="name">
+                        <cstring>btnStop</cstring>
+                    </property>
+                    <property name="font">
+                        <font>
+                            <bold>0</bold>
+                        </font>
+                    </property>
+                    <property name="text">
+                        <string></string>
+                    </property>
+                    <property name="iconSet">
+                        <iconset>image2</iconset>
+                    </property>
+                </widget>
+                <widget class="QLabel" row="0" column="0">
+                    <property name="name">
+                        <cstring>textLabel1</cstring>
+                    </property>
+                    <property name="font">
+                        <font>
+                            <bold>0</bold>
+                        </font>
+                    </property>
+                    <property name="text">
+                        <string>Step</string>
+                    </property>
+                </widget>
+                <widget class="QmitkSliderNavigator" row="0" column="1" rowspan="1" colspan="2">
+                    <property name="name">
+                        <cstring>slidAngle</cstring>
+                    </property>
+                    <property name="font">
+                        <font>
+                            <bold>0</bold>
+                        </font>
+                    </property>
+                </widget>
+            </grid>
         </widget>
-        <widget class="QLayoutWidget" row="0" column="0">
+        <widget class="QGroupBox">
             <property name="name">
-                <cstring>layout8</cstring>
+                <cstring>groupBox1</cstring>
+            </property>
+            <property name="font">
+                <font>
+                    <bold>1</bold>
+                </font>
+            </property>
+            <property name="title">
+                <string>Playing options</string>
             </property>
             <grid>
                 <property name="name">
                     <cstring>unnamed</cstring>
                 </property>
-                <widget class="QComboBox" row="0" column="1">
+                <widget class="QButtonGroup" row="2" column="0">
                     <property name="name">
-                        <cstring>cmbSelectedStepperWindow</cstring>
+                        <cstring>buttonGroup2</cstring>
                     </property>
-                    <property name="sizePolicy">
-                        <sizepolicy>
-                            <hsizetype>1</hsizetype>
-                            <vsizetype>0</vsizetype>
-                            <horstretch>0</horstretch>
-                            <verstretch>0</verstretch>
-                        </sizepolicy>
+                    <property name="frameShape">
+                        <enum>NoFrame</enum>
                     </property>
+                    <property name="title">
+                        <string></string>
+                    </property>
+                    <grid>
+                        <property name="name">
+                            <cstring>unnamed</cstring>
+                        </property>
+                        <widget class="QRadioButton" row="0" column="0" rowspan="1" colspan="2">
+                            <property name="name">
+                                <cstring>rbtnForward</cstring>
+                            </property>
+                            <property name="font">
+                                <font>
+                                    <bold>0</bold>
+                                </font>
+                            </property>
+                            <property name="text">
+                                <string>Forward</string>
+                            </property>
+                            <property name="checked">
+                                <bool>true</bool>
+                            </property>
+                        </widget>
+                        <widget class="QRadioButton" row="1" column="0" rowspan="1" colspan="2">
+                            <property name="name">
+                                <cstring>rbtnBackward</cstring>
+                            </property>
+                            <property name="font">
+                                <font>
+                                    <bold>0</bold>
+                                </font>
+                            </property>
+                            <property name="text">
+                                <string>Backward</string>
+                            </property>
+                        </widget>
+                        <widget class="QRadioButton" row="2" column="0" rowspan="1" colspan="2">
+                            <property name="name">
+                                <cstring>rbtnPingPong</cstring>
+                            </property>
+                            <property name="font">
+                                <font>
+                                    <bold>0</bold>
+                                </font>
+                            </property>
+                            <property name="text">
+                                <string>Ping-Pong</string>
+                            </property>
+                        </widget>
+                        <widget class="QLabel" row="3" column="0">
+                            <property name="name">
+                                <cstring>textLabel2</cstring>
+                            </property>
+                            <property name="font">
+                                <font>
+                                    <bold>0</bold>
+                                </font>
+                            </property>
+                            <property name="text">
+                                <string>Cycle (sec)</string>
+                            </property>
+                        </widget>
+                        <widget class="QSpinBox" row="3" column="1">
+                            <property name="name">
+                                <cstring>spnDuration</cstring>
+                            </property>
+                            <property name="font">
+                                <font>
+                                    <bold>0</bold>
+                                </font>
+                            </property>
+                            <property name="maxValue">
+                                <number>200</number>
+                            </property>
+                            <property name="minValue">
+                                <number>1</number>
+                            </property>
+                            <property name="value">
+                                <number>5</number>
+                            </property>
+                        </widget>
+                    </grid>
                 </widget>
-                <widget class="QLabel" row="0" column="0">
+                <widget class="QButtonGroup" row="0" column="0">
                     <property name="name">
-                        <cstring>textLabel3</cstring>
+                        <cstring>buttonGroup1</cstring>
                     </property>
-                    <property name="sizePolicy">
-                        <sizepolicy>
-                            <hsizetype>4</hsizetype>
-                            <vsizetype>5</vsizetype>
-                            <horstretch>0</horstretch>
-                            <verstretch>0</verstretch>
-                        </sizepolicy>
+                    <property name="frameShape">
+                        <enum>NoFrame</enum>
                     </property>
-                    <property name="font">
-                        <font>
-                            <bold>1</bold>
-                        </font>
+                    <property name="title">
+                        <string></string>
                     </property>
-                    <property name="text">
-                        <string>Select window for stepping </string>
+                    <property name="flat">
+                        <bool>false</bool>
                     </property>
+                    <property name="checkable">
+                        <bool>false</bool>
+                    </property>
+                    <grid>
+                        <property name="name">
+                            <cstring>unnamed</cstring>
+                        </property>
+                        <widget class="QRadioButton" row="0" column="0" rowspan="1" colspan="2">
+                            <property name="name">
+                                <cstring>rbtnSpatial</cstring>
+                            </property>
+                            <property name="font">
+                                <font>
+                                    <bold>0</bold>
+                                </font>
+                            </property>
+                            <property name="text">
+                                <string>Spatial</string>
+                            </property>
+                            <property name="checked">
+                                <bool>true</bool>
+                            </property>
+                        </widget>
+                        <widget class="QRadioButton" row="1" column="0" rowspan="1" colspan="2">
+                            <property name="name">
+                                <cstring>rbtnTemporal</cstring>
+                            </property>
+                            <property name="font">
+                                <font>
+                                    <bold>0</bold>
+                                </font>
+                            </property>
+                            <property name="text">
+                                <string>Temporal</string>
+                            </property>
+                        </widget>
+                        <widget class="QRadioButton" row="2" column="0" rowspan="1" colspan="2">
+                            <property name="name">
+                                <cstring>rbtnCombined</cstring>
+                            </property>
+                            <property name="font">
+                                <font>
+                                    <bold>0</bold>
+                                </font>
+                            </property>
+                            <property name="text">
+                                <string>Combined</string>
+                            </property>
+                        </widget>
+                        <widget class="QLabel" row="3" column="0">
+                            <property name="name">
+                                <cstring>textLabel2_2</cstring>
+                            </property>
+                            <property name="font">
+                                <font>
+                                    <bold>0</bold>
+                                </font>
+                            </property>
+                            <property name="text">
+                                <string>S/T Relation</string>
+                            </property>
+                        </widget>
+                        <widget class="QSpinBox" row="3" column="1">
+                            <property name="name">
+                                <cstring>spatialTimeRelation</cstring>
+                            </property>
+                            <property name="font">
+                                <font>
+                                    <bold>0</bold>
+                                </font>
+                            </property>
+                            <property name="maxValue">
+                                <number>10</number>
+                            </property>
+                            <property name="minValue">
+                                <number>-10</number>
+                            </property>
+                            <property name="value">
+                                <number>0</number>
+                            </property>
+                        </widget>
+                    </grid>
                 </widget>
-                <widget class="QLabel" row="1" column="0">
+                <widget class="Line" row="1" column="0">
                     <property name="name">
-                        <cstring>textLabel3_2</cstring>
+                        <cstring>line2</cstring>
                     </property>
-                    <property name="sizePolicy">
-                        <sizepolicy>
-                            <hsizetype>4</hsizetype>
-                            <vsizetype>5</vsizetype>
-                            <horstretch>0</horstretch>
-                            <verstretch>0</verstretch>
-                        </sizepolicy>
+                    <property name="frameShape">
+                        <enum>HLine</enum>
                     </property>
-                    <property name="font">
-                        <font>
-                            <bold>1</bold>
-                        </font>
+                    <property name="frameShadow">
+                        <enum>Sunken</enum>
                     </property>
-                    <property name="text">
-                        <string>Select window for recording</string>
-                    </property>
-                </widget>
-                <widget class="QComboBox" row="1" column="1">
-                    <property name="name">
-                        <cstring>cmbSelectedRecordingWindow</cstring>
-                    </property>
-                    <property name="sizePolicy">
-                        <sizepolicy>
-                            <hsizetype>1</hsizetype>
-                            <vsizetype>0</vsizetype>
-                            <horstretch>0</horstretch>
-                            <verstretch>0</verstretch>
-                        </sizepolicy>
+                    <property name="orientation">
+                        <enum>Horizontal</enum>
                     </property>
                 </widget>
             </grid>
         </widget>
-    </grid>
+        <spacer>
+            <property name="name">
+                <cstring>spacer3</cstring>
+            </property>
+            <property name="orientation">
+                <enum>Vertical</enum>
+            </property>
+            <property name="sizeType">
+                <enum>Expanding</enum>
+            </property>
+            <property name="sizeHint">
+                <size>
+                    <width>20</width>
+                    <height>90</height>
+                </size>
+            </property>
+        </spacer>
+    </vbox>
 </widget>
 <customwidgets>
     <customwidget>
@@ -549,16 +483,16 @@
 </customwidgets>
 <images>
     <image name="image0">
-        <data format="PNG" length="298">89504e470d0a1a0a0000000d4948445200000018000000180806000000e0773df8000000f149444154789ce5d2416ac25010c6f12f998969df0b415dd813582a55dbaa1b1f5e44c10bb42e6cb7d52348bd82a0e710149263bdde4067a25988df01fe3f0626c8b20c652e2cb57e3f8073ce970a5c8288819fef7921440c3c1a83d9d7a71a11034c844eb78de5e257858801220213a3dfffc0fa6f2546e417308199c11ce1b9d9c46ebb11212c058808cc8488094118e2a9d1c0f1b08773ce7bef91e779700580c15184873886b509de7b039c8aab81c42630c6c05a8bee5bef6c5c05a4690a2642ad56c74beb551407946f9a56abaab80aa8c4150cdd48155701e3c9541d570145e262a0685c0c148d8b814b76fbc03fd37953bf071962c40000000049454e44ae426082</data>
+        <data format="PNG" length="390">89504e470d0a1a0a0000000d4948445200000018000000180806000000e0773df80000014d49444154789cedd5a14b036118c7f1ef8d85632cbc5bba7bd35ec1b04b7a4daf190dfe154b82d96c1e064183b0b824cbb6c56dddb0e8b57bd77cc1031706efd24441d8fb6ebb66fcc1cbc3efe1c3cb1314f3020c20401b4d2ce283e65a6e7210909b9c58c41c3a07c5bca8a4f926d7aa6abec9818b814ca42de645509d0120136977d9a4a684421b8d120a0cfc95011eeffac8445a97f73fb39301805e1afa37d7de9b381b0cee07d0040cf46e7bb89a381be852a3ea11d1b160f43072dec4e91fc844dae1d3109a70aaba2c4a4db86a915d655b3771372873543d66516a22a158864b8ab77764226d7a96dabd0d46cf436841da39275c411809da476dacb5e8990ef636c84b4d37eaf2b1d2bf864f67d3e02006e3973151f30b7572414336b636f737f8cc6975d2efe1db9a7b1b4c5e2764979973736f83cd70d7e6de06becdbd0c7669ee65f07f932bbdc96b19a8eceb53ca7f810000000049454e44ae426082</data>
     </image>
     <image name="image1">
-        <data format="PNG" length="270">89504e470d0a1a0a0000000d4948445200000018000000180806000000e0773df8000000d549444154789ced944d0ac2301046bf7426fe744ab1a027d053f40a227816dde805db0b75693bee6dad335211c4b77c13f20221095555e193241fddfd1fb0c0cf066559eaa3535584107a6b5515755df707630100389f4f288a02cc8ccbe5fad2bb032282dd768b5bdb9afc102fefa0eb3a14ab95d9bb02f3d90ccc041131797720cb043146a4929abc3b3005df0d6c366b6499205da626ef0e4cc16860b198838940493079778089c1cc48884cde1d2022e4798e18a3c90f1e726cb83f1c5dde1550ed7da6689a66d0bf1578f6fd7af9f1973c05772ae8300e0e8366c20000000049454e44ae426082</data>
+        <data format="PNG" length="438">89504e470d0a1a0a0000000d4948445200000018000000180806000000e0773df80000017d49444154789ced95414bc3401085bf941eb690c3062224e2658ee9ad7aebdf92e23fd47fa0c7bd7572cb1e02e610580f35b55b1b25d5e2c58125bc079999372f9b49b6cf5bf08005f54a69cb5fc533e71d5870de51da92dfc6c9f6797b91ce073cbb54e7034e2eedc1dc798758e1f879bdbc0e1c45088124498e6942083c3e3d26a7f2ccc50aea15b1021e060c70bfb96775b3423b65f3b0d9273cc51fbf3fe0510f00aab4c2e4b0beb98d3ab6a97de7d77b6ecc83d9586500ed1d6526d8ec359e490f65263459b3a7c626317a0f008c3168ab2c8a65945f8ca0ad6379c08f4d62f695078b344372a1e99ba8804f3d925798de440a267b505044788882023d507ab60735758487a8a9290f949eedc12aaff0bdc716262ab0e395aa909f79a028620b5cab51811d2f74ed81f1e7782057826b6b248d3d902b41db1a937e283bef1e744a950b74f188b46b905ca08b154cf640ecee135dd845acc096effc0737791fdcadef26fdecf4459349fb2084f0e90cc94ef17fb60ffe77f2b7f80dd2d977282f36735e0000000049454e44ae426082</data>
     </image>
     <image name="image2">
-        <data format="PNG" length="247">89504e470d0a1a0a0000000d4948445200000018000000180806000000e0773df8000000be49444154789cdd95d10e82300c45ef6807b82e8425f205f885f282ff2ec317f00132506026781fb7aea7cdd25bd5f73d622a899afd2f003c3d504a6d4a14facb19608cdf440166d58500689a3b9c73600e86bcd5b68fe05df0b588e056d77876dd2a60498be579efe1ca320e204b53301344240ec05a81d61a46cc2ec0efe76054555d61adc05cceda419e67602250b26db257014c0c66464214074044288a025aeb5d003535a9c1ecbef6a221cf675e74e4969b7570b4cebfd1ce0f780101051f7c7cab3f560000000049454e44ae426082</data>
+        <data format="PNG" length="377">89504e470d0a1a0a0000000d4948445200000018000000180806000000e0773df80000014049444154789cdd95a16ec33018843f4f05ee14e00ec553060c262d65292cec73f40df6147b873ecfc078e1b0c75c6683482b889481a6a4b103ac1674474e6745fffd27e764d1f73db7c4c34da7ff0b83d9e58110226b50ea2e4706e7efb35c60b45dca80ddc70e3ff3186570ad43173ac9dbf76dd2317907ae736c9a0d285857ab81d7513d856402a30cce5b9a97065a4b5334d881477a02e90447875e184277605e2e09dd81e5c0973acba0296bfcd1515735bef3d4558dec64546719fcb416ad0c3638b4d2d8e04011d579095ed7842e5097c3a6e5b079446719586f2955890d1659800d1653e8a89e82b86ce0d0e47effb96781a47c33102c2803e1084a8ef4e3f3e3b9c9a3a2a5ffa2d622d59c437b1a766219d73909bebff6a06059ad20fc829a27593c896482a4c1e45a11a40ca24dbee62b374a706ddcff8b76ff067f9b2bbdd492ac38870000000049454e44ae426082</data>
     </image>
     <image name="image3">
-        <data format="PNG" length="1002">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b000003b149444154789cad94514c5b5518c77fe7dc4b7b4b6150bb96324418ca32358bee6192609c51d883892ce083f1718b3ebb185f8dc91e972cf39d2d6a78d0b027b3cd07d9e68c81c625a6c139408a4384f416100aed6d4b7bdb7b8e0fc0921a70c6ed7b3ae7e43bbff3fffedfc927e2f138bbd1dbdbab7902118fc785d8058f8d8de9aeae2e72b91cb66de338ce7f82e47239666767492412b8aefbf0dcdc553a323242f4501d918e2d3a8f15a9784584100809a609526eafd1a0f54e6142e029c5c21f3ef41583bb77a805efbe1ce9d86279e32619678eaab7853fa0f02a16abb64166ad0cdac75307eb3874b84cb0a14aa5a24108cc0688c48c9a4a1e826ddbe6f0b12219678e8ace610502ccdfafe3f68d3c33bf6c01c59dcc209d472c4e0d35d2f3ba81d205d06005e4de60c77170bd2255af80150870f70e8c0eaf009260a349577714e913a4175d16925b5cbe50607931cc3b677c68ca28a5f7066f5b26f00760febec9e8f032a0e81b68a17fc0201415989647a9d8c4c498cbe8f05f5cff3a4d4bac8bfe210b290b35e01afd428257b1b875cd01aaf4bd1de5dd0fea688e1530ad1c1bab16b7af17393558cf997311c0e49bafd670d6258621f6576c9ab09a3248fe5ae6c08103f49f36517213d33070369bf8e2529ee9c90ceb2b2eef7f14617c2c48722a4b7226845143fa87622905ebeb6514253a9eb5084504a66950c88618bee0303d99217cb09e9ed71a09369538fa523d00e9a50a42eed3bc6d8f41281fa0903e8561796cac86f8f2b33c33930ea0f0fb4d5adbeb30ad22866ffbbad226d2a805d7ee0484220208925aaa50deaa67e27b97e9c90ccdcdf5c462cdd8a94d2e7e62f3603244ea410989a4ed191f52a8fd156b056d9d553a9e0bf0e7ef45c6bf7339fd5e90ec7a88575e6d20d6e6e7e2a755ec854dce7fb8885b2cd014f6f3c2714d3a550bae55ac35c1068fb7061b00b87a7995899b25ce9e0b73e24d8fae97b37c7cbe9370b499fce6066eb54adf6098f6ee2a9a7ff9c70841a5023d270deca510d746537c7e29cdf8ad20475fb4307c82d4fc324ec6859d66fdfc6381e44014b36e9fe6e572393ca54068aa22cfd0598b686b3737aeae90bc9725796f0350802414b6e81b7c9a9f7e70708a2e6e5991cfeee3f1ecec2c0b0b3e8c068142a2a8d23728397132c6dc6f2e2b8b0a8da4b5ddc7f3c735ed47146f0cb4502983693a4c25ca7b83138904fa8a412466e00f48b4271086c2901263676c4a6990b615b6ade15b85694af239984a94585bf6f606bbae5b334f1f37e4a3531e031c8fc7c5a312ff17f849c3e3f1b8f81b8be6900aca9b61c90000000049454e44ae426082</data>
+        <data format="XBM.GZ" length="79">789c534e494dcbcc4b554829cdcdad8c2fcf4c29c95030e0524611cd48cd4ccf28010a1797249664262b2467241641a592324b8aa363156c15aab914146aadb90067111b1f</data>
     </image>
 </images>
 <connections>
@@ -672,7 +606,4 @@
     <function access="private" specifier="non virtual">init()</function>
 </functions>
 <layoutdefaults spacing="6" margin="11"/>
-<includehints>
-    <includehint>QmitkSliderNavigator.h</includehint>
-</includehints>
 </UI>

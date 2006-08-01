@@ -29,6 +29,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QmitkLevelWindowRangeChange.h>
 #include <qlineedit.h>
 #include <qtooltip.h>
+#include <qpixmap.h>
 
 /**
 * Constructor
@@ -59,6 +60,9 @@ QmitkSliderLevelWindowWidget::QmitkSliderLevelWindowWidget( QWidget * parent, co
   moveHeight = height() - 25;
   factor = 0;
   scale = TRUE;
+
+  setBackgroundMode( Qt::NoBackground );
+
   update();
 }
 
@@ -74,7 +78,9 @@ QString QmitkSliderLevelWindowWidget::GetLevel()
 
 void QmitkSliderLevelWindowWidget::paintEvent( QPaintEvent* itkNotUsed(e) ) 
 {
-  QPainter painter(this);
+  QPixmap pm(width(), moveHeight);
+  pm.fill(backgroundColor());
+  QPainter painter(&pm);
 
   painter.setFont( font );
 
@@ -114,7 +120,7 @@ void QmitkSliderLevelWindowWidget::paintEvent( QPaintEvent* itkNotUsed(e) )
     bool enoughSpace = false;
     bool enoughSpace2 = false;
 
-    for(int i = moveHeight + (int)(lw.GetRangeMin()*fact + 20*fact); i < moveHeight;)
+    for(int i = moveHeight + (int)(lw.GetRangeMin()*fact); i < moveHeight;)
     {
       s = QString::number(-count*20);
       if (count % k && (((count*20*fact) - (count - 1)*20*fact) > 2.5))
@@ -205,6 +211,8 @@ void QmitkSliderLevelWindowWidget::paintEvent( QPaintEvent* itkNotUsed(e) )
   painter.drawLine(rect.topRight(),rect.bottomRight());
   painter.drawLine(rect.bottomRight(),rect.bottomLeft());
   painter.end();
+  QPainter p (this);
+  p.drawPixmap(0, 0, pm);
 }
 
 /**

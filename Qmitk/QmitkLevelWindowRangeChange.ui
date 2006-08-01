@@ -44,10 +44,10 @@
                 <cstring>rangeMaxSpinBox</cstring>
             </property>
             <property name="maxValue">
-                <number>2147483647</number>
+                <number>1000000</number>
             </property>
             <property name="minValue">
-                <number>-2147483647</number>
+                <number>-1000000</number>
             </property>
         </widget>
         <widget class="QPushButton" row="2" column="0" rowspan="1" colspan="2">
@@ -93,10 +93,10 @@
                 <cstring>rangeMinSpinBox</cstring>
             </property>
             <property name="maxValue">
-                <number>2147483647</number>
+                <number>1000000</number>
             </property>
             <property name="minValue">
-                <number>-2147483647</number>
+                <number>-1000000</number>
             </property>
         </widget>
     </grid>

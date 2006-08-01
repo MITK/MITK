@@ -193,7 +193,7 @@ bool QmitkFctMediator::AddFunctionality(QmitkFunctionality * functionality)
     QWidget * controlWidget = functionality->CreateControlWidget(m_ControlStack);
     if(controlWidget!=NULL)
     {
-      controlWidget->setSizePolicy(ignored);
+      controlWidget->setSizePolicy(preferred);
       m_ControlStack->addWidget(controlWidget, m_NumOfFuncs);
     }
     else
@@ -278,8 +278,8 @@ QmitkFunctionality* QmitkFctMediator::GetFunctionalityByName(const char *name)
   return NULL;
 }
 
-int QmitkFctMediator::GetFunctionalityIdByName( const char * name ) {
-
+int QmitkFctMediator::GetFunctionalityIdByName( const char * name ) 
+{
   QmitkFunctionality *functionality;
   int id = 0;
 
@@ -309,35 +309,22 @@ void QmitkFctMediator::RaiseFunctionality(int id)
 
   Selecting(id);
   QWidget *oldVisibleWidget, *newVisibleWidget;
-  QSize osize, nsize;
 
-  oldVisibleWidget = m_ControlStack->visibleWidget();
   newVisibleWidget = m_ControlStack->widget(id);
-  if((oldVisibleWidget!=NULL) && (oldVisibleWidget!=newVisibleWidget))
-  {
-    osize=oldVisibleWidget->minimumSizeHint();
-    oldVisibleWidget->setSizePolicy(ignored);
-    newVisibleWidget->setSizePolicy(ignored);
-  }
   m_ControlStack->raiseWidget(newVisibleWidget);
 
-  m_LayoutTemplate->layout()->activate();
-  nsize=newVisibleWidget->minimumSizeHint();
+  if ( newVisibleWidget->minimumWidth() > 0 )
+  {
+    m_ControlStack->resize( newVisibleWidget->minimumSizeHint().width(), m_ControlStack->height() );
+  }
 
-  oldVisibleWidget = m_MainStack->visibleWidget();
   newVisibleWidget = m_MainStack->widget(id+1);
   if(strcmp(newVisibleWidget->name(),"QmitkFctMediator::dummyMain")==0)
     newVisibleWidget = m_MainStack->widget(0);
-  if((oldVisibleWidget!=NULL) && (oldVisibleWidget!=newVisibleWidget))
-  {
-    oldVisibleWidget->setSizePolicy(ignored);
-    newVisibleWidget->setSizePolicy(preferred);
-  }
+  
   m_MainStack->raiseWidget(newVisibleWidget);
 
-  if(m_LayoutTemplate!=NULL)
-    ((QmitkControlsRightFctLayoutTemplate*)m_LayoutTemplate)->setControlSizeHint(&nsize);
-  //    QApplication::sendPostedEvents(0, QEvent::LayoutHint);
+  m_LayoutTemplate->layout()->activate();
 
   FunctionalitySelected(id+1);
 }

@@ -110,60 +110,89 @@ void QmitkSliderLevelWindowWidget::paintEvent( QPaintEvent* itkNotUsed(e) )
     painter.drawText( 21, moveHeight + (int)(lw.GetRangeMin()*fact + 3), s );
 
     int count = 1;
-    for(int i = moveHeight + (int)(lw.GetRangeMin()*fact + 20*fact); i < moveHeight; i+=(int)(20*fact))
+    int k = 5;
+    bool enoughSpace = false;
+    bool enoughSpace2 = false;
+
+    for(int i = moveHeight + (int)(lw.GetRangeMin()*fact + 20*fact); i < moveHeight;)
     {
       s = QString::number(-count*20);
-      if (count % 5 && (((count*20*fact) - (count - 1)*20*fact) > 2.5) )
-        painter.drawLine( 8, moveHeight + (int)(lw.GetRangeMin()*fact + count*20*fact), 12, moveHeight + (int)(lw.GetRangeMin()*fact + count*20*fact));
-      else if (!(count % 5))
+      if (count % k && (((count*20*fact) - (count - 1)*20*fact) > 2.5))
       {
-        if (((count*20*fact) - (count - 5)*20*fact) > 7)
+        painter.drawLine( 8, moveHeight + (int)(lw.GetRangeMin()*fact + count*20*fact), 12, moveHeight + (int)(lw.GetRangeMin()*fact + count*20*fact));
+        enoughSpace = true;
+      }
+      else if (!(count % k))
+      {
+        if (((count*20*fact) - (count - k)*20*fact) > 7)
         {
           painter.drawLine( 5, moveHeight + (int)(lw.GetRangeMin()*fact + count*20*fact), 15, moveHeight + (int)(lw.GetRangeMin()*fact + count*20*fact));
           painter.drawText( 21, moveHeight + (int)(lw.GetRangeMin()*fact + count*20*fact + 3), s );
+          enoughSpace2 = true;
         }
-        else if (!(count % 10) && (((count*20*fact) - (count - 10)*20*fact) > 7) )
+        else
         {
-          painter.drawLine( 5, moveHeight + (int)(lw.GetRangeMin()*fact + count*20*fact), 15, moveHeight + (int)(lw.GetRangeMin()*fact + count*20*fact));
-          painter.drawText( 21, moveHeight + (int)(lw.GetRangeMin()*fact + count*20*fact + 3), s );
-        }
-        else if (!(count % 30))
-        {
-          painter.drawLine( 5, moveHeight + (int)(lw.GetRangeMin()*fact + count*20*fact), 15, moveHeight + (int)(lw.GetRangeMin()*fact + count*20*fact));
-          painter.drawText( 21, moveHeight + (int)(lw.GetRangeMin()*fact + count*20*fact + 3), s );
+          k += 5;
         }
       }
-      i=moveHeight + (int)(lw.GetRangeMin()*fact + count*20*fact);
-      count++;
+      if (enoughSpace)
+      {
+        i=moveHeight + (int)(lw.GetRangeMin()*fact + count*20*fact);
+        count++;
+      }
+      else if (enoughSpace2)
+      {
+        i=moveHeight + (int)(lw.GetRangeMin()*fact + count*20*fact);
+        count += k;
+      }
+      else
+      {
+        i=moveHeight + (int)(lw.GetRangeMin()*fact + count*20*fact);
+        count = k;
+      }
     }
 
     count = 1;
+    k = 5;
+    enoughSpace = false;
+    enoughSpace2 = false;
 
-    for(int i = moveHeight + (int)(lw.GetRangeMin()*fact); i >= 0; i-=(int)(20*fact))
+    for(int i = moveHeight + (int)(lw.GetRangeMin()*fact); i >= 0;)
     {
       s = QString::number(count*20);
-      if(count % 5 && (((count*20*fact) - (count - 1)*20*fact) > 2.5))
-        painter.drawLine( 8, moveHeight + (int)(lw.GetRangeMin()*fact - count*20*fact), 12, moveHeight + (int)(lw.GetRangeMin()*fact - count*20*fact));
-      else if (!(count % 5))
+      if(count % k && (((count*20*fact) - (count - 1)*20*fact) > 2.5))
       {
-        if (((count*20*fact) - (count - 5)*20*fact) > 7)
+        painter.drawLine( 8, moveHeight + (int)(lw.GetRangeMin()*fact - count*20*fact), 12, moveHeight + (int)(lw.GetRangeMin()*fact - count*20*fact));
+        enoughSpace = true;
+      }
+      else if (!(count % k))
+      {
+        if (((count*20*fact) - (count - k)*20*fact) > 7)
         {
           painter.drawLine( 5, moveHeight + (int)(lw.GetRangeMin()*fact - count*20*fact), 15, moveHeight + (int)(lw.GetRangeMin()*fact - count*20*fact));
           painter.drawText( 21, moveHeight + (int)(lw.GetRangeMin()*fact - count*20*fact + 3), s );
+          enoughSpace2 = true;
         }
-        else if (!(count % 10) && (((count*20*fact) - (count - 10)*20*fact) > 7))
+        else
         {
-          painter.drawLine( 5, moveHeight + (int)(lw.GetRangeMin()*fact - count*20*fact), 15, moveHeight + (int)(lw.GetRangeMin()*fact - count*20*fact));
-          painter.drawText( 21, moveHeight + (int)(lw.GetRangeMin()*fact - count*20*fact + 3), s );
-        }
-        else if (!(count % 30))
-        {
-          painter.drawLine( 5, moveHeight + (int)(lw.GetRangeMin()*fact - count*20*fact), 15, moveHeight + (int)(lw.GetRangeMin()*fact - count*20*fact));
-          painter.drawText( 21, moveHeight + (int)(lw.GetRangeMin()*fact - count*20*fact + 3), s );
+          k += 5;
         }
       }
-      i=moveHeight + (int)(lw.GetRangeMin()*fact - count*20*fact);
-      count++;
+      if (enoughSpace)
+      {
+        i=moveHeight + (int)(lw.GetRangeMin()*fact - count*20*fact);
+        count++;
+      }
+      else if (enoughSpace2)
+      {
+        i=moveHeight + (int)(lw.GetRangeMin()*fact - count*20*fact);
+        count += k;
+      }
+      else
+      {
+        i=moveHeight + (int)(lw.GetRangeMin()*fact - count*20*fact);
+        count = k;
+      }
     }
   }
   //end draw scale
@@ -523,8 +552,6 @@ void QmitkSliderLevelWindowWidget::showScale()
 
 void QmitkSliderLevelWindowWidget::setDefaultScaleRange()
 {
-  //lw.SetRangeMin(lw.GetDefaultRangeMin());
-  //lw.SetRangeMax(lw.GetDefaultRangeMax());
   lw.SetRangeMinMax(lw.GetDefaultRangeMin(), lw.GetDefaultRangeMax());
   lw.SetLevelWindow(lw.GetLevel(), lw.GetWindow());
   update();

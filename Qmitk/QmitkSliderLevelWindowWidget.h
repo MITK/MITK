@@ -161,8 +161,6 @@ public:
   void update( ipPicDescriptor* pic );
   void update( );
   void updateFromLineEdit();
-  QString GetWindow();
-  QString GetLevel();
 
 signals:
 

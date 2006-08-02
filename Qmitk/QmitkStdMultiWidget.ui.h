@@ -735,6 +735,7 @@ void QmitkStdMultiWidget::changeLevelWindow(mitk::LevelWindow* lw)
       lw->SetDefaultRangeMinMax(levWin.GetDefaultRangeMin(), levWin.GetDefaultRangeMax());
       lw->SetDefaultLevelWindow(levWin.GetDefaultLevel(), levWin.GetDefaultWindow());
       m_PrevTopLevWinProp = topLevWinProp;
+      levelWindowWidget->SliderRepaint();
     }
 
     topLevWinProp->SetLevelWindow(levWin);

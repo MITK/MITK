@@ -21,9 +21,13 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "QmitkBaseFunctionalityComponent.h"
 
+#include "mitkDataTree.h"
 #include <qaction.h>
 #include <qwidget.h>
 #include <qwidgetstack.h>
+#include "mitkDataTree.h"
+
+class QmitkFunctionalityComponentContainerGUI;
 
 /**
  * \brief ContainerClass for components 
@@ -50,8 +54,7 @@ class QmitkFunctionalityComponentContainer : public QmitkBaseFunctionalityCompon
   public:
 
      /** \brief Constructor. */
-    QmitkFunctionalityComponentContainer( );
-
+    QmitkFunctionalityComponentContainer(QObject *parent=0, const char *name=0, mitk::DataTreeIteratorBase* dataIt = NULL);
      /** \brief Destructor. */
     ~QmitkFunctionalityComponentContainer();
 
@@ -59,18 +62,23 @@ class QmitkFunctionalityComponentContainer : public QmitkBaseFunctionalityCompon
     virtual QString GetFunctionalityName();
     void SetFunctionalityName(QString name);
     virtual QAction * CreateAction(QActionGroup* m_FunctionalityComponentActionGroup);
-    virtual QWidget * CreateMainWidget(QWidgetStack* m_MainStack);
-    virtual QWidget * CreateControlWidget(QWidgetStack* m_ControlStack);
     virtual void CreateConnections();
     virtual QString GetFunctionalityComponentName();
+    void QmitkFunctionalityComponentContainer::SetFunctionalityName(QString* name);
     virtual void Activated();
-    void CreateSelector();
+    void CreateSelector(QWidget* parent);
 
 
-
+protected slots:  
+  void TreeChanged();
+  /*
+   * just an example slot for the example TreeNodeSelector widget
+   */
+  void ImageSelected(mitk::DataTreeIteratorClone imageIt);
 
   protected:
     QString m_Name;
+    QmitkFunctionalityComponentContainerGUI * m_GUI;
 
   private:
 

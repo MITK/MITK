@@ -82,10 +82,10 @@ void QmitkSliderLevelWindowWidget::paintEvent( QPaintEvent* itkNotUsed(e) )
   painter.drawRect(rect);
   
   // test if slider range has changed, if true -> refresh validator for line edits
-  if (!(m_lowerLimit == lw.GetMin() && m_upperLimit == lw.GetMax()))
+  if (!(m_lowerLimit == lw.GetRangeMin() && m_upperLimit == lw.GetRangeMax()))
   {
-    m_lowerLimit = lw.GetMin();
-    m_upperLimit = lw.GetMax();
+    m_lowerLimit = lw.GetRangeMin();
+    m_upperLimit = lw.GetRangeMax();
     emit newRange(&lw);
   } // end test if slider range has changed
 
@@ -551,14 +551,12 @@ void QmitkSliderLevelWindowWidget::hideScale()
 {
   scale = FALSE;
   update();
-  emit levelWindow( &lw );
 }
 
 void QmitkSliderLevelWindowWidget::showScale()
 {
   scale = TRUE;
   update();
-  emit levelWindow( &lw );
 }
 
 void QmitkSliderLevelWindowWidget::setDefaultScaleRange()

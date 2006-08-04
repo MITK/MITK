@@ -211,7 +211,6 @@
     <slot>EnableSliceRotation( bool on )</slot>
     <slot>EnableGradientBackground()</slot>
     <slot>DisableGradientBackground()</slot>
-    <slot>TreeChanged(const itk::EventObject &amp; treeChangedEvent)</slot>
 </slots>
 <functions>
     <function access="private" specifier="non virtual">init()</function>

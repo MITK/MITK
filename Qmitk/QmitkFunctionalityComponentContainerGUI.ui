@@ -136,6 +136,6 @@
 </slots>
 <layoutdefaults spacing="6" margin="11"/>
 <includehints>
-    <includehint>qmitktreenodeselector.h</includehint>
+    <includehint>QmitkTreeNodeSelector.h</includehint>
 </includehints>
 </UI>

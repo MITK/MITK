@@ -15,7 +15,7 @@
     <property name="minimumSize">
         <size>
             <width>21</width>
-            <height>226</height>
+            <height>255</height>
         </size>
     </property>
     <property name="caption">
@@ -40,6 +40,11 @@
     <item text="&amp;Edit" name="editMenu">
         <action name="editUndoAction"/>
         <action name="editRedoAction"/>
+    </item>
+    <item text="&amp;View" name="View">
+        <action name="viewShowPlanesAction"/>
+        <action name="viewLockPlanesAction"/>
+        <action name="viewLockSliceRotationAction"/>
     </item>
     <item text="&amp;Options" name="Options">
         <action name="optionsSlicesRotationAction"/>
@@ -72,20 +77,14 @@
             <property name="name">
                 <cstring>redoButton</cstring>
             </property>
+             <property name="mode"> 	 
+                 <enum>Redo</enum> 	 
+             </property>
         </widget>
         <action name="Fullscreen"/>
+        <action name="toolbarShowPlanes"/>
+        <action name="toolbarPlanesLocked"/>
         <separator/>
-        <widget class="QCheckBox">
-            <property name="name">
-                <cstring>ShowPlanesCheckBox</cstring>
-            </property>
-            <property name="text">
-                <string>Show Planes</string>
-            </property>
-            <property name="checked">
-                <bool>true</bool>
-            </property>
-        </widget>
         <action name="layoutGroup"/>
     </toolbar>
 </toolbars>
@@ -374,6 +373,43 @@
     </action>
     <action>
         <property name="name">
+            <cstring>toolbarShowPlanes</cstring>
+        </property>
+        <property name="toggleAction">
+            <bool>true</bool>
+        </property>
+        <property name="on">
+            <bool>false</bool>
+        </property>
+        <property name="iconSet">
+            <iconset>image4</iconset>
+        </property>
+        <property name="text">
+            <string>Hide Planes</string>
+        </property>
+        <property name="menuText">
+            <string>Hide Planes</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>toolbarPlanesLocked</cstring>
+        </property>
+        <property name="toggleAction">
+            <bool>true</bool>
+        </property>
+        <property name="iconSet">
+            <iconset>image5</iconset>
+        </property>
+        <property name="text">
+            <string>Lock Planes</string>
+        </property>
+        <property name="menuText">
+            <string>Lock Planes</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
             <cstring>viewHideAction</cstring>
         </property>
         <property name="text">
@@ -439,7 +475,7 @@
             <bool>false</bool>
         </property>
         <property name="text">
-            <string>Rotate slices</string>
+            <string>&amp;Rotate slices</string>
         </property>
         <property name="menuText">
             <string>&amp;Rotate slices</string>
@@ -546,6 +582,54 @@
             <string>Ctrl+P</string>
         </property>
     </action>
+    <action>
+        <property name="name">
+            <cstring>viewShowPlanesAction</cstring>
+        </property>
+        <property name="toggleAction">
+            <bool>true</bool>
+        </property>
+        <property name="on">
+            <bool>false</bool>
+        </property>
+        <property name="text">
+            <string>Hide Planes</string>
+        </property>
+        <property name="menuText">
+            <string>Hide Planes</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>viewLockPlanesAction</cstring>
+        </property>
+        <property name="toggleAction">
+            <bool>true</bool>
+        </property>
+        <property name="text">
+            <string>Lock Planes</string>
+        </property>
+        <property name="menuText">
+            <string>Lock Planes</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>viewLockSliceRotationAction</cstring>
+        </property>
+        <property name="toggleAction">
+            <bool>true</bool>
+        </property>
+        <property name="on">
+            <bool>false</bool>
+        </property>
+        <property name="text">
+            <string>Lock Slice Rotation</string>
+        </property>
+        <property name="menuText">
+            <string>Lock Slice Rotation</string>
+        </property>
+    </action>
 </actions>
 <images>
     <image name="image0">
@@ -559,6 +643,12 @@
     </image>
     <image name="image3">
         <data format="PNG" length="106">89504e470d0a1a0a0000000d49484452000000100000000d0806000000a0bbee240000003149444154789c63646060f8cf400160a24433550c6041e61c3b768c91184d565656706f0fbc17460d6060606418f2291100e23a0619d3e2d9940000000049454e44ae426082</data>
+    </image>
+    <image name="image4">
+        <data format="PNG" length="146">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b0000005949444154789c633c76ec18032d00134d4c25c560274babff4e9656ffa96e30a960d4e0216c300b8c61e9843f29eddb778c911875c7a1ea68e6624662b3342c73ec3b0e71112130f4226fd4e051833101d1198454403317030006ec1681419c4e9f0000000049454e44ae426082</data>
+    </image>
+    <image name="image5">
+        <data format="PNG" length="243">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b000000ba49444154789ce594b10ec3200c44cf55867c512518f9f08c46caf754ea928a0e29c54a01d951987a124b0ccf877584981923741b42b58083f329389f2e075b350c3c590fb87b19475c995afb4c8e9fafdf26ded7e7ae0667284d650140da801a9c3439ced7cf30e632025993dfbf60173a517a14b769eed7e2b2c3c7a72277aac94124e1b0af5533c52d6d00a07b7de61c9338b137aaeb0f9e74effa522ac77165922faeb68e523b9e3f5958623b9666c767a4fa579cd130c76f4cd442a371c4529a0000000049454e44ae426082</data>
     </image>
 </images>
 <connections>
@@ -641,12 +731,6 @@
         <slot>FullScreenMode(bool)</slot>
     </connection>
     <connection>
-        <sender>ShowPlanesCheckBox</sender>
-        <signal>clicked()</signal>
-        <receiver>QmitkMainTemplate</receiver>
-        <slot>ShowPlanesCheckBox_clicked()</slot>
-    </connection>
-    <connection>
         <sender>ColumnWidget3n4</sender>
         <signal>activated()</signal>
         <receiver>QmitkMainTemplate</receiver>
@@ -718,6 +802,36 @@
         <receiver>QmitkMainTemplate</receiver>
         <slot>optionsShow_OptionsAction_activated()</slot>
     </connection>
+    <connection>
+        <sender>viewLockPlanesAction</sender>
+        <signal>toggled(bool)</signal>
+        <receiver>QmitkMainTemplate</receiver>
+        <slot>viewPlanesLocked_toggled(bool)</slot>
+    </connection>
+    <connection>
+        <sender>viewLockSliceRotationAction</sender>
+        <signal>toggled(bool)</signal>
+        <receiver>QmitkMainTemplate</receiver>
+        <slot>viewPlaneSliceRotationLocked_toggled(bool)</slot>
+    </connection>
+    <connection>
+        <sender>viewShowPlanesAction</sender>
+        <signal>toggled(bool)</signal>
+        <receiver>QmitkMainTemplate</receiver>
+        <slot>viewShowPlanesAction_toggled(bool)</slot>
+    </connection>
+    <connection>
+        <sender>toolbarShowPlanes</sender>
+        <signal>toggled(bool)</signal>
+        <receiver>QmitkMainTemplate</receiver>
+        <slot>viewShowPlanesAction_toggled(bool)</slot>
+    </connection>
+    <connection>
+        <sender>toolbarPlanesLocked</sender>
+        <signal>toggled(bool)</signal>
+        <receiver>QmitkMainTemplate</receiver>
+        <slot>viewPlanesLocked_toggled(bool)</slot>
+    </connection>
 </connections>
 <includes>
     <include location="global" impldecl="in declaration">mitkDataTreeNodeFactory.h</include>
@@ -777,7 +891,6 @@
     <slot>changeToWidget2Layout()</slot>
     <slot>changeToWidget3Layout()</slot>
     <slot>FullScreenMode( bool fullscreen )</slot>
-    <slot>ShowPlanesCheckBox_clicked()</slot>
     <slot>changeToColumnWidget3n4Layout()</slot>
     <slot>changeToRowWidget3n4Layout()</slot>
     <slot>hideToolbar( bool on )</slot>
@@ -789,6 +902,9 @@
     <slot>optionsReinitMultiWidget()</slot>
     <slot>helpContents()</slot>
     <slot>optionsShow_OptionsAction_activated()</slot>
+    <slot>viewPlaneSliceRotationLocked_toggled( bool on )</slot>
+    <slot>viewPlanesLocked_toggled( bool on )</slot>
+    <slot>viewShowPlanesAction_toggled( bool on )</slot>
 </slots>
 <functions>
     <function>fileOpen( const char * fileName )</function>
@@ -809,7 +925,6 @@
     <function access="protected">SaveOptionsToFile( const char * filename )</function>
     <function access="protected">LoadOptionsFromFile( const char * filename )</function>
     <function>InitializeQfcm()</function>
-    <function>InitializeFunctionalityComponent()</function>
 </functions>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

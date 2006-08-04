@@ -68,15 +68,11 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <mitkLevelWindow.h>
 #include <mitkDataTree.h>
-#include <qregexp.h>
 #include <string>
 
 #include <mitkStringProperty.h>
-#include <qstring.h>
-#include <qgrid.h>
 #include <mitkMapClassIDToClassName.h>
 #include <QmitkStringPropertyEditor.h>
-#include <qmetaobject.h>
 #include "mitkImageTimeSelector.h"
 #include "mitkImageChannelSelector.h"
 
@@ -88,6 +84,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkGlobalInteraction.h>
 #include <mitkConfig.h>
 
+#include <mitkSliceNavigationController.h>
+
 #include <mitkParRecFileReader.h>
 #include <mitkInteractionConst.h>
 #include <QmitkStatusBar.h>
@@ -96,6 +94,12 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qlistbox.h>
 #include <qwidgetstack.h>
 #include <qlabel.h>
+#include <qmetaobject.h>
+#include <qregexp.h>
+#include <qstring.h>
+#include <qgrid.h>
+#include <qpixmap.h>
+#include <qiconset.h>
 
 #include <ipPicTypeMultiplex.h>
 #include <mitkDataTreeHelper.h>
@@ -579,7 +583,6 @@ void QmitkMainTemplate::Initialize()
     m_MultiWidget->EnableStandardLevelWindow();
   }
   InitializeFunctionality();
-  InitializeFunctionalityComponent();
 
 
   // Add MoveAndZoomInteractor and widget NavigationControllers as
@@ -695,11 +698,6 @@ void QmitkMainTemplate::FullScreenMode(bool fullscreen)
     showNormal();
 }
 
-void QmitkMainTemplate::ShowPlanesCheckBox_clicked()
-{
-  emit ShowWidgetPlanesToggled( ShowPlanesCheckBox->isOn() );
-}
-
 void QmitkMainTemplate::destroy()
 {
   SaveOptionsToFile("MITKOptions.xml");
@@ -782,6 +780,8 @@ void QmitkMainTemplate::editRedo()
 void QmitkMainTemplate::optionsSlicesRotation(bool on)
 {
   m_MultiWidget->EnableSliceRotation(on);
+  // enable posibilty to lock rotation in a desired position
+  viewLockSliceRotationAction->setEnabled ( on );
 }
 
 void QmitkMainTemplate::optionsReinitMultiWidget()
@@ -962,7 +962,6 @@ void QmitkMainTemplate::LoadOptionsFromFile(const char* filename)
 }
 
 
-
 void QmitkMainTemplate::InitializeQfcm()
 {
   //create an QmitkFctCompMediator. This is an invisible object that controls, manages and mediates functionalities
@@ -973,7 +972,70 @@ void QmitkMainTemplate::InitializeQfcm()
 }
 
 
-void QmitkMainTemplate::InitializeFunctionalityComponent()
+
+void QmitkMainTemplate::viewPlaneSliceRotationLocked_toggled( bool on)
+{ 
+    
+  m_MultiWidget->GetRenderWindow1()->GetSliceNavigationController()->SetSliceRotationLocked(on);
+  m_MultiWidget->GetRenderWindow2()->GetSliceNavigationController()->SetSliceRotationLocked(on);
+  m_MultiWidget->GetRenderWindow3()->GetSliceNavigationController()->SetSliceRotationLocked(on);
+}
+
+
+void QmitkMainTemplate::viewPlanesLocked_toggled( bool on)
 {
+  if( on)
+  {
+    // enable the slice rotion locking in view menu
+    if( optionsSlicesRotationAction->isOn() )
+    {
+      // add possiblity to lock slice rotation separatly
+      viewLockSliceRotationAction->setEnabled ( on );
+    }
+  }
+  else
+  {
+    //unset slice roation
+    viewLockSliceRotationAction->setOn( on );
+    viewLockSliceRotationAction->setEnabled ( on );
+  }  
+
+  // sign significant places in menu->view and the toolbar
+  viewLockPlanesAction->setOn( on );
+  toolbarPlanesLocked->setOn( on );
+
+  
+  //do your job and lock or unlock slices.
+  m_MultiWidget->GetRenderWindow1()->GetSliceNavigationController()->SetSliceLocked(on);
+  m_MultiWidget->GetRenderWindow2()->GetSliceNavigationController()->SetSliceLocked(on);
+  m_MultiWidget->GetRenderWindow3()->GetSliceNavigationController()->SetSliceLocked(on);
+}
+
+
+void QmitkMainTemplate::viewShowPlanesAction_toggled( bool on )
+{
+  if( !on )
+  {
+    //toolbarShowPlanes->setIconSet(image4);
+    toolbarShowPlanes->setText("Hide Planes");
+    toolbarShowPlanes->setMenuText("Hide Planes");
+    toolbarShowPlanes->setToolTip("Hide Planes"); 
+    
+    emit ShowWidgetPlanesToggled(true);
+  }
+  else    
+  {
+    //toolbarShowPlanes->setIconSet(image5);
+    toolbarShowPlanes->setText("Show Planes");
+    toolbarShowPlanes->setMenuText("Show Planes");
+    toolbarShowPlanes->setToolTip("Show Planes"); 
+    
+    emit ShowWidgetPlanesToggled(false);
+  }
+
+  // sign significant places in menu->view and the toolbar
+  toolbarShowPlanes->setOn( on );
+  viewShowPlanesAction->setOn( on );
 
 }
+

@@ -25,14 +25,14 @@ PURPOSE.  See the above copyright notices for more information.
 ** init() function in place of a constructor, and a destroy() function in
 ** place of a destructor.
 *****************************************************************************/
-#include "mitkProperties.h"
-#include "mitkStringProperty.h"
-#include "mitkLevelWindowProperty.h"
-#include "mitkGeometry2DDataMapper2D.h"
-#include "mitkOpenGLRenderer.h"
-#include "mitkPositionEvent.h"
-#include "mitkInteractionConst.h"
-#include "mitkGlobalInteraction.h"
+#include <mitkProperties.h>
+#include <mitkStringProperty.h>
+#include <mitkLevelWindowProperty.h>
+#include <mitkGeometry2DDataMapper2D.h>
+#include <mitkOpenGLRenderer.h>
+#include <mitkPositionEvent.h>
+#include <mitkInteractionConst.h>
+#include <mitkGlobalInteraction.h>
 
 #include <vtkRenderer.h>
 #include <vtkRenderWindow.h>

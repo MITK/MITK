@@ -21,6 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qaction.h>
 #include "icon.xpm"
 #include "QmitkTreeNodeSelector.h"
+#include "QmitkStdMultiWidget.h"
 
 @FUNCTIONALITY_NAME@::@FUNCTIONALITY_NAME@(QObject *parent, const char *name, QmitkStdMultiWidget *mitkStdMultiWidget, mitk::DataTreeIteratorBase* it)
     : QmitkFunctionality(parent, name, it), m_MultiWidget(mitkStdMultiWidget), m_Controls(NULL)

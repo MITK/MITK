@@ -23,7 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkTreeNodeSelector.h"
 
 @FUNCTIONALITY_NAME@::@FUNCTIONALITY_NAME@(QObject *parent, const char *name, QmitkStdMultiWidget *mitkStdMultiWidget, mitk::DataTreeIteratorBase* it)
-    : QmitkFunctionality(parent, name, it) ,m_Controls(NULL), m_MultiWidget(mitkStdMultiWidget)
+    : QmitkFunctionality(parent, name, it), m_MultiWidget(mitkStdMultiWidget), m_Controls(NULL)
 {
   SetAvailability(true);
 }
@@ -33,7 +33,11 @@ PURPOSE.  See the above copyright notices for more information.
 
 QWidget * @FUNCTIONALITY_NAME@::CreateMainWidget(QWidget *parent)
 {
-  return NULL;
+  if ( m_MultiWidget == NULL )
+  {
+    m_MultiWidget = new QmitkStdMultiWidget( parent );
+  }
+  return m_MultiWidget;
 }
 
 QWidget * @FUNCTIONALITY_NAME@::CreateControlWidget(QWidget *parent)

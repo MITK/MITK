@@ -480,7 +480,8 @@ mitk::SliceNavigationController* QmitkStdMultiWidget::GetTimeNavigationControlle
 void QmitkStdMultiWidget::EnableStandardLevelWindow()
 {
   levelWindowWidget->disconnect(this);
-  connect(levelWindowWidget,SIGNAL(levelWindow(mitk::LevelWindow*)),this,SLOT(changeLevelWindow(mitk::LevelWindow*)) );
+  //connect(levelWindowWidget,SIGNAL(levelWindow(mitk::LevelWindow*)),this,SLOT(changeLevelWindow(mitk::LevelWindow*)) );
+  connect(levelWindowWidget,SIGNAL(changeLevelWindow(mitk::LevelWindow*, mitk::DataTreeIteratorClone *)),this,SLOT(changeLevelWindow2(mitk::LevelWindow*, mitk::DataTreeIteratorClone *)) );
   levelWindowWidget->show();
 }
 
@@ -743,6 +744,38 @@ void QmitkStdMultiWidget::changeLevelWindow(mitk::LevelWindow* lw)
   }
 } // changeLevelWindow()
 
+void QmitkStdMultiWidget::changeLevelWindow2(mitk::LevelWindow* lw, mitk::DataTreeIteratorClone * iter)
+{
+  if (!iter==NULL)
+  {
+    mitk::LevelWindowProperty::Pointer levWinProp = dynamic_cast<mitk::LevelWindowProperty*>((*iter)->Get()->GetProperty("levelwindow").GetPointer());
+    if ( levWinProp.IsNotNull() )
+    {
+      mitk::LevelWindow levWin = levWinProp->GetLevelWindow();
+    
+      if (m_PrevTopLevWinProp == levWinProp) //if image does not change: store level/window and range values and default values
+      {
+        levWin.SetRangeMinMax(lw->GetRangeMin(), lw->GetRangeMax());
+        levWin.SetMinMax(lw->GetMin(), lw->GetMax());
+        levWin.SetDefaultRangeMinMax(lw->GetDefaultRangeMin(), lw->GetDefaultRangeMax());
+        levWin.SetDefaultLevelWindow(lw->GetDefaultLevel(), lw->GetDefaultWindow());
+      }
+      else //if image changes: set level/window and range values and default values for new image
+      {
+        lw->SetRangeMinMax(levWin.GetRangeMin(), levWin.GetRangeMax());
+        lw->SetMinMax(levWin.GetMin(), levWin.GetMax());
+        lw->SetDefaultRangeMinMax(levWin.GetDefaultRangeMin(), levWin.GetDefaultRangeMax());
+        lw->SetDefaultLevelWindow(levWin.GetDefaultLevel(), levWin.GetDefaultWindow());
+        m_PrevTopLevWinProp = levWinProp;
+        levelWindowWidget->SliderRepaint();
+      }
+
+      levWinProp->SetLevelWindow(levWin);
+      this->RequestUpdate();
+    }
+  }
+} // changeLevelWindow2()
+
 const mitk::Point3D & QmitkStdMultiWidget::GetCrossPosition() const
 {
   return m_LastLeftClickPositionSupplier->GetCurrentPoint();
@@ -899,3 +932,11 @@ void QmitkStdMultiWidget::DisableGradientBackground()
   m_GradientBackground3->Disable();
   m_GradientBackground4->Disable();
 }
+
+
+void QmitkStdMultiWidget::newImage()
+{
+  mitk::DataTreeIteratorClone it = mitkWidget1->GetRenderer()->GetData();
+  levelWindowWidget->setDataTreeIteratorClone(it);
+}
+

@@ -203,6 +203,7 @@
     <slot>wheelEvent( QWheelEvent * e )</slot>
     <slot>ReInitializeStandardViews()</slot>
     <slot>changeLevelWindow( mitk::LevelWindow * lw )</slot>
+    <slot>changeLevelWindow2( mitk::LevelWindow * lw, mitk::DataTreeIteratorClone * iter )</slot>
     <slot>EnsureDisplayContainsPoint( mitk::DisplayGeometry * displayGeometry, const mitk::Point3D &amp; p )</slot>
     <slot>MoveCrossToPosition( const mitk::Point3D &amp; newPosition )</slot>
     <slot>EnableNavigationControllerEventListening()</slot>
@@ -210,6 +211,7 @@
     <slot>EnableSliceRotation( bool on )</slot>
     <slot>EnableGradientBackground()</slot>
     <slot>DisableGradientBackground()</slot>
+    <slot>TreeChanged(const itk::EventObject &amp; treeChangedEvent)</slot>
 </slots>
 <functions>
     <function access="private" specifier="non virtual">init()</function>
@@ -223,6 +225,7 @@
     <function returnType="QmitkRenderWindow *">GetRenderWindow4() const</function>
     <function returnType="const mitk::Point3D &amp;">GetCrossPosition() const</function>
     <function returnType="int">GetLayout() const</function>
+    <function>newImage()</function>
 </functions>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

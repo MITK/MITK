@@ -19,6 +19,7 @@
 //for constructor
 void QmitkLevelWindowWidget::init()
 {
+  m_Iter = NULL;
   slw = &(SliderLevelWindowWidget->getLevelWindow());
   
   m_Level = (int)slw->GetLevel();//initial
@@ -39,6 +40,7 @@ void QmitkLevelWindowWidget::init()
 
   connect(SliderLevelWindowWidget,SIGNAL(levelWindow(mitk::LevelWindow*)),this,SLOT(levelWindowSliderChanged(mitk::LevelWindow*)) );
   connect(SliderLevelWindowWidget, SIGNAL(newRange(mitk::LevelWindow*)), this, SLOT(rangeChanged(mitk::LevelWindow*)) );
+  connect(SliderLevelWindowWidget, SIGNAL(changeLevelWindow(mitk::DataTreeIteratorClone *)), this, SLOT(changeLevelWindow(mitk::DataTreeIteratorClone * )) );
 
   //Validator for both LineEdit-widgets, to limit the valid input-range to int.
   QValidator* validatorWindowInput = new QIntValidator(1, 4096, this);
@@ -89,7 +91,8 @@ void QmitkLevelWindowWidget::validWindow()
   LevelInput->setText(stringMLevel);
 
   //send signal to change Slider
-  emit levelWindow( & getLevelWindow() );
+  //emit levelWindow( & getLevelWindow() );
+  emit changeLevelWindow( & getLevelWindow(), m_Iter);
 } 
 
 //repaint slider after a value was changed
@@ -117,7 +120,8 @@ mitk::LevelWindow& QmitkLevelWindowWidget::getLevelWindow()
 //is called up when the slider was changed
 void QmitkLevelWindowWidget::levelWindowSliderChanged( mitk::LevelWindow * slw )
 {
-  emit levelWindow(slw);
+  //emit levelWindow(slw);
+  emit changeLevelWindow( slw, m_Iter);
 
   QString l;
   int lint = (int)getLevelWindow().GetLevel();
@@ -138,7 +142,6 @@ void QmitkLevelWindowWidget::destroy()
 
 }
 
-
 void QmitkLevelWindowWidget::rangeChanged( mitk::LevelWindow *lw )
 {
   //Validator for both LineEdit-widgets, to limit the valid input-range to int.
@@ -147,4 +150,21 @@ void QmitkLevelWindowWidget::rangeChanged( mitk::LevelWindow *lw )
 
   QValidator* validatorLevelInput = new QIntValidator((int)(lw->GetRangeMin()), (int)(lw->GetRangeMax()), this);
   LevelInput->setValidator(validatorLevelInput);
+}
+
+void QmitkLevelWindowWidget::setDataTreeIteratorClone( mitk::DataTreeIteratorClone &it )
+{
+  SliderLevelWindowWidget->setDataTreeIteratorClone(it);
+}
+
+void QmitkLevelWindowWidget::changeLevelWindow( mitk::DataTreeIteratorClone * iter )
+{
+  m_Iter = iter;
+  emit changeLevelWindow( & getLevelWindow(), m_Iter);
+}
+
+
+void QmitkLevelWindowWidget::setNode( mitk::DataTreeNode * node )
+{
+  SliderLevelWindowWidget->setNode(node);
 }

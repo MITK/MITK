@@ -30,6 +30,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qlineedit.h>
 #include <qtooltip.h>
 #include <qpixmap.h>
+#include "mitkDataTreeNode.h"
+#include "QmitkCommonFunctionality.h"
 
 /**
 * Constructor
@@ -37,6 +39,8 @@ PURPOSE.  See the above copyright notices for more information.
 QmitkSliderLevelWindowWidget::QmitkSliderLevelWindowWidget( QWidget * parent, const char * name, WFlags f )
 : QWidget( parent, name, f ), mouseDown(false), brush( QBrush::SolidPattern ), lw(), pre()
 {
+  m_FilterFunction = QmitkSliderLevelWindowWidget::IsImageNode;
+  m_It = NULL;
   pre.LoadPreset();
   setMouseTracking(TRUE);
   resize = FALSE;
@@ -82,6 +86,7 @@ void QmitkSliderLevelWindowWidget::paintEvent( QPaintEvent* itkNotUsed(e) )
   painter.drawRect(rect);
   
   // test if slider range has changed, if true -> refresh validator for line edits
+
   if (!(m_lowerLimit == lw.GetRangeMin() && m_upperLimit == lw.GetRangeMax()))
   {
     m_lowerLimit = lw.GetRangeMin();
@@ -159,7 +164,7 @@ void QmitkSliderLevelWindowWidget::paintEvent( QPaintEvent* itkNotUsed(e) )
     enoughSpace = false;
     enoughSpace2 = false;
 
-    for(int i = moveHeight + minRange*fact; i >= 0;)
+    for(int i = moveHeight + (int)(minRange*fact); i >= 0;)
     {
       if (count*20 > maxRange)
         break;
@@ -485,6 +490,20 @@ void QmitkSliderLevelWindowWidget::contextMenuEvent( QContextMenuEvent * )
   connect(presetSubmenu, SIGNAL(activated(int)), this, SLOT(setPreset(int)));
   contextMenu->insertItem( "Presets",  presetSubmenu );
 
+  contextMenu->insertSeparator();
+  updateContent();
+  imageSubmenu = new QPopupMenu( this );
+  imageSubmenu->setCheckable(TRUE);
+  Q_CHECK_PTR( imageSubmenu );
+  for( std::map<std::string, mitk::DataTreeIteratorClone>::iterator iter = m_TreeNodes.begin(); iter != m_TreeNodes.end(); iter++ ) {
+    QString item = ((*iter).first).c_str();
+    int id = imageSubmenu->insertItem(item);
+    if (item == m_SelectedImage)
+      imageSubmenu->setItemChecked(id, true);
+  }
+  connect(imageSubmenu, SIGNAL(activated(int)), this, SLOT(setImage(int)));
+  contextMenu->insertItem( "Images",  imageSubmenu );
+
   contextMenu->exec( QCursor::pos() );
   delete contextMenu;
 }
@@ -579,4 +598,66 @@ void QmitkSliderLevelWindowWidget::changeScaleRange()
   }
   update();
   emit levelWindow( &lw );
+}
+
+void QmitkSliderLevelWindowWidget::setDataTreeIteratorClone(mitk::DataTreeIteratorClone &it)
+{
+  m_It = it;
+}
+
+void QmitkSliderLevelWindowWidget::updateContent()
+{
+  // iteriere ueber Baum und wende filter funktion an
+  CommonFunctionality::DataTreeIteratorVector images = CommonFunctionality::FilterNodes(m_It,m_FilterFunction);
+  m_TreeNodes.clear();
+ 
+  for (CommonFunctionality::DataTreeIteratorVector::iterator it = images.begin(); it != images.end() ; it++ )
+  {
+    std::string name;
+    if ((*it)->Get()->GetName(name))
+    {
+      while ( m_TreeNodes.find(name) != m_TreeNodes.end())
+      {
+        name += ' ';
+      }
+      
+      m_TreeNodes[name] = *it;
+    }
+  }
+}
+
+bool QmitkSliderLevelWindowWidget::IsImageNode( mitk::DataTreeNode * node )
+{
+  return node && node->GetData() && dynamic_cast<mitk::Image*>(node->GetData());
+}
+
+void QmitkSliderLevelWindowWidget::setImage(int id)
+{
+  m_SelectedImage = imageSubmenu->text(id);
+  emit changeLevelWindow(&m_TreeNodes.find(m_SelectedImage.ascii())->second);
+}
+
+void QmitkSliderLevelWindowWidget::setNode( mitk::DataTreeNode * node )
+{
+  // iteriere ueber Baum und wende filter funktion an
+  CommonFunctionality::DataTreeIteratorVector images = CommonFunctionality::FilterNodes(m_It,m_FilterFunction);
+  m_TreeNodes.clear();
+ 
+  for (CommonFunctionality::DataTreeIteratorVector::iterator it = images.begin(); it != images.end() ; it++ )
+  {
+    std::string name;
+    if ((*it)->Get()->GetName(name))
+    {
+      while ( m_TreeNodes.find(name) != m_TreeNodes.end())
+      {
+        name += ' ';
+      }
+      if ((*it)->Get() == node)
+      {
+        m_SelectedImage = name.c_str();
+      }
+      m_TreeNodes[name] = *it;
+    }
+  }
+  emit changeLevelWindow(&m_TreeNodes.find(m_SelectedImage.ascii())->second);
 }

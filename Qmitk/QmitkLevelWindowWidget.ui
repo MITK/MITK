@@ -202,8 +202,10 @@
     </connection>
 </connections>
 <includes>
-    <include location="local" impldecl="in declaration">mitkLevelWindow.h</include>
     <include location="local" impldecl="in implementation">QmitkSliderLevelWindowWidget.h</include>
+    <include location="local" impldecl="in declaration">mitkLevelWindow.h</include>
+    <include location="global" impldecl="in declaration">mitkDataTree.h</include>
+    <include location="global" impldecl="in declaration">mitkLevelWindowProperty.h</include>
     <include location="local" impldecl="in implementation">QmitkLevelWindowWidget.ui.h</include>
 </includes>
 <variables>
@@ -211,9 +213,11 @@
     <variable>int m_Level;</variable>
     <variable>mitk::LevelWindow lw;</variable>
     <variable access="public">mitk::LevelWindow* slw;</variable>
+    <variable>mitk::DataTreeIteratorClone* m_Iter;</variable>
 </variables>
 <signals>
     <signal>levelWindow(mitk::LevelWindow*)</signal>
+    <signal>changeLevelWindow(mitk::LevelWindow*, mitk::DataTreeIteratorClone*)</signal>
 </signals>
 <slots>
     <slot>SetLevelValue()</slot>
@@ -221,6 +225,7 @@
     <slot>SliderRepaint()</slot>
     <slot>levelWindowSliderChanged( mitk::LevelWindow * slw )</slot>
     <slot>rangeChanged( mitk::LevelWindow * lw )</slot>
+    <slot>changeLevelWindow( mitk::DataTreeIteratorClone * iter )</slot>
 </slots>
 <functions>
     <function access="private" specifier="non virtual">init()</function>
@@ -228,6 +233,8 @@
     <function>setLevelWindow( const mitk::LevelWindow &amp; slw )</function>
     <function returnType="mitk::LevelWindow &amp;">getLevelWindow()</function>
     <function access="private" specifier="non virtual">destroy()</function>
+    <function>setDataTreeIteratorClone( mitk::DataTreeIteratorClone &amp; it )</function>
+    <function>setNode(mitk::DataTreeNode* node)</function>
 </functions>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

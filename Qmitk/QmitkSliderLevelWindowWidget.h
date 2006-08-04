@@ -29,6 +29,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkDataTreeNode.h"
 #include "mitkDataTree.h"
+#include "QmitkCommonFunctionality.h"
+#include <map>
 
 /**
 
@@ -90,13 +92,18 @@ protected:
   int m_presetID;
   int m_defaultID;
   bool scale;
+  QString m_SelectedImage;
   QRect m_LowerBound;
   QRect m_UpperBound;
   mitk::ScalarType m_upperLimit;
   mitk::ScalarType m_lowerLimit;
+  mitk::DataTreeIteratorClone m_It;
   
   QFont font;
   QPopupMenu *presetSubmenu;
+  QPopupMenu *imageSubmenu;
+
+  std::map<std::string,mitk::DataTreeIteratorClone> m_TreeNodes;
   
 
 public:
@@ -149,6 +156,8 @@ void setDefaultScaleRange();
 void changeScaleRange();
 void hideScale();
 void showScale();
+virtual void updateContent();
+void setImage(int id);
 
 private:
    void contextMenuEvent ( QContextMenuEvent * );
@@ -157,15 +166,20 @@ private:
 public:
 
   void setLevelWindow( const mitk::LevelWindow& levelWindow );
+  void setNode( mitk::DataTreeNode * node );
   mitk::LevelWindow& getLevelWindow();
   void update( ipPicDescriptor* pic );
   void update( );
   void updateFromLineEdit();
+  void setDataTreeIteratorClone(mitk::DataTreeIteratorClone &it);
+  static bool IsImageNode( mitk::DataTreeNode * node );
+  bool (* m_FilterFunction)(mitk::DataTreeNode*);
 
 signals:
 
   void levelWindow(mitk::LevelWindow* lw );
   void newRange(mitk::LevelWindow* lw);
+  void changeLevelWindow(mitk::DataTreeIteratorClone* iter);
 
 };
 

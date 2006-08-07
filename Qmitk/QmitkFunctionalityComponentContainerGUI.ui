@@ -8,8 +8,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>219</width>
-            <height>500</height>
+            <width>212</width>
+            <height>643</height>
         </rect>
     </property>
     <property name="minimumSize">
@@ -19,7 +19,7 @@
         </size>
     </property>
     <property name="caption">
-        <string>GraphCutSegmentation</string>
+        <string>ComponentContainer</string>
     </property>
     <vbox>
         <property name="name">
@@ -33,7 +33,7 @@
         </property>
         <widget class="QGroupBox">
             <property name="name">
-                <cstring>groupBox1</cstring>
+                <cstring>m_CompContBox</cstring>
             </property>
             <property name="sizePolicy">
                 <sizepolicy>
@@ -50,36 +50,82 @@
                 <number>0</number>
             </property>
             <property name="title">
-                <string>Select Data</string>
+                <string>ComponentContainer</string>
             </property>
-            <grid>
+            <vbox>
                 <property name="name">
                     <cstring>unnamed</cstring>
                 </property>
-                <widget class="QmitkTreeNodeSelector" row="0" column="0">
+                <widget class="QLayoutWidget">
                     <property name="name">
-                        <cstring>m_TreeNodeSelector</cstring>
+                        <cstring>m_ContainerLayout</cstring>
                     </property>
-                    <property name="sizePolicy">
-                        <sizepolicy>
-                            <hsizetype>5</hsizetype>
-                            <vsizetype>5</vsizetype>
-                            <horstretch>0</horstretch>
-                            <verstretch>0</verstretch>
-                        </sizepolicy>
-                    </property>
-                    <property name="minimumSize">
-                        <size>
-                            <width>0</width>
-                            <height>20</height>
-                        </size>
-                    </property>
+                    <grid>
+                        <property name="name">
+                            <cstring>unnamed</cstring>
+                        </property>
+                        <widget class="QGroupBox" row="0" column="0">
+                            <property name="name">
+                                <cstring>DataTreeNodeSelectorBox</cstring>
+                            </property>
+                            <property name="title">
+                                <string>Select Data</string>
+                            </property>
+                            <grid>
+                                <property name="name">
+                                    <cstring>unnamed</cstring>
+                                </property>
+                                <property name="margin">
+                                    <number>3</number>
+                                </property>
+                                <property name="spacing">
+                                    <number>3</number>
+                                </property>
+                                <widget class="QmitkTreeNodeSelector" row="0" column="0">
+                                    <property name="name">
+                                        <cstring>m_TreeNodeSelector</cstring>
+                                    </property>
+                                    <property name="sizePolicy">
+                                        <sizepolicy>
+                                            <hsizetype>5</hsizetype>
+                                            <vsizetype>5</vsizetype>
+                                            <horstretch>0</horstretch>
+                                            <verstretch>0</verstretch>
+                                        </sizepolicy>
+                                    </property>
+                                    <property name="minimumSize">
+                                        <size>
+                                            <width>0</width>
+                                            <height>20</height>
+                                        </size>
+                                    </property>
+                                </widget>
+                            </grid>
+                        </widget>
+                        <spacer row="1" column="0">
+                            <property name="name">
+                                <cstring>spacer2</cstring>
+                            </property>
+                            <property name="orientation">
+                                <enum>Vertical</enum>
+                            </property>
+                            <property name="sizeType">
+                                <enum>Expanding</enum>
+                            </property>
+                            <property name="sizeHint">
+                                <size>
+                                    <width>20</width>
+                                    <height>150</height>
+                                </size>
+                            </property>
+                        </spacer>
+                    </grid>
                 </widget>
-            </grid>
+            </vbox>
         </widget>
         <spacer>
             <property name="name">
-                <cstring>spacer2</cstring>
+                <cstring>spacer2_2</cstring>
             </property>
             <property name="orientation">
                 <enum>Vertical</enum>
@@ -90,7 +136,7 @@
             <property name="sizeHint">
                 <size>
                     <width>20</width>
-                    <height>410</height>
+                    <height>141</height>
                 </size>
             </property>
         </spacer>
@@ -134,6 +180,11 @@
 <slots>
     <slot>SetDataTreeIterator( mitk::DataTreeIteratorBase * it )</slot>
 </slots>
+<functions>
+    <function returnType="QGroupBox *">GetCompContBox()</function>
+    <function returnType="QLayout *">GetContainerLayout()</function>
+    <function returnType="QmitkTreeNodeSelector *">GetTreeNodeSelector()</function>
+</functions>
 <layoutdefaults spacing="6" margin="11"/>
 <includehints>
     <includehint>QmitkTreeNodeSelector.h</includehint>

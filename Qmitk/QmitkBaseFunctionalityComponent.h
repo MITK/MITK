@@ -56,16 +56,18 @@ public:
 
 
   /** \brief Constructor. */
-  QmitkBaseFunctionalityComponent(mitk::DataTreeIteratorBase* dataIt = NULL);
+  QmitkBaseFunctionalityComponent(const char *name=0, mitk::DataTreeIteratorBase* dataIt = NULL);
 
   /** \brief Destructor. */
   ~QmitkBaseFunctionalityComponent();
 
+
+  //SET and GET
   /*!
   \brief setter method for data tree attribute
   @param it the reference to a data tree ieterator object
   */
-  void SetDataTree(mitk::DataTreeIteratorBase* it);
+  virtual void SetDataTreeIterator(mitk::DataTreeIteratorBase* it);
 
   /*!
   \brief getter for dataTree attribute. It returns the 
@@ -78,17 +80,16 @@ public:
   addicted methods
   */
   virtual void TreeChanged(const itk::EventObject & treeChangedEvent);
-
-  /*!
-  \brief  Slot that will be called if DataTree changes to inform
-  addicted methods
-  */
   virtual void TreeChanged();
+  virtual void TreeChanged(mitk::DataTreeIteratorBase* it);
+
+
 
   /*!
   \brief method for defining the name of the functionality
   */
   virtual QString GetFunctionalityName();
+  //virtual QWidget* CreateContainerWidget(QWidget* parent);
 
   void SetFunctionalityName(QString name);
 
@@ -115,6 +116,9 @@ public:
 
   virtual bool IsAvailable();
 
+  virtual QWidget* GetGUI();
+
+
 protected:
 
   
@@ -136,6 +140,8 @@ protected:
   unsigned long m_ObserverTag;
 
   bool m_TreeChangedWhileInActive;
+
+
 
 private:
 

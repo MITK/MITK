@@ -17,3 +17,18 @@ void QmitkFunctionalityComponentContainerGUI::SetDataTreeIterator( mitk::DataTre
    m_DataTreeIterator = it;
    m_TreeNodeSelector->SetDataTreeNodeIterator(it);
 }
+
+QGroupBox* QmitkFunctionalityComponentContainerGUI::GetCompContBox()
+{
+    return m_CompContBox;
+}
+
+QLayout* QmitkFunctionalityComponentContainerGUI::GetContainerLayout()
+{
+return m_ContainerLayout;
+}
+
+QmitkTreeNodeSelector*  QmitkFunctionalityComponentContainerGUI::GetTreeNodeSelector()
+{
+    return m_TreeNodeSelector;
+}

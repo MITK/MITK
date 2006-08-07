@@ -63,10 +63,10 @@ bool QmitkFctCompMediator::AddFunctionalityComponent(QmitkFunctionalityComponent
   //funcButton->setToggleButton(true);
   //menuLayout->addItem(new QWidgetItem(funcButton));
 
-  if((qfl.count()>1) && (functionalityComponent->IsAvailable()==false))
-  {
-    //funcButton->setEnabled(false);
-  }
+  //if((qfl.count()>1) && (functionalityComponent->IsAvailable()==false))
+  //{
+  //  //funcButton->setEnabled(false);
+  //}
   return true;
 }
 //QmitkFunctionalityComponentContainer* QmitkFctCompMediator::GetFunctionalityComponentByName(const char * name){}
@@ -74,3 +74,4 @@ bool QmitkFctCompMediator::AddFunctionalityComponent(QmitkFunctionalityComponent
 //QmitkFunctionalityComponentContainer* QmitkFctCompMediator::GetActiveFunctionalityComponent(){}
 //QmitkFunctionalityComponentContainer* QmitkFctCompMediator::GetFunctionalityComponentById(int id){}
 //unsigned int QmitkFctCompMediator::GetFunctionalityComponentCount(){}
+

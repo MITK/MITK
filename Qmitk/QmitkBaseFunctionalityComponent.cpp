@@ -19,9 +19,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkCommand.h>
 
 
-QmitkBaseFunctionalityComponent::QmitkBaseFunctionalityComponent(mitk::DataTreeIteratorBase* dataIt )
+QmitkBaseFunctionalityComponent::QmitkBaseFunctionalityComponent(const char *name, mitk::DataTreeIteratorBase* dataIt )
 {
-  SetDataTree(dataIt);
+  SetDataTreeIterator(dataIt);
 }
 
 
@@ -33,7 +33,7 @@ QmitkBaseFunctionalityComponent::~QmitkBaseFunctionalityComponent()
   }
 }
 
-void QmitkBaseFunctionalityComponent::SetDataTree(mitk::DataTreeIteratorBase* it)
+void QmitkBaseFunctionalityComponent::SetDataTreeIterator(mitk::DataTreeIteratorBase* it)
 {
   if(m_DataTreeIterator.IsNotNull() )
   {
@@ -47,6 +47,10 @@ void QmitkBaseFunctionalityComponent::SetDataTree(mitk::DataTreeIteratorBase* it
     m_ObserverTag = m_DataTreeIterator->GetTree()->AddObserver(itk::TreeChangeEvent<mitk::DataTreeBase>(), command);
   }
 }
+//QWidget* QmitkBaseFunctionalityComponent::CreateContainerWidget(QWidget* parent)
+//{
+// return parent;
+//}
 
 mitk::DataTreeIteratorBase* QmitkBaseFunctionalityComponent::GetDataTreeIterator()
 {
@@ -100,7 +104,7 @@ void QmitkBaseFunctionalityComponent::TreeChanged(const itk::EventObject & /*tre
   if(IsActivated())
   {
     m_TreeChangedWhileInActive = false;
-    TreeChanged();
+    //TreeChanged();
   }
   else
     m_TreeChangedWhileInActive = true;
@@ -108,8 +112,15 @@ void QmitkBaseFunctionalityComponent::TreeChanged(const itk::EventObject & /*tre
 
 void QmitkBaseFunctionalityComponent::TreeChanged()
 {
+  
+}
+
+void QmitkBaseFunctionalityComponent::TreeChanged(mitk::DataTreeIteratorBase* it)
+{
 
 }
 
-
-
+QWidget* QmitkBaseFunctionalityComponent::GetGUI()
+{
+  return NULL;
+}

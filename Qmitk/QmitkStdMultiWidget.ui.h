@@ -746,7 +746,7 @@ void QmitkStdMultiWidget::changeLevelWindow(mitk::LevelWindow* lw)
 
 void QmitkStdMultiWidget::changeLevelWindow2(mitk::LevelWindow* lw, mitk::DataTreeIteratorClone * iter)
 {
-  if (!iter==NULL)
+  if ( iter )
   {
     mitk::LevelWindowProperty::Pointer levWinProp = dynamic_cast<mitk::LevelWindowProperty*>((*iter)->Get()->GetProperty("levelwindow").GetPointer());
     if ( levWinProp.IsNotNull() )

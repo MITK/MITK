@@ -499,7 +499,10 @@ void QmitkSliderLevelWindowWidget::contextMenuEvent( QContextMenuEvent * )
     QString item = ((*iter).first).c_str();
     int id = imageSubmenu->insertItem(item);
     if (item == m_SelectedImage)
+    {
       imageSubmenu->setItemChecked(id, true);
+      emit changeLevelWindow(&m_TreeNodes.find(m_SelectedImage.ascii())->second);
+    }
   }
   connect(imageSubmenu, SIGNAL(activated(int)), this, SLOT(setImage(int)));
   contextMenu->insertItem( "Images",  imageSubmenu );

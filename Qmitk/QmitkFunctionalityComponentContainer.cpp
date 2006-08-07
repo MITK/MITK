@@ -37,7 +37,10 @@ QmitkFunctionalityComponentContainer::QmitkFunctionalityComponentContainer(QObje
 
 QmitkFunctionalityComponentContainer::~QmitkFunctionalityComponentContainer()
 {
-
+  //if(m_DataTreeIterator.IsNotNull() )
+  //{
+  //  m_DataTreeIterator->GetTree()->RemoveObserver(m_ObserverTag);
+  //}
 }
 
 QString QmitkFunctionalityComponentContainer::GetFunctionalityName()
@@ -57,17 +60,28 @@ mitk::DataTreeIteratorBase* QmitkFunctionalityComponentContainer::GetDataTreeIte
 
 void QmitkFunctionalityComponentContainer::SetDataTreeIterator(mitk::DataTreeIteratorBase* it)
 {
-  //if(m_DataTreeIterator.IsNotNull() )
-  //{
-  //  m_DataTreeIterator->GetTree()->RemoveObserver(m_ObserverTag);
-  //}
-  //m_DataTreeIterator = it;
-  //if(m_DataTreeIterator.IsNotNull())
-  //{
-  //  itk::ReceptorMemberCommand<QmitkFunctionalityComponentContainer>::Pointer command = itk::ReceptorMemberCommand<QmitkFunctionalityComponentContainer>::New();
-  //  command->SetCallbackFunction(this, &QmitkFunctionalityComponentContainer::TreeChanged);
-  //  m_ObserverTag = m_DataTreeIterator->GetTree()->AddObserver(itk::TreeChangeEvent<mitk::DataTreeBase>(), command);
-  //}
+  if(m_DataTreeIterator.IsNotNull() )
+  {
+    m_DataTreeIterator->GetTree()->RemoveObserver(m_ObserverTag);
+  }
+  m_DataTreeIterator = it;
+  if(m_DataTreeIterator.IsNotNull())
+  {
+    itk::ReceptorMemberCommand<QmitkFunctionalityComponentContainer>::Pointer command = itk::ReceptorMemberCommand<QmitkFunctionalityComponentContainer>::New();
+    command->SetCallbackFunction(this, &QmitkFunctionalityComponentContainer::TreeChanged);
+    m_ObserverTag = m_DataTreeIterator->GetTree()->AddObserver(itk::TreeChangeEvent<mitk::DataTreeBase>(), command);
+  }
+}
+
+void QmitkFunctionalityComponentContainer::TreeChanged(const itk::EventObject & /*treeChangedEvent*/)
+{
+  if(IsActivated())
+  {
+    m_TreeChangedWhileInActive = false;
+    TreeChanged();
+  }
+  else
+    m_TreeChangedWhileInActive = true;
 }
 
 void QmitkFunctionalityComponentContainer::TreeChanged()
@@ -156,5 +170,7 @@ QWidget* QmitkFunctionalityComponentContainer::GetGUI()
 {
   return m_GUI;
 }
+
+
 
 

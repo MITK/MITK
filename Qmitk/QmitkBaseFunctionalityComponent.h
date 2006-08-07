@@ -79,7 +79,7 @@ public:
   \brief  Slot that will be called if DataTree changes to inform
   addicted methods
   */
-  virtual void TreeChanged(const itk::EventObject & treeChangedEvent);
+  //virtual void TreeChanged(const itk::EventObject & treeChangedEvent);
   virtual void TreeChanged();
   virtual void TreeChanged(mitk::DataTreeIteratorBase* it);
 
@@ -137,7 +137,7 @@ protected:
   */
   QString m_Name;
 
-  unsigned long m_ObserverTag;
+  //unsigned long m_ObserverTag;
 
   bool m_TreeChangedWhileInActive;
 

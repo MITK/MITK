@@ -27,6 +27,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qwidgetstack.h>
 #include "mitkDataTree.h"
 #include <vector>
+#include <qstring.h>
+#include <qobject.h>
 
 class QmitkFunctionalityComponentContainerGUI;
 
@@ -92,12 +94,12 @@ public:
 
   QWidget* GetGUI();
 
-    virtual void TreeChanged();
+      virtual void TreeChanged(const itk::EventObject & treeChangedEvent);
 
 protected slots:  
 
   // /** \brief The TreeChanged-slot-method updates the TreeNodeSelector if the datatree changes. */
-  //virtual void TreeChanged();
+  virtual void TreeChanged();
   virtual void TreeChanged(mitk::DataTreeIteratorBase* it);
 
   /** \brief Slot method that will be called if TreeNodeSelector widget was activated. */
@@ -105,8 +107,13 @@ protected slots:
 
 protected:
   QString m_Name;
-  bool m_Activated;
+
+
     unsigned long m_ObserverTag;
+
+      
+  bool m_Available;
+  bool m_Activated;
 
 
 private:

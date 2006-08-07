@@ -27,30 +27,27 @@ QmitkBaseFunctionalityComponent::QmitkBaseFunctionalityComponent(const char *nam
 
 QmitkBaseFunctionalityComponent::~QmitkBaseFunctionalityComponent()
 {
-  if(m_DataTreeIterator.IsNotNull() )
-  {
-    m_DataTreeIterator->GetTree()->RemoveObserver(m_ObserverTag);
-  }
+  //if(m_DataTreeIterator.IsNotNull() )
+  //{
+  //  m_DataTreeIterator->GetTree()->RemoveObserver(m_ObserverTag);
+  //}
 }
 
 void QmitkBaseFunctionalityComponent::SetDataTreeIterator(mitk::DataTreeIteratorBase* it)
 {
-  if(m_DataTreeIterator.IsNotNull() )
-  {
-    m_DataTreeIterator->GetTree()->RemoveObserver(m_ObserverTag);
-  }
-  m_DataTreeIterator = it;
-  if(m_DataTreeIterator.IsNotNull())
-  {
-    itk::ReceptorMemberCommand<QmitkBaseFunctionalityComponent>::Pointer command = itk::ReceptorMemberCommand<QmitkBaseFunctionalityComponent>::New();
-    command->SetCallbackFunction(this, &QmitkBaseFunctionalityComponent::TreeChanged);
-    m_ObserverTag = m_DataTreeIterator->GetTree()->AddObserver(itk::TreeChangeEvent<mitk::DataTreeBase>(), command);
-  }
+//  if(m_DataTreeIterator.IsNotNull() )
+//  {
+//    m_DataTreeIterator->GetTree()->RemoveObserver(m_ObserverTag);
+//  }
+//  m_DataTreeIterator = it;
+//  if(m_DataTreeIterator.IsNotNull())
+//  {
+//    itk::ReceptorMemberCommand<QmitkBaseFunctionalityComponent>::Pointer command = itk::ReceptorMemberCommand<QmitkBaseFunctionalityComponent>::New();
+//    command->SetCallbackFunction(this, &QmitkBaseFunctionalityComponent::TreeChanged);
+//    m_ObserverTag = m_DataTreeIterator->GetTree()->AddObserver(itk::TreeChangeEvent<mitk::DataTreeBase>(), command);
+//  }
 }
-//QWidget* QmitkBaseFunctionalityComponent::CreateContainerWidget(QWidget* parent)
-//{
-// return parent;
-//}
+
 
 mitk::DataTreeIteratorBase* QmitkBaseFunctionalityComponent::GetDataTreeIterator()
 {
@@ -99,16 +96,16 @@ void QmitkBaseFunctionalityComponent::SetAvailability(bool available)
   //emit AvailabilityChanged();
 }
 
-void QmitkBaseFunctionalityComponent::TreeChanged(const itk::EventObject & /*treeChangedEvent*/)
-{
-  if(IsActivated())
-  {
-    m_TreeChangedWhileInActive = false;
-    //TreeChanged();
-  }
-  else
-    m_TreeChangedWhileInActive = true;
-}
+//void QmitkBaseFunctionalityComponent::TreeChanged(const itk::EventObject & /*treeChangedEvent*/)
+//{
+//  if(IsActivated())
+//  {
+//    m_TreeChangedWhileInActive = false;
+//    //TreeChanged();
+//  }
+//  else
+//    m_TreeChangedWhileInActive = true;
+//}
 
 void QmitkBaseFunctionalityComponent::TreeChanged()
 {

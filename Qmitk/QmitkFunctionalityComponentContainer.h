@@ -87,7 +87,7 @@ public:
   */
   mitk::DataTreeIteratorBase* GetDataTreeIterator();
 
-  void QmitkFunctionalityComponentContainer::AddComponent(QmitkFunctionalityComponentContainer* componentContainer);
+  void AddComponent(QmitkFunctionalityComponentContainer* componentContainer);
 
  // virtual void TreeChanged();
  // virtual void TreeChanged(mitk::DataTreeIteratorBase* it);

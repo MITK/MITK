@@ -26,38 +26,47 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkCommand.h>
 
 
+/***************       CONSTRUCTOR      ***************/
 QmitkFunctionalityComponentContainer::QmitkFunctionalityComponentContainer(QObject *parent, const char *name, mitk::DataTreeIteratorBase* it)
 : QmitkBaseFunctionalityComponent(name, it),m_GUI(NULL),m_Name(name)
 {
-  //SetAvailability(true);
-  //  CreateContainerWidget(parent);
   SetDataTreeIterator(it);
-
 }
 
+/***************        DESTRUCTOR      ***************/
 QmitkFunctionalityComponentContainer::~QmitkFunctionalityComponentContainer()
 {
-  //if(m_DataTreeIterator.IsNotNull() )
-  //{
-  //  m_DataTreeIterator->GetTree()->RemoveObserver(m_ObserverTag);
-  //}
+  if(m_DataTreeIterator.IsNotNull() )
+  {
+    m_DataTreeIterator->GetTree()->RemoveObserver(m_ObserverTag);
+  }
 }
 
+/*************** GET FUNCTIONALITY NAME ***************/
 QString QmitkFunctionalityComponentContainer::GetFunctionalityName()
 {
   return m_Name;
 }
 
+/*************** SET FUNCTIONALITY NAME ***************/
 void QmitkFunctionalityComponentContainer::SetFunctionalityName(QString name)
 {
   m_Name = name;
 }
 
+/*************** GET FUNCCOMPONENT NAME ***************/
+QString QmitkFunctionalityComponentContainer::GetFunctionalityComponentName()
+{
+  return m_Name;
+}
+
+/*************** GET DATA TREE ITERATOR ***************/
 mitk::DataTreeIteratorBase* QmitkFunctionalityComponentContainer::GetDataTreeIterator()
 {
   return m_DataTreeIterator.GetPointer();
 }
 
+/*************** SET DATA TREE ITERATOR ***************/
 void QmitkFunctionalityComponentContainer::SetDataTreeIterator(mitk::DataTreeIteratorBase* it)
 {
   if(m_DataTreeIterator.IsNotNull() )
@@ -73,6 +82,13 @@ void QmitkFunctionalityComponentContainer::SetDataTreeIterator(mitk::DataTreeIte
   }
 }
 
+/***************         GET GUI        ***************/
+QWidget* QmitkFunctionalityComponentContainer::GetGUI()
+{
+  return m_GUI;
+}
+
+/*************** TREE CHANGED ( EVENT ) ***************/
 void QmitkFunctionalityComponentContainer::TreeChanged(const itk::EventObject & /*treeChangedEvent*/)
 {
   if(IsActivated())
@@ -84,6 +100,7 @@ void QmitkFunctionalityComponentContainer::TreeChanged(const itk::EventObject & 
     m_TreeChangedWhileInActive = true;
 }
 
+/*************** TREE CHANGED (       ) ***************/
 void QmitkFunctionalityComponentContainer::TreeChanged()
 {
   if(m_GUI != NULL)
@@ -96,12 +113,12 @@ void QmitkFunctionalityComponentContainer::TreeChanged()
       TreeChanged(GetDataTreeIterator());
     }
   }
-
 }
 
+/*************** TREE CHANGED(ITERATOR) ***************/
 void QmitkFunctionalityComponentContainer::TreeChanged(mitk::DataTreeIteratorBase* it)
 {
-if(m_GUI != NULL)
+  if(m_GUI != NULL)
   {
     m_GUI->GetTreeNodeSelector()->SetDataTreeNodeIterator(it);
     for(int i = 0;  i < m_Qbfc.size(); i++)
@@ -112,6 +129,7 @@ if(m_GUI != NULL)
   }
 }
 
+/***************       CONNECTIONS      ***************/
 void QmitkFunctionalityComponentContainer::CreateConnections()
 {
   if ( m_GUI )
@@ -120,19 +138,13 @@ void QmitkFunctionalityComponentContainer::CreateConnections()
   }
 }
 
-
-QString QmitkFunctionalityComponentContainer::GetFunctionalityComponentName()
-{
-  return m_Name;
-}
-
+/***************     IMAGE SELECTED     ***************/
 void QmitkFunctionalityComponentContainer::ImageSelected(mitk::DataTreeIteratorClone imageIt)
 {
   TreeChanged();
 }
 
-
-/******************************************************************************************/
+/*************** CREATE CONTAINER WIDGET **************/
 QWidget* QmitkFunctionalityComponentContainer::CreateContainerWidget(QWidget* parent)
 {
   if (m_GUI == NULL)
@@ -143,6 +155,7 @@ QWidget* QmitkFunctionalityComponentContainer::CreateContainerWidget(QWidget* pa
   return m_GUI;
 }
 
+/***************        ACTIVATED       ***************/
 void QmitkFunctionalityComponentContainer::Activated()
 {
   m_Activated = true;
@@ -153,22 +166,18 @@ void QmitkFunctionalityComponentContainer::Activated()
   }
 }
 
+/***************      ADD COMPONENT     ***************/
 void QmitkFunctionalityComponentContainer::AddComponent(QmitkFunctionalityComponentContainer* componentContainer)
 {  
   if(componentContainer!=NULL)
   {
-    //QWidget* componentWidget = componentContainer->CreateContainerWidget(m_GUI->GetCompContBox());
+    QWidget* componentWidget = componentContainer->CreateContainerWidget(m_GUI->GetCompContBox());
     m_Qbfc.push_back(componentContainer);
 
     //QLayout* containerLayout = m_GUI->GetContainerLayout();
     //m_GUI->insertChild(component->GetWidget());
   }
 
-}
-
-QWidget* QmitkFunctionalityComponentContainer::GetGUI()
-{
-  return m_GUI;
 }
 
 

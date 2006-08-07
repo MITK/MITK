@@ -76,7 +76,7 @@ void QmitkBaseFunctionalityComponent::Activated()
 
 void QmitkBaseFunctionalityComponent::Deactivated()
 {
-  m_Activated = false;
+  //m_Activated = false;
 }
 
 bool QmitkBaseFunctionalityComponent::IsActivated()

@@ -5,7 +5,7 @@ Module:    $RCSfile$
 Language:  C++
 Date:      $Date$
 Version:   $Revision$ 
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
@@ -16,11 +16,16 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 #include "QmitkThresholdComponent.h"
+#include "QmitkThresholdComponentGUI.h"
 
+#include "QmitkTreeNodeSelector.h"
 
 QmitkThresholdComponent::QmitkThresholdComponent( )
 {
-  SetAvailability(true);
+  m_GUI = NULL;
+  //m_Name = name;
+  //SetAvailability(true);
+
 }
 
 QmitkThresholdComponent::~QmitkThresholdComponent()
@@ -30,29 +35,16 @@ QmitkThresholdComponent::~QmitkThresholdComponent()
 
 QString QmitkThresholdComponent::GetFunctionalityName()
 {
- return m_Name;
+  return m_Name;
 }
 
-QAction * QmitkThresholdComponent::CreateAction(QActionGroup* m_FunctionalityComponentActionGroup)
+QWidget* QmitkThresholdComponent::CreateContainerWidget(QWidget* parent)
 {
-    QAction* action;
-    action = NULL;
-//    action = new QAction( tr( "Simple Example" ), QPixmap((const char**)slicer_xpm), tr( "&Simple Example" ), 0, parent, "simple example" );
-    return action;
+
+  m_GUI = new QmitkThresholdComponentGUI(parent);
+  return m_GUI;
+
 }
-
-
-QWidget * QmitkThresholdComponent::CreateMainWidget(QWidgetStack* m_MainStack)
-{
-  return m_MainStack;
-}
-
-
-QWidget * QmitkThresholdComponent::CreateControlWidget(QWidgetStack* m_ControlStack)
-{
-  return m_ControlStack;
-}
-
 
 void QmitkThresholdComponent::CreateConnections()
 {
@@ -62,22 +54,38 @@ void QmitkThresholdComponent::CreateConnections()
 
 QString QmitkThresholdComponent::GetFunctionalityComponentName()
 {
- return m_Name;
+  return m_Name;
 }
 
 
-void QmitkThresholdComponent::Activated()
+void QmitkThresholdComponent::TreeChanged()
 {
-  QmitkBaseFunctionalityComponent::Activated();
-  //assert( multiWidget != NULL );
-  //// init widget 4 as a 3D widget
-  //multiWidget->mitkWidget4->GetRenderer()->SetMapperID(2);
+  if(m_GUI != NULL)
+  {
+    m_GUI->GetTreeNodeSelector()->SetDataTreeNodeIterator(this->GetDataTreeIterator());
+    for(int i = 0;  i < m_Qbfc.size(); i++)
+    {
+      //m_Qbfc[i]->SetDataTree(this->GetDataTreeIterator());
+      //m_Obfc[i]->TreeChanged(this->GetDataTreeIterator());
+    }
+  }
 
-//  if(m_NavigatorsInitialized)
-//  {
-//    multiWidget->ReInitializeStandardViews();
-//  }
 }
 
+QWidget* QmitkThresholdComponent::GetGUI()
+{
+  return m_GUI;
+}
 
+void QmitkThresholdComponent::TreeChanged(mitk::DataTreeIteratorBase* it)
+{
+  if(m_GUI != NULL)
+  {
+    m_GUI->GetTreeNodeSelector()->SetDataTreeNodeIterator(it);
+  }
+}
 
+void QmitkThresholdComponent::SetDataTreeIterator(mitk::DataTreeIteratorBase* it)
+{
+  m_DataTreeIterator = it;
+}

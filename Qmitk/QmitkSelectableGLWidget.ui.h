@@ -29,7 +29,7 @@ void QmitkSelectableGLWidget::init()
 {
   QLayout *hlayout;
   hlayout=layout();
-  hlayout->setMargin(2);
+  hlayout->setMargin(3);
   hlayout->setAutoAdd(true);
 
   QString rendererName("Renderer::");

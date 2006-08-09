@@ -50,6 +50,8 @@ public:
   /** \brief Constructor. */
   QmitkThresholdComponent( );
 
+ 
+
   /** \brief Destructor. */
   ~QmitkThresholdComponent();
 
@@ -58,6 +60,7 @@ public:
   virtual void CreateConnections();
   virtual void TreeChanged();
   virtual void TreeChanged(mitk::DataTreeIteratorBase* it);
+  virtual void UpdateTreeNodeSelector(mitk::DataTreeIteratorBase* it);
 
 
   //Set and Get

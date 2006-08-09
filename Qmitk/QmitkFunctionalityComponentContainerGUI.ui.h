@@ -25,7 +25,7 @@ QGroupBox* QmitkFunctionalityComponentContainerGUI::GetCompContBox()
 
 QLayout* QmitkFunctionalityComponentContainerGUI::GetContainerLayout()
 {
-return m_ContainerLayout;
+ return NULL;
 }
 
 QmitkTreeNodeSelector*  QmitkFunctionalityComponentContainerGUI::GetTreeNodeSelector()

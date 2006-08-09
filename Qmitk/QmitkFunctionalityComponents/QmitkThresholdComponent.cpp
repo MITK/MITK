@@ -57,13 +57,14 @@ QString QmitkThresholdComponent::GetFunctionalityComponentName()
   return m_Name;
 }
 
-
+/*************** TREE CHANGED (       ) ***************/
 void QmitkThresholdComponent::TreeChanged()
 {
   if(m_GUI != NULL)
   {
     m_GUI->GetTreeNodeSelector()->SetDataTreeNodeIterator(this->GetDataTreeIterator());
-    for(int i = 0;  i < m_Qbfc.size(); i++)
+    UpdateTreeNodeSelector(this->GetDataTreeIterator());
+    for(int i = 0;  i < m_Qbfc.size(); i++) 
     {
       //m_Qbfc[i]->SetDataTree(this->GetDataTreeIterator());
       //m_Obfc[i]->TreeChanged(this->GetDataTreeIterator());
@@ -72,20 +73,33 @@ void QmitkThresholdComponent::TreeChanged()
 
 }
 
+/*************** TREE CHANGED(ITERATOR) ***************/
+void QmitkThresholdComponent::TreeChanged(mitk::DataTreeIteratorBase* it)
+{
+  if(m_GUI != NULL)
+  {
+    SetDataTreeIterator(it);
+    m_GUI->GetTreeNodeSelector()->SetDataTreeNodeIterator(it);
+    UpdateTreeNodeSelector(it);
+  }
+}
+
+
 QWidget* QmitkThresholdComponent::GetGUI()
 {
   return m_GUI;
 }
 
-void QmitkThresholdComponent::TreeChanged(mitk::DataTreeIteratorBase* it)
-{
-  if(m_GUI != NULL)
-  {
-    m_GUI->GetTreeNodeSelector()->SetDataTreeNodeIterator(it);
-  }
-}
+
 
 void QmitkThresholdComponent::SetDataTreeIterator(mitk::DataTreeIteratorBase* it)
 {
   m_DataTreeIterator = it;
+}
+
+
+void QmitkThresholdComponent::UpdateTreeNodeSelector(mitk::DataTreeIteratorBase* it)
+{
+  m_GUI->SetDataTreeIterator(it);
+  m_GUI->GetTreeNodeSelector()->UpdateContent();
 }

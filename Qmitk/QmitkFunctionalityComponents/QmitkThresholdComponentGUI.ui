@@ -8,8 +8,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>329</width>
-            <height>500</height>
+            <width>229</width>
+            <height>55</height>
         </rect>
     </property>
     <property name="minimumSize">
@@ -17,6 +17,13 @@
             <width>0</width>
             <height>0</height>
         </size>
+    </property>
+    <property name="paletteBackgroundColor">
+        <color>
+            <red>212</red>
+            <green>191</green>
+            <blue>96</blue>
+        </color>
     </property>
     <property name="caption">
         <string>GraphCutSegmentation</string>
@@ -30,23 +37,6 @@
                 <cstring>m_TreeNodeSelector</cstring>
             </property>
         </widget>
-        <spacer>
-            <property name="name">
-                <cstring>spacer1</cstring>
-            </property>
-            <property name="orientation">
-                <enum>Vertical</enum>
-            </property>
-            <property name="sizeType">
-                <enum>Expanding</enum>
-            </property>
-            <property name="sizeHint">
-                <size>
-                    <width>20</width>
-                    <height>261</height>
-                </size>
-            </property>
-        </spacer>
     </vbox>
 </widget>
 <customwidgets>
@@ -91,4 +81,7 @@
     <function returnType="QmitkTreeNodeSelector *">GetTreeNodeSelector()</function>
 </functions>
 <layoutdefaults spacing="6" margin="11"/>
+<includehints>
+    <includehint>qmitktreenodeselector.h</includehint>
+</includehints>
 </UI>

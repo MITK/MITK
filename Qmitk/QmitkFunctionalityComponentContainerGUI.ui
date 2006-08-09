@@ -8,8 +8,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>212</width>
-            <height>643</height>
+            <width>223</width>
+            <height>824</height>
         </rect>
     </property>
     <property name="minimumSize">
@@ -17,6 +17,13 @@
             <width>0</width>
             <height>0</height>
         </size>
+    </property>
+    <property name="paletteBackgroundColor">
+        <color>
+            <red>172</red>
+            <green>255</green>
+            <blue>149</blue>
+        </color>
     </property>
     <property name="caption">
         <string>ComponentContainer</string>
@@ -43,6 +50,13 @@
                     <verstretch>0</verstretch>
                 </sizepolicy>
             </property>
+            <property name="paletteBackgroundColor">
+                <color>
+                    <red>100</red>
+                    <green>115</green>
+                    <blue>212</blue>
+                </color>
+            </property>
             <property name="lineWidth">
                 <number>1</number>
             </property>
@@ -56,90 +70,46 @@
                 <property name="name">
                     <cstring>unnamed</cstring>
                 </property>
-                <widget class="QLayoutWidget">
+                <widget class="QGroupBox">
                     <property name="name">
-                        <cstring>m_ContainerLayout</cstring>
+                        <cstring>DataTreeNodeSelectorBox</cstring>
+                    </property>
+                    <property name="title">
+                        <string>Select Data</string>
                     </property>
                     <grid>
                         <property name="name">
                             <cstring>unnamed</cstring>
                         </property>
-                        <widget class="QGroupBox" row="0" column="0">
+                        <property name="margin">
+                            <number>3</number>
+                        </property>
+                        <property name="spacing">
+                            <number>3</number>
+                        </property>
+                        <widget class="QmitkTreeNodeSelector" row="0" column="0">
                             <property name="name">
-                                <cstring>DataTreeNodeSelectorBox</cstring>
+                                <cstring>m_TreeNodeSelector</cstring>
                             </property>
-                            <property name="title">
-                                <string>Select Data</string>
+                            <property name="sizePolicy">
+                                <sizepolicy>
+                                    <hsizetype>5</hsizetype>
+                                    <vsizetype>5</vsizetype>
+                                    <horstretch>0</horstretch>
+                                    <verstretch>0</verstretch>
+                                </sizepolicy>
                             </property>
-                            <grid>
-                                <property name="name">
-                                    <cstring>unnamed</cstring>
-                                </property>
-                                <property name="margin">
-                                    <number>3</number>
-                                </property>
-                                <property name="spacing">
-                                    <number>3</number>
-                                </property>
-                                <widget class="QmitkTreeNodeSelector" row="0" column="0">
-                                    <property name="name">
-                                        <cstring>m_TreeNodeSelector</cstring>
-                                    </property>
-                                    <property name="sizePolicy">
-                                        <sizepolicy>
-                                            <hsizetype>5</hsizetype>
-                                            <vsizetype>5</vsizetype>
-                                            <horstretch>0</horstretch>
-                                            <verstretch>0</verstretch>
-                                        </sizepolicy>
-                                    </property>
-                                    <property name="minimumSize">
-                                        <size>
-                                            <width>0</width>
-                                            <height>20</height>
-                                        </size>
-                                    </property>
-                                </widget>
-                            </grid>
-                        </widget>
-                        <spacer row="1" column="0">
-                            <property name="name">
-                                <cstring>spacer2</cstring>
-                            </property>
-                            <property name="orientation">
-                                <enum>Vertical</enum>
-                            </property>
-                            <property name="sizeType">
-                                <enum>Expanding</enum>
-                            </property>
-                            <property name="sizeHint">
+                            <property name="minimumSize">
                                 <size>
-                                    <width>20</width>
-                                    <height>150</height>
+                                    <width>0</width>
+                                    <height>20</height>
                                 </size>
                             </property>
-                        </spacer>
+                        </widget>
                     </grid>
                 </widget>
             </vbox>
         </widget>
-        <spacer>
-            <property name="name">
-                <cstring>spacer2_2</cstring>
-            </property>
-            <property name="orientation">
-                <enum>Vertical</enum>
-            </property>
-            <property name="sizeType">
-                <enum>Expanding</enum>
-            </property>
-            <property name="sizeHint">
-                <size>
-                    <width>20</width>
-                    <height>141</height>
-                </size>
-            </property>
-        </spacer>
     </vbox>
 </widget>
 <customwidgets>
@@ -187,6 +157,6 @@
 </functions>
 <layoutdefaults spacing="6" margin="11"/>
 <includehints>
-    <includehint>QmitkTreeNodeSelector.h</includehint>
+    <includehint>qmitktreenodeselector.h</includehint>
 </includehints>
 </UI>

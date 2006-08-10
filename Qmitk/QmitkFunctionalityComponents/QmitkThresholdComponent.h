@@ -60,7 +60,9 @@ public:
   virtual void CreateConnections();
   virtual void TreeChanged();
   virtual void TreeChanged(mitk::DataTreeIteratorBase* it);
+  virtual void UpdateTreeNodeSelector(mitk::DataTreeIteratorClone imageIt);
   virtual void UpdateTreeNodeSelector(mitk::DataTreeIteratorBase* it);
+  virtual void UpdateSelector(QString name);
 
 
   //Set and Get

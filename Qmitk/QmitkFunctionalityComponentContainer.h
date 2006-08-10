@@ -64,6 +64,9 @@ public:
   /** \brief Vector with all added components */
   std::vector<QmitkFunctionalityComponentContainer*> m_Qbfc;
   virtual void UpdateTreeNodeSelector(mitk::DataTreeIteratorBase* it);
+  virtual void UpdateTreeNodeSelector(mitk::DataTreeIteratorClone imageIt);
+  virtual void UpdateSelector(QString name);
+
 
   // Create
   //virtual QAction * CreateAction(QActionGroup* m_FunctionalityComponentActionGroup);

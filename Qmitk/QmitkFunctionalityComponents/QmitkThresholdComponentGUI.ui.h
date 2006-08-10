@@ -12,6 +12,8 @@
 
 #include "QmitkTreeNodeSelector.h"
 
+
+
 void QmitkThresholdComponentGUI::SetDataTreeIterator( mitk::DataTreeIteratorBase * it )
 {
    m_DataTreeIterator = it;

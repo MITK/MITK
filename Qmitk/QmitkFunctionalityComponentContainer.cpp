@@ -25,6 +25,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qlayout.h>
 #include <itkCommand.h>
 #include <qobjectlist.h>
+#include <qcombobox.h>
 
 const QSizePolicy preferred(QSizePolicy::Preferred, QSizePolicy::Preferred);
 
@@ -100,7 +101,7 @@ void QmitkFunctionalityComponentContainer::TreeChanged(const itk::EventObject & 
   }
   else
     m_TreeChangedWhileInActive = true;
-    TreeChanged();
+  TreeChanged();
 }
 
 /*************** TREE CHANGED (       ) ***************/
@@ -110,14 +111,34 @@ void QmitkFunctionalityComponentContainer::TreeChanged()
   //  SetDataTreeIterator(m_ImageIt.GetPointer());
   if(m_GUI != NULL)
   {
-    
+    //if(m_ImageIt != NULL)
+    //{
+    //  m_GUI->GetTreeNodeSelector()->SetDataTreeNodeIterator(this->GetDataTreeIterator());
+    //  //UpdateTreeNodeSelector(m_ImageIt.GetPointer());
+    //}
+    //else
     m_GUI->GetTreeNodeSelector()->SetDataTreeNodeIterator(this->GetDataTreeIterator());
-     m_GUI->GetTreeNodeSelector()->UpdateContent();
+    m_GUI->GetTreeNodeSelector()->UpdateContent();
+    QString name = m_GUI->GetTreeNodeSelector()->m_ComboBox->currentText();
+     
     for(int i = 0;  i < m_Qbfc.size(); i++)
     {
-      m_Qbfc[i]->SetDataTreeIterator(this->GetDataTreeIterator());
-      m_Qbfc[i]->TreeChanged(this->GetDataTreeIterator());
-      //m_Qbfc[i]->UpdateTreeNodeSelector(this->GetDataTreeIterator());
+      if(m_ImageIt != NULL)
+      {
+        m_Qbfc[i]->SetDataTreeIterator(m_ImageIt.GetPointer());
+        m_Qbfc[i]->TreeChanged(m_ImageIt.GetPointer());
+        m_Qbfc[i]->UpdateTreeNodeSelector(m_ImageIt);
+       
+        
+      }
+      else
+      {
+        m_Qbfc[i]->SetDataTreeIterator(this->GetDataTreeIterator());
+        m_Qbfc[i]->UpdateTreeNodeSelector(this->GetDataTreeIterator());
+      }
+      m_Qbfc[i]->UpdateTreeNodeSelector(this->GetDataTreeIterator());
+      //m_Qbfc[i]->UpdateTreeNodeSelector(this->GetTreeNodeSelector());
+    m_Qbfc[i]->UpdateSelector(m_GUI->GetTreeNodeSelector()->m_ComboBox->currentText());
     }
   }
 }
@@ -125,17 +146,21 @@ void QmitkFunctionalityComponentContainer::TreeChanged()
 /*************** TREE CHANGED(ITERATOR) ***************/
 void QmitkFunctionalityComponentContainer::TreeChanged(mitk::DataTreeIteratorBase* it)
 {
-if(m_GUI != NULL)
+  if(m_GUI != NULL)
   {
     SetDataTreeIterator(it);
     m_GUI->GetTreeNodeSelector()->SetDataTreeNodeIterator(this->GetDataTreeIterator());
-     m_GUI->GetTreeNodeSelector()->UpdateContent();
+    m_GUI->GetTreeNodeSelector()->UpdateContent();
     for(int i = 0;  i < m_Qbfc.size(); i++)
     {
       m_Qbfc[i]->SetDataTreeIterator(this->GetDataTreeIterator());
       m_Qbfc[i]->TreeChanged(this->GetDataTreeIterator());
       //m_Qbfc[i]->UpdateTreeNodeSelector(this->GetDataTreeIterator());
+      m_Qbfc[i]->UpdateSelector(m_GUI->GetTreeNodeSelector()->m_ComboBox->currentText());
     }
+
+        QString name = m_GUI->GetTreeNodeSelector()->m_ComboBox->currentText();
+     
   }
 }
 
@@ -182,34 +207,48 @@ void QmitkFunctionalityComponentContainer::AddComponent(QmitkFunctionalityCompon
 {  
   if(componentContainer!=NULL)
   {
-    QWidget* componentWidget = componentContainer->CreateContainerWidget(m_GUI);
+    //TODO wieder reinholen
+    //QWidget* componentWidget = componentContainer->CreateContainerWidget(m_GUI);
     m_Qbfc.push_back(componentContainer);
+    //componentContainer->GetGUI()->setSizePolicy(preferred);
+
+    QObjectList* list;
+    list = m_GUI->queryList(0, "", true, true);
+    uint NumOfChilds = list->count();
+    list->insert(NumOfChilds, componentContainer->CreateContainerWidget(m_GUI));
     componentContainer->GetGUI()->setSizePolicy(preferred);
-    
     //QLayout* containerLayout = m_GUI->GetContainerLayout();
     //m_GUI->insertChild(componentContainer->GetGUI());
-    
-    uint numOfChilds = m_GUI->children()->count();
-    for(int i = 0; i<= numOfChilds; i++)
-    {
-     componentContainer->GetGUI()->lower();
-    }
-    
+
+    //uint numOfChilds = m_GUI->children()->count();
+    //for(int i = 0; i<= numOfChilds; i++)
+    //{
+    //  componentContainer->GetGUI()->lower();
+    //}
+
     m_GUI->setGeometry(componentContainer->GetGUI()->height(), 0, m_GUI->width(), m_GUI->height());
     //m_GUI->setGeometry(0, 0, m_GUI->width(), m_GUI->height());
     m_GUI->setSizePolicy(preferred);
     m_GUI->layout()->activate();
     m_GUI->AlignBottom;
-    
+
   }
 
 }
 
 void QmitkFunctionalityComponentContainer::UpdateTreeNodeSelector(mitk::DataTreeIteratorBase* it)
 {
-  m_GUI->SetDataTreeIterator(it);
+  //m_GUI->SetDataTreeIterator(it);
   m_GUI->GetTreeNodeSelector()->UpdateContent();
 }
 
+void QmitkFunctionalityComponentContainer::UpdateTreeNodeSelector(mitk::DataTreeIteratorClone imageIt)
+{
+  //m_GUI->SetDataTreeIterator(it);
+  m_GUI->GetTreeNodeSelector()->UpdateContent();
+}
 
-
+void QmitkFunctionalityComponentContainer::UpdateSelector(QString name)
+{
+  m_GUI->GetTreeNodeSelector()->TreeNodeSelected(name);
+}

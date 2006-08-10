@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkThresholdComponentGUI.h"
 
 #include "QmitkTreeNodeSelector.h"
+#include <qcombobox.h>
 
 QmitkThresholdComponent::QmitkThresholdComponent( )
 {
@@ -63,6 +64,7 @@ void QmitkThresholdComponent::TreeChanged()
   if(m_GUI != NULL)
   {
     m_GUI->GetTreeNodeSelector()->SetDataTreeNodeIterator(this->GetDataTreeIterator());
+    //TODO
     UpdateTreeNodeSelector(this->GetDataTreeIterator());
     for(int i = 0;  i < m_Qbfc.size(); i++) 
     {
@@ -80,6 +82,7 @@ void QmitkThresholdComponent::TreeChanged(mitk::DataTreeIteratorBase* it)
   {
     SetDataTreeIterator(it);
     m_GUI->GetTreeNodeSelector()->SetDataTreeNodeIterator(it);
+    //TODO
     UpdateTreeNodeSelector(it);
   }
 }
@@ -98,8 +101,22 @@ void QmitkThresholdComponent::SetDataTreeIterator(mitk::DataTreeIteratorBase* it
 }
 
 
+void QmitkThresholdComponent::UpdateTreeNodeSelector(mitk::DataTreeIteratorClone imageIt)
+{
+  //m_GUI->SetDataTreeIterator(it);
+  //QmitkTreeNodeSelector* guiSelector = m_GUI->GetTreeNodeSelector();
+  //guiSelector = selector;
+  //m_GUI->GetTreeNodeSelector()->UpdateContent();
+  m_GUI->GetTreeNodeSelector()->SetDataTreeNodeIterator(imageIt);
+}
+
 void QmitkThresholdComponent::UpdateTreeNodeSelector(mitk::DataTreeIteratorBase* it)
 {
-  m_GUI->SetDataTreeIterator(it);
+  //m_GUI->SetDataTreeIterator(it);
   m_GUI->GetTreeNodeSelector()->UpdateContent();
+}
+
+void QmitkThresholdComponent::UpdateSelector(QString name)
+{
+  m_GUI->GetTreeNodeSelector()->TreeNodeSelected(name);
 }

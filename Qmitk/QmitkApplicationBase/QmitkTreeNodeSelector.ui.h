@@ -140,3 +140,9 @@ bool QmitkTreeNodeSelector::SelectNode(mitk::DataTreeNode* node)
   return false;
 }
 
+
+
+QComboBox* QmitkTreeNodeSelector::GetComboBox()
+{
+  return m_ComboBox;
+}

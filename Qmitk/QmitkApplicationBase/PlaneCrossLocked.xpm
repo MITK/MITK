@@ -1,11 +1,11 @@
 /* XPM */
-static char * PlaneCrossLocked_xpm[] = {
+static char * planecrosslocked_xpm[] = {
 "22 22 5 1",
 " 	c None",
-".	c #08FF00",
-"+	c #FFFC00",
+".	c #03CF15",
+"+	c #E2DF00",
 "@	c #000000",
-"#	c #FF0800",
+"#	c #E10502",
 "                      ",
 "                      ",
 "          ..          ",

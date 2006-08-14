@@ -2,8 +2,8 @@
 static char * planecross_xpm[] = {
 "22 22 3 1",
 " 	c None",
-".	c #08FF00",
-"+	c #FF0800",
+".	c #02C01D",
+"+	c #D80503",
 "                      ",
 "                      ",
 "          ..          ",

@@ -310,10 +310,6 @@ class SliceNavigationController : public BaseController
 
   protected:
 
-    bool m_SliceLocked;
-    bool m_SliceRotationLocked;
-    //SliceNavigationController();
-
     //##ModelId=3E189B1D00BF
     virtual ~SliceNavigationController();
 
@@ -342,6 +338,9 @@ class SliceNavigationController : public BaseController
     bool m_Rotated;
 
     bool m_BlockUpdate;
+
+    bool m_SliceLocked;
+    bool m_SliceRotationLocked;
 };
 
 } // namespace mitk

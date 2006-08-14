@@ -272,6 +272,27 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
   {
     factory->SetFileName( fileName );
 
+    QString qFileName( fileName );
+    
+    // just in case this is a series
+    int fnstart = qFileName.findRev( QRegExp("[/\\\\]"), qFileName.length() ); // last occurence of / or \  (\\\\ because of C++ quoting and regex syntax)
+    if ( fnstart<0 ) fnstart=0;
+    int start = qFileName.find( QRegExp("[0-9]*\\."), fnstart );
+    if ( start>=0 )
+    {
+      char prefix[1024], pattern[1024];
+
+      strncpy(prefix, qFileName.ascii(), start);
+      prefix[start]=0;
+
+      int stop=qFileName.find( QRegExp("[^0-9]"), start );
+      sprintf(pattern, "%%s%%0%uu%s",stop-start,qFileName.ascii()+stop);
+
+
+      factory->SetFilePattern( pattern );
+      factory->SetFilePrefix( prefix );
+    }
+
     QApplication::setOverrideCursor( QCursor(Qt::WaitCursor) );
 
     factory->Update();
@@ -295,7 +316,7 @@ void QmitkMainTemplate::fileOpenImageSequence()
 
     int fnstart = fileName.findRev( QRegExp("[/\\\\]"), fileName.length() ); // last occurence of / or \  (\\\\ because of C++ quoting and regex syntax)
     if ( fnstart<0 ) fnstart=0;
-    int start = fileName.find( QRegExp("[0-9]"), fnstart );
+    int start = fileName.find( QRegExp("[0-9]*\\."), fnstart );
     if ( start<0 )
     {
       fileOpen(fileName.ascii());

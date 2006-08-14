@@ -78,8 +78,8 @@
                     </property>
                     <property name="sizePolicy">
                         <sizepolicy>
-                            <hsizetype>1</hsizetype>
-                            <vsizetype>3</vsizetype>
+                            <hsizetype>5</hsizetype>
+                            <vsizetype>5</vsizetype>
                             <horstretch>0</horstretch>
                             <verstretch>0</verstretch>
                         </sizepolicy>
@@ -92,7 +92,7 @@
                     </property>
                     <property name="maximumSize">
                         <size>
-                            <width>40</width>
+                            <width>0</width>
                             <height>2000</height>
                         </size>
                     </property>
@@ -177,7 +177,6 @@
     <variable>bool m_SlicesRotation;</variable>
     <variable>mitk::GradientBackground::Pointer m_GradientBackground1;</variable>
     <variable>mitk::GradientBackground::Pointer m_GradientBackground2;</variable>
-    <variable>mitk::LevelWindowProperty::Pointer m_PrevTopLevWinProp;</variable>
 </variables>
 <signals>
     <signal>WheelMoved( QWheelEvent* )</signal>
@@ -202,8 +201,6 @@
     <slot returnType="bool">InitializeStandardViews( const mitk::Geometry3D * geometry )</slot>
     <slot>wheelEvent( QWheelEvent * e )</slot>
     <slot>ReInitializeStandardViews()</slot>
-    <slot>changeLevelWindow( mitk::LevelWindow * lw )</slot>
-    <slot>changeLevelWindow2( mitk::LevelWindow * lw, mitk::DataTreeIteratorClone * iter )</slot>
     <slot>EnsureDisplayContainsPoint( mitk::DisplayGeometry * displayGeometry, const mitk::Point3D &amp; p )</slot>
     <slot>MoveCrossToPosition( const mitk::Point3D &amp; newPosition )</slot>
     <slot>EnableNavigationControllerEventListening()</slot>
@@ -224,7 +221,6 @@
     <function returnType="QmitkRenderWindow *">GetRenderWindow4() const</function>
     <function returnType="const mitk::Point3D &amp;">GetCrossPosition() const</function>
     <function returnType="int">GetLayout() const</function>
-    <function>newImage()</function>
 </functions>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

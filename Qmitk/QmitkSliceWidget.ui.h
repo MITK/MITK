@@ -12,6 +12,7 @@
 
 #include "mitkSliceNavigationController.h"
 #include "mitkLevelWindowProperty.h"
+#include "QmitkLevelWindowWidget.h"
 
 #include <vtkRenderer.h>
 
@@ -93,14 +94,11 @@ void QmitkSliceWidget::AddData( mitk::DataTreeNode::Pointer node)
 }
 
 
-void
-QmitkSliceWidget
-::SetData( mitk::DataTreeIteratorBase* it,
-           mitk::SliceNavigationController::ViewDirection view )
+void QmitkSliceWidget::SetData( mitk::DataTreeIteratorBase* it, mitk::SliceNavigationController::ViewDirection view )
 {
   m_DataTreeIterator = it;
   mitk::DataTreeIteratorClone tmpIterator=m_DataTreeIterator.GetPointer();
-
+  levelWindow->setDataTreeIteratorClone(tmpIterator);
   while ( !tmpIterator->IsAtEnd() ) 
   {
     mitk::Image::Pointer image =
@@ -113,10 +111,7 @@ QmitkSliceWidget
       mitk::LevelWindow picLevelWindow;
       tmpIterator->Get()->GetLevelWindow(picLevelWindow,NULL);
 
-      levelWindow->setLevelWindow(picLevelWindow);
-
       GetRenderer()->SetData(tmpIterator.GetPointer());
-      //tmpIterator->Get()->SetLevelWindow(levelWindow, NULL );
       break;
     }
  
@@ -125,9 +120,7 @@ QmitkSliceWidget
   InitWidget(view);
 }
 
-void
-QmitkSliceWidget
-::InitWidget( mitk::SliceNavigationController::ViewDirection viewDirection )
+void QmitkSliceWidget::InitWidget( mitk::SliceNavigationController::ViewDirection viewDirection )
 {
   m_View = viewDirection;
 
@@ -212,40 +205,6 @@ QmitkSliceWidget
   //vtkRenderer * vtkrenderer = ((mitk::OpenGLRenderer*)(GetRenderer()))->GetVtkRenderer();
   //if(vtkrenderer!=NULL) vtkrenderer->ResetCamera();
   //vtkObject::SetGlobalWarningDisplay(w);
-}
-
-void QmitkSliceWidget::ChangeLevelWindow(mitk::LevelWindow* lw )
-{
-  if ( m_DataTreeIterator.IsNull() )
-  {
-    return;
-  }
-
-  mitk::DataTreeIteratorClone it = m_DataTreeIterator.GetPointer();
-  while(!it->IsAtEnd()) 
-  {
-    mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(it->Get()->GetData());
-    if( image.IsNotNull() )
-    {
-      mitk::LevelWindowProperty::Pointer levWinProp = 
-        dynamic_cast<mitk::LevelWindowProperty*>(
-          it->Get()->GetProperty("levelwindow", NULL).GetPointer()
-      );
-
-      if (levWinProp.IsNotNull()) 
-      {
-        mitk::LevelWindow levWin = levWinProp->GetLevelWindow();
-
-        levWin.SetMinMax(lw->GetMin(), lw->GetMax());
-//        levWin.SetRangeMinMax(lw->GetRangeMin(), lw->GetRangeMax());
-
-        levWinProp->SetLevelWindow(levWin);
-        it->Get()->SetLevelWindow(levWin, NULL);
-      }
-    }
-    ++it;
-  }
-  GetRenderer()->GetRenderWindow()->GetSliceNavigationController()->GetRenderingManager()->RequestUpdateAll();
 }
 
 

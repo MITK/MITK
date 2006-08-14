@@ -18,207 +18,216 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "QmitkSliderLevelWindowWidget.h"
 #include <qcursor.h>
-#include <qpopupmenu.h>
-#include <qmessagebox.h>
-#include <mitkConfig.h>
-#include <itksys/SystemTools.hxx>
-#include <mitkLevelWindowPreset.h>
-#include <qdialog.h>
-#include <qlayout.h>
-#include <QmitkLevelWindowPresetDefinition.h>
-#include <QmitkLevelWindowRangeChange.h>
-#include <qlineedit.h>
 #include <qtooltip.h>
-#include <qpixmap.h>
-#include "mitkDataTreeNode.h"
-#include "QmitkCommonFunctionality.h"
+#include <itkCommand.h>
 
 /**
 * Constructor
 */
 QmitkSliderLevelWindowWidget::QmitkSliderLevelWindowWidget( QWidget * parent, const char * name, WFlags f )
-: QWidget( parent, name, f ), mouseDown(false), brush( QBrush::SolidPattern ), lw(), pre()
+: QWidget( parent, name, f )
 {
-  m_FilterFunction = QmitkSliderLevelWindowWidget::IsImageNode;
+  m_Manager = new mitk::LevelWindowManager();
+  itk::ReceptorMemberCommand<QmitkSliderLevelWindowWidget>::Pointer command = itk::ReceptorMemberCommand<QmitkSliderLevelWindowWidget>::New();
+  command->SetCallbackFunction(this, &QmitkSliderLevelWindowWidget::OnPropertyModified);
+  m_ObserverTag = m_Manager->AddObserver(itk::ModifiedEvent(), command);
   m_It = NULL;
-  pre.LoadPreset();
   setMouseTracking(TRUE);
-  resize = FALSE;
-  bottom = FALSE;
-  ctrlPressed = FALSE;
-  lw.SetLevelWindow(0, 200);
-  lw.SetDefaultLevelWindow(0, 200);
-  m_lowerLimit = -2048;
-  lw.SetRangeMinMax(-2048, 2048);
-  lw.SetDefaultRangeMinMax(-2048, 2048);
-  m_upperLimit = 2048;
+  m_Resize = FALSE;
+  m_Bottom = FALSE;
+  m_SliderVisible = FALSE;
+  m_CtrlPressed = FALSE;
+  m_MouseDown = FALSE;
   
-  //refresh validators for line edits
-  emit newRange( &lw);
+  m_Font.setPointSize( 6 );
   
-  font.setPointSize( 6 );
-  setMinimumSize ( QSize( 50, 50 ) );
-  setMaximumSize ( QSize( 50, 2000 ) );
-  setSizePolicy( QSizePolicy( QSizePolicy::Minimum, QSizePolicy::Expanding ) );
-  brush.setColor( QColor( 0, 0, 0 ) );
-  moveHeight = height() - 25;
-  factor = 0;
-  scale = TRUE;
+  m_MoveHeight = height() - 25;
+  m_Scale = TRUE;
+  m_Contextmenu = new QmitkLevelWindowWidgetContextMenu(this, "contextMenu", true);
 
   setBackgroundMode( Qt::NoBackground );
 
+  this->hide();
   update();
+}
+
+void QmitkSliderLevelWindowWidget::setLevelWindowManager(mitk::LevelWindowManager* levelWindowManager)
+{
+  if( m_ObserverTag && m_Manager)
+  {
+    m_Manager->RemoveObserver(m_ObserverTag);
+  }
+  m_Manager = levelWindowManager;
+  itk::ReceptorMemberCommand<QmitkSliderLevelWindowWidget>::Pointer command = itk::ReceptorMemberCommand<QmitkSliderLevelWindowWidget>::New();
+  command->SetCallbackFunction(this, &QmitkSliderLevelWindowWidget::OnPropertyModified);
+  m_ObserverTag = m_Manager->AddObserver(itk::ModifiedEvent(), command);
+}
+
+void QmitkSliderLevelWindowWidget::OnPropertyModified(const itk::EventObject& e)
+{
+  try
+  {
+    m_Lw = m_Manager->GetLevelWindow();
+    m_SliderVisible = TRUE;
+    this->show();
+    update();
+  }
+  catch(...)
+  {
+    m_SliderVisible = FALSE;
+    try
+    {
+      this->hide();
+    }
+    catch(...)
+    {
+    }
+  }
 }
 
 void QmitkSliderLevelWindowWidget::paintEvent( QPaintEvent* itkNotUsed(e) ) 
 {
   QPixmap pm(width(), height());
-  pm.fill(backgroundColor());
+  pm.fill( static_cast<QWidget*>(parent())->paletteBackgroundColor() );
   QPainter painter(&pm);
 
-  painter.setFont( font );
-
-  QColor c(93,144,169);
-  QColor cl = c.light();
-  QColor cd = c.dark();
-
-  painter.setBrush(c);
-  painter.drawRect(rect);
-  
-  // test if slider range has changed, if true -> refresh validator for line edits
-
-  if (!(m_lowerLimit == lw.GetRangeMin() && m_upperLimit == lw.GetRangeMax()))
+  if (m_SliderVisible)
   {
-    m_lowerLimit = lw.GetRangeMin();
-    m_upperLimit = lw.GetRangeMax();
-    emit newRange(&lw);
-  } // end test if slider range has changed
+    painter.setFont( m_Font );
+    painter.setPen(static_cast<QWidget*>(parent())->paletteForegroundColor());
 
-  float mr = lw.GetRange();
 
-  if ( mr < 1 )
-    mr = 1;
+    QColor c(93,144,169);
+    QColor cl = c.light();
+    QColor cd = c.dark();
+
+    painter.setBrush(c);
+    painter.drawRect(m_Rect);
+
+    float mr = m_Lw.GetRange();
+
+    if ( mr < 1 )
+      mr = 1;
  
-  float fact = (float) moveHeight / mr;
-  
-  painter.setPen(black);
+    float fact = (float) m_MoveHeight / mr;
 
-  //begin draw scale
-  if (scale)
-  {
-    int minRange = (int)lw.GetRangeMin();
-    int maxRange = (int)lw.GetRangeMax();
-    int yValue = moveHeight + (int)(minRange*fact);
-    painter.drawLine( 5, yValue , 15, yValue);
-    QString s = " 0";
-    painter.drawText( 21, yValue + 3, s );
-
-    int count = 1;
-    int k = 5;
-    bool enoughSpace = false;
-    bool enoughSpace2 = false;
-
-    for(int i = moveHeight + (int)(minRange*fact); i < moveHeight;)
+    //begin draw scale
+    if (m_Scale)
     {
-      if (-count*20 < minRange)
-        break;
-      yValue = moveHeight + (int)((minRange + count*20)*fact);
-      s = QString::number(-count*20);
-      if (count % k && ((20*fact) > 2.5))
-      {
-        painter.drawLine( 8, yValue, 12, yValue);
-        enoughSpace = true;
-      }
-      else if (!(count % k))
-      {
-        if ((k*20*fact) > 7)
-        {
-          painter.drawLine( 5, yValue, 15, yValue);
-          painter.drawText( 21, yValue + 3, s );
-          enoughSpace2 = true;
-        }
-        else
-        {
-          k += 5;
-        }
-      }
-      if (enoughSpace)
-      {
-        i=yValue;
-        count++;
-      }
-      else if (enoughSpace2)
-      {
-        i=yValue;
-        count += k;
-      }
-      else
-      {
-        i=yValue;
-        count = k;
-      }
-    }
+      int minRange = (int)m_Lw.GetRangeMin();
+      int maxRange = (int)m_Lw.GetRangeMax();
+      int yValue = m_MoveHeight + (int)(minRange*fact);
+      painter.drawLine( 5, yValue , 15, yValue);
+      QString s = " 0";
+      painter.drawText( 21, yValue + 3, s );
 
-    count = 1;
-    k = 5;
-    enoughSpace = false;
-    enoughSpace2 = false;
+      int count = 1;
+      int k = 5;
+      bool enoughSpace = false;
+      bool enoughSpace2 = false;
 
-    for(int i = moveHeight + (int)(minRange*fact); i >= 0;)
-    {
-      if (count*20 > maxRange)
-        break;
-      yValue = moveHeight + (int)((minRange - count*20)*fact);
-      s = QString::number(count*20);
-      if(count % k && ((20*fact) > 2.5))
+      for(int i = m_MoveHeight + (int)(minRange*fact); i < m_MoveHeight;)
       {
-        if (!(minRange > 0 && (count*20) < minRange))
+        if (-count*20 < minRange)
+          break;
+        yValue = m_MoveHeight + (int)((minRange + count*20)*fact);
+        s = QString::number(-count*20);
+        if (count % k && ((20*fact) > 2.5))
+        {
           painter.drawLine( 8, yValue, 12, yValue);
-        enoughSpace = true;
-      }
-      else if (!(count % k))
-      {
-        if ((k*20*fact) > 7)
+          enoughSpace = true;
+        }
+        else if (!(count % k))
         {
-          if (!(minRange > 0 && (count*20) < minRange))
+          if ((k*20*fact) > 7)
           {
             painter.drawLine( 5, yValue, 15, yValue);
             painter.drawText( 21, yValue + 3, s );
+            enoughSpace2 = true;
           }
-          enoughSpace2 = true;
+          else
+          {
+            k += 5;
+          }
+        }
+        if (enoughSpace)
+        {
+          i=yValue;
+          count++;
+        }
+        else if (enoughSpace2)
+        {
+          i=yValue;
+          count += k;
         }
         else
         {
-          k += 5;
+          i=yValue;
+          count = k;
         }
       }
-      if (enoughSpace)
+
+      count = 1;
+      k = 5;
+      enoughSpace = false;
+      enoughSpace2 = false;
+
+      for(int i = m_MoveHeight + (int)(minRange*fact); i >= 0;)
       {
-        i=yValue;
-        count++;
-      }
-      else if (enoughSpace2)
-      {
-        i=yValue;
-        count += k;
-      }
-      else
-      {
-        i=yValue;
-        count = k;
+        if (count*20 > maxRange)
+          break;
+        yValue = m_MoveHeight + (int)((minRange - count*20)*fact);
+        s = QString::number(count*20);
+        if(count % k && ((20*fact) > 2.5))
+        {
+          if (!(minRange > 0 && (count*20) < minRange))
+            painter.drawLine( 8, yValue, 12, yValue);
+          enoughSpace = true;
+        }
+        else if (!(count % k))
+        {
+          if ((k*20*fact) > 7)
+          {
+            if (!(minRange > 0 && (count*20) < minRange))
+            {
+              painter.drawLine( 5, yValue, 15, yValue);
+              painter.drawText( 21, yValue + 3, s );
+            }
+            enoughSpace2 = true;
+          }
+          else
+          {
+            k += 5;
+          }
+        }
+        if (enoughSpace)
+        {
+          i=yValue;
+          count++;
+        }
+        else if (enoughSpace2)
+        {
+          i=yValue;
+          count += k;
+        }
+        else
+        {
+          i=yValue;
+          count = k;
+        }
       }
     }
-  }
-  //end draw scale
+    //end draw scale
 
-  painter.setPen (cl);
-  painter.drawLine(rect.topLeft(),rect.topRight());
-  painter.drawLine(rect.topLeft(),rect.bottomLeft());
+    painter.setPen (cl);
+    painter.drawLine(m_Rect.topLeft(),m_Rect.topRight());
+    painter.drawLine(m_Rect.topLeft(),m_Rect.bottomLeft());
   
-  painter.setPen (cd);
-  painter.drawLine(rect.topRight(),rect.bottomRight());
-  painter.drawLine(rect.bottomRight(),rect.bottomLeft());
-  painter.end();
+    painter.setPen (cd);
+    painter.drawLine(m_Rect.topRight(),m_Rect.bottomRight());
+    painter.drawLine(m_Rect.bottomRight(),m_Rect.bottomLeft());
+    painter.end();
+  }
   QPainter p (this);
   p.drawPixmap(0, 0, pm);
 }
@@ -227,122 +236,122 @@ void QmitkSliderLevelWindowWidget::paintEvent( QPaintEvent* itkNotUsed(e) )
 *
 */
 void QmitkSliderLevelWindowWidget::mouseMoveEvent( QMouseEvent* mouseEvent ) {
-  if (!mouseDown)
+  if (!m_MouseDown)
   {
-    if (((mouseEvent->pos().y() >= (rect.topLeft().y() - 3) && mouseEvent->pos().y() <= (rect.topLeft().y() + 3))
-      || (mouseEvent->pos().y() >= (rect.bottomLeft().y() - 3) && mouseEvent->pos().y() <= (rect.bottomLeft().y() + 3)))
-      && mouseEvent->pos().x() >= rect.topLeft().x() && mouseEvent->pos().x() <= rect.topRight().x())
+    if (((mouseEvent->pos().y() >= (m_Rect.topLeft().y() - 3) && mouseEvent->pos().y() <= (m_Rect.topLeft().y() + 3))
+      || (mouseEvent->pos().y() >= (m_Rect.bottomLeft().y() - 3) && mouseEvent->pos().y() <= (m_Rect.bottomLeft().y() + 3)))
+      && mouseEvent->pos().x() >= m_Rect.topLeft().x() && mouseEvent->pos().x() <= m_Rect.topRight().x())
     {
       setCursor(SizeVerCursor);
       QToolTip::remove(this, m_UpperBound);
       QToolTip::remove(this, m_LowerBound);
-      m_LowerBound.setRect(rect.bottomLeft().x(), rect.bottomLeft().y() - 3, 17, 7);
+      m_LowerBound.setRect(m_Rect.bottomLeft().x(), m_Rect.bottomLeft().y() - 3, 17, 7);
       QToolTip::add(this, m_LowerBound, "Ctrl + left click to change only lower bound");
-      m_UpperBound.setRect(rect.topLeft().x(), rect.topLeft().y() - 3, 17, 7);
+      m_UpperBound.setRect(m_Rect.topLeft().x(), m_Rect.topLeft().y() - 3, 17, 7);
       QToolTip::add(this, m_UpperBound, "Ctrl + left click to change only upper bound");
-      resize = TRUE;
-      if ((mouseEvent->pos().y() >= (rect.bottomLeft().y() - 3) && mouseEvent->pos().y() <= (rect.bottomLeft().y() + 3)))
-        bottom = TRUE;
+      m_Resize = TRUE;
+      if ((mouseEvent->pos().y() >= (m_Rect.bottomLeft().y() - 3) && mouseEvent->pos().y() <= (m_Rect.bottomLeft().y() + 3)))
+        m_Bottom = TRUE;
     }
     else
     {
       QToolTip::remove(this, m_LowerBound);
       QToolTip::remove(this, m_UpperBound);
       setCursor(ArrowCursor);
-      resize = FALSE;
-      bottom = FALSE;
+      m_Resize = FALSE;
+      m_Bottom = FALSE;
     }
   }
 
-  if ( mouseDown ) {
+  if ( m_MouseDown ) {
 
-    float fact = (float) moveHeight / lw.GetRange();
+    float fact = (float) m_MoveHeight / m_Lw.GetRange();
 
-    if ( leftbutton ) 
+    if ( m_Leftbutton ) 
     {
-      if (resize && !ctrlPressed)
+      if (m_Resize && !m_CtrlPressed)
       {
         double diff = (mouseEvent->pos().y()) / fact;
-        diff -= (startPos.y()) / fact;
-        startPos = mouseEvent->pos();
+        diff -= (m_StartPos.y()) / fact;
+        m_StartPos = mouseEvent->pos();
 
         if (diff == 0) return;
         float value;
-        if (bottom)
-          value = lw.GetWindow() + ( ( 2 * diff ) );
+        if (m_Bottom)
+          value = m_Lw.GetWindow() + ( ( 2 * diff ) );
         else
-          value = lw.GetWindow() - ( ( 2 * diff ) );
+          value = m_Lw.GetWindow() - ( ( 2 * diff ) );
 
         if ( value < 1 )
           value = 1;
 
-        lw.SetWindow( value );
+        m_Lw.SetWindow( value );
       } 
-      else if(resize && ctrlPressed)
+      else if(m_Resize && m_CtrlPressed)
       {
-        if (!bottom)
+        if (!m_Bottom)
         {
           double diff = (mouseEvent->pos().y()) / fact;
-          diff -= (startPos.y()) / fact;
-          startPos = mouseEvent->pos();
+          diff -= (m_StartPos.y()) / fact;
+          m_StartPos = mouseEvent->pos();
 
           if (diff == 0) return;
           float value;
           
-          value = lw.GetWindow() - ( ( diff ) );
+          value = m_Lw.GetWindow() - ( ( diff ) );
 
           if ( value < 1 )
             value = 1;
           float oldWindow;
           float oldLevel;
           float newLevel;
-          oldWindow = lw.GetWindow();
-          oldLevel = lw.GetLevel();
+          oldWindow = m_Lw.GetWindow();
+          oldLevel = m_Lw.GetLevel();
           newLevel = oldLevel + (value - oldWindow)/2;
-          if (!((newLevel + value/2) > lw.GetRangeMax())) 
-            lw.SetLevelWindow( newLevel, value );
+          if (!((newLevel + value/2) > m_Lw.GetRangeMax())) 
+            m_Lw.SetLevelWindow( newLevel, value );
         }
         else
         {
           double diff = (mouseEvent->pos().y()) / fact;
-          diff -= (startPos.y()) / fact;
-          startPos = mouseEvent->pos();
+          diff -= (m_StartPos.y()) / fact;
+          m_StartPos = mouseEvent->pos();
 
           if (diff == 0) return;
           float value;
           
-          value = lw.GetWindow() + ( ( diff ) );
+          value = m_Lw.GetWindow() + ( ( diff ) );
 
           if ( value < 1 )
             value = 1;
           float oldWindow;
           float oldLevel;
           float newLevel;
-          oldWindow = lw.GetWindow();
-          oldLevel = lw.GetLevel();
+          oldWindow = m_Lw.GetWindow();
+          oldLevel = m_Lw.GetLevel();
           newLevel = oldLevel - (value - oldWindow)/2;
-          if (!((newLevel - value/2) < lw.GetRangeMin())) 
-            lw.SetLevelWindow( newLevel, value );
+          if (!((newLevel - value/2) < m_Lw.GetRangeMin())) 
+            m_Lw.SetLevelWindow( newLevel, value );
         }
       }
       else
       {
-        float maxv = lw.GetRangeMax();
-        float minv = lw.GetRangeMin();
-        float wh = lw.GetWindow() / 2;
+        float maxv = m_Lw.GetRangeMax();
+        float minv = m_Lw.GetRangeMin();
+        float wh = m_Lw.GetWindow() / 2;
   
-        float value = (moveHeight - mouseEvent->pos().y()) / fact + minv;
+        float value = (m_MoveHeight - mouseEvent->pos().y()) / fact + minv;
        
         if ( value - wh < minv )
-          lw.SetLevel( lw.GetRangeMin() + wh );
+          m_Lw.SetLevel( m_Lw.GetRangeMin() + wh );
 
         else if ( value + wh > maxv )
-          lw.SetLevel( lw.GetRangeMax() - wh );
+          m_Lw.SetLevel( m_Lw.GetRangeMax() - wh );
 
         else
-          lw.SetLevel( value );
+          m_Lw.SetLevel( value );
       }
-      update();
+      m_Manager->SetLevelWindow(m_Lw);
     }
   }
 }
@@ -351,23 +360,23 @@ void QmitkSliderLevelWindowWidget::mouseMoveEvent( QMouseEvent* mouseEvent ) {
 *
 */
 void QmitkSliderLevelWindowWidget::mousePressEvent( QMouseEvent* mouseEvent ) {
-  mouseDown = true;
-  startPos = mouseEvent->pos();
+  m_MouseDown = true;
+  m_StartPos = mouseEvent->pos();
 
   if ( mouseEvent->button() == QMouseEvent::LeftButton )
   {
     if (mouseEvent->state() == Qt::ControlButton || mouseEvent->state() == Qt::ShiftButton)
     {
-      ctrlPressed = true;
+      m_CtrlPressed = true;
     }
     else
     {
-      ctrlPressed = false;
+      m_CtrlPressed = false;
     }
-    leftbutton = true;
+    m_Leftbutton = true;
   }
   else
-    leftbutton = false;
+    m_Leftbutton = false;
 
   mouseMoveEvent( mouseEvent );
 }
@@ -376,7 +385,7 @@ void QmitkSliderLevelWindowWidget::mousePressEvent( QMouseEvent* mouseEvent ) {
 *
 */
 void QmitkSliderLevelWindowWidget::resizeEvent ( QResizeEvent * event ) {
-  moveHeight = event->size().height() - 25;
+  m_MoveHeight = event->size().height() - 25;
   update();
 }
 
@@ -385,282 +394,75 @@ void QmitkSliderLevelWindowWidget::resizeEvent ( QResizeEvent * event ) {
 */
 void QmitkSliderLevelWindowWidget::mouseReleaseEvent( QMouseEvent* ) 
 {
-  mouseDown = false;
-}
-
-/**
-*
-*/
-void QmitkSliderLevelWindowWidget::setLevelWindow( const mitk::LevelWindow& lw ) {
-  this->lw = lw;
-}
-
-/**
-*
-*/
-mitk::LevelWindow& QmitkSliderLevelWindowWidget::getLevelWindow() {
-  return lw;
-}
-
-/**
-*
-*/
-void QmitkSliderLevelWindowWidget::update( ipPicDescriptor* pic ) {
-
-  double min, max;
-  ipFuncExtr( pic, &min, &max );
-  lw.SetRangeMinMax(min, max);
-  lw.SetLevelWindow( (max - min) / 2, (max - min) / 2 );
-  update();
+  m_MouseDown = false;
 }
 
 /**
 *
 */
 void QmitkSliderLevelWindowWidget::update() {
-
-  float mr = lw.GetRange();
+  int rectWidth;
+  if(m_Scale)
+  {
+    rectWidth = 17;
+    setMinimumSize ( QSize( 50, 50 ) );
+    setMaximumSize ( QSize( 50, 2000 ) );
+    setSizePolicy( QSizePolicy( QSizePolicy::Minimum, QSizePolicy::Expanding ) );
+  }
+  else
+  {
+    rectWidth = 26;
+    setMinimumSize ( QSize( 40, 50 ) );
+    setMaximumSize ( QSize( 50, 2000 ) );
+    setSizePolicy( QSizePolicy( QSizePolicy::Minimum, QSizePolicy::Expanding ) );
+  }
+  float mr = m_Lw.GetRange();
 
   if ( mr < 1 )
     mr = 1;
 
-  float fact = (float) moveHeight / mr;
+  float fact = (float) m_MoveHeight / mr;
 
-  float rectHeight = lw.GetWindow() * fact;
+  float rectHeight = m_Lw.GetWindow() * fact;
 
   if ( rectHeight < 15 )
     rectHeight = 15;
 
-  if ( lw.GetMin() < 0 )
-    rect.setRect( 2, (int) (moveHeight - (lw.GetMax() - lw.GetRangeMin()) * fact) , 17, (int) rectHeight );
+  if ( m_Lw.GetMin() < 0 )
+    m_Rect.setRect( 2, (int) (m_MoveHeight - (m_Lw.GetMax() - m_Lw.GetRangeMin()) * fact) , rectWidth, (int) rectHeight );
   else
-    rect.setRect( 2, (int) (moveHeight - (lw.GetMax() - lw.GetRangeMin()) * fact), 17, (int) rectHeight );
-
+    m_Rect.setRect( 2, (int) (m_MoveHeight - (m_Lw.GetMax() - m_Lw.GetRangeMin()) * fact), rectWidth, (int) rectHeight );
+  
   QWidget::repaint();
-
-  // FIX: only emit the signal if the level window was changed by the user via mouse
-  if (mouseDown && leftbutton) emit levelWindow( &lw );
 }
-
-void QmitkSliderLevelWindowWidget::updateFromLineEdit() 
-{
-  float mr = lw.GetRange();
-
-  if ( mr < 1 )
-    mr = 1;
-
-  float fact = (float) moveHeight / mr;
-
-  float rectHeight = lw.GetWindow() * fact;
-
-  if ( rectHeight < 5 )
-    rectHeight = 5;
-
-  if ( lw.GetMin() < 0 )
-    rect.setRect( 2, (int) (moveHeight - (lw.GetMax() - lw.GetRangeMin()) * fact) , 17, (int) rectHeight );
-  else
-    rect.setRect( 2, (int) (moveHeight - (lw.GetMax() - lw.GetRangeMin()) * fact), 17, (int) rectHeight );
-
-  update();
-}//end of updateFromLineEdit
 
 void QmitkSliderLevelWindowWidget::contextMenuEvent( QContextMenuEvent * )
-{  
+{ 
+  m_Contextmenu->setLevelWindowManager(m_Manager);
   QPopupMenu *contextMenu = new QPopupMenu( this );
   Q_CHECK_PTR( contextMenu );
-  if (scale)
-    contextMenu->insertItem(tr("Hide scale"), this, SLOT(hideScale()));
+  if (m_Scale)
+    contextMenu->insertItem(tr("Hide Scale"), this, SLOT(hideScale()));
   else
-    contextMenu->insertItem(tr("Show scale"), this, SLOT(showScale()));
+    contextMenu->insertItem(tr("Show Scale"), this, SLOT(showScale()));
   contextMenu->insertSeparator();
-  contextMenu->insertItem(tr("Default Level/Window"), this, SLOT(setDefaultLevelWindow()));
-  contextMenu->insertSeparator();
-  contextMenu->insertItem(tr("Change Scale Range"), this, SLOT(changeScaleRange()));
-  contextMenu->insertItem(tr("Default Scale Range"), this, SLOT(setDefaultScaleRange()));
-  contextMenu->insertSeparator();
-  presetSubmenu = new QPopupMenu( this );
-  Q_CHECK_PTR( presetSubmenu );
-  m_presetID = presetSubmenu->insertItem(tr("Preset definition"), this, SLOT(addPreset()));
-  presetSubmenu->insertSeparator();
-  std::map<std::string, double> pres = pre.getLevelPresets();
-  for( std::map<std::string, double>::iterator iter = pres.begin(); iter != pres.end(); iter++ ) {
-    QString item = ((*iter).first.c_str());
-    presetSubmenu->insertItem(item);
-  }
-  connect(presetSubmenu, SIGNAL(activated(int)), this, SLOT(setPreset(int)));
-  contextMenu->insertItem( "Presets",  presetSubmenu );
-
-  contextMenu->insertSeparator();
-  updateContent();
-  imageSubmenu = new QPopupMenu( this );
-  imageSubmenu->setCheckable(TRUE);
-  Q_CHECK_PTR( imageSubmenu );
-  for( std::map<std::string, mitk::DataTreeIteratorClone>::iterator iter = m_TreeNodes.begin(); iter != m_TreeNodes.end(); iter++ ) {
-    QString item = ((*iter).first).c_str();
-    int id = imageSubmenu->insertItem(item);
-    if (item == m_SelectedImage)
-    {
-      imageSubmenu->setItemChecked(id, true);
-      emit changeLevelWindow(&m_TreeNodes.find(m_SelectedImage.ascii())->second);
-    }
-  }
-  connect(imageSubmenu, SIGNAL(activated(int)), this, SLOT(setImage(int)));
-  contextMenu->insertItem( "Images",  imageSubmenu );
-
-  contextMenu->exec( QCursor::pos() );
-  delete contextMenu;
-}
-
-void QmitkSliderLevelWindowWidget::setPreset(int id)
-{
-  QString item = presetSubmenu->text(id);
-  if (!(id == m_presetID))
-  {
-    double dlevel = pre.getLevel(std::string((const char*)item));
-    double dwindow = pre.getWindow(std::string((const char*)item));
-    if ((dlevel + dwindow/2) > lw.GetRangeMax())
-    {
-      double lowerBound = (dlevel - dwindow/2);
-      if (!(lowerBound > lw.GetRangeMax()))
-      {
-        dwindow = lw.GetRangeMax() - lowerBound;
-        dlevel = lowerBound + dwindow/2;
-      }
-      else
-      {
-        dlevel = lw.GetRangeMax() - 1;
-        dwindow = 2;
-      }
-    }
-    else if ((dlevel - dwindow/2) < lw.GetRangeMin())
-    {
-      double upperBound = (dlevel + dwindow/2);
-      if (!(upperBound < lw.GetRangeMin()))
-      {
-        dwindow = lw.GetRangeMin() + upperBound;
-        dlevel = upperBound - dwindow/2;
-      }
-      else
-      {
-        dlevel = lw.GetRangeMin() + 1;
-        dwindow = 2;
-      }
-    }
-    lw.SetLevelWindow(dlevel, dwindow);
-    update();
-    emit levelWindow( &lw );
-  }
-}
-
-void QmitkSliderLevelWindowWidget::addPreset()
-{
-  QmitkLevelWindowPresetDefinition addPreset(this, "newPreset", TRUE);
-  addPreset.setPresets(pre.getLevelPresets(), pre.getWindowPresets(), QString::number( (int) lw.GetLevel() ), QString::number( (int) lw.GetWindow() ));
-  if(addPreset.exec())
-  {
-    pre.newPresets(addPreset.getLevelPresets(), addPreset.getWindowPresets());
-  }
-}
-
-void QmitkSliderLevelWindowWidget::setDefaultLevelWindow()
-{
-  lw.SetLevelWindow(lw.GetDefaultLevel(), lw.GetDefaultWindow());
-  update();
-  emit levelWindow( &lw );
+  m_Contextmenu->getContextMenu(contextMenu);
 }
 
 void QmitkSliderLevelWindowWidget::hideScale()
 {
-  scale = FALSE;
+  m_Scale = FALSE;
   update();
 }
 
 void QmitkSliderLevelWindowWidget::showScale()
 {
-  scale = TRUE;
+  m_Scale = TRUE;
   update();
 }
 
-void QmitkSliderLevelWindowWidget::setDefaultScaleRange()
-{
-  lw.SetRangeMinMax(lw.GetDefaultRangeMin(), lw.GetDefaultRangeMax());
-  lw.SetLevelWindow(lw.GetLevel(), lw.GetWindow());
-  update();
-  emit levelWindow( &lw );
-}
-
-void QmitkSliderLevelWindowWidget::changeScaleRange()
-{
-  QmitkLevelWindowRangeChange changeRange(this, "changeRange", TRUE);
-  changeRange.setLowerLimit((int)lw.GetRangeMin());
-  changeRange.setUpperLimit((int)lw.GetRangeMax());
-  if(changeRange.exec())
-  {
-    lw.SetRangeMinMax(changeRange.getLowerLimit(), changeRange.getUpperLimit());
-    lw.SetLevelWindow(lw.GetLevel(), lw.GetWindow());
-  }
-  update();
-  emit levelWindow( &lw );
-}
-
-void QmitkSliderLevelWindowWidget::setDataTreeIteratorClone(mitk::DataTreeIteratorClone &it)
+void QmitkSliderLevelWindowWidget::setDataTreeIteratorClone(mitk::DataTreeIteratorClone& it)
 {
   m_It = it;
-}
-
-void QmitkSliderLevelWindowWidget::updateContent()
-{
-  // iteriere ueber Baum und wende filter funktion an
-  CommonFunctionality::DataTreeIteratorVector images = CommonFunctionality::FilterNodes(m_It,m_FilterFunction);
-  m_TreeNodes.clear();
- 
-  for (CommonFunctionality::DataTreeIteratorVector::iterator it = images.begin(); it != images.end() ; it++ )
-  {
-    std::string name;
-    if ((*it)->Get()->GetName(name))
-    {
-      while ( m_TreeNodes.find(name) != m_TreeNodes.end())
-      {
-        name += ' ';
-      }
-      
-      m_TreeNodes[name] = *it;
-    }
-  }
-}
-
-bool QmitkSliderLevelWindowWidget::IsImageNode( mitk::DataTreeNode * node )
-{
-  return node && node->GetData() && dynamic_cast<mitk::Image*>(node->GetData());
-}
-
-void QmitkSliderLevelWindowWidget::setImage(int id)
-{
-  m_SelectedImage = imageSubmenu->text(id);
-  emit changeLevelWindow(&m_TreeNodes.find(m_SelectedImage.ascii())->second);
-}
-
-void QmitkSliderLevelWindowWidget::setNode( mitk::DataTreeNode * node )
-{
-  // iteriere ueber Baum und wende filter funktion an
-  CommonFunctionality::DataTreeIteratorVector images = CommonFunctionality::FilterNodes(m_It,m_FilterFunction);
-  m_TreeNodes.clear();
- 
-  for (CommonFunctionality::DataTreeIteratorVector::iterator it = images.begin(); it != images.end() ; it++ )
-  {
-    std::string name;
-    if ((*it)->Get()->GetName(name))
-    {
-      while ( m_TreeNodes.find(name) != m_TreeNodes.end())
-      {
-        name += ' ';
-      }
-      if ((*it)->Get() == node)
-      {
-        m_SelectedImage = name.c_str();
-      }
-      m_TreeNodes[name] = *it;
-    }
-  }
-  emit changeLevelWindow(&m_TreeNodes.find(m_SelectedImage.ascii())->second);
+  m_Manager->SetDataTreeIteratorClone(m_It);
 }

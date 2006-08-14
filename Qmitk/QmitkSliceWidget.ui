@@ -196,14 +196,6 @@
         <data format="XBM.GZ" length="79">789c534e494dcbcc4b554829cdcdad8c2fcf4c29c95030e0524611cd48cd4ccf28010a1797249664262b2467241641a592324b8aa363156c15aab914146aadb90067111b1f</data>
     </image>
 </images>
-<connections>
-    <connection>
-        <sender>levelWindow</sender>
-        <signal>levelWindow(mitk::LevelWindow*)</signal>
-        <receiver>QmitkSliceWidget</receiver>
-        <slot>ChangeLevelWindow(mitk::LevelWindow*)</slot>
-    </connection>
-</connections>
 <includes>
     <include location="local" impldecl="in declaration">mitkDataTree.h</include>
     <include location="local" impldecl="in declaration">mitkOpenGLRenderer.h</include>
@@ -234,7 +226,6 @@
     <slot>AddData( mitk::DataTreeNode::Pointer node )</slot>
     <slot>SetData( mitk::DataTreeIteratorBase * it, mitk::SliceNavigationController::ViewDirection view )</slot>
     <slot>InitWidget( mitk::SliceNavigationController::ViewDirection viewDirection )</slot>
-    <slot>ChangeLevelWindow( mitk::LevelWindow * lw )</slot>
     <slot>wheelEvent( QWheelEvent * e )</slot>
     <slot>ChangeView( int val )</slot>
     <slot specifier="non virtual">SetLevelWindowEnabled( bool enable )</slot>

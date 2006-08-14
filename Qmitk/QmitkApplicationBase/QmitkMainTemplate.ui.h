@@ -375,13 +375,6 @@ void QmitkMainTemplate::fileOpenGetFactoryOutput( mitk::DataTreeNodeFactory & fa
         dataFound = true;
         it.Add( node );
       }
-      mitk::LevelWindowProperty::Pointer lw = dynamic_cast<mitk::LevelWindowProperty*>(node->GetProperty("levelwindow").GetPointer( ) );
-      if ( lw.IsNotNull( ) )
-      {
-        m_MultiWidget->newImage();
-        m_MultiWidget->levelWindowWidget->setNode( node );
-        m_MultiWidget->levelWindowWidget->setLevelWindow( lw->GetLevelWindow() );
-      }
     }
   }
   if ( dataFound ) //assure that we have at least one valid output

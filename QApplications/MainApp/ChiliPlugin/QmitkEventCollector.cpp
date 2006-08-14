@@ -199,6 +199,7 @@ EventCollector::SetObjectValue( QObject* o, QString className, QString value, QS
     if ( qcb )
       qcb->setCurrentItem(value.toInt());
   }
+  /* Bug# 135
   else if( !className.compare("QmitkSliderLevelWindowWidget") )
   {
     QmitkSliderLevelWindowWidget* qslw = dynamic_cast<QmitkSliderLevelWindowWidget *>(o);
@@ -209,7 +210,7 @@ EventCollector::SetObjectValue( QObject* o, QString className, QString value, QS
       qslw->setLevelWindow(lw);
       qslw->update();
     }
-  }
+  }*/
 
   return true;
 }
@@ -289,6 +290,7 @@ EventCollector::GetObjectValue( QObject * o2 )
       objvalue = QString("%1").arg(qlb->currentItem());
     objvalue += Seperator;
   }
+  /* Bug# 135
   else if( !className.compare("QmitkSliderLevelWindowWidget") )
   {
     QmitkSliderLevelWindowWidget* qlb = dynamic_cast<QmitkSliderLevelWindowWidget *>(o2);
@@ -300,7 +302,7 @@ EventCollector::GetObjectValue( QObject * o2 )
       objvalue += QString("%1").arg(lw.GetMax());
     }
     std::cout<<"QmitkSliderLevelWindowWidget Value: "<<objvalue.latin1()<<std::endl;
-  }
+  }*/
 
 
 //  else if( !className.compare("QListView") )

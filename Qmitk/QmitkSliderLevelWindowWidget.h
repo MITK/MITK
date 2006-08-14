@@ -19,18 +19,8 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef QSLIDERLEVELWINDOW_WIDGET
 #define QSLIDERLEVELWINDOW_WIDGET
 
-#include <qwidget.h> 
 #include <qpainter.h>
-#include <ipFunc/ipFunc.h>
-#include <mitkLevelWindow.h>
-#include <qstring.h>
-#include <mitkLevelWindowPreset.h>
-#include <qpopupmenu.h>
-
-#include "mitkDataTreeNode.h"
-#include "mitkDataTree.h"
-#include "QmitkCommonFunctionality.h"
-#include <map>
+#include <QmitkLevelWindowWidgetContextMenu.h>
 
 /**
 
@@ -64,63 +54,58 @@ PURPOSE.  See the above copyright notices for more information.
   dragging with the right mouse button.
 
   */
+
 class QmitkSliderLevelWindowWidget : public QWidget {
 
   Q_OBJECT
 
-protected:
-
-
-
-  /*!
-  * helper for drawing the component
-  */
-  QRect rect;
-
-  /*!
-  * helper for drawing the component
-  */
-  QPoint startPos;
-
-  bool resize;
-  bool bottom;
-  float factor;
-  bool mouseDown;
-  bool leftbutton;
-  bool ctrlPressed;
-  int moveHeight;
-  int m_presetID;
-  int m_defaultID;
-  bool scale;
-  QString m_SelectedImage;
-  QRect m_LowerBound;
-  QRect m_UpperBound;
-  mitk::ScalarType m_upperLimit;
-  mitk::ScalarType m_lowerLimit;
-  mitk::DataTreeIteratorClone m_It;
-  
-  QFont font;
-  QPopupMenu *presetSubmenu;
-  QPopupMenu *imageSubmenu;
-
-  std::map<std::string,mitk::DataTreeIteratorClone> m_TreeNodes;
-  
-
 public:
 
   QmitkSliderLevelWindowWidget( QWidget * parent=0, const char * name=0, WFlags f = false );
-  QBrush brush;
 
   /*!
   *	data structures which store the values manipulated
   *	by a QmitkSliderLevelWindowWidget
   */
-  mitk::LevelWindow lw;
-  mitk::LevelWindowPreset pre;
+  mitk::LevelWindow m_Lw;
+  mitk::LevelWindowManager* m_Manager;
+
+  void setLevelWindowManager(mitk::LevelWindowManager* levelWindowManager);
+  void update( );
+  void setDataTreeIteratorClone(mitk::DataTreeIteratorClone &it);
+
+private:
+
+  void contextMenuEvent ( QContextMenuEvent * );
+  void OnPropertyModified(const itk::EventObject& e);
 
 protected:
 
-  bool getPresets();
+  /*!
+  * helper for drawing the component
+  */
+  QRect m_Rect;
+
+  /*!
+  * helper for drawing the component
+  */
+  QPoint m_StartPos;
+
+  bool m_Resize;
+  bool m_Bottom;
+  bool m_MouseDown;
+  bool m_Leftbutton;
+  bool m_CtrlPressed;
+  bool m_SliderVisible;
+  int m_MoveHeight;
+  bool m_Scale;
+  QRect m_LowerBound;
+  QRect m_UpperBound;
+  mitk::DataTreeIteratorClone m_It;
+  unsigned long m_ObserverTag;
+  
+  QFont m_Font;
+  QmitkLevelWindowWidgetContextMenu* m_Contextmenu;
 
   /*! 
   * repaint the slider
@@ -149,37 +134,8 @@ protected:
 
 protected slots:
 
-void setPreset(int id);
-void addPreset();
-void setDefaultLevelWindow();
-void setDefaultScaleRange();
-void changeScaleRange();
-void hideScale();
-void showScale();
-virtual void updateContent();
-void setImage(int id);
-
-private:
-   void contextMenuEvent ( QContextMenuEvent * );
-   
-
-public:
-
-  void setLevelWindow( const mitk::LevelWindow& levelWindow );
-  void setNode( mitk::DataTreeNode * node );
-  mitk::LevelWindow& getLevelWindow();
-  void update( ipPicDescriptor* pic );
-  void update( );
-  void updateFromLineEdit();
-  void setDataTreeIteratorClone(mitk::DataTreeIteratorClone &it);
-  static bool IsImageNode( mitk::DataTreeNode * node );
-  bool (* m_FilterFunction)(mitk::DataTreeNode*);
-
-signals:
-
-  void levelWindow(mitk::LevelWindow* lw );
-  void newRange(mitk::LevelWindow* lw);
-  void changeLevelWindow(mitk::DataTreeIteratorClone* iter);
+  void hideScale();
+  void showScale();
 
 };
 

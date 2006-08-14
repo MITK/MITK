@@ -32,7 +32,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <fstream>
 #include <string>
 #include <stack>
-//#include <iostream>
 
 namespace mitk {
 
@@ -62,6 +61,10 @@ namespace mitk {
   {
    if ( fileName.empty() )
        return false;
+
+   // first test, if file exists, because VTK issues error message if not.
+   std::fstream fileExists( fileName.c_str() );
+   if (!fileExists) return false;
 
    XMLReader* xmlReader = new XMLReader( it );
    xmlReader->SetFileName( fileName.c_str() );

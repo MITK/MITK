@@ -68,9 +68,9 @@
 
     - The offered model of the data tree is <b>constrained by a filter</b>, i.e. you
       only get tree nodes of your very special interest. The filter is realized as a
-      user provided function pointer, so you can use any filter that can be called via
-      C++ function pointer syntax. A sensible set of default filters is available in
-      the mitk namespace.
+      user provided function pointer (kind of). You can define filters that suit your
+      needs quite easily.
+      A sensible set of default filters is available in the mitk namespace.
         
     - Not all views of the data tree need the hierarchy of it preserved. So <b>you can
       choose between a hierarchy-preserving and a flattening model</b>. You can switch
@@ -157,22 +157,39 @@
 
   If you want to access not only images, you have to assign a different filter function. A
   filter function must be able to return a bool for each DataTreeNode it is shown, i.e. 
-  it must conform to the type DataTreeFilter::FilterFunctionPointer.
-  The default filter IsImage is defined like this:
+  it must be a sub-type of mitk::DataTreeFilterFunction.
+
+  The reason that this sub-classing is used instead of "real" C++ function pointers, is
+  that we couldn't make a combination of templates and function pointers compile on both
+  Windows and Linux, so we switched to this way of defining filter functions.
+  
+  The default filter IsImage is defined (almost) like this:
 
 \code
   namespace mitk
   {
-    bool IsImage(mitk::DataTreeNode* node)
+    class IsImage : public DataTreeFilterFunction
     {
-      return (   node                                               // not a NULL pointer
-              && node->GetData()                                    // data in this node is not NULL either
-              && dynamic_cast<mitk::Image*>( node->GetData() ) );   // AND data is an mitk::Image (of some kind)
-    }
+      public:
+        virtual ~IsImage() {}
+
+        virtual bool NodeMatches(DataTreeNode* node) const
+        {
+          return (   node                                               // not a NULL pointer
+                  && node->GetData()                                    // data in this node is not NULL either
+                  && dynamic_cast<mitk::Image*>( node->GetData() ) );   // AND data is an mitk::Image (of some kind)
+        }
+
+        virtual DataTreeFilterFunction* Clone() const
+        {
+          return new IsImage();
+        }
+    };
+
   }
 \endcode
 
-  Define your own filter functions to suit your needs and install them via SetFilter().
+  Subclass your own filter just like shown above and install them via SetFilter().
 
   Some oftenly used filters are collected in mitkDataTreeFilterFunctions.h. Have a look at
   them and add your own if they may be useful for others.

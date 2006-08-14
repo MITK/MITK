@@ -18,7 +18,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkFunctionalityComponentContainer.h"
 #include "QmitkFunctionalityComponentContainerGUI.h"
 
-#include "QmitkTreeNodeSelector.h"
+#include <QmitkDataTreeComboBox.h>
+#include <mitkDataTreeFilter.h>
 
 /*****Qt-Elements***/
 #include <qgroupbox.h>
@@ -31,9 +32,10 @@ const QSizePolicy preferred(QSizePolicy::Preferred, QSizePolicy::Preferred);
 
 /***************       CONSTRUCTOR      ***************/
 QmitkFunctionalityComponentContainer::QmitkFunctionalityComponentContainer(QObject *parent, const char *name, mitk::DataTreeIteratorBase* it)
-: QmitkBaseFunctionalityComponent(name, it),m_GUI(NULL),m_Name(name), m_ImageIt(NULL)
+: QmitkBaseFunctionalityComponent(name, it),m_Parent(parent), m_GUI(NULL),m_Name(name), m_SelectedImage(NULL)
 {
   SetDataTreeIterator(it);
+
 }
 
 /***************        DESTRUCTOR      ***************/
@@ -107,38 +109,16 @@ void QmitkFunctionalityComponentContainer::TreeChanged(const itk::EventObject & 
 /*************** TREE CHANGED (       ) ***************/
 void QmitkFunctionalityComponentContainer::TreeChanged()
 {
-  //if(m_ImageIt != NULL)
-  //  SetDataTreeIterator(m_ImageIt.GetPointer());
+  //if(m_SelectedImage != NULL)
+    //SetDataTreeIterator(m_SelectedImage);
   if(m_GUI != NULL)
   {
-    //if(m_ImageIt != NULL)
-    //{
-    //  m_GUI->GetTreeNodeSelector()->SetDataTreeNodeIterator(this->GetDataTreeIterator());
-    //  //UpdateTreeNodeSelector(m_ImageIt.GetPointer());
-    //}
-    //else
-    m_GUI->GetTreeNodeSelector()->SetDataTreeNodeIterator(this->GetDataTreeIterator());
-    m_GUI->GetTreeNodeSelector()->UpdateContent();
-    QString name = m_GUI->GetTreeNodeSelector()->m_ComboBox->currentText();
-     
-    for(int i = 0;  i < m_Qbfc.size(); i++)
+    for(unsigned int i = 0;  i < m_Qbfc.size(); i++)
     {
-      if(m_ImageIt != NULL)
+      if(m_SelectedImage != NULL)
       {
-        m_Qbfc[i]->SetDataTreeIterator(m_ImageIt.GetPointer());
-        m_Qbfc[i]->TreeChanged(m_ImageIt.GetPointer());
-        m_Qbfc[i]->UpdateTreeNodeSelector(m_ImageIt);
-       
-        
+       m_Qbfc[i]->ImageSelected(m_SelectedImage);
       }
-      else
-      {
-        m_Qbfc[i]->SetDataTreeIterator(this->GetDataTreeIterator());
-        m_Qbfc[i]->UpdateTreeNodeSelector(this->GetDataTreeIterator());
-      }
-      m_Qbfc[i]->UpdateTreeNodeSelector(this->GetDataTreeIterator());
-      //m_Qbfc[i]->UpdateTreeNodeSelector(this->GetTreeNodeSelector());
-    m_Qbfc[i]->UpdateSelector(m_GUI->GetTreeNodeSelector()->m_ComboBox->currentText());
     }
   }
 }
@@ -148,18 +128,17 @@ void QmitkFunctionalityComponentContainer::TreeChanged(mitk::DataTreeIteratorBas
 {
   if(m_GUI != NULL)
   {
-    SetDataTreeIterator(it);
-    m_GUI->GetTreeNodeSelector()->SetDataTreeNodeIterator(this->GetDataTreeIterator());
-    m_GUI->GetTreeNodeSelector()->UpdateContent();
-    for(int i = 0;  i < m_Qbfc.size(); i++)
+    //SetDataTreeIterator(it);
+//    m_GUI->GetTreeNodeSelector()->SetDataTreeNodeIterator(this->GetDataTreeIterator());
+//    m_GUI->GetTreeNodeSelector()->UpdateContent();
+    for(unsigned int i = 0;  i < m_Qbfc.size(); i++)
     {
-      m_Qbfc[i]->SetDataTreeIterator(this->GetDataTreeIterator());
-      m_Qbfc[i]->TreeChanged(this->GetDataTreeIterator());
+      m_Qbfc[i]->ImageSelected(m_SelectedImage);
       //m_Qbfc[i]->UpdateTreeNodeSelector(this->GetDataTreeIterator());
-      m_Qbfc[i]->UpdateSelector(m_GUI->GetTreeNodeSelector()->m_ComboBox->currentText());
+      //m_Qbfc[i]->UpdateSelector(m_GUI->GetTreeNodeSelector()->m_ComboBox->currentText());
     }
 
-        QString name = m_GUI->GetTreeNodeSelector()->m_ComboBox->currentText();
+//        QString name = m_GUI->GetTreeNodeSelector()->m_ComboBox->currentText();
      
   }
 }
@@ -169,14 +148,14 @@ void QmitkFunctionalityComponentContainer::CreateConnections()
 {
   if ( m_GUI )
   {
-    connect( (QObject*)(m_GUI->m_TreeNodeSelector), SIGNAL(Activated(mitk::DataTreeIteratorClone)),(QObject*) this, SLOT(ImageSelected(mitk::DataTreeIteratorClone)) );
+    connect( (QObject*)(m_GUI->GetTreeNodeSelector()), SIGNAL(activated(const mitk::DataTreeFilter::Item *)), (QObject*) this, SLOT(ImageSelected(const mitk::DataTreeFilter::Item *)));
   }
 }
 
 /***************     IMAGE SELECTED     ***************/
-void QmitkFunctionalityComponentContainer::ImageSelected(mitk::DataTreeIteratorClone imageIt)
+void QmitkFunctionalityComponentContainer::ImageSelected(const mitk::DataTreeFilter::Item * imageIt)
 {
-  m_ImageIt = imageIt;
+  m_SelectedImage = imageIt;
   TreeChanged();
 }
 
@@ -186,6 +165,7 @@ QWidget* QmitkFunctionalityComponentContainer::CreateContainerWidget(QWidget* pa
   if (m_GUI == NULL)
   {
     m_GUI = new QmitkFunctionalityComponentContainerGUI(parent);
+    m_GUI->GetTreeNodeSelector()->SetDataTree(GetDataTreeIterator());
     m_GUI->GetCompContBox()->setTitle("Container");
   }
   return m_GUI;
@@ -230,25 +210,10 @@ void QmitkFunctionalityComponentContainer::AddComponent(QmitkFunctionalityCompon
     //m_GUI->setGeometry(0, 0, m_GUI->width(), m_GUI->height());
     m_GUI->setSizePolicy(preferred);
     m_GUI->layout()->activate();
-    m_GUI->AlignBottom;
 
   }
 
 }
 
-void QmitkFunctionalityComponentContainer::UpdateTreeNodeSelector(mitk::DataTreeIteratorBase* it)
-{
-  //m_GUI->SetDataTreeIterator(it);
-  m_GUI->GetTreeNodeSelector()->UpdateContent();
-}
 
-void QmitkFunctionalityComponentContainer::UpdateTreeNodeSelector(mitk::DataTreeIteratorClone imageIt)
-{
-  //m_GUI->SetDataTreeIterator(it);
-  m_GUI->GetTreeNodeSelector()->UpdateContent();
-}
 
-void QmitkFunctionalityComponentContainer::UpdateSelector(QString name)
-{
-  m_GUI->GetTreeNodeSelector()->TreeNodeSelected(name);
-}

@@ -29,8 +29,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vector>
 #include <qstring.h>
 #include <qobject.h>
+#include <mitkDataTreeFilter.h>
 
 class QmitkFunctionalityComponentContainerGUI;
+
 
 /**
 * \brief ContainerClass for components 
@@ -56,73 +58,77 @@ class QmitkFunctionalityComponentContainer : public QmitkBaseFunctionalityCompon
 
 public:
 
+  /***************       CONSTRUCTOR      ***************/
   /** \brief Constructor. */
   QmitkFunctionalityComponentContainer(QObject *parent=0, const char *name=0, mitk::DataTreeIteratorBase* dataIt = NULL);
+  
+  /***************        DESTRUCTOR      ***************/
   /** \brief Destructor. */
   ~QmitkFunctionalityComponentContainer();
 
-  /** \brief Vector with all added components */
-  std::vector<QmitkFunctionalityComponentContainer*> m_Qbfc;
-  virtual void UpdateTreeNodeSelector(mitk::DataTreeIteratorBase* it);
-  virtual void UpdateTreeNodeSelector(mitk::DataTreeIteratorClone imageIt);
-  virtual void UpdateSelector(QString name);
-
-
-  // Create
+  /***************        CREATE          ***************/
   //virtual QAction * CreateAction(QActionGroup* m_FunctionalityComponentActionGroup);
   virtual void CreateConnections();
   virtual QWidget* CreateContainerWidget(QWidget* parent);
 
-  virtual void Activated();
+  
 
-  // SET and GET
+  /***************        SET AND GET     ***************/
   virtual QString GetFunctionalityName();
   void SetFunctionalityName(QString name);
+
   virtual QString GetFunctionalityComponentName();
     /*!
-  \brief setter method for data tree attribute
-  @param it the reference to a data tree ieterator object
-  */
-  virtual void SetDataTreeIterator(mitk::DataTreeIteratorBase* it);
-
-  /*!
   \brief getter for dataTree attribute. It returns the 
   reference to a data tree iterator object
   */
   mitk::DataTreeIteratorBase* GetDataTreeIterator();
 
-  void AddComponent(QmitkFunctionalityComponentContainer* componentContainer);
-
- // virtual void TreeChanged();
- // virtual void TreeChanged(mitk::DataTreeIteratorBase* it);
+  /*!
+  \brief setter method for data tree attribute
+  @param it the reference to a data tree ieterator object
+  */
+  virtual void SetDataTreeIterator(mitk::DataTreeIteratorBase* it);
 
   QWidget* GetGUI();
 
-      virtual void TreeChanged(const itk::EventObject & treeChangedEvent);
+  /*************** TREE CHANGED (       ) ***************/
+  virtual void TreeChanged(const itk::EventObject & treeChangedEvent);
+
+  /***************      OHTER METHODS     ***************/
+  void AddComponent(QmitkFunctionalityComponentContainer* componentContainer);
+  virtual void Activated();
+
+  /***************        ATTRIBUTES      ***************/
+  /** \brief Vector with all added components */
+  std::vector<QmitkFunctionalityComponentContainer*> m_Qbfc;      
 
 protected slots:  
-
+  /*************** TREE CHANGED (       ) ***************/
   // /** \brief The TreeChanged-slot-method updates the TreeNodeSelector if the datatree changes. */
   virtual void TreeChanged();
   virtual void TreeChanged(mitk::DataTreeIteratorBase* it);
 
+  /***************      OHTER METHODS     ***************/
   /** \brief Slot method that will be called if TreeNodeSelector widget was activated. */
-  void ImageSelected(mitk::DataTreeIteratorClone imageIt);
+  virtual void ImageSelected(const mitk::DataTreeFilter::Item * imageIt);
 
 protected:
-  QString m_Name;
-  mitk::DataTreeIteratorClone m_ImageIt;
+  /***************        ATTRIBUTES      ***************/
 
-
-    unsigned long m_ObserverTag;
-
+  unsigned long m_ObserverTag;
       
   bool m_Available;
+
   bool m_Activated;
 
 
 private:
+  /***************        ATTRIBUTES      ***************/
+  QObject *m_Parent;
+  QString m_Name;
   QmitkFunctionalityComponentContainerGUI * m_GUI;
+  const mitk::DataTreeFilter::Item * m_SelectedImage;
 
 
 };

@@ -54,20 +54,26 @@ class QmitkBaseFunctionalityComponent : public QObject
 
 public:
 
-
+  /***************       CONSTRUCTOR      ***************/
   /** \brief Constructor. */
   QmitkBaseFunctionalityComponent(const char *name=0, mitk::DataTreeIteratorBase* dataIt = NULL);
 
+  /***************        DESTRUCTOR      ***************/
   /** \brief Destructor. */
   ~QmitkBaseFunctionalityComponent();
 
+  /***************        CREATE          ***************/
+  //virtual QWidget* CreateContainerWidget(QWidget* parent);
 
-  //SET and GET
+
+  /***************        SET AND GET     ***************/
   /*!
   \brief setter method for data tree attribute
   @param it the reference to a data tree ieterator object
   */
   virtual void SetDataTreeIterator(mitk::DataTreeIteratorBase* it);
+
+  void SetFunctionalityName(QString name);
 
   /*!
   \brief getter for dataTree attribute. It returns the 
@@ -76,23 +82,22 @@ public:
   mitk::DataTreeIteratorBase* GetDataTreeIterator();
 
   /*!
+  \brief method for defining the name of the functionality
+  */
+  virtual QString GetFunctionalityName();
+
+  virtual QWidget* GetGUI();
+
+  /*************** TREE CHANGED (       ) ***************/
+  /*!
   \brief  Slot that will be called if DataTree changes to inform
   addicted methods
   */
   //virtual void TreeChanged(const itk::EventObject & treeChangedEvent);
   virtual void TreeChanged();
-  virtual void TreeChanged(mitk::DataTreeIteratorBase* it);
+  virtual void TreeChanged(mitk::DataTreeIteratorBase*);
 
-
-
-  /*!
-  \brief method for defining the name of the functionality
-  */
-  virtual QString GetFunctionalityName();
-  //virtual QWidget* CreateContainerWidget(QWidget* parent);
-
-  void SetFunctionalityName(QString name);
-
+  /***************      OHTER METHODS     ***************/
   /*!
   \brief called when a functionality becomes active/visible. Often, event-handlers are connected (e.g., 
   GlobalStateMachine::AddInteractor() or AddListener()) in Activated() and the connection is removed in Deactivated()
@@ -107,7 +112,7 @@ public:
   */
   virtual void Deactivated();
 
-
+  /***************        ATTRIBUTES      ***************/
   //##Documentation
   //## @brief Is the functionalityComponent currently active?
   //## 
@@ -116,34 +121,39 @@ public:
 
   virtual bool IsAvailable();
 
-  virtual QWidget* GetGUI();
+
 
 
 protected:
 
-  
-  bool m_Available;
-  bool m_Activated;
-
+  /***************        SET AND GET     ***************/
   virtual void SetAvailability(bool available);
 
+
+  /***************        ATTRIBUTES      ***************/
+  
+  /*!
+  a Name of the FunctionalityComponent
+  */
+  QString m_Name;
+  
   /*!
   a reference to a data tree iterator object
   */
   mitk::DataTreeIteratorClone m_DataTreeIterator;
 
-  /*!
-  a Name of the FunctionalityComponent
-  */
-  QString m_Name;
 
   //unsigned long m_ObserverTag;
 
   bool m_TreeChangedWhileInActive;
 
+    bool m_Available;
+  bool m_Activated;
+
 
 
 private:
+
 
 
 

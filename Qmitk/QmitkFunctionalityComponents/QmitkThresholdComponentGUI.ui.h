@@ -17,14 +17,14 @@
 void QmitkThresholdComponentGUI::SetDataTreeIterator( mitk::DataTreeIteratorBase * it )
 {
    m_DataTreeIterator = it;
-   m_TreeNodeSelector->SetDataTreeNodeIterator(it);
+//TODO   m_TreeNodeSelector->SetDataTreeNodeIterator(it);
    //m_VolumetryWidget->SetDataTreeNodeIterator(it);
 }
 
 
 
 
-QmitkTreeNodeSelector* QmitkThresholdComponentGUI::GetTreeNodeSelector()
+QmitkDataTreeComboBox * QmitkThresholdComponentGUI::GetTreeNodeSelector()
 {
  return m_TreeNodeSelector;
 }

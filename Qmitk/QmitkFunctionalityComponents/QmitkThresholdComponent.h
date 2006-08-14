@@ -48,7 +48,7 @@ class QmitkThresholdComponent : public QmitkFunctionalityComponentContainer
 public:
 
   /** \brief Constructor. */
-  QmitkThresholdComponent( );
+  QmitkThresholdComponent(QObject *parent=0, const char *name=0, mitk::DataTreeIteratorBase* dataIt = NULL);
 
  
 
@@ -60,19 +60,21 @@ public:
   virtual void CreateConnections();
   virtual void TreeChanged();
   virtual void TreeChanged(mitk::DataTreeIteratorBase* it);
-  virtual void UpdateTreeNodeSelector(mitk::DataTreeIteratorClone imageIt);
-  virtual void UpdateTreeNodeSelector(mitk::DataTreeIteratorBase* it);
-  virtual void UpdateSelector(QString name);
+
 
 
   //Set and Get
   void SetDataTreeIterator(mitk::DataTreeIteratorBase* it);
   void SetFunctionalityName(QString name);
+  mitk::DataTreeIteratorBase* GetDataTreeIterator();
   virtual QString GetFunctionalityComponentName();
   virtual QString GetFunctionalityName();
   QWidget* GetGUI();
 
-
+protected slots:  
+  /***************      OHTER METHODS     ***************/
+  /** \brief Slot method that will be called if TreeNodeSelector widget was activated. */
+  void ImageSelected(const mitk::DataTreeFilter::Item * imageIt);
 
 protected:
   QString m_Name;
@@ -84,7 +86,7 @@ protected:
 
 private:
   QmitkThresholdComponentGUI * m_GUI;
-  
+  const mitk::DataTreeFilter::Item * m_SelectedImage;  
 
 
 };

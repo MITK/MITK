@@ -19,9 +19,11 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkCommand.h>
 
 
-QmitkBaseFunctionalityComponent::QmitkBaseFunctionalityComponent(const char *name, mitk::DataTreeIteratorBase* dataIt )
+QmitkBaseFunctionalityComponent::QmitkBaseFunctionalityComponent(const char *name, mitk::DataTreeIteratorBase* dataIt ):
+m_Name(name)
 {
   SetDataTreeIterator(dataIt);
+  
 }
 
 
@@ -39,7 +41,7 @@ void QmitkBaseFunctionalityComponent::SetDataTreeIterator(mitk::DataTreeIterator
 //  {
 //    m_DataTreeIterator->GetTree()->RemoveObserver(m_ObserverTag);
 //  }
-//  m_DataTreeIterator = it;
+    m_DataTreeIterator = it;
 //  if(m_DataTreeIterator.IsNotNull())
 //  {
 //    itk::ReceptorMemberCommand<QmitkBaseFunctionalityComponent>::Pointer command = itk::ReceptorMemberCommand<QmitkBaseFunctionalityComponent>::New();

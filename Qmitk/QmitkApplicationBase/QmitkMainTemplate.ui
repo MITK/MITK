@@ -77,9 +77,6 @@
             <property name="name">
                 <cstring>redoButton</cstring>
             </property>
-             <property name="mode"> 	 
-                 <enum>Redo</enum> 	 
-             </property>
         </widget>
         <action name="Fullscreen"/>
         <action name="toolbarShowPlanes"/>
@@ -381,9 +378,6 @@
         <property name="on">
             <bool>false</bool>
         </property>
-        <property name="iconSet">
-            <iconset>image4</iconset>
-        </property>
         <property name="text">
             <string>Hide Planes</string>
         </property>
@@ -399,7 +393,7 @@
             <bool>true</bool>
         </property>
         <property name="iconSet">
-            <iconset>image5</iconset>
+            <iconset>image4</iconset>
         </property>
         <property name="text">
             <string>Lock Planes</string>
@@ -590,13 +584,13 @@
             <bool>true</bool>
         </property>
         <property name="on">
-            <bool>false</bool>
+            <bool>true</bool>
         </property>
         <property name="text">
-            <string>Hide Planes</string>
+            <string>Show Planes</string>
         </property>
         <property name="menuText">
-            <string>Hide Planes</string>
+            <string>Show Planes</string>
         </property>
     </action>
     <action>
@@ -645,9 +639,6 @@
         <data format="PNG" length="106">89504e470d0a1a0a0000000d49484452000000100000000d0806000000a0bbee240000003149444154789c63646060f8cf400160a24433550c6041e61c3b768c91184d565656706f0fbc17460d6060606418f2291100e23a0619d3e2d9940000000049454e44ae426082</data>
     </image>
     <image name="image4">
-        <data format="PNG" length="146">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b0000005949444154789c633c76ec18032d00134d4c25c560274babff4e9656ffa96e30a960d4e0216c300b8c61e9843f29eddb778c911875c7a1ea68e6624662b3342c73ec3b0e71112130f4226fd4e051833101d1198454403317030006ec1681419c4e9f0000000049454e44ae426082</data>
-    </image>
-    <image name="image5">
         <data format="PNG" length="243">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b000000ba49444154789ce594b10ec3200c44cf55867c512518f9f08c46caf754ea928a0e29c54a01d951987a124b0ccf877584981923741b42b58083f329389f2e075b350c3c590fb87b19475c995afb4c8e9fafdf26ded7e7ae0667284d650140da801a9c3439ced7cf30e632025993dfbf60173a517a14b769eed7e2b2c3c7a72277aac94124e1b0af5533c52d6d00a07b7de61c9338b137aaeb0f9e74effa522ac77165922faeb68e523b9e3f5958623b9666c767a4fa579cd130c76f4cd442a371c4529a0000000049454e44ae426082</data>
     </image>
 </images>

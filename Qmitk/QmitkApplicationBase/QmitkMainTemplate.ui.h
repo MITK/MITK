@@ -107,6 +107,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkCoordinateSupplier.h>
 #include <mitkStatusBar.h>
 
+#include <PlaneCrossPoints.xpm>
+#include <PlaneCross.xpm>
+
+
 template <class T>
 static void __buildstring( ipPicDescriptor *pic, itk::Point<int, 3> p, QString &s, T /*dummy*/=0)
 {
@@ -530,6 +534,13 @@ void QmitkMainTemplate::init()
 
   //this seems to be a bug of Qt3.1.1's designer: The object name of ToolBar is not initialized.
   ToolBar->setName("ToolBar");
+
+  //set icons for show planes
+  QIconSet showPlanes;
+  showPlanes.setPixmap(QPixmap( planecross_xpm ) ,QIconSet::Automatic, QIconSet::Normal, QIconSet::On) ;
+  showPlanes.setPixmap(QPixmap( planecrosspoints_xpm ) ,QIconSet::Automatic, QIconSet::Active, QIconSet::On) ;
+  toolbarShowPlanes->setIconSet(showPlanes);
+  toolbarShowPlanes->setOn(true);
 
   //create the data m_Tree
   m_Tree=mitk::DataTree::New();
@@ -1023,29 +1034,27 @@ void QmitkMainTemplate::viewPlanesLocked_toggled( bool on)
   m_MultiWidget->GetRenderWindow1()->GetSliceNavigationController()->SetSliceLocked(on);
   m_MultiWidget->GetRenderWindow2()->GetSliceNavigationController()->SetSliceLocked(on);
   m_MultiWidget->GetRenderWindow3()->GetSliceNavigationController()->SetSliceLocked(on);
+
+  viewLockSliceRotationAction->setOn(on);
 }
 
 
 void QmitkMainTemplate::viewShowPlanesAction_toggled( bool on )
 {
-  if( !on )
+  if( on )
   {
-    //toolbarShowPlanes->setIconSet(image4);
     toolbarShowPlanes->setText("Hide Planes");
     toolbarShowPlanes->setMenuText("Hide Planes");
-    toolbarShowPlanes->setToolTip("Hide Planes"); 
-    
-    emit ShowWidgetPlanesToggled(true);
+    toolbarShowPlanes->setToolTip("Hide Planes");  
   }
   else    
   {
-    //toolbarShowPlanes->setIconSet(image5);
     toolbarShowPlanes->setText("Show Planes");
     toolbarShowPlanes->setMenuText("Show Planes");
     toolbarShowPlanes->setToolTip("Show Planes"); 
-    
-    emit ShowWidgetPlanesToggled(false);
   }
+
+  emit ShowWidgetPlanesToggled(on);
 
   // sign significant places in menu->view and the toolbar
   toolbarShowPlanes->setOn( on );

@@ -143,7 +143,4 @@
     <function returnType="QmitkDataTreeComboBox *">GetTreeNodeSelector()</function>
 </functions>
 <layoutdefaults spacing="6" margin="11"/>
-<includehints>
-    <includehint>qmitkdatatreecombobox.h</includehint>
-</includehints>
 </UI>

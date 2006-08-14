@@ -440,7 +440,7 @@ const DataTreeIteratorClone DataTreeFilter::GetIteratorToSelectedItem() const
   return NULL;
 }
 
-const DataTreeFilter::Item* DataTreeFilter::FindItem(DataTreeNode* node, DataTreeFilter::ItemList* itemList) const
+const DataTreeFilter::Item* DataTreeFilter::FindItem(const DataTreeNode* node, DataTreeFilter::ItemList* itemList) const
 {
   ItemList::iterator listIter;
   for ( listIter = itemList->begin(); listIter != itemList->end(); ++listIter )
@@ -457,7 +457,7 @@ const DataTreeFilter::Item* DataTreeFilter::FindItem(DataTreeNode* node, DataTre
   return NULL;
 }
 
-const DataTreeFilter::Item* DataTreeFilter::FindItem(DataTreeNode* node) const
+const DataTreeFilter::Item* DataTreeFilter::FindItem(const DataTreeNode* node) const
 {
   return FindItem(node, m_Items);
 }

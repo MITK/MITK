@@ -595,7 +595,7 @@ public:
   const Item* GetSelectedItem() const;
   const mitk::DataTreeIteratorClone GetIteratorToSelectedItem() const;
 
-  const Item* FindItem(DataTreeNode* node) const;
+  const Item* FindItem(const DataTreeNode* node) const;
 
   /// Views can call this to select items
   void SelectItem(const Item*, bool selected = true);
@@ -620,7 +620,7 @@ protected:
 
 private:
 
-  const Item* FindItem(DataTreeNode* node, ItemList* itemList) const;
+  const Item* FindItem(const DataTreeNode* node, ItemList* itemList) const;
 
   void AddMatchingChildren(mitk::DataTreeIteratorBase*, ItemList*, Item*, bool = true);
 

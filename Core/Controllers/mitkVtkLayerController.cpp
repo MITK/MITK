@@ -172,7 +172,7 @@ void mitk::VtkLayerController::UpdateLayers()
     currentLayerNumber  = 0;
     traverseUpwards     = true;
   #else
-    currentLayerNumber  = numberOfLayers;
+    currentLayerNumber  = numberOfLayers - 1;
     traverseUpwards     = false;
   #endif
   

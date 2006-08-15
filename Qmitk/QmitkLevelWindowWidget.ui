@@ -6,7 +6,7 @@
     </property>
     <property name="geometry">
         <rect>
-            <x>115</x>
+            <x>35</x>
             <y>0</y>
             <width>50</width>
             <height>593</height>
@@ -121,7 +121,7 @@
     </customwidget>
     <customwidget>
         <class>QmitkLineEditLevelWindowWidget</class>
-        <header location="global">QmitkLineEditLevelWindowWidget.h</header>
+        <header location="global">C:/home/daniel/ip++/AppModules/QmitkLevelWindowWidget/QmitkLineEditLevelWindowWidget.h</header>
         <sizehint>
             <width>-1</width>
             <height>-1</height>
@@ -152,15 +152,20 @@
     <include location="local" impldecl="in implementation">QmitkLevelWindowWidget.ui.h</include>
 </includes>
 <variables>
-    <variable>mitk::DataTreeIteratorClone* m_Iter;</variable>
+    <variable>unsigned long m_ObserverTag;</variable>
+    <variable>mitk::LevelWindow m_Lw;</variable>
     <variable>mitk::LevelWindowManager* m_Manager;</variable>
+    <variable>mitk::DataTreeIteratorClone* m_Iter;</variable>
 </variables>
 <slots>
     <slot>setDataTreeIteratorClone( mitk::DataTreeIteratorClone &amp; it )</slot>
+    <slot>SetLevelWindow(const mitk::LevelWindow&amp; levWin)</slot>
 </slots>
 <functions>
     <function access="private" specifier="non virtual">init()</function>
     <function access="private" specifier="non virtual">destroy()</function>
+    <function access="private">OnPropertyModified(const itk::EventObject&amp; )</function>
+    <function specifier="non virtual" returnType="const mitk::LevelWindow">GetLevelWindow()</function>
 </functions>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

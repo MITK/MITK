@@ -7,13 +7,18 @@
 ** place of a destructor.
 *****************************************************************************/
 
-#include "QmitkSliderLevelWindowWidget.h" 
+#include "QmitkSliderLevelWindowWidget.h"
+#include <itkCommand.h>
 
 //for constructor 
 
 void QmitkLevelWindowWidget::init() 
-{ 
+{
+  m_Lw = NULL;
   m_Manager = new mitk::LevelWindowManager();
+  itk::ReceptorMemberCommand<QmitkLevelWindowWidget>::Pointer command = itk::ReceptorMemberCommand<QmitkLevelWindowWidget>::New();
+  command->SetCallbackFunction(this, &QmitkLevelWindowWidget::OnPropertyModified);
+  m_ObserverTag = m_Manager->AddObserver(itk::ModifiedEvent(), command);
   SliderLevelWindowWidget->setLevelWindowManager(m_Manager);
   LineEditLevelWindowWidget->setLevelWindowManager(m_Manager);
 } 
@@ -27,3 +32,28 @@ void QmitkLevelWindowWidget::setDataTreeIteratorClone( mitk::DataTreeIteratorClo
 { 
     m_Manager->SetDataTreeIteratorClone(it); 
 } 
+
+
+void QmitkLevelWindowWidget::OnPropertyModified( const itk::EventObject & )
+{
+  try
+  {
+    m_Lw = m_Manager->GetLevelWindow();
+  }
+  catch(...)
+  {
+    m_Lw = NULL;
+  }
+}
+
+
+const mitk::LevelWindow QmitkLevelWindowWidget::GetLevelWindow()
+{
+  return m_Lw;
+}
+
+
+void QmitkLevelWindowWidget::SetLevelWindow( const mitk::LevelWindow & levWin )
+{
+  m_Manager->SetLevelWindow(levWin);
+}

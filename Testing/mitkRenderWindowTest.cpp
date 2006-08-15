@@ -60,16 +60,6 @@ int mitkRenderWindowTest(int /*argc*/, char* /*argv*/[])
   }
   std::cout<<"[PASSED]"<<std::endl;
 
-  std::cout << "Testing glrenderer->GetVtkRenderer()==NULL: ";
-  if(glrenderer->GetVtkRenderer()!=NULL)
-  {
-    std::cout<<"[FAILED] - Not really a failure! Event better like that it is now != NULL! " << std::endl
-      << "In former times  it was NULL without presence of a vtk-based Mapper." <<std::endl
-      << "Please remove this part of the test and check, whether the rest of the test show reasonable results." << std::endl;
-    return EXIT_FAILURE;
-  }
-  std::cout<<"[PASSED]"<<std::endl;
-
   vtkRenderer * ownvtkrenderer = vtkRenderer::New();
   renderwindow->GetVtkRenderWindow()->AddRenderer(ownvtkrenderer);
  // assign the actor to the rendering environment

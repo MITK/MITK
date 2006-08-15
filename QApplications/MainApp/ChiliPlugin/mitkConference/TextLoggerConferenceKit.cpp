@@ -1,7 +1,7 @@
 #include <TextLoggerConferenceKit.h>
 #include <fstream>
 
-using namespace std;
+//using namespace std;
 
 //const char* FILEPATH = "/home/hasselberg/mitkTextLogger.out";
 const char* FILEPATH = "mitkTextLogger.out";
@@ -17,10 +17,10 @@ TextLoggerConferenceKit::~TextLoggerConferenceKit(){};
 TextLoggerConferenceKit::SendQt(const char* s)
 {
 
-  ofstream MITKGlobalFile( FILEPATH, ios::app);
+  std::ofstream MITKGlobalFile( FILEPATH, std::ios::app);
   if ( MITKGlobalFile )
   {
-    MITKGlobalFile << s <<endl;
+    MITKGlobalFile << s << std::endl;
 
   }
 }; 
@@ -29,10 +29,10 @@ TextLoggerConferenceKit::SendQt(const char* s)
 TextLoggerConferenceKit::SendMITK(signed int eventID, const char* sender, int etype, int estate, int ebuttonstate, int ekey, float w1, float w2, float w3, float p1, float p2)
 {  
 
-  ofstream MITKGlobalFile( FILEPATH, ios::app);
+  std::ofstream MITKGlobalFile( FILEPATH, std::ios::app);
   if (MITKGlobalFile )
   {
-    MITKGlobalFile<<eventID<<"&&"<<sender<<"&&"<<etype<<"&&"<<estate<<"&&"<< ebuttonstate<<"&&"<< ekey<<"&&"<< w1<<"&&"<< w2<<"&&"<< w3<<"&&"<<p1<<"&&"<< p2<<endl;
+    MITKGlobalFile<<eventID<<"&&"<<sender<<"&&"<<etype<<"&&"<<estate<<"&&"<< ebuttonstate<<"&&"<< ekey<<"&&"<< w1<<"&&"<< w2<<"&&"<< w3<<"&&"<<p1<<"&&"<< p2<< std::endl;
   }
 };
 
@@ -41,10 +41,10 @@ TextLoggerConferenceKit::SendMITK(signed int eventID, const char* sender, int et
 TextLoggerConferenceKit::MouseMove( const char* sender, float w1, float w2, float w3 )
 {  
 
-  ofstream MITKGlobalFile( FILEPATH, ios::app);
+  std::ofstream MITKGlobalFile( FILEPATH, std::ios::app);
   if (MITKGlobalFile )
   {
-    MITKGlobalFile<<sender<<"&&"<< w1<<"&&"<< w2<<"&&"<< w3<<endl;
+    MITKGlobalFile<<sender<<"&&"<< w1<<"&&"<< w2<<"&&"<< w3<< std::endl;
   }
 };
 

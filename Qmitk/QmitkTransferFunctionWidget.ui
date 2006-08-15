@@ -111,7 +111,8 @@
     </vbox>
 </widget>
 <customwidgets>
-    <customwidget>
+   includehint
+  <customwidget>
         <class>QmitkPiecewiseFunctionCanvas</class>
         <header location="local">QmitkPiecewiseFunctionCanvas.h</header>
         <sizehint>

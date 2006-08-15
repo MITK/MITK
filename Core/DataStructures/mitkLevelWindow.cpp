@@ -23,7 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <ipFunc/ipFunc.h>
 #include <algorithm>
 
-mitk::LevelWindow::LevelWindow(mitk::ScalarType level, mitk::ScalarType window) : m_Min(-100), m_Max(100), m_RangeMin(-2048), m_RangeMax(2048), m_DefaultRangeMin(-2048), m_DefaultRangeMax(2048)
+ mitk::LevelWindow::LevelWindow(mitk::ScalarType level, mitk::ScalarType window) : m_Min(level-window/2.0), m_Max(level+window/2.0), m_RangeMin(-2048), m_RangeMax(4096), m_DefaultRangeMin(-2048), m_DefaultRangeMax(4096)
 {
 }
 

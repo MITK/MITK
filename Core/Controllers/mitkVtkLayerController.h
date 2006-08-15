@@ -22,6 +22,12 @@ class VtkLayerController
 	public:
     VtkLayerController(vtkRenderWindow* renderWindow);
     ~VtkLayerController();
+
+    
+    /**
+    * Returns the current vtkRenderer of the Scene
+    */
+    vtkRenderer* GetSceneRenderer();
     
     /**
     * Connects a VTK renderer with a vtk renderwindow. The renderer will be rendered in the background.

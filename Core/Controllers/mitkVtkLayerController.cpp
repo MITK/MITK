@@ -21,6 +21,10 @@ mitk::VtkLayerController::VtkLayerController(vtkRenderWindow* renderWindow)
  */
 void mitk::VtkLayerController::InsertBackgroundRenderer(vtkRenderer* renderer, bool forceAbsoluteBackground)
 {
+  
+  if(renderer == NULL)
+    return;
+  
   // Remove renderer if it already exists 
   RemoveRenderer(renderer);
 
@@ -40,6 +44,10 @@ void mitk::VtkLayerController::InsertBackgroundRenderer(vtkRenderer* renderer, b
  */
 void mitk::VtkLayerController::InsertForegroundRenderer(vtkRenderer* renderer, bool forceAbsoluteForeground)
 {
+  
+  if(renderer == NULL)
+    return;
+  
   // Remove renderer if it already exists 
   RemoveRenderer(renderer);
 
@@ -54,12 +62,24 @@ void mitk::VtkLayerController::InsertForegroundRenderer(vtkRenderer* renderer, b
   UpdateLayers();
 }
 /**
+ * Returns the Scene Renderer
+ */
+vtkRenderer* mitk::VtkLayerController::GetSceneRenderer()
+{
+   RendererVectorType::iterator it = m_SceneRenderers.begin();
+   return (*it);
+}
+/**
  * Connects a VTK renderer with a vtk renderwindow. The renderer will be rendered between background renderers and
  * foreground renderers.
  */
 void mitk::VtkLayerController::InsertSceneRenderer(vtkRenderer* renderer)
 {
-  // Remove renderer if it already exists 
+  
+  if(renderer == NULL)
+    return;
+  
+  // Remove renderer if it already exists
   RemoveRenderer(renderer);
 
   m_SceneRenderers.push_back(renderer);
@@ -112,7 +132,25 @@ void mitk::VtkLayerController::RemoveRenderer(vtkRenderer* renderer)
 void mitk::VtkLayerController::SetRenderWindow(vtkRenderWindow* renwin)
 {
   if(renwin != NULL)
+  {
+    RendererVectorType::iterator it;
+    // Tell all renderers that there is a new renderwindow
+    for(it = m_BackgroundRenderers.begin(); it != m_BackgroundRenderers.end(); it++)
+    {
+      (*it)->SetRenderWindow(renwin);
+    }
+    for(it = m_SceneRenderers.begin(); it != m_SceneRenderers.end(); it++)
+    {
+      (*it)->SetRenderWindow(renwin);
+    }
+    for(it = m_ForegroundRenderers.begin(); it != m_ForegroundRenderers.end(); it++)
+    {
+      (*it)->SetRenderWindow(renwin);
+    }
+    // Set the new RenderWindow
     m_RenderWindow = renwin;
+  }
+  // Now sort renderers and add them to the renderwindow
   UpdateLayers();
 }
 

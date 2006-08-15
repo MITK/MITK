@@ -74,7 +74,7 @@ void QmitkLevelWindowWidgetContextMenu::setLevelWindowManager(mitk::LevelWindowM
 
 void QmitkLevelWindowWidgetContextMenu::addPreset()
 {
-  QmitkLevelWindowPresetDefinition addPreset(this, "newPreset", TRUE);
+  QmitkLevelWindowPresetDefinition addPreset(this, "newPreset", true);
   addPreset.setPresets(m_Pre.getLevelPresets(), m_Pre.getWindowPresets(), QString::number( (int) m_Lw.GetLevel() ), QString::number( (int) m_Lw.GetWindow() ));
   if(addPreset.exec())
   {
@@ -97,7 +97,7 @@ void QmitkLevelWindowWidgetContextMenu::setDefaultScaleRange()
 
 void QmitkLevelWindowWidgetContextMenu::changeScaleRange()
 {
-  QmitkLevelWindowRangeChange changeRange(this, "changeRange", TRUE);
+  QmitkLevelWindowRangeChange changeRange(this, "changeRange", true);
   changeRange.setLowerLimit((int)m_Lw.GetRangeMin());
   changeRange.setUpperLimit((int)m_Lw.GetRangeMax());
   if(changeRange.exec())
@@ -144,7 +144,7 @@ void QmitkLevelWindowWidgetContextMenu::getContextMenu(QPopupMenu* cm)
     contextMenu->insertSeparator();
 
     m_ImageSubmenu = new QPopupMenu( this );
-    m_ImageSubmenu->setCheckable(TRUE);
+    m_ImageSubmenu->setCheckable(true);
     m_ImageID = m_ImageSubmenu->insertItem(tr("Set Topmost Image"));
     if (m_Manager->isAutoTopMost())
       m_ImageSubmenu->setItemChecked(m_ImageID, true);
@@ -215,7 +215,7 @@ void QmitkLevelWindowWidgetContextMenu::getContextMenu()
     contextMenu->insertSeparator();
 
     m_ImageSubmenu = new QPopupMenu( this );
-    m_ImageSubmenu->setCheckable(TRUE);
+    m_ImageSubmenu->setCheckable(true);
     m_ImageID = m_ImageSubmenu->insertItem(tr("Set Topmost Image"));
     if (m_Manager->isAutoTopMost())
       m_ImageSubmenu->setItemChecked(m_ImageID, true);

@@ -121,7 +121,7 @@
     </customwidget>
     <customwidget>
         <class>QmitkLineEditLevelWindowWidget</class>
-        <header location="global">C:/home/daniel/ip++/AppModules/QmitkLevelWindowWidget/QmitkLineEditLevelWindowWidget.h</header>
+        <header location="global">QmitkLineEditLevelWindowWidget.h</header>
         <sizehint>
             <width>-1</width>
             <height>-1</height>

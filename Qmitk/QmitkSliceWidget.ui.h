@@ -11,7 +11,6 @@
 #include "QmitkRenderWindow.h"
 
 #include "mitkSliceNavigationController.h"
-#include "mitkLevelWindowProperty.h"
 #include "QmitkLevelWindowWidget.h"
 
 #include <vtkRenderer.h>

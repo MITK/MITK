@@ -8,8 +8,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>229</width>
-            <height>55</height>
+            <width>219</width>
+            <height>119</height>
         </rect>
     </property>
     <property name="minimumSize">
@@ -32,10 +32,67 @@
         <property name="name">
             <cstring>unnamed</cstring>
         </property>
-        <widget class="QmitkDataTreeComboBox">
+        <property name="margin">
+            <number>0</number>
+        </property>
+        <property name="spacing">
+            <number>0</number>
+        </property>
+        <widget class="QGroupBox">
             <property name="name">
-                <cstring>m_TreeNodeSelector</cstring>
+                <cstring>groupBox1</cstring>
             </property>
+            <property name="title">
+                <string>Threshold Select Data</string>
+            </property>
+            <vbox>
+                <property name="name">
+                    <cstring>unnamed</cstring>
+                </property>
+                <property name="margin">
+                    <number>0</number>
+                </property>
+                <property name="spacing">
+                    <number>0</number>
+                </property>
+                <widget class="QmitkDataTreeComboBox">
+                    <property name="name">
+                        <cstring>m_TreeNodeSelector</cstring>
+                    </property>
+                </widget>
+            </vbox>
+        </widget>
+        <widget class="QGroupBox">
+            <property name="name">
+                <cstring>groupBox2</cstring>
+            </property>
+            <property name="title">
+                <string>Threshold Value</string>
+            </property>
+            <hbox>
+                <property name="name">
+                    <cstring>unnamed</cstring>
+                </property>
+                <widget class="QLineEdit">
+                    <property name="name">
+                        <cstring>m_ThresholdInputNumber</cstring>
+                    </property>
+                    <property name="frameShape">
+                        <enum>LineEditPanel</enum>
+                    </property>
+                    <property name="frameShadow">
+                        <enum>Sunken</enum>
+                    </property>
+                </widget>
+                <widget class="QSlider">
+                    <property name="name">
+                        <cstring>m_ThresholdInputSlider</cstring>
+                    </property>
+                    <property name="orientation">
+                        <enum>Horizontal</enum>
+                    </property>
+                </widget>
+            </hbox>
         </widget>
     </vbox>
 </widget>
@@ -74,6 +131,8 @@
 </slots>
 <functions>
     <function returnType="QmitkDataTreeComboBox *">GetTreeNodeSelector()</function>
+    <function returnType="int">GetSliderValue()</function>
+    <function returnType="int">GetNumberValue()</function>
 </functions>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

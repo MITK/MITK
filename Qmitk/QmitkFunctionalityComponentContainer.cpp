@@ -43,7 +43,7 @@ QmitkFunctionalityComponentContainer::~QmitkFunctionalityComponentContainer()
 {
   if(m_DataTreeIterator.IsNotNull() )
   {
-    m_DataTreeIterator->GetTree()->RemoveObserver(m_ObserverTag);
+    //m_DataTreeIterator->GetTree()->RemoveObserver(m_ObserverTag);
   }
 }
 
@@ -109,15 +109,13 @@ void QmitkFunctionalityComponentContainer::TreeChanged(const itk::EventObject & 
 /*************** TREE CHANGED (       ) ***************/
 void QmitkFunctionalityComponentContainer::TreeChanged()
 {
-  //if(m_SelectedImage != NULL)
-    //SetDataTreeIterator(m_SelectedImage);
   if(m_GUI != NULL)
   {
-    for(unsigned int i = 0;  i < m_Qbfc.size(); i++)
+    for(unsigned int i = 0;  i < m_AddedChildList.size(); i++)
     {
       if(m_SelectedImage != NULL)
       {
-       m_Qbfc[i]->ImageSelected(m_SelectedImage);
+       m_AddedChildList[i]->ImageSelected(m_SelectedImage);
       }
     }
   }
@@ -128,18 +126,10 @@ void QmitkFunctionalityComponentContainer::TreeChanged(mitk::DataTreeIteratorBas
 {
   if(m_GUI != NULL)
   {
-    //SetDataTreeIterator(it);
-//    m_GUI->GetTreeNodeSelector()->SetDataTreeNodeIterator(this->GetDataTreeIterator());
-//    m_GUI->GetTreeNodeSelector()->UpdateContent();
-    for(unsigned int i = 0;  i < m_Qbfc.size(); i++)
+    for(unsigned int i = 0;  i < m_AddedChildList.size(); i++)
     {
-      m_Qbfc[i]->ImageSelected(m_SelectedImage);
-      //m_Qbfc[i]->UpdateTreeNodeSelector(this->GetDataTreeIterator());
-      //m_Qbfc[i]->UpdateSelector(m_GUI->GetTreeNodeSelector()->m_ComboBox->currentText());
-    }
-
-//        QString name = m_GUI->GetTreeNodeSelector()->m_ComboBox->currentText();
-     
+      m_AddedChildList[i]->ImageSelected(m_SelectedImage);
+    }   
   }
 }
 
@@ -166,7 +156,8 @@ QWidget* QmitkFunctionalityComponentContainer::CreateContainerWidget(QWidget* pa
   {
     m_GUI = new QmitkFunctionalityComponentContainerGUI(parent);
     m_GUI->GetTreeNodeSelector()->SetDataTree(GetDataTreeIterator());
-    m_GUI->GetCompContBox()->setTitle("Container");
+    m_GUI->GetContainerBorder()->setTitle("Container");
+    m_GUI->GetContainerBorder()->setLineWidth(0);
   }
   return m_GUI;
 }
@@ -187,29 +178,11 @@ void QmitkFunctionalityComponentContainer::AddComponent(QmitkFunctionalityCompon
 {  
   if(componentContainer!=NULL)
   {
-    //TODO wieder reinholen
-    //QWidget* componentWidget = componentContainer->CreateContainerWidget(m_GUI);
-    m_Qbfc.push_back(componentContainer);
-    //componentContainer->GetGUI()->setSizePolicy(preferred);
-
-    QObjectList* list;
-    list = m_GUI->queryList(0, "", true, true);
-    uint NumOfChilds = list->count();
-    list->insert(NumOfChilds, componentContainer->CreateContainerWidget(m_GUI));
-    componentContainer->GetGUI()->setSizePolicy(preferred);
-    //QLayout* containerLayout = m_GUI->GetContainerLayout();
-    //m_GUI->insertChild(componentContainer->GetGUI());
-
-    //uint numOfChilds = m_GUI->children()->count();
-    //for(int i = 0; i<= numOfChilds; i++)
-    //{
-    //  componentContainer->GetGUI()->lower();
-    //}
-
-    m_GUI->setGeometry(componentContainer->GetGUI()->height(), 0, m_GUI->width(), m_GUI->height());
-    //m_GUI->setGeometry(0, 0, m_GUI->width(), m_GUI->height());
-    m_GUI->setSizePolicy(preferred);
-    m_GUI->layout()->activate();
+    QWidget* componentWidget = componentContainer->CreateContainerWidget(m_GUI);
+    m_AddedChildList.push_back(componentContainer);
+    m_GUI->layout()->add(componentWidget);
+    QSpacerItem* spacer = new QSpacerItem( 20, 20, QSizePolicy::Minimum, QSizePolicy::Expanding );
+    m_GUI->layout()->addItem( spacer );
 
   }
 

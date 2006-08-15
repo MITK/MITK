@@ -101,7 +101,7 @@ public:
 
   /***************        ATTRIBUTES      ***************/
   /** \brief Vector with all added components */
-  std::vector<QmitkFunctionalityComponentContainer*> m_Qbfc;      
+  std::vector<QmitkFunctionalityComponentContainer*> m_AddedChildList;      
 
 protected slots:  
   /*************** TREE CHANGED (       ) ***************/
@@ -109,6 +109,7 @@ protected slots:
   virtual void TreeChanged();
   virtual void TreeChanged(mitk::DataTreeIteratorBase* it);
 
+public slots:
   /***************      OHTER METHODS     ***************/
   /** \brief Slot method that will be called if TreeNodeSelector widget was activated. */
   virtual void ImageSelected(const mitk::DataTreeFilter::Item * imageIt);

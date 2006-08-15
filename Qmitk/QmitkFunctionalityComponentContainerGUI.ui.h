@@ -18,9 +18,9 @@ void QmitkFunctionalityComponentContainerGUI::SetDataTreeIterator( mitk::DataTre
 //   m_TreeNodeSelector->SetDataTreeNodeIterator(it);
 }
 
-QGroupBox* QmitkFunctionalityComponentContainerGUI::GetCompContBox()
+QGroupBox* QmitkFunctionalityComponentContainerGUI::GetContainerBorder()
 {
-    return m_CompContBox;
+    return m_ContainerBorder;
 }
 
 QLayout* QmitkFunctionalityComponentContainerGUI::GetContainerLayout()

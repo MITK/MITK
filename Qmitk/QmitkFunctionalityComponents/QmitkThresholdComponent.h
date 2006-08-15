@@ -71,10 +71,14 @@ public:
   virtual QString GetFunctionalityName();
   QWidget* GetGUI();
 
-protected slots:  
+  /***************        ATTRIBUTES      ***************/
+  /** \brief Vector with all added components */
+  std::vector<QmitkFunctionalityComponentContainer*> m_AddedChildList; 
+
+public slots:  
   /***************      OHTER METHODS     ***************/
   /** \brief Slot method that will be called if TreeNodeSelector widget was activated. */
-  void ImageSelected(const mitk::DataTreeFilter::Item * imageIt);
+  virtual void ImageSelected(const mitk::DataTreeFilter::Item * imageIt);
 
 protected:
   QString m_Name;

@@ -78,10 +78,9 @@ void QmitkThresholdComponent::TreeChanged()
   if(m_GUI != NULL)
   {
     
-    for(unsigned int i = 0;  i < m_Qbfc.size(); i++) 
+    for(unsigned int i = 0;  i < m_AddedChildList.size(); i++) 
     {
-      //m_Qbfc[i]->SetDataTree(this->GetDataTreeIterator());
-      //m_Obfc[i]->TreeChanged(this->GetDataTreeIterator());
+      m_AddedChildList[i]->ImageSelected(m_SelectedImage);
     }
   }
 
@@ -93,9 +92,6 @@ void QmitkThresholdComponent::TreeChanged(mitk::DataTreeIteratorBase* it)
   if(m_GUI != NULL)
   {
     SetDataTreeIterator(it);
-    //    m_GUI->GetTreeNodeSelector()->SetDataTreeNodeIterator(it);
-    //TODO
-    // UpdateTreeNodeSelector(it);
   }
 }
 

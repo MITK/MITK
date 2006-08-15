@@ -28,3 +28,15 @@ QmitkDataTreeComboBox * QmitkThresholdComponentGUI::GetTreeNodeSelector()
 {
  return m_TreeNodeSelector;
 }
+
+int QmitkThresholdComponentGUI::GetSliderValue()
+{
+    int value = m_ThresholdInputSlider->value();
+    return value;
+}
+
+int QmitkThresholdComponentGUI::GetNumberValue()
+{
+    int value = atoi(m_ThresholdInputNumber->text());
+    return value;
+}

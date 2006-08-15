@@ -40,7 +40,7 @@
         </property>
         <widget class="QGroupBox">
             <property name="name">
-                <cstring>m_CompContBox</cstring>
+                <cstring>m_ContainerBorder</cstring>
             </property>
             <property name="sizePolicy">
                 <sizepolicy>
@@ -52,9 +52,9 @@
             </property>
             <property name="paletteBackgroundColor">
                 <color>
-                    <red>100</red>
-                    <green>115</green>
-                    <blue>212</blue>
+                    <red>172</red>
+                    <green>255</green>
+                    <blue>149</blue>
                 </color>
             </property>
             <property name="lineWidth">
@@ -69,6 +69,12 @@
             <vbox>
                 <property name="name">
                     <cstring>unnamed</cstring>
+                </property>
+                <property name="margin">
+                    <number>0</number>
+                </property>
+                <property name="spacing">
+                    <number>0</number>
                 </property>
                 <widget class="QGroupBox">
                     <property name="name">
@@ -138,7 +144,7 @@
     <slot>SetDataTreeIterator( mitk::DataTreeIteratorBase * it )</slot>
 </slots>
 <functions>
-    <function returnType="QGroupBox *">GetCompContBox()</function>
+    <function returnType="QGroupBox *">GetContainerBorder()</function>
     <function returnType="QLayout *">GetContainerLayout()</function>
     <function returnType="QmitkDataTreeComboBox *">GetTreeNodeSelector()</function>
 </functions>

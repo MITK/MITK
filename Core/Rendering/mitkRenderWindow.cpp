@@ -110,8 +110,17 @@ void mitk::RenderWindow::SetSize(int w, int h)
 void mitk::RenderWindow::InitRenderer()
 {
   
-    
+  
+  
   if(m_Renderer.IsNull())
+  {
+    std::string rendererName("Renderer::");
+    rendererName += m_Name;
+    m_Renderer = new OpenGLRenderer( rendererName.c_str() );
+  }
+  mitk::OpenGLRenderer* o = dynamic_cast<mitk::OpenGLRenderer*>( m_Renderer.GetPointer());
+  vtkRenderer* r = o->GetVtkRenderer();
+  if(o->GetVtkRenderer() == NULL)
   {
     std::string rendererName("Renderer::");
     rendererName += m_Name;
@@ -127,12 +136,8 @@ void mitk::RenderWindow::InitRenderer()
     m_Renderer->InitSize(size[0], size[1]);
 
   // VTK Layer Controller
-  mitk::OpenGLRenderer* o = dynamic_cast<mitk::OpenGLRenderer*>( m_Renderer.GetPointer());
-  if( o != NULL)
-  {
-      vtkRenderer* r = o->GetVtkRenderer();
-      m_VtkLayerController->InsertSceneRenderer(r);
-  }
+  m_VtkLayerController->InsertSceneRenderer(r);
+ 
 }
 
 void mitk::RenderWindow::SetWindowId(void * id)

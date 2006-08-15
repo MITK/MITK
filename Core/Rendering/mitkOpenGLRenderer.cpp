@@ -443,16 +443,6 @@ This method is called from the two Constructors
 */
 void mitk::OpenGLRenderer::InitRenderer(mitk::RenderWindow* renderwindow)
 {
-  if(m_RenderWindow!=NULL)
-  {
-    m_RenderWindow->GetVtkRenderWindow()->RemoveRenderer(m_VtkRenderer);
-    m_RenderWindow->GetVtkRenderWindow()->SetInteractor(NULL);
-    if(m_VtkRenderer != NULL)
-    {
-      m_VtkRenderer->Delete();
-      m_VtkRenderer = NULL;
-    }
-  }
   BaseRenderer::InitRenderer(renderwindow);
   if(renderwindow == NULL)
   {
@@ -463,11 +453,6 @@ void mitk::OpenGLRenderer::InitRenderer(mitk::RenderWindow* renderwindow)
 
   m_InitNeeded = true;
   m_ResizeNeeded = true;
-
-  /**@todo SetNumberOfLayers commented out, because otherwise the backface of the planes are not shown (only, when a light is added).
-  * But we need SetNumberOfLayers(2) later, when we want to prevent vtk to clear the widget before it renders (i.e., when we render something in the scene before vtk).
-  */
-  //m_RenderWindow->GetVtkRenderWindow()->SetNumberOfLayers(2);
 
   if(m_CameraController != NULL)
   {
@@ -482,8 +467,6 @@ void mitk::OpenGLRenderer::InitRenderer(mitk::RenderWindow* renderwindow)
   m_LastUpdateVtkActorsTime = 0;
   //we should disable vtk doublebuffering, but then it doesn't work
   //m_RenderWindow->GetVtkRenderWindow()->SwapBuffersOff();
-  if( this->m_VtkRenderer !=NULL )
-    m_RenderWindow->GetVtkRenderWindow()->AddRenderer( this->m_VtkRenderer );
 }
 
 /*!

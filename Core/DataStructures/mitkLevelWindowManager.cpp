@@ -57,7 +57,7 @@ void mitk::LevelWindowManager::SetDataTreeIteratorClone(DataTreeIteratorClone& i
   }
 }
 
-void mitk::LevelWindowManager::OnPropertyModified(const itk::EventObject& e)
+void mitk::LevelWindowManager::OnPropertyModified(const itk::EventObject& )
 {
   Modified();
 }
@@ -140,7 +140,7 @@ void mitk::LevelWindowManager::SetLevelWindow(const mitk::LevelWindow& levWin)
   }
 }
 
-void mitk::LevelWindowManager::TreeChanged(const itk::EventObject& treeChangedEvent)
+void mitk::LevelWindowManager::TreeChanged(const itk::EventObject&)
 {
   bool stillExists = false;
   if (m_LevWinProp && !m_AutoTopMost)

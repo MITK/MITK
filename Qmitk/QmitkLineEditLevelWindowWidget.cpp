@@ -31,7 +31,7 @@ QmitkLineEditLevelWindowWidget::QmitkLineEditLevelWindowWidget(QWidget* parent, 
   command->SetCallbackFunction(this, &QmitkLineEditLevelWindowWidget::OnPropertyModified);
   m_ObserverTag = m_Manager->AddObserver(itk::ModifiedEvent(), command);
   m_It = NULL;
-  m_SelfCall = FALSE;
+  m_SelfCall = false;
   setMinimumSize ( QSize( 40, 30 ) );
   setMaximumSize ( QSize( 40, 30 ) );
   m_Contextmenu = new QmitkLevelWindowWidgetContextMenu(this, "contextMenu", true);
@@ -62,7 +62,7 @@ QmitkLineEditLevelWindowWidget::QmitkLineEditLevelWindowWidget(QWidget* parent, 
   this->hide();
 }
 
-void QmitkLineEditLevelWindowWidget::OnPropertyModified(const itk::EventObject& e)
+void QmitkLineEditLevelWindowWidget::OnPropertyModified(const itk::EventObject& )
 {
   try
   {
@@ -78,7 +78,7 @@ void QmitkLineEditLevelWindowWidget::OnPropertyModified(const itk::EventObject& 
       m_WindowInput->setText(window);
     }
     this->show();
-    m_SelfCall = FALSE;
+    m_SelfCall = false;
   }
   catch(...)
   {
@@ -113,7 +113,7 @@ void QmitkLineEditLevelWindowWidget::setDataTreeIteratorClone( mitk::DataTreeIte
 //read the levelInput and change level and slider when the button "ENTER" was pressed in the windowInput-LineEdit
 void QmitkLineEditLevelWindowWidget::SetLevelValue()
 {
-  m_SelfCall = TRUE;
+  m_SelfCall = true;
   m_Lw.SetLevel(atoi(m_LevelInput->text().latin1()));
   m_Manager->SetLevelWindow(m_Lw);
 }
@@ -121,7 +121,7 @@ void QmitkLineEditLevelWindowWidget::SetLevelValue()
 //read the windowInput and change window and slider when the button "ENTER" was pressed in the windowInput-LineEdit
 void QmitkLineEditLevelWindowWidget::SetWindowValue()
 {
-  m_SelfCall = TRUE;
+  m_SelfCall = true;
   m_Lw.SetWindow(atoi(m_WindowInput->text().latin1()));
   m_Manager->SetLevelWindow(m_Lw);
 }

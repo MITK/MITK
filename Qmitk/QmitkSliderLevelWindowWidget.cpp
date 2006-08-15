@@ -32,17 +32,17 @@ QmitkSliderLevelWindowWidget::QmitkSliderLevelWindowWidget( QWidget * parent, co
   command->SetCallbackFunction(this, &QmitkSliderLevelWindowWidget::OnPropertyModified);
   m_ObserverTag = m_Manager->AddObserver(itk::ModifiedEvent(), command);
   m_It = NULL;
-  setMouseTracking(TRUE);
-  m_Resize = FALSE;
-  m_Bottom = FALSE;
-  m_SliderVisible = FALSE;
-  m_CtrlPressed = FALSE;
-  m_MouseDown = FALSE;
+  setMouseTracking(true);
+  m_Resize = false;
+  m_Bottom = false;
+  m_SliderVisible = false;
+  m_CtrlPressed = false;
+  m_MouseDown = false;
   
   m_Font.setPointSize( 6 );
   
   m_MoveHeight = height() - 25;
-  m_Scale = TRUE;
+  m_Scale = true;
   m_Contextmenu = new QmitkLevelWindowWidgetContextMenu(this, "contextMenu", true);
 
   setBackgroundMode( Qt::NoBackground );
@@ -63,18 +63,18 @@ void QmitkSliderLevelWindowWidget::setLevelWindowManager(mitk::LevelWindowManage
   m_ObserverTag = m_Manager->AddObserver(itk::ModifiedEvent(), command);
 }
 
-void QmitkSliderLevelWindowWidget::OnPropertyModified(const itk::EventObject& e)
+void QmitkSliderLevelWindowWidget::OnPropertyModified(const itk::EventObject& )
 {
   try
   {
     m_Lw = m_Manager->GetLevelWindow();
-    m_SliderVisible = TRUE;
+    m_SliderVisible = true;
     this->show();
     update();
   }
   catch(...)
   {
-    m_SliderVisible = FALSE;
+    m_SliderVisible = false;
     try
     {
       this->hide();
@@ -249,17 +249,17 @@ void QmitkSliderLevelWindowWidget::mouseMoveEvent( QMouseEvent* mouseEvent ) {
       QToolTip::add(this, m_LowerBound, "Ctrl + left click to change only lower bound");
       m_UpperBound.setRect(m_Rect.topLeft().x(), m_Rect.topLeft().y() - 3, 17, 7);
       QToolTip::add(this, m_UpperBound, "Ctrl + left click to change only upper bound");
-      m_Resize = TRUE;
+      m_Resize = true;
       if ((mouseEvent->pos().y() >= (m_Rect.bottomLeft().y() - 3) && mouseEvent->pos().y() <= (m_Rect.bottomLeft().y() + 3)))
-        m_Bottom = TRUE;
+        m_Bottom = true;
     }
     else
     {
       QToolTip::remove(this, m_LowerBound);
       QToolTip::remove(this, m_UpperBound);
       setCursor(ArrowCursor);
-      m_Resize = FALSE;
-      m_Bottom = FALSE;
+      m_Resize = false;
+      m_Bottom = false;
     }
   }
 
@@ -451,13 +451,13 @@ void QmitkSliderLevelWindowWidget::contextMenuEvent( QContextMenuEvent * )
 
 void QmitkSliderLevelWindowWidget::hideScale()
 {
-  m_Scale = FALSE;
+  m_Scale = false;
   update();
 }
 
 void QmitkSliderLevelWindowWidget::showScale()
 {
-  m_Scale = TRUE;
+  m_Scale = true;
   update();
 }
 

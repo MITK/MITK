@@ -27,8 +27,9 @@ namespace mitk
 {
 class LevelWindowManager : public itk::Object {
 public:
-  LevelWindowManager();
-  ~LevelWindowManager();
+
+  mitkClassMacro(LevelWindowManager, itk::Object)
+  itkNewMacro(Self); 
 
   void SetDataTreeIteratorClone(mitk::DataTreeIteratorClone& it);
   mitk::DataTreeIteratorClone& GetDataTreeIteratorClone();
@@ -42,7 +43,13 @@ public:
 
   void TreeChanged(const itk::EventObject& treeChangedEvent);
 
+protected:
+
+  LevelWindowManager();
+  ~LevelWindowManager();
+
 private:
+
   DataTreeIteratorClone m_DataTreeIteratorClone;
   bool m_AutoTopMost;
   unsigned long m_ObserverTag;

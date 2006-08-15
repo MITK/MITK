@@ -26,10 +26,12 @@ PURPOSE.  See the above copyright notices for more information.
 */
 QmitkLineEditLevelWindowWidget::QmitkLineEditLevelWindowWidget(QWidget* parent, const char* name, WFlags f):QWidget(parent, name, f)
 {
-  m_Manager = new mitk::LevelWindowManager();
+  m_Manager = mitk::LevelWindowManager::New();
+  
   itk::ReceptorMemberCommand<QmitkLineEditLevelWindowWidget>::Pointer command = itk::ReceptorMemberCommand<QmitkLineEditLevelWindowWidget>::New();
   command->SetCallbackFunction(this, &QmitkLineEditLevelWindowWidget::OnPropertyModified);
   m_ObserverTag = m_Manager->AddObserver(itk::ModifiedEvent(), command);
+
   m_It = NULL;
   m_SelfCall = false;
   setMinimumSize ( QSize( 40, 30 ) );
@@ -94,20 +96,25 @@ void QmitkLineEditLevelWindowWidget::OnPropertyModified(const itk::EventObject& 
 
 void QmitkLineEditLevelWindowWidget::setLevelWindowManager(mitk::LevelWindowManager* levelWindowManager)
 {
-  if( m_ObserverTag && m_Manager)
+  if( m_ObserverTag && m_Manager.IsNotNull() )
   {
     m_Manager->RemoveObserver(m_ObserverTag);
   }
   m_Manager = levelWindowManager;
-  itk::ReceptorMemberCommand<QmitkLineEditLevelWindowWidget>::Pointer command = itk::ReceptorMemberCommand<QmitkLineEditLevelWindowWidget>::New();
-  command->SetCallbackFunction(this, &QmitkLineEditLevelWindowWidget::OnPropertyModified);
-  m_ObserverTag = m_Manager->AddObserver(itk::ModifiedEvent(), command);
+
+  m_ObserverTag = 0;
+  if ( m_Manager.IsNotNull() )
+  {
+    itk::ReceptorMemberCommand<QmitkLineEditLevelWindowWidget>::Pointer command = itk::ReceptorMemberCommand<QmitkLineEditLevelWindowWidget>::New();
+    command->SetCallbackFunction(this, &QmitkLineEditLevelWindowWidget::OnPropertyModified);
+    m_ObserverTag = m_Manager->AddObserver(itk::ModifiedEvent(), command);
+  }
 }
 
 void QmitkLineEditLevelWindowWidget::setDataTreeIteratorClone( mitk::DataTreeIteratorClone& it )
 {
   m_It = it;
-  m_Manager->SetDataTreeIteratorClone(m_It);
+  m_Manager->SetDataTreeIteratorClone(m_It); // TODO mit Ivo klaeren
 }
 
 //read the levelInput and change level and slider when the button "ENTER" was pressed in the windowInput-LineEdit
@@ -130,7 +137,8 @@ void QmitkLineEditLevelWindowWidget::setValidator()
 {
   int diffLevelToUpperBound = (int)(m_Lw.GetRangeMax() - m_Lw.GetLevel()); 
   int diffLevelToLowerBound = (int)(m_Lw.GetLevel() - m_Lw.GetRangeMin());
-  
+
+  // TODO delete noetig?
   //Validator for both LineEdit-widgets, to limit the valid input-range to int.
   if (diffLevelToUpperBound < diffLevelToLowerBound)
   {
@@ -149,6 +157,6 @@ void QmitkLineEditLevelWindowWidget::setValidator()
 
 void QmitkLineEditLevelWindowWidget::contextMenuEvent( QContextMenuEvent * )
 { 
-  m_Contextmenu->setLevelWindowManager(m_Manager);
+  m_Contextmenu->setLevelWindowManager(m_Manager.GetPointer());
   m_Contextmenu->getContextMenu();
 }

@@ -68,7 +68,7 @@ public:
   *	by a QmitkSliderLevelWindowWidget
   */
   mitk::LevelWindow m_Lw;
-  mitk::LevelWindowManager* m_Manager;
+  mitk::LevelWindowManager::Pointer m_Manager;
 
   void setLevelWindowManager(mitk::LevelWindowManager* levelWindowManager);
   void update( );

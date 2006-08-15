@@ -27,10 +27,12 @@ PURPOSE.  See the above copyright notices for more information.
 QmitkSliderLevelWindowWidget::QmitkSliderLevelWindowWidget( QWidget * parent, const char * name, WFlags f )
 : QWidget( parent, name, f )
 {
-  m_Manager = new mitk::LevelWindowManager();
+  m_Manager = mitk::LevelWindowManager::New();
+
   itk::ReceptorMemberCommand<QmitkSliderLevelWindowWidget>::Pointer command = itk::ReceptorMemberCommand<QmitkSliderLevelWindowWidget>::New();
   command->SetCallbackFunction(this, &QmitkSliderLevelWindowWidget::OnPropertyModified);
   m_ObserverTag = m_Manager->AddObserver(itk::ModifiedEvent(), command);
+
   m_It = NULL;
   setMouseTracking(true);
   m_Resize = false;
@@ -53,14 +55,19 @@ QmitkSliderLevelWindowWidget::QmitkSliderLevelWindowWidget( QWidget * parent, co
 
 void QmitkSliderLevelWindowWidget::setLevelWindowManager(mitk::LevelWindowManager* levelWindowManager)
 {
-  if( m_ObserverTag && m_Manager)
+  if( m_ObserverTag && m_Manager.IsNotNull())
   {
     m_Manager->RemoveObserver(m_ObserverTag);
   }
   m_Manager = levelWindowManager;
-  itk::ReceptorMemberCommand<QmitkSliderLevelWindowWidget>::Pointer command = itk::ReceptorMemberCommand<QmitkSliderLevelWindowWidget>::New();
-  command->SetCallbackFunction(this, &QmitkSliderLevelWindowWidget::OnPropertyModified);
-  m_ObserverTag = m_Manager->AddObserver(itk::ModifiedEvent(), command);
+
+  m_ObserverTag = 0;
+  if ( m_Manager.IsNotNull() )
+  {
+    itk::ReceptorMemberCommand<QmitkSliderLevelWindowWidget>::Pointer command = itk::ReceptorMemberCommand<QmitkSliderLevelWindowWidget>::New();
+    command->SetCallbackFunction(this, &QmitkSliderLevelWindowWidget::OnPropertyModified);
+    m_ObserverTag = m_Manager->AddObserver(itk::ModifiedEvent(), command);
+  }
 }
 
 void QmitkSliderLevelWindowWidget::OnPropertyModified(const itk::EventObject& )
@@ -438,7 +445,7 @@ void QmitkSliderLevelWindowWidget::update() {
 
 void QmitkSliderLevelWindowWidget::contextMenuEvent( QContextMenuEvent * )
 { 
-  m_Contextmenu->setLevelWindowManager(m_Manager);
+  m_Contextmenu->setLevelWindowManager(m_Manager.GetPointer());
   QPopupMenu *contextMenu = new QPopupMenu( this );
   Q_CHECK_PTR( contextMenu );
   if (m_Scale)

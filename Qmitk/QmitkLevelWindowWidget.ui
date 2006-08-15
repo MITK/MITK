@@ -153,19 +153,17 @@
 </includes>
 <variables>
     <variable>unsigned long m_ObserverTag;</variable>
-    <variable>mitk::LevelWindow m_Lw;</variable>
-    <variable>mitk::LevelWindowManager* m_Manager;</variable>
     <variable>mitk::DataTreeIteratorClone* m_Iter;</variable>
+    <variable>mitk::LevelWindowManager::Pointer m_Manager;</variable>
 </variables>
 <slots>
     <slot>setDataTreeIteratorClone( mitk::DataTreeIteratorClone &amp; it )</slot>
-    <slot>SetLevelWindow(const mitk::LevelWindow&amp; levWin)</slot>
+    <slot>SetLevelWindow( const mitk::LevelWindow &amp; levWin )</slot>
 </slots>
 <functions>
     <function access="private" specifier="non virtual">init()</function>
     <function access="private" specifier="non virtual">destroy()</function>
-    <function access="private">OnPropertyModified(const itk::EventObject&amp; )</function>
-    <function specifier="non virtual" returnType="const mitk::LevelWindow">GetLevelWindow()</function>
+    <function specifier="non virtual" returnType="const mitk::LevelWindow &amp;">GetLevelWindow()</function>
 </functions>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

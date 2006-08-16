@@ -5,8 +5,6 @@
 #include <Vector3.h>
 #include <mitkPointSet.h>
 #include <mitkPlaneGeometry.h>
-#include <mitkGeometry3D.h>
-#include <mitkGeometryData.h>
 #include "mitkGeometryDataSource.h"
 
 namespace mitk {

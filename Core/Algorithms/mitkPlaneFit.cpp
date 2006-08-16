@@ -1,10 +1,11 @@
 #include <mitkPlaneFit.h>
 #include <mitkPlaneGeometry.h>
+#include <mitkGeometryData.h>
 #include <vnl/algo/vnl_svd.h>
 #include <vcl_iostream.h>
 
 
-mitk::PlaneFit::PlaneFit()
+mitk::PlaneFit::PlaneFit()/*:m_Centroid(NULL)*/
 {
   m_Plane = mitk::PlaneGeometry::New();
 }
@@ -116,7 +117,6 @@ void mitk::PlaneFit::ProcessPointSet()
   // calculate the SVD of A
   vnl_vector<mitk::ScalarType> v = svd.nullvector();
 
-  std::cout<<"NULLVECTOR: "<<v[0]<<", "<<v[1]<<", "<<v[2]<<std::endl;
 
   // Avoid erratic normal sign switching when the plane changes minimally
   // by negating the vector for negative x values.

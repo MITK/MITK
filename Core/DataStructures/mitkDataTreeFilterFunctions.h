@@ -19,11 +19,8 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITK_DATATREEFILTERFUNCTOINS_H_INCLUDED
 #define MITK_DATATREEFILTERFUNCTOINS_H_INCLUDED
 
-#include <mitkConfig.h>
 #include <mitkDataTreeNode.h>
 
-#include <mitkImage.h>
-#include <mitkSurface.h>
 #include <mitkProperties.h>
 
 namespace mitk

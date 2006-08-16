@@ -18,6 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include "mitkVerboseLimitedLinearUndo.h"
+#include "mitkOperationEvent.h"
 
 mitk::VerboseLimitedLinearUndo::VerboseLimitedLinearUndo()
 {

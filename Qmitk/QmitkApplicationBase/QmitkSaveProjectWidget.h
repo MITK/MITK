@@ -17,8 +17,6 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 #include <qwidget.h>
 
-#include <mitkProperties.h>
-#include <mitkDataTree.h>
 #include <mitkDataTreeFilter.h>
 
 namespace mitk {

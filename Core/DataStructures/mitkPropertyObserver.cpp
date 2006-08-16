@@ -1,5 +1,6 @@
 
 #include <mitkPropertyObserver.h>
+#include <mitkBaseProperty.h>
 #include <itkCommand.h>
 #include <stdexcept>
 

@@ -22,7 +22,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 // MITK header
 #include "mitkCommon.h"
-#include "mitkOperationEvent.h"
 #include "mitkLimitedLinearUndo.h"
 // STL header
 #include <vector>
@@ -32,6 +31,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk {
 
+class UndoStackItem;
+  
 /**
 * @brief A limited linear undo model providing GUI elements with stack status information.
 *

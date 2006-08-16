@@ -36,10 +36,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkOperationEvent.h"
 #include <mitkXMLIO.h>
 
-#ifdef INTERACTION_DEBUG
-#include "mitkInteractionDebug.h"
-#endif
-
 namespace mitk {
 
   // base class of statem machine functors

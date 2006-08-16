@@ -18,7 +18,7 @@
 #define __TreeChangeEvent_h
 
 #include "itkMacro.h"
-#include <itkObject.h>
+#include <itkEventObject.h>
 #include <itkTreeIteratorBase.h>
 
 namespace itk

@@ -1,7 +1,7 @@
 #ifndef MITK_BASEPROPERTYOBSERVER_H_INCLUDED
 #define MITK_BASEPROPERTYOBSERVER_H_INCLUDED
 
-#include <mitkBaseProperty.h>
+#include <itkEventObject.h>
 
 namespace mitk {
 
@@ -16,6 +16,8 @@ namespace mitk {
 
 */
 class PropertyObserver {};
+
+class BaseProperty;
   
 class PropertyView : public PropertyObserver
 {

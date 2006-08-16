@@ -53,7 +53,7 @@ Color ColorSequenceHalfTones::GetNextColor()
 void ColorSequenceHalfTones::InitColorList()
 {
   
-  mitk::Color defaultColor, red, green, blue, yellow, magenta, cyan, orange;
+  Color defaultColor, red, green, blue, yellow, magenta, cyan, orange;
   defaultColor.Set(1.0, 0.67, 0.0);
   red.Set(1.0, 0.6, 0.6);
   green.Set(0.6, 1.0, 0.6);

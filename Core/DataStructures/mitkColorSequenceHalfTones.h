@@ -48,7 +48,7 @@ namespace mitk
   /*!  
   \brief global color-object that holds the actual color and changes to the next one
   */ 
-  mitk::Color m_Color;
+  Color m_Color;
 
   /*!  
   \brief color-index to iterate through the colors

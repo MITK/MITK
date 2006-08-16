@@ -20,17 +20,17 @@ PURPOSE.  See the above copyright notices for more information.
 #error MeshUtils currently not supported for MS Visual C++ 6.0. Sorry.
 #endif
 
-#include <itkMesh.h>
+//#include <itkMesh.h>
 #include <itkLineCell.h>
 #include <itkTriangleCell.h>
 #include <itkPolygonCell.h>
 #include <itkQuadrilateralCell.h>
 #include <itkCellInterface.h>
-#include <itkDefaultDynamicMeshTraits.h> 
+//#include <itkDefaultDynamicMeshTraits.h> 
 #include <itkSphereMeshSource.h> 
-#include <itkTransformMeshFilter.h>
-#include <itkTranslationTransform.h>
-#include <itkMinimumMaximumImageCalculator.h>
+//#include <itkTransformMeshFilter.h>
+//#include <itkTranslationTransform.h>
+//#include <itkMinimumMaximumImageCalculator.h>
 #include <itkAutomaticTopologyMeshSource.h>
 #include <itkRegularSphereMeshSource.h>
 #include <vnl/vnl_cross.h>

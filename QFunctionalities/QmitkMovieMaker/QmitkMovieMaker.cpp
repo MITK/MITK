@@ -26,6 +26,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkOpenGLRenderer.h"
 #include "mitkMovieGenerator.h"
 #include "mitkGlobalInteraction.h"
+#include "mitkRenderWindow.h"
 
 #include "icon.xpm"
 

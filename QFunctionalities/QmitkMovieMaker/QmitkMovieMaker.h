@@ -23,7 +23,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkCameraRotationController.h"
 #include "mitkStepper.h"
 #include "mitkMultiStepper.h"
-#include "mitkRenderWindow.h"
 #include "itkCommand.h"
 
 class QmitkStdMultiWidget;

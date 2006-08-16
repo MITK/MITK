@@ -23,7 +23,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkCommon.h"
 #include <vector>
 #include <itkObject.h>
-#include <itkObjectFactory.h>
 
 namespace mitk
 {

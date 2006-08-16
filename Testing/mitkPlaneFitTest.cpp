@@ -2,7 +2,7 @@
 #include <mitkPointSet.h>
 #include <mitkGeometry2D.h>
 #include <mitkVector.h>
-
+#include <mitkGeometryData.h>
 #include <fstream>
 
 int mitkPlaneFitTest(int, char*[] )

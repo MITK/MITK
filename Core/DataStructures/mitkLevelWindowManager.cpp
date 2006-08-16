@@ -32,28 +32,43 @@ mitk::LevelWindowManager::LevelWindowManager()
 
 mitk::LevelWindowManager::~LevelWindowManager()
 {
-  if(m_ObserverTag && m_DataTreeIteratorClone.IsNotNull() )
+  if (m_DataTreeIteratorClone.IsNotNull())
   {
-    m_DataTreeIteratorClone->GetTree()->RemoveObserver(m_ObserverTag);
+    if(m_DataTreeIteratorClone->GetTree()->HasObserver(itk::TreeChangeEvent<mitk::DataTreeBase>()) )
+    {
+      m_DataTreeIteratorClone->GetTree()->RemoveObserver(m_ObserverTag);
+    }
   }
-  if( m_PropertyModifiedTag && m_LevWinProp.IsNotNull())
+  if (m_LevWinProp.IsNotNull())
   {
-    m_LevWinProp->RemoveObserver(m_PropertyModifiedTag);
+    if(m_LevWinProp->HasObserver(itk::ModifiedEvent()))
+    {
+      m_LevWinProp->RemoveObserver(m_PropertyModifiedTag);
+    }
   }
 }
 
 void mitk::LevelWindowManager::SetDataTreeIteratorClone(DataTreeIteratorClone& it)
 {
-  if(m_ObserverTag && m_DataTreeIteratorClone.IsNotNull() )
+  if (m_DataTreeIteratorClone.IsNotNull())
   {
-    m_DataTreeIteratorClone->GetTree()->RemoveObserver(m_ObserverTag);
+    if(m_DataTreeIteratorClone->GetTree()->HasObserver(itk::TreeChangeEvent<mitk::DataTreeBase>()) )
+    {
+      m_DataTreeIteratorClone->GetTree()->RemoveObserver(m_ObserverTag);
+    }
   }
   m_DataTreeIteratorClone = it;
-  if(m_DataTreeIteratorClone.IsNotNull())
+  if (m_DataTreeIteratorClone->GetTree() != NULL)
   {
-    itk::ReceptorMemberCommand<LevelWindowManager>::Pointer command = itk::ReceptorMemberCommand<LevelWindowManager>::New();
-    command->SetCallbackFunction(this, &LevelWindowManager::TreeChanged);
-    m_ObserverTag = m_DataTreeIteratorClone->GetTree()->AddObserver(itk::TreeChangeEvent<mitk::DataTreeBase>(), command);
+  if (m_DataTreeIteratorClone.IsNotNull())
+  {
+    if(!m_DataTreeIteratorClone->GetTree()->HasObserver(itk::TreeChangeEvent<mitk::DataTreeBase>()))
+    {
+      itk::ReceptorMemberCommand<LevelWindowManager>::Pointer command = itk::ReceptorMemberCommand<LevelWindowManager>::New();
+      command->SetCallbackFunction(this, &LevelWindowManager::TreeChanged);
+      m_ObserverTag = m_DataTreeIteratorClone->GetTree()->AddObserver(itk::TreeChangeEvent<mitk::DataTreeBase>(), command);
+    }
+  }
   }
 }
 
@@ -64,56 +79,76 @@ void mitk::LevelWindowManager::OnPropertyModified(const itk::EventObject& )
 
 void mitk::LevelWindowManager::SetAutoTopMostImage()
 {
-  if( m_PropertyModifiedTag && m_LevWinProp.IsNotNull())
+  m_AutoTopMost = true;
+  if (m_LevWinProp.IsNotNull())
   {
-    m_LevWinProp->RemoveObserver(m_PropertyModifiedTag);
-  }
-  m_DataTreeIteratorClone->GoToBegin();
-  int maxLayer = itk::NumericTraits<int>::min();
-  m_LevWinProp = NULL;
-  while ( !m_DataTreeIteratorClone->IsAtEnd() )
-  {
-    if ( (m_DataTreeIteratorClone->Get().IsNotNull()) && (m_DataTreeIteratorClone->Get()->IsVisible(NULL)) )
+    if( m_LevWinProp->HasObserver(itk::ModifiedEvent()))
     {
-      int layer = 0;
-      m_DataTreeIteratorClone->Get()->GetIntProperty("layer", layer);
-      if ( layer >= maxLayer )
+      m_LevWinProp->RemoveObserver(m_PropertyModifiedTag);
+      m_PropertyModifiedTag = 0;
+    }
+  }
+  if (m_DataTreeIteratorClone.IsNotNull())
+  {
+    m_DataTreeIteratorClone->GoToBegin();
+    int maxLayer = itk::NumericTraits<int>::min();
+    m_LevWinProp = NULL;
+    while ( !m_DataTreeIteratorClone->IsAtEnd() )
+    {
+      if ( (m_DataTreeIteratorClone->Get().IsNotNull()) && (m_DataTreeIteratorClone->Get()->IsVisible(NULL)) )
       {
-        bool binary = false;
-        m_DataTreeIteratorClone->Get()->GetBoolProperty("binary", binary);
-        if( binary == false)
+        int layer = 0;
+        m_DataTreeIteratorClone->Get()->GetIntProperty("layer", layer);
+        if ( layer >= maxLayer )
         {
-          mitk::LevelWindowProperty::Pointer levWinProp = dynamic_cast<mitk::LevelWindowProperty*>(m_DataTreeIteratorClone->Get()->GetProperty("levelwindow").GetPointer());
-          if (levWinProp.IsNotNull())
+          bool binary = false;
+          m_DataTreeIteratorClone->Get()->GetBoolProperty("binary", binary);
+          if( binary == false)
           {
-            m_LevWinProp = levWinProp;
-            maxLayer = layer;
+            mitk::LevelWindowProperty::Pointer levWinProp = dynamic_cast<mitk::LevelWindowProperty*>(m_DataTreeIteratorClone->Get()->GetProperty("levelwindow").GetPointer());
+            if (levWinProp.IsNotNull())
+            { 
+              m_LevWinProp = levWinProp;
+              maxLayer = layer;
+            }
           }
         }
       }
+      ++m_DataTreeIteratorClone;
     }
-    ++m_DataTreeIteratorClone;
+    if (m_LevWinProp.IsNotNull())
+    {
+      if (!m_LevWinProp->HasObserver(itk::ModifiedEvent()))
+      {
+        itk::ReceptorMemberCommand<LevelWindowManager>::Pointer command = itk::ReceptorMemberCommand<LevelWindowManager>::New();
+        command->SetCallbackFunction(this, &LevelWindowManager::OnPropertyModified);
+        m_PropertyModifiedTag = m_LevWinProp->AddObserver( itk::ModifiedEvent(), command );
+      }
+    }
+    m_AutoTopMost = true;
+    Modified();
   }
-  if (m_LevWinProp)
-  {
-    itk::ReceptorMemberCommand<LevelWindowManager>::Pointer command = itk::ReceptorMemberCommand<LevelWindowManager>::New();
-    command->SetCallbackFunction(this, &LevelWindowManager::OnPropertyModified);
-    m_PropertyModifiedTag = m_LevWinProp->AddObserver( itk::ModifiedEvent(), command );
-  }
-  m_AutoTopMost = true;
-  Modified();
 }
 
 void mitk::LevelWindowManager::SetLevWinProp(LevelWindowProperty::Pointer levWinProp)
 {
-  if( m_PropertyModifiedTag && m_LevWinProp.IsNotNull())
+  if (m_LevWinProp.IsNotNull())
   {
-    m_LevWinProp->RemoveObserver(m_PropertyModifiedTag);
+    if( m_LevWinProp->HasObserver(itk::ModifiedEvent()))
+    {
+      m_LevWinProp->RemoveObserver(m_PropertyModifiedTag);
+    }
   }
   m_LevWinProp = levWinProp;
-  itk::ReceptorMemberCommand<LevelWindowManager>::Pointer command = itk::ReceptorMemberCommand<LevelWindowManager>::New();
-  command->SetCallbackFunction(this, &LevelWindowManager::OnPropertyModified);
-  m_PropertyModifiedTag = m_LevWinProp->AddObserver( itk::ModifiedEvent(), command );
+  if (m_LevWinProp.IsNotNull())
+  {
+    if (!m_LevWinProp->HasObserver(itk::ModifiedEvent()))
+    {
+      itk::ReceptorMemberCommand<LevelWindowManager>::Pointer command = itk::ReceptorMemberCommand<LevelWindowManager>::New();
+      command->SetCallbackFunction(this, &LevelWindowManager::OnPropertyModified);
+      m_PropertyModifiedTag = m_LevWinProp->AddObserver( itk::ModifiedEvent(), command );
+    }
+  }
   m_AutoTopMost = false;
   Modified();
 }
@@ -125,7 +160,7 @@ mitk::LevelWindowProperty::Pointer mitk::LevelWindowManager::GetLevWinProp()
 
 const mitk::LevelWindow& mitk::LevelWindowManager::GetLevelWindow()
 {
-  if (m_LevWinProp && m_LevWinProp.IsNotNull())
+  if (m_LevWinProp.IsNotNull())
     return m_LevWinProp->GetLevelWindow();
   else
     throw "No LevelWindow available!";
@@ -143,7 +178,7 @@ void mitk::LevelWindowManager::SetLevelWindow(const mitk::LevelWindow& levWin)
 void mitk::LevelWindowManager::TreeChanged(const itk::EventObject&)
 {
   bool stillExists = false;
-  if (m_LevWinProp && !m_AutoTopMost)
+  if (m_LevWinProp.IsNotNull() && !m_AutoTopMost && m_DataTreeIteratorClone.IsNotNull())
   {
       m_DataTreeIteratorClone->GoToBegin();
       while ( !m_DataTreeIteratorClone->IsAtEnd() )
@@ -154,10 +189,10 @@ void mitk::LevelWindowManager::TreeChanged(const itk::EventObject&)
           m_DataTreeIteratorClone->Get()->GetBoolProperty("binary", binary);
           if( binary == false)
           { 
-            mitk::LevelWindowProperty::Pointer levWinProp = dynamic_cast<mitk::LevelWindowProperty*>(m_DataTreeIteratorClone->Get()->GetProperty("levelwindow").GetPointer());
-            if (levWinProp.IsNotNull())
+            mitk::LevelWindowProperty* levWinProp = dynamic_cast<mitk::LevelWindowProperty*>(m_DataTreeIteratorClone->Get()->GetProperty("levelwindow").GetPointer());
+            if (levWinProp)
             {
-              if (m_LevWinProp == levWinProp)
+              if (m_LevWinProp.GetPointer() == levWinProp)
                 stillExists = true;
             }
           }
@@ -165,7 +200,7 @@ void mitk::LevelWindowManager::TreeChanged(const itk::EventObject&)
         ++m_DataTreeIteratorClone;
       }
   }
-  if (stillExists == false)
+  if (stillExists == false && m_DataTreeIteratorClone.IsNotNull())
   {
     SetAutoTopMostImage();
   }

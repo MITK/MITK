@@ -32,10 +32,16 @@ const QSizePolicy preferred(QSizePolicy::Preferred, QSizePolicy::Preferred);
 
 /***************       CONSTRUCTOR      ***************/
 QmitkFunctionalityComponentContainer::QmitkFunctionalityComponentContainer(QObject *parent, const char *name, mitk::DataTreeIteratorBase* it)
-: QmitkBaseFunctionalityComponent(name, it),m_Parent(parent), m_GUI(NULL),m_Name(name), m_SelectedImage(NULL)
+: QmitkBaseFunctionalityComponent(name, it),m_Parent(parent), m_GUI(NULL),m_Name(name), m_SelectedImage(NULL), m_UpdateSelector(true), m_ShowSelector(true)
 {
   SetDataTreeIterator(it);
+}
 
+/***************       CONSTRUCTOR      ***************/
+QmitkFunctionalityComponentContainer::QmitkFunctionalityComponentContainer(QObject *parent, const char *name, mitk::DataTreeIteratorBase* it, bool updateSelector, bool showSelector)
+: QmitkBaseFunctionalityComponent(name, it),m_Parent(parent), m_GUI(NULL),m_Name(name), m_SelectedImage(NULL), m_UpdateSelector(updateSelector), m_ShowSelector(showSelector)
+{
+  SetDataTreeIterator(it);
 }
 
 /***************        DESTRUCTOR      ***************/

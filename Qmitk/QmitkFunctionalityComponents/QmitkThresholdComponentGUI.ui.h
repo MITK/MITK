@@ -40,3 +40,19 @@ int QmitkThresholdComponentGUI::GetNumberValue()
     int value = atoi(m_ThresholdInputNumber->text());
     return value;
 }
+
+QSlider* QmitkThresholdComponentGUI::GetThresholdInputSlider()
+{
+return m_ThresholdInputSlider;
+}
+
+QLineEdit* QmitkThresholdComponentGUI::GetThresholdInputNumber()
+{
+return m_ThresholdInputNumber;
+}
+
+
+QCheckBox* QmitkThresholdComponentGUI::GetShowThresholdCheckBox()
+{
+  return m_ShowThresholdCheckBox;
+}

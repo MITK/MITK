@@ -59,9 +59,14 @@ class QmitkFunctionalityComponentContainer : public QmitkBaseFunctionalityCompon
 public:
 
   /***************       CONSTRUCTOR      ***************/
-  /** \brief Constructor. */
+  /** \brief Standard-Constructor. */
   QmitkFunctionalityComponentContainer(QObject *parent=0, const char *name=0, mitk::DataTreeIteratorBase* dataIt = NULL);
   
+  /***************       CONSTRUCTOR      ***************/
+  /** \brief Constructor to set some preferences. */
+  QmitkFunctionalityComponentContainer(QObject *parent, const char *name, mitk::DataTreeIteratorBase* dataIt, bool updateSelector, bool showSelector);
+  
+
   /***************        DESTRUCTOR      ***************/
   /** \brief Destructor. */
   ~QmitkFunctionalityComponentContainer();
@@ -122,6 +127,10 @@ protected:
   bool m_Available;
 
   bool m_Activated;
+  /** \brief Attribute to decide whether the selector shall be updated when a parent-Selector is updatet or not */
+  bool m_UpdateSelector;
+  /** \brief Attribute to decide whether the selector shall be shown or not */
+  bool m_ShowSelector;
 
 
 private:

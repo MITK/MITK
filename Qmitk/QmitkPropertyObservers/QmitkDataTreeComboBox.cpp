@@ -161,6 +161,8 @@ void QmitkDataTreeComboBox::SetDataTree(mitk::DataTreeBase* tree)
 {
   if (tree)
   {
+    disconnectNotifications(); 
+
     // create default filter with visibility (editable) and name (non-editable)
     m_PrivateFilter = mitk::DataTreeFilter::New(tree);
     m_PrivateFilter->SetFilter( mitk::IsBaseDataType<mitk::Image>() );
@@ -169,7 +171,6 @@ void QmitkDataTreeComboBox::SetDataTree(mitk::DataTreeBase* tree)
     visible.push_back("name");
     m_PrivateFilter->SetVisibleProperties(visible);
     
-    disconnectNotifications(); 
     m_DataTreeFilter = m_PrivateFilter;
     connectNotifications(); // add observers
   
@@ -400,6 +401,7 @@ void QmitkDataTreeComboBox::generateItems()
   try
   {
     if ( QComboBox::currentItem() < 0 ) return; // nothing selected (e.g. because there are no items)
+    if ( m_Items.size() == 0 ) return; // nothing selected (there are no items)
     mitk::DataTreeFilter::Item* currentItem = const_cast<mitk::DataTreeFilter::Item*>(m_Items.at( QComboBox::currentItem() ));
     if ( currentItem != m_CurrentItem )
     {

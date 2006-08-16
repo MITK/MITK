@@ -261,12 +261,12 @@ mitk::SeedsImage::GetNit( SeedsImageType* image )
       if ( dist <= m_Radius*m_Radius )
       {
         nit.ActivateOffset( nit.GetOffset( i ) );
-        //*nit[i] = gaussianFunction->Evaluate( point );
+        // *nit[i] = gaussianFunction->Evaluate( point );
       }
       else
       {
         nit.DeactivateOffset( nit.GetOffset( i ) );
-        //*nit[i] = 0;
+        // *nit[i] = 0;
       }
       */
     }

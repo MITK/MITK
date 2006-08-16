@@ -204,14 +204,7 @@ template < int Dimension >
 itk::Neighborhood< float, Dimension >&
 mitk::SeedsImage::GetBrush()
 {
-  static initialized = false;
   static itk::Neighborhood< float, Dimension > brush;
-
-  if ( ! initialized )
-  {
-
-    initialized = true;
-  }
   return brush;
 }
 
@@ -226,7 +219,7 @@ mitk::SeedsImage::GetNit( SeedsImageType* image )
   typedef itk::GaussianSpatialFunction< int, SeedsImageType::ImageDimension >
     GaussianFunctionType;
 
-  static initialized = false;
+  static bool initialized = false;
   static SeedsImageType* iteratedImage = 0;
   static NeighborhoodIteratorType nit;
   static GaussianFunctionType::Pointer gaussianFunction

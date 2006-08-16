@@ -134,7 +134,7 @@
 <customwidgets>
     <customwidget>
         <class>QmitkDataTreeComboBox</class>
-        <header location="global">C:/home/urte/ip++/AppModules/QmitkPropertyObservers/QmitkDataTreeComboBox.h</header>
+        <header location="global">QmitkDataTreeComboBox.h</header>
         <sizehint>
             <width>-1</width>
             <height>-1</height>

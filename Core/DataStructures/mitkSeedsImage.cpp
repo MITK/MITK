@@ -118,7 +118,7 @@ void mitk::SeedsImage::AddSeedPoint(SeedsImageType* itkImage)
 { 
   typedef itk::NeighborhoodIterator< SeedsImageType >
     NeighborhoodIteratorType;
-  typedef NeighborhoodIteratorType::IndexType IndexType;
+  typedef typename NeighborhoodIteratorType::IndexType IndexType;
 
   NeighborhoodIteratorType& nit = this->GetNit< SeedsImageType >( itkImage );
 
@@ -152,7 +152,9 @@ void mitk::SeedsImage::PointInterpolation(SeedsImageType* itkImage)
 {
   typedef itk::NeighborhoodIterator< SeedsImageType >
     NeighborhoodIteratorType;
-  typedef NeighborhoodIteratorType::IndexType IndexType;
+  typedef typename NeighborhoodIteratorType::IndexType IndexType;
+
+
 
   NeighborhoodIteratorType& nit = this->GetNit< SeedsImageType >( itkImage );
 

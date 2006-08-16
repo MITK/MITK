@@ -128,7 +128,7 @@ void mitk::SeedsImage::AddSeedPoint(SeedsImageType* itkImage)
   this->GetGeometry()->WorldToIndex( m_Point, index );
 
   IndexType itkIndex;
-  int d;
+  unsigned int d;
   for ( d = 0; d < dimension; ++d )
   {
     itkIndex[d] = (int)(index[d] + 0.5);
@@ -136,7 +136,7 @@ void mitk::SeedsImage::AddSeedPoint(SeedsImageType* itkImage)
   nit.SetLocation( itkIndex );
 
   
-  int i;
+  unsigned int i;
   for ( i = 0; i < nit.Size(); ++i )
   {
     if ( nit[i] != 0 )
@@ -216,15 +216,15 @@ mitk::SeedsImage::GetNit( SeedsImageType* image )
 {
   typedef itk::NeighborhoodIterator< SeedsImageType >
     NeighborhoodIteratorType;
-  typedef NeighborhoodIteratorType::OffsetType OffsetType;
-  typedef NeighborhoodIteratorType::SizeType SizeType;
+  typedef typename NeighborhoodIteratorType::OffsetType OffsetType;
+  typedef typename NeighborhoodIteratorType::SizeType SizeType;
   typedef itk::GaussianSpatialFunction< int, SeedsImageType::ImageDimension >
     GaussianFunctionType;
 
   static bool initialized = false;
   static SeedsImageType* iteratedImage = 0;
   static NeighborhoodIteratorType nit;
-  static GaussianFunctionType::Pointer gaussianFunction
+  static typename GaussianFunctionType::Pointer gaussianFunction
     = GaussianFunctionType::New();
 
   if ( iteratedImage != image )
@@ -244,7 +244,7 @@ mitk::SeedsImage::GetNit( SeedsImageType* image )
     {
       OffsetType offset = nit.GetOffset( i );
 
-      GaussianFunctionType::InputType point;
+      typename GaussianFunctionType::InputType point;
       double dist = 0;
       int d;
       for ( d = 0; d < SeedsImageType::ImageDimension; ++d )

@@ -308,7 +308,7 @@ void QmitkFctMediator::RaiseFunctionality(int id)
     ((QButtonGroup*)m_ToolBar)->setButton(id);
 
   Selecting(id);
-  QWidget *oldVisibleWidget, *newVisibleWidget;
+  QWidget *newVisibleWidget;
 
   newVisibleWidget = m_ControlStack->widget(id);
   m_ControlStack->raiseWidget(newVisibleWidget);

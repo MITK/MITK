@@ -20,10 +20,16 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITKSEEDSIMAGE_H_HEADER_INCLUDED_C1C2FCD2
 #define MITKSEEDSIMAGE_H_HEADER_INCLUDED_C1C2FCD2
 
-#include <mitkImage.h>
-#include <itkImage.h>
+#include "mitkImage.h"
 
-namespace mitk {
+#include <itkImage.h>
+#include <itkNeighborhood.h>
+#include <itkNeighborhoodIterator.h>
+#include <itkGaussianSpatialFunction.h>
+#include <itkBinaryBallStructuringElement.h>
+
+namespace mitk
+{
 
 //##Documentation
 //## @brief SeedsImage class for storing seeds-images
@@ -49,8 +55,16 @@ public:
 
 
 protected:
+  SeedsImage();
+  virtual ~SeedsImage();
 
   void CreateBrush();
+
+  template < int Dimension >
+  itk::Neighborhood< float, Dimension >& GetBrush();
+
+  template< typename SeedsImageType >
+    itk::NeighborhoodIterator< SeedsImageType >& GetNit( SeedsImageType* image );
 
   /// sets a sphere of seeds around the point
   template < typename SeedsImageType >
@@ -77,7 +91,24 @@ protected:
 
   typedef itk::Image<float,3> MaskImageType;
   MaskImageType::Pointer m_Brush;
+
+  typedef itk::Neighborhood< float, 3 > Brush3DType;
+  Brush3DType m_Brush3D;
+  typedef itk::Neighborhood< float, 2 > Brush2DType;
+  Brush2DType m_Brush2D;
+
+  typedef itk::GaussianSpatialFunction< int, 3 > GaussianFunction3DType;
+  GaussianFunction3DType::Pointer m_GaussianFunction3D;
+  typedef itk::GaussianSpatialFunction< int, 2 > GaussianFunction2DType;
+  GaussianFunction2DType::Pointer m_GaussianFunction2D;
+
+  typedef itk::BinaryBallStructuringElement< short, 3 > BallStructuringElement3DType;
+  BallStructuringElement3DType m_StructuringElement3D;
+  typedef itk::BinaryBallStructuringElement< short, 2 > BallStructuringElement2DType;
+  BallStructuringElement2DType m_StructuringElement2D;
+
 };
+
 } // namespace mitk
 
 #endif /* MITKSEEDSIMAGE_H_HEADER_INCLUDED_C1C2FCD2 */

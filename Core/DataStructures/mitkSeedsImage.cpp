@@ -23,13 +23,25 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkDrawOperation.h"
 #include "mitkImageAccessByItk.h"
 #include "mitkInteractionConst.h"
-
 #include "mitkRenderingManager.h"
-#include <itkDiscreteGaussianImageFilter.h>
+
+#include <itkNeighborhoodIterator.h>
+#include <itkLineConstIterator.h>
+
+
+mitk::SeedsImage::SeedsImage()
+{
+  m_GaussianFunction3D = GaussianFunction3DType::New();
+  m_GaussianFunction2D = GaussianFunction2DType::New();
+}
+
+mitk::SeedsImage::~SeedsImage()
+{
+}
 
 void mitk::SeedsImage::Initialize() 
 {
-  m_Radius = -1;
+  m_Radius = 1;
   std::cout << "seeds image radius reset" << std::endl;
 }
 
@@ -50,7 +62,8 @@ void mitk::SeedsImage::ExecuteOperation(mitk::Operation* operation)
     if (m_Radius != seedsOp->GetRadius())
     {
       m_Radius = seedsOp->GetRadius();
-      CreateBrush();
+      m_Radius = 1;
+      //CreateBrush();
     }
 
     switch (operation->GetOperationType())
@@ -103,91 +116,32 @@ void mitk::SeedsImage::ExecuteOperation(mitk::Operation* operation)
 template < typename SeedsImageType >
 void mitk::SeedsImage::AddSeedPoint(SeedsImageType* itkImage)
 { 
-  itk::ImageRegionIterator<SeedsImageType>
-  iterator(itkImage, itkImage->GetRequestedRegion());
+  typedef itk::NeighborhoodIterator< SeedsImageType >
+    NeighborhoodIteratorType;
+  typedef NeighborhoodIteratorType::IndexType IndexType;
+
+  NeighborhoodIteratorType& nit = this->GetNit< SeedsImageType >( itkImage );
+
   const unsigned int dimension = ::itk::GetImageDimension<SeedsImageType>::ImageDimension;
-  itk::Index<dimension> baseIndex;
-  itk::Index<dimension> setIndex;
 
-  typedef typename SeedsImageType::PixelType CoordType;
+  mitk::Point3D index;
+  this->GetGeometry()->WorldToIndex( m_Point, index );
 
-  itk::Point<CoordType, dimension> p;
-  p[0] = (CoordType) m_Point[0];
-  p[1] = (CoordType) m_Point[1];
-  p[2] = (CoordType) m_Point[2];
-  itk::ContinuousIndex<CoordType, dimension> contIndex;
-  itkImage->TransformPhysicalPointToContinuousIndex(p, contIndex);
-
-  GetGeometry()->WorldToIndex(m_Point, baseIndex); // commented out because of the slices problem
-//  for (int i=0; i<3; i++) baseIndex[i] = (int)ceil((point[i]/m_Spacing[i])-(itkImage->GetOrigin()[i]/m_Spacing[i]));
-  
-  // setting a sphere around the point
-  if(dimension==2)
+  IndexType itkIndex;
+  int d;
+  for ( d = 0; d < dimension; ++d )
   {
-    int radius[dimension];
-    for(unsigned int i=0; i<dimension; i++)
-      radius[i] = int(m_Radius/m_Spacing[i]);
-    //FillVector2D(radius, ((ScalarType)m_Radius)/m_Spacing[0], ((ScalarType)m_Radius)/m_Spacing[1]);
-      for(int y = (int)(contIndex[1] - radius[1]); y <= (int)(contIndex[1] + radius[1]); ++y){
-        for(int x = (int)(contIndex[0] - radius[0]); x <= (int)(contIndex[0] + radius[0]); ++x){
-          delta_x = fabs((float)(x - contIndex[0]))*m_Spacing[0];
-          delta_y = fabs((float)(y - contIndex[1]))*m_Spacing[1];
-          sphere_distance = (delta_x * delta_x) + (delta_y * delta_y);
-          if (sphere_distance <= (m_Radius*m_Radius)){
-            // check -> is the point inside the image?
-            if ((x>=0) && (x<=orig_size[0]) && (y>=0) && (y<=orig_size[1])){
-              setIndex[1]=y;
-              setIndex[0]=x;
-              iterator.SetIndex(setIndex);
-              iterator.Set(m_DrawState);
-            }
-          }
-        }
-      }
+    itkIndex[d] = (int)(index[d] + 0.5);
   }
-  else
+  nit.SetLocation( itkIndex );
+
+  
+  int i;
+  for ( i = 0; i < nit.Size(); ++i )
   {
-    MaskImageType::IndexType getIndex;
-//    Vector3D radius;
-//    FillVector3D(radius, m_Radius/m_Spacing[0], m_Radius/m_Spacing[1], m_Radius/m_Spacing[2]);
-    int radius[dimension];
-    for(unsigned int i=0; i<dimension; i++)
-      radius[i] = int(m_Radius);//int(m_Radius/m_Spacing[i]);
-    for(int z = (int)(contIndex[2] - radius[2]); z <= (int)(contIndex[2] + radius[2]); ++z){
-      for(int y = (int)(contIndex[1] - radius[1]); y <= (int)(contIndex[1] + radius[1]); ++y){
-        for(int x = (int)(contIndex[0] - radius[0]); x <= (int)(contIndex[0] + radius[0]); ++x){
-          delta_x = fabs((float)x - contIndex[0])*m_Spacing[0];
-          delta_y = fabs((float)y - contIndex[1])*m_Spacing[1];
-          delta_z = fabs((float)z - contIndex[2])*m_Spacing[2];
-          sphere_distance = (delta_x * delta_x) + (delta_y * delta_y) + (delta_z * delta_z);
-          if (sphere_distance <= (m_Radius*m_Radius)){
-            // check -> is the point inside the image?
-            if ((x>=0) && (x<=orig_size[0]) && (y>=0) && (y<=orig_size[1]) && (z>=0) && (z<orig_size[2])){
-              setIndex[2]=z;
-              setIndex[1]=y;
-              setIndex[0]=x;
-              iterator.SetIndex(setIndex);
-              if (m_DrawState == -1 || m_DrawState == 1)
-              {  
-                getIndex[2]=(MaskImageType::IndexType::IndexValueType) (z + m_Radius -contIndex[2]);
-                getIndex[1]=(MaskImageType::IndexType::IndexValueType) (y + m_Radius -contIndex[1]);
-                getIndex[0]=(MaskImageType::IndexType::IndexValueType) (x + m_Radius -contIndex[0]);
-                CoordType val = (CoordType) m_Brush->GetPixel(getIndex);
-                if (m_DrawState == -1) 
-                {
-                  val *= (CoordType)-1.0;
-                }
-                val += iterator.Get();
-                iterator.Set( val );
-              }
-              else
-              {
-                iterator.Set(m_DrawState);
-              }
-            }
-          }
-        }
-      }
+    if ( nit[i] != 0 )
+    {
+      nit.SetPixel( i, m_DrawState );
     }
   }
 }
@@ -196,136 +150,40 @@ void mitk::SeedsImage::AddSeedPoint(SeedsImageType* itkImage)
 template < typename SeedsImageType >
 void mitk::SeedsImage::PointInterpolation(SeedsImageType* itkImage)
 {
-  typedef typename SeedsImageType::PixelType CoordType;
-  itk::ImageRegionIterator<SeedsImageType >
-  iterator(itkImage, itkImage->GetRequestedRegion());
+  typedef itk::NeighborhoodIterator< SeedsImageType >
+    NeighborhoodIteratorType;
+  typedef NeighborhoodIteratorType::IndexType IndexType;
+
+  NeighborhoodIteratorType& nit = this->GetNit< SeedsImageType >( itkImage );
+
   const unsigned int dimension = ::itk::GetImageDimension<SeedsImageType>::ImageDimension;
-  //itk::Index<dimension> pointIndex;
-  //itk::Index<dimension> last_pointIndex;
-  itk::Index<dimension> baseIndex;
-  itk::Index<dimension> setIndex;
-  float point_distance;
-  int distance_step;
-  int distance_iterator;
-  float t;
 
-  itk::Point<CoordType, dimension> p;
-  p[0] = (CoordType) m_Point[0];
-  p[1] = (CoordType) m_Point[1];
-  p[2] = (CoordType) m_Point[2];
-  itk::ContinuousIndex<CoordType, dimension> pointIndex;
-  itkImage->TransformPhysicalPointToContinuousIndex(p, pointIndex);
-  p[0] = (CoordType) m_LastPoint[0];
-  p[1] = (CoordType) m_LastPoint[1];
-  p[2] = (CoordType) m_LastPoint[2];
-  itk::ContinuousIndex<CoordType, dimension> last_pointIndex;
-  itkImage->TransformPhysicalPointToContinuousIndex(p, last_pointIndex);
+  mitk::Point3D indexBegin, indexEnd;
+  this->GetGeometry()->WorldToIndex( m_Point, indexBegin );
+  this->GetGeometry()->WorldToIndex( m_LastPoint, indexEnd );
 
-  // coordinate transformation from physical coordinates to index coordinates
-  //GetGeometry()->WorldToIndex(m_Point, pointIndex);
-  //GetGeometry()->WorldToIndex(m_LastPoint, last_pointIndex);
-
-//  for (int i=0; i<3; i++) pointIndex[i] = (int)ceil((point[i]/m_Spacing[i])-(itkImage->GetOrigin()[i]/m_Spacing[i]));
-//  for (int i=0; i<3; i++) last_pointIndex[i] = (int)ceil((last_point[i]/m_Spacing[i])-(itkImage->GetOrigin()[i]/m_Spacing[i]));
-
-  delta_x = fabsf(m_LastPoint[0] - m_Point[0]);
-  delta_y = fabsf(m_LastPoint[1] - m_Point[1]);
-  delta_z = fabsf(m_LastPoint[2] - m_Point[2]);            
-
-  // calculation of the distance between last_point and point
-  if(dimension==2){
-    point_distance = (delta_x * delta_x) + (delta_y * delta_y);   
-    distance_step = m_Radius*m_Radius;
-    distance_iterator = distance_step;
-
-    // check - is there a gap between the points?
-    if(point_distance > distance_step){
-      // fill the gap
-      while (distance_iterator < point_distance){
-        t = distance_iterator/point_distance;
-        // interpolation between the points
-        for (unsigned int i=0; i<dimension; i++) baseIndex[i] = (int)(((1-t)*last_pointIndex[i]) + (t*pointIndex[i]));
-
-        int radius[dimension];
-        for(unsigned int i=0; i<dimension; i++)
-          radius[i] = int(m_Radius/m_Spacing[i]);
-        for(int y = baseIndex[1] - radius[1]; y <= baseIndex[1] + radius[1]; ++y){
-          for(int x = baseIndex[0] - radius[0]; x <= baseIndex[0] + radius[0]; ++x){
-            delta_x = fabsf(x - baseIndex[0])*m_Spacing[0];
-            delta_y = fabsf(y - baseIndex[1])*m_Spacing[1];
-            sphere_distance = (delta_x * delta_x) + (delta_y * delta_y);
-            if (sphere_distance <= (m_Radius*m_Radius)){
-              // is the point inside the image?
-              if ((x>=0) && (x<=orig_size[0]) && (y>=0) && (y<=orig_size[1])){
-                setIndex[1]=y;
-                setIndex[0]=x;
-                iterator.SetIndex(setIndex);
-                iterator.Set(m_DrawState);
-              }
-            }
-          }
-        }     
-      distance_iterator = distance_iterator + distance_step;
-      }
-    }
+  IndexType itkIndexBegin, itkIndexEnd;
+  int d;
+  for ( d = 0; d < dimension; ++d )
+  {
+    itkIndexBegin[d] = (int)(indexBegin[d] + 0.5);
+    itkIndexEnd[d] = (int)(indexEnd[d] + 0.5);
   }
-  else{ 
-    MaskImageType::IndexType getIndex;
 
-    point_distance = (delta_x * delta_x) + (delta_y * delta_y) + (delta_z * delta_z);   
-    distance_step = m_Radius*m_Radius;
-    distance_iterator = distance_step;
 
-    // check - is there a gap between the points?
-    if(point_distance > distance_step){
-      // fill the gap
-      while (distance_iterator < point_distance){
-        t = distance_iterator/point_distance;
-        // interpolation between the points
-        for (unsigned int i=0; i<dimension; i++) baseIndex[i] = (int)(((1-t)*last_pointIndex[i]) + (t*pointIndex[i]));
+  typedef itk::LineConstIterator< SeedsImageType > LineIteratorType;
+  LineIteratorType lit( itkImage, itkIndexBegin, itkIndexEnd );
 
-//        Vector3D radius;
-//        FillVector3D(radius, m_Radius/m_Spacing[0], m_Radius/m_Spacing[1], m_Radius/m_Spacing[2]);
-        int radius[dimension];
-        for(unsigned int i=0; i<dimension; i++)
-          radius[i] = int(m_Radius);
-        for(int z = baseIndex[2] - radius[2]; z <= baseIndex[2] + radius[2]; ++z){
-          for(int y = baseIndex[1] - radius[1]; y <= baseIndex[1] + radius[1]; ++y){
-            for(int x = baseIndex[0] - radius[0]; x <= baseIndex[0] + radius[0]; ++x){
-              delta_x = fabsf(x - baseIndex[0])*m_Spacing[2];
-              delta_y = fabsf(y - baseIndex[1])*m_Spacing[2];
-              delta_z = fabsf(z - baseIndex[2])*m_Spacing[2];
-              sphere_distance = (delta_x * delta_x) + (delta_y * delta_y) + (delta_z * delta_z);
-              if (sphere_distance <= (m_Radius*m_Radius)){
-                // is the point inside the image?
-                if ((x>=0) && (x<=orig_size[0]) && (y>=0) && (y<=orig_size[1]) && (z>=0) && (z<orig_size[2])){
-                  setIndex[2]=z;
-                  setIndex[1]=y;
-                  setIndex[0]=x;
-                  iterator.SetIndex(setIndex);
-                  if (m_DrawState == -1 || m_DrawState == 1)
-                  {  
-                    getIndex[2]= (MaskImageType::IndexType::IndexValueType) (z + m_Radius -baseIndex[2]);
-                    getIndex[1]= (MaskImageType::IndexType::IndexValueType) (y + m_Radius -baseIndex[1]);
-                    getIndex[0]= (MaskImageType::IndexType::IndexValueType) (x + m_Radius -baseIndex[0]);
-                    CoordType val = (CoordType) m_Brush->GetPixel(getIndex);
-                    if (m_DrawState == -1) 
-                    {
-                      val *= (CoordType)-1.0;
-                    }
-                    val += iterator.Get();
-                    iterator.Set( val );
-                  }
-                  else
-                  {
-                    iterator.Set(m_DrawState);
-                  }
-                }
-              }
-            }
-          }
-        }     
-      distance_iterator = distance_iterator + distance_step;
+  for ( lit.GoToBegin(); !lit.IsAtEnd(); ++lit )
+  {
+    nit.SetLocation( lit.GetIndex() );
+
+    int i;
+    for ( i = 0; i < nit.Size(); ++i )
+    {
+      if ( nit[i] != 0 )
+      {
+        nit.SetPixel( i, m_DrawState );
       }
     }
   }
@@ -342,9 +200,140 @@ void mitk::SeedsImage::ClearBuffer(SeedsImageType* itkImage)
   itkImage->FillBuffer(0);
 }
 
+template < int Dimension >
+itk::Neighborhood< float, Dimension >&
+mitk::SeedsImage::GetBrush()
+{
+  static initialized = false;
+  static itk::Neighborhood< float, Dimension > brush;
+
+  if ( ! initialized )
+  {
+
+    initialized = true;
+  }
+  return brush;
+}
+
+template < typename SeedsImageType >
+itk::NeighborhoodIterator< SeedsImageType >&
+mitk::SeedsImage::GetNit( SeedsImageType* image )
+{
+  typedef itk::NeighborhoodIterator< SeedsImageType >
+    NeighborhoodIteratorType;
+  typedef NeighborhoodIteratorType::OffsetType OffsetType;
+  typedef NeighborhoodIteratorType::SizeType SizeType;
+  typedef itk::GaussianSpatialFunction< int, SeedsImageType::ImageDimension >
+    GaussianFunctionType;
+
+  static initialized = false;
+  static SeedsImageType* iteratedImage = 0;
+  static NeighborhoodIteratorType nit;
+  static GaussianFunctionType::Pointer gaussianFunction
+    = GaussianFunctionType::New();
+
+  if ( iteratedImage != image )
+  {
+    SizeType radius;
+    radius.Fill( m_Radius);
+    nit.Initialize( radius, image, image->GetBufferedRegion() );
+    iteratedImage = image;
+  }
+
+  if ( !initialized )
+  {
+    nit.SetRadius( m_Radius );
+
+    int i;
+    for ( i = 0; i < nit.GetCenterNeighborhoodIndex()*2+1; ++i )
+    {
+      OffsetType offset = nit.GetOffset( i );
+
+      GaussianFunctionType::InputType point;
+      double dist = 0;
+      int d;
+      for ( d = 0; d < SeedsImageType::ImageDimension; ++d )
+      {
+        point[d] = offset[d];
+        dist += offset[d] * offset[d];
+      }
+      /*
+      if ( dist <= m_Radius*m_Radius )
+      {
+        nit.ActivateOffset( nit.GetOffset( i ) );
+        //*nit[i] = gaussianFunction->Evaluate( point );
+      }
+      else
+      {
+        nit.DeactivateOffset( nit.GetOffset( i ) );
+        //*nit[i] = 0;
+      }
+      */
+    }
+    initialized = true;
+  }
+
+  return nit;
+}
 
 void mitk::SeedsImage::CreateBrush()
 {
+  // Initializie structuring element (brush form)
+  m_StructuringElement3D.SetRadius( m_Radius );
+  m_StructuringElement3D.CreateStructuringElement();
+
+  m_StructuringElement2D.SetRadius( m_Radius );
+  m_StructuringElement2D.CreateStructuringElement();
+
+  // Create brushes
+  m_Brush3D.SetRadius( m_Radius );
+
+  GaussianFunction3DType::ArrayType sigma3D;
+  sigma3D.Fill( m_Radius );
+  GaussianFunction3DType::ArrayType mean3D;
+  mean3D.Fill( m_Radius );
+
+  m_GaussianFunction3D->SetScale( 100.0 );
+  m_GaussianFunction3D->SetSigma( sigma3D );
+  m_GaussianFunction3D->SetMean( mean3D );
+
+  m_Brush2D.SetRadius( m_Radius );
+
+  GaussianFunction2DType::ArrayType sigma2D;
+  sigma2D.Fill( m_Radius );
+  GaussianFunction2DType::ArrayType mean2D;
+  mean2D.Fill( m_Radius );
+
+  m_GaussianFunction2D->SetScale( 100.0 );
+  m_GaussianFunction2D->SetSigma( sigma2D );
+  m_GaussianFunction2D->SetMean( mean2D );
+
+  Brush3DType::OffsetType offset3D;
+  GaussianFunction3DType::InputType point3D;
+  Brush2DType::OffsetType offset2D;
+  GaussianFunction2DType::InputType point2D;
+  int x, y, z;
+  for ( x = 0; x < m_Radius*2+1; ++x )
+  {
+    offset3D[0] = point3D[0] = x;
+    offset2D[0] = point2D[0] = x;
+    for ( y = 0; y < m_Radius*2+1; ++y )
+    {
+      offset3D[1] = point3D[1] = y;
+      offset2D[1] = point2D[1] = y;
+      m_Brush2D[offset2D] = m_GaussianFunction2D->Evaluate( point2D );
+      for ( z = 0; z < m_Radius*2+1; ++z )
+      {
+        offset3D[2] = z;
+        point3D[2] = z;
+        m_Brush3D[offset3D] = m_GaussianFunction3D->Evaluate( point3D );
+      }
+    }
+  }
+
+
+  
+  /*
   m_Brush =  MaskImageType::New();
   MaskImageType::SpacingType spacing;
   spacing.Fill(1);
@@ -375,14 +364,6 @@ void mitk::SeedsImage::CreateBrush()
     m_Brush->SetPixel(idx, 100);
   }
 
-  //m_Brush->SetPixel(idx, 100);
-  //idx[0] += 1; m_Brush->SetPixel(idx, 100);
-  //idx[0] -= 2; m_Brush->SetPixel(idx, 100);idx[0] += 1;
-  //idx[1] += 1; m_Brush->SetPixel(idx, 100);
-  //idx[1] -= 2; m_Brush->SetPixel(idx, 100);idx[1] += 1;
-  //idx[2] += 1; m_Brush->SetPixel(idx, 100);
-  //idx[2] -= 2; m_Brush->SetPixel(idx, 100);idx[2] += 1;
-
   typedef itk::DiscreteGaussianImageFilter<MaskImageType,MaskImageType> BlurFT;
   BlurFT::Pointer blurring = BlurFT::New();
   blurring->SetInput( m_Brush );
@@ -392,4 +373,5 @@ void mitk::SeedsImage::CreateBrush()
 
   m_Brush = blurring->GetOutput();
   m_Brush->DisconnectPipeline();
+  */
 }

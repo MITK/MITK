@@ -9,7 +9,7 @@
             <x>0</x>
             <y>0</y>
             <width>219</width>
-            <height>119</height>
+            <height>96</height>
         </rect>
     </property>
     <property name="minimumSize">
@@ -73,9 +73,29 @@
                 <property name="name">
                     <cstring>unnamed</cstring>
                 </property>
+                <widget class="QCheckBox">
+                    <property name="name">
+                        <cstring>m_ShowThresholdCheckBox</cstring>
+                    </property>
+                    <property name="text">
+                        <string></string>
+                    </property>
+                    <property name="checked">
+                        <bool>true</bool>
+                    </property>
+                    <property name="toolTip" stdset="0">
+                        <string>show Threshold</string>
+                    </property>
+                </widget>
                 <widget class="QLineEdit">
                     <property name="name">
                         <cstring>m_ThresholdInputNumber</cstring>
+                    </property>
+                    <property name="maximumSize">
+                        <size>
+                            <width>50</width>
+                            <height>32767</height>
+                        </size>
                     </property>
                     <property name="frameShape">
                         <enum>LineEditPanel</enum>
@@ -83,10 +103,25 @@
                     <property name="frameShadow">
                         <enum>Sunken</enum>
                     </property>
+                    <property name="text">
+                        <string>1</string>
+                    </property>
                 </widget>
                 <widget class="QSlider">
                     <property name="name">
                         <cstring>m_ThresholdInputSlider</cstring>
+                    </property>
+                    <property name="acceptDrops">
+                        <bool>true</bool>
+                    </property>
+                    <property name="minValue">
+                        <number>-4000</number>
+                    </property>
+                    <property name="maxValue">
+                        <number>1024</number>
+                    </property>
+                    <property name="value">
+                        <number>1</number>
                     </property>
                     <property name="orientation">
                         <enum>Horizontal</enum>
@@ -99,7 +134,7 @@
 <customwidgets>
     <customwidget>
         <class>QmitkDataTreeComboBox</class>
-        <header location="global">QmitkDataTreeComboBox.h</header>
+        <header location="global">C:/home/urte/ip++/AppModules/QmitkPropertyObservers/QmitkDataTreeComboBox.h</header>
         <sizehint>
             <width>-1</width>
             <height>-1</height>
@@ -133,6 +168,10 @@
     <function returnType="QmitkDataTreeComboBox *">GetTreeNodeSelector()</function>
     <function returnType="int">GetSliderValue()</function>
     <function returnType="int">GetNumberValue()</function>
+    <function returnType="QSlider *">GetThresholdInputSlider()</function>
+    <function returnType="QLineEdit *">GetThresholdInputNumber()</function>
+    <function returnType="QCheckBox *">GetShowThresholdCheckBox()</function>
 </functions>
 <layoutdefaults spacing="6" margin="11"/>
+
 </UI>

@@ -1,4 +1,4 @@
-#include <CreatePOVMesh.h>
+#include "CreatePOVMesh.h"
 #include <itksys/SystemTools.hxx>
 
 int vtkPolyDataToPovRayMesh2Test (int argc, char * argv[])

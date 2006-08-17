@@ -55,13 +55,12 @@ QmitkSliderLevelWindowWidget::QmitkSliderLevelWindowWidget( QWidget * parent, co
 
 void QmitkSliderLevelWindowWidget::setLevelWindowManager(mitk::LevelWindowManager* levelWindowManager)
 {
-  if( m_ObserverTag && m_Manager.IsNotNull())
+  if ( m_ObserverTag != -1)
   {
     m_Manager->RemoveObserver(m_ObserverTag);
+    m_ObserverTag = -1;
   }
   m_Manager = levelWindowManager;
-
-  m_ObserverTag = 0;
   if ( m_Manager.IsNotNull() )
   {
     itk::ReceptorMemberCommand<QmitkSliderLevelWindowWidget>::Pointer command = itk::ReceptorMemberCommand<QmitkSliderLevelWindowWidget>::New();

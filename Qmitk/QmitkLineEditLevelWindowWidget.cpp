@@ -96,13 +96,12 @@ void QmitkLineEditLevelWindowWidget::OnPropertyModified(const itk::EventObject& 
 
 void QmitkLineEditLevelWindowWidget::setLevelWindowManager(mitk::LevelWindowManager* levelWindowManager)
 {
-  if( m_ObserverTag && m_Manager.IsNotNull() )
+  if( m_ObserverTag != -1 )
   {
     m_Manager->RemoveObserver(m_ObserverTag);
+    m_ObserverTag = -1;
   }
   m_Manager = levelWindowManager;
-
-  m_ObserverTag = 0;
   if ( m_Manager.IsNotNull() )
   {
     itk::ReceptorMemberCommand<QmitkLineEditLevelWindowWidget>::Pointer command = itk::ReceptorMemberCommand<QmitkLineEditLevelWindowWidget>::New();

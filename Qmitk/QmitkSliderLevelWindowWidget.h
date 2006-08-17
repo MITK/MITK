@@ -103,6 +103,7 @@ protected:
   QRect m_UpperBound;
   mitk::DataTreeIteratorClone m_It;
   unsigned long m_ObserverTag;
+  bool m_IsObserverTagSet;
   
   QFont m_Font;
   QmitkLevelWindowWidgetContextMenu* m_Contextmenu;

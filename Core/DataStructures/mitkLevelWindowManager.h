@@ -53,7 +53,9 @@ private:
   DataTreeIteratorClone m_DataTreeIteratorClone;
   bool m_AutoTopMost;
   unsigned long m_ObserverTag;
+  bool m_IsObserverTagSet;
   unsigned long m_PropertyModifiedTag;
+  bool m_IsPropertyModifiedTagSet;
   LevelWindowProperty::Pointer m_LevWinProp;
 };
 }

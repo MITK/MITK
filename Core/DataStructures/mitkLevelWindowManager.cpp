@@ -24,23 +24,23 @@ PURPOSE.  See the above copyright notices for more information.
 mitk::LevelWindowManager::LevelWindowManager()
 {
   m_LevWinProp = NULL;
-  m_ObserverTag = -1;
-  m_PropertyModifiedTag = -1;
+  m_IsObserverTagSet = false;
+  m_IsPropertyModifiedTagSet = false;
   m_DataTreeIteratorClone = NULL;
   m_AutoTopMost = true;
 }
 
 mitk::LevelWindowManager::~LevelWindowManager()
 {
-  if (m_ObserverTag != -1)
+  if (m_IsObserverTagSet)
   {
     m_DataTreeIteratorClone->GetTree()->RemoveObserver(m_ObserverTag);
-    m_ObserverTag = -1;
+    m_IsObserverTagSet = false;
   }
-  if (m_PropertyModifiedTag != -1)
+  if (m_IsPropertyModifiedTagSet)
   {
     m_LevWinProp->RemoveObserver(m_PropertyModifiedTag);
-    m_PropertyModifiedTag = -1;
+    m_IsPropertyModifiedTagSet = false;
   }
 }
 
@@ -48,15 +48,16 @@ void mitk::LevelWindowManager::SetDataTreeIteratorClone(DataTreeIteratorClone& i
 {
   if (it.IsNotNull() && it->GetTree() != NULL)
   {
-    if (m_ObserverTag != -1)
+    if (m_IsObserverTagSet)
     {
       m_DataTreeIteratorClone->GetTree()->RemoveObserver(m_ObserverTag);
-      m_ObserverTag = -1;
+      m_IsObserverTagSet = false;
     }
     m_DataTreeIteratorClone = it;
     itk::ReceptorMemberCommand<LevelWindowManager>::Pointer command = itk::ReceptorMemberCommand<LevelWindowManager>::New();
     command->SetCallbackFunction(this, &LevelWindowManager::TreeChanged);
     m_ObserverTag = m_DataTreeIteratorClone->GetTree()->AddObserver(itk::TreeChangeEvent<mitk::DataTreeBase>(), command);
+    m_IsObserverTagSet = true;
   }
 }
 
@@ -68,10 +69,10 @@ void mitk::LevelWindowManager::OnPropertyModified(const itk::EventObject& )
 void mitk::LevelWindowManager::SetAutoTopMostImage()
 {
   m_AutoTopMost = true;
-  if (m_PropertyModifiedTag != -1)
+  if (m_IsPropertyModifiedTagSet)
   {
     m_LevWinProp->RemoveObserver(m_PropertyModifiedTag);
-    m_PropertyModifiedTag = -1;
+    m_IsPropertyModifiedTagSet = false;
   }
   if (m_DataTreeIteratorClone.IsNotNull())
   {
@@ -106,6 +107,7 @@ void mitk::LevelWindowManager::SetAutoTopMostImage()
       itk::ReceptorMemberCommand<LevelWindowManager>::Pointer command = itk::ReceptorMemberCommand<LevelWindowManager>::New();
       command->SetCallbackFunction(this, &LevelWindowManager::OnPropertyModified);
       m_PropertyModifiedTag = m_LevWinProp->AddObserver( itk::ModifiedEvent(), command );
+      m_IsPropertyModifiedTagSet = true;
     }
     m_AutoTopMost = true;
     Modified();
@@ -116,15 +118,16 @@ void mitk::LevelWindowManager::SetLevWinProp(LevelWindowProperty::Pointer levWin
 {
   if (levWinProp.IsNotNull())
   {
-    if (m_PropertyModifiedTag != -1)
+    if (m_IsPropertyModifiedTagSet)
     {
       m_LevWinProp->RemoveObserver(m_PropertyModifiedTag);
-      m_PropertyModifiedTag = -1;
+      m_IsPropertyModifiedTagSet = false;
     }
     m_LevWinProp = levWinProp;
     itk::ReceptorMemberCommand<LevelWindowManager>::Pointer command = itk::ReceptorMemberCommand<LevelWindowManager>::New();
     command->SetCallbackFunction(this, &LevelWindowManager::OnPropertyModified);
     m_PropertyModifiedTag = m_LevWinProp->AddObserver( itk::ModifiedEvent(), command );
+    m_IsPropertyModifiedTagSet = true;
     m_AutoTopMost = false;
     Modified();
   }

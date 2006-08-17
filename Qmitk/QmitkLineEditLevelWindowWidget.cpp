@@ -31,6 +31,7 @@ QmitkLineEditLevelWindowWidget::QmitkLineEditLevelWindowWidget(QWidget* parent, 
   itk::ReceptorMemberCommand<QmitkLineEditLevelWindowWidget>::Pointer command = itk::ReceptorMemberCommand<QmitkLineEditLevelWindowWidget>::New();
   command->SetCallbackFunction(this, &QmitkLineEditLevelWindowWidget::OnPropertyModified);
   m_ObserverTag = m_Manager->AddObserver(itk::ModifiedEvent(), command);
+  m_IsObserverTagSet = true;
 
   m_It = NULL;
   m_SelfCall = false;
@@ -96,10 +97,10 @@ void QmitkLineEditLevelWindowWidget::OnPropertyModified(const itk::EventObject& 
 
 void QmitkLineEditLevelWindowWidget::setLevelWindowManager(mitk::LevelWindowManager* levelWindowManager)
 {
-  if( m_ObserverTag != -1 )
+  if( m_IsObserverTagSet )
   {
     m_Manager->RemoveObserver(m_ObserverTag);
-    m_ObserverTag = -1;
+    m_IsObserverTagSet = false;
   }
   m_Manager = levelWindowManager;
   if ( m_Manager.IsNotNull() )
@@ -107,6 +108,7 @@ void QmitkLineEditLevelWindowWidget::setLevelWindowManager(mitk::LevelWindowMana
     itk::ReceptorMemberCommand<QmitkLineEditLevelWindowWidget>::Pointer command = itk::ReceptorMemberCommand<QmitkLineEditLevelWindowWidget>::New();
     command->SetCallbackFunction(this, &QmitkLineEditLevelWindowWidget::OnPropertyModified);
     m_ObserverTag = m_Manager->AddObserver(itk::ModifiedEvent(), command);
+    m_IsObserverTagSet = true;
   }
 }
 

@@ -32,6 +32,7 @@ QmitkSliderLevelWindowWidget::QmitkSliderLevelWindowWidget( QWidget * parent, co
   itk::ReceptorMemberCommand<QmitkSliderLevelWindowWidget>::Pointer command = itk::ReceptorMemberCommand<QmitkSliderLevelWindowWidget>::New();
   command->SetCallbackFunction(this, &QmitkSliderLevelWindowWidget::OnPropertyModified);
   m_ObserverTag = m_Manager->AddObserver(itk::ModifiedEvent(), command);
+  m_IsObserverTagSet = true;
 
   m_It = NULL;
   setMouseTracking(true);
@@ -55,10 +56,10 @@ QmitkSliderLevelWindowWidget::QmitkSliderLevelWindowWidget( QWidget * parent, co
 
 void QmitkSliderLevelWindowWidget::setLevelWindowManager(mitk::LevelWindowManager* levelWindowManager)
 {
-  if ( m_ObserverTag != -1)
+  if ( m_IsObserverTagSet)
   {
     m_Manager->RemoveObserver(m_ObserverTag);
-    m_ObserverTag = -1;
+   m_IsObserverTagSet = false;
   }
   m_Manager = levelWindowManager;
   if ( m_Manager.IsNotNull() )
@@ -66,6 +67,7 @@ void QmitkSliderLevelWindowWidget::setLevelWindowManager(mitk::LevelWindowManage
     itk::ReceptorMemberCommand<QmitkSliderLevelWindowWidget>::Pointer command = itk::ReceptorMemberCommand<QmitkSliderLevelWindowWidget>::New();
     command->SetCallbackFunction(this, &QmitkSliderLevelWindowWidget::OnPropertyModified);
     m_ObserverTag = m_Manager->AddObserver(itk::ModifiedEvent(), command);
+    m_IsObserverTagSet = true;
   }
 }
 

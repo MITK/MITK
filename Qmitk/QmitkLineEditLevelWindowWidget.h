@@ -50,6 +50,7 @@ public slots:
 protected:
   mitk::DataTreeIteratorClone m_It;
   unsigned long m_ObserverTag;
+  bool m_IsObserverTagSet;
   QmitkLevelWindowWidgetContextMenu* m_Contextmenu;
   bool m_SelfCall;
 

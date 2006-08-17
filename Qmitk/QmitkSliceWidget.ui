@@ -186,8 +186,6 @@
             <verstretch>0</verstretch>
         </sizepolicy>
         <pixmap>image0</pixmap>
-        <signal>levelWindow(mitk::LevelWindow*)</signal>
-        <signal>levelWindow( const LevelWindow&amp; )</signal>
         <slot access="public" specifier="">slot()</slot>
     </customwidget>
 </customwidgets>
@@ -216,10 +214,6 @@
     <variable>mitk::SliceNavigationController::ViewDirection m_View;</variable>
     <variable>int newVariable;</variable>
 </variables>
-<signals>
-    <signal>sliderChanged(int)</signal>
-    <signal>levelWindowChanged(int)</signal>
-</signals>
 <slots>
     <slot>SetData( mitk::DataTreeIteratorBase * it )</slot>
     <slot>SetData( mitk::DataTreeNode::Pointer node )</slot>
@@ -228,7 +222,7 @@
     <slot>InitWidget( mitk::SliceNavigationController::ViewDirection viewDirection )</slot>
     <slot>wheelEvent( QWheelEvent * e )</slot>
     <slot>ChangeView( int val )</slot>
-    <slot specifier="non virtual">SetLevelWindowEnabled( bool enable )</slot>
+    <slot>SetLevelWindowEnabled( bool enable )</slot>
 </slots>
 <functions>
     <function access="private" specifier="non virtual">init()</function>

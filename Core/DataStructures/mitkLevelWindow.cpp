@@ -221,12 +221,6 @@ void mitk::LevelWindow::SetAuto(mitk::Image* image, bool tryPicTags, bool guessB
     if ( ( image == NULL ) || ( !image->IsInitialized()) )
         return;
 
-    if ( tryPicTags )
-    {
-        if ( SetAutoByPicTags(image->GetPic()) )
-            return;
-    }
-
     mitk::Image* wholeImage = image;
     mitk::ImageSliceSelector::Pointer sliceSelector = mitk::ImageSliceSelector::New();
     if ( guessByCentralSlice )
@@ -348,6 +342,11 @@ void mitk::LevelWindow::SetAuto(mitk::Image* image, bool tryPicTags, bool guessB
   SetDefaultRangeMinMax(minValue, maxValue);
   SetMinMax(minValue, maxValue);
   SetDefaultLevelWindow((maxValue - minValue) / 2 + minValue, maxValue - minValue);
+  if ( tryPicTags )
+  {
+    if ( SetAutoByPicTags(image->GetPic()) )
+      return;
+  }
 }
 
 bool mitk::LevelWindow::SetAutoByPicTags(const ipPicDescriptor* aPic)

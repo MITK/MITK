@@ -74,6 +74,12 @@ std::string mitk::LevelWindowProperty::GetValueAsString() const
 
 bool mitk::LevelWindowProperty::WriteXMLData( XMLWriter& xmlWriter )
 {
+  xmlWriter.WriteProperty( "MINRANGE", m_LevWin.GetRangeMin());
+  xmlWriter.WriteProperty( "MAXRANGE", m_LevWin.GetRangeMax());
+  xmlWriter.WriteProperty( "DEFAULTMINRANGE", m_LevWin.GetDefaultRangeMin());
+  xmlWriter.WriteProperty( "DEFAULTMAXRANGE", m_LevWin.GetDefaultRangeMax());
+  xmlWriter.WriteProperty( "DEFAULTLEVEL", m_LevWin.GetDefaultLevel());
+  xmlWriter.WriteProperty( "DEFAULTWINDOW", m_LevWin.GetDefaultWindow());
   xmlWriter.WriteProperty( "LEVEL", m_LevWin.GetLevel() );
   xmlWriter.WriteProperty( "WINDOW", m_LevWin.GetWindow() );
   return true;
@@ -81,9 +87,21 @@ bool mitk::LevelWindowProperty::WriteXMLData( XMLWriter& xmlWriter )
 
 bool mitk::LevelWindowProperty::ReadXMLData( XMLReader& xmlReader )
 {
-  double level, window;
-  xmlReader.GetAttribute( "LEVEL", level );
-  xmlReader.GetAttribute( "WINDOW", window );
-  m_LevWin.SetLevelWindow( level, window );
+  ScalarType minRange(-2048), maxRange(4096);
+  if ( xmlReader.GetAttribute( "MINRANGE", minRange ) && xmlReader.GetAttribute( "MAXRANGE", maxRange ))
+    m_LevWin.SetRangeMinMax(minRange, maxRange);
+  
+  ScalarType defaultminrange(-2048), defaultmaxrange(4096);
+  if ( xmlReader.GetAttribute( "DEFAULTMINRANGE", defaultminrange ) && xmlReader.GetAttribute( "DEFAULTMAXRANGE", defaultmaxrange ))
+    m_LevWin.SetDefaultRangeMinMax(defaultminrange, defaultmaxrange);
+
+  ScalarType defaultlevel(0), defaultwindow(400);
+  if ( xmlReader.GetAttribute( "DEFAULTLEVEL", defaultlevel ) && xmlReader.GetAttribute( "DEFAULTWINDOW", defaultwindow ))
+    m_LevWin.SetDefaultLevelWindow( defaultlevel, defaultwindow );
+
+  ScalarType level(0), window(400);
+  if ( xmlReader.GetAttribute( "LEVEL", level ) && xmlReader.GetAttribute( "WINDOW", window ))
+    m_LevWin.SetLevelWindow( level, window );
+
   return true;
 }

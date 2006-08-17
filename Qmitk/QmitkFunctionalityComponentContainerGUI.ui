@@ -21,8 +21,8 @@
     <property name="paletteBackgroundColor">
         <color>
             <red>255</red>
-            <green>255</green>
-            <blue>127</blue>
+            <green>207</green>
+            <blue>15</blue>
         </color>
     </property>
     <property name="caption">
@@ -53,8 +53,8 @@
             <property name="paletteBackgroundColor">
                 <color>
                     <red>255</red>
-                    <green>255</green>
-                    <blue>127</blue>
+                    <green>207</green>
+                    <blue>15</blue>
                 </color>
             </property>
             <property name="lineWidth">
@@ -113,7 +113,7 @@
 <customwidgets>
     <customwidget>
         <class>QmitkDataTreeComboBox</class>
-        <header location="global">C:/home/urte/ip++/AppModules/QmitkPropertyObservers/QmitkDataTreeComboBox.h</header>
+        <header location="global">QmitkDataTreeComboBox.h</header>
         <sizehint>
             <width>-1</width>
             <height>-1</height>

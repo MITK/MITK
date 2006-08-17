@@ -146,6 +146,9 @@
                     <property name="name">
                         <cstring>m_ShowThresholdGroupBox</cstring>
                     </property>
+                    <property name="enabled">
+                        <bool>true</bool>
+                    </property>
                     <property name="title">
                         <string>Threshold</string>
                     </property>
@@ -156,7 +159,7 @@
                         <bool>true</bool>
                     </property>
                     <property name="checked">
-                        <bool>false</bool>
+                        <bool>true</bool>
                     </property>
                     <vbox>
                         <property name="name">
@@ -201,7 +204,7 @@
                                                 <cstring>m_ThresholdInputNumber</cstring>
                                             </property>
                                             <property name="enabled">
-                                                <bool>false</bool>
+                                                <bool>true</bool>
                                             </property>
                                             <property name="maximumSize">
                                                 <size>

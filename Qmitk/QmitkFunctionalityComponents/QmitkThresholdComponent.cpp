@@ -36,6 +36,7 @@ QmitkThresholdComponent::QmitkThresholdComponent(QObject *parent, const char *na
   m_GUI = NULL;
   m_Node = it->Get();
   m_MultiWidget= mitkStdMultiWidget;
+  m_Active = false;
 }
 
 /***************       CONSTRUCTOR      ***************/
@@ -161,6 +162,13 @@ QWidget* QmitkThresholdComponent::CreateContainerWidget(QWidget* parent)
   return m_GUI;
 }
 
+/***************        ACTIVATED       ***************/
+void QmitkThresholdComponent::Activated()
+{
+  m_Active = true;
+  ShowThreshold();
+}
+
 ///***************  CREATE NEW IMAGE NODE  **************/
 void QmitkThresholdComponent::CreateThresholdImageNode()
 {
@@ -176,7 +184,7 @@ void QmitkThresholdComponent::CreateThresholdImageNode()
     m_Node->GetIntProperty("layer", layer);
     m_ThresholdImageNode->SetIntProperty("layer", layer+1);
     m_ThresholdImageNode->SetLevelWindow(mitk::LevelWindow(m_GUI->GetNumberValue(),1));
-
+    
     mitk::DataTreeIteratorClone iteratorClone = m_DataTreeIterator;
     while ( !iteratorClone->IsAtEnd() )
     {
@@ -186,6 +194,7 @@ void QmitkThresholdComponent::CreateThresholdImageNode()
         iteratorClone->Add(m_ThresholdImageNode);
       }
       ++iteratorClone;
+    m_ThresholdImageNode->SetProperty("visible", new mitk::BoolProperty((false)) );
     }
   }
 }
@@ -193,9 +202,11 @@ void QmitkThresholdComponent::CreateThresholdImageNode()
 ///***************      SHOW THRESHOLD     **************/
 void QmitkThresholdComponent::ShowThreshold(bool)
 {
-  m_ThresholdImageNode->SetProperty("visible", new mitk::BoolProperty((m_GUI->GetShowThresholdGroupBox()->isChecked())) );
+  if(m_Active == true)
+  {
+    m_ThresholdImageNode->SetProperty("visible", new mitk::BoolProperty((m_GUI->GetShowThresholdGroupBox()->isChecked())) );
+  }
   m_GUI->GetThresholdValueContent()->setShown(m_GUI->GetShowThresholdGroupBox()->isChecked());
-  m_GUI->GetThresholdInputNumber()->setEnabled(m_GUI->GetShowThresholdGroupBox()->isChecked());
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 

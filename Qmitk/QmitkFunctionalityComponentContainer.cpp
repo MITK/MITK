@@ -35,6 +35,7 @@ QmitkFunctionalityComponentContainer::QmitkFunctionalityComponentContainer(QObje
 : QmitkBaseFunctionalityComponent(name, it),m_Parent(parent), m_GUI(NULL),m_Name(name), m_MultiWidget(mitkStdMultiWidget), m_SelectedImage(NULL), m_UpdateSelector(true), m_ShowSelector(true)
 {
   SetDataTreeIterator(it);
+  m_Active = false;
 }
 
 /***************       CONSTRUCTOR      ***************/
@@ -164,12 +165,14 @@ QWidget* QmitkFunctionalityComponentContainer::CreateContainerWidget(QWidget* pa
 void QmitkFunctionalityComponentContainer::Activated()
 {
   m_Activated = true;
+  m_Active = true;
   if(m_TreeChangedWhileInActive)
   {
     TreeChanged();
     m_TreeChangedWhileInActive = false;
   }
 }
+
 
 /***************      ADD COMPONENT     ***************/
 void QmitkFunctionalityComponentContainer::AddComponent(QmitkFunctionalityComponentContainer* componentContainer)

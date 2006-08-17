@@ -105,6 +105,7 @@ public:
   void AddComponent(QmitkFunctionalityComponentContainer* componentContainer);
   virtual void Activated();
 
+
   /***************        ATTRIBUTES      ***************/
   /** \brief Vector with all added components */
   std::vector<QmitkFunctionalityComponentContainer*> m_AddedChildList;      
@@ -128,6 +129,7 @@ protected:
   bool m_Available;
 
   bool m_Activated;
+  bool m_Active;
   /** \brief Attribute to decide whether the selector shall be updated when a parent-Selector is updatet or not */
   bool m_UpdateSelector;
   /** \brief Attribute to decide whether the selector shall be shown or not */

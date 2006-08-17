@@ -87,7 +87,10 @@ public:
   virtual QString GetFunctionalityComponentName();
   
   /** \brief Method to get the GUI of this component. This Method is obligatory */
-  QWidget* GetGUI();
+  virtual QWidget* GetGUI();
+   
+  ///** \brief Method to set m_Activated to true */
+  virtual void Activated();
 
   /***************        ATTRIBUTES      ***************/
 
@@ -155,6 +158,9 @@ protected:
 
   /** \brief Attribute to decide whether the selector shall be shown or not */
   bool m_ShowSelector;
+ 
+  /** \brief Attribute to that will be set to true by the first activation of the functionality */
+  bool m_Active;
 
 
 private:

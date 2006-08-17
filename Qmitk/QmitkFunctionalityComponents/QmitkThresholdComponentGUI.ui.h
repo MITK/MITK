@@ -52,7 +52,27 @@ return m_ThresholdInputNumber;
 }
 
 
-QCheckBox* QmitkThresholdComponentGUI::GetShowThresholdCheckBox()
+QGroupBox* QmitkThresholdComponentGUI::GetShowThresholdGroupBox()
 {
-  return m_ShowThresholdCheckBox;
+  return m_ShowThresholdGroupBox;
+}
+
+QGroupBox* QmitkThresholdComponentGUI::GetThresholdFinderGroupBox()
+{
+  return m_ThresholdFinder;
+}
+
+QGroupBox* QmitkThresholdComponentGUI::GetThresholdSelectDataGroupBox()
+{
+  return m_ThresholdSelectDataGroupBox;
+}
+
+QGroupBox* QmitkThresholdComponentGUI::GetThresholdValueContent()
+{
+  return m_ThresholdValueContent;
+}
+
+QGroupBox* QmitkThresholdComponentGUI::GetImageContent()
+{
+  return m_ImageContent;
 }

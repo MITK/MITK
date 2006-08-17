@@ -32,6 +32,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkDataTreeFilter.h>
 
 class QmitkFunctionalityComponentContainerGUI;
+class QmitkStdMultiWidget;
 
 
 /**
@@ -60,7 +61,7 @@ public:
 
   /***************       CONSTRUCTOR      ***************/
   /** \brief Standard-Constructor. */
-  QmitkFunctionalityComponentContainer(QObject *parent=0, const char *name=0, mitk::DataTreeIteratorBase* dataIt = NULL);
+  QmitkFunctionalityComponentContainer(QObject *parent=0, const char *name=0, QmitkStdMultiWidget *mitkStdMultiWidget = NULL, mitk::DataTreeIteratorBase* dataIt = NULL);
   
   /***************       CONSTRUCTOR      ***************/
   /** \brief Constructor to set some preferences. */
@@ -137,6 +138,7 @@ private:
   /***************        ATTRIBUTES      ***************/
   QObject *m_Parent;
   QString m_Name;
+  QmitkStdMultiWidget * m_MultiWidget;
   QmitkFunctionalityComponentContainerGUI * m_GUI;
   const mitk::DataTreeFilter::Item * m_SelectedImage;
 

@@ -31,8 +31,8 @@ PURPOSE.  See the above copyright notices for more information.
 const QSizePolicy preferred(QSizePolicy::Preferred, QSizePolicy::Preferred);
 
 /***************       CONSTRUCTOR      ***************/
-QmitkFunctionalityComponentContainer::QmitkFunctionalityComponentContainer(QObject *parent, const char *name, mitk::DataTreeIteratorBase* it)
-: QmitkBaseFunctionalityComponent(name, it),m_Parent(parent), m_GUI(NULL),m_Name(name), m_SelectedImage(NULL), m_UpdateSelector(true), m_ShowSelector(true)
+QmitkFunctionalityComponentContainer::QmitkFunctionalityComponentContainer(QObject *parent, const char *name, QmitkStdMultiWidget *mitkStdMultiWidget, mitk::DataTreeIteratorBase* it)
+: QmitkBaseFunctionalityComponent(name, it),m_Parent(parent), m_GUI(NULL),m_Name(name), m_MultiWidget(mitkStdMultiWidget), m_SelectedImage(NULL), m_UpdateSelector(true), m_ShowSelector(true)
 {
   SetDataTreeIterator(it);
 }
@@ -115,28 +115,13 @@ void QmitkFunctionalityComponentContainer::TreeChanged(const itk::EventObject & 
 /*************** TREE CHANGED (       ) ***************/
 void QmitkFunctionalityComponentContainer::TreeChanged()
 {
-  if(m_GUI != NULL)
-  {
-    for(unsigned int i = 0;  i < m_AddedChildList.size(); i++)
-    {
-      if(m_SelectedImage != NULL)
-      {
-       m_AddedChildList[i]->ImageSelected(m_SelectedImage);
-      }
-    }
-  }
+  
 }
 
 /*************** TREE CHANGED(ITERATOR) ***************/
 void QmitkFunctionalityComponentContainer::TreeChanged(mitk::DataTreeIteratorBase* it)
 {
-  if(m_GUI != NULL)
-  {
-    for(unsigned int i = 0;  i < m_AddedChildList.size(); i++)
-    {
-      m_AddedChildList[i]->ImageSelected(m_SelectedImage);
-    }   
-  }
+
 }
 
 /***************       CONNECTIONS      ***************/
@@ -152,6 +137,13 @@ void QmitkFunctionalityComponentContainer::CreateConnections()
 void QmitkFunctionalityComponentContainer::ImageSelected(const mitk::DataTreeFilter::Item * imageIt)
 {
   m_SelectedImage = imageIt;
+    if(m_GUI != NULL)
+  {
+    for(unsigned int i = 0;  i < m_AddedChildList.size(); i++)
+    {
+      m_AddedChildList[i]->ImageSelected(m_SelectedImage);
+    }   
+  }
   TreeChanged();
 }
 

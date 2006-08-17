@@ -20,9 +20,9 @@
     </property>
     <property name="paletteBackgroundColor">
         <color>
-            <red>172</red>
+            <red>255</red>
             <green>255</green>
-            <blue>149</blue>
+            <blue>127</blue>
         </color>
     </property>
     <property name="caption">
@@ -52,9 +52,9 @@
             </property>
             <property name="paletteBackgroundColor">
                 <color>
-                    <red>172</red>
+                    <red>255</red>
                     <green>255</green>
-                    <blue>149</blue>
+                    <blue>127</blue>
                 </color>
             </property>
             <property name="lineWidth">
@@ -113,7 +113,7 @@
 <customwidgets>
     <customwidget>
         <class>QmitkDataTreeComboBox</class>
-        <header location="global">QmitkDataTreeComboBox.h</header>
+        <header location="global">C:/home/urte/ip++/AppModules/QmitkPropertyObservers/QmitkDataTreeComboBox.h</header>
         <sizehint>
             <width>-1</width>
             <height>-1</height>
@@ -149,4 +149,5 @@
     <function returnType="QmitkDataTreeComboBox *">GetTreeNodeSelector()</function>
 </functions>
 <layoutdefaults spacing="6" margin="11"/>
+
 </UI>

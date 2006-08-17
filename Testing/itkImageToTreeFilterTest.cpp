@@ -782,7 +782,7 @@ int testMeshReadWrite()
 
 }
 
-int itkImageToTreeFilterTest(int i, char* argv[] )
+int itkImageToTreeFilterTest(int /*i*/, char** /*argv[]*/)
 {
   ResultListType resultList;
   int failedCount = 0;

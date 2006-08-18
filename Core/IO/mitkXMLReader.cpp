@@ -27,6 +27,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkRenderWindow.h>
 #include <mitkBaseXMLWriter.h>
 #include <itksys/SystemTools.hxx>
+#include <vtkObjectFactory.h>
 
 
 #include <fstream>
@@ -53,8 +54,14 @@ namespace mitk {
   
   std::string m_FileName;
 
-  XMLReader::XMLReader( const mitk::DataTreeIteratorBase* it )
-    :vtkXMLParser(), m_Root(NULL), m_CurrentNode(NULL), m_CurrentPosition(const_cast<mitk::DataTreeIteratorBase*>(it)) { }
+  vtkCxxRevisionMacro( XMLReader, "$Revision$" );
+  vtkStandardNewMacro( XMLReader );
+
+
+  XMLReader::XMLReader()
+    :vtkXMLParser(), m_Root(NULL), m_CurrentNode(NULL), m_CurrentPosition(NULL) 
+  { 
+  }
 
 
   bool XMLReader::Load( std::string fileName, const mitk::DataTreeIteratorBase* it )
@@ -66,7 +73,8 @@ namespace mitk {
    std::fstream fileExists( fileName.c_str() );
    if (!fileExists) return false;
 
-   XMLReader* xmlReader = new XMLReader( it );
+   XMLReader* xmlReader = XMLReader::New();
+   xmlReader->Setm_CurrentPosition( const_cast<mitk::DataTreeIteratorBase*>(it) );
    xmlReader->SetFileName( fileName.c_str() );
    m_FileName = fileName;
 

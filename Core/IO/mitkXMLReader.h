@@ -77,13 +77,19 @@ namespace mitk{
       static XMLNode* FindNext( const std::string& name, XMLNode* node );
     };
 
-    XMLReader( const mitk::DataTreeIteratorBase* it );
 
-    /// loads the XML file and starts to parse it
+    vtkTypeRevisionMacro( XMLReader, vtkXMLParser );
+
+    static XMLReader* New();
+
+        /// loads the XML file and starts to parse it
     static bool Load( std::string fileName, const mitk::DataTreeIteratorBase* it );
 
     typedef itk::RGBAPixel< vtkFloatingPointType >  RGBAType;
     typedef itk::RGBPixel<vtkFloatingPointType> Color;
+
+
+    vtkSetMacro( m_CurrentPosition, mitk::DataTreeIteratorBase* );
 
     /// gets the data as a string of the specified XML attribute
     bool GetAttribute( std::string name, std::string& value ) ;
@@ -153,6 +159,10 @@ namespace mitk{
     std::string GetSourceFilePath();
 
   protected:
+
+    XMLReader();  //  const mitk::DataTreeIteratorBase* it 
+    ~XMLReader() {};
+
     void  StartElement (const char *elementName, const char **atts);
     void  EndElement (const char *elementName);
     void Build();

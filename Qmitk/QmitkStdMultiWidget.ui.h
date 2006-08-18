@@ -33,9 +33,13 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkPositionEvent.h>
 #include <mitkInteractionConst.h>
 #include <mitkGlobalInteraction.h>
+#include <mitkPositionTracker.h>
+#include <mitkPointSet.h>
+//#include <mitkOperationActor.h>
 
 #include <vtkRenderer.h>
 #include <vtkRenderWindow.h>
+
 
 void QmitkStdMultiWidget::init()
 {
@@ -45,6 +49,7 @@ void QmitkStdMultiWidget::init()
   mitkWidget4->setPaletteBackgroundColor ("yellow");
 
   planesIterator = NULL;
+  m_PositionTracker = NULL;
 
   //transfer colors in WorldGeometry-Nodes of the associated Renderer
   QColor qcolor;
@@ -426,11 +431,29 @@ void QmitkStdMultiWidget::Fit()
   vtkObject::SetGlobalWarningDisplay(w);
 }
 
+void QmitkStdMultiWidget::AddPositionTrackingPointSet(mitk::DataTreeIteratorBase* it)
+{
+  //PoinSetNode for MouseOrientation
+  mitk::DataTreeNode::Pointer positonPointSetNode = mitk::DataTreeNode::New();
+  positonPointSetNode->SetProperty("name", new mitk::StringProperty("Mouse Position (&other Input Devices)"));
+  positonPointSetNode->SetData( mitk::PointSet::New() );
+  positonPointSetNode->SetColor(1.0,0.33,0.0);
+  positonPointSetNode->SetProperty("layer", new mitk::IntProperty(1001));
+  positonPointSetNode->SetProperty( "visible", new mitk::BoolProperty(true) );
+  positonPointSetNode->SetProperty( "inputdevice", new mitk::BoolProperty(true) );
+  positonPointSetNode->SetProperty( "PointThroughSliceInteraction", new mitk::IntProperty(0) );//point position 2D mouse
+  positonPointSetNode->SetProperty("baserenderer", new mitk::StringProperty("N/A"));
+  mitk::DataTreeIteratorClone dit = it;
+  dit->GoToChild();
+  dit->Add(positonPointSetNode);
+  
+}
 void QmitkStdMultiWidget::AddDisplayPlaneSubTree(mitk::DataTreeIteratorBase* it)
 {
   // add the diplayed planes of the multiwidget to a node to which the subtree @a planesSubTree points ...
 
   mitk::DataTreeNode::Pointer node=mitk::DataTreeNode::New();
+  node->SetProperty("name", new mitk::StringProperty("Widgets"));
   mitk::DataTreeIteratorClone dit = it;
   dit->Add(node);
   dit->GoToChild(dit->ChildPosition(node));
@@ -694,6 +717,31 @@ const mitk::Point3D & QmitkStdMultiWidget::GetCrossPosition() const
   return m_LastLeftClickPositionSupplier->GetCurrentPoint();
 }
 
+void QmitkStdMultiWidget::EnablePositionTracking()
+{
+  if(!m_PositionTracker)
+  {
+    m_PositionTracker = new mitk::PositionTracker("PositionTracker", NULL);
+  }
+
+  mitk::GlobalInteraction* globalInteraction = mitk::GlobalInteraction::GetInstance();
+
+  if(globalInteraction)
+  {
+     globalInteraction->AddListener(m_PositionTracker); 
+  }
+}
+
+void QmitkStdMultiWidget::DisablePositionTracking()
+{
+  mitk::GlobalInteraction* globalInteraction = mitk::GlobalInteraction::GetInstance();
+
+  if(globalInteraction)
+  {
+    globalInteraction->RemoveListener(m_PositionTracker); 
+  }
+}
+
 void QmitkStdMultiWidget::EnsureDisplayContainsPoint(mitk::DisplayGeometry* displayGeometry, const mitk::Point3D& p)
 {
   mitk::Point2D pointOnPlane;
@@ -845,5 +893,3 @@ void QmitkStdMultiWidget::DisableGradientBackground()
   m_GradientBackground3->Disable();
   m_GradientBackground4->Disable();
 }
-
-

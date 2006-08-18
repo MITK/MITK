@@ -158,6 +158,7 @@
     <include location="global" impldecl="in declaration">mitkDisplayInteractor.h</include>
     <include location="global" impldecl="in declaration">mitkDisplayVectorInteractor.h</include>
     <include location="global" impldecl="in declaration">mitkCoordinateSupplier.h</include>
+    <include location="global" impldecl="in declaration">mitkPositionTracker.h</include>
     <include location="global" impldecl="in declaration">mitkSlicesRotator.h</include>
     <include location="global" impldecl="in declaration">mitkGradientBackground.h</include>
     <include location="global" impldecl="in declaration">mitkLevelWindowProperty.h</include>
@@ -173,6 +174,7 @@
     <variable>mitk::DataTreeBase::Pointer planesSubTree;</variable>
     <variable>mitk::SliceNavigationController::Pointer timeNavigationController;</variable>
     <variable>mitk::CoordinateSupplier::Pointer m_LastLeftClickPositionSupplier;</variable>
+    <variable>mitk::PositionTracker::Pointer m_PositionTracker;</variable>
     <variable>mitk::SlicesRotator* m_SlicesRotator;</variable>
     <variable>bool m_SlicesRotation;</variable>
     <variable>mitk::GradientBackground::Pointer m_GradientBackground1;</variable>
@@ -195,6 +197,7 @@
     <slot>SetData( mitk::DataTreeIteratorBase * it )</slot>
     <slot>Fit()</slot>
     <slot>AddDisplayPlaneSubTree( mitk::DataTreeIteratorBase * it )</slot>
+    <slot>AddPositionTrackingPointSet( mitk::DataTreeIteratorBase * it )</slot>
     <slot>EnableStandardLevelWindow()</slot>
     <slot>DisableStandardLevelWindow()</slot>
     <slot returnType="bool">InitializeStandardViews( mitk::DataTreeIteratorBase * it )</slot>
@@ -220,6 +223,8 @@
     <function returnType="QmitkRenderWindow *">GetRenderWindow3() const</function>
     <function returnType="QmitkRenderWindow *">GetRenderWindow4() const</function>
     <function returnType="const mitk::Point3D &amp;">GetCrossPosition() const</function>
+    <function>EnablePositionTracking()</function>
+    <function>DisablePositionTracking()</function>
     <function returnType="int">GetLayout() const</function>
 </functions>
 <layoutdefaults spacing="6" margin="11"/>

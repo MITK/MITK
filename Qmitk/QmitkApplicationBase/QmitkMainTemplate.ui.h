@@ -47,7 +47,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "QmitkCommonFunctionality.h"
 #include "QmitkSelectableGLWidget.h"
-#include "QmitkLevelWindowWidget.h"
+//#include "QmitkLevelWindowWidget.h"
 #include "QmitkHelpBrowser.h"
 
 #include <vtkSTLReader.h>
@@ -59,14 +59,14 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkStructuredPointsReader.h>
 #include <vtkStructuredPointsWriter.h>
 #include <map>
-#include <mitkSurface.h>
+//#include <mitkSurface.h>
 
-#include <mitkProperties.h>
-#include <mitkColorProperty.h>
-#include <mitkProperties.h>
-#include <mitkLevelWindowProperty.h>
+//#include <mitkProperties.h>
+//#include <mitkColorProperty.h>
+//#include <mitkProperties.h>
+//#include <mitkLevelWindowProperty.h>
 
-#include <mitkLevelWindow.h>
+//#include <mitkLevelWindow.h>
 #include <mitkDataTree.h>
 #include <string>
 
@@ -74,17 +74,17 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkMapClassIDToClassName.h>
 #include <QmitkStringPropertyEditor.h>
 #include "mitkImageTimeSelector.h"
-#include "mitkImageChannelSelector.h"
+//#include "mitkImageChannelSelector.h"
 
 #include <mitkStateMachineFactory.h>
 #include <mitkUndoController.h>
-#include <mitkStateMachine.h>
-#include <mitkEventMapper.h>
+//#include <mitkStateMachine.h>
+//#include <mitkEventMapper.h>
 #include <mitkOperation.h>
 #include <mitkGlobalInteraction.h>
-#include <mitkConfig.h>
+//#include <mitkConfig.h>
 
-#include <mitkSliceNavigationController.h>
+//#include <mitkSliceNavigationController.h>
 
 #include <mitkParRecFileReader.h>
 #include <mitkInteractionConst.h>
@@ -102,7 +102,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qiconset.h>
 
 #include <ipPicTypeMultiplex.h>
-#include <mitkDataTreeHelper.h>
+//#include <mitkDataTreeHelper.h>
 #include <mitkPointOperation.h>
 #include <mitkCoordinateSupplier.h>
 #include <mitkStatusBar.h>
@@ -605,6 +605,7 @@ void QmitkMainTemplate::Initialize()
     m_MultiWidget->SetData(&it);
 
     m_MultiWidget->AddDisplayPlaneSubTree(&it);
+    m_MultiWidget->AddPositionTrackingPointSet(&it); //mouse position
     m_MultiWidget->EnableStandardLevelWindow();
   }
   InitializeFunctionality();
@@ -1062,3 +1063,29 @@ void QmitkMainTemplate::viewShowPlanesAction_toggled( bool on )
 
 }
 
+
+
+void QmitkMainTemplate::toolbarPositionOrientation_toggled( bool on )
+{
+  //@brief Setting Input-Device (Mouse) Tracking - for Projection in other widgets
+  mitk::DataTreePreOrderIterator iterator(m_Tree);
+  mitk::DataTreeIteratorClone it = &iterator;
+  bool inputdevice= false;
+    
+  while ( !it->IsAtEnd() )
+  {
+    if(it->Get()->GetBoolProperty("inputdevice", inputdevice) && inputdevice )
+    {
+      it->Get()->SetVisibility(on);         
+    }
+    ++it;
+  }
+
+  if(on)
+    m_MultiWidget->EnablePositionTracking();
+  else
+    m_MultiWidget->DisablePositionTracking();
+
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+
+}

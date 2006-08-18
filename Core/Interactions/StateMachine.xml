@@ -591,6 +591,13 @@
       </transition>
     </state>
   </stateMachine>
+  <stateMachine NAME="PositionTracker">
+    <state NAME="neutral" ID="1" START_STATE="TRUE" X_POS="212" Y_POS="188" WIDTH="100" HEIGHT="50"> 
+      <transition NAME="Mouse Move" EVENT_ID="520" NEXT_STATE_ID="1" >
+        <action ID="92"> <!--AcMove--> </action>
+      </transition>
+    </state>
+  </stateMachine>
   <stateMachine NAME="picking">
     <state NAME="neutral" ID="1" START_STATE="TRUE" X_POS="264" Y_POS="239" WIDTH="100" HEIGHT="50">
       <transition NAME="do picking" NEXT_STATE_ID="1" EVENT_ID="3">

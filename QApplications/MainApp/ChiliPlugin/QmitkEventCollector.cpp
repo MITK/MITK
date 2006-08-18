@@ -122,7 +122,7 @@ EventCollector::eventFilter( QObject *o, QEvent *e )
 }
 
 bool
-EventCollector::SetObjectValue( QObject* o, QString className, QString value, QString value2 )
+EventCollector::SetObjectValue( QObject* o, QString className, QString value, QString /*value2*/ )
 {
 
   if (!value.compare("NULL")) return true;
@@ -322,7 +322,7 @@ EventCollector::GetObjectValue( QObject * o2 )
 
 
 QString
-EventCollector::Object2String( QEvent::Type eventid, QObject* o)
+EventCollector::Object2String( QEvent::Type /*eventid*/, QObject* o)
 {
   QStringList objlist;
 
@@ -521,7 +521,7 @@ EventCollector::PostEvent(QString str, QWidget* w)
     }
   }
   
-  bool send;
+  bool send = false;
   if(aObject)
   {
     std::cout<<"POST: "<<aObject->className()<<" --> "<< aObject->name()<<std::endl;

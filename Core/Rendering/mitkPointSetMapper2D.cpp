@@ -171,7 +171,41 @@ void mitk::PointSetMapper2D::Paint(mitk::BaseRenderer * renderer)
       displayGeometry->Project(p, projected_p);
       Vector3D diff=p-projected_p;
       ScalarType scalardiff = diff.GetSquaredNorm();
-      if((scalardiff<4.0) || (m_Polygon))
+
+      //MouseOrientation
+      bool isInputDevice=false;
+
+      bool isRendererSlice = scalardiff < 0.00001; //cause roundoff error
+      if(this->GetDataTreeNode()->GetBoolProperty("inputdevice",isInputDevice) && isInputDevice && !isRendererSlice )
+      {
+        mitk::ScalarType dist = displayGeometry->SignedDistance(p);
+        //if (dist > 0)
+        //  std::cout<<"PointSetMapper2d: "<<scalardiff<<" signed: "<<dist<<std::endl;
+        //else
+        //  std::cout<<"--PointSetMapper2d: "<<scalardiff<<" signed: "<<dist<<std::endl;
+        
+        displayGeometry->Map(projected_p, pt2d);
+        displayGeometry->WorldToDisplay(pt2d, pt2d);
+
+        //Point size depending of distance to slice
+        float p_size = (1/scalardiff)*100;
+        if(p_size < 6.0 ) 
+          p_size = 6.0;
+        else if ( p_size > 10.0 )
+          p_size = 10.0;
+
+        //draw Point
+        float opacity = (p_size<8)?0.3:1.0;
+        glColor4f(unselectedColor[0],unselectedColor[1],unselectedColor[2],opacity);
+        glPointSize(p_size);
+        //glShadeModel(GL_FLAT);
+        glBegin (GL_POINTS);
+          glVertex2fv(&pt2d[0]);
+        glEnd ();
+      }
+
+      //for point set
+      if(!isInputDevice && ( (scalardiff<4.0) || (m_Polygon)))
       {
         Point2D tmp;
         displayGeometry->Map(projected_p, pt2d);
@@ -194,7 +228,7 @@ void mitk::PointSetMapper2D::Paint(mitk::BaseRenderer * renderer)
           }
           WriteTextXY(pt2d[0] + text2dDistance, pt2d[1] + text2dDistance, l);
         }
-
+        
         if((m_ShowPoints) && (scalardiff<4.0))
         {
           //check if the point is to be marked as selected 
@@ -206,14 +240,14 @@ void mitk::PointSetMapper2D::Paint(mitk::BaseRenderer * renderer)
 
             //a diamond around the point with the selected color
             glBegin (GL_LINE_LOOP);
-            tmp=pt2d-horz;      glVertex2fv(&tmp[0]);
-            tmp=pt2d+vert;      glVertex2fv(&tmp[0]);
-            tmp=pt2d+horz;			glVertex2fv(&tmp[0]);
-            tmp=pt2d-vert;      glVertex2fv(&tmp[0]);
+             tmp=pt2d-horz;      glVertex2fv(&tmp[0]);
+             tmp=pt2d+vert;      glVertex2fv(&tmp[0]);
+             tmp=pt2d+horz;      glVertex2fv(&tmp[0]);
+             tmp=pt2d-vert;      glVertex2fv(&tmp[0]);
             glEnd ();
-
             //the actual point in the specified color to see the usual color of the point
             glColor3f(unselectedColor[0],unselectedColor[1],unselectedColor[2]);
+            glPointSize(1);
             glBegin (GL_POINTS);
             tmp=pt2d;             glVertex2fv(&tmp[0]);
             glEnd ();

@@ -121,7 +121,10 @@ void QmitkLevelWindowWidgetContextMenu::getContextMenu(QPopupMenu* cm)
   try
   {
     m_Lw = m_Manager->GetLevelWindow();
-    mitk::DataTreeIteratorClone dataTreeIteratorClone = m_Manager->GetDataTreeIteratorClone();
+
+    mitk::DataTree* dataTree = m_Manager->GetDataTree();
+    mitk::DataTreeIteratorClone dataTreeIteratorClone = dataTree->GetIteratorToNode( dataTree, NULL );
+
     QPopupMenu* contextMenu = cm;
     Q_CHECK_PTR( contextMenu );
     contextMenu->insertItem(tr("Default Level/Window"), this, SLOT(setDefaultLevelWindow()));
@@ -192,7 +195,9 @@ void QmitkLevelWindowWidgetContextMenu::getContextMenu()
   try
   {
     m_Lw = m_Manager->GetLevelWindow();
-    mitk::DataTreeIteratorClone dataTreeIteratorClone = m_Manager->GetDataTreeIteratorClone();
+    mitk::DataTree* dataTree = m_Manager->GetDataTree();
+    mitk::DataTreeIteratorClone dataTreeIteratorClone = dataTree->GetIteratorToNode( dataTree, NULL );
+
     QPopupMenu* contextMenu = new QPopupMenu( this );
     Q_CHECK_PTR( contextMenu );
     contextMenu->insertItem(tr("Default Level/Window"), this, SLOT(setDefaultLevelWindow()));

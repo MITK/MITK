@@ -153,11 +153,10 @@
 </includes>
 <variables>
     <variable>unsigned long m_ObserverTag;</variable>
-    <variable>mitk::DataTreeIteratorClone* m_Iter;</variable>
     <variable>mitk::LevelWindowManager::Pointer m_Manager;</variable>
 </variables>
 <slots>
-    <slot>setDataTreeIteratorClone( mitk::DataTreeIteratorClone &amp; it )</slot>
+    <slot>setDataTree( mitk::DataTree* tree )</slot>
     <slot>SetLevelWindow( const mitk::LevelWindow &amp; levWin )</slot>
 </slots>
 <functions>

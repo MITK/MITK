@@ -31,8 +31,8 @@ public:
   mitkClassMacro(LevelWindowManager, itk::Object)
   itkNewMacro(Self); 
 
-  void SetDataTreeIteratorClone(mitk::DataTreeIteratorClone& it);
-  mitk::DataTreeIteratorClone& GetDataTreeIteratorClone();
+  void SetDataTree(mitk::DataTree* tree);
+  DataTree* GetDataTree();
   void OnPropertyModified(const itk::EventObject& e);
   void SetAutoTopMostImage();
   void SetLevWinProp(LevelWindowProperty::Pointer levWinProp);
@@ -50,7 +50,7 @@ protected:
 
 private:
 
-  DataTreeIteratorClone m_DataTreeIteratorClone;
+  DataTree::Pointer m_DataTree;
   bool m_AutoTopMost;
   unsigned long m_ObserverTag;
   bool m_IsObserverTagSet;

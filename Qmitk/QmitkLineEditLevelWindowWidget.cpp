@@ -33,7 +33,6 @@ QmitkLineEditLevelWindowWidget::QmitkLineEditLevelWindowWidget(QWidget* parent, 
   m_ObserverTag = m_Manager->AddObserver(itk::ModifiedEvent(), command);
   m_IsObserverTagSet = true;
 
-  m_It = NULL;
   m_SelfCall = false;
   setMinimumSize ( QSize( 40, 30 ) );
   setMaximumSize ( QSize( 40, 30 ) );
@@ -112,10 +111,9 @@ void QmitkLineEditLevelWindowWidget::setLevelWindowManager(mitk::LevelWindowMana
   }
 }
 
-void QmitkLineEditLevelWindowWidget::setDataTreeIteratorClone( mitk::DataTreeIteratorClone& it )
+void QmitkLineEditLevelWindowWidget::setDataTree( mitk::DataTree* tree )
 {
-  m_It = it;
-  m_Manager->SetDataTreeIteratorClone(m_It); // TODO mit Ivo klaeren
+  m_Manager->SetDataTree(tree);
 }
 
 //read the levelInput and change level and slider when the button "ENTER" was pressed in the windowInput-LineEdit

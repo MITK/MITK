@@ -34,7 +34,6 @@ QmitkSliderLevelWindowWidget::QmitkSliderLevelWindowWidget( QWidget * parent, co
   m_ObserverTag = m_Manager->AddObserver(itk::ModifiedEvent(), command);
   m_IsObserverTagSet = true;
 
-  m_It = NULL;
   setMouseTracking(true);
   m_Resize = false;
   m_Bottom = false;
@@ -469,8 +468,7 @@ void QmitkSliderLevelWindowWidget::showScale()
   update();
 }
 
-void QmitkSliderLevelWindowWidget::setDataTreeIteratorClone(mitk::DataTreeIteratorClone& it)
+void QmitkSliderLevelWindowWidget::setDataTree(mitk::DataTree* tree)
 {
-  m_It = it;
-  m_Manager->SetDataTreeIteratorClone(m_It);
+  m_Manager->SetDataTree(tree);
 }

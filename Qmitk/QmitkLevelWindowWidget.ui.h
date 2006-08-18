@@ -24,9 +24,9 @@ void QmitkLevelWindowWidget::destroy()
 { 
 } 
 
-void QmitkLevelWindowWidget::setDataTreeIteratorClone( mitk::DataTreeIteratorClone& it ) 
+void QmitkLevelWindowWidget::setDataTree( mitk::DataTree* tree ) 
 { 
-  m_Manager->SetDataTreeIteratorClone(it); 
+  m_Manager->SetDataTree(tree); 
 } 
 
 

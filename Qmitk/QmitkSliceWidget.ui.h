@@ -97,7 +97,7 @@ void QmitkSliceWidget::SetData( mitk::DataTreeIteratorBase* it, mitk::SliceNavig
 {
   m_DataTreeIterator = it;
   mitk::DataTreeIteratorClone tmpIterator=m_DataTreeIterator.GetPointer();
-  levelWindow->setDataTreeIteratorClone(tmpIterator);
+  levelWindow->setDataTree(dynamic_cast<mitk::DataTree*>(tmpIterator->GetTree()));
   while ( !tmpIterator->IsAtEnd() ) 
   {
     mitk::Image::Pointer image =

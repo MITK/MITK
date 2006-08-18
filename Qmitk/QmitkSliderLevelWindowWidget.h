@@ -72,7 +72,7 @@ public:
 
   void setLevelWindowManager(mitk::LevelWindowManager* levelWindowManager);
   void update( );
-  void setDataTreeIteratorClone(mitk::DataTreeIteratorClone &it);
+  void setDataTree(mitk::DataTree* tree);
 
 private:
 
@@ -101,7 +101,6 @@ protected:
   bool m_Scale;
   QRect m_LowerBound;
   QRect m_UpperBound;
-  mitk::DataTreeIteratorClone m_It;
   unsigned long m_ObserverTag;
   bool m_IsObserverTagSet;
   

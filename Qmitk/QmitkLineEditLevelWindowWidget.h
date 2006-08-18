@@ -36,7 +36,7 @@ public:
   mitk::LevelWindowManager::Pointer m_Manager;
   
   void setLevelWindowManager(mitk::LevelWindowManager* levelWindowManager);
-  void setDataTreeIteratorClone( mitk::DataTreeIteratorClone& it );
+  void setDataTree( mitk::DataTree* tree );
 
 private:
   void contextMenuEvent ( QContextMenuEvent * );
@@ -48,7 +48,6 @@ public slots:
   void setValidator();
 
 protected:
-  mitk::DataTreeIteratorClone m_It;
   unsigned long m_ObserverTag;
   bool m_IsObserverTagSet;
   QmitkLevelWindowWidgetContextMenu* m_Contextmenu;

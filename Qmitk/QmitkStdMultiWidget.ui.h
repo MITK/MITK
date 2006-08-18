@@ -503,7 +503,7 @@ void QmitkStdMultiWidget::EnableStandardLevelWindow()
 {
   levelWindowWidget->disconnect(this);
   mitk::DataTreeIteratorClone it = mitkWidget1->GetRenderer()->GetData();
-  levelWindowWidget->setDataTreeIteratorClone(it);
+  levelWindowWidget->setDataTree(dynamic_cast<mitk::DataTree*>(it->GetTree()));
   levelWindowWidget->show();
 }
 

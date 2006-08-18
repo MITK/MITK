@@ -893,3 +893,8 @@ void QmitkStdMultiWidget::DisableGradientBackground()
   m_GradientBackground3->Disable();
   m_GradientBackground4->Disable();
 }
+
+mitk::SlicesRotator * QmitkStdMultiWidget::GetSlicesRotator() const
+{
+  return m_SlicesRotator;
+}

@@ -124,7 +124,7 @@ void QmitkThresholdComponent::CreateConnections()
   if ( m_GUI )
   {
     connect( (QObject*)(m_GUI->GetTreeNodeSelector()), SIGNAL(activated(const mitk::DataTreeFilter::Item *)), (QObject*) this, SLOT(ImageSelected(const mitk::DataTreeFilter::Item *)));
-    connect( (QObject*)(m_GUI->GetThresholdInputSlider()), SIGNAL(sliderReleased()), (QObject*) this, SLOT(ThresholdSliderChanged()));
+    connect( (QObject*)(m_GUI->GetThresholdInputSlider()), SIGNAL(sliderMoved(int)), (QObject*) this, SLOT(ThresholdSliderChanged(int)));
     connect( (QObject*)(m_GUI->GetThresholdInputNumber()), SIGNAL(returnPressed()), (QObject*) this, SLOT(ThresholdValueChanged()));    
     connect( (QObject*)(m_GUI->GetShowThresholdGroupBox()), SIGNAL(toggled(bool)), (QObject*) this, SLOT(ShowThreshold(bool)));     
     connect( (QObject*)(m_GUI->GetThresholdFinderGroupBox()), SIGNAL(toggled(bool)), (QObject*) this, SLOT(ShowThresholdContent(bool)));     
@@ -261,7 +261,7 @@ void QmitkThresholdComponent::ShowImageContent(bool)
 
 ///*************** THRESHOLD VALUE CHANGED **************/
 //By Slider
-void QmitkThresholdComponent::ThresholdSliderChanged()
+void QmitkThresholdComponent::ThresholdSliderChanged(int)
 {
   int value = m_GUI->GetThresholdInputSlider()->value();
   if (m_ThresholdImageNode)

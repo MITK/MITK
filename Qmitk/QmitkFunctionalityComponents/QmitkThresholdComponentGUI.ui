@@ -469,7 +469,7 @@
                                                 <enum>Sunken</enum>
                                             </property>
                                             <property name="text">
-                                                <string></string>
+                                                <string>0</string>
                                             </property>
                                         </widget>
                                         <spacer>

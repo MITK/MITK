@@ -117,7 +117,7 @@ public slots:
   void ShowImageContent(bool show = true);
 
   /** \brief Slot method that will be called if the Thresholdslider was moved to update the shown image and the ThresholdLineEdit. */ 
-  void ThresholdSliderChanged();
+  void ThresholdSliderChanged(int moved = 0);
 
   /** \brief Slot method that will be called if the ThresholdLineEdit was changed to update the shown image and the ThresholdSlider. */
   void ThresholdValueChanged( );

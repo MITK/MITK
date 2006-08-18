@@ -21,7 +21,6 @@ PURPOSE.  See the above copyright notices for more information.
 #define IMAGETIMESELECTOR_H_HEADER_INCLUDED_C1E4861D
 
 #include "mitkCommon.h"
-#include "mitkImageToImageFilter.h"
 #include "mitkSubImageSelector.h"
 
 namespace mitk {

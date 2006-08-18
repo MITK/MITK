@@ -23,7 +23,6 @@ PURPOSE.  See the above copyright notices for more information.
 #endif
 
 #include "itkObjectFactoryBase.h"
-#include "mitkBaseData.h"
 
 namespace mitk
 {

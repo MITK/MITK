@@ -21,6 +21,7 @@ See MITKCopyright.txt or http://www.mitk.org/ for details.
 
 #include "mitkImageToItk.h"
 #include "mitkImageDataItem.h"
+#include "mitkBaseProcess.h"
 
 
 template <class TOutputImage>

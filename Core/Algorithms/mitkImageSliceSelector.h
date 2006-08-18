@@ -21,7 +21,6 @@ PURPOSE.  See the above copyright notices for more information.
 #define IMAGESLICESELECTOR_H_HEADER_INCLUDED_C1E4BE7B
 
 #include "mitkCommon.h"
-#include "mitkImageToImageFilter.h"
 #include "mitkSubImageSelector.h"
 
 namespace mitk {

@@ -20,7 +20,6 @@ PURPOSE.  See the above copyright notices for more information.
 #define HISTOGRAM_GENERATOR_H_HEADER_INCLUDED
 
 #include <itkObject.h>
-#include <itkObjectFactory.h>
 #include <itkHistogram.h>
 #include <itkImage.h>
 #include "mitkImage.h"

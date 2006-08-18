@@ -21,7 +21,6 @@ PURPOSE.  See the above copyright notices for more information.
 #define IMAGECHANNELSELECTOR_H_HEADER_INCLUDED_C1E4F4E7
 
 #include "mitkCommon.h"
-#include "mitkImageToImageFilter.h"
 #include "mitkSubImageSelector.h"
 
 namespace mitk {

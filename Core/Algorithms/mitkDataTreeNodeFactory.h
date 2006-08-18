@@ -20,7 +20,6 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef _DATA_TREE_NODE_FACTORY_H_
 #define _DATA_TREE_NODE_FACTORY_H_
 
-#include "mitkConfig.h"
 #include "mitkDataTreeNodeSource.h"
 #include "mitkFileSeriesReader.h"
 

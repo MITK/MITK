@@ -2,7 +2,6 @@
 #define __mitkAutoCropImageFilter_h_
 
 #include "mitkCommon.h"
-#include "mitkImageToImageFilter.h"
 #include "mitkSubImageSelector.h"
 #include "mitkImageTimeSelector.h"
 #include <itkImageRegion.h>

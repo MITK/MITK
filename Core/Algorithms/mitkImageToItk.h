@@ -26,7 +26,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <itkImage.h>
 #include <itkImageSource.h>
-#include "mitkBaseProcess.h"
 #include "mitkImage.h"
 
 namespace mitk

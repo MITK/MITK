@@ -29,6 +29,8 @@ PURPOSE.  See the above copyright notices for more information.
 // these files have to be included at this location
 // because otherwise microsoft visual c++ generates
 // an internal compiler error
+#include <mitkConfig.h> //for MBI_INTERNAL
+
 #ifdef MBI_INTERNAL
   #include <mitkVesselTreeFileReader.h>
   #include <mitkVesselGraphFileReader.h>
@@ -59,14 +61,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkStructuredPointsReader.h>
 #include <vtkStructuredPointsWriter.h>
 #include <map>
-//#include <mitkSurface.h>
 
-//#include <mitkProperties.h>
-//#include <mitkColorProperty.h>
-//#include <mitkProperties.h>
-//#include <mitkLevelWindowProperty.h>
+#include <mitkProperties.h>
 
-//#include <mitkLevelWindow.h>
 #include <mitkDataTree.h>
 #include <string>
 
@@ -74,17 +71,11 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkMapClassIDToClassName.h>
 #include <QmitkStringPropertyEditor.h>
 #include "mitkImageTimeSelector.h"
-//#include "mitkImageChannelSelector.h"
 
 #include <mitkStateMachineFactory.h>
 #include <mitkUndoController.h>
-//#include <mitkStateMachine.h>
-//#include <mitkEventMapper.h>
 #include <mitkOperation.h>
 #include <mitkGlobalInteraction.h>
-//#include <mitkConfig.h>
-
-//#include <mitkSliceNavigationController.h>
 
 #include <mitkParRecFileReader.h>
 #include <mitkInteractionConst.h>
@@ -102,7 +93,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qiconset.h>
 
 #include <ipPicTypeMultiplex.h>
-//#include <mitkDataTreeHelper.h>
 #include <mitkPointOperation.h>
 #include <mitkCoordinateSupplier.h>
 #include <mitkStatusBar.h>

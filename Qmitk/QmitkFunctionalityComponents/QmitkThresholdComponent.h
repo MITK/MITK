@@ -92,6 +92,9 @@ public:
   ///** \brief Method to set m_Activated to true */
   virtual void Activated();
 
+  ///** \brief Method to set m_Activated to false */
+  virtual void Deactivated();
+
   /***************        ATTRIBUTES      ***************/
 
   /** \brief Vector with all added components */
@@ -171,6 +174,9 @@ private:
   /** \brief Method to set the Range of the ThresholdSlider*/
   void SetSliderRange();
 
+  /** \brief Method to to delete ThresholdNode if Component is deactivated*/
+  void DeleteThresholdNode();
+
 
   /***************        ATTRIBUTES      ***************/
 
@@ -179,6 +185,9 @@ private:
 
   /** \brief This Attribute holds the current ImageItem from the TreeNodeSelector if his selection was changed*/
   const mitk::DataTreeFilter::Item * m_SelectedImage; 
+
+  /** \brief This Attribute holds the information if a thresholdnode is already existing or not*/
+  bool m_ThresholdNodeExisting;
 
 };
 

@@ -164,13 +164,12 @@ QWidget* QmitkFunctionalityComponentContainer::CreateContainerWidget(QWidget* pa
 /***************        ACTIVATED       ***************/
 void QmitkFunctionalityComponentContainer::Activated()
 {
-  m_Activated = true;
   m_Active = true;
-  if(m_TreeChangedWhileInActive)
-  {
-    TreeChanged();
-    m_TreeChangedWhileInActive = false;
-  }
+}
+
+void QmitkFunctionalityComponentContainer::Deactivated()
+{
+  m_Active = false;
 }
 
 

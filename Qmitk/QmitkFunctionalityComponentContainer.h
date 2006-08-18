@@ -104,6 +104,7 @@ public:
   /***************      OHTER METHODS     ***************/
   void AddComponent(QmitkFunctionalityComponentContainer* componentContainer);
   virtual void Activated();
+  virtual void Deactivated();
 
 
   /***************        ATTRIBUTES      ***************/
@@ -126,9 +127,9 @@ protected:
 
   unsigned long m_ObserverTag;
       
-  bool m_Available;
+  //bool m_Available;
 
-  bool m_Activated;
+  //bool m_Activated;
   bool m_Active;
   /** \brief Attribute to decide whether the selector shall be updated when a parent-Selector is updatet or not */
   bool m_UpdateSelector;

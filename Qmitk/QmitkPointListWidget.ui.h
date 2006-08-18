@@ -85,10 +85,38 @@ void QmitkPointListWidget::ItemsOfListUpdate()
     {
       m_PointSet->GetPointSet()->GetPoints()->GetElementIfIndexExists(it->Index(), &ppt);
       std::stringstream  aStrStream;
-      aStrStream<<prefix<<i+1<<"  ("<< (ppt)[0]<<",  "<<(ppt)[1]<<",  "<<(ppt)[2]<<")";
+      aStrStream<<prefix<<i+1<<"  ("<< (ppt)[0]<<",  "<<(ppt)[1]<<",  "<<(ppt)[2]<<")"<<", Index "<< it->Index();
       const std::string s = aStrStream.str();
       const char * Item =s.c_str();
       this->InteractivePointList->insertItem(Item);
+    }
+    //
+    // if there is a selected point in the point set, it will
+    // also be highlighted in the pointlist widget.
+    //
+    int selectedPointIndex = m_PointSet->SearchSelectedPoint();
+    if (selectedPointIndex > -1 && m_PointSet->GetPointSet()->GetPoints()->IndexExists(selectedPointIndex))
+    {
+      //
+      // convert index into a number ranging from [0..N-1]
+      // this is necessary, since if the user deletes points, the point
+      // indices are not monotonically increasing.
+      //
+      int selectedItem = 0;
+      for (it = m_PointSet->GetPointSet()->GetPoints()->Begin(); it->Index()!= (unsigned)selectedPointIndex; it++,selectedItem++)
+      {}
+      
+      // select the currently active point in the point
+      // list box      
+      this->InteractivePointList->setSelected( selectedItem, true );
+      
+      // center the currently active point in the vertical
+      // scroll bar
+      this->InteractivePointList->centerCurrentItem();
+    }
+    else
+    {
+      this->InteractivePointList->clearSelection();
     }
   }
 }

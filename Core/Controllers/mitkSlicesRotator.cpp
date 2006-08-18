@@ -53,7 +53,8 @@ SlicesRotator::Pointer SlicesRotator::New()
 }
 
 SlicesRotator::SlicesRotator(const char* machine)
-:SlicesCoordinator(machine)
+: SlicesCoordinator(machine),
+  m_LinkPlanes( false )
 {
 
 }
@@ -268,8 +269,13 @@ bool SlicesRotator::ExecuteAction(Action* action, StateEvent const* stateEvent)
           else
           {
             otherGeometry = geometry2D;
-            // uncomment to rotate all visible slices at once
-            //m_SNCsToBeRotated.push_back(*iter);
+
+            if ( m_LinkPlanes )
+            {
+              // All slices are rotated, i.e. the relative angles between
+              // slices remain fixed
+              m_SNCsToBeRotated.push_back(*iter);
+            }
           }
         }
       }

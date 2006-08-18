@@ -67,6 +67,12 @@ class SlicesRotator : public SlicesCoordinator
     SlicesRotator(const char* machine);
 
     virtual void SetGeometry(const itk::EventObject& EventObject);
+
+    /** Set/Get whether to link planes (fix their relative angle) */
+    itkSetMacro( LinkPlanes, bool );
+    itkGetMacro( LinkPlanes, bool );
+    itkBooleanMacro( LinkPlanes );
+    
   protected:
 
     // clear list of controllers
@@ -86,6 +92,8 @@ class SlicesRotator : public SlicesCoordinator
 
     Point3D  m_LastCursorPosition;
     Point3D  m_CenterOfRotation;
+
+    bool m_LinkPlanes;
 };
 
 } // namespace 

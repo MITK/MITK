@@ -18,6 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include "mitkImageChannelSelector.h"
+#include <itkSmartPointerForwardReference.txx>
 
 //##ModelId=3E1B1980039C
 mitk::ImageChannelSelector::ImageChannelSelector() : m_ChannelNr(0)

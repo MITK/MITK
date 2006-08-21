@@ -165,7 +165,7 @@ void mitk::SeedsImage::PointInterpolation(SeedsImageType* itkImage)
   this->GetGeometry()->WorldToIndex( m_LastPoint, indexEnd );
 
   IndexType itkIndexBegin, itkIndexEnd;
-  int d;
+  unsigned int d;
   for ( d = 0; d < dimension; ++d )
   {
     itkIndexBegin[d] = (int)(indexBegin[d] + 0.5);
@@ -180,7 +180,7 @@ void mitk::SeedsImage::PointInterpolation(SeedsImageType* itkImage)
   {
     nit.SetLocation( lit.GetIndex() );
 
-    int i;
+    unsigned int i;
     for ( i = 0; i < nit.Size(); ++i )
     {
       if ( nit[i] != 0 )
@@ -310,12 +310,12 @@ void mitk::SeedsImage::CreateBrush()
   int x, y, z;
   for ( x = 0; x < m_Radius*2+1; ++x )
   {
-    offset3D[0] = point3D[0] = x;
-    offset2D[0] = point2D[0] = x;
+    point3D[0] = offset3D[0] = x;
+    point2D[0] = offset2D[0] = x;
     for ( y = 0; y < m_Radius*2+1; ++y )
     {
-      offset3D[1] = point3D[1] = y;
-      offset2D[1] = point2D[1] = y;
+      point3D[1] = offset3D[1] = y;
+      point2D[1] = offset2D[1] = y;
       m_Brush2D[offset2D] = m_GaussianFunction2D->Evaluate( point2D );
       for ( z = 0; z < m_Radius*2+1; ++z )
       {

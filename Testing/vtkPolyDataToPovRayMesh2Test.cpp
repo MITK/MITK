@@ -3,12 +3,13 @@
 
 int vtkPolyDataToPovRayMesh2Test (int argc, char * argv[])
 {
-  std::string fileOut = "ParameterizedMeshPOVWriter";
+  std::string fileOut = "ParameterizedMeshPOVWriterTest";
   fileOut = itksys::SystemTools::ConvertToOutputPath(fileOut.c_str());
-  std::cout<<"Output File to: "<<fileOut<<std::endl;
+  std::cout << "Output File to: " << fileOut<<std::endl;
 
   bool error = true;
   error = itkMeshToIndexedTriangleMeshFilterTest(fileOut);
+  std::cout << "Subroutine returned: " << error << std::endl;
 
   if ( !error ) std::cout << "[TEST DONE]" << std::endl;
   else {std::cout << "[FAILED]" << std::endl;
@@ -25,24 +26,38 @@ bool itkMeshToIndexedTriangleMeshFilterTest(std::string outFile)
   vtkSphereSource *mySphereSource = vtkSphereSource::New();
   mySphereSource->SetRadius(5.);
   mySphereSource->Update();
-  if ( !mySphereSource ) return EXIT_FAILURE;
+  if ( !mySphereSource ) {
+    std::cout << "Unable to create vtk::Sphere" << std::endl;
+    return EXIT_FAILURE;
+  }
+  else std::cout << "Created test sphere." << std::endl;
 
   // Convert sphere to itk::Mesh
   MeshType::Pointer itkmesh = MeshType::New();
   itkmesh = MeshUtilType::meshFromPolyData( mySphereSource->GetOutput() );
-  if ( ! itkmesh ) return EXIT_FAILURE;
+  if ( ! itkmesh ) {
+    std::cout << "Unable to convert test sphere to itk::Mesh" << std::endl;
+    return EXIT_FAILURE;
+  }
+  else std::cout << "Converted test sphere to itk::Mesh." << std::endl;
 
   // Convert itk::Mesh to itk::IndexedTriangleMesh
   FilterType::Pointer filter = FilterType::New();
   filter->SetInput( itkmesh );
   filter->SetDeepCopy( false );
   filter->GenerateData();
-  if ( !filter ) return EXIT_FAILURE;
+  if ( !filter ) {
+    std::cout << "Unable to instantiate filter" << std::endl;
+    return EXIT_FAILURE;
+  }
 
   ITMeshType::Pointer dummy = ITMeshType::New();
   dummy = filter->GetOutput();
-    if ( !dummy ) return EXIT_FAILURE;
-
+    if ( !dummy ) {
+      std::cout << "Unable to convert mesh to Indexed triangle mesh" << std::endl;
+      return EXIT_FAILURE;
+    }
+    else std::cout << "Converted mesh to indeed triangle mesh." << std::endl;
 
   // Try if conversation to itk::SphericalParameterizedTriangleMesh is possible;
   // (would allow the use of UV Coordinates)
@@ -55,19 +70,19 @@ bool itkMeshToIndexedTriangleMeshFilterTest(std::string outFile)
   writer->SetSubdivisionLevel(2);
   writer->SetTranslationInX(0);
   writer->SetTranslationInY(0);
+  writer->SetSSMFileName("NoSSMFile");
   writer->SetFilePrefix(outFile.c_str());
 
   if( writer->GetNumberOfInputs() < 1 )
   {
-     std::cout<<"[FAILED]"<<std::endl;
+     std::cout << "[FAILED]: Writer has no outputs." << std::endl;
      writer->Delete();
      return EXIT_FAILURE;
   }
     else
   {
-     std::cout<<"[PASSED]"<<std::endl;
      writer->Write();
+     std::cout << "[PASSED]" << std::endl;
   }
-
   return writer->GetWriteError();
 }

@@ -24,8 +24,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 class QWidget;
 #include <mitkDataTree.h>
-#include "mitkProperties.h"
-#include "mitkRenderWindow.h"
 #include "itkCommand.h"
 #include "QmitkDataManagerControls.h"
 class NodeViewPropertyItem;

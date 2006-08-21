@@ -22,48 +22,48 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qcursor.h>
 
 QmitkLevelWindowWidgetContextMenu::QmitkLevelWindowWidgetContextMenu(QWidget * parent, const char * name, WFlags f )
-: QWidget( parent, name, f ), m_Pre()
+: QWidget( parent, name, f ), m_LevelWindowPreset()
 {
-  m_Pre.LoadPreset();
+  m_LevelWindowPreset.LoadPreset();
 }
 
-void QmitkLevelWindowWidgetContextMenu::setPreset(int id)
+void QmitkLevelWindowWidgetContextMenu::setPreset(int presetID)
 {
-  QString item = m_PresetSubmenu->text(id);
-  if (!(id == m_PresetID))
+  QString item = m_PresetSubmenu->text(presetID);
+  if (!(presetID == m_PresetID))
   {
-    double dlevel = m_Pre.getLevel(std::string((const char*)item));
-    double dwindow = m_Pre.getWindow(std::string((const char*)item));
-    if ((dlevel + dwindow/2) > m_Lw.GetRangeMax())
+    double dlevel = m_LevelWindowPreset.getLevel(std::string((const char*)item));
+    double dwindow = m_LevelWindowPreset.getWindow(std::string((const char*)item));
+    if ((dlevel + dwindow/2) > m_LevelWindow.GetRangeMax())
     {
       double lowerBound = (dlevel - dwindow/2);
-      if (!(lowerBound > m_Lw.GetRangeMax()))
+      if (!(lowerBound > m_LevelWindow.GetRangeMax()))
       {
-        dwindow = m_Lw.GetRangeMax() - lowerBound;
+        dwindow = m_LevelWindow.GetRangeMax() - lowerBound;
         dlevel = lowerBound + dwindow/2;
       }
       else
       {
-        dlevel = m_Lw.GetRangeMax() - 1;
+        dlevel = m_LevelWindow.GetRangeMax() - 1;
         dwindow = 2;
       }
     }
-    else if ((dlevel - dwindow/2) < m_Lw.GetRangeMin())
+    else if ((dlevel - dwindow/2) < m_LevelWindow.GetRangeMin())
     {
       double upperBound = (dlevel + dwindow/2);
-      if (!(upperBound < m_Lw.GetRangeMin()))
+      if (!(upperBound < m_LevelWindow.GetRangeMin()))
       {
-        dwindow = m_Lw.GetRangeMin() + upperBound;
+        dwindow = m_LevelWindow.GetRangeMin() + upperBound;
         dlevel = upperBound - dwindow/2;
       }
       else
       {
-        dlevel = m_Lw.GetRangeMin() + 1;
+        dlevel = m_LevelWindow.GetRangeMin() + 1;
         dwindow = 2;
       }
     }
-    m_Lw.SetLevelWindow(dlevel, dwindow);
-    m_Manager->SetLevelWindow(m_Lw);
+    m_LevelWindow.SetLevelWindow(dlevel, dwindow);
+    m_Manager->SetLevelWindow(m_LevelWindow);
   }
 }
 
@@ -75,57 +75,57 @@ void QmitkLevelWindowWidgetContextMenu::setLevelWindowManager(mitk::LevelWindowM
 void QmitkLevelWindowWidgetContextMenu::addPreset()
 {
   QmitkLevelWindowPresetDefinition addPreset(this, "newPreset", true);
-  addPreset.setPresets(m_Pre.getLevelPresets(), m_Pre.getWindowPresets(), QString::number( (int) m_Lw.GetLevel() ), QString::number( (int) m_Lw.GetWindow() ));
+  addPreset.setPresets(m_LevelWindowPreset.getLevelPresets(), m_LevelWindowPreset.getWindowPresets(), QString::number( (int) m_LevelWindow.GetLevel() ), QString::number( (int) m_LevelWindow.GetWindow() ));
   if(addPreset.exec())
   {
-    m_Pre.newPresets(addPreset.getLevelPresets(), addPreset.getWindowPresets());
+    m_LevelWindowPreset.newPresets(addPreset.getLevelPresets(), addPreset.getWindowPresets());
   }
 }
 
 void QmitkLevelWindowWidgetContextMenu::setDefaultLevelWindow()
 {
-  m_Lw.SetLevelWindow(m_Lw.GetDefaultLevel(), m_Lw.GetDefaultWindow());
-  m_Manager->SetLevelWindow(m_Lw);
+  m_LevelWindow.SetLevelWindow(m_LevelWindow.GetDefaultLevel(), m_LevelWindow.GetDefaultWindow());
+  m_Manager->SetLevelWindow(m_LevelWindow);
 }
 
 void QmitkLevelWindowWidgetContextMenu::setDefaultScaleRange()
 {
-  m_Lw.SetRangeMinMax(m_Lw.GetDefaultRangeMin(), m_Lw.GetDefaultRangeMax());
-  m_Lw.SetLevelWindow(m_Lw.GetLevel(), m_Lw.GetWindow());
-  m_Manager->SetLevelWindow(m_Lw);
+  m_LevelWindow.SetRangeMinMax(m_LevelWindow.GetDefaultRangeMin(), m_LevelWindow.GetDefaultRangeMax());
+  m_LevelWindow.SetLevelWindow(m_LevelWindow.GetLevel(), m_LevelWindow.GetWindow());
+  m_Manager->SetLevelWindow(m_LevelWindow);
 }
 
 void QmitkLevelWindowWidgetContextMenu::changeScaleRange()
 {
   QmitkLevelWindowRangeChange changeRange(this, "changeRange", true);
-  changeRange.setLowerLimit((int)m_Lw.GetRangeMin());
-  changeRange.setUpperLimit((int)m_Lw.GetRangeMax());
+  changeRange.setLowerLimit((int)m_LevelWindow.GetRangeMin());
+  changeRange.setUpperLimit((int)m_LevelWindow.GetRangeMax());
   if(changeRange.exec())
   {
-    m_Lw.SetRangeMinMax(changeRange.getLowerLimit(), changeRange.getUpperLimit());
-    m_Lw.SetLevelWindow(m_Lw.GetLevel(), m_Lw.GetWindow());
-    m_Manager->SetLevelWindow(m_Lw);
+    m_LevelWindow.SetRangeMinMax(changeRange.getLowerLimit(), changeRange.getUpperLimit());
+    m_LevelWindow.SetLevelWindow(m_LevelWindow.GetLevel(), m_LevelWindow.GetWindow());
+    m_Manager->SetLevelWindow(m_LevelWindow);
   }
 }
 
-void QmitkLevelWindowWidgetContextMenu::setImage(int id)
+void QmitkLevelWindowWidgetContextMenu::setImage(int imageID)
 {
-  if (id == m_ImageID)
+  if (imageID == m_ImageID)
     m_Manager->SetAutoTopMostImage();
   else
-    m_Manager->SetLevWinProp(m_Images[id]);
+    m_Manager->SetLevelWindowProperty(m_Images[imageID]);
 }
 
-void QmitkLevelWindowWidgetContextMenu::getContextMenu(QPopupMenu* cm)
+void QmitkLevelWindowWidgetContextMenu::getContextMenu(QPopupMenu* contextmenu)
 {
   try
   {
-    m_Lw = m_Manager->GetLevelWindow();
+    m_LevelWindow = m_Manager->GetLevelWindow();
 
     mitk::DataTree* dataTree = m_Manager->GetDataTree();
     mitk::DataTreeIteratorClone dataTreeIteratorClone = dataTree->GetIteratorToNode( dataTree, NULL );
 
-    QPopupMenu* contextMenu = cm;
+    QPopupMenu* contextMenu = contextmenu;
     Q_CHECK_PTR( contextMenu );
     contextMenu->insertItem(tr("Default Level/Window"), this, SLOT(setDefaultLevelWindow()));
     contextMenu->insertSeparator();
@@ -137,8 +137,8 @@ void QmitkLevelWindowWidgetContextMenu::getContextMenu(QPopupMenu* cm)
     Q_CHECK_PTR( m_PresetSubmenu );
     m_PresetID = m_PresetSubmenu->insertItem(tr("Preset Definition"), this, SLOT(addPreset()));
     m_PresetSubmenu->insertSeparator();
-    std::map<std::string, double> pres = m_Pre.getLevelPresets();
-    for( std::map<std::string, double>::iterator iter = pres.begin(); iter != pres.end(); iter++ ) {
+    std::map<std::string, double> preset = m_LevelWindowPreset.getLevelPresets();
+    for( std::map<std::string, double>::iterator iter = preset.begin(); iter != preset.end(); iter++ ) {
       QString item = ((*iter).first.c_str());
       m_PresetSubmenu->insertItem(item);
     }
@@ -162,15 +162,15 @@ void QmitkLevelWindowWidgetContextMenu::getContextMenu(QPopupMenu* cm)
         dataTreeIteratorClone->Get()->GetBoolProperty("binary", binary);
         if( binary == false)
         { 
-          mitk::LevelWindowProperty::Pointer levWinProp = dynamic_cast<mitk::LevelWindowProperty*>(dataTreeIteratorClone->Get()->GetProperty("levelwindow").GetPointer());
-          if (levWinProp.IsNotNull())
+          mitk::LevelWindowProperty::Pointer levelWindowProperty = dynamic_cast<mitk::LevelWindowProperty*>(dataTreeIteratorClone->Get()->GetProperty("levelwindow").GetPointer());
+          if (levelWindowProperty.IsNotNull())
           {
             std::string name;
             dataTreeIteratorClone->Get()->GetName(name);
             QString item = name.c_str();
             int id = m_ImageSubmenu->insertItem(item);
-            m_Images[id] = levWinProp;
-            if (levWinProp == m_Manager->GetLevWinProp())
+            m_Images[id] = levelWindowProperty;
+            if (levelWindowProperty == m_Manager->GetLevelWindowProperty())
             {
               m_ImageSubmenu->setItemChecked(id, true);
             }
@@ -194,7 +194,7 @@ void QmitkLevelWindowWidgetContextMenu::getContextMenu()
 {
   try
   {
-    m_Lw = m_Manager->GetLevelWindow();
+    m_LevelWindow = m_Manager->GetLevelWindow();
     mitk::DataTree* dataTree = m_Manager->GetDataTree();
     mitk::DataTreeIteratorClone dataTreeIteratorClone = dataTree->GetIteratorToNode( dataTree, NULL );
 
@@ -210,8 +210,8 @@ void QmitkLevelWindowWidgetContextMenu::getContextMenu()
     Q_CHECK_PTR( m_PresetSubmenu );
     m_PresetID = m_PresetSubmenu->insertItem(tr("Preset Definition"), this, SLOT(addPreset()));
     m_PresetSubmenu->insertSeparator();
-    std::map<std::string, double> pres = m_Pre.getLevelPresets();
-    for( std::map<std::string, double>::iterator iter = pres.begin(); iter != pres.end(); iter++ ) {
+    std::map<std::string, double> preset = m_LevelWindowPreset.getLevelPresets();
+    for( std::map<std::string, double>::iterator iter = preset.begin(); iter != preset.end(); iter++ ) {
       QString item = ((*iter).first.c_str());
       m_PresetSubmenu->insertItem(item);
     }
@@ -235,15 +235,15 @@ void QmitkLevelWindowWidgetContextMenu::getContextMenu()
         dataTreeIteratorClone->Get()->GetBoolProperty("binary", binary);
         if( binary == false)
         { 
-          mitk::LevelWindowProperty::Pointer levWinProp = dynamic_cast<mitk::LevelWindowProperty*>(dataTreeIteratorClone->Get()->GetProperty("levelwindow").GetPointer());
-          if (levWinProp.IsNotNull())
+          mitk::LevelWindowProperty::Pointer levelWindowProperty = dynamic_cast<mitk::LevelWindowProperty*>(dataTreeIteratorClone->Get()->GetProperty("levelwindow").GetPointer());
+          if (levelWindowProperty.IsNotNull())
           {
             std::string name;
             dataTreeIteratorClone->Get()->GetName(name);
             QString item = name.c_str();
             int id = m_ImageSubmenu->insertItem(item);
-            m_Images[id] = levWinProp;
-            if (levWinProp == m_Manager->GetLevWinProp())
+            m_Images[id] = levelWindowProperty;
+            if (levelWindowProperty == m_Manager->GetLevelWindowProperty())
             {
               m_ImageSubmenu->setItemChecked(id, true);
             }

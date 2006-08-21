@@ -178,7 +178,7 @@ void mitk::PointSetMapper2D::Paint(mitk::BaseRenderer * renderer)
       bool isRendererSlice = scalardiff < 0.00001; //cause roundoff error
       if(this->GetDataTreeNode()->GetBoolProperty("inputdevice",isInputDevice) && isInputDevice && !isRendererSlice )
       {
-        mitk::ScalarType dist = displayGeometry->SignedDistance(p);
+        //mitk::ScalarType dist = displayGeometry->SignedDistance(p);
         //if (dist > 0)
         //  std::cout<<"PointSetMapper2d: "<<scalardiff<<" signed: "<<dist<<std::endl;
         //else

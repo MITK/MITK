@@ -11,6 +11,7 @@
 #include "mitkImageAccessByItk.h"
 #include "mitkGeometry3D.h"
 #include "mitkStatusBar.h"
+#include <itkSmartPointerForwardReference.txx>
 
 
 namespace mitk

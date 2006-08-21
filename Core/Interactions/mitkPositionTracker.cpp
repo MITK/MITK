@@ -6,6 +6,7 @@
 #include "mitkInteractionConst.h"
 #include <mitkPointSet.h>
 #include <mitkRenderingManager.h>
+#include <mitkVector.h> // for PointDataType 
 
 
 mitk::PositionTracker::PositionTracker(const char * type, mitk::OperationActor* operationActor)
@@ -14,7 +15,7 @@ mitk::PositionTracker::PositionTracker(const char * type, mitk::OperationActor* 
 
 
 bool mitk::PositionTracker::ExecuteAction(Action* action, mitk::StateEvent const* stateEvent)
-{
+ {
 //  std::cout<<"PositionTracker";
   bool ok = false;
 	
@@ -63,11 +64,18 @@ bool mitk::PositionTracker::ExecuteAction(Action* action, mitk::StateEvent const
             if( isPointSet )
             {
               mitk::PointSet* ps = (mitk::PointSet*) dtnode->GetData();
-             
-              if( ps->GetPointSet()->GetPoints()->IndexExists( 0 )) //first element
-                ps->GetPointSet()->GetPoints()->SetElement( 0, displayPositionEvent->GetWorldPosition());                            
+              int position = 0;
+              
+              if( ps->GetPointSet()->GetPoints()->IndexExists( position )) //first element
+              {
+                ps->GetPointSet()->GetPoints()->SetElement( position, displayPositionEvent->GetWorldPosition());                            
+              }
               else
-                ps->GetPointSet()->GetPoints()->InsertElement(0,displayPositionEvent->GetWorldPosition());
+              {
+                mitk::PointSet::PointDataType pointData = {position , false /*selected*/, mitk::PTUNDEFINED};
+                ps->GetPointSet()->GetPointData()->InsertElement(position, pointData);
+                ps->GetPointSet()->GetPoints()->InsertElement(position, displayPositionEvent->GetWorldPosition());
+              }
 
               dtnode->SetData(ps);
               mitk::RenderingManager::GetInstance()->RequestUpdateAll();

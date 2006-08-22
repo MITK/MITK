@@ -16,18 +16,17 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#include "mitkConfig.h"
-#include "mitkDataTreeNodeFactory.h"
-#include "mitkBaseDataIOFactory.h"
+#include <mitkDataTreeNodeFactory.h>
+#include <mitkBaseDataIOFactory.h>
 
 // these files have to be included at this location, 
 // otherwise visual c++ will produce an internal 
 // compiler error :(
 #ifdef MBI_INTERNAL
- #include "mitkVesselGraphFileReader.h"
- #include "mitkVesselTreeFileReader.h"
- #include "mitkVesselTreeToLookupTableFilter.h"
- #include "mitkVesselTreeLookupTableProperty.h"
+ #include <mitkVesselGraphFileReader.h>
+ #include <mitkVesselTreeFileReader.h>
+ #include <mitkVesselTreeToLookupTableFilter.h>
+ #include <mitkVesselTreeLookupTableProperty.h>
 #endif
 
 // C-Standard library includes

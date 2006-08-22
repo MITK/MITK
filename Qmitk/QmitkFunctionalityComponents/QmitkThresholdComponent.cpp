@@ -104,15 +104,6 @@ void QmitkThresholdComponent::TreeChanged()
   }
 }
 
-/*************** TREE CHANGED(ITERATOR) ***************/
-void QmitkThresholdComponent::TreeChanged(mitk::DataTreeIteratorBase* it)
-{
-  if(m_GUI != NULL)
-  {
-    SetDataTreeIterator(it);
-  }
-}
-
 /***************       CONNECTIONS      ***************/
 void QmitkThresholdComponent::CreateConnections()
 {
@@ -314,8 +305,8 @@ void QmitkThresholdComponent::SetSliderRange()
     mitk::Image* currentImage = dynamic_cast<mitk::Image*>(m_ThresholdImageNode->GetData());
     if(currentImage)
     {
-    m_GUI->GetThresholdInputSlider()->setMinValue(currentImage->GetScalarValueMin());
-    m_GUI->GetThresholdInputSlider()->setMaxValue(currentImage->GetScalarValueMax());
+    m_GUI->GetThresholdInputSlider()->setMinValue((int)currentImage->GetScalarValueMin());
+    m_GUI->GetThresholdInputSlider()->setMaxValue((int)currentImage->GetScalarValueMax());
     }
   }
   }

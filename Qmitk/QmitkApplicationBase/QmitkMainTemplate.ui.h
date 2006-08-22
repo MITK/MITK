@@ -734,11 +734,6 @@ QmitkFctMediator* QmitkMainTemplate::GetFctMediator()
   return qfm;
 }
 
-QmitkFctCompMediator* QmitkMainTemplate::GetFctCompMediator()
-{
-  return qfcm;
-}
-
 void QmitkMainTemplate::changeToColumnWidget3n4Layout()
 {
   m_MultiWidget->changeLayoutToColumnWidget3And4();
@@ -976,18 +971,6 @@ void QmitkMainTemplate::LoadOptionsFromFile(const char* filename)
     ++iter;
   }
 }
-
-
-void QmitkMainTemplate::InitializeQfcm()
-{
-  //create an QmitkFctCompMediator. This is an invisible object that controls, manages and mediates functionalities
-  qfcm=new QmitkFctCompMediator(this);
-
-  //let the QmitkFctCompMediator know about the layout. This includes the toolbar and the layoutTemplate.
-  qfcm->Initialize(this);
-}
-
-
 
 void QmitkMainTemplate::viewPlaneSliceRotationLocked_toggled( bool on)
 { 

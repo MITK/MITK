@@ -117,9 +117,6 @@ public slots:
   /** \brief Method is called when the DataTree was changed. This Method is 	self-evident obligatory */
   virtual void TreeChanged();
 
-  /** \brief Method is called when the DataTree was changed. This Method is 	self-evident obligatory */
-  virtual void TreeChanged(mitk::DataTreeIteratorBase* it);
-
 protected:
   /***************        ATTRIBUTES      ***************/
 

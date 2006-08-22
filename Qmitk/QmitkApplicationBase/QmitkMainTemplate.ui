@@ -874,7 +874,6 @@
     <include location="global" impldecl="in implementation">qstring.h</include>
     <include location="global" impldecl="in implementation">qapplication.h</include>
     <include location="local" impldecl="in implementation">QmitkUndoRedoButton.h</include>
-    <include location="local" impldecl="in implementation">QmitkFctCompMediator.h</include>
     <include location="local" impldecl="in implementation">QmitkMainTemplate.ui.h</include>
 </includes>
 <forwards>
@@ -883,7 +882,6 @@
     <forward>class QmitkSimpleExampleFunctionality</forward>
     <forward>class QmitkStdMultiWidget</forward>
     <forward>class QmitkSelectableGLWidget</forward>
-    <forward>class QmitkFctCompMediator</forward>
 </forwards>
 <variables>
     <variable>QString m_ProjectFileName;</variable>
@@ -895,7 +893,6 @@
     <variable>QmitkFctMediator* qfm;</variable>
     <variable>mitk::UndoController* m_UndoController;</variable>
     <variable access="private">static QmitkMainTemplate* m_Instance;</variable>
-    <variable>QmitkFctCompMediator* qfcm;</variable>
 </variables>
 <signals>
     <signal>ShowWidgetPlanesToggled(bool)</signal>
@@ -944,12 +941,10 @@
     <function access="private">destroy()</function>
     <function specifier="static" returnType="QmitkMainTemplate *">GetInstance()</function>
     <function specifier="non virtual" returnType="QmitkFctMediator *">GetFctMediator()</function>
-    <function returnType="QmitkFctCompMediator *">GetFctCompMediator()</function>
     <function returnType="bool">GetStandardViewsInitialized()</function>
     <function>SetStandardViewsInitialized( bool areInitialized )</function>
     <function access="protected">SaveOptionsToFile( const char * filename )</function>
     <function access="protected">LoadOptionsFromFile( const char * filename )</function>
-    <function>InitializeQfcm()</function>
 </functions>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

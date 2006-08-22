@@ -45,10 +45,8 @@ public:
   to the application template
   */
   virtual void InitializeFunctionality();
-  virtual void InitializeFunctionalityComponent();
 
   virtual void InitializeQfm();
-  virtual void InitializeQfcm();
 
 public slots:
 

@@ -115,7 +115,6 @@ protected slots:
   /*************** TREE CHANGED (       ) ***************/
   // /** \brief The TreeChanged-slot-method updates the TreeNodeSelector if the datatree changes. */
   virtual void TreeChanged();
-  virtual void TreeChanged(mitk::DataTreeIteratorBase* it);
 
 public slots:
   /***************      OHTER METHODS     ***************/
@@ -126,11 +125,10 @@ protected:
   /***************        ATTRIBUTES      ***************/
 
   unsigned long m_ObserverTag;
-      
-  //bool m_Available;
 
-  //bool m_Activated;
+  /** \brief Attribute whether the component is active or not */
   bool m_Active;
+
   /** \brief Attribute to decide whether the selector shall be updated when a parent-Selector is updatet or not */
   bool m_UpdateSelector;
   /** \brief Attribute to decide whether the selector shall be shown or not */

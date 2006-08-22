@@ -88,15 +88,6 @@ void QmitkSurfaceCreatorComponent::TreeChanged()
 
 }
 
-/*************** TREE CHANGED(ITERATOR) ***************/
-void QmitkSurfaceCreatorComponent::TreeChanged(mitk::DataTreeIteratorBase* it)
-{
-  if(m_GUI != NULL)
-  {
-    SetDataTreeIterator(it);
-  }
-}
-
 /***************       CONNECTIONS      ***************/
 void QmitkSurfaceCreatorComponent::CreateConnections()
 {

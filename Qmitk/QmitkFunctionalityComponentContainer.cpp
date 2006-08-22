@@ -33,11 +33,18 @@ const QSizePolicy preferred(QSizePolicy::Preferred, QSizePolicy::Preferred);
 
 /***************       CONSTRUCTOR      ***************/
 QmitkFunctionalityComponentContainer::QmitkFunctionalityComponentContainer(QObject *parent, const char *name, QmitkStdMultiWidget *mitkStdMultiWidget, mitk::DataTreeIteratorBase* it, bool updateSelector, bool showSelector)
-: QmitkBaseFunctionalityComponent(name, it),m_Parent(parent), m_GUI(NULL),m_Name(name), m_MultiWidget(mitkStdMultiWidget), m_SelectedImage(NULL), m_UpdateSelector(updateSelector), m_ShowSelector(showSelector)
+: QmitkBaseFunctionalityComponent(name, it),
+m_Active(false),
+m_UpdateSelector(updateSelector), 
+m_ShowSelector(showSelector),
+m_Parent(parent), 
+m_Name(name), 
+m_MultiWidget(mitkStdMultiWidget),
+m_GUI(NULL),
+m_SelectedImage(NULL),
+m_Spacer(NULL)
 {
   SetDataTreeIterator(it);
-  m_Active = false;
-  m_Spacer = NULL;
 }
 
 /***************        DESTRUCTOR      ***************/
@@ -110,12 +117,6 @@ void QmitkFunctionalityComponentContainer::TreeChanged(const itk::EventObject & 
 
 /*************** TREE CHANGED (       ) ***************/
 void QmitkFunctionalityComponentContainer::TreeChanged()
-{
-
-}
-
-/*************** TREE CHANGED(ITERATOR) ***************/
-void QmitkFunctionalityComponentContainer::TreeChanged(mitk::DataTreeIteratorBase* it)
 {
 
 }

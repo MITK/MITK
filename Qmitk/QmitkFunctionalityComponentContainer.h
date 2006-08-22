@@ -30,6 +30,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qstring.h>
 #include <qobject.h>
 #include <mitkDataTreeFilter.h>
+#include <qlayout.h>
 
 class QmitkFunctionalityComponentContainerGUI;
 class QmitkStdMultiWidget;
@@ -61,13 +62,8 @@ public:
 
   /***************       CONSTRUCTOR      ***************/
   /** \brief Standard-Constructor. */
-  QmitkFunctionalityComponentContainer(QObject *parent=0, const char *name=0, QmitkStdMultiWidget *mitkStdMultiWidget = NULL, mitk::DataTreeIteratorBase* dataIt = NULL);
+  QmitkFunctionalityComponentContainer(QObject *parent=0, const char *name=0, QmitkStdMultiWidget *mitkStdMultiWidget = NULL, mitk::DataTreeIteratorBase* dataIt = NULL, bool updateSelector = true, bool showSelector = true);
   
-  /***************       CONSTRUCTOR      ***************/
-  /** \brief Constructor to set some preferences. */
-  QmitkFunctionalityComponentContainer(QObject *parent, const char *name, mitk::DataTreeIteratorBase* dataIt, bool updateSelector, bool showSelector);
-  
-
   /***************        DESTRUCTOR      ***************/
   /** \brief Destructor. */
   ~QmitkFunctionalityComponentContainer();
@@ -96,7 +92,11 @@ public:
   */
   virtual void SetDataTreeIterator(mitk::DataTreeIteratorBase* it);
 
+  /** \brief Method to get the GUI of this component. This Method is obligatory */
   QWidget* GetGUI();
+
+  /** \brief Method to set the Image Selector visible or invisible */
+  virtual void SetSelectorVisibility(bool visibility);
 
   /*************** TREE CHANGED (       ) ***************/
   virtual void TreeChanged(const itk::EventObject & treeChangedEvent);
@@ -144,6 +144,7 @@ private:
   QmitkStdMultiWidget * m_MultiWidget;
   QmitkFunctionalityComponentContainerGUI * m_GUI;
   const mitk::DataTreeFilter::Item * m_SelectedImage;
+  QSpacerItem* m_Spacer;
 
 
 };

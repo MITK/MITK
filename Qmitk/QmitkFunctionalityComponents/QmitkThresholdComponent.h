@@ -50,11 +50,7 @@ class QmitkThresholdComponent : public QmitkFunctionalityComponentContainer
 public:
   /***************       CONSTRUCTOR      ***************/
   /** \brief Constructor. */
-  QmitkThresholdComponent(QObject *parent=0, const char *name=0, QmitkStdMultiWidget *mitkStdMultiWidget = NULL, mitk::DataTreeIteratorBase* dataIt = NULL);
-
-  /***************       CONSTRUCTOR      ***************/
-  /** \brief Constructor to set some preferences. */
-  QmitkThresholdComponent(QObject *parent, const char *name, mitk::DataTreeIteratorBase* dataIt, bool updateSelector, bool showSelector);
+  QmitkThresholdComponent(QObject *parent=0, const char *name=0, QmitkStdMultiWidget *mitkStdMultiWidget = NULL, mitk::DataTreeIteratorBase* dataIt = NULL, bool updateSelector = true, bool showSelector = true);
 
   /***************        DESTRUCTOR      ***************/
   /** \brief Destructor. */
@@ -88,6 +84,11 @@ public:
   
   /** \brief Method to get the GUI of this component. This Method is obligatory */
   virtual QWidget* GetGUI();
+
+  /** \brief Method to set the Image Selector visible or invisible */
+  virtual void SetSelectorVisibility(bool visibility);
+
+  /***************      (DE)ACTIVATED     ***************/
    
   ///** \brief Method to set m_Activated to true */
   virtual void Activated();
@@ -111,7 +112,7 @@ public slots:
   void ShowThreshold(bool show = true);
 
   /** \brief Slot method that will be called if the CheckBox at the Threshold-Group-Box was toggled to show the threshold image or not. */ 
-  void ShowThresholdContent(bool show = true);
+  void ShowThresholdFinderContent(bool show = true);
 
    /** \brief Slot method that will be called if the CheckBox at the TreeNodeSelector-Group-Box was toggled to show the TreeNodeSelector or not. */ 
   void ShowImageContent(bool show = true);

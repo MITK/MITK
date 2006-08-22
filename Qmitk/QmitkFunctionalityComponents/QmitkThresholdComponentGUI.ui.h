@@ -62,7 +62,7 @@ QGroupBox* QmitkThresholdComponentGUI::GetThresholdFinderGroupBox()
   return m_ThresholdFinder;
 }
 
-QGroupBox* QmitkThresholdComponentGUI::GetThresholdSelectDataGroupBox()
+QGroupBox* QmitkThresholdComponentGUI::GetSelectDataGroupBox()
 {
   return m_ThresholdSelectDataGroupBox;
 }

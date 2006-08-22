@@ -42,8 +42,15 @@
             <property name="name">
                 <cstring>m_ThresholdFinder</cstring>
             </property>
+            <property name="paletteBackgroundColor">
+                <color>
+                    <red>213</red>
+                    <green>0</green>
+                    <blue>0</blue>
+                </color>
+            </property>
             <property name="title">
-                <string>ThresholdFinder</string>
+                <string>Show ThresholdFinder</string>
             </property>
             <property name="flat">
                 <bool>false</bool>
@@ -72,7 +79,7 @@
                         <number>0</number>
                     </property>
                     <property name="title">
-                        <string>Image</string>
+                        <string>Show Image Selector</string>
                     </property>
                     <property name="flat">
                         <bool>true</bool>
@@ -150,7 +157,7 @@
                         <bool>true</bool>
                     </property>
                     <property name="title">
-                        <string>Threshold</string>
+                        <string>Show Threshold</string>
                     </property>
                     <property name="flat">
                         <bool>true</bool>
@@ -577,7 +584,7 @@
     <function returnType="QLineEdit *">GetThresholdInputNumber()</function>
     <function returnType="QGroupBox *">GetShowThresholdGroupBox()</function>
     <function returnType="QGroupBox *">GetThresholdFinderGroupBox()</function>
-    <function returnType="QGroupBox *">GetThresholdSelectDataGroupBox()</function>
+    <function returnType="QGroupBox *">GetSelectDataGroupBox()</function>
     <function returnType="QGroupBox *">GetThresholdValueContent()</function>
     <function returnType="QGroupBox *">GetImageContent()</function>
 </functions>

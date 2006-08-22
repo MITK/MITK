@@ -32,3 +32,9 @@ QmitkDataTreeComboBox*  QmitkFunctionalityComponentContainerGUI::GetTreeNodeSele
 {
     return m_TreeNodeSelector;
 }
+
+
+QGroupBox * QmitkFunctionalityComponentContainerGUI::GetSelectDataGroupBox()
+{
+  return m_DataTreeNodeSelectorBox;
+}

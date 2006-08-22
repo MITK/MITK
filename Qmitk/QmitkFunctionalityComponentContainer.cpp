@@ -27,22 +27,17 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkCommand.h>
 #include <qobjectlist.h>
 #include <qcombobox.h>
+//#include <qlayout.h>
 
 const QSizePolicy preferred(QSizePolicy::Preferred, QSizePolicy::Preferred);
 
 /***************       CONSTRUCTOR      ***************/
-QmitkFunctionalityComponentContainer::QmitkFunctionalityComponentContainer(QObject *parent, const char *name, QmitkStdMultiWidget *mitkStdMultiWidget, mitk::DataTreeIteratorBase* it)
-: QmitkBaseFunctionalityComponent(name, it),m_Parent(parent), m_GUI(NULL),m_Name(name), m_MultiWidget(mitkStdMultiWidget), m_SelectedImage(NULL), m_UpdateSelector(true), m_ShowSelector(true)
+QmitkFunctionalityComponentContainer::QmitkFunctionalityComponentContainer(QObject *parent, const char *name, QmitkStdMultiWidget *mitkStdMultiWidget, mitk::DataTreeIteratorBase* it, bool updateSelector, bool showSelector)
+: QmitkBaseFunctionalityComponent(name, it),m_Parent(parent), m_GUI(NULL),m_Name(name), m_MultiWidget(mitkStdMultiWidget), m_SelectedImage(NULL), m_UpdateSelector(updateSelector), m_ShowSelector(showSelector)
 {
   SetDataTreeIterator(it);
   m_Active = false;
-}
-
-/***************       CONSTRUCTOR      ***************/
-QmitkFunctionalityComponentContainer::QmitkFunctionalityComponentContainer(QObject *parent, const char *name, mitk::DataTreeIteratorBase* it, bool updateSelector, bool showSelector)
-: QmitkBaseFunctionalityComponent(name, it),m_Parent(parent), m_GUI(NULL),m_Name(name), m_SelectedImage(NULL), m_UpdateSelector(updateSelector), m_ShowSelector(showSelector)
-{
-  SetDataTreeIterator(it);
+  m_Spacer = NULL;
 }
 
 /***************        DESTRUCTOR      ***************/
@@ -116,7 +111,7 @@ void QmitkFunctionalityComponentContainer::TreeChanged(const itk::EventObject & 
 /*************** TREE CHANGED (       ) ***************/
 void QmitkFunctionalityComponentContainer::TreeChanged()
 {
-  
+
 }
 
 /*************** TREE CHANGED(ITERATOR) ***************/
@@ -138,7 +133,7 @@ void QmitkFunctionalityComponentContainer::CreateConnections()
 void QmitkFunctionalityComponentContainer::ImageSelected(const mitk::DataTreeFilter::Item * imageIt)
 {
   m_SelectedImage = imageIt;
-    if(m_GUI != NULL)
+  if(m_GUI != NULL)
   {
     for(unsigned int i = 0;  i < m_AddedChildList.size(); i++)
     {
@@ -161,6 +156,16 @@ QWidget* QmitkFunctionalityComponentContainer::CreateContainerWidget(QWidget* pa
   return m_GUI;
 }
 
+/************** SET SELECTOR VISIBILITY ***************/
+void QmitkFunctionalityComponentContainer::SetSelectorVisibility(bool visibility)
+{
+  if(m_GUI)
+  {
+    m_GUI->GetSelectDataGroupBox()->setShown(visibility);
+  }
+  m_ShowSelector = visibility;
+}
+
 /***************        ACTIVATED       ***************/
 void QmitkFunctionalityComponentContainer::Activated()
 {
@@ -181,8 +186,13 @@ void QmitkFunctionalityComponentContainer::AddComponent(QmitkFunctionalityCompon
     QWidget* componentWidget = componentContainer->CreateContainerWidget(m_GUI);
     m_AddedChildList.push_back(componentContainer);
     m_GUI->layout()->add(componentWidget);
-    QSpacerItem* spacer = new QSpacerItem( 20, 20, QSizePolicy::Minimum, QSizePolicy::Expanding );
-    m_GUI->layout()->addItem( spacer );
+    if(m_Spacer != NULL)
+    {
+      m_GUI->layout()->removeItem(m_Spacer);
+    }
+      QSpacerItem*  spacer = new QSpacerItem( 20, 20, QSizePolicy::Minimum, QSizePolicy::Expanding );
+      m_Spacer = spacer;
+      m_GUI->layout()->addItem( m_Spacer );
 
   }
 

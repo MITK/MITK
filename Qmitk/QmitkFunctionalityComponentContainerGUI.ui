@@ -78,7 +78,7 @@
                 </property>
                 <widget class="QGroupBox">
                     <property name="name">
-                        <cstring>DataTreeNodeSelectorBox</cstring>
+                        <cstring>m_DataTreeNodeSelectorBox</cstring>
                     </property>
                     <property name="title">
                         <string>Select Data</string>
@@ -147,7 +147,7 @@
     <function returnType="QGroupBox *">GetContainerBorder()</function>
     <function returnType="QLayout *">GetContainerLayout()</function>
     <function returnType="QmitkDataTreeComboBox *">GetTreeNodeSelector()</function>
+    <function returnType="QGroupBox *">GetSelectDataGroupBox()</function>
 </functions>
 <layoutdefaults spacing="6" margin="11"/>
-
 </UI>

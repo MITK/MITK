@@ -22,7 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkCommon.h>
 #include <mitkInteractor.h>
 #include <mitkVector.h>
-#include <mitkImageAccessByItk.h>
+//#include <mitkImageAccessByItk.h>
 #include <mitkDataTreeNode.h>
 #include <mitkSeedsImage.h>
 

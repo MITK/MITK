@@ -1,6 +1,7 @@
 #include "CreatePOVMesh.h"
 #include <itksys/SystemTools.hxx>
 
+
 int vtkPolyDataToPovRayMesh2Test (int argc, char * argv[])
 {
   std::string fileOut = "ParameterizedMeshPOVWriterTest";
@@ -34,7 +35,7 @@ bool itkMeshToIndexedTriangleMeshFilterTest(std::string outFile)
 
   // Convert sphere to itk::Mesh
   MeshType::Pointer itkmesh = MeshType::New();
-  itkmesh = MeshUtilType::meshFromPolyData( mySphereSource->GetOutput() );
+  itkmesh = MeshUtilType::MeshFromPolyData( mySphereSource->GetOutput() );
   if ( ! itkmesh ) {
     std::cout << "Unable to convert test sphere to itk::Mesh" << std::endl;
     return EXIT_FAILURE;
@@ -57,7 +58,7 @@ bool itkMeshToIndexedTriangleMeshFilterTest(std::string outFile)
       std::cout << "Unable to convert mesh to Indexed triangle mesh" << std::endl;
       return EXIT_FAILURE;
     }
-    else std::cout << "Converted mesh to indeed triangle mesh." << std::endl;
+    else std::cout << "Converted mesh to indexed triangle mesh." << std::endl;
 
   // Try if conversation to itk::SphericalParameterizedTriangleMesh is possible;
   // (would allow the use of UV Coordinates)
@@ -70,7 +71,6 @@ bool itkMeshToIndexedTriangleMeshFilterTest(std::string outFile)
   writer->SetSubdivisionLevel(2);
   writer->SetTranslationInX(0);
   writer->SetTranslationInY(0);
-  writer->SetSSMFileName("NoSSMFile");
   writer->SetFilePrefix(outFile.c_str());
 
   if( writer->GetNumberOfInputs() < 1 )

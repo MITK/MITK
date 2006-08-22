@@ -239,14 +239,14 @@ mitk::SeedsImage::GetNit( SeedsImageType* image )
   {
     nit.SetRadius( m_Radius );
 
-    int i;
+    unsigned int i;
     for ( i = 0; i < nit.GetCenterNeighborhoodIndex()*2+1; ++i )
     {
       OffsetType offset = nit.GetOffset( i );
 
       typename GaussianFunctionType::InputType point;
       double dist = 0;
-      int d;
+      unsigned int d;
       for ( d = 0; d < SeedsImageType::ImageDimension; ++d )
       {
         point[d] = offset[d];

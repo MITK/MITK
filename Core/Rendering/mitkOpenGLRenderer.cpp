@@ -51,8 +51,13 @@ PURPOSE.  See the above copyright notices for more information.
 
 //##ModelId=3E33ECF301AD
 mitk::OpenGLRenderer::OpenGLRenderer( const char* name )
-  : BaseRenderer(name), m_VtkMapperPresent(false), m_VtkRenderer(NULL), 
-  m_LastUpdateVtkActorsTime(0), m_NewRenderer(true),  m_PixelMapGL(NULL), m_PixelMapGLValid(false)
+  : BaseRenderer(name), 
+  m_VtkMapperPresent(false), 
+  m_VtkRenderer(NULL),
+  m_NewRenderer(true),  
+  m_LastUpdateVtkActorsTime(0),   
+  m_PixelMapGL(NULL), 
+  m_PixelMapGLValid(false)
 {
   m_CameraController=NULL;//\*todo remove line
   m_CameraController = new VtkInteractorCameraController();

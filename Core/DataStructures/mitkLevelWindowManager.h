@@ -28,9 +28,9 @@ PURPOSE.  See the above copyright notices for more information.
 
   \brief Provides access to the mitkLevelWindowProperty object and mitkLevelWindow to the current image.
 
-  Changes on Level/Window can be set with SetLevelWindow() and will affect either the topmost Layer image,
-  if isAutoTopMost() returns true, or an image which is set by SetLevWinProp(LevelWindowProperty::Pointer levWinProp).
-  Changes on Level/Window, when another image gets active or by SetLevelWindow(const mitk::LevelWindow& levWin),
+  Changes on Level/Window can be set with SetLevelWindow() and will affect either the topmost layer image,
+  if isAutoTopMost() returns true, or an image which is set by SetLevelWindowProperty(LevelWindowProperty::Pointer levelWindowProperty).
+  Changes on Level/Window, when another image gets active or by SetLevelWindow(const mitk::LevelWindow& levelWindow),
   will be sent to all listeners by Modified().
 
   TreeChanged() listens to the DataTree for new or removed images. Depending on how m_AutoTopMost is set,

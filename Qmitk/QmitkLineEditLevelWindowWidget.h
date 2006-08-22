@@ -24,6 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 /**
   \class QmitkLineEditLevelWindowWidget QmitkLineEditLevelWindowWidget.h QmitkLineEditLevelWindowWidget.h
+  \ingroup Widgets
 
   \brief Provides a widget with two lineedit fields, one to change the window value of the current image and one to change the level value of the current image.
 

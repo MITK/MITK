@@ -25,6 +25,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 /**
   \class QmitkLevelWindowWidgetContextMenu QmitkLevelWindowWidgetContextMenu.h QmitkLevelWindowWidgetContextMenu.h
+  \ingroup Widgets
 
   \brief Provides a contextmenu for Level/Window functionality. Either creates a new contextmenu with standard functions or adds Level/Window standard functions to an predefined contextmenu.
 

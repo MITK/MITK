@@ -24,6 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 /**
   \class QmitkSliderLevelWindowWidget QmitkSliderLevelWindowWidget.h QmitkSliderLevelWindowWidget.h
+  \ingroup Widgets
 
   \brief Provides a widget with a slider to change the level and window value of the current image.
 

@@ -10,7 +10,6 @@
 #include "QmitkSliderLevelWindowWidget.h"
 
 //for constructor 
-
 void QmitkLevelWindowWidget::init() 
 {
   m_Manager = mitk::LevelWindowManager::New();
@@ -29,15 +28,7 @@ void QmitkLevelWindowWidget::setDataTree( mitk::DataTree* tree )
   m_Manager->SetDataTree(tree); 
 } 
 
-
-/// throws exception if no level window object available
-const mitk::LevelWindow& QmitkLevelWindowWidget::GetLevelWindow()
+mitk::LevelWindowManager* QmitkLevelWindowWidget::GetManager()
 {
-  return m_Manager->GetLevelWindow();
-}
-
-
-void QmitkLevelWindowWidget::SetLevelWindow( const mitk::LevelWindow & levWin )
-{
-  m_Manager->SetLevelWindow(levWin);
+  return m_Manager.GetPointer();
 }

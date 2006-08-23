@@ -156,13 +156,12 @@
     <variable>mitk::LevelWindowManager::Pointer m_Manager;</variable>
 </variables>
 <slots>
-    <slot>setDataTree( mitk::DataTree* tree )</slot>
-    <slot>SetLevelWindow( const mitk::LevelWindow &amp; levWin )</slot>
+    <slot>setDataTree( mitk::DataTree * tree )</slot>
 </slots>
 <functions>
     <function access="private" specifier="non virtual">init()</function>
     <function access="private" specifier="non virtual">destroy()</function>
-    <function specifier="non virtual" returnType="const mitk::LevelWindow &amp;">GetLevelWindow()</function>
+    <function specifier="non virtual" returnType="mitk::LevelWindowManager *">GetManager()</function>
 </functions>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

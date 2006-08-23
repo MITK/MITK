@@ -20,12 +20,8 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MAPPER2D_H_HEADER_INCLUDED_C1C5453B
 #define MAPPER2D_H_HEADER_INCLUDED_C1C5453B
 
-#include "mitkCommon.h"
 #include "mitkMapper.h"
 #include "mitkGeometry3D.h"
-#include "mitkDisplayGeometry.h"
-#include "mitkBaseRenderer.h"
-#include "mitkImageChannelSelector.h"
 
 namespace mitk {
 
@@ -41,8 +37,8 @@ namespace mitk {
 //## @ingroup Mapper
 class Mapper2D : public Mapper
 {
-public:
-	mitkClassMacro(Mapper2D,Mapper);
+  public:
+    mitkClassMacro(Mapper2D,Mapper);
 
     //##ModelId=3E3C45A0009E
     //##Documentation
@@ -50,9 +46,7 @@ public:
     //## @sa m_Geometry3D
     virtual void SetGeometry3D(const mitk::Geometry3D* aGeometry3D);
 
-	/** Method for creation through the object factory. */
-//	itkNewMacro(Self);
-protected:
+  protected:
     //##ModelId=3E3C46810341
     Mapper2D();
 

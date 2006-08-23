@@ -48,13 +48,13 @@ protected:
 
     vtkActor* m_PointActor;
 
-	vtkPolyDataMapper* m_PointMapper;
+    vtkPolyDataMapper* m_PointMapper;
 
-	vtkPolyData* m_PolyData;
-	vtkPoints* m_Points;
-	vtkCellArray* m_CellArray;
+    vtkPolyData* m_PolyData;
+    vtkPoints* m_Points;
+    vtkCellArray* m_CellArray;
 
-	float m_Radius;
+    float m_Radius;
 };
 
 

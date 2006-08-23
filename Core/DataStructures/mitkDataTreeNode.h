@@ -38,6 +38,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkStringProperty.h"
 #include "mitkColorProperty.h"
 #include "mitkPropertyList.h"
+#include "mitkMapper.h"
 
 #include <map>
 #include "mitkLevelWindow.h"

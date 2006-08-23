@@ -20,10 +20,9 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef BASEVTKMAPPER2D_H_HEADER_INCLUDED_C1C517D5
 #define BASEVTKMAPPER2D_H_HEADER_INCLUDED_C1C517D5
 
-#include "mitkCommon.h"
 #include "mitkMapper2D.h"
-#include <vtkProp.h>
-#include "mitkBaseRenderer.h"
+
+class vtkProp;
 
 namespace mitk {
 

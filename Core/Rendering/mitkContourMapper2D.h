@@ -21,14 +21,13 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITK_CONTOUR_MAPPER_2D_H_
 
 #include "mitkCommon.h"
-#include "mitkMapper2D.h"
-#include "mitkContour.h"
 #include "mitkGLMapper2D.h"
 #include "mitkDataTree.h"
 
 namespace mitk {
 
 class BaseRenderer;
+class Contour;
 
 /** 
  * @brief OpenGL-based mapper to display a mitk::Contour object in a 2D render window 
@@ -47,12 +46,12 @@ public:
     /**
      * reimplemented from Baseclass
      */
-    virtual void Paint(mitk::BaseRenderer * renderer);
+    virtual void Paint(BaseRenderer * renderer);
 
     /**
      * return a refernce of the rendered data object 
      */
-    const mitk::Contour * GetInput(void);
+    const Contour* GetInput(void);
 
 protected:
     ContourMapper2D();

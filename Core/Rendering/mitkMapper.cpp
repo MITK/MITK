@@ -40,6 +40,13 @@ mitk::BaseData* mitk::Mapper::GetData() const
   return m_DataTreeNode->GetData();
 }
 
+mitk::DataTreeNode* mitk::Mapper::GetDataTreeNode() const
+{
+  itkDebugMacro("returning DataTreeNode address " << this->m_DataTreeNode );
+  return this->m_DataTreeNode.GetPointer();
+} 
+
+
 //##ModelId=3EF17276014B
 bool mitk::Mapper::GetColor(float rgb[3], mitk::BaseRenderer* renderer, const char* name) const
 {

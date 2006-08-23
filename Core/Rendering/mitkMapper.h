@@ -28,9 +28,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk {
 
-class DataTreeNode;
 class BaseRenderer;
 class BaseData;
+class DataTreeNode;
 
 //##ModelId=3D6A0EE70237
 //##Documentation
@@ -46,10 +46,8 @@ class Mapper : public itk::Object, public XMLIO
 public:
     mitkClassMacro(Mapper, itk::Object);
 
-	/** Method for creation through the object factory. */
-	//   itkNewMacro(Self);  
 
-	//##ModelId=3E32E456028D
+    //##ModelId=3E32E456028D
     //##Documentation
     //## @brief Set the DataTreeNode containing the data to map
     itkSetObjectMacro(DataTreeNode, mitk::DataTreeNode);
@@ -65,7 +63,8 @@ public:
     //##ModelId=3E86B0EA00B0
     //##Documentation
     //## @brief Get the DataTreeNode containing the data to map
-    mitkGetObjectMacroConst(DataTreeNode, mitk::DataTreeNode);
+    virtual DataTreeNode* GetDataTreeNode() const;
+    
     //##ModelId=3EF17276014B
     //##Documentation
     //## @brief Convenience access method for color properties (instances of

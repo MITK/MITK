@@ -20,9 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MAPPER3D_H_HEADER_INCLUDED_C1C517B9
 #define MAPPER3D_H_HEADER_INCLUDED_C1C517B9
 
-#include "mitkCommon.h"
 #include "mitkMapper.h"
-#include "mitkImageChannelSelector.h"
 
 namespace mitk {
 
@@ -32,13 +30,10 @@ namespace mitk {
 //## @ingroup Mapper
 class Mapper3D : public Mapper
 {
-public:
-	mitkClassMacro(Mapper3D,Mapper);
+  public:
+    mitkClassMacro(Mapper3D,Mapper);
 
-	/** Method for creation through the object factory. */
-	//itkNewMacro(Self);
-
-protected:
+  protected:
     //##ModelId=3E3AE1C5010C
     Mapper3D();
 

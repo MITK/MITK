@@ -32,6 +32,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 class vtkRenderer;
 class vtkRenderWindow;
+class VtkRenderWindow;
 class vtkLight;
 class vtkLightKit;
 class vtkWorldPointPicker;

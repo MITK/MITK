@@ -322,7 +322,7 @@ void QmitkThresholdComponent::DeleteThresholdNode()
       mitk::DataTreeNode::Pointer node = iteratorClone->Get();
       if (  node == m_ThresholdImageNode )
       {
-        iteratorClone->Remove();
+        iteratorClone->Disconnect();
         m_ThresholdNodeExisting = false;
       }
       ++iteratorClone;

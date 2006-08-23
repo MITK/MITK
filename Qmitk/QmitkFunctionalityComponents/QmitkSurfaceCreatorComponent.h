@@ -21,6 +21,8 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITK_SURFACECREATORCOMPONENT_H
 
 #include "QmitkFunctionalityComponentContainer.h"
+#include <mitkColorSequence.h>
+
 class QmitkSurfaceCreatorComponentGUI;
 class QmitkStdMultiWidget;
 
@@ -114,8 +116,21 @@ public slots:
   /** \brief Slot method that will be called if the CheckBox at the TreeNodeSelector-Group-Box was toggled to show the TreeNodeSelector or not. */ 
   void ShowImageContent(bool show = true);
 
-  /** \brief Method is called when the DataTree was changed. This Method is 	self-evident obligatory */
+  /** \brief Method is called when the DataTree was changed. This Method is self-evident obligatory */
   virtual void TreeChanged();
+
+  /** \brief Method to set the threshold that is used to create the surface */
+  virtual void SetThreshold(int threshold);
+
+  /** \brief Method to set the threshold that is used to create the surface */
+  void SetThreshold(const QString& threshold);
+
+protected slots:
+
+  //----------------------------------------------------
+  /** \brief Method  to create a surface if the "create surface" button was pressed*/
+  void CreateSurface();
+  //----------------------------------------------------
 
 protected:
   /***************        ATTRIBUTES      ***************/
@@ -147,7 +162,6 @@ protected:
 
 private:
 
-
   /***************        ATTRIBUTES      ***************/
 
   /** \brief The created GUI from the .ui-File. This Attribute is	obligatory*/
@@ -155,6 +169,36 @@ private:
 
   /** \brief This Attribute holds the current ImageItem from the TreeNodeSelector if his selection was changed*/
   const mitk::DataTreeFilter::Item * m_SelectedImage; 
+
+  //----------------------------------------------------
+  /*!
+  * image which is used to create the surface
+  */
+  mitk::Image* m_MitkImage;
+
+  /*!
+  * read thresholdvalue from GUI and convert it to float
+  */
+  float getThreshold();
+
+  /*!
+  * iterator on current image
+  */
+  mitk::DataTreeIteratorClone m_MitkImageIterator;
+
+  /*!
+  *  variable to count Surfaces and hang it after the name in the DataTree 
+  */
+  int m_SurfaceCounter;
+
+  //SurfaceColor
+  float m_r;
+  float m_g;
+  float m_b;
+
+  mitk::Color m_Color;
+  mitk::ColorSequence* m_RainbowColor;
+  int m_Threshold;
 
 
 };

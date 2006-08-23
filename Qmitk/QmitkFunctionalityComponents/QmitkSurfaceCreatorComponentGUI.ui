@@ -8,8 +8,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>247</width>
-            <height>71</height>
+            <width>230</width>
+            <height>180</height>
         </rect>
     </property>
     <property name="minimumSize">
@@ -142,6 +142,110 @@
                         </widget>
                     </vbox>
                 </widget>
+                <widget class="QGroupBox">
+                    <property name="name">
+                        <cstring>m_CreateSurfaceGroupBox</cstring>
+                    </property>
+                    <property name="title">
+                        <string></string>
+                    </property>
+                    <vbox>
+                        <property name="name">
+                            <cstring>unnamed</cstring>
+                        </property>
+                        <widget class="QLayoutWidget">
+                            <property name="name">
+                                <cstring>layout4</cstring>
+                            </property>
+                            <hbox>
+                                <property name="name">
+                                    <cstring>unnamed</cstring>
+                                </property>
+                                <widget class="QLabel">
+                                    <property name="name">
+                                        <cstring>textLabel1</cstring>
+                                    </property>
+                                    <property name="text">
+                                        <string>Threshold</string>
+                                    </property>
+                                </widget>
+                                <spacer>
+                                    <property name="name">
+                                        <cstring>spacer2</cstring>
+                                    </property>
+                                    <property name="orientation">
+                                        <enum>Horizontal</enum>
+                                    </property>
+                                    <property name="sizeType">
+                                        <enum>Fixed</enum>
+                                    </property>
+                                    <property name="sizeHint">
+                                        <size>
+                                            <width>20</width>
+                                            <height>20</height>
+                                        </size>
+                                    </property>
+                                </spacer>
+                                <widget class="QLineEdit">
+                                    <property name="name">
+                                        <cstring>m_ThresholdLineEdit</cstring>
+                                    </property>
+                                    <property name="frameShape">
+                                        <enum>LineEditPanel</enum>
+                                    </property>
+                                    <property name="frameShadow">
+                                        <enum>Sunken</enum>
+                                    </property>
+                                    <property name="text">
+                                        <string>1</string>
+                                    </property>
+                                </widget>
+                            </hbox>
+                        </widget>
+                        <spacer>
+                            <property name="name">
+                                <cstring>spacer3</cstring>
+                            </property>
+                            <property name="orientation">
+                                <enum>Vertical</enum>
+                            </property>
+                            <property name="sizeType">
+                                <enum>Fixed</enum>
+                            </property>
+                            <property name="sizeHint">
+                                <size>
+                                    <width>20</width>
+                                    <height>16</height>
+                                </size>
+                            </property>
+                        </spacer>
+                        <widget class="QPushButton">
+                            <property name="name">
+                                <cstring>m_CreateSurfaceButton</cstring>
+                            </property>
+                            <property name="text">
+                                <string>Create Surface</string>
+                            </property>
+                        </widget>
+                        <spacer>
+                            <property name="name">
+                                <cstring>spacer4</cstring>
+                            </property>
+                            <property name="orientation">
+                                <enum>Vertical</enum>
+                            </property>
+                            <property name="sizeType">
+                                <enum>Fixed</enum>
+                            </property>
+                            <property name="sizeHint">
+                                <size>
+                                    <width>20</width>
+                                    <height>16</height>
+                                </size>
+                            </property>
+                        </spacer>
+                    </vbox>
+                </widget>
             </vbox>
         </widget>
     </vbox>
@@ -183,7 +287,12 @@
     <function returnType="QmitkDataTreeComboBox *">GetTreeNodeSelector()</function>
     <function returnType="QGroupBox *">GetSelectDataGroupBox()</function>
     <function returnType="QGroupBox *">GetImageContent()</function>
+    <function returnType="QGroupBox *">GetCreateSurfaceGroupBox()</function>
     <function returnType="QGroupBox *">GetSurfaceCreatorGroupBox()</function>
+    <function returnType="QPushButton *">GetCreateSurfaceButton()</function>
+    <function returnType="QLineEdit *">GetThresholdLineEdit()</function>
+    <function returnType="int">GetThreshold()</function>
+    <function>SetThreshold( int threshold )</function>
 </functions>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

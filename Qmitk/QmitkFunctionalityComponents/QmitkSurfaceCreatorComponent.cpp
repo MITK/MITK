@@ -19,25 +19,43 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkSurfaceCreatorComponentGUI.h"
 
 #include <QmitkDataTreeComboBox.h>
+#include "QmitkCommonFunctionality.h"
+#include "QmitkStdMultiWidget.h"
 
 #include "mitkRenderWindow.h"
 #include "mitkRenderingManager.h"
 #include "mitkProperties.h"
+#include <mitkColorSequenceRainbow.h>
+#include <mitkManualSegmentationToSurfaceFilter.h>
 
 #include <qlineedit.h>
 #include <qslider.h>
 #include <qgroupbox.h>
+#include <qapplication.h>
+#include <qcursor.h>
 
 
 /***************       CONSTRUCTOR      ***************/
-QmitkSurfaceCreatorComponent::QmitkSurfaceCreatorComponent(QObject *parent, const char *name, QmitkStdMultiWidget *mitkStdMultiWidget, mitk::DataTreeIteratorBase* it, bool updateSelector, bool showSelector)
+QmitkSurfaceCreatorComponent::QmitkSurfaceCreatorComponent(QObject *parent, const char *name, QmitkStdMultiWidget *mitkStdMultiWidget, mitk::DataTreeIteratorBase* it, bool updateSelector, bool showSelector):
+m_Name(name),
+m_MultiWidget(mitkStdMultiWidget),
+m_DataTreeIteratorClone(NULL),
+m_UpdateSelector(updateSelector),
+m_ShowSelector(showSelector),
+m_Active(false),
+m_GUI(NULL),
+m_SelectedImage(NULL),
+m_MitkImage(NULL),
+m_MitkImageIterator(NULL),
+m_SurfaceCounter(0),
+m_r(0.75),
+m_g(0.42),
+m_b(-0.75), 
+m_Threshold(1)
 {
   SetDataTreeIterator(it);
-  m_GUI = NULL;
-  m_MultiWidget= mitkStdMultiWidget;
-  m_Active = false;
-  m_UpdateSelector = updateSelector;
-  m_ShowSelector = showSelector;
+  m_Color.Set(1.0, 0.67, 0.0);
+  m_RainbowColor = new mitk::ColorSequenceRainbow();
 }
 
 /***************        DESTRUCTOR      ***************/
@@ -96,6 +114,9 @@ void QmitkSurfaceCreatorComponent::CreateConnections()
     connect( (QObject*)(m_GUI->GetTreeNodeSelector()), SIGNAL(activated(const mitk::DataTreeFilter::Item *)), (QObject*) this, SLOT(ImageSelected(const mitk::DataTreeFilter::Item *)));        
     connect( (QObject*)(m_GUI->GetSurfaceCreatorGroupBox()), SIGNAL(toggled(bool)), (QObject*) this, SLOT(ShowSurfaceCreatorContent(bool)));
     connect( (QObject*)(m_GUI->GetSelectDataGroupBox()), SIGNAL(toggled(bool)), (QObject*) this, SLOT(ShowImageContent(bool)));
+
+    connect( (QObject*)(m_GUI->GetCreateSurfaceButton()), SIGNAL(pressed()), (QObject*) this, SLOT(CreateSurface()));
+    connect( (QObject*)(m_GUI->GetThresholdLineEdit()), SIGNAL(returnPressed()), (QObject*) this, SLOT(CreateSurface()));
   }
 }
 
@@ -127,6 +148,17 @@ void QmitkSurfaceCreatorComponent::ImageSelected(const mitk::DataTreeFilter::Ite
     }
   }
   TreeChanged();
+
+  if(m_GUI)
+  {
+    mitk::DataTreeFilter* filter = m_GUI->GetTreeNodeSelector()->GetFilter();
+    m_MitkImageIterator = filter->GetIteratorToSelectedItem();
+    
+    if(m_MitkImageIterator.GetPointer())
+    {
+      m_MitkImage = static_cast<mitk::Image*> (m_MitkImageIterator->Get()->GetData());
+    }
+  }
 }
 
 /*************** CREATE CONTAINER WIDGET **************/
@@ -180,4 +212,107 @@ void QmitkSurfaceCreatorComponent::ShowSurfaceCreatorContent(bool)
 void QmitkSurfaceCreatorComponent::ShowImageContent(bool)
 {
   m_GUI->GetImageContent()->setShown(m_GUI->GetSelectDataGroupBox()->isChecked());
+}
+
+/****************************************************************************SURFACE CREATOR***************************************************************************/
+
+void QmitkSurfaceCreatorComponent::SetThreshold(int threshold)
+{
+  m_Threshold = threshold;
+  m_GUI->SetThreshold(threshold);
+}
+
+void QmitkSurfaceCreatorComponent::SetThreshold(const QString& threshold)
+{
+  m_GUI->SetThreshold(atoi(threshold));
+}
+
+///***************      CREATE SURFACE     **************/
+void QmitkSurfaceCreatorComponent::CreateSurface()
+{
+  QApplication::setOverrideCursor( QCursor(Qt::WaitCursor) );
+  if(m_MitkImage != NULL)
+  {
+  //Value Gauss
+  //float gsDev = 1.5;
+
+  //Value for DecimatePro 
+  float targetReduction = 0.05;
+
+  //ImageToSurface Instance
+  mitk::DataTreeIteratorClone  iteratorOnImageToBeSkinExtracted;
+  if(m_MitkImageIterator.IsNotNull())
+  {
+      
+    iteratorOnImageToBeSkinExtracted = m_MitkImageIterator;
+  }
+  else 
+  {
+    iteratorOnImageToBeSkinExtracted = CommonFunctionality::GetIteratorToFirstImage(m_DataTreeIterator.GetPointer());
+  }
+
+  mitk::ManualSegmentationToSurfaceFilter::Pointer filter = mitk::ManualSegmentationToSurfaceFilter::New();
+  if (filter.IsNull())
+  {
+    std::cout<<"NULL Pointer for ManualSegmentationToSurfaceFilter"<<std::endl;
+    return;
+  }
+
+  filter->SetInput( m_MitkImage );  
+  filter->SetStandardDeviation( 0.5 );
+  filter->SetUseStandardDeviation( true );
+  filter->SetThreshold( m_GUI->GetThreshold()); //if( Gauss ) --> TH manipulated for vtkMarchingCube
+  
+
+  filter->SetTargetReduction( targetReduction );
+
+  mitk::DataTreeNode::Pointer surfaceNode = mitk::DataTreeNode::New(); 
+  surfaceNode->SetData( filter->GetOutput() );
+  
+  int layer = 0;
+
+  ++m_SurfaceCounter;
+  std::ostringstream buffer;
+  buffer << m_SurfaceCounter;
+  std::string surfaceNodeName = "Surface " + buffer.str();
+
+  m_r += 0.25; if(m_r > 1){m_r = m_r - 1;}
+  m_g += 0.25; if(m_g > 1){m_g = m_g - 1;}
+  m_b += 0.25; if(m_b > 1){m_b = m_b - 1;}
+
+  iteratorOnImageToBeSkinExtracted->Get()->GetIntProperty("layer", layer);
+  mitk::DataTreeNodeFactory::SetDefaultSurfaceProperties(surfaceNode);
+  surfaceNode->SetIntProperty("layer", layer+1);
+  surfaceNode->SetProperty("Surface", new mitk::BoolProperty(true));
+  surfaceNode->SetProperty("name", new mitk::StringProperty(surfaceNodeName));
+  
+  
+  mitk::DataTreeIteratorClone iteratorClone = m_DataTreeIterator;
+  bool isSurface = false;
+
+  while(!(iteratorClone->IsAtEnd())&&(isSurface == false))
+  {
+    iteratorClone->Get()->GetBoolProperty("Surface", isSurface);
+    if(isSurface == false)
+    {
+      ++iteratorClone;
+    }
+  }
+   iteratorClone= iteratorOnImageToBeSkinExtracted;  
+   iteratorClone->Add(surfaceNode);
+   iteratorClone->GetTree()->Modified();
+
+
+  mitk::Surface::Pointer surface = filter->GetOutput();
+ 
+  //to show surfaceContur
+  m_Color = m_RainbowColor->GetNextColor();
+  surfaceNode->SetColor(m_Color);
+  surfaceNode->SetVisibility(true);
+
+  m_MultiWidget->RequestUpdate();
+
+  }//if m_MitkImage != NULL
+
+  QApplication::restoreOverrideCursor();
 }

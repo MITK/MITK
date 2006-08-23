@@ -9,7 +9,7 @@
             <x>0</x>
             <y>0</y>
             <width>255</width>
-            <height>409</height>
+            <height>132</height>
         </rect>
     </property>
     <property name="minimumSize">
@@ -476,7 +476,7 @@
                                                 <enum>Sunken</enum>
                                             </property>
                                             <property name="text">
-                                                <string>0</string>
+                                                <string>1</string>
                                             </property>
                                         </widget>
                                         <spacer>

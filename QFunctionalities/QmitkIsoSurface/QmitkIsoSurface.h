@@ -114,7 +114,7 @@ protected:
 
 
   /*!
-  * iterator on actual image
+  * iterator on current image
   */
    mitk::DataTreeIteratorClone m_MitkImageIterator;
 

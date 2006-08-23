@@ -31,6 +31,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkProperties.h>
 #include <mitkFocusManager.h>
 #include <mitkRenderingManager.h>
+#include <mitkRenderWindow.h>
 #include <mitkAffineInteractor.h>
 #include <QmitkSystemInfo.h>
 

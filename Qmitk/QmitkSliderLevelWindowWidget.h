@@ -88,6 +88,9 @@ public:
   /// sets the DataTree which holds all image-nodes
   void setDataTree(mitk::DataTree* tree);
 
+  /// returns the manager who is responsible to collect and deliver changes on Level/Window
+  mitk::LevelWindowManager* GetManager();
+
 private:
 
   /// creates the contextmenu for this widget from class QmitkLevelWindowWidgetContextMenu
@@ -136,15 +139,19 @@ protected:
   void paintEvent( QPaintEvent* e );
 
   /*!
-  * method implements the component behaviour -
-  * checks if cursor is on upper or lower bound of slider bar and changes cursor symbol -
-  * checks if left mouse button is pressed and CTRL is pressed and changes sliderbar in movedirection accordingly
+  * method implements the component behaviour
+  *
+  * checks if cursor is on upper or lower bound of slider bar and changes cursor symbol
+  *
+  * checks if left mouse button is pressed and if CTRL is pressed and changes sliderbar in movedirection accordingly
   */
   void mouseMoveEvent( QMouseEvent* mouseEvent );
 
   /*!
-  *	registers events when a mousebutton is pressed -
-  * if leftbutton is pressed m_Leftbutton is set to true,
+  *	registers events when a mousebutton is pressed
+  *
+  * if leftbutton is pressed m_Leftbutton is set to true
+  *
   * also checks if CTRL is pressed and sets the bool variable m_CtrlPressed
   */
   void mousePressEvent( QMouseEvent* mouseEvent );

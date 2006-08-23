@@ -467,3 +467,8 @@ void QmitkSliderLevelWindowWidget::setDataTree(mitk::DataTree* tree)
 {
   m_Manager->SetDataTree(tree);
 }
+
+mitk::LevelWindowManager* QmitkSliderLevelWindowWidget::GetManager()
+{
+  return m_Manager.GetPointer();
+}

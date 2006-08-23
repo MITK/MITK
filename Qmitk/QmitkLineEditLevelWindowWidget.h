@@ -60,6 +60,9 @@ public:
   /// sets the DataTree which holds all image-nodes
   void setDataTree( mitk::DataTree* tree );
 
+  /// returns the manager who is responsible to collect and deliver changes on Level/Window
+  mitk::LevelWindowManager* GetManager();
+
 private:
 
   /// creates the contextmenu for this widget from class QmitkLevelWindowWidgetContextMenu
@@ -68,14 +71,22 @@ private:
   /// change notifications from the mitkLevelWindowManager
   void OnPropertyModified(const itk::EventObject& e);
 
-  /// tests if new level + window/2 <= maxRange, if not level would be set to maxRange - window/2
-  /// tests if new level - window/2 >= maxRange, if not level would be set to minRange + window/2
-  /// window keeps its old value
+  /*!
+  * tests if new level + window/2 <= maxRange, if not level would be set to maxRange - window/2
+  *
+  * tests if new level - window/2 >= maxRange, if not level would be set to minRange + window/2
+  *
+  * window keeps its old value
+  */
   void validLevel();
 
-  /// tests if current level + window/2 <= maxRange, if not window/2 would be set to maxRange - level
-  /// tests if current level - window/2 >= minRange, if not window/2 would be set to level - minRange
-  /// level keeps its old value
+  /*!
+  * tests if current level + window/2 <= maxRange, if not window/2 would be set to maxRange - level
+  *
+  * tests if current level - window/2 >= minRange, if not window/2 would be set to level - minRange
+  *
+  * level keeps its old value
+  */
   void validWindow();
 
 public slots:
@@ -86,7 +97,7 @@ public slots:
   /// called when return is pressed in windowinput field
   void SetWindowValue();
   
-  /// validator to accept only possible values for Level/Window in lineedits
+  // validator to accept only possible values for Level/Window in lineedits
   //void setValidator();
 
 protected:

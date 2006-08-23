@@ -193,3 +193,8 @@ void QmitkLineEditLevelWindowWidget::validWindow()
   m_LevelWindow.SetWindow(window);
   m_Manager->SetLevelWindow(m_LevelWindow);
 }
+
+mitk::LevelWindowManager* QmitkLineEditLevelWindowWidget::GetManager()
+{
+  return m_Manager.GetPointer();
+}

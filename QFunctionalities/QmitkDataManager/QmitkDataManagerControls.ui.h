@@ -26,25 +26,23 @@ PURPOSE.  See the above copyright notices for more information.
 ** place of a destructor.
 *****************************************************************************/
 
-#include "QmitkCommonFunctionality.h"
+#include <QmitkCommonFunctionality.h>
 #include <utility>
-#include "mitkProperties.h"
-#include "mitkEventMapper.h"
-#include "mitkFocusManager.h"
-#include "mitkRenderingManager.h"
-#include "mitkRenderWindow.h"
-#include "mitkAffineInteractor.h"
+#include <mitkProperties.h>
+#include <mitkFocusManager.h>
+#include <mitkRenderingManager.h>
+#include <mitkAffineInteractor.h>
 #include <QmitkSystemInfo.h>
 
-#include "itkImage.h"
+#include <itkImage.h>
 
 #include <itksys/SystemTools.hxx>
 
-#include "ipPic/ipPic.h"
-#include "ipFunc/ipFunc.h"
+#include <ipPic/ipPic.h>
+#include <ipFunc/ipFunc.h>
 
-#include "mitkChiliPlugin.h"
-#include "mitkLightBoxResultImageWriter.h"
+#include <mitkChiliPlugin.h>
+#include <mitkLightBoxResultImageWriter.h>
 
 #include <qfiledialog.h>
 #include <qmessagebox.h>
@@ -124,21 +122,21 @@ void QmitkDataManagerControls::RemoveButtonClicked()
   QmitkDataTreeViewItem *selected = dynamic_cast<QmitkDataTreeViewItem*>(m_DataTreeView->selectedItem());
 
   switch(QMessageBox::question(this, tr("DataManager"), tr("Do you really want do delete this item?"),
-           QMessageBox::Yes | QMessageBox::Default, QMessageBox::No, QMessageBox::Cancel | QMessageBox::Escape)) 
-    {
-      case QMessageBox::Yes: //Remove the item from view and tree
-        if (selected)
-        {
-          mitk::DataTreeIteratorClone selectedIterator = selected->GetDataTreeIterator();
-          assert(selectedIterator.IsNotNull());
-          delete selected;
-          selectedIterator->Remove();
-          mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-        }
-        break;
-      case QMessageBox::No: break;
-      case QMessageBox::Cancel: break;
-    }
+        QMessageBox::Yes | QMessageBox::Default, QMessageBox::No, QMessageBox::Cancel | QMessageBox::Escape)) 
+  {
+    case QMessageBox::Yes: //Remove the item from view and tree
+      if (selected)
+      {
+        mitk::DataTreeIteratorClone selectedIterator = selected->GetDataTreeIterator();
+        assert(selectedIterator.IsNotNull());
+        delete selected;
+        selectedIterator->Remove();
+        mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+      }
+      break;
+    case QMessageBox::No: break;
+    case QMessageBox::Cancel: break;
+  }
 }
 
 void QmitkDataManagerControls::SaveButton_clicked()
@@ -174,9 +172,9 @@ void QmitkDataManagerControls::SaveLightBox_clicked()
   if(mitk::ChiliPlugin::IsPlugin()==false)
   {
     QMessageBox::critical( this, "Save Selected to LightBox",
-                           "Saving to LightBox not possible:\n"
-                           "This is not a plugin!! ... or the plugin is not correctly initialized!",
-                           QMessageBox::Cancel|QMessageBox::Default|QMessageBox::Escape,QMessageBox::NoButton );
+        "Saving to LightBox not possible:\n"
+        "This is not a plugin!! ... or the plugin is not correctly initialized!",
+        QMessageBox::Cancel|QMessageBox::Default|QMessageBox::Escape,QMessageBox::NoButton );
     return;
   }
 
@@ -203,8 +201,8 @@ void QmitkDataManagerControls::SaveLightBox_clicked()
             if(lbwriter->SetSourceByTreeSearch(selectedIterator)==false)
             {
               QMessageBox::critical( this, "Save Selected to LightBox",
-                                     "Saving to LightBox not possible:\n"
-                                     "Unable to find parent image that came from Chili.", QMessageBox::Cancel|QMessageBox::Default|QMessageBox::Escape,QMessageBox::NoButton );
+                  "Saving to LightBox not possible:\n"
+                  "Unable to find parent image that came from Chili.", QMessageBox::Cancel|QMessageBox::Default|QMessageBox::Escape,QMessageBox::NoButton );
               return;
             }
             lbwriter->SetLightBoxToCurrentLightBox();
@@ -341,7 +339,7 @@ void QmitkDataManagerControls::RendererChangeMulti()
   propNames.push_back("name");
   propNames.push_back("visible");
   propNames.push_back("color");
-propNames.push_back("opacity");
+  propNames.push_back("opacity");
   CommonFunctionality::DataTreeIteratorVector treeNodes;
   mitk::DataTreeIteratorClone it = m_DataTreeIterator;
   while (!it->IsAtEnd())
@@ -492,6 +490,6 @@ void QmitkDataManagerControls::GlobalReInit_clicked()
 void QmitkDataManagerControls::init()
 {
 #ifndef MBI_INTERNAL
-    m_AffineInteraction->hide();
+  m_AffineInteraction->hide();
 #endif
 }

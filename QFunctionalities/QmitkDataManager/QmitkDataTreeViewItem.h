@@ -24,15 +24,14 @@ PURPOSE.  See the above copyright notices for more information.
 
 class QWidget;
 #include <mitkDataTree.h>
-#include "itkCommand.h"
-#include "QmitkDataManagerControls.h"
+#include <QmitkDataManagerControls.h>
 class NodeViewPropertyItem;
 class NodeViewCheckboxItem;
 
 class QmitkDataTreeViewItem : public QListViewItem
 {
 
-	public:
+  public:
     QmitkDataTreeViewItem( QListView *parent, const QString &s1, const QString &s2, mitk::DataTreeIteratorBase * nodeIt );
     QmitkDataTreeViewItem( QmitkDataTreeViewItem * parent, mitk::DataTreeIteratorBase * nodeIt );
     virtual ~QmitkDataTreeViewItem() {}
@@ -40,7 +39,7 @@ class QmitkDataTreeViewItem : public QListViewItem
     mitk::DataTreeNode::Pointer GetDataTreeNode() const;
     mitk::DataTreeIteratorBase* GetDataTreeIterator() {return m_DataTreeIterator.GetPointer();}
 
-	protected:
+  protected:
     mitk::DataTreeNode::Pointer m_TreeNode;
     mitk::DataTreeIteratorClone m_DataTreeIterator;
 };

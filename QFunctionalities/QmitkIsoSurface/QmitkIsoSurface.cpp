@@ -16,32 +16,33 @@ PURPOSE.  See the above copyright notices for more information.
  
 =========================================================================*/
 
-#include "QmitkIsoSurface.h"
-#include "QmitkIsoSurfaceControls.h"//GUI
-#include "isoSurface.xpm" //image
+#include <QmitkIsoSurface.h>
+#include <QmitkIsoSurfaceControls.h>//GUI
+#include <isoSurface.xpm> //image
 
 //MITK-Elements
+#include <mitkSurface.h>
 #include <mitkManualSegmentationToSurfaceFilter.h>
 #include <mitkColorSequenceRainbow.h>
 
 //QMitk-Elements
-#include "QmitkCommonFunctionality.h"
-#include "QmitkSelectableGLWidget.h"
-#include "QmitkStdMultiWidget.h"
-#include "QmitkTreeNodeSelector.h"
+#include <QmitkCommonFunctionality.h>
+#include <QmitkSelectableGLWidget.h>
+#include <QmitkStdMultiWidget.h>
+#include <QmitkTreeNodeSelector.h>
 
 //QT-GUI-Elements
 #include <qaction.h>
 #include <qapplication.h>
 #include <qcursor.h>
 #include <qlineedit.h>
-#include "qpushbutton.h"
+#include <qpushbutton.h>
 
 #include <string.h>
 
 
-QmitkIsoSurface::QmitkIsoSurface(QObject *parent, const char *name, QmitkStdMultiWidget *mitkStdMultiWidget, mitk::DataTreeIteratorBase* it)
-    : QmitkFunctionality(parent, name, it) , m_MultiWidget(mitkStdMultiWidget), m_Controls(NULL)
+  QmitkIsoSurface::QmitkIsoSurface(QObject *parent, const char *name, QmitkStdMultiWidget *mitkStdMultiWidget, mitk::DataTreeIteratorBase* it)
+: QmitkFunctionality(parent, name, it) , m_MultiWidget(mitkStdMultiWidget), m_Controls(NULL)
 {
   SetAvailability(true);
   m_SurfaceCounter = 0;
@@ -111,84 +112,84 @@ void QmitkIsoSurface::CreateSurface()
   QApplication::setOverrideCursor( QCursor(Qt::WaitCursor) );
   if(m_MitkImage != NULL)
   {
-  //Value Gauss
-  //float gsDev = 1.5;
+    //Value Gauss
+    //float gsDev = 1.5;
 
-  //Value for DecimatePro 
-  float targetReduction = 0.05;
+    //Value for DecimatePro 
+    float targetReduction = 0.05;
 
-  //ImageToSurface Instance
-  mitk::DataTreeIteratorClone  iteratorOnImageToBeSkinExtracted;
-  if(m_MitkImageIterator.IsNotNull())
-  {
-      
-    iteratorOnImageToBeSkinExtracted = m_MitkImageIterator;
-  }
-  else 
-  {
-    iteratorOnImageToBeSkinExtracted = CommonFunctionality::GetIteratorToFirstImage(m_DataTreeIterator.GetPointer());
-  }
-
-  mitk::ManualSegmentationToSurfaceFilter::Pointer filter = mitk::ManualSegmentationToSurfaceFilter::New();
-  if (filter.IsNull())
-  {
-    std::cout<<"NULL Pointer for ManualSegmentationToSurfaceFilter"<<std::endl;
-    return;
-  }
-
-  filter->SetInput( m_MitkImage );  
-  filter->SetStandardDeviation( 0.5 );
-  filter->SetUseStandardDeviation( true );
-  filter->SetThreshold( getThreshold()); //if( Gauss ) --> TH manipulated for vtkMarchingCube
-  
-
-  filter->SetTargetReduction( targetReduction );
-
-  mitk::DataTreeNode::Pointer surfaceNode = mitk::DataTreeNode::New(); 
-  surfaceNode->SetData( filter->GetOutput() );
-  
-  int layer = 0;
-
-  ++m_SurfaceCounter;
-  std::ostringstream buffer;
-  buffer << m_SurfaceCounter;
-  std::string surfaceNodeName = "Surface " + buffer.str();
-
-  m_r += 0.25; if(m_r > 1){m_r = m_r - 1;}
-  m_g += 0.25; if(m_g > 1){m_g = m_g - 1;}
-  m_b += 0.25; if(m_b > 1){m_b = m_b - 1;}
-
-  iteratorOnImageToBeSkinExtracted->Get()->GetIntProperty("layer", layer);
-  mitk::DataTreeNodeFactory::SetDefaultSurfaceProperties(surfaceNode);
-  surfaceNode->SetIntProperty("layer", layer+1);
-  surfaceNode->SetProperty("Surface", new mitk::BoolProperty(true));
-  surfaceNode->SetProperty("name", new mitk::StringProperty(surfaceNodeName));
-  
-  
-  mitk::DataTreeIteratorClone iteratorClone = m_DataTreeIterator;
-  bool isSurface = false;
-
-  while(!(iteratorClone->IsAtEnd())&&(isSurface == false))
-  {
-    iteratorClone->Get()->GetBoolProperty("Surface", isSurface);
-    if(isSurface == false)
+    //ImageToSurface Instance
+    mitk::DataTreeIteratorClone  iteratorOnImageToBeSkinExtracted;
+    if(m_MitkImageIterator.IsNotNull())
     {
-      ++iteratorClone;
+
+      iteratorOnImageToBeSkinExtracted = m_MitkImageIterator;
     }
-  }
-   iteratorClone= iteratorOnImageToBeSkinExtracted;  
-   iteratorClone->Add(surfaceNode);
-   iteratorClone->GetTree()->Modified();
+    else 
+    {
+      iteratorOnImageToBeSkinExtracted = CommonFunctionality::GetIteratorToFirstImage(m_DataTreeIterator.GetPointer());
+    }
+
+    mitk::ManualSegmentationToSurfaceFilter::Pointer filter = mitk::ManualSegmentationToSurfaceFilter::New();
+    if (filter.IsNull())
+    {
+      std::cout<<"NULL Pointer for ManualSegmentationToSurfaceFilter"<<std::endl;
+      return;
+    }
+
+    filter->SetInput( m_MitkImage );  
+    filter->SetStandardDeviation( 0.5 );
+    filter->SetUseStandardDeviation( true );
+    filter->SetThreshold( getThreshold()); //if( Gauss ) --> TH manipulated for vtkMarchingCube
 
 
-  mitk::Surface::Pointer surface = filter->GetOutput();
- 
-  //to show surfaceContur
-  m_Color = m_RainbowColor->GetNextColor();
-  surfaceNode->SetColor(m_Color);
-  surfaceNode->SetVisibility(true);
+    filter->SetTargetReduction( targetReduction );
 
-  m_MultiWidget->RequestUpdate();
+    mitk::DataTreeNode::Pointer surfaceNode = mitk::DataTreeNode::New(); 
+    surfaceNode->SetData( filter->GetOutput() );
+
+    int layer = 0;
+
+    ++m_SurfaceCounter;
+    std::ostringstream buffer;
+    buffer << m_SurfaceCounter;
+    std::string surfaceNodeName = "Surface " + buffer.str();
+
+    m_r += 0.25; if(m_r > 1){m_r = m_r - 1;}
+    m_g += 0.25; if(m_g > 1){m_g = m_g - 1;}
+    m_b += 0.25; if(m_b > 1){m_b = m_b - 1;}
+
+    iteratorOnImageToBeSkinExtracted->Get()->GetIntProperty("layer", layer);
+    mitk::DataTreeNodeFactory::SetDefaultSurfaceProperties(surfaceNode);
+    surfaceNode->SetIntProperty("layer", layer+1);
+    surfaceNode->SetProperty("Surface", new mitk::BoolProperty(true));
+    surfaceNode->SetProperty("name", new mitk::StringProperty(surfaceNodeName));
+
+
+    mitk::DataTreeIteratorClone iteratorClone = m_DataTreeIterator;
+    bool isSurface = false;
+
+    while(!(iteratorClone->IsAtEnd())&&(isSurface == false))
+    {
+      iteratorClone->Get()->GetBoolProperty("Surface", isSurface);
+      if(isSurface == false)
+      {
+        ++iteratorClone;
+      }
+    }
+    iteratorClone= iteratorOnImageToBeSkinExtracted;  
+    iteratorClone->Add(surfaceNode);
+    iteratorClone->GetTree()->Modified();
+
+
+    mitk::Surface::Pointer surface = filter->GetOutput();
+
+    //to show surfaceContur
+    m_Color = m_RainbowColor->GetNextColor();
+    surfaceNode->SetColor(m_Color);
+    surfaceNode->SetVisibility(true);
+
+    m_MultiWidget->RequestUpdate();
 
   }//if m_MitkImage != NULL
 

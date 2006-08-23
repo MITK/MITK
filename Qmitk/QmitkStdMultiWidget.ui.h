@@ -431,21 +431,20 @@ void QmitkStdMultiWidget::Fit()
   vtkObject::SetGlobalWarningDisplay(w);
 }
 
-void QmitkStdMultiWidget::AddPositionTrackingPointSet(mitk::DataTreeIteratorBase* it)
+void QmitkStdMultiWidget::AddPositionTrackingPointSet(mitk::DataTreeIteratorBase* treeIterator)
 {
+  if (treeIterator) m_Tree = treeIterator->GetTree(); 
+
   //PoinSetNode for MouseOrientation
-  mitk::DataTreeNode::Pointer positonPointSetNode = mitk::DataTreeNode::New();
-  positonPointSetNode->SetProperty("name", new mitk::StringProperty("Mouse Position (&other Input Devices)"));
-  positonPointSetNode->SetData( mitk::PointSet::New() );
-  positonPointSetNode->SetColor(1.0,0.33,0.0);
-  positonPointSetNode->SetProperty("layer", new mitk::IntProperty(1001));
-  positonPointSetNode->SetProperty( "visible", new mitk::BoolProperty(true) );
-  positonPointSetNode->SetProperty( "inputdevice", new mitk::BoolProperty(true) );
-  positonPointSetNode->SetProperty( "PointThroughSliceInteraction", new mitk::IntProperty(0) );//point position 2D mouse
-  positonPointSetNode->SetProperty("baserenderer", new mitk::StringProperty("N/A"));
-  mitk::DataTreeIteratorClone dit = it;
-  dit->GoToChild();
-  dit->Add(positonPointSetNode);
+  m_PositionTrackerNode = mitk::DataTreeNode::New();
+  m_PositionTrackerNode->SetProperty("name", new mitk::StringProperty("Mouse Position"));
+  m_PositionTrackerNode->SetData( mitk::PointSet::New() );
+  m_PositionTrackerNode->SetColor(1.0,0.33,0.0);
+  m_PositionTrackerNode->SetProperty("layer", new mitk::IntProperty(1001));
+  m_PositionTrackerNode->SetProperty( "visible", new mitk::BoolProperty(true) );
+  m_PositionTrackerNode->SetProperty( "inputdevice", new mitk::BoolProperty(true) );
+  m_PositionTrackerNode->SetProperty( "PointThroughSliceInteraction", new mitk::IntProperty(0) );//point position 2D mouse
+  m_PositionTrackerNode->SetProperty("baserenderer", new mitk::StringProperty("N/A"));
   
 }
 void QmitkStdMultiWidget::AddDisplayPlaneSubTree(mitk::DataTreeIteratorBase* it)
@@ -728,6 +727,8 @@ void QmitkStdMultiWidget::EnablePositionTracking()
 
   if(globalInteraction)
   {
+     mitk::DataTreePreOrderIterator iterator(m_Tree);
+     iterator.Add( m_PositionTrackerNode);
      globalInteraction->AddListener(m_PositionTracker); 
   }
 }
@@ -738,6 +739,17 @@ void QmitkStdMultiWidget::DisablePositionTracking()
 
   if(globalInteraction)
   {
+    mitk::DataTreePreOrderIterator it(m_Tree);
+
+    while ( !it.IsAtEnd() )
+    {
+      if(it.Get() == m_PositionTrackerNode.GetPointer() )
+      {
+        it.Disconnect();
+      }
+      ++it;
+    }
+
     globalInteraction->RemoveListener(m_PositionTracker); 
   }
 }

@@ -1041,19 +1041,6 @@ void QmitkMainTemplate::viewShowPlanesAction_toggled( bool on )
 void QmitkMainTemplate::toolbarPositionOrientation_toggled( bool on )
 {
   //@brief Setting Input-Device (Mouse) Tracking - for Projection in other widgets
-  mitk::DataTreePreOrderIterator iterator(m_Tree);
-  mitk::DataTreeIteratorClone it = &iterator;
-  bool inputdevice= false;
-    
-  while ( !it->IsAtEnd() )
-  {
-    if(it->Get()->GetBoolProperty("inputdevice", inputdevice) && inputdevice )
-    {
-      it->Get()->SetVisibility(on);         
-    }
-    ++it;
-  }
-
   if(on)
     m_MultiWidget->EnablePositionTracking();
   else

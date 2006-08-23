@@ -175,6 +175,8 @@
     <variable>mitk::SliceNavigationController::Pointer timeNavigationController;</variable>
     <variable>mitk::CoordinateSupplier::Pointer m_LastLeftClickPositionSupplier;</variable>
     <variable>mitk::PositionTracker::Pointer m_PositionTracker;</variable>
+    <variable>mitk::DataTreeNode::Pointer m_PositionTrackerNode;</variable>
+    <variable>mitk::DataTreeBase::Pointer m_Tree;</variable>
     <variable>mitk::SlicesRotator* m_SlicesRotator;</variable>
     <variable>bool m_SlicesRotation;</variable>
     <variable>mitk::GradientBackground::Pointer m_GradientBackground1;</variable>
@@ -197,7 +199,7 @@
     <slot>SetData( mitk::DataTreeIteratorBase * it )</slot>
     <slot>Fit()</slot>
     <slot>AddDisplayPlaneSubTree( mitk::DataTreeIteratorBase * it )</slot>
-    <slot>AddPositionTrackingPointSet( mitk::DataTreeIteratorBase * it )</slot>
+    <slot>AddPositionTrackingPointSet(mitk::DataTreeIteratorBase* treeIterator)</slot>
     <slot>EnableStandardLevelWindow()</slot>
     <slot>DisableStandardLevelWindow()</slot>
     <slot returnType="bool">InitializeStandardViews( mitk::DataTreeIteratorBase * it )</slot>

@@ -782,7 +782,7 @@ int testMeshReadWrite()
 
 }
 
-int itkImageToTreeFilterTest(int /*i*/, char* argv[])
+int itkImageToTreeFilterTest(int /*i*/, char** /*argv[]*/)
 {
   ResultListType resultList;
   int failedCount = 0;
@@ -801,11 +801,16 @@ int itkImageToTreeFilterTest(int /*i*/, char* argv[])
   std::cout << " *** [ALL TESTS DONE] ***\n";
 
   testCount = resultList.size();
+  bool allSuccess = true;
 
   while (resultList.size() > 0)
   {
     int value = resultList.front();
-    if(value == EXIT_FAILURE) { failedCount++; }
+    if(value == EXIT_FAILURE) 
+    { 
+      failedCount++; 
+      allSuccess = false;
+    }
     resultList.pop_front();
   }
 
@@ -813,5 +818,12 @@ int itkImageToTreeFilterTest(int /*i*/, char* argv[])
 
   std::cout << "Result: " << failedCount << "/" << testCount << " Tests failed (" << failRatio << " %)" << std::endl;
 
-  return EXIT_SUCCESS;
+  if(allSuccess)
+  {
+    return EXIT_SUCCESS;
+  }
+  else 
+  {
+    return EXIT_FAILURE;
+  }
 }

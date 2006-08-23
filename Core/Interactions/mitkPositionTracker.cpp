@@ -1,22 +1,21 @@
-#include "mitkPositionTracker.h"
+#include <mitkPositionTracker.h>
 
 #include <mitkBaseRenderer.h>
 #include <mitkDataTree.h>
 #include <mitkDisplayPositionEvent.h>
-#include "mitkInteractionConst.h"
+#include <mitkInteractionConst.h>
 #include <mitkPointSet.h>
 #include <mitkRenderingManager.h>
 #include <mitkVector.h> // for PointDataType 
 
 
-mitk::PositionTracker::PositionTracker(const char * type, mitk::OperationActor* operationActor)
+mitk::PositionTracker::PositionTracker(const char * type, mitk::OperationActor* /*operationActor*/)
 : mitk::StateMachine(type)
 {}
 
 
 bool mitk::PositionTracker::ExecuteAction(Action* action, mitk::StateEvent const* stateEvent)
  {
-//  std::cout<<"PositionTracker";
   bool ok = false;
 	
   const DisplayPositionEvent* displayPositionEvent = dynamic_cast<const DisplayPositionEvent*>(stateEvent->GetEvent());

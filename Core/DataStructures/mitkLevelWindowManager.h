@@ -56,8 +56,11 @@ namespace mitk
     /// sets the topmost layer image to be affected by changes
     void SetAutoTopMostImage();
 
-    /// sets an specific LevelWindowProperty, all changes will affect the image belonging to this property.
-    /// sets m_AutoTopMost to false
+    /*!
+    * sets an specific LevelWindowProperty, all changes will affect the image belonging to this property.
+    *
+    * sets m_AutoTopMost to false
+    */
     void SetLevelWindowProperty(LevelWindowProperty::Pointer levelWindowProperty);
 
     /// sets new Level/Window values and informs all listeners about changes

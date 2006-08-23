@@ -65,8 +65,11 @@ public:
   /// with the integernumber representing the image for the contextmenu
   std::map<int, mitk::LevelWindowProperty::Pointer> m_Images;
 
-  /// returns the contextmenu with standard functions for Level/Window
-  /// input is a prefilled contextmenu to which standard functions will be added
+  /*!
+  * returns the contextmenu with standard functions for Level/Window
+  *
+  * input is a prefilled contextmenu to which standard functions will be added
+  */
   void getContextMenu(QPopupMenu* contextmenu);
 
   /// returns the contextmenu with standard functions for Level/Window

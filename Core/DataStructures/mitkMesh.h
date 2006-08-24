@@ -21,12 +21,11 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITKMESH_H_HEADER_INCLUDED
 
 #include "mitkPointSet.h"
-
-
 #include <vtkCellArray.h>
 #include <vtkFloatArray.h>
 #include <vtkPointData.h>
 #include <vtkPolyData.h>
+#include <itkPolygonCell.h>
 #if (VTK_MAJOR_VERSION >= 5)
 #include <vtkType.h>
 #else

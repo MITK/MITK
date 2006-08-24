@@ -23,13 +23,13 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkCommon.h>
 #include <mitkVector.h>
 #include <mitkBaseData.h>
-#include <itkPoint.h>
+//#include <itkPoint.h>
 #include <itkPointSet.h>
-#include <itkCovariantVector.h>
+//#include <itkCovariantVector.h>
 #include <itkMesh.h>
 #include <itkDefaultDynamicMeshTraits.h>
-#include <itkPolygonCell.h>
-#include <itkEventObject.h>
+//#include <itkPolygonCell.h>
+//#include <itkEventObject.h>
 
 const unsigned int PointDimension = 3;
 const unsigned int MaxTopologicalDimension = 3;

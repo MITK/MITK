@@ -38,6 +38,9 @@ class Image;
 *
 * @ingroup IO
 * @ingroup Chili
+* 
+* itk::BaseProcess inputs: 1. image to store in database
+*                          2. sample image, that is already in the database and has the same dimensions as 1.
 */
 class LightBoxResultImageWriter : public BaseProcess
 {

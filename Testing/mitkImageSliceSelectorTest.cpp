@@ -17,10 +17,10 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 
-#include "mitkImage.h"
-#include "mitkDataTreeNodeFactory.h"
-#include "mitkCylindricToCartesianFilter.h"
-#include "mitkImageSliceSelector.h"
+#include <mitkImage.h>
+#include <mitkDataTreeNodeFactory.h>
+#include <mitkCylindricToCartesianFilter.h>
+#include <mitkImageSliceSelector.h>
 #include <itksys/SystemTools.hxx>
 
 #include <fstream>
@@ -37,6 +37,7 @@ int mitkImageSliceSelectorTest(int argc, char* argv[])
   mitk::DataTreeNodeFactory::Pointer factory = mitk::DataTreeNodeFactory::New();
   try
   {
+    std::cout<<argv[1]<<std::endl;
     factory->SetFileName( argv[1] );
     factory->Update();
 
@@ -64,10 +65,10 @@ int mitkImageSliceSelectorTest(int argc, char* argv[])
     slice_nr = 0;
 
   //Take a slice
-	mitk::ImageSliceSelector::Pointer slice = mitk::ImageSliceSelector::New();
-	  slice->SetInput(image);
-	  slice->SetSliceNr(slice_nr);
-	  slice->Update();
+  mitk::ImageSliceSelector::Pointer slice = mitk::ImageSliceSelector::New();
+  slice->SetInput(image);
+  slice->SetSliceNr(slice_nr);
+  slice->Update();
 
   std::cout << "Testing IsInitialized(): ";
   if(slice->GetOutput()->IsInitialized()==false)
@@ -112,19 +113,19 @@ int mitkImageSliceSelectorTest(int argc, char* argv[])
     std::cout << "Testing another, smaller (!!) input with the same slice-selector(): ";
     //Use CylindricToCartesianFilter
     mitk::CylindricToCartesianFilter::Pointer cyl2cart = mitk::CylindricToCartesianFilter::New();
-      cyl2cart->SetInput(image);
-      //the output size of this filter is smaller than the of the input!!
-      cyl2cart->SetTargetXSize( 64 );
+    cyl2cart->SetInput(image);
+    //the output size of this filter is smaller than the of the input!!
+    cyl2cart->SetTargetXSize( 64 );
 
     //Use the same slice-selector again, this time to take a slice of the filtered image
-      //which is smaller than the one of the old input!!
+    //which is smaller than the one of the old input!!
     slice->SetInput(cyl2cart->GetOutput());
-      slice->SetSliceNr(1);
+    slice->SetSliceNr(1);
 
-      //The requested region is still the old one, 	 
-      //therefore the following results in most ITK versions
-      //in an exception!
-      slice->Update();
+    //The requested region is still the old one, 	 
+    //therefore the following results in most ITK versions
+    //in an exception!
+    slice->Update();
 
     //If no exception occured, check that the requested region is now 
     //the one of the smaller image
@@ -153,7 +154,7 @@ int mitkImageSliceSelectorTest(int argc, char* argv[])
 
   try
   {
-	  slice->UpdateLargestPossibleRegion();
+    slice->UpdateLargestPossibleRegion();
   }
   catch ( itk::ExceptionObject )
   {
@@ -183,7 +184,7 @@ int mitkImageSliceSelectorTest(int argc, char* argv[])
     int time=image->GetDimension(3)-1;
 
     std::cout << "Testing 3D+t: Setting time to " << time << ": ";
-	  slice->SetTimeNr(time);
+    slice->SetTimeNr(time);
     if(slice->GetTimeNr()!=time)
     {
       std::cout<<"[FAILED]"<<std::endl;

@@ -23,6 +23,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkInteractionConst.h"
 #include "mitkInteractor.h"
 #include "mitkTransition.h"
+#include "mitkOperationEvent.h"
+#include "mitkStateEvent.h"
+#include "mitkAction.h"
+#include "mitkUndoController.h"
 #include <itkMacro.h>
 #include <mitkXMLWriter.h>
 #include <mitkXMLReader.h>

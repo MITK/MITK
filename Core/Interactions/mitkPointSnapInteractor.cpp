@@ -20,6 +20,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkPointSet.h>
 #include <mitkPointOperation.h>
 #include <mitkPositionEvent.h>
+#include <mitkStateEvent.h>
+#include <mitkOperationEvent.h>
+#include <mitkUndoController.h>
 #include <mitkDataTreeNode.h>
 #include <mitkInteractionConst.h>
 #include <mitkAction.h>

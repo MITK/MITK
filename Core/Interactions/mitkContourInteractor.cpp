@@ -11,6 +11,7 @@
 #include <mitkPositionEvent.h>
 #include <mitkInteractionConst.h>
 #include <mitkPositionEvent.h>
+#include <mitkStateEvent.h>
 #include <mitkOpenGLRenderer.h>
 
 #include <vtkRenderer.h>

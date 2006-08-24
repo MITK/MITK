@@ -19,6 +19,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkHierarchicalInteractor.h"
 #include "mitkAction.h"
+#include "mitkStateEvent.h"
+#include "mitkState.h"
 #include "mitkInteractionConst.h"
 #include <mitkProperties.h>
 #include <mitkEventMapper.h>

@@ -3,8 +3,8 @@
 #include <mitkContour.h>
 #include <mitkExtrudedContour.h>
 
-//#include "ipSegmentation.h"
-//#include "mitkDataTreeNode.h"
+#include <mitkStateEvent.h>
+#include <mitkUndoController.h>
 #include <mitkProperties.h>
 #include <mitkStringProperty.h>
 #include <mitkPointOperation.h>

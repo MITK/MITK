@@ -23,6 +23,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkPositionEvent.h>
 #include <mitkGeometry3D.h>
 #include <mitkAction.h>
+#include <mitkOperationEvent.h>
+#include <mitkStateEvent.h>
+#include <mitkState.h>
+#include <mitkUndoController.h>
 #include <mitkStatusBar.h>
 #include <vtkCamera.h>
 #include <vtkRenderer.h>

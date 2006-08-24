@@ -20,6 +20,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkPolygonInteractor.h"
 #include <mitkInteractionConst.h>
 #include <mitkPositionEvent.h>
+#include <mitkOperationEvent.h>
+#include <mitkUndoController.h>
 #include <mitkLineOperation.h>
 #include <mitkDataTreeNode.h>
 #include <mitkMesh.h>
@@ -43,27 +45,27 @@ mitk::PolygonInteractor::~PolygonInteractor()
 void mitk::PolygonInteractor::DeselectAllCells()  
 {
   mitk::Mesh* mesh = dynamic_cast<mitk::Mesh*>(m_DataTreeNode->GetData());
-	if (mesh == NULL)
-		return;
+  if (mesh == NULL)
+    return;
 
   //deselect cells
   mitk::Mesh::DataType *itkMesh = mesh->GetMesh(); 
   mitk::Mesh::CellDataIterator cellDataIt, cellDataEnd;
   cellDataEnd = itkMesh->GetCellData()->End();
   for (cellDataIt = itkMesh->GetCellData()->Begin(); cellDataIt != cellDataEnd; cellDataIt++)
-	{
+  {
     if ( cellDataIt->Value().selected )
-		{
+    {
       mitk::LineOperation* doOp = new mitk::LineOperation(OpDESELECTCELL, cellDataIt->Index());
-			if (m_UndoEnabled)
-			{
-				mitk::LineOperation* undoOp = new mitk::LineOperation(OpSELECTCELL, cellDataIt->Index());
-				OperationEvent *operationEvent = new OperationEvent(mesh, doOp, undoOp);
-				m_UndoController->SetOperationEvent(operationEvent);
-			}
-			mesh->ExecuteOperation(doOp);
-		}
-	}
+      if (m_UndoEnabled)
+      {
+        mitk::LineOperation* undoOp = new mitk::LineOperation(OpSELECTCELL, cellDataIt->Index());
+        OperationEvent *operationEvent = new OperationEvent(mesh, doOp, undoOp);
+        m_UndoController->SetOperationEvent(operationEvent);
+      }
+      mesh->ExecuteOperation(doOp);
+    }
+  }
 }
 
 float mitk::PolygonInteractor::CalculateJurisdiction(StateEvent const* stateEvent) const
@@ -85,11 +87,11 @@ bool mitk::PolygonInteractor::ExecuteAction( Action* action, mitk::StateEvent co
   
   //checking corresponding Data; has to be a PointSet or a subclass
   mitk::Mesh* mesh = dynamic_cast<mitk::Mesh*>(m_DataTreeNode->GetData());
-	if (mesh == NULL)
-		return false;
+  if (mesh == NULL)
+    return false;
 
   switch (action->GetActionId())
-	{
+  {
   case AcINITNEWOBJECT:
     //Set a Property so that a BoundingBox is drawn arround the Polygon if selected
     {
@@ -104,13 +106,13 @@ bool mitk::PolygonInteractor::ExecuteAction( Action* action, mitk::StateEvent co
     {
       int cellId = mesh->SearchSelectedCell();
       LineOperation* lineDoOp = new mitk::LineOperation(OpCLOSECELL, cellId);
-		  if (m_UndoEnabled)
-		  {
-		  	LineOperation* lineUndoOp = new mitk::LineOperation(OpOPENCELL, cellId);
-			  OperationEvent *operationEvent = new OperationEvent(mesh, lineDoOp, lineUndoOp);
-			  m_UndoController->SetOperationEvent(operationEvent);
-		  }
-		  //execute the Operation
+      if (m_UndoEnabled)
+      {
+        LineOperation* lineUndoOp = new mitk::LineOperation(OpOPENCELL, cellId);
+        OperationEvent *operationEvent = new OperationEvent(mesh, lineDoOp, lineUndoOp);
+        m_UndoController->SetOperationEvent(operationEvent);
+      }
+      //execute the Operation
       mesh->ExecuteOperation(lineDoOp );
     }
     ok = true;

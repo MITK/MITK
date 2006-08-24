@@ -21,6 +21,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkOperation.h"
 #include "mitkDisplayCoordinateOperation.h"
 #include "mitkDisplayPositionEvent.h"
+#include "mitkUndoController.h"
+#include "mitkStateEvent.h"
 #include "mitkInteractionConst.h"
 #include "mitkAction.h"
 

@@ -32,6 +32,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkCuboid.h>
 #include <mitkProperties.h>
 #include <mitkGlobalInteraction.h>
+#include <mitkUndoController.h>
 #include <mitkBoundingObjectCutter.h>
 #include <mitkDataTreeHelper.h>
 

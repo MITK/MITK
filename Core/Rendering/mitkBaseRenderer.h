@@ -27,6 +27,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkGeometry2DData.h"
 #include <itkSmartPointerForwardReference.h>
 #include "mitkEventTypedefs.h"
+#include <set>
 
 
 namespace mitk {

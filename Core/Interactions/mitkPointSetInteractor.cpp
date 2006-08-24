@@ -25,6 +25,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkDataTreeNode.h>
 #include <mitkInteractionConst.h>
 #include "mitkAction.h"
+#include "mitkStateEvent.h"
+#include "mitkOperationEvent.h"
+#include "mitkUndoController.h"
 #include <mitkStateMachineFactory.h>
 #include <mitkStateTransitionOperation.h>
 

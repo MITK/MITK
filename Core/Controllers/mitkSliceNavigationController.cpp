@@ -24,6 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkPlaneGeometry.h>
 #include <mitkOperation.h>
 #include <mitkOperationActor.h>
+#include <mitkStateEvent.h>
 #include <mitkPositionEvent.h>
 #include <mitkInteractionConst.h>
 #include <mitkAction.h>

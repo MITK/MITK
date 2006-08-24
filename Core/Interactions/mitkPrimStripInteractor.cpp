@@ -20,6 +20,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkPrimStripInteractor.h"
 #include <mitkInteractionConst.h>
 #include <mitkPositionEvent.h>
+#include <mitkState.h>
+#include <mitkStateEvent.h>
+#include <mitkUndoController.h>
 #include <mitkDataTreeNode.h>
 #include <mitkMesh.h>
 #include <vtkLinearTransform.h>
@@ -69,8 +72,8 @@ float mitk::PrimStripInteractor::CalculateJurisdiction(StateEvent const* stateEv
 
   //check on the right data-type
   mitk::Mesh* mesh = dynamic_cast<mitk::Mesh*>(m_DataTreeNode->GetData());
-	if (mesh == NULL)
-		return false;
+  if (mesh == NULL)
+    return false;
 
 
   //go throgh all cells and get the BoundingBox:
@@ -133,11 +136,11 @@ bool mitk::PrimStripInteractor::ExecuteAction(Action* action, mitk::StateEvent c
   
   //checking corresponding Data; has to be a PointSet or a subclass
   mitk::Mesh* mesh = dynamic_cast<mitk::Mesh*>(m_DataTreeNode->GetData());
-	if (mesh == NULL)
-		return false;
+  if (mesh == NULL)
+    return false;
 
   switch (action->GetActionId())
-	{
+  {
   case AcINITNEWOBJECT:
     {
       //get the next cellId and set m_CurrentCellId
@@ -145,12 +148,12 @@ bool mitk::PrimStripInteractor::ExecuteAction(Action* action, mitk::StateEvent c
 
       //now reserv a new cell in m_ItkData
       LineOperation* doOp = new mitk::LineOperation(OpNEWCELL, m_CurrentCellId);
-		  if (m_UndoEnabled)
-		  {
-			  LineOperation* undoOp = new mitk::LineOperation(OpDELETECELL, m_CurrentCellId);
-			  OperationEvent *operationEvent = new OperationEvent(mesh, doOp, undoOp, "Add cell");
-			  m_UndoController->SetOperationEvent(operationEvent);
-		  }
+      if (m_UndoEnabled)
+      {
+        LineOperation* undoOp = new mitk::LineOperation(OpDELETECELL, m_CurrentCellId);
+        OperationEvent *operationEvent = new OperationEvent(mesh, doOp, undoOp, "Add cell");
+        m_UndoController->SetOperationEvent(operationEvent);
+      }
       mesh->ExecuteOperation(doOp);
     }
     ok = true;
@@ -159,7 +162,7 @@ bool mitk::PrimStripInteractor::ExecuteAction(Action* action, mitk::StateEvent c
     //check, if a line is hit
     {
       mitk::PositionEvent const  *posEvent = dynamic_cast <const mitk::PositionEvent *> (stateEvent->GetEvent());
-			if (posEvent == NULL)
+      if (posEvent == NULL)
         return false;
 
       mitk::Point3D worldPoint = posEvent->GetWorldPosition();
@@ -182,19 +185,19 @@ bool mitk::PrimStripInteractor::ExecuteAction(Action* action, mitk::StateEvent c
         ok = true;
       }
       else
-		  {
-			  //new Event with information NO
+      {
+        //new Event with information NO
         mitk::StateEvent* newStateEvent = new mitk::StateEvent(EIDNO, stateEvent->GetEvent());
         this->HandleEvent( newStateEvent );
-			  ok = true;
-			}
+        ok = true;
+      }
     }
     break;
   case AcCHECKBOUNDINGBOX:
     //check if the MousePosition lies inside the BoundingBox of the current Cell
     {
       mitk::PositionEvent const  *posEvent = dynamic_cast <const mitk::PositionEvent *> (stateEvent->GetEvent());
-  		if (posEvent == NULL) 
+      if (posEvent == NULL) 
         return false;
 
       mitk::Point3D worldPoint = posEvent->GetWorldPosition();
@@ -224,7 +227,7 @@ bool mitk::PrimStripInteractor::ExecuteAction(Action* action, mitk::StateEvent c
       //picking if this object is hit. then set the m_CurrentCellId Variable
       //this object is hit, if the transmitted position of the event is hitting a point or a line of that cell
       mitk::PositionEvent const  *posEvent = dynamic_cast <const mitk::PositionEvent *> (stateEvent->GetEvent());
-  		if (posEvent == NULL) 
+      if (posEvent == NULL) 
         return false;
 
       //var's for EvaluatePosition
@@ -258,12 +261,12 @@ bool mitk::PrimStripInteractor::ExecuteAction(Action* action, mitk::StateEvent c
   case AcSELECTCELL:
     {
       LineOperation* lineDoOp = new mitk::LineOperation(OpSELECTCELL, m_CurrentCellId);
-		  if (m_UndoEnabled)
-		  {
-		  	LineOperation* lineUndoOp = new mitk::LineOperation(OpDESELECTCELL, m_CurrentCellId);
-			  OperationEvent *operationEvent = new OperationEvent(mesh, lineDoOp, lineUndoOp);
-			  m_UndoController->SetOperationEvent(operationEvent);
-		  }
+      if (m_UndoEnabled)
+      {
+        LineOperation* lineUndoOp = new mitk::LineOperation(OpDESELECTCELL, m_CurrentCellId);
+        OperationEvent *operationEvent = new OperationEvent(mesh, lineDoOp, lineUndoOp);
+        m_UndoController->SetOperationEvent(operationEvent);
+      }
       mesh->ExecuteOperation(lineDoOp );
     }
     ok = true;
@@ -274,12 +277,12 @@ bool mitk::PrimStripInteractor::ExecuteAction(Action* action, mitk::StateEvent c
       if (mesh->GetNumberOfCells()>0)
       {
         LineOperation* lineDoOp = new mitk::LineOperation(OpDESELECTCELL, m_CurrentCellId);
-		    if (m_UndoEnabled)
-		    {
-		  	  LineOperation* lineUndoOp = new mitk::LineOperation(OpSELECTCELL, m_CurrentCellId);
-			    OperationEvent *operationEvent = new OperationEvent(mesh, lineDoOp, lineUndoOp);
-			    m_UndoController->SetOperationEvent(operationEvent);
-		    }
+        if (m_UndoEnabled)
+        {
+          LineOperation* lineUndoOp = new mitk::LineOperation(OpSELECTCELL, m_CurrentCellId);
+          OperationEvent *operationEvent = new OperationEvent(mesh, lineDoOp, lineUndoOp);
+          m_UndoController->SetOperationEvent(operationEvent);
+        }
         mesh->ExecuteOperation(lineDoOp );
       }
     }
@@ -289,7 +292,7 @@ bool mitk::PrimStripInteractor::ExecuteAction(Action* action, mitk::StateEvent c
     //prepare everything for movement of one cell
     {
       mitk::PositionEvent const  *posEvent = dynamic_cast <const mitk::PositionEvent *> (stateEvent->GetEvent());
-		  if (posEvent == NULL)
+      if (posEvent == NULL)
         return false;
     
       //start of the Movement is stored to calculate the undoCoordinate in FinishMovement
@@ -302,7 +305,7 @@ bool mitk::PrimStripInteractor::ExecuteAction(Action* action, mitk::StateEvent c
     //move the cell without undo
     {
       mitk::PositionEvent const  *posEvent = dynamic_cast <const mitk::PositionEvent *> (stateEvent->GetEvent());
-	  	if (posEvent == NULL)
+      if (posEvent == NULL)
         return false;
 
       mitk::Point3D newPoint = posEvent->GetWorldPosition();
@@ -316,7 +319,7 @@ bool mitk::PrimStripInteractor::ExecuteAction(Action* action, mitk::StateEvent c
       
       //execute the Operation
       //here no undo is stored. only the start and the end is stored for undo.
-		  mesh->ExecuteOperation(doOp);
+      mesh->ExecuteOperation(doOp);
     }
     ok = true;
     break;
@@ -324,7 +327,7 @@ bool mitk::PrimStripInteractor::ExecuteAction(Action* action, mitk::StateEvent c
     //move the cell to the final position and send undo-information
     {
       mitk::PositionEvent const *posEvent = dynamic_cast <const mitk::PositionEvent *> (stateEvent->GetEvent());
-		  if (posEvent == NULL)
+      if (posEvent == NULL)
         return false;
 
       //finish the movement:
@@ -334,15 +337,15 @@ bool mitk::PrimStripInteractor::ExecuteAction(Action* action, mitk::StateEvent c
       Vector3D vector = newPoint - m_OldPoint;
 
       CellOperation* doOp = new mitk::CellOperation(OpMOVECELL, m_CurrentCellId, vector);
-	    if ( m_UndoEnabled )
+      if ( m_UndoEnabled )
       {
         Vector3D vectorBack = m_MovementStart - newPoint;
         CellOperation* undoOp = new mitk::CellOperation(OpMOVECELL, m_CurrentCellId, vectorBack);
         OperationEvent *operationEvent = new OperationEvent(m_DataTreeNode->GetData(), doOp, undoOp, "Move cell");
         m_UndoController->SetOperationEvent(operationEvent);
       }
-		  //execute the Operation
-		  m_DataTreeNode->GetData()->ExecuteOperation(doOp);
+      //execute the Operation
+      m_DataTreeNode->GetData()->ExecuteOperation(doOp);
     }
     ok = true;
     break;
@@ -360,15 +363,15 @@ bool mitk::PrimStripInteractor::ExecuteAction(Action* action, mitk::StateEvent c
         PointOperation* doOp = new mitk::PointOperation(OpSETPOINTTYPE, point, position, true, PTSTART);
 
         //Undo
-      	if (m_UndoEnabled)	//write to UndoMechanism
+        if (m_UndoEnabled)  //write to UndoMechanism
         {
-	        PointOperation* undoOp = new mitk::PointOperation(OpSETPOINTTYPE, point, position, true, PTUNDEFINED);
-	        OperationEvent *operationEvent = new OperationEvent(mesh, doOp, undoOp, "Set start point");
-	        m_UndoController->SetOperationEvent(operationEvent);
-	      }
+          PointOperation* undoOp = new mitk::PointOperation(OpSETPOINTTYPE, point, position, true, PTUNDEFINED);
+          OperationEvent *operationEvent = new OperationEvent(mesh, doOp, undoOp, "Set start point");
+          m_UndoController->SetOperationEvent(operationEvent);
+        }
 
-	      //execute the Operation
-	      mesh->ExecuteOperation(doOp);
+        //execute the Operation
+        mesh->ExecuteOperation(doOp);
         ok = true;
       }
     }

@@ -34,6 +34,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkStatusBar.h"
 #include "mitkInteractionConst.h"
 #include "mitkStateEvent.h"
+#include "mitkOperationEvent.h"
 #include "mitkStateMachine.h"
 
 #include "mitkGlobalInteraction.h"

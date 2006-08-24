@@ -3,6 +3,9 @@
 #include <mitkBaseRenderer.h>
 #include <mitkDataTree.h>
 #include <mitkDisplayPositionEvent.h>
+#include <mitkAction.h>
+#include <mitkStateEvent.h>
+#include <mitkUndoController.h>
 #include <mitkInteractionConst.h>
 #include <mitkPointSet.h>
 #include <mitkRenderingManager.h>
@@ -17,7 +20,7 @@ mitk::PositionTracker::PositionTracker(const char * type, mitk::OperationActor* 
 bool mitk::PositionTracker::ExecuteAction(Action* action, mitk::StateEvent const* stateEvent)
  {
   bool ok = false;
-	
+  
   const DisplayPositionEvent* displayPositionEvent = dynamic_cast<const DisplayPositionEvent*>(stateEvent->GetEvent());
 
   mitk::DataTreeIteratorClone dtit;
@@ -91,5 +94,5 @@ bool mitk::PositionTracker::ExecuteAction(Action* action, mitk::StateEvent const
    }
    
  }
-	return ok;
+  return ok;
 }

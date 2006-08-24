@@ -25,19 +25,16 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkOperationActor.h"
 #include <string>
 
-//includes for all derived classes. not necessary here but then lower classes doesn't need to include everytime
-#include "mitkState.h"
-#include "mitkAction.h"
-#include "mitkStateEvent.h"
 #include "mitkUndoModel.h"
-#include "mitkUndoController.h"
-#include <string>
-#include <mitkXMLIO.h>
-#include "mitkOperationEvent.h"
 #include <mitkXMLIO.h>
 
 namespace mitk {
 
+  class State;
+  class Action;
+  class StateEvent;
+  class UndoController;
+  
   // base class of statem machine functors
   class TStateMachineFunctor
   {

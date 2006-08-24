@@ -35,7 +35,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkGlobalInteraction.h>
 #include <mitkPositionTracker.h>
 #include <mitkPointSet.h>
-//#include <mitkOperationActor.h>
+#include <mitkStateEvent.h>
 
 #include <vtkRenderer.h>
 #include <vtkRenderWindow.h>

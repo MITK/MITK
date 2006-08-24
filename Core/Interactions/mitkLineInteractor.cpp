@@ -22,6 +22,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkInteractionConst.h>
 #include <mitkLineOperation.h>
 #include <mitkPointOperation.h>
+#include <mitkStateEvent.h>
+#include <mitkOperationEvent.h>
+#include <mitkUndoController.h>
 #include <mitkPositionEvent.h>
 #include <mitkStateTransitionOperation.h>
 #include <mitkDataTreeNode.h>
@@ -51,8 +54,8 @@ mitk::LineInteractor::~LineInteractor()
 void mitk::LineInteractor::DeselectAllLines()//\*todo: move to mitkMesh.cpp
 {
   mitk::Mesh* mesh = dynamic_cast<mitk::Mesh*>(m_DataTreeNode->GetData());
-	if (mesh == NULL)
-		return;
+  if (mesh == NULL)
+    return;
 
   //find the selected cell
   mitk::Mesh::DataType *itkMesh = mesh->GetMesh(); 
@@ -71,16 +74,16 @@ void mitk::LineInteractor::DeselectAllLines()//\*todo: move to mitkMesh.cpp
   {
     mitk::PointSet::SelectedLinesType selectedLines = cellDataIt->Value().selectedLines;
     for (unsigned int i = 0; i < selectedLines.size(); i++)
-		{
+    {
       mitk::LineOperation* doOp = new mitk::LineOperation(OpDESELECTLINE, cellDataIt->Index(), -1, -1, selectedLines[i]);
-			if (m_UndoEnabled)
-			{
-				mitk::LineOperation* undoOp = new mitk::LineOperation(OpSELECTLINE, cellDataIt->Index(), -1, -1, selectedLines[i]);
-				OperationEvent *operationEvent = new OperationEvent(mesh, doOp, undoOp);
-				m_UndoController->SetOperationEvent(operationEvent);
-			}
-			mesh->ExecuteOperation(doOp);
-		}
+      if (m_UndoEnabled)
+      {
+        mitk::LineOperation* undoOp = new mitk::LineOperation(OpSELECTLINE, cellDataIt->Index(), -1, -1, selectedLines[i]);
+        OperationEvent *operationEvent = new OperationEvent(mesh, doOp, undoOp);
+        m_UndoController->SetOperationEvent(operationEvent);
+      }
+      mesh->ExecuteOperation(doOp);
+    }
   }
 }
 
@@ -113,8 +116,8 @@ float mitk::LineInteractor::CalculateJurisdiction(StateEvent const* stateEvent) 
 
   //check on the right data-type
   mitk::Mesh* mesh = dynamic_cast<mitk::Mesh*>(m_DataTreeNode->GetData());
-	if (mesh == NULL)
-		return 0;
+  if (mesh == NULL)
+    return 0;
 
 
   //since we now have 3D picking in GlobalInteraction and all events send are DisplayEvents with 3D information,
@@ -209,22 +212,22 @@ bool mitk::LineInteractor::ExecuteAction(Action* action, mitk::StateEvent const*
   }
 
   //checking corresponding Data; has to be a PointSet or a subclass
-	mitk::Mesh* mesh = dynamic_cast<mitk::Mesh*>(m_DataTreeNode->GetData());
-	if (mesh == NULL)
-		return false;
+  mitk::Mesh* mesh = dynamic_cast<mitk::Mesh*>(m_DataTreeNode->GetData());
+  if (mesh == NULL)
+    return false;
 
   switch (action->GetActionId())
-	{
+  {
   case AcADDLINE:
     {
       Operation* doOp = new mitk::Operation(OpADDLINE);
-		  if (m_UndoEnabled)
-		  {
-		  	Operation* undoOp = new mitk::Operation(OpDELETELINE);
-			  OperationEvent *operationEvent = new OperationEvent(mesh, doOp, undoOp, "Add line");
-			  m_UndoController->SetOperationEvent(operationEvent);
-		  }
-		  //execute the Operation
+      if (m_UndoEnabled)
+      {
+        Operation* undoOp = new mitk::Operation(OpDELETELINE);
+        OperationEvent *operationEvent = new OperationEvent(mesh, doOp, undoOp, "Add line");
+        m_UndoController->SetOperationEvent(operationEvent);
+      }
+      //execute the Operation
       mesh->ExecuteOperation(doOp );
     }
     ok = true;
@@ -239,37 +242,37 @@ bool mitk::LineInteractor::ExecuteAction(Action* action, mitk::StateEvent const*
     //checks if the position of the mouse lies over a line
     {
       mitk::PositionEvent const  *posEvent = dynamic_cast <const mitk::PositionEvent *> (stateEvent->GetEvent());
-		  if (posEvent != NULL)
+      if (posEvent != NULL)
       {
         mitk::Point3D worldPoint = posEvent->GetWorldPosition();
 
         unsigned long lineId, cellId;
 
         bool found = mesh->SearchLine(worldPoint, PRECISION, lineId, cellId);
-			  if (found)//found a point near enough to the given point
-			  {
+        if (found)//found a point near enough to the given point
+        {
           m_CurrentLineId = lineId;
           m_CurrentCellId = cellId;
           mitk::StateEvent* newStateEvent = new mitk::StateEvent(EIDYES, posEvent);
           //call HandleEvent to leave the guard-state
           this->HandleEvent( newStateEvent );
-				  ok = true;
-  			}
-	  		else //not found
-		  	{
-				  //new Event with information NO
+          ok = true;
+        }
+        else //not found
+        {
+          //new Event with information NO
           mitk::StateEvent* newStateEvent = new mitk::StateEvent(EIDNO, posEvent);
           this->HandleEvent(newStateEvent );
-				  ok = true;
-			  }
-		  }
+          ok = true;
+        }
+      }
       else //not a positionEvent, so call warning and go on with EIDNO. that way we don't risk to hang up in a guard-state
       {
         itkWarningMacro("recieved wrong event-type! Check mitkLineOperation::AcCHECKLINE.");
         //new Event with information NO
         mitk::StateEvent* newStateEvent = new mitk::StateEvent(EIDNO, stateEvent->GetEvent());
         this->HandleEvent(newStateEvent );
-				ok = true;
+        ok = true;
       }
     }
     break;
@@ -277,7 +280,7 @@ bool mitk::LineInteractor::ExecuteAction(Action* action, mitk::StateEvent const*
     //check if the selected line is still hit
     {
       mitk::PositionEvent const  *posEvent = dynamic_cast <const mitk::PositionEvent *> (stateEvent->GetEvent());
-		  if (posEvent != NULL)
+      if (posEvent != NULL)
       {
         mitk::Point3D worldPoint = posEvent->GetWorldPosition();
 
@@ -287,27 +290,27 @@ bool mitk::LineInteractor::ExecuteAction(Action* action, mitk::StateEvent const*
         if (found && 
             m_CurrentCellId == cellId &&
             m_CurrentLineId == lineId )//found the same line again
-			  {
+        {
           mitk::StateEvent* newStateEvent = new mitk::StateEvent(EIDYES, posEvent);
           //call HandleEvent to leave the guard-state
           this->HandleEvent( newStateEvent );
-				  ok = true;
-  			}
-	  		else //not found
-		  	{
-				  //new Event with information NO
+          ok = true;
+        }
+        else //not found
+        {
+          //new Event with information NO
           mitk::StateEvent* newStateEvent = new mitk::StateEvent(EIDNO, posEvent);
           this->HandleEvent(newStateEvent );
-				  ok = true;
-			  }
-		  }
+          ok = true;
+        }
+      }
       else //not a positionEvent, so call warning and go on with EIDNO. that way we don't risk to hang up in a guard-state
       {
         itkWarningMacro("recieved wrong event-type! Check mitkLineOperation::AcCHECKLINE.");
         //new Event with information NO
         mitk::StateEvent* newStateEvent = new mitk::StateEvent(EIDNO, stateEvent->GetEvent());
         this->HandleEvent(newStateEvent );
-				ok = true;
+        ok = true;
       }
     }
     break;
@@ -320,16 +323,16 @@ bool mitk::LineInteractor::ExecuteAction(Action* action, mitk::StateEvent const*
     {
       LineOperation* doOp = new mitk::LineOperation(OpSELECTLINE, m_CurrentCellId, 0, 0, m_CurrentLineId);
       //Undo
-			if (m_UndoEnabled)	//write to UndoMechanism
+      if (m_UndoEnabled)  //write to UndoMechanism
       {
-				LineOperation* undoOp = new mitk::LineOperation(OpDESELECTLINE, m_CurrentCellId, 0, 0, m_CurrentLineId);
-				OperationEvent *operationEvent = new OperationEvent(mesh, doOp, undoOp);
-				m_UndoController->SetOperationEvent(operationEvent);
-			}
+        LineOperation* undoOp = new mitk::LineOperation(OpDESELECTLINE, m_CurrentCellId, 0, 0, m_CurrentLineId);
+        OperationEvent *operationEvent = new OperationEvent(mesh, doOp, undoOp);
+        m_UndoController->SetOperationEvent(operationEvent);
+      }
 
-			//execute the Operation
-			mesh->ExecuteOperation(doOp);
-			ok = true;
+      //execute the Operation
+      mesh->ExecuteOperation(doOp);
+      ok = true;
     }
     break;
   case AcDESELECT:
@@ -337,16 +340,16 @@ bool mitk::LineInteractor::ExecuteAction(Action* action, mitk::StateEvent const*
   {
      LineOperation* doOp = new mitk::LineOperation(OpDESELECTLINE, m_CurrentCellId, 0, 0, m_CurrentLineId);
       //Undo
-			if (m_UndoEnabled)	//write to UndoMechanism
+      if (m_UndoEnabled)  //write to UndoMechanism
       {
-				LineOperation* undoOp = new mitk::LineOperation(OpSELECTLINE, m_CurrentCellId, 0, 0, m_CurrentLineId);
-				OperationEvent *operationEvent = new OperationEvent( mesh, doOp, undoOp );
-				m_UndoController->SetOperationEvent(operationEvent);
-			}
+        LineOperation* undoOp = new mitk::LineOperation(OpSELECTLINE, m_CurrentCellId, 0, 0, m_CurrentLineId);
+        OperationEvent *operationEvent = new OperationEvent( mesh, doOp, undoOp );
+        m_UndoController->SetOperationEvent(operationEvent);
+      }
 
-			//execute the Operation
-			mesh->ExecuteOperation(doOp);
-			ok = true;
+      //execute the Operation
+      mesh->ExecuteOperation(doOp);
+      ok = true;
   }
   break;
   case AcINITMOVEMENT:

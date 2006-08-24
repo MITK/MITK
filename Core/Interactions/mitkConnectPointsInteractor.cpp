@@ -20,6 +20,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkConnectPointsInteractor.h"
 #include <mitkLineOperation.h>
 #include <mitkPositionEvent.h>
+#include <mitkState.h>
+#include <mitkStateEvent.h>
+#include <mitkUndoController.h>
 #include <mitkMesh.h>
 #include <mitkDataTreeNode.h>
 #include <mitkInteractionConst.h>

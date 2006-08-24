@@ -24,6 +24,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkOperationActor.h"
 #include "mitkPointOperation.h"
 #include "mitkPositionEvent.h"
+#include "mitkStateEvent.h"
+#include "mitkUndoController.h"
 //and not here!
 #include <string>
 #include "mitkInteractionConst.h"
@@ -41,7 +43,7 @@ mitk::CoordinateSupplier::CoordinateSupplier(const char * type, mitk::OperationA
 bool mitk::CoordinateSupplier::ExecuteAction(Action* action, mitk::StateEvent const* stateEvent)
 {
     bool ok = false;
-	
+  
     const PositionEvent* posEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
     
     if(posEvent!=NULL)
@@ -66,16 +68,16 @@ bool mitk::CoordinateSupplier::ExecuteAction(Action* action, mitk::StateEvent co
             return false;
           m_OldPoint = posEvent->GetWorldPosition();
 
-			    PointOperation* doOp = new mitk::PointOperation(OpADD, timeInMS, m_OldPoint, 0);
-			    //Undo
+          PointOperation* doOp = new mitk::PointOperation(OpADD, timeInMS, m_OldPoint, 0);
+          //Undo
           if (m_UndoEnabled)
           {
-				    PointOperation* undoOp = new PointOperation(OpDELETE, m_OldPoint, 0);
+            PointOperation* undoOp = new PointOperation(OpDELETE, m_OldPoint, 0);
             OperationEvent *operationEvent = new OperationEvent( m_Destination, doOp, undoOp );
             m_UndoController->SetOperationEvent(operationEvent);
           }
           //execute the Operation
-			    m_Destination->ExecuteOperation(doOp);
+          m_Destination->ExecuteOperation(doOp);
           ok = true;
           break;
         }
@@ -88,7 +90,7 @@ bool mitk::CoordinateSupplier::ExecuteAction(Action* action, mitk::StateEvent co
 
           PointOperation* doOp = new mitk::PointOperation(OpMOVE, timeInMS, movePoint, 0);
           //execute the Operation
-			    m_Destination->ExecuteOperation(doOp);
+          m_Destination->ExecuteOperation(doOp);
           ok = true;
           break;
         }
@@ -101,7 +103,7 @@ bool mitk::CoordinateSupplier::ExecuteAction(Action* action, mitk::StateEvent co
             return false;
           PointOperation* doOp = new mitk::PointOperation(OpMOVE, timeInMS, movePoint, 0);
           //execute the Operation
-			    m_Destination->ExecuteOperation(doOp);
+          m_Destination->ExecuteOperation(doOp);
           ok = true;
           break;
         }
@@ -134,7 +136,7 @@ bool mitk::CoordinateSupplier::ExecuteAction(Action* action, mitk::StateEvent co
             m_UndoController->SetOperationEvent(operationEvent);
           }
           //execute the Operation
-	  		  m_Destination->ExecuteOperation(doOp);
+          m_Destination->ExecuteOperation(doOp);
           m_Destination->ExecuteOperation(finishOp);
           ok = true;
           break;
@@ -160,5 +162,5 @@ bool mitk::CoordinateSupplier::ExecuteAction(Action* action, mitk::StateEvent co
         return true;
     }
 
-	return false;
+  return false;
 }

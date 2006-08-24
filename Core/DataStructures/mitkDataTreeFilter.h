@@ -4,6 +4,7 @@
 #include <mitkDataTree.h> 
 #include <itkSmartPointerVectorContainer.h>
 #include "itkMacro.h"
+#include <set>
 
 /*
 

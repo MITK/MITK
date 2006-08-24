@@ -18,11 +18,10 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include "mitkContourSetMapper2D.h"
-#include "mitkContourMapper2D.h"
-#include "mitkContour.h"
 #include "mitkBaseRenderer.h"
 #include "mitkPlaneGeometry.h"
 #include "mitkColorProperty.h"
+#include "mitkContourSet.h"
 #include "mitkProperties.h"
 #include <vtkLinearTransform.h>
 
@@ -126,5 +125,5 @@ void mitk::ContourSetMapper2D::Paint(mitk::BaseRenderer * renderer)
 
 const mitk::ContourSet* mitk::ContourSetMapper2D::GetInput(void)
 {
-	return static_cast<const mitk::ContourSet * > ( GetData() );
+  return static_cast<const mitk::ContourSet * > ( GetData() );
 }

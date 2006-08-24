@@ -22,10 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkCommon.h"
 #include "mitkBaseVtkMapper3D.h"
-#include "mitkGeometry2DData.h"
 #include "mitkDataTree.h"
-#include "mitkImageSliceSelector.h"
-#include "mitkBaseRenderer.h"
 
 class vtkActor;
 class vtkTexture;
@@ -39,6 +36,9 @@ class vtkFeatureEdges;
 class vtkTubeFilter;
 
 namespace mitk {
+
+class Geometry2DData;
+class BaseRenderer;
 
 //##ModelId=3E691E09014F
 //##Documentation

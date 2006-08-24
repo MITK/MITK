@@ -2,9 +2,6 @@
 #define _MITK_STL_VECTOR_H_
 
 #include <vector>
-#include "mitkCommon.h"
-#include <itkDataObject.h>
-#include <itkObjectFactory.h>
 #include <itkSimpleDataObjectDecorator.h>    
 
 namespace mitk

@@ -21,13 +21,12 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITK_CONTOUR_SET_MAPPER_2D_H_
 
 #include "mitkCommon.h"
-#include "mitkMapper2D.h"
-#include "mitkContourSet.h"
 #include "mitkGLMapper2D.h"
-#include "mitkDataTree.h"
 
 namespace mitk {
 
+class BaseRenderer;
+class ContourSet;
 class BaseRenderer;
 
 /** 

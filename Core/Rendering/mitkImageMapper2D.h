@@ -21,13 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITKIMAGEMAPPER2D_H_HEADER_INCLUDED_C10E906E
 
 #include "mitkCommon.h"
-#include "mitkGeometry3D.h"
-#include "mitkLevelWindow.h"
-#include "mitkDataTreeNode.h"
-#include "mitkMapper2D.h"
-#include "mitkImageSliceSelector.h"
 #include "mitkGLMapper2D.h"
-#include "mitkImageChannelSelector.h"
 #include "mitkBaseRenderer.h"
 
 #include <map>
@@ -47,7 +41,6 @@ class vtkImageChangeInformation;
 namespace mitk {
 
 class RenderWindow;
-class BaseRenderer;
 
 //##ModelId=3D74B23E0176
 //##Documentation
@@ -234,7 +227,7 @@ protected:
   static int numRenderer;
 
 protected:
-  typedef std::map<mitk::BaseRenderer*,RendererInfo> RenderInfoMap;
+  typedef std::map<BaseRenderer*,RendererInfo> RenderInfoMap;
 
   //##ModelId=3EDD039F02EC
   //##Documentation

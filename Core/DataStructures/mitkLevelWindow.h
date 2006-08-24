@@ -68,6 +68,11 @@ public:
   ScalarType GetDefaultWindow() const;
 
   /*!
+  * \brief the default level and window for image will be reset
+  */
+  void ResetDefaultLevelWindow();
+
+  /*!
   * getter for window minimum value
   */
   ScalarType GetMin() const;
@@ -93,44 +98,14 @@ public:
   void SetLevelWindow(ScalarType level, ScalarType window);
 
   /*!
-  * setter for default level and window value
-  */
-  void SetDefaultLevelWindow(ScalarType level, ScalarType window);
-
-  /*!
-  * setter for window minimum value
-  */
-  void SetMin(ScalarType min);
-
-  /*!
-  * setter for window maximum value
-  */
-  void SetMax(ScalarType max);
-
-  /*!
   * setter for window min and max values
   */
   void SetMinMax(ScalarType min, ScalarType max);
 
   /*!
-  * setter for total range minimum value
-  */
-  void SetRangeMin(ScalarType min);
-
-  /*!
-  * setter for total range maximum value
-  */
-  void SetRangeMax(ScalarType max);
-
-  /*!
   * setter for total range minimum and maximum value
   */
   void SetRangeMinMax(ScalarType min, ScalarType max);
-
-  /*!
-  * setter for default total range maximum value
-  */
-  void SetDefaultRangeMinMax(ScalarType min, ScalarType max);
 
   /*!
   * getter for total range minimum value
@@ -152,16 +127,25 @@ public:
   */
   ScalarType GetDefaultRangeMax() const;
 
+  /*!
+  * \brief the default min and max range for image will be reset
+  */
+  void ResetDefaultRangeMinMax();
+
   /**!
   * \brief method returns the size of the grey value range
   */
   ScalarType GetRange() const;
 
-  /**!
-  * \brief sets level/window according to the tags in the given ipPicDescriptor
-  * \return @a true if tags where found
+  /*!
+  * setter for default level and window value
   */
-  bool SetAutoByPicTags(const ipPicDescriptor* pic);
+  void SetDefaultLevelWindow(ScalarType level, ScalarType window);
+
+  /*!
+  * setter for default total range maximum value
+  */
+  void SetDefaultRangeMinMax(ScalarType min, ScalarType max);
 
   /**!
   * \brief sets level/window to the second min/max greyvalues of the given Image
@@ -185,6 +169,12 @@ public:
   virtual LevelWindow& operator=(const LevelWindow& levWin);
 
 protected:
+
+  /**!
+  * \brief sets level/window according to the tags in the given ipPicDescriptor
+  * \return @a true if tags where found
+  */
+  bool SetAutoByPicTags(const ipPicDescriptor* pic);
 
   /*!
   * lower limit of current window

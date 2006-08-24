@@ -84,13 +84,13 @@ void QmitkLevelWindowWidgetContextMenu::addPreset()
 
 void QmitkLevelWindowWidgetContextMenu::setDefaultLevelWindow()
 {
-  m_LevelWindow.SetLevelWindow(m_LevelWindow.GetDefaultLevel(), m_LevelWindow.GetDefaultWindow());
+  m_LevelWindow.ResetDefaultLevelWindow();
   m_Manager->SetLevelWindow(m_LevelWindow);
 }
 
 void QmitkLevelWindowWidgetContextMenu::setDefaultScaleRange()
 {
-  m_LevelWindow.SetRangeMinMax(m_LevelWindow.GetDefaultRangeMin(), m_LevelWindow.GetDefaultRangeMax());
+  m_LevelWindow.ResetDefaultRangeMinMax();
   m_LevelWindow.SetLevelWindow(m_LevelWindow.GetLevel(), m_LevelWindow.GetWindow());
   m_Manager->SetLevelWindow(m_LevelWindow);
 }
@@ -111,7 +111,10 @@ void QmitkLevelWindowWidgetContextMenu::changeScaleRange()
 void QmitkLevelWindowWidgetContextMenu::setImage(int imageID)
 {
   if (imageID == m_ImageID)
-    m_Manager->SetAutoTopMostImage();
+    if ( m_Manager->isAutoTopMost() == false)
+      m_Manager->SetAutoTopMostImage(true);
+    else
+      m_Manager->SetAutoTopMostImage(false);
   else
     m_Manager->SetLevelWindowProperty(m_Images[imageID]);
 }

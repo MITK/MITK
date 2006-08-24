@@ -23,7 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <ipFunc/ipFunc.h>
 #include <algorithm>
 
- mitk::LevelWindow::LevelWindow(mitk::ScalarType level, mitk::ScalarType window) : m_Min(level-window/2.0), m_Max(level+window/2.0), m_RangeMin(-2048), m_RangeMax(4096), m_DefaultRangeMin(-2048), m_DefaultRangeMax(4096)
+mitk::LevelWindow::LevelWindow(mitk::ScalarType level, mitk::ScalarType window) : m_Min(level-window/2.0), m_Max(level+window/2.0), m_RangeMin(-2048), m_RangeMax(4096), m_DefaultRangeMin(-2048), m_DefaultRangeMax(4096), m_DefaultLevel(level), m_DefaultWindow(window)
 {
 }
 
@@ -54,6 +54,11 @@ mitk::ScalarType mitk::LevelWindow::GetDefaultLevel() const
 mitk::ScalarType mitk::LevelWindow::GetDefaultWindow() const
 {
   return m_DefaultWindow;
+}
+
+void mitk::LevelWindow::ResetDefaultLevelWindow()
+{
+  SetLevelWindow(m_DefaultLevel, m_DefaultWindow);
 }
 
 mitk::ScalarType mitk::LevelWindow::GetMin() const
@@ -100,18 +105,6 @@ void mitk::LevelWindow::SetLevelWindow(mitk::ScalarType level, mitk::ScalarType 
   testValues();
 }
 
-void mitk::LevelWindow::SetMin(mitk::ScalarType min)
-{
-  m_Min = min;
-  testValues(); 
-}
-
-void mitk::LevelWindow::SetMax(mitk::ScalarType max)
-{
-  m_Max = max;
-  testValues();
-}
-
 void mitk::LevelWindow::SetMinMax(mitk::ScalarType min, mitk::ScalarType max)
 {
   if(min>max)
@@ -119,22 +112,6 @@ void mitk::LevelWindow::SetMinMax(mitk::ScalarType min, mitk::ScalarType max)
 
   m_Min = min;
   m_Max = max;
-  testValues();
-}
-
-void mitk::LevelWindow::SetRangeMin(mitk::ScalarType min)
-{
-  m_RangeMin = min;
-  if(m_RangeMin > m_RangeMax)
-    std::swap(m_RangeMin,m_RangeMax);
-  testValues();
-}
-
-void mitk::LevelWindow::SetRangeMax(mitk::ScalarType max)
-{
-  m_RangeMax = max;
-  if(m_RangeMin > m_RangeMax)
-    std::swap(m_RangeMin,m_RangeMax);
   testValues();
 }
 
@@ -178,6 +155,11 @@ mitk::ScalarType mitk::LevelWindow::GetDefaultRangeMax() const
 mitk::ScalarType mitk::LevelWindow::GetDefaultRangeMin() const
 {
   return m_DefaultRangeMin;
+}
+
+void mitk::LevelWindow::ResetDefaultRangeMinMax()
+{
+  SetRangeMinMax(m_DefaultRangeMin, m_DefaultRangeMax);
 }
 
 /*!

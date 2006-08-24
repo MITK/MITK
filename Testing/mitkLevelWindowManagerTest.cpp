@@ -63,7 +63,7 @@ int mitkLevelWindowManagerTest(int, char* [])
   }
 
   std::cout << "Testing mitk::LevelWindowManager SetAutoTopMostImage ";
-  manager->SetAutoTopMostImage();
+  manager->SetAutoTopMostImage(true);
   std::cout<<"[PASSED]"<<std::endl;
   std::cout << "Testing mitk::LevelWindowManager isAutoTopMost ";
   if (!(manager->isAutoTopMost()))

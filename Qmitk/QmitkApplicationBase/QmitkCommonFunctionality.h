@@ -128,10 +128,8 @@ namespace CommonFunctionality
       double level  = window/2;
 
       mitk::LevelWindow levWin = levWinProp->GetLevelWindow();
-      levWin.SetRangeMin(extrema[0]);
-      levWin.SetRangeMax(extrema[1]);
-      levWin.SetLevel( level );
-      levWin.SetWindow( window );
+      levWin.SetRangeMinMax(extrema[0], extrema[1]);
+      levWin.SetLevelWindow( level, window );
       levWinProp->SetLevelWindow(levWin);
 
     }

@@ -53,8 +53,8 @@ namespace mitk
     /// returns the DataTree
     DataTree* GetDataTree();
   
-    /// sets the topmost layer image to be affected by changes
-    void SetAutoTopMostImage();
+    /// if autoTopMost == true: sets the topmost layer image to be affected by changes
+    void SetAutoTopMostImage(bool autoTopMost);
 
     /*!
     * sets an specific LevelWindowProperty, all changes will affect the image belonging to this property.

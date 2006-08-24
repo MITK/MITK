@@ -3,6 +3,7 @@
 QcMITKTask::QcMITKTask(const char** xpm, QWidget* parent, const char* name) :
             QcTask(xpm, parent, name), m_Visible(true)
 {
+  isImageTask( true );
 }
 
 

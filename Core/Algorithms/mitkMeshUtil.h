@@ -158,6 +158,7 @@ class MeshUtil
     typedef itk::TriangleCell<CellInterfaceType>      floatTriangleCell;
     typedef itk::PolygonCell<CellInterfaceType>       floatPolygonCell;
     typedef itk::QuadrilateralCell<CellInterfaceType> floatQuadrilateralCell;
+    typedef typename CellInterfaceType::PointIdConstIterator PointIdIterator;
 
   public:
     /*!
@@ -165,10 +166,13 @@ class MeshUtil
     */
     void Visit(unsigned long , floatLineCell* t)
     {
+      vtkIdType pts[2];
+      int i=0;
       unsigned long num = t->GetNumberOfVertices();
-      vtkIdType *pts = (vtkIdType*)t->PointIdsBegin();
-      if (num==2) // useless because itk::LineCell always returns 2
-        this->InsertLine(pts);
+      if (num==2) { // useless because itk::LineCell always returns 2
+        for (PointIdIterator it=t->PointIdsBegin(); it!=t->PointIdsEnd(); it++) pts[i++] = *it;
+        this->InsertLine( (vtkIdType*)pts );
+      }
     }
 
     /*!
@@ -176,16 +180,24 @@ class MeshUtil
     */
     void Visit(unsigned long , floatPolygonCell* t)
     {
+      vtkIdType pts[4096];
+      int i=0;
       unsigned long num = t->GetNumberOfVertices();
-      vtkIdType *pts = (vtkIdType*)t->PointIdsBegin();
-      if (num > 3) 
-        this->InsertPolygon(num, pts);
-      else
-      if (num == 3) 
-        this->InsertTriangle(pts);
-      else
-      if (num==2)
-        this->InsertLine(pts);
+      if (num > 4096) {
+        std::cerr << "Problem in mitkMeshUtil: Polygon with more than maximum number of vewrtices encountered." << std::endl;
+      }
+      else if (num > 3) {
+        for (PointIdIterator it=t->PointIdsBegin(); it!=t->PointIdsEnd(); it++) pts[i++] = *it;
+        this->InsertPolygon( num, (vtkIdType*)pts );
+      }
+      else if (num == 3) { 
+        for (PointIdIterator it=t->PointIdsBegin(); it!=t->PointIdsEnd(); it++) pts[i++] = *it;
+        this->InsertTriangle( (vtkIdType*)pts );
+      }
+      else if (num==2) {
+        for (PointIdIterator it=t->PointIdsBegin(); it!=t->PointIdsEnd(); it++) pts[i++] = *it;
+        this->InsertLine( (vtkIdType*)pts );
+      }
     }
 
     /*!
@@ -193,13 +205,17 @@ class MeshUtil
     */
     void Visit(unsigned long , floatTriangleCell* t)
     {
+      vtkIdType pts[3];
+      int i=0;
       unsigned long num = t->GetNumberOfVertices();
-      vtkIdType *pts = (vtkIdType*)t->PointIdsBegin();
-      if (num == 3) 
-        this->InsertTriangle(pts);
-      else
-      if (num==2)
-        this->InsertLine(pts);
+      if (num == 3) {
+        for (PointIdIterator it=t->PointIdsBegin(); it!=t->PointIdsEnd(); it++) pts[i++] = *it;
+        this->InsertTriangle( (vtkIdType*)pts );
+      }
+      else if (num==2) {
+        for (PointIdIterator it=t->PointIdsBegin(); it!=t->PointIdsEnd(); it++) pts[i++] = *it;
+        this->InsertLine( (vtkIdType*)pts );
+      }
     }
 
     /*! 
@@ -207,16 +223,21 @@ class MeshUtil
     */
     void Visit(unsigned long , floatQuadrilateralCell* t)
     {
+      vtkIdType pts[4];
+      int i=0;
       unsigned long num = t->GetNumberOfVertices();
-      vtkIdType *pts = (vtkIdType*)t->PointIdsBegin();
-      if (num == 4) 
-        this->InsertQuad(pts);
-      else
-      if (num == 3) 
-        this->InsertTriangle(pts);
-      else
-      if (num==2)
-        this->InsertLine(pts);
+      if (num == 4) {
+        for (PointIdIterator it=t->PointIdsBegin(); it!=t->PointIdsEnd(); it++) pts[i++] = *it;
+        this->InsertQuad( (vtkIdType*)pts );
+      }
+      else if (num == 3) {
+        for (PointIdIterator it=t->PointIdsBegin(); it!=t->PointIdsEnd(); it++) pts[i++] = *it;
+        this->InsertTriangle( (vtkIdType*)pts );
+      }
+      else if (num==2) {
+        for (PointIdIterator it=t->PointIdsBegin(); it!=t->PointIdsEnd(); it++) pts[i++] = *it;
+        this->InsertLine( (vtkIdType*)pts );
+      }
     }
   };
 

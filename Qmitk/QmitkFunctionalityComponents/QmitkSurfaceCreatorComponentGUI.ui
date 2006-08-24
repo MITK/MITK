@@ -8,8 +8,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>230</width>
-            <height>180</height>
+            <width>262</width>
+            <height>689</height>
         </rect>
     </property>
     <property name="minimumSize">
@@ -153,6 +153,9 @@
                         <property name="name">
                             <cstring>unnamed</cstring>
                         </property>
+                        <property name="margin">
+                            <number>0</number>
+                        </property>
                         <widget class="QLayoutWidget">
                             <property name="name">
                                 <cstring>layout4</cstring>
@@ -215,10 +218,560 @@
                             <property name="sizeHint">
                                 <size>
                                     <width>20</width>
-                                    <height>16</height>
+                                    <height>10</height>
                                 </size>
                             </property>
                         </spacer>
+                        <widget class="QGroupBox">
+                            <property name="name">
+                                <cstring>m_ShowSurfaceParameterGroupBox</cstring>
+                            </property>
+                            <property name="lineWidth">
+                                <number>0</number>
+                            </property>
+                            <property name="title">
+                                <string>ShowSurfaceParameter</string>
+                            </property>
+                            <property name="checkable">
+                                <bool>true</bool>
+                            </property>
+                            <property name="checked">
+                                <bool>false</bool>
+                            </property>
+                            <vbox>
+                                <property name="name">
+                                    <cstring>unnamed</cstring>
+                                </property>
+                                <property name="margin">
+                                    <number>0</number>
+                                </property>
+                                <property name="spacing">
+                                    <number>0</number>
+                                </property>
+                                <widget class="QGroupBox">
+                                    <property name="name">
+                                        <cstring>m_ShowExpertModeGroupBox</cstring>
+                                    </property>
+                                    <property name="title">
+                                        <string>ShowExpertMode</string>
+                                    </property>
+                                    <property name="checkable">
+                                        <bool>true</bool>
+                                    </property>
+                                    <property name="checked">
+                                        <bool>false</bool>
+                                    </property>
+                                    <vbox>
+                                        <property name="name">
+                                            <cstring>unnamed</cstring>
+                                        </property>
+                                        <property name="margin">
+                                            <number>0</number>
+                                        </property>
+                                        <widget class="QCheckBox">
+                                            <property name="name">
+                                                <cstring>m_Median3DCheckBox</cstring>
+                                            </property>
+                                            <property name="enabled">
+                                                <bool>false</bool>
+                                            </property>
+                                            <property name="text">
+                                                <string>Median 3D</string>
+                                            </property>
+                                        </widget>
+                                        <widget class="QGroupBox">
+                                            <property name="name">
+                                                <cstring>m_ExpertModeMedianGroupBox</cstring>
+                                            </property>
+                                            <property name="enabled">
+                                                <bool>false</bool>
+                                            </property>
+                                            <property name="title">
+                                                <string>Median</string>
+                                            </property>
+                                            <vbox>
+                                                <property name="name">
+                                                    <cstring>unnamed</cstring>
+                                                </property>
+                                                <widget class="QLayoutWidget">
+                                                    <property name="name">
+                                                        <cstring>layout5</cstring>
+                                                    </property>
+                                                    <hbox>
+                                                        <property name="name">
+                                                            <cstring>unnamed</cstring>
+                                                        </property>
+                                                        <widget class="QLabel">
+                                                            <property name="name">
+                                                                <cstring>textLabel1_2</cstring>
+                                                            </property>
+                                                            <property name="text">
+                                                                <string>Median X, Y, Z:</string>
+                                                            </property>
+                                                        </widget>
+                                                        <widget class="QLayoutWidget">
+                                                            <property name="name">
+                                                                <cstring>layout3</cstring>
+                                                            </property>
+                                                            <hbox>
+                                                                <property name="name">
+                                                                    <cstring>unnamed</cstring>
+                                                                </property>
+                                                                <widget class="QLineEdit">
+                                                                    <property name="name">
+                                                                        <cstring>m_Median3DXValueLineEdit</cstring>
+                                                                    </property>
+                                                                    <property name="text">
+                                                                        <string>3</string>
+                                                                    </property>
+                                                                    <property name="cursorPosition">
+                                                                        <number>1</number>
+                                                                    </property>
+                                                                </widget>
+                                                                <spacer>
+                                                                    <property name="name">
+                                                                        <cstring>spacer6</cstring>
+                                                                    </property>
+                                                                    <property name="orientation">
+                                                                        <enum>Horizontal</enum>
+                                                                    </property>
+                                                                    <property name="sizeType">
+                                                                        <enum>Fixed</enum>
+                                                                    </property>
+                                                                    <property name="sizeHint">
+                                                                        <size>
+                                                                            <width>2</width>
+                                                                            <height>20</height>
+                                                                        </size>
+                                                                    </property>
+                                                                </spacer>
+                                                                <widget class="QLineEdit">
+                                                                    <property name="name">
+                                                                        <cstring>m_Median3DYValueLineEdit</cstring>
+                                                                    </property>
+                                                                    <property name="text">
+                                                                        <string>3</string>
+                                                                    </property>
+                                                                </widget>
+                                                                <spacer>
+                                                                    <property name="name">
+                                                                        <cstring>spacer5</cstring>
+                                                                    </property>
+                                                                    <property name="orientation">
+                                                                        <enum>Horizontal</enum>
+                                                                    </property>
+                                                                    <property name="sizeType">
+                                                                        <enum>Fixed</enum>
+                                                                    </property>
+                                                                    <property name="sizeHint">
+                                                                        <size>
+                                                                            <width>2</width>
+                                                                            <height>20</height>
+                                                                        </size>
+                                                                    </property>
+                                                                </spacer>
+                                                                <widget class="QLineEdit">
+                                                                    <property name="name">
+                                                                        <cstring>m_Median3DZValueLineEdit</cstring>
+                                                                    </property>
+                                                                    <property name="text">
+                                                                        <string>3</string>
+                                                                    </property>
+                                                                </widget>
+                                                            </hbox>
+                                                        </widget>
+                                                    </hbox>
+                                                </widget>
+                                            </vbox>
+                                        </widget>
+                                        <widget class="QCheckBox">
+                                            <property name="name">
+                                                <cstring>m_InterpolateCheckBox</cstring>
+                                            </property>
+                                            <property name="enabled">
+                                                <bool>false</bool>
+                                            </property>
+                                            <property name="text">
+                                                <string>Interpolate</string>
+                                            </property>
+                                        </widget>
+                                        <widget class="QGroupBox">
+                                            <property name="name">
+                                                <cstring>m_ExpertModeInterpolateGroupBox</cstring>
+                                            </property>
+                                            <property name="enabled">
+                                                <bool>false</bool>
+                                            </property>
+                                            <property name="title">
+                                                <string>Interpolate</string>
+                                            </property>
+                                            <vbox>
+                                                <property name="name">
+                                                    <cstring>unnamed</cstring>
+                                                </property>
+                                                <widget class="QLayoutWidget">
+                                                    <property name="name">
+                                                        <cstring>layout5_2</cstring>
+                                                    </property>
+                                                    <hbox>
+                                                        <property name="name">
+                                                            <cstring>unnamed</cstring>
+                                                        </property>
+                                                        <widget class="QLabel">
+                                                            <property name="name">
+                                                                <cstring>textLabel1_2_2</cstring>
+                                                            </property>
+                                                            <property name="text">
+                                                                <string>Interpolate</string>
+                                                            </property>
+                                                        </widget>
+                                                        <widget class="QLayoutWidget">
+                                                            <property name="name">
+                                                                <cstring>layout3_2</cstring>
+                                                            </property>
+                                                            <hbox>
+                                                                <property name="name">
+                                                                    <cstring>unnamed</cstring>
+                                                                </property>
+                                                                <widget class="QLineEdit">
+                                                                    <property name="name">
+                                                                        <cstring>m_InterpolateXValueLineEdit</cstring>
+                                                                    </property>
+                                                                    <property name="text">
+                                                                        <string>1</string>
+                                                                    </property>
+                                                                    <property name="cursorPosition">
+                                                                        <number>1</number>
+                                                                    </property>
+                                                                </widget>
+                                                                <spacer>
+                                                                    <property name="name">
+                                                                        <cstring>spacer6_2</cstring>
+                                                                    </property>
+                                                                    <property name="orientation">
+                                                                        <enum>Horizontal</enum>
+                                                                    </property>
+                                                                    <property name="sizeType">
+                                                                        <enum>Fixed</enum>
+                                                                    </property>
+                                                                    <property name="sizeHint">
+                                                                        <size>
+                                                                            <width>2</width>
+                                                                            <height>20</height>
+                                                                        </size>
+                                                                    </property>
+                                                                </spacer>
+                                                                <widget class="QLineEdit">
+                                                                    <property name="name">
+                                                                        <cstring>m_InterpolateYValueLineEdit</cstring>
+                                                                    </property>
+                                                                    <property name="text">
+                                                                        <string>3</string>
+                                                                    </property>
+                                                                    <property name="cursorPosition">
+                                                                        <number>1</number>
+                                                                    </property>
+                                                                </widget>
+                                                                <spacer>
+                                                                    <property name="name">
+                                                                        <cstring>spacer5_2</cstring>
+                                                                    </property>
+                                                                    <property name="orientation">
+                                                                        <enum>Horizontal</enum>
+                                                                    </property>
+                                                                    <property name="sizeType">
+                                                                        <enum>Fixed</enum>
+                                                                    </property>
+                                                                    <property name="sizeHint">
+                                                                        <size>
+                                                                            <width>2</width>
+                                                                            <height>20</height>
+                                                                        </size>
+                                                                    </property>
+                                                                </spacer>
+                                                                <widget class="QLineEdit">
+                                                                    <property name="name">
+                                                                        <cstring>m_InterpolateZValueLineEdit</cstring>
+                                                                    </property>
+                                                                    <property name="text">
+                                                                        <string>3</string>
+                                                                    </property>
+                                                                </widget>
+                                                            </hbox>
+                                                        </widget>
+                                                    </hbox>
+                                                </widget>
+                                            </vbox>
+                                        </widget>
+                                        <widget class="QCheckBox">
+                                            <property name="name">
+                                                <cstring>m_SmoothCheckBox</cstring>
+                                            </property>
+                                            <property name="enabled">
+                                                <bool>false</bool>
+                                            </property>
+                                            <property name="text">
+                                                <string>Smooth</string>
+                                            </property>
+                                        </widget>
+                                        <widget class="QGroupBox">
+                                            <property name="name">
+                                                <cstring>m_ExpertModeSmoothGroupBox</cstring>
+                                            </property>
+                                            <property name="enabled">
+                                                <bool>false</bool>
+                                            </property>
+                                            <property name="title">
+                                                <string>Smooth</string>
+                                            </property>
+                                            <vbox>
+                                                <property name="name">
+                                                    <cstring>unnamed</cstring>
+                                                </property>
+                                                <widget class="QLayoutWidget">
+                                                    <property name="name">
+                                                        <cstring>layout12</cstring>
+                                                    </property>
+                                                    <hbox>
+                                                        <property name="name">
+                                                            <cstring>unnamed</cstring>
+                                                        </property>
+                                                        <widget class="QLabel">
+                                                            <property name="name">
+                                                                <cstring>textLabel1_2_2_2</cstring>
+                                                            </property>
+                                                            <property name="text">
+                                                                <string>Smooth Iterations:</string>
+                                                            </property>
+                                                        </widget>
+                                                        <spacer>
+                                                            <property name="name">
+                                                                <cstring>spacer6_2_2</cstring>
+                                                            </property>
+                                                            <property name="orientation">
+                                                                <enum>Horizontal</enum>
+                                                            </property>
+                                                            <property name="sizeType">
+                                                                <enum>Fixed</enum>
+                                                            </property>
+                                                            <property name="sizeHint">
+                                                                <size>
+                                                                    <width>16</width>
+                                                                    <height>20</height>
+                                                                </size>
+                                                            </property>
+                                                        </spacer>
+                                                        <widget class="QLineEdit">
+                                                            <property name="name">
+                                                                <cstring>m_SmoothIterationValueLineEdit</cstring>
+                                                            </property>
+                                                            <property name="text">
+                                                                <string>50</string>
+                                                            </property>
+                                                            <property name="cursorPosition">
+                                                                <number>2</number>
+                                                            </property>
+                                                        </widget>
+                                                    </hbox>
+                                                </widget>
+                                                <widget class="QLayoutWidget">
+                                                    <property name="name">
+                                                        <cstring>layout14</cstring>
+                                                    </property>
+                                                    <hbox>
+                                                        <property name="name">
+                                                            <cstring>unnamed</cstring>
+                                                        </property>
+                                                        <widget class="QLabel">
+                                                            <property name="name">
+                                                                <cstring>textLabel2</cstring>
+                                                            </property>
+                                                            <property name="text">
+                                                                <string>Smooth Relaxations:</string>
+                                                            </property>
+                                                        </widget>
+                                                        <spacer>
+                                                            <property name="name">
+                                                                <cstring>spacer5_2_2</cstring>
+                                                            </property>
+                                                            <property name="orientation">
+                                                                <enum>Horizontal</enum>
+                                                            </property>
+                                                            <property name="sizeType">
+                                                                <enum>Fixed</enum>
+                                                            </property>
+                                                            <property name="sizeHint">
+                                                                <size>
+                                                                    <width>16</width>
+                                                                    <height>20</height>
+                                                                </size>
+                                                            </property>
+                                                        </spacer>
+                                                        <widget class="QLineEdit">
+                                                            <property name="name">
+                                                                <cstring>m_SmoothIRelaxationValueLineEdit</cstring>
+                                                            </property>
+                                                            <property name="text">
+                                                                <string>0.1</string>
+                                                            </property>
+                                                        </widget>
+                                                    </hbox>
+                                                </widget>
+                                            </vbox>
+                                        </widget>
+                                        <widget class="QCheckBox">
+                                            <property name="name">
+                                                <cstring>m_GaussCheckBox</cstring>
+                                            </property>
+                                            <property name="enabled">
+                                                <bool>false</bool>
+                                            </property>
+                                            <property name="text">
+                                                <string>Gauss</string>
+                                            </property>
+                                        </widget>
+                                        <widget class="QGroupBox">
+                                            <property name="name">
+                                                <cstring>m_ExpertModeGaussGroupBox</cstring>
+                                            </property>
+                                            <property name="enabled">
+                                                <bool>false</bool>
+                                            </property>
+                                            <property name="title">
+                                                <string>Gauss</string>
+                                            </property>
+                                            <vbox>
+                                                <property name="name">
+                                                    <cstring>unnamed</cstring>
+                                                </property>
+                                                <widget class="QLayoutWidget">
+                                                    <property name="name">
+                                                        <cstring>layout17</cstring>
+                                                    </property>
+                                                    <hbox>
+                                                        <property name="name">
+                                                            <cstring>unnamed</cstring>
+                                                        </property>
+                                                        <widget class="QLabel">
+                                                            <property name="name">
+                                                                <cstring>textLabel1_2_2_2_2</cstring>
+                                                            </property>
+                                                            <property name="text">
+                                                                <string>Gauss:</string>
+                                                            </property>
+                                                        </widget>
+                                                        <spacer>
+                                                            <property name="name">
+                                                                <cstring>spacer6_2_2_2</cstring>
+                                                            </property>
+                                                            <property name="orientation">
+                                                                <enum>Horizontal</enum>
+                                                            </property>
+                                                            <property name="sizeType">
+                                                                <enum>Fixed</enum>
+                                                            </property>
+                                                            <property name="sizeHint">
+                                                                <size>
+                                                                    <width>16</width>
+                                                                    <height>20</height>
+                                                                </size>
+                                                            </property>
+                                                        </spacer>
+                                                        <widget class="QLineEdit">
+                                                            <property name="name">
+                                                                <cstring>m_GausValueLineEdit</cstring>
+                                                            </property>
+                                                            <property name="text">
+                                                                <string>1.5</string>
+                                                            </property>
+                                                            <property name="cursorPosition">
+                                                                <number>3</number>
+                                                            </property>
+                                                        </widget>
+                                                    </hbox>
+                                                </widget>
+                                            </vbox>
+                                        </widget>
+                                        <widget class="QCheckBox">
+                                            <property name="name">
+                                                <cstring>m_DecimateCheckBox</cstring>
+                                            </property>
+                                            <property name="enabled">
+                                                <bool>false</bool>
+                                            </property>
+                                            <property name="text">
+                                                <string>Decimate</string>
+                                            </property>
+                                            <property name="checked">
+                                                <bool>true</bool>
+                                            </property>
+                                        </widget>
+                                        <widget class="QGroupBox">
+                                            <property name="name">
+                                                <cstring>m_ExpertModeDecimateGroupBox</cstring>
+                                            </property>
+                                            <property name="enabled">
+                                                <bool>false</bool>
+                                            </property>
+                                            <property name="title">
+                                                <string>Decimate</string>
+                                            </property>
+                                            <vbox>
+                                                <property name="name">
+                                                    <cstring>unnamed</cstring>
+                                                </property>
+                                                <widget class="QLayoutWidget">
+                                                    <property name="name">
+                                                        <cstring>layout12_2_2</cstring>
+                                                    </property>
+                                                    <hbox>
+                                                        <property name="name">
+                                                            <cstring>unnamed</cstring>
+                                                        </property>
+                                                        <widget class="QLabel">
+                                                            <property name="name">
+                                                                <cstring>textLabel1_2_2_2_2_2</cstring>
+                                                            </property>
+                                                            <property name="text">
+                                                                <string>Decimate:</string>
+                                                            </property>
+                                                        </widget>
+                                                        <spacer>
+                                                            <property name="name">
+                                                                <cstring>spacer6_2_2_2_2</cstring>
+                                                            </property>
+                                                            <property name="orientation">
+                                                                <enum>Horizontal</enum>
+                                                            </property>
+                                                            <property name="sizeType">
+                                                                <enum>Fixed</enum>
+                                                            </property>
+                                                            <property name="sizeHint">
+                                                                <size>
+                                                                    <width>16</width>
+                                                                    <height>20</height>
+                                                                </size>
+                                                            </property>
+                                                        </spacer>
+                                                        <widget class="QLineEdit">
+                                                            <property name="name">
+                                                                <cstring>m_DecimateValueLineEdit</cstring>
+                                                            </property>
+                                                            <property name="text">
+                                                                <string>0.5</string>
+                                                            </property>
+                                                            <property name="cursorPosition">
+                                                                <number>3</number>
+                                                            </property>
+                                                        </widget>
+                                                    </hbox>
+                                                </widget>
+                                            </vbox>
+                                        </widget>
+                                    </vbox>
+                                </widget>
+                            </vbox>
+                        </widget>
                         <widget class="QPushButton">
                             <property name="name">
                                 <cstring>m_CreateSurfaceButton</cstring>
@@ -240,7 +793,7 @@
                             <property name="sizeHint">
                                 <size>
                                     <width>20</width>
-                                    <height>16</height>
+                                    <height>10</height>
                                 </size>
                             </property>
                         </spacer>
@@ -293,6 +846,22 @@
     <function returnType="QLineEdit *">GetThresholdLineEdit()</function>
     <function returnType="int">GetThreshold()</function>
     <function>SetThreshold( int threshold )</function>
+    <function returnType="QGroupBox *">GetShowExpertModeGroupBox()</function>
+    <function returnType="QGroupBox *">GetExpertModeMedianGroupBox()</function>
+    <function returnType="QGroupBox *">GetExpertModeInterpolateGoupBox()</function>
+    <function returnType="QGroupBox *">GetExpertModeSmoothGroupBox()</function>
+    <function returnType="QGroupBox *">GetExpertModeGaussGroupBox()</function>
+    <function returnType="QGroupBox *">GetExpertModeDecimateGroupBox()</function>
+    <function returnType="QCheckBox *">GetMedian3DCheckBox()</function>
+    <function returnType="QCheckBox *">GetInterpolateCheckBox()</function>
+    <function returnType="QCheckBox *">GetSmoothCheckBox()</function>
+    <function returnType="QCheckBox *">GetGaussCheckBox()</function>
+    <function returnType="QCheckBox *">GetDecimateCheckBox()</function>
+    <function returnType="QGroupBox *">GetShowSurfaceParameterGroupBox()</function>
+    <function returnType="float">GetGaussValue()</function>
+    <function returnType="float">GetDecimateValue()</function>
+    <function returnType="int">GetSmoothIterationValue()</function>
+    <function returnType="float">GetSmoothRelaxationValue()</function>
 </functions>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

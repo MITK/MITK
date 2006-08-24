@@ -25,6 +25,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 class QmitkSurfaceCreatorComponentGUI;
 class QmitkStdMultiWidget;
+class QGroupBox;
+class QCheckBox;
 
 /**
 * \brief ComponentClass to create a surface based on a threshold for a selected image
@@ -83,12 +85,16 @@ public:
 
   /** \brief Method to get the Name of the FunctionalityComponent */
   virtual QString GetFunctionalityComponentName();
-  
+
   /** \brief Method to get the GUI of this component. This Method is obligatory */
   virtual QWidget* GetGUI();
-   
+
   /** \brief Method to set the Image Selector visible or invisible */
   virtual void SetSelectorVisibility(bool visibility);
+
+  /** \brief Method to set the ExpertMode visible or invisible */
+  virtual void SetExpertMode(bool visibility);
+
 
   /***************      (DE)ACTIVATED     ***************/
 
@@ -116,13 +122,22 @@ public slots:
   /** \brief Slot method that will be called if the CheckBox at the TreeNodeSelector-Group-Box was toggled to show the TreeNodeSelector or not. */ 
   void ShowImageContent(bool show = true);
 
+  /** \brief Slot method that will be called if the CheckBox at the SurfaceCreatorCheckBox was toggled to show the SurfaceCreator or not. */ 
+  void ShowCreateSurface(bool);
+
+  /** \brief Slot method that will be called if the CheckBox ShowExpertMode was toggled to show the ExpertMode or not. */ 
+  void ShowExpertMode(bool);
+
+  /** \brief Slot method that will be called if the CheckBox ShowSurfaceParameter was toggled to show the Parameters or not. */ 
+  void ShowSurfaceParameter(bool);
+
   /** \brief Method is called when the DataTree was changed. This Method is self-evident obligatory */
   virtual void TreeChanged();
 
   /** \brief Method to set the threshold that is used to create the surface */
   virtual void SetThreshold(int threshold);
 
-  /** \brief Method to set the threshold that is used to create the surface */
+  /** \brief Method to set the threshold that is used to create the surface as slot combiend with thresholdComponent*/
   void SetThreshold(const QString& threshold);
 
 protected slots:
@@ -132,8 +147,27 @@ protected slots:
   void CreateSurface();
   //----------------------------------------------------
 
+  
+  void SetMedian3DFlag(bool flag);
+  void SetInterpolateFlag(bool flag);
+  void SetSmoothFlag(bool flag);
+  void SetGaussFlag(bool flag);
+  void SetDecimateFlag(bool flag);
+
 protected:
+
+  void InitSurfaceGUI();
+
+  void InitSurfaceParamterFlags();
+
   /***************        ATTRIBUTES      ***************/
+
+  /** \brief Vector with all Widgets from the ExpertMode */
+  std::vector<QGroupBox *> m_ExpertModeList;
+
+  /** \brief Vector with all Parameter-Widgets */
+  std::vector<QCheckBox *> m_ParameterList;
+
 
   /*!
   the name of the component
@@ -155,12 +189,63 @@ protected:
 
   /** \brief Attribute to decide whether the selector shall be shown or not */
   bool m_ShowSelector;
- 
+
   /** \brief Attribute to that will be set to true by the first activation of the functionality */
   bool m_Active;
 
+  /** \brief Attribute to decide whether the ExpertMode can be visible or not */
+  bool m_ShowExpertMode;
+
+  //Flags if to use Parameters or not:
+
+  /** \brief Attribute to decide whether the Median3D-Paramter is checked an shall be used or not */
+  bool m_Median3DFlag;
+
+  /** \brief Attribute to decide whether the Interpolate-Paramter is checked an shall be used or not */
+  bool m_InterpolateFlag;
+
+  /** \brief Attribute to decide whether the Smooth-Paramter is checked an shall be used or not */
+  bool m_SmoothFlag;
+
+  /** \brief Attribute to decide whether the Gauss-Paramter is checked an shall be used or not */
+  bool m_GaussFlag;
+
+  /** \brief Attribute to decide whether the Decimate-Paramter is checked an shall be used or not */
+  bool m_DecimateFlag;
+
 
 private:
+
+
+  /*!
+  Returns the Median3DValue from the GUI-InputField
+  */
+  int GetMedian3DValue();
+
+  /*!
+  Returns the InterpolationValue from the GUI-InputField
+  */
+  int GetInterpolateValue();
+
+  /*!
+  Returns the SmoothIterationValues from the GUI-InputField
+  */
+  int GetSmoothIterationValue();
+
+  /*!
+  Returns the SmoothRelaxationValues from the GUI-InputField
+  */
+  float GetSmoothRelaxationValue();
+
+  /*!
+  Returns the GaussValue from the GUI-InputField
+  */
+  float GetGaussValue();
+
+  /*!
+  Returns the DecimateValue from the GUI-InputField
+  */
+  float GetDecimateValue();
 
   /***************        ATTRIBUTES      ***************/
 
@@ -191,13 +276,31 @@ private:
   */
   int m_SurfaceCounter;
 
-  //SurfaceColor
+  /*!
+  *  variable to set the red-value of the surface 
+  */
   float m_r;
+  /*!
+  *  variable to set the greed-value of the surface 
+  */
   float m_g;
+  /*!
+  *  variable to set the blue-value of the surface 
+  */
   float m_b;
 
+  /*!
+  *  variable to set the color of the surface 
+  */
   mitk::Color m_Color;
+  /*!
+  *  variable to get the next color 
+  */
   mitk::ColorSequence* m_RainbowColor;
+
+  /*!
+  *  variable to hold the threshold that is used to create the surface 
+  */
   int m_Threshold;
 
 

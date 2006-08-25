@@ -30,7 +30,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 /***************       CONSTRUCTOR      ***************/
-QmitkThresholdComponent::QmitkThresholdComponent(QObject *parent, const char *name, QmitkStdMultiWidget *mitkStdMultiWidget, mitk::DataTreeIteratorBase* it, bool updateSelector, bool showSelector)
+QmitkThresholdComponent::QmitkThresholdComponent(QObject * /*parent*/, const char * /*name*/, QmitkStdMultiWidget *mitkStdMultiWidget, mitk::DataTreeIteratorBase* it, bool updateSelector, bool showSelector)
 {
   SetDataTreeIterator(it);
   m_GUI = NULL;

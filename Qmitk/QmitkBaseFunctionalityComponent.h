@@ -95,7 +95,6 @@ public:
   */
   //virtual void TreeChanged(const itk::EventObject & treeChangedEvent);
   virtual void TreeChanged();
-  virtual void TreeChanged(mitk::DataTreeIteratorBase*);
 
   /***************      OHTER METHODS     ***************/
   /*!

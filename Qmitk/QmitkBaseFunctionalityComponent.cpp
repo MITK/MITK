@@ -114,11 +114,6 @@ void QmitkBaseFunctionalityComponent::TreeChanged()
   
 }
 
-void QmitkBaseFunctionalityComponent::TreeChanged(mitk::DataTreeIteratorBase* it)
-{
-
-}
-
 QWidget* QmitkBaseFunctionalityComponent::GetGUI()
 {
   return NULL;

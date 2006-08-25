@@ -24,7 +24,6 @@ PURPOSE.  See the above copyright notices for more information.
 std::string mitk::BaseProperty::VALUE = "VALUE";
 const std::string mitk::BaseProperty::XML_NODE_NAME = "property";
 
-//##ModelId=3E38FF0902A7
 mitk::BaseProperty::BaseProperty() 
 {
   m_ReferenceCountLock.Lock();
@@ -32,15 +31,36 @@ mitk::BaseProperty::BaseProperty()
   m_ReferenceCountLock.Unlock();
 }
 
-
-//##ModelId=3E38FF0902CF
 mitk::BaseProperty::~BaseProperty()
 {
 }
 
 std::string mitk::BaseProperty::GetValueAsString() const
 {
-   return "n/a"; 
+  return std::string("n/a"); 
+}
+
+/*!
+  Should be implemented by subclasses to indicate whether they can accept the parameter 
+  as the right-hand-side argument of an assignment. This test will most probably include
+  some dynamic_cast.
+ */
+bool mitk::BaseProperty::Assignable(const BaseProperty&) const
+{
+  return false;
+}
+
+/*!
+  To be implemented more meaningful by subclasses. This version just accepts the assignment
+  of BaseProperty objects to others, but the assignment has NO MEANING, values are not changed at all!
+ */
+mitk::BaseProperty& mitk::BaseProperty::operator=(const BaseProperty& rhs)
+{
+  if (this == &rhs) return *this; // no self assignment
+
+  // place meaningful copy code here (nothing possible with BaseProeprties
+
+  return *this;
 }
 
 bool mitk::BaseProperty::WriteXMLData( XMLWriter& xmlWriter )
@@ -49,7 +69,7 @@ bool mitk::BaseProperty::WriteXMLData( XMLWriter& xmlWriter )
   return true;
 }
 
-bool mitk::BaseProperty::ReadXMLData( XMLReader& /*xmlReader*/ )
+bool mitk::BaseProperty::ReadXMLData( XMLReader& )
 {
   return false;
 }

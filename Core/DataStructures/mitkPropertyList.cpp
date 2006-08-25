@@ -39,30 +39,60 @@ mitk::BaseProperty::Pointer mitk::PropertyList::GetProperty(const char *property
 //##ModelId=3D78B966005F
 void mitk::PropertyList::SetProperty(const char* propertyKey, BaseProperty* property)
 {
-    PropertyMap::iterator it;
-    
-    it=m_Properties.find( propertyKey );
-    //is a property with key @a propertyKey contained in the list?
-    if(it!=m_Properties.end())
-        //yes?
+  if (!property) return;
+
+  PropertyMap::iterator it( m_Properties.find( propertyKey ) );
+  
+  // Is a property with key @a propertyKey contained in the list?
+  if( it != m_Properties.end() )
+  {
+    // yes
+    //is the property contained in the list identical to the new one?
+    if( it->second.first == property) 
     {
-        //is the property contained in the list identical to the new one?
-        if( it->second.first == property) {
-            // yes? do nothing and return.
-            return;
-  }
-        //no? erase the old entry.
-        it->second.first=NULL;
-        m_Properties.erase(it);
+      // yes? do nothing and return.
+      return;
     }
 
-    //no? add/replace it.
-  //std::pair<PropertyMap::iterator, bool> o=
-       PropertyMapElementType newProp;
-       newProp.first = propertyKey;
-       newProp.second = std::pair<BaseProperty::Pointer,bool>(property,true);
-       m_Properties.insert ( newProp );
-       Modified();
+    // compatible? then use operator= to assign value
+    if (it->second.first->Assignable( *property ))
+    {
+      *(static_cast<BaseProperty*>(it->second.first.GetPointer())) = *property;
+      return;
+    }
+    
+    // Neither identical nor compatible? Then override the old entry.
+    it->second.first=NULL;
+    m_Properties.erase(it);
+  }
+
+  //no? add/replace it.
+  PropertyMapElementType newProp;
+  newProp.first = propertyKey;
+  newProp.second = std::pair<BaseProperty::Pointer,bool>(property,true);
+  m_Properties.insert ( newProp );
+  Modified();
+}
+
+void mitk::PropertyList::ReplaceProperty(const char* propertyKey, BaseProperty* property)
+{
+  if (!property) return;
+
+  PropertyMap::iterator it( m_Properties.find( propertyKey ) );
+  
+  // Is a property with key @a propertyKey contained in the list?
+  if( it != m_Properties.end() )
+  {
+    it->second.first=NULL;
+    m_Properties.erase(it);
+  }
+
+  //no? add/replace it.
+  PropertyMapElementType newProp;
+  newProp.first = propertyKey;
+  newProp.second = std::pair<BaseProperty::Pointer,bool>(property,true);
+  m_Properties.insert ( newProp );
+  Modified();
 }
 
 //##ModelId=3E38FEFE0125

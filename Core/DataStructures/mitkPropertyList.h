@@ -56,10 +56,24 @@ public:
 
     //##ModelId=3D78B966005F
     //##Documentation
-    //## @brief Set a property in the list/map 
-    //## 
-    //## Each property gets a key (@a propertyKey) to make it accessible. 
+    //## @brief Set a property in the list/map. This is set-by-value. 
+    //##
+    //## @warning Change in semantics since Aug 25th 2006. Check your usage of this method if you do
+    //##          more with properties than just call <tt>SetProperty( "key", new SomeProperty("value") )</tt>.
+    //##
+    //## The actual OBJECT holding the value of the property is not replaced, but its value 
+    //## is modified to match that of @a property. To really replace the object holding the
+    //## property - which would make sense if you want to change the type (bool, string) of the property
+    //## - call ReplaceProperty.
     void SetProperty(const char* propertyKey, BaseProperty* property);
+
+    //## @brief Set a property object in the list/map. This is kind of set-by-reference (seems the wrong word - delete this comment if it's not). 
+    //##
+    //## The actual OBJECT holding the value of the property is replaced by this function.
+    //## This is useful if you want to change the type of the property, like from BoolProperty to StringProperty.
+    //## Another use is to share one and the same property object among several ProperyList/DataTreeNode objects, which
+    //## makes them appear synchronized.
+    void ReplaceProperty(const char* propertyKey, BaseProperty* property);
 
     //##ModelId=3ED94AAE0075
     //##Documentation
@@ -74,7 +88,7 @@ public:
 
     const PropertyMap* GetMap() const { return &m_Properties; }
 
-		virtual Pointer Clone();
+    virtual Pointer Clone();
 
     virtual void Clear();
 

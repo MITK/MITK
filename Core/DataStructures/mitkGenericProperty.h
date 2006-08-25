@@ -32,42 +32,101 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk {
 
-//##ModelId=3EF99DB6009C
+/*!
+  @ brief Template class for generating properties for int, float, bool, etc.
+
+  This class template can be instantiated for all classes/internal types that fulfills
+  these requirements:
+    - an operator<< so that the properties value can be put into a std::stringstream
+    - an operator== so that two properties can be checked for equality
+
+*/
 template <typename T>
 class GenericProperty : public BaseProperty
 {
   public:
-   
+
     mitkClassMacro(GenericProperty, BaseProperty);
-//    itkNewMacro(Self);
-    //##ModelId=3EF99E2C0290
-    GenericProperty() {};
-    GenericProperty(T x) : m_Value(x) {};	
-    //##ModelId=3EF99E2C02AE
-    virtual ~GenericProperty() {}; 
-    //##ModelId=3EF99E3A0196
-    virtual bool operator==(const BaseProperty& property) const {
-        const Self *other = dynamic_cast<const Self*>(&property);
-        if(other==NULL) return false;
-        return other->m_Value==m_Value;
-    }
     
-    itkSetMacro(Value,T);
-    itkGetConstMacro(Value,T);
-    
-   	
-    std::string GetValueAsString() const {
-       std::stringstream myStr;
-       myStr << GetValue() ;
-       return myStr.str(); 
+    GenericProperty() 
+    {
     }
 
-  virtual bool WriteXMLData( XMLWriter& xmlWriter );
-  
-  virtual bool ReadXMLData( XMLReader& xmlReader );
+
+    GenericProperty(T x) 
+    : m_Value(x) 
+    {
+    }
+   
+
+    virtual ~GenericProperty() 
+    {
+    }
+
+    itkSetMacro(Value,T);
+    itkGetConstMacro(Value,T);
+
+    virtual bool operator==(const BaseProperty& other) const 
+    {
+      try
+      {
+        const Self& otherProp( dynamic_cast<const Self&>(other) );
+
+        if (this->m_Value == otherProp.m_Value) return true;
+      }
+      catch (std::bad_cast)
+      {
+        // nothing to do now - just return false
+      }
+
+      return false;
+    }
+
+    std::string GetValueAsString() const 
+    {
+      std::stringstream myStr;
+      myStr << GetValue() ;
+      return myStr.str(); 
+    }
     
+    virtual bool Assignable(const BaseProperty& other) const
+    {
+      try
+      {
+        dynamic_cast<const Self&>(other); // dear compiler, please don't optimize this away!
+        return true;
+      }
+      catch (std::bad_cast)
+      {
+      }
+      return false;
+    }
+
+    virtual BaseProperty& operator=(const BaseProperty& other)
+    {
+      try
+      {
+        const Self& otherProp( dynamic_cast<const Self&>(other) );
+
+        if (this->m_Value != otherProp.m_Value)
+        {
+          this->m_Value = otherProp.m_Value;
+          this->Modified();
+        }
+      }
+      catch (std::bad_cast)
+      {
+        // nothing to do then
+      }
+
+      return *this;
+     }
+
+    virtual bool WriteXMLData( XMLWriter& xmlWriter );
+
+    virtual bool ReadXMLData( XMLReader& xmlReader );
+
   protected:
-    //##ModelId=3EF99E45001F
     T m_Value;
 
 };
@@ -92,3 +151,4 @@ bool GenericProperty<T>::ReadXMLData( XMLReader& xmlReader )
 } // namespace mitk
 
 #endif /* MITKGENERICPROPERTY_H_HEADER_INCLUDED_C1061CEE */
+

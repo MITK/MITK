@@ -58,6 +58,11 @@ class BaseRenderer;
 //## draw the data, a transform (vtkTransform) and a list of properties
 //## (PropertyList).
 //## @ingroup DataTree
+//##
+//## @TODO clean up all the GetProperty methods. There are too many different flavours... Can most probably be reduced to <tt>bool GetProperty<type>(type&)</tt>
+//##
+//## @warning Change in semantics of SetProperty() since Aug 25th 2006. Check your usage of this method if you do
+//##          more with properties than just call <tt>SetProperty( "key", new SomeProperty("value") )</tt>.
 class DataTreeNode : public itk::DataObject, public XMLIO
 {
 public:
@@ -124,15 +129,27 @@ public:
   virtual void CopyInformation(const itk::DataObject *data);
 
   //##Documentation
-  //## @brief Set the property (instance of BaseProperty) with key @a propertyKey to the PropertyList 
-  //## of the @a renderer (if NULL, use BaseRenderer-independent PropertyList).
+  //## @brief Set the property (instance of BaseProperty) with key @a propertyKey in the PropertyList 
+  //## of the @a renderer (if NULL, use BaseRenderer-independent PropertyList). This is set-by-value.
+  //##
+  //## @warning Change in semantics since Aug 25th 2006. Check your usage of this method if you do
+  //##          more with properties than just call <tt>SetProperty( "key", new SomeProperty("value") )</tt>.
+  //## 
+  //## @sa GetProperty
+  //## @sa m_PropertyList
+  //## @sa m_MapOfPropertyLists
+  void SetProperty(const char *propertyKey, BaseProperty* property, const mitk::BaseRenderer* renderer = NULL);
+ 
+  //##Documentation
+  //## @brief Replace the property (instance of BaseProperty) with key @a propertyKey in the PropertyList 
+  //## of the @a renderer (if NULL, use BaseRenderer-independent PropertyList). This is set-by-reference.
   //## 
   //## If @a renderer is @a NULL the property is set in the BaseRenderer-independent 
   //## PropertyList of this DataTreeNode.
   //## @sa GetProperty
   //## @sa m_PropertyList
   //## @sa m_MapOfPropertyLists
-  void SetProperty(const char *propertyKey, BaseProperty* property, const mitk::BaseRenderer* renderer = NULL);	
+  void ReplaceProperty(const char *propertyKey, BaseProperty* property, const mitk::BaseRenderer* renderer = NULL);
 
   //##Documentation
   //## @brief Get the PropertyList of the @a renderer. If @a renderer is @a

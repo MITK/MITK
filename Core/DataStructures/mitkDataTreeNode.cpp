@@ -385,6 +385,14 @@ void mitk::DataTreeNode::SetProperty(const char *propertyKey,
   GetPropertyList(renderer)->SetProperty(propertyKey, propertyValue);
 }
 
+void mitk::DataTreeNode::ReplaceProperty(const char *propertyKey, 
+                                         BaseProperty* propertyValue, 
+                                         const mitk::BaseRenderer* renderer)
+{
+  GetPropertyList(renderer)->ReplaceProperty(propertyKey, propertyValue);
+}
+
+
 //##ModelId=3ED91D050121
 vtkLinearTransform* mitk::DataTreeNode::GetVtkTransform(int t) const
 {

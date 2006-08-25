@@ -27,12 +27,10 @@ PURPOSE.  See the above copyright notices for more information.
 ** destructor.
 *****************************************************************************/
 
-#include "mitkImageTimeSelector.h"
 #include "QmitkCommonFunctionality.h"
 #include "itkImage.h"
 #include <limits>
 #include "mitkDataTreeNode.h"
-#include "mitkRenderWindow.h"
 #include "mitkDataTreeHelper.h"
 #include "mitkRenderingManager.h"
 

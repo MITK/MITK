@@ -28,7 +28,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <QmitkCommonFunctionality.h>
 #include <utility>
-#include <mitkProperties.h>
+
 #include <mitkFocusManager.h>
 #include <mitkRenderingManager.h>
 #include <mitkRenderWindow.h>

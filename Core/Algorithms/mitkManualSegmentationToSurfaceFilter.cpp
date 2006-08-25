@@ -10,11 +10,13 @@ mitk::ManualSegmentationToSurfaceFilter::ManualSegmentationToSurfaceFilter()
   m_UseStandardDeviation = false;
   m_StandardDeviation = 1.5;
   m_Interpolation = false;
+  m_InterpolationX = 1;
+  m_InterpolationY = 1;
+  m_InterpolationZ = 1;
 };
 
 
 mitk::ManualSegmentationToSurfaceFilter::~ManualSegmentationToSurfaceFilter(){};
-
 
 void mitk::ManualSegmentationToSurfaceFilter::GenerateData() 
 {
@@ -108,5 +110,12 @@ void mitk::ManualSegmentationToSurfaceFilter::SetMedianKernelSize(int x, int y, 
   m_MedianKernelSizeX = x;
   m_MedianKernelSizeY = y;
   m_MedianKernelSizeZ = z;
+}
+
+void mitk::ManualSegmentationToSurfaceFilter::SetInterpolation(int x, int y, int z)
+{
+  m_InterpolationX = x;
+  m_InterpolationY = y;
+  m_InterpolationZ = z;
 }
 

@@ -71,6 +71,11 @@ public:
   itkGetConstMacro(MedianKernelSizeY, int);
   itkGetConstMacro(MedianKernelSizeZ, int);
 
+  /**
+  * Set the values for Spacing in X, Y and Z-Dimension
+  */
+  void SetInterpolation(int x, int y, int z);
+
 protected:
   ManualSegmentationToSurfaceFilter();
   virtual ~ManualSegmentationToSurfaceFilter();
@@ -80,6 +85,10 @@ protected:
   bool m_UseStandardDeviation; //Gaussian Filter
   double m_StandardDeviation;
   bool m_Interpolation;
+
+  int m_InterpolationX;
+  int m_InterpolationY;
+  int m_InterpolationZ;
   
 };//namespace
 

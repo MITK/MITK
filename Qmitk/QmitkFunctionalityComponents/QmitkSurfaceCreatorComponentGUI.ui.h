@@ -173,5 +173,22 @@ float QmitkSurfaceCreatorComponentGUI::GetSmoothRelaxationValue()
   return value;
 }
 
+void QmitkSurfaceCreatorComponentGUI::GetMedian3DValue(int& x, int& y, int& z)
+{
+   x = atoi(m_Median3DXValueLineEdit->text());
+   y = atoi(m_Median3DYValueLineEdit->text());
+   z = atoi(m_Median3DZValueLineEdit->text());
+}
+
+QCheckBox * QmitkSurfaceCreatorComponentGUI::GetReplaceExistingSurfaceCheckBox()
+{
+  return m_ReplaceExistingSurfaceCheckBox;
+}
 
 
+void QmitkSurfaceCreatorComponentGUI::GetInterpolationValue( int & x, int & y, int & z )
+{
+    x = atoi(m_InterpolateXValueLineEdit->text());
+    y = atoi(m_InterpolateYValueLineEdit->text());
+    z = atoi(m_InterpolateZValueLineEdit->text());
+}

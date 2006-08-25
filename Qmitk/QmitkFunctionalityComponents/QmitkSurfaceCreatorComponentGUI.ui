@@ -8,7 +8,7 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>262</width>
+            <width>251</width>
             <height>689</height>
         </rect>
     </property>
@@ -218,7 +218,7 @@
                             <property name="sizeHint">
                                 <size>
                                     <width>20</width>
-                                    <height>10</height>
+                                    <height>16</height>
                                 </size>
                             </property>
                         </spacer>
@@ -422,7 +422,7 @@
                                                                 <cstring>textLabel1_2_2</cstring>
                                                             </property>
                                                             <property name="text">
-                                                                <string>Interpolate</string>
+                                                                <string>X, Y, Z spacing in mm</string>
                                                             </property>
                                                         </widget>
                                                         <widget class="QLayoutWidget">
@@ -466,7 +466,7 @@
                                                                         <cstring>m_InterpolateYValueLineEdit</cstring>
                                                                     </property>
                                                                     <property name="text">
-                                                                        <string>3</string>
+                                                                        <string>1</string>
                                                                     </property>
                                                                     <property name="cursorPosition">
                                                                         <number>1</number>
@@ -494,7 +494,7 @@
                                                                         <cstring>m_InterpolateZValueLineEdit</cstring>
                                                                     </property>
                                                                     <property name="text">
-                                                                        <string>3</string>
+                                                                        <string>1</string>
                                                                     </property>
                                                                 </widget>
                                                             </hbox>
@@ -780,6 +780,17 @@
                                 <string>Create Surface</string>
                             </property>
                         </widget>
+                        <widget class="QCheckBox">
+                            <property name="name">
+                                <cstring>m_ReplaceExistingSurfaceCheckBox</cstring>
+                            </property>
+                            <property name="enabled">
+                                <bool>false</bool>
+                            </property>
+                            <property name="text">
+                                <string>Replace existing Surface</string>
+                            </property>
+                        </widget>
                         <spacer>
                             <property name="name">
                                 <cstring>spacer4</cstring>
@@ -793,7 +804,7 @@
                             <property name="sizeHint">
                                 <size>
                                     <width>20</width>
-                                    <height>10</height>
+                                    <height>16</height>
                                 </size>
                             </property>
                         </spacer>
@@ -835,6 +846,7 @@
 </variables>
 <slots>
     <slot specifier="non virtual">SetDataTreeIterator( mitk::DataTreeIteratorBase * it )</slot>
+    <slot>GetMedian3DValue( int &amp; x, int &amp; y, int &amp; z )</slot>
 </slots>
 <functions>
     <function returnType="QmitkDataTreeComboBox *">GetTreeNodeSelector()</function>
@@ -862,6 +874,8 @@
     <function returnType="float">GetDecimateValue()</function>
     <function returnType="int">GetSmoothIterationValue()</function>
     <function returnType="float">GetSmoothRelaxationValue()</function>
+    <function returnType="QCheckBox *">GetReplaceExistingSurfaceCheckBox()</function>
+    <function>GetInterpolationValue( int &amp; x, int &amp; y, int &amp; z )</function>
 </functions>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

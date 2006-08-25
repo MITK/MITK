@@ -27,6 +27,9 @@ class QmitkSurfaceCreatorComponentGUI;
 class QmitkStdMultiWidget;
 class QGroupBox;
 class QCheckBox;
+namespace mitk{
+  class ManualSegmentationToSurfaceFilter;
+}
 
 /**
 * \brief ComponentClass to create a surface based on a threshold for a selected image
@@ -54,7 +57,7 @@ class QmitkSurfaceCreatorComponent : public QmitkFunctionalityComponentContainer
 public:
   /***************       CONSTRUCTOR      ***************/
   /** \brief Constructor. */
-  QmitkSurfaceCreatorComponent(QObject *parent=0, const char *name=0, QmitkStdMultiWidget *mitkStdMultiWidget = NULL, mitk::DataTreeIteratorBase* dataIt = NULL, bool updateSelector = true, bool showSelector = true);
+  QmitkSurfaceCreatorComponent(QObject *parent=0, const char *name=0, QmitkStdMultiWidget *mitkStdMultiWidget = NULL, mitk::DataTreeIteratorBase* dataIt = NULL, bool updateSelector = true, bool showSelector = true, bool allowExpertMode = true);
 
   /***************        DESTRUCTOR      ***************/
   /** \brief Destructor. */
@@ -160,6 +163,8 @@ protected:
 
   void InitSurfaceParamterFlags();
 
+  void InsertSurfaceIntoDataTree(mitk::ManualSegmentationToSurfaceFilter * ft, mitk::DataTreeIteratorClone  iT);
+
   /***************        ATTRIBUTES      ***************/
 
   /** \brief Vector with all Widgets from the ExpertMode */
@@ -196,6 +201,9 @@ protected:
   /** \brief Attribute to decide whether the ExpertMode can be visible or not */
   bool m_ShowExpertMode;
 
+  /** \brief Attribute to decide whether the ExpertMode can be visible or not */
+  bool m_AllowExpertMode;
+
   //Flags if to use Parameters or not:
 
   /** \brief Attribute to decide whether the Median3D-Paramter is checked an shall be used or not */
@@ -220,12 +228,12 @@ private:
   /*!
   Returns the Median3DValue from the GUI-InputField
   */
-  int GetMedian3DValue();
+  void GetMedian3DValue(int& x, int& y, int& z);
 
   /*!
   Returns the InterpolationValue from the GUI-InputField
   */
-  int GetInterpolateValue();
+  void GetInterpolateValue(int& x, int& y, int& z);
 
   /*!
   Returns the SmoothIterationValues from the GUI-InputField

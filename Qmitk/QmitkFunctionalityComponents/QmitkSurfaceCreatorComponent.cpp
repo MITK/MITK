@@ -27,6 +27,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkProperties.h"
 #include <mitkColorSequenceRainbow.h>
 #include <mitkManualSegmentationToSurfaceFilter.h>
+//#include <mitkImageToSurfaceFilter.h>
 
 #include <qlineedit.h>
 #include <qslider.h>
@@ -37,12 +38,13 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 /***************       CONSTRUCTOR      ***************/
-QmitkSurfaceCreatorComponent::QmitkSurfaceCreatorComponent(QObject *parent, const char *name, QmitkStdMultiWidget *mitkStdMultiWidget, mitk::DataTreeIteratorBase* it, bool updateSelector, bool showSelector):
+QmitkSurfaceCreatorComponent::QmitkSurfaceCreatorComponent(QObject *parent, const char *name, QmitkStdMultiWidget *mitkStdMultiWidget, mitk::DataTreeIteratorBase* it, bool updateSelector, bool showSelector, bool allowExpertMode):
 m_Name(name),
 m_MultiWidget(mitkStdMultiWidget),
 m_DataTreeIteratorClone(NULL),
 m_UpdateSelector(updateSelector),
 m_ShowSelector(showSelector),
+m_AllowExpertMode(allowExpertMode),
 m_Active(false),
 m_ShowExpertMode(true),
 m_Median3DFlag(false),
@@ -175,6 +177,9 @@ void QmitkSurfaceCreatorComponent::ImageSelected(const mitk::DataTreeFilter::Ite
       m_MitkImage = static_cast<mitk::Image*> (m_MitkImageIterator->Get()->GetData());
     }
   }
+ m_SurfaceCounter = 0;
+ m_GUI->GetReplaceExistingSurfaceCheckBox()->setChecked(false);
+
 }
 
 /*************** CREATE CONTAINER WIDGET **************/
@@ -193,6 +198,13 @@ QWidget* QmitkSurfaceCreatorComponent::CreateContainerWidget(QWidget* parent)
 
   InitSurfaceParamterFlags();
 
+  if(!m_AllowExpertMode)
+  {
+   m_GUI->GetShowExpertModeGroupBox()->setCheckable(m_AllowExpertMode);
+   m_GUI->GetShowExpertModeGroupBox()->setTitle("");
+   m_GUI->GetShowExpertModeGroupBox()->setLineWidth(0);
+  }
+
   return m_GUI;
 
 }
@@ -209,8 +221,11 @@ void QmitkSurfaceCreatorComponent::SetSelectorVisibility(bool visibility)
 
 void QmitkSurfaceCreatorComponent::SetExpertMode(bool visibility)
 {
-  m_ShowExpertMode = visibility;
-  ShowExpertMode(visibility);
+  if(m_AllowExpertMode)
+  {
+    m_ShowExpertMode = visibility;
+    ShowExpertMode(visibility);
+  }
 
 }
 
@@ -257,12 +272,15 @@ void QmitkSurfaceCreatorComponent::ShowCreateSurface(bool)
 
 void QmitkSurfaceCreatorComponent::ShowExpertMode(bool)
 {
-  if(m_ShowExpertMode)
+  if(m_AllowExpertMode)
   {
-    for(unsigned int i = 0;  i < m_ExpertModeList.size(); i++)
+    if(m_ShowExpertMode)
     {
-      m_ExpertModeList[i]->setShown(m_GUI->GetShowExpertModeGroupBox()->isChecked());
-    }   
+      for(unsigned int i = 0;  i < m_ExpertModeList.size(); i++)
+      {
+        m_ExpertModeList[i]->setShown(m_GUI->GetShowExpertModeGroupBox()->isChecked());
+      }   
+    }
   }
   else
   {
@@ -271,6 +289,7 @@ void QmitkSurfaceCreatorComponent::ShowExpertMode(bool)
       m_ExpertModeList[i]->setShown(false);
     }
   }
+
   for(unsigned int i = 0;  i < m_ParameterList.size(); i++)
   {
     m_ParameterList[i]->setEnabled(true);
@@ -373,16 +392,14 @@ void QmitkSurfaceCreatorComponent::InitSurfaceParamterFlags()
   }
 }
 
-int QmitkSurfaceCreatorComponent::GetMedian3DValue()
+void QmitkSurfaceCreatorComponent::GetMedian3DValue(int& x, int& y, int& z)
 {
-  int median= 1;
-  return median;
+  m_GUI->GetMedian3DValue(x, y, z);
 }
 
-int QmitkSurfaceCreatorComponent::GetInterpolateValue()
+void QmitkSurfaceCreatorComponent::GetInterpolateValue(int& x, int& y, int& z)
 {
-  int interpolate = 1;
-  return interpolate;
+  m_GUI->GetInterpolationValue(x, y, z);
 }
 
 int QmitkSurfaceCreatorComponent::GetSmoothIterationValue()
@@ -424,14 +441,23 @@ void QmitkSurfaceCreatorComponent::CreateSurface()
   QApplication::setOverrideCursor( QCursor(Qt::WaitCursor) );
   if(m_MitkImage != NULL)
   {
-    //int interpolation[3] = GetMedian3DValue();
-    //int interpolation[3] = GetInterpolateValue();
+    //call the function to get the Median 3D-Values from GUI
+    int median3DXValue;
+    int median3DYValue;
+    int median3DZValue;
+    GetMedian3DValue(median3DXValue, median3DYValue, median3DZValue);
+
+    //call the function to get the Interpolation-Values from GUI
+    int interpolationXValue;
+    int interpolationYValue;
+    int interpolationZValue;
+    GetInterpolateValue(interpolationXValue, interpolationYValue, interpolationZValue);
+
+    //Get other values from GUI
     int smoothIterations = GetSmoothIterationValue();
     float smoothRelaxation = GetSmoothRelaxationValue();
     float gauss = GetGaussValue();
     float decimate = GetDecimateValue();
-
-
 
     //ImageToSurface Instance
     mitk::DataTreeIteratorClone  iteratorOnImageToBeSkinExtracted;
@@ -444,41 +470,94 @@ void QmitkSurfaceCreatorComponent::CreateSurface()
     {
       iteratorOnImageToBeSkinExtracted = CommonFunctionality::GetIteratorToFirstImage(m_DataTreeIterator.GetPointer());
     }
-
+    
+    //create surface-object, called filter
     mitk::ManualSegmentationToSurfaceFilter::Pointer filter = mitk::ManualSegmentationToSurfaceFilter::New();
+
     if (filter.IsNull())
     {
       std::cout<<"NULL Pointer for ManualSegmentationToSurfaceFilter"<<std::endl;
       return;
     }
 
+    //image from that the surface shall be created
     filter->SetInput( m_MitkImage ); 
+
+    //GAUSS FILTER (must be set befor threshold)
+    filter->SetUseStandardDeviation( m_GaussFlag );
     if(m_GaussFlag)
     {
       filter->SetStandardDeviation( gauss );
     }
-      filter->SetUseStandardDeviation( m_GaussFlag );
-    
-    filter->SetThreshold( m_GUI->GetThreshold()); //if( Gauss ) --> TH manipulated for vtkMarchingCube
-    
-    //filter->DebugOn();
 
+    //THRESHOLD FROM GUI 
+    filter->SetThreshold( m_GUI->GetThreshold()); 
+
+    //MEDIAN 3D FILTER
+    filter->SetMedianFilter3D(m_Median3DFlag);
+    if(m_Median3DFlag)
+    {
+      filter->SetMedianKernelSize(median3DXValue, median3DYValue, median3DZValue);
+    }
+
+    //INTERFOLATION FILTER
+    if(m_InterpolateFlag)
+    {
+      filter->SetInterpolation(interpolationXValue, interpolationYValue, interpolationZValue);
+    }
+    filter->SetInterpolation(m_InterpolateFlag);
+ 
+    //SMOOTH FILTER
+    if(m_SmoothFlag)
+    {
+      filter->SetSmoothIteration(smoothIterations);
+      filter->SetSmoothRelaxation(smoothRelaxation);
+    }
+    filter->SetSmooth(m_SmoothFlag);
+    
+
+    //DECIMATE FILTER
     if(m_DecimateFlag)
     {
       filter->SetTargetReduction( decimate );
+      filter->SetDecimate(mitk::ImageToSurfaceFilter::DecimatePro);
+    }
+    else
+    {
+      filter->SetDecimate(mitk::ImageToSurfaceFilter::NoDecimation );
     }
 
-    //filter->DebugOff();
+
+    InsertSurfaceIntoDataTree(filter, iteratorOnImageToBeSkinExtracted);
+    
+
+  }//if m_MitkImage != NULL
+
+  QApplication::restoreOverrideCursor();
+}
+
+void QmitkSurfaceCreatorComponent::InsertSurfaceIntoDataTree(mitk::ManualSegmentationToSurfaceFilter * ft, mitk::DataTreeIteratorClone  iT)
+{
+
+    mitk::ManualSegmentationToSurfaceFilter::Pointer filter = ft;
+    mitk::DataTreeIteratorClone iteratorOnImageToBeSkinExtracted = iT;
 
     mitk::DataTreeNode::Pointer surfaceNode = mitk::DataTreeNode::New(); 
     surfaceNode->SetData( filter->GetOutput() );
 
     int layer = 0;
 
+
     ++m_SurfaceCounter;
+
+
     std::ostringstream buffer;
+    QString surfaceDataName = m_GUI->GetTreeNodeSelector()->currentText();
+    buffer << surfaceDataName.ascii();
+    buffer << "_";
     buffer << m_SurfaceCounter;
-    std::string surfaceNodeName = "Surface " + buffer.str();
+    
+    std::string surfaceNodeName = "Surface_" + buffer.str();
 
     m_r += 0.25; if(m_r > 1){m_r = m_r - 1;}
     m_g += 0.25; if(m_g > 1){m_g = m_g - 1;}
@@ -502,8 +581,33 @@ void QmitkSurfaceCreatorComponent::CreateSurface()
         ++iteratorClone;
       }
     }
-    iteratorClone= iteratorOnImageToBeSkinExtracted;  
-    iteratorClone->Add(surfaceNode);
+    iteratorClone= iteratorOnImageToBeSkinExtracted; 
+
+    if(!(m_GUI->GetReplaceExistingSurfaceCheckBox()->isChecked()))
+    {
+      iteratorClone->Add(surfaceNode);
+      isSurface = true;
+    }
+
+    else if(m_GUI->GetReplaceExistingSurfaceCheckBox()->isChecked())
+    {
+      if(isSurface)
+      {
+        ++iteratorClone;
+        bool stillIsSurface = false;
+        if((!iteratorClone->IsAtEnd()) && (iteratorClone->Get().IsNotNull()))
+        {
+        iteratorClone->Get()->GetBoolProperty("Surface", stillIsSurface);
+        }
+        if(stillIsSurface)
+        {
+          iteratorClone->Set(surfaceNode);
+        }
+      }
+    }
+
+    m_GUI->GetReplaceExistingSurfaceCheckBox()->setEnabled(isSurface);
+
     iteratorClone->GetTree()->Modified();
 
 
@@ -515,10 +619,4 @@ void QmitkSurfaceCreatorComponent::CreateSurface()
     surfaceNode->SetVisibility(true);
 
     m_MultiWidget->RequestUpdate();
-
-  }//if m_MitkImage != NULL
-
-  QApplication::restoreOverrideCursor();
 }
-
-

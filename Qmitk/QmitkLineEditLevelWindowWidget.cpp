@@ -172,7 +172,7 @@ void QmitkLineEditLevelWindowWidget::validLevel()
   QString qLevel;
   qLevel.setNum(level);
   m_LevelInput->setText(qLevel);
-  m_LevelWindow.SetLevel(level);
+  m_LevelWindow.SetLevelWindow(level, m_LevelWindow.GetWindow());
   m_Manager->SetLevelWindow(m_LevelWindow);
 }
 
@@ -190,7 +190,7 @@ void QmitkLineEditLevelWindowWidget::validWindow()
   QString qWindow;
   qWindow.setNum(window);
   m_WindowInput->setText(qWindow);
-  m_LevelWindow.SetWindow(window);
+  m_LevelWindow.SetLevelWindow(m_LevelWindow.GetLevel(), window);
   m_Manager->SetLevelWindow(m_LevelWindow);
 }
 

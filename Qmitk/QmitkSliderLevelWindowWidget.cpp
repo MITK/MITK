@@ -287,7 +287,7 @@ void QmitkSliderLevelWindowWidget::mouseMoveEvent( QMouseEvent* mouseEvent ) {
         if ( value < 1 )
           value = 1;
 
-        m_LevelWindow.SetWindow( value );
+        m_LevelWindow.SetLevelWindow( m_LevelWindow.GetLevel(), value );
       } 
       else if(m_Resize && m_CtrlPressed)
       {
@@ -345,13 +345,13 @@ void QmitkSliderLevelWindowWidget::mouseMoveEvent( QMouseEvent* mouseEvent ) {
         float value = (m_MoveHeight - mouseEvent->pos().y()) / fact + minv;
        
         if ( value - wh < minv )
-          m_LevelWindow.SetLevel( m_LevelWindow.GetRangeMin() + wh );
+          m_LevelWindow.SetLevelWindow( m_LevelWindow.GetRangeMin() + wh, m_LevelWindow.GetLevel() );
 
         else if ( value + wh > maxv )
-          m_LevelWindow.SetLevel( m_LevelWindow.GetRangeMax() - wh );
+          m_LevelWindow.SetLevelWindow( m_LevelWindow.GetRangeMax() - wh, m_LevelWindow.GetLevel() );
 
         else
-          m_LevelWindow.SetLevel( value );
+          m_LevelWindow.SetLevelWindow( value, m_LevelWindow.GetLevel() );
       }
       m_Manager->SetLevelWindow(m_LevelWindow);
     }

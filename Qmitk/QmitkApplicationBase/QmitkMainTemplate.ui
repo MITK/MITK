@@ -48,6 +48,7 @@
     </item>
     <item text="&amp;Options" name="Options">
         <action name="optionsSlicesRotationAction"/>
+        <action name="optionsLinkSlices"/>
         <action name="optionsReinitMultiWidgetAction"/>
         <action name="HideToolbarAction"/>
         <action name="optionsFine_Undo_enabledAction"/>
@@ -77,8 +78,8 @@
             <property name="name">
                 <cstring>redoButton</cstring>
             </property>
-            <property name="mode"> 	 
-                <enum>Redo</enum> 	 
+            <property name="mode">
+                <enum>Redo</enum>
             </property>
         </widget>
         <action name="Fullscreen"/>
@@ -648,6 +649,29 @@
             <string>Lock Slice Rotation</string>
         </property>
     </action>
+    <action>
+        <property name="name">
+            <cstring>optionsLinkSlices</cstring>
+        </property>
+        <property name="toggleAction">
+            <bool>true</bool>
+        </property>
+        <property name="on">
+            <bool>false</bool>
+        </property>
+        <property name="enabled">
+            <bool>false</bool>
+        </property>
+        <property name="text">
+            <string>Link slices</string>
+        </property>
+        <property name="menuText">
+            <string>Link slices</string>
+        </property>
+        <property name="toolTip">
+            <string>During rotation the slices can be linked together. works for every 2D view</string>
+        </property>
+    </action>
 </actions>
 <images>
     <image name="image0">
@@ -856,6 +880,12 @@
         <receiver>QmitkMainTemplate</receiver>
         <slot>toolbarPositionOrientation_toggled(bool)</slot>
     </connection>
+    <connection>
+        <sender>optionsLinkSlices</sender>
+        <signal>toggled(bool)</signal>
+        <receiver>QmitkMainTemplate</receiver>
+        <slot>optionsLinkSlices_toggled(bool)</slot>
+    </connection>
 </connections>
 <includes>
     <include location="global" impldecl="in declaration">mitkDataTreeNodeFactory.h</include>
@@ -926,7 +956,8 @@
     <slot>viewPlaneSliceRotationLocked_toggled( bool on )</slot>
     <slot>viewPlanesLocked_toggled( bool on )</slot>
     <slot>viewShowPlanesAction_toggled( bool on )</slot>
-    <slot>toolbarPositionOrientation_toggled( bool )</slot>
+    <slot>toolbarPositionOrientation_toggled( bool on )</slot>
+    <slot>optionsLinkSlices_toggled( bool link )</slot>
 </slots>
 <functions>
     <function>fileOpen( const char * fileName )</function>

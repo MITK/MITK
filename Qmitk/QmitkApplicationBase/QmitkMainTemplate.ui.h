@@ -40,17 +40,16 @@ PURPOSE.  See the above copyright notices for more information.
   #include <QmitkSaveProjectWidget.h>
   #include <itksys/SystemTools.hxx>
 #else
-  #include "itkImage.h"
-  #include "itkImageFileReader.h"
-  #include "itkDICOMImageIO2.h"
-  #include "itkImageSeriesReader.h"
-  #include "itkDICOMSeriesFileNames.h"
+  #include <itkImage.h>
+  #include <itkImageFileReader.h>
+  #include <itkDICOMImageIO2.h>
+  #include <itkImageSeriesReader.h>
+  #include <itkDICOMSeriesFileNames.h>
 #endif
 
-#include "QmitkCommonFunctionality.h"
-#include "QmitkSelectableGLWidget.h"
-//#include "QmitkLevelWindowWidget.h"
-#include "QmitkHelpBrowser.h"
+#include <QmitkCommonFunctionality.h>
+#include <QmitkSelectableGLWidget.h>
+#include <QmitkHelpBrowser.h>
 
 #include <vtkSTLReader.h>
 #include <vtkSTLWriter.h>
@@ -70,7 +69,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkStringProperty.h>
 #include <mitkMapClassIDToClassName.h>
 #include <QmitkStringPropertyEditor.h>
-#include "mitkImageTimeSelector.h"
+#include <mitkImageTimeSelector.h>
 
 #include <mitkStateMachineFactory.h>
 #include <mitkUndoController.h>
@@ -80,6 +79,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkParRecFileReader.h>
 #include <mitkInteractionConst.h>
 #include <QmitkStatusBar.h>
+#include <QmitkSystemInfo.h>
 
 #include <QmitkOptionDialog.h>
 #include <qlistbox.h>
@@ -759,7 +759,7 @@ void QmitkMainTemplate::enableFineUndo( bool enabled )
   redoButton->setFineUndo(enabled);
 }
 
-#include "QmitkSystemInfo.h"
+
 void QmitkMainTemplate::optionsSystem_InformationAction_activated()
 {
   QmitkSystemInfo* systemInfo = new QmitkSystemInfo(this, "QmitkSystemInfo");
@@ -793,6 +793,7 @@ void QmitkMainTemplate::optionsSlicesRotation(bool on)
   m_MultiWidget->EnableSliceRotation(on);
   // enable posibilty to lock rotation in a desired position
   viewLockSliceRotationAction->setEnabled ( on );
+  optionsLinkSlices->setEnabled ( on );
 }
 
 void QmitkMainTemplate::optionsReinitMultiWidget()
@@ -1048,4 +1049,11 @@ void QmitkMainTemplate::toolbarPositionOrientation_toggled( bool on )
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 
+}
+
+
+void QmitkMainTemplate::optionsLinkSlices_toggled( bool link )
+{
+  m_MultiWidget->GetSlicesRotator()->SetLinkPlanes( link );
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }

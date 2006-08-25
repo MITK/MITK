@@ -52,6 +52,17 @@ public:
   virtual void SetInput(const mitk::Image *image);
 
   /**
+  * Set number of iterations
+  */
+  void SetSmoothIteration(int smoothIteration);
+
+  /**
+  * Setnumber of relaxation
+  */
+  void SetSmoothRelaxation(float smoothRelaxation);
+
+
+  /**
   * Set disired threshold for input image 1 for binary
   */
   itkSetMacro(Threshold, ScalarType);
@@ -102,6 +113,8 @@ protected:
   DecimationType m_Decimate;
   ScalarType m_Threshold; 
   float m_TargetReduction;
+  int m_SmoothIteration;
+  float m_SmoothRelaxation;
 
 };
 

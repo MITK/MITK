@@ -35,6 +35,8 @@ mitk::ImageToSurfaceFilter::ImageToSurfaceFilter()
   m_Decimate = NoDecimation;
   m_Threshold = 1;
   m_TargetReduction = 0.95f;
+  m_SmoothIteration = 50;
+  m_SmoothRelaxation = 0.1;
 }
 
 mitk::ImageToSurfaceFilter::~ImageToSurfaceFilter()
@@ -73,8 +75,8 @@ void mitk::ImageToSurfaceFilter::CreateSurface(int time, vtkImageData *vtkimage,
 
   if (m_Smooth)
   {
-    int spIterations =50;
-    float spRelaxation =0.1;
+    int spIterations = m_SmoothIteration;
+    float spRelaxation = m_SmoothRelaxation;
 
     vtkSmoothPolyDataFilter *smoother = vtkSmoothPolyDataFilter::New();
     //read poly1 (poly1 can be the original polygon, or the decimated polygon)
@@ -189,6 +191,15 @@ void mitk::ImageToSurfaceFilter::GenerateData()
   }
 }
 
+void mitk::ImageToSurfaceFilter::SetSmoothIteration(int smoothIteration)
+{
+  m_SmoothIteration = smoothIteration;
+}
+
+void mitk::ImageToSurfaceFilter::SetSmoothRelaxation(float smoothRelaxation)
+{
+  m_SmoothRelaxation = smoothRelaxation;
+}
 
 void mitk::ImageToSurfaceFilter::SetInput(const mitk::Image *image)
 {

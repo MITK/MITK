@@ -18,81 +18,68 @@ mitk::PositionTracker::PositionTracker(const char * type, mitk::OperationActor* 
 
 
 bool mitk::PositionTracker::ExecuteAction(Action* action, mitk::StateEvent const* stateEvent)
- {
+{
   bool ok = false;
-  
   const DisplayPositionEvent* displayPositionEvent = dynamic_cast<const DisplayPositionEvent*>(stateEvent->GetEvent());
 
   mitk::DataTreeIteratorClone dtit;
   mitk::DataTreeNode::Pointer  dtnode;
- if(displayPositionEvent!=NULL)
- {
-   if(stateEvent->GetEvent()->GetSender()!=NULL)
-   {
-     dtit = stateEvent->GetEvent()->GetSender()->GetData();
-   }
-   else
-   {
-     itkWarningMacro(<<"StateEvent::GetSender()==NULL - setting timeInMS to 0");
-     return false;
-   }
+
+  if(displayPositionEvent!=NULL)
+  {
+    if(stateEvent->GetEvent()->GetSender()!=NULL)
+    {
+      dtit = stateEvent->GetEvent()->GetSender()->GetData();
+    }
+    else
+    {
+      itkWarningMacro(<<"StateEvent::GetSender()==NULL - setting timeInMS to 0");
+      return false;
+    }
 
 
-   if (dtit.IsNull()) return false;
+    if (dtit.IsNull()) return false;
 
-   // looking for desired point set
-   bool isPointSet=false;
-   while( !dtit->IsAtEnd() )
-   {
-     dtnode = dtit->Get();
-     if ( dtnode->GetBoolProperty("inputdevice",isPointSet) && isPointSet)
-     {
-       //std::cout<<"PointSet found!!!"<<std::endl;
-       break;
-     }
-     ++dtit;
-   }
+    // looking for desired point set
+    bool isPointSet=false;
+    while( !dtit->IsAtEnd() )
+    {
+      dtnode = dtit->Get();
+      if ( dtnode->GetBoolProperty("inputdevice",isPointSet) && isPointSet)
+      {
+//        mitk::StringProperty sp = new mitk::StringProperty(stateEvent->GetEvent()->GetSender()->GetName());
+          int mapperID = stateEvent->GetEvent()->GetSender()->GetMapperID();
+          dtnode->SetIntProperty("BaseRendererMapperID",mapperID);
 
-   if ( dtit->IsAtEnd() ) return ok;
+        break;
+      }
+      ++dtit;
+    }
 
-   //switch could be removed if no proper distinction is needed
-   switch (action->GetActionId())
-   {
-     case AcNEWPOINT:
-     case AcINITMOVEMENT:
-     case AcMOVEPOINT:
-     case AcMOVE:
-     case AcFINISHMOVEMENT:
-            if( isPointSet )
-            {
-              mitk::PointSet* ps = (mitk::PointSet*) dtnode->GetData();
-              int position = 0;
-              
-              if( ps->GetPointSet()->GetPoints()->IndexExists( position )) //first element
-              {
-                ps->GetPointSet()->GetPoints()->SetElement( position, displayPositionEvent->GetWorldPosition());                            
-              }
-              else
-              {
-                mitk::PointSet::PointDataType pointData = {position , false /*selected*/, mitk::PTUNDEFINED};
-                ps->GetPointSet()->GetPointData()->InsertElement(position, pointData);
-                ps->GetPointSet()->GetPoints()->InsertElement(position, displayPositionEvent->GetWorldPosition());
-              }
+    if ( dtit->IsAtEnd() ) return ok;
 
-              dtnode->SetData(ps);
-              mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-            }
-            
-            ok = true;
-            break;
-     case AcREMOVEPOINT:
-       //rmv
-       std::cout<<"PosTrack: AcREMOVEPOINT"<<std::endl;
-     default:
-       ok = false;
-       break;
-   }
-   
- }
+    if( isPointSet )
+    {
+      mitk::PointSet* ps = (mitk::PointSet*) dtnode->GetData();
+      int position = 0;
+
+      if( ps->GetPointSet()->GetPoints()->IndexExists( position )) //first element
+      {
+        ps->GetPointSet()->GetPoints()->SetElement( position, displayPositionEvent->GetWorldPosition());                            
+      }
+      else
+      {
+        mitk::PointSet::PointDataType pointData = {position , false /*selected*/, mitk::PTUNDEFINED};
+        ps->GetPointSet()->GetPointData()->InsertElement(position, pointData);
+        ps->GetPointSet()->GetPoints()->InsertElement(position, displayPositionEvent->GetWorldPosition());
+      }
+
+      ps->Modified();
+
+      dtnode->SetData(ps);
+      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    }
+
+  }
   return ok;
 }

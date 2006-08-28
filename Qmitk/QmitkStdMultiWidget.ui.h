@@ -443,7 +443,7 @@ void QmitkStdMultiWidget::AddPositionTrackingPointSet(mitk::DataTreeIteratorBase
   m_PositionTrackerNode->SetProperty("layer", new mitk::IntProperty(1001));
   m_PositionTrackerNode->SetProperty( "visible", new mitk::BoolProperty(true) );
   m_PositionTrackerNode->SetProperty( "inputdevice", new mitk::BoolProperty(true) );
-  m_PositionTrackerNode->SetProperty( "PointThroughSliceInteraction", new mitk::IntProperty(0) );//point position 2D mouse
+  m_PositionTrackerNode->SetProperty( "BaseRendererMapperID", new mitk::IntProperty(0) );//point position 2D mouse
   m_PositionTrackerNode->SetProperty("baserenderer", new mitk::StringProperty("N/A"));
   
 }

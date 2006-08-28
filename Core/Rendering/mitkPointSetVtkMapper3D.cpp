@@ -17,12 +17,12 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 
-#include "mitkPointSetVtkMapper3D.h"
-#include "mitkDataTreeNode.h"
-#include "mitkProperties.h"
-#include "mitkColorProperty.h"
-#include "mitkOpenGLRenderer.h"
-#include "mitkPointSet.h"
+#include <mitkPointSetVtkMapper3D.h>
+#include <mitkDataTreeNode.h>
+#include <mitkProperties.h>
+#include <mitkColorProperty.h>
+#include <mitkOpenGLRenderer.h>
+#include <mitkPointSet.h>
 
 #include <vtkActor.h>
 #include <vtkAppendPolyData.h>
@@ -58,10 +58,17 @@ const mitk::PointSet* mitk::PointSetVtkMapper3D::GetInput()
 
 //##ModelId=3E70F60301F4
 mitk::PointSetVtkMapper3D::PointSetVtkMapper3D() 
-: m_vtkSelectedPointList(NULL), m_vtkUnselectedPointList(NULL), m_vtkContourPolyData(NULL),
-m_VtkSelectedPolyDataMapper(NULL), m_VtkUnselectedPolyDataMapper(NULL),m_vtkContourPolyDataMapper(NULL),
-m_vtkTextList(NULL), m_contour(NULL), m_tubefilter(NULL),
-m_NumberOfSelectedAdded(0), m_NumberOfUnselectedAdded(0)
+: m_vtkSelectedPointList(NULL), 
+m_vtkUnselectedPointList(NULL), 
+m_vtkContourPolyData(NULL),
+m_VtkSelectedPolyDataMapper(NULL), 
+m_VtkUnselectedPolyDataMapper(NULL),
+m_vtkContourPolyDataMapper(NULL),
+m_vtkTextList(NULL), 
+m_contour(NULL), 
+m_tubefilter(NULL),
+m_NumberOfSelectedAdded(0), 
+m_NumberOfUnselectedAdded(0)
 {
   //propassembly
   m_PointsAssembly = vtkPropAssembly::New();
@@ -91,6 +98,17 @@ void mitk::PointSetVtkMapper3D::GenerateData()
     m_PointsAssembly->RemovePart(m_UnselectedActor);
   if(m_PointsAssembly->GetParts()->IsItemPresent(m_ContourActor))
     m_PointsAssembly->RemovePart(m_ContourActor);
+
+  // exceptional displaying for PositionTracker -> MouseOrientationTool
+  int mapperID;
+  bool isInputDevice=false;   
+  if( this->GetDataTreeNode()->GetBoolProperty("inputdevice",isInputDevice) && isInputDevice )
+  {
+    if( this->GetDataTreeNode()->GetIntProperty("BaseRendererMapperID",mapperID) && mapperID == 2)
+    {
+      return; //The event for the PositionTracker came from the 3d widget and  not needs to be displayed
+    }
+  }
 
   mitk::PointSet::Pointer input  = const_cast<mitk::PointSet*>(this->GetInput());
   input->Update();
@@ -276,8 +294,18 @@ void mitk::PointSetVtkMapper3D::GenerateData()
         vtkSphereSource *sphere = vtkSphereSource::New();
         sphere->SetRadius(pointSize);
         sphere->SetCenter(pointsIter.Value()[0],pointsIter.Value()[1],pointsIter.Value()[2]);
-        sphere->SetThetaResolution(20);
-        sphere->SetPhiResolution(20);
+   
+        //MouseOrientation Tool (PositionTracker)
+        if(isInputDevice)
+        {
+          sphere->SetThetaResolution(10);
+          sphere->SetPhiResolution(10);
+        }
+        else
+        {
+          sphere->SetThetaResolution(20);
+          sphere->SetPhiResolution(20);
+        }
         source = sphere;
       }
       break;

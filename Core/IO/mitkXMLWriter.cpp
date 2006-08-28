@@ -25,7 +25,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk {
 
-std::string XMLWriter::m_ImageExtension = ".pic";
+std::string XMLWriter::m_ImageExtension = ".pic";     // what is THIS doing HERE?
 
 
 XMLWriter::XMLWriter( const char* filename, const char* subDirectory, int space )
@@ -64,54 +64,6 @@ XMLWriter::XMLWriter( const char* filename, int space )
 
 XMLWriter::~XMLWriter() 
 {
-}
-
-
-void XMLWriter::WriteProperty( const std::string& key, const mitk::Point3D& value ) const
-{
-  std::stringstream stream;;
-  stream << value;
-  BaseXMLWriter::WriteProperty( key, stream.str() );
-}
-
-
-void XMLWriter::WriteProperty( const std::string& key, const mitk::Point4D& value ) const
-{
-  std::stringstream stream;;
-  stream << value;
-  BaseXMLWriter::WriteProperty( key, stream.str() );
-}
-
-
-void XMLWriter::WriteProperty( const std::string& key, const mitk::Vector3D& value ) const
-{
-  std::stringstream stream;;
-  stream << value;
-  BaseXMLWriter::WriteProperty( key, stream.str() );
-}
-
-
-void XMLWriter::WriteProperty( const std::string& key, const itk::Point<int,3> value ) const
-{
-  std::stringstream stream;;
-  stream << value;
-  BaseXMLWriter::WriteProperty( key, stream.str() );
-}
-
-
-void XMLWriter::WriteProperty( const std::string& key, RGBAType value ) const
-{
-  std::stringstream stream;;
-  stream << value;
-  BaseXMLWriter::WriteProperty( key, stream.str() );
-}
-
-
-void XMLWriter::WriteProperty( const std::string& key, Color value ) const
-{
-  std::stringstream stream;;
-  stream << value;
-  BaseXMLWriter::WriteProperty( key, stream.str() );
 }
 
 
@@ -333,25 +285,5 @@ bool XMLWriter::IsFileExtension(std::string fileExtensionKey, std::string& fileN
     return true;
   }
 }
-
-
-void XMLWriter::WriteProperty( const std::string& key, const char* value ) const
-{ XMLWriter::BaseXMLWriter::WriteProperty( key, value ); }
-/**
-  writes a XML attribute that datatype is a const string&
-
-  \ param key specifies the name of the attribute
-  \ param value represents the data of the attribute
-*/
-void XMLWriter::WriteProperty( const std::string& key, const std::string& value ) const
-{ XMLWriter::BaseXMLWriter::WriteProperty( key, value ); }
-void XMLWriter::WriteProperty( const std::string& key, int value ) const
-{ XMLWriter::BaseXMLWriter::WriteProperty( key, value ); }
-void XMLWriter::WriteProperty( const std::string& key, float value ) const
-{ XMLWriter::BaseXMLWriter::WriteProperty( key, value ); }
-void XMLWriter::WriteProperty( const std::string& key, double value ) const
-{ XMLWriter::BaseXMLWriter::WriteProperty( key, value ); }
-void XMLWriter::WriteProperty( const std::string& key, bool value ) const
-{ XMLWriter::BaseXMLWriter::WriteProperty( key, value ); }
 
 } // namespace mitk

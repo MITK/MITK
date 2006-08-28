@@ -271,8 +271,6 @@ bool mitk::LookupTable::WriteXMLData( XMLWriter& xmlWriter )
   float color[ 4 ], lowerRange, upperRange;
 #endif
   
-  XMLWriter::RGBAType rgba;
-
   xmlWriter.WriteProperty( NUMBER_OF_COLORS, m_LookupTable->GetNumberOfColors() );
   xmlWriter.WriteProperty( SCALE, m_LookupTable->GetScale() );
   xmlWriter.WriteProperty( RAMP, m_LookupTable->GetRamp() );
@@ -299,11 +297,9 @@ bool mitk::LookupTable::WriteXMLData( XMLWriter& xmlWriter )
     xmlWriter.WriteProperty( TABLE_UPPER_RANGE, upperRange );
     for(int i=(int)lowerRange; i<=(int)upperRange; ++i){
       xmlWriter.BeginNode(TABLE_VALUE);
-        xmlWriter.WriteProperty( "INDEX", i );
-        m_LookupTable->GetTableValue(i, color);
-        for(int j=0; j<4; ++j)
-          rgba[j]=color[j];
-        xmlWriter.WriteProperty( "COLOR", rgba );
+      xmlWriter.WriteProperty( "INDEX", i );
+      m_LookupTable->GetTableValue(i, color);
+      xmlWriter.WriteProperty( "COLOR", color );
       xmlWriter.EndNode();
   }
   xmlWriter.EndNode();

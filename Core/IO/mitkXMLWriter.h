@@ -20,10 +20,6 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITK_XML_WRITER
 
 #include "mitkBaseXMLWriter.h"
-#include <mitkVector.h>
-#include <itkRGBAPixel.h>
-#include <itkRGBPixel.h>
-#include <vtkSystemIncludes.h>
 
 namespace mitk{
 
@@ -67,44 +63,13 @@ namespace mitk{
     /// destructor
     virtual ~XMLWriter();
 
-    typedef itk::RGBAPixel< vtkFloatingPointType >  RGBAType;
-    typedef itk::RGBPixel<vtkFloatingPointType> Color;
-
-    /// writes a XML attribute that datatype is a const char*
-    void WriteProperty( const std::string& key, const char* value ) const;
-
-    /// Writes a XML attribute that datatype is a const std::string&. Parameter key specifies the name of the attribute. Parameter value represents the data of the attribute.
-    void WriteProperty( const std::string& key, const std::string& value ) const;
-
-    /// writes a XML attribute that datatype is an integer
-    void WriteProperty( const std::string& key, int value ) const;
-
-    /// writes a XML attribute that datatype is a float
-    void WriteProperty( const std::string& key, float value ) const;
-
-    /// writes a XML attribute that datatype is a double
-    void WriteProperty( const std::string& key, double value ) const;
-
-    /// writes a XML attribute that datatype is a bool
-    void WriteProperty( const std::string& key, bool value ) const;
-
-    /// writes a XML attribute that datatype is a mitk::Point3D
-    void WriteProperty( const std::string& key, const mitk::Point3D& value ) const;
-
-    /// writes a XML attribute that datatype is a mitk::Point4D
-    void WriteProperty( const std::string& key, const mitk::Point4D& value ) const;
-
-    /// writes a XML attribute that datatype is a mitk::Vector3D
-    void WriteProperty( const std::string& key, const mitk::Vector3D& value ) const;
-
-    /// writes a XML attribute that datatype is an itk::Point<int,3>
-    void WriteProperty( const std::string& key, const itk::Point<int,3> value ) const;
-
-    /// writes a XML attribute that datatype is a RGBAType
-    void WriteProperty( const std::string& key, RGBAType value ) const;
-
-    /// writes a XML attribute that datatype is a Color (RGB)
-    void WriteProperty( const std::string& key, Color value ) const;
+    template <typename T>
+    void WriteProperty( const std::string& key, const T& value ) const
+    {
+      std::stringstream stream;;
+      stream << value;
+      BaseXMLWriter::WriteProperty( key, stream.str() );
+    }
 
     /// sets the filename of a source file
     void SetSourceFileName( const char* sourceFileName);

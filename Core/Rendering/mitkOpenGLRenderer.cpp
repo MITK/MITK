@@ -459,7 +459,7 @@ void mitk::OpenGLRenderer::InitRenderer(mitk::RenderWindow* renderwindow)
   m_InitNeeded = true;
   m_ResizeNeeded = true;
 
-  if(m_CameraController != NULL)
+  if(m_CameraController.IsNotNull())
   {
     VtkInteractorCameraController* vicc=dynamic_cast<VtkInteractorCameraController*>(m_CameraController.GetPointer());
     if(vicc!=NULL)

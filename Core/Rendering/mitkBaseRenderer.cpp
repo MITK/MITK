@@ -38,11 +38,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkCameraController.h"
 
 #include <vtkLinearTransform.h>
-#include <itkSmartPointerForwardReference.txx>
+
 
 mitk::BaseRenderer::RendererSet mitk::BaseRenderer::instances;
 
-template class itk::SmartPointerForwardReference<mitk::CameraController>;
 
 //##ModelId=3E3D2F120050
 mitk::BaseRenderer::BaseRenderer( const char* name ) :

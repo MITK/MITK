@@ -18,7 +18,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include "mitkImageSliceSelector.h"
-#include <itkSmartPointerForwardReference.txx>
 
 
 //##ModelId=3E1A0A2E027F

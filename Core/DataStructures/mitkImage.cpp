@@ -28,14 +28,16 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkImageTimeSelector.h"
 
 #include "ipFunc/ipFunc.h"
-
+#include <itkSmartPointerForwardReference.txx>
 #include <vtkImageData.h>
 #include <mitkXMLWriter.h>
 #include <mitkXMLReader.h>
 #include <mitkImageWriter.h>
 #include "mitkDataTreeNodeFactory.h"
 
-#include <itkSmartPointerForwardReference.txx>
+
+//template class itk::SmartPointerForwardReference<ImageDataItem>;
+
 
 mitk::Image::Image() : 
   m_Dimension(0), m_Dimensions(NULL), m_OffsetTable(NULL),
@@ -170,7 +172,7 @@ mitk::Image::ImageDataItemPointer mitk::Image::GetSliceData(int s, int t, int n,
   // slice is unavailable. Can we calculate it?
   if((GetSource()!=NULL) && (GetSource()->Updating()==false))
   {
-    // ... wir müssen rechnen!!! ....
+    // ... wir mï¿½ssen rechnen!!! ....
     m_RequestedRegion.SetIndex(0, 0);
     m_RequestedRegion.SetIndex(1, 0);
     m_RequestedRegion.SetIndex(2, s);
@@ -268,7 +270,7 @@ mitk::Image::ImageDataItemPointer mitk::Image::GetVolumeData(int t, int n, void 
   // volume is unavailable. Can we calculate it?
   if((GetSource()!=NULL) && (GetSource()->Updating()==false))
   {
-    // ... wir müssen rechnen!!! ....
+    // ... wir mï¿½ssen rechnen!!! ....
     m_RequestedRegion.SetIndex(0, 0);
     m_RequestedRegion.SetIndex(1, 0);
     m_RequestedRegion.SetIndex(2, 0);
@@ -356,7 +358,7 @@ mitk::Image::ImageDataItemPointer mitk::Image::GetChannelData(int n, void *data,
   // channel is unavailable. Can we calculate it?
   if((GetSource()!=NULL) && (GetSource()->Updating()==false))
   {
-    // ... wir müssen rechnen!!! ....
+    // ... wir mï¿½ssen rechnen!!! ....
     m_RequestedRegion.SetIndex(0, 0);
     m_RequestedRegion.SetIndex(1, 0);
     m_RequestedRegion.SetIndex(2, 0);

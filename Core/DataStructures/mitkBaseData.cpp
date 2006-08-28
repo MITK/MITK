@@ -22,6 +22,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkXMLWriter.h>
 #include <mitkXMLReader.h>
 #include <itkObjectFactoryBase.h>
+#include <itkSmartPointerForwardReference.txx>
+
+//template class itk::SmartPointerForwardReference<mitk::BaseProcess>;
 
 #define MITK_WEAKPOINTER_PROBLEM_WORKAROUND_ENABLED
 

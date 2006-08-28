@@ -345,10 +345,10 @@ void QmitkSliderLevelWindowWidget::mouseMoveEvent( QMouseEvent* mouseEvent ) {
         float value = (m_MoveHeight - mouseEvent->pos().y()) / fact + minv;
        
         if ( value - wh < minv )
-          m_LevelWindow.SetLevelWindow( m_LevelWindow.GetRangeMin() + wh, m_LevelWindow.GetLevel() );
+          m_LevelWindow.SetLevelWindow( m_LevelWindow.GetRangeMin() + wh, m_LevelWindow.GetWindow() );
 
         else if ( value + wh > maxv )
-          m_LevelWindow.SetLevelWindow( m_LevelWindow.GetRangeMax() - wh, m_LevelWindow.GetLevel() );
+          m_LevelWindow.SetLevelWindow( m_LevelWindow.GetRangeMax() - wh, m_LevelWindow.GetWindow() );
 
         else
           m_LevelWindow.SetLevelWindow( value, m_LevelWindow.GetWindow() );

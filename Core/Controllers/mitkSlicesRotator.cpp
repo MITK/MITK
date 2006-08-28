@@ -38,7 +38,11 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkSlicedGeometry3D.h>
 #include <mitkTimeSlicedGeometry.h>
 
+#include <mitkApplicationCursor.h>
+
 #include <math.h>
+
+#include "rotate_cursor.xpm"
 
 namespace mitk {
 
@@ -309,7 +313,7 @@ bool SlicesRotator::ExecuteAction(Action* action, StateEvent const* stateEvent)
         if (!planeGeometry2->IntersectionPoint(intersection, m_CenterOfRotation)) break;
         // everything's fine
         newStateEvent = new StateEvent(EIDYES, stateEvent->GetEvent());
-        
+
       }
 
       if (!newStateEvent) std::cerr << "rotation would be nice but is impossible... (in l. " << __LINE__ << " of " << __FILE__ << std::endl;
@@ -318,6 +322,16 @@ bool SlicesRotator::ExecuteAction(Action* action, StateEvent const* stateEvent)
       delete newStateEvent;
 
       ok = true;
+      break;
+    }
+    case AcROTATESTART:
+    {
+      ApplicationCursor::GetInstance()->PushCursor(rotate_cursor_xpm, 7, 7);
+      break;
+    }
+    case AcROTATEEND:
+    {
+      ApplicationCursor::GetInstance()->PopCursor();
       break;
     }
     default:

@@ -20,7 +20,7 @@ void QmitkApplicationCursor::PushCursor(const char* XPM[], int hotspotX, int hot
   QApplication::setOverrideCursor( cursor );
 }
 
-void QmitkApplicationCursor::QmitkApplicationCursor::PopCursor()
+void QmitkApplicationCursor::PopCursor()
 {
   QApplication::restoreOverrideCursor();
 }

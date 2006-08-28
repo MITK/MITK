@@ -71,26 +71,6 @@ mitk::ScalarType mitk::LevelWindow::GetMax() const
   return m_Max;
 }
 
-void mitk::LevelWindow::SetLevel(mitk::ScalarType level)
-{
-  mitk::ScalarType halfWindow = (m_Max - m_Min) / 2;
-  m_Min = level - halfWindow;
-  m_Max = level + halfWindow;
-
-  testValues();
-}
-
-void mitk::LevelWindow::SetWindow(mitk::ScalarType window)
-{
-  mitk::ScalarType level = m_Min + (m_Max - m_Min) / 2;
-  mitk::ScalarType halfWindow = window / 2;
-
-  m_Min = level - halfWindow;
-  m_Max = level + halfWindow;
-
-  testValues();
-}
-
 void mitk::LevelWindow::SetDefaultLevelWindow(mitk::ScalarType level, mitk::ScalarType window)
 {
   m_DefaultLevel = level;
@@ -119,8 +99,11 @@ void mitk::LevelWindow::SetRangeMinMax(mitk::ScalarType min, mitk::ScalarType ma
 {
   m_RangeMin = min;
   m_RangeMax = max;
+  if ( m_RangeMin == m_RangeMax)
+    m_RangeMin = m_RangeMax - 1;
   if(m_RangeMin > m_RangeMax)
     std::swap(m_RangeMin,m_RangeMax);
+
   testValues();
 }
 
@@ -128,6 +111,8 @@ void mitk::LevelWindow::SetDefaultRangeMinMax(mitk::ScalarType min, mitk::Scalar
 {
   m_DefaultRangeMin = min;
   m_DefaultRangeMax = max;
+  if ( m_DefaultRangeMin == m_DefaultRangeMax)
+    m_DefaultRangeMin = m_DefaultRangeMax - 1;
   if(m_DefaultRangeMin > m_DefaultRangeMax)
     std::swap(m_DefaultRangeMin,m_DefaultRangeMax);
 }
@@ -160,6 +145,7 @@ mitk::ScalarType mitk::LevelWindow::GetDefaultRangeMin() const
 void mitk::LevelWindow::ResetDefaultRangeMinMax()
 {
   SetRangeMinMax(m_DefaultRangeMin, m_DefaultRangeMax);
+  testValues();
 }
 
 /*!

@@ -83,16 +83,6 @@ public:
   ScalarType GetMax() const;
 
   /*!
-  * setter for level value
-  */
-  void SetLevel(ScalarType level);
-
-  /*!
-  * setter for window value
-  */
-  void SetWindow(ScalarType window);
-
-  /*!
   * setter for level and window value
   */
   void SetLevelWindow(ScalarType level, ScalarType window);

@@ -27,6 +27,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkImage.h>
 #include <itkImageSource.h>
 #include "mitkImage.h"
+#include "mitkImageDataItem.h"
 
 namespace mitk
 {
@@ -35,8 +36,8 @@ template <class TOutputImage>
 class ITK_EXPORT ImageToItk : public itk::ImageSource< TOutputImage >
 {
 protected:
-	mitk::Image::Pointer m_MitkImage;
-  mitk::Image::ImageDataItemPointer m_ImageDataItem;
+  mitk::Image::Pointer m_MitkImage;
+  mitk::ImageDataItem::Pointer m_ImageDataItem;
   
 public:
   typedef ImageToItk  Self;

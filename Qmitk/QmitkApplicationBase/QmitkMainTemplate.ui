@@ -29,8 +29,8 @@
     <item text="&amp;File" name="File">
         <action name="fileOpenAction"/>
         <action name="fileOpenImageSequenceAction"/>
-        <separator/>
         <action name="fileOpenProjectAction"/>
+        <separator/>
         <action name="fileSaveProjectAction"/>
         <action name="fileSaveProjectAsAction"/>
         <action name="fileCloseProjectAction"/>
@@ -42,16 +42,19 @@
         <action name="editRedoAction"/>
     </item>
     <item text="&amp;View" name="View">
+        <action name="viewReinitMultiWidgetAction"/>
+        <separator/>
         <action name="viewShowPlanesAction"/>
         <action name="viewLockPlanesAction"/>
         <action name="viewLockSliceRotationAction"/>
+        <separator/>
+        <action name="viewSlicesRotationAction"/>
+        <action name="viewLinkSlices"/>
     </item>
     <item text="&amp;Options" name="Options">
-        <action name="optionsSlicesRotationAction"/>
-        <action name="optionsLinkSlices"/>
-        <action name="optionsReinitMultiWidgetAction"/>
         <action name="HideToolbarAction"/>
         <action name="optionsFine_Undo_enabledAction"/>
+        <separator/>
         <action name="optionsSystem_InformationAction"/>
         <action name="optionsShow_OptionsAction"/>
     </item>
@@ -424,7 +427,7 @@
             <string>Enable Position Tracking</string>
         </property>
         <property name="whatsThis">
-            <string>PositonTracking shows a projection from the input device to the other widgets</string>
+            <string>Positon tracking shows a projection from the input device to the other planes</string>
         </property>
     </action>
     <action>
@@ -485,7 +488,7 @@
     </action>
     <action>
         <property name="name">
-            <cstring>optionsSlicesRotationAction</cstring>
+            <cstring>viewSlicesRotationAction</cstring>
         </property>
         <property name="toggleAction">
             <bool>true</bool>
@@ -494,27 +497,24 @@
             <bool>false</bool>
         </property>
         <property name="text">
-            <string>&amp;Rotate slices</string>
+            <string>Enable plane rotation</string>
         </property>
         <property name="menuText">
-            <string>&amp;Rotate slices</string>
-        </property>
-        <property name="accel">
-            <string>Ctrl+R</string>
+            <string>Enable plane &amp;rotation</string>
         </property>
     </action>
     <action>
         <property name="name">
-            <cstring>optionsReinitMultiWidgetAction</cstring>
+            <cstring>viewReinitMultiWidgetAction</cstring>
         </property>
         <property name="text">
-            <string>Reinit view</string>
+            <string>Reset the planes of the 2D views to the centre of the image</string>
         </property>
         <property name="menuText">
-            <string>Re&amp;init view</string>
+            <string>&amp;Reset view</string>
         </property>
         <property name="accel">
-            <string>Ctrl+I</string>
+            <string>Ctrl+R</string>
         </property>
     </action>
     <action>
@@ -525,10 +525,7 @@
             <string>MITK System Information</string>
         </property>
         <property name="menuText">
-            <string>&amp;MITK System Information</string>
-        </property>
-        <property name="accel">
-            <string>Ctrl+I</string>
+            <string>MITK System &amp;Information</string>
         </property>
     </action>
     <action>
@@ -592,13 +589,10 @@
             <string>Show Preferences</string>
         </property>
         <property name="menuText">
-            <string>Show Preferences</string>
+            <string>Show &amp;Preferences</string>
         </property>
         <property name="statusTip">
             <string>Show Preferences</string>
-        </property>
-        <property name="accel">
-            <string>Ctrl+P</string>
         </property>
     </action>
     <action>
@@ -643,15 +637,15 @@
             <bool>false</bool>
         </property>
         <property name="text">
-            <string>Lock Slice Rotation</string>
+            <string>Lock Plane Rotation</string>
         </property>
         <property name="menuText">
-            <string>Lock Slice Rotation</string>
+            <string>Lock Plane Rotation</string>
         </property>
     </action>
     <action>
         <property name="name">
-            <cstring>optionsLinkSlices</cstring>
+            <cstring>viewLinkSlices</cstring>
         </property>
         <property name="toggleAction">
             <bool>true</bool>
@@ -663,13 +657,13 @@
             <bool>false</bool>
         </property>
         <property name="text">
-            <string>Link slices</string>
+            <string>Rotate planes together</string>
         </property>
         <property name="menuText">
-            <string>Link slices</string>
+            <string>Rotate planes together</string>
         </property>
         <property name="toolTip">
-            <string>During rotation the slices can be linked together. works for every 2D view</string>
+            <string>During rotation the planes of a 2D view are rotated together.</string>
         </property>
     </action>
 </actions>
@@ -821,16 +815,16 @@
         <slot>editRedo()</slot>
     </connection>
     <connection>
-        <sender>optionsSlicesRotationAction</sender>
+        <sender>viewSlicesRotationAction</sender>
         <signal>toggled(bool)</signal>
         <receiver>QmitkMainTemplate</receiver>
-        <slot>optionsSlicesRotation(bool)</slot>
+        <slot>viewSlicesRotation(bool)</slot>
     </connection>
     <connection>
-        <sender>optionsReinitMultiWidgetAction</sender>
+        <sender>viewReinitMultiWidgetAction</sender>
         <signal>activated()</signal>
         <receiver>QmitkMainTemplate</receiver>
-        <slot>optionsReinitMultiWidget()</slot>
+        <slot>viewReinitMultiWidget()</slot>
     </connection>
     <connection>
         <sender>helpContentsAction</sender>
@@ -881,10 +875,10 @@
         <slot>toolbarPositionOrientation_toggled(bool)</slot>
     </connection>
     <connection>
-        <sender>optionsLinkSlices</sender>
+        <sender>viewLinkSlices</sender>
         <signal>toggled(bool)</signal>
         <receiver>QmitkMainTemplate</receiver>
-        <slot>optionsLinkSlices_toggled(bool)</slot>
+        <slot>viewLinkSlices_toggled(bool)</slot>
     </connection>
 </connections>
 <includes>
@@ -949,15 +943,15 @@
     <slot>optionsSystem_InformationAction_activated()</slot>
     <slot>editUndo()</slot>
     <slot>editRedo()</slot>
-    <slot>optionsSlicesRotation( bool on )</slot>
-    <slot>optionsReinitMultiWidget()</slot>
+    <slot>viewSlicesRotation( bool on )</slot>
+    <slot>viewReinitMultiWidget()</slot>
     <slot>helpContents()</slot>
     <slot>optionsShow_OptionsAction_activated()</slot>
     <slot>viewPlaneSliceRotationLocked_toggled( bool on )</slot>
     <slot>viewPlanesLocked_toggled( bool on )</slot>
     <slot>viewShowPlanesAction_toggled( bool on )</slot>
     <slot>toolbarPositionOrientation_toggled( bool on )</slot>
-    <slot>optionsLinkSlices_toggled( bool link )</slot>
+    <slot>viewLinkSlices_toggled( bool link )</slot>
 </slots>
 <functions>
     <function>fileOpen( const char * fileName )</function>

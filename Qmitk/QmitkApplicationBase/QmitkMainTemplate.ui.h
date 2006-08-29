@@ -788,15 +788,15 @@ void QmitkMainTemplate::editRedo()
     redoButton->doUndoRedoLast(1);
 }
 
-void QmitkMainTemplate::optionsSlicesRotation(bool on)
+void QmitkMainTemplate::viewSlicesRotation(bool on)
 {
   m_MultiWidget->EnableSliceRotation(on);
   // enable posibilty to lock rotation in a desired position
   viewLockSliceRotationAction->setEnabled ( on );
-  optionsLinkSlices->setEnabled ( on );
+  viewLinkSlices->setEnabled ( on );
 }
 
-void QmitkMainTemplate::optionsReinitMultiWidget()
+void QmitkMainTemplate::viewReinitMultiWidget()
 {
   mitk::DataTreePreOrderIterator it(m_Tree);
   m_MultiWidget->InitializeStandardViews( &it );
@@ -987,7 +987,7 @@ void QmitkMainTemplate::viewPlanesLocked_toggled( bool on)
   if( on)
   {
     // enable the slice rotion locking in view menu
-    if( optionsSlicesRotationAction->isOn() )
+    if( viewSlicesRotationAction->isOn() )
     {
       // add possiblity to lock slice rotation separatly
       viewLockSliceRotationAction->setEnabled ( on );
@@ -1052,7 +1052,7 @@ void QmitkMainTemplate::toolbarPositionOrientation_toggled( bool on )
 }
 
 
-void QmitkMainTemplate::optionsLinkSlices_toggled( bool link )
+void QmitkMainTemplate::viewLinkSlices_toggled( bool link )
 {
   m_MultiWidget->GetSlicesRotator()->SetLinkPlanes( link );
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();

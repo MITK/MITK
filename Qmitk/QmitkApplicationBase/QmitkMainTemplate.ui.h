@@ -75,6 +75,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkUndoController.h>
 #include <mitkOperation.h>
 #include <mitkGlobalInteraction.h>
+#include <mitkStandardFileLocations.h>
 
 #include <mitkParRecFileReader.h>
 #include <mitkInteractionConst.h>
@@ -576,7 +577,12 @@ void QmitkMainTemplate::Initialize()
   //initialize functionality management
   InitializeQfm();
 
-  LoadOptionsFromFile("MITKOptions.xml");
+  std::string optionsFile(mitk::StandardFileLocations::FindFile("MITKOptions.xml"));
+  
+  if (!optionsFile.empty())
+  {
+    LoadOptionsFromFile(optionsFile.c_str());
+  }
   m_Options->SetProperty( "MITKSampleAppFunctionalityName", new mitk::StringProperty("MITKSampleApp") );
 
   QWidget* defaultMain = qfm->GetDefaultMain();

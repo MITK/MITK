@@ -26,7 +26,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkProperties.h>
 #include <mitkStringProperty.h>
 #include <mitkConfig.h>
-#include <itksys/SystemTools.hxx>
+#include <mitkStandardFileLocations.h>
 
 #ifdef INTERACTION_DEBUG
 #include <mitkInteractionDebug.h>
@@ -184,29 +184,12 @@ bool mitk::StateMachineFactory::LoadBehavior(std::string fileName)
 
 bool mitk::StateMachineFactory::LoadStandardBehavior()
 {
-  std::string xmlFileName;
+  std::string xmlFileName( StandardFileLocations::FindFile("StateMachine.xml", "Interactions/mitkBaseInteraction") );
 
-  const char* mitkConf = itksys::SystemTools::GetEnv("MITKCONF");
-  if (mitkConf != NULL) 
-  {
-    xmlFileName  = mitkConf;
-    xmlFileName += "/";
-    xmlFileName = itksys::SystemTools::ConvertToOutputPath(xmlFileName.c_str());
-    xmlFileName += "StateMachine.xml";
-    if(itksys::SystemTools::FileExists(xmlFileName.c_str()))
-      return LoadBehavior(xmlFileName);
-  } 
-  xmlFileName = "StateMachine.xml";
-
-  if(itksys::SystemTools::FileExists(xmlFileName.c_str()))
+  if (!xmlFileName.empty()) 
     return LoadBehavior(xmlFileName);
-
-  xmlFileName = MITK_ROOT;
-  xmlFileName += "Interactions/mitkBaseInteraction/StateMachine.xml";
-  if(itksys::SystemTools::FileExists(xmlFileName.c_str()))
-    return LoadBehavior(xmlFileName);
-
-  return false;
+  else
+    return false;
 }
 
 

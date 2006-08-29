@@ -326,7 +326,7 @@ bool SlicesRotator::ExecuteAction(Action* action, StateEvent const* stateEvent)
     }
     case AcROTATESTART:
     {
-      ApplicationCursor::GetInstance()->PushCursor(rotate_cursor_xpm, 7, 7);
+      ApplicationCursor::GetInstance()->PushCursor(rotate_cursor_xpm, 0, 0);
       break;
     }
     case AcROTATEEND:

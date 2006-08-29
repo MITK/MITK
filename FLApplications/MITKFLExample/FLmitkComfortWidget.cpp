@@ -29,8 +29,7 @@ int FLmitkComfortWidget::handle(int event) {
       m_LastY = Fl::event_y();
       mitk::LevelWindow lvlWin;
       if (m_Node.IsNotNull() && m_Node->GetLevelWindow(lvlWin,GetRenderer())) {
-	lvlWin.SetWindow(lvlWin.GetWindow() + dx);
-	lvlWin.SetLevel(lvlWin.GetLevel() + dy);
+	lvlWin.SetLevelWindow(lvlWin.GetLevel() + dy, lvlWin.GetWindow() + dx);
 	m_Node->SetLevelWindow(lvlWin,GetRenderer());
 	m_Node->SetLevelWindow(lvlWin,NULL);
 	GetRenderer()->Render();

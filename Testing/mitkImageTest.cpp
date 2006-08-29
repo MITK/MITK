@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkImage.h"
 #include "mitkImageDataItem.h"
 #include <fstream>
+#include <itkSmartPointerForwardReference.txx>
 
 
 int mitkImageTest(int /*argc*/, char* /*argv*/[])

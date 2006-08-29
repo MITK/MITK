@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkDataTreeNode.h"
 #include "mitkMapperFactory.h"
 #include <vtkTransform.h>
+#include <itkSmartPointerForwardReference.txx>
 
 #include "mitkProperties.h"
 #include "mitkStringProperty.h"

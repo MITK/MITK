@@ -22,6 +22,7 @@ See MITKCopyright.txt or http://www.mitk.org/ for details.
 #include "mitkImageToItk.h"
 #include "mitkImageDataItem.h"
 #include "mitkBaseProcess.h"
+#include <itkSmartPointerForwardReference.txx>
 
 
 template <class TOutputImage>

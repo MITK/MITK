@@ -18,6 +18,8 @@ See MITKCopyright.txt or http://www.mitk.org/ for details.
 
 #include "mitkLine.h"
 #include <itkProcessObject.h>
+#include <itkSmartPointerForwardReference.txx>
+
 
 //##ModelId=3E639CD30201
 mitk::Line::Line()

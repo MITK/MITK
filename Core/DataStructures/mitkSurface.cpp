@@ -27,6 +27,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkSTLWriter.h>
 #include "mitkSurfaceVtkWriter.h"
 #include "mitkDataTreeNodeFactory.h"
+#include <itkSmartPointerForwardReference.txx>
 
 void mitk::Surface::SetVtkPolyData( vtkPolyData* polydata, unsigned int t )
 {

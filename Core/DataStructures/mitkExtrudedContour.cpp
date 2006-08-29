@@ -20,6 +20,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkExtrudedContour.h"
 #include "mitkVector.h"
 
+#include <itkSmartPointerForwardReference.txx>
+
 #include <vtkLinearExtrusionFilter.h>
 #include <vtkPolyData.h>
 #include <vtkPoints.h>

@@ -19,6 +19,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkSlicedData.h"
 #include "mitkBaseProcess.h"
+#include <itkSmartPointerForwardReference.txx>
+
 
 //##ModelId=3E141028018A
 void mitk::SlicedData::UpdateOutputInformation()

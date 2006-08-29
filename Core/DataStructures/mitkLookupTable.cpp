@@ -18,7 +18,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include "mitkLookupTable.h"
-#include "itkProcessObject.h"
+#include <itkProcessObject.h>
+#include <itkSmartPointerForwardReference.txx>
 #include <mitkXMLWriter.h>
 #include <mitkXMLReader.h>
 

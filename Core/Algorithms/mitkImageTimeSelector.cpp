@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include "mitkImageTimeSelector.h"
-
+#include <itkSmartPointerForwardReference.txx>
 
 
 //##ModelId=3E1B1975031E

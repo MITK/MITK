@@ -27,6 +27,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkPointSetWriter.h"
 #include "mitkPointSetReader.h"
 #include "mitkRenderingManager.h"
+#include <itkSmartPointerForwardReference.txx>
 
 
 #include "mitkRenderWindow.h"//*\todo remove later, when update ok!

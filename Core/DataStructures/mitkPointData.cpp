@@ -1,6 +1,8 @@
 #include "mitkPointData.h"
 #include <itkProcessObject.h>
 #include <mitkBaseProcess.h>
+#include <itkSmartPointerForwardReference.txx>
+
 
 mitk::PointData::PointData()
 {

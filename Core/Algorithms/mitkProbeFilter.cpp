@@ -28,6 +28,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkPolyData.h>
 #include <vtkImageData.h>
 
+#include <itkSmartPointerForwardReference.txx>
+
 
 mitk::ProbeFilter::ProbeFilter()
 {

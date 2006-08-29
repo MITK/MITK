@@ -20,6 +20,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkBoundingObjectGroup.h"
 #include "mitkBaseProcess.h"
 #include <vtkLinearTransform.h>
+#include <itkSmartPointerForwardReference.txx>
+
 
 mitk::BoundingObjectGroup::BoundingObjectGroup()
 :  m_Counter(0), m_CSGMode(Difference) // m_CSGMode(Union) //m_CSGMode(Intersection)

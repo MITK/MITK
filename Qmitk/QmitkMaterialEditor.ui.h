@@ -32,8 +32,6 @@
 
 #include <vtkSphereSource.h>
 #include <vtkPolyData.h>
-#include <mitkSurface.h>
-#include <mitkDataTreeNode.h>
 #include <qgrid.h>
 #include <QmitkMaterialShowcase.h>
 #include <qlayout.h>

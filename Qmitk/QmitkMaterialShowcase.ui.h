@@ -13,7 +13,6 @@
 #include <vtkPolyData.h>
 #include <vtkCamera.h>
 #include <vtkRenderer.h>
-#include <mitkCameraController.h>
 #include <mitkOpenGLRenderer.h>
 
 /**

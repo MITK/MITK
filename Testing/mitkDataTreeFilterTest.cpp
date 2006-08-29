@@ -24,6 +24,8 @@
 //       die propertyviews aus dem datamanager wiedervewrwenden?
 // TODO  ExtendedSelect (mehrfache auswahl moeglich, aber nur items am stueck, ohne luecke)
 
+#ifndef DOXYGEN_SKIP
+
 int verbose;
 
 class EinsZwoFilterDing : public mitk::DataTreeFilterFunction
@@ -676,4 +678,6 @@ int mitkDataTreeFilterTest(int argc, char ** const /*argv*/)
 
   return EXIT_SUCCESS;
 }
+
+#endif 
 

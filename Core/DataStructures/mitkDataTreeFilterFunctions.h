@@ -89,6 +89,41 @@ namespace mitk
   };
 
   /// tests the data entry of nodes for a specific type (given here as template parameter)
+  /// AND having a TRUE BoolProperty
+  template <class T>
+  class IsBaseDataTypeWithBoolProperty : public DataTreeFilterFunction
+  {
+    public:
+
+      IsBaseDataTypeWithBoolProperty(const char* propertyName)
+      :m_PropertyName(propertyName)
+      {
+      }
+      
+      virtual bool NodeMatches(DataTreeNode* node) const
+      {
+        bool propVal(false);
+        return (    node != NULL && node->GetData()      // node is not NULL, and node->GetData is also not NULL
+                 && dynamic_cast<T*>( node->GetData() )   // data is of a certain type
+                 && node->GetPropertyValue(m_PropertyName.c_str(), propVal)  // there is a certain BoolProperty
+                 && propVal
+                );
+      }
+
+      virtual DataTreeFilterFunction* Clone() const
+      {
+        return new IsBaseDataTypeWithBoolProperty<T>(m_PropertyName.c_str());
+      }
+
+      virtual ~IsBaseDataTypeWithBoolProperty() {}
+
+    private:
+      
+      std::string m_PropertyName;
+  };
+
+
+  /// tests the data entry of nodes for a specific type (given here as template parameter)
   /// AND for NOT having a given property (or it being a false bool property)
   template <class T>
   class IsBaseDataTypeWithoutProperty : public DataTreeFilterFunction

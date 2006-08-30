@@ -212,7 +212,7 @@ public:
   //## (T being the type of the second parameter)
   //## @return @a true property was found
   template <typename T>
-    bool GetPropertyValue(const char* propertyKey, T & value, mitk::BaseRenderer* renderer=NULL, bool* defaultRendererUsed = NULL);
+    bool GetPropertyValue(const char* propertyKey, T & value, mitk::BaseRenderer* renderer=NULL, bool* defaultRendererUsed = NULL) const;
 
   //##Documentation
   //## @brief Convenience access method for bool properties (instances of

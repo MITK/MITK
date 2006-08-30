@@ -33,5 +33,5 @@ const std::string mitk::StandardFileLocations::FindFile(const char* filename, co
   
   if(itksys::SystemTools::FileExists(xmlFileName.c_str())) return xmlFileName;
 
-  return std::string();
+  return std::string("");
 }

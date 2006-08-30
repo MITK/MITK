@@ -31,7 +31,10 @@ const std::string mitk::StandardFileLocations::FindFile(const char* filename, co
 
   // 3. use a source tree location from compile time
   xmlFileName = MITK_ROOT;
-  xmlFileName += pathInSourceDir;
+  if (pathInSourceDir)
+  {
+    xmlFileName += pathInSourceDir;
+  }
   xmlFileName += '/';
   xmlFileName += filename;
   

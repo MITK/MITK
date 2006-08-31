@@ -16,10 +16,12 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#include "QmitkSliderLevelWindowWidget.h"
+#include <QmitkSliderLevelWindowWidget.h>
 #include <qcursor.h>
+#include <qpainter.h>
 #include <qtooltip.h>
 #include <itkCommand.h>
+#include <QmitkLevelWindowWidgetContextMenu.h>
 
 /**
 * Constructor

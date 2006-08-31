@@ -21,6 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkImageSliceSelector.h"
 
 #include <ipFunc/ipFunc.h>
+#include <ipPic/ipPic.h>
 #include <algorithm>
 
 mitk::LevelWindow::LevelWindow(mitk::ScalarType level, mitk::ScalarType window) : m_Min(level-window/2.0), m_Max(level+window/2.0), m_RangeMin(-2048), m_RangeMax(4096), m_DefaultRangeMin(-2048), m_DefaultRangeMax(4096), m_DefaultLevel(level), m_DefaultWindow(window)
@@ -92,29 +93,45 @@ void mitk::LevelWindow::SetMinMax(mitk::ScalarType min, mitk::ScalarType max)
 
   m_Min = min;
   m_Max = max;
+  if (m_Min < m_RangeMin)
+    m_Min = m_RangeMin;
+  if (m_Min >= m_RangeMax)
+    m_Min = m_RangeMax - 1;
+  if (m_Max > m_RangeMax)
+    m_Max = m_RangeMax;
+  if (m_Max <= m_RangeMin)
+    m_Max = m_RangeMin + 1;
   testValues();
 }
 
 void mitk::LevelWindow::SetRangeMinMax(mitk::ScalarType min, mitk::ScalarType max)
 {
+  if(min > max)
+    std::swap(min, max);
   m_RangeMin = min;
   m_RangeMax = max;
   if ( m_RangeMin == m_RangeMax)
     m_RangeMin = m_RangeMax - 1;
-  if(m_RangeMin > m_RangeMax)
-    std::swap(m_RangeMin,m_RangeMax);
+  if (m_Min < m_RangeMin)
+    m_Min = m_RangeMin;
+  if (m_Min >= m_RangeMax)
+    m_Min = m_RangeMax - 1;
+  if (m_Max > m_RangeMax)
+    m_Max = m_RangeMax;
+  if (m_Max <= m_RangeMin)
+    m_Max = m_RangeMin + 1;
 
   testValues();
 }
 
 void mitk::LevelWindow::SetDefaultRangeMinMax(mitk::ScalarType min, mitk::ScalarType max)
 {
+  if(min > max)
+    std::swap(min, max);
   m_DefaultRangeMin = min;
   m_DefaultRangeMax = max;
   if ( m_DefaultRangeMin == m_DefaultRangeMax)
     m_DefaultRangeMin = m_DefaultRangeMax - 1;
-  if(m_DefaultRangeMin > m_DefaultRangeMax)
-    std::swap(m_DefaultRangeMin,m_DefaultRangeMax);
 }
 
 mitk::ScalarType mitk::LevelWindow::GetRangeMin() const
@@ -145,7 +162,6 @@ mitk::ScalarType mitk::LevelWindow::GetDefaultRangeMin() const
 void mitk::LevelWindow::ResetDefaultRangeMinMax()
 {
   SetRangeMinMax(m_DefaultRangeMin, m_DefaultRangeMax);
-  testValues();
 }
 
 /*!

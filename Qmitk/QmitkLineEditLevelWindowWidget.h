@@ -19,8 +19,11 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef QMITKSPINBOXLEVELWINDOWWIDGET
 #define QMITKSPINBOXLEVELWINDOWWIDGET
 
-#include <QmitkLevelWindowWidgetContextMenu.h>
-#include <qlineedit.h>
+#include <qwidget.h>
+#include <mitkLevelWindowManager.h>
+
+class QmitkLevelWindowWidgetContextMenu;
+class QLineEdit;
 
 /**
   \class QmitkLineEditLevelWindowWidget QmitkLineEditLevelWindowWidget.h QmitkLineEditLevelWindowWidget.h

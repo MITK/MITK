@@ -16,10 +16,12 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#include "QmitkLineEditLevelWindowWidget.h"
+#include <QmitkLineEditLevelWindowWidget.h>
 #include <itkCommand.h>
 #include <qvalidator.h>
 #include <qlayout.h>
+#include <qlineedit.h>
+#include <QmitkLevelWindowWidgetContextMenu.h>
 
 /**
 * Constructor

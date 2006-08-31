@@ -19,8 +19,10 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef QMITKSLIDERLEVELWINDOW_WIDGET
 #define QMITKSLIDERLEVELWINDOW_WIDGET
 
-#include <qpainter.h>
-#include <QmitkLevelWindowWidgetContextMenu.h>
+#include <qwidget.h>
+#include <mitkLevelWindowManager.h>
+
+class QmitkLevelWindowWidgetContextMenu;
 
 /**
   \class QmitkSliderLevelWindowWidget QmitkSliderLevelWindowWidget.h QmitkSliderLevelWindowWidget.h

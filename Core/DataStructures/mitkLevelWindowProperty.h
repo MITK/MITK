@@ -20,7 +20,6 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITKLEVELWINDOWPROPERTY_H_HEADER_INCLUDED_C10EEAA8
 #define MITKLEVELWINDOWPROPERTY_H_HEADER_INCLUDED_C10EEAA8
 
-#include "mitkCommon.h"
 #include "mitkBaseProperty.h"
 #include "mitkLevelWindow.h"
 
@@ -36,7 +35,7 @@ class LevelWindowProperty : public BaseProperty
 
 protected:
     //##ModelId=3ED953090113
-    mitk::LevelWindow m_LevWin;
+    LevelWindow m_LevWin;
 
 public:
     mitkClassMacro(LevelWindowProperty, BaseProperty);
@@ -57,7 +56,7 @@ public:
     const mitk::LevelWindow & GetLevelWindow() const;
 
     //##ModelId=3ED953090135
-    void SetLevelWindow(const mitk::LevelWindow &levWin);
+    void SetLevelWindow(const LevelWindow &levWin);
 
     virtual std::string GetValueAsString() const;
 

@@ -20,9 +20,9 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef LEVELWINDOW_H_HEADER_INCLUDED_C1F4F02C
 #define LEVELWINDOW_H_HEADER_INCLUDED_C1F4F02C
 
-#include "mitkCommon.h"
 #include "mitkVector.h"
-#include <ipPic/ipPic.h>
+
+struct ipPicDescriptor;
 
 namespace mitk {
 

@@ -266,8 +266,9 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
   try
   {
     factory->SetFileName( fileName );
+    factory->SetImageSerie(false);
 
-    QString qFileName( fileName );
+    /*QString qFileName( fileName );
     
     // just in case this is a series
     int fnstart = qFileName.findRev( QRegExp("[/\\\\]"), qFileName.length() ); // last occurence of / or \  (\\\\ because of C++ quoting and regex syntax)
@@ -283,10 +284,13 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
       int stop=qFileName.find( QRegExp("[^0-9]"), start );
       sprintf(pattern, "%%s%%0%uu%s",stop-start,qFileName.ascii()+stop);
 
-
-      factory->SetFilePattern( pattern );
-      factory->SetFilePrefix( prefix );
-    }
+      if (start != stop)
+      {
+        factory->SetImageSerie(true);
+        factory->SetFilePattern( pattern );
+        factory->SetFilePrefix( prefix );
+      }
+    }*/
 
     QApplication::setOverrideCursor( QCursor(Qt::WaitCursor) );
 
@@ -303,7 +307,7 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
 
 void QmitkMainTemplate::fileOpenImageSequence()
 {
-  QString fileName = QFileDialog::getOpenFileName(NULL,CommonFunctionality::GetFileExtensions());
+  QString fileName = QFileDialog::getOpenFileName(NULL,CommonFunctionality::GetFileExtensions(), 0, 0, "Open Sequence");
 
   if ( !fileName.isNull() )
   {
@@ -328,15 +332,20 @@ void QmitkMainTemplate::fileOpenImageSequence()
 
 
     mitk::DataTreeNodeFactory::Pointer factory = mitk::DataTreeNodeFactory::New();
-
     try
     {
-      factory->SetFilePattern( pattern );
-      factory->SetFilePrefix( prefix );
-
+      factory->SetFileName(fileName);
+      factory->SetImageSerie(false);
+      if (start != stop)
+      {
+        factory->SetImageSerie(true);
+        factory->SetFilePattern( pattern );
+        factory->SetFilePrefix( prefix );
+      }
       QApplication::setOverrideCursor( QCursor(Qt::WaitCursor) );
 
       factory->Update();
+      factory->SetImageSerie(false);
       fileOpenGetFactoryOutput(*factory.GetPointer());
     }
     catch ( itk::ExceptionObject & ex )

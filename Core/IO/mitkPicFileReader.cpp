@@ -286,14 +286,18 @@ void mitk::PicFileReader::EnlargeOutputRequestedRegion(itk::DataObject *output)
   output->SetRequestedRegionToLargestPossibleRegion();
 }
 
-bool mitk::PicFileReader::CanReadFile(const std::string filename, const std::string /*filePrefix*/, const std::string /*filePattern*/) 
+bool mitk::PicFileReader::CanReadFile(const std::string filename, const std::string filePrefix, const std::string filePattern) 
 {
   // First check the extension
   if(  filename == "" )
-    {
+  {
       //std::cout<<"No filename specified."<<std::endl;
     return false;
-    }
+  }
+
+  // check if image is serie
+  if( filePattern != "" && filePrefix != "" )
+    return false;
 
   bool extensionFound = false;
   std::string::size_type PICPos = filename.rfind(".pic");

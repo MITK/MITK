@@ -132,7 +132,7 @@ void mitk::PicVolumeTimeSeriesReader::GenerateData()
 
 bool mitk::PicVolumeTimeSeriesReader::CanReadFile(const std::string /*filename*/, const std::string filePrefix, const std::string filePattern) 
 {
-  if( filePattern != "" && filePrefix != "" )
+  if( filePattern == "" && filePrefix == "" )
     return false;
 
   bool extensionFound = false;

@@ -109,6 +109,11 @@ public:
    * Sets default properites common to tus files
    */
   void SetDefaultTusProperties(int count, DataTreeNode::Pointer &node);
+
+  /**
+   * if true -> loaded image is part of a serie
+   */
+  void SetImageSerie(bool serie);
   
 protected:
 
@@ -122,6 +127,7 @@ protected:
   */
   virtual ~DataTreeNodeFactory();
 
+  bool m_Serie;
 
   /**
   * Determines of which file type a given file is and calls the 

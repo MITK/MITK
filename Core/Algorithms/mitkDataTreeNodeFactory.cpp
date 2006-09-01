@@ -98,11 +98,17 @@ PURPOSE.  See the above copyright notices for more information.
 
 mitk::DataTreeNodeFactory::DataTreeNodeFactory()
 {
+  m_Serie = false;
   this->Modified();
 }
 
 mitk::DataTreeNodeFactory::~DataTreeNodeFactory()
 {}
+
+void mitk::DataTreeNodeFactory::SetImageSerie(bool serie)
+{
+  m_Serie = serie;
+}
 
 void mitk::DataTreeNodeFactory::GenerateData()
 {
@@ -110,12 +116,24 @@ void mitk::DataTreeNodeFactory::GenerateData()
   if ( this->FileNameEndsWith( ".dcm" ) || this->FileNameEndsWith( ".DCM" ) 
     || this->FileNameEndsWith( ".ima" ) 
     || this->FileNameEndsWith( ".IMA" ) 
+    || this->FilePatternEndsWith( ".dcm" ) 
+    || this->FilePatternEndsWith( ".DCM" ) 
+    || this->FilePatternEndsWith( ".ima" ) 
+    || this->FilePatternEndsWith( ".IMA" ) 
     || (itksys::SystemTools::GetFilenameLastExtension(m_FileName) == "" ) )
   {
+    if (m_Serie)
+    {
+      m_FileName = m_FilePrefix;
+    }
     this->ReadFileSeriesTypeDCM();
   }
-  else if ( this->FileNameEndsWith( ".gdcm" ) || this->FileNameEndsWith( ".GDCM" ) )
+  else if ( this->FileNameEndsWith( ".gdcm" ) || this->FileNameEndsWith( ".GDCM" ) || this->FilePatternEndsWith( ".gdcm" ) || this->FilePatternEndsWith( ".GDCM" ) )
   {
+    if (m_Serie)
+    {
+      m_FileName = m_FilePrefix;
+    }
     this->ReadFileSeriesTypeGDCM();
   }
   else
@@ -125,6 +143,12 @@ void mitk::DataTreeNodeFactory::GenerateData()
     // the IO factories of the file readers are registered in the class mitkBaseDataIOFactory
     // for more details see the doxygen documentation (modules IO)
     bool usedNewDTNF = false;
+
+    if (m_Serie)
+    {
+      m_FileName = m_FilePrefix;
+    }
+
     std::vector<mitk::BaseData::Pointer>* baseDataVector = mitk::BaseDataIOFactory::CreateBaseDataIO( m_FileName, m_FilePrefix, m_FilePattern, mitk::BaseDataIOFactory::ReadMode );
 
     if(baseDataVector)

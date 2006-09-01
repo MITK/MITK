@@ -24,6 +24,7 @@ See MITKCopyright.txt or http://www.mitk.org/ for details.
 
 #include "mitkStatusBar.h"
 #include "mitkImageToItk.h"
+#include "itkImageRegionIteratorWithIndex.h"
 
 namespace mitk
 {

@@ -350,7 +350,19 @@ bool mitk::LevelWindow::SetAutoByPicTags(const ipPicDescriptor* aPic)
       window = ((type *)tsv->value)[1];
 
     ipPicFORALL_2( GET_C_W, tsv, level, window );
-
+    
+    ScalarType min = GetRangeMin();
+    ScalarType max = GetRangeMax();
+    if ((double)(GetRangeMin()) > (level - window/2))
+    {
+      min = level - window/2;
+    }
+    if ((double)(GetRangeMax()) < (level + window/2))
+    {
+      max = level + window/2;
+    }
+    SetRangeMinMax(min, max);
+    SetDefaultRangeMinMax(min, max);
     SetLevelWindow( level, window );
     SetDefaultLevelWindow(level, window);
     return true;

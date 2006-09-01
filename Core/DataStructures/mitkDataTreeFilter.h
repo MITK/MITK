@@ -195,7 +195,7 @@
   them and add your own if they may be useful for others.
   
 \code
-  treeFilter->SetFilter( &mitk::IsImage );
+  treeFilter->SetFilter( mitk::IsBaseDataTypeWithProperty<mitk::Image>("segmentation") );
 \endcode
  
   \subsubsection sectionMitkDataTreeFilterUsage13 Defining the filter's behaviour

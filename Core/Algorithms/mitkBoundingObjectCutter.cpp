@@ -27,6 +27,7 @@ See MITKCopyright.txt or http://www.mitk.org/ for details.
 #include "mitkImageAccessByItk.h"
 #include "mitkBoundingObject.h"
 #include "mitkGeometry3D.h"
+//#include "itkImageRegionIteratorWithIndex.h"
 
 namespace mitk
 {

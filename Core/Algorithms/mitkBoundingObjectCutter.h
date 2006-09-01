@@ -25,7 +25,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkBoundingObject.h"
 #include "mitkImageTimeSelector.h"
 #include "itkImage.h"
-#include "itkImageRegionIteratorWithIndex.h"
+
 
 namespace mitk {
 

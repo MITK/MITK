@@ -212,7 +212,20 @@ public:
   //## (T being the type of the second parameter)
   //## @return @a true property was found
   template <typename T>
-    bool GetPropertyValue(const char* propertyKey, T & value, mitk::BaseRenderer* renderer=NULL, bool* defaultRendererUsed = NULL) const;
+    bool GetPropertyValue(const char* propertyKey, T & value, mitk::BaseRenderer* renderer=NULL, bool* defaultRendererUsed = NULL) const
+#ifdef _MSC_VER
+    {
+      GenericProperty<T>* gp= dynamic_cast<GenericProperty<T>*>(GetProperty(propertyKey, renderer, defaultRendererUsed).GetPointer());
+      if ( gp != NULL )
+      {
+        value = gp->GetValue();
+        return true;
+      }
+      return false;
+    }
+#else
+  ;
+#endif
 
   //##Documentation
   //## @brief Convenience access method for bool properties (instances of

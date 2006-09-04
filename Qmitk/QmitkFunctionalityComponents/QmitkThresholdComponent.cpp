@@ -30,17 +30,21 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 /***************       CONSTRUCTOR      ***************/
-QmitkThresholdComponent::QmitkThresholdComponent(QObject * /*parent*/, const char * /*name*/, QmitkStdMultiWidget *mitkStdMultiWidget, mitk::DataTreeIteratorBase* it, bool updateSelector, bool showSelector)
+QmitkThresholdComponent::QmitkThresholdComponent(QObject * /*parent*/, const char * parentName, QmitkStdMultiWidget *mitkStdMultiWidget, mitk::DataTreeIteratorBase* it, bool updateSelector, bool showSelector):
+m_ParentName(parentName),
+m_ComponentName("ThresholdFinder"),
+m_MultiWidget(mitkStdMultiWidget),
+m_UpdateSelector(updateSelector),
+m_ShowSelector(showSelector),
+m_Active(false),
+m_GUI(NULL),
+m_SelectedImage(NULL),
+m_Spacer(NULL)
 {
   SetDataTreeIterator(it);
-  m_GUI = NULL;
   m_Node = it->Get();
   m_ThresholdImageNode = NULL;
-  m_MultiWidget= mitkStdMultiWidget;
-  m_Active = false;
   m_ThresholdNodeExisting = false;
-  m_UpdateSelector = updateSelector;
-  m_ShowSelector = showSelector;
 }
 
 /***************        DESTRUCTOR      ***************/
@@ -52,19 +56,19 @@ QmitkThresholdComponent::~QmitkThresholdComponent()
 /*************** GET FUNCTIONALITY NAME ***************/
 QString QmitkThresholdComponent::GetFunctionalityName()
 {
-  return m_Name;
+  return m_ParentName;
 }
 
 /*************** SET FUNCTIONALITY NAME ***************/
-void QmitkThresholdComponent::SetFunctionalityName(QString name)
+void QmitkThresholdComponent::SetFunctionalityName(QString parentName)
 {
-  m_Name = name;
+  m_ParentName = parentName;
 }
 
-/*************** GET FUNCCOMPONENT NAME ***************/
-QString QmitkThresholdComponent::GetFunctionalityComponentName()
+/***************   GET COMPONENT NAME   ***************/
+QString QmitkThresholdComponent::GetComponentName()
 {
-  return m_Name;
+  return m_ComponentName;
 }
 
 /*************** GET DATA TREE ITERATOR ***************/
@@ -192,6 +196,24 @@ void QmitkThresholdComponent::Deactivated()
   m_Active = false;
   ShowThreshold();
   DeleteThresholdNode();
+}
+
+/***************      ADD COMPONENT     ***************/
+void QmitkThresholdComponent::AddComponent(QmitkFunctionalityComponentContainer* componentContainer)
+{  
+  if(componentContainer!=NULL)
+  {
+    QWidget* componentWidget = componentContainer->CreateContainerWidget(m_GUI);
+    m_AddedChildList.push_back(componentContainer);
+    m_GUI->layout()->add(componentWidget);
+    if(m_Spacer != NULL)
+    {
+      m_GUI->layout()->removeItem(m_Spacer);
+    }
+      QSpacerItem*  spacer = new QSpacerItem( 20, 20, QSizePolicy::Minimum, QSizePolicy::Expanding );
+      m_Spacer = spacer;
+      m_GUI->layout()->addItem( m_Spacer );
+  }
 }
 
 ///*************CREATE THRESHOLD IMAGE NODE************/

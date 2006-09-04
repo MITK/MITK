@@ -32,13 +32,14 @@ PURPOSE.  See the above copyright notices for more information.
 const QSizePolicy preferred(QSizePolicy::Preferred, QSizePolicy::Preferred);
 
 /***************       CONSTRUCTOR      ***************/
-QmitkFunctionalityComponentContainer::QmitkFunctionalityComponentContainer(QObject *parent, const char *name, QmitkStdMultiWidget *mitkStdMultiWidget, mitk::DataTreeIteratorBase* it, bool updateSelector, bool showSelector)
-: QmitkBaseFunctionalityComponent(name, it),
+QmitkFunctionalityComponentContainer::QmitkFunctionalityComponentContainer(QObject *parent, const char *parentName, QmitkStdMultiWidget *mitkStdMultiWidget, mitk::DataTreeIteratorBase* it, bool updateSelector, bool showSelector)
+: QmitkBaseFunctionalityComponent(parentName, it),
 m_Active(false),
 m_UpdateSelector(updateSelector), 
 m_ShowSelector(showSelector),
 m_Parent(parent), 
-m_Name(name), 
+m_ComponentName("ComponentContainer"),
+m_ParentName(parentName), 
 m_MultiWidget(mitkStdMultiWidget),
 m_GUI(NULL),
 m_SelectedImage(NULL),
@@ -59,19 +60,19 @@ QmitkFunctionalityComponentContainer::~QmitkFunctionalityComponentContainer()
 /*************** GET FUNCTIONALITY NAME ***************/
 QString QmitkFunctionalityComponentContainer::GetFunctionalityName()
 {
-  return m_Name;
+  return m_ParentName;
 }
 
 /*************** SET FUNCTIONALITY NAME ***************/
-void QmitkFunctionalityComponentContainer::SetFunctionalityName(QString name)
+void QmitkFunctionalityComponentContainer::SetFunctionalityName(QString parentName)
 {
-  m_Name = name;
+  m_ParentName = parentName;
 }
 
-/*************** GET FUNCCOMPONENT NAME ***************/
-QString QmitkFunctionalityComponentContainer::GetFunctionalityComponentName()
+/***************   GET COMPONENT NAME   ***************/
+QString QmitkFunctionalityComponentContainer::GetComponentName()
 {
-  return m_Name;
+  return m_ComponentName;
 }
 
 /*************** GET DATA TREE ITERATOR ***************/

@@ -62,7 +62,7 @@ public:
 
   /***************       CONSTRUCTOR      ***************/
   /** \brief Standard-Constructor. */
-  QmitkFunctionalityComponentContainer(QObject *parent=0, const char *name=0, QmitkStdMultiWidget *mitkStdMultiWidget = NULL, mitk::DataTreeIteratorBase* dataIt = NULL, bool updateSelector = true, bool showSelector = true);
+  QmitkFunctionalityComponentContainer(QObject *parent=0, const char * parentName = 0, QmitkStdMultiWidget *mitkStdMultiWidget = NULL, mitk::DataTreeIteratorBase* dataIt = NULL, bool updateSelector = true, bool showSelector = true);
   
   /***************        DESTRUCTOR      ***************/
   /** \brief Destructor. */
@@ -77,9 +77,10 @@ public:
 
   /***************        SET AND GET     ***************/
   virtual QString GetFunctionalityName();
-  void SetFunctionalityName(QString name);
 
-  virtual QString GetFunctionalityComponentName();
+  void SetFunctionalityName(QString parentName);
+
+  virtual QString GetComponentName();
     /*!
   \brief getter for dataTree attribute. It returns the 
   reference to a data tree iterator object
@@ -97,12 +98,17 @@ public:
 
   /** \brief Method to set the Image Selector visible or invisible */
   virtual void SetSelectorVisibility(bool visibility);
+  
+  /***************     ADD COMPONENTS     ***************/
+  /** \brief method to add components into this component. */
+  virtual void AddComponent(QmitkFunctionalityComponentContainer* componentContainer);
+
 
   /*************** TREE CHANGED (       ) ***************/
   virtual void TreeChanged(const itk::EventObject & treeChangedEvent);
 
   /***************      OHTER METHODS     ***************/
-  void AddComponent(QmitkFunctionalityComponentContainer* componentContainer);
+
   virtual void Activated();
   virtual void Deactivated();
 
@@ -138,10 +144,13 @@ protected:
 private:
   /***************        ATTRIBUTES      ***************/
   QObject *m_Parent;
-  QString m_Name;
+  QString m_ParentName;
+  QString m_ComponentName;
   QmitkStdMultiWidget * m_MultiWidget;
   QmitkFunctionalityComponentContainerGUI * m_GUI;
   const mitk::DataTreeFilter::Item * m_SelectedImage;
+
+  /** \brief Spacer added at the end of the component */
   QSpacerItem* m_Spacer;
 
 

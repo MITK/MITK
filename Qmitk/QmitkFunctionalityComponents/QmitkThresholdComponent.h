@@ -50,7 +50,7 @@ class QmitkThresholdComponent : public QmitkFunctionalityComponentContainer
 public:
   /***************       CONSTRUCTOR      ***************/
   /** \brief Constructor. */
-  QmitkThresholdComponent(QObject *parent=0, const char *name=0, QmitkStdMultiWidget *mitkStdMultiWidget = NULL, mitk::DataTreeIteratorBase* dataIt = NULL, bool updateSelector = true, bool showSelector = true);
+  QmitkThresholdComponent(QObject *parent=0, const char *parentName=0, QmitkStdMultiWidget *mitkStdMultiWidget = NULL, mitk::DataTreeIteratorBase* dataIt = NULL, bool updateSelector = true, bool showSelector = true);
 
   /***************        DESTRUCTOR      ***************/
   /** \brief Destructor. */
@@ -74,13 +74,13 @@ public:
   mitk::DataTreeIteratorBase* GetDataTreeIterator();
 
   /** \brief Method to set the Name of the Functionality */
-  void SetFunctionalityName(QString name);
+  void SetFunctionalityName(QString parentName);
 
   /** \brief Method to get the Name of the Functionality */
   virtual QString GetFunctionalityName();
 
   /** \brief Method to get the Name of the FunctionalityComponent */
-  virtual QString GetFunctionalityComponentName();
+  virtual QString GetComponentName();
   
   /** \brief Method to get the GUI of this component. This Method is obligatory */
   virtual QWidget* GetGUI();
@@ -95,6 +95,10 @@ public:
 
   ///** \brief Method to set m_Activated to false */
   virtual void Deactivated();
+
+  /***************     ADD COMPONENTS     ***************/
+  /** \brief method to add components into this component. */
+  virtual void AddComponent(QmitkFunctionalityComponentContainer* componentContainer);
 
   /***************        ATTRIBUTES      ***************/
 
@@ -131,9 +135,14 @@ protected:
   /***************        ATTRIBUTES      ***************/
 
   /*!
+  the name of the parent-component
+  */
+  QString m_ParentName;
+
+  /*!
   the name of the component
   */
-  QString m_Name;
+  QString m_ComponentName;
 
   /*!
   a reference to the MultiWidget
@@ -187,6 +196,9 @@ private:
 
   /** \brief This Attribute holds the information if a thresholdnode is already existing or not*/
   bool m_ThresholdNodeExisting;
+
+  /** \brief Spacer added at the end of the component */
+  QSpacerItem* m_Spacer;
 
 };
 

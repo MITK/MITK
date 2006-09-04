@@ -38,33 +38,35 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 /***************       CONSTRUCTOR      ***************/
-QmitkSurfaceCreatorComponent::QmitkSurfaceCreatorComponent(QObject * /*parent*/, const char * name, QmitkStdMultiWidget *mitkStdMultiWidget, mitk::DataTreeIteratorBase* it, bool updateSelector, bool showSelector, bool allowExpertMode):
-m_Name(name),
+QmitkSurfaceCreatorComponent::QmitkSurfaceCreatorComponent(QObject * /*parent*/, const char * parentName, QmitkStdMultiWidget *mitkStdMultiWidget, mitk::DataTreeIteratorBase* it, bool updateSelector, bool showSelector, bool allowExpertMode):
+m_ParentName(parentName),
+m_ComponentName("SurfaceCreator"),
 m_MultiWidget(mitkStdMultiWidget),
 m_DataTreeIteratorClone(NULL),
 m_UpdateSelector(updateSelector),
 m_ShowSelector(showSelector),
-m_AllowExpertMode(allowExpertMode),
 m_Active(false),
-m_ShowExpertMode(true),
-m_Median3DFlag(false),
-m_InterpolateFlag(false),
-m_SmoothFlag(false),
-m_GaussFlag(false),
-m_DecimateFlag(false),
 m_GUI(NULL),
 m_SelectedImage(NULL),
-m_MitkImage(NULL),
-m_MitkImageIterator(NULL),
-m_SurfaceCounter(0),
-m_r(0.75),
-m_g(0.42),
-m_b(-0.75), 
-m_Threshold(1)
+m_Spacer(NULL)
 {
   SetDataTreeIterator(it);
   m_Color.Set(1.0, 0.67, 0.0);
   m_RainbowColor = new mitk::ColorSequenceRainbow();
+  m_AllowExpertMode = allowExpertMode;
+  m_ShowExpertMode = true;
+  m_Median3DFlag = false;
+  m_InterpolateFlag = false;
+  m_SmoothFlag = false;
+  m_GaussFlag = false;
+  m_DecimateFlag = false;
+  m_MitkImage = NULL;
+  m_MitkImageIterator = NULL;
+  m_SurfaceCounter = 0;
+  m_r = 0.75;
+  m_g = 0.42;
+  m_b = -0.75; 
+  m_Threshold = 1;
 }
 
 /***************        DESTRUCTOR      ***************/
@@ -76,19 +78,19 @@ QmitkSurfaceCreatorComponent::~QmitkSurfaceCreatorComponent()
 /*************** GET FUNCTIONALITY NAME ***************/
 QString QmitkSurfaceCreatorComponent::GetFunctionalityName()
 {
-  return m_Name;
+  return m_ParentName;
 }
 
 /*************** SET FUNCTIONALITY NAME ***************/
-void QmitkSurfaceCreatorComponent::SetFunctionalityName(QString name)
+void QmitkSurfaceCreatorComponent::SetFunctionalityName(QString parentName)
 {
-  m_Name = name;
+  m_ParentName = parentName;
 }
 
-/*************** GET FUNCCOMPONENT NAME ***************/
-QString QmitkSurfaceCreatorComponent::GetFunctionalityComponentName()
+/***************   GET COMPONENT NAME   ***************/
+QString QmitkSurfaceCreatorComponent::GetComponentName()
 {
-  return m_Name;
+  return m_ComponentName;
 }
 
 /*************** GET DATA TREE ITERATOR ***************/
@@ -433,6 +435,24 @@ float QmitkSurfaceCreatorComponent::GetDecimateValue()
   targetReduction = m_GUI->GetDecimateValue();
 
   return targetReduction;
+}
+
+/***************      ADD COMPONENT     ***************/
+void QmitkSurfaceCreatorComponent::AddComponent(QmitkFunctionalityComponentContainer* componentContainer)
+{  
+  if(componentContainer!=NULL)
+  {
+    QWidget* componentWidget = componentContainer->CreateContainerWidget(m_GUI);
+    m_AddedChildList.push_back(componentContainer);
+    m_GUI->layout()->add(componentWidget);
+    if(m_Spacer != NULL)
+    {
+      m_GUI->layout()->removeItem(m_Spacer);
+    }
+      QSpacerItem*  spacer = new QSpacerItem( 20, 20, QSizePolicy::Minimum, QSizePolicy::Expanding );
+      m_Spacer = spacer;
+      m_GUI->layout()->addItem( m_Spacer );
+  }
 }
 
 ///***************      CREATE SURFACE     **************/

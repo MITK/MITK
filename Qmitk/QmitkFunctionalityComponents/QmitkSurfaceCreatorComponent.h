@@ -57,7 +57,7 @@ class QmitkSurfaceCreatorComponent : public QmitkFunctionalityComponentContainer
 public:
   /***************       CONSTRUCTOR      ***************/
   /** \brief Constructor. */
-  QmitkSurfaceCreatorComponent(QObject *parent=0, const char *name=0, QmitkStdMultiWidget *mitkStdMultiWidget = NULL, mitk::DataTreeIteratorBase* dataIt = NULL, bool updateSelector = true, bool showSelector = true, bool allowExpertMode = true);
+  QmitkSurfaceCreatorComponent(QObject *parent=0, const char *parentName=0, QmitkStdMultiWidget *mitkStdMultiWidget = NULL, mitk::DataTreeIteratorBase* dataIt = NULL, bool updateSelector = true, bool showSelector = true, bool allowExpertMode = true);
 
   /***************        DESTRUCTOR      ***************/
   /** \brief Destructor. */
@@ -81,13 +81,13 @@ public:
   mitk::DataTreeIteratorBase* GetDataTreeIterator();
 
   /** \brief Method to set the Name of the Functionality */
-  void SetFunctionalityName(QString name);
+  void SetFunctionalityName(QString parentName);
 
   /** \brief Method to get the Name of the Functionality */
   virtual QString GetFunctionalityName();
 
   /** \brief Method to get the Name of the FunctionalityComponent */
-  virtual QString GetFunctionalityComponentName();
+  virtual QString GetComponentName();
 
   /** \brief Method to get the GUI of this component. This Method is obligatory */
   virtual QWidget* GetGUI();
@@ -106,6 +106,10 @@ public:
 
   ///** \brief Method to set m_Activated to false */
   virtual void Deactivated();
+
+  /***************     ADD COMPONENTS     ***************/
+  /** \brief method to add components into this component. */
+  virtual void AddComponent(QmitkFunctionalityComponentContainer* componentContainer);
 
   /***************        ATTRIBUTES      ***************/
 
@@ -159,10 +163,13 @@ protected slots:
 
 protected:
 
+  /** \brief Method to push all parameterwidgets and expertwidgets in a parameterList-vector respectively in a expertModeList-vector and set them shown or not, addicted to the user-preferences at the GUI*/
   void InitSurfaceGUI();
 
+  /** \brief Method to set all parameter Flags to true or false,  addicted to the user-preferences at the GUI*/
   void InitSurfaceParamterFlags();
 
+  /** \brief Method to insert the created surface into datatree*/
   void InsertSurfaceIntoDataTree(mitk::ManualSegmentationToSurfaceFilter * ft, mitk::DataTreeIteratorClone  iT);
 
   /***************        ATTRIBUTES      ***************/
@@ -173,11 +180,15 @@ protected:
   /** \brief Vector with all Parameter-Widgets */
   std::vector<QCheckBox *> m_ParameterList;
 
+  /*!
+  the name of the parent-component
+  */
+  QString m_ParentName;
 
   /*!
   the name of the component
   */
-  QString m_Name;
+  QString m_ComponentName;
 
   /*!
   a reference to the MultiWidget
@@ -310,6 +321,9 @@ private:
   *  variable to hold the threshold that is used to create the surface 
   */
   int m_Threshold;
+
+  /** \brief Spacer added at the end of the component */
+  QSpacerItem* m_Spacer;
 
 
 };

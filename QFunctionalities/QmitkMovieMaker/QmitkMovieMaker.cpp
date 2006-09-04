@@ -224,6 +224,9 @@ void QmitkMovieMaker::FocusChange()
     if ( focusedRenderer == (*iter)->GetRenderer() )
     {
       m_Controls->cmbSelectedStepperWindow->setCurrentItem( i );
+      m_Controls->cmbSelectedStepperWindow_activated(i);
+      m_Controls->cmbSelectedRecordingWindow->setCurrentItem( i );
+      m_Controls->cmbSelectedRecordWindow_activated(i);
       break;
     }
   }

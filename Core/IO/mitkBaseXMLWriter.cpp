@@ -112,57 +112,12 @@ void BaseXMLWriter::EndNode( )
   \ param key specifies the name of the attribute
   \ param value represents the data of the attribute
 */
-void BaseXMLWriter::WriteProperty( const std::string& key, const char* value ) const
-{
-  std::ostream& stream = m_Stack.top()->GetPropertyStream();
-  stream << ConvertString( key.c_str() );
-  stream << "=\"" << ConvertString( value ) << "\" ";
-}
-
-
 void BaseXMLWriter::WriteProperty( const std::string& key, const std::string& value ) const 
 {
   std::ostream& stream = m_Stack.top()->GetPropertyStream();
   stream << ConvertString( key.c_str() );
   stream << "=\"" << ConvertString( value.c_str() ) << "\" ";
 }
-
-
-void BaseXMLWriter::WriteProperty( const std::string& key, int value ) const 
-{
-  std::ostream& stream = m_Stack.top()->GetPropertyStream();
-  stream << ConvertString( key.c_str() );
-  stream << "=\"" << value << "\" ";
-}
-
-
-void BaseXMLWriter::WriteProperty( const std::string& key, float value ) const
-{
-  std::ostream& stream = m_Stack.top()->GetPropertyStream();
-  stream << ConvertString( key.c_str() );
-  stream << "=\"" << value << "\" ";
-}
-
-
-void BaseXMLWriter::WriteProperty( const std::string& key, double value ) const
-{
-  std::ostream& stream = m_Stack.top()->GetPropertyStream();
-  stream << ConvertString( key.c_str() );
-  stream << "=\"" << value << "\" ";
-}
-
-
-void BaseXMLWriter::WriteProperty( const std::string& key, bool value ) const
-{
-  std::ostream& stream = m_Stack.top()->GetPropertyStream();
-  stream << ConvertString( key.c_str() );
-
-  if ( value == true )
-    stream << "=\"" << "TRUE\" ";
-  else
-    stream << "=\"" << "FALSE\" ";
-}
-
 
 void BaseXMLWriter::WriteComment( const std::string& text ) 
 {

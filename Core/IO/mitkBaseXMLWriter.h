@@ -84,23 +84,8 @@ namespace mitk{
     /// closes an open XML node
     void EndNode( );
 
-    /// Writes a XML attribute that datatype is a const char*. Parameter key specifies the name of the attribute. Parameter value represents the data of the attribute.
-    void WriteProperty( const std::string& key, const char* value ) const;
-
     /// writes a XML attribute that datatype is a string
     void WriteProperty( const std::string& key, const std::string& value ) const;
-
-    /// writes a XML attribute that datatype is an integer
-    void WriteProperty( const std::string& key, int value ) const;
-
-    /// writes a XML attribute that datatype is a float
-    void WriteProperty( const std::string& key, float value ) const;
-
-    /// writes a XML attribute that datatype is a double
-    void WriteProperty( const std::string& key, double value ) const;
-
-    /// writes a XML attribute that datatype is a bool
-    void WriteProperty( const std::string& key, bool value ) const;
 
     /// writes a comment in the XML file
     void WriteComment( const std::string& key );

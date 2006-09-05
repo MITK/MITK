@@ -26,7 +26,7 @@ PURPOSE.  See the above copyright notices for more information.
 template <typename T>
 int TestGenericPropertyForDataType(T testValue1, T testValue2, std::string testValue1AsString, std::string testValue2AsString, std::string type)
 {
-  std::cout << "Testing mitk::GenericProperty<" << type << ">(" << testValue1 << ", " << testValue2 << ") ";
+  std::cout << "Testing mitk::GenericProperty<" << type << ">(" << testValue1AsString << ", " << testValue2AsString << ") ";
   
   typename mitk::GenericProperty<T>::Pointer prop = new mitk::GenericProperty<T>();
   typename mitk::GenericProperty<T>::Pointer prop2 = new mitk::GenericProperty<T>(testValue1);

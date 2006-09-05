@@ -69,6 +69,7 @@ class BaseProperty : public itk::Object, public XMLIO
     
     virtual ~BaseProperty();
 
+    friend class PropertyList; // for VALUE
 
     static std::string VALUE;
 };

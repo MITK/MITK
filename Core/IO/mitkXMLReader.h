@@ -137,6 +137,7 @@ namespace mitk{
     static const std::string DATA_TREE; 
     static const std::string RENDERER_NAME;
     static const std::string PROPERTY_KEY;
+    static const std::string PROPERTY_UID;
     static const std::string RENDERER;
     static const std::string FILENAME;
     static const std::string MIN;

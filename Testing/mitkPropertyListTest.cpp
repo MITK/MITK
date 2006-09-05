@@ -132,7 +132,7 @@ bool TestXMLWriter()
     return false;
   }
 
-  ip1->SetValue(SECOND_VALUE);
+  ip1->SetValue(FIRST_VALUE);
   if (ip1->GetValue() != ip2->GetValue())
   {
     std::cout << "  IntProperties somehow corrupted" << std::endl;

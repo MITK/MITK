@@ -171,6 +171,7 @@ mitk::TimeBounds mitk::DataTree::ComputeTimeBounds(mitk::DataTreeIteratorBase* i
 
 bool mitk::DataTree::Load( const mitk::DataTreeIteratorBase* it, const char* filename )
 {
+  mitk::PropertyList::PrepareXML_IO(); // to get "shared" properties right  
   return mitk::XMLReader::Load( filename, it );
 }
 
@@ -178,7 +179,7 @@ bool mitk::DataTree::Save( const mitk::DataTreeIteratorBase* it, const char* fil
 {
   if ( fileName == NULL || it == NULL || it->IsAtEnd() )
     return false;
-
+  
   mitk::XMLWriter writer( fileName );
 
   if ( !Save( it, writer, writeRootNodeToo ) )
@@ -228,6 +229,7 @@ bool mitk::DataTree::SaveNext( const mitk::DataTreeIteratorBase* it, mitk::XMLWr
 
 bool mitk::DataTree::Save( const mitk::DataTreeIteratorBase* it, mitk::XMLWriter& xmlWriter, bool writeRootNodeToo ) 
 {
+  mitk::PropertyList::PrepareXML_IO(); // to get "shared" properties right  
   xmlWriter.BeginNode(XML_NODE_NAME);
   bool result = SaveNext( it, xmlWriter, writeRootNodeToo );
   xmlWriter.EndNode(); // mitkDataTree

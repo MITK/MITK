@@ -26,6 +26,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <string>
 #include <map> 
 #include <mitkXMLIO.h>
+#include <mitkUIDGenerator.h>
 
 namespace mitk {
 
@@ -92,6 +93,8 @@ public:
 
     virtual void Clear();
 
+    static void PrepareXML_IO();
+
     virtual bool WriteXMLData( XMLWriter& xmlWriter );
     virtual bool ReadXMLData( XMLReader& xmlReader );
     virtual bool IsEnabled(const char *propertyKey);
@@ -113,6 +116,18 @@ protected:
 
     //##Documentation
     virtual const std::string& GetXMLNodeName() const;
+
+private:
+
+    /// Needed for XML writing. Generates UIDs to identify memory addresses.
+    static UIDGenerator m_UIDGenerator;
+
+    /// Used during XML reading. Stores, which properties have already been read/created.
+    static std::map<std::string, BaseProperty*> m_AlreadyReadFromXML;
+    /// Used during XML writing. Stores, which properties have already been written, so that each property is only written once.
+    static std::map<BaseProperty*, std::string> m_AlreadyWrittenToXML;
+
+    static const std::string XML_ALREADY_SEEN;
 };
 
 } // namespace mitk

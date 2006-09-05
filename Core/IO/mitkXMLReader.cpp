@@ -39,11 +39,12 @@ namespace mitk {
   const std::string XMLReader::DATA = "data";
   const std::string XMLReader::TREE_NODE = "treeNode";
   const std::string XMLReader::DATA_TREE_NODE = "dataTreeNode";
-  const std::string XMLReader::ISTRUE = "TRUE";
-  const std::string XMLReader::ISFALSE = "FALSE";
+  const std::string XMLReader::ISTRUE = "1";
+  const std::string XMLReader::ISFALSE = "0";
   const std::string XMLReader::PROPERTY = "property";
   const std::string XMLReader::DATA_TREE = "mitkDataTree";
   const std::string XMLReader::PROPERTY_KEY = "PROPERTY_KEY";
+  const std::string XMLReader::PROPERTY_UID = "PROPERTY_UID";
   const std::string XMLReader::RENDERER = "renderer";
   const std::string XMLReader::RENDERER_NAME = "RENDERER_NAME";
   const std::string XMLReader::PROPERTY_LIST = "propertyList";

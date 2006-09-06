@@ -1,5 +1,4 @@
 #include <QmitkRenderWindow.h>
-#include <QmitkSliceWidget.h>
 
 #include <mitkDataTreeNodeFactory.h>
 #include <mitkProperties.h>

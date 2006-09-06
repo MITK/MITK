@@ -34,6 +34,8 @@ namespace mitk {
 
    typedef GenericProperty<double> DoubleProperty;
 
+   typedef GenericProperty<Vector3D> Vector3DProperty;
+
    typedef GenericProperty<Point3D> Point3dProperty;
 
    typedef GenericProperty<Point4D> Point4dProperty;

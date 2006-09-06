@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkDataTree.h"
 #include <mitkXMLWriter.h>
 #include <mitkXMLReader.h>
+#include <mitkSmartPointerProperty.h>
 
 const std::string mitk::DataTree::XML_NODE_NAME = "mitkDataTree";
 const std::string mitk::DataTree::XML_TAG_TREE_NODE = "treeNode";
@@ -172,7 +173,10 @@ mitk::TimeBounds mitk::DataTree::ComputeTimeBounds(mitk::DataTreeIteratorBase* i
 bool mitk::DataTree::Load( const mitk::DataTreeIteratorBase* it, const char* filename )
 {
   mitk::PropertyList::PrepareXML_IO(); // to get "shared" properties right  
-  return mitk::XMLReader::Load( filename, it );
+  bool result = mitk::XMLReader::Load( filename, it );
+  SmartPointerProperty::PostProcessXMLReading(); // to get "shared" properties right  
+
+  return result;
 }
 
 bool mitk::DataTree::Save( const mitk::DataTreeIteratorBase* it, const char* fileName, bool writeRootNodeToo ) 

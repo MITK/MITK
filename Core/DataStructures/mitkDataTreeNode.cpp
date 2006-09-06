@@ -24,6 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkProperties.h"
 #include "mitkStringProperty.h"
+#include "mitkSmartPointerProperty.h"
 #include "mitkMaterialProperty.h"
 #include "mitkColorProperty.h"
 #include "mitkLevelWindowProperty.h"
@@ -425,6 +426,13 @@ unsigned long mitk::DataTreeNode::GetMTime() const
 
 bool mitk::DataTreeNode::WriteXMLData( XMLWriter& xmlWriter ) 
 {
+  xmlWriter.BeginNode( SmartPointerProperty::XML_SMARTPOINTER_TARGET_NODE );
+  if ( SmartPointerProperty::GetReferenceCountFor(this) > 0 )
+  {
+    xmlWriter.WriteProperty( SmartPointerProperty::XML_SMARTPOINTER_TARGET_KEY, SmartPointerProperty::GetReferenceUIDFor(this) );
+  }
+  xmlWriter.EndNode();
+
   // PropertyLists
   MapOfPropertyLists::iterator i = m_MapOfPropertyLists.begin();
   const MapOfPropertyLists::iterator end = m_MapOfPropertyLists.end();
@@ -493,6 +501,14 @@ bool mitk::DataTreeNode::ReadXMLData( XMLReader& xmlReader )
   if ( xmlReader.Goto( BaseData::XML_NODE_NAME ) ) {
     m_Data = dynamic_cast<mitk::BaseData*>( xmlReader.CreateObject().GetPointer() );
     if ( m_Data.IsNotNull() ) m_Data->ReadXMLData( xmlReader );
+    xmlReader.GotoParent();
+  }
+  if ( xmlReader.Goto( SmartPointerProperty::XML_SMARTPOINTER_TARGET_NODE ) ) {
+    std::string uid;
+    if ( xmlReader.GetAttribute( SmartPointerProperty::XML_SMARTPOINTER_TARGET_KEY, uid ) )
+    {
+      SmartPointerProperty::RegisterPointerTarget( this, uid );
+    }
     xmlReader.GotoParent();
   }
   if ( xmlReader.Goto( Interactor::XML_NODE_NAME ) ) {

@@ -22,6 +22,11 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkCommon.h"
 #include "mitkBaseProperty.h"
+#include "mitkUIDGenerator.h"
+
+#include<map>
+#include<list>
+#include<string>
 
 namespace mitk {
 
@@ -35,9 +40,10 @@ class SmartPointerProperty : public BaseProperty
     mitkClassMacro(SmartPointerProperty, BaseProperty);
 
     //##ModelId=3ED94B4203C1
-    virtual bool operator==(const BaseProperty& property) const;
+    virtual bool operator==(const BaseProperty&) const;
+
     //##ModelId=3ED94B7500F2
-    SmartPointerProperty(itk::Object* pointer);
+    SmartPointerProperty(itk::Object* = NULL);
 
     //##ModelId=3ED94B750111
     virtual ~SmartPointerProperty();
@@ -46,10 +52,44 @@ class SmartPointerProperty : public BaseProperty
     itk::Object::Pointer GetSmartPointer() const;
 
     //##ModelId=3ED952AD02F6
-    void SetSmartPointer(itk::Object* pointer);
+    void SetSmartPointer(itk::Object*);
+
+    /// mainly for XML output
+    virtual std::string GetValueAsString() const;
+
+    /// XML input
+    virtual bool ReadXMLData(XMLReader&);
+
+    static void PostProcessXMLReading();
+
+    /// Return the number of SmartPointerProperties that reference the object given as parameter
+    static unsigned int GetReferenceCountFor(itk::Object*);
+    static std::string GetReferenceUIDFor(itk::Object*);
+    static void RegisterPointerTarget(itk::Object*, const std::string uid);
+
+    static const char* XML_SMARTPOINTER_TARGET_NODE;
+    static const char* XML_SMARTPOINTER_TARGET_KEY;
+
   protected:
+
     //##ModelId=3ED95309021C
     itk::Object::Pointer m_SmartPointer;
+
+  private:
+
+    typedef std::map<itk::Object*, unsigned int>             ReferenceCountMapType;
+    typedef std::map<itk::Object*, std::string>              ReferencesUIDMapType;
+    typedef std::map<SmartPointerProperty*, std::string>     ReadInSmartPointersMapType;
+    typedef std::map<std::string, itk::Object*>              ReadInTargetsMapType;
+
+    /// for each itk::Object* count how many SmartPointerProperties point to it
+    static ReferenceCountMapType          m_ReferenceCount;
+    static ReferencesUIDMapType           m_ReferencesUID;
+    static ReadInSmartPointersMapType     m_ReadInInstances;
+    static ReadInTargetsMapType           m_ReadInTargets;
+
+    /// to generate unique IDs for the objects pointed at (during XML writing)
+    static UIDGenerator m_UIDGenerator;
 };
 
 } // namespace mitk

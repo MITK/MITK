@@ -21,6 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITKGEOMETRYDATA_H_HEADER_INCLUDED_C19C01E2
 
 #include "mitkBaseData.h"
+#include "mitkXMLIO.h"
 
 namespace mitk {
 
@@ -48,6 +49,10 @@ public:
   virtual void SetRequestedRegion(itk::DataObject *data);
 
   virtual void CopyInformation(const itk::DataObject *data);
+
+  virtual bool WriteXMLData( XMLWriter& xmlWriter );
+  
+  virtual bool ReadXMLData( XMLReader& xmlReader );
 
 protected:
   GeometryData();

@@ -16,7 +16,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-
 /****************************************************************************
 ** ui.h extension file, included from the uic-generated form implementation.
 **

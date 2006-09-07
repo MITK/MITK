@@ -284,6 +284,16 @@ inline bool Equal(double scalar1, double scalar2)
   return fabs(scalar1-scalar2) < mitk::eps;
 }
 
+template <class Tin, class Tout> inline void TransferMatrix(const Tin& in, Tout& out)
+{ 
+  if ((in.RowDimensions != out.RowDimensions) || (in.ColumnDimensions != out.ColumnDimensions))
+    return;
+  for (unsigned int i = 0; i < in.RowDimensions; ++i)
+    for (unsigned int j = 0; j < in.ColumnDimensions; ++j)
+      out[i][j] = in[i][j];
+}
+
+
 } // namespace mitk
 
 

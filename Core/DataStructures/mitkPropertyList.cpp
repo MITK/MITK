@@ -221,10 +221,10 @@ bool mitk::PropertyList::ReadXMLData( XMLReader& xmlReader )
 
       if ( property.IsNotNull() ) 
       {
-        std::string value;
-        xmlReader.GetAttribute( BaseProperty::VALUE, value );
+        std::string referenced_uid; 
+        xmlReader.GetAttribute( XML_ALREADY_SEEN, referenced_uid );
 
-        if ( !value.empty() )
+        if ( referenced_uid.empty() )
         {
           // object could be created
           property->ReadXMLData( xmlReader );
@@ -245,9 +245,6 @@ bool mitk::PropertyList::ReadXMLData( XMLReader& xmlReader )
           // no object was created, so this is perhaps a reference to another (already created) property
 
           // find out, which property is referenced
-          std::string referenced_uid;
-          xmlReader.GetAttribute( XML_ALREADY_SEEN, referenced_uid );
-
           if ( m_AlreadyReadFromXML.find(referenced_uid) != m_AlreadyReadFromXML.end() )
           {
             // ok, this property is alredy created

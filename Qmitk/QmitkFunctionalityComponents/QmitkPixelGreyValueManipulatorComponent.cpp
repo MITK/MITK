@@ -192,8 +192,8 @@ void QmitkPixelGreyValueManipulatorComponent::ShowImageContent(bool)
  m_GUI->GetImageContent()->setShown(m_GUI->GetSelectDataGroupBox()->isChecked());
 }
 
-void QmitkPixelGreyValueManipulatorComponent::HideOrShowValue2(int index)
-{
+void QmitkPixelGreyValueManipulatorComponent::HideOrShowValue2(int /*index*/)
+{ 
   if(m_GUI->GetManipulationModeComboBox()->currentItem() != 2)
   {
     m_GUI->GetValue2GroupBox()->setShown(false);

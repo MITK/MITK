@@ -838,6 +838,7 @@ void mitk::DataTreeNodeFactory::ReadFileSeriesTypeITKImageSeriesReader()
 void mitk::DataTreeNodeFactory::SetDefaultImageProperties(mitk::DataTreeNode::Pointer &node) 
 {
   node->SetProperty( "volumerendering", new mitk::BoolProperty( false ) );
+  node->SetProperty( "use color", new mitk::BoolProperty( true ) );
   node->SetProperty( "iilInterpolation", new mitk::BoolProperty( false ) );
   node->SetProperty( "vtkInterpolation", new mitk::BoolProperty( true ) );
   node->SetProperty( "texture interpolation", new mitk::BoolProperty( true ) );
@@ -855,6 +856,16 @@ void mitk::DataTreeNodeFactory::SetDefaultImageProperties(mitk::DataTreeNode::Po
     levWinProp->SetLevelWindow( levelwindow );
     node->GetPropertyList()->SetProperty( "levelwindow", levWinProp );
   }
+  
+  // add a default rainbow lookup table for color mapping
+  mitk::LookupTable::Pointer mitkLut = mitk::LookupTable::New();
+  vtkLookupTable* vtkLut = mitkLut->GetVtkLookupTable();
+  vtkLut->SetHueRange(0.6667, 0.0);
+  vtkLut->SetTableRange(0.0, 20.0);
+  vtkLut->Build();
+  mitk::LookupTableProperty::Pointer mitkLutProp = new mitk::LookupTableProperty();
+  mitkLutProp->SetLookupTable(mitkLut);
+  node->SetProperty( "LookupTable", mitkLutProp );
 } 
 
 void mitk::DataTreeNodeFactory::SetDefaultSurfaceProperties(mitk::DataTreeNode::Pointer &node)

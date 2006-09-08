@@ -481,10 +481,12 @@ void mitk::ImageMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
   assert(image != NULL);
 
   float rgba[4]={1.0f,1.0f,1.0f,1.0f};
+  float opacity = 1.0f;
   // check for color prop and use it for rendering if it exists
   GetColor(rgba, renderer);
   // check for opacity prop and use it for rendering if it exists
-  GetOpacity(rgba[3], renderer);
+  GetOpacity(opacity, renderer);
+  rgba[3]=opacity;
 
   // check for interpolation properties
   bool iilInterpolation=false;
@@ -513,6 +515,12 @@ void mitk::ImageMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
   else 
   {
     m_iil4mitkMode = iil4mitkImage::COLOR_ALPHA;
+    // only update the lut, when the properties have changed...
+    if ( LookupTableProp->GetLookupTable()->GetMTime() <= this->GetDataTreeNode()->GetPropertyList()->GetMTime() )
+    {
+      LookupTableProp->GetLookupTable()->ChangeOpacityForAll( opacity );
+      LookupTableProp->GetLookupTable()->ChangeOpacity(0, 0.0);
+    }
     image->setColors(LookupTableProp->GetLookupTable()->GetRawLookupTable());	
   }
 

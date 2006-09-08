@@ -184,11 +184,15 @@ void mitk::Geometry2DDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
               mitk::BaseRenderer::Pointer renderer = dynamic_cast<mitk::BaseRenderer*>(rendererProp->GetWeakPointer().GetPointer());
               if(renderer.IsNotNull())
               {
-
+                bool useColor = true;
+                
+                // check for "use color"
+                node->GetBoolProperty("use color", useColor, renderer);
+                
                 // check for LookupTable
                 mitk::LookupTableProperty::Pointer lookupTableProp;
                 lookupTableProp = dynamic_cast<mitk::LookupTableProperty*>(node->GetPropertyList()->GetProperty("LookupTable").GetPointer());
-                if (lookupTableProp.IsNotNull() )
+                if (lookupTableProp.IsNotNull() && !useColor)
                 {
                   m_VtkLookupTable = lookupTableProp->GetLookupTable()->GetVtkLookupTable();
                   m_VtkTexture->SetLookupTable(m_VtkLookupTable);

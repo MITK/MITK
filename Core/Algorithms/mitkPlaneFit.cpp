@@ -131,6 +131,16 @@ void mitk::PlaneFit::ProcessPointSet()
 
 }
 
+mitk::PlaneGeometry::Pointer mitk::PlaneFit::GetPlaneGeometry()
+{
+  return m_Plane;
+}
+
+const mitk::Vector3D &mitk::PlaneFit::GetPlaneNormal() const
+{
+  return m_PlaneVector;
+}
+
 const mitk::Point3D &mitk::PlaneFit::GetCentroid() const
 {
   return m_Centroid;

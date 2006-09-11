@@ -66,10 +66,20 @@ public:
   */
   virtual void SetInput(const mitk::PointSet* ps);
 
-  /*! return the center of gravity of the point set.
+  /*! returns the center of gravity of the point set.
   *
   */
   virtual const mitk::Point3D &GetCentroid() const;
+
+  /*! returns the plane geometry which represents the point set.
+  *
+  */
+  virtual mitk::PlaneGeometry::Pointer GetPlaneGeometry();
+  
+  /*! returns the normal of the plane which represents the point set.
+  *
+  */
+  virtual const mitk::Vector3D &GetPlaneNormal() const;
 
 protected:
 	PlaneFit();

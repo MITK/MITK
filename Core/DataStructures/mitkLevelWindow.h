@@ -34,6 +34,8 @@ class Image;
 //## Current min and max value are stored in m_Min and m_Max.
 //## The maximum and minimum of valid value range is stored in
 //## m_RangeMin and m_RangeMax.
+//## m_DefaultLevel amd m_DefaultWindow store the initial Level/Window values for the image.
+//## m_DefaultRangeMin and m_DefaultRangeMax store the initial minrange and maxrange for the image.
 //##
 //## See documentation of SetAuto for information on how the
 //## level window is initialized from an image.
@@ -208,6 +210,13 @@ protected:
 
   /*!
   * confidence tests
+  *
+  * if m_Min > m_Max, then the values for m_Min and m_Max will be exchanged
+  *
+  * if m_Min < m_RangeMin, m_Min will be set to m_RangeMin. m_Max will be decreased the same as m_Min will be increased, but minimum value for m_Max is also m_RangeMin.
+  * 
+  * if m_Max > m_RangeMax, m_Max will be set to m_RangeMax. m_Min will be increased the same as m_Max will be decreased, but maximum value for m_Min is also m_RangeMax.
+  *
   */
   inline void testValues()
   {

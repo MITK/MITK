@@ -152,10 +152,14 @@ void mitk::ItkImageFileReader::GenerateData()
 }
 
 
-bool mitk::ItkImageFileReader::CanReadFile(const std::string filename, const std::string /*filePrefix*/, const std::string /*filePattern*/) 
+bool mitk::ItkImageFileReader::CanReadFile(const std::string filename, const std::string filePrefix, const std::string filePattern) 
 {
   // First check the extension
   if(  filename == "" )
+    return false;
+
+  // check if image is serie
+  if( filePattern != "" && filePrefix != "" )
     return false;
 
   itk::ImageIOBase::Pointer imageIO = itk::ImageIOFactory::CreateImageIO( filename.c_str(), itk::ImageIOFactory::ReadMode );

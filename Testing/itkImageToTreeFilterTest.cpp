@@ -21,11 +21,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include <string>
 
 #include <itkImage.h>
-#include <itkTimeProbe.h>
-#include <itkVector.h>
-
 #include <itkImageToTreeFilter.h>
 #include <itkITTFilterContext.h>
+#include <itkParticle.h>
+#include <itkParticleReflectionCalculator.h>
 #include <itkProfileData.h>
 #include <itkProfileGradientFinder.h>
 #include <itkRefinementModelProcessor.h>
@@ -33,11 +32,13 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkRegistrationModelXMLReader.h>
 #include <itkRegistrationModelXMLWriter.h>
 #include <itkStartPointData.h>
+#include <itkTimeProbe.h>
 #include <itkTransform.h>
 #include <itkTranslationTransform.h>
 #include <itkTreeToBinaryImageFilter.h>
 #include <itkTubeSegmentModel.h>
 #include <itkTubeSegmentModelGenerator.h>
+#include <itkVector.h>
 
 // image type
 typedef short                                         PixelType;
@@ -145,8 +146,14 @@ typedef TubeSegmentModelRegistratorType::Pointer          TubeSegmentModelRegist
 
 typedef itk::Vector<ScalarType>                       VectorType;
 
+typedef itk::Particle<ScalarType, DIMENSION>          ParticleType;
+typedef itk::ParticleReflectionCalculator<ImageType>
+    ParticleReflectionCalculatorType;
 
 typedef std::list<int>                                ResultListType;
+
+typedef itk::ImageFileWriter<ImageType>               ImageFileWriterType;
+typedef itk::ROISphereExtractor<ImageType>            ROISphereExtractorType;
 
 TubeSegmentModelPointer generateTubeSegment()
 {
@@ -727,6 +734,7 @@ int testRegistrationModelRadius()
   if (diff > 1.0 || diff < -1.0)
   {
     std::cout << "Radius outside of tolerance: " << radius << std::endl;
+    std::cout << " *** [TEST FAILED] ***" << std::endl;
     return EXIT_FAILURE;
   }
 
@@ -774,12 +782,103 @@ int testMeshReadWrite()
       mesh->GetCells()->Size() != readMesh->GetCells()->Size())
   {
     std::cout << "Meshes do not match." << std::endl;
+    std::cout << " *** [TEST FAILED] ***" << std::endl;
     return EXIT_FAILURE;
   }
 
   std::cout << " *** [TEST PASSED] ***\n";
   return EXIT_SUCCESS;
 
+}
+
+int testParticleReflectionCalculator()
+{
+  std::cout << " *** Testing the reflection of particle ***" << std::endl;
+
+  // generate an test image
+  ImageType::Pointer image = OutputImageType::New();
+  ImageType::SizeType size;
+  size.Fill(100);
+  image->SetRegions(size);
+  image->Allocate();
+  image->FillBuffer(255);
+
+  PointType center;
+  center.Fill(50);
+
+  ROISphereExtractorType::Pointer roiExtractor = ROISphereExtractorType::New();
+  roiExtractor->SetRadius(25);
+  roiExtractor->SetCenterPoint(center);
+  roiExtractor->SetOutsideValue(0);
+  roiExtractor->SetInput(image);
+  roiExtractor->Update();
+  image = roiExtractor->GetOutput();
+
+  ImageFileWriterType::Pointer writer = ImageFileWriterType::New();
+  writer->SetInput(image);
+  writer->SetFileName("image.vtk");
+  writer->Update();
+
+  ParticleType::Pointer testParticle = ParticleType::New();
+  PointType startPoint;
+  startPoint[0] = 0;
+  startPoint[1] = 0;
+  startPoint[2] = 0;
+  testParticle->SetCurrentPoint(startPoint);
+  VectorType startDirection;
+  startDirection[0] = 50;
+  startDirection[1] = 50;
+  startDirection[2] = 50;
+  testParticle->SetCurrentDirection(startDirection);
+
+  ParticleReflectionCalculatorType::Pointer calculator = ParticleReflectionCalculatorType::New();
+  calculator->SetThreshold(1);
+  calculator->SetInputImage(image);
+  calculator->Initialize();
+  calculator->SetParticle(testParticle);
+  calculator->CalculateReflection();
+
+  ScalarType tolerance = 0.1;
+
+  PointType expPoint;
+  expPoint[0] = 35.5;
+  expPoint[1] = 35.5;
+  expPoint[2] = 35.5;
+  VectorType expDirection;
+  expDirection[0] = -0.4;
+  expDirection[1] = -0.7;
+  expDirection[2] = -0.5;
+
+  PointType actualPoint = testParticle->GetCurrentPoint();
+  for (unsigned int dim = 0; dim < DIMENSION; dim++)
+  {
+    ScalarType diff = expPoint[dim] - actualPoint[dim];
+    if(diff < -tolerance || diff > tolerance)
+    {
+      std::cout << "point location outside of tolerance" << std::endl;
+      std::cout << "expected: " << expPoint << std::endl;
+      std::cout << "actual: " << actualPoint << std::endl;
+      std::cout << " *** [TEST FAILED] ***" << std::endl;
+      return EXIT_FAILURE;
+    }
+  }
+
+  VectorType actualDirection = testParticle->GetCurrentDirection();
+  for (unsigned int dim = 0; dim < DIMENSION; dim++)
+  {
+    ScalarType diff = expDirection[dim] - actualDirection[dim];
+    if(diff < -tolerance || diff > tolerance)
+    {
+      std::cout << "direction outside of tolerance" << std::endl;
+      std::cout << "expected: " << expDirection << std::endl;
+      std::cout << "actual: " << actualDirection << std::endl;
+      std::cout << " *** [TEST FAILED] ***" << std::endl;
+      return EXIT_FAILURE;
+    }
+  }
+
+  std::cout << " *** [TEST PASSED] ***\n";
+  return EXIT_SUCCESS;
 }
 
 int itkImageToTreeFilterTest(int /*i*/, char* argv[])
@@ -797,6 +896,7 @@ int itkImageToTreeFilterTest(int /*i*/, char* argv[])
   resultList.push_back(testRegistrationModelRadius());
   resultList.push_back(testTubeSegmentRegistrator());
   resultList.push_back(testMeshReadWrite());
+  resultList.push_back(testParticleReflectionCalculator());
 
   std::cout << " *** [ALL TESTS DONE] ***\n";
 
@@ -806,9 +906,9 @@ int itkImageToTreeFilterTest(int /*i*/, char* argv[])
   while (resultList.size() > 0)
   {
     int value = resultList.front();
-    if(value == EXIT_FAILURE) 
-    { 
-      failedCount++; 
+    if(value == EXIT_FAILURE)
+    {
+      failedCount++;
       allSuccess = false;
     }
     resultList.pop_front();
@@ -822,7 +922,7 @@ int itkImageToTreeFilterTest(int /*i*/, char* argv[])
   {
     return EXIT_SUCCESS;
   }
-  else 
+  else
   {
     return EXIT_FAILURE;
   }

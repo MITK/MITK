@@ -75,6 +75,7 @@ int testExceptionTask()
   }
   catch (itk::ExceptionObject &e)
   {
+    std::cout << "Catched exception " << e << std::endl;
     std::cout << " *** [TEST PASSED] ***\n";
     return EXIT_SUCCESS;
   }

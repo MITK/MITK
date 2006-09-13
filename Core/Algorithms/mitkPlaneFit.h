@@ -2,7 +2,6 @@
 #if !defined(MITK_PLANEFIT_H__INCLUDED_)
 #define MITK_PLANEFIT_H__INCLUDED_
 
-#include <Vector3.h>
 #include <mitkPointSet.h>
 #include <mitkPlaneGeometry.h>
 #include "mitkGeometryDataSource.h"

@@ -23,6 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkRenderWindow.h"
 #include "mitkRenderingManager.h"
 #include "mitkProperties.h"
+#include "mitkDataTreeFilterFunctions.h"
 
 #include <qlineedit.h>
 #include <qslider.h>
@@ -167,7 +168,7 @@ QWidget* QmitkThresholdComponent::CreateContainerWidget(QWidget* parent)
   {
     m_GUI->GetSelectDataGroupBox()->setShown(false);
   }
-
+   m_GUI->GetTreeNodeSelector()->GetFilter()->SetFilter(mitk::IsBaseDataTypeWithOutBoolProperty<mitk::Image>("isComponentThresholdImage"));
   return m_GUI;
 
 }
@@ -228,6 +229,9 @@ void QmitkThresholdComponent::CreateThresholdImageNode()
         m_ThresholdImageNode = mitk::DataTreeNode::New();
         mitk::StringProperty::Pointer nameProp = new mitk::StringProperty("Thresholdview image" );
         m_ThresholdImageNode->SetProperty( "name", nameProp );
+        mitk::BoolProperty::Pointer componentThresholdImageProp = new mitk::BoolProperty(true);
+        m_ThresholdImageNode->SetProperty( "isComponentThresholdImage", componentThresholdImageProp );
+
         m_ThresholdImageNode->SetData(m_Node->GetData());
         m_ThresholdImageNode->SetColor(0.0,1.0,0.0);
         m_ThresholdImageNode->SetOpacity(.25);

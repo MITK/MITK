@@ -25,6 +25,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkRenderWindow.h"
 #include "mitkRenderingManager.h"
 #include "mitkProperties.h"
+#include "mitkDataTreeFilterFunctions.h"
 #include <mitkColorSequenceRainbow.h>
 #include <mitkManualSegmentationToSurfaceFilter.h>
 //#include <mitkImageToSurfaceFilter.h>
@@ -194,7 +195,7 @@ QWidget* QmitkSurfaceCreatorComponent::CreateContainerWidget(QWidget* parent)
   {
     m_GUI->GetSelectDataGroupBox()->setShown(false);
   }
-
+   m_GUI->GetTreeNodeSelector()->GetFilter()->SetFilter(mitk::IsBaseDataTypeWithOutBoolProperty<mitk::Image>("isComponentThresholdImage"));
   InitSurfaceGUI();
   ShowSurfaceParameter(false);
 

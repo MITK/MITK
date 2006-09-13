@@ -50,7 +50,7 @@ class QmitkPixelGreyValueManipulatorComponent : public QmitkFunctionalityCompone
 public:
   /***************       CONSTRUCTOR      ***************/
   /** \brief Constructor. */
-  QmitkPixelGreyValueManipulatorComponent(QObject *parent=0, const char *name=0, QmitkStdMultiWidget *mitkStdMultiWidget = NULL, mitk::DataTreeIteratorBase* dataIt = NULL, bool updateSelector = true, bool showSelector = true);
+  QmitkPixelGreyValueManipulatorComponent(QObject *parent=0, const char *name=0, QmitkStdMultiWidget *mitkStdMultiWidget = NULL, mitk::DataTreeIteratorBase* dataIt = NULL, bool updateSelector = false, bool showSelector = true);
 
   /***************        DESTRUCTOR      ***************/
   /** \brief Destructor. */
@@ -122,7 +122,7 @@ public slots:
   virtual void TreeChanged();
 
   /** \brief Method is called when the "create new manipulated image" - was pressed. This Method coordinates all steps to create a new manipulated image  */
-  virtual void PipelineControlerToCreateManipulatedImage();
+  virtual void PipelineControllerToCreateManipulatedImage();
 
   /** \brief Method is called when the ManipulationMode was selected to decide 	whether value2 shall be visible or not */
   virtual void HideOrShowValue2(int index);
@@ -149,6 +149,8 @@ protected:
   a reference to a data tree iterator object
   */
   mitk::DataTreeIteratorClone m_DataTreeIteratorClone;
+
+  void QmitkPixelGreyValueManipulatorComponent::LinearShift(const mitk::Image* image, const mitk::Image* segmentation = NULL);
 
   /** \brief Attribute to decide whether the selector shall be updated when a parent-Selector is updatet or not */
   bool m_UpdateSelector;

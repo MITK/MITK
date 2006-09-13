@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <QmitkDataTreeComboBox.h>
 #include <mitkDataTreeFilter.h>
+#include "mitkDataTreeFilterFunctions.h"
 
 /*****Qt-Elements***/
 #include <qgroupbox.h>
@@ -155,6 +156,7 @@ QWidget* QmitkFunctionalityComponentContainer::CreateContainerWidget(QWidget* pa
     m_GUI->GetContainerBorder()->setTitle("Container");
     m_GUI->GetContainerBorder()->setLineWidth(0);
   }
+  m_GUI->GetTreeNodeSelector()->GetFilter()->SetFilter(mitk::IsBaseDataTypeWithOutBoolProperty<mitk::Image>("isComponentThresholdImage"));
   return m_GUI;
 }
 

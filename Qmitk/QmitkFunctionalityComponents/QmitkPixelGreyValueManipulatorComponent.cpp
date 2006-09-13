@@ -149,7 +149,7 @@ QWidget* QmitkPixelGreyValueManipulatorComponent::CreateContainerWidget(QWidget*
   {
     m_GUI->GetSelectDataGroupBox()->setShown(false);
   }
-  //m_GUI->GetTreeNodeSelector()->GetFilter()->SetFilter(mitk::IsBaseDataTypeWithBoolProperty<mitk::Image>("segmentation"));
+  //m_GUI->GetTreeNodeSelector()->GetFilter()->SetFilter(mitk::IsBaseDataTypeWithBoolProperty<mitk::Image>("IsSegmentationImage"));
   
   
 
@@ -223,7 +223,9 @@ void QmitkPixelGreyValueManipulatorComponent::AddComponent(QmitkFunctionalityCom
       m_GUI->layout()->addItem( m_Spacer );
   }
 }
- void QmitkPixelGreyValueManipulatorComponent::PipelineControlerToCreateManipulatedImage()
+
+/****PIPELINE CONTROLLER TO CREATE MANIPULATED IMAGE***/
+ void QmitkPixelGreyValueManipulatorComponent::PipelineControllerToCreateManipulatedImage()
  {
   int manipulationMode;
   int manipulationArea;
@@ -231,11 +233,65 @@ void QmitkPixelGreyValueManipulatorComponent::AddComponent(QmitkFunctionalityCom
   int value1;
   int value2;
   GetManipulationValueFromGUI(value1, value2);
+  switch(manipulationMode)
+  {
+  case 0: 
+    //nothing selected
+    break;
+  case 1: 
+    // Linear Shift 
+    //if(manipulationArea == 2)//if manipulationArea == Segmentation
+    //{
+    //  //LinearShift(const mitk::Image* image, const mitk::Image* segmentation);
+    //}
+    //else(manipulationArea == 1 )// else (i.e. even if nothing is selected, the default is manipulationArea = Image
+    //{
+    //  //LinearShift(const mitk::Image* image, const mitk::Image* segmentation);
+    //}
+    break;
+  case 2: 
+    // GradientShift
+    //    if(manipulationArea == 2)//if manipulationArea == Segmentation
+    //{
+
+    //}
+    //else(manipulationArea == 1 )// else (i.e. even if nothing is selected, the default is manipulationArea = Image
+    //{
+
+    //}
+    break;
+  case 3:
+    // ChangeGreyValue
+    //    if(manipulationArea == 2)//if manipulationArea == Segmentation
+    //{
+
+    //}
+    //else(manipulationArea == 1 )// else (i.e. even if nothing is selected, the default is manipulationArea = Image
+    //{
+
+    //}
+    break;
+  case 4:
+    //Lighten / Shade
+    //    if(manipulationArea == 2)//if manipulationArea == Segmentation
+    //{
+
+    //}
+    //else(manipulationArea == 1 )// else (i.e. even if nothing is selected, the default is manipulationArea = Image
+    //{
+
+    //}
+    break;
+  default:
+    break;
+
+
+  }
+
  }
 
 
-//***************************************** COMBO BOX SELECTION ****************************************
-//
+/*************** GET MANIPULATION MODE  ***************/
 void QmitkPixelGreyValueManipulatorComponent::GetManipulationModeAndAreaFromGUI(int & manipulationMode, int & manipulationArea)
 {
   manipulationMode = m_GUI->GetManipulationModeComboBox()->currentItem(); // 0 = Nothing selected, 1 = linear shift, 2 = gradient shift, 3 = change grey value, 4 = lighten / shade
@@ -253,12 +309,19 @@ void QmitkPixelGreyValueManipulatorComponent::GetManipulationModeAndAreaFromGUI(
   }
 }
 
+/*************** GET MANIPULATION AREA  ***************/
 void QmitkPixelGreyValueManipulatorComponent::GetManipulationValueFromGUI(int & value1, int & value2)
 {
   value1 = atoi(m_GUI->GetValue1LineEdit()->text());
   value2 = atoi(m_GUI->GetValue2LineEdit()->text());
 
 }
+
+void QmitkPixelGreyValueManipulatorComponent::LinearShift(const mitk::Image* image, const mitk::Image* segmentation)
+{
+
+}
+
 ////******************************************** Shift Local Threshold******************************
 ////
 ////connect if button "SHIFT LOCAL THRESHOLD" was pressed, calls ChangePixelValue

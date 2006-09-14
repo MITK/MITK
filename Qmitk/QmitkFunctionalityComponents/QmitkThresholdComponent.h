@@ -96,10 +96,6 @@ public:
   ///** \brief Method to set m_Activated to false */
   virtual void Deactivated();
 
-  /***************     ADD COMPONENTS     ***************/
-  /** \brief method to add components into this component. */
-  virtual void AddComponent(QmitkFunctionalityComponentContainer* componentContainer);
-
   /***************        ATTRIBUTES      ***************/
 
   /** \brief Vector with all added components */
@@ -189,7 +185,7 @@ private:
   /***************        ATTRIBUTES      ***************/
 
   /** \brief The created GUI from the .ui-File. This Attribute is	obligatory*/
-  QmitkThresholdComponentGUI * m_GUI;
+  QmitkThresholdComponentGUI * m_ThresholdComponentGUI;
 
   /** \brief This Attribute holds the current ImageItem from the TreeNodeSelector if his selection was changed*/
   const mitk::DataTreeFilter::Item * m_SelectedImage; 

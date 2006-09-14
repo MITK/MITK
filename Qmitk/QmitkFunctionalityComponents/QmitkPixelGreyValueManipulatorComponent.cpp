@@ -39,7 +39,7 @@ m_DataTreeIteratorClone(NULL),
 m_UpdateSelector(updateSelector),
 m_ShowSelector(showSelector),
 m_Active(false),
-m_GUI(NULL),
+m_PixelGreyValueManipulatorComponentGUI(NULL),
 m_SelectedImage(NULL),
 m_Spacer(NULL)
 {
@@ -85,7 +85,7 @@ void QmitkPixelGreyValueManipulatorComponent::SetDataTreeIterator(mitk::DataTree
 /***************         GET GUI        ***************/
 QWidget* QmitkPixelGreyValueManipulatorComponent::GetGUI()
 {
-  return m_GUI;
+  return m_PixelGreyValueManipulatorComponentGUI;
 }
 
 /*************** TREE CHANGED (       ) ***************/
@@ -97,15 +97,15 @@ void QmitkPixelGreyValueManipulatorComponent::TreeChanged()
 /***************       CONNECTIONS      ***************/
 void QmitkPixelGreyValueManipulatorComponent::CreateConnections()
 {
-  if ( m_GUI )
+  if ( m_PixelGreyValueManipulatorComponentGUI )
   {
-    connect( (QObject*)(m_GUI->GetTreeNodeSelector()), SIGNAL(activated(const mitk::DataTreeFilter::Item *)), (QObject*) this, SLOT(ImageSelected(const mitk::DataTreeFilter::Item *)));        
-    connect( (QObject*)(m_GUI->GetPixelGreyValueManipulatorGroupBox()), SIGNAL(toggled(bool)), (QObject*) this, SLOT(ShowPixelGreyValueManipulatorContent(bool)));
-    connect( (QObject*)(m_GUI->GetSelectDataGroupBox()), SIGNAL(toggled(bool)), (QObject*) this, SLOT(ShowImageContent(bool)));
+    connect( (QObject*)(m_PixelGreyValueManipulatorComponentGUI->GetTreeNodeSelector()), SIGNAL(activated(const mitk::DataTreeFilter::Item *)), (QObject*) this, SLOT(ImageSelected(const mitk::DataTreeFilter::Item *)));        
+    connect( (QObject*)(m_PixelGreyValueManipulatorComponentGUI->GetPixelGreyValueManipulatorGroupBox()), SIGNAL(toggled(bool)), (QObject*) this, SLOT(ShowPixelGreyValueManipulatorContent(bool)));
+    connect( (QObject*)(m_PixelGreyValueManipulatorComponentGUI->GetSelectDataGroupBox()), SIGNAL(toggled(bool)), (QObject*) this, SLOT(ShowImageContent(bool)));
 
     //Button "create new manipulated image" pressed
-    connect( (QObject*)(m_GUI->GetCreateNewManipulatedImageButton()), SIGNAL(pressed()), (QObject*) this, SLOT(PipelineControlerToCreateManipulatedImage()));
-    connect( (QObject*)(m_GUI->GetManipulationModeComboBox()), SIGNAL(activated (int)), (QObject*) this, SLOT(HideOrShowValue2(int)));    
+    connect( (QObject*)(m_PixelGreyValueManipulatorComponentGUI->GetCreateNewManipulatedImageButton()), SIGNAL(pressed()), (QObject*) this, SLOT(PipelineControlerToCreateManipulatedImage()));
+    connect( (QObject*)(m_PixelGreyValueManipulatorComponentGUI->GetManipulationModeComboBox()), SIGNAL(activated (int)), (QObject*) this, SLOT(HideOrShowValue2(int)));    
   }
 }
 
@@ -114,9 +114,9 @@ void QmitkPixelGreyValueManipulatorComponent::ImageSelected(const mitk::DataTree
 {
   m_SelectedImage = imageIt;
   mitk::DataTreeFilter::Item* currentItem(NULL);
-  if(m_GUI)
+  if(m_PixelGreyValueManipulatorComponentGUI)
   {
-    if(mitk::DataTreeFilter* filter = m_GUI->GetTreeNodeSelector()->GetFilter())
+    if(mitk::DataTreeFilter* filter = m_PixelGreyValueManipulatorComponentGUI->GetTreeNodeSelector()->GetFilter())
     {
       if(imageIt)
       {
@@ -128,7 +128,7 @@ void QmitkPixelGreyValueManipulatorComponent::ImageSelected(const mitk::DataTree
   {
     currentItem->SetSelected(true);
   }
-  if(m_GUI != NULL)
+  if(m_PixelGreyValueManipulatorComponentGUI != NULL)
   {
 
     for(unsigned int i = 0;  i < m_AddedChildList.size(); i++) 
@@ -142,27 +142,28 @@ void QmitkPixelGreyValueManipulatorComponent::ImageSelected(const mitk::DataTree
 /*************** CREATE CONTAINER WIDGET **************/
 QWidget* QmitkPixelGreyValueManipulatorComponent::CreateContainerWidget(QWidget* parent)
 {
-  m_GUI = new QmitkPixelGreyValueManipulatorComponentGUI(parent);
-  m_GUI->GetTreeNodeSelector()->SetDataTree(GetDataTreeIterator());
+  m_PixelGreyValueManipulatorComponentGUI = new QmitkPixelGreyValueManipulatorComponentGUI(parent);
+  m_GUI = m_PixelGreyValueManipulatorComponentGUI;
+  m_PixelGreyValueManipulatorComponentGUI->GetTreeNodeSelector()->SetDataTree(GetDataTreeIterator());
  
   if(!m_ShowSelector)
   {
-    m_GUI->GetSelectDataGroupBox()->setShown(false);
+    m_PixelGreyValueManipulatorComponentGUI->GetSelectDataGroupBox()->setShown(false);
   }
-  //m_GUI->GetTreeNodeSelector()->GetFilter()->SetFilter(mitk::IsBaseDataTypeWithBoolProperty<mitk::Image>("IsSegmentationImage"));
+  //m_PixelGreyValueManipulatorComponentGUI->GetTreeNodeSelector()->GetFilter()->SetFilter(mitk::IsBaseDataTypeWithBoolProperty<mitk::Image>("IsSegmentationImage"));
   
-  
+  CreateConnections();
 
-  return m_GUI;
+  return m_PixelGreyValueManipulatorComponentGUI;
 
 }
 
 /************** SET SELECTOR VISIBILITY ***************/
 void QmitkPixelGreyValueManipulatorComponent::SetSelectorVisibility(bool visibility)
 {
-  if(m_GUI)
+  if(m_PixelGreyValueManipulatorComponentGUI)
   {
-    m_GUI->GetSelectDataGroupBox()->setShown(visibility);
+    m_PixelGreyValueManipulatorComponentGUI->GetSelectDataGroupBox()->setShown(visibility);
   }
   m_ShowSelector = visibility;
 }
@@ -183,44 +184,24 @@ void QmitkPixelGreyValueManipulatorComponent::Deactivated()
 ///*********** SHOW PIXEL MANIPULATOR CONTENT ***********/
 void QmitkPixelGreyValueManipulatorComponent::ShowPixelGreyValueManipulatorContent(bool)
 {
-m_GUI->GetPixelManipulatorContentGroupBox()->setShown(m_GUI->GetPixelGreyValueManipulatorGroupBox()->isChecked());
+m_PixelGreyValueManipulatorComponentGUI->GetPixelManipulatorContentGroupBox()->setShown(m_PixelGreyValueManipulatorComponentGUI->GetPixelGreyValueManipulatorGroupBox()->isChecked());
 }
 
 ///***************    SHOW IMAGE CONTENT   **************/
 void QmitkPixelGreyValueManipulatorComponent::ShowImageContent(bool)
 {
- m_GUI->GetImageContent()->setShown(m_GUI->GetSelectDataGroupBox()->isChecked());
+ m_PixelGreyValueManipulatorComponentGUI->GetImageContent()->setShown(m_PixelGreyValueManipulatorComponentGUI->GetSelectDataGroupBox()->isChecked());
 }
 
 void QmitkPixelGreyValueManipulatorComponent::HideOrShowValue2(int /*index*/)
 { 
-  if(m_GUI->GetManipulationModeComboBox()->currentItem() != 2)
+  if(m_PixelGreyValueManipulatorComponentGUI->GetManipulationModeComboBox()->currentItem() != 2)
   {
-    m_GUI->GetValue2GroupBox()->setShown(false);
+    m_PixelGreyValueManipulatorComponentGUI->GetValue2GroupBox()->setShown(false);
   }
-  else if(m_GUI->GetManipulationModeComboBox()->currentItem() == 2)
+  else if(m_PixelGreyValueManipulatorComponentGUI->GetManipulationModeComboBox()->currentItem() == 2)
   {
-    m_GUI->GetValue2GroupBox()->setShown(true);
-  }
-}
-
-
-
-/***************      ADD COMPONENT     ***************/
-void QmitkPixelGreyValueManipulatorComponent::AddComponent(QmitkFunctionalityComponentContainer* componentContainer)
-{  
-  if(componentContainer!=NULL)
-  {
-    QWidget* componentWidget = componentContainer->CreateContainerWidget(m_GUI);
-    m_AddedChildList.push_back(componentContainer);
-    m_GUI->layout()->add(componentWidget);
-    if(m_Spacer != NULL)
-    {
-      m_GUI->layout()->removeItem(m_Spacer);
-    }
-      QSpacerItem*  spacer = new QSpacerItem( 20, 20, QSizePolicy::Minimum, QSizePolicy::Expanding );
-      m_Spacer = spacer;
-      m_GUI->layout()->addItem( m_Spacer );
+    m_PixelGreyValueManipulatorComponentGUI->GetValue2GroupBox()->setShown(true);
   }
 }
 
@@ -294,16 +275,16 @@ void QmitkPixelGreyValueManipulatorComponent::AddComponent(QmitkFunctionalityCom
 /*************** GET MANIPULATION MODE  ***************/
 void QmitkPixelGreyValueManipulatorComponent::GetManipulationModeAndAreaFromGUI(int & manipulationMode, int & manipulationArea)
 {
-  manipulationMode = m_GUI->GetManipulationModeComboBox()->currentItem(); // 0 = Nothing selected, 1 = linear shift, 2 = gradient shift, 3 = change grey value, 4 = lighten / shade
-  manipulationArea = m_GUI->GetManipulationAreaComboBox()->currentItem(); // 0 = Nothing selected, 1 = on Image, 2 = on Segmentation
+  manipulationMode = m_PixelGreyValueManipulatorComponentGUI->GetManipulationModeComboBox()->currentItem(); // 0 = Nothing selected, 1 = linear shift, 2 = gradient shift, 3 = change grey value, 4 = lighten / shade
+  manipulationArea = m_PixelGreyValueManipulatorComponentGUI->GetManipulationAreaComboBox()->currentItem(); // 0 = Nothing selected, 1 = on Image, 2 = on Segmentation
 
   //default is Mode = linear, Area = Segmentation
-  if(m_GUI->GetManipulationModeComboBox()->currentItem() == 0)
+  if(m_PixelGreyValueManipulatorComponentGUI->GetManipulationModeComboBox()->currentItem() == 0)
   {
     manipulationMode = 1;
   }
 
-    if(m_GUI->GetManipulationAreaComboBox()->currentItem() == 0)
+    if(m_PixelGreyValueManipulatorComponentGUI->GetManipulationAreaComboBox()->currentItem() == 0)
   {
     manipulationArea = 2;
   }
@@ -312,8 +293,8 @@ void QmitkPixelGreyValueManipulatorComponent::GetManipulationModeAndAreaFromGUI(
 /*************** GET MANIPULATION AREA  ***************/
 void QmitkPixelGreyValueManipulatorComponent::GetManipulationValueFromGUI(int & value1, int & value2)
 {
-  value1 = atoi(m_GUI->GetValue1LineEdit()->text());
-  value2 = atoi(m_GUI->GetValue2LineEdit()->text());
+  value1 = atoi(m_PixelGreyValueManipulatorComponentGUI->GetValue1LineEdit()->text());
+  value2 = atoi(m_PixelGreyValueManipulatorComponentGUI->GetValue2LineEdit()->text());
 
 }
 

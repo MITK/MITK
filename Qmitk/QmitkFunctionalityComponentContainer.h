@@ -31,8 +31,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qobject.h>
 #include <mitkDataTreeFilter.h>
 #include <qlayout.h>
+#include "QmitkFunctionalityComponentContainerGUI.h"
 
-class QmitkFunctionalityComponentContainerGUI;
 class QmitkStdMultiWidget;
 
 
@@ -132,6 +132,8 @@ protected:
 
   unsigned long m_ObserverTag;
 
+  QWidget* m_GUI;
+
   /** \brief Attribute whether the component is active or not */
   bool m_Active;
 
@@ -143,11 +145,12 @@ protected:
 
 private:
   /***************        ATTRIBUTES      ***************/
+  QmitkFunctionalityComponentContainerGUI * m_FunctionalityComponentContainerGUI;
   QObject *m_Parent;
   QString m_ParentName;
   QString m_ComponentName;
   QmitkStdMultiWidget * m_MultiWidget;
-  QmitkFunctionalityComponentContainerGUI * m_GUI;
+//  QmitkFunctionalityComponentContainerGUI * m_GUI;
   const mitk::DataTreeFilter::Item * m_SelectedImage;
 
   /** \brief Spacer added at the end of the component */

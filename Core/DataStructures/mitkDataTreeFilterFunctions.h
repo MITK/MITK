@@ -28,6 +28,7 @@ namespace mitk
   class DataTreeNode; 
 
   /*! \brief Base class for all filter function that are accepted by mitk::DataTreeFilter.
+
     Subclasses are required to implement the Clone() method, which should return a copy of
     the object, and the NodeMatches() method. NodeMatches() will receive a
     mitk::DataTreeNode* everytime it is called, and should return true. <b>This pointer can be NULL</b>. 
@@ -42,6 +43,7 @@ namespace mitk
   };
 
   /*! \brief tests the data entry of nodes for a specific type (given here as template parameter).
+
     To be used with mitk::DataTreeFilter, e.g.
     \code
      treeFilter->SetFilter( mitk::IsBaseDataType<mitk::Image>() );
@@ -65,6 +67,7 @@ namespace mitk
   };
 
   /*! \brief Tests the data entry of nodes for a specific type (given here as template parameter) AND having a given property.
+
     To be used with mitk::DataTreeFilter, e.g.
     \code
      treeFilter->SetFilter( mitk::IsBaseDataTypeWithProperty<mitk::Surface>("volume") );
@@ -102,6 +105,7 @@ namespace mitk
   };
 
   /*! \brief Tests the data entry of nodes for a specific type (given here as template parameter) AND having a TRUE BoolProperty.
+
     To be used with mitk::DataTreeFilter, e.g.
     \code
      treeFilter->SetFilter( mitk::IsBaseDataTypeWithBoolProperty<mitk::Image>("segmentation") );
@@ -141,6 +145,7 @@ namespace mitk
 
 
   /*! \brief Tests the data entry of nodes for a specific type (given here as template parameter) AND for NOT having a given property (or it being a false bool property).
+
     To be used with mitk::DataTreeFilter, e.g.
     \code
      treeFilter->SetFilter( mitk::IsBaseDataTypeWithoutProperty<mitk::Image>("segmentation") );
@@ -185,6 +190,7 @@ namespace mitk
   // some default filters in mitk:: namespace for use by clients of mitk::DataTreeFilter
   
   /*! \brief Accepts all nodes (accepts nodes that are not NULL).
+
     To be used with mitk::DataTreeFilter, e.g.
     \code
      treeFilter->SetFilter( mitk::IsBaseDataTypeWithoutProperty<mitk::Image>("segmentation") );
@@ -199,6 +205,7 @@ namespace mitk
   };
 
   /*! \brief Accepts all data objects (accepts nodes that have associated mitk::BaseData (tested via GetData)).
+
     To be used with mitk::DataTreeFilter, e.g.
     \code
      treeFilter->SetFilter( mitk::IsBaseDataTypeWithoutProperty<mitk::Image>("segmentation") );

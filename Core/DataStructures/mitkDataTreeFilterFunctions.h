@@ -69,8 +69,8 @@ namespace mitk
       
       virtual bool NodeMatches(DataTreeNode* node) const
       {
-        return (    node != NULL && node->GetData()      // node is not NULL, and node->GetData is also not NULL
-                 && dynamic_cast<T*>(node->GetData() )   // data is of a certain type
+        return (    node != NULL && node->GetData()                                // node is not NULL, and node->GetData is also not NULL
+                 && dynamic_cast<T*>(node->GetData() )                            // data is of a certain type
                  && (   node->GetProperty(m_PropertyName.c_str()).IsNotNull()    // there is a certain property
                     )
                 );
@@ -103,8 +103,8 @@ namespace mitk
       virtual bool NodeMatches(DataTreeNode* node) const
       {
         bool propVal(false);
-        return (    node != NULL && node->GetData()      // node is not NULL, and node->GetData is also not NULL
-                 && dynamic_cast<T*>( node->GetData() )   // data is of a certain type
+        return (    node != NULL && node->GetData()                            // node is not NULL, and node->GetData is also not NULL
+                 && dynamic_cast<T*>( node->GetData() )                       // data is of a certain type
                  && node->GetPropertyValue(m_PropertyName.c_str(), propVal)  // there is a certain BoolProperty
                  && propVal
                 );
@@ -139,9 +139,9 @@ namespace mitk
         bool propVal(false);
       
         bool propertyExists = node->GetPropertyValue(m_PropertyName.c_str(), propVal );
-        return (    node != NULL && node->GetData()      // node is not NULL, and node->GetData is also not NULL
+        return (    node != NULL && node->GetData()        // node is not NULL, and node->GetData is also not NULL
                  && dynamic_cast<T*>( node->GetData() )   // data is of a certain type
-                 && (!propertyExists || !propVal)// there is a certain BoolProperty
+                 && (!propertyExists || !propVal)        // the bool property does not exist, or its value is false
                 );
       }
 
@@ -172,8 +172,8 @@ namespace mitk
       
       virtual bool NodeMatches(DataTreeNode* node) const
       {
-        return (    node != NULL && node->GetData()      // node is not NULL, and node->GetData is also not NULL
-                 && dynamic_cast<T*>(node->GetData() )   // data is of a certain type
+        return (    node != NULL && node->GetData()                             // node is not NULL, and node->GetData is also not NULL
+                 && dynamic_cast<T*>(node->GetData() )                         // data is of a certain type
                  && (   node->GetProperty(m_PropertyName.c_str()).IsNull()    // there either is NO property
                       || (       ( dynamic_cast<BoolProperty*>( node->GetProperty(m_PropertyName.c_str()).GetPointer() )) // OR the property is a BoolProperty that is false
                             && ( (dynamic_cast<BoolProperty*>( node->GetProperty(m_PropertyName.c_str()).GetPointer()))->GetValue() == false )

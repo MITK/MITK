@@ -19,7 +19,7 @@
 QmitkDataTreeComboBox::QmitkDataTreeComboBox(QWidget* parent, const char* name)
 : QComboBox(parent, name),
   m_DataTreeFilter(NULL),
-  m_CurrentItem(NULL)
+  m_CurrentNode(NULL)
 {
   initialize();
 }
@@ -34,7 +34,7 @@ QmitkDataTreeComboBox::QmitkDataTreeComboBox(QWidget* parent, const char* name)
 QmitkDataTreeComboBox::QmitkDataTreeComboBox(mitk::DataTreeFilter* filter,QWidget* parent, const char* name)
 : QComboBox(parent, name),
   m_DataTreeFilter(filter),
-  m_CurrentItem(NULL)
+  m_CurrentNode(NULL)
 {
   initialize();
   SetFilter(filter);
@@ -50,7 +50,7 @@ QmitkDataTreeComboBox::QmitkDataTreeComboBox(mitk::DataTreeFilter* filter,QWidge
 QmitkDataTreeComboBox::QmitkDataTreeComboBox(mitk::DataTreeBase* tree,QWidget* parent, const char* name)
 : QComboBox(parent, name),
   m_DataTreeFilter(NULL),
-  m_CurrentItem(NULL)
+  m_CurrentNode(NULL)
 {
   initialize();
   SetDataTree(tree);
@@ -66,7 +66,7 @@ QmitkDataTreeComboBox::QmitkDataTreeComboBox(mitk::DataTreeBase* tree,QWidget* p
 QmitkDataTreeComboBox::QmitkDataTreeComboBox(mitk::DataTreeIteratorBase* iterator,QWidget* parent, const char* name)
 : QComboBox(parent, name),
   m_DataTreeFilter(NULL),
-  m_CurrentItem(NULL)
+  m_CurrentNode(NULL)
 {
   initialize();
   SetDataTree(iterator);
@@ -254,8 +254,9 @@ void QmitkDataTreeComboBox::onActivated(int index)
     // following cast is due to bad design... class Item needs needs rework 
     m_SelfCall = true;
     const_cast<mitk::DataTreeFilter::Item*>(m_Items.at(index))->SetSelected(true);
-    m_CurrentItem = m_Items.at(index);
-    emit activated( m_CurrentItem );
+    const mitk::DataTreeFilter::Item* currentItem = m_Items.at(index);
+    m_CurrentNode = currentItem->GetNode();
+    emit activated( currentItem );
     m_SelfCall = false;
   }
   catch (std::out_of_range)
@@ -360,6 +361,11 @@ void QmitkDataTreeComboBox::AddItemsToList(const mitk::DataTreeFilter::ItemList*
      
     m_Items.push_back(*itemiter);
     QComboBox::insertItem(displayedText);
+
+    if (itemiter->GetNode() == m_CurrentNode)
+    {
+      QComboBox::setCurrentItem( QComboBox::count()-1 ); // select the recently added item
+    }
  
     if ( itemiter->HasChildren() )
     {
@@ -377,7 +383,7 @@ void QmitkDataTreeComboBox::AddItemsToList(const mitk::DataTreeFilter::ItemList*
 */
 void QmitkDataTreeComboBox::clearItems()
 {
-  QComboBox::clear();
+  QComboBox::clear(); // seems not to work
   m_Items.clear();
 } 
 
@@ -402,13 +408,14 @@ void QmitkDataTreeComboBox::generateItems()
   {
     if ( QComboBox::currentItem() < 0 ) return; // nothing selected (e.g. because there are no items)
     if ( m_Items.size() == 0 ) return; // nothing selected (there are no items)
+   
     mitk::DataTreeFilter::Item* currentItem = const_cast<mitk::DataTreeFilter::Item*>(m_Items.at( QComboBox::currentItem() ));
-    if ( currentItem != m_CurrentItem )
+    if ( currentItem->GetNode() != m_CurrentNode )
     {
-      m_CurrentItem = currentItem; 
+      m_CurrentNode = currentItem->GetNode(); 
       m_SelfCall = true;
       currentItem->SetSelected(true);
-      emit activated(m_CurrentItem);
+      emit activated(currentItem);
       m_SelfCall = false;
     }
   }
@@ -475,6 +482,7 @@ void QmitkDataTreeComboBox::selectionChangedHandler( const itk::EventObject& e)
       if ( m_Items.at(row) == item )
       {
         QComboBox::setCurrentItem(row);
+        m_CurrentNode = m_Items.at(row)->GetNode();
         emit activated(m_Items.at(row));
         break;
       }

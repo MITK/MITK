@@ -156,7 +156,7 @@ QWidget* QmitkFunctionalityComponentContainer::CreateContainerWidget(QWidget* pa
     m_GUI->GetContainerBorder()->setTitle("Container");
     m_GUI->GetContainerBorder()->setLineWidth(0);
   }
-  m_GUI->GetTreeNodeSelector()->GetFilter()->SetFilter(mitk::IsBaseDataTypeWithOutBoolProperty<mitk::Image>("isComponentThresholdImage"));
+  m_GUI->GetTreeNodeSelector()->GetFilter()->SetFilter(mitk::IsBaseDataTypeWithoutProperty<mitk::Image>("isComponentThresholdImage"));
   return m_GUI;
 }
 

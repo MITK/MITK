@@ -27,8 +27,12 @@ namespace mitk
 {
   class DataTreeNode; 
 
-  /// base class for all filter function that are accepted by mitk::DataTreeFilter
-  class DataTreeFilterFunction
+  /*! \brief Base class for all filter function that are accepted by mitk::DataTreeFilter.
+    Subclasses are required to implement the Clone() method, which should return a copy of
+    the object, and the NodeMatches() method. NodeMatches() will receive a
+    mitk::DataTreeNode* everytime it is called, and should return true. <b>This pointer can be NULL</b>. 
+  */
+   class DataTreeFilterFunction
   {
     public:
       virtual ~DataTreeFilterFunction() {}
@@ -37,7 +41,12 @@ namespace mitk
       virtual DataTreeFilterFunction* Clone() const = 0;
   };
 
-  /// tests the data entry of nodes for a specific type (given here as template parameter)
+  /*! \brief tests the data entry of nodes for a specific type (given here as template parameter).
+    To be used with mitk::DataTreeFilter, e.g.
+    \code
+     treeFilter->SetFilter( mitk::IsBaseDataType<mitk::Image>() );
+    \endcode
+  */
   template <class T>
   class IsBaseDataType : public DataTreeFilterFunction
   {
@@ -55,8 +64,12 @@ namespace mitk
       virtual ~IsBaseDataType() {}
   };
 
-  /// tests the data entry of nodes for a specific type (given here as template parameter)
-  /// AND having a given property
+  /*! \brief Tests the data entry of nodes for a specific type (given here as template parameter) AND having a given property.
+    To be used with mitk::DataTreeFilter, e.g.
+    \code
+     treeFilter->SetFilter( mitk::IsBaseDataTypeWithProperty<mitk::Surface>("volume") );
+    \endcode
+  */
   template <class T>
   class IsBaseDataTypeWithProperty : public DataTreeFilterFunction
   {
@@ -88,8 +101,12 @@ namespace mitk
       std::string m_PropertyName;
   };
 
-  /// tests the data entry of nodes for a specific type (given here as template parameter)
-  /// AND having a TRUE BoolProperty
+  /*! \brief Tests the data entry of nodes for a specific type (given here as template parameter) AND having a TRUE BoolProperty.
+    To be used with mitk::DataTreeFilter, e.g.
+    \code
+     treeFilter->SetFilter( mitk::IsBaseDataTypeWithBoolProperty<mitk::Image>("segmentation") );
+    \endcode
+  */
   template <class T>
   class IsBaseDataTypeWithBoolProperty : public DataTreeFilterFunction
   {
@@ -122,44 +139,13 @@ namespace mitk
       std::string m_PropertyName;
   };
 
-  /// tests the data entry of nodes for a specific type (given here as template parameter)
-  /// AND NOT having a TRUE BoolProperty
-  template <class T>
-  class IsBaseDataTypeWithOutBoolProperty : public DataTreeFilterFunction
-  {
-    public:
 
-      IsBaseDataTypeWithOutBoolProperty(const char* propertyName)
-      :m_PropertyName(propertyName)
-      {
-      }
-      
-      virtual bool NodeMatches(DataTreeNode* node) const
-      {
-        bool propVal(false);
-      
-        bool propertyExists = node->GetPropertyValue(m_PropertyName.c_str(), propVal );
-        return (    node != NULL && node->GetData()        // node is not NULL, and node->GetData is also not NULL
-                 && dynamic_cast<T*>( node->GetData() )   // data is of a certain type
-                 && (!propertyExists || !propVal)        // the bool property does not exist, or its value is false
-                );
-      }
-
-      virtual DataTreeFilterFunction* Clone() const
-      {
-        return new IsBaseDataTypeWithOutBoolProperty<T>(m_PropertyName.c_str());
-      }
-
-      virtual ~IsBaseDataTypeWithOutBoolProperty() {}
-
-    private:
-      
-      std::string m_PropertyName;
-  };
-
-
-  /// tests the data entry of nodes for a specific type (given here as template parameter)
-  /// AND for NOT having a given property (or it being a false bool property)
+  /*! \brief Tests the data entry of nodes for a specific type (given here as template parameter) AND for NOT having a given property (or it being a false bool property).
+    To be used with mitk::DataTreeFilter, e.g.
+    \code
+     treeFilter->SetFilter( mitk::IsBaseDataTypeWithoutProperty<mitk::Image>("segmentation") );
+    \endcode
+    */
   template <class T>
   class IsBaseDataTypeWithoutProperty : public DataTreeFilterFunction
   {
@@ -172,14 +158,15 @@ namespace mitk
       
       virtual bool NodeMatches(DataTreeNode* node) const
       {
-        return (    node != NULL && node->GetData()                             // node is not NULL, and node->GetData is also not NULL
-                 && dynamic_cast<T*>(node->GetData() )                         // data is of a certain type
-                 && (   node->GetProperty(m_PropertyName.c_str()).IsNull()    // there either is NO property
-                      || (       ( dynamic_cast<BoolProperty*>( node->GetProperty(m_PropertyName.c_str()).GetPointer() )) // OR the property is a BoolProperty that is false
-                            && ( (dynamic_cast<BoolProperty*>( node->GetProperty(m_PropertyName.c_str()).GetPointer()))->GetValue() == false )
-                         )
-                    )
-                );
+        bool propVal(false);
+        bool propertyExists(false);
+
+        if (node)
+          propertyExists = node->GetPropertyValue(m_PropertyName.c_str(), propVal );
+
+        return (    node != NULL && node->GetData()         // node is not NULL, and node->GetData is also not NULL
+                 && dynamic_cast<T*>(node->GetData() )     // data is of a certain type
+                 && ( !propertyExists || !propVal ));     // the property does not exist, OR its value is false
       }
 
       virtual DataTreeFilterFunction* Clone() const
@@ -197,8 +184,12 @@ namespace mitk
 
   // some default filters in mitk:: namespace for use by clients of mitk::DataTreeFilter
   
-  /// Accepts all nodes
-  /// (accepts nodes that are not NULL)
+  /*! \brief Accepts all nodes (accepts nodes that are not NULL).
+    To be used with mitk::DataTreeFilter, e.g.
+    \code
+     treeFilter->SetFilter( mitk::IsBaseDataTypeWithoutProperty<mitk::Image>("segmentation") );
+    \endcode
+  */
   class IsDataTreeNode : public DataTreeFilterFunction
   {
     public:
@@ -207,8 +198,12 @@ namespace mitk
       virtual DataTreeFilterFunction* Clone() const;
   };
 
-  /// Accepts all data objects
-  /// (accepts nodes that have associated mitk::BaseData (tested via GetData))
+  /*! \brief Accepts all data objects (accepts nodes that have associated mitk::BaseData (tested via GetData)).
+    To be used with mitk::DataTreeFilter, e.g.
+    \code
+     treeFilter->SetFilter( mitk::IsBaseDataTypeWithoutProperty<mitk::Image>("segmentation") );
+    \endcode
+  */
   class IsGoodDataTreeNode : public DataTreeFilterFunction
   {
     public:

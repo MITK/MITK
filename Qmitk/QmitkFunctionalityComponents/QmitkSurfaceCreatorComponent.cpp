@@ -195,7 +195,7 @@ QWidget* QmitkSurfaceCreatorComponent::CreateContainerWidget(QWidget* parent)
   {
     m_GUI->GetSelectDataGroupBox()->setShown(false);
   }
-   m_GUI->GetTreeNodeSelector()->GetFilter()->SetFilter(mitk::IsBaseDataTypeWithOutBoolProperty<mitk::Image>("isComponentThresholdImage"));
+   m_GUI->GetTreeNodeSelector()->GetFilter()->SetFilter(mitk::IsBaseDataTypeWithoutProperty<mitk::Image>("isComponentThresholdImage"));
   InitSurfaceGUI();
   ShowSurfaceParameter(false);
 
